@@ -4,7 +4,7 @@ LucasArts, the LucasArts logo, STAR WARS and related properties are trademarks i
 the United States and/or in other countries of Lucasfilm Ltd. and/or its affiliates.
 © 1997-2009 Lucasfilm Entertainment Company Ltd. or Lucasfilm Ltd.
 
-byacc, flex, libsmacker, and other third-party libraries and utilities in this
+byacc, flex, libsmacker, PhysicsFS, and other third-party libraries and utilities in this
 repository are subject to their respective licenses.
 
 OpenJKDF2 is Copyright (C) OpenJKDF2 contributors.
