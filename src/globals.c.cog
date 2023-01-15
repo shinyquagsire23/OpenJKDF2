@@ -85,9 +85,12 @@
         fname = os.path.basename(fpath)
         contents = open(fpath, "r").read()
 
-        contents = contents.replace("\n", "\\n")
+        cog.outl("{\"%s\", " % (fpath_,))
 
-        cog.outl("{\"%s\", \"%s\", 0x%x}," % (fpath_, contents, len(contents)))
+        for line in contents.split("\n"):
+            cog.outl("\"%s\"" % (line + "\\n"))
+
+        cog.outl(", 0x%x}," % (len(contents),))
 
     cog.outl("};")
 
