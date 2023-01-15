@@ -882,7 +882,7 @@ yyout 0x00855D94 stdFile_t
 sithCogParse_pSymbolTable 0x008554C0 sithCogSymboltable*
 yacc_linenum 0x00889F0C int
 cog_yacc_loop_depth 0x0054C850 int = 1
-cog_parser_node_stackpos 0x008554C8 int[512]
+cog_parser_node_stackpos 0x008554C8 int[SITHCOG_NODE_STACKDEPTH]
 cogvm_stackpos 0x00855CD8 int
 cogparser_nodes_alloc 0x00855CD0 sith_cog_parser_node*
 cogparser_topnode 0x00855CCC sith_cog_parser_node*
