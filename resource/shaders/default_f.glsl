@@ -44,6 +44,7 @@ vec4 impl_textureGather(sampler2D tex, vec2 uv)
 #define TEX_MODE_16BPP 5
 #define TEX_MODE_BILINEAR_16BPP 6
 
+#define D3DBLEND_ONE             (2)
 #define D3DBLEND_SRCALPHA        (5)
 #define D3DBLEND_INVSRCALPHA     (6)
 
@@ -163,6 +164,21 @@ vec4 bilinear_paletted()
     vec4 c11  = texture(worldPalette, vec2(gIndex.y, 0.5));
     vec4 c10 = texture(worldPalette, vec2(gIndex.z, 0.5));
 
+    if (blend_mode == D3DBLEND_SRCALPHA || blend_mode == D3DBLEND_INVSRCALPHA) {
+        if (gIndex.x == 0.0) {
+            c01.a = 0.0;
+        }
+        if (gIndex.y == 0.0) {
+            c11.a = 0.0;
+        }
+        if (gIndex.z == 0.0) {
+            c10.a = 0.0;
+        }
+        if (gIndex.w == 0.0) {
+            c00.a = 0.0;
+        }
+    }
+
     vec2 filterWeight = pixCoord - originPixCoord;
  
     // Bi-linear mixing:
@@ -170,7 +186,7 @@ vec4 bilinear_paletted()
     vec4 temp1 = mix(c00, c10, filterWeight.x);
     vec4 blendColor = mix(temp1, temp0, filterWeight.y);
 
-    return vec4(blendColor.r, blendColor.g, blendColor.b, 1.0);
+    return vec4(blendColor.r, blendColor.g, blendColor.b, blendColor.a);
 }
 
 vec4 bilinear_paletted_light(float index)
@@ -203,14 +219,30 @@ vec4 bilinear_paletted_light(float index)
     vec4 c11  = texture(worldPalette, vec2(texture(worldPaletteLights, vec2(gIndex.y, light_idx)).r, 0.5));
     vec4 c10 = texture(worldPalette, vec2(texture(worldPaletteLights, vec2(gIndex.z, light_idx)).r, 0.5));
 
+    /*if (blend_mode == D3DBLEND_SRCALPHA || blend_mode == D3DBLEND_INVSRCALPHA) {
+        if (gIndex.x == 0.0) {
+            c01.a = 0.0;
+        }
+        if (gIndex.y == 0.0) {
+            c11.a = 0.0;
+        }
+        if (gIndex.z == 0.0) {
+            c10.a = 0.0;
+        }
+        if (gIndex.w == 0.0) {
+            c00.a = 0.0;
+        }
+    }*/
+
     vec2 filterWeight = pixCoord - originPixCoord;
  
     // Bi-linear mixing:
     vec4 temp0 = mix(c01, c11, filterWeight.x);
     vec4 temp1 = mix(c00, c10, filterWeight.x);
     vec4 blendColor = mix(temp1, temp0, filterWeight.y);
+    vec4 light_mult_quad = vec4(light_mult, light_mult, light_mult, 1.0);
 
-    return vec4(blendColor.r, blendColor.g, blendColor.b, 1.0) * light_mult ;//* (1.0 - light) * light_mult;
+    return vec4(blendColor.r, blendColor.g, blendColor.b, 1.0) * light_mult_quad ;//* (1.0 - light) * light_mult;
 }
 #endif
 
@@ -246,15 +278,13 @@ void main(void)
 #endif
     )
     {
-        if (sampled.r == 0.0 && sampled.g == 0.0 && sampled.b == 0.0 && sampledEmiss.r == 0.0 && sampledEmiss.g == 0.0 && sampledEmiss.b == 0.0 && (blend_mode == D3DBLEND_SRCALPHA || blend_mode == D3DBLEND_INVSRCALPHA))
-            discard;
         sampled_color = vec4(sampled.b, sampled.g, sampled.r, sampled.a);
     }
 #ifdef CAN_BILINEAR_FILTER_16
     else if (tex_mode == TEX_MODE_BILINEAR_16BPP)
     {
-        if (sampled.r == 0.0 && sampled.g == 0.0 && sampled.b == 0.0 && sampledEmiss.r == 0.0 && sampledEmiss.g == 0.0 && sampledEmiss.b == 0.0 && (blend_mode == D3DBLEND_SRCALPHA || blend_mode == D3DBLEND_INVSRCALPHA))
-            discard;
+        //if (sampled.r == 0.0 && sampled.g == 0.0 && sampled.b == 0.0 && sampledEmiss.r == 0.0 && sampledEmiss.g == 0.0 && sampledEmiss.b == 0.0 && (blend_mode == D3DBLEND_SRCALPHA || blend_mode == D3DBLEND_INVSRCALPHA))
+        //    discard;
 
         // Get texture size in pixels:
         vec2 colorTextureSize = vec2(textureSize(tex, 0));
@@ -317,46 +347,62 @@ void main(void)
         // Add more of the emissive color depending on the darkness of the fragment
         color_add = (lightPalval  * light_mult); // * (1.0 - light)
         sampled_color = palval;
-
-        //if (light_worldpalidx == 0.0)
-        //    color_add.a = 0.0;
     }
 #ifdef CAN_BILINEAR_FILTER
     else if (tex_mode == TEX_MODE_BILINEAR)
     {
-        if (index == 0.0 && (blend_mode == D3DBLEND_SRCALPHA || blend_mode == D3DBLEND_INVSRCALPHA))
-            discard;
-        
         sampled_color = bilinear_paletted();
         color_add = bilinear_paletted_light(index);
+
+        if (sampled_color.a < 0.01) {
+            discard;
+        }
     }
 #endif
 
-    //if (blend_mode == D3DBLEND_SRCALPHA)
+    vec4 albedoFactor_copy = albedoFactor;
+
+    if (blend_mode == D3DBLEND_INVSRCALPHA)
     {
-        //if (sampled_color.a < 0.5)
-        //    discard;
+        if (vertex_color.a < 0.01) {
+            discard;
+        }
+        //albedoFactor_copy.a = (1.0 - albedoFactor_copy.a);
+        //vertex_color.a = (1.0 - vertex_color.a);
+        //sampled_color.a = (1.0 - sampled_color.a);
     }
 
     vec4 main_color = (sampled_color * vertex_color);
     vec4 effectAdd_color = vec4(colorEffects_add.r, colorEffects_add.g, colorEffects_add.b, 0.0);
-
+    
+    main_color *= albedoFactor_copy;
     float should_write_normals = 1.0;
     float orig_alpha = main_color.a;
-
-    main_color *= albedoFactor;
+    
 
     //if (blend_mode == D3DBLEND_SRCALPHA || blend_mode == D3DBLEND_INVSRCALPHA)
     {
         should_write_normals = main_color.a;
     }
 
+    
+
+    if (main_color.a < 0.01 && sampledEmiss.r == 0.0 && sampledEmiss.g == 0.0 && sampledEmiss.b == 0.0) {
+        discard;
+    }
+    
     if (blend_mode == D3DBLEND_INVSRCALPHA)
     {
         main_color.rgb *= (1.0 - main_color.a);
         main_color.a = (1.0 - main_color.a);
+        //sampledEmiss.rgb *= main_color.a;
+        //main_color.a = 0.0;
+
         //orig_alpha = main_color.a;
         //main_color.rgb += (main_color.rgb * (2.0 + main_color.a));
+        //if (main_color.a < 0.01) {
+        //    discard;
+        //}
     }
 
     //if (sampledEmiss.r != 0.0 || sampledEmiss.g != 0.0 || sampledEmiss.b != 0.0)

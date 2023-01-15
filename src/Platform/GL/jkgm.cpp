@@ -240,6 +240,55 @@ bool loadPngImage(const char *name, int* outWidth, int* outHeight, int* outHasAl
     /* Close the file */
     fclose(fp);
 
+#if 0
+    if (!*outHasAlpha)
+    {
+        GLubyte* outDataConv = (unsigned char*) jkgm_alloc_aligned(width * height * 4);
+        _memset(outDataConv, 0, row_bytes * height);
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < row_bytes/3; j++) {
+                void* ptr = *outData+(row_bytes * i)+(j*3);
+                void* ptrOut = outDataConv+(row_bytes * i)+(j*4);
+                uint32_t* pDatIn = (uint32_t*)ptr;
+                uint32_t* pDatOut = (uint32_t*)ptrOut;
+                uint32_t val = *pDatIn & 0xFFFFFF;
+
+
+                if (val) {
+                    val |= 0xFF000000;
+                }
+                val &= ~0xFF000000;
+
+                *pDatOut = val;
+            }
+        }
+
+        jkgm_aligned_free(*outData);
+        *outData = outDataConv;
+        *outHasAlpha = 1;
+    }
+    else 
+    {
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < row_bytes/4; j++) {
+                void* ptr = *outData+(row_bytes * i)+(j*4);
+                void* ptrOut = *outData+(row_bytes * i)+(j*4);
+                uint32_t* pDatIn = (uint32_t*)ptr;
+                uint32_t* pDatOut = (uint32_t*)ptrOut;
+                uint32_t val = *pDatIn;
+
+
+                if (!(val & 0xFFFFFF)) {
+                    val &= ~0xFF000000;
+                }
+                val &= ~0xFF000000;
+
+                *pDatOut = val;
+            }
+        }
+    }
+#endif
+
     //memset(*outData, 0xFF, row_bytes * height);
  
     /* That's it */

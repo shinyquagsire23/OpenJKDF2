@@ -1211,6 +1211,7 @@ typedef struct rdDDrawSurface
     void* emissive_data;
     void* albedo_data;
     void* displacement_data;
+    void* pDataDepthConverted;
     int skip_jkgm;
     jkgm_cache_entry_t* cache_entry;
 #endif

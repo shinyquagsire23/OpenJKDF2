@@ -474,7 +474,7 @@ int rdCache_SendFaceListToHardware()
                         || tex2_arr_sel->albedo_factor[2] != 0.0
                         || tex2_arr_sel->albedo_factor[3] != 0.0)
                     {
-                        flags_idk_ |= 0;
+                        flags_idk_ |= 0x0;
                     }
                     else {
                         // If a texture is only emissive (blaster shots, etc)

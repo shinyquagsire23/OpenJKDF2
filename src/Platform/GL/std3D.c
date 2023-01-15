@@ -2471,56 +2471,119 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
     if (vbuf->format.format.is16bit)
     {
         texture->is_16bit = 1;
+#if 1
         if (!is_alpha_tex)
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width, height, 0,  GL_RGB, GL_UNSIGNED_SHORT_5_6_5_REV, image_8bpp);
         else
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0,  GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, image_8bpp);
-    }
-    else
-    {
-        texture->is_16bit = 0;
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, image_8bpp);
-    }
+#endif
 
-#if 0
-    void* image_data = malloc(width*height*4);
+#ifdef __NOTDEF_FORMAT_CONVERSION
+        void* image_data = malloc(width*height*4);
     
-    for (int j = 0; j < height; j++)
-    {
-        for (int i = 0; i < width; i++)
+        for (int j = 0; j < height; j++)
         {
-            uint32_t index = (i*height) + j;
-            uint32_t val_rgba = 0xFF000000;
-            
-            if (pal)
+            for (int i = 0; i < width; i++)
             {
-                uint8_t val = image_8bpp[index];
-                val_rgba |= (pal[(val * 3) + 2] << 16);
-                val_rgba |= (pal[(val * 3) + 1] << 8);
-                val_rgba |= (pal[(val * 3) + 0] << 0);
+                uint32_t index = (i*height) + j;
+                uint32_t val_rgba = 0x00000000;
+                
+                uint16_t val = image_16bpp[index];
+                if (!is_alpha_tex) // RGB565
+                {
+                    uint8_t val_a1 = 1;
+                    uint8_t val_r5 = (val >> 11) & 0x1F;
+                    uint8_t val_g6 = (val >> 5) & 0x3F;
+                    uint8_t val_b5 = (val >> 0) & 0x1F;
+
+                    uint8_t val_a8 = val_a1 ? 0xFF : 0x0;
+                    uint8_t val_r8 = ( val_r5 * 527 + 23 ) >> 6;
+                    uint8_t val_g8 = ( val_g6 * 259 + 33 ) >> 6;
+                    uint8_t val_b8 = ( val_b5 * 527 + 23 ) >> 6;
+
+#ifdef __NOTDEF_TRANSPARENT_BLACK
+                    uint8_t transparent_r8 = (vbuf->transparent_color >> 16) & 0xFF;
+                    uint8_t transparent_g8 = (vbuf->transparent_color >> 8) & 0xFF;
+                    uint8_t transparent_b8 = (vbuf->transparent_color >> 0) & 0xFF;
+
+                    if (val_r8 == transparent_r8 && val_g8 == transparent_g8 && val_b8 == transparent_b8) {
+                        val_a1 = 0;
+                    }
+#endif // __NOTDEF_TRANSPARENT_BLACK
+
+                    val_rgba |= (val_a8 << 24);
+                    val_rgba |= (val_b8 << 16);
+                    val_rgba |= (val_g8 << 8);
+                    val_rgba |= (val_r8 << 0);
+                }
+                else // RGB1555
+                {
+                    uint8_t val_a1 = (val >> 15);
+                    uint8_t val_r5 = (val >> 10) & 0x1F;
+                    uint8_t val_g5 = (val >> 5) & 0x1F;
+                    uint8_t val_b5 = (val >> 0) & 0x1F;
+
+                    uint8_t val_a8 = val_a1 ? 0xFF : 0x0;
+                    uint8_t val_r8 = ( val_r5 * 527 + 23 ) >> 6;
+                    uint8_t val_g8 = ( val_g5 * 527 + 23 ) >> 6;
+                    uint8_t val_b8 = ( val_b5 * 527 + 23 ) >> 6;
+
+                    val_rgba |= (val_a8 << 24);
+                    val_rgba |= (val_b8 << 16);
+                    val_rgba |= (val_g8 << 8);
+                    val_rgba |= (val_r8 << 0);
+                }
+                    
+                *(uint32_t*)(image_data + index*4) = val_rgba;
             }
-            else
-            {
-                uint8_t val = image_8bpp[index];
-                rdColor24* pal_master = (rdColor24*)sithWorld_pCurrentWorld->colormaps->colors;//stdDisplay_gammaPalette;
-                rdColor24* color = &pal_master[val];
-                val_rgba |= (color->r << 16);
-                val_rgba |= (color->g << 8);
-                val_rgba |= (color->b << 0);
-            }
-            
-            *(uint32_t*)(image_data + index*4) = val_rgba;
         }
         
-        
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, image_data);
+
+        texture->pDataDepthConverted = image_data;
+#endif // __NOTDEF_FORMAT_CONVERSION
     }
+    else {
+#if 0
+        void* image_data = malloc(width*height*4);
     
-    glBindTexture(GL_TEXTURE_2D, image_texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+        for (int j = 0; j < height; j++)
+        {
+            for (int i = 0; i < width; i++)
+            {
+                uint32_t index = (i*height) + j;
+                uint32_t val_rgba = 0xFF000000;
+                
+                if (pal)
+                {
+                    uint8_t val = image_8bpp[index];
+                    val_rgba |= (pal[(val * 3) + 2] << 16);
+                    val_rgba |= (pal[(val * 3) + 1] << 8);
+                    val_rgba |= (pal[(val * 3) + 0] << 0);
+                }
+                else
+                {
+                    uint8_t val = image_8bpp[index];
+                    rdColor24* pal_master = (rdColor24*)sithWorld_pCurrentWorld->colormaps->colors;//stdDisplay_gammaPalette;
+                    rdColor24* color = &pal_master[val];
+                    val_rgba |= (color->r << 16);
+                    val_rgba |= (color->g << 8);
+                    val_rgba |= (color->b << 0);
+                }
+                
+                *(uint32_t*)(image_data + index*4) = val_rgba;
+            }
+        }
+        
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+
+        texture->pDataDepthConverted = image_data;
 #endif
+        texture->is_16bit = 0;
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, image_8bpp);
+
+        texture->pDataDepthConverted = NULL;
+    }
 
     
 done_load:    
@@ -2648,6 +2711,11 @@ void std3D_PurgeTextureEntry(int i) {
 
     rdDDrawSurface* tex = std3D_aLoadedSurfaces[i];
     if (!tex) return;
+
+    if (tex->pDataDepthConverted != NULL) {
+        free(tex->pDataDepthConverted);
+        tex->pDataDepthConverted = NULL;
+    }
 
     if (tex->albedo_data != NULL) {
         //jkgm_aligned_free(tex->albedo_data);
