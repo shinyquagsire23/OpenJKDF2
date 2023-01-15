@@ -273,50 +273,11 @@ void main(void)
         sampled_color = vec4(1.0, 1.0, 1.0, 1.0);
     }
     else if (tex_mode == TEX_MODE_16BPP
-#ifndef CAN_BILINEAR_FILTER_16
     || tex_mode == TEX_MODE_BILINEAR_16BPP
-#endif
     )
     {
         sampled_color = vec4(sampled.b, sampled.g, sampled.r, sampled.a);
     }
-#ifdef CAN_BILINEAR_FILTER_16
-    else if (tex_mode == TEX_MODE_BILINEAR_16BPP)
-    {
-        //if (sampled.r == 0.0 && sampled.g == 0.0 && sampled.b == 0.0 && sampledEmiss.r == 0.0 && sampledEmiss.g == 0.0 && sampledEmiss.b == 0.0 && (blend_mode == D3DBLEND_SRCALPHA || blend_mode == D3DBLEND_INVSRCALPHA))
-        //    discard;
-
-        // Get texture size in pixels:
-        vec2 colorTextureSize = vec2(textureSize(tex, 0));
-
-        // Convert UV coordinates to pixel coordinates and get pixel index of top left pixel (assuming UVs are relative to top left corner of texture)
-        vec2 pixCoord = adj_texcoords * colorTextureSize - 0.5f;    // First pixel goes from -0.5 to +0.4999 (0.0 is center) last pixel goes from (size - 1.5) to (size - 0.5000001)
-        vec2 originPixCoord = floor(pixCoord);              // Pixel index coordinates of bottom left pixel of set of 4 we will be blending
-
-        // For Gather we want UV coordinates of bottom right corner of top left pixel
-        vec2 gUV = (originPixCoord + 1.0f) / colorTextureSize;
-
-        vec4 gR   = impl_textureGather(tex, gUV, 0);
-        vec4 gG   = impl_textureGather(tex, gUV, 1);
-        vec4 gB   = impl_textureGather(tex, gUV, 2);
-        vec4 gA   = impl_textureGather(tex, gUV, 3);
-
-        vec4 c00   = vec4(gB.w, gG.w, gR.w, gA.w);
-        vec4 c01 = vec4(gB.x, gG.x, gR.x, gA.x);
-        vec4 c11  = vec4(gB.y, gG.y, gR.y, gA.y);
-        vec4 c10 = vec4(gB.z, gG.z, gR.z, gA.z);
-
-        vec2 filterWeight = pixCoord - originPixCoord;
-     
-        // Bi-linear mixing:
-        vec4 temp0 = mix(c01, c11, filterWeight.x);
-        vec4 temp1 = mix(c00, c10, filterWeight.x);
-        vec4 blendColor = mix(temp1, temp0, filterWeight.y);
-
-        sampled_color = vec4(blendColor.r, blendColor.g, blendColor.b, 1.0);
-    }
-#endif
-
     else if (tex_mode == TEX_MODE_WORLDPAL
 #ifndef CAN_BILINEAR_FILTER
     || tex_mode == TEX_MODE_BILINEAR
@@ -395,31 +356,18 @@ void main(void)
     {
         main_color.rgb *= (1.0 - main_color.a);
         main_color.a = (1.0 - main_color.a);
-        //sampledEmiss.rgb *= main_color.a;
-        //main_color.a = 0.0;
-
-        //orig_alpha = main_color.a;
-        //main_color.rgb += (main_color.rgb * (2.0 + main_color.a));
-        //if (main_color.a < 0.01) {
-        //    discard;
-        //}
     }
 
     //if (sampledEmiss.r != 0.0 || sampledEmiss.g != 0.0 || sampledEmiss.b != 0.0)
     {
         color_add.rgb += sampledEmiss.rgb * emissiveFactor * 0.1;
-        //color_add.rgb *= main_color.a;
-        //color_add = vec4(1.0, 1.0, 1.0, 1.0);
     }
 
     if (sampledEmiss.r != 0.0 || sampledEmiss.g != 0.0 || sampledEmiss.b != 0.0)
     {
         color_add_emiss.rgb += sampledEmiss.rgb * 0.1;
-        //color_add_emiss.a = 0.2;
-        //color_add_emiss = vec4(1.0, 1.0, 1.0, 1.0);
     }
 
-    //color_add.a = 0.0;
     fragColor = main_color + effectAdd_color;// + color_add;
 
     color_add.a = orig_alpha;
@@ -443,13 +391,6 @@ void main(void)
     }
 
     vec3 tint = normalize(colorEffects_tint + 1.0) * sqrt(3.0);
-
-    /*if (colorEffects_tint.r > 0.0 || colorEffects_tint.g > 0.0 || colorEffects_tint.b > 0.0)
-    {
-        color_add.r *= (colorEffects_tint.r - (0.5 * (colorEffects_tint.g + colorEffects_tint.b)));
-        color_add.g *= (colorEffects_tint.g - (0.5 * (colorEffects_tint.r + colorEffects_tint.b)));
-        color_add.b *= (colorEffects_tint.b - (0.5 * (colorEffects_tint.g + colorEffects_tint.r)));
-    }*/
 
     color_add.r *= tint.r;
     color_add.g *= tint.g;
