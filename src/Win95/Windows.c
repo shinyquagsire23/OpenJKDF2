@@ -12,6 +12,7 @@
 #include "Main/jkStrings.h"
 #include "jk.h"
 #include "General/stdString.h"
+#include "Cog/sithCog.h"
 
 #include "Main/Main.h"
 #include "Main/InstallHelper.h"
@@ -158,10 +159,25 @@ int Windows_GdiHandler(HWND a1, UINT msg, WPARAM wParam, HWND a4, LRESULT *a5)
         case WM_KEYFIRST:
             if ( wParam == 0x1B )               // ESC
             {
-                if ( jkHud_bChatOpen )
-                    jkHud_idk_time();
+                if (Main_bMotsCompat)
+                {
+                    if (!jkGuiMultiplayer_mpcInfo.pCutsceneCog) {
+                        if ( jkHud_bChatOpen )
+                            jkHud_idk_time();
+                        else
+                            jkMain_do_guistate6();
+                    }
+                    else {
+                        sithCog_SendMessage(jkGuiMultiplayer_mpcInfo.pCutsceneCog,SITH_MESSAGE_ESCAPED,0,0,0,0,0);
+                    }
+                }
                 else
-                    jkMain_do_guistate6();
+                {
+                    if ( jkHud_bChatOpen )
+                        jkHud_idk_time();
+                    else
+                        jkMain_do_guistate6();
+                }
             }
             else if ( wParam > 0x5A && wParam <= 0x5C )// WIN
             {
