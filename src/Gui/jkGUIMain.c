@@ -30,6 +30,7 @@
 #include "stdPlatform.h"
 
 // Added
+extern int jkCredits_cdOverride;
 static wchar_t jkGuiMain_versionBuffer[64];
 
 static int jkGuiMain_bIdk = 1;
@@ -126,6 +127,7 @@ LABEL_12:
                     jkMain_SwitchTo12();
                     break;
                 case 16:
+                    jkCredits_cdOverride = 1; // Added: Simulate disk 1 in menu for jkCredits
                     jkMain_SwitchTo13();
                     break;
 #ifdef QOL_IMPROVEMENTS

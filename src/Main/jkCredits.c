@@ -6,8 +6,12 @@
 #include "Win95/Window.h"
 #include "Win95/stdMci.h"
 #include "Main/jkRes.h"
+#include "Main/jkMain.h"
 
 #include "../jk.h"
+
+// Added: Simulate Disk 1 in menu
+int jkCredits_cdOverride = 0;
 
 static stdVBuffer* jkCredits_pVbufferTmp;
 
@@ -17,6 +21,7 @@ void jkCredits_Startup(char *fpath)
     jkCredits_fontLarge = stdFont_Load("ui\\sft\\creditlarge.sft", 0, 0);
     jkCredits_fontSmall = stdFont_Load("ui\\sft\\creditsmall.sft", 0, 0);
     jkCredits_bInitted = 1;
+    jkCredits_cdOverride = 0; // Added: Simulate Disk 1 in menu
 }
 
 void jkCredits_Shutdown()
@@ -33,6 +38,7 @@ void jkCredits_Shutdown()
     }
     stdStrTable_Free(&jkCredits_table);
     jkCredits_bInitted = 0;
+    jkCredits_cdOverride = 0; // Added: Simulate Disk 1 in menu
 }
 
 // MOTS altered (songs?)
@@ -150,19 +156,20 @@ LABEL_19:
     while ( (intptr_t)v7 < (intptr_t)&jkCredits_aPalette[0x29B] );
     v10 = 0;
     v11 = 0;
-    v12 = &jkCredits_aPalette[0x2A1];
+    v12 = &jkCredits_aPalette[0x2A0];
     do
     {
-        v12 += 3;
         v13 = (uint64_t)(2216757315 * v11) >> 32;
         v11 += 4;
-        *(v12 - 4) = (v13 >> 4 < 0) + (v13 >> 4);
-        *(v12 - 3) = 0;
+        *(v12) = (v13 >> 4 < 0) + (v13 >> 4);
+        *(v12 + 1) = 0;
         v14 = (int)((uint64_t)(2216757315 * v10) >> 32) >> 4;
         v10 += 183;
-        *(v12 - 2) = (v14 < 0) + v14;
+        *(v12 + 2) = (v14 < 0) + v14;
+
+        v12 += 3;
     }
-    while ( (intptr_t)v12 < (intptr_t)&jkCredits_aPalette[0x304] );
+    while ( (intptr_t)v12 < (intptr_t)&jkCredits_aPalette[0x300] );
     stdDisplay_SetMasterPalette(jkCredits_aPalette);
     v15 = stdDisplay_VBufferNew(&Video_menuBuffer.format, 1, 1, jkCredits_aPalette);
     _memcpy(&v26, &Video_menuBuffer.format, sizeof(v26));
@@ -190,18 +197,41 @@ LABEL_19:
         v18 += 256;
     }
     while ( v17 < 0x1B80 );
-    whichCdInserted = jkRes_ReadKey() - 1;
-    if ( whichCdInserted )
+
+    // MOTS added: CD tracks
+    if (!Main_bMotsCompat)
     {
-        if ( whichCdInserted == 1 )
-            stdMci_Play(6u, 7);
+        // Added: Discern the CD number from the episode.
+        whichCdInserted = 0;
+        if(jkMain_pEpisodeEnt)
+            whichCdInserted = jkMain_pEpisodeEnt->cdNum;
+        else if(jkMain_pEpisodeEnt2)
+            whichCdInserted = jkMain_pEpisodeEnt2->cdNum;
+
+        // Added: Simulate disk 1 in menu for jkCredits
+        if (jkCredits_cdOverride) {
+            whichCdInserted = jkCredits_cdOverride;
+            jkCredits_cdOverride = 0;
+        }
+
+        //whichCdInserted = jkRes_ReadKey() - 1; // Removed: Discern the CD number from the episode.
+        if ( whichCdInserted )
+        {
+            if ( whichCdInserted == 1 )
+                stdMci_Play(6u, 7);
+            else
+                stdMci_Play(2u, 3);
+        }
         else
-            stdMci_Play(2u, 3);
+        {
+            stdMci_Play(4u, 5);
+        }
     }
-    else
-    {
-        stdMci_Play(4u, 5);
+    else {
+        stdMci_Play(6, 9);
     }
+    
+
     jkCredits_startMs = pHS->getTimerTick();
     result = 1;
     jkCredits_dword_55AD68 = 0;
