@@ -272,7 +272,7 @@ void stdMci_trackStart(int track)
     }
 
     // Try and convert the OG track numbers to GOG/Steam first
-    if (!stdMci_music && track <= 12)
+    if (!stdMci_music && track <= 12 && !Main_bMotsCompat)
     {
         int track_shifted = track;
         if (cdNum == 1)
