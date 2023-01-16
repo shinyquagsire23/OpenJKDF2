@@ -72,7 +72,12 @@ static jkGuiMenu jkGuiMods_menu = {jkGuiMods_aElements, 0xFFFFFFFF, 0xFFFF, 0xFF
 
 static int jkGuiMods_bInitted;
 
-#if defined(LINUX)
+#if defined(MACOS)
+int jkGuiMods_OpenURL(const char* url)
+{
+    return SDL_OpenURL(url);
+}
+#elif defined(LINUX)
 // Lifted from SDL2
 int jkGuiMods_OpenURL(const char *url)
 {
@@ -119,9 +124,10 @@ int jkGuiMods_OpenURL(const char *url)
              }
         }
     }
+    return 0;
 }
 #else
-int jkGuiMods_OpenURL(const char *url)
+int jkGuiMods_OpenURL(const char* url)
 {
     return SDL_OpenURL(url);
 }
@@ -177,7 +183,9 @@ void jkGuiMods_Show()
             char tmpUrl[512];
             getcwd(tmpCwd, sizeof(tmpCwd));
             snprintf(tmpUrl, sizeof(tmpUrl), "file://%s", tmpCwd);
-            jkGuiMods_OpenURL(tmpUrl);
+
+            SDL_ClearError();
+            int error = jkGuiMods_OpenURL(tmpUrl);
 #endif
         }
         else if ( v4 == JKGUIMODS_BTN_LISTCLICK )
