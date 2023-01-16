@@ -178,7 +178,6 @@ void jkGuiMods_Show()
             getcwd(tmpCwd, sizeof(tmpCwd));
             snprintf(tmpUrl, sizeof(tmpUrl), "file://%s", tmpCwd);
             jkGuiMods_OpenURL(tmpUrl);
-            printf
 #endif
         }
         else if ( v4 == JKGUIMODS_BTN_LISTCLICK )
