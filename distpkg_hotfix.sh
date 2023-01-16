@@ -11,6 +11,7 @@ git stash
 git checkout master
 git pull
 git checkout "$1"
+git pull
 git add org.openjkdf2.OpenJKDF2.yml
 git commit -m "hotfix"
 git push origin "$1"
