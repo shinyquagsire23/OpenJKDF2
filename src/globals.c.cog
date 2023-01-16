@@ -125,8 +125,13 @@ void OpenJKDF2_Globals_Reset()
             c_type = s[0]
             c_type_post = "[" + s[1] 
         
-        cog.outl("%s __%s_origValue%s = %s;" % (c_type, name, c_type_post, c_val))
-        cog.outl("_memcpy(&%s, &__%s_origValue, sizeof(%s));" % (name, name, name))
+        if c_val == "NULL" or c_val == "0" or c_val == "0.0f":
+            cog.outl("%s = %s;" % (name, c_val))
+        if c_val == "{0}":
+            cog.outl("_memset(&%s, 0, sizeof(%s));" % (name, name))
+        else:
+            cog.outl("%s __%s_origValue%s = %s;" % (c_type, name, c_type_post, c_val))
+            cog.outl("_memcpy(&%s, &__%s_origValue, sizeof(%s));" % (name, name, name))
 
 ]]]
 [[[end]]]

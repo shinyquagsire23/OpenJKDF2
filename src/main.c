@@ -161,6 +161,7 @@
 int openjkdf2_bIsKVM = 1;
 int openjkdf2_bRestartToMots = 0;
 int openjkdf2_bRestartToDF2 = 0;
+char openjkdf2_aOrigCwd[1024];
 
 void do_hooks();
 
@@ -199,8 +200,11 @@ int main(int argc, char** argv)
         }
     }
 
+    getcwd(openjkdf2_aOrigCwd, sizeof(openjkdf2_aOrigCwd));
+
     while (1)
     {
+        chdir(openjkdf2_aOrigCwd);
         openjkdf2_bRestartToDF2 = 0;
         openjkdf2_bRestartToMots = 0;
         OpenJKDF2_Globals_Reset();
@@ -418,8 +422,11 @@ int main(int argc, char** argv)
     
     //while (1);
 
+    getcwd(openjkdf2_aOrigCwd, sizeof(openjkdf2_aOrigCwd));
+
     while (1)
     {
+        chdir(openjkdf2_aOrigCwd);
         openjkdf2_bRestartToDF2 = 0;
         openjkdf2_bRestartToMots = 0;
         OpenJKDF2_Globals_Reset();

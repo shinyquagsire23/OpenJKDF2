@@ -423,6 +423,48 @@ void jkGuiRend_Startup()
 void jkGuiRend_Shutdown()
 {
     jkGuiRend_bInitted = 0;
+
+    // Added: Clean reset
+#ifdef QOL_IMPROVEMENTS
+    for (int i = 0; i < 4; i++)
+    {
+        //if ( jkGuiRend_DsoundHandles[i] )
+        //    stdSound_BufferRelease(jkGuiRend_DsoundHandles[i]);
+            
+        //if ( jkGuiRend_LoadedSounds[i] )
+        //    std_pHS->free(jkGuiRend_LoadedSounds[i]);
+    }
+    
+    memset(jkGuiRend_LoadedSounds, 0, sizeof(jkGuiRend_LoadedSounds));
+    memset(jkGuiRend_palette, 0, sizeof(jkGuiRend_palette));
+    memset(jkGuiRend_DsoundHandles, 0, sizeof(jkGuiRend_DsoundHandles));
+
+    jkGuiRend_idk2 = 0;
+    jkGuiRend_idk = 0;
+    jkGuiRend_activeMenu = NULL;
+    jkGuiRend_menuBuffer = NULL;
+    jkGuiRend_texture_dword_8561E8 = NULL;
+
+    jkGuiRend_thing_five = 0;
+    jkGuiRend_thing_four = 0;
+    jkGuiRend_bIsSurfaceValid = 0;
+    jkGuiRend_bInitted = 0;
+    jkGuiRend_bOpen = 0;
+    jkGuiRend_HandlerIsSet = 0;
+    jkGuiRend_fillColor = 0;
+    jkGuiRend_paletteChecksum = 0;
+    jkGuiRend_dword_85620C = 0;
+    jkGuiRend_lastKeyScancode = 0;
+    jkGuiRend_mouseX = 0;
+    jkGuiRend_mouseY = 0;
+    jkGuiRend_bShiftDown = 0;
+    jkGuiRend_mouseXLatest = 0;
+    jkGuiRend_mouseYLatest = 0;
+    jkGuiRend_mouseLatestMs = 0;
+    jkGuiRend_hCursor = 0;
+
+    jkGuiRend_CursorVisible = 1;
+#endif
 }
 
 void jkGuiRend_Open(stdVBuffer *menuBuffer, stdVBuffer *otherBuf, int fillColor)
