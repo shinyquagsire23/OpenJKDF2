@@ -2,6 +2,8 @@
 
 OPENJKDF2_ROOT=$(pwd)
 
+git push origin master
+
 python3 scripts/increment_version_commits.py "$1" $(git log -1 --format="%H")
 
 cd $OPENJKDF2_ROOT/../org.openjkdf2.OpenJKDF2/
