@@ -228,7 +228,7 @@ int Main_Startup(const char *cmdline)
     Video_modeStruct.Video_8606B8 = 0;
     Video_modeStruct.Video_8606BC = 0;
     Video_modeStruct.Video_8606C0 = 0;
-    Main_path[0] = 0;
+    //Main_path[0] = 0; // Added: We reset this elsewhere
     Main_bWindowGUI = 1;
     Main_bDisplayConfig = 0;
     Main_dword_86078C = 0;
@@ -239,6 +239,7 @@ int Main_Startup(const char *cmdline)
     Main_verboseLevel = 0;
     Main_bDevMode = 0;
     jkGuiSound_musicVolume = 1.0;
+    printf("%s\n", Main_path);
     Main_ParseCmdLine((char *)cmdline);
 
     if ( Main_logLevel == 1 )

@@ -167,6 +167,7 @@ int openjkdf2_bOrigWasDF2 = 0;
 int openjkdf2_bIsKVM = 1;
 int openjkdf2_restartMode = OPENJKDF2_RESTART_NONE;
 char openjkdf2_aOrigCwd[1024];
+char openjkdf2_aRestartPath[256];
 
 void do_hooks();
 
@@ -298,9 +299,15 @@ int main(int argc, char** argv)
 
     while (1)
     {
-        openjkdf2_restartMode = OPENJKDF2_RESTART_NONE;
         OpenJKDF2_Globals_Reset();
 
+        // Set the mod path
+        if (openjkdf2_restartMode == OPENJKDF2_RESTART_PATH) {
+            stdString_SafeStrCopy(Main_path, openjkdf2_aRestartPath, 128);
+        }
+
+        openjkdf2_restartMode = OPENJKDF2_RESTART_NONE;
+        memset(openjkdf2_aRestartPath, 0, sizeof(openjkdf2_aRestartPath));
         Window_Main_Linux(argc, argv);
 
         printf("openjkdf2_bOrigWasRunningFromExistingInstall %x\n", openjkdf2_bOrigWasRunningFromExistingInstall);
@@ -340,6 +347,9 @@ int main(int argc, char** argv)
         }
         else if (openjkdf2_restartMode == OPENJKDF2_RESTART_DF2) {
             Main_bMotsCompat = 0;
+            continue;
+        }
+        else if (openjkdf2_restartMode == OPENJKDF2_RESTART_PATH) {
             continue;
         }
 

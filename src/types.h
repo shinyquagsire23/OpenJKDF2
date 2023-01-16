@@ -632,6 +632,7 @@ extern int openjkdf2_bIsRunningFromExistingInstall;
 extern int openjkdf2_bOrigWasRunningFromExistingInstall;
 extern int openjkdf2_bOrigWasDF2;
 extern int openjkdf2_restartMode;
+extern char openjkdf2_aRestartPath[256];
 extern int Main_bMotsCompat;
 extern int Main_bDwCompat;
 #define SITH_MESSAGE_MAX (Main_bMotsCompat ? 47 : 41)

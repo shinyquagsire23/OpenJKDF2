@@ -42,8 +42,17 @@
 
 typedef struct jkGuiModsElement_t
 {
+    int type;
     const char* paPath;
 } jkGuiModsElement_t;
+
+enum jkGuiModsType_t
+{
+    JKGUIMODS_TYPE_NONE = 0,
+    JKGUIMODS_TYPE_RESTART = 1,
+    JKGUIMODS_TYPE_EXPANSION = 2,
+    JKGUIMODS_TYPE_GOB = 3,
+};
 
 enum jkGuiModsButton_t
 {
@@ -156,7 +165,7 @@ void jkGuiMods_Show()
     int v4; // eax
     const char *v6; // eax
     int v7; // esi
-    void *i; // eax
+    jkGuiModsElement_t *i; // eax
     int v9; // [esp+10h] [ebp-15Ch]
     Darray darray; // [esp+14h] [ebp-158h] BYREF
     char v11[64]; // [esp+2Ch] [ebp-140h] BYREF
@@ -191,34 +200,56 @@ void jkGuiMods_Show()
         else if ( v4 == JKGUIMODS_BTN_LISTCLICK )
         {
             jkGuiModsElement_t* pListElement = (jkGuiModsElement_t*)jkGuiRend_GetId(&darray, jkGuiMods_aElements[1].selectedTextEntry);
-            snprintf(v12, 256, "mods%c%s", '\\', pListElement->paPath); // Added: sprintf -> snprintf
-
-            printf("Selected entry %u, %s\n", jkGuiMods_aElements[1].selectedTextEntry, v12);
-            if (!strcmp(pListElement->paPath, "OPENJKDF2_RESTART_DF2"))
+            
+            if (pListElement->type == JKGUIMODS_TYPE_RESTART)
             {
+                if (!strcmp(pListElement->paPath, "OPENJKDF2_RESTART_DF2"))
+                {
+                    g_should_exit = 1;
+                    Main_path[0] = 0;
+                    openjkdf2_restartMode = OPENJKDF2_RESTART_DF2;
+                    break;
+                }
+                else if (!strcmp(pListElement->paPath, "OPENJKDF2_RESTART_MOTS"))
+                {
+                    g_should_exit = 1;
+                    Main_path[0] = 0;
+                    openjkdf2_restartMode = OPENJKDF2_RESTART_MOTS;
+                    break;
+                }
+            }
+            else if (pListElement->type == JKGUIMODS_TYPE_EXPANSION)
+            {
+                snprintf(v12, 256, "expansions%c%s", LEC_PATH_SEPARATOR_CHR, pListElement->paPath); // Added: sprintf -> snprintf
+
+                printf("Selected entry %u, %s\n", jkGuiMods_aElements[1].selectedTextEntry, v12);
+
+                strncpy(openjkdf2_aRestartPath, v12, sizeof(openjkdf2_aRestartPath));
+
                 g_should_exit = 1;
-                openjkdf2_restartMode = OPENJKDF2_RESTART_DF2;
+                openjkdf2_restartMode = OPENJKDF2_RESTART_PATH;
                 break;
             }
-            else if (!strcmp(pListElement->paPath, "OPENJKDF2_RESTART_MOTS"))
+            else if (pListElement->type == JKGUIMODS_TYPE_GOB)
             {
-                g_should_exit = 1;
-                openjkdf2_restartMode = OPENJKDF2_RESTART_MOTS;
-                break;
+                snprintf(v12, 256, "mods%c%s", LEC_PATH_SEPARATOR_CHR, pListElement->paPath); // Added: sprintf -> snprintf
+
+                printf("Selected entry %u, %s\n", jkGuiMods_aElements[1].selectedTextEntry, v12);
             }
         }
     }
     while ( v4 != -1 );
 
     v7 = 0;
-    for ( i = (void *)jkGuiRend_GetId(&darray, 0); i; i = (void *)jkGuiRend_GetId(&darray, v7) )
+    for ( i = (jkGuiModsElement_t *)jkGuiRend_GetId(&darray, 0); i; i = (jkGuiModsElement_t *)jkGuiRend_GetId(&darray, v7) )
     {
+        pHS->free(i->paPath);
         pHS->free(i);
         ++v7;
     }
 }
 
-void jkGuiMods_AddEntry(Darray *pListDisplayed, jkGuiElement *pElement, const char* paVal, const char* paDisplayed)
+void jkGuiMods_AddEntry(Darray *pListDisplayed, int type, const char* paVal, const char* paDisplayed)
 {
     size_t alloc_sz = (_strlen(paDisplayed) + 1) * sizeof(wchar_t);
 
@@ -227,7 +258,11 @@ void jkGuiMods_AddEntry(Darray *pListDisplayed, jkGuiElement *pElement, const ch
 
     jkGuiModsElement_t* pListElement = (jkGuiModsElement_t*)pHS->alloc(sizeof(jkGuiModsElement_t));
     memset(pListElement, 0, sizeof(jkGuiModsElement_t));
-    pListElement->paPath = paVal;
+    
+    char* paValNew = (char*)pHS->alloc(_strlen(paVal) + 1);
+    stdString_SafeStrCopy(paValNew, paVal, _strlen(paVal)+1);
+    pListElement->type = type;
+    pListElement->paPath = paValNew;
 
     stdString_CharToWchar(out, paDisplayed, _strlen(paDisplayed));
     jkGuiRend_DarrayReallocStr(pListDisplayed, out, (intptr_t)pListElement);
@@ -254,32 +289,51 @@ void jkGuiMods_PopulateEntries(Darray *pListDisplayed, jkGuiElement *element)
     if (!Main_bMotsCompat)
     {
         if (!(!openjkdf2_bOrigWasDF2 && openjkdf2_bOrigWasRunningFromExistingInstall) && (keyval == 0 || !JKRES_IS_MOTS_MAGIC(keyval))) {
-            jkGuiMods_AddEntry(pListDisplayed, element, "OPENJKDF2_RESTART_MOTS", "Install Mysteries of the Sith");
+            jkGuiMods_AddEntry(pListDisplayed, JKGUIMODS_TYPE_RESTART, "OPENJKDF2_RESTART_MOTS", "Install Mysteries of the Sith");
         }
         else {
-            jkGuiMods_AddEntry(pListDisplayed, element, "OPENJKDF2_RESTART_MOTS", "Launch Mysteries of the Sith");
+            jkGuiMods_AddEntry(pListDisplayed, JKGUIMODS_TYPE_RESTART, "OPENJKDF2_RESTART_MOTS", "Launch Mysteries of the Sith");
         }
     }
-    else
+    else if (Main_bMotsCompat && Main_path[0])
     {
-        if (!(openjkdf2_bOrigWasDF2 && openjkdf2_bOrigWasRunningFromExistingInstall) && (keyval == 0 || !JKRES_IS_DF2_MAGIC(keyval))) {
-            jkGuiMods_AddEntry(pListDisplayed, element, "OPENJKDF2_RESTART_DF2", "Install Dark Forces II");
-        }
-        else {
-            jkGuiMods_AddEntry(pListDisplayed, element, "OPENJKDF2_RESTART_DF2", "Launch Dark Forces II");
-        }
+        jkGuiMods_AddEntry(pListDisplayed, JKGUIMODS_TYPE_RESTART, "OPENJKDF2_RESTART_MOTS", "Return to Mysteries of the Sith");
     }
     
-
+    if (Main_bMotsCompat)
+    {
+        if (!(openjkdf2_bOrigWasDF2 && openjkdf2_bOrigWasRunningFromExistingInstall) && (keyval == 0 || !JKRES_IS_DF2_MAGIC(keyval))) {
+            jkGuiMods_AddEntry(pListDisplayed, JKGUIMODS_TYPE_RESTART, "OPENJKDF2_RESTART_DF2", "Install Dark Forces II");
+        }
+        else {
+            jkGuiMods_AddEntry(pListDisplayed, JKGUIMODS_TYPE_RESTART, "OPENJKDF2_RESTART_DF2", "Launch Dark Forces II");
+        }
+    }
+    else if (!Main_bMotsCompat && Main_path[0])
+    {
+        jkGuiMods_AddEntry(pListDisplayed, JKGUIMODS_TYPE_RESTART, "OPENJKDF2_RESTART_DF2", "Return to Dark Forces II");
+    }
+    
     stdFileSearchResult modResult;
-    stdFileSearch* pSearch = stdFileUtil_NewFind("mods", 3, JKRES_GOB_EXT);
+    stdFileSearch* pSearch = stdFileUtil_NewFind("expansions", 2, NULL);
     while (stdFileUtil_FindNext(pSearch, &modResult))
     {
         if ( modResult.fpath[0] != '.' )
         {
-            jkGuiMods_AddEntry(pListDisplayed, element, modResult.fpath, modResult.fpath);
+            jkGuiMods_AddEntry(pListDisplayed, JKGUIMODS_TYPE_EXPANSION, modResult.fpath, modResult.fpath);
         }
     }
+    stdFileUtil_DisposeFind(pSearch);
+
+    pSearch = stdFileUtil_NewFind("mods", 3, JKRES_GOB_EXT);
+    while (stdFileUtil_FindNext(pSearch, &modResult))
+    {
+        if ( modResult.fpath[0] != '.' )
+        {
+            jkGuiMods_AddEntry(pListDisplayed, JKGUIMODS_TYPE_GOB, modResult.fpath, modResult.fpath);
+        }
+    }
+    stdFileUtil_DisposeFind(pSearch);
 
     jkGuiRend_AddStringEntry(pListDisplayed, 0, 0);
     jkGuiRend_SetClickableString(element, pListDisplayed);
