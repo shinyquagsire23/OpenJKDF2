@@ -1,6 +1,8 @@
 #!/bin/zsh
 
 export PATH="${HOMEBREW_PREFIX}/opt/llvm/bin:$PATH"
+export OPENJKDF2_RELEASE_COMMIT=$(git log -1 --format="%H")
+export OPENJKDF2_RELEASE_COMMIT_SHORT=$(git rev-parse --short=8 HEAD)
 
 #cp DF2/player_bak/Max/Max.plr ~/.local/share/openjkdf2/player/Max/Max.plr
 #OPENJKDF2_NO_ASAN=1 DEBUG_QOL_CHEATS=1 make -f Makefile.macos -j10 &&
