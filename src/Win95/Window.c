@@ -1257,8 +1257,11 @@ int Window_Main_Linux(int argc, char** argv)
     while (1)
     {
         Window_Main_Loop();
+        if (g_should_exit) break;
     }
 #endif
+
+    Main_Shutdown();
 }
 
 int Window_Main(HINSTANCE hInstance, int a2, char *lpCmdLine, int nShowCmd, LPCSTR lpWindowName)

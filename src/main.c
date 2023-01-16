@@ -159,6 +159,8 @@
 #include "stdPlatform.h"
 
 int openjkdf2_bIsKVM = 1;
+int openjkdf2_bRestartToMots = 0;
+int openjkdf2_bRestartToDF2 = 0;
 
 void do_hooks();
 
@@ -197,7 +199,38 @@ int main(int argc, char** argv)
         }
     }
 
-    Window_Main_Linux(argc, argv);
+    while (1)
+    {
+        openjkdf2_bRestartToDF2 = 0;
+        openjkdf2_bRestartToMots = 0;
+        OpenJKDF2_Globals_Reset();
+
+        Window_Main_Linux(argc, argv);
+
+        if (openjkdf2_bRestartToMots || openjkdf2_bRestartToDF2) {
+            for (int i = 1; i < argc; i++) {
+                if (!__strcmpi(argv[i], "-motsCompat") || !__strcmpi(argv[i], "/motsCompat")) {
+                    argv[i] = "";
+                }
+                else if (!__strcmpi(argv[i], "-path") || !__strcmpi(argv[i], "/path")) {
+                    argv[i] = "";
+                    argv[i+1] = "";
+                }
+            }
+        }
+
+        if (openjkdf2_bRestartToMots) {
+            Main_bMotsCompat = 1;
+            continue;
+        }
+        if (openjkdf2_bRestartToDF2) {
+            Main_bMotsCompat = 0;
+            continue;
+        }
+
+        break;
+    }
+    return 1;
 }
 #endif
 
@@ -385,7 +418,38 @@ int main(int argc, char** argv)
     
     //while (1);
 
-    Window_Main_Linux(argc, argv);
+    while (1)
+    {
+        openjkdf2_bRestartToDF2 = 0;
+        openjkdf2_bRestartToMots = 0;
+        OpenJKDF2_Globals_Reset();
+
+        Window_Main_Linux(argc, argv);
+
+        if (openjkdf2_bRestartToMots || openjkdf2_bRestartToDF2) {
+            for (int i = 1; i < argc; i++) {
+                if (!__strcmpi(argv[i], "-motsCompat") || !__strcmpi(argv[i], "/motsCompat")) {
+                    argv[i] = "";
+                }
+                else if (!__strcmpi(argv[i], "-path") || !__strcmpi(argv[i], "/path")) {
+                    argv[i] = "";
+                    argv[i+1] = "";
+                }
+            }
+        }
+
+        if (openjkdf2_bRestartToMots) {
+            Main_bMotsCompat = 1;
+            continue;
+        }
+        if (openjkdf2_bRestartToDF2) {
+            Main_bMotsCompat = 0;
+            continue;
+        }
+
+        break;
+    }
+    return 1;
 }
 
 #endif

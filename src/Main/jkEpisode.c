@@ -33,6 +33,7 @@ void jkEpisode_Shutdown()
     for (int i = 0; i < 64; i++) {
         jkPlayer_aBubbleInfo[i].pThing = 0;
     }
+    jkEpisode_numBubbles = 0; // Added
 #endif
 }
 

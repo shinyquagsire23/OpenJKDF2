@@ -14,5 +14,7 @@ int jkGob_Startup()
 
 void jkGob_Shutdown()
 {
+#ifndef SDL2_RENDER
     jk_ChangeDisplaySettingsA(0, 0);
+#endif
 }

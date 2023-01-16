@@ -37,6 +37,7 @@ int jkControl_Startup()
 
 int jkControl_Shutdown()
 {
+    sithControl_Shutdown(); // Added
     jkControl_bInit = 0;
     return 1;
 }

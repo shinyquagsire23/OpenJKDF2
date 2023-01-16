@@ -31,6 +31,7 @@
 #include "Gui/jkGUISaveLoad.h"
 #include "Gui/jkGUIRend.h"
 #include "Gui/jkGUI.h"
+#include "Gui/jkGUIMods.h"
 #include "World/jkPlayer.h"
 #include "Gameplay/jkSaber.h"
 #include "Win95/std.h"
@@ -327,6 +328,9 @@ int Main_Startup(const char *cmdline)
         jkGuiBuildMulti_Startup();
         jkGuiSaveLoad_Startup();
         jkGuiControlSaveLoad_Startup();
+#ifdef QOL_IMPROVEMENTS
+        jkGuiMods_Startup();
+#endif
 #ifndef LINUX_TMP
         smack_Startup(); // TODO
 #endif
@@ -398,12 +402,16 @@ void Main_Shutdown()
     jkGuiSound_Shutdown();
     jkGuiObjectives_Shutdown();
     jkGuiSingleTally_Shutdown();
+#ifdef QOL_IMPROVEMENTS
+    jkGuiMods_Shutdown();
+#endif
     jkGuiRend_Shutdown();
     jkCog_Shutdown();
     sithMain_Free();
     jkCredits_Shutdown();
     jkCutscene_Shutdown();
     jkDSS_Shutdown();
+    jkControl_Shutdown(); // Added
     jkHudInv_Shutdown();
     if ( jkCutscene_isRendering )
         jkCutscene_sub_421410();
@@ -411,7 +419,9 @@ void Main_Shutdown()
     jkGame_Shutdown();
     jkDev_Shutdown();
     sithMain_Shutdown();
+#ifndef LINUX_TMP
     smack_Shutdown();
+#endif
     jkGui_Shutdown();
     rdShutdown();
     jkStrings_Shutdown();
@@ -428,7 +438,11 @@ void Main_Shutdown()
         fclose((FILE*)debug_log_fp);
     }
     
+    jkPlayer_ResetVars(); // Added
+
+#ifndef QOL_IMPROVEMENTS
     exit(0);
+#endif
 }
 
 // Inlined?

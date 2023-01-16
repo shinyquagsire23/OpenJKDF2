@@ -166,7 +166,9 @@ void jkGui_Shutdown()
     playerShortName[31] = 0;
     wuRegistry_SetString("playerShortName", playerShortName);
 
+#ifndef SDL2_RENDER
     stdDisplay_422A50();
+#endif
     jkGui_bInitialized = 0;
 }
 

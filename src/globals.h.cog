@@ -132,6 +132,8 @@ typedef struct embeddedResource_t
 
 #endif
 
+extern void OpenJKDF2_Globals_Reset();
+
 // Embed
 [[[cog
     import cog

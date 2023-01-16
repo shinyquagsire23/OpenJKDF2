@@ -32,6 +32,7 @@
 #include "General/stdJSON.h"
 #include "Platform/std3D.h"
 
+// DO NOT FORGET TO ADD TO jkPlayer_ResetVars()
 #ifdef QOL_IMPROVEMENTS
 int jkPlayer_fov = 90;
 int jkPlayer_fovIsVertical = 1;
@@ -140,6 +141,38 @@ int jkPlayer_aMotsFpBins[74] =
     -1,
     0
 };
+
+// Added: Clean reset
+void jkPlayer_ResetVars()
+{
+#ifdef QOL_IMPROVEMENTS
+    jkPlayer_fov = 90;
+    jkPlayer_fovIsVertical = 1;
+    jkPlayer_enableTextureFilter = 0;
+    jkPlayer_enableOrigAspect = 0;
+    jkPlayer_enableBloom = 0;
+    jkPlayer_enableSSAO = 0;
+    jkPlayer_fpslimit = 0;
+    jkPlayer_enableVsync = 0;
+    jkPlayer_ssaaMultiple = 1.0;
+    jkPlayer_gamma = 1.0;
+    jkPlayer_bEnableJkgm = 1;
+    jkPlayer_bEnableTexturePrecache = 1;
+    jkPlayer_bKeepCorpses = 0;
+    jkPlayer_bFastMissionText = 0;
+#endif
+
+#ifdef FIXED_TIMESTEP_PHYS
+    jkPlayer_bJankyPhysics = 0;
+#endif
+
+#ifdef JKM_DSS
+    memset(jkPlayer_aMotsInfos, 0, sizeof(jkPlayer_aMotsInfos));
+    memset(jkPlayer_aBubbleInfo, 0, sizeof(jkPlayer_aBubbleInfo));
+    jkPlayer_personality = 0;
+    memset(jkPlayer_aMultiParams, 0, sizeof(jkPlayer_aMultiParams));
+#endif
+}
 
 int jkPlayer_LoadAutosave()
 {

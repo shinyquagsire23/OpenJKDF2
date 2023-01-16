@@ -618,6 +618,8 @@ enum SithCogFlag
     SITH_COG_NO_SYNC = 0x200,
 };
 
+extern int openjkdf2_bRestartToMots;
+extern int openjkdf2_bRestartToDF2;
 extern int Main_bMotsCompat;
 extern int Main_bDwCompat;
 #define SITH_MESSAGE_MAX (Main_bMotsCompat ? 47 : 41)

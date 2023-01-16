@@ -110,6 +110,84 @@ void jkCutscene_Shutdown()
         jkCutscene_subtitlefont = 0;
     }
     stdStrTable_Free(&jkCutscene_strings); // MOTS removed
+
+    // Added: Clean shutdown
+#ifdef QOL_IMPROVEMENTS
+#ifdef SDL2_RENDER
+    for (int i = 0; i < AUDIO_QUEUE_DEPTH; i++) {
+        if (jkCutscene_audio_queue[i])
+            free(jkCutscene_audio_queue[i]);
+
+        jkCutscene_audio_queue[i] = NULL;
+        jkCutscene_audio_queue_lens[i] = 0;
+    }
+    if (jkCutscene_audio_buf) {
+        free(jkCutscene_audio_buf);
+        jkCutscene_audio_buf = NULL;
+    }
+    if (jkCutscene_audio) {
+        stdSound_BufferRelease(jkCutscene_audio);
+        jkCutscene_audio = NULL;
+    }
+    if (jkCutscene_audio2) {
+        stdSound_BufferRelease(jkCutscene_audio2);
+        jkCutscene_audio2 = NULL;
+    }
+    if (jkCutscene_audio3) {
+        stdSound_BufferRelease(jkCutscene_audio3);
+        jkCutscene_audio3 = NULL;
+    }
+    //stdSound_BufferRelease(jkCutscene_audio2);
+    if (jkCutscene_audioFull) {
+        stdSound_BufferRelease(jkCutscene_audioFull);
+        jkCutscene_audioFull = NULL;
+    }
+    if (jkCutscene_pSmush) {
+        smush_destroy(jkCutscene_pSmush);
+        jkCutscene_pSmush = NULL;
+    }
+    else {
+        //smk_close(jkCutscene_smk);
+    }
+
+    if (jkCutscene_frameBuf) {
+        stdDisplay_VBufferFree(jkCutscene_frameBuf);
+        jkCutscene_frameBuf = NULL;
+    }
+#endif
+
+    jkCutscene_pSmush = NULL;
+    memset(&jkCutscene_smk, 0, sizeof(jkCutscene_smk));
+    jkCutscene_smk_usf = 0;
+    jkCutscene_smk_w = 0;
+    jkCutscene_smk_h = 0;
+    jkCutscene_smk_frames = 0;
+    jkCutscene_frameBuf = NULL;
+    jkCutscene_palette = NULL;
+    //jkCutscene_audioBuf = NULL;
+    jkCutscene_audio = NULL;
+    jkCutscene_audio2 = NULL;
+    jkCutscene_audio3 = NULL;
+    jkCutscene_audioFull = NULL;
+    jkCutscene_audioFlip = 0;
+
+    last_displayFrame = 0;
+    last_audioUs = 0;
+    extraUs = 0;
+
+    jkCutscene_audio_us = 0.0;
+    jkCutscene_audio_us_slop = 0.0;
+
+    jkCutscene_audio_buf = NULL;
+    jkCutscene_audio_pos = NULL;
+    jkCutscene_audio_len = 0;
+
+    memset(jkCutscene_audio_queue, 0, sizeof(jkCutscene_audio_queue));
+    memset(jkCutscene_audio_queue_lens, 0, sizeof(jkCutscene_audio_queue_lens));
+    jkCutscene_audio_queue_read_idx = 0;
+    jkCutscene_audio_queue_write_idx = 0;
+#endif
+
     jkCutscene_bInitted = 0;
 }
 
@@ -340,17 +418,27 @@ int jkCutscene_sub_421410()
         jkCutscene_audio_queue[i] = NULL;
         jkCutscene_audio_queue_lens[i] = 0;
     }
-    if (jkCutscene_audio_buf)
+    if (jkCutscene_audio_buf) {
         free(jkCutscene_audio_buf);
-    if (jkCutscene_audio)
+        jkCutscene_audio_buf = NULL;
+    }
+    if (jkCutscene_audio) {
         stdSound_BufferRelease(jkCutscene_audio);
-    if (jkCutscene_audio2)
+        jkCutscene_audio = NULL;
+    }
+    if (jkCutscene_audio2) {
         stdSound_BufferRelease(jkCutscene_audio2);
-    if (jkCutscene_audio3)
+        jkCutscene_audio2 = NULL;
+    }
+    if (jkCutscene_audio3) {
         stdSound_BufferRelease(jkCutscene_audio3);
+        jkCutscene_audio3 = NULL;
+    }
     //stdSound_BufferRelease(jkCutscene_audio2);
-    if (jkCutscene_audioFull)
+    if (jkCutscene_audioFull) {
         stdSound_BufferRelease(jkCutscene_audioFull);
+        jkCutscene_audioFull = NULL;
+    }
     if (jkCutscene_pSmush) {
         smush_destroy(jkCutscene_pSmush);
         jkCutscene_pSmush = NULL;
@@ -358,8 +446,11 @@ int jkCutscene_sub_421410()
     else {
         smk_close(jkCutscene_smk);
     }
-    stdDisplay_VBufferFree(jkCutscene_frameBuf);
-    jkCutscene_frameBuf = NULL;
+
+    if (jkCutscene_frameBuf) {
+        stdDisplay_VBufferFree(jkCutscene_frameBuf);
+        jkCutscene_frameBuf = NULL;
+    }
 #endif
 
     last_displayFrame = 0;

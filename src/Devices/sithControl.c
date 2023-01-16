@@ -136,6 +136,24 @@ int sithControl_Shutdown()
     if ( !sithControl_bInitted )
         return 0;
     stdControl_Shutdown();
+
+#ifdef QOL_IMPROVEMENTS
+    // Added
+    sithControl_followingPlayer = 0;
+    sithControl_curDebugCam = 0;
+    memset(sithControl_debugWStrTmp, 0, sizeof(sithControl_debugWStrTmp));
+
+    // MOTS added
+    sithControl_008d7f44 = 0.0;
+    sithControl_008d7f4c = 0;
+    sithControl_008d7f50 = 0;
+    sithControl_008d7f54 = 0;
+    sithControl_008d7f58 = 0;
+    sithControl_008d7f5c = 0;
+
+    sithControl_numHandlers = 0;
+#endif
+
     sithControl_bInitted = 0;
     return 1;
 }

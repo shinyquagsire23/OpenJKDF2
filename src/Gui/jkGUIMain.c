@@ -77,6 +77,8 @@ void jkGuiMain_Show()
 
         do
         {
+            if (g_should_exit) return; // Added
+
             jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiMain_menu, &jkGuiMain_elements[2]);
             v1 = jkGuiRend_DisplayAndReturnClicked(&jkGuiMain_menu);
             switch ( v1 )
@@ -97,7 +99,9 @@ void jkGuiMain_Show()
 #ifdef WIN32_BLOBS
                     jk_PostMessageA(stdGdi_GetHwnd(), 16, 0, 0);
 #else
-                    exit(0);
+                    g_should_exit = 1;
+                    //exit(0);
+                    return;
 #endif
                     break;
                 case 13:
@@ -202,6 +206,9 @@ LABEL_17:
 void jkGuiMain_Startup()
 {
     jkGui_InitMenu(&jkGuiMain_menu, jkGui_stdBitmaps[0]);
+
+    // Added: clean reset
+    jkGuiMain_bIdk = 1;
 }
 
 void jkGuiMain_Shutdown()

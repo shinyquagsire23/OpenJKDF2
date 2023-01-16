@@ -12,6 +12,8 @@
 #include "World/sithSector.h"
 #include "World/sithThing.h"
 
+#include "jk.h"
+
 #ifdef NO_JK_MMAP
 // Vars
 [[[cog
@@ -69,6 +71,66 @@
 ]]]
 [[[end]]]
 #endif
+
+void OpenJKDF2_Globals_Reset()
+{
+// Vars
+[[[cog
+    import cog
+
+    addrs = []
+
+    f = open(symbols_fpath, "r")
+    for line in f.readlines():
+        if "//" in line:
+            line = line.split("//")[0]
+        if "#" in line:
+            line = line.split("#")[0]
+        parts = line.replace("\n", "").replace("\r", "").split(" ")
+        if len(parts) < 3:
+            continue
+        
+        name = parts[0]
+        addr = parts[1]
+        c_type = " ".join(parts[2:])
+        c_type_post = ""
+        c_val = "";
+
+        if addr in addrs:
+            cog.outl("aaaaaaaa duplicate addr %s" % addr)
+        else:
+            addrs += [addr]
+        
+        if "=" in c_type:
+            c_val = c_type.split("=")[1]
+            c_type = c_type.split("=")[0]
+        
+        if c_type == "func":
+            continue
+        
+        if c_val == "":
+            if c_type == "int":
+                c_val = "0"
+            elif c_type == "float":
+                c_val = "0.0f"
+            elif c_type == "double":
+                c_val = "0.0f"
+            elif "*" in c_type and "[" not in c_type:
+                c_val = "NULL"
+            else:
+                c_val = "{0}"
+        
+        if "[" in c_type:
+            s = c_type.split("[")
+            c_type = s[0]
+            c_type_post = "[" + s[1] 
+        
+        cog.outl("%s __%s_origValue%s = %s;" % (c_type, name, c_type_post, c_val))
+        cog.outl("_memcpy(&%s, &__%s_origValue, sizeof(%s));" % (name, name, name))
+
+]]]
+[[[end]]]
+}
 
 [[[cog
     import cog

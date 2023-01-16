@@ -39,7 +39,26 @@ void jkHudCameraView_Startup(void)
 
 void jkHudCameraView_Shutdown(void)
 {
+    // Added: Clean shutdown
+    if (jkHudCameraView_bOpened) {
+        jkHudCameraView_Close();
+    }
+
     jkHudCameraView_bInitted = 0;
+
+    // Added: Clean shutdown
+#ifdef QOL_IMPROVEMENTS
+    jkHudCameraView_bInitted = 0;
+    jkHudCameraView_bOpened = 0;
+    jkHudCameraView_w_005b08e0 = 0;
+    jkHudCameraView_h_005b08e4 = 0;
+
+    jkHudCameraView_pBitmap1 = NULL;
+    jkHudCameraView_pBitmap2 = NULL;
+    jkHudCameraView_pBitmap3 = NULL;
+    jkHudCameraView_pBitmap4 = NULL;
+    jkHudCameraView_pFont1 = NULL;
+#endif
 }
 
 

@@ -52,6 +52,18 @@ void Windows_Shutdown()
 {
     Window_RemoveMsgHandler(Windows_DefaultHandler);
     wuRegistry_Shutdown();
+
+    // Added: Clean reset
+#ifdef QOL_IMPROVEMENTS
+    Windows_bInitted = 0;
+    memset(Windows_cpu_info, 0, sizeof(Windows_cpu_info));
+    memset(Windows_cdpath_default, 0, sizeof(Windows_cdpath_default));
+
+    Windows_bInittedGdi = 0;
+    Windows_bWindowed = 0;
+    Windows_bUnk = 0;
+#endif
+
     Windows_bInitted = 0;
 }
 

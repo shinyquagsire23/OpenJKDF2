@@ -24,6 +24,9 @@
 #include "external/fcaseopen/fcaseopen.h"
 #endif
 
+void jkGuiMods_Startup();
+void jkGuiMods_Shutdown();
+
 void jkGuiMods_Show();
 void jkGuiMods_PopulateEntries(Darray *list, jkGuiElement *element);
 
