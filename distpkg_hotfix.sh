@@ -4,7 +4,7 @@ OPENJKDF2_ROOT=$(pwd)
 
 python3 scripts/increment_version_commits.py "$1" $(git log -1 --format="%H")
 
-cp packaging/flatpak/org.openjkdf2.OpenJKDF2.metainfo.xml $OPENJKDF2_ROOT/../org.openjkdf2.OpenJKDF2/org.openjkdf2.OpenJKDF2.yml
+cp packaging/flatpak/org.openjkdf2.OpenJKDF2.yml $OPENJKDF2_ROOT/../org.openjkdf2.OpenJKDF2/org.openjkdf2.OpenJKDF2.yml
 
 cd $OPENJKDF2_ROOT/../org.openjkdf2.OpenJKDF2/
 git stash
