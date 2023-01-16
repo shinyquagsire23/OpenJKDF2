@@ -75,6 +75,17 @@ typedef struct smush_tres
     uint8_t subtitle_index[2];
 } smush_tres;
 
+typedef struct smush_stor
+{
+    uint8_t idk[4];
+} smush_stor;
+
+typedef struct smush_ftch
+{
+    uint8_t idk_0[2];
+    uint8_t idk[2];
+    uint8_t padding[2];
+} smush_ftch;
 
 typedef struct codec48_ctx codec48_ctx; 
 typedef struct smush_ctx
@@ -95,6 +106,9 @@ typedef struct smush_ctx
 
     codec48_ctx* c48_ctx;
     uint8_t* framebuffer;
+    uint8_t* framebuffer_stor;
+    int store_next;
+    uint32_t store_param;
 
     int16_t codec_x;
     int16_t codec_y;

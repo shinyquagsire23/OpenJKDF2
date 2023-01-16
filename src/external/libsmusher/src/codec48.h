@@ -6,7 +6,7 @@
 typedef struct codec48_hdr
 {
     uint8_t type;
-    uint8_t table_index;
+    int8_t table_index;
     uint8_t seq_num[2];
     uint8_t unk2[4];
 
@@ -43,11 +43,16 @@ typedef struct codec48_ctx
 
 void codec48_destroy(smush_ctx* parent_ctx);
 void codec48_proc(smush_ctx* ctx, const uint8_t* data, size_t data_len);
-void codec48_make_table(codec48_ctx* ctx, int8_t idx);
-void codec48_proc_block2(codec48_ctx* ctx, const uint8_t* data, uint32_t len, uint8_t* out);
-void codec48_proc_block3(codec48_ctx* ctx, const uint8_t* data, uint8_t* out, size_t inter_buf_offs);
+void codec48_make_table(codec48_ctx* ctx, int16_t idx);
+void codec48_proc_block2(codec48_ctx* ctx, const uint8_t* data, uint32_t len, uint32_t len2, uint8_t* out);
+void codec48_proc_block3(codec48_ctx* ctx, const uint8_t* data, uint8_t* out, size_t inter_buf_offs, uint32_t len);
 
-void codec48_block_copy(codec48_ctx* ctx, uint8_t *dst, size_t inter_buf_offs, int32_t offset);
+void codec48_8x8block_read(codec48_ctx* ctx, uint8_t *dst, const uint8_t *data);
+void codec48_block_copy(codec48_ctx* ctx, uint8_t *dst, size_t inter_buf_offs, size_t offset);
+void codec48_block_copy4x4_abs(codec48_ctx* ctx, uint8_t *dst, const uint8_t *data, size_t inter_buf_offs, int32_t offset);
+void codec48_block_copy4x4_offsettable(codec48_ctx* ctx, uint8_t *dst, const uint8_t *data, size_t inter_buf_offs, int32_t offset);
+void codec48_block_copy2x2_abs(codec48_ctx* ctx, uint8_t *dst, const uint8_t *data, size_t inter_buf_offs, int32_t offset);
+void codec48_block_copy2x2_offsettable(codec48_ctx* ctx, uint8_t *dst, const uint8_t *data, size_t inter_buf_offs, int32_t offset);
 void codec48_block_scale(codec48_ctx* ctx, uint8_t *dst, const uint8_t *src);
 
 #endif // _LIBSMUSHER_CODEC48_H

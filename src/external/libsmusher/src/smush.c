@@ -17,6 +17,8 @@ smush_ctx* smush_from_fpath(const char* fpath)
 
     ctx->framebuffer = malloc(640*480*sizeof(uint8_t));
     memset(ctx->framebuffer, 0, 640*480*sizeof(uint8_t));
+    ctx->framebuffer_stor = malloc(640*480*sizeof(uint8_t));
+    memset(ctx->framebuffer_stor, 0, 640*480*sizeof(uint8_t));
     ctx->c48_ctx = NULL;
 
     ctx->f = fopen(fpath, "rb");
@@ -75,6 +77,7 @@ void smush_destroy(smush_ctx* ctx) {
     fclose(ctx->f);
 
     free(ctx->framebuffer);
+    free(ctx->framebuffer_stor);
     free(ctx);
 }
 
@@ -445,13 +448,44 @@ void smush_proc_tres(smush_ctx* ctx, uint32_t seek_pos, uint32_t total_size)
     unk3 = getle32(tres.unk3);
     unk4 = getle16(tres.unk4);
     unk5 = getle16(tres.unk5);
-    unk6 = getle16(tres.unk6);
+    unk6 = getle16(tres.unk6);//0x48435446 
     unk7 = getle16(tres.unk7);
     subtitle_index = getle16(tres.subtitle_index);
 
     //smush_error("TRES: %u %u %u %u %u %u %u %u\n", unk1, unk2, unk3, unk4, unk5, unk6, unk7, subtitle_index);
 
     ctx->current_sub = subtitle_index;
+}
+
+void smush_proc_stor(smush_ctx* ctx, uint32_t seek_pos, uint32_t total_size)
+{
+    smush_stor stor;
+    fseek(ctx->f, seek_pos, SEEK_SET);
+    fread(&stor, sizeof(stor), 1, ctx->f);
+
+
+    uint32_t idk = getle32(stor.idk);
+
+    //smush_error("TRES: %u %u %u %u %u %u %u %u\n", unk1, unk2, unk3, unk4, unk5, unk6, unk7, subtitle_index);
+
+    //smush_error("STOR: %u\n", idk);
+
+    ctx->store_next = 1;
+    ctx->store_param = idk;
+}
+
+void smush_proc_ftch(smush_ctx* ctx, uint32_t seek_pos, uint32_t total_size)
+{
+    smush_ftch ftch;
+    fseek(ctx->f, seek_pos, SEEK_SET);
+    fread(&ftch, sizeof(ftch), 1, ctx->f);
+
+    int16_t idk_0 = getle16(ftch.idk_0);
+    int16_t idk = getle16(ftch.idk);
+
+    //smush_error("FTCH: %d %d\n", idk_0, idk);
+
+    memcpy(ctx->framebuffer, ctx->framebuffer_stor, 640*480*sizeof(uint8_t));
 }
 
 void smush_proc_frme(smush_ctx* ctx, uint32_t seek_pos, uint32_t total_size)
@@ -495,10 +529,10 @@ void smush_proc_frme(smush_ctx* ctx, uint32_t seek_pos, uint32_t total_size)
             smush_proc_iact(ctx, seek_pos, getbe32(tmp.size));
         }
         else if (getbe32(tmp.magic) == SMUSH_MAGIC_FTCH) {
-            // TODO?
+            smush_proc_ftch(ctx, seek_pos, getbe32(tmp.size));
         }
         else if (getbe32(tmp.magic) == SMUSH_MAGIC_STOR) {
-            // TODO?
+            smush_proc_stor(ctx, seek_pos, getbe32(tmp.size));
         }
         else if (getbe32(tmp.magic) == SMUSH_MAGIC_TRES) {
             smush_proc_tres(ctx, seek_pos, getbe32(tmp.size));
@@ -522,7 +556,11 @@ void smush_proc_frme(smush_ctx* ctx, uint32_t seek_pos, uint32_t total_size)
         }
     }
 
-    
+    if (ctx->store_next) {
+        memcpy(ctx->framebuffer_stor, ctx->framebuffer, 640*480*sizeof(uint8_t));
+        
+        ctx->store_next = 0;
+    }
 }
 
 void smush_print(smush_ctx* ctx)

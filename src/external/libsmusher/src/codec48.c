@@ -41,13 +41,15 @@ void codec48_proc(smush_ctx* parent_ctx, const uint8_t* data, size_t data_len)
 
     uint16_t seq_num = getle16(hdr->seq_num);
     uint32_t flags = getle32(hdr->flags);
+    uint32_t unk2 = getle32(hdr->unk2);
+    uint32_t unk3 = getle32(hdr->unk3);
     
     smush_debug("  Codec 48:\n");
     smush_debug("    Type: 0x%02x\n", hdr->type);
     smush_debug("    Table Idx: 0x%02x\n", hdr->table_index);
     smush_debug("    Seq num: 0x%04x\n", seq_num);
-    smush_debug("    Unk2: 0x%04x\n", getle32(hdr->unk2));
-    smush_debug("    Unk3: 0x%04x\n", getle32(hdr->unk3));
+    smush_debug("    Unk2: 0x%04x\n", unk2);
+    smush_debug("    Unk3: 0x%04x\n", unk3);
     smush_debug("    Flags: 0x%04x\n", flags);
 
 
@@ -75,20 +77,21 @@ void codec48_proc(smush_ctx* parent_ctx, const uint8_t* data, size_t data_len)
     }
 
     if (hdr->type == 0) {
-        memcpy(ctx->delta_buf[ctx->cur_buf], data, getle32(hdr->unk2));
+        memcpy(ctx->delta_buf[ctx->cur_buf], data, unk2);
     }
     else if (hdr->type == 2) {
-        codec48_proc_block2(ctx, data, ctx->width * ctx->height, ctx->delta_buf[ctx->cur_buf]);
+        codec48_proc_block2(ctx, data, unk2, unk3, ctx->delta_buf[ctx->cur_buf]);
     }
     else if (hdr->type == 3) {
         // 8x8 block encoding
         if (!(seq_num && seq_num != ctx->last_seq_num + 1))
         {
-            if (seq_num & 1 || !(flags & C48_FLAG_1) || (flags & C48_FLAG_10)) {
+            if ((seq_num & 1) || !(flags & C48_FLAG_1) || (flags & C48_FLAG_10)) 
+            {
                 ctx->cur_buf ^= 1;
             }
 
-            codec48_proc_block3(ctx, data, ctx->delta_buf[ctx->cur_buf], ctx->delta_buf[ctx->cur_buf ^ 1] - ctx->delta_buf[ctx->cur_buf]);
+            codec48_proc_block3(ctx, data, ctx->delta_buf[ctx->cur_buf], ctx->delta_buf[ctx->cur_buf ^ 1] - ctx->delta_buf[ctx->cur_buf], unk3);
         }
     }
     else if (hdr->type == 5) {
@@ -111,7 +114,7 @@ void codec48_proc(smush_ctx* parent_ctx, const uint8_t* data, size_t data_len)
     ctx->last_seq_num = seq_num;
 }
 
-void codec48_make_table(codec48_ctx* ctx, int8_t idx)
+void codec48_make_table(codec48_ctx* ctx, int16_t idx)
 {
     int32_t strided_idx = idx * 255;
     static const int16_t table[] = {
@@ -233,14 +236,16 @@ void codec48_make_table(codec48_ctx* ctx, int8_t idx)
         int32_t j = (i + strided_idx) * 2;
         ctx->offset_table[i] = table[j + 1] * ctx->pitch + table[j];
     }
+    ctx->offset_table[255] = 0xFFFF;
 }
 
-void codec48_proc_block2(codec48_ctx* ctx, const uint8_t* data, uint32_t len, uint8_t* out)
+void codec48_proc_block2(codec48_ctx* ctx, const uint8_t* data, uint32_t len, uint32_t len2, uint8_t* out)
 {
-    while (len > 0)
+    while (len > 0 && len2 > 0)
     {
         uint8_t packed = *data++;
         uint8_t num = (packed >> 1) + 1;
+        len2--;
 
         if (num > len) {
             num = len;
@@ -248,10 +253,12 @@ void codec48_proc_block2(codec48_ctx* ctx, const uint8_t* data, uint32_t len, ui
 
         if (packed & 1) {
             memset(out, *data++, num);
+            len2--;
         }
         else {
             memcpy(out, data, num);
             data += num;
+            len2 -= num;
         }
 
         out += num;
@@ -259,12 +266,14 @@ void codec48_proc_block2(codec48_ctx* ctx, const uint8_t* data, uint32_t len, ui
     }
 }
 
-void codec48_proc_block3(codec48_ctx* ctx, const uint8_t* data, uint8_t* out, size_t inter_buf_offs)
+void codec48_proc_block3(codec48_ctx* ctx, const uint8_t* data, uint8_t* out, size_t inter_buf_offs, uint32_t len)
 {
+    const uint8_t* data_end = data + len;
     for (int i = 0; i < ctx->block_y; i++) 
     {
         for (int j = 0; j < ctx->block_x; j++) 
         {
+            if (data >= data_end) return;
             uint8_t op = *data++;
             
             //printf("%p %p %p %p %p\n", ctx, data, out, &out[7 - (size_t)ctx->pitch], ctx->delta_buf[0]); // (out[7 - ctx->pitch] << 8) | *data
@@ -301,7 +310,7 @@ void codec48_proc_block3(codec48_ctx* ctx, const uint8_t* data, uint8_t* out, si
                 // Copy a block using an absolute offset
                 case 0xFE:
                 {
-                    codec48_block_copy(ctx, out, inter_buf_offs, (int16_t)getle16(data));
+                    codec48_block_copy(ctx, out, inter_buf_offs, getles16(data));
                     data += 2;
                     break;
                 }
@@ -339,26 +348,7 @@ void codec48_proc_block3(codec48_ctx* ctx, const uint8_t* data, uint8_t* out, si
                 // Copy 4 4x4 blocks using the offset table
                 case 0xFC:
                 {
-                    *((uint32_t *)(out + (ctx->pitch * 0))) = *((uint32_t *)(out + inter_buf_offs + ctx->offset_table[data[0]]));
-                    *((uint32_t *)(out + (ctx->pitch * 1))) = *((uint32_t *)(out + inter_buf_offs + ctx->offset_table[data[0]] + ctx->pitch));
-                    *((uint32_t *)(out + (ctx->pitch * 2))) = *((uint32_t *)(out + inter_buf_offs + ctx->offset_table[data[0]] + ctx->pitch * 2));
-                    *((uint32_t *)(out + (ctx->pitch * 3))) = *((uint32_t *)(out + inter_buf_offs + ctx->offset_table[data[0]] + ctx->pitch * 3));
-
-                    *((uint32_t *)(out + (ctx->pitch * 0) + 4)) = *((uint32_t *)(out + inter_buf_offs + ctx->offset_table[data[1]] + 4));
-                    *((uint32_t *)(out + (ctx->pitch * 1) + 4)) = *((uint32_t *)(out + inter_buf_offs + ctx->offset_table[data[1]] + ctx->pitch + 4));
-                    *((uint32_t *)(out + (ctx->pitch * 2) + 4)) = *((uint32_t *)(out + inter_buf_offs + ctx->offset_table[data[1]] + ctx->pitch * 2 + 4));
-                    *((uint32_t *)(out + (ctx->pitch * 3) + 4)) = *((uint32_t *)(out + inter_buf_offs + ctx->offset_table[data[1]] + ctx->pitch * 3 + 4));
-
-                    *((uint32_t *)(out + (ctx->pitch * 4))) = *((uint32_t *)(out + inter_buf_offs + ctx->offset_table[data[2]] + ctx->pitch * 4));
-                    *((uint32_t *)(out + (ctx->pitch * 5))) = *((uint32_t *)(out + inter_buf_offs + ctx->offset_table[data[2]] + ctx->pitch * 5));
-                    *((uint32_t *)(out + (ctx->pitch * 6))) = *((uint32_t *)(out + inter_buf_offs + ctx->offset_table[data[2]] + ctx->pitch * 6));
-                    *((uint32_t *)(out + (ctx->pitch * 7))) = *((uint32_t *)(out + inter_buf_offs + ctx->offset_table[data[2]] + ctx->pitch * 7));
-
-                    *((uint32_t *)(out + (ctx->pitch * 4) + 4)) = *((uint32_t *)(out + inter_buf_offs + ctx->offset_table[data[3]] + ctx->pitch * 4 + 4));
-                    *((uint32_t *)(out + (ctx->pitch * 5) + 4)) = *((uint32_t *)(out + inter_buf_offs + ctx->offset_table[data[3]] + ctx->pitch * 5 + 4));
-                    *((uint32_t *)(out + (ctx->pitch * 6) + 4)) = *((uint32_t *)(out + inter_buf_offs + ctx->offset_table[data[3]] + ctx->pitch * 6 + 4));
-                    *((uint32_t *)(out + (ctx->pitch * 7) + 4)) = *((uint32_t *)(out + inter_buf_offs + ctx->offset_table[data[3]] + ctx->pitch * 7 + 4));
-
+                    codec48_block_copy4x4_offsettable(ctx, out, data, inter_buf_offs, 0);
                     data += 4;
                     break;
                 }
@@ -366,25 +356,7 @@ void codec48_proc_block3(codec48_ctx* ctx, const uint8_t* data, uint8_t* out, si
                 // Copy 4 4x4 blocks using absolute offsets
                 case 0xFB:
                 {
-                    *((uint32_t *)out) = *((uint32_t *)(out + inter_buf_offs + (int16_t)getle16(data)));
-                    *((uint32_t *)(out + ctx->pitch)) = *((uint32_t *)(out + inter_buf_offs + (int16_t)getle16(data) + ctx->pitch));
-                    *((uint32_t *)(out + ctx->pitch * 2)) = *((uint32_t *)(out + inter_buf_offs + (int16_t)getle16(data) + ctx->pitch * 2));
-                    *((uint32_t *)(out + ctx->pitch * 3)) = *((uint32_t *)(out + inter_buf_offs + (int16_t)getle16(data) + ctx->pitch * 3));
-
-                    *((uint32_t *)(out + 4)) = *((uint32_t *)(out + inter_buf_offs + (int16_t)getle16(data + 2) + 4));
-                    *((uint32_t *)(out + ctx->pitch + 4)) = *((uint32_t *)(out + inter_buf_offs + (int16_t)getle16(data + 2) + ctx->pitch + 4));
-                    *((uint32_t *)(out + ctx->pitch * 2 + 4)) = *((uint32_t *)(out + inter_buf_offs + (int16_t)getle16(data + 2) + ctx->pitch * 2 + 4));
-                    *((uint32_t *)(out + ctx->pitch * 3 + 4)) = *((uint32_t *)(out + inter_buf_offs + (int16_t)getle16(data + 2) + ctx->pitch * 3 + 4));
-
-                    *((uint32_t *)(out + ctx->pitch * 4)) = *((uint32_t *)(out + inter_buf_offs + (int16_t)getle16(data + 4) + ctx->pitch * 4));
-                    *((uint32_t *)(out + ctx->pitch * 5)) = *((uint32_t *)(out + inter_buf_offs + (int16_t)getle16(data + 4) + ctx->pitch * 5));
-                    *((uint32_t *)(out + ctx->pitch * 6)) = *((uint32_t *)(out + inter_buf_offs + (int16_t)getle16(data + 4) + ctx->pitch * 6));
-                    *((uint32_t *)(out + ctx->pitch * 7)) = *((uint32_t *)(out + inter_buf_offs + (int16_t)getle16(data + 4) + ctx->pitch * 7));
-
-                    *((uint32_t *)(out + ctx->pitch * 4 + 4)) = *((uint32_t *)(out + inter_buf_offs + (int16_t)getle16(data + 6) + ctx->pitch * 4 + 4));
-                    *((uint32_t *)(out + ctx->pitch * 5 + 4)) = *((uint32_t *)(out + inter_buf_offs + (int16_t)getle16(data + 6) + ctx->pitch * 5 + 4));
-                    *((uint32_t *)(out + ctx->pitch * 6 + 4)) = *((uint32_t *)(out + inter_buf_offs + (int16_t)getle16(data + 6) + ctx->pitch * 6 + 4));
-                    *((uint32_t *)(out + ctx->pitch * 7 + 4)) = *((uint32_t *)(out + inter_buf_offs + (int16_t)getle16(data + 6) + ctx->pitch * 7 + 4));
+                    codec48_block_copy4x4_abs(ctx, out, data, inter_buf_offs, 0);
                     data += 8;
                     break;
                 }
@@ -400,53 +372,7 @@ void codec48_proc_block3(codec48_ctx* ctx, const uint8_t* data, uint8_t* out, si
                 // Copy 16 2x2 blocks using the offset table
                 case 0xF9:
                 {
-                    *((uint16_t *)out) = *((uint16_t *)(out + inter_buf_offs + ctx->offset_table[data[0]]));
-                    *((uint16_t *)(out + ctx->pitch)) = *((uint16_t *)(out + inter_buf_offs + ctx->offset_table[data[0]] + ctx->pitch));
-
-                    *((uint16_t *)(out + 2)) = *((uint16_t *)(out + inter_buf_offs + ctx->offset_table[data[1]] + 2));
-                    *((uint16_t *)(out + ctx->pitch + 2)) = *((uint16_t *)(out + inter_buf_offs + ctx->offset_table[data[1]] + ctx->pitch + 2));
-
-                    *((uint16_t *)(out + 4)) = *((uint16_t *)(out + inter_buf_offs + ctx->offset_table[data[2]] + 4));
-                    *((uint16_t *)(out + ctx->pitch + 4)) = *((uint16_t *)(out + inter_buf_offs + ctx->offset_table[data[2]] + ctx->pitch + 4));
-
-                    *((uint16_t *)(out + 6)) = *((uint16_t *)(out + inter_buf_offs + ctx->offset_table[data[3]] + 6));
-                    *((uint16_t *)(out + ctx->pitch + 6)) = *((uint16_t *)(out + inter_buf_offs + ctx->offset_table[data[3]] + ctx->pitch + 6));
-
-                    *((uint16_t *)(out + ctx->pitch * 2)) = *((uint16_t *)(out + inter_buf_offs + ctx->offset_table[data[4]] + ctx->pitch * 2));
-                    *((uint16_t *)(out + ctx->pitch * 3)) = *((uint16_t *)(out + inter_buf_offs + ctx->offset_table[data[4]] + ctx->pitch * 3));
-
-                    *((uint16_t *)(out + ctx->pitch * 2 + 2)) = *((uint16_t *)(out + inter_buf_offs + ctx->offset_table[data[5]] + ctx->pitch * 2 + 2));
-                    *((uint16_t *)(out + ctx->pitch * 3 + 2)) = *((uint16_t *)(out + inter_buf_offs + ctx->offset_table[data[5]] + ctx->pitch * 3 + 2));
-
-                    *((uint16_t *)(out + ctx->pitch * 2 + 4)) = *((uint16_t *)(out + inter_buf_offs + ctx->offset_table[data[6]] + ctx->pitch * 2 + 4));
-                    *((uint16_t *)(out + ctx->pitch * 3 + 4)) = *((uint16_t *)(out + inter_buf_offs + ctx->offset_table[data[6]] + ctx->pitch * 3 + 4));
-
-                    *((uint16_t *)(out + ctx->pitch * 2 + 6)) = *((uint16_t *)(out + inter_buf_offs + ctx->offset_table[data[7]] + ctx->pitch * 2 + 6));
-                    *((uint16_t *)(out + ctx->pitch * 3 + 6)) = *((uint16_t *)(out + inter_buf_offs + ctx->offset_table[data[7]] + ctx->pitch * 3 + 6));
-
-                    *((uint16_t *)(out + ctx->pitch * 4)) = *((uint16_t *)(out + inter_buf_offs + ctx->offset_table[data[8]] + ctx->pitch * 4));
-                    *((uint16_t *)(out + ctx->pitch * 5)) = *((uint16_t *)(out + inter_buf_offs + ctx->offset_table[data[8]] + ctx->pitch * 5));
-
-                    *((uint16_t *)(out + ctx->pitch * 4 + 2)) = *((uint16_t *)(out + inter_buf_offs + ctx->offset_table[data[9]] + ctx->pitch * 4 + 2));
-                    *((uint16_t *)(out + ctx->pitch * 5 + 2)) = *((uint16_t *)(out + inter_buf_offs + ctx->offset_table[data[9]] + ctx->pitch * 5 + 2));
-
-                    *((uint16_t *)(out + ctx->pitch * 4 + 4)) = *((uint16_t *)(out + inter_buf_offs + ctx->offset_table[data[10]] + ctx->pitch * 4 + 4));
-                    *((uint16_t *)(out + ctx->pitch * 5 + 4)) = *((uint16_t *)(out + inter_buf_offs + ctx->offset_table[data[10]] + ctx->pitch * 5 + 4));
-
-                    *((uint16_t *)(out + ctx->pitch * 4 + 6)) = *((uint16_t *)(out + inter_buf_offs + ctx->offset_table[data[11]] + ctx->pitch * 4 + 6));
-                    *((uint16_t *)(out + ctx->pitch * 5 + 6)) = *((uint16_t *)(out + inter_buf_offs + ctx->offset_table[data[11]] + ctx->pitch * 5 + 6));
-
-                    *((uint16_t *)(out + ctx->pitch * 6)) = *((uint16_t *)(out + inter_buf_offs + ctx->offset_table[data[12]] + ctx->pitch * 6));
-                    *((uint16_t *)(out + ctx->pitch * 7)) = *((uint16_t *)(out + inter_buf_offs + ctx->offset_table[data[12]] + ctx->pitch * 7));
-
-                    *((uint16_t *)(out + ctx->pitch * 6 + 2)) = *((uint16_t *)(out + inter_buf_offs + ctx->offset_table[data[13]] + ctx->pitch * 6 + 2));
-                    *((uint16_t *)(out + ctx->pitch * 7 + 2)) = *((uint16_t *)(out + inter_buf_offs + ctx->offset_table[data[13]] + ctx->pitch * 7 + 2));
-
-                    *((uint16_t *)(out + ctx->pitch * 6 + 4)) = *((uint16_t *)(out + inter_buf_offs + ctx->offset_table[data[14]] + ctx->pitch * 6 + 4));
-                    *((uint16_t *)(out + ctx->pitch * 7 + 4)) = *((uint16_t *)(out + inter_buf_offs + ctx->offset_table[data[14]] + ctx->pitch * 7 + 4));
-
-                    *((uint16_t *)(out + ctx->pitch * 6 + 6)) = *((uint16_t *)(out + inter_buf_offs + ctx->offset_table[data[15]] + ctx->pitch * 6 + 6));
-                    *((uint16_t *)(out + ctx->pitch * 7 + 6)) = *((uint16_t *)(out + inter_buf_offs + ctx->offset_table[data[15]] + ctx->pitch * 7 + 6));
+                    codec48_block_copy2x2_offsettable(ctx, out, data, inter_buf_offs, 0);
                     data += 16;
                     break;
                 }
@@ -454,54 +380,7 @@ void codec48_proc_block3(codec48_ctx* ctx, const uint8_t* data, uint8_t* out, si
                 // Copy 16 2x2 blocks using absolute offsets
                 case 0xF8:
                 {
-                    *((uint16_t *)out) = *((uint16_t *)(out + inter_buf_offs + (int16_t)getle16(data)));
-                    *((uint16_t *)(out + ctx->pitch)) = *((uint16_t *)(out + inter_buf_offs + (int16_t)getle16(data) + ctx->pitch));
-            
-                    *((uint16_t *)(out + 2)) = *((uint16_t *)(out + inter_buf_offs + (int16_t)getle16(data + 2) + 2));
-                    *((uint16_t *)(out + ctx->pitch + 2)) = *((uint16_t *)(out + inter_buf_offs + (int16_t)getle16(data + 2) + ctx->pitch + 2));
-
-                    *((uint16_t *)(out + 4)) = *((uint16_t *)(out + inter_buf_offs + (int16_t)getle16(data + 4) + 4));
-                    *((uint16_t *)(out + ctx->pitch + 4)) = *((uint16_t *)(out + inter_buf_offs + (int16_t)getle16(data + 4) + ctx->pitch + 4));
-
-                    *((uint16_t *)(out + 6)) = *((uint16_t *)(out + inter_buf_offs + (int16_t)getle16(data + 6) + 6));
-                    *((uint16_t *)(out + ctx->pitch + 6)) = *((uint16_t *)(out + inter_buf_offs + (int16_t)getle16(data + 6) + ctx->pitch + 6));
-
-                    *((uint16_t *)(out + ctx->pitch * 2)) = *((uint16_t *)(out + inter_buf_offs + (int16_t)getle16(data + 8) + ctx->pitch * 2));
-                    *((uint16_t *)(out + ctx->pitch * 3)) = *((uint16_t *)(out + inter_buf_offs + (int16_t)getle16(data + 8) + ctx->pitch * 3));
-
-                    *((uint16_t *)(out + ctx->pitch * 2 + 2)) = *((uint16_t *)(out + inter_buf_offs + (int16_t)getle16(data + 10) + ctx->pitch * 2 + 2));
-                    *((uint16_t *)(out + ctx->pitch * 3 + 2)) = *((uint16_t *)(out + inter_buf_offs + (int16_t)getle16(data + 10) + ctx->pitch * 3 + 2));
-
-                    *((uint16_t *)(out + ctx->pitch * 2 + 4)) = *((uint16_t *)(out + inter_buf_offs + (int16_t)getle16(data + 12) + ctx->pitch * 2 + 4));
-                    *((uint16_t *)(out + ctx->pitch * 3 + 4)) = *((uint16_t *)(out + inter_buf_offs + (int16_t)getle16(data + 12) + ctx->pitch * 3 + 4));
-
-                    *((uint16_t *)(out + ctx->pitch * 2 + 6)) = *((uint16_t *)(out + inter_buf_offs + (int16_t)getle16(data + 14) + ctx->pitch * 2 + 6));
-                    *((uint16_t *)(out + ctx->pitch * 3 + 6)) = *((uint16_t *)(out + inter_buf_offs + (int16_t)getle16(data + 14) + ctx->pitch * 3 + 6));
-
-                    *((uint16_t *)(out + ctx->pitch * 4)) = *((uint16_t *)(out + inter_buf_offs + (int16_t)getle16(data + 16) + ctx->pitch * 4));
-                    *((uint16_t *)(out + ctx->pitch * 5)) = *((uint16_t *)(out + inter_buf_offs + (int16_t)getle16(data + 16) + ctx->pitch * 5));
-
-                    *((uint16_t *)(out + ctx->pitch * 4 + 2)) = *((uint16_t *)(out + inter_buf_offs + (int16_t)getle16(data + 18) + ctx->pitch * 4 + 2));
-                    *((uint16_t *)(out + ctx->pitch * 5 + 2)) = *((uint16_t *)(out + inter_buf_offs + (int16_t)getle16(data + 18) + ctx->pitch * 5 + 2));
-
-                    *((uint16_t *)(out + ctx->pitch * 4 + 4)) = *((uint16_t *)(out + inter_buf_offs + (int16_t)getle16(data + 20) + ctx->pitch * 4 + 4));
-                    *((uint16_t *)(out + ctx->pitch * 5 + 4)) = *((uint16_t *)(out + inter_buf_offs + (int16_t)getle16(data + 20) + ctx->pitch * 5 + 4));
-
-                    *((uint16_t *)(out + ctx->pitch * 4 + 6)) = *((uint16_t *)(out + inter_buf_offs + (int16_t)getle16(data + 22) + ctx->pitch * 4 + 6));
-                    *((uint16_t *)(out + ctx->pitch * 5 + 6)) = *((uint16_t *)(out + inter_buf_offs + (int16_t)getle16(data + 22) + ctx->pitch * 5 + 6));
-
-                    *((uint16_t *)(out + ctx->pitch * 6)) = *((uint16_t *)(out + inter_buf_offs + (int16_t)getle16(data + 24) + ctx->pitch * 6));
-                    *((uint16_t *)(out + ctx->pitch * 7)) = *((uint16_t *)(out + inter_buf_offs + (int16_t)getle16(data + 24) + ctx->pitch * 7));
-
-                    *((uint16_t *)(out + ctx->pitch * 6 + 2)) = *((uint16_t *)(out + inter_buf_offs + (int16_t)getle16(data + 26) + ctx->pitch * 6 + 2));
-                    *((uint16_t *)(out + ctx->pitch * 7 + 2)) = *((uint16_t *)(out + inter_buf_offs + (int16_t)getle16(data + 26) + ctx->pitch * 7 + 2));
-
-                    *((uint16_t *)(out + ctx->pitch * 6 + 4)) = *((uint16_t *)(out + inter_buf_offs + (int16_t)getle16(data + 28) + ctx->pitch * 6 + 4));
-                    *((uint16_t *)(out + ctx->pitch * 7 + 4)) = *((uint16_t *)(out + inter_buf_offs + (int16_t)getle16(data + 28) + ctx->pitch * 7 + 4));
-
-                    *((uint16_t *)(out + ctx->pitch * 6 + 6)) = *((uint16_t *)(out + inter_buf_offs + (int16_t)getle16(data + 30) + ctx->pitch * 6 + 6));
-                    *((uint16_t *)(out + ctx->pitch * 7 + 6)) = *((uint16_t *)(out + inter_buf_offs + (int16_t)getle16(data + 30) + ctx->pitch * 7 + 6));
-
+                    codec48_block_copy2x2_abs(ctx, out, data, inter_buf_offs, 0);
                     data += 32;
                     break;
                 }
@@ -509,23 +388,7 @@ void codec48_proc_block3(codec48_ctx* ctx, const uint8_t* data, uint8_t* out, si
                 // Raw 8x8 block
                 case 0xF7:
                 {
-                    *((uint32_t *)out) = getle32(data);
-                    *((uint32_t *)(out + 4)) = getle32((data + 4));
-                    *((uint32_t *)(out + ctx->pitch)) = getle32((data + 8));
-                    *((uint32_t *)(out + ctx->pitch + 4)) = getle32((data + 12));
-                    *((uint32_t *)(out + ctx->pitch * 2)) = getle32((data + 16));
-                    *((uint32_t *)(out + ctx->pitch * 2 + 4)) = getle32((data + 20));
-                    *((uint32_t *)(out + ctx->pitch * 3)) = getle32((data + 24));
-                    *((uint32_t *)(out + ctx->pitch * 3 + 4)) = getle32((data + 28));
-                    *((uint32_t *)(out + ctx->pitch * 4)) = getle32((data + 32));
-                    *((uint32_t *)(out + ctx->pitch * 4 + 4)) = getle32((data + 36));
-                    *((uint32_t *)(out + ctx->pitch * 5)) = getle32((data + 40));
-                    *((uint32_t *)(out + ctx->pitch * 5 + 4)) = getle32((data + 44));
-                    *((uint32_t *)(out + ctx->pitch * 6)) = getle32((data + 48));
-                    *((uint32_t *)(out + ctx->pitch * 6 + 4)) = getle32((data + 52));
-                    *((uint32_t *)(out + ctx->pitch * 7)) = getle32((data + 56));
-                    *((uint32_t *)(out + ctx->pitch * 7 + 4)) = getle32((data + 60));
-
+                    codec48_8x8block_read(ctx, out, data);
                     data += 64;
                     break;
                 }
@@ -545,7 +408,18 @@ void codec48_proc_block3(codec48_ctx* ctx, const uint8_t* data, uint8_t* out, si
     }
 }
 
-void codec48_block_copy(codec48_ctx* ctx, uint8_t *dst, size_t inter_buf_offs, int32_t offset)
+void codec48_8x8block_read(codec48_ctx* ctx, uint8_t *dst, const uint8_t *data)
+{
+    for (int i = 0; i < 8; i++) 
+    {
+        *((uint32_t *)(dst + ctx->pitch * i)) = getle32(data);
+        data += 4;
+        *((uint32_t *)(dst + ctx->pitch * i + 4)) = getle32(data);
+        data += 4;
+    }
+}
+
+void codec48_block_copy(codec48_ctx* ctx, uint8_t *dst, size_t inter_buf_offs, size_t offset)
 {
     const uint8_t *src = dst + inter_buf_offs + offset;
 
@@ -553,6 +427,86 @@ void codec48_block_copy(codec48_ctx* ctx, uint8_t *dst, size_t inter_buf_offs, i
     {
         *((uint32_t *)(dst + ctx->pitch * i)) = getle32((src + ctx->pitch * i));
         *((uint32_t *)(dst + ctx->pitch * i + 4)) = getle32((src + ctx->pitch * i + 4));
+    }
+}
+
+void codec48_block_copy4x4_abs(codec48_ctx* ctx, uint8_t *dst, const uint8_t *data, size_t inter_buf_offs, int32_t offset)
+{
+#if 0
+        *((uint32_t *)(out + ctx->pitch * 0)) = *((uint32_t *)(out + inter_buf_offs + (int16_t)getle16(data) + ctx->pitch * 1));
+        *((uint32_t *)(out + ctx->pitch * 1)) = *((uint32_t *)(out + inter_buf_offs + (int16_t)getle16(data) + ctx->pitch * 1));
+        *((uint32_t *)(out + ctx->pitch * 2)) = *((uint32_t *)(out + inter_buf_offs + (int16_t)getle16(data) + ctx->pitch * 2));
+        *((uint32_t *)(out + ctx->pitch * 3)) = *((uint32_t *)(out + inter_buf_offs + (int16_t)getle16(data) + ctx->pitch * 3));
+
+        *((uint32_t *)(out + ctx->pitch * 0 + 4)) = *((uint32_t *)(out + inter_buf_offs + (int16_t)getle16(data + 2) + 4));
+        *((uint32_t *)(out + ctx->pitch * 1 + 4)) = *((uint32_t *)(out + inter_buf_offs + (int16_t)getle16(data + 2) + ctx->pitch + 4));
+        *((uint32_t *)(out + ctx->pitch * 2 + 4)) = *((uint32_t *)(out + inter_buf_offs + (int16_t)getle16(data + 2) + ctx->pitch * 2 + 4));
+        *((uint32_t *)(out + ctx->pitch * 3 + 4)) = *((uint32_t *)(out + inter_buf_offs + (int16_t)getle16(data + 2) + ctx->pitch * 3 + 4));
+
+        *((uint32_t *)(out + ctx->pitch * 4)) = *((uint32_t *)(out + inter_buf_offs + (int16_t)getle16(data + 4) + ctx->pitch * 4));
+        *((uint32_t *)(out + ctx->pitch * 5)) = *((uint32_t *)(out + inter_buf_offs + (int16_t)getle16(data + 4) + ctx->pitch * 5));
+        *((uint32_t *)(out + ctx->pitch * 6)) = *((uint32_t *)(out + inter_buf_offs + (int16_t)getle16(data + 4) + ctx->pitch * 6));
+        *((uint32_t *)(out + ctx->pitch * 7)) = *((uint32_t *)(out + inter_buf_offs + (int16_t)getle16(data + 4) + ctx->pitch * 7));
+
+        *((uint32_t *)(out + ctx->pitch * 4 + 4)) = *((uint32_t *)(out + inter_buf_offs + (int16_t)getle16(data + 6) + ctx->pitch * 4 + 4));
+        *((uint32_t *)(out + ctx->pitch * 5 + 4)) = *((uint32_t *)(out + inter_buf_offs + (int16_t)getle16(data + 6) + ctx->pitch * 5 + 4));
+        *((uint32_t *)(out + ctx->pitch * 6 + 4)) = *((uint32_t *)(out + inter_buf_offs + (int16_t)getle16(data + 6) + ctx->pitch * 6 + 4));
+        *((uint32_t *)(out + ctx->pitch * 7 + 4)) = *((uint32_t *)(out + inter_buf_offs + (int16_t)getle16(data + 6) + ctx->pitch * 7 + 4));
+#endif
+
+    const uint8_t *src = dst + inter_buf_offs + offset;
+
+    for (int i = 0; i < 4; i++) 
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            *((uint32_t *)(dst + (ctx->pitch * (j+(i>>1)*4)) + (i&1)*4)) = getle32(src + (ctx->pitch * (j+(i>>1)*4)) + ((i&1)*4) + getles16(data));
+        }
+        data += 2;
+    }
+}
+
+void codec48_block_copy4x4_offsettable(codec48_ctx* ctx, uint8_t *dst, const uint8_t *data, size_t inter_buf_offs, int32_t offset)
+{
+    const uint8_t *src = dst + inter_buf_offs + offset;
+
+    for (int i = 0; i < 4; i++) 
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            *((uint32_t *)(dst + (ctx->pitch * (j+(i>>1)*4)) + (i&1)*4)) = getle32(src + (ctx->pitch * (j+(i>>1)*4)) + ((i&1)*4) + ctx->offset_table[*data]);
+        }
+        data += 1;
+    }
+}
+
+void codec48_block_copy2x2_abs(codec48_ctx* ctx, uint8_t *dst, const uint8_t *data, size_t inter_buf_offs, int32_t offset)
+{
+    const uint8_t *src = dst + inter_buf_offs + offset;
+
+    for (int i = 0; i < 4; i++) 
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            *((uint16_t *)(dst + (ctx->pitch * (i*2)) + (j*2))) = getle16(src + (ctx->pitch * (i*2)) + getles16(data) + (j*2));
+            *((uint16_t *)(dst + (ctx->pitch * ((i*2)+1)) + (j*2))) = getle16(src + (ctx->pitch * ((i*2)+1)) + getles16(data) + (j*2));
+            data += 2;
+        }
+    }
+}
+
+void codec48_block_copy2x2_offsettable(codec48_ctx* ctx, uint8_t *dst, const uint8_t *data, size_t inter_buf_offs, int32_t offset)
+{
+    const uint8_t *src = dst + inter_buf_offs + offset;
+
+    for (int i = 0; i < 4; i++) 
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            *((uint16_t *)(dst + (ctx->pitch * (i*2)) + (j*2))) = getle16(src + (ctx->pitch * (i*2)) + ctx->offset_table[*data] + (j*2));
+            *((uint16_t *)(dst + (ctx->pitch * ((i*2)+1)) + (j*2))) = getle16(src + (ctx->pitch * ((i*2)+1)) + ctx->offset_table[*data] + (j*2));
+            data += 1;
+        }
     }
 }
 
