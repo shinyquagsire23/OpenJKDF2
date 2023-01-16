@@ -43,9 +43,6 @@
   <releases>
     <!--NEXT_RELEASE_HERE-->
     <release version="0.7.13" date="2023-01-15" />
-    <release version="0.7.13.test2" date="2023-01-15" />
-    <release version="0.7.13.test" date="2023-01-15" />
-    <release version="0.7.13" date="2023-01-15" />
     <release version="0.7.12" date="2023-01-14" />
     <release version="0.7.11" date="2023-01-11" />
     <release version="0.7.10" date="2023-01-10" />
