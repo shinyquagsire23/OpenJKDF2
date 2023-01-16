@@ -271,6 +271,24 @@ void stdMci_trackStart(int track)
         if (stdMci_TryPlay(tmp)) goto done;
     }
 
+    // Try and convert the OG track numbers to GOG/Steam first
+    if (!stdMci_music && track <= 12)
+    {
+        int track_shifted = track;
+        if (cdNum == 1)
+        {
+            track_shifted += 10;
+        }
+        else if (cdNum == 2)
+        {
+            track_shifted += 20;
+        }
+
+        // GOG and Steam soundtrack location
+        snprintf(tmp, 255, "MUSIC/Track%d.ogg", track_shifted);
+        if (stdMci_TryPlay(tmp)) goto done;
+    }
+
     // GOG and Steam soundtrack location
     snprintf(tmp, 255, "MUSIC/Track%d.ogg", track);
     if (stdMci_TryPlay(tmp)) goto done;
@@ -278,23 +296,6 @@ void stdMci_trackStart(int track)
     // GOG and Steam soundtrack location (00-09)
     if (track < 10) {
         snprintf(tmp, 255, "MUSIC/Track%02d.ogg", track);
-        if (stdMci_TryPlay(tmp)) goto done;
-    }
-
-    // Try and convert the OG track numbers to GOG/Steam
-    if (!stdMci_music && track < 12)
-    {
-        if (cdNum == 1)
-        {
-            track += 10;
-        }
-        else if (cdNum == 2)
-        {
-            track += 20;
-        }
-
-        // GOG and Steam soundtrack location
-        snprintf(tmp, 255, "MUSIC/Track%d.ogg", track);
         if (stdMci_TryPlay(tmp)) goto done;
     }
 
