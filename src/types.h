@@ -618,8 +618,20 @@ enum SithCogFlag
     SITH_COG_NO_SYNC = 0x200,
 };
 
-extern int openjkdf2_bRestartToMots;
-extern int openjkdf2_bRestartToDF2;
+enum OpenJKDF2RestartMode
+{
+    OPENJKDF2_RESTART_NONE = 0,
+    OPENJKDF2_RESTART_DF2 = 1,
+    OPENJKDF2_RESTART_MOTS = 2,
+    OPENJKDF2_RESTART_PATH = 3,
+};
+
+extern int openjkdf2_bSkipWorkingDirData;
+extern int openjkdf2_bIsFirstLaunch;
+extern int openjkdf2_bIsRunningFromExistingInstall;
+extern int openjkdf2_bOrigWasRunningFromExistingInstall;
+extern int openjkdf2_bOrigWasDF2;
+extern int openjkdf2_restartMode;
 extern int Main_bMotsCompat;
 extern int Main_bDwCompat;
 #define SITH_MESSAGE_MAX (Main_bMotsCompat ? 47 : 41)

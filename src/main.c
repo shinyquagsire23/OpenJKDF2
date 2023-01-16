@@ -75,6 +75,7 @@
 #include "Gameplay/sithTime.h"
 #include "Main/sithMain.h"
 #include "Main/sithCommand.h"
+#include "Main/InstallHelper.h"
 #include "World/sithModel.h"
 #include "Engine/sithParticle.h"
 #include "Engine/sithPhysics.h"
@@ -158,9 +159,13 @@
 #include "Devices/sithComm.h"
 #include "stdPlatform.h"
 
+int openjkdf2_bSkipWorkingDirData = 0;
+int openjkdf2_bIsFirstLaunch = 1;
+int openjkdf2_bIsRunningFromExistingInstall = 0; // 1 is OpenJKDF2 acting as a JK.EXE replacement, 0 is running as a launcher.
+int openjkdf2_bOrigWasRunningFromExistingInstall = 0;
+int openjkdf2_bOrigWasDF2 = 0;
 int openjkdf2_bIsKVM = 1;
-int openjkdf2_bRestartToMots = 0;
-int openjkdf2_bRestartToDF2 = 0;
+int openjkdf2_restartMode = OPENJKDF2_RESTART_NONE;
 char openjkdf2_aOrigCwd[1024];
 
 void do_hooks();
@@ -169,9 +174,34 @@ void do_hooks();
 #include "exchndl.h"
 
 #include <Windows.h>
+#endif
+
+#ifdef LINUX
+#ifndef ARCH_WASM
+static char* executable_path;
+void crash_handler_basic(int sig);
+
+#include <sys/mman.h>
+#include <execinfo.h>
+#include <signal.h>
+#endif // !ARCH_WASM
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <errno.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+#ifdef SDL2_RENDER
+#include <SDL2/SDL.h>
+#endif // SDL2_RENDER
+
+#endif // LINUX
 
 int main(int argc, char** argv)
-{   
+{
+#ifdef WIN64_STANDALONE
     FILE* fp;
     AllocConsole();
     freopen_s(&fp, "CONIN$", "r", stdin);
@@ -199,19 +229,87 @@ int main(int argc, char** argv)
             pfnExcHndlInit();
         }
     }
+#endif // WIN64_STANDALONE
+
+#ifdef LINUX
+#ifndef ARCH_WASM
+    executable_path = argv[0];
+    signal(SIGSEGV, crash_handler_basic);
+    //signal(SIGINT, int_handler);
+#endif // !ARCH_WASM
+
+#ifndef ARCH_64BIT
+#ifndef ARCH_WASM
+    mmap((void*)0x400000, 0x122000, PROT_READ | PROT_WRITE, MAP_ANON|MAP_PRIVATE|MAP_FIXED, -1, 0);
+    mmap((void*)0x522000, 0x500000, PROT_READ | PROT_WRITE, MAP_ANON|MAP_PRIVATE|MAP_FIXED, -1, 0);
+    
+    // Fill with illegal instructions
+    for (int i = 0; i < 0x500000; i += 2)
+    {
+        *(uint8_t*)(0x400000+i) = 0x0f;
+        *(uint8_t*)(0x400000+i+1) = 0x0b;
+    }
+    
+    // Zero .rodata, .data and .bss before loading
+    memset((void*)0x525000, 0, 0x3DE000);
+    
+    FILE* f = fopen("JK.EXE", "rb");
+    if (!f) {
+        printf("Failed to open `JK.EXE`! Make sure the file exists in the current working directory.");
+        exit(-1);
+    }
+    
+    // text
+    fseek(f, 0x400, SEEK_SET);
+#ifndef LINUX_TMP
+    printf("Using JK.EXE blob...\n");
+    fread((void*)0x401000, 0x120200, 1, f);
+#endif // !LINUX_TMP
+
+#ifndef NO_JK_MMAP
+    // rdata
+    fseek(f, 0x120600, SEEK_SET);
+    fread((void*)0x522000, 0x2200, 1, f);
+
+    // data
+    fseek(f, 0x122800, SEEK_SET);
+    fread((void*)0x525000, 0x2DA00, 1, f);
+#endif // !NO_JK_MMAP
+    fclose(f);
+    
+    do_hooks();
+    
+    mprotect((void*)0x400000, 0x122000, PROT_READ | PROT_EXEC);
+#endif // !ARCH_WASM
+#endif // !ARCH_64BIT
+#endif // LINUX
 
     getcwd(openjkdf2_aOrigCwd, sizeof(openjkdf2_aOrigCwd));
 
+    openjkdf2_bOrigWasDF2 = 1;
+    for (int i = 1; i < argc; i++) {
+        if (!__strcmpi(argv[i], "-motsCompat") || !__strcmpi(argv[i], "/motsCompat")) {
+            openjkdf2_bOrigWasDF2 = 0; // Running MoTS.
+        }
+        else if (!__strcmpi(argv[i], "-path") || !__strcmpi(argv[i], "/path")) {
+            openjkdf2_bOrigWasDF2 = 0; // Running some kind of mod.
+        }
+    }
+
     while (1)
     {
-        chdir(openjkdf2_aOrigCwd);
-        openjkdf2_bRestartToDF2 = 0;
-        openjkdf2_bRestartToMots = 0;
+        openjkdf2_restartMode = OPENJKDF2_RESTART_NONE;
         OpenJKDF2_Globals_Reset();
 
         Window_Main_Linux(argc, argv);
 
-        if (openjkdf2_bRestartToMots || openjkdf2_bRestartToDF2) {
+        printf("openjkdf2_bOrigWasRunningFromExistingInstall %x\n", openjkdf2_bOrigWasRunningFromExistingInstall);
+        printf("openjkdf2_bIsRunningFromExistingInstall %x\n", openjkdf2_bIsRunningFromExistingInstall);
+        printf("openjkdf2_bOrigWasDF2 %x\n", openjkdf2_bOrigWasDF2);
+
+        openjkdf2_bIsFirstLaunch = 0;
+        if (openjkdf2_restartMode != OPENJKDF2_RESTART_NONE) {
+            // Purge any cmdline args that will get in the way.
             for (int i = 1; i < argc; i++) {
                 if (!__strcmpi(argv[i], "-motsCompat") || !__strcmpi(argv[i], "/motsCompat")) {
                     argv[i] = "";
@@ -221,13 +319,26 @@ int main(int argc, char** argv)
                     argv[i+1] = "";
                 }
             }
+
+            // Scenario: User has an existing JK.EXE/JKM.EXE replacement install, and wants to run the other game.
+            // If we keep the current working directory, it will trigger the jk_.cd checks and not restart correctly.
+            // So we override the cwd to the LocalData directory to prevent this.
+            if ((openjkdf2_bOrigWasRunningFromExistingInstall && openjkdf2_bOrigWasDF2 && (openjkdf2_restartMode == OPENJKDF2_RESTART_MOTS))
+                || (openjkdf2_bOrigWasRunningFromExistingInstall && !openjkdf2_bOrigWasDF2 && (openjkdf2_restartMode == OPENJKDF2_RESTART_DF2))) 
+            {
+                openjkdf2_bSkipWorkingDirData = 1;
+            }
+            else {
+                openjkdf2_bSkipWorkingDirData = 0;
+                chdir(openjkdf2_aOrigCwd);
+            }
         }
 
-        if (openjkdf2_bRestartToMots) {
+        if (openjkdf2_restartMode == OPENJKDF2_RESTART_MOTS) {
             Main_bMotsCompat = 1;
             continue;
         }
-        if (openjkdf2_bRestartToDF2) {
+        else if (openjkdf2_restartMode == OPENJKDF2_RESTART_DF2) {
             Main_bMotsCompat = 0;
             continue;
         }
@@ -236,31 +347,12 @@ int main(int argc, char** argv)
     }
     return 1;
 }
-#endif
 
 #ifdef LINUX
-
-#ifndef ARCH_WASM
-#include <sys/mman.h>
-#include <execinfo.h>
-#include <signal.h>
-#endif
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <errno.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-
-#ifdef SDL2_RENDER
-#include <SDL2/SDL.h>
-#endif
 
 //#include "external/libbacktrace/backtrace.h"
 
 #ifndef ARCH_WASM
-static char* executable_path;
 
 #if 0
 static int
@@ -365,101 +457,7 @@ void int_handler(int sig) {
 }
 #endif // ARCH_WASM
 
-int main(int argc, char** argv)
-{
-#ifndef ARCH_WASM
-    executable_path = argv[0];
-    signal(SIGSEGV, crash_handler_basic);
-    //signal(SIGINT, int_handler);
-#endif
-
-#ifndef ARCH_64BIT
-#ifndef ARCH_WASM
-    mmap((void*)0x400000, 0x122000, PROT_READ | PROT_WRITE, MAP_ANON|MAP_PRIVATE|MAP_FIXED, -1, 0);
-    mmap((void*)0x522000, 0x500000, PROT_READ | PROT_WRITE, MAP_ANON|MAP_PRIVATE|MAP_FIXED, -1, 0);
-    
-    // Fill with illegal instructions
-    for (int i = 0; i < 0x500000; i += 2)
-    {
-        *(uint8_t*)(0x400000+i) = 0x0f;
-        *(uint8_t*)(0x400000+i+1) = 0x0b;
-    }
-    
-    // Zero .rodata, .data and .bss before loading
-    memset((void*)0x525000, 0, 0x3DE000);
-    
-    FILE* f = fopen("JK.EXE", "rb");
-    if (!f) {
-        printf("Failed to open `JK.EXE`! Make sure the file exists in the current working directory.");
-        exit(-1);
-    }
-    
-    // text
-    fseek(f, 0x400, SEEK_SET);
-#ifndef LINUX_TMP
-    printf("Using JK.EXE blob...\n");
-    fread((void*)0x401000, 0x120200, 1, f);
-#endif
-
-#ifndef NO_JK_MMAP
-    // rdata
-    fseek(f, 0x120600, SEEK_SET);
-    fread((void*)0x522000, 0x2200, 1, f);
-
-    // data
-    fseek(f, 0x122800, SEEK_SET);
-    fread((void*)0x525000, 0x2DA00, 1, f);
-#endif
-    fclose(f);
-    
-    do_hooks();
-    
-    mprotect((void*)0x400000, 0x122000, PROT_READ | PROT_EXEC);
-#endif // ARCH_WASM
-#endif // ARCH_64BIT
-
-    //printf("%x\n", *(uint32_t*)0x401000);
-    
-    //while (1);
-
-    getcwd(openjkdf2_aOrigCwd, sizeof(openjkdf2_aOrigCwd));
-
-    while (1)
-    {
-        chdir(openjkdf2_aOrigCwd);
-        openjkdf2_bRestartToDF2 = 0;
-        openjkdf2_bRestartToMots = 0;
-        OpenJKDF2_Globals_Reset();
-
-        Window_Main_Linux(argc, argv);
-
-        if (openjkdf2_bRestartToMots || openjkdf2_bRestartToDF2) {
-            for (int i = 1; i < argc; i++) {
-                if (!__strcmpi(argv[i], "-motsCompat") || !__strcmpi(argv[i], "/motsCompat")) {
-                    argv[i] = "";
-                }
-                else if (!__strcmpi(argv[i], "-path") || !__strcmpi(argv[i], "/path")) {
-                    argv[i] = "";
-                    argv[i+1] = "";
-                }
-            }
-        }
-
-        if (openjkdf2_bRestartToMots) {
-            Main_bMotsCompat = 1;
-            continue;
-        }
-        if (openjkdf2_bRestartToDF2) {
-            Main_bMotsCompat = 0;
-            continue;
-        }
-
-        break;
-    }
-    return 1;
-}
-
-#endif
+#endif // LINUX
 
 #ifndef WIN64_STANDALONE
 #ifdef WIN32
@@ -492,14 +490,14 @@ __declspec(dllexport) void hook_init(void)
     jk_init();
     do_hooks();
 }
-#endif
+#endif // WIN32
 
 int yyparse();
 void do_hooks()
 {
 #ifndef LINUX
     hook_function(WinMain_ADDR, WinMain_);
-#endif
+#endif // LINUX
     
     // stdPlatform
     hook_function(stdPlatform_InitServices_ADDR, stdPlatform_InitServices);

@@ -1068,19 +1068,32 @@ void InstallHelper_SetCwd()
     stdFnames_MakePath(fname, 256, data_home, "resource/jk_.cd");
 
     // If ~/.local/share/openjkdf2/resource/jk_cd exists, use that directory as resource root
-    if(util_FileExists(fname) && !util_FileExists("resource/jk_.cd")) {
+    if(openjkdf2_bSkipWorkingDirData || (util_FileExists(fname) && !util_FileExists("resource/jk_.cd"))) {
         InstallHelper_UseLocalData();
         found_override = 1;
     }
 
     if (!found_override) {
         printf("Running from current working directory.\n");
+        openjkdf2_bIsRunningFromExistingInstall = 1;
+        if (openjkdf2_bIsFirstLaunch) {
+            openjkdf2_bOrigWasRunningFromExistingInstall = 1;
+        }
+    }
+    else {
+        openjkdf2_bIsRunningFromExistingInstall = 0;
+        if (openjkdf2_bIsFirstLaunch) {
+            openjkdf2_bOrigWasRunningFromExistingInstall = 0;
+        }
     }
 
     // If we can tell that we're loading MoTS assets, enable Main_bMotsCompat
     int keyval = jkRes_ReadKeyRawEarly();
     if (JKRES_IS_MOTS_MAGIC(keyval)) {
         Main_bMotsCompat = 1;
+        if (openjkdf2_bIsFirstLaunch) {
+            openjkdf2_bOrigWasDF2 = 0;
+        }
     }
 
 #endif // (defined(MACOS) || defined(LINUX) || defined(WIN32)) && defined(SDL2_RENDER) && !defined(ARCH_WASM)
@@ -1096,6 +1109,7 @@ void InstallHelper_SetCwd()
     }
 
     stdFileUtil_MkDir("mods");
+    stdFileUtil_MkDir("expansions");
 #endif
 }
 

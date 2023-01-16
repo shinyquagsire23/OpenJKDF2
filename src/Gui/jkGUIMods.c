@@ -40,14 +40,25 @@
 #include <errno.h>
 #endif
 
+typedef struct jkGuiModsElement_t
+{
+    const char* paPath;
+} jkGuiModsElement_t;
+
+enum jkGuiModsButton_t
+{
+    JKGUIMODS_BTN_LISTCLICK = 1,
+    JKGUIMODS_BTN_OPENRESOURCEFOLDER = 10,
+};
+
 static uint32_t jkGuiMods_listboxIdk[2] = {0xd, 0xe};
 
 static jkGuiElement jkGuiMods_aElements[9] = {
     {ELEMENT_TEXT, 0, 5, L"Expansions & Mods", 3, {0, 30, 640, 60}, 1, 0, 0, 0, 0, 0, {0}, 0},
-    {ELEMENT_LISTBOX, 1, 2, 0, 0, {80, 135, 480, 240}, 1, 0, 0, 0, 0, jkGuiMods_listboxIdk, {0}, 0},
+    {ELEMENT_LISTBOX, JKGUIMODS_BTN_LISTCLICK, 2, 0, 0, {80, 135, 480, 240}, 1, 0, 0, 0, 0, jkGuiMods_listboxIdk, {0}, 0},
     
     {ELEMENT_TEXT, 0, 2, L"This menu is slightly functional.", 3, {160, 100, 320, 30}, 1, 0, 0, 0, 0, 0, {0}, 0},
-    {ELEMENT_TEXTBUTTON, 10, 2, L"Open Resource Folder", 3, {160, 380, 320, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_TEXTBUTTON, JKGUIMODS_BTN_OPENRESOURCEFOLDER, 2, L"Open Resource Folder", 3, {160, 380, 320, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
 
     {ELEMENT_TEXT,  0,  0,  NULL,  3, {560, 440, 70, 15},  1,  0,  0,  0,  0,  0, {0},  0},
     {ELEMENT_TEXT,  0,  0,  NULL,  3, {560, 455, 70, 15},  1,  0,  0,  0,  0,  0, {0},  0},
@@ -137,7 +148,6 @@ void jkGuiMods_Show()
     char *v2; // edx
     wchar_t *v3; // eax
     int v4; // eax
-    const char *v5; // eax
     const char *v6; // eax
     int v7; // esi
     void *i; // eax
@@ -161,31 +171,32 @@ void jkGuiMods_Show()
         jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiMods_menu, &jkGuiMods_aElements[3]);
         v4 = jkGuiRend_DisplayAndReturnClicked(&jkGuiMods_menu);
         
-        if (v4 == 10) {
+        if (v4 == JKGUIMODS_BTN_OPENRESOURCEFOLDER) {
 #ifdef SDL2_RENDER
             char tmpCwd[256];
             char tmpUrl[512];
             getcwd(tmpCwd, sizeof(tmpCwd));
             snprintf(tmpUrl, sizeof(tmpUrl), "file://%s", tmpCwd);
             jkGuiMods_OpenURL(tmpUrl);
+            printf
 #endif
         }
-        else if ( v4 == 1 )
+        else if ( v4 == JKGUIMODS_BTN_LISTCLICK )
         {
-            v5 = (const char *)jkGuiRend_GetId(&darray, jkGuiMods_aElements[1].selectedTextEntry);
-            snprintf(v12, 256, "mods%c%s", '\\', v5); // Added: sprintf -> snprintf
+            jkGuiModsElement_t* pListElement = (jkGuiModsElement_t*)jkGuiRend_GetId(&darray, jkGuiMods_aElements[1].selectedTextEntry);
+            snprintf(v12, 256, "mods%c%s", '\\', pListElement->paPath); // Added: sprintf -> snprintf
 
             printf("Selected entry %u, %s\n", jkGuiMods_aElements[1].selectedTextEntry, v12);
-            if (jkGuiMods_aElements[1].selectedTextEntry == 0)
+            if (!strcmp(pListElement->paPath, "OPENJKDF2_RESTART_DF2"))
             {
                 g_should_exit = 1;
-                if (Main_bMotsCompat) {
-                    openjkdf2_bRestartToDF2 = 1;
-                }
-                else {
-                    openjkdf2_bRestartToMots = 1;
-                }
-                
+                openjkdf2_restartMode = OPENJKDF2_RESTART_DF2;
+                break;
+            }
+            else if (!strcmp(pListElement->paPath, "OPENJKDF2_RESTART_MOTS"))
+            {
+                g_should_exit = 1;
+                openjkdf2_restartMode = OPENJKDF2_RESTART_MOTS;
                 break;
             }
         }
@@ -195,27 +206,31 @@ void jkGuiMods_Show()
     v7 = 0;
     for ( i = (void *)jkGuiRend_GetId(&darray, 0); i; i = (void *)jkGuiRend_GetId(&darray, v7) )
     {
-        //pHS->free(i);
+        pHS->free(i);
         ++v7;
     }
 }
 
-void jkGuiMods_AddEntry(Darray *list, jkGuiElement *element, const char* val)
+void jkGuiMods_AddEntry(Darray *pListDisplayed, jkGuiElement *pElement, const char* paVal, const char* paDisplayed)
 {
-    size_t alloc_sz = (_strlen(val) + 1) * sizeof(wchar_t);
+    size_t alloc_sz = (_strlen(paDisplayed) + 1) * sizeof(wchar_t);
 
     wchar_t* out = (wchar_t *)pHS->alloc(alloc_sz);
     memset(out, 0, alloc_sz);
 
-    stdString_CharToWchar(out, val, _strlen(val));
-    jkGuiRend_DarrayReallocStr(list, out, (intptr_t)val);
+    jkGuiModsElement_t* pListElement = (jkGuiModsElement_t*)pHS->alloc(sizeof(jkGuiModsElement_t));
+    memset(pListElement, 0, sizeof(jkGuiModsElement_t));
+    pListElement->paPath = paVal;
+
+    stdString_CharToWchar(out, paDisplayed, _strlen(paDisplayed));
+    jkGuiRend_DarrayReallocStr(pListDisplayed, out, (intptr_t)pListElement);
     pHS->free(out);
 }
 
-void jkGuiMods_PopulateEntries(Darray *list, jkGuiElement *element)
+void jkGuiMods_PopulateEntries(Darray *pListDisplayed, jkGuiElement *element)
 {
-    char tmpCwd[256];
-    char tmpKeyPath[256];
+    char tmpCwd[512];
+    char tmpKeyPath[512];
 
 #ifndef ARCH_WASM
     Main_bMotsCompat = !Main_bMotsCompat;
@@ -228,24 +243,23 @@ void jkGuiMods_PopulateEntries(Darray *list, jkGuiElement *element)
     
     stdFnames_MakePath(tmpKeyPath, 256, tmpCwd, "resource/jk_.cd");
     int keyval = jkRes_ReadKeyFromFile(tmpKeyPath);
-    printf("%s %x\n", tmpKeyPath, keyval);
 
     if (!Main_bMotsCompat)
     {
-        if (keyval == 0 || !JKRES_IS_MOTS_MAGIC(keyval)) {
-            jkGuiMods_AddEntry(list, element, "Install Mysteries of the Sith");
+        if (!(!openjkdf2_bOrigWasDF2 && openjkdf2_bOrigWasRunningFromExistingInstall) && (keyval == 0 || !JKRES_IS_MOTS_MAGIC(keyval))) {
+            jkGuiMods_AddEntry(pListDisplayed, element, "OPENJKDF2_RESTART_MOTS", "Install Mysteries of the Sith");
         }
         else {
-            jkGuiMods_AddEntry(list, element, "Launch Mysteries of the Sith");
+            jkGuiMods_AddEntry(pListDisplayed, element, "OPENJKDF2_RESTART_MOTS", "Launch Mysteries of the Sith");
         }
     }
     else
     {
-        if (keyval == 0 || !JKRES_IS_DF2_MAGIC(keyval)) {
-            jkGuiMods_AddEntry(list, element, "Install Dark Forces II");
+        if (!(openjkdf2_bOrigWasDF2 && openjkdf2_bOrigWasRunningFromExistingInstall) && (keyval == 0 || !JKRES_IS_DF2_MAGIC(keyval))) {
+            jkGuiMods_AddEntry(pListDisplayed, element, "OPENJKDF2_RESTART_DF2", "Install Dark Forces II");
         }
         else {
-            jkGuiMods_AddEntry(list, element, "Launch Dark Forces II");
+            jkGuiMods_AddEntry(pListDisplayed, element, "OPENJKDF2_RESTART_DF2", "Launch Dark Forces II");
         }
     }
     
@@ -256,11 +270,11 @@ void jkGuiMods_PopulateEntries(Darray *list, jkGuiElement *element)
     {
         if ( modResult.fpath[0] != '.' )
         {
-            jkGuiMods_AddEntry(list, element, modResult.fpath);
+            jkGuiMods_AddEntry(pListDisplayed, element, modResult.fpath, modResult.fpath);
         }
     }
 
-    jkGuiRend_AddStringEntry(list, 0, 0);
-    jkGuiRend_SetClickableString(element, list);
+    jkGuiRend_AddStringEntry(pListDisplayed, 0, 0);
+    jkGuiRend_SetClickableString(element, pListDisplayed);
     element->selectedTextEntry = 0;
 }

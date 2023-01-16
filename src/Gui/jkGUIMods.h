@@ -28,6 +28,6 @@ void jkGuiMods_Startup();
 void jkGuiMods_Shutdown();
 
 void jkGuiMods_Show();
-void jkGuiMods_PopulateEntries(Darray *list, jkGuiElement *element);
+void jkGuiMods_PopulateEntries(Darray *pListDisplayed, jkGuiElement *element);
 
 #endif // _JKGUI_MODS_H
