@@ -1,5 +1,8 @@
 #!/bin/zsh
 
+export OPENJKDF2_RELEASE_COMMIT=$(git log -1 --format="%H")
+export OPENJKDF2_RELEASE_COMMIT_SHORT=$(git rev-parse --short=8 HEAD)
+
 mkdir -p build_linux64 && cd build_linux64
 
 if [ ! -f build_protoc/protoc ]; then

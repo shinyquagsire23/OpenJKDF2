@@ -3911,6 +3911,8 @@ typedef struct jkBubbleInfo
 #include "stdPlatform.h"
 #endif
 
+#include "version.h"
+
 #ifdef __cplusplus
 }
 #endif

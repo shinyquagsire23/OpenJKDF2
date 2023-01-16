@@ -13,10 +13,10 @@ finish-args:
   - --socket=pulseaudio
 
 modules:
-  - packaging/flatpak/glew/glew.json
-  - packaging/flatpak/glu/glu-9.json
-  - packaging/flatpak/python3-cogapp.json
-  
+  - shared-modules/glew/glew.json
+  - shared-modules/glu/glu-9.json
+  - python3-cogapp.json
+
   - name: openjkdf2
     buildsystem: simple
     build-commands:

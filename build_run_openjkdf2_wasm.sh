@@ -3,6 +3,9 @@
 # Run in OpenJKDF2 directory:
 # python -m SimpleHTTPServer
 
+export OPENJKDF2_RELEASE_COMMIT=$(git log -1 --format="%H")
+export OPENJKDF2_RELEASE_COMMIT_SHORT=$(git rev-parse --short=8 HEAD)
+
 rm -f wasm_out/openjkdf2.js
 rm -f wasm_out/openjkdf2.wasm
 rm -f wasm_out/openjkdf2.data

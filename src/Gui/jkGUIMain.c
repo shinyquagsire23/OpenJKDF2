@@ -29,6 +29,9 @@
 #include "General/stdFnames.h"
 #include "stdPlatform.h"
 
+// Added
+static wchar_t jkGuiMain_versionBuffer[64];
+
 static int jkGuiMain_bIdk = 1;
 static int jkGuiCutscenes_initted;
 
@@ -44,7 +47,7 @@ static jkGuiElement jkGuiMain_cutscenesElements[5] = {
 
 static jkGuiMenu jkGuiMain_cutscenesMenu = {jkGuiMain_cutscenesElements, 0xFFFFFFFF, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 
-static jkGuiElement jkGuiMain_elements[9] = {
+static jkGuiElement jkGuiMain_elements[11] = {
     {ELEMENT_TEXTBUTTON, 10, 5, "GUI_SINGLEPLAYER", 3, {0, 0xA0, 0x280, 0x3C}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON, 11, 5, "GUI_MULTIPLAYER", 3, {0, 0xDC, 0x280, 0x3C}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON, 12, 5, "GUI_QUIT", 3, {0, 0x118, 0x280, 0x3C}, 1, 0, 0, 0, 0, 0, {0}, 0},
@@ -54,6 +57,8 @@ static jkGuiElement jkGuiMain_elements[9] = {
 #ifdef QOL_IMPROVEMENTS
     {ELEMENT_TEXTBUTTON, 16, 2, "GUI_CREDITS", 3, {130, 430, 150, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON, 17, 2, L"Expansions & Mods", 3, {370, 430, 150, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_TEXT,  0,  0,  NULL,  3, {560, 440, 70, 15},  1,  0,  0,  0,  0,  0, {0},  0},
+    {ELEMENT_TEXT,  0,  0,  NULL,  3, {560, 455, 70, 15},  1,  0,  0,  0,  0,  0, {0},  0},
 #else
     {ELEMENT_TEXTBUTTON, 16, 2, "GUI_CREDITS", 3, {250, 420, 150, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
 #endif
@@ -68,6 +73,10 @@ void jkGuiMain_Show()
     int v1; // esi
     wchar_t *v2; // eax
     wchar_t *v4; // [esp-4h] [ebp-Ch]
+
+    // Added: OpenJKDF2 version
+    jkGuiMain_elements[8].wstr = openjkdf2_waReleaseVersion;
+    jkGuiMain_elements[9].wstr = openjkdf2_waReleaseCommitShort;
 
     jkGui_SetModeMenu(jkGui_stdBitmaps[0]->palette);
     if ( !jkGuiMain_bIdk || (jkGuiMain_bIdk = 0, jkGuiPlayer_ShowNewPlayer(1), !stdComm_dword_8321F8) || jkGuiMultiplayer_Show2() != 1 )

@@ -5,6 +5,9 @@ export MACOSX_DEPLOYMENT_TARGET=10.15
 
 cd /Users/maxamillion/workspace/OpenJKDF2/
 
+export OPENJKDF2_RELEASE_COMMIT=$(git log -1 --format="%H")
+export OPENJKDF2_RELEASE_COMMIT_SHORT=$(git rev-parse --short=8 HEAD)
+
 #make flex/flex
 #make byacc/yacc
 
@@ -57,6 +60,7 @@ echo "Running..." &&
 #codesign -s - openjkdf2-64 &&
 #OPENJKMOTS_ROOT="~/Library/Application Support/OpenJKDF2/openjkmots" LSAN_OPTIONS="suppressions=/Users/maxamillion/workspace/OpenJKDF2/suppr.txt" ASAN_OPTIONS="log_path=/Users/maxamillion/workspace/OpenJKDF2/asan.log"  lldb -o run ./OpenJKDF2.app/Contents/MacOS/openjkdf2-64 -- -motsCompat #-- -verboseNetworking
 #OPENJKDF2_ROOT="~/Library/Application Support/OpenJKDF2/openjkmots" LSAN_OPTIONS="suppressions=/Users/maxamillion/workspace/OpenJKDF2/suppr.txt" ASAN_OPTIONS="log_path=/Users/maxamillion/workspace/OpenJKDF2/asan.log"  lldb -o run ./OpenJKDF2.app/Contents/MacOS/openjkdf2-64 #-- -verboseNetworking
+#lldb -o run ./OpenJKDF2.app/Contents/MacOS/openjkdf2-64 -- -motsCompat -path research #-- -verboseNetworking
 lldb -o run ./OpenJKDF2.app/Contents/MacOS/openjkdf2-64 -- -motsCompat #-- -verboseNetworking
 #lldb -o run ./OpenJKDF2.app/Contents/MacOS/openjkdf2-64
 #open OpenJKDF2.app

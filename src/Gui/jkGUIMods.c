@@ -42,19 +42,22 @@
 
 static uint32_t jkGuiMods_listboxIdk[2] = {0xd, 0xe};
 
-static jkGuiElement jkGuiMods_cutscenesElements[7] = {
+static jkGuiElement jkGuiMods_aElements[9] = {
     {ELEMENT_TEXT, 0, 5, L"Expansions & Mods", 3, {0, 30, 640, 60}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_LISTBOX, 1, 2, 0, 0, {80, 135, 480, 240}, 1, 0, 0, 0, 0, jkGuiMods_listboxIdk, {0}, 0},
     
     {ELEMENT_TEXT, 0, 2, L"This menu is slightly functional.", 3, {160, 100, 320, 30}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON, 10, 2, L"Open Resource Folder", 3, {160, 380, 320, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
 
+    {ELEMENT_TEXT,  0,  0,  NULL,  3, {560, 440, 70, 15},  1,  0,  0,  0,  0,  0, {0},  0},
+    {ELEMENT_TEXT,  0,  0,  NULL,  3, {560, 455, 70, 15},  1,  0,  0,  0,  0,  0, {0},  0},
+
     {ELEMENT_TEXTBUTTON, 1, 2, "GUI_OK", 3, {340, 420, 140, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON, -1, 2, "GUI_CANCEL", 3, {150, 420, 180, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_END, 0, 0, 0, 0, {0}, 0, 0, 0, 0, 0, 0, {0}, 0}
 };
 
-static jkGuiMenu jkGuiMods_cutscenesMenu = {jkGuiMods_cutscenesElements, 0xFFFFFFFF, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
+static jkGuiMenu jkGuiMods_menu = {jkGuiMods_aElements, 0xFFFFFFFF, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 
 static int jkGuiMods_bInitted;
 
@@ -118,7 +121,7 @@ void jkGuiMods_Startup()
     if ( jkGuiMods_bInitted )
         return;
 
-    jkGui_InitMenu(&jkGuiMods_cutscenesMenu, jkGui_stdBitmaps[3]);
+    jkGui_InitMenu(&jkGuiMods_menu, jkGui_stdBitmaps[3]);
     jkGuiMods_bInitted = 1;
 }
 
@@ -143,17 +146,20 @@ void jkGuiMods_Show()
     char v11[64]; // [esp+2Ch] [ebp-140h] BYREF
     char v12[256]; // [esp+6Ch] [ebp-100h] BYREF
 
+    jkGuiMods_aElements[4].wstr = openjkdf2_waReleaseVersion;
+    jkGuiMods_aElements[5].wstr = openjkdf2_waReleaseCommitShort;
+
     jkGui_SetModeMenu(jkGui_stdBitmaps[0]->palette);
     jkGuiRend_DarrayNewStr(&darray, 32, 1);
     
-    jkGuiMods_PopulateEntries(&darray, &jkGuiMods_cutscenesElements[1]);
+    jkGuiMods_PopulateEntries(&darray, &jkGuiMods_aElements[1]);
 
     v4 = -1;
     do
     {
-        jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiMods_cutscenesMenu, &jkGuiMods_cutscenesElements[2]);
-        jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiMods_cutscenesMenu, &jkGuiMods_cutscenesElements[3]);
-        v4 = jkGuiRend_DisplayAndReturnClicked(&jkGuiMods_cutscenesMenu);
+        jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiMods_menu, &jkGuiMods_aElements[2]);
+        jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiMods_menu, &jkGuiMods_aElements[3]);
+        v4 = jkGuiRend_DisplayAndReturnClicked(&jkGuiMods_menu);
         
         if (v4 == 10) {
 #ifdef SDL2_RENDER
@@ -166,11 +172,11 @@ void jkGuiMods_Show()
         }
         else if ( v4 == 1 )
         {
-            v5 = (const char *)jkGuiRend_GetId(&darray, jkGuiMods_cutscenesElements[1].selectedTextEntry);
+            v5 = (const char *)jkGuiRend_GetId(&darray, jkGuiMods_aElements[1].selectedTextEntry);
             snprintf(v12, 256, "mods%c%s", '\\', v5); // Added: sprintf -> snprintf
 
-            printf("Selected entry %u, %s\n", jkGuiMods_cutscenesElements[1].selectedTextEntry, v12);
-            if (jkGuiMods_cutscenesElements[1].selectedTextEntry == 0)
+            printf("Selected entry %u, %s\n", jkGuiMods_aElements[1].selectedTextEntry, v12);
+            if (jkGuiMods_aElements[1].selectedTextEntry == 0)
             {
                 g_should_exit = 1;
                 if (Main_bMotsCompat) {
