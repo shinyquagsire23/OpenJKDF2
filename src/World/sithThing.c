@@ -943,6 +943,11 @@ int sithThing_SetNewModel(sithThing *thing, rdModel3 *model)
     rdThing_NewEntry(v2, thing);
     rdThing_SetModel3(v2, model);
     thing->rdthing.puppet = v4;
+
+    // MOTS added
+    if (Main_bMotsCompat)
+        thing->unk = 1;
+
     return 1;
 }
 

@@ -386,6 +386,11 @@ void sithCogFunctionSurface_SetFaceGeoMode(sithCog *ctx)
     {
         if ( v2->surfaceInfo.face.material )
         {
+            // MoTS added
+            if (!v2->surfaceInfo.face.vertexUVIdx && geoMode == RD_GEOMODE_TEXTURED) {
+                geoMode = RD_GEOMODE_SOLIDCOLOR;
+            }
+
             v2->surfaceInfo.face.geometryMode = geoMode;
             if ( COG_SHOULD_SYNC(ctx) )
             {

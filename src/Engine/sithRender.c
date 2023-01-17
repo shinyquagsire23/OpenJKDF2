@@ -1799,20 +1799,20 @@ void sithRender_RenderAlphaSurfaces()
         }
         
         v9->geometryMode = sithRender_geoMode;
-        if ( v0->surfaceInfo.face.geometryMode < sithRender_geoMode )
+        if ( v0->surfaceInfo.face.geometryMode < v9->geometryMode )
         {
             v9->geometryMode = v0->surfaceInfo.face.geometryMode;
         }
 
         v9->lightingMode = sithRender_lightMode;
-        if ( v0->surfaceInfo.face.lightingMode < sithRender_lightMode )
+        if ( v0->surfaceInfo.face.lightingMode < v9->lightingMode )
         {
             v9->lightingMode = v0->surfaceInfo.face.lightingMode;
         }
         
-        v9->textureMode = sithRender_texMode;
-        if (v0->surfaceInfo.face.textureMode < sithRender_texMode)
-            v9->textureMode = v0->surfaceInfo.face.textureMode;
+        v9->textureMode = v0->surfaceInfo.face.textureMode;
+        if (sithRender_texMode <= v9->textureMode)
+            v9->textureMode = sithRender_texMode;
 
         sithRender_idxInfo.intensities = v0->surfaceInfo.intensities;
         meshinfo_out.vertexUVs = v9->vertexUVs;
@@ -1821,6 +1821,12 @@ void sithRender_RenderAlphaSurfaces()
         sithRender_idxInfo.vertexPosIdx = v0->surfaceInfo.face.vertexPosIdx;
         sithRender_idxInfo.vertexUVIdx = v0->surfaceInfo.face.vertexUVIdx;
         meshinfo_out.verticesProjected = vertices_tmp;
+
+        // Added: Just in case
+        if (!sithRender_idxInfo.vertexUVIdx && v9->geometryMode > RD_GEOMODE_SOLIDCOLOR) {
+            v9->geometryMode = RD_GEOMODE_SOLIDCOLOR;
+        }
+
         rdPrimit3_ClipFace(surfaceSector->clipFrustum, v9->geometryMode, v9->lightingMode, v9->textureMode, &sithRender_idxInfo, &meshinfo_out, &v0->surfaceInfo.face.clipIdk);
         if ( meshinfo_out.numVertices < 3u )
         {

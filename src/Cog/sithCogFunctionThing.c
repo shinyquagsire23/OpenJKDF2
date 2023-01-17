@@ -1700,8 +1700,11 @@ void sithCogFunctionThing_AmputateJoint(sithCog *ctx)
             if (animclass && idx < 0xA)
             {
                 int jointIdx = animclass->bodypart_to_joint[idx];
-                if ( jointIdx >= 0 )
-                    rdthing->amputatedJoints[jointIdx] = 1;
+                if ( jointIdx >= 0 ) {
+                    // Added: prevent oob
+                    if (rdthing->model3 && jointIdx < rdthing->model3->numHierarchyNodes)
+                        rdthing->amputatedJoints[jointIdx] = 1;
+                }
             }
         }
     }
