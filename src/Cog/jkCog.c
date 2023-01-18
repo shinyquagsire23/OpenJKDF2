@@ -140,6 +140,9 @@ void jkCog_Shutdown()
 {
     stdStrTable_Free(&jkCog_strings);
     jkCog_bInitted = 0;
+
+    // Added: clean reset
+    jkCog_bubbleIdx = 0;
 }
 
 int jkCog_StringsInit()

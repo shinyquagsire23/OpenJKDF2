@@ -127,6 +127,34 @@ void sithAI_Shutdown()
         stdHashTable_Free(sithAI_commandsHashmap);
         sithAI_bInit = 0;
     }
+
+    // Added: Clean reset
+    sithAI_commandsHashmap = NULL;
+    sithAI_maxActors = 0;
+    memset(sithAI_actorInitted, 0, sizeof(sithAI_actorInitted));
+    sithAI_bOpened = 0;
+    sithAI_bInit = 0;
+    sithAI_commandList = NULL;
+    sithAI_numCommands = 0;
+    sithAI_flt_84DE58 = 0.0f;
+    sithAI_dword_84DE5C = 0;
+    sithAI_dword_84DE60 = 0;
+    sithAI_flt_84DE64 = 0.0f;
+    sithAI_pThing_84DE68 = NULL;
+    sithAI_dword_84DE6C = 0;
+    sithAI_flt_84DE70 = 0.0f;
+    sithAI_dword_84DE74 = 0;
+
+    // These are located in a different part of .data?
+    memset(sithAI_aAlignments, 0, sizeof(sithAI_aAlignments));
+    memset(sithAI_actors, 0, sizeof(sithAI_actors));
+    sithAI_inittedActors = 0;
+
+    // This is also in a different part
+    // MoTS Added
+    sithThing* sithAI_pDistractor = NULL;
+
+    sithAI_FLOAT_005a79d8 = 1.0;
 }
 
 int sithAI_Open()

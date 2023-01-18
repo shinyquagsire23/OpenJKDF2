@@ -224,7 +224,8 @@ void jkGuiMain_Startup()
 
 void jkGuiMain_Shutdown()
 {
-    ;
+    // Added: clean reset
+    jkGuiCutscenes_initted = 0;
 }
 
 void jkGuiMain_PopulateCutscenes(Darray *list, jkGuiElement *element)

@@ -24,7 +24,7 @@
 
 static int jkGuiPlayer_bInitted = 0;
 
-static wchar_t word_555D28[0x100] = {0};
+static wchar_t jkGuiPlayer_awTmp_555D28[0x100] = {0};
 static char* jkGuiPlayer_GuiDifficulties[3] = {"GUI_EASY", "GUI_MED", "GUI_HARD"};
 
 static int jkGuiPlayer_menuSelectIdk[2] = {0xFA, 0};
@@ -86,6 +86,9 @@ int jkGuiPlayer_Startup()
 void jkGuiPlayer_Shutdown()
 {
     jkGuiPlayer_bInitted = 0;
+
+    // Added: clean reset
+    memset(jkGuiPlayer_awTmp_555D28, 0, sizeof(jkGuiPlayer_awTmp_555D28));
 }
 
 int jkGuiPlayer_sub_410640(Darray *array, jkGuiElement *element)
@@ -254,8 +257,8 @@ void jkGuiPlayer_ShowNewPlayer(int a1)
                 continue;
             case 2:
                 jkGuiPlayer_menuNewElements[9].bIsVisible = v15 == 0;
-                jkGuiPlayer_menuNewElements[3].wstr = word_555D28;
-                _memset(word_555D28, 0, 16 * sizeof(wchar_t));
+                jkGuiPlayer_menuNewElements[3].wstr = jkGuiPlayer_awTmp_555D28;
+                _memset(jkGuiPlayer_awTmp_555D28, 0, 16 * sizeof(wchar_t));
                 jkGuiPlayer_menuNewElements[3].selectedTextEntry = 16;
                 jkGuiPlayer_menuNewElements[8].unistr = 0;
                 jkGuiPlayer_menuNewElements[5].selectedTextEntry = 0;
@@ -288,11 +291,11 @@ void jkGuiPlayer_ShowNewPlayer(int a1)
             v7 = jkGuiRend_DisplayAndReturnClicked(&jkGuiPlayer_menuNew);
             if ( v7 == 1 )
             {
-                if ( word_555D28[0] )
+                if ( jkGuiPlayer_awTmp_555D28[0] )
                 {
-                    if ( jkPlayer_VerifyWcharName(word_555D28) )
+                    if ( jkPlayer_VerifyWcharName(jkGuiPlayer_awTmp_555D28) )
                     {
-                        stdString_WcharToChar(v19, word_555D28, 127);
+                        stdString_WcharToChar(v19, jkGuiPlayer_awTmp_555D28, 127);
                         v19[127] = 0;
                         stdFnames_MakePath(v21, 128, "player", v19);
                         stdString_snprintf(v21, 128, "player%c%s%c%s.plr", LEC_PATH_SEPARATOR_CHR, v19, LEC_PATH_SEPARATOR_CHR, v19);
@@ -322,7 +325,7 @@ void jkGuiPlayer_ShowNewPlayer(int a1)
                 jkPlayer_setDiff = 0;
             else
                 jkPlayer_setDiff = 2 - (jkGuiPlayer_menuNewElements[6].selectedTextEntry != 0);
-            jkPlayer_CreateConf(word_555D28);
+            jkPlayer_CreateConf(jkGuiPlayer_awTmp_555D28);
         }
         if ( v7 < 0 )
             v14 = 1;

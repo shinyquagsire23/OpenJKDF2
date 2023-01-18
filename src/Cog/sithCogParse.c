@@ -36,6 +36,9 @@ void sithCogParse_Reset()
         cogparser_num_nodes = 0;
         cogparser_current_nodeidx = 0;
     }
+
+    // Added
+    sithCogParse_lastParsedFile = "INVALID";
 }
 
 int sithCogParse_Load(char *cog_fpath, sithCogScript *cogscript, int unk)

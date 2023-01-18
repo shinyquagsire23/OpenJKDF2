@@ -705,5 +705,7 @@ void jkGuiMouse_Startup()
 
 void jkGuiMouse_Shutdown()
 {
-    ;
+    // Added: clean reset
+    jkGuiMouse_dword_530328 = -1;
+    jkGuiMouse_dword_53032C = -1;
 }

@@ -677,6 +677,15 @@ void jkGuiForce_Shutdown()
             jkGuiForce_aBitmaps[i] = NULL;
         }
     }
+
+    // Added: Clean restart
+    jkGuiForce_alignment = 0;
+    jkGuiForce_flt_556674 = 0;
+    jkGuiForce_numSpendStars = 0;
+    jkGuiForce_bCanSpendStars = 0;
+    jkGuiForce_isMulti = 0;
+    memset(jkGuiForce_aBitmaps, 0, sizeof(jkGuiForce_aBitmaps));
+    memset(jkGuiForce_waTmp, 0, sizeof(jkGuiForce_waTmp));
 }
 
 

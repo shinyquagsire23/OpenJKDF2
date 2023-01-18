@@ -297,5 +297,11 @@ void jkGuiControlSaveLoad_Startup()
 
 void jkGuiControlSaveLoad_Shutdown()
 {
-    ;
+    // Added: clean reset
+    memset(jkGuiControlSaveLoad_awTmp, 0, sizeof(jkGuiControlSaveLoad_awTmp));
+    memset(&jkGuiControlSaveLoad_darray, 0, sizeof(jkGuiControlSaveLoad_darray)); // TODO free?
+    jkGuiControlSaveLoad_dword_559C80 = 0;
+    jkGuiControlSaveLoad_dword_559C84 = 0;
+    memset(jkGuiControlSaveLoad_tmp, 0, sizeof(jkGuiControlSaveLoad_tmp));
+    memset(jkGuiControlSaveLoad_aUnk, 0, sizeof(jkGuiControlSaveLoad_aUnk));
 }

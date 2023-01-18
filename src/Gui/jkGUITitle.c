@@ -60,7 +60,9 @@ void jkGuiTitle_Startup()
 
 void jkGuiTitle_Shutdown()
 {
-    ;
+    // Added: clean reset
+    memset(jkGuiTitle_versionBuffer, 0, sizeof(jkGuiTitle_versionBuffer));
+    jkGuiTitle_loadPercent = 0;
 }
 
 char jkGuiTitle_sub_4189A0(char *a1)

@@ -65,6 +65,11 @@ int sithComm_Startup()
         sithComm_msgFuncs[DSS_MOTS_NEW_1] = sithDSSThing_ProcessMOTSNew1;
         sithComm_msgFuncs[DSS_MOTS_NEW_2] = sithDSSThing_ProcessMOTSNew2;
     }
+
+    // Added: clean reset
+    sithComm_009a1160 = 0;
+    sithComm_version = 6;
+
     sithComm_bInit = 1;
     return 1;
 }
@@ -73,6 +78,10 @@ void sithComm_Shutdown()
 {
     if ( sithComm_bInit )
         sithComm_bInit = 0;
+
+    // Added: clean reset
+    sithComm_009a1160 = 0;
+    sithComm_version = 6;
 }
 
 void sithComm_SetMsgFunc(int msgid, void *func)

@@ -97,7 +97,8 @@ void jkGuiGeneral_Startup()
 
 void jkGuiGeneral_Shutdown()
 {
-    ;
+    // Added: clean restart
+    memset(slider_val_text, 0, sizeof(slider_val_text));
 }
 
 #if defined(QOL_IMPROVEMENTS) && !defined(SDL2_RENDER)

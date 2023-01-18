@@ -475,7 +475,12 @@ void jkGuiMultiTally_Startup()
 
 void jkGuiMultiTally_Shutdown()
 {
-    ;
+    // Added: clean reset
+    memset(jkGuiMultiTally_waTmp, 0, sizeof(jkGuiMultiTally_waTmp));
+
+    jkGuiMultiTally_msStart = 0;
+    jkGuiMultiTally_dword_5568D0 = 0;
+    jkGuiMultiTally_idkType = 0;
 }
 
 void jkGuiMultiTally_sub_4188B0(jkGuiMenu *pMenu)

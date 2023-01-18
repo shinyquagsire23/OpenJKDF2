@@ -210,6 +210,10 @@ void jkGuiBuildMulti_StartupEditCharacter()
 
 void jkGuiBuildMulti_ShutdownEditCharacter()
 {
+    // Added: clean reset
+    jkGuiBuildMulti_jediRank = 0;
+    jkGuiBuildMulti_bRendering = 0;
+
     ;
 }
 
@@ -521,10 +525,14 @@ LABEL_32:
     jkGuiBuildMulti_bEditShowing = 0;
     if ( jkGame_aSabers )
         pHS->free(jkGame_aSabers);
-    for ( i = 0; i < jkGuiBuildMulti_numSabers; ++i )
+    for ( i = 0; i < jkGuiBuildMulti_numSabers; ++i ) {
         stdBitmap_Free(jkGuiBuildMulti_apSaberBitmaps[i]);
-    if ( jkGuiBuildMulti_apSaberBitmaps )
+        jkGuiBuildMulti_apSaberBitmaps[i] = NULL; // Added
+    }
+    if ( jkGuiBuildMulti_apSaberBitmaps ) {
         pHS->free(jkGuiBuildMulti_apSaberBitmaps);
+        jkGuiBuildMulti_apSaberBitmaps = NULL; // Added
+    }
     jkGui_SetModeGame();
 
     // Added
@@ -760,6 +768,54 @@ int jkGuiBuildMulti_Startup()
 void jkGuiBuildMulti_Shutdown()
 {
     jkGuiBuildMulti_bInitted = 0;
+
+    // Added: clean reset
+    memset(jkGuiBuildMulti_wPlayerShortName, 0, sizeof(jkGuiBuildMulti_wPlayerShortName));
+    memset(jkGuiBuildMulti_aMpcInfo, 0, sizeof(jkGuiBuildMulti_aMpcInfo));
+    memset(jkGuiBuildMulti_wTmp, 0, sizeof(jkGuiBuildMulti_wTmp));
+    memset(jkGuiBuildMulti_wTmp2, 0, sizeof(jkGuiBuildMulti_wTmp2));
+    memset(jkGuiBuildMulti_aWchar_5594C8, 0, sizeof(jkGuiBuildMulti_aWchar_5594C8));
+
+    jkGuiBuildMulti_fnMatLoader = NULL;
+    jkGuiBuildMulti_fnModelLoader = NULL;
+    jkGuiBuildMulti_fnKeyframeLoader = NULL;
+    jkGuiBuildMulti_pCanvas = NULL;
+    jkGuiBuildMulti_pCamera = NULL;
+    jkGuiBuildMulti_model = NULL;
+    jkGuiBuildMulti_pModelGun = NULL;
+    jkGuiBuildMulti_keyframe = NULL;
+    jkGuiBuildMulti_pThingCamera = NULL;
+    jkGuiBuildMulti_thing = NULL;
+    jkGuiBuildMulti_pThingGun = NULL;
+    jkGuiBuildMulti_startTimeSecs = 0;
+
+    memset(&jkGuiBuildMulti_colormap, 0, sizeof(jkGuiBuildMulti_colormap));
+    memset(&jkGuiBuildMulti_light, 0, sizeof(jkGuiBuildMulti_light));
+    memset(&jkGuiBuildMulti_matrix, 0, sizeof(jkGuiBuildMulti_matrix));
+
+    jkGuiBuildMulti_pVBuf1 = NULL;
+    jkGuiBuildMulti_pVBuf2 = NULL;
+    jkGuiBuildMulti_trackNum = 0;
+    memset(jkGuiBuildMulti_waTmp, 0, sizeof(jkGuiBuildMulti_waTmp));
+    memset(jkGuiBuildMulti_waTmp2, 0, sizeof(jkGuiBuildMulti_waTmp2));
+
+    jkGuiBuildMulti_apSaberBitmaps = NULL;
+    jkGame_aSabers = NULL;
+    jkGuiBuildMulti_bSabersLoaded = 0;
+    jkGuiBuildMulti_bEditShowing = 0;
+    jkGuiBuildMulti_numModels = 0;
+    jkGuiBuildMulti_numSabers = 0;
+    jkGuiBuildMulti_saberIdx = 0;
+    jkGuiBuildMulti_modelIdx = 0;
+    jkGuiBuildMulti_aModels = NULL;
+    jkGuiBuildMulti_renderOptions = 0x103;
+
+    memset(&jkGuiBuildMulti_projectRot, 0, sizeof(jkGuiBuildMulti_projectRot));
+    memset(&jkGuiBuildMulti_projectPos, 0, sizeof(jkGuiBuildMulti_projectPos));
+    memset(&jkGuiBuildMulti_texFmt, 0, sizeof(jkGuiBuildMulti_texFmt));
+    memset(&jkGuiBuildMulti_orthoProjection, 0, sizeof(jkGuiBuildMulti_orthoProjection));
+    memset(&jkGuiBuildMulti_lightPos, 0, sizeof(jkGuiBuildMulti_lightPos));
+    jkGuiBuildMulti_lastModelDrawMs = 0;
 }
 
 void jkGuiBuildMulti_Load(char *pPathOut, int pathOutLen, wchar_t *pPlayerName, wchar_t *pCharName, int bCharPath)

@@ -88,6 +88,8 @@ void jkGuiSound_Shutdown()
     // Added
     wuRegistry_SaveFloat("cutsceneVolume", jkGuiSound_cutsceneVolume);
 
+    // Added: clean reset
+    jkGuiSound_cutsceneVolume = 1.0;
 }
 
 int jkGuiSound_Show()

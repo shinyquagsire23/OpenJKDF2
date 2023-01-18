@@ -397,6 +397,12 @@ void sithCog_Shutdown()
     }
     sithCogParse_Reset();
     sithCog_bInitted = 0;
+
+    // Added: sithCogExec var clean reset
+    sithCogExec_009d39b0 = 0;
+    sithCogExec_pIdkMotsCtx = NULL;
+    sithCog_pActionCog = NULL;
+    sithCog_actionCogIdk = 0;
 }
 
 int sithCog_Open()

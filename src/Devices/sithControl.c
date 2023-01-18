@@ -137,6 +137,7 @@ int sithControl_Shutdown()
         return 0;
     stdControl_Shutdown();
 
+    // Added: clean reset
 #ifdef QOL_IMPROVEMENTS
     // Added
     sithControl_followingPlayer = 0;

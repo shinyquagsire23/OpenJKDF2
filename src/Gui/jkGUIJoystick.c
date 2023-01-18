@@ -1134,5 +1134,23 @@ void jkGuiJoystick_Startup()
 
 void jkGuiJoystick_Shutdown()
 {
-    ;
+    // Added: clean reset
+    jkGuiJoystick_dword_557078 = 0;
+    memset(&jkGuiJoystick_aUnk1, 0, sizeof(jkGuiJoystick_aUnk1));
+    memset(&jkGuiJoystick_darray, 0, sizeof(jkGuiJoystick_darray));
+
+    jkGuiJoystick_dword_557128 = 0;
+    memset(&jkGuiJoystick_darray2, 0, sizeof(jkGuiJoystick_darray2));
+    memset(&jkGuiJoystick_strings, 0, sizeof(jkGuiJoystick_strings));
+    memset(&jkGuiJoystick_aFloats, 0, sizeof(jkGuiJoystick_aFloats));
+    memset(&jkGuiJoystick_awTmp, 0, sizeof(jkGuiJoystick_awTmp));
+    memset(&jkGuiJoystick_darray3, 0, sizeof(jkGuiJoystick_darray3));
+    memset(jkGuiJoystick_waIdk2, 0, sizeof(jkGuiJoystick_waIdk2));
+
+    jkGuiJoystick_dword_5576F0 = 0;
+    jkGuiJoystick_dword_5576F4 = 0;
+    memset(jkGuiJoystick_waIdk2, 0, sizeof(jkGuiJoystick_waIdk2));
+
+    jkGuiJoystick_dword_536B98 = -1;
+    jkGuiJoystick_dword_536B9C = -1;
 }
