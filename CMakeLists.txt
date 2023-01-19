@@ -158,7 +158,7 @@ elseif(PLAT_MACOS)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -O2 -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fshort-wchar")
     
-    add_link_options(-fshort-wchar)
+    add_link_options(-fshort-wchar -Wl,-map,openjkdf2.map)
 
 elseif(PLAT_MACOS_X86_64)
     message( STATUS "Targeting MacOS x86_64 ${CMAKE_OSX_ARCHITECTURES}" )
