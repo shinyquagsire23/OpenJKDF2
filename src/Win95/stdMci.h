@@ -24,4 +24,7 @@ void stdMci_Stop();
 int stdMci_CheckStatus();
 double stdMci_GetTrackLength(int track);
 
+// Added
+extern int stdMci_bIsGOG;
+
 #endif // _STDMCI_H

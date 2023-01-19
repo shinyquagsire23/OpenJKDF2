@@ -10,6 +10,7 @@
 #include "General/stdFnames.h"
 #include "General/stdString.h"
 #include "Win95/Windows.h"
+#include "Win95/stdMci.h"
 #include "Cog/jkCog.h"
 #include "World/jkPlayer.h"
 
@@ -441,6 +442,13 @@ LABEL_67:
                     0);
                 v17 = 0;
             }
+
+            // Added: GOG detection for soundtracks
+            if (v19->cdNum > 1 && stdMci_bIsGOG) {
+                stdMci_bIsGOG = 0;
+                printf("jkEpisode_Load: Seeing CD number >1 (%u), assuming this is an OG disk install with offsetted tracks...\n", v19->cdNum);
+            }
+
             if ( _string_modify_idk(sType[0]) == 'L' )
                 v19->type = 0; // LEVEL = 0
             else

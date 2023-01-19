@@ -7,10 +7,16 @@
 #include "external/fcaseopen/fcaseopen.h"
 #endif
 
+// Added
+int stdMci_bIsGOG = 1;
+
 #ifndef SDL2_RENDER
 
 int stdMci_Startup()
 {
+    // Added
+    stdMci_bIsGOG = 1;
+
     MCI_SET_PARMS setParams;
     MCI_OPEN_PARMS openParams;
     struct tagAUXCAPSA pac;
@@ -55,6 +61,9 @@ void stdMci_Shutdown()
         jk_auxSetVolume(stdMci_uDeviceID, stdMci_dwVolume);
 
     stdMci_bInitted = 0;
+
+    // Added
+    stdMci_bIsGOG = 1;
 }
 
 int stdMci_Play(uint8_t trackFrom, uint8_t trackTo)
@@ -133,6 +142,9 @@ int stdMci_Startup()
     stdMci_uDeviceID = 0;
 
     stdMci_bInitted = 1;
+
+    // Added
+    stdMci_bIsGOG = 1;
     
     return 1;
 }
@@ -140,6 +152,13 @@ int stdMci_Startup()
 void stdMci_Shutdown()
 {
     stdMci_bInitted = 0;
+
+    // Added: Clean reset
+    stdMci_trackFrom = 0;
+    stdMci_trackTo = 0;
+    stdMci_trackCurrent = 0;
+    stdMci_music = 0;
+    stdMci_bIsGOG = 1;
 }
 
 void stdMci_trackFinished();
@@ -210,6 +229,9 @@ int stdMci_Startup()
 	    return 1;
 
 	Mix_AllocateChannels(2);
+
+    // Added
+    stdMci_bIsGOG = 1;
     
     return 1;
 }
@@ -218,6 +240,13 @@ void stdMci_Shutdown()
 {
     stdMci_bInitted = 0;
     Mix_CloseAudio();
+
+    // Added: Clean reset
+    stdMci_trackFrom = 0;
+    stdMci_trackTo = 0;
+    stdMci_trackCurrent = 0;
+    stdMci_music = 0;
+    stdMci_bIsGOG = 1;
 }
 
 int stdMci_TryPlay(const char* fpath) {
@@ -261,6 +290,18 @@ void stdMci_trackStart(int track)
     else if(jkMain_pEpisodeEnt2)
         cdNum = jkMain_pEpisodeEnt2->cdNum;
 
+    // GOG only reports real track IDs, and does not have any disk 2s
+    if (cdNum > 1 && stdMci_bIsGOG) {
+        stdMci_bIsGOG = 0;
+        printf("jkEpisode_Load: Seeing CD number >1 (%u), assuming this is an OG disk install with offsetted tracks...\n", cdNum);
+    }
+
+    // If we're getting a >12 track number, it's definitely GOG
+    if (track > 12 && !stdMci_bIsGOG) {
+        printf("stdMci_trackStart: Seeing a >12 track number (%u), assuming this is a GOG install with no offsets...\n", track);
+        stdMci_bIsGOG = 1;
+    }
+
     // Try and play disk-dumped music
     snprintf(tmp, 255, "MUSIC/%d/Track%d.ogg", cdNum, track);
     if (stdMci_TryPlay(tmp)) goto done;
@@ -271,7 +312,20 @@ void stdMci_trackStart(int track)
         if (stdMci_TryPlay(tmp)) goto done;
     }
 
-    // Try and convert the OG track numbers to GOG/Steam first
+    // If we are a GOG install, assume all tracks are as-is first
+    if (stdMci_bIsGOG) {
+        // GOG and Steam soundtrack location
+        snprintf(tmp, 255, "MUSIC/Track%d.ogg", track);
+        if (stdMci_TryPlay(tmp)) goto done;
+
+        // GOG and Steam soundtrack location (00-09)
+        if (track < 10) {
+            snprintf(tmp, 255, "MUSIC/Track%02d.ogg", track);
+            if (stdMci_TryPlay(tmp)) goto done;
+        }
+    }
+
+    // Try and convert the OG track numbers to GOG/Steam
     if (!stdMci_music && track <= 12 && !Main_bMotsCompat)
     {
         int track_shifted = track;
@@ -289,14 +343,16 @@ void stdMci_trackStart(int track)
         if (stdMci_TryPlay(tmp)) goto done;
     }
 
-    // GOG and Steam soundtrack location
-    snprintf(tmp, 255, "MUSIC/Track%d.ogg", track);
-    if (stdMci_TryPlay(tmp)) goto done;
-
-    // GOG and Steam soundtrack location (00-09)
-    if (track < 10) {
-        snprintf(tmp, 255, "MUSIC/Track%02d.ogg", track);
+    // Last chance to get it right...
+    if (!stdMci_bIsGOG) {
+        snprintf(tmp, 255, "MUSIC/Track%d.ogg", track);
         if (stdMci_TryPlay(tmp)) goto done;
+
+        // GOG and Steam soundtrack location (00-09)
+        if (track < 10) {
+            snprintf(tmp, 255, "MUSIC/Track%02d.ogg", track);
+            if (stdMci_TryPlay(tmp)) goto done;
+        }
     }
 
 done:

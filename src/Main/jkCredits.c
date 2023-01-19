@@ -208,10 +208,17 @@ LABEL_19:
         else if(jkMain_pEpisodeEnt2)
             whichCdInserted = jkMain_pEpisodeEnt2->cdNum;
 
+        // Added: GOG doesn't report CD 2.
+        if (stdMci_bIsGOG) {
+            whichCdInserted = 2;
+        }
+
         // Added: Simulate disk 1 in menu for jkCredits
         if (jkCredits_cdOverride) {
             whichCdInserted = jkCredits_cdOverride;
             jkCredits_cdOverride = 0;
+            jkMain_pEpisodeEnt = NULL;
+            jkMain_pEpisodeEnt2 = NULL;
         }
 
         //whichCdInserted = jkRes_ReadKey() - 1; // Removed: Discern the CD number from the episode.
