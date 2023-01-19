@@ -441,6 +441,13 @@ void Main_Shutdown()
     
     jkPlayer_ResetVars(); // Added
 
+    // Added
+    Main_bDedicatedServer = 0;
+    Main_bHeadless = 0;
+    Main_bVerboseNetworking = 0;
+    Main_bDwCompat = 0;
+    Main_bEnhancedCogVerbs = 0;
+
 #ifndef QOL_IMPROVEMENTS
     exit(0);
 #endif

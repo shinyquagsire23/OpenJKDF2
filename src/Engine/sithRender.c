@@ -328,6 +328,11 @@ void sithRender_Draw()
     sithRender_adjoinSafeguard = 0; // Added: safeguard
 
     // Added: noclip
+    if (!(g_debugmodeFlags & DEBUGFLAG_NOCLIP)) {
+        sithPlayer_bNoClippingRend = 0;
+    }
+
+    // Added: noclip
     if (!sithPlayer_bNoClippingRend) {
         sithRender_Clip(sithCamera_currentCamera->sector, rdCamera_pCurCamera->cameraClipFrustum, 0.0);
     }
