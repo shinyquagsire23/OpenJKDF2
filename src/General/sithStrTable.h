@@ -1,7 +1,7 @@
 #ifndef _SITHSTRTABLE_H
 #define _SITHSTRTABLE_H
 
-#include <stddef.h>
+#include "types.h"
 
 #define sithStrTable_Startup_ADDR (0x004F2970)
 #define sithStrTable_Shutdown_ADDR (0x004F2990)
