@@ -117,6 +117,7 @@ void std3D_UpdateSettings();
 void std3D_ResetUIRenderList();
 int std3D_AddBitmapToTextureCache(stdBitmap *texture, int mipIdx, int is_alpha_tex, int no_alpha);
 void std3D_DrawUIBitmap(stdBitmap* pBmp, int mipIdx, float dstX, float dstY, rdRect* srcRect, float scale, int bAlphaOverwrite);
+void std3D_DrawUIClearedRect(uint8_t palIdx, rdRect* dstRect);
 
 #ifdef __cplusplus
 }

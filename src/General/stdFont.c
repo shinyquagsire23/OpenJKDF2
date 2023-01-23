@@ -1294,7 +1294,7 @@ int stdFont_Draw4GPU(stdFont *font, int xPos, int yPos, int a5, int a6, int a7, 
                 break;
             if ( _iswspace(*v10) )
             {
-                v9 += font->marginX;
+                v9 += INT_FLOAT_SCALED(font->marginX, scale);
             }
             else
             {
@@ -1325,11 +1325,11 @@ int stdFont_Draw4GPU(stdFont *font, int xPos, int yPos, int a5, int a6, int a7, 
                 while ( v13 );
                 if ( v13 )
 LABEL_17:
-                    v14 = v13->pEntries[v12 - v13->charFirst].field_4;
+                    v14 = INT_FLOAT_SCALED(v13->pEntries[v12 - v13->charFirst].field_4, scale);
                 else
 LABEL_16:
                     v14 = 0;
-                v9 += v14 + font->marginY;
+                v9 += v14 + INT_FLOAT_SCALED(font->marginY, scale);
             }
             ++v10;
         }
@@ -1342,7 +1342,7 @@ LABEL_16:
         }
         if ( (a7 & 2) != 0 )
         {
-            v18 = (a6 - (*font->bitmap->mipSurfaces)->format.height) / 2;
+            v18 = (a6 - INT_FLOAT_SCALED((*font->bitmap->mipSurfaces)->format.height, scale)) / 2;
             if ( v18 < 0 )
                 v18 = 0;
         }
@@ -1351,7 +1351,7 @@ LABEL_16:
     {
         v15 = a5;
     }
-    return stdFont_Draw1GPU(font, xPos + INT_FLOAT_SCALED(v17, scale), yPos + INT_FLOAT_SCALED(v18, scale), v15 - INT_FLOAT_SCALED(v17, scale), text, alpha_maybe, scale);
+    return stdFont_Draw1GPU(font, xPos + v17, yPos + v18, v15 - v17, text, alpha_maybe, scale);
 }
 
 unsigned int stdFont_Draw1GPU(stdFont *font, unsigned int blit_x, int blit_y, int a5, wchar_t *a6, int alpha_maybe, float scale)
