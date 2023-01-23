@@ -246,7 +246,7 @@ int jkGame_Update()
         }
     }
 
-    jkDev_sub_41F950();
+    jkDev_BlitLogToScreen();
     jkHudInv_Draw();
 #ifndef SDL2_RENDER
     if ( Video_modeStruct.b3DAccel )

@@ -4,6 +4,7 @@
 #include "General/stdColor.h"
 #include "Win95/stdDisplay.h"
 #include "Win95/std.h"
+#include "Platform/std3D.h"
 #include "jk.h"
 
 stdBitmap* stdBitmap_Load(char *fpath, int bCreateDDrawSurface, int gpuMem)
@@ -58,7 +59,6 @@ stdBitmap* stdBitmap_Load2(char *fpath, int bCreateDDrawSurface, int gpuMem)
 stdBitmap* stdBitmap_LoadFromFile(stdFile_t fd, int bCreateDDrawSurface, int a3)
 {
     stdBitmap *outAlloc; // esi
-    stdBitmap *result; // eax
     unsigned int i; // edi
 
     outAlloc = (stdBitmap *)std_pHS->alloc(sizeof(stdBitmap));
@@ -66,33 +66,19 @@ stdBitmap* stdBitmap_LoadFromFile(stdFile_t fd, int bCreateDDrawSurface, int a3)
     {
         if ( stdBitmap_LoadEntryFromFile(fd, outAlloc, bCreateDDrawSurface, a3) )
         {
-            result = outAlloc;
+            return outAlloc;
         }
         else
         {
-            if ( outAlloc->mipSurfaces )
-            {
-                for ( i = 0; i < outAlloc->numMips; ++i )
-                {
-                    if ( outAlloc->mipSurfaces[i] )
-                        stdDisplay_VBufferFree(outAlloc->mipSurfaces[i]);
-                }
-                std_pHS->free(outAlloc->mipSurfaces);
-            }
-            if ( outAlloc->palette )
-                std_pHS->free(outAlloc->palette);
-            stdPrintf(std_pHS->debugPrint, ".\\General\\stdBitmap.c", 359, "Bitmap elements successfully freed.\n", 0, 0, 0, 0);
-            std_pHS->free(outAlloc);
-            stdPrintf(std_pHS->debugPrint, ".\\General\\stdBitmap.c", 322, "Bitmap successfully freed.\n", 0, 0, 0, 0);
-            result = 0;
+            stdBitmap_Free(outAlloc);
+            return 0;
         }
     }
     else
     {
         stdPrintf(std_pHS->errorPrint, ".\\General\\stdBitmap.c", 103, "Error: Unable to allocate memory for bitmap.\n", 0, 0, 0, 0);
-        result = 0;
+        return NULL;
     }
-    return result;
 }
 
 int stdBitmap_LoadEntry(char *fpath, stdBitmap *out, int bCreateDDrawSurface, int gpuMem)
@@ -120,13 +106,10 @@ int stdBitmap_LoadEntry(char *fpath, stdBitmap *out, int bCreateDDrawSurface, in
 
 int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSurface, int gpuMem)
 {
-    stdBitmap *v5; // ebx
     int palFmt; // ebp
     int numMips_; // edx
     unsigned int vbufAllocSize; // esi
     stdVBuffer **vbufAlloc; // edi
-    int v10; // ecx
-    int v11; // edx
     int v12; // eax
     stdVBuffer *surface; // esi
     char *lockAlloc; // ebp
@@ -151,7 +134,6 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
         stdPrintf(std_pHS->errorPrint, ".\\General\\stdBitmap.c", 220, "Error: Bad version %d for bitmap file\n", bmp_header.field_4);
         return 0;
     }
-    v5 = out;
     palFmt = bmp_header.palFmt;
     v18 = bmp_header.field_8;
     numMips_ = bmp_header.numMips;
@@ -173,49 +155,41 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
     {
         stdPrintf(std_pHS->messagePrint, ".\\General\\stdBitmap.c", 843, "Ran out of memory trying allocate bitmap.\n", 0, 0, 0, 0);
     }
-    v10 = bmp_header.colorkey;
-    v11 = bmp_header.xPos;
+    out->colorkey = bmp_header.colorkey;
+    out->xPos = bmp_header.xPos;
     out->yPos = bmp_header.yPos;
-    out->colorkey = v10;
     _memset(&vbufTexFmt, 0, sizeof(vbufTexFmt));
-    mipCount = 0;
-    v12 = out->numMips;
-    out->xPos = v11;
-    if ( v12 )
+    for (mipCount = 0; mipCount < out->numMips; mipCount++)
     {
-        do
+        std_pHS->fileRead(fp, v21, 8);
+        vbufTexFmt.height = v21[1];
+        vbufTexFmt.width = v21[0];
+
+        _memcpy(&vbufTexFmt.format, &out->format, sizeof(vbufTexFmt.format));
+
+        surface = stdDisplay_VBufferNew(&vbufTexFmt, bCreateDDrawSurface, gpuMem, 0);
+        if ( !surface )
+            goto LABEL_17;
+
+        out->mipSurfaces[mipCount] = surface;
+        stdDisplay_VBufferLock(surface);
+        lockAlloc = surface->surface_lock_alloc;
+        
+        v15 = surface->format.width * ((unsigned int)surface->format.format.bpp >> 3);
+        for ( i = 0; i < vbufTexFmt.height; ++i )
         {
-            std_pHS->fileRead(fp, v21, 8);
-            vbufTexFmt.height = v21[1];
-            vbufTexFmt.width = v21[0];
-
-            _memcpy(&vbufTexFmt.format, &out->format, sizeof(vbufTexFmt.format));
-
-            surface = stdDisplay_VBufferNew(&vbufTexFmt, bCreateDDrawSurface, gpuMem, 0);
-            if ( !surface )
-                goto LABEL_17;
-
-            v5->mipSurfaces[mipCount] = surface;
-            stdDisplay_VBufferLock(surface);
-            lockAlloc = surface->surface_lock_alloc;
-            
-            v15 = surface->format.width * ((unsigned int)surface->format.format.bpp >> 3);
-            for ( i = 0; i < vbufTexFmt.height; ++i )
-            {
-                std_pHS->fileRead(fp, lockAlloc, v15);
-                lockAlloc += surface->format.width_in_bytes;
-            }
-            stdDisplay_VBufferUnlock(surface);
-            if ( (out->palFmt & 1) != 0 )
-                stdDisplay_VBufferSetColorKey(surface, out->colorkey);
-            v5 = out;
+            std_pHS->fileRead(fp, lockAlloc, v15);
+            lockAlloc += surface->format.width_in_bytes;
         }
-        while ( (unsigned int)++mipCount < out->numMips );
+        stdDisplay_VBufferUnlock(surface);
+        if ( (out->palFmt & 1) != 0 )
+            stdDisplay_VBufferSetColorKey(surface, out->colorkey);
     }
-    if ( (v5->palFmt & 2) != 0 )
+
+    if ( (out->palFmt & 2) != 0 )
     {
         palette_map = std_pHS->alloc(0x300);
-        v5->palette = palette_map;
+        out->palette = palette_map;
         if ( !palette_map )
         {
 LABEL_17:
@@ -224,6 +198,17 @@ LABEL_17:
         }
         std_pHS->fileRead(fp, palette_map, 0x300);
     }
+
+#ifdef SDL2_RENDER
+    out->aTextureIds = (uint32_t*)std_pHS->alloc(out->numMips * sizeof(uint32_t));
+    out->abLoadedToGPU = (int*)std_pHS->alloc(out->numMips * sizeof(int));
+    out->paDataDepthConverted = (void**)std_pHS->alloc(out->numMips * sizeof(void*));
+    for (int i = 0; i < out->numMips; i++)
+    {
+        std3D_AddBitmapToTextureCache(out, i, !(out->palFmt & 1), 0);
+    }
+#endif
+
     return 1;
 }
 
@@ -266,25 +251,35 @@ void stdBitmap_ConvertColorFormat(rdTexformat *formatTo, stdBitmap *bitmap)
     }
 }
 
-void stdBitmap_Free(stdBitmap *bitmap)
+void stdBitmap_Free(stdBitmap *pBitmap)
 {
     unsigned int i; // esi
     
     // Added: nullptr check
-    if (!bitmap) return;
+    if (!pBitmap) return;
 
-    if ( bitmap->mipSurfaces )
+#ifdef SDL2_RENDER
+    std3D_PurgeBitmapRefs(pBitmap);
+    std_pHS->free(pBitmap->aTextureIds);
+    pBitmap->aTextureIds = NULL;
+    std_pHS->free(pBitmap->abLoadedToGPU);
+    pBitmap->abLoadedToGPU = NULL;
+    std_pHS->free(pBitmap->paDataDepthConverted);
+    pBitmap->paDataDepthConverted = NULL;
+#endif
+
+    if ( pBitmap->mipSurfaces )
     {
-        for ( i = 0; i < bitmap->numMips; ++i )
+        for ( i = 0; i < pBitmap->numMips; ++i )
         {
-            if ( bitmap->mipSurfaces[i] )
-                stdDisplay_VBufferFree(bitmap->mipSurfaces[i]);
+            if ( pBitmap->mipSurfaces[i] )
+                stdDisplay_VBufferFree(pBitmap->mipSurfaces[i]);
         }
-        std_pHS->free(bitmap->mipSurfaces);
+        std_pHS->free(pBitmap->mipSurfaces);
     }
-    if ( bitmap->palette )
-        std_pHS->free(bitmap->palette);
+    if ( pBitmap->palette )
+        std_pHS->free(pBitmap->palette);
     stdPrintf(std_pHS->debugPrint, ".\\General\\stdBitmap.c", 359, "Bitmap elements successfully freed.\n", 0, 0, 0, 0);
-    std_pHS->free(bitmap);
+    std_pHS->free(pBitmap);
     stdPrintf(std_pHS->debugPrint, ".\\General\\stdBitmap.c", 322, "Bitmap successfully freed.\n", 0, 0, 0, 0);
 }

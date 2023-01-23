@@ -581,8 +581,8 @@ void jkDSS_SendSetSaberInfo2(sithThing *thing)
     }
 
     NETMSG_PUSHU32(thing->playerInfo->field_21C);
-    NETMSG_PUSHU32(thing->playerInfo->shields);
-    NETMSG_PUSHU32(thing->playerInfo->field_224);
+    NETMSG_PUSHU32(thing->playerInfo->bHasSuperShields);
+    NETMSG_PUSHU32(thing->playerInfo->bHasForceSurge);
     
     NETMSG_END(DSS_SABERINFO3);
     
@@ -678,8 +678,8 @@ int jkDSS_ProcessSetSaberInfo2(sithCogMsg *msg)
     playerInfo->blood_sparks = sithTemplate_GetEntryByIdx(NETMSG_POPS32());
     playerInfo->saber_sparks = sithTemplate_GetEntryByIdx(NETMSG_POPS32());
     playerInfo->field_21C = NETMSG_POPU32();
-    playerInfo->shields = NETMSG_POPU32();
-    playerInfo->field_224 = NETMSG_POPU32();
+    playerInfo->bHasSuperShields = NETMSG_POPU32();
+    playerInfo->bHasForceSurge = NETMSG_POPU32();
 
     return 1;
 }

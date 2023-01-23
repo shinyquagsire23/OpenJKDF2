@@ -947,6 +947,15 @@ typedef struct rdTri
   rdDDrawSurface *texture; // DirectDrawSurface*
 } rdTri;
 
+typedef struct rdUITri
+{
+  int v1;
+  int v2;
+  int v3;
+  int flags;
+  uint32_t texture; // DirectDrawSurface*
+} rdUITri;
+
 typedef struct rdLine
 {
     int v1;
@@ -2379,8 +2388,8 @@ typedef struct jkPlayerInfo
     uint32_t nextTwinkleSpawnMs;
     uint32_t numTwinkles;
     uint32_t field_21C;
-    int shields;
-    uint32_t field_224;
+    int bHasSuperShields;
+    uint32_t bHasForceSurge;
 #ifdef JKM_DSS
     int jkmUnk4;
     uint32_t jkmUnk5;

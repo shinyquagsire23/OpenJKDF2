@@ -27,6 +27,12 @@ typedef struct stdBitmap
     int yPos;
     uint32_t colorkey;
     stdVBuffer **mipSurfaces;
+#ifdef SDL2_RENDER
+    int is_16bit;
+    int* abLoadedToGPU;
+    uint32_t* aTextureIds;
+    void** paDataDepthConverted;
+#endif
 } stdBitmap;
 
 typedef struct bitmapHeader

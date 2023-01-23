@@ -108,9 +108,15 @@ intptr_t std3D_GetRenderList();
 static int (*std3D_CreateExecuteBuffer)() = (void*)std3D_CreateExecuteBuffer_ADDR;
 #endif
 
+void std3D_PurgeUIEntry(int i, int idx);
 void std3D_PurgeTextureEntry(int i);
+void std3D_PurgeBitmapRefs(stdBitmap *pBitmap);
 void std3D_PurgeSurfaceRefs(rdDDrawSurface *texture);
 void std3D_UpdateSettings();
+
+void std3D_ResetUIRenderList();
+int std3D_AddBitmapToTextureCache(stdBitmap *texture, int mipIdx, int is_alpha_tex, int no_alpha);
+void std3D_DrawUIBitmap(stdBitmap* pBmp, int mipIdx, float dstX, float dstY, rdRect* srcRect, float scale, int bAlphaOverwrite);
 
 #ifdef __cplusplus
 }

@@ -512,7 +512,7 @@ jkDev_Shutdown	.text	0041F6A0	00000031			R	.	.	.	.	.	T	.
 jkDev_Open	.text	0041F6E0	000000B2	0000004C	00000000	R	.	.	.	.	.	.	.
 jkDev_Close	.text	0041F7A0	00000030			R	.	.	.	.	.	.	.
 jkDev_DrawLog	.text	0041F7D0	00000178	00000020	00000000	R	.	.	.	.	.	T	.
-jkDev_sub_41F950	.text	0041F950	000000FF	00000010	00000000	R	.	.	.	.	.	T	.
+jkDev_BlitLogToScreen	.text	0041F950	000000FF	00000010	00000000	R	.	.	.	.	.	T	.
 jkDev_PrintUniString	.text	0041FA50	000000BB	00000008	00000004	R	.	.	.	.	.	T	.
 jkDev_DebugLog	.text	0041FB10	00000064	00000108	00000004	R	.	.	.	.	.	T	.
 jkDev_sub_41FB80	.text	0041FB80	000000B3	00000010	00000008	R	.	.	.	.	.	T	.

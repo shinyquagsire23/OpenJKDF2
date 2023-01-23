@@ -386,9 +386,9 @@ void jkCog_SetSuperFlags(sithCog *ctx)
     if ( (flags & 1) != 0 )
         playerThings[playerThingIdx].field_21C = 1;
     if ( (flags & 2) != 0 )
-        playerThings[playerThingIdx].shields = 1;
+        playerThings[playerThingIdx].bHasSuperShields = 1;
     if ( (flags & 4) != 0 )
-        playerThings[playerThingIdx].field_224 = 1;
+        playerThings[playerThingIdx].bHasForceSurge = 1;
 }
 
 void jkCog_ClearSuperFlags(sithCog *ctx)
@@ -398,9 +398,9 @@ void jkCog_ClearSuperFlags(sithCog *ctx)
     if ( (flags & 1) != 0 )
         playerThings[playerThingIdx].field_21C = 0;
     if ( (flags & 2) != 0 )
-        playerThings[playerThingIdx].shields = 0;
+        playerThings[playerThingIdx].bHasSuperShields = 0;
     if ( (flags & 4) != 0 )
-        playerThings[playerThingIdx].field_224 = 0;
+        playerThings[playerThingIdx].bHasForceSurge = 0;
 }
 
 void jkCog_GetSuperFlags(sithCog *cog)
@@ -410,9 +410,9 @@ void jkCog_GetSuperFlags(sithCog *cog)
     // Added: Original used +, not |
     if (playerThings[playerThingIdx].field_21C)
         flags |= 1;
-    if ( playerThings[playerThingIdx].shields )
+    if ( playerThings[playerThingIdx].bHasSuperShields )
         flags |= 2;
-    if ( playerThings[playerThingIdx].field_224 )
+    if ( playerThings[playerThingIdx].bHasForceSurge )
         flags |= 4;
     sithCogExec_PushInt(cog, flags);
 }

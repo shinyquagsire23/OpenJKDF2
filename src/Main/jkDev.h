@@ -9,7 +9,7 @@
 #define jkDev_Open_ADDR (0x0041F6E0)
 #define jkDev_Close_ADDR (0x0041F7A0)
 #define jkDev_DrawLog_ADDR (0x0041F7D0)
-#define jkDev_sub_41F950_ADDR (0x0041F950)
+#define jkDev_BlitLogToScreen_ADDR (0x0041F950)
 #define jkDev_PrintUniString_ADDR (0x0041FA50)
 #define jkDev_DebugLog_ADDR (0x0041FB10)
 #define jkDev_sub_41FB80_ADDR (0x0041FB80)
@@ -51,7 +51,7 @@ void jkDev_Shutdown();
 int jkDev_Open();
 void jkDev_Close();
 void jkDev_DrawLog();
-void jkDev_sub_41F950();
+void jkDev_BlitLogToScreen();
 int jkDev_PrintUniString(const wchar_t *str);
 int jkDev_DebugLog(const char *lParam);
 int jkDev_sub_41FB80(int a1, const wchar_t *a2);

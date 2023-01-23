@@ -273,10 +273,10 @@ void jkPlayer_InitSaber()
         playerInfoJk->maxTwinkles = 8;
         playerInfoJk->twinkleSpawnRate = 16;
         playerInfoJk->field_21C = 0;
-        playerInfoJk->shields = 0;
+        playerInfoJk->bHasSuperShields = 0;
         if (playerInfo->playerThing) // Added
             playerInfo->playerThing->thingflags |= SITH_TF_RENDERWEAPON;
-        playerInfoJk->field_224 = 0;
+        playerInfoJk->bHasForceSurge = 0;
         
         // MOTS added
 #ifdef JKM_DSS

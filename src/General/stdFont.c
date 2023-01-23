@@ -4,6 +4,7 @@
 #include "General/stdBitmap.h"
 #include "Win95/stdDisplay.h"
 #include "Win95/std.h"
+#include "Platform/std3D.h"
 
 stdFont* stdFont_Load(char *fpath, int a2, int a3)
 {
@@ -1160,4 +1161,400 @@ int stdFont_sub_4355B0(stdFont *font, uint16_t a2)
         while ( v3 );
     }
     return v3 != 0;
+}
+
+uint32_t stdFont_DrawAsciiGPU(stdFont *a2, unsigned int blit_x, int blit_y, int x_max, char *str, int alpha_maybe)
+{
+    unsigned int v8; // ebp
+    unsigned int v9; // esi
+    stdVBuffer *v10; // eax
+    char v11; // al
+    int v12; // ecx
+    int v14; // eax
+    uint16_t v15; // cx
+    stdFontCharset *v16; // eax
+    signed int v17; // ecx
+    int v19; // [esp+10h] [ebp-14h]
+    rdRect a5a; // [esp+14h] [ebp-10h] BYREF
+    stdVBuffer *v21; // [esp+2Ch] [ebp+8h]
+
+    v8 = blit_x;
+    v9 = blit_x;
+    v19 = 0;
+    v10 = *a2->bitmap->mipSurfaces;
+    a5a.y = 0;
+    v21 = v10;
+    a5a.height = v10->format.height;
+    //if ( x_max >= (int)(a1->format.width - blit_x) )
+    //    x_max = a1->format.width - blit_x;
+    v11 = *str;
+    if ( *str )
+    {
+        while ( 1 )
+        {
+            if ( v19 )
+                return v9 - v8;
+            if ( v11 == 9 )
+            {
+                v12 = 16;
+                if ( 8 * a2->marginX >= 16 )
+                    v12 = 8 * a2->marginX;
+                v9 = v8 + v12 * ((int)(v9 + v12 - v8) / v12);
+                goto LABEL_30;
+            }
+            if ( __isspace(v11) )
+                break;
+            v15 = *str;
+            v16 = &a2->charsetHead;
+            if ( a2 != (stdFont *)-48 )
+            {
+                do
+                {
+                    if ( v15 >= v16->charFirst && v15 <= v16->charLast )
+                        break;
+                    v16 = v16->previous;
+                }
+                while ( v16 );
+                if ( v16 )
+                    goto LABEL_25;
+            }
+            v15 = a2->field_28;
+            v16 = &a2->charsetHead;
+            a5a.x = 0;
+            a5a.width = 0;
+            if ( a2 == (stdFont *)-48 )
+                goto LABEL_24;
+            do
+            {
+                if ( v15 >= v16->charFirst && v15 <= v16->charLast )
+                    break;
+                v16 = v16->previous;
+            }
+            while ( v16 );
+            if ( v16 )
+            {
+LABEL_25:
+                v8 = blit_x;
+                a5a.x = v16->pEntries[v15 - v16->charFirst].field_0;
+                v17 = v16->pEntries[v15 - v16->charFirst].field_4;
+                a5a.width = v17;
+            }
+            else
+            {
+LABEL_24:
+                v17 = 0;
+                a5a.x = 0;
+                a5a.width = 0;
+            }
+            if ( (int)(v9 + v17) < (int)(v8 + x_max) )
+            {
+                std3D_DrawUIBitmap(a2->bitmap, 0, v9, blit_y, &a5a, 1.0, alpha_maybe);
+                //stdDisplay_VBufferCopy(a1, v21, v9, blit_y, &a5a, alpha_maybe);
+                v14 = a5a.width + a2->marginY;
+                goto LABEL_29;
+            }
+            v19 = 1;
+LABEL_30:
+            v11 = *++str;
+            if ( !*str )
+                return v9 - v8;
+        }
+        v14 = a2->marginX;
+LABEL_29:
+        v9 += v14;
+        goto LABEL_30;
+    }
+    return v9 - v8;
+}
+
+int stdFont_Draw4GPU(stdFont *font, int xPos, int yPos, int a5, int a6, int a7, wchar_t *text, int alpha_maybe)
+{
+    int v9; // ebp
+    wchar_t *v10; // edi
+    int i; // ebx
+    uint16_t v12; // cx
+    stdFontCharset *v13; // eax
+    int v14; // ecx
+    int v15; // ecx
+    int v17; // [esp+10h] [ebp-8h]
+    int v18; // [esp+14h] [ebp-4h]
+
+    v9 = 0;
+    v17 = 0;
+    v18 = 0;
+    if ( a7 )
+    {
+        v10 = text;
+        for ( i = 0x7FFFFFFF; *v10; --i )
+        {
+            if ( i <= 0 )
+                break;
+            if ( _iswspace(*v10) )
+            {
+                v9 += font->marginX;
+            }
+            else
+            {
+                v12 = *v10;
+                v13 = &font->charsetHead;
+                if ( font != (stdFont *)-48 )
+                {
+                    do
+                    {
+                        if ( v12 >= v13->charFirst && v12 <= v13->charLast )
+                            break;
+                        v13 = v13->previous;
+                    }
+                    while ( v13 );
+                    if ( v13 )
+                        goto LABEL_17;
+                }
+                v12 = font->field_28;
+                v13 = &font->charsetHead;
+                if ( font == (stdFont *)-48 )
+                    goto LABEL_16;
+                do
+                {
+                    if ( v12 >= v13->charFirst && v12 <= v13->charLast )
+                        break;
+                    v13 = v13->previous;
+                }
+                while ( v13 );
+                if ( v13 )
+LABEL_17:
+                    v14 = v13->pEntries[v12 - v13->charFirst].field_4;
+                else
+LABEL_16:
+                    v14 = 0;
+                v9 += v14 + font->marginY;
+            }
+            ++v10;
+        }
+        v15 = a5;
+        if ( (a7 & 1) != 0 )
+        {
+            v17 = (a5 - v9) / 2;
+            if ( v17 < 0 )
+                v17 = 0;
+        }
+        if ( (a7 & 2) != 0 )
+        {
+            v18 = (a6 - (*font->bitmap->mipSurfaces)->format.height) / 2;
+            if ( v18 < 0 )
+                v18 = 0;
+        }
+    }
+    else
+    {
+        v15 = a5;
+    }
+    return stdFont_Draw1GPU(font, xPos + v17, yPos + v18, v15 - v17, text, alpha_maybe);
+}
+
+unsigned int stdFont_Draw1GPU(stdFont *font, unsigned int blit_x, int blit_y, int a5, wchar_t *a6, int alpha_maybe)
+{
+    unsigned int v8; // edx
+    unsigned int v9; // esi
+    wchar_t *v10; // ebx
+    wchar_t v11; // ax
+    int v12; // ecx
+    int v13; // eax
+    uint16_t v14; // cx
+    stdFontCharset *v15; // eax
+    signed int v16; // ecx
+    int v18; // [esp+10h] [ebp-14h]
+    rdRect a5a; // [esp+14h] [ebp-10h] BYREF
+    stdVBuffer *a2a; // [esp+2Ch] [ebp+8h]
+
+    v8 = blit_x;
+    v9 = blit_x;
+    v18 = 0;
+    a2a = *font->bitmap->mipSurfaces;
+    a5a.y = 0;
+    a5a.height = a2a->format.height;
+    //if ( a5 >= (int)(vbuf->format.width - blit_x) )
+    //    a5 = vbuf->format.width - blit_x;
+    v10 = a6;
+    v11 = *a6;
+    if ( *a6 )
+    {
+        while ( 1 )
+        {
+            if ( v18 )
+                return v9 - v8;
+            if ( v11 == 9 )
+            {
+                v12 = 16;
+                if ( 8 * font->marginX >= 16 )
+                    v12 = 8 * font->marginX;
+                v9 = blit_x + v12 * ((int)(v12 + v9 - v8) / v12);
+                goto LABEL_27;
+            }
+            if ( _iswspace(v11) )
+                break;
+            v14 = *v10;
+            v15 = &font->charsetHead;
+            if ( font != (stdFont *)-48 )
+            {
+                do
+                {
+                    if ( v14 >= v15->charFirst && v14 <= v15->charLast )
+                        break;
+                    v15 = v15->previous;
+                }
+                while ( v15 );
+                if ( v15 )
+                    goto LABEL_22;
+            }
+            v14 = font->field_28;
+            v15 = &font->charsetHead;
+            a5a.x = 0;
+            a5a.width = 0;
+            if ( font == (stdFont *)-48 )
+                goto LABEL_21;
+            do
+            {
+                if ( v14 >= v15->charFirst && v14 <= v15->charLast )
+                    break;
+                v15 = v15->previous;
+            }
+            while ( v15 );
+            if ( v15 )
+            {
+LABEL_22:
+                a5a.x = v15->pEntries[v14 - v15->charFirst].field_0;
+                v16 = v15->pEntries[v14 - v15->charFirst].field_4;
+                a5a.width = v16;
+            }
+            else
+            {
+LABEL_21:
+                v16 = 0;
+                a5a.x = 0;
+                a5a.width = 0;
+            }
+            if ( (int)(v9 + v16) < (int)(blit_x + a5) )
+            {
+                std3D_DrawUIBitmap(font->bitmap, 0, v9, blit_y, &a5a, 1.0, alpha_maybe);
+                v13 = a5a.width + font->marginY;
+                goto LABEL_26;
+            }
+            v18 = 1;
+LABEL_27:
+            v11 = v10[1];
+            v8 = blit_x;
+            ++v10;
+            if ( !v11 )
+                return v9 - v8;
+        }
+        v13 = font->marginX;
+LABEL_26:
+        v9 += v13;
+        goto LABEL_27;
+    }
+    return v9 - v8;
+}
+
+unsigned int stdFont_Draw1Width(stdFont *font, unsigned int blit_x, int blit_y, int a5, wchar_t *a6, int alpha_maybe)
+{
+    unsigned int v8; // edx
+    unsigned int v9; // esi
+    wchar_t *v10; // ebx
+    wchar_t v11; // ax
+    int v12; // ecx
+    int v13; // eax
+    uint16_t v14; // cx
+    stdFontCharset *v15; // eax
+    signed int v16; // ecx
+    int v18; // [esp+10h] [ebp-14h]
+    rdRect a5a; // [esp+14h] [ebp-10h] BYREF
+    stdVBuffer *a2a; // [esp+2Ch] [ebp+8h]
+
+    v8 = blit_x;
+    v9 = blit_x;
+    v18 = 0;
+    a2a = *font->bitmap->mipSurfaces;
+    a5a.y = 0;
+    a5a.height = a2a->format.height;
+    //if ( a5 >= (int)(vbuf->format.width - blit_x) )
+    //    a5 = vbuf->format.width - blit_x;
+    v10 = a6;
+    v11 = *a6;
+    if ( *a6 )
+    {
+        while ( 1 )
+        {
+            if ( v18 )
+                return v9 - v8;
+            if ( v11 == 9 )
+            {
+                v12 = 16;
+                if ( 8 * font->marginX >= 16 )
+                    v12 = 8 * font->marginX;
+                v9 = blit_x + v12 * ((int)(v12 + v9 - v8) / v12);
+                goto LABEL_27;
+            }
+            if ( _iswspace(v11) )
+                break;
+            v14 = *v10;
+            v15 = &font->charsetHead;
+            if ( font != (stdFont *)-48 )
+            {
+                do
+                {
+                    if ( v14 >= v15->charFirst && v14 <= v15->charLast )
+                        break;
+                    v15 = v15->previous;
+                }
+                while ( v15 );
+                if ( v15 )
+                    goto LABEL_22;
+            }
+            v14 = font->field_28;
+            v15 = &font->charsetHead;
+            a5a.x = 0;
+            a5a.width = 0;
+            if ( font == (stdFont *)-48 )
+                goto LABEL_21;
+            do
+            {
+                if ( v14 >= v15->charFirst && v14 <= v15->charLast )
+                    break;
+                v15 = v15->previous;
+            }
+            while ( v15 );
+            if ( v15 )
+            {
+LABEL_22:
+                a5a.x = v15->pEntries[v14 - v15->charFirst].field_0;
+                v16 = v15->pEntries[v14 - v15->charFirst].field_4;
+                a5a.width = v16;
+            }
+            else
+            {
+LABEL_21:
+                v16 = 0;
+                a5a.x = 0;
+                a5a.width = 0;
+            }
+            if ( (int)(v9 + v16) < (int)(blit_x + a5) )
+            {
+                //std3D_DrawUIBitmap(font->bitmap, 0, v9, blit_y, &a5a, 1.0, alpha_maybe);
+                v13 = a5a.width + font->marginY;
+                goto LABEL_26;
+            }
+            v18 = 1;
+LABEL_27:
+            v11 = v10[1];
+            v8 = blit_x;
+            ++v10;
+            if ( !v11 )
+                return v9 - v8;
+        }
+        v13 = font->marginX;
+LABEL_26:
+        v9 += v13;
+        goto LABEL_27;
+    }
+    return v9 - v8;
 }

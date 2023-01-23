@@ -22,6 +22,9 @@
 #include "Dss/jkDSS.h"
 #include "../jk.h"
 
+void jkDev_DrawEntriesGPU();
+void jkDev_BlitLogToScreenGPU();
+
 // MOTS altered
 void jkDev_Startup()
 {
@@ -208,7 +211,7 @@ void jkDev_DrawLog()
 }
 
 // MOTS altered
-void jkDev_sub_41F950()
+void jkDev_BlitLogToScreen()
 {
     int v0; // ecx
     int v1; // ebx
@@ -218,6 +221,11 @@ void jkDev_sub_41F950()
     int v5; // ecx
     int v6; // eax
     rdRect v7; // [esp+0h] [ebp-10h] BYREF
+
+#ifdef SDL2_RENDER
+    jkDev_BlitLogToScreenGPU();
+    return;
+#endif
 
     if ( jkDev_vbuf )
     {
@@ -254,6 +262,51 @@ void jkDev_sub_41F950()
     }
 }
 
+// MOTS altered
+void jkDev_BlitLogToScreenGPU()
+{
+    int v1; // ebx
+    int v2; // ebp
+    jkDevLogEnt* v3; // edi
+    int v4; // esi
+    int v5; // ecx
+    int v6; // eax
+    rdRect v7; // [esp+0h] [ebp-10h] BYREF
+
+    if (!jkDev_vbuf) return;
+
+    v7.x = 0;
+    v7.y = 0;
+    v7.height = jkDev_BMFontHeight;
+    v1 = 4;
+    v2 = 0;
+    v3 = &jkDev_aEntries[0];
+    for (int i = 0; i < 5; i++)
+    {
+        if ( v2 < jkDev_log_55A4A4 && (v1 + v7.height > Video_pCanvas->yStart || v3->bDrawEntry) )
+        {
+            v7.width = v3->drawWidth;
+            v4 = (signed int)(stdDisplay_pCurVideoMode->format.width - v7.width) / 2;
+            if ( v4 < 0 )
+                v4 = 0;
+            //stdDisplay_VBufferCopy(Video_pMenuBuffer, jkDev_vbuf, v4, v1, &v7, 1);
+            stdFont_Draw1GPU(jkHud_pMsgFontSft, v4, v1, jkDev_vbuf->format.width, v3->text, 1);
+            v5 = v7.width;
+            v6 = jkDev_dword_55A9D0 + 2 * v2;
+            jkDev_aEntryPositions[v6].x = v4;
+            jkDev_aEntryPositions[v6].y = v5;
+            //printf("Draw?\n %u %u\n", v4, v1);
+        }
+        if ( v3->bDrawEntry > 0 )
+            --v3->bDrawEntry;
+        v1 += jkDev_BMFontHeight;
+        ++v3;
+        ++v2;
+        v7.y += jkDev_BMFontHeight;
+    }
+    jkDev_dword_55A9D0 = (jkDev_dword_55A9D0 + 1) % 2;
+}
+
 // MOTS altered? inlined?
 int jkDev_PrintUniString(const wchar_t *str)
 {
@@ -285,7 +338,7 @@ LABEL_7:
     _wcsncpy(jkDev_aEntries[v1].text, str, 0x80u);
     jkDev_aEntries[v6].field_104 = 0;
     jkDev_aEntries[v6].timeMsExpiration = stdPlatform_GetTimeMsec() + 5000;
-    jkDev_log_55A4A8 = 1;
+    jkDev_bScreenNeedsUpdate = 1;
     ++jkDev_log_55A4A4;
     jkDev_aEntries[v6].bDrawEntry = 2;
     jkDev_aEntries[v6].field_10C = 2;
@@ -350,7 +403,7 @@ LABEL_9:
                     _wcsncpy(v4->text, a2, 0x80u);
                     v4->bDrawEntry = 2;
                     v4->field_10C = 2;
-                    jkDev_log_55A4A8 = 1;
+                    jkDev_bScreenNeedsUpdate = 1;
                 }
                 result = 1;
             }
@@ -984,7 +1037,7 @@ int jkDev_UpdateEntries()
                     v2->field_10C = 2;
                     v3->bDrawEntry = 2;
                     v3->field_10C = 2;
-                    jkDev_log_55A4A8 = 1;
+                    jkDev_bScreenNeedsUpdate = 1;
                 }
                 ++v2;
                 ++v4;
@@ -1002,36 +1055,75 @@ void jkDev_DrawEntries()
 {
     int v0; // ebp
     signed int v1; // edi
-    signed int v2; // eax
     jkDevLogEnt* v3; // esi
-    int v4; // ecx
     rdRect a4; // [esp+8h] [ebp-10h] BYREF
+
+    // Added: GPU rendered text
+#ifdef SDL2_RENDER
+    jkDev_DrawEntriesGPU();
+    return;
+#endif
 
     v0 = 0;
     if ( jkDev_vbuf )
     {
-        if ( jkDev_log_55A4A8 )
+        if ( jkDev_bScreenNeedsUpdate )
         {
             v1 = 0;
-            jkDev_log_55A4A8 = 0;
+            jkDev_bScreenNeedsUpdate = 0;
             if ( jkDev_log_55A4A4 > 0 )
             {
-                v2 = jkDev_BMFontHeight;
                 v3 = &jkDev_aEntries[0];
                 do
                 {
                     if ( v3->bDrawEntry )
                     {
-                        v4 = v3->drawWidth;
-                        a4.height = v2;
-                        a4.width = v4;
+                        a4.height = jkDev_BMFontHeight;
+                        a4.width = v3->drawWidth;
                         a4.x = 0;
                         a4.y = v1;
                         stdDisplay_VBufferFill(jkDev_vbuf, jkDev_ColorKey, &a4);
                         v3->drawWidth = stdFont_Draw1(jkDev_vbuf, jkHud_pMsgFontSft, 0, v1, jkDev_vbuf->format.width, v3->text, 0);
-                        v2 = jkDev_BMFontHeight;
                     }
-                    v1 += v2;
+                    v1 += jkDev_BMFontHeight;
+                    ++v0;
+                    ++v3;
+                }
+                while ( v0 < jkDev_log_55A4A4 );
+            }
+        }
+    }
+}
+
+void jkDev_DrawEntriesGPU()
+{
+    int v0; // ebp
+    signed int v1; // edi
+    jkDevLogEnt* v3; // esi
+    rdRect a4; // [esp+8h] [ebp-10h] BYREF
+
+    v0 = 0;
+    if ( jkDev_vbuf )
+    {
+        //if ( jkDev_bScreenNeedsUpdate )
+        {
+            v1 = 0;
+            jkDev_bScreenNeedsUpdate = 0;
+            if ( jkDev_log_55A4A4 > 0 )
+            {
+                v3 = &jkDev_aEntries[v0];
+                do
+                {
+                    //if ( v3->bDrawEntry )
+                    {
+                        a4.height = jkDev_BMFontHeight;
+                        a4.width = v3->drawWidth;
+                        a4.x = 0;
+                        a4.y = v1;
+                        stdDisplay_VBufferFill(jkDev_vbuf, jkDev_ColorKey, &a4); // jkDev_vbuf->format.width
+                        v3->drawWidth = stdFont_Draw1Width(jkHud_pMsgFontSft, 0, v1, jkDev_vbuf->format.width, v3->text, 0);
+                    }
+                    v1 += jkDev_BMFontHeight;
                     ++v0;
                     ++v3;
                 }
