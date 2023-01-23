@@ -3237,7 +3237,6 @@ int std3D_AddBitmapToTextureCache(stdBitmap *texture, int mipIdx, int is_alpha_t
                         val_rgba |= (color_b << 16);
                         val_rgba |= (color_g << 8);
                         val_rgba |= (color_r << 0);
-                        printf("%x %x\n", val_rgba, val);
                     }
                     else {
                         val_rgba = 0xFFFFFF00; // HACK
