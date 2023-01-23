@@ -60,8 +60,8 @@ echo "Running..." &&
 #codesign -s - openjkdf2-64 &&
 #OPENJKDF2_ROOT="/Users/maxamillion/.local/share/openjkdf2_todoa" LSAN_OPTIONS="suppressions=/Users/maxamillion/workspace/OpenJKDF2/suppr.txt" ASAN_OPTIONS="log_path=/Users/maxamillion/workspace/OpenJKDF2/asan.log"  lldb -o run ./OpenJKDF2.app/Contents/MacOS/openjkdf2-64 -- -enhancedCogVerbs #-- -verboseNetworking
 #OPENJKDF2_ROOT="/Users/maxamillion/.local/share/openjkdf2_todoa2012" LSAN_OPTIONS="suppressions=/Users/maxamillion/workspace/OpenJKDF2/suppr.txt" ASAN_OPTIONS="log_path=/Users/maxamillion/workspace/OpenJKDF2/asan.log"  lldb -o run ./OpenJKDF2.app/Contents/MacOS/openjkdf2-64 -- -enhancedCogVerbs #-- -verboseNetworking
-#OPENJKDF2_ROOT="/Users/maxamillion/.local/share/openjkdf2-cds" LSAN_OPTIONS="suppressions=/Users/maxamillion/workspace/OpenJKDF2/suppr.txt" ASAN_OPTIONS="log_path=/Users/maxamillion/workspace/OpenJKDF2/asan.log"  lldb -o run ./OpenJKDF2.app/Contents/MacOS/openjkdf2-64 -- -enhancedCogVerbs #-- -verboseNetworking
-LSAN_OPTIONS="suppressions=/Users/maxamillion/workspace/OpenJKDF2/suppr.txt" ASAN_OPTIONS="log_path=/Users/maxamillion/workspace/OpenJKDF2/asan.log"  lldb -o run ./OpenJKDF2.app/Contents/MacOS/openjkdf2-64 #-- -verboseNetworking
+OPENJKDF2_ROOT="/Users/maxamillion/.local/share/openjkdf2-cds" LSAN_OPTIONS="suppressions=/Users/maxamillion/workspace/OpenJKDF2/suppr.txt" ASAN_OPTIONS="log_path=/Users/maxamillion/workspace/OpenJKDF2/asan.log"  lldb -o run ./OpenJKDF2.app/Contents/MacOS/openjkdf2-64 -- -enhancedCogVerbs #-- -verboseNetworking
+#LSAN_OPTIONS="suppressions=/Users/maxamillion/workspace/OpenJKDF2/suppr.txt" ASAN_OPTIONS="log_path=/Users/maxamillion/workspace/OpenJKDF2/asan.log"  lldb -o run ./OpenJKDF2.app/Contents/MacOS/openjkdf2-64 #-- -verboseNetworking
 #lldb -o run ./OpenJKDF2.app/Contents/MacOS/openjkdf2-64
 #open OpenJKDF2.app
 
