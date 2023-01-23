@@ -2230,7 +2230,7 @@ void std3D_DrawSceneFbo()
     if (!draw_ssao)
     {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex0, 0, 0, 1.0, 1.0, 1.0, 0);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex0, 0, 0, 1.0, 1.0, jkPlayer_gamma, 0);
         //std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex1, 0, 0, 0.0, 1.0, jkPlayer_gamma, 0); // test emission output
     }
     else

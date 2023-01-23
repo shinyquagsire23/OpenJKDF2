@@ -1763,7 +1763,11 @@ void sithRender_RenderAlphaSurfaces()
     float v31; // [esp+4h] [ebp-10h]
     sithSector *surfaceSector; // [esp+Ch] [ebp-8h]
 
+#ifdef SDL2_RENDER
+    rdSetZBufferMethod(RD_ZBUFFER_READ_NOWRITE);
+#else
     rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
+#endif
     rdSetOcclusionMethod(0);
     rdSetSortingMethod(2);
 
