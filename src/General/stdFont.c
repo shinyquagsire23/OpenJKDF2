@@ -1249,7 +1249,7 @@ LABEL_24:
                 a5a.x = 0;
                 a5a.width = 0;
             }
-            if ( (int)(v9 + v17) < (int)(v8 + x_max) )
+            if ( (int)(v9 + INT_FLOAT_SCALED(v17, scale)) < (int)(v8 + x_max) )
             {
                 std3D_DrawUIBitmap(a2->bitmap, 0, v9, blit_y, &a5a, scale, alpha_maybe);
                 //stdDisplay_VBufferCopy(a1, v21, v9, blit_y, &a5a, alpha_maybe);
@@ -1364,7 +1364,6 @@ unsigned int stdFont_Draw1GPU(stdFont *font, unsigned int blit_x, int blit_y, in
     int v13; // eax
     uint16_t v14; // cx
     stdFontCharset *v15; // eax
-    signed int v16; // ecx
     int v18; // [esp+10h] [ebp-14h]
     rdRect a5a; // [esp+14h] [ebp-10h] BYREF
     stdVBuffer *a2a; // [esp+2Ch] [ebp+8h]
@@ -1426,17 +1425,15 @@ unsigned int stdFont_Draw1GPU(stdFont *font, unsigned int blit_x, int blit_y, in
             {
 LABEL_22:
                 a5a.x = v15->pEntries[v14 - v15->charFirst].field_0;
-                v16 = v15->pEntries[v14 - v15->charFirst].field_4;
-                a5a.width = v16;
+                a5a.width = v15->pEntries[v14 - v15->charFirst].field_4;
             }
             else
             {
 LABEL_21:
-                v16 = 0;
                 a5a.x = 0;
                 a5a.width = 0;
             }
-            if ( (int)(v9 + v16) < (int)(blit_x + a5) )
+            if ( (int)(v9 + INT_FLOAT_SCALED(a5a.width, scale)) < (int)(blit_x + a5) )
             {
                 std3D_DrawUIBitmap(font->bitmap, 0, v9, blit_y, &a5a, scale, alpha_maybe);
                 v13 = a5a.width + font->marginY;
@@ -1452,7 +1449,7 @@ LABEL_27:
         }
         v13 = font->marginX;
 LABEL_26:
-        v9 += (int)((float)v13 * scale);
+        v9 += INT_FLOAT_SCALED(v13, scale);
         goto LABEL_27;
     }
     return v9 - v8;
@@ -1468,10 +1465,11 @@ unsigned int stdFont_Draw1Width(stdFont *font, unsigned int blit_x, int blit_y, 
     int v13; // eax
     uint16_t v14; // cx
     stdFontCharset *v15; // eax
-    signed int v16; // ecx
     int v18; // [esp+10h] [ebp-14h]
     rdRect a5a; // [esp+14h] [ebp-10h] BYREF
     stdVBuffer *a2a; // [esp+2Ch] [ebp+8h]
+
+    uint32_t largest_x = 0;
 
     v8 = blit_x;
     v9 = blit_x;
@@ -1488,7 +1486,7 @@ unsigned int stdFont_Draw1Width(stdFont *font, unsigned int blit_x, int blit_y, 
         while ( 1 )
         {
             if ( v18 )
-                return v9 - v8;
+                return largest_x;//v9 - v8;
             if ( v11 == 9 )
             {
                 v12 = 16;
@@ -1530,18 +1528,20 @@ unsigned int stdFont_Draw1Width(stdFont *font, unsigned int blit_x, int blit_y, 
             {
 LABEL_22:
                 a5a.x = v15->pEntries[v14 - v15->charFirst].field_0;
-                v16 = v15->pEntries[v14 - v15->charFirst].field_4;
-                a5a.width = v16;
+                a5a.width = v15->pEntries[v14 - v15->charFirst].field_4;
             }
             else
             {
 LABEL_21:
-                v16 = 0;
                 a5a.x = 0;
                 a5a.width = 0;
             }
-            if ( (int)(v9 + v16) < (int)(blit_x + a5) )
+            if ( (int)(v9 + INT_FLOAT_SCALED(a5a.width, scale)) < (int)(blit_x + a5) )
             {
+                int next_spot = (int)(v9 + INT_FLOAT_SCALED(a5a.width, scale)) - blit_x;
+                if (next_spot > largest_x) {
+                    largest_x = next_spot;
+                }
                 //std3D_DrawUIBitmap(font->bitmap, 0, v9, blit_y, &a5a, 1.0, alpha_maybe);
                 v13 = a5a.width + font->marginY;
                 goto LABEL_26;
@@ -1552,12 +1552,12 @@ LABEL_27:
             v8 = blit_x;
             ++v10;
             if ( !v11 )
-                return v9 - v8;
+                return largest_x;//v9 - v8;
         }
         v13 = font->marginX;
 LABEL_26:
-        v9 += (int)((float)v13 * scale);
+        v9 += INT_FLOAT_SCALED(v13, scale);
         goto LABEL_27;
     }
-    return v9 - v8;
+    return largest_x;//v9 - v8;
 }

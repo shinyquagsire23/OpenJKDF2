@@ -612,7 +612,7 @@ void jkHudInv_DrawGPU()
 
                 // Added: allow displaying all numbers.
                 if ( v18 > 1 )
-                    stdFont_Draw1GPU(jkHudInv_font, v20 + HUD_SCALED(v17->mipSurfaces[0]->format.width) - width, v19 + HUD_SCALED(2), 640, a6, 1, jkPlayer_hudScale);
+                    stdFont_Draw1GPU(jkHudInv_font, v20 + HUD_SCALED(v17->mipSurfaces[0]->format.width) - width - HUD_SCALED(2), v19 + HUD_SCALED(2), 640, a6, 1, jkPlayer_hudScale);
 #if 0
                 v22 = 99;
                 if ( v18 <= 99 )
@@ -661,7 +661,7 @@ void jkHudInv_DrawGPU()
 
                         // Added: allow displaying all numbers.
                         if ( v27 > 1 )
-                            stdFont_Draw1GPU(jkHudInv_font, v29 + HUD_SCALED(v26->mipSurfaces[0]->format.width) - width, v28 + HUD_SCALED(2), 640, v48, 1, jkPlayer_hudScale);
+                            stdFont_Draw1GPU(jkHudInv_font, v29 + HUD_SCALED(v26->mipSurfaces[0]->format.width) - width - HUD_SCALED(2), v28 + HUD_SCALED(2), 640, v48, 1, jkPlayer_hudScale);
 
 #if 0
                         v31 = 99;
@@ -714,7 +714,7 @@ LABEL_84:
 
                         // Added: allow displaying all numbers.
                         if ( v34 > 1 )
-                            stdFont_Draw1GPU(jkHudInv_font, v38 + HUD_SCALED(v26->mipSurfaces[0]->format.width) - width, v36 + HUD_SCALED(2), 640, v50, 1, jkPlayer_hudScale);
+                            stdFont_Draw1GPU(jkHudInv_font, v38 + HUD_SCALED(v33->mipSurfaces[0]->format.width) - width - HUD_SCALED(2), v36 + HUD_SCALED(2), 640, v50, 1, jkPlayer_hudScale);
 
 
 #if 0
