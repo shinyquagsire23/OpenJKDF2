@@ -1552,6 +1552,20 @@ void std3D_DrawMapOverlay()
 
 void std3D_DrawUIBitmap(stdBitmap* pBmp, int mipIdx, float dstX, float dstY, rdRect* srcRect, float scale, int bAlphaOverwrite)
 {
+    float internalWidth = Video_menuBuffer.format.width;
+    float internalHeight = Video_menuBuffer.format.height;
+
+    if (jkGuiBuildMulti_bRendering) {
+        internalWidth = 640.0;
+        internalHeight = 480.0;
+    }
+
+    double scaleX = (double)Window_xSize/(double)internalWidth;
+    double scaleY = (double)Window_ySize/(double)internalHeight;
+
+    dstX *= scaleX;
+    dstY *= scaleY;
+
     //double tex_w = (double)Window_xSize;
     //double tex_h = (double)Window_ySize;
     double tex_w = pBmp->mipSurfaces[0]->format.width;
@@ -1583,6 +1597,11 @@ void std3D_DrawUIBitmap(stdBitmap* pBmp, int mipIdx, float dstX, float dstY, rdR
         scale = 1.0;
     }
 
+    double dstScaleX = scale;
+    double dstScaleY = scale;
+    dstScaleX *= scaleX;
+    dstScaleY *= scaleY;
+
     double u1 = (x / tex_w);
     double u2 = ((x+w) / tex_w);
     double v1 = (y / tex_h);
@@ -1598,7 +1617,7 @@ void std3D_DrawUIBitmap(stdBitmap* pBmp, int mipIdx, float dstX, float dstY, rdR
     *(uint32_t*)&GL_tmpUIVertices[GL_tmpUIVerticesAmt+0].nz = 0;
     
     GL_tmpUIVertices[GL_tmpUIVerticesAmt+1].x = dstX;
-    GL_tmpUIVertices[GL_tmpUIVerticesAmt+1].y = dstY + (scale * h_dst);
+    GL_tmpUIVertices[GL_tmpUIVerticesAmt+1].y = dstY + (dstScaleY * h_dst);
     GL_tmpUIVertices[GL_tmpUIVerticesAmt+1].z = 0.0;
     GL_tmpUIVertices[GL_tmpUIVerticesAmt+1].tu = u1;
     GL_tmpUIVertices[GL_tmpUIVerticesAmt+1].tv = v2;
@@ -1606,8 +1625,8 @@ void std3D_DrawUIBitmap(stdBitmap* pBmp, int mipIdx, float dstX, float dstY, rdR
     GL_tmpUIVertices[GL_tmpUIVerticesAmt+1].color = 0xFFFFFFFF;
     *(uint32_t*)&GL_tmpUIVertices[GL_tmpUIVerticesAmt+1].nz = 0;
     
-    GL_tmpUIVertices[GL_tmpUIVerticesAmt+2].x = dstX + (scale * w_dst);
-    GL_tmpUIVertices[GL_tmpUIVerticesAmt+2].y = dstY + (scale * h_dst);
+    GL_tmpUIVertices[GL_tmpUIVerticesAmt+2].x = dstX + (dstScaleX * w_dst);
+    GL_tmpUIVertices[GL_tmpUIVerticesAmt+2].y = dstY + (dstScaleY * h_dst);
     GL_tmpUIVertices[GL_tmpUIVerticesAmt+2].z = 0.0;
     GL_tmpUIVertices[GL_tmpUIVerticesAmt+2].tu = u2;
     GL_tmpUIVertices[GL_tmpUIVerticesAmt+2].tv = v2;
@@ -1615,7 +1634,7 @@ void std3D_DrawUIBitmap(stdBitmap* pBmp, int mipIdx, float dstX, float dstY, rdR
     GL_tmpUIVertices[GL_tmpUIVerticesAmt+2].color = 0xFFFFFFFF;
     *(uint32_t*)&GL_tmpUIVertices[GL_tmpUIVerticesAmt+2].nz = 0;
     
-    GL_tmpUIVertices[GL_tmpUIVerticesAmt+3].x = dstX + (scale * w_dst);
+    GL_tmpUIVertices[GL_tmpUIVerticesAmt+3].x = dstX + (dstScaleX * w_dst);
     GL_tmpUIVertices[GL_tmpUIVerticesAmt+3].y = dstY;
     GL_tmpUIVertices[GL_tmpUIVerticesAmt+3].z = 0.0;
     GL_tmpUIVertices[GL_tmpUIVerticesAmt+3].tu = u2;
@@ -1715,11 +1734,10 @@ void std3D_DrawUIRenderList()
 
     float param1 = 1.0;
     float param2 = 1.0;
-    float param3 = 1.0;
 
     glUniform1f(std3D_uiProgram.uniform_param1, param1);
     glUniform1f(std3D_uiProgram.uniform_param2, param2);
-    glUniform1f(std3D_uiProgram.uniform_param3, param3);
+    glUniform1f(std3D_uiProgram.uniform_param3, jkPlayer_gamma);
     
     }
 
@@ -2940,10 +2958,11 @@ int std3D_AddBitmapToTextureCache(stdBitmap *texture, int mipIdx, int is_alpha_t
         else
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0,  GL_RGBA, GL_UNSIGNED_SHORT_5_5_5_1, image_8bpp);
 #endif
-        uint32_t tex_width, tex_height;
-        width = vbuf->format.width_in_bytes / 2;
-        tex_width = vbuf->format.width_in_bytes / 2;
+        uint32_t tex_width, tex_height, tex_row_stride;
+        uint32_t row_stride = vbuf->format.width_in_bytes / 2;
+        tex_width = width;//vbuf->format.width_in_bytes / 2;
         tex_height = height;
+        tex_row_stride = width;
 
         void* image_data = malloc(tex_width*tex_height*4);
         memset(image_data, 0, tex_width*tex_height*4);
@@ -2953,12 +2972,12 @@ int std3D_AddBitmapToTextureCache(stdBitmap *texture, int mipIdx, int is_alpha_t
         {
             for (int i = 0; i < width; i++)
             {
-                uint32_t index = (j*width) + i;
-                uint32_t tex_index = (j*tex_width) + i;
+                uint32_t index = (j*row_stride) + i;
+                uint32_t tex_index = (j*tex_row_stride) + i;
                 uint32_t val_rgba = 0x00000000;
                 
                 uint16_t val = image_16bpp[index];
-                if (!is_alpha_tex) // RGB565
+                if (vbuf->format.format.g_bits == 6) // RGB565
                 {
                     uint8_t val_a1 = 1;
                     uint8_t val_r5 = (val >> 11) & 0x1F;
@@ -2984,9 +3003,9 @@ int std3D_AddBitmapToTextureCache(stdBitmap *texture, int mipIdx, int is_alpha_t
 
                     if (vbuf->transparent_color && val_r5 == transparent_r5 && val_g6 == transparent_g6 && val_b5 == transparent_b5) {
                         val_a8 = 0;
-                        val_r8 = 0;
-                        val_g8 = 0;
-                        val_b8 = 0;
+                        //val_r8 = 0;
+                        //val_g8 = 0;
+                        //val_b8 = 0;
                     }
 
                     val_rgba |= (val_a8 << 24);
@@ -3020,7 +3039,6 @@ int std3D_AddBitmapToTextureCache(stdBitmap *texture, int mipIdx, int is_alpha_t
                 }
                     
                 ((uint32_t*)image_data)[tex_index] = val_rgba;
-                index++;
             }
         }
         

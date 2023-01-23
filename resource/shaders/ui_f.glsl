@@ -19,6 +19,7 @@ void main(void)
         }
         else {
             sampled_color = vec4(sampled_color.r, sampled_color.g, sampled_color.b, 1.0);
+            //sampled_color = vec4(0.0, 0.0, 0.0, 0.0);
         }
     }
 

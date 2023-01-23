@@ -253,6 +253,16 @@ stdVBuffer* stdDisplay_VBufferNew(stdVBufferTexFmt *fmt, int create_ddraw_surfac
     //out->format.width_in_bytes = 0;
     //out->surface_lock_alloc = std_pHS->alloc(texture_size_in_bytes);
     
+    //if (fmt->format.g_bits == 6) // RGB565
+    {
+        fmt->format.r_bits = 0;
+        fmt->format.g_bits = 0;
+        fmt->format.b_bits = 0;
+        fmt->format.r_shift = 0;
+        fmt->format.g_shift = 0;
+        fmt->format.b_shift = 0;
+    }
+
     uint32_t rbitmask = ((1 << fmt->format.r_bits) - 1) << fmt->format.r_shift;
     uint32_t gbitmask = ((1 << fmt->format.g_bits) - 1) << fmt->format.g_shift;
     uint32_t bbitmask = ((1 << fmt->format.b_bits) - 1) << fmt->format.b_shift;
@@ -278,9 +288,10 @@ stdVBuffer* stdDisplay_VBufferNew(stdVBufferTexFmt *fmt, int create_ddraw_surfac
     else
     {
         //printf("asdf\n");
-        printf("Failed to allocate VBuffer! %s, w %u h %u bpp %u, rmask %x gmask %x bmask %x amask %x, %x %x %x\n", SDL_GetError(), fmt->width, fmt->height, fmt->format.bpp, rbitmask, gbitmask, bbitmask, abitmask, fmt->format.r_bits, fmt->format.g_bits, fmt->format.b_bits);
+        printf("Failed to allocate VBuffer! %s, w %u h %u bpp %u, rmask %x gmask %x bmask %x amask %x, %x %x %x, %x %x %x\n", SDL_GetError(), fmt->width, fmt->height, fmt->format.bpp, rbitmask, gbitmask, bbitmask, abitmask, fmt->format.r_bits, fmt->format.g_bits, fmt->format.b_bits, fmt->format.r_shift, fmt->format.g_shift, fmt->format.b_shift);
         assert(0);
     }
+    //printf("Failed to allocate VBuffer! %s, w %u h %u bpp %u, rmask %x gmask %x bmask %x amask %x, %x %x %x, %x %x %x\n", SDL_GetError(), fmt->width, fmt->height, fmt->format.bpp, rbitmask, gbitmask, bbitmask, abitmask, fmt->format.r_bits, fmt->format.g_bits, fmt->format.b_bits, fmt->format.r_shift, fmt->format.g_shift, fmt->format.b_shift);
     
     out->sdlSurface = surface;
     

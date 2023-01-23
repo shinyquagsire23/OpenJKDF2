@@ -8,6 +8,7 @@
 #include "stdPlatform.h"
 #include "Cog/sithCog.h"
 #include "Main/Main.h"
+#include "Platform/std3D.h"
 #include "jk.h"
 
 static int jkHudScope_bInitted = 0;
@@ -63,11 +64,14 @@ int jkHudScope_Open(void)
 
     do 
     {
+#ifndef SDL2_RENDER
         if (Video_format.format.bpp == 8) {
             pcVar10 = pBmIter->path8bpp;
             pcVar9 = "ui\\bm\\%s";
         }
-        else {
+        else 
+#endif
+        {
             pcVar10 = pBmIter->path16bpp;
             pcVar9 = "ui\\bm\\%s";
         }
@@ -165,7 +169,11 @@ void jkHudScope_Draw(void)
 
     do 
     {
+#ifndef SDL2_RENDER
         stdDisplay_VBufferCopy(pOverlayBuffer, *(*pBmIter->pBitmap)->mipSurfaces, pBmIter->unk4, pBmIter->unk5, NULL, 1);
+#else
+        std3D_DrawUIBitmap(*pBmIter->pBitmap, 0, pBmIter->unk4, pBmIter->unk5, NULL, 1.0, 1);
+#endif
         pBmIter++;
     } while (pBmIter < &jkHudScope_aBitmaps[1]);
 
