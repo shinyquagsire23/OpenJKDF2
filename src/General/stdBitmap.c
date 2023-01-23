@@ -203,6 +203,10 @@ LABEL_17:
     out->aTextureIds = (uint32_t*)std_pHS->alloc(out->numMips * sizeof(uint32_t));
     out->abLoadedToGPU = (int*)std_pHS->alloc(out->numMips * sizeof(int));
     out->paDataDepthConverted = (void**)std_pHS->alloc(out->numMips * sizeof(void*));
+
+    memset(out->aTextureIds, 0, (out->numMips * sizeof(uint32_t)));
+    memset(out->abLoadedToGPU, 0, (out->numMips * sizeof(int)));
+    memset(out->paDataDepthConverted, 0, (out->numMips * sizeof(void*)));
     for (int i = 0; i < out->numMips; i++)
     {
         std3D_AddBitmapToTextureCache(out, i, !(out->palFmt & 1), 0);
