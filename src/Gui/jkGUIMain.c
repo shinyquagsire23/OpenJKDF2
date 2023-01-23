@@ -49,8 +49,8 @@ static jkGuiElement jkGuiMain_cutscenesElements[5] = {
 static jkGuiMenu jkGuiMain_cutscenesMenu = {jkGuiMain_cutscenesElements, 0xFFFFFFFF, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 
 static jkGuiElement jkGuiMain_elements[11] = {
-    {ELEMENT_TEXTBUTTON, 10, 5, "GUI_SINGLEPLAYER", 3, {0, 0xA0, 0x280, 0x3C}, 1, 0, 0, 0, 0, 0, {0}, 0},
-    {ELEMENT_TEXTBUTTON, 11, 5, "GUI_MULTIPLAYER", 3, {0, 0xDC, 0x280, 0x3C}, 1, 0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_TEXTBUTTON, 10, 5, "GUI_SINGLEPLAYER", 3, {0, 160, 0x280, 0x3C}, 1, 0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_TEXTBUTTON, 11, 5, "GUI_MULTIPLAYER", 3, {0, 220, 0x280, 0x3C}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON, 12, 5, "GUI_QUIT", 3, {0, 0x118, 0x280, 0x3C}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON, 14, 2, "GUI_CHOOSEPLAYER", 3, {20, 380, 150, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON, 15, 2, "GUI_VIEWCUTSCENES", 3, {250, 380, 150, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
@@ -74,6 +74,35 @@ void jkGuiMain_Show()
     int v1; // esi
     wchar_t *v2; // eax
     wchar_t *v4; // [esp-4h] [ebp-Ch]
+
+    if (!Main_bMotsCompat) {
+        jkGuiMain_elements[0].rect.y = 160;
+        jkGuiMain_elements[1].rect.y = 220;
+        jkGuiMain_elements[2].rect.y = 280;
+        jkGuiMain_elements[3].rect.y = 380;
+        jkGuiMain_elements[4].rect.y = 380;
+        jkGuiMain_elements[5].rect.y = 380;
+#ifdef QOL_IMPROVEMENTS
+        jkGuiMain_elements[6].rect.y = 430;
+        jkGuiMain_elements[7].rect.y = 430;
+#else
+        jkGuiMain_elements[6].rect.y = 420;
+#endif
+    }
+    else {
+        jkGuiMain_elements[0].rect.y = 160+25;
+        jkGuiMain_elements[1].rect.y = 220+25;
+        jkGuiMain_elements[2].rect.y = 280+25;
+        jkGuiMain_elements[3].rect.y = 380+5;
+        jkGuiMain_elements[4].rect.y = 380+5;
+        jkGuiMain_elements[5].rect.y = 380+5;
+#ifdef QOL_IMPROVEMENTS
+        jkGuiMain_elements[6].rect.y = 430;
+        jkGuiMain_elements[7].rect.y = 430;
+#else
+        jkGuiMain_elements[6].rect.y = 420+5;
+#endif
+    }
 
     // Added: OpenJKDF2 version
     jkGuiMain_elements[8].wstr = openjkdf2_waReleaseVersion;
