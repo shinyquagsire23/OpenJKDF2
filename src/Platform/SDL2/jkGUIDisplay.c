@@ -248,6 +248,10 @@ continue_menu:
             jkPlayer_hudScale = 1.0;
         }
 
+        if (jkPlayer_hudScale > 100.0) {
+            jkPlayer_hudScale = 100.0;
+        }
+
         jkPlayer_WriteConf(jkPlayer_playerShortName);
 
         // Make sure filter settings get applied

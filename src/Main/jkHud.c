@@ -460,7 +460,7 @@ void jkHud_Draw()
             jkHud_blittedBatteryAmt = v5;
             stdDisplay_VBufferCopy(
                 *jkHud_pStatusRightBm->mipSurfaces,
-                jkHud_pStBatBm->mipSurfaces[v5 * (jkHud_pStBatBm->numMips - 1) / 0xC8u],
+                jkHud_pStBatBm->mipSurfaces[v5 * (jkHud_pStBatBm->numMips - 1) / 200],
                 jkHud_pStBatBm->xPos,
                 jkHud_pStBatBm->yPos,
                 0,
@@ -1017,13 +1017,13 @@ void jkHud_DrawGPU()
             jkHud_blittedBatteryAmt = v5;
             /*stdDisplay_VBufferCopy(
                 *jkHud_pStatusRightBm->mipSurfaces,
-                jkHud_pStBatBm->mipSurfaces[v5 * (jkHud_pStBatBm->numMips - 1) / 0xC8u],
+                jkHud_pStBatBm->mipSurfaces[v5 * (jkHud_pStBatBm->numMips - 1) / 200],
                 jkHud_pStBatBm->xPos,
                 jkHud_pStBatBm->yPos,
                 0,
                 1);*/
             //std3D_DrawUIBitmap(jkHud_pStatusRightBm,0, 0,0,64,64,0,0,4.0);
-            std3D_DrawUIBitmap(jkHud_pStBatBm, v5 * (jkHud_pStBatBm->numMips - 1) / 0xC8u, jkHud_rightBlitX + HUD_SCALED(jkHud_pStBatBm->xPos), jkHud_rightBlitY + HUD_SCALED(jkHud_pStBatBm->yPos), NULL, jkPlayer_hudScale, 1);
+            std3D_DrawUIBitmap(jkHud_pStBatBm, v5 * (jkHud_pStBatBm->numMips - 1) / 200, jkHud_rightBlitX + HUD_SCALED(jkHud_pStBatBm->xPos), jkHud_rightBlitY + HUD_SCALED(jkHud_pStBatBm->yPos), NULL, jkPlayer_hudScale, 1);
         }
         v6 = sithInventory_GetActivate(v4, SITHBIN_FIELDLIGHT);
         //if ( jkHud_blittedFieldlightAmt != v6 )
