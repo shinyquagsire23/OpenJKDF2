@@ -1244,6 +1244,14 @@ void jkHud_DrawGPU()
                     v33 = v32->playerThing->rdthing.model3->filename;
                     stdFnames_CopyShortName(tmpFname, 16, v33);
                     jkGuiTitle_sub_4189A0(tmpFname);
+                    // MOTS altered here "_SHORT" TODO
+                    /*
+                            _sprintf(local_11c,"%s_SHORT",&local_14c);
+                            pwVar7 = jkStrings_GetText2(local_11c);
+                            if (pwVar7 == (wchar_t *)0x0) {
+                                pwVar7 = jkStrings_GetText((char *)&local_14c);
+                            }
+                    */
                     v34 = jkStrings_GetText(tmpFname);
                     stdString_SafeWStrCopy(jkHud_aPlayerScores[jkHud_numPlayers].modelName, v34, 0x20);
                     v35 = jkHud_numPlayers;
