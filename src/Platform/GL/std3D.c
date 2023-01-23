@@ -275,8 +275,8 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     glGenTextures(1, &pFb->tex2);
     glBindTexture(GL_TEXTURE_2D, pFb->tex2);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
@@ -287,8 +287,8 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     glGenTextures(1, &pFb->tex3);
     glBindTexture(GL_TEXTURE_2D, pFb->tex3);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     
@@ -461,6 +461,8 @@ bool std3D_loadSimpleTexProgram(const char* fpath_base, std3DSimpleTexStage* pOu
 int init_resources()
 {
     printf("OpenGL init...\n");
+
+    memset(std3D_aUITextures, 0, sizeof(std3D_aUITextures));
 
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, &std3D_windowFbo);
 
@@ -3334,6 +3336,26 @@ void std3D_UpdateSettings()
             }
         }
     }
+
+#if 0
+    for (int i = 0; i < STD3D_MAX_TEXTURES; i++)
+    {
+        if (!std3D_aUITextures[i]) continue;
+        glBindTexture(GL_TEXTURE_2D, std3D_aUITextures[i]);
+
+        if (jkPlayer_enableTextureFilter)
+        {
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        }
+        else
+        {
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        }
+        
+    }
+#endif
 
     glBindTexture(GL_TEXTURE_2D, blank_tex);
 }
