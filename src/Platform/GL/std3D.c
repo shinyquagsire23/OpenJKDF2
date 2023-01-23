@@ -3054,7 +3054,7 @@ int std3D_AddBitmapToTextureCache(stdBitmap *texture, int mipIdx, int is_alpha_t
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     }
 
-    if (vbuf->format.format.is16bit)
+    if (vbuf->format.format.is16bit || texture->format.bpp == 16)
     {
         texture->is_16bit = 1;
 
@@ -3083,7 +3083,7 @@ int std3D_AddBitmapToTextureCache(stdBitmap *texture, int mipIdx, int is_alpha_t
                 uint32_t val_rgba = 0x00000000;
                 
                 uint16_t val = image_16bpp[index];
-                if (vbuf->format.format.g_bits == 6) // RGB565
+                if (vbuf->format.format.r_bits == 5 && vbuf->format.format.g_bits == 6 && vbuf->format.format.b_bits == 5) // RGB565
                 {
                     uint8_t val_a1 = 1;
                     uint8_t val_r5 = (val >> 11) & 0x1F;
@@ -3107,6 +3107,7 @@ int std3D_AddBitmapToTextureCache(stdBitmap *texture, int mipIdx, int is_alpha_t
                     uint8_t transparent_g8 = ( transparent_g6 * 259 + 33 ) >> 6;
                     uint8_t transparent_b8 = ( transparent_b5 * 527 + 23 ) >> 6;
 
+                    //
                     if (vbuf->transparent_color && val_r5 == transparent_r5 && val_g6 == transparent_g6 && val_b5 == transparent_b5) {
                         val_a8 = 0;
                         //val_r8 = 0;
@@ -3126,7 +3127,7 @@ int std3D_AddBitmapToTextureCache(stdBitmap *texture, int mipIdx, int is_alpha_t
                     val_rgba |= (transparent_r8 << 0);
 #endif
                 }
-                else // RGB1555
+                else if (vbuf->format.format.r_bits == 5 && vbuf->format.format.g_bits == 5 && vbuf->format.format.b_bits == 5) // RGB1555
                 {
                     uint8_t val_a1 = (val >> 15);
                     uint8_t val_r5 = (val >> 10) & 0x1F;
@@ -3138,10 +3139,38 @@ int std3D_AddBitmapToTextureCache(stdBitmap *texture, int mipIdx, int is_alpha_t
                     uint8_t val_g8 = ( val_g5 * 527 + 23 ) >> 6;
                     uint8_t val_b8 = ( val_b5 * 527 + 23 ) >> 6;
 
+                    uint8_t transparent_a1 = (vbuf->transparent_color >> 15) & 0x1;
+                    uint8_t transparent_r5 = (vbuf->transparent_color >> 10) & 0x1F;
+                    uint8_t transparent_g5 = (vbuf->transparent_color >> 5) & 0x1F;
+                    uint8_t transparent_b5 = (vbuf->transparent_color >> 0) & 0x1F;
+
+                    uint8_t transparent_r8 = ( transparent_r5 * 527 + 23 ) >> 6;
+                    uint8_t transparent_g8 = ( transparent_g5 * 527 + 23 ) >> 6;
+                    uint8_t transparent_b8 = ( transparent_b5 * 527 + 23 ) >> 6;
+
+#if 0
+                    //vbuf->transparent_color && 
+                    if (val_a1 == transparent_a1 && val_r5 == transparent_r5 && val_g5 == transparent_g5 && val_b5 == transparent_b5) {
+                        val_a8 = 0;
+                        //val_r8 = 0;
+                        //val_g8 = 0;
+                        //val_b8 = 0;
+                    }
+#endif
+
                     val_rgba |= (val_a8 << 24);
                     val_rgba |= (val_b8 << 16);
                     val_rgba |= (val_g8 << 8);
                     val_rgba |= (val_r8 << 0);
+#if 0
+                    val_rgba = 0xFF000000;
+                    val_rgba |= (transparent_b8 << 16);
+                    val_rgba |= (transparent_g8 << 8);
+                    val_rgba |= (transparent_r8 << 0);
+#endif
+                }
+                else {
+                    printf("wtf is this %u %u %u %u\n", vbuf->format.format.unk_40, vbuf->format.format.r_bits, vbuf->format.format.g_bits, vbuf->format.format.b_bits);
                 }
                     
                 ((uint32_t*)image_data)[tex_index] = val_rgba;
@@ -3154,7 +3183,81 @@ int std3D_AddBitmapToTextureCache(stdBitmap *texture, int mipIdx, int is_alpha_t
     }
     else {
         texture->is_16bit = 0;
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, image_8bpp);
+#if 1
+        uint32_t tex_width, tex_height, tex_row_stride;
+        uint32_t row_stride = vbuf->format.width_in_bytes;
+        tex_width = width;//vbuf->format.width_in_bytes / 2;
+        tex_height = height;
+        tex_row_stride = width;
+
+        void* image_data = malloc(tex_width*tex_height*4);
+        memset(image_data, 0, tex_width*tex_height*4);
+    
+        for (int j = 0; j < height; j++)
+        {
+            for (int i = 0; i < width; i++)
+            {
+                uint32_t index = (j*row_stride) + i;
+                uint32_t tex_index = (j*tex_row_stride) + i;
+                uint32_t val_rgba = 0x00000000;
+                
+                if (pal)
+                {
+                    uint8_t val = image_8bpp[index];
+                    val_rgba |= (pal[(val * 3) + 2] << 16);
+                    val_rgba |= (pal[(val * 3) + 1] << 8);
+                    val_rgba |= (pal[(val * 3) + 0] << 0);
+                    val_rgba |= (0xFF << 24);
+                }
+                else
+                {
+                    uint8_t val = image_8bpp[index];
+#if 0
+                    if (sithWorld_pCurrentWorld && sithWorld_pCurrentWorld->colormaps && sithWorld_pCurrentWorld->colormaps->colors)
+                    {
+                        rdColor24* pal_master = (rdColor24*)sithWorld_pCurrentWorld->colormaps->colors;//stdDisplay_gammaPalette;
+                        rdColor24* color = &pal_master[val];
+                        val_rgba |= (color->r << 16);
+                        val_rgba |= (color->g << 8);
+                        val_rgba |= (color->b << 0);
+                        val_rgba |= (0xFF << 24);
+                        printf("%x %x\n", val_rgba, val);
+                    }
+                    else {
+                        val_rgba = 0xFFFFFFFF; // HACK
+                    }
+#endif
+                    if (displaypal_data)
+                    {
+                        uint8_t color_r = ((uint8_t*)displaypal_data)[(val*3) + 0];
+                        uint8_t color_g = ((uint8_t*)displaypal_data)[(val*3) + 1];
+                        uint8_t color_b = ((uint8_t*)displaypal_data)[(val*3) + 2];
+
+                        val_rgba |= (0xFF << 24);
+                        val_rgba |= (color_b << 16);
+                        val_rgba |= (color_g << 8);
+                        val_rgba |= (color_r << 0);
+                        printf("%x %x\n", val_rgba, val);
+                    }
+                    else {
+                        val_rgba = 0xFFFFFF00; // HACK
+                    }
+                    
+
+                    if (!val) {
+                        val_rgba = 0;
+                    }
+                }
+                
+                ((uint32_t*)image_data)[tex_index] = val_rgba;
+            }
+        }
+        
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+
+        texture->paDataDepthConverted[mipIdx] = image_data;
+#endif
+        //glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, image_8bpp);
     }
 
     
