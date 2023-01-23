@@ -48,6 +48,7 @@ int jkPlayer_bEnableJkgm = 1;
 int jkPlayer_bEnableTexturePrecache = 1;
 int jkPlayer_bKeepCorpses = 0;
 int jkPlayer_bFastMissionText = 0;
+float jkPlayer_hudScale = 2.0;
 #endif
 
 #ifdef FIXED_TIMESTEP_PHYS
@@ -160,6 +161,7 @@ void jkPlayer_ResetVars()
     jkPlayer_bEnableTexturePrecache = 1;
     jkPlayer_bKeepCorpses = 0;
     jkPlayer_bFastMissionText = 0;
+    jkPlayer_hudScale = 2.0;
 #endif
 
 #ifdef FIXED_TIMESTEP_PHYS

@@ -19,6 +19,7 @@
 #include "Main/jkStrings.h"
 #include "Gui/jkGUITitle.h"
 #include "Platform/std3D.h"
+#include "World/jkPlayer.h"
 #include "../jk.h"
 
 //stdBitmap* jkHud_pTestbitmap = NULL;
@@ -130,10 +131,10 @@ int jkHud_Open()
         ++fontIter;
     }
     jkHud_leftBlitX = 0;
-    jkHud_leftBlitY = Video_format.height - (*jkHud_pStatusLeftBm->mipSurfaces)->format.height;
+    jkHud_leftBlitY = Video_format.height - HUD_SCALED((*jkHud_pStatusLeftBm->mipSurfaces)->format.height);
     v6 = *jkHud_pStatusRightBm->mipSurfaces;
-    jkHud_rightBlitX = Video_format.width - v6->format.width;
-    jkHud_rightBlitY = Video_format.height - v6->format.height;
+    jkHud_rightBlitX = Video_format.width - HUD_SCALED(v6->format.width);
+    jkHud_rightBlitY = Video_format.height - HUD_SCALED(v6->format.height);
     for (v7 = 0; v7 < 5; v7++)
     {
         jkHud_aTeamColors16bpp[v7] = stdColor_Indexed8ToRGB16(jkHud_aTeamColors8bpp[v7], Video_aPalette, &Video_format.format);
@@ -997,8 +998,8 @@ void jkHud_DrawGPU()
     // The rendering for GPU is kind of inverted from how the original does it.
     // The original blits onto the left/right statuses, then blits those to the screen.
     // We have to blit the left/right status, then everything on top of it.
-    std3D_DrawUIBitmap(jkHud_pStatusLeftBm, 0, jkHud_leftBlitX, jkHud_leftBlitY, NULL, 1.0, 1);
-    std3D_DrawUIBitmap(jkHud_pStatusRightBm, 0, jkHud_rightBlitX, jkHud_rightBlitY, NULL, 1.0, 1);
+    std3D_DrawUIBitmap(jkHud_pStatusLeftBm, 0, jkHud_leftBlitX, jkHud_leftBlitY, NULL, jkPlayer_hudScale, 1);
+    std3D_DrawUIBitmap(jkHud_pStatusRightBm, 0, jkHud_rightBlitX, jkHud_rightBlitY, NULL, jkPlayer_hudScale, 1);
 
     if ( v4->type == SITH_THING_PLAYER && !(sithNet_isServer && jkGuiNetHost_bIsDedicated) )
     {
@@ -1022,7 +1023,7 @@ void jkHud_DrawGPU()
                 0,
                 1);*/
             //std3D_DrawUIBitmap(jkHud_pStatusRightBm,0, 0,0,64,64,0,0,4.0);
-            std3D_DrawUIBitmap(jkHud_pStBatBm, v5 * (jkHud_pStBatBm->numMips - 1) / 0xC8u, jkHud_rightBlitX + jkHud_pStBatBm->xPos, jkHud_rightBlitY + jkHud_pStBatBm->yPos, NULL, 1.0, 1);
+            std3D_DrawUIBitmap(jkHud_pStBatBm, v5 * (jkHud_pStBatBm->numMips - 1) / 0xC8u, jkHud_rightBlitX + HUD_SCALED(jkHud_pStBatBm->xPos), jkHud_rightBlitY + HUD_SCALED(jkHud_pStBatBm->yPos), NULL, jkPlayer_hudScale, 1);
         }
         v6 = sithInventory_GetActivate(v4, SITHBIN_FIELDLIGHT);
         //if ( jkHud_blittedFieldlightAmt != v6 )
@@ -1035,7 +1036,7 @@ void jkHud_DrawGPU()
                 jkHud_pFieldlightBm->yPos,
                 0,
                 1);*/
-            std3D_DrawUIBitmap(jkHud_pFieldlightBm, v6, jkHud_rightBlitX + jkHud_pFieldlightBm->xPos, jkHud_rightBlitY + jkHud_pFieldlightBm->yPos, NULL, 1.0, 1);
+            std3D_DrawUIBitmap(jkHud_pFieldlightBm, v6, jkHud_rightBlitX + (int)((float)jkHud_pFieldlightBm->xPos * jkPlayer_hudScale), jkHud_rightBlitY + (int)((float)jkHud_pFieldlightBm->yPos * jkPlayer_hudScale), NULL, jkPlayer_hudScale, 1);
         }
         v7 = (int32_t)sithInventory_GetBinAmount(v4, SITHBIN_FORCEMANA);
         if ( v7 < 0 )
@@ -1059,7 +1060,7 @@ void jkHud_DrawGPU()
                     jkHud_pStFrcSuperBm->yPos,
                     0,
                     1);*/
-                std3D_DrawUIBitmap(jkHud_pStFrcSuperBm, 0, jkHud_rightBlitX + jkHud_pStFrcSuperBm->xPos, jkHud_rightBlitY + jkHud_pStFrcSuperBm->yPos, NULL, 1.0, 1);
+                std3D_DrawUIBitmap(jkHud_pStFrcSuperBm, 0, jkHud_rightBlitX + HUD_SCALED(jkHud_pStFrcSuperBm->xPos), jkHud_rightBlitY + HUD_SCALED(jkHud_pStFrcSuperBm->yPos), NULL, jkPlayer_hudScale, 1);
             }
             else
             {
@@ -1071,7 +1072,7 @@ void jkHud_DrawGPU()
                     0,
                     1);*/
 
-                std3D_DrawUIBitmap(jkHud_pStFrcBm, v8 / 400, jkHud_rightBlitX + jkHud_pStFrcBm->xPos, jkHud_rightBlitY + jkHud_pStFrcBm->yPos, NULL, 1.0, 1);
+                std3D_DrawUIBitmap(jkHud_pStFrcBm, v8 / 400, jkHud_rightBlitX + HUD_SCALED(jkHud_pStFrcBm->xPos), jkHud_rightBlitY + HUD_SCALED(jkHud_pStFrcBm->yPos), NULL, jkPlayer_hudScale, 1);
                 jkHud_blittedForceIdx = v8 / 400;
             }
         }
@@ -1093,7 +1094,7 @@ void jkHud_DrawGPU()
             if ( !playerThings[playerThingIdx].bHasSuperShields )
                 v12 = jkHud_pArmorNumSft;
             stdString_snprintf(tmp, 32, "%03d", v10); // v10
-            stdFont_DrawAsciiGPU(v12, jkHud_leftBlitX + 23u, jkHud_leftBlitY + 43, 999, tmp, 0);
+            stdFont_DrawAsciiGPU(v12, jkHud_leftBlitX + HUD_SCALED(23u), jkHud_leftBlitY + HUD_SCALED(43), 999, tmp, 0, jkPlayer_hudScale);
             /*stdDisplay_VBufferCopy(
                 *jkHud_pStatusLeftBm->mipSurfaces,
                 jkHud_pStShieldBm->mipSurfaces[(jkHud_pStShieldBm->numMips - 1) * (SITHBIN_NUMBINS - v10) / SITHBIN_NUMBINS],
@@ -1101,7 +1102,7 @@ void jkHud_DrawGPU()
                 jkHud_pStShieldBm->yPos,
                 0,
                 1);*/
-            std3D_DrawUIBitmap(jkHud_pStShieldBm, (jkHud_pStShieldBm->numMips - 1) * (SITHBIN_NUMBINS - v10) / SITHBIN_NUMBINS, jkHud_leftBlitX + jkHud_pStShieldBm->xPos, jkHud_leftBlitY + jkHud_pStShieldBm->yPos, NULL, 1.0, 1);
+            std3D_DrawUIBitmap(jkHud_pStShieldBm, (jkHud_pStShieldBm->numMips - 1) * (SITHBIN_NUMBINS - v10) / SITHBIN_NUMBINS, jkHud_leftBlitX + HUD_SCALED(jkHud_pStShieldBm->xPos), jkHud_leftBlitY + HUD_SCALED(jkHud_pStShieldBm->yPos), NULL, jkPlayer_hudScale, 1);
             v11 = playerThingIdx;
         }
         v13 = (int32_t)v4->actorParams.health;
@@ -1124,7 +1125,7 @@ void jkHud_DrawGPU()
             if ( !jkHud_isSuper )
                 healthFont = jkHud_pHelthNumSft;
             stdString_snprintf(tmp, 32, "%03d", v13);
-            stdFont_DrawAsciiGPU(healthFont, jkHud_leftBlitX + 13u, jkHud_leftBlitY + 35, 999, tmp, 0);
+            stdFont_DrawAsciiGPU(healthFont, jkHud_leftBlitX + HUD_SCALED(13u), jkHud_leftBlitY + HUD_SCALED(35), 999, tmp, 0, jkPlayer_hudScale);
             /*stdDisplay_VBufferCopy(
                 *jkHud_pStatusLeftBm->mipSurfaces,
                 jkHud_pStHealthBm->mipSurfaces[(jkHud_pStHealthBm->numMips - 1) * (v15 - v13) / v15],
@@ -1132,7 +1133,7 @@ void jkHud_DrawGPU()
                 jkHud_pStHealthBm->yPos,
                 0,
                 1);*/
-            std3D_DrawUIBitmap(jkHud_pStHealthBm, (jkHud_pStHealthBm->numMips - 1) * (v15 - v13) / v15, jkHud_leftBlitX + jkHud_pStHealthBm->xPos, jkHud_leftBlitY + jkHud_pStHealthBm->yPos, NULL, 1.0, 1);
+            std3D_DrawUIBitmap(jkHud_pStHealthBm, (jkHud_pStHealthBm->numMips - 1) * (v15 - v13) / v15, jkHud_leftBlitX + HUD_SCALED(jkHud_pStHealthBm->xPos), jkHud_leftBlitY + HUD_SCALED(jkHud_pStHealthBm->yPos), NULL, jkPlayer_hudScale, 1);
         }
         v18 = jkHud_GetWeaponAmmo(v4);
         //if ( jkHud_blittedAmmoAmt != v18 || jkHud_idk14 != playerThings[playerThingIdx].field_21C )
@@ -1151,7 +1152,7 @@ void jkHud_DrawGPU()
             {
                 stdString_snprintf(tmp, 32, "%03d", v18);
             }
-            stdFont_DrawAsciiGPU(ammoFont, jkHud_rightBlitX + 13u, jkHud_rightBlitY + 19, 999, tmp, 0);
+            stdFont_DrawAsciiGPU(ammoFont, jkHud_rightBlitX + HUD_SCALED(13u), jkHud_rightBlitY + HUD_SCALED(19), 999, tmp, 0, jkPlayer_hudScale);
         }
     }
 
@@ -1286,7 +1287,8 @@ void jkHud_DrawGPU()
                 jkHud_rectViewScores.height,
                 1,
                 v49,
-                1);
+                1,
+                1.0);
             v50 = jkStrings_GetText("HUD_TEAMNAME");
             stdFont_Draw4GPU(
                 jkHud_pMsgFontSft,
@@ -1296,7 +1298,8 @@ void jkHud_DrawGPU()
                 jkHud_rectViewScores.height,
                 0,
                 v50,
-                1);
+                1,
+                1.0);
             v51 = jkStrings_GetText("HUD_TEAMPLAYERS");
             stdFont_Draw4GPU(
                 jkHud_pMsgFontSft,
@@ -1306,7 +1309,8 @@ void jkHud_DrawGPU()
                 jkHud_rectViewScores.height,
                 0,
                 v51,
-                1);
+                1,
+                1.0);
             v52 = jkStrings_GetText("HUD_TEAMSCORE");
             stdFont_Draw4GPU(
                 jkHud_pMsgFontSft,
@@ -1316,7 +1320,8 @@ void jkHud_DrawGPU()
                 jkHud_rectViewScores.height,
                 0,
                 v52,
-                1);
+                1,
+                1.0);
             v53 = 100;
             v54 = jkHud_aTeamScores;
             for (int i = 0; i < 5; i++)
@@ -1338,7 +1343,7 @@ void jkHud_DrawGPU()
                             goto LABEL_115;
                         case 3:
                             v66 = jkStrings_GetText("GUI_BLUE");
-                            stdFont_Draw1GPU(jkHud_pMsgFontSft, jkHud_rectViewScores.x + 40, v53, jkHud_rectViewScores.width, v66, 1);
+                            stdFont_Draw1GPU(jkHud_pMsgFontSft, jkHud_rectViewScores.x + 40, v53, jkHud_rectViewScores.width, v66, 1, 1.0);
                             goto LABEL_116;
                         case 4:
                             v55 = jkStrings_GetText("GUI_GREEN");
@@ -1346,12 +1351,12 @@ void jkHud_DrawGPU()
                         default:
                             v55 = jkStrings_GetText("GUI_NONE");
 LABEL_115:
-                            stdFont_Draw1GPU(jkHud_pMsgFontSft, jkHud_rectViewScores.x + 40, v53, jkHud_rectViewScores.width, v55, 1);
+                            stdFont_Draw1GPU(jkHud_pMsgFontSft, jkHud_rectViewScores.x + 40, v53, jkHud_rectViewScores.width, v55, 1, 1.0);
 LABEL_116:
                             jk_snwprintf(a6, 0x80u, L"%4d", v54->field_C);
-                            stdFont_Draw1GPU(jkHud_pMsgFontSft, jkHud_rectViewScores.x + 90, v53, jkHud_rectViewScores.width, a6, 1);
+                            stdFont_Draw1GPU(jkHud_pMsgFontSft, jkHud_rectViewScores.x + 90, v53, jkHud_rectViewScores.width, a6, 1, 1.0);
                             jk_snwprintf(a6, 0x80u, L"%4d", v54->score);
-                            stdFont_Draw1GPU(jkHud_pMsgFontSft, jkHud_rectViewScores.x + 150, v53, jkHud_rectViewScores.width, a6, 1);
+                            stdFont_Draw1GPU(jkHud_pMsgFontSft, jkHud_rectViewScores.x + 150, v53, jkHud_rectViewScores.width, a6, 1, 1.0);
                             v53 += (*jkHud_pMsgFontSft->bitmap->mipSurfaces)->format.height + jkHud_pMsgFontSft->marginY;
                             break;
                     }
@@ -1374,7 +1379,8 @@ LABEL_116:
                 jkHud_rectViewScores.height,
                 1,
                 v42,
-                1);
+                1,
+                1.0);
             v43 = jkHud_dword_553ED0;
             v44 = 80;
             v45 = jkHud_dword_553ED0;
@@ -1397,11 +1403,11 @@ LABEL_116:
                         }
                     }
                     jk_snwprintf(a6, 0x11u, L"%.16ls", v46);
-                    stdFont_Draw1GPU(jkHud_pMsgFontSft, jkHud_rectViewScores.x + 10, v44, jkHud_rectViewScores.width, a6, 1);
+                    stdFont_Draw1GPU(jkHud_pMsgFontSft, jkHud_rectViewScores.x + 10, v44, jkHud_rectViewScores.width, a6, 1, 1.0);
                     jk_snwprintf(a6, 0x80u, L"(%.8ls)", v46->modelName);
-                    stdFont_Draw1GPU(jkHud_pMsgFontSft, jkHud_rectViewScores.x + 130, v44, jkHud_rectViewScores.width, a6, 1);
+                    stdFont_Draw1GPU(jkHud_pMsgFontSft, jkHud_rectViewScores.x + 130, v44, jkHud_rectViewScores.width, a6, 1, 1.0);
                     jk_snwprintf(a6, 0x80u, L"%4d", v46->score);
-                    stdFont_Draw1GPU(jkHud_pMsgFontSft, jkHud_rectViewScores.x + 190, v44, jkHud_rectViewScores.width, a6, 1);
+                    stdFont_Draw1GPU(jkHud_pMsgFontSft, jkHud_rectViewScores.x + 190, v44, jkHud_rectViewScores.width, a6, 1, 1.0);
                     ++v46;
                     v44 += (*jkHud_pMsgFontSft->bitmap->mipSurfaces)->format.height + jkHud_pMsgFontSft->marginY;
                     if ( ++v45 >= jkHud_numPlayers )
@@ -1425,7 +1431,7 @@ LABEL_116:
         fps = 0;
     memset(tmp, 0, 32);
     stdString_snprintf(tmp, 32, "%03d", fps);
-    stdFont_DrawAsciiGPU(jkHud_pMsgFontSft, jkHud_leftBlitX, jkHud_leftBlitY, 999, tmp, 1);
+    stdFont_DrawAsciiGPU(jkHud_pMsgFontSft, jkHud_leftBlitX, jkHud_leftBlitY, 999, tmp, 1, jkPlayer_hudScale);
 #endif
 
 #ifdef SDL2_RENDER

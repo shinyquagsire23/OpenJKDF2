@@ -5,6 +5,9 @@
 #include "Win95/stdDisplay.h"
 #include "Win95/std.h"
 #include "Platform/std3D.h"
+#include "World/jkPlayer.h"
+
+#define INT_FLOAT_SCALED(x, s) ((int)((float)(x) * (float)(s)))
 
 stdFont* stdFont_Load(char *fpath, int a2, int a3)
 {
@@ -1163,7 +1166,7 @@ int stdFont_sub_4355B0(stdFont *font, uint16_t a2)
     return v3 != 0;
 }
 
-uint32_t stdFont_DrawAsciiGPU(stdFont *a2, unsigned int blit_x, int blit_y, int x_max, char *str, int alpha_maybe)
+uint32_t stdFont_DrawAsciiGPU(stdFont *a2, unsigned int blit_x, int blit_y, int x_max, char *str, int alpha_maybe, float scale)
 {
     unsigned int v8; // ebp
     unsigned int v9; // esi
@@ -1248,7 +1251,7 @@ LABEL_24:
             }
             if ( (int)(v9 + v17) < (int)(v8 + x_max) )
             {
-                std3D_DrawUIBitmap(a2->bitmap, 0, v9, blit_y, &a5a, 1.0, alpha_maybe);
+                std3D_DrawUIBitmap(a2->bitmap, 0, v9, blit_y, &a5a, scale, alpha_maybe);
                 //stdDisplay_VBufferCopy(a1, v21, v9, blit_y, &a5a, alpha_maybe);
                 v14 = a5a.width + a2->marginY;
                 goto LABEL_29;
@@ -1261,13 +1264,13 @@ LABEL_30:
         }
         v14 = a2->marginX;
 LABEL_29:
-        v9 += v14;
+        v9 += INT_FLOAT_SCALED(v14, scale);
         goto LABEL_30;
     }
     return v9 - v8;
 }
 
-int stdFont_Draw4GPU(stdFont *font, int xPos, int yPos, int a5, int a6, int a7, wchar_t *text, int alpha_maybe)
+int stdFont_Draw4GPU(stdFont *font, int xPos, int yPos, int a5, int a6, int a7, wchar_t *text, int alpha_maybe, float scale)
 {
     int v9; // ebp
     wchar_t *v10; // edi
@@ -1348,10 +1351,10 @@ LABEL_16:
     {
         v15 = a5;
     }
-    return stdFont_Draw1GPU(font, xPos + v17, yPos + v18, v15 - v17, text, alpha_maybe);
+    return stdFont_Draw1GPU(font, xPos + INT_FLOAT_SCALED(v17, scale), yPos + INT_FLOAT_SCALED(v18, scale), v15 - INT_FLOAT_SCALED(v17, scale), text, alpha_maybe, scale);
 }
 
-unsigned int stdFont_Draw1GPU(stdFont *font, unsigned int blit_x, int blit_y, int a5, wchar_t *a6, int alpha_maybe)
+unsigned int stdFont_Draw1GPU(stdFont *font, unsigned int blit_x, int blit_y, int a5, wchar_t *a6, int alpha_maybe, float scale)
 {
     unsigned int v8; // edx
     unsigned int v9; // esi
@@ -1435,7 +1438,7 @@ LABEL_21:
             }
             if ( (int)(v9 + v16) < (int)(blit_x + a5) )
             {
-                std3D_DrawUIBitmap(font->bitmap, 0, v9, blit_y, &a5a, 1.0, alpha_maybe);
+                std3D_DrawUIBitmap(font->bitmap, 0, v9, blit_y, &a5a, scale, alpha_maybe);
                 v13 = a5a.width + font->marginY;
                 goto LABEL_26;
             }
@@ -1449,13 +1452,13 @@ LABEL_27:
         }
         v13 = font->marginX;
 LABEL_26:
-        v9 += v13;
+        v9 += (int)((float)v13 * scale);
         goto LABEL_27;
     }
     return v9 - v8;
 }
 
-unsigned int stdFont_Draw1Width(stdFont *font, unsigned int blit_x, int blit_y, int a5, wchar_t *a6, int alpha_maybe)
+unsigned int stdFont_Draw1Width(stdFont *font, unsigned int blit_x, int blit_y, int a5, wchar_t *a6, int alpha_maybe, float scale)
 {
     unsigned int v8; // edx
     unsigned int v9; // esi
@@ -1553,7 +1556,7 @@ LABEL_27:
         }
         v13 = font->marginX;
 LABEL_26:
-        v9 += v13;
+        v9 += (int)((float)v13 * scale);
         goto LABEL_27;
     }
     return v9 - v8;

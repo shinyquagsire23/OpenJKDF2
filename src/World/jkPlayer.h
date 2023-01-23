@@ -143,6 +143,7 @@ extern int jkPlayer_enableVsync;
 extern float jkPlayer_ssaaMultiple;
 extern int jkPlayer_enableSSAO;
 extern float jkPlayer_gamma;
+extern float jkPlayer_hudScale;
 
 extern int jkPlayer_bEnableJkgm;
 extern int jkPlayer_bEnableTexturePrecache;
@@ -160,6 +161,9 @@ extern int jkPlayer_bFastMissionText;
 #ifdef FIXED_TIMESTEP_PHYS
 extern int jkPlayer_bJankyPhysics;
 #endif
+
+
+#define HUD_SCALED(x) ((int)((float)(x) * jkPlayer_hudScale))
 
 //static void (*jkPlayer_InitThings)() = (void*)jkPlayer_InitThings_ADDR;
 //static int (*jkPlayer_ReadConf)(wchar_t *a1) = (void*)jkPlayer_ReadConf_ADDR;

@@ -11,6 +11,7 @@
 #include "Gameplay/sithInventory.h"
 #include "Main/Main.h"
 #include "Platform/std3D.h"
+#include "World/jkPlayer.h"
 #include "jk.h"
 
 void jkHudInv_DrawGPU();
@@ -472,9 +473,9 @@ void jkHudInv_DrawGPU()
             v4 = sithInventory_GetItemDesc(player, jkHudInv_aItems[v2])->hudBitmap;
             if ( v4 )
             {
-                std3D_DrawUIBitmap(v4, 0, jkHudInv_scroll.blitX, i, NULL, 1.0, 1);
+                std3D_DrawUIBitmap(v4, 0, jkHudInv_scroll.blitX, i, NULL, jkPlayer_hudScale, 1);
                 //stdDisplay_VBufferCopy(Video_pMenuBuffer, *v4->mipSurfaces, jkHudInv_scroll.blitX, i, 0, 1);
-                i += 28;
+                i += HUD_SCALED(28);
                 ++v1;
             }
         }
@@ -492,9 +493,9 @@ void jkHudInv_DrawGPU()
                 v7 = v6->hudBitmap;
                 if ( v7 )
                 {
-                    std3D_DrawUIBitmap(v7, 0, jkHudInv_scroll.blitX, i, NULL, 1.0, 1);
+                    std3D_DrawUIBitmap(v7, 0, jkHudInv_scroll.blitX, i, NULL, jkPlayer_hudScale, 1);
                     //stdDisplay_VBufferCopy(Video_pMenuBuffer, *v7->mipSurfaces, jkHudInv_scroll.blitX, i, 0, 1);
-                    i += 28;
+                    i += HUD_SCALED(28);
                     ++v1;
                 }
             }
@@ -584,7 +585,7 @@ void jkHudInv_DrawGPU()
                 jkHudInv_info.field_18 = v13;
             }
             //stdDisplay_VBufferCopy(Video_pMenuBuffer, v14->mipSurfaces[v13], jkHudInv_info.field_8[v11], jkHudInv_info.field_10[v11], 0, 1);
-            std3D_DrawUIBitmap(v14, v13, jkHudInv_info.field_8[v11], jkHudInv_info.field_10[v11], NULL, 1.0, 1);
+            std3D_DrawUIBitmap(v14, v13, jkHudInv_info.field_8[v11], jkHudInv_info.field_10[v11], NULL, jkPlayer_hudScale, 1);
         }
         v16 = sithInventory_GetItemDesc(player, a2);
         v17 = v16->hudBitmap;
@@ -598,7 +599,7 @@ void jkHudInv_DrawGPU()
                 return;
             }
             //stdDisplay_VBufferCopy(Video_pMenuBuffer, *v17->mipSurfaces, jkHudInv_info.field_0, jkHudInv_info.field_4, 0, 1);
-            std3D_DrawUIBitmap(v17, 0, jkHudInv_info.field_0, jkHudInv_info.field_4, NULL, 1.0, 1);
+            std3D_DrawUIBitmap(v17, 0, jkHudInv_info.field_0, jkHudInv_info.field_4, NULL, jkPlayer_hudScale, 1);
             if (v16->flags & ITEMINFO_ITEM)
             {
                 char tmpChars[4];
@@ -606,24 +607,32 @@ void jkHudInv_DrawGPU()
                 v20 = jkHudInv_info.field_0;
                 stdString_snprintf(tmpChars, 4, "%d", v18);
                 stdString_CharToWchar(a6, tmpChars, 3);
+
+                int width = stdFont_Draw1Width(jkHudInv_font, 0, 0, 640, a6, 1, jkPlayer_hudScale);
+
+                // Added: allow displaying all numbers.
+                if ( v18 > 1 )
+                    stdFont_Draw1GPU(jkHudInv_font, v20 + HUD_SCALED(v17->mipSurfaces[0]->format.width) - width, v19 + HUD_SCALED(2), 640, a6, 1, jkPlayer_hudScale);
+#if 0
                 v22 = 99;
                 if ( v18 <= 99 )
                     v22 = v18;
                 if ( v22 <= 9 )
                 {
                     if ( v22 > 1 )
-                        stdFont_Draw1GPU(jkHudInv_font, v20 + 18, v19 + 2, 640, a6, 1);
+                        stdFont_Draw1GPU(jkHudInv_font, v20 + HUD_SCALED(18), v19 + 2, 640, a6, 1, jkPlayer_hudScale);
                 }
                 else
                 {
-                    stdFont_Draw1GPU(jkHudInv_font, v20 + 14, v19 + 2, 640, a6, 1);
+                    stdFont_Draw1GPU(jkHudInv_font, v20 + HUD_SCALED(14), v19 + 2, 640, a6, 1, jkPlayer_hudScale);
                 }
+#endif
             }
         }
         v23 = a2;
-        v24 = 32;
+        v24 = HUD_SCALED(32);
         idx = a2;
-        v43 = 32;
+        v43 = HUD_SCALED(32);
         while ( 1 )
         {
             if ( v23 >= 0 )
@@ -640,25 +649,34 @@ void jkHudInv_DrawGPU()
                     if ( v27 <= 0 )
                         goto LABEL_84;
                     //stdDisplay_VBufferCopy(Video_pMenuBuffer, *v26->mipSurfaces, jkHudInv_info.field_0 - v24, jkHudInv_info.field_4, 0, 1);
-                    std3D_DrawUIBitmap(v26, 0, jkHudInv_info.field_0 - v24, jkHudInv_info.field_4, NULL, 1.0, 1);
+                    std3D_DrawUIBitmap(v26, 0, jkHudInv_info.field_0 - v24, jkHudInv_info.field_4, NULL, jkPlayer_hudScale, 1);
                     if (v25->flags & ITEMINFO_ITEM)
                     {
                         v28 = jkHudInv_info.field_4;
                         v29 = jkHudInv_info.field_0 - v24;
                         stdString_snprintf(v44, 4, "%d", v27);
                         stdString_CharToWchar(v48, v44, 3);
+
+                        int width = stdFont_Draw1Width(jkHudInv_font, 0, 0, 640, v48, 1, jkPlayer_hudScale);
+
+                        // Added: allow displaying all numbers.
+                        if ( v27 > 1 )
+                            stdFont_Draw1GPU(jkHudInv_font, v29 + HUD_SCALED(v26->mipSurfaces[0]->format.width) - width, v28 + HUD_SCALED(2), 640, v48, 1, jkPlayer_hudScale);
+
+#if 0
                         v31 = 99;
                         if ( v27 <= 99 )
                             v31 = v27;
                         if ( v31 <= 9 )
                         {
                             if ( v31 > 1 )
-                                stdFont_Draw1GPU(jkHudInv_font, v29 + 18, v28 + 2, 640, v48, 1);
+                                stdFont_Draw1GPU(jkHudInv_font, v29 + 18, v28 + 2, 640, v48, 1, jkPlayer_hudScale);
                         }
                         else
                         {
-                            stdFont_Draw1GPU(jkHudInv_font, v29 + 14, v28 + 2, 640, v48, 1);
+                            stdFont_Draw1GPU(jkHudInv_font, v29 + 14, v28 + 2, 640, v48, 1, jkPlayer_hudScale);
                         }
+#endif
                     }
                 }
             }
@@ -682,7 +700,7 @@ LABEL_84:
                     }
                     v35 = v43;
                     //stdDisplay_VBufferCopy(Video_pMenuBuffer, *v33->mipSurfaces, v43 + jkHudInv_info.field_0, jkHudInv_info.field_4, 0, 1);
-                    std3D_DrawUIBitmap(v33, 0, v43 + jkHudInv_info.field_0, jkHudInv_info.field_4, NULL, 1.0, 1);
+                    std3D_DrawUIBitmap(v33, 0, v43 + jkHudInv_info.field_0, jkHudInv_info.field_4, NULL, jkPlayer_hudScale, 1);
                     
                     if (v32->flags & ITEMINFO_ITEM)
                     {
@@ -691,24 +709,34 @@ LABEL_84:
                         v38 = jkHudInv_info.field_0 + v35;
                         stdString_snprintf(tmpChars, 4, "%d", v34);
                         stdString_CharToWchar(v50, tmpChars, 3);
+
+                        int width = stdFont_Draw1Width(jkHudInv_font, 0, 0, 640, v50, 1, jkPlayer_hudScale);
+
+                        // Added: allow displaying all numbers.
+                        if ( v34 > 1 )
+                            stdFont_Draw1GPU(jkHudInv_font, v38 + HUD_SCALED(v26->mipSurfaces[0]->format.width) - width, v36 + HUD_SCALED(2), 640, v50, 1, jkPlayer_hudScale);
+
+
+#if 0
                         v39 = 99;
                         if ( v34 <= 99 )
                             v39 = v34;
                         if ( v39 <= 9 )
                         {
                             if ( v39 > 1 )
-                                stdFont_Draw1GPU(jkHudInv_font, v38 + 18, v36 + 2, 640, v50, 1);
+                                stdFont_Draw1GPU(jkHudInv_font, v38 + 18, v36 + 2, 640, v50, 1, jkPlayer_hudScale);
                         }
                         else
                         {
-                            stdFont_Draw1GPU(jkHudInv_font, v38 + 14, v36 + 2, 640, v50, 1);
+                            stdFont_Draw1GPU(jkHudInv_font, v38 + 14, v36 + 2, 640, v50, 1, jkPlayer_hudScale);
                         }
+#endif
                     }
                 }
             }
-            v24 = v43 + 32;
-            v43 += 32;
-            if ( v43 >= 96 )
+            v24 = v43 + HUD_SCALED(32);
+            v43 += HUD_SCALED(32);
+            if ( v43 >= HUD_SCALED(96) )
                 return;
             v23 = idx;
         }
@@ -873,14 +901,14 @@ void jkHudInv_LoadItemRes()
     _memset(&jkHudInv_info, 0, sizeof(jkHudInvInfo));
     v7 = Video_format.height;
     _memset(&jkHudInv_scroll, 0, sizeof(jkHudInvScroll));
-    v8 = Video_format.height - 36;
-    jkHudInv_info.field_0 = (Video_format.width - 24) >> 1;
-    jkHudInv_info.drawRect.x = jkHudInv_info.field_0 - 64;
-    v9 = 24;
-    jkHudInv_info.field_4 = Video_format.height - 36;
-    jkHudInv_info.drawRect.y = Video_format.height - 36;
-    jkHudInv_info.drawRect.width = 184;
-    jkHudInv_info.drawRect.height = 24;
+    v8 = Video_format.height - HUD_SCALED(36);
+    jkHudInv_info.field_0 = (Video_format.width - HUD_SCALED(24)) >> 1;
+    jkHudInv_info.drawRect.x = jkHudInv_info.field_0 - HUD_SCALED(64);
+    v9 = HUD_SCALED(24);
+    jkHudInv_info.field_4 = Video_format.height - HUD_SCALED(36);
+    jkHudInv_info.drawRect.y = Video_format.height - HUD_SCALED(36);
+    jkHudInv_info.drawRect.width = HUD_SCALED(184);
+    jkHudInv_info.drawRect.height = HUD_SCALED(24);
     if ( jkHudInv_aBitmaps[0] )
     {
         for ( i = 0; i < 2; ++i )
@@ -889,9 +917,9 @@ void jkHudInv_LoadItemRes()
             if ( v11 )
             {
                 v12 = *v11->mipSurfaces;
-                v13 = v12->format.height;
-                jkHudInv_info.field_8[i] = (v6 - v12->format.width) >> 1;
-                v14 = v7 - ((v13 - 24) >> 1) - 36;
+                v13 = HUD_SCALED(v12->format.height);
+                jkHudInv_info.field_8[i] = (v6 - HUD_SCALED(v12->format.width)) >> 1;
+                v14 = v7 - ((v13 - HUD_SCALED(24)) >> 1) - HUD_SCALED(36);
                 jkHudInv_info.field_10[i] = v14;
                 v8 = jkHudInv_info.drawRect.y;
                 v15 = v14 + v13;
@@ -905,13 +933,13 @@ void jkHudInv_LoadItemRes()
                     v9 = v15 - v8;
                 else
                     v9 = v16 - v8;
-                jkHudInv_info.drawRect.height = v9;
+                jkHudInv_info.drawRect.height = HUD_SCALED(v9);
             }
         }
     }
     jkHudInv_info.field_3C = v9 + v8;
-    jkHudInv_scroll.blitX = v6 - 32;
-    jkHudInv_scroll.scroll = (v7 - 76) / 28u;
+    jkHudInv_scroll.blitX = v6 - HUD_SCALED(32);
+    jkHudInv_scroll.scroll = (v7 - HUD_SCALED(76)) / HUD_SCALED(28u);
 }
 
 void jkHudInv_Close()
