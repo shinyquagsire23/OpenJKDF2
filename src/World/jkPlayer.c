@@ -49,6 +49,8 @@ int jkPlayer_bEnableTexturePrecache = 1;
 int jkPlayer_bKeepCorpses = 0;
 int jkPlayer_bFastMissionText = 0;
 float jkPlayer_hudScale = 2.0;
+float jkPlayer_crosshairLineWidth = 1.0;
+float jkPlayer_crosshairScale = 1.0;
 #endif
 
 #ifdef FIXED_TIMESTEP_PHYS
@@ -162,6 +164,8 @@ void jkPlayer_ResetVars()
     jkPlayer_bKeepCorpses = 0;
     jkPlayer_bFastMissionText = 0;
     jkPlayer_hudScale = 2.0;
+    jkPlayer_crosshairLineWidth = 1.0;
+    jkPlayer_crosshairScale = 1.0;
 #endif
 
 #ifdef FIXED_TIMESTEP_PHYS
@@ -482,6 +486,8 @@ void jkPlayer_WriteConf(wchar_t *name)
         stdJSON_SaveBool(ext_fpath, "bKeepCorpses", jkPlayer_bKeepCorpses);
         stdJSON_SaveBool(ext_fpath, "bFastMissionText", jkPlayer_bFastMissionText);
         stdJSON_SaveFloat(ext_fpath, "hudScale", jkPlayer_hudScale);
+        stdJSON_SaveFloat(ext_fpath, "crosshairLineWidth", jkPlayer_crosshairLineWidth);
+        stdJSON_SaveFloat(ext_fpath, "crosshairScale", jkPlayer_crosshairScale);
 #endif
 #ifdef FIXED_TIMESTEP_PHYS
         stdJSON_SaveBool(ext_fpath, "bJankyPhysics", jkPlayer_bJankyPhysics);
@@ -658,6 +664,8 @@ int jkPlayer_ReadConf(wchar_t *name)
         jkPlayer_bKeepCorpses = stdJSON_GetBool(ext_fpath, "bKeepCorpses", jkPlayer_bKeepCorpses);
         jkPlayer_bFastMissionText = stdJSON_GetBool(ext_fpath, "bFastMissionText", jkPlayer_bFastMissionText);
         jkPlayer_hudScale = stdJSON_GetFloat(ext_fpath, "hudScale", jkPlayer_hudScale);
+        jkPlayer_crosshairLineWidth = stdJSON_GetFloat(ext_fpath, "crosshairLineWidth", jkPlayer_crosshairLineWidth);
+        jkPlayer_crosshairScale = stdJSON_GetFloat(ext_fpath, "crosshairScale", jkPlayer_crosshairScale);
 
         std3D_UpdateSettings();
 #endif

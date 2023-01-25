@@ -1176,8 +1176,8 @@ void jkHud_DrawGPU()
             tmpInt = 48;
         else
             tmpInt = stdColor_Indexed8ToRGB16(0x30u, (rdColor24 *)Video_aPalette, &Video_format.format);
-        v24 = (int32_t)(v20 * 18.0 - -0.5);
-        v25 = (int32_t)(v20 * 6.0 - -0.5);
+        v24 = (int32_t)(v20 * 18.0 * jkPlayer_crosshairScale - -0.5);
+        v25 = (int32_t)(v20 * 6.0 * jkPlayer_crosshairScale - -0.5);
         
         //rdPrimit2_DrawClippedLine(Video_pCanvas, v22 - v24, v23,       v22 - v25, v23,       tmpInt, -1);
         //rdPrimit2_DrawClippedLine(Video_pCanvas, v22 + v25, v23,       v22 + v24, v23,       tmpInt, -1);
@@ -1185,7 +1185,7 @@ void jkHud_DrawGPU()
         //rdPrimit2_DrawClippedLine(Video_pCanvas, v22,       v23 + v25, v22,       v23 + v24, tmpInt, -1);
 
         float line_len = v24 - v25 + 1;
-        float line_width = 1.0;
+        float line_width = jkPlayer_crosshairLineWidth;
 
         rdRect rect1 = {v22 - v24, v23-(line_width/2), line_len, line_width}; // left
         rdRect rect2 = {v22 + v25, v23-(line_width/2), line_len, line_width}; // right

@@ -1778,7 +1778,7 @@ void std3D_DrawUIRenderList()
     glBindFramebuffer(GL_FRAMEBUFFER, std3D_windowFbo);
     glDepthMask(GL_TRUE);
     glCullFace(GL_FRONT);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glDepthFunc(GL_ALWAYS);
     glUseProgram(std3D_uiProgram.program); // TODO: simpler shader
     
