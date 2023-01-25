@@ -591,7 +591,7 @@ void jkHud_Draw()
         }
     }
 
-    if ( jkPlayer_setCrosshair && sithCamera_currentCamera->cameraPerspective == 1 && !(sithPlayer_pLocalPlayerThing->thingflags & SITH_TF_DEAD))
+    if ( jkPlayer_setCrosshair && sithCamera_currentCamera->cameraPerspective == 1 && !(sithPlayer_pLocalPlayerThing->thingflags & SITH_TF_DEAD) && MOTS_ONLY_COND(!(sithPlayer_pLocalPlayerThing->actorParams.typeflags & SITH_AF_SCOPEHUD)))
     {
         uint32_t tmpInt;
 #ifdef QOL_IMPROVEMENTS
@@ -1156,7 +1156,8 @@ void jkHud_DrawGPU()
         }
     }
 
-    if ( jkPlayer_setCrosshair && sithCamera_currentCamera->cameraPerspective == 1 && !(sithPlayer_pLocalPlayerThing->thingflags & SITH_TF_DEAD))
+    // MoTS altered: Scope hud
+    if ( jkPlayer_setCrosshair && sithCamera_currentCamera->cameraPerspective == 1 && !(sithPlayer_pLocalPlayerThing->thingflags & SITH_TF_DEAD) && MOTS_ONLY_COND(!(sithPlayer_pLocalPlayerThing->actorParams.typeflags & SITH_AF_SCOPEHUD)))
     {
         uint32_t tmpInt;
 #ifdef QOL_IMPROVEMENTS
@@ -1178,10 +1179,26 @@ void jkHud_DrawGPU()
         v24 = (int32_t)(v20 * 18.0 - -0.5);
         v25 = (int32_t)(v20 * 6.0 - -0.5);
         
-        rdPrimit2_DrawClippedLine(Video_pCanvas, v22 - v24, v23,       v22 - v25, v23,       tmpInt, -1);
-        rdPrimit2_DrawClippedLine(Video_pCanvas, v22 + v25, v23,       v22 + v24, v23,       tmpInt, -1);
-        rdPrimit2_DrawClippedLine(Video_pCanvas, v22,       v23 - v24, v22,       v23 - v25, tmpInt, -1);
-        rdPrimit2_DrawClippedLine(Video_pCanvas, v22,       v23 + v25, v22,       v23 + v24, tmpInt, -1);
+        //rdPrimit2_DrawClippedLine(Video_pCanvas, v22 - v24, v23,       v22 - v25, v23,       tmpInt, -1);
+        //rdPrimit2_DrawClippedLine(Video_pCanvas, v22 + v25, v23,       v22 + v24, v23,       tmpInt, -1);
+        //rdPrimit2_DrawClippedLine(Video_pCanvas, v22,       v23 - v24, v22,       v23 - v25, tmpInt, -1);
+        //rdPrimit2_DrawClippedLine(Video_pCanvas, v22,       v23 + v25, v22,       v23 + v24, tmpInt, -1);
+
+        float line_len = v24 - v25 + 1;
+        float line_width = 1.0;
+
+        rdRect rect1 = {v22 - v24, v23-(line_width/2), line_len, line_width}; // left
+        rdRect rect2 = {v22 + v25, v23-(line_width/2), line_len, line_width}; // right
+        rdRect rect3 = {v22-(line_width/2), v23 - v24, line_width, line_len}; // up
+        rdRect rect4 = {v22-(line_width/2), v23 + v25, line_width, line_len}; // down
+
+        std3D_DrawUIClearedRect(tmpInt, &rect1);
+        std3D_DrawUIClearedRect(tmpInt, &rect2);
+        std3D_DrawUIClearedRect(tmpInt, &rect3);
+        std3D_DrawUIClearedRect(tmpInt, &rect4);
+
+        //rdRect rect1a = {(double)Video_format.width/2, (double)Video_format.height/2, 20, 20};
+        //std3D_DrawUIClearedRect(tmpInt, &rect1a);
     }
 
     rdScreenPoint tmpScreenPt;
@@ -1341,7 +1358,7 @@ void jkHud_DrawGPU()
                         stdDisplay_VBufferFill(Video_pMenuBuffer, jkHud_aTeamColors16bpp[v54->field_0], &a4);
                     else
                         stdDisplay_VBufferFill(Video_pMenuBuffer, jkHud_aTeamColors8bpp[v54->field_0], &a4);*/
-                     std3D_DrawUIClearedRect(jkHud_aTeamColors8bpp[v54->field_0], &a4);
+                    std3D_DrawUIClearedRect(jkHud_aTeamColors8bpp[v54->field_0], &a4);
                     switch ( v54->field_0 )
                     {
                         case 1:

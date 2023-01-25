@@ -1127,7 +1127,7 @@ void std3D_DrawMenu()
     }
     else
     {
-        bFixHudScale = 1;
+        bFixHudScale = 0;
 
         menu_w = Video_menuBuffer.format.width;
         menu_h = Video_menuBuffer.format.height;

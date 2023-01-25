@@ -384,6 +384,14 @@ int jkCutscene_sub_421310(char* fpath)
         jkGui_SetModeMenu(smush_get_palette(jkCutscene_pSmush));
     }
 
+    jkCutscene_55AA54 = 0;
+    jkCutscene_audioFlip = 0;
+    last_displayFrame = 0;
+    last_audioUs = 0;
+    extraUs = 0;
+    jkCutscene_audio_us = 0.0;
+    jkCutscene_audio_us_slop = 0.0;
+
     last_audioUs = Linux_TimeUs();
 
 	stdDisplay_VBufferFill(Video_pMenuBuffer, 0, NULL);
@@ -454,6 +462,7 @@ int jkCutscene_sub_421410()
 #endif
 
     last_displayFrame = 0;
+    last_audioUs = 0;
     extraUs = 0;
 
     jkCutscene_isRendering = 0;

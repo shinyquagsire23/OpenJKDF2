@@ -98,7 +98,7 @@ int jkHudScope_Open(void)
                 pBmIter->unk5 -= (uint32_t)((*(*pBmIter->pBitmap)->mipSurfaces)->format).height >> 1;
                 break;
             case 0x54:
-                pBmIter->unk4 = pBmIter->unk4 - ((uint32_t)((*(*pBmIter->pBitmap)->mipSurfaces)->format).width >> 1);
+                pBmIter->unk4 -= ((uint32_t)((*(*pBmIter->pBitmap)->mipSurfaces)->format).width >> 1);
                 break;
             default:
                 break;
