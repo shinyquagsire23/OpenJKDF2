@@ -56,6 +56,7 @@
 #include "Main/jkSmack.h"
 #include "Main/smack.h"
 #include "Main/jkMain.h"
+#include "Main/jkQuakeConsole.h"
 #include "Engine/rdroid.h"
 #include "Main/sithMain.h"
 #include "Dss/sithMulti.h"
@@ -350,6 +351,8 @@ int Main_Startup(const char *cmdline)
         jkCredits_Startup("ui\\credits.uni");
         jkSmack_Startup();
 
+        jkQuakeConsole_Startup(); // Added
+
         if (jkRes_LoadCD(0))
         {
 #ifdef QOL_IMPROVEMENTS
@@ -377,6 +380,8 @@ int Main_Startup(const char *cmdline)
 
 void Main_Shutdown()
 {
+    jkQuakeConsole_Shutdown();
+
     jkSmack_Shutdown();
     jkGuiControlSaveLoad_Shutdown();
     jkGuiSaveLoad_Shutdown();

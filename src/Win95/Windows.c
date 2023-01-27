@@ -16,6 +16,7 @@
 
 #include "Main/Main.h"
 #include "Main/InstallHelper.h"
+#include "Main/jkQuakeConsole.h" // Added
 
 #ifdef SDL2_RENDER
 #include <SDL.h>
@@ -156,11 +157,11 @@ int Windows_GdiHandler(HWND a1, UINT msg, WPARAM wParam, HWND a4, LRESULT *a5)
     v5 = 0;
     switch ( msg )
     {
-        case 0x10u:
+        case WM_CLOSE:
             v5 = 1;
             *a5 = 1;
             break;
-        case 0x20u:
+        case WM_SETCURSOR:
             if ( Windows_bWindowed )
             {
                 jk_SetCursor(0);
@@ -169,7 +170,7 @@ int Windows_GdiHandler(HWND a1, UINT msg, WPARAM wParam, HWND a4, LRESULT *a5)
             }
             break;
         case WM_KEYFIRST:
-            if ( wParam == 0x1B )               // ESC
+            if ( wParam == VK_ESCAPE )               // ESC
             {
                 if (Main_bMotsCompat)
                 {
@@ -201,6 +202,12 @@ int Windows_GdiHandler(HWND a1, UINT msg, WPARAM wParam, HWND a4, LRESULT *a5)
             if ( jkHud_bChatOpen )
             {
                 jkHud_SendChat(wParam);
+                v5 = 1;
+                *a5 = 1;
+            }
+            else if ( jkQuakeConsole_bOpen ) // Added: Quake console
+            {
+                jkQuakeConsole_SendInput(wParam);
                 v5 = 1;
                 *a5 = 1;
             }

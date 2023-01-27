@@ -18,6 +18,7 @@
 #include "Main/jkHudScope.h"
 #include "Main/jkHudCameraView.h"
 #include "Main/jkDev.h"
+#include "Main/jkQuakeConsole.h"
 #include "Engine/rdColormap.h"
 #include "Engine/sithCamera.h"
 
@@ -261,6 +262,7 @@ int jkGame_Update()
     */
 
 #ifdef SDL2_RENDER
+    jkQuakeConsole_Render();
     std3D_DrawMenu();
     rdFinishFrame();
 #endif

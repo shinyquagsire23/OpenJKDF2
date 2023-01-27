@@ -378,6 +378,18 @@ typedef int CONSOLE_CURSOR_INFO;
 #define WM_USER 0x400
 #define WM_APP 0x8000
 
+#define VK_BACK   (0x08)
+#define VK_TAB    (0x09)
+#define VK_RETURN (0x0D)
+#define VK_ESCAPE (0x1B)
+#define VK_END    (0x23)
+#define VK_HOME   (0x24)
+#define VK_LEFT   (0x25)
+#define VK_UP     (0x26)
+#define VK_RIGHT  (0x27) 
+#define VK_DOWN   (0x28)
+#define VK_OEM_3  (0xC0)
+
 #define HKEY_LOCAL_MACHINE 0
 
 typedef struct COORD

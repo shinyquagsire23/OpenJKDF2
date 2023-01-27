@@ -21,9 +21,11 @@
 #include "wprintf.h"
 #include "Dss/jkDSS.h"
 #include "../jk.h"
+#include "Main/jkQuakeConsole.h"
 
 void jkDev_DrawEntriesGPU();
 void jkDev_BlitLogToScreenGPU();
+void jkDev_RenderQuakeConsole();
 
 // MOTS altered
 void jkDev_Startup()
@@ -344,10 +346,13 @@ LABEL_7:
     jkDev_aEntries[v6].field_10C = 2;
 #ifdef QOL_IMPROVEMENTS
     char tmp[256];
+    char tmp2[256+2];
     stdString_WcharToChar(tmp, str, 255);
     tmp[255] = 0;
     printf("\r                                            \r");
-    printf("%s%c", tmp, _strlen(tmp) && tmp[_strlen(tmp)-1] == '\n' ? ' ' : '\n');
+    stdString_snprintf(tmp2, sizeof(tmp2), "%s%c", tmp, _strlen(tmp) && tmp[_strlen(tmp)-1] == '\n' ? ' ' : '\n');
+    printf("%s", tmp2);
+    jkQuakeConsole_PrintLine(tmp2);
 #endif
     return v5;
 }

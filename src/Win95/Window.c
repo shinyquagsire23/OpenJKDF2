@@ -12,6 +12,7 @@
 #include "stdPlatform.h"
 #include "Devices/sithConsole.h"
 #include "Platform/wuRegistry.h"
+#include "Main/jkQuakeConsole.h"
 
 #include "jk.h"
 
@@ -384,6 +385,7 @@ int Window_lastMouseY = 0;
 int Window_xPos = SDL_WINDOWPOS_CENTERED;
 int Window_yPos = SDL_WINDOWPOS_CENTERED;
 int last_jkGame_isDDraw = 0;
+int last_jkQuakeConsole_bOpen = 0;
 int Window_menu_mouseX = 0;
 int Window_menu_mouseY = 0;
 
@@ -418,6 +420,8 @@ void Window_HandleMouseMove(SDL_MouseMotionEvent *event)
 
     if (Window_mouseX < 0)
         Window_mouseX = 0;
+
+    if (jkQuakeConsole_bOpen) return; // Hijack all input to console
 
     uint32_t pos = ((Window_mouseX) & 0xFFFF) | (((Window_mouseY) << 16) & 0xFFFF0000);
     
@@ -639,11 +643,13 @@ void Window_UpdateHeadless()
 
         if (!jkGuiBuildMulti_bRendering) {
             std3D_StartScene();
+            jkQuakeConsole_Render();
             std3D_DrawMenu();
             std3D_EndScene();
             //SDL_GL_SwapWindow(displayWindow);
         }
         else {
+            jkQuakeConsole_Render();
             std3D_DrawMenu();
             //SDL_GL_SwapWindow(displayWindow);
             //menu_framelimit_amt_ms = 64;
@@ -676,6 +682,7 @@ void Window_UpdateHeadless()
     SDL_Delay(sampleTime_delay);
 
     last_jkGame_isDDraw = jkGame_isDDraw;
+    last_jkQuakeConsole_bOpen = jkQuakeConsole_bOpen;
 }
 
 void Window_SdlUpdate()
@@ -719,8 +726,8 @@ void Window_SdlUpdate()
                 if (event.key.keysym.sym == SDLK_ESCAPE)
                 {
                     if (!event.key.repeat)
-                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, 0x1B, 0);
-                    Window_msg_main_handler(g_hWnd, WM_CHAR, 0x1B, 0);
+                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_ESCAPE, 0);
+                    Window_msg_main_handler(g_hWnd, WM_CHAR, VK_ESCAPE, 0);
                 }
                 else if (event.key.keysym.sym == SDLK_LEFT)
                 {
@@ -749,8 +756,8 @@ void Window_SdlUpdate()
                 else if (event.key.keysym.sym == SDLK_BACKSPACE)
                 {
                     if (!event.key.repeat)
-                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, 0x8, 0);
-                    Window_msg_main_handler(g_hWnd, WM_CHAR, 0x8, 0);
+                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_BACK, 0);
+                    Window_msg_main_handler(g_hWnd, WM_CHAR, VK_BACK, 0);
                 }
                 else if (event.key.keysym.sym == SDLK_DELETE)
                 {
@@ -762,8 +769,8 @@ void Window_SdlUpdate()
                 {
                     // HACK apparently Windows buffers these events in some way, but to replicate the behavior in jkGUI we just spam KEYFIRST
                     //if (!event.key.repeat)
-                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, 0xD, 0);
-                    Window_msg_main_handler(g_hWnd, WM_CHAR, 0xD, 0);
+                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_RETURN, 0);
+                    Window_msg_main_handler(g_hWnd, WM_CHAR, VK_RETURN, 0);
                 }
                 else if (event.key.keysym.sym == SDLK_LSHIFT)
                 {
@@ -780,8 +787,8 @@ void Window_SdlUpdate()
                 else if (event.key.keysym.sym == SDLK_TAB)
                 {
                     if (!event.key.repeat)
-                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, 0x9, 0);
-                    Window_msg_main_handler(g_hWnd, WM_CHAR, 0x9, 0);
+                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_TAB, 0);
+                    Window_msg_main_handler(g_hWnd, WM_CHAR, VK_TAB, 0);
                 }
                 else if (event.key.keysym.sym == SDLK_END)
                 {
@@ -795,6 +802,12 @@ void Window_SdlUpdate()
                         Window_msg_main_handler(g_hWnd, WM_KEYFIRST, 0x24, 0);
                     //Window_msg_main_handler(g_hWnd, WM_CHAR, 0x24, 0);
                 }
+                else if (event.key.keysym.sym == SDLK_BACKQUOTE)
+                {
+                    if (!event.key.repeat)
+                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_OEM_3, 0);
+                    Window_msg_main_handler(g_hWnd, WM_CHAR, VK_OEM_3, 0);
+                }
 
                 //if (!event.key.repeat)
                 //    stdControl_SetSDLKeydown(event.key.keysym.scancode, 1, event.key.timestamp);
@@ -802,7 +815,7 @@ void Window_SdlUpdate()
             case SDL_KEYUP:
                 if (event.key.keysym.sym == SDLK_ESCAPE)
                 {
-                    Window_msg_main_handler(g_hWnd, WM_KEYUP, 0x1B, 0);
+                    Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_ESCAPE, 0);
                 }
                 else if (event.key.keysym.sym == SDLK_LEFT)
                 {
@@ -822,7 +835,7 @@ void Window_SdlUpdate()
                 }
                 else if (event.key.keysym.sym == SDLK_BACKSPACE)
                 {
-                    Window_msg_main_handler(g_hWnd, WM_KEYUP, 0x8, 0);
+                    Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_BACK, 0);
                 }
                 else if (event.key.keysym.sym == SDLK_DELETE)
                 {
@@ -852,7 +865,13 @@ void Window_SdlUpdate()
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYUP, 0x24, 0);
                 }
+                else if (event.key.keysym.sym == SDLK_BACKQUOTE)
+                {
+                    Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_OEM_3, 0);
+                }
                 //handleKey(&event.key.keysym, WM_KEYUP, 0xc0000001);
+
+                if (jkQuakeConsole_bOpen) break; // Hijack all input to console
 
                 stdControl_SetSDLKeydown(event.key.keysym.scancode, 0, event.key.timestamp);
                 break;
@@ -899,6 +918,8 @@ void Window_SdlUpdate()
                 pos = ((Window_mouseX) & 0xFFFF) | (((Window_mouseY) << 16) & 0xFFFF0000);
                 msgl = (event.type == SDL_MOUSEBUTTONDOWN ? WM_LBUTTONDOWN : WM_LBUTTONUP);
                 msgr = (event.type == SDL_MOUSEBUTTONDOWN ? WM_RBUTTONDOWN : WM_RBUTTONUP);
+
+                if (jkQuakeConsole_bOpen) break; // Hijack all input to console
                 
                 if (hasLeft)
                     Window_msg_main_handler(g_hWnd, msgl, left | right, pos);
@@ -912,6 +933,8 @@ void Window_SdlUpdate()
             case SDL_MOUSEWHEEL:
                 Window_mouseWheelY = event.wheel.y;
                 Window_mouseWheelX = event.wheel.x;
+
+                if (jkQuakeConsole_bOpen) break; // Hijack all input to console
                 break;
             case SDL_QUIT:
                 printf("Quit!\n");
@@ -958,11 +981,13 @@ void Window_SdlUpdate()
 
         if (!jkGuiBuildMulti_bRendering) {
             std3D_StartScene();
+            jkQuakeConsole_Render();
             std3D_DrawMenu();
             std3D_EndScene();
             SDL_GL_SwapWindow(displayWindow);
         }
         else {
+            jkQuakeConsole_Render();
             std3D_DrawMenu();
             SDL_GL_SwapWindow(displayWindow);
             //menu_framelimit_amt_ms = 64;
@@ -998,7 +1023,22 @@ void Window_SdlUpdate()
             Window_lastYRel = 0;
         }
 
-        if (SDL_GetWindowFlags(displayWindow) & SDL_WINDOW_MOUSE_FOCUS) {
+        if (jkQuakeConsole_bOpen && jkQuakeConsole_bOpen != last_jkQuakeConsole_bOpen) {
+            SDL_WarpMouseInWindow(displayWindow, Window_menu_mouseX, Window_menu_mouseY);
+        }
+        else if (!jkQuakeConsole_bOpen && jkQuakeConsole_bOpen != last_jkQuakeConsole_bOpen) {
+            Window_menu_mouseX = Window_mouseX;
+            Window_menu_mouseY = Window_mouseY;
+            Window_lastXRel = 0;
+            Window_lastYRel = 0;
+        }
+
+        if (jkQuakeConsole_bOpen)
+        {
+            SDL_SetRelativeMouseMode(SDL_FALSE);
+        }
+
+        if (!jkQuakeConsole_bOpen && SDL_GetWindowFlags(displayWindow) & SDL_WINDOW_MOUSE_FOCUS) {
             SDL_SetRelativeMouseMode(SDL_TRUE);
             //SDL_WarpMouseInWindow(displayWindow, 100, 100);
         }
@@ -1011,6 +1051,7 @@ void Window_SdlUpdate()
     jkPlayer_enableVsync_last = jkPlayer_enableVsync;
 
     last_jkGame_isDDraw = jkGame_isDDraw;
+    last_jkQuakeConsole_bOpen = jkQuakeConsole_bOpen;
 }
 
 void Window_SdlVblank()

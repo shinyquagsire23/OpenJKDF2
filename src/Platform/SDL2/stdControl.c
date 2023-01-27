@@ -3,6 +3,7 @@
 #include "Devices/sithControl.h"
 #include "Win95/Window.h"
 #include "stdPlatform.h"
+#include "Main/jkQuakeConsole.h"
 
 #include <SDL.h>
 
@@ -683,6 +684,7 @@ void stdControl_ReadControls()
 
     if (!stdControl_bControlsActive)
         return;
+    if (jkQuakeConsole_bOpen) return; // Hijack input to console
 
     _memset(stdControl_aInput1, 0, sizeof(int) * JK_NUM_KEYS);
     stdControl_bControlsIdle = 1;
@@ -799,6 +801,7 @@ void stdControl_ReadMouse()
 {
     if (!stdControl_bReadMouse)
         return;
+    if (jkQuakeConsole_bOpen) return; // Hijack input to console
 
     stdControl_aAxisPos[AXIS_MOUSE_Z] = Window_mouseWheelY; // TODO
     stdControl_aAxisPos[AXIS_MOUSE_X] = Window_lastXRel; // TODO

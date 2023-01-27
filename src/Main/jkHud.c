@@ -1597,7 +1597,7 @@ void jkHud_SendChat(char a1)
     wchar_t *v4; // [esp-8h] [ebp-10Ch]
     wchar_t tmp[256]; // [esp+4h] [ebp-100h] BYREF
 
-    if ( a1 == 13 )
+    if ( a1 == VK_RETURN )
     {
         if ( jkHud_chatStrPos )
         {
@@ -1620,12 +1620,12 @@ void jkHud_SendChat(char a1)
     }
     else
     {
-        if ( a1 == 8 )
+        if ( a1 == VK_BACK )
         {
             if ( jkHud_chatStrPos )
                 jkHud_chatStr[--jkHud_chatStrPos] = 0;
         }
-        else if ( a1 == 9 )
+        else if ( a1 == VK_TAB )
         {
             if ( sithNet_isMulti )
                 jkHud_dword_552D10 = (jkHud_dword_552D10 == -2) - 2;

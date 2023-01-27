@@ -143,11 +143,11 @@ rdVector3* tiledrand_data;
 size_t std3D_loadedUITexturesAmt = 0;
 stdBitmap* std3D_aUIBitmaps[STD3D_MAX_TEXTURES] = {0};
 GLuint std3D_aUITextures[STD3D_MAX_TEXTURES] = {0};
-static rdUITri GL_tmpUITris[STD3D_MAX_TRIS] = {0};
+static rdUITri GL_tmpUITris[STD3D_MAX_UI_TRIS] = {0};
 static size_t GL_tmpUITrisAmt = 0;
 GLuint last_ui_tex = 0;
 int last_ui_flags = 0;
-static D3DVERTEX GL_tmpUIVertices[STD3D_MAX_VERTICES] = {0};
+static D3DVERTEX GL_tmpUIVertices[STD3D_MAX_UI_VERTICES] = {0};
 static size_t GL_tmpUIVerticesAmt = 0;
 
 rdDDrawSurface* std3D_aLoadedSurfaces[STD3D_MAX_TEXTURES] = {0};
@@ -631,8 +631,8 @@ int init_resources()
     world_data_all = malloc(STD3D_MAX_VERTICES * sizeof(D3DVERTEX));
     world_data_elements = malloc(sizeof(GLushort) * 3 * STD3D_MAX_TRIS);
 
-    menu_data_all = malloc(STD3D_MAX_VERTICES * sizeof(D3DVERTEX));
-    menu_data_elements = malloc(sizeof(GLushort) * 3 * STD3D_MAX_TRIS);
+    menu_data_all = malloc(STD3D_MAX_UI_VERTICES * sizeof(D3DVERTEX));
+    menu_data_elements = malloc(sizeof(GLushort) * 3 * STD3D_MAX_UI_TRIS);
 
     glGenBuffers(1, &world_vbo_all);
     glGenBuffers(1, &world_ibo_triangle);
@@ -1552,21 +1552,26 @@ void std3D_DrawMapOverlay()
     glDisableVertexAttribArray(programMenu_attribute_coord3d);
 }
 
-void std3D_DrawUIBitmap(stdBitmap* pBmp, int mipIdx, float dstX, float dstY, rdRect* srcRect, float scale, int bAlphaOverwrite)
+void std3D_DrawUIBitmapRGBA(stdBitmap* pBmp, int mipIdx, float dstX, float dstY, rdRect* srcRect, float scaleX, float scaleY, int bAlphaOverwrite, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a)
 {
     float internalWidth = Video_menuBuffer.format.width;
     float internalHeight = Video_menuBuffer.format.height;
+
+    if (!pBmp) return;
+    if (!pBmp->abLoadedToGPU[mipIdx]) {
+        std3D_AddBitmapToTextureCache(pBmp, mipIdx, !(pBmp->palFmt & 1), 0);
+    }
 
     if (jkGuiBuildMulti_bRendering) {
         internalWidth = 640.0;
         internalHeight = 480.0;
     }
 
-    double scaleX = (double)Window_xSize/(double)internalWidth;
-    double scaleY = (double)Window_ySize/(double)internalHeight;
+    double scaleX_ = (double)Window_xSize/(double)internalWidth;
+    double scaleY_ = (double)Window_ySize/(double)internalHeight;
 
-    dstX *= scaleX;
-    dstY *= scaleY;
+    dstX *= scaleX_;
+    dstY *= scaleY_;
 
     //double tex_w = (double)Window_xSize;
     //double tex_h = (double)Window_ySize;
@@ -1588,7 +1593,7 @@ void std3D_DrawUIBitmap(stdBitmap* pBmp, int mipIdx, float dstX, float dstY, rdR
     float w_dst = w;
     float h_dst = h;
 
-    if (scale == 0.0)
+    if (scaleX == 0.0 && scaleY == 0.0)
     {
         w_dst = (w / tex_w) * (double)Window_xSize;
         h_dst = (h / tex_h) * (double)Window_ySize;
@@ -1596,18 +1601,40 @@ void std3D_DrawUIBitmap(stdBitmap* pBmp, int mipIdx, float dstX, float dstY, rdR
         dstX = (dstX / tex_w) * (double)Window_xSize;
         dstY = (dstY / tex_h) * (double)Window_ySize;
 
-        scale = 1.0;
+        scaleX = 1.0;
+        scaleY = 1.0;
     }
 
-    double dstScaleX = scale;
-    double dstScaleY = scale;
-    dstScaleX *= scaleX;
-    dstScaleY *= scaleY;
+    double dstScaleX = scaleX;
+    double dstScaleY = scaleY;
+    dstScaleX *= scaleX_;
+    dstScaleY *= scaleY_;
 
     double u1 = (x / tex_w);
     double u2 = ((x+w) / tex_w);
     double v1 = (y / tex_h);
     double v2 = ((y+h) / tex_h);
+
+    uint32_t color = 0;
+
+    color |= (color_r << 0);
+    color |= (color_g << 8);
+    color |= (color_b << 16);
+    color |= (color_a << 24);
+
+    if (GL_tmpUIVerticesAmt + 4 > STD3D_MAX_UI_VERTICES) {
+        return;
+    }
+    if (GL_tmpUITrisAmt + 2 > STD3D_MAX_UI_TRIS) {
+        return;
+    }
+
+    if (dstY + (dstScaleY * h_dst) < 0.0 || dstX + (dstScaleX * w_dst) < 0.0) {
+        return;
+    }
+    if (dstY > Window_ySize || dstX > Window_xSize) {
+        return;
+    }
 
     GL_tmpUIVertices[GL_tmpUIVerticesAmt+0].x = dstX;
     GL_tmpUIVertices[GL_tmpUIVerticesAmt+0].y = dstY;
@@ -1615,7 +1642,7 @@ void std3D_DrawUIBitmap(stdBitmap* pBmp, int mipIdx, float dstX, float dstY, rdR
     GL_tmpUIVertices[GL_tmpUIVerticesAmt+0].tu = u1;
     GL_tmpUIVertices[GL_tmpUIVerticesAmt+0].tv = v1;
     *(uint32_t*)&GL_tmpUIVertices[GL_tmpUIVerticesAmt+0].nx = 0;
-    GL_tmpUIVertices[GL_tmpUIVerticesAmt+0].color = 0xFFFFFFFF;
+    GL_tmpUIVertices[GL_tmpUIVerticesAmt+0].color = color;
     *(uint32_t*)&GL_tmpUIVertices[GL_tmpUIVerticesAmt+0].nz = 0;
     
     GL_tmpUIVertices[GL_tmpUIVerticesAmt+1].x = dstX;
@@ -1624,7 +1651,7 @@ void std3D_DrawUIBitmap(stdBitmap* pBmp, int mipIdx, float dstX, float dstY, rdR
     GL_tmpUIVertices[GL_tmpUIVerticesAmt+1].tu = u1;
     GL_tmpUIVertices[GL_tmpUIVerticesAmt+1].tv = v2;
     *(uint32_t*)&GL_tmpUIVertices[GL_tmpUIVerticesAmt+1].nx = 0;
-    GL_tmpUIVertices[GL_tmpUIVerticesAmt+1].color = 0xFFFFFFFF;
+    GL_tmpUIVertices[GL_tmpUIVerticesAmt+1].color = color;
     *(uint32_t*)&GL_tmpUIVertices[GL_tmpUIVerticesAmt+1].nz = 0;
     
     GL_tmpUIVertices[GL_tmpUIVerticesAmt+2].x = dstX + (dstScaleX * w_dst);
@@ -1633,7 +1660,7 @@ void std3D_DrawUIBitmap(stdBitmap* pBmp, int mipIdx, float dstX, float dstY, rdR
     GL_tmpUIVertices[GL_tmpUIVerticesAmt+2].tu = u2;
     GL_tmpUIVertices[GL_tmpUIVerticesAmt+2].tv = v2;
     *(uint32_t*)&GL_tmpUIVertices[GL_tmpUIVerticesAmt+2].nx = 0;
-    GL_tmpUIVertices[GL_tmpUIVerticesAmt+2].color = 0xFFFFFFFF;
+    GL_tmpUIVertices[GL_tmpUIVerticesAmt+2].color = color;
     *(uint32_t*)&GL_tmpUIVertices[GL_tmpUIVerticesAmt+2].nz = 0;
     
     GL_tmpUIVertices[GL_tmpUIVerticesAmt+3].x = dstX + (dstScaleX * w_dst);
@@ -1642,7 +1669,7 @@ void std3D_DrawUIBitmap(stdBitmap* pBmp, int mipIdx, float dstX, float dstY, rdR
     GL_tmpUIVertices[GL_tmpUIVerticesAmt+3].tu = u2;
     GL_tmpUIVertices[GL_tmpUIVerticesAmt+3].tv = v1;
     *(uint32_t*)&GL_tmpUIVertices[GL_tmpUIVerticesAmt+3].nx = 0;
-    GL_tmpUIVertices[GL_tmpUIVerticesAmt+3].color = 0xFFFFFFFF;
+    GL_tmpUIVertices[GL_tmpUIVerticesAmt+3].color = color;
     *(uint32_t*)&GL_tmpUIVertices[GL_tmpUIVerticesAmt+3].nz = 0;
     
     GL_tmpUITris[GL_tmpUITrisAmt+0].v1 = GL_tmpUIVerticesAmt+1;
@@ -1661,14 +1688,32 @@ void std3D_DrawUIBitmap(stdBitmap* pBmp, int mipIdx, float dstX, float dstY, rdR
     GL_tmpUITrisAmt += 2;
 }
 
+void std3D_DrawUIBitmap(stdBitmap* pBmp, int mipIdx, float dstX, float dstY, rdRect* srcRect, float scale, int bAlphaOverwrite)
+{
+    std3D_DrawUIBitmapRGBA(pBmp, mipIdx, dstX, dstY, srcRect, scale, scale, bAlphaOverwrite, 0xFF, 0xFF, 0xFF, 0xFF);
+}
+
 void std3D_DrawUIClearedRect(uint8_t palIdx, rdRect* dstRect)
 {
+    if (!displaypal_data) return;
+    uint32_t color = 0;
+    uint8_t color_r = ((uint8_t*)displaypal_data)[(palIdx*3) + 0];
+    uint8_t color_g = ((uint8_t*)displaypal_data)[(palIdx*3) + 1];
+    uint8_t color_b = ((uint8_t*)displaypal_data)[(palIdx*3) + 2];
+
+    std3D_DrawUIClearedRectRGBA(color_r, color_g, color_b, 0xFF, dstRect);
+}
+
+void std3D_DrawUIClearedRectRGBA(uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a, rdRect* dstRect)
+{
+    if (!has_initted) return;
     if (!dstRect) return;
     double dstX = dstRect->x;
     double dstY = dstRect->y;
 
     float internalWidth = Video_menuBuffer.format.width;
     float internalHeight = Video_menuBuffer.format.height;
+    if (!internalWidth || !internalHeight) return;
 
     if (jkGuiBuildMulti_bRendering) {
         internalWidth = 640.0;
@@ -1685,6 +1730,7 @@ void std3D_DrawUIClearedRect(uint8_t palIdx, rdRect* dstRect)
     //double tex_h = (double)Window_ySize;
     double tex_w = dstRect->width;
     double tex_h = dstRect->height;
+    if (!tex_w || !tex_h) return;
 
     double w = tex_w;
     double h = tex_h;
@@ -1706,14 +1752,17 @@ void std3D_DrawUIClearedRect(uint8_t palIdx, rdRect* dstRect)
     double v2 = ((y+h) / tex_h);
 
     uint32_t color = 0;
-    uint8_t color_r = ((uint8_t*)displaypal_data)[(palIdx*3) + 0];
-    uint8_t color_g = ((uint8_t*)displaypal_data)[(palIdx*3) + 1];
-    uint8_t color_b = ((uint8_t*)displaypal_data)[(palIdx*3) + 2];
 
     color |= (color_r << 0);
     color |= (color_g << 8);
     color |= (color_b << 16);
-    color |= (0xFF << 24);
+    color |= (color_a << 24);
+    if (GL_tmpUIVerticesAmt + 4 > STD3D_MAX_UI_VERTICES) {
+        return;
+    }
+    if (GL_tmpUITrisAmt + 2 > STD3D_MAX_UI_TRIS) {
+        return;
+    }
 
     GL_tmpUIVertices[GL_tmpUIVerticesAmt+0].x = dstX;
     GL_tmpUIVertices[GL_tmpUIVerticesAmt+0].y = dstY;
@@ -3009,6 +3058,7 @@ int std3D_GetBitmapCacheIdx()
 int std3D_AddBitmapToTextureCache(stdBitmap *texture, int mipIdx, int is_alpha_tex, int no_alpha)
 {
     if (Main_bHeadless) return 1;
+    if (!has_initted) return 0;
     if (!texture) return 1;
     if (mipIdx >= texture->numMips) return 1;
     if (!texture->abLoadedToGPU || texture->abLoadedToGPU[mipIdx]) return 1;
@@ -3229,11 +3279,18 @@ int std3D_AddBitmapToTextureCache(stdBitmap *texture, int mipIdx, int is_alpha_t
                         val_rgba = 0xFFFFFFFF; // HACK
                     }
 #endif
-                    if (displaypal_data)
+
+                    void* palette_data = texture->palette;//displaypal_data;
+
+                    if (!palette_data && jkGui_stdBitmaps[0]) {
+                        palette_data = jkGui_stdBitmaps[0]->palette;
+                    }
+
+                    if (palette_data)
                     {
-                        uint8_t color_r = ((uint8_t*)displaypal_data)[(val*3) + 0];
-                        uint8_t color_g = ((uint8_t*)displaypal_data)[(val*3) + 1];
-                        uint8_t color_b = ((uint8_t*)displaypal_data)[(val*3) + 2];
+                        uint8_t color_r = ((uint8_t*)palette_data)[(val*3) + 0];
+                        uint8_t color_g = ((uint8_t*)palette_data)[(val*3) + 1];
+                        uint8_t color_b = ((uint8_t*)palette_data)[(val*3) + 2];
 
                         val_rgba |= (0xFF << 24);
                         val_rgba |= (color_b << 16);
