@@ -50,7 +50,8 @@ extern int openjkdf2_bIsKVM;
 
 // Smush
 #define AUDIO_QUEUE_DEPTH (128)
-#define AUDIO_BUFS_DEPTH (0x80000)
+#define AUDIO_BUFS_DEPTH (0x400000)
+#define AUDIO_MAXIMUM_ALLOWED_SLOP_BYTES (0x8000)
 
 static double jkCutscene_audio_us;
 static double jkCutscene_audio_us_slop;
@@ -795,21 +796,6 @@ int jkCutscene_smusher_process()
             }
             slop = 0;
         }
-        jkCutscene_audioFlip++;
-        jkCutscene_audioFlip %= 3;
-        stdSound_buffer_t* buf = jkCutscene_audio;
-        if (jkCutscene_audioFlip == 1) {
-            buf = jkCutscene_audio2;
-        }
-        else if (jkCutscene_audioFlip == 2) {
-             buf = jkCutscene_audio3;
-        }
-
-        stdSound_BufferReset(buf);
-        int len = 0;
-        uint8_t* stream = (uint8_t*)stdSound_BufferSetData(buf, AUDIO_BUFS_DEPTH, &len);
-        uint8_t* stream_iter = stream;
-        uint32_t stream_left = len;
 
         int slop_bytes = (int)((slop * 22050.0 * 4.0) / 1000000.0);
         if (slop_bytes > AUDIO_BUFS_DEPTH / 4) {
@@ -824,10 +810,11 @@ int jkCutscene_smusher_process()
             slop_bytes += 4;
         }
         slop_bytes &= ~3;
-        //printf("slop bytes %x %x %x\n", slop_bytes, jkCutscene_audio_queue_read_idx, jkCutscene_audioFlip);
-
-        memset(stream, 0, len);
-        stream_iter += (slop_bytes);
+        
+        if (slop_bytes > AUDIO_MAXIMUM_ALLOWED_SLOP_BYTES) {
+            goto skip_audio;
+        }
+        printf("slop bytes %x %x %x\n", slop_bytes, jkCutscene_audio_queue_read_idx, jkCutscene_audioFlip);
 
         if (jkCutscene_audio_len <= 0) {
             if (jkCutscene_audio_buf) {
@@ -846,9 +833,27 @@ int jkCutscene_smusher_process()
         }
 
         if (!jkCutscene_audio_pos || !jkCutscene_audio_len) {
-            stdSound_BufferUnlock(buf, stream, len);
             goto skip_audio;
         }
+
+        jkCutscene_audioFlip++;
+        jkCutscene_audioFlip %= 3;
+        stdSound_buffer_t* buf = jkCutscene_audio;
+        if (jkCutscene_audioFlip == 1) {
+            buf = jkCutscene_audio2;
+        }
+        else if (jkCutscene_audioFlip == 2) {
+             buf = jkCutscene_audio3;
+        }
+
+        stdSound_BufferReset(buf);
+        int len = 0;
+        uint8_t* stream = (uint8_t*)stdSound_BufferSetData(buf, AUDIO_BUFS_DEPTH, &len);
+        uint8_t* stream_iter = stream;
+        uint32_t stream_left = len;
+
+        memset(stream, 0, len);
+        stream_iter += (slop_bytes);
         
         int written_len = slop_bytes;
         stream_left -= written_len;

@@ -188,7 +188,7 @@ void smush_audio_frame(smush_ctx* ctx)
 
 void smush_frame(smush_ctx* ctx)
 {
-    while (ctx->audio_buffer_collected_flushed < ctx->audio_buffer_size * 2)
+    while (ctx->audio_buffer_collected_flushed < ctx->audio_buffer_size * 2 && ctx->audio_frame_fpos < ctx->max_fpos)
     {
         smush_audio_frame(ctx);
     }
