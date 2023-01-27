@@ -58,6 +58,8 @@ smush_ctx* smush_from_fpath(const char* fpath)
     ctx->start_fpos = sizeof(ctx->header) + sizeof(smush_header) + getbe32(ahdr->size);
     ctx->max_fpos = sizeof(ctx->header) + getbe32(hdr->size);
     ctx->frame_fpos = ctx->start_fpos;
+    ctx->audio_frame_fpos = ctx->start_fpos;
+    ctx->audio_buffer_size = 0x40000;
 
     return ctx;
 
@@ -83,6 +85,15 @@ void smush_destroy(smush_ctx* ctx) {
 
 void smush_set_debug(smush_ctx* ctx, int val) {
     _smush_debug_prints = val;
+}
+
+void smush_set_audio_buffer_size(smush_ctx* ctx, uint32_t buffer_size)
+{
+    if (buffer_size < 0x1000) {
+        buffer_size = 0x1000;
+    }
+
+    ctx->audio_buffer_size = buffer_size;
 }
 
 void smush_set_audio_callback(smush_ctx* ctx, smush_audio_callback_t callback)
@@ -127,13 +138,62 @@ int smush_get_current_subtitle(smush_ctx* ctx) {
 }
 
 void smush_restart(smush_ctx* ctx) {
+    smush_audio_flush(ctx);
+    ctx->audio_buffer_collected_flushed = 0;
+
     ctx->frame_fpos = ctx->start_fpos;
     ctx->cur_frame = 0;
+    ctx->audio_frame_fpos = ctx->start_fpos;
+    ctx->audio_cur_frame = 0;
+
     memcpy(ctx->palette, ctx->ahdr.palette, sizeof(ctx->palette));
+}
+
+void smush_audio_frame(smush_ctx* ctx)
+{
+    if (ctx->audio_frame_fpos >= ctx->max_fpos) {
+        ctx->audio_frame_fpos = ctx->max_fpos;
+        smush_audio_flush(ctx);
+        return;
+    }
+
+    uint32_t seek_pos = ctx->audio_frame_fpos;
+    
+    while (1)
+    {
+        smush_header tmp;
+        
+        fseek(ctx->f, seek_pos, SEEK_SET);
+        if(fread(&tmp, 1, sizeof(tmp), ctx->f) <= 0) break;
+
+        if(getbe32(tmp.magic) == SMUSH_MAGIC_FRME) {
+            smush_proc_frme(ctx, seek_pos, getbe32(tmp.size), 1);
+
+            ctx->audio_frame_fpos = seek_pos;
+            ctx->audio_frame_fpos += 8;
+            ctx->audio_frame_fpos += getbe32(tmp.size);
+            ctx->audio_cur_frame++;
+            break;
+        }
+        else {
+            smush_debug("  Tag @ 0x%x:\n", seek_pos);
+            smush_debug("    Magic: %c%c%c%c\n", tmp.magic[0], tmp.magic[1], tmp.magic[2], tmp.magic[3]);
+            smush_debug("    Size: 0x%x\n", getbe32(tmp.size));
+        }
+
+        seek_pos += 8;
+        seek_pos += getbe32(tmp.size);
+    }    
 }
 
 void smush_frame(smush_ctx* ctx)
 {
+    while (ctx->audio_buffer_collected_flushed < ctx->audio_buffer_size * 2)
+    {
+        smush_audio_frame(ctx);
+    }
+    smush_audio_frame(ctx);
+
     if (ctx->frame_fpos >= ctx->max_fpos) {
         smush_restart(ctx);
     }
@@ -148,7 +208,7 @@ void smush_frame(smush_ctx* ctx)
         if(fread(&tmp, 1, sizeof(tmp), ctx->f) <= 0) break;
 
         if(getbe32(tmp.magic) == SMUSH_MAGIC_FRME) {
-            smush_proc_frme(ctx, seek_pos, getbe32(tmp.size));
+            smush_proc_frme(ctx, seek_pos, getbe32(tmp.size), 0);
 
             ctx->frame_fpos = seek_pos;
             ctx->frame_fpos += 8;
@@ -261,6 +321,21 @@ void smush_proc_npal(smush_ctx* ctx, uint32_t seek_pos, uint32_t total_size)
     fread(ctx->palette, sizeof(ctx->palette), 1, ctx->f);
 }
 
+void smush_audio_flush(smush_ctx* ctx)
+{
+    if (!ctx->audio_buffer_tmp || !ctx->audio_buffer_collected) return;
+
+    if (ctx->audio_callback) {
+        ctx->audio_callback(ctx->audio_buffer_tmp, ctx->audio_buffer_collected);
+        ctx->audio_buffer_collected_flushed += ctx->audio_buffer_collected;
+        ctx->audio_buffer_collected = 0;
+    }
+    else {
+        free(ctx->audio_buffer_tmp);
+    }
+    ctx->audio_buffer_tmp = NULL;
+}
+
 void smush_proc_iact_payload(smush_ctx* ctx, const uint8_t* data, int64_t total_size)
 {
     uint8_t* iact_tmp = ctx->iact_tmp;
@@ -288,7 +363,12 @@ void smush_proc_iact_payload(smush_ctx* ctx, const uint8_t* data, int64_t total_
             
             smush_debug("    Len?: 0x%04x\n", len);
 
-            uint8_t* disposable_buf = (uint8_t*)malloc(0x1000);
+            if (!ctx->audio_buffer_tmp) {
+                ctx->audio_buffer_tmp = (uint8_t*)malloc(ctx->audio_buffer_size);
+                memset(ctx->audio_buffer_tmp, 0, ctx->audio_buffer_size);
+                ctx->audio_buffer_collected = 0;
+            }
+            uint8_t* disposable_buf = ctx->audio_buffer_tmp + ctx->audio_buffer_collected;
             uint8_t* decode_in = iact_tmp + 2;
             uint8_t *out = disposable_buf;
 
@@ -357,11 +437,12 @@ void smush_proc_iact_payload(smush_ctx* ctx, const uint8_t* data, int64_t total_
 #endif
             }
 
-            if (ctx->audio_callback) {
-                ctx->audio_callback(disposable_buf, 0x1000);
-            }
-            else {
-                free(disposable_buf);
+            ctx->audio_buffer_collected += 0x1000;
+            //printf("%x %x\n", ctx->audio_buffer_collected, ctx->audio_buffer_collected_flushed);
+            
+            if (ctx->audio_buffer_collected >= ctx->audio_buffer_size)
+            {
+                smush_audio_flush(ctx);
             }
             
             ctx->iact_idx = 0;
@@ -488,7 +569,7 @@ void smush_proc_ftch(smush_ctx* ctx, uint32_t seek_pos, uint32_t total_size)
     memcpy(ctx->framebuffer, ctx->framebuffer_stor, 640*480*sizeof(uint8_t));
 }
 
-void smush_proc_frme(smush_ctx* ctx, uint32_t seek_pos, uint32_t total_size)
+void smush_proc_frme(smush_ctx* ctx, uint32_t seek_pos, uint32_t total_size, int is_audio_only)
 {
     smush_header tmp;
     smush_fobj fobj;
@@ -503,7 +584,8 @@ void smush_proc_frme(smush_ctx* ctx, uint32_t seek_pos, uint32_t total_size)
 
     uint32_t max_seek_pos = seek_pos + getbe32(tmp.size);
 
-    ctx->current_sub = 0;
+    if (!is_audio_only)
+        ctx->current_sub = 0;
 
     while (1)
     {
@@ -515,6 +597,14 @@ void smush_proc_frme(smush_ctx* ctx, uint32_t seek_pos, uint32_t total_size)
         smush_debug("    Size: 0x%x\n", getbe32(tmp.size));
         seek_pos += sizeof(tmp);
 
+        if (is_audio_only && getbe32(tmp.magic) == SMUSH_MAGIC_IACT) {
+            smush_proc_iact(ctx, seek_pos, getbe32(tmp.size));
+            goto skip_nonaudio;
+        }
+        else if (is_audio_only) {
+            goto skip_nonaudio;
+        }
+
         if(getbe32(tmp.magic) == SMUSH_MAGIC_FOBJ) {
             smush_proc_fobj(ctx, seek_pos-8, getbe32(tmp.size));
             //break;
@@ -525,9 +615,6 @@ void smush_proc_frme(smush_ctx* ctx, uint32_t seek_pos, uint32_t total_size)
         else if (getbe32(tmp.magic) == SMUSH_MAGIC_NPAL) {
             smush_proc_npal(ctx, seek_pos, getbe32(tmp.size));
         }
-        else if (getbe32(tmp.magic) == SMUSH_MAGIC_IACT) {
-            smush_proc_iact(ctx, seek_pos, getbe32(tmp.size));
-        }
         else if (getbe32(tmp.magic) == SMUSH_MAGIC_FTCH) {
             smush_proc_ftch(ctx, seek_pos, getbe32(tmp.size));
         }
@@ -537,10 +624,13 @@ void smush_proc_frme(smush_ctx* ctx, uint32_t seek_pos, uint32_t total_size)
         else if (getbe32(tmp.magic) == SMUSH_MAGIC_TRES) {
             smush_proc_tres(ctx, seek_pos, getbe32(tmp.size));
         }
+        else if (getbe32(tmp.magic) == SMUSH_MAGIC_IACT) {
+        }
         else {
             smush_warn("    Unhandled tag: %c%c%c%c\n", tmp.magic[0], tmp.magic[1], tmp.magic[2], tmp.magic[3]);
         }
-        
+
+skip_nonaudio:
         seek_pos += getbe32(tmp.size);
         if (seek_pos & 1) {
             seek_pos++;

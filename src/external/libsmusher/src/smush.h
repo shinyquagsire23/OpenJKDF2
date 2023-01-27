@@ -123,6 +123,12 @@ typedef struct smush_ctx
     uint8_t iact_tmp[0x10008];
 
     smush_audio_callback_t audio_callback;
+    uint32_t audio_buffer_size;
+    uint32_t audio_buffer_collected;
+    uint32_t audio_buffer_collected_flushed;
+    uint8_t* audio_buffer_tmp;
+    uint32_t audio_frame_fpos;
+    uint32_t audio_cur_frame;
 } smush_ctx;
 
 // BE32
@@ -143,6 +149,7 @@ typedef struct smush_ctx
 
 smush_ctx* smush_from_fpath(const char* fpath);
 void smush_set_debug(smush_ctx* ctx, int val);
+void smush_set_audio_buffer_size(smush_ctx* ctx, uint32_t buffer_size);
 void smush_set_audio_callback(smush_ctx* ctx, smush_audio_callback_t callback);
 
 void smush_destroy(smush_ctx* ctx);
@@ -156,8 +163,10 @@ uint32_t smush_video_height(smush_ctx* ctx);
 int smush_video_fps(smush_ctx* ctx);
 int smush_get_current_subtitle(smush_ctx* ctx);
 
+void smush_audio_flush(smush_ctx* ctx);
+
 void smush_frame(smush_ctx* ctx);
-void smush_proc_frme(smush_ctx* ctx, uint32_t seek_pos, uint32_t total_size);
+void smush_proc_frme(smush_ctx* ctx, uint32_t seek_pos, uint32_t total_size, int is_audio_only);
 
 void smush_print(smush_ctx* ctx);
 void smush_print_frme(smush_ctx* ctx, uint32_t seek_pos, uint32_t total_size);

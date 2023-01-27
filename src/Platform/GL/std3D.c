@@ -3620,3 +3620,8 @@ int std3D_CreateExecuteBuffer()
 {
     return 1;
 }
+
+int std3D_IsReady()
+{
+    return has_initted;
+}
