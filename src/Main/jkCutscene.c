@@ -814,7 +814,7 @@ int jkCutscene_smusher_process()
         if (slop_bytes > AUDIO_MAXIMUM_ALLOWED_SLOP_BYTES) {
             goto skip_audio;
         }
-        printf("slop bytes %x %x %x\n", slop_bytes, jkCutscene_audio_queue_read_idx, jkCutscene_audioFlip);
+        //printf("slop bytes %x %x %x\n", slop_bytes, jkCutscene_audio_queue_read_idx, jkCutscene_audioFlip);
 
         if (jkCutscene_audio_len <= 0) {
             if (jkCutscene_audio_buf) {
