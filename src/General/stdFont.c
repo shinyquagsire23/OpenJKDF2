@@ -1235,6 +1235,7 @@ uint32_t stdFont_DrawAsciiGPU(stdFont *a2, unsigned int blit_x, int blit_y, int 
                 v16 = v16->previous;
             }
             while ( v16 );
+
             if ( v16 )
             {
 LABEL_25:

@@ -50,10 +50,9 @@ typedef struct stdFont
   int32_t marginY;
   int32_t marginX;
   int16_t field_28;
-  int16_t field_2A;
+  int16_t monospaceW;
   stdBitmap *bitmap;
   stdFontCharset charsetHead;
-  int monospaceW; // added
 } stdFont;
 
 typedef struct stdFontHeader
