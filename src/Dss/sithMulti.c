@@ -21,11 +21,12 @@
 #include "Main/Main.h"
 #include "AI/sithAI.h"
 #include "Devices/sithComm.h"
+#include "stdPlatform.h"
 
-#define sithMulti_infoPrintf(fmt, ...) printf(fmt, ##__VA_ARGS__)
+#define sithMulti_infoPrintf(fmt, ...) stdPlatform_Printf(fmt, ##__VA_ARGS__)
 #define sithMulti_verbosePrintf(fmt, ...) if (Main_bVerboseNetworking) \
     { \
-        printf(fmt, ##__VA_ARGS__);  \
+        stdPlatform_Printf(fmt, ##__VA_ARGS__);  \
     } \
     ;
 

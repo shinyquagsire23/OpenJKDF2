@@ -5,6 +5,10 @@
 #include "jk.h"
 #include "globals.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define stdPlatform_Startup_ADDR (0x0042C080)
 #define stdPlatform_Assert_ADDR (0x0042C090)
 #define stdPlatform_Printf_ADDR (0x0042C160)
@@ -22,6 +26,7 @@
 void stdPlatform_InitServices(HostServices *handlers);
 int stdPlatform_Startup();
 
+#ifndef __cplusplus
 static void (*stdPlatform_Assert)(const char* a1, const char *a2, int a3) = (void*)stdPlatform_Assert_ADDR;
 
 static void* (*stdPlatform_AllocHandle)(size_t) = (void*)stdPlatform_AllocHandle_ADDR;
@@ -29,6 +34,7 @@ static void (*stdPlatform_FreeHandle)(void*) = (void*)stdPlatform_FreeHandle_ADD
 static void* (*stdPlatform_ReallocHandle)(void*, size_t) = (void*)stdPlatform_ReallocHandle_ADDR;
 static uint32_t (*stdPlatform_LockHandle)(uint32_t) = (void*)stdPlatform_LockHandle_ADDR;
 static void (*stdPlatform_UnlockHandle)(uint32_t) = (void*)stdPlatform_UnlockHandle_ADDR;
+#endif
 
 #ifndef PLATFORM_POSIX
 static int (*stdPrintf)(void* a1, char *a2, int line, char *fmt, ...) = (void*)0x426D80;
@@ -42,5 +48,9 @@ uint32_t stdPlatform_GetTimeMsec();
 #endif
 
 int stdConsolePrintf(const char *fmt, ...);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _STDPLATFORM_H

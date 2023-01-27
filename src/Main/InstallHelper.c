@@ -6,6 +6,7 @@
 #include "General/util.h"
 #include "General/stdFileUtil.h"
 #include "Main/jkRes.h"
+#include "stdPlatform.h"
 
 #if defined(SDL2_RENDER) && !defined(ARCH_WASM)
 
@@ -92,7 +93,7 @@ int InstallHelper_CopyFile(const char* pFolder, const char* pName)
     }
 #endif
 
-    printf("asset copy: %s -> %s\n", tmp, tmpTo);
+    stdPlatform_Printf("asset copy: %s -> %s\n", tmp, tmpTo);
 
     // Files are the same
     if (!strcmp(tmp, tmpTo)) {
@@ -138,7 +139,7 @@ int InstallHelper_CopyFileDisk(const char* pFolder, const char* pName)
     int bFound = 0;
     for (size_t i = 0; i < aAssetMap_len; i += 2)
     {
-        printf("%s %s %s\n", pName, aAssetMap[i], aAssetMap[i+1]);
+        stdPlatform_Printf("%s %s %s\n", pName, aAssetMap[i], aAssetMap[i+1]);
         if (!strcmp(pName, aAssetMap[i])) {
             strncat(tmp, aAssetMap[i+1], sizeof(tmp)-1);
             bFound = 1;
@@ -184,7 +185,7 @@ int InstallHelper_CopyFileDisk(const char* pFolder, const char* pName)
     }
 #endif
 
-    printf("disk copy: %s -> %s\n", tmp, tmpTo);
+    stdPlatform_Printf("disk copy: %s -> %s\n", tmp, tmpTo);
 
     // Files are the same
     if (!strcmp(tmp, tmpTo)) {
@@ -269,7 +270,7 @@ int InstallHelper_GetLocalDataDir(char* pOut, size_t pOut_sz, int bChdir)
         stdFileUtil_MkDir(fname);
         if (bChdir) {
             chdir(fname);
-            printf("Using OPENJKDF2_ROOT, root directory: %s\n", fname);
+            stdPlatform_Printf("Using OPENJKDF2_ROOT, root directory: %s\n", fname);
         }
         bIsOverride = 1;
     }
@@ -302,7 +303,7 @@ int InstallHelper_GetLocalDataDir(char* pOut, size_t pOut_sz, int bChdir)
             stdFileUtil_MkDir(fname);
             if (bChdir) {
                 chdir(fname);
-                printf("Using XDG root directory: %s\n", fname);
+                stdPlatform_Printf("Using XDG root directory: %s\n", fname);
             }
         }
         else {
@@ -313,7 +314,7 @@ int InstallHelper_GetLocalDataDir(char* pOut, size_t pOut_sz, int bChdir)
 
             if (bChdir) {
                 chdir(fname);
-                printf("Using new XDG root directory: %s\n", fname);
+                stdPlatform_Printf("Using new XDG root directory: %s\n", fname);
             }
         }
     }
@@ -335,7 +336,7 @@ int InstallHelper_GetLocalDataDir(char* pOut, size_t pOut_sz, int bChdir)
                 stdFileUtil_MkDir(fname);
                 if (bChdir) {
                     chdir(fname);
-                    printf("Using root directory: %s\n", fname);
+                    stdPlatform_Printf("Using root directory: %s\n", fname);
                 }
                 bFound = 1;
             }
@@ -348,7 +349,7 @@ int InstallHelper_GetLocalDataDir(char* pOut, size_t pOut_sz, int bChdir)
                 stdFileUtil_MkDir(fname);
                 if (bChdir) {
                     chdir(fname);
-                    printf("Using SDL_GetPrefPath: %s\n", fname);
+                    stdPlatform_Printf("Using SDL_GetPrefPath: %s\n", fname);
                 }
                 SDL_free(data_home);
                 data_home = NULL;
@@ -363,7 +364,7 @@ int InstallHelper_GetLocalDataDir(char* pOut, size_t pOut_sz, int bChdir)
         stdFileUtil_MkDir(fname);
         if (bChdir) {
             chdir(fname);
-            printf("Using OPENJKDF2_ROOT, root directory: %s\n", fname);
+            stdPlatform_Printf("Using OPENJKDF2_ROOT, root directory: %s\n", fname);
         }
     }
     else if ((homedir = getenv("AppData")) != NULL) {
@@ -384,7 +385,7 @@ int InstallHelper_GetLocalDataDir(char* pOut, size_t pOut_sz, int bChdir)
             stdFileUtil_MkDir(fname);
             if (bChdir) {
                 chdir(fname);
-                printf("Using root directory: %s\n", fname);
+                stdPlatform_Printf("Using root directory: %s\n", fname);
             }
             bFound = 1;
         }
@@ -396,7 +397,7 @@ int InstallHelper_GetLocalDataDir(char* pOut, size_t pOut_sz, int bChdir)
                 stdFileUtil_MkDir(fname);
                 if (bChdir) {
                     chdir(fname);
-                    printf("Using SDL_GetPrefPath: %s\n", fname);
+                    stdPlatform_Printf("Using SDL_GetPrefPath: %s\n", fname);
                 }
                 SDL_free(data_home);
                 data_home = NULL;
@@ -1074,7 +1075,7 @@ void InstallHelper_SetCwd()
     }
 
     if (!found_override) {
-        printf("Running from current working directory.\n");
+        stdPlatform_Printf("Running from current working directory.\n");
         openjkdf2_bIsRunningFromExistingInstall = 1;
         if (openjkdf2_bIsFirstLaunch) {
             openjkdf2_bOrigWasRunningFromExistingInstall = 1;

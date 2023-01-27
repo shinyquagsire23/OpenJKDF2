@@ -125,7 +125,7 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
             v4 = &puppet->tracks[i];
 
             //if (thing->parentSithThing == sithPlayer_pLocalPlayerThing && v4->keyframe)
-            //    printf("%d %s (%x/%u) %p %x %f\n", i, v4->keyframe->name, v4->keyframe->id, v4->keyframe->id, v4->keyframe, v4->status, v4->playSpeed);
+            //    stdPlatform_Printf("%d %s (%x/%u) %p %x %f\n", i, v4->keyframe->name, v4->keyframe->id, v4->keyframe->id, v4->keyframe, v4->status, v4->playSpeed);
 
             // Added: joints check
             if ( v4->status && v4->keyframe && v4->keyframe->joints)
@@ -390,7 +390,7 @@ int rdPuppet_UpdateTracks(rdPuppet *puppet, float deltaSeconds)
             track->playSpeed -= track->fadeSpeed * deltaSeconds;
             
             //if (puppet->rdthing->parentSithThing == sithPlayer_pLocalPlayerThing)
-            //    printf("%u %f %f %f %f %u\n", v2, track->playSpeed, track->fadeSpeed, deltaSeconds, track->field_124, track->keyframe->numFrames);
+            //    stdPlatform_Printf("%u %f %f %f %f %u\n", v2, track->playSpeed, track->fadeSpeed, deltaSeconds, track->field_124, track->keyframe->numFrames);
             
             if ( track->playSpeed <= 0.0 ) // verified
             {

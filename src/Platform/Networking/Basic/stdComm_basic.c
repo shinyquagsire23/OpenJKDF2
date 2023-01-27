@@ -3,6 +3,7 @@
 #include "Win95/stdComm.h"
 #include "Dss/sithMulti.h"
 #include "General/stdString.h"
+#include "stdPlatform.h"
 #include "jk.h"
 
 #if defined(WIN64_MINGW)
@@ -126,7 +127,7 @@ void MyDplay_CheckIncoming()
     fcntl(client_sock, F_SETFL, O_NONBLOCK);
 #endif
 
-    printf("Client with IP %s connected\n", inet_ntoa(MyDplay_addr.sin_addr));
+    stdPlatform_Printf("Client with IP %s connected\n", inet_ntoa(MyDplay_addr.sin_addr));
 
     for (int i = 0; i < 32; i++)
     {
@@ -165,7 +166,7 @@ int DirectPlay_ReceiveLoopback(int *pIdOut, int *pMsgIdOut, int *pLenOut)
     pPkt->data = NULL;
     pPkt->dataSize = 0;
 
-    printf("[L] Recv %x bytes from %x (%x)\n", pMsgIdOut_size, pPkt->idFrom, *pMsgIdOut);
+    stdPlatform_Printf("[L] Recv %x bytes from %x (%x)\n", pMsgIdOut_size, pPkt->idFrom, *pMsgIdOut);
 
     return 0;
 }
@@ -201,7 +202,7 @@ int DirectPlay_Receive(int *pIdOut, int *pMsgIdOut, int *pLenOut)
     while (1)
     {
         //if (MyDplay_curState)
-        //    printf("Reading... %x\n", MyDplay_curState);
+        //    stdPlatform_Printf("Reading... %x\n", MyDplay_curState);
         if (MyDplay_curState == STATE_FINDMAGIC)
         {
             if (magicAmt == 4)
@@ -211,7 +212,7 @@ int DirectPlay_Receive(int *pIdOut, int *pMsgIdOut, int *pLenOut)
                     continue;
                 }
                 else {
-                    printf("%x\n", *(uint32_t*)magicBytes);
+                    stdPlatform_Printf("%x\n", *(uint32_t*)magicBytes);
                     uint8_t magicBytesShift[4];
                     memcpy(magicBytesShift, &magicBytes[1], 3);
                     memcpy(magicBytes, magicBytesShift, 3);
@@ -280,7 +281,7 @@ int DirectPlay_Receive(int *pIdOut, int *pMsgIdOut, int *pLenOut)
 
     // Info request packet
     if (idFrom == 0xFFFFFFFF) {
-        printf("[I] Recv %x bytes from %x/%x (%x)\n", pMsgIdOut_size, idRecv, idFrom, *pMsgIdOut);
+        stdPlatform_Printf("[I] Recv %x bytes from %x/%x (%x)\n", pMsgIdOut_size, idRecv, idFrom, *pMsgIdOut);
 
         int type = *(uint32_t*)&MyDplay_readBuffer[8];
         if (type == 0) {
@@ -319,7 +320,7 @@ int DirectPlay_Receive(int *pIdOut, int *pMsgIdOut, int *pLenOut)
     *pIdOut = idFrom;
     *pLenOut = pMsgIdOut_size;
 
-    printf("Recv %x bytes from %x/%x %x (%x)\n", pMsgIdOut_size, idFrom, idRecv, idTo, *pMsgIdOut);
+    stdPlatform_Printf("Recv %x bytes from %x/%x %x (%x)\n", pMsgIdOut_size, idFrom, idRecv, idTo, *pMsgIdOut);
     MyDplay_amtRead = 0;
 
     //
@@ -350,7 +351,7 @@ BOOL DirectPlay_SendLoopback(DPID idFrom, DPID idTo, void *lpData, DWORD dwDataS
     pPkt->data = malloc(dwDataSize);
     pPkt->dataSize = dwDataSize;
 
-    printf("[L] Sent %x bytes to %x (%x)\n", dwDataSize, idTo, *(int*)lpData);
+    stdPlatform_Printf("[L] Sent %x bytes to %x (%x)\n", dwDataSize, idTo, *(int*)lpData);
 
     memcpy(pPkt->data, lpData, dwDataSize);
 
@@ -390,7 +391,7 @@ BOOL DirectPlay_Send(DPID idFrom, DPID idTo, void *lpData, DWORD dwDataSize)
         MyDplay_amtSent += n;
     }
 
-    printf("Sent %x bytes to %x (%x) %x %x\n", MyDplay_amtSent, idTo, *(int*)lpData, *(uint32_t*)&MyDplay_sendBuffer[0], *(uint32_t*)&MyDplay_sendBuffer[4]);
+    stdPlatform_Printf("Sent %x bytes to %x (%x) %x %x\n", MyDplay_amtSent, idTo, *(int*)lpData, *(uint32_t*)&MyDplay_sendBuffer[0], *(uint32_t*)&MyDplay_sendBuffer[4]);
     
     MyDplay_amtSent = 0;
     return 1;

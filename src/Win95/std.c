@@ -117,7 +117,7 @@ int stdFilePrintf(stdFile_t pFile, const char *fmt, ...)
 
 int stdAssert(const char *pMsg, const char *pFileName, int lineNo)
 {
-    return printf("[ASSERT] %s(%d): %s\n", pFileName, lineNo, pMsg);
+    return stdPlatform_Printf("[ASSERT] %s(%d): %s\n", pFileName, lineNo, pMsg);
 }
 
 void* stdDebugMalloc(unsigned int amt)

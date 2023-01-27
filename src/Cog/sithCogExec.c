@@ -115,7 +115,7 @@ void sithCogExec_Exec(sithCog *cog_ctx)
                 if (!v12 )
                     break;
                 if (v12->val.type) {
-                    printf("OpenJKDF2: Script `%s` attempted to call `%s`, which doesn't exist...\n", cog_ctx->cogscript->cog_fpath, v12->field_18);
+                    stdPlatform_Printf("OpenJKDF2: Script `%s` attempted to call `%s`, which doesn't exist...\n", cog_ctx->cogscript->cog_fpath, v12->field_18);
                     break;
                 }
                 if ( v12->val.dataAsFunc ) {
@@ -123,7 +123,7 @@ void sithCogExec_Exec(sithCog *cog_ctx)
                     v12->val.dataAsFunc(cog_ctx); 
                 }
                 else {
-                    printf("OpenJKDF2: Script `%s` attempted to call `%s`, which doesn't exist...\n", cog_ctx->cogscript->cog_fpath, v12->field_18);
+                    stdPlatform_Printf("OpenJKDF2: Script `%s` attempted to call `%s`, which doesn't exist...\n", cog_ctx->cogscript->cog_fpath, v12->field_18);
                 }
                 //func = sithCogExec_PopSymbolFunc(cog_ctx); // this function is slightly different?
                 break;

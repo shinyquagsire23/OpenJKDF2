@@ -1,6 +1,7 @@
 #include "stdMci.h"
 
 #include "Main/jkMain.h"
+#include "stdPlatform.h"
 #include "jk.h"
 
 #ifdef LINUX
@@ -191,7 +192,7 @@ void stdMci_SetVolume(float vol)
 
 void stdMci_Stop()
 {
-    printf("stdMci: stop music\n");
+    stdPlatform_Printf("stdMci: stop music\n");
     
     if (stdMci_music) {
         stdMci_music = 0;
@@ -265,7 +266,7 @@ int stdMci_TryPlay(const char* fpath) {
     stdMci_music = Mix_LoadMUS(tmp); 
     if (!stdMci_music) {
         //printf("INFO: Failed to play music `%s', trying alternate location...\n", tmp);
-        printf("Mix_LoadMUS: %s\n", Mix_GetError());
+        stdPlatform_Printf("stdMci: Error in Mix_LoadMUS, %s\n", Mix_GetError());
     }
 
     if (stdMci_music)
@@ -293,12 +294,12 @@ void stdMci_trackStart(int track)
     // GOG only reports real track IDs, and does not have any disk 2s
     if (cdNum > 1 && stdMci_bIsGOG) {
         stdMci_bIsGOG = 0;
-        printf("jkEpisode_Load: Seeing CD number >1 (%u), assuming this is an OG disk install with offsetted tracks...\n", cdNum);
+        stdPlatform_Printf("stdMci: Seeing CD number >1 (%u), assuming this is an OG disk install with offsetted tracks...\n", cdNum);
     }
 
     // If we're getting a >12 track number, it's definitely GOG
     if (track > 12 && !stdMci_bIsGOG) {
-        printf("stdMci_trackStart: Seeing a >12 track number (%u), assuming this is a GOG install with no offsets...\n", track);
+        stdPlatform_Printf("stdMci: Seeing a >12 track number (%u), assuming this is a GOG install with no offsets...\n", track);
         stdMci_bIsGOG = 1;
     }
 
@@ -357,17 +358,17 @@ void stdMci_trackStart(int track)
 
 done:
     if (!stdMci_music) {
-        printf("No music was loaded, must not have any music.\n");
+        stdPlatform_Printf("stdMci: No music was loaded, must not have any music.\n");
         return;
     }
 
     stdMci_trackCurrent = track;
     Mix_HaltMusic();
     if (Mix_PlayMusic(stdMci_music, 0) < 0) {
-        printf("Mix_PlayMusic: %s\n", Mix_GetError());
+        stdPlatform_Printf("stdMci: Error in Mix_PlayMusic, %s\n", Mix_GetError());
     }
     Mix_HookMusicFinished(stdMci_trackFinished);
-    printf("INFO: Playing music `%s'\n", tmp);
+    stdPlatform_Printf("stdMci: Playing music `%s'\n", tmp);
 }
 
 void stdMci_trackFinished()
@@ -383,7 +384,7 @@ int stdMci_Play(uint8_t trackFrom, uint8_t trackTo)
 {
     char tmp[256];
     
-    printf("stdMci: play track %d to %d\n", trackFrom, trackTo);
+    stdPlatform_Printf("stdMci: play track %d to %d\n", trackFrom, trackTo);
     
     stdMci_trackFrom = trackFrom;
     stdMci_trackTo = trackTo;
@@ -395,14 +396,14 @@ int stdMci_Play(uint8_t trackFrom, uint8_t trackTo)
 
 void stdMci_SetVolume(float vol)
 {
-    printf("Set vol %f\n", vol);
+    stdPlatform_Printf("stdMci: Set vol %f\n", vol);
     uint8_t volQuantized = (uint16_t)(vol * (double)MIX_MAX_VOLUME);
     Mix_VolumeMusic(volQuantized);
 }
 
 void stdMci_Stop()
 {
-    printf("stdMci: stop music\n");
+    stdPlatform_Printf("stdMci: stop music\n");
     
     if (stdMci_music) {
         Mix_HaltMusic();

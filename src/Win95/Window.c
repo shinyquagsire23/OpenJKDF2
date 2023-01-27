@@ -937,7 +937,7 @@ void Window_SdlUpdate()
                 if (jkQuakeConsole_bOpen) break; // Hijack all input to console
                 break;
             case SDL_QUIT:
-                printf("Quit!\n");
+                stdPlatform_Printf("Quit!\n");
                 exit(-1);
                 break;
             default:
@@ -1088,7 +1088,7 @@ void Window_RecreateSDL2Window()
 {
     if (Main_bHeadless) return;
 
-    printf("Recreating SDL2 Window!\n");
+    stdPlatform_Printf("Recreating SDL2 Window!\n");
     Window_needsRecreate = 0;
 
     if (displayWindow) {

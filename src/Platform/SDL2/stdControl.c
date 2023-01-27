@@ -305,7 +305,7 @@ void stdControl_InitSdlJoysticks()
     //v2 = 2;
 
     int numJoysticks = SDL_NumJoysticks();
-    printf ("SDL has %u joysticks.\n", numJoysticks);
+    stdPlatform_Printf ("SDL has %u joysticks.\n", numJoysticks);
     for (int i = 0; i < numJoysticks; i++) {
         if (i >= JK_NUM_JOYSTICKS) break;
 
@@ -316,7 +316,7 @@ void stdControl_InitSdlJoysticks()
         int numButtons = SDL_JoystickNumButtons(pJoysticks[i]);
         int numHats = SDL_JoystickNumHats(pJoysticks[i]);
 
-        printf("SDL Joystick %u: %s, %u axes %u buttons %u hats\n", i, SDL_JoystickNameForIndex(i), numAxes, numButtons, numHats);
+        stdPlatform_Printf("SDL Joystick %u: %s, %u axes %u buttons %u hats\n", i, SDL_JoystickNameForIndex(i), numAxes, numButtons, numHats);
         if (numButtons > JK_JOYSTICK_BUTTON_STRIDE + JK_JOYSTICK_EXT_BUTTON_STRIDE) {
             numButtons = JK_JOYSTICK_BUTTON_STRIDE + JK_JOYSTICK_EXT_BUTTON_STRIDE;
         }

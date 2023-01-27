@@ -3,6 +3,7 @@
 #include "Win95/stdComm.h"
 #include "Dss/sithMulti.h"
 #include "General/stdString.h"
+#include "stdPlatform.h"
 #include "jk.h"
 
 #ifdef MACOS
@@ -56,10 +57,10 @@
     #include <dlfcn.h>
 #endif
 
-#define sithDplayGNS_infoPrintf(fmt, ...) printf(fmt, ##__VA_ARGS__)
+#define sithDplayGNS_infoPrintf(fmt, ...) stdPlatform_Printf(fmt, ##__VA_ARGS__)
 #define sithDplayGNS_verbosePrintf(fmt, ...) if (Main_bVerboseNetworking) \
     { \
-        printf(fmt, ##__VA_ARGS__);  \
+        stdPlatform_Printf(fmt, ##__VA_ARGS__);  \
     } \
     ;
 
@@ -182,7 +183,7 @@ static void stdComm_GNS_LoadSymbols()
         HMODULE h = ::LoadLibraryA( pszModule );
         if ( h == NULL )
         {
-            printf("Failed to load %s.\n", pszModule );
+            stdPlatform_Printf("Failed to load %s.\n", pszModule );
             stdComm_GNS_bForceStubs = 1;
             
             return;
@@ -202,7 +203,7 @@ static void stdComm_GNS_LoadSymbols()
         void* h = dlopen(pszModule, RTLD_LAZY);
         if ( h == NULL )
         {
-            printf("Failed to dlopen %s.  %s\n", pszModule, dlerror() );
+            stdPlatform_Printf("Failed to dlopen %s.  %s\n", pszModule, dlerror() );
             stdComm_GNS_bForceStubs = 1;
             return;
         }
@@ -220,11 +221,11 @@ static void stdComm_GNS_LoadSymbols()
         || !g_GameNetworkingSockets_Kill || !g_SteamNetworkingSockets 
         || !g_SteamNetworkingIPAddr_ToString || !g_SteamNetworkingIPAddr_ParseString)
     {
-        printf("Failed to load %s, reverting to stubs.\n");
+        stdPlatform_Printf("Failed to load %s, reverting to stubs.\n");
         stdComm_GNS_bForceStubs = 1;
         return;
     }
-    printf("Loaded %s successfully.\n", pszModule);
+    stdPlatform_Printf("Loaded %s successfully.\n", pszModule);
 
     stdComm_GNS_bSymbolsLoaded = 1;
 }
@@ -587,7 +588,7 @@ private:
 
                 // Don't accept if we can't allocate an ID
                 if (ConnectedPlayers() >= 64) {
-                    printf("Rejecting request.\n");
+                    stdPlatform_Printf("Rejecting request.\n");
                     break;
                 }
 

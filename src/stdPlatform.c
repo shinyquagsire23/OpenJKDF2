@@ -2,6 +2,7 @@
 
 #include "Win95/std.h"
 #include "General/stdMemory.h"
+#include "Main/jkQuakeConsole.h"
 
 #ifdef PLATFORM_POSIX
 #include <stdlib.h>
@@ -200,9 +201,14 @@ int stdPrintf(void* a1, char *a2, int line, char *fmt, ...)
 
 int stdPlatform_Printf(const char *fmt, ...)
 {
+    char tmp[256];
     va_list args;
     va_start (args, fmt);
     int ret = vprintf(fmt, args);
+
+    vsnprintf(tmp, sizeof(tmp), fmt, args);
+    jkQuakeConsole_PrintLine(tmp);
+
     va_end (args);
     return ret;
 }

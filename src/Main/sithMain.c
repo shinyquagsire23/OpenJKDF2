@@ -39,6 +39,7 @@
 #include "World/jkPlayer.h"
 #include "Cog/sithCog.h"
 #include "Devices/sithComm.h"
+#include "stdPlatform.h"
 #include "jk.h"
 
 #ifdef FIXED_TIMESTEP_PHYS
@@ -231,7 +232,7 @@ int sithMain_Tick()
         for (int i = 0; i < sithWorld_pCurrentWorld->numKeyframesLoaded; i++) {
             rdKeyframe* keyframe = &sithWorld_pCurrentWorld->keyframes[i];
             if (keyframe->id != i) {
-                printf("BAD KEYFRAME!! %d -> %d\n", i, keyframe->id);
+                stdPlatform_Printf("BAD KEYFRAME!! %d -> %d\n", i, keyframe->id);
             }
         }
         

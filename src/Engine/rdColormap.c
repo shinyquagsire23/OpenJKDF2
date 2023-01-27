@@ -3,6 +3,7 @@
 #include "Engine/rdroid.h"
 #include "Platform/std3D.h"
 #include "Win95/std.h"
+#include "stdPlatform.h"
 
 static rdTexformat rdColormap_colorInfo = {1, 0x10, 5, 6, 5, 0x0B, 5, 0, 3, 2, 3, 0, 0, 0};
 
@@ -62,7 +63,7 @@ int rdColormap_LoadEntry(char *colormap_fname, rdColormap *colormap)
     colormap_fptr = rdroid_pHS->fileOpen(colormap_fname, "rb");
     if ( !colormap_fptr )
     {
-        printf("failed to open colormap `%s`!\n", colormap_fname);
+        stdPlatform_Printf("failed to open colormap `%s`!\n", colormap_fname);
         return 0;
     }
     v4 = stdFileFromPath(colormap_fname);

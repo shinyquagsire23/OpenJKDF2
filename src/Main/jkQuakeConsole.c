@@ -4,6 +4,7 @@
 #include "General/stdBitmap.h"
 #include "General/stdFont.h"
 #include "General/stdString.h"
+#include "General/stdLinklist.h"
 #include "Win95/stdDisplay.h"
 #include "Devices/sithConsole.h"
 #include "Win95/WinIdk.h"
@@ -28,6 +29,8 @@
 
 #define JKQUAKECONSOLE_NUM_LINES (1024)
 
+int jkQuakeConsole_bOnce = 0;
+
 int jkQuakeConsole_bInitted = 0;
 stdFont* jkQuakeConsole_pFont = NULL;
 
@@ -40,6 +43,8 @@ char jkQuakeConsole_chatStr[1024];
 uint32_t jkQuakeConsole_chatStrPos = 0;
 int32_t jkQuakeConsole_scrollPos = 0;
 uint32_t jkQuakeConsole_realLines = 0;
+uint32_t jkQuakeConsole_tabIdx = 0;
+int jkQuakeConsole_bHasTabbed = 0;
 
 char* jkQuakeConsole_aLines[JKQUAKECONSOLE_NUM_LINES];
 
@@ -59,7 +64,6 @@ void jkQuakeConsole_Startup()
         char theChar = i + jkQuakeConsole_pFont->charsetHead.charFirst;
         averageW += w;
         if (w > largestW && theChar != ' ' && theChar != '\t') {
-            printf("%x (%c) %x\n", i, theChar, w);
             largestW = w;
         }
     }
@@ -75,8 +79,12 @@ void jkQuakeConsole_Startup()
 
     jkQuakeConsole_ResetShade();
 
-    memset(jkQuakeConsole_aLines, 0, sizeof(jkQuakeConsole_aLines));
-
+    if (!jkQuakeConsole_bOnce)
+    {
+        memset(jkQuakeConsole_aLines, 0, sizeof(jkQuakeConsole_aLines));
+        jkQuakeConsole_bOnce = 1;
+    }
+    
     jkQuakeConsole_bOpen = 0;
     jkQuakeConsole_bInitted = 1;
 }
@@ -87,8 +95,8 @@ void jkQuakeConsole_Shutdown()
 
     jkQuakeConsole_ResetShade();
 
-    memset(jkQuakeConsole_aLines, 0, sizeof(jkQuakeConsole_aLines));
-    jkQuakeConsole_realLines = 0;
+    //memset(jkQuakeConsole_aLines, 0, sizeof(jkQuakeConsole_aLines));
+    //jkQuakeConsole_realLines = 0;
 
     jkQuakeConsole_bOpen = 0;
     jkQuakeConsole_bInitted = 0;
@@ -101,6 +109,8 @@ void jkQuakeConsole_ResetShade()
     jkQuakeConsole_blinkCounter = 0;
     jkQuakeConsole_chatStrPos = 0;
     jkQuakeConsole_scrollPos = 0;
+    jkQuakeConsole_tabIdx = 0;
+    jkQuakeConsole_bHasTabbed = 0;
     memset(jkQuakeConsole_chatStr, 0, sizeof(jkQuakeConsole_chatStr));
 }
 
@@ -210,6 +220,7 @@ void jkQuakeConsole_SendInput(char wParam)
         char tmp2[1024];
         stdString_snprintf(tmp2, sizeof(tmp2), "]%s", jkQuakeConsole_chatStr);
         jkQuakeConsole_PrintLine(tmp2);
+        jkQuakeConsole_tabIdx = 0;
 
         if ( jkQuakeConsole_chatStrPos )
         {
@@ -235,14 +246,77 @@ void jkQuakeConsole_SendInput(char wParam)
         {
             if ( jkQuakeConsole_chatStrPos )
                 jkQuakeConsole_chatStr[--jkQuakeConsole_chatStrPos] = 0;
+            jkQuakeConsole_tabIdx = 0;
+            jkQuakeConsole_bHasTabbed = 0;
         }
         else if ( wParam == VK_TAB )
         {
+            if (!jkDev_cheatHashtable) return;
+
+            if (jkQuakeConsole_bHasTabbed) {
+                jkQuakeConsole_chatStr[jkQuakeConsole_chatStrPos-1] = 0;
+            }
+
+            char tmp2[1024];
+            stdString_snprintf(tmp2, sizeof(tmp2), "]%s", jkQuakeConsole_chatStr);
+            
+            int shouldPrint = !jkQuakeConsole_bHasTabbed;
+            int bPrintOnce = jkQuakeConsole_bHasTabbed;
+            int idx = 0;
+
+            char* tabbedStr = NULL;
+            for (int i = 0; i < jkDev_cheatHashtable->numBuckets; i++)
+            {
+                stdLinklist* pIter = &jkDev_cheatHashtable->buckets[i];
+                while (pIter)
+                {
+                    if (pIter->key) {
+                        if (!strncmp(jkQuakeConsole_chatStr, pIter->key, strlen(jkQuakeConsole_chatStr))) {
+                            if (!bPrintOnce)
+                            {
+                                jkQuakeConsole_PrintLine(tmp2);
+                                bPrintOnce = 1;
+                            }
+
+                            if (idx == jkQuakeConsole_tabIdx) {
+                                // Keep track of where we were, so if backspace is pressed 
+                                // then it reverts the completion.
+                                if (!jkQuakeConsole_bHasTabbed) {
+                                    jkQuakeConsole_chatStrPos++;
+                                }
+
+                                tabbedStr = pIter->key;
+
+                                jkQuakeConsole_bHasTabbed = 1;
+                            }
+                            idx++;
+
+                            if (shouldPrint) {
+                                stdPlatform_Printf("  %s\n", pIter->key);
+                            }
+                        }
+                    }
+                    pIter = pIter->next;
+                }
+            }
+
+            if (tabbedStr) {
+                strcpy(jkQuakeConsole_chatStr, tabbedStr);
+            }
+
+            jkQuakeConsole_tabIdx++;
+            jkQuakeConsole_tabIdx %= idx;
             //if ( sithNet_isMulti )
             //    jkHud_dword_552D10 = (jkHud_dword_552D10 == -2) - 2;
         }
         else
         {
+            // User has chosen to continue the completion
+            if (jkQuakeConsole_bHasTabbed) {
+                jkQuakeConsole_chatStrPos = strlen(jkQuakeConsole_chatStr);
+            }
+            jkQuakeConsole_tabIdx = 0;
+            jkQuakeConsole_bHasTabbed = 0;
             if ( jkQuakeConsole_chatStrPos < 0x7F )
             {
                 jkQuakeConsole_chatStr[jkQuakeConsole_chatStrPos] = wParam;
@@ -307,7 +381,7 @@ void jkQuakeConsole_PrintLine(const char* pLine)
 {
     char* pLastLine = jkQuakeConsole_aLines[JKQUAKECONSOLE_NUM_LINES-1];
     if (pLastLine) {
-        std_pHS->free(pLastLine);
+        free(pLastLine);
     }
 
     for (int i = JKQUAKECONSOLE_NUM_LINES-1; i > 0; i--)
@@ -315,7 +389,7 @@ void jkQuakeConsole_PrintLine(const char* pLine)
         jkQuakeConsole_aLines[i] = jkQuakeConsole_aLines[i-1];
     }
 
-    char* pNewLine = std_pHS->alloc(strlen(pLine)+2);
+    char* pNewLine = malloc(strlen(pLine)+2);
     strcpy(pNewLine, pLine);
 
     jkQuakeConsole_aLines[0] = pNewLine;

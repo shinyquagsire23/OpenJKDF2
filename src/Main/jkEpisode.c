@@ -446,7 +446,7 @@ LABEL_67:
             // Added: GOG detection for soundtracks
             if (v19->cdNum > 1 && stdMci_bIsGOG) {
                 stdMci_bIsGOG = 0;
-                printf("jkEpisode_Load: Seeing CD number >1 (%u), assuming this is an OG disk install with offsetted tracks...\n", v19->cdNum);
+                stdPlatform_Printf("jkEpisode_Load: Seeing CD number >1 (%u), assuming this is an OG disk install with offsetted tracks...\n", v19->cdNum);
             }
 
             if ( _string_modify_idk(sType[0]) == 'L' )

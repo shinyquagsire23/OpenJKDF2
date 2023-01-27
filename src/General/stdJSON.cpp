@@ -14,6 +14,7 @@
 #include <locale> 
 #include <codecvt> 
 #include "jk.h"
+#include "stdPlatform.h"
 
 namespace fs = std::filesystem;
 
@@ -64,15 +65,15 @@ extern "C"
     ; \
 
 static inline void stdJSON_PrintNullWarning() {
-    printf("WARN: stdJSON was passed a NULL pFpath.\n");
+    stdPlatform_Printf("WARN: stdJSON was passed a NULL pFpath.\n");
 }
 
 static inline void stdJSON_PrintNullKeyWarning() {
-    printf("WARN: stdJSON was passed a NULL key.\n");
+    stdPlatform_Printf("WARN: stdJSON was passed a NULL key.\n");
 }
 
 static inline void stdJSON_PrintNullPtrWarning() {
-    printf("WARN: stdJSON was passed a NULL ptr value.\n");
+    stdPlatform_Printf("WARN: stdJSON was passed a NULL ptr value.\n");
 }
 
 static nlohmann::json stdJSON_OpenAndReadFile(const char* pFpath)
@@ -96,13 +97,13 @@ static int stdJSON_WriteToFile(const char* pFpath, nlohmann::json& json_file)
     std::ofstream o(json_path);
     if (!o)
     {
-        printf("ERROR: Failed to open `%s`!\n", pFpath);
+        stdPlatform_Printf("ERROR: Failed to open `%s`!\n", pFpath);
         return 0;
     }
     o << json_file.dump(4, ' ', true);
     if (!o)
     {
-        printf("ERROR: Failed to write `%s`!\n", pFpath);
+        stdPlatform_Printf("ERROR: Failed to write `%s`!\n", pFpath);
         return 0;
     }
     return 1;

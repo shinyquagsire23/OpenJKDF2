@@ -14,6 +14,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "stdPlatform.h"
+
 #ifdef LINUX
 #include "external/fcaseopen/fcaseopen.h"
 #endif
@@ -84,7 +86,7 @@ retry_file:
 	    if (fread(shader_contents, 1, len, f) != len)
 	    {
 	        char errtmp[256];
-	        snprintf(errtmp, 256, "Failed to read shader file `%s`!\n", filepath);
+	        snprintf(errtmp, 256, "std3D: Failed to read shader file `%s`!\n", filepath);
 	        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", errtmp, NULL);
 	        return -1;
 	    }
@@ -129,12 +131,12 @@ retry_file:
     if (!shader_contents)
     {
     	char errtmp[256];
-        snprintf(errtmp, 256, "Failed to load shader file `%s`!\n", filepath);
+        snprintf(errtmp, 256, "std3D: Failed to load shader file `%s`!\n", filepath);
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", errtmp, NULL);
         return -1;
     }
     
-    printf("Parse shader `%s`\n", filepath);
+    stdPlatform_Printf("std3D: Parse shader `%s`\n", filepath);
     
     GLuint ret = create_shader(shader_contents, type);
     free(shader_contents);

@@ -14,6 +14,7 @@
 #include "General/md5.h"
 #include "Engine/rdMaterial.h"
 #include "Platform/std3D.h"
+#include "stdPlatform.h"
 #include "jk.h"
 
 namespace fs = std::filesystem;
@@ -83,9 +84,9 @@ int compare_hashstr(uint8_t *p, const char* str){
 
 void print_hash(uint8_t *p){
     for(unsigned int i = 0; i < 16; ++i){
-        printf("%02x", p[i]);
+        stdPlatform_Printf("%02x", p[i]);
     }
-    printf("\n");
+    stdPlatform_Printf("\n");
 }
 
 bool loadPngImage(const char *name, int* outWidth, int* outHeight, int* outHasAlpha, GLubyte **outData, int flip_bgr) {
@@ -121,7 +122,7 @@ bool loadPngImage(const char *name, int* outWidth, int* outHeight, int* outHasAl
      * for image information.  REQUIRED. */
     info_ptr = png_create_info_struct(png_ptr);
     if (info_ptr == NULL) {
-        printf("Failed in png_create_info_struct\n");
+        stdPlatform_Printf("Failed in png_create_info_struct\n");
         fclose(fp);
         png_destroy_read_struct(&png_ptr, NULL, NULL);
         return false;
@@ -137,7 +138,7 @@ bool loadPngImage(const char *name, int* outWidth, int* outHeight, int* outHasAl
      * earlier.
      */
     if (setjmp(png_jmpbuf(png_ptr))) {
-        printf("Failed to read `%s`\n", name);
+        stdPlatform_Printf("Failed to read `%s`\n", name);
         /* Free all of the memory associated
          * with the png_ptr and info_ptr */
         png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
@@ -899,7 +900,7 @@ int jkgm_std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int 
 
     texture->skip_jkgm = 1;
 
-    printf("Cache miss, %s\n", cache_key.c_str());
+    stdPlatform_Printf("Cache miss, %s\n", cache_key.c_str());
 
     return 0;
 }

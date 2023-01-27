@@ -289,7 +289,7 @@ int jkGame_Update()
 #ifdef SDL2_RENDER
 void jkGame_Screenshot()
 {
-    printf("TODO: Implement screenshots\n");
+    stdPlatform_Printf("TODO: Implement screenshots\n");
 }
 #endif
 

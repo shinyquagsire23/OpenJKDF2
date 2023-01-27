@@ -240,7 +240,7 @@ int Main_Startup(const char *cmdline)
     Main_verboseLevel = 0;
     Main_bDevMode = 0;
     jkGuiSound_musicVolume = 1.0;
-    printf("%s\n", Main_path);
+    stdPlatform_Printf("%s\n", Main_path);
     Main_ParseCmdLine((char *)cmdline);
 
     if ( Main_logLevel == 1 )

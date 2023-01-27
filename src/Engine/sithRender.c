@@ -29,6 +29,7 @@
 #include "World/sithWorld.h"
 #include "World/sithExplosion.h"
 #include "Platform/std3D.h"
+#include "stdPlatform.h"
 
 #ifdef QOL_IMPROVEMENTS
 #if 0
@@ -434,7 +435,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
     rdTexinfo *v51; // [esp+64h] [ebp-1Ch]
 
     //if (sector->id == 92 || sector->id == 67 || sector->id == 66)
-    //    printf("OpenJKDF2: Render sector %u %x\n", sector->id, sithRender_lastRenderTick);
+    //    stdPlatform_Printf("OpenJKDF2: Render sector %u %x\n", sector->id, sithRender_lastRenderTick);
 
     if ( sector->field_8C == sithRender_lastRenderTick )
     {
@@ -528,7 +529,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
     {
         for (adjoinIter = sector->adjoins ; adjoinIter != NULL; adjoinIter = adjoinIter->next)
         {
-            printf("?? adjoin...%u->%u %x\n", sector->id, adjoinIter->sector->id, adjoinIter->sector->field_90);
+            stdPlatform_Printf("?? adjoin...%u->%u %x\n", sector->id, adjoinIter->sector->id, adjoinIter->sector->field_90);
         }
     }
 #endif
@@ -537,7 +538,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
     for (adjoinIter = sector->adjoins ; adjoinIter != NULL; adjoinIter = adjoinIter->next)
     {
         //if (sector->id == 66) // adjoinIter->sector->id == 92 || 
-        //    printf("adjoin...%u->%u %x\n", sector->id, adjoinIter->sector->id, adjoinIter->sector->field_90);
+        //    stdPlatform_Printf("adjoin...%u->%u %x\n", sector->id, adjoinIter->sector->id, adjoinIter->sector->field_90);
         
         if (adjoinIter->sector->field_90 )
         {
@@ -546,7 +547,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
 
         // Added
         if (++sithRender_adjoinSafeguard >= 0x100000) {
-            printf("Hit safeguard...\n");
+            stdPlatform_Printf("Hit safeguard...\n");
             break;
         }
 

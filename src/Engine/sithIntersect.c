@@ -608,7 +608,7 @@ int sithIntersect_sub_508D20(const rdVector3 *pStartPos, const rdVector3 *pRayDi
     if (!pPushVelOut)
         pPushVelOut = &outSafe;
     //if (result)
-    //    printf("%x: %f %f %f, %f %f %f, %f %f %f\n", result, pStartPos->x, pStartPos->y, pStartPos->z, pRayDirection->x, pRayDirection->y, pRayDirection->z, pPushVelOut->x, pPushVelOut->y, pPushVelOut->z);
+    //    stdPlatform_Printf("%x: %f %f %f, %f %f %f, %f %f %f\n", result, pStartPos->x, pStartPos->y, pStartPos->z, pRayDirection->x, pRayDirection->y, pRayDirection->z, pPushVelOut->x, pPushVelOut->y, pPushVelOut->z);
     //rdVector_Scale3Acc(pPushVelOut, 0.05);
     return result;
 }

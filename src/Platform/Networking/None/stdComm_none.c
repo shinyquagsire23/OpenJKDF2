@@ -3,6 +3,7 @@
 #include "Win95/stdComm.h"
 #include "Dss/sithMulti.h"
 #include "General/stdString.h"
+#include "stdPlatform.h"
 #include "jk.h"
 
 void Hack_ResetClients()

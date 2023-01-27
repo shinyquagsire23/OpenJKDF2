@@ -8,6 +8,7 @@
 #include "Main/jkGame.h"
 #include "World/jkPlayer.h"
 #include "General/stdBitmap.h"
+#include "stdPlatform.h"
 
 #include "jk.h"
 
@@ -219,7 +220,7 @@ void std3D_generateIntermediateFbo(int32_t width, int32_t height, std3DIntermedi
     // Bind it to our framebuffer fb
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, pFbo->rbo);
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        printf("ERROR: Framebuffer is incomplete!\n");
+        stdPlatform_Printf("std3D: ERROR, Framebuffer is incomplete!\n");
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -304,7 +305,7 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     // Bind it to our framebuffer fb
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, pFb->rbo);
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        printf("ERROR: Framebuffer is incomplete!\n");
+        stdPlatform_Printf("std3D: ERROR, Framebuffer is incomplete!\n");
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     if (jkPlayer_enableSSAO)
@@ -423,7 +424,7 @@ GLint std3D_tryFindAttribute(GLuint program, const char* attribute_name)
 {
     GLint out = glGetAttribLocation(program, attribute_name);
     if (out == -1) {
-        printf("Could not bind attribute %s!\n", attribute_name);
+        stdPlatform_Printf("std3D: Could not bind attribute %s!\n", attribute_name);
     }
     return out;
 }
@@ -432,7 +433,7 @@ GLint std3D_tryFindUniform(GLuint program, const char* uniform_name)
 {
     GLint out = glGetUniformLocation(program, uniform_name);
     if (out == -1) {
-        printf("Could not bind uniform %s!\n", uniform_name);
+        stdPlatform_Printf("std3D: Could not bind uniform %s!\n", uniform_name);
     }
     return out;
 }
@@ -460,7 +461,7 @@ bool std3D_loadSimpleTexProgram(const char* fpath_base, std3DSimpleTexStage* pOu
 
 int init_resources()
 {
-    printf("OpenGL init...\n");
+    stdPlatform_Printf("std3D: OpenGL init...\n");
 
     memset(std3D_aUITextures, 0, sizeof(std3D_aUITextures));
 
@@ -716,7 +717,7 @@ int std3D_StartScene()
     if (!has_initted)
     {
         if (!init_resources()) {
-            printf("Failed to init resources, exiting...");
+            stdPlatform_Printf("std3D: Failed to init resources, exiting...");
             SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed to init resources, exiting...", NULL);
             exit(-1);
         }
@@ -2013,17 +2014,17 @@ void std3D_DrawUIRenderList()
         
         
         /*int vert = tris[j].v1;
-        printf("%u: %f %f %f, %f %f %f, %f %f\n", vert, vertexes[vert].x, vertexes[vert].y, vertexes[vert].z,
+        stdPlatform_Printf("%u: %f %f %f, %f %f %f, %f %f\n", vert, vertexes[vert].x, vertexes[vert].y, vertexes[vert].z,
                                       vertexes[vert].nx, vertexes[vert].ny, vertexes[vert].nz,
                                       vertexes[vert].tu, vertexes[vert].tv);
         
         vert = tris[j].v2;
-        printf("%u: %f %f %f, %f %f %f, %f %f\n", vert, vertexes[vert].x, vertexes[vert].y, vertexes[vert].z,
+        stdPlatform_Printf("%u: %f %f %f, %f %f %f, %f %f\n", vert, vertexes[vert].x, vertexes[vert].y, vertexes[vert].z,
                                       vertexes[vert].nx, vertexes[vert].ny, vertexes[vert].nz,
                                       vertexes[vert].tu, vertexes[vert].tv);
         
         vert = tris[j].v3;
-        printf("%u: %f %f %f, %f %f %f, %f %f\n", vert, vertexes[vert].x, vertexes[vert].y, vertexes[vert].z,
+        stdPlatform_Printf("%u: %f %f %f, %f %f %f, %f %f\n", vert, vertexes[vert].x, vertexes[vert].y, vertexes[vert].z,
                                       vertexes[vert].nx, vertexes[vert].ny, vertexes[vert].nz,
                                       vertexes[vert].tu, vertexes[vert].tv);*/
     }
@@ -2384,7 +2385,7 @@ void std3D_DoTex(rdDDrawSurface* tex, rdTri* tri, int tris_left)
         glBindTexture(GL_TEXTURE_2D, displace_tex_id);
     }
     //if (tex->emissive_factor[0] != 0.0 || tex->emissive_factor[1] != 0.0 || tex->emissive_factor[2] != 0.0)
-    //    printf("%f %f %f\n", tex->emissive_factor[0], tex->emissive_factor[1], tex->emissive_factor[2]);
+    //    stdPlatform_Printf("%f %f %f\n", tex->emissive_factor[0], tex->emissive_factor[1], tex->emissive_factor[2]);
     glUniform3f(uniform_emissiveFactor, tex->emissive_factor[0], tex->emissive_factor[1], tex->emissive_factor[2]);
     glUniform4f(uniform_albedoFactor, tex->albedo_factor[0], tex->albedo_factor[1], tex->albedo_factor[2], tex->albedo_factor[3]);
     if (tex->displacement_factor) {
@@ -2534,10 +2535,10 @@ void std3D_DrawRenderList()
     //if (rdroid_curColorEffects.tint.x || rdroid_curColorEffects.tint.y || rdroid_curColorEffects.tint.z)
     if (rdroid_curColorEffects.add.x || rdroid_curColorEffects.add.y || rdroid_curColorEffects.add.z)
     {
-        printf("a %f %f %f ", rdroid_curColorEffects.tint.x, rdroid_curColorEffects.tint.y, rdroid_curColorEffects.tint.z);
-        printf("%d %d %d ", rdroid_curColorEffects.filter.x, rdroid_curColorEffects.filter.y, rdroid_curColorEffects.filter.z);
-        printf("%d %d %d ", rdroid_curColorEffects.add.x, rdroid_curColorEffects.add.y, rdroid_curColorEffects.add.z);
-        printf("%f\n", rdroid_curColorEffects.fade);
+        stdPlatform_Printf("a %f %f %f ", rdroid_curColorEffects.tint.x, rdroid_curColorEffects.tint.y, rdroid_curColorEffects.tint.z);
+        stdPlatform_Printf("%d %d %d ", rdroid_curColorEffects.filter.x, rdroid_curColorEffects.filter.y, rdroid_curColorEffects.filter.z);
+        stdPlatform_Printf("%d %d %d ", rdroid_curColorEffects.add.x, rdroid_curColorEffects.add.y, rdroid_curColorEffects.add.z);
+        stdPlatform_Printf("%f\n", rdroid_curColorEffects.fade);
     }
 #endif
 
@@ -2710,17 +2711,17 @@ void std3D_DrawRenderList()
         
         
         /*int vert = tris[j].v1;
-        printf("%u: %f %f %f, %f %f %f, %f %f\n", vert, vertexes[vert].x, vertexes[vert].y, vertexes[vert].z,
+        stdPlatform_Printf("%u: %f %f %f, %f %f %f, %f %f\n", vert, vertexes[vert].x, vertexes[vert].y, vertexes[vert].z,
                                       vertexes[vert].nx, vertexes[vert].ny, vertexes[vert].nz,
                                       vertexes[vert].tu, vertexes[vert].tv);
         
         vert = tris[j].v2;
-        printf("%u: %f %f %f, %f %f %f, %f %f\n", vert, vertexes[vert].x, vertexes[vert].y, vertexes[vert].z,
+        stdPlatform_Printf("%u: %f %f %f, %f %f %f, %f %f\n", vert, vertexes[vert].x, vertexes[vert].y, vertexes[vert].z,
                                       vertexes[vert].nx, vertexes[vert].ny, vertexes[vert].nz,
                                       vertexes[vert].tu, vertexes[vert].tv);
         
         vert = tris[j].v3;
-        printf("%u: %f %f %f, %f %f %f, %f %f\n", vert, vertexes[vert].x, vertexes[vert].y, vertexes[vert].z,
+        stdPlatform_Printf("%u: %f %f %f, %f %f %f, %f %f\n", vert, vertexes[vert].x, vertexes[vert].y, vertexes[vert].z,
                                       vertexes[vert].nx, vertexes[vert].ny, vertexes[vert].nz,
                                       vertexes[vert].tu, vertexes[vert].tv);*/
     }
@@ -2859,7 +2860,7 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
     if (texture->texture_loaded) return 1;
 
     if (std3D_loadedTexturesAmt >= STD3D_MAX_TEXTURES) {
-        printf("ERROR: Texture cache exhausted!! Ask ShinyQuagsire to increase the size.\n");
+        stdPlatform_Printf("ERROR: Texture cache exhausted!! Ask ShinyQuagsire to increase the size.\n");
         return 1;
     }
     //printf("Add to texture cache\n");
@@ -3068,7 +3069,7 @@ int std3D_AddBitmapToTextureCache(stdBitmap *texture, int mipIdx, int is_alpha_t
 
     int cacheIdx = std3D_GetBitmapCacheIdx();
     if (cacheIdx < 0) {
-        printf("ERROR: Texture cache exhausted!! Ask ShinyQuagsire to increase the size.\n");
+        stdPlatform_Printf("ERROR: Texture cache exhausted!! Ask ShinyQuagsire to increase the size.\n");
         return 1;
     }
     //printf("Add to texture cache\n");
@@ -3222,7 +3223,7 @@ int std3D_AddBitmapToTextureCache(stdBitmap *texture, int mipIdx, int is_alpha_t
 #endif
                 }
                 else {
-                    printf("wtf is this %u %u %u %u\n", vbuf->format.format.unk_40, vbuf->format.format.r_bits, vbuf->format.format.g_bits, vbuf->format.format.b_bits);
+                    stdPlatform_Printf("wtf is this %u %u %u %u\n", vbuf->format.format.unk_40, vbuf->format.format.r_bits, vbuf->format.format.g_bits, vbuf->format.format.b_bits);
                 }
                     
                 ((uint32_t*)image_data)[tex_index] = val_rgba;
@@ -3273,7 +3274,7 @@ int std3D_AddBitmapToTextureCache(stdBitmap *texture, int mipIdx, int is_alpha_t
                         val_rgba |= (color->g << 8);
                         val_rgba |= (color->b << 0);
                         val_rgba |= (0xFF << 24);
-                        printf("%x %x\n", val_rgba, val);
+                        stdPlatform_Printf("%x %x\n", val_rgba, val);
                     }
                     else {
                         val_rgba = 0xFFFFFFFF; // HACK
