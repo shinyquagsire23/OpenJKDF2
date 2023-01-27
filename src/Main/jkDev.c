@@ -472,16 +472,17 @@ int jkDev_TryCommand(const char *cmd)
     char *v1; // eax
     stdDebugConsoleCmd *pFoundCmd; // esi
     char *v5; // eax
-    char key[32]; // [esp+4h] [ebp-A0h] BYREF
+    char key[128]; // Added: increased len 32->128
     char SrcStr[128]; // [esp+24h] [ebp-80h] BYREF
 
-    _strncpy(SrcStr, cmd, 0x7Fu);
+    _strncpy(SrcStr, cmd, 0x80);
     SrcStr[127] = 0;
     _strtolower(SrcStr);
     v1 = _strtok(SrcStr, ", \t\n\r");
     if ( !v1 )
         return 0;
-    _strncpy(key, v1, 0x1Fu);
+    _strncpy(key, v1, 128);
+    key[127] = 0;
     jkDev_Decrypt(key);
     pFoundCmd = (stdDebugConsoleCmd *)stdHashTable_GetKeyVal(jkDev_cheatHashtable, key);
     if ( !pFoundCmd )

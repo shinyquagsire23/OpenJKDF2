@@ -28,6 +28,7 @@
 #include "../jk.h"
 
 #define JKQUAKECONSOLE_NUM_LINES (1024)
+#define JKQUAKECONSOLE_CHAT_LEN (256)
 
 int jkQuakeConsole_bOnce = 0;
 
@@ -39,7 +40,7 @@ uint64_t jkQuakeConsole_lastTimeUs = 0;
 uint64_t jkQuakeConsole_blinkCounter = 0;
 float jkQuakeConsole_shadeY = 0.0;
 
-char jkQuakeConsole_chatStr[1024];
+char jkQuakeConsole_chatStr[JKQUAKECONSOLE_CHAT_LEN];
 uint32_t jkQuakeConsole_chatStrPos = 0;
 int32_t jkQuakeConsole_scrollPos = 0;
 uint32_t jkQuakeConsole_realLines = 0;
@@ -176,7 +177,7 @@ void jkQuakeConsole_Render()
     jkQuakeConsole_blinkCounter %= (1000*1000);
     int isBlink = jkQuakeConsole_blinkCounter > ((1000*1000)/2);
     
-    char tmpBlink[1024];
+    char tmpBlink[JKQUAKECONSOLE_CHAT_LEN*2];
     stdString_snprintf(tmpBlink, sizeof(tmpBlink), "]%s%c", jkQuakeConsole_chatStr, isBlink ? ' ' : '_');
 
     //stdFont_DrawAsciiGPU(jkQuakeConsole_pFont, 0, realShadeY, 640, tmpBlink, 1, jkPlayer_hudScale);
@@ -217,7 +218,7 @@ void jkQuakeConsole_SendInput(char wParam)
 
     if ( wParam == VK_RETURN )
     {
-        char tmp2[1024];
+        char tmp2[JKQUAKECONSOLE_CHAT_LEN*2];
         stdString_snprintf(tmp2, sizeof(tmp2), "]%s", jkQuakeConsole_chatStr);
         jkQuakeConsole_PrintLine(tmp2);
         jkQuakeConsole_tabIdx = 0;
@@ -254,10 +255,15 @@ void jkQuakeConsole_SendInput(char wParam)
             if (!jkDev_cheatHashtable) return;
 
             if (jkQuakeConsole_bHasTabbed) {
-                jkQuakeConsole_chatStr[jkQuakeConsole_chatStrPos-1] = 0;
+                if (jkQuakeConsole_chatStrPos) {
+                    jkQuakeConsole_chatStr[jkQuakeConsole_chatStrPos-1] = 0;
+                }
+                else {
+                    jkQuakeConsole_chatStr[0] = 0;
+                }
             }
 
-            char tmp2[1024];
+            char tmp2[JKQUAKECONSOLE_CHAT_LEN*2];
             stdString_snprintf(tmp2, sizeof(tmp2), "]%s", jkQuakeConsole_chatStr);
             
             int shouldPrint = !jkQuakeConsole_bHasTabbed;
@@ -301,7 +307,7 @@ void jkQuakeConsole_SendInput(char wParam)
             }
 
             if (tabbedStr) {
-                strcpy(jkQuakeConsole_chatStr, tabbedStr);
+                strncpy(jkQuakeConsole_chatStr, tabbedStr, JKQUAKECONSOLE_CHAT_LEN-1);
             }
 
             jkQuakeConsole_tabIdx++;
@@ -314,10 +320,13 @@ void jkQuakeConsole_SendInput(char wParam)
             // User has chosen to continue the completion
             if (jkQuakeConsole_bHasTabbed) {
                 jkQuakeConsole_chatStrPos = strlen(jkQuakeConsole_chatStr);
+                if (jkQuakeConsole_chatStrPos > JKQUAKECONSOLE_CHAT_LEN-1) {
+                    jkQuakeConsole_chatStrPos = JKQUAKECONSOLE_CHAT_LEN-1;
+                }
             }
             jkQuakeConsole_tabIdx = 0;
             jkQuakeConsole_bHasTabbed = 0;
-            if ( jkQuakeConsole_chatStrPos < 0x7F )
+            if ( jkQuakeConsole_chatStrPos < JKQUAKECONSOLE_CHAT_LEN-2 )
             {
                 jkQuakeConsole_chatStr[jkQuakeConsole_chatStrPos] = wParam;
                 jkQuakeConsole_chatStr[jkQuakeConsole_chatStrPos + 1] = 0;
@@ -326,15 +335,15 @@ void jkQuakeConsole_SendInput(char wParam)
         }
         if ( jkHud_dword_552D10 == -2 )
         {
-            stdString_SafeWStrCopy(tmp, jkStrings_GetText("HUD_COMMAND"), 0x80u);
+            //stdString_SafeWStrCopy(tmp, jkStrings_GetText("HUD_COMMAND"), 0x80u);
         }
         else if ( jkHud_dword_552D10 == -1 )
         {
-            stdString_SafeWStrCopy(tmp, jkStrings_GetText("HUD_SENDTOALL"), 0x80u);
+            //stdString_SafeWStrCopy(tmp, jkStrings_GetText("HUD_SENDTOALL"), 0x80u);
         }
-        int v2 = _wcslen(tmp);
-        stdString_CharToWchar(&tmp[v2], jkQuakeConsole_chatStr, 127 - v2);
-        tmp[127] = 0;
+        //int v2 = _wcslen(tmp);
+        //stdString_CharToWchar(&tmp[v2], jkQuakeConsole_chatStr, 127 - v2);
+        //tmp[127] = 0;
         //jkDev_sub_41FB80(103, tmp);
     }
 }
@@ -379,6 +388,8 @@ int jkQuakeConsole_WmHandler(HWND a1, UINT msg, WPARAM wParam, HWND a4, LRESULT 
 
 void jkQuakeConsole_PrintLine(const char* pLine)
 {
+    if (!pLine) return;
+
     char* pLastLine = jkQuakeConsole_aLines[JKQUAKECONSOLE_NUM_LINES-1];
     if (pLastLine) {
         free(pLastLine);
