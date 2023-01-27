@@ -13,6 +13,7 @@
 #include "Gameplay/sithEvent.h"
 #include "Engine/sithAdjoin.h"
 #include "Devices/sithComm.h"
+#include "World/jkPlayer.h"
 
 #include "jk.h"
 
@@ -685,7 +686,24 @@ void sithDSS_SendSyncCameras(int sendto_id, int mpFlags)
             NETMSG_PUSHS32(-1);
         }
 
-        NETMSG_PUSHF32(sithCamera_cameras[i].fov);
+        if (Main_bMotsCompat) {
+#ifndef QOL_IMPROVEMENTS
+            if (!sithCamera_cameras[i].rdCam.canvas || !sithCamera_cameras[i].bZoomed) {
+                NETMSG_PUSHF32(sithCamera_cameras[i].rdCam.fov); //fVar1 = (ADJ(ppsVar5)->rdCam).fov;
+            }
+            else {
+                NETMSG_PUSHF32(sithCamera_cameras[i].zoomFov);
+                //fVar1 = ADJ(ppsVar5)->zoomFov;
+            }
+#else
+            NETMSG_PUSHF32(sithCamera_cameras[i].fov);
+#endif
+            
+        }
+        else {
+            NETMSG_PUSHF32(sithCamera_cameras[i].fov);
+        }
+        
     }
 
     NETMSG_PUSHU16(sithPlayer_pLocalPlayer->palEffectsIdx1);
@@ -696,6 +714,7 @@ void sithDSS_SendSyncCameras(int sendto_id, int mpFlags)
     sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendto_id, mpFlags, 1);
 }
 
+// MOTS altered
 int sithDSS_ProcessSyncCameras(sithCogMsg *msg)
 {
     NETMSG_IN_START(msg);
@@ -720,6 +739,29 @@ int sithDSS_ProcessSyncCameras(sithCogMsg *msg)
         if (!sithCamera_cameras[i].secondaryFocus && secondaryIdx != -1) return 0;
 
         sithCamera_cameras[i].fov = NETMSG_POPF32();
+
+        // MOTS added
+        if (Main_bMotsCompat) {
+#ifndef QOL_IMPROVEMENTS
+            if ((sithCamera_cameras[i].fov < 5.0) || (179.0 < sithCamera_cameras[i].fov)) {
+                sithCamera_cameras[i].fov = 90.0;
+            }
+#else
+            if ((sithCamera_cameras[i].fov < 5.0) || (179.0 < sithCamera_cameras[i].fov)) {
+                sithCamera_cameras[i].fov = jkPlayer_fov;
+            }
+#endif
+
+            rdCamera_SetFOV(&sithCamera_cameras[i].rdCam, sithCamera_cameras[i].fov);
+            sithCamera_cameras[i].bZoomed = 0;
+            sithCamera_cameras[i].zoomFov = sithCamera_cameras[i].fov;
+#ifdef QOL_IMPROVEMENTS
+            sithCamera_cameras[i].zoomFov = 1.0;
+            sithCamera_cameras[i].zoomScale = 1.0;
+            sithCamera_cameras[i].invZoomScale = 1.0;
+            sithCamera_cameras[i].zoomScaleOrig = 1.0;
+#endif
+        }
     }
 
     sithPlayer_pLocalPlayer->palEffectsIdx1 = NETMSG_POPU16();
