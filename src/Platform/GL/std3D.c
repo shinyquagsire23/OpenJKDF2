@@ -1575,7 +1575,6 @@ void std3D_DrawUIBitmapRGBA(stdBitmap* pBmp, int mipIdx, float dstX, float dstY,
 
     if (!pBmp) return;
     if (!pBmp->abLoadedToGPU[mipIdx]) {
-        printf("asdf\n");
         std3D_AddBitmapToTextureCache(pBmp, mipIdx, !(pBmp->palFmt & 1), 0);
     }
 
