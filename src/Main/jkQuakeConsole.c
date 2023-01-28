@@ -130,6 +130,9 @@ void jkQuakeConsole_Render()
 
     int64_t deltaUs = Linux_TimeUs() - jkQuakeConsole_lastTimeUs;
     jkQuakeConsole_lastTimeUs = Linux_TimeUs();
+    if (deltaUs < 0) {
+        deltaUs = 0;
+    }
 
     float screenW = Video_menuBuffer.format.width;
     float screenH = Video_menuBuffer.format.height;
@@ -151,18 +154,25 @@ void jkQuakeConsole_Render()
         }
     }
 
-    jkQuakeConsole_scrollPos += Window_mouseWheelY;
-    if (jkQuakeConsole_scrollPos < 0) {
+    if (jkQuakeConsole_bOpen)
+    {
+        jkQuakeConsole_scrollPos += Window_mouseWheelY;
+        if (jkQuakeConsole_scrollPos < 0) {
+            jkQuakeConsole_scrollPos = 0;
+        }
+        if (jkQuakeConsole_realLines < maxVisibleLines) {
+            jkQuakeConsole_scrollPos = 0;
+        }
+        if (jkQuakeConsole_scrollPos > jkQuakeConsole_realLines - maxVisibleLines) {
+            jkQuakeConsole_scrollPos = jkQuakeConsole_realLines - maxVisibleLines;
+        }
+        Window_mouseWheelX = 0;
+        Window_mouseWheelY = 0;
+    }
+    else {
         jkQuakeConsole_scrollPos = 0;
     }
-    if (jkQuakeConsole_realLines < maxVisibleLines) {
-        jkQuakeConsole_scrollPos = 0;
-    }
-    if (jkQuakeConsole_scrollPos > jkQuakeConsole_realLines - maxVisibleLines) {
-        jkQuakeConsole_scrollPos = jkQuakeConsole_realLines - maxVisibleLines;
-    }
-    Window_mouseWheelX = 0;
-    Window_mouseWheelY = 0;
+    
     int realScrollY = jkQuakeConsole_scrollPos;
 
     float realShadeY = -(screenH / 2) + jkQuakeConsole_shadeY;

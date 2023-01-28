@@ -6,17 +6,7 @@
 
 typedef struct stdBitmap
 {
-    int field_0;
-    int field_4;
-    int field_8;
-    int field_C;
-    int field_10;
-    int field_14;
-    int field_18;
-    uint8_t field_1C;
-    uint8_t field_1D;
-    uint8_t field_1E;
-    uint8_t field_1F;
+    char fpath[32];
     int field_20;
     int palFmt;
     rdTexformat format;

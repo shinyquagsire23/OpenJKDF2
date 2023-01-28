@@ -179,6 +179,8 @@ GLuint menu_ibo_triangle;
 
 extern int jkGuiBuildMulti_bRendering;
 
+int std3D_bInitted = 0;
+rdColormap std3D_ui_colormap;
 
 
 void std3D_generateIntermediateFbo(int32_t width, int32_t height, std3DIntermediateFbo* pFbo, int isFloat)
@@ -647,12 +649,25 @@ int init_resources()
 
 int std3D_Startup()
 {
+    if (std3D_bInitted) {
+        return 1;
+    }
+
+    memset(&std3D_ui_colormap, 0, sizeof(std3D_ui_colormap));
+    rdColormap_LoadEntry("misc\\cmp\\UIColormap.cmp", &std3D_ui_colormap);
+
+    std3D_bInitted = 1;
     return 1;
 }
 
 void std3D_Shutdown()
 {
+    if (!std3D_bInitted) {
+        return;
+    }
 
+    rdColormap_FreeEntry(&std3D_ui_colormap);
+    std3D_bInitted = 0;
 }
 
 void std3D_FreeResources()
@@ -1560,6 +1575,7 @@ void std3D_DrawUIBitmapRGBA(stdBitmap* pBmp, int mipIdx, float dstX, float dstY,
 
     if (!pBmp) return;
     if (!pBmp->abLoadedToGPU[mipIdx]) {
+        printf("asdf\n");
         std3D_AddBitmapToTextureCache(pBmp, mipIdx, !(pBmp->palFmt & 1), 0);
     }
 
@@ -3245,6 +3261,17 @@ int std3D_AddBitmapToTextureCache(stdBitmap *texture, int mipIdx, int is_alpha_t
 
         void* image_data = malloc(tex_width*tex_height*4);
         memset(image_data, 0, tex_width*tex_height*4);
+
+        void* palette_data = texture->palette;//displaypal_data;
+
+        if (!palette_data) 
+        {
+            palette_data = std3D_ui_colormap.colors;//jkGui_stdBitmaps[2]->palette;
+            pal = palette_data;
+        }
+        else {
+            pal = texture->palette;
+        }
     
         for (int j = 0; j < height; j++)
         {
@@ -3280,12 +3307,6 @@ int std3D_AddBitmapToTextureCache(stdBitmap *texture, int mipIdx, int is_alpha_t
                         val_rgba = 0xFFFFFFFF; // HACK
                     }
 #endif
-
-                    void* palette_data = texture->palette;//displaypal_data;
-
-                    if (!palette_data && jkGui_stdBitmaps[0]) {
-                        palette_data = jkGui_stdBitmaps[0]->palette;
-                    }
 
                     if (palette_data)
                     {

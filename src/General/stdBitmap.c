@@ -22,8 +22,8 @@ stdBitmap* stdBitmap_Load(char *fpath, int bCreateDDrawSurface, int gpuMem)
         if ( fp )
         {
             v7 = stdFileFromPath(fpath);
-            _strncpy((char *)outAlloc, v7, 0x1Fu);
-            outAlloc->field_1F = 0;
+            _strncpy((char *)outAlloc->fpath, v7, 0x1Fu);
+            outAlloc->fpath[31] = 0;
             v6 = stdBitmap_LoadEntryFromFile(fp, outAlloc, bCreateDDrawSurface, gpuMem);
             std_pHS->fileClose(fp);
         }
@@ -91,8 +91,8 @@ int stdBitmap_LoadEntry(char *fpath, stdBitmap *out, int bCreateDDrawSurface, in
     if ( fd )
     {
         v6 = stdFileFromPath(fpath);
-        _strncpy((char *)out, v6, 0x1Fu);
-        out->field_1F = 0;
+        _strncpy((char *)out->fpath, v6, 0x1Fu);
+        out->fpath[31] = 0;
         v7 = stdBitmap_LoadEntryFromFile(fd, out, bCreateDDrawSurface, gpuMem);
         std_pHS->fileClose(fd);
         return v7;

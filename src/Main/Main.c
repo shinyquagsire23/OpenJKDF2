@@ -351,6 +351,7 @@ int Main_Startup(const char *cmdline)
         jkCredits_Startup("ui\\credits.uni");
         jkSmack_Startup();
 
+        std3D_Startup(); // Added
         jkQuakeConsole_Startup(); // Added
 
         if (jkRes_LoadCD(0))
@@ -380,6 +381,7 @@ int Main_Startup(const char *cmdline)
 
 void Main_Shutdown()
 {
+    std3D_Shutdown(); // Added
     jkQuakeConsole_Shutdown();
 
     jkSmack_Shutdown();

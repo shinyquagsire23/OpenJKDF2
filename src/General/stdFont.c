@@ -124,8 +124,8 @@ LABEL_21:
     fontAlloc_->bitmap = bitmap;
     if ( bitmap )
     {
-        _strncpy((char *)bitmap, "FONTSTRIP", 0x1Fu);
-        fontAlloc_->bitmap->field_1F = 0;
+        _strncpy((char *)bitmap->fpath, "FONTSTRIP", 0x1Fu);
+        fontAlloc_->bitmap->fpath[31] = 0;
         std_pHS->fileClose(fd);
         result = fontAlloc_;
     }
