@@ -30,6 +30,7 @@
 #define JKQUAKECONSOLE_COMMAND_HISTORY_DEPTH (64)
 #define JKQUAKECONSOLE_NUM_LINES (1024)
 #define JKQUAKECONSOLE_CHAT_LEN (256)
+#define JKQUAKECONSOLE_SORTED_LIMIT (256)
 
 int jkQuakeConsole_bOnce = 0;
 
@@ -55,7 +56,17 @@ int jkQuakeConsole_selectedHistory = 0;
 char* jkQuakeConsole_aLines[JKQUAKECONSOLE_NUM_LINES];
 char* jkQuakeConsole_aLastCommands[JKQUAKECONSOLE_COMMAND_HISTORY_DEPTH];
 
+int jkQuakeConsole_sortTmpIdx = 0;
+char* jkQuakeConsole_aSortTmp[JKQUAKECONSOLE_SORTED_LIMIT];
+
 void jkQuakeConsole_ResetShade();
+
+static int jkQuakeConsole_cmpstr(const void* a, const void* b) 
+{
+    const char* aa = *(const char**)a;
+    const char* bb = *(const char**)b;
+    return strcmp(aa, bb);
+}
 
 void jkQuakeConsole_Startup()
 {
@@ -226,6 +237,29 @@ void jkQuakeConsole_Render()
     }
 }
 
+int jkQuakeConsole_AutocompleteCheats()
+{
+    int bPrintOnce = 0;
+    for (int i = 0; i < jkDev_cheatHashtable->numBuckets; i++)
+    {
+        stdLinklist* pIter = &jkDev_cheatHashtable->buckets[i];
+        while (pIter)
+        {
+            if (pIter->key) {
+                if (!strncmp(jkQuakeConsole_chatStr, pIter->key, strlen(jkQuakeConsole_chatStr))) {
+                    bPrintOnce = 1;
+
+                    if (jkQuakeConsole_sortTmpIdx < JKQUAKECONSOLE_SORTED_LIMIT) {
+                        jkQuakeConsole_aSortTmp[jkQuakeConsole_sortTmpIdx++] = pIter->key;
+                    }
+                }
+            }
+            pIter = pIter->next;
+        }
+    }
+    return bPrintOnce;
+}
+
 void jkQuakeConsole_SendInput(char wParam)
 {
     wchar_t tmp[256]; // [esp+4h] [ebp-100h] BYREF
@@ -327,42 +361,32 @@ void jkQuakeConsole_SendInput(char wParam)
             stdString_snprintf(tmp2, sizeof(tmp2), "]%s", jkQuakeConsole_chatStr);
             
             int shouldPrint = !jkQuakeConsole_bHasTabbed;
-            int bPrintOnce = jkQuakeConsole_bHasTabbed;
-            int idx = 0;
-
+            int bPrintOnce = 0;
             char* tabbedStr = NULL;
-            for (int i = 0; i < jkDev_cheatHashtable->numBuckets; i++)
-            {
-                stdLinklist* pIter = &jkDev_cheatHashtable->buckets[i];
-                while (pIter)
-                {
-                    if (pIter->key) {
-                        if (!strncmp(jkQuakeConsole_chatStr, pIter->key, strlen(jkQuakeConsole_chatStr))) {
-                            if (!bPrintOnce)
-                            {
-                                jkQuakeConsole_PrintLine(tmp2);
-                                bPrintOnce = 1;
-                            }
 
-                            if (idx == jkQuakeConsole_tabIdx) {
-                                // Keep track of where we were, so if backspace is pressed 
-                                // then it reverts the completion.
-                                if (!jkQuakeConsole_bHasTabbed) {
-                                    jkQuakeConsole_chatStrPos++;
-                                }
+            jkQuakeConsole_sortTmpIdx = 0;
 
-                                tabbedStr = pIter->key;
+            bPrintOnce |= jkQuakeConsole_AutocompleteCheats();
 
-                                jkQuakeConsole_bHasTabbed = 1;
-                            }
-                            idx++;
+            if (!jkQuakeConsole_bHasTabbed && bPrintOnce) {
+                jkQuakeConsole_PrintLine(tmp2);
+            }
 
-                            if (shouldPrint) {
-                                stdPlatform_Printf("  %s\n", pIter->key);
-                            }
-                        }
+            _qsort(jkQuakeConsole_aSortTmp, jkQuakeConsole_sortTmpIdx, sizeof(char*), jkQuakeConsole_cmpstr);
+            for (int i = 0; i < jkQuakeConsole_sortTmpIdx; i++) {
+                if (i == jkQuakeConsole_tabIdx) {
+                    // Keep track of where we were, so if backspace is pressed 
+                    // then it reverts the completion.
+                    if (!jkQuakeConsole_bHasTabbed) {
+                        jkQuakeConsole_chatStrPos++;
                     }
-                    pIter = pIter->next;
+
+                    tabbedStr = jkQuakeConsole_aSortTmp[i];
+
+                    jkQuakeConsole_bHasTabbed = 1;
+                }
+                if (shouldPrint) {
+                    stdPlatform_Printf("  %s\n", jkQuakeConsole_aSortTmp[i]);
                 }
             }
 
@@ -371,7 +395,7 @@ void jkQuakeConsole_SendInput(char wParam)
             }
 
             jkQuakeConsole_tabIdx++;
-            jkQuakeConsole_tabIdx %= idx;
+            jkQuakeConsole_tabIdx %= jkQuakeConsole_sortTmpIdx;
             //if ( sithNet_isMulti )
             //    jkHud_dword_552D10 = (jkHud_dword_552D10 == -2) - 2;
         }
