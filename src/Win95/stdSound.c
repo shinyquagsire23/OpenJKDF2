@@ -264,6 +264,28 @@ int stdSound_BufferUnlock(stdSound_buffer_t* sound, void* buffer, int bufferRead
 
     alBufferData(sound->buffer, sound->format, sound->data, sound->bufferBytes, sound->nSamplesPerSec);
 
+#if 0
+    if (!sound->bIsCopy) {
+        float tmp = sound->vol;
+        sound->vol = 0.0;
+        stdSound_BufferPlay(sound, 0);
+        sound->vol = tmp;
+    }
+#endif
+
+    if (!sound->source)
+    {
+        alGenSources((ALuint)1, &sound->source);
+
+        alSourcef(sound->source, AL_PITCH, 1.0);
+        alSourcefv(sound->source, AL_POSITION, (ALfloat*)&sound->pos);
+        alSourcefv(sound->source, AL_VELOCITY, (ALfloat*)&sound->vel);
+        alSourcei(sound->source, AL_SOURCE_RELATIVE, AL_TRUE); // No 3D until we're given a position
+        
+        //printf("%u %u\n", buf->source, buf->buffer);
+    }
+    alSourcei(sound->source, AL_BUFFER, sound->buffer);
+
     return 1;
 }
 
