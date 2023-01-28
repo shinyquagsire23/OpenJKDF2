@@ -1121,7 +1121,7 @@ void std3D_DrawMenu()
         menu_h = Video_menuBuffer.format.height;
 
         // For ultrawide screens, limit the width to 16:9
-        if (Window_xSize > Window_ySize && ((double)Window_xSize / (double)Window_ySize) > (21.0/9.0)) {
+        if (Window_xSize > Window_ySize && ((double)Window_xSize / (double)Window_ySize) > (Main_bMotsCompat ? (16.0/9.0) : (21.0/9.0))) {
             fake_windowW = fake_windowH * (16.0/9.0);
         }
 
