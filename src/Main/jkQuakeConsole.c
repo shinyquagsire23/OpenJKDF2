@@ -27,6 +27,7 @@
 #include "Platform/stdControl.h"
 #include "../jk.h"
 
+#define JKQUAKECONSOLE_COMMAND_HISTORY_DEPTH (64)
 #define JKQUAKECONSOLE_NUM_LINES (1024)
 #define JKQUAKECONSOLE_CHAT_LEN (256)
 
@@ -40,14 +41,19 @@ uint64_t jkQuakeConsole_lastTimeUs = 0;
 uint64_t jkQuakeConsole_blinkCounter = 0;
 float jkQuakeConsole_shadeY = 0.0;
 
+char jkQuakeConsole_chatStrSaved[JKQUAKECONSOLE_CHAT_LEN];
+
 char jkQuakeConsole_chatStr[JKQUAKECONSOLE_CHAT_LEN];
 uint32_t jkQuakeConsole_chatStrPos = 0;
 int32_t jkQuakeConsole_scrollPos = 0;
 uint32_t jkQuakeConsole_realLines = 0;
 uint32_t jkQuakeConsole_tabIdx = 0;
 int jkQuakeConsole_bHasTabbed = 0;
+int jkQuakeConsole_realHistoryLines = 0;
+int jkQuakeConsole_selectedHistory = 0;
 
 char* jkQuakeConsole_aLines[JKQUAKECONSOLE_NUM_LINES];
+char* jkQuakeConsole_aLastCommands[JKQUAKECONSOLE_COMMAND_HISTORY_DEPTH];
 
 void jkQuakeConsole_ResetShade();
 
@@ -113,6 +119,9 @@ void jkQuakeConsole_ResetShade()
     jkQuakeConsole_tabIdx = 0;
     jkQuakeConsole_bHasTabbed = 0;
     memset(jkQuakeConsole_chatStr, 0, sizeof(jkQuakeConsole_chatStr));
+
+    jkQuakeConsole_selectedHistory = 0;
+    memset(jkQuakeConsole_chatStrSaved, 0, sizeof(jkQuakeConsole_chatStrSaved));
 }
 
 void jkQuakeConsole_Render()
@@ -222,9 +231,12 @@ void jkQuakeConsole_SendInput(char wParam)
         stdString_snprintf(tmp2, sizeof(tmp2), "]%s", jkQuakeConsole_chatStr);
         jkQuakeConsole_PrintLine(tmp2);
         jkQuakeConsole_tabIdx = 0;
+        jkQuakeConsole_selectedHistory = 0;
 
         if ( jkQuakeConsole_chatStrPos )
         {
+            jkQuakeConsole_RecordHistory(jkQuakeConsole_chatStr);
+
             if ( jkHud_dword_552D10 == -1 && sithNet_isMulti )
             {
                 _sprintf(std_genBuffer, "You say, '%s'", jkQuakeConsole_chatStr);
@@ -243,11 +255,49 @@ void jkQuakeConsole_SendInput(char wParam)
     }
     else
     {
-        if ( wParam == VK_BACK )
+        if (wParam == VK_UP)
+        {
+            if (!jkQuakeConsole_selectedHistory) {
+                strcpy(jkQuakeConsole_chatStrSaved, jkQuakeConsole_chatStr);
+            }
+
+            jkQuakeConsole_selectedHistory++;
+            if (jkQuakeConsole_selectedHistory >= jkQuakeConsole_realHistoryLines) {
+                jkQuakeConsole_selectedHistory = jkQuakeConsole_realHistoryLines;
+            }
+
+            if (jkQuakeConsole_selectedHistory)
+            {
+                strncpy(jkQuakeConsole_chatStr, jkQuakeConsole_aLastCommands[jkQuakeConsole_selectedHistory-1], JKQUAKECONSOLE_CHAT_LEN-1);
+                jkQuakeConsole_chatStrPos = strlen(jkQuakeConsole_chatStr);
+            }
+        }
+        else if (wParam == VK_DOWN)
+        {
+            if (!jkQuakeConsole_selectedHistory) {
+                strcpy(jkQuakeConsole_chatStrSaved, jkQuakeConsole_chatStr);
+            }
+
+            jkQuakeConsole_selectedHistory--;
+            if (jkQuakeConsole_selectedHistory < 0) {
+                jkQuakeConsole_selectedHistory = 0;
+            }
+
+            if (!jkQuakeConsole_selectedHistory) {
+                strcpy(jkQuakeConsole_chatStr, jkQuakeConsole_chatStrSaved);
+                jkQuakeConsole_chatStrPos = strlen(jkQuakeConsole_chatStr);
+            }
+            else {
+                strncpy(jkQuakeConsole_chatStr, jkQuakeConsole_aLastCommands[jkQuakeConsole_selectedHistory-1], JKQUAKECONSOLE_CHAT_LEN-1);
+                jkQuakeConsole_chatStrPos = strlen(jkQuakeConsole_chatStr);
+            }
+        }
+        else if ( wParam == VK_BACK )
         {
             if ( jkQuakeConsole_chatStrPos )
                 jkQuakeConsole_chatStr[--jkQuakeConsole_chatStrPos] = 0;
             jkQuakeConsole_tabIdx = 0;
+            jkQuakeConsole_selectedHistory = 0;
             jkQuakeConsole_bHasTabbed = 0;
         }
         else if ( wParam == VK_TAB )
@@ -325,6 +375,7 @@ void jkQuakeConsole_SendInput(char wParam)
                 }
             }
             jkQuakeConsole_tabIdx = 0;
+            jkQuakeConsole_selectedHistory = 0;
             jkQuakeConsole_bHasTabbed = 0;
             if ( jkQuakeConsole_chatStrPos < JKQUAKECONSOLE_CHAT_LEN-2 )
             {
@@ -362,6 +413,9 @@ int jkQuakeConsole_WmHandler(HWND a1, UINT msg, WPARAM wParam, HWND a4, LRESULT 
                 stdControl_ToggleCursor(!jkQuakeConsole_bOpen);
                 *a5 = 1;
                 return 1;
+            }
+            else if (wParam == VK_UP || wParam == VK_DOWN) {
+                jkQuakeConsole_SendInput(wParam);
             }
 
             // Hijack all input to the console if the shade is down.
@@ -408,5 +462,30 @@ void jkQuakeConsole_PrintLine(const char* pLine)
     jkQuakeConsole_realLines++;
     if (jkQuakeConsole_realLines > JKQUAKECONSOLE_NUM_LINES) {
         jkQuakeConsole_realLines = JKQUAKECONSOLE_NUM_LINES;
+    }
+}
+
+void jkQuakeConsole_RecordHistory(const char* pLine)
+{
+    if (!pLine) return;
+
+    char* pLastLine = jkQuakeConsole_aLastCommands[JKQUAKECONSOLE_COMMAND_HISTORY_DEPTH-1];
+    if (pLastLine) {
+        free(pLastLine);
+    }
+
+    for (int i = JKQUAKECONSOLE_COMMAND_HISTORY_DEPTH-1; i > 0; i--)
+    {
+        jkQuakeConsole_aLastCommands[i] = jkQuakeConsole_aLastCommands[i-1];
+    }
+
+    char* pNewLine = malloc(strlen(pLine)+2);
+    strcpy(pNewLine, pLine);
+
+    jkQuakeConsole_aLastCommands[0] = pNewLine;
+
+    jkQuakeConsole_realHistoryLines++;
+    if (jkQuakeConsole_realHistoryLines > JKQUAKECONSOLE_COMMAND_HISTORY_DEPTH) {
+        jkQuakeConsole_realHistoryLines = JKQUAKECONSOLE_COMMAND_HISTORY_DEPTH;
     }
 }
