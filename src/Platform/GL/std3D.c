@@ -3266,10 +3266,10 @@ int std3D_AddBitmapToTextureCache(stdBitmap *texture, int mipIdx, int is_alpha_t
         if (!palette_data) 
         {
             palette_data = std3D_ui_colormap.colors;//jkGui_stdBitmaps[2]->palette;
-            pal = palette_data;
+            pal = NULL;palette_data;
         }
         else {
-            pal = texture->palette;
+            pal = NULL;texture->palette;
         }
     
         for (int j = 0; j < height; j++)
@@ -3287,6 +3287,10 @@ int std3D_AddBitmapToTextureCache(stdBitmap *texture, int mipIdx, int is_alpha_t
                     val_rgba |= (pal[(val * 3) + 1] << 8);
                     val_rgba |= (pal[(val * 3) + 0] << 0);
                     val_rgba |= (0xFF << 24);
+
+                    if (!val) {
+                        val_rgba = 0;
+                    }
                 }
                 else
                 {
