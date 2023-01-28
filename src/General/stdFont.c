@@ -1677,3 +1677,261 @@ LABEL_26:
     }
     return largest_x;//v9 - v8;
 }
+
+unsigned int stdFont_DrawMultilineCenteredGPU(stdFont *font, unsigned int blit_x, int blit_y, int a5, wchar_t *a6, int alpha_maybe, float scale)
+{
+    unsigned int v8; // edx
+    unsigned int v9; // esi
+    wchar_t *v10; // ebx
+    wchar_t v11; // ax
+    int v12; // ecx
+    int v13; // eax
+    uint16_t v14; // cx
+    stdFontCharset *v15; // eax
+    int v18; // [esp+10h] [ebp-14h]
+    rdRect a5a; // [esp+14h] [ebp-10h] BYREF
+    stdVBuffer *a2a; // [esp+2Ch] [ebp+8h]
+
+    uint32_t line_width = stdFont_Draw1Width(font, blit_x, blit_y, a5, a6, alpha_maybe, scale);
+    if (line_width > a5-blit_x) {
+        line_width = a5-blit_x;
+    }
+
+    uint32_t largest_x = 0;
+
+    v9 = blit_x + ((a5 - line_width) / 2);
+    v18 = 0;
+    a2a = *font->bitmap->mipSurfaces;
+    a5a.y = 0;
+    a5a.height = a2a->format.height;
+    //if ( a5 >= (int)(vbuf->format.width - blit_x) )
+    //    a5 = vbuf->format.width - blit_x;
+    v10 = a6;
+    v11 = *a6;
+
+    int orig_blit_y = blit_y;
+    int orig_blit_x = blit_x;
+
+    if ( *a6 )
+    {
+        while ( 1 )
+        {
+            if ( v18 ) {
+                v11 = *v10;
+                if (!v11) {
+                    return (blit_y - orig_blit_y) + INT_FLOAT_SCALED(a5a.height, scale);
+                }
+                line_width = stdFont_Draw1Width(font, orig_blit_x, blit_y, a5, v10, alpha_maybe, scale);
+                if (line_width > a5-blit_x) {
+                    line_width = a5-blit_x;
+                }
+                blit_y += INT_FLOAT_SCALED(a5a.height, scale);
+                v18 = 0;
+                v9 = blit_x + ((a5 - line_width) / 2);
+                //return v9 - v8;
+            }
+            if ( v11 == 9 )
+            {
+                v12 = 16;
+                if ( 8 * font->marginX >= 16 )
+                    v12 = 8 * font->marginX;
+                v9 = blit_x + v12 * ((int)(v12 + v9 - blit_x) / v12);
+                goto LABEL_27;
+            }
+            if ( _iswspace(v11) )
+                break;
+            v14 = *v10;
+            v15 = &font->charsetHead;
+            if ( font != (stdFont *)-48 )
+            {
+                do
+                {
+                    if ( v14 >= v15->charFirst && v14 <= v15->charLast )
+                        break;
+                    v15 = v15->previous;
+                }
+                while ( v15 );
+                if ( v15 )
+                    goto LABEL_22;
+            }
+            v14 = font->field_28;
+            v15 = &font->charsetHead;
+            a5a.x = 0;
+            a5a.width = 0;
+            if ( font == (stdFont *)-48 )
+                goto LABEL_21;
+            do
+            {
+                if ( v14 >= v15->charFirst && v14 <= v15->charLast )
+                    break;
+                v15 = v15->previous;
+            }
+            while ( v15 );
+            if ( v15 )
+            {
+LABEL_22:
+                a5a.x = v15->pEntries[v14 - v15->charFirst].field_0;
+                a5a.width = v15->pEntries[v14 - v15->charFirst].field_4;
+            }
+            else
+            {
+LABEL_21:
+                a5a.x = 0;
+                a5a.width = 0;
+            }
+
+            if ( (int)(v9 + INT_FLOAT_SCALED(a5a.width, scale)) < (int)(blit_x + a5) )
+            {
+                int next_spot = (int)(v9 + INT_FLOAT_SCALED(a5a.width, scale)) - blit_x;
+                if (next_spot > largest_x) {
+                    largest_x = next_spot;
+                }
+                
+                std3D_DrawUIBitmap(font->bitmap, 0, v9, blit_y, &a5a, scale, alpha_maybe);
+                v13 = a5a.width + font->marginY;
+                goto LABEL_26;
+            }
+            v18 = 1;
+            continue;
+LABEL_27:
+            v11 = v10[1];
+            ++v10;
+            if ( !v11 )
+                return (blit_y - orig_blit_y) + INT_FLOAT_SCALED(a5a.height, scale);//v9 - blit_x;
+        }
+        v13 = font->marginX;
+LABEL_26:
+        v9 += INT_FLOAT_SCALED(v13, scale);
+        goto LABEL_27;
+    }
+    return (blit_y - orig_blit_y) + INT_FLOAT_SCALED(a5a.height, scale);//v9 - blit_x;
+}
+
+unsigned int stdFont_DrawMultilineCenteredHeight(stdFont *font, unsigned int blit_x, int blit_y, int a5, wchar_t *a6, int alpha_maybe, float scale)
+{
+    unsigned int v8; // edx
+    unsigned int v9; // esi
+    wchar_t *v10; // ebx
+    wchar_t v11; // ax
+    int v12; // ecx
+    int v13; // eax
+    uint16_t v14; // cx
+    stdFontCharset *v15; // eax
+    int v18; // [esp+10h] [ebp-14h]
+    rdRect a5a; // [esp+14h] [ebp-10h] BYREF
+    stdVBuffer *a2a; // [esp+2Ch] [ebp+8h]
+
+    uint32_t line_width = stdFont_Draw1Width(font, blit_x, blit_y, a5, a6, alpha_maybe, scale);
+    if (line_width > a5-blit_x) {
+        line_width = a5-blit_x;
+    }
+
+    uint32_t largest_x = 0;
+
+    v9 = blit_x + ((a5 - line_width) / 2);
+    v18 = 0;
+    a2a = *font->bitmap->mipSurfaces;
+    a5a.y = 0;
+    a5a.height = a2a->format.height;
+    //if ( a5 >= (int)(vbuf->format.width - blit_x) )
+    //    a5 = vbuf->format.width - blit_x;
+    v10 = a6;
+    v11 = *a6;
+
+    int orig_blit_y = blit_y;
+    int orig_blit_x = blit_x;
+
+    if ( *a6 )
+    {
+        while ( 1 )
+        {
+            if ( v18 ) {
+                v11 = *v10;
+                if (!v11) {
+                    return (blit_y - orig_blit_y) + INT_FLOAT_SCALED(a5a.height, scale);
+                }
+                line_width = stdFont_Draw1Width(font, orig_blit_x, blit_y, a5, v10, alpha_maybe, scale);
+                if (line_width > a5-blit_x) {
+                    line_width = a5-blit_x;
+                }
+                blit_y += INT_FLOAT_SCALED(a5a.height, scale);
+                v18 = 0;
+                v9 = blit_x + ((a5 - line_width) / 2);
+                //return v9 - v8;
+            }
+            if ( v11 == 9 )
+            {
+                v12 = 16;
+                if ( 8 * font->marginX >= 16 )
+                    v12 = 8 * font->marginX;
+                v9 = blit_x + v12 * ((int)(v12 + v9 - blit_x) / v12);
+                goto LABEL_27;
+            }
+            if ( _iswspace(v11) )
+                break;
+            v14 = *v10;
+            v15 = &font->charsetHead;
+            if ( font != (stdFont *)-48 )
+            {
+                do
+                {
+                    if ( v14 >= v15->charFirst && v14 <= v15->charLast )
+                        break;
+                    v15 = v15->previous;
+                }
+                while ( v15 );
+                if ( v15 )
+                    goto LABEL_22;
+            }
+            v14 = font->field_28;
+            v15 = &font->charsetHead;
+            a5a.x = 0;
+            a5a.width = 0;
+            if ( font == (stdFont *)-48 )
+                goto LABEL_21;
+            do
+            {
+                if ( v14 >= v15->charFirst && v14 <= v15->charLast )
+                    break;
+                v15 = v15->previous;
+            }
+            while ( v15 );
+            if ( v15 )
+            {
+LABEL_22:
+                a5a.x = v15->pEntries[v14 - v15->charFirst].field_0;
+                a5a.width = v15->pEntries[v14 - v15->charFirst].field_4;
+            }
+            else
+            {
+LABEL_21:
+                a5a.x = 0;
+                a5a.width = 0;
+            }
+
+            if ( (int)(v9 + INT_FLOAT_SCALED(a5a.width, scale)) < (int)(blit_x + a5) )
+            {
+                int next_spot = (int)(v9 + INT_FLOAT_SCALED(a5a.width, scale)) - blit_x;
+                if (next_spot > largest_x) {
+                    largest_x = next_spot;
+                }
+                
+                //std3D_DrawUIBitmap(font->bitmap, 0, v9, blit_y, &a5a, scale, alpha_maybe);
+                v13 = a5a.width + font->marginY;
+                goto LABEL_26;
+            }
+            v18 = 1;
+            continue;
+LABEL_27:
+            v11 = v10[1];
+            ++v10;
+            if ( !v11 )
+                return (blit_y - orig_blit_y) + INT_FLOAT_SCALED(a5a.height, scale);//v9 - blit_x;
+        }
+        v13 = font->marginX;
+LABEL_26:
+        v9 += INT_FLOAT_SCALED(v13, scale);
+        goto LABEL_27;
+    }
+    return (blit_y - orig_blit_y) + INT_FLOAT_SCALED(a5a.height, scale);//v9 - blit_x;
+}

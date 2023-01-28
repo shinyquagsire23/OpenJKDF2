@@ -94,6 +94,8 @@ int stdFont_Draw4GPU(stdFont *font, int xPos, int yPos, int a5, int a6, int a7, 
 unsigned int stdFont_Draw1GPU(stdFont *font, unsigned int blit_x, int blit_y, int a5, wchar_t *a6, int alpha_maybe, float scale);
 unsigned int stdFont_Draw1Width(stdFont *font, unsigned int blit_x, int blit_y, int a5, wchar_t *a6, int alpha_maybe, float scale);
 
+unsigned int stdFont_DrawMultilineCenteredGPU(stdFont *font, unsigned int blit_x, int blit_y, int a5, wchar_t *a6, int alpha_maybe, float scale);
+unsigned int stdFont_DrawMultilineCenteredHeight(stdFont *font, unsigned int blit_x, int blit_y, int a5, wchar_t *a6, int alpha_maybe, float scale);
 //static int (*stdFont_DrawAscii)(stdVBuffer *a1, stdFont *a2, unsigned int blit_x, int blit_y, int x_max, char *str, int alpha_maybe) = (void*)stdFont_DrawAscii_ADDR;
 
 //static int (*stdFont_Draw4)(stdVBuffer *a1, stdFont *font, int xPos, int yPos, int a5, int a6, int a7, WCHAR *text, int alpha_maybe) = (void*)stdFont_Draw4_ADDR;

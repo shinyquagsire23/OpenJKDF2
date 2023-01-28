@@ -292,7 +292,7 @@ void jkDev_BlitLogToScreenGPU()
             if ( v4 < 0 )
                 v4 = 0;
             //stdDisplay_VBufferCopy(Video_pMenuBuffer, jkDev_vbuf, v4, v1, &v7, 1);
-            stdFont_Draw1GPU(jkHud_pMsgFontSft, v4, v1, jkDev_vbuf->format.width, v3->text, 1, jkPlayer_hudScale);
+            stdFont_DrawMultilineCenteredGPU(jkHud_pMsgFontSft, 0, v1, stdDisplay_pCurVideoMode->format.width, v3->text, 1, jkPlayer_hudScale);
             v5 = v7.width;
             v6 = jkDev_dword_55A9D0 + 2 * v2;
             jkDev_aEntryPositions[v6].x = v4;
@@ -301,7 +301,8 @@ void jkDev_BlitLogToScreenGPU()
         }
         if ( v3->bDrawEntry > 0 )
             --v3->bDrawEntry;
-        v1 += (int)((float)jkDev_BMFontHeight * jkPlayer_hudScale);
+        //v1 += (int)((float)jkDev_BMFontHeight * jkPlayer_hudScale);
+        v1 += stdFont_DrawMultilineCenteredHeight(jkHud_pMsgFontSft, 0, v1, stdDisplay_pCurVideoMode->format.width, v3->text, 1, jkPlayer_hudScale);
         ++v3;
         ++v2;
         v7.y += (int)((float)jkDev_BMFontHeight * jkPlayer_hudScale);
@@ -1127,7 +1128,7 @@ void jkDev_DrawEntriesGPU()
                         a4.x = 0;
                         a4.y = v1;
                         stdDisplay_VBufferFill(jkDev_vbuf, jkDev_ColorKey, &a4); // jkDev_vbuf->format.width
-                        v3->drawWidth = stdFont_Draw1Width(jkHud_pMsgFontSft, 0, v1, jkDev_vbuf->format.width, v3->text, 0, jkPlayer_hudScale);
+                        v3->drawWidth = stdFont_Draw1Width(jkHud_pMsgFontSft, 0, v1, Video_menuBuffer.format.width, v3->text, 0, jkPlayer_hudScale);
                     }
                     v1 += (int)((float)jkDev_BMFontHeight * jkPlayer_hudScale);
                     ++v0;
