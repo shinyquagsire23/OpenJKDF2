@@ -172,8 +172,7 @@ sithSound* sithSound_LoadEntry(char *sound_fname, int a2)
         {
             sound->id |= 0x8000;
         }
-        _strncpy(sound->sound_fname, sound_fname, 0x1Fu);
-        sound->sound_fname[31] = 0;
+        stdString_SafeStrCopy(sound->sound_fname, sound_fname, 32);
         sound->bufferBytes = stdSound_ParseWav(sound_file, &sound->sampleRateHz, &sound->bitsPerSample, &sound->bStereo, &sound->seekOffset);
         if ( sound->bufferBytes )
         {
