@@ -1464,6 +1464,7 @@ void sithInventory_SendKilledMessageToAll(sithThing *player, sithThing *sender)
         
         if ( player->actorParams.playerinfo != (sithPlayerInfo *)-136 
           && desc->flags & ITEMINFO_VALID 
+          && player->actorParams.playerinfo // Added
           && player->actorParams.playerinfo->iteminfo[i].state & ITEMSTATE_AVAILABLE 
           && desc->cog )
         {
