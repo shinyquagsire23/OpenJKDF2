@@ -47,7 +47,7 @@ float jkQuakeConsole_shadeY = 0.0;
 char jkQuakeConsole_chatStrSaved[JKQUAKECONSOLE_CHAT_LEN];
 
 char jkQuakeConsole_chatStr[JKQUAKECONSOLE_CHAT_LEN];
-uint32_t jkQuakeConsole_chatStrPos = 0;
+int32_t jkQuakeConsole_chatStrPos = 0;
 int32_t jkQuakeConsole_scrollPos = 0;
 uint32_t jkQuakeConsole_realLines = 0;
 uint32_t jkQuakeConsole_tabIdx = 0;
@@ -217,11 +217,21 @@ void jkQuakeConsole_Render()
     jkQuakeConsole_blinkCounter %= (1000*1000);
     int isBlink = jkQuakeConsole_blinkCounter > ((1000*1000)/2);
     
+    char tmpBlinkCut = jkQuakeConsole_chatStr[jkQuakeConsole_chatStrPos];
+    jkQuakeConsole_chatStr[jkQuakeConsole_chatStrPos] = 0;
+
     char tmpBlink[JKQUAKECONSOLE_CHAT_LEN*2];
-    stdString_snprintf(tmpBlink, sizeof(tmpBlink), "]%s%c", jkQuakeConsole_chatStr, isBlink ? ' ' : '_');
+    stdString_snprintf(tmpBlink, sizeof(tmpBlink), "]%s", jkQuakeConsole_chatStr);
+
+    printf("%s %x\n", tmpBlink, jkQuakeConsole_chatStrPos);
 
     //stdFont_DrawAsciiGPU(jkQuakeConsole_pFont, 0, realShadeY, 640, tmpBlink, 1, jkPlayer_hudScale);
+    uint32_t blink_pos_x = stdFont_DrawAsciiWidth(jkQuakeConsole_pFont, 0, realShadeBottom - fontHeight*2, screenW, tmpBlink, 1, jkPlayer_hudScale);
+    jkQuakeConsole_chatStr[jkQuakeConsole_chatStrPos] = tmpBlinkCut;
+
+    stdString_snprintf(tmpBlink, sizeof(tmpBlink), "]%s", jkQuakeConsole_chatStr);
     stdFont_DrawAsciiGPU(jkQuakeConsole_pFont, 0, realShadeBottom - fontHeight*2, screenW, tmpBlink, 1, jkPlayer_hudScale);
+    stdFont_DrawAsciiGPU(jkQuakeConsole_pFont, blink_pos_x, realShadeBottom - fontHeight*2 + (fontHeight / 4), screenW, isBlink ? " " : "_", 1, jkPlayer_hudScale);
 
     stdString_snprintf(tmpBlink, sizeof(tmpBlink), "OpenJKDF2 %s (%s)", openjkdf2_aReleaseVersion, openjkdf2_aReleaseCommitShort);
     uint32_t strW = stdFont_DrawAsciiWidth(jkQuakeConsole_pFont, 0, realShadeBottom - fontHeight, screenW, tmpBlink, 1, jkPlayer_hudScale);
@@ -425,10 +435,47 @@ void jkQuakeConsole_SendInput(char wParam)
                 jkQuakeConsole_chatStrPos = strlen(jkQuakeConsole_chatStr);
             }
         }
+        else if (wParam == VK_LEFT)
+        {
+            jkQuakeConsole_chatStrPos--;
+            if (jkQuakeConsole_chatStrPos < 0) {
+                jkQuakeConsole_chatStrPos = 0;
+            }
+            if (jkQuakeConsole_chatStrPos > strlen(jkQuakeConsole_chatStr)) {
+                jkQuakeConsole_chatStrPos = strlen(jkQuakeConsole_chatStr);
+            }
+            if (jkQuakeConsole_chatStrPos > JKQUAKECONSOLE_CHAT_LEN-1) {
+                jkQuakeConsole_chatStrPos = JKQUAKECONSOLE_CHAT_LEN-1;
+            }
+
+            jkQuakeConsole_tabIdx = 0;
+            jkQuakeConsole_selectedHistory = 0;
+            jkQuakeConsole_bHasTabbed = 0;
+        }
+        else if (wParam == VK_RIGHT)
+        {
+            jkQuakeConsole_chatStrPos++;
+            if (jkQuakeConsole_chatStrPos < 0) {
+                jkQuakeConsole_chatStrPos = 0;
+            }
+            if (jkQuakeConsole_chatStrPos > strlen(jkQuakeConsole_chatStr)) {
+                jkQuakeConsole_chatStrPos = strlen(jkQuakeConsole_chatStr);
+            }
+            if (jkQuakeConsole_chatStrPos > JKQUAKECONSOLE_CHAT_LEN-1) {
+                jkQuakeConsole_chatStrPos = JKQUAKECONSOLE_CHAT_LEN-1;
+            }
+
+            jkQuakeConsole_tabIdx = 0;
+            jkQuakeConsole_selectedHistory = 0;
+            jkQuakeConsole_bHasTabbed = 0;
+        }
         else if ( wParam == VK_BACK )
         {
-            if ( jkQuakeConsole_chatStrPos )
-                jkQuakeConsole_chatStr[--jkQuakeConsole_chatStrPos] = 0;
+            if ( jkQuakeConsole_chatStrPos ) {
+                memmove(&jkQuakeConsole_chatStr[jkQuakeConsole_chatStrPos-1], &jkQuakeConsole_chatStr[jkQuakeConsole_chatStrPos], JKQUAKECONSOLE_CHAT_LEN-jkQuakeConsole_chatStrPos-1);
+                //jkQuakeConsole_chatStr[--jkQuakeConsole_chatStrPos] = 0;
+                jkQuakeConsole_chatStrPos--;
+            }
             jkQuakeConsole_tabIdx = 0;
             jkQuakeConsole_selectedHistory = 0;
             jkQuakeConsole_bHasTabbed = 0;
@@ -527,8 +574,9 @@ void jkQuakeConsole_SendInput(char wParam)
             jkQuakeConsole_bHasTabbed = 0;
             if ( jkQuakeConsole_chatStrPos < JKQUAKECONSOLE_CHAT_LEN-2 )
             {
+                memmove(&jkQuakeConsole_chatStr[jkQuakeConsole_chatStrPos+1], &jkQuakeConsole_chatStr[jkQuakeConsole_chatStrPos], JKQUAKECONSOLE_CHAT_LEN-jkQuakeConsole_chatStrPos-1);
                 jkQuakeConsole_chatStr[jkQuakeConsole_chatStrPos] = wParam;
-                jkQuakeConsole_chatStr[jkQuakeConsole_chatStrPos + 1] = 0;
+                //jkQuakeConsole_chatStr[jkQuakeConsole_chatStrPos + 1] = 0;
                 jkQuakeConsole_chatStrPos++;
             }
         }
@@ -562,7 +610,7 @@ int jkQuakeConsole_WmHandler(HWND a1, UINT msg, WPARAM wParam, HWND a4, LRESULT 
                 *a5 = 1;
                 return 1;
             }
-            else if (wParam == VK_UP || wParam == VK_DOWN) {
+            else if (wParam == VK_UP || wParam == VK_DOWN || wParam == VK_LEFT || wParam == VK_RIGHT) {
                 jkQuakeConsole_SendInput(wParam);
             }
 
