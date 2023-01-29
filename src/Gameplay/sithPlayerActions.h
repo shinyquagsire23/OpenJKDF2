@@ -11,6 +11,9 @@ void sithPlayerActions_JumpWithVel(sithThing *thing, float vel);
 void sithPlayerActions_Activate(sithThing *thing);
 void sithPlayerActions_WarpToCheckpoint(sithThing *thing, int idx);
 
+// Added
+sithThing* sithPlayerActions_SpawnThingAtLookAt(sithThing *pPlayerThing, sithThing* pTemplate);
+
 //static void (*sithPlayerActions_Remove)(sithThing *thing) = (void*)sithPlayerActions_Remove_ADDR;
 //static void (*sithPlayerActions_Activate)(sithThing*) = (void*)sithPlayerActions_Activate_ADDR;
 //static void (*sithPlayerActions_WarpToCheckpoint)(sithThing *a1, int a2) = (void*)sithPlayerActions_WarpToCheckpoint_ADDR;

@@ -13,6 +13,7 @@
 #include "Gameplay/jkSaber.h"
 #include "World/jkPlayer.h"
 #include "World/sithActor.h"
+#include "World/sithTemplate.h"
 #include "Main/sithCommand.h"
 #include "Dss/sithMulti.h"
 #include "Main/Main.h"
@@ -25,6 +26,7 @@
 #include "Platform/std3D.h"
 #include "Win95/Window.h"
 #include "Platform/stdControl.h"
+#include "Gameplay/sithPlayerActions.h"
 #include "../jk.h"
 
 #define JKQUAKECONSOLE_COMMAND_HISTORY_DEPTH (64)
@@ -53,6 +55,7 @@ int jkQuakeConsole_bHasTabbed = 0;
 int jkQuakeConsole_realHistoryLines = 0;
 int jkQuakeConsole_selectedHistory = 0;
 
+char* jkQuakeConsole_pTabPos = NULL;
 char* jkQuakeConsole_aLines[JKQUAKECONSOLE_NUM_LINES];
 char* jkQuakeConsole_aLastCommands[JKQUAKECONSOLE_COMMAND_HISTORY_DEPTH];
 
@@ -246,7 +249,7 @@ int jkQuakeConsole_AutocompleteCheats()
         while (pIter)
         {
             if (pIter->key) {
-                if (!strncmp(jkQuakeConsole_chatStr, pIter->key, strlen(jkQuakeConsole_chatStr))) {
+                if (!strncmp(jkQuakeConsole_pTabPos, pIter->key, strlen(jkQuakeConsole_pTabPos))) {
                     bPrintOnce = 1;
 
                     if (jkQuakeConsole_sortTmpIdx < JKQUAKECONSOLE_SORTED_LIMIT) {
@@ -255,6 +258,42 @@ int jkQuakeConsole_AutocompleteCheats()
                 }
             }
             pIter = pIter->next;
+        }
+    }
+    return bPrintOnce;
+}
+
+int jkQuakeConsole_AutocompleteTemplates()
+{
+    int bPrintOnce = 0;
+
+    if (sithWorld_pStatic && sithWorld_pStatic->templates) 
+    {
+        for (int i = 0; i < sithWorld_pStatic->numTemplatesLoaded; i++)
+        {
+            char* pName = sithWorld_pStatic->templates[i].template_name;
+            if (!strncmp(jkQuakeConsole_pTabPos, pName, strlen(jkQuakeConsole_pTabPos))) {
+                bPrintOnce = 1;
+
+                if (jkQuakeConsole_sortTmpIdx < JKQUAKECONSOLE_SORTED_LIMIT) {
+                    jkQuakeConsole_aSortTmp[jkQuakeConsole_sortTmpIdx++] = pName;
+                }
+            }
+        }
+    }
+    
+
+    if (!sithWorld_pCurrentWorld || !sithWorld_pCurrentWorld->templates) return bPrintOnce;
+    
+    for (int i = 0; i < sithWorld_pCurrentWorld->numTemplatesLoaded; i++)
+    {
+        char* pName = sithWorld_pCurrentWorld->templates[i].template_name;
+        if (!strncmp(jkQuakeConsole_pTabPos, pName, strlen(jkQuakeConsole_pTabPos))) {
+            bPrintOnce = 1;
+
+            if (jkQuakeConsole_sortTmpIdx < JKQUAKECONSOLE_SORTED_LIMIT) {
+                jkQuakeConsole_aSortTmp[jkQuakeConsole_sortTmpIdx++] = pName;
+            }
         }
     }
     return bPrintOnce;
@@ -281,7 +320,36 @@ void jkQuakeConsole_SendInput(char wParam)
         {
             jkQuakeConsole_RecordHistory(jkQuakeConsole_chatStr);
 
-            if ( jkHud_dword_552D10 == -1 && sithNet_isMulti )
+            char* baseCmd = (char*)malloc(strlen(jkQuakeConsole_chatStr)+1);
+            memset(baseCmd, 0, strlen(jkQuakeConsole_chatStr)+1);
+
+            char* lastArg = _strrchr(jkQuakeConsole_chatStr, ' ');
+            if (!lastArg) {
+                lastArg = jkQuakeConsole_chatStr;
+                strcpy(baseCmd, jkQuakeConsole_chatStr);
+            }
+            else {
+                
+                lastArg++;
+                strncpy(baseCmd, jkQuakeConsole_chatStr, (lastArg-jkQuakeConsole_chatStr));
+            }
+
+
+            if (!sithNet_isMulti && (!__strcmpi(baseCmd, "thing spawn ") || !__strcmpi(baseCmd, "npc spawn "))) {
+                sithThing* pTemplate = sithTemplate_GetEntryByName(lastArg);
+                if (!pTemplate) {
+                    sithConsole_Print("No template by that name.");
+                }
+                else if (pTemplate && sithWorld_pCurrentWorld && sithPlayer_pLocalPlayerThing) {
+                    //sithThing* pSpawned = sithThing_SpawnTemplate(pTemplate, sithPlayer_pLocalPlayerThing);
+                    sithThing* pSpawned = sithPlayerActions_SpawnThingAtLookAt(sithPlayer_pLocalPlayerThing, pTemplate);
+                }
+                else {
+                    sithConsole_Print("No world.");
+                }
+                
+            }
+            else if ( jkHud_dword_552D10 == -1 && sithNet_isMulti )
             {
                 _sprintf(std_genBuffer, "You say, '%s'", jkQuakeConsole_chatStr);
                 jkDev_DebugLog(std_genBuffer);
@@ -364,9 +432,34 @@ void jkQuakeConsole_SendInput(char wParam)
             int bPrintOnce = 0;
             char* tabbedStr = NULL;
 
+            char* baseCmd = (char*)malloc(strlen(jkQuakeConsole_chatStr)+1);
+            strcpy(baseCmd, jkQuakeConsole_chatStr);
+
+            int bCanAutocompleteCheats = 1;
+            jkQuakeConsole_pTabPos = _strrchr(jkQuakeConsole_chatStr, ' ');
+            if (!jkQuakeConsole_pTabPos) {
+                jkQuakeConsole_pTabPos = jkQuakeConsole_chatStr;
+            }
+            else {
+                bCanAutocompleteCheats = 0;
+                memset(baseCmd, 0, strlen(jkQuakeConsole_chatStr)+1);
+
+                jkQuakeConsole_pTabPos++;
+                strncpy(baseCmd, jkQuakeConsole_chatStr, (jkQuakeConsole_pTabPos-jkQuakeConsole_chatStr));
+                printf("%s %s %x\n", baseCmd, jkQuakeConsole_pTabPos, (jkQuakeConsole_pTabPos-jkQuakeConsole_chatStr));
+            }
+
             jkQuakeConsole_sortTmpIdx = 0;
 
-            bPrintOnce |= jkQuakeConsole_AutocompleteCheats();
+            if (bCanAutocompleteCheats) {
+                bPrintOnce |= jkQuakeConsole_AutocompleteCheats();
+            }
+            
+            // TODO proper command db
+            if (!__strcmpi(baseCmd, "thing spawn ") || !__strcmpi(baseCmd, "npc spawn ")) {
+                printf("adsf\n");
+                bPrintOnce |= jkQuakeConsole_AutocompleteTemplates();
+            }
 
             if (!jkQuakeConsole_bHasTabbed && bPrintOnce) {
                 jkQuakeConsole_PrintLine(tmp2);
@@ -391,8 +484,9 @@ void jkQuakeConsole_SendInput(char wParam)
             }
 
             if (tabbedStr) {
-                strncpy(jkQuakeConsole_chatStr, tabbedStr, JKQUAKECONSOLE_CHAT_LEN-1);
+                strncpy(jkQuakeConsole_pTabPos, tabbedStr, JKQUAKECONSOLE_CHAT_LEN-1);
             }
+            free(baseCmd);
 
             jkQuakeConsole_tabIdx++;
             jkQuakeConsole_tabIdx %= jkQuakeConsole_sortTmpIdx;

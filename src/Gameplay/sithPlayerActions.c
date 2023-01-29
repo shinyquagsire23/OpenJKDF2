@@ -14,6 +14,8 @@
 #include "Cog/sithCogExec.h"
 #include "Cog/sithCog.h"
 #include "Dss/sithDSSThing.h"
+#include "Engine/sithAdjoin.h"
+#include "World/sithWeapon.h"
 #include "jk.h"
 
 static int lastDoorOpenTime = 0;
@@ -172,4 +174,86 @@ void sithPlayerActions_WarpToCheckpoint(sithThing *thing, int idx)
             sithPhysics_FindFloor(thing, 1);
         }
     }
+}
+
+// Added
+sithThing* sithPlayerActions_SpawnThingAtLookAt(sithThing *pPlayerThing, sithThing* pTemplate)
+{
+    sithSector *v4; // esi
+    int v5; // eax
+    sithCollisionSearchEntry *searchResult; // eax
+    sithThing *v7; // edx
+    float a6; // [esp+0h] [ebp-58h]
+    rdVector3 thingPos; // [esp+1Ch] [ebp-3Ch] BYREF
+    rdMatrix34 out; // [esp+28h] [ebp-30h] BYREF
+
+    _memcpy(&out, &pPlayerThing->lookOrientation, sizeof(out));
+    rdVector_Copy3(&thingPos, &pPlayerThing->position);
+    if ( pPlayerThing->type == SITH_THING_ACTOR || pPlayerThing->type == SITH_THING_PLAYER )
+    {
+        rdMatrix_PreRotate34(&out, &pPlayerThing->actorParams.eyePYR);
+        rdVector_Add3Acc(&thingPos, &pPlayerThing->actorParams.eyeOffset);
+    }
+
+    if (pTemplate->type == SITH_THING_WEAPON) {
+        rdVector3 tmp1, tmp2;
+        rdVector_Zero3(&tmp1);
+        rdVector_Zero3(&tmp2);
+        return sithWeapon_FireProjectile(pPlayerThing, pTemplate, NULL, -1, &tmp1, &tmp2, 1.0, 0, 90.0, 90.0, 0);
+    }
+
+    sithThing* pSpawned = sithThing_SpawnTemplate(pTemplate, pPlayerThing);
+
+    sithSector* pSectorIter = sithCollision_GetSectorLookAt(pPlayerThing->sector, &pPlayerThing->position, &thingPos, 0.0);
+    if ( pSectorIter )
+    {
+        a6 = pPlayerThing->moveSize*10;//pPlayerThing->moveSize - -0.1;
+        sithCollision_SearchRadiusForThings(pSectorIter, pPlayerThing, &thingPos, &out.lvec, a6, 0.025, 0);
+        for ( searchResult = sithCollision_NextSearchResult(); searchResult; searchResult = sithCollision_NextSearchResult() )
+        {
+            if (searchResult->hitType & SITHCOLLISION_ADJOINCROSS)
+            {
+                pSectorIter = searchResult->surface->adjoin->sector;
+                sithThing_MoveToSector(pSpawned, pSectorIter, 0);
+            }
+            else if ( (searchResult->hitType & SITHCOLLISION_WORLD) != 0 )
+            {
+                pSectorIter = searchResult->surface->parent_sector;
+                //sithCog_SendMessageFromSurface(searchResult->surface, pPlayerThing, SITH_MESSAGE_ACTIVATE);
+                sithThing_MoveToSector(pSpawned, pSectorIter, 0);
+
+                rdVector3 tmp, tmp2;
+                rdVector_Copy3(&tmp, &thingPos);
+                rdVector_Copy3(&tmp2, &searchResult->surface->surfaceInfo.face.normal);
+                rdVector_Scale3Acc(&tmp2, pTemplate->moveSize / 2);
+                rdVector_MultAcc3(&tmp, &out.lvec, searchResult->distance - 0.001);
+                rdVector_Add3Acc(&tmp, &tmp2);
+                pSpawned->position = tmp;
+
+                sithCollision_SearchClose();
+                return pSpawned;
+            }
+            /*else if ( (searchResult->hitType & SITHCOLLISION_THING) != 0 )
+            {
+                v7 = searchResult->receiver;
+
+                if ( v7->type != SITH_THING_ITEM && v7->type != SITH_THING_WEAPON && (v7->thingflags & SITH_TF_CAPTURED) != 0 )
+                {
+                    sithThing_MoveToSector(i, v5->sector, 0);
+
+                    //sithCog_SendMessageFromThing(searchResult->receiver, pPlayerThing, SITH_MESSAGE_ACTIVATE);
+                    sithCollision_SearchClose();
+                    return pSpawned;
+                }
+            }*/
+        }
+
+        rdVector3 tmp;
+        rdVector_Copy3(&tmp, &pPlayerThing->position);
+        rdVector_MultAcc3(&tmp, &out.lvec, a6);
+        pSpawned->position = tmp;
+    }
+
+    sithCollision_SearchClose();
+    return pSpawned;
 }
