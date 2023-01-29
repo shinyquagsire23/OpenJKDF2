@@ -213,14 +213,18 @@ sithThing* sithPlayerActions_SpawnThingAtLookAt(sithThing *pPlayerThing, sithThi
         {
             if (searchResult->hitType & SITHCOLLISION_ADJOINCROSS)
             {
-                pSectorIter = searchResult->surface->adjoin->sector;
-                sithThing_MoveToSector(pSpawned, pSectorIter, 0);
+                if (searchResult && searchResult->surface && searchResult->surface->adjoin && searchResult->surface->adjoin->sector)
+                {
+                    pSectorIter = searchResult->surface->adjoin->sector;
+                    sithThing_MoveToSector(pSpawned, pSectorIter, 0);
+                }
             }
             else if ( (searchResult->hitType & SITHCOLLISION_WORLD) != 0 )
             {
                 pSectorIter = searchResult->surface->parent_sector;
                 //sithCog_SendMessageFromSurface(searchResult->surface, pPlayerThing, SITH_MESSAGE_ACTIVATE);
-                sithThing_MoveToSector(pSpawned, pSectorIter, 0);
+                if (pSectorIter)
+                    sithThing_MoveToSector(pSpawned, pSectorIter, 0);
 
                 rdVector3 tmp, tmp2;
                 rdVector_Copy3(&tmp, &thingPos);

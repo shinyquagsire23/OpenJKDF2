@@ -877,7 +877,7 @@ float sithCog_SendMessageFromThingEx(sithThing *sender, sithThing *receiver, SIT
     if ( v9 )
     {
 #ifdef DEBUG_QOL_CHEATS
-        if (message == SITH_MESSAGE_ACTIVATE) {
+        if (receiver == sithPlayer_pLocalPlayerThing && message == SITH_MESSAGE_ACTIVATE) {
             jk_printf("OpenJKDF2: Debug thing cog class %s\n", v9->cogscript_fpath);
         }
 #endif
@@ -904,7 +904,7 @@ float sithCog_SendMessageFromThingEx(sithThing *sender, sithThing *receiver, SIT
     if ( v12 )
     {
 #ifdef DEBUG_QOL_CHEATS
-        if (message == SITH_MESSAGE_ACTIVATE) {
+        if (receiver == sithPlayer_pLocalPlayerThing && message == SITH_MESSAGE_ACTIVATE) {
             jk_printf("OpenJKDF2: Debug thing cog capture %s\n", v12->cogscript_fpath);
         }
 #endif
@@ -930,7 +930,7 @@ float sithCog_SendMessageFromThingEx(sithThing *sender, sithThing *receiver, SIT
         if ( v15->thing == sender && v15->signature == sender->signature && (receivera & v15->mask) != 0 )
         {
 #ifdef DEBUG_QOL_CHEATS
-            if (message == SITH_MESSAGE_ACTIVATE && v15->cog) {
+            if (receiver == sithPlayer_pLocalPlayerThing &&message == SITH_MESSAGE_ACTIVATE && v15->cog) {
                 jk_printf("OpenJKDF2: Debug thing cog link %s\n", v15->cog->cogscript_fpath);
             }
 #endif
@@ -1011,7 +1011,7 @@ double sithCog_SendMessageFromSurfaceEx(sithSurface *sender, sithThing *thing, S
         sithCogSurfaceLink* surfaceLink = &sithCog_aSurfaceLinks[i];
         if ( surfaceLink->surface == sender && (surfaceLink->mask & v15) != 0 )
         {
-            if (msg == SITH_MESSAGE_ACTIVATE) {
+            if (thing == sithPlayer_pLocalPlayerThing && msg == SITH_MESSAGE_ACTIVATE) {
                 printf("OpenJKDF2: Debug %s\n", surfaceLink->cog->cogscript_fpath);
             }
             if ( msg == SITH_MESSAGE_DAMAGED )
