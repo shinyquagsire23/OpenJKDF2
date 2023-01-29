@@ -218,12 +218,11 @@ void jkQuakeConsole_Render()
     int isBlink = jkQuakeConsole_blinkCounter > ((1000*1000)/2);
     
     char tmpBlinkCut = jkQuakeConsole_chatStr[jkQuakeConsole_chatStrPos];
-    jkQuakeConsole_chatStr[jkQuakeConsole_chatStrPos] = 0;
+    if (!jkQuakeConsole_bHasTabbed)
+        jkQuakeConsole_chatStr[jkQuakeConsole_chatStrPos] = 0;
 
     char tmpBlink[JKQUAKECONSOLE_CHAT_LEN*2];
     stdString_snprintf(tmpBlink, sizeof(tmpBlink), "]%s", jkQuakeConsole_chatStr);
-
-    printf("%s %x\n", tmpBlink, jkQuakeConsole_chatStrPos);
 
     //stdFont_DrawAsciiGPU(jkQuakeConsole_pFont, 0, realShadeY, 640, tmpBlink, 1, jkPlayer_hudScale);
     uint32_t blink_pos_x = stdFont_DrawAsciiWidth(jkQuakeConsole_pFont, 0, realShadeBottom - fontHeight*2, screenW, tmpBlink, 1, jkPlayer_hudScale);
@@ -455,6 +454,12 @@ void jkQuakeConsole_SendInput(char wParam)
         else if (wParam == VK_RIGHT)
         {
             jkQuakeConsole_chatStrPos++;
+
+            // User has chosen to continue the completion
+            if (jkQuakeConsole_bHasTabbed) {
+                jkQuakeConsole_chatStrPos = strlen(jkQuakeConsole_chatStr);
+            }
+
             if (jkQuakeConsole_chatStrPos < 0) {
                 jkQuakeConsole_chatStrPos = 0;
             }
@@ -471,7 +476,10 @@ void jkQuakeConsole_SendInput(char wParam)
         }
         else if ( wParam == VK_BACK )
         {
-            if ( jkQuakeConsole_chatStrPos ) {
+            if (jkQuakeConsole_bHasTabbed && jkQuakeConsole_chatStrPos) {
+                jkQuakeConsole_chatStr[--jkQuakeConsole_chatStrPos] = 0;
+            }
+            else if ( jkQuakeConsole_chatStrPos ) {
                 memmove(&jkQuakeConsole_chatStr[jkQuakeConsole_chatStrPos-1], &jkQuakeConsole_chatStr[jkQuakeConsole_chatStrPos], JKQUAKECONSOLE_CHAT_LEN-jkQuakeConsole_chatStrPos-1);
                 //jkQuakeConsole_chatStr[--jkQuakeConsole_chatStrPos] = 0;
                 jkQuakeConsole_chatStrPos--;
