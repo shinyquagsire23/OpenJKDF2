@@ -45,4 +45,6 @@ int sithCommand_CmdPlayers(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 int sithCommand_CmdPing(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 int sithCommand_CmdKick(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 
+int sithCommand_CmdThingNpc(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+
 #endif // _SITHDEBUGCONSOLE_H

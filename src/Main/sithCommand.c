@@ -14,6 +14,7 @@
 #include "Win95/stdComm.h"
 #include "World/sithWorld.h"
 #include "Gameplay/sithPlayer.h"
+#include "World/sithTemplate.h"
 #include "jk.h"
 
 #define sithCommand_CmdMatList ((void*)sithCommand_CmdMatList_ADDR)
@@ -74,6 +75,8 @@ void sithCommand_Startup()
 #ifdef QOL_IMPROVEMENTS
     sithConsole_RegisterDevCmd(sithCommand_CmdQuit, "quit", 0);
     sithConsole_RegisterDevCmd(sithCommand_CmdQuit, "q", 0);
+    sithConsole_RegisterDevCmd(sithCommand_CmdThingNpc, "npc", 0);
+    sithConsole_RegisterDevCmd(sithCommand_CmdThingNpc, "thing", 0);
 #endif
 }
 
@@ -712,5 +715,42 @@ int sithCommand_CmdKick(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         }
         while ( v2 < jkPlayer_maxPlayers );
     }
+    return 1;
+}
+
+int sithCommand_CmdThingNpc(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+{
+    if (sithNet_isMulti) return 1;
+
+    char* pArgIter = _strtok(pArgStr, ", \t\n\r");
+    if ( !pArgIter ){
+        _sprintf(std_genBuffer, "Usage: %s [spawn]\n", pCmd->cmdStr);
+        sithConsole_Print(std_genBuffer);
+        return 1;
+    }
+
+    if (!__strcmpi(pArgIter, "spawn")) {
+        pArgIter = _strtok(NULL, ", \t\n\r");
+        if (!pArgIter) {
+            _sprintf(std_genBuffer, "Usage: %s spawn <template>\n", pCmd->cmdStr);
+            sithConsole_Print(std_genBuffer);
+            return 1;
+        }
+        
+        sithThing* pTemplate = sithTemplate_GetEntryByName(pArgIter);
+        if (!pTemplate) {
+            sithConsole_Print("No template by that name.");
+        }
+        else if (pTemplate && sithWorld_pCurrentWorld && sithPlayer_pLocalPlayerThing) {
+            //sithThing* pSpawned = sithThing_SpawnTemplate(pTemplate, sithPlayer_pLocalPlayerThing);
+            sithThing* pSpawned = sithPlayerActions_SpawnThingAtLookAt(sithPlayer_pLocalPlayerThing, pTemplate);
+        }
+        else {
+            sithConsole_Print("No world.");
+        }
+    }
+
+    
+
     return 1;
 }

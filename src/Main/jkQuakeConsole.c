@@ -263,6 +263,29 @@ int jkQuakeConsole_AutocompleteCheats()
     return bPrintOnce;
 }
 
+int jkQuakeConsole_AutocompleteConsoleCmds()
+{
+    int bPrintOnce = 0;
+    for (int i = 0; i < sithConsole_pCmdHashtable->numBuckets; i++)
+    {
+        stdLinklist* pIter = &sithConsole_pCmdHashtable->buckets[i];
+        while (pIter)
+        {
+            if (pIter->key) {
+                if (!strncmp(jkQuakeConsole_pTabPos, pIter->key, strlen(jkQuakeConsole_pTabPos))) {
+                    bPrintOnce = 1;
+
+                    if (jkQuakeConsole_sortTmpIdx < JKQUAKECONSOLE_SORTED_LIMIT) {
+                        jkQuakeConsole_aSortTmp[jkQuakeConsole_sortTmpIdx++] = pIter->key;
+                    }
+                }
+            }
+            pIter = pIter->next;
+        }
+    }
+    return bPrintOnce;
+}
+
 int jkQuakeConsole_AutocompleteTemplates()
 {
     int bPrintOnce = 0;
@@ -282,7 +305,6 @@ int jkQuakeConsole_AutocompleteTemplates()
         }
     }
     
-
     if (!sithWorld_pCurrentWorld || !sithWorld_pCurrentWorld->templates) return bPrintOnce;
     
     for (int i = 0; i < sithWorld_pCurrentWorld->numTemplatesLoaded; i++)
@@ -335,21 +357,7 @@ void jkQuakeConsole_SendInput(char wParam)
             }
 
 
-            if (!sithNet_isMulti && (!__strcmpi(baseCmd, "thing spawn ") || !__strcmpi(baseCmd, "npc spawn "))) {
-                sithThing* pTemplate = sithTemplate_GetEntryByName(lastArg);
-                if (!pTemplate) {
-                    sithConsole_Print("No template by that name.");
-                }
-                else if (pTemplate && sithWorld_pCurrentWorld && sithPlayer_pLocalPlayerThing) {
-                    //sithThing* pSpawned = sithThing_SpawnTemplate(pTemplate, sithPlayer_pLocalPlayerThing);
-                    sithThing* pSpawned = sithPlayerActions_SpawnThingAtLookAt(sithPlayer_pLocalPlayerThing, pTemplate);
-                }
-                else {
-                    sithConsole_Print("No world.");
-                }
-                
-            }
-            else if ( jkHud_dword_552D10 == -1 && sithNet_isMulti )
+            if ( jkHud_dword_552D10 == -1 && sithNet_isMulti )
             {
                 _sprintf(std_genBuffer, "You say, '%s'", jkQuakeConsole_chatStr);
                 jkDev_DebugLog(std_genBuffer);
@@ -452,6 +460,7 @@ void jkQuakeConsole_SendInput(char wParam)
 
             if (bCanAutocompleteCheats) {
                 bPrintOnce |= jkQuakeConsole_AutocompleteCheats();
+                bPrintOnce |= jkQuakeConsole_AutocompleteConsoleCmds();
             }
             
             // TODO proper command db
