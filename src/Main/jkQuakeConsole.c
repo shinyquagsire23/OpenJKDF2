@@ -621,7 +621,7 @@ int jkQuakeConsole_WmHandler(HWND a1, UINT msg, WPARAM wParam, HWND a4, LRESULT 
             else if (wParam == VK_UP || wParam == VK_DOWN || wParam == VK_LEFT || wParam == VK_RIGHT) {
                 jkQuakeConsole_SendInput(wParam);
             }
-            else {
+            else if (!jkHud_bChatOpen && !jkQuakeConsole_bOpen) {
                 sithCommand_HandleBinds(wParam);
             }
 
@@ -639,7 +639,7 @@ int jkQuakeConsole_WmHandler(HWND a1, UINT msg, WPARAM wParam, HWND a4, LRESULT 
                 *a5 = 1;
                 return 1;
             }
-            else {
+            else if (!jkHud_bChatOpen && !jkQuakeConsole_bOpen) {
                 sithCommand_HandleBinds(wParam);
             }
             break;
