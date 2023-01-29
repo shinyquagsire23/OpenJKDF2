@@ -53,7 +53,7 @@ void sithPlayerActions_Activate(sithThing *thing)
                 if ( (searchResult->hitType & SITHCOLLISION_WORLD) != 0 )
                 {
 #ifdef DEBUG_QOL_CHEATS
-                    if (searchResult->surface && searchResult->surface->surfaceInfo.face.material)
+                    if (searchResult->surface && searchResult->surface->surfaceInfo.face.material && thing == sithPlayer_pLocalPlayerThing)
                         jk_printf("OpenJKDF2: Debug surf %s\n", searchResult->surface->surfaceInfo.face.material->mat_fpath);
 #endif
                     if (searchResult->surface->surfaceFlags & SITH_SURFACE_COG_LINKED)
@@ -67,7 +67,7 @@ void sithPlayerActions_Activate(sithThing *thing)
                 {
                     v7 = searchResult->receiver;
 #ifdef DEBUG_QOL_CHEATS
-                    if (v7)
+                    if (v7 && thing == sithPlayer_pLocalPlayerThing)
                         jk_printf("OpenJKDF2: Debug thing %s\n", v7->template_name);
 #endif
                     if ( v7->type != SITH_THING_ITEM && v7->type != SITH_THING_WEAPON && (v7->thingflags & SITH_TF_CAPTURED) != 0 )
@@ -203,6 +203,9 @@ sithThing* sithPlayerActions_SpawnThingAtLookAt(sithThing *pPlayerThing, sithThi
     }
 
     sithThing* pSpawned = sithThing_SpawnTemplate(pTemplate, pPlayerThing);
+    if (!pSpawned) {
+        return NULL;
+    }
 
     sithSector* pSectorIter = sithCollision_GetSectorLookAt(pPlayerThing->sector, &pPlayerThing->position, &thingPos, 0.0);
     if ( pSectorIter )
