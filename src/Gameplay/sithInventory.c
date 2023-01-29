@@ -898,22 +898,62 @@ sithThing* sithInventory_CreateBackpack(sithThing *player)
     backpack->itemParams.numBins = 0;
     backpack->itemParams.typeflags |= THING_TYPEFLAGS_DAMAGE; // ??
     
-    for (int i = 0; i < SITHBIN_NUMBINS; i++)
+    if (!Main_bMotsCompat)
     {
-        sithItemDescriptor* desc = &sithInventory_aDescriptors[i];
-        if ( desc->flags & ITEMINFO_VALID && (desc->flags & ITEMINFO_MP_BACKPACK))
+        for (int i = 0; i < SITHBIN_NUMBINS; i++)
         {
-            float ammoAmt = 0.0;
-            if ( player->actorParams.playerinfo != (sithPlayerInfo *)-136 && desc->flags & ITEMINFO_VALID )
-                ammoAmt = player->actorParams.playerinfo->iteminfo[i].ammoAmt;
-
-            if ( backpack->itemParams.numBins < 16 && ammoAmt > 0.0 )
+            sithItemDescriptor* desc = &sithInventory_aDescriptors[i];
+            if ( desc->flags & ITEMINFO_VALID && (desc->flags & ITEMINFO_MP_BACKPACK))
             {
-                backpack->itemParams.contents[backpack->itemParams.numBins].binIdx = i;
-                backpack->itemParams.contents[backpack->itemParams.numBins++].value = ammoAmt;
+                float ammoAmt = 0.0;
+                if ( player->actorParams.playerinfo != (sithPlayerInfo *)-136 && desc->flags & ITEMINFO_VALID )
+                    ammoAmt = player->actorParams.playerinfo->iteminfo[i].ammoAmt;
+
+                if ( backpack->itemParams.numBins < 16 && ammoAmt > 0.0 )
+                {
+                    backpack->itemParams.contents[backpack->itemParams.numBins].binIdx = i;
+                    backpack->itemParams.contents[backpack->itemParams.numBins++].value = ammoAmt;
+                }
             }
         }
     }
+    else {
+        // MOTS adds all of the guns into the backpack first, then items
+        for (int i = SITHBIN_MOTS_NONE; i < SITHBIN_MOTS_CARBO_GUN+1; i++)
+        {
+            sithItemDescriptor* desc = &sithInventory_aDescriptors[i];
+            if ( desc->flags & ITEMINFO_VALID && (desc->flags & ITEMINFO_MP_BACKPACK))
+            {
+                float ammoAmt = 0.0;
+                if ( player->actorParams.playerinfo != (sithPlayerInfo *)-136 && desc->flags & ITEMINFO_VALID )
+                    ammoAmt = player->actorParams.playerinfo->iteminfo[i].ammoAmt;
+
+                if ( backpack->itemParams.numBins < 16 && ammoAmt > 0.0 )
+                {
+                    backpack->itemParams.contents[backpack->itemParams.numBins].binIdx = i;
+                    backpack->itemParams.contents[backpack->itemParams.numBins++].value = ammoAmt;
+                }
+            }
+        }
+
+        for (int i = SITHBIN_ENERGY; i < SITHBIN_NUMBINS; i++)
+        {
+            sithItemDescriptor* desc = &sithInventory_aDescriptors[i];
+            if ( (i < SITHBIN_MOTS_NONE || i > SITHBIN_MOTS_CARBO_GUN) && desc->flags & ITEMINFO_VALID && (desc->flags & ITEMINFO_MP_BACKPACK))
+            {
+                float ammoAmt = 0.0;
+                if ( player->actorParams.playerinfo != (sithPlayerInfo *)-136 && desc->flags & ITEMINFO_VALID )
+                    ammoAmt = player->actorParams.playerinfo->iteminfo[i].ammoAmt;
+
+                if ( backpack->itemParams.numBins < 16 && ammoAmt > 0.0 )
+                {
+                    backpack->itemParams.contents[backpack->itemParams.numBins].binIdx = i;
+                    backpack->itemParams.contents[backpack->itemParams.numBins++].value = ammoAmt;
+                }
+            }
+        }
+    }
+    
 
     sithDSSThing_SendCreateThing(templateThing, backpack, player, 0, 0, 0, 255, 1);
     sithDSSThing_SendSyncThing(backpack, -1, 255);

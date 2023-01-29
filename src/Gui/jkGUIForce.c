@@ -526,7 +526,7 @@ int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, wchar_t* a5, int *p
     }
 
     jkGuiForce_pElements[EIDX_FLAVORTEXT].wstr = jkStrings_GetText(std_genBuffer);
-    if ( Main_bMotsCompat || a4 == 0 )
+    if ( Main_bMotsCompat || (!Main_bMotsCompat && a4 == 0) )
     {
         newStars = (int)sithPlayer_GetBinAmt(SITHBIN_NEW_STARS);
         spendStars = (int)sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS);
@@ -534,7 +534,7 @@ int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, wchar_t* a5, int *p
         sithPlayer_SetBinAmt(SITHBIN_SPEND_STARS, (float)(newStars + spendStars));
     }
 
-    if (!Main_bMotsCompat) 
+    if (!Main_bMotsCompat)
     {
         jkGuiForce_numSpendStars = (int)sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS);
         jkGuiForce_pElements[EIDX_ALIGN_SLIDER].bIsVisible = 1;

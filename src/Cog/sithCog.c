@@ -504,8 +504,8 @@ void sithCog_Close()
         sithCog_numSurfaceLinks = 0;
         sithCog_numThingLinks = 0;
         sithCog_masterCog = 0;
-        sithCog_pActionCog = NULL;
-        sithCog_actionCogIdk = -1;
+        sithCog_pActionCog = NULL; // MOTS added
+        sithCog_actionCogIdk = -1; // MOTS added
         sithCog_bOpened = 0;
     }
 }
