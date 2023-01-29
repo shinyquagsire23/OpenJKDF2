@@ -239,8 +239,7 @@ void sithControl_Tick(float deltaSecs, int deltaMs)
 
     // MOTS altered
     if ( !sithPlayer_pLocalPlayerThing
-      || DF2_ONLY_COND(sithPlayer_pLocalPlayerThing->actorParams.typeflags & SITH_AF_NOHUD)
-      || MOTS_ONLY_COND(sithPlayer_pLocalPlayerThing->actorParams.typeflags & (SITH_AF_NOHUD|SITH_AF_SCOPEHUD|SITH_AF_80000000))
+      || (sithPlayer_pLocalPlayerThing->actorParams.typeflags & (Main_bMotsCompat ? (SITH_AF_NOHUD|SITH_AF_SCOPEHUD|SITH_AF_80000000) : SITH_AF_NOHUD))
       || (sithPlayer_pLocalPlayerThing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) != 0
       || (sithCamera_state & 1) != 0 )
     {
