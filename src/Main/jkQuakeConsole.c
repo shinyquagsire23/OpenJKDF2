@@ -103,6 +103,15 @@ void jkQuakeConsole_Startup()
     if (!jkQuakeConsole_bOnce)
     {
         memset(jkQuakeConsole_aLines, 0, sizeof(jkQuakeConsole_aLines));
+
+        memset(jkQuakeConsole_chatStr, 0, sizeof(jkQuakeConsole_chatStr));
+        jkQuakeConsole_chatStrPos = 0;
+
+        jkQuakeConsole_tabIdx = 0;
+        jkQuakeConsole_bHasTabbed = 0;
+        jkQuakeConsole_selectedHistory = 0;
+        memset(jkQuakeConsole_chatStrSaved, 0, sizeof(jkQuakeConsole_chatStrSaved));
+
         jkQuakeConsole_bOnce = 1;
     }
     
@@ -128,14 +137,12 @@ void jkQuakeConsole_ResetShade()
     jkQuakeConsole_lastTimeUs = Linux_TimeUs();
     jkQuakeConsole_shadeY = 0.0f;
     jkQuakeConsole_blinkCounter = 0;
-    jkQuakeConsole_chatStrPos = 0;
+    
     jkQuakeConsole_scrollPos = 0;
-    jkQuakeConsole_tabIdx = 0;
-    jkQuakeConsole_bHasTabbed = 0;
-    memset(jkQuakeConsole_chatStr, 0, sizeof(jkQuakeConsole_chatStr));
 
-    jkQuakeConsole_selectedHistory = 0;
-    memset(jkQuakeConsole_chatStrSaved, 0, sizeof(jkQuakeConsole_chatStrSaved));
+    jkQuakeConsole_pTabPos = NULL;
+    jkQuakeConsole_sortTmpIdx = 0;
+    memset(jkQuakeConsole_aSortTmp, 0, sizeof(jkQuakeConsole_aSortTmp));
 }
 
 void jkQuakeConsole_Render()
@@ -242,6 +249,8 @@ void jkQuakeConsole_Render()
 
 int jkQuakeConsole_AutocompleteCheats()
 {
+    if (!jkQuakeConsole_pTabPos) return 0;
+
     int bPrintOnce = 0;
     for (int i = 0; i < jkDev_cheatHashtable->numBuckets; i++)
     {
@@ -265,6 +274,8 @@ int jkQuakeConsole_AutocompleteCheats()
 
 int jkQuakeConsole_AutocompleteConsoleCmds()
 {
+    if (!jkQuakeConsole_pTabPos) return 0;
+
     int bPrintOnce = 0;
     for (int i = 0; i < sithConsole_pCmdHashtable->numBuckets; i++)
     {
@@ -288,6 +299,8 @@ int jkQuakeConsole_AutocompleteConsoleCmds()
 
 int jkQuakeConsole_AutocompleteTemplates()
 {
+    if (!jkQuakeConsole_pTabPos) return 0;
+
     int bPrintOnce = 0;
 
     if (sithWorld_pStatic && sithWorld_pStatic->templates) 
@@ -597,6 +610,10 @@ void jkQuakeConsole_PrintLine(const char* pLine)
     jkQuakeConsole_realLines++;
     if (jkQuakeConsole_realLines > JKQUAKECONSOLE_NUM_LINES) {
         jkQuakeConsole_realLines = JKQUAKECONSOLE_NUM_LINES;
+    }
+
+    if (jkQuakeConsole_bOpen && jkQuakeConsole_scrollPos) {
+        jkQuakeConsole_scrollPos++;
     }
 }
 
