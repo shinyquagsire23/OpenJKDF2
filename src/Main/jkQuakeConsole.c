@@ -446,7 +446,6 @@ void jkQuakeConsole_SendInput(char wParam)
 
                 jkQuakeConsole_pTabPos++;
                 strncpy(baseCmd, jkQuakeConsole_chatStr, (jkQuakeConsole_pTabPos-jkQuakeConsole_chatStr));
-                printf("%s %s %x\n", baseCmd, jkQuakeConsole_pTabPos, (jkQuakeConsole_pTabPos-jkQuakeConsole_chatStr));
             }
 
             jkQuakeConsole_sortTmpIdx = 0;
@@ -457,7 +456,6 @@ void jkQuakeConsole_SendInput(char wParam)
             
             // TODO proper command db
             if (!__strcmpi(baseCmd, "thing spawn ") || !__strcmpi(baseCmd, "npc spawn ")) {
-                printf("adsf\n");
                 bPrintOnce |= jkQuakeConsole_AutocompleteTemplates();
             }
 
