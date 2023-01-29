@@ -45,6 +45,18 @@ int sithCommand_CmdPlayers(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 int sithCommand_CmdPing(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 int sithCommand_CmdKick(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 
+// Added
 int sithCommand_CmdThingNpc(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int sithCommand_CmdBind(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+int sithCommand_CmdUnbind(stdDebugConsoleCmd *pCmd, const char *pArgStr);
+
+// Added
+void sithCommand_StartupBinds();
+void sithCommand_ShutdownBinds();
+void sithCommand_SaveBinds();
+void sithCommand_LoadBinds();
+void sithCommand_HandleBinds(uint16_t key);
+void sithCommand_AddBind(uint16_t key, const char* pCmd);
+void sithCommand_RemoveBind(uint16_t key);
 
 #endif // _SITHDEBUGCONSOLE_H

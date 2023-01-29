@@ -158,6 +158,9 @@ void jkQuakeConsole_Render()
     float screenW = Video_menuBuffer.format.width;
     float screenH = Video_menuBuffer.format.height;
     float fontHeight = ((*jkQuakeConsole_pFont->bitmap->mipSurfaces)->format.height + jkQuakeConsole_pFont->marginY) * jkPlayer_hudScale;
+    if (fontHeight <= 0.0) {
+        fontHeight = 1.0;
+    }
     int maxVisibleLines = (int)((screenH / 2) / fontHeight)-2;
 
     if (jkQuakeConsole_bOpen)
@@ -343,6 +346,20 @@ int jkQuakeConsole_AutocompleteTemplates()
     return bPrintOnce;
 }
 
+void jkQuakeConsole_ExecuteCommand(const char* pCmd)
+{
+    if ( jkHud_dword_552D10 == -1 && sithNet_isMulti )
+    {
+        _sprintf(std_genBuffer, "You say, '%s'", pCmd);
+        jkDev_DebugLog(std_genBuffer);
+        sithMulti_SendChat(pCmd, -1, playerThingIdx);
+    }
+    else if ( !jkDev_TryCommand(pCmd) )
+    {
+        sithConsole_TryCommand(pCmd);
+    }
+}
+
 void jkQuakeConsole_SendInput(char wParam)
 {
     wchar_t tmp[256]; // [esp+4h] [ebp-100h] BYREF
@@ -364,31 +381,7 @@ void jkQuakeConsole_SendInput(char wParam)
         {
             jkQuakeConsole_RecordHistory(jkQuakeConsole_chatStr);
 
-            char* baseCmd = (char*)malloc(strlen(jkQuakeConsole_chatStr)+1);
-            memset(baseCmd, 0, strlen(jkQuakeConsole_chatStr)+1);
-
-            char* lastArg = _strrchr(jkQuakeConsole_chatStr, ' ');
-            if (!lastArg) {
-                lastArg = jkQuakeConsole_chatStr;
-                strcpy(baseCmd, jkQuakeConsole_chatStr);
-            }
-            else {
-                
-                lastArg++;
-                strncpy(baseCmd, jkQuakeConsole_chatStr, (lastArg-jkQuakeConsole_chatStr));
-            }
-
-
-            if ( jkHud_dword_552D10 == -1 && sithNet_isMulti )
-            {
-                _sprintf(std_genBuffer, "You say, '%s'", jkQuakeConsole_chatStr);
-                jkDev_DebugLog(std_genBuffer);
-                sithMulti_SendChat(jkQuakeConsole_chatStr, -1, playerThingIdx);
-            }
-            else if ( !jkDev_TryCommand(jkQuakeConsole_chatStr) )
-            {
-                sithConsole_TryCommand(jkQuakeConsole_chatStr);
-            }
+            jkQuakeConsole_ExecuteCommand(jkQuakeConsole_chatStr);
         }
         jkQuakeConsole_chatStrPos = 0;
         memset(jkQuakeConsole_chatStr, 0, sizeof(jkQuakeConsole_chatStr));
@@ -560,11 +553,18 @@ void jkQuakeConsole_SendInput(char wParam)
 
             if (tabbedStr) {
                 strncpy(jkQuakeConsole_pTabPos, tabbedStr, JKQUAKECONSOLE_CHAT_LEN-1);
+                strncat(jkQuakeConsole_pTabPos, " ", JKQUAKECONSOLE_CHAT_LEN-1);
             }
             free(baseCmd);
 
             jkQuakeConsole_tabIdx++;
-            jkQuakeConsole_tabIdx %= jkQuakeConsole_sortTmpIdx;
+            if (jkQuakeConsole_sortTmpIdx) {
+                jkQuakeConsole_tabIdx %= jkQuakeConsole_sortTmpIdx;
+            }
+            else {
+                jkQuakeConsole_tabIdx = 0;
+            }
+            
             //if ( sithNet_isMulti )
             //    jkHud_dword_552D10 = (jkHud_dword_552D10 == -2) - 2;
         }
@@ -621,6 +621,9 @@ int jkQuakeConsole_WmHandler(HWND a1, UINT msg, WPARAM wParam, HWND a4, LRESULT 
             else if (wParam == VK_UP || wParam == VK_DOWN || wParam == VK_LEFT || wParam == VK_RIGHT) {
                 jkQuakeConsole_SendInput(wParam);
             }
+            else {
+                sithCommand_HandleBinds(wParam);
+            }
 
             // Hijack all input to the console if the shade is down.
             if (jkQuakeConsole_bOpen) {
@@ -635,6 +638,9 @@ int jkQuakeConsole_WmHandler(HWND a1, UINT msg, WPARAM wParam, HWND a4, LRESULT 
                 jkQuakeConsole_SendInput(wParam);
                 *a5 = 1;
                 return 1;
+            }
+            else {
+                sithCommand_HandleBinds(wParam);
             }
             break;
         default:

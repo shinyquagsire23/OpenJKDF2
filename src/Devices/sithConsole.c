@@ -46,6 +46,7 @@ int sithConsole_Startup(int maxCmds)
         stdHashTable_Free(v1);
         sithConsole_pCmdHashtable = 0;
     }
+
     return 0;
 }
 
@@ -63,6 +64,10 @@ void sithConsole_Shutdown()
     }
     if ( sithConsole_alertSound )
         stdSound_BufferRelease(sithConsole_alertSound);
+
+    // Added
+    sithCommand_ShutdownBinds();
+
     sithConsole_bInitted = 0;
 }
 

@@ -323,4 +323,44 @@ int stdJSON_GetWString(const char* pFpath, const char* pKey, char16_t* pOut, int
     return 1;
 }
 
+int stdJSON_IterateKeys(const char* pFpath, stdJSONCallback_t pCallbackFn, void* pCtx)
+{
+    CHECK_ARGPTR(pFpath);
+
+    nlohmann::json json_file = stdJSON_OpenAndReadFile(pFpath);
+
+    for (auto& el : json_file.items())
+    {
+        std::string out = json_file.value(std::string(el.key().c_str()), std::string(""));
+        if (out == std::string("")) {
+            stdJSON_SetString(pFpath, el.key().c_str(), "");
+        }
+
+        if (pCallbackFn) {
+            pCallbackFn(el.key().c_str(), out.c_str(), pCtx);
+        }
+    }
+
+    //[pKey] = std::string(pVal);
+    //return stdJSON_WriteToFile(pFpath, json_file);
+    return 1;
+}
+
+int stdJSON_EraseKey(const char* pFpath, const char* pKey)
+{
+    CHECK_COMMON(pFpath, pKey);
+
+    nlohmann::json json_file = stdJSON_OpenAndReadFile(pFpath);
+    json_file.erase(pKey);
+    return stdJSON_WriteToFile(pFpath, json_file);
+}
+
+int stdJSON_EraseAll(const char* pFpath)
+{
+    CHECK_ARGPTR(pFpath);
+    
+    nlohmann::json json_file(nlohmann::json::value_t::object);
+    return stdJSON_WriteToFile(pFpath, json_file);
+}
+
 }

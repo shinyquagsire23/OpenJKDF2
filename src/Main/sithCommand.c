@@ -15,11 +15,23 @@
 #include "World/sithWorld.h"
 #include "Gameplay/sithPlayer.h"
 #include "World/sithTemplate.h"
+#include "Main/jkQuakeConsole.h"
+#include "General/stdJSON.h"
 #include "jk.h"
 
 #define sithCommand_CmdMatList ((void*)sithCommand_CmdMatList_ADDR)
 
 #define sithCommand_matlist_sort ((void*)sithCommand_matlist_sort_ADDR)
+
+typedef struct sithCommandBind sithCommandBind;
+typedef struct sithCommandBind
+{
+    uint16_t key;
+    const char* pCmd;
+    sithCommandBind* pNext;
+} sithCommandBind;
+
+sithCommandBind* sithCommand_pBinds;
 
 static char sithCommand_aIdk[4]; // TODO symbols?
 
@@ -77,6 +89,10 @@ void sithCommand_Startup()
     sithConsole_RegisterDevCmd(sithCommand_CmdQuit, "q", 0);
     sithConsole_RegisterDevCmd(sithCommand_CmdThingNpc, "npc", 0);
     sithConsole_RegisterDevCmd(sithCommand_CmdThingNpc, "thing", 0);
+    sithConsole_RegisterDevCmd(sithCommand_CmdBind, "bind", 0);
+    sithConsole_RegisterDevCmd(sithCommand_CmdUnbind, "unbind", 0);
+
+    sithCommand_StartupBinds();
 #endif
 }
 
@@ -749,8 +765,198 @@ int sithCommand_CmdThingNpc(stdDebugConsoleCmd *pCmd, const char *pArgStr)
             sithConsole_Print("No world.");
         }
     }
-
-    
-
     return 1;
+}
+
+int sithCommand_CmdBind(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+{
+    char tmp[512];
+    memset(tmp, 0, sizeof(tmp));
+
+    char* pArgIter = _strtok(pArgStr, ", \t\n\r");
+    if ( !pArgIter || strlen(pArgIter) > 1) {
+        _sprintf(std_genBuffer, "Usage: %s <key> <command...args>\n", pCmd->cmdStr);
+        sithConsole_Print(std_genBuffer);
+        return 1;
+    }
+
+    uint16_t key = pArgIter[0];
+
+    pArgIter = _strtok(NULL, ", \t\n\r");
+    while (pArgIter)
+    {
+        strncat(tmp, pArgIter, sizeof(tmp));
+        strncat(tmp, " ", sizeof(tmp));
+
+        pArgIter = _strtok(NULL, ", \t\n\r");
+    }
+    tmp[strlen(tmp)] = 0;
+
+    if (strlen(tmp) > 0) {
+        sithCommand_AddBind(key, tmp);
+    }
+    else {
+        _sprintf(std_genBuffer, "Usage: %s <key> <command...args>\n", pCmd->cmdStr);
+        sithConsole_Print(std_genBuffer);
+        return 1;
+    }
+    return 1;
+}
+
+int sithCommand_CmdUnbind(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+{
+    char tmp[512];
+    memset(tmp, 0, sizeof(tmp));
+
+    char* pArgIter = _strtok(pArgStr, ", \t\n\r");
+    if ( !pArgIter || strlen(pArgIter) > 1) {
+        _sprintf(std_genBuffer, "Usage: %s <key>\n", pCmd->cmdStr);
+        sithConsole_Print(std_genBuffer);
+        return 1;
+    }
+
+    uint16_t key = pArgIter[0];
+
+    sithCommand_RemoveBind(key);
+    return 1;
+}
+
+void sithCommand_StartupBinds()
+{
+    if (sithCommand_pBinds) {
+        sithCommand_ShutdownBinds();
+    }
+
+    // Added: binds
+    sithCommand_pBinds = (sithCommandBind*)malloc(sizeof(sithCommandBind));
+    sithCommand_pBinds->key = 0;
+    sithCommand_pBinds->pCmd = "";
+    sithCommand_pBinds->pNext = NULL;
+
+    sithCommand_LoadBinds();
+}
+
+void sithCommand_ShutdownBinds()
+{
+    if (!sithCommand_pBinds) {
+        return;
+    }
+
+    sithCommand_SaveBinds();
+
+    sithCommandBind* pBindIter = sithCommand_pBinds;
+    while (pBindIter)
+    {
+        if (pBindIter->key && pBindIter->pCmd) {
+            free(pBindIter->pCmd);
+        }
+        sithCommandBind* pBindIterNext = pBindIter->pNext;
+        free(pBindIter);
+        pBindIter = pBindIterNext;
+    }
+    sithCommand_pBinds = NULL;
+}
+
+void sithCommand_LoadBindCallback(const char* pKey, const char* pVal, void* pCtx)
+{
+    sithCommand_AddBind(pKey[0], pVal);
+}
+
+void sithCommand_SaveBinds()
+{
+    const char* ext_fpath = "openjkdf2_binds.json";
+    stdJSON_EraseAll(ext_fpath);
+    
+    char tmp[3];
+    sithCommandBind* pBindIter = sithCommand_pBinds;
+    while (pBindIter = pBindIter->pNext)
+    {
+        snprintf(tmp, 3, "%c", pBindIter->key);
+        stdJSON_SetString(ext_fpath, tmp, pBindIter->pCmd);
+    }
+}
+
+void sithCommand_LoadBinds()
+{
+    const char* ext_fpath = "openjkdf2_binds.json";
+    stdJSON_IterateKeys(ext_fpath, sithCommand_LoadBindCallback, NULL);
+}
+
+// Added
+char sithCommand_aTmpCommandExecute[512];
+void sithCommand_HandleBinds(uint16_t key)
+{
+    sithCommandBind* pBindIter = sithCommand_pBinds;
+    while (pBindIter = pBindIter->pNext)
+    {
+        if (key == pBindIter->key) {
+            strcpy(sithCommand_aTmpCommandExecute, pBindIter->pCmd);
+            jkQuakeConsole_ExecuteCommand(sithCommand_aTmpCommandExecute);
+        }
+    }
+}
+
+// Added
+void sithCommand_AddBind(uint16_t key, const char* pCmd)
+{
+    if (!pCmd || !key) return;
+
+    sithCommandBind* pBindIter = sithCommand_pBinds;
+    while (pBindIter)
+    {
+        // Overwrite existing bind
+        if (key == pBindIter->key) {
+            if (pBindIter->pCmd) {
+                free(pBindIter->pCmd);
+            }
+            pBindIter->pCmd = (char*)malloc(strlen(pCmd)+1);
+            strcpy(pBindIter->pCmd, pCmd);
+            break;
+        }
+
+        // End of the list, add a bind
+        if (!pBindIter->pNext) {
+            sithCommandBind* pNewBind = (sithCommandBind*)malloc(sizeof(sithCommandBind));
+            pBindIter->pNext = pNewBind;
+
+            pNewBind->key = key;
+            pNewBind->pCmd = (char*)malloc(strlen(pCmd)+1);
+            strcpy(pNewBind->pCmd, pCmd);
+            pNewBind->pNext = NULL;
+            break;
+        }
+        pBindIter = pBindIter->pNext;
+    }
+
+    sithCommand_SaveBinds();
+}
+
+// Added
+void sithCommand_RemoveBind(uint16_t key)
+{
+    if (!key) return;
+
+    sithCommandBind* pBindIter = sithCommand_pBinds;
+    sithCommandBind* pBindIterLast = NULL;
+    while (pBindIter)
+    {
+        // Overwrite existing bind
+        if (key == pBindIter->key) {
+            if (pBindIter->pCmd) {
+                free(pBindIter->pCmd);
+            }
+
+            sithCommandBind* pBindIterNext = pBindIter->pNext;
+            if (pBindIterLast) {
+                pBindIterLast->pNext = pBindIterNext;
+            }
+            free(pBindIter);
+            pBindIter = pBindIterNext;
+            continue;
+        }
+        pBindIterLast = pBindIter;
+        pBindIter = pBindIter->pNext;
+    }
+
+    sithCommand_SaveBinds();
 }
