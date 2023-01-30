@@ -65,23 +65,29 @@ jkGuiMenu jkGuiBuildMulti_menu =
 static int unk_52B170[2] = {0x0d, 0x0e};
 static int unk_583bf8[2] = {0x0d, 0x0e};
 
-static jkGuiElement jkGuiBuildMulti_menuEditCharacter_buttons[15] =
+static jkGuiElement jkGuiBuildMulti_menuEditCharacter_buttons[17] =
 {
-  { ELEMENT_TEXT, 0, 0, NULL, 3, { 0, 390, 640, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXT, 0, 5, "GUI_EDIT_CHARACTER", 3, { 240, 20, 400, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXT, 0, 1, NULL, 3, { 240, 60, 400, 30 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_LISTBOX, 1, 0, NULL, 0, { 280, 100, 320, 251 }, 1, 0, NULL, NULL, NULL, unk_52B170, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXT, 0, 2, "GUI_NAME", 3, { 0, 130, 200, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXT, 0, 1, NULL, 1, { 0, 150, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXT, 0, 2, "GUI_RANKLABEL", 3, { 0, 190, 200, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXT, 0, 1, NULL, 1, { 0, 210, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXT, 0, 2, "GUI_MODEL", 3, { 0, 250, 200, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXT, 0, 1, NULL, 1, { 0, 270, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXTBUTTON, -1, 2, "GUI_DONE", 3, { 30, 430, 128, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXTBUTTON, 100, 2, "GUI_NEW", 3, { 250, 430, 128, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXTBUTTON, 102, 2, "GUI_REMOVE", 3, { 380, 430, 128, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXTBUTTON, 1, 2, "GUI_EDIT", 3, { 510, 430, 130, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_END, 0, 0, NULL, 0, { 0, 0, 0, 0 }, 0, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 }
+/*00*/  { ELEMENT_TEXT, 0, 0, NULL, 3, { 0, 390, 640, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*01*/  { ELEMENT_TEXT, 0, 5, "GUI_EDIT_CHARACTER", 3, { 240, 20, 400, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*02*/  { ELEMENT_TEXT, 0, 1, NULL, 3, { 240, 60, 400, 30 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*03*/  { ELEMENT_LISTBOX, 1, 0, NULL, 0, { 280, 100, 320, 251 }, 1, 0, NULL, NULL, NULL, unk_52B170, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*04*/  { ELEMENT_TEXT, 0, 2, "GUI_NAME", 3, { 0, 130, 200, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*05*/  { ELEMENT_TEXT, 0, 1, NULL, 1, { 0, 150, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+  
+  // 310, 330
+/*06*/  { ELEMENT_TEXT, 0, 2, "GUI_RANKLABEL", 3, { 0, 190, 200, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*07*/  { ELEMENT_TEXT, 0, 1, NULL, 1, { 0, 210, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*08*/  { ELEMENT_TEXT, 0, 2, "GUI_MODEL", 3, { 0, 250, 200, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*09*/  { ELEMENT_TEXT, 0, 1, NULL, 1, { 0, 270, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+  
+/*10*/  { ELEMENT_TEXT, 0, 2, "GUI_PERSONALITY", 3, { 0, 190, 200, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*11*/  { ELEMENT_TEXT, 0, 1, NULL, 1, { 0, 210, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+
+/*12*/  { ELEMENT_TEXTBUTTON, -1, 2, "GUI_DONE", 3, { 30, 430, 128, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*13*/  { ELEMENT_TEXTBUTTON, 100, 2, "GUI_NEW", 3, { 250, 430, 128, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*14*/  { ELEMENT_TEXTBUTTON, 102, 2, "GUI_REMOVE", 3, { 380, 430, 128, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*15*/  { ELEMENT_TEXTBUTTON, 1, 2, "GUI_EDIT", 3, { 510, 430, 130, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*16*/  { ELEMENT_END, 0, 0, NULL, 0, { 0, 0, 0, 0 }, 0, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 }
 };
 
 static jkGuiMenu jkGuiBuildMulti_menuEditCharacter =
@@ -164,30 +170,34 @@ static jkGuiMenu jkGuiBuildMulti_menuNewCharacterMots =
 static jkGuiElement* jkGuiBuildMulti_pNewCharacterElements = jkGuiBuildMulti_menuNewCharacter_buttons;
 static jkGuiMenu* jkGuiBuildMulti_pNewCharacterMenu = &jkGuiBuildMulti_menuNewCharacter;
 
-static jkGuiElement jkGuiBuildMulti_menuLoadCharacter_buttons[22] =
+static jkGuiElement jkGuiBuildMulti_menuLoadCharacter_buttons[24] =
 {
-  { ELEMENT_TEXT, 0, 0, NULL, 3, { 0, 390, 640, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXT, 0, 5, "GUI_LOAD_CHARACTER", 3, { 240, 20, 400, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXT, 0, 1, NULL, 3, { 240, 60, 400, 30 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_LISTBOX, 1, 0, NULL, 0, { 280, 100, 320, 251 }, 1, 0, NULL, NULL, NULL, unk_52B170, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXT, 0, 2, "GUI_SLEPISODE", 3, { 0, 30, 200, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXT, 0, 0, NULL, 1, { 0, 50, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXT, 0, 2, "GUI_SLLEVEL", 3, { 0, 90, 200, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXT, 0, 0, NULL, 1, { 0, 110, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXT, 0, 2, "GUI_MAXSTARS", 3, { 0, 150, 200, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXT, 0, 0, NULL, 1, { 0, 170, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXT, 0, 2, "GUI_NAME", 3, { 0, 210, 200, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXT, 0, 1, NULL, 1, { 0, 230, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXT, 0, 2, "GUI_RANKLABEL", 3, { 0, 270, 200, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXT, 0, 1, NULL, 1, { 0, 290, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXT, 0, 2, "GUI_MODEL", 3, { 0, 330, 200, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXT, 0, 1, NULL, 1, { 0, 350, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXTBUTTON, -1, 2, "GUI_CANCEL", 3, { 0, 430, 128, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXTBUTTON, 100, 2, "GUI_NEW", 3, { 128, 430, 128, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXTBUTTON, 102, 2, "GUI_REMOVE", 3, { 256, 430, 128, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXTBUTTON, 101, 2, "GUI_EDIT", 3, { 384, 430, 128, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXTBUTTON, 1, 2, "GUI_OK", 3, { 512, 430, 128, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_END, 0, 0, NULL, 0, { 0, 0, 0, 0 }, 0, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 }
+/*00*/  { ELEMENT_TEXT, 0, 0, NULL, 3, { 0, 390, 640, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*01*/  { ELEMENT_TEXT, 0, 5, "GUI_LOAD_CHARACTER", 3, { 240, 20, 400, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*02*/  { ELEMENT_TEXT, 0, 1, NULL, 3, { 240, 60, 400, 30 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*03*/  { ELEMENT_LISTBOX, 1, 0, NULL, 0, { 280, 100, 320, 251 }, 1, 0, NULL, NULL, NULL, unk_52B170, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*04*/  { ELEMENT_TEXT, 0, 2, "GUI_SLEPISODE", 3, { 0, 30, 200, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*05*/  { ELEMENT_TEXT, 0, 0, NULL, 1, { 0, 50, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*06*/  { ELEMENT_TEXT, 0, 2, "GUI_SLLEVEL", 3, { 0, 90, 200, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*07*/  { ELEMENT_TEXT, 0, 0, NULL, 1, { 0, 110, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*08*/  { ELEMENT_TEXT, 0, 2, "GUI_MAXSTARS", 3, { 0, 150, 200, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*09*/  { ELEMENT_TEXT, 0, 0, NULL, 1, { 0, 170, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*10*/  { ELEMENT_TEXT, 0, 2, "GUI_NAME", 3, { 0, 210, 200, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*11*/  { ELEMENT_TEXT, 0, 1, NULL, 1, { 0, 230, 200, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*12*/  { ELEMENT_TEXT, 0, 2, "GUI_RANKLABEL", 3, { 0, 270, 200, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*13*/  { ELEMENT_TEXT, 0, 1, NULL, 1, { 0, 290, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*14*/  { ELEMENT_TEXT, 0, 2, "GUI_MODEL", 3, { 0, 330, 200, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*15*/  { ELEMENT_TEXT, 0, 1, NULL, 1, { 0, 350, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+  
+/*16*/  { ELEMENT_TEXT, 0, 2, "GUI_PERSONALITY", 3, { 0, 390, 200, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*17*/  { ELEMENT_TEXT, 0, 1, NULL, 1, { 0, 410, 200, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+
+/*18*/  { ELEMENT_TEXTBUTTON, -1, 2, "GUI_CANCEL", 3, { 0, 430, 128, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*19*/  { ELEMENT_TEXTBUTTON, 100, 2, "GUI_NEW", 3, { 128, 430, 128, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*20*/  { ELEMENT_TEXTBUTTON, 102, 2, "GUI_REMOVE", 3, { 256, 430, 128, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*21*/  { ELEMENT_TEXTBUTTON, 101, 2, "GUI_EDIT", 3, { 384, 430, 128, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*22*/  { ELEMENT_TEXTBUTTON, 1, 2, "GUI_OK", 3, { 512, 430, 128, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*23*/  { ELEMENT_END, 0, 0, NULL, 0, { 0, 0, 0, 0 }, 0, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 }
 };
 
 
@@ -202,6 +212,7 @@ static wchar_t jkGuiBuildMulti_wPlayerShortName[64];
 static jkPlayerMpcInfo jkGuiBuildMulti_aMpcInfo[32];
 static wchar_t jkGuiBuildMulti_wTmp[128];
 static wchar_t jkGuiBuildMulti_wTmp2[32];
+static wchar_t jkGuiBuildMulti_wTmp3[32];
 static wchar_t jkGuiBuildMulti_aWchar_5594C8[48];
 static rdMaterialLoader_t jkGuiBuildMulti_fnMatLoader;
 static model3Loader_t jkGuiBuildMulti_fnModelLoader;
@@ -848,6 +859,7 @@ void jkGuiBuildMulti_Shutdown()
     memset(jkGuiBuildMulti_aMpcInfo, 0, sizeof(jkGuiBuildMulti_aMpcInfo));
     memset(jkGuiBuildMulti_wTmp, 0, sizeof(jkGuiBuildMulti_wTmp));
     memset(jkGuiBuildMulti_wTmp2, 0, sizeof(jkGuiBuildMulti_wTmp2));
+    memset(jkGuiBuildMulti_wTmp3, 0, sizeof(jkGuiBuildMulti_wTmp3));
     memset(jkGuiBuildMulti_aWchar_5594C8, 0, sizeof(jkGuiBuildMulti_aWchar_5594C8));
 
     jkGuiBuildMulti_fnMatLoader = NULL;
@@ -930,6 +942,22 @@ int jkGuiBuildMulti_Show()
     char tmp1[128]; // [esp+16Ch] [ebp-280h] BYREF
     wchar_t wtmp1[256]; // [esp+1ECh] [ebp-200h] BYREF
 
+    // MoTS added: Need to move things around for Personality
+    if (!Main_bMotsCompat) {
+        jkGuiBuildMulti_menuEditCharacter_buttons[10].bIsVisible = 0;
+        jkGuiBuildMulti_menuEditCharacter_buttons[11].bIsVisible = 0;
+
+        jkGuiBuildMulti_menuEditCharacter_buttons[6].rect.y = 190;
+        jkGuiBuildMulti_menuEditCharacter_buttons[7].rect.y = 210;
+    }
+    else {
+        jkGuiBuildMulti_menuEditCharacter_buttons[10].bIsVisible = 1;
+        jkGuiBuildMulti_menuEditCharacter_buttons[11].bIsVisible = 1;
+
+        jkGuiBuildMulti_menuEditCharacter_buttons[6].rect.y = 310;
+        jkGuiBuildMulti_menuEditCharacter_buttons[7].rect.y = 330;
+    }
+
     wPlayerName[0] = 0;
     memset(&wPlayerName[1], 0, 0x3Cu);
     wPlayerName[31] = 0;
@@ -948,8 +976,8 @@ int jkGuiBuildMulti_Show()
         v3 = 1;
         if ( v2 )
         {
-            jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiBuildMulti_menuEditCharacter, &jkGuiBuildMulti_menuEditCharacter_buttons[13]);
-            jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiBuildMulti_menuEditCharacter, &jkGuiBuildMulti_menuEditCharacter_buttons[10]);
+            jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiBuildMulti_menuEditCharacter, &jkGuiBuildMulti_menuEditCharacter_buttons[15]);
+            jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiBuildMulti_menuEditCharacter, &jkGuiBuildMulti_menuEditCharacter_buttons[12]);
             v9 = jkGuiRend_DisplayAndReturnClicked(&jkGuiBuildMulti_menuEditCharacter);
         }
         else
@@ -1388,6 +1416,33 @@ int jkGuiBuildMulti_ShowLoad(jkPlayerMpcInfo *pPlayerMpcInfo, char *pStrEpisode,
     char tmp3[128]; // [esp+19Ch] [ebp-280h] BYREF
     wchar_t wtmp1[256]; // [esp+21Ch] [ebp-200h] BYREF
 
+    if (!Main_bMotsCompat) {
+        jkGuiBuildMulti_menuLoadCharacter_buttons[16].bIsVisible = 0;
+        jkGuiBuildMulti_menuLoadCharacter_buttons[17].bIsVisible = 0;
+
+        jkGuiBuildMulti_menuLoadCharacter_buttons[10].rect.y = 210;
+        jkGuiBuildMulti_menuLoadCharacter_buttons[11].rect.y = 230;
+
+        jkGuiBuildMulti_menuLoadCharacter_buttons[12].rect.y = 270;
+        jkGuiBuildMulti_menuLoadCharacter_buttons[13].rect.y = 290;
+
+        jkGuiBuildMulti_menuLoadCharacter_buttons[14].rect.y = 330;
+        jkGuiBuildMulti_menuLoadCharacter_buttons[15].rect.y = 350;
+    }
+    else {
+        jkGuiBuildMulti_menuLoadCharacter_buttons[16].bIsVisible = 1;
+        jkGuiBuildMulti_menuLoadCharacter_buttons[17].bIsVisible = 1;
+
+        jkGuiBuildMulti_menuLoadCharacter_buttons[10].rect.y = 330;
+        jkGuiBuildMulti_menuLoadCharacter_buttons[11].rect.y = 350;
+
+        jkGuiBuildMulti_menuLoadCharacter_buttons[12].rect.y = 270;
+        jkGuiBuildMulti_menuLoadCharacter_buttons[13].rect.y = 290;
+
+        jkGuiBuildMulti_menuLoadCharacter_buttons[14].rect.y = 210;
+        jkGuiBuildMulti_menuLoadCharacter_buttons[15].rect.y = 230;
+    }
+
     name[0] = 0;
     memset(&name[1], 0, 0x3Cu);
     name[31] = 0;
@@ -1444,8 +1499,8 @@ LABEL_7:
         v14 = 1;
         if ( v12 )
         {
-            jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiBuildMulti_menuLoadCharacter, &jkGuiBuildMulti_menuLoadCharacter_buttons[20]);
-            jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiBuildMulti_menuLoadCharacter, &jkGuiBuildMulti_menuLoadCharacter_buttons[16]);
+            jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiBuildMulti_menuLoadCharacter, &jkGuiBuildMulti_menuLoadCharacter_buttons[22]);
+            jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiBuildMulti_menuLoadCharacter, &jkGuiBuildMulti_menuLoadCharacter_buttons[18]);
             v22 = jkGuiRend_DisplayAndReturnClicked(&jkGuiBuildMulti_menuLoadCharacter);
         }
         else
@@ -1559,6 +1614,14 @@ void jkGuiBuildMulti_sub_41D680(jkGuiMenu *pMenu, int idx)
         v3 = jkStrings_GetText(tmp1);
         jk_snwprintf(jkGuiBuildMulti_wTmp2, 0x20, L"%s", v3); // ADDED: swprintf -> snwprintf
         jkGuiBuildMulti_menuEditCharacter_buttons[9].wstr = jkGuiBuildMulti_wTmp2;
+
+        if (Main_bMotsCompat) {
+            stdString_snprintf(tmp1, 32, "GUI_PERSONALITY%d", jkGuiBuildMulti_aMpcInfo[idx].personality); // Added: sprintf -> snprintf
+            v3 = jkStrings_GetText(tmp1);
+
+            jk_snwprintf(jkGuiBuildMulti_wTmp3, 0x20, L"%s", v3); // ADDED: swprintf -> snwprintf
+            jkGuiBuildMulti_menuEditCharacter_buttons[11].wstr = jkGuiBuildMulti_wTmp3;
+        }
     }
     else if ( pMenu == &jkGuiBuildMulti_menuLoadCharacter )
     {
@@ -1575,6 +1638,14 @@ void jkGuiBuildMulti_sub_41D680(jkGuiMenu *pMenu, int idx)
         v5 = jkStrings_GetText(tmp1);
         jk_snwprintf(jkGuiBuildMulti_wTmp2, 0x20, L"%s", v5); // ADDED: swprintf -> snwprintf
         jkGuiBuildMulti_menuLoadCharacter_buttons[15].wstr = jkGuiBuildMulti_wTmp2;
+
+        if (Main_bMotsCompat) {
+            stdString_snprintf(tmp1, 32, "GUI_PERSONALITY%d", jkGuiBuildMulti_aMpcInfo[idx].personality); // Added: sprintf -> snprintf
+            v3 = jkStrings_GetText(tmp1);
+
+            jk_snwprintf(jkGuiBuildMulti_wTmp3, 0x20, L"%s", v3); // ADDED: swprintf -> snwprintf
+            jkGuiBuildMulti_menuLoadCharacter_buttons[17].wstr = jkGuiBuildMulti_wTmp3;
+        }
     }
 }
 
@@ -1588,6 +1659,9 @@ int jkGuiBuildMulti_sub_41D830(jkGuiElement *pElement, jkGuiMenu *pMenu, int mou
         jkGuiRend_UpdateAndDrawClickable(&jkGuiBuildMulti_menuEditCharacter_buttons[5], pMenu, 1);
         jkGuiRend_UpdateAndDrawClickable(&jkGuiBuildMulti_menuEditCharacter_buttons[7], pMenu, 1);
         jkGuiRend_UpdateAndDrawClickable(&jkGuiBuildMulti_menuEditCharacter_buttons[9], pMenu, 1);
+        if (Main_bMotsCompat) {
+            jkGuiRend_UpdateAndDrawClickable(&jkGuiBuildMulti_menuEditCharacter_buttons[11], pMenu, 1);
+        }
         return a5 != 0;
     }
     else
