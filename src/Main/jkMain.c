@@ -1274,6 +1274,10 @@ void jkMain_VideoShow(int a1, int a2)
 {
     signed int result; // eax
 
+    // Added: Fix a bug with the door on Level 10?
+    //if (Main_bMotsCompat && !sithNet_isMulti )
+    //    sithTime_Pause();
+
     result = jkCutscene_sub_421310(jkMain_aLevelJklFname);
     if ( !result )
     {
@@ -1365,6 +1369,10 @@ void jkMain_VideoTick(int a2)
 
 void jkMain_VideoLeave(int a1, int a2)
 {
+    // Added: Fix a bug with the door on Level 10?
+    //if (Main_bMotsCompat && !sithNet_isMulti )
+    //    sithTime_Resume();
+
     jkCutscene_sub_421410();
     if ( a1 == JK_GAMEMODE_VIDEO3 || a1 == JK_GAMEMODE_VIDEO4 )
         jkMain_CdSwitch(0, 1);

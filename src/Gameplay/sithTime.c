@@ -3,9 +3,9 @@
 #include "stdPlatform.h"
 
 #ifdef MICROSECOND_TIME
-static uint64_t sithTime_deltaUs;
+static int64_t sithTime_deltaUs;
 static uint64_t sithTime_curUsAbsolute;
-static uint64_t sithTime_pauseTimeUs;
+static int64_t sithTime_pauseTimeUs;
 #endif
 
 // Added
@@ -64,6 +64,14 @@ void sithTime_SetDelta(int deltaMs)
     sithTime_curMs += sithTime_deltaMs;
 #ifdef MICROSECOND_TIME
     sithTime_deltaUs = Linux_TimeUs() - sithTime_curUsAbsolute;
+    if ( sithTime_deltaMs < SITHTIME_MINDELTA_US )
+    {
+        sithTime_deltaMs = SITHTIME_MINDELTA_US;
+    }
+    if ( sithTime_deltaUs > SITHTIME_MAXDELTA_US)
+    {
+        sithTime_deltaUs = SITHTIME_MAXDELTA_US;
+    }
     if (g_debugmodeFlags & DEBUGFLAG_SLOWMO) {
         sithTime_deltaUs = (uint64_t)((double)sithTime_deltaUs * 0.2);
     }
