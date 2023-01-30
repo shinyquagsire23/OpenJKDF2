@@ -1429,6 +1429,11 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
         procEntry->lightingMode = 1;
     }
 
+    // Added: safeguard
+    if (!face->vertexUVIdx && geometryMode == RD_GEOMODE_TEXTURED) {
+        geometryMode = RD_GEOMODE_SOLIDCOLOR;
+    }
+
     procEntry->geometryMode = geometryMode;
     procEntry->lightingMode = lightingMode;
     procEntry->textureMode = textureMode;
