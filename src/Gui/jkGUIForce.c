@@ -645,6 +645,10 @@ void jkGuiForce_Startup()
         jkGuiForce_pMenu = &jkGuiForce_menuMots;
         jkGuiForce_pElements = jkGuiForce_buttonsMots;
     }
+    else {
+        jkGuiForce_pMenu = &jkGuiForce_menu;
+        jkGuiForce_pElements = jkGuiForce_buttons;
+    }
 
     jkGui_InitMenu(jkGuiForce_pMenu, jkGui_stdBitmaps[9]);
     if (Main_bMotsCompat) {
