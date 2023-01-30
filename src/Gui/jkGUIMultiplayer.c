@@ -264,7 +264,7 @@ LABEL_1:
                     {
                         sithNet_scorelimit = v34.scoreLimit;
                         sithNet_multiplayer_timelimit = v34.timeLimit;
-                        if ( jkGuiBuildMulti_ShowLoad(&jkGuiMultiplayer_mpcInfo, v34.episodeGobName, v34.mapJklFname, 0, v34.maxRank) == 1 )
+                        if ( jkGuiBuildMulti_ShowLoad(&jkGuiMultiplayer_mpcInfo, v34.episodeGobName, v34.mapJklFname, 0, v34.maxRank, v34.multiModeFlags & MULTIMODEFLAG_1000) == 1 ) // MOTS altered: last arg
                         {
                             v21 = sithMulti_CreatePlayer(
                                       v34.serverName,
@@ -335,7 +335,8 @@ LABEL_29:
                  jkGuiMultiplayer_aEntries[jkGuiMultiplayer_aElements3[3].selectedTextEntry].episodeGobName,
                  jkGuiMultiplayer_aEntries[jkGuiMultiplayer_aElements3[3].selectedTextEntry].mapJklFname,
                  0,
-                 jkGuiMultiplayer_aEntries[jkGuiMultiplayer_aElements3[3].selectedTextEntry].maxRank) != 1 )
+                 jkGuiMultiplayer_aEntries[jkGuiMultiplayer_aElements3[3].selectedTextEntry].maxRank,
+                 jkGuiMultiplayer_aEntries[jkGuiMultiplayer_aElements3[3].selectedTextEntry].multiModeFlags & MULTIMODEFLAG_1000) != 1 )
             goto LABEL_28;
 #ifdef QOL_IMPROVEMENTS
         // HACK: Actually do passwords correctly
@@ -666,10 +667,10 @@ int jkGuiMultiplayer_Show2()
             v2 = jkGuiRend_DisplayAndReturnClicked(&jkGuiMultiplayer_menu4);
             jkGui_SetModeGame();
             if ( v2 == 1
-              && jkGuiBuildMulti_ShowLoad(&jkGuiMultiplayer_mpcInfo, jkGuiMultiplayer_aGobPath, jkGuiMultiplayer_aEpisodeJkl, 0, jkGuiMultiplayer_dword_55613C) == 1 )
+              && jkGuiBuildMulti_ShowLoad(&jkGuiMultiplayer_mpcInfo, jkGuiMultiplayer_multiEntry.episodeGobName, jkGuiMultiplayer_multiEntry.mapJklFname, 0, jkGuiMultiplayer_multiEntry.maxRank, jkGuiMultiplayer_multiEntry.multiModeFlags & MULTIMODEFLAG_1000) == 1 )
             {
-                sithMulti_InitTick(jkGuiMultiplayer_tickrate);
-                jkMain_loadFile2(jkGuiMultiplayer_aGobPath, jkGuiMultiplayer_aEpisodeJkl);
+                sithMulti_InitTick(jkGuiMultiplayer_multiEntry.tickRateMs);
+                jkMain_loadFile2(jkGuiMultiplayer_multiEntry.episodeGobName, jkGuiMultiplayer_multiEntry.mapJklFname);
                 return 1;
             }
             goto LABEL_10;
@@ -677,7 +678,7 @@ int jkGuiMultiplayer_Show2()
         if ( jkGuiNetHost_Show(&v8) != 1
           || (sithNet_scorelimit = v8.scoreLimit,
               sithNet_multiplayer_timelimit = v8.timeLimit,
-              jkGuiBuildMulti_ShowLoad(&jkGuiMultiplayer_mpcInfo, v8.episodeGobName, v8.mapJklFname, 0, v8.maxRank) != 1) )
+              jkGuiBuildMulti_ShowLoad(&jkGuiMultiplayer_mpcInfo, v8.episodeGobName, v8.mapJklFname, 0, v8.maxRank, v8.multiModeFlags & MULTIMODEFLAG_1000) != 1) )
         {
 LABEL_10:
             stdComm_CloseConnection();

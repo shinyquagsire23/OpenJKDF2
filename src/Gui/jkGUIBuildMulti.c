@@ -909,11 +909,12 @@ int jkGuiBuildMulti_Show()
                 }
                 break;
             case 100:
-                if ( jkGuiBuildMulti_ShowNewCharacter(-1, 1, 0) < 0 && !v2 ) // MOTS altered TODO
+                if ( jkGuiBuildMulti_ShowNewCharacter(-1, 0, 0) < 0 && !v2 ) // MOTS altered TODO
 LABEL_8:
                     v3 = 0;
                 break;
             case 102:
+                // MOTS added a tmp array here?
                 v6 = jkGuiRend_GetString(&darr, jkGuiBuildMulti_menuEditCharacter_buttons[3].selectedTextEntry);
                 v7 = jkStrings_GetText("GUI_CONFIRM_REMOVE_PLAYER");
                 jk_snwprintf(wtmp1, 0x100u, v7, v6);
@@ -1020,7 +1021,7 @@ int jkGuiBuildMulti_ShowNewCharacter(int rank, int bGameFormatIsJK, int bHasNoVa
     char personalityTmp[128];
 
     // MOTS added
-    if (bGameFormatIsJK == 0) {
+    if (Main_bMotsCompat && bGameFormatIsJK == 0) {
         jkGuiBuildMulti_jediRank = 8;
     }
     else {
@@ -1169,7 +1170,7 @@ LABEL_9:
     return 0;
 }
 
-int jkGuiBuildMulti_ShowLoad(jkPlayerMpcInfo *pPlayerMpcInfo, char *pStrEpisode, char *pJklFname, int minIdk, int a5)
+int jkGuiBuildMulti_ShowLoad(jkPlayerMpcInfo *pPlayerMpcInfo, char *pStrEpisode, char *pJklFname, int minIdk, int rank, int bGameFormatIsJK)
 {
     wchar_t *v5; // eax
     int v6; // eax
@@ -1238,12 +1239,12 @@ LABEL_7:
         jkGuiBuildMulti_menuLoadCharacter_buttons[5].wstr = jkEpisode_aEpisodes[v6].unistr;
     jkRes_LoadGob(pStrEpisode);
     stdStrTable_Load(&strtable, "misc\\cogStrings.uni");
-    v9 = a5;
+    v9 = rank;
     jkGuiBuildMulti_menuLoadCharacter_buttons[7].unistr = (char *)jkGuiTitle_quicksave_related_func1(&strtable, pJklFname);
-    stdString_snprintf(tmp5, 32, "RANK_%d_L", a5);
+    stdString_snprintf(tmp5, 32, "RANK_%d_L", rank);
     v21 = jkStrings_GetText(tmp5);
     v10 = jkStrings_GetText("GUI_RANK");
-    jk_snwprintf(&jkGuiBuildMulti_wTmp[32], 0x80u, v10, a5, v21);
+    jk_snwprintf(&jkGuiBuildMulti_wTmp[32], 0x80u, v10, rank, v21);
     jkGuiBuildMulti_menuLoadCharacter_buttons[9].unistr = (char *)&jkGuiBuildMulti_wTmp[32];
     v11 = 0;
     while ( 1 )
@@ -1283,7 +1284,7 @@ LABEL_7:
                 }
                 break;
             case 100:
-                if ( jkGuiBuildMulti_ShowNewCharacter(a5, 1, v13) < 0 && !v12 ) // MOTS altered TODO
+                if ( jkGuiBuildMulti_ShowNewCharacter(rank, bGameFormatIsJK, v13) < 0 && !v12 ) // MOTS altered TODO
 LABEL_18:
                     v14 = 0;
                 break;
@@ -1332,7 +1333,7 @@ LABEL_18:
         }
         if ( !v14 )
             break;
-        v9 = a5;
+        v9 = rank;
     }
     jkGuiRend_DarrayFree(&darr);
     jkGui_SetModeGame();
