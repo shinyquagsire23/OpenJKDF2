@@ -362,6 +362,7 @@ void jkGuiBuildMulti_ThingCleanup()
     jkGuiBuildMulti_bRendering = tmp; // Added
 }
 
+// MOTS altered
 int jkGuiBuildMulti_ShowEditCharacter(int bIdk)
 {
     int v1; // esi
@@ -409,6 +410,14 @@ int jkGuiBuildMulti_ShowEditCharacter(int bIdk)
     v2 = jkStrings_GetText("GUI_RANK");
     jk_snwprintf(jkGuiBuildMulti_waTmp, 0x80u, v2, v1, v21);
     jkGuiBuildMulti_buttons[2].wstr = jkGuiBuildMulti_waTmp;
+
+    if (jkPlayer_personality != 1) {
+        jkGuiBuildMulti_buttons[2].bIsVisible = 0;
+    }
+    else {
+        jkGuiBuildMulti_buttons[2].bIsVisible = 1; // Added: Fix an LEC bug where the rank text disappeared forever
+    }
+
     v3 = jkStrings_GetText("GUI_S_MULTIPLAYER_CHARACTERS");
     jk_snwprintf(&jkGuiBuildMulti_waTmp[64], 0x40u, v3, jkPlayer_playerShortName);
     jkGuiBuildMulti_buttons[1].wstr = &jkGuiBuildMulti_waTmp[64];
@@ -559,7 +568,13 @@ LABEL_32:
             case 109:
                 jkPlayer_FixStars();
                 jkGuiBuildMulti_bRendering = 0; // Added
-                jkGuiForce_Show(1, 1, 0, &jkGuiBuildMulti_waTmp[32], 0, 0);
+                if (!Main_bMotsCompat || jkPlayer_personality == 1) {
+                    jkGuiForce_Show(1, 1, 0, &jkGuiBuildMulti_waTmp[32], 0, 0);
+                }
+                else {
+                    jkGuiForce_Show(0, 1, 0, &jkGuiBuildMulti_waTmp[32], 0, 0);
+                }
+                
                 jkGuiBuildMulti_bRendering = 1; // Added
                 v16 = 1;
                 break;

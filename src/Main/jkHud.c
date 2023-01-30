@@ -30,7 +30,7 @@ static jkHudFont jkHud_aFonts[6] = {
     {&jkHud_pArmorNumsSuperSft, "ArmorNumsSuper.sft", "ArmorNumsSuper16.sft"},
     {&jkHud_pAmoNumsSft, "AmoNums.sft", "AmoNums16.sft"},
     {&jkHud_pAmoNumsSuperSft, "AmoNumsSuper.sft", "AmoNumsSuper16.sft"},
-    {&jkHud_pMsgFontSft, "msgFont.sft", "msgFont16.sft"},
+    {&jkHud_pMsgFontSft, "msgFont.sft", "msgFont16.sft"}, // TODO: msgFonts, msgFont16s
 };
 
 static jkHudBitmap jkHud_aBitmaps[8] = {

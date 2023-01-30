@@ -1157,6 +1157,16 @@ int jkPlayer_MPCParse(jkPlayerMpcInfo *info, sithPlayerInfo* unk, wchar_t *fname
       && stdConffile_ReadLine()
       && _sscanf(stdConffile_aLine, "tipmat: %s", jkPlayer_tipMat) == 1 )
     {
+        if (Main_bMotsCompat) {
+            if (!stdConffile_ReadLine() || _sscanf(stdConffile_aLine, "personality: %d", &jkPlayer_personality) != 1) {
+                stdConffile_Close();
+                return 0;
+            }
+        }
+        else {
+            jkPlayer_personality = 1; // HACK: JK only has Jedi classes.
+        }
+
         _strncpy(info->model, jkPlayer_model, 0x1Fu);
         info->model[31] = 0;
         _strncpy(info->soundClass, jkPlayer_soundClass, 0x1Fu);
@@ -1165,6 +1175,7 @@ int jkPlayer_MPCParse(jkPlayerMpcInfo *info, sithPlayerInfo* unk, wchar_t *fname
         info->sideMat[31] = 0;
         _strncpy(info->tipMat, jkPlayer_tipMat, 0x1Fu);
         info->tipMat[31] = 0;
+        info->personality = jkPlayer_personality; // MOTS added
         if ( hasBins )
         {
             jkPlayer_MPCBinRead();
@@ -1172,7 +1183,7 @@ int jkPlayer_MPCParse(jkPlayerMpcInfo *info, sithPlayerInfo* unk, wchar_t *fname
         info->jediRank = jkPlayer_GetJediRank();
         stdConffile_Close();
 
-        jkPlayer_personality = 1; // MOTS TODO TODO TODO not real just a hack
+        
         jkPlayer_SetAmmoMaximums(jkPlayer_personality); // MOTS added
         jkPlayer_mpcInfoSet = 1;
         return 1;
@@ -1208,6 +1219,10 @@ int jkPlayer_MPCWrite(sithPlayerInfo* unk, wchar_t *mpcName, wchar_t *playerName
       && stdConffile_Printf("sidemat: %s\n", jkPlayer_sideMat)
       && stdConffile_Printf("tipmat: %s\n", jkPlayer_tipMat))
     {
+        if (Main_bMotsCompat) {
+            stdConffile_Printf("personality: %d\n", jkPlayer_personality);
+        }
+
         v4 = jkPlayer_MPCBinWrite();
         stdConffile_CloseWrite();
         return v4;
