@@ -56,6 +56,10 @@ int jkGuiBuildMulti_ShowLoad(jkPlayerMpcInfo *pPlayerMpcInfo, char *pStrEpisode,
 void jkGuiBuildMulti_sub_41D680(jkGuiMenu *pMenu, int idx);
 int jkGuiBuildMulti_sub_41D830(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5);
 
+
+int jkGuiBuildMulti_FUN_00420930(jkGuiElement *pElement,jkGuiMenu *pMenu,int mouseX,int mouseY,int a5);
+int jkGuiBuildMulti_FUN_004209b0(jkGuiElement *pElement,jkGuiMenu *pMenu,int mouseX,int mouseY,int a5);
+
 //static int (*jkGuiBuildMulti_ShowLoad)(jkPlayerMpcInfo *a1, char *a2, char *a3, int a4, int a5) = (void*)jkGuiBuildMulti_ShowLoad_ADDR;
 
 //static int (*jkGuiBuildMulti_sub_41D000)() = (void*)jkGuiBuildMulti_sub_41D000_ADDR;

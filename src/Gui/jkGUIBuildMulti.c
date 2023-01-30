@@ -57,12 +57,13 @@ static jkGuiElement jkGuiBuildMulti_buttons[17] =
 
 jkGuiMenu jkGuiBuildMulti_menu =
 {
-  &jkGuiBuildMulti_buttons, -1, 65535, 65535, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, 0, jkGuiBuildMulti_sub_41A120, "thermloop01.wav", "thrmlpu2.wav", NULL, NULL, NULL, 0, NULL, NULL
+    &jkGuiBuildMulti_buttons, -1, 65535, 65535, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, 0, jkGuiBuildMulti_sub_41A120, "thermloop01.wav", "thrmlpu2.wav", NULL, NULL, NULL, 0, NULL, NULL
 };
 
 
 
 static int unk_52B170[2] = {0x0d, 0x0e};
+static int unk_583bf8[2] = {0x0d, 0x0e};
 
 static jkGuiElement jkGuiBuildMulti_menuEditCharacter_buttons[15] =
 {
@@ -85,35 +86,83 @@ static jkGuiElement jkGuiBuildMulti_menuEditCharacter_buttons[15] =
 
 static jkGuiMenu jkGuiBuildMulti_menuEditCharacter =
 {
-  &jkGuiBuildMulti_menuEditCharacter_buttons, -1, 65535, 65535, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, 0, NULL, "thermloop01.wav", "thrmlpu2.wav", NULL, NULL, NULL, 0, NULL, NULL
+    &jkGuiBuildMulti_menuEditCharacter_buttons, -1, 65535, 65535, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, 0, NULL, "thermloop01.wav", "thrmlpu2.wav", NULL, NULL, NULL, 0, NULL, NULL
 };
 
-static jkGuiElement jkGuiBuildMulti_menuNewCharacter_buttons[15] =
+// 13 -> 16
+// 12 -> 15
+// 11 -> 14
+// 10 -> 13
+// 7 -> 8
+// 6 -> 7
+// 5 -> 6?
+// 4 -> 5?
+// 2 -> 2
+static jkGuiElement jkGuiBuildMulti_menuNewCharacter_buttons[18] =
 {
-  { ELEMENT_TEXT, 0, 0, NULL, 3, { 230, 410, 410, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXT, 0, 5, "GUI_NEW_CHARACTER", 3, { 240, 20, 400, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXT, 0, 1, NULL, 3, { 240, 60, 400, 30 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXT, 0, 2, "GUI_NEW_CHARACTER_CONFIG", 3, { 240, 130, 400, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXT, 0, 2, "GUI_MAXSTARS", 3, { 0, 30, 200, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXT, 0, 0, NULL, 3, { 0, 50, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXT, 0, 2, "GUI_RANKLABEL", 3, { 320, 240, 240, 30 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXT, 0, 0, NULL, 3, { 344, 270, 192, 30 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_PICBUTTON, 103, 0, NULL, 33, { 320, 270, 24, 24 }, 1, 0, NULL, NULL, jkGuiBuildMulti_sub_41D000, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_PICBUTTON, 104, 0, NULL, 34, { 536, 270, 24, 24 }, 1, 0, NULL, NULL, jkGuiBuildMulti_sub_41D000, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXT, 0, 2, "GUI_NAME", 3, { 320, 170, 240, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXTBOX, 0, 0, NULL, 0, { 320, 200, 240, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXTBUTTON, -1, 2, "GUI_CANCEL", 3, { 0, 430, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_TEXTBUTTON, 1, 2, "GUI_OK", 3, { 460, 430, 180, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-  { ELEMENT_END, 0, 0, NULL, 0, { 0, 0, 0, 0 }, 0, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 }
+/*00*/  { ELEMENT_TEXT, 0, 0, NULL, 3, { 230, 410, 410, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*01*/  { ELEMENT_TEXT, 0, 5, "GUI_NEW_CHARACTER", 3, { 240, 20, 400, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*02*/  { ELEMENT_TEXT, 0, 1, NULL, 3, { 240, 60, 400, 30 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*03*/  { ELEMENT_TEXT, 0, 2, "GUI_NEW_CHARACTER_CONFIG", 3, { 240, 130, 400, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+
+/*04 dummy*/  { ELEMENT_TEXT, 0, 0, L"", 3, { 0, 0, 0, 0 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*05*/  { ELEMENT_TEXT, 0, 2, "GUI_MAXSTARS", 3, { 0, 30, 200, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*06*/  { ELEMENT_TEXT, 0, 0, NULL, 3, { 0, 50, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+
+/*07*/  { ELEMENT_TEXT, 0, 2, "GUI_RANKLABEL", 3, { 320, 240, 240, 30 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*08*/  { ELEMENT_TEXT, 0, 0, NULL, 3, { 344, 270, 192, 30 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*09*/  { ELEMENT_PICBUTTON, 103, 0, NULL, 33, { 320, 270, 24, 24 }, 1, 0, NULL, NULL, jkGuiBuildMulti_sub_41D000, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*10*/  { ELEMENT_PICBUTTON, 104, 0, NULL, 34, { 536, 270, 24, 24 }, 1, 0, NULL, NULL, jkGuiBuildMulti_sub_41D000, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+
+/*11 dummy*/  { ELEMENT_TEXT, 0, 0, L"", 3, { 0, 0, 0, 0 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*12 dummy*/  { ELEMENT_TEXT, 0, 0, L"", 3, { 0, 0, 0, 0 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+
+/*13*/  { ELEMENT_TEXT, 0, 2, "GUI_NAME", 3, { 320, 170, 240, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*14*/  { ELEMENT_TEXTBOX, 0, 0, NULL, 0, { 320, 200, 240, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*15*/  { ELEMENT_TEXTBUTTON, -1, 2, "GUI_CANCEL", 3, { 0, 430, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*16*/  { ELEMENT_TEXTBUTTON, 1, 2, "GUI_OK", 3, { 460, 430, 180, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*17*/  { ELEMENT_END, 0, 0, NULL, 0, { 0, 0, 0, 0 }, 0, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 }
 };
-
-
-
 
 static jkGuiMenu jkGuiBuildMulti_menuNewCharacter =
 {
-  &jkGuiBuildMulti_menuNewCharacter_buttons, -1, 65535, 65535, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, 0, NULL, "thermloop01.wav", "thrmlpu2.wav", NULL, NULL, NULL, 0, NULL, NULL
+    &jkGuiBuildMulti_menuNewCharacter_buttons, -1, 65535, 65535, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, 0, NULL, "thermloop01.wav", "thrmlpu2.wav", NULL, NULL, NULL, 0, NULL, NULL
 };
+
+static jkGuiElement jkGuiBuildMulti_menuNewCharacter_buttonsMots[18] =
+{
+/*00*/  { ELEMENT_TEXT,        0,    0,    NULL,    3,    { 0, 100, 200, 320 },    1,    0,    NULL,    NULL,    NULL,    NULL,    { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } },    0 },
+/*01*/  { ELEMENT_TEXT,        0,    5,    "GUI_NEW_CHARACTER",    3,    { 240, 15, 400, 50 },    1,    0,    NULL,    NULL,    NULL,    NULL,    { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } },    0 },
+/*02*/  { ELEMENT_TEXT,        0,    1,    NULL,    3,    { 240, 60, 400, 30 },    1,    0,    NULL,    NULL,    NULL,    NULL,    { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } },    0 },
+/*03*/  { ELEMENT_TEXT,        0,    2,    "GUI_NEW_CHARACTER_CONFIG",    3,    { 240, 110, 400, 20 },    1,    0,    NULL,    NULL,    NULL,    NULL,    { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } },    0 },
+/*04*/  { ELEMENT_TEXT,        0,    2,    "GUI_TYPEOFGAME",    2,    { 300, 220, 240, 30 },    1,    0,    NULL,    NULL,    NULL,    NULL,    { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } },    0 },
+
+/*05*/  { ELEMENT_CHECKBOX,    0,    0,    "GUI_TYPEPERSONALITIES",    0,    { 300, 250, 340, 20 },    1,    0,    NULL,    NULL,    jkGuiBuildMulti_FUN_004209b0,    NULL,    { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } },    0 },
+/*06*/  { ELEMENT_CHECKBOX,    0,    0,    "GUI_TYPEJEDIONLY",    0,    { 300, 270, 340, 20 },    1,    0,    NULL,    NULL,    jkGuiBuildMulti_FUN_00420930,    NULL,    { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } },    0 },
+
+// TODO jkGuiBuildMulti_waTmpRankLabel
+/*07*/  { ELEMENT_TEXT,        0,    2,   "GUI_RANKLABEL",    2,    { 300, 320, 240, 30 },    1,    0,    NULL,    NULL,    NULL,    NULL,    { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } },    0 },
+/*08*/  { ELEMENT_TEXT,        0,    0,    NULL,    2,    { 360, 360, 192, 30 },    1,    0,    NULL,    NULL,    NULL,    NULL,    { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } },    0 },
+/*09*/  { ELEMENT_PICBUTTON,   103,  0,    NULL,    33,    { 300, 360, 24, 24 },    1,    0,    NULL,    NULL,    jkGuiBuildMulti_sub_41D000,    NULL,    { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } },    0 },
+/*10*/  { ELEMENT_PICBUTTON,   104,  0,    NULL,    34,    { 326, 360, 24, 24 },    1,    0,    NULL,    NULL,    jkGuiBuildMulti_sub_41D000,    NULL,    { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } },    0 },
+
+/*11*/  { ELEMENT_TEXT,        0,    2,    "GUI_PERSONALITY",    2,    { 300, 310, 240, 30 },    1,    0,    NULL,    NULL,    NULL,    NULL,    { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } },    0 },
+/*12*/  { ELEMENT_LISTBOX,     1,    0,    NULL,    0,    { 300, 345, 240, 66 },    1,    0,    NULL,    NULL,    NULL,    unk_583bf8,    { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } },    0 },
+
+/*13*/  { ELEMENT_TEXT,        0,    2,    "GUI_NAME",    2,    { 300, 145, 240, 30 },    1,    0,    NULL,    NULL,    NULL,    NULL,    { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } },    0 },
+/*14*/  { ELEMENT_TEXTBOX,     0,    0,    NULL,    0,    { 300, 180, 240, 20 },    1,    0,    NULL,    NULL,    NULL,    NULL,    { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } },    0 },
+/*15*/  { ELEMENT_TEXTBUTTON, -1,    2,    "GUI_CANCEL",    3,    { 0, 430, 200, 40 },    1,    0,    NULL,    NULL,    NULL,    NULL,    { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } },    0 },
+/*16*/  { ELEMENT_TEXTBUTTON,  1,    2,    "GUI_OK",    3,    { 460, 430, 180, 40 },    1,    0,    NULL,    NULL,    NULL,    NULL,    { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } },    0 },
+/*17*/  { ELEMENT_END,         0,    0,    NULL,    0,    { 0, 0, 0, 0 },    0,    0,    NULL,    NULL,    NULL,    NULL,    { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } },    0}
+};
+
+static jkGuiMenu jkGuiBuildMulti_menuNewCharacterMots =
+{
+    &jkGuiBuildMulti_menuNewCharacter_buttonsMots, -1, 65535, 65535, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, 0, NULL, "thermloop01.wav", "thrmlpu2.wav", NULL, NULL, NULL, 0, NULL, NULL
+};
+
+static jkGuiElement* jkGuiBuildMulti_pNewCharacterElements = jkGuiBuildMulti_menuNewCharacter_buttons;
+static jkGuiMenu* jkGuiBuildMulti_pNewCharacterMenu = &jkGuiBuildMulti_menuNewCharacter;
 
 static jkGuiElement jkGuiBuildMulti_menuLoadCharacter_buttons[22] =
 {
@@ -191,6 +240,8 @@ static stdVBufferTexFmt jkGuiBuildMulti_texFmt;
 static rdMatrix34 jkGuiBuildMulti_orthoProjection;
 static rdVector3 jkGuiBuildMulti_lightPos;
 static uint32_t jkGuiBuildMulti_lastModelDrawMs;
+
+static wchar_t jkGuiBuildMulti_waTmpRankLabel[128];
 
 static rdRect jkGuiBuildMulti_rect_5353C8 = {315, 115, 260, 260};
 
@@ -756,8 +807,16 @@ void jkGuiBuildMulti_sub_41A120(jkGuiMenu *pMenu)
 
 int jkGuiBuildMulti_Startup()
 {
-
-    jkGui_InitMenu(&jkGuiBuildMulti_menuNewCharacter, jkGui_stdBitmaps[12]);
+    if (!Main_bMotsCompat)
+    {
+        jkGuiBuildMulti_pNewCharacterMenu = &jkGuiBuildMulti_menuNewCharacter;
+        jkGuiBuildMulti_pNewCharacterElements = jkGuiBuildMulti_menuNewCharacter_buttons;
+    }
+    else {
+        jkGuiBuildMulti_pNewCharacterMenu = &jkGuiBuildMulti_menuNewCharacterMots;
+        jkGuiBuildMulti_pNewCharacterElements = jkGuiBuildMulti_menuNewCharacter_buttonsMots;
+    }
+    jkGui_InitMenu(jkGuiBuildMulti_pNewCharacterMenu, jkGui_stdBitmaps[12]);
     jkGui_InitMenu(&jkGuiBuildMulti_menuEditCharacter, jkGui_stdBitmaps[12]);
     jkGui_InitMenu(&jkGuiBuildMulti_menuLoadCharacter, jkGui_stdBitmaps[12]);
 
@@ -1001,7 +1060,6 @@ int jkGuiBuildMulti_Show2(Darray *pDarray, jkGuiElement *pElement, int minIdk, i
 // MOTS altered TODO
 int jkGuiBuildMulti_ShowNewCharacter(int rank, int bGameFormatIsJK, int bHasNoValidChars)
 {
-    wchar_t *v3; // eax
     wchar_t *v4; // eax
     signed int v5; // esi
     wchar_t *v6; // eax
@@ -1010,7 +1068,6 @@ int jkGuiBuildMulti_ShowNewCharacter(int rank, int bGameFormatIsJK, int bHasNoVa
     wchar_t *v9; // eax
     wchar_t *a2a; // [esp+0h] [ebp-1A8h]
     wchar_t *a2b; // [esp+0h] [ebp-1A8h]
-    float a2d; // [esp+0h] [ebp-1A8h]
     char v15[32]; // [esp+18h] [ebp-190h] BYREF
     char v16[128]; // [esp+28h] [ebp-180h] BYREF
     char v17[128]; // [esp+A8h] [ebp-100h] BYREF
@@ -1041,47 +1098,99 @@ int jkGuiBuildMulti_ShowNewCharacter(int rank, int bGameFormatIsJK, int bHasNoVa
     }
     jkGuiRend_DarrayReallocStr(&daPersonalities,(wchar_t *)0x0,0);
 
-    // MOTS added TODO TODO
+    // MOTS added
     jkPlayer_personality = 1;
+    if (Main_bMotsCompat) {
+        jkGuiRend_SetClickableString(&jkGuiBuildMulti_pNewCharacterElements[12],&daPersonalities);
+        jkGuiBuildMulti_pNewCharacterElements[12].selectedTextEntry = 0;
+    }
 
-    jkGuiBuildMulti_menuNewCharacter_buttons[11].wstr = jkGuiBuildMulti_aWchar_5594C8;
+    // MOTS: 11 -> 14
+    jkGuiBuildMulti_pNewCharacterElements[14].wstr = jkGuiBuildMulti_aWchar_5594C8; // 11
     memset(jkGuiBuildMulti_aWchar_5594C8, 0, 0x20u);
-    jkGuiBuildMulti_menuNewCharacter_buttons[11].selectedTextEntry = 16;
+    jkGuiBuildMulti_pNewCharacterElements[14].selectedTextEntry = 16; // 11
     if ( bHasNoValidChars )
     {
         jkGuiDialog_ErrorDialog(jkStrings_GetText("GUI_NOVALIDCHARTITLE"), jkStrings_GetText("GUI_NOVALIDCHARACTERS"));
     }
-    v3 = jkStrings_GetText("GUI_S_MULTIPLAYER_CHARACTERS");
-    jk_snwprintf(&jkGuiBuildMulti_wTmp[64], 0x40u, v3, jkPlayer_playerShortName);
-    jkGuiBuildMulti_menuNewCharacter_buttons[2].wstr = &jkGuiBuildMulti_wTmp[64];
-    if ( rank < 0 )
-    {
-        jkGuiRend_SetVisibleAndDraw(&jkGuiBuildMulti_menuNewCharacter_buttons[4], &jkGuiBuildMulti_menuNewCharacter, 0);
-        jkGuiBuildMulti_menuNewCharacter_buttons[5].wstr = NULL;
+    jk_snwprintf(&jkGuiBuildMulti_wTmp[64], 0x40u, jkStrings_GetText("GUI_S_MULTIPLAYER_CHARACTERS"), jkPlayer_playerShortName);
+    jkGuiBuildMulti_pNewCharacterElements[2].wstr = &jkGuiBuildMulti_wTmp[64]; // 2
+
+    if (Main_bMotsCompat) {
+        if ( rank < 0 )
+        {
+            jk_snwprintf(jkGuiBuildMulti_waTmpRankLabel, 0x80u, jkStrings_GetText("GUI_RANKLABEL"), rank);
+            jkGuiBuildMulti_pNewCharacterElements[7].wstr = jkGuiBuildMulti_waTmpRankLabel;
+        }
+        else
+        {
+            jk_snwprintf(jkGuiBuildMulti_waTmpRankLabel, 0x80u, jkStrings_GetText("GUI_RANKLABELMAX"), rank);
+            jkGuiBuildMulti_pNewCharacterElements[7].wstr = jkGuiBuildMulti_waTmpRankLabel;
+        }
     }
-    else
-    {
-        jkGuiRend_SetVisibleAndDraw(&jkGuiBuildMulti_menuNewCharacter_buttons[4], &jkGuiBuildMulti_menuNewCharacter, 1);
-        stdString_snprintf(v15, 32, "RANK_%d_L", rank);
-        a2a = jkStrings_GetText(v15);
-        v4 = jkStrings_GetText("GUI_RANK");
-        jk_snwprintf(&jkGuiBuildMulti_wTmp[32], 0x80u, v4, rank, a2a);
-        jkGuiBuildMulti_menuNewCharacter_buttons[5].wstr = &jkGuiBuildMulti_wTmp[32];
+    else {
+        if ( rank < 0 )
+        {
+            jkGuiRend_SetVisibleAndDraw(&jkGuiBuildMulti_pNewCharacterElements[5], jkGuiBuildMulti_pNewCharacterMenu, 0); // 4
+            jkGuiBuildMulti_pNewCharacterElements[6].wstr = NULL; // 5
+        }
+        else
+        {
+            jkGuiRend_SetVisibleAndDraw(&jkGuiBuildMulti_pNewCharacterElements[5], jkGuiBuildMulti_pNewCharacterMenu, 1); // 4
+            stdString_snprintf(v15, 32, "RANK_%d_L", rank);
+            a2a = jkStrings_GetText(v15);
+            v4 = jkStrings_GetText("GUI_RANK");
+            jk_snwprintf(&jkGuiBuildMulti_wTmp[32], 0x80u, v4, rank, a2a);
+            jkGuiBuildMulti_pNewCharacterElements[6].wstr = &jkGuiBuildMulti_wTmp[32]; // 5
+        }
     }
+    
     v5 = rank < 0 ? 0 : rank;
     jkPlayer_SetRank(v5);
     stdString_snprintf(v15, 32, "RANK_%d_L", v5);
     a2b = jkStrings_GetText(v15);
     v6 = jkStrings_GetText("GUI_RANK");
     jk_snwprintf(jkGuiBuildMulti_wTmp, 0x80u, v6, v5, a2b);
-    jkGuiBuildMulti_menuNewCharacter_buttons[7].wstr = jkGuiBuildMulti_wTmp;
-    jkGuiBuildMulti_menuNewCharacter_buttons[0].wstr = NULL;
+    jkGuiBuildMulti_pNewCharacterElements[8].wstr = jkGuiBuildMulti_wTmp; // 7
+    jkGuiBuildMulti_pNewCharacterElements[0].wstr = NULL; // 0
+
+    if (Main_bMotsCompat) {
+        jkGuiBuildMulti_pNewCharacterElements[5].bIsVisible = 1;
+        jkGuiBuildMulti_pNewCharacterElements[6].bIsVisible = 1;
+        if (bGameFormatIsJK == 0) {
+            jkGuiBuildMulti_pNewCharacterElements[6].selectedTextEntry = 0;
+            jkGuiBuildMulti_pNewCharacterElements[5].selectedTextEntry = 1;
+            jkGuiBuildMulti_pNewCharacterElements[7].bIsVisible = 0;
+            jkGuiBuildMulti_pNewCharacterElements[8].bIsVisible = 0;
+            jkGuiBuildMulti_pNewCharacterElements[9].bIsVisible = 0;
+            jkGuiBuildMulti_pNewCharacterElements[10].bIsVisible = 0;
+            jkGuiBuildMulti_pNewCharacterElements[11].bIsVisible = 1;
+            jkGuiBuildMulti_pNewCharacterElements[12].bIsVisible = 1;
+            if (bHasNoValidChars != 0) {
+                jkGuiBuildMulti_pNewCharacterElements[6].bIsVisible = 0;
+            }
+        }
+        else {
+            jkGuiBuildMulti_pNewCharacterElements[6].selectedTextEntry = 1;
+            jkGuiBuildMulti_pNewCharacterElements[5].selectedTextEntry = 0;
+            jkGuiBuildMulti_pNewCharacterElements[7].bIsVisible = 1;
+            jkGuiBuildMulti_pNewCharacterElements[8].bIsVisible = 1;
+            jkGuiBuildMulti_pNewCharacterElements[9].bIsVisible = 1;
+            jkGuiBuildMulti_pNewCharacterElements[10].bIsVisible = 1;
+            jkGuiBuildMulti_pNewCharacterElements[11].bIsVisible = 0;
+            jkGuiBuildMulti_pNewCharacterElements[12].bIsVisible = 0;
+            if (bHasNoValidChars != 0) {
+                jkGuiBuildMulti_pNewCharacterElements[5].bIsVisible = 0;
+            }
+        }
+    }
+
     do
     {
         v7 = 0;
-        jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiBuildMulti_menuNewCharacter, &jkGuiBuildMulti_menuNewCharacter_buttons[13]);
-        jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiBuildMulti_menuNewCharacter, &jkGuiBuildMulti_menuNewCharacter_buttons[12]);
-        v8 = jkGuiRend_DisplayAndReturnClicked(&jkGuiBuildMulti_menuNewCharacter);
+        jkGuiRend_MenuSetReturnKeyShortcutElement(jkGuiBuildMulti_pNewCharacterMenu, &jkGuiBuildMulti_pNewCharacterElements[16]); // 13
+        jkGuiRend_MenuSetEscapeKeyShortcutElement(jkGuiBuildMulti_pNewCharacterMenu, &jkGuiBuildMulti_pNewCharacterElements[15]); // 12
+        v8 = jkGuiRend_DisplayAndReturnClicked(jkGuiBuildMulti_pNewCharacterMenu);
         if ( v8 != 1 )
             goto LABEL_16;
         if ( jkGuiBuildMulti_aWchar_5594C8[0] )
@@ -1111,7 +1220,7 @@ int jkGuiBuildMulti_ShowNewCharacter(int rank, int bGameFormatIsJK, int bHasNoVa
             v7 = 1;
             v9 = jkStrings_GetText("ERR_NO_PLAYER_NAME");
         }
-        jkGuiBuildMulti_menuNewCharacter_buttons[0].wstr = v9;
+        jkGuiBuildMulti_pNewCharacterElements[0].wstr = v9; // 8
 LABEL_16:
         if ( v8 == -1 ) {
             jkGuiRend_DarrayFree(&daPersonalities); // MOTS added
@@ -1119,16 +1228,81 @@ LABEL_16:
         }
     }
     while ( v7 );
-    a2d = (double)jkPlayer_GetJediRank() * 3.0;
-    sithPlayer_SetBinAmt(17, a2d);
-    sithPlayer_SetBinAmt(16, 0.0);
+    sithPlayer_SetBinAmt(SITHBIN_SPEND_STARS, (double)jkPlayer_GetJediRank() * 3.0);
+    sithPlayer_SetBinAmt(SITHBIN_NEW_STARS, 0.0);
+    if (Main_bMotsCompat) {
+        if (jkGuiBuildMulti_pNewCharacterElements[5].selectedTextEntry == 0) {
+            jkPlayer_personality = 1;
+        }
+        else {
+            jkPlayer_SetRank(7);
+            jkPlayer_personality = jkGuiBuildMulti_pNewCharacterElements[12].selectedTextEntry + 1;
+        }
+        jkPlayer_SetAmmoMaximums(jkPlayer_personality);
+    }
     jkPlayer_ResetPowers();
+    if (Main_bMotsCompat) {
+        jkPlayer_SyncForcePowers(jkPlayer_GetJediRank(), 1);
+    }
     jkPlayer_SetPlayerName(jkGuiBuildMulti_aWchar_5594C8);
     jkPlayer_mpcInfoSet = 0;
     jkGuiBuildMulti_ShowEditCharacter(1);
     jkPlayer_MPCWrite(&jkPlayer_playerInfos[playerThingIdx], jkPlayer_playerShortName, jkGuiBuildMulti_aWchar_5594C8);
     jkGuiRend_DarrayFree(&daPersonalities); // MOTS added
     return v8;
+}
+
+
+int jkGuiBuildMulti_FUN_00420930(jkGuiElement *pElement,jkGuiMenu *pMenu,int mouseX,int mouseY,int a5)
+{
+    jkGuiBuildMulti_pNewCharacterElements[6].selectedTextEntry = 1;
+    jkGuiBuildMulti_pNewCharacterElements[5].selectedTextEntry = 0;
+    if (pMenu != (jkGuiMenu *)0x0) {
+        jkGuiRend_UpdateAndDrawClickable(pElement,pMenu,1);
+    }
+    jkGuiBuildMulti_pNewCharacterElements[7].bIsVisible = 1;
+    jkGuiBuildMulti_pNewCharacterElements[8].bIsVisible = 1;
+    jkGuiBuildMulti_pNewCharacterElements[9].bIsVisible = 1;
+    jkGuiBuildMulti_pNewCharacterElements[10].bIsVisible = 1;
+    jkGuiBuildMulti_pNewCharacterElements[11].bIsVisible = 0;
+    jkGuiBuildMulti_pNewCharacterElements[12].bIsVisible = 0;
+
+    // Added: Prevent infloop
+    if (!pMenu->focusedElement->bIsVisible) {
+        pMenu->focusedElement = &jkGuiBuildMulti_pNewCharacterElements[14];
+    }
+
+    if (pMenu != (jkGuiMenu *)0x0) {
+        jkGuiRend_Paint(pMenu);
+        jkGuiRend_Paint(pMenu);
+    }
+    return 0;
+}
+
+int jkGuiBuildMulti_FUN_004209b0(jkGuiElement *pElement,jkGuiMenu *pMenu,int mouseX,int mouseY,int a5)
+{
+    jkGuiBuildMulti_pNewCharacterElements[6].selectedTextEntry = 0;
+    jkGuiBuildMulti_pNewCharacterElements[5].selectedTextEntry = 1;
+    if (pMenu != (jkGuiMenu *)0x0) {
+        jkGuiRend_UpdateAndDrawClickable(pElement,pMenu,1);
+    }
+    jkGuiBuildMulti_pNewCharacterElements[7].bIsVisible = 0;
+    jkGuiBuildMulti_pNewCharacterElements[8].bIsVisible = 0;
+    jkGuiBuildMulti_pNewCharacterElements[9].bIsVisible = 0;
+    jkGuiBuildMulti_pNewCharacterElements[10].bIsVisible = 0;
+    jkGuiBuildMulti_pNewCharacterElements[11].bIsVisible = 1;
+    jkGuiBuildMulti_pNewCharacterElements[12].bIsVisible = 1;
+
+    // Added: Prevent infloop
+    if (!pMenu->focusedElement->bIsVisible) {
+        pMenu->focusedElement = &jkGuiBuildMulti_pNewCharacterElements[14];
+    }
+
+    if (pMenu != (jkGuiMenu *)0x0) {
+        jkGuiRend_Paint(pMenu);
+        jkGuiRend_Paint(pMenu);
+    }
+    return 0;
 }
 
 int jkGuiBuildMulti_sub_41D000(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5)
@@ -1164,8 +1338,8 @@ int jkGuiBuildMulti_sub_41D000(jkGuiElement *pElement, jkGuiMenu *pMenu, int mou
         v3 = jkStrings_GetText("GUI_RANK");
 LABEL_9:
         jk_snwprintf(jkGuiBuildMulti_wTmp, 0x80u, v3, v6, v7);
-        jkGuiBuildMulti_menuNewCharacter_buttons[7].wstr = jkGuiBuildMulti_wTmp;
-        jkGuiRend_UpdateAndDrawClickable(&jkGuiBuildMulti_menuNewCharacter_buttons[7], pMenu, 1);
+        jkGuiBuildMulti_pNewCharacterElements[8].wstr = jkGuiBuildMulti_wTmp;
+        jkGuiRend_UpdateAndDrawClickable(&jkGuiBuildMulti_pNewCharacterElements[8], pMenu, 1);
     }
     return 0;
 }
