@@ -381,14 +381,25 @@ typedef int CONSOLE_CURSOR_INFO;
 #define VK_BACK   (0x08)
 #define VK_TAB    (0x09)
 #define VK_RETURN (0x0D)
+#define VK_SHIFT  (0x10)
 #define VK_ESCAPE (0x1B)
+#define VK_SPACE  (0x20)
+#define VK_PRIOR  (0x21) // PAGE UP
+#define VK_NEXT   (0x22) // PAGE DOWN
 #define VK_END    (0x23)
 #define VK_HOME   (0x24)
 #define VK_LEFT   (0x25)
 #define VK_UP     (0x26)
 #define VK_RIGHT  (0x27) 
 #define VK_DOWN   (0x28)
+#define VK_DELETE (0x2E)
+
+#define VK_LSHIFT (0xA0)
+#define VK_RSHIFT (0xA1)
 #define VK_OEM_3  (0xC0)
+
+#define VK_LWIN   (0x5B)
+#define VK_RWIN   (0x5C)
 
 #define HKEY_LOCAL_MACHINE 0
 
@@ -2923,14 +2934,14 @@ typedef struct Darray
 } Darray;
 
 typedef void (*jkGuiDrawFunc_t)(jkGuiElement*, jkGuiMenu*, stdVBuffer*, int);
-typedef int (*jkGuiButtonDownFunc_t)(jkGuiElement*, jkGuiMenu*, int, int);
-typedef int (*jkGuiButtonUpFunc_t)(jkGuiElement*, jkGuiMenu*, int, int, int);
+typedef int (*jkGuiEventHandlerFunc_t)(jkGuiElement*, jkGuiMenu*, int, int);
+typedef int (*jkGuiClickHandlerFunc_t)(jkGuiElement*, jkGuiMenu*, int, int, int);
 
 typedef struct jkGuiElementHandlers
 {
-  jkGuiButtonDownFunc_t buttonDown;
+  jkGuiEventHandlerFunc_t fnEventHandler;
   jkGuiDrawFunc_t draw;
-  jkGuiButtonUpFunc_t buttonUp;
+  jkGuiClickHandlerFunc_t fnClickHandler;
 } jkGuiElementHandlers;
 
 typedef struct jkGuiTexInfo
@@ -2970,7 +2981,7 @@ typedef struct jkGuiElement
         wchar_t* wHintText;
     };
     jkGuiDrawFunc_t drawFuncOverride;
-    jkGuiButtonUpFunc_t func;
+    jkGuiClickHandlerFunc_t func;
     void *anonymous_13;
     jkGuiTexInfo texInfo;
     int elementIdk;
@@ -3005,7 +3016,7 @@ typedef struct jkGuiMenu
   jkGuiElement *focusedElement;
   jkGuiElement *lastMouseDownClickable;
   jkGuiElement *lastMouseOverClickable;
-  int lastButtonUp;
+  int lastClicked;
   jkGuiElement* clickables_end;
   jkGuiElement* field_48;
 } jkGuiMenu;

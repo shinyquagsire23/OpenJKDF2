@@ -2067,8 +2067,8 @@ void do_hooks()
     hook_function(jkGuiRend_sub_5103E0_ADDR, jkGuiRend_sub_5103E0);
     hook_function(jkGuiRend_ElementHasHoverSound_ADDR, jkGuiRend_ElementHasHoverSound);
     hook_function(jkGuiRend_UpdateAndDrawClickable_ADDR, jkGuiRend_UpdateAndDrawClickable);
-    hook_function(jkGuiRend_InvokeButtonDown_ADDR, jkGuiRend_InvokeButtonDown);
-    hook_function(jkGuiRend_InvokeButtonUp_ADDR, jkGuiRend_InvokeButtonUp);
+    hook_function(jkGuiRend_InvokeEvent_ADDR, jkGuiRend_InvokeEvent);
+    hook_function(jkGuiRend_InvokeClicked_ADDR, jkGuiRend_InvokeClicked);
     hook_function(jkGuiRend_PlayClickSound_ADDR, jkGuiRend_PlayClickSound);
     hook_function(jkGuiRend_RenderFocused_ADDR, jkGuiRend_RenderFocused);
     hook_function(jkGuiRend_RenderIdk2_ADDR, jkGuiRend_RenderIdk2);
@@ -2080,7 +2080,7 @@ void do_hooks()
     hook_function(jkGuiRend_sub_510C60_ADDR, jkGuiRend_sub_510C60);
     hook_function(jkGuiRend_ClickSound_ADDR, jkGuiRend_ClickSound);
     hook_function(jkGuiRend_HoverOn_ADDR, jkGuiRend_HoverOn);
-    hook_function(jkGuiRend_ListBoxButtonDown_ADDR, jkGuiRend_ListBoxButtonDown);
+    hook_function(jkGuiRend_ListBoxEventHandler_ADDR, jkGuiRend_ListBoxEventHandler);
     hook_function(jkGuiRend_ListBoxDraw_ADDR, jkGuiRend_ListBoxDraw);
     hook_function(jkGuiRend_CheckBoxDraw_ADDR, jkGuiRend_CheckBoxDraw);
     hook_function(jkGuiRend_DrawClickableAndUpdatebool_ADDR, jkGuiRend_DrawClickableAndUpdatebool);
@@ -2090,14 +2090,14 @@ void do_hooks()
     hook_function(jkGuiRend_GetMousePos_ADDR, jkGuiRend_GetMousePos);
     hook_function(jkGuiRend_ResetMouseLatestMs_ADDR, jkGuiRend_ResetMouseLatestMs);
     hook_function(jkGuiRend_InvalidateGdi_ADDR, jkGuiRend_InvalidateGdi);
-    hook_function(jkGuiRend_SliderButtonDown_ADDR, jkGuiRend_SliderButtonDown);
+    hook_function(jkGuiRend_SliderEventHandler_ADDR, jkGuiRend_SliderEventHandler);
     hook_function(jkGuiRend_SliderDraw_ADDR, jkGuiRend_SliderDraw);
-    hook_function(jkGuiRend_TextBoxButtonDown_ADDR, jkGuiRend_TextBoxButtonDown);
+    hook_function(jkGuiRend_TextBoxEventHandler_ADDR, jkGuiRend_TextBoxEventHandler);
     hook_function(jkGuiRend_TextBoxDraw_ADDR, jkGuiRend_TextBoxDraw);
     hook_function(jkGuiRend_TextDraw_ADDR, jkGuiRend_TextDraw);
-    hook_function(jkGuiRend_PicButtonButtonDown_ADDR, jkGuiRend_PicButtonButtonDown);
+    hook_function(jkGuiRend_PicButtonEventHandler_ADDR, jkGuiRend_PicButtonEventHandler);
     hook_function(jkGuiRend_PicButtonDraw_ADDR, jkGuiRend_PicButtonDraw);
-    hook_function(jkGuiRend_TextButtonButtonDown_ADDR, jkGuiRend_TextButtonButtonDown);
+    hook_function(jkGuiRend_TextButtonEventHandler_ADDR, jkGuiRend_TextButtonEventHandler);
     hook_function(jkGuiRend_TextButtonDraw_ADDR, jkGuiRend_TextButtonDraw);
     
     // jkGUI

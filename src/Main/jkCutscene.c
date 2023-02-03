@@ -639,53 +639,53 @@ int jkCutscene_Handler(HWND a1, UINT a2, WPARAM a3, LPARAM a4, LRESULT *a5)
             jk_SetCursor(0);
             return 1;
         case WM_CHAR:
-            if ( a3 != 0x1B )
+            if ( a3 == VK_ESCAPE )
             {
-                if ( a3 == 0x20 )
+                if ( jkCutscene_isRendering )
                 {
-                    jkCutscene_55AA54 = !jkCutscene_55AA54;
+                    return jkCutscene_sub_421410();
+                }
+                return 1;
+            }
+            else if ( a3 == VK_SPACE )
+            {
+                jkCutscene_55AA54 = !jkCutscene_55AA54;
 #if !defined(SDL2_RENDER)
-                    if (!openjkdf2_bIsKVM)
-                        smack_off(jkCutscene_55AA54);
+                if (!openjkdf2_bIsKVM)
+                    smack_off(jkCutscene_55AA54);
 #endif
 
 #if defined(SDL2_RENDER)
-                    if (jkCutscene_55AA54)
-                    {
-                        if (jkCutscene_audioFull)
-                            stdSound_BufferStop(jkCutscene_audioFull);
-                        if (jkCutscene_audio)
-                            stdSound_BufferStop(jkCutscene_audio);
-                        if (jkCutscene_audio2)
-                            stdSound_BufferStop(jkCutscene_audio2);
-                        if (jkCutscene_audio3)
-                            stdSound_BufferStop(jkCutscene_audio3);
-                        last_displayFrame -= Linux_TimeUs();
-                        last_audioUs -= Linux_TimeUs();
-                    }
-                    else
-                    {
-                        if (jkCutscene_audioFull)
-                            stdSound_BufferPlay(jkCutscene_audioFull, 0);
-                        if (jkCutscene_audio)
-                            stdSound_BufferPlay(jkCutscene_audio, 0);
-                        if (jkCutscene_audio2)
-                            stdSound_BufferPlay(jkCutscene_audio2, 0);
-                        if (jkCutscene_audio3)
-                            stdSound_BufferPlay(jkCutscene_audio3, 0);
-                        last_displayFrame += Linux_TimeUs();
-                        last_audioUs += Linux_TimeUs();
-                    }
-#endif
-                    jkCutscene_PauseShow(0);
+                if (jkCutscene_55AA54)
+                {
+                    if (jkCutscene_audioFull)
+                        stdSound_BufferStop(jkCutscene_audioFull);
+                    if (jkCutscene_audio)
+                        stdSound_BufferStop(jkCutscene_audio);
+                    if (jkCutscene_audio2)
+                        stdSound_BufferStop(jkCutscene_audio2);
+                    if (jkCutscene_audio3)
+                        stdSound_BufferStop(jkCutscene_audio3);
+                    last_displayFrame -= Linux_TimeUs();
+                    last_audioUs -= Linux_TimeUs();
                 }
-                return 0;
+                else
+                {
+                    if (jkCutscene_audioFull)
+                        stdSound_BufferPlay(jkCutscene_audioFull, 0);
+                    if (jkCutscene_audio)
+                        stdSound_BufferPlay(jkCutscene_audio, 0);
+                    if (jkCutscene_audio2)
+                        stdSound_BufferPlay(jkCutscene_audio2, 0);
+                    if (jkCutscene_audio3)
+                        stdSound_BufferPlay(jkCutscene_audio3, 0);
+                    last_displayFrame += Linux_TimeUs();
+                    last_audioUs += Linux_TimeUs();
+                }
+#endif
+                jkCutscene_PauseShow(0);
             }
-            if ( jkCutscene_isRendering )
-            {
-                return jkCutscene_sub_421410();
-            }
-            return 1;
+            return 0;
     }
     return 0;
 }

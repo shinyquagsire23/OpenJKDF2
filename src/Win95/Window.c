@@ -725,88 +725,75 @@ void Window_SdlUpdate()
                 //handleKey(&event.key.keysym, WM_KEYDOWN, 0x1);
                 if (event.key.keysym.sym == SDLK_ESCAPE)
                 {
-                    if (!event.key.repeat)
-                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_ESCAPE, 0);
-                    Window_msg_main_handler(g_hWnd, WM_CHAR, VK_ESCAPE, 0);
+                    Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_ESCAPE, event.key.repeat & 0xFFFF);
+                    Window_msg_main_handler(g_hWnd, WM_CHAR, VK_ESCAPE, event.key.repeat & 0xFFFF);
+                }
+                else if (event.key.keysym.sym == SDLK_PAGEUP)
+                {
+                    Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_PRIOR, event.key.repeat & 0xFFFF);
+                }
+                else if (event.key.keysym.sym == SDLK_PAGEDOWN)
+                {
+                    Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_NEXT, event.key.repeat & 0xFFFF);
                 }
                 else if (event.key.keysym.sym == SDLK_LEFT)
                 {
-                    if (!event.key.repeat)
-                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, 0x25, 0);
-                    //Window_msg_main_handler(g_hWnd, WM_CHAR, 0x25, 0);
+                    Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_LEFT, event.key.repeat & 0xFFFF);
                 }
                 else if (event.key.keysym.sym == SDLK_RIGHT)
                 {
-                    if (!event.key.repeat)
-                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, 0x27, 0);
-                    //Window_msg_main_handler(g_hWnd, WM_CHAR, 0x27, 0);
+                    Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_RIGHT, event.key.repeat & 0xFFFF);
                 }
                 else if (event.key.keysym.sym == SDLK_UP)
                 {
-                    if (!event.key.repeat)
-                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, 0x26, 0);
-                    //Window_msg_main_handler(g_hWnd, WM_CHAR, 0x26, 0);
+                    Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_UP, event.key.repeat & 0xFFFF);
                 }
                 else if (event.key.keysym.sym == SDLK_DOWN)
                 {
-                    if (!event.key.repeat)
-                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, 0x28, 0);
-                    //Window_msg_main_handler(g_hWnd, WM_CHAR, 0x28, 0);
+                    Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_DOWN, event.key.repeat & 0xFFFF);
                 }
                 else if (event.key.keysym.sym == SDLK_BACKSPACE)
                 {
-                    if (!event.key.repeat)
-                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_BACK, 0);
-                    Window_msg_main_handler(g_hWnd, WM_CHAR, VK_BACK, 0);
+                    Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_BACK, event.key.repeat & 0xFFFF);
+                    Window_msg_main_handler(g_hWnd, WM_CHAR, VK_BACK, event.key.repeat & 0xFFFF);
                 }
                 else if (event.key.keysym.sym == SDLK_DELETE)
                 {
-                    if (!event.key.repeat)
-                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, 0x2E, 0);
-                    //Window_msg_main_handler(g_hWnd, WM_CHAR, 0x8, 0);
+                    Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_DELETE, event.key.repeat & 0xFFFF);
+                    Window_msg_main_handler(g_hWnd, WM_CHAR, VK_DELETE, 0);
                 }
                 else if (event.key.keysym.sym == SDLK_RETURN)
                 {
                     // HACK apparently Windows buffers these events in some way, but to replicate the behavior in jkGUI we just spam KEYFIRST
-                    //if (!event.key.repeat)
-                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_RETURN, 0);
-                    Window_msg_main_handler(g_hWnd, WM_CHAR, VK_RETURN, 0);
+                    Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_RETURN, event.key.repeat & 0xFFFF);
+                    Window_msg_main_handler(g_hWnd, WM_CHAR, VK_RETURN, event.key.repeat & 0xFFFF);
                 }
                 else if (event.key.keysym.sym == SDLK_LSHIFT)
                 {
-                    if (!event.key.repeat)
-                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, 0xA0, 0);
-                    Window_msg_main_handler(g_hWnd, WM_KEYDOWN, 0xA0, 0);
+                    Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_LSHIFT, event.key.repeat & 0xFFFF);
                 }
                 else if (event.key.keysym.sym == SDLK_RSHIFT)
                 {
-                    if (!event.key.repeat)
-                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, 0xA1, 0);
-                    Window_msg_main_handler(g_hWnd, WM_KEYDOWN, 0xA1, 0);
+                    Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_RSHIFT, event.key.repeat & 0xFFFF);
                 }
                 else if (event.key.keysym.sym == SDLK_TAB)
                 {
-                    if (!event.key.repeat)
-                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_TAB, 0);
-                    Window_msg_main_handler(g_hWnd, WM_CHAR, VK_TAB, 0);
+                    Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_TAB, event.key.repeat & 0xFFFF);
+                    Window_msg_main_handler(g_hWnd, WM_CHAR, VK_TAB, event.key.repeat & 0xFFFF);
                 }
                 else if (event.key.keysym.sym == SDLK_END)
                 {
-                    if (!event.key.repeat)
-                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, 0x23, 0);
+                    Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_END, event.key.repeat & 0xFFFF);
                     //Window_msg_main_handler(g_hWnd, WM_CHAR, 0x23, 0);
                 }
                 else if (event.key.keysym.sym == SDLK_HOME)
                 {
-                    if (!event.key.repeat)
-                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, 0x24, 0);
+                    Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_HOME, event.key.repeat & 0xFFFF);
                     //Window_msg_main_handler(g_hWnd, WM_CHAR, 0x24, 0);
                 }
                 else if (event.key.keysym.sym == SDLK_BACKQUOTE)
                 {
-                    if (!event.key.repeat)
-                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_OEM_3, 0);
-                    Window_msg_main_handler(g_hWnd, WM_CHAR, VK_OEM_3, 0);
+                    Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_OEM_3, event.key.repeat & 0xFFFF);
                 }
 
                 //if (!event.key.repeat)
@@ -819,19 +806,19 @@ void Window_SdlUpdate()
                 }
                 else if (event.key.keysym.sym == SDLK_LEFT)
                 {
-                    Window_msg_main_handler(g_hWnd, WM_KEYUP, 0x25, 0);
+                    Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_LEFT, 0);
                 }
                 else if (event.key.keysym.sym == SDLK_RIGHT)
                 {
-                    Window_msg_main_handler(g_hWnd, WM_KEYUP, 0x27, 0);
+                    Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_RIGHT, 0);
                 }
                 else if (event.key.keysym.sym == SDLK_UP)
                 {
-                    Window_msg_main_handler(g_hWnd, WM_KEYUP, 0x26, 0);
+                    Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_UP, 0);
                 }
                 else if (event.key.keysym.sym == SDLK_DOWN)
                 {
-                    Window_msg_main_handler(g_hWnd, WM_KEYUP, 0x28, 0);
+                    Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_DOWN, 0);
                 }
                 else if (event.key.keysym.sym == SDLK_BACKSPACE)
                 {
@@ -839,31 +826,31 @@ void Window_SdlUpdate()
                 }
                 else if (event.key.keysym.sym == SDLK_DELETE)
                 {
-                    Window_msg_main_handler(g_hWnd, WM_KEYUP, 0x2E, 0);
+                    Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_DELETE, 0);
                 }
                 else if (event.key.keysym.sym == SDLK_RETURN)
                 {
-                    Window_msg_main_handler(g_hWnd, WM_KEYUP, 0xB, 0);
+                    Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_RETURN, 0); // 0xB?
                 }
                 else if (event.key.keysym.sym == SDLK_LSHIFT)
                 {
-                    Window_msg_main_handler(g_hWnd, WM_KEYUP, 0xA0, 0);
+                    Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_LSHIFT, 0);
                 }
                 else if (event.key.keysym.sym == SDLK_RSHIFT)
                 {
-                    Window_msg_main_handler(g_hWnd, WM_KEYUP, 0xA1, 0);
+                    Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_RSHIFT, 0);
                 }
                 else if (event.key.keysym.sym == SDLK_TAB)
                 {
-                    Window_msg_main_handler(g_hWnd, WM_KEYUP, 0x9, 0);
+                    Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_TAB, 0);
                 }
                 else if (event.key.keysym.sym == SDLK_END)
                 {
-                    Window_msg_main_handler(g_hWnd, WM_KEYUP, 0x23, 0);
+                    Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_END, 0);
                 }
                 else if (event.key.keysym.sym == SDLK_HOME)
                 {
-                    Window_msg_main_handler(g_hWnd, WM_KEYUP, 0x24, 0);
+                    Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_HOME, 0);
                 }
                 else if (event.key.keysym.sym == SDLK_BACKQUOTE)
                 {
@@ -1303,6 +1290,7 @@ int Window_Main_Linux(int argc, char** argv)
 #endif
 
     Main_Shutdown();
+    return 1;
 }
 
 int Window_Main(HINSTANCE hInstance, int a2, char *lpCmdLine, int nShowCmd, LPCSTR lpWindowName)

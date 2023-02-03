@@ -481,6 +481,15 @@ void jkQuakeConsole_SendInput(char wParam)
             jkQuakeConsole_selectedHistory = 0;
             jkQuakeConsole_bHasTabbed = 0;
         }
+        else if ( wParam == VK_DELETE )
+        {
+            if ( jkQuakeConsole_chatStrPos < JKQUAKECONSOLE_CHAT_LEN-1) {
+                memmove(&jkQuakeConsole_chatStr[jkQuakeConsole_chatStrPos], &jkQuakeConsole_chatStr[jkQuakeConsole_chatStrPos+1], JKQUAKECONSOLE_CHAT_LEN-jkQuakeConsole_chatStrPos-1);
+            }
+            jkQuakeConsole_tabIdx = 0;
+            jkQuakeConsole_selectedHistory = 0;
+            jkQuakeConsole_bHasTabbed = 0;
+        }
         else if ( wParam == VK_TAB )
         {
             if (!jkDev_cheatHashtable) return;
@@ -605,10 +614,13 @@ void jkQuakeConsole_SendInput(char wParam)
 
 int jkQuakeConsole_WmHandler(HWND a1, UINT msg, WPARAM wParam, HWND a4, LRESULT *a5)
 {
+    LPARAM lParam = (LPARAM)a4;
+    uint16_t repeats = lParam & 0xFFFF;
+
     switch ( msg )
     {
         case WM_KEYFIRST:
-            if (wParam == VK_OEM_3) // `/~ key
+            if (wParam == VK_OEM_3 && !repeats) // `/~ key
             {
                 jkQuakeConsole_bOpen = !jkQuakeConsole_bOpen;
                 if (jkQuakeConsole_bOpen) {

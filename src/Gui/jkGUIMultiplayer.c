@@ -438,7 +438,7 @@ int jkGuiMultiplayer_CogMsgHandleJoining(sithCogMsg *msg)
                 v2 = jkStrings_GetText("GUINET_JOINERROR");
 LABEL_9:
                 jkGuiDialog_ErrorDialog(v2, v3);
-                jkGuiMultiplayer_menu4.lastButtonUp = -2;
+                jkGuiMultiplayer_menu4.lastClicked = -2;
                 sithComm_SetNeedsSync();
                 break;
             default:
@@ -507,14 +507,14 @@ void jkGuiMultiplayer_sub_4140B0(jkGuiMenu *pMenu)
             }
             if ( v3 == 0x88770118 )
             {
-                pMenu->lastButtonUp = -1;
+                pMenu->lastClicked = -1;
             }
             else if ( v3 )
             {
                 v9 = jkStrings_GetText("GUINET_NOCONNECT");
                 v7 = jkStrings_GetText("GUINET_JOINERROR");
                 jkGuiDialog_ErrorDialog(v7, v9);
-                pMenu->lastButtonUp = -1;
+                pMenu->lastClicked = -1;
             }
             jkGuiRend_UpdateAndDrawClickable(&jkGuiMultiplayer_aElements3[3], &jkGuiMultiplayer_menu3, 1);
         }
@@ -627,14 +627,14 @@ void jkGuiMultiplayer_idk(jkGuiMenu *pMenu)
         {
             sithComm_Sync();
             if ( (g_submodeFlags & 8) == 0 )
-                pMenu->lastButtonUp = 1;
+                pMenu->lastClicked = 1;
         }
         else
         {
             v3 = jkStrings_GetText("GUINET_NOGAMECONNECT");
             v2 = jkStrings_GetText("GUINET_JOINERROR");
             jkGuiDialog_ErrorDialog(v2, v3);
-            pMenu->lastButtonUp = -2;
+            pMenu->lastClicked = -2;
         }
     }
 }
@@ -729,7 +729,7 @@ void jkGuiMultiplayer_sub_4142C0(jkGuiMenu *pMenu)
             if ( jkGuiMultiplayer_multiEntry.field_E0 )
             {
                 jkGuiMultiplayer_checksumSeed = jkGuiMultiplayer_multiEntry.checksumSeed;
-                pMenu->lastButtonUp = 1;
+                pMenu->lastClicked = 1;
             }
         }
     }

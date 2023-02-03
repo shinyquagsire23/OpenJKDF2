@@ -45,13 +45,13 @@ static HCURSOR jkGuiRend_hCursor = 0;
 static int jkGuiRend_CursorVisible = 1;
 static jkGuiElementHandlers jkGuiRend_elementHandlers[8] = 
 {
-    {jkGuiRend_TextButtonButtonDown, jkGuiRend_TextButtonDraw, jkGuiRend_PlayClickSound},
-    {jkGuiRend_PicButtonButtonDown, jkGuiRend_PicButtonDraw, jkGuiRend_PlayClickSound},
+    {jkGuiRend_TextButtonEventHandler, jkGuiRend_TextButtonDraw, jkGuiRend_PlayClickSound},
+    {jkGuiRend_PicButtonEventHandler, jkGuiRend_PicButtonDraw, jkGuiRend_PlayClickSound},
     {NULL, jkGuiRend_TextDraw, NULL},
     {NULL, jkGuiRend_CheckBoxDraw, jkGuiRend_DrawClickableAndUpdatebool},
-    {jkGuiRend_ListBoxButtonDown, jkGuiRend_ListBoxDraw, jkGuiRend_ClickSound},
-    {jkGuiRend_TextBoxButtonDown, jkGuiRend_TextBoxDraw, NULL},
-    {jkGuiRend_SliderButtonDown, jkGuiRend_SliderDraw, NULL},
+    {jkGuiRend_ListBoxEventHandler, jkGuiRend_ListBoxDraw, jkGuiRend_ClickSound},
+    {jkGuiRend_TextBoxEventHandler, jkGuiRend_TextBoxDraw, NULL},
+    {jkGuiRend_SliderEventHandler, jkGuiRend_SliderDraw, NULL},
     {NULL, NULL, NULL},
 };
 
@@ -90,132 +90,131 @@ void jkGuiRend_DrawRect(stdVBuffer *vbuf, rdRect *rect, int16_t color)
     int v35; // ebx
     int v36; // [esp+10h] [ebp-8h]
 
-    if ( g_app_suspended && !jkGuiRend_bIsSurfaceValid )
-    {
-        int x = rect->x;
-        if ( rect->x < 0 )
-        {
-            int w = rect->width;
-            rect->x = 0;
-            rect->width = x + w;
-        }
-        int y = rect->y;
-        if ( y < 0 )
-        {
-            int h = rect->height;
-            rect->y = 0;
-            rect->height = y + h;
-        }
-        if ( rect->width + rect->x > vbuf->format.width )
-            rect->width = vbuf->format.width - rect->x;
-        if ( rect->height + rect->y > vbuf->format.height )
-            rect->height = vbuf->format.height - rect->y;
+    if ( !g_app_suspended || jkGuiRend_bIsSurfaceValid )
+        return;
 
-        if ( stdDisplay_VBufferLock(vbuf) )
+    int x = rect->x;
+    if ( rect->x < 0 )
+    {
+        int w = rect->width;
+        rect->x = 0;
+        rect->width = x + w;
+    }
+    int y = rect->y;
+    if ( y < 0 )
+    {
+        int h = rect->height;
+        rect->y = 0;
+        rect->height = y + h;
+    }
+    if ( rect->width + rect->x > vbuf->format.width )
+        rect->width = vbuf->format.width - rect->x;
+    if ( rect->height + rect->y > vbuf->format.height )
+        rect->height = vbuf->format.height - rect->y;
+
+    if (!stdDisplay_VBufferLock(vbuf))
+        return;
+
+    v36 = rect->y * vbuf->format.width_in_pixels;
+    v12 = rect->y + rect->height;
+    v14 = vbuf->format.width_in_pixels * (v12 - 1);
+    if ( vbuf->format.format.bpp == 8 )
+    {
+        if ( rect->x < rect->x + rect->width )
         {
-            v36 = rect->y * vbuf->format.width_in_pixels;
-            v12 = rect->y + rect->height;
-            v14 = vbuf->format.width_in_pixels * (v12 - 1);
-            if ( vbuf->format.format.bpp == 8 )
+            v21 = v36 - v14;
+            v22 = &vbuf->surface_lock_alloc[rect->x + v14];
+            v23 = rect->width;
+            do
             {
-                if ( rect->x < rect->x + rect->width )
-                {
-                    v21 = v36 - v14;
-                    v22 = &vbuf->surface_lock_alloc[rect->x + v14];
-                    v23 = rect->width;
-                    do
-                    {
-                        v22[v21] = color;
-                        *v22++ = color;
-                        --v23;
-                    }
-                    while ( v23 );
-                }
+                v22[v21] = color;
+                *v22++ = color;
+                --v23;
             }
-            else
+            while ( v23 );
+        }
+    }
+    else
+    {
+        if ( vbuf->format.format.bpp != 16 )
+            goto LABEL_22;
+        if ( rect->x < rect->x + rect->width )
+        {
+            int16_t* v18 = (int16_t *)&vbuf->surface_lock_alloc[2 * (rect->x + v14)];
+            int16_t* v19 = (int16_t *)&vbuf->surface_lock_alloc[2 * (rect->x + v36)];
+            v20 = rect->width;
+            do
             {
-                if ( vbuf->format.format.bpp != 16 )
-                    goto LABEL_22;
-                if ( rect->x < rect->x + rect->width )
-                {
-                    int16_t* v18 = (int16_t *)&vbuf->surface_lock_alloc[2 * (rect->x + v14)];
-                    int16_t* v19 = (int16_t *)&vbuf->surface_lock_alloc[2 * (rect->x + v36)];
-                    v20 = rect->width;
-                    do
-                    {
-                        *v19 = color;
-                        *v18 = color;
-                        ++v19;
-                        ++v18;
-                        --v20;
-                    }
-                    while ( v20 );
-                }
+                *v19 = color;
+                *v18 = color;
+                ++v19;
+                ++v18;
+                --v20;
             }
+            while ( v20 );
+        }
+    }
 LABEL_22:
-            v24 = rect->x + rect->width - 1;
-            if ( vbuf->format.format.bpp == 8 )
+    v24 = rect->x + rect->width - 1;
+    if ( vbuf->format.format.bpp == 8 )
+    {
+        if ( rect->y < v12 )
+        {
+            v32 = rect->x - v24;
+            v33 = &vbuf->surface_lock_alloc[rect->y * vbuf->format.width_in_pixels + v24];
+            v34 = v12 - rect->y;
+            do
             {
-                if ( rect->y < v12 )
-                {
-                    v32 = rect->x - v24;
-                    v33 = &vbuf->surface_lock_alloc[rect->y * vbuf->format.width_in_pixels + v24];
-                    v34 = v12 - rect->y;
-                    do
-                    {
-                        v35 = vbuf->format.width_in_pixels;
-                        v33[v32] = color;
-                        *v33 = color;
-                        v33 += v35;
-                        --v34;
-                    }
-                    while ( v34 );
-                }
+                v35 = vbuf->format.width_in_pixels;
+                v33[v32] = color;
+                *v33 = color;
+                v33 += v35;
+                --v34;
             }
-            else if ( vbuf->format.format.bpp == 16 )
+            while ( v34 );
+        }
+    }
+    else if ( vbuf->format.format.bpp == 16 )
+    {
+        uint16_t* as16Bit = (uint16_t*)vbuf->surface_lock_alloc;
+        if ( rect->y < v12 )
+        {
+            v26 = vbuf->format.width_in_pixels;
+            v27 = 2 * v26;
+            v28 = rect->y * v26;
+            v29 = (__int16 *)&as16Bit[v28 + v24];
+            v30 = v12 - rect->y;
+            v31 = (__int16 *)&as16Bit[v28 + rect->x];
+            do
             {
-                uint16_t* as16Bit = (uint16_t*)vbuf->surface_lock_alloc;
-                if ( rect->y < v12 )
-                {
-                    v26 = vbuf->format.width_in_pixels;
-                    v27 = 2 * v26;
-                    v28 = rect->y * v26;
-                    v29 = (__int16 *)&as16Bit[v28 + v24];
-                    v30 = v12 - rect->y;
-                    v31 = (__int16 *)&as16Bit[v28 + rect->x];
-                    do
-                    {
-                        *v31 = color;
-                        *v29 = color;
-                        v31 = (__int16 *)((char *)v31 + v27);
-                        v29 = (__int16 *)((char *)v29 + v27);
-                        --v30;
-                    }
-                    while ( v30 );
-                    stdDisplay_VBufferUnlock(vbuf);
-                    return;
-                }
+                *v31 = color;
+                *v29 = color;
+                v31 = (__int16 *)((char *)v31 + v27);
+                v29 = (__int16 *)((char *)v29 + v27);
+                --v30;
             }
+            while ( v30 );
             stdDisplay_VBufferUnlock(vbuf);
             return;
         }
     }
+    stdDisplay_VBufferUnlock(vbuf);
 }
 
 void jkGuiRend_UpdateDrawMenu(jkGuiMenu *menu)
 {
-    if ( g_app_suspended && !jkGuiRend_bIsSurfaceValid)
+    if (!g_app_suspended || jkGuiRend_bIsSurfaceValid)
+        return;
+
+    int idx = menu->clickableIdxIdk;
+    if ( idx >= 0 )
     {
-        int idx = menu->clickableIdxIdk;
-        if ( idx >= 0 )
-        {
-            jkGuiElement* clickable = menu->lastMouseOverClickable;
-            if ( clickable && clickable->hintText && clickable->bIsVisible && !clickable->anonymous_9 )
-                menu->clickables[idx].str = clickable->hintText;
-            else
-                menu->clickables[idx].str = 0;
-            jkGuiRend_UpdateAndDrawClickable(&menu->clickables[menu->clickableIdxIdk], menu, 1);
-        }
+        jkGuiElement* clickable = menu->lastMouseOverClickable;
+        if ( clickable && clickable->hintText && clickable->bIsVisible && !clickable->anonymous_9 )
+            menu->clickables[idx].str = clickable->hintText;
+        else
+            menu->clickables[idx].str = 0;
+        jkGuiRend_UpdateAndDrawClickable(&menu->clickables[menu->clickableIdxIdk], menu, 1);
     }
 }
 
@@ -225,33 +224,31 @@ void jkGuiRend_Paint(jkGuiMenu *menu)
     
     jkGuiElement* lastFocused = menu->focusedElement;
     jkGuiElement* lastDown = menu->lastMouseDownClickable;
-    
-    if ( g_app_suspended && !jkGuiRend_bIsSurfaceValid )
-    {
-        stdControl_ShowCursor(0);
-        stdDisplay_SetMasterPalette(jkGuiRend_palette);
-        if ( menu->texture )
-            stdDisplay_VBufferCopy(jkGuiRend_menuBuffer, menu->texture, 0, 0, 0, 0);
 
-        jkGuiElement* clickable = &menu->clickables[0];
-        int clickableIdx = 0;
-        while ( clickable->type != ELEMENT_END )
-        {
-            jkGuiRend_UpdateAndDrawClickable(clickable, menu, 0);
-            clickable = &menu->clickables[++clickableIdx];
-        }
+    if (!g_app_suspended || jkGuiRend_bIsSurfaceValid)
+        return;
+    
+    stdControl_ShowCursor(0);
+    stdDisplay_SetMasterPalette(jkGuiRend_palette);
+    if ( menu->texture )
+        stdDisplay_VBufferCopy(jkGuiRend_menuBuffer, menu->texture, 0, 0, 0, 0);
+
+    jkGuiElement* clickable = &menu->clickables[0];
+    int clickableIdx = 0;
+    while ( clickable->type != ELEMENT_END )
+    {
+        jkGuiRend_UpdateAndDrawClickable(clickable, menu, 0);
+        clickable = &menu->clickables[++clickableIdx];
+    }
 
 #ifdef SDL2_RENDER
-        menu->focusedElement = lastFocused;
-        menu->lastMouseDownClickable = lastDown;
+    menu->focusedElement = lastFocused;
+    menu->lastMouseDownClickable = lastDown;
 #endif
-        
-        jkGuiRend_FlipAndDraw(menu, 0);
+    
+    jkGuiRend_FlipAndDraw(menu, 0);
 
-        jkGuiRend_UpdateCursor();
-    }
-    
-    
+    jkGuiRend_UpdateCursor();
 }
 
 void jkGuiRend_SetElementIdk(jkGuiElement *element, int idk)
@@ -279,7 +276,7 @@ int jkGuiRend_DisplayAndReturnClicked(jkGuiMenu *menu)
     jkGuiRend_gui_sets_handler_framebufs(menu);
     
     jkGuiRend_SetCursorVisible(1);
-    while ( !menu->lastButtonUp )
+    while ( !menu->lastClicked )
     {
         msgret = Window_MessageLoop();
         if ( jkGuiRend_thing_four && jkGuiRend_thing_five )
@@ -287,7 +284,7 @@ int jkGuiRend_DisplayAndReturnClicked(jkGuiMenu *menu)
             // Added: this makes the menu that appears when pressing ESC in jkGUISingleTally flicker,
             //        I think due to how we handle window message emulation.
 #ifndef SDL2_RENDER
-            menu->lastButtonUp = -1;
+            menu->lastClicked = -1;
 #endif
         }
         else
@@ -295,14 +292,14 @@ int jkGuiRend_DisplayAndReturnClicked(jkGuiMenu *menu)
             jkGuiRend_thing_four = 0;
             if ( g_should_exit )
                 jk_exit(msgret);
-            if ( menu->idkFunc && !menu->lastButtonUp )
+            if ( menu->idkFunc && !menu->lastClicked )
                 menu->idkFunc(menu);
         }
     }
     jkGuiRend_sub_50FDB0();
     --jkGuiRend_thing_five;
     jkGuiRend_activeMenu = lastActiveMenu;
-    return menu->lastButtonUp;
+    return menu->lastClicked;
 }
 
 void jkGuiRend_sub_50FAD0(jkGuiMenu *menu)
@@ -312,7 +309,7 @@ void jkGuiRend_sub_50FAD0(jkGuiMenu *menu)
     menu->focusedElement = 0;
     menu->lastMouseDownClickable = 0;
     menu->lastMouseOverClickable = 0;
-    menu->lastButtonUp = 0;
+    menu->lastClicked = 0;
 
     if ( menu->palette )
        jkGuiRend_SetPalette(menu->palette);
@@ -348,7 +345,7 @@ void jkGuiRend_sub_50FAD0(jkGuiMenu *menu)
     while (clickable->type != ELEMENT_END)
     {
         _memset(&clickable->texInfo, 0, sizeof(clickable->texInfo));
-        jkGuiRend_InvokeButtonDown(clickable, menu, 0, 0);
+        jkGuiRend_InvokeEvent(clickable, menu, JKGUI_EVENT_INIT, 0);
         clickable = &menu->clickables[++idx];
     }
     
@@ -392,10 +389,10 @@ void jkGuiRend_gui_sets_handler_framebufs(jkGuiMenu *menu)
 
 int jkGuiRend_Menuidk()
 {
-    if ( jkGuiRend_activeMenu->lastButtonUp )
+    if ( jkGuiRend_activeMenu->lastClicked )
     {
         jkGuiRend_sub_50FDB0();
-        return jkGuiRend_activeMenu->lastButtonUp;
+        return jkGuiRend_activeMenu->lastClicked;
     }
     else
     {
@@ -477,12 +474,11 @@ void jkGuiRend_Open(stdVBuffer *menuBuffer, stdVBuffer *otherBuf, int fillColor)
 
 void jkGuiRend_Close()
 {
-    if ( jkGuiRend_bOpen )
-    {
-        jkGuiRend_menuBuffer = 0;
-        jkGuiRend_texture_dword_8561E8 = 0;
-        jkGuiRend_bOpen = 0;
-    }
+    if (!jkGuiRend_bOpen) return;
+
+    jkGuiRend_menuBuffer = 0;
+    jkGuiRend_texture_dword_8561E8 = 0;
+    jkGuiRend_bOpen = 0;
 }
 
 jkGuiElement* jkGuiRend_MenuGetClickableById(jkGuiMenu *menu, int id)
@@ -591,14 +587,11 @@ void jkGuiRend_UpdateCursor()
 
 void jkGuiRend_UpdateSurface()
 {
-    if ( g_app_suspended )
-    {
-        if ( !jkGuiRend_bIsSurfaceValid )
-        {
-            stdDisplay_ClearRect(jkGuiRend_menuBuffer, jkGuiRend_fillColor, 0);
-            jkGuiRend_FlipAndDraw(jkGuiRend_activeMenu, 0);
-        }
-    }
+    if (!g_app_suspended || jkGuiRend_bIsSurfaceValid)
+        return;
+
+    stdDisplay_ClearRect(jkGuiRend_menuBuffer, jkGuiRend_fillColor, 0);
+    jkGuiRend_FlipAndDraw(jkGuiRend_activeMenu, 0);
 }
 
 int jkGuiRend_DrawAndFlip(uint32_t a)
@@ -793,19 +786,19 @@ LABEL_47:
         stdControl_ShowCursor(1);
 }
 
-int jkGuiRend_InvokeButtonDown(jkGuiElement *element, jkGuiMenu *menu, int a3, int a4)
+int jkGuiRend_InvokeEvent(jkGuiElement *element, jkGuiMenu *menu, int eventType, int eventParam)
 {
-    jkGuiButtonDownFunc_t handler;
+    jkGuiEventHandlerFunc_t fnEventHandler;
 
-    if ( element && (!a3 || element->bIsVisible && !element->anonymous_9) && (handler = jkGuiRend_elementHandlers[element->type].buttonDown) != 0 )
-        return handler(element, menu, a3, a4);
+    if ( element && (!eventType || element->bIsVisible && !element->anonymous_9) && (fnEventHandler = jkGuiRend_elementHandlers[element->type].fnEventHandler) != 0 )
+        return fnEventHandler(element, menu, eventType, eventParam);
     else
         return 0;
 }
 
-int jkGuiRend_InvokeButtonUp(jkGuiElement *clickable, jkGuiMenu *menu, int mouseX, int mouseY, int a5)
+int jkGuiRend_InvokeClicked(jkGuiElement *clickable, jkGuiMenu *menu, int mouseX, int mouseY, int a5)
 {
-    jkGuiButtonUpFunc_t handler;
+    jkGuiClickHandlerFunc_t handler;
 
     if ( !clickable->bIsVisible || clickable->anonymous_9 )
         return 0;
@@ -813,13 +806,13 @@ int jkGuiRend_InvokeButtonUp(jkGuiElement *clickable, jkGuiMenu *menu, int mouse
     handler = clickable->func;
     if ( !handler )
     {
-        handler = jkGuiRend_elementHandlers[clickable->type].buttonUp;
+        handler = jkGuiRend_elementHandlers[clickable->type].fnClickHandler;
     }
 
     if (handler)
-        menu->lastButtonUp = handler(clickable, menu, mouseX, mouseY, a5);
+        menu->lastClicked = handler(clickable, menu, mouseX, mouseY, a5);
 
-    return menu->lastButtonUp;
+    return menu->lastClicked;
 }
 
 int jkGuiRend_PlayClickSound(jkGuiElement *element, jkGuiMenu *menu, int a, int b, int c)
@@ -915,18 +908,19 @@ void jkGuiRend_RenderIdk2_alt(jkGuiMenu *menu)
     {
         iter = &menu->clickables[idxOther];
         if ( menu->clickables[idxOther].type != ELEMENT_END )
-            break;
-        idxOther = -1;
-LABEL_12:
+        {
+            if ( iter->bIsVisible && !iter->anonymous_9 && !(iter->type < ELEMENT_LISTBOX || iter->type > ELEMENT_TEXTBOX))
+                break;
+        }
+        else
+        {
+            idxOther = -1;
+        }
+        
         if ( ++idxOther == idx )
             return;
     }
-    if ( !iter->bIsVisible )
-        goto LABEL_12;
-    if ( iter->anonymous_9 )
-        goto LABEL_12;
-    if ( iter->type < ELEMENT_LISTBOX || iter->type > ELEMENT_TEXTBOX )
-        goto LABEL_12;
+
 
     jkGuiElement* element = &menu->clickables[idxOther];
     if ( element && jkGuiRend_sub_5103E0(element) )
@@ -980,21 +974,16 @@ void jkGuiRend_RenderAll(jkGuiMenu *menu)
                 ++clickables;
                 ++idxOther;
             }
-            goto LABEL_13;
         }
-        v6 = &menu->clickables[idxOther];
-        if ( v6->bIsVisible )
+        else if ( menu->clickables[idxOther].bIsVisible && !menu->clickables[idxOther].anonymous_9 && menu->clickables[idxOther].type >= ELEMENT_LISTBOX && menu->clickables[idxOther].type <= ELEMENT_TEXTBOX)
         {
-            if ( !v6->anonymous_9 )
-            {
-                if ( v6->type >= ELEMENT_LISTBOX && v6->type <= ELEMENT_TEXTBOX )
-                    break;
-            }
+            break;
         }
-LABEL_13:
+
         if ( --idxOther == idx )
             return;
     }
+
     iter = &menu->clickables[idxOther];
     if ( iter && jkGuiRend_sub_5103E0(iter) )
     {
@@ -1040,43 +1029,46 @@ void jkGuiRend_MouseMovedCallback(jkGuiMenu *menu, int x, int y)
 {
     int v7; // edx
     jkGuiElement *v8; // ecx
-    rdRect *v9; // eax
-    int v10; // ecx
 
     jkGuiElement* lastMouseOverClickable = menu->lastMouseOverClickable;
-    if ( !lastMouseOverClickable || !lastMouseOverClickable->bIsVisible || (x < lastMouseOverClickable->rect.x) || x >= lastMouseOverClickable->rect.x + lastMouseOverClickable->rect.width || (y < lastMouseOverClickable->rect.y) || y >= lastMouseOverClickable->rect.y + lastMouseOverClickable->rect.height )
+    if (lastMouseOverClickable 
+        && lastMouseOverClickable->bIsVisible 
+        && (x >= lastMouseOverClickable->rect.x) 
+        && x < lastMouseOverClickable->rect.x + lastMouseOverClickable->rect.width 
+        && (y >= lastMouseOverClickable->rect.y) 
+        && y < lastMouseOverClickable->rect.y + lastMouseOverClickable->rect.height ) 
     {
-        v7 = 0;
-        if ( menu->clickables->type == ELEMENT_END )
+        return;
+    }
+
+
+    v7 = 0;
+    if ( menu->clickables->type == ELEMENT_END )
+    {
+        jkGuiRend_ClickableMouseover(menu, 0);
+        return;
+    }
+ 
+    v8 = menu->clickables;
+    while ( 1 )
+    {
+        if ( v8->bIsVisible )
+        {
+            if ( x >= v8->rect.x && x < v8->rect.x + v8->rect.width )
+            {
+                if ( y >= v8->rect.y && y < v8->rect.y + v8->rect.height )
+                    break;
+            }
+        }
+        ++v7;
+        ++v8;
+        if ( v8->type == ELEMENT_END )
         {
             jkGuiRend_ClickableMouseover(menu, 0);
-        }
-        else
-        {
-            v8 = menu->clickables;
-            while ( 1 )
-            {
-                v9 = &v8->rect;
-                if ( v8->bIsVisible )
-                {
-                    if ( x >= v9->x && x < v9->x + v9->width )
-                    {
-                        v10 = v9->y;
-                        if ( y >= v10 && y < v10 + v9->height )
-                            break;
-                    }
-                }
-                ++v7;
-                ++v8;
-                if ( v8->type == ELEMENT_END )
-                {
-                    jkGuiRend_ClickableMouseover(menu, 0);
-                    return;
-                }
-            }
-            jkGuiRend_ClickableMouseover(menu, &menu->clickables[v7]);
+            return;
         }
     }
+    jkGuiRend_ClickableMouseover(menu, &menu->clickables[v7]);
 }
 
 void jkGuiRend_SetVisibleAndDraw(jkGuiElement *clickable, jkGuiMenu *menu, int bVisible)
@@ -1149,8 +1141,6 @@ LABEL_10:
 void jkGuiRend_sub_510C60(jkGuiElement *element)
 {
     jkGuiStringEntry *v1; // edx
-    int v2; // ecx
-    int v3; // ecx
     int v4; // esi
     int v5; // ecx
     int v6; // edi
@@ -1163,20 +1153,19 @@ void jkGuiRend_sub_510C60(jkGuiElement *element)
     {
         do
         {
-            v2 = element->texInfo.numTextEntries + 1;
-            element->texInfo.numTextEntries = v2;
+            ;
         }
-        while ( v1[v2].str );
+        while ( v1[++element->texInfo.numTextEntries].str );
     }
-    v3 = element->selectedTextEntry;
-    if ( v3 < 0 )
+
+    if ( element->selectedTextEntry < 0 )
     {
         v4 = 0;
     }
     else
     {
         v4 = element->texInfo.numTextEntries - 1;
-        if ( v3 <= v4 )
+        if ( element->selectedTextEntry <= v4 )
             v4 = element->selectedTextEntry;
     }
     v5 = element->texInfo.numTextEntries;
@@ -1230,7 +1219,7 @@ void jkGuiRend_HoverOn(jkGuiElement *element, jkGuiMenu *menu, int a3)
     jkGuiRend_PlayWav(menu->soundHover);
 }
 
-int jkGuiRend_ListBoxButtonDown(jkGuiElement *element, jkGuiMenu *menu, int mouseX, int mouseY)
+int jkGuiRend_ListBoxEventHandler(jkGuiElement *element, jkGuiMenu *menu, int mouseX, int mouseY)
 {
     signed int result; // eax
     jkGuiElement *element_; // esi
@@ -1305,30 +1294,30 @@ int jkGuiRend_ListBoxButtonDown(jkGuiElement *element, jkGuiMenu *menu, int mous
                 v11 += v7;
             switch ( mouseY )
             {
-                case 13:
+                case VK_RETURN:
                     if ( element_->func )
-                        menu->lastButtonUp = element_->func(element_, menu, v12, v11, 1);
+                        menu->lastClicked = element_->func(element_, menu, v12, v11, 1);
                     break;
-                case 27:
+                case VK_ESCAPE:
                     if ( element_->func )
                     {
                         element_->texInfo.anonymous_18 = 1;
-                        menu->lastButtonUp = element_->func(element_, menu, v12, v11, 0);
+                        menu->lastClicked = element_->func(element_, menu, v12, v11, 0);
                         element_->texInfo.anonymous_18 = 0;
                     }
                     break;
-                case 33:
+                case VK_PRIOR:
                     jkGuiRend_ClickableHover(menu, element_, -1);
                     break;
-                case 34:
+                case VK_NEXT:
                     jkGuiRend_ClickableHover(menu, element_, 1);
                     break;
-                case 38:
+                case VK_UP:
                     element_->selectedTextEntry = v6 - 1;
                     jkGuiRend_UpdateAndDrawClickable(element_, menu, 1);
                     jkGuiRend_PlayWav(menu->soundHover);
                     break;
-                case 40:
+                case VK_DOWN:
                     element_->selectedTextEntry = v6 + 1;
                     jkGuiRend_UpdateAndDrawClickable(element_, menu, 1);
                     jkGuiRend_PlayWav(menu->soundHover);
@@ -1340,7 +1329,7 @@ int jkGuiRend_ListBoxButtonDown(jkGuiElement *element, jkGuiMenu *menu, int mous
             {
                 if ( element_->func )
                 {
-                    menu->lastButtonUp = element_->func(element_, menu, v12, v11, 0);
+                    menu->lastClicked = element_->func(element_, menu, v12, v11, 0);
                     return 0;
                 }
             }
@@ -1381,9 +1370,9 @@ int jkGuiRend_ListBoxButtonDown(jkGuiElement *element, jkGuiMenu *menu, int mous
         element->texInfo.rect.y = v27;
         element->texInfo.rect.height = v28 + 4;
         element->texInfo.rect.width = v26 + 4;
-        result = 1;
+        return 1;
     }
-    return result;
+    return 0;
 }
 
 void jkGuiRend_ListBoxDraw(jkGuiElement *element_, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw)
@@ -1549,7 +1538,7 @@ int jkGuiRend_WindowHandler(HWND hWnd, UINT a2, WPARAM wParam, LPARAM lParam, LR
             if ( jkGuiRend_activeMenu->lastMouseDownClickable )
             {
                 jkGuiRend_UpdateAndDrawClickable(jkGuiRend_activeMenu->lastMouseDownClickable, jkGuiRend_activeMenu, 1);
-                jkGuiRend_InvokeButtonDown(jkGuiRend_activeMenu->lastMouseDownClickable, jkGuiRend_activeMenu, 1, wParam);
+                jkGuiRend_InvokeEvent(jkGuiRend_activeMenu->lastMouseDownClickable, jkGuiRend_activeMenu, JKGUI_EVENT_MOUSEDOWN, wParam);
             }
             return 0;
         }
@@ -1584,7 +1573,7 @@ int jkGuiRend_WindowHandler(HWND hWnd, UINT a2, WPARAM wParam, LPARAM lParam, LR
                     jkGuiRend_mouseXLatest = mouseX;
                     jkGuiRend_mouseYLatest = mouseY;
                     jkGuiRend_mouseLatestMs = timeMs;
-                    jkGuiRend_InvokeButtonUp(jkGuiRend_activeMenu->lastMouseOverClickable, jkGuiRend_activeMenu, mouseX, mouseY, redraw);
+                    jkGuiRend_InvokeClicked(jkGuiRend_activeMenu->lastMouseOverClickable, jkGuiRend_activeMenu, mouseX, mouseY, redraw);
                 }
                 if ( jkGuiRend_activeMenu->lastMouseDownClickable && jkGuiRend_activeMenu->lastMouseDownClickable->bIsVisible )
                 {
@@ -1603,17 +1592,17 @@ int jkGuiRend_WindowHandler(HWND hWnd, UINT a2, WPARAM wParam, LPARAM lParam, LR
             jkGuiRend_mouseY = lParam >> 16;
             jkGuiRend_UpdateMouse();
             if ( jkGuiRend_activeMenu->lastMouseDownClickable )
-                jkGuiRend_InvokeButtonDown(jkGuiRend_activeMenu->lastMouseDownClickable, jkGuiRend_activeMenu, 3, wParam);
+                jkGuiRend_InvokeEvent(jkGuiRend_activeMenu->lastMouseDownClickable, jkGuiRend_activeMenu, JKGUI_EVENT_MOUSEMOVED, wParam);
             return 1;
 
         case WM_KEYFIRST:
-            if ( wParam == 0x10 || wParam == 0xA0 || wParam == 0xA1 )
+            if ( wParam == VK_SHIFT || wParam == VK_LSHIFT || wParam == VK_RSHIFT )
                 jkGuiRend_bShiftDown = 1;
-            if ( wParam != 0xD || (v8 = jkGuiRend_activeMenu->clickables_end) == 0 || v8->anonymous_9 || !v8->bIsVisible )
+            if ( wParam != VK_RETURN || (v8 = jkGuiRend_activeMenu->clickables_end) == 0 || v8->anonymous_9 || !v8->bIsVisible )
             {
-                if ( wParam != 0x1B || (v8 = jkGuiRend_activeMenu->field_48) == 0 || v8->anonymous_9 || !v8->bIsVisible )
+                if ( wParam != VK_ESCAPE || (v8 = jkGuiRend_activeMenu->field_48) == 0 || v8->anonymous_9 || !v8->bIsVisible )
                 {
-                    if ( wParam == 9 )  // TAB
+                    if ( wParam == VK_TAB )  // TAB
                     {
                         if ( jkGuiRend_bShiftDown )
                             jkGuiRend_RenderAll(jkGuiRend_activeMenu);
@@ -1627,7 +1616,7 @@ int jkGuiRend_WindowHandler(HWND hWnd, UINT a2, WPARAM wParam, LPARAM lParam, LR
                     {
 LABEL_47:
                         jkGuiRend_lastKeyScancode = 0;
-                        jkGuiRend_InvokeButtonDown(jkGuiRend_activeMenu->focusedElement, jkGuiRend_activeMenu, 4, wParam);
+                        jkGuiRend_InvokeEvent(jkGuiRend_activeMenu->focusedElement, jkGuiRend_activeMenu, JKGUI_EVENT_KEYDOWN, wParam);
                         return 0;
                     }
                     while ( wParam != v8->elementIdk || v8->anonymous_9 || !v8->bIsVisible )
@@ -1638,12 +1627,12 @@ LABEL_47:
                     }
                 }
             }
-            jkGuiRend_InvokeButtonUp(v8, jkGuiRend_activeMenu, v8->rect.x + 1, v8->rect.y + 1, 0);
+            jkGuiRend_InvokeClicked(v8, jkGuiRend_activeMenu, v8->rect.x + 1, v8->rect.y + 1, 0);
             jkGuiRend_lastKeyScancode = lParam & 0xFF0000;
             return 1;
 
         case WM_KEYUP:
-            if ( wParam == 0x10 || wParam == 0xA0 || wParam == 0xA1 )
+            if ( wParam == VK_SHIFT || wParam == VK_LSHIFT || wParam == VK_RSHIFT )
             {
                 jkGuiRend_bShiftDown = 0;
                 return 0;
@@ -1654,7 +1643,7 @@ LABEL_47:
 #ifndef SDL2_RENDER
             if ( (jkGuiRend_lastKeyScancode != 0xFF0000) & (uint8_t)lParam )
 #endif
-                jkGuiRend_InvokeButtonDown(jkGuiRend_activeMenu->focusedElement, jkGuiRend_activeMenu, 5, wParam);
+                jkGuiRend_InvokeEvent(jkGuiRend_activeMenu->focusedElement, jkGuiRend_activeMenu, JKGUI_EVENT_CHAR, wParam);
             jkGuiRend_lastKeyScancode = 0;
             return 0;
 
@@ -1758,7 +1747,7 @@ void jkGuiRend_InvalidateGdi()
     jk_InvalidateRect(stdGdi_GetHwnd(), 0, 1);
 }
 
-int jkGuiRend_SliderButtonDown(jkGuiElement *element, jkGuiMenu *menu, int a3, signed int a4)
+int jkGuiRend_SliderEventHandler(jkGuiElement *element, jkGuiMenu *menu, int a3, signed int a4)
 {
     signed int result; // eax
     int v7; // edi MAPDST
@@ -2082,7 +2071,7 @@ void jkGuiRend_SliderDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vb
     }
 }
 
-int jkGuiRend_TextBoxButtonDown(jkGuiElement *element, jkGuiMenu *menu, int a3, int a4)
+int jkGuiRend_TextBoxEventHandler(jkGuiElement *element, jkGuiMenu *menu, int a3, int a4)
 {
     jkGuiElement *v5; // esi
     uint16_t v6; // bx
@@ -2290,7 +2279,7 @@ void jkGuiRend_TextDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *outB
         stdFont_Draw3(outBuf, menu->fonts[element->field_8], element->rect.y, &element->rect, element->selectedTextEntry, element->wstr, 1);
 }
 
-int jkGuiRend_PicButtonButtonDown(jkGuiElement *element, jkGuiMenu *menu, int a, int b)
+int jkGuiRend_PicButtonEventHandler(jkGuiElement *element, jkGuiMenu *menu, int a, int b)
 {
     if ( a )
         return 0;
@@ -2344,7 +2333,7 @@ void jkGuiRend_PicButtonDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer 
     }
 }
 
-int jkGuiRend_TextButtonButtonDown(jkGuiElement *element, jkGuiMenu *menu, int a3, int b)
+int jkGuiRend_TextButtonEventHandler(jkGuiElement *element, jkGuiMenu *menu, int a3, int b)
 {
     int v5; // edi
     stdFont **v6; // edx

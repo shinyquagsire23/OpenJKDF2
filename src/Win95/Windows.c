@@ -139,7 +139,7 @@ int Windows_DefaultHandler(HWND a1, UINT a2, WPARAM a3, HWND a4, LRESULT *a5)
     signed int result; // eax
 
     result = 0;
-    if ( a2 == 0x14 )
+    if ( a2 == WM_ERASEBKGND )
     {
         result = 1;
         *a5 = 1;
@@ -192,7 +192,7 @@ int Windows_GdiHandler(HWND a1, UINT msg, WPARAM wParam, HWND a4, LRESULT *a5)
                         jkMain_do_guistate6();
                 }
             }
-            else if ( wParam > 0x5A && wParam <= 0x5C )// WIN
+            else if ( wParam >= VK_LWIN && wParam <= VK_RWIN )// WIN
             {
                 v5 = 1;
                 *a5 = 1;

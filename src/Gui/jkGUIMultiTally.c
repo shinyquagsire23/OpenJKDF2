@@ -491,7 +491,7 @@ void jkGuiMultiTally_sub_4188B0(jkGuiMenu *pMenu)
     {
         v1 = stdPlatform_GetTimeMsec() - jkGuiMultiTally_msStart;
         if ( v1 > SCORE_DELAY_MS )
-            pMenu->lastButtonUp = 1;
+            pMenu->lastClicked = 1;
         if ( v1 / 1000 != jkGuiMultiTally_dword_5568D0 )
         {
             jkGuiMultiTally_dword_5568D0 = v1 / 1000;

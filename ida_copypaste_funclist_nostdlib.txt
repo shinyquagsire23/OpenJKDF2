@@ -3151,7 +3151,7 @@ jkGuiRend_DarrayFreeEntry	.text	00510390	00000046	00000008	00000004	R	.	.	.	.	.	
 jkGuiRend_sub_5103E0	.text	005103E0	00000027	00000000	00000004	R	.	.	.	.	.	T	.
 jkGuiRend_ElementHasHoverSound	.text	00510410	00000031	00000000	00000004	R	.	.	.	.	.	T	.
 jkGuiRend_UpdateAndDrawClickable	.text	00510460	000001E7	00000018	0000000C	R	.	.	.	.	.	T	.
-jkGuiRend_InvokeButtonDown	.text	00510650	0000004B	00000004	00000014	R	.	.	.	.	.	T	.
+jkGuiRend_InvokeEvent	.text	00510650	0000004B	00000004	00000014	R	.	.	.	.	.	T	.
 jkGuiRend_InvokeButtonUp	.text	005106A0	00000050	00000004	00000014	R	.	.	.	.	.	T	.
 jkGuiRend_PlayClickSound	.text	005106F0	00000018	00000000	00000008	R	.	.	.	.	.	T	.
 jkGuiRend_RenderFocused	.text	00510710	00000057	0000000C	00000008	R	.	.	.	.	.	T	.
@@ -3164,7 +3164,7 @@ jkGuiRend_ClickableHover	.text	00510B80	000000DC	0000000C	0000000C	R	.	.	.	.	.	T
 jkGuiRend_sub_510C60	.text	00510C60	00000081	00000008	00000004	R	.	.	.	.	.	T	.
 jkGuiRend_ClickSound	.text	00510CF0	00000023	00000000	00000014	R	.	.	.	.	.	T	.
 jkGuiRend_HoverOn	.text	00510D20	0000002F	00000004	0000000C	R	.	.	.	.	.	T	.
-jkGuiRend_ListBoxButtonDown	.text	00510D50	00000277	00000010	00000010	R	.	.	.	.	.	T	.
+jkGuiRend_ListBoxEventHandler	.text	00510D50	00000277	00000010	00000010	R	.	.	.	.	.	T	.
 jkGuiRend_ListBoxDraw	.text	00511000	00000254	00000030	00000010	R	.	.	.	.	.	T	.
 jkGuiRend_CheckBoxDraw	.text	00511260	000000E4	00000020	00000010	R	.	.	.	.	.	T	.
 jkGuiRend_DrawClickableAndUpdatebool	.text	00511350	00000024	00000000	00000008	R	.	.	.	.	.	T	.
@@ -3174,12 +3174,12 @@ jkGuiRend_FlipAndDraw	.text	00511800	0000006E	00000014	00000008	R	.	.	.	.	.	T	.
 jkGuiRend_GetMousePos	.text	00511870	00000050	00000008	00000008	R	.	.	.	.	.	T	.
 jkGuiRend_ResetMouseLatestMs	.text	005118C0	0000000B			R	.	.	.	.	.	.	.
 jkGuiRend_InvalidateGdi	.text	005118D0	00000011	00000000	00000000	R	.	.	.	.	.	.	.
-jkGuiRend_SliderButtonDown	.text	005118F0	00000250	0000001C	00000010	R	.	.	.	.	.	T	.
+jkGuiRend_SliderEventHandler	.text	005118F0	00000250	0000001C	00000010	R	.	.	.	.	.	T	.
 jkGuiRend_SliderDraw	.text	00511B60	000002A8	0000006C	00000010	R	.	.	.	.	.	T	.
-jkGuiRend_TextBoxButtonDown	.text	00511E10	0000024A	00000010	0000000E	R	.	.	.	.	.	T	.
+jkGuiRend_TextBoxEventHandler	.text	00511E10	0000024A	00000010	0000000E	R	.	.	.	.	.	T	.
 jkGuiRend_TextBoxDraw	.text	00512080	00000178	00000020	00000010	R	.	.	.	.	.	T	.
 jkGuiRend_TextDraw	.text	00512200	0000004F	00000008	00000010	R	.	.	.	.	.	T	.
-jkGuiRend_PicButtonButtonDown	.text	00512250	00000064	00000000	00000010	R	.	.	.	.	.	T	.
+jkGuiRend_PicButtonEventHandler	.text	00512250	00000064	00000000	00000010	R	.	.	.	.	.	T	.
 jkGuiRend_PicButtonDraw	.text	005122C0	000000AF	0000001C	00000010	R	.	.	.	.	.	T	.
-jkGuiRend_TextButtonButtonDown	.text	00512370	0000004E	00000000	00000010	R	.	.	.	.	.	T	.
+jkGuiRend_TextButtonEventHandler	.text	00512370	0000004E	00000000	00000010	R	.	.	.	.	.	T	.
 jkGuiRend_TextButtonDraw	.text	005123C0	0000005F	00000010	00000010	R	.	.	.	.	.	T	.
