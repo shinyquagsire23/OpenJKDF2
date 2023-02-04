@@ -164,24 +164,19 @@ int stdString_WcharToChar(char *a1, const wchar_t *a2, int a3)
     return result;
 }
 
-int stdString_wstrncpy(wchar_t *a1, int a2, int a3)
+int stdString_WstrRemoveCharsAt(wchar_t *pwaStr, int idx, int numChars)
 {
-    int result; // eax
-    int v4; // edx
-    int v5; // eax
-
-    result = _wcslen(a1);
-    if ( a2 < result )
+    int len = _wcslen(pwaStr);
+    if ( idx < len )
     {
-        v4 = a3;
-        v5 = result - a2;
-        if ( a3 >= v5 )
-            v4 = v5;
-        result = sizeof(wchar_t) * (v5 - v4 + 1);
+        int totalChars = len - idx;
+        if ( numChars >= totalChars )
+            numChars = totalChars;
+
         // Added: memcpy -> memmove
-        memmove(&a1[a2], &a1[a2 + v4], result);
+        memmove(&pwaStr[idx], &pwaStr[idx + numChars], sizeof(wchar_t) * (totalChars - numChars + 1));
     }
-    return result;
+    return len;
 }
 
 int stdString_wstrncat(wchar_t *a1, int a2, int a3, wchar_t *a4)

@@ -211,10 +211,10 @@ void jkGuiRend_UpdateDrawMenu(jkGuiMenu *menu)
     {
         jkGuiElement* clickable = menu->lastMouseOverClickable;
         if ( clickable && clickable->hintText && clickable->bIsVisible && !clickable->anonymous_9 )
-            menu->clickables[idx].str = clickable->hintText;
+            menu->paElements[idx].str = clickable->hintText;
         else
-            menu->clickables[idx].str = 0;
-        jkGuiRend_UpdateAndDrawClickable(&menu->clickables[menu->clickableIdxIdk], menu, 1);
+            menu->paElements[idx].str = 0;
+        jkGuiRend_UpdateAndDrawClickable(&menu->paElements[menu->clickableIdxIdk], menu, 1);
     }
 }
 
@@ -233,12 +233,12 @@ void jkGuiRend_Paint(jkGuiMenu *menu)
     if ( menu->texture )
         stdDisplay_VBufferCopy(jkGuiRend_menuBuffer, menu->texture, 0, 0, 0, 0);
 
-    jkGuiElement* clickable = &menu->clickables[0];
+    jkGuiElement* clickable = &menu->paElements[0];
     int clickableIdx = 0;
     while ( clickable->type != ELEMENT_END )
     {
         jkGuiRend_UpdateAndDrawClickable(clickable, menu, 0);
-        clickable = &menu->clickables[++clickableIdx];
+        clickable = &menu->paElements[++clickableIdx];
     }
 
 #ifdef SDL2_RENDER
@@ -251,19 +251,19 @@ void jkGuiRend_Paint(jkGuiMenu *menu)
     jkGuiRend_UpdateCursor();
 }
 
-void jkGuiRend_SetElementIdk(jkGuiElement *element, int idk)
+void jkGuiRend_ElementSetClickShortcutScancode(jkGuiElement *element, int scancode)
 {
-    element->elementIdk = idk;
+    element->clickShortcutScancode = scancode;
 }
 
 void jkGuiRend_MenuSetReturnKeyShortcutElement(jkGuiMenu *menu, jkGuiElement *element)
 {
-    menu->clickables_end = element;
+    menu->pReturnKeyShortcutElement = element;
 }
 
 void jkGuiRend_MenuSetEscapeKeyShortcutElement(jkGuiMenu *menu, jkGuiElement *element)
 {
-    menu->field_48 = element;
+    menu->pEscapeKeyShortcutElement = element;
 }
 
 int jkGuiRend_DisplayAndReturnClicked(jkGuiMenu *menu)
@@ -340,32 +340,32 @@ void jkGuiRend_sub_50FAD0(jkGuiMenu *menu)
 
     stdDisplay_SetMasterPalette(jkGuiRend_palette);
 
-    jkGuiElement* clickable = menu->clickables;
+    jkGuiElement* clickable = menu->paElements;
     int idx = 0;
     while (clickable->type != ELEMENT_END)
     {
         _memset(&clickable->texInfo, 0, sizeof(clickable->texInfo));
         jkGuiRend_InvokeEvent(clickable, menu, JKGUI_EVENT_INIT, 0);
-        clickable = &menu->clickables[++idx];
+        clickable = &menu->paElements[++idx];
     }
     
-    clickable = menu->clickables;
+    clickable = menu->paElements;
     idx = 0;
     if (clickable->type != ELEMENT_END )
     {
         idx = 0;
         while ( !jkGuiRend_sub_5103E0(&clickable[idx]) )
         {
-            clickable = menu->clickables;
+            clickable = menu->paElements;
             ++idx;
-            if ( menu->clickables[idx].type == ELEMENT_END )
+            if ( menu->paElements[idx].type == ELEMENT_END )
             {
                 jkGuiRend_UpdateMouse();
                 jkGuiRend_ResetMouseLatestMs();
                 return;
             }
         }
-        menu->focusedElement = &menu->clickables[idx];
+        menu->focusedElement = &menu->paElements[idx];
     }
 
     jkGuiRend_UpdateMouse();
@@ -485,8 +485,8 @@ jkGuiElement* jkGuiRend_MenuGetClickableById(jkGuiMenu *menu, int id)
 {
     jkGuiElement *result;
 
-    result = menu->clickables;
-    if ( menu->clickables->type == ELEMENT_END )
+    result = menu->paElements;
+    if ( menu->paElements->type == ELEMENT_END )
         return 0;
     while ( result->hoverId != id )
     {
@@ -845,7 +845,7 @@ void jkGuiRend_RenderIdk2(jkGuiMenu *menu)
     int idx = 0;
     jkGuiElement* focusedElement = menu->focusedElement;
     if ( focusedElement )
-        idx = focusedElement - menu->clickables;
+        idx = focusedElement - menu->paElements;
 
     int idxOther = idx + 1;
     if ( idx + 1 == idx )
@@ -854,8 +854,8 @@ void jkGuiRend_RenderIdk2(jkGuiMenu *menu)
     jkGuiElement* iter;
     while ( 1 )
     {
-        iter = &menu->clickables[idxOther];
-        if ( menu->clickables[idxOther].type != ELEMENT_END )
+        iter = &menu->paElements[idxOther];
+        if ( menu->paElements[idxOther].type != ELEMENT_END )
             break;
         idxOther = -1;
 LABEL_12:
@@ -869,7 +869,7 @@ LABEL_12:
     if ( iter->type < ELEMENT_LISTBOX || iter->type > ELEMENT_TEXTBOX )
         goto LABEL_12;
 
-    jkGuiElement* element = &menu->clickables[idxOther];
+    jkGuiElement* element = &menu->paElements[idxOther];
     if ( element && jkGuiRend_sub_5103E0(element) )
     {
 //#ifndef SDL2_RENDER
@@ -897,7 +897,7 @@ void jkGuiRend_RenderIdk2_alt(jkGuiMenu *menu)
     int idx = 0;
     jkGuiElement* focusedElement = menu->focusedElement;
     if ( focusedElement )
-        idx = focusedElement - menu->clickables;
+        idx = focusedElement - menu->paElements;
 
     int idxOther = idx + 1;
     if ( idx + 1 == idx )
@@ -906,8 +906,8 @@ void jkGuiRend_RenderIdk2_alt(jkGuiMenu *menu)
     jkGuiElement* iter;
     while ( 1 )
     {
-        iter = &menu->clickables[idxOther];
-        if ( menu->clickables[idxOther].type != ELEMENT_END )
+        iter = &menu->paElements[idxOther];
+        if ( menu->paElements[idxOther].type != ELEMENT_END )
         {
             if ( iter->bIsVisible && !iter->anonymous_9 && !(iter->type < ELEMENT_LISTBOX || iter->type > ELEMENT_TEXTBOX))
                 break;
@@ -922,7 +922,7 @@ void jkGuiRend_RenderIdk2_alt(jkGuiMenu *menu)
     }
 
 
-    jkGuiElement* element = &menu->clickables[idxOther];
+    jkGuiElement* element = &menu->paElements[idxOther];
     if ( element && jkGuiRend_sub_5103E0(element) )
     {
 #ifndef SDL2_RENDER
@@ -950,14 +950,14 @@ void jkGuiRend_RenderAll(jkGuiMenu *menu)
     jkGuiElement *focusedElement; // ebx
     int idx; // edx
     int idxOther; // eax
-    jkGuiElement *clickables; // ecx
+    jkGuiElement *paElements; // ecx
     int v5; // esi
     jkGuiElement *v6; // ecx
     jkGuiElement *iter; // esi
 
     focusedElement = menu->focusedElement;
     if ( focusedElement )
-        idx = focusedElement - menu->clickables;
+        idx = focusedElement - menu->paElements;
     else
         idx = 0;
     idxOther = idx - 1;
@@ -967,15 +967,15 @@ void jkGuiRend_RenderAll(jkGuiMenu *menu)
     {
         if ( idxOther < 0 )
         {
-            clickables = menu->clickables;
+            paElements = menu->paElements;
             idxOther = 0;
-            while ( clickables->type != ELEMENT_END )
+            while ( paElements->type != ELEMENT_END )
             {
-                ++clickables;
+                ++paElements;
                 ++idxOther;
             }
         }
-        else if ( menu->clickables[idxOther].bIsVisible && !menu->clickables[idxOther].anonymous_9 && menu->clickables[idxOther].type >= ELEMENT_LISTBOX && menu->clickables[idxOther].type <= ELEMENT_TEXTBOX)
+        else if ( menu->paElements[idxOther].bIsVisible && !menu->paElements[idxOther].anonymous_9 && menu->paElements[idxOther].type >= ELEMENT_LISTBOX && menu->paElements[idxOther].type <= ELEMENT_TEXTBOX)
         {
             break;
         }
@@ -984,7 +984,7 @@ void jkGuiRend_RenderAll(jkGuiMenu *menu)
             return;
     }
 
-    iter = &menu->clickables[idxOther];
+    iter = &menu->paElements[idxOther];
     if ( iter && jkGuiRend_sub_5103E0(iter) )
     {
         menu->focusedElement = iter;
@@ -1043,13 +1043,13 @@ void jkGuiRend_MouseMovedCallback(jkGuiMenu *menu, int x, int y)
 
 
     v7 = 0;
-    if ( menu->clickables->type == ELEMENT_END )
+    if ( menu->paElements->type == ELEMENT_END )
     {
         jkGuiRend_ClickableMouseover(menu, 0);
         return;
     }
  
-    v8 = menu->clickables;
+    v8 = menu->paElements;
     while ( 1 )
     {
         if ( v8->bIsVisible )
@@ -1068,7 +1068,7 @@ void jkGuiRend_MouseMovedCallback(jkGuiMenu *menu, int x, int y)
             return;
         }
     }
-    jkGuiRend_ClickableMouseover(menu, &menu->clickables[v7]);
+    jkGuiRend_ClickableMouseover(menu, &menu->paElements[v7]);
 }
 
 void jkGuiRend_SetVisibleAndDraw(jkGuiElement *clickable, jkGuiMenu *menu, int bVisible)
@@ -1219,7 +1219,7 @@ void jkGuiRend_HoverOn(jkGuiElement *element, jkGuiMenu *menu, int a3)
     jkGuiRend_PlayWav(menu->soundHover);
 }
 
-int jkGuiRend_ListBoxEventHandler(jkGuiElement *element, jkGuiMenu *menu, int mouseX, int mouseY)
+int jkGuiRend_ListBoxEventHandler(jkGuiElement *element, jkGuiMenu *menu, int eventType, int eventParam)
 {
     signed int result; // eax
     jkGuiElement *element_; // esi
@@ -1243,100 +1243,9 @@ int jkGuiRend_ListBoxEventHandler(jkGuiElement *element, jkGuiMenu *menu, int mo
     int v27; // esi
     int v28; // eax
     int a1a; // [esp+14h] [ebp+4h]
+    int mouseX, mouseY;
 
-    if ( mouseX )
-    {
-        if ( mouseX == 1 )
-        {
-            jkGuiRend_GetMousePos(&mouseX, &mouseY);
-            selectedIdx = (mouseY - element->rect.y - 3) / element->texInfo.textHeight;
-            if ( selectedIdx >= 0 )
-            {
-                if ( selectedIdx < element->texInfo.maxTextEntries )
-                {
-                    v18 = selectedIdx + element->texInfo.textScrollY;
-                    if ( element->texInfo.numTextEntries > element->texInfo.maxTextEntries )
-                    {
-                        if ( !selectedIdx )
-                        {
-                            jkGuiRend_ClickableHover(menu, element, -1);
-                            jkGuiRend_ResetMouseLatestMs();
-                            return 0;
-                        }
-                        if ( selectedIdx == element->texInfo.maxTextEntries - 1 )
-                        {
-                            jkGuiRend_ClickableHover(menu, element, 1);
-                            jkGuiRend_ResetMouseLatestMs();
-                            return 0;
-                        }
-                        --v18;
-                    }
-                    element->selectedTextEntry = v18;
-                    jkGuiRend_UpdateAndDrawClickable(element, menu, 1);
-                    jkGuiRend_PlayWav(menu->soundHover);
-                }
-            }
-        }
-        else
-        {
-            if ( mouseX != 4 )
-                return 0;
-            element_ = element;
-            v6 = element->selectedTextEntry;
-            v7 = element->texInfo.textHeight;
-            v8 = element->rect.y;
-            v9 = v7 * (element->selectedTextEntry - element->texInfo.textScrollY);
-            v10 = element->rect.x;
-            a1a = element->selectedTextEntry;
-            v11 = v9 + v8 + 4;
-            v12 = v10 + 1;
-            if ( element_->texInfo.numTextEntries > element_->texInfo.maxTextEntries )
-                v11 += v7;
-            switch ( mouseY )
-            {
-                case VK_RETURN:
-                    if ( element_->func )
-                        menu->lastClicked = element_->func(element_, menu, v12, v11, 1);
-                    break;
-                case VK_ESCAPE:
-                    if ( element_->func )
-                    {
-                        element_->texInfo.anonymous_18 = 1;
-                        menu->lastClicked = element_->func(element_, menu, v12, v11, 0);
-                        element_->texInfo.anonymous_18 = 0;
-                    }
-                    break;
-                case VK_PRIOR:
-                    jkGuiRend_ClickableHover(menu, element_, -1);
-                    break;
-                case VK_NEXT:
-                    jkGuiRend_ClickableHover(menu, element_, 1);
-                    break;
-                case VK_UP:
-                    element_->selectedTextEntry = v6 - 1;
-                    jkGuiRend_UpdateAndDrawClickable(element_, menu, 1);
-                    jkGuiRend_PlayWav(menu->soundHover);
-                    break;
-                case VK_DOWN:
-                    element_->selectedTextEntry = v6 + 1;
-                    jkGuiRend_UpdateAndDrawClickable(element_, menu, 1);
-                    jkGuiRend_PlayWav(menu->soundHover);
-                    break;
-                default:
-                    break;
-            }
-            if ( element_->selectedTextEntry != a1a )
-            {
-                if ( element_->func )
-                {
-                    menu->lastClicked = element_->func(element_, menu, v12, v11, 0);
-                    return 0;
-                }
-            }
-        }
-        result = 0;
-    }
-    else
+    if (eventType == JKGUI_EVENT_INIT)
     {
         v19 = 2;
         v20 = &menu->fonts[element->field_8];
@@ -1371,6 +1280,92 @@ int jkGuiRend_ListBoxEventHandler(jkGuiElement *element, jkGuiMenu *menu, int mo
         element->texInfo.rect.height = v28 + 4;
         element->texInfo.rect.width = v26 + 4;
         return 1;
+    }
+    else if ( eventType == JKGUI_EVENT_MOUSEDOWN )
+    {
+        jkGuiRend_GetMousePos(&mouseX, &mouseY);
+        selectedIdx = (mouseY - element->rect.y - 3) / element->texInfo.textHeight;
+        if ( selectedIdx >= 0 )
+        {
+            if ( selectedIdx < element->texInfo.maxTextEntries )
+            {
+                v18 = selectedIdx + element->texInfo.textScrollY;
+                if ( element->texInfo.numTextEntries > element->texInfo.maxTextEntries )
+                {
+                    if ( !selectedIdx )
+                    {
+                        jkGuiRend_ClickableHover(menu, element, -1);
+                        jkGuiRend_ResetMouseLatestMs();
+                        return 0;
+                    }
+                    if ( selectedIdx == element->texInfo.maxTextEntries - 1 )
+                    {
+                        jkGuiRend_ClickableHover(menu, element, 1);
+                        jkGuiRend_ResetMouseLatestMs();
+                        return 0;
+                    }
+                    --v18;
+                }
+                element->selectedTextEntry = v18;
+                jkGuiRend_UpdateAndDrawClickable(element, menu, 1);
+                jkGuiRend_PlayWav(menu->soundHover);
+            }
+        }
+    }
+    else if ( eventType == JKGUI_EVENT_KEYDOWN )
+    {
+        element_ = element;
+        v6 = element->selectedTextEntry;
+        v7 = element->texInfo.textHeight;
+        v8 = element->rect.y;
+        v9 = v7 * (element->selectedTextEntry - element->texInfo.textScrollY);
+        v10 = element->rect.x;
+        a1a = element->selectedTextEntry;
+        v11 = v9 + v8 + 4;
+        v12 = v10 + 1;
+        if ( element_->texInfo.numTextEntries > element_->texInfo.maxTextEntries )
+            v11 += v7;
+        switch ( eventParam )
+        {
+            case VK_RETURN:
+                if ( element_->func )
+                    menu->lastClicked = element_->func(element_, menu, v12, v11, 1);
+                break;
+            case VK_ESCAPE:
+                if ( element_->func )
+                {
+                    element_->texInfo.anonymous_18 = 1;
+                    menu->lastClicked = element_->func(element_, menu, v12, v11, 0);
+                    element_->texInfo.anonymous_18 = 0;
+                }
+                break;
+            case VK_PRIOR:
+                jkGuiRend_ClickableHover(menu, element_, -1);
+                break;
+            case VK_NEXT:
+                jkGuiRend_ClickableHover(menu, element_, 1);
+                break;
+            case VK_UP:
+                element_->selectedTextEntry = v6 - 1;
+                jkGuiRend_UpdateAndDrawClickable(element_, menu, 1);
+                jkGuiRend_PlayWav(menu->soundHover);
+                break;
+            case VK_DOWN:
+                element_->selectedTextEntry = v6 + 1;
+                jkGuiRend_UpdateAndDrawClickable(element_, menu, 1);
+                jkGuiRend_PlayWav(menu->soundHover);
+                break;
+            default:
+                break;
+        }
+        if ( element_->selectedTextEntry != a1a )
+        {
+            if ( element_->func )
+            {
+                menu->lastClicked = element_->func(element_, menu, v12, v11, 0);
+                return 0;
+            }
+        }
     }
     return 0;
 }
@@ -1598,9 +1593,9 @@ int jkGuiRend_WindowHandler(HWND hWnd, UINT a2, WPARAM wParam, LPARAM lParam, LR
         case WM_KEYFIRST:
             if ( wParam == VK_SHIFT || wParam == VK_LSHIFT || wParam == VK_RSHIFT )
                 jkGuiRend_bShiftDown = 1;
-            if ( wParam != VK_RETURN || (v8 = jkGuiRend_activeMenu->clickables_end) == 0 || v8->anonymous_9 || !v8->bIsVisible )
+            if ( wParam != VK_RETURN || (v8 = jkGuiRend_activeMenu->pReturnKeyShortcutElement) == 0 || v8->anonymous_9 || !v8->bIsVisible )
             {
-                if ( wParam != VK_ESCAPE || (v8 = jkGuiRend_activeMenu->field_48) == 0 || v8->anonymous_9 || !v8->bIsVisible )
+                if ( wParam != VK_ESCAPE || (v8 = jkGuiRend_activeMenu->pEscapeKeyShortcutElement) == 0 || v8->anonymous_9 || !v8->bIsVisible )
                 {
                     if ( wParam == VK_TAB )  // TAB
                     {
@@ -1611,15 +1606,15 @@ int jkGuiRend_WindowHandler(HWND hWnd, UINT a2, WPARAM wParam, LPARAM lParam, LR
                         jkGuiRend_lastKeyScancode = lParam & 0xFF0000;
                         return 1;
                     }
-                    v8 = jkGuiRend_activeMenu->clickables;
-                    if ( jkGuiRend_activeMenu->clickables->type == ELEMENT_END )
+                    v8 = jkGuiRend_activeMenu->paElements;
+                    if ( jkGuiRend_activeMenu->paElements->type == ELEMENT_END )
                     {
 LABEL_47:
                         jkGuiRend_lastKeyScancode = 0;
                         jkGuiRend_InvokeEvent(jkGuiRend_activeMenu->focusedElement, jkGuiRend_activeMenu, JKGUI_EVENT_KEYDOWN, wParam);
                         return 0;
                     }
-                    while ( wParam != v8->elementIdk || v8->anonymous_9 || !v8->bIsVisible )
+                    while ( wParam != v8->clickShortcutScancode || v8->anonymous_9 || !v8->bIsVisible )
                     {
                         ++v8;
                         if ( v8->type == ELEMENT_END )
@@ -1747,7 +1742,7 @@ void jkGuiRend_InvalidateGdi()
     jk_InvalidateRect(stdGdi_GetHwnd(), 0, 1);
 }
 
-int jkGuiRend_SliderEventHandler(jkGuiElement *element, jkGuiMenu *menu, int a3, signed int a4)
+int jkGuiRend_SliderEventHandler(jkGuiElement *element, jkGuiMenu *menu, int eventType, signed int eventParam)
 {
     signed int result; // eax
     int v7; // edi MAPDST
@@ -1777,21 +1772,20 @@ int jkGuiRend_SliderEventHandler(jkGuiElement *element, jkGuiMenu *menu, int a3,
     int pY; // [esp+10h] [ebp-Ch]
     int pX;
 
-    switch ( a3 )
+    switch ( eventType )
     {
-        case 0:
+        case JKGUI_EVENT_INIT:
             element->texInfo.textHeight = 0;
             return 0;
-        case 1:
-            goto LABEL_5;
-        case 2:
+        case JKGUI_EVENT_2:
             result = 0;
             element->texInfo.textHeight = 0;
             return result;
-        case 3:
+
+        case JKGUI_EVENT_MOUSEMOVED:
             if ( !element->texInfo.textHeight )
                 return 1;
-LABEL_5:
+        case JKGUI_EVENT_MOUSEDOWN:
             v7 = element->selectedTextEntry;
             v7 = element->selectedTextEntry;
             jkGuiRend_GetMousePos(&pX, &pY);
@@ -1808,7 +1802,7 @@ LABEL_5:
                 v11 = 0;
                 v12 = element->rect.width;
                 if ( v33 != (uint8_t*)-44 )
-                    a4 = 0;
+                    eventParam = 0;
                 v13 = (int *)element->anonymous_13;
                 v15 = *v13;
                 v16 = menu->ui_structs[v15];
@@ -1826,7 +1820,7 @@ LABEL_5:
                     {
                         v19 = element->rect.x + v11 + element->selectedTextEntry * v12 / (uint32_t)element->extraInt;
                         if ( pX >= v19 - 4 && pX < (signed int)(v19 + v18 + 4) )
-                            a4 = 1;
+                            eventParam = 1;
                     }
                 }
                 v20 = (intptr_t)element->unistr;
@@ -1834,18 +1828,21 @@ LABEL_5:
                 if ( v21 < 0 )
                 {
                     v21 = 0;
+                    element->selectedTextEntry = v21;
                 }
                 else if ( v21 > v20 )
                 {
                     element->selectedTextEntry = v20;
-                    goto LABEL_24;
                 }
-                element->selectedTextEntry = v21;
+                else {
+                    element->selectedTextEntry = v21;
+                }
+                
             }
-LABEL_24:
-            if ( a3 == 1 )
+
+            if ( eventType == JKGUI_EVENT_MOUSEDOWN )
             {
-                v22 = a4;
+                v22 = eventParam;
                 element->texInfo.numTextEntries = v7;
                 element->texInfo.textHeight = v22;
             }
@@ -1853,8 +1850,8 @@ LABEL_24:
                 return 0;
             jkGuiRend_UpdateAndDrawClickable(element, menu, 1);
             return 0;
-        case 4:
-            if ( a4 == 37 )
+        case JKGUI_EVENT_KEYDOWN:
+            if ( eventParam == VK_LEFT )
             {
                 v29 = element;
                 v30 = element->selectedTextEntry - 1;
@@ -1874,7 +1871,7 @@ LABEL_24:
                 jkGuiRend_UpdateAndDrawClickable(v29, menu, 1);
                 return 0;
             }
-            if ( a4 != 39 )
+            if ( eventParam != VK_RIGHT )
                 return 0;
             v23 = element;
             v24 = element->selectedTextEntry + 1;
@@ -2071,7 +2068,7 @@ void jkGuiRend_SliderDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vb
     }
 }
 
-int jkGuiRend_TextBoxEventHandler(jkGuiElement *element, jkGuiMenu *menu, int a3, int a4)
+int jkGuiRend_TextBoxEventHandler(jkGuiElement *element, jkGuiMenu *menu, int eventType, int a4)
 {
     jkGuiElement *v5; // esi
     uint16_t v6; // bx
@@ -2101,94 +2098,7 @@ int jkGuiRend_TextBoxEventHandler(jkGuiElement *element, jkGuiMenu *menu, int a3
     int v30; // ebx
     const wchar_t *v31; // edx
 
-    if ( a3 )
-    {
-        if ( a3 == 4 )
-        {
-            switch ( a4 )
-            {
-                case 35:
-                    v20 = element;
-                    v21 = _wcslen((const wchar_t *)element->unistr);
-                    v22 = menu;
-                    v20->texInfo.textHeight = v21;
-                    jkGuiRend_UpdateAndDrawClickable(v20, v22, 1);
-                    return 0;
-                case 36:
-                    v18 = menu;
-                    v19 = element;
-                    element->texInfo.textHeight = 0;
-                    jkGuiRend_UpdateAndDrawClickable(v19, v18, 1);
-                    return 0;
-                case 37:
-                    v12 = element->texInfo.textHeight;
-                    if ( v12 <= 0 )
-                        goto LABEL_23;
-                    v13 = menu;
-                    v14 = element;
-                    element->texInfo.textHeight = v12 - 1;
-                    jkGuiRend_UpdateAndDrawClickable(v14, v13, 1);
-                    return 0;
-                case 39:
-                    v15 = element;
-                    v16 = element->texInfo.textHeight;
-                    if ( v16 >= _wcslen((const wchar_t *)element->unistr) )
-                        goto LABEL_23;
-                    v17 = menu;
-                    v15->texInfo.textHeight = v16 + 1;
-                    jkGuiRend_UpdateAndDrawClickable(v15, v17, 1);
-                    return 0;
-                case 46:
-                    v23 = element;
-                    v24 = element->texInfo.textHeight;
-                    if ( v24 >= 0 )
-                    {
-                        stdString_wstrncpy((wchar_t *)element->unistr, v24, 1);
-                        jkGuiRend_UpdateAndDrawClickable(v23, menu, 1);
-                    }
-                    goto LABEL_23;
-                default:
-LABEL_23:
-                    return 0;
-            }
-        }
-        else if ( a3 == 5 )
-        {
-            v5 = element;
-            v6 = a4;
-            v7 = element->unistr;
-            if ( (uint16_t)a4 == 8 )
-            {
-                v8 = element->texInfo.textHeight;
-                if ( v8 > 0 )
-                {
-                    element->texInfo.textHeight = v8 - 1;
-                    stdString_wstrncpy((wchar_t *)v7, v8 - 1, 1);
-                }
-            }
-            else if ( stdFont_sub_4355B0(menu->fonts[element->field_8], a4) )
-            {
-                v9 = v5->selectedTextEntry;
-                if ( _wcslen((const wchar_t *)v7) < v9 - 1 )
-                {
-                    v10 = v5->texInfo.textHeight;
-                    element = (jkGuiElement *)v6;
-                    stdString_wstrncat((wchar_t *)v7, v9, v10, (wchar_t *)&element);
-                    v11 = v5->texInfo.textHeight + 1;
-                    if ( v11 >= v5->selectedTextEntry - 1 )
-                        v11 = v5->selectedTextEntry - 1;
-                    v5->texInfo.textHeight = v11;
-                }
-            }
-            jkGuiRend_UpdateAndDrawClickable(v5, menu, 1);
-            return 0;
-        }
-        else
-        {
-            return 0;
-        }
-    }
-    else
+    if ( eventType == JKGUI_EVENT_INIT)
     {
         v25 = element;
         v26 = menu->fonts[element->field_8];
@@ -2214,6 +2124,97 @@ LABEL_23:
         v25->texInfo.textHeight = _wcslen(v31);
         return 1;
     }
+
+    else if ( eventType == JKGUI_EVENT_KEYDOWN )
+    {
+        switch ( a4 )
+        {
+            case VK_END:
+                v20 = element;
+                v21 = _wcslen((const wchar_t *)element->unistr);
+                v22 = menu;
+                v20->texInfo.textHeight = v21;
+                jkGuiRend_UpdateAndDrawClickable(v20, v22, 1);
+                return 0;
+            case VK_HOME:
+                v18 = menu;
+                v19 = element;
+                element->texInfo.textHeight = 0;
+                jkGuiRend_UpdateAndDrawClickable(v19, v18, 1);
+                return 0;
+            case VK_LEFT:
+                v12 = element->texInfo.textHeight;
+                if ( v12 <= 0 )
+                    return 0;
+                v13 = menu;
+                v14 = element;
+                element->texInfo.textHeight = v12 - 1;
+                jkGuiRend_UpdateAndDrawClickable(v14, v13, 1);
+                return 0;
+            case VK_RIGHT:
+                v15 = element;
+                v16 = element->texInfo.textHeight;
+                if ( v16 >= _wcslen((const wchar_t *)element->unistr) )
+                    return 0;
+                v17 = menu;
+                v15->texInfo.textHeight = v16 + 1;
+                jkGuiRend_UpdateAndDrawClickable(v15, v17, 1);
+                return 0;
+            case VK_DELETE:
+                v23 = element;
+                v24 = element->texInfo.textHeight;
+                if ( v24 >= 0 )
+                {
+                    stdString_WstrRemoveCharsAt((wchar_t *)element->unistr, v24, 1);
+                    jkGuiRend_UpdateAndDrawClickable(v23, menu, 1);
+                }
+                return 0;
+            default:
+                return 0;
+        }
+    }
+    else if ( eventType == JKGUI_EVENT_CHAR )
+    {
+        v5 = element;
+        v6 = a4;
+        v7 = element->unistr;
+        if ( (uint16_t)a4 == VK_BACK )
+        {
+            v8 = element->texInfo.textHeight;
+            if ( v8 > 0 )
+            {
+                element->texInfo.textHeight = v8 - 1;
+                stdString_WstrRemoveCharsAt((wchar_t *)v7, v8 - 1, 1);
+            }
+        }
+#ifdef SDL2_RENDER
+        else if ( (uint16_t)a4  == VK_DELETE)
+        {
+
+        }
+#endif
+        else if ( stdFont_sub_4355B0(menu->fonts[element->field_8], a4) )
+        {
+            v9 = v5->selectedTextEntry;
+            if ( _wcslen((const wchar_t *)v7) < v9 - 1 )
+            {
+                v10 = v5->texInfo.textHeight;
+                element = (jkGuiElement *)v6;
+                stdString_wstrncat((wchar_t *)v7, v9, v10, (wchar_t *)&element);
+                v11 = v5->texInfo.textHeight + 1;
+                if ( v11 >= v5->selectedTextEntry - 1 )
+                    v11 = v5->selectedTextEntry - 1;
+                v5->texInfo.textHeight = v11;
+            }
+        }
+        jkGuiRend_UpdateAndDrawClickable(v5, menu, 1);
+        return 0;
+    }
+    else
+    {
+        return 0;
+    }
+    
     return 0;
 }
 
@@ -2333,13 +2334,13 @@ void jkGuiRend_PicButtonDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer 
     }
 }
 
-int jkGuiRend_TextButtonEventHandler(jkGuiElement *element, jkGuiMenu *menu, int a3, int b)
+int jkGuiRend_TextButtonEventHandler(jkGuiElement *element, jkGuiMenu *menu, int eventType, int b)
 {
     int v5; // edi
     stdFont **v6; // edx
     int v7; // eax
 
-    if ( a3 )
+    if ( eventType )
         return 0;
     v5 = 3;
     v6 = &menu->fonts[element->field_8];

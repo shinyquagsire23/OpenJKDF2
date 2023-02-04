@@ -53,20 +53,20 @@ static jkGuiMenu jkGuiSetupControls_menu = {jkGuiSetupControls_buttons, 0, 0xFF,
 
 void jkGuiSetup_sub_412EF0(jkGuiMenu *menu, int a2)
 {
-    jkGuiElement *clickables; // eax
+    jkGuiElement *paElements; // eax
 
-    clickables = menu->clickables;
-    clickables[2].anonymous_9 = 1;
-    clickables[3].anonymous_9 = 1;
-    clickables[4].anonymous_9 = 1;
-    clickables[5].anonymous_9 = 1;
-    clickables[6].anonymous_9 = 1;
+    paElements = menu->paElements;
+    paElements[2].anonymous_9 = 1;
+    paElements[3].anonymous_9 = 1;
+    paElements[4].anonymous_9 = 1;
+    paElements[5].anonymous_9 = 1;
+    paElements[6].anonymous_9 = 1;
     if ( a2 )
     {
-        clickables[7].anonymous_9 = 1;
-        clickables[8].anonymous_9 = 1;
-        clickables[9].anonymous_9 = 1;
-        clickables[10].anonymous_9 = 1;
+        paElements[7].anonymous_9 = 1;
+        paElements[8].anonymous_9 = 1;
+        paElements[9].anonymous_9 = 1;
+        paElements[10].anonymous_9 = 1;
     }
 }
 
@@ -138,7 +138,7 @@ LABEL_17:
                                     if ( !v1 )
                                     {
                                         jkGui_sub_412E20(&jkGuiSetup_menu, 105, 108, i);
-                                        jkGuiSetup_menu.clickables[jkGuiSetup_menu.clickableIdxIdk].wstr = 0; // MOTS added
+                                        jkGuiSetup_menu.paElements[jkGuiSetup_menu.clickableIdxIdk].wstr = 0; // MOTS added
                                         jkGuiRend_Paint(&jkGuiSetup_menu);
                                     }
                                 }
@@ -150,7 +150,7 @@ LABEL_17:
                         default:
 LABEL_23:
                             jkGui_sub_412E20(&jkGuiSetup_menu, 100, 104, i);
-                            jkGuiSetup_menu.clickables[jkGuiSetup_menu.clickableIdxIdk].wstr = 0; // MOTS added
+                            jkGuiSetup_menu.paElements[jkGuiSetup_menu.clickableIdxIdk].wstr = 0; // MOTS added
                             jkGuiRend_Paint(&jkGuiSetup_menu);
                             if ( i < 100 )
                                 break;

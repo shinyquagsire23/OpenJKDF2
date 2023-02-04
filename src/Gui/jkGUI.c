@@ -85,8 +85,8 @@ void jkGui_InitMenu(jkGuiMenu *menu, stdBitmap *bgBitmap)
         menu->texture = bgBitmap->mipSurfaces[0];
     }
     
-    jkGuiElement* iter = menu->clickables;
-    while ( iter->type != 9 )
+    jkGuiElement* iter = menu->paElements;
+    while ( iter->type != ELEMENT_END )
     {
         if ( iter->hintText )
         {
@@ -95,7 +95,7 @@ void jkGui_InitMenu(jkGuiMenu *menu, stdBitmap *bgBitmap)
                 iter->wHintText = text;
         }
 
-        if ( !iter->type || iter->type == 2 || iter->type == 3 )
+        if ( !iter->type || iter->type == ELEMENT_TEXT || iter->type == ELEMENT_CHECKBOX )
         {
             if ( iter->unistr )
             {

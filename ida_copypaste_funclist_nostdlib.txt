@@ -794,7 +794,7 @@ stdString_CopyBetweenDelimiter	.text	0042F1A0	0000006E	00000010	00000010	R	.	.	.
 stdString_GetQuotedStringContents	.text	0042F210	0000006D	00000010	0000000C	R	.	.	.	.	.	T	.
 stdString_CharToWchar	.text	0042F280	0000003C	00000008	0000000C	R	.	.	.	.	.	T	.
 stdString_WcharToChar	.text	0042F2C0	00000045	00000008	0000000C	R	.	.	.	.	.	T	.
-stdString_wstrncpy	.text	0042F310	00000044	00000008	0000000C	R	.	.	.	.	.	T	.
+stdString_WstrRemoveCharsAt	.text	0042F310	00000044	00000008	0000000C	R	.	.	.	.	.	T	.
 stdString_wstrncat	.text	0042F360	00000094	00000010	00000010	R	.	.	.	.	.	T	.
 stdString_CstrCopy	.text	0042F400	00000070	00000010	00000004	R	.	.	.	.	.	.	.
 stdString_WcharCopy	.text	0042F470	00000079	00000010	00000004	R	.	.	.	.	.	.	.
@@ -3120,7 +3120,7 @@ jkGuiRend_SetPalette	.text	0050F4F0	00000015	00000008	00000004	R	.	.	.	.	.	T	.
 jkGuiRend_DrawRect	.text	0050F510	000001E6	00000018	0000000A	R	.	.	.	.	.	T	.
 jkGuiRend_UpdateDrawMenu	.text	0050F700	00000076	00000000	00000004	R	.	.	.	.	.	T	.
 jkGuiRend_Paint	.text	0050F780	000000EF	00000008	00000004	R	.	.	.	.	.	T	.
-jkGuiRend_SetElementIdk	.text	0050F870	0000000C	00000000	00000008	R	.	.	.	.	.	T	.
+jkGuiRend_ElementSetClickShortcutScancode	.text	0050F870	0000000C	00000000	00000008	R	.	.	.	.	.	T	.
 jkGuiRend_MenuSetReturnKeyShortcutElement	.text	0050F880	0000000C	00000000	00000008	R	.	.	.	.	.	T	.
 jkGuiRend_MenuSetEscapeKeyShortcutElement	.text	0050F890	0000000C	00000000	00000008	R	.	.	.	.	.	T	.
 jkGuiRend_DisplayAndReturnClicked	.text	0050F8A0	00000223	00000014	00000004	R	.	.	.	.	.	T	.

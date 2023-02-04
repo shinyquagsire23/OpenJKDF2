@@ -1078,8 +1078,8 @@ int jkGuiJoystick_Show()
     jkGuiJoystick_dword_536B9C = -1;
     jkGuiJoystick_aElements[26].selectedTextEntry = (sithWeapon_controlOptions >> 5) & 1;
     jkGuiJoystick_Draw(&jkGuiJoystick_menu, 0);
-    jkGuiRend_SetElementIdk(&jkGuiJoystick_aElements[14], 45);
-    jkGuiRend_SetElementIdk(&jkGuiJoystick_aElements[16], 46);
+    jkGuiRend_ElementSetClickShortcutScancode(&jkGuiJoystick_aElements[14], VK_INSERT);
+    jkGuiRend_ElementSetClickShortcutScancode(&jkGuiJoystick_aElements[16], VK_DELETE);
     jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiJoystick_menu, &jkGuiJoystick_aElements[23]);
     jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiJoystick_menu, &jkGuiJoystick_aElements[24]);
     jkGuiSetup_sub_412EF0(&jkGuiJoystick_menu, 1);

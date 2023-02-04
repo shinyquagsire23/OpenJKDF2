@@ -392,6 +392,7 @@ typedef int CONSOLE_CURSOR_INFO;
 #define VK_UP     (0x26)
 #define VK_RIGHT  (0x27) 
 #define VK_DOWN   (0x28)
+#define VK_INSERT (0x2D)
 #define VK_DELETE (0x2E)
 
 #define VK_LSHIFT (0xA0)
@@ -2984,7 +2985,7 @@ typedef struct jkGuiElement
     jkGuiClickHandlerFunc_t func;
     void *anonymous_13;
     jkGuiTexInfo texInfo;
-    int elementIdk;
+    int clickShortcutScancode;
 } jkGuiElement;
 
 typedef struct jkGuiStringEntry
@@ -3000,7 +3001,7 @@ typedef struct jkGuiStringEntry
 
 typedef struct jkGuiMenu
 {
-  jkGuiElement *clickables;
+  jkGuiElement *paElements;
   int clickableIdxIdk;
   int anonymous_1;
   int fillColor;
@@ -3017,8 +3018,8 @@ typedef struct jkGuiMenu
   jkGuiElement *lastMouseDownClickable;
   jkGuiElement *lastMouseOverClickable;
   int lastClicked;
-  jkGuiElement* clickables_end;
-  jkGuiElement* field_48;
+  jkGuiElement* pReturnKeyShortcutElement;
+  jkGuiElement* pEscapeKeyShortcutElement;
 } jkGuiMenu;
 
 typedef struct stdPalEffect

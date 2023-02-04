@@ -11,7 +11,7 @@
 #define jkGuiRend_DrawRect_ADDR (0x0050F510)
 #define jkGuiRend_UpdateDrawMenu_ADDR (0x0050F700)
 #define jkGuiRend_Paint_ADDR (0x0050F780)
-#define jkGuiRend_SetElementIdk_ADDR (0x0050F870)
+#define jkGuiRend_ElementSetClickShortcutScancode_ADDR (0x0050F870)
 #define jkGuiRend_MenuSetReturnKeyShortcutElement_ADDR (0x0050F880)
 #define jkGuiRend_MenuSetEscapeKeyShortcutElement_ADDR (0x0050F890)
 #define jkGuiRend_DisplayAndReturnClicked_ADDR (0x0050F8A0)
@@ -144,7 +144,7 @@ void jkGuiRend_SetPalette(uint8_t* pal);
 void jkGuiRend_DrawRect(stdVBuffer *vbuf, rdRect *rect, __int16 color);
 void jkGuiRend_UpdateDrawMenu(jkGuiMenu *menu);
 void jkGuiRend_Paint(jkGuiMenu *menu);
-void jkGuiRend_SetElementIdk(jkGuiElement *element, int idk);
+void jkGuiRend_ElementSetClickShortcutScancode(jkGuiElement *element, int idk);
 void jkGuiRend_MenuSetReturnKeyShortcutElement(jkGuiMenu *menu, jkGuiElement *element);
 void jkGuiRend_MenuSetEscapeKeyShortcutElement(jkGuiMenu *menu, jkGuiElement *element);
 int jkGuiRend_DisplayAndReturnClicked(jkGuiMenu *menu);

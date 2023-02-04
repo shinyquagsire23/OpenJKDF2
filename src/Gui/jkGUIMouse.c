@@ -669,8 +669,8 @@ int jkGuiMouse_Show()
     jkGuiMouse_dword_530328 = -1;
     jkGuiMouse_dword_53032C = -1;
     jkGuiMouse_sub_416D40(&jkGuiMouse_menu, 0);
-    jkGuiRend_SetElementIdk(&jkGuiMouse_aElements[14], 45);
-    jkGuiRend_SetElementIdk(&jkGuiMouse_aElements[16], 46);
+    jkGuiRend_ElementSetClickShortcutScancode(&jkGuiMouse_aElements[14], VK_INSERT);
+    jkGuiRend_ElementSetClickShortcutScancode(&jkGuiMouse_aElements[16], VK_DELETE);
     jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiMouse_menu, &jkGuiMouse_aElements[21]);
     jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiMouse_menu, &jkGuiMouse_aElements[22]);
     jkGuiSetup_sub_412EF0(&jkGuiMouse_menu, 1);

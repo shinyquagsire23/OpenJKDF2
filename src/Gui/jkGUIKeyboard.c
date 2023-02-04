@@ -528,8 +528,8 @@ int jkGuiKeyboard_Show()
     jkGui_sub_412E20(&jkGuiKeyboard_menu, 105, 108, 105);
     jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiKeyboard_menu, &jkGuiKeyboard_aElements[15]);
     jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiKeyboard_menu, &jkGuiKeyboard_aElements[16]);
-    jkGuiRend_SetElementIdk(&jkGuiKeyboard_aElements[13], 45);
-    jkGuiRend_SetElementIdk(&jkGuiKeyboard_aElements[14], 46);
+    jkGuiRend_ElementSetClickShortcutScancode(&jkGuiKeyboard_aElements[13], VK_INSERT);
+    jkGuiRend_ElementSetClickShortcutScancode(&jkGuiKeyboard_aElements[14], VK_DELETE);
     jkGuiSetup_sub_412EF0(&jkGuiKeyboard_menu, 1);
     v0 = jkGuiRend_DisplayAndReturnClicked(&jkGuiKeyboard_menu);
     if ( v0 == 1 )

@@ -917,7 +917,7 @@ void do_hooks()
     hook_function(stdString_GetQuotedStringContents_ADDR, stdString_GetQuotedStringContents);
     hook_function(stdString_CharToWchar_ADDR, stdString_CharToWchar);
     hook_function(stdString_WcharToChar_ADDR, stdString_WcharToChar);
-    hook_function(stdString_wstrncpy_ADDR, stdString_wstrncpy);
+    hook_function(stdString_WstrRemoveCharsAt_ADDR, stdString_WstrRemoveCharsAt);
     hook_function(stdString_wstrncat_ADDR, stdString_wstrncat);
     hook_function(stdString_CstrCopy_ADDR, stdString_CstrCopy);
     hook_function(stdString_WcharCopy_ADDR, stdString_WcharCopy);
@@ -2036,7 +2036,7 @@ void do_hooks()
     hook_function(jkGuiRend_DrawRect_ADDR, jkGuiRend_DrawRect);
     hook_function(jkGuiRend_UpdateDrawMenu_ADDR, jkGuiRend_UpdateDrawMenu);
     hook_function(jkGuiRend_Paint_ADDR, jkGuiRend_Paint);
-    hook_function(jkGuiRend_SetElementIdk_ADDR, jkGuiRend_SetElementIdk);
+    hook_function(jkGuiRend_ElementSetClickShortcutScancode_ADDR, jkGuiRend_ElementSetClickShortcutScancode);
     hook_function(jkGuiRend_MenuSetReturnKeyShortcutElement_ADDR, jkGuiRend_MenuSetReturnKeyShortcutElement);
     hook_function(jkGuiRend_MenuSetEscapeKeyShortcutElement_ADDR, jkGuiRend_MenuSetEscapeKeyShortcutElement);
     hook_function(jkGuiRend_DisplayAndReturnClicked_ADDR, jkGuiRend_DisplayAndReturnClicked);

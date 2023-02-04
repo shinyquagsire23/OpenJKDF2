@@ -762,6 +762,11 @@ void Window_SdlUpdate()
                     Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_DELETE, event.key.repeat & 0xFFFF);
                     Window_msg_main_handler(g_hWnd, WM_CHAR, VK_DELETE, 0);
                 }
+                else if (event.key.keysym.sym == SDLK_INSERT)
+                {
+                    Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_INSERT, event.key.repeat & 0xFFFF);
+                    Window_msg_main_handler(g_hWnd, WM_CHAR, VK_INSERT, 0);
+                }
                 else if (event.key.keysym.sym == SDLK_RETURN)
                 {
                     // HACK apparently Windows buffers these events in some way, but to replicate the behavior in jkGUI we just spam KEYFIRST
@@ -804,6 +809,14 @@ void Window_SdlUpdate()
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_ESCAPE, 0);
                 }
+                else if (event.key.keysym.sym == SDLK_PAGEUP)
+                {
+                    Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_PRIOR, 0);
+                }
+                else if (event.key.keysym.sym == SDLK_PAGEDOWN)
+                {
+                    Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_NEXT, 0);
+                }
                 else if (event.key.keysym.sym == SDLK_LEFT)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_LEFT, 0);
@@ -827,6 +840,10 @@ void Window_SdlUpdate()
                 else if (event.key.keysym.sym == SDLK_DELETE)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_DELETE, 0);
+                }
+                else if (event.key.keysym.sym == SDLK_INSERT)
+                {
+                    Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_INSERT, 0);
                 }
                 else if (event.key.keysym.sym == SDLK_RETURN)
                 {

@@ -125,6 +125,7 @@ wchar_t jkGuiNetHost_portText[32];
 int jkGuiNetHost_portNum = 27020;
 int jkGuiNetHost_bIsDedicated = 0;
 int jkGuiNetHost_bIsCoop = 0;
+int jkGuiNetHost_bIsEpisodeCoop = 0;
 
 int wstr_to_int_clamped(wchar_t *pWstr, int minVal, int maxVal)
 {
@@ -156,7 +157,7 @@ void jkGuiNetHost_SaveSettings()
         jkGuiNetHost_sessionFlags &= ~SESSIONFLAG_ISDEDICATED;
     }
 
-    if (jkGuiNetHost_bIsDedicated) {
+    if (jkGuiNetHost_bIsEpisodeCoop) {
         jkGuiNetHost_gameFlags |= MULTIMODEFLAG_COOP;
     }
     else {
@@ -178,6 +179,7 @@ void jkGuiNetHost_SaveSettings()
     wuRegistry_SaveInt("portNum", jkGuiNetHost_portNum);
     wuRegistry_SaveBool("bIsDedicated", jkGuiNetHost_bIsDedicated);
     wuRegistry_SaveBool("bIsCoop", jkGuiNetHost_bIsCoop);
+    wuRegistry_SaveBool("bIsEpisodeCoop", jkGuiNetHost_bIsEpisodeCoop);
 
     wuRegistry_SaveBool("bUseScoreLimit", jkGuiNetHost_gameFlags & MULTIMODEFLAG_SCORELIMIT);
     wuRegistry_SaveBool("bUseTimeLimit", jkGuiNetHost_gameFlags & MULTIMODEFLAG_TIMELIMIT);
@@ -222,7 +224,8 @@ void jkGuiNetHost_LoadSettings()
     }
 
     jkGuiNetHost_bIsCoop = wuRegistry_GetBool("bIsCoop", jkGuiNetHost_bIsCoop);
-    if (jkGuiNetHost_bIsCoop) {
+    jkGuiNetHost_bIsEpisodeCoop = wuRegistry_GetBool("bIsEpisodeCoop", jkGuiNetHost_bIsCoop);
+    if (jkGuiNetHost_bIsEpisodeCoop) {
         jkGuiNetHost_gameFlags |= MULTIMODEFLAG_COOP;
     }
     else {
@@ -427,12 +430,24 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
             wuRegistry_SetWString("serverPassword", pMultiEntry->wPassword);
             wuRegistry_SetString("serverEpisodeGob", pMultiEntry->episodeGobName);
             wuRegistry_SetString("serverMapJkl", pMultiEntry->mapJklFname);
+
+            // Added: Only add Co-op flags on singleplayer levels
+            if (jkGuiSingleplayer_FUN_0041d590(pMultiEntry->episodeGobName) & JK_EPISODE_SINGLEPLAYER) {
+                jkGuiNetHost_bIsEpisodeCoop = 1;
+            }
+            else {
+                jkGuiNetHost_bIsEpisodeCoop = 0;
+            }
+
             if (jkGuiNetHost_bIsDedicated) {
                 jkGuiNetHost_sessionFlags |= SESSIONFLAG_ISDEDICATED;
             }
 
-            if (jkGuiNetHost_bIsCoop) {
+            if (jkGuiNetHost_bIsEpisodeCoop) {
                 jkGuiNetHost_gameFlags |= MULTIMODEFLAG_COOP;
+            }
+            else {
+                jkGuiNetHost_gameFlags &= ~MULTIMODEFLAG_COOP;
             }
             pMultiEntry->multiModeFlags = jkGuiNetHost_gameFlags;
             pMultiEntry->sessionFlags = jkGuiNetHost_sessionFlags;
@@ -530,11 +545,19 @@ int jkGuiNetHost_sub_4119D0(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX
         jkGuiRend_SetClickableString(&jkGuiNetHost_aElements[NETHOST_LEVEL_LISTBOX], &jkGuiNetHost_dArray2);
     }
 
+#ifdef QOL_IMPROVEMENTS
+    // Added: Only add Co-op flags on singleplayer levels
+    if (jkGuiSingleplayer_FUN_0041d590(pElement->unistr[pElement->selectedTextEntry].c_str) & JK_EPISODE_SINGLEPLAYER) {
+        jkGuiNetHost_bIsEpisodeCoop = 1;
+    }
+    else {
+        jkGuiNetHost_bIsEpisodeCoop = 0;
+    }
+#endif
+
     // MOTS added
     /*
-    uVar2 = jkGuiSingleplayer_FUN_0041d590(a1);
-    bVar3 = (uVar2 & 0x10) == 0;
-    if (!bVar3) {
+    if (jkGuiSingleplayer_FUN_0041d590(a1) & 0x10) {
         jkGuiNetHost_aElements[16].unlabelled16 = 1;
         jkGuiNetHost_aElements[15].unlabelled16 = 0;
         jkGuiNetHost_aElements[12].bIsVisible = 1;

@@ -286,6 +286,19 @@ int jkGuiSingleplayer_EnumEpisodes(Darray *array, jkGuiElement *element, int a3,
     return ret;
 }
 
+// MOTS added
+int jkGuiSingleplayer_FUN_0041d590(const char* pName)
+{
+    for (int i = 0; i < jkEpisode_var2; i++)
+    {
+        //printf("%s %s %x\n", pName, jkEpisode_aEpisodes[i].name, jkEpisode_aEpisodes[i].type);
+        if (!strcmp(jkEpisode_aEpisodes[i].name, pName))
+            return jkEpisode_aEpisodes[i].type;
+    }
+
+    return 0;
+}
+
 void jkGuiSingleplayer_sub_41AA30(Darray *array, jkGuiElement *element, int a3, char *episodeDir, int a5, int a6, int a7, jkEpisodeEntry* a8)
 {
     int i; // edi
