@@ -60,7 +60,10 @@ int sithGamesave_Load(char *saveFname, int debugNextCheckpoint, int a3)
 
     stdString_WcharToChar(playerName, jkPlayer_playerShortName, 31);
     playerName[31] = 0;
-    stdString_snprintf(fpath, 128, "player\\%s\\%s", playerName, saveFname);
+    stdString_snprintf(
+        fpath, 128, "player%c%s%c%s",
+        LEC_PATH_SEPARATOR_CHR, playerName, LEC_PATH_SEPARATOR_CHR, saveFname
+    );
 
     if (stdConffile_OpenMode(fpath, "rb"))
     {
