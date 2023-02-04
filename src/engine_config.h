@@ -79,6 +79,8 @@
 #define STD3D_MAX_UI_TRIS (0x8000)
 #define STD3D_MAX_UI_VERTICES (0x8000)
 
+#define SITHCONTROL_NUM_HANDLERS (9)
+
 // jkGuiMultiTally delay between maps
 #define SCORE_DELAY_MS ((jkGuiNetHost_bIsDedicated && stdComm_bIsServer) ? 0 : 30000)
 

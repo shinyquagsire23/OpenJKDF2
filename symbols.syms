@@ -204,7 +204,7 @@ sithControl_aInputFuncToKeyinfo 0x00833B48 stdControlKeyInfo[74]
 sithControl_msIdle 0x00835830 uint32_t
 sithControl_bInitted 0x00835834 int
 sithControl_bOpened 0x00835838 int
-sithControl_aHandlers 0x00833A00 sithControl_handler_t[5]
+sithControl_aHandlers 0x00833A00 sithControl_handler_t[SITHCONTROL_NUM_HANDLERS]
 sithControl_numHandlers 0x008339F8 int
 sithControl_death_msgtimer 0x0083583C int
 sithControl_vec3_54A570 0x0054A570 rdVector3 = {0.0, -1.0, 0.0}

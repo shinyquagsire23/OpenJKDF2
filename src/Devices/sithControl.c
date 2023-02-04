@@ -152,6 +152,7 @@ int sithControl_Shutdown()
     sithControl_008d7f58 = 0;
     sithControl_008d7f5c = 0;
 
+    memset(sithControl_aHandlers, 0, sizeof(sithControl_handler_t) * SITHCONTROL_NUM_HANDLERS);
     sithControl_numHandlers = 0;
 #endif
 
@@ -853,7 +854,8 @@ float sithControl_GetAxis(int funcIdx)
 
 void sithControl_AddInputHandler(sithControl_handler_t a1)
 {
-    if ( sithControl_numHandlers <= 8 )
+    // The original engine had an off-by-one here?
+    if (sithControl_numHandlers < SITHCONTROL_NUM_HANDLERS)
     {
         sithControl_aHandlers[sithControl_numHandlers++] = a1;
     }

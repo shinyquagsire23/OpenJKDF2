@@ -30,6 +30,7 @@
 
 static smush_ctx* jkCutscene_pSmush;
 static smk jkCutscene_smk;
+static int jkCutscene_bSmkValid = 0;
 static double jkCutscene_smk_usf;
 static unsigned long jkCutscene_smk_w, jkCutscene_smk_h, jkCutscene_smk_frames;
 static stdVBuffer* jkCutscene_frameBuf = NULL;
@@ -73,49 +74,9 @@ void smush_audio_callback(const uint8_t* data, size_t len)
     jkCutscene_audio_queue_write_idx = jkCutscene_audio_queue_write_idx % AUDIO_QUEUE_DEPTH;
 }
 
-// MOTS altered
-void jkCutscene_Startup(char *fpath)
+// Added
+void jkCutscene_CleanReset()
 {
-    stdStrTable_Load(&jkCutscene_strings, fpath); // MOTS removed
-    jkCutscene_subtitlefont = stdFont_Load("ui\\sft\\subtitlefont.sft", 0, 0);
-    
-    if (Main_bMotsCompat) {
-        jkCutscene_rect1.x = 10;
-        jkCutscene_rect1.y = 400; // MoTS was 385?
-        jkCutscene_rect1.width = 620;
-        jkCutscene_rect1.height = 80; // MoTS was 95?
-        jkCutscene_rect2.x = 0;
-        jkCutscene_rect2.y = 10;
-        jkCutscene_rect2.width = 640;
-        jkCutscene_rect2.height = 40;
-    }
-    else {
-        jkCutscene_rect1.x = 10;
-        jkCutscene_rect1.y = 360;
-        jkCutscene_rect1.width = 620;
-        jkCutscene_rect1.height = 120;
-        jkCutscene_rect2.x = 0;
-        jkCutscene_rect2.y = 10;
-        jkCutscene_rect2.width = 640;
-        jkCutscene_rect2.height = 40;
-    }
-    
-
-    jkCutscene_bInitted = 1;
-}
-
-// MOTS altered
-void jkCutscene_Shutdown()
-{
-    if ( jkCutscene_subtitlefont )
-    {
-        stdFont_Free(jkCutscene_subtitlefont);
-        jkCutscene_subtitlefont = 0;
-    }
-    stdStrTable_Free(&jkCutscene_strings); // MOTS removed
-
-    // Added: Clean shutdown
-#ifdef QOL_IMPROVEMENTS
 #ifdef SDL2_RENDER
     for (int i = 0; i < AUDIO_QUEUE_DEPTH; i++) {
         if (jkCutscene_audio_queue[i])
@@ -149,8 +110,9 @@ void jkCutscene_Shutdown()
         smush_destroy(jkCutscene_pSmush);
         jkCutscene_pSmush = NULL;
     }
-    else {
-        //smk_close(jkCutscene_smk);
+    if (jkCutscene_bSmkValid) {
+        smk_close(jkCutscene_smk);
+        jkCutscene_bSmkValid = 0;
     }
 
     if (jkCutscene_frameBuf) {
@@ -161,6 +123,7 @@ void jkCutscene_Shutdown()
 
     jkCutscene_pSmush = NULL;
     memset(&jkCutscene_smk, 0, sizeof(jkCutscene_smk));
+    jkCutscene_bSmkValid = 0;
     jkCutscene_smk_usf = 0;
     jkCutscene_smk_w = 0;
     jkCutscene_smk_h = 0;
@@ -189,6 +152,53 @@ void jkCutscene_Shutdown()
     memset(jkCutscene_audio_queue_lens, 0, sizeof(jkCutscene_audio_queue_lens));
     jkCutscene_audio_queue_read_idx = 0;
     jkCutscene_audio_queue_write_idx = 0;
+}
+
+// MOTS altered
+void jkCutscene_Startup(char *fpath)
+{
+    jkCutscene_CleanReset();
+
+    stdStrTable_Load(&jkCutscene_strings, fpath); // MOTS removed
+    jkCutscene_subtitlefont = stdFont_Load("ui\\sft\\subtitlefont.sft", 0, 0);
+    
+    if (Main_bMotsCompat) {
+        jkCutscene_rect1.x = 10;
+        jkCutscene_rect1.y = 400; // MoTS was 385?
+        jkCutscene_rect1.width = 620;
+        jkCutscene_rect1.height = 80; // MoTS was 95?
+        jkCutscene_rect2.x = 0;
+        jkCutscene_rect2.y = 10;
+        jkCutscene_rect2.width = 640;
+        jkCutscene_rect2.height = 40;
+    }
+    else {
+        jkCutscene_rect1.x = 10;
+        jkCutscene_rect1.y = 360;
+        jkCutscene_rect1.width = 620;
+        jkCutscene_rect1.height = 120;
+        jkCutscene_rect2.x = 0;
+        jkCutscene_rect2.y = 10;
+        jkCutscene_rect2.width = 640;
+        jkCutscene_rect2.height = 40;
+    }
+
+    jkCutscene_bInitted = 1;
+}
+
+// MOTS altered
+void jkCutscene_Shutdown()
+{
+    if ( jkCutscene_subtitlefont )
+    {
+        stdFont_Free(jkCutscene_subtitlefont);
+        jkCutscene_subtitlefont = 0;
+    }
+    stdStrTable_Free(&jkCutscene_strings); // MOTS removed
+
+    // Added: Clean shutdown
+#ifdef QOL_IMPROVEMENTS
+    jkCutscene_CleanReset();
 #endif
 
     jkCutscene_bInitted = 0;
@@ -252,6 +262,7 @@ int jkCutscene_sub_421310(char* fpath)
     jkCutscene_pSmush = smush_from_fpath(tmp);
     if (!jkCutscene_pSmush)
     {
+        jkCutscene_bSmkValid = 0;
         jkCutscene_smk = smk_open_file(tmp, SMK_MODE_MEMORY);
         if (!jkCutscene_smk)
         {
@@ -259,6 +270,7 @@ int jkCutscene_sub_421310(char* fpath)
             return 1;
         }
 
+        jkCutscene_bSmkValid = 1;
         smk_info_all(jkCutscene_smk, NULL, &jkCutscene_smk_frames, &jkCutscene_smk_usf);
         smk_info_video(jkCutscene_smk, &jkCutscene_smk_w, &jkCutscene_smk_h, NULL);
         jk_printf("Opened file %s as SMK\nWidth: %lu\nHeight: %lu\nFrames: %lu\nFPS: %f\n", tmp, jkCutscene_smk_w, jkCutscene_smk_h, jkCutscene_smk_frames, 1000000.0 / jkCutscene_smk_usf);
@@ -325,6 +337,7 @@ int jkCutscene_sub_421310(char* fpath)
         jkGui_SetModeMenu(smk_get_palette(jkCutscene_smk));
     }
     else {
+        jkCutscene_bSmkValid = 0;
         jkCutscene_audio_buf = NULL;
         jkCutscene_audio_pos = NULL;
         jkCutscene_audio_len = 0;
@@ -424,8 +437,9 @@ int jkCutscene_sub_421410()
 
 #ifdef SDL2_RENDER
     for (int i = 0; i < AUDIO_QUEUE_DEPTH; i++) {
-        if (jkCutscene_audio_queue[i])
+        if (jkCutscene_audio_queue[i]) {
             free(jkCutscene_audio_queue[i]);
+        }
 
         jkCutscene_audio_queue[i] = NULL;
         jkCutscene_audio_queue_lens[i] = 0;
@@ -455,9 +469,11 @@ int jkCutscene_sub_421410()
         smush_destroy(jkCutscene_pSmush);
         jkCutscene_pSmush = NULL;
     }
-    else {
+    
+    if (jkCutscene_bSmkValid) {
         smk_close(jkCutscene_smk);
     }
+    jkCutscene_bSmkValid = 0;
 
     if (jkCutscene_frameBuf) {
         stdDisplay_VBufferFree(jkCutscene_frameBuf);
