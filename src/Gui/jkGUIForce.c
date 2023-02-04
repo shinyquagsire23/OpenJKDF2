@@ -474,12 +474,13 @@ LAB_00418eb2:
 }
 
 // MOTS altered
-int jkGuiForce_ResetClick(jkGuiElement *element, jkGuiMenu *menu, int a, int b, int c)
+int jkGuiForce_ResetClick(jkGuiElement *element, jkGuiMenu *menu, int mouseX, int mouseY, int bRedraw)
 {
     if ( !jkGuiForce_bCanSpendStars )
         return 0;
+
     sithPlayer_SetBinAmt(SITHBIN_SPEND_STARS, (double)jkGuiForce_numSpendStars);
-    for (int i = EIDX_START_FP; i < EIDX_END_FP_CLICKABLE; i++)
+    for (int i = EIDX_START_FP; i < (Main_bMotsCompat ? EIDX_END_FP : EIDX_END_FP_CLICKABLE); i++)
     {
         float v5 = (float)(*(int*)&jkGuiForce_pElements[i].anonymous_13);
         sithPlayer_SetBinAmt(jkGuiForce_pElements[i].hoverId, v5);
@@ -490,6 +491,7 @@ int jkGuiForce_ResetClick(jkGuiElement *element, jkGuiMenu *menu, int a, int b, 
     {
         jkGuiForce_UpdateViewForRank();
     }
+
     if (!Main_bMotsCompat)
         jkGuiForce_pElements[EIDX_ALIGN_SLIDER].selectedTextEntry = 100 - (uint64_t)(int)jkPlayer_CalcAlignment(jkGuiForce_isMulti);
     jkGuiRend_Paint(menu);
