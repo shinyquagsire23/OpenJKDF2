@@ -340,6 +340,22 @@ static std::unordered_map<std::string, jkgm_cache_entry_t> jkgm_cache_hash;
 static bool jkgm_cache_once = false;
 static bool jkgm_fastpath_disable = false;
 
+void jkgm_startup()
+{
+    jkgm_cache_once = false;
+    jkgm_fastpath_disable = false;
+
+    for (auto i : jkgm_cache) {
+        jkgm_free_cache_entry(&i.second);
+    }
+    for (auto i : jkgm_cache_hash) {
+        jkgm_free_cache_entry(&i.second);
+    }
+
+    jkgm_cache.clear();
+    jkgm_cache_hash.clear();
+}
+
 static std::string jkgm_hash_to_str(uint8_t *p) {
     char tmp[32+2];
     char* tmp_it = tmp;

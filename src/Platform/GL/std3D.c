@@ -465,6 +465,8 @@ int init_resources()
 {
     stdPlatform_Printf("std3D: OpenGL init...\n");
 
+    jkgm_startup();
+
     memset(std3D_aUITextures, 0, sizeof(std3D_aUITextures));
 
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, &std3D_windowFbo);
