@@ -104,8 +104,10 @@ void sithWorld_Shutdown()
 {
     if ( sithWorld_pCurrentWorld )
         pSithHS->free(sithWorld_pCurrentWorld);
-    if ( sithWorld_pStatic )
-        pSithHS->free(sithWorld_pStatic);
+    if ( sithWorld_pStatic ) {
+        //pSithHS->free(sithWorld_pStatic); // Added: Actually free everything
+        sithWorld_FreeEntry(sithWorld_pStatic); // Added: Actually free everything
+    }
     sithWorld_pCurrentWorld = 0;
     sithWorld_pStatic = 0;
     sithWorld_pLoading = 0;

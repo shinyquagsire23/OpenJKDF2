@@ -363,6 +363,7 @@ int sithSurface_Load(sithWorld *world)
     
     world->numSurfaces = numSurfaces;
     pSithHS->free(sithMaterial_aMaterials);
+    sithMaterial_aMaterials = NULL; // Added
     sithMaterial_numMaterials = 0;
     return 1;
 }

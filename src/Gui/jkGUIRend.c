@@ -425,11 +425,11 @@ void jkGuiRend_Shutdown()
 #ifdef QOL_IMPROVEMENTS
     for (int i = 0; i < 4; i++)
     {
-        //if ( jkGuiRend_DsoundHandles[i] )
-        //    stdSound_BufferRelease(jkGuiRend_DsoundHandles[i]);
+        if ( jkGuiRend_DsoundHandles[i] )
+            stdSound_BufferRelease(jkGuiRend_DsoundHandles[i]);
             
-        //if ( jkGuiRend_LoadedSounds[i] )
-        //    std_pHS->free(jkGuiRend_LoadedSounds[i]);
+        if ( jkGuiRend_LoadedSounds[i] )
+            std_pHS->free(jkGuiRend_LoadedSounds[i]);
     }
     
     memset(jkGuiRend_LoadedSounds, 0, sizeof(jkGuiRend_LoadedSounds));
@@ -522,16 +522,20 @@ void jkGuiRend_PlayWav(char *fpath)
 
     if ( newHandle )
     {
-        if ( jkGuiRend_DsoundHandles[3] )
+        if ( jkGuiRend_DsoundHandles[3]) {
             stdSound_BufferRelease(jkGuiRend_DsoundHandles[3]);
+            jkGuiRend_DsoundHandles[3] = NULL;
+        }
             
-        if ( jkGuiRend_LoadedSounds[3] )
+        if ( jkGuiRend_LoadedSounds[3] ) {
             std_pHS->free(jkGuiRend_LoadedSounds[3]);
+            jkGuiRend_LoadedSounds[3] = NULL;
+        }
 
-        for (int i = 0; i < 3; i++)
+        for (int i = 3; i >= 1; i--)
         {
-            jkGuiRend_DsoundHandles[i+1] = jkGuiRend_DsoundHandles[i];
-            jkGuiRend_LoadedSounds[i+1] = jkGuiRend_LoadedSounds[i];
+            jkGuiRend_DsoundHandles[i] = jkGuiRend_DsoundHandles[i-1];
+            jkGuiRend_LoadedSounds[i] = jkGuiRend_LoadedSounds[i-1];
         }
 
         jkGuiRend_DsoundHandles[0] = newHandle;

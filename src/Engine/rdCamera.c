@@ -15,9 +15,13 @@ static float rdCamera_mipmapScalar = 1.0; // MOTS added
 rdCamera* rdCamera_New(float fov, float x, float y, float z, float aspectRatio)
 {
     rdCamera* out = (rdCamera *)rdroid_pHS->alloc(sizeof(rdCamera));
-    if ( !out )
+    if ( !out ) {
         return 0;
+    }
     
+    // Added: zero out alloc
+    memset(out, 0, sizeof(*out));
+
     rdCamera_NewEntry(out, fov, x, y, z, aspectRatio);    
     
     return out;
@@ -28,7 +32,12 @@ int rdCamera_NewEntry(rdCamera *camera, float fov, float a3, float a4, float a5,
     if (!camera)
         return 0;
 
-    camera->cameraClipFrustum = (rdClipFrustum *)rdroid_pHS->alloc(sizeof(rdClipFrustum));
+    // Added: Don't double-alloc
+    if (!camera->cameraClipFrustum)
+    {
+        camera->cameraClipFrustum = (rdClipFrustum *)rdroid_pHS->alloc(sizeof(rdClipFrustum));
+    }
+
     if ( camera->cameraClipFrustum )
     {
         camera->canvas = 0;
@@ -62,8 +71,10 @@ void rdCamera_Free(rdCamera *camera)
 
 void rdCamera_FreeEntry(rdCamera *camera)
 {
-    if ( camera->cameraClipFrustum )
+    if ( camera->cameraClipFrustum ) {
         rdroid_pHS->free(camera->cameraClipFrustum);
+        camera->cameraClipFrustum = NULL; // Added: no UAF
+    }
 }
 
 int rdCamera_SetCanvas(rdCamera *camera, rdCanvas *canvas)

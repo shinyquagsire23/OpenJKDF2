@@ -247,6 +247,7 @@ void jkGuiMods_Show()
         pHS->free(i);
         ++v7;
     }
+    jkGuiRend_DarrayFree(&darray);
 }
 
 void jkGuiMods_AddEntry(Darray *pListDisplayed, int type, const char* paVal, const char* paDisplayed)

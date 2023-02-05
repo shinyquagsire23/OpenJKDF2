@@ -2960,13 +2960,27 @@ typedef struct jkGuiElement
     int type;
     int hoverId;
     int field_8;
+
+// Added: Allow soft-resetting of these fields easily
+#ifdef QOL_IMPROVEMENTS
+    union
+    {
+      const char* origStr;
+      jkGuiStringEntry *orig_unistr;
+      wchar_t* orig_wstr;
+      int origExtraInt;
+    };
+#else
     union
     {
       const char* str;
       jkGuiStringEntry *unistr;
       wchar_t* wstr;
       int extraInt;
+      int origExtraInt;
     };
+#endif
+
     union
     {
         int selectedTextEntry;
@@ -2976,16 +2990,42 @@ typedef struct jkGuiElement
     rdRect rect;
     int bIsVisible;
     int anonymous_9;
+
+// Added: Allow soft-resetting of these fields easily
+#ifdef QOL_IMPROVEMENTS
+    union
+    {
+        const char* origHintText;
+        wchar_t* orig_wHintText;
+    };
+#else
     union
     {
         const char* hintText;
         wchar_t* wHintText;
     };
+#endif
     jkGuiDrawFunc_t drawFuncOverride;
     jkGuiClickHandlerFunc_t func;
     void *anonymous_13;
     jkGuiTexInfo texInfo;
     int clickShortcutScancode;
+
+// Added: Allow soft-resetting of these fields easily
+#ifdef QOL_IMPROVEMENTS
+    union
+    {
+      const char* str;
+      jkGuiStringEntry *unistr;
+      wchar_t* wstr;
+      int extraInt;
+    };
+    union
+    {
+        const char* hintText;
+        wchar_t* wHintText;
+    };
+#endif
 } jkGuiElement;
 
 typedef struct jkGuiStringEntry

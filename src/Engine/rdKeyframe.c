@@ -8,14 +8,16 @@
 
 keyframeLoader_t rdKeyframe_RegisterLoader(keyframeLoader_t loader)
 {
+    keyframeLoader_t result = pKeyframeLoader;
     pKeyframeLoader = loader;
-    return loader;
+    return result;
 }
 
 keyframeUnloader_t rdKeyframe_RegisterUnloader(keyframeUnloader_t loader)
 {
+    keyframeUnloader_t result = pKeyframeUnloader;
     pKeyframeUnloader = loader;
-    return loader;
+    return result;
 }
 
 void rdKeyframe_NewEntry(rdKeyframe *keyframe)

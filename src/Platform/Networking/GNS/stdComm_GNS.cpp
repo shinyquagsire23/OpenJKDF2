@@ -169,6 +169,7 @@ static void Printf( const char *fmt, ... )
     DebugOutput( k_ESteamNetworkingSocketsDebugOutputType_Msg, text );
 }
 
+static int stdComm_GNS_bInitted = 0;
 static int stdComm_GNS_bForceStubs = 0;
 static int stdComm_GNS_bSymbolsLoaded = 0;
 
@@ -232,6 +233,8 @@ static void stdComm_GNS_LoadSymbols()
 
 static void InitSteamDatagramConnectionSockets()
 {
+    if (stdComm_GNS_bInitted) return;
+
     stdComm_GNS_LoadSymbols();
 
     #ifdef STEAMNETWORKINGSOCKETS_OPENSOURCE
@@ -258,10 +261,13 @@ static void InitSteamDatagramConnectionSockets()
     g_logTimeZero = g_SteamNetworkingUtils()->GetLocalTimestamp();
 
     g_SteamNetworkingUtils()->SetDebugOutputFunction( k_ESteamNetworkingSocketsDebugOutputType_Msg, DebugOutput );
+    stdComm_GNS_bInitted = 1;
 }
 
 static void ShutdownSteamDatagramConnectionSockets()
 {
+    if (!stdComm_GNS_bInitted) return;
+
     // Give connections time to finish up.  This is an application layer protocol
     // here, it's not TCP.  Note that if you have an application and you need to be
     // more sure about cleanup, you won't be able to do this.  You will need to send
@@ -274,6 +280,8 @@ static void ShutdownSteamDatagramConnectionSockets()
     #else
         SteamDatagramClient_Kill();
     #endif
+
+    stdComm_GNS_bInitted = 0;
 }
 
 

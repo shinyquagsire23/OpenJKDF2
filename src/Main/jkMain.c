@@ -94,6 +94,18 @@ void jkMain_Shutdown()
 {
     jkPlayer_Shutdown();
     sithMain_Close();
+
+    // Added: memleak
+    if ( jkEpisode_mLoad.paEntries )
+    {
+        pHS->free(jkEpisode_mLoad.paEntries);
+        jkEpisode_mLoad.paEntries = 0;
+    }
+
+    // Added: prevent UAF
+    jkMain_pEpisodeEnt = NULL;
+    jkMain_pEpisodeEnt2 = NULL;
+
     jkMain_bInit = 0;
 }
 

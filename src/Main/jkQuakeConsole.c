@@ -74,7 +74,6 @@ static int jkQuakeConsole_cmpstr(const void* a, const void* b)
 
 void jkQuakeConsole_Startup()
 {
-    // Added
     jkQuakeConsole_pFont = stdFont_Load("ui\\sft\\msgFont16.sft", 0, 0);
 
     int num = jkQuakeConsole_pFont->charsetHead.charLast - jkQuakeConsole_pFont->charsetHead.charFirst;
@@ -124,6 +123,9 @@ void jkQuakeConsole_Startup()
 
 void jkQuakeConsole_Shutdown()
 {
+    stdFont_Free(jkQuakeConsole_pFont);
+    jkQuakeConsole_pFont = NULL;
+
     Window_RemoveMsgHandler(jkQuakeConsole_WmHandler);
 
     jkQuakeConsole_ResetShade();

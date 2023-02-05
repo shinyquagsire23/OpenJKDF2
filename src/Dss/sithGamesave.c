@@ -119,7 +119,15 @@ int sithGamesave_LoadEntry(char *fpath)
 #ifdef QOL_IMPROVEMENTS
     if ( jkEpisode_Load(&jkGui_episodeLoad) )
     {
+        if (jkEpisode_mLoad.paEntries) {
+            pHS->free(jkEpisode_mLoad.paEntries);
+            jkEpisode_mLoad.paEntries = NULL;
+        }
         jkEpisode_mLoad = jkGui_episodeLoad;
+        size_t aEnts_size = (jkEpisode_mLoad.numSeq + 1) * sizeof(jkEpisodeEntry);
+        jkEpisode_mLoad.paEntries = (jkEpisodeEntry *)pHS->alloc(aEnts_size);
+        memcpy(jkEpisode_mLoad.paEntries, jkGui_episodeLoad.paEntries, aEnts_size);
+
         for (int j = 0; j < jkEpisode_mLoad.numSeq; j++)
         {
             //printf("%s %s\n", jkEpisode_mLoad.paEntries[j].fileName, v25);

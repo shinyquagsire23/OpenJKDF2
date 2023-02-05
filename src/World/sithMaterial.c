@@ -22,6 +22,12 @@ void sithMaterial_Shutdown()
         stdHashTable_Free(sithMaterial_hashmap);
         sithMaterial_hashmap = 0;
     }
+
+    // Added
+    if (sithMaterial_aMaterials) {
+        pSithHS->free(sithMaterial_aMaterials);
+        sithMaterial_aMaterials = NULL;
+    }
 }
 
 void sithMaterial_Free(sithWorld *world)
@@ -58,9 +64,7 @@ int sithMaterial_Load(sithWorld *world, int a2)
 {
     int v2; // ebx
     int result; // eax
-    int v4; // esi
-    rdMaterial *v5; // eax
-    stdHashTable *v6; // eax
+
     rdMaterial *v7; // eax
     double v8; // st7
     char *v9; // ecx
@@ -80,19 +84,16 @@ int sithMaterial_Load(sithWorld *world, int a2)
             // Added: needed for JKE?
             a2 *= 2;
 
-            v4 = a2;
+            sithMaterial_New(world, a2);
+
             v12 = 45.0 / (double)(unsigned int)a2;
-            v5 = (rdMaterial *)pSithHS->alloc(sizeof(rdMaterial) * a2);
-            world->materials = v5;
-            if ( v5 )
-            {
-                v6 = sithMaterial_hashmap;
-                world->numMaterials = v4;
-                if ( v6 || (sithMaterial_hashmap = stdHashTable_New(1024)) != 0 )
-                    world->materials2 = (rdVector2 *)pSithHS->alloc(sizeof(rdVector2) * v4);
-                else
-                    pSithHS->free(world->materials);
+
+            // Added: memleak. TODO: static.jkl??
+            if (sithMaterial_aMaterials) {
+                pSithHS->free(sithMaterial_aMaterials);
+                sithMaterial_aMaterials = NULL;
             }
+
             sithMaterial_aMaterials = (rdMaterial **)pSithHS->alloc(sizeof(rdMaterial*) * a2);
             if ( stdConffile_ReadArgs() )
             {
@@ -224,7 +225,6 @@ int sithMaterial_GetMemorySize(rdMaterial *mat)
 rdVector2* sithMaterial_New(sithWorld *world, int num)
 {
     rdMaterial *v2; // eax
-    stdHashTable *v3; // eax
     rdVector2 *result; // eax
 
     // Added: needed for JKE?
@@ -234,9 +234,9 @@ rdVector2* sithMaterial_New(sithWorld *world, int num)
     world->materials = v2;
     if ( !v2 )
         return 0;
-    v3 = sithMaterial_hashmap;
+
     world->numMaterials = num;
-    if ( !v3 )
+    if ( !sithMaterial_hashmap )
     {
         sithMaterial_hashmap = stdHashTable_New(1024);
         if ( !sithMaterial_hashmap )

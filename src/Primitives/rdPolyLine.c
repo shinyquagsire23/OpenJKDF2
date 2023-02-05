@@ -19,6 +19,7 @@ rdPolyLine* rdPolyLine_New(char *polyline_fname, char *material_fname, char *mat
     polyline = (rdPolyLine *)rdroid_pHS->alloc(sizeof(rdPolyLine));
     if (polyline)
     {
+        memset(polyline, 0, sizeof(*polyline)); // Added: clear struct
         rdPolyLine_NewEntry(polyline, polyline_fname, material_fname, material_fname2, length, base_rad, tip_rad, lightmode, texmode, sortingmethod, extraLight);
     }
     return polyline;
@@ -34,6 +35,9 @@ int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *materi
     int *vertexUVIdx;
     rdVector2 *extraUVFaceMaybe;
     stdVBuffer *v22;
+
+    // Added: memleak mitigation
+    rdPolyLine_FreeEntry(polyline);
 
     if ( polyline_fname )
     {

@@ -24,7 +24,7 @@ static float jkGuiTitle_loadPercent;
 
 static jkGuiElement jkGuiTitle_elementsLoad[6] = {
     {ELEMENT_TEXT,  0,  2,  0,  3, {250, 50, 390, 80},  1,  0,  0,  0,  0,  0, {0},  0},
-    {ELEMENT_CUSTOM,  0,  0, .extraInt = 0xE1,  0, {330, 131, 240, 20},  1,  0,  0, jkGuiTitle_LoadBarDraw,  0,  0, {0},  0},
+    {ELEMENT_CUSTOM,  0,  0, .origExtraInt = 0xE1,  0, {330, 131, 240, 20},  1,  0,  0, jkGuiTitle_LoadBarDraw,  0,  0, {0},  0},
     {ELEMENT_TEXT,  0,  0, "GUI_LOADING",  3, {330, 152, 240, 20},  1,  0,  0,  0,  0,  0, {0},  0},
     
 #ifdef QOL_IMPROVEMENTS
@@ -40,7 +40,7 @@ static jkGuiMenu jkGuiTitle_menuLoad = {jkGuiTitle_elementsLoad, 0xFFFFFFFF, 0xF
 
 static jkGuiElement jkGuiTitle_elementsLoadStatic[6] = {
     {ELEMENT_TEXT,  0,  2, "GUI_LOADING",  3, {60, 280, 520, 30},  1,  0,  0,  0,  0,  0, {0},  0},
-    {ELEMENT_CUSTOM,  0,  0, .extraInt = 0xE1,  0, {220, 240, 200, 20},  1,  0,  0, jkGuiTitle_LoadBarDraw,  0,  0, {0},  0},
+    {ELEMENT_CUSTOM,  0,  0, .origExtraInt = 0xE1,  0, {220, 240, 200, 20},  1,  0,  0, jkGuiTitle_LoadBarDraw,  0,  0, {0},  0},
     {ELEMENT_TEXT,  0,  1, "GUI_COPYRIGHT1",  3, {10, 420, 620, 30},  1,  0,  0,  0,  0,  0, {0},  0},
     {ELEMENT_TEXT,  0,  1, "GUI_COPYRIGHT2",  3, {10, 440, 620, 30},  1,  0,  0,  0,  0,  0, {0},  0},
     {ELEMENT_TEXT,  0,  0,  0,  3, {560, 440, 70, 30},  1,  0,  0,  0,  0,  0, {0},  0},

@@ -82,6 +82,12 @@ void jkGuiSingleplayer_Startup()
 
 void jkGuiSingleplayer_Shutdown()
 {
+    // Added: memleak
+    if ( jkGui_episodeLoad.paEntries )
+    {
+        pHS->free(jkGui_episodeLoad.paEntries);
+        jkGui_episodeLoad.paEntries = 0;
+    }
 }
 
 int jkGuiSingleplayer_Show()
@@ -227,7 +233,15 @@ int jkGuiSingleplayer_Show()
 
 #ifdef QOL_IMPROVEMENTS
                                 // Added: progress end of level normally from debug menu, instead of exiting to main menu
+                                if (jkEpisode_mLoad.paEntries) {
+                                    pHS->free(jkEpisode_mLoad.paEntries);
+                                    jkEpisode_mLoad.paEntries = NULL;
+                                }
                                 jkEpisode_mLoad = jkGui_episodeLoad;
+                                size_t aEnts_size = (jkEpisode_mLoad.numSeq + 1) * sizeof(jkEpisodeEntry);
+                                jkEpisode_mLoad.paEntries = (jkEpisodeEntry *)pHS->alloc(aEnts_size);
+                                memcpy(jkEpisode_mLoad.paEntries, jkGui_episodeLoad.paEntries, aEnts_size);
+                                
                                 for (int j = 0; j < jkEpisode_mLoad.numSeq; j++)
                                 {
                                     //printf("%s %s\n", jkEpisode_mLoad.paEntries[j].fileName, v25);

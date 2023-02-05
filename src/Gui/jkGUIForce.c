@@ -154,7 +154,7 @@ jkGuiElement jkGuiForce_buttonsMots[31] = {
                 0, { 0, 0, 0, 0 }, 0, 0, NULL, NULL, NULL, NULL, {0}, 0 },
 
 // HACK: Just make an unused slider
-/*30*/  { ELEMENT_SLIDER,      0, 0, .extraInt = 200,  
+/*30*/  { ELEMENT_SLIDER,      0, 0, .origExtraInt = 200,  
         100, {150, 418, 340, 40}, 1, 0,  NULL,           0,  0,          &jkGuiForce_idkExtra, {0},  0}, 
 };  
 
@@ -196,11 +196,11 @@ static jkGuiElement jkGuiForce_buttons[25] = {
 /*16*/  { ELEMENT_PICBUTTON,  SITHBIN_F_DEADLYSIGHT, 0, NULL,               
           2, {-1, -1, -1, -1},    1, 0, "GUI_HINT_DEADLYSIGHT", 0, jkGuiForce_ExtraClick,   0, {0},  0}, 
 
-/*17*/  { ELEMENT_TEXTBUTTON,  1, 2, .str = "GUI_OK",    
+/*17*/  { ELEMENT_TEXTBUTTON,  1, 2, "GUI_OK",    
           3, {550, 420, 80, 40},  1, 0, NULL,                   0, 0,                       0, {0},  0}, 
-/*18*/  { ELEMENT_TEXTBUTTON,  0, 2, .str = "GUI_RESET", 
+/*18*/  { ELEMENT_TEXTBUTTON,  0, 2, "GUI_RESET", 
           3, {270, 350, 100, 30}, 1, 0, NULL,                   0, jkGuiForce_ResetClick,   0, {0},  0}, 
-/*19*/  { ELEMENT_TEXTBUTTON, -1, 2, .str = "GUI_QUIT",  
+/*19*/  { ELEMENT_TEXTBUTTON, -1, 2, "GUI_QUIT",  
           3, { 0, 420, 100, 40},  1, 0, NULL,                   0,  0,                      0, {0},  0}, 
 
 /*20*/  { ELEMENT_CUSTOM,      0, 0, NULL,               
@@ -210,7 +210,7 @@ static jkGuiElement jkGuiForce_buttons[25] = {
 /*22*/  { ELEMENT_CUSTOM,      0, 0, NULL,               
           0, {150, 418, 170, 40}, 1, 0, "GUI_LIGHTSIDE", jkGuiForce_DarkLightHoverDraw, 0,  0, {0},  0}, 
 
-/*23*/  { ELEMENT_SLIDER,      0, 0, .extraInt = 200,  
+/*23*/  { ELEMENT_SLIDER,      0, 0, .origExtraInt = 200,  
         100, {150, 418, 340, 40}, 1, 0,  NULL,           0,  0,          &jkGuiForce_idkExtra, {0},  0}, 
 /*24*/  { ELEMENT_END,         0, 0, NULL,               
           0, {0},                 0, 0,  NULL,           0,  0,                             0, {0},  0}

@@ -87,7 +87,11 @@ void jkGuiSingleTally_Startup()
 
 void jkGuiSingleTally_Shutdown()
 {
-    ;
+    // Added: clean reset
+    if (jkGuiSingleTally_foStars) {
+        stdBitmap_Free(jkGuiSingleTally_foStars);
+        jkGuiSingleTally_foStars = NULL;
+    }
 }
 
 void jkGuiSingleTally_ForceStarsRender(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int d)

@@ -1580,6 +1580,7 @@ LABEL_18:
         v9 = rank;
     }
     jkGuiRend_DarrayFree(&darr);
+    stdStrTable_Free(&strtable); // Added: memleak
     jkGui_SetModeGame();
     return v22;
 }

@@ -2,6 +2,8 @@
 
 export PATH="${HOMEBREW_PREFIX}/opt/llvm/bin:$PATH"
 export MACOSX_DEPLOYMENT_TARGET=10.15
+export CC=/opt/homebrew/opt/llvm/bin/clang
+export CXX=/opt/homebrew/opt/llvm/bin/clang++
 
 cd /Users/maxamillion/workspace/OpenJKDF2/
 
@@ -61,7 +63,7 @@ echo "Running..." &&
 #OPENJKDF2_ROOT="/Users/maxamillion/.local/share/openjkdf2_todoa" LSAN_OPTIONS="suppressions=/Users/maxamillion/workspace/OpenJKDF2/suppr.txt" ASAN_OPTIONS="log_path=/Users/maxamillion/workspace/OpenJKDF2/asan.log"  lldb -o run ./OpenJKDF2.app/Contents/MacOS/openjkdf2-64 -- -enhancedCogVerbs #-- -verboseNetworking
 #OPENJKDF2_ROOT="/Users/maxamillion/.local/share/openjkdf2_todoa2012" LSAN_OPTIONS="suppressions=/Users/maxamillion/workspace/OpenJKDF2/suppr.txt" ASAN_OPTIONS="log_path=/Users/maxamillion/workspace/OpenJKDF2/asan.log"  lldb -o run ./OpenJKDF2.app/Contents/MacOS/openjkdf2-64 -- -enhancedCogVerbs #-- -verboseNetworking
 #OPENJKDF2_ROOT="/Users/maxamillion/.local/share/openjkdf2-cds" LSAN_OPTIONS="suppressions=/Users/maxamillion/workspace/OpenJKDF2/suppr.txt" ASAN_OPTIONS="log_path=/Users/maxamillion/workspace/OpenJKDF2/asan.log"  lldb -o run ./OpenJKDF2.app/Contents/MacOS/openjkdf2-64 -- -enhancedCogVerbs #-- -verboseNetworking
-LSAN_OPTIONS="suppressions=/Users/maxamillion/workspace/OpenJKDF2/suppr.txt" ASAN_OPTIONS="log_path=/Users/maxamillion/workspace/OpenJKDF2/asan.log"  lldb -o run ./OpenJKDF2.app/Contents/MacOS/openjkdf2-64 #-- -verboseNetworking
+LSAN_OPTIONS="suppressions=/Users/maxamillion/workspace/OpenJKDF2/suppr.txt" ASAN_OPTIONS="log_path=/Users/maxamillion/workspace/OpenJKDF2/asan.log detect_leaks=0"  lldb -o run ./OpenJKDF2.app/Contents/MacOS/openjkdf2-64 #-- -verboseNetworking
 #lldb -o run ./OpenJKDF2.app/Contents/MacOS/openjkdf2-64
 #open OpenJKDF2.app
 

@@ -61,6 +61,9 @@ int jkHud_Startup()
 
 void jkHud_Shutdown()
 {
+    // Added: clean reset
+    jkHud_Close();
+
     if ( !Main_bNoHUD )
     {
         jkHud_pTargetThing = NULL;

@@ -144,6 +144,7 @@ void stdHashTable_FreeBuckets(stdLinklist *a1)
         stdLinklist* next_iter = iter->next;
         iter->next = NULL; // added
 
+        //printf("Free from %p: %p\n", a1, iter);
         std_pHS->free(iter);
         
         iter = next_iter;
@@ -200,6 +201,7 @@ int stdHashTable_SetKeyVal(stdHashTable *hashmap, const char *key, void *value)
         new_child = (stdLinklist *)std_pHS->alloc(sizeof(stdLinklist));
         if (!new_child)
             return 0;
+        //printf("Alloc to %p: %p\n", v9, new_child);
 
         _memset(new_child, 0, sizeof(*new_child));
         new_child->key = key;
@@ -274,7 +276,7 @@ int stdHashTable_FreeKey(stdHashTable *hashtable, char *key)
     if ( !foundKey )
         return 0;
 
-    stdLinklist_UnlinkChild(foundKey);
+    //stdLinklist_UnlinkChild(foundKey); // Added: Moved to prevent freeing issues
     bucketTopKey = &hashtable->buckets[v2];
     if ( bucketTopKey == foundKey )
     {
@@ -297,6 +299,7 @@ int stdHashTable_FreeKey(stdHashTable *hashtable, char *key)
     }
     else
     {
+        stdLinklist_UnlinkChild(foundKey); // Added: Moved to prevent freeing issues
         std_pHS->free(foundKey);
     }
     return 1;

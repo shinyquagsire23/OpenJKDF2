@@ -88,6 +88,11 @@ void jkGui_InitMenu(jkGuiMenu *menu, stdBitmap *bgBitmap)
     jkGuiElement* iter = menu->paElements;
     while ( iter->type != ELEMENT_END )
     {
+#ifdef QOL_IMPROVEMENTS
+        iter->hintText = iter->origHintText;
+        iter->str = iter->origStr;
+#endif
+
         if ( iter->hintText )
         {
             wchar_t* text = jkStrings_GetText2(iter->hintText);
@@ -97,11 +102,11 @@ void jkGui_InitMenu(jkGuiMenu *menu, stdBitmap *bgBitmap)
 
         if ( !iter->type || iter->type == ELEMENT_TEXT || iter->type == ELEMENT_CHECKBOX )
         {
-            if ( iter->unistr )
+            if ( iter->str )
             {
-                wchar_t* text = jkStrings_GetText2((const char *)iter->unistr);
+                wchar_t* text = jkStrings_GetText2(iter->str);
                 if ( text )
-                    iter->unistr = (jkGuiStringEntry *)text;
+                    iter->wstr = (jkGuiStringEntry *)text;
             }
         }
         ++iter;

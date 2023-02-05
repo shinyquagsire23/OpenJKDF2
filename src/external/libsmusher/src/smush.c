@@ -64,22 +64,35 @@ smush_ctx* smush_from_fpath(const char* fpath)
     return ctx;
 
 cleanup_1:
+    free(ctx->framebuffer);
+    free(ctx->framebuffer_stor);
     free(ctx);
     return NULL;
 
 cleanup_2:
     fclose(ctx->f);
+    free(ctx->framebuffer);
+    free(ctx->framebuffer_stor);
     free(ctx);
     return NULL;
 }
 
 void smush_destroy(smush_ctx* ctx) {
+    if (!ctx) return;
+
     codec48_destroy(ctx);
 
     fclose(ctx->f);
 
+    if (ctx->audio_buffer_tmp) {
+        free(ctx->audio_buffer_tmp);
+    }
+
     free(ctx->framebuffer);
     free(ctx->framebuffer_stor);
+
+    memset(ctx, 0, sizeof(*ctx));
+
     free(ctx);
 }
 

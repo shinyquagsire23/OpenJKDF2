@@ -54,10 +54,15 @@ int sithCamera_Startup()
 
 void sithCamera_Shutdown()
 {
-    for (int i = 0; i < 7; i++)
-    {
-        rdCamera_FreeEntry(&sithCamera_cameras[i].rdCam);
-    }
+    sithCamera_Close(); // Added--moved the rdCamera_FreeEntries where they belong
+
+    // Added: Clean reset
+#ifdef DW_CAMERA
+    memset(sithCamera_cameras, 0, sizeof(sithCamera) * 8);
+#else
+    memset(sithCamera_cameras, 0, sizeof(sithCamera) * 7);
+#endif
+
     sithCamera_bInitted = 0;
 }
 
@@ -117,6 +122,17 @@ void sithCamera_Close()
         rdCamera_SetCanvas(&sithCamera_cameras[6].rdCam, NULL);
 #ifdef DW_CAMERA
         rdCamera_SetCanvas(&sithCamera_cameras[7].rdCam, NULL);
+#endif
+
+        // Added: Prevent memleak
+        for (int i = 0; i < 7; i++)
+        {
+            rdCamera_FreeEntry(&sithCamera_cameras[i].rdCam);
+        }
+#ifdef DW_CAMERA
+        if (Main_bDwCompat) {
+            rdCamera_FreeEntry(&sithCamera_cameras[7].rdCam);
+        }
 #endif
     }
 }

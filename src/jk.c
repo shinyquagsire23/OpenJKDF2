@@ -1084,7 +1084,13 @@ int __isspace(int a)
 
 int _iswspace(int a)
 {
-    return isspace(a & 0xFF);
+    unsigned char c = a & 0x7F;
+    if (c == '\t' || c == '\n' ||
+        c == '\v' || c == '\f' || c == '\r' || c == ' ') {
+        return 1;
+    }
+
+    return isspace(c);
 }
 
 size_t __wcslen(const wchar_t * strarg)

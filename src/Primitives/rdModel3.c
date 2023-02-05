@@ -16,14 +16,16 @@
 
 model3Loader_t rdModel3_RegisterLoader(model3Loader_t loader)
 {
+    model3Loader_t result = pModel3Loader;
     pModel3Loader = loader;
-    return loader;
+    return result;
 }
 
 model3Unloader_t rdModel3_RegisterUnloader(model3Unloader_t unloader)
 {
+    model3Unloader_t result = pModel3Unloader;
     pModel3Unloader = unloader;
-    return unloader;
+    return result;
 }
 
 void rdModel3_ClearFrameCounters()

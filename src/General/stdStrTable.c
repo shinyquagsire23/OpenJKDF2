@@ -191,49 +191,58 @@ int stdStrTable_Load(stdStrTable *strtable, char *fpath)
     return v11;
 }
 
-void stdStrTable_Free(stdStrTable *table)
+void stdStrTable_Free(stdStrTable* pTable)
 {
     stdStrMsg *msgs; // ebp
     stdStrMsg *msg; // esi
 
-    if ( table->magic_sTbl == 0x7354626C )
+    if ( pTable->magic_sTbl == 0x7354626C )
     {
-        table->magic_sTbl = 0;
-        table->numMsgs = 0;
-        table->msgs = 0;
-        stdHashTable_Free(table->hashtable);
-        if ( table->msgs )
+        pTable->magic_sTbl = 0;
+        // Added: Moved
+        //pTable->numMsgs = 0;
+        //pTable->msgs = 0;
+        stdHashTable_Free(pTable->hashtable);
+        if ( pTable->msgs )
         {
-            for (int i = 0; i < table->numMsgs; i++)
+            for (int i = 0; i < pTable->numMsgs; i++)
             {
-                if ( table->msgs[i].uniStr )
-                    std_pHS->free(table->msgs[i].uniStr);
-                if ( table->msgs[i].key )
-                    std_pHS->free(table->msgs[i].key);
+                if ( pTable->msgs[i].uniStr )
+                    std_pHS->free(pTable->msgs[i].uniStr);
+                if ( pTable->msgs[i].key )
+                    std_pHS->free(pTable->msgs[i].key);
             }
-            std_pHS->free(table->msgs);
+            std_pHS->free(pTable->msgs);
         }
+
+        // Added: Moved
+        pTable->numMsgs = 0;
+        pTable->msgs = 0;
+    }
+    else
+    {
+        //stdPlatform_Printf("OpenJKDF2: Tried to free bad stdStrTable %p? magic==%x\n", pTable, pTable->magic_sTbl);
     }
 }
 
-wchar_t* stdStrTable_GetUniString(stdStrTable *table, const char *key)
+wchar_t* stdStrTable_GetUniString(stdStrTable* pTable, const char *key)
 {
     stdStrMsg *v2; // eax
     wchar_t *result; // eax
 
-    if ( table->numMsgs && (v2 = (stdStrMsg *)stdHashTable_GetKeyVal(table->hashtable, key)) != 0 )
+    if ( pTable->numMsgs && (v2 = (stdStrMsg *)stdHashTable_GetKeyVal(pTable->hashtable, key)) != 0 )
         result = v2->uniStr;
     else
         result = 0;
     return result;
 }
 
-wchar_t* stdStrTable_GetString(stdStrTable *table, char *key)
+wchar_t* stdStrTable_GetString(stdStrTable* pTable, char *key)
 {
     stdStrMsg *v2; // eax
     wchar_t *result; // eax
 
-    if ( table->numMsgs && (v2 = (stdStrMsg *)stdHashTable_GetKeyVal(table->hashtable, key)) != 0 )
+    if ( pTable->numMsgs && (v2 = (stdStrMsg *)stdHashTable_GetKeyVal(pTable->hashtable, key)) != 0 )
         result = v2->uniStr;
     else
         result = 0;

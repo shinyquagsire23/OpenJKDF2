@@ -285,6 +285,12 @@ int jkEpisode_Load(jkEpisodeLoad *a1)
     numSeq = 0;
     a1->numSeq = 0;
     a1->field_8 = 0;
+
+    // Added: memleak
+    if (a1->paEntries) {
+        pHS->free(a1->paEntries);
+    }
+
     a1->paEntries = 0;
     v2 = pHS->fileOpen("episode.jk", "rt");
     if ( !v2 )

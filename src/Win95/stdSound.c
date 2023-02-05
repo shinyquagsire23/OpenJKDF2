@@ -350,7 +350,9 @@ end:
 	
 	if (sound->data && !sound->bIsCopy)
 	    std_pHS->free(sound->data);
-	//std_pHS->free(sound);
+
+    memset(sound, 0, sizeof(*sound));
+	std_pHS->free(sound);
 }
 
 int stdSound_BufferReset(stdSound_buffer_t* sound)
@@ -621,6 +623,9 @@ void stdSound_BufferRelease(stdSound_buffer_t* sound)
 {	
 	if (sound->data && !sound->bIsCopy)
 	    std_pHS->free(sound->data);
+
+    memset(sound, 0, sizeof(*sound));
+    std_pHS->free(sound);
 }
 
 int stdSound_BufferReset(stdSound_buffer_t* sound)

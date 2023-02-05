@@ -131,15 +131,15 @@ std3DSimpleTexStage std3D_ssaoStage;
 std3DSimpleTexStage std3D_ssaoMixStage;
 
 GLuint blank_tex, blank_tex_white;
-void* blank_data, *blank_data_white;
+void* blank_data = NULL, *blank_data_white = NULL;
 GLuint worldpal_texture;
-void* worldpal_data;
+void* worldpal_data = NULL;
 GLuint worldpal_lights_texture;
-void* worldpal_lights_data;
+void* worldpal_lights_data = NULL;
 GLuint displaypal_texture;
-void* displaypal_data;
+void* displaypal_data = NULL;
 GLuint tiledrand_texture;
-rdVector3* tiledrand_data;
+rdVector3* tiledrand_data = NULL;
 
 size_t std3D_loadedUITexturesAmt = 0;
 stdBitmap* std3D_aUIBitmaps[STD3D_MAX_TEXTURES] = {0};
@@ -605,6 +605,9 @@ int init_resources()
 
     // Tiled random
     glGenTextures(1, &tiledrand_texture);
+    if (tiledrand_data) {
+        free(tiledrand_data);
+    }
     tiledrand_data = malloc(3 * 4 * 4 * sizeof(float));
     memset(tiledrand_data, 0, 3 * 4 * 4 * sizeof(float));
 

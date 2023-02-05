@@ -808,7 +808,6 @@ void jkHudInv_LoadItemRes()
     stdBitmap *v1; // eax
     stdBitmap *v2; // eax
     stdBitmap *v4; // eax
-    stdFont *v5; // eax
     unsigned int v6; // ebp
     int v7; // ebx
     signed int v8; // edx
@@ -892,11 +891,10 @@ void jkHudInv_LoadItemRes()
         jkHudInv_font = NULL;
     }
 
-    v5 = stdFont_Load(v18, 0, 0);
-    jkHudInv_font = v5;
-    if ( !v5 )
+    jkHudInv_font = stdFont_Load(v18, 0, 0);
+    if ( !jkHudInv_font )
         Windows_GameErrorMsgbox("ERR_CANNOT_LOAD_FILE %s", v18);
-    stdBitmap_ConvertColorFormat(&Video_format.format, v5->bitmap);
+    stdBitmap_ConvertColorFormat(&Video_format.format, jkHudInv_font->bitmap);
     v6 = Video_format.width;
     _memset(&jkHudInv_info, 0, sizeof(jkHudInvInfo));
     v7 = Video_format.height;
@@ -956,6 +954,8 @@ int jkHudInv_Startup()
 
 int jkHudInv_Shutdown()
 {
+    jkHudInv_Close(); // Added: memleak
+
     if ( jkHudInv_aItems )
         pHS->free(jkHudInv_aItems);
 

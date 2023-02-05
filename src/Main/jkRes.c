@@ -244,7 +244,7 @@ int jkRes_LoadNew(jkResGobDirectory *resGob, char *name, int a3)
 
     jkRes_UnhookHS();
 
-    // Add a mods dir which always overrides resource/
+    // Added: Add a mods dir which always overrides resource/
     if (!_strcmp(name, "resource"))
     {
         v15 = stdFileUtil_NewFind("mods", 3, JKRES_GOB_EXT);
@@ -261,6 +261,7 @@ int jkRes_LoadNew(jkResGobDirectory *resGob, char *name, int a3)
                     resGob->numGobs++;
             }
         }
+        stdFileUtil_DisposeFind(v15);
     }
 
     v15 = stdFileUtil_NewFind(name, 3, JKRES_GOB_EXT);
