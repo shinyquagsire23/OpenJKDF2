@@ -339,12 +339,6 @@ void main(void)
     main_color *= albedoFactor_copy;
     float should_write_normals = 1.0;
     float orig_alpha = main_color.a;
-    
-
-    //if (blend_mode == D3DBLEND_SRCALPHA || blend_mode == D3DBLEND_INVSRCALPHA)
-    {
-        should_write_normals = main_color.a;
-    }
 
     
 
@@ -356,6 +350,11 @@ void main(void)
     {
         main_color.rgb *= (1.0 - main_color.a);
         main_color.a = (1.0 - main_color.a);
+    }
+
+    if (blend_mode == D3DBLEND_SRCALPHA || blend_mode == D3DBLEND_INVSRCALPHA)
+    {
+        should_write_normals = main_color.a;
     }
 
     //if (sampledEmiss.r != 0.0 || sampledEmiss.g != 0.0 || sampledEmiss.b != 0.0)
