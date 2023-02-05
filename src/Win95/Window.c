@@ -1064,6 +1064,9 @@ void Window_SdlVblank()
 
     //static uint32_t roundtrip = 0;
     //uint32_t before = stdPlatform_GetTimeMsec();
+#ifdef ARCH_WASM
+    if (!jkGuiBuildMulti_bRendering)
+#endif
     SDL_GL_SwapWindow(displayWindow);
     //uint32_t after = stdPlatform_GetTimeMsec();
     //printf("%u %u\n", after-before, before-roundtrip);
@@ -1090,6 +1093,14 @@ EM_JS(int, canvas_get_height, (), {
 
 void Window_RecreateSDL2Window()
 {
+#ifdef ARCH_WASM
+    static int onlyOnce = 0;
+    if (onlyOnce) {
+        return;
+    }
+    onlyOnce = 1;
+#endif
+
     if (Main_bHeadless) return;
 
     stdPlatform_Printf("Recreating SDL2 Window!\n");
@@ -1297,6 +1308,7 @@ int Window_Main_Linux(int argc, char** argv)
     while (1)
     {
         Window_Main_Loop();
+        if (g_should_exit) break;
     }
 #else
     while (1)

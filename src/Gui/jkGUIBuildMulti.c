@@ -218,32 +218,32 @@ static rdMaterialLoader_t jkGuiBuildMulti_fnMatLoader;
 static model3Loader_t jkGuiBuildMulti_fnModelLoader;
 static keyframeLoader_t jkGuiBuildMulti_fnKeyframeLoader;
 
-static rdCanvas *jkGuiBuildMulti_pCanvas;
-static rdCamera *jkGuiBuildMulti_pCamera;
-static rdModel3 *jkGuiBuildMulti_model;
-static rdModel3 *jkGuiBuildMulti_pModelGun;
-static rdKeyframe *jkGuiBuildMulti_keyframe;
-static rdThing *jkGuiBuildMulti_pThingCamera;
-static rdThing *jkGuiBuildMulti_thing;
-static rdThing *jkGuiBuildMulti_pThingGun;
-static uint32_t jkGuiBuildMulti_startTimeSecs; // Added: float -> u32
+static rdCanvas *jkGuiBuildMulti_pCanvas = NULL;
+static rdCamera *jkGuiBuildMulti_pCamera = NULL;
+static rdModel3 *jkGuiBuildMulti_model = NULL;
+static rdModel3 *jkGuiBuildMulti_pModelGun = NULL;
+static rdKeyframe *jkGuiBuildMulti_keyframe = NULL;
+static rdThing *jkGuiBuildMulti_pThingCamera = NULL;
+static rdThing *jkGuiBuildMulti_thing = NULL;
+static rdThing *jkGuiBuildMulti_pThingGun = NULL;
+static uint32_t jkGuiBuildMulti_startTimeSecs = 0; // Added: float -> u32
 static rdColormap jkGuiBuildMulti_colormap;
 static rdLight jkGuiBuildMulti_light;
 static rdMatrix34 jkGuiBuildMulti_matrix;
-static stdVBuffer* jkGuiBuildMulti_pVBuf1;
-static stdVBuffer* jkGuiBuildMulti_pVBuf2;
-static int jkGuiBuildMulti_trackNum;
+static stdVBuffer* jkGuiBuildMulti_pVBuf1 = NULL;
+static stdVBuffer* jkGuiBuildMulti_pVBuf2 = NULL;
+static int jkGuiBuildMulti_trackNum = 0;
 static wchar_t jkGuiBuildMulti_waTmp[128];
 static wchar_t jkGuiBuildMulti_waTmp2[32];
-static stdBitmap **jkGuiBuildMulti_apSaberBitmaps;
-static jkSaberInfo *jkGame_aSabers;
-static int jkGuiBuildMulti_bSabersLoaded;
-static int jkGuiBuildMulti_bEditShowing;
-static int jkGuiBuildMulti_numModels;
-static int jkGuiBuildMulti_numSabers;
-static int jkGuiBuildMulti_saberIdx;
-static int jkGuiBuildMulti_modelIdx;
-static jkMultiModelInfo *jkGuiBuildMulti_aModels;
+static stdBitmap **jkGuiBuildMulti_apSaberBitmaps = NULL;
+static jkSaberInfo *jkGame_aSabers = NULL;
+static int jkGuiBuildMulti_bSabersLoaded = 0;
+static int jkGuiBuildMulti_bEditShowing = 0;
+static int jkGuiBuildMulti_numModels = 0;
+static int jkGuiBuildMulti_numSabers = 0;
+static int jkGuiBuildMulti_saberIdx = 0;
+static int jkGuiBuildMulti_modelIdx = 0;
+static jkMultiModelInfo *jkGuiBuildMulti_aModels = NULL;
 static int jkGuiBuildMulti_renderOptions = 0x103;
 static rdVector3 jkGuiBuildMulti_projectRot;
 static rdVector3 jkGuiBuildMulti_projectPos;
@@ -252,7 +252,7 @@ static rdMatrix34 jkGuiBuildMulti_orthoProjection;
 static rdVector3 jkGuiBuildMulti_lightPos;
 static uint32_t jkGuiBuildMulti_lastModelDrawMs;
 
-static wchar_t jkGuiBuildMulti_waTmpRankLabel[128];
+static wchar_t jkGuiBuildMulti_waTmpRankLabel[128+1];
 
 static rdRect jkGuiBuildMulti_rect_5353C8 = {315, 115, 260, 260};
 
@@ -467,6 +467,10 @@ int jkGuiBuildMulti_ShowEditCharacter(int bIdk)
         }
         stdConffile_Close();
     }
+    else {
+        return 0; // Added: MoTS demo has no MP assets
+    }
+
     if ( v4 )
     {
         v8 = 0;

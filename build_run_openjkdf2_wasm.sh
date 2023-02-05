@@ -6,12 +6,19 @@
 export OPENJKDF2_RELEASE_COMMIT=$(git log -1 --format="%H")
 export OPENJKDF2_RELEASE_COMMIT_SHORT=$(git rev-parse --short=8 HEAD)
 
+mkdir -p wasm_out
+mkdir -p wasm_out/jk1
+mkdir -p wasm_out/mots
+
 rm -f wasm_out/openjkdf2.js
 rm -f wasm_out/openjkdf2.wasm
 rm -f wasm_out/openjkdf2.data
-rm -rf wasm_out/resource/shaders
-mkdir -p wasm_out/resource/shaders
-cp resource/shaders/* wasm_out/resource/shaders
+rm -rf wasm_out/jk1/resource/shaders
+mkdir -p wasm_out/jk1/resource/shaders
+rm -rf wasm_out/mots/resource/shaders
+mkdir -p wasm_out/mots/resource/shaders
+cp resource/shaders/* wasm_out/jk1/resource/shaders
+cp resource/shaders/* wasm_out/mots/resource/shaders
 
 #rm -rf build_emcc
 mkdir -p build_emcc && cd build_emcc

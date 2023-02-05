@@ -352,8 +352,9 @@ int main(int argc, char** argv)
         else if (openjkdf2_restartMode == OPENJKDF2_RESTART_PATH) {
             continue;
         }
-
+#ifndef ARCH_WASM
         break;
+#endif
     }
     return 1;
 }

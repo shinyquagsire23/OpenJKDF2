@@ -1115,5 +1115,17 @@ void InstallHelper_SetCwd()
 }
 
 #else
-void InstallHelper_SetCwd(){}
+void InstallHelper_SetCwd()
+{
+    if (!Main_bMotsCompat) {
+        chdir("/jk1/");
+    }
+    else {
+        chdir("/mots/");
+    }
+    char tmpCwd[256];
+    getcwd(tmpCwd, sizeof(tmpCwd));
+
+    printf("Running from: %s\n", tmpCwd);
+}
 #endif // defined(SDL2_RENDER) && !defined(ARCH_WASM)

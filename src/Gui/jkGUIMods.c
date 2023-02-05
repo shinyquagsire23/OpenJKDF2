@@ -280,7 +280,14 @@ void jkGuiMods_PopulateEntries(Darray *pListDisplayed, jkGuiElement *element)
     InstallHelper_GetLocalDataDir(tmpCwd, sizeof(tmpCwd), 0);
     Main_bMotsCompat = !Main_bMotsCompat;
 #else
-    strcpy(tmpCwd, ".");
+    Main_bMotsCompat = !Main_bMotsCompat;
+    if (Main_bMotsCompat) {
+        strcpy(tmpCwd, "../mots/");
+    }
+    else {
+        strcpy(tmpCwd, "../jk1/");
+    }
+    Main_bMotsCompat = !Main_bMotsCompat;
 #endif
 
     
