@@ -854,7 +854,6 @@ int jkCutscene_smusher_process()
 
         if (jkCutscene_audio_len <= 0) {
             if (jkCutscene_audio_buf) {
-                printf("Free %p\n", jkCutscene_audio_buf);
                 free(jkCutscene_audio_buf);
                 jkCutscene_audio_buf = NULL;
             }
@@ -897,7 +896,6 @@ int jkCutscene_smusher_process()
         while (written_len < (len/2) + (slop_bytes)) {
             if (jkCutscene_audio_len <= 0) {
                 if (jkCutscene_audio_buf) {
-                    printf("Free %p\n", jkCutscene_audio_buf);
                     free(jkCutscene_audio_buf);
                     jkCutscene_audio_buf = NULL;
                 }
