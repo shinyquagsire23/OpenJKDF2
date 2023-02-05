@@ -515,7 +515,7 @@ int sithAI_PrintThings()
     }
 }
 
-int sithAI_PrintThingStatus(int a1, char *idxStr)
+int sithAI_PrintThingStatus(stdDebugConsoleCmd* a1, const char *idxStr)
 {
     uint32_t v2; // ebx
     sithThing *v3; // eax

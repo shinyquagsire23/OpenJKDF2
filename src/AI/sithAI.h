@@ -119,7 +119,7 @@ void sithAI_SetActorFireTarget(sithActor *actor, int a2, intptr_t a3);
 void sithAI_RegisterCommand(char *cmdName, void *func, int param1, int param2, int param3);
 sithAICommand* sithAI_FindCommand(const char *cmdName);
 int sithAI_PrintThings();
-int sithAI_PrintThingStatus(int a1, char *idxStr);
+int sithAI_PrintThingStatus(stdDebugConsoleCmd* a1, const char *idxStr);
 int sithAI_LoadThingActorParams(stdConffileArg *arg, sithThing *thing, int param);
 void sithAI_idkframesalloc(sithThing *a2, sithThing *a3, rdVector3 *a4);
 void sithAI_Tick(sithThing *thing, float deltaSeconds);

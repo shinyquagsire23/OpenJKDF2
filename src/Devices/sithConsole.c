@@ -136,7 +136,7 @@ int sithConsole_TryCommand(char *cmd)
         if ( v2 )
         {
             v3 = _strtok(0, "\n\r");
-            ((void (__cdecl *)(stdDebugConsoleCmd *, char *))v2->cmdFunc)(v2, v3);
+            v2->cmdFunc(v2, (const char*)v3);
             return 1;
         }
         _sprintf(std_genBuffer, "Console command %s not recognized.", v1);
@@ -174,7 +174,7 @@ void sithConsole_AdvanceLogBuf()
     }
 }
 
-int sithConsole_RegisterDevCmd(void *fn, char *cmd, int extra)
+int sithConsole_RegisterDevCmd(DebugConsoleCmd_t fn, char *cmd, int extra)
 {
     stdDebugConsoleCmd *v4; // [esp-4h] [ebp-4h]
 

@@ -1680,7 +1680,7 @@ int sithCogScript_TimerTick(int deltaMs, sithEventInfo *info)
 }
 
 // MOTS altered
-void sithCogScript_DevCmdCogStatus(stdDebugConsoleCmd *cmd, char *extra)
+int sithCogScript_DevCmdCogStatus(stdDebugConsoleCmd *cmd, const char *extra)
 {
     sithWorld *world; // esi
     sithCog *v3; // ebp
@@ -1726,6 +1726,7 @@ void sithCogScript_DevCmdCogStatus(stdDebugConsoleCmd *cmd, char *extra)
     {
         sithConsole_Print("Error, bad parameters.\n");
     }
+    return 1;
 }
 
 sithCog* sithCog_GetByIdx(int idx)
