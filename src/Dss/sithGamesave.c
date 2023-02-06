@@ -48,7 +48,10 @@ int sithGamesave_GetProfilePath(char *out, int outSize, char *a3)
 
     stdString_WcharToChar(a1, jkPlayer_playerShortName, 31);
     a1[31] = 0;
-    return stdString_snprintf(out, outSize, "player\\%s\\%s", a1, a3);
+    return stdString_snprintf(
+        out, outSize, "player%c%s%c%s",
+        LEC_PATH_SEPARATOR_CHR, a1, LEC_PATH_SEPARATOR_CHR, a3
+    );
 }
 
 // write
@@ -60,7 +63,10 @@ int sithGamesave_Load(char *saveFname, int debugNextCheckpoint, int a3)
 
     stdString_WcharToChar(playerName, jkPlayer_playerShortName, 31);
     playerName[31] = 0;
-    stdString_snprintf(fpath, 128, "player\\%s\\%s", playerName, saveFname);
+    stdString_snprintf(
+        fpath, 128, "player%c%s%c%s",
+        LEC_PATH_SEPARATOR_CHR, playerName, LEC_PATH_SEPARATOR_CHR, saveFname
+    );
 
     if (stdConffile_OpenMode(fpath, "rb"))
     {
@@ -394,11 +400,19 @@ int sithGamesave_Write(char *saveFname, int a2, int a3, wchar_t *saveName)
     sithGamesave_dword_835914 = a3;
     stdString_WcharToChar(tmp_playerName, jkPlayer_playerShortName, 31);
     tmp_playerName[31] = 0;
-    stdString_snprintf(PathName, 128, "player\\%s\\%s", tmp_playerName, &sithGamesave_fpath[128]);
+    stdString_snprintf(
+        PathName, 128, "player%c%s%c%s",
+        LEC_PATH_SEPARATOR_CHR, tmp_playerName, LEC_PATH_SEPARATOR_CHR,
+        &sithGamesave_fpath[128]
+    );
     stdFileUtil_MkDir(PathName);
     stdString_WcharToChar(tmp_playerName, jkPlayer_playerShortName, 31);
     tmp_playerName[31] = 0;
-    stdString_snprintf(PathName, 128, "player\\%s\\%s", tmp_playerName, saveFname);
+    stdString_snprintf(
+        PathName, 128, "player%c%s%c%s",
+        LEC_PATH_SEPARATOR_CHR, tmp_playerName, LEC_PATH_SEPARATOR_CHR,
+        saveFname
+    );
     if ( a2 || !stdConffile_OpenRead(PathName) )
     {
         _memset(&sithGamesave_headerTmp, 0, sizeof(sithGamesave_headerTmp));
