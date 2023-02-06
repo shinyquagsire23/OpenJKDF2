@@ -19,6 +19,7 @@
 #include "General/stdFnames.h"
 #include "Platform/std3D.h"
 
+static wchar_t jkGuiTitle_tmpBuffer[512];
 static wchar_t jkGuiTitle_versionBuffer[64];
 static float jkGuiTitle_loadPercent;
 
@@ -98,7 +99,6 @@ wchar_t* jkGuiTitle_quicksave_related_func1(stdStrTable *strTable, char *jkl_fna
     for (int i = 0; i < 20; i++)
     {
         if (texts->str) {
-            printf("%p\n", texts->str);
             std_pHS->free(texts->str);
             texts->str = NULL;
         }
@@ -110,6 +110,11 @@ wchar_t* jkGuiTitle_quicksave_related_func1(stdStrTable *strTable, char *jkl_fna
         stdString_snprintf(tmp, 64, "%s_TEXT_%02d", key, i);
         texts->str = stdString_FastWCopy(stdStrTable_GetUniString(&jkCog_strings, tmp));
         ++texts;
+    }
+
+    if (retval) {
+        stdString_SafeWStrCopy(jkGuiTitle_tmpBuffer, retval, sizeof(jkGuiTitle_tmpBuffer) / sizeof(wchar_t));
+        retval = jkGuiTitle_tmpBuffer;
     }
 
     return retval;
