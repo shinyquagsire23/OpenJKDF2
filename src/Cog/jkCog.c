@@ -147,7 +147,12 @@ void jkCog_Shutdown()
 
 int jkCog_StringsInit()
 {
-    stdStrTable_Free(&jkCog_strings);
+    // Added: HACK HACK HACK
+    // TODO AAAAAAAAAAAAAAAAA UAF hell
+    //stdStrTable_Free(&jkCog_strings);
+    memset(&jkCog_strings, 0, sizeof(jkCog_strings));
+
+
     return stdStrTable_Load(&jkCog_strings, "misc\\cogStrings.uni");
 }
 

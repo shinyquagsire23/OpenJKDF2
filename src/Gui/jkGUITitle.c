@@ -94,12 +94,21 @@ wchar_t* jkGuiTitle_quicksave_related_func1(stdStrTable *strTable, char *jkl_fna
         retval = jkStrings_GetText(key);
 
     texts = jkGuiTitle_aTexts;
+    // Added: cleanup
+    for (int i = 0; i < 20; i++)
+    {
+        if (texts->str) {
+            printf("%p\n", texts->str);
+            std_pHS->free(texts->str);
+            texts->str = NULL;
+        }
+    }
     _memset(jkGuiTitle_aTexts, 0, sizeof(jkGuiTitle_aTexts));
 
     for (int i = 0; i < 20; i++)
     {
         stdString_snprintf(tmp, 64, "%s_TEXT_%02d", key, i);
-        texts->str = stdStrTable_GetUniString(&jkCog_strings, tmp);
+        texts->str = stdString_FastWCopy(stdStrTable_GetUniString(&jkCog_strings, tmp));
         ++texts;
     }
 
@@ -276,19 +285,8 @@ void jkGuiTitle_ShowLoading(char *a1, wchar_t *a2)
     jkGuiRend_SetCursorVisible(0);
     sithWorld_SetLoadPercentCallback(jkGuiTitle_WorldLoadCallback);
     jkGuiTitle_elementsLoad[1].selectedTextEntry = 0;
-    stdFnames_CopyShortName(key, 64, a1);
-    jkGuiTitle_sub_4189A0(key);
-    v4 = stdStrTable_GetUniString(&jkCog_strings, key);
-    if ( !v4 )
-        v4 = jkStrings_GetText(key);
 
-    _memset(jkGuiTitle_aTexts, 0, sizeof(jkGuiTitle_aTexts));
-
-    for (v6 = 0; v6 < 20; v6++)
-    {
-        stdString_snprintf(v8, 64, "%s_TEXT_%02d", key, v6);
-        jkGuiTitle_aTexts[v6].str = stdStrTable_GetUniString(&jkCog_strings, v8);
-    }
+    v4 = jkGui_sub_412ED0();
 
     jkGuiTitle_elementsLoad[0].wstr = a2;
     if ( !a2 )

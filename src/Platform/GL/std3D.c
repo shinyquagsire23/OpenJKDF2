@@ -1429,6 +1429,8 @@ void std3D_DrawMenu()
 
     std3D_DrawMapOverlay();
     std3D_DrawUIRenderList();
+
+    last_flags = 0;
 }
 
 void std3D_DrawMapOverlay()
@@ -2594,19 +2596,21 @@ void std3D_DrawRenderList()
     int do_batch = 0;
     
     //glDepthFunc(GL_LESS);
-    glDepthMask(GL_TRUE);
-    glCullFace(GL_FRONT);
+    //glDepthMask(GL_TRUE);
+    //glCullFace(GL_FRONT);
 
     if (last_tex) {
         std3D_DoTex(last_tex, &tris[0], GL_tmpTrisAmt);
     }
 
-    if (!(last_flags & 0x800)) {
-        glDepthFunc(GL_ALWAYS);
+    last_flags = tris[0].flags;
+
+    if (last_flags & 0x800) {
+        glDepthFunc(GL_LESS);
         //glClear(GL_DEPTH_BUFFER_BIT);
     }
     else {
-        glDepthFunc(GL_LESS);
+        glDepthFunc(GL_ALWAYS);
     }
 
     if (last_flags & 0x600) {
@@ -2779,6 +2783,7 @@ void std3D_DrawRenderList()
     glCullFace(GL_FRONT);
     
     std3D_ResetRenderList();
+    glFlush();
 }
 
 int std3D_SetCurrentPalette(rdColor24 *a1, int a2)
@@ -2869,6 +2874,7 @@ void std3D_AddRenderListUITris(rdUITri *tris, unsigned int num_tris)
 
 int std3D_ClearZBuffer()
 {
+    glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->fbo);
     glClear(GL_DEPTH_BUFFER_BIT);
     return 1;
 }

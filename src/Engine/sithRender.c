@@ -1765,9 +1765,7 @@ void sithRender_RenderAlphaSurfaces()
     sithSector *surfaceSector; // [esp+Ch] [ebp-8h]
 
 #ifdef SDL2_RENDER
-    rdSetZBufferMethod(RD_ZBUFFER_READ_NOWRITE);
-#else
-    rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
+    rdCache_Flush();
 #endif
     rdSetOcclusionMethod(0);
     rdSetSortingMethod(2);

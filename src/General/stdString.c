@@ -29,6 +29,16 @@ char* stdString_FastCopy(const char *str)
     return result;
 }
 
+// Added: wchar
+wchar_t* stdString_FastWCopy(const wchar_t *str)
+{
+    if (!str) return NULL;
+
+    wchar_t* result = (wchar_t*)std_pHS->alloc((_wcslen(str) + 1)* sizeof(wchar_t));
+    stdString_SafeWStrCopy(result, str, _wcslen(str)+1);
+    return result;
+}
+
 int stdString_snprintf(char *out, int num, char *fmt, ...)
 {
     int result; // eax

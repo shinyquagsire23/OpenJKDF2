@@ -3025,6 +3025,19 @@ typedef struct jkGuiElement
         const char* hintText;
         wchar_t* wHintText;
     };
+
+    union
+    {
+      const char* strAlloced;
+      jkGuiStringEntry *unistrAlloced;
+      wchar_t* wstrAlloced;
+      int extraIntAlloced;
+    };
+    union
+    {
+        const char* hintTextAlloced;
+        wchar_t* wHintTextAlloced;
+    };
 #endif
 } jkGuiElement;
 

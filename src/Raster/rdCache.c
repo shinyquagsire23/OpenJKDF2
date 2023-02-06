@@ -1097,6 +1097,7 @@ LABEL_232:
     }
 
     rdCache_DrawRenderList();
+    rdCache_ResetRenderList(); // Added
     return 1;
 }
 

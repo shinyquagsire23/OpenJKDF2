@@ -89,15 +89,25 @@ void jkGui_InitMenu(jkGuiMenu *menu, stdBitmap *bgBitmap)
     while ( iter->type != ELEMENT_END )
     {
 #ifdef QOL_IMPROVEMENTS
+        if (iter->wHintTextAlloced) {
+            std_pHS->free(iter->wHintTextAlloced);
+        }
+        if (iter->strAlloced) {
+            std_pHS->free(iter->strAlloced);
+        }
         iter->hintText = iter->origHintText;
         iter->str = iter->origStr;
+        iter->wHintTextAlloced = NULL;
+        iter->strAlloced = NULL;
 #endif
 
         if ( iter->hintText )
         {
             wchar_t* text = jkStrings_GetText2(iter->hintText);
-            if ( text )
-                iter->wHintText = text;
+            if ( text ) {
+                iter->wHintText = stdString_FastWCopy(text);
+                iter->wHintTextAlloced = iter->wHintText;
+            }
         }
 
         if ( !iter->type || iter->type == ELEMENT_TEXT || iter->type == ELEMENT_CHECKBOX )
@@ -105,8 +115,10 @@ void jkGui_InitMenu(jkGuiMenu *menu, stdBitmap *bgBitmap)
             if ( iter->str )
             {
                 wchar_t* text = jkStrings_GetText2(iter->str);
-                if ( text )
-                    iter->wstr = (jkGuiStringEntry *)text;
+                if ( text ) {
+                    iter->wstr = stdString_FastWCopy(text);
+                    iter->strAlloced = iter->wstr;
+                }
             }
         }
         ++iter;
