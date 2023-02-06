@@ -53,6 +53,11 @@
 #endif
 #include "Win95/Video.h"
 
+#if defined(MACOS)
+#include <stdbool.h>
+#import <Carbon/Carbon.h>
+#endif
+
 extern int Window_xPos, Window_yPos;
 #endif
 
@@ -438,6 +443,22 @@ void Window_HandleWindowEvent(SDL_Event* event)
     switch (event->window.event) 
     {
         case SDL_WINDOWEVENT_SHOWN:
+#ifdef MACOS
+            {
+                static int bMacosOnlyOncePerProcessLifetimeTriggerTheStupidDylibLoad = 0;
+                if (!bMacosOnlyOncePerProcessLifetimeTriggerTheStupidDylibLoad)
+                {
+                    ProcessSerialNumber psn;
+                    GetFrontProcess( &psn );
+                    CGEventRef ref = CGEventCreateKeyboardEvent(NULL, 0x72 /* help */, 1);
+                    CGEventSetFlags( ref, kCGEventFlagMaskNumericPad );
+                    CGEventSetFlags( ref, kCGEventFlagMaskSecondaryFn );
+                    CGEventPostToPSN(&psn, ref);
+                    CFRelease(ref);
+                    bMacosOnlyOncePerProcessLifetimeTriggerTheStupidDylibLoad = 1;
+                }
+            }
+#endif
             //printf("Window %d shown", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_HIDDEN:

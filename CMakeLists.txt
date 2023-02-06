@@ -533,6 +533,7 @@ if(TARGET_MACOS)
       LINK_SEARCH_END_STATIC ON
     )
     target_link_libraries(${BIN_NAME} PRIVATE "-framework AppKit")
+    target_link_libraries(${BIN_NAME} PRIVATE "-framework Carbon")
 
     find_package(PkgConfig REQUIRED)
     
