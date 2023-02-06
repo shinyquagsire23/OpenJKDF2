@@ -465,8 +465,6 @@ int init_resources()
 {
     stdPlatform_Printf("std3D: OpenGL init...\n");
 
-    jkgm_startup();
-
     memset(std3D_aUITextures, 0, sizeof(std3D_aUITextures));
 
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, &std3D_windowFbo);
@@ -657,6 +655,8 @@ int std3D_Startup()
     if (std3D_bInitted) {
         return 1;
     }
+
+    jkgm_startup();
 
     memset(&std3D_ui_colormap, 0, sizeof(std3D_ui_colormap));
     rdColormap_LoadEntry("misc\\cmp\\UIColormap.cmp", &std3D_ui_colormap);
