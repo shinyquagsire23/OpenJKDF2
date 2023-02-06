@@ -2783,7 +2783,6 @@ void std3D_DrawRenderList()
     glCullFace(GL_FRONT);
     
     std3D_ResetRenderList();
-    glFlush();
 }
 
 int std3D_SetCurrentPalette(rdColor24 *a1, int a2)
