@@ -1766,6 +1766,9 @@ void sithRender_RenderAlphaSurfaces()
 
 #ifdef SDL2_RENDER
     rdCache_Flush();
+    rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
+#else
+    rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
 #endif
     rdSetOcclusionMethod(0);
     rdSetSortingMethod(2);
@@ -1930,6 +1933,9 @@ void sithRender_RenderAlphaSurfaces()
         rdCache_AddProcFace(0, meshinfo_out.numVertices, v23);
     }
     rdCache_Flush();
+#ifdef SDL2_RENDER
+    rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
+#endif
 }
 
 int sithRender_SetRenderWeaponHandle(void *a1)
