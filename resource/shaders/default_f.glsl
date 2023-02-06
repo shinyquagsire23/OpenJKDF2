@@ -333,6 +333,11 @@ void main(void)
         //sampled_color.a = (1.0 - sampled_color.a);
     }
 
+    if (blend_mode != D3DBLEND_SRCALPHA && blend_mode != D3DBLEND_INVSRCALPHA && vertex_color.a != 0.0)
+    {
+        vertex_color.a = 1.0;
+    }
+
     vec4 main_color = (sampled_color * vertex_color);
     vec4 effectAdd_color = vec4(colorEffects_add.r, colorEffects_add.g, colorEffects_add.b, 0.0);
     
