@@ -162,10 +162,10 @@ void sithPlayerActions_WarpToCheckpoint(sithThing *thing, int idx)
     {
         if ( (jkPlayer_playerInfos[idx].flags & 2) != 0 )
         {
-            _memcpy(&thing->lookOrientation, &jkPlayer_playerInfos[idx].field_135C, sizeof(thing->lookOrientation));
+            _memcpy(&thing->lookOrientation, &jkPlayer_playerInfos[idx].spawnPosOrient, sizeof(thing->lookOrientation));
             thing->position = thing->lookOrientation.scale;
             rdVector_Zero3(&thing->lookOrientation.scale);
-            sithThing_MoveToSector(thing, jkPlayer_playerInfos[idx].field_138C, 0);
+            sithThing_MoveToSector(thing, jkPlayer_playerInfos[idx].pSpawnSector, 0);
         }
         if ( thing->moveType == SITH_MT_PHYSICS )
         {

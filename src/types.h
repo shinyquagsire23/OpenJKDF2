@@ -2356,8 +2356,8 @@ typedef struct sithPlayerInfo
     int curPower;
     int field_1354;
     sithThing* playerThing;
-    rdMatrix34 field_135C;
-    sithSector* field_138C;
+    rdMatrix34 spawnPosOrient;
+    sithSector* pSpawnSector;
     uint32_t respawnMask;
     uint32_t palEffectsIdx1;
     uint32_t palEffectsIdx2;

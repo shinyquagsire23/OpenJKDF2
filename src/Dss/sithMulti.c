@@ -313,9 +313,9 @@ int sithMulti_GetSpawnIdx(sithThing *pPlayerThing)
     {
         v8 = v12[v7];
         sithCollision_SearchRadiusForThings(
-            jkPlayer_playerInfos[v8].field_138C,
+            jkPlayer_playerInfos[v8].pSpawnSector,
             0,
-            &jkPlayer_playerInfos[v8].field_135C.scale,
+            &jkPlayer_playerInfos[v8].spawnPosOrient.scale,
             &rdroid_zeroVector3,
             0.0,
             pPlayerThing->moveSize,

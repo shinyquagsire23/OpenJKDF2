@@ -80,9 +80,9 @@ void sithPlayer_NewEntry(sithWorld *world)
                 v1->thingflags |= SITH_TF_INVULN;
                 v1->actorParams.playerinfo = playerInfo;
                 playerInfo->flags |= 2;
-                rdMatrix_Copy34(&playerInfo->field_135C, &v1->lookOrientation);
-                rdVector_Copy3(&playerInfo->field_135C.scale, &v1->position);
-                playerInfo->field_138C = v1->sector;
+                rdMatrix_Copy34(&playerInfo->spawnPosOrient, &v1->lookOrientation);
+                rdVector_Copy3(&playerInfo->spawnPosOrient.scale, &v1->position);
+                playerInfo->pSpawnSector = v1->sector;
                 playerInfo++;
                 ++v3;
             }
@@ -93,7 +93,7 @@ void sithPlayer_NewEntry(sithWorld *world)
     for (int i = jkPlayer_maxPlayers; i < 32; i++)
     {
         jkPlayer_playerInfos[i].playerThing = 0;
-        jkPlayer_playerInfos[i].field_138C = 0;
+        jkPlayer_playerInfos[i].pSpawnSector = 0;
     }
 }
 
@@ -497,9 +497,9 @@ void sithPlayer_debug_ToNextCheckpoint(sithThing *player)
             sithThing_LeaveSector(player);
             sithThing_SetPosAndRot(
                 player,
-                &jkPlayer_playerInfos[v9].field_135C.scale,
-                &jkPlayer_playerInfos[v9].field_135C);
-            sithThing_EnterSector(player, jkPlayer_playerInfos[v9].field_138C, 1, 0);
+                &jkPlayer_playerInfos[v9].spawnPosOrient.scale,
+                &jkPlayer_playerInfos[v9].spawnPosOrient);
+            sithThing_EnterSector(player, jkPlayer_playerInfos[v9].pSpawnSector, 1, 0);
             sithCamera_FollowFocus(sithCamera_currentCamera);
             sithPhysics_ThingStop(player);
             sithWeapon_SyncPuppet(player);
