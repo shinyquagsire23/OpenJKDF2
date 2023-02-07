@@ -278,7 +278,7 @@ void jkPlayer_InitSaber()
             playerInfo->playerThing->playerInfo = playerInfoJk;
         playerInfoJk->maxTwinkles = 8;
         playerInfoJk->twinkleSpawnRate = 16;
-        playerInfoJk->field_21C = 0;
+        playerInfoJk->bHasSuperWeapon = 0;
         playerInfoJk->bHasSuperShields = 0;
         if (playerInfo->playerThing) // Added
             playerInfo->playerThing->thingflags |= SITH_TF_RENDERWEAPON;
@@ -401,8 +401,7 @@ void jkPlayer_CreateConf(wchar_t *name)
     sithPlayer_SetBinAmt(SITHBIN_CHOICE, 0.0);
     sithWeapon_InitDefaults();
     jkGame_SetDefaultSettings();
-    _wcsncpy(jkPlayer_playerShortName, name, 0x1Fu);
-    jkPlayer_playerShortName[31] = 0;
+    stdString_SafeWStrCopy(jkPlayer_playerShortName, name, 32);
     jkPlayer_setNumCutscenes = 0;
     v11 = sithControl_IsOpen();
     if ( v11 )

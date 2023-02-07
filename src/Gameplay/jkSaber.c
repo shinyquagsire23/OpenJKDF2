@@ -206,7 +206,7 @@ void  jkSaber_UpdateCollision2(sithThing *pPlayerThing,rdVector3 *pSaberPos,rdVe
     if (!pSector) {
         return;
     }
-    sithCollision_SearchRadiusForThings(pSector,pPlayerThing,pSaberPos,pSaberDir,pCollideInfo->field_1AC,0.0,0);
+    sithCollision_SearchRadiusForThings(pSector,pPlayerThing,pSaberPos,pSaberDir,pCollideInfo->bladeLength,0.0,0);
     
 
     sithSector* pSectorIter = pSector;
@@ -440,24 +440,24 @@ void jkSaber_SpawnSparks(jkPlayerInfo *pPlayerInfo, rdVector3 *pPos, sithSector 
 }
 
 // MOTS altered
-void jkSaber_Enable(sithThing *a1, float a2, float a3, float a4)
+void jkSaber_Enable(sithThing *pThing, float damage, float bladeLength, float stunDelay)
 {
-    if (!a1 || !a1->playerInfo) return; // MOTS added
+    if (!pThing || !pThing->playerInfo) return; // MOTS added
 
-    a1->playerInfo->saberCollideInfo.damage = a2;
-    a1->playerInfo->saberCollideInfo.field_1AC = a3;
-    a1->playerInfo->saberCollideInfo.field_1B0 = a4;
-    a1->playerInfo->saberCollideInfo.field_1A4 = 1;
-    a1->playerInfo->saberCollideInfo.numDamagedThings = 0;
-    a1->playerInfo->saberCollideInfo.numDamagedSurfaces = 0;
+    pThing->playerInfo->saberCollideInfo.damage = damage;
+    pThing->playerInfo->saberCollideInfo.bladeLength = bladeLength;
+    pThing->playerInfo->saberCollideInfo.stunDelay = stunDelay;
+    pThing->playerInfo->saberCollideInfo.field_1A4 = 1;
+    pThing->playerInfo->saberCollideInfo.numDamagedThings = 0;
+    pThing->playerInfo->saberCollideInfo.numDamagedSurfaces = 0;
 
-    _memset(a1->playerInfo->saberCollideInfo.damagedThings, 0, sizeof(a1->playerInfo->saberCollideInfo.damagedThings));
-    _memset(a1->playerInfo->saberCollideInfo.damagedSurfaces, 0, sizeof(a1->playerInfo->saberCollideInfo.damagedSurfaces));
+    _memset(pThing->playerInfo->saberCollideInfo.damagedThings, 0, sizeof(pThing->playerInfo->saberCollideInfo.damagedThings));
+    _memset(pThing->playerInfo->saberCollideInfo.damagedSurfaces, 0, sizeof(pThing->playerInfo->saberCollideInfo.damagedSurfaces));
     
-    a1->playerInfo->lastSparkSpawnMs = 0;
+    pThing->playerInfo->lastSparkSpawnMs = 0;
 
 #ifdef JKM_SABER
-    a1->playerInfo->jkmUnk1 = 0; // MOTS added
+    pThing->playerInfo->jkmUnk1 = 0; // MOTS added
 #endif
 }
 

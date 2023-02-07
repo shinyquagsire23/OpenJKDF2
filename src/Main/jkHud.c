@@ -574,11 +574,11 @@ void jkHud_Draw()
                 1);
         }
         v18 = jkHud_GetWeaponAmmo(v4);
-        if ( jkHud_blittedAmmoAmt != v18 || jkHud_idk14 != playerThings[playerThingIdx].field_21C )
+        if ( jkHud_blittedAmmoAmt != v18 || jkHud_idk14 != playerThings[playerThingIdx].bHasSuperWeapon )
         {
             ammoFont = jkHud_pAmoNumsSuperSft;
             jkHud_blittedAmmoAmt = v18;
-            jkHud_idk14 = playerThings[playerThingIdx].field_21C;
+            jkHud_idk14 = playerThings[playerThingIdx].bHasSuperWeapon;
             if ( !jkHud_idk14 )
                 ammoFont = jkHud_pAmoNumsSft;
             if ( v18 == -999 )
@@ -1139,11 +1139,11 @@ void jkHud_DrawGPU()
             std3D_DrawUIBitmap(jkHud_pStHealthBm, (jkHud_pStHealthBm->numMips - 1) * (v15 - v13) / v15, jkHud_leftBlitX + HUD_SCALED(jkHud_pStHealthBm->xPos), jkHud_leftBlitY + HUD_SCALED(jkHud_pStHealthBm->yPos), NULL, jkPlayer_hudScale, 1);
         }
         v18 = jkHud_GetWeaponAmmo(v4);
-        //if ( jkHud_blittedAmmoAmt != v18 || jkHud_idk14 != playerThings[playerThingIdx].field_21C )
+        //if ( jkHud_blittedAmmoAmt != v18 || jkHud_idk14 != playerThings[playerThingIdx].bHasSuperWeapon )
         {
             ammoFont = jkHud_pAmoNumsSuperSft;
             jkHud_blittedAmmoAmt = v18;
-            jkHud_idk14 = playerThings[playerThingIdx].field_21C;
+            jkHud_idk14 = playerThings[playerThingIdx].bHasSuperWeapon;
             if ( !jkHud_idk14 )
                 ammoFont = jkHud_pAmoNumsSft;
             if ( v18 == -999 )

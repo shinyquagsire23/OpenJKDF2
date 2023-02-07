@@ -2373,8 +2373,8 @@ typedef struct jkSaberCollide
 {
     int32_t field_1A4;
     float damage;
-    float field_1AC;
-    float field_1B0;
+    float bladeLength;
+    float stunDelay;
     uint32_t field_1B4;
     uint32_t numDamagedThings;
     sithThing* damagedThings[6];
@@ -2411,7 +2411,7 @@ typedef struct jkPlayerInfo
     uint32_t nextTwinkleRandMs;
     uint32_t nextTwinkleSpawnMs;
     uint32_t numTwinkles;
-    uint32_t field_21C;
+    uint32_t bHasSuperWeapon;
     int bHasSuperShields;
     uint32_t bHasForceSurge;
 #ifdef JKM_DSS

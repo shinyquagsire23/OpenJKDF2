@@ -25,7 +25,7 @@ void jkSaber_Draw(rdMatrix34 *posRotMat);
 void jkSaber_UpdateLength(sithThing *thing);
 void jkSaber_UpdateCollision(sithThing *player, int joint, int bSecondary);
 void jkSaber_SpawnSparks(jkPlayerInfo *pPlayerInfo, rdVector3 *pPos, sithSector *psector, int sparkType);
-void jkSaber_Enable(sithThing *a1, float a2, float a3, float a4);
+void jkSaber_Enable(sithThing *pThing, float damage, float bladeLength, float stunDelay);
 void jkSaber_Disable(sithThing *player);
 
 //static void (*jkSaber_UpdateCollision)(sithThing *player, int joint) = (void*)jkSaber_UpdateCollision_ADDR;

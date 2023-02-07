@@ -470,8 +470,8 @@ void jkDSS_SendJKEnableSaber(sithThing *pPlayerThing)
 
     NETMSG_PUSHS16(pPlayerThing->thingIdx);
     NETMSG_PUSHF32(pPlayerInfo->saberCollideInfo.damage);
-    NETMSG_PUSHF32(pPlayerInfo->saberCollideInfo.field_1AC);
-    NETMSG_PUSHF32(pPlayerInfo->saberCollideInfo.field_1B0);
+    NETMSG_PUSHF32(pPlayerInfo->saberCollideInfo.bladeLength);
+    NETMSG_PUSHF32(pPlayerInfo->saberCollideInfo.stunDelay);
 
     NETMSG_END(DSS_JKENABLESABER);
 
@@ -580,7 +580,7 @@ void jkDSS_SendSetSaberInfo2(sithThing *thing)
         NETMSG_PUSHS32(-1);
     }
 
-    NETMSG_PUSHU32(thing->playerInfo->field_21C);
+    NETMSG_PUSHU32(thing->playerInfo->bHasSuperWeapon);
     NETMSG_PUSHU32(thing->playerInfo->bHasSuperShields);
     NETMSG_PUSHU32(thing->playerInfo->bHasForceSurge);
     
@@ -677,7 +677,7 @@ int jkDSS_ProcessSetSaberInfo2(sithCogMsg *msg)
     playerInfo->wall_sparks = sithTemplate_GetEntryByIdx(NETMSG_POPS32());
     playerInfo->blood_sparks = sithTemplate_GetEntryByIdx(NETMSG_POPS32());
     playerInfo->saber_sparks = sithTemplate_GetEntryByIdx(NETMSG_POPS32());
-    playerInfo->field_21C = NETMSG_POPU32();
+    playerInfo->bHasSuperWeapon = NETMSG_POPU32();
     playerInfo->bHasSuperShields = NETMSG_POPU32();
     playerInfo->bHasForceSurge = NETMSG_POPU32();
 

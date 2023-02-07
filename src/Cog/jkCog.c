@@ -389,7 +389,7 @@ void jkCog_SetSuperFlags(sithCog *ctx)
     int flags = sithCogExec_PopInt(ctx);
 
     if ( (flags & 1) != 0 )
-        playerThings[playerThingIdx].field_21C = 1;
+        playerThings[playerThingIdx].bHasSuperWeapon = 1;
     if ( (flags & 2) != 0 )
         playerThings[playerThingIdx].bHasSuperShields = 1;
     if ( (flags & 4) != 0 )
@@ -401,7 +401,7 @@ void jkCog_ClearSuperFlags(sithCog *ctx)
     int flags = sithCogExec_PopInt(ctx);
 
     if ( (flags & 1) != 0 )
-        playerThings[playerThingIdx].field_21C = 0;
+        playerThings[playerThingIdx].bHasSuperWeapon = 0;
     if ( (flags & 2) != 0 )
         playerThings[playerThingIdx].bHasSuperShields = 0;
     if ( (flags & 4) != 0 )
@@ -413,7 +413,7 @@ void jkCog_GetSuperFlags(sithCog *cog)
     int flags = 0;
 
     // Added: Original used +, not |
-    if (playerThings[playerThingIdx].field_21C)
+    if (playerThings[playerThingIdx].bHasSuperWeapon)
         flags |= 1;
     if ( playerThings[playerThingIdx].bHasSuperShields )
         flags |= 2;
