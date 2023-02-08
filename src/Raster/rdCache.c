@@ -1097,7 +1097,7 @@ LABEL_232:
     }
 
     rdCache_DrawRenderList();
-    rdCache_ResetRenderList(); // Added
+    //rdCache_ResetRenderList(); // Added
     return 1;
 }
 
@@ -1125,7 +1125,7 @@ void rdCache_DrawRenderList()
             std3D_AddRenderListVertices(rdCache_aHWVertices, rdCache_totalVerts);
         }
         std3D_RenderListVerticesFinish();
-        if ( rdroid_curZBufferMethod == 2 )
+        if ( rdroid_curZBufferMethod == RD_ZBUFFER_READ_WRITE )
             _qsort(rdCache_aHWNormalTris, rdCache_totalNormalTris, sizeof(rdTri), rdCache_TriCompare);
         if ( rdCache_totalSolidTris )
             std3D_AddRenderListTris(rdCache_aHWSolidTris, rdCache_totalSolidTris);

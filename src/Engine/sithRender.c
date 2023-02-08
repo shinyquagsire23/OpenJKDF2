@@ -620,12 +620,12 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
             sithSurface* adjoinMirrorSurface = adjoinIter->mirror->surface;
             rdMaterial* adjoinMirrorMat = adjoinMirrorSurface->surfaceInfo.face.material;
             rdTexinfo* adjoinMirrorTexinfo = NULL;
-            if ( adjoinMat )
+            if ( adjoinMirrorMat )
             {
                 int v19 = adjoinMirrorSurface->surfaceInfo.face.wallCel;
                 if ( v19 == -1 )
                     v19 = adjoinMirrorMat->celIdx;
-                adjoinMirrorTexinfo = adjoinMat->texinfos[v19]; 
+                adjoinMirrorTexinfo = adjoinMirrorMat->texinfos[v19]; 
             }
             else {
                 adjoinMirrorTexinfo = NULL; // Added. TODO: does setting this to NULL cause issues?
@@ -1810,7 +1810,7 @@ void sithRender_RenderAlphaSurfaces()
 
 #ifdef SDL2_RENDER
     rdCache_Flush();
-    rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
+    rdSetZBufferMethod(RD_ZBUFFER_READ_NOWRITE);
 #else
     rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
 #endif

@@ -2873,6 +2873,7 @@ void std3D_AddRenderListUITris(rdUITri *tris, unsigned int num_tris)
 
 int std3D_ClearZBuffer()
 {
+    glDepthMask(GL_TRUE);
     glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->fbo);
     glClear(GL_DEPTH_BUFFER_BIT);
     return 1;
