@@ -228,6 +228,7 @@ void sithMain_SetEndLevel()
 // MOTS altered
 int sithMain_Tick()
 {
+#if 0
     if (sithWorld_pCurrentWorld) {
         for (int i = 0; i < sithWorld_pCurrentWorld->numKeyframesLoaded; i++) {
             rdKeyframe* keyframe = &sithWorld_pCurrentWorld->keyframes[i];
@@ -237,6 +238,7 @@ int sithMain_Tick()
         }
         
     }
+#endif
     
     if ( (g_submodeFlags & 8) != 0 )
     {

@@ -450,7 +450,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
         }
 
         sithRender_aSectors[sithRender_numSectors++] = sector;
-        if ( (sector->flags & SITH_SECTOR_AUTOMAPVISIBLE) == 0 )
+        if (!(sector->flags & SITH_SECTOR_AUTOMAPVISIBLE) && !sithPlayer_bNoClippingRend)
         {
             sector->flags |= SITH_SECTOR_AUTOMAPVISIBLE;
             if ( (sector->flags & SITH_SECTOR_COGLINKED) != 0 )
@@ -558,8 +558,12 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
             int v19 = adjoinSurface->surfaceInfo.face.wallCel;
             if ( v19 == -1 )
                 v19 = adjoinMat->celIdx;
-            v51 = adjoinMat->texinfos[v19];
+            v51 = adjoinMat->texinfos[v19]; 
         }
+        else {
+            v51 = NULL; // Added. TODO: does setting this to NULL cause issues?
+        }
+
         v20 = &sithWorld_pCurrentWorld->vertices[*adjoinSurface->surfaceInfo.face.vertexPosIdx];
         float dist = (sithCamera_currentCamera->vec3_1.y - v20->y) * adjoinSurface->surfaceInfo.face.normal.y
                    + (sithCamera_currentCamera->vec3_1.z - v20->z) * adjoinSurface->surfaceInfo.face.normal.z
@@ -591,13 +595,53 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
 
             rdPrimit3_ClipFace(frustumArg, RD_GEOMODE_WIREFRAME, RD_LIGHTMODE_NOTLIT, RD_TEXTUREMODE_AFFINE, &sithRender_idxInfo, &meshinfo_out, &adjoinSurface->surfaceInfo.face.clipIdk);
 
+#if 0
             if ( ((unsigned int)meshinfo_out.numVertices >= 3u || (rdClip_faceStatus & 0x40) != 0)
               && ((rdClip_faceStatus & 0x41) != 0
-               || (adjoinIter->flags & 1) != 0
-               && (!adjoinSurface->surfaceInfo.face.material
-                || !adjoinSurface->surfaceInfo.face.geometryMode
-                || (adjoinSurface->surfaceInfo.face.type & 2) != 0
-                || (v51->header.texture_type & 8) != 0 && (v51->texture_ptr->alpha_en & 1) != 0)) )
+                   || ((adjoinIter->flags & 1) != 0
+                       && ((!adjoinSurface->surfaceInfo.face.material
+                            || !adjoinSurface->surfaceInfo.face.geometryMode
+                            || (adjoinSurface->surfaceInfo.face.type & 2) != 0)
+                        || (v51 && (v51->header.texture_type & 8) != 0 && (v51->texture_ptr->alpha_en & 1) != 0)
+                        ))) ) // Added: v51 nullptr check
+#endif
+
+            int bAdjoinIsTransparent = (((!adjoinSurface->surfaceInfo.face.material ||
+                        (adjoinSurface->surfaceInfo.face.geometryMode == 0)) ||
+                       ((adjoinSurface->surfaceInfo.face.type & 2))) ||
+                      (v51 && (v51->header.texture_type & 8) && (v51->texture_ptr->alpha_en & 1))
+                      );
+
+#ifdef QOL_IMPROVEMENTS
+            // Added: Somehow the clipping changed enough to cause a bug in MoTS Lv12.
+            // The ground under the water surface somehow renders.
+            // As a mitigation, if a mirror surface is transparent but the top-layer isn't,
+            // we will render underneath anyways.
+            sithSurface* adjoinMirrorSurface = adjoinIter->mirror->surface;
+            rdMaterial* adjoinMirrorMat = adjoinMirrorSurface->surfaceInfo.face.material;
+            rdTexinfo* adjoinMirrorTexinfo = NULL;
+            if ( adjoinMat )
+            {
+                int v19 = adjoinMirrorSurface->surfaceInfo.face.wallCel;
+                if ( v19 == -1 )
+                    v19 = adjoinMirrorMat->celIdx;
+                adjoinMirrorTexinfo = adjoinMat->texinfos[v19]; 
+            }
+            else {
+                adjoinMirrorTexinfo = NULL; // Added. TODO: does setting this to NULL cause issues?
+            }
+
+            int bMirrorAdjoinIsTransparent = (((!adjoinMirrorSurface->surfaceInfo.face.material ||
+                        (adjoinMirrorSurface->surfaceInfo.face.geometryMode == 0)) ||
+                       ((adjoinMirrorSurface->surfaceInfo.face.type & 2))) ||
+                      (adjoinMirrorTexinfo && (adjoinMirrorTexinfo->header.texture_type & 8) && (adjoinMirrorTexinfo->texture_ptr->alpha_en & 1))
+                      );
+
+            bAdjoinIsTransparent |= bMirrorAdjoinIsTransparent;
+#endif
+
+            if ((((unsigned int)meshinfo_out.numVertices >= 3u) || (rdClip_faceStatus & 0x40)) 
+                && ((rdClip_faceStatus & 0x41) || ((adjoinIter->flags & 1) && bAdjoinIsTransparent))) 
             {
                 rdCamera_pCurCamera->projectLst(vertices_tmp_projected, vertices_tmp, meshinfo_out.numVertices);
                 

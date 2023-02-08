@@ -95,6 +95,8 @@ enum SithSurfaceAdjoinFlag
     SITHSURF_ADJOIN_ALLOW_PLAYER_ONLY = 0x8,
     SITHSURF_ADJOIN_ALLOW_AI_ONLY = 0x10,
     SITHSURF_ADJOIN_SET_BY_SECTOR = 0x20,
+    SITHSURF_ADJOIN_40 = 0x40,
+    SITHSURF_ADJOIN_80 = 0x80,
 };
 
 int sithSurface_Startup();

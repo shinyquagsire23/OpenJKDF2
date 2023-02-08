@@ -240,7 +240,7 @@ int sithSurface_Load(sithWorld *world)
                   && (face->type & 2) == 0 
                   && ((v66->header.texture_type & 8) == 0 || (v66->texture_ptr->alpha_en & 1) == 0)))
             {
-                surfaceAdjoin->flags |= 0x80;
+                surfaceAdjoin->flags |= SITHSURF_ADJOIN_80;
             }
         }
         v32 = _atof(stdConffile_entry.args[8].value);
@@ -947,7 +947,7 @@ rdSurface* sithSurface_SlideWall(sithSurface *surface, rdVector3 *a2)
     a1.x = v31.x - v30.x;
     v28 = v15;
     a1.y = v31.y - v30.y;
-    for ( a1.z = v31.z - v30.z; rdVector_Len3(&a1) < 0.000099999997; v28 = v17[v16].y )
+    for ( a1.z = v31.z - v30.z; rdVector_Len3(&a1) < 0.0001; v28 = v17[v16].y )
     {
         if ( ++v7 == surface->surfaceInfo.face.numVertices )
             v7 = 0;
@@ -956,9 +956,7 @@ rdSurface* sithSurface_SlideWall(sithSurface *surface, rdVector3 *a2)
         v17 = v6->vertexUVs;
         v25 = v17[v16].x;
     }
-    v30.x = v30.x - v31.x;
-    v30.y = v30.y - v31.y;
-    v30.z = v30.z - v31.z;
+    rdVector_Sub3Acc(&v30, &v31);
     v26 = v25 - v35.x;
     in.rvec = v30;
     v29 = v28 - v35.y;

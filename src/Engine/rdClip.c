@@ -1309,11 +1309,12 @@ int rdClip_Face3W(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices)
             {
                 ++v5;
                 v98 = (frustum->field_0.y - v96->y) / (v97->y - v96->y);
+                v94->x = (v97->x - v96->x) * v98 + v96->x;
                 v94->y = frustum->field_0.y;
-                ++v94;
+                v94->z = (v97->z - v96->z) * v98 + v96->z;
                 rdClip_faceStatus |= 1;
-                v94[-1].z = (v97->z - v96->z) * v98 + v96->z;
-                v94[-1].x = (v97->x - v96->x) * v98 + v96->x;
+                
+                ++v94;
             }
             if ( v97->y >= (double)frustum->field_0.y )
             {
