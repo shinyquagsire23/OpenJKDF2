@@ -35,11 +35,11 @@ void sithCogFunctionSound_PlaySoundThing(sithCog *ctx)
     float minDist = sithCogExec_PopFlex(ctx);
     float volume = sithCogExec_PopFlex(ctx);
     sithThing* pThing = sithCogExec_PopThing(ctx);
-    sithSound* sound = sithCogExec_PopSound(ctx);
+    sithSound* pSound = sithCogExec_PopSound(ctx);
 
     //printf("sithCogFunctionSound_PlaySoundThing %s\n", ctx->cogscript_fpath);
 
-    if ( !sound )
+    if ( !pSound )
     {
         sithCogExec_PushInt(ctx, -1);
         return;
@@ -69,12 +69,12 @@ void sithCogFunctionSound_PlaySoundThing(sithCog *ctx)
         if (!(flags & SITHSOUNDFLAG_FOLLOWSTHING))
         {
             flagsTmp = flags | SITHSOUNDFLAG_ABSOLUTE;
-            playingSound = sithSoundMixer_PlaySoundPosAbsolute(sound, &pThing->position, pThing->sector, volume, minDist_act, maxDist_act_, flagsTmp);
+            playingSound = sithSoundMixer_PlaySoundPosAbsolute(pSound, &pThing->position, pThing->sector, volume, minDist_act, maxDist_act_, flagsTmp);
         }
         else
         {
             flagsTmp = flags & ~SITHSOUNDFLAG_ABSOLUTE;
-            playingSound = sithSoundMixer_PlaySoundPosThing(sound, pThing, volume, minDist_act, maxDist_act_, flagsTmp);
+            playingSound = sithSoundMixer_PlaySoundPosThing(pSound, pThing, volume, minDist_act, maxDist_act_, flagsTmp);
         }
         if (COG_SHOULD_SYNC(ctx))
         {
@@ -82,20 +82,20 @@ void sithCogFunctionSound_PlaySoundThing(sithCog *ctx)
                 refid_ = playingSound->refid;
             else
                 refid_ = -1;
-            sithDSSThing_SendPlaySound(pThing, &pThing->position, sound, minDist_act, maxDist_act_, flagsTmp, refid_, -1, 255);
+            sithDSSThing_SendPlaySound(pThing, &pThing->position, pSound, minDist_act, maxDist_act_, flagsTmp, refid_, -1, 255);
         }
     }
     else
     {
         flags &= ~(SITHSOUNDFLAG_FOLLOWSTHING|SITHSOUNDFLAG_ABSOLUTE);
-        playingSound = sithSoundMixer_cog_playsound_internal(sound, volume, 0.0, flags);
+        playingSound = sithSoundMixer_cog_playsound_internal(pSound, volume, 0.0, flags);
         if (COG_SHOULD_SYNC(ctx))
         {
             if ( playingSound )
                 refid = playingSound->refid;
             else
                 refid = -1;
-            sithDSSThing_SendPlaySound(0, 0, sound, volume, 0.0, flags, refid, -1, 255);
+            sithDSSThing_SendPlaySound(0, 0, pSound, volume, 0.0, flags, refid, -1, 255);
         }
     }
     if ( playingSound )
@@ -120,9 +120,9 @@ void sithCogFunctionSound_PlaySoundPos(sithCog *ctx)
     float minDist = sithCogExec_PopFlex(ctx);
     float volume = sithCogExec_PopFlex(ctx);
     int posVal = sithCogExec_PopVector3(ctx, &pos);
-    sithSound* sound = sithCogExec_PopSound(ctx);
+    sithSound* pSound = sithCogExec_PopSound(ctx);
 
-    if ( !sound || !posVal )
+    if ( !pSound || !posVal )
     {
         sithCogExec_PushInt(ctx, -1);
         return;
@@ -141,7 +141,7 @@ void sithCogFunctionSound_PlaySoundPos(sithCog *ctx)
     if ( minDist_act > (double)maxDist_act )
         maxDist_act = minDist_act;
     flagsTmp = flags | SITHSOUNDFLAG_ABSOLUTE;
-    playingSound = sithSoundMixer_PlaySoundPosAbsolute(sound, &pos, 0, volume, minDist_act, maxDist_act, flagsTmp);
+    playingSound = sithSoundMixer_PlaySoundPosAbsolute(pSound, &pos, 0, volume, minDist_act, maxDist_act, flagsTmp);
     if (COG_SHOULD_SYNC(ctx))
     {
         if ( playingSound )
@@ -149,7 +149,7 @@ void sithCogFunctionSound_PlaySoundPos(sithCog *ctx)
         else
             refId = -1;
 
-        sithDSSThing_SendPlaySound(0, &pos, sound, minDist_act, maxDist_act, flagsTmp, refId, -1, 255);
+        sithDSSThing_SendPlaySound(0, &pos, pSound, minDist_act, maxDist_act, flagsTmp, refId, -1, 255);
     }
 
     if ( playingSound )
@@ -163,11 +163,11 @@ void sithCogFunctionSound_PlaySoundLocal(sithCog *ctx)
     int flags = sithCogExec_PopInt(ctx);
     float pan = sithCogExec_PopFlex(ctx);
     float volume = sithCogExec_PopFlex(ctx);
-    sithSound* sound = sithCogExec_PopSound(ctx);
+    sithSound* pSound = sithCogExec_PopSound(ctx);
 
     //printf("sithCogFunctionSound_PlaySoundLocal %s\n", ctx->cogscript_fpath);
 
-    if (!sound)
+    if (!pSound)
     {
         sithCogExec_PushInt(ctx, -1);
         return;
@@ -191,7 +191,7 @@ void sithCogFunctionSound_PlaySoundLocal(sithCog *ctx)
         volume = 1.5;
     }
 
-    sithPlayingSound* playingSound = sithSoundMixer_cog_playsound_internal(sound, volume, pan, flags & ~(SITHSOUNDFLAG_FOLLOWSTHING|SITHSOUNDFLAG_ABSOLUTE));
+    sithPlayingSound* playingSound = sithSoundMixer_cog_playsound_internal(pSound, volume, pan, flags & ~(SITHSOUNDFLAG_FOLLOWSTHING|SITHSOUNDFLAG_ABSOLUTE));
 
     if ( playingSound )
         sithCogExec_PushInt(ctx, playingSound->refid);
@@ -204,11 +204,11 @@ void sithCogFunctionSound_PlaySoundGlobal(sithCog *ctx)
     int flags = sithCogExec_PopInt(ctx);
     float pan = sithCogExec_PopFlex(ctx);
     float volume = sithCogExec_PopFlex(ctx);
-    sithSound* sound = sithCogExec_PopSound(ctx);
+    sithSound* pSound = sithCogExec_PopSound(ctx);
 
     //printf("sithCogFunctionSound_PlaySoundGlobal %s\n", ctx->cogscript_fpath);
 
-    if (!sound)
+    if (!pSound)
     {
         sithCogExec_PushInt(ctx, -1);
         return;
@@ -232,12 +232,12 @@ void sithCogFunctionSound_PlaySoundGlobal(sithCog *ctx)
     }
 
     int flagsTmp = flags & ~(SITHSOUNDFLAG_FOLLOWSTHING|SITHSOUNDFLAG_ABSOLUTE);
-    sithPlayingSound* playingSound = sithSoundMixer_cog_playsound_internal(sound, volume, pan, flagsTmp);
+    sithPlayingSound* playingSound = sithSoundMixer_cog_playsound_internal(pSound, volume, pan, flagsTmp);
     if ( playingSound )
     {
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithDSSThing_SendPlaySound(0, 0, sound, volume, pan, flagsTmp, playingSound->refid, -1, 255);
+            sithDSSThing_SendPlaySound(0, 0, pSound, volume, pan, flagsTmp, playingSound->refid, -1, 255);
         }
         sithCogExec_PushInt(ctx, playingSound->refid);
     }
@@ -273,11 +273,11 @@ void sithCogFunctionSound_StopSound(sithCog *ctx)
 
 void sithCogFunctionSound_LoadSound(sithCog *ctx)
 {
-    sithSound *sound;
+    sithSound* pSound;
 
     char* path = sithCogExec_PopString(ctx);
-    if ( path && (sound = sithSound_LoadEntry(path, 0)) != 0 )
-        sithCogExec_PushInt(ctx, sound->id);
+    if ( path && (pSound = sithSound_LoadEntry(path, 0)) != 0 )
+        sithCogExec_PushInt(ctx, pSound->id);
     else
         sithCogExec_PushInt(ctx, -1);
 }
@@ -329,20 +329,20 @@ void sithCogFunctionSound_ChangeSoundPitch(sithCog *ctx)
     float changetime = sithCogExec_PopFlex(ctx);
     float pitch = sithCogExec_PopFlex(ctx);
     int ref = sithCogExec_PopInt(ctx);
-    sithPlayingSound* sound = sithSoundMixer_GetSoundFromRef(ref);
+    sithPlayingSound* pPlayingSound = sithSoundMixer_GetSoundFromRef(ref);
 
-    if ( sound && changetime > 0.0 && pitch > 0.0 )
-        sithSoundMixer_SetPitch(sound, pitch, changetime);
+    if ( pPlayingSound && changetime > 0.0 && pitch > 0.0 )
+        sithSoundMixer_SetPitch(pPlayingSound, pitch, changetime);
 }
 
 void sithCogFunctionSound_SectorSound(sithCog *ctx)
 {
     float vol = sithCogExec_PopFlex(ctx);
-    sithSound* sound = sithCogExec_PopSound(ctx);
+    sithSound* pSound = sithCogExec_PopSound(ctx);
     sithSector* sector = sithCogExec_PopSector(ctx);
 
     if ( sector )
-        sithSoundMixer_SectorSound(sector, sound, vol);
+        sithSoundMixer_SectorSound(sector, pSound, vol);
 }
 
 void sithCogFunctionSound_SetMusicVol(sithCog *ctx)
@@ -361,11 +361,11 @@ void sithCogFunctionSound_SetMusicVol(sithCog *ctx)
 
 void sithCogFunctionSound_GetSoundLen(sithCog *ctx)
 {
-    sithSound* sound = sithCogExec_PopSound(ctx);
+    sithSound* pSound = sithCogExec_PopSound(ctx);
 
-    if (sound)
+    if (pSound)
     {
-        sithCogExec_PushFlex(ctx, (double)sound->sound_len * 0.001);
+        sithCogExec_PushFlex(ctx, (double)pSound->sound_len * 0.001);
     }
     else
     {
@@ -390,11 +390,11 @@ void sithCogFunctionSound_PlaySoundThingLocal(sithCog *ctx)
     float minDist = sithCogExec_PopFlex(ctx);
     float volume = sithCogExec_PopFlex(ctx);
     sithThing* pThing = sithCogExec_PopThing(ctx);
-    sithSound* sound = sithCogExec_PopSound(ctx);
+    sithSound* pSound = sithCogExec_PopSound(ctx);
 
     //printf("sithCogFunctionSound_PlaySoundThing %s\n", ctx->cogscript_fpath);
 
-    if ( !sound )
+    if ( !pSound )
     {
         sithCogExec_PushInt(ctx, -1);
         return;
@@ -424,18 +424,18 @@ void sithCogFunctionSound_PlaySoundThingLocal(sithCog *ctx)
         if (!(flags & SITHSOUNDFLAG_FOLLOWSTHING))
         {
             flagsTmp = flags | SITHSOUNDFLAG_ABSOLUTE;
-            playingSound = sithSoundMixer_PlaySoundPosAbsolute(sound, &pThing->position, pThing->sector, volume, minDist_act, maxDist_act_, flagsTmp);
+            playingSound = sithSoundMixer_PlaySoundPosAbsolute(pSound, &pThing->position, pThing->sector, volume, minDist_act, maxDist_act_, flagsTmp);
         }
         else
         {
             flagsTmp = flags & ~SITHSOUNDFLAG_ABSOLUTE;
-            playingSound = sithSoundMixer_PlaySoundPosThing(sound, pThing, volume, minDist_act, maxDist_act_, flagsTmp);
+            playingSound = sithSoundMixer_PlaySoundPosThing(pSound, pThing, volume, minDist_act, maxDist_act_, flagsTmp);
         }
     }
     else
     {
         flags &= ~(SITHSOUNDFLAG_FOLLOWSTHING|SITHSOUNDFLAG_ABSOLUTE);
-        playingSound = sithSoundMixer_cog_playsound_internal(sound, volume, 0.0, flags);
+        playingSound = sithSoundMixer_cog_playsound_internal(pSound, volume, 0.0, flags);
     }
     if ( playingSound )
         sithCogExec_PushInt(ctx, playingSound->refid);
@@ -459,9 +459,9 @@ void sithCogFunctionSound_PlaySoundPosLocal(sithCog *ctx)
     float minDist = sithCogExec_PopFlex(ctx);
     float volume = sithCogExec_PopFlex(ctx);
     int posVal = sithCogExec_PopVector3(ctx, &pos);
-    sithSound* sound = sithCogExec_PopSound(ctx);
+    sithSound* pSound = sithCogExec_PopSound(ctx);
 
-    if ( !sound || !posVal )
+    if ( !pSound || !posVal )
     {
         sithCogExec_PushInt(ctx, -1);
         return;
@@ -479,7 +479,7 @@ void sithCogFunctionSound_PlaySoundPosLocal(sithCog *ctx)
     }
     if ( minDist_act > (double)maxDist_act )
         maxDist_act = minDist_act;
-    playingSound = sithSoundMixer_PlaySoundPosAbsolute(sound, &pos, 0, volume, minDist_act, maxDist_act, flags | SITHSOUNDFLAG_ABSOLUTE);
+    playingSound = sithSoundMixer_PlaySoundPosAbsolute(pSound, &pos, 0, volume, minDist_act, maxDist_act, flags | SITHSOUNDFLAG_ABSOLUTE);
 
     if ( playingSound )
         sithCogExec_PushInt(ctx, playingSound->refid);
