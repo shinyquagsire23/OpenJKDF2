@@ -296,7 +296,6 @@ void jkGame_Screenshot()
     do {
         stdString_snprintf(local_80, sizeof(local_80), "SHOT%04d.PNG", Video_dword_5528B0);
         stdFile_t fp = pHS->fileOpen(local_80, "r");
-        printf("%s %p %04d\n", local_80, fp, Video_dword_5528B0);
         if (fp == 0) {
             bVar2 = 1;
         }
