@@ -45,15 +45,13 @@ void sithCogFunctionSurface_GetNumSurfaceVertices(sithCog *ctx)
 
 void sithCogFunctionSurface_GetSurfaceVertexPos(sithCog *ctx)
 {
-    sithWorld *world; // ebx
     uint32_t vtx_idx; // edi
     sithSurface *surface; // eax
 
-    world = sithWorld_pCurrentWorld;
     vtx_idx = sithCogExec_PopInt(ctx);
     surface = sithCogExec_PopSurface(ctx);
     if ( surface && vtx_idx < surface->surfaceInfo.face.numVertices && (vtx_idx & 0x80000000) == 0 )
-        sithCogExec_PushVector3(ctx, &world->vertices[surface->surfaceInfo.face.vertexPosIdx[vtx_idx]]);
+        sithCogExec_PushVector3(ctx, &sithWorld_pCurrentWorld->vertices[surface->surfaceInfo.face.vertexPosIdx[vtx_idx]]);
     else
         sithCogExec_PushVector3(ctx, &rdroid_zeroVector3);
 }

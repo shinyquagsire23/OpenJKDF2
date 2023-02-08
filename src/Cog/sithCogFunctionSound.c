@@ -34,7 +34,7 @@ void sithCogFunctionSound_PlaySoundThing(sithCog *ctx)
     float maxDist = sithCogExec_PopFlex(ctx);
     float minDist = sithCogExec_PopFlex(ctx);
     float volume = sithCogExec_PopFlex(ctx);
-    sithThing* thing = sithCogExec_PopThing(ctx);
+    sithThing* pThing = sithCogExec_PopThing(ctx);
     sithSound* sound = sithCogExec_PopSound(ctx);
 
     //printf("sithCogFunctionSound_PlaySoundThing %s\n", ctx->cogscript_fpath);
@@ -64,17 +64,17 @@ void sithCogFunctionSound_PlaySoundThing(sithCog *ctx)
     {
         volume = 1.5;
     }
-    if ( thing )
+    if ( pThing )
     {
         if (!(flags & SITHSOUNDFLAG_FOLLOWSTHING))
         {
             flagsTmp = flags | SITHSOUNDFLAG_ABSOLUTE;
-            playingSound = sithSoundMixer_PlaySoundPosAbsolute(sound, &thing->position, thing->sector, volume, minDist_act, maxDist_act_, flagsTmp);
+            playingSound = sithSoundMixer_PlaySoundPosAbsolute(sound, &pThing->position, pThing->sector, volume, minDist_act, maxDist_act_, flagsTmp);
         }
         else
         {
             flagsTmp = flags & ~SITHSOUNDFLAG_ABSOLUTE;
-            playingSound = sithSoundMixer_PlaySoundPosThing(sound, thing, volume, minDist_act, maxDist_act_, flagsTmp);
+            playingSound = sithSoundMixer_PlaySoundPosThing(sound, pThing, volume, minDist_act, maxDist_act_, flagsTmp);
         }
         if (COG_SHOULD_SYNC(ctx))
         {
@@ -82,7 +82,7 @@ void sithCogFunctionSound_PlaySoundThing(sithCog *ctx)
                 refid_ = playingSound->refid;
             else
                 refid_ = -1;
-            sithDSSThing_SendPlaySound(thing, &thing->position, sound, minDist_act, maxDist_act_, flagsTmp, refid_, -1, 255);
+            sithDSSThing_SendPlaySound(pThing, &pThing->position, sound, minDist_act, maxDist_act_, flagsTmp, refid_, -1, 255);
         }
     }
     else
@@ -287,14 +287,14 @@ void sithCogFunctionSound_PlaySoundClass(sithCog *ctx)
     sithPlayingSound *pPlayingSound;
 
     int soundClassId = sithCogExec_PopInt(ctx);
-    sithThing* thing = sithCogExec_PopThing(ctx);
+    sithThing* pThing = sithCogExec_PopThing(ctx);
 
-    if ( thing && thing->soundclass && (pPlayingSound = sithSoundClass_PlayModeRandom(thing, soundClassId)) != 0 )
+    if ( pThing && pThing->soundclass && (pPlayingSound = sithSoundClass_PlayModeRandom(pThing, soundClassId)) != 0 )
     {
         sithCogExec_PushInt(ctx, pPlayingSound->refid);
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithDSSThing_SendPlaySoundMode(thing, soundClassId, pPlayingSound->refid, -1.0);
+            sithDSSThing_SendPlaySoundMode(pThing, soundClassId, pPlayingSound->refid, -1.0);
         }
     }
     else
@@ -389,7 +389,7 @@ void sithCogFunctionSound_PlaySoundThingLocal(sithCog *ctx)
     float maxDist = sithCogExec_PopFlex(ctx);
     float minDist = sithCogExec_PopFlex(ctx);
     float volume = sithCogExec_PopFlex(ctx);
-    sithThing* thing = sithCogExec_PopThing(ctx);
+    sithThing* pThing = sithCogExec_PopThing(ctx);
     sithSound* sound = sithCogExec_PopSound(ctx);
 
     //printf("sithCogFunctionSound_PlaySoundThing %s\n", ctx->cogscript_fpath);
@@ -419,17 +419,17 @@ void sithCogFunctionSound_PlaySoundThingLocal(sithCog *ctx)
     {
         volume = 1.5;
     }
-    if ( thing )
+    if ( pThing )
     {
         if (!(flags & SITHSOUNDFLAG_FOLLOWSTHING))
         {
             flagsTmp = flags | SITHSOUNDFLAG_ABSOLUTE;
-            playingSound = sithSoundMixer_PlaySoundPosAbsolute(sound, &thing->position, thing->sector, volume, minDist_act, maxDist_act_, flagsTmp);
+            playingSound = sithSoundMixer_PlaySoundPosAbsolute(sound, &pThing->position, pThing->sector, volume, minDist_act, maxDist_act_, flagsTmp);
         }
         else
         {
             flagsTmp = flags & ~SITHSOUNDFLAG_ABSOLUTE;
-            playingSound = sithSoundMixer_PlaySoundPosThing(sound, thing, volume, minDist_act, maxDist_act_, flagsTmp);
+            playingSound = sithSoundMixer_PlaySoundPosThing(sound, pThing, volume, minDist_act, maxDist_act_, flagsTmp);
         }
     }
     else
