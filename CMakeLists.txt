@@ -662,6 +662,7 @@ elseif(TARGET_LINUX)
 
     target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
     target_link_libraries(${BIN_NAME} PRIVATE dl) # dlopen, dlsym
+    target_link_libraries(${BIN_NAME} PRIVATE stdc++fs)
 elseif(PLAT_MSVC)
     set_target_properties(${BIN_NAME} PROPERTIES
       LINK_SEARCH_START_STATIC ON
