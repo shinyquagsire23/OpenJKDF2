@@ -21,6 +21,7 @@
 #include "Main/jkQuakeConsole.h"
 #include "Engine/rdColormap.h"
 #include "Engine/sithCamera.h"
+#include "General/stdString.h"
 
 #include "stdPlatform.h"
 #include "jk.h"
@@ -289,7 +290,26 @@ int jkGame_Update()
 #ifdef SDL2_RENDER
 void jkGame_Screenshot()
 {
-    stdPlatform_Printf("TODO: Implement screenshots\n");
+    //stdPlatform_Printf("TODO: Implement screenshots\n");
+    char local_80[128];
+    int bVar2 = 0;
+    do {
+        stdString_snprintf(local_80, sizeof(local_80), "SHOT%04d.PNG", Video_dword_5528B0);
+        stdFile_t fp = pHS->fileOpen(local_80, "r");
+        printf("%s %p %04d\n", local_80, fp, Video_dword_5528B0);
+        if (fp == 0) {
+            bVar2 = 1;
+        }
+        else {
+            pHS->fileClose(fp);
+        }
+        Video_dword_5528B0++;
+        if (Video_dword_5528B0 > 9999) {
+            bVar2 = 1;
+        }
+    } while (!bVar2);
+
+    std3D_Screenshot(local_80);
 }
 #endif
 

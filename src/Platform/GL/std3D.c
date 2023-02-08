@@ -3277,10 +3277,10 @@ int std3D_AddBitmapToTextureCache(stdBitmap *texture, int mipIdx, int is_alpha_t
         if (!palette_data) 
         {
             palette_data = std3D_ui_colormap.colors;//jkGui_stdBitmaps[2]->palette;
-            pal = NULL;palette_data;
+            pal = NULL;//palette_data;
         }
         else {
-            pal = NULL;texture->palette;
+            pal = NULL;//texture->palette;
         }
     
         for (int j = 0; j < height; j++)
@@ -3451,6 +3451,19 @@ void std3D_UpdateSettings()
 #endif
 
     glBindTexture(GL_TEXTURE_2D, blank_tex);
+}
+
+// Added
+void std3D_Screenshot(const char* pFpath)
+{
+#ifndef ARCH_WASM
+    if (!std3D_pFb) return;
+
+    uint8_t* data = malloc(std3D_pFb->w * std3D_pFb->h * 3 * sizeof(uint8_t));
+    glReadPixels(0, 0, std3D_pFb->w, std3D_pFb->h, GL_RGB, GL_UNSIGNED_BYTE, data);
+    jkgm_write_png(pFpath, std3D_pFb->w, std3D_pFb->h, data);
+    free(data);
+#endif
 }
 
 int std3D_HasAlpha()

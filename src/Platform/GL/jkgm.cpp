@@ -953,5 +953,50 @@ void jkgm_free_cache_entry(jkgm_cache_entry_t* entry)
     entry->displacement_hasAlpha = 0;
 }
 
+void jkgm_write_png(const char *pFname, int width, int height, uint8_t* paFramebuffer) 
+{
+    int y;
+
+    FILE *fp = fopen(pFname, "wb");
+    if(!fp) return;
+
+    png_structp png = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+    if (!png) return;
+
+    png_infop info = png_create_info_struct(png);
+    if (!info) return;
+
+    if (setjmp(png_jmpbuf(png))) abort();
+
+    png_init_io(png, fp);
+
+    // Output is 8bit depth, RGBA format.
+    png_set_IHDR(
+        png,
+        info,
+        width, height,
+        8,
+        PNG_COLOR_TYPE_RGB,
+        PNG_INTERLACE_NONE,
+        PNG_COMPRESSION_TYPE_DEFAULT,
+        PNG_FILTER_TYPE_DEFAULT
+    );
+    png_write_info(png, info);
+
+    // To remove the alpha channel for PNG_COLOR_TYPE_RGB format,
+    // Use png_set_filler().
+    //png_set_filler(png, 0, PNG_FILLER_AFTER);
+
+    for(int y = height-1; y >= 0; y--) {
+        png_write_row(png, paFramebuffer+(y*width*3));
+    }
+
+    png_write_end(png, NULL);
+
+    fclose(fp);
+
+    png_destroy_write_struct(&png, &info);
+}
+
 #endif // ARCH_WASM
 #endif //SDL2_RENDER

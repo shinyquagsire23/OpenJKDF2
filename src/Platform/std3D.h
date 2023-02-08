@@ -113,6 +113,7 @@ void std3D_PurgeTextureEntry(int i);
 void std3D_PurgeBitmapRefs(stdBitmap *pBitmap);
 void std3D_PurgeSurfaceRefs(rdDDrawSurface *texture);
 void std3D_UpdateSettings();
+void std3D_Screenshot(const char* pFpath);
 
 void std3D_ResetUIRenderList();
 int std3D_AddBitmapToTextureCache(stdBitmap *texture, int mipIdx, int is_alpha_tex, int no_alpha);
