@@ -8,7 +8,6 @@
 #include "Devices/sithSound.h"
 #include "Raster/rdCache.h" // rdTri
 #include "Cog/sithCog.h"
-#include "Cog/sithCogScript.h"
 #include "Engine/sithKeyFrame.h"
 #include "Engine/sithAnimClass.h"
 #include "AI/sithAIClass.h"
@@ -23,7 +22,6 @@
 #include "Engine/sithParticle.h"
 #include "World/sithSurface.h"
 #include "World/sithArchLighting.h"
-#include "Engine/sithAdjoin.h"
 #include "Engine/sithPhysics.h"
 #include "Cog/sithCog.h"
 #include "General/util.h"

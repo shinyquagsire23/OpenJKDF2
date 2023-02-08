@@ -149,11 +149,11 @@ LABEL_21:
     return result;
 }
 
-unsigned int stdFont_Draw1(stdVBuffer *vbuf, stdFont *font, unsigned int blit_x, int blit_y, int a5, wchar_t *a6, int alpha_maybe)
+unsigned int stdFont_Draw1(stdVBuffer *vbuf, stdFont *font, unsigned int blit_x, int blit_y, int a5, const wchar_t *a6, int alpha_maybe)
 {
     unsigned int v8; // edx
     unsigned int v9; // esi
-    wchar_t *v10; // ebx
+    const wchar_t *v10; // ebx
     wchar_t v11; // ax
     int v12; // ecx
     int v13; // eax
@@ -253,12 +253,12 @@ LABEL_26:
     return v9 - v8;
 }
 
-void stdFont_Draw2(stdVBuffer *a1, stdFont *a2, unsigned int a3, int a4, rdRect *a5, wchar_t *a6, int a7)
+void stdFont_Draw2(stdVBuffer *a1, stdFont *a2, unsigned int a3, int a4, rdRect *a5, const wchar_t *a6, int a7)
 {
-    wchar_t *v8; // ebx
+    const wchar_t *v8; // ebx
     unsigned int v9; // edi
     stdVBuffer *v10; // ebp
-    wchar_t *v11; // eax
+    const wchar_t *v11; // eax
     int v12; // ecx
     int v13; // eax
     uint16_t v14; // cx
@@ -266,7 +266,7 @@ void stdFont_Draw2(stdVBuffer *a1, stdFont *a2, unsigned int a3, int a4, rdRect 
     int v16; // eax
     signed int v17; // eax
     int v18; // [esp+10h] [ebp-18h] BYREF
-    wchar_t *v19; // [esp+14h] [ebp-14h]
+    const wchar_t *v19; // [esp+14h] [ebp-14h]
     rdRect rect; // [esp+18h] [ebp-10h] BYREF
     stdVBuffer *a2a; // [esp+30h] [ebp+8h]
     int a6a; // [esp+40h] [ebp+18h]
@@ -370,22 +370,22 @@ LABEL_19:
     }
 }
 
-void stdFont_Draw3(stdVBuffer *paintSurface, stdFont *font, int a3, rdRect *a4, int a5, wchar_t *a6, int a7)
+void stdFont_Draw3(stdVBuffer *paintSurface, stdFont *font, int a3, rdRect *a4, int a5, const wchar_t *a6, int a7)
 {
     char v7; // bl
     int v8; // esi
     stdFont *v9; // edi
     rdRect *v10; // ebp
     stdVBuffer *v11; // eax
-    wchar_t *v12; // ecx
-    wchar_t *v13; // eax
+    const wchar_t *v12; // ecx
+    const wchar_t *v13; // eax
     int v14; // eax
-    WCHAR *v15; // eax
-    wchar_t *v16; // ebx
-    wchar_t *v17; // ecx
+    const wchar_t *v15; // eax
+    const wchar_t *v16; // ebx
+    const wchar_t *v17; // ecx
     int v18; // esi
     int v19; // ecx
-    WCHAR v20; // cx
+    wchar_t v20; // cx
     stdFontCharset *v21; // eax
     signed int v22; // ecx
     int v23; // ebx
@@ -395,7 +395,7 @@ void stdFont_Draw3(stdVBuffer *paintSurface, stdFont *font, int a3, rdRect *a4, 
     wchar_t v27; // cx
     signed int v28; // eax
     stdVBuffer *vbuf2; // [esp+10h] [ebp-18h]
-    wchar_t *v30; // [esp+14h] [ebp-14h]
+    const wchar_t *v30; // [esp+14h] [ebp-14h]
     rdRect rect; // [esp+18h] [ebp-10h] BYREF
     int tmp;
 
@@ -598,10 +598,10 @@ LABEL_51:
     }
 }
 
-int stdFont_Draw4(stdVBuffer *a1, stdFont *font, int xPos, int yPos, int a5, int a6, int a7, wchar_t *text, int alpha_maybe)
+int stdFont_Draw4(stdVBuffer *a1, stdFont *font, int xPos, int yPos, int a5, int a6, int a7, const wchar_t *text, int alpha_maybe)
 {
     int v9; // ebp
-    wchar_t *v10; // edi
+    const wchar_t *v10; // edi
     int i; // ebx
     uint16_t v12; // cx
     stdFontCharset *v13; // eax
@@ -682,27 +682,27 @@ LABEL_16:
     return stdFont_Draw1(a1, font, xPos + v17, yPos + v18, v15 - v17, text, alpha_maybe);
 }
 
-WCHAR* stdFont_sub_4352C0(WCHAR *a1, stdFont *a2, int a3, rdRect *a4, int *a5)
+const wchar_t* stdFont_sub_4352C0(const wchar_t *a1, stdFont *a2, int a3, rdRect *a4, int *a5)
 {
-    WCHAR *v5; // ebp
+    const wchar_t *v5; // ebp
     int v6; // eax
-    WCHAR v7; // si
+    wchar_t v7; // si
     int v8; // edi
     int v9; // zf
-    WCHAR v10; // si
+    wchar_t v10; // si
     int v11; // ecx
     uint16_t v12; // cx
     stdFontCharset *v13; // eax
     int v14; // ecx
     int v15; // edx
-    WCHAR v16; // ax
+    wchar_t v16; // ax
     int v17; // ecx
     uint16_t v18; // cx
     stdFontCharset *v19; // eax
     int v20; // ecx
     int v22; // [esp+10h] [ebp-Ch]
     int v23; // [esp+14h] [ebp-8h]
-    WCHAR *v24; // [esp+18h] [ebp-4h]
+    const wchar_t *v24; // [esp+18h] [ebp-4h]
     int v25; // [esp+20h] [ebp+4h]
 
     // Added: nullptr check
@@ -867,9 +867,9 @@ LABEL_49:
     return 0;
 }
 
-int stdFont_sub_4357C0(stdFont *a1, wchar_t *a2, rdRect *a4)
+int stdFont_sub_4357C0(stdFont *a1, const wchar_t *a2, rdRect *a4)
 {
-    wchar_t *v3; // eax
+    const wchar_t *v3; // eax
     int v4; // edi
     rdRect *v5; // esi
     int tmp;
@@ -889,9 +889,9 @@ int stdFont_sub_4357C0(stdFont *a1, wchar_t *a2, rdRect *a4)
     return v4 * ((*a1->bitmap->mipSurfaces)->format.height + a1->marginY);
 }
 
-int stdFont_sub_435810(stdFont *a1, wchar_t *a2, int a3)
+int stdFont_sub_435810(stdFont *a1, const wchar_t *a2, int a3)
 {
-    wchar_t *v3; // edi
+    const wchar_t *v3; // edi
     int v4; // ebp
     wchar_t i; // ax
     uint16_t v7; // cx
@@ -1057,14 +1057,12 @@ uint32_t stdFont_DrawAscii(stdVBuffer *a1, stdFont *a2, unsigned int blit_x, int
     signed int v17; // ecx
     int v19; // [esp+10h] [ebp-14h]
     rdRect a5a; // [esp+14h] [ebp-10h] BYREF
-    stdVBuffer *v21; // [esp+2Ch] [ebp+8h]
 
     v8 = blit_x;
     v9 = blit_x;
     v19 = 0;
     v10 = *a2->bitmap->mipSurfaces;
     a5a.y = 0;
-    v21 = v10;
     a5a.height = v10->format.height;
     if ( x_max >= (int)(a1->format.width - blit_x) )
         x_max = a1->format.width - blit_x;
@@ -1129,7 +1127,7 @@ LABEL_24:
             }
             if ( (int)(v9 + v17) < (int)(v8 + x_max) )
             {
-                stdDisplay_VBufferCopy(a1, v21, v9, blit_y, &a5a, alpha_maybe);
+                stdDisplay_VBufferCopy(a1, v10, v9, blit_y, &a5a, alpha_maybe);
                 v14 = a5a.width + a2->marginY;
                 goto LABEL_29;
             }
@@ -1180,14 +1178,12 @@ uint32_t stdFont_DrawAsciiGPU(stdFont *a2, unsigned int blit_x, int blit_y, int 
     signed int v17; // ecx
     int v19; // [esp+10h] [ebp-14h]
     rdRect a5a; // [esp+14h] [ebp-10h] BYREF
-    stdVBuffer *v21; // [esp+2Ch] [ebp+8h]
 
     v8 = blit_x;
     v9 = blit_x;
     v19 = 0;
     v10 = *a2->bitmap->mipSurfaces;
     a5a.y = 0;
-    v21 = v10;
     a5a.height = v10->format.height;
     //if ( x_max >= (int)(a1->format.width - blit_x) )
     //    x_max = a1->format.width - blit_x;
@@ -1258,7 +1254,7 @@ LABEL_24:
                     shift = (a2->monospaceW - a5a.width)/2;
                 }
                 std3D_DrawUIBitmap(a2->bitmap, 0, v9+shift, blit_y, &a5a, scale, alpha_maybe);
-                //stdDisplay_VBufferCopy(a1, v21, v9, blit_y, &a5a, alpha_maybe);
+                //stdDisplay_VBufferCopy(a1, v10, v9, blit_y, &a5a, alpha_maybe);
                 v14 = a5a.width + a2->marginY;
                 goto LABEL_29;
             }
@@ -1292,14 +1288,12 @@ uint32_t stdFont_DrawAsciiWidth(stdFont *a2, unsigned int blit_x, int blit_y, in
     signed int v17; // ecx
     int v19; // [esp+10h] [ebp-14h]
     rdRect a5a; // [esp+14h] [ebp-10h] BYREF
-    stdVBuffer *v21; // [esp+2Ch] [ebp+8h]
 
     v8 = blit_x;
     v9 = blit_x;
     v19 = 0;
     v10 = *a2->bitmap->mipSurfaces;
     a5a.y = 0;
-    v21 = v10;
     a5a.height = v10->format.height;
     //if ( x_max >= (int)(a1->format.width - blit_x) )
     //    x_max = a1->format.width - blit_x;
@@ -1365,7 +1359,7 @@ LABEL_24:
             if ( (int)(v9 + INT_FLOAT_SCALED(v17, scale)) < (int)(v8 + x_max) )
             {
                 //std3D_DrawUIBitmap(a2->bitmap, 0, v9, blit_y, &a5a, scale, alpha_maybe);
-                //stdDisplay_VBufferCopy(a1, v21, v9, blit_y, &a5a, alpha_maybe);
+                //stdDisplay_VBufferCopy(a1, v10, v9, blit_y, &a5a, alpha_maybe);
                 v14 = a5a.width + a2->marginY;
                 goto LABEL_29;
             }
@@ -1386,10 +1380,10 @@ LABEL_29:
     return v9 - v8;
 }
 
-int stdFont_Draw4GPU(stdFont *font, int xPos, int yPos, int a5, int a6, int a7, wchar_t *text, int alpha_maybe, float scale)
+int stdFont_Draw4GPU(stdFont *font, int xPos, int yPos, int a5, int a6, int a7, const wchar_t *text, int alpha_maybe, float scale)
 {
     int v9; // ebp
-    wchar_t *v10; // edi
+    const wchar_t *v10; // edi
     int i; // ebx
     uint16_t v12; // cx
     stdFontCharset *v13; // eax
@@ -1470,11 +1464,11 @@ LABEL_16:
     return stdFont_Draw1GPU(font, xPos + v17, yPos + v18, v15 - v17, text, alpha_maybe, scale);
 }
 
-unsigned int stdFont_Draw1GPU(stdFont *font, unsigned int blit_x, int blit_y, int a5, wchar_t *a6, int alpha_maybe, float scale)
+unsigned int stdFont_Draw1GPU(stdFont *font, unsigned int blit_x, int blit_y, int a5, const wchar_t *a6, int alpha_maybe, float scale)
 {
     unsigned int v8; // edx
     unsigned int v9; // esi
-    wchar_t *v10; // ebx
+    const wchar_t *v10; // ebx
     wchar_t v11; // ax
     int v12; // ecx
     int v13; // eax
@@ -1571,11 +1565,11 @@ LABEL_26:
     return v9 - v8;
 }
 
-unsigned int stdFont_Draw1Width(stdFont *font, unsigned int blit_x, int blit_y, int a5, wchar_t *a6, int alpha_maybe, float scale)
+unsigned int stdFont_Draw1Width(stdFont *font, unsigned int blit_x, int blit_y, int a5, const wchar_t *a6, int alpha_maybe, float scale)
 {
     unsigned int v8; // edx
     unsigned int v9; // esi
-    wchar_t *v10; // ebx
+    const wchar_t *v10; // ebx
     wchar_t v11; // ax
     int v12; // ecx
     int v13; // eax
@@ -1678,11 +1672,11 @@ LABEL_26:
     return largest_x;//v9 - v8;
 }
 
-unsigned int stdFont_DrawMultilineCenteredGPU(stdFont *font, unsigned int blit_x, int blit_y, int a5, wchar_t *a6, int alpha_maybe, float scale)
+unsigned int stdFont_DrawMultilineCenteredGPU(stdFont *font, unsigned int blit_x, int blit_y, int a5, const wchar_t *a6, int alpha_maybe, float scale)
 {
     unsigned int v8; // edx
     unsigned int v9; // esi
-    wchar_t *v10; // ebx
+    const wchar_t *v10; // ebx
     wchar_t v11; // ax
     int v12; // ecx
     int v13; // eax
@@ -1807,11 +1801,11 @@ LABEL_26:
     return (blit_y - orig_blit_y) + INT_FLOAT_SCALED(a5a.height, scale);//v9 - blit_x;
 }
 
-unsigned int stdFont_DrawMultilineCenteredHeight(stdFont *font, unsigned int blit_x, int blit_y, int a5, wchar_t *a6, int alpha_maybe, float scale)
+unsigned int stdFont_DrawMultilineCenteredHeight(stdFont *font, unsigned int blit_x, int blit_y, int a5, const wchar_t *a6, int alpha_maybe, float scale)
 {
     unsigned int v8; // edx
     unsigned int v9; // esi
-    wchar_t *v10; // ebx
+    const wchar_t *v10; // ebx
     wchar_t v11; // ax
     int v12; // ecx
     int v13; // eax

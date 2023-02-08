@@ -390,7 +390,7 @@ stdSound_buffer_t* sithSound_InitFromPath(char *path)
     stdSound_buffer_t *dsoundBuf; // esi
     int bStereo; // [esp+Ch] [ebp-94h] BYREF
     int32_t bufferMaxSize; // [esp+10h] [ebp-90h] BYREF
-    int nSamplesPerSec; // [esp+14h] [ebp-8Ch] BYREF
+    uint32_t nSamplesPerSec; // [esp+14h] [ebp-8Ch] BYREF
     int seekOffs; // [esp+18h] [ebp-88h] BYREF
     int bitsPerSample; // [esp+1Ch] [ebp-84h] BYREF
     char tmp[128]; // [esp+20h] [ebp-80h] BYREF

@@ -8,7 +8,6 @@
 #include "Engine/sithIntersect.h"
 #include "World/sithWorld.h"
 #include "World/jkPlayer.h"
-#include "Engine/sithAdjoin.h"
 #include "World/sithSurface.h"
 #include "World/sithSoundClass.h"
 #include "Gameplay/sithTime.h"

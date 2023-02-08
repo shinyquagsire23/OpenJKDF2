@@ -179,7 +179,7 @@ void jkGuiPlayer_ShowNewPlayer(int a1)
     wchar_t *v5; // eax
     int v6; // esi
     int v7; // edi
-    char *v8; // eax
+    const wchar_t *v8; // eax
     wchar_t *v9; // eax
     wchar_t *v10; // eax
     jkGuiStringEntry *v11; // eax
@@ -302,20 +302,20 @@ void jkGuiPlayer_ShowNewPlayer(int a1)
                         if ( !util_FileExists(v21) )
                             continue;
                         v6 = 1;
-                        v8 = (char *)jkStrings_GetText("ERR_PLAYER_ALREADY_EXISTS");
+                        v8 = jkStrings_GetText("ERR_PLAYER_ALREADY_EXISTS");
                     }
                     else
                     {
                         v6 = 1;
-                        v8 = (char *)jkStrings_GetText("ERR_BAD_PLAYER_NAME");
+                        v8 = jkStrings_GetText("ERR_BAD_PLAYER_NAME");
                     }
                 }
                 else
                 {
                     v6 = 1;
-                    v8 = (char *)jkStrings_GetText("ERR_NO_PLAYER_NAME");
+                    v8 = jkStrings_GetText("ERR_NO_PLAYER_NAME");
                 }
-                jkGuiPlayer_menuNewElements[8].unistr = v8;
+                jkGuiPlayer_menuNewElements[8].wstr = v8;
             }
         }
         while ( v6 );

@@ -20,7 +20,6 @@
 #include "Engine/sithRender.h"
 #include "Engine/sithCamera.h"
 #include "Devices/sithSound.h"
-#include "Engine/sithNet.h"
 #include "Dss/sithGamesave.h"
 #include "Gameplay/sithEvent.h"
 #include "Engine/sithPhysics.h"
@@ -1015,7 +1014,7 @@ void sithCogFunction_SetActionCog(sithCog *ctx)
 {
     sithCog_actionCogIdk = sithCogExec_PopInt(ctx);
     sithCog* pCog = sithCogExec_PopCog(ctx);
-    sithCog_pActionCog = (pCog == -1) ? NULL : pCog;
+    sithCog_pActionCog = (pCog == (void*)-1) ? NULL : pCog;
 }
 
 void sithCogFunction_NewColorEffect(sithCog *ctx)
@@ -1775,8 +1774,8 @@ void sithCogFunction_SendMessageExRadius(sithCog *ctx)
             {
                 sithCog_SendMessageFromThingEx(sender, NULL, message, param0, param1, local_8, local_4);
             }
-            iVar5_idx = iVar5_idx--;
-            local_28 = local_28 + -1;
+            iVar5_idx--;
+            local_28--;
         } while (local_28 != 0);
     }
 }

@@ -148,7 +148,7 @@ static void FatalError( const char *fmt, ... )
     char text[ 2048 ];
     va_list ap;
     va_start( ap, fmt );
-    vsprintf( text, fmt, ap );
+    vsnprintf( text, sizeof(text), fmt, ap );
     va_end(ap);
     char *nl = strchr( text, '\0' ) - 1;
     if ( nl >= text && *nl == '\n' )
@@ -161,7 +161,7 @@ static void Printf( const char *fmt, ... )
     char text[ 2048 ];
     va_list ap;
     va_start( ap, fmt );
-    vsprintf( text, fmt, ap );
+    vsnprintf( text, sizeof(text), fmt, ap );
     va_end(ap);
     char *nl = strchr( text, '\0' ) - 1;
     if ( nl >= text && *nl == '\n' )
@@ -538,14 +538,14 @@ private:
                     if ( pInfo->m_info.m_eState == k_ESteamNetworkingConnectionState_ProblemDetectedLocally )
                     {
                         pszDebugLogAction = "problem detected locally";
-                        sprintf( temp, "Problem detected with client %x (%s)", itClient->second.m_id, pInfo->m_info.m_szEndDebug );
+                        snprintf( temp, sizeof(temp), "Problem detected with client %x (%s)", itClient->second.m_id, pInfo->m_info.m_szEndDebug );
                     }
                     else
                     {
                         // Note that here we could check the reason code to see if
                         // it was a "usual" connection or an "unusual" one.
                         pszDebugLogAction = "closed by peer";
-                        sprintf( temp, "Client id %x has left.", itClient->second.m_id );
+                        snprintf( temp, sizeof(temp), "Client id %x has left.", itClient->second.m_id );
                     }
 
                     // Spew something to our own log.  Note that because we put their nick
@@ -1355,7 +1355,7 @@ static int stdComm_EnumThread(void *ptr)
         int r = getaddrinfo( sAddress.c_str(), sService.c_str(), nullptr, &pAddrInfo );
         if ( r != 0 || pAddrInfo == nullptr )
         {
-            //sprintf( errMsg, "Invalid/unknown server address.  getaddrinfo returned %d", r );
+            //snprintf( errMsg, sizeof(errMsg), "Invalid/unknown server address.  getaddrinfo returned %d", r );
             //return nullptr;
 
         }

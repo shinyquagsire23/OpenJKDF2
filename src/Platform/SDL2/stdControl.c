@@ -350,7 +350,7 @@ void stdControl_InitSdlJoysticks()
 
 int stdControl_Startup()
 {
-    UINT v0; // ebp
+    //UINT v0; // ebp
     //int v2; // ebx
     UINT v4; // eax
     int v5; // ecx
@@ -368,7 +368,7 @@ int stdControl_Startup()
     struct tagJOYCAPSA pjc; // [esp+60h] [ebp-194h] BYREF
 #endif
 
-    v0 = 0;
+    //v0 = 0;
     _memset(stdControl_aInput1, 0, sizeof(int) * JK_NUM_KEYS);
     _memset(stdControl_aKeyInfo, 0, sizeof(int) * JK_NUM_KEYS);
     _memset(stdControl_aJoysticks, 0, sizeof(stdControlJoystickEntry) * JK_NUM_AXES);

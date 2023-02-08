@@ -4,7 +4,6 @@
 #include "types.h"
 #include "globals.h"
 #include "Engine/rdKeyframe.h"
-#include "Cog/sithCogScript.h"
 #include "World/sithThing.h"
 #include "Engine/rdMaterial.h"
 
@@ -47,81 +46,6 @@ extern int sithCogExec_009d39b0;
 extern sithCog* sithCogExec_pIdkMotsCtx;
 extern sithCog* sithCog_pActionCog;
 extern int sithCog_actionCogIdk;
-
-enum SENDERTYPE
-{
-    SENDERTYPE_0     = 0,
-    SENDERTYPE_SYSTEM  = 1,
-    SENDERTYPE_2     = 2,
-    SENDERTYPE_THING  = 3,
-    SENDERTYPE_4     = 4,
-    SENDERTYPE_SECTOR  = 5,
-    SENDERTYPE_SURFACE  = 6,
-    SENDERTYPE_7     = 7,
-    SENDERTYPE_8     = 8,
-    SENDERTYPE_COG   = 9
-};
-
-enum COG_TYPE
-{
-    COG_TYPE_VERB    = 0,
-    COG_TYPE_1       = 1,
-    COG_TYPE_FLEX  = 2,
-    COG_TYPE_INT  = 3,
-    COG_TYPE_TEMPLATE = 4,
-    COG_TYPE_KEYFRAME = 7,
-    COG_TYPE_SOUND = 8,
-    COG_TYPE_MATERIAL = 10,
-    COG_TYPE_VECTOR = 11,
-    COG_TYPE_MODEL = 12,
-    COG_TYPE_AICLASS = 13,
-};
-
-enum COG_VARTYPE
-{
-    COG_VARTYPE_VERB  = 0,
-    COG_VARTYPE_SYMBOL  = 1,
-    COG_VARTYPE_FLEX  = 2,
-    COG_VARTYPE_INT  = 3,
-    COG_VARTYPE_STR  = 4,
-    COG_VARTYPE_VECTOR  = 5
-};
-
-enum COG_OPCODE
-{
-    COG_OPCODE_NOP   = 0,
-    COG_OPCODE_PUSHINT  = 1,
-    COG_OPCODE_PUSHFLOAT  = 2,
-    COG_OPCODE_PUSHSYMBOL  = 3,
-    COG_OPCODE_ARRAYINDEX  = 4,
-    COG_OPCODE_CALLFUNC  = 5,
-    COG_OPCODE_ASSIGN  = 6,
-    COG_OPCODE_PUSHVECTOR  = 7,
-    COG_OPCODE_ADD   = 8,
-    COG_OPCODE_SUB   = 9,
-    COG_OPCODE_MUL   = 10,
-    COG_OPCODE_DIV   = 11,
-    COG_OPCODE_MOD   = 12,
-    COG_OPCODE_CMPFALSE  = 13,
-    COG_OPCODE_NEG   = 14,
-    COG_OPCODE_CMPGT  = 15,
-    COG_OPCODE_CMPLS  = 16,
-    COG_OPCODE_CMPEQ  = 17,
-    COG_OPCODE_CMPLE  = 18,
-    COG_OPCODE_CMPGE  = 19,
-    COG_OPCODE_CMPAND  = 20,
-    COG_OPCODE_CMPOR  = 21,
-    COG_OPCODE_CMPNE  = 22,
-    COG_OPCODE_ANDI  = 23,
-    COG_OPCODE_ORI   = 24,
-    COG_OPCODE_XORI  = 25,
-    COG_OPCODE_GOFALSE  = 26,
-    COG_OPCODE_GOTRUE  = 27,
-    COG_OPCODE_GO    = 28,
-    COG_OPCODE_RET   = 29,
-    COG_OPCODE_UNK30  = 30,
-    COG_OPCODE_CALL  = 31
-};
 
 void sithCogExec_Exec(sithCog *cog_ctx);
 void sithCogExec_ExecCog(sithCog *ctx, int trigIdx);

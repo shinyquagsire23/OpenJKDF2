@@ -1,6 +1,8 @@
 #ifndef _OPENJKDF2_ENGINE_CONFIG_H
 #define _OPENJKDF2_ENGINE_CONFIG_H
 
+#include "types_enums.h"
+
 // If I ever do demo recording, add it here
 #define NEEDS_STEPPED_PHYS (!jkPlayer_bJankyPhysics || sithNet_isMulti)
 
@@ -120,11 +122,20 @@
 #define SITHINVENTORY_NUM_POWERKEYBINDS (20+1)
 #endif
 
+#define SITHBIN_NUMBINS (200)
+
 // Droidworks cameras
 #ifdef DW_CAMERA
 #define SITHCAMERA_NUMCAMERAS (8)
 #else
 #define SITHCAMERA_NUMCAMERAS (7)
+#endif
+
+
+#ifdef SDL2_RENDER
+#define JOYSTICK_MAX_STRS (6)
+#else
+#define JOYSTICK_MAX_STRS (3)
 #endif
 
 //

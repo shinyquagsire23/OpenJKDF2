@@ -27,6 +27,6 @@ void sithComm_SetNeedsSync();
 int sithComm_InvokeMsgByIdx(sithCogMsg *a1);
 void sithComm_SyncWithPlayers();
 void sithComm_ClearMsgTmpBuf();
-int sithComm_cogMsg_Reset();
+int sithComm_cogMsg_Reset(sithCogMsg *msg);
 
 #endif // _DEVICES_SITHCOMM_H

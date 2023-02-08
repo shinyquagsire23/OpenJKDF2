@@ -68,8 +68,8 @@ int sithWeapon_GetCurWeaponMode();
 void sithWeapon_SyncPuppet(sithThing *player);
 int sithWeapon_WriteConf();
 int sithWeapon_ReadConf();
-void sithWeapon_Syncunused1();
-void sithWeapon_Syncunused2();
+void sithWeapon_Syncunused1(sithThing* player);
+void sithWeapon_Syncunused2(sithThing* player);
 void sithWeapon_SetFireRate(sithThing *weapon, float fireRate);
 
 

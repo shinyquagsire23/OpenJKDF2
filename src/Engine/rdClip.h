@@ -3,8 +3,6 @@
 
 #include "types.h"
 #include "globals.h"
-#include "rdCanvas.h"
-#include "Primitives/rdVector.h"
 
 #define rdClip_Line2_ADDR (0x0046D6F0)
 #define rdClip_CalcOutcode2_ADDR (0x0046DA10)
@@ -23,14 +21,6 @@
 #define rdClip_Face3GT_ADDR (0x00473880)
 #define rdClip_Face3GTOrtho_ADDR (0x004748D0)
 #define rdClip_SphereInFrustrum_ADDR (0x004756E0)
-
-enum CLIP_OUTCODE
-{
-    CLIP_LEFT = 0x1,
-    CLIP_RIGHT = 0x10,
-    CLIP_BOTTOM = 0x100,
-    CLIP_TOP = 0x1000
-};
 
 int rdClip_Line2(rdCanvas *canvas, signed int *pX1, signed int *pY1, signed int *pX2, signed int *pY2);
 int rdClip_CalcOutcode2(rdCanvas *canvas, int x, int y);

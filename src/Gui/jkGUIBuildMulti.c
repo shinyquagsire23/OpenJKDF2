@@ -404,16 +404,12 @@ int jkGuiBuildMulti_ShowEditCharacter(int bIdk)
     char tmp2[32]; // [esp+4Ch] [ebp-140h] BYREF
     char tmp3[32]; // [esp+6Ch] [ebp-120h] BYREF
     char v28[32]; // [esp+8Ch] [ebp-100h] BYREF
-    int16_t v30; // [esp+A9h] [ebp-E3h]
-    char v31; // [esp+ABh] [ebp-E1h]
     char v32[32]; // [esp+ACh] [ebp-E0h] BYREF
     char v33[32]; // [esp+CCh] [ebp-C0h] BYREF
     char v34[32]; // [esp+ECh] [ebp-A0h] BYREF
     char FileName[128]; // [esp+10Ch] [ebp-80h] BYREF
 
     memset(v28, 0, sizeof(v28));
-    v30 = 0;
-    v31 = 0;
     jkGui_SetModeMenu(jkGui_stdBitmaps[11]->palette);
     v1 = jkPlayer_GetJediRank();
     stdString_snprintf(v24, 32, "RANK_%d_L", v1);
@@ -1412,7 +1408,6 @@ int jkGuiBuildMulti_ShowLoad(jkPlayerMpcInfo *pPlayerMpcInfo, char *pStrEpisode,
     int v22; // [esp+10h] [ebp-40Ch]
     Darray darr; // [esp+14h] [ebp-408h] BYREF
     wchar_t name[32]; // [esp+2Ch] [ebp-3F0h] BYREF
-    __int16 v26; // [esp+6Ah] [ebp-3B2h]
     char tmp5[32]; // [esp+6Ch] [ebp-3B0h] BYREF
     stdStrTable strtable; // [esp+8Ch] [ebp-390h] BYREF
     char tmp1[128]; // [esp+9Ch] [ebp-380h] BYREF
@@ -1461,7 +1456,7 @@ int jkGuiBuildMulti_ShowLoad(jkPlayerMpcInfo *pPlayerMpcInfo, char *pStrEpisode,
     jkGuiBuildMulti_menuLoadCharacter_buttons[0].unistr = 0;
     v5 = jkStrings_GetText("GUI_S_MULTIPLAYER_CHARACTERS");
     jk_snwprintf(&jkGuiBuildMulti_wTmp[64], 0x40u, v5, jkPlayer_playerShortName);
-    jkGuiBuildMulti_menuLoadCharacter_buttons[2].wstr = (char *)&jkGuiBuildMulti_wTmp[64];
+    jkGuiBuildMulti_menuLoadCharacter_buttons[2].wstr = &jkGuiBuildMulti_wTmp[64];
     jkEpisode_LoadVerify();
     v6 = -1;
     v7 = 0;
@@ -1488,7 +1483,7 @@ LABEL_7:
     jkRes_LoadGob(pStrEpisode);
     stdStrTable_Load(&strtable, "misc\\cogStrings.uni");
     v9 = rank;
-    jkGuiBuildMulti_menuLoadCharacter_buttons[7].unistr = (char *)jkGuiTitle_quicksave_related_func1(&strtable, pJklFname);
+    jkGuiBuildMulti_menuLoadCharacter_buttons[7].wstr = jkGuiTitle_quicksave_related_func1(&strtable, pJklFname);
     stdString_snprintf(tmp5, 32, "RANK_%d_L", rank);
     v21 = jkStrings_GetText(tmp5);
     v10 = jkStrings_GetText("GUI_RANK");
@@ -1520,7 +1515,6 @@ LABEL_7:
                 v20 = jkGuiRend_GetStringEntry(&darr, jkGuiBuildMulti_menuLoadCharacter_buttons[3].selectedTextEntry);
                 _wcsncpy(name, v20->str, 0x1Fu);
                 v14 = 0;
-                v26 = 0;
                 if ( jkPlayer_VerifyWcharName(name) )
                 {
                     jkPlayer_MPCParse(pPlayerMpcInfo, &jkPlayer_playerInfos[playerThingIdx], jkPlayer_playerShortName, name, 1);
@@ -1539,7 +1533,6 @@ LABEL_18:
             case 101:
                 v16 = jkGuiRend_GetStringEntry(&darr, jkGuiBuildMulti_menuLoadCharacter_buttons[3].selectedTextEntry);
                 _wcsncpy(name, v16->str, 0x1Fu);
-                v26 = 0;
                 v14 = 1;
                 if ( jkPlayer_VerifyWcharName(name) )
                 {
@@ -1550,7 +1543,7 @@ LABEL_18:
                         name,
                         1);
                     jkGuiBuildMulti_ShowEditCharacter(0);
-                    jkPlayer_MPCWrite(&jkPlayer_playerInfos[playerThingIdx], jkPlayer_playerShortName, &name);
+                    jkPlayer_MPCWrite(&jkPlayer_playerInfos[playerThingIdx], jkPlayer_playerShortName, name);
                     v11 = jkGuiBuildMulti_menuLoadCharacter_buttons[3].selectedTextEntry;
                 }
                 else

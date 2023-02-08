@@ -240,7 +240,7 @@ int stdDisplay_SetMasterPalette(uint8_t* pal)
     return 1;
 }
 
-stdVBuffer* stdDisplay_VBufferNew(stdVBufferTexFmt *fmt, int create_ddraw_surface, int gpu_mem, void* palette)
+stdVBuffer* stdDisplay_VBufferNew(stdVBufferTexFmt *fmt, int create_ddraw_surface, int gpu_mem, const void* palette)
 {
     stdVBuffer* out = std_pHS->alloc(sizeof(stdVBuffer));
     

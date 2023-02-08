@@ -9,10 +9,6 @@
 #define jkGuiSingleTally_Shutdown_ADDR (0x00417FF0)
 #define jkGuiSingleTally_ForceStarsRender_ADDR (0x00418000)
 
-typedef struct jkGuiElement jkGuiElement;
-typedef struct jkGuiMenu jkGuiMenu;
-typedef struct stdVBuffer stdVBuffer;
-
 int jkGuiSingleTally_Show();
 void jkGuiSingleTally_Startup();
 void jkGuiSingleTally_Shutdown();

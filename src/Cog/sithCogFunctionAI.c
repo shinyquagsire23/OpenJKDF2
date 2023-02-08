@@ -591,7 +591,6 @@ void sithCogFunctionAI_AIAddAlignmentPriority(sithCog *ctx)
 {
     int iVar1;
     int *piVar3;
-    int iVar4;
     int val;
     int iVar5;
     float fVar6;
@@ -602,7 +601,6 @@ void sithCogFunctionAI_AIAddAlignmentPriority(sithCog *ctx)
     val = -1;
     iVar1 = sithCogExec_PopInt(ctx);
     fVar6 = sithCogExec_PopFlex(ctx);
-    iVar4 = 0;
 
     for (int i = 0; i < 10; i++) {
         if (sithAI_aAlignments[i].bValid == 0) {

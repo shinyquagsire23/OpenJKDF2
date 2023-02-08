@@ -70,7 +70,7 @@ static int (*stdDisplay_FindClosestMode)(render_pair *a1, struct stdVideoMode *r
 static int (*stdDisplay_FindClosestDevice)(stdDeviceParams *a1) = (void*)stdDisplay_FindClosestDevice_ADDR;
 static void (*stdDisplay_Close)() = (void*)stdDisplay_Close_ADDR;
 static int (*stdDisplay_Open)(unsigned int index) = (void*)stdDisplay_Open_ADDR;
-static stdVBuffer* (__cdecl *stdDisplay_VBufferNew)(stdVBufferTexFmt *a1, int create_ddraw_surface, int gpu_mem, void* palette) = (void*)stdDisplay_VBufferNew_ADDR;
+static stdVBuffer* (__cdecl *stdDisplay_VBufferNew)(stdVBufferTexFmt *a1, int create_ddraw_surface, int gpu_mem, const void* palette) = (void*)stdDisplay_VBufferNew_ADDR;
 static int (__cdecl *stdDisplay_VBufferLock)(stdVBuffer *a1) = (void*)stdDisplay_VBufferLock_ADDR;
 static void (__cdecl *stdDisplay_VBufferUnlock)(stdVBuffer *a1) = (void*)stdDisplay_VBufferUnlock_ADDR;
 static int (__cdecl *stdDisplay_VBufferSetColorKey)(stdVBuffer *a1, int color) = (void*)stdDisplay_VBufferSetColorKey_ADDR;
@@ -95,7 +95,7 @@ int stdDisplay_FindClosestMode(render_pair *a1, struct stdVideoMode *render_surf
 int stdDisplay_FindClosestDevice(void* a);
 int stdDisplay_Open(int a); // MOTS altered (added a video mode)
 void stdDisplay_Close();
-stdVBuffer* stdDisplay_VBufferNew(stdVBufferTexFmt *a1, int create_ddraw_surface, int gpu_mem, void* palette);
+stdVBuffer* stdDisplay_VBufferNew(stdVBufferTexFmt *a1, int create_ddraw_surface, int gpu_mem, const void* palette);
 int stdDisplay_VBufferLock(stdVBuffer *a1);
 void stdDisplay_VBufferUnlock(stdVBuffer *a1);
 int stdDisplay_VBufferSetColorKey(stdVBuffer *vbuf, int color);

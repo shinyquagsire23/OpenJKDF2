@@ -16,13 +16,6 @@
 #define jkGui_sub_412EC0_ADDR (0x00412EC0)
 #define jkGui_sub_412ED0_ADDR (0x00412ED0)
 
-enum jkGUIButtonID_t
-{
-    JKGUI_NEWGAME = 100,
-    JKGUI_LOAD = 101,
-    JKGUI_DEBUGPLAY = 102
-};
-
 typedef struct jkGuiMenu jkGuiMenu;
 typedef struct stdBitmap stdBitmap;
 typedef struct stdFont stdFont;

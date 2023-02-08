@@ -275,7 +275,7 @@ LABEL_25:
         sithRender_SetRenderWeaponHandle(jkPlayer_renderSaberWeaponMesh);
         Video_camera_related();
         stdPalEffects_RefreshPalette();
-        v7 = stdDisplay_GetPalette();
+        v7 = (char*)stdDisplay_GetPalette();
         sithRender_SetPalette(v7);
         jkHudInv_LoadItemRes();
         jkHud_Open();

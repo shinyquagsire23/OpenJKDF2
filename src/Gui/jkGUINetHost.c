@@ -278,7 +278,6 @@ void jkGuiNetHost_Shutdown()
     jkGuiNetHost_bInitted = 0;
 
     // Added: clean reset
-    jkGuiNetHost_bInitted;
     memset(jkGuiNetHost_wstrStarsText, 0, sizeof(jkGuiNetHost_wstrStarsText));
     memset(&jkGuiNetHost_dArray1, 0, sizeof(jkGuiNetHost_dArray1));
     memset(&jkGuiNetHost_dArray2, 0, sizeof(jkGuiNetHost_dArray2));

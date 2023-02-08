@@ -81,7 +81,7 @@ void jkGui_InitMenu(jkGuiMenu *menu, stdBitmap *bgBitmap)
 {
     if ( bgBitmap )
     {
-        menu->palette = (char *)bgBitmap->palette;
+        menu->palette = (uint8_t*)bgBitmap->palette;
         menu->texture = bgBitmap->mipSurfaces[0];
     }
     
@@ -90,10 +90,10 @@ void jkGui_InitMenu(jkGuiMenu *menu, stdBitmap *bgBitmap)
     {
 #ifdef QOL_IMPROVEMENTS
         if (iter->wHintTextAlloced) {
-            std_pHS->free(iter->wHintTextAlloced);
+            std_pHS->free((void*)iter->wHintTextAlloced);
         }
         if (iter->strAlloced) {
-            std_pHS->free(iter->strAlloced);
+            std_pHS->free((void*)iter->strAlloced);
         }
         iter->hintText = iter->origHintText;
         iter->str = iter->origStr;
@@ -117,7 +117,7 @@ void jkGui_InitMenu(jkGuiMenu *menu, stdBitmap *bgBitmap)
                 wchar_t* text = jkStrings_GetText2(iter->str);
                 if ( text ) {
                     iter->wstr = stdString_FastWCopy(text);
-                    iter->strAlloced = iter->wstr;
+                    iter->strAlloced = (const char*)iter->wstr;
                 }
             }
         }

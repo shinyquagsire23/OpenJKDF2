@@ -5,7 +5,6 @@
 #include "World/sithSector.h"
 #include "World/sithWeapon.h"
 #include "World/sithActor.h"
-#include "Engine/sithNet.h"
 #include "Dss/sithMulti.h"
 #include "Engine/sithCamera.h"
 #include "Dss/sithGamesave.h"

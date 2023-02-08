@@ -24,7 +24,6 @@
 #include "Engine/sithAnimClass.h"
 #include "World/sithModel.h"
 #include "World/sithSprite.h"
-#include "Engine/sithNet.h"
 #include "Main/sithMain.h"
 #include "Engine/sithCamera.h"
 #include "Engine/sithPhysics.h"
@@ -1373,7 +1372,7 @@ void sithThing_AttachThing(sithThing *parent, sithThing *child)
 
 int sithThing_DetachThing(sithThing* pThing)
 {
-    int *v2; // edi
+    uint32_t *v2; // edi
     sithThing *v3; // ebx
     double v12; // rt2
     sithThing *v13; // ecx

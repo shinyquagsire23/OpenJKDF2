@@ -12,7 +12,6 @@
 #include "World/sithSurface.h"
 #include "Gameplay/sithEvent.h"
 #include "Gameplay/sithTime.h"
-#include "Engine/sithNet.h"
 #include "Engine/sithAnimClass.h"
 #include "General/sithStrTable.h"
 #include "General/stdPalEffects.h"

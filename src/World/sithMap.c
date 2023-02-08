@@ -1,7 +1,6 @@
 #include "sithMap.h"
 
 #include "World/sithThing.h"
-#include "Engine/sithAdjoin.h"
 #include "Main/sithMain.h"
 #include "Engine/rdroid.h"
 #include "Dss/sithMulti.h"

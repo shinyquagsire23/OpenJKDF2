@@ -16,7 +16,6 @@
 #include "Gui/jkGUISetup.h"
 #include "Gui/jkGUIForce.h"
 #include "World/jkPlayer.h"
-#include "Engine/sithNet.h"
 #include "Main/jk.h"
 #include "Main/jkStrings.h"
 #include "Main/jkMain.h"

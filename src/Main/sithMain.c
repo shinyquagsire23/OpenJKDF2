@@ -33,7 +33,6 @@
 #include "Devices/sithControl.h"
 #include "Dss/sithMulti.h"
 #include "Dss/sithGamesave.h"
-#include "Engine/sithNet.h"
 #include "World/sithWeapon.h"
 #include "World/sithSector.h"
 #include "World/jkPlayer.h"

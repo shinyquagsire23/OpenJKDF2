@@ -27,48 +27,6 @@
 #define sithCollision_FallHurt_ADDR (0x004E9550)
 #define sithCollision_DebrisPlayerCollide_ADDR (0x004E95A0)
 
-// hitType
-enum SITHCOLLISION
-{
-    SITHCOLLISION_NONE = 0x0,
-    SITHCOLLISION_THING = 0x1,
-    SITHCOLLISION_WORLD = 0x2,
-    SITHCOLLISION_THINGADJOINCROSS = 0x4,
-    SITHCOLLISION_THINGCROSS = 0x8,
-    SITHCOLLISION_THINGTOUCH = 0x10,
-
-    SITHCOLLISION_ADJOINCROSS = 0x20,
-    SITHCOLLISION_ADJOINTOUCH = 0x40,
-};
-
-enum SithCollideType
-{
-    SITH_COLLIDE_NONE = 0x0,
-    SITH_COLLIDE_SPHERE = 0x1,
-    SITH_COLLIDE_2 = 0x2,
-    SITH_COLLIDE_FACE = 0x3,
-};
-
-enum SithRaycastType
-{
-    RAYCAST_1 = 0x1,
-    RAYCAST_2 = 0x2,
-    RAYCAST_4 = 0x4,
-    RAYCAST_8 = 0x8,
-    RAYCAST_10 = 0x10,
-    RAYCAST_20 = 0x20,
-    RAYCAST_40 = 0x40,
-    RAYCAST_80 = 0x80,
-    RAYCAST_100 = 0x100,
-    RAYCAST_200 = 0x200,
-    RAYCAST_400 = 0x400,
-    RAYCAST_800 = 0x800,
-    RAYCAST_1000 = 0x1000,
-    RAYCAST_2000 = 0x2000,
-    RAYCAST_4000 = 0x4000,
-    RAYCAST_8000 = 0x8000,
-};
-
 int sithCollision_Startup();
 int sithCollision_Shutdown();
 void sithCollision_RegisterCollisionHandler(int idxA, int idxB, void* func, void* a4);

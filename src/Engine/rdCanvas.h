@@ -1,21 +1,7 @@
 #ifndef _RDCANVAS_H
 #define _RDCANVAS_H
 
-#include "rdMaterial.h"
-
-typedef struct rdCanvas
-{
-    uint32_t bIdk;
-    stdVBuffer* vbuffer;
-    float screen_height_half;
-    float screen_width_half;
-    stdVBuffer* d3d_vbuf;
-    uint32_t field_14;
-    int xStart;
-    int yStart;
-    int widthMinusOne;
-    int heightMinusOne;
-} rdCanvas;
+#include "types.h"
 
 #define rdCanvas_New_ADDR (0x0043AC20)
 #define rdCanvas_NewEntry_ADDR (0x0043AC70)

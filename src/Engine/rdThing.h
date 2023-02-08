@@ -25,17 +25,6 @@
 #define rdThing_Draw_ADDR (0x0043E4E0)
 #define rdThing_AccumulateMatrices_ADDR (0x0043E560)
 
-enum RD_THINGTYPE
-{
-    RD_THINGTYPE_0   = 0,
-    RD_THINGTYPE_MODEL  = 1,
-    RD_THINGTYPE_CAMERA  = 2,
-    RD_THINGTYPE_LIGHT  = 3,
-    RD_THINGTYPE_SPRITE3  = 4,
-    RD_THINGTYPE_PARTICLECLOUD  = 5,
-    RD_THINGTYPE_POLYLINE  = 6
-};
-
 rdThing* rdThing_New(sithThing *parent);
 int rdThing_NewEntry(rdThing *thing, sithThing *parent);
 void rdThing_Free(rdThing *thing);

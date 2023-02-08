@@ -3,7 +3,6 @@
 #include "Gameplay/sithTime.h"
 #include "World/sithThing.h"
 #include "Cog/sithCog.h"
-#include "Engine/sithNet.h"
 #include "Engine/sithCollision.h"
 #include "World/jkPlayer.h"
 #include "World/sithSector.h"

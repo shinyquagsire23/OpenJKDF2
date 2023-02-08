@@ -12,33 +12,6 @@
 #define sithAIClass_Load_ADDR (0x004F14A0)
 #define sithAIClass_LoadEntry_ADDR (0x004F15C0)
 
-typedef struct sithAIClassEntry
-{
-  int param1;
-  int param2;
-  int param3;
-  float argsAsFloat[16];
-  int argsAsInt[16];
-  sithAICommandFunc_t func;
-} sithAIClassEntry;
-
-typedef struct sithAIClass
-{
-  int index;
-  int field_4;
-  float alignment;
-  float rank;
-  float maxStep;
-  float sightDist;
-  float hearDist;
-  float fov;
-  float wakeupDist;
-  float accuracy;
-  int numEntries;
-  sithAIClassEntry entries[16];
-  char fpath[32];
-} sithAIClass;
-
 int sithAIClass_Startup();
 void sithAIClass_Shutdown();
 int sithAIClass_New(sithWorld *world, int a2);

@@ -4,7 +4,6 @@
 #include "World/sithWorld.h"
 #include "World/sithSector.h"
 #include "World/sithSurface.h"
-#include "Engine/sithAdjoin.h"
 #include "Main/Main.h"
 
 

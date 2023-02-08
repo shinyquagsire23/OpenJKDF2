@@ -10,10 +10,8 @@
 #include "World/sithSector.h"
 #include "Engine/sithIntersect.h"
 #include "World/sithThing.h"
-#include "Engine/sithAdjoin.h"
 #include "World/sithMaterial.h"
 #include "Gameplay/sithTime.h"
-#include "Engine/sithNet.h"
 #include "Dss/sithDSS.h"
 #include "jk.h"
 

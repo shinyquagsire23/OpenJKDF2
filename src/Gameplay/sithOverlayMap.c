@@ -2,7 +2,6 @@
 
 #include "World/sithSurface.h"
 #include "World/sithSector.h"
-#include "Engine/sithAdjoin.h"
 #include "Engine/rdroid.h"
 #include "Dss/sithMulti.h"
 #include "Primitives/rdPrimit2.h"

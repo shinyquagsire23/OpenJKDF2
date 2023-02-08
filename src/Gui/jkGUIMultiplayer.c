@@ -769,7 +769,7 @@ int jkGuiMultiplayer_ShowWaitHostSettings()
     v2 = jkGui_stdBitmaps[2]->palette;
     g_submodeFlags |= 8u;
     jkGui_SetModeMenu(v2);
-    jkGuiMultiplayer_aElements4[1].wstr = (const char *)jkStrings_GetText("GUINET_WAITHOSTSETTINGS");
+    jkGuiMultiplayer_aElements4[1].wstr = jkStrings_GetText("GUINET_WAITHOSTSETTINGS");
     jkGuiMultiplayer_menu4.idkFunc = jkGuiMultiplayer_sub_4142C0;
     jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiMultiplayer_menu4, &jkGuiMultiplayer_aElements4[2]);
     v0 = jkGuiRend_DisplayAndReturnClicked(&jkGuiMultiplayer_menu4);

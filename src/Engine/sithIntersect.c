@@ -3,7 +3,6 @@
 #include <math.h>
 
 #include "General/stdMath.h"
-#include "Engine/sithAdjoin.h"
 #include "World/sithSurface.h"
 #include "Raster/rdFace.h"
 #include "World/sithSector.h"

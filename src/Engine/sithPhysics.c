@@ -3,7 +3,6 @@
 #include "General/stdMath.h"
 #include "Primitives/rdMath.h"
 #include "Engine/sithCollision.h"
-#include "Engine/sithAdjoin.h"
 #include "World/sithSurface.h"
 #include "World/sithThing.h"
 #include "World/sithSector.h"
@@ -549,7 +548,7 @@ void sithPhysics_ThingPhysPlayer(sithThing *player, float deltaSeconds)
     rdMatrix34 a;
     rdVector3 a3;
     rdVector3 a1a;
-    int bOverrideIdk = 0;
+    //int bOverrideIdk = 0; // Remove compiler warns
     float zOverride = 0.0;
 
     rdVector_Zero3(&player->physicsParams.addedVelocity);
@@ -610,7 +609,7 @@ void sithPhysics_ThingPhysPlayer(sithThing *player, float deltaSeconds)
             }
             tmp.y = (fVar3 / fVar6) * tmp.y;
         }
-        bOverrideIdk = 1;
+        //bOverrideIdk = 1; // Remove compiler warns
         rdVector_Copy3(&a3, &tmp);
     }
 #endif

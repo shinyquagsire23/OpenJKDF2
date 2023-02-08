@@ -57,7 +57,7 @@ stdBitmap* stdPcx_Load(char *fpath, int create_ddraw_surface, int gpu_mem)
     stdDisplay_VBufferLock(vbuf);
 
     mipSurface = bitmap->mipSurfaces[0];
-    lockAlloc = (uint8_t*)mipSurface->surface_lock_alloc;
+    lockAlloc = (char*)mipSurface->surface_lock_alloc;
     for (int i = 0; i < mipSurface->format.texture_size_in_bytes; i++ )
     {
         uint8_t v11 = stdFGetc(fhand);
@@ -133,7 +133,7 @@ int stdPcx_Write(char *fpath, stdBitmap *bitmap)
     lockAlloc = (uint8_t*)mipSurface->surface_lock_alloc;
     for (int i = 0; i < mipSurface->format.height; i++)
     {
-        for (int j = 0; j < mipSurface->format.width; j )
+        for (int j = 0; j < mipSurface->format.width; j++ )
         {
             uint8_t* v14 = &lockAlloc[(mipSurface->format.width * i) + j];
             uint8_t v13 = *v14;

@@ -5,7 +5,6 @@
 #include "Engine/rdroid.h"
 #include "Raster/rdCache.h"
 #include "Engine/sithRender.h"
-#include "Engine/sithNet.h"
 #include "World/sithWorld.h"
 #include "World/jkPlayer.h"
 #include "World/sithSector.h"

@@ -9,12 +9,10 @@
 #include "Gameplay/sithTime.h"
 #include "Engine/sithAnimClass.h"
 #include "Engine/sithPuppet.h"
-#include "Engine/sithNet.h"
 #include "Engine/sithPhysics.h"
 #include "Cog/sithCogExec.h"
 #include "Cog/sithCog.h"
 #include "Dss/sithDSSThing.h"
-#include "Engine/sithAdjoin.h"
 #include "World/sithWeapon.h"
 #include "jk.h"
 

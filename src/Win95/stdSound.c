@@ -148,7 +148,7 @@ void stdSound_SetMenuVolume(float a1)
     stdSound_fMenuVolume = a1;
 }
 
-stdSound_buffer_t* stdSound_BufferCreate(int bStereo, int nSamplesPerSec, uint16_t bitsPerSample, int bufferLen)
+stdSound_buffer_t* stdSound_BufferCreate(int bStereo, uint32_t nSamplesPerSec, uint16_t bitsPerSample, int bufferLen)
 {
     stdSound_buffer_t* out = std_pHS->alloc(sizeof(stdSound_buffer_t));
     if (!out)

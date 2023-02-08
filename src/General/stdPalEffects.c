@@ -2,7 +2,7 @@
 
 #include "jk.h"
 
-int stdPalEffects_Open(stdPalEffectSetPaletteFunc_t *a1)
+int stdPalEffects_Open(stdPalEffectSetPaletteFunc_t a1)
 {
     stdPalEffects_setPalette = a1;
     _memset(stdPalEffects_aEffects, 0, sizeof(stdPalEffects_aEffects));
@@ -280,7 +280,7 @@ LABEL_23:
     }
     if ( v1 )
     {
-        stdPalEffects_setPalette(stdPalEffects_palette);
+        stdPalEffects_setPalette((uint8_t*)stdPalEffects_palette);
 LABEL_71:
         v7 = stdPalEffects_state.effect.add.z;
         v9 = stdPalEffects_state.effect.add.y;
@@ -289,7 +289,7 @@ LABEL_71:
     }
     if ( v18 )
     {
-        stdPalEffects_setPalette(palette);
+        stdPalEffects_setPalette((uint8_t*)palette);
         goto LABEL_71;
     }
 LABEL_72:
@@ -444,7 +444,7 @@ void stdPalEffects_ApplyTint(rdColor24 *aPalette, float tintR, float tintG, floa
     v9 = v8;
     v10 = v4;
     v11 = tintR - (v7 + aPaletteb);
-    v12 = &aPalette->b;
+    v12 = (char*)&aPalette->b;
     v13 = 256;
     v14 = tintB - (v10 + aPaletteb);
     v15 = tintG - v9;

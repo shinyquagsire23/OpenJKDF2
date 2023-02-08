@@ -75,67 +75,6 @@
 #define jkGuiRend_TextButtonEventHandler_ADDR (0x00512370)
 #define jkGuiRend_TextButtonDraw_ADDR (0x005123C0)
 
-typedef struct stdFont stdFont;
-typedef struct jkGuiStringEntry jkGuiStringEntry;
-typedef struct jkGuiElement jkGuiElement;
-typedef struct jkGuiMenu jkGuiMenu;
-typedef struct jkGuiTexInfo jkGuiTexInfo;
-typedef struct stdBitmap stdBitmap;
-typedef struct stdVBuffer stdVBuffer;
-typedef struct Darray Darray;
-
-enum jkGuiElementType_t
-{
-    ELEMENT_TEXTBUTTON = 0,
-    ELEMENT_PICBUTTON = 1,
-    ELEMENT_TEXT = 2,
-    ELEMENT_CHECKBOX = 3,
-    ELEMENT_LISTBOX = 4,
-    ELEMENT_TEXTBOX = 5,
-    ELEMENT_SLIDER = 6,
-    ELEMENT_CUSTOM = 7,
-    ELEMENT_8 = 8,
-    ELEMENT_END = 9,
-};
-
-enum jkGuiEventType_t
-{
-    JKGUI_EVENT_INIT = 0,
-    JKGUI_EVENT_MOUSEDOWN = 1,
-    JKGUI_EVENT_2 = 2,
-    JKGUI_EVENT_MOUSEMOVED = 3,
-    JKGUI_EVENT_KEYDOWN = 4,
-    JKGUI_EVENT_CHAR = 5,
-};
-
-//#define jkGuiRend_palette ((uint8_t*)0x855EC8)
-//#define jkGuiRend_idk2 (*(int*)0x8561C8)
-//#define jkGuiRend_idk (*(int*)0x8561CC)
-//#define jkGuiRend_activeMenu (*(jkGuiMenu**)0x8561E0)
-//#define jkGuiRend_menuBuffer (*(stdVBuffer**)0x8561E4)
-//#define jkGuiRend_texture_dword_8561E8 (*(stdVBuffer**)0x8561E8)
-
-//#define jkGuiRend_thing_five (*(int*)0x8561EC)
-//#define jkGuiRend_thing_four (*(int*)0x8561F0)
-//#define jkGuiRend_bIsSurfaceValid (*(int*)0x8561F4)
-//#define jkGuiRend_bInitted (*(int*)0x008561F8)
-//#define jkGuiRend_bOpen (*(int*)0x008561FC)
-//#define jkGuiRend_HandlerIsSet (*(int*)0x00856200)
-//#define jkGuiRend_fillColor (*(int*)0x00856204)
-//#define jkGuiRend_paletteChecksum (*(int*)0x00856208)
-//#define jkGuiRend_dword_85620C (*(int*)0x0085620C)
-//#define jkGuiRend_lastKeyScancode (*(int*)0x00856210)
-//#define jkGuiRend_mouseX (*(int*)0x00856214)
-//#define jkGuiRend_mouseY (*(int*)0x00856218)
-//#define jkGuiRend_bShiftDown (*(int*)0x0085621C)
-//#define jkGuiRend_mouseXLatest (*(int*)0x00856220)
-//#define jkGuiRend_mouseYLatest (*(int*)0x00856224)
-//#define jkGuiRend_mouseLatestMs (*(int*)0x00856228)
-//#define jkGuiRend_hCursor (*(HCURSOR*)0x0085622C)
-
-//#define jkGuiRend_CursorVisible (*(int*)0x54F6BC)
-//#define jkGuiRend_elementHandlers ((jkGuiElementHandlers*)0x54F6D0)
-
 extern int jkGuiRend_thing_five;
 extern int jkGuiRend_thing_four;
 

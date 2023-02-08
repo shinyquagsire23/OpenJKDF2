@@ -10,7 +10,6 @@
 #include "Engine/sithCollision.h"
 #include "Engine/sithCamera.h"
 #include "Engine/rdThing.h"
-#include "Engine/sithNet.h"
 #include "World/sithSurface.h"
 #include "Engine/sithPuppet.h"
 #include "Gameplay/sithTime.h"
@@ -2211,7 +2210,7 @@ void sithCogFunctionThing_TakeItem(sithCog *ctx)
 {
     sithThing* player = sithCogExec_PopThing(ctx);
     sithThing* itemThing = sithCogExec_PopThing(ctx);
-    if ( itemThing && (Main_bMotsCompat ? 1 : player) && itemThing->type == SITH_THING_ITEM )
+    if ( itemThing && (Main_bMotsCompat || player) && itemThing->type == SITH_THING_ITEM )
         sithItem_Take(itemThing, player, 0);
 }
 

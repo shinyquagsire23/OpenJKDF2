@@ -243,7 +243,7 @@ void jkGuiMods_Show()
     v7 = 0;
     for ( i = (jkGuiModsElement_t *)jkGuiRend_GetId(&darray, 0); i; i = (jkGuiModsElement_t *)jkGuiRend_GetId(&darray, v7) )
     {
-        pHS->free(i->paPath);
+        pHS->free((void*)i->paPath);
         pHS->free(i);
         ++v7;
     }

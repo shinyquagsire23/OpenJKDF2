@@ -11,7 +11,6 @@
 #include "Engine/sithKeyFrame.h"
 #include "Dss/sithMulti.h"
 #include "Gameplay/sithEvent.h"
-#include "Engine/sithAdjoin.h"
 #include "Devices/sithComm.h"
 #include "World/jkPlayer.h"
 

@@ -3,7 +3,6 @@
 #include "Cog/sithCog.h"
 #include "jk.h"
 #include "stdPlatform.h"
-#include "Cog/sithCogScript.h"
 #include "World/sithWorld.h"
 #include "World/sithThing.h"
 #include "World/sithSector.h"
@@ -15,7 +14,6 @@
 #include "Gameplay/sithTime.h"
 #include "Win95/stdComm.h"
 #include "Main/jkGame.h"
-#include "Engine/sithNet.h"
 #include "Dss/sithMulti.h"
 #include "AI/sithAIClass.h"
 

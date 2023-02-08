@@ -75,7 +75,7 @@ int Darray_sub_520CB0(Darray *a1, int (__cdecl *a2)(int, int), int a3)
     v3 = 0;
     if (a1->total <= 0)
         return -1;
-    while ( a2(a3, (int)Darray_GetIndex(a1, v3)) )
+    while ( a2(a3, (int)(intptr_t)Darray_GetIndex(a1, v3)) )
     {
         if ( ++v3 >= a1->total )
             return -1;

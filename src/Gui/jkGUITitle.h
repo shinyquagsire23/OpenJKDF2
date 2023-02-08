@@ -14,11 +14,6 @@
 #define jkGuiTitle_ShowLoading_ADDR (0x00418D80)
 #define jkGuiTitle_LoadingFinalize_ADDR (0x00418EB0)
 
-typedef struct jkGuiElement jkGuiElement;
-typedef struct jkGuiMenu jkGuiMenu;
-typedef struct stdVBuffer stdVBuffer;
-typedef struct stdStrTable stdStrTable;
-
 void jkGuiTitle_Startup();
 void jkGuiTitle_Shutdown();
 char jkGuiTitle_sub_4189A0(char *a1);

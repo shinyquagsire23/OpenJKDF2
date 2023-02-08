@@ -2,7 +2,6 @@
 
 #include "AI/sithAI.h"
 #include "Gameplay/sithEvent.h"
-#include "Engine/sithAdjoin.h"
 #include "World/sithWorld.h"
 #include "World/sithSector.h"
 #include "World/sithThing.h"

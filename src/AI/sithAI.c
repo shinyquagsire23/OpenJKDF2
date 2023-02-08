@@ -15,7 +15,6 @@
 #include "Gameplay/sithTime.h"
 #include "World/sithSoundClass.h"
 #include "Engine/sithPuppet.h"
-#include "Engine/sithAdjoin.h"
 #include "Engine/sithAnimClass.h"
 #include "Engine/sithRender.h"
 #include "Engine/sithPhysics.h"
@@ -1660,8 +1659,7 @@ void sithAI_GetThingsInCone(sithSector *a1, rdMatrix34 *a2, float a3)
         sithAI_dword_84DE6C = 100;
     }
 
-    int iterIdx = sithWorld_pCurrentWorld->numThings;
-    for (iterIdx; iterIdx >= 0; iterIdx--)
+    for (int iterIdx = sithWorld_pCurrentWorld->numThings; iterIdx >= 0; iterIdx--)
     {
         v4 = &sithWorld_pCurrentWorld->things[iterIdx];
         if ( sithAI_dword_84DE60 >= (unsigned int)sithAI_dword_84DE6C )

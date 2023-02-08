@@ -44,76 +44,6 @@ extern "C" {
 #define sithMulti_GetSpawnIdx_ADDR (0x004CBFC0)
 #define sithMulti_FreeThing_ADDR (0x004CC110)
 
-enum DSS_ID
-{
-    DSS_THINGPOS  = 1,
-    DSS_CHAT      = 2,
-    DSS_SECTORFLAGS  = 3,
-    DSS_FIREPROJECTILE  = 4,
-    DSS_DEATH     = 5,
-    DSS_DAMAGE    = 6,
-    DSS_SETTHINGMODEL  = 7,
-    DSS_SENDTRIGGER  = 8,
-    DSS_PLAYKEY   = 9,
-    DSS_PLAYSOUND  = 10,
-    DSS_SYNCTHING  = 11,
-    DSS_THINGFULLDESC  = 12,
-    DSS_SYNCCOG   = 13,
-    DSS_SURFACESTATUS  = 14,
-    DSS_AISTATUS    = 15,
-    DSS_INVENTORY  = 16,
-    DSS_SURFACE  = 17,
-    DSS_SECTORSTATUS  = 18,
-    DSS_PLAYKEYMODE  = 19,
-    DSS_PATHMOVE  = 20,
-    DSS_SYNCPUPPET  = 21,
-    DSS_SYNCTHINGATTACHMENT  = 22,
-    DSS_SYNCEVENTS  = 23,
-    DSS_SYNCCAMERAS  = 24,
-    DSS_TAKEITEM1  = 25,
-    DSS_TAKEITEM2  = 26,
-    DSS_STOPKEY   = 27,
-    DSS_STOPSOUND  = 28,
-    DSS_CREATETHING  = 29,
-    DSS_SYNCPALEFFECTS  = 30,
-    DSS_ID_1F     = 31,
-    DSS_LEAVEJOIN  = 32,
-    DSS_WELCOME  = 33,
-    DSS_JOINREQUEST  = 34,
-    DSS_DESTROYTHING  = 35,
-    DSS_JOINING   = 36,
-    DSS_PLAYSOUNDMODE  = 37,
-    DSS_PING      = 38,
-    DSS_PINGREPLY  = 39,
-    DSS_RESET     = 40,
-    DSS_ENUMPLAYERS  = 41,
-    DSS_QUIT      = 42,
-    DSS_ID_2B     = 43,
-    DSS_MOTS_NEW_1     = 44,
-    DSS_MOTS_NEW_2     = 45,
-    DSS_ID_2E     = 46,
-    DSS_ID_2F     = 47,
-    DSS_JKENABLESABER  = 48,
-    DSS_SABERINFO3  = 49,
-    DSS_ID_32     = 50,
-    DSS_ID_33     = 51,
-    DSS_ID_34     = 52,
-    DSS_HUDTARGET  = 53,
-    DSS_ID_36     = 54,
-    DSS_JKPRINTUNISTRING  = 55,
-    DSS_ENDLEVEL  = 56,
-    DSS_SABERINFO1  = 57,
-    DSS_SABERINFO2  = 58,
-    DSS_JKSETWEAPONMESH  = 59,
-    DSS_SETTEAM   = 60,
-    DSS_61        = 61,
-    DSS_62        = 62,
-    DSS_63        = 63,
-    DSS_64        = 64,
-    DSS_MAX        = 66
-};
-
-
 #define NETMSG_START intptr_t craftingPacket = (intptr_t)&sithComm_netMsgTmp.pktData[0];
 #define NETMSG_START_2 intptr_t craftingPacket = (intptr_t)&stdComm_cogMsgTmp.pktData[0];
 #define NETMSG_PUSHU8(x) {*(uint8_t*)craftingPacket = (uint8_t)(x); craftingPacket += sizeof(uint8_t);};
@@ -160,48 +90,6 @@ rdVector3 _readingOutV3; rdVector3i _readingOutV3i; rdMatrix34 _readingOutM34;
 #define NETMSG_POPSTR(x,l) { _strncpy((x), (char*)_readingPacket, (l)-1); (x)[(l)-1] = 0; _readingPacket += (l); }
 #define NETMSG_POPWSTR(x,l) { _wcsncpy((x), (wchar_t*)_readingPacket, (l)-1); (x)[(l)-1] = 0; _readingPacket += (l*sizeof(wchar_t)); }
 #define NETMSG_IN_END {}
-
-
-enum sithMultiModeFlags
-{
-    MULTIMODEFLAG_TEAMS = 0x1,
-    MULTIMODEFLAG_2 = 0x2,
-    MULTIMODEFLAG_4 = 0x4,
-    MULTIMODEFLAG_TIMELIMIT = 0x8,
-    MULTIMODEFLAG_SCORELIMIT = 0x10,
-    MULTIMODEFLAG_20 = 0x20,
-    MULTIMODEFLAG_40 = 0x40,
-    MULTIMODEFLAG_SINGLE_LEVEL = 0x80,
-    MULTIMODEFLAG_100 = 0x100,
-    MULTIMODEFLAG_200 = 0x200,
-    MULTIMODEFLAG_400 = 0x400,
-    MULTIMODEFLAG_800 = 0x800,
-    MULTIMODEFLAG_1000 = 0x1000, // MOTS uses
-    MULTIMODEFLAG_2000 = 0x2000,
-    MULTIMODEFLAG_4000 = 0x4000,
-    MULTIMODEFLAG_8000 = 0x8000,
-    MULTIMODEFLAG_COOP = 0x10000
-};
-
-enum sithMultiSessionFlags
-{
-    SESSIONFLAG_1 = 0x1,
-    SESSIONFLAG_2 = 0x2,
-    SESSIONFLAG_4 = 0x4,
-    SESSIONFLAG_8 = 0x8,
-    SESSIONFLAG_10 = 0x10,
-    SESSIONFLAG_20 = 0x20,
-    SESSIONFLAG_40 = 0x40,
-    SESSIONFLAG_80 = 0x80,
-    SESSIONFLAG_100 = 0x100,
-    SESSIONFLAG_200 = 0x200,
-    SESSIONFLAG_PASSWORD = 0x400,
-    SESSIONFLAG_800 = 0x800,
-    SESSIONFLAG_1000 = 0x1000,
-    SESSIONFLAG_2000 = 0x2000,
-    SESSIONFLAG_4000 = 0x4000,
-    SESSIONFLAG_ISDEDICATED = 0x8000,
-};
 
 extern int jkGuiNetHost_bIsDedicated;
 

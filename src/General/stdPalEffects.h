@@ -28,7 +28,7 @@
 
 #define stdPalEffects_Close_idk_ADDR (0x004C8620)
 
-int stdPalEffects_Open(stdPalEffectSetPaletteFunc_t *a1);
+int stdPalEffects_Open(stdPalEffectSetPaletteFunc_t a1);
 void stdPalEffects_Close();
 int stdPalEffects_NewRequest(int idx);
 void stdPalEffects_FreeRequest(uint32_t idx);

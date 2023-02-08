@@ -360,7 +360,7 @@ static std::string jkgm_hash_to_str(uint8_t *p) {
     char tmp[32+2];
     char* tmp_it = tmp;
     for(unsigned int i = 0; i < 16; ++i){
-        sprintf(tmp_it, "%02x", p[i]);
+        snprintf(tmp_it, 3, "%02x", p[i]);
         tmp_it += 2;
     }
     *tmp_it = 0;

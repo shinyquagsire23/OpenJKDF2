@@ -4,7 +4,6 @@
 #include "Devices/sithControl.h"
 #include "Devices/sithSound.h"
 #include "Gameplay/sithTime.h"
-#include "Engine/sithNet.h"
 #include "Engine/sithCamera.h"
 #include "Win95/stdSound.h"
 #include "Win95/stdMci.h"

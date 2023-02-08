@@ -14,7 +14,6 @@
 #include "Engine/rdroid.h"
 #include "Gameplay/sithTime.h"
 #include "Engine/sithCamera.h"
-#include "Engine/sithAdjoin.h"
 #include "Raster/rdCache.h"
 #include "Engine/rdClip.h"
 #include "Engine/rdCamera.h"

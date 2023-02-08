@@ -5,7 +5,6 @@
 #include "Gameplay/sithTime.h"
 #include "General/stdConffile.h"
 #include "stdPlatform.h"
-#include "Engine/sithNet.h"
 #include "World/sithSector.h"
 #include "World/sithTemplate.h"
 #include "Devices/sithControl.h"

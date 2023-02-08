@@ -3,7 +3,6 @@
 #include "World/jkPlayer.h"
 #include "Gameplay/sithPlayer.h"
 #include "Dss/sithMulti.h"
-#include "Engine/sithNet.h"
 #include "World/sithWeapon.h"
 #include "World/sithActor.h"
 #include "Gameplay/sithInventory.h"

@@ -2,7 +2,6 @@
 
 #include "stdPlatform.h"
 #include "General/stdHashTable.h"
-#include "Engine/sithNet.h"
 #include "Devices/sithSound.h"
 #include "Devices/sithSoundMixer.h"
 #include "Win95/stdSound.h"

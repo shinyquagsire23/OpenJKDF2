@@ -11,7 +11,6 @@
 #include "Gameplay/jkSaber.h"
 #include "Gameplay/sithPlayer.h"
 #include "Engine/sithPuppet.h"
-#include "Engine/sithNet.h"
 #include "Dss/sithMulti.h"
 #include "General/stdString.h"
 #include "Cog/sithCogFunctionPlayer.h"

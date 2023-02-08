@@ -89,10 +89,9 @@ sithAnimclass* sithAnimClass_LoadEntry(char *a1)
 int sithAnimClass_LoadPupEntry(sithAnimclass *animclass, char *fpath)
 {
     int mode; // ebx
-    int result; // eax
     unsigned int bodypart_idx; // esi
     int joint_idx; // eax
-    int animNameIdx; // ebp
+    intptr_t animNameIdx; // ebp
     sithWorld *world; // esi
     char *key_fname; // edi
     rdKeyframe *v10; // eax
@@ -104,7 +103,6 @@ int sithAnimClass_LoadPupEntry(sithAnimclass *animclass, char *fpath)
     char keyframe_fpath[128]; // [esp+10h] [ebp-80h] BYREF
 
     mode = 0;
-    result = 0;
     if (!stdConffile_OpenRead(fpath))
         return 0;
 
@@ -133,7 +131,7 @@ int sithAnimClass_LoadPupEntry(sithAnimclass *animclass, char *fpath)
         }
         else if ( stdConffile_entry.numArgs > 1u )
         {
-            animNameIdx = (int)stdHashTable_GetKeyVal(sithPuppet_animNamesToIdxHashtable, stdConffile_entry.args[0].value);
+            animNameIdx = (intptr_t)stdHashTable_GetKeyVal(sithPuppet_animNamesToIdxHashtable, stdConffile_entry.args[0].value);
             if ( animNameIdx )
             {
                 if ( stdConffile_entry.numArgs <= 2u )

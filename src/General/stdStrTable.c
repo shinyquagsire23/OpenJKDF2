@@ -208,9 +208,9 @@ void stdStrTable_Free(stdStrTable* pTable)
             for (int i = 0; i < pTable->numMsgs; i++)
             {
                 if ( pTable->msgs[i].uniStr )
-                    std_pHS->free(pTable->msgs[i].uniStr);
+                    std_pHS->free((void*)pTable->msgs[i].uniStr);
                 if ( pTable->msgs[i].key )
-                    std_pHS->free(pTable->msgs[i].key);
+                    std_pHS->free((void*)pTable->msgs[i].key);
             }
             std_pHS->free(pTable->msgs);
         }

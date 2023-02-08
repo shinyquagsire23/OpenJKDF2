@@ -9,8 +9,6 @@
 #include "Engine/sithCollision.h"
 #include "Engine/sithIntersect.h"
 #include "jk.h"
-#include "Engine/sithAdjoin.h"
-#include "Engine/sithNet.h"
 #include "Gameplay/sithEvent.h"
 #include "Engine/rdColormap.h"
 #include "Engine/sithCamera.h"

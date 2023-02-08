@@ -391,15 +391,12 @@ float _frand()
 
 int __wcscmp(const wchar_t *a, const wchar_t *b)
 {
-    int ca, cb, n;
+    int ca, cb;
 
-    n = 0;
     do 
     {
-        //if (n >= c) break;
         ca = (uint16_t) *a++;
         cb = (uint16_t) *b++;
-        n++;
     }
     while (ca == cb && ca != '\0');
 
@@ -408,17 +405,14 @@ int __wcscmp(const wchar_t *a, const wchar_t *b)
 
 int __wcsicmp(const wchar_t *a, const wchar_t *b)
 {
-    int ca, cb, n;
+    int ca, cb;
 
-    n = 0;
     do 
     {
-        //if (n >= c) break;
         ca = (uint16_t) *a++;
         cb = (uint16_t) *b++;
         ca = __tolower(ca);
         cb = __tolower(cb);
-        n++;
     }
     while (ca == cb && ca != '\0');
 
@@ -634,7 +628,7 @@ int _sprintf(char * s, const char * format, ...)
 {
     va_list args;
     va_start (args, format);
-    int ret = vsprintf (s, format, args);
+    int ret = vsnprintf (s, 0x7FFF, format, args);
     va_end (args);
     return ret;
 }
@@ -834,17 +828,14 @@ int jk_MessageBeep(int a)
 
 int __strcmpi(const char *a, const char *b)
 {
-    int ca, cb, n;
+    int ca, cb;
 
-    n = 0;
     do 
     {
-        //if (n >= c) break;
         ca = (unsigned char) *a++;
         cb = (unsigned char) *b++;
         ca = tolower(toupper(ca));
         cb = tolower(toupper(cb));
-        n++;
     }
     while (ca == cb && ca != '\0');
 
@@ -1026,13 +1017,13 @@ uint32_t jk_GetDesktopWindow()
     return 0;
 }
 
-uint32_t jk_GetDC()
+uint32_t jk_GetDC(HWND hWnd)
 {
     assert(0);
     return 0;
 }
 
-uint32_t jk_GetDeviceCaps()
+uint32_t jk_GetDeviceCaps(HDC hdc, int index)
 {
     assert(0);
     return 0;
@@ -1049,7 +1040,7 @@ int _string_modify_idk(int c)
     return toupper(c);
 }
 
-void jk_ReleaseDC()
+void jk_ReleaseDC(HWND hWnd, HDC hDC)
 {
     assert(0);
 }

@@ -7,7 +7,6 @@
 #include "World/sithSoundClass.h"
 #include "Gameplay/sithTime.h"
 #include "World/sithSurface.h"
-#include "Engine/sithAdjoin.h"
 #include "Engine/sithPuppet.h"
 #include "Dss/sithMulti.h"
 #include "World/sithTemplate.h"

@@ -48,7 +48,7 @@ typedef struct stdALBuffer
     int format;
     int bStereo;
     int bitsPerSample;
-    int nSamplesPerSec;
+    uint32_t nSamplesPerSec;
     int bufferBytes;
     int bufferLen;
     int refcnt;
@@ -72,7 +72,7 @@ typedef struct stdNullSoundBuffer
     int format;
     int bStereo;
     int bitsPerSample;
-    int nSamplesPerSec;
+    uint32_t nSamplesPerSec;
     int bufferBytes;
     int bufferLen;
     int refcnt;
@@ -86,7 +86,7 @@ typedef struct stdWaveFormat
 {
   int16_t wFormatTag;
   uint16_t nChannels;
-  int32_t nSamplesPerSec;
+  uint32_t nSamplesPerSec;
   int32_t nAvgBytesPerSec;
   uint16_t nBlockAlign;
   int16_t wBitsPerSample;
@@ -100,7 +100,7 @@ extern float stdSound_fMenuVolume;
 static int (*stdSound_Startup)() = (void*)stdSound_Startup_ADDR;
 static void (*stdSound_Shutdown)() = (void*)stdSound_Shutdown_ADDR;
 static void (*stdSound_SetMenuVolume)(float a1) = (void*)stdSound_SetMenuVolume_ADDR;
-static stdSound_buffer_t* (*stdSound_BufferCreate)(int bStereo, int nSamplesPerSec, uint16_t bitsPerSample, int bufferLen) = (void*)stdSound_BufferCreate_ADDR;
+static stdSound_buffer_t* (*stdSound_BufferCreate)(int bStereo, uint32_t nSamplesPerSec, uint16_t bitsPerSample, int bufferLen) = (void*)stdSound_BufferCreate_ADDR;
 static void* (*stdSound_BufferSetData)(stdSound_buffer_t* a1, int bufferBytes, int *bufferMaxSize) = (void*)stdSound_BufferSetData_ADDR;
 static int (*stdSound_BufferUnlock)(stdSound_buffer_t* a1, void* buffer, int bufferReadLen) = (void*)stdSound_BufferUnlock_ADDR;
 static void (*stdSound_BufferRelease)(stdSound_buffer_t* a1) = (void*)stdSound_BufferRelease_ADDR;
@@ -125,7 +125,7 @@ static void (*stdSound_3DBufferRelease)(stdSound_3dBuffer_t* a1) = (void*)stdSou
 int stdSound_Startup();
 void stdSound_Shutdown();
 void stdSound_SetMenuVolume(float a1);
-stdSound_buffer_t* stdSound_BufferCreate(int bStereo, int nSamplesPerSec, uint16_t bitsPerSample, int bufferLen);
+stdSound_buffer_t* stdSound_BufferCreate(int bStereo, uint32_t nSamplesPerSec, uint16_t bitsPerSample, int bufferLen);
 void* stdSound_BufferSetData(stdSound_buffer_t* sound, int bufferBytes, int* bufferMaxSize);
 int stdSound_BufferUnlock(stdSound_buffer_t* sound, void* buffer, int bufferRead);
 void stdSound_BufferRelease(stdSound_buffer_t* sound);

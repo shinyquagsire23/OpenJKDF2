@@ -2,7 +2,6 @@
 
 #include "../jk.h"
 #include "Engine/rdroid.h"
-#include "Engine/sithNet.h"
 #include "Main/sithMain.h"
 #include "Devices/sithControl.h"
 #include "Devices/sithSoundMixer.h"
@@ -282,7 +281,7 @@ void jkMain_GuiAdvance()
                 break;
             case JK_GAMEMODE_GAMEPLAY:
                 stdControl_ToggleCursor(1);
-                jkGame_ddraw_idk_palettes(0);
+                jkGame_ddraw_idk_palettes();
                 break;
             default:
                 break;
@@ -541,7 +540,7 @@ void jkMain_GameplayShow(int a1, int a2)
 
         // MOTS added:
         // jkEpisode_Shutdown
-
+        v3 = 0; // Added
         if ( jkSmack_gameMode == 0)
         {
 #ifdef JKM_DSS
@@ -571,7 +570,7 @@ void jkMain_GameplayShow(int a1, int a2)
             if ( jkGame_isDDraw )
             {
                 Windows_ShutdownGdi();
-                Video_SwitchToGDI(1);
+                Video_SwitchToGDI();
                 jkPlayer_Close();
                 jkGame_isDDraw = 0;
             }
