@@ -218,7 +218,7 @@ int rdCamera_BuildFOV(rdCamera *camera)
         case rdCameraProjectType_Perspective:
         {
 #ifdef QOL_IMPROVEMENTS
-            float overdraw = 0.0; // Added: HACK for 1px off on the bottom of the screen
+            float overdraw = 1.0; // Added: HACK for 1px off on the bottom of the screen
 #else
             float overdraw = 0.0;
 #endif
@@ -271,7 +271,7 @@ int rdCamera_BuildClipFrustum(rdCamera *camera, rdClipFrustum *outClip, signed i
         return 0;
 
 #ifdef QOL_IMPROVEMENTS
-    float overdraw = 0.0; // Added: HACK for 1px off on the bottom of the screen
+    float overdraw = 1.0; // Added: HACK for 1px off on the bottom of the screen
 #else
     float overdraw = 0.0;
 #endif

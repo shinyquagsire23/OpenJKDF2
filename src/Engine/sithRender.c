@@ -450,7 +450,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
         }
 
         sithRender_aSectors[sithRender_numSectors++] = sector;
-        if (!(sector->flags & SITH_SECTOR_AUTOMAPVISIBLE) && !sithPlayer_bNoClippingRend)
+        if (!(sector->flags & SITH_SECTOR_AUTOMAPVISIBLE) && !(g_debugmodeFlags & DEBUGFLAG_NOCLIP)) // Added: don't send sighted stuff in noclip, otherwise the whole map reveals
         {
             sector->flags |= SITH_SECTOR_AUTOMAPVISIBLE;
             if ( (sector->flags & SITH_SECTOR_COGLINKED) != 0 )
@@ -1758,9 +1758,9 @@ int sithRender_RenderThing(sithThing *povThing)
 {
     int ret;
 
-    if ( (povThing->thingflags & SITH_TF_INCAMFOV) == 0 )
+    if ( (povThing->thingflags & SITH_TF_INCAMFOV) == 0 && !(g_debugmodeFlags & DEBUGFLAG_NOCLIP)) // Added: don't send sighted stuff in noclip
     {
-        if ( (povThing->thingflags & SITH_TF_CAPTURED) != 0 )
+        if ( (povThing->thingflags & SITH_TF_CAPTURED) != 0 ) 
             sithCog_SendMessageFromThing(povThing, 0, SITH_MESSAGE_SIGHTED);
 
         if ( povThing->thingtype == SITH_THING_ACTOR )
