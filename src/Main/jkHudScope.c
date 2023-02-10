@@ -53,6 +53,12 @@ int jkHudScope_Open(void)
     iVar2 = Video_modeStruct.aViewSizes[Video_modeStruct.viewSizeIdx].yMin;
     lVar7 = (int)(Video_modeStruct.aViewSizes[Video_modeStruct.viewSizeIdx].xMax - (float)(iVar1 / 2));
     lVar8 = (int)(Video_modeStruct.aViewSizes[Video_modeStruct.viewSizeIdx].yMax - (float)(iVar2 / 2));
+#ifdef SDL2_RENDER
+    iVar1 = Video_format.width;
+    iVar2 = Video_format.height;
+    lVar7 = 0;
+    lVar8 = 0;
+#endif
     jkHudScope_w_005b08e0 = (iVar1 * 1000 + 320) / 640;
     jkHudScope_h_005b08e4 = (iVar2 * 1000 + 240) / 480;
 
@@ -78,8 +84,8 @@ int jkHudScope_Open(void)
         _sprintf(local_80,pcVar9,pcVar10);
         psVar3 = stdBitmap_Load2(local_80,0,0);
         *pBmIter->pBitmap = psVar3;
-        pBmIter->unk4 = (int)(pBmIter->unk2 * iVar1) / 640 + lVar7;
-        pBmIter->unk5 = (int)(pBmIter->unk3 * iVar2) / 480 + lVar8;
+        pBmIter->unk4 = (int)(((float)pBmIter->unk2 * iVar1) / 640.0) + lVar7;
+        pBmIter->unk5 = (int)(((float)pBmIter->unk3 * iVar2) / 480.0) + lVar8;
         switch(pBmIter->unk1) 
         {
             case 0x42:
