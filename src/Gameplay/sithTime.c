@@ -8,6 +8,13 @@ static uint64_t sithTime_curUsAbsolute;
 static int64_t sithTime_pauseTimeUs;
 #endif
 
+//#define TIME_PROFILING
+#ifdef TIME_PROFILING
+static uint64_t sithTime_deltaUs_history[1000];
+static size_t sithTime_deltaUs_history_idx = 0;
+static size_t sithTime_deltaUs_history_collected_entries = 0;
+#endif
+
 // Added
 double sithTime_physicsRolloverFrames = 0.0;
 
@@ -64,9 +71,9 @@ void sithTime_SetDelta(int deltaMs)
     sithTime_curMs += sithTime_deltaMs;
 #ifdef MICROSECOND_TIME
     sithTime_deltaUs = Linux_TimeUs() - sithTime_curUsAbsolute;
-    if ( sithTime_deltaMs < SITHTIME_MINDELTA_US )
+    if ( sithTime_deltaUs < SITHTIME_MINDELTA_US )
     {
-        sithTime_deltaMs = SITHTIME_MINDELTA_US;
+        sithTime_deltaUs = SITHTIME_MINDELTA_US;
     }
     if ( sithTime_deltaUs > SITHTIME_MAXDELTA_US)
     {
@@ -77,7 +84,31 @@ void sithTime_SetDelta(int deltaMs)
     }
     sithTime_curUsAbsolute = Linux_TimeUs();
     sithTime_deltaSeconds = (double)sithTime_deltaUs * 0.001 * 0.001;
-    //printf("%u %u %f\n", sithTime_deltaMs, sithTime_deltaUs, sithTime_deltaSeconds);
+
+#ifdef TIME_PROFILING
+    sithTime_deltaUs_history[sithTime_deltaUs_history_idx++] = sithTime_deltaUs;
+    if (sithTime_deltaUs_history_idx >= 1000) {
+        sithTime_deltaUs_history_idx = 0;
+    }
+    sithTime_deltaUs_history_collected_entries++;
+    if (sithTime_deltaUs_history_collected_entries >= 1000) {
+        sithTime_deltaUs_history_collected_entries = 1000;
+    } 
+    uint64_t avg_us = 0;
+    uint64_t largest_us = 0;
+    uint64_t smallest_us = 0xFFFFFFFF;
+    for (int i = 0; i < sithTime_deltaUs_history_collected_entries; i++) {
+        uint64_t val = sithTime_deltaUs_history[i];
+        if (val > largest_us) 
+            largest_us = val;
+        if (val < smallest_us)
+            smallest_us = val;
+        avg_us += val;
+    }
+    avg_us /= sithTime_deltaUs_history_collected_entries;
+
+    printf("%u %u %f %llu %llu %llu\n", sithTime_deltaMs, sithTime_deltaUs, sithTime_deltaSeconds, avg_us, largest_us, smallest_us);
+#endif // TIME_PROFILING
 #else
     sithTime_deltaSeconds = (double)sithTime_deltaMs * 0.001;
 #endif

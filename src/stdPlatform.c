@@ -19,10 +19,10 @@ uint32_t Linux_TimeMs()
 {
     struct timespec _t;
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && !defined(WIN64_MINGW)
     timespec_get(&_t, TIME_UTC);
 #else
-    clock_gettime(CLOCK_REALTIME, &_t);
+    clock_gettime(CLOCK_MONOTONIC, &_t);
 #endif
 
     return _t.tv_sec*1000 + lround(_t.tv_nsec/1.0e6);
@@ -32,10 +32,10 @@ uint64_t Linux_TimeUs()
 {
     struct timespec _t;
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && !defined(WIN64_MINGW)
     timespec_get(&_t, TIME_UTC);
 #else
-    clock_gettime(CLOCK_REALTIME, &_t);
+    clock_gettime(CLOCK_MONOTONIC, &_t);
 #endif
 
     return _t.tv_sec*1000000 + lround(_t.tv_nsec/1.0e3);

@@ -267,7 +267,7 @@ int sithMain_Tick()
             }
 
             sithTime_deltaSeconds = tmp;
-        sithTime_deltaMs = tmp2;
+            sithTime_deltaMs = tmp2;
         }
         else
 #endif

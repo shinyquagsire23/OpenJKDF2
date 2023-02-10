@@ -67,8 +67,6 @@
 #define sithInventory_SetBinWait_ADDR (0x004D32F0)
 #define sithInventory_SelectPower_ADDR (0x004D3330)
 
-typedef struct stdBitmap stdBitmap;
-
 void sithInventory_NewEntry(int binIdx, sithCog *cog, char *name, float min, float max, int flags);
 int sithInventory_GetNumBinsWithFlag(sithThing *thing, int binNum, int flags);
 int sithInventory_GetNumBinsWithFlagRev(sithThing *thing, int binNum, int flags);
