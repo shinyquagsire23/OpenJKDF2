@@ -51,7 +51,7 @@ extern int openjkdf2_bIsKVM;
 
 // Smush
 #define AUDIO_QUEUE_DEPTH (128)
-#define AUDIO_BUFS_DEPTH (0x400000)
+#define AUDIO_BUFS_DEPTH (0x800000)
 #define AUDIO_MAXIMUM_ALLOWED_SLOP_BYTES (0x8000)
 
 static double jkCutscene_audio_us;
