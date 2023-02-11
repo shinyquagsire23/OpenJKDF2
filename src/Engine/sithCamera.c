@@ -22,7 +22,7 @@ static int sithCamera_camIdxToGlobalIdx[2] = {0,1};
 #define SITHCAMERA_FOV (90.0)
 #define SITHCAMERA_ASPECT (1.0)
 #ifdef SDL2_RENDER
-#define SITHCAMERA_ZNEAR_FIRSTPERSON (1.0 / 90.0)
+#define SITHCAMERA_ZNEAR_FIRSTPERSON (1.0 / 64.0)
 #define SITHCAMERA_ZNEAR (1.0 / 64.0)
 #define SITHCAMERA_ZFAR (128.0)
 #else
