@@ -1,5 +1,6 @@
 #include "sithItem.h"
 
+#include "General/stdConffile.h"
 #include "Gameplay/sithTime.h"
 #include "World/sithThing.h"
 #include "Cog/sithCog.h"

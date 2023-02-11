@@ -247,15 +247,15 @@ LABEL_8:
         rdPuppet_SetCallback(puppet, trackNum, sithPuppet_DefaultCallback);
     if ( (a5 & 2) != 0 )
     {
-        rdPuppet_SetStatus(puppet, trackNum, 32);
+        rdPuppet_SetStatus(puppet, trackNum, 0x20);
     }
     else if ( (a5 & 0x20) != 0 )
     {
-        rdPuppet_SetStatus(puppet, trackNum, 128);
+        rdPuppet_SetStatus(puppet, trackNum, 0x80);
     }
     else if ( (a5 & 4) != 0 )
     {
-        rdPuppet_SetStatus(puppet, trackNum, 64);
+        rdPuppet_SetStatus(puppet, trackNum, 0x40);
     }
     if ( (a5 & 1) != 0 )
         rdPuppet_SetTrackSpeed(puppet, trackNum, 0.0);
@@ -372,11 +372,9 @@ float sithPuppet_sub_4E4380(sithThing *thing)
     double v14; // st6
     char missing_3; // c0
     int anim; // ecx
-    sithActor *v17 = NULL; // eax
     sithPuppet *v18 = NULL; // edx
     sithAnimclassEntry *v19 = NULL; // edi
     int v20; // eax
-    sithPuppet *v22 = NULL; // eax
     float v23; // [esp+10h] [ebp-10h]
     rdVector3 a1a; // [esp+14h] [ebp-Ch] BYREF
     float thinga; // [esp+24h] [ebp+4h]
@@ -395,12 +393,9 @@ float sithPuppet_sub_4E4380(sithThing *thing)
         if ( thing->attach_flags || (thing->physicsParams.physflags & SITH_PF_FLY) != 0 || (thing->sector->flags & SITH_ANIM_WALK) != 0 )
         {
             v2 = a1a.y;
-            v5 = a1a.y;
-            if ( v5 < 0.0 )
-                v5 = -v5;
-            v8 = a1a.x;
-            if ( v8 < 0.0 )
-                v8 = -v8;
+            v5 = fabs(a1a.y);
+            v8 = fabs(a1a.x);
+
             if ( v5 <= v8 )
             {
                 v3 = 0;
@@ -419,8 +414,8 @@ float sithPuppet_sub_4E4380(sithThing *thing)
             v3 = SITH_ANIM_WALK;
         }
     }
-    v10 = thing->sector;
-    if ( v10 && (v10->flags & SITH_ANIM_WALK) != 0 )
+
+    if ( thing->sector && (thing->sector->flags & SITH_SECTOR_UNDERWATER) != 0 )
     {
         v11 = thing->animclass;
         if ( v11 )
@@ -443,13 +438,12 @@ float sithPuppet_sub_4E4380(sithThing *thing)
         v11 = thing->animclass;
         if ( v11 )
         {
-            v22 = thing->puppet;
-            if ( v22 )
+            if ( thing->puppet )
             {
-                if ( v22->field_4 )
+                if ( thing->puppet->field_4 )
                 {
-                    v22->field_4 = 0;
-                    v22->majorMode = v22->field_0;
+                    thing->puppet->field_4 = 0;
+                    thing->puppet->majorMode = thing->puppet->field_0;
                 }
             }
         }
@@ -467,10 +461,10 @@ float sithPuppet_sub_4E4380(sithThing *thing)
         v14 = -v14;
     if ( v14 <= 0.02 )
     {
-        if ( thing->thingtype == SITH_ANIM_WALK && (v17 = thing->actor) != 0 )
+        if ( thing->thingtype == SITH_ANIM_WALK && thing->actor )
         {
             thinga = 0.2;
-            anim = (v17->flags & 8) != 0 ? SITH_ANIM_TURNLEFT : SITH_ANIM_STAND;
+            anim = (thing->actor->flags & SITHAI_MODE_TURNING) != 0 ? SITH_ANIM_TURNLEFT : SITH_ANIM_STAND;
         }
         else
         {

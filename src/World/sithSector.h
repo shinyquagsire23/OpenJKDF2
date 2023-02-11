@@ -4,10 +4,6 @@
 #include "types.h"
 #include "globals.h"
 
-// sithRenderSky
-
-// sithPhysics
-
 #define sithSector_Load_ADDR (0x004F8720)
 #define sithSector_GetIdxFromPtr_ADDR (0x004F8BB0)
 #define sithSector_New_ADDR (0x004F8BF0)
@@ -21,35 +17,6 @@
 #define sithSector_SyncSector_ADDR (0x004F8E80)
 #define sithSector_Sync_ADDR (0x004F8EF0)
 #define sithSector_GetPtrFromIdx_ADDR (0x004F8F50)
-
-typedef enum ATTACHFLAGS
-{
-  SITH_ATTACH_WORLDSURFACE = 0x1,
-  SITH_ATTACH_THINGSURFACE = 0x2,
-  SITH_ATTACH_THING = 0x4,
-  SITH_ATTACH_NO_MOVE = 0x8,
-  SITH_ATTACH_FORCE_SERIALIZE = 0x10, // MOTS added: Jail Key
-} ATTACHFLAGS;
-
-typedef enum SITH_SECTOR_FLAG
-{
-  SITH_SECTOR_NOGRAVITY = 0x1,
-  SITH_SECTOR_UNDERWATER = 0x2,
-  SITH_SECTOR_COGLINKED = 0x4,
-  SITH_SECTOR_HASTHRUST = 0x8,
-  SITH_SECTOR_AUTOMAPHIDE = 0x10,
-  SITH_SECTOR_NOACTORS = 0x20,
-  SITH_SECTOR_FALLDEATH = 0x40,
-  SITH_SECTOR_ADJOINS_SET = 0x80,
-  SITH_SECTOR_100 = 0x100,
-  SITH_SECTOR_200 = 0x200,
-  SITH_SECTOR_400 = 0x400,
-  SITH_SECTOR_800 = 0x800,
-  SITH_SECTOR_HAS_COLLIDE_BOX = 0x1000,
-  SITH_SECTOR_2000 = 0x2000,
-  SITH_SECTOR_AUTOMAPVISIBLE = 0x4000,
-  SITH_SECTOR_SYNC = 0x8000,
-} SITH_SECTOR_FLAG;
 
 int sithSector_Load(sithWorld *world, int tmp);
 

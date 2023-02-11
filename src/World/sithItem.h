@@ -1,7 +1,7 @@
 #ifndef _SITHITEM_H
 #define _SITHITEM_H
 
-#include "General/stdConffile.h"
+#include "types.h"
 
 #define sithItem_Collide_ADDR (0x004FBE10)
 #define sithItem_New_ADDR (0x004FBE70)
@@ -9,7 +9,6 @@
 #define sithItem_Remove_ADDR (0x004FBF30)
 #define sithItem_LoadThingParams_ADDR (0x004FC030)
 
-typedef struct sithThing sithThing;
 
 int sithItem_Collide(sithThing *a1, sithThing *a2, sithCollisionSearchEntry *a4, int a5);
 void sithItem_New(sithThing *out);

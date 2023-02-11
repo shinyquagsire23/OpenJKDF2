@@ -1766,7 +1766,7 @@ int sithRender_RenderThing(sithThing *povThing)
         {
             if ( povThing->actor )
             {
-                povThing->actor->flags &= ~SITH_AF_1000;
+                povThing->actor->flags &= ~SITHAI_MODE_SLEEPING;
             }
         }
         povThing->thingflags |= SITH_TF_INCAMFOV;
