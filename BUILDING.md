@@ -38,6 +38,9 @@ sudo apt-get upgrade
 sudo apt install git build-essential cmake make python3 python3-pip bison imagemagick libgtk-3-dev protobuf-compiler zsh
 pip3 install cogapp
 
+# On some Ubuntu versions (22.04?)
+sudo apt install libstdc++-12-dev
+
 # Win32/MinGW
 sudo apt install mingw-w64
 
