@@ -48,6 +48,8 @@ extern "C" {
 #define std3D_42BFE0_ADDR (0x0042BFE0)
 #define std3D_42C030_ADDR (0x0042C030)
 
+extern int std3D_bReinitHudElements;
+
 // Added
 int std3D_HasAlpha();
 int std3D_HasModulateAlpha();

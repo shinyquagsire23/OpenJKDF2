@@ -181,7 +181,7 @@ extern int jkGuiBuildMulti_bRendering;
 
 int std3D_bInitted = 0;
 rdColormap std3D_ui_colormap;
-
+int std3D_bReinitHudElements = 0;
 
 void std3D_generateIntermediateFbo(int32_t width, int32_t height, std3DIntermediateFbo* pFbo, int isFloat)
 {
@@ -465,6 +465,8 @@ int init_resources()
 {
     stdPlatform_Printf("std3D: OpenGL init...\n");
 
+    std3D_bReinitHudElements = 1;
+
     memset(std3D_aUITextures, 0, sizeof(std3D_aUITextures));
 
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, &std3D_windowFbo);
@@ -661,6 +663,8 @@ int std3D_Startup()
     memset(&std3D_ui_colormap, 0, sizeof(std3D_ui_colormap));
     rdColormap_LoadEntry("misc\\cmp\\UIColormap.cmp", &std3D_ui_colormap);
 
+    std3D_bReinitHudElements = 1;
+
     std3D_bInitted = 1;
     return 1;
 }
@@ -670,6 +674,8 @@ void std3D_Shutdown()
     if (!std3D_bInitted) {
         return;
     }
+
+    std3D_bReinitHudElements = 0;
 
     rdColormap_FreeEntry(&std3D_ui_colormap);
     std3D_bInitted = 0;
@@ -725,6 +731,8 @@ void std3D_FreeResources()
     glDeleteBuffers(1, &world_ibo_triangle);
 
     glDeleteBuffers(1, &menu_vbo_all);
+
+    std3D_bReinitHudElements = 1;
 
     has_initted = false;
 }

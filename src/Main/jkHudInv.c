@@ -829,8 +829,9 @@ void jkHudInv_LoadItemRes()
 #endif
     jkHudInv_rend_isshowing_maybe = 0;
     jkHudInv_dword_553F94 = 0;
-    if ( _memcmp(&Video_format.format, &jkHudInv_itemTexfmt, sizeof(rdTexformat)) )
+    if ( _memcmp(&Video_format.format, &jkHudInv_itemTexfmt, sizeof(rdTexformat)) || std3D_bReinitHudElements) // Added: std3D_bReinitHudElements
     {
+        std3D_bReinitHudElements = 0;
         _memcpy(&jkHudInv_itemTexfmt, &Video_format.format, sizeof(jkHudInv_itemTexfmt));
         if ( jkHudInv_aBitmaps[0] )
         {
