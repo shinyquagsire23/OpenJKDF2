@@ -90,7 +90,7 @@ const uint8_t stdControl_aSdlToDik[256] =
     0,//DIK_PRINTSCREEN,
     DIK_SCROLL,
     DIK_PAUSE,
-    DIK_INSERT,
+    0, // DIK_INSERT, this gets stuck down?
     DIK_HOME,
     DIK_PRIOR,
     DIK_DELETE,
@@ -272,8 +272,12 @@ void stdControl_SetSDLKeydown(int keyNum, int bDown, uint32_t readTime)
     if (keyNum < 0 || keyNum >= 256)
         return;
 
-    if (bDown)
+    if (!stdControl_aSdlToDik[keyNum])
+        return;
+
+    if (bDown) {
         stdControl_bControlsIdle = 0;
+    }
 
     stdControl_SetKeydown(stdControl_aSdlToDik[keyNum], bDown, readTime);
 }
@@ -807,8 +811,9 @@ void stdControl_ReadMouse()
     stdControl_aAxisPos[AXIS_MOUSE_X] = Window_lastXRel; // TODO
     stdControl_aAxisPos[AXIS_MOUSE_Y] = Window_lastYRel; // TODO
 
-    if (Window_lastXRel || Window_lastYRel || Window_mouseWheelX || Window_mouseWheelY)
+    if (Window_lastXRel || Window_lastYRel || Window_mouseWheelX || Window_mouseWheelY) {
         stdControl_bControlsIdle = 0;
+    }
 
     if ( stdControl_msDelta < 25 )
     {
@@ -820,6 +825,7 @@ void stdControl_ReadMouse()
 
     Window_lastXRel = 0;
     Window_lastYRel = 0;
+    Window_mouseWheelX = 0;
     Window_mouseWheelY = 0;
 
     for (int i = 0; i < 32; i++)
