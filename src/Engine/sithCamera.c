@@ -22,9 +22,11 @@ static int sithCamera_camIdxToGlobalIdx[2] = {0,1};
 #define SITHCAMERA_FOV (90.0)
 #define SITHCAMERA_ASPECT (1.0)
 #ifdef SDL2_RENDER
-#define SITHCAMERA_ZNEAR (1.0 / 128.0)
+#define SITHCAMERA_ZNEAR_FIRSTPERSON (1.0 / 90.0)
+#define SITHCAMERA_ZNEAR (1.0 / 64.0)
 #define SITHCAMERA_ZFAR (128.0)
 #else
+#define SITHCAMERA_ZNEAR_FIRSTPERSON (1.0 / 64.0)
 #define SITHCAMERA_ZNEAR (1.0 / 64.0)
 #define SITHCAMERA_ZFAR (64.0)
 #endif
@@ -71,7 +73,7 @@ int sithCamera_Open(rdCanvas *canvas, float aspect)
         return 0;
 
     sithCamera_cameras[0].aspectRatio = aspect;
-    rdCamera_NewEntry(&sithCamera_cameras[0].rdCam, sithCamera_cameras[0].rdCam.fov, 0.0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
+    rdCamera_NewEntry(&sithCamera_cameras[0].rdCam, sithCamera_cameras[0].rdCam.fov, 0.0, SITHCAMERA_ZNEAR_FIRSTPERSON, SITHCAMERA_ZFAR, aspect);
     rdCamera_SetAttenuation(&sithCamera_cameras[0].rdCam, 0.4, 0.8);
     rdCamera_SetCanvas(&sithCamera_cameras[0].rdCam, canvas);
     sithCamera_cameras[1].aspectRatio = aspect;
