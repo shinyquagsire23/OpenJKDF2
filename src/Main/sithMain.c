@@ -313,6 +313,8 @@ int sithMain_Tick()
             float tmp3 = sithTime_TickHz;
             float tmp4 = stdControl_updateKHz;
             float tmp5 = stdControl_updateHz;
+            uint32_t tmp6 = sithTime_curMs;
+            sithTime_curMs -= sithTime_deltaMs;
             sithTime_deltaSeconds = DELTA_PHYSTICK_FPS;
             sithTime_deltaMs = (int)(DELTA_PHYSTICK_FPS * 1000.0);
             sithTime_TickHz = 1.0 / sithTime_deltaSeconds;
@@ -340,11 +342,18 @@ int sithMain_Tick()
                 //}
                 sithThing_TickAll(sithTime_deltaSeconds, sithTime_deltaMs);
                 sithThing_MotsTick(0x1F, 0, 0);
+
+                sithCogScript_TickAll();
+
+                // COG scripts will sleep for periods of time based on sithTime_curMs,
+                // so we have to emulate the current time as well
+                sithTime_curMs += sithTime_deltaMs;
             }
 
             sithTime_deltaSeconds = tmp;
             sithTime_deltaMs = tmp2;
             sithTime_TickHz = tmp3;
+            sithTime_curMs = tmp6;
             //stdControl_updateKHz = tmp4;
             //stdControl_updateHz = tmp5;
         }
@@ -374,9 +383,9 @@ int sithMain_Tick()
 
             sithThing_TickAll(sithTime_deltaSeconds, sithTime_deltaMs);
             sithThing_MotsTick(0x1F, 0, 0);
-        }
 
-        sithCogScript_TickAll();
+            sithCogScript_TickAll();
+        }
 
         //sithAI_PrintThings();
         

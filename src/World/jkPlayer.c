@@ -52,6 +52,8 @@ int jkPlayer_bUseOldPlayerPhysics = 0;
 float jkPlayer_hudScale = 2.0;
 float jkPlayer_crosshairLineWidth = 1.0;
 float jkPlayer_crosshairScale = 1.0;
+float jkPlayer_canonicalCogTickrate = CANONICAL_COG_TICKRATE;
+float jkPlayer_canonicalPhysTickrate = CANONICAL_PHYS_TICKRATE;
 #endif
 
 #ifdef FIXED_TIMESTEP_PHYS
@@ -168,6 +170,8 @@ void jkPlayer_ResetVars()
     jkPlayer_hudScale = 2.0;
     jkPlayer_crosshairLineWidth = 1.0;
     jkPlayer_crosshairScale = 1.0;
+    jkPlayer_canonicalCogTickrate = CANONICAL_COG_TICKRATE;
+    jkPlayer_canonicalPhysTickrate = CANONICAL_PHYS_TICKRATE;
 #endif
 
 #ifdef FIXED_TIMESTEP_PHYS
@@ -489,11 +493,15 @@ void jkPlayer_WriteConf(wchar_t *name)
         stdJSON_SaveFloat(ext_fpath, "hudScale", jkPlayer_hudScale);
         stdJSON_SaveFloat(ext_fpath, "crosshairLineWidth", jkPlayer_crosshairLineWidth);
         stdJSON_SaveFloat(ext_fpath, "crosshairScale", jkPlayer_crosshairScale);
+        stdJSON_SaveFloat(ext_fpath, "canonicalCogTickrate", jkPlayer_canonicalCogTickrate);
+        stdJSON_SaveFloat(ext_fpath, "canonicalPhysTickrate", jkPlayer_canonicalPhysTickrate);
+
+        stdJSON_SaveBool(ext_fpath, "bUseOldPlayerPhysics", jkPlayer_bUseOldPlayerPhysics);
 #endif
 #ifdef FIXED_TIMESTEP_PHYS
         stdJSON_SaveBool(ext_fpath, "bJankyPhysics", jkPlayer_bJankyPhysics);
 #endif
-        stdJSON_SaveBool(ext_fpath, "bUseOldPlayerPhysics", jkPlayer_bUseOldPlayerPhysics);
+        
         stdConffile_CloseWrite();
     }
 }
@@ -668,14 +676,17 @@ int jkPlayer_ReadConf(wchar_t *name)
         jkPlayer_hudScale = stdJSON_GetFloat(ext_fpath, "hudScale", jkPlayer_hudScale);
         jkPlayer_crosshairLineWidth = stdJSON_GetFloat(ext_fpath, "crosshairLineWidth", jkPlayer_crosshairLineWidth);
         jkPlayer_crosshairScale = stdJSON_GetFloat(ext_fpath, "crosshairScale", jkPlayer_crosshairScale);
+        jkPlayer_canonicalCogTickrate = stdJSON_GetFloat(ext_fpath, "canonicalCogTickrate", jkPlayer_canonicalCogTickrate);
+        jkPlayer_canonicalPhysTickrate = stdJSON_GetFloat(ext_fpath, "canonicalPhysTickrate", jkPlayer_canonicalPhysTickrate);
+
+        jkPlayer_bUseOldPlayerPhysics = stdJSON_GetBool(ext_fpath, "bUseOldPlayerPhysics", jkPlayer_bUseOldPlayerPhysics);
 
         std3D_UpdateSettings();
 #endif
 #ifdef FIXED_TIMESTEP_PHYS
         jkPlayer_bJankyPhysics = stdJSON_GetBool(ext_fpath, "bJankyPhysics", jkPlayer_bJankyPhysics);
 #endif
-        jkPlayer_bUseOldPlayerPhysics = stdJSON_GetBool(ext_fpath, "bUseOldPlayerPhysics", jkPlayer_bUseOldPlayerPhysics);
-
+        
         stdConffile_Close();
         return 1;
     }

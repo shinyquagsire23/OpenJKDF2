@@ -1046,7 +1046,7 @@ void sithPhysics_ThingPhysAttached(sithThing *pThing, float deltaSeconds)
 #ifdef FIXED_TIMESTEP_PHYS
             // Fix physics being tied to framerate?
             if (NEEDS_STEPPED_PHYS)
-                v109 *= (deltaSeconds / (1.0 / 25.0));
+                v109 *= (deltaSeconds / CANONICAL_PHYS_TICKRATE);
 #endif
             rdVector_MultAcc3(&pThing->physicsParams.vel, &attachedNormal, -v109);
         }
@@ -1089,7 +1089,7 @@ void sithPhysics_ThingPhysAttached(sithThing *pThing, float deltaSeconds)
     {
         // Fix physics being tied to framerate?
         float orig_v131 = stdMath_ClampValue(v131, deltaSeconds * 0.5);
-        float new_v131 = v131 * (deltaSeconds / (1.0 / 25.0));
+        float new_v131 = v131 * (deltaSeconds / CANONICAL_PHYS_TICKRATE);
         new_v131 = stdMath_ClampValue(new_v131, deltaSeconds * 0.5);
 
 #ifdef FIXED_TIMESTEP_PHYS

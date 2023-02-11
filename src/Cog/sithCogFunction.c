@@ -83,22 +83,31 @@ void sithCogFunction_Sleep(sithCog *ctx)
 {
     sithCog *ctx_;
     double fSecs;
-    float fSecs_;
 
     ctx_ = ctx;
     fSecs = sithCogExec_PopFlex(ctx);
-    fSecs_ = fSecs;
     if ( fSecs <= 0.0 )
-        fSecs_ = 0.1;
-    
+        fSecs = 0.1;
+
+    // In the original game, sleeps < 0.02s will always round up to 0.02s.
+    // For consistency on some sector thrusts (Lv18's air shafts for example)
+    // we have to round up.
+#ifdef FIXED_TIMESTEP_PHYS
+    if (NEEDS_STEPPED_PHYS) {
+        if ( fSecs <= jkPlayer_canonicalCogTickrate ) {
+            fSecs = jkPlayer_canonicalCogTickrate;
+        }
+    }
+#endif
+
     // TODO this is probably an inlined func?
     if ( ctx_->flags & SITH_COG_DEBUG )
     {
-        _sprintf(std_genBuffer, "Cog %s: Sleeping for %f seconds.\n", ctx_->cogscript_fpath, fSecs_);
+        _sprintf(std_genBuffer, "Cog %s: Sleeping for %f seconds.\n", ctx_->cogscript_fpath, fSecs);
         sithConsole_Print(std_genBuffer);
     }
     ctx_->script_running = 2;
-    ctx_->wakeTimeMs = sithTime_curMs + (int)(fSecs_ * 1000.0);
+    ctx_->wakeTimeMs = sithTime_curMs + (int)(fSecs * 1000.0);
 }
 
 void sithCogFunction_Print(sithCog *ctx)

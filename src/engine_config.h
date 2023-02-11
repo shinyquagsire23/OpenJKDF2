@@ -11,8 +11,26 @@
 #define DELTA_PHYSTICK_FPS (1.0/TARGET_PHYSTICK_FPS)
 
 // Settings for the old stepped physics
-#define OLDSTEP_TARGET_FPS (sithNet_isMulti ? (sithNet_tickrate < 100 ? 150.0 : 50.0) : 150.0)
+#define OLDSTEP_TARGET_FPS (sithNet_isMulti ? (sithNet_tickrate < 100 ? 150.0 : 50.0) : 50.0)
 #define OLDSTEP_DELTA_50FPS (1.0/OLDSTEP_TARGET_FPS)
+
+// Default setting for canonical COG tickrate minimum.
+// In the original game, sleeps < 0.02s will always round up to 0.02s
+// in practice, because every COG execute tick was always 0.02s apart from
+// the frame limiter.
+// For consistency on some sector thrusts (Lv18's air shafts for example)
+// we have to round up.
+#define CANONICAL_COG_TICKRATE (1.0 / 50.0)
+
+// Default setting for canonical physics tickrate minimum.
+// In the original game, slopes drag the player downwards
+// faster depending on the framerate.
+// At high FPS, this causes the player to get stuck climbing
+// up slopes, because the player falls more than they were
+// able to climb, creating a barrier.
+//
+// This default is based on the boxes in Training.jkl in Droidworks
+#define CANONICAL_PHYS_TICKRATE (1.0 / 25.0)
 
 // Use microsecond timing to calculate sithTime_deltaSecs/etc
 #ifdef PLATFORM_POSIX
