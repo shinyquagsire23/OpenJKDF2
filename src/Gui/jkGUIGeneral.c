@@ -78,8 +78,9 @@ static jkGuiElement jkGuiGeneral_aElementsAdvanced[22] = {
     { ELEMENT_TEXTBUTTON,  1,            2, "GUI_OK",               3, {440, 430, 200, 40}, 1, 0, NULL,                        0, 0, 0, {0}, 0},
     { ELEMENT_TEXTBUTTON, -1,            2, "GUI_CANCEL",           3, {0, 430, 200, 40},   1, 0, NULL,                        0, 0, 0, {0}, 0},
     
-    { ELEMENT_CHECKBOX,    0,            0, L"Disable physics stepping",          0, {20, 150, 300, 40},  1, 0, L"Sets physics delta to the render framerate instead of 150Hz.",          0, 0, 0, {0}, 0},
-    { ELEMENT_CHECKBOX,    0,            0, L"Disable corpse despawning",          0, {20, 190, 300, 40},  1, 0, L"Don't automatically despawn corpse bodies.",          0, 0, 0, {0}, 0},
+    { ELEMENT_CHECKBOX,    0,            0, L"Restore inconsistent physics",          0, {20, 190, 300, 40},  1, 0, L"Sets physics delta to the render framerate instead of 150Hz.",          0, 0, 0, {0}, 0},
+    { ELEMENT_CHECKBOX,    0,            0, L"Disable corpse despawning",          0, {20, 150, 300, 40},  1, 0, L"Don't automatically despawn corpse bodies.",          0, 0, 0, {0}, 0},
+    { ELEMENT_CHECKBOX,    0,            0, L"Restore 50Hz midair player physics",          0, {20, 230, 300, 40},  1, 0, L"Player physics and POV will be stepped at 50Hz while midair.",          0, 0, 0, {0}, 0},
     
     { ELEMENT_END,         0,            0, NULL,                   0, {0},                 0, 0, NULL,                        0, 0, 0, {0}, 0},
 };
@@ -122,6 +123,7 @@ int jkGuiGeneral_ShowAdvanced()
     jkGui_sub_412E20(&jkGuiGeneral_menuAdvanced, 100, 104, 100);
     jkGuiGeneral_aElementsAdvanced[9].selectedTextEntry = jkPlayer_bJankyPhysics;
     jkGuiGeneral_aElementsAdvanced[10].selectedTextEntry = jkPlayer_bKeepCorpses;
+    jkGuiGeneral_aElementsAdvanced[11].selectedTextEntry = jkPlayer_bUseOldPlayerPhysics;
     
     jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiGeneral_menuAdvanced, &jkGuiGeneral_aElementsAdvanced[7]);
     jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiGeneral_menuAdvanced, &jkGuiGeneral_aElementsAdvanced[8]);
@@ -135,6 +137,7 @@ int jkGuiGeneral_ShowAdvanced()
         {
             jkPlayer_bJankyPhysics = jkGuiGeneral_aElementsAdvanced[9].selectedTextEntry;
             jkPlayer_bKeepCorpses = jkGuiGeneral_aElementsAdvanced[10].selectedTextEntry;
+            jkPlayer_bUseOldPlayerPhysics = jkGuiGeneral_aElementsAdvanced[11].selectedTextEntry;
 
             jkPlayer_WriteConf(jkPlayer_playerShortName);
         }

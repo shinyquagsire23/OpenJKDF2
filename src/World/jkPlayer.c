@@ -48,6 +48,7 @@ int jkPlayer_bEnableJkgm = 1;
 int jkPlayer_bEnableTexturePrecache = 1;
 int jkPlayer_bKeepCorpses = 0;
 int jkPlayer_bFastMissionText = 0;
+int jkPlayer_bUseOldPlayerPhysics = 0;
 float jkPlayer_hudScale = 2.0;
 float jkPlayer_crosshairLineWidth = 1.0;
 float jkPlayer_crosshairScale = 1.0;
@@ -163,6 +164,7 @@ void jkPlayer_ResetVars()
     jkPlayer_bEnableTexturePrecache = 1;
     jkPlayer_bKeepCorpses = 0;
     jkPlayer_bFastMissionText = 0;
+    jkPlayer_bUseOldPlayerPhysics = 0;
     jkPlayer_hudScale = 2.0;
     jkPlayer_crosshairLineWidth = 1.0;
     jkPlayer_crosshairScale = 1.0;
@@ -491,6 +493,7 @@ void jkPlayer_WriteConf(wchar_t *name)
 #ifdef FIXED_TIMESTEP_PHYS
         stdJSON_SaveBool(ext_fpath, "bJankyPhysics", jkPlayer_bJankyPhysics);
 #endif
+        stdJSON_SaveBool(ext_fpath, "bUseOldPlayerPhysics", jkPlayer_bUseOldPlayerPhysics);
         stdConffile_CloseWrite();
     }
 }
@@ -671,6 +674,7 @@ int jkPlayer_ReadConf(wchar_t *name)
 #ifdef FIXED_TIMESTEP_PHYS
         jkPlayer_bJankyPhysics = stdJSON_GetBool(ext_fpath, "bJankyPhysics", jkPlayer_bJankyPhysics);
 #endif
+        jkPlayer_bUseOldPlayerPhysics = stdJSON_GetBool(ext_fpath, "bUseOldPlayerPhysics", jkPlayer_bUseOldPlayerPhysics);
 
         stdConffile_Close();
         return 1;

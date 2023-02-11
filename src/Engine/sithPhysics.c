@@ -176,10 +176,10 @@ void sithPhysics_ThingTick(sithThing *pThing, float deltaSecs)
         sithPhysics_ThingPhysUnderwater(pThing, deltaSecs);
     }
 #ifdef QOL_IMPROVEMENTS
-    else if ( pThing->type == SITH_THING_PLAYER && sithNet_isMulti)
+    else if ( pThing->type == SITH_THING_PLAYER && (jkPlayer_bUseOldPlayerPhysics || sithNet_isMulti))
     {
 #ifdef FIXED_TIMESTEP_PHYS
-        if (NEEDS_STEPPED_PHYS) {
+        if ((NEEDS_STEPPED_PHYS) && !jkPlayer_bUseOldPlayerPhysics) {
             // time stepping is handled elsewhere
             sithPhysics_ThingPhysGeneral(pThing, deltaSecs);
         }
