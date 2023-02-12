@@ -15,6 +15,8 @@
 #include "AI/sithAI.h"
 #include "jk.h"
 
+#include <math.h>
+
 static const char* sithPuppet_animNames[43+2] = {
     "--RESERVED--",
     "stand",
