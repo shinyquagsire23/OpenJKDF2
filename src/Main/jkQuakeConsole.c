@@ -365,7 +365,7 @@ void jkQuakeConsole_ExecuteCommand(const char* pCmd)
     }
 }
 
-void jkQuakeConsole_SendInput(char wParam)
+void jkQuakeConsole_SendInput(char wParam, int bIsChar)
 {
     wchar_t tmp[256]; // [esp+4h] [ebp-100h] BYREF
 
@@ -395,7 +395,7 @@ void jkQuakeConsole_SendInput(char wParam)
     }
     else
     {
-        if (wParam == VK_UP)
+        if (wParam == VK_UP && !bIsChar)
         {
             if (!jkQuakeConsole_selectedHistory) {
                 strcpy(jkQuakeConsole_chatStrSaved, jkQuakeConsole_chatStr);
@@ -412,7 +412,7 @@ void jkQuakeConsole_SendInput(char wParam)
                 jkQuakeConsole_chatStrPos = strlen(jkQuakeConsole_chatStr);
             }
         }
-        else if (wParam == VK_DOWN)
+        else if (wParam == VK_DOWN && !bIsChar)
         {
             if (!jkQuakeConsole_selectedHistory) {
                 strcpy(jkQuakeConsole_chatStrSaved, jkQuakeConsole_chatStr);
@@ -432,7 +432,7 @@ void jkQuakeConsole_SendInput(char wParam)
                 jkQuakeConsole_chatStrPos = strlen(jkQuakeConsole_chatStr);
             }
         }
-        else if (wParam == VK_LEFT)
+        else if (wParam == VK_LEFT && !bIsChar)
         {
             jkQuakeConsole_chatStrPos--;
             if (jkQuakeConsole_chatStrPos < 0) {
@@ -449,7 +449,7 @@ void jkQuakeConsole_SendInput(char wParam)
             jkQuakeConsole_selectedHistory = 0;
             jkQuakeConsole_bHasTabbed = 0;
         }
-        else if (wParam == VK_RIGHT)
+        else if (wParam == VK_RIGHT && !bIsChar)
         {
             jkQuakeConsole_chatStrPos++;
 
@@ -472,7 +472,7 @@ void jkQuakeConsole_SendInput(char wParam)
             jkQuakeConsole_selectedHistory = 0;
             jkQuakeConsole_bHasTabbed = 0;
         }
-        else if ( wParam == VK_BACK )
+        else if ( wParam == VK_BACK && bIsChar)
         {
             if (jkQuakeConsole_bHasTabbed && jkQuakeConsole_chatStrPos) {
                 jkQuakeConsole_chatStr[--jkQuakeConsole_chatStrPos] = 0;
@@ -486,7 +486,7 @@ void jkQuakeConsole_SendInput(char wParam)
             jkQuakeConsole_selectedHistory = 0;
             jkQuakeConsole_bHasTabbed = 0;
         }
-        else if ( wParam == VK_DELETE )
+        else if ( wParam == VK_DELETE && !bIsChar)
         {
             if ( jkQuakeConsole_chatStrPos < JKQUAKECONSOLE_CHAT_LEN-1) {
                 memmove(&jkQuakeConsole_chatStr[jkQuakeConsole_chatStrPos], &jkQuakeConsole_chatStr[jkQuakeConsole_chatStrPos+1], JKQUAKECONSOLE_CHAT_LEN-jkQuakeConsole_chatStrPos-1);
@@ -638,8 +638,8 @@ int jkQuakeConsole_WmHandler(HWND a1, UINT msg, WPARAM wParam, HWND a4, LRESULT 
                 *a5 = 1;
                 return 1;
             }
-            else if (wParam == VK_UP || wParam == VK_DOWN || wParam == VK_LEFT || wParam == VK_RIGHT) {
-                jkQuakeConsole_SendInput(wParam);
+            else if (wParam == VK_UP || wParam == VK_DOWN || wParam == VK_LEFT || wParam == VK_RIGHT || wParam == VK_DELETE) { // 
+                jkQuakeConsole_SendInput(wParam, 0);
             }
             else if (!jkHud_bChatOpen && !jkQuakeConsole_bOpen) {
                 sithCommand_HandleBinds(wParam);
@@ -661,7 +661,7 @@ int jkQuakeConsole_WmHandler(HWND a1, UINT msg, WPARAM wParam, HWND a4, LRESULT 
         case WM_CHAR:
             if ( jkQuakeConsole_bOpen ) // Added: Quake console
             {
-                jkQuakeConsole_SendInput(wParam);
+                jkQuakeConsole_SendInput(wParam, 1);
                 *a5 = 1;
                 return 1;
             }

@@ -779,7 +779,7 @@ void Window_SdlUpdate()
                 else if (event.key.keysym.sym == SDLK_DELETE)
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_DELETE, event.key.repeat & 0xFFFF);
-                    Window_msg_main_handler(g_hWnd, WM_CHAR, VK_DELETE, 0);
+                    //Window_msg_main_handler(g_hWnd, WM_CHAR, VK_DELETE, 0);
                 }
                 else if (event.key.keysym.sym == SDLK_INSERT)
                 {

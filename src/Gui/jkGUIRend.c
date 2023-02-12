@@ -2191,12 +2191,7 @@ int jkGuiRend_TextBoxEventHandler(jkGuiElement *element, jkGuiMenu *menu, int ev
                 stdString_WstrRemoveCharsAt((wchar_t *)v7, v8 - 1, 1);
             }
         }
-#ifdef SDL2_RENDER
-        else if ( (uint16_t)a4  == VK_DELETE)
-        {
 
-        }
-#endif
         else if ( stdFont_sub_4355B0(menu->fonts[element->field_8], a4) )
         {
             v9 = v5->selectedTextEntry;
