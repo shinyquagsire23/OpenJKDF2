@@ -276,7 +276,7 @@ void stdControl_SetSDLKeydown(int keyNum, int bDown, uint32_t readTime)
         return;
 
     if (bDown) {
-        stdControl_bControlsIdle = 0;
+        //stdControl_bControlsIdle = 0;
     }
 
     stdControl_SetKeydown(stdControl_aSdlToDik[keyNum], bDown, readTime);
@@ -785,7 +785,7 @@ void stdControl_ReadControls()
                 }
                 //printf("%u: %u %x\n", j, val, idx);
                 if (val) {
-                    stdControl_bControlsIdle = 0;
+                    //stdControl_bControlsIdle = 0;
                 }
                 stdControl_SetKeydown(idx, val /* button val */, stdControl_curReadTime);
             }
