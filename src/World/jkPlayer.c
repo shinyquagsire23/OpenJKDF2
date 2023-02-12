@@ -31,9 +31,12 @@
 #include "Win95/Window.h"
 #include "General/stdJSON.h"
 #include "Platform/std3D.h"
+#include "Main/sithCvar.h"
 
 // DO NOT FORGET TO ADD TO jkPlayer_ResetVars()
 #ifdef QOL_IMPROVEMENTS
+int Window_isHiDpi_tmp = 0;
+int Window_isFullscreen_tmp = 0;
 int jkPlayer_fov = 90;
 int jkPlayer_fovIsVertical = 1;
 int jkPlayer_enableTextureFilter = 0;
@@ -148,10 +151,44 @@ int jkPlayer_aMotsFpBins[74] =
     0
 };
 
+// Added: cvars
+void jkPlayer_StartupVars()
+{
+    sithCvar_RegisterInt("r_fov",                       90,                         &jkPlayer_fov,                      CVARFLAG_LOCAL);
+    sithCvar_RegisterBool("r_fovIsVertical",            1,                          &jkPlayer_fovIsVertical,            CVARFLAG_LOCAL);
+    sithCvar_RegisterBool("r_enableTextureFilter",      0,                          &jkPlayer_enableTextureFilter,      CVARFLAG_LOCAL);
+    sithCvar_RegisterBool("r_enableOrigAspect",         0,                          &jkPlayer_enableOrigAspect,         CVARFLAG_LOCAL);
+    sithCvar_RegisterBool("r_enableBloom",              0,                          &jkPlayer_enableBloom,              CVARFLAG_LOCAL);
+    sithCvar_RegisterBool("r_enableSSAO",               0,                          &jkPlayer_enableSSAO,               CVARFLAG_LOCAL);
+    sithCvar_RegisterInt("r_fpslimit",                  0,                          &jkPlayer_fpslimit,                 CVARFLAG_LOCAL);
+    sithCvar_RegisterBool("r_enableVsync",              0,                          &jkPlayer_enableVsync,              CVARFLAG_LOCAL);
+    sithCvar_RegisterFlex("r_ssaaMultiple",             1.0,                        &jkPlayer_ssaaMultiple,             CVARFLAG_LOCAL);
+    sithCvar_RegisterFlex("r_gamma",                    1.0,                        &jkPlayer_gamma,                    CVARFLAG_LOCAL);
+    sithCvar_RegisterBool("r_bEnableJkgm",              1,                          &jkPlayer_bEnableJkgm,              CVARFLAG_LOCAL);
+    sithCvar_RegisterBool("r_bEnableTexturePrecache",   1,                          &jkPlayer_bEnableTexturePrecache,   CVARFLAG_LOCAL);
+    sithCvar_RegisterBool("g_bKeepCorpses",             0,                          &jkPlayer_bKeepCorpses,             CVARFLAG_LOCAL);
+    sithCvar_RegisterBool("menu_bFastMissionText",      0,                          &jkPlayer_bFastMissionText,         CVARFLAG_LOCAL);
+    sithCvar_RegisterBool("g_bUseOldPlayerPhysics",     0,                          &jkPlayer_bUseOldPlayerPhysics,     CVARFLAG_LOCAL);
+    sithCvar_RegisterFlex("hud_scale",                  2.0,                        &jkPlayer_hudScale,                 CVARFLAG_LOCAL);
+    sithCvar_RegisterFlex("hud_crosshairLineWidth",     1.0,                        &jkPlayer_crosshairLineWidth,       CVARFLAG_LOCAL);
+    sithCvar_RegisterFlex("hud_crosshairScale",         1.0,                        &jkPlayer_crosshairScale,           CVARFLAG_LOCAL);
+    sithCvar_RegisterFlex("g_canonicalCogTickrate",     CANONICAL_COG_TICKRATE,     &jkPlayer_canonicalCogTickrate,     CVARFLAG_LOCAL);
+    sithCvar_RegisterFlex("g_canonicalPhysTickrate",    CANONICAL_PHYS_TICKRATE,    &jkPlayer_canonicalPhysTickrate,    CVARFLAG_LOCAL);
+
+    sithCvar_RegisterBool("r_hidpi",                     0,                         &Window_isHiDpi_tmp,                CVARFLAG_LOCAL);
+    sithCvar_RegisterBool("r_fullscreen",                0,                         &Window_isFullscreen_tmp,           CVARFLAG_LOCAL);
+
+#ifdef FIXED_TIMESTEP_PHYS
+    sithCvar_RegisterBool("g_bJankyPhysics",             1,                         &jkPlayer_bJankyPhysics,            CVARFLAG_LOCAL);
+#endif
+}
+
 // Added: Clean reset
 void jkPlayer_ResetVars()
 {
 #ifdef QOL_IMPROVEMENTS
+    Window_isHiDpi_tmp = 0;
+    Window_isFullscreen_tmp = 0;
     jkPlayer_fov = 90;
     jkPlayer_fovIsVertical = 1;
     jkPlayer_enableTextureFilter = 0;
@@ -396,6 +433,11 @@ void jkPlayer_CreateConf(wchar_t *name)
     char a1[32]; // [esp+34h] [ebp-120h]
     char pathName[128]; // [esp+D4h] [ebp-80h]
 
+#ifdef QOL_IMPROVEMENTS
+    jkPlayer_ResetVars();
+    sithCvar_ResetLocals();
+#endif
+
     stdString_WcharToChar(a1, name, 31);
     a1[31] = 0;
     stdFileUtil_MkDir("player");
@@ -451,10 +493,18 @@ void jkPlayer_WriteConf(wchar_t *name)
     char nameTmp[32]; // [esp+0h] [ebp-A0h]
     char fpath[128]; // [esp+20h] [ebp-80h]
     char ext_fpath[256];
+    char ext_fpath_cvars[256];
+
+#ifdef QOL_IMPROVEMENTS
+    sithCvar_SaveGlobals();
+#endif
+
+    if (!name[0]) return; // Added
 
     stdString_WcharToChar(nameTmp, name, 31);
     nameTmp[31] = 0;
-    stdFnames_MakePath3(ext_fpath, 256, "player", nameTmp, "openjkdf2.json");
+    stdFnames_MakePath3(ext_fpath, 256, "player", nameTmp, "openjkdf2.json"); // Added
+    stdFnames_MakePath3(ext_fpath_cvars, 256, "player", nameTmp, "openjkdf2_cvars.json"); // Added
     stdString_snprintf(fpath, 128, "player\\%s\\%s.plr", nameTmp, nameTmp);
     if ( stdConffile_OpenWrite(fpath) )
     {
@@ -501,7 +551,13 @@ void jkPlayer_WriteConf(wchar_t *name)
 #ifdef FIXED_TIMESTEP_PHYS
         stdJSON_SaveBool(ext_fpath, "bJankyPhysics", jkPlayer_bJankyPhysics);
 #endif
-        
+
+#ifdef QOL_IMPROVEMENTS
+        Window_isHiDpi_tmp = Window_isHiDpi;
+        Window_isFullscreen_tmp = Window_isFullscreen;
+        sithCvar_SaveLocals(ext_fpath_cvars);
+#endif
+
         stdConffile_CloseWrite();
     }
 }
@@ -591,6 +647,7 @@ int jkPlayer_ReadConf(wchar_t *name)
     char v6[32]; // [esp+10h] [ebp-A0h]
     char fpath[256]; // Added: 128 -> 256
     char ext_fpath[256];
+    char ext_fpath_cvars[256];
 
     int version = 0;
     if (!jkPlayer_VerifyWcharName(name))
@@ -601,6 +658,7 @@ int jkPlayer_ReadConf(wchar_t *name)
     _wcsncpy(jkPlayer_playerShortName, name, 0x1Fu);
     jkPlayer_playerShortName[31] = 0;
     stdFnames_MakePath3(ext_fpath, 256, "player", v6, "openjkdf2.json");
+    stdFnames_MakePath3(ext_fpath_cvars, 256, "player", v6, "openjkdf2_cvars.json"); // Added
     stdString_snprintf(fpath, 256, "player\\%s\\%s.plr", v6, v6); // Added: sprintf -> snprintf
     if (!stdConffile_OpenRead(fpath))
         return 0;
@@ -646,12 +704,10 @@ int jkPlayer_ReadConf(wchar_t *name)
         jkPlayer_ParseLegacyExt();
 
         // New JSON parsing
-        int dpi_tmp = 0;
-        int fulltmp = 0;
         jkPlayer_fov = stdJSON_GetInt(ext_fpath, "fov", jkPlayer_fov);
         jkPlayer_fovIsVertical = stdJSON_GetBool(ext_fpath, "fovisvertical", jkPlayer_fovIsVertical);
-        dpi_tmp = stdJSON_GetBool(ext_fpath, "windowishidpi", Window_isHiDpi);
-        fulltmp = stdJSON_GetBool(ext_fpath, "windowfullscreen", Window_isFullscreen);
+        Window_isHiDpi_tmp = stdJSON_GetBool(ext_fpath, "windowishidpi", Window_isHiDpi);
+        Window_isFullscreen_tmp = stdJSON_GetBool(ext_fpath, "windowfullscreen", Window_isFullscreen);
         jkPlayer_enableTextureFilter = stdJSON_GetBool(ext_fpath, "texturefiltering", jkPlayer_enableTextureFilter);
         jkPlayer_enableOrigAspect = stdJSON_GetBool(ext_fpath, "originalaspect", jkPlayer_enableOrigAspect);
         jkPlayer_fpslimit = stdJSON_GetInt(ext_fpath, "fpslimit", jkPlayer_fpslimit);
@@ -660,14 +716,6 @@ int jkPlayer_ReadConf(wchar_t *name)
         jkPlayer_ssaaMultiple = stdJSON_GetFloat(ext_fpath, "ssaamultiple", jkPlayer_ssaaMultiple);
         jkPlayer_enableSSAO = stdJSON_GetInt(ext_fpath, "enablessao", jkPlayer_enableSSAO);
         jkPlayer_gamma = stdJSON_GetFloat(ext_fpath, "gamma", jkPlayer_gamma);
-
-        if (jkPlayer_fov < FOV_MIN)
-            jkPlayer_fov = FOV_MIN;
-        if (jkPlayer_fov > FOV_MAX)
-            jkPlayer_fov = FOV_MAX;
-
-        Window_SetHiDpi(dpi_tmp);
-        Window_SetFullscreen(fulltmp);
 
         jkPlayer_bEnableJkgm = stdJSON_GetBool(ext_fpath, "bEnableJkgm", jkPlayer_bEnableJkgm);
         jkPlayer_bEnableTexturePrecache = stdJSON_GetBool(ext_fpath, "bEnableTexturePrecache", jkPlayer_bEnableTexturePrecache);
@@ -681,10 +729,23 @@ int jkPlayer_ReadConf(wchar_t *name)
 
         jkPlayer_bUseOldPlayerPhysics = stdJSON_GetBool(ext_fpath, "bUseOldPlayerPhysics", jkPlayer_bUseOldPlayerPhysics);
 
-        std3D_UpdateSettings();
 #endif
 #ifdef FIXED_TIMESTEP_PHYS
         jkPlayer_bJankyPhysics = stdJSON_GetBool(ext_fpath, "bJankyPhysics", jkPlayer_bJankyPhysics);
+#endif
+
+#ifdef QOL_IMPROVEMENTS
+        sithCvar_LoadLocals(ext_fpath_cvars);
+
+        if (jkPlayer_fov < FOV_MIN)
+            jkPlayer_fov = FOV_MIN;
+        if (jkPlayer_fov > FOV_MAX)
+            jkPlayer_fov = FOV_MAX;
+
+        Window_SetHiDpi(Window_isHiDpi_tmp);
+        Window_SetFullscreen(Window_isFullscreen_tmp);
+
+        std3D_UpdateSettings();
 #endif
         
         stdConffile_Close();

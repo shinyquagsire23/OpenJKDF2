@@ -961,6 +961,7 @@ void Window_SdlUpdate()
                 break;
             case SDL_QUIT:
                 stdPlatform_Printf("Quit!\n");
+                jkPlayer_WriteConf(jkPlayer_playerShortName); // Added
                 exit(-1);
                 break;
             default:
@@ -1336,6 +1337,8 @@ int Window_Main_Linux(int argc, char** argv)
         if (g_should_exit) break;
     }
 #endif
+
+    jkPlayer_WriteConf(jkPlayer_playerShortName); // Added
 
     Main_Shutdown();
     return 1;

@@ -142,6 +142,8 @@ void jkGuiMain_Show()
 #ifdef WIN32_BLOBS
                     jk_PostMessageA(stdGdi_GetHwnd(), 16, 0, 0);
 #else
+                    sithCvar_SaveGlobals();
+                    jkPlayer_WriteConf(jkPlayer_playerShortName); // Added
                     g_should_exit = 1;
                     //exit(0);
                     return;

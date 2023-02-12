@@ -3332,6 +3332,31 @@ typedef struct jkBubbleInfo
     uint32_t type;
 } jkBubbleInfo;
 
+typedef struct sSithCvar
+{
+    const char* pName;
+    void* pLinkPtr;
+    int32_t type;
+    int32_t flags;
+    union
+    {
+        intptr_t val;
+        char* pStrVal;
+        int32_t intVal;
+        int32_t boolVal;
+        float flexVal;
+    };
+    union
+    {
+        intptr_t defaultVal;
+        char* pDefaultStrVal;
+        int32_t defaultIntVal;
+        int32_t defaultBoolVal;
+        float defaultFlexVal;
+    };
+} tSithCvar;
+
+typedef void (*sithCvarEnumerationFn_t)(tSithCvar*);
 
 #ifdef GHIDRA_IMPORT
 #include "Win95/stdGob.h"

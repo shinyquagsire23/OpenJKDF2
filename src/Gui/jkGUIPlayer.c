@@ -197,6 +197,8 @@ void jkGuiPlayer_ShowNewPlayer(int a1)
     wchar_t a2[256]; // [esp+274h] [ebp-400h] BYREF
     wchar_t v24[256]; // [esp+474h] [ebp-200h] BYREF
 
+    jkPlayer_playerShortName[0] = 0; // Added
+
     v15 = 0; 
     jkGuiRend_DarrayNewStr(&a1a, 5, 1);
     do

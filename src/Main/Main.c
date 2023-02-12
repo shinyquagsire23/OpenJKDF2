@@ -297,6 +297,7 @@ int Main_Startup(const char *cmdline)
     jkRes_Startup(pHS);
     Windows_Startup();
     jkStrings_Startup();
+    sithCvar_Startup(); // Added
 
     if (Windows_InitWindow())
     {
@@ -432,6 +433,7 @@ void Main_Shutdown()
 #endif
     jkGui_Shutdown();
     rdShutdown();
+    sithCvar_Shutdown(); // Added
     jkStrings_Shutdown();
     Windows_Shutdown();
     jkRes_Shutdown();

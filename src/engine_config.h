@@ -200,6 +200,10 @@
 #define JKDEV_NUM_CHEATS (32)
 #endif
 
+#define SITHCVAR_MAX_CVARS (1024)
+#define SITHCVAR_MAX_STRLEN (256)
+#define SITHCVAR_FNAME ("openjkdf2_cvars.json")
+
 #define DF2_ONLY_COND(cond) ( Main_bMotsCompat || (!Main_bMotsCompat && (cond)) )
 #define MOTS_ONLY_COND(cond) ( !Main_bMotsCompat || (Main_bMotsCompat && (cond)) )
 #define MOTS_ONLY_FLAG(_flag) (Main_bMotsCompat ? (_flag) : (0))

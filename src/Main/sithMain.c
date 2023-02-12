@@ -99,6 +99,7 @@ int sithMain_Startup(HostServices *commonFuncs)
 
 void sithMain_Shutdown()
 {
+    //sithWeapon
     sithSoundMixer_Shutdown();
     sithSound_Shutdown();
     sithSurface_Shutdown();

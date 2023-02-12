@@ -183,6 +183,21 @@ enum jkEpisodeLoadType
     JK_EPISODE_ALL = 0xFFFF
 };
 
+typedef enum
+{
+    CVARTYPE_INVALID = 0,
+    CVARTYPE_BOOL = 1,
+    CVARTYPE_INT = 2,
+    CVARTYPE_FLEX = 3,
+    CVARTYPE_STR = 4
+} tCvarType;
+
+#define CVARFLAG_LOCAL (0)
+typedef enum
+{
+    CVARFLAG_GLOBAL = 1,
+} tCvarFlags;
+
 #define JK_JOYSTICK_AXIS_STRIDE (6)
 #define JK_NUM_JOYSTICKS        (2)
 #define JK_NUM_MOUSE_AXES       (3)

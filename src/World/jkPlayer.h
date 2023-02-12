@@ -76,6 +76,7 @@ enum JKFLAG
     JKFLAG_100 = 0x100,
 };
 
+void jkPlayer_StartupVars();
 void jkPlayer_ResetVars();
 
 int jkPlayer_LoadAutosave();
