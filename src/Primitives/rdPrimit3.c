@@ -1521,12 +1521,10 @@ void rdPrimit3_ClipFaceRGBLevel
             uVar22 = uVar16;
             do {
                 iVar15 = *piVar18;
-                piVar18 = piVar18 + 1;
-                uVar22 = uVar22 - 1;
+                piVar18++;
+                uVar22--;
                 prVar1 = prVar7 + iVar15;
-                prVar20->x = prVar1->x;
-                prVar20->y = prVar1->y;
-                prVar20->z = prVar1->z;
+                rdVector_Copy3(prVar20, prVar1);
                 prVar20 = prVar20 + 1;
             } while (uVar22 != 0);
         }
@@ -1542,13 +1540,11 @@ void rdPrimit3_ClipFaceRGBLevel
             uVar22 = uVar16;
             do {
                 iVar15 = *piVar18;
-                piVar18 = piVar18 + 1;
-                uVar22 = uVar22 - 1;
+                piVar18++;
+                uVar22--;
                 prVar1 = prVar7 + iVar15;
-                prVar20->x = prVar1->x;
-                prVar20->y = prVar1->y;
-                prVar20->z = prVar1->z;
-                prVar20 = prVar20 + 1;
+                rdVector_Copy3(prVar20, prVar1);
+                prVar20++;
             } while (uVar22 != 0);
         }
         if (rdCamera_pCurCamera->projectType != 1) {
@@ -1571,13 +1567,11 @@ void rdPrimit3_ClipFaceRGBLevel
                 uVar22 = uVar16;
                 do {
                     iVar15 = *piVar18;
-                    piVar18 = piVar18 + 1;
-                    uVar22 = uVar22 - 1;
+                    piVar18++;
+                    uVar22--;
                     prVar1 = prVar7 + iVar15;
-                    prVar20->x = prVar1->x;
-                    prVar20->y = prVar1->y;
-                    prVar20->z = prVar1->z;
-                    prVar20 = prVar20 + 1;
+                    rdVector_Copy3(prVar20, prVar1);
+                    prVar20++;
                 } while (uVar22 != 0);
                 if (rdCamera_pCurCamera->projectType == 1) {
                     uVar16 = rdClip_Face3S(clipFrustum,mesh_out->verticesProjected,uVar16);
@@ -1596,13 +1590,11 @@ void rdPrimit3_ClipFaceRGBLevel
                 uVar22 = uVar16;
                 do {
                     iVar15 = *piVar18;
-                    piVar18 = piVar18 + 1;
-                    uVar22 = uVar22 - 1;
+                    piVar18++;
+                    uVar22--;
                     prVar1 = prVar7 + iVar15;
-                    prVar20->x = prVar1->x;
-                    prVar20->y = prVar1->y;
-                    prVar20->z = prVar1->z;
-                    prVar20 = prVar20 + 1;
+                    rdVector_Copy3(prVar20, prVar1);
+                    prVar20++;
                 } while (uVar22 != 0);
             }
             break;
@@ -1618,51 +1610,22 @@ void rdPrimit3_ClipFaceRGBLevel
                 float* blueIter = mesh_out->paBlueIntensities;
 
                 int idxIter = 0;
-                int idkIn_ = idxInfo->numVertices;
-                do {
+                
+                for (int idkIn_ = idxInfo->numVertices; idkIn_ >= 0; idkIn_--) {
                     iVar12 = *piVar18;
                     prVar1 = prVar7 + iVar12;
-                    prVar20->x = prVar1->x;
-                    prVar20->y = prVar1->y;
-                    prVar20->z = prVar1->z;
-                    fVar4 = idxInfo->paRedIntensities[idxIter] + pfVar9[iVar12];
-                    if (fVar4 < 0.0) {
-                        fVar4 = 0.0;
-                    }
-                    else if (fVar4 > 1.0) {
-                        fVar4 = 1.0;
-                    }
-                    *redIter = fVar4;
-
-                    fVar3 = idxInfo->paGreenIntensities[idxIter];
-                    fVar3 = fVar3 + pfVar9[iVar12];
-                    if (fVar3 < 0.0) {
-                        fVar3 = 0.0;
-                    }
-                    else if (fVar3 > 1.0) {
-                        fVar3 = 1.0;
-                    }
-
-                    fVar4 = idxInfo->paBlueIntensities[idxIter];
-                    *greenIter = fVar3;
-                    fVar4 = fVar4 + pfVar9[iVar12];
-                    if (fVar4 < 0.0) {
-                        fVar4 = 0.0;
-                    }
-                    else if (fVar4 > 1.0) {
-                        fVar4 = 1.0;
-                    }
-                    prVar20 = prVar20 + 1;
-                    *blueIter = fVar4;
-                    piVar18 = piVar18 + 1;
+                    rdVector_Copy3(prVar20, prVar1);
+                    *redIter = stdMath_Clamp(idxInfo->paRedIntensities[idxIter] + pfVar9[iVar12], 0.0, 1.0);
+                    *greenIter = stdMath_Clamp(idxInfo->paGreenIntensities[idxIter] + pfVar9[iVar12], 0.0, 1.0);
+                    *blueIter = stdMath_Clamp(idxInfo->paBlueIntensities[idxIter] + pfVar9[iVar12], 0.0, 1.0);
+                    prVar20++;
+                    piVar18++;
 
                     redIter++;
                     greenIter++;
                     blueIter++;
                     idxIter++;
-
-                    idkIn_--;
-                } while (idkIn_ != 0x0);
+                }
             }
             uVar14 = rdClip_Face3GSRGB(clipFrustum,mesh_out->verticesProjected,
                                        mesh_out->paRedIntensities,mesh_out->paGreenIntensities,
@@ -1688,16 +1651,14 @@ void rdPrimit3_ClipFaceRGBLevel
                     local_8 = idxInfo->numVertices;
                     do {
                         prVar1 = prVar7 + *piVar24;
-                        prVar20->x = prVar1->x;
-                        prVar20->y = prVar1->y;
-                        prVar20->z = prVar1->z;
+                        rdVector_Copy3(prVar20, prVar1);
                         iVar15 = *piVar19;
                         prVar17->x = prVar5[iVar15].x + idkIn->x;
                         prVar17->y = prVar5[iVar15].y + idkIn->y;
                         local_8--;
-                        prVar17 = prVar17 + 1;
-                        piVar19 = piVar19 + 1;
-                        prVar20 = prVar20 + 1;
+                        prVar17++;
+                        piVar19++;
+                        prVar20++;
                         piVar24++;
                     } while (local_8 != 0);
                 }
@@ -1732,20 +1693,13 @@ void rdPrimit3_ClipFaceRGBLevel
                     do {
                         iVar12 = *piVar24;
                         prVar20 = prVar7 + iVar12;
-                        local_10->x = prVar20->x;
-                        local_10->y = prVar20->y;
-                        local_10->z = prVar20->z;
+                        rdVector_Copy3(local_10, prVar20);
                         iVar13 = *piVar18;
                         prVar17->x = prVar5[iVar13].x + idkIn->x;
                         prVar17->y = prVar5[iVar13].y + idkIn->y;
-                        fVar4 = stdMath_Clamp(pfVar9[iVar12] + idxInfo->paRedIntensities[idxIter], 0.0, 1.0);
-                        *redIter = fVar4;
-
-                        fVar3 = stdMath_Clamp(pfVar9[iVar12] + idxInfo->paGreenIntensities[idxIter], 0.0, 1.0);
-                        *greenIter = fVar3;
-
-                        fVar4 = stdMath_Clamp(pfVar9[iVar12] + idxInfo->paBlueIntensities[idxIter], 0.0, 1.0);
-                        *blueIter = fVar4;
+                        *redIter = stdMath_Clamp(pfVar9[iVar12] + idxInfo->paRedIntensities[idxIter], 0.0, 1.0);
+                        *greenIter = stdMath_Clamp(pfVar9[iVar12] + idxInfo->paGreenIntensities[idxIter], 0.0, 1.0);
+                        *blueIter = stdMath_Clamp(pfVar9[iVar12] + idxInfo->paBlueIntensities[idxIter], 0.0, 1.0);
 
                         local_10++;
                         prVar17++;

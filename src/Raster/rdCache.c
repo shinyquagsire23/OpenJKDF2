@@ -312,7 +312,7 @@ int rdCache_SendFaceListToHardware()
         v1 = 1;
         v129 = 1;
     }
-    if ( v0 || v1 || (rdroid_curVertexColorMode == 1)) // MOTS added
+    if ( v0 || v1 || (rdGetVertexColorMode() == 1)) // MOTS added
     {
         flags_idk |= 0x8000;
     }
@@ -545,7 +545,7 @@ int rdCache_SendFaceListToHardware()
             {
                 // MOTS added
 #ifdef JKM_LIGHTING
-                if (rdroid_curVertexColorMode == 1) {
+                if (rdGetVertexColorMode() == 1) {
                     float* iterRedIntense = active_6c->paRedIntensities;
                     float* iterGreenIntense = active_6c->paGreenIntensities;
                     float* iterBlueIntense = active_6c->paBlueIntensities;
@@ -626,7 +626,7 @@ int rdCache_SendFaceListToHardware()
                 else
                 {
                     // MOTS added
-                    if (rdroid_curVertexColorMode != 1 || lighting_capability != 3)
+                    if (rdGetVertexColorMode() != 1 || lighting_capability != 3)
                     {
                         if ( lighting_capability == 3 )
                             light_level = active_6c->vertexIntensities[vtx_idx];
@@ -652,20 +652,19 @@ int rdCache_SendFaceListToHardware()
 #ifdef JKM_LIGHTING
                     else
                     {
-                        // Added for SDL2
-#ifdef SDL2_RENDER
-                        if ( lighting_capability == 3 )
-                            light_level = active_6c->vertexIntensities[vtx_idx];
-                        else
-                            light_level = active_6c->light_level_static;
-
-                        rdCache_aHWVertices[rdCache_totalVerts].lightLevel = light_level / 255.0;
-#endif
                         //printf("%f\n", active_6c->paRedIntensities[vtx_idx]);
+                        light_level = 1.0;
                         double intRed = active_6c->paRedIntensities[vtx_idx];
                         double intGreen = active_6c->paGreenIntensities[vtx_idx];
                         double intBlue = active_6c->paBlueIntensities[vtx_idx];
 
+                        // Added for SDL2
+#ifdef SDL2_RENDER
+                        double luma = (0.2126 * intRed) + (0.7152 * intGreen) + (0.0722 * intBlue);
+                        light_level = luma;
+
+                        rdCache_aHWVertices[rdCache_totalVerts].lightLevel = luma / 255.0;
+#endif
 
                         vertex_b = (int)intBlue;
                         vertex_g = (int)intGreen;
@@ -843,7 +842,7 @@ solid_tri:
         {
             // MOTS added
 #ifdef JKM_LIGHTING
-            if (rdroid_curVertexColorMode == 1) {
+            if (rdGetVertexColorMode() == 1) {
                 float* iterRedIntense = active_6c->paRedIntensities;
                 float* iterGreenIntense = active_6c->paGreenIntensities;
                 float* iterBlueIntense = active_6c->paBlueIntensities;
@@ -928,7 +927,7 @@ LABEL_232:
             else
             {
                 // MOTS added
-                if (rdroid_curVertexColorMode != 1 || lighting_capability != 3)
+                if (rdGetVertexColorMode() != 1 || lighting_capability != 3)
                 {
                     v91 = (rdColormap *)active_6c->colormap;
                     if ( lighting_capability == 3 )

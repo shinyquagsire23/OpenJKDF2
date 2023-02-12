@@ -589,7 +589,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
             }
             sithRender_idxInfo.numVertices = adjoinSurface->surfaceInfo.face.numVertices;
             sithRender_idxInfo.vertexPosIdx = adjoinSurface->surfaceInfo.face.vertexPosIdx;
-            meshinfo_out.verticesProjected = vertices_tmp;
+            meshinfo_out.verticesProjected = sithRender_aVerticesTmp;
             sithRender_idxInfo.vertexUVIdx = adjoinSurface->surfaceInfo.face.vertexUVIdx;
 
             rdPrimit3_ClipFace(frustumArg, RD_GEOMODE_WIREFRAME, RD_LIGHTMODE_NOTLIT, RD_TEXTUREMODE_AFFINE, &sithRender_idxInfo, &meshinfo_out, &adjoinSurface->surfaceInfo.face.clipIdk);
@@ -642,7 +642,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
             if ((((unsigned int)meshinfo_out.numVertices >= 3u) || (rdClip_faceStatus & 0x40)) 
                 && ((rdClip_faceStatus & 0x41) || ((adjoinIter->flags & 1) && bAdjoinIsTransparent))) 
             {
-                rdCamera_pCurCamera->projectLst(vertices_tmp_projected, vertices_tmp, meshinfo_out.numVertices);
+                rdCamera_pCurCamera->projectLst(sithRender_aVerticesTmp_projected, sithRender_aVerticesTmp, meshinfo_out.numVertices);
                 
                 v31 = frustumArg;
 
@@ -659,8 +659,8 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
                     float maxY = -FLT_MAX;
                     for (int i = 0; i < meshinfo_out.numVertices; i++)
                     {
-                        float v34 = vertices_tmp_projected[i].x;
-                        float v57 = vertices_tmp_projected[i].y;
+                        float v34 = sithRender_aVerticesTmp_projected[i].x;
+                        float v57 = sithRender_aVerticesTmp_projected[i].y;
                         if (v34 < minX)
                             minX = v34;
                         if (v34 > maxX)
@@ -887,7 +887,7 @@ void sithRender_RenderLevelGeometry()
                 if ( texMode2 >= texMode )
                     texMode2 = texMode;
                 procEntry->textureMode = texMode2;
-                meshinfo_out.verticesProjected = vertices_tmp;
+                meshinfo_out.verticesProjected = sithRender_aVerticesTmp;
                 meshinfo_out.paDynamicLight = procEntry->vertexIntensities;
                 sithRender_idxInfo.vertexPosIdx = v65->surfaceInfo.face.vertexPosIdx;
                 meshinfo_out.vertexUVs = procEntry->vertexUVs;
@@ -944,7 +944,7 @@ void sithRender_RenderLevelGeometry()
                 {
                     continue;
                 }
-                rdCamera_pCurCamera->projectLst(procEntry->vertices, vertices_tmp, meshinfo_out.numVertices);
+                rdCamera_pCurCamera->projectLst(procEntry->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
                 if ( sithRender_lightingIRMode )
                 {
                     v49 = sithRender_f_83198C;
@@ -1031,7 +1031,7 @@ void sithRender_RenderLevelGeometry()
                 }
                 else if ( (surfaceFlags & SITH_SURFACE_CEILING_SKY) != 0 )
                 {
-                    sithRenderSky_TransformVertical(procEntry, &v65->surfaceInfo, vertices_tmp, num_vertices);
+                    sithRenderSky_TransformVertical(procEntry, &v65->surfaceInfo, sithRender_aVerticesTmp, num_vertices);
                 }
                 v57 = v65->surfaceInfo.face.type;
                 procEntry->wallCel = v65->surfaceInfo.face.wallCel;
@@ -1092,7 +1092,7 @@ void sithRender_RenderLevelGeometry()
                         v79[1] = v65->surfaceInfo.face.vertexUVIdx[v71];
                         v79[2] = v65->surfaceInfo.face.vertexUVIdx[v18];
                     }
-                    meshinfo_out.verticesProjected = vertices_tmp;
+                    meshinfo_out.verticesProjected = sithRender_aVerticesTmp;
                     sithRender_idxInfo.numVertices = 3;
                     meshinfo_out.vertexUVs = v20->vertexUVs;
                     sithRender_idxInfo.vertexPosIdx = v78;
@@ -1116,7 +1116,8 @@ void sithRender_RenderLevelGeometry()
                     else {
                         
 
-                        if ((v65->surfaceFlags & SITH_SURFACE_1000000) == 0) {
+                        if ((v65->surfaceFlags & SITH_SURFACE_1000000) == 0) 
+                        {
                             v80[0] = v65->surfaceInfo.intensities[v19];
                             v80[1] = v65->surfaceInfo.intensities[v71];
                             v80[2] = v65->surfaceInfo.intensities[v18];
@@ -1160,7 +1161,7 @@ void sithRender_RenderLevelGeometry()
                     if ( meshinfo_out.numVertices < 3u )
                         goto LABEL_92;
 
-                    rdCamera_pCurCamera->projectLst(v20->vertices, vertices_tmp, meshinfo_out.numVertices);
+                    rdCamera_pCurCamera->projectLst(v20->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
 
                     if ( sithRender_lightingIRMode )
                     {
@@ -1172,6 +1173,7 @@ void sithRender_RenderLevelGeometry()
                     {
                         v20->ambientLight = stdMath_Clamp(level_idk->extraLight + sithRender_008d4098, 0.0, 1.0);
                     }
+
                     if ( v20->ambientLight >= 1.0 )
                     {
                         if ( v68 )
@@ -1369,7 +1371,6 @@ void sithRender_UpdateAllLights()
     }
 }
 
-// MOTS altered
 // Added: recursion depth
 void sithRender_UpdateLights(sithSector *sector, float prev, float dist, int depth)
 {
@@ -1874,7 +1875,7 @@ void sithRender_RenderAlphaSurfaces()
         sithRender_idxInfo.numVertices = v0->surfaceInfo.face.numVertices;
         sithRender_idxInfo.vertexPosIdx = v0->surfaceInfo.face.vertexPosIdx;
         sithRender_idxInfo.vertexUVIdx = v0->surfaceInfo.face.vertexUVIdx;
-        meshinfo_out.verticesProjected = vertices_tmp;
+        meshinfo_out.verticesProjected = sithRender_aVerticesTmp;
 
         // Added: Just in case
         if (!sithRender_idxInfo.vertexUVIdx && v9->geometryMode > RD_GEOMODE_SOLIDCOLOR) {
@@ -1886,7 +1887,7 @@ void sithRender_RenderAlphaSurfaces()
         {
             continue;
         }
-        rdCamera_pCurCamera->projectLst(v9->vertices, vertices_tmp, meshinfo_out.numVertices);
+        rdCamera_pCurCamera->projectLst(v9->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
         
         v9->ambientLight = stdMath_Clamp(surfaceSector->extraLight + sithRender_008d4098, 0.0, 1.0);
 

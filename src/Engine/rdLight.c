@@ -233,6 +233,7 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
                     }
                 }
             }
+
             if (*outLights > 1.0) {
                 *outLights = 1.0;
             }

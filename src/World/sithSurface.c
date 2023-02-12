@@ -65,8 +65,7 @@ int sithSurface_Load(sithWorld *world)
     int wallCel; // edx
     double v32; // st7
     char *v33; // eax
-    unsigned int v34; // eax
-    unsigned int v35; // ebp
+    unsigned int v34; // ebp
     unsigned int v40; // ebx
     unsigned int v43; // edi
     unsigned int v50; // edi
@@ -245,7 +244,6 @@ int sithSurface_Load(sithWorld *world)
         v33 = stdConffile_entry.args[9].value;
         face->extraLight = v32;
         v34 = _atoi(v33);
-        v35 = v34;
         if ( v34 < 3 )
             return 0;
         if ( v34 > stdConffile_entry.numArgs - 10 )
@@ -258,19 +256,19 @@ int sithSurface_Load(sithWorld *world)
             return 0;
 
 #ifndef JKM_LIGHTING
-        surfaceInfo->intensities = pSithHS->alloc(sizeof(float) * v35);
+        surfaceInfo->intensities = pSithHS->alloc(sizeof(float) * v34);
         if ( !surfaceInfo->intensities )
             return 0;
 #endif
 
         if (face->material && (face->material->tex_type & 2))
         {
-            face->vertexUVIdx = pSithHS->alloc(sizeof(int) * v35);
+            face->vertexUVIdx = pSithHS->alloc(sizeof(int) * v34);
             if ( !face->vertexUVIdx )
                 return 0;
 
             v61 = 10;
-            for (v40 = 0; v40 < v35; v40++)
+            for (v40 = 0; v40 < v34; v40++)
             {
                 face->vertexPosIdx[v40] = _atoi(stdConffile_entry.args[v61].value);
                 face->vertexUVIdx[v40] = _atoi(stdConffile_entry.args[v61+1].value);
@@ -281,7 +279,7 @@ int sithSurface_Load(sithWorld *world)
         {
             face->vertexUVIdx = 0;
             v61 = 10;
-            for (v43 = 0; v43 < v35; v43++)
+            for (v43 = 0; v43 < v34; v43++)
             {
                 face->vertexPosIdx[v43] = _atoi(stdConffile_entry.args[v61].value);
                 v61 += 2;
@@ -289,13 +287,13 @@ int sithSurface_Load(sithWorld *world)
         }
 
 #ifndef JKM_LIGHTING
-        for (int v45 = 0; v45 < v35; v45++)
+        for (int v45 = 0; v45 < v34; v45++)
         {
             surfaceInfo->intensities[v45] = _atof(stdConffile_entry.args[v61+v45].value);
         }
 #else
         int testAmt = 0;
-        /*for (int v45 = 0; v45 < v35; v45++)
+        /*for (int v45 = 0; v45 < v34; v45++)
         {
             if (v61+(v45*4)+3 >= stdConffile_entry.numArgs) break; // Added
 
@@ -310,35 +308,39 @@ int sithSurface_Load(sithWorld *world)
         }*/
         testAmt = stdConffile_entry.numArgs - v61;
 
-        if (testAmt < v35 * 4) {
-            surfaceInfo->intensities = pSithHS->alloc(sizeof(float) * v35 * 4); // Added: extra
-            memset(surfaceInfo->intensities, 0, sizeof(float) * v35 * 4); // Added
+        if (testAmt < v34 * 4) {
+            surfaceInfo->intensities = pSithHS->alloc(sizeof(float) * ((v34 * 4) + 1)); // Added: extra
+            memset(surfaceInfo->intensities, 0, sizeof(float) * ((v34 * 4) + 1)); // Added
             if ( !surfaceInfo->intensities )
                 return 0;
-            for (int v45 = 0; v45 < v35; v45++)
+            for (int v45 = 0; v45 < v34; v45++)
             {
-                surfaceInfo->intensities[v45] = _atof(stdConffile_entry.args[v61+v45].value);
+                float val = _atof(stdConffile_entry.args[v61+v45].value);
+                surfaceInfo->intensities[(v34*0)+v45] = val; // Added
+                surfaceInfo->intensities[(v34*1)+v45] = val; // Added
+                surfaceInfo->intensities[(v34*2)+v45] = val; // Added 
+                surfaceInfo->intensities[(v34*3)+v45] = val; // Added
             }
             surfaceIter->surfaceFlags &= ~SITH_SURFACE_1000000;
         }
         else {
-            surfaceInfo->intensities = pSithHS->alloc(sizeof(float) * v35 * 4);
-            memset(surfaceInfo->intensities, 0, sizeof(float) * v35 * 4); // Added
+            surfaceInfo->intensities = pSithHS->alloc(sizeof(float) * ((v34 * 4) + 1));
+            memset(surfaceInfo->intensities, 0, sizeof(float) * ((v34 * 4) + 1)); // Added
             if ( !surfaceInfo->intensities )
                 return 0;
 
             surfaceIter->surfaceFlags |= SITH_SURFACE_1000000;
-            for (int v45 = 0; v45 < v35; v45++)
+            for (int v45 = 0; v45 < v34; v45++)
             {
-                surfaceInfo->intensities[(v35*0)+v45] = _atof(stdConffile_entry.args[v61+(v45*4)+0].value);
-                surfaceInfo->intensities[(v35*1)+v45] = _atof(stdConffile_entry.args[v61+(v45*4)+1].value);
-                surfaceInfo->intensities[(v35*2)+v45] = _atof(stdConffile_entry.args[v61+(v45*4)+2].value);
-                surfaceInfo->intensities[(v35*3)+v45] = _atof(stdConffile_entry.args[v61+(v45*4)+3].value);
+                surfaceInfo->intensities[(v34*0)+v45] = _atof(stdConffile_entry.args[v61+(v45*4)+0].value);
+                surfaceInfo->intensities[(v34*1)+v45] = _atof(stdConffile_entry.args[v61+(v45*4)+1].value);
+                surfaceInfo->intensities[(v34*2)+v45] = _atof(stdConffile_entry.args[v61+(v45*4)+2].value);
+                surfaceInfo->intensities[(v34*3)+v45] = _atof(stdConffile_entry.args[v61+(v45*4)+3].value);
             }
         }
 #endif
 
-        face->numVertices = v35;
+        face->numVertices = v34;
         face->num = v67;
     }
 
