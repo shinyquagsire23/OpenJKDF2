@@ -196,6 +196,8 @@ typedef enum
 typedef enum
 {
     CVARFLAG_GLOBAL = 1,
+    CVARFLAG_READONLY = 2,
+    CVARFLAG_RESETHUD = 4,
 } tCvarFlags;
 
 #define JK_JOYSTICK_AXIS_STRIDE (6)

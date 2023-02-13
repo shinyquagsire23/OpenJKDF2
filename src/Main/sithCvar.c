@@ -3,6 +3,7 @@
 #include "General/stdString.h"
 #include "General/stdStrTable.h"
 #include "General/stdJSON.h"
+#include "Main/jkHud.h"
 #include "World/jkPlayer.h"
 #include "stdPlatform.h"
 #include "jk.h"
@@ -40,7 +41,10 @@ void sithCvar_Shutdown()
         tSithCvar* pCvar = &sithCvar_aCvars[i];
 
         if(pCvar->type == CVARTYPE_STR && pCvar->pStrVal) {
-            pSithHS->free(pCvar->pStrVal);
+            pHS->free(pCvar->pStrVal);
+        }
+        if (pCvar->pNameLower) {
+            pHS->free(pCvar->pNameLower);
         }
     }
 
@@ -190,6 +194,7 @@ tSithCvar* sithCvar_Find(const char* pName)
     char tmp[256];
     if (!pName) return NULL;
 
+    memset(tmp, 0, sizeof(tmp));
     stdString_SafeStrCopy(tmp, pName, SITHCVAR_MAX_STRLEN);
     _strtolower(tmp);
 
@@ -199,11 +204,14 @@ tSithCvar* sithCvar_Find(const char* pName)
 
 int sithCvar_Register(const char* pName, int32_t type, intptr_t defaultVal, void* pLinkPtr, uint32_t flags)
 {
-    char tmp[256];
     if (sithCvar_numRegistered >= SITHCVAR_MAX_CVARS) return 0;
+
+    char* tmp = pHS->alloc(SITHCVAR_MAX_STRLEN);
+    if (!tmp) return 0;
 
     tSithCvar* pCvar = &sithCvar_aCvars[sithCvar_numRegistered++];
     pCvar->pName = pName;
+    pCvar->pNameLower = tmp;
     pCvar->type = type;
 
     pCvar->val = 0;
@@ -220,7 +228,7 @@ int sithCvar_Register(const char* pName, int32_t type, intptr_t defaultVal, void
             break;
         case CVARTYPE_STR:
         {
-            char* pVal = pSithHS->alloc(SITHCVAR_MAX_STRLEN);
+            char* pVal = pHS->alloc(SITHCVAR_MAX_STRLEN);
             stdString_SafeStrCopy(pVal, (const char*)defaultVal, SITHCVAR_MAX_STRLEN);
             pCvar->pStrVal = pVal;
             break;
@@ -231,10 +239,11 @@ int sithCvar_Register(const char* pName, int32_t type, intptr_t defaultVal, void
     pCvar->pLinkPtr = pLinkPtr;
     pCvar->flags = flags;
 
-    stdString_SafeStrCopy(tmp, pName, SITHCVAR_MAX_STRLEN);
-    _strtolower(tmp);
-    stdHashTable_SetKeyVal(sithCvar_pHashTable, tmp, pCvar);
-
+    memset(pCvar->pNameLower, 0, SITHCVAR_MAX_STRLEN);
+    stdString_SafeStrCopy(pCvar->pNameLower, pName, SITHCVAR_MAX_STRLEN);
+    _strtolower(pCvar->pNameLower);
+    stdHashTable_SetKeyVal(sithCvar_pHashTable, pCvar->pNameLower, pCvar);
+    
     sithCvar_UpdateLinkInternal(pCvar);
 
     return 1;
@@ -270,6 +279,10 @@ int sithCvar_SetRaw(const char* pName, intptr_t val)
     tSithCvar* pCvar = sithCvar_Find(pName);
     if (!pCvar) return 0;
 
+    if (pCvar->flags & CVARFLAG_READONLY) {
+        return 0;
+    }
+
     pCvar->val = val;
 
     return sithCvar_UpdateLinkInternal(pCvar);
@@ -283,6 +296,10 @@ int sithCvar_SetStr(const char* pName, const char* pVal)
     if (!pCvar) return 0;
 
     if(pCvar->type != CVARTYPE_STR) {
+        return 0;
+    }
+
+    if (pCvar->flags & CVARFLAG_READONLY) {
         return 0;
     }
 
@@ -306,6 +323,10 @@ int sithCvar_SetBool(const char* pName, int32_t val)
         return 0;
     }
 
+    if (pCvar->flags & CVARFLAG_READONLY) {
+        return 0;
+    }
+
     pCvar->boolVal = val;
 
     return sithCvar_UpdateLinkInternal(pCvar);
@@ -322,6 +343,10 @@ int sithCvar_SetInt(const char* pName, int32_t val)
         return 0;
     }
 
+    if (pCvar->flags & CVARFLAG_READONLY) {
+        return 0;
+    }
+
     pCvar->intVal = val;
 
     return sithCvar_UpdateLinkInternal(pCvar);
@@ -335,6 +360,10 @@ int sithCvar_SetFlex(const char* pName, float val)
     if (!pCvar) return 0;
 
     if(pCvar->type != CVARTYPE_FLEX) {
+        return 0;
+    }
+
+    if (pCvar->flags & CVARFLAG_READONLY) {
         return 0;
     }
 
@@ -382,6 +411,11 @@ int sithCvar_UpdateLinkInternal(tSithCvar* pCvar)
         case CVARTYPE_STR:
             stdString_SafeStrCopy((char*)pCvar->pLinkPtr, pCvar->pStrVal, SITHCVAR_MAX_STRLEN);
             break;
+    }
+
+    if (pCvar->flags & CVARFLAG_RESETHUD) {
+        jkHud_Close();
+        jkHud_Open();
     }
     return 1;
 }
@@ -479,5 +513,84 @@ void sithCvar_Enumerate(sithCvarEnumerationFn_t fnCallback)
     for (int i = 0; i < sithCvar_numRegistered; i++)
     {
         fnCallback(&sithCvar_aCvars[i]);
+    }
+}
+
+void sithCvar_ToString(const char* pName, char* pOut, int outSize)
+{
+    if (!pOut || !outSize) return;
+    memset(pOut, 0, outSize);
+
+    tSithCvar* pCvar = sithCvar_Find(pName);
+    if (!pCvar) {
+        return;
+    }
+
+    switch (pCvar->type) {
+        case CVARTYPE_BOOL:
+            stdString_SafeStrCopy(pOut, pCvar->boolVal ? "1" : "0", outSize);
+            break;
+        case CVARTYPE_INT:
+            stdString_snprintf(pOut, outSize, "%d", pCvar->intVal);
+            break;
+        case CVARTYPE_FLEX:
+            stdString_snprintf(pOut, outSize, "%f", pCvar->flexVal);
+            break;
+        case CVARTYPE_STR:
+            stdString_SafeStrCopy(pOut, pCvar->pStrVal, SITHCVAR_MAX_STRLEN);
+            break;
+    }
+}
+
+int sithCvar_SetFromString(const char* pName, const char* pStrVal)
+{
+    if (!pName || !pStrVal) return 0;
+
+    tSithCvar* pCvar = sithCvar_Find(pName);
+    if (!pCvar) {
+        return 0;
+    }
+
+    if (pCvar->flags & CVARFLAG_READONLY) {
+        return 0;
+    }
+
+    float readValFlex = 0.0;
+    int readValInt = 0;
+
+    switch (pCvar->type) {
+        case CVARTYPE_BOOL:
+            if (!__strcmpi(pStrVal, "true") || !__strcmpi(pStrVal, "t") || !__strcmpi(pStrVal, "yes") || !__strcmpi(pStrVal, "y") || !__strcmpi(pStrVal, "on")) {
+                pCvar->boolVal = 1;
+            }
+            else if (!__strcmpi(pStrVal, "false") || !__strcmpi(pStrVal, "f") || !__strcmpi(pStrVal, "no") || !__strcmpi(pStrVal, "n") || !__strcmpi(pStrVal, "off")) {
+                pCvar->boolVal = 0;
+            }
+            else if (_sscanf(pStrVal, "%d", &readValInt) == 1) {
+                pCvar->boolVal = !!readValInt;
+            }
+            else {
+                return 0;
+            }
+            return sithCvar_UpdateLinkInternal(pCvar);
+        case CVARTYPE_INT:
+            if (_sscanf(pStrVal, "%d", &readValInt) == 1) {
+                pCvar->intVal = readValInt;
+            }
+            else {
+                return 0;
+            }
+            return sithCvar_UpdateLinkInternal(pCvar);
+        case CVARTYPE_FLEX:
+            if (_sscanf(pStrVal, "%f", &readValFlex) == 1) {
+                pCvar->flexVal = readValFlex;
+            }
+            else {
+                return 0;
+            }
+            return sithCvar_UpdateLinkInternal(pCvar);
+        case CVARTYPE_STR:
+            stdString_SafeStrCopy(pCvar->pStrVal, pStrVal, SITHCVAR_MAX_STRLEN);
+            return sithCvar_UpdateLinkInternal(pCvar);
     }
 }

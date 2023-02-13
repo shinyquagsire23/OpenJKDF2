@@ -36,5 +36,7 @@ int32_t sithCvar_GetInt(const char* pName);
 float sithCvar_GetFlex(const char* pName);
 
 void sithCvar_Enumerate(sithCvarEnumerationFn_t fnCallback);
+void sithCvar_ToString(const char* pName, char* pOut, int outSize);
+int sithCvar_SetFromString(const char* pName, const char* pStrVal);
 
 #endif // _OPENJKDF2_SITH_CVAR_H

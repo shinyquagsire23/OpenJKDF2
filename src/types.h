@@ -3335,6 +3335,7 @@ typedef struct jkBubbleInfo
 typedef struct sSithCvar
 {
     const char* pName;
+    const char* pNameLower;
     void* pLinkPtr;
     int32_t type;
     int32_t flags;

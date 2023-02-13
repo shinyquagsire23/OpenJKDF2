@@ -27,6 +27,7 @@
 #include "Win95/Window.h"
 #include "Platform/stdControl.h"
 #include "Gameplay/sithPlayerActions.h"
+#include "Main/sithCvar.h"
 #include "../jk.h"
 
 #define JKQUAKECONSOLE_COMMAND_HISTORY_DEPTH (64)
@@ -264,6 +265,40 @@ void jkQuakeConsole_Render()
     }
 }
 
+int jkQuakeConsole_AutocompleteCvarsCallback_bPrintOnce = 0;
+
+void jkQuakeConsole_AutocompleteCvarsCallback(tSithCvar* pCvar)
+{
+    if (!__strnicmp(jkQuakeConsole_pTabPos, pCvar->pName, strlen(jkQuakeConsole_pTabPos))) {
+        jkQuakeConsole_AutocompleteCvarsCallback_bPrintOnce = 1;
+
+        if (jkQuakeConsole_sortTmpIdx < JKQUAKECONSOLE_SORTED_LIMIT) {
+            jkQuakeConsole_aSortTmp[jkQuakeConsole_sortTmpIdx++] = pCvar->pName;
+        }
+    }
+}
+
+int jkQuakeConsole_AutocompleteCvars()
+{
+    if (!jkQuakeConsole_pTabPos) return 0;
+
+    jkQuakeConsole_AutocompleteCvarsCallback_bPrintOnce = 0;
+    sithCvar_Enumerate(jkQuakeConsole_AutocompleteCvarsCallback);
+
+    for (int i = 0; i < sithConsole_pCmdHashtable->numBuckets; i++)
+    {
+        stdLinklist* pIter = &sithConsole_pCmdHashtable->buckets[i];
+        while (pIter)
+        {
+            if (pIter->key) {
+                
+            }
+            pIter = pIter->next;
+        }
+    }
+    return jkQuakeConsole_AutocompleteCvarsCallback_bPrintOnce;
+}
+
 int jkQuakeConsole_AutocompleteCheats()
 {
     if (!jkQuakeConsole_pTabPos) return 0;
@@ -275,7 +310,7 @@ int jkQuakeConsole_AutocompleteCheats()
         while (pIter)
         {
             if (pIter->key) {
-                if (!strncmp(jkQuakeConsole_pTabPos, pIter->key, strlen(jkQuakeConsole_pTabPos))) {
+                if (!__strnicmp(jkQuakeConsole_pTabPos, pIter->key, strlen(jkQuakeConsole_pTabPos))) {
                     bPrintOnce = 1;
 
                     if (jkQuakeConsole_sortTmpIdx < JKQUAKECONSOLE_SORTED_LIMIT) {
@@ -300,7 +335,7 @@ int jkQuakeConsole_AutocompleteConsoleCmds()
         while (pIter)
         {
             if (pIter->key) {
-                if (!strncmp(jkQuakeConsole_pTabPos, pIter->key, strlen(jkQuakeConsole_pTabPos))) {
+                if (!__strnicmp(jkQuakeConsole_pTabPos, pIter->key, strlen(jkQuakeConsole_pTabPos))) {
                     bPrintOnce = 1;
 
                     if (jkQuakeConsole_sortTmpIdx < JKQUAKECONSOLE_SORTED_LIMIT) {
@@ -368,6 +403,7 @@ void jkQuakeConsole_ExecuteCommand(const char* pCmd)
 void jkQuakeConsole_SendInput(char wParam, int bIsChar)
 {
     wchar_t tmp[256]; // [esp+4h] [ebp-100h] BYREF
+    char tmp_cvar[SITHCVAR_MAX_STRLEN];
 
     if ( wParam == VK_ESCAPE || wParam == VK_OEM_3 || wParam == 0xffffffc0 || wParam == '`' || wParam == '~')
     {
@@ -534,6 +570,7 @@ void jkQuakeConsole_SendInput(char wParam, int bIsChar)
             jkQuakeConsole_sortTmpIdx = 0;
 
             if (bCanAutocompleteCheats) {
+                bPrintOnce |= jkQuakeConsole_AutocompleteCvars();
                 bPrintOnce |= jkQuakeConsole_AutocompleteCheats();
                 bPrintOnce |= jkQuakeConsole_AutocompleteConsoleCmds();
             }
@@ -561,7 +598,15 @@ void jkQuakeConsole_SendInput(char wParam, int bIsChar)
                     jkQuakeConsole_bHasTabbed = 1;
                 }
                 if (shouldPrint) {
-                    stdPlatform_Printf("  %s\n", jkQuakeConsole_aSortTmp[i]);
+
+                    tSithCvar* pCvar = sithCvar_Find(jkQuakeConsole_aSortTmp[i]);
+                    if (pCvar) {
+                        sithCvar_ToString(jkQuakeConsole_aSortTmp[i], tmp_cvar, SITHCVAR_MAX_STRLEN);
+                        stdPlatform_Printf("  %s = \"%s\"\n", jkQuakeConsole_aSortTmp[i], tmp_cvar);
+                    }
+                    else {
+                        stdPlatform_Printf("  %s\n", jkQuakeConsole_aSortTmp[i]);
+                    }
                 }
             }
 

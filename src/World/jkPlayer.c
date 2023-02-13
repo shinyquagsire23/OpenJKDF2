@@ -164,19 +164,19 @@ void jkPlayer_StartupVars()
     sithCvar_RegisterBool("r_enableVsync",              0,                          &jkPlayer_enableVsync,              CVARFLAG_LOCAL);
     sithCvar_RegisterFlex("r_ssaaMultiple",             1.0,                        &jkPlayer_ssaaMultiple,             CVARFLAG_LOCAL);
     sithCvar_RegisterFlex("r_gamma",                    1.0,                        &jkPlayer_gamma,                    CVARFLAG_LOCAL);
-    sithCvar_RegisterBool("r_bEnableJkgm",              1,                          &jkPlayer_bEnableJkgm,              CVARFLAG_LOCAL);
-    sithCvar_RegisterBool("r_bEnableTexturePrecache",   1,                          &jkPlayer_bEnableTexturePrecache,   CVARFLAG_LOCAL);
+    sithCvar_RegisterBool("r_bEnableJkgm",              1,                          &jkPlayer_bEnableJkgm,              CVARFLAG_LOCAL|CVARFLAG_READONLY);
+    sithCvar_RegisterBool("r_bEnableTexturePrecache",   1,                          &jkPlayer_bEnableTexturePrecache,   CVARFLAG_LOCAL|CVARFLAG_READONLY);
     sithCvar_RegisterBool("g_bKeepCorpses",             0,                          &jkPlayer_bKeepCorpses,             CVARFLAG_LOCAL);
     sithCvar_RegisterBool("menu_bFastMissionText",      0,                          &jkPlayer_bFastMissionText,         CVARFLAG_LOCAL);
     sithCvar_RegisterBool("g_bUseOldPlayerPhysics",     0,                          &jkPlayer_bUseOldPlayerPhysics,     CVARFLAG_LOCAL);
-    sithCvar_RegisterFlex("hud_scale",                  2.0,                        &jkPlayer_hudScale,                 CVARFLAG_LOCAL);
-    sithCvar_RegisterFlex("hud_crosshairLineWidth",     1.0,                        &jkPlayer_crosshairLineWidth,       CVARFLAG_LOCAL);
-    sithCvar_RegisterFlex("hud_crosshairScale",         1.0,                        &jkPlayer_crosshairScale,           CVARFLAG_LOCAL);
+    sithCvar_RegisterFlex("hud_scale",                  2.0,                        &jkPlayer_hudScale,                 CVARFLAG_LOCAL|CVARFLAG_RESETHUD);
+    sithCvar_RegisterFlex("hud_crosshairLineWidth",     1.0,                        &jkPlayer_crosshairLineWidth,       CVARFLAG_LOCAL|CVARFLAG_RESETHUD);
+    sithCvar_RegisterFlex("hud_crosshairScale",         1.0,                        &jkPlayer_crosshairScale,           CVARFLAG_LOCAL|CVARFLAG_RESETHUD);
     sithCvar_RegisterFlex("g_canonicalCogTickrate",     CANONICAL_COG_TICKRATE,     &jkPlayer_canonicalCogTickrate,     CVARFLAG_LOCAL);
     sithCvar_RegisterFlex("g_canonicalPhysTickrate",    CANONICAL_PHYS_TICKRATE,    &jkPlayer_canonicalPhysTickrate,    CVARFLAG_LOCAL);
 
-    sithCvar_RegisterBool("r_hidpi",                     0,                         &Window_isHiDpi_tmp,                CVARFLAG_LOCAL);
-    sithCvar_RegisterBool("r_fullscreen",                0,                         &Window_isFullscreen_tmp,           CVARFLAG_LOCAL);
+    sithCvar_RegisterBool("r_hidpi",                     0,                         &Window_isHiDpi_tmp,                CVARFLAG_LOCAL|CVARFLAG_READONLY);
+    sithCvar_RegisterBool("r_fullscreen",                0,                         &Window_isFullscreen_tmp,           CVARFLAG_LOCAL|CVARFLAG_READONLY);
 
 #ifdef FIXED_TIMESTEP_PHYS
     sithCvar_RegisterBool("g_bJankyPhysics",             1,                         &jkPlayer_bJankyPhysics,            CVARFLAG_LOCAL);

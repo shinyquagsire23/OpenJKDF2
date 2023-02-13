@@ -5,6 +5,7 @@
 #include "Devices/sithSound.h"
 #include "General/stdHashTable.h"
 #include "General/stdString.h"
+#include "Main/sithCvar.h"
 #include "stdPlatform.h"
 #include "jk.h"
 
@@ -127,11 +128,50 @@ int sithConsole_TryCommand(char *cmd)
     char *v1; // esi
     stdDebugConsoleCmd *v2; // edi
     char *v3; // eax
+    char tmp_cvar[SITHCVAR_MAX_STRLEN];
 
     _strtolower(cmd);
     v1 = _strtok(cmd, ", \t\n\r");
     if ( v1 )
     {
+        // Added: cvars
+        tSithCvar* pCvar = sithCvar_Find(v1);
+        if (pCvar) {
+            v3 = _strtok(0, "\n\r");
+
+            if (pCvar->flags & CVARFLAG_READONLY) {
+                if (!_strtok(v3, ", \t\n\r")) {
+                    sithCvar_ToString(pCvar->pName, tmp_cvar, SITHCVAR_MAX_STRLEN);
+                    _sprintf(std_genBuffer, "%s = \"%s\"", pCvar->pName, tmp_cvar);
+                    if ( DebugGui_fnPrint )
+                    {
+                        DebugGui_fnPrint(std_genBuffer);
+                    }
+                    return 0;
+                }
+
+                _sprintf(std_genBuffer, "Cvar %s is read-only.", pCvar->pName);
+                if ( DebugGui_fnPrint )
+                {
+                    DebugGui_fnPrint(std_genBuffer);
+                }
+                return 0;
+            }
+
+            
+            if (!sithCvar_SetFromString(pCvar->pName, v3))
+            {
+                sithCvar_ToString(pCvar->pName, tmp_cvar, SITHCVAR_MAX_STRLEN);
+                _sprintf(std_genBuffer, "%s = \"%s\"", pCvar->pName, tmp_cvar);
+                if ( DebugGui_fnPrint )
+                {
+                    DebugGui_fnPrint(std_genBuffer);
+                }
+                return 0;
+            }
+            return 1;
+        }
+
         v2 = (stdDebugConsoleCmd *)stdHashTable_GetKeyVal(sithConsole_pCmdHashtable, v1);
         if ( v2 )
         {
