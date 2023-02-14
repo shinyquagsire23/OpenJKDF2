@@ -1611,7 +1611,7 @@ void rdPrimit3_ClipFaceRGBLevel
 
                 int idxIter = 0;
                 
-                for (int idkIn_ = idxInfo->numVertices; idkIn_ >= 0; idkIn_--) {
+                for (int idkIn_ = idxInfo->numVertices; idkIn_ > 0; idkIn_--) {
                     iVar12 = *piVar18;
                     prVar1 = prVar7 + iVar12;
                     rdVector_Copy3(prVar20, prVar1);
