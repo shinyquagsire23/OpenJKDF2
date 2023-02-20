@@ -45,9 +45,9 @@ uint64_t jkQuakeConsole_lastTimeUs = 0;
 uint64_t jkQuakeConsole_blinkCounter = 0;
 float jkQuakeConsole_shadeY = 0.0;
 
-char jkQuakeConsole_chatStrSaved[JKQUAKECONSOLE_CHAT_LEN];
+char jkQuakeConsole_chatStrSaved[JKQUAKECONSOLE_CHAT_LEN+16];
 
-char jkQuakeConsole_chatStr[JKQUAKECONSOLE_CHAT_LEN];
+char jkQuakeConsole_chatStr[JKQUAKECONSOLE_CHAT_LEN+16];
 int32_t jkQuakeConsole_chatStrPos = 0;
 int32_t jkQuakeConsole_scrollPos = 0;
 uint32_t jkQuakeConsole_realLines = 0;

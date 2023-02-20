@@ -27,6 +27,7 @@
 #include "General/stdString.h"
 #include "General/util.h"
 #include "General/stdFnames.h"
+#include "Main/sithCvar.h"
 #include "stdPlatform.h"
 
 // Added
