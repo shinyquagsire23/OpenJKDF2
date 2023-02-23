@@ -1,5 +1,6 @@
 #include "jkHud.h"
 
+#include "Gameplay/sithInventory.h"
 #include "Win95/Video.h"
 #include "Win95/Windows.h"
 #include "Platform/stdControl.h"
@@ -21,6 +22,8 @@
 #include "Platform/std3D.h"
 #include "World/jkPlayer.h"
 #include "../jk.h"
+#include "types.h"
+#include "types_enums.h"
 
 //stdBitmap* jkHud_pTestbitmap = NULL;
 
@@ -594,7 +597,17 @@ void jkHud_Draw()
         }
     }
 
-    if ( jkPlayer_setCrosshair && sithCamera_currentCamera->cameraPerspective == 1 && !(sithPlayer_pLocalPlayerThing->thingflags & SITH_TF_DEAD) && MOTS_ONLY_COND(!(sithPlayer_pLocalPlayerThing->actorParams.typeflags & SITH_AF_SCOPEHUD)))
+    if ( 
+        jkPlayer_setCrosshair 
+        && sithCamera_currentCamera->cameraPerspective == 1
+        && !(sithPlayer_pLocalPlayerThing->thingflags & SITH_TF_DEAD) 
+        && MOTS_ONLY_COND(!(sithPlayer_pLocalPlayerThing->actorParams.typeflags & SITH_AF_SCOPEHUD))
+#ifdef QOL_IMPROVEMENTS
+        && jkHud_shouldCrosshairBeShownForWeapon(sithPlayer_pLocalPlayerThing)
+#endif /* ifdef QOL_IMPROVEMENTS */
+
+    )
+
     {
         uint32_t tmpInt;
 #ifdef QOL_IMPROVEMENTS
@@ -1160,7 +1173,15 @@ void jkHud_DrawGPU()
     }
 
     // MoTS altered: Scope hud
-    if ( jkPlayer_setCrosshair && sithCamera_currentCamera->cameraPerspective == 1 && !(sithPlayer_pLocalPlayerThing->thingflags & SITH_TF_DEAD) && MOTS_ONLY_COND(!(sithPlayer_pLocalPlayerThing->actorParams.typeflags & SITH_AF_SCOPEHUD)))
+    if ( 
+        jkPlayer_setCrosshair 
+        && sithCamera_currentCamera->cameraPerspective == 1 
+        && !(sithPlayer_pLocalPlayerThing->thingflags & SITH_TF_DEAD) 
+        && MOTS_ONLY_COND(!(sithPlayer_pLocalPlayerThing->actorParams.typeflags & SITH_AF_SCOPEHUD))
+#ifdef QOL_IMPROVEMENTS
+        && jkHud_shouldCrosshairBeShownForWeapon(sithPlayer_pLocalPlayerThing)
+#endif /* ifdef QOL_IMPROVEMENTS */
+  )
     {
         uint32_t tmpInt;
 #ifdef QOL_IMPROVEMENTS
@@ -1758,3 +1779,18 @@ int jkHud_chat2()
     a1[127] = 0;
     return jkDev_sub_41FB80(103, a1);
 }
+
+#ifdef QOL_IMPROVEMENTS
+BOOL jkHud_shouldCrosshairBeShownForWeapon(sithThing *player) {
+  int currentWeapon = sithInventory_GetCurWeapon(player);
+  if(currentWeapon == SITHBIN_FISTS) {
+    return jkPlayer_setCrosshairOnFist;
+  }
+
+  if(currentWeapon == SITHBIN_LIGHTSABER){
+    return jkPlayer_setCrosshairOnLightsaber;
+  }
+
+  return 1;
+}
+#endif /* ifdef QOL_IMPROVEMENTS */
