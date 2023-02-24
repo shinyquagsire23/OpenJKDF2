@@ -67,6 +67,7 @@
 #include "General/stdJSON.h"
 #include "Dss/jkDSS.h"
 #include "Main/InstallHelper.h"
+#include "sithCvar.h"
 
 #if defined(PLATFORM_POSIX)
 #include <locale.h>
