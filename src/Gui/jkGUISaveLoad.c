@@ -452,7 +452,7 @@ int jkGuiSaveLoad_PopulateInfoInit(jkGuiElement *a1, jkGuiMenu *a2, int a3, int 
 
 void jkGuiSaveLoad_Startup()
 {
-    jkGui_InitMenu(&jkGuiSaveLoad_menu, jkGui_stdBitmaps[3]);
+    jkGui_InitMenu(&jkGuiSaveLoad_menu, jkGui_stdBitmaps[JKGUI_BM_BK_SETUP]);
 }
 
 void jkGuiSaveLoad_Shutdown()

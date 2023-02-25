@@ -37,7 +37,7 @@ int jkGuiSingleTally_Show()
     int ret; // eax
     wchar_t v14[32]; // [esp+8h] [ebp-40h] BYREF
 
-    jkGui_SetModeMenu(jkGui_stdBitmaps[10]->palette);
+    jkGui_SetModeMenu(jkGui_stdBitmaps[JKGUI_BM_BK_TALLY]->palette);
     jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiSingleTally_menu, &jkGuiSingleTally_buttons[6]);
     jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiSingleTally_menu, &jkGuiSingleTally_buttons[5]);
     jkGuiSingleTally_buttons[0].wstr = jkPlayer_playerShortName;
@@ -82,7 +82,7 @@ void jkGuiSingleTally_Startup()
         jkGuiSingleTally_foStars = stdBitmap_Load("ui\\bm\\foStars.bm", 1, 0);
     }
     
-    jkGui_InitMenu(&jkGuiSingleTally_menu, jkGui_stdBitmaps[10]);
+    jkGui_InitMenu(&jkGuiSingleTally_menu, jkGui_stdBitmaps[JKGUI_BM_BK_TALLY]);
 }
 
 void jkGuiSingleTally_Shutdown()

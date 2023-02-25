@@ -24,7 +24,7 @@ static jkGuiMenu jkGuiDecision_menu = {jkGuiDecision_buttons, -1, 0x0E1, 0x0FF, 
 
 void jkGuiDecision_Startup()
 {
-    jkGui_InitMenu(&jkGuiDecision_menu, jkGui_stdBitmaps[8]);
+    jkGui_InitMenu(&jkGuiDecision_menu, jkGui_stdBitmaps[JKGUI_BM_BK_DECISION]);
 }
 
 void jkGuiDecision_Shutdown()
@@ -33,7 +33,7 @@ void jkGuiDecision_Shutdown()
 
 int jkGuiDecision_Show()
 {
-    jkGui_SetModeMenu(jkGui_stdBitmaps[8]->palette);
+    jkGui_SetModeMenu(jkGui_stdBitmaps[JKGUI_BM_BK_DECISION]->palette);
 
     int clicked = jkGuiRend_DisplayAndReturnClicked(&jkGuiDecision_menu);
 

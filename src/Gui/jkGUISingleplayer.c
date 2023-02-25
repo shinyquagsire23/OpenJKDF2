@@ -68,9 +68,9 @@ static jkGuiMenu jkGuiSingleplayer_menu3 = {jkGuiSingleplayer_buttons3, 0, 0xFFF
 
 void jkGuiSingleplayer_Startup()
 {
-    jkGui_InitMenu(&jkGuiSingleplayer_menu1, jkGui_stdBitmaps[1]);
-    jkGui_InitMenu(&jkGuiSingleplayer_menu2, jkGui_stdBitmaps[1]);
-    jkGui_InitMenu(&jkGuiSingleplayer_menu3, jkGui_stdBitmaps[1]);
+    jkGui_InitMenu(&jkGuiSingleplayer_menu1, jkGui_stdBitmaps[JKGUI_BM_BK_SINGLE]);
+    jkGui_InitMenu(&jkGuiSingleplayer_menu2, jkGui_stdBitmaps[JKGUI_BM_BK_SINGLE]);
+    jkGui_InitMenu(&jkGuiSingleplayer_menu3, jkGui_stdBitmaps[JKGUI_BM_BK_SINGLE]);
 
     int old_Main_bDevMode = Main_bDevMode;
     Main_bDevMode = 1;

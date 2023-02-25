@@ -265,8 +265,8 @@ void jkGuiNetHost_LoadSettings()
 
 void jkGuiNetHost_Startup()
 {
-    jkGui_InitMenu(&jkGuiNetHost_menu, jkGui_stdBitmaps[2]);
-    jkGui_InitMenu(&jkGuiNetHost_menuSettings, jkGui_stdBitmaps[3]);
+    jkGui_InitMenu(&jkGuiNetHost_menu, jkGui_stdBitmaps[JKGUI_BM_BK_MULTI]);
+    jkGui_InitMenu(&jkGuiNetHost_menuSettings, jkGui_stdBitmaps[JKGUI_BM_BK_SETUP]);
     
     jkGuiNetHost_LoadSettings();
     jkGuiNetHost_bInitted = 1;

@@ -52,8 +52,8 @@ static jkGuiMenu jkGuiTitle_menuLoadStatic = {jkGuiTitle_elementsLoadStatic, 0xF
 
 void jkGuiTitle_Startup()
 {
-    jkGui_InitMenu(&jkGuiTitle_menuLoadStatic, jkGui_stdBitmaps[0]);
-    jkGui_InitMenu(&jkGuiTitle_menuLoad, jkGui_stdBitmaps[5]);
+    jkGui_InitMenu(&jkGuiTitle_menuLoadStatic, jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]);
+    jkGui_InitMenu(&jkGuiTitle_menuLoad, jkGui_stdBitmaps[JKGUI_BM_BK_LOADING]);
 #ifdef QOL_IMPROVEMENTS
     jkGuiTitle_elementsLoad[4].bIsVisible = 0;
 #endif
@@ -260,7 +260,7 @@ void jkGuiTitle_ShowLoadingStatic()
     //wchar_t v4[16]; // [esp+0h] [ebp-20h] BYREF
     // Added: removed undefined behavior, used to use the stack.....
 
-    jkGui_SetModeMenu(jkGui_stdBitmaps[0]->palette);
+    jkGui_SetModeMenu(jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]->palette);
     jkGuiTitle_whichLoading = 1;
     sithWorld_SetLoadPercentCallback(jkGuiTitle_WorldLoadCallback);
     verRevision = jkGuiTitle_verRevision;
@@ -285,7 +285,7 @@ void jkGuiTitle_ShowLoading(char *a1, wchar_t *a2)
     jkGuiTitle_elementsLoad[4].bIsVisible = 0;
 #endif
 
-    jkGui_SetModeMenu(jkGui_stdBitmaps[0]->palette);
+    jkGui_SetModeMenu(jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]->palette);
     jkGuiTitle_whichLoading = 2;
     jkGuiRend_SetCursorVisible(0);
     sithWorld_SetLoadPercentCallback(jkGuiTitle_WorldLoadCallback);

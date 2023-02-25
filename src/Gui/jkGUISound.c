@@ -62,7 +62,7 @@ static jkGuiMenu jkGuiSound_menu = {jkGuiSound_elements, 0, 0xFFFF, 0xFFFF, 0xF,
 
 void jkGuiSound_Startup()
 {
-    jkGui_InitMenu(&jkGuiSound_menu, jkGui_stdBitmaps[3]);
+    jkGui_InitMenu(&jkGuiSound_menu, jkGui_stdBitmaps[JKGUI_BM_BK_SETUP]);
 
     jkGuiSound_musicVolume = wuRegistry_GetFloat("musicVolume", jkGuiSound_musicVolume);
     jkGuiSound_sfxVolume = wuRegistry_GetFloat("sfxVolume", jkGuiSound_sfxVolume);

@@ -267,7 +267,7 @@ int jkGuiBuildMulti_bRendering = 0;
 
 void jkGuiBuildMulti_StartupEditCharacter()
 {
-    jkGui_InitMenu(&jkGuiBuildMulti_menu, jkGui_stdBitmaps[11]);
+    jkGui_InitMenu(&jkGuiBuildMulti_menu, jkGui_stdBitmaps[JKGUI_BM_BK_BUILD_MULTI]);
 }
 
 void jkGuiBuildMulti_ShutdownEditCharacter()
@@ -410,7 +410,7 @@ int jkGuiBuildMulti_ShowEditCharacter(int bIdk)
     char FileName[128]; // [esp+10Ch] [ebp-80h] BYREF
 
     memset(v28, 0, sizeof(v28));
-    jkGui_SetModeMenu(jkGui_stdBitmaps[11]->palette);
+    jkGui_SetModeMenu(jkGui_stdBitmaps[JKGUI_BM_BK_BUILD_MULTI]->palette);
     v1 = jkPlayer_GetJediRank();
     stdString_snprintf(v24, 32, "RANK_%d_L", v1);
     v21 = jkStrings_GetText(v24);
@@ -842,9 +842,9 @@ int jkGuiBuildMulti_Startup()
         jkGuiBuildMulti_pNewCharacterMenu = &jkGuiBuildMulti_menuNewCharacterMots;
         jkGuiBuildMulti_pNewCharacterElements = jkGuiBuildMulti_menuNewCharacter_buttonsMots;
     }
-    jkGui_InitMenu(jkGuiBuildMulti_pNewCharacterMenu, jkGui_stdBitmaps[12]);
-    jkGui_InitMenu(&jkGuiBuildMulti_menuEditCharacter, jkGui_stdBitmaps[12]);
-    jkGui_InitMenu(&jkGuiBuildMulti_menuLoadCharacter, jkGui_stdBitmaps[12]);
+    jkGui_InitMenu(jkGuiBuildMulti_pNewCharacterMenu, jkGui_stdBitmaps[JKGUI_BM_BK_BUILD_LOAD]);
+    jkGui_InitMenu(&jkGuiBuildMulti_menuEditCharacter, jkGui_stdBitmaps[JKGUI_BM_BK_BUILD_LOAD]);
+    jkGui_InitMenu(&jkGuiBuildMulti_menuLoadCharacter, jkGui_stdBitmaps[JKGUI_BM_BK_BUILD_LOAD]);
 
     jkGuiBuildMulti_bInitted = 1;
     return 1;
@@ -961,7 +961,7 @@ int jkGuiBuildMulti_Show()
     wPlayerName[0] = 0;
     memset(&wPlayerName[1], 0, 0x3Cu);
     wPlayerName[31] = 0;
-    jkGui_SetModeMenu(jkGui_stdBitmaps[12]->palette);
+    jkGui_SetModeMenu(jkGui_stdBitmaps[JKGUI_BM_BK_BUILD_LOAD]->palette);
     jkGuiRend_DarrayNewStr(&darr, 5, 1);
     jkGuiBuildMulti_menuEditCharacter_buttons[3].func = jkGuiBuildMulti_sub_41D830;
     jkGuiBuildMulti_menuEditCharacter_buttons[0].wstr = NULL;
@@ -1450,7 +1450,7 @@ int jkGuiBuildMulti_ShowLoad(jkPlayerMpcInfo *pPlayerMpcInfo, char *pStrEpisode,
     tmp5[29] = 0;
     tmp5[30] = 0;
     tmp5[31] = 0;
-    jkGui_SetModeMenu(jkGui_stdBitmaps[12]->palette);
+    jkGui_SetModeMenu(jkGui_stdBitmaps[JKGUI_BM_BK_BUILD_LOAD]->palette);
     jkGuiRend_DarrayNewStr(&darr, 5, 1);
     jkGuiBuildMulti_menuLoadCharacter_buttons[3].func = jkGuiBuildMulti_sub_41D830;
     jkGuiBuildMulti_menuLoadCharacter_buttons[0].unistr = 0;
