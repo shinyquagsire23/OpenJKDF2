@@ -23,7 +23,7 @@ enum jkGuiDecisionButton_t
 };
 
 static wchar_t slider_val_text[5] = {0};
-static int slider_1[2] = {18, 17};
+static int slider_images[2] = {JKGUI_BM_SLIDER_BACK, JKGUI_BM_SLIDER_THUMB};
 void jkGuiGeneral_FovDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
 
 static jkGuiElement jkGuiGeneral_aElements[23] = { 

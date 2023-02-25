@@ -33,7 +33,7 @@ void jkGuiObjectives_CustomRender(jkGuiElement *element, jkGuiMenu *menu, stdVBu
 {
     signed int v6; // esi
     int v7; // ebp
-    int v8; // eax
+    int textType; // eax
     int v9; // ecx
     stdFont **v10; // edx
     int v11; // ebp
@@ -60,14 +60,14 @@ void jkGuiObjectives_CustomRender(jkGuiElement *element, jkGuiMenu *menu, stdVBu
             v16 = a4a->str;
             if ( a4a->str )
             {
-                v8 = element->field_8;
+                textType = element->textType;
                 ++v14;
                 v9 = element->rect.x + 30;
                 drawRect.width = element->rect.width - 30;
                 v10 = menu->fonts;
                 drawRect.x = v9;
                 drawRect.y = v6;
-                drawRect.height = v7 + (*v10[v8]->bitmap->mipSurfaces)->format.height;
+                drawRect.height = v7 + (*v10[textType]->bitmap->mipSurfaces)->format.height;
                 v11 = (uint8_t)(v15 & 4 | 0x10) >> 1;
                 stdFont_Draw2(vbuf, v10[v11], v9, v6, &drawRect, v16, 1);
                 v12 = stdFont_sub_4357C0(menu->fonts[v11], a4a->str, &drawRect);
@@ -78,7 +78,7 @@ void jkGuiObjectives_CustomRender(jkGuiElement *element, jkGuiMenu *menu, stdVBu
                     v6 + ((unsigned int)(v12 - (*jkGui_stdBitmaps[16]->mipSurfaces)->format.height) >> 1),
                     0,
                     1);
-                v7 = (*menu->fonts[element->field_8]->bitmap->mipSurfaces)->format.height + v12;
+                v7 = (*menu->fonts[element->textType]->bitmap->mipSurfaces)->format.height + v12;
                 v6 += v7;
             }
         }
@@ -87,7 +87,7 @@ void jkGuiObjectives_CustomRender(jkGuiElement *element, jkGuiMenu *menu, stdVBu
     if ( !v14 )
     {
         v13 = jkStrings_GetText("GUI_NO_OBJECTIVES");
-        stdFont_Draw1(vbuf, menu->fonts[element->field_8], element->rect.x + 30, element->rect.y, element->rect.width, v13, 1);
+        stdFont_Draw1(vbuf, menu->fonts[element->textType], element->rect.x + 30, element->rect.y, element->rect.width, v13, 1);
     }
 }
 

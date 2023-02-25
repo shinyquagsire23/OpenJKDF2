@@ -597,7 +597,7 @@ void jkHud_Draw()
         }
     }
 
-    if ( 
+    if (
         jkPlayer_setCrosshair 
         && sithCamera_currentCamera->cameraPerspective == 1
         && !(sithPlayer_pLocalPlayerThing->thingflags & SITH_TF_DEAD) 
@@ -1173,8 +1173,8 @@ void jkHud_DrawGPU()
     }
 
     // MoTS altered: Scope hud
-    if ( 
-        jkPlayer_setCrosshair 
+    if (
+        jkPlayer_setCrosshair
         && sithCamera_currentCamera->cameraPerspective == 1 
         && !(sithPlayer_pLocalPlayerThing->thingflags & SITH_TF_DEAD) 
         && MOTS_ONLY_COND(!(sithPlayer_pLocalPlayerThing->actorParams.typeflags & SITH_AF_SCOPEHUD))

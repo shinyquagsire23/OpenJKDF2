@@ -12,9 +12,10 @@
 #include "World/jkPlayer.h"
 
 #include "jk.h"
+#include "types_enums.h"
 
-int jkGuiKeyboard_idk1[2] = {0xAA, 0x0};
-int jkGuiKeyboard_aIdk2[2] = {0xD, 0xE};
+int jkGuiKeyboard_listbox_paddings[2] = {170, 0};
+int jkGuiKeyboard_listbox_images[2] = {JKGUI_BM_UP_15, JKGUI_BM_DOWN_15};
 
 static jkGuiElement jkGuiKeyboard_aElements[19] =
 {
@@ -30,7 +31,7 @@ static jkGuiElement jkGuiKeyboard_aElements[19] =
     { ELEMENT_TEXTBUTTON,  107, 2, "GUI_JOYSTICK", 3, { 320, 120, 140, 40 }, 1, 0, "GUI_JOYSTICK_HINT", NULL, NULL, NULL, {0}, 0},
     { ELEMENT_TEXTBUTTON,  108, 2, "GUI_CONTROLOPTIONS", 3, { 460, 120, 140, 40 }, 1, 0, "GUI_CONTROLOPTIONS_HINT", NULL, NULL, NULL, {0}, 0},
     { ELEMENT_TEXT,        0, 2, (const char*)jkGuiKeyboard_wstr_555E18, 3, { 50, 220, 320, 80 }, 1, 0, NULL, NULL, NULL, NULL, {0}, 0},
-    { ELEMENT_LISTBOX,     0, 0, NULL, 0, { 20, 170, 370, 216 }, 1, 0, "GUI_CONTROLSLIST_HINT", NULL, &jkGuiKeyboard_ControlListClicked, &jkGuiKeyboard_aIdk2, {0}, 0},
+    { ELEMENT_LISTBOX,     0, 0, NULL, 0, { 20, 170, 370, 216 }, 1, 0, "GUI_CONTROLSLIST_HINT", NULL, &jkGuiKeyboard_ControlListClicked, &jkGuiKeyboard_listbox_images, {0}, 0},
     { ELEMENT_TEXTBUTTON,  0, 2, "GUI_ADD_CONTROL", 3, { 420, 210, 210, 40 }, 1, 0, "GUI_ADD_CONTROL_HINT", NULL, &jkGuiKeyboard_AddControlClicked, NULL, {0}, 0},
     { ELEMENT_TEXTBUTTON,  0, 2, "GUI_REMOVE_CONTROL", 3, { 420, 250, 210, 40 }, 1, 0, "GUI_REMOVE_CONTROL_HINT", NULL, &jkGuiKeyboard_RemoveControlClicked, NULL, {0}, 0},
     { ELEMENT_TEXTBUTTON,  1, 2, "GUI_OK", 3, { 440, 430, 200, 40 }, 1, 0, NULL, NULL, &jkGuiKeyboard_OkClicked, NULL, {0}, 0},
@@ -40,7 +41,7 @@ static jkGuiElement jkGuiKeyboard_aElements[19] =
 };
 
 
-static jkGuiMenu jkGuiKeyboard_menu = {jkGuiKeyboard_aElements, 0, 225, 255, 15, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, (intptr_t)jkGuiKeyboard_idk1, jkGuiKeyboard_sub_4123C0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
+static jkGuiMenu jkGuiKeyboard_menu = {jkGuiKeyboard_aElements, 0, 225, 255, 15, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, (intptr_t)jkGuiKeyboard_listbox_paddings, jkGuiKeyboard_sub_4123C0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 
 const char* jkGuiKeyboard_DIKNumToStr(unsigned int idx, char bIsIdxAxis)
 {

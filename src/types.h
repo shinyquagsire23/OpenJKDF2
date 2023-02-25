@@ -2786,7 +2786,7 @@ typedef struct jkGuiElement
 {
     int type;
     int hoverId;
-    int field_8;
+    int textType;
 
 // Added: Allow soft-resetting of these fields easily
 #ifdef QOL_IMPROVEMENTS
@@ -2887,14 +2887,14 @@ typedef struct jkGuiMenu
 {
   jkGuiElement *paElements;
   int clickableIdxIdk;
-  int anonymous_1;
+  int textBoxCursorColor;
   int fillColor;
   int anonymous_3;
   stdVBuffer *texture;
   uint8_t* palette;
   stdBitmap **ui_structs;
   stdFont** fonts;
-  intptr_t anonymous_7;
+  intptr_t paddings;
   void (__cdecl *idkFunc)(jkGuiMenu *);
   char *soundHover;
   char *soundClick;

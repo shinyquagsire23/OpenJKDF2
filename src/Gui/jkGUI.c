@@ -292,7 +292,7 @@ void jkGui_sub_412E20(jkGuiMenu *menu, int a2, int a3, int a4)
         jkGuiElement* element = jkGuiRend_MenuGetClickableById(menu, i);
         if ( element )
         {
-            element->field_8 = 2;
+            element->textType = 2;
             element->type = ELEMENT_TEXTBUTTON;
         }
     }
@@ -302,7 +302,7 @@ void jkGui_sub_412E20(jkGuiMenu *menu, int a2, int a3, int a4)
         jkGuiElement* element = jkGuiRend_MenuGetClickableById(menu, a4);
         if ( element )
         {
-            element->field_8 = 3;
+            element->textType = 3;
             element->type = ELEMENT_TEXT;
         }
     }
