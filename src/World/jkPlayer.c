@@ -57,6 +57,9 @@ float jkPlayer_crosshairLineWidth = 1.0;
 float jkPlayer_crosshairScale = 1.0;
 float jkPlayer_canonicalCogTickrate = CANONICAL_COG_TICKRATE;
 float jkPlayer_canonicalPhysTickrate = CANONICAL_PHYS_TICKRATE;
+
+int jkPlayer_setCrosshairOnLightsaber = 1;
+int jkPlayer_setCrosshairOnFist = 1;
 #endif
 
 #ifdef FIXED_TIMESTEP_PHYS
@@ -547,6 +550,9 @@ void jkPlayer_WriteConf(wchar_t *name)
         stdJSON_SaveFloat(ext_fpath, "canonicalPhysTickrate", jkPlayer_canonicalPhysTickrate);
 
         stdJSON_SaveBool(ext_fpath, "bUseOldPlayerPhysics", jkPlayer_bUseOldPlayerPhysics);
+
+        stdJSON_SaveBool(ext_fpath, "setCrosshairOnLightsaber", jkPlayer_setCrosshairOnLightsaber);
+        stdJSON_SaveBool(ext_fpath, "setCrosshairOnFist", jkPlayer_setCrosshairOnFist);
 #endif
 #ifdef FIXED_TIMESTEP_PHYS
         stdJSON_SaveBool(ext_fpath, "bJankyPhysics", jkPlayer_bJankyPhysics);
@@ -728,6 +734,9 @@ int jkPlayer_ReadConf(wchar_t *name)
         jkPlayer_canonicalPhysTickrate = stdJSON_GetFloat(ext_fpath, "canonicalPhysTickrate", jkPlayer_canonicalPhysTickrate);
 
         jkPlayer_bUseOldPlayerPhysics = stdJSON_GetBool(ext_fpath, "bUseOldPlayerPhysics", jkPlayer_bUseOldPlayerPhysics);
+
+        jkPlayer_setCrosshairOnLightsaber = stdJSON_GetBool(ext_fpath, "setCrosshairOnLightsaber", jkPlayer_setCrosshairOnLightsaber);
+        jkPlayer_setCrosshairOnFist = stdJSON_GetBool(ext_fpath, "setCrosshairOnFist", jkPlayer_setCrosshairOnFist);
 
 #endif
 #ifdef FIXED_TIMESTEP_PHYS

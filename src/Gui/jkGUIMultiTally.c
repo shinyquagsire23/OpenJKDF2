@@ -256,19 +256,19 @@ int jkGuiMultiTally_Show(int a1)
             {
                 if ( pPlayerInfoIter->net_id == jkPlayer_playerInfos[playerThingIdx].net_id )
                 {
-                    pElementIter[-16].field_8 = 1;
-                    pElementIter->field_8 = 1;
-                    pElementIter[16].field_8 = 1;
-                    pElementIter[32].field_8 = 1;
-                    pElementIter[48].field_8 = 1;
+                    pElementIter[-16].textType = 1;
+                    pElementIter->textType = 1;
+                    pElementIter[16].textType = 1;
+                    pElementIter[32].textType = 1;
+                    pElementIter[48].textType = 1;
                 }
                 else
                 {
-                    pElementIter[-16].field_8 = 0;
-                    pElementIter->field_8 = 0;
-                    pElementIter[16].field_8 = 0;
-                    pElementIter[32].field_8 = 0;
-                    pElementIter[48].field_8 = 0;
+                    pElementIter[-16].textType = 0;
+                    pElementIter->textType = 0;
+                    pElementIter[16].textType = 0;
+                    pElementIter[32].textType = 0;
+                    pElementIter[48].textType = 0;
                 }
                 jk_snwprintf(&wtmp2[v8], 0x20u, L"%ls", pPlayerInfoIter);
                 v9 = pPlayerInfoIter->score;

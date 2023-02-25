@@ -17,15 +17,16 @@
 #include "World/jkPlayer.h"
 #include "Main/jkStrings.h"
 #include "Devices/sithControl.h"
+#include "types_enums.h"
 
 #include <math.h>
 #include <float.h>
 
 void jkGuiMouse_SensitivityDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
 
-static const int jkGUIMouse_idk1 = 0xAA;
-static int aIdk_52B170[2] = {0xd, 0xe};
-static int aIdk_52B168[2] = {0x13, 0x11};
+static const int jkGUIMouse_listbox_paddings = 0xAA;
+static int jkGUIMouse_listbox_images[2] = {JKGUI_BM_UP_15, JKGUI_BM_DOWN_15};
+static int jkGUIMouse_slider_images[2] = {JKGUI_BM_SLIDER_BACK_200, JKGUI_BM_SLIDER_THUMB};
 
 #ifdef QOL_IMPROVEMENTS
 static wchar_t slider_val_text[5] = {0};
@@ -71,16 +72,16 @@ static jkGuiElement jkGuiMouse_aElements[26] =
     {ELEMENT_TEXTBUTTON,  106, 2, "GUI_MOUSE",              3, {180, 120, 140, 40},  1, 0, "GUI_MOUSE_HINT", 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON,  107, 2, "GUI_JOYSTICK",           3, {320, 120, 140, 40}, 1, 0, "GUI_JOYSTICK_HINT", 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON,  108, 2, "GUI_CONTROLOPTIONS",     3, {460, 120, 140,  40}, 1, 0, "GUI_CONTROLOPTIONS_HINT", 0, 0, 0, {0}, 0},
-    {ELEMENT_LISTBOX,     0,   0, NULL,                     0, { 20, 170, 380, 141 }, 1, 0, "GUI_CONTROLSLIST_HINT", NULL, jkGuiMouse_ListClicked1, aIdk_52B170, {0}, 0},
-    {ELEMENT_LISTBOX,     0,   0, NULL,                     0, { 420, 170, 200, 141 }, 1, 0, "GUI_CONTROLSLIST_HINT", NULL, jkGuiMouse_ListClicked2, aIdk_52B170, {0}, 0},
-    {ELEMENT_LISTBOX,     0,   0, NULL,                     0, { 420, 170, 200, 141 }, 1, 0, "GUI_CONTROLSLIST_HINT", NULL, jkGuiMouse_ListClicked3, aIdk_52B170, {0}, 0},
+    {ELEMENT_LISTBOX,     0,   0, NULL,                     0, { 20, 170, 380, 141 }, 1, 0, "GUI_CONTROLSLIST_HINT", NULL, jkGuiMouse_ListClicked1, jkGUIMouse_listbox_images, {0}, 0},
+    {ELEMENT_LISTBOX,     0,   0, NULL,                     0, { 420, 170, 200, 141 }, 1, 0, "GUI_CONTROLSLIST_HINT", NULL, jkGuiMouse_ListClicked2, jkGUIMouse_listbox_images, {0}, 0},
+    {ELEMENT_LISTBOX,     0,   0, NULL,                     0, { 420, 170, 200, 141 }, 1, 0, "GUI_CONTROLSLIST_HINT", NULL, jkGuiMouse_ListClicked3, jkGUIMouse_listbox_images, {0}, 0},
     {ELEMENT_TEXTBUTTON,  0,   2, "GUI_ADD_CONTROL",        3, { 420, 190, 200, 40 }, 1, 0, "GUI_ADD_CONTROL_HINT", NULL, jkGuiMouse_AddEditControlsClicked, NULL, {0}, 0},
     {ELEMENT_TEXTBUTTON,  0,   2, "GUI_EDIT_CONTROL",       3, { 420, 190, 200, 40 }, 1, 0, "GUI_EDIT_CONTROL_HINT", NULL, jkGuiMouse_AddEditControlsClicked, NULL, {0}, 0},
     {ELEMENT_TEXTBUTTON,  0,   2, "GUI_REMOVE_CONTROL",     3, { 420, 230, 200, 40 }, 1, 0, "GUI_REMOVE_CONTROL_HINT", NULL, jkGuiMouse_RemoveClicked, NULL, {0}, 0},
     {ELEMENT_CHECKBOX,    0,   0, "GUI_REVERSE_AXIS",       0, { 320, 335, 300, 20 }, 1, 0, "GUI_REVERSE_HINT", NULL, NULL, NULL, {0}, 0},
     {ELEMENT_CHECKBOX,    0,   0, "GUI_CONTROL_RAW",        0, { 320, 365, 300, 20 }, 1, 0, "GUI_RAW_HINT", NULL, NULL, NULL, {0}, 0},
     {ELEMENT_TEXT,        0,   0, "GUI_SENSITIVITY",        2, { 50, 335, 170, 20 }, 1, 0, NULL, NULL, NULL, NULL, {0}, 0}, 
-    {ELEMENT_SLIDER,      0,   0, (char *)200,             50, { 60, 355, 205, 30 }, 1, 0, "GUI_SENSITIVITY_HINT", jkGuiMouse_SensitivityDraw, NULL, aIdk_52B168, {0}, 0},
+    {ELEMENT_SLIDER,      0,   0, (char *)200,             50, { 60, 355, 205, 30 }, 1, 0, "GUI_SENSITIVITY_HINT", jkGuiMouse_SensitivityDraw, NULL, jkGUIMouse_slider_images, {0}, 0},
     {ELEMENT_TEXTBUTTON,  1,   2, "GUI_OK",                 3, { 440, 430, 200, 40 }, 1, 0, NULL, NULL, jkGuiMouse_CancelOkClicked, NULL, {0}, 0},
     {ELEMENT_TEXTBUTTON, -1,   2, "GUI_CANCEL",             3, { 0, 430, 200, 40 }, 1, 0, NULL, NULL, jkGuiMouse_CancelOkClicked, NULL, {0}, 0},
     {ELEMENT_TEXTBUTTON,  0,   2, "GUI_RESTORE_DEFAULTS",   3, { 200, 430, 240, 40 }, 1, 0, NULL, NULL, jkGuiMouse_RestoreDefaultsClicked, NULL, {0}, 0},
@@ -93,7 +94,7 @@ static jkGuiElement jkGuiMouse_aElements[26] =
     {ELEMENT_END,         0,   0, NULL,                     0, {0}, 0, 0, NULL, NULL, NULL, NULL, {0}, 0},
 };
 
-static jkGuiMenu jkGuiMouse_menu = {jkGuiMouse_aElements, 0, 225, 255, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, (intptr_t)&jkGUIMouse_idk1, NULL, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
+static jkGuiMenu jkGuiMouse_menu = {jkGuiMouse_aElements, 0, 225, 255, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, (intptr_t)&jkGUIMouse_listbox_paddings, NULL, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 
 void jkGuiMouse_SensitivityDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw)
 {

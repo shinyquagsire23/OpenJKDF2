@@ -22,6 +22,10 @@
 #define jkHud_SortTeamScore_ADDR (0x004091A0)
 #define jkHud_Tally_ADDR (0x004091C0)
 
+#ifdef QOL_IMPROVEMENTS
+BOOL jkHud_shouldCrosshairBeShownForWeapon(sithThing *player);
+#endif // DEBUG
+
 int jkHud_Startup();
 void jkHud_Shutdown();
 int jkHud_Open();

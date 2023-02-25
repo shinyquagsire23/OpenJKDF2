@@ -949,10 +949,10 @@ LABEL_15:
     return v4;
 }
 
-int stdFont_sub_434EC0(stdVBuffer *a1, stdFont *a2, int a3, int a4, int a5, int *a6, wchar_t *a7, int a8)
+int stdFont_sub_434EC0(stdVBuffer *vBuffer, stdFont *font, int a3, int a4, int a5, int *paddings, wchar_t *text, int a8)
 {
-    int *v8; // ebp
-    int v9; // edi
+    int *paddingList; // ebp
+    int padding; // edi
     wchar_t *v11; // ebx
     wchar_t *v12; // eax
     wchar_t *v13; // esi
@@ -963,12 +963,12 @@ int stdFont_sub_434EC0(stdVBuffer *a1, stdFont *a2, int a3, int a4, int a5, int 
     int v18; // [esp+10h] [ebp-4h]
     uint16_t a7_;
 
-    v8 = a6;
-    v9 = 0;
+    paddingList = paddings;
+    padding = 0;
     v18 = 0;
-    if ( !a6 )
-        return stdFont_Draw1(a1, a2, a3, a4, a5, a7, a8);
-    v11 = a7;
+    if ( !paddings )
+        return stdFont_Draw1(vBuffer, font, a3, a4, a5, text, a8);
+    v11 = text;
     while ( *v11 )
     {
         v12 = __wcsrchr(v11, 9u);
@@ -979,9 +979,9 @@ int stdFont_sub_434EC0(stdVBuffer *a1, stdFont *a2, int a3, int a4, int a5, int 
             *v12 = 0;
             a7_ = v14;
         }
-        if ( v9 + a3 >= (signed int)a1->format.width )
+        if ( padding + a3 >= (signed int)vBuffer->format.width )
             break;
-        v9 += stdFont_Draw1(a1, a2, v9 + a3, a4, a5 - v9, v11, a8);
+        padding += stdFont_Draw1(vBuffer, font, padding + a3, a4, a5 - padding, v11, a8);
         if ( v13 )
         {
             v11 = v13 + 1;
@@ -997,26 +997,26 @@ int stdFont_sub_434EC0(stdVBuffer *a1, stdFont *a2, int a3, int a4, int a5, int 
             break;
         if ( *v11 )
         {
-            for ( i = *v8; i; ++v8 )
+            for ( i = *paddingList; i != 0; ++paddingList )
             {
-                if ( v9 <= i )
+                if ( padding <= i )
                     break;
-                i = v8[1];
+                i = paddingList[1];
             }
-            if ( *v8 )
+            if ( *paddingList )
             {
-                v9 = *v8;
+                padding = *paddingList;
             }
             else
             {
-                v17 = 8 * a2->marginX;
+                v17 = 8 * font->marginX;
                 if ( v17 <= 16 )
                     v17 = 16;
-                v9 += v17;
+                padding += v17;
             }
         }
     }
-    return v9;
+    return padding;
 }
 
 void stdFont_Free(stdFont *font)

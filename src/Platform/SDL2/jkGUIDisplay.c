@@ -32,8 +32,9 @@ static wchar_t hud_level[256] = {0};
 
 static wchar_t slider_val_text[5] = {0};
 static wchar_t slider_val_text_2[5] = {0};
-static int slider_1[2] = {18, 17};
-static int slider_2[2] = {18, 17};
+
+static int slider_images[2] = {JKGUI_BM_SLIDER_BACK, JKGUI_BM_SLIDER_THUMB};
+
 void jkGuiDisplay_FovDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
 void jkGuiDisplay_FramelimitDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
 
@@ -50,7 +51,7 @@ static jkGuiElement jkGuiDisplay_aElements[31] = {
 
     // 9
     {ELEMENT_TEXT,         0,            0, L"FOV",                 3, {20, 130, 300, 30}, 1,  0, 0, 0, 0, 0, {0}, 0},
-    {ELEMENT_SLIDER,       0,            0, (const char*)(FOV_MAX - FOV_MIN),                    0, {10, 160, 320, 30}, 1, 0, L"Set FOV", jkGuiDisplay_FovDraw, 0, slider_1, {0}, 0},
+    {ELEMENT_SLIDER,       0,            0, (const char*)(FOV_MAX - FOV_MIN),                    0, {10, 160, 320, 30}, 1, 0, L"Set FOV", jkGuiDisplay_FovDraw, 0, slider_images, {0}, 0},
     {ELEMENT_TEXT,         0,            0, slider_val_text,        3, {20, 190, 300, 30}, 1,  0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_CHECKBOX,     0,            0, L"FOV is vertical (Hor+)",    0, {20, 210, 200, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
     {ELEMENT_CHECKBOX,     0,            0, L"Enable Fullscreen",    0, {400, 150, 200, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
@@ -60,7 +61,7 @@ static jkGuiElement jkGuiDisplay_aElements[31] = {
 
     // 17
     {ELEMENT_TEXT,         0,            0, L"FPS Limit",                 3, {20, 280, 300, 30}, 1,  0, 0, 0, 0, 0, {0}, 0},
-    {ELEMENT_SLIDER,       0,            0, (const char*)(FPS_LIMIT_MAX - FPS_LIMIT_MIN),                    0, {10, 310, 320, 30}, 1, 0, L"Set FPS limit", jkGuiDisplay_FramelimitDraw, 0, slider_2, {0}, 0},
+    {ELEMENT_SLIDER,       0,            0, (const char*)(FPS_LIMIT_MAX - FPS_LIMIT_MIN),                    0, {10, 310, 320, 30}, 1, 0, L"Set FPS limit", jkGuiDisplay_FramelimitDraw, 0, slider_images, {0}, 0},
     {ELEMENT_TEXT,         0,            0, slider_val_text_2,        3, {20, 340, 300, 30}, 1,  0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_CHECKBOX,     0,            0, L"Enable VSync",    0, {20, 360, 300, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
     
