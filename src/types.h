@@ -2893,7 +2893,7 @@ typedef struct jkGuiMenu
   int clickableIdxIdk;
   int textBoxCursorColor;
   int fillColor;
-  int anonymous_3;
+  int checkboxBitmapIdx;
   stdVBuffer *texture;
   uint8_t* palette;
   stdBitmap **ui_structs;

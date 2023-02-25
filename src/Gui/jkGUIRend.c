@@ -1470,7 +1470,7 @@ void jkGuiRend_ListBoxDraw(jkGuiElement *element_, jkGuiMenu *menu, stdVBuffer *
 
 void jkGuiRend_CheckBoxDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw)
 {
-    stdBitmap *v4; // ebp
+    stdBitmap *checkboxBitmap; // ebp
     int v5; // eax
     stdVBuffer *v6; // ecx
     signed int v7; // eax
@@ -1485,8 +1485,8 @@ void jkGuiRend_CheckBoxDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *
 
     if ( redraw )
         jkGuiRend_CopyVBuffer(menu, &element->rect);
-    v4 = menu->ui_structs[menu->anonymous_3];
-    v6 = v4->mipSurfaces[(element->selectedTextEntry != 0) ? 1 : 0];
+    checkboxBitmap = menu->ui_structs[menu->checkboxBitmapIdx];
+    v6 = checkboxBitmap->mipSurfaces[(element->selectedTextEntry != 0) ? 1 : 0];
     v7 = (unsigned int)(element->rect.height - v6->format.height) / 2;
     if ( v7 < 0 )
         v7 = 0;

@@ -10,6 +10,7 @@
 #include "Gui/jkGUISetup.h"
 #include "World/jkPlayer.h"
 #include "Win95/Window.h"
+#include "types_enums.h"
 
 enum jkGuiDecisionButton_t
 {
@@ -85,7 +86,7 @@ static jkGuiElement jkGuiGeneral_aElementsAdvanced[22] = {
     { ELEMENT_END,         0,            0, NULL,                   0, {0},                 0, 0, NULL,                        0, 0, 0, {0}, 0},
 };
 
-static jkGuiMenu jkGuiGeneral_menuAdvanced = { jkGuiGeneral_aElementsAdvanced, 0, 0xFF, 0xE1, 0x0F, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0 };
+static jkGuiMenu jkGuiGeneral_menuAdvanced = { jkGuiGeneral_aElementsAdvanced, 0, 0xFF, 0xE1, JKGUI_BM_CHECK, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0 };
 #endif
 
 void jkGuiGeneral_Startup()
