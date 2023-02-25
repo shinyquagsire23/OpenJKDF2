@@ -182,8 +182,8 @@ void jkGuiMods_Show()
     v4 = -1;
     do
     {
-        jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiMods_menu, &jkGuiMods_aElements[2]);
-        jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiMods_menu, &jkGuiMods_aElements[3]);
+        jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiMods_menu, &jkGuiMods_aElements[6]);
+        jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiMods_menu, &jkGuiMods_aElements[7]);
         v4 = jkGuiRend_DisplayAndReturnClicked(&jkGuiMods_menu);
         
         if (v4 == JKGUIMODS_BTN_OPENRESOURCEFOLDER) {
