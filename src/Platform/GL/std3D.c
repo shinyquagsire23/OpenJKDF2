@@ -1454,21 +1454,13 @@ void std3D_DrawMapOverlay()
     glDepthFunc(GL_ALWAYS);
     glUseProgram(programMenu);
     
-    float menu_w, menu_h, menu_u, menu_v, menu_x;
-    menu_w = (double)Window_xSize;
-    menu_h = (double)Window_ySize;
-    menu_u = 1.0;
-    menu_v = 1.0;
-    menu_x = 0.0;
-    
-    int bFixHudScale = 0;
+    float menu_w = (double)Window_xSize;
+    float menu_h = (double)Window_ySize;
 
     if (!jkGame_isDDraw)
     {
         return;
     }
-    
-    bFixHudScale = 1;
 
     menu_w = Video_menuBuffer.format.width;
     menu_h = Video_menuBuffer.format.height;
@@ -3050,8 +3042,6 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
     }
 
     
-done_load:    
-    
     std3D_aLoadedSurfaces[std3D_loadedTexturesAmt] = texture;
     std3D_aLoadedTextures[std3D_loadedTexturesAmt++] = image_texture;
     /*ext->surfacebuf = image_data;
@@ -3361,9 +3351,6 @@ int std3D_AddBitmapToTextureCache(stdBitmap *texture, int mipIdx, int is_alpha_t
 #endif
         //glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, image_8bpp);
     }
-
-    
-done_load:    
     
     std3D_aUIBitmaps[cacheIdx] = texture;
     std3D_aUITextures[cacheIdx] = image_texture;

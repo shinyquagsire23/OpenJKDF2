@@ -62,7 +62,7 @@ char* jkQuakeConsole_aLines[JKQUAKECONSOLE_NUM_LINES];
 char* jkQuakeConsole_aLastCommands[JKQUAKECONSOLE_COMMAND_HISTORY_DEPTH];
 
 int jkQuakeConsole_sortTmpIdx = 0;
-char* jkQuakeConsole_aSortTmp[JKQUAKECONSOLE_SORTED_LIMIT];
+const char* jkQuakeConsole_aSortTmp[JKQUAKECONSOLE_SORTED_LIMIT];
 
 void jkQuakeConsole_ResetShade();
 

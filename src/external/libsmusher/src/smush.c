@@ -524,7 +524,7 @@ void smush_proc_iact(smush_ctx* ctx, uint32_t seek_pos, uint32_t total_size)
         free(data);
     }
     else {
-        smush_error("Can't handle this IACT!\n", track_flags);
+        smush_error("Can't handle this IACT!\n");
     }
 }
 

@@ -146,7 +146,7 @@ int stdString_CharToWchar(wchar_t *a1, const char *a2, int a3)
 int stdString_WcharToChar(char *a1, const wchar_t *a2, int a3)
 {
     int result; // eax
-    wchar_t *v4; // ecx
+    const wchar_t *v4; // ecx
     char *v5; // esi
 
     result = 0;

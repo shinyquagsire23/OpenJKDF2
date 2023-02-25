@@ -556,7 +556,7 @@ int jkGuiMultiTally_ShowTeamScores(int a1)
 
     _qsort(aTmpTeamScores, 5u, sizeof(jkHudTeamScore), jkGuiMultiTally_SortTeamScore);
     pElementIter = &jkGuiMultiTally_buttons3[4];
-    v9 = &v19;
+    v9 = v19;
     v10 = aTmpTeamScores;
     do
     {
