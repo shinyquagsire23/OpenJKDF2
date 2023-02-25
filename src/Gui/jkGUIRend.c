@@ -1390,7 +1390,7 @@ void jkGuiRend_ListBoxDraw(jkGuiElement *element_, jkGuiMenu *menu, stdVBuffer *
     rdRect renderRect; // [esp+20h] [ebp-10h]
     int element; // [esp+34h] [ebp+4h]
 
-    bitmapIndices = element_->anonymous_13;
+    bitmapIndices = element_->uiBitmaps;
     topArrowBitmap = menu->ui_structs[*bitmapIndices];
     bottomArrowBitmap = menu->ui_structs[bitmapIndices[1]];
     if ( redraw )
@@ -1807,7 +1807,7 @@ int jkGuiRend_SliderEventHandler(jkGuiElement *element, jkGuiMenu *menu, int eve
                 v12 = element->rect.width;
                 if ( v33 != (uint8_t*)-44 )
                     eventParam = 0;
-                bitmapIdices = (int *)element->anonymous_13;
+                bitmapIdices = (int *)element->uiBitmaps;
                 backgroundIdx = *bitmapIdices;
                 backgroundBitmap = menu->ui_structs[backgroundIdx];
                 if ( backgroundBitmap )
@@ -1960,7 +1960,7 @@ void jkGuiRend_SliderDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vb
     int redrawb; // [esp+7Ch] [ebp+10h]
 
     v6 = 0;
-    bitmapIndices = (signed int *)element->anonymous_13;
+    bitmapIndices = (signed int *)element->uiBitmaps;
     v43 = 0;
     sliderThumbIdx = bitmapIndices[1];
     sliderThumbBitmap = menu->ui_structs[sliderThumbIdx];
@@ -2022,7 +2022,7 @@ void jkGuiRend_SliderDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vb
         drawRect.width = v56;
         drawRect.y = blitY - v54;
         stdDisplay_VBufferCopy(vbuf, elementa->mipSurfaces[v46], blitX, blitY, &drawRect, 1);
-        bitmapIndices2 = element->anonymous_13;
+        bitmapIndices2 = element->uiBitmaps;
         elementb = (jkGuiStringEntry *)element->selectedTextEntry;
         sliderBackgroundBitmap2 = menu->ui_structs[*bitmapIndices2];
         v32 = 0;

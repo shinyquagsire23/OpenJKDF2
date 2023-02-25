@@ -2838,7 +2838,11 @@ typedef struct jkGuiElement
 #endif
     jkGuiDrawFunc_t drawFuncOverride;
     jkGuiClickHandlerFunc_t func;
-    void *anonymous_13;
+    union
+    {
+         int* uiBitmaps;
+         int oldForcePoints;
+    };
     jkGuiTexInfo texInfo;
     int clickShortcutScancode;
 
