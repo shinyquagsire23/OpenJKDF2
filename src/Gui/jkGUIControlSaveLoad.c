@@ -292,7 +292,7 @@ LABEL_43:
 
 void jkGuiControlSaveLoad_Startup()
 {
-    jkGui_InitMenu(&jkGuiControlSaveLoad_menu, jkGui_stdBitmaps[3]);
+    jkGui_InitMenu(&jkGuiControlSaveLoad_menu, jkGui_stdBitmaps[JKGUI_BM_BK_SETUP]);
 }
 
 void jkGuiControlSaveLoad_Shutdown()

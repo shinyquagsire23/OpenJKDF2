@@ -208,7 +208,7 @@ int jkGuiMultiTally_Show(int a1)
         if ( result == -1 )
             return result;
     }
-    jkGui_SetModeMenu(jkGui_stdBitmaps[10]->palette);
+    jkGui_SetModeMenu(jkGui_stdBitmaps[JKGUI_BM_BK_TALLY]->palette);
     jkGuiMultiTally_buttons[1].wstr = jkGui_sub_412ED0();
     jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiMultiTally_menu, &jkGuiMultiTally_buttons[90]);
     jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiMultiTally_menu, &jkGuiMultiTally_buttons[89]);
@@ -468,9 +468,9 @@ int jkGuiMultiTally_SortPlayerScore(const sithPlayerInfo *pA, const sithPlayerIn
 
 void jkGuiMultiTally_Startup()
 {
-    jkGui_InitMenu(&jkGuiMultiTally_menu, jkGui_stdBitmaps[10]);
-    jkGui_InitMenu(&jkGuiMultiTally_menu2, jkGui_stdBitmaps[10]);
-    jkGui_InitMenu(&jkGuiMultiTally_menu3, jkGui_stdBitmaps[10]);
+    jkGui_InitMenu(&jkGuiMultiTally_menu, jkGui_stdBitmaps[JKGUI_BM_BK_TALLY]);
+    jkGui_InitMenu(&jkGuiMultiTally_menu2, jkGui_stdBitmaps[JKGUI_BM_BK_TALLY]);
+    jkGui_InitMenu(&jkGuiMultiTally_menu3, jkGui_stdBitmaps[JKGUI_BM_BK_TALLY]);
 }
 
 void jkGuiMultiTally_Shutdown()
@@ -530,7 +530,7 @@ int jkGuiMultiTally_ShowTeamScores(int a1)
     jkGuiMultiTally_msStart = stdPlatform_GetTimeMsec();
     jkGuiMultiTally_idkType = a1;
     jkGuiMultiTally_dword_5568D0 = 0;
-    jkGui_SetModeMenu(jkGui_stdBitmaps[10]->palette);
+    jkGui_SetModeMenu(jkGui_stdBitmaps[JKGUI_BM_BK_TALLY]->palette);
     jkGuiRend_SetVisibleAndDraw(&jkGuiMultiTally_buttons3[15], &jkGuiMultiTally_menu3, a1); // MOTS removed?
     jkGuiMultiTally_buttons3[1].wstr = jkGui_sub_412ED0();
     jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiMultiTally_menu3, &jkGuiMultiTally_buttons3[16]);
@@ -556,7 +556,7 @@ int jkGuiMultiTally_ShowTeamScores(int a1)
 
     _qsort(aTmpTeamScores, 5u, sizeof(jkHudTeamScore), jkGuiMultiTally_SortTeamScore);
     pElementIter = &jkGuiMultiTally_buttons3[4];
-    v9 = &v19;
+    v9 = v19;
     v10 = aTmpTeamScores;
     do
     {

@@ -1459,10 +1459,14 @@ void sithInventory_ClearInventory(sithThing *player)
         sithPlayerInfo* playerinfo = player->actorParams.playerinfo;
 
         sithInventory_SetBinAmount(player, i, 0.0);
-        
+
+        // Original game had this, idk why but it did.
+        // Commented out to avoid compiler warnings.
+#if 0
         if ( !playerinfo->iteminfo )
             continue;
-                
+#endif
+
         if ( desc->flags & ITEMINFO_DEFAULT && desc->flags & ITEMINFO_VALID)
         {
             playerinfo->iteminfo[i].state |= ITEMSTATE_AVAILABLE;

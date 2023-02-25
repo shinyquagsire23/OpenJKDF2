@@ -73,9 +73,9 @@ void jkGuiObjectives_CustomRender(jkGuiElement *element, jkGuiMenu *menu, stdVBu
                 v12 = stdFont_sub_4357C0(menu->fonts[v11], a4a->str, &drawRect);
                 stdDisplay_VBufferCopy(
                     vbuf,
-                    jkGui_stdBitmaps[16]->mipSurfaces[(uint8_t)(v15 & 2) >> 1],
+                    jkGui_stdBitmaps[JKGUI_BM_OBJECTIVESCHECK]->mipSurfaces[(uint8_t)(v15 & 2) >> 1],
                     element->rect.x,
-                    v6 + ((unsigned int)(v12 - (*jkGui_stdBitmaps[16]->mipSurfaces)->format.height) >> 1),
+                    v6 + ((unsigned int)(v12 - (*jkGui_stdBitmaps[JKGUI_BM_OBJECTIVESCHECK]->mipSurfaces)->format.height) >> 1),
                     0,
                     1);
                 v7 = (*menu->fonts[element->textType]->bitmap->mipSurfaces)->format.height + v12;
@@ -138,7 +138,7 @@ int jkGuiObjectives_Show()
 
 void jkGuiObjectives_Startup()
 {
-    jkGui_InitMenu(&jkGuiObjectives_menu, jkGui_stdBitmaps[6]);
+    jkGui_InitMenu(&jkGuiObjectives_menu, jkGui_stdBitmaps[JKGUI_BM_BK_FIELD_LOG]);
 }
 
 void jkGuiObjectives_Shutdown()

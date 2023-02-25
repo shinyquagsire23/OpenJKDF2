@@ -508,7 +508,7 @@ int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, wchar_t* a5, int *p
     jkGuiForce_bCanSpendStars = bCanSpendStars;
     jkGuiForce_isMulti = isMulti;
 
-    jkGui_SetModeMenu(jkGui_stdBitmaps[9]->palette);
+    jkGui_SetModeMenu(jkGui_stdBitmaps[JKGUI_BM_BK_FORCE]->palette);
     
     jkGuiForce_pElements[EIDX_NAMETEXT].wstr = jkPlayer_playerShortName;
     jkGuiForce_pElements[EIDX_RESET].bIsVisible = bCanSpendStars;
@@ -651,7 +651,7 @@ void jkGuiForce_Startup()
         jkGuiForce_pElements = jkGuiForce_buttons;
     }
 
-    jkGui_InitMenu(jkGuiForce_pMenu, jkGui_stdBitmaps[9]);
+    jkGui_InitMenu(jkGuiForce_pMenu, jkGui_stdBitmaps[JKGUI_BM_BK_FORCE]);
     if (Main_bMotsCompat) {
         for (int i = 0; i < 19; i++)
         {

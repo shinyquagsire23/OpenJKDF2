@@ -80,10 +80,10 @@ wchar_t jkGuiMultiplayer_ipText[256];
 
 void jkGuiMultiplayer_Startup()
 {
-    jkGui_InitMenu(&jkGuiMultiplayer_menu, jkGui_stdBitmaps[2]);
-    jkGui_InitMenu(&jkGuiMultiplayer_menu2, jkGui_stdBitmaps[2]);
-    jkGui_InitMenu(&jkGuiMultiplayer_menu3, jkGui_stdBitmaps[2]);
-    jkGui_InitMenu(&jkGuiMultiplayer_menu4, jkGui_stdBitmaps[2]);
+    jkGui_InitMenu(&jkGuiMultiplayer_menu, jkGui_stdBitmaps[JKGUI_BM_BK_MULTI]);
+    jkGui_InitMenu(&jkGuiMultiplayer_menu2, jkGui_stdBitmaps[JKGUI_BM_BK_MULTI]);
+    jkGui_InitMenu(&jkGuiMultiplayer_menu3, jkGui_stdBitmaps[JKGUI_BM_BK_MULTI]);
+    jkGui_InitMenu(&jkGuiMultiplayer_menu4, jkGui_stdBitmaps[JKGUI_BM_BK_MULTI]);
     jkGuiMultiplayer_bInitted = 1;
 
 #ifdef QOL_IMPROVEMENTS
@@ -392,7 +392,7 @@ int jkGuiMultiplayer_ShowSynchronizing()
     int v0; // esi
     void *v2; // [esp-4h] [ebp-8h]
 
-    v2 = jkGui_stdBitmaps[2]->palette;
+    v2 = jkGui_stdBitmaps[JKGUI_BM_BK_MULTI]->palette;
     g_submodeFlags |= 8u;
     jkGui_SetModeMenu(v2);
     jkGuiMultiplayer_aElements4[1].wstr = jkStrings_GetText("GUI_SYNCHRONIZING");
@@ -660,7 +660,7 @@ int jkGuiMultiplayer_Show2()
             if ( stdComm_dword_8321F8 != 2 )
                 return result;
             g_submodeFlags |= 8;
-            jkGui_SetModeMenu(jkGui_stdBitmaps[2]->palette);
+            jkGui_SetModeMenu(jkGui_stdBitmaps[JKGUI_BM_BK_MULTI]->palette);
             jkGuiMultiplayer_aElements4[1].wstr = jkStrings_GetText("GUINET_WAITHOSTSETTINGS");
             jkGuiMultiplayer_menu4.idkFunc = jkGuiMultiplayer_sub_4142C0;
             jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiMultiplayer_menu4, &jkGuiMultiplayer_aElements4[2]);
@@ -766,7 +766,7 @@ int jkGuiMultiplayer_ShowWaitHostSettings()
     int v0; // esi
     void *v2; // [esp-4h] [ebp-8h]
 
-    v2 = jkGui_stdBitmaps[2]->palette;
+    v2 = jkGui_stdBitmaps[JKGUI_BM_BK_MULTI]->palette;
     g_submodeFlags |= 8u;
     jkGui_SetModeMenu(v2);
     jkGuiMultiplayer_aElements4[1].wstr = jkStrings_GetText("GUINET_WAITHOSTSETTINGS");

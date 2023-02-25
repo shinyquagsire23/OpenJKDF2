@@ -113,8 +113,8 @@ static jkGuiMenu jkGuiDisplay_menuAdvanced = { jkGuiDisplay_aElementsAdvanced, 0
 
 void jkGuiDisplay_Startup()
 {
-    jkGui_InitMenu(&jkGuiDisplay_menu, jkGui_stdBitmaps[3]);
-    jkGui_InitMenu(&jkGuiDisplay_menuAdvanced, jkGui_stdBitmaps[3]);
+    jkGui_InitMenu(&jkGuiDisplay_menu, jkGui_stdBitmaps[JKGUI_BM_BK_SETUP]);
+    jkGui_InitMenu(&jkGuiDisplay_menuAdvanced, jkGui_stdBitmaps[JKGUI_BM_BK_SETUP]);
     jkGuiDisplay_aElements[24].wstr = render_level;
 
     jkGuiDisplay_aElements[26].wstr = gamma_level;

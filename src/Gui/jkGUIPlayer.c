@@ -77,8 +77,8 @@ int jkGuiPlayer_Startup()
         jkGuiPlayer_menuNewElements[7].rect.y = 0x17C;
     }
 
-    jkGui_InitMenu(&jkGuiPlayer_menuSelect, jkGui_stdBitmaps[0]);
-    jkGui_InitMenu(&jkGuiPlayer_menuNew, jkGui_stdBitmaps[0]);
+    jkGui_InitMenu(&jkGuiPlayer_menuSelect, jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]);
+    jkGui_InitMenu(&jkGuiPlayer_menuNew, jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]);
     jkGuiPlayer_bInitted = 1;
     return 1;
 }

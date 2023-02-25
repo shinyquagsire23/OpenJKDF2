@@ -47,12 +47,12 @@ stdVBuffer *jkGuiDialog_sub_416900()
     stdVBuffer *v0; // eax
     stdVBuffer *v1; // esi
 
-    v0 = stdDisplay_VBufferNew(&(*jkGui_stdBitmaps[0]->mipSurfaces)->format, 0, 0, Video_menuBuffer.palette);
+    v0 = stdDisplay_VBufferNew(&(*jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]->mipSurfaces)->format, 0, 0, Video_menuBuffer.palette);
     v1 = v0;
     if ( v0 )
     {
         stdDisplay_VBufferCopy(v0, &Video_menuBuffer, 0, 0, 0, 0);
-        stdDisplay_VBufferCopy(v1, *jkGui_stdBitmaps[7]->mipSurfaces, jkGui_stdBitmaps[7]->xPos, jkGui_stdBitmaps[7]->yPos, 0, 0);
+        stdDisplay_VBufferCopy(v1, *jkGui_stdBitmaps[JKGUI_BM_BK_DIALOG]->mipSurfaces, jkGui_stdBitmaps[JKGUI_BM_BK_DIALOG]->xPos, jkGui_stdBitmaps[JKGUI_BM_BK_DIALOG]->yPos, 0, 0);
     }
     return v1;
 }
@@ -65,7 +65,7 @@ int jkGuiDialog_OkCancelDialog(wchar_t *stringA, wchar_t *stringB)
     v2 = 0;
     if ( !jkGui_GdiMode )
     {
-        jkGui_SetModeMenu(jkGui_stdBitmaps[0]->palette);
+        jkGui_SetModeMenu(jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]->palette);
         v2 = 1;
     }
     jkGuiDialog_OkCancel_buttons[0].wstr = stringA;
@@ -91,7 +91,7 @@ void jkGuiDialog_ErrorDialog(wchar_t *stringA, wchar_t *stringB)
     v2 = 0;
     if ( !jkGui_GdiMode )
     {
-        jkGui_SetModeMenu(jkGui_stdBitmaps[0]->palette);
+        jkGui_SetModeMenu(jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]->palette);
         v2 = 1;
     }
     jkGuiDialog_Ok_buttons[0].wstr = stringA;
@@ -116,7 +116,7 @@ int jkGuiDialog_YesNoDialog(wchar_t *stringA, wchar_t *stringB)
     v2 = 0;
     if ( !jkGui_GdiMode )
     {
-        jkGui_SetModeMenu(jkGui_stdBitmaps[0]->palette);
+        jkGui_SetModeMenu(jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]->palette);
         v2 = 1;
     }
     jkGuiDialog_OkCancel_buttons[0].wstr = stringA;

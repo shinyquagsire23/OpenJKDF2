@@ -147,7 +147,7 @@ void jkGuiMods_Startup()
     if ( jkGuiMods_bInitted )
         return;
 
-    jkGui_InitMenu(&jkGuiMods_menu, jkGui_stdBitmaps[3]);
+    jkGui_InitMenu(&jkGuiMods_menu, jkGui_stdBitmaps[JKGUI_BM_BK_SETUP]);
     jkGuiMods_bInitted = 1;
 }
 
@@ -174,7 +174,7 @@ void jkGuiMods_Show()
     jkGuiMods_aElements[4].wstr = openjkdf2_waReleaseVersion;
     jkGuiMods_aElements[5].wstr = openjkdf2_waReleaseCommitShort;
 
-    jkGui_SetModeMenu(jkGui_stdBitmaps[0]->palette);
+    jkGui_SetModeMenu(jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]->palette);
     jkGuiRend_DarrayNewStr(&darray, 32, 1);
     
     jkGuiMods_PopulateEntries(&darray, &jkGuiMods_aElements[1]);
@@ -182,8 +182,8 @@ void jkGuiMods_Show()
     v4 = -1;
     do
     {
-        jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiMods_menu, &jkGuiMods_aElements[2]);
-        jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiMods_menu, &jkGuiMods_aElements[3]);
+        jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiMods_menu, &jkGuiMods_aElements[6]);
+        jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiMods_menu, &jkGuiMods_aElements[7]);
         v4 = jkGuiRend_DisplayAndReturnClicked(&jkGuiMods_menu);
         
         if (v4 == JKGUIMODS_BTN_OPENRESOURCEFOLDER) {
