@@ -10,6 +10,7 @@
 #include "Gui/jkGUISetup.h"
 #include "World/jkPlayer.h"
 #include "Win95/Window.h"
+#include "types_enums.h"
 
 enum jkGuiDecisionButton_t
 {
@@ -43,7 +44,7 @@ static jkGuiElement jkGuiGeneral_aElements[23] = {
     // 12
 #if defined(QOL_IMPROVEMENTS) && !defined(SDL2_RENDER)
     {ELEMENT_TEXT,         0,            0, L"FOV",                 3, {20, 240, 300, 30}, 1,  0, 0, 0, 0, 0, {0}, 0},
-    {ELEMENT_SLIDER,       0,            0, (FOV_MAX - FOV_MIN),                    0, {10, 270, 320, 30}, 1, 0, L"Set FOV", jkGuiGeneral_FovDraw, 0, slider_1, {0}, 0},
+    {ELEMENT_SLIDER,       0,            0, (FOV_MAX - FOV_MIN),                    0, {10, 270, 320, 30}, 1, 0, L"Set FOV", jkGuiGeneral_FovDraw, 0, slider_images, {0}, 0},
     {ELEMENT_TEXT,         0,            0, slider_val_text,        3, {20, 300, 300, 30}, 1,  0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_CHECKBOX,     0,            0, L"FOV is vertical (Hor+)",    0, {20, 320, 300, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
 #else
@@ -85,7 +86,7 @@ static jkGuiElement jkGuiGeneral_aElementsAdvanced[22] = {
     { ELEMENT_END,         0,            0, NULL,                   0, {0},                 0, 0, NULL,                        0, 0, 0, {0}, 0},
 };
 
-static jkGuiMenu jkGuiGeneral_menuAdvanced = { jkGuiGeneral_aElementsAdvanced, 0, 0xFF, 0xE1, 0x0F, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0 };
+static jkGuiMenu jkGuiGeneral_menuAdvanced = { jkGuiGeneral_aElementsAdvanced, 0, 0xFF, 0xE1, JKGUI_BM_CHECK, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0 };
 #endif
 
 void jkGuiGeneral_Startup()

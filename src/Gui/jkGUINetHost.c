@@ -361,7 +361,7 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
     jkGuiRend_DarrayNewStr(&jkGuiNetHost_dArray2, 10, 1);
     jkGuiRend_DarrayReallocStr(&jkGuiNetHost_dArray2, 0, 0);
     jkGuiRend_SetClickableString(&jkGuiNetHost_aElements[NETHOST_LEVEL_LISTBOX], &jkGuiNetHost_dArray2);
-    jkGuiNetHost_aElements[NETHOST_EPISODE_LISTBOX].func = jkGuiNetHost_sub_4119D0;
+    jkGuiNetHost_aElements[NETHOST_EPISODE_LISTBOX].clickHandlerFunc = jkGuiNetHost_sub_4119D0;
     jkGui_sub_412E20(&jkGuiNetHost_menu, 100, 101, 101);
     jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiNetHost_menu, &jkGuiNetHost_aElements[23]);
     jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiNetHost_menu, &jkGuiNetHost_aElements[24]);

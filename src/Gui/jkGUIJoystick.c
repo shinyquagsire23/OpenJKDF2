@@ -1069,7 +1069,7 @@ int jkGuiJoystick_Show()
     jkGuiJoystick_aElements[33].bIsVisible = 0;
     jkGuiJoystick_aElements[34].bIsVisible = 0;
 #endif
-    jkGuiJoystick_aElements[26].func = jkGuiJoystick_DisableJoystickClick;
+    jkGuiJoystick_aElements[26].clickHandlerFunc = jkGuiJoystick_DisableJoystickClick;
     jkGuiJoystick_aElements[11].selectedTextEntry = 0;
     jkGuiJoystick_aElements[12].selectedTextEntry = 0;
     jkGuiJoystick_aElements[13].selectedTextEntry = 0;

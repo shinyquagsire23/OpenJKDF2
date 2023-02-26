@@ -42,7 +42,7 @@ int jkGuiBuildMulti_DisplayModel();
 void jkGuiBuildMulti_ModelDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVBuffer *pVbuf, int redraw);
 void jkGuiBuildMulti_SaberDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVBuffer *pVbuf, int redraw);
 void jkGuiBuildMulti_sub_41A120(jkGuiMenu *pMenu);
-int jkGuiBuildMulti_SaberButtonClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5);
+int jkGuiBuildMulti_SaberButtonClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, BOOL redraw);
 //static int (*jkGuiBuildMulti_StartupEditCharacter)() = (void*)jkGuiBuildMulti_StartupEditCharacter_ADDR;
 
 int jkGuiBuildMulti_Startup();
@@ -51,10 +51,10 @@ void jkGuiBuildMulti_Load(char *pPathOut, int pathOutLen, wchar_t *pPlayerName, 
 int jkGuiBuildMulti_Show();
 int jkGuiBuildMulti_Show2(Darray *pDarray, jkGuiElement *pElement, int minIdk, int maxIdk, int idx);
 int jkGuiBuildMulti_ShowNewCharacter(int rank, int bGameFormatIsJK, int bHasNoValidChars);
-int jkGuiBuildMulti_sub_41D000(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5);
+int jkGuiBuildMulti_menuNewCharacter_rankArrowButtonClickHandler(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, BOOL redraw);
 int jkGuiBuildMulti_ShowLoad(jkPlayerMpcInfo *pPlayerMpcInfo, char *pStrEpisode, char *pJklFname, int minIdk, int rank, int bGameFormatIsJK);
 void jkGuiBuildMulti_sub_41D680(jkGuiMenu *pMenu, int idx);
-int jkGuiBuildMulti_sub_41D830(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5);
+int jkGuiBuildMulti_sub_41D830(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, BOOL redraw);
 
 
 int jkGuiBuildMulti_FUN_00420930(jkGuiElement *pElement,jkGuiMenu *pMenu,int mouseX,int mouseY,int a5);

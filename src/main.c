@@ -2245,7 +2245,7 @@ void do_hooks()
     hook_function(jkGuiBuildMulti_Show_ADDR, jkGuiBuildMulti_Show);
     hook_function(jkGuiBuildMulti_Show2_ADDR, jkGuiBuildMulti_Show2);
     hook_function(jkGuiBuildMulti_ShowNewCharacter_ADDR, jkGuiBuildMulti_ShowNewCharacter);
-    hook_function(jkGuiBuildMulti_sub_41D000_ADDR, jkGuiBuildMulti_sub_41D000);
+    hook_function(jkGuiBuildMulti_sub_41D000_ADDR, jkGuiBuildMulti_menuNewCharacter_rankArrowButtonClickHandler);
     hook_function(jkGuiBuildMulti_ShowLoad_ADDR, jkGuiBuildMulti_ShowLoad);
     hook_function(jkGuiBuildMulti_sub_41D680_ADDR, jkGuiBuildMulti_sub_41D680);
     hook_function(jkGuiBuildMulti_sub_41D830_ADDR, jkGuiBuildMulti_sub_41D830);

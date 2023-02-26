@@ -96,7 +96,7 @@ int jkGuiKeyboard_sub_411E40(Darray *pDarr)
     return result;
 }
 
-int jkGuiKeyboard_RemoveControlClicked(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5)
+int jkGuiKeyboard_RemoveControlClicked(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int mouseX, int mouseY, BOOL redraw)
 {
     jkGuiKeyboardEntry *pEntry; // eax
     int v3; // ecx
@@ -296,7 +296,7 @@ LABEL_25:
     return 1;
 }
 
-int jkGuiKeyboard_AddControlClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5)
+int jkGuiKeyboard_AddControlClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, BOOL redraw)
 {
     int v3; // esi
     jkGuiKeyboardEntry *v4; // eax
@@ -456,7 +456,7 @@ LABEL_35:
     }
 }
 
-int jkGuiKeyboard_OkClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5)
+int jkGuiKeyboard_OkClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, BOOL redraw)
 {
     if ( jkGuiKeyboard_bOnceIdk )
         return 0;
@@ -464,7 +464,7 @@ int jkGuiKeyboard_OkClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX
     return pElement->hoverId;
 }
 
-int jkGuiKeyboard_CancelClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5)
+int jkGuiKeyboard_CancelClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, BOOL redraw)
 {
     jkGuiRend_PlayWav(pMenu->soundClick);
     if ( !jkGuiKeyboard_bOnceIdk )
@@ -477,22 +477,22 @@ int jkGuiKeyboard_CancelClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int mo
     return 0;
 }
 
-int jkGuiKeyboard_ControlListClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5)
+int jkGuiKeyboard_ControlListClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, BOOL redraw)
 {
     jkGuiKeyboardEntry *v6; // eax
 
     if ( jkGuiKeyboard_bOnceIdk )
         return 0;
-    jkGuiRend_ClickSound(pElement, pMenu, mouseX, mouseY, a5);
+    jkGuiRend_ClickSound(pElement, pMenu, mouseX, mouseY, redraw);
     v6 = (jkGuiKeyboardEntry *)jkGuiRend_GetId(&jkGuiKeyboard_darrEntries, pElement->selectedTextEntry);
     if ( v6 )
         jkGuiRend_SetVisibleAndDraw(&jkGuiKeyboard_aElements[14], pMenu, v6->dxKeyNum != -1);
-    if ( a5 )
-        jkGuiKeyboard_AddControlClicked(&jkGuiKeyboard_aElements[13], pMenu, mouseX, mouseY, a5);
+    if ( redraw )
+        jkGuiKeyboard_AddControlClicked(&jkGuiKeyboard_aElements[13], pMenu, mouseX, mouseY, redraw);
     return 0;
 }
 
-int jkGuiKeyboard_RestoreDefaultsClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5)
+int jkGuiKeyboard_RestoreDefaultsClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, BOOL redraw)
 {
     wchar_t *v3; // eax
     wchar_t *v4; // [esp-8h] [ebp-8h]

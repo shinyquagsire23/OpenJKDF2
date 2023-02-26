@@ -14,13 +14,13 @@
 #define jkGuiSaveLoad_Startup_ADDR (0x0041E440)
 #define jkGuiSaveLoad_Shutdown_ADDR (0x0041E460)
 
-int jkGuiSaveLoad_ListClick(jkGuiElement *element, jkGuiMenu *menu, int mouseX, int mouseY, int a5);
+int jkGuiSaveLoad_ListClick(jkGuiElement *element, jkGuiMenu *menu, int mouseX, int mouseY, BOOL redraw);
 void jkGuiSaveLoad_PopulateInfo(int bRedraw);
 int jkGuiSaveLoad_DeleteOnClick(jkGuiElement *element, jkGuiMenu *menu, int mouseX, int mouseY, int bRedraw);
 void jkGuiSaveLoad_PopulateList();
 int jkGuiSaveLoad_SaveSort(const void* a_, const void* b_);
 int jkGuiSaveLoad_Show(int bIsSave);
-int jkGuiSaveLoad_PopulateInfoInit(jkGuiElement *a1, jkGuiMenu *a2, int a3, int a4, int a5);
+int jkGuiSaveLoad_PopulateInfoInit(jkGuiElement *a1, jkGuiMenu *a2, int a3, int a4, BOOL redraw);
 void jkGuiSaveLoad_Startup();
 void jkGuiSaveLoad_Shutdown();
 

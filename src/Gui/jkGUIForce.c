@@ -83,7 +83,7 @@ static int jkGuiForce_bCanSpendStars;
 static float jkGuiForce_isMulti;
 static stdBitmap* jkGuiForce_aBitmaps[19];
 
-static rdVector2i jkGuiForce_idkExtra = {16, 15};
+static int jkGuiForce_sliderBitmapIndices[2] = {16, 15};
 
 static wchar_t jkGuiForce_waTmp[400];
 
@@ -155,7 +155,7 @@ jkGuiElement jkGuiForce_buttonsMots[31] = {
 
 // HACK: Just make an unused slider
 /*30*/  { ELEMENT_SLIDER,      0, 0, .origExtraInt = 200,  
-        100, {150, 418, 340, 40}, 1, 0,  NULL,           0,  0,          &jkGuiForce_idkExtra, {0},  0}, 
+        100, {150, 418, 340, 40}, 1, 0,  NULL,           0,  0,          &jkGuiForce_sliderBitmapIndices, {0},  0}, 
 };  
 
 
@@ -211,7 +211,7 @@ static jkGuiElement jkGuiForce_buttons[25] = {
           0, {150, 418, 170, 40}, 1, 0, "GUI_LIGHTSIDE", jkGuiForce_DarkLightHoverDraw, 0,  0, {0},  0}, 
 
 /*23*/  { ELEMENT_SLIDER,      0, 0, .origExtraInt = 200,  
-        100, {150, 418, 340, 40}, 1, 0,  NULL,           0,  0,          &jkGuiForce_idkExtra, {0},  0}, 
+        100, {150, 418, 340, 40}, 1, 0,  NULL,           0,  0,          &jkGuiForce_sliderBitmapIndices, {0},  0}, 
 /*24*/  { ELEMENT_END,         0, 0, NULL,               
           0, {0},                 0, 0,  NULL,           0,  0,                             0, {0},  0}
 };
@@ -420,12 +420,12 @@ int jkGuiForce_ButtonClick(jkGuiElement *element, jkGuiMenu *menu, int a, int b,
             sithPlayer_SetBinAmt(binIdx,(float)(curLevel + 1));
         }
         if (jkGuiForce_isMulti == 0) {
-            if ((curLevel == *(int*)&element->anonymous_13) ||
+            if ((curLevel == element->oldForcePoints) ||
                ((curLevel != 4 && (bIsDefense <= spendStars)))) goto LAB_00418eb2;
             sithPlayer_SetBinAmt
                       (SITHBIN_SPEND_STARS,
-                       (float)((curLevel - *(int*)&element->anonymous_13) * bIsDefense + spendStars));
-            pvVar1 = *(int*)&element->anonymous_13;
+                       (float)((curLevel - element->oldForcePoints) * bIsDefense + spendStars));
+            pvVar1 = element->oldForcePoints;
         }
         else {
             
@@ -482,8 +482,8 @@ int jkGuiForce_ResetClick(jkGuiElement *element, jkGuiMenu *menu, int mouseX, in
     sithPlayer_SetBinAmt(SITHBIN_SPEND_STARS, (double)jkGuiForce_numSpendStars);
     for (int i = EIDX_START_FP; i < (Main_bMotsCompat ? EIDX_END_FP : EIDX_END_FP_CLICKABLE); i++)
     {
-        float v5 = (float)(*(int*)&jkGuiForce_pElements[i].anonymous_13);
-        sithPlayer_SetBinAmt(jkGuiForce_pElements[i].hoverId, v5);
+        float initialForcePoints = (float)jkGuiForce_pElements[i].oldForcePoints;
+        sithPlayer_SetBinAmt(jkGuiForce_pElements[i].hoverId, initialForcePoints);
     }
 
     // MOTS added: no condition
@@ -540,7 +540,7 @@ int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, wchar_t* a5, int *p
     {
         jkGuiForce_numSpendStars = (int)sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS);
         jkGuiForce_pElements[EIDX_ALIGN_SLIDER].bIsVisible = 1;
-        jkGuiForce_pElements[EIDX_ALIGN_SLIDER].anonymous_9 = 1;
+        jkGuiForce_pElements[EIDX_ALIGN_SLIDER].enableHover = 1;
         jkGuiForce_pElements[EIDX_ALIGN_SLIDER].selectedTextEntry = 100 - (uint32_t)darklight_float;
         if (isMulti)
         {
@@ -553,7 +553,7 @@ int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, wchar_t* a5, int *p
         {
             int id = jkGuiForce_pElements[i].hoverId;
 
-            *(int*)&jkGuiForce_pElements[i].anonymous_13 = (int)sithPlayer_GetBinAmt(id);
+            jkGuiForce_pElements[i].oldForcePoints = (int)sithPlayer_GetBinAmt(id);
 
             jkGuiForce_pElements[i].bIsVisible = !!(jkPlayer_playerInfos[playerThingIdx].iteminfo[id].state & ITEMSTATE_CARRIES);
         }
@@ -602,8 +602,7 @@ int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, wchar_t* a5, int *p
             if (i == EIDX_MOTS_DEFENSE) {
                 jkGuiForce_pElements[i].bIsVisible = !!jkGuiForce_isMulti;
             }
-
-            *(int*)&jkGuiForce_pElements[i].anonymous_13 = (int)sithPlayer_GetBinAmt(id);
+            jkGuiForce_pElements[i].oldForcePoints = (int)sithPlayer_GetBinAmt(id);
         }
     }
     

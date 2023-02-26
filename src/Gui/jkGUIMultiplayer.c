@@ -492,14 +492,14 @@ void jkGuiMultiplayer_sub_4140B0(jkGuiMenu *pMenu)
                     }
                     jkGuiRend_DarrayReallocStr(&jkGuiMultiplayer_stru_5564A8, 0, 0);
                     jkGuiRend_SetClickableString(&jkGuiMultiplayer_aElements3[3], &jkGuiMultiplayer_stru_5564A8);
-                    jkGuiMultiplayer_aElements3[3].anonymous_9 = 0;
+                    jkGuiMultiplayer_aElements3[3].enableHover = 0;
                 }
                 else
                 {
                     v8 = dplay_dword_55D618;
                     v4 = jkStrings_GetText("GUI_NOGAMESTOJOIN");
                     jkGuiRend_DarrayReallocStr(&jkGuiMultiplayer_stru_5564A8, v4, v8);
-                    jkGuiMultiplayer_aElements3[3].anonymous_9 = 1;
+                    jkGuiMultiplayer_aElements3[3].enableHover = 1;
                 }
                 jkGuiMultiplayer_aElements3[3].selectedTextEntry = v2;
                 jkGuiMultiplayer_sub_413E50(v2);
