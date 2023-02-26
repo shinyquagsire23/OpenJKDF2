@@ -16,10 +16,12 @@
 #include "World/jkPlayer.h"
 #include "types_enums.h"
 
-
+static wchar_t slider_val_text[5] = {0};
 static int slider_images[2] = {JKGUI_BM_SLIDER_BACK_200, JKGUI_BM_SLIDER_THUMB};
 
-static jkGuiElement jkGuiGameplay_buttons[42] = {
+void jkGuiGameplay_ScaleDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
+
+static jkGuiElement jkGuiGameplay_buttons[44] = {
     {ELEMENT_TEXT, 0, 0, 0, 3, {0, 410, 640, 20}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXT, 0, 6, "GUI_SETUP", 3, {20, 20, 600, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON, 100, 2, "GUI_GENERAL", 3, {20, 80, 120, 40},  1, 0, "GUI_GENERAL_HINT", 0, 0, 0, {0}, 0},
@@ -63,10 +65,12 @@ static jkGuiElement jkGuiGameplay_buttons[42] = {
 #ifdef QOL_IMPROVEMENTS
     {ELEMENT_CHECKBOX, 0, 0, L"Show Crosshair with lightsaber", 0, {30, 260, 270, 20}, 1, 0, L"When this is enabled the crosshair is shown when the lightsaber is equipped", 0, 0, 0, {0}, 0},
     {ELEMENT_CHECKBOX, 0, 0, L"Show Crosshair with fist", 0, {30, 290, 270, 20}, 1, 0, L"When this is enabled the crosshair is shown when the fist is equipped", 0, 0, 0, {0}, 0},
-    // Slider for crosshair size
-  //
-    {ELEMENT_SLIDER, 0, 0, (const char*)10, 50, { 60, 355, 205, 30 }, 1, 0, L"Adjust the size of the crosshair (from 0% to 200%)", 0, 0, slider_images, {0}, 0},
-#endif /* ifdef QOL_IMPROVEMENTS */
+    
+    // 40
+    {ELEMENT_SLIDER, 0, 0, (const char*)10, 50, { 30, 345, 235, 30 }, 1, 0, L"Adjust the size of the crosshair (from 0% to 200%)", jkGuiGameplay_ScaleDraw, 0, slider_images, {0}, 0},
+    {ELEMENT_TEXT,         0,            0, L"Crosshair Scale",                 3, {30, 345-25, 235, 20}, 1,  0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_TEXT,         0,            0, slider_val_text,        3, {30, 345+30, 235, 20}, 1,  0, 0, 0, 0, 0, {0}, 0},
+#endif /* QOL_IMPROVEMENTS */
  
     {ELEMENT_END, 0, 0, 0, 0, {0}, 0, 0, 0, 0, 0, 0, {0}, 0},
 };
@@ -82,6 +86,20 @@ void jkGuiGameplay_Shutdown()
 {
     ;
 }
+
+#ifdef QOL_IMPROVEMENTS
+void jkGuiGameplay_ScaleDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw)
+{
+    float tmp = ((float)jkGuiGameplay_buttons[40].selectedTextEntry)*0.2f;
+    
+    jk_snwprintf(slider_val_text, 5, L"%f", tmp);
+    jkGuiGameplay_buttons[42].wstr = slider_val_text;
+    
+    jkGuiRend_SliderDraw(element, menu, vbuf, redraw);
+    
+    jkGuiRend_UpdateAndDrawClickable(&jkGuiGameplay_buttons[42], menu, 1);
+}
+#endif // QOL_IMPROVEMENTS
 
 int jkGuiGameplay_Show()
 {
@@ -112,7 +130,7 @@ int jkGuiGameplay_Show()
     jkGuiGameplay_buttons[38].selectedTextEntry = jkPlayer_setCrosshairOnLightsaber;
     jkGuiGameplay_buttons[39].selectedTextEntry = jkPlayer_setCrosshairOnFist;
     jkGuiGameplay_buttons[40].selectedTextEntry = jkPlayer_crosshairScale * 5;
-#endif /* ifdef QOL_IMPROVEMENTS */
+#endif /* QOL_IMPROVEMENTS */
     
 
     jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiGameplay_menu, &jkGuiGameplay_buttons[36]);
@@ -154,8 +172,8 @@ int jkGuiGameplay_Show()
 #ifdef QOL_IMPROVEMENTS
         jkPlayer_setCrosshairOnLightsaber = jkGuiGameplay_buttons[38].selectedTextEntry;
         jkPlayer_setCrosshairOnFist = jkGuiGameplay_buttons[39].selectedTextEntry;
-        jkPlayer_crosshairScale = jkGuiGameplay_buttons[40].selectedTextEntry*0.2f;
-#endif /* ifdef QOL_IMPROVEMENTS */
+        jkPlayer_crosshairScale = ((float)jkGuiGameplay_buttons[40].selectedTextEntry)*0.2f;
+#endif /* QOL_IMPROVEMENTS */
     
         jkPlayer_WriteConf(jkPlayer_playerShortName);
     }

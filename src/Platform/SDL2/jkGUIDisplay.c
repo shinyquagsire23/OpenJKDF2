@@ -133,9 +133,9 @@ void jkGuiDisplay_Shutdown()
 
 void jkGuiDisplay_FovDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw)
 {
-    jkPlayer_fov = FOV_MIN + jkGuiDisplay_aElements[10].selectedTextEntry;
+    uint32_t tmp = FOV_MIN + jkGuiDisplay_aElements[10].selectedTextEntry;
     
-    jk_snwprintf(slider_val_text, 5, L"%u", jkPlayer_fov);
+    jk_snwprintf(slider_val_text, 5, L"%u", tmp);
     jkGuiDisplay_aElements[11].wstr = slider_val_text;
     
     jkGuiRend_SliderDraw(element, menu, vbuf, redraw);
@@ -145,10 +145,10 @@ void jkGuiDisplay_FovDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vb
 
 void jkGuiDisplay_FramelimitDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw)
 {
-    jkPlayer_fpslimit = FPS_LIMIT_MIN + jkGuiDisplay_aElements[18].selectedTextEntry;
+    uint32_t tmp = FPS_LIMIT_MIN + jkGuiDisplay_aElements[18].selectedTextEntry;
     
-    if (jkPlayer_fpslimit)
-        jk_snwprintf(slider_val_text_2, 5, L"%u", jkPlayer_fpslimit);
+    if (tmp)
+        jk_snwprintf(slider_val_text_2, 5, L"%u", tmp);
     else
         jk_snwprintf(slider_val_text_2, 5, L"None");
 
@@ -223,11 +223,13 @@ continue_menu:
     }
     else if ( v0 != -1 )
     {
+        jkPlayer_fov = FOV_MIN + jkGuiDisplay_aElements[10].selectedTextEntry;
         jkPlayer_fovIsVertical = jkGuiDisplay_aElements[12].selectedTextEntry;
         Window_SetFullscreen(jkGuiDisplay_aElements[13].selectedTextEntry);
         Window_SetHiDpi(jkGuiDisplay_aElements[14].selectedTextEntry);
         jkPlayer_enableTextureFilter = jkGuiDisplay_aElements[15].selectedTextEntry;
         jkPlayer_enableOrigAspect = jkGuiDisplay_aElements[16].selectedTextEntry;
+        jkPlayer_fpslimit = FPS_LIMIT_MIN + jkGuiDisplay_aElements[18].selectedTextEntry;
         jkPlayer_enableVsync = jkGuiDisplay_aElements[20].selectedTextEntry;
         jkPlayer_enableBloom = jkGuiDisplay_aElements[21].selectedTextEntry;
         jkPlayer_enableSSAO = jkGuiDisplay_aElements[22].selectedTextEntry;
