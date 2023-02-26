@@ -269,7 +269,7 @@ int jkQuakeConsole_AutocompleteCvarsCallback_bPrintOnce = 0;
 
 void jkQuakeConsole_AutocompleteCvarsCallback(tSithCvar* pCvar)
 {
-    if (!__strnicmp(jkQuakeConsole_pTabPos, pCvar->pName, strlen(jkQuakeConsole_pTabPos))) {
+    if (!*jkQuakeConsole_pTabPos || !__strnicmp(jkQuakeConsole_pTabPos, pCvar->pName, strlen(jkQuakeConsole_pTabPos))) {
         jkQuakeConsole_AutocompleteCvarsCallback_bPrintOnce = 1;
 
         if (jkQuakeConsole_sortTmpIdx < JKQUAKECONSOLE_SORTED_LIMIT) {
@@ -285,17 +285,6 @@ int jkQuakeConsole_AutocompleteCvars()
     jkQuakeConsole_AutocompleteCvarsCallback_bPrintOnce = 0;
     sithCvar_Enumerate(jkQuakeConsole_AutocompleteCvarsCallback);
 
-    for (int i = 0; i < sithConsole_pCmdHashtable->numBuckets; i++)
-    {
-        stdLinklist* pIter = &sithConsole_pCmdHashtable->buckets[i];
-        while (pIter)
-        {
-            if (pIter->key) {
-                
-            }
-            pIter = pIter->next;
-        }
-    }
     return jkQuakeConsole_AutocompleteCvarsCallback_bPrintOnce;
 }
 
@@ -310,7 +299,7 @@ int jkQuakeConsole_AutocompleteCheats()
         while (pIter)
         {
             if (pIter->key) {
-                if (!__strnicmp(jkQuakeConsole_pTabPos, pIter->key, strlen(jkQuakeConsole_pTabPos))) {
+                if (!*jkQuakeConsole_pTabPos || !__strnicmp(jkQuakeConsole_pTabPos, pIter->key, strlen(jkQuakeConsole_pTabPos))) {
                     bPrintOnce = 1;
 
                     if (jkQuakeConsole_sortTmpIdx < JKQUAKECONSOLE_SORTED_LIMIT) {
@@ -335,7 +324,7 @@ int jkQuakeConsole_AutocompleteConsoleCmds()
         while (pIter)
         {
             if (pIter->key) {
-                if (!__strnicmp(jkQuakeConsole_pTabPos, pIter->key, strlen(jkQuakeConsole_pTabPos))) {
+                if (!*jkQuakeConsole_pTabPos || !__strnicmp(jkQuakeConsole_pTabPos, pIter->key, strlen(jkQuakeConsole_pTabPos))) {
                     bPrintOnce = 1;
 
                     if (jkQuakeConsole_sortTmpIdx < JKQUAKECONSOLE_SORTED_LIMIT) {
