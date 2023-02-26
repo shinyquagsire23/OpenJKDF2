@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/zsh
 
 BINDIR="build_win64"
 EXE="$BINDIR/openjkdf2-64.exe"
