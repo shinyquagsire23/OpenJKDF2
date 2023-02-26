@@ -174,7 +174,7 @@ void do_hooks();
 #ifdef WIN64_STANDALONE
 #include "exchndl.h"
 
-#include <Windows.h>
+#include <windows.h>
 #endif
 
 #ifdef LINUX
