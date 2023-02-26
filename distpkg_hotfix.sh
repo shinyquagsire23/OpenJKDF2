@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/sh
 
 OPENJKDF2_ROOT=$(pwd)
 

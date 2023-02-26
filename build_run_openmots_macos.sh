@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/sh
 
 export PATH="${HOMEBREW_PREFIX}/opt/llvm/bin:$PATH"
 export MACOSX_DEPLOYMENT_TARGET=10.15

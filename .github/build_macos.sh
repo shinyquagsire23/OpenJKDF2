@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/sh
 
 export PATH="${HOMEBREW_PREFIX}/opt/llvm/bin:$PATH"
 export OPENJKDF2_RELEASE_COMMIT=$(git log -1 --format="%H")

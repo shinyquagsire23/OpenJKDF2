@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/sh
 make flex/flex
 make byacc/yacc
 

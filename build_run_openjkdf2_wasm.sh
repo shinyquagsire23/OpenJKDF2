@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/sh
 
 # Run in OpenJKDF2 directory:
 # python -m SimpleHTTPServer

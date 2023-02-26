@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/sh
 
 rm -rf OpenJKDF2_universal.app
 cp -r OpenJKDF2.app OpenJKDF2_universal.app
