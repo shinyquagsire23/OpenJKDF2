@@ -28,6 +28,8 @@
 #include "Win95/Window.h"
 
 #include "jk.h"
+#include "types.h"
+#include "types_enums.h"
 
 // MOTS added
 int jkGuiBuildMulti_jediRank = 0;
@@ -62,15 +64,15 @@ jkGuiMenu jkGuiBuildMulti_menu =
 
 
 
-static int unk_52B170[2] = {0x0d, 0x0e};
-static int unk_583bf8[2] = {0x0d, 0x0e};
+static int listbox_images[2] = {JKGUI_BM_UP_15, JKGUI_BM_DOWN_15};
+static int listbox_images2[2] = {JKGUI_BM_UP_15, JKGUI_BM_DOWN_15};
 
 static jkGuiElement jkGuiBuildMulti_menuEditCharacter_buttons[17] =
 {
 /*00*/  { ELEMENT_TEXT, 0, 0, NULL, 3, { 0, 390, 640, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
 /*01*/  { ELEMENT_TEXT, 0, 5, "GUI_EDIT_CHARACTER", 3, { 240, 20, 400, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
 /*02*/  { ELEMENT_TEXT, 0, 1, NULL, 3, { 240, 60, 400, 30 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-/*03*/  { ELEMENT_LISTBOX, 1, 0, NULL, 0, { 280, 100, 320, 251 }, 1, 0, NULL, NULL, NULL, unk_52B170, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*03*/  { ELEMENT_LISTBOX, 1, 0, NULL, 0, { 280, 100, 320, 251 }, 1, 0, NULL, NULL, NULL, listbox_images, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
 /*04*/  { ELEMENT_TEXT, 0, 2, "GUI_NAME", 3, { 0, 130, 200, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
 /*05*/  { ELEMENT_TEXT, 0, 1, NULL, 1, { 0, 150, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
   
@@ -117,8 +119,8 @@ static jkGuiElement jkGuiBuildMulti_menuNewCharacter_buttons[18] =
 
 /*07*/  { ELEMENT_TEXT, 0, 2, "GUI_RANKLABEL", 3, { 320, 240, 240, 30 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
 /*08*/  { ELEMENT_TEXT, 0, 0, NULL, 3, { 344, 270, 192, 30 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-/*09*/  { ELEMENT_PICBUTTON, 103, 0, NULL, 33, { 320, 270, 24, 24 }, 1, 0, NULL, NULL, jkGuiBuildMulti_sub_41D000, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-/*10*/  { ELEMENT_PICBUTTON, 104, 0, NULL, 34, { 536, 270, 24, 24 }, 1, 0, NULL, NULL, jkGuiBuildMulti_sub_41D000, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*09*/  { ELEMENT_PICBUTTON, 103, 0, NULL, 33, { 320, 270, 24, 24 }, 1, 0, NULL, NULL, jkGuiBuildMulti_menuNewCharacter_rankArrowButtonClickHandler, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*10*/  { ELEMENT_PICBUTTON, 104, 0, NULL, 34, { 536, 270, 24, 24 }, 1, 0, NULL, NULL, jkGuiBuildMulti_menuNewCharacter_rankArrowButtonClickHandler, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
 
 /*11 dummy*/  { ELEMENT_TEXT, 0, 0, L"", 3, { 0, 0, 0, 0 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
 /*12 dummy*/  { ELEMENT_TEXT, 0, 0, L"", 3, { 0, 0, 0, 0 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
@@ -149,11 +151,11 @@ static jkGuiElement jkGuiBuildMulti_menuNewCharacter_buttonsMots[18] =
 // TODO jkGuiBuildMulti_waTmpRankLabel
 /*07*/  { ELEMENT_TEXT,        0,    2,   "GUI_RANKLABEL",    2,    { 300, 320, 240, 30 },    1,    0,    NULL,    NULL,    NULL,    NULL,    { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } },    0 },
 /*08*/  { ELEMENT_TEXT,        0,    0,    NULL,    2,    { 360, 360, 192, 30 },    1,    0,    NULL,    NULL,    NULL,    NULL,    { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } },    0 },
-/*09*/  { ELEMENT_PICBUTTON,   103,  0,    NULL,    33,    { 300, 360, 24, 24 },    1,    0,    NULL,    NULL,    jkGuiBuildMulti_sub_41D000,    NULL,    { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } },    0 },
-/*10*/  { ELEMENT_PICBUTTON,   104,  0,    NULL,    34,    { 326, 360, 24, 24 },    1,    0,    NULL,    NULL,    jkGuiBuildMulti_sub_41D000,    NULL,    { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } },    0 },
+/*09*/  { ELEMENT_PICBUTTON,   103,  0,    NULL,    33,    { 300, 360, 24, 24 },    1,    0,    NULL,    NULL,    jkGuiBuildMulti_menuNewCharacter_rankArrowButtonClickHandler,    NULL,    { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } },    0 },
+/*10*/  { ELEMENT_PICBUTTON,   104,  0,    NULL,    34,    { 326, 360, 24, 24 },    1,    0,    NULL,    NULL,    jkGuiBuildMulti_menuNewCharacter_rankArrowButtonClickHandler,    NULL,    { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } },    0 },
 
 /*11*/  { ELEMENT_TEXT,        0,    2,    "GUI_PERSONALITY",    2,    { 300, 310, 240, 30 },    1,    0,    NULL,    NULL,    NULL,    NULL,    { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } },    0 },
-/*12*/  { ELEMENT_LISTBOX,     1,    0,    NULL,    0,    { 300, 345, 240, 66 },    1,    0,    NULL,    NULL,    NULL,    unk_583bf8,    { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } },    0 },
+/*12*/  { ELEMENT_LISTBOX,     1,    0,    NULL,    0,    { 300, 345, 240, 66 },    1,    0,    NULL,    NULL,    NULL,    listbox_images2,    { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } },    0 },
 
 /*13*/  { ELEMENT_TEXT,        0,    2,    "GUI_NAME",    2,    { 300, 145, 240, 30 },    1,    0,    NULL,    NULL,    NULL,    NULL,    { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } },    0 },
 /*14*/  { ELEMENT_TEXTBOX,     0,    0,    NULL,    0,    { 300, 180, 240, 20 },    1,    0,    NULL,    NULL,    NULL,    NULL,    { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } },    0 },
@@ -175,7 +177,7 @@ static jkGuiElement jkGuiBuildMulti_menuLoadCharacter_buttons[24] =
 /*00*/  { ELEMENT_TEXT, 0, 0, NULL, 3, { 0, 390, 640, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
 /*01*/  { ELEMENT_TEXT, 0, 5, "GUI_LOAD_CHARACTER", 3, { 240, 20, 400, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
 /*02*/  { ELEMENT_TEXT, 0, 1, NULL, 3, { 240, 60, 400, 30 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-/*03*/  { ELEMENT_LISTBOX, 1, 0, NULL, 0, { 280, 100, 320, 251 }, 1, 0, NULL, NULL, NULL, unk_52B170, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+/*03*/  { ELEMENT_LISTBOX, 1, 0, NULL, 0, { 280, 100, 320, 251 }, 1, 0, NULL, NULL, NULL, listbox_images, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
 /*04*/  { ELEMENT_TEXT, 0, 2, "GUI_SLEPISODE", 3, { 0, 30, 200, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
 /*05*/  { ELEMENT_TEXT, 0, 0, NULL, 1, { 0, 50, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
 /*06*/  { ELEMENT_TEXT, 0, 2, "GUI_SLLEVEL", 3, { 0, 90, 200, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
@@ -763,7 +765,7 @@ void jkGuiBuildMulti_SaberDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVB
 }
 
 // MOTS altered
-int jkGuiBuildMulti_SaberButtonClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5)
+int jkGuiBuildMulti_SaberButtonClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, BOOL redraw)
 {
     int v2; // eax
     wchar_t *v3; // eax
@@ -963,7 +965,7 @@ int jkGuiBuildMulti_Show()
     wPlayerName[31] = 0;
     jkGui_SetModeMenu(jkGui_stdBitmaps[JKGUI_BM_BK_BUILD_LOAD]->palette);
     jkGuiRend_DarrayNewStr(&darr, 5, 1);
-    jkGuiBuildMulti_menuEditCharacter_buttons[3].func = jkGuiBuildMulti_sub_41D830;
+    jkGuiBuildMulti_menuEditCharacter_buttons[3].clickHandlerFunc = jkGuiBuildMulti_sub_41D830;
     jkGuiBuildMulti_menuEditCharacter_buttons[0].wstr = NULL;
     pwMultiplayerCharsStr = jkStrings_GetText("GUI_S_MULTIPLAYER_CHARACTERS");
     jk_snwprintf(jkGuiBuildMulti_wPlayerShortName, 0x40u, pwMultiplayerCharsStr, jkPlayer_playerShortName);
@@ -1296,7 +1298,7 @@ LABEL_16:
 }
 
 
-int jkGuiBuildMulti_FUN_00420930(jkGuiElement *pElement,jkGuiMenu *pMenu,int mouseX,int mouseY,int a5)
+int jkGuiBuildMulti_FUN_00420930(jkGuiElement *pElement,jkGuiMenu *pMenu,int mouseX,int mouseY, BOOL redraw)
 {
     jkGuiBuildMulti_pNewCharacterElements[6].selectedTextEntry = 1;
     jkGuiBuildMulti_pNewCharacterElements[5].selectedTextEntry = 0;
@@ -1322,7 +1324,7 @@ int jkGuiBuildMulti_FUN_00420930(jkGuiElement *pElement,jkGuiMenu *pMenu,int mou
     return 0;
 }
 
-int jkGuiBuildMulti_FUN_004209b0(jkGuiElement *pElement,jkGuiMenu *pMenu,int mouseX,int mouseY,int a5)
+int jkGuiBuildMulti_FUN_004209b0(jkGuiElement *pElement,jkGuiMenu *pMenu, int mouseX, int mouseY, BOOL redraw)
 {
     jkGuiBuildMulti_pNewCharacterElements[6].selectedTextEntry = 0;
     jkGuiBuildMulti_pNewCharacterElements[5].selectedTextEntry = 1;
@@ -1348,7 +1350,7 @@ int jkGuiBuildMulti_FUN_004209b0(jkGuiElement *pElement,jkGuiMenu *pMenu,int mou
     return 0;
 }
 
-int jkGuiBuildMulti_sub_41D000(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5)
+int jkGuiBuildMulti_menuNewCharacter_rankArrowButtonClickHandler(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, BOOL a5)
 {
     signed int v2; // esi
     wchar_t *v3; // eax
@@ -1452,7 +1454,7 @@ int jkGuiBuildMulti_ShowLoad(jkPlayerMpcInfo *pPlayerMpcInfo, char *pStrEpisode,
     tmp5[31] = 0;
     jkGui_SetModeMenu(jkGui_stdBitmaps[JKGUI_BM_BK_BUILD_LOAD]->palette);
     jkGuiRend_DarrayNewStr(&darr, 5, 1);
-    jkGuiBuildMulti_menuLoadCharacter_buttons[3].func = jkGuiBuildMulti_sub_41D830;
+    jkGuiBuildMulti_menuLoadCharacter_buttons[3].clickHandlerFunc = jkGuiBuildMulti_sub_41D830;
     jkGuiBuildMulti_menuLoadCharacter_buttons[0].unistr = 0;
     v5 = jkStrings_GetText("GUI_S_MULTIPLAYER_CHARACTERS");
     jk_snwprintf(&jkGuiBuildMulti_wTmp[64], 0x40u, v5, jkPlayer_playerShortName);
@@ -1647,10 +1649,10 @@ void jkGuiBuildMulti_sub_41D680(jkGuiMenu *pMenu, int idx)
     }
 }
 
-int jkGuiBuildMulti_sub_41D830(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5)
+int jkGuiBuildMulti_sub_41D830(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, BOOL redraw)
 {
     if ( mouseX != -1 || mouseY != -1 )
-        jkGuiRend_ClickSound(pElement, pMenu, mouseX, mouseY, a5);
+        jkGuiRend_ClickSound(pElement, pMenu, mouseX, mouseY, redraw);
     jkGuiBuildMulti_sub_41D680(pMenu, pElement->selectedTextEntry);
     if ( pMenu == &jkGuiBuildMulti_menuEditCharacter )
     {
@@ -1660,7 +1662,7 @@ int jkGuiBuildMulti_sub_41D830(jkGuiElement *pElement, jkGuiMenu *pMenu, int mou
         if (Main_bMotsCompat) {
             jkGuiRend_UpdateAndDrawClickable(&jkGuiBuildMulti_menuEditCharacter_buttons[11], pMenu, 1);
         }
-        return a5 != 0;
+        return redraw != 0;
     }
     else
     {
@@ -1670,7 +1672,7 @@ int jkGuiBuildMulti_sub_41D830(jkGuiElement *pElement, jkGuiMenu *pMenu, int mou
             jkGuiRend_UpdateAndDrawClickable(&jkGuiBuildMulti_menuLoadCharacter_buttons[13], pMenu, 1);
             jkGuiRend_UpdateAndDrawClickable(&jkGuiBuildMulti_menuLoadCharacter_buttons[15], pMenu, 1);
         }
-        return a5 != 0;
+        return redraw != 0;
     }
     return 0;
 }

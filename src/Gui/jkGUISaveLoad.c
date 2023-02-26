@@ -41,10 +41,10 @@ static jkGuiElement jkGuiSaveLoad_aElements[15] = {
 
 static jkGuiMenu jkGuiSaveLoad_menu = {jkGuiSaveLoad_aElements, 0xFFFFFFFF, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 
-int jkGuiSaveLoad_ListClick(jkGuiElement *element, jkGuiMenu *menu, int mouseX, int mouseY, int a5)
+int jkGuiSaveLoad_ListClick(jkGuiElement *element, jkGuiMenu *menu, int mouseX, int mouseY, BOOL redraw)
 {
-    jkGuiRend_ClickSound(element, menu, mouseX, mouseY, a5);
-    if ( a5 )
+    jkGuiRend_ClickSound(element, menu, mouseX, mouseY, redraw);
+    if ( redraw )
         return 12345;
     jkGuiSaveLoad_PopulateInfo(1);
     return 0;
@@ -302,7 +302,7 @@ int jkGuiSaveLoad_Show(int bIsSave)
     jkGuiSaveLoad_aElements[4].selectedTextEntry = 0;
     jkGuiSaveLoad_aElements[1].bIsVisible = bIsSave;
     jkGuiSaveLoad_aElements[2].bIsVisible = bIsSave;
-    jkGuiSaveLoad_aElements[2].func = jkGuiSaveLoad_PopulateInfoInit;
+    jkGuiSaveLoad_aElements[2].clickHandlerFunc = jkGuiSaveLoad_PopulateInfoInit;
     jkGuiSaveLoad_aElements[13].bIsVisible = jkGuiSaveLoad_numEntries > 0;
     if ( bIsSave || (jkGuiSaveLoad_aElements[11].bIsVisible = 0, jkGuiSaveLoad_numEntries > 0) )
         jkGuiSaveLoad_aElements[11].bIsVisible = 1;
@@ -444,7 +444,7 @@ LABEL_46:
     return result;
 }
 
-int jkGuiSaveLoad_PopulateInfoInit(jkGuiElement *a1, jkGuiMenu *a2, int a3, int a4, int a5)
+int jkGuiSaveLoad_PopulateInfoInit(jkGuiElement *a1, jkGuiMenu *a2, int a3, int a4, BOOL redraw)
 {
     jkGuiSaveLoad_PopulateInfo(1);
     return 0;

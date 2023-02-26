@@ -17,6 +17,7 @@
 #include "World/jkPlayer.h"
 #include "Main/jkStrings.h"
 #include "Devices/sithControl.h"
+#include "types.h"
 #include "types_enums.h"
 
 #include <math.h>
@@ -111,11 +112,11 @@ void jkGuiMouse_SensitivityDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuff
     jkGuiRend_UpdateAndDrawClickable(&jkGuiMouse_aElements[24], menu, 1);
 }
 
-int jkGuiMouse_ListClicked1(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5)
+int jkGuiMouse_ListClicked1(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int redraw)
 {
     signed int result; // eax
 
-    jkGuiRend_ClickSound(pElement, pMenu, mouseX, mouseY, a5);
+    jkGuiRend_ClickSound(pElement, pMenu, mouseX, mouseY, redraw);
     if ( pElement->texInfo.anonymous_18 )
     {
         jkGuiRend_PlayWav(pMenu->soundClick);
@@ -123,7 +124,7 @@ int jkGuiMouse_ListClicked1(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX
     }
     else
     {
-        if ( a5 )
+        if ( redraw )
             jkGuiMouse_dword_5566B0 = 1;
         jkGuiMouse_sub_416D40(pMenu, 1);
         result = 0;
@@ -273,18 +274,18 @@ LABEL_29:
     }
 }
 
-int jkGuiMouse_ListClicked2(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5)
+int jkGuiMouse_ListClicked2(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int mouseX, int mouseY, BOOL redraw)
 {
     char *v5; // edx
 
-    jkGuiRend_ClickSound(pClickedElement, pMenu, mouseX, mouseY, a5);
+    jkGuiRend_ClickSound(pClickedElement, pMenu, mouseX, mouseY, redraw);
     if ( pClickedElement->texInfo.anonymous_18 )
     {
         v5 = pMenu->soundClick;
         jkGuiMouse_dword_5566B0 = 0;
         jkGuiRend_PlayWav(v5);
     }
-    if ( a5 )
+    if ( redraw )
     {
         jkGuiMouse_sub_417100(jkGuiMouse_aElements[11].selectedTextEntry, pClickedElement->selectedTextEntry);
         jkGuiMouse_dword_5566B0 = 0;
@@ -504,7 +505,7 @@ int jkGuiMouse_EnumBindings(int a1, const char *a2, uint32_t a3, int a4, uint32_
     return 1;
 }
 
-int jkGuiMouse_ListClicked3(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5)
+int jkGuiMouse_ListClicked3(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, BOOL redraw)
 {
     char *v5; // edx
     int v6; // esi
@@ -518,14 +519,14 @@ int jkGuiMouse_ListClicked3(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX
     wchar_t *v14; // eax
     wchar_t *v16; // [esp-4h] [ebp-14h]
 
-    jkGuiRend_ClickSound(pElement, pMenu, mouseX, mouseY, a5);
+    jkGuiRend_ClickSound(pElement, pMenu, mouseX, mouseY, redraw);
     if ( pElement->texInfo.anonymous_18 )
     {
         v5 = pMenu->soundClick;
         jkGuiMouse_dword_5566B0 = 0;
         jkGuiRend_PlayWav(v5);
     }
-    if ( a5 )
+    if ( redraw )
     {
         v6 = pElement->selectedTextEntry;
         v7 = jkGuiRend_GetId(&jkGuiMouse_Darray_5566B8, jkGuiMouse_aElements[11].selectedTextEntry);
@@ -555,7 +556,7 @@ int jkGuiMouse_ListClicked3(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX
     return 0;
 }
 
-int jkGuiMouse_AddEditControlsClicked(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5)
+int jkGuiMouse_AddEditControlsClicked(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int mouseX, int mouseY, BOOL redraw)
 {
     jkGuiMouse_dword_5566B0 = 1;
     jkGuiRend_PlayWav(pMenu->soundClick);
@@ -563,7 +564,7 @@ int jkGuiMouse_AddEditControlsClicked(jkGuiElement *pClickedElement, jkGuiMenu *
     return 0;
 }
 
-int jkGuiMouse_RemoveClicked(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5)
+int jkGuiMouse_RemoveClicked(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int mouseX, int mouseY, BOOL redraw)
 {
     int v5; // eax
 
@@ -577,7 +578,7 @@ int jkGuiMouse_RemoveClicked(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, in
     return 0;
 }
 
-int jkGuiMouse_CancelOkClicked(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5)
+int jkGuiMouse_CancelOkClicked(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int mouseX, int mouseY, BOOL redraw)
 {
     int v5; // esi
     int v6; // ebx
@@ -630,7 +631,7 @@ int jkGuiMouse_CancelOkClicked(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, 
     return 0;
 }
 
-int jkGuiMouse_RestoreDefaultsClicked(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int a5)
+int jkGuiMouse_RestoreDefaultsClicked(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int mouseX, int mouseY, BOOL redraw)
 {
     wchar_t *v5; // eax
     wchar_t *v7; // [esp-4h] [ebp-8h]

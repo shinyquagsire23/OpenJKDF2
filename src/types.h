@@ -2763,7 +2763,7 @@ typedef struct Darray
 
 typedef void (*jkGuiDrawFunc_t)(jkGuiElement*, jkGuiMenu*, stdVBuffer*, int);
 typedef int (*jkGuiEventHandlerFunc_t)(jkGuiElement*, jkGuiMenu*, int, int);
-typedef int (*jkGuiClickHandlerFunc_t)(jkGuiElement*, jkGuiMenu*, int, int, int);
+typedef int (*jkGuiClickHandlerFunc_t)(jkGuiElement*, jkGuiMenu*, int mouseX, int mouseY, int);
 
 typedef struct jkGuiElementHandlers
 {
@@ -2818,7 +2818,7 @@ typedef struct jkGuiElement
     };
     rdRect rect;
     int bIsVisible;
-    int anonymous_9;
+    BOOL enableHover;
 
 // Added: Allow soft-resetting of these fields easily
 #ifdef QOL_IMPROVEMENTS
@@ -2837,7 +2837,7 @@ typedef struct jkGuiElement
     };
 #endif
     jkGuiDrawFunc_t drawFuncOverride;
-    jkGuiClickHandlerFunc_t func;
+    jkGuiClickHandlerFunc_t clickHandlerFunc;
     union
     {
          int* uiBitmaps;

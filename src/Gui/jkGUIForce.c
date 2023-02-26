@@ -540,7 +540,7 @@ int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, wchar_t* a5, int *p
     {
         jkGuiForce_numSpendStars = (int)sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS);
         jkGuiForce_pElements[EIDX_ALIGN_SLIDER].bIsVisible = 1;
-        jkGuiForce_pElements[EIDX_ALIGN_SLIDER].anonymous_9 = 1;
+        jkGuiForce_pElements[EIDX_ALIGN_SLIDER].enableHover = 1;
         jkGuiForce_pElements[EIDX_ALIGN_SLIDER].selectedTextEntry = 100 - (uint32_t)darklight_float;
         if (isMulti)
         {

@@ -14,6 +14,7 @@
 #include "General/stdString.h"
 #include "stdPlatform.h"
 #include "jk.h"
+#include "types.h"
 
 static char *jkGuiRend_LoadedSounds[4] = {0};
 static uint8_t jkGuiRend_palette[0x300] = {0};
@@ -210,7 +211,7 @@ void jkGuiRend_UpdateDrawMenu(jkGuiMenu *menu)
     if ( idx >= 0 )
     {
         jkGuiElement* clickable = menu->lastMouseOverClickable;
-        if ( clickable && clickable->hintText && clickable->bIsVisible && !clickable->anonymous_9 )
+        if ( clickable && clickable->hintText && clickable->bIsVisible && !clickable->enableHover )
             menu->paElements[idx].str = clickable->hintText;
         else
             menu->paElements[idx].str = 0;
@@ -705,12 +706,12 @@ void jkGuiRend_DarrayFreeEntry(Darray *array)
 
 int jkGuiRend_sub_5103E0(jkGuiElement *element)
 {
-    return (element->bIsVisible && !element->anonymous_9 && element->type >= ELEMENT_LISTBOX && element->type <= ELEMENT_TEXTBOX);
+    return (element->bIsVisible && !element->enableHover && (element->type == ELEMENT_LISTBOX || element->type == ELEMENT_TEXTBOX));
 }
 
 int jkGuiRend_ElementHasHoverSound(jkGuiElement *element)
 {
-    if ( !element->bIsVisible || element->anonymous_9 )
+    if ( !element->bIsVisible || element->enableHover )
         return 0;
 
     switch ( element->type )
@@ -759,7 +760,7 @@ void jkGuiRend_UpdateAndDrawClickable(jkGuiElement *clickable, jkGuiMenu *menu, 
         if ( !drawFunc )
             drawFunc = jkGuiRend_elementHandlers[clickable->type].draw;
         jkGuiElement* lastSave = menu->lastMouseOverClickable;
-        if ( clickable->anonymous_9 )
+        if ( clickable->enableHover )
             menu->lastMouseOverClickable = 0;
         drawFunc(clickable, menu, jkGuiRend_menuBuffer, forceRedraw);
         menu->lastMouseOverClickable = lastSave;
@@ -794,27 +795,27 @@ int jkGuiRend_InvokeEvent(jkGuiElement *element, jkGuiMenu *menu, int eventType,
 {
     jkGuiEventHandlerFunc_t fnEventHandler;
 
-    if ( element && (!eventType || element->bIsVisible && !element->anonymous_9) && (fnEventHandler = jkGuiRend_elementHandlers[element->type].fnEventHandler) != 0 )
+    if ( element && (!eventType || element->bIsVisible && !element->enableHover) && (fnEventHandler = jkGuiRend_elementHandlers[element->type].fnEventHandler) != 0 )
         return fnEventHandler(element, menu, eventType, eventParam);
     else
         return 0;
 }
 
-int jkGuiRend_InvokeClicked(jkGuiElement *clickable, jkGuiMenu *menu, int mouseX, int mouseY, int a5)
+int jkGuiRend_InvokeClicked(jkGuiElement *clickable, jkGuiMenu *menu, int mouseX, int mouseY, BOOL redraw)
 {
     jkGuiClickHandlerFunc_t handler;
 
-    if ( !clickable->bIsVisible || clickable->anonymous_9 )
+    if ( !clickable->bIsVisible || clickable->enableHover )
         return 0;
 
-    handler = clickable->func;
+    handler = clickable->clickHandlerFunc;
     if ( !handler )
     {
         handler = jkGuiRend_elementHandlers[clickable->type].fnClickHandler;
     }
 
     if (handler)
-        menu->lastClicked = handler(clickable, menu, mouseX, mouseY, a5);
+        menu->lastClicked = handler(clickable, menu, mouseX, mouseY, redraw);
 
     return menu->lastClicked;
 }
@@ -830,7 +831,7 @@ void jkGuiRend_RenderFocused(jkGuiMenu *menu, jkGuiElement *element)
     jkGuiElement *focusedElement; // edi
 
     focusedElement = menu->focusedElement;
-    if ( element && element->bIsVisible && !element->anonymous_9 && element->type >= ELEMENT_LISTBOX && element->type <= ELEMENT_TEXTBOX )
+    if ( element && element->bIsVisible && !element->enableHover && element->type >= ELEMENT_LISTBOX && element->type <= ELEMENT_TEXTBOX )
     {
         menu->focusedElement = element;
         if ( focusedElement )
@@ -868,7 +869,7 @@ LABEL_12:
     }
     if ( !iter->bIsVisible )
         goto LABEL_12;
-    if ( iter->anonymous_9 )
+    if ( iter->enableHover )
         goto LABEL_12;
     if ( iter->type < ELEMENT_LISTBOX || iter->type > ELEMENT_TEXTBOX )
         goto LABEL_12;
@@ -913,7 +914,7 @@ void jkGuiRend_RenderIdk2_alt(jkGuiMenu *menu)
         iter = &menu->paElements[idxOther];
         if ( menu->paElements[idxOther].type != ELEMENT_END )
         {
-            if ( iter->bIsVisible && !iter->anonymous_9 && !(iter->type < ELEMENT_LISTBOX || iter->type > ELEMENT_TEXTBOX))
+            if ( iter->bIsVisible && !iter->enableHover && !(iter->type < ELEMENT_LISTBOX || iter->type > ELEMENT_TEXTBOX))
                 break;
         }
         else
@@ -979,7 +980,7 @@ void jkGuiRend_RenderAll(jkGuiMenu *menu)
                 ++idxOther;
             }
         }
-        else if ( menu->paElements[idxOther].bIsVisible && !menu->paElements[idxOther].anonymous_9 && menu->paElements[idxOther].type >= ELEMENT_LISTBOX && menu->paElements[idxOther].type <= ELEMENT_TEXTBOX)
+        else if ( menu->paElements[idxOther].bIsVisible && !menu->paElements[idxOther].enableHover && menu->paElements[idxOther].type >= ELEMENT_LISTBOX && menu->paElements[idxOther].type <= ELEMENT_TEXTBOX)
         {
             break;
         }
@@ -1208,9 +1209,9 @@ void jkGuiRend_sub_510C60(jkGuiElement *element)
     }
 }
 
-int jkGuiRend_ClickSound(jkGuiElement *element, jkGuiMenu *menu, int mouseX, int mouseY, int a5)
+int jkGuiRend_ClickSound(jkGuiElement *element, jkGuiMenu *menu, int mouseX, int mouseY, BOOL redraw)
 {
-    if ( !a5 )
+    if ( !redraw )
         return 0;
     jkGuiRend_PlayWav(menu->soundClick);
     return element->hoverId;
@@ -1332,14 +1333,14 @@ int jkGuiRend_ListBoxEventHandler(jkGuiElement *element, jkGuiMenu *menu, int ev
         switch ( eventParam )
         {
             case VK_RETURN:
-                if ( element_->func )
-                    menu->lastClicked = element_->func(element_, menu, v12, v11, 1);
+                if ( element_->clickHandlerFunc )
+                    menu->lastClicked = element_->clickHandlerFunc(element_, menu, v12, v11, 1);
                 break;
             case VK_ESCAPE:
-                if ( element_->func )
+                if ( element_->clickHandlerFunc )
                 {
                     element_->texInfo.anonymous_18 = 1;
-                    menu->lastClicked = element_->func(element_, menu, v12, v11, 0);
+                    menu->lastClicked = element_->clickHandlerFunc(element_, menu, v12, v11, 0);
                     element_->texInfo.anonymous_18 = 0;
                 }
                 break;
@@ -1364,9 +1365,9 @@ int jkGuiRend_ListBoxEventHandler(jkGuiElement *element, jkGuiMenu *menu, int ev
         }
         if ( element_->selectedTextEntry != a1a )
         {
-            if ( element_->func )
+            if ( element_->clickHandlerFunc )
             {
-                menu->lastClicked = element_->func(element_, menu, v12, v11, 0);
+                menu->lastClicked = element_->clickHandlerFunc(element_, menu, v12, v11, 0);
                 return 0;
             }
         }
@@ -1597,9 +1598,9 @@ int jkGuiRend_WindowHandler(HWND hWnd, UINT a2, WPARAM wParam, LPARAM lParam, LR
         case WM_KEYFIRST:
             if ( wParam == VK_SHIFT || wParam == VK_LSHIFT || wParam == VK_RSHIFT )
                 jkGuiRend_bShiftDown = 1;
-            if ( wParam != VK_RETURN || (v8 = jkGuiRend_activeMenu->pReturnKeyShortcutElement) == 0 || v8->anonymous_9 || !v8->bIsVisible )
+            if ( wParam != VK_RETURN || (v8 = jkGuiRend_activeMenu->pReturnKeyShortcutElement) == 0 || v8->enableHover || !v8->bIsVisible )
             {
-                if ( wParam != VK_ESCAPE || (v8 = jkGuiRend_activeMenu->pEscapeKeyShortcutElement) == 0 || v8->anonymous_9 || !v8->bIsVisible )
+                if ( wParam != VK_ESCAPE || (v8 = jkGuiRend_activeMenu->pEscapeKeyShortcutElement) == 0 || v8->enableHover || !v8->bIsVisible )
                 {
                     if ( wParam == VK_TAB )  // TAB
                     {
@@ -1618,7 +1619,7 @@ LABEL_47:
                         jkGuiRend_InvokeEvent(jkGuiRend_activeMenu->focusedElement, jkGuiRend_activeMenu, JKGUI_EVENT_KEYDOWN, wParam);
                         return 0;
                     }
-                    while ( wParam != v8->clickShortcutScancode || v8->anonymous_9 || !v8->bIsVisible )
+                    while ( wParam != v8->clickShortcutScancode || v8->enableHover || !v8->bIsVisible )
                     {
                         ++v8;
                         if ( v8->type == ELEMENT_END )
