@@ -10,6 +10,28 @@ extern "C" {
 #define AL_SILENCE_DEPRECATION
 #endif
 
+// Ghidra tutorial:
+// File > Parse C Source...
+//
+// Select VisualStudio12_32.prf
+// Click second top-right button "Save profile to new name"
+// Name it JK, JKM, DW, etc
+//
+// Hit + button
+// Add this file as a header
+//
+// Add the following to the parse options:
+// -DGHIDRA_IMPORT
+//
+// For JKM:
+// -DJKM_TYPES
+//
+// For DroidWorks:
+// -DDW_TYPES
+//
+// Parse to Program and Save
+// In Data Type Manager, right click the EXE and Apply Function Data Types
+
 #ifdef GHIDRA_IMPORT
 typedef char int8_t;
 typedef unsigned char uint8_t;
@@ -2058,8 +2080,10 @@ typedef struct sithItemDescriptor
     float ammoMin;
     float ammoMax;
     sithCog* cog;
+#ifndef DW_TYPES
     uint32_t field_90;
     uint32_t field_94;
+#endif
     stdBitmap* hudBitmap;
 } sithItemDescriptor;
 
@@ -2169,19 +2193,31 @@ typedef struct rdPuppet
 
 typedef struct sithPlayerInfo
 {
+#ifndef DW_TYPES
     wchar_t player_name[32];
     wchar_t multi_name[32];
+#endif
     uint32_t flags;
     uint32_t net_id;
+
+#ifdef DW_TYPES
+    sithItemInfo iteminfo[32];
+    int pad[0x6C];
+#else
     sithItemInfo iteminfo[200];
+#endif
     int curItem;
     int curWeapon;
     int curPower;
+#ifndef DW_TYPES
     int field_1354;
+#endif
     sithThing* playerThing;
     rdMatrix34 spawnPosOrient;
     sithSector* pSpawnSector;
+#ifndef DW_TYPES
     uint32_t respawnMask;
+#endif
     uint32_t palEffectsIdx1;
     uint32_t palEffectsIdx2;
     uint32_t teamNum;
@@ -3366,7 +3402,6 @@ typedef void (*sithCvarEnumerationFn_t)(tSithCvar*);
 #ifdef GHIDRA_IMPORT
 #include "Win95/stdGob.h"
 #include "Engine/rdKeyframe.h"
-#include "Engine/sithAdjoin.h"
 #include "Engine/rdCanvas.h"
 #include "Engine/sithKeyFrame.h"
 #include "Engine/sithAnimClass.h"
@@ -3376,7 +3411,6 @@ typedef void (*sithCvarEnumerationFn_t)(tSithCvar*);
 #include "General/stdFileUtil.h"
 #include "General/stdPcx.h"
 #include "Cog/sithCog.h"
-#include "Cog/sithCogScript.h"
 #include "Dss/sithMulti.h"
 
 #include "Cog/sithCog.h"

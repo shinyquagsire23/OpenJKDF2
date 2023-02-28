@@ -1486,7 +1486,6 @@ int sithThing_Load(sithWorld *world, int a2)
     sithThing *v22; // ebx
     int v23; // eax
     sithSector *v24; // edi
-    int v25; // eax
     int v26; // ecx
     int v27; // edi
     stdConffileArg *v28; // ebx
@@ -1590,11 +1589,9 @@ int sithThing_Load(sithWorld *world, int a2)
                 sithThing_SetPosAndRot(v21, &pos, &a);
                 sithThing_EnterSector(v21, v24, 1, 1);
                 sithThing_sub_4CD100(v21);
-                v25 = sithThing_bInitted2;
                 v26 = v21->thingIdx;
-                v21->signature = sithThing_bInitted2;
+                v21->signature = sithThing_bInitted2++;
                 v21->thing_id = v26;
-                sithThing_bInitted2 = v25 + 1;
                 v27 = 10;
                 if ( stdConffile_entry.numArgs > 10 )
                 {
@@ -1613,8 +1610,7 @@ int sithThing_Load(sithWorld *world, int a2)
                 }
                 else
                 {
-                    _strncpy(v21->template_name, stdConffile_entry.args[2].value, 0x1Fu);
-                    v21->template_name[31] = 0;
+                    stdString_SafeStrCopy(v21->template_name, stdConffile_entry.args[2].value, 0x20);
                 }
             }
         }
