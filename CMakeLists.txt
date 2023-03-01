@@ -15,6 +15,7 @@ set(CMAKE_IGNORE_PATH "/opt/homebrew")
 set(CMAKE_IGNORE_PATH "/opt/homebrew/include")
 set(CMAKE_IGNORE_PATH "/opt/homebrew/lib")
 
+
 list(APPEND CMAKE_PREFIX_PATH /usr/local)
 endif()
 
