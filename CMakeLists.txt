@@ -383,17 +383,22 @@ include_directories(${PROJECT_SOURCE_DIR}/src/external/fcaseopen)
 
 # Automatic updates
 if(TARGET_USE_CURL)
-    # curl
-    file(GLOB CURL_SRCS ${PROJECT_SOURCE_DIR}/src/external/curl/*.c ${PROJECT_SOURCE_DIR}/src/external/curl/vtls/*.c ${PROJECT_SOURCE_DIR}/src/external/curl/vauth/*.c  ${PROJECT_SOURCE_DIR}/src/external/curl/vquic/*.c)
-    list(APPEND SOURCE_FILES ${CURL_SRCS})
-    include_directories(${PROJECT_SOURCE_DIR}/src/external/curl)
+    if(TARGET_LINUX)
+        # Linux can just use the package manager version of libcurl, yay
+        add_definitions(-DPLATFORM_CURL)
+    else()
+        # curl
+        file(GLOB CURL_SRCS ${PROJECT_SOURCE_DIR}/src/external/curl/*.c ${PROJECT_SOURCE_DIR}/src/external/curl/vtls/*.c ${PROJECT_SOURCE_DIR}/src/external/curl/vauth/*.c  ${PROJECT_SOURCE_DIR}/src/external/curl/vquic/*.c)
+        list(APPEND SOURCE_FILES ${CURL_SRCS})
+        include_directories(${PROJECT_SOURCE_DIR}/src/external/curl)
 
-    # mbedtls
-    file(GLOB MBEDTLS_SRCS ${PROJECT_SOURCE_DIR}/src/external/mbedtls/*.c)
-    list(APPEND SOURCE_FILES ${MBEDTLS_SRCS})
-    include_directories(${PROJECT_SOURCE_DIR}/src/external/mbedtls)
+        # mbedtls
+        file(GLOB MBEDTLS_SRCS ${PROJECT_SOURCE_DIR}/src/external/mbedtls/*.c)
+        list(APPEND SOURCE_FILES ${MBEDTLS_SRCS})
+        include_directories(${PROJECT_SOURCE_DIR}/src/external/mbedtls)
 
-    add_definitions(-DPLATFORM_CURL)
+        add_definitions(-DPLATFORM_CURL)
+    endif()
 endif()
 
 if(TARGET_NO_BLOBS)
@@ -600,6 +605,11 @@ if(TARGET_LINUX)
     include_directories(${LIBPNG_STATIC_INCLUDE_DIRS})
     link_directories(${LIBPNG_STATIC_LIBRARY_DIRS})
     add_definitions(${LIBPNG_STATIC_CFLAGS_OTHER})
+
+    pkg_check_modules(LIBCURL REQUIRED libcurl)
+    include_directories(${LIBCURL_STATIC_INCLUDE_DIRS})
+    link_directories(${LIBCURL_STATIC_LIBRARY_DIRS})
+    add_definitions(${LIBCURL_STATIC_CFLAGS_OTHER})
 
     if(TARGET_USE_GAMENETWORKINGSOCKETS)
         include_directories(${PROJECT_SOURCE_DIR}/3rdparty/GameNetworkingSockets/include)
