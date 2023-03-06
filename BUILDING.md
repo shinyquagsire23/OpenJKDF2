@@ -9,7 +9,7 @@ Building is currently tested primarily on Arch Linux, Ubuntu 20.04, and MacOS Mo
 
 ```
 # All
-pacman -S git cmake base-devel make python python-pip bison imagemagick gtk3 openssl protobuf  zsh
+pacman -S git cmake base-devel make python python-pip bison imagemagick gtk3 openssl protobuf zsh libpng curl
 pip3 install cogapp
 
 # Win32/MinGW
@@ -35,7 +35,7 @@ sudo apt-get update
 sudo apt-get upgrade
 
 # All
-sudo apt install git build-essential cmake make python3 python3-pip bison imagemagick libgtk-3-dev protobuf-compiler zsh
+sudo apt install git build-essential cmake make python3 python3-pip bison imagemagick libgtk-3-dev protobuf-compiler zsh libpng-dev libcurl-dev
 pip3 install cogapp
 
 # On some Ubuntu versions (22.04?)
@@ -82,7 +82,7 @@ pip3 install cogapp generate-iconset
 brew install mingw-w64
 
 # MacOS 64-bit
-brew install openal-soft sdl2 sdl2_mixer glew openssl@1.1 protobuf
+brew install openal-soft sdl2 sdl2_mixer glew openssl@1.1 protobuf libpng libmodplug
 
 # WebAssembly
 brew install emscripten
