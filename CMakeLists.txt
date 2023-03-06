@@ -15,6 +15,7 @@ set(CMAKE_IGNORE_PATH "/opt/homebrew")
 set(CMAKE_IGNORE_PATH "/opt/homebrew/include")
 set(CMAKE_IGNORE_PATH "/opt/homebrew/lib")
 
+
 list(APPEND CMAKE_PREFIX_PATH /usr/local)
 endif()
 
@@ -52,6 +53,7 @@ set(TARGET_WIN32 FALSE)
 set(TARGET_WASM FALSE)
 set(TARGET_NO_BLOBS FALSE)
 set(OPENJKDF2_USE_BLOBS FALSE CACHE BOOL "Use blobs")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-implicit-function-declaration")
 
 set(DEBUG_QOL_CHEATS $ENV{DEBUG_QOL_CHEATS})
 
