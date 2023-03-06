@@ -2079,9 +2079,9 @@ typedef struct sDwLaser
     uint32_t field_0;
     uint32_t field_4;
     uint32_t pad[0xF];
-    uint32_t pad[0x10];
-    uint32_t pad[0x10];
-    uint32_t pad[0x8];
+    uint32_t pad2[0x10];
+    uint32_t pad3[0x10];
+    uint32_t pad4[0x8];
 } tDwLaser;
 
 typedef int (*sithWorldSectionParser_t)(sithWorld*, int);
