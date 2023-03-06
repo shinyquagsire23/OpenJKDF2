@@ -74,12 +74,20 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows" AND PLAT_AUTO)
     set(PLAT_MSVC TRUE)
 endif()
 
+# General defs
 add_definitions(-DOPENJKDF2_RELEASE_COMMIT="$ENV{OPENJKDF2_RELEASE_COMMIT}")
 add_definitions(-DOPENJKDF2_RELEASE_COMMIT_SHORT="$ENV{OPENJKDF2_RELEASE_COMMIT_SHORT}")
 add_definitions(-DOPENJKDF2_RELEASE_COMMIT_W=L"$ENV{OPENJKDF2_RELEASE_COMMIT}")
 add_definitions(-DOPENJKDF2_RELEASE_COMMIT_SHORT_W=L"$ENV{OPENJKDF2_RELEASE_COMMIT_SHORT}")
-
 add_definitions(-DQOL_IMPROVEMENTS)
+
+# Curl
+add_definitions(-DHAVE_STRUCT_TIMEVAL)
+add_definitions(-DHAVE_CONFIG_H)
+add_definitions(-DBUILDING_LIBCURL)
+add_definitions(-DUSE_MBEDTLS)
+add_definitions(-D__USE_MINGW_ANSI_STDIO)
+
 set(CMAKE_CXX_STANDARD 17)
 
 if(PLAT_LINUX_32)
@@ -100,6 +108,7 @@ if(PLAT_LINUX_32)
     set(TARGET_NO_BLOBS TRUE)
     set(TARGET_CAN_JKGM TRUE)
     set(OPENJKDF2_NO_ASAN TRUE)
+    set(TARGET_USE_CURL TRUE)
 
     if(OPENJKDF2_USE_BLOBS)
         set(TARGET_NO_BLOBS FALSE)
@@ -128,6 +137,7 @@ elseif(PLAT_LINUX_64)
     set(TARGET_NO_BLOBS TRUE)
     set(TARGET_CAN_JKGM TRUE)
     set(OPENJKDF2_NO_ASAN TRUE)
+    set(TARGET_USE_CURL TRUE)
     
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -fshort-wchar")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fshort-wchar")
@@ -153,6 +163,7 @@ elseif(PLAT_MACOS)
     set(TARGET_MACOS TRUE)
     set(TARGET_NO_BLOBS TRUE)
     set(TARGET_CAN_JKGM TRUE)
+    set(TARGET_USE_CURL TRUE)
 
     set(BUNDLE "${PROJECT_SOURCE_DIR}/OpenJKDF2.app")
     set(HOMEBREW_PREFIX $ENV{HOMEBREW_PREFIX})
@@ -181,6 +192,7 @@ elseif(PLAT_MACOS_X86_64)
     set(TARGET_MACOS TRUE)
     set(TARGET_NO_BLOBS TRUE)
     set(TARGET_CAN_JKGM TRUE)
+    set(TARGET_USE_CURL TRUE)
 
     set(BUNDLE "${PROJECT_SOURCE_DIR}/OpenJKDF2_x86_64.app")
     set(HOMEBREW_PREFIX "/usr/local")
@@ -215,6 +227,7 @@ elseif(PLAT_MINGW_X86_64)
     set(TARGET_WIN32 TRUE)
     set(TARGET_NO_BLOBS TRUE)
     set(TARGET_CAN_JKGM TRUE)
+    set(TARGET_USE_CURL TRUE)
 
     # TODO: Bump to O2 eventually. MinGW likes to replace memset with calls to itself...
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -ggdb -fno-omit-frame-pointer")
@@ -248,6 +261,7 @@ elseif(PLAT_WASM)
     set(TARGET_NO_BLOBS TRUE)
     set(TARGET_WASM TRUE)
     set(TARGET_CAN_JKGM FALSE)
+    set(TARGET_USE_CURL FALSE)
 
     add_link_options(-fno-exceptions)
     add_compile_options(-fno-exceptions)
@@ -298,6 +312,7 @@ elseif(PLAT_MSVC)
     set(TARGET_WIN32 TRUE)
     set(TARGET_NO_BLOBS TRUE)
     set(TARGET_CAN_JKGM TRUE)
+    set(TARGET_USE_CURL FALSE)
 	
 	set(SDL2_PATH ${CMAKE_SOURCE_DIR}/3rdparty/SDL2-2.24.0)
 	set(SDL2_MIXER_PATH ${CMAKE_SOURCE_DIR}/3rdparty/SDL2_mixer-2.6.2)
@@ -365,6 +380,19 @@ file(GLOB SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/*.c ${PROJECT_SOURCE_DIR}/src/*
 file(GLOB FCASEOPEN_SRCS ${PROJECT_SOURCE_DIR}/src/external/fcaseopen/*.c)
 list(APPEND SOURCE_FILES ${FCASEOPEN_SRCS})
 include_directories(${PROJECT_SOURCE_DIR}/src/external/fcaseopen)
+
+# Automatic updates
+if(TARGET_USE_CURL)
+    # curl
+    file(GLOB CURL_SRCS ${PROJECT_SOURCE_DIR}/src/external/curl/*.c ${PROJECT_SOURCE_DIR}/src/external/curl/vtls/*.c ${PROJECT_SOURCE_DIR}/src/external/curl/vauth/*.c)
+    list(APPEND SOURCE_FILES ${CURL_SRCS})
+    include_directories(${PROJECT_SOURCE_DIR}/src/external/curl)
+
+    # mbedtls
+    file(GLOB MBEDTLS_SRCS ${PROJECT_SOURCE_DIR}/src/external/mbedtls/*.c)
+    list(APPEND SOURCE_FILES ${MBEDTLS_SRCS})
+    include_directories(${PROJECT_SOURCE_DIR}/src/external/)
+endif()
 
 if(TARGET_NO_BLOBS)
     add_definitions(-DLINUX_TMP)
