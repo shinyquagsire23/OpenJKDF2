@@ -69,6 +69,14 @@
 #include "Main/InstallHelper.h"
 #include "sithCvar.h"
 
+#if defined(PLATFORM_CURL)
+#ifdef LINUX
+#include <curl/curl.h>
+#else // !LINUX
+#include "curl/curl.h"
+#endif // !LINUX
+#endif
+
 #if defined(PLATFORM_POSIX)
 #include <locale.h>
 #endif
@@ -193,6 +201,14 @@ int Main_StartupDedicated()
 }
 #endif // QOL_IMPROVEMENTS
 
+#if defined(PLATFORM_CURL)
+char tmp_dl[4096];
+static size_t curlhelper_write_to_buffer(void *contents, size_t size, size_t nmemb, void *userp)
+{ 
+    memcpy(userp, contents, size*nmemb);
+}
+#endif
+
 int Main_Startup(const char *cmdline)
 {
     int result; // eax
@@ -200,6 +216,33 @@ int Main_Startup(const char *cmdline)
 #if defined(PLATFORM_POSIX)
     // Make sure floating point stuff is using . and not ,
     setlocale(LC_ALL, "C");
+#endif
+
+#if defined(PLATFORM_CURL)
+    char *url = "https://api.github.com/repos/shinyquagsire23/OpenJKDF2/releases";
+
+    CURLcode res;
+    CURL* curl = curl_easy_init();
+    if (curl) {
+        memset(tmp_dl, 0, sizeof(tmp_dl));
+        curl_easy_setopt(curl, CURLOPT_URL, url);
+        curl_easy_setopt(curl, CURLOPT_USERAGENT, "OpenJKDF2-Update-Check");
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlhelper_write_to_buffer);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, tmp_dl);
+        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1);
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 1);
+        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
+        curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
+        //curl_easy_setopt(curl, CURLOPT_SSL_VERIFYSTATUS, 0);
+        res = curl_easy_perform(curl);
+        /* always cleanup */
+
+        printf("cURL error: %s\n", curl_easy_strerror(res));
+        curl_easy_cleanup(curl);
+
+        printf("Test: %s\n", tmp_dl);
+    }
 #endif
 
     stdInitServices(&hs);    
