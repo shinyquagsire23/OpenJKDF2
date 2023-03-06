@@ -55,6 +55,10 @@ typedef uint32_t size_t;
 #define JKM_CAMERA
 #endif
 
+#ifdef DW_TYPES
+#define DW_LASERS
+#endif
+
 #include "types_win_enums.h"
 #include "types_enums.h"
 #include "engine_config.h"
@@ -1981,6 +1985,8 @@ typedef struct sithArchLight
 
 typedef void (__cdecl *sithWorldProgressCallback_t)(float);
 
+typedef struct sDwLaser tDwLaser;
+
 typedef struct sithWorld
 {
     uint32_t level_type_maybe;
@@ -2062,7 +2068,21 @@ typedef struct sithWorld
     //int sizeArchLights;
     sithArchLight* aArchlights;
 #endif
+#ifdef DW_LASERS
+    sDwLaser* paLasers;
+    sDwLaser* pLastLaser;
+#endif
 } sithWorld;
+
+typedef struct sDwLaser
+{
+    uint32_t field_0;
+    uint32_t field_4;
+    uint32_t pad[0xF];
+    uint32_t pad[0x10];
+    uint32_t pad[0x10];
+    uint32_t pad[0x8];
+} tDwLaser;
 
 typedef int (*sithWorldSectionParser_t)(sithWorld*, int);
 

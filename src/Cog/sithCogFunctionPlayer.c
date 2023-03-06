@@ -548,14 +548,21 @@ void sithCogFunctionPlayer_KillPlayerQuietly(sithCog *ctx)
 void sithCogFunctionPlayer_Startup(void* ctx)
 {
     sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetInvActivate, "setinvactivated");
+
+    // DW added: g_debugModeFlags & DEBUGFLAG_100 check
     sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetInvAvailable, "setinvavailable");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_IsInvActivated, "isinvactivated");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_IsInvAvailable, "isinvavailable");
+
+    // Start DW removed
     sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetGoalFlags, "setgoalflags");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_ClearGoalFlags, "cleargoalflags");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetNumPlayers, "getnumplayers");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetMaxPlayers, "getmaxplayers");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetAbsoluteMaxPlayers, "getabsolutemaxplayers");
+    // End DW removed
+
+    // Start DW removed
     sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetLocalPlayerThing, "getlocalplayerthing");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetPlayerThing, "getplayerthing");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetPlayerNum, "getplayernum");
@@ -582,8 +589,12 @@ void sithCogFunctionPlayer_Startup(void* ctx)
     sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetAutoReload, "setautoreload");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetRespawnMask, "getrespawnmask");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetRespawnMask, "setrespawnmask");
+    // End DW removed
+
     sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_ActivateBin, "activatebin");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_DeactivateBin, "deactivatebin");
+
+    // Start DW removed
     sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetBinWait, "setbinwait");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_GetNumPlayersInTeam, "getnumplayersinteam");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_AddScoreToTeamMembers, "addscoretoteammembers");
@@ -591,5 +602,5 @@ void sithCogFunctionPlayer_Startup(void* ctx)
     if (Main_bMotsCompat) {
         sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_KillPlayerQuietly, "killplayerquietly");
     }
-
+    // End DW removed
 }

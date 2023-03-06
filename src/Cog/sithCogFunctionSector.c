@@ -439,12 +439,37 @@ void sithCogFunctionSector_SetSectorAmbientLight(sithCog *ctx)
     }
 }
 
+// DW added
+void sithCogFunctionSector_GetAmbient(sithCog *ctx)
+{
+    sithSector* pSector = sithCogExec_PopSector(ctx);
+    if (!pSector) {
+        sithCogExec_PushFlex(ctx, 0.0);
+        return;
+    }
+
+    float val = pSector->extraLight + pSector->ambientLight;
+    if (0.0 <= val) {
+        if (val <= 1.0) {
+            sithCogExec_PushFlex(ctx, val);
+        }
+        else {
+            sithCogExec_PushFlex(ctx, 1.0);
+        }
+        return;
+    }
+    sithCogExec_PushFlex(ctx,0.0);
+}
+
 void sithCogFunctionSector_Startup(void* ctx)
 {
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_GetTint, "getsectortint");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_SetTint, "setsectortint");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_SetSectorAdjoins, "setsectoradjoins");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_SetSectorAdjoins, "sectoradjoins");
+    if (Main_bDwCompat) {
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_GetAmbient, "getsectorambient");
+    }
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_GetSectorLight, "getsectorlight");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_SetSectorLight, "setsectorlight");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_SetSectorLight, "sectorlight");

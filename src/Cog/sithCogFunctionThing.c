@@ -2585,6 +2585,23 @@ void sithCogFunctionThing_SetThingLookPYR(sithCog *ctx)
     return;
 }
 
+// DW added
+void sithCogFunctionThing_GetThingInsertOffset(sithCog *ctx)
+{
+    rdModel3 *prVar1;
+    sithThing* pThing = sithCogExec_PopThing(ctx);
+    if (((pThing != (sithThing *)0x0) 
+        && ((pThing->rdthing).type == RD_THINGTYPE_MODEL)) 
+        && (prVar1 = (pThing->rdthing).model3, prVar1 != (rdModel3 *)0x0))
+    {
+        sithCogExec_PushVector3(ctx,&prVar1->insertOffset);
+        return;
+    }
+    sithCogExec_PushVector3(ctx,&rdroid_zeroVector3);
+}
+
+
+
 void sithCogFunctionThing_Startup(void* ctx)
 {
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_WaitForStop, "waitforstop");
@@ -2602,7 +2619,15 @@ void sithCogFunctionThing_Startup(void* ctx)
     if (Main_bMotsCompat) {
         sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_CreateThingLocal, "createthinglocal");
     }
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_CreateThingNr, "createthingnr");
+
+    // DW added: ?
+    if (Main_bDwCompat) {
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_CreateThing, "createthingnr");
+    }
+    else {
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_CreateThingNr, "createthingnr");
+    }
+
     if (Main_bMotsCompat) {
         sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_CreateThingAtPosMots, "createthingatpos");
         sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_CreateThingAtPosOwner, "createthingatposowner");
@@ -2667,14 +2692,20 @@ void sithCogFunctionThing_Startup(void* ctx)
     }
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetThingRvec, "getthingrvec");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetThingFlags, "getthingflags");
+    if (Main_bDwCompat) {
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetThingInsertOffset, "getthinginsertoffset");
+    }
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetCollideType, "getcollidetype");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetHeadlightIntensity, "getheadlightintensity");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_IsThingVisible, "isthingvisible");
+    if (Main_bDwCompat) {
+        sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetThingCollideSize, "getthingradius");
+    }
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetThingPulse, "setthingpulse");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetThingTimer, "setthingtimer");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetInv, "getinv");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetInv, "setinv");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_ChangeInv, "changeinv");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetInv, "setinv"); // DW added: g_debugModeFlags & DEBUGFLAG_100 check
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_ChangeInv, "changeinv"); // DW added: g_debugModeFlags & DEBUGFLAG_100 check
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetInvCog, "getinvcog");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetInvMin, "getinvmin");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetInvMax, "getinvmax");
@@ -2700,6 +2731,15 @@ void sithCogFunctionThing_Startup(void* ctx)
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_JumpToFrame, "jumptoframe");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_PathMovePause, "pathmovepause");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_PathMoveResume, "pathmoveresume");
+    if (Main_bDwCompat) {
+        // TODO
+        //sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_AddLaser, "addlaser");
+        //sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_AddBeam, "addbeam");
+        //sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_RemoveLaser, "removelaser");
+        //sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetLaserColor, "getlasercolor");
+        //sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetLaserId, "getlaserid");
+        //sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_ComputeCatapultVelocity, "computecatapultvelocity");
+    }
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetThingTemplate, "getthingtemplate");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_DamageThing, "damagething");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetLifeLeft, "setlifeleft");
@@ -2728,8 +2768,8 @@ void sithCogFunctionThing_Startup(void* ctx)
     if (Main_bMotsCompat) {
         sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetThingLookPYR, "setthinglookpyr");
     }
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_IsCrouching, "isthingcrouching");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_IsCrouching, "iscrouching");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_IsCrouching, "isthingcrouching"); // DW removed
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_IsCrouching, "iscrouching");  // DW removed
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetThingClassCog, "getthingclasscog");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetThingClassCog, "setthingclasscog");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetThingCaptureCog, "getthingcapturecog");

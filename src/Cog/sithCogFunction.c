@@ -1895,7 +1895,12 @@ void sithCogFunction_Startup(void* ctx)
     sithCogScript_RegisterVerb(ctx, sithCogFunction_ClearMapModeFlags, "clearmapmodeflags");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_NewColorEffect, "newcoloreffect");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_FreeColorEffect, "freecoloreffect");
-    sithCogScript_RegisterVerb(ctx, sithCogFunction_FreeColorEffect, "modifycoloreffect");
+    if (Main_bDwCompat) {
+        sithCogScript_RegisterVerb(ctx, sithCogFunction_ModifyColorEffect, "modifycoloreffect");
+    }
+    else {
+        sithCogScript_RegisterVerb(ctx, sithCogFunction_FreeColorEffect, "modifycoloreffect"); // oops? Droidworks fixes this
+    }
     sithCogScript_RegisterVerb(ctx, sithCogFunction_AddDynamicTint, "adddynamictint");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_AddDynamicAdd, "adddynamicadd");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_GetMaterialCel, "getmaterialcel");
@@ -1923,6 +1928,8 @@ void sithCogFunction_Startup(void* ctx)
         sithCogScript_RegisterVerb(ctx,sithCogFunction_GetActionCog,"getactioncog"); // MOTS
         sithCogScript_RegisterVerb(ctx,sithCogFunction_SetActionCog,"setactioncog"); // MOTS
     }
+
+    // Droidworks removes start
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SetMultiModeFlags, "setmultimodeflags");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_GetMultiModeFlags, "getmultimodeflags");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_ClearMultiModeFlags, "clearmultimodeflags");
@@ -1934,6 +1941,8 @@ void sithCogFunction_Startup(void* ctx)
     sithCogScript_RegisterVerb(ctx, sithCogFunction_GetTimeLimit, "gettimelimit");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SetScoreLimit, "setscorelimit");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_GetScoreLimit, "getscorelimit");
+    // Droidworks removes end
+
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SendTrigger, "sendtrigger");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_AutoSaveGame, "autosavegame");
 

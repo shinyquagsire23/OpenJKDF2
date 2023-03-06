@@ -487,6 +487,96 @@ void sithCogFunctionSound_PlaySoundPosLocal(sithCog *ctx)
         sithCogExec_PushInt(ctx, -1);
 }
 
+// Droidworks added
+void sithCogFunctionSound_PlaySoundThingAndWait(sithCog *ctx)
+{
+    double maxDist_act; // st7
+    __int32 flagsTmp; // ebx
+    sithPlayingSound *playingSound; // eax
+    sithPlayingSound *playingSound_; // ebp
+    int refid_; // eax
+    int refid; // eax
+    float minDist_act; // [esp+10h] [ebp-Ch]
+    float maxDist_act_; // [esp+14h] [ebp-8h]
+
+    int flags = sithCogExec_PopInt(ctx);
+    float maxDist = sithCogExec_PopFlex(ctx);
+    float minDist = sithCogExec_PopFlex(ctx);
+    float volume = sithCogExec_PopFlex(ctx);
+    sithThing* pThing = sithCogExec_PopThing(ctx);
+    sithSound* pSound = sithCogExec_PopSound(ctx);
+
+    //printf("sithCogFunctionSound_PlaySoundThing %s\n", ctx->cogscript_fpath);
+
+    if ( !pSound )
+    {
+        sithCogExec_PushInt(ctx, -1);
+        return;
+    }
+
+    if ( minDist >= 0.0 )
+        minDist_act = minDist * 0.1;
+    else
+        minDist_act = 0.5;
+    if ( maxDist >= 0.0 )
+        maxDist_act = maxDist * 0.1;
+    else
+        maxDist_act = 2.5;
+    maxDist_act_ = maxDist_act;
+    if ( maxDist_act <= minDist_act )
+        maxDist_act_ = minDist_act;
+    if ( volume < 0.0 )
+    {
+        volume = 0.0;
+    }
+    else if ( volume > 1.5 )
+    {
+        volume = 1.5;
+    }
+    if ( pThing )
+    {
+        if (!(flags & SITHSOUNDFLAG_FOLLOWSTHING))
+        {
+            flagsTmp = flags | SITHSOUNDFLAG_ABSOLUTE;
+            playingSound = sithSoundMixer_PlaySoundPosAbsolute(pSound, &pThing->position, pThing->sector, volume, minDist_act, maxDist_act_, flagsTmp);
+        }
+        else
+        {
+            flagsTmp = flags & ~SITHSOUNDFLAG_ABSOLUTE;
+            playingSound = sithSoundMixer_PlaySoundPosThing(pSound, pThing, volume, minDist_act, maxDist_act_, flagsTmp);
+        }
+        if (COG_SHOULD_SYNC(ctx))
+        {
+            if ( playingSound )
+                refid_ = playingSound->refid;
+            else
+                refid_ = -1;
+            sithDSSThing_SendPlaySound(pThing, &pThing->position, pSound, minDist_act, maxDist_act_, flagsTmp, refid_, -1, 255);
+        }
+    }
+    else
+    {
+        flags &= ~(SITHSOUNDFLAG_FOLLOWSTHING|SITHSOUNDFLAG_ABSOLUTE);
+        playingSound = sithSoundMixer_cog_playsound_internal(pSound, volume, 0.0, flags);
+        if (COG_SHOULD_SYNC(ctx))
+        {
+            if ( playingSound )
+                refid = playingSound->refid;
+            else
+                refid = -1;
+            sithDSSThing_SendPlaySound(0, 0, pSound, volume, 0.0, flags, refid, -1, 255);
+        }
+    }
+    if ( playingSound ) {
+        ctx->script_running = 2;
+        ctx->wakeTimeMs = sithTime_curMs + pSound->sound_len;
+
+        sithCogExec_PushInt(ctx, playingSound->refid);
+    }
+    else
+        sithCogExec_PushInt(ctx, -1);
+}
+
 void sithCogFunctionSound_Startup(void* ctx)
 {
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_PlaySong, "playsong");
@@ -514,5 +604,7 @@ void sithCogFunctionSound_Startup(void* ctx)
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_SectorSound, "sectorsound");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_SetMusicVol, "setmusicvol");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_GetSoundLen, "getsoundlen");
-
+    if (Main_bDwCompat) {
+        sithCogScript_RegisterVerb(ctx,sithCogFunctionSound_PlaySoundThingAndWait,"playsoundthingandwait");
+    }
 }
