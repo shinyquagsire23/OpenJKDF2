@@ -384,14 +384,16 @@ include_directories(${PROJECT_SOURCE_DIR}/src/external/fcaseopen)
 # Automatic updates
 if(TARGET_USE_CURL)
     # curl
-    file(GLOB CURL_SRCS ${PROJECT_SOURCE_DIR}/src/external/curl/*.c ${PROJECT_SOURCE_DIR}/src/external/curl/vtls/*.c ${PROJECT_SOURCE_DIR}/src/external/curl/vauth/*.c)
+    file(GLOB CURL_SRCS ${PROJECT_SOURCE_DIR}/src/external/curl/*.c ${PROJECT_SOURCE_DIR}/src/external/curl/vtls/*.c ${PROJECT_SOURCE_DIR}/src/external/curl/vauth/*.c  ${PROJECT_SOURCE_DIR}/src/external/curl/vquic/*.c)
     list(APPEND SOURCE_FILES ${CURL_SRCS})
     include_directories(${PROJECT_SOURCE_DIR}/src/external/curl)
 
     # mbedtls
     file(GLOB MBEDTLS_SRCS ${PROJECT_SOURCE_DIR}/src/external/mbedtls/*.c)
     list(APPEND SOURCE_FILES ${MBEDTLS_SRCS})
-    include_directories(${PROJECT_SOURCE_DIR}/src/external/)
+    include_directories(${PROJECT_SOURCE_DIR}/src/external/mbedtls)
+
+    add_definitions(-DPLATFORM_CURL)
 endif()
 
 if(TARGET_NO_BLOBS)
@@ -564,6 +566,7 @@ if(TARGET_MACOS)
     )
     target_link_libraries(${BIN_NAME} PRIVATE "-framework AppKit")
     target_link_libraries(${BIN_NAME} PRIVATE "-framework Carbon")
+    target_link_libraries(${BIN_NAME} PRIVATE "-framework SystemConfiguration")
 
     find_package(PkgConfig REQUIRED)
     
