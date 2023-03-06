@@ -20,6 +20,8 @@
 #include "external/fcaseopen/fcaseopen.h"
 #endif
 
+#include "Platform/Common/stdEmbeddedRes.h"
+
 /**
  * Display compilation errors from the OpenGL shader compiler
  */
@@ -51,82 +53,7 @@ void print_log(GLuint object) {
 
 GLuint load_shader_file(const char* filepath, GLenum type)
 {
-    char tmp_filepath[256];
-    strncpy(tmp_filepath, filepath, 256);
-    
-#ifdef WIN32
-for (int i = 0; i < strlen(tmp_filepath); i++)
-{
-    if (tmp_filepath[i] == '/') {
-        tmp_filepath[i] = '\\';
-    }
-}
-#endif
-
-#ifdef LINUX
-    char *r = malloc(strlen(tmp_filepath) + 16);
-    if (casepath(tmp_filepath, r))
-    {
-        strcpy(tmp_filepath, r);
-    }
-    free(r);
-#endif
-
-    char* shader_contents = NULL;
-    FILE* f = fopen(tmp_filepath, "r");
-    if (f)
-    {
-retry_file:
-	    fseek(f, 0, SEEK_END);
-	    size_t len = ftell(f);
-	    rewind(f);
-	    
-	    shader_contents = malloc(len+1);
-	    
-	    if (fread(shader_contents, 1, len, f) != len)
-	    {
-	        char errtmp[256];
-	        snprintf(errtmp, 256, "std3D: Failed to read shader file `%s`!\n", filepath);
-	        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", errtmp, NULL);
-	        return -1;
-	    }
-	    shader_contents[len] = 0;
-	    
-	    fclose(f);
-	}
-	else
-    {
-#if defined(MACOS)
-    	char* base_path = SDL_GetBasePath();
-    	strncpy(tmp_filepath, base_path, 256);
-    	strncat(tmp_filepath, "Contents/Resources/", 256);
-    	strncat(tmp_filepath, filepath, 256);
-    	SDL_free(base_path);
-
-    	f = fopen(tmp_filepath, "r");
-    	if (f)
-    		goto retry_file;
-#endif
-
-	    strncpy(tmp_filepath, filepath, 256);
-	    
-		for (int i = 0; i < strlen(tmp_filepath); i++)
-		{
-		    if (tmp_filepath[i] == '\\') {
-		        tmp_filepath[i] = '/';
-		    }
-		}
-
-    	for (size_t i = 0; i < embeddedResource_aFiles_num; i++)
-    	{
-    		if (!strcmp(embeddedResource_aFiles[i].fpath, tmp_filepath)) {
-    			shader_contents = malloc(embeddedResource_aFiles[i].data_len+1);
-    			memcpy(shader_contents, embeddedResource_aFiles[i].data, embeddedResource_aFiles[i].data_len);
-    			shader_contents[embeddedResource_aFiles[i].data_len] = 0;
-    			break;
-    		}
-    	}
-    }
+    char* shader_contents = stdEmbeddedRes_Load(filepath, NULL);
 
     if (!shader_contents)
     {

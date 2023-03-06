@@ -142,6 +142,7 @@ extern void OpenJKDF2_Globals_Reset();
     from pathlib import Path
 
     embed_files = glob.glob(str(Path(project_root) / "resource" / "shaders" / "*.glsl"))
+    embed_files += glob.glob(str(Path(project_root) / "resource" / "ssl" / "*.pem"))
     cog.outl("extern const size_t embeddedResource_aFiles_num;")
     cog.outl("extern const embeddedResource_t embeddedResource_aFiles[%d];" % (len(embed_files),))
 ]]]
