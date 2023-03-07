@@ -106,7 +106,7 @@ void* stdHttp_Fetch(const char* pUrl)
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 0);
     curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
 
-#ifndef LINUX
+#ifndef PLATFORM_NO_CACERT_BLOB
     curl_easy_setopt(curl, CURLOPT_CAINFO, NULL);
     curl_easy_setopt(curl, CURLOPT_CAPATH, NULL);
     curl_easy_setopt(curl, CURLOPT_CAINFO_BLOB, &blob);

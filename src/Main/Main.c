@@ -70,6 +70,7 @@
 #include "sithCvar.h"
 
 #include "Platform/Common/stdHttp.h"
+#include "Platform/Common/stdUpdater.h"
 
 #if defined(PLATFORM_POSIX)
 #include <locale.h>
@@ -297,10 +298,7 @@ int Main_Startup(const char *cmdline)
     //stdStartup(&hs); // Moved
 
     stdHttp_Startup();
-    char* test = stdHttp_Fetch("https://api.github.com/repos/shinyquagsire23/OpenJKDF2/releases?per_page=1");
-    if (test) {
-        stdPlatform_Printf("Test: %s\n", test);
-    }
+    stdUpdater_CheckForUpdates();
 
     jkGob_Startup();
     jkRes_Startup(pHS);
