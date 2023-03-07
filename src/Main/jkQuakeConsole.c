@@ -26,6 +26,7 @@
 #include "Platform/std3D.h"
 #include "Win95/Window.h"
 #include "Platform/stdControl.h"
+#include "Platform/Common/stdUpdater.h"
 #include "Gameplay/sithPlayerActions.h"
 #include "Main/sithCvar.h"
 #include "../jk.h"
@@ -56,6 +57,10 @@ int jkQuakeConsole_bHasTabbed = 0;
 int jkQuakeConsole_realHistoryLines = 0;
 int jkQuakeConsole_selectedHistory = 0;
 int jkQuakeConsole_bShiftHeld = 0;
+int jkQuakeConsole_bShowUpdateText = 0;
+int jkQuakeConsole_updateTextCooldown = 0;
+int jkQuakeConsole_updateTextWidth = 0;
+int jkQuakeConsole_updateTextHeight = 0;
 
 char* jkQuakeConsole_pTabPos = NULL;
 char* jkQuakeConsole_aLines[JKQUAKECONSOLE_NUM_LINES];
@@ -115,6 +120,11 @@ void jkQuakeConsole_Startup()
 
         jkQuakeConsole_bShiftHeld = 0;
 
+        jkQuakeConsole_bShowUpdateText = stdUpdater_CheckForUpdates();
+        if (jkQuakeConsole_bShowUpdateText) {
+            jkQuakeConsole_updateTextCooldown = 10*1000*1000;
+        }
+
         jkQuakeConsole_bOnce = 1;
     }
     
@@ -168,6 +178,23 @@ void jkQuakeConsole_Render()
         fontHeight = 1.0;
     }
     int maxVisibleLines = (int)((screenH / 2) / fontHeight)-2;
+
+    // Show update text over everything
+    if (jkQuakeConsole_bShowUpdateText) {
+        char tmp[128];
+
+        jkQuakeConsole_updateTextCooldown -= deltaUs;
+        if (jkQuakeConsole_updateTextCooldown <= 0) {
+            jkQuakeConsole_updateTextCooldown = 0;
+            jkQuakeConsole_bShowUpdateText = 0;
+        }
+
+        // TODO: i8n
+        stdUpdater_GetUpdateText(tmp, sizeof(tmp));
+        jkQuakeConsole_updateTextWidth = stdFont_DrawAsciiGPU(jkQuakeConsole_pFont, 0, 0, screenW, tmp, 1, jkPlayer_hudScale);
+        stdFont_DrawAsciiGPU(jkQuakeConsole_pFont, 0, fontHeight, screenW, "Click here to download.", 1, jkPlayer_hudScale);
+        jkQuakeConsole_updateTextHeight = (int)(fontHeight * 2);
+    }
 
     if (jkQuakeConsole_bOpen)
     {
@@ -655,6 +682,8 @@ int jkQuakeConsole_WmHandler(HWND a1, UINT msg, WPARAM wParam, HWND a4, LRESULT 
 {
     LPARAM lParam = (LPARAM)a4;
     uint16_t repeats = lParam & 0xFFFF;
+    uint16_t mouseX = lParam & 0xFFFF;
+    uint16_t mouseY = (lParam >> 16) & 0xFFFF;
 
     switch ( msg )
     {
@@ -701,6 +730,12 @@ int jkQuakeConsole_WmHandler(HWND a1, UINT msg, WPARAM wParam, HWND a4, LRESULT 
             }
             else if (!jkHud_bChatOpen && !jkQuakeConsole_bOpen) {
                 sithCommand_HandleBinds(wParam);
+            }
+            break;
+        case WM_LBUTTONDOWN:
+            if (jkQuakeConsole_bShowUpdateText && mouseX < jkQuakeConsole_updateTextWidth && mouseY < jkQuakeConsole_updateTextHeight)
+            {
+                printf("Clicked. %u %u\n", mouseX, mouseY);
             }
             break;
         default:

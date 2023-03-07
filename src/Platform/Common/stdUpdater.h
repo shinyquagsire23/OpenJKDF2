@@ -8,6 +8,7 @@ extern "C" {
 #include "types.h"
 
 int stdUpdater_CheckForUpdates();
+void stdUpdater_GetUpdateText(char* pOut, size_t outSz);
 
 #ifdef __cplusplus
 }

@@ -298,7 +298,6 @@ int Main_Startup(const char *cmdline)
     //stdStartup(&hs); // Moved
 
     stdHttp_Startup();
-    stdUpdater_CheckForUpdates();
 
     jkGob_Startup();
     jkRes_Startup(pHS);

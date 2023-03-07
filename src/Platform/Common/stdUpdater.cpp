@@ -6,12 +6,28 @@
 #include <nlohmann/json.hpp>
 
 #include "Platform/Common/stdHttp.h"
+#include "General/stdString.h"
 #include "stdPlatform.h"
 
 extern "C" {
 
+std::string stdUpdater_strBrowserDownloadUrl;
+std::string stdUpdater_strUpdateVersion;
+std::string stdUpdater_strDlFname;
+bool found_update;
+
+void stdUpdater_Reset()
+{
+    stdUpdater_strBrowserDownloadUrl = "";
+    stdUpdater_strUpdateVersion = "";
+    stdUpdater_strDlFname = "";
+    found_update = false;
+}
+
 int stdUpdater_CheckForUpdates()
 {
+    stdUpdater_Reset();
+
     char* pData = (char*)stdHttp_Fetch("https://api.github.com/repos/shinyquagsire23/OpenJKDF2/releases?per_page=1");
     if (!pData) {
         return 0;
@@ -41,6 +57,12 @@ int stdUpdater_CheckForUpdates()
             return 0;
         }
 
+        stdUpdater_strUpdateVersion = entry["tag_name"].get<std::string>();
+
+        if (!strcmp(openjkdf2_aReleaseVersion, stdUpdater_strUpdateVersion.c_str())) {
+            return 0;
+        }
+
         for (int i = 0; i < assets.size(); i++) {
             auto asset = assets[i];
             if (!asset.contains("name")) {
@@ -50,22 +72,15 @@ int stdUpdater_CheckForUpdates()
                 continue;
             }
 
-            std::string name = asset["name"].get<std::string>();
-            std::string browser_download_url = asset["browser_download_url"].get<std::string>();
-
-            if (name != "win64-debug.zip") {
+            stdUpdater_strDlFname = asset["name"].get<std::string>();
+            if (stdUpdater_strDlFname != "win64-debug.zip") {
                 continue;
             }
 
-            stdPlatform_Printf("stdUpdater: %s %s\n", name.c_str(), browser_download_url.c_str());
-            break;
-        }
+            stdUpdater_strBrowserDownloadUrl = asset["browser_download_url"].get<std::string>();
 
-        std::string tag_name = entry["tag_name"].get<std::string>();
-        stdPlatform_Printf("%s\n", tag_name.c_str());
-
-        if (strcmp(openjkdf2_aReleaseVersion, tag_name.c_str())) {
-            stdPlatform_Printf("stdUpdater: An update is available! Current: %s -> Latest: %s\n", openjkdf2_aReleaseVersion, tag_name.c_str());
+            stdPlatform_Printf("stdUpdater: An update is available! Current: %s -> Latest: %s\n", openjkdf2_aReleaseVersion, stdUpdater_strUpdateVersion.c_str());
+            stdPlatform_Printf("stdUpdater: %s %s\n", stdUpdater_strDlFname.c_str(), stdUpdater_strBrowserDownloadUrl.c_str());
             return 1;
         }
 
@@ -76,6 +91,12 @@ int stdUpdater_CheckForUpdates()
         stdPlatform_Printf("stdUpdater: Failed to parse JSON?");
         return 0;
     }
+}
+
+void stdUpdater_GetUpdateText(char* pOut, size_t outSz)
+{
+    // TODO: i8n
+    stdString_snprintf(pOut, outSz, "An update is available: %s => %s", openjkdf2_aReleaseVersion, stdUpdater_strUpdateVersion.c_str());
 }
 
 }
