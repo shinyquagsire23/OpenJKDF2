@@ -479,6 +479,7 @@ if(TARGET_LINUX)
     list(APPEND SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/external/nativefiledialog-extended/nfd_gtk.cpp)
 
     add_definitions(-DLINUX)
+    add_definitions(-DPLATFORM_LINUX)
     add_definitions(-DPLATFORM_NO_CACERT_BLOB)
 endif()
 

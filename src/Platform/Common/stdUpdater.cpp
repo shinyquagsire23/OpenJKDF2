@@ -78,6 +78,10 @@ int stdUpdater_CheckForUpdates()
 {
     stdUpdater_Reset();
 
+#ifdef PLATFORM_LINUX
+    return 0;
+#endif
+
     char* pData = (char*)stdHttp_Fetch(stdUpdater_pUpdaterUrl);
     if (!pData) {
         return 0;
@@ -110,7 +114,7 @@ int stdUpdater_CheckForUpdates()
         stdUpdater_strUpdateVersion = entry["tag_name"].get<std::string>();
 
         if (!strcmp(openjkdf2_aReleaseVersion, stdUpdater_strUpdateVersion.c_str())) {
-            //return 0;
+            return 0;
         }
 
         for (int i = 0; i < assets.size(); i++) {
@@ -268,6 +272,13 @@ int stdUpdater_UpdateThread(void* unused)
 
 void stdUpdater_DoUpdate()
 {
+#ifdef PLATFORM_LINUX
+    stdUpdater_bFoundUpdate = false;
+    stdUpdater_bDownloading = false;
+    stdUpdater_bCompletedUpdate = false;
+    return;
+#endif
+
     if (!stdUpdater_bFoundUpdate) {
         return;
     }
@@ -278,7 +289,7 @@ void stdUpdater_DoUpdate()
     stdUpdater_UpdateThread(NULL);
 #endif
 
-    stdUpdater_bFoundUpdate = 0;
+    stdUpdater_bFoundUpdate = false;
 }
 
 }
