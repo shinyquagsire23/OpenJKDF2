@@ -168,6 +168,7 @@ int openjkdf2_bIsKVM = 1;
 int openjkdf2_restartMode = OPENJKDF2_RESTART_NONE;
 char openjkdf2_aOrigCwd[1024];
 char openjkdf2_aRestartPath[256];
+char* openjkdf2_pExecutablePath = "";
 
 void do_hooks();
 
@@ -177,9 +178,12 @@ void do_hooks();
 #include <windows.h>
 #endif
 
+#ifdef PLATFORM_PHYSFS
+#include <physfs.h>
+#endif
+
 #ifdef LINUX
 #ifndef ARCH_WASM
-static char* executable_path;
 void crash_handler_basic(int sig);
 
 #include <sys/mman.h>
@@ -232,9 +236,13 @@ int main(int argc, char** argv)
     }
 #endif // WIN64_STANDALONE
 
-#ifdef LINUX
 #ifndef ARCH_WASM
-    executable_path = argv[0];
+    openjkdf2_pExecutablePath = argv[0];
+#endif // !ARCH_WASM
+
+#ifdef LINUX
+
+#ifndef ARCH_WASM
     signal(SIGSEGV, crash_handler_basic);
     //signal(SIGINT, int_handler);
 #endif // !ARCH_WASM
@@ -284,6 +292,11 @@ int main(int argc, char** argv)
 #endif // !ARCH_WASM
 #endif // !ARCH_64BIT
 #endif // LINUX
+
+#ifdef PLATFORM_PHYSFS
+    PHYSFS_init(argv[0]);
+    PHYSFS_permitSymbolicLinks(0);
+#endif
 
     getcwd(openjkdf2_aOrigCwd, sizeof(openjkdf2_aOrigCwd));
 
@@ -356,6 +369,11 @@ int main(int argc, char** argv)
         break;
 #endif
     }
+
+#ifdef PLATFORM_PHYSFS
+    PHYSFS_deinit();
+#endif
+
     return 1;
 }
 
@@ -457,7 +475,7 @@ void crash_handler_full(int sig)
     //struct backtrace_state *lbstate;
 
     //printf ("Backtrace:\n");
-    //lbstate = backtrace_create_state (executable_path, 1, error_callback, NULL);      
+    //lbstate = backtrace_create_state (openjkdf2_pExecutablePath, 1, error_callback, NULL);      
     //backtrace_full(lbstate, 0, full_callback, error_callback, 0);
     exit(1);
 }

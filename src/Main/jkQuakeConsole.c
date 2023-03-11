@@ -61,6 +61,7 @@ int jkQuakeConsole_bShowUpdateText = 0;
 int jkQuakeConsole_updateTextCooldown = 0;
 int jkQuakeConsole_updateTextWidth = 0;
 int jkQuakeConsole_updateTextHeight = 0;
+int jkQuakeConsole_bClickedUpdate = 0;
 
 char* jkQuakeConsole_pTabPos = NULL;
 char* jkQuakeConsole_aLines[JKQUAKECONSOLE_NUM_LINES];
@@ -180,7 +181,7 @@ void jkQuakeConsole_Render()
     int maxVisibleLines = (int)((screenH / 2) / fontHeight)-2;
 
     // Show update text over everything
-    if (jkQuakeConsole_bShowUpdateText) {
+    if (jkQuakeConsole_bShowUpdateText || jkQuakeConsole_bClickedUpdate) {
         char tmp[128];
 
         jkQuakeConsole_updateTextCooldown -= deltaUs;
@@ -192,7 +193,10 @@ void jkQuakeConsole_Render()
         // TODO: i8n
         stdUpdater_GetUpdateText(tmp, sizeof(tmp));
         jkQuakeConsole_updateTextWidth = stdFont_DrawAsciiGPU(jkQuakeConsole_pFont, 0, 0, screenW, tmp, 1, jkPlayer_hudScale);
-        stdFont_DrawAsciiGPU(jkQuakeConsole_pFont, 0, fontHeight, screenW, "Click here to download.", 1, jkPlayer_hudScale);
+        
+        if (!jkQuakeConsole_bClickedUpdate) {
+            stdFont_DrawAsciiGPU(jkQuakeConsole_pFont, 0, fontHeight, screenW, "Click here to download.", 1, jkPlayer_hudScale);
+        }
         jkQuakeConsole_updateTextHeight = (int)(fontHeight * 2);
     }
 
@@ -735,7 +739,9 @@ int jkQuakeConsole_WmHandler(HWND a1, UINT msg, WPARAM wParam, HWND a4, LRESULT 
         case WM_LBUTTONDOWN:
             if (jkQuakeConsole_bShowUpdateText && mouseX < jkQuakeConsole_updateTextWidth && mouseY < jkQuakeConsole_updateTextHeight)
             {
+                jkQuakeConsole_bClickedUpdate = 1;
                 printf("Clicked. %u %u\n", mouseX, mouseY);
+                stdUpdater_DoUpdate();
             }
             break;
         default:

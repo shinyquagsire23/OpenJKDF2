@@ -70,6 +70,11 @@ static size_t stdHttp_write_to_buffer(void *contents, size_t size, size_t nmemb,
     return actual_recv;
 }
 
+static size_t stdHttp_write_to_file(void *contents, size_t size, size_t nmemb, void *userp)
+{
+    return fwrite(contents, size, nmemb, (FILE*)userp);
+}
+
 void stdHttp_Startup()
 {
     stdHttp_pCaCertBlob = stdEmbeddedRes_Load("resource/ssl/cacert.pem", NULL);
@@ -123,6 +128,56 @@ void* stdHttp_Fetch(const char* pUrl)
     curl_easy_cleanup(curl);
 
     return stdHttp_export();
+}
+
+int stdHttp_DownloadToPath(const char* pUrl, const char* pFpath)
+{
+    CURLcode res;
+    CURL* curl = curl_easy_init();
+    if (!curl) {
+        return 0;
+    }
+    stdHttp_reset();
+
+    struct curl_blob blob;
+    blob.data = stdHttp_pCaCertBlob;
+    blob.len = strlen(blob.data);
+    blob.flags = CURL_BLOB_COPY;
+
+    FILE* pFile = fopen(pFpath, "wb");
+    if (!pFile) {
+        return 0;
+    }
+
+    curl_easy_setopt(curl, CURLOPT_URL, pUrl);
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, "OpenJKDF2-stdHttp");
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, stdHttp_write_to_file);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, pFile);
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1);
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 1);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0);
+    curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
+
+#ifndef PLATFORM_NO_CACERT_BLOB
+    curl_easy_setopt(curl, CURLOPT_CAINFO, NULL);
+    curl_easy_setopt(curl, CURLOPT_CAPATH, NULL);
+    curl_easy_setopt(curl, CURLOPT_CAINFO_BLOB, &blob);
+    curl_easy_setopt(curl, CURLOPT_SSLCERTTYPE, "PEM");
+#endif
+
+    res = curl_easy_perform(curl);
+    /* always cleanup */
+
+    if (res) {
+        stdPlatform_Printf("stdHttp: Failed to download `%s`, cURL error: %s\n", pUrl, curl_easy_strerror(res));
+    }
+
+    curl_easy_cleanup(curl);
+    fclose(pFile);
+    stdHttp_reset();
+
+    return 1;
 }
 #else
 void stdHttp_Startup()

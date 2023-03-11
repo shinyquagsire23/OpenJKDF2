@@ -36,6 +36,7 @@
 #  if ((TARGET_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE))
 #     define PHYSFS_NO_CDROM_SUPPORT 1
 #  endif
+#  define PHYSFS_NO_CDROM_SUPPORT 1 // Added
 #  define PHYSFS_PLATFORM_APPLE 1
 #  define PHYSFS_PLATFORM_POSIX 1
 #elif defined(macintosh)

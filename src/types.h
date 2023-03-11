@@ -374,6 +374,7 @@ extern int openjkdf2_restartMode;
 extern char openjkdf2_aRestartPath[256];
 extern int Main_bMotsCompat;
 extern int Main_bDwCompat;
+extern char* openjkdf2_pExecutablePath;
 
 // All the typedefs
 typedef struct rdVector2i

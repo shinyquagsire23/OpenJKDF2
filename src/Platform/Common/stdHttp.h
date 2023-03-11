@@ -10,6 +10,7 @@ extern "C" {
 void stdHttp_Startup();
 void stdHttp_Shutdown();
 void* stdHttp_Fetch(const char* pUrl);
+int stdHttp_DownloadToPath(const char* pUrl, const char* pFpath);
 
 #ifdef __cplusplus
 }

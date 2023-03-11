@@ -14,6 +14,18 @@
 #include "external/fcaseopen/fcaseopen.h"
 #endif
 
+#ifdef SDL2_RENDER
+#ifdef MACOS
+#define GL_SILENCE_DEPRECATION
+#include <SDL.h>
+#elif defined(ARCH_WASM)
+#include <emscripten.h>
+#include <SDL.h>
+#else
+#include <SDL.h>
+#endif
+#endif
+
 #ifdef PLATFORM_POSIX
 uint32_t Linux_TimeMs()
 {
@@ -199,10 +211,22 @@ int stdPrintf(void* a1, char *a2, int line, char *fmt, ...)
     return ret;
 }
 
+#ifdef SDL2_RENDER
+static SDL_mutex* stdPlatform_mtxPrintf = NULL;
+#endif
+
 int stdPlatform_Printf(const char *fmt, ...)
 {
     char tmp[256];
     va_list args;
+
+#ifdef SDL2_RENDER
+    if (!stdPlatform_mtxPrintf)
+        stdPlatform_mtxPrintf = SDL_CreateMutex();
+
+    SDL_LockMutex(stdPlatform_mtxPrintf);
+#endif
+    
     va_start (args, fmt);
     int ret = vprintf(fmt, args);
     va_end (args);
@@ -212,6 +236,9 @@ int stdPlatform_Printf(const char *fmt, ...)
     jkQuakeConsole_PrintLine(tmp);
 
     va_end (args);
+#ifdef SDL2_RENDER
+    SDL_UnlockMutex(stdPlatform_mtxPrintf);
+#endif
     return ret;
 }
 #endif

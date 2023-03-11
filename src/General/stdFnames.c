@@ -214,7 +214,7 @@ char* stdFnames_Concat(char *a1, char *a2, int a3)
   return a1;
 }
 
-char* stdFnames_MakePath(char *a1, int a2, char *a3, char *a4)
+char* stdFnames_MakePath(char *a1, int a2, const char *a3, const char *a4)
 {
     int v4; // ecx
     unsigned int v5; // kr04_4

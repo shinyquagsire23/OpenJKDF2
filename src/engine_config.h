@@ -205,6 +205,8 @@
 #define SITHCVAR_FNAME ("openjkdf2_cvars.json")
 
 #define STDUPDATER_DEFAULT_URL ("https://api.github.com/repos/shinyquagsire23/OpenJKDF2/releases?per_page=1")
+#define STDUPDATER_DEFAULT_WIN64_FILENAME ("win64-debug.zip")
+#define STDUPDATER_DEFAULT_MACOS_FILENAME ("macos-debug.tar.gz")
 
 #define DF2_ONLY_COND(cond) ( Main_bMotsCompat || (!Main_bMotsCompat && (cond)) )
 #define MOTS_ONLY_COND(cond) ( !Main_bMotsCompat || (Main_bMotsCompat && (cond)) )

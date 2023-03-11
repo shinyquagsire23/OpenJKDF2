@@ -24,6 +24,11 @@
 #define LEC_PATH_SEPARATOR "/"
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 char* stdFnames_FindMedName(char *path);
 char* stdFnames_FindExt(char *path);
 int stdFnames_AddDefaultExt(char *str, const char *ext);
@@ -36,7 +41,11 @@ int stdFnames_CopyMedName(char *out, int out_size, char *path);
 char* stdFnames_CopyDir(char *out, int out_size, char *path);
 char* stdFnames_CopyShortName(char *a1, int a2, char *a3);
 char* stdFnames_Concat(char *a1, char *a2, int a3);
-char* stdFnames_MakePath(char *a1, int a2, char *a3, char *a4);
+char* stdFnames_MakePath(char *a1, int a2, const char *pBasePath, const char *pAppendedPath);
 char* stdFnames_MakePath3(char *a1, int a2, char *a3, char *a4, char *a5);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _STDFNAMES_H

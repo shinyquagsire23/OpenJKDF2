@@ -1,6 +1,10 @@
 #ifndef _STDFILEUTIL_H
 #define _STDFILEUTIL_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "types.h"
 
 #define stdFileUtil_NewFind_ADDR (0x00431740)
@@ -53,5 +57,9 @@ BOOL stdFileUtil_MkDir(LPCSTR lpPathName);
 //static stdFileSearch* (*stdFileUtil_NewFind)(char *path, int a2, char *extension) = (void*)stdFileUtil_NewFind_ADDR;
 //static int (*stdFileUtil_FindNext)(stdFileSearch *a1, stdFileSearchResult *a2) = (void*)stdFileUtil_FindNext_ADDR;
 //static void (*stdFileUtil_DisposeFind)(stdFileSearch *a1) = (void*)stdFileUtil_DisposeFind_ADDR;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _STDFILEUTIL_H
