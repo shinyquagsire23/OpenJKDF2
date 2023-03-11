@@ -66,6 +66,17 @@ int sithCvar_SaveVar(tSithCvar* pCvar, const char* pFpath)
     if (!pCvar) return 0;
     sithCvar_UpdateValInternal(pCvar);
 
+    // Don't save defaults, so that stuff like the updater URL can change easily.
+    if (pCvar->flags & CVARFLAG_UPDATABLE_DEFAULT)
+    {
+        if (pCvar->type == CVARTYPE_STR && pCvar->pStrVal && pCvar->defaultVal && !strcmp(pCvar->pStrVal, pCvar->pDefaultStrVal)) {
+            return 1;
+        }
+        else if (pCvar->type != CVARTYPE_STR && pCvar->val == pCvar->defaultVal) {
+            return 1;
+        }
+    }
+
     switch (pCvar->type) {
         case CVARTYPE_BOOL:
             stdJSON_SaveBool(pFpath, pCvar->pName, pCvar->boolVal);

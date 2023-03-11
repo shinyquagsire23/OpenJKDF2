@@ -198,6 +198,7 @@ typedef enum
     CVARFLAG_GLOBAL = 1,
     CVARFLAG_READONLY = 2,
     CVARFLAG_RESETHUD = 4,
+    CVARFLAG_UPDATABLE_DEFAULT = 8, // Don't safe default values so that new defaults can be applied later, ie updater URLs
 } tCvarFlags;
 
 #define JK_JOYSTICK_AXIS_STRIDE (6)

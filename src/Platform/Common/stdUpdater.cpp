@@ -45,6 +45,7 @@ std::string stdUpdater_strDlFname;
 bool stdUpdater_bDownloading;
 bool stdUpdater_bFoundUpdate;
 bool stdUpdater_bCompletedUpdate;
+int stdUpdater_bDisableUpdates = 0;
 
 char stdUpdater_pUpdaterUrl[SITHCVAR_MAX_STRLEN];
 char stdUpdater_pWin64UpdateFilename[SITHCVAR_MAX_STRLEN];
@@ -53,9 +54,10 @@ char* stdUpdater_pUpdateFilename = "";
 
 void stdUpdater_StartupCvars()
 {
-    sithCvar_RegisterStr("net_updaterUrl", STDUPDATER_DEFAULT_URL, &stdUpdater_pUpdaterUrl, CVARFLAG_GLOBAL);
-    sithCvar_RegisterStr("net_win64UpdateFilename", STDUPDATER_DEFAULT_WIN64_FILENAME, &stdUpdater_pWin64UpdateFilename, CVARFLAG_GLOBAL);
-    sithCvar_RegisterStr("net_macosUpdateFilename", STDUPDATER_DEFAULT_MACOS_FILENAME, &stdUpdater_pMacosUpdateFilename, CVARFLAG_GLOBAL);
+    sithCvar_RegisterBool("net_disableUpdates", 0, &stdUpdater_bDisableUpdates, CVARFLAG_GLOBAL);
+    sithCvar_RegisterStr("net_updaterUrl", STDUPDATER_DEFAULT_URL, &stdUpdater_pUpdaterUrl, CVARFLAG_GLOBAL | CVARFLAG_UPDATABLE_DEFAULT);
+    sithCvar_RegisterStr("net_win64UpdateFilename", STDUPDATER_DEFAULT_WIN64_FILENAME, &stdUpdater_pWin64UpdateFilename, CVARFLAG_GLOBAL | CVARFLAG_UPDATABLE_DEFAULT);
+    sithCvar_RegisterStr("net_macosUpdateFilename", STDUPDATER_DEFAULT_MACOS_FILENAME, &stdUpdater_pMacosUpdateFilename, CVARFLAG_GLOBAL | CVARFLAG_UPDATABLE_DEFAULT);
 
 #ifdef WIN64_STANDALONE
     stdUpdater_pUpdateFilename = stdUpdater_pWin64UpdateFilename;
@@ -81,6 +83,10 @@ int stdUpdater_CheckForUpdates()
 #ifdef PLATFORM_LINUX
     return 0;
 #endif
+
+    if (stdUpdater_bDisableUpdates) {
+        return 0;
+    }
 
     char* pData = (char*)stdHttp_Fetch(stdUpdater_pUpdaterUrl);
     if (!pData) {
