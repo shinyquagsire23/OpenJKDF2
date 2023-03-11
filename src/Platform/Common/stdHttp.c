@@ -117,7 +117,7 @@ void* stdHttp_Fetch(const char* pUrl)
     /* always cleanup */
 
     if (res) {
-        stdPlatform_Printf("cURL error: %s\n", curl_easy_strerror(res));
+        stdPlatform_Printf("stdHttp: Failed to fetch `%s`, cURL error: %s\n", pUrl, curl_easy_strerror(res));
     }
 
     curl_easy_cleanup(curl);

@@ -7,6 +7,7 @@ extern "C" {
 
 #include "types.h"
 
+void stdUpdater_StartupCvars();
 int stdUpdater_CheckForUpdates();
 void stdUpdater_GetUpdateText(char* pOut, size_t outSz);
 

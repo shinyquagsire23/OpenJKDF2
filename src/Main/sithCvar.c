@@ -5,6 +5,7 @@
 #include "General/stdJSON.h"
 #include "Main/jkHud.h"
 #include "World/jkPlayer.h"
+#include "Platform/Common/stdUpdater.h"
 #include "stdPlatform.h"
 #include "jk.h"
 
@@ -26,6 +27,7 @@ int sithCvar_Startup()
     sithCvar_bInitted = 1;
 
     jkPlayer_StartupVars();
+    stdUpdater_StartupCvars();
 
     return 1;
 }

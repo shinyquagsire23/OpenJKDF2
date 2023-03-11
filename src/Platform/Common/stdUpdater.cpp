@@ -7,6 +7,7 @@
 
 #include "Platform/Common/stdHttp.h"
 #include "General/stdString.h"
+#include "Main/sithCvar.h"
 #include "stdPlatform.h"
 
 extern "C" {
@@ -14,21 +15,28 @@ extern "C" {
 std::string stdUpdater_strBrowserDownloadUrl;
 std::string stdUpdater_strUpdateVersion;
 std::string stdUpdater_strDlFname;
-bool found_update;
+bool stdUpdater_bFoundUpdate;
+
+char stdUpdater_pUpdateUrl[SITHCVAR_MAX_STRLEN];
+
+void stdUpdater_StartupCvars()
+{
+    sithCvar_RegisterStr("net_updaterUrl", STDUPDATER_DEFAULT_URL, &stdUpdater_pUpdateUrl, CVARFLAG_GLOBAL);
+}
 
 void stdUpdater_Reset()
 {
     stdUpdater_strBrowserDownloadUrl = "";
     stdUpdater_strUpdateVersion = "";
     stdUpdater_strDlFname = "";
-    found_update = false;
+    stdUpdater_bFoundUpdate = false;
 }
 
 int stdUpdater_CheckForUpdates()
 {
     stdUpdater_Reset();
 
-    char* pData = (char*)stdHttp_Fetch("https://api.github.com/repos/shinyquagsire23/OpenJKDF2/releases?per_page=1");
+    char* pData = (char*)stdHttp_Fetch(stdUpdater_pUpdateUrl);
     if (!pData) {
         return 0;
     }
@@ -81,6 +89,8 @@ int stdUpdater_CheckForUpdates()
 
             stdPlatform_Printf("stdUpdater: An update is available! Current: %s -> Latest: %s\n", openjkdf2_aReleaseVersion, stdUpdater_strUpdateVersion.c_str());
             stdPlatform_Printf("stdUpdater: %s %s\n", stdUpdater_strDlFname.c_str(), stdUpdater_strBrowserDownloadUrl.c_str());
+            stdUpdater_bFoundUpdate = true;
+
             return 1;
         }
 
