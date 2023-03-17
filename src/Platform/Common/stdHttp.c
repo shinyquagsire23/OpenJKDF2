@@ -141,10 +141,12 @@ int stdHttp_DownloadToPath(const char* pUrl, const char* pFpath)
     }
     stdHttp_reset();
 
+#ifndef PLATFORM_NO_CACERT_BLOB
     struct curl_blob blob;
     blob.data = stdHttp_pCaCertBlob;
     blob.len = strlen(blob.data);
     blob.flags = CURL_BLOB_COPY;
+#endif
 
     FILE* pFile = fopen(pFpath, "wb");
     if (!pFile) {
