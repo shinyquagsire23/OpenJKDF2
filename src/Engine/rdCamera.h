@@ -33,7 +33,7 @@
 #define rdCamera_AdvanceFrame_ADDR (0x00443D10)
 
 rdCamera* rdCamera_New(float fov, float x, float y, float z, float aspectRatio);
-int rdCamera_NewEntry(rdCamera *camera, float fov, float a3, float a4, float a5, float aspectRatio);
+int rdCamera_NewEntry(rdCamera *camera, float fov, float a3, float zNear, float zFar, float aspectRatio);
 void rdCamera_Free(rdCamera *camera);
 void rdCamera_FreeEntry(rdCamera *camera);
 int rdCamera_SetCanvas(rdCamera *camera, rdCanvas *canvas);

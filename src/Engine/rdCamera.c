@@ -27,7 +27,7 @@ rdCamera* rdCamera_New(float fov, float x, float y, float z, float aspectRatio)
     return out;
 }
 
-int rdCamera_NewEntry(rdCamera *camera, float fov, float a3, float a4, float a5, float aspectRatio)
+int rdCamera_NewEntry(rdCamera *camera, float fov, float a3, float zNear, float zFar, float aspectRatio)
 {
     if (!camera)
         return 0;
@@ -45,8 +45,8 @@ int rdCamera_NewEntry(rdCamera *camera, float fov, float a3, float a4, float a5,
         rdCamera_SetOrthoScale(camera, 1.0);
 
         camera->cameraClipFrustum->field_0.x = a3;
-        camera->cameraClipFrustum->field_0.y = a4;
-        camera->cameraClipFrustum->field_0.z = a5;
+        camera->cameraClipFrustum->field_0.y = zNear;
+        camera->cameraClipFrustum->field_0.z = zFar;
         camera->screenAspectRatio = aspectRatio;
         camera->ambientLight = 0.0;
         camera->numLights = 0;

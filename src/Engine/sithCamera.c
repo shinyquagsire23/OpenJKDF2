@@ -19,18 +19,6 @@ static rdVector3 sithCamera_trans2 = {0.0, 0.2, 0.0};
 static rdVector3 sithCamera_trans3 = {0.0, 1.0, 1.0};
 static int sithCamera_camIdxToGlobalIdx[2] = {0,1};
 
-#define SITHCAMERA_FOV (90.0)
-#define SITHCAMERA_ASPECT (1.0)
-#ifdef SDL2_RENDER
-#define SITHCAMERA_ZNEAR_FIRSTPERSON (1.0 / 64.0)
-#define SITHCAMERA_ZNEAR (1.0 / 64.0)
-#define SITHCAMERA_ZFAR (128.0)
-#else
-#define SITHCAMERA_ZNEAR_FIRSTPERSON (1.0 / 64.0)
-#define SITHCAMERA_ZNEAR (1.0 / 64.0)
-#define SITHCAMERA_ZFAR (64.0)
-#endif
-
 int sithCamera_Startup()
 {
     sithCamera_NewEntry(&sithCamera_cameras[0], 0, 0x1, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
@@ -74,33 +62,33 @@ int sithCamera_Open(rdCanvas *canvas, float aspect)
 
     sithCamera_cameras[0].aspectRatio = aspect;
     rdCamera_NewEntry(&sithCamera_cameras[0].rdCam, sithCamera_cameras[0].rdCam.fov, 0.0, SITHCAMERA_ZNEAR_FIRSTPERSON, SITHCAMERA_ZFAR, aspect);
-    rdCamera_SetAttenuation(&sithCamera_cameras[0].rdCam, 0.4, 0.8);
+    rdCamera_SetAttenuation(&sithCamera_cameras[0].rdCam, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
     rdCamera_SetCanvas(&sithCamera_cameras[0].rdCam, canvas);
     sithCamera_cameras[1].aspectRatio = aspect;
     rdCamera_NewEntry(&sithCamera_cameras[1].rdCam, sithCamera_cameras[1].rdCam.fov, 0.0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
-    rdCamera_SetAttenuation(&sithCamera_cameras[1].rdCam, 0.4, 0.8);
+    rdCamera_SetAttenuation(&sithCamera_cameras[1].rdCam, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
     rdCamera_SetCanvas(&sithCamera_cameras[1].rdCam, canvas);
     sithCamera_cameras[2].aspectRatio = aspect;
     rdCamera_NewEntry(&sithCamera_cameras[2].rdCam, sithCamera_cameras[2].rdCam.fov, 0.0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
-    rdCamera_SetAttenuation(&sithCamera_cameras[2].rdCam, 0.4, 0.8);
+    rdCamera_SetAttenuation(&sithCamera_cameras[2].rdCam, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
     rdCamera_SetCanvas(&sithCamera_cameras[2].rdCam, canvas);
     sithCamera_cameras[4].aspectRatio = aspect;
     rdCamera_NewEntry(&sithCamera_cameras[4].rdCam, sithCamera_cameras[4].rdCam.fov, 0.0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
-    rdCamera_SetAttenuation(&sithCamera_cameras[4].rdCam, 0.4, 0.8);
+    rdCamera_SetAttenuation(&sithCamera_cameras[4].rdCam, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
     rdCamera_SetCanvas(&sithCamera_cameras[4].rdCam, canvas);
     sithCamera_cameras[5].aspectRatio = aspect;
     rdCamera_NewEntry(&sithCamera_cameras[5].rdCam, sithCamera_cameras[5].rdCam.fov, 0.0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
-    rdCamera_SetAttenuation(&sithCamera_cameras[5].rdCam, 0.4, 0.8);
+    rdCamera_SetAttenuation(&sithCamera_cameras[5].rdCam, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
     rdCamera_SetCanvas(&sithCamera_cameras[5].rdCam, canvas);
     sithCamera_cameras[6].aspectRatio = aspect;
     rdCamera_NewEntry(&sithCamera_cameras[6].rdCam, sithCamera_cameras[6].rdCam.fov, 0.0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
-    rdCamera_SetAttenuation(&sithCamera_cameras[6].rdCam, 0.4, 0.8);
+    rdCamera_SetAttenuation(&sithCamera_cameras[6].rdCam, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
     rdCamera_SetCanvas(&sithCamera_cameras[6].rdCam, canvas);
 #ifdef DW_CAMERA
     if (Main_bDwCompat) {
         sithCamera_cameras[7].aspectRatio = aspect;
         rdCamera_NewEntry(&sithCamera_cameras[7].rdCam, sithCamera_cameras[7].rdCam.fov, 0.0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
-        rdCamera_SetAttenuation(&sithCamera_cameras[7].rdCam, 0.4, 0.8);
+        rdCamera_SetAttenuation(&sithCamera_cameras[7].rdCam, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
         rdCamera_SetCanvas(&sithCamera_cameras[7].rdCam, canvas);
     }
 #endif // DW_CAMERA
@@ -186,7 +174,7 @@ int sithCamera_NewEntry(sithCamera *camera, uint32_t a2, uint32_t a3, float fov,
     camera->aspectRatio = aspectRatio;
     camera->secondaryFocus = focus_near;
     rdCamera_NewEntry(&camera->rdCam, fov, 0.0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspectRatio);
-    rdCamera_SetAttenuation(&camera->rdCam, 0.4, 0.8);
+    rdCamera_SetAttenuation(&camera->rdCam, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
 
     if (canvas) {
         rdCamera_SetCanvas(&camera->rdCam, canvas);

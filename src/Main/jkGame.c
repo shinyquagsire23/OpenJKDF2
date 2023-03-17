@@ -124,6 +124,23 @@ int jkGame_Update()
     int result; // eax
     int v6; // [esp+1Ch] [ebp-1Ch]
 
+    // HACK HACK HACK: Adjust zNear depending on if we're using the scope/camera views
+#ifdef SDL2_RENDER
+    if (sithCamera_cameras[0].rdCam.cameraClipFrustum) {
+        sithCamera_cameras[0].rdCam.cameraClipFrustum->field_0.y = SITHCAMERA_ZNEAR_FIRSTPERSON;
+
+        if (Main_bMotsCompat) {
+            if (playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_SCOPEHUD) {
+                sithCamera_cameras[0].rdCam.cameraClipFrustum->field_0.y = SITHCAMERA_ZNEAR;
+            }
+            if ((playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_80000000) != 0) {
+                sithCamera_cameras[0].rdCam.cameraClipFrustum->field_0.y = SITHCAMERA_ZNEAR;
+            }
+        }
+    }
+    
+#endif
+
 #ifdef SDL2_RENDER
     // HACK
     Video_modeStruct.b3DAccel = 1;
@@ -230,8 +247,9 @@ int jkGame_Update()
 
     // MOTS added: scope/security cam overlays
     if (!Main_bMotsCompat) {
-        if ( (playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_NOHUD) == 0 )
+        if ( (playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_NOHUD) == 0 ) {
             jkHud_Draw();
+        }
     }
     else {
         if (playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_SCOPEHUD) {
