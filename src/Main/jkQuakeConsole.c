@@ -193,10 +193,12 @@ void jkQuakeConsole_Render()
         // TODO: i8n
         stdUpdater_GetUpdateText(tmp, sizeof(tmp));
         jkQuakeConsole_updateTextWidth = stdFont_DrawAsciiGPU(jkQuakeConsole_pFont, 0, 0, screenW, tmp, 1, jkPlayer_hudScale);
-        
+
+#if !defined(PLATFORM_LINUX)
         if (!jkQuakeConsole_bClickedUpdate) {
             stdFont_DrawAsciiGPU(jkQuakeConsole_pFont, 0, fontHeight, screenW, "Click here to download.", 1, jkPlayer_hudScale);
         }
+#endif
         jkQuakeConsole_updateTextHeight = (int)(fontHeight * 2);
     }
 
@@ -740,7 +742,6 @@ int jkQuakeConsole_WmHandler(HWND a1, UINT msg, WPARAM wParam, HWND a4, LRESULT 
             if (jkQuakeConsole_bShowUpdateText && mouseX < jkQuakeConsole_updateTextWidth && mouseY < jkQuakeConsole_updateTextHeight)
             {
                 jkQuakeConsole_bClickedUpdate = 1;
-                printf("Clicked. %u %u\n", mouseX, mouseY);
                 stdUpdater_DoUpdate();
             }
             break;
