@@ -608,10 +608,12 @@ if(TARGET_LINUX)
     link_directories(${LIBPNG_STATIC_LIBRARY_DIRS})
     add_definitions(${LIBPNG_STATIC_CFLAGS_OTHER})
 
-    pkg_check_modules(LIBCURL REQUIRED libcurl)
-    include_directories(${LIBCURL_STATIC_INCLUDE_DIRS})
-    link_directories(${LIBCURL_STATIC_LIBRARY_DIRS})
-    add_definitions(${LIBCURL_STATIC_CFLAGS_OTHER})
+    if(TARGET_USE_CURL)
+        pkg_check_modules(LIBCURL REQUIRED libcurl)
+        include_directories(${LIBCURL_STATIC_INCLUDE_DIRS})
+        link_directories(${LIBCURL_STATIC_LIBRARY_DIRS})
+        add_definitions(${LIBCURL_STATIC_CFLAGS_OTHER})
+    endif()
 
     if(TARGET_USE_GAMENETWORKINGSOCKETS)
         include_directories(${PROJECT_SOURCE_DIR}/3rdparty/GameNetworkingSockets/include)
@@ -724,6 +726,10 @@ elseif(TARGET_LINUX)
 
     target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
     target_link_libraries(${BIN_NAME} PRIVATE dl) # dlopen, dlsym
+
+    if(TARGET_USE_CURL)
+        target_link_libraries(${BIN_NAME} PRIVATE curl)
+    endif()
 elseif(PLAT_MSVC)
     set_target_properties(${BIN_NAME} PROPERTIES
       LINK_SEARCH_START_STATIC ON
