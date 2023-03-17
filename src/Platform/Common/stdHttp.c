@@ -96,10 +96,12 @@ void* stdHttp_Fetch(const char* pUrl)
     }
     stdHttp_reset();
 
+#ifndef PLATFORM_NO_CACERT_BLOB
     struct curl_blob blob;
     blob.data = stdHttp_pCaCertBlob;
     blob.len = strlen(blob.data);
     blob.flags = CURL_BLOB_COPY;
+#endif
 
     curl_easy_setopt(curl, CURLOPT_URL, pUrl);
     curl_easy_setopt(curl, CURLOPT_USERAGENT, "OpenJKDF2-stdHttp");
