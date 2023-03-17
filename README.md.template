@@ -95,17 +95,13 @@ OpenJKDF2 requires game data from a licensed copy of Jedi Knight: Dark Forces II
         └── 57A.SMK
 ```
 
-When running on SDL2-based builds (Linux/MacOS/Win64), be sure to have copied the GLSL shaders from `resource/shaders/*` to `<JK.EXE base folder>/resource/shaders/*`, as shown above.
-
 ## Building
 
 See [here](BUILDING.md) for instructions.
 
 ## TL;DR: What Isn't Implemented, Yet
- - Joystick menu in Setup > Controls (input bindings are still loaded and written to config, though)
  - Load Configuration and Save Configuration in Setup > Controls > Options
  - Using plus or minus to resize the screen (with SDL2, resolution auto-resizes to window size)
- - In-game screenshots
 
 ## Usage with original JK.EXE and DirectX using hooks
 See [here](HOOKS.md) for instructions.
