@@ -59,9 +59,9 @@ void stdUpdater_StartupCvars()
     sithCvar_RegisterStr("net_win64UpdateFilename", STDUPDATER_DEFAULT_WIN64_FILENAME, &stdUpdater_pWin64UpdateFilename, CVARFLAG_GLOBAL | CVARFLAG_UPDATABLE_DEFAULT);
     sithCvar_RegisterStr("net_macosUpdateFilename", STDUPDATER_DEFAULT_MACOS_FILENAME, &stdUpdater_pMacosUpdateFilename, CVARFLAG_GLOBAL | CVARFLAG_UPDATABLE_DEFAULT);
 
-#ifdef WIN64_STANDALONE
+#ifdef defined(WIN64_STANDALONE)
     stdUpdater_pUpdateFilename = stdUpdater_pWin64UpdateFilename;
-#elif MACOS
+#elif defined(MACOS)
     stdUpdater_pUpdateFilename = stdUpdater_pMacosUpdateFilename;
 #endif
 }
@@ -159,7 +159,7 @@ void stdUpdater_GetUpdateText(char* pOut, size_t outSz)
 {
     // TODO: i8n
     if (stdUpdater_bCompletedUpdate) {
-#ifdef WIN64_STANDALONE
+#if defined(WIN64_STANDALONE)
         stdString_snprintf(pOut, outSz, "Update complete, restart to apply.");
 #else
         stdString_snprintf(pOut, outSz, "Update downloaded, complete installation and restart.");
@@ -190,7 +190,7 @@ void stdUpdater_Win64UpdateThread()
     stdUpdater_bDownloading = true;
     stdHttp_DownloadToPath(stdUpdater_strBrowserDownloadUrl.c_str(), tmp_zippath);
 
-#ifdef PLATFORM_PHYSFS
+#if defined(PLATFORM_PHYSFS)
     PHYSFS_mount(tmp_zippath, "update", 1);
 
     rc = PHYSFS_enumerateFiles("update");
@@ -244,6 +244,7 @@ void stdUpdater_Win64UpdateThread()
     stdUpdater_bDownloading = false;
 }
 
+#if defined(MACOS)
 void stdUpdater_MacOSUpdateThread()
 {
     stdPlatform_Printf("stdUpdater: Starting update...\n");
@@ -264,12 +265,13 @@ void stdUpdater_MacOSUpdateThread()
     stdUpdater_bCompletedUpdate = true;
     stdUpdater_bDownloading = false;
 }
+#endif
 
 int stdUpdater_UpdateThread(void* unused)
 {
-#ifdef WIN64_STANDALONE
+#if defined(WIN64_STANDALONE)
     stdUpdater_Win64UpdateThread();
-#elif MACOS
+#elif defined(MACOS)
     stdUpdater_MacOSUpdateThread();
 #endif
 
@@ -278,7 +280,7 @@ int stdUpdater_UpdateThread(void* unused)
 
 void stdUpdater_DoUpdate()
 {
-#ifdef PLATFORM_LINUX
+#if defined(PLATFORM_LINUX)
     stdUpdater_bFoundUpdate = false;
     stdUpdater_bDownloading = false;
     stdUpdater_bCompletedUpdate = false;
