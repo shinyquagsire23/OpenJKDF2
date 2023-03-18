@@ -778,7 +778,7 @@ elseif(PLAT_MSVC)
     #cp /opt/homebrew/Cellar/mingw-w64/9.0.0_2/toolchain-x86_64/x86_64-w64-mingw32/lib/libgcc_s_seh-1.dll .
     #cp /opt/homebrew/Cellar/mingw-w64/9.0.0_2/toolchain-x86_64/x86_64-w64-mingw32/bin/libwinpthread-1.dll .
     #cp /opt/homebrew/Cellar/mingw-w64/9.0.0_2/toolchain-x86_64/x86_64-w64-mingw32/lib/libstdc++-6.dll . 
-else()
+elseif(TARGET_MACOS)
     set(LIBPNG_LIST ${LIBPNG_LIBRARY_DIRS})
     separate_arguments(LIBPNG_LIST)
     message(STATUS "list = ${ZLIB_STATIC_LDFLAGS}")
@@ -792,8 +792,13 @@ else()
     if(TARGET_USE_PHYSFS)
         target_link_libraries(${BIN_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/build_physfs/libphysfs.a)
     endif()
+else()
+    message(FATAL_ERROR "Unknown target! Cannot continue.")
 endif()
 
+#
+# macOS post-build packaging
+#
 if(TARGET_MACOS)
     add_custom_command(TARGET ${BIN_NAME}
     POST_BUILD

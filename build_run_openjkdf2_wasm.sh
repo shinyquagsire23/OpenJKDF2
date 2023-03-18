@@ -22,8 +22,8 @@ cp resource/shaders/* wasm_out/mots/resource/shaders
 
 #rm -rf build_emcc
 mkdir -p build_emcc && cd build_emcc
-cmake .. --toolchain ../cmake_modules/wasm_toolchain.cmake
-cmake .. --toolchain ../cmake_modules/wasm_toolchain.cmake
+cmake .. --toolchain ../cmake_modules/toolchain_wasm.cmake
+cmake .. --toolchain ../cmake_modules/toolchain_wasm.cmake
 make -j10 VERBOSE=1
 cd ..
 

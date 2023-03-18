@@ -196,7 +196,7 @@ then copy `openjkdf2` to the same directory as JK.EXE and run it. *JK.EXE versio
 mkdir -p build
 cd build
 
-cmake .. --toolchain ../cmake_modules/linux_32_toolchain.cmake
+cmake .. --toolchain ../cmake_modules/toolchain_linux_32.cmake
 make -j10
 ```
 </details>
