@@ -316,7 +316,7 @@ void Windows_GameErrorMsgbox(const char *a1, ...)
     jk_printf("FATAL ERROR: %s\n", tmp);
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", tmp, NULL);
 
-#ifndef ARCH_WASM
+#if !defined(ARCH_WASM) && !defined(TARGET_ANDROID)
     InstallHelper_CheckRequiredAssets(1);
 #endif
 #endif

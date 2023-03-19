@@ -101,6 +101,8 @@ build_linux64_/*
 build_linux64_flatpak/*
 build_linux_arm64_flatpak/*
 build_linux_x86_64_flatpak/*
+build_android_aarch64/*
+build_android_arm32/*
 flatpak_openjkdf2/*
 .flatpak-builder/*
 OpenJKDF2.flatpak

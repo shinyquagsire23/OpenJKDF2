@@ -55,7 +55,7 @@ void jkgm_aligned_free(void* p)
 }
 
 #ifdef SDL2_RENDER
-#ifndef ARCH_WASM
+#if defined(TARGET_CAN_JKGM)
 
 extern "C" {
 
@@ -998,5 +998,5 @@ void jkgm_write_png(const char *pFname, int width, int height, uint8_t* paFrameb
     png_destroy_write_struct(&png, &info);
 }
 
-#endif // ARCH_WASM
+#endif // TARGET_CAN_JKGM
 #endif //SDL2_RENDER

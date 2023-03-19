@@ -9,8 +9,7 @@
 #include "shader_utils.h"
 #include "globals.h"
 
-#include <SDL.h>
-#include <GL/glew.h>
+#include "SDL2_helper.h"
 #include <stdio.h>
 #include <string.h>
 

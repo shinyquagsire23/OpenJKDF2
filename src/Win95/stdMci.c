@@ -131,7 +131,7 @@ double stdMci_GetTrackLength(int track)
 }
 
 #else // LINUX
-#ifdef NULL_SOUND
+#ifdef STDSOUND_NULL
 
 int stdMci_trackFrom;
 int stdMci_trackTo;
@@ -209,7 +209,7 @@ double stdMci_GetTrackLength(int track)
     return 0.0;
 }
 
-#else // !NULL_SOUND
+#else // !STDSOUND_NULL
 
 #include <SDL_mixer.h>
 
@@ -423,4 +423,4 @@ double stdMci_GetTrackLength(int track)
 }
 
 #endif // else SDL2_RENDER
-#endif // else NULL_SOUND
+#endif // else STDSOUND_NULL

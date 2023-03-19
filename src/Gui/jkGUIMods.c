@@ -275,7 +275,7 @@ void jkGuiMods_PopulateEntries(Darray *pListDisplayed, jkGuiElement *element)
     char tmpCwd[512];
     char tmpKeyPath[512];
 
-#ifndef ARCH_WASM
+#if !defined(ARCH_WASM) && !defined(TARGET_ANDROID)
     Main_bMotsCompat = !Main_bMotsCompat;
     InstallHelper_GetLocalDataDir(tmpCwd, sizeof(tmpCwd), 0);
     Main_bMotsCompat = !Main_bMotsCompat;

@@ -37,19 +37,15 @@
 #endif
 //#include <stropts.h>
 
-#ifdef ARCH_WASM
-#include <SDL2/SDL.h>
-#else
-#include <SDL.h>
-#endif
+#include "SDL2_helper.h"
 
 #include <string.h>
 
-#include <GL/glew.h>
+//#include <GL/glew.h>
 #ifdef MACOS
 #include "Platform/macOS/SDL_fix.h"
 #else
-#include <GL/gl.h>
+//#include <GL/gl.h>
 #endif
 #include "Win95/Video.h"
 
@@ -1273,7 +1269,9 @@ int Window_Main_Linux(int argc, char** argv)
 
     
     Window_RecreateSDL2Window();
+#if !defined(TARGET_ANDROID)
     glewInit();
+#endif
     
     //SDL_RenderClear(displayRenderer);
     //SDL_RenderPresent(displayRenderer);

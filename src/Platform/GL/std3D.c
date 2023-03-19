@@ -18,21 +18,9 @@
 #include "Platform/GL/shader_utils.h"
 #include "Platform/GL/jkgm.h"
 
-#ifdef MACOS
-#define GL_SILENCE_DEPRECATION
-#include <SDL.h>
-#elif defined(ARCH_WASM)
-#include <emscripten.h>
-#include <SDL.h>
-#include <SDL_opengles2.h>
-#else
-#include <SDL.h>
-#include <GL/gl.h>
-#endif
+#include "SDL2_helper.h"
 
 #ifdef WIN32
-#define GL_R8 GL_RED
-
 // Force Optimus/AMD to use non-integrated GPUs by default.
 __declspec(dllexport) DWORD NvOptimusEnablement = 1;
 __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
@@ -658,7 +646,9 @@ int std3D_Startup()
         return 1;
     }
 
+#ifdef TARGET_CAN_JKGM
     jkgm_startup();
+#endif
 
     memset(&std3D_ui_colormap, 0, sizeof(std3D_ui_colormap));
     rdColormap_LoadEntry("misc\\cmp\\UIColormap.cmp", &std3D_ui_colormap);
@@ -3451,7 +3441,7 @@ void std3D_UpdateSettings()
 // Added
 void std3D_Screenshot(const char* pFpath)
 {
-#ifndef ARCH_WASM
+#ifdef TARGET_CAN_JKGM
     if (!std3D_pFb) return;
 
     uint8_t* data = malloc(std3D_pFb->w * std3D_pFb->h * 3 * sizeof(uint8_t));

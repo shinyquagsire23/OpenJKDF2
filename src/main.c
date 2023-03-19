@@ -198,9 +198,7 @@ void crash_handler_basic(int sig);
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#ifdef SDL2_RENDER
-#include <SDL2/SDL.h>
-#endif // SDL2_RENDER
+#include "SDL2_helper.h"
 
 #endif // LINUX
 
@@ -236,13 +234,13 @@ int main(int argc, char** argv)
     }
 #endif // WIN64_STANDALONE
 
-#ifndef ARCH_WASM
+#if !defined(ARCH_WASM) && !defined(TARGET_ANDROID)
     openjkdf2_pExecutablePath = argv[0];
 #endif // !ARCH_WASM
 
 #ifdef LINUX
 
-#ifndef ARCH_WASM
+#if !defined(ARCH_WASM) && !defined(TARGET_ANDROID)
     signal(SIGSEGV, crash_handler_basic);
     //signal(SIGINT, int_handler);
 #endif // !ARCH_WASM
@@ -381,7 +379,7 @@ int main(int argc, char** argv)
 
 //#include "external/libbacktrace/backtrace.h"
 
-#ifndef ARCH_WASM
+#if !defined(ARCH_WASM) && !defined(TARGET_ANDROID)
 
 #if 0
 static int

@@ -57,7 +57,7 @@ uint32_t stdSound_ParseWav(stdFile_t sound_file, uint32_t *nSamplesPerSec, int *
     return result;
 }
 
-#ifdef OPENAL_SOUND
+#ifdef STDSOUND_OPENAL
 
 #define AL_FORMAT_MONO24 (0xFFFF0000)
 #define AL_FORMAT_STEREO24 (0xFFFF0001)
@@ -554,7 +554,7 @@ void stdSound_3DBufferRelease(stdSound_3dBuffer_t* p3DBuffer)
 }
 #endif
 
-#ifdef NULL_SOUND
+#ifdef STDSOUND_NULL
 int stdSound_Startup()
 {
     jkGuiSound_b3DSound = 0;
@@ -570,7 +570,7 @@ void stdSound_SetMenuVolume(float a1)
 {
 }
 
-stdSound_buffer_t* stdSound_BufferCreate(int bStereo, int nSamplesPerSec, uint16_t bitsPerSample, int bufferLen)
+stdSound_buffer_t* stdSound_BufferCreate(int bStereo, uint32_t nSamplesPerSec, uint16_t bitsPerSample, int bufferLen)
 {
     stdSound_buffer_t* out = std_pHS->alloc(sizeof(stdSound_buffer_t));
     if (!out)

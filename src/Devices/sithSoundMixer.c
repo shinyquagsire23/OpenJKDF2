@@ -315,7 +315,7 @@ sithPlayingSound* sithSoundMixer_cog_playsound_internal(sithSound *sound, float 
     //return NULL;
 #endif
 
-#ifdef OPENAL_SOUND
+#ifdef STDSOUND_OPENAL
     jkGuiSound_numChannels = SITH_MIXER_NUMPLAYINGSOUNDS;
 #endif
 
@@ -470,7 +470,7 @@ sithPlayingSound* sithSoundMixer_PlaySoundPosThing(sithSound *sound, sithThing *
     //printf("play %s at thing flags %x\n", sound->sound_fname, flags);
 #endif
 
-#ifdef OPENAL_SOUND
+#ifdef STDSOUND_OPENAL
     jkGuiSound_numChannels = SITH_MIXER_NUMPLAYINGSOUNDS;
     //jkGuiSound_b3DSound = 1;
 #endif
@@ -729,7 +729,7 @@ void sithSoundMixer_Tick(float deltaSecs)
     float v43; // [esp+4h] [ebp-10h]
     rdVector3 v44; // [esp+8h] [ebp-Ch] BYREF
 
-#ifdef OPENAL_SOUND
+#ifdef STDSOUND_OPENAL
     jkGuiSound_numChannels = SITH_MIXER_NUMPLAYINGSOUNDS;
 #endif
 
@@ -1292,7 +1292,7 @@ int sithSoundMixer_sub_4DD3F0(sithPlayingSound *sound)
     stdSound_buffer_t *v13; // [esp-4h] [ebp-Ch]
     stdSound_buffer_t *v14; // [esp-4h] [ebp-Ch]
 
-#ifdef OPENAL_SOUND
+#ifdef STDSOUND_OPENAL
     jkGuiSound_numChannels = SITH_MIXER_NUMPLAYINGSOUNDS;
     //jkGuiSound_b3DSound = 1;
 #endif

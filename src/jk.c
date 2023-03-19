@@ -27,6 +27,10 @@
 #include <stdarg.h>
 #endif
 
+#if defined(TARGET_ANDROID)
+#include <ctype.h>
+#endif
+
 #include "General/stdString.h"
 #include "Platform/stdControl.h"
 
@@ -1066,7 +1070,7 @@ void jk_ValidateRect(HWND hWnd, const RECT *lpRect)
     assert(0);
 }
 
-#ifndef ARCH_WASM
+#if !defined(ARCH_WASM)
 int __isspace(int a)
 {
     return isspace(a & 0xFF);

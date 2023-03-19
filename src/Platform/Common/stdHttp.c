@@ -198,4 +198,9 @@ void* stdHttp_Fetch(const char* pUrl)
 {
     return NULL;
 }
+
+int stdHttp_DownloadToPath(const char* pUrl, const char* pFpath)
+{
+    return 0;
+}
 #endif

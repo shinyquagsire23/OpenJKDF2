@@ -177,7 +177,7 @@ LABEL_21:
         texture->opaqueMats[mipmap_num].texture_loaded = 0;
         texture->opaqueMats[mipmap_num].gpu_accel_maybe = 0;
 #ifdef SDL2_RENDER
-#ifndef ARCH_WASM
+#if defined(TARGET_CAN_JKGM)
         texture->alphaMats[mipmap_num].skip_jkgm = 0;
         texture->opaqueMats[mipmap_num].skip_jkgm = 0;
 #endif
@@ -279,7 +279,7 @@ LABEL_22:
             surface->is_16bit = 0;
             surface->texture_loaded = 0;
 
-#ifndef ARCH_WASM
+#if defined(TARGET_CAN_JKGM)
             jkgm_populate_shortcuts(mipmap, surface, material, texture->alpha_en & 1, j, i);
 #endif
         }
@@ -326,7 +326,7 @@ void rdMaterial_FreeEntry(rdMaterial* material)
 #ifdef SDL2_RENDER
             //printf("Deinit %s %x\n", material->mat_fpath, surface->texture_id);
             std3D_PurgeSurfaceRefs(surface);
-#ifndef ARCH_WASM
+#if defined(TARGET_CAN_JKGM)
             jkgm_free_cache_entry(surface->cache_entry);
 #endif
 #endif
@@ -370,7 +370,7 @@ int rdMaterial_AddToTextureCache(rdMaterial *material, rdTexture *texture, int m
             return 1;
         }
 #ifdef SDL2_RENDER
-#ifndef ARCH_WASM
+#if defined(TARGET_CAN_JKGM)
         else if (jkgm_std3D_AddToTextureCache(mipmap, surface, texture->alpha_en & 1, no_alpha, material, cel_idx))
         {
             //printf("rdmat Init %s %x %x\n", material->mat_fpath, surface->texture_id, std3D_loadedTexturesAmt);
@@ -394,7 +394,7 @@ int rdMaterial_AddToTextureCache(rdMaterial *material, rdTexture *texture, int m
             return 1;
         }
 #ifdef SDL2_RENDER
-#ifndef ARCH_WASM
+#if defined(TARGET_CAN_JKGM)
         else if (jkgm_std3D_AddToTextureCache(mipmap, surface, texture->alpha_en & 1, no_alpha, material, cel_idx))
         {
             //printf("rdmat Init %s %x %x\n", material->mat_fpath, surface->texture_id, std3D_loadedTexturesAmt);

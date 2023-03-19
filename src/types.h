@@ -339,19 +339,19 @@ typedef struct stdControlKeyInfoEntry stdControlKeyInfoEntry;
 #ifndef SDL2_RENDER
 typedef IDirectSoundBuffer stdSound_buffer_t;
 typedef IDirectSound3DBuffer stdSound_3dBuffer_t;
-#else // OPENAL_SOUND
+#else // STDSOUND_OPENAL
 
-#ifdef OPENAL_SOUND
+#ifdef STDSOUND_OPENAL
 typedef stdALBuffer stdSound_buffer_t;
 typedef stdALBuffer stdSound_3dBuffer_t;
 #endif
 
-#ifdef NULL_SOUND
+#ifdef STDSOUND_NULL
 typedef stdNullSoundBuffer stdSound_buffer_t;
 typedef stdNullSoundBuffer stdSound_3dBuffer_t;
 #endif 
 
-#endif // OPENAL_SOUND
+#endif // STDSOUND_OPENAL
 
 typedef rdModel3* (*model3Loader_t)(const char *, int);
 typedef int (*model3Unloader_t)(rdModel3*);

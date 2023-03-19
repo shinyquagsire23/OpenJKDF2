@@ -12,7 +12,7 @@
 #endif
 
 #ifdef SDL2_RENDER
-#include <SDL.h>
+#include "SDL2_helper.h"
 
 #define stdEmbeddedRes_errmsg(_msg) SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", _msg, NULL)
 #else

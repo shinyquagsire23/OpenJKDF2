@@ -7,7 +7,8 @@
 
 #ifndef _CREATE_SHADER_H
 #define _CREATE_SHADER_H
-#include <GL/glew.h>
+#include "SDL2_helper.h"
+//#include <GL/glew.h>
 
 extern void print_log(GLuint object);
 GLuint load_shader_file(const char* filepath, GLenum type);

@@ -8,7 +8,7 @@
 #include "Main/jkRes.h"
 #include "stdPlatform.h"
 
-#if defined(SDL2_RENDER) && !defined(ARCH_WASM)
+#if defined(SDL2_RENDER) && !defined(ARCH_WASM) && !defined(TARGET_ANDROID)
 
 const char* aRequiredAssets[] = {
     "episode/JK1.gob",
@@ -1049,7 +1049,7 @@ void InstallHelper_CheckRequiredAssets(int doInstall)
 
 void InstallHelper_SetCwd()
 {
-#if (defined(MACOS) || defined(LINUX) || defined(WIN32)) && defined(SDL2_RENDER) && !defined(ARCH_WASM)
+#if (defined(MACOS) || defined(LINUX) || defined(WIN32)) && defined(SDL2_RENDER) && !defined(ARCH_WASM) && !defined(TARGET_ANDROID)
     const char *homedir;
     char fname[256];
 
@@ -1099,7 +1099,7 @@ void InstallHelper_SetCwd()
 
 #endif // (defined(MACOS) || defined(LINUX) || defined(WIN32)) && defined(SDL2_RENDER) && !defined(ARCH_WASM)
 
-#if defined(SDL2_RENDER) && !defined(ARCH_WASM)
+#if defined(SDL2_RENDER) && !defined(ARCH_WASM) && !defined(TARGET_ANDROID)
     /*if (!util_FileExists("resource/jk_.cd")) {
         // TODO: polyglot
         //SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "OpenJKDF2 could not find any game assets (`resource/jk_.cd` is missing). Would you like to install assets now?", NULL);
@@ -1128,4 +1128,4 @@ void InstallHelper_SetCwd()
 
     printf("Running from: %s\n", tmpCwd);
 }
-#endif // defined(SDL2_RENDER) && !defined(ARCH_WASM)
+#endif // defined(SDL2_RENDER) && !defined(ARCH_WASM) && !defined(TARGET_ANDROID)

@@ -20,22 +20,7 @@ uint8_t* stdDisplay_GetPalette()
 #ifndef SDL2_RENDER
 
 #else
-
-#ifdef WIN32
-#define GL_R8 GL_RED
-#endif
-
-#ifdef ARCH_WASM
-#include <SDL2/SDL.h>
-#else
-#include <SDL.h>
-#endif
-
-#ifdef MACOS
-#include "OpenGL/gl.h"
-#else
-#include <GL/gl.h>
-#endif
+#include "SDL2_helper.h"
 #include <assert.h>
 
 uint32_t Video_menuTexId = 0;

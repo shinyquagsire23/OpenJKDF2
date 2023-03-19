@@ -16,17 +16,7 @@
 #include <physfs.h>
 #endif
 
-#ifdef SDL2_RENDER
-#ifdef MACOS
-#define GL_SILENCE_DEPRECATION
-#include <SDL.h>
-#elif defined(ARCH_WASM)
-#include <emscripten.h>
-#include <SDL.h>
-#else
-#include <SDL.h>
-#endif
-#endif
+#include "SDL2_helper.h"
 
 #if defined(LINUX)
 #include <stdio.h>

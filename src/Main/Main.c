@@ -77,7 +77,7 @@
 #endif
 
 #if defined(SDL2_RENDER)
-#include <SDL.h>
+#include "SDL2_helper.h"
 #ifndef _WIN32
 #include <unistd.h>
 #endif

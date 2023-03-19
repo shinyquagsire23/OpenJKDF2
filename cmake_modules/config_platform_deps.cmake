@@ -76,7 +76,7 @@ if(TARGET_USE_SDL2)
     file(GLOB TARGET_SDL2_SRCS ${PROJECT_SOURCE_DIR}/src/Platform/SDL2/*.c)
     list(APPEND SOURCE_FILES ${TARGET_SDL2_SRCS})
     add_definitions(-DSDL2_RENDER)
-    add_definitions(-DOPENAL_SOUND)
+    
 endif()
 
 if(TARGET_USE_OPENGL)
@@ -85,6 +85,12 @@ if(TARGET_USE_OPENGL)
 
     file(GLOB TARGET_GL_CPP_SRCS ${PROJECT_SOURCE_DIR}/src/Platform/GL/*.cpp)
     list(APPEND SOURCE_FILES ${TARGET_GL_CPP_SRCS})
+endif()
+
+if(TARGET_USE_OPENAL)
+    add_definitions(-DSTDSOUND_OPENAL)
+else()
+    add_definitions(-DSTDSOUND_NULL)
 endif()
 
 if(TARGET_USE_D3D)
@@ -120,6 +126,10 @@ endif()
 
 if(TARGET_WASM)
     add_definitions(-DLINUX)
+endif()
+
+if(TARGET_CAN_JKGM)
+    add_definitions(-DTARGET_CAN_JKGM)
 endif()
 
 if(TARGET_WIN32)
