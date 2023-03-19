@@ -108,3 +108,6 @@ flatpak_openjkdf2/*
 OpenJKDF2.flatpak
 org.openjkdf2.OpenJKDF2.yml
 /.vs/VSWorkspaceState.json
+packaging/android-project/.gradle/*
+packaging/android-project/app/build/*
+packaging/android-project/app/src/main/jniLibs/*

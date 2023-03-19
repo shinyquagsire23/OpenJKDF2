@@ -93,3 +93,16 @@ fi
 
 cmake .. --toolchain ../cmake_modules/toolchain_android_aarch64.cmake && make -j10 openjkdf2-armv8a
 cd ..
+
+cd packaging/android-project
+mkdir -p app/src/main/jniLibs
+mkdir -p app/src/main/jniLibs/arm64-v8a
+cp $OPENJKDF2_SDL2_LIBRARY app/src/main/jniLibs/arm64-v8a
+cp $OPENJKDF2_SDL2_MIXER_LIBRARY app/src/main/jniLibs/arm64-v8a
+cp $OPENJKDF2_BUILD_DIR/libopenjkdf2-armv8a.so app/src/main/jniLibs/arm64-v8a/libmain.so
+./gradlew assembleDebug
+./gradlew installDebug
+cd ../..
+#adb push wasm_out/jk1 /storage/self/primary/Android/data/org.openjkdf2.app/files/
+#adb push wasm_out/mots /storage/self/primary/Android/data/org.openjkdf2.app/files/
+adb shell am start -n org.openjkdf2.app/.GameActivity

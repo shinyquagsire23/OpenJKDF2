@@ -246,7 +246,7 @@ int main(int argc, char** argv)
 #endif // !ARCH_WASM
 
 #ifndef ARCH_64BIT
-#ifndef ARCH_WASM
+#if !defined(ARCH_WASM) && !defined(TARGET_ANDROID)
     mmap((void*)0x400000, 0x122000, PROT_READ | PROT_WRITE, MAP_ANON|MAP_PRIVATE|MAP_FIXED, -1, 0);
     mmap((void*)0x522000, 0x500000, PROT_READ | PROT_WRITE, MAP_ANON|MAP_PRIVATE|MAP_FIXED, -1, 0);
     

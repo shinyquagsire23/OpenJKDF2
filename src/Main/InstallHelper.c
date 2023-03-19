@@ -1117,15 +1117,25 @@ void InstallHelper_SetCwd()
 #else
 void InstallHelper_SetCwd()
 {
+#if defined(TARGET_ANDROID)
+    chdir(SDL_AndroidGetExternalStoragePath());
+    if (!Main_bMotsCompat) {
+        chdir("jk1/");
+    }
+    else {
+        chdir("mots/");
+    }
+#else
     if (!Main_bMotsCompat) {
         chdir("/jk1/");
     }
     else {
         chdir("/mots/");
     }
+#endif
     char tmpCwd[256];
     getcwd(tmpCwd, sizeof(tmpCwd));
 
-    printf("Running from: %s\n", tmpCwd);
+    stdPlatform_Printf("Running from: %s\n", tmpCwd);
 }
 #endif // defined(SDL2_RENDER) && !defined(ARCH_WASM) && !defined(TARGET_ANDROID)

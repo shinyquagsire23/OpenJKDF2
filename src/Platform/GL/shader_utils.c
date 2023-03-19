@@ -110,6 +110,12 @@ GLuint create_shader(const char* shader, GLenum type) {
     defines = "#define CAN_BILINEAR_FILTER\n";
 #endif
 
+#if defined(TARGET_ANDROID)
+    version = "#version 300 es\n";
+    extensions = "\n";
+    defines = "#define CAN_BILINEAR_FILTER\n";
+#endif
+
 	// GLES2 precision specifiers
 	const char* precision;
 	precision =

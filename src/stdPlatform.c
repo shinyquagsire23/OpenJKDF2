@@ -225,6 +225,10 @@ int stdPlatform_Printf(const char *fmt, ...)
     vsnprintf(tmp, sizeof(tmp), fmt, args);
     jkQuakeConsole_PrintLine(tmp);
 
+#ifdef TARGET_ANDROID
+    LOGI("%s", tmp);
+#endif
+
     va_end (args);
 #ifdef SDL2_RENDER
     SDL_UnlockMutex(stdPlatform_mtxPrintf);

@@ -649,7 +649,7 @@ elseif(PLAT_MSVC)
     #cp /opt/homebrew/Cellar/mingw-w64/9.0.0_2/toolchain-x86_64/x86_64-w64-mingw32/bin/libwinpthread-1.dll .
     #cp /opt/homebrew/Cellar/mingw-w64/9.0.0_2/toolchain-x86_64/x86_64-w64-mingw32/lib/libstdc++-6.dll . 
 elseif(TARGET_ANDROID)
-    target_link_libraries(${BIN_NAME} PRIVATE ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY} GLESv3 ${GTK3_LIBRARIES} ${LIBPNG_STATIC_LDFLAGS}) #${OPENAL_LIBRARY} GLEW::GLEW
+    target_link_libraries(${BIN_NAME} PRIVATE ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY} GLESv1_CM GLESv2 GLESv3 log EGL ${GTK3_LIBRARIES} ${LIBPNG_STATIC_LDFLAGS}) #${OPENAL_LIBRARY} GLEW::GLEW
      
     if(TARGET_USE_GAMENETWORKINGSOCKETS)
         #target_link_libraries(${BIN_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/libGameNetworkingSockets.so)
