@@ -102,12 +102,12 @@ int sithOverlayMap_Render1(rdCanvas *canvas)
     a3.z = 0.0;
     rdMatrix_BuildRotate34(&sithOverlayMap_matrix, &a3);
     v4 = sithOverlayMap_pPlayer->sector;
-    if ( v4->field_8C != sithRender_lastRenderTick )
+    if ( v4->renderTick != sithRender_lastRenderTick )
     {
         v5 = v4->flags;
         if ( (v5 & 0x4000) != 0 || (g_mapModeFlags & 2) != 0 )
         {
-            v4->field_8C = sithRender_lastRenderTick;
+            v4->renderTick = sithRender_lastRenderTick;
             if ( (v5 & 0x10) != 0 ? 1 : sithOverlayMap_Render3(v4) )
             {
                 for ( i = v4->adjoins; i; i = i->next )
@@ -163,12 +163,12 @@ void sithOverlayMap_Render2(sithSector *sector)
     signed int v2; // eax
     sithAdjoin *i; // esi
 
-    if ( sector->field_8C != sithRender_lastRenderTick )
+    if ( sector->renderTick != sithRender_lastRenderTick )
     {
         v1 = sector->flags;
         if ( (v1 & 0x4000) != 0 || (g_mapModeFlags & 2) != 0 )
         {
-            sector->field_8C = sithRender_lastRenderTick;
+            sector->renderTick = sithRender_lastRenderTick;
             if ( (v1 & 0x10) != 0 )
                 v2 = 1;
             else

@@ -411,13 +411,13 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
     int v45; // [esp+4Ch] [ebp-34h]
     rdTexinfo *v51; // [esp+64h] [ebp-1Ch]
 
-    if ( sector->field_8C == sithRender_lastRenderTick )
+    if ( sector->renderTick == sithRender_lastRenderTick )
     {
         sector->clipFrustum = rdCamera_pCurCamera->cameraClipFrustum;
     }
     else
     {
-        sector->field_8C = sithRender_lastRenderTick;
+        sector->renderTick = sithRender_lastRenderTick;
         if (sithRender_numSectors >= SITH_MAX_VISIBLE_SECTORS)
             return;
 
@@ -484,14 +484,14 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
     }
 
     adjoinIter = sector->adjoins;
-    v45 = sector->field_90;
+    v45 = sector->clipVisited;
     sithRender_idxInfo.vertices = sithWorld_pCurrentWorld->verticesTransformed;
     sithRender_idxInfo.vertexUVs = sithWorld_pCurrentWorld->vertexUVs;
-    sector->field_90 = 1;
+    sector->clipVisited = 1;
     sithRender_idxInfo.paDynamicLight = sithWorld_pCurrentWorld->verticesDynamicLight;
     while ( adjoinIter )
     {
-        if (adjoinIter->sector->field_90 )
+        if (adjoinIter->sector->clipVisited)
         {
             adjoinIter = adjoinIter->next;
             continue;
@@ -584,7 +584,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
         }
         adjoinIter = adjoinIter->next;
     }
-    sector->field_90 = v45;
+    sector->clipVisited = v45;
 }
 
 // MOTS altered
@@ -1228,7 +1228,7 @@ void sithRender_UpdateAllLights()
     {
         for ( i = sithRender_aSectors[j]->adjoins; i; i = i->next )
         {
-            if ( i->sector->field_8C != sithRender_lastRenderTick && (i->flags & 1) != 0 )
+            if ( i->sector->renderTick != sithRender_lastRenderTick && (i->flags & 1) != 0 )
             {
                 i->sector->clipFrustum = sithRender_aSectors[j]->clipFrustum;
                 sithRender_UpdateLights(i->sector, 0.0, i->dist);
@@ -1244,10 +1244,10 @@ void sithRender_UpdateLights(sithSector *sector, float prev, float dist)
     sithAdjoin *j;
     rdVector3 vertex_out;
 
-    if ( sector->field_8C == sithRender_lastRenderTick )
+    if ( sector->renderTick == sithRender_lastRenderTick )
         return;
 
-    sector->field_8C = sithRender_lastRenderTick;
+    sector->renderTick = sithRender_lastRenderTick;
     if ( prev < 2.0 && sithRender_numLights < 0x20)
     {
         for ( i = sector->thingsList; i; i = i->nextThing )
@@ -1299,7 +1299,7 @@ void sithRender_UpdateLights(sithSector *sector, float prev, float dist)
 
     for ( j = sector->adjoins; j; j = j->next )
     {
-        if ( (j->flags & 1) != 0 && j->sector->field_8C != sithRender_lastRenderTick )
+        if ( (j->flags & 1) != 0 && j->sector->renderTick != sithRender_lastRenderTick )
         {
             float nextDist = j->mirror->dist + j->dist + dist + prev;
             if ( nextDist < 0.8 || nextDist < 2.0 )

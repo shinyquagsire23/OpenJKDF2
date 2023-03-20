@@ -397,7 +397,7 @@ void sithCogFunctionAI_AISetFireTarget(sithCog *ctx)
             if ( v3 )
             {
                 v4 = sithTime_curMs;
-                v3->field_1D0 = v1;
+                v3->attackThing = v1;
                 v3->field_204 = v4;
                 v5 = v3->flags;
                 if ( v1 )
@@ -492,7 +492,7 @@ void sithCogFunctionAI_AIFlee(sithCog *ctx)
                 if ( v3 )
                 {
                     v4 = v3->flags;
-                    v3->field_1C0 = v1;
+                    v3->fleeThing = v1;
                     if ( (v4 & SITHAI_MODE_FLEEING) == 0 )
                     {
                         v3->flags |= SITHAI_MODE_FLEEING;

@@ -53,7 +53,7 @@ int jkAI_SaberFighting(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
     v8 = actor->thing->playerInfo;
     if ( !v8 )
         return 0;
-    v9 = actor->field_1D0;
+    v9 = actor->attackThing;
     if ( !v9 )
         return 0;
     if ( (v9->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
@@ -73,14 +73,14 @@ int jkAI_SaberFighting(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
                 v12 = actor->field_1F4;
                 if ( v12 == 3
                   && ((actor->thing->actorParams.typeflags & SITH_TF_NOIMPACTDAMAGE) != 0
-                   || (v13 = actor->field_1D0) != 0 && v13->actorParams.typeflags & SITHAI_MODE_UNK80) )
+                   || (v13 = actor->attackThing) != 0 && v13->actorParams.typeflags & SITHAI_MODE_UNK80) )
                 {
-                    actor->field_1F0 = 0.0;
+                    actor->attackDistance = 0.0;
                 }
                 else
                 {
                     if ( v12 != 3 )
-                        sithAI_SetLookFrame(actor, &actor->field_1D0->position);
+                        sithAI_SetLookFrame(actor, &actor->attackThing->position);
                     if ( actor->field_1F4 || aiclass->argsAsFloat[0] != 0.0 && aiclass->argsAsFloat[0] > _frand() )
                     {
 LABEL_27:
@@ -95,7 +95,7 @@ LABEL_27:
                 v14 = &aiclass->argsAsFloat[1];
                 do
                 {
-                    if ( actor->field_1F0 > (double)*v14 )
+                    if ( actor->attackDistance > (double)*v14 )
                         break;
                     ++v5;
                     v14 += 3;
@@ -200,13 +200,13 @@ int jkAI_SpecialAttack(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
                 instinct->param0 = 0.0;
                 instinct->nextUpdate = v11;
             }
-            if ( actor->field_1D0 )
+            if ( actor->attackThing)
             {
                 instinct->nextUpdate = v10 + aiclass->argsAsInt[0];
                 if ( actor->field_288 <= v10 && aiclass->argsAsFloat[1] >= _frand() )
                 {
                     sithAI_sub_4EAD60(actor);
-                    if ( aiclass->argsAsFloat[2] <= (double)actor->field_1F0 && aiclass->argsAsFloat[3] >= (double)actor->field_1F0 )
+                    if ( aiclass->argsAsFloat[2] <= (double)actor->attackDistance && aiclass->argsAsFloat[3] >= (double)actor->attackDistance)
                     {
                         sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_RESERVED1);
                         v13 = actor->thing;
@@ -260,17 +260,17 @@ int jkAI_ForcePowers(sithActor *actor, sithAIClassEntry *aiclass, sithActorInsti
     v14 = 0;
     instinct->nextUpdate = sithTime_curMs + aiclass->argsAsInt[0];
     sithAI_sub_4EAD60(actor);
-    if ( !actor->field_1D0 || actor->field_1F4 )
+    if ( !actor->attackThing || actor->field_1F4 )
         return 0;
     v7 = _frand();
     instincta = v7;
     if ( v7 < aiclass->argsAsFloat[7]
-      && (aiclass->argsAsFloat[1] > (double)actor->field_1F0 || aiclass->argsAsFloat[2] < (double)actor->field_1F0 ? (v8 = 0) : (v8 = 1), v8) )
+      && (aiclass->argsAsFloat[1] > (double)actor->attackDistance || aiclass->argsAsFloat[2] < (double)actor->attackDistance ? (v8 = 0) : (v8 = 1), v8) )
     {
         v6 = 1;
     }
     else if ( instincta < (double)aiclass->argsAsFloat[8]
-           && (aiclass->argsAsFloat[3] > (double)actor->field_1F0 || aiclass->argsAsFloat[4] < (double)actor->field_1F0 ? (v9 = 0) : (v9 = 1), v9) )
+           && (aiclass->argsAsFloat[3] > (double)actor->attackDistance || aiclass->argsAsFloat[4] < (double)actor->attackDistance ? (v9 = 0) : (v9 = 1), v9) )
     {
         v6 = 2;
     }
@@ -278,7 +278,7 @@ int jkAI_ForcePowers(sithActor *actor, sithAIClassEntry *aiclass, sithActorInsti
     {
         if ( instincta >= (double)aiclass->argsAsFloat[9] )
             goto LABEL_25;
-        if ( aiclass->argsAsFloat[5] > (double)actor->field_1F0 || aiclass->argsAsFloat[6] < (double)actor->field_1F0 )
+        if ( aiclass->argsAsFloat[5] > (double)actor->attackDistance || aiclass->argsAsFloat[6] < (double)actor->attackDistance)
             goto LABEL_25;
         v6 = 3;
     }
@@ -287,7 +287,7 @@ LABEL_25:
     if ( v6 )
     {
         v13 = (float)v14;
-        v12 = (float)(unsigned int)actor->field_1D0->thingIdx;
+        v12 = (float)(unsigned int)actor->attackThing->thingIdx;
         sithCog_SendMessageFromThingEx(actor->thing, 0, SITH_MESSAGE_USER0, v12, v13, 0.0, 0.0);
         instinct->nextUpdate = sithTime_curMs + aiclass->argsAsInt[v6 + 9];
     }
