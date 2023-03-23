@@ -1001,7 +1001,7 @@ void sithAI_sub_4EAF40(sithActor *actor)
 }
 
 // MoTS altered
-int sithAI_CheckSightThing(sithThing *a3, rdVector3 *a4, sithThing *arg8, float argC, float arg10, float a6, rdVector3 *a5, float *a8)
+int sithAI_CheckSightThing(sithThing *thing, rdVector3 *targetPosition, sithThing *targetThing, float fov, float maxDistance, float unused, rdVector3 *targetErrorDir, float *targetDistance)
 {
     long double v12; // st7
     double v18; // st7
@@ -1011,59 +1011,59 @@ int sithAI_CheckSightThing(sithThing *a3, rdVector3 *a4, sithThing *arg8, float 
     float a4a; // [esp+18h] [ebp+8h]
     float a5a; // [esp+2Ch] [ebp+1Ch]
 
-    rdVector_Sub3(a5, &arg8->position, a4);
-    v12 = rdVector_Normalize3Acc(a5) - arg8->collideSize;
-    *a8 = v12;
+    rdVector_Sub3(targetErrorDir, &targetThing->position, targetPosition);
+    v12 = rdVector_Normalize3Acc(targetErrorDir) - targetThing->collideSize;
+    *targetDistance = v12;
  
     if ( v12 <= 0.0 )
         v12 = 0.0;
 
-    *a8 = v12;
-    if ( !(a3->thingflags & SITH_TF_WATER) && (arg8->thingflags & SITH_TF_WATER))
+    *targetDistance = v12;
+    if ( !(thing->thingflags & SITH_TF_WATER) && (targetThing->thingflags & SITH_TF_WATER))
     {
-        if ( arg8->moveType != SITH_MT_PHYSICS )
+        if ( targetThing->moveType != SITH_MT_PHYSICS )
             return 3;
-        if ( (arg8->physicsParams.physflags & SITH_PF_MIDAIR) == 0 )
+        if ( (targetThing->physicsParams.physflags & SITH_PF_MIDAIR) == 0 )
             return 3;
     }
-    if ( (a3->thingflags & SITH_TF_WATER) && !(arg8->thingflags & SITH_TF_WATER))
+    if ( (thing->thingflags & SITH_TF_WATER) && !(targetThing->thingflags & SITH_TF_WATER))
         return 3;
-    if ( v12 - arg8->collideSize > arg10 )
+    if ( v12 - targetThing->collideSize > maxDistance )
         return 1;
-    if ( argC > -1.0 )
+    if ( fov > -1.0 )
     {
-        v18 = rdVector_Dot3(&a3->lookOrientation.rvec, a5);
-        a5a = rdVector_Dot3(&a3->lookOrientation.lvec, a5);
+        v18 = rdVector_Dot3(&thing->lookOrientation.rvec, targetErrorDir);
+        a5a = rdVector_Dot3(&thing->lookOrientation.lvec, targetErrorDir);
 
         if ( v18 < 0.0 )
             v18 = -v18;
 
         a4a = v18;
-        if ( argC >= 0.0 )
+        if ( fov >= 0.0 )
         {
             if ( a5a < 0.0 )
                 return 2;
-            if ( a4a > 1.0 - argC )
+            if ( a4a > 1.0 - fov )
                 return 2;
         }
-        if ( argC < 0.0 && a5a < 0.0 && a4a < argC - -1.0 )
+        if ( fov < 0.0 && a5a < 0.0 && a4a < fov - -1.0 )
             return 2;
     }
 
     // MoTS added
-    if (a3->sector == NULL) {
+    if (thing->sector == NULL) {
         return 3;
     }
 
-    v21 = sithCollision_GetSectorLookAt(a3->sector, &a3->position, a4, 0.0);
-    sithCollision_SearchRadiusForThings(v21, a3, a4, a5, *a8, 0.0, 0x102);
+    v21 = sithCollision_GetSectorLookAt(thing->sector, &thing->position, targetPosition, 0.0);
+    sithCollision_SearchRadiusForThings(v21, thing, targetPosition, targetErrorDir, *targetDistance, 0.0, 0x102);
     v22 = sithCollision_NextSearchResult();
     if ( v22 )
     {
         while ( (v22->hitType & SITHCOLLISION_THING) != 0 )
         {
             v23 = v22->receiver;
-            if ( v23 != arg8 )
+            if ( v23 != targetThing )
             {
                 if ( v23->type == SITH_THING_ACTOR || v23->type == SITH_THING_COG )
                     break;
@@ -1552,52 +1552,52 @@ void sithAI_GetThingsInView(sithSector *a1, rdMatrix34 *a2, float a3)
 }
 
 // MoTS altered
-int sithAI_CanDetectSightThing(sithActor *a1, sithThing *a2, float a3)
+int sithAI_CanDetectSightThing(sithActor *actor, sithThing *targetThing, float distance)
 {
-    sithThing *v3; // esi
-    double v5; // st7
-    sithSector *v6; // edx
+    sithThing *actorThing; // esi
+    double clampedDistance; // st7
+    sithSector *targetSector; // edx
     int result; // eax
-    float v8; // [esp+0h] [ebp-4h]
+    float awareness; // [esp+0h] [ebp-4h]
 
-    v8 = 1.0;
-    v3 = a1->thing;
-    if ( !a2 )
+    awareness = 1.0;
+    actorThing = actor->thing;
+    if ( !targetThing )
         return 1;
-    if ( a2->type != SITH_THING_ACTOR && a2->type != SITH_THING_PLAYER )
+    if ( targetThing->type != SITH_THING_ACTOR && targetThing->type != SITH_THING_PLAYER )
         return 1;
-    if ( a3 >= 2.0 )
+    if ( distance >= 2.0 )
     {
-        if (!(a1->flags & SITHAI_MODE_ACTIVE))
-            v8 = 0.5;
-        if (!(a2->actorParams.typeflags & SITH_AF_FIELDLIGHT) && (a2->jkFlags & 1) == 0 )
+        if (!(actor->flags & SITHAI_MODE_ACTIVE))
+            awareness = 0.5;
+        if (!(targetThing->actorParams.typeflags & SITH_AF_FIELDLIGHT) && (targetThing->jkFlags & 1) == 0 )
         {
-            v5 = stdMath_Clamp((a3 - 2.0) * 0.1, 0.0, 0.6);
-            v8 = (1.0 - v5) * v8;
-            if (!(v3->actorParams.typeflags & SITH_AF_CAN_SEE_IN_DARK))
+            clampedDistance = stdMath_Clamp((distance - 2.0) * 0.1, 0.0, 0.6);
+            awareness = (1.0 - clampedDistance) * awareness;
+            if (!(actorThing->actorParams.typeflags & SITH_AF_CAN_SEE_IN_DARK))
             {
-                v6 = a2->sector;
-                if ( v6->ambientLight < 0.5 )
-                    v8 = (v6->ambientLight - -0.2) * v8;
+                targetSector = targetThing->sector;
+                if ( targetSector->ambientLight < 0.5 )
+                    awareness = (targetSector->ambientLight - -0.2) * awareness;
             }
-            if ( a2->moveType == SITH_MT_PHYSICS )
+            if ( targetThing->moveType == SITH_MT_PHYSICS )
             {
-                if (a2->physicsParams.physflags & SITH_PF_CROUCHING)
-                    v8 = v8 * 0.75;
-                if (rdVector_IsZero3(&a2->physicsParams.vel))
-                    v8 = v8 * 0.5;
+                if (targetThing->physicsParams.physflags & SITH_PF_CROUCHING)
+                    awareness = awareness * 0.75;
+                if (rdVector_IsZero3(&targetThing->physicsParams.vel))
+                    awareness = awareness * 0.5;
             }
         }
     }
-    if (a2->actorParams.typeflags & SITH_AF_INVISIBLE
-        && !(v3->actorParams.typeflags & SITH_AF_CAN_SEE_INVISIBLE)) {
-        v8 = v8 * 0.05;
+    if (targetThing->actorParams.typeflags & SITH_AF_INVISIBLE
+        && !(actorThing->actorParams.typeflags & SITH_AF_CAN_SEE_INVISIBLE)) {
+        awareness = awareness * 0.05;
     }
-    if (v3->actorParams.typeflags & SITH_AF_COMBO_BLIND) {
-        v8 = v8 * 0.05;
+    if (actorThing->actorParams.typeflags & SITH_AF_COMBO_BLIND) {
+        awareness = awareness * 0.05;
     }
-    v8 = stdMath_Clamp(v8, 0.05, 1.0);
-    if ( _frand() >= v8 )
+    awareness = stdMath_Clamp(awareness, 0.05, 1.0);
+    if ( _frand() >= awareness )
         return 0;
     else
         return 1;
