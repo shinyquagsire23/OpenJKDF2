@@ -55,7 +55,7 @@ void sithMap_DrawCircle(rdCamera *camera, rdMatrix34 *viewMat)
     v2 = sithMap_pPlayerThing;
     sithMap_var = 1;
     v3 = sithMap_pPlayerThing->sector;
-    if ( v3->field_8C == sithRender_lastRenderTick )
+    if ( v3->renderTick == sithRender_lastRenderTick )
     {
 LABEL_10:
         v2 = sithMap_pPlayerThing;
@@ -65,7 +65,7 @@ LABEL_10:
 
     if ( (v3->flags & SITH_SECTOR_AUTOMAPVISIBLE) != 0 || (g_mapModeFlags & 2) != 0 )
     {
-        v3->field_8C = sithRender_lastRenderTick;
+        v3->renderTick = sithRender_lastRenderTick;
         if ( (v3->flags & 0x10) != 0 )
             v5 = 1;
         else
@@ -92,7 +92,7 @@ void sithMap_sub_4EC4D0(sithSector *sector)
     int v2; // eax
     sithAdjoin *i; // esi
 
-    if ( ++sithMap_var >= 20 || sector->field_8C == sithRender_lastRenderTick )
+    if ( ++sithMap_var >= 20 || sector->renderTick == sithRender_lastRenderTick )
     {
 LABEL_11:
         --sithMap_var;
@@ -101,7 +101,7 @@ LABEL_11:
 
     if ( (sector->flags & SITH_SECTOR_AUTOMAPVISIBLE) != 0 || (g_mapModeFlags & 2) != 0 )
     {
-        sector->field_8C = sithRender_lastRenderTick;
+        sector->renderTick = sithRender_lastRenderTick;
         if ( (sector->flags & SITH_SECTOR_AUTOMAPHIDE) != 0 )
             v2 = 1;
         else

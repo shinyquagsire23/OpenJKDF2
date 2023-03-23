@@ -436,13 +436,13 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
     //if (sector->id == 92 || sector->id == 67 || sector->id == 66)
     //    stdPlatform_Printf("OpenJKDF2: Render sector %u %x\n", sector->id, sithRender_lastRenderTick);
 
-    if ( sector->field_8C == sithRender_lastRenderTick )
+    if ( sector->renderTick == sithRender_lastRenderTick )
     {
         sector->clipFrustum = rdCamera_pCurCamera->cameraClipFrustum;
     }
     else
     {
-        sector->field_8C = sithRender_lastRenderTick;
+        sector->renderTick = sithRender_lastRenderTick;
         if (sithRender_numSectors >= SITH_MAX_VISIBLE_SECTORS) {
             jk_printf("OpenJKDF2: Hit max visible sectors.\n");
             return;
@@ -517,10 +517,10 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
     }
 
     
-    v45 = sector->field_90;
+    v45 = sector->clipVisited;
     sithRender_idxInfo.vertices = sithWorld_pCurrentWorld->verticesTransformed;
     sithRender_idxInfo.vertexUVs = sithWorld_pCurrentWorld->vertexUVs;
-    sector->field_90 = 1;
+    sector->clipVisited = 1;
     sithRender_idxInfo.paDynamicLight = sithWorld_pCurrentWorld->verticesDynamicLight;
 
 #if 0
@@ -539,7 +539,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
         //if (sector->id == 66) // adjoinIter->sector->id == 92 || 
         //    stdPlatform_Printf("adjoin...%u->%u %x\n", sector->id, adjoinIter->sector->id, adjoinIter->sector->field_90);
         
-        if (adjoinIter->sector->field_90 )
+        if (adjoinIter->sector->clipVisited)
         {
             continue;
         }
@@ -699,7 +699,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
             }
         }
     }
-    sector->field_90 = v45;
+    sector->clipVisited = v45;
 }
 
 // MOTS altered
@@ -1362,7 +1362,7 @@ void sithRender_UpdateAllLights()
     {
         for ( i = sithRender_aSectors[j]->adjoins; i; i = i->next )
         {
-            if ( i->sector->field_8C != sithRender_lastRenderTick && (i->flags & 1) != 0 )
+            if ( i->sector->renderTick != sithRender_lastRenderTick && (i->flags & 1) != 0 )
             {
                 i->sector->clipFrustum = sithRender_aSectors[j]->clipFrustum;
                 sithRender_UpdateLights(i->sector, 0.0, i->dist, 0);
@@ -1383,10 +1383,10 @@ void sithRender_UpdateLights(sithSector *sector, float prev, float dist, int dep
         return;
     }
 
-    if ( sector->field_8C == sithRender_lastRenderTick )
+    if ( sector->renderTick == sithRender_lastRenderTick )
         return;
 
-    sector->field_8C = sithRender_lastRenderTick;
+    sector->renderTick = sithRender_lastRenderTick;
     if ( prev < 2.0 && sithRender_numLights < 0x20)
     {
         int safeguard = 0;
@@ -1444,7 +1444,7 @@ void sithRender_UpdateLights(sithSector *sector, float prev, float dist, int dep
 
     for ( j = sector->adjoins; j; j = j->next )
     {
-        if ( (j->flags & 1) != 0 && j->sector->field_8C != sithRender_lastRenderTick )
+        if ( (j->flags & 1) != 0 && j->sector->renderTick != sithRender_lastRenderTick )
         {
             float nextDist = j->mirror->dist + j->dist + dist + prev;
             if ( nextDist < 0.8 || nextDist < 2.0 )

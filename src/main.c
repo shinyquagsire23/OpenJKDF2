@@ -1993,8 +1993,8 @@ void do_hooks()
     hook_function(sithAI_Jump_ADDR, sithAI_Jump);
     hook_function(sithAI_RandomFireVector_ADDR, sithAI_RandomFireVector);
     hook_function(sithAI_sub_4EAD60_ADDR, sithAI_sub_4EAD60);
-    hook_function(sithAI_sub_4EC140_ADDR, sithAI_sub_4EC140);
-    hook_function(sithAI_sub_4EB090_ADDR, sithAI_sub_4EB090);
+    hook_function(sithAI_CanDetectSightThing_ADDR, sithAI_CanDetectSightThing);
+    hook_function(sithAI_CheckSightThing_ADDR, sithAI_CheckSightThing);
     hook_function(sithAI_sub_4EAF40_ADDR, sithAI_sub_4EAF40);
     hook_function(sithAI_FireWeapon_ADDR, sithAI_FireWeapon);
     hook_function(sithAI_sub_4EB300_ADDR, sithAI_sub_4EB300);

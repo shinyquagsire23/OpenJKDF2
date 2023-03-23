@@ -242,8 +242,8 @@ void sithDSS_SendAIStatus(sithActor *actor, int sendto_id, int idx)
     }
     if (actor->flags & SITHAI_MODE_FLEEING)
     {
-        if ( actor->field_1C0 ) {
-            NETMSG_PUSHS16(actor->field_1C0->thingIdx);
+        if ( actor->fleeThing) {
+            NETMSG_PUSHS16(actor->fleeThing->thingIdx);
         }
         else {
             NETMSG_PUSHS16(-1);
@@ -321,7 +321,7 @@ int sithDSS_ProcessAIStatus(sithCogMsg *msg)
     }
     if (actor->flags & SITHAI_MODE_FLEEING)
     {
-        actor->field_1C0 = sithThing_GetThingByIdx(NETMSG_POPS16());
+        actor->fleeThing = sithThing_GetThingByIdx(NETMSG_POPS16());
     }
     actor->position = NETMSG_POPVEC3();
     actor->lookOrientation = NETMSG_POPVEC3();

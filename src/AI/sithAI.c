@@ -914,12 +914,12 @@ void sithAI_sub_4EAD60(sithActor *actor)
         if ( (v4->actorParams.typeflags & SITH_AF_INVISIBLE) || (actor->thing->actorParams.typeflags & SITH_AF_COMBO_BLIND) != 0 )
             v9 = 3;
         actor->field_1D4 = v4->position;
-        v5 = sithAI_sub_4EB090(v2, &actor->blindAimError, v4, actor->aiclass->fov, actor->aiclass->sightDist, actora, &actor->field_1E4, &actor->field_1F0);
+        v5 = sithAI_CheckSightThing(v2, &actor->blindAimError, v4, actor->aiclass->fov, actor->aiclass->sightDist, actora, &actor->attackError, &actor->attackDistance);
         actor->field_1F4 = v5;
 
         if ( !v5 )
         {
-            if ( !v9 || sithAI_sub_4EC140(actor, actor->pDistractor, actor->field_1F0) )
+            if ( !v9 || sithAI_CanDetectSightThing(actor, actor->pDistractor, actor->attackDistance) )
             {
                 actor->field_1F8 = actor->pDistractor->position;
                 actor->field_204 = sithTime_curMs;
@@ -939,8 +939,8 @@ void sithAI_sub_4EAD60(sithActor *actor)
                  actor->aiclass->fov,
                  actor->aiclass->sightDist,
                  actora,
-                 &actor->field_1E4,
-                 &actor->field_1F0);
+                 &actor->attackError,
+                 &actor->attackDistance);
         actor->field_1F4 = v6;
         if ( !v6 )
         {
@@ -964,11 +964,11 @@ void sithAI_sub_4EAF40(sithActor *actor)
         {
             if ( (actor->thingidk->actorParams.typeflags & SITH_AF_INVISIBLE) || (actor->thing->actorParams.typeflags & SITH_AF_COMBO_BLIND) != 0 )
                 v1 = 3;
-            v3 = sithAI_sub_4EB090(actor->thing, &actor->thing->position, actor->thingidk, -1.0, actor->aiclass->sightDist, 0.0, &actor->field_228, &actor->currentDistanceFromTarget);
+            v3 = sithAI_CheckSightThing(actor->thing, &actor->thing->position, actor->thingidk, -1.0, actor->aiclass->sightDist, 0.0, &actor->field_228, &actor->currentDistanceFromTarget);
             actor->field_238 = v3;
             if ( !v3 )
             {
-                if ( !v1 || sithAI_sub_4EC140(actor, actor->thingidk, actor->currentDistanceFromTarget) )
+                if ( !v1 || sithAI_CanDetectSightThing(actor, actor->thingidk, actor->currentDistanceFromTarget) )
                 {
                     actor->field_23C = actor->thingidk->position;
                     actor->field_248 = sithTime_curMs;
@@ -1001,7 +1001,7 @@ void sithAI_sub_4EAF40(sithActor *actor)
 }
 
 // MoTS altered
-int sithAI_sub_4EB090(sithThing *a3, rdVector3 *a4, sithThing *arg8, float argC, float arg10, float a6, rdVector3 *a5, float *a8)
+int sithAI_CheckSightThing(sithThing *a3, rdVector3 *a4, sithThing *arg8, float argC, float arg10, float a6, rdVector3 *a5, float *a8)
 {
     long double v12; // st7
     double v18; // st7
@@ -1379,7 +1379,7 @@ int sithAI_FireWeapon(sithActor *actor, float minDistToFire, float maxDistToFire
     if ( !v8 )
         return 0;
     sithAI_sub_4EAD60(actor);
-    rdVector_Copy3(&v1, &actor->field_1E4);
+    rdVector_Copy3(&v1, &actor->attackError);
     if ( (a7 & 8) != 0 )
     {
         v20 = 0;
@@ -1387,7 +1387,7 @@ int sithAI_FireWeapon(sithActor *actor, float minDistToFire, float maxDistToFire
     }
     if ( actor->field_288 > sithTime_curMs || actor->field_1F4 )
         return 0;
-    if ( actor->field_1F0 < (double)minDistToFire || actor->field_1F0 > (double)maxDistToFire )
+    if ( actor->attackDistance < (double)minDistToFire || actor->attackDistance > (double)maxDistToFire )
         return 0;
 
     // MoTS added
@@ -1434,8 +1434,8 @@ LABEL_12:
             yvel = v8->physicsParams.vel.y;
         }
 
-        v14 = actor->field_1F0 / yvel * 0.5;
-        rdVector_Scale3(&a1a, &actor->field_1E4, v8->physicsParams.vel.y);
+        v14 = actor->attackDistance / yvel * 0.5;
+        rdVector_Scale3(&a1a, &actor->attackError, v8->physicsParams.vel.y);
         a1a.z = v14 * sithWorld_pCurrentWorld->worldGravity + a1a.z;
         v15 = 1;
         v21 = rdVector_Normalize3(&v1, &a1a) / yvel;
@@ -1444,7 +1444,7 @@ LABEL_12:
     {
         v15 = 0;
     }
-    if ( percentageErrorInAim != 0.0 && actor->field_1F0 != 0.0 && _frand() > actor->aiclass->accuracy )
+    if ( percentageErrorInAim != 0.0 && actor->attackDistance != 0.0 && _frand() > actor->aiclass->accuracy )
     {
         sithAI_RandomFireVector(&v1, percentageErrorInAim);
     }
@@ -1472,10 +1472,10 @@ void sithAI_GetThingsInView(sithSector *a1, rdMatrix34 *a2, float a3)
     float v17; // [esp+4Ch] [ebp+4h]
     float a2a; // [esp+50h] [ebp+8h]
 
-    if ( a1->field_8C == sithRender_lastRenderTick )
+    if ( a1->renderTick == sithRender_lastRenderTick )
         return;
 
-    a1->field_8C = sithRender_lastRenderTick;
+    a1->renderTick = sithRender_lastRenderTick;
     if (sithAI_dword_84DE5C >= 0x80)
         return;
 
@@ -1552,7 +1552,7 @@ void sithAI_GetThingsInView(sithSector *a1, rdMatrix34 *a2, float a3)
 }
 
 // MoTS altered
-int sithAI_sub_4EC140(sithActor *a1, sithThing *a2, float a3)
+int sithAI_CanDetectSightThing(sithActor *a1, sithThing *a2, float a3)
 {
     sithThing *v3; // esi
     double v5; // st7
@@ -1774,27 +1774,27 @@ LAB_0053a691:
         pActor->field_28C = sithTime_curMs + 2000;
         pActor->moveSpeed = 1313.0;
         pActor->flags &= ~(SITHAI_MODE_TURNING | SITHAI_MODE_MOVING);
-        pActor->field_1E4.x = fVar5;
+        pActor->attackError.x = fVar5;
         thing->physicsParams.vel.x = param_6 * fVar5;
         thing->physicsParams.vel.y = param_6 * fVar3;
-        pActor->field_1E4.y = fVar3;
-        pActor->field_1E4.z = fVar4;
-        pActor->field_1F0 = stdMath_Sqrt(fVar4 * fVar4 + fVar3 * fVar3 + fVar5 * fVar5);
+        pActor->attackError.y = fVar3;
+        pActor->attackError.z = fVar4;
+        pActor->attackDistance = stdMath_Sqrt(fVar4 * fVar4 + fVar3 * fVar3 + fVar5 * fVar5);
         thing->physicsParams.vel.z = param_6 * fVar4;
         return 1;
     }
     if (((uint32_t)pActor->field_288 <= sithTime_curMs) &&
             (pActor->field_1F4 == 0)) {
-        if ((pActor->field_1F0 < param_2) || (pActor->field_1F0 > param_3)) {
+        if ((pActor->attackDistance < param_2) || (pActor->attackDistance > param_3)) {
             bVar6 = 0;
         }
         else {
             bVar6 = 1;
         }
         if (bVar6) {
-            fVar3 = (thing->lookOrientation).rvec.z * (pActor->field_1E4).z +
-                    (thing->lookOrientation).rvec.y * (pActor->field_1E4).y +
-                    (thing->lookOrientation).rvec.x * (pActor->field_1E4).x;
+            fVar3 = (thing->lookOrientation).rvec.z * (pActor->attackError).z +
+                    (thing->lookOrientation).rvec.y * (pActor->attackError).y +
+                    (thing->lookOrientation).rvec.x * (pActor->attackError).x;
             if (fVar3 < 0.0) {
                 fVar3 = -fVar3;
             }
@@ -1864,10 +1864,10 @@ LAB_0053a3b9:
         fVar9 = stdMath_Sqrt(fVar8 * (double)(float)fVar8 + fVar7 * fVar7 + fVar6 * (double)(float)fVar6);
         fVar10 = fVar9 / (double)param_6 - (double) - 0.2;
         fVar1 = sithWorld_pCurrentWorld->worldGravity;
-        (pActor->field_1E4).x = (float)fVar6;
-        (pActor->field_1E4).y = (float)fVar7;
-        (pActor->field_1E4).z = (float)fVar8;
-        pActor->field_1F0 = (float)fVar9;
+        (pActor->attackError).x = (float)fVar6;
+        (pActor->attackError).y = (float)fVar7;
+        (pActor->attackError).z = (float)fVar8;
+        pActor->attackDistance = (float)fVar9;
         lVar11 = (int64_t)(fVar10 * 1000.0);
         pActor->field_28C = (int)lVar11 + uVar5;
         pActor->flags &= ~(SITHAI_MODE_TURNING | SITHAI_MODE_MOVING);
@@ -1884,16 +1884,16 @@ LAB_0053a3b9:
     if (((uint32_t)pActor->field_288 <= sithTime_curMs) &&
             (pActor->field_1F4 == 0)) 
     {
-        if (pActor->field_1F0 < minDist || pActor->field_1F0 > maxDist) {
+        if (pActor->attackDistance < minDist || pActor->attackDistance > maxDist) {
             bVar4 = 0;
         }
         else {
             bVar4 = 1;
         }
         if (bVar4) {
-            fVar1 = (thing->lookOrientation).rvec.z * (pActor->field_1E4).z +
-                    (thing->lookOrientation).rvec.y * (pActor->field_1E4).y +
-                    (thing->lookOrientation).rvec.x * (pActor->field_1E4).x;
+            fVar1 = (thing->lookOrientation).rvec.z * (pActor->attackError).z +
+                    (thing->lookOrientation).rvec.y * (pActor->attackError).y +
+                    (thing->lookOrientation).rvec.x * (pActor->attackError).x;
             if (fVar1 < 0.0) {
                 fVar1 = -fVar1;
             }
@@ -1958,7 +1958,7 @@ sithThing* sithAI_FUN_00539a60(sithActor *pThing)
                         }
                     }
                     if (((fVar2 != 0.0) && (psVar1 = pThing->aiclass, fVar2 < 0.0 != psVar1->alignment < 0.0))
-                            && (iVar3 = sithAI_sub_4EB090(a3, &a3->position, arg8, psVar1->fov, psVar1->sightDist, 0.0,
+                            && (iVar3 = sithAI_CheckSightThing(a3, &a3->position, arg8, psVar1->fov, psVar1->sightDist, 0.0,
                                                           &local_c, &local_10), iVar3 == 0)) {
                         local_1c = local_1c - -1.0;
                         fVar2 = _frand() * local_1c;

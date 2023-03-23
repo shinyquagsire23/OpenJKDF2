@@ -779,7 +779,7 @@ void sithWorld_sub_4D0A20(sithWorld *world)
             sithSurface* surface = &world->sectors[i].surfaces[j];
             surface->field_4 = 0;
         }
-        sector->field_8C = 0;
+        sector->renderTick = 0;
     }
 }
 

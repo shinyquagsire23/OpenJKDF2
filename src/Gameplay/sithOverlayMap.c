@@ -148,10 +148,10 @@ void sithOverlayMap_Render2(sithSector *sector)
     signed int v2; // eax
     sithAdjoin *i; // esi
 
-    if ( sector->field_8C != sithRender_lastRenderTick 
+    if ( sector->renderTick != sithRender_lastRenderTick
         && (sector->flags & SITH_SECTOR_AUTOMAPVISIBLE || g_mapModeFlags & 2))
     {
-        sector->field_8C = sithRender_lastRenderTick;
+        sector->renderTick = sithRender_lastRenderTick;
         if ( (sector->flags & SITH_SECTOR_AUTOMAPHIDE) != 0 )
             v2 = 1;
         else
