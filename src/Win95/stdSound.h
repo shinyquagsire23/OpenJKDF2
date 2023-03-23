@@ -60,9 +60,11 @@ typedef struct stdALBuffer
 #else
 typedef struct IDirectSoundBuffer
 {
+    void* p;
 } IDirectSoundBuffer;
 typedef struct IDirectSound3DBuffer
 {
+    void* p;
 } IDirectSound3DBuffer;
 #endif
 
