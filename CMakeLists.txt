@@ -57,7 +57,6 @@ set(TARGET_ANDROID_ARM64 FALSE)
 set(TARGET_HOOKS FALSE)
 set(TARGET_NO_BLOBS FALSE)
 set(OPENJKDF2_USE_BLOBS FALSE CACHE BOOL "Use blobs")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-implicit-function-declaration")
 
 set(DEBUG_QOL_CHEATS $ENV{DEBUG_QOL_CHEATS})
 
@@ -110,8 +109,8 @@ if(PLAT_LINUX_32)
         set(TARGET_NO_BLOBS FALSE)
     endif()
     
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -fshort-wchar")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fshort-wchar")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -fshort-wchar -Wno-implicit-function-declaration")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fshort-wchar -Wno-implicit-function-declaration")
     add_link_options(-fshort-wchar)
 
 elseif(PLAT_LINUX_64)
@@ -136,8 +135,8 @@ elseif(PLAT_LINUX_64)
     set(OPENJKDF2_NO_ASAN TRUE)
     set(TARGET_USE_CURL TRUE)
     
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -fshort-wchar")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fshort-wchar")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -fshort-wchar -Wno-implicit-function-declaration")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fshort-wchar -Wno-implicit-function-declaration")
     add_link_options(-fshort-wchar)
 
 elseif(PLAT_MACOS)
@@ -166,7 +165,7 @@ elseif(PLAT_MACOS)
     set(BUNDLE "${PROJECT_SOURCE_DIR}/OpenJKDF2.app")
     set(HOMEBREW_PREFIX $ENV{HOMEBREW_PREFIX})
 
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -O2 -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -O2 -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces -Wno-implicit-function-declaration")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fshort-wchar")
     
     add_link_options(-fshort-wchar -Wl,-map,openjkdf2.map)
@@ -196,7 +195,7 @@ elseif(PLAT_MACOS_X86_64)
     set(BUNDLE "${PROJECT_SOURCE_DIR}/OpenJKDF2_x86_64.app")
     set(HOMEBREW_PREFIX "/usr/local")
 
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -O2 -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -O2 -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces -Wno-implicit-function-declaration")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fshort-wchar")
     add_link_options(-fshort-wchar)
 
@@ -230,7 +229,7 @@ elseif(PLAT_MINGW_X86_64)
     set(TARGET_USE_CURL TRUE)
 
     # TODO: Bump to O2 eventually. MinGW likes to replace memset with calls to itself...
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -ggdb -fno-omit-frame-pointer")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -ggdb -fno-omit-frame-pointer -Wno-implicit-function-declaration")
     
     add_link_options(-Wl,-Map=output-win64.map -fno-trapping-math -fshort-wchar -D_MBCS)
     add_compile_options(-Wuninitialized -fno-trapping-math -fshort-wchar -Dmain=SDL_main -D_MBCS -static -pthread)
@@ -318,7 +317,7 @@ elseif(PLAT_ANDROID_ARM64)
     include_directories(${PROJECT_SOURCE_DIR}/3rdparty/freeglut/include)
     include_directories(${PROJECT_SOURCE_DIR}/3rdparty/glew/include)
 
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -fshort-wchar")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -fshort-wchar -Wno-implicit-function-declaration")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fshort-wchar")
     add_link_options(-fshort-wchar)
 
