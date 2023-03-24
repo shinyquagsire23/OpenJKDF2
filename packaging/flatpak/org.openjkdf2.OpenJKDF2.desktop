@@ -1,6 +1,7 @@
 [Desktop Entry]
 Name=OpenJKDF2
+Comment=Open Jedi Knight: Dark Forces II
 Exec=openjkdf2
 Type=Application
 Icon=org.openjkdf2.OpenJKDF2
-Categories=Game
+Categories=Game;
