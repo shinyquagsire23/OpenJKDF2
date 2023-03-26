@@ -264,7 +264,7 @@ void sithDSS_SendAIStatus(sithActor *actor, int sendto_id, int idx)
     NETMSG_PUSHU32(actor->loadedFrames);
     for (int i = 0; i < actor->loadedFrames; i++)
     {
-        NETMSG_PUSHVEC3(actor->framesAlloc[i]);
+        NETMSG_PUSHVEC3(actor->paFrames[i]);
     }
     
     NETMSG_END(DSS_AISTATUS);
@@ -341,13 +341,13 @@ int sithDSS_ProcessAIStatus(sithCogMsg *msg)
     
     if ( actor->loadedFrames)
     {
-        actor->framesAlloc = (rdVector3 *)pSithHS->alloc(sizeof(rdVector3) * actor->loadedFrames);
+        actor->paFrames = (rdVector3 *)pSithHS->alloc(sizeof(rdVector3) * actor->loadedFrames);
         actor->sizeFrames = actor->loadedFrames;
-        if ( actor->framesAlloc )
+        if ( actor->paFrames )
         {
             for (int i = 0; i < actor->loadedFrames; i++)
             {
-                actor->framesAlloc[i] = NETMSG_POPVEC3();
+                actor->paFrames[i] = NETMSG_POPVEC3();
             }
             return 1;
         }
@@ -356,7 +356,7 @@ int sithDSS_ProcessAIStatus(sithCogMsg *msg)
     {
         actor->sizeFrames = 0;
         actor->loadedFrames = 0;
-        actor->framesAlloc = NULL; // Added
+        actor->paFrames = NULL; // Added
     }
     return 1;
 }

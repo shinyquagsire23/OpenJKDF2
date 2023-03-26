@@ -280,10 +280,10 @@ void sithAI_FreeEntry(sithThing *thing)
         v2 = v1 - sithAI_actors;
 
         // Added: fix memleak
-        if (sithAI_actors[v2].framesAlloc)
+        if (sithAI_actors[v2].paFrames)
         {
-            pSithHS->free(sithAI_actors[v2].framesAlloc);
-            sithAI_actors[v2].framesAlloc = NULL;
+            pSithHS->free(sithAI_actors[v2].paFrames);
+            sithAI_actors[v2].paFrames = NULL;
         }
 
         _memset(&sithAI_actors[v2], 0, sizeof(sithActor));
@@ -600,7 +600,7 @@ int sithAI_LoadThingActorParams(stdConffileArg *arg, sithThing *thing, int param
         v6 = v3->loadedFrames;
         if ( v6 < v3->sizeFrames && _sscanf(arg->value, "(%f/%f/%f)", &v9, &v10, &v11) == 3 )
         {
-            v7 = &v3->framesAlloc[v6];
+            v7 = &v3->paFrames[v6];
             v7->x = v9;
             v7->y = v10;
             v7->z = v11;
@@ -617,7 +617,7 @@ int sithAI_LoadThingActorParams(stdConffileArg *arg, sithThing *thing, int param
     if ( !v5 )
         return 0;
     result = (intptr_t)pSithHS->alloc(sizeof(rdVector3) * v5);
-    v3->framesAlloc = (rdVector3 *)result;
+    v3->paFrames = (rdVector3 *)result;
     if ( result )
     {
         _memset((void *)result, 0, sizeof(rdVector3) * v5);
@@ -642,7 +642,7 @@ void sithAI_idkframesalloc(sithThing *a2, sithThing *a3, rdVector3 *a4)
 
     v3 = a3;
     v4 = a2->actor;
-    v4->framesAlloc = (rdVector3 *)pSithHS->alloc(sizeof(rdVector3) * a3->trackParams.sizeFrames);
+    v4->paFrames = (rdVector3 *)pSithHS->alloc(sizeof(rdVector3) * a3->trackParams.sizeFrames);
     v4->sizeFrames = a3->trackParams.sizeFrames;
     v5 = a3->trackParams.loadedFrames;
     v6 = 0;
@@ -654,7 +654,7 @@ void sithAI_idkframesalloc(sithThing *a2, sithThing *a3, rdVector3 *a4)
         {
             v8 = &v3->trackParams.aFrames[v6].pos;
             rdVector_Rotate3(&a1, a4, v8 + 1);
-            v9 = &v4->framesAlloc[v7];
+            v9 = &v4->paFrames[v7];
             ++v7;
             ++v6;
             rdVector_Add3(v9, v8, &a1);

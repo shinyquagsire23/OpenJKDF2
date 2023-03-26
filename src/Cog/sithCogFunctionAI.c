@@ -101,7 +101,7 @@ void sithCogFunctionAI_AISetMoveFrame(sithCog *ctx)
             v3 = v2->actor;
             if ( v3 )
             {
-                v4 = v3->framesAlloc;
+                v4 = v3->paFrames;
                 if ( v4 )
                 {
                     if ( v1 < v3->loadedFrames )
@@ -180,7 +180,7 @@ void sithCogFunctionAI_AISetLookFrame(sithCog *ctx)
             v3 = v2->actor;
             if ( v3 )
             {
-                v4 = v3->framesAlloc;
+                v4 = v3->paFrames;
                 if ( v4 )
                 {
                     if ( v1 < v3->loadedFrames )

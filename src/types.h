@@ -2459,7 +2459,7 @@ typedef struct sithActor
     int field_284;
     int field_288;
     int field_28C;
-    rdVector3 *framesAlloc;
+    rdVector3 *paFrames;
     int loadedFrames;
     int sizeFrames;
 } sithActor;
