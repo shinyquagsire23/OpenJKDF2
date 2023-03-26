@@ -36,6 +36,7 @@ bool stdUpdater_bDownloading;
 bool stdUpdater_bFoundUpdate;
 bool stdUpdater_bCompletedUpdate;
 int stdUpdater_bDisableUpdates = 0;
+int stdUpdater_bTestUpdate = 0;
 
 char stdUpdater_pUpdaterUrl[SITHCVAR_MAX_STRLEN];
 char stdUpdater_pWin64UpdateFilename[SITHCVAR_MAX_STRLEN];
@@ -45,6 +46,7 @@ char* stdUpdater_pUpdateFilename = "";
 void stdUpdater_StartupCvars()
 {
     sithCvar_RegisterBool("net_disableUpdates", 0, &stdUpdater_bDisableUpdates, CVARFLAG_GLOBAL);
+    sithCvar_RegisterBool("net_testUpdate", 0, &stdUpdater_bTestUpdate, CVARFLAG_GLOBAL | CVARFLAG_UPDATABLE_DEFAULT);
     sithCvar_RegisterStr("net_updaterUrl", STDUPDATER_DEFAULT_URL, &stdUpdater_pUpdaterUrl, CVARFLAG_GLOBAL | CVARFLAG_UPDATABLE_DEFAULT);
     sithCvar_RegisterStr("net_win64UpdateFilename", STDUPDATER_DEFAULT_WIN64_FILENAME, &stdUpdater_pWin64UpdateFilename, CVARFLAG_GLOBAL | CVARFLAG_UPDATABLE_DEFAULT);
     sithCvar_RegisterStr("net_macosUpdateFilename", STDUPDATER_DEFAULT_MACOS_FILENAME, &stdUpdater_pMacosUpdateFilename, CVARFLAG_GLOBAL | CVARFLAG_UPDATABLE_DEFAULT);
@@ -78,15 +80,19 @@ int stdUpdater_CheckForUpdates()
         return 0;
     }
 
-    char* pData = (char*)stdHttp_Fetch(stdUpdater_pUpdaterUrl);
+    char* pData = NULL;
+    for (int i = 0; i < 2; i++)
+    {
+        pData = (char*)stdHttp_Fetch(stdUpdater_pUpdaterUrl);
+        if (pData) break;
+    }
+    
     if (!pData) {
         return 0;
     }
 
     std::string dataStr(pData);
     free(pData);
-
-    //stdPlatform_Printf("Test: %s\n", dataStr.c_str());
 
     try {
         nlohmann::json json_file = nlohmann::json::parse(dataStr);
@@ -110,7 +116,9 @@ int stdUpdater_CheckForUpdates()
         stdUpdater_strUpdateVersion = entry["tag_name"].get<std::string>();
 
         if (!strcmp(openjkdf2_aReleaseVersion, stdUpdater_strUpdateVersion.c_str())) {
-            return 0;
+            if (!stdUpdater_bTestUpdate) {
+                return 0;
+            }
         }
 
         stdPlatform_Printf("stdUpdater: An update is available! Current: %s -> Latest: %s\n", openjkdf2_aReleaseVersion, stdUpdater_strUpdateVersion.c_str());

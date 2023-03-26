@@ -29,6 +29,8 @@ int sithCvar_Startup()
     jkPlayer_StartupVars();
     stdUpdater_StartupCvars();
 
+    sithCvar_LoadGlobals();
+
     return 1;
 }
 
@@ -93,6 +95,7 @@ int sithCvar_SaveVar(tSithCvar* pCvar, const char* pFpath)
         default:
             return 0;
     }
+
     return 1;
 }
 
@@ -100,7 +103,6 @@ int sithCvar_LoadVar(tSithCvar* pCvar, const char* pFpath)
 {
     char tmp[SITHCVAR_MAX_STRLEN];
     if (!pCvar) return 0;
-    sithCvar_UpdateValInternal(pCvar);
 
     switch (pCvar->type) {
         case CVARTYPE_BOOL:
@@ -113,12 +115,16 @@ int sithCvar_LoadVar(tSithCvar* pCvar, const char* pFpath)
             pCvar->flexVal = stdJSON_GetFloat(pFpath, pCvar->pName, pCvar->flexVal);
             break;
         case CVARTYPE_STR:
+            memset(tmp, 0, SITHCVAR_MAX_STRLEN);
             stdJSON_GetString(pFpath, pCvar->pName, tmp, SITHCVAR_MAX_STRLEN, pCvar->pStrVal);
+            memset((char*)pCvar->pStrVal, 0, SITHCVAR_MAX_STRLEN);
             stdString_SafeStrCopy(pCvar->pStrVal, tmp, SITHCVAR_MAX_STRLEN);
             break;
         default:
             return 0;
     }
+
+    sithCvar_UpdateLinkInternal(pCvar);
     return 1;
 }
 
@@ -422,6 +428,7 @@ int sithCvar_UpdateLinkInternal(tSithCvar* pCvar)
             *(float*)pCvar->pLinkPtr = pCvar->flexVal;
             break;
         case CVARTYPE_STR:
+            memset((char*)pCvar->pLinkPtr, 0, SITHCVAR_MAX_STRLEN);
             stdString_SafeStrCopy((char*)pCvar->pLinkPtr, pCvar->pStrVal, SITHCVAR_MAX_STRLEN);
             break;
     }
