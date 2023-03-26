@@ -30,7 +30,7 @@
 #define sithAI_Jump_ADDR (0x004EACF0)
 #define sithAI_sub_4EAD60_ADDR (0x004EAD60)
 #define sithAI_sub_4EAF40_ADDR (0x004EAF40)
-#define sithAI_sub_4EB090_ADDR (0x004EB090)
+#define sithAI_CheckSightThing_ADDR (0x004EB090)
 #define sithAI_sub_4EB300_ADDR (0x004EB300)
 #define sithAI_physidk_ADDR (0x004EB4B0)
 #define sithAI_sub_4EB640_ADDR (0x004EB640)
@@ -41,7 +41,7 @@
 #define sithAI_RandomRotationVector_ADDR (0x004EB9A0)
 #define sithAI_FireWeapon_ADDR (0x004EBA10)
 #define sithAI_GetThingsInView_ADDR (0x004EBE80)
-#define sithAI_sub_4EC140_ADDR (0x004EC140)
+#define sithAI_CanDetectSightThing_ADDR (0x004EC140)
 
 extern int sithAI_bOpened;
 extern sithActor sithAI_actors[256];
@@ -73,7 +73,7 @@ void sithAI_SetMoveThing(sithActor *actor, rdVector3 *movePos, float moveSpeed);
 void sithAI_Jump(sithActor *actor, rdVector3 *pos, float vel);
 void sithAI_sub_4EAD60(sithActor *actor);
 void sithAI_sub_4EAF40(sithActor *actor);
-int sithAI_sub_4EB090(sithThing *a3, rdVector3 *a4, sithThing *arg8, float argC, float arg10, float a6, rdVector3 *a5, float *a8);
+int sithAI_CheckSightThing(sithThing* thing, rdVector3* targetPosition, sithThing* targetThing, float fov, float maxDistance, float unused, rdVector3* targetErrorDir, float* targetDistance);
 int sithAI_sub_4EB300(sithThing *a3, rdVector3 *a4, rdVector3 *arg8, float argC, float arg10, float a7, rdVector3 *a5, float *a8);
 int sithAI_physidk(sithActor *a7, rdVector3 *a4, int *arg8);
 int sithAI_sub_4EB640(sithActor *actor, rdVector3 *a4, sithSector *a2, int *out);
@@ -84,7 +84,7 @@ void sithAI_RandomFireVector(rdVector3 *out, float magnitude);
 void sithAI_RandomRotationVector(rdVector3 *out);
 int sithAI_FireWeapon(sithActor *actor, float a2, float a3, float a4, float a5, int bAltFire, int a7);
 void sithAI_GetThingsInView(sithSector *a1, rdMatrix34 *a2, float a3);
-int sithAI_sub_4EC140(sithActor *a1, sithThing *a2, float a3);
+int sithAI_CanDetectSightThing(sithActor* actor, sithThing* targetThing, float distance);
 
 void sithAI_SetDistractor(sithThing *pDistractor);
 void sithAI_AddAlignmentPriority(float param_1);
@@ -116,6 +116,6 @@ sithThing* sithAI_FUN_00539a60(sithActor *pThing);
 //static void (*sithAI_sub_4EAD60)(sithActor *actor) = (void*)sithAI_sub_4EAD60_ADDR;
 //static int (*sithAI_physidk)(sithActor *a7, rdVector3 *a4, int *arg8) = (void*)sithAI_physidk_ADDR;
 //static int (*sithAI_sub_4EB640)(sithActor *arg0, rdVector3 *a4, sithSector *a2, int *argC) = (void*)sithAI_sub_4EB640_ADDR;
-//static int (*sithAI_sub_4EB090)(sithThing *a3, rdVector3 *a4, sithThing *arg8, float argC, float arg10, float a6, rdVector3 *a5, float *a8) = (void*)sithAI_sub_4EB090_ADDR;
+//static int (*sithAI_CheckSightThing)(sithThing* thing, rdVector3* targetPosition, sithThing* targetThing, float fov, float maxDistance, float unused, rdVector3* targetErrorDir, float* targetDistance) = (void*)sithAI_CheckSightThing_ADDR;
 
 #endif // _SITHAI_H

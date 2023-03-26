@@ -2376,8 +2376,8 @@ typedef struct sithSector
     rdVector3 boundingbox_onecorner;
     rdVector3 boundingbox_othercorner;
     float radius;
-    uint32_t field_8C;
-    uint32_t field_90;
+    uint32_t renderTick;
+    uint32_t clipVisited;
     rdClipFrustum* clipFrustum;
 } sithSector;
 
@@ -2427,13 +2427,13 @@ typedef struct sithActor
     rdVector3 field_1AC;
     float field_1B8;
     float moveSpeed;
-    sithThing* field_1C0;
+    sithThing* fleeThing;
     rdVector3 field_1C4;
     sithThing* pDistractor;
     rdVector3 field_1D4;
     int field_1E0;
-    rdVector3 field_1E4;
-    float field_1F0;
+    rdVector3 attackError;
+    float attackDistance;
     int field_1F4;
     rdVector3 field_1F8;
     int field_204;

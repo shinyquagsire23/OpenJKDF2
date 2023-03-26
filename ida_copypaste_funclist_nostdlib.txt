@@ -2402,7 +2402,7 @@ sithAI_SetMoveThing	.text	004EAC90	00000053	00000004	0000000C	R	.	.	.	.	.	T	.
 sithAI_Jump	.text	004EACF0	00000068	00000004	0000000C	R	.	.	.	.	.	T	.
 sithAI_sub_4EAD60	.text	004EAD60	000001DC	00000014	00000004	R	.	.	.	.	.	T	.
 sithAI_sub_4EAF40	.text	004EAF40	00000150	0000000C	00000004	R	.	.	.	.	.	T	.
-sithAI_sub_4EB090	.text	004EB090	00000268	00000010	00000020	R	.	.	.	.	.	T	.
+sithAI_CheckSightThing	.text	004EB090	00000268	00000010	00000020	R	.	.	.	.	.	T	.
 sithAI_sub_4EB300	.text	004EB300	000001AB	00000010	00000020	R	.	.	.	.	.	T	.
 sithAI_physidk	.text	004EB4B0	00000182	0000002C	0000000C	R	.	.	.	.	.	T	.
 sithAI_sub_4EB640	.text	004EB640	00000149	00000024	00000010	R	.	.	.	.	.	T	.
@@ -2413,7 +2413,7 @@ sithAI_RandomFireVector	.text	004EB920	0000007B	00000004	00000008	R	.	.	.	.	.	T	
 sithAI_RandomRotationVector	.text	004EB9A0	00000064	00000010	00000004	R	.	.	.	.	.	T	.
 sithAI_FireWeapon	.text	004EBA10	00000462	00000030	0000001C	R	.	.	.	.	.	T	.
 sithAI_GetThingsInView	.text	004EBE80	000002B4	00000048	0000000C	R	.	.	.	.	.	T	.
-sithAI_sub_4EC140	.text	004EC140	000001EB	00000004	0000000C	R	.	.	.	.	.	T	.
+sithAI_CanDetectSightThing	.text	004EC140	000001EB	00000004	0000000C	R	.	.	.	.	.	T	.
 sithMap_Startup	.text	004EC330	0000002B	00000000	00000004	R	.	.	.	.	.	T	.
 sithMap_Shutdown	.text	004EC360	00000014			R	.	.	.	.	.	.	.
 sithMap_DrawCircle	.text	004EC380	00000150	00000020	00000008	R	.	.	.	.	.	T	.
