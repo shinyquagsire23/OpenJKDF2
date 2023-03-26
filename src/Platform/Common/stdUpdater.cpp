@@ -153,7 +153,7 @@ int stdUpdater_CheckForUpdates()
     }
     catch (...)
     {
-        stdPlatform_Printf("stdUpdater: Failed to parse JSON?");
+        stdPlatform_Printf("stdUpdater: Failed to parse JSON?\n");
         return 0;
     }
 }
