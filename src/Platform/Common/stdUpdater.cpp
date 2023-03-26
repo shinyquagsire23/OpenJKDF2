@@ -49,7 +49,7 @@ void stdUpdater_StartupCvars()
     sithCvar_RegisterStr("net_win64UpdateFilename", STDUPDATER_DEFAULT_WIN64_FILENAME, &stdUpdater_pWin64UpdateFilename, CVARFLAG_GLOBAL | CVARFLAG_UPDATABLE_DEFAULT);
     sithCvar_RegisterStr("net_macosUpdateFilename", STDUPDATER_DEFAULT_MACOS_FILENAME, &stdUpdater_pMacosUpdateFilename, CVARFLAG_GLOBAL | CVARFLAG_UPDATABLE_DEFAULT);
 
-#ifdef defined(WIN64_STANDALONE)
+#if defined(WIN64_STANDALONE)
     stdUpdater_pUpdateFilename = stdUpdater_pWin64UpdateFilename;
 #elif defined(MACOS)
     stdUpdater_pUpdateFilename = stdUpdater_pMacosUpdateFilename;
@@ -113,6 +113,8 @@ int stdUpdater_CheckForUpdates()
             return 0;
         }
 
+        stdPlatform_Printf("stdUpdater: An update is available! Current: %s -> Latest: %s\n", openjkdf2_aReleaseVersion, stdUpdater_strUpdateVersion.c_str());
+
         for (int i = 0; i < assets.size(); i++) {
             auto asset = assets[i];
             if (!asset.contains("name")) {
@@ -129,14 +131,17 @@ int stdUpdater_CheckForUpdates()
 
             stdUpdater_strBrowserDownloadUrl = asset["browser_download_url"].get<std::string>();
 
-            stdPlatform_Printf("stdUpdater: An update is available! Current: %s -> Latest: %s\n", openjkdf2_aReleaseVersion, stdUpdater_strUpdateVersion.c_str());
             stdPlatform_Printf("stdUpdater: %s\n", stdUpdater_strBrowserDownloadUrl.c_str());
-            stdUpdater_bFoundUpdate = true;
 
-            return 1;
+            stdUpdater_bFoundUpdate = true;
+            break;
         }
 
-        return 0;
+        if (!stdUpdater_bFoundUpdate) {
+            stdPlatform_Printf("stdUpdater: An update is available, but no payload? updateFilename: %s, updaterURL: %s\n", stdUpdater_pUpdateFilename, stdUpdater_pUpdaterUrl);
+        }
+
+        return 1;
     }
     catch (...)
     {
@@ -173,6 +178,7 @@ void stdUpdater_Win64UpdateThread()
 
     char tmp_exepath[512];
     char tmp_zippath[512];
+    char* exe_fname = stdFnames_FindMedName(openjkdf2_pExecutablePath);
     stdFnames_CopyDir(tmp_exepath, sizeof(tmp_exepath), openjkdf2_pExecutablePath);
     stdFnames_MakePath(tmp_zippath, sizeof(tmp_zippath), tmp_exepath, stdUpdater_strDlFname.c_str());
 
@@ -193,8 +199,21 @@ void stdUpdater_Win64UpdateThread()
         {
             char tmp[512];
             char tmp2[512];
-            stdFnames_MakePath(tmp, sizeof(tmp), tmp_exepath, *i);
-            stdString_snprintf(tmp2, sizeof(tmp2), "%s.bak", tmp);
+
+            // TODO: Check openjkdf2-64.exe instead? idk if I'll ever ship two EXEs.
+            // Basically what we're solving for here is if someone renames their EXE to
+            // JediKnight.EXE or JK.EXE for Steam/GOG launchers.
+            if(!__strcmpi(stdFnames_FindExt(*i), "exe"))
+            {
+                stdFnames_MakePath(tmp, sizeof(tmp), tmp_exepath, exe_fname);
+                stdString_snprintf(tmp2, sizeof(tmp2), "%s.bak", tmp);
+            }
+            else
+            {
+                stdFnames_MakePath(tmp, sizeof(tmp), tmp_exepath, *i);
+                stdString_snprintf(tmp2, sizeof(tmp2), "%s.bak", tmp);
+            }
+            
             stdPlatform_Printf("stdUpdater: Renaming: %s -> %s\n", tmp, tmp2);
 
             stdFileUtil_DelFile(tmp2);
@@ -207,7 +226,7 @@ void stdUpdater_Win64UpdateThread()
 
             stdPlatform_Printf("stdUpdater: Writing:  %s\n", tmp);
 
-            PHYSFS_sint64 rc, i;
+            PHYSFS_sint64 rc, i2;
             while (1)
             {
                 rc = PHYSFS_readBytes(f_in, buffer, sizeof (buffer));
