@@ -492,7 +492,7 @@ void sithCogFunctionAI_AIFlee(sithCog *ctx)
                 if ( v3 )
                 {
                     v4 = v3->flags;
-                    v3->fleeThing = v1;
+                    v3->pFleeThing = v1;
                     if ( (v4 & SITHAI_MODE_FLEEING) == 0 )
                     {
                         v3->flags |= SITHAI_MODE_FLEEING;

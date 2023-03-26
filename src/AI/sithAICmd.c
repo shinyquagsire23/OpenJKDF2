@@ -1140,16 +1140,16 @@ int sithAICmd_Flee(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinc
         instinct->param0 = sithTime_curSeconds;
     if ( v8 == 0.0 )
         v8 = 10.0;
-    v11 = actor->fleeThing;
+    v11 = actor->pFleeThing;
     if ( !v11
       || sithTime_curSeconds > instinct->param0 + v8
       || ((v12 = aiclass->argsAsInt[1], actor->flags = v7 & ~SITHAI_MODE_ATTACKING, !v12) ? (instinct->nextUpdate = sithTime_curMs + 5000) : (instinct->nextUpdate = v12 + sithTime_curMs),
           sithAI_CheckSightThing(actor->thing, &actor->thing->position, v11, -1.0, aiclass1a, 0.0, &a5, &tmp)) )
     {
-        v16 = actor->fleeThing;
+        v16 = actor->pFleeThing;
         if ( v16 )
             sithAI_SetLookFrame(actor, &v16->position);
-        actor->fleeThing = 0;
+        actor->pFleeThing = 0;
         actor->flags &= ~(SITHAI_MODE_FLEEING|SITHAI_MODE_ACTIVE);
         actor->flags |= SITHAI_MODE_SEARCHING;
         
@@ -1208,14 +1208,14 @@ int sithAICmd_Withdraw(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
     if ( (actor->flags & SITHAI_MODE_FLEEING) == 0 )
         return 0;
 
-    if ( actor->fleeThing)
+    if ( actor->pFleeThing)
     {
         if ( aiclass->argsAsInt[0] )
             instinct->nextUpdate = aiclass->argsAsInt[0] + sithTime_curMs;
         else
             instinct->nextUpdate = sithTime_curMs + 5000;
 
-        if ( sithAI_CheckSightThing(actor->thing, &actor->thing->position, actor->fleeThing, -1.0, actor->aiclass->sightDist, 0.0, &a5, &tmp) )
+        if ( sithAI_CheckSightThing(actor->thing, &actor->thing->position, actor->pFleeThing, -1.0, actor->aiclass->sightDist, 0.0, &a5, &tmp) )
         {
             result = 1;
             actor->flags &= ~(SITHAI_MODE_FLEEING|SITHAI_MODE_ACTIVE);
@@ -1440,7 +1440,7 @@ int sithAICmd_SenseDanger(sithActor *actor, sithAIClassEntry *aiclass, sithActor
                 actor->flags |= SITHAI_MODE_FLEEING;
                 sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_FEAR);
                 sithAIAwareness_AddEntry(actor->thing->sector, &actor->thing->position, 1, 3.0, actor->thing);
-                actor->fleeThing = actor->pDistractor;
+                actor->pFleeThing = actor->pDistractor;
                 return 1;
             }
         }
@@ -1457,7 +1457,7 @@ int sithAICmd_SenseDanger(sithActor *actor, sithAIClassEntry *aiclass, sithActor
                 v9 = sithAI_CheckSightThing(actor->thing, &actor->thing->position, v8, -1.0, actor->aiclass->hearDist, 0.0, &a5, &tmp);
                 if ( v9 != 1 && v9 != 3 )
                 {
-                    actor->fleeThing = v8;
+                    actor->pFleeThing = v8;
                     if ( (actor->flags & SITHAI_MODE_FLEEING) == 0 )
                     {
                         sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_FEAR);
@@ -1473,7 +1473,7 @@ int sithAICmd_SenseDanger(sithActor *actor, sithAIClassEntry *aiclass, sithActor
     }
     sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_SURPRISE);
     if ( extra )
-        actor->fleeThing = sithThing_GetParent(extra);
+        actor->pFleeThing = sithThing_GetParent(extra);
     result = 1;
     actor->flags &= ~SITHAI_MODE_SEARCHING;
     actor->flags |= SITHAI_MODE_FLEEING;
@@ -1514,7 +1514,7 @@ int sithAICmd_HitAndRun(sithActor *actor, sithAIClassEntry *aiclass, sithActorIn
     {
         instinct->param0 = 0.0;
         actor->flags |= SITHAI_MODE_FLEEING;
-        actor->fleeThing = actor->pDistractor;
+        actor->pFleeThing = actor->pDistractor;
         instinct->nextUpdate = sithTime_curMs + (int)aiclass->argsAsFloat[1];
         return 1;
     }
@@ -1550,7 +1550,7 @@ int sithAICmd_Retreat(sithActor *actor, sithAIClassEntry *aiclass, sithActorInst
             instinct->param0 = instinct->param0 - -1.0;
             sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_FLEE);
             actor->flags |= SITHAI_MODE_FLEEING;
-            actor->fleeThing = actor->pDistractor;
+            actor->pFleeThing = actor->pDistractor;
             return 1;
         }
 

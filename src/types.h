@@ -2427,7 +2427,7 @@ typedef struct sithActor
     rdVector3 field_1AC;
     float field_1B8;
     float moveSpeed;
-    sithThing* fleeThing;
+    sithThing* pFleeThing;
     rdVector3 field_1C4;
     sithThing* pDistractor;
     rdVector3 field_1D4;
