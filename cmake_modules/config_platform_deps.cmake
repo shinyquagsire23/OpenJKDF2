@@ -136,6 +136,7 @@ if(TARGET_WIN32)
     file(GLOB TARGET_WIN32_SRCS ${PROJECT_SOURCE_DIR}/src/Platform/Win32/*.c)
     list(APPEND SOURCE_FILES ${TARGET_WIN32_SRCS})
 
+    add_subdirectory(${PROJECT_SOURCE_DIR}/packaging/win32)
     list(APPEND SOURCE_FILES ${PROJECT_SOURCE_DIR}/packaging/win32/openjkdf2.rc)
 
     # Prefer the POSIX wuRegistry (JSON) over native
