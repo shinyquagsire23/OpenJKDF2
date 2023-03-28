@@ -18,7 +18,7 @@ if(PLAT_MACOS_X86_64)
     list(APPEND CMAKE_PREFIX_PATH /usr/local)
 endif()
 
-project(OpenJKDF2)
+project(OpenJKDF2 VERSION 0.8.17.0)
 
 # All of our supported platforms
 set(PLAT_LINUX_32 FALSE CACHE BOOL "Linux 32-bit target")
@@ -76,11 +76,20 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows" AND PLAT_AUTO)
 endif()
 
 # General defs
-add_definitions(-DOPENJKDF2_RELEASE_COMMIT="$ENV{OPENJKDF2_RELEASE_COMMIT}")
-add_definitions(-DOPENJKDF2_RELEASE_COMMIT_SHORT="$ENV{OPENJKDF2_RELEASE_COMMIT_SHORT}")
-add_definitions(-DOPENJKDF2_RELEASE_COMMIT_W=L"$ENV{OPENJKDF2_RELEASE_COMMIT}")
-add_definitions(-DOPENJKDF2_RELEASE_COMMIT_SHORT_W=L"$ENV{OPENJKDF2_RELEASE_COMMIT_SHORT}")
-add_definitions(-DQOL_IMPROVEMENTS)
+add_compile_definitions(
+    OPENJKDF2_PROJECT_NAME=${PROJECT_NAME}
+    OPENJKDF2_VERSION=${PROJECT_VERSION}
+    OPENJKDF2_MAJOR_VERSION=${PROJECT_VERSION_MAJOR}
+    OPENJKDF2_MINOR_VERSION=${PROJECT_VERSION_MINOR}
+    OPENJKDF2_PATCH_VERSION=${PROJECT_VERSION_PATCH}
+    OPENJKDF2_TWEAK_VERSION=${PROJECT_VERSION_TWEAK}
+    OPENJKDF2_RELEASE_VERSION_STRING=\"v${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}\"
+    OPENJKDF2_RELEASE_VERSION_STRING_W=L\"v${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}\"
+    OPENJKDF2_RELEASE_COMMIT=\"$ENV{OPENJKDF2_RELEASE_COMMIT}\"
+    OPENJKDF2_RELEASE_COMMIT_SHORT=\"$ENV{OPENJKDF2_RELEASE_COMMIT_SHORT}\"
+    OPENJKDF2_RELEASE_COMMIT_W=L\"$ENV{OPENJKDF2_RELEASE_COMMIT}\"
+    OPENJKDF2_RELEASE_COMMIT_SHORT_W=L\"$ENV{OPENJKDF2_RELEASE_COMMIT_SHORT}\"
+    QOL_IMPROVEMENTS)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -204,13 +213,18 @@ elseif(PLAT_MACOS_X86_64)
 elseif(PLAT_MINGW_X86_64)
     message( STATUS "Targeting Win64 MinGW" )
 
-    set(BIN_NAME "openjkdf2-64")
+    set(BIN_NAME "${PROJECT_NAME}-64")
+    string(TOLOWER ${BIN_NAME} BIN_NAME)
 
-    add_definitions(-DWIN64)
-    add_definitions(-DWIN64_STANDALONE)
-    add_definitions(-DARCH_64BIT)
-    add_definitions(-DWIN32)
-    add_definitions(-DWIN64_MINGW)
+    add_compile_definitions(WINVER=0x0502 _WIN32_WINNT=0x0502)
+    add_compile_definitions(WIN64)
+    add_compile_definitions(WIN64_STANDALONE)
+    add_compile_definitions(ARCH_64BIT)
+    add_compile_definitions(WIN32)
+    add_compile_definitions(WIN64_MINGW)
+    
+    set(OPENJKDF2_ASSEMBLY_PROCESSOR_ARCHITECTURE AMD64) # the assemblyIdentity element’s processorArchitecture attribute only accepts x64 or AMD64 but not x86_64
+    configure_file(${PROJECT_SOURCE_DIR}/packaging/win32/openjkdf2.manifest.in ${PROJECT_SOURCE_DIR}/packaging/win32/${BIN_NAME}.exe.manifest)
 
     if (NOT DEFINED GITHUB_RUNNER_COMPILE)
         set(TARGET_USE_PHYSFS TRUE)
@@ -231,8 +245,9 @@ elseif(PLAT_MINGW_X86_64)
     # TODO: Bump to O2 eventually. MinGW likes to replace memset with calls to itself...
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -ggdb -fno-omit-frame-pointer -Wno-implicit-function-declaration")
     
-    add_link_options(-Wl,-Map=output-win64.map -fno-trapping-math -fshort-wchar -D_MBCS)
-    add_compile_options(-Wuninitialized -fno-trapping-math -fshort-wchar -Dmain=SDL_main -D_MBCS -static -pthread)
+    add_link_options(-Wl,-Map=${BIN_NAME}.map -fno-trapping-math -fshort-wchar)
+    add_compile_definitions(main=SDL_main _MBCS)
+    add_compile_options(-Wuninitialized -fno-trapping-math -fshort-wchar -static -pthread)
 
     include_directories(${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/include)
     include_directories(${PROJECT_SOURCE_DIR}/3rdparty/freeglut/include)
@@ -326,10 +341,14 @@ elseif(PLAT_MSVC)
 
     set(BIN_NAME "openjkdf2-64")
 
-    add_definitions(-DWIN64)
-    add_definitions(-DWIN64_STANDALONE)
-    add_definitions(-DARCH_64BIT)
-    add_definitions(-DWIN32)
+    add_compile_definitions(WINVER=0x0502 _WIN32_WINNT=0x0502)
+    add_compile_definitions(WIN64)
+    add_compile_definitions(WIN64_STANDALONE)
+    add_compile_definitions(ARCH_64BIT)
+    add_compile_definitions(WIN32)
+
+    set(OPENJKDF2_ASSEMBLY_PROCESSOR_ARCHITECTURE AMD64) # the assemblyIdentity element’s processorArchitecture attribute only accepts x64 or AMD64 but not x86_64
+    configure_file(${PROJECT_SOURCE_DIR}/packaging/win32/openjkdf2.manifest.in ${PROJECT_SOURCE_DIR}/packaging/win32/${BIN_NAME}.exe.manifest)
 
     set(TARGET_USE_PHYSFS FALSE)
     set(TARGET_USE_GAMENETWORKINGSOCKETS TRUE)
