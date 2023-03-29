@@ -129,7 +129,7 @@ void sithCogFunctionAI_AISetMoveThing(sithCog *ctx)
         v3 = v2->actor;
         if ( v3 )
         {
-            v3->thingidk = v1;
+            v3->pMoveThing = v1;
             sithAI_SetMoveThing(v3, &v1->position, v3->moveSpeed);
         }
     }

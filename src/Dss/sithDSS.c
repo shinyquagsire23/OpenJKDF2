@@ -212,8 +212,8 @@ void sithDSS_SendAIStatus(sithActor *actor, int sendto_id, int idx)
     NETMSG_PUSHS16((int16_t)(((intptr_t)actor->aiclass - (intptr_t)sithWorld_pCurrentWorld->aiclasses) / sizeof(sithAIClass)));
     NETMSG_PUSHU32(actor->flags);
     NETMSG_PUSHU32(actor->nextUpdate);
-    if ( actor->thingidk ) {
-        NETMSG_PUSHS16(actor->thingidk->thingIdx);
+    if ( actor->pMoveThing ) {
+        NETMSG_PUSHS16(actor->pMoveThing->thingIdx);
     }
     else {
         NETMSG_PUSHS16(-1);
@@ -296,7 +296,7 @@ int sithDSS_ProcessAIStatus(sithCogMsg *msg)
     actor->numAIClassEntries = sithWorld_pCurrentWorld->aiclasses[idx].numEntries;
     actor->flags = NETMSG_POPU32();
     actor->nextUpdate = NETMSG_POPU32();
-    actor->thingidk = sithThing_GetThingByIdx(NETMSG_POPS16());
+    actor->pMoveThing = sithThing_GetThingByIdx(NETMSG_POPS16());
     actor->field_224 = 0; // interesting?
     
     actor->movepos = NETMSG_POPVEC3();

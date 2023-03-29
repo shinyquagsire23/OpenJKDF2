@@ -207,7 +207,7 @@ int sithAICmd_Follow(sithActor *actor, sithAIClassEntry *aiclass, sithActorInsti
     {
         if ( !flags)
         {
-            v7 = actor->thingidk;
+            v7 = actor->pMoveThing;
             if (!v7) {
                 return 0;
             }
@@ -326,7 +326,7 @@ int sithAICmd_CircleStrafe(sithActor *actor, sithAIClassEntry *aiclass, sithActo
     float unused;
 
     instinct->nextUpdate = sithTime_curMs + aiclass->argsAsInt[0];
-    if ( actor->thingidk )
+    if ( actor->pMoveThing )
     {
         v8 = aiclass->argsAsInt[4];
         sithAI_sub_4EAF40(actor);
@@ -334,7 +334,7 @@ int sithAICmd_CircleStrafe(sithActor *actor, sithAIClassEntry *aiclass, sithActo
         {
             rdVector_Scale3(&a2a, &actor->field_228, -actor->currentDistanceFromTarget);
             if ( v8
-              || actor->thingidk->lookOrientation.lvec.y * a2a.y + actor->thingidk->lookOrientation.lvec.z * a2a.z + actor->thingidk->lookOrientation.lvec.x * a2a.x >= 0.0 )
+              || actor->pMoveThing->lookOrientation.lvec.y * a2a.y + actor->pMoveThing->lookOrientation.lvec.z * a2a.z + actor->pMoveThing->lookOrientation.lvec.x * a2a.x >= 0.0 )
             {
                 if ( instinct->param0 == 0.0 || v8 )
                 {
@@ -354,11 +354,11 @@ int sithAICmd_CircleStrafe(sithActor *actor, sithAIClassEntry *aiclass, sithActo
                 }
                 a4.y = v13;
                 rdVector_Rotate3(&movePos, &a2a, &a4);
-                rdVector_Add3Acc(&movePos, &actor->thingidk->position);
-                if ( !sithAI_sub_4EB300(actor->thingidk, &actor->thingidk->position, &movePos, -1.0, actor->aiclass->sightDist, 0.0, &a5, &unused) )
+                rdVector_Add3Acc(&movePos, &actor->pMoveThing->position);
+                if ( !sithAI_sub_4EB300(actor->pMoveThing, &actor->pMoveThing->position, &movePos, -1.0, actor->aiclass->sightDist, 0.0, &a5, &unused) )
                 {
                     sithAI_SetMoveThing(actor, &movePos, 0.5);
-                    sithAI_SetLookFrame(actor, &actor->thingidk->position);
+                    sithAI_SetLookFrame(actor, &actor->pMoveThing->position);
                     instinct->nextUpdate = sithTime_curMs + aiclass->argsAsInt[3];
                     return 0;
                 }
@@ -871,7 +871,7 @@ LABEL_26:
                     && MOTS_ONLY_COND(actor_->aiclass->alignment != 1.0 || (sithAI_FLOAT_005a79d8 != 1.0) || v17 != sithAICmd_NearestPlayer(actor_)) ) // TODO will sithAICmd_NearestPlayer work?
                 {
                     actor_->pDistractor = v17;
-                    actor_->thingidk = v17;
+                    actor_->pMoveThing = v17;
                     actor_->flags &= ~SITHAI_MODE_SEARCHING;
                     actor_->flags |= SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_HASDEST|SITHAI_MODE_ATTACKING;
                 }
@@ -983,7 +983,7 @@ int sithAICmd_LookForTarget(sithActor *actor, sithAIClassEntry *aiclass, sithAct
                 sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_ALERT);
                 sithSoundClass_ThingPlaySoundclass4(actor->thing, SITH_SC_ACTIVATE);
                 sithAIAwareness_AddEntry(actor->pDistractor->sector, &actor->thing->position, 0, 3.0, actor->pDistractor);
-                actor->thingidk = actor->pDistractor;
+                actor->pMoveThing = actor->pDistractor;
                 return 1;
             }
             psVar3 = actor->pInterest;
@@ -1001,7 +1001,7 @@ int sithAICmd_LookForTarget(sithActor *actor, sithAIClassEntry *aiclass, sithAct
                     sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_ALERT);
                     sithSoundClass_ThingPlaySoundclass4(actor->thing, SITH_SC_ACTIVATE);
                     sithAIAwareness_AddEntry(actor->pDistractor->sector, &actor->thing->position, 0, 3.0, actor->pDistractor);
-                    actor->thingidk = actor->pDistractor;
+                    actor->pMoveThing = actor->pDistractor;
                     return 1;
                 }
                 if (aiclass->argsAsFloat[0] == 0.0) {
@@ -1022,7 +1022,7 @@ int sithAICmd_LookForTarget(sithActor *actor, sithAIClassEntry *aiclass, sithAct
                     sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_ALERT);
                     sithSoundClass_ThingPlaySoundclass4(actor->thing, SITH_SC_ACTIVATE);
                     sithAIAwareness_AddEntry(actor->pDistractor->sector, &actor->thing->position, 0, 3.0, actor->pDistractor);
-                    actor->thingidk = actor->pDistractor;
+                    actor->pMoveThing = actor->pDistractor;
                     return 1;
                 }
                 if ( aiclass->argsAsFloat[0] == 0.0 )
@@ -1673,7 +1673,7 @@ int sithAICmd_LookForOpposingTarget(sithActor *pActor, sithAIClassEntry *pAiclas
                 sithSoundClass_PlayModeRandom(pActor->thing, SITH_SC_ALERT);
                 sithSoundClass_ThingPlaySoundclass4(pActor->thing, SITH_SC_ACTIVATE);
                 sithAIAwareness_AddEntry(pActor->pDistractor->sector, &pActor->thing->position, 0, 3.0, pActor->pDistractor);
-                pActor->thingidk = pActor->pDistractor;
+                pActor->pMoveThing = pActor->pDistractor;
                 return 1;
             }
             if (pAiclass->argsAsFloat[0] == 0.0)

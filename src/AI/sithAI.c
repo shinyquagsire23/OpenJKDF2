@@ -960,17 +960,17 @@ void sithAI_sub_4EAF40(sithActor *actor)
     if ( actor->field_224 != bShowInvisibleThings )
     {
         actor->field_224 = bShowInvisibleThings;
-        if ( actor->thingidk )
+        if ( actor->pMoveThing )
         {
-            if ( (actor->thingidk->actorParams.typeflags & SITH_AF_INVISIBLE) || (actor->thing->actorParams.typeflags & SITH_AF_COMBO_BLIND) != 0 )
+            if ( (actor->pMoveThing->actorParams.typeflags & SITH_AF_INVISIBLE) || (actor->thing->actorParams.typeflags & SITH_AF_COMBO_BLIND) != 0 )
                 v1 = 3;
-            v3 = sithAI_CheckSightThing(actor->thing, &actor->thing->position, actor->thingidk, -1.0, actor->aiclass->sightDist, 0.0, &actor->field_228, &actor->currentDistanceFromTarget);
+            v3 = sithAI_CheckSightThing(actor->thing, &actor->thing->position, actor->pMoveThing, -1.0, actor->aiclass->sightDist, 0.0, &actor->field_228, &actor->currentDistanceFromTarget);
             actor->field_238 = v3;
             if ( !v3 )
             {
-                if ( !v1 || sithAI_CanDetectSightThing(actor, actor->thingidk, actor->currentDistanceFromTarget) )
+                if ( !v1 || sithAI_CanDetectSightThing(actor, actor->pMoveThing, actor->currentDistanceFromTarget) )
                 {
-                    actor->field_23C = actor->thingidk->position;
+                    actor->field_23C = actor->pMoveThing->position;
                     actor->field_248 = sithTime_curMs;
                 }
                 else

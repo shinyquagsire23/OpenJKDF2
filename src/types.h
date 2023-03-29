@@ -2438,7 +2438,7 @@ typedef struct sithActor
     rdVector3 field_1F8;
     int field_204;
     rdVector3 blindAimError;
-    sithThing *thingidk;
+    sithThing *pMoveThing;
     rdVector3 movepos;
     int field_224;
     rdVector3 field_228;
