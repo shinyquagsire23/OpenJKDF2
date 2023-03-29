@@ -75,8 +75,8 @@ int jkGuiControlSaveLoad_ConfirmDelete(jkGuiElement *pElement, jkGuiMenu *pMenu,
     if ( jkGuiControlSaveLoad_aElements[4].selectedTextEntry < jkGuiControlSaveLoad_darray.total )
     {
         v5 = (jkGuiControlInfo *)jkGuiRend_GetId(&jkGuiControlSaveLoad_darray, jkGuiControlSaveLoad_aElements[4].selectedTextEntry);
-        v11 = jkStrings_GetText("GUI_CSLCONFIRM_DELETE");
-        v6 = jkStrings_GetText("GUI_CSLDELETE");
+        v11 = jkStrings_GetUniStringWithFallback("GUI_CSLCONFIRM_DELETE");
+        v6 = jkStrings_GetUniStringWithFallback("GUI_CSLDELETE");
         if ( jkGuiDialog_YesNoDialog(v6, v11) )
         {
             stdString_snprintf(tmp, 128, "controls\\%s", v5->fpath); // Added: sprintf -> snprintf
@@ -193,7 +193,7 @@ int jkGuiControlSaveLoad_Write(int bIdk)
             goto LABEL_43;
         if ( !bIdk || _wcslen(jkGuiControlSaveLoad_awTmp) )
             break;
-        jkGuiDialog_ErrorDialog(jkStrings_GetText("ERROR"), jkStrings_GetText("GUI_CSLMUSTENTERNAME"));
+        jkGuiDialog_ErrorDialog(jkStrings_GetUniStringWithFallback("ERROR"), jkStrings_GetUniStringWithFallback("GUI_CSLMUSTENTERNAME"));
     }
     if ( jkGuiControlSaveLoad_aElements[4].selectedTextEntry < 0 || jkGuiControlSaveLoad_aElements[4].selectedTextEntry >= jkGuiControlSaveLoad_darray.total )
         v5 = 0;

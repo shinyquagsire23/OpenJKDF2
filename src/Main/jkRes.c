@@ -402,15 +402,15 @@ LABEL_11:
         v24 = 1;
         if ( cdNumberNeeded )
         {
-            v8 = jkStrings_GetText("GUI_INSERTCD");
+            v8 = jkStrings_GetUniStringWithFallback("GUI_INSERTCD");
             jk_snwprintf(v28, 0x40u, v8, cdNumberNeeded);
         }
         else
         {
-            v7 = jkStrings_GetText("GUI_INSERTANYCD");
+            v7 = jkStrings_GetUniStringWithFallback("GUI_INSERTANYCD");
             jk_snwprintf(v28, 0x40u, v7);
         }
-        v9 = jkStrings_GetText("GUI_INSERTCDTITLE");
+        v9 = jkStrings_GetUniStringWithFallback("GUI_INSERTCDTITLE");
         if ( !jkGuiDialog_OkCancelDialog(v9, v28) )
             break;
 LABEL_39:

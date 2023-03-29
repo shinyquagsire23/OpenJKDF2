@@ -671,11 +671,11 @@ void jkQuakeConsole_SendInput(char wParam, int bIsChar)
         }
         if ( jkHud_dword_552D10 == -2 )
         {
-            //stdString_SafeWStrCopy(tmp, jkStrings_GetText("HUD_COMMAND"), 0x80u);
+            //stdString_SafeWStrCopy(tmp, jkStrings_GetUniStringWithFallback("HUD_COMMAND"), 0x80u);
         }
         else if ( jkHud_dword_552D10 == -1 )
         {
-            //stdString_SafeWStrCopy(tmp, jkStrings_GetText("HUD_SENDTOALL"), 0x80u);
+            //stdString_SafeWStrCopy(tmp, jkStrings_GetUniStringWithFallback("HUD_SENDTOALL"), 0x80u);
         }
         //int v2 = _wcslen(tmp);
         //stdString_CharToWchar(&tmp[v2], jkQuakeConsole_chatStr, 127 - v2);

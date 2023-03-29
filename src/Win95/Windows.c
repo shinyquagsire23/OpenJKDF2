@@ -246,15 +246,15 @@ int Windows_ErrorMsgboxWide(const char *a1, ...)
 
     va_start(va, a1);
 #ifndef SDL2_RENDER
-    v1 = jkStrings_GetText(a1);
+    v1 = jkStrings_GetUniStringWithFallback(a1);
     jk_vsnwprintf(Text, 0x400u, v1, va);
-    v4 = jkStrings_GetText("ERROR");
+    v4 = jkStrings_GetUniStringWithFallback("ERROR");
     v2 = stdGdi_GetHwnd();
     return jk_MessageBoxW(v2, Text, v4, 0x10u);
 #else
-    v1 = jkStrings_GetText(a1);
+    v1 = jkStrings_GetUniStringWithFallback(a1);
     jk_vsnwprintf(Text, 0x400u, v1, va);
-    //v4 = jkStrings_GetText("ERROR");
+    //v4 = jkStrings_GetUniStringWithFallback("ERROR");
     stdString_WcharToChar(tmp, Text, 1024);
 
     jk_printf("ERROR: %s\n", tmp);
@@ -275,15 +275,15 @@ int Windows_ErrorMsgbox(const char *a1, ...)
     va_start(va, a1);
 
 #ifndef SDL2_RENDER
-    v1 = jkStrings_GetText(a1);
+    v1 = jkStrings_GetUniStringWithFallback(a1);
     jk_vsnwprintf(Text, 0x200u, v1, va);
-    v4 = jkStrings_GetText("ERROR");
+    v4 = jkStrings_GetUniStringWithFallback("ERROR");
     v2 = stdGdi_GetHwnd();
     return jk_MessageBoxW(v2, Text, v4, 0x10u);
 #else
-    v1 = jkStrings_GetText(a1);
+    v1 = jkStrings_GetUniStringWithFallback(a1);
     jk_vsnwprintf(Text, 0x200u, v1, va);
-    //v4 = jkStrings_GetText("ERROR");
+    //v4 = jkStrings_GetUniStringWithFallback("ERROR");
 
     stdString_WcharToChar(tmp, Text, 512);
 
@@ -305,9 +305,9 @@ void Windows_GameErrorMsgbox(const char *a1, ...)
     va_start(va, a1);
 
 #ifndef SDL2_RENDER
-    v1 = jkStrings_GetText(a1);
+    v1 = jkStrings_GetUniStringWithFallback(a1);
     jk_vsnwprintf(Text, 0x200u, v1, va);
-    v3 = jkStrings_GetText("ERROR");
+    v3 = jkStrings_GetUniStringWithFallback("ERROR");
     stdDisplay_ClearMode();
     v2 = stdGdi_GetHwnd();
     jk_MessageBoxW(v2, Text, v3, 0x10u);

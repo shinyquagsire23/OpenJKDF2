@@ -118,8 +118,8 @@ int jkGuiKeyboard_RemoveControlClicked(jkGuiElement *pClickedElement, jkGuiMenu 
                 return 0;
             }
         }
-        v6 = jkStrings_GetText("ERR_REMOVING_CONTROL");
-        v5 = jkStrings_GetText("ERROR");
+        v6 = jkStrings_GetUniStringWithFallback("ERR_REMOVING_CONTROL");
+        v5 = jkStrings_GetUniStringWithFallback("ERROR");
         jkGuiDialog_ErrorDialog(v5, v6);
         jkGuiRend_Paint(&jkGuiKeyboard_menu);
         jkGui_MessageBeep();
@@ -240,7 +240,7 @@ int jkGuiKeyboard_EnumBindings(int inputFuncIdx, const char *pInputFuncStr, uint
     {
         if ( (a3 & 2) == 0
           || ((_strncpy(v18, pInputFuncStr, 0x1Fu), v18[31] = 0, (flags & 1) == 0) ? ((flags & 4) == 0 ? (v16 = "_K") : (v16 = "_R"), strncat(v18, v16, 0x20u)) : strncat(v18, "_A", 0x20u),
-              (v8 = jkStrings_GetText(v18)) != 0) )
+              (v8 = jkStrings_GetUniStringWithFallback(v18)) != 0) )
         {
             if ( dxKeyNum == -1 )
             {
@@ -276,7 +276,7 @@ int jkGuiKeyboard_EnumBindings(int inputFuncIdx, const char *pInputFuncStr, uint
                     v11 = stdControl_aDikNumToStr[v12].pStr;
                 }
 LABEL_25:
-                v9 = jkStrings_GetText(v11);
+                v9 = jkStrings_GetUniStringWithFallback(v11);
             }
             jk_snwprintf(wStr, 0xFFu, L"%ls%ls\t%ls", v17, v8, v9);
 
@@ -329,7 +329,7 @@ int jkGuiKeyboard_AddControlClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, in
     memset(v9, 0, sizeof(v9));
     v7 = __wcschr(v6, '\t');
     __wcsncpy(v9, v6, v7 - v6);
-    v8 = jkStrings_GetText("GUI_HIT_KEY_TO_ATTACH");
+    v8 = jkStrings_GetUniStringWithFallback("GUI_HIT_KEY_TO_ATTACH");
     jk_snwprintf(jkGuiKeyboard_wstr_555E18, 0x100u, v8, v9);
 
     return 0;
@@ -392,9 +392,9 @@ void jkGuiKeyboard_sub_4123C0(jkGuiMenu *pMenu)
             }
             memset(v12, 0, sizeof(v12));
             _wcsncpy(v12, v2, v3);
-            v6 = jkStrings_GetText("GUI_ALREADY_BOUND_Q");
+            v6 = jkStrings_GetUniStringWithFallback("GUI_ALREADY_BOUND_Q");
             jk_snwprintf(v13, 0x100u, v6, v12);
-            v7 = jkStrings_GetText("GUI_ALREADY_BOUND");
+            v7 = jkStrings_GetUniStringWithFallback("GUI_ALREADY_BOUND");
             if ( jkGuiDialog_YesNoDialog(v7, v13) )
             {
                 v4 = v11;
@@ -405,8 +405,8 @@ LABEL_23:
                 }
                 else
                 {
-                    v9 = jkStrings_GetText("ERR_CANNOT_BIND_CONTROL");
-                    v8 = jkStrings_GetText("ERROR");
+                    v9 = jkStrings_GetUniStringWithFallback("ERR_CANNOT_BIND_CONTROL");
+                    v8 = jkStrings_GetUniStringWithFallback("ERROR");
                     jkGuiDialog_ErrorDialog(v8, v9);
                 }
                 jkGuiRend_Paint(&jkGuiKeyboard_menu);
@@ -500,8 +500,8 @@ int jkGuiKeyboard_RestoreDefaultsClicked(jkGuiElement *pElement, jkGuiMenu *pMen
     if ( jkGuiKeyboard_bOnceIdk )
         return 0;
     jkGuiRend_PlayWav(pMenu->soundClick);
-    v4 = jkStrings_GetText("GUI_RESTORE_DEFAULTS_Q");
-    v3 = jkStrings_GetText("GUI_RESTORE_DEFAULTS");
+    v4 = jkStrings_GetUniStringWithFallback("GUI_RESTORE_DEFAULTS_Q");
+    v3 = jkStrings_GetUniStringWithFallback("GUI_RESTORE_DEFAULTS");
     if ( jkGuiDialog_YesNoDialog(v3, v4) )
     {
         sithControl_sub_4D7350();

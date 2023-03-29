@@ -86,7 +86,7 @@ void jkGuiObjectives_CustomRender(jkGuiElement *element, jkGuiMenu *menu, stdVBu
 
     if ( !v14 )
     {
-        v13 = jkStrings_GetText("GUI_NO_OBJECTIVES");
+        v13 = jkStrings_GetUniStringWithFallback("GUI_NO_OBJECTIVES");
         stdFont_Draw1(vbuf, menu->fonts[element->textType], element->rect.x + 30, element->rect.y, element->rect.width, v13, 1);
     }
 }
@@ -122,13 +122,13 @@ int jkGuiObjectives_Show()
     v5 = sithPlayer_GetBinAmt(SITHBIN_MAXSECRETS);
     if ( (int)(__int64)v5 <= 0 )
     {
-        v9 = jkStrings_GetText("GUI_NO_SECRETS");
-        v7 = jkStrings_GetText("GUI_SECRETS_FOUND");
+        v9 = jkStrings_GetUniStringWithFallback("GUI_NO_SECRETS");
+        v7 = jkStrings_GetUniStringWithFallback("GUI_SECRETS_FOUND");
         jk_snwprintf(v10, 0x20u, L"%ls %ls", v7, v9);
     }
     else
     {
-        v6 = jkStrings_GetText("GUI_SECRETS_FOUND");
+        v6 = jkStrings_GetUniStringWithFallback("GUI_SECRETS_FOUND");
         jk_snwprintf(v10, 0x20u, L"%ls %d/%d", v6, v4, (unsigned int)(__int64)v5);
     }
     jkGuiObjectives_elements[3].wstr = v10;

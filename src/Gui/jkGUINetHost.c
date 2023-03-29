@@ -321,7 +321,7 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
     jkGuiNetHost_aElements[NETHOST_TEAMMODE_CHECKBOX].selectedTextEntry = jkGuiNetHost_gameFlags & MULTIMODEFLAG_TEAMS;
     if ( !jkGuiNetHost_gameName[0] )
     {
-        jk_snwprintf(jkGuiNetHost_gameName, 0x20u, jkStrings_GetText("GUI_DEFAULT_GAME_NAME"), jkPlayer_playerShortName);
+        jk_snwprintf(jkGuiNetHost_gameName, 0x20u, jkStrings_GetUniStringWithFallback("GUI_DEFAULT_GAME_NAME"), jkPlayer_playerShortName);
     }
     jkGuiNetHost_aElements[NETHOST_GAMENAME_TEXTBOX].wstr = jkGuiNetHost_gameName;
     jkGuiNetHost_aElements[NETHOST_GAMENAME_TEXTBOX].selectedTextEntry = 16;
@@ -345,7 +345,7 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
     jkGuiNetHost_aElements[NETHOST_TIMELIMIT_TEXTBOX].wstr = v26;
     jkGuiNetHost_aElements[NETHOST_TIMELIMIT_TEXTBOX].selectedTextEntry = 4;
     __snprintf(v29, 32, "RANK_%d_L", jkGuiNetHost_maxRank); // sprintf -> snprintf
-    jk_snwprintf(jkGuiNetHost_wstrStarsText, 0x80u, jkStrings_GetText("GUI_RANK"), jkGuiNetHost_maxRank, jkStrings_GetText(v29));
+    jk_snwprintf(jkGuiNetHost_wstrStarsText, 0x80u, jkStrings_GetUniStringWithFallback("GUI_RANK"), jkGuiNetHost_maxRank, jkStrings_GetUniStringWithFallback(v29));
     memset(v30, 0, sizeof(v30));
     jkGuiNetHost_aElements[NETHOST_STARS_TEXT].wstr = jkGuiNetHost_wstrStarsText;
     jkGuiNetHost_aElements[NETHOST_PASSWORD_TEXTBOX].wstr = v30;
@@ -539,7 +539,7 @@ int jkGuiNetHost_sub_4119D0(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX
     else
     {
         jkGuiRend_DarrayFreeEntry(&jkGuiNetHost_dArray2);
-        jkGuiRend_DarrayReallocStr(&jkGuiNetHost_dArray2, jkStrings_GetText("GUI_NO_LEVELS_IN_EPISODE"), 0);
+        jkGuiRend_DarrayReallocStr(&jkGuiNetHost_dArray2, jkStrings_GetUniStringWithFallback("GUI_NO_LEVELS_IN_EPISODE"), 0);
         jkGuiRend_DarrayReallocStr(&jkGuiNetHost_dArray2, 0, 0);
         jkGuiRend_SetClickableString(&jkGuiNetHost_aElements[NETHOST_LEVEL_LISTBOX], &jkGuiNetHost_dArray2);
     }
@@ -582,9 +582,9 @@ int jkGuiNetHost_sub_411AE0(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX
         if ( jkGuiNetHost_maxRank )
         {
             stdString_snprintf(v12, 32, "RANK_%d_L", --jkGuiNetHost_maxRank);
-            v11 = jkStrings_GetText(v12);
+            v11 = jkStrings_GetUniStringWithFallback(v12);
             v9 = jkGuiNetHost_maxRank;
-            v7 = jkStrings_GetText("GUI_RANK");
+            v7 = jkStrings_GetUniStringWithFallback("GUI_RANK");
             jk_snwprintf(jkGuiNetHost_wstrStarsText, 0x80u, v7, v9, v11);
             jkGuiNetHost_aElements[NETHOST_STARS_TEXT].wstr = jkGuiNetHost_wstrStarsText;
             jkGuiRend_UpdateAndDrawClickable(&jkGuiNetHost_aElements[NETHOST_STARS_TEXT], pMenu, 1);
@@ -593,7 +593,7 @@ int jkGuiNetHost_sub_411AE0(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX
     else if ( pElement->hoverId == 2 && (unsigned int)jkGuiNetHost_maxRank < 8 )
     {
         stdString_snprintf(v12, 32, "RANK_%d_L", ++jkGuiNetHost_maxRank);
-        jk_snwprintf(jkGuiNetHost_wstrStarsText, 0x80u, jkStrings_GetText("GUI_RANK"), jkGuiNetHost_maxRank, jkStrings_GetText(v12));
+        jk_snwprintf(jkGuiNetHost_wstrStarsText, 0x80u, jkStrings_GetUniStringWithFallback("GUI_RANK"), jkGuiNetHost_maxRank, jkStrings_GetUniStringWithFallback(v12));
         jkGuiNetHost_aElements[NETHOST_STARS_TEXT].wstr = jkGuiNetHost_wstrStarsText;
         jkGuiRend_UpdateAndDrawClickable(&jkGuiNetHost_aElements[NETHOST_STARS_TEXT], pMenu, 1);
         return 0;

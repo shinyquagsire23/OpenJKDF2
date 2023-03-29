@@ -251,7 +251,7 @@ skip_free_things:
         jkPlayer_InitSaber();
         sithMain_AutoSave();
 
-        jkGuiDialog_ErrorDialog(jkStrings_GetText("ERROR"), L"This save is outdated and cannot be loaded fully. The level will be restarted with your existing inventory and progress.");
+        jkGuiDialog_ErrorDialog(jkStrings_GetUniStringWithFallback("ERROR"), L"This save is outdated and cannot be loaded fully. The level will be restarted with your existing inventory and progress.");
 
         goto skip_dss;
     }

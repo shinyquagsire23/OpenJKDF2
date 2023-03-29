@@ -571,7 +571,7 @@ int jkCutscene_smack_related_loops()
 
                     char key[32];
                     stdString_snprintf(key, 32, "COG_%05d", iVar2 * 10000 + uVar4);
-                    str = jkStrings_GetText(key);
+                    str = jkStrings_GetUniStringWithFallback(key);
                 }
                 
                 if (str) {
@@ -633,7 +633,7 @@ int jkCutscene_PauseShow(int unk)
 
     if ( jkCutscene_55AA54 )
     {
-        v0 = jkStrings_GetText("GUI_PAUSED");
+        v0 = jkStrings_GetUniStringWithFallback("GUI_PAUSED");
         stdFont_Draw4(&Video_otherBuf, jkCutscene_subtitlefont, 0, 10, 640, 40, 3, v0, 0);
     }
     else

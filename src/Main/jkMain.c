@@ -127,8 +127,8 @@ int jkMain_SetVideoMode()
     {
         thing_six = 1;
         sithControl_Close();
-        v3 = jkStrings_GetText("ERR_CHANGING_VIDEO_DESC");
-        v1 = jkStrings_GetText("ERR_CHANGING_VIDEO_MODE");
+        v3 = jkStrings_GetUniStringWithFallback("ERR_CHANGING_VIDEO_DESC");
+        v1 = jkStrings_GetUniStringWithFallback("ERR_CHANGING_VIDEO_MODE");
         jkGuiDialog_ErrorDialog(v1, v3);
         sithControl_Open();
         thing_six = 0;
@@ -151,8 +151,8 @@ LABEL_12:
             jkGuiRend_thing_four = 1;
         jkSmack_stopTick = 1;
         jkSmack_nextGuiState = 3;
-        v4 = jkStrings_GetText("ERR_CHANGING_VIDEO_ABORT");
-        v2 = jkStrings_GetText("ERR_CHANGING_VIDEO_MODE");
+        v4 = jkStrings_GetUniStringWithFallback("ERR_CHANGING_VIDEO_ABORT");
+        v2 = jkStrings_GetUniStringWithFallback("ERR_CHANGING_VIDEO_MODE");
         jkGuiDialog_ErrorDialog(v2, v4);
         result = 0;
     }
@@ -578,8 +578,8 @@ void jkMain_GameplayShow(int a1, int a2)
                 jkGuiRend_thing_four = 1;
             jkSmack_stopTick = 1;
             jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
-            v6 = jkStrings_GetText("ERR_CANNOT_LOAD_LEVEL");
-            v4 = jkStrings_GetText("ERROR");
+            v6 = jkStrings_GetUniStringWithFallback("ERR_CANNOT_LOAD_LEVEL");
+            v4 = jkStrings_GetUniStringWithFallback("ERROR");
             jkGuiDialog_ErrorDialog(v4, v6);
             return;
         }
@@ -1086,8 +1086,8 @@ int jkMain_cd_swap_reverify(jkEpisodeEntry *ent)
                 v6 = 1;
             if ( !v6 )
             {
-                v8 = jkStrings_GetText("GUI_CONFIRM_ABORTCD");
-                v7 = jkStrings_GetText("GUI_ABORTCDREQUEST");
+                v8 = jkStrings_GetUniStringWithFallback("GUI_CONFIRM_ABORTCD");
+                v7 = jkStrings_GetUniStringWithFallback("GUI_ABORTCDREQUEST");
                 if ( jkGuiDialog_YesNoDialog(v7, v8) )
                     v5 = 1;
             }
@@ -1575,8 +1575,8 @@ int jkMain_SetVideoMode()
     {
         thing_six = 1;
         //sithControl_Close();
-        v3 = jkStrings_GetText("ERR_CHANGING_VIDEO_DESC");
-        v1 = jkStrings_GetText("ERR_CHANGING_VIDEO_MODE");
+        v3 = jkStrings_GetUniStringWithFallback("ERR_CHANGING_VIDEO_DESC");
+        v1 = jkStrings_GetUniStringWithFallback("ERR_CHANGING_VIDEO_MODE");
         jkGuiDialog_ErrorDialog(v1, v3);
         //sithControl_Open();
         thing_six = 0;

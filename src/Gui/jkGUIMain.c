@@ -134,8 +134,8 @@ void jkGuiMain_Show()
                     v1 = jkGuiMultiplayer_Show();
                     break;
                 case 12:
-                    v4 = jkStrings_GetText("GUI_QUITCONFIRM_Q");
-                    v2 = jkStrings_GetText("GUI_QUITCONFIRM");
+                    v4 = jkStrings_GetUniStringWithFallback("GUI_QUITCONFIRM_Q");
+                    v2 = jkStrings_GetUniStringWithFallback("GUI_QUITCONFIRM");
                     if ( !jkGuiDialog_YesNoDialog(v2, v4) )
                         goto LABEL_12;
 

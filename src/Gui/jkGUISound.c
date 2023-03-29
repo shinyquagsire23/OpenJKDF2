@@ -113,9 +113,9 @@ int jkGuiSound_Show()
 
     // START MOTS removed:
     if ( jkGuiSound_bLowResSound )
-        v0 = jkStrings_GetText("GUI_LOWRESSOUNDS");
+        v0 = jkStrings_GetUniStringWithFallback("GUI_LOWRESSOUNDS");
     else
-        v0 = jkStrings_GetText("GUI_HIGHRESSOUNDS");
+        v0 = jkStrings_GetUniStringWithFallback("GUI_HIGHRESSOUNDS");
 
     jkGuiSound_elements[8].wstr = v0;
     // END MOTS removed
@@ -144,8 +144,8 @@ int jkGuiSound_Show()
         jkGuiSound_numChannels = jkGuiSound_elements[18].selectedTextEntry + 8;
         if ( jkGuiSound_b3DSound_3 && jkGuiSound_elements[7].selectedTextEntry != jkGuiSound_b3DSound_2 )
         {
-            v4 = jkStrings_GetText("GUISOUND_MUSTRESTART");
-            v2 = jkStrings_GetText("GUISOUND_WARNING");
+            v4 = jkStrings_GetUniStringWithFallback("GUISOUND_MUSTRESTART");
+            v2 = jkStrings_GetUniStringWithFallback("GUISOUND_WARNING");
             jkGuiDialog_ErrorDialog(v2, v4);
             jkGuiSound_b3DSound_2 = jkGuiSound_elements[7].selectedTextEntry;
             wuRegistry_SaveBool("b3DSound", (HKEY)jkGuiSound_elements[7].selectedTextEntry);

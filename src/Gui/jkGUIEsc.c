@@ -141,7 +141,7 @@ void jkGuiEsc_Show()
                 return;
 
             case JKGUIESC_RESTART:
-                if ( !jkGuiDialog_YesNoDialog(jkStrings_GetText("GUI_RESTART_MISSION"), jkStrings_GetText("GUI_CONFIRM_RESTART")) )
+                if ( !jkGuiDialog_YesNoDialog(jkStrings_GetUniStringWithFallback("GUI_RESTART_MISSION"), jkStrings_GetUniStringWithFallback("GUI_CONFIRM_RESTART")) )
                     continue;
                 jkPlayer_LoadAutosave();
                 jkMain_MissionReload();
@@ -162,7 +162,7 @@ void jkGuiEsc_Show()
                 continue;
 
             case JKGUIESC_ABORT:
-                if ( !jkGuiDialog_YesNoDialog(jkStrings_GetText("GUI_ABORT_GAME"), jkStrings_GetText("GUI_CONFIRM_ABORT")) )
+                if ( !jkGuiDialog_YesNoDialog(jkStrings_GetUniStringWithFallback("GUI_ABORT_GAME"), jkStrings_GetUniStringWithFallback("GUI_CONFIRM_ABORT")) )
                     continue;
                 jkMain_MenuReturn();
                 jkGuiRend_UpdateSurface();

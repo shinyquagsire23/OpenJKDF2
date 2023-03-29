@@ -175,11 +175,11 @@ int Main_StartupDedicated()
               v34.maxRank);
     if ( v21 == 0x88770118 )
     {
-        jkGuiDialog_ErrorDialog(jkStrings_GetText("GUINET_HOSTERROR"), jkStrings_GetText("GUINET_USERCANCEL"));
+        jkGuiDialog_ErrorDialog(jkStrings_GetUniStringWithFallback("GUINET_HOSTERROR"), jkStrings_GetUniStringWithFallback("GUINET_USERCANCEL"));
     }
     else if ( v21 )
     {
-        jkGuiDialog_ErrorDialog(jkStrings_GetText("GUINET_HOSTERROR"), jkStrings_GetText("GUINET_NOCONNECT"));
+        jkGuiDialog_ErrorDialog(jkStrings_GetUniStringWithFallback("GUINET_HOSTERROR"), jkStrings_GetUniStringWithFallback("GUINET_NOCONNECT"));
     }
     
     std3D_StartScene();

@@ -441,7 +441,7 @@ void jkCog_PrintUniString(sithCog *ctx)
     stdString_snprintf(key, 64, "COG_%05d", v1);
     v4 = stdStrTable_GetUniString(&jkCog_strings, key);
     if ( !v4 )
-        v4 = jkStrings_GetText(key);
+        v4 = jkStrings_GetUniStringWithFallback(key);
     stdString_WcharToChar(v8, v4, 127);
     v8[127] = 0;
     if ( v3 >= 0 )
@@ -646,7 +646,7 @@ void jkCog_StringConcatUnistring(sithCog *pCog)
     stdString_snprintf(key, 32, "COG_%05d", uniID);
     str = stdStrTable_GetUniString(&jkCog_strings, key);
     if ( !str )
-        str = jkStrings_GetText(key);
+        str = jkStrings_GetUniStringWithFallback(key);
 
     finalLen = _wcslen(str) + _wcslen(jkCog_jkstring);
     if (finalLen < 0x81)

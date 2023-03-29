@@ -205,7 +205,7 @@ LABEL_30:
                             goto LABEL_50;
                     }
                     stdString_GetQuotedStringContents(v29, jkEpisode_var4, 128);
-                    v22 = jkStrings_GetText(jkEpisode_var4);
+                    v22 = jkStrings_GetUniStringWithFallback(jkEpisode_var4);
                     _wcsncpy(v16->unistr, v22, 0x40u);
                     v16->type = JK_EPISODE_SINGLEPLAYER;
                     v24 = 0;
@@ -239,7 +239,7 @@ LABEL_50:
             }
             else
             {
-                v27 = jkStrings_GetText("ERR_INVALID_EPISODE %s");
+                v27 = jkStrings_GetUniStringWithFallback("ERR_INVALID_EPISODE %s");
                 jk_snwprintf(v16->unistr, 0x40u, v27, v16);
             }
             result = v28 + 1;

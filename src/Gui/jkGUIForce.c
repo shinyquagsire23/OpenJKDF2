@@ -299,7 +299,7 @@ void jkGuiForce_ForceStarsDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffe
     int spendStars = (int)sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS);
     if ( spendStars <= 0 )
     {
-        stdFont_Draw4(vbuf, jkGui_stdFonts[2], element->rect.x, element->rect.y, element->rect.width, element->rect.height, 3, jkStrings_GetText("GUI_NO_STARS"), 1);
+        stdFont_Draw4(vbuf, jkGui_stdFonts[2], element->rect.x, element->rect.y, element->rect.width, element->rect.height, 3, jkStrings_GetUniStringWithFallback("GUI_NO_STARS"), 1);
     }
     else
     {
@@ -527,7 +527,7 @@ int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, wchar_t* a5, int *p
         stdString_snprintf(std_genBuffer, 1024, "RANK_%d_%c", jkPlayer_GetJediRank(), (darklight_float >= 0.0) ? 'L' : 'D');
     }
 
-    jkGuiForce_pElements[EIDX_FLAVORTEXT].wstr = jkStrings_GetText(std_genBuffer);
+    jkGuiForce_pElements[EIDX_FLAVORTEXT].wstr = jkStrings_GetUniStringWithFallback(std_genBuffer);
     if ( Main_bMotsCompat || (!Main_bMotsCompat && a4 == 0) )
     {
         newStars = (int)sithPlayer_GetBinAmt(SITHBIN_NEW_STARS);
@@ -562,7 +562,7 @@ int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, wchar_t* a5, int *p
         {
             if ( darklight_float >= 0.0 )
             {
-                jkGuiForce_pElements[EIDX_FLAVORTEXT].wstr = jkStrings_GetText("GUI_PATH_LIGHT");
+                jkGuiForce_pElements[EIDX_FLAVORTEXT].wstr = jkStrings_GetUniStringWithFallback("GUI_PATH_LIGHT");
                 if ( jkPlayer_GetAlignment() == 1 )
                 {
                     sithPlayer_SetBinCarries(SITHBIN_F_PROTECTION, 1);
@@ -573,7 +573,7 @@ int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, wchar_t* a5, int *p
             }
             else
             {
-                jkGuiForce_pElements[EIDX_FLAVORTEXT].wstr = jkStrings_GetText("GUI_PATH_DARK");
+                jkGuiForce_pElements[EIDX_FLAVORTEXT].wstr = jkStrings_GetUniStringWithFallback("GUI_PATH_DARK");
                 if ( jkPlayer_GetAlignment() == 2 )
                 {
                     sithPlayer_SetBinCarries(SITHBIN_F_DEADLYSIGHT, 1);
@@ -615,7 +615,7 @@ int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, wchar_t* a5, int *p
         clicked = jkGuiRend_DisplayAndReturnClicked(jkGuiForce_pMenu);
         if ( clicked == -1 )
         {
-            if ( !jkGuiDialog_YesNoDialog(jkStrings_GetText("GUI_ABORT_GAME"), jkStrings_GetText("GUI_CONFIRM_ABORTCD")) )
+            if ( !jkGuiDialog_YesNoDialog(jkStrings_GetUniStringWithFallback("GUI_ABORT_GAME"), jkStrings_GetUniStringWithFallback("GUI_CONFIRM_ABORTCD")) )
                 continue;
         }
         else if ( clicked != 1 )
@@ -735,7 +735,7 @@ void jkGuiForce_UpdateViewForRankMots(void)
         }
 
         if (jediRank_ != 0) {
-            jk_snwprintf(pwVar5,100,jkStrings_GetText("GUI_CHOOSE_N"),jediRank_);
+            jk_snwprintf(pwVar5,100,jkStrings_GetUniStringWithFallback("GUI_CHOOSE_N"),jediRank_);
         }
         pwVar5 = pwVar5 + 100;
     }

@@ -31,7 +31,7 @@ wchar_t* jkStrings_GetUniString(const char *key)
     return result;
 }
 
-wchar_t* jkStrings_GetText(const char *key)
+wchar_t* jkStrings_GetUniStringWithFallback(const char *key)
 {
     wchar_t *result; // eax
 

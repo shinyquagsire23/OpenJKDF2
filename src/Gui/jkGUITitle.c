@@ -92,7 +92,7 @@ wchar_t* jkGuiTitle_quicksave_related_func1(stdStrTable *strTable, char *jkl_fna
 
     retval = stdStrTable_GetUniString(strTable, key);
     if ( !retval )
-        retval = jkStrings_GetText(key);
+        retval = jkStrings_GetUniStringWithFallback(key);
 
     texts = jkGuiTitle_aTexts;
     // Added: cleanup
@@ -267,7 +267,7 @@ void jkGuiTitle_ShowLoadingStatic()
     verMinor = jkGuiTitle_verMinor;
     verMajor = jkGuiTitle_verMajor;
     verMotsStr = L""; // TODO?
-    guiVersionStr = jkStrings_GetText("GUI_VERSION");
+    guiVersionStr = jkStrings_GetUniStringWithFallback("GUI_VERSION");
     jk_snwprintf(jkGuiTitle_versionBuffer, sizeof(jkGuiTitle_versionBuffer) / sizeof(wchar_t), guiVersionStr, verMajor, verMinor, verRevision, verMotsStr);
     jkGuiTitle_elementsLoadStatic[4].wstr = jkGuiTitle_versionBuffer;
     jkGuiTitle_elementsLoadStatic[1].selectedTextEntry = 0;
