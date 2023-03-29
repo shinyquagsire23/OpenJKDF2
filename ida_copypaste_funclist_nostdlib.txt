@@ -2532,7 +2532,7 @@ sithEvent_Advance	.text	004F28B0	000000B8	00000008	00000000	R	.	.	.	.	.	.	.
 sithStrTable_Startup	.text	004F2970	0000001D			R	.	.	.	.	.	.	.
 sithStrTable_Shutdown	.text	004F2990	00000018			R	.	.	.	.	.	.	.
 sithStrTable_GetUniString	.text	004F29B0	00000013	00000000	00000004	R	.	.	.	.	.	T	.
-sithStrTable_GetString	.text	004F29D0	00000013	00000000	00000004	R	.	.	.	.	.	T	.
+sithStrTable_GetUniStringWithFallback	.text	004F29D0	00000013	00000000	00000004	R	.	.	.	.	.	T	.
 sithAIAwareness_Startup	.text	004F29F0	0000005D			R	.	.	.	.	.	.	.
 sithAIAwareness_Shutdown	.text	004F2A50	00000037			R	.	.	.	.	.	T	.
 sithAIAwareness_AddEntry	.text	004F2A90	00000077	00000000	00000014	R	.	.	.	.	.	T	.

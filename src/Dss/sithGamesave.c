@@ -505,7 +505,7 @@ int sithGamesave_Flush()
             sithGamesave_saveName[127] = 0;
             _wcsncpy(sithGamesave_wsaveName, sithGamesave_headerTmp.saveName, 0xFFu);
             sithGamesave_wsaveName[255] = 0;
-            sithConsole_PrintUniStr(sithStrTable_GetString("GAME_SAVED"));
+            sithConsole_PrintUniStr(sithStrTable_GetUniStringWithFallback("GAME_SAVED"));
         }
         sithComm_multiplayerFlags = multiplayerFlagsSave;
     }

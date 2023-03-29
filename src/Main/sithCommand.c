@@ -154,11 +154,11 @@ LABEL_13:
             stdString_CharToWchar(v9, pCmd->cmdStr, 31);
             v9[31] = 0;
             if ( (*v2 & v3) != 0 )
-                v5 = sithStrTable_GetString("ON");
+                v5 = sithStrTable_GetUniStringWithFallback("ON");
             else
-                v5 = sithStrTable_GetString("OFF");
+                v5 = sithStrTable_GetUniStringWithFallback("OFF");
             v8 = v5;
-            v6 = sithStrTable_GetString("%s_IS_%s");
+            v6 = sithStrTable_GetUniStringWithFallback("%s_IS_%s");
             jk_snwprintf(a1, 0x80u, v6, v9, v8);
             sithConsole_PrintUniStr(a1);
             result = 1;
@@ -375,13 +375,13 @@ int sithCommand_CmdFly(stdDebugConsoleCmd *pCmd, const char *pArgStr)
             {
                 v0->physicsParams.physflags &= ~SITH_PF_FLY;
                 v0->physicsParams.physflags |= SITH_PF_USEGRAVITY;
-                v3 = sithStrTable_GetString("FLYING_OFF");
+                v3 = sithStrTable_GetUniStringWithFallback("FLYING_OFF");
             }
             else
             {
                 v0->physicsParams.physflags &= ~SITH_PF_USEGRAVITY;
                 v0->physicsParams.physflags |= SITH_PF_FLY;
-                v3 = sithStrTable_GetString("FLYING_ON");
+                v3 = sithStrTable_GetUniStringWithFallback("FLYING_ON");
             }
             sithConsole_PrintUniStr(v3);
             return 1;

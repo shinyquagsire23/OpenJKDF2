@@ -917,15 +917,15 @@ int sithControl_HandlePlayer(sithThing *player, float deltaSecs)
                 {
                     if ( sithNet_isMulti )
                     {
-                        v17 = sithStrTable_GetString("PRESS_ACTIVATE_TO_RESPAWN");
+                        v17 = sithStrTable_GetUniStringWithFallback("PRESS_ACTIVATE_TO_RESPAWN");
                     }
                     else if ( !__strnicmp(sithGamesave_autosave_fname, "_JKAUTO_", 8u) )
                     {
-                        v17 = sithStrTable_GetString("PRESS_ACTIVATE_TO_RESTART");
+                        v17 = sithStrTable_GetUniStringWithFallback("PRESS_ACTIVATE_TO_RESTART");
                     }
                     else
                     {
-                        v17 = sithStrTable_GetString("PRESS_ACTIVATE_TO_RESTORE");
+                        v17 = sithStrTable_GetUniStringWithFallback("PRESS_ACTIVATE_TO_RESTORE");
                     }
                     sithConsole_PrintUniStr(v17);
                     sithConsole_AlertSound();

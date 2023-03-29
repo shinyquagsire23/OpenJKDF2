@@ -954,7 +954,7 @@ void do_hooks()
     hook_function(sithStrTable_Startup_ADDR, sithStrTable_Startup);
     hook_function(sithStrTable_Shutdown_ADDR, sithStrTable_Shutdown);
     hook_function(sithStrTable_GetUniString_ADDR, sithStrTable_GetUniString);
-    hook_function(sithStrTable_GetString_ADDR, sithStrTable_GetString);
+    hook_function(sithStrTable_GetUniStringWithFallback_ADDR, sithStrTable_GetUniStringWithFallback);
 
 #ifndef LINUX
     // stdConsole
