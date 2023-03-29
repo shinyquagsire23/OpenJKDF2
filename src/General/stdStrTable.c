@@ -237,7 +237,7 @@ wchar_t* stdStrTable_GetUniString(stdStrTable* pTable, const char *key)
     return result;
 }
 
-wchar_t* stdStrTable_GetString(stdStrTable* pTable, char *key)
+wchar_t* stdStrTable_GetStringWithFallback(stdStrTable* pTable, char *key)
 {
     stdStrMsg *v2; // eax
     wchar_t *result; // eax

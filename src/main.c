@@ -944,7 +944,7 @@ void do_hooks()
     hook_function(stdStrTable_Load_ADDR, stdStrTable_Load);
     hook_function(stdStrTable_Free_ADDR, stdStrTable_Free);
     hook_function(stdStrTable_GetUniString_ADDR, stdStrTable_GetUniString);
-    hook_function(stdStrTable_GetString_ADDR, stdStrTable_GetString);
+    hook_function(stdStrTable_GetStringWithFallback_ADDR, stdStrTable_GetStringWithFallback);
     
     // stdPcx
     hook_function(stdPcx_Load_ADDR, stdPcx_Load);

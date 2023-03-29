@@ -37,7 +37,7 @@ wchar_t* jkStrings_GetText(const char *key)
 
     result = stdStrTable_GetUniString(&jkstrings_hashmap, key);
     if ( !result )
-        result = stdStrTable_GetString(&jkCog_strings, (char *)key);
+        result = stdStrTable_GetStringWithFallback(&jkCog_strings, (char *)key);
     return result;
 }
 

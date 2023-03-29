@@ -29,5 +29,5 @@ wchar_t* sithStrTable_GetUniString(const char *key)
 
 wchar_t* sithStrTable_GetString(char *key)
 {
-    return stdStrTable_GetString(&sithStrTable_pSithStrings, key);
+    return stdStrTable_GetStringWithFallback(&sithStrTable_pSithStrings, key);
 }
