@@ -182,7 +182,7 @@ void jkQuakeConsole_Render()
 
     // Show update text over everything
     if (jkQuakeConsole_bShowUpdateText || jkQuakeConsole_bClickedUpdate) {
-        char tmp[128];
+        wchar_t tmp[128];
 
         jkQuakeConsole_updateTextCooldown -= deltaUs;
         if (jkQuakeConsole_updateTextCooldown <= 0) {
@@ -192,11 +192,11 @@ void jkQuakeConsole_Render()
 
         // TODO: i8n
         stdUpdater_GetUpdateText(tmp, sizeof(tmp));
-        jkQuakeConsole_updateTextWidth = stdFont_DrawAsciiGPU(jkQuakeConsole_pFont, 0, 0, screenW, tmp, 1, jkPlayer_hudScale);
-
+        jkQuakeConsole_updateTextWidth = stdFont_Draw1GPU(jkQuakeConsole_pFont, 0, 0, screenW, tmp, 1, jkPlayer_hudScale);
+        
 #if !defined(PLATFORM_LINUX)
         if (!jkQuakeConsole_bClickedUpdate) {
-            stdFont_DrawAsciiGPU(jkQuakeConsole_pFont, 0, fontHeight, screenW, "Click here to download.", 1, jkPlayer_hudScale);
+            stdFont_Draw1GPU(jkQuakeConsole_pFont, 0, fontHeight, screenW, jkStrings_GetUniStringWithFallback("GUIEXT_UPDATE_CLICK_TO_DL"), 1, jkPlayer_hudScale);
         }
 #endif
         jkQuakeConsole_updateTextHeight = (int)(fontHeight * 2);

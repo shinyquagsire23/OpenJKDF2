@@ -9,7 +9,7 @@ extern "C" {
 
 void stdUpdater_StartupCvars();
 int stdUpdater_CheckForUpdates();
-void stdUpdater_GetUpdateText(char* pOut, size_t outSz);
+void stdUpdater_GetUpdateText(wchar_t* pOut, size_t outSz);
 void stdUpdater_DoUpdate();
 
 #ifdef __cplusplus

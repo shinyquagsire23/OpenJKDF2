@@ -1545,7 +1545,12 @@ LABEL_21:
             }
             if ( (int)(v9 + INT_FLOAT_SCALED(a5a.width, scale)) < (int)(blit_x + a5) )
             {
-                std3D_DrawUIBitmap(font->bitmap, 0, v9, blit_y, &a5a, scale, alpha_maybe);
+                // Added: monospace
+                int shift = 0;
+                if (font->monospaceW && a5a.width < font->monospaceW) {
+                    shift = (font->monospaceW - a5a.width)/2;
+                }
+                std3D_DrawUIBitmap(font->bitmap, 0, v9+shift, blit_y, &a5a, scale, alpha_maybe);
                 v13 = a5a.width + font->marginY;
                 goto LABEL_26;
             }
@@ -1559,6 +1564,10 @@ LABEL_27:
         }
         v13 = font->marginX;
 LABEL_26:
+        // Added: monospace
+        if (v13 < font->monospaceW) {
+            v13 = font->monospaceW;
+        }
         v9 += INT_FLOAT_SCALED(v13, scale);
         goto LABEL_27;
     }
@@ -1666,6 +1675,10 @@ LABEL_27:
         }
         v13 = font->marginX;
 LABEL_26:
+        // Added: monospace
+        if (v13 < font->monospaceW) {
+            v13 = font->monospaceW;
+        }
         v9 += INT_FLOAT_SCALED(v13, scale);
         goto LABEL_27;
     }

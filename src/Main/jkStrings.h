@@ -1,6 +1,10 @@
 #ifndef _JKSTRINGS_H
 #define _JKSTRINGS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "types.h"
 
 #define jkStrings_Startup_ADDR (0x0040B3F0)
@@ -17,6 +21,11 @@ int jkStrings_unused_sub_40B490();
 
 #ifdef QOL_IMPROVEMENTS
 extern stdStrTable jkStrings_tableExtOver;
+#endif
+
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // _JKSTRINGS_H

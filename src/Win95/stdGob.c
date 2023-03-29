@@ -372,7 +372,7 @@ const char* stdGob_FileGets(stdGobFile *f, char *out, unsigned int len)
             *(++cutoff) = 0;
         }
 
-        size_t actual_read = strlen(out)+1;
+        size_t actual_read = strlen(out);
         f->seekOffs += actual_read;
 
         if (!actual_read) return NULL;
@@ -433,7 +433,7 @@ const wchar_t* stdGob_FileGetws(stdGobFile *f, wchar_t *out, unsigned int len)
             *(++cutoff) = 0;
         }
 
-        size_t actual_read = (_wcslen(out)+1)*sizeof(wchar_t);
+        size_t actual_read = (_wcslen(out))*sizeof(wchar_t);
         f->seekOffs += actual_read;
 
         if (!actual_read) return NULL;

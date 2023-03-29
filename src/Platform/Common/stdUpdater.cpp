@@ -10,6 +10,7 @@
 #include "General/stdFnames.h"
 #include "General/stdFileUtil.h"
 #include "Main/sithCvar.h"
+#include "Main/jkStrings.h"
 #include "stdPlatform.h"
 
 #ifdef PLATFORM_PHYSFS
@@ -158,23 +159,23 @@ int stdUpdater_CheckForUpdates()
     }
 }
 
-void stdUpdater_GetUpdateText(char* pOut, size_t outSz)
+void stdUpdater_GetUpdateText(wchar_t* pOut, size_t outSz)
 {
     // TODO: i8n
     if (stdUpdater_bCompletedUpdate) {
 #if defined(WIN64_STANDALONE)
-        stdString_snprintf(pOut, outSz, "Update complete, restart to apply.");
+        jk_snwprintf(pOut, outSz/sizeof(wchar_t), jkStrings_GetUniStringWithFallback("GUIEXT_UPDATE_COMPLETE_RESTART"));
 #else
-        stdString_snprintf(pOut, outSz, "Update downloaded, complete installation and restart.");
+        jk_snwprintf(pOut, outSz/sizeof(wchar_t), jkStrings_GetUniStringWithFallback("GUIEXT_UPDATE_COMPLETE_SEMIAUTO"));
 #endif
         return;
     }
     else if (stdUpdater_bDownloading) {
-        stdString_snprintf(pOut, outSz, "Downloading...");
+        jk_snwprintf(pOut, outSz/sizeof(wchar_t), jkStrings_GetUniStringWithFallback("GUIEXT_UPDATE_DOWNLOADING"));
         return;
     }
     
-    stdString_snprintf(pOut, outSz, "An update is available: %s => %s", openjkdf2_aReleaseVersion, stdUpdater_strUpdateVersion.c_str());
+    jk_snwprintf(pOut, outSz/sizeof(wchar_t), jkStrings_GetUniStringWithFallback("GUIEXT_UPDATE_IS_AVAIL"), openjkdf2_aReleaseVersion, stdUpdater_strUpdateVersion.c_str());
 }
 
 void stdUpdater_Win64UpdateThread()
