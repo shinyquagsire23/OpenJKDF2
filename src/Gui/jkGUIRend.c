@@ -1193,6 +1193,9 @@ void jkGuiRend_sub_510C60(jkGuiElement *element)
             if ( v7 <= v8 )
                 v8 = element->texInfo.textScrollY;
         }
+
+        // Added: prevent infloop?
+        int safety_switch = 0;
         while ( 1 )
         {
             while ( 1 )
@@ -1201,10 +1204,20 @@ void jkGuiRend_sub_510C60(jkGuiElement *element)
                 if ( v4 >= v8 )
                     break;
                 --v8;
+
+                // Added: prevent infloop?
+                if (++safety_switch >= 0x1000) {
+                    break;
+                }
             }
             if ( v4 < v8 + v6 - 2 )
                 break;
             ++v8;
+
+            // Added: prevent infloop?
+            if (++safety_switch >= 0x1000) {
+                break;
+            }
         }
     }
 }
