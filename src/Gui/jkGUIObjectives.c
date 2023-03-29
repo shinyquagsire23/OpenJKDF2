@@ -113,6 +113,13 @@ int jkGuiObjectives_Show()
         {
             v2 = &jkGuiObjectives_aTexts[v1];
             stdString_snprintf(key, 64, "GOAL_%05d", v0 + v1);
+
+            // Added: Allow openjkdf2_i8n.uni to override everything
+#ifdef QOL_IMPROVEMENTS
+            v3 = stdStrTable_GetUniString(&jkStrings_tableExtOver, key);
+            if ( !v3 )
+#endif
+
             v3 = stdStrTable_GetUniString(&jkCog_strings, key);
             if ( v3 )
                 v2->str = v3;

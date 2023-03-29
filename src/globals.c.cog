@@ -145,18 +145,19 @@ void OpenJKDF2_Globals_Reset()
     
     embed_files = glob.glob(str(Path(project_root) / "resource" / "shaders" / "*.glsl"))
     embed_files += glob.glob(str(Path(project_root) / "resource" / "ssl" / "*.pem"))
+    embed_files += glob.glob(str(Path(project_root) / "resource" / "ui" / "*.uni"))
     cog.outl("const size_t embeddedResource_aFiles_num = %d;" % (len(embed_files),))
     cog.outl("const embeddedResource_t embeddedResource_aFiles[%d] = {" % (len(embed_files),))
 
     for fpath in embed_files:
-        fpath_ = fpath.replace(str(Path(project_root)) + os.sep, "").replace("\\", "/")
+        fpath_ = fpath.replace(str(Path(project_root)) + os.sep, "").replace("\\", "/").replace("resource/", "")
         fname = os.path.basename(fpath)
         contents = open(fpath, "r").read()
 
         cog.outl("{\"%s\", " % (fpath_,))
 
         for line in contents.split("\n"):
-            cog.outl("\"%s\"" % (line + "\\n"))
+            cog.outl("\"%s\"" % (line.replace("\"", "\\\"") + "\\n"))
 
         cog.outl(", 0x%x}," % (len(contents),))
 

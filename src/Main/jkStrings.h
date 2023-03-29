@@ -15,4 +15,8 @@ wchar_t* jkStrings_GetUniString(const char *key);
 wchar_t* jkStrings_GetUniStringWithFallback(const char *key);
 int jkStrings_unused_sub_40B490();
 
+#ifdef QOL_IMPROVEMENTS
+extern stdStrTable jkStrings_tableExtOver;
+#endif
+
 #endif // _JKSTRINGS_H

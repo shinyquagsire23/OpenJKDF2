@@ -1044,7 +1044,15 @@ int jkDSS_ProcessJKPrintUniString(sithCogMsg *msg)
     NETMSG_IN_START(msg);
 
     stdString_snprintf(key, 64, "COG_%05d", NETMSG_POPS32());
-    wchar_t* v1 = stdStrTable_GetUniString(&jkCog_strings, key);
+
+    wchar_t* v1 = NULL;
+// Added: Allow openjkdf2_i8n.uni to override everything
+#ifdef QOL_IMPROVEMENTS
+    v1 = stdStrTable_GetUniString(&jkStrings_tableExtOver, key);
+    if ( !v1 )
+#endif
+
+    v1 = stdStrTable_GetUniString(&jkCog_strings, key);
     if ( !v1 )
         v1 = jkStrings_GetUniStringWithFallback(key);
     jkDev_PrintUniString(v1);

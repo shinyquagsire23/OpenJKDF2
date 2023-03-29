@@ -77,7 +77,7 @@ static size_t stdHttp_write_to_file(void *contents, size_t size, size_t nmemb, v
 
 void stdHttp_Startup()
 {
-    stdHttp_pCaCertBlob = stdEmbeddedRes_Load("resource/ssl/cacert.pem", NULL);
+    stdHttp_pCaCertBlob = stdEmbeddedRes_Load("ssl/cacert.pem", NULL);
 }
 
 void stdHttp_Shutdown()

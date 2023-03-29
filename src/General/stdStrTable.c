@@ -52,7 +52,7 @@ int stdStrTable_Load(stdStrTable *strtable, char *fpath)
             {
                 std_pHS->fileGets(fhand, v32, 64);
             }
-            while ( !_strchr(v32, 10) );
+            while ( !_strchr(v32, '\n') );
         }
         for ( i = a1a; __isspace(*i); ++i )
             ;

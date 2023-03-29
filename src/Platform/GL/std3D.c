@@ -468,13 +468,13 @@ int init_resources()
     std3D_activeFb = 1;
     std3D_pFb = &std3D_framebuffers[0];
     
-    if ((programDefault = std3D_loadProgram("resource/shaders/default")) == 0) return false;
-    if ((programMenu = std3D_loadProgram("resource/shaders/menu")) == 0) return false;
-    if (!std3D_loadSimpleTexProgram("resource/shaders/ui", &std3D_uiProgram)) return false;
-    if (!std3D_loadSimpleTexProgram("resource/shaders/texfbo", &std3D_texFboStage)) return false;
-    if (!std3D_loadSimpleTexProgram("resource/shaders/blur", &std3D_blurStage)) return false;
-    if (!std3D_loadSimpleTexProgram("resource/shaders/ssao", &std3D_ssaoStage)) return false;
-    if (!std3D_loadSimpleTexProgram("resource/shaders/ssao_mix", &std3D_ssaoMixStage)) return false;
+    if ((programDefault = std3D_loadProgram("shaders/default")) == 0) return false;
+    if ((programMenu = std3D_loadProgram("shaders/menu")) == 0) return false;
+    if (!std3D_loadSimpleTexProgram("shaders/ui", &std3D_uiProgram)) return false;
+    if (!std3D_loadSimpleTexProgram("shaders/texfbo", &std3D_texFboStage)) return false;
+    if (!std3D_loadSimpleTexProgram("shaders/blur", &std3D_blurStage)) return false;
+    if (!std3D_loadSimpleTexProgram("shaders/ssao", &std3D_ssaoStage)) return false;
+    if (!std3D_loadSimpleTexProgram("shaders/ssao_mix", &std3D_ssaoMixStage)) return false;
 
     // Attributes/uniforms
     attribute_coord3d = std3D_tryFindAttribute(programDefault, "coord3d");

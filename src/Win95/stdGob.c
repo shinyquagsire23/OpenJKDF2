@@ -7,6 +7,7 @@
 
 #include "General/stdHashTable.h"
 #include "General/stdString.h"
+#include "Platform/Common/stdEmbeddedRes.h"
 
 static HostServices gobHS;
 static HostServices* pGobHS;
@@ -180,6 +181,34 @@ stdGobFile* stdGob_FileOpen(stdGob *gob, const char *filepath)
     stdGobFile *result;
     int v5;
 
+    // Embedded resources
+#ifdef QOL_IMPROVEMENTS
+    size_t sz = 0;
+    void* data = stdEmbeddedRes_LoadOnlyInternal(filepath, &sz);
+    if (data) {
+        result = gob->openedFile;
+        v5 = 0;
+        if ( !gob->numFilesOpen )
+            return 0;
+
+        while ( result->isOpen )
+        {
+            ++result;
+            if ( ++v5 >= gob->numFilesOpen )
+                return 0;
+        }
+        result->bIsMemoryMapped = 1;
+        result->pMemory = (intptr_t)data;
+        result->memorySz = sz;
+
+        result->isOpen = 1;
+        result->parent = gob;
+        result->entry = entry;
+        result->seekOffs = 0;
+        return result;
+    }
+#endif
+
     stdString_SafeStrCopy(stdGob_fpath, filepath, 128);
     stdString_CStrToLower(stdGob_fpath);
 
@@ -205,6 +234,11 @@ stdGobFile* stdGob_FileOpen(stdGob *gob, const char *filepath)
         if ( ++v5 >= gob->numFilesOpen )
             return 0;
     }
+#ifdef QOL_IMPROVEMENTS
+    result->bIsMemoryMapped = 0;
+    result->pMemory = (intptr_t)NULL;
+    result->memorySz = 0;
+#endif
     result->isOpen = 1;
     result->parent = gob;
     result->entry = entry;
@@ -214,11 +248,20 @@ stdGobFile* stdGob_FileOpen(stdGob *gob, const char *filepath)
 
 void stdGob_FileClose(stdGobFile *f)
 {
-  stdGob* gob = f->parent;
-  f->isOpen = 0;
+#ifdef QOL_IMPROVEMENTS
+    if (f->pMemory) {
+        free((void*)f->pMemory);
+        f->pMemory = (intptr_t)NULL;
+    }
+    f->bIsMemoryMapped = 0;
+#endif
 
-  if (f == gob->lastReadFile)
-    gob->lastReadFile = 0;
+    stdGob* gob = f->parent;
+    f->isOpen = 0;
+
+    if (f == gob->lastReadFile) {
+        gob->lastReadFile = 0;
+    }
 }
 
 int stdGob_FSeek(stdGobFile *f, int pos, int whence)
@@ -263,10 +306,28 @@ bool stdGob_FEof(stdGobFile *f)
     return ret;
 }
 
-size_t stdGob_FileRead(stdGobFile *f, void *out, unsigned int len)
+size_t stdGob_FileRead(stdGobFile *f, void *out, uint32_t len)
 {
     stdGob *gob;
     size_t result;
+
+#ifdef QOL_IMPROVEMENTS
+    if (f->bIsMemoryMapped) {
+        size_t to_read = len;
+        if (f->seekOffs >= f->memorySz) {
+            f->seekOffs = f->memorySz;
+            return 0;
+        }
+
+        if (f->seekOffs + to_read > f->memorySz) {
+            to_read = f->memorySz - f->seekOffs;
+        }
+        memcpy(out, (void*)(f->pMemory + f->seekOffs), to_read);
+        f->seekOffs += to_read;
+
+        return to_read;
+    }
+#endif
 
     gob = f->parent;
     if (gob->lastReadFile != f)
@@ -290,6 +351,35 @@ const char* stdGob_FileGets(stdGobFile *f, char *out, unsigned int len)
     int seekOffs;
     const char *result;
     stdGob *gob;
+
+#ifdef QOL_IMPROVEMENTS
+    if (f->bIsMemoryMapped) {
+        size_t to_read = len;
+        if (f->seekOffs >= f->memorySz) {
+            f->seekOffs = f->memorySz;
+            return NULL;
+        }
+
+        if (f->seekOffs + to_read > f->memorySz) {
+            to_read = f->memorySz - f->seekOffs;
+        }
+        if (!to_read) {
+            return NULL;
+        }
+        strncpy(out, (char*)(f->pMemory + f->seekOffs), to_read);
+        char* cutoff = strchr(out, '\n');
+        if (cutoff) {
+            *(++cutoff) = 0;
+        }
+
+        size_t actual_read = strlen(out)+1;
+        f->seekOffs += actual_read;
+
+        if (!actual_read) return NULL;
+
+        return out;
+    }
+#endif
 
     entry = f->entry;
     seekOffs = f->seekOffs;
@@ -323,6 +413,35 @@ const wchar_t* stdGob_FileGetws(stdGobFile *f, wchar_t *out, unsigned int len)
     const wchar_t *ret; // eax
     const wchar_t *ret_; // edi
 
+#ifdef QOL_IMPROVEMENTS
+    if (f->bIsMemoryMapped) {
+        size_t to_read = len * sizeof(wchar_t);
+        if (f->seekOffs >= f->memorySz) {
+            f->seekOffs = f->memorySz;
+            return 0;
+        }
+
+        if (f->seekOffs + to_read > f->memorySz) {
+            to_read = f->memorySz - f->seekOffs;
+        }
+        if (!to_read) {
+            return NULL;
+        }
+        __wcsncpy(out, (char*)(f->pMemory + f->seekOffs), to_read / sizeof(wchar_t));
+        wchar_t* cutoff = __wcschr(out, '\n');
+        if (cutoff) {
+            *(++cutoff) = 0;
+        }
+
+        size_t actual_read = (_wcslen(out)+1)*sizeof(wchar_t);
+        f->seekOffs += actual_read;
+
+        if (!actual_read) return NULL;
+
+        return out;
+    }
+#endif
+
     entry = f->entry;
     seekOffs = f->seekOffs;
     if ( seekOffs >= entry->fileSize - 1 )
@@ -349,6 +468,11 @@ size_t stdGob_FileSize(stdGobFile *f)
 {
     if (!f) return 0;
     if (!f->entry) return 0;
+#ifdef QOL_IMPROVEMENTS
+    if (f->bIsMemoryMapped) {
+        return f->memorySz;
+    }
+#endif
 
     return f->entry->fileSize;
 }

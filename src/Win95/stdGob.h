@@ -51,6 +51,11 @@ typedef struct stdGobFile
     stdGob* parent;
     stdGobEntry* entry;
     int32_t seekOffs;
+#ifdef QOL_IMPROVEMENTS
+    uint32_t bIsMemoryMapped;
+    intptr_t pMemory;
+    size_t memorySz;
+#endif
 } stdGobFile;
 
 typedef struct stdGob
