@@ -49,21 +49,32 @@ MSGS 100          # <--- DON'T FORGET TO UPDATE THIS COUNT
    "GUIEXT_UPDATE_DOWNLOADING"                0 "Downloading..."
    "GUIEXT_UPDATE_COMPLETE_RESTART"           0 "Update complete, restart to apply."
    "GUIEXT_UPDATE_COMPLETE_SEMIAUTO"          0 "Update downloaded, complete installation and restart."
+
+
+#******************************
+#  Multiplayer Setup
+#******************************
+   "GUIEXT_DEDICATED_SERVER"        0 "Dedicated Server"
+   "GUIEXT_DEDICATED_SERVER_HINT"   0 "Launch server without participating as a player."
+   "GUIEXT_COOP"                    0 "Experimental Co-op"
+   "GUIEXT_COOP_HINT"               0 "Launch server with actors enabled."
+   "GUIEXT_SERVER_PORT"             0 "Server Port:"
+
    #"GUIEXT_"                0 ""
 
 #******************************
 #  General
 #******************************
-   "GUIEXT_DISABLE_MISSION_CONFIRMATION"  0 "Disable mission start confirmation."
-   "GUIEXT_DISABLE_MISSION_CONFIRMATION_HINT"  0 "Enter the mission as soon as the level is loaded."
+   "GUIEXT_DISABLE_MISSION_CONFIRMATION"        0 "Disable mission start confirmation."
+   "GUIEXT_DISABLE_MISSION_CONFIRMATION_HINT"   0 "Enter the mission as soon as the level is loaded."
 
-   "GUIEXT_INCONSISTENT_PHYS" 0 "Restore inconsistent physics"
-   "GUIEXT_INCONSISTENT_PHYS_HINT" 0 "Sets physics delta to the render framerate instead of 150Hz."
+   "GUIEXT_INCONSISTENT_PHYS"                   0 "Restore inconsistent physics"
+   "GUIEXT_INCONSISTENT_PHYS_HINT"              0 "Sets physics delta to the render framerate instead of 150Hz."
 
-   "GUIEXT_CORPSE_DESPAWN" 0 "Disable corpse despawning"
-   "GUIEXT_CORPSE_DESPAWN_HINT" 0 "Don't automatically despawn corpse bodies."
+   "GUIEXT_CORPSE_DESPAWN"                      0 "Disable corpse despawning"
+   "GUIEXT_CORPSE_DESPAWN_HINT"                 0 "Don't automatically despawn corpse bodies."
 
-   "GUIEXT_50HZ_MIDAIR_PHYS" 0 "Restore 50Hz midair player physics"
-   "GUIEXT_50HZ_MIDAIR_PHYS_HINT" 0 "Player physics and POV will be stepped at 50Hz while midair."
+   "GUIEXT_50HZ_MIDAIR_PHYS"                    0 "Restore 50Hz midair player physics"
+   "GUIEXT_50HZ_MIDAIR_PHYS_HINT"               0 "Player physics and POV will be stepped at 50Hz while midair."
 
 END
