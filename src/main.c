@@ -1775,7 +1775,7 @@ void do_hooks()
     // jkStrings
     hook_function(jkStrings_Startup_ADDR, jkStrings_Startup);
     hook_function(jkStrings_Shutdown_ADDR, jkStrings_Shutdown);
-    hook_function(jkStrings_GetText2_ADDR, jkStrings_GetText2);
+    hook_function(jkStrings_GetUniString_ADDR, jkStrings_GetUniString);
     hook_function(jkStrings_GetText_ADDR, jkStrings_GetText);
     hook_function(jkStrings_unused_sub_40B490_ADDR, jkStrings_unused_sub_40B490);
     

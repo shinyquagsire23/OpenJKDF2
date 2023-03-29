@@ -21,7 +21,7 @@ void jkStrings_Shutdown()
     jkStrings_bInitialized = 0;
 }
 
-wchar_t* jkStrings_GetText2(const char *key)
+wchar_t* jkStrings_GetUniString(const char *key)
 {
     wchar_t *result; // eax
 

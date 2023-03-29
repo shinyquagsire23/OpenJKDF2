@@ -235,7 +235,7 @@ int jkGuiKeyboard_EnumBindings(int inputFuncIdx, const char *pInputFuncStr, uint
     wchar_t wStr[256]; // [esp+38h] [ebp-200h] BYREF
 
     v8 = &jkGuiKeyboard_pWStr_55601C;
-    v17 = jkStrings_GetText2(pInputFuncStr);
+    v17 = jkStrings_GetUniString(pInputFuncStr);
     if ( v17 && (jkGuiKeyboard_dword_555E10 != 105 || (flags & 1) == 0) )
     {
         if ( (a3 & 2) == 0

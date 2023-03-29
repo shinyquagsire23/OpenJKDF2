@@ -1288,7 +1288,7 @@ void jkHud_DrawGPU()
                     // MOTS altered here "_SHORT" TODO
                     /*
                             _sprintf(local_11c,"%s_SHORT",&local_14c);
-                            pwVar7 = jkStrings_GetText2(local_11c);
+                            pwVar7 = jkStrings_GetUniString(local_11c);
                             if (pwVar7 == (wchar_t *)0x0) {
                                 pwVar7 = jkStrings_GetText((char *)&local_14c);
                             }

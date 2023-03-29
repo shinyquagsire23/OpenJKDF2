@@ -180,7 +180,7 @@ int jkGuiControlSaveLoad_Write(int bIdk)
     v1 = "GUI_CSLSAVESET";
     if ( !bIdk )
         v1 = "GUI_CSLLOADSET";
-    jkGuiControlSaveLoad_aElements[0].wstr = (const char *)jkStrings_GetText2(v1);
+    jkGuiControlSaveLoad_aElements[0].wstr = (const char *)jkStrings_GetUniString(v1);
     jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiControlSaveLoad_menu, &jkGuiControlSaveLoad_aElements[5]);
     jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiControlSaveLoad_menu, &jkGuiControlSaveLoad_aElements[6]);
     _wcsncpy(jkGuiControlSaveLoad_awTmp, jkGuiControlSaveLoad_aUnk, 0xFFu);

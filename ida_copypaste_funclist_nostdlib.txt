@@ -194,7 +194,7 @@ jkCog_GetSaberCam	.text	0040B3B0	00000014	00000000	00000004	R	.	.	.	.	.	T	.
 jkCog_GetChoice	.text	0040B3D0	00000014	00000000	00000004	R	.	.	.	.	.	T	.
 jkStrings_Startup	.text	0040B3F0	0000001D			R	.	.	.	.	.	.	.
 jkStrings_Shutdown	.text	0040B410	00000018			R	.	.	.	.	.	.	.
-jkStrings_GetText2	.text	0040B430	00000027	00000004	00000004	R	.	.	.	.	.	T	.
+jkStrings_GetUniString	.text	0040B430	00000027	00000004	00000004	R	.	.	.	.	.	T	.
 jkStrings_GetText	.text	0040B460	00000027	00000004	00000004	R	.	.	.	.	.	.	.
 jkStrings_unused_sub_40B490	.text	0040B490	00000006	00000000	00000000	R	.	.	.	.	.	.	.
 jkSaber_Startup	.text	0040B4A0	00000001	00000000	00000000	R	.	.	.	.	.	.	.

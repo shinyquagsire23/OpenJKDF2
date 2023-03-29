@@ -424,7 +424,7 @@ int jkGuiMouse_EnumBindings(int a1, const char *a2, uint32_t a3, int a4, uint32_
     v8 = &jkGuiMouse_pWStr_5566E8;
     if ( (a3 & 1) == 0 )
         return 1;
-    v9 = jkStrings_GetText2(a2);
+    v9 = jkStrings_GetUniString(a2);
     v15 = v9;
     if ( !v9 )
         return 1;

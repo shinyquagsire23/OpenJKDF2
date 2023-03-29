@@ -309,7 +309,7 @@ int jkGuiSaveLoad_Show(int bIsSave)
     v1 = "GUI_SLSAVEGAME";
     if ( !bIsSave )
         v1 = "GUI_SLLOADGAME";
-    jkGuiSaveLoad_aElements[0].wstr = jkStrings_GetText2(v1);
+    jkGuiSaveLoad_aElements[0].wstr = jkStrings_GetUniString(v1);
     jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiSaveLoad_menu, &jkGuiSaveLoad_aElements[11]);
     jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiSaveLoad_menu, &jkGuiSaveLoad_aElements[12]);
     jkGuiSaveLoad_menu.focusedElement = &jkGuiSaveLoad_aElements[2];

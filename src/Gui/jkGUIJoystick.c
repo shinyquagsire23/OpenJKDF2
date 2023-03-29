@@ -565,7 +565,7 @@ int jkGuiJoystick_EnumFunc(int inputFuncIdx, const char *pInputFuncStr, uint32_t
     v9 = jkGuiJoystick_waIdk2;
     if ( (flags & 1) == 0 )
         return 1;
-    v10 = jkStrings_GetText2(pInputFuncStr);
+    v10 = jkStrings_GetUniString(pInputFuncStr);
     v16 = v10;
     if ( !v10 )
         return 1;

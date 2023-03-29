@@ -1136,7 +1136,7 @@ int jkGuiBuildMulti_ShowNewCharacter(int rank, int bGameFormatIsJK, int bHasNoVa
     {
         if ((bGameFormatIsJK == 0) || (i == 0)) {
             stdString_snprintf(personalityTmp, 128, "GUI_PERSONALITY%d", i + 1); // Added: sprintf -> snprintf
-            wchar_t* pwVar1 = jkStrings_GetText2(personalityTmp);
+            wchar_t* pwVar1 = jkStrings_GetUniString(personalityTmp);
             if (pwVar1 == NULL) break;
             jkGuiRend_DarrayReallocStr(&daPersonalities, pwVar1, 0);
         }
