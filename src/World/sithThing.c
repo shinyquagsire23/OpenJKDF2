@@ -1859,11 +1859,11 @@ int sithThing_LoadThingParam(stdConffileArg *arg, sithThing* pThing, int param)
         case THINGPARAM_AICLASS:
             pThing->thingtype = SITH_THING_ACTOR;
             pAIClass = sithAIClass_Load(arg->value);
-            pThing->aiclass = pAIClass;
+            pThing->pAIClass = pAIClass;
             pActor = pThing->actor;
             if ( !pActor || !pAIClass )
                 goto LABEL_58;
-            pActor->aiclass = pAIClass;
+            pActor->pAIClass = pAIClass;
             pActor->numAIClassEntries = pAIClass->numEntries;
             result = 1;
             break;
@@ -2036,7 +2036,7 @@ void sithThing_Sync()
 
         // Added: Co-op
         if (sithMulti_multiModeFlags & MULTIMODEFLAG_COOP && (v1 & THING_SYNC_AI)) {
-            if (sithNet_aSyncThings[v0]->actor && sithNet_aSyncThings[v0]->actor->aiclass)
+            if (sithNet_aSyncThings[v0]->actor && sithNet_aSyncThings[v0]->actor->pAIClass)
                 sithDSS_SendAIStatus(sithNet_aSyncThings[v0]->actor, -1, 1);
         }
 

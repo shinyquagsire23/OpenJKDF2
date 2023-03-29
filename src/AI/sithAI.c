@@ -226,7 +226,7 @@ void sithAI_NewEntry(sithThing *thing)
     int v3; // eax
     sithActor *actor; // eax
 
-    sith_ai = thing->aiclass;
+    sith_ai = thing->pAIClass;
     if ( sith_ai )
     {
         v2 = sithAI_maxActors;
@@ -247,7 +247,7 @@ void sithAI_NewEntry(sithThing *thing)
             thing->actor = actor;
             rdVector_Copy3(&actor->position, &thing->position);
             actor->lookOrientation = thing->lookOrientation.lvec;
-            actor->aiclass = sith_ai;
+            actor->pAIClass = sith_ai;
             actor->thing = thing;
             actor->numAIClassEntries = sith_ai->numEntries;
             actor->flags = (SITHAI_MODE_SLEEPING|SITHAI_MODE_SEARCHING);
@@ -319,7 +319,7 @@ void sithAI_TickAll()
     {
         if (Main_bMotsCompat)
         {
-            if ( actor->aiclass
+            if ( actor->pAIClass
                   && (actor->thing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0
                   && actor->thing->actorParams.health > 0.0
                   && (actor->flags & (SITHAI_MODE_DISABLED|SITHAI_MODE_SLEEPING)) == 0 )
@@ -337,7 +337,7 @@ void sithAI_TickAll()
             }
         }
         else {
-            if ( actor->aiclass
+            if ( actor->pAIClass
                   && (actor->thing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0
                   && actor->thing->actorParams.health > 0.0
                   && (actor->flags & (SITHAI_MODE_DISABLED|SITHAI_MODE_SLEEPING)) == 0
@@ -370,13 +370,13 @@ void sithAI_TickActor(sithActor *actor)
         {
             if ( (actor->instincts[a1a].field_0 & 1) == 0 )
             {
-                if ((actor->flags & actor->aiclass->entries[a1a].param1) 
-                    && !(actor->flags & actor->aiclass->entries[a1a].param2))
+                if ((actor->flags & actor->pAIClass->entries[a1a].param1) 
+                    && !(actor->flags & actor->pAIClass->entries[a1a].param2))
                 {
                     if ( actor->instincts[a1a].nextUpdate <= sithTime_curMs )
                     {
                         actor->instincts[a1a].nextUpdate = sithTime_curMs + 1000;
-                        if ( actor->aiclass->entries[a1a].func(actor, &actor->aiclass->entries[a1a], &actor->instincts[a1a], 0, 0) && a3 != actor->flags )
+                        if ( actor->pAIClass->entries[a1a].func(actor, &actor->pAIClass->entries[a1a], &actor->instincts[a1a], 0, 0) && a3 != actor->flags )
                         {
                             sithAI_SetActorFireTarget(actor, SITHAI_MODE_UNK100, a3);
                             a3 = actor->flags;
@@ -402,7 +402,7 @@ void sithAI_SetActorFireTarget(sithActor *actor, int a2, intptr_t actorFlags)
     uint32_t v7; // ebx
     int old_flags; // [esp+14h] [ebp+4h]
 
-    for ( ; actor->aiclass; a2 = SITHAI_MODE_UNK100 )
+    for ( ; actor->pAIClass; a2 = SITHAI_MODE_UNK100 )
     {
         if ( !actor->thing )
             break;
@@ -431,9 +431,9 @@ void sithAI_SetActorFireTarget(sithActor *actor, int a2, intptr_t actorFlags)
             sithActorInstinct* entry = &actor->instincts[v7];
             if ( (entry->field_0 & 1) == 0 )
             {
-                if ( (actor->aiclass->entries[v7].param3 & a2) != 0 )
+                if ( (actor->pAIClass->entries[v7].param3 & a2) != 0 )
                 {
-                    if ( actor->aiclass->entries[v7].func(actor, &actor->aiclass->entries[v7], entry, a2, actorFlags) )
+                    if ( actor->pAIClass->entries[v7].func(actor, &actor->pAIClass->entries[v7], entry, a2, actorFlags) )
                         break;
                 }
             }
@@ -487,7 +487,7 @@ int sithAI_PrintThings()
         v1 = 0;
         for ( i = sithAI_actors; v1 <= sithAI_inittedActors; ++i )
         {
-            v3 = i->aiclass;
+            v3 = i->pAIClass;
             if ( v3 )
             {
                 if ( i->thing )
@@ -535,7 +535,7 @@ int sithAI_PrintThingStatus(stdDebugConsoleCmd* a1, const char *idxStr)
             _sprintf(
                 std_genBuffer,
                 "Class '%s', Flags=0x%x, Moods %d/%d/%d, NextUpdate=%d\n",
-                v4->aiclass->fpath,
+                v4->pAIClass->fpath,
                 v4->flags,
                 v4->mood0,
                 v4->mood1,
@@ -558,8 +558,8 @@ int sithAI_PrintThingStatus(stdDebugConsoleCmd* a1, const char *idxStr)
                         v6->param2,
                         v6->param3,
                         v6->nextUpdate,
-                        v4->aiclass->entries[v7].param3,
-                        v4->aiclass->entries[v7].param1);
+                        v4->pAIClass->entries[v7].param3,
+                        v4->pAIClass->entries[v7].param1);
                     sithConsole_Print(std_genBuffer);
                     ++v2;
                     ++v6;
@@ -914,7 +914,7 @@ void sithAI_sub_4EAD60(sithActor *actor)
         if ( (v4->actorParams.typeflags & SITH_AF_INVISIBLE) || (actor->thing->actorParams.typeflags & SITH_AF_COMBO_BLIND) != 0 )
             v9 = 3;
         actor->field_1D4 = v4->position;
-        v5 = sithAI_CheckSightThing(v2, &actor->blindAimError, v4, actor->aiclass->fov, actor->aiclass->sightDist, actora, &actor->attackError, &actor->attackDistance);
+        v5 = sithAI_CheckSightThing(v2, &actor->blindAimError, v4, actor->pAIClass->fov, actor->pAIClass->sightDist, actora, &actor->attackError, &actor->attackDistance);
         actor->field_1F4 = v5;
 
         if ( !v5 )
@@ -936,8 +936,8 @@ void sithAI_sub_4EAD60(sithActor *actor)
                  v2,
                  &actor->blindAimError,
                  &actor->field_1D4,
-                 actor->aiclass->fov,
-                 actor->aiclass->sightDist,
+                 actor->pAIClass->fov,
+                 actor->pAIClass->sightDist,
                  actora,
                  &actor->attackError,
                  &actor->attackDistance);
@@ -964,7 +964,7 @@ void sithAI_sub_4EAF40(sithActor *actor)
         {
             if ( (actor->pMoveThing->actorParams.typeflags & SITH_AF_INVISIBLE) || (actor->thing->actorParams.typeflags & SITH_AF_COMBO_BLIND) != 0 )
                 v1 = 3;
-            v3 = sithAI_CheckSightThing(actor->thing, &actor->thing->position, actor->pMoveThing, -1.0, actor->aiclass->sightDist, 0.0, &actor->field_228, &actor->currentDistanceFromTarget);
+            v3 = sithAI_CheckSightThing(actor->thing, &actor->thing->position, actor->pMoveThing, -1.0, actor->pAIClass->sightDist, 0.0, &actor->field_228, &actor->currentDistanceFromTarget);
             actor->field_238 = v3;
             if ( !v3 )
             {
@@ -986,7 +986,7 @@ void sithAI_sub_4EAF40(sithActor *actor)
                      &actor->thing->position,
                      &actor->movepos,
                      -1.0,
-                     actor->aiclass->sightDist,
+                     actor->pAIClass->sightDist,
                      0.0,
                      &actor->field_228,
                      &actor->currentDistanceFromTarget);
@@ -1149,7 +1149,7 @@ int sithAI_physidk(sithActor *a7, rdVector3 *a4, int *arg8)
     v6 = (sithSector *)result;
     if ( !result )
         return result;
-    a6 = sithPhysics_ThingGetInsertOffsetZ(v4) + a7->aiclass->maxStep;
+    a6 = sithPhysics_ThingGetInsertOffsetZ(v4) + a7->pAIClass->maxStep;
     sithCollision_SearchRadiusForThings(v6, v4, a4, &a5, a6, a7a, 0x2002);
     v7 = sithCollision_NextSearchResult();
     if ( !v7 )
@@ -1221,7 +1221,7 @@ int sithAI_sub_4EB640(sithActor *actor, rdVector3 *a4, sithSector *a2, int *out)
     rdVector_Neg3(&a5, &rdroid_zVector3);
     v5 = 0;
     a7 = v4->moveSize * 0.25;
-    a6 = sithPhysics_ThingGetInsertOffsetZ(v4) + actor->aiclass->maxStep;
+    a6 = sithPhysics_ThingGetInsertOffsetZ(v4) + actor->pAIClass->maxStep;
     sithCollision_SearchRadiusForThings(a2, v4, a4, &a5, a6, a7, 0x2002);
     v6 = sithCollision_NextSearchResult();
     if ( v6 )
@@ -1444,7 +1444,7 @@ LABEL_12:
     {
         v15 = 0;
     }
-    if ( percentageErrorInAim != 0.0 && actor->attackDistance != 0.0 && _frand() > actor->aiclass->accuracy )
+    if ( percentageErrorInAim != 0.0 && actor->attackDistance != 0.0 && _frand() > actor->pAIClass->accuracy )
     {
         sithAI_RandomFireVector(&v1, percentageErrorInAim);
     }
@@ -1931,7 +1931,7 @@ sithThing* sithAI_FUN_00539a60(sithActor *pThing)
     rdVector3 local_c;
 
     psVar4 = (sithThing *)0x0;
-    if (pThing->aiclass->alignment != 0.0) 
+    if (pThing->pAIClass->alignment != 0.0) 
     {
         a3 = pThing->thing;
         local_1c = 0.0;
@@ -1949,7 +1949,7 @@ sithThing* sithAI_FUN_00539a60(sithActor *pThing)
                 {
                     if (arg8->thingtype == 2) 
                     {
-                        fVar2 = arg8->aiclass->alignment;
+                        fVar2 = arg8->pAIClass->alignment;
                     }
                     else {
                         fVar2 = 0.0;
@@ -1957,7 +1957,7 @@ sithThing* sithAI_FUN_00539a60(sithActor *pThing)
                             fVar2 = sithAI_FLOAT_005a79d8;
                         }
                     }
-                    if (((fVar2 != 0.0) && (psVar1 = pThing->aiclass, fVar2 < 0.0 != psVar1->alignment < 0.0))
+                    if (((fVar2 != 0.0) && (psVar1 = pThing->pAIClass, fVar2 < 0.0 != psVar1->alignment < 0.0))
                             && (iVar3 = sithAI_CheckSightThing(a3, &a3->position, arg8, psVar1->fov, psVar1->sightDist, 0.0,
                                                           &local_c, &local_10), iVar3 == 0)) {
                         local_1c = local_1c - -1.0;

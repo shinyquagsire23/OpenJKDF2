@@ -78,7 +78,7 @@ int sithAIAwareness_Tick(int a, sithEventInfo* b)
 
         sithActor* i = &sithAI_actors[v3];
 
-        if ( i->aiclass )
+        if ( i->pAIClass )
         {
             if ( i->thing )
             {

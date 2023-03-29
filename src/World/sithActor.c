@@ -130,12 +130,12 @@ float sithActor_Hit(sithThing *sender, sithThing *receiver, float amount, int fl
             if (Main_bMotsCompat
                 && sender->thingtype == SITH_THING_ACTOR
                 && sender->actor
-                && sender->actor->aiclass
+                && sender->actor->pAIClass
                 && v7->thingtype == SITH_THING_ACTOR
                 && v7->actor
-                && v7->actor->aiclass) {
+                && v7->actor->pAIClass) {
 
-                if (v7->actor->aiclass->alignment * sender->actor->aiclass->alignment <= -1.0) {
+                if (v7->actor->pAIClass->alignment * sender->actor->pAIClass->alignment <= -1.0) {
                     damageMult = 0.5;
                 }
             }

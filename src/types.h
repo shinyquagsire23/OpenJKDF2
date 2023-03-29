@@ -2414,7 +2414,7 @@ typedef struct sithActorInstinct
 typedef struct sithActor
 {
     sithThing *thing;
-    sithAIClass *aiclass;
+    sithAIClass *pAIClass;
     int flags;
     sithActorInstinct instincts[16];
     uint32_t numAIClassEntries;
@@ -2782,7 +2782,7 @@ typedef struct sithThing
     uint32_t field_260;
     float waggle;
     rdVector3 field_268;
-    sithAIClass* aiclass;
+    sithAIClass* pAIClass;
     sithActor* actor;
     char template_name[32];
     sithCog* class_cog;
