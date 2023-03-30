@@ -60,6 +60,7 @@ float jkPlayer_canonicalPhysTickrate = CANONICAL_PHYS_TICKRATE;
 
 int jkPlayer_setCrosshairOnLightsaber = 1;
 int jkPlayer_setCrosshairOnFist = 1;
+int jkPlayer_bHasLoadedSettingsOnce = 0;
 #endif
 
 #ifdef FIXED_TIMESTEP_PHYS
@@ -217,6 +218,8 @@ void jkPlayer_ResetVars()
 
     jkPlayer_setCrosshairOnLightsaber = 1;
     jkPlayer_setCrosshairOnFist = 1;
+
+    jkPlayer_bHasLoadedSettingsOnce = 0;
 #endif
 
 #ifdef FIXED_TIMESTEP_PHYS
@@ -760,6 +763,8 @@ int jkPlayer_ReadConf(wchar_t *name)
         Window_SetFullscreen(Window_isFullscreen_tmp);
 
         std3D_UpdateSettings();
+
+        jkPlayer_bHasLoadedSettingsOnce = 1;
 #endif
         
         stdConffile_Close();

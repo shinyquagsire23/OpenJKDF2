@@ -957,7 +957,12 @@ void Window_SdlUpdate()
                 break;
             case SDL_QUIT:
                 stdPlatform_Printf("Quit!\n");
-                jkPlayer_WriteConf(jkPlayer_playerShortName); // Added
+
+                // Added
+                if (jkPlayer_bHasLoadedSettingsOnce) {
+                    jkPlayer_WriteConf(jkPlayer_playerShortName);
+                }
+                
                 exit(-1);
                 break;
             default:
@@ -1347,7 +1352,10 @@ int Window_Main_Linux(int argc, char** argv)
     }
 #endif
 
-    jkPlayer_WriteConf(jkPlayer_playerShortName); // Added
+    // Added
+    if (jkPlayer_bHasLoadedSettingsOnce) {
+        jkPlayer_WriteConf(jkPlayer_playerShortName);
+    }
 
     Main_Shutdown();
     return 1;
