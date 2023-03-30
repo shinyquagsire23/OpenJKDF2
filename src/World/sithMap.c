@@ -283,7 +283,7 @@ LABEL_22:
     {
         for ( i = v1->thingsList; i; i = i->nextThing )
         {
-            if ( i != sithWorld_pCurrentWorld->cameraFocus && (i->thingflags & 0x80012) == 0 )
+            if ( i != sithWorld_pCurrentWorld->cameraFocus && (i->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_WILLBEREMOVED)) == 0 )
             {
                 int v37 = (g_mapModeFlags & 0x40) != 0;
                 switch ( i->thingtype )
