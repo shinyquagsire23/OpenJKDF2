@@ -185,7 +185,7 @@ void jkPlayer_StartupVars()
     sithCvar_RegisterBool("r_fullscreen",                0,                         &Window_isFullscreen_tmp,           CVARFLAG_LOCAL|CVARFLAG_READONLY);
 
 #ifdef FIXED_TIMESTEP_PHYS
-    sithCvar_RegisterBool("g_bJankyPhysics",             1,                         &jkPlayer_bJankyPhysics,            CVARFLAG_LOCAL);
+    sithCvar_RegisterBool("g_bJankyPhysics",             0,                         &jkPlayer_bJankyPhysics,            CVARFLAG_LOCAL);
 #endif
 }
 
