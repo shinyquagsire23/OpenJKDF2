@@ -168,7 +168,7 @@ int openjkdf2_bIsKVM = 1;
 int openjkdf2_restartMode = OPENJKDF2_RESTART_NONE;
 char openjkdf2_aOrigCwd[1024];
 char openjkdf2_aRestartPath[256];
-char* openjkdf2_pExecutablePath = ""; 
+char* openjkdf2_pExecutablePath = "";
 
 void do_hooks();
 
