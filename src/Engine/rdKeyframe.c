@@ -50,7 +50,7 @@ rdKeyframe* rdKeyframe_Load(char *fname)
 int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
 {
     char *key_fname_only;
-    rdJoint *joints;
+    rdJoint *paJoints;
     rdKeyframe *num_joints;
     unsigned int num_markers_read;
     rdMarkers *markers;
@@ -116,12 +116,12 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
     if (_sscanf(stdConffile_aLine, " joints %d", &keyframe->numJoints) != 1)
       goto read_fail;
 
-    joints = (rdJoint *)rdroid_pHS->alloc(sizeof(rdJoint) * (keyframe->numJoints+1)); // Added: try and contain rdPuppet crashes...
-    keyframe->joints = joints;
-    if (!joints)
+    paJoints = (rdJoint *)rdroid_pHS->alloc(sizeof(rdJoint) * (keyframe->numJoints+1)); // Added: try and contain rdPuppet crashes...
+    keyframe->paJoints = paJoints;
+    if (!paJoints)
       goto read_fail;
 
-    _memset(joints, 0, sizeof(rdJoint) * (keyframe->numJoints+1));
+    _memset(paJoints, 0, sizeof(rdJoint) * (keyframe->numJoints+1));
     keyframe->numJoints2 = keyframe->numJoints;
 
     if (!stdConffile_ReadLine() || _sscanf(stdConffile_aLine, " section: %s", std_genBuffer) != 1)
@@ -175,7 +175,7 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
             goto read_fail;
         if (_sscanf(stdConffile_aLine, " mesh name %s", mesh_name) != 1)
             goto read_fail;
-        joint = &keyframe->joints[node_idx];
+        joint = &keyframe->paJoints[node_idx];
         
         _strncpy(joint->mesh_name, mesh_name, 0x1Fu);
         joint->mesh_name[31] = 0;
@@ -277,11 +277,11 @@ int rdKeyframe_Write(char *out_fpath, rdKeyframe *keyframe, char *creation_metho
     totalAnimEntries = 0;
     for (i = 0; i < keyframe->numJoints2; i++)
     {
-        if (keyframe->joints[i].numAnimEntries)
+        if (keyframe->paJoints[i].numAnimEntries)
             ++totalAnimEntries;
     }
     rdroid_pHS->filePrintf(fd, "NODES %d\n\n", totalAnimEntries);
-    joint_iter = keyframe->joints;
+    joint_iter = keyframe->paJoints;
     for (i = 0; i < keyframe->numJoints2; i++, joint_iter++)
     {
         if (!joint_iter->numAnimEntries)
@@ -353,10 +353,10 @@ void rdKeyframe_FreeJoints(rdKeyframe *keyframe)
     unsigned int i;
     rdJoint* joint_iter;
     
-    if (!keyframe->joints)
+    if (!keyframe->paJoints)
         return;
 
-    joint_iter = keyframe->joints;
+    joint_iter = keyframe->paJoints;
     for (i = 0; i < keyframe->numJoints2; i++)
     {
         if (joint_iter->paAnimEntries)
@@ -366,6 +366,6 @@ void rdKeyframe_FreeJoints(rdKeyframe *keyframe)
         }
         joint_iter++;
     }
-    rdroid_pHS->free(keyframe->joints);
-    keyframe->joints = NULL;
+    rdroid_pHS->free(keyframe->paJoints);
+    keyframe->paJoints = NULL;
 }

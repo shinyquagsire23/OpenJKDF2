@@ -860,7 +860,7 @@ void sithWorld_GetMemorySize(sithWorld *world, int *outAllocated, int *outQuanti
         outAllocated[11] += sizeof(rdJoint) * (world->keyframes[i].numJoints2 + 3);
         for (int j = 0; j < world->keyframes[i].numJoints2; j++)
         {
-            outAllocated[11] += sizeof(rdAnimEntry) * world->keyframes[i].joints[j].numAnimEntries;
+            outAllocated[11] += sizeof(rdAnimEntry) * world->keyframes[i].paJoints[j].numAnimEntries;
         }
     }
     outQuantity[12] = world->numAnimClassesLoaded;

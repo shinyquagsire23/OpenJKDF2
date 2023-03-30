@@ -534,7 +534,7 @@ typedef struct rdKeyframe
     float fps;
     uint32_t numFrames;
     uint32_t numJoints2;
-    rdJoint* joints;
+    rdJoint* paJoints;
     uint32_t numMarkers;
     rdMarkers markers;
 } rdKeyframe;
