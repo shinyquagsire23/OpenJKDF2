@@ -319,7 +319,7 @@ int rdCache_SendFaceListToHardware()
 
     std3D_ResetRenderList();
     rdCache_ResetRenderList();
-    v7 = rdCamera_pCurCamera->cameraClipFrustum;
+    v7 = rdCamera_pCurCamera->pClipFrustum;
     v8 = 1.0 / v7->field_0.z;
     rend_6c_current_idx = 0;
     v134 = v8;

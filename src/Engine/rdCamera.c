@@ -33,20 +33,20 @@ int rdCamera_NewEntry(rdCamera *camera, float fov, float a3, float zNear, float 
         return 0;
 
     // Added: Don't double-alloc
-    if (!camera->cameraClipFrustum)
+    if (!camera->pClipFrustum)
     {
-        camera->cameraClipFrustum = (rdClipFrustum *)rdroid_pHS->alloc(sizeof(rdClipFrustum));
+        camera->pClipFrustum = (rdClipFrustum *)rdroid_pHS->alloc(sizeof(rdClipFrustum));
     }
 
-    if ( camera->cameraClipFrustum )
+    if ( camera->pClipFrustum )
     {
         camera->canvas = 0;
         rdCamera_SetFOV(camera, fov);
         rdCamera_SetOrthoScale(camera, 1.0);
 
-        camera->cameraClipFrustum->field_0.x = a3;
-        camera->cameraClipFrustum->field_0.y = zNear;
-        camera->cameraClipFrustum->field_0.z = zFar;
+        camera->pClipFrustum->field_0.x = a3;
+        camera->pClipFrustum->field_0.y = zNear;
+        camera->pClipFrustum->field_0.z = zFar;
         camera->screenAspectRatio = aspectRatio;
         camera->ambientLight = 0.0;
         camera->numLights = 0;
@@ -71,9 +71,9 @@ void rdCamera_Free(rdCamera *camera)
 
 void rdCamera_FreeEntry(rdCamera *camera)
 {
-    if ( camera->cameraClipFrustum ) {
-        rdroid_pHS->free(camera->cameraClipFrustum);
-        camera->cameraClipFrustum = NULL; // Added: no UAF
+    if ( camera->pClipFrustum ) {
+        rdroid_pHS->free(camera->pClipFrustum);
+        camera->pClipFrustum = NULL; // Added: no UAF
     }
 }
 
@@ -192,7 +192,7 @@ int rdCamera_BuildFOV(rdCamera *camera)
     double v15; // st4
     float camerac; // [esp+1Ch] [ebp+4h]
 
-    rdClipFrustum* clipFrustum = camera->cameraClipFrustum;
+    rdClipFrustum* clipFrustum = camera->pClipFrustum;
     rdCanvas* canvas = camera->canvas;
     if ( !canvas )
         return 0;
@@ -265,7 +265,7 @@ int rdCamera_BuildClipFrustum(rdCamera *camera, rdClipFrustum *outClip, signed i
 {   
     //jk_printf("%u %u %u %u\n", height, width, height2, width2);
 
-    rdClipFrustum* cameraClip = camera->cameraClipFrustum;
+    rdClipFrustum* cameraClip = camera->pClipFrustum;
     rdCanvas* canvas = camera->canvas;
     if ( !canvas )
         return 0;

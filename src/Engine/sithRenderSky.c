@@ -66,7 +66,7 @@ void sithRenderSky_TransformHorizontal(rdProcEntry *a1, sithSurfaceInfo *a2, int
         v5 = sithWorld_pCurrentWorld;
         v6 = rdCamera_pCurCamera->canvas;
         v7 = a1->vertexUVs;
-        v15 = rdCamera_pCurCamera->cameraClipFrustum;
+        v15 = rdCamera_pCurCamera->pClipFrustum;
         v8 = a1->vertices;
         do
         {

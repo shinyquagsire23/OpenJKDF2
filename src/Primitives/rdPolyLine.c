@@ -358,7 +358,7 @@ void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVert
             procEntry->textureMode = rdroid_curTextureMode;
     }
 
-    rdPrimit3_ClipFace(rdCamera_pCurCamera->cameraClipFrustum, procEntry->geometryMode, procEntry->lightingMode, procEntry->textureMode, idxInfo, &mesh_out, &face->clipIdk);
+    rdPrimit3_ClipFace(rdCamera_pCurCamera->pClipFrustum, procEntry->geometryMode, procEntry->lightingMode, procEntry->textureMode, idxInfo, &mesh_out, &face->clipIdk);
     if ( mesh_out.numVertices < 3 )
         return;
 

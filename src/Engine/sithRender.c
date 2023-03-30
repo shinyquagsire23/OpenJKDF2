@@ -334,12 +334,12 @@ void sithRender_Draw()
 
     // Added: noclip
     if (!sithPlayer_bNoClippingRend) {
-        sithRender_Clip(sithCamera_currentCamera->sector, rdCamera_pCurCamera->cameraClipFrustum, 0.0);
+        sithRender_Clip(sithCamera_currentCamera->sector, rdCamera_pCurCamera->pClipFrustum, 0.0);
     }
     else {
         for (int i = 0; i < sithWorld_pCurrentWorld->numSectors; i++)
         {
-            sithRender_Clip(&sithWorld_pCurrentWorld->sectors[i], rdCamera_pCurCamera->cameraClipFrustum, 0.0);
+            sithRender_Clip(&sithWorld_pCurrentWorld->sectors[i], rdCamera_pCurCamera->pClipFrustum, 0.0);
         }
     }
 
@@ -438,7 +438,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
 
     if ( sector->renderTick == sithRender_lastRenderTick )
     {
-        sector->clipFrustum = rdCamera_pCurCamera->cameraClipFrustum;
+        sector->clipFrustum = rdCamera_pCurCamera->pClipFrustum;
     }
     else
     {
@@ -783,7 +783,7 @@ void sithRender_RenderLevelGeometry()
     sithRender_idxInfo.vertices = sithWorld_pCurrentWorld->verticesTransformed;
     sithRender_idxInfo.paDynamicLight = sithWorld_pCurrentWorld->verticesDynamicLight;
     sithRender_idxInfo.vertexUVs = vertices_uvs;
-    v77 = rdCamera_pCurCamera->cameraClipFrustum;
+    v77 = rdCamera_pCurCamera->pClipFrustum;
 
     for (v72 = 0; v72 < sithRender_numSectors; v72++)
     {
@@ -1351,7 +1351,7 @@ LABEL_150:
     }
 
     rdCache_Flush();
-    rdCamera_pCurCamera->cameraClipFrustum = v77;
+    rdCamera_pCurCamera->pClipFrustum = v77;
 }
 
 void sithRender_UpdateAllLights()

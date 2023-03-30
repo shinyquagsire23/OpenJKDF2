@@ -332,7 +332,7 @@ int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
     particle = thing->particlecloud;
     rdMatrix_TransformPoint34(&vertex_out, &matrix_4_3->scale, &rdCamera_pCurCamera->view_matrix);
     if ( rdroid_curCullFlags & 2 )
-        v3 = rdClip_SphereInFrustrum(rdCamera_pCurCamera->cameraClipFrustum, &vertex_out, particle->cloudRadius);
+        v3 = rdClip_SphereInFrustrum(rdCamera_pCurCamera->pClipFrustum, &vertex_out, particle->cloudRadius);
     else
         v3 = thing->clippingIdk;
     if ( v3 != 2 )
@@ -386,7 +386,7 @@ int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
             v21 = v17;
             v22 = *v4;
             aParticleVerticesTmp[1].z = v21;
-            v23 = rdCamera_pCurCamera->cameraClipFrustum;
+            v23 = rdCamera_pCurCamera->pClipFrustum;
             v24 = v19;
             v25 = v9;
             aParticleVerticesTmp[2].x = v20;

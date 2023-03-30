@@ -475,7 +475,7 @@ typedef struct rdCamera
     float fov_y;
     float screenAspectRatio;
     float orthoScale;
-    rdClipFrustum *cameraClipFrustum;
+    rdClipFrustum *pClipFrustum;
     void (*project)(rdVector3 *, rdVector3 *);
     void (*projectLst)(rdVector3 *, rdVector3 *, unsigned int);
     float ambientLight;

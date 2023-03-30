@@ -884,7 +884,7 @@ int rdPrimit3_GetScreenCoord(rdVector3 *vec, rdScreenPoint *screenpt)
     rdVector3 a2a; // [esp+Ch] [ebp-Ch] BYREF
 
     rdMatrix_TransformPoint34(&a2a, vec, &rdCamera_pCurCamera->view_matrix);
-    if ( !rdClip_Point3(rdCamera_pCurCamera->cameraClipFrustum, &a2a) )
+    if ( !rdClip_Point3(rdCamera_pCurCamera->pClipFrustum, &a2a) )
         return 0;
     rdCamera_pCurCamera->project(&v4, &a2a);
     if ( screenpt )
