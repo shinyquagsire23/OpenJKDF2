@@ -136,13 +136,13 @@ int rdCamera_SetProjectType(rdCamera *camera, int type)
         {
             if (camera->screenAspectRatio == 1.0 )
             {
-                camera->project = rdCamera_OrthoProjectSquare;
-                camera->projectLst = rdCamera_OrthoProjectSquareLst;
+                camera->fnProject = rdCamera_OrthoProjectSquare;
+                camera->fnProjectLst = rdCamera_OrthoProjectSquareLst;
             }
             else
             {
-                camera->project = rdCamera_OrthoProject;
-                camera->projectLst = rdCamera_OrthoProjectLst;
+                camera->fnProject = rdCamera_OrthoProject;
+                camera->fnProjectLst = rdCamera_OrthoProjectLst;
             }
             break;
         }
@@ -150,13 +150,13 @@ int rdCamera_SetProjectType(rdCamera *camera, int type)
         {
             if (camera->screenAspectRatio == 1.0)
             {
-                camera->project = rdCamera_PerspProjectSquare;
-                camera->projectLst = rdCamera_PerspProjectSquareLst;
+                camera->fnProject = rdCamera_PerspProjectSquare;
+                camera->fnProjectLst = rdCamera_PerspProjectSquareLst;
             }
             else
             {
-                camera->project = rdCamera_PerspProject;
-                camera->projectLst = rdCamera_PerspProjectLst;
+                camera->fnProject = rdCamera_PerspProject;
+                camera->fnProjectLst = rdCamera_PerspProjectLst;
             }
             break;
         }

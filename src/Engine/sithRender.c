@@ -642,7 +642,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
             if ((((unsigned int)meshinfo_out.numVertices >= 3u) || (rdClip_faceStatus & 0x40)) 
                 && ((rdClip_faceStatus & 0x41) || ((adjoinIter->flags & 1) && bAdjoinIsTransparent))) 
             {
-                rdCamera_pCurCamera->projectLst(sithRender_aVerticesTmp_projected, sithRender_aVerticesTmp, meshinfo_out.numVertices);
+                rdCamera_pCurCamera->fnProjectLst(sithRender_aVerticesTmp_projected, sithRender_aVerticesTmp, meshinfo_out.numVertices);
                 
                 v31 = frustumArg;
 
@@ -944,7 +944,7 @@ void sithRender_RenderLevelGeometry()
                 {
                     continue;
                 }
-                rdCamera_pCurCamera->projectLst(procEntry->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
+                rdCamera_pCurCamera->fnProjectLst(procEntry->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
                 if ( sithRender_lightingIRMode )
                 {
                     v49 = sithRender_f_83198C;
@@ -1161,7 +1161,7 @@ void sithRender_RenderLevelGeometry()
                     if ( meshinfo_out.numVertices < 3u )
                         goto LABEL_92;
 
-                    rdCamera_pCurCamera->projectLst(v20->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
+                    rdCamera_pCurCamera->fnProjectLst(v20->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
 
                     if ( sithRender_lightingIRMode )
                     {
@@ -1887,7 +1887,7 @@ void sithRender_RenderAlphaSurfaces()
         {
             continue;
         }
-        rdCamera_pCurCamera->projectLst(v9->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
+        rdCamera_pCurCamera->fnProjectLst(v9->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
         
         v9->ambientLight = stdMath_Clamp(surfaceSector->extraLight + sithRender_008d4098, 0.0, 1.0);
 

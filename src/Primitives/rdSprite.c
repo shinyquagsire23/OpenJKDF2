@@ -232,7 +232,7 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     if ( mesh_out.numVertices < 3u )
         return 0;
 
-    rdCamera_pCurCamera->projectLst(mesh_out.verticesOrig, mesh_out.verticesProjected, mesh_out.numVertices);
+    rdCamera_pCurCamera->fnProjectLst(mesh_out.verticesOrig, mesh_out.verticesProjected, mesh_out.numVertices);
 
     if ( rdroid_curRenderOptions & 2 )
         procEntry->ambientLight = rdCamera_pCurCamera->ambientLight;

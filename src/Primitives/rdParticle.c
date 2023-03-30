@@ -401,7 +401,7 @@ int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
             v27 = v26;
             if ( v26 >= 3 )
             {
-                rdCamera_pCurCamera->projectLst(v5->vertices, aParticleVerticesTmp, v26);
+                rdCamera_pCurCamera->fnProjectLst(v5->vertices, aParticleVerticesTmp, v26);
                 v5->lightingMode = v35;
                 v29 = particle->vertexCel;
                 v5->material = particle->material;

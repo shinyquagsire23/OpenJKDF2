@@ -226,8 +226,8 @@ int sithMap_Draw(sithSector *sector)
                                 point2 = sithMap_pCurWorld->verticesTransformed[v17];
                                 if ( rdClip_Line3Project(sithMap_pCurCamera->pClipFrustum, &point1, &point2, &out1, &out2) )
                                 {
-                                    sithMap_pCurCamera->project(&v46, &point1);
-                                    sithMap_pCurCamera->project(&v43, &point2);
+                                    sithMap_pCurCamera->fnProject(&v46, &point1);
+                                    sithMap_pCurCamera->fnProject(&v43, &point2);
                                     v18 = 0;
                                     v19 = 0;
                                     if ( sithMap_ctx.numArr )
