@@ -188,11 +188,11 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
 
         joint->nodeIdx = node_idx;
         joint->numAnimEntries = anim_entry_cnt;
-        joint->animEntries = (rdAnimEntry*)rdroid_pHS->alloc(sizeof(rdAnimEntry) * anim_entry_cnt + 2); // Added: prevent some oob accesses in rdPuppet
-        if (!joint->animEntries)
+        joint->paAnimEntries = (rdAnimEntry*)rdroid_pHS->alloc(sizeof(rdAnimEntry) * anim_entry_cnt + 2); // Added: prevent some oob accesses in rdPuppet
+        if (!joint->paAnimEntries)
           goto read_fail;
 
-        anim_entry = joint->animEntries;
+        anim_entry = joint->paAnimEntries;
         for (anim_entry_read = 0; anim_entry_read < joint->numAnimEntries; anim_entry_read++)
         {
             if (!stdConffile_ReadLine()) {
@@ -297,7 +297,7 @@ int rdKeyframe_Write(char *out_fpath, rdKeyframe *keyframe, char *creation_metho
         rdroid_pHS->filePrintf(
         fd,
         "#                                 dx:          dy:          dz:          dp:          dy:          dr:\n");
-        animEntry_iter = joint_iter->animEntries;
+        animEntry_iter = joint_iter->paAnimEntries;
         for (j = 0; j < joint_iter->numAnimEntries; j++ )
         {
             rdroid_pHS->filePrintf(
@@ -359,10 +359,10 @@ void rdKeyframe_FreeJoints(rdKeyframe *keyframe)
     joint_iter = keyframe->joints;
     for (i = 0; i < keyframe->numJoints2; i++)
     {
-        if (joint_iter->animEntries)
+        if (joint_iter->paAnimEntries)
         {
-            rdroid_pHS->free(joint_iter->animEntries);
-            joint_iter->animEntries = NULL;
+            rdroid_pHS->free(joint_iter->paAnimEntries);
+            joint_iter->paAnimEntries = NULL;
         }
         joint_iter++;
     }

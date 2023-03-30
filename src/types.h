@@ -521,7 +521,7 @@ typedef struct rdJoint
     char mesh_name[32];
     uint32_t nodeIdx;
     uint32_t numAnimEntries;
-    rdAnimEntry* animEntries;
+    rdAnimEntry* paAnimEntries;
 } rdJoint;
 
 typedef struct rdKeyframe
