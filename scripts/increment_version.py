@@ -13,7 +13,7 @@ def handle_flatpak(version):
 
     dt = today.strftime("%Y-%m-%d")
 
-    contents = contents.replace("<!--NEXT_RELEASE_HERE-->", "<!--NEXT_RELEASE_HERE-->\n    <release version=\"" + version + "\" date=\"" + dt + "\" />")
+    contents = contents.replace("<!--NEXT_RELEASE_HERE-->", "<!--NEXT_RELEASE_HERE-->\n    <release version=\"" + version + "\" date=\"" + dt + "\">")
 
     f = open("packaging/flatpak/org.openjkdf2.OpenJKDF2.metainfo.xml", "w")
     f.write(contents)
