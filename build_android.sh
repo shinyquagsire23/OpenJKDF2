@@ -20,10 +20,7 @@ if [ ! -f build_protoc/protoc ]; then
 fi
 
 # Prevent macOS headers from getting linked in
-SDKROOT=""
-MACOSX_DEPLOYMENT_TARGET=""
-CPLUS_INCLUDE_PATH=""
-C_INCLUDE_PATH=""
+export -n SDKROOT MACOSX_DEPLOYMENT_TARGET CPLUS_INCLUDE_PATH C_INCLUDE_PATH
 
 if [ ! -f libSDL2.so ]; then
     rm -f SDL2-2.26.4.zip
@@ -74,14 +71,14 @@ if [ ! -f libprotobuf.so.3.21.4.0 ]; then
     #cp build_protobuf/libprotobuf.so.3.21.4.0 .
 fi
 
-if [ ! -f libGameNetworkingSockets.so ]; then
-    mkdir -p build_gns && cd build_gns
-    GNS_BUILD=$(pwd)
-    #cmake --toolchain $GNS_BUILD/../../cmake_modules/toolchain_android_aarch64.cmake -DCMAKE_BUILD_TYPE=Release -DProtobuf_USE_STATIC_LIBS=ON -DProtobuf_LIBRARIES="-L$GNS_BUILD/../build_protobuf/lib" -DProtobuf_LIBRARIES_PATH="$GNS_BUILD/../build_protobuf/lib" -DProtobuf_INCLUDE_DIRS=$GNS_BUILD/../../3rdparty/protobuf/src -DProtobuf_INCLUDE_DIR=$GNS_BUILD/../../3rdparty/protobuf/src -DProtobuf_INCLUDE_DIR2=$GNS_BUILD/../../3rdparty/protobuf/third_party/abseil-cpp -DProtobuf_PROTOC_EXECUTABLE=$GNS_BUILD/../build_protoc/protoc $GNS_BUILD/../../3rdparty/GameNetworkingSockets
-    #make -j10
-    cd $OPENJKDF2_BUILD_DIR
-    #cp build_gns/bin/libGameNetworkingSockets.so .
-fi
+#if [ ! -f libGameNetworkingSockets.so ]; then
+#    mkdir -p build_gns && cd build_gns
+#    GNS_BUILD=$(pwd)
+#    cmake --toolchain $GNS_BUILD/../../cmake_modules/toolchain_android_aarch64.cmake -DCMAKE_BUILD_TYPE=Release -DProtobuf_USE_STATIC_LIBS=ON -DProtobuf_LIBRARIES="-L$GNS_BUILD/../build_protobuf/lib" -DProtobuf_LIBRARIES_PATH="$GNS_BUILD/../build_protobuf/lib" -DProtobuf_INCLUDE_DIRS=$GNS_BUILD/../../3rdparty/protobuf/src -DProtobuf_INCLUDE_DIR=$GNS_BUILD/../../3rdparty/protobuf/src -DProtobuf_INCLUDE_DIR2=$GNS_BUILD/../../3rdparty/protobuf/third_party/abseil-cpp -DProtobuf_PROTOC_EXECUTABLE=$GNS_BUILD/../build_protoc/protoc $GNS_BUILD/../../3rdparty/GameNetworkingSockets
+#    make -j10
+#    cd $OPENJKDF2_BUILD_DIR
+#    cp build_gns/bin/libGameNetworkingSockets.so .
+#fi
 
 if [ ! -f build_physfs/libphysfs.a ]; then
     mkdir -p build_physfs && cd build_physfs

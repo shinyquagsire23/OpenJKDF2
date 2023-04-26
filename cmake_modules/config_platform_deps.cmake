@@ -1,10 +1,15 @@
+include(ExternalProject)
+
 # Automatic updates
 if(TARGET_USE_CURL)
-    add_definitions(-DHAVE_STRUCT_TIMEVAL)
-    add_definitions(-DHAVE_CONFIG_H)
-    add_definitions(-DBUILDING_LIBCURL)
-    add_definitions(-DUSE_MBEDTLS)
-    add_definitions(-D__USE_MINGW_ANSI_STDIO)
+    add_compile_definitions(
+        HAVE_STRUCT_TIMEVAL
+        HAVE_CONFIG_H
+        BUILDING_LIBCURL
+        USE_MBEDTLS
+        __USE_MINGW_ANSI_STDIO
+        CURL_STATICLIB
+    )
 
     if(TARGET_LINUX)
         # Linux can just use the package manager version of libcurl, yay
@@ -34,9 +39,26 @@ if(DEBUG_QOL_CHEATS)
     add_definitions(-DDEBUG_QOL_CHEATS)
 endif()
 
+find_package(GLUT)
+if(NOT FreeGLUT_FOUND OR CMAKE_CROSSCOMPILING)
+    message(STATUS "Going to build “FreeGLUT 3.4.0” from Git module")
+    include(build_freeglut)
+endif()
+
 if(TARGET_USE_PHYSFS)
-    include_directories(${PROJECT_SOURCE_DIR}/3rdparty/physfs/src)
-    add_definitions(-DPLATFORM_PHYSFS)
+    find_package(PhysFS 3.2.0)
+    if(NOT PHYSFS_FOUND OR CMAKE_CROSSCOMPILING)
+        message(STATUS "Going to build “PhysFS 3.2.0” from Git module")
+        include(build_physfs)
+    endif()
+    add_compile_definitions(PLATFORM_PHYSFS)
+endif()
+
+set(GLEW_USE_STATIC_LIBS TRUE)
+find_package(GLEW 2.2.0)
+if(NOT GLEW_FOUND OR CMAKE_CROSSCOMPILING)
+    message(STATUS "Going to build “GLEW 2.2.0” from Git module")
+    include(build_glew)
 endif()
 
 if (NOT TARGET_USE_BASICSOCKETS AND NOT TARGET_USE_GAMENETWORKINGSOCKETS)
@@ -44,10 +66,49 @@ if (NOT TARGET_USE_BASICSOCKETS AND NOT TARGET_USE_GAMENETWORKINGSOCKETS)
 endif()
 
 if(TARGET_USE_GAMENETWORKINGSOCKETS)
+    find_package(ZLIB 1.2.13)
+    if(NOT ZLIB_FOUND)
+        message(STATUS "Going to build “zlib 1.2.13” from Git module")
+        include(build_zlib)
+        set(PROTOBUF_DEPENDS ZLIB_${CMAKE_SYSTEM_NAME}_${CMAKE_SYSTEM_PROCESSOR})
+    endif()
+    set(PROTOBUF_BUILD_PROTOC_BINARIES TRUE)
+    if(CMAKE_CROSSCOMPILING)
+        # Build zlib for cross‑compiling target
+        set(ZLIB_BUILD_FOR_HOST_SYSTEM TRUE)
+        include(build_zlib)
+        set(PROTOC_DEPENDS ZLIB_${CMAKE_HOST_SYSTEM_NAME}_${CMAKE_HOST_SYSTEM_PROCESSOR})
+        # Set ZLIB_ROOT to cross‑compiled flavor because this is the default
+        # when cross‑compiling and the host/native flavor of zlib has outlived
+        # its usefulness
+        set(ZLIB_ROOT ${ZLIB_${CMAKE_SYSTEM_NAME}_${CMAKE_SYSTEM_PROCESSOR}_ROOT})
+        # When cross‑compiling, build protoc for the host system
+        message(STATUS "Going to build “protoc” for ${CMAKE_HOST_SYSTEM_NAME} on ${CMAKE_HOST_SYSTEM_PROCESSOR}")
+        include(build_protoc)
+        # When cross‑compiling, only build libprotobuf because the host system
+        # cannot execute a cross-compiled libprotoc nor protoc
+        set(PROTOBUF_BUILD_PROTOC_BINARIES FALSE)
+        # Use native protoc when building GameNetworkingSockets
+        set(GAMENETWORKINGSOCKETS_PROTOC_EXECUTABLE -DProtobuf_PROTOC_EXECUTABLE:FILEPATH=${Protoc_PROTOC_EXECUTABLE})
+        set(GAMENETWORKINGSOCKETS_DEPENDS PROTOC)
+    endif()
+
+    find_package(Protobuf 3.21.12)
+    if(NOT Protobuf_FOUND OR CMAKE_CROSSCOMPILING)
+        message(STATUS "Going to build “protobuf 3.21.12” from Git module")
+        include(build_protobuf)
+    endif()
+
+    find_package(GameNetworkingSockets 1.4.1)
+    if(NOT GameNetworkingSockets_FOUND)
+        message(STATUS "Going to build “GameNetworkingSockets 1.4.1” from Git module")
+        include(build_gns)
+    endif()
+
     file(GLOB TARGET_GNS_SRCS ${PROJECT_SOURCE_DIR}/src/Platform/Networking/GNS/*.cpp)
     list(APPEND SOURCE_FILES ${TARGET_GNS_SRCS})
 
-    add_definitions(-DPLATFORM_GNS)
+    add_compile_definitions(PLATFORM_GNS)
 endif()
 
 if(TARGET_USE_BASICSOCKETS)
@@ -64,6 +125,12 @@ if(TARGET_USE_NOSOCKETS AND NOT TARGET_HOOKS)
     add_definitions(-DPLATFORM_NOSOCKETS)
 endif()
 
+find_package(PNG 1.6.39)
+if(NOT PNG_FOUND OR CMAKE_CROSSCOMPILING)
+    message(STATUS "Going to build “libpng 1.6.39” from Git module")
+    include(build_libpng)
+endif()
+
 if(TARGET_USE_LIBSMACKER)
     list(APPEND SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/external/libsmacker/smacker.c ${PROJECT_SOURCE_DIR}/src/external/libsmacker/smk_bitstream.c ${PROJECT_SOURCE_DIR}/src/external/libsmacker/smk_hufftree.c)
 endif()
@@ -73,10 +140,14 @@ if(TARGET_USE_LIBSMUSHER)
 endif()
 
 if(TARGET_USE_SDL2)
+    find_package(SDL 2.26.5)
+    if(NOT SDL_FOUND)
+        message(STATUS "Going to build “SDL 2.26.5” from Git module")
+        include(build_sdl)
+    endif()
     file(GLOB TARGET_SDL2_SRCS ${PROJECT_SOURCE_DIR}/src/Platform/SDL2/*.c)
     list(APPEND SOURCE_FILES ${TARGET_SDL2_SRCS})
-    add_definitions(-DSDL2_RENDER)
-    
+    add_compile_definitions(SDL2_RENDER)
 endif()
 
 if(TARGET_USE_OPENGL)
@@ -88,9 +159,14 @@ if(TARGET_USE_OPENGL)
 endif()
 
 if(TARGET_USE_OPENAL)
-    add_definitions(-DSTDSOUND_OPENAL)
+    find_package(OpenAL 1.23.1)
+    if(NOT OPENAL_FOUND)
+        message(STATUS "Going to build “libopenal 1.23.1” from Git module")
+        include(build_openal)
+    endif()
+    add_compile_definitions(STDSOUND_OPENAL)
 else()
-    add_definitions(-DSTDSOUND_NULL)
+    add_compile_definitions(STDSOUND_NULL)
 endif()
 
 if(TARGET_USE_D3D)
@@ -133,6 +209,10 @@ if(TARGET_CAN_JKGM)
 endif()
 
 if(TARGET_WIN32)
+    include_directories(
+        ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/include
+        ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer/x86_64-w64-mingw32/include/SDL2
+    )
     file(GLOB TARGET_WIN32_SRCS ${PROJECT_SOURCE_DIR}/src/Platform/Win32/*.c)
     list(APPEND SOURCE_FILES ${TARGET_WIN32_SRCS})
 
@@ -144,7 +224,7 @@ if(TARGET_WIN32)
         list(REMOVE_ITEM SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/Platform/Win32/wuRegistry.c)
     endif()
 
-    if (PLAT_MSVC)
+    if(PLAT_MSVC)
         list(APPEND SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/Platform/Posix/wuRegistry.c)
     endif()
 
@@ -152,8 +232,6 @@ if(TARGET_WIN32)
         list(APPEND SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/external/nativefiledialog-extended/nfd_win.cpp)
         if(PLAT_MSVC)
             set(LINK_LIBS ${LINK_LIBS} ole32.lib uuid.lib)
-        else()
-            add_link_options(-lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid -lws2_32)
         endif()
     endif()
 endif()

@@ -45,7 +45,18 @@ def handle_cmake(version):
     cmake_version = ".".join([major, minor, patch, "0"])
 
     f = open("cmake_modules/version.cmake", "w")
-    f.write("set(OPENJKDF2_PROJECT_VERSION " + cmake_version + ")\n");
+    f.write("set(OPENJKDF2_PROJECT_VERSION " + cmake_version + ")\n"
+            "find_package(Git)\n"
+            "execute_process(\n"
+            "    COMMAND git log -1 --format=%H\n"
+            "    OUTPUT_VARIABLE OPENJKDF2_RELEASE_COMMIT\n"
+            "    OUTPUT_STRIP_TRAILING_WHITESPACE\n"
+            ")\n"
+            "execute_process(\n"
+            "    COMMAND git rev-parse --short=8 HEAD\n"
+            "    OUTPUT_VARIABLE OPENJKDF2_RELEASE_COMMIT_SHORT\n"
+            "    OUTPUT_STRIP_TRAILING_WHITESPACE\n"
+            ")");
     f.close()
 
 if __name__ == "__main__":
