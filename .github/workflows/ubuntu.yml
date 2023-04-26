@@ -1,23 +1,35 @@
-name: Ubuntu 20.04 SDL2
+name: Ubuntu 22.04 SDL2
 
 on:
   push:
-    branches: [ master ]
+    branches:
+      - master
   pull_request:
-    branches: [ master ]
+    branches: 
+      - master
 
 jobs:
   build:
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
+    env:
+      OPENJKDF2_BUILD_DIR: /tmp/OpenJKDF2/Linux/x86_64/Debug
+      CC: clang
+      CXX: clang++
     steps:
-    - uses: actions/checkout@v2
-    - name: Install Packages
-      run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y build-essential cmake make python3 python3-pip bison imagemagick libgtk-3-dev
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+        name: Checkout
+      - name: Install Packages
+        run: |
+          sudo apt-get update -qq &&
+          sudo apt-get install -y build-essential cmake make clang python3 python3-pip bison imagemagick zsh \
+                                  libgtk-3-dev libsdl2-dev libsdl2-mixer-dev libopenal-dev libglew-dev libssl-dev libprotobuf-dev libpng-dev libcurl4-openssl-dev \
+                                  protobuf-compiler &&
           sudo pip3 install cogapp
-          sudo apt-get install -y zsh mingw-w64 clang libsdl2-dev libsdl2-mixer-dev libopenal-dev libglew-dev libssl-dev libprotobuf-dev protobuf-compiler libpng-dev libcurl4-openssl-dev
-    - name: cmake
-      run: export CC=clang && export CXX=clang++ && ./build_linux64.sh
+      - name: Generate CMake Build System
+        run: cmake -DCMAKE_BUILD_TYPE=Debug -B "$OPENJKDF2_BUILD_DIR"
+      - name: Make
+        run: make -C "$OPENJKDF2_BUILD_DIR"
