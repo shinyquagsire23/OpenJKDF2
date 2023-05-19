@@ -4,39 +4,39 @@
   <metadata_license>0BSD</metadata_license>
   <project_license>0BSD</project_license>
   <name>OpenJKDF2</name>
-  <summary>A cross-platform reimplementation of &#x201c;Jedi Knight: Dark Forces II&#x201d;</summary>
-  <summary xml:lang="de">Eine Plattformen &#x00fc;bergreifende Reimplementierung von &#x201e;Jedi Knight: Dark Forces II&#x201c;</summary>
-  <summary xml:lang="pl">Wieloplatformowa reimplementacja &#x201e;Jedi Knight: Dark Forces II&#x201d;</summary>
+  <summary>A cross-platform reimplementation of &#x201c;Jedi&#x00a0;Knight&#x2122;:&#x00a0;Dark&#x00a0;Forces&#x00a0;II&#x201d;</summary>
+  <summary xml:lang="de">Eine Plattformen &#x00fc;bergreifende Reimplementierung von &#x201e;Jedi&#x00a0;Knight&#x2122;:&#x00a0;Dark&#x00a0;Forces&#x00a0;II&#x201c;</summary>
+  <summary xml:lang="pl">Wieloplatformowa reimplementacja &#x201e;Jedi&#x00a0;Knight&#x2122;:&#x00a0;Dark&#x00a0;Forces&#x00a0;II&#x201d;</summary>
   <description>
     <p>
-      OpenJKDF2 is an open-source re-implementation of &#x201c;Jedi Knight: Dark Forces II&#x201d; (JKDF2).
+      OpenJKDF2 is an open-source re-implementation of &#x201c;Jedi&#x00a0;Knight&#x2122;:&#x00a0;Dark&#x00a0;Forces&#x00a0;II&#x201d; (JKDF2).
       OpenJKDF2 removes the hassle of rendering and input compatibility shims, while also
       providing in-app guided installation steps, cross-platform multiplayer, and a host
-      of graphical (and other) improvements:
+      of graphical (and other) improvements.
     </p>
     <p xml:lang="de">
-      OpenJKDF2 ist eine quelloffene Reimplementierung von &#x201e;Jedi Knight: Dark Forces II&#x201c; (JKDF2).
+      OpenJKDF2 ist eine quelloffene Reimplementierung von &#x201e;Jedi&#x00a0;Knight&#x2122;:&#x00a0;Dark&#x00a0;Forces&#x00a0;II&#x201c; (JKDF2).
       OpenJKDF2 befreit nicht nur vom &#x00c4;rger mit der Grafikdarstellung sowie von Inkompatibilit&#x00e4;ten mit Eingabeger&#x00e4;ten,
       sondern bietet auch anwendungsgef&#x00fc;hrte Installationsschritte, Plattformen &#x00fc;bergreifende Mehrspieler&#x2011;Unterst&#x00fc;tzung
       und eine F&#x00fc;lle von grafischen (und Anderen) Verbesserungen.
     </p>
     <p xml:lang="pl">
-      OpenJKDF2, to otwarto&#x017a;r&#x00f3;d&#x0142;owa reimplementacja &#x201e;Jedi Knight: Dark Forces II&#x201d; (JKDF2).
+      OpenJKDF2, to otwarto&#x017a;r&#x00f3;d&#x0142;owa reimplementacja &#x201e;Jedi&#x00a0;Knight&#x2122;:&#x00a0;Dark&#x00a0;Forces&#x00a0;II&#x201d; (JKDF2).
       OpenJKDF2 usuwa k&#x0142;opoty z grafik&#x0105; i kompatybilno&#x015b;ci&#x0105; urz&#x0105;dze&#x0144; sterowniczych,
       zapewnia kroki instalacyjne providing in-app guided installation steps, obs&#x0142;uguje wieloplatformow&#x0105; wieloosobow&#x0105; gr&#x0119;
       i dodaje mn&#x00f3;stwo graficznych (jak i innych) ulepsze&#x0144;.
     </p>
     <p>
-      Jedi Knight&#x2122; Dark Forces II is Copyright &#x00a9; Lucasfilm Ltd. 1997-2009.
-      An original &#x201c;Jedi Knight: Dark Forces II&#x201d; game disk, or original licensed assets from Steam or GOG, are required in order to play OpenJKDF2.
+      &#x201c;Jedi&#x00a0;Knight&#x2122;:&#x00a0;Dark&#x00a0;Forces&#x00a0;II&#x201d; is Copyright &#x00a9; Lucasfilm Ltd. 1997-2009.
+      An original &#x201c;Jedi&#x00a0;Knight&#x2122;:&#x00a0;Dark&#x00a0;Forces&#x00a0;II&#x201d; game disk, or original licensed assets from Steam or GOG, are required in order to play OpenJKDF2.
     </p>
     <p xml:lang="de">
-      &#x201e;Jedi Knight&#x2122; Dark Forces II&#x201c; ist urheberrechtlich durch Lucasfilm Ltd. 1997-2009 gesch&#x00fc;tzt.
-      Eine original &#x201e;Jedi Knight: Dark Forces II&#x201c;&#x2011;Spieldisk oder &#x00fc;ber Steam bzw. GOG original lizenzierte Spielwerke werden ben&#x00f6;tigt um OpenJKDF2 zu spielen.
+      &#x201e;Jedi&#x00a0;Knight&#x2122;:&#x00a0;Dark&#x00a0;Forces&#x00a0;II&#x201c; ist urheberrechtlich durch Lucasfilm Ltd. 1997-2009 gesch&#x00fc;tzt.
+      Eine original &#x201e;Jedi&#x00a0;Knight&#x2122;:&#x00a0;Dark&#x00a0;Forces&#x00a0;II&#x201c;&#x2011;Spieldisk oder &#x00fc;ber Steam bzw. GOG original lizenzierte Spielwerke werden ben&#x00f6;tigt um OpenJKDF2 zu spielen.
     </p>
     <p xml:lang="pl">
-      Lucasfilm Ltd. jest w&#x0142;a&#x015b;cicielem prawa autorskiego do &#x201e;Jedi Knight&#x2122; Dark Forces II&#x201d; z lat 1997 do 2009.
-      Aby wykorzysta&#x0107; OpenJKDF2 do odtwarzania &#x201e;Jedi Knight: Dark Forces II&#x201d;, niezb&#x0119;dny jest oryginalny dysk lub licencjonowane oryginalne zasoby gry ze Steam lub GOG.
+      Lucasfilm Ltd. jest w&#x0142;a&#x015b;cicielem prawa autorskiego do &#x201e;Jedi&#x00a0;Knight&#x2122;:&#x00a0;Dark&#x00a0;Forces&#x00a0;II&#x201d; z lat 1997 do 2009.
+      Aby wykorzysta&#x0107; OpenJKDF2 do odtwarzania &#x201e;Jedi&#x00a0;Knight&#x2122;:&#x00a0;Dark&#x00a0;Forces&#x00a0;II&#x201d;, niezb&#x0119;dny jest oryginalny dysk lub licencjonowane oryginalne zasoby gry ze Steam lub GOG.
     </p>
   </description>
   <screenshots>
@@ -69,12 +69,22 @@
   </content_rating>
   <releases>
     <!--NEXT_RELEASE_HERE-->
+      <description>
+        <p>
+          What&#x2019;s new in &#x201c;Jedi&#x00a0;Knight&#x2122;:&#x00a0;Dark&#x00a0;Forces&#x00a0;II&#x201d;:
+        </p>
+        <ul>
+          <li>Include README.md and LICENSE.md files</li>
+          <li>Fix typos in AppStream metadata and add search keywords</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.8.18" date="2023-03-29" />
     <release version="0.8.17" date="2023-03-26" />
     <release version="0.8.16" date="2023-03-17">
       <description>
         <p>
-          What&#x2019;s new in &#x201c;Jedi Knight: Dark Forces II&#x201d;:
+          What&#x2019;s new in &#x201c;Jedi&#x00a0;Knight&#x2122;:&#x00a0;Dark&#x00a0;Forces&#x00a0;II&#x201d;:
         </p>
         <ul>
           <li>OpenGL hardware rendering with emissive textures, bloom, and ambient occlusion.</li>
