@@ -1411,4 +1411,16 @@ enum JKGUI_BM {
     JKGUI_BM_ARROW_RIGHT = 34, 
 };
 
+enum SITH_MAPMODE
+{
+    MAPMODE_01 = 0x01,
+    MAPMODE_02 = 0x02,
+    MAPMODE_04 = 0x04,
+    MAPMODE_08 = 0x08,
+    MAPMODE_10 = 0x10,
+    MAPMODE_20 = 0x20,
+    MAPMODE_40 = 0x40,
+    MAPMODE_80 = 0x80,
+};
+
 #endif // _OPENJKDF2_TYPES_ENUMS_H
