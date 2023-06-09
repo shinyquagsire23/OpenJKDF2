@@ -73,7 +73,7 @@ void sithPlayer_NewEntry(sithWorld *world)
         sithPlayerInfo* playerInfo = &jkPlayer_playerInfos[0];
         for (v5 = v2 + 1; v5 >= 0; v5--)
         {
-            if ( v1->type == SITH_THING_PLAYER && v3 < 0x20 )
+            if ( v1->type == SITH_THING_PLAYER && v3 < 32 )
             {
                 playerInfo->playerThing = v1;
                 v1->thingflags |= SITH_TF_INVULN;
@@ -84,6 +84,8 @@ void sithPlayer_NewEntry(sithWorld *world)
                 playerInfo->pSpawnSector = v1->sector;
                 playerInfo++;
                 ++v3;
+
+
             }
             ++v1;
         }

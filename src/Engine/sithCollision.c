@@ -134,11 +134,17 @@ float sithCollision_SearchRadiusForThings(sithSector *pStartSector, sithThing *p
     float a1a; // [esp+1Ch] [ebp+4h]
     float a5a; // [esp+2Ch] [ebp+14h]
 
+
     sithCollision_searchStackIdx++;
     sithCollision_searchNumResults[sithCollision_searchStackIdx] = 0;
     sithCollision_stackIdk[sithCollision_searchStackIdx] = 1;
     v25 = moveDist;
     sithCollision_stackSectors[sithCollision_searchStackIdx].sectors[0] = pStartSector;
+
+    if (!pStartSector) {
+        jk_printf("OpenJKDF2 WARN: sithCollision_SearchRadiusForThings received NULL pStartSector!\n");
+        return 0.0f;
+    }
 
     if ( (flags & RAYCAST_1) == 0 )
         v25 = sithCollision_UpdateSectorThingCollision(pStartSector, pThing, pStartPos, pMoveNorm, moveDist, radius, flags);

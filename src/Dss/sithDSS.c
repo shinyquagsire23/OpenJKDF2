@@ -16,6 +16,84 @@
 
 #include "jk.h"
 
+const char* sithDSS_IdToStr(int id)
+{
+    const char* strs[DSS_MAX] = 
+    {
+        "UNK_0",
+        "DSS_THINGPOS",
+        "DSS_CHAT",
+        "DSS_SECTORFLAGS",
+        "DSS_FIREPROJECTILE",
+        "DSS_DEATH",
+        "DSS_DAMAGE",
+        "DSS_SETTHINGMODEL",
+        "DSS_SENDTRIGGER",
+        "DSS_PLAYKEY",
+        "DSS_PLAYSOUND",
+        "DSS_SYNCTHING",
+        "DSS_THINGFULLDESC",
+        "DSS_SYNCCOG",
+        "DSS_SURFACESTATUS",
+        "DSS_AISTATUS",
+        "DSS_INVENTORY",
+        "DSS_SURFACE",
+        "DSS_SECTORSTATUS",
+        "DSS_PLAYKEYMODE",
+        "DSS_PATHMOVE",
+        "DSS_SYNCPUPPET",
+        "DSS_SYNCTHINGATTACHMENT",
+        "DSS_SYNCEVENTS",
+        "DSS_SYNCCAMERAS",
+        "DSS_TAKEITEM1",
+        "DSS_TAKEITEM2",
+        "DSS_STOPKEY",
+        "DSS_STOPSOUND",
+        "DSS_CREATETHING",
+        "DSS_SYNCPALEFFECTS",
+        "DSS_ID_1F",
+        "DSS_LEAVEJOIN",
+        "DSS_WELCOME",
+        "DSS_JOINREQUEST",
+        "DSS_DESTROYTHING",
+        "DSS_JOINING",
+        "DSS_PLAYSOUNDMODE",
+        "DSS_PING",
+        "DSS_PINGREPLY",
+        "DSS_RESET",
+        "DSS_ENUMPLAYERS",
+        "DSS_QUIT",
+        "DSS_ID_2B",
+        "DSS_MOTS_NEW_1",
+        "DSS_MOTS_NEW_2",
+        "DSS_ID_2E",
+        "DSS_ID_2F",
+        "DSS_JKENABLESABER",
+        "DSS_SABERINFO3",
+        "DSS_ID_32",
+        "DSS_ID_33",
+        "DSS_ID_34",
+        "DSS_HUDTARGET",
+        "DSS_ID_36",
+        "DSS_JKPRINTUNISTRING",
+        "DSS_ENDLEVEL",
+        "DSS_SABERINFO1",
+        "DSS_SABERINFO2",
+        "DSS_JKSETWEAPONMESH",
+        "DSS_SETTEAM",
+        "DSS_61",
+        "DSS_62",
+        "DSS_63",
+        "DSS_64",
+        "DSS_MAX",
+    };
+    if (id < 0) return "UNK_TOOSMAll";
+    if (id > DSS_MAX) {
+        return "UNK_TOOLARGE";
+    }
+    return strs[id];
+}
+
 void sithDSS_SendSurfaceStatus(sithSurface *surface, int sendto_id, int mpFlags)
 {
     NETMSG_START;

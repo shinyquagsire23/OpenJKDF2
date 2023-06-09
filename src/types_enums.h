@@ -590,6 +590,8 @@ enum DSS_ID
     DSS_MAX        = 66
 };
 
+const char* sithDSS_IdToStr(int id);
+
 enum sithMultiModeFlags
 {
     MULTIMODEFLAG_TEAMS = 0x1,

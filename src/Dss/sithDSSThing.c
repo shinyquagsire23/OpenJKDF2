@@ -121,7 +121,23 @@ void sithDSSThing_SendSyncThing(sithThing *pThing, int sendto_id, int mpFlags)
 {
     NETMSG_START;
 
-    if (!pThing || !pThing->type || !pThing->sector || !sithThing_GetIdxFromThing(pThing) || MOTS_ONLY_COND(pThing->physicsParams.physflags & SITH_PF_4000000))
+#if 0
+    if (!pThing) {
+        jk_printf("OpenJKDF2 WARN: Thing NULL, not synced.\n");
+        return;
+    }
+    if (!pThing->type) {
+        jk_printf("OpenJKDF2 WARN: Thing type 0, not synced.\n");
+    }
+    if (!pThing->sector) {
+        jk_printf("OpenJKDF2 WARN: Thing sector NULL, not synced.\n");
+    }
+    if (!sithThing_GetIdxFromThing(pThing)) {
+        jk_printf("OpenJKDF2 WARN: Thing not syncable?\n");
+    }
+#endif
+
+    if (!pThing || !pThing->type || !pThing->sector || !sithThing_GetIdxFromThing(pThing) || MOTS_ONLY_FLAG(pThing->physicsParams.physflags & SITH_PF_4000000))
         return;
 
     NETMSG_PUSHS32(pThing->thing_id);

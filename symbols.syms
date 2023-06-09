@@ -245,7 +245,7 @@ sithNet_dword_8C4BA8 0x008C4BA8 int
 sithNet_dword_83262C 0x0083262C int
 sithMulti_leaveJoinType 0x0083263C int
 sithNet_checksum 0x00832630 int
-sithNet_dword_832640 0x00832640 int
+sithNet_bNeedsFullThingSyncForLeaveJoin 0x00832640 int
 sithMulti_sendto_id 0x00832644 int
 sithNet_bSyncScores 0x00832648 int
 sithNet_dword_832620 0x00832620 int
@@ -339,8 +339,8 @@ stdComm_dword_8321F0 0x008321F0 int
 stdComm_dword_8321F4 0x008321F4 int
 stdComm_dplayIdSelf 0x008321EC int
 stdComm_dword_832204 0x00832204 int
-stdComm_dword_832208 0x00832208 uint32_t
-stdComm_dword_83220C 0x0083220C int
+stdComm_dword_832208 0x00832208 int
+stdComm_currentBigSyncStage 0x0083220C int
 stdComm_dword_8321E0 0x008321E0 int
 stdComm_bIsServer 0x008321E4 int
 stdComm_dword_8321E8 0x008321E8 int
