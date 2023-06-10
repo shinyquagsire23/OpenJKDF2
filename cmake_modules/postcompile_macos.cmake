@@ -32,10 +32,20 @@ if(TARGET_MACOS)
 
     COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/libvorbis/lib/libvorbis.0.dylib @executable_path/libvorbis.0.dylib ${BUNDLE}/Contents/MacOS/libSDL2_mixer-2.0.0.dylib
     COMMAND cp ${HOMEBREW_PREFIX}/opt/libvorbis/lib/libvorbis.0.dylib ${BUNDLE}/Contents/MacOS
+
+    COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/libxmp/lib/libxmp.4.dylib @executable_path/libxmp.4.dylib ${BUNDLE}/Contents/MacOS/libSDL2_mixer-2.0.0.dylib
+    COMMAND cp ${HOMEBREW_PREFIX}/opt/libxmp/lib/libxmp.4.dylib ${BUNDLE}/Contents/MacOS
+
+    COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/fluid-synth/lib/libfluidsynth.3.dylib @executable_path/libfluidsynth.3.dylib ${BUNDLE}/Contents/MacOS/libSDL2_mixer-2.0.0.dylib
+    COMMAND cp ${HOMEBREW_PREFIX}/opt/fluid-synth/lib/libfluidsynth.3.dylib ${BUNDLE}/Contents/MacOS
+
+    COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/opusfile/lib/libopusfile.0.dylib @executable_path/libopusfile.0.dylib ${BUNDLE}/Contents/MacOS/libSDL2_mixer-2.0.0.dylib
+    COMMAND cp ${HOMEBREW_PREFIX}/opt/opusfile/lib/libopusfile.0.dylib ${BUNDLE}/Contents/MacOS
     
     COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/libvorbis/lib/libvorbisfile.3.dylib @executable_path/libvorbisfile.3.dylib ${BUNDLE}/Contents/MacOS/libSDL2_mixer-2.0.0.dylib
     COMMAND cp ${HOMEBREW_PREFIX}/opt/libvorbis/lib/libvorbisfile.3.dylib ${BUNDLE}/Contents/MacOS
 
+    COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/openssl@1.1/lib/libcrypto.1.1.dylib @executable_path/libcrypto.1.1.dylib ${BUNDLE}/Contents/MacOS/libSDL2_mixer-2.0.0.dylib
     COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/openssl@1.1/lib/libcrypto.1.1.dylib @executable_path/libcrypto.1.1.dylib ${BUNDLE}/Contents/MacOS/libGameNetworkingSockets.dylib
     COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/openssl@1.1/lib/libcrypto.1.1.dylib @executable_path/libcrypto.1.1.dylib ${BUNDLE}/Contents/MacOS/${BIN_NAME}
     COMMAND cp ${HOMEBREW_PREFIX}/opt/openssl@1.1/lib/libcrypto.1.1.dylib ${BUNDLE}/Contents/MacOS
@@ -49,7 +59,59 @@ if(TARGET_MACOS)
     COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/Cellar/libvorbis/1.3.7/lib/libvorbis.0.dylib @executable_path/libvorbis.0.dylib ${BUNDLE}/Contents/MacOS/libvorbisfile.3.dylib
     COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/libogg/lib/libogg.0.dylib @executable_path/libogg.0.dylib ${BUNDLE}/Contents/MacOS/libvorbisfile.3.dylib
 
+    COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/libogg/lib/libogg.0.dylib @executable_path/libogg.0.dylib ${BUNDLE}/Contents/MacOS/libvorbisfile.3.dylib
     COMMAND cp ${HOMEBREW_PREFIX}/opt/libogg/lib/libogg.0.dylib ${BUNDLE}/Contents/MacOS
+
+    # Ehhhhhhhhhhh
+    #
+    # libfluidsynth
+    #
+    COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/glib/lib/libglib-2.0.0.dylib @executable_path/libglib-2.0.0.dylib ${BUNDLE}/Contents/MacOS/libfluidsynth.3.dylib
+    COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/glib/lib/libgthread-2.0.0.dylib @executable_path/libgthread-2.0.0.dylib  ${BUNDLE}/Contents/MacOS/libfluidsynth.3.dylib
+    COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/gettext/lib/libintl.8.dylib @executable_path/libintl.8.dylib ${BUNDLE}/Contents/MacOS/libfluidsynth.3.dylib
+    COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/libsndfile/lib/libsndfile.1.dylib @executable_path/libsndfile.1.dylib  ${BUNDLE}/Contents/MacOS/libfluidsynth.3.dylib
+    COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/portaudio/lib/libportaudio.2.dylib @executable_path/libportaudio.2.dylib  ${BUNDLE}/Contents/MacOS/libfluidsynth.3.dylib
+    COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/readline/lib/libreadline.8.dylib @executable_path/libreadline.8.dylib ${BUNDLE}/Contents/MacOS/libfluidsynth.3.dylib
+
+    COMMAND cp ${HOMEBREW_PREFIX}/opt/glib/lib/libglib-2.0.0.dylib ${BUNDLE}/Contents/MacOS
+    COMMAND cp ${HOMEBREW_PREFIX}/opt/glib/lib/libgthread-2.0.0.dylib ${BUNDLE}/Contents/MacOS
+    COMMAND cp ${HOMEBREW_PREFIX}/opt/gettext/lib/libintl.8.dylib ${BUNDLE}/Contents/MacOS
+    COMMAND cp ${HOMEBREW_PREFIX}/opt/libsndfile/lib/libsndfile.1.dylib ${BUNDLE}/Contents/MacOS
+    COMMAND cp ${HOMEBREW_PREFIX}/opt/portaudio/lib/libportaudio.2.dylib ${BUNDLE}/Contents/MacOS
+    COMMAND cp ${HOMEBREW_PREFIX}/opt/readline/lib/libreadline.8.dylib ${BUNDLE}/Contents/MacOS
+
+    #
+    # libsndfile
+    #
+    COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/flac/lib/libFLAC.12.dylib @executable_path/libFLAC.12.dylib ${BUNDLE}/Contents/MacOS/libsndfile.1.dylib
+    COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/libvorbis/lib/libvorbisenc.2.dylib @executable_path/libvorbisenc.2.dylib ${BUNDLE}/Contents/MacOS/libsndfile.1.dylib
+    COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/opus/lib/libopus.0.dylib @executable_path/libopus.0.dylib ${BUNDLE}/Contents/MacOS/libsndfile.1.dylib
+    COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/mpg123/lib/libmpg123.0.dylib @executable_path/libmpg123.0.dylib ${BUNDLE}/Contents/MacOS/libsndfile.1.dylib
+    COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/lame/lib/libmp3lame.0.dylib @executable_path/libmp3lame.0.dylib ${BUNDLE}/Contents/MacOS/libsndfile.1.dylib
+    COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/libvorbis/lib/libvorbis.0.dylib @executable_path/libvorbis.0.dylib ${BUNDLE}/Contents/MacOS/libsndfile.1.dylib
+    COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/libogg/lib/libogg.0.dylib @executable_path/libogg.0.dylib ${BUNDLE}/Contents/MacOS/libsndfile.1.dylib
+
+    COMMAND cp ${HOMEBREW_PREFIX}/opt/opus/lib/libopus.0.dylib ${BUNDLE}/Contents/MacOS
+    COMMAND cp ${HOMEBREW_PREFIX}/opt/libvorbis/lib/libvorbisenc.2.dylib ${BUNDLE}/Contents/MacOS
+    COMMAND cp ${HOMEBREW_PREFIX}/opt/lame/lib/libmp3lame.0.dylib ${BUNDLE}/Contents/MacOS
+
+    COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/Cellar/libvorbis/1.3.7/lib/libvorbis.0.dylib @executable_path/libvorbis.0.dylib ${BUNDLE}/Contents/MacOS/libvorbisenc.2.dylib
+    COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/libogg/lib/libogg.0.dylib @executable_path/libogg.0.dylib ${BUNDLE}/Contents/MacOS/libvorbisenc.2.dylib
+    COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/libogg/lib/libogg.0.dylib @executable_path/libogg.0.dylib ${BUNDLE}/Contents/MacOS/libopusfile.0.dylib
+    COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/opus/lib/libopus.0.dylib @executable_path/libopus.0.dylib ${BUNDLE}/Contents/MacOS/libopusfile.0.dylib
+
+    #
+    # libgthread
+    #
+    COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/Cellar/glib/2.76.3/lib/libglib-2.0.0.dylib @executable_path/libglib-2.0.0.dylib ${BUNDLE}/Contents/MacOS/libgthread-2.0.0.dylib
+
+    #
+    # libglib-2.0.0.dylib
+    #
+    COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/gettext/lib/libintl.8.dylib @executable_path/libintl.8.dylib ${BUNDLE}/Contents/MacOS/libglib-2.0.0.dylib
+    COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/pcre2/lib/libpcre2-8.0.dylib @executable_path/libpcre2-8.0.dylib ${BUNDLE}/Contents/MacOS/libglib-2.0.0.dylib
+    COMMAND cp ${HOMEBREW_PREFIX}/opt/pcre2/lib/libpcre2-8.0.dylib ${BUNDLE}/Contents/MacOS
+
     COMMAND chmod 774 ${BUNDLE}/Contents/MacOS/*.dylib
     COMMAND cp -r ${CMAKE_CURRENT_BINARY_DIR}/openjkdf2-64.dsym ${BUNDLE}/Contents/MacOS/openjkdf2-64.dsym
     COMMAND chmod 774 ${BUNDLE}/Contents/MacOS/${BIN_NAME}
