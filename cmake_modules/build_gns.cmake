@@ -1,5 +1,5 @@
 set(GameNetworkingSockets_ROOT ${CMAKE_BINARY_DIR}/GameNetworkingSockets)
-if(WIN32)
+if(TARGET_WIN32)
     set(USE_CRYPTO BCrypt)
 else()
     set(USE_CRYPTO OpenSSL)

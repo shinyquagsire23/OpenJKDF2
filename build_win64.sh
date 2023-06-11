@@ -40,24 +40,24 @@ mkdir -p build_win64 && pushd build_win64 &&
 #    popd
 #fi
 
-if [ ! -f build_physfs/libphysfs.a ]; then
-    mkdir -p build_physfs && pushd build_physfs &&
-    PHYSFS_BUILD=$(pwd) &&
-    cmake --toolchain "$PHYSFS_BUILD/../../cmake_modules/toolchain_mingw.cmake"\
-          -DCMAKE_BUILD_TYPE=Release \
-          -DPHYSFS_ARCHIVE_GRP=FALSE \
-          -DPHYSFS_ARCHIVE_WAD=FALSE \
-          -DPHYSFS_ARCHIVE_HOG=FALSE \
-          -DPHYSFS_ARCHIVE_MVL=FALSE \
-          -DPHYSFS_ARCHIVE_QPAK=FALSE \
-          -DPHYSFS_ARCHIVE_SLB=FALSE \
-          -DPHYSFS_ARCHIVE_VDF=FALSE \
-          "$PHYSFS_BUILD/../../3rdparty/physfs" &&
-    make -j $(nproc) &&
-    popd
-fi &&
+#if [ ! -f build_physfs/libphysfs.a ]; then
+#    mkdir -p build_physfs && pushd build_physfs &&
+#    PHYSFS_BUILD=$(pwd) &&
+#    cmake --toolchain "$PHYSFS_BUILD/../../cmake_modules/toolchain_mingw.cmake"\
+#          -DCMAKE_BUILD_TYPE=Release \
+#          -DPHYSFS_ARCHIVE_GRP=FALSE \
+#          -DPHYSFS_ARCHIVE_WAD=FALSE \
+#          -DPHYSFS_ARCHIVE_HOG=FALSE \
+#          -DPHYSFS_ARCHIVE_MVL=FALSE \
+#          -DPHYSFS_ARCHIVE_QPAK=FALSE \
+#          -DPHYSFS_ARCHIVE_SLB=FALSE \
+#          -DPHYSFS_ARCHIVE_VDF=FALSE \
+#          "$PHYSFS_BUILD/../../3rdparty/physfs" &&
+#    make -j $(nproc) &&
+#    popd
+#fi &&
 
-cmake .. --toolchain ../cmake_modules/toolchain_mingw.cmake &&
+cmake .. --toolchain $(pwd)/../cmake_modules/toolchain_mingw.cmake &&
 make -j $(nproc) openjkdf2-64 &&
 popd &&
 ./scripts/helper_CopyMinGWDLLs.sh

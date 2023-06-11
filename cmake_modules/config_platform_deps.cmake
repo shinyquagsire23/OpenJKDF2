@@ -76,13 +76,10 @@ if(TARGET_USE_GAMENETWORKINGSOCKETS)
     set(PROTOBUF_BUILD_PROTOC_BINARIES TRUE)
     if(CMAKE_CROSSCOMPILING)
         # Build zlib for cross‑compiling target
-        set(ZLIB_BUILD_FOR_HOST_SYSTEM TRUE)
-        include(build_zlib)
-        set(PROTOC_DEPENDS ZLIB_${CMAKE_HOST_SYSTEM_NAME}_${CMAKE_HOST_SYSTEM_PROCESSOR})
-        # Set ZLIB_ROOT to cross‑compiled flavor because this is the default
-        # when cross‑compiling and the host/native flavor of zlib has outlived
-        # its usefulness
-        set(ZLIB_ROOT ${ZLIB_${CMAKE_SYSTEM_NAME}_${CMAKE_SYSTEM_PROCESSOR}_ROOT})
+        
+        include(build_host_zlib)
+        set(PROTOC_DEPENDS ZLIB_HOST_${CMAKE_HOST_SYSTEM_NAME}_${CMAKE_HOST_SYSTEM_PROCESSOR})
+        
         # When cross‑compiling, build protoc for the host system
         message(STATUS "Going to build “protoc” for ${CMAKE_HOST_SYSTEM_NAME} on ${CMAKE_HOST_SYSTEM_PROCESSOR}")
         include(build_protoc)

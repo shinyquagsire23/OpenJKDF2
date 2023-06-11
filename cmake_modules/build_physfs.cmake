@@ -1,5 +1,5 @@
 set(PHYSFS_ROOT ${CMAKE_BINARY_DIR}/physfs CACHE PATH PHYSFS_ROOT)
-if(WIN32) # Due to PhysFS’ incompleteness
+if(TARGET_WIN32) # Due to PhysFS’ incompleteness
     set(OPTIONAL_LIBRARY_LIBS -DOPTIONAL_LIBRARY_LIBS:FILE=advapi32;shell32;user32)
 endif()
 ExternalProject_Add(
@@ -42,7 +42,7 @@ set_property(
 )
 target_include_directories(PhysFS::PhysFS_s INTERFACE ${PHYSFS_INCLUDE_DIR})
 target_link_directories(PhysFS::PhysFS_s INTERFACE ${PHYSFS_INCLUDE_DIR}/../lib)
-if(WIN32)
+if(TARGET_WIN32)
     target_link_libraries(PhysFS::PhysFS_s INTERFACE advapi32 shell32 user32)
 endif()
 

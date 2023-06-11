@@ -7,15 +7,6 @@ ExternalProject_Add(
     UPDATE_DISCONNECTED TRUE
     CMAKE_ARGS          --install-prefix ${Protoc_ROOT}
                         -DCMAKE_BUILD_TYPE:STRING=Release
-                        "-DCMAKE_C_FLAGS:STRING=\
-                            -march=native -mtune=native\
-                            -fpic -fstack-check=no -fno-stack-limit\
-                            -flto=auto -ffat-lto-objects -flto-compression-level=9 -flto-partition=one"
-                        "-DCMAKE_CXX_FLAGS:STRING=\
-                            -march=native -mtune=native\
-                            -fpic -fstack-check=no -fno-stack-limit\
-                            -flto=auto -ffat-lto-objects -flto-compression-level=9 -flto-partition=one"
-                        "-DCMAKE_EXE_LINKER_FLAGS:STRING=-s -pie" # CMake does pass all compile options to the LTO stage
                         -DCMAKE_POLICY_DEFAULT_CMP0074:STRING=NEW
                         -Dprotobuf_BUILD_TESTS:BOOL=FALSE
                         -Dprotobuf_BUILD_SHARED_LIBS:BOOL=FALSE
@@ -23,7 +14,7 @@ ExternalProject_Add(
                         -Dprotobuf_BUILD_EXAMPLES:BOOL=FALSE
                         -Dprotobuf_BUILD_PROTOC_BINARIES:BOOL=TRUE
                         -Dprotobuf_DISABLE_RTTI:BOOL=TRUE
-                        -DZLIB_ROOT:PATH=${ZLIB_ROOT}
+                        -DZLIB_ROOT:PATH=${ZLIB_HOST_ROOT}
     BUILD_COMMAND       ${CMAKE_MAKE_PROGRAM} protoc
     DEPENDS             ${PROTOC_DEPENDS}
 )

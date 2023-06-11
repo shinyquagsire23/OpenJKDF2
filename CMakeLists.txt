@@ -153,7 +153,6 @@ elseif(PLAT_LINUX_64)
     set(TARGET_CAN_JKGM TRUE)
     set(OPENJKDF2_NO_ASAN TRUE)
     set(TARGET_USE_CURL TRUE)
-    set(TARGET_COMPILE_FREEGLUT TRUE)
     
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -fshort-wchar -Wno-implicit-function-declaration")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fshort-wchar -Wno-implicit-function-declaration")
@@ -250,6 +249,7 @@ elseif(PLAT_MINGW_X86_64)
     set(TARGET_NO_BLOBS TRUE)
     set(TARGET_CAN_JKGM TRUE)
     set(TARGET_USE_CURL TRUE)
+    set(TARGET_COMPILE_FREEGLUT TRUE)
 
     add_compile_definitions(main=SDL_main _MBCS)
     # TODO: Bump to O2 eventually. MinGW likes to replace memset with calls to itself...
@@ -328,9 +328,9 @@ elseif(PLAT_ANDROID_ARM64)
     set(TARGET_CAN_JKGM FALSE)
     set(TARGET_USE_CURL FALSE)
 
-    list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/3rdparty/glew")
-    include_directories(${PROJECT_SOURCE_DIR}/3rdparty/freeglut/include)
-    include_directories(${PROJECT_SOURCE_DIR}/3rdparty/glew/include)
+    list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/lib/glew")
+    include_directories(${PROJECT_SOURCE_DIR}/lib/freeglut/include)
+    include_directories(${PROJECT_SOURCE_DIR}/lib/glew/include)
 
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -fshort-wchar -Wno-implicit-function-declaration")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fshort-wchar")
@@ -363,8 +363,8 @@ elseif(PLAT_MSVC)
 
     set(SDL2_PATH ${CMAKE_SOURCE_DIR}/3rdparty/SDL2-2.24.0)
     set(SDL2_MIXER_PATH ${CMAKE_SOURCE_DIR}/3rdparty/SDL2_mixer-2.6.2)
-    #set(GLEW_DIR ${CMAKE_SOURCE_DIR}/3rdparty/glew)
-    list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/3rdparty/glew")
+    #set(GLEW_DIR ${CMAKE_SOURCE_DIR}/lib/glew)
+    list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/lib/glew")
 
     # TODO: Bump to O2 eventually. MinGW likes to replace memset with calls to itself...
     #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -ggdb -fno-omit-frame-pointer")
@@ -431,7 +431,9 @@ if(TARGET_USE_SDL2)
 endif()
 
 if(TARGET_USE_OPENAL)
-    include_directories(${OPENAL_INCLUDE_DIR})
+    if(NOT PLAT_MINGW_X86_64)
+        include_directories(${OPENAL_INCLUDE_DIR})
+    endif()
 endif()
 
 # All of the base sources
@@ -512,14 +514,6 @@ if(TARGET_LINUX)
         link_directories(${LIBCURL_STATIC_LIBRARY_DIRS})
         add_definitions(${LIBCURL_STATIC_CFLAGS_OTHER})
     endif()
-
-    if(TARGET_USE_GAMENETWORKINGSOCKETS)
-        include_directories(${PROJECT_SOURCE_DIR}/3rdparty/GameNetworkingSockets/include)
-    endif()
-
-    if(TARGET_USE_PHYSFS)
-        include_directories(${PROJECT_SOURCE_DIR}/3rdparty/physfs/src)
-    endif()
 endif()
 
 if(NOT OPENJKDF2_NO_ASAN)
@@ -562,7 +556,7 @@ if(PLAT_MINGW_X86_64)
 
     target_link_libraries(${BIN_NAME} PRIVATE GLUT::GLUT)
     target_link_libraries(${BIN_NAME} PRIVATE GLEW::glew_s)
-    target_link_libraries(${BIN_NAME} PRIVATE mingw32 SDL2main SDL::SDL version imm32 setupapi) # SDL2’s peculiarity that you have to link mingw32 before SDL2main
+    target_link_libraries(${BIN_NAME} PRIVATE mingw32 SDL2main SDL::SDL version imm32 setupapi gdi32 winmm imm32 ole32 oleaut32 shell32) # SDL2’s peculiarity that you have to link mingw32 before SDL2main
     target_link_directories(${BIN_NAME} PRIVATE "${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer/x86_64-w64-mingw32/lib")
     target_link_libraries(${BIN_NAME} PRIVATE SDL2_mixer winmm)
     #target_link_libraries(${BIN_NAME} PRIVATE "-L${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/lib/" exchndl)
@@ -581,7 +575,8 @@ if(PLAT_MINGW_X86_64)
     add_custom_command(
         TARGET ${BIN_NAME}
         POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/SDL/bin/SDL2.dll ${PROJECT_BINARY_DIR}
+        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2-2.24.0/lib/x64/SDL2.dll ${PROJECT_BINARY_DIR} # TODO: sdl2_mixer has this dependency??
+        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer-2.6.2/lib/x64/SDL2_mixer.dll ${PROJECT_BINARY_DIR}
         COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer-2.6.2/lib/x64/optional/libogg-0.dll ${PROJECT_BINARY_DIR}
         COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer-2.6.2/lib/x64/optional/libopus-0.dll ${PROJECT_BINARY_DIR}
         COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer-2.6.2/lib/x64/optional/libopusfile-0.dll ${PROJECT_BINARY_DIR}
@@ -590,6 +585,8 @@ if(PLAT_MINGW_X86_64)
         COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/symsrv.dll ${PROJECT_BINARY_DIR}
         COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/mgwhelp.dll ${PROJECT_BINARY_DIR}
         COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/symsrv.yes ${PROJECT_BINARY_DIR}
+        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/libpng/libpng16.dll ${PROJECT_BINARY_DIR}
+        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/zlib/${CMAKE_SYSTEM_NAME}/${CMAKE_SYSTEM_PROCESSOR}/libzlib.dll ${PROJECT_BINARY_DIR}
     )
 
     if(TARGET_USE_GAMENETWORKINGSOCKETS)
@@ -597,7 +594,6 @@ if(PLAT_MINGW_X86_64)
             TARGET ${BIN_NAME}
             POST_BUILD 
             COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/GameNetworkingSockets/bin/libGameNetworkingSockets.dll ${PROJECT_BINARY_DIR}
-            COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/protobuf/bin/libprotobuf.dll ${PROJECT_BINARY_DIR}
         )
     endif()
 
@@ -611,13 +607,11 @@ elseif(TARGET_LINUX)
     target_link_libraries(${BIN_NAME} PRIVATE PNG::PNG ${ZLIB_LIBRARY_TARGET_NAME})
     target_link_libraries(${BIN_NAME} PRIVATE SDL2main SDL::SDL ${SDL2_MIXER_LIBRARY} GL ${OPENAL_LIBRARY} GLEW::GLEW ${GTK3_LIBRARIES})
      
-    if(TARGET_USE_GAMENETWORKINGSOCKETS)
-        #target_link_libraries(${BIN_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/libGameNetworkingSockets.so)
-        #target_link_libraries(${BIN_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/libprotobuf.so.3.21.4.0)
-    endif()
-
     if(TARGET_USE_PHYSFS)
-        target_link_libraries(${BIN_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/build_physfs/libphysfs.a)
+        target_link_libraries(${BIN_NAME} PRIVATE PhysFS::PhysFS_s)
+    endif()
+    if(TARGET_USE_GAMENETWORKINGSOCKETS)
+        target_link_libraries(${BIN_NAME} PRIVATE GameNetworkingSockets::GameNetworkingSockets)
     endif()
 
     target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
@@ -676,13 +670,11 @@ elseif(TARGET_ANDROID)
     target_link_libraries(${BIN_NAME} PRIVATE PNG::PNG)
     target_link_libraries(${BIN_NAME} PRIVATE SDL2main SDL::SDL ${SDL2_MIXER_LIBRARY} GLESv1_CM GLESv2 GLESv3 log EGL ${GTK3_LIBRARIES}) #${OPENAL_LIBRARY} GLEW::GLEW
      
-    if(TARGET_USE_GAMENETWORKINGSOCKETS)
-        #target_link_libraries(${BIN_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/libGameNetworkingSockets.so)
-        #target_link_libraries(${BIN_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/libprotobuf.so.3.21.4.0)
-    endif()
-
     if(TARGET_USE_PHYSFS)
-        target_link_libraries(${BIN_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/build_physfs/libphysfs.a)
+        target_link_libraries(${BIN_NAME} PRIVATE PhysFS::PhysFS_s)
+    endif()
+    if(TARGET_USE_GAMENETWORKINGSOCKETS)
+        target_link_libraries(${BIN_NAME} PRIVATE GameNetworkingSockets::GameNetworkingSockets)
     endif()
 
     target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
