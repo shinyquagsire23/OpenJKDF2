@@ -9,7 +9,6 @@ cp -r OpenJKDF2_x86_64.app/Contents/MacOS/openjkdf2-64.dsym OpenJKDF2_universal.
 
 lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/openjkdf2-64 OpenJKDF2.app/Contents/MacOS/openjkdf2-64 OpenJKDF2_x86_64.app/Contents/MacOS/openjkdf2-64
 lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libGLEW.2.2.dylib OpenJKDF2.app/Contents/MacOS/libGLEW.2.2.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libGLEW.2.2.dylib
-lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libSDL2-2.0.0.dylib OpenJKDF2.app/Contents/MacOS/libSDL2-2.0.0.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libSDL2-2.0.0.dylib
 lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libSDL2_mixer-2.0.0.dylib OpenJKDF2.app/Contents/MacOS/libSDL2_mixer-2.0.0.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libSDL2_mixer-2.0.0.dylib
 
 lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libmodplug.1.dylib OpenJKDF2.app/Contents/MacOS/libmodplug.1.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libmodplug.1.dylib
