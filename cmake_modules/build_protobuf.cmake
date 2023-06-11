@@ -10,7 +10,7 @@ ExternalProject_Add(
                            -DCMAKE_BUILD_TYPE:STRING=Release
                            -DCMAKE_POLICY_DEFAULT_CMP0074:STRING=NEW
                            -Dprotobuf_BUILD_TESTS:BOOL=FALSE
-                           -Dprotobuf_BUILD_SHARED_LIBS:BOOL=TRUE
+                           -Dprotobuf_BUILD_SHARED_LIBS:BOOL=FALSE
                            -Dprotobuf_BUILD_CONFORMANCE:BOOL=FALSE
                            -Dprotobuf_BUILD_EXAMPLES:BOOL=FALSE
                            -Dprotobuf_BUILD_PROTOC_BINARIES:BOOL=${PROTOBUF_BUILD_PROTOC_BINARIES}

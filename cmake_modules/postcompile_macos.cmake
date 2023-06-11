@@ -16,8 +16,8 @@ if(TARGET_MACOS)
     COMMAND cp ${HOMEBREW_PREFIX}/opt/sdl2_mixer/lib/libSDL2_mixer-2.0.0.dylib ${BUNDLE}/Contents/MacOS
     COMMAND cp ${HOMEBREW_PREFIX}/opt/glew/lib/libGLEW.2.2.dylib ${BUNDLE}/Contents/MacOS
     
-    COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/build_gns/bin/libGameNetworkingSockets.dylib ${BUNDLE}/Contents/MacOS
-    COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/build_protobuf/libprotobuf.3.21.4.0.dylib ${BUNDLE}/Contents/MacOS
+    COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/libGameNetworkingSockets.dylib ${BUNDLE}/Contents/MacOS
+    #COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/build_protobuf/libprotobuf.3.21.4.0.dylib ${BUNDLE}/Contents/MacOS
     COMMAND install_name_tool -change @rpath/libGameNetworkingSockets.dylib @executable_path/libGameNetworkingSockets.dylib ${BUNDLE}/Contents/MacOS/${BIN_NAME}
     COMMAND install_name_tool -change @rpath/libprotobuf.3.21.4.0.dylib @executable_path/libprotobuf.3.21.4.0.dylib ${BUNDLE}/Contents/MacOS/${BIN_NAME}
 

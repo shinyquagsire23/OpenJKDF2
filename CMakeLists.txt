@@ -41,6 +41,8 @@ if(NOT PLAT_LINUX_32 AND NOT PLAT_LINUX_64 AND NOT PLAT_MACOS AND NOT PLAT_MACOS
 endif()
 
 # Internal targets: Stuff like OpenGL vs D3D, OpenAL vs null sound, etc
+set(TARGET_COMPILE_FREEGLUT FALSE)
+set(TARGET_USE_CURL FALSE)
 set(TARGET_USE_PHYSFS FALSE)
 set(TARGET_USE_BASICSOCKETS FALSE)
 set(TARGET_USE_GAMENETWORKINGSOCKETS FALSE)
@@ -59,6 +61,7 @@ set(TARGET_ANDROID FALSE)
 set(TARGET_ANDROID_ARM64 FALSE)
 set(TARGET_HOOKS FALSE)
 set(TARGET_NO_BLOBS FALSE)
+set(TARGET_CAN_JKGM FALSE)
 set(OPENJKDF2_USE_BLOBS FALSE CACHE BOOL "Use blobs")
 
 set(DEBUG_QOL_CHEATS $ENV{DEBUG_QOL_CHEATS})
@@ -150,6 +153,7 @@ elseif(PLAT_LINUX_64)
     set(TARGET_CAN_JKGM TRUE)
     set(OPENJKDF2_NO_ASAN TRUE)
     set(TARGET_USE_CURL TRUE)
+    set(TARGET_COMPILE_FREEGLUT TRUE)
     
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -fshort-wchar -Wno-implicit-function-declaration")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fshort-wchar -Wno-implicit-function-declaration")
@@ -492,9 +496,6 @@ if(TARGET_MACOS)
     add_definitions(${LIBPNG_STATIC_CFLAGS_OTHER})
 
     if(TARGET_USE_GAMENETWORKINGSOCKETS)
-        include_directories(${PROJECT_SOURCE_DIR}/3rdparty/GameNetworkingSockets/include)
-        target_link_libraries(${BIN_NAME} PUBLIC "-L${CMAKE_BINARY_DIR}/build_gns/bin" GameNetworkingSockets)
-        target_link_libraries(${BIN_NAME} PUBLIC "-L${CMAKE_BINARY_DIR}/build_protobuf/" protobuf)
         find_package(OpenSSL REQUIRED)
         target_link_libraries(${BIN_NAME} PUBLIC OpenSSL::Crypto)
     endif()
@@ -704,11 +705,19 @@ elseif(TARGET_MACOS)
 
     target_link_libraries(${BIN_NAME} PRIVATE ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY} ${OPENGL_LIBRARY} ${OPENAL_LIBRARY} GLEW::GLEW ${LIBPNG_LIST}/libpng.a ${ZLIB_STATIC_LDFLAGS})
     target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
-    #target_link_libraries(${BIN_NAME} PRIVATE 3rdparty/protobuf/libprotobufd.a)
 
     if(TARGET_USE_PHYSFS)
-        target_link_libraries(${BIN_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/build_physfs/libphysfs.a)
+        target_link_libraries(${BIN_NAME} PRIVATE PhysFS::PhysFS_s)
     endif()
+    if(TARGET_USE_GAMENETWORKINGSOCKETS)
+        target_link_libraries(${BIN_NAME} PRIVATE GameNetworkingSockets::GameNetworkingSockets)
+        add_custom_command(
+            TARGET ${BIN_NAME}
+            POST_BUILD 
+            COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/GameNetworkingSockets/bin/libGameNetworkingSockets.dylib ${PROJECT_BINARY_DIR}
+        )
+    endif()
+
     #
     # macOS post-build packaging
     #

@@ -4,6 +4,15 @@ if(WIN32)
 else()
     set(USE_CRYPTO OpenSSL)
 endif()
+
+# Kinda hacky
+if(TARGET_MACOS)
+    set(GAMENETWORKINGSOCKETS_EXTRA_ARGS "-DIOS:BOOL=TRUE")
+    message(STATUS "Protobuf_ROOT=${Protobuf_ROOT}")
+else()
+    set(GAMENETWORKINGSOCKETS_EXTRA_ARGS "")
+endif()
+
 ExternalProject_Add(
     GAMENETWORKINGSOCKETS
     SOURCE_DIR             ${CMAKE_SOURCE_DIR}/lib/GameNetworkingSockets
@@ -21,6 +30,7 @@ ExternalProject_Add(
                            -DProtobuf_USE_STATIC_LIBS:BOOL=TRUE
                            -DProtobuf_ROOT:PATH=${Protobuf_ROOT}
                            ${GAMENETWORKINGSOCKETS_PROTOC_EXECUTABLE}
+                           ${GAMENETWORKINGSOCKETS_EXTRA_ARGS}
     DEPENDS                PROTOBUF ${GAMENETWORKINGSOCKETS_DEPENDS}
     PATCH_COMMAND          git restore CMakeLists.txt src/CMakeLists.txt &&
                            git apply -v ${CMAKE_SOURCE_DIR}/cmake_modules/GameNetworkingSockets_v1.4.1.patch

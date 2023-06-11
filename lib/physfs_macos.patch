@@ -1,0 +1,12 @@
+diff --git a/src/physfs_platforms.h b/src/physfs_platforms.h
+index 1ac17d9..b8d42ff 100644
+--- a/src/physfs_platforms.h
++++ b/src/physfs_platforms.h
+@@ -38,6 +38,7 @@
+ #  endif
+ #  define PHYSFS_PLATFORM_APPLE 1
+ #  define PHYSFS_PLATFORM_POSIX 1
++#  define PHYSFS_NO_CDROM_SUPPORT 1
+ #elif defined(macintosh)
+ #  error Classic Mac OS support was dropped from PhysicsFS 2.0. Move to OS X.
+ #elif defined(__ANDROID__)

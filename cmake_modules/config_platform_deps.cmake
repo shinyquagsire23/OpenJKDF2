@@ -1,5 +1,10 @@
 include(ExternalProject)
 
+# Makes cross-compiling easier in the build_whatever.cmake files
+if(NOT CMAKE_TOOLCHAIN_FILE)
+    set(CMAKE_TOOLCHAIN_FILE ${PROJECT_SOURCE_DIR}/cmake_modules/toolchain_native.cmake)
+endif()
+
 # Automatic updates
 if(TARGET_USE_CURL)
     add_compile_definitions(
