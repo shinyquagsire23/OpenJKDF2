@@ -13,9 +13,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-        name: Checkout
+      with:
+        submodules: recursive
+      name: Checkout
     - name: Install Packages
       run: |
           set -e
