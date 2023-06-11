@@ -19,6 +19,20 @@ lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libvorbisfile.3.dyli
 lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libFLAC.12.dylib OpenJKDF2.app/Contents/MacOS/libFLAC.12.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libFLAC.12.dylib
 lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libogg.0.dylib OpenJKDF2.app/Contents/MacOS/libogg.0.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libogg.0.dylib
 
+lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libxmp.4.dylib OpenJKDF2.app/Contents/MacOS/libxmp.4.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libxmp.4.dylib
+lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libfluidsynth.3.dylib OpenJKDF2.app/Contents/MacOS/libfluidsynth.3.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libfluidsynth.3.dylib
+lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libopusfile.0.dylib OpenJKDF2.app/Contents/MacOS/libopusfile.0.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libopusfile.0.dylib
+lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libglib-2.0.0.dylib OpenJKDF2.app/Contents/MacOS/libglib-2.0.0.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libglib-2.0.0.dylib
+lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libgthread-2.0.0.dylib OpenJKDF2.app/Contents/MacOS/libgthread-2.0.0.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libgthread-2.0.0.dylib
+lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libintl.8.dylib OpenJKDF2.app/Contents/MacOS/libintl.8.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libintl.8.dylib
+lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libsndfile.1.dylib OpenJKDF2.app/Contents/MacOS/libsndfile.1.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libsndfile.1.dylib
+lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libportaudio.2.dylib OpenJKDF2.app/Contents/MacOS/libportaudio.2.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libportaudio.2.dylib
+lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libreadline.8.dylib OpenJKDF2.app/Contents/MacOS/libreadline.8.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libreadline.8.dylib
+lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libopus.0.dylib OpenJKDF2.app/Contents/MacOS/libopus.0.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libopus.0.dylib
+lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libvorbisenc.2.dylib OpenJKDF2.app/Contents/MacOS/libvorbisenc.2.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libvorbisenc.2.dylib
+lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libmp3lame.0.dylib OpenJKDF2.app/Contents/MacOS/libmp3lame.0.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libmp3lame.0.dylib
+lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libpcre2-8.0.dylib OpenJKDF2.app/Contents/MacOS/libpcre2-8.0.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libpcre2-8.0.dylib
+
 lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libGameNetworkingSockets.dylib OpenJKDF2.app/Contents/MacOS/libGameNetworkingSockets.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libGameNetworkingSockets.dylib
 lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libprotobuf.3.21.4.0.dylib OpenJKDF2.app/Contents/MacOS/libprotobuf.3.21.4.0.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libprotobuf.3.21.4.0.dylib
 lipo -create -output OpenJKDF2_universal.app/Contents/MacOS/libcrypto.1.1.dylib OpenJKDF2.app/Contents/MacOS/libcrypto.1.1.dylib OpenJKDF2_x86_64.app/Contents/MacOS/libcrypto.1.1.dylib
