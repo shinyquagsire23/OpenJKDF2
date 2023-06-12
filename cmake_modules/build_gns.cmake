@@ -23,6 +23,7 @@ ExternalProject_Add(
                            "--install-prefix ${GameNetworkingSockets_ROOT}"
     CMAKE_CACHE_ARGS       -DCMAKE_BUILD_TYPE:STRING=Release
                            -DCMAKE_POLICY_DEFAULT_CMP0074:STRING=NEW
+                           -DCMAKE_POSITION_INDEPENDENT_CODE=ON
                            -DBUILD_STATIC_LIB:BOOL=FALSE
                            -DBUILD_SHARED_LIB:BOOL=TRUE
                            -DUSE_CRYPTO:STRING=${USE_CRYPTO}
