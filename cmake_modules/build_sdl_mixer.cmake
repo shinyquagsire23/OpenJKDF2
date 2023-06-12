@@ -2,6 +2,13 @@ set(SDL_MIXER_ROOT ${CMAKE_BINARY_DIR}/SDL_mixer)
 set(SDL_ROOT ${CMAKE_BINARY_DIR}/SDL)
 set(SDL2_INCLUDE_DIR ${CMAKE_BINARY_DIR}/SDL/include/SDL2)
 
+if(PLAT_MINGW_X86_64)
+    set(SDL_MIXER_C_FLAGS "-fno-stack-protector")
+    set(SDL_MIXER_CXX_FLAGS "-fno-stack-protector")
+else()
+    set(SDL_MIXER_C_FLAGS "")
+    set(SDL_MIXER_CXX_FLAGS "")
+endif()
 
 ExternalProject_Add(
     SDL_mixer
@@ -12,6 +19,8 @@ ExternalProject_Add(
     PATCH_COMMAND cd ${CMAKE_SOURCE_DIR}/lib/SDL_mixer && chmod +x ${CMAKE_SOURCE_DIR}/lib/SDL_mixer/external/download.sh && ${CMAKE_SOURCE_DIR}/lib/SDL_mixer/external/download.sh || true
     CMAKE_ARGS          --toolchain ${CMAKE_TOOLCHAIN_FILE}
                         --install-prefix ${SDL_MIXER_ROOT}
+                        -DCMAKE_C_FLAGS:STRING=${SDL_MIXER_C_FLAGS}
+                        -DCMAKE_CXX_FLAGS:STRING=${SDL_MIXER_CXX_FLAGS}
                         -DCMAKE_BUILD_TYPE:STRING=Release
                         -DBUILD_SHARED_LIBS:BOOL=FALSE
                         -DSDL2MIXER_MOD:BOOL=FALSE
