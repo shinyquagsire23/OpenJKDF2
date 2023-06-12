@@ -91,14 +91,11 @@ if(TARGET_USE_GAMENETWORKINGSOCKETS)
         set(GAMENETWORKINGSOCKETS_DEPENDS PROTOC)
     endif()
 
-    find_package(Protobuf 3.21.12)
-    if(NOT Protobuf_FOUND OR CMAKE_CROSSCOMPILING)
-        message(STATUS "Going to build “protobuf 3.21.12” from Git module")
-        include(build_protobuf)
-    endif()
-
     find_package(GameNetworkingSockets 1.4.1)
     if(NOT GameNetworkingSockets_FOUND)
+        message(STATUS "Going to build “protobuf 3.21.12” from Git module")
+        include(build_protobuf)
+
         message(STATUS "Going to build “GameNetworkingSockets 1.4.1” from Git module")
         include(build_gns)
     endif()
