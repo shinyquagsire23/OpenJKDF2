@@ -202,6 +202,19 @@ void crash_handler_basic(int sig);
 
 #endif // LINUX
 
+// HACK: minGW fails on the Github runner??
+#ifdef WIN64_MINGW
+void __attribute__((weak)) __stack_chk_fail(void)
+{
+
+}
+
+void* __attribute__((weak)) __memcpy_chk(void * dest, const void * src, size_t len, size_t destlen)
+{
+    return memcpy(dest, src, len);
+}
+#endif // WIN64_MINGW
+
 int main(int argc, char** argv)
 {
 #ifdef WIN64_STANDALONE
