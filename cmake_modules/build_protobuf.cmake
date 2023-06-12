@@ -1,12 +1,5 @@
 set(Protobuf_ROOT ${CMAKE_BINARY_DIR}/protobuf)
 
-if(TARGET_LINUX)
-    # why??
-    set(PROTOBUF_EXTRA_FLAGS "-DCMAKE_POSITION_INDEPENDENT_CODE=ON")
-else()
-    set(PROTOBUF_EXTRA_FLAGS "")
-endif()
-
 ExternalProject_Add(
     PROTOBUF
     SOURCE_DIR             ${CMAKE_SOURCE_DIR}/lib/protobuf
@@ -18,6 +11,7 @@ ExternalProject_Add(
                            -DCMAKE_BUILD_TYPE:STRING=Release
                            ${PROTOBUF_EXTRA_FLAGS}
                            -DCMAKE_POLICY_DEFAULT_CMP0074:STRING=NEW
+                           -DCMAKE_POSITION_INDEPENDENT_CODE=ON
                            -Dprotobuf_BUILD_TESTS:BOOL=FALSE
                            -Dprotobuf_BUILD_SHARED_LIBS:BOOL=FALSE
                            -Dprotobuf_BUILD_CONFORMANCE:BOOL=FALSE
