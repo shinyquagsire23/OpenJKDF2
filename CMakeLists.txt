@@ -128,8 +128,8 @@ if(PLAT_LINUX_32)
         set(TARGET_NO_BLOBS FALSE)
     endif()
     
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -fshort-wchar -Wno-implicit-function-declaration")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fshort-wchar -Wno-implicit-function-declaration")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -fshort-wchar -Wno-implicit-function-declaration -Wno-unused-variable -Wno-parentheses")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fshort-wchar -Wno-implicit-function-declaration -Wno-unused-variable -Wno-parentheses")
     add_link_options(-fshort-wchar)
 
 elseif(PLAT_LINUX_64)
@@ -154,8 +154,8 @@ elseif(PLAT_LINUX_64)
     set(OPENJKDF2_NO_ASAN TRUE)
     set(TARGET_USE_CURL TRUE)
     
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -fshort-wchar -Wno-implicit-function-declaration")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fshort-wchar -Wno-implicit-function-declaration")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -fshort-wchar -Wno-implicit-function-declaration -Wno-unused-variable -Wno-parentheses ")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fshort-wchar -Wno-implicit-function-declaration -Wno-unused-variable -Wno-parentheses ")
     add_link_options(-fshort-wchar)
 
 elseif(PLAT_MACOS)
@@ -253,7 +253,7 @@ elseif(PLAT_MINGW_X86_64)
 
     add_compile_definitions(main=SDL_main _MBCS)
     # TODO: Bump to O2 eventually. MinGW likes to replace memset with calls to itself...
-    add_compile_options(-pthread -Wall)
+    add_compile_options(-pthread -Wall -Wno-unused-variable -Wno-parentheses)
     if(CMAKE_BUILD_TYPE STREQUAL Debug)
         add_compile_options(-Og)
     endif()
@@ -332,7 +332,7 @@ elseif(PLAT_ANDROID_ARM64)
     include_directories(${PROJECT_SOURCE_DIR}/lib/freeglut/include)
     include_directories(${PROJECT_SOURCE_DIR}/lib/glew/include)
 
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -fshort-wchar -Wno-implicit-function-declaration")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -fshort-wchar -Wno-implicit-function-declaration -Wno-unused-variable -Wno-parentheses")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fshort-wchar")
     add_link_options(-fshort-wchar)
 

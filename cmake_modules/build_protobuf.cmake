@@ -8,6 +8,8 @@ ExternalProject_Add(
     CMAKE_ARGS             --toolchain ${CMAKE_TOOLCHAIN_FILE}
                            --install-prefix ${Protobuf_ROOT}
                            -DCMAKE_BUILD_TYPE:STRING=Release
+                           "-DCMAKE_C_FLAGS:STRING=-fPIC" # why??
+                           "-DCMAKE_CXX_FLAGS:STRING=-fPIC" # why??
                            -DCMAKE_POLICY_DEFAULT_CMP0074:STRING=NEW
                            -Dprotobuf_BUILD_TESTS:BOOL=FALSE
                            -Dprotobuf_BUILD_SHARED_LIBS:BOOL=FALSE
