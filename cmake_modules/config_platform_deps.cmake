@@ -67,11 +67,12 @@ if (NOT TARGET_USE_BASICSOCKETS AND NOT TARGET_USE_GAMENETWORKINGSOCKETS)
     set(TARGET_USE_NOSOCKETS TRUE)
 endif()
 
+message(STATUS "Going to build “zlib 1.2.13” from Git module")
+include(build_zlib)
+
 if(TARGET_USE_GAMENETWORKINGSOCKETS)
     #set(ZLIB_USE_STATIC_LIBS TRUE)
 
-    message(STATUS "Going to build “zlib 1.2.13” from Git module")
-    include(build_zlib)
     set(PROTOBUF_DEPENDS ZLIB_${CMAKE_SYSTEM_NAME}_${CMAKE_SYSTEM_PROCESSOR})
     set(PROTOBUF_BUILD_PROTOC_BINARIES TRUE)
     if(CMAKE_CROSSCOMPILING)

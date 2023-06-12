@@ -654,7 +654,7 @@ elseif(PLAT_MSVC)
 
 elseif(TARGET_ANDROID)
     target_link_libraries(${BIN_NAME} PRIVATE PNG::PNG)
-    target_link_libraries(${BIN_NAME} PRIVATE SDL2main SDL::SDL SDL::Mixer GLESv1_CM GLESv2 GLESv3 log EGL ${GTK3_LIBRARIES}) #${OPENAL_LIBRARY} GLEW::GLEW
+    target_link_libraries(${BIN_NAME} PRIVATE SDL2main SDL::SDL SDL::Mixer GLESv1_CM GLESv2 GLESv3 log EGL ${GTK3_LIBRARIES} android jnigraphics nativewindow OpenSLES) #${OPENAL_LIBRARY} GLEW::GLEW
      
     if(TARGET_USE_PHYSFS)
         target_link_libraries(${BIN_NAME} PRIVATE PhysFS::PhysFS_s)
