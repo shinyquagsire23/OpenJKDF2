@@ -1,7 +1,7 @@
 set(PNG_ROOT ${CMAKE_BINARY_DIR}/libpng)
-if(NOT ZLIB_FOUND)
-    set(LIBPNG_DEPENDS ZLIB_${CMAKE_SYSTEM_NAME}_${CMAKE_SYSTEM_PROCESSOR})
-endif()
+
+set(LIBPNG_DEPENDS ZLIB::ZLIB)
+
 ExternalProject_Add(
     LIBPNG
     SOURCE_DIR          ${CMAKE_SOURCE_DIR}/lib/libpng

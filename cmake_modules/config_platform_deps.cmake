@@ -50,12 +50,6 @@ if(NOT FreeGLUT_FOUND OR CMAKE_CROSSCOMPILING)
     include(build_freeglut)
 endif()
 
-if(TARGET_USE_PHYSFS)
-    message(STATUS "Going to build “PhysFS 3.2.0” from Git module")
-    include(build_physfs)
-    add_compile_definitions(PLATFORM_PHYSFS)
-endif()
-
 set(GLEW_USE_STATIC_LIBS TRUE)
 find_package(GLEW 2.2.0)
 if(NOT GLEW_FOUND OR CMAKE_CROSSCOMPILING)
@@ -69,6 +63,12 @@ endif()
 
 message(STATUS "Going to build “zlib 1.2.13” from Git module")
 include(build_zlib)
+
+if(TARGET_USE_PHYSFS)
+    message(STATUS "Going to build “PhysFS 3.2.0” from Git module")
+    include(build_physfs)
+    add_compile_definitions(PLATFORM_PHYSFS)
+endif()
 
 if(TARGET_USE_GAMENETWORKINGSOCKETS)
     #set(ZLIB_USE_STATIC_LIBS TRUE)
@@ -121,10 +121,8 @@ if(TARGET_USE_NOSOCKETS AND NOT TARGET_HOOKS)
     add_definitions(-DPLATFORM_NOSOCKETS)
 endif()
 
-
 message(STATUS "Going to build “libpng 1.6.39” from Git module")
 include(build_libpng)
-
 
 if(TARGET_USE_LIBSMACKER)
     list(APPEND SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/external/libsmacker/smacker.c ${PROJECT_SOURCE_DIR}/src/external/libsmacker/smk_bitstream.c ${PROJECT_SOURCE_DIR}/src/external/libsmacker/smk_hufftree.c)

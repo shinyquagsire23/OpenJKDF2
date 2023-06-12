@@ -550,7 +550,7 @@ if(PLAT_MINGW_X86_64)
     target_link_libraries(${BIN_NAME} PRIVATE GLUT::GLUT)
     target_link_libraries(${BIN_NAME} PRIVATE GLEW::glew_s)
     target_link_libraries(${BIN_NAME} PRIVATE mingw32 SDL2main SDL::SDL version imm32 setupapi gdi32 winmm imm32 ole32 oleaut32 shell32) # SDL2’s peculiarity that you have to link mingw32 before SDL2main
-    target_link_libraries(${BIN_NAME} PRIVATE SDL::Mixer winmm)
+    target_link_libraries(${BIN_NAME} PRIVATE ${SDL_MIXER_DEPS} SDL::Mixer winmm)
     target_link_libraries(${BIN_NAME} PRIVATE PNG::PNG ${ZLIB_LIBRARY_TARGET_NAME})
 #   target_link_libraries(${BIN_NAME} PRIVATE ZLIB::ZLIB)
     target_link_libraries(${BIN_NAME} PRIVATE OpenAL::OpenAL)
@@ -591,7 +591,7 @@ elseif(TARGET_WASM)
     target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
 elseif(TARGET_LINUX)
     target_link_libraries(${BIN_NAME} PRIVATE PNG::PNG ${ZLIB_LIBRARY_TARGET_NAME})
-    target_link_libraries(${BIN_NAME} PRIVATE SDL2main SDL::SDL SDL::Mixer GL ${OPENAL_LIBRARY} GLEW::GLEW ${GTK3_LIBRARIES})
+    target_link_libraries(${BIN_NAME} PRIVATE SDL2main SDL::SDL SDL::Mixer ${SDL_MIXER_DEPS} GL ${OPENAL_LIBRARY} GLEW::GLEW ${GTK3_LIBRARIES})
      
     if(TARGET_USE_PHYSFS)
         target_link_libraries(${BIN_NAME} PRIVATE PhysFS::PhysFS_s)
@@ -618,7 +618,7 @@ elseif(PLAT_MSVC)
     set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
     target_link_libraries(${BIN_NAME} PRIVATE Threads::Threads)
 
-    target_link_libraries(${BIN_NAME} PRIVATE SDL2main SDL::SDL SDL::Mixer ${OPENGL_LIBRARIES} ${OPENAL_LIBRARY} ${GLEW_LIBRARY} ${LIBPNG_STATIC_LDFLAGS})
+    target_link_libraries(${BIN_NAME} PRIVATE SDL2main SDL::SDL ${SDL_MIXER_DEPS} SDL::Mixer ${OPENGL_LIBRARIES} ${OPENAL_LIBRARY} ${GLEW_LIBRARY} ${LIBPNG_STATIC_LDFLAGS})
     target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
 
     target_link_libraries(${BIN_NAME} PRIVATE dinput8 dxguid user32 gdi32 winmm imm32 ole32 oleaut32 shell32 setupapi -lversion uuid ws2_32)
@@ -654,7 +654,7 @@ elseif(PLAT_MSVC)
 
 elseif(TARGET_ANDROID)
     target_link_libraries(${BIN_NAME} PRIVATE PNG::PNG)
-    target_link_libraries(${BIN_NAME} PRIVATE SDL2main SDL::SDL SDL::Mixer GLESv1_CM GLESv2 GLESv3 log EGL ${GTK3_LIBRARIES} android jnigraphics nativewindow OpenSLES) #${OPENAL_LIBRARY} GLEW::GLEW
+    target_link_libraries(${BIN_NAME} PRIVATE SDL2main SDL::SDL ${SDL_MIXER_DEPS} SDL::Mixer GLESv1_CM GLESv2 GLESv3 log EGL ${GTK3_LIBRARIES} android jnigraphics nativewindow OpenSLES) #${OPENAL_LIBRARY} GLEW::GLEW
      
     if(TARGET_USE_PHYSFS)
         target_link_libraries(${BIN_NAME} PRIVATE PhysFS::PhysFS_s)
@@ -672,7 +672,7 @@ elseif(TARGET_ANDROID)
 elseif(TARGET_MACOS)
     target_link_libraries(${BIN_NAME} PRIVATE PNG::PNG ${ZLIB_LIBRARY_TARGET_NAME})
 
-    target_link_libraries(${BIN_NAME} PRIVATE SDL2main SDL::SDL SDL::Mixer ${OPENGL_LIBRARY} ${OPENAL_LIBRARY} GLEW::GLEW)
+    target_link_libraries(${BIN_NAME} PRIVATE SDL2main SDL::SDL ${SDL_MIXER_DEPS} SDL::Mixer ${OPENGL_LIBRARY} ${OPENAL_LIBRARY} GLEW::GLEW)
     target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
 
     if(TARGET_USE_PHYSFS)
