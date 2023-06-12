@@ -8,8 +8,6 @@ if(PLAT_MACOS_X86_64)
     set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
     set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 
-    set(SDL2_DIR "/usr/local/opt/sdl2")
-    set(SDL2_MIXER_PATH "/usr/local/opt/sdl2_mixer")
     set(GLEW_PATH "/usr/local/opt/glew")
     set(CMAKE_IGNORE_PATH "/opt/homebrew")
     set(CMAKE_IGNORE_PATH "/opt/homebrew/include")
@@ -396,16 +394,11 @@ if(TARGET_LINUX OR TARGET_MACOS OR PLAT_MSVC OR TARGET_ANDROID)
 endif()
 
 if(TARGET_ANDROID)
-    find_package(SDL2_mixer REQUIRED)
-    #find_package(OpenAL REQUIRED)
-    #find_package(GLEW 2.0 REQUIRED)
-
     set(OPENAL_INCLUDE_DIR "")
     set(GLEW_INCLUDE_DIRS "")
     set(JSON_Install OFF CACHE INTERNAL "")
     add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/json)
 elseif(NOT PLAT_MINGW_X86_64 AND NOT TARGET_HOOKS AND NOT TARGET_WASM)
-    find_package(SDL2_mixer REQUIRED)
     if(TARGET_USE_OPENAL)
         find_package(OpenAL REQUIRED)
     endif()
@@ -427,7 +420,7 @@ include_directories(
 )
 
 if(TARGET_USE_SDL2)
-    include_directories(${SDL_INCLUDE_DIRS} ${SDL2_MIXER_INCLUDE_DIR})
+    include_directories(${SDL_INCLUDE_DIRS} ${SDL_MIXER_INCLUDE_DIRS})
 endif()
 
 if(TARGET_USE_OPENAL)
@@ -557,9 +550,7 @@ if(PLAT_MINGW_X86_64)
     target_link_libraries(${BIN_NAME} PRIVATE GLUT::GLUT)
     target_link_libraries(${BIN_NAME} PRIVATE GLEW::glew_s)
     target_link_libraries(${BIN_NAME} PRIVATE mingw32 SDL2main SDL::SDL version imm32 setupapi gdi32 winmm imm32 ole32 oleaut32 shell32) # SDL2’s peculiarity that you have to link mingw32 before SDL2main
-    target_link_directories(${BIN_NAME} PRIVATE "${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer/x86_64-w64-mingw32/lib")
-    target_link_libraries(${BIN_NAME} PRIVATE SDL2_mixer winmm)
-    #target_link_libraries(${BIN_NAME} PRIVATE "-L${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/lib/" exchndl)
+    target_link_libraries(${BIN_NAME} PRIVATE SDL::Mixer winmm)
     target_link_libraries(${BIN_NAME} PRIVATE PNG::PNG ${ZLIB_LIBRARY_TARGET_NAME})
 #   target_link_libraries(${BIN_NAME} PRIVATE ZLIB::ZLIB)
     target_link_libraries(${BIN_NAME} PRIVATE OpenAL::OpenAL)
@@ -575,11 +566,6 @@ if(PLAT_MINGW_X86_64)
     add_custom_command(
         TARGET ${BIN_NAME}
         POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2-2.24.0/lib/x64/SDL2.dll ${PROJECT_BINARY_DIR} # TODO: sdl2_mixer has this dependency??
-        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer-2.6.2/lib/x64/SDL2_mixer.dll ${PROJECT_BINARY_DIR}
-        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer-2.6.2/lib/x64/optional/libogg-0.dll ${PROJECT_BINARY_DIR}
-        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer-2.6.2/lib/x64/optional/libopus-0.dll ${PROJECT_BINARY_DIR}
-        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer-2.6.2/lib/x64/optional/libopusfile-0.dll ${PROJECT_BINARY_DIR}
         COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/openal/bin/OpenAL32.dll ${PROJECT_BINARY_DIR}
         COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/exchndl.dll ${PROJECT_BINARY_DIR}
         COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/symsrv.dll ${PROJECT_BINARY_DIR}
@@ -605,7 +591,7 @@ elseif(TARGET_WASM)
     target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
 elseif(TARGET_LINUX)
     target_link_libraries(${BIN_NAME} PRIVATE PNG::PNG ${ZLIB_LIBRARY_TARGET_NAME})
-    target_link_libraries(${BIN_NAME} PRIVATE SDL2main SDL::SDL ${SDL2_MIXER_LIBRARY} GL ${OPENAL_LIBRARY} GLEW::GLEW ${GTK3_LIBRARIES})
+    target_link_libraries(${BIN_NAME} PRIVATE SDL2main SDL::SDL SDL::Mixer GL ${OPENAL_LIBRARY} GLEW::GLEW ${GTK3_LIBRARIES})
      
     if(TARGET_USE_PHYSFS)
         target_link_libraries(${BIN_NAME} PRIVATE PhysFS::PhysFS_s)
@@ -632,7 +618,7 @@ elseif(PLAT_MSVC)
     set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
     target_link_libraries(${BIN_NAME} PRIVATE Threads::Threads)
 
-    target_link_libraries(${BIN_NAME} PRIVATE SDL2main SDL::SDL ${SDL2_MIXER_LIBRARY} ${OPENGL_LIBRARIES} ${OPENAL_LIBRARY} ${GLEW_LIBRARY} ${LIBPNG_STATIC_LDFLAGS})
+    target_link_libraries(${BIN_NAME} PRIVATE SDL2main SDL::SDL SDL::Mixer ${OPENGL_LIBRARIES} ${OPENAL_LIBRARY} ${GLEW_LIBRARY} ${LIBPNG_STATIC_LDFLAGS})
     target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
 
     target_link_libraries(${BIN_NAME} PRIVATE dinput8 dxguid user32 gdi32 winmm imm32 ole32 oleaut32 shell32 setupapi -lversion uuid ws2_32)
@@ -668,7 +654,7 @@ elseif(PLAT_MSVC)
 
 elseif(TARGET_ANDROID)
     target_link_libraries(${BIN_NAME} PRIVATE PNG::PNG)
-    target_link_libraries(${BIN_NAME} PRIVATE SDL2main SDL::SDL ${SDL2_MIXER_LIBRARY} GLESv1_CM GLESv2 GLESv3 log EGL ${GTK3_LIBRARIES}) #${OPENAL_LIBRARY} GLEW::GLEW
+    target_link_libraries(${BIN_NAME} PRIVATE SDL2main SDL::SDL SDL::Mixer GLESv1_CM GLESv2 GLESv3 log EGL ${GTK3_LIBRARIES}) #${OPENAL_LIBRARY} GLEW::GLEW
      
     if(TARGET_USE_PHYSFS)
         target_link_libraries(${BIN_NAME} PRIVATE PhysFS::PhysFS_s)
@@ -686,7 +672,7 @@ elseif(TARGET_ANDROID)
 elseif(TARGET_MACOS)
     target_link_libraries(${BIN_NAME} PRIVATE PNG::PNG ${ZLIB_LIBRARY_TARGET_NAME})
 
-    target_link_libraries(${BIN_NAME} PRIVATE SDL2main SDL::SDL ${SDL2_MIXER_LIBRARY} ${OPENGL_LIBRARY} ${OPENAL_LIBRARY} GLEW::GLEW)
+    target_link_libraries(${BIN_NAME} PRIVATE SDL2main SDL::SDL SDL::Mixer ${OPENGL_LIBRARY} ${OPENAL_LIBRARY} GLEW::GLEW)
     target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
 
     if(TARGET_USE_PHYSFS)

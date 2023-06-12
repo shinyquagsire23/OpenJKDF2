@@ -137,6 +137,9 @@ if(TARGET_USE_SDL2)
     message(STATUS "Going to build “SDL 2.26.5” from Git module")
     include(build_sdl)
 
+    message(STATUS "Going to build “SDL_mixer 2.6.3” from Git module")
+    include(build_sdl_mixer)
+
     file(GLOB TARGET_SDL2_SRCS ${PROJECT_SOURCE_DIR}/src/Platform/SDL2/*.c)
     list(APPEND SOURCE_FILES ${TARGET_SDL2_SRCS})
     add_compile_definitions(SDL2_RENDER)
