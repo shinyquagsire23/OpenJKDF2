@@ -251,7 +251,7 @@ elseif(PLAT_MINGW_X86_64)
 
     add_compile_definitions(main=SDL_main _MBCS)
     # TODO: Bump to O2 eventually. MinGW likes to replace memset with calls to itself...
-    add_compile_options(-pthread -Wall -Wno-unused-variable -Wno-parentheses)
+    add_compile_options(-pthread -Wall -Wno-unused-variable -Wno-parentheses -fstack-protector)
     if(CMAKE_BUILD_TYPE STREQUAL Debug)
         add_compile_options(-Og)
     endif()
