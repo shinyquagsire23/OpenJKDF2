@@ -251,7 +251,7 @@ elseif(PLAT_MINGW_X86_64)
 
     add_compile_definitions(main=SDL_main _MBCS)
     # TODO: Bump to O2 eventually. MinGW likes to replace memset with calls to itself...
-    add_compile_options(-pthread -Wall -Wno-unused-variable -Wno-parentheses -fstack-protector)
+    add_compile_options(-pthread -Wall -Wno-unused-variable -Wno-parentheses)
     if(CMAKE_BUILD_TYPE STREQUAL Debug)
         add_compile_options(-Og)
     endif()
@@ -549,7 +549,7 @@ if(PLAT_MINGW_X86_64)
 
     target_link_libraries(${BIN_NAME} PRIVATE GLUT::GLUT)
     target_link_libraries(${BIN_NAME} PRIVATE GLEW::glew_s)
-    target_link_libraries(${BIN_NAME} PRIVATE mingw32 SDL2main SDL::SDL version imm32 setupapi gdi32 winmm imm32 ole32 oleaut32 shell32) # SDL2’s peculiarity that you have to link mingw32 before SDL2main
+    target_link_libraries(${BIN_NAME} PRIVATE mingw32 SDL2main SDL::SDL version imm32 setupapi gdi32 winmm imm32 ole32 oleaut32 shell32 ssp) # SDL2’s peculiarity that you have to link mingw32 before SDL2main
     target_link_libraries(${BIN_NAME} PRIVATE ${SDL_MIXER_DEPS} SDL::Mixer winmm)
     target_link_libraries(${BIN_NAME} PRIVATE PNG::PNG ${ZLIB_LIBRARY_TARGET_NAME})
 #   target_link_libraries(${BIN_NAME} PRIVATE ZLIB::ZLIB)
