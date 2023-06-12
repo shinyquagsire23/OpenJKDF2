@@ -1,4 +1,12 @@
 set(Protobuf_ROOT ${CMAKE_BINARY_DIR}/protobuf)
+
+if(TARGET_LINUX)
+    # why??
+    set(PROTOBUF_EXTRA_FLAGS "-DCMAKE_C_FLAGS:STRING=-fPIC -DCMAKE_CXX_FLAGS:STRING=-fPIC")
+else()
+    set(PROTOBUF_EXTRA_FLAGS "")
+endif()
+
 ExternalProject_Add(
     PROTOBUF
     SOURCE_DIR             ${CMAKE_SOURCE_DIR}/lib/protobuf
@@ -8,8 +16,7 @@ ExternalProject_Add(
     CMAKE_ARGS             --toolchain ${CMAKE_TOOLCHAIN_FILE}
                            --install-prefix ${Protobuf_ROOT}
                            -DCMAKE_BUILD_TYPE:STRING=Release
-                           "-DCMAKE_C_FLAGS:STRING=-fPIC" # why??
-                           "-DCMAKE_CXX_FLAGS:STRING=-fPIC" # why??
+                           ${PROTOBUF_EXTRA_FLAGS}
                            -DCMAKE_POLICY_DEFAULT_CMP0074:STRING=NEW
                            -Dprotobuf_BUILD_TESTS:BOOL=FALSE
                            -Dprotobuf_BUILD_SHARED_LIBS:BOOL=FALSE
