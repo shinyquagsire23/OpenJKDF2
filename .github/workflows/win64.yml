@@ -58,7 +58,7 @@ jobs:
       - name: Generate CMake Build System
         run: |
           cmake --toolchain cmake_modules/toolchain_mingw.cmake \
-                -DCMAKE_BUILD_TYPE=Debug \
+                -DCMAKE_BUILD_TYPE=Debug -DGITHUB_RUNNER_COMPILE=1 \
                 -B "$OPENJKDF2_BUILD_DIR"
       - name: Make
         run: make -C "$OPENJKDF2_BUILD_DIR" -j $(nproc)
