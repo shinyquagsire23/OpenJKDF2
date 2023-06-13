@@ -571,16 +571,30 @@ if(PLAT_MINGW_X86_64)
     endif()
     target_link_libraries(${BIN_NAME} PRIVATE opengl32 ws2_32 uuid ole32)
 
+    if (TARGET_USE_OPENAL)
+        add_custom_command(
+            TARGET ${BIN_NAME}
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/openal/bin/OpenAL32.dll ${PROJECT_BINARY_DIR}
+        )
+    endif()
+
+    if(TARGET_CAN_JKGM)
+        add_custom_command(
+            TARGET ${BIN_NAME}
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/libpng/libpng16.dll ${PROJECT_BINARY_DIR}
+            COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/zlib/${CMAKE_SYSTEM_NAME}/${CMAKE_SYSTEM_PROCESSOR}/libzlib.dll ${PROJECT_BINARY_DIR}
+        )
+    endif()
+
     add_custom_command(
         TARGET ${BIN_NAME}
         POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/openal/bin/OpenAL32.dll ${PROJECT_BINARY_DIR}
         COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/exchndl.dll ${PROJECT_BINARY_DIR}
         COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/symsrv.dll ${PROJECT_BINARY_DIR}
         COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/mgwhelp.dll ${PROJECT_BINARY_DIR}
         COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/symsrv.yes ${PROJECT_BINARY_DIR}
-        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/libpng/libpng16.dll ${PROJECT_BINARY_DIR}
-        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/zlib/${CMAKE_SYSTEM_NAME}/${CMAKE_SYSTEM_PROCESSOR}/libzlib.dll ${PROJECT_BINARY_DIR}
     )
 
     if(TARGET_USE_GAMENETWORKINGSOCKETS)
