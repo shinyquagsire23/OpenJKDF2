@@ -57,10 +57,10 @@
 extern int Window_xPos, Window_yPos;
 #endif
 
-int Window_xSize = 640;
-int Window_ySize = 480;
-int Window_screenXSize = 640;
-int Window_screenYSize = 480;
+int Window_xSize = WINDOW_DEFAULT_WIDTH;
+int Window_ySize = WINDOW_DEFAULT_HEIGHT;
+int Window_screenXSize = WINDOW_DEFAULT_WIDTH;
+int Window_screenYSize = WINDOW_DEFAULT_HEIGHT;
 int Window_isHiDpi = 0;
 int Window_isFullscreen = 0;
 int Window_needsRecreate = 0;
@@ -84,10 +84,10 @@ void Window_SetFullscreen(int val)
         // Reset window when exiting fullscreen
         // TODO: Add settings for these sizes maybe?
         if (Window_isFullscreen && !val) {
-            Window_xSize = 640;
-            Window_ySize = 480;
-            Window_screenXSize = 640;
-            Window_screenYSize = 480;
+            Window_xSize = WINDOW_DEFAULT_WIDTH;
+            Window_ySize = WINDOW_DEFAULT_HEIGHT;
+            Window_screenXSize = WINDOW_DEFAULT_WIDTH;
+            Window_screenYSize = WINDOW_DEFAULT_HEIGHT;
 #ifdef SDL2_RENDER
             Window_xPos = SDL_WINDOWPOS_CENTERED;
             Window_yPos = SDL_WINDOWPOS_CENTERED;
