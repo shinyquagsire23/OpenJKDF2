@@ -9,6 +9,7 @@ ExternalProject_Add(
     CMAKE_ARGS          --toolchain ${CMAKE_TOOLCHAIN_FILE}
                         --install-prefix ${SDL_ROOT}
                         -DCMAKE_BUILD_TYPE:STRING=Release
+                        -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
                         -DSDL_SHARED:BOOL=FALSE
                         -DSDL_STATIC:BOOL=TRUE
                         -DSDL_TEST:BOOL=FALSE

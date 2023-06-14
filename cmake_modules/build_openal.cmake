@@ -16,6 +16,7 @@ ExternalProject_Add(
     CMAKE_ARGS          --toolchain ${CMAKE_TOOLCHAIN_FILE}
                         --install-prefix ${OPENAL_ROOT}
                         -DCMAKE_BUILD_TYPE:STRING=Release
+                        -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
                         -DALSOFT_UTILS:BOOL=FALSE
                         -DALSOFT_NO_CONFIG_UTIL:BOOL=TRUE
                         -DALSOFT_EXAMPLES:BOOL=FALSE

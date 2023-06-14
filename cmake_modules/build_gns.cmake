@@ -13,6 +13,8 @@ else()
     set(GAMENETWORKINGSOCKETS_EXTRA_ARGS "")
 endif()
 
+message(STATUS ${CMAKE_OSX_ARCHITECTURES})
+
 ExternalProject_Add(
     GAMENETWORKINGSOCKETS
     SOURCE_DIR             ${CMAKE_SOURCE_DIR}/lib/GameNetworkingSockets
@@ -21,6 +23,7 @@ ExternalProject_Add(
     UPDATE_DISCONNECTED    TRUE
     CMAKE_ARGS             "--toolchain ${CMAKE_TOOLCHAIN_FILE}"
                            "--install-prefix ${GameNetworkingSockets_ROOT}"
+                           -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
     CMAKE_CACHE_ARGS       -DCMAKE_BUILD_TYPE:STRING=Release
                            -DCMAKE_POLICY_DEFAULT_CMP0074:STRING=NEW
                            -DCMAKE_POSITION_INDEPENDENT_CODE=ON

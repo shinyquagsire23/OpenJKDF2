@@ -8,6 +8,7 @@ ExternalProject_Add(
     CMAKE_ARGS          --toolchain ${CMAKE_TOOLCHAIN_FILE}
                         --install-prefix ${GLEW_ROOT}
                         -DCMAKE_BUILD_TYPE:STRING=Release
+                        -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
                         -Dglew-cmake_BUILD_SHARED:BOOL=FALSE
                         -DONLY_LIBS:BOOL=TRUE
 )

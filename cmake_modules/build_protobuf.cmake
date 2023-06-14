@@ -9,6 +9,7 @@ ExternalProject_Add(
     CMAKE_ARGS             --toolchain ${CMAKE_TOOLCHAIN_FILE}
                            --install-prefix ${Protobuf_ROOT}
                            -DCMAKE_BUILD_TYPE:STRING=Release
+                           -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
                            ${PROTOBUF_EXTRA_FLAGS}
                            -DCMAKE_POLICY_DEFAULT_CMP0074:STRING=NEW
                            -DCMAKE_POSITION_INDEPENDENT_CODE=ON

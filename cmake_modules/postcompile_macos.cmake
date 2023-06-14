@@ -18,10 +18,6 @@ if(TARGET_MACOS)
     COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/zlib/*/*/libz.1.dylib ${BUNDLE}/Contents/MacOS
     COMMAND install_name_tool -change libz.1.dylib @executable_path/libz.1.dylib ${BUNDLE}/Contents/MacOS/${BIN_NAME}
 
-    # libpng
-    COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/libpng/libpng16.16.39.0.dylib ${BUNDLE}/Contents/MacOS/libpng16.16.dylib
-    COMMAND install_name_tool -change @rpath/libpng16.16.dylib @executable_path/libpng16.16.dylib ${BUNDLE}/Contents/MacOS/${BIN_NAME}
-
     COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/openssl@1.1/lib/libcrypto.1.1.dylib @executable_path/libcrypto.1.1.dylib ${BUNDLE}/Contents/MacOS/libGameNetworkingSockets.dylib
     COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/openssl@1.1/lib/libcrypto.1.1.dylib @executable_path/libcrypto.1.1.dylib ${BUNDLE}/Contents/MacOS/${BIN_NAME}
     COMMAND cp ${HOMEBREW_PREFIX}/opt/openssl@1.1/lib/libcrypto.1.1.dylib ${BUNDLE}/Contents/MacOS

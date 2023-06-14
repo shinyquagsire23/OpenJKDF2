@@ -11,6 +11,7 @@ ExternalProject_Add(
     CMAKE_ARGS          --toolchain ${CMAKE_TOOLCHAIN_FILE}
                         --install-prefix ${PHYSFS_ROOT}
                         -DCMAKE_BUILD_TYPE:STRING=Release
+                        -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
                         -DPHYSFS_BUILD_STATIC:BOOL=TRUE
                         -DPHYSFS_BUILD_SHARED:BOOL=TRUE
                         -DPHYSFS_ARCHIVE_7Z:BOOL=FALSE

@@ -554,10 +554,9 @@ if(PLAT_MINGW_X86_64)
     target_link_libraries(${BIN_NAME} PRIVATE mingw32 SDL2main SDL::SDL version imm32 setupapi gdi32 winmm imm32 ole32 oleaut32 shell32 ssp winmm user32 crypt32 advapi32) # SDL2’s peculiarity that you have to link mingw32 before SDL2main
     
     if(TARGET_CAN_JKGM)
-        target_link_libraries(${BIN_NAME} PRIVATE PNG::PNG ${ZLIB_LIBRARY_TARGET_NAME})
+        target_link_libraries(${BIN_NAME} PRIVATE PNG::PNG ZLIB::ZLIB)
     endif()
 
-#   target_link_libraries(${BIN_NAME} PRIVATE ZLIB::ZLIB)
     if (TARGET_USE_OPENAL)
         target_link_libraries(${BIN_NAME} PRIVATE ${SDL_MIXER_DEPS} SDL::Mixer)
         target_link_libraries(${BIN_NAME} PRIVATE OpenAL::OpenAL)
@@ -576,15 +575,6 @@ if(PLAT_MINGW_X86_64)
             TARGET ${BIN_NAME}
             POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/openal/bin/OpenAL32.dll ${PROJECT_BINARY_DIR}
-        )
-    endif()
-
-    if(TARGET_CAN_JKGM)
-        add_custom_command(
-            TARGET ${BIN_NAME}
-            POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/libpng/libpng16.dll ${PROJECT_BINARY_DIR}
-            COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/zlib/${CMAKE_SYSTEM_NAME}/${CMAKE_SYSTEM_PROCESSOR}/libzlib.dll ${PROJECT_BINARY_DIR}
         )
     endif()
 
@@ -612,7 +602,7 @@ elseif(TARGET_WASM)
     target_link_libraries(${BIN_NAME} PRIVATE -lm -lSDL2 -lSDL2_mixer -lGL -lGLEW -lopenal)
     target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
 elseif(TARGET_LINUX)
-    target_link_libraries(${BIN_NAME} PRIVATE PNG::PNG ${ZLIB_LIBRARY_TARGET_NAME})
+    target_link_libraries(${BIN_NAME} PRIVATE PNG::PNG ZLIB::ZLIB)
     target_link_libraries(${BIN_NAME} PRIVATE SDL2main SDL::SDL SDL::Mixer ${SDL_MIXER_DEPS} GL ${OPENAL_LIBRARY} GLEW::GLEW ${GTK3_LIBRARIES})
      
     if(TARGET_USE_PHYSFS)
@@ -692,7 +682,9 @@ elseif(TARGET_ANDROID)
         target_link_libraries(${BIN_NAME} PRIVATE curl)
     endif()
 elseif(TARGET_MACOS)
-    target_link_libraries(${BIN_NAME} PRIVATE PNG::PNG ${ZLIB_LIBRARY_TARGET_NAME})
+    if(TARGET_CAN_JKGM)
+        target_link_libraries(${BIN_NAME} PRIVATE PNG::PNG ZLIB::ZLIB)
+    endif()
 
     target_link_libraries(${BIN_NAME} PRIVATE SDL2main SDL::SDL ${SDL_MIXER_DEPS} SDL::Mixer ${OPENGL_LIBRARY} ${OPENAL_LIBRARY} GLEW::GLEW)
     target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)

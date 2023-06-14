@@ -1,5 +1,5 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 90899a4..f0cba15 100644
+index 90899a4..8ec8727 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -35,7 +35,7 @@ endif()
@@ -41,6 +41,15 @@ index 90899a4..f0cba15 100644
  
  	#
  	# Check whether BCrypt can be used with this SDK version
+@@ -116,7 +118,7 @@ if (USE_CRYPTO STREQUAL "OpenSSL")
+ 		endif()
+ 		check_symbol_exists(EVP_MD_CTX_free openssl/evp.h OPENSSL_NEW_ENOUGH)
+ 		if (NOT OPENSSL_NEW_ENOUGH)
+-			message(FATAL_ERROR "Cannot find EVP_MD_CTX_free in OpenSSL headers/libs for the target architecture.  Check that you're using OpenSSL 1.1.0 or later.")
++			#message(FATAL_ERROR "Cannot find EVP_MD_CTX_free in OpenSSL headers/libs for the target architecture.  Check that you're using OpenSSL 1.1.0 or later.")
+ 		endif()
+ 	cmake_pop_check_state()
+ 	cmake_push_check_state()
 @@ -157,15 +159,15 @@ function(set_target_common_gns_properties TGT)
  		target_compile_options(${TGT} PRIVATE -ffunction-sections -fdata-sections ${TARGET_ARCH_FLAGS})
  	endif()

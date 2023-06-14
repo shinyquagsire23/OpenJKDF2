@@ -19,6 +19,7 @@ ExternalProject_Add(
     PATCH_COMMAND cd ${CMAKE_SOURCE_DIR}/lib/SDL_mixer && chmod +x ${CMAKE_SOURCE_DIR}/lib/SDL_mixer/external/download.sh && ${CMAKE_SOURCE_DIR}/lib/SDL_mixer/external/download.sh || true
     CMAKE_ARGS          --toolchain ${CMAKE_TOOLCHAIN_FILE}
                         --install-prefix ${SDL_MIXER_ROOT}
+                        -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
                         -DCMAKE_C_FLAGS:STRING=${SDL_MIXER_C_FLAGS}
                         -DCMAKE_CXX_FLAGS:STRING=${SDL_MIXER_CXX_FLAGS}
                         -DCMAKE_BUILD_TYPE:STRING=Release

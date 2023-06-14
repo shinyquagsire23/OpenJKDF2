@@ -9,6 +9,7 @@ if (TARGET_COMPILE_FREEGLUT)
         CMAKE_ARGS          --toolchain ${CMAKE_TOOLCHAIN_FILE}
                             --install-prefix ${FreeGLUT_ROOT}
                             -DCMAKE_BUILD_TYPE:STRING=Release
+                            -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
                             -DFREEGLUT_BUILD_STATIC_LIBS:BOOL=FALSE
                             -DFREEGLUT_BUILD_DEMOS=OFF
         # We have to pass `LIBS` via `CMAKE_CACHE_ARGS` because CMake’s 3.26.3

@@ -7,6 +7,7 @@ ExternalProject_Add(
     UPDATE_DISCONNECTED TRUE
     CMAKE_ARGS          --install-prefix ${Protoc_ROOT}
                         -DCMAKE_BUILD_TYPE:STRING=Release
+                        -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
                         -DCMAKE_POLICY_DEFAULT_CMP0074:STRING=NEW
                         -Dprotobuf_BUILD_TESTS:BOOL=FALSE
                         -Dprotobuf_BUILD_SHARED_LIBS:BOOL=FALSE
