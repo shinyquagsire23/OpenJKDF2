@@ -1285,7 +1285,7 @@ int Window_Main_Linux(int argc, char** argv)
 
     
     Window_RecreateSDL2Window();
-#if !defined(TARGET_ANDROID)
+#if !defined(TARGET_ANDROID) && !defined(ARCH_WASM)
     glewInit();
 #endif
     

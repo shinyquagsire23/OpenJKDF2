@@ -2,6 +2,7 @@
 
 #include "General/stdHashTable.h"
 #include "General/util.h"
+#include "General/stdString.h"
 #include "World/jkPlayer.h"
 #include "World/sithWorld.h"
 #include "Gameplay/sithPlayerActions.h"

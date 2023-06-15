@@ -1,5 +1,5 @@
-#ifndef JK_H
-#define JK_H
+#ifndef _OPENJKDF2_JK_H
+#define _OPENJKDF2_JK_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -359,7 +359,7 @@ wchar_t* __wcsrchr(const wchar_t *, wchar_t);
 int __snprintf(char *, size_t, const char *, ...);
 int __vsnprintf(char *a1, size_t a2, const char *fmt, va_list args);
 char* _strstr(const char* a, const char* b);
-#endif
+#endif // WIN32_BLOBS
 
 long jk_wcstol(const wchar_t * nptr, wchar_t ** endptr, int base);
 int _strlen(const char *str);
@@ -383,4 +383,4 @@ void jk_fatal();
 }
 #endif
 
-#endif // JK_H
+#endif // _OPENJKDF2_JK_H

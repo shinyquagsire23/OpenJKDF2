@@ -21,11 +21,11 @@ cp resource/shaders/* wasm_out/jk1/resource/shaders
 cp resource/shaders/* wasm_out/mots/resource/shaders
 
 #rm -rf build_emcc
-mkdir -p build_emcc && cd build_emcc
-cmake .. --toolchain ../cmake_modules/toolchain_wasm.cmake
-cmake .. --toolchain ../cmake_modules/toolchain_wasm.cmake
-make -j10 VERBOSE=1
-cd ..
+mkdir -p build_emcc && pushd build_emcc
+cmake .. --toolchain $(pwd)/../cmake_modules/toolchain_wasm.cmake
+cmake .. --toolchain $(pwd)/../cmake_modules/toolchain_wasm.cmake
+make -j1 VERBOSE=1
+popd
 
 cp build_emcc/openjkdf2.js wasm_out/openjkdf2.js
 cp build_emcc/openjkdf2.wasm wasm_out/openjkdf2.wasm

@@ -280,7 +280,7 @@ elseif(PLAT_WASM)
 
     add_link_options(-fno-exceptions)
     add_compile_options(-fno-exceptions)
-    set(USE_FLAGS "-s USE_SDL=2 -s USE_SDL_MIXER=2 -s WASM=1 -s ALLOW_MEMORY_GROWTH=1 -s FULL_ES2=1 -s FULL_ES3=1 -s ASYNCIFY -s INITIAL_MEMORY=200mb -s STACK_SIZE=100mb")
+    set(USE_FLAGS "-sUSE_SDL=2 -sUSE_SDL_MIXER=2 -sWASM=1 -s ALLOW_MEMORY_GROWTH=1 -sFULL_ES2 -sFULL_ES3 -sUSE_WEBGL2=1 -sASYNCIFY -sINITIAL_MEMORY=200mb -s STACK_SIZE=100mb")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${USE_FLAGS}")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${USE_FLAGS}")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${USE_FLAGS} --profiling --preload-file ${PROJECT_SOURCE_DIR}/wasm_out@/ ")
@@ -362,30 +362,7 @@ elseif(PLAT_MSVC)
     set(TARGET_USE_CURL FALSE)
     set(TARGET_COMPILE_FREEGLUT TRUE)
 
-    #set(SDL2_PATH ${CMAKE_SOURCE_DIR}/3rdparty/SDL2-2.24.0)
-    #set(SDL2_MIXER_PATH ${CMAKE_SOURCE_DIR}/3rdparty/SDL2_mixer-2.6.2)
-    #set(GLEW_DIR ${CMAKE_SOURCE_DIR}/lib/glew)
-    #list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/lib/glew")
-
-    # TODO: Bump to O2 eventually. MinGW likes to replace memset with calls to itself...
-    #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -ggdb -fno-omit-frame-pointer")
-
-    #add_link_options(-Wl,-Map=% -fno-trapping-math -fshort-wchar -D_MBCS)
-    #add_compile_options(-Wuninitialized -fno-trapping-math -fshort-wchar -Dmain=SDL_main -D_MBCS)
-
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /std:c11")
-
-    #link_directories(${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/lib)
-    #link_libraries(libexchndl.a)
-    #link_directories(${PROJECT_SOURCE_DIR}/3rdparty/freeglut/lib/x64)
-    #link_libraries(libfreeglut.a)
-    #link_directories(${PROJECT_SOURCE_DIR}/3rdparty/zlib-1.2.3-lib/lib)
-    #link_libraries(libz.dll.a)
-    #link_directories(${PROJECT_SOURCE_DIR}/3rdparty/libpng-1.2.37-lib/lib)
-    #link_libraries(libpng.dll.a)
-    #link_directories(${PROJECT_SOURCE_DIR}/3rdparty/openal-soft/lib/Win64)
-    #link_libraries(OpenAL32.dll.a)
-    #link_libraries(OpenGL32)
 endif()
 
 set(CMAKE_BUILD_TYPE Debug)
