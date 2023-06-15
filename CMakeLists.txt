@@ -491,6 +491,14 @@ if(TARGET_LINUX)
         link_directories(${LIBCURL_STATIC_LIBRARY_DIRS})
         add_definitions(${LIBCURL_STATIC_CFLAGS_OTHER})
     endif()
+
+    if(TARGET_USE_GAMENETWORKINGSOCKETS)
+        add_custom_command(
+            TARGET ${BIN_NAME}
+            POST_BUILD 
+            COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/GameNetworkingSockets/bin/libGameNetworkingSockets.so ${PROJECT_BINARY_DIR}
+        )
+    endif()
 endif()
 
 if(NOT OPENJKDF2_NO_ASAN)
