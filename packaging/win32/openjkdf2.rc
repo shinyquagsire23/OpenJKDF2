@@ -25,6 +25,7 @@
 #endif /* _M_X64 || _M_AMD64 */
 #endif /* _WIN32_WINNT */
 
+#include <windows.h>
 #include <winresrc.h>
 
 #ifndef RC_MAKELANGID
@@ -67,9 +68,9 @@ FILESUBTYPE    VFT2_UNKNOWN {
     BLOCK "VarFileInfo" {
         // Ordered by LCID, not alphabet
         VALUE "Translation",
-        RC_MAKELANGID(LANG_GERMAN, SUBLANG_NEUTRAL),  1200,
-        RC_MAKELANGID(LANG_ENGLISH, SUBLANG_NEUTRAL), 1200,
-        RC_MAKELANGID(LANG_POLISH, SUBLANG_NEUTRAL),  1200
+        LANG_GERMAN,  1200,
+        LANG_ENGLISH, 1200,
+        LANG_POLISH,  1200
     }
     BLOCK "StringFileInfo" {
         // Ordered by LCID, not alphabet
@@ -127,5 +128,5 @@ FILESUBTYPE    VFT2_UNKNOWN {
 #ifdef _WIN64
 CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "openjkdf2-64.exe.manifest"
 #else
-CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "openjkdf2.exe.manifest"
+CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "openjkdf2-64.exe.manifest" // TODO ??
 #endif /* _WIN64 */

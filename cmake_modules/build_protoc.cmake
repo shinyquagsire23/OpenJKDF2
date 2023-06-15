@@ -18,6 +18,7 @@ ExternalProject_Add(
                         -DZLIB_ROOT:PATH=${ZLIB_HOST_ROOT}
     BUILD_COMMAND       ${CMAKE_MAKE_PROGRAM} protoc
     DEPENDS             ${PROTOC_DEPENDS}
+    BUILD_BYPRODUCTS    ${TODO}
 )
 set(Protoc_PROTOC_EXECUTABLE ${Protoc_ROOT}/bin/protoc)
 

@@ -13,7 +13,15 @@ else()
     set(GAMENETWORKINGSOCKETS_EXTRA_ARGS "")
 endif()
 
-message(STATUS ${CMAKE_OSX_ARCHITECTURES})
+set(GameNetworkingSockets_FOUND TRUE)
+set(GameNetworkingSockets_VERSION 1.4.1)
+set(GameNetworkingSockets_INCLUDE_DIRS ${GameNetworkingSockets_ROOT}/include/GameNetworkingSockets)
+set(GameNetworkingSockets_SHARED_LIBRARIES GameNetworkingSockets)
+set(GameNetworkingSockets_STATIC_LIBRARIES GameNetworkingSockets_s)
+
+set(GameNetworkingSockets_SHARED_LIBRARY_PATH ${GameNetworkingSockets_ROOT}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}${GameNetworkingSockets_SHARED_LIBRARIES}${CMAKE_SHARED_LIBRARY_SUFFIX})
+set(GameNetworkingSockets_STATIC_LIBRARY_PATH ${GameNetworkingSockets_ROOT}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}${GameNetworkingSockets_STATIC_LIBRARIES}${CMAKE_STATIC_LIBRARY_SUFFIX})
+set(GameNetworkingSockets_IMPORT_LIBRARY_PATH ${GameNetworkingSockets_ROOT}/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}${GameNetworkingSockets_SHARED_LIBRARIES}${CMAKE_IMPORT_LIBRARY_SUFFIX})
 
 ExternalProject_Add(
     GAMENETWORKINGSOCKETS
@@ -38,13 +46,8 @@ ExternalProject_Add(
     DEPENDS                PROTOBUF ${GAMENETWORKINGSOCKETS_DEPENDS}
     PATCH_COMMAND          git restore CMakeLists.txt src/CMakeLists.txt &&
                            git apply -v ${CMAKE_SOURCE_DIR}/cmake_modules/GameNetworkingSockets_v1.4.1.patch
+    BUILD_BYPRODUCTS       ${GameNetworkingSockets_SHARED_LIBRARY_PATH} ${GameNetworkingSockets_STATIC_LIBRARY_PATH} ${GameNetworkingSockets_IMPORT_LIBRARY_PATH}
 )
-
-set(GameNetworkingSockets_FOUND TRUE)
-set(GameNetworkingSockets_VERSION 1.4.1)
-set(GameNetworkingSockets_INCLUDE_DIRS ${GameNetworkingSockets_ROOT}/include/GameNetworkingSockets)
-set(GameNetworkingSockets_SHARED_LIBRARIES GameNetworkingSockets)
-set(GameNetworkingSockets_STATIC_LIBRARIES GameNetworkingSockets_s)
 
 if(NOT TARGET GameNetworkingSockets::GameNetworkingSockets)
     add_library(GameNetworkingSockets::GameNetworkingSockets SHARED IMPORTED)
@@ -53,10 +56,8 @@ add_dependencies(GameNetworkingSockets::GameNetworkingSockets GAMENETWORKINGSOCK
 file(MAKE_DIRECTORY ${GameNetworkingSockets_INCLUDE_DIRS})
 set_target_properties(
     GameNetworkingSockets::GameNetworkingSockets PROPERTIES
-    IMPORTED_LOCATION
-    ${GameNetworkingSockets_ROOT}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}${GameNetworkingSockets_SHARED_LIBRARIES}${CMAKE_SHARED_LIBRARY_SUFFIX}
-    IMPORTED_IMPLIB
-    ${GameNetworkingSockets_ROOT}/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}${GameNetworkingSockets_SHARED_LIBRARIES}${CMAKE_IMPORT_LIBRARY_SUFFIX}
+    IMPORTED_LOCATION ${GameNetworkingSockets_IMPORT_LIBRARY_PATH}
+    IMPORTED_IMPLIB   ${GameNetworkingSockets_IMPORT_LIBRARY_PATH}
 )
 target_include_directories(
     GameNetworkingSockets::GameNetworkingSockets INTERFACE
@@ -72,8 +73,7 @@ endif()
 add_dependencies(GameNetworkingSockets::GameNetworkingSockets_s GAMENETWORKINGSOCKETS)
 set_property(
     TARGET GameNetworkingSockets::GameNetworkingSockets_s
-    PROPERTY IMPORTED_LOCATION
-    ${GameNetworkingSockets_ROOT}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}${GameNetworkingSockets_STATIC_LIBRARIES}${CMAKE_STATIC_LIBRARY_SUFFIX}
+    PROPERTY IMPORTED_LOCATION ${GameNetworkingSockets_STATIC_LIBRARY_PATH}
 )
 target_include_directories(
     GameNetworkingSockets::GameNetworkingSockets_s INTERFACE

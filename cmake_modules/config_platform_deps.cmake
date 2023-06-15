@@ -153,7 +153,7 @@ if(TARGET_USE_OPENGL)
 endif()
 
 if(TARGET_USE_OPENAL)
-    find_package(OpenAL 1.23.1)
+    #find_package(OpenAL 1.23.1)
     if(NOT OPENAL_FOUND)
         message(STATUS "Going to build “libopenal 1.23.1” from Git module")
         include(build_openal)

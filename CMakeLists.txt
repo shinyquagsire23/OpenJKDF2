@@ -375,8 +375,8 @@ elseif(PLAT_MSVC)
 
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /std:c11")
 
-    link_directories(${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/lib)
-    link_libraries(libexchndl.a)
+    #link_directories(${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/lib)
+    #link_libraries(libexchndl.a)
     #link_directories(${PROJECT_SOURCE_DIR}/3rdparty/freeglut/lib/x64)
     #link_libraries(libfreeglut.a)
     #link_directories(${PROJECT_SOURCE_DIR}/3rdparty/zlib-1.2.3-lib/lib)
@@ -401,7 +401,7 @@ if(TARGET_ANDROID)
     set(GLEW_INCLUDE_DIRS "")
     set(JSON_Install OFF CACHE INTERNAL "")
     add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/json)
-elseif(NOT PLAT_MINGW_X86_64 AND NOT TARGET_HOOKS AND NOT TARGET_WASM)
+elseif(NOT PLAT_MINGW_X86_64 AND NOT PLAT_MSVC AND NOT TARGET_HOOKS AND NOT TARGET_WASM)
     if(TARGET_USE_OPENAL)
         find_package(OpenAL REQUIRED)
     endif()
@@ -427,7 +427,7 @@ if(TARGET_USE_SDL2)
 endif()
 
 if(TARGET_USE_OPENAL)
-    if(NOT PLAT_MINGW_X86_64 AND NOT PLAT_MSVC)
+    if(NOT OPENAL_COMPILING_FROM_SRC)
         include_directories(${OPENAL_INCLUDE_DIR})
     endif()
 endif()
@@ -654,7 +654,7 @@ elseif(PLAT_MSVC)
 
     target_link_libraries(${BIN_NAME} PRIVATE GLUT::GLUT)
     target_link_libraries(${BIN_NAME} PRIVATE GLEW::glew_s)
-    target_link_libraries(${BIN_NAME} PRIVATE SDL2main SDL::SDL version imm32 setupapi gdi32 winmm imm32 ole32 oleaut32 shell32 ssp winmm user32 crypt32 advapi32) # SDL2’s peculiarity that you have to link mingw32 before SDL2main
+    target_link_libraries(${BIN_NAME} PRIVATE SDL2main SDL::SDL version imm32 setupapi gdi32 winmm imm32 ole32 oleaut32 shell32 winmm user32 crypt32 advapi32) # SDL2’s peculiarity that you have to link mingw32 before SDL2main
 
     if(TARGET_CAN_JKGM)
         target_link_libraries(${BIN_NAME} PRIVATE PNG::PNG ZLIB::ZLIB)
@@ -702,7 +702,7 @@ elseif(PLAT_MSVC)
         add_custom_command(
             TARGET ${BIN_NAME}
             POST_BUILD 
-            COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/GameNetworkingSockets/bin/libGameNetworkingSockets.dll ${PROJECT_BINARY_DIR}
+            COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/GameNetworkingSockets/bin/GameNetworkingSockets.dll ${PROJECT_BINARY_DIR}
         )
     endif()
 

@@ -177,8 +177,8 @@ void stdGob_FreeEntry(stdGob *gob)
 
 stdGobFile* stdGob_FileOpen(stdGob *gob, const char *filepath)
 {
-    stdGobEntry *entry;
-    stdGobFile *result;
+    stdGobEntry *entry = NULL;
+    stdGobFile *result = NULL;
     int v5;
 
     // Embedded resources
