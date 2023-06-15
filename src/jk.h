@@ -375,6 +375,10 @@ void jk_init();
 int _iswspace(int a);
 void jk_fatal();
 
+#define OPENJKDF2_WARN_NULL_PRINT(var) jk_printf("OpenJKDF2 WARN: " #var " is NULL in %s!\n", __func__)
+#define OPENJKDF2_WARN_NULL_NO_RETURN(var) if(!var) { OPENJKDF2_WARN_NULL_PRINT(var); }
+#define OPENJKDF2_WARN_NULL_AND_RETURN(var) if(!var) { OPENJKDF2_WARN_NULL_PRINT(var); return; }
+
 #ifdef __cplusplus
 }
 #endif
