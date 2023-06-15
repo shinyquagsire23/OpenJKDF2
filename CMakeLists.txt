@@ -256,6 +256,8 @@ elseif(PLAT_MINGW_X86_64)
     add_compile_options(-pthread -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces)
     if(CMAKE_BUILD_TYPE STREQUAL Debug)
         add_compile_options(-Og)
+    else()
+        add_compile_options(-O2)
     endif()
 
 elseif(PLAT_WASM)
@@ -365,7 +367,9 @@ elseif(PLAT_MSVC)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /std:c11")
 endif()
 
-set(CMAKE_BUILD_TYPE Debug)
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
 
 # CMake module paths
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules")
