@@ -112,6 +112,7 @@ Download and install the latest CMake from [here](https://cmake.org/download/), 
 ```
 git clone https://github.com/shinyquagsire23/OpenJKDF2.git
 cd OpenJKDF2
+git submodule update --init
 
 export CC=clang
 export CXX=clang++
@@ -130,6 +131,7 @@ LD_LIBRARY_PATH=build_linux64 ./build_linux64/openjkdf2
 ```
 git clone https://github.com/shinyquagsire23/OpenJKDF2.git
 cd OpenJKDF2
+git submodule update --init
 
 chmod +x build_win64.sh
 ./build_win64.sh
@@ -143,6 +145,7 @@ A full, universal MacOS appbundle can be created on ARM64 Macs using
 ```
 git clone https://github.com/shinyquagsire23/OpenJKDF2.git
 cd OpenJKDF2
+git submodule update --init
 
 ./distpkg_macos.sh
 ```
@@ -210,9 +213,11 @@ make -j10
 <details>
   <summary>x86_64 Visual Studio 2022 Project</summary>
 
-Clone the repository using git, then open VS 2022 and select `Open a local folder`. Right click CMakeLists.txt and select `Configure OpenJKDF2` until it succeeds (for some reason it errors a few times initially on SDL2_mixer, etc). Once it succeeds, right click CMakeLists.txt and select `Build`. 
+Clone the repository using git, then initialize subrepositories (`git submodule update --init`). Then open VS 2022 and select `Open a local folder`. Right click CMakeLists.txt and select `Configure OpenJKDF2` until it succeeds (for some reason it errors a few times initially on SDL2_mixer, etc). Once it succeeds, right click CMakeLists.txt and select `Build`. 
 
 After it builds you can set it as a startup item, from there it should work and debug as expected.
+
+Sometimes if there are significant CMake changes, you may need to right-click `CMakeLists.txt` and select `Delete Cache and Reconfigure`. You may also need to make sure subrepositories are up to date using `git submodule update` before reconfiguring.
 </details>
 
 <details>

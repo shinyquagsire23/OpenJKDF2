@@ -2,6 +2,7 @@
 
 #include "General/stdStrTable.h"
 #include "Cog/jkCog.h"
+#include "../jk.h"
 
 static int jkStrings_bInitialized = 0;
 static stdStrTable jkStrings_table;

@@ -1,0 +1,50 @@
+[submodule "libpng"]
+	path = lib/libpng
+	url = https://github.com/glennrp/libpng.git
+	branch = v1.6.39
+	shallow = true
+[submodule "freeglut"]
+	path = lib/freeglut
+	url = https://github.com/FreeGLUTProject/freeglut.git
+	branch = v3.4.0
+	shallow = true
+[submodule "glew"]
+	path = lib/glew
+	url = https://github.com/Perlmint/glew-cmake.git
+	branch = master
+	shallow = true
+[submodule "zlib"]
+	path = lib/zlib
+	url = https://github.com/madler/zlib.git
+	branch = v1.2.13
+	shallow = true
+[submodule "GameNetworkingSockets"]
+	path = lib/GameNetworkingSockets
+	url = https://github.com/ValveSoftware/GameNetworkingSockets.git
+	branch = v1.4.1
+	shallow = true
+[submodule "protobuf"]
+	path = lib/protobuf
+	url = https://github.com/protocolbuffers/protobuf.git
+	branch = v21.12
+	shallow = true
+[submodule "physfs"]
+	path = lib/physfs
+	url = https://github.com/icculus/physfs.git
+	branch = release-3.2.0
+	shallow = true
+[submodule "openal"]
+	path = lib/openal
+	url = https://github.com/kcat/openal-soft.git
+	branch = 1.23.1
+	shallow = true
+[submodule "SDL"]
+	path = lib/SDL
+	url = https://github.com/libsdl-org/SDL.git
+	branch = release-2.26.5
+	shallow = true
+[submodule "SDL_mixer"]
+	path = lib/SDL_mixer
+	url = https://github.com/libsdl-org/SDL_mixer.git
+	branch = release-2.6.3
+	shallow = true

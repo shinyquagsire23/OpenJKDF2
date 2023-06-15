@@ -111,3 +111,4 @@ org.openjkdf2.OpenJKDF2.yml
 packaging/android-project/.gradle/*
 packaging/android-project/app/build/*
 packaging/android-project/app/src/main/jniLibs/*
+packaging/win32/openjkdf2-64.exe.manifest

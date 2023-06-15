@@ -1,5 +1,7 @@
 #include "jkgm.h"
 
+#include "SDL2_helper.h"
+
 #include <iostream>
 #include <fstream>
 #include <vector>

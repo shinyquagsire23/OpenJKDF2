@@ -1,1 +1,132 @@
-id ICON "../openjkdf2.ico"
+#ifndef WINVER
+#if defined _M_X64 || defined _M_AMD64 || \
+    defined __x86_64 || defined __x86_64__ || \
+    defined __amd64 || defined __amd64__
+#define WINVER 0x0502
+#elif defined _M_ARM || _M_ARM64 || \
+      defined __arm || defined __arm__ || \
+      defined __aarch64 || defined __aarch64__
+#define WINVER 0x0603
+#else /* _M_ARM || _M_ARM64 */
+#define WINVER 0x0500
+#endif /* _M_X64 || _M_AMD64 */
+#endif /* WINVER */
+#ifndef _WIN32_WINNT
+#if defined _M_X64 || defined _M_AMD64 || \
+    defined __x86_64 || defined __x86_64__ || \
+    defined __amd64 || defined __amd64__
+#define _WIN32_WINNT 0x0502
+#elif defined _M_ARM || _M_ARM64 || \
+      defined __arm || defined __arm__ || \
+      defined __aarch64 || defined __aarch64__
+#define _WIN32_WINNT 0x0603
+#else /* _M_ARM || _M_ARM64 */
+#define _WIN32_WINNT 0x0500
+#endif /* _M_X64 || _M_AMD64 */
+#endif /* _WIN32_WINNT */
+
+#include <windows.h>
+#include <winresrc.h>
+
+#ifndef RC_MAKELANGID
+#define RC_MAKELANGID(lang,sublang) lang | sublang * 0x200
+#endif /* RC_MAKELANGID */
+
+#ifndef OPENJKDF2_FILE_VERSION
+#define OPENJKDF2_FILE_VERSION OPENJKDF2_RELEASE_VERSION_STRING_W
+#endif /* OPENJKDF2_FILE_VERSION */
+#ifndef OPENJKDF2_PRODUCT_VERSION
+#define OPENJKDF2_PRODUCT_VERSION OPENJKDF2_FILE_VERSION
+#endif /* OPENJKDF2_PRODUCT_VERSION */
+
+#ifndef OPENJKDF2_COMPANY_NAME
+#define OPENJKDF2_COMPANY_NAME L"OpenJKDF2"
+#endif /* OPENJKDF2_COMPANY_NAME */
+#ifndef OPENJKDF2_INTERNAL_NAME
+#define OPENJKDF2_INTERNAL_NAME L"OpenJKDF2"
+#endif /* OPENJKDF2_INTERNAL_NAME */
+#ifndef OPENJKDF2_PRODUCT_NAME
+#define OPENJKDF2_PRODUCT_NAME L"Open Jedi Knight\x2122: Dark Forces II"
+#endif /* OPENJKDF2_PRODUCT_NAME */
+#ifndef OPENJKDF2_ORIGINAL_FILENAME
+#ifdef _WIN64
+#define OPENJKDF2_ORIGINAL_FILENAME L"openjkdf2-64.exe"
+#else
+#define OPENJKDF2_ORIGINAL_FILENAME L"openjkdf2.exe"
+#endif /* _WIN64 */
+#endif /* OPENJKDF2_ORIGINAL_FILENAME */
+
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION    OPENJKDF2_MAJOR_VERSION,OPENJKDF2_MINOR_VERSION,OPENJKDF2_PATCH_VERSION,OPENJKDF2_TWEAK_VERSION
+PRODUCTVERSION OPENJKDF2_MAJOR_VERSION,OPENJKDF2_MINOR_VERSION,OPENJKDF2_PATCH_VERSION,OPENJKDF2_TWEAK_VERSION
+FILEFLAGSMASK  VS_FFI_FILEFLAGSMASK
+FILEFLAGS      0
+FILEOS         VOS_NT_WINDOWS32
+FILETYPE       VFT_APP
+FILESUBTYPE    VFT2_UNKNOWN {
+    BLOCK "VarFileInfo" {
+        // Ordered by LCID, not alphabet
+        VALUE "Translation",
+        LANG_GERMAN,  1200,
+        LANG_ENGLISH, 1200,
+        LANG_POLISH,  1200
+    }
+    BLOCK "StringFileInfo" {
+        // Ordered by LCID, not alphabet
+        BLOCK "000704B0" { // LANG_GERMAN
+            VALUE "CompanyName",       OPENJKDF2_COMPANY_NAME
+            VALUE "FileDescription",   L"Ausf\x00FChrbare \x201EOpen Jedi Knight\x2122: Dark Forces II\x201C\x2011Datei"
+            VALUE "FileVersion",       OPENJKDF2_FILE_VERSION
+            VALUE "InternalName",      OPENJKDF2_INTERNAL_NAME
+            VALUE "LegalCopyright",    L"\x201EJedi Knight\x2122 Dark Forces II\x201C ist urheberrechtlich durch Lucasfilm Ltd. 1997-2009 gesch\x00FCtzt.\r\n"
+                                       L"Eine original \x201EJedi Knight\x2122: Dark Forces II\x201C\x2011Spieldisk "
+                                       L"oder \x00FCber Steam bzw. GOG original lizenzierte Spielwerke werden ben\x00F6tigt um OpenJKDF2 zu spielen.\r\n"
+                                       L"OpenJKDF2 wird nach 0BSD lizenziert."
+            VALUE "LegalTrademarks",   L"LucasArts, das LucasArts Logo, STAR WARS und verwandte Eigenschaften sind Warenzeichen von "
+                                       L"Lucasfilm Ltd. und seinen Gesch\x00E4ftspartnern in den Vereinten Staaten von Amerika "
+                                       L"bzw. anderen Staaten."
+            VALUE "OriginalFilename",  OPENJKDF2_ORIGINAL_FILENAME
+            VALUE "ProductName",       OPENJKDF2_PRODUCT_NAME
+            VALUE "ProductVersion",    OPENJKDF2_PRODUCT_VERSION
+        }
+        BLOCK "000904B0" { // LANG_ENGLISH
+            VALUE "CompanyName",       OPENJKDF2_COMPANY_NAME
+            VALUE "FileDescription",   L"Open Jedi Knight\x2122: Dark Forces II executable"
+            VALUE "FileVersion",       OPENJKDF2_FILE_VERSION
+            VALUE "InternalName",      OPENJKDF2_INTERNAL_NAME
+            VALUE "LegalCopyright",    L"Jedi Knight\x2122 Dark Forces II is Copyright \x00A9 Lucasfilm Ltd. 1997-2009.\r\n"
+                                       L"An original \x201CJedi Knight\x2122: Dark Forces II\x201D game disk, "
+                                       L"or original licensed assets from Steam or GOG, are required in order to play OpenJKDF2.\r\n"
+                                       L"OpenJKDF2 is licensed under 0BSD."
+            VALUE "LegalTrademarks",   L"LucasArts, the LucasArts logo, STAR WARS and related properties are trademarks in "
+                                       L"the United States and/or in other countries of Lucasfilm Ltd. and/or its affiliates."
+            VALUE "OriginalFilename",  OPENJKDF2_ORIGINAL_FILENAME
+            VALUE "ProductName",       OPENJKDF2_PRODUCT_NAME
+            VALUE "ProductVersion",    OPENJKDF2_PRODUCT_VERSION
+        }
+        BLOCK "001504B0" { // LANG_POLISH
+            VALUE "CompanyName",       OPENJKDF2_COMPANY_NAME
+            VALUE "FileDescription",   L"Plik wykonawczy \x201COpen Jedi Knight\x2122: Dark Forces II\x201D"
+            VALUE "FileVersion",       OPENJKDF2_FILE_VERSION
+            VALUE "InternalName",      OPENJKDF2_INTERNAL_NAME
+            VALUE "LegalCopyright",    L"Lucasfilm Ltd. jest w\x0142a\x015Bcicielem prawa autorskiego do \x201EJedi Knight\x2122 Dark Forces II\x201D z lat 1997 do 2009.\r\n"
+                                       L"Aby wykorzysta\x0107 OpenJKDF2 do odtwarzania \x201EJedi Knight: Dark Forces II\x201D, niezb\x0119dny jest oryginalny dysk "
+                                       L"lub licencjonowane oryginalne zasoby gry ze Steam lub GOG.\r\n"
+                                       L"OpenJKDF2 na licencji 0BSD."
+            VALUE "LegalTrademarks",   L"LucasArts, LucasArts logo, STAR WARS i pokrewne w\x0142a\x015bciwo\x015Bci s\x0105 znakami towarowymi "
+                                       L"Lucasfilm Ltd. lub jej podmiot\x00F3w gospodarczych w Stanach Zjednoczonych Ameryki i innych pa\x0144stwach."
+            VALUE "OriginalFilename",  OPENJKDF2_ORIGINAL_FILENAME
+            VALUE "ProductName",       OPENJKDF2_PRODUCT_NAME
+            VALUE "ProductVersion",    OPENJKDF2_PRODUCT_VERSION
+        }
+    }
+}
+
+1 ICON "../openjkdf2.ico"
+
+#ifdef _WIN64
+CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "openjkdf2-64.exe.manifest"
+#else
+CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "openjkdf2-64.exe.manifest" // TODO ??
+#endif /* _WIN64 */

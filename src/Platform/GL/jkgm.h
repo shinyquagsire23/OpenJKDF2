@@ -10,8 +10,6 @@ extern "C" {
 void* jkgm_alloc_aligned(size_t amt);
 void jkgm_aligned_free(void* p);
 
-#include "SDL2_helper.h"
-
 #ifdef SDL2_RENDER
 #if defined(TARGET_CAN_JKGM)
 void jkgm_startup();

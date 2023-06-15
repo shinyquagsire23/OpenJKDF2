@@ -229,6 +229,16 @@
 #define COMPAT_SAVE_VERSION (Main_bMotsCompat ? 0x7D6 : 0x6)
 #define JKSAVE_FORMATSTR (Main_bMotsCompat ? "msav%04d.jks" : "save%04d.jks")
 
+extern int Window_isHiDpi;
+#ifdef WIN64_STANDALONE
+#define WINDOW_DEFAULT_WIDTH  (640*2)
+#define WINDOW_DEFAULT_HEIGHT (480*2)
+#else // WIN64_STANDALONE
+#define WINDOW_DEFAULT_WIDTH  (640)
+#define WINDOW_DEFAULT_HEIGHT (480)
+#endif // WIN64_STANDALONE
+
+
 // Disable warnings for Vegetable Studio
 #if 1 && defined _MSC_VER
 #pragma warning(disable: 4003) // not enough arguments for function-like macro invocation
