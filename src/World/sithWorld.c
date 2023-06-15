@@ -123,7 +123,7 @@ void sithWorld_UpdateLoadPercent(float percent)
         sithWorld_LoadPercentCallback(percent);
 }
 
-int sithWorld_Load(sithWorld *world, char *map_jkl_fname)
+int sithWorld_Load(sithWorld *pWorld, char *map_jkl_fname)
 {
     int result; // eax
     int v3; // esi
@@ -134,7 +134,7 @@ int sithWorld_Load(sithWorld *world, char *map_jkl_fname)
     char v8[128]; // [esp+44h] [ebp-F8h] BYREF
     char tmp[120]; // [esp+C4h] [ebp-78h] BYREF
 
-    if ( !world )
+    if ( !pWorld )
         return 0;
 #ifdef SDL2_RENDER
     std3D_PurgeTextureCache();
@@ -144,12 +144,12 @@ int sithWorld_Load(sithWorld *world, char *map_jkl_fname)
     {
         // aaaaaa these sizes are wrong
         // Added: actually use correct lengths
-        _strncpy(world->map_jkl_fname, map_jkl_fname, 0x1F);
-        world->map_jkl_fname[31] = 0; 
-        _strtolower(world->map_jkl_fname);
-        _strncpy(world->episodeName, sithWorld_episodeName, 0x1Fu);
-        world->episodeName[0x1F] = 0;
-        sithWorld_pLoading = world;
+        _strncpy(pWorld->map_jkl_fname, map_jkl_fname, 0x1F);
+        pWorld->map_jkl_fname[31] = 0; 
+        _strtolower(pWorld->map_jkl_fname);
+        _strncpy(pWorld->episodeName, sithWorld_episodeName, 0x1Fu);
+        pWorld->episodeName[0x1F] = 0;
+        sithWorld_pLoading = pWorld;
         stdFnames_MakePath(v8, 128, "jkl", map_jkl_fname);
         sithWorld_some_integer_4 = 0;
         if ( !stdConffile_OpenRead(v8) )
@@ -181,7 +181,7 @@ LABEL_11:
                 if ( v3 != -1 )
                 {
                     startMsecs = stdPlatform_GetTimeMsec();
-                    if ( !sithWorld_aSectionParsers[v3].funcptr(world, 0) ) {
+                    if ( !sithWorld_aSectionParsers[v3].funcptr(pWorld, 0) ) {
                         // Added
                         _sprintf(tmp, "%f seconds to parse section %s -- FAILED!\n", (double)v6 * 0.001, section);
                         sithConsole_Print(tmp);
@@ -204,7 +204,7 @@ LABEL_19:
         stdConffile_Close();
     }
 
-    if ( sithWorld_NewEntry(world) )
+    if ( sithWorld_NewEntry(pWorld) )
     {
 #ifdef SDL2_RENDER
         std3D_UpdateSettings();
@@ -217,7 +217,7 @@ LABEL_19:
 parse_problem:
     stdPrintf(pSithHS->errorPrint, ".\\World\\sithWorld.c", 276, "Parse problem in file '%s'.\n", v8);
 cleanup:
-    sithWorld_FreeEntry(world);
+    sithWorld_FreeEntry(pWorld);
     return 0;
 }
 
@@ -231,7 +231,7 @@ sithWorld* sithWorld_New()
     return result;
 }
 
-int sithWorld_NewEntry(sithWorld *world)
+int sithWorld_NewEntry(sithWorld *pWorld)
 {
     sithAdjoin *v1; // ebp
     sithSector *v2; // ebx
@@ -250,58 +250,58 @@ int sithWorld_NewEntry(sithWorld *world)
 
     v1 = 0;
     v2 = 0;
-    if ( (world->level_type_maybe & 2) == 0 )
+    if ( (pWorld->level_type_maybe & 2) == 0 )
     {
-        v3 = world->numVertices;
+        v3 = pWorld->numVertices;
         if ( v3 )
         {
             v4 = (rdVector3 *)pSithHS->alloc(sizeof(rdVector3) * v3);
-            world->verticesTransformed = v4;
+            pWorld->verticesTransformed = v4;
             if ( !v4 )
                 return 0;
 
-            v5 = (float *)pSithHS->alloc(sizeof(float) * world->numVertices);
-            world->verticesDynamicLight = v5;
+            v5 = (float *)pSithHS->alloc(sizeof(float) * pWorld->numVertices);
+            pWorld->verticesDynamicLight = v5;
             if ( !v5 )
                 return 0;
-            _memset(v5, 0, sizeof(float) * world->numVertices);
+            _memset(v5, 0, sizeof(float) * pWorld->numVertices);
 
-            v6 = (int *)pSithHS->alloc(sizeof(int) * world->numVertices);
-            world->alloc_unk98 = v6;
+            v6 = (int *)pSithHS->alloc(sizeof(int) * pWorld->numVertices);
+            pWorld->alloc_unk98 = v6;
             if ( !v6 )
                 return 0;
-            _memset(v6, 0, sizeof(int) * world->numVertices);
+            _memset(v6, 0, sizeof(int) * pWorld->numVertices);
 
-            v7 = (int *)pSithHS->alloc(sizeof(int) * world->numVertices);
-            world->alloc_unk9c = v7;
+            v7 = (int *)pSithHS->alloc(sizeof(int) * pWorld->numVertices);
+            pWorld->alloc_unk9c = v7;
             if ( !v7 )
                 return 0;
-            _memset(v7, 0, sizeof(int) * world->numVertices);
-            for (int i = 0; i < world->numSurfaces; i++)
+            _memset(v7, 0, sizeof(int) * pWorld->numVertices);
+            for (int i = 0; i < pWorld->numSurfaces; i++)
             {
-                adjoinIter = world->surfaces[i].adjoin;
+                adjoinIter = pWorld->surfaces[i].adjoin;
                 if ( adjoinIter )
                 {
                     adjoinIterMirror = adjoinIter->mirror;
                     if ( adjoinIterMirror )
                         adjoinIter->sector = adjoinIterMirror->surface->parent_sector;
-                    if ( v1 && (v12 = world->surfaces[i].parent_sector, v2 == world->surfaces[i].parent_sector) )
+                    if ( v1 && (v12 = pWorld->surfaces[i].parent_sector, v2 == pWorld->surfaces[i].parent_sector) )
                     {
                         v1->next = adjoinIter;
                     }
                     else
                     {
-                        v12 = world->surfaces[i].parent_sector;
-                        world->surfaces[i].parent_sector->adjoins = adjoinIter;
+                        v12 = pWorld->surfaces[i].parent_sector;
+                        pWorld->surfaces[i].parent_sector->adjoins = adjoinIter;
                     }
                     v1 = adjoinIter;
                     v2 = v12;
                 }
             }
-            sithPlayer_NewEntry(world);
-            for (int i = 0; i < world->numThingsLoaded; i++)
+            sithPlayer_NewEntry(pWorld);
+            for (int i = 0; i < pWorld->numThingsLoaded; i++)
             {
-                v16 = &world->things[i];
+                v16 = &pWorld->things[i];
                 if ( v16->type
                   && v16->moveType == SITH_MT_PHYSICS
                   && (v16->physicsParams.physflags & (SITH_PF_WALLSTICK|SITH_PF_FLOORSTICK)))
@@ -309,101 +309,101 @@ int sithWorld_NewEntry(sithWorld *world)
                     sithPhysics_FindFloor(v16, 1);
                 }
             }
-            if ( !sithWorld_Verify(world) )
+            if ( !sithWorld_Verify(pWorld) )
                 return 0;
         }
-        world->level_type_maybe |= 2;
+        pWorld->level_type_maybe |= 2;
     }
     return 1;
 }
 
 // MOTS altered
-void sithWorld_FreeEntry(sithWorld *world)
+void sithWorld_FreeEntry(sithWorld *pWorld)
 {
     unsigned int v1; // edi
     int v2; // ebx
 
-    if ( world->colormaps )
+    if ( pWorld->colormaps )
     {
         v1 = 0;
-        if ( world->numColormaps )
+        if ( pWorld->numColormaps )
         {
             v2 = 0;
             do
             {
-                rdColormap_FreeEntry(&world->colormaps[v2]);
+                rdColormap_FreeEntry(&pWorld->colormaps[v2]);
                 ++v1;
                 ++v2;
             }
-            while ( v1 < world->numColormaps );
+            while ( v1 < pWorld->numColormaps );
         }
-        pSithHS->free(world->colormaps);
-        world->colormaps = 0;
-        world->numColormaps = 0;
+        pSithHS->free(pWorld->colormaps);
+        pWorld->colormaps = 0;
+        pWorld->numColormaps = 0;
     }
-    if ( world->things )
-        sithThing_Free(world);
-    if ( world->sectors )
-        sithSector_Free(world);
-    if ( world->models )
-        sithModel_Free(world);
-    if ( world->sprites )
-        sithSprite_FreeEntry(world);
-    if ( world->particles )
-        sithParticle_Free(world);
-    if ( world->keyframes )
-        sithKeyFrame_Free(world);
-    if ( world->templates )
-        sithTemplate_FreeWorld(world);
-    if ( world->vertices )
+    if ( pWorld->things )
+        sithThing_Free(pWorld);
+    if ( pWorld->sectors )
+        sithSector_Free(pWorld);
+    if ( pWorld->models )
+        sithModel_Free(pWorld);
+    if ( pWorld->sprites )
+        sithSprite_FreeEntry(pWorld);
+    if ( pWorld->particles )
+        sithParticle_Free(pWorld);
+    if ( pWorld->keyframes )
+        sithKeyFrame_Free(pWorld);
+    if ( pWorld->templates )
+        sithTemplate_FreeWorld(pWorld);
+    if ( pWorld->vertices )
     {
-        pSithHS->free(world->vertices);
-        world->vertices = 0;
+        pSithHS->free(pWorld->vertices);
+        pWorld->vertices = 0;
     }
-    if ( world->verticesTransformed )
+    if ( pWorld->verticesTransformed )
     {
-        pSithHS->free(world->verticesTransformed);
-        world->verticesTransformed = 0;
+        pSithHS->free(pWorld->verticesTransformed);
+        pWorld->verticesTransformed = 0;
     }
-    if ( world->verticesDynamicLight )
+    if ( pWorld->verticesDynamicLight )
     {
-        pSithHS->free(world->verticesDynamicLight);
-        world->verticesDynamicLight = 0;
+        pSithHS->free(pWorld->verticesDynamicLight);
+        pWorld->verticesDynamicLight = 0;
     }
-    if ( world->alloc_unk9c )
+    if ( pWorld->alloc_unk9c )
     {
-        pSithHS->free(world->alloc_unk9c);
-        world->alloc_unk9c = 0;
+        pSithHS->free(pWorld->alloc_unk9c);
+        pWorld->alloc_unk9c = 0;
     }
-    if ( world->vertexUVs )
+    if ( pWorld->vertexUVs )
     {
-        pSithHS->free(world->vertexUVs);
-        world->vertexUVs = 0;
+        pSithHS->free(pWorld->vertexUVs);
+        pWorld->vertexUVs = 0;
     }
-    if ( world->surfaces )
-        sithSurface_Free(world);
-    if ( world->alloc_unk98 )
+    if ( pWorld->surfaces )
+        sithSurface_Free(pWorld);
+    if ( pWorld->alloc_unk98 )
     {
-        pSithHS->free(world->alloc_unk98);
-        world->alloc_unk98 = 0;
+        pSithHS->free(pWorld->alloc_unk98);
+        pWorld->alloc_unk98 = 0;
     }
-    if ( world->materials )
-        sithMaterial_Free(world);
-    if ( world->sounds )
-        sithSound_Free(world);
-    if ( world->cogs || world->cogScripts )
-        sithCog_Free(world);
-    if ( world->animclasses )
-        sithAnimClass_Free(world);
-    if ( world->aiclasses )
-        sithAIClass_Free(world);
-    if ( world->soundclasses )
-        sithSoundClass_Free2(world);
+    if ( pWorld->materials )
+        sithMaterial_Free(pWorld);
+    if ( pWorld->sounds )
+        sithSound_Free(pWorld);
+    if ( pWorld->cogs || pWorld->cogScripts )
+        sithCog_Free(pWorld);
+    if ( pWorld->animclasses )
+        sithAnimClass_Free(pWorld);
+    if ( pWorld->aiclasses )
+        sithAIClass_Free(pWorld);
+    if ( pWorld->soundclasses )
+        sithSoundClass_Free2(pWorld);
 
 #ifdef JKM_LIGHTING
     // MOTS added
-    if (world->aArchlights) {
-        sithArchLighting_Free(world);
+    if (pWorld->aArchlights) {
+        sithArchLighting_Free(pWorld);
     }
 #endif
 
@@ -420,14 +420,14 @@ void sithWorld_FreeEntry(sithWorld *world)
     }
 
     // Added: Kinda hacky, but static never gets unloaded.
-    memset(world, 0, sizeof(*world));
+    memset(pWorld, 0, sizeof(*pWorld));
     sithWorld_pCurrentWorld = 0;
 
     // Added (Droidworks): JK and MoTS memleaked the world alloc
-    pSithHS->free(world);
+    pSithHS->free(pWorld);
 }
 
-int sithHeader_Load(sithWorld *world, int junk)
+int sithHeader_Load(sithWorld *pWorld, int junk)
 {
     if ( junk )
         return 0;
@@ -441,52 +441,52 @@ int sithHeader_Load(sithWorld *world, int junk)
     }
     if ( !stdConffile_ReadLine() )
         return 0;
-    _sscanf(stdConffile_aLine, "world gravity %f", &world->worldGravity);
+    _sscanf(stdConffile_aLine, "world gravity %f", &pWorld->worldGravity);
     if ( !stdConffile_ReadLine() )
         return 0;
-    _sscanf(stdConffile_aLine, "ceiling sky z %f", &world->ceilingSky);
+    _sscanf(stdConffile_aLine, "ceiling sky z %f", &pWorld->ceilingSky);
     if ( !stdConffile_ReadLine() )
         return 0;
-    _sscanf(stdConffile_aLine, "horizon distance %f", &world->horizontalDistance);
+    _sscanf(stdConffile_aLine, "horizon distance %f", &pWorld->horizontalDistance);
     if ( !stdConffile_ReadLine() )
         return 0;
-    _sscanf(stdConffile_aLine, "horizon pixels per rev %f", &world->horizontalPixelsPerRev);
+    _sscanf(stdConffile_aLine, "horizon pixels per rev %f", &pWorld->horizontalPixelsPerRev);
     if ( !stdConffile_ReadLine() )
         return 0;
-    _sscanf(stdConffile_aLine, "horizon sky offset %f %f", &world->horizontalSkyOffs, &world->horizontalSkyOffs.y);
+    _sscanf(stdConffile_aLine, "horizon sky offset %f %f", &pWorld->horizontalSkyOffs, &pWorld->horizontalSkyOffs.y);
     if ( !stdConffile_ReadLine() )
         return 0;
-    _sscanf(stdConffile_aLine, "ceiling sky offset %f %f", &world->ceilingSkyOffs, &world->ceilingSkyOffs.y);
+    _sscanf(stdConffile_aLine, "ceiling sky offset %f %f", &pWorld->ceilingSkyOffs, &pWorld->ceilingSkyOffs.y);
     if ( !stdConffile_ReadLine() )
         return 0;
     _sscanf(
         stdConffile_aLine,
         "mipmap distances %f %f %f %f",
-        &world->mipmapDistance.x,
-        &world->mipmapDistance.y,
-        &world->mipmapDistance.z,
-        &world->mipmapDistance.w);
+        &pWorld->mipmapDistance.x,
+        &pWorld->mipmapDistance.y,
+        &pWorld->mipmapDistance.z,
+        &pWorld->mipmapDistance.w);
     if ( !stdConffile_ReadLine() )
         return 0;
-    _sscanf(stdConffile_aLine, "lod distances %f %f %f %f", &world->lodDistance.x, &world->lodDistance.y, &world->lodDistance.z, &world->lodDistance.w);
+    _sscanf(stdConffile_aLine, "lod distances %f %f %f %f", &pWorld->lodDistance.x, &pWorld->lodDistance.y, &pWorld->lodDistance.z, &pWorld->lodDistance.w);
     if ( !stdConffile_ReadLine() )
         return 0;
-    _sscanf(stdConffile_aLine, "perspective distance %f", &world->perspectiveDistance);
+    _sscanf(stdConffile_aLine, "perspective distance %f", &pWorld->perspectiveDistance);
     if ( !stdConffile_ReadLine() )
         return 0;
-    _sscanf(stdConffile_aLine, "gouraud distance %f", &world->gouradDistance);
+    _sscanf(stdConffile_aLine, "gouraud distance %f", &pWorld->gouradDistance);
 
 // Old-style mipmap/LOD removal
 //#ifdef QOL_IMPROVEMENTS
 #if 0
-    world->mipmapDistance.x = 200.0;
-    world->mipmapDistance.y = 200.0;
-    world->mipmapDistance.z = 200.0;
-    world->mipmapDistance.w = 200.0;
-    world->loadDistance.x = 200.0;
-    world->loadDistance.y = 200.0;
-    world->loadDistance.z = 200.0;
-    world->loadDistance.w = 200.0;
+    pWorld->mipmapDistance.x = 200.0;
+    pWorld->mipmapDistance.y = 200.0;
+    pWorld->mipmapDistance.z = 200.0;
+    pWorld->mipmapDistance.w = 200.0;
+    pWorld->loadDistance.x = 200.0;
+    pWorld->loadDistance.y = 200.0;
+    pWorld->loadDistance.z = 200.0;
+    pWorld->loadDistance.w = 200.0;
 #endif
 
     return 1;
@@ -554,53 +554,53 @@ int sithWorld_FindSectionParser(char *a1)
     return i;
 }
 
-int sithWorld_Verify(sithWorld *world)
+int sithWorld_Verify(sithWorld *pWorld)
 {
-    if ( !world->things && world->numThingsLoaded )
+    if ( !pWorld->things && pWorld->numThingsLoaded )
     {
         stdPrintf(pSithHS->errorPrint, ".\\World\\sithWorld.c", 1245, "Problem with things array, should not be NULL.\n", 0, 0, 0, 0);
         return 0;
     }
-    if ( !world->sprites && world->numSpritesLoaded )
+    if ( !pWorld->sprites && pWorld->numSpritesLoaded )
     {
         stdPrintf(pSithHS->errorPrint, ".\\World\\sithWorld.c", 1251, "Problem with spriates array, should not be NULL.\n", 0, 0, 0, 0);
         return 0;
     }
-    if ( !world->models && world->numModelsLoaded )
+    if ( !pWorld->models && pWorld->numModelsLoaded )
     {
         stdPrintf(pSithHS->errorPrint, ".\\World\\sithWorld.c", 1257, "Problem with models array, should not be NULL.\n", 0, 0, 0, 0);
         return 0;
     }
-    if ( !world->sectors || !world->surfaces || !world->vertices )
+    if ( !pWorld->sectors || !pWorld->surfaces || !pWorld->vertices )
     {
         stdPrintf(pSithHS->errorPrint, ".\\World\\sithWorld.c", 1263, "A required geometry section is missing from the level file.\n", 0, 0, 0, 0);
         return 0;
     }
-    if ( sithSurface_Verify(world) )
+    if ( sithSurface_Verify(pWorld) )
         return 1;
     stdPrintf(pSithHS->errorPrint, ".\\World\\sithWorld.c", 1271, "Surface resources did not pass validation.\n", 0, 0, 0, 0);
     return 0;
 }
 
 // MOTS altered
-uint32_t sithWorld_CalcChecksum(sithWorld *world, uint32_t seed)
+uint32_t sithWorld_CalcChecksum(sithWorld *pWorld, uint32_t seed)
 {
     // Starting hash seed
     uint32_t hash = seed;
 
     // Hash all world cogscript __VM bytecode__ (*not* text)
-    for (int i = 0; i < world->numCogScriptsLoaded; i++)
+    for (int i = 0; i < pWorld->numCogScriptsLoaded; i++)
     {
-        hash = util_Weirdchecksum((uint8_t *)world->cogScripts[i].script_program, world->cogScripts[i].codeSize, hash);
+        hash = util_Weirdchecksum((uint8_t *)pWorld->cogScripts[i].script_program, pWorld->cogScripts[i].codeSize, hash);
     }
 
     // Hash all world vertices
-    hash = util_Weirdchecksum((uint8_t *)world->vertices, 12 * world->numVertices, hash);
+    hash = util_Weirdchecksum((uint8_t *)pWorld->vertices, 12 * pWorld->numVertices, hash);
 
     // Hash all thing templates
-    for (int i = 0; i < world->numTemplatesLoaded; i++)
+    for (int i = 0; i < pWorld->numTemplatesLoaded; i++)
     {
-        hash = sithThing_Checksum(&world->templates[i], hash);
+        hash = sithThing_Checksum(&pWorld->templates[i], hash);
     }
     
     // Hash static COG __VM bytecode__ (*not* text)
@@ -630,7 +630,7 @@ int sithWorld_Initialize()
     return 1;
 }
 
-int sithWorld_LoadGeoresource(sithWorld *world, int a2)
+int sithWorld_LoadGeoresource(sithWorld *pWorld, int a2)
 {
     rdVector3 *vertices; // eax
     rdVector3 *vertex; // esi
@@ -665,9 +665,9 @@ int sithWorld_LoadGeoresource(sithWorld *world, int a2)
         return 0;
     }
 
-    world->numColormaps = numColormaps;
-    world->colormaps = (rdColormap *)pSithHS->alloc(sizeof(rdColormap) * numColormaps);
-    if (!world->colormaps)
+    pWorld->numColormaps = numColormaps;
+    pWorld->colormaps = (rdColormap *)pSithHS->alloc(sizeof(rdColormap) * numColormaps);
+    if (!pWorld->colormaps)
     {
         return 0;
     }
@@ -684,7 +684,7 @@ int sithWorld_LoadGeoresource(sithWorld *world, int a2)
             return 0;
         }
         _sprintf(colormap_fname, "%s%c%s", "misc\\cmp", '\\', std_genBuffer);
-        if ( !rdColormap_LoadEntry(colormap_fname, &world->colormaps[i]) )
+        if ( !rdColormap_LoadEntry(colormap_fname, &pWorld->colormaps[i]) )
         {
             return 0;
         }
@@ -701,7 +701,7 @@ int sithWorld_LoadGeoresource(sithWorld *world, int a2)
     }
 
     vertices = (rdVector3 *)pSithHS->alloc(sizeof(rdVector3) * num_vertices);
-    world->vertices = vertices;
+    pWorld->vertices = vertices;
     if (!vertices)
     {
         return 0;
@@ -726,7 +726,7 @@ int sithWorld_LoadGeoresource(sithWorld *world, int a2)
         ++vertex;
     }
 
-    world->numVertices = num_vertices;
+    pWorld->numVertices = num_vertices;
     if (!stdConffile_ReadLine())
     {
         return 0;
@@ -737,20 +737,20 @@ int sithWorld_LoadGeoresource(sithWorld *world, int a2)
         return 0;
     }
 
-    world->vertexUVs = (rdVector2 *)pSithHS->alloc(sizeof(rdVector2) * num_vertices_uvs);
-    if (!world->vertexUVs)
+    pWorld->vertexUVs = (rdVector2 *)pSithHS->alloc(sizeof(rdVector2) * num_vertices_uvs);
+    if (!pWorld->vertexUVs)
     {
         return 0;
     }
 
-    vertex_uvs = world->vertexUVs;
+    vertex_uvs = pWorld->vertexUVs;
     v14 = num_vertices_uvs;
     v15 = 0;
     if ( !num_vertices_uvs )
     {
 LABEL_28:
-        world->numVertexUVs = v14;
-        return sithSurface_Load(world) != 0;
+        pWorld->numVertexUVs = v14;
+        return sithSurface_Load(pWorld) != 0;
     }
     while ( stdConffile_ReadLine() && _sscanf(stdConffile_aLine, " %d: %f %f", &v_idx, &v21, &v23) == 3 )
     {
@@ -765,18 +765,18 @@ LABEL_28:
     return 0;
 }
 
-void sithWorld_sub_4D0A20(sithWorld *world)
+void sithWorld_sub_4D0A20(sithWorld *pWorld)
 {
-    _memset(world->alloc_unk98, 0, 4 * world->numVertices);
-    _memset(world->alloc_unk9c, 0, 4 * world->numVertices);
+    _memset(pWorld->alloc_unk98, 0, 4 * pWorld->numVertices);
+    _memset(pWorld->alloc_unk9c, 0, 4 * pWorld->numVertices);
 
-    for (int i = 0; i < world->numSectors; i++)
+    for (int i = 0; i < pWorld->numSectors; i++)
     {
-        sithSector* sector = &world->sectors[i];
+        sithSector* sector = &pWorld->sectors[i];
         
-        for (int j = 0; j < world->sectors[i].numSurfaces; j++)
+        for (int j = 0; j < pWorld->sectors[i].numSurfaces; j++)
         {
-            sithSurface* surface = &world->sectors[i].surfaces[j];
+            sithSurface* surface = &pWorld->sectors[i].surfaces[j];
             surface->field_4 = 0;
         }
         sector->renderTick = 0;
@@ -793,88 +793,88 @@ void sithWorld_Free()
     }
 }
 
-void sithWorld_ResetSectorRuntimeAlteredVars(sithWorld *world)
+void sithWorld_ResetSectorRuntimeAlteredVars(sithWorld *pWorld)
 {
-    for (int i = 0; i < world->numMaterialsLoaded; i++)
+    for (int i = 0; i < pWorld->numMaterialsLoaded; i++)
     {
-        world->materials[i].celIdx = 0;;
+        pWorld->materials[i].celIdx = 0;;
     }
 
-    for (int i = 0; i < world->numSectors; i++)
+    for (int i = 0; i < pWorld->numSectors; i++)
     {
-        rdVector_Zero3(&world->sectors[i].thrust);
-        rdVector_Zero3(&world->sectors[i].tint);
+        rdVector_Zero3(&pWorld->sectors[i].thrust);
+        rdVector_Zero3(&pWorld->sectors[i].tint);
     }
     sithPlayer_ResetPalEffects();
 }
 
 // MOTS altered
-void sithWorld_GetMemorySize(sithWorld *world, int *outAllocated, int *outQuantity)
+void sithWorld_GetMemorySize(sithWorld *pWorld, int *outAllocated, int *outQuantity)
 {
     _memset(outAllocated, 0, sizeof(int) * 0x11);
     _memset(outQuantity, 0, sizeof(int) * 0x11);
-    outQuantity[0] = world->numMaterialsLoaded;
-    for (int i = 0; i < world->numMaterialsLoaded; i++)
+    outQuantity[0] = pWorld->numMaterialsLoaded;
+    for (int i = 0; i < pWorld->numMaterialsLoaded; i++)
     {
-        outAllocated[0] += sithMaterial_GetMemorySize(&world->materials[i]);
+        outAllocated[0] += sithMaterial_GetMemorySize(&pWorld->materials[i]);
     }
-    outQuantity[1] = world->numVertices;
-    outAllocated[1] = 0x34 * world->numVertices;               // TODO: what is this size?
-    outQuantity[2] = world->numVertexUVs;
-    outAllocated[2] = sizeof(rdVector2) * world->numVertexUVs;
-    outQuantity[3] = world->numSurfaces;
-    for (int i = 0; i < world->numSurfaces; i++)
+    outQuantity[1] = pWorld->numVertices;
+    outAllocated[1] = 0x34 * pWorld->numVertices;               // TODO: what is this size?
+    outQuantity[2] = pWorld->numVertexUVs;
+    outAllocated[2] = sizeof(rdVector2) * pWorld->numVertexUVs;
+    outQuantity[3] = pWorld->numSurfaces;
+    for (int i = 0; i < pWorld->numSurfaces; i++)
     {
-        outAllocated[3] += sizeof(rdVector3) * world->surfaces[i].surfaceInfo.face.numVertices + sizeof(sithSurface);
+        outAllocated[3] += sizeof(rdVector3) * pWorld->surfaces[i].surfaceInfo.face.numVertices + sizeof(sithSurface);
     }
-    outQuantity[4] = world->numAdjoinsLoaded;
-    outAllocated[4] = sizeof(sithAdjoin) * world->numAdjoinsLoaded;
-    outQuantity[5] = world->numSectors;
-    for (int i = 0; i < world->numSectors; i++)
+    outQuantity[4] = pWorld->numAdjoinsLoaded;
+    outAllocated[4] = sizeof(sithAdjoin) * pWorld->numAdjoinsLoaded;
+    outQuantity[5] = pWorld->numSectors;
+    for (int i = 0; i < pWorld->numSectors; i++)
     {
-        outAllocated[5] += 4 * world->sectors[i].numVertices + sizeof(sithSector); // TODO bug?
+        outAllocated[5] += 4 * pWorld->sectors[i].numVertices + sizeof(sithSector); // TODO bug?
     }
-    outQuantity[6] = world->numSoundsLoaded;
-    for (int i = 0; i < world->numSoundsLoaded; i++)
+    outQuantity[6] = pWorld->numSoundsLoaded;
+    for (int i = 0; i < pWorld->numSoundsLoaded; i++)
     {
-        outAllocated[6] += world->sounds[i].bufferBytes + sizeof(sithSound);
+        outAllocated[6] += pWorld->sounds[i].bufferBytes + sizeof(sithSound);
     }
-    outQuantity[8] = world->numCogScriptsLoaded;
-    for (int i = 0; i < world->numCogScriptsLoaded; i++)
+    outQuantity[8] = pWorld->numCogScriptsLoaded;
+    for (int i = 0; i < pWorld->numCogScriptsLoaded; i++)
     {
-        outAllocated[8] += 4 * (7 * world->cogScripts[i].pSymbolTable->entry_cnt + world->cogScripts[i].numIdk) + 0x1DD0; // TODO verify struct sizes here...
+        outAllocated[8] += 4 * (7 * pWorld->cogScripts[i].pSymbolTable->entry_cnt + pWorld->cogScripts[i].numIdk) + 0x1DD0; // TODO verify struct sizes here...
     }
-    outQuantity[7] = world->numCogsLoaded;
-    for (int i = 0; i < world->numCogsLoaded; i++)
+    outQuantity[7] = pWorld->numCogsLoaded;
+    for (int i = 0; i < pWorld->numCogsLoaded; i++)
     {
-        outAllocated[7] += 28 * world->cogs[i].pSymbolTable->entry_cnt + 0x14DC; // TODO verify struct sizes
+        outAllocated[7] += 28 * pWorld->cogs[i].pSymbolTable->entry_cnt + 0x14DC; // TODO verify struct sizes
     }
-    outQuantity[10] = world->numModelsLoaded;
-    for (int i = 0; i < world->numModelsLoaded; i++)
+    outQuantity[10] = pWorld->numModelsLoaded;
+    for (int i = 0; i < pWorld->numModelsLoaded; i++)
     {
-        outAllocated[10] += sithModel_GetMemorySize(&world->models[i]);
+        outAllocated[10] += sithModel_GetMemorySize(&pWorld->models[i]);
     }
-    outQuantity[11] = world->numKeyframesLoaded;
-    for (int i = 0; i < world->numKeyframesLoaded; i++)
+    outQuantity[11] = pWorld->numKeyframesLoaded;
+    for (int i = 0; i < pWorld->numKeyframesLoaded; i++)
     {
-        outAllocated[11] += sizeof(rdJoint) * (world->keyframes[i].numJoints2 + 3);
-        for (int j = 0; j < world->keyframes[i].numJoints2; j++)
+        outAllocated[11] += sizeof(rdJoint) * (pWorld->keyframes[i].numJoints2 + 3);
+        for (int j = 0; j < pWorld->keyframes[i].numJoints2; j++)
         {
-            outAllocated[11] += sizeof(rdAnimEntry) * world->keyframes[i].paJoints[j].numAnimEntries;
+            outAllocated[11] += sizeof(rdAnimEntry) * pWorld->keyframes[i].paJoints[j].numAnimEntries;
         }
     }
-    outQuantity[12] = world->numAnimClassesLoaded;
-    outAllocated[12] = sizeof(sithAnimclass) * world->numAnimClassesLoaded;
-    outQuantity[13] = world->numSpritesLoaded;
-    outAllocated[13] = sizeof(rdSprite) * world->numSpritesLoaded;
-    for (int i = 0; i < world->numSpritesLoaded; i++)
+    outQuantity[12] = pWorld->numAnimClassesLoaded;
+    outAllocated[12] = sizeof(sithAnimclass) * pWorld->numAnimClassesLoaded;
+    outQuantity[13] = pWorld->numSpritesLoaded;
+    outAllocated[13] = sizeof(rdSprite) * pWorld->numSpritesLoaded;
+    for (int i = 0; i < pWorld->numSpritesLoaded; i++)
     {
-        outAllocated[13] += sizeof(rdTri) * world->sprites[i].face.numVertices;
+        outAllocated[13] += sizeof(rdTri) * pWorld->sprites[i].face.numVertices;
     }
-    outQuantity[14] = world->numTemplatesLoaded;
-    outQuantity[15] = world->numThingsLoaded;
-    outAllocated[14] = sizeof(sithThing) * world->numTemplatesLoaded;
-    outAllocated[15] = sizeof(sithThing) * world->numThingsLoaded;
+    outQuantity[14] = pWorld->numTemplatesLoaded;
+    outQuantity[15] = pWorld->numThingsLoaded;
+    outAllocated[14] = sizeof(sithThing) * pWorld->numTemplatesLoaded;
+    outAllocated[15] = sizeof(sithThing) * pWorld->numThingsLoaded;
 }
 
 

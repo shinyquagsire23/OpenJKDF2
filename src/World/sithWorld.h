@@ -38,21 +38,21 @@ int sithWorld_Startup();
 void sithWorld_Shutdown();
 void sithWorld_SetLoadPercentCallback(sithWorldProgressCallback_t func);
 void sithWorld_UpdateLoadPercent(float percent);
-int sithWorld_Load(sithWorld *world, char *map_jkl_fname);
+int sithWorld_Load(sithWorld *pWorld, char *map_jkl_fname);
 sithWorld* sithWorld_New();
-int sithWorld_NewEntry(sithWorld *world);
-void sithWorld_FreeEntry(sithWorld *world);
-int sithHeader_Load(sithWorld *world, int junk);
+int sithWorld_NewEntry(sithWorld *pWorld);
+void sithWorld_FreeEntry(sithWorld *pWorld);
+int sithHeader_Load(sithWorld *pWorld, int junk);
 int sithCopyright_Load(sithWorld *lvl, int junk);
 int sithWorld_SetSectionParser(char *section_name, sithWorldSectionParser_t parser);
 int sithWorld_FindSectionParser(char *a1);
-int sithWorld_Verify(sithWorld *world);
-uint32_t sithWorld_CalcChecksum(sithWorld *world, uint32_t seed);
+int sithWorld_Verify(sithWorld *pWorld);
+uint32_t sithWorld_CalcChecksum(sithWorld *pWorld, uint32_t seed);
 int sithWorld_Initialize();
-int sithWorld_LoadGeoresource(sithWorld *world, int a2);
-void sithWorld_sub_4D0A20(sithWorld *world);
+int sithWorld_LoadGeoresource(sithWorld *pWorld, int a2);
+void sithWorld_sub_4D0A20(sithWorld *pWorld);
 void sithWorld_Free();
-void sithWorld_ResetSectorRuntimeAlteredVars(sithWorld *world);
+void sithWorld_ResetSectorRuntimeAlteredVars(sithWorld *pWorld);
 
 void sithWorld_SetChecksumExtraFunc(sithWorld_ChecksumHandler_t handler); // MOTS added
 
@@ -60,10 +60,10 @@ void sithWorld_SetChecksumExtraFunc(sithWorld_ChecksumHandler_t handler); // MOT
 // sithWorld_GetMemorySize
 
 
-//static int (*sithWorld_NewEntry)(sithWorld *world) = (void*)sithWorld_NewEntry_ADDR;
-//static void (*sithWorld_sub_4D0A20)(sithWorld *world) = (void*)sithWorld_sub_4D0A20_ADDR;
-//static int (*sithWorld_Load)(sithWorld *world, char *map_jkl_fname) = (void*)sithWorld_Load_ADDR;
+//static int (*sithWorld_NewEntry)(sithWorld *pWorld) = (void*)sithWorld_NewEntry_ADDR;
+//static void (*sithWorld_sub_4D0A20)(sithWorld *pWorld) = (void*)sithWorld_sub_4D0A20_ADDR;
+//static int (*sithWorld_Load)(sithWorld *pWorld, char *map_jkl_fname) = (void*)sithWorld_Load_ADDR;
 
-//static void (*sithWorld_ResetSectorRuntimeAlteredVars)(sithWorld *world) = (void*)sithWorld_ResetSectorRuntimeAlteredVars_ADDR;
+//static void (*sithWorld_ResetSectorRuntimeAlteredVars)(sithWorld *pWorld) = (void*)sithWorld_ResetSectorRuntimeAlteredVars_ADDR;
 
 #endif // _SITHWORLD_H
