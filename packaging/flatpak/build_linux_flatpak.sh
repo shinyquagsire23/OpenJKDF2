@@ -7,7 +7,7 @@ mkdir -p build_linux && pushd build_linux
 cmake -DCMAKE_INSTALL_PREFIX=$FLATPAK_DEST .. &&
 (make -j $(nproc) PROTOBUF || make -j1 PROTOBUF) && 
 make -j $(nproc) openjkdf2 &&
-popd .. &&
+popd &&
 mkdir -p $FLATPAK_DEST/share/applications/ &&
 mkdir -p $FLATPAK_DEST/bin &&
 mkdir -p $FLATPAK_DEST/share/metainfo &&
