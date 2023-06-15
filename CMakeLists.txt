@@ -361,10 +361,10 @@ elseif(PLAT_MSVC)
     set(TARGET_CAN_JKGM TRUE)
     set(TARGET_USE_CURL FALSE)
 
-    set(SDL2_PATH ${CMAKE_SOURCE_DIR}/3rdparty/SDL2-2.24.0)
-    set(SDL2_MIXER_PATH ${CMAKE_SOURCE_DIR}/3rdparty/SDL2_mixer-2.6.2)
+    #set(SDL2_PATH ${CMAKE_SOURCE_DIR}/3rdparty/SDL2-2.24.0)
+    #set(SDL2_MIXER_PATH ${CMAKE_SOURCE_DIR}/3rdparty/SDL2_mixer-2.6.2)
     #set(GLEW_DIR ${CMAKE_SOURCE_DIR}/lib/glew)
-    list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/lib/glew")
+    #list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/lib/glew")
 
     # TODO: Bump to O2 eventually. MinGW likes to replace memset with calls to itself...
     #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -ggdb -fno-omit-frame-pointer")
@@ -376,15 +376,15 @@ elseif(PLAT_MSVC)
 
     link_directories(${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/lib)
     link_libraries(libexchndl.a)
-    link_directories(${PROJECT_SOURCE_DIR}/3rdparty/freeglut/lib/x64)
-    link_libraries(libfreeglut.a)
-    link_directories(${PROJECT_SOURCE_DIR}/3rdparty/zlib-1.2.3-lib/lib)
-    link_libraries(libz.dll.a)
-    link_directories(${PROJECT_SOURCE_DIR}/3rdparty/libpng-1.2.37-lib/lib)
-    link_libraries(libpng.dll.a)
-    link_directories(${PROJECT_SOURCE_DIR}/3rdparty/openal-soft/lib/Win64)
-    link_libraries(OpenAL32.dll.a)
-    link_libraries(OpenGL32)
+    #link_directories(${PROJECT_SOURCE_DIR}/3rdparty/freeglut/lib/x64)
+    #link_libraries(libfreeglut.a)
+    #link_directories(${PROJECT_SOURCE_DIR}/3rdparty/zlib-1.2.3-lib/lib)
+    #link_libraries(libz.dll.a)
+    #link_directories(${PROJECT_SOURCE_DIR}/3rdparty/libpng-1.2.37-lib/lib)
+    #link_libraries(libpng.dll.a)
+    #link_directories(${PROJECT_SOURCE_DIR}/3rdparty/openal-soft/lib/Win64)
+    #link_libraries(OpenAL32.dll.a)
+    #link_libraries(OpenGL32)
 endif()
 
 set(CMAKE_BUILD_TYPE Debug)
@@ -620,6 +620,27 @@ elseif(TARGET_LINUX)
     endif()
 elseif(PLAT_MSVC)
     set_target_properties(${BIN_NAME} PROPERTIES
+        ENABLE_EXPORTS FALSE
+        WINDOWS_EXPORT_ALL_SYMBOLS FALSE
+        # CMake missbehaives here because the PE image version field actually
+        # specifies the version of the PE specification the PE image has been
+        # built to and has NOTHING to do with the application version.
+        # Traditionally, the PE image version has followed the internal release
+        # version of Windows. Consequently, becuase the linker is the last tool
+        # to build a PE image it is supposed to be the linker who should set
+        # the PE image version field.
+        VERSION ${CMAKE_SYSTEM_VERSION}
+    )
+    if(CMAKE_BUILD_TYPE STREQUAL Release OR
+       CMAKE_BUILD_TYPE STREQUAL MinSizeRel OR
+       CMAKE_BUILD_TYPE STREQUAL RelWithDebInfo)
+        # TODO: Implement WinMain() for this to work nicely
+        set_target_properties(${BIN_NAME} PROPERTIES WIN32_EXECUTABLE TRUE)
+    elseif(CMAKE_BUILD_TYPE STREQUAL Debug)
+        set_target_properties(${BIN_NAME} PROPERTIES WIN32_EXECUTABLE FALSE)
+    endif()
+
+    set_target_properties(${BIN_NAME} PROPERTIES
       LINK_SEARCH_START_STATIC ON
       LINK_SEARCH_END_STATIC ON
     )
@@ -630,38 +651,54 @@ elseif(PLAT_MSVC)
     set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
     target_link_libraries(${BIN_NAME} PRIVATE Threads::Threads)
 
-    target_link_libraries(${BIN_NAME} PRIVATE SDL2main SDL::SDL ${SDL_MIXER_DEPS} SDL::Mixer ${OPENGL_LIBRARIES} ${OPENAL_LIBRARY} ${GLEW_LIBRARY} ${LIBPNG_STATIC_LDFLAGS})
+    target_link_libraries(${BIN_NAME} PRIVATE GLUT::GLUT)
+    target_link_libraries(${BIN_NAME} PRIVATE GLEW::glew_s)
+    target_link_libraries(${BIN_NAME} PRIVATE SDL2main SDL::SDL version imm32 setupapi gdi32 winmm imm32 ole32 oleaut32 shell32 ssp winmm user32 crypt32 advapi32) # SDL2’s peculiarity that you have to link mingw32 before SDL2main
+
+    if(TARGET_CAN_JKGM)
+        target_link_libraries(${BIN_NAME} PRIVATE PNG::PNG ZLIB::ZLIB)
+    endif()
+
+    if (TARGET_USE_OPENAL)
+        target_link_libraries(${BIN_NAME} PRIVATE ${SDL_MIXER_DEPS} SDL::Mixer)
+        target_link_libraries(${BIN_NAME} PRIVATE OpenAL::OpenAL)
+    endif()
     target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
+    if(TARGET_USE_GAMENETWORKINGSOCKETS)
+        target_link_libraries(${BIN_NAME} PRIVATE GameNetworkingSockets::GameNetworkingSockets)
+    endif()
+    if(TARGET_USE_PHYSFS)
+        target_link_libraries(${BIN_NAME} PRIVATE PhysFS::PhysFS_s)
+    endif()
+    target_link_libraries(${BIN_NAME} PRIVATE opengl32 ws2_32 uuid ole32)
 
-    target_link_libraries(${BIN_NAME} PRIVATE dinput8 dxguid user32 gdi32 winmm imm32 ole32 oleaut32 shell32 setupapi -lversion uuid ws2_32)
+    #target_link_libraries(${BIN_NAME} PRIVATE SDL2main SDL::SDL ${SDL_MIXER_DEPS} SDL::Mixer ${OPENGL_LIBRARIES} ${GLEW_LIBRARY} ${LIBPNG_STATIC_LDFLAGS})
+    #target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
+    #target_link_libraries(${BIN_NAME} PRIVATE dinput8 dxguid user32 gdi32 winmm imm32 ole32 oleaut32 shell32 setupapi -lversion uuid ws2_32)
 
-    add_custom_command(TARGET ${BIN_NAME} 
-    POST_BUILD 
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/glew/bin/Release/x64/glew32.dll ${PROJECT_BINARY_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer-2.6.2/lib/x64/optional/libogg-0.dll ${PROJECT_BINARY_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer-2.6.2/lib/x64/optional/libopus-0.dll ${PROJECT_BINARY_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer-2.6.2/lib/x64/optional/libopusfile-0.dll ${PROJECT_BINARY_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/openal-soft/bin/Win64/soft_oal.dll ${PROJECT_BINARY_DIR}/OpenAL32.dll
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/dbgcore.dll ${PROJECT_BINARY_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/dbghelp.dll ${PROJECT_BINARY_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/exchndl.dll ${PROJECT_BINARY_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/mgwhelp.dll ${PROJECT_BINARY_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/symsrv.dll ${PROJECT_BINARY_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/symsrv.yes ${PROJECT_BINARY_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2-2.24.0/lib/x64/SDL2.dll ${PROJECT_BINARY_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer-2.6.2/lib/x64/SDL2_mixer.dll ${PROJECT_BINARY_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/SDL2_mixer-2.6.2/lib/x64/SDL2_mixer.dll ${PROJECT_BINARY_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/libpng-1.2.37-lib/bin/libpng16-16.dll ${PROJECT_BINARY_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/libpng-1.2.37-lib/bin/zlib1.dll ${PROJECT_BINARY_DIR}
+    if (TARGET_USE_OPENAL)
+        add_custom_command(
+            TARGET ${BIN_NAME}
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/openal/bin/OpenAL32.dll ${PROJECT_BINARY_DIR}
+        )
+    endif()
+
+    add_custom_command(
+        TARGET ${BIN_NAME}
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/exchndl.dll ${PROJECT_BINARY_DIR}
+        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/symsrv.dll ${PROJECT_BINARY_DIR}
+        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/mgwhelp.dll ${PROJECT_BINARY_DIR}
+        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/symsrv.yes ${PROJECT_BINARY_DIR}
     )
 
     if(TARGET_USE_GAMENETWORKINGSOCKETS)
-        add_custom_command(TARGET ${BIN_NAME} 
-        POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/GNS_compiled/GameNetworkingSockets.dll ${CMAKE_CURRENT_BINARY_DIR}/libGameNetworkingSockets.dll
-        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/GNS_compiled/libprotobufd.dll ${CMAKE_CURRENT_BINARY_DIR}
-        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/GNS_compiled/libcrypto-3-x64.dll ${CMAKE_CURRENT_BINARY_DIR}
-    )
+        add_custom_command(
+            TARGET ${BIN_NAME}
+            POST_BUILD 
+            COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/GameNetworkingSockets/bin/libGameNetworkingSockets.dll ${PROJECT_BINARY_DIR}
+        )
     endif()
 
 elseif(TARGET_ANDROID)
