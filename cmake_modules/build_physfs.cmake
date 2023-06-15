@@ -59,7 +59,7 @@ add_library(PhysFS::PhysFS SHARED IMPORTED)
 add_dependencies(PhysFS::PhysFS PHYSFS)
 set_target_properties(
     PhysFS::PhysFS PROPERTIES
-    IMPORTED_LOCATION
+    IMPORTED_LOCATION ${PHYSFS_SHARED_LIBRARY_PATH}
     IMPORTED_IMPLIB ${PHYSFS_IMPORT_LIBRARY_PATH}
 )
 target_include_directories(PhysFS::PhysFS INTERFACE ${PHYSFS_INCLUDE_DIR})

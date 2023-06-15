@@ -56,7 +56,7 @@ add_dependencies(GameNetworkingSockets::GameNetworkingSockets GAMENETWORKINGSOCK
 file(MAKE_DIRECTORY ${GameNetworkingSockets_INCLUDE_DIRS})
 set_target_properties(
     GameNetworkingSockets::GameNetworkingSockets PROPERTIES
-    IMPORTED_LOCATION ${GameNetworkingSockets_IMPORT_LIBRARY_PATH}
+    IMPORTED_LOCATION ${GameNetworkingSockets_SHARED_LIBRARY_PATH}
     IMPORTED_IMPLIB   ${GameNetworkingSockets_IMPORT_LIBRARY_PATH}
 )
 target_include_directories(

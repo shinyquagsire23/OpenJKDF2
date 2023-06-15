@@ -677,10 +677,6 @@ elseif(PLAT_MSVC)
     endif()
     target_link_libraries(${BIN_NAME} PRIVATE opengl32 ws2_32 uuid ole32)
 
-    #target_link_libraries(${BIN_NAME} PRIVATE SDL2main SDL::SDL ${SDL_MIXER_DEPS} SDL::Mixer ${OPENGL_LIBRARIES} ${GLEW_LIBRARY} ${LIBPNG_STATIC_LDFLAGS})
-    #target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
-    #target_link_libraries(${BIN_NAME} PRIVATE dinput8 dxguid user32 gdi32 winmm imm32 ole32 oleaut32 shell32 setupapi -lversion uuid ws2_32)
-
     if (TARGET_USE_OPENAL)
         add_custom_command(
             TARGET ${BIN_NAME}
