@@ -508,19 +508,17 @@ int sithMulti_LobbyMessage()
 {
     int16_t v0; // bp
 
-    NETMSG_START;
-
     if ( sithNet_isServer )
     {
         if ( sithNet_bNeedsFullThingSyncForLeaveJoin )
         {
             if ( sithMulti_sendto_id )
             {
-                sithComm_netMsgTmp.pktData[0] = 3;
-                sithComm_netMsgTmp.pktData[1] = 0;
-                sithComm_netMsgTmp.netMsg.msg_size = 8;
-                sithComm_netMsgTmp.netMsg.flag_maybe = 0;
-                sithComm_netMsgTmp.netMsg.cogMsgId = DSS_JOINING;
+                NETMSG_START;
+
+                NETMSG_PUSHS32(3);
+                NETMSG_PUSHS32(0);
+                NETMSG_END(DSS_JOINING);
                 sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sithMulti_sendto_id, 1, 0);
             }
             sithNet_bNeedsFullThingSyncForLeaveJoin = 0;
@@ -530,6 +528,8 @@ int sithMulti_LobbyMessage()
         }
         if ( stdComm_dword_8321F8 )
         {
+            NETMSG_START;
+
             NETMSG_PUSHS32(sithNet_MultiModeFlags);
             for (int i = 0; i < 5; i++)
             {
@@ -1245,14 +1245,10 @@ LABEL_11:
 // MOTS altered
 void sithMulti_HandleTimeLimit(int deltaMs)
 {
-    wchar_t *v1; // eax
     unsigned int v2; // esi
-    unsigned int v7; // esi
     sithSurface *v8; // edx
     sithSurface *v9; // ecx
-    unsigned int v10; // edi
     sithSector *v11; // esi
-    sithSector *v12; // ecx
     sithThing *v14; // esi
     unsigned int deltaMsa; // [esp+18h] [ebp+4h]
 
@@ -1284,8 +1280,7 @@ void sithMulti_HandleTimeLimit(int deltaMs)
         }
         if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_TIMELIMIT) != 0 && sithTime_curMs > sithNet_multiplayer_timelimit )
         {
-            v1 = sithStrTable_GetUniStringWithFallback("MULTI_TIMELIMIT");
-            stdString_WcharToChar(std_genBuffer, v1, 127);
+            stdString_WcharToChar(std_genBuffer, sithStrTable_GetUniStringWithFallback("MULTI_TIMELIMIT"), 127);
             std_genBuffer[127] = 0;
             sithConsole_Print(std_genBuffer);
             sithConsole_AlertSound();
@@ -1333,57 +1328,40 @@ void sithMulti_HandleTimeLimit(int deltaMs)
                     switch ( stdComm_currentBigSyncStage )
                     {
                     case 1:
-                        v10 = sithWorld_pCurrentWorld->numSectors;
-                        if ( stdComm_dword_832208 >= v10 )
-                            goto LABEL_42;
-                        v11 = &sithWorld_pCurrentWorld->sectors[stdComm_dword_832208];
-                        while ( 1 )
+                        while (stdComm_dword_832208 < sithWorld_pCurrentWorld->numSectors)
                         {
-                            v12 = v11;
-                            ++stdComm_dword_832208;
-                            ++v11;
-                            if ( v12->flags & SITH_SECTOR_SYNC )
+                            v11 = &sithWorld_pCurrentWorld->sectors[stdComm_dword_832208++];
+                            if (v11->flags & SITH_SECTOR_SYNC )
+                            {
+                                sithDSS_SendSectorStatus(v11, sithMulti_sendto_id, 1);
                                 break;
-                            if ( (v12->flags & SITH_SECTOR_ADJOINS_SET) != 0 )
-                            {
-                                sithDSS_SendSectorFlags(v12, sithMulti_sendto_id, 1);
-                                goto LABEL_41;
                             }
-                            if ( stdComm_dword_832208 >= v10 )
+                            else if (v11->flags & SITH_SECTOR_ADJOINS_SET)
                             {
-LABEL_42:
-                                if ( stdComm_dword_832208 >= sithWorld_pCurrentWorld->numSectors )
-                                {
-                                    stdComm_dword_832208 = 0;
-                                    stdComm_currentBigSyncStage = 3;
-                                    stdComm_dword_832208 = 0;
-                                }
-                                ++stdComm_dword_832210;
-                                goto LABEL_64;
+                                sithDSS_SendSectorFlags(v11, sithMulti_sendto_id, 1);
+                                break;
                             }
                         }
-                        sithDSS_SendSectorStatus(v12, sithMulti_sendto_id, 1);
-LABEL_41:
-                        goto LABEL_42;
+
+                        if ( stdComm_dword_832208 >= sithWorld_pCurrentWorld->numSectors )
+                        {
+                            stdComm_dword_832208 = 0;
+                            stdComm_currentBigSyncStage = 3;
+                            stdComm_dword_832208 = 0;
+                        }
+                        ++stdComm_dword_832210;
+                        continue;
                     case 2:
-                        v7 = sithWorld_pCurrentWorld->numSurfaces;
-                        if ( stdComm_dword_832208 >= v7 )
-                            goto LABEL_30;
-                        v8 = &sithWorld_pCurrentWorld->surfaces[stdComm_dword_832208];
-                        while ( 1 )
+                        while (stdComm_dword_832208 < sithWorld_pCurrentWorld->numSurfaces)
                         {
-                            v9 = v8;
-                            ++stdComm_dword_832208;
-                            ++v8;
-                            if ( (v9->surfaceFlags & SITH_SURFACE_CHANGED) != 0 )
-                                break;
-                            if ( stdComm_dword_832208 >= v7 )
+                            v8 = &sithWorld_pCurrentWorld->surfaces[stdComm_dword_832208++];
+                            if (v8->surfaceFlags & SITH_SURFACE_CHANGED)
                             {
-                                goto LABEL_30;
+                                sithDSS_SendSurfaceStatus(v8, sithMulti_sendto_id, 1);
+                                break;
                             }
                         }
-                        sithDSS_SendSurfaceStatus(v9, sithMulti_sendto_id, 1);
-LABEL_30:
+                        
                         if ( stdComm_dword_832208 >= sithWorld_pCurrentWorld->numSurfaces )
                         {
                             stdComm_dword_832208 = 0;
@@ -1391,11 +1369,43 @@ LABEL_30:
                             stdComm_dword_832208 = 0;
                         }
                         ++stdComm_dword_832200;
-                        goto LABEL_64;
+                        continue;
                     case 3:
-                        if (stdComm_dword_832208 > sithWorld_pCurrentWorld->numThings )
-                            goto LABEL_56;
-                        break;
+                        // Sync stage 3 (TODO: is there an off-by-one here...? not touching it for now.)
+                        while (stdComm_dword_832208 <= sithWorld_pCurrentWorld->numThings)
+                        {
+                            v14 = &sithWorld_pCurrentWorld->things[stdComm_dword_832208++];
+                            if ( sithThing_ShouldSync(v14) )
+                            {
+                                if ( v14->type != SITH_THING_WEAPON && v14->type != SITH_THING_EXPLOSION )
+                                {
+                                    if ( (v14->thing_id & 0xFFFF0000) != 0 )
+                                        sithDSSThing_SendFullDesc(v14, sithMulti_sendto_id, 1);
+                                    else
+                                        sithDSSThing_SendSyncThing(v14, sithMulti_sendto_id, 1);
+
+                                    sithDSSThing_SendPos(v14, sithMulti_sendto_id, 0);
+
+                                    // Added: co-op
+                                    if (v14->type == SITH_THING_CORPSE || ((v14->type == SITH_THING_ACTOR || v14->type == SITH_THING_PLAYER) && v14->thingflags & SITH_TF_DEAD)) {
+                                        //sithDSSThing_SendSyncThing(v14, sithMulti_sendto_id, 1);
+                                        //sithDSS_SendSyncAI(v14->actor, sithMulti_sendto_id, 1);
+                                        if (v14->rdthing.puppet)
+                                            sithDSS_SendSyncPuppet(v14, sithMulti_sendto_id, 255);
+                                    }
+                                }
+                            }
+                        }
+
+                        if (stdComm_dword_832208 > sithWorld_pCurrentWorld->numThings)
+                        {
+                            stdComm_dword_832208 = 0;
+                            stdComm_currentBigSyncStage = 4;
+                            stdComm_dword_832208 = 0;
+                        }
+                        ++sithNet_dword_832620;
+
+                        continue;
                     case 4:
                         if ( stdComm_dword_832208 >= sithMulti_dword_83265C
                                 || (sithDSSThing_SendDestroyThing(sithMulti_arr_832218[stdComm_dword_832208], sithMulti_sendto_id),
@@ -1415,51 +1425,10 @@ LABEL_30:
                             stdComm_dword_832208 = 0;
                             sithNet_bSyncScores = 1;
                         }
-                        goto LABEL_64;
+                        continue;
                     default:
                         return;
-                    }
-
-                    // Sync stage 3 (TODO: fix flow)
-                    while ( 1 )
-                    {
-                        v14 = &sithWorld_pCurrentWorld->things[stdComm_dword_832208];
-                        stdComm_dword_832208++;
-                        if ( sithThing_ShouldSync(v14) )
-                        {
-                            if ( v14->type != SITH_THING_WEAPON && v14->type != SITH_THING_EXPLOSION )
-                                break;
-                        }
-                        if ( stdComm_dword_832208 > sithWorld_pCurrentWorld->numThings )
-                            goto LABEL_55;
-                    }
-
-                    if ( (v14->thing_id & 0xFFFF0000) != 0 )
-                        sithDSSThing_SendFullDesc(v14, sithMulti_sendto_id, 1);
-                    else
-                        sithDSSThing_SendSyncThing(v14, sithMulti_sendto_id, 1);
-
-                    sithDSSThing_SendPos(v14, sithMulti_sendto_id, 0);
-
-                    // Added: co-op
-                    if (v14->type == SITH_THING_CORPSE || ((v14->type == SITH_THING_ACTOR || v14->type == SITH_THING_PLAYER) && v14->thingflags & SITH_TF_DEAD)) {
-                        //sithDSSThing_SendSyncThing(v14, sithMulti_sendto_id, 1);
-                        //sithDSS_SendSyncAI(v14->actor, sithMulti_sendto_id, 1);
-                        if (v14->rdthing.puppet)
-                            sithDSS_SendSyncPuppet(v14, sithMulti_sendto_id, 255);
-                    }
-
-LABEL_55:
-                    if (stdComm_dword_832208 > sithWorld_pCurrentWorld->numThings)
-                    {
-LABEL_56:
-                        stdComm_dword_832208 = 0;
-                        stdComm_currentBigSyncStage = 4;
-                        stdComm_dword_832208 = 0;
-                    }
-                    ++sithNet_dword_832620;
-LABEL_64:
-                    continue;
+                    }                    
                 }
             }
         }

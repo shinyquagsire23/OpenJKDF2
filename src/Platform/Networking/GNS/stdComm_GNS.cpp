@@ -561,7 +561,7 @@ private:
                         }
                     }
 
-                    availableIds &= ~(1 << (itClient->second.m_id-1));
+                    availableIds &= ~(1ULL << (itClient->second.m_id-1));
                     m_mapClients.erase( itClient );
                 }
                 else
@@ -588,7 +588,7 @@ private:
 
                 // Don't accept if we can't allocate an ID
                 if (ConnectedPlayers() >= 64) {
-                    stdPlatform_Printf("Rejecting request.\n");
+                    stdPlatform_Printf("Rejecting request too many players connected (%u)\n", ConnectedPlayers());
                     break;
                 }
 
@@ -615,8 +615,8 @@ private:
                 int nextId = 0;
                 for (int i = 0; i < 64; i++)
                 {
-                    if (!(availableIds & (1 << i))) {
-                        availableIds |= (1 << i);
+                    if (!(availableIds & (1ULL << i))) {
+                        availableIds |= (1ULL << i);
                         nextId = i+1;
                         break;
                     }
@@ -682,7 +682,7 @@ private:
         //RealConnectedPlayers();
         for (int i = 0; i < 64; i++)
         {
-            if (availableIds & (1 << i)) {
+            if (availableIds & (1ULL << i)) {
                 ret++;
             }
         }
@@ -702,7 +702,7 @@ private:
                 
             }
             else {
-                //availableIds |= (1 << (jkPlayer_playerInfos[i].net_id-1));
+                //availableIds |= (1ULL << (jkPlayer_playerInfos[i].net_id-1));
                 amt++;
             }
         }

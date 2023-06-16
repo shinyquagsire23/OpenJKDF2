@@ -470,23 +470,23 @@ float sithThing_Damage(sithThing *sender, sithThing *reciever, float amount, int
 
 //sithThing_Create_idk
 
-void sithThing_Free(sithWorld *world)
+void sithThing_Free(sithWorld *pWorld)
 {
     // Added: !world check
-    if (!world || !world->things)
+    if (!pWorld || !pWorld->things)
     {
         return;
     }
 
-    sithThing_freestuff(world);
+    sithThing_freestuff(pWorld);
 
-    pSithHS->free(world->things);
-    world->things = 0;
-    world->numThingsLoaded = 0;
-    world->numThings = -1;
+    pSithHS->free(pWorld->things);
+    pWorld->things = 0;
+    pWorld->numThingsLoaded = 0;
+    pWorld->numThings = -1;
 }
 
-void sithThing_freestuff(sithWorld *world)
+void sithThing_freestuff(sithWorld *pWorld)
 {
     sithThing* pThingIter; // esi
     sithWorld *v3; // edx
@@ -494,12 +494,13 @@ void sithThing_freestuff(sithWorld *world)
     int v5; // eax
     int v7; // eax
 
-    if (!world->things)
+    // Added: !world check
+    if (!pWorld || !pWorld->things)
         return;
 
-    for (int v9 = 0; v9 < world->numThingsLoaded; v9++)
+    for (int v9 = 0; v9 < pWorld->numThingsLoaded; v9++)
     {
-        pThingIter = &world->things[v9];
+        pThingIter = &pWorld->things[v9];
         if (!pThingIter->type)
             continue;
 
@@ -1470,7 +1471,7 @@ void sithThing_detachallchildren(sithThing* pThing)
 //sithThing_LotsOfFreeing
 
 // MOTS altered
-int sithThing_Load(sithWorld *world, int a2)
+int sithThing_Load(sithWorld *pWorld, int a2)
 {
     sithThing *v4; // esi
     int v5; // esi
@@ -1497,11 +1498,11 @@ int sithThing_Load(sithWorld *world, int a2)
     int v38; // [esp+64h] [ebp+8h]
 
     sithThing_bInitted2 = 1;
-    if ( a2 && world->things )
+    if ( a2 && pWorld->things )
     {
-        for (v36 = 0; v36 < world->numThingsLoaded; v36++)
+        for (v36 = 0; v36 < pWorld->numThingsLoaded; v36++)
         {
-            v4 = &world->things[v36];
+            v4 = &pWorld->things[v36];
             if ( v4->type )
             {
                 if ( sithNet_isMulti && sithNet_isServer && (v4->thing_id & 0xFFFF0000) == 0 )
@@ -1520,10 +1521,10 @@ int sithThing_Load(sithWorld *world, int a2)
                 sithNet_things[1 + sithNet_thingsIdx++] = v5;
             }
         }
-        pSithHS->free(world->things);
-        world->things = 0;
-        world->numThingsLoaded = 0;
-        world->numThings = -1;
+        pSithHS->free(pWorld->things);
+        pWorld->things = 0;
+        pWorld->numThingsLoaded = 0;
+        pWorld->numThings = -1;
     }
     stdConffile_ReadArgs();
     if ( _strcmp(stdConffile_entry.args[0].value, "world") )
