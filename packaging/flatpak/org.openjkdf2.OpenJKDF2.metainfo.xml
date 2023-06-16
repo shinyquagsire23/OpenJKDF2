@@ -69,7 +69,6 @@
   </content_rating>
   <releases>
     <!--NEXT_RELEASE_HERE-->
-    <release version="0.8.20" date="2023-06-14" />
     <release version="0.8.19" date="2023-06-08" />
     <release version="0.8.18" date="2023-03-29" />
     <release version="0.8.17" date="2023-03-26" />
