@@ -1,4 +1,4 @@
-set(OPENJKDF2_PROJECT_VERSION 0.8.20.0)
+set(OPENJKDF2_PROJECT_VERSION 0.9.0.0)
 find_package(Git)
 execute_process(
     COMMAND git log -1 --format=%H
