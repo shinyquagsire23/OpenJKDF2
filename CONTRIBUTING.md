@@ -114,6 +114,7 @@ Function arguments should follow Hungarian notation.
 
 Before cleanup:
 <details>
+
 ```c
 void sithThing_SetSyncFlags(sithThing *thing, int flags)
 {
@@ -139,6 +140,7 @@ void sithThing_SetSyncFlags(sithThing *thing, int flags)
 
 After cleanup:
 <details>
+    
 ```c
 void sithThing_SetSyncFlags(sithThing *pThing, int flags)
 {
