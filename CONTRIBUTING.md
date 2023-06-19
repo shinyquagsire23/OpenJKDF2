@@ -140,7 +140,7 @@ void sithThing_SetSyncFlags(sithThing *thing, int flags)
 
 After cleanup:
 <details>
-    
+
 ```c
 void sithThing_SetSyncFlags(sithThing *pThing, int flags)
 {
@@ -211,7 +211,7 @@ else
 
 ### Placeholder variable/function names
 
-Variable names whose behavior/function are unclear should always be prefixed as `v[number]`. This allows contributors to easily find functions which need refactoring. Variable names which are unclear (ex: `int idk3;`) should be refactored to a clear name, or back to a `v[number]` designation.
+Variable names whose behavior/function are unclear should always be prefixed as `v[number]`. This allows contributors to easily find functions which need refactoring. Variable names which are unclear (ex: `int idk3;`) should be refactored to a clear name, refactored away entirely, or refactored or back to a `v[number]` designation.
 
 Function names which are placeholders (ex: `sithThing_sub_4CD100`) or are unclear (`jkStrings_GetText2`) should be refactored to describe their function clearly.
 
@@ -220,6 +220,8 @@ Example:
 jkStrings_GetText -> jkStrings_GetUniStringWithFallback
 jkStrings_GetText2 -> jkStrings_GetUniString
 ```
+
+`goto` labels should **NEVER** be refactored to clear names, and should instead be refactored out entirely. See `for loop/goto untangling` for details.
 
 ## Incorrectly named functions
 
@@ -534,5 +536,35 @@ for (int i = 0; i < update_steps; i++)
         return;
     }                    
 }
+```
+</details>
+
+### Inlined functions
+
+Some 'unused' functions are actually functions which were inlined into other functions. Code should be refactored to appear as it would have been in the LEC codebase. Inlined functions can usually be sussed out if a function in a module is unused, if a `bInitialized` variable is checked multiple times, or if a variable is checked `NULL` in the middle of a function.
+
+All operations on `rdVector3`s/`rdMatrix34`s are usually inlined. Usually good places to double-check are `stdMath` or `rdMath` if something feels inlined but isn't present in `rdVector`/`rdMatrix`.
+
+Before cleanup:
+<details>
+
+```c
+...
+
+if (sithSoundMixer_bInitted)
+{
+    sithSoundMixer_musicVolume = stdMath_Clamp(sithSoundMixer_musicVolume, 0.0, 1.0);
+    stdMci_SetVolume(sithSoundMixer_globalVolume * sithSoundMixer_musicVolume);
+}
+
+...
+```
+</details>
+
+After cleanup:
+<details>
+
+```c
+sithSoundMixer_SetMusicVol(sithSoundMixer_musicVolume);
 ```
 </details>
