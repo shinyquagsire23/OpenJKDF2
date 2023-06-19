@@ -100,6 +100,10 @@ OpenJKDF2 requires game data from a licensed copy of Jedi Knight: Dark Forces II
 
 See [here](BUILDING.md) for instructions.
 
+## Contributing
+
+Contributions in the form of code cleanup and documentation are highly welcomed. See [CONTRIBUTING.md](CONTRIBUTING.md) for details on what kinds of cleanup tasks still need to be done. OpenJKDF2 is not currently accepting monetary donations, however [detailed bug and crash reports](https://github.com/shinyquagsire23/OpenJKDF2/issues) are always appreciated, including bugs/crashes involving mods.
+
 ## TL;DR: What Isn't Implemented, Yet
  - Load Configuration and Save Configuration in Setup > Controls > Options
  - Using plus or minus to resize the screen (with SDL2, resolution auto-resizes to window size)
