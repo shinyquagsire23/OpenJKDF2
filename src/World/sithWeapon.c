@@ -54,7 +54,7 @@ void sithWeapon_Startup()
     sithWeapon_InitDefaults();
 }
 
-void sithWeapon_Tick(sithThing *weapon, float deltaSeconds)
+void sithWeapon_Tick(sithThing* weapon, float deltaSeconds)
 {
     sithWeaponFlags_t typeFlags = weapon->weaponParams.typeflags;
     if (typeFlags & SITH_WF_INSTANT_IMPACT) // shooting walls?

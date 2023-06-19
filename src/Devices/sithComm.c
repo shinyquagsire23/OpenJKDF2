@@ -193,7 +193,7 @@ LABEL_35:
 }
 
 // MOTS altered
-void sithComm_FileWrite(sithCogMsg *ctx)
+void sithComm_FileWrite(sithCogMsg* ctx)
 {
     // Added: multiple version handling
     if (sithComm_version == 0x7D6) {
