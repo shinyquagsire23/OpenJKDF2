@@ -26,7 +26,7 @@ OpenJKDF2 supports the following configurations:
 The following implementations are in-progress or planned:
 
 | Configuration | Renderer | Description | Status |
-| --- | --- | --- |
+| --- | --- | --- | --- |
 | Android | OpenGL ES 3 | Not a huge priority, but would be nice to have. | It compiles and renders! Input/menuing is lacking. |
 | iOS | Metal? | Not a huge priority, but would be nice to have. | Not started |
 | Switch libnx | OpenGL ES 3 | Not a huge priority, but would be nice to have. | Not started |
