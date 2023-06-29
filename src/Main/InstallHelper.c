@@ -270,7 +270,7 @@ int InstallHelper_GetLocalDataDir(char* pOut, size_t pOut_sz, int bChdir)
         stdFileUtil_MkDir(fname);
         if (bChdir) {
             chdir(fname);
-            stdPlatform_Printf("Using OPENJKDF2_ROOT, root directory: %s\n", fname);
+            stdPlatform_Printf("Using %s, root directory: %s\n", INSTALL_OVERRIDE_ENVVAR_NAME, fname);
         }
         bIsOverride = 1;
     }
@@ -364,7 +364,7 @@ int InstallHelper_GetLocalDataDir(char* pOut, size_t pOut_sz, int bChdir)
         stdFileUtil_MkDir(fname);
         if (bChdir) {
             chdir(fname);
-            stdPlatform_Printf("Using OPENJKDF2_ROOT, root directory: %s\n", fname);
+            stdPlatform_Printf("Using %s, root directory: %s\n", INSTALL_OVERRIDE_ENVVAR_NAME, fname);
         }
     }
     else if ((homedir = getenv("AppData")) != NULL) {
