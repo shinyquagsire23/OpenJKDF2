@@ -2052,7 +2052,7 @@ int jkPlayer_SetAmmoMaximums(int classIdx)
                 if (iVar1 == 0) {
                     stdConffile_Close();
                     jkHudInv_FixAmmoMaximums();
-                    pfVar2 = jkPlayer_aMultiParams + 0x33;
+                    pfVar2 = jkPlayer_aMultiParams + 51;
                     do {
                         iVar1 = (int)pfVar2[-1];
                         if ((-1 < iVar1) && (iVar1 < 200)) {
