@@ -824,7 +824,7 @@ int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithCollisionSea
             v5 = v4->mat_fpath;
         else
             v5 = "none";
-        _sprintf(std_genBuffer, "Weapon hit surface %d, sector %d, material '%s'.\n", surface->field_0, surface->parent_sector->id, v5);
+        _sprintf(std_genBuffer, "Weapon hit surface %d, sector %d, material '%s'.\n", surface->index, surface->parent_sector->id, v5);
         sithConsole_Print(std_genBuffer);
     }
     v6 = surface->surfaceFlags;

@@ -1019,7 +1019,7 @@ double sithCog_SendMessageFromSurfaceEx(sithSurface *sender, sithThing *thing, S
                           surfaceLink->cog,
                           SITH_MESSAGE_DAMAGED,
                           SENDERTYPE_SURFACE,
-                          sender->field_0,
+                          sender->index,
                           sourceType,
                           v8,
                           surfaceLink->linkid,
@@ -1040,7 +1040,7 @@ double sithCog_SendMessageFromSurfaceEx(sithSurface *sender, sithThing *thing, S
             }
             else
             {
-                v12 = sithCog_SendMessageEx(surfaceLink->cog, msg, SENDERTYPE_SURFACE, sender->field_0, sourceType, v8, surfaceLink->linkid, v9, a5, a6, a7);
+                v12 = sithCog_SendMessageEx(surfaceLink->cog, msg, SENDERTYPE_SURFACE, sender->index, sourceType, v8, surfaceLink->linkid, v9, a5, a6, a7);
                 if ( v12 != -9999.9873046875 )
                     v14 = v12 + v14;
             }

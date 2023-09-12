@@ -98,7 +98,7 @@ void sithDSS_SendSurfaceStatus(sithSurface *surface, int sendto_id, int mpFlags)
 {
     NETMSG_START;
 
-    NETMSG_PUSHS16(surface->field_0);
+    NETMSG_PUSHS16(surface->index);
     NETMSG_PUSHU32(surface->surfaceFlags);
     if ( surface->surfaceInfo.face.material ) {
         NETMSG_PUSHS32(surface->surfaceInfo.face.material->id);
@@ -520,7 +520,7 @@ void sithDSS_SendSurface(rdSurface *surface, int sendto_id, int mpFlags)
         NETMSG_PUSHU32(surface->signature);
     }
     if (surface->flags & 0x20000)
-        NETMSG_PUSHU32(surface->sithSurfaceParent->field_0);
+        NETMSG_PUSHU32(surface->sithSurfaceParent->index);
     if (surface->flags & 0x100000)
     {
         NETMSG_PUSHVEC3(surface->field_24);

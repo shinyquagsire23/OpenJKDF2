@@ -167,7 +167,7 @@ void sithDSSThing_SendSyncThing(sithThing *pThing, int sendto_id, int mpFlags)
             break;
         case SITH_THING_ITEM:
             NETMSG_PUSHS32(pThing->itemParams.typeflags);
-            if (pThing->itemParams.typeflags & ITEMSTATE_AVAILABLE)
+            if (pThing->itemParams.typeflags & SITH_ITEM_BACKPACK)
             {
                 NETMSG_PUSHS16(pThing->itemParams.numBins);
                 for (int i = 0; i < pThing->itemParams.numBins; i++)
@@ -229,12 +229,18 @@ int sithDSSThing_ProcessSyncThing(sithCogMsg *msg)
         thingflags &= ~SITH_TF_INVULN;
 
     // MoTS added
-    /*
-    if ((((thing->thingflags & SITH_TF_DISABLED) != 0) && ((uVar8 & SITH_TF_DISABLED) == 0)) &&
-       (((thing->type == 5 && (((sithNet_isMulti != 0 && (sithNet_isServer == 0)) && (*(int *)&(thing->typeParams).field_0x10 != 0)))) && ((*(byte *)&thing->typeParams & 1) != 0)))) {
-        sithCog_SendMessageFromThing(thing,thing,SITH_MESSAGE_RESPAWN);
+    if (Main_bMotsCompat)
+    {
+        if ((pThing->thingflags & SITH_TF_DISABLED)
+            && !(thingflags & SITH_TF_DISABLED) 
+            && pThing->type == SITH_THING_ITEM 
+            && sithNet_isMulti 
+            && !sithNet_isServer
+            && pThing->itemParams.respawnFactor != 0 
+            && pThing->itemParams.typeflags & SITH_ITEM_RESPAWN_MP) {
+            sithCog_SendMessageFromThing(pThing, pThing, SITH_MESSAGE_RESPAWN);
+        }
     }
-    */
 
     sithAnimclass* pAnimclass = pThing->animclass;
     pThing->thingflags = thingflags;
@@ -259,7 +265,7 @@ int sithDSSThing_ProcessSyncThing(sithCogMsg *msg)
             break;
         case SITH_THING_ITEM:
             pThing->itemParams.typeflags = NETMSG_POPS32();
-            if (pThing->itemParams.typeflags & ITEMSTATE_AVAILABLE)
+            if (pThing->itemParams.typeflags & SITH_ITEM_BACKPACK)
             {
                 pThing->itemParams.numBins = NETMSG_POPS16();
                 for (int i = 0; i < pThing->itemParams.numBins; i++)
@@ -1204,7 +1210,7 @@ void sithDSSThing_SendSyncThingAttachment(sithThing *thing, int sendto_id, int m
 
     if (thing->attach_flags & SITH_ATTACH_WORLDSURFACE)
     {
-        NETMSG_PUSHU16(thing->attachedSurface->field_0);
+        NETMSG_PUSHU16(thing->attachedSurface->index);
     }
     else if (thing->attach_flags & (SITH_ATTACH_THING|SITH_ATTACH_THINGSURFACE))
     {

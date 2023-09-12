@@ -9,12 +9,12 @@
 
 void sithCogFunctionSurface_GetSurfaceAdjoin(sithCog *ctx)
 {
-    sithSurface *surface; // eax
-    uint32_t *v2; // eax
+    sithSurface* pSurface = sithCogExec_PopSurface(ctx);
 
-    surface = sithCogExec_PopSurface(ctx);
-    if ( surface && (v2 = &surface->adjoin->mirror->surface->field_0) != 0 )
-        sithCogExec_PushInt(ctx, *v2);
+    // TODO was this borked in JKDF2 and fixed in MoTS?
+    // Previously: (v2 = &pSurface->adjoin->mirror->surface->index) != 0
+    if ( pSurface && pSurface->adjoin->mirror->surface) 
+        sithCogExec_PushInt(ctx, pSurface->adjoin->mirror->surface->index);
     else
         sithCogExec_PushInt(ctx, -1);
 }

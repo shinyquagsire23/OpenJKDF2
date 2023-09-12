@@ -358,7 +358,7 @@ void sithCogFunctionSector_GetSectorSurfaceRef(sithCog *ctx)
     v1 = sithCogExec_PopInt(ctx);
     v2 = sithCogExec_PopSector(ctx);
     if ( v2 && (unsigned int)v1 < v2->numSurfaces && v1 >= 0 )
-        sithCogExec_PushInt(ctx, v2->surfaces[v1].field_0);
+        sithCogExec_PushInt(ctx, v2->surfaces[v1].index);
     else
         sithCogExec_PushInt(ctx, -1);
 }

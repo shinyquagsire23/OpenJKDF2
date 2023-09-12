@@ -1400,7 +1400,7 @@ struct rdSurface
 
 typedef struct sithSurface
 {
-    uint32_t field_0;
+    uint32_t index;
     uint32_t field_4;
     sithSector* parent_sector;
     sithAdjoin* adjoin;

@@ -1198,7 +1198,7 @@ void jkCogExt_GetThingAttachSurface(sithCog* ctx)
         if (pThing->attach_flags == SITH_ATTACH_WORLDSURFACE) {
             sithSurface* pAttached = pThing->attachedSurface;
             if (pAttached) {
-                retval = pAttached->field_0;
+                retval = pAttached->index;
             }
         }
     }
