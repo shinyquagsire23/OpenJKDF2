@@ -5,6 +5,7 @@
 #include "jk.h"
 #include "types.h"
 
+#ifndef NO_JK_MMAP
 #include "Cog/sithCog.h"
 #include "Cog/sithCogExec.h"
 #include "Cog/jkCog.h"
@@ -158,17 +159,14 @@
 #include "Dss/jkDSS.h"
 #include "Devices/sithComm.h"
 #include "stdPlatform.h"
+#else
+#include "General/stdString.h"
+#include "Win95/Window.h"
+#include "Main/jkMain.h"
+#include "Main/Main.h"
+#endif // NO_JK_MMAP
 
-int openjkdf2_bSkipWorkingDirData = 0;
-int openjkdf2_bIsFirstLaunch = 1;
-int openjkdf2_bIsRunningFromExistingInstall = 0; // 1 is OpenJKDF2 acting as a JK.EXE replacement, 0 is running as a launcher.
-int openjkdf2_bOrigWasRunningFromExistingInstall = 0;
-int openjkdf2_bOrigWasDF2 = 0;
-int openjkdf2_bIsKVM = 1;
-int openjkdf2_restartMode = OPENJKDF2_RESTART_NONE;
-char openjkdf2_aOrigCwd[1024];
-char openjkdf2_aRestartPath[256];
-char* openjkdf2_pExecutablePath = "";
+extern char openjkdf2_aOrigCwd[1024];
 
 void do_hooks();
 
@@ -535,6 +533,7 @@ __declspec(dllexport) void hook_init(void)
 int yyparse();
 void do_hooks()
 {
+#ifndef NO_JK_MMAP
 #ifndef LINUX
     hook_function(WinMain_ADDR, WinMain_);
 #endif // LINUX
@@ -2531,5 +2530,6 @@ void do_hooks()
     hook_function_inv(rdKeyframe_FreeJoints_ADDR, rdKeyframe_FreeJoints);
 #endif
 #endif
+#endif // !NO_JK_MMAP
 }
 #endif // WIN64_STANDALONE

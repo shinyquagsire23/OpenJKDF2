@@ -62,6 +62,13 @@ set(TARGET_NO_BLOBS FALSE)
 set(TARGET_CAN_JKGM FALSE)
 set(OPENJKDF2_USE_BLOBS FALSE CACHE BOOL "Use blobs")
 
+# Options for compiling
+if(DEFINED ENV{TARGET_BUILD_TESTS})
+    set(TARGET_BUILD_TESTS $ENV{TARGET_BUILD_TESTS})
+else()
+    set(TARGET_BUILD_TESTS FALSE)
+endif()
+
 set(DEBUG_QOL_CHEATS $ENV{DEBUG_QOL_CHEATS})
 
 # Options for compiling
@@ -279,6 +286,7 @@ elseif(PLAT_WASM)
     set(TARGET_WASM TRUE)
     set(TARGET_CAN_JKGM FALSE)
     set(TARGET_USE_CURL FALSE)
+    set(TARGET_BUILD_TESTS FALSE)
 
     add_link_options(-fno-exceptions)
     add_compile_options(-fno-exceptions)
@@ -304,6 +312,7 @@ elseif(PLAT_HOOKS)
     set(OPENJKDF2_NO_ASAN TRUE)
     set(TARGET_WIN32 TRUE)
     set(TARGET_USE_D3D TRUE)
+    set(TARGET_BUILD_TESTS FALSE)
 
     add_compile_options(-g -Wuninitialized -fno-trapping-math)
     add_link_options(-g -Wl,--subsystem,windows -Wl,-Map=% -fno-trapping-math)
@@ -329,6 +338,7 @@ elseif(PLAT_ANDROID_ARM64)
     set(TARGET_ANDROID_ARM64 TRUE)
     set(TARGET_CAN_JKGM FALSE)
     set(TARGET_USE_CURL FALSE)
+    set(TARGET_BUILD_TESTS FALSE)
 
     list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/lib/glew")
     include_directories(${PROJECT_SOURCE_DIR}/lib/freeglut/include)
@@ -414,15 +424,23 @@ if(TARGET_USE_OPENAL)
 endif()
 
 # All of the base sources
-file(GLOB SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/*.c
+file(GLOB ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/*.c
                        ${PROJECT_SOURCE_DIR}/src/*/*.c
                        ${PROJECT_SOURCE_DIR}/src/General/*.cpp
                        ${PROJECT_SOURCE_DIR}/src/Platform/Common/*.c
                        ${PROJECT_SOURCE_DIR}/src/Platform/Common/*.cpp)
 
+# Game main
+file(GLOB GAME_MAIN_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/main.c)
+
+# Remove test sources
+file(GLOB TEST_SRCS ${PROJECT_SOURCE_DIR}/src/Tests/*.c)
+list(REMOVE_ITEM ENGINE_SOURCE_FILES ${TEST_SRCS})
+list(REMOVE_ITEM ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/main.c)
+
 # Fcaseopen
 file(GLOB FCASEOPEN_SRCS ${PROJECT_SOURCE_DIR}/src/external/fcaseopen/*.c)
-list(APPEND SOURCE_FILES ${FCASEOPEN_SRCS})
+list(APPEND ENGINE_SOURCE_FILES ${FCASEOPEN_SRCS})
 include_directories(${PROJECT_SOURCE_DIR}/src/external/fcaseopen)
 
 # The rest of the conditional/TARGET_* dependencies
@@ -434,47 +452,48 @@ include(cmake_modules/precompile_globals.cmake)
 
 #set( CMAKE_VERBOSE_MAKEFILE on )
 
-if(TARGET_ANDROID)
-    add_library(${BIN_NAME} SHARED ${SOURCE_FILES})
-elseif(NOT TARGET_HOOKS)
-    add_executable(${BIN_NAME} ${SOURCE_FILES})
+add_library(sith_engine OBJECT ${ENGINE_SOURCE_FILES})
+if(PLAT_MSVC OR PLAT_MINGW_X86_64)
+    set(SDL2_COMMON_LIBS SDL2main SDL::SDL)
+elseif(PLAT_WASM)
+    set(SDL2_COMMON_LIBS "")
 else()
-    add_library(${BIN_NAME} SHARED ${SOURCE_FILES})
-    add_library("${BIN_NAME}_kvm" SHARED ${SOURCE_FILES})
+    set(SDL2_COMMON_LIBS SDL2main SDL::SDL ${SDL_MIXER_DEPS} SDL::Mixer)
+endif()
+
+if(TARGET_ANDROID)
+    add_library(${BIN_NAME} SHARED ${GAME_MAIN_SOURCE_FILES})
+    target_link_libraries(${BIN_NAME} PRIVATE ${SDL2_COMMON_LIBS} sith_engine)
+elseif(TARGET_HOOKS)
+    add_library(${BIN_NAME} SHARED ${GAME_MAIN_SOURCE_FILES})
+    add_library("${BIN_NAME}_kvm" SHARED ${GAME_MAIN_SOURCE_FILES})
 
     SET_TARGET_PROPERTIES(${BIN_NAME} PROPERTIES PREFIX "")
     SET_TARGET_PROPERTIES("${BIN_NAME}_kvm" PROPERTIES PREFIX "")
 
-    target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
-    target_link_libraries(${BIN_NAME}_kvm PRIVATE nlohmann_json::nlohmann_json)
+    target_link_libraries(${BIN_NAME} PRIVATE ${SDL2_COMMON_LIBS} sith_engine)
+    target_link_libraries(${BIN_NAME}_kvm PRIVATE  ${SDL2_COMMON_LIBS} sith_engine)
+else()
+    add_executable(${BIN_NAME} ${GAME_MAIN_SOURCE_FILES})
+    target_link_libraries(${BIN_NAME} PRIVATE ${SDL2_COMMON_LIBS} sith_engine)
+
+    if(TARGET_BUILD_TESTS)
+        add_executable(rle_test src/Tests/rle_test.c)
+        target_link_libraries(rle_test PRIVATE ${SDL2_COMMON_LIBS} sith_engine)
+        macos_target_add_standard_deps(rle_test)
+    endif()
 endif()
 
 # TODO byacc and flex
 
 if(TARGET_MACOS)
-    set_target_properties(${BIN_NAME} PROPERTIES
-      LINK_SEARCH_START_STATIC ON
-      LINK_SEARCH_END_STATIC ON
-    )
-    target_link_libraries(${BIN_NAME} PRIVATE "-framework AppKit")
-    target_link_libraries(${BIN_NAME} PRIVATE "-framework Carbon")
-    target_link_libraries(${BIN_NAME} PRIVATE "-framework SystemConfiguration")
-    target_link_libraries(${BIN_NAME} PRIVATE "-framework CoreAudio")
-    target_link_libraries(${BIN_NAME} PRIVATE "-framework AudioToolbox")
-    target_link_libraries(${BIN_NAME} PRIVATE "-framework CoreVideo")
-    target_link_libraries(${BIN_NAME} PRIVATE "-framework Cocoa")
-    target_link_libraries(${BIN_NAME} PRIVATE "-framework Metal")
-    target_link_libraries(${BIN_NAME} PRIVATE "-framework CoreHaptics")
-    target_link_libraries(${BIN_NAME} PRIVATE "-framework IOKit")
-    target_link_libraries(${BIN_NAME} PRIVATE "-framework ForceFeedback")
-    target_link_libraries(${BIN_NAME} PRIVATE "-framework GameController")
-    target_link_libraries(${BIN_NAME} PRIVATE iconv)
+    macos_target_add_standard_deps(${BIN_NAME})
 
     find_package(PkgConfig REQUIRED)
 
     if(TARGET_USE_GAMENETWORKINGSOCKETS)
         find_package(OpenSSL REQUIRED)
-        target_link_libraries(${BIN_NAME} PUBLIC OpenSSL::Crypto)
+        target_link_libraries(sith_engine PUBLIC OpenSSL::Crypto)
     endif()
 endif()
 
@@ -539,26 +558,28 @@ if(PLAT_MINGW_X86_64)
         set_target_properties(${BIN_NAME} PROPERTIES WIN32_EXECUTABLE FALSE)
     endif()
 
-    target_link_libraries(${BIN_NAME} PRIVATE GLUT::GLUT)
+    target_link_libraries(sith_engine PRIVATE GLUT::GLUT)
+    target_link_libraries(sith_engine PRIVATE GLEW::glew_s)
     target_link_libraries(${BIN_NAME} PRIVATE GLEW::glew_s)
-    target_link_libraries(${BIN_NAME} PRIVATE mingw32 SDL2main SDL::SDL version imm32 setupapi gdi32 winmm imm32 ole32 oleaut32 shell32 ssp winmm user32 crypt32 advapi32) # SDL2’s peculiarity that you have to link mingw32 before SDL2main
+    target_link_libraries(sith_engine PRIVATE mingw32 ${SDL2_COMMON_LIBS} version imm32 setupapi gdi32 winmm imm32 ole32 oleaut32 shell32 ssp winmm user32 crypt32 advapi32) # SDL2’s peculiarity that you have to link mingw32 before SDL2main
     
     if(TARGET_CAN_JKGM)
-        target_link_libraries(${BIN_NAME} PRIVATE PNG::PNG ZLIB::ZLIB)
+        target_link_libraries(sith_engine PRIVATE PNG::PNG ZLIB::ZLIB)
     endif()
 
     if (TARGET_USE_OPENAL)
-        target_link_libraries(${BIN_NAME} PRIVATE ${SDL_MIXER_DEPS} SDL::Mixer)
-        target_link_libraries(${BIN_NAME} PRIVATE OpenAL::OpenAL)
+        target_link_libraries(sith_engine PRIVATE ${SDL_MIXER_DEPS} SDL::Mixer)
+        target_link_libraries(sith_engine PRIVATE OpenAL::OpenAL)
     endif()
-    target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
+    target_link_libraries(sith_engine PRIVATE nlohmann_json::nlohmann_json)
     if(TARGET_USE_GAMENETWORKINGSOCKETS)
-        target_link_libraries(${BIN_NAME} PRIVATE GameNetworkingSockets::GameNetworkingSockets)
+        target_link_libraries(sith_engine PRIVATE GameNetworkingSockets::GameNetworkingSockets)
     endif()
     if(TARGET_USE_PHYSFS)
+        target_link_libraries(sith_engine PRIVATE PhysFS::PhysFS_s)
         target_link_libraries(${BIN_NAME} PRIVATE PhysFS::PhysFS_s)
     endif()
-    target_link_libraries(${BIN_NAME} PRIVATE opengl32 ws2_32 uuid ole32)
+    target_link_libraries(sith_engine PRIVATE opengl32 ws2_32 uuid ole32)
 
     if (TARGET_USE_OPENAL)
         add_custom_command(
@@ -590,23 +611,24 @@ elseif(TARGET_HOOKS)
     target_link_libraries("${BIN_NAME}_kvm" PRIVATE -Wl,-e_hook_init -nostartfiles -static -static-libgcc -static-libstdc++)
 elseif(TARGET_WASM)
     target_link_libraries(${BIN_NAME} PRIVATE -lm -lSDL2 -lSDL2_mixer -lGL -lGLEW -lopenal)
-    target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
+    target_link_libraries(sith_engine PRIVATE nlohmann_json::nlohmann_json)
 elseif(TARGET_LINUX)
-    target_link_libraries(${BIN_NAME} PRIVATE PNG::PNG ZLIB::ZLIB)
-    target_link_libraries(${BIN_NAME} PRIVATE SDL2main SDL::SDL SDL::Mixer ${SDL_MIXER_DEPS} GL ${OPENAL_LIBRARY} GLEW::GLEW ${GTK3_LIBRARIES})
+    target_link_libraries(sith_engine PRIVATE PNG::PNG ZLIB::ZLIB)
+    target_link_libraries(sith_engine PRIVATE ${SDL2_COMMON_LIBS} GL ${OPENAL_LIBRARY} GLEW::GLEW ${GTK3_LIBRARIES})
      
     if(TARGET_USE_PHYSFS)
+        target_link_libraries(sith_engine PRIVATE PhysFS::PhysFS_s)
         target_link_libraries(${BIN_NAME} PRIVATE PhysFS::PhysFS_s)
     endif()
     if(TARGET_USE_GAMENETWORKINGSOCKETS)
-        target_link_libraries(${BIN_NAME} PRIVATE GameNetworkingSockets::GameNetworkingSockets)
+        target_link_libraries(sith_engine PRIVATE GameNetworkingSockets::GameNetworkingSockets)
     endif()
 
-    target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
-    target_link_libraries(${BIN_NAME} PRIVATE dl) # dlopen, dlsym
+    target_link_libraries(sith_engine PRIVATE nlohmann_json::nlohmann_json)
+    target_link_libraries(sith_engine PRIVATE dl) # dlopen, dlsym
 
     if(TARGET_USE_CURL)
-        target_link_libraries(${BIN_NAME} PRIVATE curl)
+        target_link_libraries(sith_engine PRIVATE curl)
     endif()
 elseif(PLAT_MSVC)
     set_target_properties(${BIN_NAME} PROPERTIES
@@ -639,32 +661,34 @@ elseif(PLAT_MSVC)
     find_package(Threads REQUIRED)
     target_link_libraries(${BIN_NAME} PRIVATE -static)
     set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
-    target_link_libraries(${BIN_NAME} PRIVATE Threads::Threads)
+    target_link_libraries(sith_engine PRIVATE Threads::Threads)
 
-    target_link_libraries(${BIN_NAME} PRIVATE GLUT::GLUT)
+    target_link_libraries(sith_engine PRIVATE GLUT::GLUT)
+    target_link_libraries(sith_engine PRIVATE GLEW::glew_s)
     target_link_libraries(${BIN_NAME} PRIVATE GLEW::glew_s)
-    target_link_libraries(${BIN_NAME} PRIVATE SDL2main SDL::SDL version imm32 setupapi gdi32 winmm imm32 ole32 oleaut32 shell32 winmm user32 crypt32 advapi32) # SDL2’s peculiarity that you have to link mingw32 before SDL2main
+    target_link_libraries(sith_engine PRIVATE ${SDL2_COMMON_LIBS} version imm32 setupapi gdi32 winmm imm32 ole32 oleaut32 shell32 winmm user32 crypt32 advapi32) # SDL2’s peculiarity that you have to link mingw32 before SDL2main
 
     if(TARGET_CAN_JKGM)
-        target_link_libraries(${BIN_NAME} PRIVATE PNG::PNG ZLIB::ZLIB)
+        target_link_libraries(sith_engine PRIVATE PNG::PNG ZLIB::ZLIB)
     endif()
 
     if (TARGET_USE_OPENAL)
-        target_link_libraries(${BIN_NAME} PRIVATE ${SDL_MIXER_DEPS} SDL::Mixer)
+        target_link_libraries(sith_engine PRIVATE ${SDL_MIXER_DEPS} SDL::Mixer)
         if (OPENAL_COMPILING_FROM_SRC)
-            target_link_libraries(${BIN_NAME} PRIVATE OpenAL::OpenAL)
+            target_link_libraries(sith_engine PRIVATE OpenAL::OpenAL)
         else()
-            target_link_libraries(${BIN_NAME} PRIVATE ${OPENAL_LIBRARIES})
+            target_link_libraries(sith_engine PRIVATE ${OPENAL_LIBRARIES})
         endif()
     endif()
-    target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
+    target_link_libraries(sith_engine PRIVATE nlohmann_json::nlohmann_json)
     if(TARGET_USE_GAMENETWORKINGSOCKETS)
-        target_link_libraries(${BIN_NAME} PRIVATE GameNetworkingSockets::GameNetworkingSockets)
+        target_link_libraries(sith_engine PRIVATE GameNetworkingSockets::GameNetworkingSockets)
     endif()
     if(TARGET_USE_PHYSFS)
+        target_link_libraries(sith_engine PRIVATE PhysFS::PhysFS_s)
         target_link_libraries(${BIN_NAME} PRIVATE PhysFS::PhysFS_s)
     endif()
-    target_link_libraries(${BIN_NAME} PRIVATE opengl32 ws2_32 uuid ole32)
+    target_link_libraries(sith_engine PRIVATE opengl32 ws2_32 uuid ole32)
 
     if (TARGET_USE_OPENAL)
         add_custom_command(
@@ -692,35 +716,38 @@ elseif(PLAT_MSVC)
     endif()
 
 elseif(TARGET_ANDROID)
-    target_link_libraries(${BIN_NAME} PRIVATE PNG::PNG)
-    target_link_libraries(${BIN_NAME} PRIVATE SDL2main SDL::SDL ${SDL_MIXER_DEPS} SDL::Mixer GLESv1_CM GLESv2 GLESv3 log EGL ${GTK3_LIBRARIES} android jnigraphics nativewindow OpenSLES) #${OPENAL_LIBRARY} GLEW::GLEW
+    target_link_libraries(sith_engine PRIVATE PNG::PNG)
+    target_link_libraries(sith_engine PRIVATE ${SDL2_COMMON_LIBS} GLESv1_CM GLESv2 GLESv3 log EGL ${GTK3_LIBRARIES} android jnigraphics nativewindow OpenSLES) #${OPENAL_LIBRARY} GLEW::GLEW
      
     if(TARGET_USE_PHYSFS)
+        target_link_libraries(sith_engine PRIVATE PhysFS::PhysFS_s)
         target_link_libraries(${BIN_NAME} PRIVATE PhysFS::PhysFS_s)
     endif()
     if(TARGET_USE_GAMENETWORKINGSOCKETS)
-        target_link_libraries(${BIN_NAME} PRIVATE GameNetworkingSockets::GameNetworkingSockets)
+        target_link_libraries(sith_engine PRIVATE GameNetworkingSockets::GameNetworkingSockets)
     endif()
 
-    target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
-    target_link_libraries(${BIN_NAME} PRIVATE dl) # dlopen, dlsym
+    target_link_libraries(sith_engine PRIVATE nlohmann_json::nlohmann_json)
+    target_link_libraries(sith_engine PRIVATE dl) # dlopen, dlsym
 
     if(TARGET_USE_CURL)
-        target_link_libraries(${BIN_NAME} PRIVATE curl)
+        target_link_libraries(sith_engine PRIVATE curl)
     endif()
 elseif(TARGET_MACOS)
     if(TARGET_CAN_JKGM)
-        target_link_libraries(${BIN_NAME} PRIVATE PNG::PNG ZLIB::ZLIB)
+        target_link_libraries(sith_engine PRIVATE PNG::PNG ZLIB::ZLIB)
     endif()
 
-    target_link_libraries(${BIN_NAME} PRIVATE SDL2main SDL::SDL ${SDL_MIXER_DEPS} SDL::Mixer ${OPENGL_LIBRARY} ${OPENAL_LIBRARY} GLEW::GLEW)
-    target_link_libraries(${BIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
+    target_link_libraries(sith_engine PRIVATE ${SDL2_COMMON_LIBS} ${OPENGL_LIBRARY} ${OPENAL_LIBRARY} GLEW::GLEW)
+    target_link_libraries(${BIN_NAME} PRIVATE GLEW::GLEW)
+    target_link_libraries(sith_engine PRIVATE nlohmann_json::nlohmann_json)
 
     if(TARGET_USE_PHYSFS)
+        target_link_libraries(sith_engine PRIVATE PhysFS::PhysFS_s)
         target_link_libraries(${BIN_NAME} PRIVATE PhysFS::PhysFS_s)
     endif()
     if(TARGET_USE_GAMENETWORKINGSOCKETS)
-        target_link_libraries(${BIN_NAME} PRIVATE GameNetworkingSockets::GameNetworkingSockets)
+        target_link_libraries(sith_engine PRIVATE GameNetworkingSockets::GameNetworkingSockets)
     endif()
 
     #

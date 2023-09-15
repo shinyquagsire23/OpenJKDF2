@@ -3445,6 +3445,7 @@ typedef void (*sithCvarEnumerationFn_t)(tSithCvar*);
 #include "Cog/sithCogFunctionSector.h"
 #include "Cog/sithCogFunctionSound.h"
 #include "General/stdBitmap.h"
+#include "General/stdBitmapRle.h"
 #include "General/stdMath.h"
 #include "General/stdJSON.h"
 #include "Primitives/rdVector.h"

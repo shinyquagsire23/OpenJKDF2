@@ -10,7 +10,7 @@ export -n SDKROOT MACOSX_DEPLOYMENT_TARGET CPLUS_INCLUDE_PATH C_INCLUDE_PATH &&
 #rm -rf build_win64
 mkdir -p build_win64 && pushd build_win64 &&
 
-cmake .. --toolchain $(pwd)/../cmake_modules/toolchain_mingw.cmake &&
+TARGET_BUILD_TESTS=1 cmake .. --toolchain $(pwd)/../cmake_modules/toolchain_mingw.cmake &&
 (make -j $(nproc) PROTOBUF || make -j1 PROTOBUF) && 
 (make -j $(nproc) PROTOC || make -j1 PROTOC) && 
 make -j $(nproc) openjkdf2-64 &&
