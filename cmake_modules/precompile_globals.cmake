@@ -3,7 +3,7 @@ set(GLOBALS_H ${PROJECT_SOURCE_DIR}/src/globals.h)
 set(GLOBALS_C ${PROJECT_SOURCE_DIR}/src/globals.c)
 set(GLOBALS_H_COG ${PROJECT_SOURCE_DIR}/src/globals.h.cog)
 set(GLOBALS_C_COG ${PROJECT_SOURCE_DIR}/src/globals.c.cog)
-list(APPEND SOURCE_FILES ${GLOBALS_C})
+list(APPEND ENGINE_SOURCE_FILES ${GLOBALS_C})
 
 # All of our pre-build steps
 add_custom_command(
