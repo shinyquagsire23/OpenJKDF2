@@ -290,5 +290,7 @@ if(TARGET_USE_GAMENETWORKINGSOCKETS)
                        COMMAND ${CMAKE_COMMAND} -E touch "${GNS_PROTOC_HACK_ZLIB}"
                        )
     add_custom_target(GNS_HACK_ZLIB DEPENDS ${GNS_PROTOC_HACK_ZLIB})
-    add_dependencies(PROTOBUF GNS_HACK_ZLIB)
+    add_dependencies(GameNetworkingSockets::GameNetworkingSockets GNS_HACK_ZLIB)
+    add_dependencies(GameNetworkingSockets::GameNetworkingSockets_s GNS_HACK_ZLIB)
+    add_dependencies(GNS_HACK_ZLIB PROTOBUF)
 endif()
