@@ -111,6 +111,8 @@ if(TARGET_USE_GAMENETWORKINGSOCKETS)
         # Use native protoc when building GameNetworkingSockets
         set(GAMENETWORKINGSOCKETS_PROTOC_EXECUTABLE -DProtobuf_PROTOC_EXECUTABLE:FILEPATH=${Protoc_PROTOC_EXECUTABLE})
         set(GAMENETWORKINGSOCKETS_DEPENDS PROTOC)
+    else()
+        set(GAMENETWORKINGSOCKETS_DEPENDS PROTOBUF)
     endif()
 
     find_package(GameNetworkingSockets 1.4.1)
@@ -271,7 +273,7 @@ if(TARGET_USE_GAMENETWORKINGSOCKETS)
     endif()
 
 
-    set(GNS_PROTOC_HACK_ZLIB ${GameNetworkingSockets_ROOT}/src/${CMAKE_SHARED_LIBRARY_PREFIX}${ZLIB_HOST_LIBRARIES}${CMAKE_SHARED_LIBRARY_SUFFIX})
+    set(GNS_PROTOC_HACK_ZLIB ${GameNetworkingSockets_ROOT}/src/.copied_hack)
     set(GNS_PROTOC_HACK_ZLIB_DIR ${GameNetworkingSockets_ROOT}/src)
     set(GNS_PROTOC_HACK_ZLIB_WILDCARD ${GameNetworkingSockets_ROOT}/src/${CMAKE_SHARED_LIBRARY_PREFIX}${ZLIB_HOST_LIBRARIES}${CMAKE_SHARED_LIBRARY_SUFFIX})
 
