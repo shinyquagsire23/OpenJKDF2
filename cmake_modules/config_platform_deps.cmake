@@ -263,51 +263,11 @@ endif()
 # Also why did this break in the first place I didn't change anything??
 if(TARGET_USE_GAMENETWORKINGSOCKETS)
     if(CMAKE_CROSSCOMPILING)
-        set(Protoc_PROTOC_HACK_ZLIB ${Protoc_ROOT}/bin/${CMAKE_SHARED_LIBRARY_PREFIX}${ZLIB_HOST_LIBRARIES}${CMAKE_SHARED_LIBRARY_SUFFIX})
-        set(Protoc_PROTOC_HACK_ZLIB_DIR ${Protoc_ROOT}/bin)
-        set(Protoc_PROTOC_HACK_ZLIB_WILDCARD ${Protoc_ROOT}/bin/${CMAKE_SHARED_LIBRARY_PREFIX}${ZLIB_HOST_LIBRARIES}${CMAKE_SHARED_LIBRARY_SUFFIX})
-
-        set(Protobuf_PROTOC_HACK_ZLIB ${Protobuf_ROOT}/bin/${CMAKE_SHARED_LIBRARY_PREFIX}${ZLIB_HOST_LIBRARIES}${CMAKE_SHARED_LIBRARY_SUFFIX})
-        set(Protobuf_PROTOC_HACK_ZLIB_DIR ${Protobuf_ROOT}/bin)
-        set(Protobuf_PROTOC_HACK_ZLIB_WILDCARD ${Protobuf_ROOT}/bin/${CMAKE_SHARED_LIBRARY_PREFIX}${ZLIB_HOST_LIBRARIES}${CMAKE_SHARED_LIBRARY_SUFFIX})
-
         set(HACK_ZLIB_SRC ${ZLIB_HOST_SHARED_LIBRARY_PATH})
         set(HACK_ZLIB_SRC_DIR ${ZLIB_HOST_SHARED_LIBRARY_DIR})
-        
-        add_custom_command(OUTPUT "${Protoc_PROTOC_HACK_ZLIB}" 
-                           COMMAND ${CMAKE_COMMAND} -E touch "${HACK_ZLIB_SRC_DIR}/hack.dylib"
-                           COMMAND ${CMAKE_COMMAND} -E touch "${HACK_ZLIB_SRC_DIR}/hack.dll"
-                           COMMAND ${CMAKE_COMMAND} -E touch "${HACK_ZLIB_SRC_DIR}/hack.so"
-                           COMMAND ${CMAKE_COMMAND} -E copy "${HACK_ZLIB_SRC_DIR}/*.dylib" "${Protoc_PROTOC_HACK_ZLIB_DIR}"
-                           COMMAND ${CMAKE_COMMAND} -E copy "${HACK_ZLIB_SRC_DIR}/*.dll" "${Protoc_PROTOC_HACK_ZLIB_DIR}"
-                           COMMAND ${CMAKE_COMMAND} -E copy "${HACK_ZLIB_SRC_DIR}/*.so" "${Protoc_PROTOC_HACK_ZLIB_DIR}"
-                           COMMAND ${CMAKE_COMMAND} -E touch "${Protoc_PROTOC_HACK_ZLIB}"
-                           )
-        add_custom_target(PROTOC_HACK_ZLIB DEPENDS ${Protoc_PROTOC_HACK_ZLIB})
-        add_dependencies(PROTOC PROTOC_HACK_ZLIB)
     else()
-        set(Protoc_PROTOC_HACK_ZLIB ${Protoc_ROOT}/bin/${CMAKE_SHARED_LIBRARY_PREFIX}${ZLIB_LIBRARIES}${CMAKE_SHARED_LIBRARY_SUFFIX})
-        set(Protoc_PROTOC_HACK_ZLIB_DIR ${Protoc_ROOT}/bin)
-        set(Protoc_PROTOC_HACK_ZLIB_WILDCARD ${Protoc_ROOT}/bin/${CMAKE_SHARED_LIBRARY_PREFIX}${ZLIB_LIBRARIES}${CMAKE_SHARED_LIBRARY_SUFFIX})
-
-        set(Protobuf_PROTOC_HACK_ZLIB ${Protobuf_ROOT}/bin/${CMAKE_SHARED_LIBRARY_PREFIX}${ZLIB_LIBRARIES}${CMAKE_SHARED_LIBRARY_SUFFIX})
-        set(Protobuf_PROTOC_HACK_ZLIB_DIR ${Protobuf_ROOT}/bin)
-        set(Protobuf_PROTOC_HACK_ZLIB_WILDCARD ${Protobuf_ROOT}/bin/${CMAKE_SHARED_LIBRARY_PREFIX}${ZLIB_LIBRARIES}${CMAKE_SHARED_LIBRARY_SUFFIX})
-
         set(HACK_ZLIB_SRC ${ZLIB_SHARED_LIBRARY_PATH})
         set(HACK_ZLIB_SRC_DIR ${ZLIB_SHARED_LIBRARY_DIR})
-
-        add_custom_command(OUTPUT "${Protobuf_PROTOC_HACK_ZLIB}" 
-                           COMMAND ${CMAKE_COMMAND} -E touch "${HACK_ZLIB_SRC_DIR}/hack.dylib"
-                           COMMAND ${CMAKE_COMMAND} -E touch "${HACK_ZLIB_SRC_DIR}/hack.dll"
-                           COMMAND ${CMAKE_COMMAND} -E touch "${HACK_ZLIB_SRC_DIR}/hack.so"
-                           COMMAND ${CMAKE_COMMAND} -E copy "${HACK_ZLIB_SRC_DIR}/*.dylib" "${Protobuf_PROTOC_HACK_ZLIB_DIR}"
-                           COMMAND ${CMAKE_COMMAND} -E copy "${HACK_ZLIB_SRC_DIR}/*.dll" "${Protobuf_PROTOC_HACK_ZLIB_DIR}"
-                           COMMAND ${CMAKE_COMMAND} -E copy "${HACK_ZLIB_SRC_DIR}/*.so" "${Protobuf_PROTOC_HACK_ZLIB_DIR}"
-                           COMMAND ${CMAKE_COMMAND} -E touch "${Protobuf_PROTOC_HACK_ZLIB}"
-                           )
-        add_custom_target(PROTOBUF_HACK_ZLIB DEPENDS ${Protobuf_PROTOC_HACK_ZLIB})
-        add_dependencies(PROTOBUF PROTOBUF_HACK_ZLIB)
     endif()
 
 
@@ -326,5 +286,6 @@ if(TARGET_USE_GAMENETWORKINGSOCKETS)
                        COMMAND ${CMAKE_COMMAND} -E touch "${GNS_PROTOC_HACK_ZLIB}"
                        )
     add_custom_target(GNS_HACK_ZLIB DEPENDS ${GNS_PROTOC_HACK_ZLIB})
-    add_dependencies(PROTOBUF GNS_HACK_ZLIB)
+    #add_dependencies(PROTOBUF GNS_HACK_ZLIB)
+    add_dependencies(GNS_HACK_ZLIB GameNetworkingSockets::GameNetworkingSockets)
 endif()
