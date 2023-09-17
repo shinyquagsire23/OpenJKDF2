@@ -277,6 +277,7 @@ if(TARGET_USE_GAMENETWORKINGSOCKETS)
 
 
     add_custom_command(OUTPUT "${GNS_PROTOC_HACK_ZLIB}" 
+                       COMMAND ${CMAKE_COMMAND} -E make_directory "${GNS_PROTOC_HACK_ZLIB_DIR}"
                        COMMAND ${CMAKE_COMMAND} -E touch "${HACK_ZLIB_SRC_DIR}/hack.dylib"
                        COMMAND ${CMAKE_COMMAND} -E touch "${HACK_ZLIB_SRC_DIR}/hack.dll"
                        COMMAND ${CMAKE_COMMAND} -E touch "${HACK_ZLIB_SRC_DIR}/hack.so"
@@ -286,6 +287,5 @@ if(TARGET_USE_GAMENETWORKINGSOCKETS)
                        COMMAND ${CMAKE_COMMAND} -E touch "${GNS_PROTOC_HACK_ZLIB}"
                        )
     add_custom_target(GNS_HACK_ZLIB DEPENDS ${GNS_PROTOC_HACK_ZLIB})
-    #add_dependencies(PROTOBUF GNS_HACK_ZLIB)
-    add_dependencies(GNS_HACK_ZLIB GameNetworkingSockets::GameNetworkingSockets)
+    add_dependencies(PROTOBUF GNS_HACK_ZLIB)
 endif()
