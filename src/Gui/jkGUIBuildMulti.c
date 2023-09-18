@@ -59,7 +59,7 @@ static jkGuiElement jkGuiBuildMulti_buttons[17] =
 
 jkGuiMenu jkGuiBuildMulti_menu =
 {
-    &jkGuiBuildMulti_buttons, -1, 65535, 65535, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, 0, jkGuiBuildMulti_sub_41A120, "thermloop01.wav", "thrmlpu2.wav", NULL, NULL, NULL, 0, NULL, NULL
+    jkGuiBuildMulti_buttons, -1, 65535, 65535, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, 0, jkGuiBuildMulti_sub_41A120, "thermloop01.wav", "thrmlpu2.wav", NULL, NULL, NULL, 0, NULL, NULL
 };
 
 
@@ -94,7 +94,7 @@ static jkGuiElement jkGuiBuildMulti_menuEditCharacter_buttons[17] =
 
 static jkGuiMenu jkGuiBuildMulti_menuEditCharacter =
 {
-    &jkGuiBuildMulti_menuEditCharacter_buttons, -1, 65535, 65535, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, 0, NULL, "thermloop01.wav", "thrmlpu2.wav", NULL, NULL, NULL, 0, NULL, NULL
+    jkGuiBuildMulti_menuEditCharacter_buttons, -1, 65535, 65535, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, 0, NULL, "thermloop01.wav", "thrmlpu2.wav", NULL, NULL, NULL, 0, NULL, NULL
 };
 
 // 13 -> 16
@@ -134,7 +134,7 @@ static jkGuiElement jkGuiBuildMulti_menuNewCharacter_buttons[18] =
 
 static jkGuiMenu jkGuiBuildMulti_menuNewCharacter =
 {
-    &jkGuiBuildMulti_menuNewCharacter_buttons, -1, 65535, 65535, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, 0, NULL, "thermloop01.wav", "thrmlpu2.wav", NULL, NULL, NULL, 0, NULL, NULL
+    jkGuiBuildMulti_menuNewCharacter_buttons, -1, 65535, 65535, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, 0, NULL, "thermloop01.wav", "thrmlpu2.wav", NULL, NULL, NULL, 0, NULL, NULL
 };
 
 static jkGuiElement jkGuiBuildMulti_menuNewCharacter_buttonsMots[18] =
@@ -166,7 +166,7 @@ static jkGuiElement jkGuiBuildMulti_menuNewCharacter_buttonsMots[18] =
 
 static jkGuiMenu jkGuiBuildMulti_menuNewCharacterMots =
 {
-    &jkGuiBuildMulti_menuNewCharacter_buttonsMots, -1, 65535, 65535, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, 0, NULL, "thermloop01.wav", "thrmlpu2.wav", NULL, NULL, NULL, 0, NULL, NULL
+    jkGuiBuildMulti_menuNewCharacter_buttonsMots, -1, 65535, 65535, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, 0, NULL, "thermloop01.wav", "thrmlpu2.wav", NULL, NULL, NULL, 0, NULL, NULL
 };
 
 static jkGuiElement* jkGuiBuildMulti_pNewCharacterElements = jkGuiBuildMulti_menuNewCharacter_buttons;
@@ -206,7 +206,7 @@ static jkGuiElement jkGuiBuildMulti_menuLoadCharacter_buttons[24] =
 
 static jkGuiMenu jkGuiBuildMulti_menuLoadCharacter =
 {
-    &jkGuiBuildMulti_menuLoadCharacter_buttons, -1, 65535, 65535, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, 0, NULL, "thermloop01.wav", "thrmlpu2.wav", NULL, NULL, NULL, 0, NULL, NULL
+    jkGuiBuildMulti_menuLoadCharacter_buttons, -1, 65535, 65535, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, 0, NULL, "thermloop01.wav", "thrmlpu2.wav", NULL, NULL, NULL, 0, NULL, NULL
 };
 
 static int jkGuiBuildMulti_bInitted = 0;
@@ -1490,7 +1490,7 @@ LABEL_7:
     v21 = jkStrings_GetUniStringWithFallback(tmp5);
     v10 = jkStrings_GetUniStringWithFallback("GUI_RANK");
     jk_snwprintf(&jkGuiBuildMulti_wTmp[32], 0x80u, v10, rank, v21);
-    jkGuiBuildMulti_menuLoadCharacter_buttons[9].unistr = (char *)&jkGuiBuildMulti_wTmp[32];
+    jkGuiBuildMulti_menuLoadCharacter_buttons[9].wstr = &jkGuiBuildMulti_wTmp[32];
     v11 = 0;
     while ( 1 )
     {

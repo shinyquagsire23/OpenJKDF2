@@ -1390,7 +1390,7 @@ int jkGuiRend_ListBoxEventHandler(jkGuiElement *element, jkGuiMenu *menu, int ev
 
 void jkGuiRend_ListBoxDraw(jkGuiElement *element_, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw)
 {
-    uint32_t *bitmapIndices; // eax
+    int* bitmapIndices; // eax
     int v10; // eax
     int v11; // ecx
     int v12; // edi
@@ -1405,7 +1405,7 @@ void jkGuiRend_ListBoxDraw(jkGuiElement *element_, jkGuiMenu *menu, stdVBuffer *
     int element; // [esp+34h] [ebp+4h]
 
     bitmapIndices = element_->uiBitmaps;
-    topArrowBitmap = menu->ui_structs[*bitmapIndices];
+    topArrowBitmap = menu->ui_structs[bitmapIndices[0]];
     bottomArrowBitmap = menu->ui_structs[bitmapIndices[1]];
     if ( redraw )
         jkGuiRend_CopyVBuffer(menu, &element_->texInfo.rect);
@@ -1780,12 +1780,12 @@ int jkGuiRend_SliderEventHandler(jkGuiElement *element, jkGuiMenu *menu, int eve
     signed int v22; // edx
     jkGuiElement *v23; // eax
     int v24; // ecx MAPDST
-    jkGuiStringEntry *v26; // ecx
+    int v26; // ecx
     jkGuiMenu *v27; // ST04_4
     jkGuiElement *v29; // eax
     int v30; // ecx
     int v31; // edx
-    jkGuiStringEntry *v32; // ecx
+    int v32; // ecx
     uint8_t v33[16]; // [esp+0h] [ebp-1Ch]
     int pY; // [esp+10h] [ebp-Ch]
     int pX;
@@ -1881,11 +1881,11 @@ int jkGuiRend_SliderEventHandler(jkGuiElement *element, jkGuiMenu *menu, int eve
                 }
                 else
                 {
-                    v32 = v29->unistr;
+                    v32 = v29->extraInt;
                     if ( v31 <= (signed int)v32 )
-                        v32 = (jkGuiStringEntry *)v31;
+                        v32 = v31;
                 }
-                v29->otherDataPtr = (intptr_t)v32;
+                v29->extraInt = v32;
                 jkGuiRend_UpdateAndDrawClickable(v29, menu, 1);
                 return 0;
             }
@@ -1900,8 +1900,8 @@ int jkGuiRend_SliderEventHandler(jkGuiElement *element, jkGuiMenu *menu, int eve
             }
             else
             {
-                v26 = v23->unistr;
-                if ( v24 <= (signed int)v26 )
+                v26 = v23->extraInt;
+                if ( v24 <= v26 )
                 {
                     v27 = menu;
                     v23->selectedTextEntry = v24;
@@ -1909,7 +1909,7 @@ int jkGuiRend_SliderEventHandler(jkGuiElement *element, jkGuiMenu *menu, int eve
                     return 0;
                 }
             }
-            v23->otherDataPtr = (intptr_t)v26;
+            v23->otherDataPtr = v26;
             jkGuiRend_UpdateAndDrawClickable(v23, menu, 1);
             return 0;
         default:
@@ -1941,7 +1941,7 @@ void jkGuiRend_SliderDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vb
     int v26; // ebp
     int v27; // ecx
     int v28; // ecx
-    uint32_t *bitmapIndices2; // edi
+    int *bitmapIndices2; // edi
     stdBitmap *sliderBackgroundBitmap2; // edx
     int v32; // ecx
     int v33; // ebp
@@ -1969,9 +1969,9 @@ void jkGuiRend_SliderDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vb
     int v55; // [esp+58h] [ebp-14h]
     int v56; // [esp+64h] [ebp-8h]
     stdBitmap *elementa; // [esp+70h] [ebp+4h]
-    jkGuiStringEntry *elementb; // [esp+70h] [ebp+4h]
     unsigned int redrawa; // [esp+7Ch] [ebp+10h]
     int redrawb; // [esp+7Ch] [ebp+10h]
+    int elementb;
 
     v6 = 0;
     bitmapIndices = (signed int *)element->uiBitmaps;
@@ -1981,119 +1981,115 @@ void jkGuiRend_SliderDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vb
     sliderBackgroundBitmap = menu->ui_structs[*bitmapIndices];
     v44 = sliderThumbBitmap;
     elementa = menu->ui_structs[*bitmapIndices];
-    if ( sliderThumbBitmap && sliderBackgroundBitmap )
+    if (!sliderThumbBitmap || !sliderBackgroundBitmap) return;
+    
+    if ( element == menu->lastMouseOverClickable )
     {
-        if ( element == menu->lastMouseOverClickable )
-        {
-            v6 = 1;
-            v43 = 1;
-        }
-        if ( redraw )
-            jkGuiRend_CopyVBuffer(menu, &element->rect);
-        v12 = sliderBackgroundBitmap->numMips;
-        if ( v6 > v12 - 1 )
-            v6 = v12 - 1;
-        v13 = sliderThumbBitmap->numMips;
-        if ( v43 > v13 - 1 )
-            v43 = v13 - 1;
-        v46 = v6;
-        v14 = element->rect.x;
-        blit_x = v14;
-        v15 = element->rect.y;
-        blit_y = v15;
-        v52 = element->rect.width;
-        v16 = element->rect.height;
-        v17 = elementa->mipSurfaces;
-        v53 = v16;
-        v18 = v17[v6];
-        v19 = v18->format.height;
-        v20 = v18->format.width;
-        v45 = v19;
-        redrawa = v20;
-        blitX = v14;
-        v22 = (v16 - v19) / 2;
-        v47 = v22;
-        v23 = v14 + (signed int)(v52 - v20) / 2;
-        v24 = v15 + v22;
-        v54 = v24;
-        if ( v14 <= v23 )
-            blitX = v14 + (signed int)(v52 - v20) / 2;
-        blitY = v15;
-        if ( v15 <= v24 )
-            blitY = v24;
-        v26 = v52 + v14;
-        v27 = v23 + redrawa;
-        v48 = v26;
-        if ( v26 < (signed int)(v23 + redrawa) )
-            v27 = v26;
-        v56 = v27 - blitX;
-        v28 = v15 + v53;
-        redrawb = v15 + v53;
-        if ( v15 + v53 >= v45 + v54 )
-            v28 = v45 + v54;
-        drawRect.height = v28 - blitY;
-        drawRect.x = blitX - v23;
-        drawRect.width = v56;
-        drawRect.y = blitY - v54;
-        stdDisplay_VBufferCopy(vbuf, elementa->mipSurfaces[v46], blitX, blitY, &drawRect, 1);
-        bitmapIndices2 = element->uiBitmaps;
-        elementb = (jkGuiStringEntry *)element->selectedTextEntry;
-        sliderBackgroundBitmap2 = menu->ui_structs[*bitmapIndices2];
-        v32 = 0;
-        v33 = element->rect.width;
-        if ( sliderBackgroundBitmap2 )
-        {
-            v33 = (*sliderBackgroundBitmap2->mipSurfaces)->format.width;
-            v32 = (element->rect.width - v33) / 2;
-        }
-        sliderThumbBitmap2 = menu->ui_structs[bitmapIndices2[1]];
-        if ( sliderThumbBitmap2 )
-        {
-            v33 -= (*sliderThumbBitmap2->mipSurfaces)->format.width;
-            v32 += sliderThumbBitmap2->xPos;
-        }
-        if ( (signed int)elementb < 0 )
-        {
-            elementb = 0;
-        }
-        else if ( (signed int)elementb > (uint32_t)element->extraInt )
-        {
-            elementb = element->unistr;
-        }
-        v35 = element->rect.x + v32 + v33 * (signed int)elementb / (uint32_t)element->extraInt;
-        blitX2 = blit_x;
-        blitY2 = blit_y;
-        v38 = v44->mipSurfaces[v43];
-        v39 = blit_y + v47 + v44->yPos;
-        v40 = v38->format.width;
-        v55 = v38->format.height;
-        if ( (signed int)blit_x <= v35 )
-            blitX2 = v35;
-        if ( blit_y <= v39 )
-            blitY2 = v39;
-        v41 = v35 + v40;
-        if ( v48 < (signed int)(v35 + v40) )
-            v41 = v48;
-        v56 = v41 - blitX2;
-        v42 = v39 + v55;
-        if ( redrawb < v39 + v55 )
-            v42 = redrawb;
-        drawRect.width = v56;
-        drawRect.height = v42 - blitY2;
-        drawRect.x = blitX2 - v35;
-        drawRect.y = blitY2 - v39;
-        stdDisplay_VBufferCopy(vbuf, v44->mipSurfaces[v43], blitX2, blitY2, &drawRect, 1);
+        v6 = 1;
+        v43 = 1;
     }
+    if ( redraw )
+        jkGuiRend_CopyVBuffer(menu, &element->rect);
+    v12 = sliderBackgroundBitmap->numMips;
+    if ( v6 > v12 - 1 )
+        v6 = v12 - 1;
+    v13 = sliderThumbBitmap->numMips;
+    if ( v43 > v13 - 1 )
+        v43 = v13 - 1;
+    v46 = v6;
+    v14 = element->rect.x;
+    blit_x = v14;
+    v15 = element->rect.y;
+    blit_y = v15;
+    v52 = element->rect.width;
+    v16 = element->rect.height;
+    v17 = elementa->mipSurfaces;
+    v53 = v16;
+    v18 = v17[v6];
+    v19 = v18->format.height;
+    v20 = v18->format.width;
+    v45 = v19;
+    redrawa = v20;
+    blitX = v14;
+    v22 = (v16 - v19) / 2;
+    v47 = v22;
+    v23 = v14 + (signed int)(v52 - v20) / 2;
+    v24 = v15 + v22;
+    v54 = v24;
+    if ( v14 <= v23 )
+        blitX = v14 + (signed int)(v52 - v20) / 2;
+    blitY = v15;
+    if ( v15 <= v24 )
+        blitY = v24;
+    v26 = v52 + v14;
+    v27 = v23 + redrawa;
+    v48 = v26;
+    if ( v26 < (signed int)(v23 + redrawa) )
+        v27 = v26;
+    v56 = v27 - blitX;
+    v28 = v15 + v53;
+    redrawb = v15 + v53;
+    if ( v15 + v53 >= v45 + v54 )
+        v28 = v45 + v54;
+    drawRect.height = v28 - blitY;
+    drawRect.x = blitX - v23;
+    drawRect.width = v56;
+    drawRect.y = blitY - v54;
+    stdDisplay_VBufferCopy(vbuf, elementa->mipSurfaces[v46], blitX, blitY, &drawRect, 1);
+    bitmapIndices2 = element->uiBitmaps;
+    elementb = element->selectedTextEntry;
+    sliderBackgroundBitmap2 = menu->ui_structs[*bitmapIndices2];
+    v32 = 0;
+    v33 = element->rect.width;
+    if ( sliderBackgroundBitmap2 )
+    {
+        v33 = (*sliderBackgroundBitmap2->mipSurfaces)->format.width;
+        v32 = (element->rect.width - v33) / 2;
+    }
+    sliderThumbBitmap2 = menu->ui_structs[bitmapIndices2[1]];
+    if ( sliderThumbBitmap2 )
+    {
+        v33 -= (*sliderThumbBitmap2->mipSurfaces)->format.width;
+        v32 += sliderThumbBitmap2->xPos;
+    }
+    if ( elementb < 0 )
+    {
+        elementb = 0;
+    }
+    else if ( elementb > (uint32_t)element->extraInt )
+    {
+        elementb = element->extraInt;
+    }
+    v35 = element->rect.x + v32 + v33 * elementb / (uint32_t)element->extraInt;
+    blitX2 = blit_x;
+    blitY2 = blit_y;
+    v38 = v44->mipSurfaces[v43];
+    v39 = blit_y + v47 + v44->yPos;
+    v40 = v38->format.width;
+    v55 = v38->format.height;
+    if ( (signed int)blit_x <= v35 )
+        blitX2 = v35;
+    if ( blit_y <= v39 )
+        blitY2 = v39;
+    v41 = v35 + v40;
+    if ( v48 < (signed int)(v35 + v40) )
+        v41 = v48;
+    v56 = v41 - blitX2;
+    v42 = v39 + v55;
+    if ( redrawb < v39 + v55 )
+        v42 = redrawb;
+    drawRect.width = v56;
+    drawRect.height = v42 - blitY2;
+    drawRect.x = blitX2 - v35;
+    drawRect.y = blitY2 - v39;
+    stdDisplay_VBufferCopy(vbuf, v44->mipSurfaces[v43], blitX2, blitY2, &drawRect, 1);
 }
 
 int jkGuiRend_TextBoxEventHandler(jkGuiElement *element, jkGuiMenu *menu, int eventType, int a4)
 {
     jkGuiElement *v5; // esi
-    uint16_t v6; // bx
     jkGuiStringEntry *v7; // edi
     int v8; // eax
-    int v9; // ebp
-    int v10; // ST08_4
     int v11; // eax
     int v12; // eax
     jkGuiMenu *v13; // ST08_4
@@ -2194,7 +2190,6 @@ int jkGuiRend_TextBoxEventHandler(jkGuiElement *element, jkGuiMenu *menu, int ev
     else if ( eventType == JKGUI_EVENT_CHAR )
     {
         v5 = element;
-        v6 = a4;
         v7 = element->unistr;
         if ( (uint16_t)a4 == VK_BACK )
         {
@@ -2208,12 +2203,10 @@ int jkGuiRend_TextBoxEventHandler(jkGuiElement *element, jkGuiMenu *menu, int ev
 
         else if ( stdFont_sub_4355B0(menu->fonts[element->textType], a4) )
         {
-            v9 = v5->selectedTextEntry;
-            if ( _wcslen((const wchar_t *)v7) < v9 - 1 )
+            if ( _wcslen((const wchar_t *)v7) < v5->selectedTextEntry - 1 )
             {
-                v10 = v5->texInfo.textHeight;
-                element = (jkGuiElement *)v6;
-                stdString_wstrncat((wchar_t *)v7, v9, v10, (wchar_t *)&element);
+                wchar_t tmp_wchar[2] = {a4, 0}; // Added: ensure null terminator
+                stdString_wstrncat((wchar_t *)v7, v5->selectedTextEntry, v5->texInfo.textHeight, tmp_wchar);
                 v11 = v5->texInfo.textHeight + 1;
                 if ( v11 >= v5->selectedTextEntry - 1 )
                     v11 = v5->selectedTextEntry - 1;
@@ -2233,10 +2226,10 @@ int jkGuiRend_TextBoxEventHandler(jkGuiElement *element, jkGuiMenu *menu, int ev
 
 void jkGuiRend_TextBoxDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw)
 {
-    wchar_t *v4; // edi
+    const wchar_t *v4; // edi
     int v9; // ecx
     int v10; // ecx
-    wchar_t *v11; // edi
+    const wchar_t *v11; // edi
     int v14; // edx
     int v15; // eax
     int v16; // edx
@@ -2257,15 +2250,12 @@ void jkGuiRend_TextBoxDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *v
     if (element->texInfo.numTextEntries > element->texInfo.textHeight)
         element->texInfo.numTextEntries = element->texInfo.textHeight;
     v10 = element->texInfo.numTextEntries;
+    v14 = element->texInfo.textHeight - v10 + 1;
     v11 = &v4[v10];
-    if ( stdFont_sub_435810(menu->fonts[element->textType], v11, element->texInfo.textHeight - v10 + 1) > element->rect.width - 6 )
+    while ( stdFont_sub_435810(menu->fonts[element->textType], v11, v14) > element->rect.width - 6 )
     {
-        do
-        {
-            ++v11;
-            v14 = element->texInfo.textHeight - element->texInfo.numTextEntries++;
-        }
-        while ( stdFont_sub_435810(menu->fonts[element->textType], v11, v14) > element->rect.width - 6 );
+        ++v11;
+        v14 = element->texInfo.textHeight - element->texInfo.numTextEntries++;
     }
     stdFont_Draw1(vbuf, menu->fonts[element->textType], element->rect.x + 3, element->rect.y + 3, element->rect.width - 3, v11, 1);
     if ( menu->focusedElement == element )

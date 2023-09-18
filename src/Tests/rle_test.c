@@ -4,9 +4,12 @@
 #include <stdio.h>
 
 #include "General/stdBitmapRle.h"
+#include "General/stdFnames.h"
+#include "Engine/rdColormap.h"
 #include "Main/Main.h"
 #include "stdPlatform.h"
 #include "Platform/GL/jkgm.h"
+#include "Win95/std.h"
 
 static HostServices hs;
 

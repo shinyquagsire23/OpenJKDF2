@@ -1794,14 +1794,14 @@ typedef struct HostServicesBasic
     stdFile_t (*fileOpen)(const char *, const char *);
     int (*fileClose)(stdFile_t);
     size_t (*fileRead)(stdFile_t, void *, size_t);
-    char *(*fileGets)(stdFile_t, char *, size_t);
+    const char *(*fileGets)(stdFile_t, char *, size_t);
     size_t (*fileWrite)(stdFile_t, void *, size_t);
     int (*feof)(stdFile_t);
     int (*ftell)(stdFile_t);
     int (*fseek)(stdFile_t, int, int);
     int (*fileSize)(stdFile_t);
     int (*filePrintf)(stdFile_t, const char*, ...);
-    wchar_t* (*fileGetws)(stdFile_t, wchar_t *, size_t);
+    const wchar_t* (*fileGetws)(stdFile_t, wchar_t *, size_t);
 } HostServicesBasic;
 
 typedef struct HostServices
@@ -1821,14 +1821,14 @@ typedef struct HostServices
     stdFile_t (*fileOpen)(const char *, const char *);
     int (*fileClose)(stdFile_t);
     size_t (*fileRead)(stdFile_t, void *, size_t);
-    char *(*fileGets)(stdFile_t, char *, size_t);
+    const char *(*fileGets)(stdFile_t, char *, size_t);
     size_t (*fileWrite)(stdFile_t, void *, size_t);
     int (*feof)(stdFile_t);
     int (*ftell)(stdFile_t);
     int (*fseek)(stdFile_t, int, int);
     int (*fileSize)(stdFile_t);
     int (*filePrintf)(stdFile_t, const char*, ...);
-    wchar_t* (*fileGetws)(stdFile_t, wchar_t *, size_t);
+    const wchar_t* (*fileGetws)(stdFile_t, wchar_t *, size_t);
     void* (*allocHandle)(size_t);
     void (*freeHandle)(void*);
     void* (*reallocHandle)(void*, size_t);

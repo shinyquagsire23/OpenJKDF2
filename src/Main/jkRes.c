@@ -567,22 +567,22 @@ size_t jkRes_FileWrite(stdFile_t fd, void* out, size_t len)
         return 0; // GOB has no write function
 }
 
-char* jkRes_FileGets(stdFile_t fd, char* a2,size_t a3)
+const char* jkRes_FileGets(stdFile_t fd, char* str, size_t n)
 {
     jkResFile* resFile = &jkRes_aFiles[fd - 1];
-    if ( resFile->useLowLevel )
-        return pLowLevelHS->fileGets(resFile->fsHandle, a2, a3);
+    if (resFile->useLowLevel)
+        return pLowLevelHS->fileGets(resFile->fsHandle, str, n);
     else
-        return stdGob_FileGets(resFile->gobHandle, a2, a3);
+        return stdGob_FileGets(resFile->gobHandle, str, n);
 }
 
-wchar_t* jkRes_FileGetws(stdFile_t fd, wchar_t* a2, size_t a3)
+const wchar_t* jkRes_FileGetws(stdFile_t fd, wchar_t* wstr, size_t n)
 {
     jkResFile* resFile = &jkRes_aFiles[fd - 1];
-    if ( resFile->useLowLevel )
-        return pLowLevelHS->fileGetws(resFile->fsHandle, a2, a3);
+    if (resFile->useLowLevel)
+        return pLowLevelHS->fileGetws(resFile->fsHandle, wstr, n);
     else
-        return stdGob_FileGetws(resFile->gobHandle, a2, a3);
+        return stdGob_FileGetws(resFile->gobHandle, wstr, n);
 }
 
 int jkRes_FEof(stdFile_t fd)

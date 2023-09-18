@@ -60,11 +60,11 @@ enum jkGuiModsButton_t
     JKGUIMODS_BTN_OPENRESOURCEFOLDER = 10,
 };
 
-static uint32_t jkGuiMods_listboxIdk[2] = {0xd, 0xe};
+static int jkGuiMods_listboxBitmapIndices[2] = {14, 15};
 
 static jkGuiElement jkGuiMods_aElements[9] = {
     {ELEMENT_TEXT, 0, 5, L"Expansions & Mods", 3, {0, 30, 640, 60}, 1, 0, 0, 0, 0, 0, {0}, 0},
-    {ELEMENT_LISTBOX, JKGUIMODS_BTN_LISTCLICK, 2, 0, 0, {80, 135, 480, 240}, 1, 0, 0, 0, 0, jkGuiMods_listboxIdk, {0}, 0},
+    {ELEMENT_LISTBOX, JKGUIMODS_BTN_LISTCLICK, 2, 0, 0, {80, 135, 480, 240}, 1, 0, 0, 0, 0, jkGuiMods_listboxBitmapIndices, {0}, 0},
     
     {ELEMENT_TEXT, 0, 2, L"This menu is slightly functional.", 3, {160, 100, 320, 30}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON, JKGUIMODS_BTN_OPENRESOURCEFOLDER, 2, L"Open Resource Folder", 3, {160, 380, 320, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},

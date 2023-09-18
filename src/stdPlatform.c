@@ -95,7 +95,7 @@ static size_t Linux_stdFileWrite(stdFile_t fhand, void* dst, size_t len)
     return fwrite(dst, 1, len, (void*)fhand);
 }
 
-static char* Linux_stdFileGets(stdFile_t fhand, char* dst, size_t len)
+static const char* Linux_stdFileGets(stdFile_t fhand, char* dst, size_t len)
 {
     return fgets(dst, len, (void*)fhand);
 }

@@ -41,14 +41,10 @@ stdGob* stdGob_Load(char *fpath, int a2, int a3)
 
 int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
 {
-    unsigned int v4; // ebx
     int v8; // edx
     stdGobFile *v9; // eax
-    stdGobEntry *ent; // edi
     stdGobHeader header; // [esp+10h] [ebp-Ch]
 
-
-    v4 = 0;
     _strncpy(gob->fpath, fname, 0x7Fu);
     gob->fpath[127] = 0;
     gob->numFilesOpen = a3;
@@ -114,18 +110,11 @@ int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
     // Added
     _memset(gob->entries, 0, sizeof(stdGobEntry) * gob->numFiles);
 
-    ent = gob->entries;
     gob->entriesHashtable = stdHashTable_New(1024);
-    if ( gob->numFiles > 0u )
+    for (int v4 = 0; v4 < gob->numFiles; v4++)
     {
-        do
-        {
-            pGobHS->fileRead(gob->fhand, ent, sizeof(stdGobEntry));
-            stdHashTable_SetKeyVal(gob->entriesHashtable, ent->fname, ent);
-            ++ent;
-            ++v4;
-        }
-        while ( v4 < gob->numFiles );
+        pGobHS->fileRead(gob->fhand, &gob->entries[v4], sizeof(stdGobEntry));
+        stdHashTable_SetKeyVal(gob->entriesHashtable, gob->entries[v4].fname, &gob->entries[v4]);
     }
 
     jk_printf("Loaded GOB file `%s`...\n", fname);

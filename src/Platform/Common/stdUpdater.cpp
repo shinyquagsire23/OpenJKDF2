@@ -42,7 +42,7 @@ int stdUpdater_bTestUpdate = 0;
 char stdUpdater_pUpdaterUrl[SITHCVAR_MAX_STRLEN];
 char stdUpdater_pWin64UpdateFilename[SITHCVAR_MAX_STRLEN];
 char stdUpdater_pMacosUpdateFilename[SITHCVAR_MAX_STRLEN];
-char* stdUpdater_pUpdateFilename = "";
+char* stdUpdater_pUpdateFilename = (char*)"";
 
 void stdUpdater_StartupCvars()
 {
