@@ -1,5 +1,6 @@
 #include "sithCogFunctionAI.h"
 
+#include "General/stdMath.h" 
 #include "Gameplay/sithTime.h"
 #include "AI/sithAI.h"
 #include "AI/sithAIClass.h"
@@ -9,7 +10,7 @@
 
 void sithCogFunctionAI_AISetMoveSpeed(sithCog *ctx)
 {
-    double moveSpeed = stdMath_Clamp(sithCogExec_PopFlex(ctx), 0.0, 2.0);
+    float moveSpeed = stdMath_Clamp(sithCogExec_PopFlex(ctx), 0.0, 2.0);
     sithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing && pThing->thingtype == SITH_THING_ACTOR && pThing->actor)
     {
