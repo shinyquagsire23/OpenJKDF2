@@ -127,7 +127,7 @@ void sithAI_Shutdown()
     // Added: Clean reset
     sithAI_commandsHashmap = NULL;
     sithAI_maxActors = 0;
-    memset(sithAI_actorInitted, 0, sizeof(sithAI_actorInitted));
+    _memset(sithAI_actorInitted, 0, sizeof(sithAI_actorInitted));
     sithAI_bOpened = 0;
     sithAI_bInit = 0;
     sithAI_commandList = NULL;
@@ -142,8 +142,8 @@ void sithAI_Shutdown()
     sithAI_dword_84DE74 = 0;
 
     // These are located in a different part of .data?
-    memset(sithAI_aAlignments, 0, sizeof(sithAI_aAlignments));
-    memset(sithAI_actors, 0, sizeof(sithAI_actors));
+    _memset(sithAI_aAlignments, 0, sizeof(sithAI_aAlignments));
+    _memset(sithAI_actors, 0, sizeof(sithAI_actors));
     sithAI_inittedActors = 0;
 
     // This is also in a different part
