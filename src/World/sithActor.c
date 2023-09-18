@@ -167,44 +167,40 @@ LABEL_32:
 
 void sithActor_HurtSound(sithThing *thing, float amount, int hurtType)
 {
-    double v3; // st7
-    float v4; // [esp+8h] [ebp+8h]
+    if ( thing->actorParams.health <= 0.0 || amount < 3.0 ) return;
 
-    if ( thing->actorParams.health > 0.0 && amount >= 3.0 )
+
+    float hurt_vol = amount / thing->actorParams.health * 1.5;
+    if (hurt_vol >= 0.01)
     {
-        v3 = amount / thing->actorParams.health * 1.5;
-        v4 = v3;
-        if ( v3 >= 0.01 )
+        if (hurt_vol < 0.0)
         {
-            if ( v4 < 0.0 )
-            {
-                v4 = 0.0;
-            }
-            else if ( v4 > 1.0 )
-            {
-                v4 = 1.0;
-            }
-            switch ( hurtType )
-            {
-                case 2:
-                    sithSoundClass_ThingPlaySoundclass5(thing, SITH_SC_HURTENERGY, v4);
-                    break;
-                case 4:
-                    sithSoundClass_ThingPlaySoundclass5(thing, SITH_SC_HURTFIRE, v4);
-                    break;
-                case 8:
-                    sithSoundClass_ThingPlaySoundclass5(thing, SITH_SC_HURTMAGIC, v4);
-                    break;
-                case 16:
-                    sithSoundClass_ThingPlaySoundclass5(thing, SITH_SC_HURTSPECIAL, v4);
-                    break;
-                case 32:
-                    sithSoundClass_ThingPlaySoundclass5(thing, SITH_SC_DROWNING, v4);
-                    break;
-                default:
-                    sithSoundClass_ThingPlaySoundclass5(thing, SITH_SC_HURTIMPACT, v4);
-                    break;
-            }
+            hurt_vol = 0.0;
+        }
+        else if (hurt_vol > 1.0)
+        {
+            hurt_vol = 1.0;
+        }
+        switch ( hurtType )
+        {
+            case SITH_DAMAGE_ENERGY:
+                sithSoundClass_ThingPlaySoundclass5(thing, SITH_SC_HURTENERGY, hurt_vol);
+                break;
+            case SITH_DAMAGE_FIRE:
+                sithSoundClass_ThingPlaySoundclass5(thing, SITH_SC_HURTFIRE, hurt_vol);
+                break;
+            case SITH_DAMAGE_FORCE:
+                sithSoundClass_ThingPlaySoundclass5(thing, SITH_SC_HURTMAGIC, hurt_vol);
+                break;
+            case SITH_DAMAGE_SABER:
+                sithSoundClass_ThingPlaySoundclass5(thing, SITH_SC_HURTSPECIAL, hurt_vol);
+                break;
+            case SITH_DAMAGE_DROWN:
+                sithSoundClass_ThingPlaySoundclass5(thing, SITH_SC_DROWNING, hurt_vol);
+                break;
+            default:
+                sithSoundClass_ThingPlaySoundclass5(thing, SITH_SC_HURTIMPACT, hurt_vol);
+                break;
         }
     }
 }
@@ -279,9 +275,9 @@ void sithActor_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4)
             int old_typeflags = thing->actorParams.typeflags;
 
             // MOTS added: quiet death
-            if ((!Main_bMotsCompat || a4 != 12345678) && (old_typeflags & SITH_AF_EXPLODE_WHEN_KILLED) != 0 && (v8 = thing->actorParams.templateExplode) != 0 )
+            if ((!Main_bMotsCompat || a4 != 12345678) && (old_typeflags & SITH_AF_EXPLODE_WHEN_KILLED) && thing->actorParams.templateExplode)
             {
-                sithThing_Create(v8, &thing->position, &thing->lookOrientation, thing->sector, 0);
+                sithThing_Create(thing->actorParams.templateExplode, &thing->position, &thing->lookOrientation, thing->sector, 0);
                 sithThing_Destroy(thing);
             }
             else
@@ -307,17 +303,16 @@ void sithActor_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4)
 
 int sithActor_sub_4ED1D0(sithThing *thing, sithSurface *surface, sithCollisionSearchEntry *searchEnt)
 {
-    int v3; // edi
-
-    v3 = sithCollision_DefaultHitHandler(thing, surface, searchEnt);
-    if ( v3 && thing->thingtype == SITH_THING_ACTOR )
+    int ret = sithCollision_DefaultHitHandler(thing, surface, searchEnt);
+    if (ret && thing->thingtype == SITH_THING_ACTOR) {
         sithAI_SetActorFireTarget(thing->actor, SITHAI_MODE_ACTIVE, 0);
-    return v3;
+    }
+    return ret;
 }
 
 void sithActor_MoveJointsForEyePYR(sithThing *actor, const rdVector3 *eyePYR)
 {
-    sithAnimclass *v3; // eax
+    sithAnimclass *pAnimClass; // eax
     rdVector3 *v4; // ebx
     int torsoIdx; // esi
     int primaryWeapJointIdx; // ebp
@@ -329,102 +324,91 @@ void sithActor_MoveJointsForEyePYR(sithThing *actor, const rdVector3 *eyePYR)
     int v12; // ecx
     int v13; // ecx
     int v14; // ecx
-    rdVector3 *actora; // [esp+14h] [ebp+4h]
 
     actor->actorParams.typeflags &= ~SITH_AF_HEAD_IS_CENTERED;
     actor->actorParams.eyePYR = *eyePYR;
-    v3 = actor->animclass;
-    if ( v3 )
+    pAnimClass = actor->animclass;
+    if (!pAnimClass || actor->rdthing.type != RD_THINGTYPE_MODEL) return;
+
+
+    v4 = actor->rdthing.hierarchyNodes2;
+    if (v4)
     {
-        if ( actor->rdthing.type == RD_THINGTYPE_MODEL )
+        torsoIdx = pAnimClass->bodypart_to_joint[JOINTTYPE_TORSO];
+        primaryWeapJointIdx = pAnimClass->bodypart_to_joint[JOINTTYPE_PRIMARYWEAPJOINT];
+        v7 = actor->rdthing.model3->numHierarchyNodes;
+        neckIdx = pAnimClass->bodypart_to_joint[JOINTTYPE_NECK];
+        v9 = pAnimClass->bodypart_to_joint[JOINTTYPE_SECONDARYWEAPJOINT];
+        v10 = v7 - 1;
+        if ( neckIdx < 0 )
         {
-            actora = actor->rdthing.hierarchyNodes2;
-            v4 = actora;
-            if ( actora )
-            {
-                torsoIdx = v3->bodypart_to_joint[JOINTTYPE_TORSO];
-                primaryWeapJointIdx = v3->bodypart_to_joint[JOINTTYPE_PRIMARYWEAPJOINT];
-                v7 = actor->rdthing.model3->numHierarchyNodes;
-                neckIdx = v3->bodypart_to_joint[JOINTTYPE_NECK];
-                v9 = v3->bodypart_to_joint[JOINTTYPE_SECONDARYWEAPJOINT];
-                v10 = v7 - 1;
-                if ( neckIdx < 0 )
-                {
-                    v11 = 0;
-                }
-                else
-                {
-                    v11 = neckIdx <= v10;
-                    v4 = actora;
-                }
-                if ( v11 )
-                    v4[neckIdx].x = eyePYR->x * 0.5;
-                if ( torsoIdx < 0 )
-                    v12 = 0;
-                else
-                    v12 = torsoIdx <= v10;
-                if ( v12 )
-                    v4[torsoIdx].x = eyePYR->x * 0.5;
-                if ( primaryWeapJointIdx < 0 )
-                    v13 = 0;
-                else
-                    v13 = primaryWeapJointIdx <= v10;
-                if ( v13 )
-                    v4[primaryWeapJointIdx].x = eyePYR->x * 0.3;
-                if ( v9 < 0 )
-                    v14 = 0;
-                else
-                    v14 = v9 <= v10;
-                if ( v14 )
-                    v4[v9].x = eyePYR->x * 0.3;
-            }
+            v11 = 0;
+        }
+        else
+        {
+            v11 = neckIdx <= v10;
+        }
+        if ( v11 ) {
+            v4[neckIdx].x = eyePYR->x * 0.5;
+        }
+        if ( torsoIdx < 0 ) {
+            v12 = 0;
+        }
+        else {
+            v12 = torsoIdx <= v10;
+        }
+        if ( v12 ) {
+            v4[torsoIdx].x = eyePYR->x * 0.5;
+        }
+        if ( primaryWeapJointIdx < 0 ) {
+            v13 = 0;
+        }
+        else {
+            v13 = primaryWeapJointIdx <= v10;
+        }
+        if ( v13 ) {
+            v4[primaryWeapJointIdx].x = eyePYR->x * 0.3;
+        }
+        if ( v9 < 0 ) {
+            v14 = 0;
+        }
+        else {
+            v14 = v9 <= v10;
+        }
+        if ( v14 ) {
+            v4[v9].x = eyePYR->x * 0.3;
         }
     }
 }
 
 int sithActor_ActorActorCollide(sithThing *thing, sithThing *thing2, sithCollisionSearchEntry *a3, int a4)
 {
-    int result; // eax
-    int v5; // ebx
-    sithActor *v6; // eax
-    sithActor *v7; // eax
-
-    result = sithCollision_DebrisDebrisCollide(thing, thing2, a3, a4);
-    v5 = result;
-    if ( result )
+    int ret = sithCollision_DebrisDebrisCollide(thing, thing2, a3, a4);
+    if (ret)
     {
-        if ( thing->thingtype == SITH_THING_ACTOR )
+        if (thing->thingtype == SITH_THING_ACTOR && thing->actor)
         {
-            v6 = thing->actor;
-            if ( v6 )
-                sithAI_SetActorFireTarget(v6, SITHAI_MODE_SEARCHING, (intptr_t)thing2);
+            sithAI_SetActorFireTarget(thing->actor, SITHAI_MODE_SEARCHING, (intptr_t)thing2);
         }
-        if ( thing2->thingtype == SITH_THING_ACTOR )
+        if (thing2->thingtype == SITH_THING_ACTOR && thing2->actor)
         {
-            v7 = thing2->actor;
-            if ( v7 )
-                sithAI_SetActorFireTarget(v7, SITHAI_MODE_SEARCHING, (intptr_t)thing);
+            sithAI_SetActorFireTarget(thing2->actor, SITHAI_MODE_SEARCHING, (intptr_t)thing);
         }
-        result = v5;
     }
-    return result;
+    return ret;
 }
 
-void sithActor_RotateTurretToEyePYR(sithThing *a1)
+void sithActor_RotateTurretToEyePYR(sithThing* pThing)
 {
-    sithAnimclass *v1; // eax
-    int v2; // ecx
-    int v3; // eax
-
-    v1 = a1->animclass;
-    if ( v1 )
+    sithAnimclass* pAnimClass = pThing->animclass;
+    if (pAnimClass)
     {
-        v2 = v1->bodypart_to_joint[7];
-        v3 = v1->bodypart_to_joint[8];
-        if ( v2 >= 0 )
-            a1->rdthing.hierarchyNodes2[v2].x = a1->actorParams.eyePYR.x;
-        if ( v3 >= 0 )
-            a1->rdthing.hierarchyNodes2[v3].y = a1->actorParams.eyePYR.y;
+        int pitch_idx = pAnimClass->bodypart_to_joint[JOINTTYPE_TURRETPITCH];
+        int yaw_idx = pAnimClass->bodypart_to_joint[JOINTTYPE_TURRETYAW];
+        if (pitch_idx >= 0)
+            pThing->rdthing.hierarchyNodes2[pitch_idx].x = pThing->actorParams.eyePYR.x;
+        if (yaw_idx >= 0)
+            pThing->rdthing.hierarchyNodes2[yaw_idx].y = pThing->actorParams.eyePYR.y;
     }
 }
 
@@ -495,33 +479,31 @@ void sithActor_Remove(sithThing *thing)
 
 void sithActor_RemoveCorpse(sithThing *corpse)
 {
-    if (jkPlayer_bKeepCorpses || corpse->isVisible + 1 == bShowInvisibleThings ) // Added
+    // Added: retain corpses option
+    if (jkPlayer_bKeepCorpses || corpse->isVisible + 1 == bShowInvisibleThings ) {
         corpse->lifeLeftMs = 3000;
-    else
+    }
+    else {
         sithThing_Destroy(corpse);
+    }
 }
 
 int sithActor_LoadParams(stdConffileArg *arg, sithThing *thing, unsigned int param)
 {
-    sithThing *v3; // eax
     int result; // eax
-    sithThing *v5; // eax
     double v6; // st7
     double v9; // st7
     double v10; // st7
     double v11; // st7
     double v12; // st7
     int v13; // eax
-    sithThing *v14; // esi
-    sithThing *v16; // eax
-    sithThing *v18; // eax
     double v19; // st7
     double v20; // st7
     double v21; // st7
     float tmp;
     int tmpInt;
 
-    switch ( param )
+    switch (param)
     {
         case THINGPARAM_TYPEFLAGS:
             if ( _sscanf(arg->value, "%x", &tmpInt) != 1 )
@@ -561,16 +543,13 @@ int sithActor_LoadParams(stdConffileArg *arg, sithThing *thing, unsigned int par
             thing->actorParams.jumpSpeed = v12;
             return result;
         case THINGPARAM_WEAPON:
-            v3 = sithTemplate_GetEntryByName(arg->value);
-            thing->actorParams.templateWeapon = v3;
+            thing->actorParams.templateWeapon = sithTemplate_GetEntryByName(arg->value);
             return 1;
         case THINGPARAM_WEAPON2:
-            v5 = sithTemplate_GetEntryByName(arg->value);
-            thing->actorParams.templateWeapon2 = v5;
+            thing->actorParams.templateWeapon2 = sithTemplate_GetEntryByName(arg->value);
             return 1;
         case THINGPARAM_EXPLODE:
-            v18 = sithTemplate_GetEntryByName(arg->value);
-            thing->actorParams.templateExplode = v18;
+            thing->actorParams.templateExplode = sithTemplate_GetEntryByName(arg->value);
             return 1;
         case THINGPARAM_MAXHEALTH:
             v9 = _atof(arg->value);
@@ -613,7 +592,6 @@ LABEL_25:
             result = 1;
             break;
         case THINGPARAM_LIGHTOFFSET:
-            v14 = thing;
             if ( _sscanf(
                      arg->value,
                      "(%f/%f/%f)",
@@ -621,15 +599,14 @@ LABEL_25:
                      &thing->actorParams.lightOffset.y,
                      &thing->actorParams.lightOffset.z) != 3 )
                 goto LABEL_38;
-            v14->thingflags |= SITH_TF_LIGHT;
+            thing->thingflags |= SITH_TF_LIGHT;
             result = 1;
             break;
         case THINGPARAM_LIGHTINTENSITY:
             if ( _sscanf(arg->value, "%f", &tmp) != 1 )
                 return 0;
-            v16 = thing;
             thing->actorParams.lightIntensity = tmp;
-            v16->thingflags |= SITH_TF_LIGHT;
+            thing->thingflags |= SITH_TF_LIGHT;
             return 1;
         case THINGPARAM_ERROR:
             v19 = _atof(arg->value);
