@@ -34,21 +34,19 @@ void sithAIAwareness_Shutdown()
 
 int sithAIAwareness_AddEntry(sithSector *sector, rdVector3 *pos, int a3, float a4, sithThing *thing)
 {
-    int v6; // ecx
-    int v7; // eax
+    if (!sithAI_bOpened) {
+        return 0;
+    }
+    if (sithAIAwareness_numEntries == 32) {
+        return 0;
+    }
+    sithAIAwareness_aEntries[sithAIAwareness_numEntries].sector = sector;
+    rdVector_Copy3(&sithAIAwareness_aEntries[sithAIAwareness_numEntries].pos, pos);
+    sithAIAwareness_aEntries[sithAIAwareness_numEntries].field_14 = a3;
+    sithAIAwareness_aEntries[sithAIAwareness_numEntries].field_18 = a4;
+    sithAIAwareness_aEntries[sithAIAwareness_numEntries].thing = thing;
 
-    if ( !sithAI_bOpened )
-        return 0;
-    v6 = sithAIAwareness_numEntries;
-    if ( sithAIAwareness_numEntries == 32 )
-        return 0;
-    v7 = sithAIAwareness_numEntries;
-    sithAIAwareness_aEntries[v7].sector = sector;
-    sithAIAwareness_numEntries = v6 + 1;
-    rdVector_Copy3(&sithAIAwareness_aEntries[v6].pos, pos);
-    sithAIAwareness_aEntries[v7].field_14 = a3;
-    sithAIAwareness_aEntries[v7].field_18 = a4;
-    sithAIAwareness_aEntries[v7].thing = thing;
+    sithAIAwareness_numEntries++;
 
     return 1;
 }
@@ -56,12 +54,14 @@ int sithAIAwareness_AddEntry(sithSector *sector, rdVector3 *pos, int a3, float a
 int sithAIAwareness_Tick(int a, sithEventInfo* b)
 {
     // Added: co-op
-    if (sithNet_isMulti && !sithNet_isServer)
+    if (sithNet_isMulti && !sithNet_isServer) {
         return 1;
+    }
 
     ++sithAIAwareness_timerTicks;
-    if ( !sithAIAwareness_numEntries )
+    if (!sithAIAwareness_numEntries) {
         return 1;
+    }
 
     for (size_t v1 = 0; v1 < sithAIAwareness_numEntries; v1++)
     {
@@ -108,21 +108,21 @@ void sithAIAwareness_sub_4F2C30(sithSectorEntry *pSectorEntry, sithSector *pSect
     OPENJKDF2_WARN_NULL_AND_RETURN(pPos2);
 
     sithSectorAlloc* pSectorAlloc = &sithAIAwareness_aSectors[pSector->id];
-    if ( pSectorAlloc->field_0 != sithAIAwareness_timerTicks )
+    if (pSectorAlloc->field_0 != sithAIAwareness_timerTicks)
     {
         _memset(pSectorAlloc, 0, sizeof(sithSectorAlloc));
         pSectorAlloc->field_0 = sithAIAwareness_timerTicks;
     }
 
-    if ( pSectorAlloc->field_4[pSectorEntry->field_14] < (double)a5 )
+    if (pSectorAlloc->field_4[pSectorEntry->field_14] < (double)a5)
     {
         pSectorAlloc->field_4[pSectorEntry->field_14] = a5;
         pSectorAlloc->field_10[pSectorEntry->field_14] = *pPos1;
         pSectorAlloc->field_34[pSectorEntry->field_14] = *pPos2;
         pSectorAlloc->field_58[pSectorEntry->field_14] = pThing;
-        if ( a6 > 0.0 )
+        if (a6 > 0.0)
         {
-            for (sithAdjoin* i = pSector->adjoins; i; i = i->next )
+            for (sithAdjoin* i = pSector->adjoins; i; i = i->next)
             {
                 float a6a = (i->mirror ? a6 - i->mirror->dist : a6);
 

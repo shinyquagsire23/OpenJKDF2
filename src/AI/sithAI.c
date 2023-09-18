@@ -57,7 +57,6 @@ float sithAI_FLOAT_005a79d8 = 1.0;
 
 int sithAI_Startup()
 {
-    int v0; // ebx
     int v1; // edx
     int *v2; // ebp
     sithActor *v3; // esi
@@ -79,7 +78,6 @@ int sithAI_Startup()
 
     sithAICmd_Startup();
 
-    v0 = sithAI_inittedActors;
     _memset(sithAI_actors, 0, sizeof(sithActor) * SITHAI_MAX_ACTORS);
 
     v1 = SITHAI_MAX_ACTORS-1;
@@ -90,7 +88,7 @@ int sithAI_Startup()
     do
     {
         _memset(v3, 0, sizeof(sithActor));
-        if ( v1 == v0 )
+        if ( v1 == sithAI_inittedActors )
         {
             v4 = v1 - 1;
             if ( v1 - 1 >= 0 )
@@ -105,7 +103,6 @@ int sithAI_Startup()
                 }
                 while ( v4 >= 0 );
             }
-            v0 = v4;
             sithAI_inittedActors = v4;
         }
         *v2++ = v1;
