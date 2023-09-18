@@ -9,27 +9,11 @@
 
 void sithCogFunctionAI_AISetMoveSpeed(sithCog *ctx)
 {
-    double v2; // st7
-    sithThing *v3; // eax
-    sithActor *v4; // eax
-    float a1a; // [esp+8h] [ebp+4h]
-
-    v2 = sithCogExec_PopFlex(ctx);
-    a1a = v2;
-    if ( v2 < 0.0 )
+    double moveSpeed = stdMath_Clamp(sithCogExec_PopFlex(ctx), 0.0, 2.0);
+    sithThing* pThing = sithCogExec_PopThing(ctx);
+    if (pThing && pThing->thingtype == SITH_THING_ACTOR && pThing->actor)
     {
-        a1a = 0.0;
-    }
-    else if ( a1a > 2.0 )
-    {
-        a1a = 2.0;
-    }
-    v3 = sithCogExec_PopThing(ctx);
-    if ( v3 && v3->thingtype == SITH_THING_ACTOR )
-    {
-        v4 = v3->actor;
-        if ( v4 )
-            v4->moveSpeed = a1a;
+        pThing->actor->moveSpeed = moveSpeed;
     }
 }
 
@@ -41,19 +25,14 @@ void sithCogFunctionAI_SetMovePos(sithCog *ctx)
 
     if ( sithCogExec_PopVector3(ctx, &v3) )
     {
-        v1 = sithCogExec_PopThing(ctx);
+        sithThing* pThing = sithCogExec_PopThing(ctx);
         
         // Added
         if (g_debugmodeFlags & DEBUGFLAG_1) return;
         
-        if ( v1 )
+        if (pThing && pThing->thingtype == SITH_THING_ACTOR && pThing->actor)
         {
-            if ( v1->thingtype == SITH_THING_ACTOR )
-            {
-                v2 = v1->actor;
-                if ( v2 )
-                    sithAI_SetMoveThing(v2, &v3, v2->moveSpeed);
-            }
+            sithAI_SetMoveThing(pThing->actor, &v3, pThing->actor->moveSpeed);
         }
     }
 }
