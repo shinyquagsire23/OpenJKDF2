@@ -23,7 +23,8 @@ void sithCogFunctionAI_SetMovePos(sithCog *ctx)
     sithActor *v2; // eax
     rdVector3 v3; // [esp+4h] [ebp-Ch] BYREF
 
-    if ( sithCogExec_PopVector3(ctx, &v3) )
+    // TODO: Bug? If the vector is invalid, other args will never get popped.
+    if (sithCogExec_PopVector3(ctx, &v3))
     {
         sithThing* pThing = sithCogExec_PopThing(ctx);
         
@@ -120,11 +121,12 @@ void sithCogFunctionAI_AISetLookPos(sithCog *ctx)
     sithActor *v2; // eax
     rdVector3 v3; // [esp+4h] [ebp-Ch] BYREF
 
+    // TODO: Bug? If the vector is invalid, other args will never get popped.
     if ( sithCogExec_PopVector3(ctx, &v3) )
     {
         v1 = sithCogExec_PopThing(ctx);
         
-        // Added
+        // Added: Fully disable AI including cog verbs
         if (g_debugmodeFlags & DEBUGFLAG_1) return;
         
         if ( v1 )
