@@ -109,273 +109,29 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 if(PLAT_LINUX_32)
-    message( STATUS "Targeting Linux 32-bit" )
-    set(BIN_NAME "openjkdf2")
-    
-    add_definitions(-D_XOPEN_SOURCE=500)
-    add_definitions(-D_DEFAULT_SOURCE)
-
-    set(TARGET_USE_PHYSFS TRUE)
-    set(TARGET_USE_GAMENETWORKINGSOCKETS TRUE)
-    set(TARGET_USE_LIBSMACKER TRUE)
-    set(TARGET_USE_LIBSMUSHER TRUE)
-    set(TARGET_USE_SDL2 TRUE)
-    set(TARGET_USE_OPENGL TRUE)
-    set(TARGET_USE_OPENAL TRUE)
-    set(TARGET_POSIX TRUE)
-    set(TARGET_LINUX TRUE)
-    set(TARGET_NO_BLOBS TRUE)
-    set(TARGET_CAN_JKGM TRUE)
-    set(OPENJKDF2_NO_ASAN TRUE)
-    set(TARGET_USE_CURL TRUE)
-
-    if(OPENJKDF2_USE_BLOBS)
-        set(TARGET_NO_BLOBS FALSE)
-    endif()
-    
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -fshort-wchar -Werror=implicit-function-declaration -Wno-unused-variable -Wno-parentheses")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fshort-wchar -Werror=implicit-function-declaration -Wno-unused-variable -Wno-parentheses")
-    add_link_options(-fshort-wchar)
-
+    include(cmake_modules/plat_linux_32.cmake)
 elseif(PLAT_LINUX_64)
-    message( STATUS "Targeting Linux 64-bit" )
-    set(BIN_NAME "openjkdf2")
-
-    add_definitions(-DARCH_64BIT)
-    add_definitions(-D_XOPEN_SOURCE=500)
-    add_definitions(-D_DEFAULT_SOURCE)
-
-    set(TARGET_USE_PHYSFS TRUE)
-    set(TARGET_USE_GAMENETWORKINGSOCKETS TRUE)
-    set(TARGET_USE_LIBSMACKER TRUE)
-    set(TARGET_USE_LIBSMUSHER TRUE)
-    set(TARGET_USE_SDL2 TRUE)
-    set(TARGET_USE_OPENGL TRUE)
-    set(TARGET_USE_OPENAL TRUE)
-    set(TARGET_POSIX TRUE)
-    set(TARGET_LINUX TRUE)
-    set(TARGET_NO_BLOBS TRUE)
-    set(TARGET_CAN_JKGM TRUE)
-    set(OPENJKDF2_NO_ASAN TRUE)
-    set(TARGET_USE_CURL TRUE)
-    
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -fshort-wchar -Werror=implicit-function-declaration -Wno-unused-variable -Wno-parentheses ")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fshort-wchar -Werror=implicit-function-declaration -Wno-unused-variable -Wno-parentheses ")
-    add_link_options(-fshort-wchar)
-
+    include(cmake_modules/plat_linux_64.cmake)
 elseif(PLAT_MACOS)
-    message( STATUS "Targeting MacOS" )
-    set(BIN_NAME "openjkdf2-64")
-
-    add_definitions(-DARCH_64BIT)
-
-    # macOS specific options
-    set(MACOSX_DEPLOYMENT_TARGET "10.15" CACHE STRING "Minimum OS X deployment version" FORCE)
-
-    set(TARGET_USE_PHYSFS TRUE)
-    #set(TARGET_USE_BASICSOCKETS TRUE)
-    set(TARGET_USE_GAMENETWORKINGSOCKETS TRUE)
-    set(TARGET_USE_LIBSMACKER TRUE)
-    set(TARGET_USE_LIBSMUSHER TRUE)
-    set(TARGET_USE_SDL2 TRUE)
-    set(TARGET_USE_OPENGL TRUE)
-    set(TARGET_USE_OPENAL TRUE)
-    set(TARGET_POSIX TRUE)
-    set(TARGET_MACOS TRUE)
-    set(TARGET_NO_BLOBS TRUE)
-    set(TARGET_CAN_JKGM TRUE)
-    set(TARGET_USE_CURL TRUE)
-
-    set(BUNDLE "${PROJECT_SOURCE_DIR}/OpenJKDF2.app")
-    set(HOMEBREW_PREFIX $ENV{HOMEBREW_PREFIX})
-
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -O2 -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces -Werror=implicit-function-declaration")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fshort-wchar")
-    
-    add_link_options(-fshort-wchar -Wl,-map,openjkdf2.map)
-
+    include(cmake_modules/plat_macos.cmake)
 elseif(PLAT_MACOS_X86_64)
-    message( STATUS "Targeting MacOS x86_64 ${CMAKE_OSX_ARCHITECTURES}" )
-    set(BIN_NAME "openjkdf2-64")
-
-    add_definitions(-DARCH_64BIT)
-
-    # macOS specific options
-    set(MACOSX_DEPLOYMENT_TARGET "10.15" CACHE STRING "Minimum OS X deployment version" FORCE)
-
-    set(TARGET_USE_PHYSFS TRUE)
-    set(TARGET_USE_GAMENETWORKINGSOCKETS TRUE)
-    set(TARGET_USE_LIBSMACKER TRUE)
-    set(TARGET_USE_LIBSMUSHER TRUE)
-    set(TARGET_USE_SDL2 TRUE)
-    set(TARGET_USE_OPENGL TRUE)
-    set(TARGET_USE_OPENAL TRUE)
-    set(TARGET_POSIX TRUE)
-    set(TARGET_MACOS TRUE)
-    set(TARGET_NO_BLOBS TRUE)
-    set(TARGET_CAN_JKGM TRUE)
-    set(TARGET_USE_CURL TRUE)
-
-    set(BUNDLE "${PROJECT_SOURCE_DIR}/OpenJKDF2_x86_64.app")
-    set(HOMEBREW_PREFIX "/usr/local")
-
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -O2 -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces -Werror=implicit-function-declaration")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fshort-wchar")
-    add_link_options(-fshort-wchar)
-
-    #set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${HOMEBREW_PREFIX}/opt/protobuf/lib/pkgconfig")
-
+    include(cmake_modules/plat_macos_x86_64.cmake)
 elseif(PLAT_MINGW_X86_64)
-    message( STATUS "Targeting Win64 MinGW" )
-
-    set(BIN_NAME "${PROJECT_NAME}-64")
-    string(TOLOWER ${BIN_NAME} BIN_NAME)
-
-    add_compile_definitions(
-        WINVER=0x0600 _WIN32_WINNT=0x0600
-        WIN64_STANDALONE #TODO: Rename to `WINDOWS_STANDALONE`
-        ARCH_64BIT       #TODO: Test `sizeof(void*)` or `_WIN64` instead
-        WIN32            #TODO: Test `_WIN32` instead
-        WIN64_MINGW      #TODO: Test `_WIN64 && __MINGW32__` or `__MINGW64__` or `_WIN64 && __GNUC__` instead
-    )
-
-    if (NOT DEFINED GITHUB_RUNNER_COMPILE)
-        set(TARGET_USE_PHYSFS TRUE)
-        set(TARGET_USE_GAMENETWORKINGSOCKETS TRUE)
-    endif()
-    set(OPENJKDF2_NO_ASAN TRUE)
-    set(TARGET_USE_LIBSMACKER TRUE)
-    set(TARGET_USE_LIBSMUSHER TRUE)
-    set(TARGET_USE_SDL2 TRUE)
-    set(TARGET_USE_OPENGL TRUE)
-    if (NOT DEFINED GITHUB_RUNNER_COMPILE)
-        set(TARGET_USE_OPENAL TRUE)
-    endif()
-    set(TARGET_POSIX TRUE)
-    set(TARGET_WIN32 TRUE)
-    set(TARGET_NO_BLOBS TRUE)
-    set(TARGET_CAN_JKGM TRUE)
-    set(TARGET_USE_CURL TRUE)
-    set(TARGET_COMPILE_FREEGLUT TRUE)
-
-    add_compile_definitions(main=SDL_main _MBCS)
-    # TODO: Bump to O2 eventually. MinGW likes to replace memset with calls to itself...
-    add_compile_options(-pthread -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces)
-    if(CMAKE_BUILD_TYPE STREQUAL Debug)
-        add_compile_options(-Og)
-    else()
-        add_compile_options(-O2)
-    endif()
-
+    include(cmake_modules/plat_mingw_x86_64.cmake)
 elseif(PLAT_WASM)
-    message( STATUS "Targeting Emscripten WASM" )
-
-    set(BIN_NAME "openjkdf2")
-
-    add_definitions(-DARCH_WASM)
-
-    set(TARGET_USE_PHYSFS FALSE)
-    set(OPENJKDF2_NO_ASAN TRUE)
-    set(TARGET_USE_LIBSMACKER TRUE)
-    set(TARGET_USE_LIBSMUSHER TRUE)
-    set(TARGET_USE_SDL2 TRUE)
-    set(TARGET_USE_OPENGL TRUE)
-    set(TARGET_USE_OPENAL TRUE)
-    set(TARGET_POSIX TRUE)
-    set(TARGET_NO_BLOBS TRUE)
-    set(TARGET_WASM TRUE)
-    set(TARGET_CAN_JKGM FALSE)
-    set(TARGET_USE_CURL FALSE)
-    set(TARGET_BUILD_TESTS FALSE)
-
-    add_link_options(-fno-exceptions)
-    add_compile_options(-fno-exceptions)
-    set(USE_FLAGS "-sUSE_SDL=2 -sUSE_SDL_MIXER=2 -sWASM=1 -s ALLOW_MEMORY_GROWTH=1 -sFULL_ES2 -sFULL_ES3 -sUSE_WEBGL2=1 -sASYNCIFY -sINITIAL_MEMORY=200mb -s STACK_SIZE=100mb")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${USE_FLAGS}")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${USE_FLAGS}")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${USE_FLAGS} --profiling --preload-file ${PROJECT_SOURCE_DIR}/wasm_out@/ ")
-    set(CMAKE_EXECUTABLE_SUFFIX .js)
-
-    add_compile_options(-O2 -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces)
-
+    include(cmake_modules/plat_wasm.cmake)
 elseif(PLAT_HOOKS)
-    message( STATUS "Targeting MinGW Hooks DLL" )
-
-    set(BIN_NAME "df2_reimpl")
-
-    add_definitions(-DWIN32)
-    add_definitions(-DWIN32_BLOBS)
-    add_definitions(-DARCH_X86)
-    add_definitions(-DTARGET_HAS_DPLAY)
-
-    set(TARGET_HOOKS TRUE)
-    set(OPENJKDF2_NO_ASAN TRUE)
-    set(TARGET_WIN32 TRUE)
-    set(TARGET_USE_D3D TRUE)
-    set(TARGET_BUILD_TESTS FALSE)
-
-    add_compile_options(-g -Wuninitialized -fno-trapping-math)
-    add_link_options(-g -Wl,--subsystem,windows -Wl,-Map=% -fno-trapping-math)
+    include(cmake_modules/plat_hooks.cmake)
 elseif(PLAT_ANDROID_ARM64)
-    message( STATUS "Targeting Android ARM64" )
-
-    set(BIN_NAME "openjkdf2-armv8a")
-
-    add_definitions(-DTARGET_ANDROID)
-    add_definitions(-DLINUX)
-    add_definitions(-DSTDSOUND_NULL)
-
-    set(TARGET_USE_PHYSFS FALSE)
-    set(OPENJKDF2_NO_ASAN TRUE)
-    set(TARGET_USE_LIBSMACKER TRUE)
-    set(TARGET_USE_LIBSMUSHER TRUE)
-    set(TARGET_USE_SDL2 TRUE)
-    set(TARGET_USE_OPENGL TRUE)
-    set(TARGET_USE_OPENAL FALSE)
-    set(TARGET_POSIX TRUE)
-    set(TARGET_NO_BLOBS TRUE)
-    set(TARGET_ANDROID TRUE)
-    set(TARGET_ANDROID_ARM64 TRUE)
-    set(TARGET_CAN_JKGM FALSE)
-    set(TARGET_USE_CURL FALSE)
-    set(TARGET_BUILD_TESTS FALSE)
-
-    list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/lib/glew")
-    include_directories(${PROJECT_SOURCE_DIR}/lib/freeglut/include)
-    include_directories(${PROJECT_SOURCE_DIR}/lib/glew/include)
-
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -fshort-wchar -Werror=implicit-function-declaration -Wno-unused-variable -Wno-parentheses")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fshort-wchar")
-    add_link_options(-fshort-wchar)
-
+    include(cmake_modules/plat_android_arm64.cmake)
 elseif(PLAT_MSVC)
-    message( STATUS "Targeting Win64 MSVC" )
-
-    set(BIN_NAME "openjkdf2-64")
-
-    add_compile_definitions(WINVER=0x0600 _WIN32_WINNT=0x0600)
-    add_compile_definitions(WIN64)
-    add_compile_definitions(WIN64_STANDALONE)
-    add_compile_definitions(ARCH_64BIT)
-    add_compile_definitions(WIN32)
-
-    set(TARGET_USE_PHYSFS FALSE)
-    set(TARGET_USE_GAMENETWORKINGSOCKETS TRUE)
-    set(OPENJKDF2_NO_ASAN TRUE)
-    set(TARGET_USE_LIBSMACKER TRUE)
-    set(TARGET_USE_LIBSMUSHER TRUE)
-    set(TARGET_USE_SDL2 TRUE)
-    set(TARGET_USE_OPENGL TRUE)
-    set(TARGET_USE_OPENAL TRUE)
-    set(TARGET_POSIX TRUE)
-    set(TARGET_WIN32 TRUE)
-    set(TARGET_NO_BLOBS TRUE)
-    set(TARGET_CAN_JKGM TRUE)
-    set(TARGET_USE_CURL FALSE)
-    set(TARGET_COMPILE_FREEGLUT TRUE)
-
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /std:c11")
+    include(cmake_modules/plat_msvc.cmake)
+else()
+    message(FATAL_ERROR "Unknown platform! Cannot continue.")
 endif()
+
+# Establishes compile options, defines, etc
+plat_initialize()
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
@@ -390,20 +146,15 @@ endif()
 if(TARGET_ANDROID)
     set(OPENAL_INCLUDE_DIR "")
     set(GLEW_INCLUDE_DIRS "")
-    set(JSON_Install OFF CACHE INTERNAL "")
-    add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/json)
-elseif(NOT PLAT_MINGW_X86_64 AND NOT PLAT_MSVC AND NOT TARGET_HOOKS AND NOT TARGET_WASM)
-    if(TARGET_USE_OPENAL)
-        find_package(OpenAL REQUIRED)
-    endif()
-
-    set(JSON_Install OFF CACHE INTERNAL "")
-    add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/json)
-else()
-    # idk
-    set(JSON_Install OFF CACHE INTERNAL "")
-    add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/json)
 endif()
+
+if(TARGET_USE_OPENAL AND TARGET_FIND_OPENAL)
+    find_package(OpenAL REQUIRED)
+endif()
+
+# idk
+set(JSON_Install OFF CACHE INTERNAL "")
+add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/json)
 
 # All of the includes
 include_directories(
@@ -453,13 +204,7 @@ include(cmake_modules/precompile_globals.cmake)
 #set( CMAKE_VERBOSE_MAKEFILE on )
 
 add_library(sith_engine OBJECT ${ENGINE_SOURCE_FILES})
-if(PLAT_MSVC OR PLAT_MINGW_X86_64)
-    set(SDL2_COMMON_LIBS SDL2main SDL::SDL)
-elseif(PLAT_WASM)
-    set(SDL2_COMMON_LIBS "")
-else()
-    set(SDL2_COMMON_LIBS SDL2main SDL::SDL ${SDL_MIXER_DEPS} SDL::Mixer)
-endif()
+plat_specific_deps()
 
 if(TARGET_ANDROID)
     add_library(${BIN_NAME} SHARED ${GAME_MAIN_SOURCE_FILES})
