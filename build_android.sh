@@ -15,23 +15,12 @@ OPENJKDF2_BUILD_DIR=$(pwd)
 # Prevent macOS headers from getting linked in
 export -n SDKROOT MACOSX_DEPLOYMENT_TARGET CPLUS_INCLUDE_PATH C_INCLUDE_PATH
 
-export SDL2_DIR="$OPENJKDF2_BUILD_DIR/SDL2-2.26.4"
-export OPENJKDF2_SDL2_PATH="$SDL2_DIR"
-export OPENJKDF2_SDL2_LIBRARY="$OPENJKDF2_BUILD_DIR/libSDL2.so"
-export OPENJKDF2_SDL2_INCLUDE_DIR="$SDL2_DIR/include"
-
-export OPENJKDF2_SDL2_MIXER_PATH="$OPENJKDF2_BUILD_DIR/SDL2_mixer-2.6.3"
-export OPENJKDF2_SDL2_MIXER_LIBRARY="$OPENJKDF2_BUILD_DIR/libSDL2_mixer.so"
-export OPENJKDF2_SDL2_MIXER_INCLUDE_DIR="$OPENJKDF2_SDL2_MIXER_PATH/include"
-
-cmake .. --toolchain $(pwd)/../cmake_modules/toolchain_android_aarch64.cmake && make -j10 openjkdf2-armv8a
+cmake .. --toolchain $(pwd)/../cmake_modules/toolchain_android_aarch64.cmake && make -j1 openjkdf2-armv8a
 cd ..
 
 cd packaging/android-project
 mkdir -p app/src/main/jniLibs
 mkdir -p app/src/main/jniLibs/arm64-v8a
-cp $OPENJKDF2_SDL2_LIBRARY app/src/main/jniLibs/arm64-v8a
-cp $OPENJKDF2_SDL2_MIXER_LIBRARY app/src/main/jniLibs/arm64-v8a
 cp $OPENJKDF2_BUILD_DIR/libopenjkdf2-armv8a.so app/src/main/jniLibs/arm64-v8a/libmain.so
 ./gradlew assembleDebug
 ./gradlew installDebug

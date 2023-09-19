@@ -347,7 +347,7 @@ void jk_SetFocus(HWND hWnd);
 void jk_SetActiveWindow(HWND hWnd);
 void jk_ShowCursor(int a);
 void jk_ValidateRect(HWND hWnd, const RECT *lpRect);
-#if !defined(ARCH_WASM) && !defined(TARGET_ANDROID)
+#if !defined(ARCH_WASM)
 int __isspace(int a);
 #endif
 void* _memset(void* ptr, int val, size_t num);

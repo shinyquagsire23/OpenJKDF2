@@ -1,4 +1,6 @@
-function(plat_initialize)
+include(cmake_modules/target_android_all.cmake)
+
+macro(plat_initialize)
     message( STATUS "Targeting Android ARM64" )
 
     set(BIN_NAME "openjkdf2-armv8a")
@@ -14,6 +16,7 @@ function(plat_initialize)
     set(TARGET_USE_CURL FALSE)
     set(TARGET_BUILD_TESTS FALSE)
     set(TARGET_FIND_OPENAL FALSE)
+    set(TARGET_USE_GAMENETWORKINGSOCKETS FALSE)
     
     set(TARGET_ANDROID TRUE)
     set(TARGET_ANDROID_ARM64 TRUE)
@@ -25,12 +28,8 @@ function(plat_initialize)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -fshort-wchar -Werror=implicit-function-declaration -Wno-unused-variable -Wno-parentheses")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fshort-wchar")
     add_link_options(-fshort-wchar)
-endfunction()
-
-macro(plat_specific_deps)
-    plat_sdl2_deps()
 endmacro()
 
-macro(plat_link_and_package)
-    
+macro(plat_specific_deps)
+    set(SDL2_COMMON_LIBS SDL2main SDL::SDL)
 endmacro()
