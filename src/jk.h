@@ -18,7 +18,7 @@ extern "C" {
 #include <ctype.h>
 #endif
 
-#ifdef MACOS
+#if defined(MACOS) || defined(LINUX)
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

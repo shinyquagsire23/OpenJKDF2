@@ -238,6 +238,8 @@ extern int Window_isHiDpi;
 #define WINDOW_DEFAULT_HEIGHT (480)
 #endif // WIN64_STANDALONE
 
+// TODO: fixed point support?
+typedef float flex_t;
 
 // Disable warnings for Vegetable Studio
 #if 1 && defined _MSC_VER
