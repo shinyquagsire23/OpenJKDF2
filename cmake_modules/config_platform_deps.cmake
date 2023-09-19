@@ -1,27 +1,5 @@
 include(ExternalProject)
 
-function(macos_target_add_standard_deps target_name)
-    if(TARGET_MACOS)
-        set_target_properties(${target_name} PROPERTIES
-          LINK_SEARCH_START_STATIC ON
-          LINK_SEARCH_END_STATIC ON
-        )
-        target_link_libraries(${target_name} PRIVATE "-framework AppKit")
-        target_link_libraries(${target_name} PRIVATE "-framework Carbon")
-        target_link_libraries(${target_name} PRIVATE "-framework SystemConfiguration")
-        target_link_libraries(${target_name} PRIVATE "-framework CoreAudio")
-        target_link_libraries(${target_name} PRIVATE "-framework AudioToolbox")
-        target_link_libraries(${target_name} PRIVATE "-framework CoreVideo")
-        target_link_libraries(${target_name} PRIVATE "-framework Cocoa")
-        target_link_libraries(${target_name} PRIVATE "-framework Metal")
-        target_link_libraries(${target_name} PRIVATE "-framework CoreHaptics")
-        target_link_libraries(${target_name} PRIVATE "-framework IOKit")
-        target_link_libraries(${target_name} PRIVATE "-framework ForceFeedback")
-        target_link_libraries(${target_name} PRIVATE "-framework GameController")
-        target_link_libraries(${target_name} PRIVATE iconv GLEW::GLEW)
-    endif()
-endfunction()
-
 # Makes cross-compiling easier in the build_whatever.cmake files
 if(NOT CMAKE_TOOLCHAIN_FILE)
     set(CMAKE_TOOLCHAIN_FILE ${PROJECT_SOURCE_DIR}/cmake_modules/toolchain_native.cmake)

@@ -30,3 +30,7 @@ endfunction()
 macro(plat_specific_deps)
     plat_sdl2_deps()
 endmacro()
+
+macro(plat_link_and_package)
+    
+endmacro()

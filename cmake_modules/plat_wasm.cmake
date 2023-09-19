@@ -30,3 +30,8 @@ endmacro()
 macro(plat_specific_deps)
     set(SDL2_COMMON_LIBS "")
 endmacro()
+
+macro(plat_link_and_package)
+    target_link_libraries(${BIN_NAME} PRIVATE -lm -lSDL2 -lSDL2_mixer -lGL -lGLEW -lopenal)
+    target_link_libraries(sith_engine PRIVATE nlohmann_json::nlohmann_json)
+endmacro()

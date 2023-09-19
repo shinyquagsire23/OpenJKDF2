@@ -108,6 +108,13 @@ set(CMAKE_C_STANDARD_REQUIRED TRUE)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
+# Default macros
+macro(plat_link_and_package)
+    message(FATAL_ERROR "Unknown target! Cannot continue.")
+endmacro()
+macro(plat_extra_deps)
+endmacro()
+
 if(PLAT_LINUX_32)
     include(cmake_modules/plat_linux_32.cmake)
 elseif(PLAT_LINUX_64)
@@ -130,7 +137,7 @@ else()
     message(FATAL_ERROR "Unknown platform! Cannot continue.")
 endif()
 
-# Establishes compile options, defines, etc
+# Establishes compile options, binary/library names, defines, etc
 plat_initialize()
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -168,10 +175,8 @@ if(TARGET_USE_SDL2)
     include_directories(${SDL_INCLUDE_DIRS} ${SDL_MIXER_INCLUDE_DIRS})
 endif()
 
-if(TARGET_USE_OPENAL)
-    if(NOT OPENAL_COMPILING_FROM_SRC)
-        include_directories(${OPENAL_INCLUDE_DIR})
-    endif()
+if(TARGET_USE_OPENAL AND NOT OPENAL_COMPILING_FROM_SRC)
+    include_directories(${OPENAL_INCLUDE_DIR})
 endif()
 
 # All of the base sources
@@ -184,7 +189,7 @@ file(GLOB ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/*.c
 # Game main
 file(GLOB GAME_MAIN_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/main.c)
 
-# Remove test sources
+# Remove test sources from glob
 file(GLOB TEST_SRCS ${PROJECT_SOURCE_DIR}/src/Tests/*.c)
 list(REMOVE_ITEM ENGINE_SOURCE_FILES ${TEST_SRCS})
 list(REMOVE_ITEM ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/main.c)
@@ -231,39 +236,8 @@ endif()
 
 # TODO byacc and flex
 
-if(TARGET_MACOS)
-    macos_target_add_standard_deps(${BIN_NAME})
-
-    find_package(PkgConfig REQUIRED)
-
-    if(TARGET_USE_GAMENETWORKINGSOCKETS)
-        find_package(OpenSSL REQUIRED)
-        target_link_libraries(sith_engine PUBLIC OpenSSL::Crypto)
-    endif()
-endif()
-
-if(TARGET_LINUX)
-    find_package(PkgConfig REQUIRED)
-    pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
-    include_directories(${GTK3_INCLUDE_DIRS})
-    link_directories(${GTK3_LIBRARY_DIRS})
-    add_definitions(${GTK3_CFLAGS_OTHER})
-
-    if(TARGET_USE_CURL)
-        pkg_check_modules(LIBCURL REQUIRED libcurl)
-        include_directories(${LIBCURL_STATIC_INCLUDE_DIRS})
-        link_directories(${LIBCURL_STATIC_LIBRARY_DIRS})
-        add_definitions(${LIBCURL_STATIC_CFLAGS_OTHER})
-    endif()
-
-    if(TARGET_USE_GAMENETWORKINGSOCKETS)
-        add_custom_command(
-            TARGET ${BIN_NAME}
-            POST_BUILD 
-            COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/GameNetworkingSockets/bin/libGameNetworkingSockets.so ${PROJECT_BINARY_DIR}
-        )
-    endif()
-endif()
+# Allow platforms to add extra dependencies, ie Frameworks on macOS or PkgConfig on Linux
+plat_extra_deps()
 
 if(NOT OPENJKDF2_NO_ASAN)
     #add_compile_options(-fsanitize=address -fsanitize=float-divide-by-zero)
@@ -281,224 +255,5 @@ endif()
 
 include(cmake_modules/misc_stdcpp_fs_fix.cmake)
 
-if(PLAT_MINGW_X86_64)
-    set_target_properties(${BIN_NAME} PROPERTIES
-        ENABLE_EXPORTS FALSE
-        WINDOWS_EXPORT_ALL_SYMBOLS FALSE
-        # CMake missbehaives here because the PE image version field actually
-        # specifies the version of the PE specification the PE image has been
-        # built to and has NOTHING to do with the application version.
-        # Traditionally, the PE image version has followed the internal release
-        # version of Windows. Consequently, becuase the linker is the last tool
-        # to build a PE image it is supposed to be the linker who should set
-        # the PE image version field.
-        VERSION ${CMAKE_SYSTEM_VERSION}
-    )
-    if(CMAKE_BUILD_TYPE STREQUAL Release OR
-       CMAKE_BUILD_TYPE STREQUAL MinSizeRel OR
-       CMAKE_BUILD_TYPE STREQUAL RelWithDebInfo)
-        # TODO: Implement WinMain() for this to work nicely
-        set_target_properties(${BIN_NAME} PROPERTIES WIN32_EXECUTABLE TRUE)
-    elseif(CMAKE_BUILD_TYPE STREQUAL Debug)
-        set_target_properties(${BIN_NAME} PROPERTIES WIN32_EXECUTABLE FALSE)
-    endif()
-
-    target_link_libraries(sith_engine PRIVATE GLUT::GLUT)
-    target_link_libraries(sith_engine PRIVATE GLEW::glew_s)
-    target_link_libraries(${BIN_NAME} PRIVATE GLEW::glew_s)
-    target_link_libraries(sith_engine PRIVATE mingw32 ${SDL2_COMMON_LIBS} version imm32 setupapi gdi32 winmm imm32 ole32 oleaut32 shell32 ssp winmm user32 crypt32 advapi32) # SDL2’s peculiarity that you have to link mingw32 before SDL2main
-    
-    if(TARGET_CAN_JKGM)
-        target_link_libraries(sith_engine PRIVATE PNG::PNG ZLIB::ZLIB)
-    endif()
-
-    if (TARGET_USE_OPENAL)
-        target_link_libraries(sith_engine PRIVATE ${SDL_MIXER_DEPS} SDL::Mixer)
-        target_link_libraries(sith_engine PRIVATE OpenAL::OpenAL)
-    endif()
-    target_link_libraries(sith_engine PRIVATE nlohmann_json::nlohmann_json)
-    if(TARGET_USE_GAMENETWORKINGSOCKETS)
-        target_link_libraries(sith_engine PRIVATE GameNetworkingSockets::GameNetworkingSockets)
-    endif()
-    if(TARGET_USE_PHYSFS)
-        target_link_libraries(sith_engine PRIVATE PhysFS::PhysFS_s)
-        target_link_libraries(${BIN_NAME} PRIVATE PhysFS::PhysFS_s)
-    endif()
-    target_link_libraries(sith_engine PRIVATE opengl32 ws2_32 uuid ole32)
-
-    if (TARGET_USE_OPENAL)
-        add_custom_command(
-            TARGET ${BIN_NAME}
-            POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/openal/bin/OpenAL32.dll ${PROJECT_BINARY_DIR}
-        )
-    endif()
-
-    add_custom_command(
-        TARGET ${BIN_NAME}
-        POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/exchndl.dll ${PROJECT_BINARY_DIR}
-        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/symsrv.dll ${PROJECT_BINARY_DIR}
-        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/mgwhelp.dll ${PROJECT_BINARY_DIR}
-        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/symsrv.yes ${PROJECT_BINARY_DIR}
-    )
-
-    if(TARGET_USE_GAMENETWORKINGSOCKETS)
-        add_custom_command(
-            TARGET ${BIN_NAME}
-            POST_BUILD 
-            COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/GameNetworkingSockets/bin/libGameNetworkingSockets.dll ${PROJECT_BINARY_DIR}
-        )
-    endif()
-
-elseif(TARGET_HOOKS)
-    target_link_libraries(${BIN_NAME} PRIVATE -static-libgcc)
-    target_link_libraries("${BIN_NAME}_kvm" PRIVATE -Wl,-e_hook_init -nostartfiles -static -static-libgcc -static-libstdc++)
-elseif(TARGET_WASM)
-    target_link_libraries(${BIN_NAME} PRIVATE -lm -lSDL2 -lSDL2_mixer -lGL -lGLEW -lopenal)
-    target_link_libraries(sith_engine PRIVATE nlohmann_json::nlohmann_json)
-elseif(TARGET_LINUX)
-    target_link_libraries(sith_engine PRIVATE PNG::PNG ZLIB::ZLIB)
-    target_link_libraries(sith_engine PRIVATE ${SDL2_COMMON_LIBS} GL ${OPENAL_LIBRARY} GLEW::GLEW ${GTK3_LIBRARIES})
-     
-    if(TARGET_USE_PHYSFS)
-        target_link_libraries(sith_engine PRIVATE PhysFS::PhysFS_s)
-        target_link_libraries(${BIN_NAME} PRIVATE PhysFS::PhysFS_s)
-    endif()
-    if(TARGET_USE_GAMENETWORKINGSOCKETS)
-        target_link_libraries(sith_engine PRIVATE GameNetworkingSockets::GameNetworkingSockets)
-    endif()
-
-    target_link_libraries(sith_engine PRIVATE nlohmann_json::nlohmann_json)
-    target_link_libraries(sith_engine PRIVATE dl) # dlopen, dlsym
-
-    if(TARGET_USE_CURL)
-        target_link_libraries(sith_engine PRIVATE curl)
-    endif()
-elseif(PLAT_MSVC)
-    set_target_properties(${BIN_NAME} PROPERTIES
-        ENABLE_EXPORTS FALSE
-        WINDOWS_EXPORT_ALL_SYMBOLS FALSE
-        # CMake missbehaives here because the PE image version field actually
-        # specifies the version of the PE specification the PE image has been
-        # built to and has NOTHING to do with the application version.
-        # Traditionally, the PE image version has followed the internal release
-        # version of Windows. Consequently, becuase the linker is the last tool
-        # to build a PE image it is supposed to be the linker who should set
-        # the PE image version field.
-        VERSION ${CMAKE_SYSTEM_VERSION}
-    )
-    if(CMAKE_BUILD_TYPE STREQUAL Release OR
-       CMAKE_BUILD_TYPE STREQUAL MinSizeRel OR
-       CMAKE_BUILD_TYPE STREQUAL RelWithDebInfo)
-        # TODO: Implement WinMain() for this to work nicely
-        set_target_properties(${BIN_NAME} PROPERTIES WIN32_EXECUTABLE TRUE)
-    elseif(CMAKE_BUILD_TYPE STREQUAL Debug)
-        set_target_properties(${BIN_NAME} PROPERTIES WIN32_EXECUTABLE FALSE)
-    endif()
-
-    set_target_properties(${BIN_NAME} PROPERTIES
-      LINK_SEARCH_START_STATIC ON
-      LINK_SEARCH_END_STATIC ON
-    )
-    set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
-    set(THREADS_PREFER_PTHREAD_FLAG TRUE)
-    find_package(Threads REQUIRED)
-    target_link_libraries(${BIN_NAME} PRIVATE -static)
-    set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
-    target_link_libraries(sith_engine PRIVATE Threads::Threads)
-
-    target_link_libraries(sith_engine PRIVATE GLUT::GLUT)
-    target_link_libraries(sith_engine PRIVATE GLEW::glew_s)
-    target_link_libraries(${BIN_NAME} PRIVATE GLEW::glew_s)
-    target_link_libraries(sith_engine PRIVATE ${SDL2_COMMON_LIBS} version imm32 setupapi gdi32 winmm imm32 ole32 oleaut32 shell32 winmm user32 crypt32 advapi32) # SDL2’s peculiarity that you have to link mingw32 before SDL2main
-
-    if(TARGET_CAN_JKGM)
-        target_link_libraries(sith_engine PRIVATE PNG::PNG ZLIB::ZLIB)
-    endif()
-
-    if (TARGET_USE_OPENAL)
-        target_link_libraries(sith_engine PRIVATE ${SDL_MIXER_DEPS} SDL::Mixer)
-        if (OPENAL_COMPILING_FROM_SRC)
-            target_link_libraries(sith_engine PRIVATE OpenAL::OpenAL)
-        else()
-            target_link_libraries(sith_engine PRIVATE ${OPENAL_LIBRARIES})
-        endif()
-    endif()
-    target_link_libraries(sith_engine PRIVATE nlohmann_json::nlohmann_json)
-    if(TARGET_USE_GAMENETWORKINGSOCKETS)
-        target_link_libraries(sith_engine PRIVATE GameNetworkingSockets::GameNetworkingSockets)
-    endif()
-    if(TARGET_USE_PHYSFS)
-        target_link_libraries(sith_engine PRIVATE PhysFS::PhysFS_s)
-        target_link_libraries(${BIN_NAME} PRIVATE PhysFS::PhysFS_s)
-    endif()
-    target_link_libraries(sith_engine PRIVATE opengl32 ws2_32 uuid ole32)
-
-    if (TARGET_USE_OPENAL)
-        add_custom_command(
-            TARGET ${BIN_NAME}
-            POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/openal/bin/OpenAL32.dll ${PROJECT_BINARY_DIR}
-        )
-    endif()
-
-    add_custom_command(
-        TARGET ${BIN_NAME}
-        POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/exchndl.dll ${PROJECT_BINARY_DIR}
-        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/symsrv.dll ${PROJECT_BINARY_DIR}
-        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/mgwhelp.dll ${PROJECT_BINARY_DIR}
-        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/symsrv.yes ${PROJECT_BINARY_DIR}
-    )
-
-    if(TARGET_USE_GAMENETWORKINGSOCKETS)
-        add_custom_command(
-            TARGET ${BIN_NAME}
-            POST_BUILD 
-            COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/GameNetworkingSockets/bin/GameNetworkingSockets.dll ${PROJECT_BINARY_DIR}
-        )
-    endif()
-
-elseif(TARGET_ANDROID)
-    target_link_libraries(sith_engine PRIVATE PNG::PNG)
-    target_link_libraries(sith_engine PRIVATE ${SDL2_COMMON_LIBS} GLESv1_CM GLESv2 GLESv3 log EGL ${GTK3_LIBRARIES} android jnigraphics nativewindow OpenSLES) #${OPENAL_LIBRARY} GLEW::GLEW
-     
-    if(TARGET_USE_PHYSFS)
-        target_link_libraries(sith_engine PRIVATE PhysFS::PhysFS_s)
-        target_link_libraries(${BIN_NAME} PRIVATE PhysFS::PhysFS_s)
-    endif()
-    if(TARGET_USE_GAMENETWORKINGSOCKETS)
-        target_link_libraries(sith_engine PRIVATE GameNetworkingSockets::GameNetworkingSockets)
-    endif()
-
-    target_link_libraries(sith_engine PRIVATE nlohmann_json::nlohmann_json)
-    target_link_libraries(sith_engine PRIVATE dl) # dlopen, dlsym
-
-    if(TARGET_USE_CURL)
-        target_link_libraries(sith_engine PRIVATE curl)
-    endif()
-elseif(TARGET_MACOS)
-    if(TARGET_CAN_JKGM)
-        target_link_libraries(sith_engine PRIVATE PNG::PNG ZLIB::ZLIB)
-    endif()
-
-    target_link_libraries(sith_engine PRIVATE ${SDL2_COMMON_LIBS} ${OPENGL_LIBRARY} ${OPENAL_LIBRARY} GLEW::GLEW)
-    target_link_libraries(${BIN_NAME} PRIVATE GLEW::GLEW)
-    target_link_libraries(sith_engine PRIVATE nlohmann_json::nlohmann_json)
-
-    if(TARGET_USE_PHYSFS)
-        target_link_libraries(sith_engine PRIVATE PhysFS::PhysFS_s)
-        target_link_libraries(${BIN_NAME} PRIVATE PhysFS::PhysFS_s)
-    endif()
-    if(TARGET_USE_GAMENETWORKINGSOCKETS)
-        target_link_libraries(sith_engine PRIVATE GameNetworkingSockets::GameNetworkingSockets)
-    endif()
-
-    #
-    # macOS post-build packaging
-    #
-    include(cmake_modules/postcompile_macos.cmake)
-else()
-    message(FATAL_ERROR "Unknown target! Cannot continue.")
-endif()
+# Runs all the target_link_libraries, platform-specific post-build packaging, etc
+plat_link_and_package()

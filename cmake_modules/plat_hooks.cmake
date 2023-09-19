@@ -23,3 +23,8 @@ endmacro()
 macro(plat_specific_deps)
     plat_sdl2_deps()
 endmacro()
+
+macro(plat_link_and_package)
+    target_link_libraries(${BIN_NAME} PRIVATE -static-libgcc)
+    target_link_libraries("${BIN_NAME}_kvm" PRIVATE -Wl,-e_hook_init -nostartfiles -static -static-libgcc -static-libstdc++)
+endmacro()

@@ -1,3 +1,5 @@
+include(cmake_modules/target_linux_all.cmake)
+
 macro(plat_initialize)
     message( STATUS "Targeting Linux 32-bit" )
     set(BIN_NAME "openjkdf2")
@@ -16,3 +18,4 @@ endmacro()
 macro(plat_specific_deps)
     plat_sdl2_deps()
 endmacro()
+

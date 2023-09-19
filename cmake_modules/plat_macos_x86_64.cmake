@@ -1,3 +1,5 @@
+include(cmake_modules/target_macos_all.cmake)
+
 macro(plat_initialize)
     message( STATUS "Targeting MacOS x86_64 ${CMAKE_OSX_ARCHITECTURES}" )
     set(BIN_NAME "openjkdf2-64")

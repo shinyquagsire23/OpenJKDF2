@@ -1,3 +1,5 @@
+include(cmake_modules/target_linux_all.cmake)
+
 macro(plat_initialize)
     message( STATUS "Targeting Linux 64-bit" )
     set(BIN_NAME "openjkdf2")
