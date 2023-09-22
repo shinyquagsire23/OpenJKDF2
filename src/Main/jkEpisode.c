@@ -183,7 +183,7 @@ LABEL_30:
             {
                 v19 = 0;
                 pHS->fileGets(v17, v29, 64);
-                if ( !pHS->feof(v17) )
+                if ( !pHS->fileEof(v17) )
                 {
                     while ( 1 )
                     {
@@ -201,7 +201,7 @@ LABEL_30:
                         if ( v19 )
                             break;
                         pHS->fileGets(v17, v29, 64);
-                        if ( pHS->feof(v17) )
+                        if ( pHS->fileEof(v17) )
                             goto LABEL_50;
                     }
                     stdString_GetQuotedStringContents(v29, jkEpisode_var4, 128);
@@ -210,7 +210,7 @@ LABEL_30:
                     v16->type = JK_EPISODE_SINGLEPLAYER;
                     v24 = 0;
                     pHS->fileGets(v17, v29, 64);
-                    if ( !pHS->feof(v17) )
+                    if ( !pHS->fileEof(v17) )
                     {
                         while ( 1 )
                         {
@@ -228,7 +228,7 @@ LABEL_30:
                             if ( v24 )
                                 break;
                             pHS->fileGets(v17, v29, 64);
-                            if ( pHS->feof(v17) )
+                            if ( pHS->fileEof(v17) )
                                 goto LABEL_50;
                         }
                         _sscanf(v29, "TYPE %d", &v16->type);
@@ -297,7 +297,7 @@ int jkEpisode_Load(jkEpisodeLoad *a1)
         return 0;
     v4 = 0;
     pHS->fileGets(v2, a1a, 128);
-    while ( !pHS->feof(v2) )
+    while ( !pHS->fileEof(v2) )
     {
         if ( !_strchr(a1a, '\n') )
         {
@@ -316,7 +316,7 @@ int jkEpisode_Load(jkEpisodeLoad *a1)
     }
     v7 = 0;
     pHS->fileGets(v2, a1a, 128);
-    if ( pHS->feof(v2) )
+    if ( pHS->fileEof(v2) )
         goto LABEL_30;
     while ( 1 )
     {
@@ -334,7 +334,7 @@ int jkEpisode_Load(jkEpisodeLoad *a1)
         if ( v7 )
             break;
         pHS->fileGets(v2, a1a, 128);
-        if ( pHS->feof(v2) )
+        if ( pHS->fileEof(v2) )
             goto LABEL_30;
     }
     if ( _sscanf(a1a, "TYPE %d", &a1->type) != 1 )
@@ -346,7 +346,7 @@ LABEL_30:
     }
     v11 = 0;
     pHS->fileGets(v2, a1a, 128);
-    if ( pHS->feof(v2) )
+    if ( pHS->fileEof(v2) )
         goto LABEL_47;
     while ( 1 )
     {
@@ -364,7 +364,7 @@ LABEL_30:
         if ( v11 )
             break;
         pHS->fileGets(v2, a1a, 128);
-        if ( pHS->feof(v2) )
+        if ( pHS->fileEof(v2) )
             goto LABEL_47;
     }
     if ( _sscanf(a1a, "SEQ %d", &numSeq) != 1 )
@@ -391,7 +391,7 @@ LABEL_47:
         v18 = 0;
         v19 = &a1->paEntries[v16];
         pHS->fileGets(v2, a1a, 128);
-        if ( pHS->feof(v2) )
+        if ( pHS->fileEof(v2) )
         {
 LABEL_67:
             v17 = 0;
@@ -414,7 +414,7 @@ LABEL_67:
                 if ( v18 )
                     break;
                 pHS->fileGets(v2, a1a, 128);
-                if ( pHS->feof(v2) )
+                if ( pHS->fileEof(v2) )
                     goto LABEL_67;
             }
             v17 = 1;
@@ -471,7 +471,7 @@ LABEL_67:
         a1a[0] = 0;
         v22 = 0;
         pHS->fileGets(v2, a1a, 128);
-        while ( !pHS->feof(v2) )
+        while ( !pHS->fileEof(v2) )
         {
             if ( !_strchr(a1a, '\n') )
             {

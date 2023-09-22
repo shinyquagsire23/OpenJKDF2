@@ -2,7 +2,7 @@
 
 #include "types.h"
 
-#ifdef LINUX
+#if defined(LINUX) || defined(TARGET_TWL)
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
@@ -924,7 +924,7 @@ void jk_EndPaint(HWND hWnd, const PAINTSTRUCT *lpPaint)
     assert(0);
 }
 
-int stdGdi_GetHInstance()
+HINSTANCE stdGdi_GetHInstance()
 {
     assert(0);
     return 0;

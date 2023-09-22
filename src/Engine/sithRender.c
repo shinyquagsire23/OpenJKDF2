@@ -242,7 +242,7 @@ void sithRender_SetLightMode(rdLightMode_t lightMode)
     sithRender_lightMode = lightMode;
 }
 
-void sithRender_SetTexMode(int texMode)
+void sithRender_SetTexMode(rdTexMode_t texMode)
 {
     sithRender_texMode = texMode;
 }

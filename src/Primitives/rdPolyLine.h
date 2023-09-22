@@ -13,7 +13,7 @@
 #define rdPolyLine_DrawFace_ADDR (0x00448FA0)
 
 rdPolyLine* rdPolyLine_New(char *polyline_fname, char *material_fname, char *material_fname2, float length, float base_rad, float tip_rad, int lightmode, int texmode, int sortingmethod, float extraLight);
-int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *material_side_fname, char *material_tip_fname, float length, float base_rad, float tip_rad, int edgeGeometryMode, int edgeLightingMode, int edgeTextureMode, float extraLight);
+int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *material_side_fname, char *material_tip_fname, float length, float base_rad, float tip_rad, rdGeoMode_t edgeGeometryMode, rdLightMode_t edgeLightingMode, rdTexMode_t edgeTextureMode, float extraLight);
 void rdPolyLine_Free(rdPolyLine *polyline);
 void rdPolyLine_FreeEntry(rdPolyLine *polyline);
 int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix);

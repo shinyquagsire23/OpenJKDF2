@@ -42,7 +42,7 @@ extern int Window_isFullscreen;
 void Window_SetHiDpi(int val);
 void Window_SetFullscreen(int val);
 
-#ifdef SDL2_RENDER
+
 extern int Window_lastXRel;
 extern int Window_lastYRel;
 extern int Window_lastSampleMs;
@@ -51,6 +51,7 @@ extern int Window_bMouseRight;
 extern int Window_mouseWheelY;
 extern int Window_mouseWheelX;
 
+#ifdef SDL2_RENDER
 int Window_Main_Linux(int argc, char** argv);
 //int Window_AddMsgHandler(WindowHandler_t a1);
 //int Window_RemoveMsgHandler(WindowHandler_t a1);

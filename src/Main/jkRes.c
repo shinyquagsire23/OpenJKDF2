@@ -137,7 +137,7 @@ void jkRes_HookHS()
         jkRes_pHS->fileGets = jkRes_FileGets;
         jkRes_pHS->fileGetws = jkRes_FileGetws;
         jkRes_pHS->fileWrite = jkRes_FileWrite;
-        jkRes_pHS->feof = jkRes_FEof;
+        jkRes_pHS->fileEof = jkRes_FEof;
         jkRes_pHS->ftell = jkRes_FTell;
         jkRes_pHS->fseek = jkRes_FSeek;
         jkRes_pHS->fileSize = jkRes_FileSize;
@@ -156,7 +156,7 @@ void jkRes_UnhookHS()
         jkRes_pHS->fileGets = lowLevelHS.fileGets;
         jkRes_pHS->fileGetws = lowLevelHS.fileGetws;
         jkRes_pHS->fileWrite = lowLevelHS.fileWrite;
-        jkRes_pHS->feof = lowLevelHS.feof;
+        jkRes_pHS->fileEof = lowLevelHS.fileEof;
         jkRes_pHS->ftell = lowLevelHS.ftell;
         jkRes_pHS->fseek = lowLevelHS.fseek;
         jkRes_pHS->fileSize = lowLevelHS.fileSize;
@@ -589,7 +589,7 @@ int jkRes_FEof(stdFile_t fd)
 {
     jkResFile* resFile = &jkRes_aFiles[fd - 1];
     if ( resFile->useLowLevel )
-        return pLowLevelHS->feof(resFile->fsHandle);
+        return pLowLevelHS->fileEof(resFile->fsHandle);
     else
         return stdGob_FEof(resFile->gobHandle);
 }

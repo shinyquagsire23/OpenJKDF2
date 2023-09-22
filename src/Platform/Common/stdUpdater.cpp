@@ -73,7 +73,7 @@ int stdUpdater_CheckForUpdates()
 {
     stdUpdater_Reset();
 
-#if defined(PLATFORM_LINUX) || defined(ARCH_WASM)
+#if defined(PLATFORM_LINUX) || defined(ARCH_WASM) || defined(TARGET_TWL)
     return 0;
 #else
     if (stdUpdater_bDisableUpdates) {
@@ -156,7 +156,7 @@ int stdUpdater_CheckForUpdates()
         stdPlatform_Printf("stdUpdater: Failed to parse JSON?\n");
         return 0;
     }
-#endif // defined(PLATFORM_LINUX) || defined(ARCH_WASM)
+#endif // defined(PLATFORM_LINUX) || defined(ARCH_WASM) || defined(TARGET_TWL)
 }
 
 void stdUpdater_GetUpdateText(wchar_t* pOut, size_t outSz)

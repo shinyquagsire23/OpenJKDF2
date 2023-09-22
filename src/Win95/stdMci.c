@@ -11,7 +11,7 @@
 // Added
 int stdMci_bIsGOG = 1;
 
-#ifndef SDL2_RENDER
+#if !defined(SDL2_RENDER) && defined(WIN32)
 
 int stdMci_Startup()
 {

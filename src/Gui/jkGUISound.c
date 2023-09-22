@@ -48,7 +48,7 @@ static jkGuiElement jkGuiSound_elements[25] = {
     {ELEMENT_TEXT, 0, 0, "GUI_MAX", 2, {590, 370, 40, 20}, 1, 0, 0, 0, 0, 0, {0}, 0},
 #else
     {ELEMENT_TEXT, 0, 0, "GUI_DIGICHANNELS", 3, {340, 310, 220, 20}, 1, 0, 0, 0, 0, 0, {0}, 0},
-    {ELEMENT_SLIDER, 0, 0, (const char*)16, 0, {300, 335, 320, 30}, 1, 0, "GUI_DIGICHANNELS_HINT", 0, 0, slider_1, {0}, 0},
+    {ELEMENT_SLIDER, 0, 0, (const char*)16, 0, {300, 335, 320, 30}, 1, 0, "GUI_DIGICHANNELS_HINT", 0, 0, slider_images, {0}, 0},
     {ELEMENT_TEXT, 0, 0, "GUI_8", 2, {310, 370, 40, 20}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXT, 0, 0, "GUI_16", 2, {450, 370, 40, 20}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXT, 0, 0, "GUI_24", 2, {590, 370, 40, 20}, 1, 0, 0, 0, 0, 0, {0}, 0},

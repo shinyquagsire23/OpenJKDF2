@@ -157,7 +157,7 @@ void stdPlatform_InitServices(HostServices *handlers)
     handlers->fileRead = stdFileRead;
     handlers->fileGets = stdFileGets;
     handlers->fileWrite = stdFileWrite;
-    handlers->feof = stdFeof;
+    handlers->fileEof = stdFeof;
     handlers->ftell = stdFtell;
     handlers->fseek = stdFseek;
     handlers->fileSize = stdFileSize;
@@ -181,7 +181,7 @@ void stdPlatform_InitServices(HostServices *handlers)
     handlers->fseek = Linux_stdFseek;
     handlers->ftell = Linux_stdFtell;
     handlers->getTimerTick = Linux_TimeMs;
-    handlers->feof = Linux_stdFeof;
+    handlers->fileEof = Linux_stdFeof;
 #endif
 }
 

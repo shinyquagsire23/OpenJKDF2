@@ -10,6 +10,10 @@ extern "C" {
 #define AL_SILENCE_DEPRECATION
 #endif
 
+#if (defined(LINUX) || defined(TARGET_TWL)) && !defined(PLAT_MISSING_WIN32)
+#define PLAT_MISSING_WIN32
+#endif
+
 // Ghidra tutorial:
 // File > Parse C Source...
 //
@@ -123,7 +127,7 @@ typedef struct GUID_idk
     uint32_t a,b,c,d;
 } GUID_idk;
 
-#ifdef LINUX
+#if defined(PLAT_MISSING_WIN32)
 #define __stdcall
 #define __cdecl
 typedef int HKEY;
@@ -336,7 +340,7 @@ typedef struct Darray Darray;
 
 typedef struct stdControlKeyInfoEntry stdControlKeyInfoEntry;
 
-#ifndef SDL2_RENDER
+#if !defined(SDL2_RENDER) && defined(WIN32)
 typedef IDirectSoundBuffer stdSound_buffer_t;
 typedef IDirectSound3DBuffer stdSound_3dBuffer_t;
 #else // STDSOUND_OPENAL
@@ -1441,7 +1445,7 @@ typedef struct jkDevLogEnt
     int bDrawEntry;
 } jkDevLogEnt;
 
-#ifdef LINUX
+#ifdef PLAT_MISSING_WIN32
 typedef uint32_t MCIDEVICEID;
 #endif
 
@@ -1796,7 +1800,7 @@ typedef struct HostServicesBasic
     size_t (*fileRead)(stdFile_t, void *, size_t);
     const char *(*fileGets)(stdFile_t, char *, size_t);
     size_t (*fileWrite)(stdFile_t, void *, size_t);
-    int (*feof)(stdFile_t);
+    int (*fileEof)(stdFile_t);
     int (*ftell)(stdFile_t);
     int (*fseek)(stdFile_t, int, int);
     int (*fileSize)(stdFile_t);
@@ -1823,7 +1827,7 @@ typedef struct HostServices
     size_t (*fileRead)(stdFile_t, void *, size_t);
     const char *(*fileGets)(stdFile_t, char *, size_t);
     size_t (*fileWrite)(stdFile_t, void *, size_t);
-    int (*feof)(stdFile_t);
+    int (*fileEof)(stdFile_t);
     int (*ftell)(stdFile_t);
     int (*fseek)(stdFile_t, int, int);
     int (*fileSize)(stdFile_t);

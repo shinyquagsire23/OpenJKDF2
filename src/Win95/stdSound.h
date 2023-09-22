@@ -98,7 +98,7 @@ uint32_t stdSound_ParseWav(stdFile_t sound_file, uint32_t *nSamplesPerSec, int *
 
 extern float stdSound_fMenuVolume;
 
-#ifndef SDL2_RENDER
+#if !defined(SDL2_RENDER) && defined(WIN32)
 static int (*stdSound_Startup)() = (void*)stdSound_Startup_ADDR;
 static void (*stdSound_Shutdown)() = (void*)stdSound_Shutdown_ADDR;
 static void (*stdSound_SetMenuVolume)(float a1) = (void*)stdSound_SetMenuVolume_ADDR;

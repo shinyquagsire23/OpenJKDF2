@@ -26,7 +26,7 @@
 #include <stdio.h>
 #ifndef _WIN32
 #include <unistd.h>
-#endif
+#endif //!_WIN32
 
 #if !defined(WIN64_MINGW) && !defined(_WIN32)
 #include <sys/ioctl.h>
@@ -55,7 +55,7 @@
 #endif
 
 extern int Window_xPos, Window_yPos;
-#endif
+#endif // SDL2_RENDER
 
 int Window_xSize = WINDOW_DEFAULT_WIDTH;
 int Window_ySize = WINDOW_DEFAULT_HEIGHT;
@@ -167,7 +167,7 @@ static int dword_855DE4 = 0;
 #else
 #define dword_855E98 (*(int*)0x855E98)
 #define dword_855DE4 (*(int*)0x855DE4)
-#endif
+#endif // SDL2_RENDER
 
 int Window_msg_main_handler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
@@ -245,7 +245,7 @@ int Window_msg_main_handler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
     return v10;
 }
 
-#ifndef SDL2_RENDER
+#if !defined(SDL2_RENDER) && defined(WIN32)
 
 int Window_Main(HINSTANCE hInstance, int a2, char *lpCmdLine, int nShowCmd, LPCSTR lpWindowName)
 {
@@ -1472,7 +1472,7 @@ int Window_MessageLoop()
     return 0;
 }
 
-#endif
+#endif // SDL2_RENDER
 
 void Window_SetDrawHandlers(WindowDrawHandler_t a1, WindowDrawHandler_t a2)
 {

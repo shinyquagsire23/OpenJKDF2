@@ -38,7 +38,7 @@ uint32_t stdSound_ParseWav(stdFile_t sound_file, uint32_t *nSamplesPerSec, int *
         //std_pHS->fileRead(sound_file, &seekPos, 4);
 
         // MoTS added
-        while (!std_pHS->feof(sound_file))
+        while (!std_pHS->fileEof(sound_file))
         {
             std_pHS->fileRead(sound_file, v9, 4);
             std_pHS->fileRead(sound_file, &seekPos, 4);

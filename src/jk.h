@@ -18,7 +18,7 @@ extern "C" {
 #include <ctype.h>
 #endif
 
-#if defined(MACOS) || defined(LINUX)
+#if defined(MACOS) || defined(LINUX) || defined(TARGET_TWL)
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -321,7 +321,7 @@ int jk_GetUpdateRect(HWND hWnd, LPRECT lpRect, BOOL bErase);
 void jk_BeginPaint(int a, struct tagPAINTSTRUCT * lpPaint);
 int jk_vsnwprintf(wchar_t * a, size_t b, const wchar_t *fmt, va_list list);
 void jk_EndPaint(HWND hWnd, const PAINTSTRUCT *lpPaint);
-int stdGdi_GetHInstance();
+HINSTANCE stdGdi_GetHInstance();
 int jk_LoadCursorA(HINSTANCE hInstance, LPCSTR lpCursorName);
 void jk_SetCursor(HCURSOR hCursor);
 void jk_InvalidateRect(HWND hWnd, const RECT *lpRect, BOOL bErase);

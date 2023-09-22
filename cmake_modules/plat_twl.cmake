@@ -3,7 +3,8 @@ macro(plat_initialize)
 
     set(BIN_NAME "openjkdf2")
 
-    #add_definitions(-DARCH_WASM)
+    add_definitions(-DPLAT_MISSING_WIN32)
+    add_definitions(-DTARGET_TWL)
 
     # These are the standard features for full game support
     set(TARGET_USE_PHYSFS FALSE)
@@ -20,10 +21,6 @@ macro(plat_initialize)
     set(OPENJKDF2_NO_ASAN TRUE)
     set(TARGET_USE_CURL FALSE)
     set(TARGET_FIND_OPENAL FALSE)
-
-    if(OPENJKDF2_USE_BLOBS)
-        set(TARGET_NO_BLOBS FALSE)
-    endif()
 
     set(TARGET_BUILD_TESTS FALSE)
     set(SDL2_COMMON_LIBS "")
