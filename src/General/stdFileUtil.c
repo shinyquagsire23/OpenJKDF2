@@ -173,7 +173,7 @@ LABEL_7:
         return RemoveDirectoryA(lpPathName);
     return v2;
 }
-#endif
+#endif // WIN32
 
 #ifdef PLATFORM_POSIX
 
@@ -218,9 +218,9 @@ int stdFileUtil_Deltree(const char* lpPathName)
     return 0;
 }
 #endif // _WIN32
-#endif
+#endif // PLATFORM_POSIX
 
-#ifdef PLATFORM_POSIX
+#if defined(PLATFORM_POSIX) && !defined(WIN32)
 
 static char* search_ext = "";
 
