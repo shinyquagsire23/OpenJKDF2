@@ -21,6 +21,12 @@ else()
     set(NDSTOOL ${DEVKITPRO}/tools/bin/ndstool)
 endif()
 
+if(DEFINED ENV{LIBNDS})
+    set(LIBNDS $ENV{LIBNDS})
+else()
+    set(LIBNDS ${DEVKITPRO}/libnds)
+endif()
+
 set(TOOLCHAIN_PREFIX arm-none-eabi)
 set(TOOLCHAIN_PREFIX_PATH ${DEVKITARM}/bin/${TOOLCHAIN_PREFIX})
 

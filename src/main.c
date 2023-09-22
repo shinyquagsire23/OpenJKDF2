@@ -197,8 +197,18 @@ void crash_handler_basic(int sig);
 #include <fcntl.h>
 
 #include "SDL2_helper.h"
-
 #endif // LINUX
+
+#ifdef TARGET_TWL
+#include <nds.h>
+
+volatile int frame = 0;
+//---------------------------------------------------------------------------------
+void Vblank() {
+//---------------------------------------------------------------------------------
+    frame++;
+}
+#endif
 
 // HACK: minGW fails on the Github runner??
 #ifdef WIN64_MINGW
@@ -215,6 +225,33 @@ void* __attribute__((weak)) __memcpy_chk(void * dest, const void * src, size_t l
 
 int main(int argc, char** argv)
 {
+#ifdef TARGET_TWL
+    touchPosition touchXY;
+
+    irqSet(IRQ_VBLANK, Vblank);
+
+    consoleDemoInit();
+
+    iprintf("\x1b[32mWaddup\n");
+ 
+    while(1) {
+    
+        swiWaitForVBlank();
+        scanKeys();
+        int keys = keysDown();
+        if (keys & KEY_START) break;
+
+        touchRead(&touchXY);
+
+        // print at using ansi escape sequence \x1b[line;columnH 
+        iprintf("\x1b[10;0HFrame = %d",frame);
+        iprintf("\x1b[16;0HTouch x = %04X, %04X\n", touchXY.rawx, touchXY.px);
+        iprintf("Touch y = %04X, %04X\n", touchXY.rawy, touchXY.py);        
+    
+    }
+
+    return 0;
+#endif
 #ifdef WIN64_STANDALONE
     FILE* fp;
     AllocConsole();
