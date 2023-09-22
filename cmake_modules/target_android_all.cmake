@@ -1,6 +1,6 @@
 macro(plat_link_and_package)
-    target_link_libraries(sith_engine PRIVATE PNG::PNG)
-    target_link_libraries(sith_engine PRIVATE ${SDL2_COMMON_LIBS} GLESv1_CM GLESv2 GLESv3 log EGL ${GTK3_LIBRARIES} android jnigraphics nativewindow OpenSLES) #${OPENAL_LIBRARY} GLEW::GLEW
+    target_link_libraries(sith_engine PRIVATE PNG::PNG ZLIB::ZLIB)
+    target_link_libraries(sith_engine PRIVATE ${SDL2_COMMON_LIBS} GLESv1_CM GLESv2 GLESv3 log EGL ${GTK3_LIBRARIES} android jnigraphics nativewindow OpenSLES ${OPENAL_LIBRARY}) #GLEW::GLEW
      
     if(TARGET_USE_PHYSFS)
         target_link_libraries(sith_engine PRIVATE PhysFS::PhysFS_s)

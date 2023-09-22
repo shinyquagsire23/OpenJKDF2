@@ -51,6 +51,15 @@ extern "C" {
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO,     TAG, __VA_ARGS__)
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG,    TAG, __VA_ARGS__)
 
+// TODO why?
+#ifndef GL_BGRA
+#define GL_BGRA 0x80E1
+#endif
+
+#ifndef GL_BGR
+#define GL_BGR 0x80E0
+#endif
+
 #else
 #include <GL/glew.h>
 #include <SDL.h>

@@ -16,6 +16,12 @@ message(SDL_VERSION_MAJOR\ ==\ ${SDL_VERSION_MAJOR})
 message(SDL_VERSION_MINOR\ ==\ ${SDL_VERSION_MINOR})
 message(SDL_VERSION_PATCH\ ==\ ${SDL_VERSION_PATCH})
 
+if(TARGET_ANDROID)
+set(SDL_HIDAPI FALSE)
+else()
+set(SDL_HIDAPI TRUE)
+endif()
+
 ExternalProject_Add(
     SDL
     SOURCE_DIR          ${CMAKE_SOURCE_DIR}/lib/SDL
@@ -29,6 +35,7 @@ ExternalProject_Add(
                         -DSDL_SHARED:BOOL=FALSE
                         -DSDL_STATIC:BOOL=TRUE
                         -DSDL_TEST:BOOL=FALSE
+                        -DSDL_HIDAPI:BOOL=${SDL_HIDAPI}
     BUILD_BYPRODUCTS    ${SDL_LIBRARIES}
 )
 
@@ -45,6 +52,9 @@ set_target_properties(
 )
 target_include_directories(SDL::SDL INTERFACE ${SDL_INCLUDE_DIRS})
 target_link_directories(SDL::SDL INTERFACE ${SDL_ROOT}/lib)
+
+set(SDL2_LIBRARY ${SDL_ROOT}/lib)
+set(SDL2_INCLUDE_DIR ${SDL_INCLUDE_DIRS})
 
 # TODO why doesn't this work?
 #if(TARGET_MACOS)

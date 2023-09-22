@@ -5,14 +5,13 @@ macro(plat_initialize)
 
     set(BIN_NAME "openjkdf2-armv8a")
 
+    add_definitions(-DARCH_64BIT)
     add_definitions(-DTARGET_ANDROID)
     add_definitions(-DLINUX)
-    add_definitions(-DSTDSOUND_NULL)
+    #add_definitions(-DSTDSOUND_NULL)
 
     include(cmake_modules/plat_feat_full_sdl2.cmake)
     set(TARGET_USE_PHYSFS FALSE)
-    set(TARGET_USE_OPENAL FALSE)
-    set(TARGET_CAN_JKGM FALSE)
     set(TARGET_USE_CURL FALSE)
     set(TARGET_BUILD_TESTS FALSE)
     set(TARGET_FIND_OPENAL FALSE)
@@ -31,5 +30,7 @@ macro(plat_initialize)
 endmacro()
 
 macro(plat_specific_deps)
-    set(SDL2_COMMON_LIBS SDL2main SDL::SDL)
+    #set(SDL2_COMMON_LIBS SDL2main SDL::SDL)
+    set(SDL2_COMMON_LIBS SDL2main SDL::SDL ${SDL_MIXER_DEPS} SDL::Mixer OpenAL::OpenAL)
 endmacro()
+
