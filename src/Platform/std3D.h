@@ -55,36 +55,7 @@ int std3D_HasAlpha();
 int std3D_HasModulateAlpha();
 int std3D_HasAlphaFlatStippled();
 
-#ifdef SDL2_RENDER
-int std3D_Startup();
-void std3D_Shutdown();
-int std3D_StartScene();
-int std3D_EndScene();
-void std3D_ResetRenderList();
-int std3D_RenderListVerticesFinish();
-void std3D_DrawRenderList();
-int std3D_SetCurrentPalette(rdColor24 *a1, int a2);
-void std3D_GetValidDimension(unsigned int inW, unsigned int inH, unsigned int *outW, unsigned int *outH);
-int std3D_DrawOverlay();
-void std3D_UnloadAllTextures();
-void std3D_AddRenderListTris(rdTri *tris, unsigned int num_tris);
-void std3D_AddRenderListLines(rdLine* lines, uint32_t num_lines);
-int std3D_AddRenderListVertices(D3DVERTEX *vertex_array, int count);
-void std3D_UpdateFrameCount(rdDDrawSurface *surface);
-void std3D_PurgeTextureCache();
-void std3D_Shutdown();
-int std3D_ClearZBuffer();
-int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_alpha_tex, int no_alpha);
-void std3D_DrawMenu();
-void std3D_DrawSceneFbo();
-void std3D_FreeResources();
-void std3D_InitializeViewport(rdRect *viewRect);
-int std3D_GetValidDimensions(int a1, int a2, int a3, int a4);
-int std3D_FindClosestDevice(uint32_t index, int a2);
-int std3D_SetRenderList(intptr_t a1);
-intptr_t std3D_GetRenderList();
-int std3D_CreateExecuteBuffer();
-#else
+#if !defined(SDL2_RENDER) && defined(WIN32)
 static int (*std3D_Startup)() = (void*)std3D_Startup_ADDR;
 static void (*std3D_Shutdown)() = (void*)std3D_Shutdown_ADDR;
 static int (*std3D_StartScene)() = (void*)std3D_StartScene_ADDR;
@@ -108,6 +79,34 @@ static int (*std3D_FindClosestDevice)(uint32_t index, int a2) = (void*)std3D_Fin
 int std3D_SetRenderList(intptr_t a1);
 intptr_t std3D_GetRenderList();
 static int (*std3D_CreateExecuteBuffer)() = (void*)std3D_CreateExecuteBuffer_ADDR;
+#else
+int std3D_Startup();
+void std3D_Shutdown();
+int std3D_StartScene();
+int std3D_EndScene();
+void std3D_ResetRenderList();
+int std3D_RenderListVerticesFinish();
+void std3D_DrawRenderList();
+int std3D_SetCurrentPalette(rdColor24 *a1, int a2);
+void std3D_GetValidDimension(unsigned int inW, unsigned int inH, unsigned int *outW, unsigned int *outH);
+int std3D_DrawOverlay();
+void std3D_UnloadAllTextures();
+void std3D_AddRenderListTris(rdTri *tris, unsigned int num_tris);
+void std3D_AddRenderListLines(rdLine* lines, uint32_t num_lines);
+int std3D_AddRenderListVertices(D3DVERTEX *vertex_array, int count);
+void std3D_UpdateFrameCount(rdDDrawSurface *surface);
+void std3D_PurgeTextureCache();
+int std3D_ClearZBuffer();
+int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_alpha_tex, int no_alpha);
+void std3D_DrawMenu();
+void std3D_DrawSceneFbo();
+void std3D_FreeResources();
+void std3D_InitializeViewport(rdRect *viewRect);
+int std3D_GetValidDimensions(int a1, int a2, int a3, int a4);
+int std3D_FindClosestDevice(uint32_t index, int a2);
+int std3D_SetRenderList(intptr_t a1);
+intptr_t std3D_GetRenderList();
+int std3D_CreateExecuteBuffer();
 #endif
 
 void std3D_PurgeUIEntry(int i, int idx);

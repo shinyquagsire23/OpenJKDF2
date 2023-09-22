@@ -4,7 +4,8 @@
 #include "General/stdFnames.h"
 #include "jk.h"
 
-#ifdef PLATFORM_POSIX 
+#ifdef PLATFORM_POSIX
+#include <assert.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -207,7 +208,11 @@ int stdFileUtil_Deltree(const char* lpPathName)
     }
 #endif
 
+#ifndef TARGET_TWL
     nftw(tmp, rmFiles, 10, FTW_DEPTH|FTW_MOUNT|FTW_PHYS);
+#else
+    assert(0);
+#endif
 
     //rmdir(tmp);
     return 0;
@@ -215,7 +220,7 @@ int stdFileUtil_Deltree(const char* lpPathName)
 #endif // _WIN32
 #endif
 
-#ifdef LINUX
+#ifdef PLATFORM_POSIX
 
 static char* search_ext = "";
 
@@ -386,4 +391,4 @@ int stdFileUtil_DelFile(char* lpFileName)
 
     return 1;
 }
-#endif
+#endif // PLATFORM_POSIX

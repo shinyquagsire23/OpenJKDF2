@@ -135,10 +135,15 @@ int jkGuiMods_OpenURL(const char *url)
     }
     return 0;
 }
-#else
+#elif defined(SDL2_RENDER)
 int jkGuiMods_OpenURL(const char* url)
 {
     return SDL_OpenURL(url);
+}
+#else
+int jkGuiMods_OpenURL(const char* url)
+{
+    return 0;
 }
 #endif
 
@@ -275,7 +280,7 @@ void jkGuiMods_PopulateEntries(Darray *pListDisplayed, jkGuiElement *element)
     char tmpCwd[512];
     char tmpKeyPath[512];
 
-#if !defined(ARCH_WASM) && !defined(TARGET_ANDROID)
+#if !defined(ARCH_WASM) && !defined(TARGET_ANDROID) && !defined(TARGET_TWL)
     Main_bMotsCompat = !Main_bMotsCompat;
     InstallHelper_GetLocalDataDir(tmpCwd, sizeof(tmpCwd), 0);
     Main_bMotsCompat = !Main_bMotsCompat;

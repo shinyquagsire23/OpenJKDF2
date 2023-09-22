@@ -129,7 +129,11 @@ static void* Linux_realloc(void* ptr, uint32_t len)
 
 static int Linux_stdFeof(stdFile_t fhand)
 {
+#ifdef TARGET_TWL
+    return 0;
+#else
     return feof((void*)fhand);
+#endif
 }
 
 uint32_t stdPlatform_GetTimeMsec()

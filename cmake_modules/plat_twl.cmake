@@ -5,6 +5,8 @@ macro(plat_initialize)
 
     add_definitions(-DPLAT_MISSING_WIN32)
     add_definitions(-DTARGET_TWL)
+    add_definitions(-D_XOPEN_SOURCE=500)
+    add_definitions(-D_DEFAULT_SOURCE)
 
     # These are the standard features for full game support
     set(TARGET_USE_PHYSFS FALSE)
@@ -27,7 +29,7 @@ macro(plat_initialize)
 
     set(TARGET_TWL TRUE)
 
-    add_link_options(-fno-exceptions)
+    add_link_options(-fno-exceptions -fshort-wchar)
     add_compile_options(-fno-exceptions)
     add_compile_options(-O2 -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces)
 endmacro()
@@ -37,6 +39,6 @@ macro(plat_specific_deps)
 endmacro()
 
 macro(plat_link_and_package)
-    target_link_libraries(${BIN_NAME} PRIVATE -lm -lSDL2 -lSDL2_mixer -lGL -lGLEW -lopenal)
+    target_link_libraries(${BIN_NAME} PRIVATE -lm)
     target_link_libraries(sith_engine PRIVATE nlohmann_json::nlohmann_json)
 endmacro()

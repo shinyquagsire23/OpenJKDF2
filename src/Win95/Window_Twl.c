@@ -1,13 +1,7 @@
 #include "Window.h"
 
 #ifdef TARGET_TWL
-int Window_xSize = WINDOW_DEFAULT_WIDTH;
-int Window_ySize = WINDOW_DEFAULT_HEIGHT;
-int Window_screenXSize = WINDOW_DEFAULT_WIDTH;
-int Window_screenYSize = WINDOW_DEFAULT_HEIGHT;
-int Window_isHiDpi = 0;
-int Window_isFullscreen = 0;
-int Window_needsRecreate = 0;
+
 
 static int dword_855E98 = 0;
 static int dword_855DE4 = 0;
@@ -31,5 +25,14 @@ int last_jkGame_isDDraw = 0;
 int last_jkQuakeConsole_bOpen = 0;
 int Window_menu_mouseX = 0;
 int Window_menu_mouseY = 0;
+
+int Window_Main_Linux(int argc, char** argv)
+{
+}
+
+int Window_DefaultHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam, void* unused)
+{
+    return 0;
+}
 
 #endif

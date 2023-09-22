@@ -201,6 +201,11 @@ if(TARGET_MACOS)
     add_definitions(-DLINUX)
 endif()
 
+if(TARGET_TWL)
+    file(GLOB TARGET_TWL_SRCS ${PROJECT_SOURCE_DIR}/src/Platform/TWL/*.c)
+    list(APPEND ENGINE_SOURCE_FILES ${TARGET_TWL_SRCS})
+endif()
+
 if(TARGET_WASM)
     add_definitions(-DLINUX)
 endif()
