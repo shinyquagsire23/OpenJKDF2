@@ -76,6 +76,127 @@ static inline void stdJSON_PrintNullPtrWarning() {
     stdPlatform_Printf("WARN: stdJSON was passed a NULL ptr value.\n");
 }
 
+#ifdef TARGET_TWL
+
+static int stdJSON_WriteToFile(const char* pFpath, nlohmann::json& json_file)
+{
+    return 1;
+}
+
+int stdJSON_SaveInt(const char* pFpath, const char* pKey, int val)
+{
+    CHECK_COMMON(pFpath, pKey);
+
+    return 1;
+}
+
+int stdJSON_SaveFloat(const char* pFpath, const char* pKey, float val)
+{
+    CHECK_COMMON(pFpath, pKey);
+
+    return 1;
+}
+
+int stdJSON_GetInt(const char* pFpath, const char* pKey, int valDefault)
+{
+    CHECK_COMMON_GET(pFpath, pKey, valDefault);
+
+    return valDefault;
+}
+
+float stdJSON_GetFloat(const char* pFpath, const char* pKey, float valDefault)
+{
+    CHECK_COMMON_GET(pFpath, pKey, valDefault);
+
+    return valDefault;
+}
+
+int stdJSON_SaveBool(const char* pFpath, const char* pKey, int bVal)
+{
+    CHECK_COMMON(pFpath, pKey);
+
+    return 1;
+}
+
+int stdJSON_GetBool(const char* pFpath, const char* pKey, int bValDefault)
+{
+    CHECK_COMMON_GET(pFpath, pKey, bValDefault);
+
+    return bValDefault;
+}
+
+int stdJSON_SaveBytes(const char* pFpath, const char* pKey, uint8_t *pData, uint32_t dataLen)
+{
+    CHECK_COMMON(pFpath, pKey);
+    CHECK_ARGPTR(pData);
+
+    return 1;
+}
+
+int stdJSON_GetBytes(const char* pFpath, const char* pKey, uint8_t* pData, uint32_t dataLen)
+{
+    CHECK_COMMON(pFpath, pKey);
+    CHECK_ARGPTR(pData);
+
+    return 1;
+}
+
+int stdJSON_SetString(const char* pFpath, const char* pKey, const char *pVal)
+{
+    CHECK_COMMON(pFpath, pKey);
+    CHECK_ARGPTR(pVal);
+
+    return 1;
+}
+
+int stdJSON_GetString(const char* pFpath, const char* pKey, char* pOut, int outSize, const char *pValDefault)
+{
+    CHECK_COMMON(pFpath, pKey);
+    CHECK_ARGPTR(pOut);
+    CHECK_ARGPTR(pValDefault);
+
+    _strncpy(pOut, pValDefault, outSize);
+
+    return 1;
+}
+
+int stdJSON_SetWString(const char* pFpath, const char* pKey, const char16_t *pVal)
+{
+    CHECK_COMMON(pFpath, pKey);
+    CHECK_ARGPTR(pVal);
+
+    return 1;
+}
+
+int stdJSON_GetWString(const char* pFpath, const char* pKey, char16_t* pOut, int outSize, const char16_t *pValDefault)
+{
+    CHECK_COMMON(pFpath, pKey);
+    CHECK_ARGPTR(pOut);
+    CHECK_ARGPTR(pValDefault);
+
+    _wcsncpy((wchar_t*)pOut, (wchar_t*)pValDefault, outSize);
+
+    return 1;
+}
+
+int stdJSON_IterateKeys(const char* pFpath, stdJSONCallback_t pCallbackFn, void* pCtx)
+{
+    return 1;
+}
+
+int stdJSON_EraseKey(const char* pFpath, const char* pKey)
+{
+    return 1;
+}
+
+int stdJSON_EraseAll(const char* pFpath)
+{
+    return 1;
+}
+
+#endif // TARGET_TWL
+
+#ifndef TARGET_TWL
 static nlohmann::json stdJSON_OpenAndReadFile(const char* pFpath)
 {
     fs::path json_path = {pFpath};
@@ -362,5 +483,5 @@ int stdJSON_EraseAll(const char* pFpath)
     nlohmann::json json_file(nlohmann::json::value_t::object);
     return stdJSON_WriteToFile(pFpath, json_file);
 }
-
+#endif // !TARGET_TWL
 }

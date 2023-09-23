@@ -48,7 +48,7 @@ macro(plat_specific_deps)
 endmacro()
 
 macro(plat_link_and_package)
-    target_link_libraries(${BIN_NAME} PRIVATE -lm -lnds9)
+    target_link_libraries(${BIN_NAME} PRIVATE -lm -lfat -lnds9)
     target_link_libraries(sith_engine PRIVATE nlohmann_json::nlohmann_json)
 
     target_link_options(${BIN_NAME} PRIVATE -T${PROJECT_SOURCE_DIR}/cmake_modules/openjkdf2_dsi_arm9.mem -T${PROJECT_SOURCE_DIR}/cmake_modules/openjkdf2_ds_arm9.ld -Wl,--no-warn-rwx-segments -Wl,-Map,openjkdf2.map ${DEVKITARM}/arm-none-eabi/lib/ds_arm9_crt0.o)

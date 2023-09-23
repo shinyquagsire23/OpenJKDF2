@@ -226,31 +226,10 @@ void* __attribute__((weak)) __memcpy_chk(void * dest, const void * src, size_t l
 int main(int argc, char** argv)
 {
 #ifdef TARGET_TWL
-    touchPosition touchXY;
-
-    irqSet(IRQ_VBLANK, Vblank);
-
     consoleDemoInit();
+    fatInitDefault();
 
-    iprintf("\x1b[32mWaddup\n");
- 
-    while(1) {
-    
-        swiWaitForVBlank();
-        scanKeys();
-        int keys = keysDown();
-        if (keys & KEY_START) break;
-
-        touchRead(&touchXY);
-
-        // print at using ansi escape sequence \x1b[line;columnH 
-        iprintf("\x1b[10;0HFrame = %d",frame);
-        iprintf("\x1b[16;0HTouch x = %04X, %04X\n", touchXY.rawx, touchXY.px);
-        iprintf("Touch y = %04X, %04X\n", touchXY.rawy, touchXY.py);        
-    
-    }
-
-    return 0;
+    printf("Waddup\n");
 #endif
 #ifdef WIN64_STANDALONE
     FILE* fp;

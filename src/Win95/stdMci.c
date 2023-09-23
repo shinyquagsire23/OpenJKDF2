@@ -4,7 +4,7 @@
 #include "stdPlatform.h"
 #include "jk.h"
 
-#ifdef LINUX
+#ifdef FS_POSIX
 #include "external/fcaseopen/fcaseopen.h"
 #endif
 
@@ -254,7 +254,7 @@ int stdMci_TryPlay(const char* fpath) {
     char tmp[256];
     strncpy(tmp, fpath, 255);
 
-#ifdef LINUX
+#ifdef FS_POSIX
     char *r = malloc(strlen(tmp) + 16);
     if (casepath(tmp, r))
     {

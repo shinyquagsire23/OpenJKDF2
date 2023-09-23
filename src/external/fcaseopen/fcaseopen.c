@@ -75,6 +75,8 @@ int casepath(char const *path, char *r)
         
         c = strsep(&p, "/");
     }
+
+    strcat(r, "/"); // Added
     
     if (d) closedir(d);
     return 1;

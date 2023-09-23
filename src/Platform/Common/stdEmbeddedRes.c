@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef LINUX
+#ifdef FS_POSIX
 #include "external/fcaseopen/fcaseopen.h"
 #endif
 
@@ -120,7 +120,7 @@ for (int i = 0; i < strlen(tmp_filepath); i++)
 }
 #endif
 
-#ifdef LINUX
+#ifdef FS_POSIX
     char *r = malloc(strlen(tmp_filepath) + 16);
     if (casepath(tmp_filepath, r))
     {

@@ -14,6 +14,10 @@ extern "C" {
 #define PLAT_MISSING_WIN32
 #endif
 
+#if defined(LINUX) || defined(TARGET_TWL)
+#define FS_POSIX
+#endif
+
 // Ghidra tutorial:
 // File > Parse C Source...
 //

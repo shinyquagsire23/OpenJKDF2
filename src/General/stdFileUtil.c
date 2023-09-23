@@ -24,8 +24,9 @@
 stdFileSearch* stdFileUtil_NewFind(char *path, int a2, char *extension)
 {
     stdFileSearch* search = (stdFileSearch *)std_pHS->alloc(sizeof(stdFileSearch));
-    if ( !search )
+    if ( !search ) {
         return search;
+    }
     _memset(search, 0, sizeof(stdFileSearch));
 
     if ( a2 < 0 )
@@ -42,7 +43,7 @@ stdFileSearch* stdFileUtil_NewFind(char *path, int a2, char *extension)
     _sprintf(std_genBuffer, "*.%s", extension);
     stdFnames_MakePath(search->path, 128, path, std_genBuffer);
     
-#ifdef LINUX
+#ifdef FS_POSIX
     for (int i = 0; i < strlen(search->path); i++)
     {
         if (search->path[i] == '\\')

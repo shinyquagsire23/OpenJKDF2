@@ -1125,6 +1125,13 @@ void InstallHelper_SetCwd()
     else {
         chdir("mots/");
     }
+#elif defined(TARGET_TWL)
+    if (!Main_bMotsCompat) {
+        chdir("sd:/jk1/");
+    }
+    else {
+        chdir("sd:/mots/");
+    }
 #else
     if (!Main_bMotsCompat) {
         chdir("/jk1/");

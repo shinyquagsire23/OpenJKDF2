@@ -293,7 +293,7 @@ int Main_Startup(const char *cmdline)
     }
     stdStartup(&hs); // Added
     InstallHelper_SetCwd(); // Added
-    
+
     wuRegistry_Startup(HKEY_LOCAL_MACHINE, "Software\\LucasArts Entertainment Company\\JediKnight\\v1.0", "0.1");
     //stdStartup(&hs); // Moved
 
@@ -307,8 +307,10 @@ int Main_Startup(const char *cmdline)
 
     if (Windows_InitWindow())
     {
+
         rdStartup(&hs);
         jkGuiRend_Startup();
+#ifndef TARGET_TWL // TODO
         jkGui_Startup();
         jkGuiMultiplayer_Startup();
         jkGuiNetHost_Startup();
@@ -382,7 +384,9 @@ int Main_Startup(const char *cmdline)
             return 1;
         }
         return 0;
+#endif
     }
+
     return 0;
 }
 

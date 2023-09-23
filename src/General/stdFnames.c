@@ -2,7 +2,7 @@
 
 #include "jk.h"
 
-#ifdef LINUX
+#ifdef FS_POSIX
 #include "external/fcaseopen/fcaseopen.h"
 #endif
 
@@ -230,7 +230,7 @@ char* stdFnames_MakePath(char *a1, int a2, const char *a3, const char *a4)
       a1[v5] = 0;
     }
 
-#ifdef LINUX
+#ifdef FS_POSIX
     char *r = malloc(strlen(a1) + 16);
     if (casepath(a1, r))
     {

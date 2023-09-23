@@ -17,3 +17,6 @@ export -n SDKROOT MACOSX_DEPLOYMENT_TARGET CPLUS_INCLUDE_PATH C_INCLUDE_PATH
 
 cmake .. --toolchain $(pwd)/../cmake_modules/toolchain_twl.cmake && make -j10 openjkdf2.nds
 cd ..
+
+echo "Starting..."
+pkill -9 melonDS ; pkill -9 melonDS ; open build_nintendo_dsi/openjkdf2.nds

@@ -11,7 +11,7 @@
 #include "World/jkPlayer.h"
 #include "Main/jkEpisode.h"
 
-#ifdef LINUX
+#ifdef FS_POSIX
 #include "external/fcaseopen/fcaseopen.h"
 #endif
 
@@ -56,7 +56,7 @@ int jkSmack_SmackPlay(const char *fname)
     }
     _sprintf(std_genBuffer, "video%c%s", '\\', fname);
 
-#ifdef LINUX
+#ifdef FS_POSIX
     char *r = malloc(strlen(std_genBuffer) + 16);
     if (casepath(std_genBuffer, r))
     {

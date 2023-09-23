@@ -214,8 +214,9 @@
 #define JKDEV_NUM_CHEATS (32)
 #endif
 
-#define SITHCVAR_MAX_CVARS (1024)
+#define SITHCVAR_MAX_CVARS (512)
 #define SITHCVAR_MAX_STRLEN (256)
+#define SITHCVAR_MAX_NAME_STRLEN (64)
 #define SITHCVAR_FNAME ("openjkdf2_cvars.json")
 
 #define STDUPDATER_DEFAULT_URL ("https://api.github.com/repos/shinyquagsire23/OpenJKDF2/releases?per_page=1")
