@@ -125,7 +125,7 @@ int jkGame_Update()
     int v6; // [esp+1Ch] [ebp-1Ch]
 
     // HACK HACK HACK: Adjust zNear depending on if we're using the scope/camera views
-#ifdef SDL2_RENDER
+#if defined(SDL2_RENDER) || defined(TARGET_TWL)
     if (sithCamera_cameras[0].rdCam.pClipFrustum) {
         sithCamera_cameras[0].rdCam.pClipFrustum->field_0.y = SITHCAMERA_ZNEAR_FIRSTPERSON;
 
@@ -141,12 +141,12 @@ int jkGame_Update()
     
 #endif
 
-#ifdef SDL2_RENDER
+#if defined(SDL2_RENDER) || defined(TARGET_TWL)
     // HACK
     Video_modeStruct.b3DAccel = 1;
 #endif
 
-#ifndef SDL2_RENDER
+#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
     if ( Video_modeStruct.Video_8606C0 || Video_modeStruct.geoMode <= 2 )
 #endif
         stdDisplay_VBufferFill(Video_pMenuBuffer, Video_fillColor, 0);
@@ -155,22 +155,22 @@ int jkGame_Update()
     jkHud_ClearRects(0);
 
     stdPalEffects_UpdatePalette(stdDisplay_GetPalette());
-#ifndef SDL2_RENDER
+#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
     if ( Video_modeStruct.b3DAccel )
 #endif
         rdSetColorEffects(&stdPalEffects_state.effect);
 
-#ifdef SDL2_RENDER
+#if defined(SDL2_RENDER) || defined(TARGET_TWL)
     _memcpy(stdDisplay_masterPalette, sithWorld_pCurrentWorld->colormaps->colors, 0x300);
 #endif
     rdAdvanceFrame();
-#ifndef SDL2_RENDER
+#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
     if ( Video_modeStruct.b3DAccel )
 #endif
     {
         sithMain_UpdateCamera();
     }
-#ifndef SDL2_RENDER
+#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
     else
     {
         stdDisplay_VBufferLock(Video_pMenuBuffer);
@@ -238,7 +238,7 @@ int jkGame_Update()
     }
 #endif
 
-#ifdef SDL2_RENDER
+#if defined(SDL2_RENDER)
     stdVBuffer* pOverlayBuffer = Video_pCanvasOverlayMap->vbuffer;
     stdDisplay_VBufferLock(pOverlayBuffer);
     stdDisplay_VBufferFill(pOverlayBuffer, Video_fillColor, 0);
@@ -267,7 +267,7 @@ int jkGame_Update()
 
     jkDev_BlitLogToScreen();
     jkHudInv_Draw();
-#ifndef SDL2_RENDER
+#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
     if ( Video_modeStruct.b3DAccel )
         std3D_DrawOverlay();
 #endif
@@ -279,8 +279,11 @@ int jkGame_Update()
     }
     */
 
-#ifdef SDL2_RENDER
+#if defined(SDL2_RENDER)
     jkQuakeConsole_Render();
+#endif
+
+#if defined(SDL2_RENDER) || defined(TARGET_TWL)
     std3D_DrawMenu();
     rdFinishFrame();
 #endif
@@ -341,7 +344,7 @@ void jkGame_Gamma()
         Video_modeStruct.Video_8606A4 = 0;
     }
     stdDisplay_GammaCorrect3(v0);
-#ifndef SDL2_RENDER
+#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
     stdPalEffects_RefreshPalette();
     if ( Video_modeStruct.b3DAccel )
     {

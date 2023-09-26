@@ -5,6 +5,8 @@
 #include "stdPlatform.h"
 #include "Main/jkQuakeConsole.h"
 
+#include <nds.h>
+
 #include "jk.h"
 
 const uint8_t stdControl_aSdlToDik[256] =
@@ -253,7 +255,7 @@ const uint8_t stdControl_aSdlToDik[256] =
     0,//DIK_RGUI,
 };
 
-uint8_t stdControl_aDebounce[256];
+uint8_t stdControl_aDebounce[JK_NUM_KEYS];
 
 #define SDL2_MIN_BINARY_THRESH (-0x5000)
 #define SDL2_MAX_BINARY_THRESH (0x5000)
@@ -690,6 +692,28 @@ void stdControl_ReadControls()
         return;
     if (jkQuakeConsole_bOpen) return; // Hijack input to console
 
+    // HACK
+    stdControl_bHasJoysticks = 1; // HACK
+    stdControl_aJoystickNumAxes[0] = 1;
+    stdControl_aJoystickMaxButtons[0] = 7;
+    stdControl_aAxisEnabled[0] = 1;
+    stdControl_aJoystickExists[0] = 1;
+    sithWeapon_controlOptions &= ~(1 << 5); // Enable joystick
+
+    stdControl_InitAxis(AXIS_JOY1_X, -0x7FFF, 0x7FFF, 0.2);
+    stdControl_InitAxis(AXIS_JOY1_Y, -0x7FFF, 0x7FFF, 0.2);
+
+    scanKeys();
+    u16 keys_held = keysHeld();
+    //if((keys_held & KEY_UP)) rotateX += 3;
+    //if((keys_held & KEY_DOWN)) rotateX -= 3;
+    //if((keys_held & KEY_LEFT)) rotateY += 3;
+    //if((keys_held & KEY_RIGHT)) rotateY -= 3;
+    //if((keys & KEY_A)) fCamera -= 0.05f;
+    //if((keys & KEY_B)) fCamera += 0.05f;
+
+    u16 keysPressed = keysDown();
+
     _memset(stdControl_aInput1, 0, sizeof(int) * JK_NUM_KEYS);
     stdControl_bControlsIdle = 1;
     _memset(stdControl_aInput2, 0, sizeof(int) * JK_NUM_KEYS);
@@ -717,88 +741,57 @@ void stdControl_ReadControls()
 
     if ( !stdControl_bDisableKeyboard )
     {
-        /*const Uint8 *state = SDL_GetKeyboardState(NULL);
+        const uint8_t *state = stdControl_aInput1;
         for (int i = 0; i < 256; i++)
         {
             int s = !!state[i];
             if (s && stdControl_aDebounce[i]) {
                 continue;
             }
-            stdControl_SetSDLKeydown(i, s, stdControl_curReadTime);
+            stdControl_SetKeydown(i, s, stdControl_curReadTime);
             stdControl_aDebounce[i] = 0;
-        }*/
+        }
         // stdControl_SetKeydown(keyNum, keyVal, timestamp)
     }
-#if 0
+
     if ( stdControl_bHasJoysticks )
     {
-        for (int i = 0; i < JK_NUM_JOYSTICKS; i++)
-        {
-            if ( !(stdControl_aAxisEnabled[i] && stdControl_aJoystickExists[i]) )
-                continue;
+        stdControl_SetKeydown(KEY_JOY1_B1, !!(keys_held & KEY_A) /* button val */, stdControl_curReadTime);
+        stdControl_SetKeydown(KEY_JOY1_B2, !!(keys_held & KEY_B) /* button val */, stdControl_curReadTime);
+        stdControl_SetKeydown(KEY_JOY1_B3, !!(keys_held & KEY_X) /* button val */, stdControl_curReadTime);
+        stdControl_SetKeydown(KEY_JOY1_B4, !!(keys_held & KEY_Y) /* button val */, stdControl_curReadTime);
+        stdControl_SetKeydown(KEY_JOY1_B5, !!(keys_held & KEY_L) /* button val */, stdControl_curReadTime);
+        stdControl_SetKeydown(KEY_JOY1_B6, !!(keys_held & KEY_R) /* button val */, stdControl_curReadTime);
+        stdControl_SetKeydown(KEY_JOY1_B7, !!(keys_held & KEY_SELECT) /* button val */, stdControl_curReadTime);
+        //stdControl_SetKeydown(KEY_JOY1_B8, !!(keys_held & KEY_START) /* button val */, stdControl_curReadTime);
 
-            if (!pJoysticks[i]) continue;
+        stdControl_SetKeydown(KEY_JOY1_HLEFT,  !!(keys_held & KEY_LEFT) /* button val */, stdControl_curReadTime);
+        stdControl_SetKeydown(KEY_JOY1_HUP,    !!(keys_held & KEY_UP) /* button val */, stdControl_curReadTime);
+        stdControl_SetKeydown(KEY_JOY1_HRIGHT, !!(keys_held & KEY_RIGHT) /* button val */, stdControl_curReadTime);
+        stdControl_SetKeydown(KEY_JOY1_HDOWN,  !!(keys_held & KEY_DOWN) /* button val */, stdControl_curReadTime);
 
-            uint32_t quirks = stdControl_aJoystickQuirks[i];
-
-            //stdControl_aAxisEnabled[i] = 0;
-
-            
-            for (int j = 0; j < JK_JOYSTICK_AXIS_STRIDE; j++)
-            {
-                int val = SDL_JoystickGetAxis(pJoysticks[i],j);
-                //printf("%u: %d\n", j, val);
-                stdControl_aAxisPos[(JK_JOYSTICK_AXIS_STRIDE * i) + j] = val;
-            }
-
-            int numAxes = stdControl_aJoystickNumAxes[i];
-            int numButtons = stdControl_aJoystickMaxButtons[i];
-            int numRealButtons = numButtons - (numAxes * 2);
-            int numAxisButtons = numAxes * 2;
-            
-            for (int j = 0; j < JK_NUM_JOY_BUTTONS + JK_NUM_EXT_JOY_BUTTONS; ++j )
-            {
-                int val = SDL_JoystickGetButton(pJoysticks[i], j);
-
-                if (quirks & QUIRK_NINTENDO_TRIGGER_AXIS_TO_BUTTON) {
-                    if (j == 15) { // Capture
-                        val = SDL_JoystickGetAxis(pJoysticks[i],4) > 0;
-                    }
-                    else if (j == 5) { // Home
-                        val = SDL_JoystickGetAxis(pJoysticks[i],5) > 0;
-                    }
-                }
-
-                if (j >= numRealButtons && j < numButtons) {
-                    int axisButtonNum = (j - numRealButtons);
-                    int axisNum = axisButtonNum / 2;
-                    if (axisButtonNum & 1) {
-                        val = !!(SDL_JoystickGetAxis(pJoysticks[i], axisNum) < SDL2_MIN_BINARY_THRESH);
-                    }
-                    else {
-                        val = !!(SDL_JoystickGetAxis(pJoysticks[i], axisNum) > SDL2_MAX_BINARY_THRESH);
-                    }
-                }
-                
-                int idx = j + (256 + JK_JOYSTICK_BUTTON_STRIDE*i);
-                if (j >= JK_NUM_JOY_BUTTONS) {
-                    idx = (j - JK_NUM_JOY_BUTTONS) + (KEY_JOY1_EXT_STARTIDX + (JK_JOYSTICK_EXT_BUTTON_STRIDE*i));
-                }
-                //printf("%u: %u %x\n", j, val, idx);
-                if (val) {
-                    //stdControl_bControlsIdle = 0;
-                }
-                stdControl_SetKeydown(idx, val /* button val */, stdControl_curReadTime);
-            }
-
-            uint8_t hatState = SDL_JoystickGetHat(pJoysticks[i], 0);
-            stdControl_SetKeydown((JK_JOYSTICK_BUTTON_STRIDE*i) + KEY_JOY1_HLEFT, !!(hatState & SDL_HAT_LEFT) /* button val */, stdControl_curReadTime);
-            stdControl_SetKeydown((JK_JOYSTICK_BUTTON_STRIDE*i) + KEY_JOY1_HUP, !!(hatState & SDL_HAT_UP) /* button val */, stdControl_curReadTime);
-            stdControl_SetKeydown((JK_JOYSTICK_BUTTON_STRIDE*i) + KEY_JOY1_HRIGHT, !!(hatState & SDL_HAT_RIGHT) /* button val */, stdControl_curReadTime);
-            stdControl_SetKeydown((JK_JOYSTICK_BUTTON_STRIDE*i) + KEY_JOY1_HDOWN, !!(hatState & SDL_HAT_DOWN) /* button val */, stdControl_curReadTime);
+        if (keys_held & KEY_LEFT) {
+            //stdControl_aAxisPos[AXIS_JOY1_X] = -0x7FFF;
         }
+        else if (keys_held & KEY_RIGHT) {
+            //stdControl_aAxisPos[AXIS_JOY1_X] = 0x7FFF;
+        }
+        else {
+            stdControl_aAxisPos[AXIS_JOY1_X] = 0;
+        }
+
+        if (keys_held & KEY_UP) {
+            //stdControl_aAxisPos[AXIS_JOY1_Y] = -0x7FFF;
+        }
+        else if (keys_held & KEY_DOWN) {
+            //stdControl_aAxisPos[AXIS_JOY1_Y] = 0x7FFF;
+        }
+        else {
+            stdControl_aAxisPos[AXIS_JOY1_Y] = 0;
+        }
+        
     }
-#endif
+
     stdControl_ReadMouse();
     stdControl_msLast = stdControl_curReadTime;
 }

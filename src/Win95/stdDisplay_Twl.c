@@ -364,6 +364,7 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
 
     if (!srcPixels || !dstPixels) {
         //stdPlatform_Printf("Vbuffer copy missing src or dst %p %p\n", srcPixels, dstPixels);
+        return 0;
     }
 
     int self_copy = 0;
@@ -450,6 +451,12 @@ int stdDisplay_VBufferFill(stdVBuffer *vbuf, int fillColor, rdRect *rect)
     uint8_t* dstPixels = vbuf->surface_lock_alloc;
     uint32_t dstStride = vbuf->format.width_in_bytes;
     uint32_t max_idx = dstStride * vbuf->format.height;
+
+    if (!dstPixels) {
+        //stdPlatform_Printf("Vbuffer copy missing buffer %p %p\n", dstPixels);
+        return 0;
+    }
+
     for (int i = 0; i < rect->width; i++)
     {
         for (int j = 0; j < rect->height; j++)
@@ -492,6 +499,8 @@ void stdDisplay_VBufferFree(stdVBuffer *vbuf)
 {
     stdDisplay_VBufferUnlock(vbuf);
     //SDL_FreeSurface(vbuf->sdlSurface);
+    if (vbuf->surface_lock_alloc)
+        std_pHS->free(vbuf->surface_lock_alloc);
     std_pHS->free(vbuf);
 }
 

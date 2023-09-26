@@ -226,6 +226,7 @@ void* __attribute__((weak)) __memcpy_chk(void * dest, const void * src, size_t l
 int main(int argc, char** argv)
 {
 #ifdef TARGET_TWL
+    defaultExceptionHandler();
     consoleDebugInit(DebugDevice_NOCASH);
 
     lcdMainOnTop();
@@ -235,6 +236,10 @@ int main(int argc, char** argv)
     consoleDemoInit();
 
     fatInitDefault();
+
+    // Millisecond timer
+    TIMER0_CR = TIMER_ENABLE|TIMER_DIV_1024;
+    TIMER1_CR = TIMER_ENABLE|TIMER_CASCADE;
 
     printf("Waddup\n");
 #endif

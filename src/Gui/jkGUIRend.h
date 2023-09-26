@@ -46,8 +46,8 @@
 #define jkGuiRend_InvokeClicked_ADDR (0x005106A0)
 #define jkGuiRend_PlayClickSound_ADDR (0x005106F0)
 #define jkGuiRend_RenderFocused_ADDR (0x00510710)
-#define jkGuiRend_RenderIdk2_ADDR (0x00510770)
-#define jkGuiRend_RenderAll_ADDR (0x00510840)
+#define jkGuiRend_FocusNextElement_ADDR (0x00510770)
+#define jkGuiRend_FocusPrevElement_ADDR (0x00510840)
 #define jkGuiRend_ClickableMouseover_ADDR (0x00510910)
 #define jkGuiRend_MouseMovedCallback_ADDR (0x005109B0)
 #define jkGuiRend_SetVisibleAndDraw_ADDR (0x00510B50)
@@ -74,6 +74,12 @@
 #define jkGuiRend_PicButtonDraw_ADDR (0x005122C0)
 #define jkGuiRend_TextButtonEventHandler_ADDR (0x00512370)
 #define jkGuiRend_TextButtonDraw_ADDR (0x005123C0)
+
+#define FOCUS_LEFT  (0)
+#define FOCUS_RIGHT (1)
+#define FOCUS_UP    (2)
+#define FOCUS_DOWN  (3)
+#define FOCUS_NONE  (4)
 
 extern int jkGuiRend_thing_five;
 extern int jkGuiRend_thing_four;
@@ -118,9 +124,9 @@ int jkGuiRend_InvokeEvent(jkGuiElement *element, jkGuiMenu *menu, int eventType,
 int jkGuiRend_InvokeClicked(jkGuiElement *clickable, jkGuiMenu *menu, int mouseX, int mouseY, BOOL redraw);
 int jkGuiRend_PlayClickSound(jkGuiElement *element, jkGuiMenu *menu, int a, int b, int c);
 void jkGuiRend_RenderFocused(jkGuiMenu *menu, jkGuiElement *element);
-void jkGuiRend_RenderIdk2(jkGuiMenu *menu);
+void jkGuiRend_FocusNextElement(jkGuiMenu *menu);
 void jkGuiRend_RenderIdk2_alt(jkGuiMenu *menu);
-void jkGuiRend_RenderAll(jkGuiMenu *menu);
+void jkGuiRend_FocusPrevElement(jkGuiMenu *menu);
 void jkGuiRend_ClickableMouseover(jkGuiMenu *menu, jkGuiElement *element);
 void jkGuiRend_MouseMovedCallback(jkGuiMenu *menu, int x, int y);
 void jkGuiRend_SetVisibleAndDraw(jkGuiElement *clickable, jkGuiMenu *menu, int bVisible);
@@ -147,5 +153,8 @@ int jkGuiRend_PicButtonEventHandler(jkGuiElement *element, jkGuiMenu *menu, int 
 void jkGuiRend_PicButtonDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
 int jkGuiRend_TextButtonEventHandler(jkGuiElement *element, jkGuiMenu *menu, int a3, int b);
 void jkGuiRend_TextButtonDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
+
+void jkGuiRend_FocusElementDir(jkGuiMenu *pMenu, int dir);
+void jkGuiRend_UpdateController();
 
 #endif // _JKGUIREND_H

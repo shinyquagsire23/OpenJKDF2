@@ -206,7 +206,7 @@ typedef enum
 #define JK_NUM_MOUSE_AXES       (3)
 #define JK_NUM_AXES             ((JK_JOYSTICK_AXIS_STRIDE * JK_NUM_JOYSTICKS) + JK_NUM_MOUSE_AXES)
 
-#ifndef SDL2_RENDER
+#if defined(SDL2_RENDER) || defined(TARGET_TWL)
 #define JK_NUM_MOUSE_BUTTONS     (4)
 #define JK_NUM_EXT_MOUSE_BUTTONS (0)
 #define JK_NUM_JOY_BUTTONS       (8)

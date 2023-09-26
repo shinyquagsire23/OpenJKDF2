@@ -169,6 +169,16 @@ void Window_SdlUpdate()
     uint32_t pos, msgl, msgr;
     int hasLeft, hasRight;
 
+    //printf("Heap: 0x%x/0x%x %p\n",  getHeapEnd() - getHeapStart(), getHeapLimit() - getHeapStart(), getHeapStart());
+
+    scanKeys();
+    u16 keysPressed = keysDown();
+    if (keysPressed & KEY_START) {
+        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_ESCAPE, 0);
+        Window_msg_main_handler(g_hWnd, WM_CHAR, VK_ESCAPE, 0);
+        printf("escape\n");
+    }
+
 #if 0
     SDL_Event event;
     SDL_MouseButtonEvent* mevent;
@@ -464,6 +474,8 @@ void Window_SdlUpdate()
         }
 
         //SDL_SetRelativeMouseMode(SDL_FALSE);
+
+        jkGuiRend_UpdateController();
 
         if (!jkGuiBuildMulti_bRendering) {
             std3D_StartScene();

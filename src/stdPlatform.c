@@ -16,9 +16,18 @@
 
 #include "SDL2_helper.h"
 
+#ifdef TARGET_TWL
+#include <nds.h>
+#endif
+
 #ifdef PLATFORM_POSIX
 uint32_t Linux_TimeMs()
 {
+    // TWL has hardware timers we can use for accurate ms timing
+#ifdef TARGET_TWL
+    return (uint32_t)(((TIMER1_DATA*(1<<16))+TIMER0_DATA)/32.7285);
+#endif
+
     struct timespec _t;
 
 #if defined(_MSC_VER) && !defined(WIN64_MINGW)
@@ -32,6 +41,9 @@ uint32_t Linux_TimeMs()
 
 uint64_t Linux_TimeUs()
 {
+#ifdef TARGET_TWL
+    return (uint64_t)(((TIMER1_DATA*(1<<16))+TIMER0_DATA)/32728.5);
+#endif
     struct timespec _t;
 
 #if defined(_MSC_VER) && !defined(WIN64_MINGW)

@@ -249,8 +249,8 @@ void jkGuiTitle_WorldLoadCallback(float percentage)
             jkGuiTitle_elementsLoad[1].selectedTextEntry = (__int64)percentage;
             jkGuiRend_UpdateAndDrawClickable(&jkGuiTitle_elementsLoad[1], &jkGuiTitle_menuLoad, 1);
         }
-#ifdef SDL2_RENDER
-#ifdef PLATFORM_POSIX
+#if defined(SDL2_RENDER) || defined(TARGET_TWL)
+#if defined(PLATFORM_POSIX) && !defined(TARGET_TWL)
     static uint64_t lastRefresh = 0;
     // Only update loading bar at 30fps, so that we don't waste time
     // during vsync.
@@ -332,8 +332,8 @@ void jkGuiTitle_LoadingFinalize()
             if (shouldSkip) break;
             int selected = jkGuiRend_DisplayAndReturnClicked(&jkGuiTitle_menuLoad);
 
-#ifdef SDL2_RENDER
-#ifdef PLATFORM_POSIX
+#if defined(SDL2_RENDER) || defined(TARGET_TWL)
+#if defined(PLATFORM_POSIX) && !defined(TARGET_TWL)
             static uint64_t lastRefresh = 0;
             // Only update loading bar at 30fps, so that we don't waste time
             // during vsync.

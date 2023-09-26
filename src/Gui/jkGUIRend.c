@@ -16,6 +16,8 @@
 #include "jk.h"
 #include "types.h"
 
+#include <math.h>
+
 static char *jkGuiRend_LoadedSounds[4] = {0};
 static uint8_t jkGuiRend_palette[0x300] = {0};
 static WindowDrawHandler_t jkGuiRend_idk2 = 0;
@@ -286,7 +288,11 @@ int jkGuiRend_DisplayAndReturnClicked(jkGuiMenu *menu)
     lastActiveMenu = jkGuiRend_activeMenu;
     ++jkGuiRend_thing_five;
     jkGuiRend_gui_sets_handler_framebufs(menu);
-    
+
+#ifdef QOL_IMPROVEMENTS
+    jkGuiRend_FocusElementDir(menu, FOCUS_NONE);
+#endif
+
     jkGuiRend_SetCursorVisible(1);
     while ( !menu->lastClicked )
     {
@@ -857,7 +863,7 @@ void jkGuiRend_RenderFocused(jkGuiMenu *menu, jkGuiElement *element)
     }
 }
 
-void jkGuiRend_RenderIdk2(jkGuiMenu *menu)
+void jkGuiRend_FocusNextElement(jkGuiMenu *menu)
 {
     int idx = 0;
     jkGuiElement* focusedElement = menu->focusedElement;
@@ -962,7 +968,7 @@ LABEL_22:
     }
 }
 
-void jkGuiRend_RenderAll(jkGuiMenu *menu)
+void jkGuiRend_FocusPrevElement(jkGuiMenu *menu)
 {
     jkGuiElement *focusedElement; // ebx
     int idx; // edx
@@ -1255,9 +1261,7 @@ int jkGuiRend_ListBoxEventHandler(jkGuiElement *element, jkGuiMenu *menu, int ev
     jkGuiElement *element_; // esi
     int v6; // ecx
     int v7; // eax
-    int v8; // edi
     int v9; // edx
-    int v10; // ebx
     int v11; // ebp
     int v12; // ebx
     int selectedIdx; // eax
@@ -1347,12 +1351,10 @@ int jkGuiRend_ListBoxEventHandler(jkGuiElement *element, jkGuiMenu *menu, int ev
         element_ = element;
         v6 = element->selectedTextEntry;
         v7 = element->texInfo.textHeight;
-        v8 = element->rect.y;
         v9 = v7 * (element->selectedTextEntry - element->texInfo.textScrollY);
-        v10 = element->rect.x;
         a1a = element->selectedTextEntry;
-        v11 = v9 + v8 + 4;
-        v12 = v10 + 1;
+        v11 = v9 + element->rect.y + 4;
+        v12 = element->rect.x + 1;
         if ( element_->texInfo.numTextEntries > element_->texInfo.maxTextEntries )
             v11 += v7;
         switch ( eventParam )
@@ -1630,9 +1632,9 @@ int jkGuiRend_WindowHandler(HWND hWnd, UINT a2, WPARAM wParam, LPARAM lParam, LR
                     if ( wParam == VK_TAB )  // TAB
                     {
                         if ( jkGuiRend_bShiftDown )
-                            jkGuiRend_RenderAll(jkGuiRend_activeMenu);
+                            jkGuiRend_FocusPrevElement(jkGuiRend_activeMenu);
                         else
-                            jkGuiRend_RenderIdk2(jkGuiRend_activeMenu);
+                            jkGuiRend_FocusNextElement(jkGuiRend_activeMenu);
                         jkGuiRend_lastKeyScancode = lParam & 0xFF0000;
                         return 1;
                     }
@@ -2390,4 +2392,219 @@ void jkGuiRend_TextButtonDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer
     if ( redraw )
         jkGuiRend_CopyVBuffer(menu, &element->rect);
     stdFont_Draw3(vbuf, menu->fonts[element->textType + v4], element->rect.y, &element->rect, v5, element->wstr, 1);
+}
+
+// Added functions
+void jkGuiRend_FocusElementDir(jkGuiMenu *pMenu, int dir)
+{
+    int idx = 0;
+    jkGuiElement* focusedElement = pMenu->lastMouseOverClickable;
+    if (!focusedElement)
+        focusedElement = pMenu->focusedElement;
+    if (!focusedElement)
+    {
+        focusedElement = pMenu->paElements;
+        while ( 1 )
+        {
+            if ( focusedElement->type == ELEMENT_END ) {
+                focusedElement = &pMenu->paElements[0];
+                break;
+            }
+
+            if ( !focusedElement->bIsVisible ) {
+                focusedElement++;
+                continue;
+            }
+            
+            if (focusedElement->type != ELEMENT_TEXTBUTTON
+                && focusedElement->type != ELEMENT_PICBUTTON
+                && focusedElement->type != ELEMENT_CHECKBOX
+                && focusedElement->type != ELEMENT_LISTBOX
+                && focusedElement->type != ELEMENT_TEXTBOX
+                && focusedElement->type != ELEMENT_SLIDER
+                && focusedElement->type != ELEMENT_CUSTOM) {
+                focusedElement++;
+                continue;
+            }
+
+            break;
+        }
+    }
+
+    if (focusedElement->type == ELEMENT_LISTBOX) {
+        //printf("listbox\n");
+        int prev_selected = focusedElement->selectedTextEntry;
+        if (dir == FOCUS_UP)
+        {
+            jkGuiRend_lastKeyScancode = 0;
+            jkGuiRend_InvokeEvent(focusedElement, pMenu, JKGUI_EVENT_KEYDOWN, VK_UP);
+            if (prev_selected != focusedElement->selectedTextEntry) {
+                return;
+            }
+        }
+        else if (dir == FOCUS_DOWN)
+        {
+            jkGuiRend_lastKeyScancode = 0;
+            jkGuiRend_InvokeEvent(focusedElement, pMenu, JKGUI_EVENT_KEYDOWN, VK_DOWN);
+            if (prev_selected != focusedElement->selectedTextEntry) {
+                return;
+            }
+        }
+    }
+
+    rdRect curFocus = focusedElement->rect;
+
+    jkGuiElement* iter = pMenu->paElements;
+    jkGuiElement* bestCandidate = focusedElement;
+    while ( 1 )
+    {
+        if ( iter->type == ELEMENT_END ) {
+            if (bestCandidate == focusedElement) {
+                //printf("Failed to find element.\n");
+                //return;
+            }
+            break;
+        }
+
+        if ( !iter->bIsVisible ) {
+            iter++;
+            continue;
+        }
+
+        if (iter == focusedElement) {
+            iter++;
+            continue;
+        }
+        /*if ( iter->enableHover ) {
+            iter++;
+            continue;
+        }*/
+        
+
+        if (iter->type != ELEMENT_LISTBOX && !iter->enableHover) {
+            //iter++;
+            //continue;
+        }
+
+        if (iter->type != ELEMENT_TEXTBUTTON
+            && iter->type != ELEMENT_PICBUTTON
+            && iter->type != ELEMENT_CHECKBOX
+            && iter->type != ELEMENT_LISTBOX
+            && iter->type != ELEMENT_TEXTBOX
+            && iter->type != ELEMENT_SLIDER
+            && iter->type != ELEMENT_CUSTOM) {
+            iter++;
+            continue;
+        }
+
+        rdRect rect = iter->rect;
+        rdRect bcRect = bestCandidate->rect;
+        if (bestCandidate == focusedElement) {
+            if (dir == FOCUS_RIGHT || dir == FOCUS_DOWN) {
+                bcRect = (rdRect){-1000,-1000,0,0};
+            }
+            else {
+                bcRect = (rdRect){1000,1000,0,0};
+            }
+            
+        }
+        //printf("%u %u\n", abs(rect.y - curFocus.y), abs(bcRect.y - curFocus.y));
+        //int bDistCloseX = abs(rect.x - curFocus.x) < abs(bcRect.x - curFocus.x);
+        //int bDistCloseY = abs(rect.y - curFocus.y) < abs(bcRect.y - curFocus.y);
+        int distCur = sqrt((rect.x - curFocus.x)*(rect.x - curFocus.x) + (rect.y - curFocus.y)*(rect.y - curFocus.y));
+        int distBc = sqrt((bcRect.x - curFocus.x)*(bcRect.x - curFocus.x) + (bcRect.y - curFocus.y)*(bcRect.y - curFocus.y));
+        int bDistCloseX = distCur < distBc;
+        int bDistCloseY = bDistCloseX;
+        if (dir == FOCUS_LEFT)
+        {
+            if (rect.x < curFocus.x && bDistCloseX && bDistCloseY) {
+                bestCandidate = iter;
+            }
+        }
+        else if (dir == FOCUS_RIGHT)
+        {
+            if (rect.x > curFocus.x && bDistCloseX && bDistCloseY) {
+                bestCandidate = iter;
+            }
+        }
+        else if (dir == FOCUS_UP)
+        {
+            if (rect.y < curFocus.y && bDistCloseX && bDistCloseY) {
+                bestCandidate = iter;
+            }
+        }
+        else if (dir == FOCUS_DOWN)
+        {
+            if (rect.y > curFocus.y && bDistCloseX && bDistCloseY) {
+                bestCandidate = iter;
+            }
+        }
+        
+        iter++;
+    }
+
+    printf("%u->%u, %u %u, %u %u\n", (int)(focusedElement - pMenu->paElements), (int)(bestCandidate - pMenu->paElements), focusedElement->rect.x, focusedElement->rect.y, bestCandidate->rect.x, bestCandidate->rect.y);
+
+    jkGuiElement* element = bestCandidate;
+    if (!element) return;
+    if ((element->type == ELEMENT_LISTBOX || element->type == ELEMENT_TEXTBOX) && jkGuiRend_sub_5103E0(element))
+    {
+//#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
+        pMenu->focusedElement = element;
+        pMenu->lastMouseOverClickable = element;
+//#endif
+        if ( focusedElement )
+        {
+            if ( focusedElement != element )
+            {
+                jkGuiRend_UpdateAndDrawClickable(focusedElement, pMenu, 1);
+                goto LABEL_22;
+            }
+        }
+        else
+        {
+LABEL_22:
+            if ( focusedElement != element )
+                jkGuiRend_UpdateAndDrawClickable(element, pMenu, 1);
+        }
+    }
+    else {
+        jkGuiRend_MouseMovedCallback(pMenu, bestCandidate->rect.x, bestCandidate->rect.y);
+    }
+}
+
+void jkGuiRend_UpdateController()
+{
+    stdControl_bControlsActive = 1; // HACK
+    stdControl_ReadControls();
+
+    int val = 0;
+    if (stdControl_ReadKey(KEY_JOY1_HLEFT, &val) && val) {
+        jkGuiRend_FocusElementDir(jkGuiRend_activeMenu, FOCUS_LEFT);
+        printf("left\n");
+    }
+    if (stdControl_ReadKey(KEY_JOY1_HRIGHT, &val) && val) {
+        jkGuiRend_FocusElementDir(jkGuiRend_activeMenu, FOCUS_RIGHT);
+        printf("right\n");
+    }
+    if (stdControl_ReadKey(KEY_JOY1_HUP, &val) && val) {
+        jkGuiRend_FocusElementDir(jkGuiRend_activeMenu, FOCUS_UP);
+        printf("up\n");
+    }
+    if (stdControl_ReadKey(KEY_JOY1_HDOWN, &val) && val) {
+        jkGuiRend_FocusElementDir(jkGuiRend_activeMenu, FOCUS_DOWN);
+        printf("down\n");
+    }
+    if (stdControl_ReadKey(KEY_JOY1_B1, &val) && val) {
+        //jkGuiRend_InvokeEvent(jkGuiRend_activeMenu->focusedElement, jkGuiRend_activeMenu, JKGUI_EVENT_KEYDOWN, VK_RETURN);
+        jkGuiRend_WindowHandler(0, WM_KEYFIRST, VK_RETURN, 0, 0);
+        //if (jkGuiRend_activeMenu->lastMouseOverClickable && jkGuiRend_activeMenu->lastMouseOverClickable->clickHandlerFunc )
+        //    jkGuiRend_activeMenu->lastClicked = jkGuiRend_activeMenu->lastMouseOverClickable->clickHandlerFunc(jkGuiRend_activeMenu->lastMouseOverClickable, jkGuiRend_activeMenu, jkGuiRend_mouseX, jkGuiRend_mouseY, 1);
+        jkGuiRend_InvokeClicked(jkGuiRend_activeMenu->lastMouseOverClickable, jkGuiRend_activeMenu, jkGuiRend_mouseX, jkGuiRend_mouseY, 1);
+        printf("a\n");
+    }
+    if (stdControl_ReadKey(KEY_JOY1_B2, &val) && val) {
+        jkGuiRend_WindowHandler(0, WM_KEYFIRST, VK_ESCAPE, 0, 0);
+        printf("b\n");
+    }
 }

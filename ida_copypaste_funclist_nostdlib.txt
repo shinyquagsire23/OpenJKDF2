@@ -3155,8 +3155,8 @@ jkGuiRend_InvokeEvent	.text	00510650	0000004B	00000004	00000014	R	.	.	.	.	.	T	.
 jkGuiRend_InvokeButtonUp	.text	005106A0	00000050	00000004	00000014	R	.	.	.	.	.	T	.
 jkGuiRend_PlayClickSound	.text	005106F0	00000018	00000000	00000008	R	.	.	.	.	.	T	.
 jkGuiRend_RenderFocused	.text	00510710	00000057	0000000C	00000008	R	.	.	.	.	.	T	.
-jkGuiRend_RenderIdk2	.text	00510770	000000C1	00000010	00000004	R	.	.	.	.	.	T	.
-jkGuiRend_RenderAll	.text	00510840	000000CF	0000000C	00000004	R	.	.	.	.	.	T	.
+jkGuiRend_FocusNextElement	.text	00510770	000000C1	00000010	00000004	R	.	.	.	.	.	T	.
+jkGuiRend_FocusPrevElement	.text	00510840	000000CF	0000000C	00000004	R	.	.	.	.	.	T	.
 jkGuiRend_ClickableMouseover	.text	00510910	00000087	00000008	00000008	R	.	.	.	.	.	T	.
 jkGuiRend_MouseMovedCallback	.text	005109B0	00000170	00000010	0000000C	R	.	.	.	.	.	T	.
 jkGuiRend_SetVisibleAndDraw	.text	00510B50	00000021	00000000	0000000C	R	.	.	.	.	.	T	.

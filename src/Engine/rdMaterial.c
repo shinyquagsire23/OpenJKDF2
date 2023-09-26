@@ -182,6 +182,8 @@ LABEL_21:
         texture->opaqueMats[mipmap_num].skip_jkgm = 0;
 #endif
 #endif
+
+#ifndef TARGET_TWL
         created_tex = stdDisplay_VBufferNew(&format, create_ddraw_surface, gpu_mem, 0);
         *texture_struct = created_tex;
         if ( !created_tex )
@@ -194,6 +196,9 @@ LABEL_21:
           (void *)(*texture_struct)->surface_lock_alloc,
           (*texture_struct)->format.texture_size_in_bytes);
         stdDisplay_VBufferUnlock(*texture_struct);
+#else
+        std_pHS->fseek(mat_file__, format.width*format.height*(format.format.is16bit?2:1), SEEK_CUR);
+#endif
         format.width = (unsigned int)format.width >> 1;
         format.height = (unsigned int)format.height >> 1;
         ++mipmap_num;

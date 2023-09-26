@@ -1770,7 +1770,9 @@ void sithControl_InputInit()
     stdControlKeyInfoEntry *v8; // eax
 
     _memset(sithControl_aInputFuncToKeyinfo, 0, sizeof(stdControlKeyInfo) * 74);
+#ifndef TARGET_TWL
     stdControl_Reset();
+#endif
     sithWeapon_controlOptions = 36;
     sithControl_MapDefaults();
     sithControl_MapAxisFunc(INPUT_FUNC_FORWARD, AXIS_JOY1_Y, 4u);
@@ -1779,10 +1781,12 @@ void sithControl_InputInit()
     sithControl_DefaultHelper(INPUT_FUNC_FIRE2, KEY_JOY1_B2, 2);
     sithControl_DefaultHelper(INPUT_FUNC_ACTIVATE, KEY_JOY1_B3, 2);
     sithControl_MapFunc(INPUT_FUNC_JUMP, KEY_JOY1_B4, 0);
+#ifndef TARGET_TWL
     sithControl_MapFunc(INPUT_FUNC_PITCH, KEY_JOY1_HUP, 4);
     sithControl_MapFunc(INPUT_FUNC_PITCH, KEY_JOY1_HDOWN, 0);
     sithControl_MapFunc(INPUT_FUNC_SLIDE, KEY_JOY1_HLEFT, 4);
     sithControl_MapFunc(INPUT_FUNC_SLIDE, KEY_JOY1_HRIGHT, 0);
+#endif
     sithControl_MapFunc(INPUT_FUNC_NEXTINV, KEY_JOY1_B5, 0);
     sithControl_MapFunc(INPUT_FUNC_USEINV, KEY_JOY1_B7, 0);
     v6 = sithControl_MapAxisFunc(INPUT_FUNC_TURN, AXIS_MOUSE_X, 0xCu);
@@ -1798,6 +1802,13 @@ void sithControl_InputInit()
     sithControl_DefaultHelper(INPUT_FUNC_FIRE1, KEY_MOUSE_B1, 2);
     sithControl_DefaultHelper(INPUT_FUNC_JUMP, KEY_MOUSE_B2, 2);
     sithControl_DefaultHelper(INPUT_FUNC_FIRE2, KEY_MOUSE_B3, 2);
+
+#ifdef TARGET_TWL
+    sithControl_MapFunc(INPUT_FUNC_FORWARD, KEY_JOY1_HUP, 0);
+    sithControl_MapFunc(INPUT_FUNC_FORWARD, KEY_JOY1_HDOWN, 4);
+    sithControl_MapFunc(INPUT_FUNC_TURN, KEY_JOY1_HLEFT, 0);
+    sithControl_MapFunc(INPUT_FUNC_TURN, KEY_JOY1_HRIGHT, 4);
+#endif
 }
 
 void sithControl_sub_4D6930(int funcIdx)

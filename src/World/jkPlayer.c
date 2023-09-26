@@ -692,6 +692,11 @@ int jkPlayer_ReadConf(wchar_t *name)
         sithWeapon_ReadConf();
         //jk_printf("%s\n", stdConffile_aLine);
         sithControl_ReadConf();
+
+        // HACK
+#ifdef TARGET_TWL
+        sithControl_InputInit();
+#endif
         if ( stdConffile_ReadArgs() )
         {
             if ( stdConffile_entry.numArgs >= 1u

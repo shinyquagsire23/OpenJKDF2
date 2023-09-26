@@ -234,7 +234,12 @@ char* stdFnames_MakePath(char *a1, int a2, const char *a3, const char *a4)
     char *r = malloc(strlen(a1) + 16);
     if (casepath(a1, r))
     {
-        strcpy(a1, r);
+        if (r[0] == '.' && (r[1] == '/' || r[1] == '\\')) {
+            strcpy(a1, r+2);
+        }
+        else {
+            strcpy(a1, r);
+        }
         strcat(a1, "/"); // Added?
     }
     free(r);

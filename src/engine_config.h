@@ -33,7 +33,7 @@
 #define CANONICAL_PHYS_TICKRATE (1.0 / 25.0)
 
 // Use microsecond timing to calculate sithTime_deltaSecs/etc
-#ifdef PLATFORM_POSIX
+#if defined(PLATFORM_POSIX) && !defined(TARGET_TWL)
 #define MICROSECOND_TIME
 #endif
 
@@ -92,12 +92,21 @@
 #define SITHCOG_NODE_STACKDEPTH (0x200) // JK was 0x200, MoTS is 0x400
 #endif // QOL_IMPROVEMENTS
 
+#if defined(TARGET_TWL)
+#define RDCACHE_MAX_TRIS (0x400)
+#define RDCACHE_MAX_VERTICES (0x1000)
+
+#define STD3D_MAX_TEXTURES (1024)
+#define STD3D_MAX_UI_TRIS (0x100)
+#define STD3D_MAX_UI_VERTICES (0x100)
+#else
 #define RDCACHE_MAX_TRIS (0x400)
 #define RDCACHE_MAX_VERTICES (0x8000)
 
 #define STD3D_MAX_TEXTURES (4096)
 #define STD3D_MAX_UI_TRIS (0x8000)
 #define STD3D_MAX_UI_VERTICES (0x8000)
+#endif
 
 #define SITHCONTROL_NUM_HANDLERS (9)
 
