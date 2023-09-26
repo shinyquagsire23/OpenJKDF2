@@ -212,7 +212,6 @@ void jkMain_GuiAdvance()
     int v3; // esi
     int v4; // esi
     void (__cdecl *v5)(int, int); // ecx
-    int v6; // eax
     void (__cdecl *v7)(int, int); // ecx
     void (__cdecl *v8)(int); // ecx
 
@@ -256,7 +255,7 @@ void jkMain_GuiAdvance()
                 jkGame_dword_552B5C += stdPlatform_GetTimeMsec() - v1;
                 v3 = stdPlatform_GetTimeMsec();
                 if ( g_app_suspended && jkSmack_currentGuiState != 6 ) {
-#ifdef SDL2_RENDER
+#if defined(SDL2_RENDER) || defined(TARGET_TWL)
                     if (jkMain_lastTickMs == v1)
 #endif
                     jkGame_Update();
@@ -298,7 +297,6 @@ void jkMain_GuiAdvance()
             v5(jkSmack_currentGuiState, jkSmack_nextGuiState);
         //jk_printf("leave %u\n", jkSmack_currentGuiState);
 
-        v6 = jkSmack_nextGuiState;
         jkSmack_stopTick = 0;
         jkSmack_currentGuiState = jkSmack_nextGuiState;
         v7 = jkMain_aGuiStateFuncs[jkSmack_nextGuiState].showFunc;
@@ -308,14 +306,13 @@ void jkMain_GuiAdvance()
         v7(jkSmack_nextGuiState, v4);
         //jk_printf("showed %u\n", jkSmack_currentGuiState);
     }
-    v6 = jkSmack_currentGuiState;
 LABEL_35:
     if ( !jkSmack_stopTick )
     {
-        //jk_printf("tick %u %x\n", jkSmack_currentGuiState, jkMain_aGuiStateFuncs[v6].tickFunc);
-        v8 = jkMain_aGuiStateFuncs[v6].tickFunc;
+        //jk_printf("tick %u %x\n", jkSmack_currentGuiState, jkMain_aGuiStateFuncs[jkSmack_currentGuiState].tickFunc);
+        v8 = jkMain_aGuiStateFuncs[jkSmack_currentGuiState].tickFunc;
         if ( v8 )
-            v8(v6);
+            v8(jkSmack_currentGuiState);
     }
 }
 

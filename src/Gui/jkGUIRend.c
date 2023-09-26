@@ -67,6 +67,8 @@ void jkGuiRend_CopyVBuffer(jkGuiMenu *menu, rdRect *rect)
 
 void jkGuiRend_SetPalette(uint8_t* pal)
 {
+    if (!pal) return; // Added
+
     _memcpy(jkGuiRend_palette, pal, 0x300); // TODO sizeof(jkGuiRend_palette)
 }
 
@@ -221,6 +223,7 @@ void jkGuiRend_UpdateDrawMenu(jkGuiMenu *menu)
 
 void jkGuiRend_Paint(jkGuiMenu *menu)
 {
+
     int ret;
     
     jkGuiElement* lastFocused = menu->focusedElement;
@@ -231,6 +234,7 @@ void jkGuiRend_Paint(jkGuiMenu *menu)
     
     stdControl_ShowCursor(0);
     stdDisplay_SetMasterPalette(jkGuiRend_palette);
+#ifndef TARGET_TWL
     if ( menu->texture )
         stdDisplay_VBufferCopy(jkGuiRend_menuBuffer, menu->texture, 0, 0, 0, 0);
 
@@ -250,6 +254,7 @@ void jkGuiRend_Paint(jkGuiMenu *menu)
     jkGuiRend_FlipAndDraw(menu, 0);
 
     jkGuiRend_UpdateCursor();
+#endif
 }
 
 void jkGuiRend_ElementSetClickShortcutScancode(jkGuiElement *element, int scancode)

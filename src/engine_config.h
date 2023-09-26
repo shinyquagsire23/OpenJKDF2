@@ -65,7 +65,7 @@
 #endif
 
 // World limits
-#ifndef QOL_IMPROVEMENTS
+#if !defined(QOL_IMPROVEMENTS) || defined(TARGET_TWL)
 #define SITH_MAX_THINGS (641)
 #define SITH_MAX_VISIBLE_SECTORS (0x80)
 #define SITH_MAX_VISIBLE_SECTORS_2 (0xA0)
@@ -78,7 +78,7 @@
 #endif // QOL_IMPROVEMENTS
 
 // COG resource limits
-#ifdef QOL_IMPROVEMENTS
+#if defined(QOL_IMPROVEMENTS) && !defined(TARGET_TWL)
 #define SITHCOGVM_MAX_STACKSIZE (0x10000)
 #define SITHCOG_SYMBOL_LIMIT (2048) // JK was 512, MoTS/DW are 1024
 #define SITHCOG_LINKED_SYMBOL_LIMIT (2048)

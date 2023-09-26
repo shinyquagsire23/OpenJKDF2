@@ -310,7 +310,6 @@ int jkRes_NewGob(jkResGobDirectory *gobFullpath, char *gobFolder, char *gobFname
 int jkRes_LoadCD(int cdNumberNeeded)
 {
     int v1; // eax
-    int v2; // esi
     unsigned int v3; // edi
     stdGob **v4; // esi
     unsigned int v5; // edi
@@ -340,25 +339,28 @@ int jkRes_LoadCD(int cdNumberNeeded)
     while ( 1 )
     {
         v1 = pHS->fileOpen("jk_.cd", "rb");
-        v2 = v1;
-        if ( !v1 )
-            goto LABEL_11;
-        pHS->fileRead(v1, &keyval, 4);
-        if ( keyval == JKRES_MAGIC_0 )
-            goto LABEL_9;
-        if ( !cdNumberNeeded )
+        if ( v1 )
         {
-            if ( keyval != JKRES_MAGIC_1 && keyval != JKRES_MAGIC_2 )
-                goto LABEL_10;
-LABEL_9:
-            v23 = 1;
-            goto LABEL_10;
+            pHS->fileRead(v1, &keyval, 4);
+            if ( keyval == JKRES_MAGIC_0 ) {
+                v23 = 1;
+            }
+            else if ( !cdNumberNeeded )
+            {
+                if ( keyval == JKRES_MAGIC_1 || keyval == JKRES_MAGIC_2 )
+                    v23 = 1;
+            }
+            else if ( keyval == ((cdNumberNeeded << (cdNumberNeeded + 5)) | JKRES_MAGIC_3) ) {
+                v23 = 1;
+            }
+
+            pHS->fileClose(v1);
         }
-        if ( keyval == ((cdNumberNeeded << (cdNumberNeeded + 5)) | JKRES_MAGIC_3) )
-            goto LABEL_9;
-LABEL_10:
-        pHS->fileClose(v2);
-LABEL_11:
+
+#ifdef TARGET_TWL
+        v23 = 1;
+#endif
+        
         if ( v23 )
         {
             if ( v24 )

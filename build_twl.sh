@@ -9,14 +9,18 @@ export OPENJKDF2_RELEASE_COMMIT_SHORT=$(git rev-parse --short=8 HEAD)
 #PATH=$PATH:$NDK_TOOLCHAIN_BINS
 
 #rm -rf build_win64
-mkdir -p build_nintendo_dsi && cd build_nintendo_dsi
+mkdir -p build_nintendo_dsi && pushd build_nintendo_dsi
 OPENJKDF2_BUILD_DIR=$(pwd)
 
 # Prevent macOS headers from getting linked in
 export -n SDKROOT MACOSX_DEPLOYMENT_TARGET CPLUS_INCLUDE_PATH C_INCLUDE_PATH
 
-cmake .. --toolchain $(pwd)/../cmake_modules/toolchain_twl.cmake && make -j10 openjkdf2.nds
-cd ..
+cmake .. --toolchain $(pwd)/../cmake_modules/toolchain_twl.cmake &&
+(make -j $(nproc) openjkdf2.nds || make -j1 openjkdf2.nds)
+if [ $? -ne 0 ]; then
+    exit -1
+fi
+popd
 
-echo "Starting..."
-pkill -9 melonDS ; pkill -9 melonDS ; open build_nintendo_dsi/openjkdf2.nds
+echo "Starting..." && \
+pkill -9 melonDS ; pkill -9 melonDS ; /Applications/melonDS.app/Contents/MacOS/melonDS build_nintendo_dsi/openjkdf2.nds

@@ -47,7 +47,7 @@ void stdControl_SetSDLKeydown(int keyNum, int bDown, uint32_t readTime);
 
 void stdControl_InitAxis(int index, int stickMin, int stickMax, float multiplier);
 
-#ifndef SDL2_RENDER
+#if !defined(SDL2_RENDER) && defined(WIN32)
 static int (*stdControl_Startup)() = (void*)stdControl_Startup_ADDR;
 static void (*stdControl_Shutdown)() = (void*)stdControl_Shutdown_ADDR;
 static int (*stdControl_Open)() = (void*)stdControl_Open_ADDR;

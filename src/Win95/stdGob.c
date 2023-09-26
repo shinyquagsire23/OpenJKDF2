@@ -198,6 +198,10 @@ stdGobFile* stdGob_FileOpen(stdGob *gob, const char *filepath)
     }
 #endif
 
+    // Added: clean up paths
+    if (filepath[0] == '.' && (filepath[1] == '/' || filepath[1] == '\\')) {
+        filepath += 2;
+    }
     stdString_SafeStrCopy(stdGob_fpath, filepath, 128);
     stdString_CStrToLower(stdGob_fpath);
 
@@ -299,6 +303,8 @@ size_t stdGob_FileRead(stdGobFile *f, void *out, uint32_t len)
 {
     stdGob *gob;
     size_t result;
+
+    //printf("\x1b[0;0Hreading %s %p %x\n", f->entry->fname, out, len);
 
 #ifdef QOL_IMPROVEMENTS
     if (f->bIsMemoryMapped) {

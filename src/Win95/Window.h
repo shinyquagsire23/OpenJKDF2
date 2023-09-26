@@ -51,7 +51,12 @@ extern int Window_bMouseRight;
 extern int Window_mouseWheelY;
 extern int Window_mouseWheelX;
 
-#ifdef SDL2_RENDER
+#if !defined(SDL2_RENDER) && defined(WIN32)
+static int (*Window_ShowCursorUnwindowed)(int a1) = (void*)Window_ShowCursorUnwindowed_ADDR;
+static int (*Window_MessageLoop)() = (void*)Window_MessageLoop_ADDR;
+//static int (*Window_AddMsgHandler)(WindowHandler_t handler) = (void*)Window_AddMsgHandler_ADDR;
+//static int (*Window_RemoveMsgHandler)(WindowHandler_t handler) = (void*)Window_RemoveMsgHandler_ADDR;
+#else
 int Window_Main_Linux(int argc, char** argv);
 //int Window_AddMsgHandler(WindowHandler_t a1);
 //int Window_RemoveMsgHandler(WindowHandler_t a1);
@@ -60,11 +65,6 @@ int Window_MessageLoop();
 void Window_SdlUpdate();
 void Window_SdlVblank();
 void Window_RecreateSDL2Window();
-#else
-static int (*Window_ShowCursorUnwindowed)(int a1) = (void*)Window_ShowCursorUnwindowed_ADDR;
-static int (*Window_MessageLoop)() = (void*)Window_MessageLoop_ADDR;
-//static int (*Window_AddMsgHandler)(WindowHandler_t handler) = (void*)Window_AddMsgHandler_ADDR;
-//static int (*Window_RemoveMsgHandler)(WindowHandler_t handler) = (void*)Window_RemoveMsgHandler_ADDR;
 #endif
 
 #endif // _WINDOW_H

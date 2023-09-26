@@ -16,37 +16,37 @@ stdBitmap* stdBitmap_Load(char *fpath, int bCreateDDrawSurface, int gpuMem)
     const char *v7; // eax
 
     outAlloc = (stdBitmap *)std_pHS->alloc(sizeof(stdBitmap));
-    if ( outAlloc )
+    if (!outAlloc)
     {
-        fp = std_pHS->fileOpen(fpath, "rb");
-        if ( fp )
-        {
-            v7 = stdFileFromPath(fpath);
-            _strncpy((char *)outAlloc->fpath, v7, 0x1Fu);
-            outAlloc->fpath[31] = 0;
-            v6 = stdBitmap_LoadEntryFromFile(fp, outAlloc, bCreateDDrawSurface, gpuMem);
-            std_pHS->fileClose(fp);
-        }
-        else
-        {
-            stdPrintf(std_pHS->errorPrint, ".\\General\\stdBitmap.c", 147, "Error: Invalid load filename '%s'.\n", fpath);
-            v6 = 0;
-        }
-        if ( v6 )
-        {
-            result = outAlloc;
-        }
-        else
-        {
-            std_pHS->free(outAlloc);
-            result = 0;
-        }
+        stdPrintf(std_pHS->errorPrint, ".\\General\\stdBitmap.c", 68, "Error: Unable to allocate memory for bitmap '%s'\n", fpath);
+        return NULL;
+    }
+
+
+    fp = std_pHS->fileOpen(fpath, "rb");
+    if ( fp )
+    {
+        v7 = stdFileFromPath(fpath);
+        _strncpy((char *)outAlloc->fpath, v7, 0x1Fu);
+        outAlloc->fpath[31] = 0;
+        v6 = stdBitmap_LoadEntryFromFile(fp, outAlloc, bCreateDDrawSurface, gpuMem);
+        std_pHS->fileClose(fp);
     }
     else
     {
-        stdPrintf(std_pHS->errorPrint, ".\\General\\stdBitmap.c", 68, "Error: Unable to allocate memory for bitmap '%s'\n", fpath);
+        stdPrintf(std_pHS->errorPrint, ".\\General\\stdBitmap.c", 147, "Error: Invalid load filename '%s'.\n", fpath);
+        v6 = 0;
+    }
+    if ( v6 )
+    {
+        result = outAlloc;
+    }
+    else
+    {
+        std_pHS->free(outAlloc);
         result = 0;
     }
+    
     return result;
 }
 
@@ -56,28 +56,23 @@ stdBitmap* stdBitmap_Load2(char *fpath, int bCreateDDrawSurface, int gpuMem)
     return stdBitmap_Load(fpath, bCreateDDrawSurface, gpuMem);
 }
 
-stdBitmap* stdBitmap_LoadFromFile(stdFile_t fd, int bCreateDDrawSurface, int a3)
+stdBitmap* stdBitmap_LoadFromFile(stdFile_t fd, int bCreateDDrawSurface, int gpuMem)
 {
-    stdBitmap *outAlloc; // esi
-    unsigned int i; // edi
-
-    outAlloc = (stdBitmap *)std_pHS->alloc(sizeof(stdBitmap));
-    if ( outAlloc )
-    {
-        if ( stdBitmap_LoadEntryFromFile(fd, outAlloc, bCreateDDrawSurface, a3) )
-        {
-            return outAlloc;
-        }
-        else
-        {
-            stdBitmap_Free(outAlloc);
-            return 0;
-        }
-    }
-    else
+    stdBitmap* outAlloc = (stdBitmap*)std_pHS->alloc(sizeof(stdBitmap));
+    if (!outAlloc)
     {
         stdPrintf(std_pHS->errorPrint, ".\\General\\stdBitmap.c", 103, "Error: Unable to allocate memory for bitmap.\n", 0, 0, 0, 0);
         return NULL;
+    }
+
+    if (stdBitmap_LoadEntryFromFile(fd, outAlloc, bCreateDDrawSurface, gpuMem))
+    {
+        return outAlloc;
+    }
+    else
+    {
+        stdBitmap_Free(outAlloc);
+        return 0;
     }
 }
 

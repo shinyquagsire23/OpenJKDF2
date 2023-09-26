@@ -18,6 +18,10 @@ extern "C" {
 #define FS_POSIX
 #endif
 
+#if defined(SDL2_RENDER)
+#define QUAKE_CONSOLE
+#endif
+
 // Ghidra tutorial:
 // File > Parse C Source...
 //

@@ -65,7 +65,7 @@ typedef struct bitmapHeader
 
 stdBitmap* stdBitmap_Load(char *fpath, int bCreateDDrawSurface, int gpuMem);
 stdBitmap* stdBitmap_Load2(char *fpath, int bCreateDDrawSurface, int gpuMem); // MOTS added
-stdBitmap* stdBitmap_LoadFromFile(intptr_t fd, int bCreateDDrawSurface, int a3);
+stdBitmap* stdBitmap_LoadFromFile(intptr_t fd, int bCreateDDrawSurface, int gpuMem);
 int stdBitmap_LoadEntry(char *fpath, stdBitmap *out, int bCreateDDrawSurface, int gpuMem);
 int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSurface, int gpuMem);
 void stdBitmap_ConvertColorFormat(rdTexformat *formatTo, stdBitmap *bitmap);

@@ -226,7 +226,14 @@ void* __attribute__((weak)) __memcpy_chk(void * dest, const void * src, size_t l
 int main(int argc, char** argv)
 {
 #ifdef TARGET_TWL
+    consoleDebugInit(DebugDevice_NOCASH);
+
+    lcdMainOnTop();
+
+    videoSetMode(MODE_0_3D);
+    consoleInit( NULL, 0, BgType_Text4bpp, BgSize_T_256x256, 23, 2, false, true );
     consoleDemoInit();
+
     fatInitDefault();
 
     printf("Waddup\n");

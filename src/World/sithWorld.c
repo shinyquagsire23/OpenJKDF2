@@ -136,7 +136,7 @@ int sithWorld_Load(sithWorld *pWorld, char *map_jkl_fname)
 
     if ( !pWorld )
         return 0;
-#ifdef SDL2_RENDER
+#if defined(SDL2_RENDER) || defined(TARGET_TWL)
     std3D_PurgeTextureCache();
 #endif
 
@@ -154,7 +154,7 @@ int sithWorld_Load(sithWorld *pWorld, char *map_jkl_fname)
         sithWorld_some_integer_4 = 0;
         if ( !stdConffile_OpenRead(v8) )
         {
-            goto parse_problem;
+            goto failed_open;
         }
 
         while ( stdConffile_ReadLine() )
@@ -214,8 +214,12 @@ LABEL_19:
     }
     goto cleanup;
 
+failed_open:
+    stdPrintf(pSithHS->errorPrint, ".\\World\\sithWorld.c", 276, "Failed to open file '%s'.\n", v8);
+    goto cleanup;
 parse_problem:
     stdPrintf(pSithHS->errorPrint, ".\\World\\sithWorld.c", 276, "Parse problem in file '%s'.\n", v8);
+    goto cleanup;
 cleanup:
     sithWorld_FreeEntry(pWorld);
     return 0;

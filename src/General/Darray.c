@@ -17,8 +17,10 @@ int Darray_New(Darray *array, int entrySize, int num)
         return 1;
 
     array->alloc = std_pHS->alloc(entrySize * num);
-    if ( !array->alloc )
+    if ( !array->alloc ) {
         std_pHS->errorPrint("Ran out of memory initializing Darray.\n");
+        std_pHS->errorPrint("OpenJKDF2: entrySize=%x, num=%x\n", entrySize, num); // Added
+    }
     array->size = num;
     return (array->alloc != 0);
 }

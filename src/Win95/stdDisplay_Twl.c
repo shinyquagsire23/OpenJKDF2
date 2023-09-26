@@ -1,3 +1,4 @@
+#ifdef TARGET_TWL
 #include "stdDisplay.h"
 
 #include "stdPlatform.h"
@@ -6,21 +7,6 @@
 #include "Win95/Window.h"
 #include "General/stdColor.h"
 
-void stdDisplay_SetGammaTable(int len, double *table)
-{
-    stdDisplay_gammaTableLen = len;
-    stdDisplay_paGammaTable = table;
-}
-
-uint8_t* stdDisplay_GetPalette()
-{
-    return (uint8_t*)stdDisplay_gammaPalette;
-}
-
-#ifndef SDL2_RENDER
-
-#else
-#include "SDL2_helper.h"
 #include <assert.h>
 
 uint32_t Video_menuTexId = 0;
@@ -92,25 +78,26 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
     _memcpy(&Video_otherBuf.format, &stdDisplay_pCurVideoMode->format, sizeof(Video_otherBuf.format));
     _memcpy(&Video_menuBuffer.format, &stdDisplay_pCurVideoMode->format, sizeof(Video_menuBuffer.format));
     
-    _memcpy(&Video_overlayMapBuffer.format, &stdDisplay_pCurVideoMode->format, sizeof(Video_overlayMapBuffer.format));
+    //_memcpy(&Video_overlayMapBuffer.format, &stdDisplay_pCurVideoMode->format, sizeof(Video_overlayMapBuffer.format));
     
 
     if (Video_bModeSet)
     {
         glDeleteTextures(1, &Video_menuTexId);
         glDeleteTextures(1, &Video_overlayTexId);
-        if (Video_otherBuf.sdlSurface)
-            SDL_FreeSurface(Video_otherBuf.sdlSurface);
-        if (Video_menuBuffer.sdlSurface)
-            SDL_FreeSurface(Video_menuBuffer.sdlSurface);
-        if (Video_overlayMapBuffer.sdlSurface)
-            SDL_FreeSurface(Video_overlayMapBuffer.sdlSurface);
+        //if (Video_otherBuf.sdlSurface)
+        //    SDL_FreeSurface(Video_otherBuf.sdlSurface);
+        //if (Video_menuBuffer.sdlSurface)
+        //    SDL_FreeSurface(Video_menuBuffer.sdlSurface);
+        //if (Video_overlayMapBuffer.sdlSurface)
+        //    SDL_FreeSurface(Video_overlayMapBuffer.sdlSurface);
         
-        Video_otherBuf.sdlSurface = 0;
-        Video_menuBuffer.sdlSurface = 0;
-        Video_overlayMapBuffer.sdlSurface = 0;
+        //Video_otherBuf.sdlSurface = 0;
+        //Video_menuBuffer.sdlSurface = 0;
+        //Video_overlayMapBuffer.sdlSurface = 0;
     }
     
+#if 0
     SDL_Surface* otherSurface = SDL_CreateRGBSurface(0, newW, newH, 8,
                                         0,
                                         0,
@@ -144,11 +131,11 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
     
     //SDL_SetSurfacePalette(otherSurface, palette);
     //SDL_SetSurfacePalette(menuSurface, palette);
-    
+
     Video_otherBuf.sdlSurface = otherSurface;
     Video_menuBuffer.sdlSurface = menuSurface;
     Video_overlayMapBuffer.sdlSurface = overlaySurface;
-    
+
     Video_menuBuffer.format.width_in_bytes = menuSurface->pitch;
     Video_otherBuf.format.width_in_bytes = otherSurface->pitch;
     Video_overlayMapBuffer.format.width_in_bytes = overlaySurface->pitch;
@@ -156,17 +143,19 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
     Video_menuBuffer.format.width_in_pixels = menuSurface->pitch;
     Video_otherBuf.format.width_in_pixels = otherSurface->pitch;
     Video_overlayMapBuffer.format.width_in_pixels = overlaySurface->pitch;
+#endif
     Video_menuBuffer.format.width = newW;
     Video_otherBuf.format.width = newW;
-    Video_overlayMapBuffer.format.width = newW;
+    //Video_overlayMapBuffer.format.width = newW;
     Video_menuBuffer.format.height = newH;
     Video_otherBuf.format.height = newH;
-    Video_overlayMapBuffer.format.height = newH;
+    //Video_overlayMapBuffer.format.height = newH;
     
     Video_menuBuffer.format.format.bpp = 8;
     Video_otherBuf.format.format.bpp = 8;
-    Video_overlayMapBuffer.format.format.bpp = 8;
-    
+    //Video_overlayMapBuffer.format.format.bpp = 8;
+
+#if 0
     glGenTextures(1, &Video_menuTexId);
     glBindTexture(GL_TEXTURE_2D, Video_menuTexId);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -180,7 +169,7 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, newW, newH, 0, GL_RED, GL_UNSIGNED_BYTE, Video_overlayMapBuffer.sdlSurface->pixels);
-    
+#endif
 
     Video_bModeSet = 1;
     
@@ -211,7 +200,18 @@ int stdDisplay_SetMasterPalette(uint8_t* pal)
     rdColor24* pal24 = (rdColor24*)pal;
     
     memcpy(stdDisplay_masterPalette, pal24, sizeof(stdDisplay_masterPalette));
+#if 0    
+    SDL_Color* tmp = malloc(sizeof(SDL_Color) * 256);
+    for (int i = 0; i < 256; i++)
+    {
+        tmp[i].r = pal24[i].r;
+        tmp[i].g = pal24[i].g;
+        tmp[i].b = pal24[i].b;
+        tmp[i].a = 0xFF;
+    }
     
+    free(tmp);
+#endif
     return 1;
 }
 
@@ -223,10 +223,14 @@ stdVBuffer* stdDisplay_VBufferNew(stdVBufferTexFmt *fmt, int create_ddraw_surfac
     
     _memcpy(&out->format, fmt, sizeof(out->format));
     
-    // force 0 reads
+    // TODO
+    out->format.width_in_bytes = fmt->width;
+    out->format.width_in_pixels = fmt->width;
+    out->format.texture_size_in_bytes = fmt->width * fmt->height;
+
     //out->format.width = 0;
     //out->format.width_in_bytes = 0;
-    //out->surface_lock_alloc = std_pHS->alloc(texture_size_in_bytes);
+    out->surface_lock_alloc = std_pHS->alloc(out->format.texture_size_in_bytes);
     
     //if (fmt->format.g_bits == 6) // RGB565
     {
@@ -250,6 +254,7 @@ stdVBuffer* stdDisplay_VBufferNew(stdVBufferTexFmt *fmt, int create_ddraw_surfac
         abitmask = 0;
     }
 
+#if 0
     SDL_Surface* surface = SDL_CreateRGBSurface(0, fmt->width, fmt->height, fmt->format.bpp, rbitmask, gbitmask, bbitmask, abitmask);
     
     if (surface)
@@ -269,6 +274,7 @@ stdVBuffer* stdDisplay_VBufferNew(stdVBufferTexFmt *fmt, int create_ddraw_surfac
     //printf("Failed to allocate VBuffer! %s, w %u h %u bpp %u, rmask %x gmask %x bmask %x amask %x, %x %x %x, %x %x %x\n", SDL_GetError(), fmt->width, fmt->height, fmt->format.bpp, rbitmask, gbitmask, bbitmask, abitmask, fmt->format.r_bits, fmt->format.g_bits, fmt->format.b_bits, fmt->format.r_shift, fmt->format.g_shift, fmt->format.b_shift);
     
     out->sdlSurface = surface;
+#endif
     
     return out;
 }
@@ -277,8 +283,8 @@ int stdDisplay_VBufferLock(stdVBuffer *buf)
 {
     if (!buf) return 0;
 
-    SDL_LockSurface(buf->sdlSurface);
-    buf->surface_lock_alloc = buf->sdlSurface->pixels;
+    //SDL_LockSurface(buf->sdlSurface);
+    //buf->surface_lock_alloc = buf->sdlSurface->pixels;
     return 1;
 }
 
@@ -286,8 +292,8 @@ void stdDisplay_VBufferUnlock(stdVBuffer *buf)
 {
     if (!buf) return;
     
-    buf->surface_lock_alloc = NULL;
-    SDL_UnlockSurface(buf->sdlSurface);
+    //buf->surface_lock_alloc = NULL;
+    //SDL_UnlockSurface(buf->sdlSurface);
 }
 
 int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int blit_x, int blit_y, rdRect *rect, int alpha_maybe)
@@ -308,7 +314,7 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
     if (vbuf->palette)
     {
         rdColor24* pal24 = vbuf->palette;
-        SDL_Color* tmp = malloc(sizeof(SDL_Color) * 256);
+        /*SDL_Color* tmp = malloc(sizeof(SDL_Color) * 256);
         for (int i = 0; i < 256; i++)
         {
             tmp[i].r = pal24[i].r;
@@ -318,13 +324,13 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
         }
     
         SDL_SetPaletteColors(vbuf->sdlSurface->format->palette, tmp, 0, 256);
-        free(tmp);
+        free(tmp);*/
     }
     
     if (vbuf2->palette)
     {
         rdColor24* pal24 = vbuf2->palette;
-        SDL_Color* tmp = malloc(sizeof(SDL_Color) * 256);
+        /*SDL_Color* tmp = malloc(sizeof(SDL_Color) * 256);
         for (int i = 0; i < 256; i++)
         {
             tmp[i].r = pal24[i].r;
@@ -334,9 +340,9 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
         }
         
         SDL_SetPaletteColors(vbuf2->sdlSurface->format->palette, tmp, 0, 256);
-        free(tmp);
+        free(tmp);*/
     }
-
+#if 0
     SDL_Rect dstRect = {blit_x, blit_y, rect->width, rect->height};
     SDL_Rect srcRect = {rect->x, rect->y, rect->width, rect->height};
     
@@ -405,13 +411,15 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
     {
         free(srcPixels);
     }
-    
+#endif
+
     //SDL_BlitSurface(vbuf2->sdlSurface, &srcRect, vbuf->sdlSurface, &dstRect); //TODO error check
     return 1;
 }
 
 int stdDisplay_VBufferFill(stdVBuffer *vbuf, int fillColor, rdRect *rect)
-{    
+{
+#if 0
     rdRect fallback = {0,0,vbuf->format.width, vbuf->format.height};
     if (!rect)
     {
@@ -441,7 +449,7 @@ int stdDisplay_VBufferFill(stdVBuffer *vbuf, int fillColor, rdRect *rect)
     }
     
     //SDL_FillRect(vbuf, &dstRect, fillColor); //TODO error check
-
+#endif
     return 1;
 }
 
@@ -470,7 +478,7 @@ int stdDisplay_VBufferSetColorKey(stdVBuffer *vbuf, int color)
 void stdDisplay_VBufferFree(stdVBuffer *vbuf)
 {
     stdDisplay_VBufferUnlock(vbuf);
-    SDL_FreeSurface(vbuf->sdlSurface);
+    //SDL_FreeSurface(vbuf->sdlSurface);
     std_pHS->free(vbuf);
 }
 
@@ -498,12 +506,3 @@ int stdDisplay_SetCooperativeLevel(uint32_t a){return 0;}
 int stdDisplay_DrawAndFlipGdi(uint32_t a){return 0;}
 void stdDisplay_422A50(){}
 #endif
-
-void stdDisplay_GammaCorrect(const void *pPal)
-{
-    _memcpy(stdDisplay_tmpGammaPal, pPal, sizeof(stdDisplay_tmpGammaPal));
-    if ( stdDisplay_paGammaTable && stdDisplay_gammaIdx )
-        stdColor_GammaCorrect((uint8_t *)stdDisplay_gammaPalette, (uint8_t *)stdDisplay_tmpGammaPal, 256, stdDisplay_paGammaTable[stdDisplay_gammaIdx - 1]);
-    else
-        _memcpy(stdDisplay_gammaPalette, pPal, sizeof(stdDisplay_gammaPalette));
-}

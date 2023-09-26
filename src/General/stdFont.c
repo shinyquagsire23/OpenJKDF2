@@ -41,8 +41,9 @@ stdFont* stdFont_Load(char *fpath, int a2, int a3)
 
     fd = std_pHS->fileOpen(fpath, "rb");
 
-    if (!fd)
+    if (!fd) {
         return NULL;
+    }
 
     if ( std_pHS->fileRead(fd, &header, 0x28) != 40 )
         goto LABEL_28;

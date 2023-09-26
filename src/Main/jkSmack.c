@@ -10,6 +10,7 @@
 #include "Win95/stdComm.h"
 #include "World/jkPlayer.h"
 #include "Main/jkEpisode.h"
+#include "General/stdFnames.h"
 
 #ifdef FS_POSIX
 #include "external/fcaseopen/fcaseopen.h"
@@ -54,7 +55,7 @@ int jkSmack_SmackPlay(const char *fname)
         jkSmack_nextGuiState = JK_GAMEMODE_TITLE;
         return 1;
     }
-    _sprintf(std_genBuffer, "video%c%s", '\\', fname);
+    _sprintf(std_genBuffer, "video%c%s", LEC_PATH_SEPARATOR_CHR, fname);
 
 #ifdef FS_POSIX
     char *r = malloc(strlen(std_genBuffer) + 16);

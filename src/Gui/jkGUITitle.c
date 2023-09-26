@@ -231,6 +231,7 @@ void jkGuiTitle_LoadBarDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *
 
 void jkGuiTitle_WorldLoadCallback(float percentage)
 {
+#ifndef TARGET_TWL
     double v1; // st7
 
     if ( jkGuiTitle_loadPercent != (__int64)percentage )
@@ -263,6 +264,7 @@ void jkGuiTitle_WorldLoadCallback(float percentage)
     stdDisplay_DDrawGdiSurfaceFlip();
 #endif
     }
+#endif
 }
 
 // MOTS altered: Added some string to the printf

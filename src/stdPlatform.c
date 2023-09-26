@@ -102,7 +102,10 @@ static const char* Linux_stdFileGets(stdFile_t fhand, char* dst, size_t len)
 
 static int Linux_stdFseek(stdFile_t fhand, int a, int b)
 {
-    return fseek((void*)fhand, a, b);
+    //printf("fseek? %x %x\n", a, b);
+    int ret = fseek((void*)fhand, a, b);
+    //printf("fseek %x\n", ret);
+    return ret;
 }
 
 static int Linux_stdFtell(stdFile_t fhand)
@@ -112,6 +115,14 @@ static int Linux_stdFtell(stdFile_t fhand)
 
 static void* Linux_alloc(uint32_t len)
 {
+#ifdef TARGET_TWL
+    void* ret = malloc(len);
+    if (!ret) {
+        printf("Failed to allocate %x bytes...\n", len);
+        return NULL;
+    }
+    return ret;
+#endif
     //TODO figure out where we're having alloc issues?
     return malloc(len);
 }
@@ -129,11 +140,7 @@ static void* Linux_realloc(void* ptr, uint32_t len)
 
 static int Linux_stdFeof(stdFile_t fhand)
 {
-#ifdef TARGET_TWL
-    return 0;
-#else
-    return feof((void*)fhand);
-#endif
+    return feof((FILE*)fhand);
 }
 
 uint32_t stdPlatform_GetTimeMsec()

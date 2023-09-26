@@ -161,12 +161,12 @@ int Window_AddDialogHwnd(HWND a1)
     return 1;
 }
 
-#ifdef SDL2_RENDER
-static int dword_855E98 = 0;
-static int dword_855DE4 = 0;
-#else
+#if !defined(SDL2_RENDER) && defined(WIN32)
 #define dword_855E98 (*(int*)0x855E98)
 #define dword_855DE4 (*(int*)0x855DE4)
+#else
+static int dword_855E98 = 0;
+static int dword_855DE4 = 0;
 #endif // SDL2_RENDER
 
 int Window_msg_main_handler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)

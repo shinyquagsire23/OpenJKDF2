@@ -145,16 +145,18 @@ int jkGui_Startup()
     {
         stdString_snprintf(tmp, 128, "ui\\sft\\%s", jkGui_aFonts[i]);
         jkGui_stdFonts[i] = stdFont_Load(tmp, 1, 0);
-        if (jkGui_stdFonts[i] == NULL)
+        if (jkGui_stdFonts[i] == NULL) {
             Windows_GameErrorMsgbox("ERR_CANNOT_LOAD_FILE %s", tmp);
+        }
     }
 
     for (int i = 0; i < 35; i++)
     {
         stdString_snprintf(tmp, 128, "ui\\bm\\%s", jkGui_aBitmaps[i]);
         jkGui_stdBitmaps[i] = stdBitmap_Load(tmp, 1, 0);
-        if (jkGui_stdBitmaps[i] == NULL)
+        if (jkGui_stdBitmaps[i] == NULL) {
             Windows_GameErrorMsgbox("ERR_CANNOT_LOAD_FILE %s", tmp);
+        }
     }
 
     Window_ShowCursorUnwindowed(Main_bWindowGUI == 0);

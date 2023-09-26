@@ -14,7 +14,7 @@
 #define stdGdi_SetHInstance_ADDR (0x00436D30)
 #define stdGdi_GetHInstance_ADDR (0x00436D40)
 
-#ifndef SDL2_RENDER
+#if !defined(SDL2_RENDER) && defined(WIN32)
 
 HBITMAP stdGdi_Create8bppPaletted(HDC hdc, int a2, int a3, void **ppvBits, uint8_t *a5);
 HBITMAP stdGdi_CreateRGB(HDC hdc, LONG width, int height, void **ppvBits);

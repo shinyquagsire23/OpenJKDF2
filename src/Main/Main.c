@@ -307,10 +307,8 @@ int Main_Startup(const char *cmdline)
 
     if (Windows_InitWindow())
     {
-
         rdStartup(&hs);
         jkGuiRend_Startup();
-#ifndef TARGET_TWL // TODO
         jkGui_Startup();
         jkGuiMultiplayer_Startup();
         jkGuiNetHost_Startup();
@@ -361,7 +359,9 @@ int Main_Startup(const char *cmdline)
         jkSmack_Startup();
 
         std3D_Startup(); // Added
+#ifdef QUAKE_CONSOLE
         jkQuakeConsole_Startup(); // Added
+#endif
 
         if (jkRes_LoadCD(0))
         {
@@ -384,7 +384,6 @@ int Main_Startup(const char *cmdline)
             return 1;
         }
         return 0;
-#endif
     }
 
     return 0;
