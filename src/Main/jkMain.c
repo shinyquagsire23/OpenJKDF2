@@ -109,7 +109,7 @@ void jkMain_Shutdown()
 }
 
 // TODO merge SDL2 in
-#ifndef SDL2_RENDER
+#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
 int jkMain_SetVideoMode()
 {
     signed int result; // eax
@@ -1478,7 +1478,7 @@ void jkMain_StartupCutscene(char *pCutsceneStr)
     }
 }
 
-#ifdef SDL2_RENDER
+#if defined(SDL2_RENDER) || defined(TARGET_TWL)
 void jkMain_FixRes()
 {
     if (!jkGame_isDDraw)
@@ -1541,8 +1541,9 @@ void jkMain_FixRes()
     sithCamera_Close();
     rdCanvas_Free(Video_pCanvas);
 
+#if defined(SDL2_RENDER)
     rdCanvas_Free(Video_pCanvasOverlayMap);
-
+#endif
 
     jkHudInv_LoadItemRes();
     jkHud_Open();
@@ -1553,7 +1554,9 @@ void jkMain_FixRes()
     jkDev_Open();
     
     Video_pCanvas = rdCanvas_New(2, Video_pMenuBuffer, Video_pVbufIdk, 0, 0, newW, newH, 6);
+#if defined(SDL2_RENDER)
     Video_pCanvasOverlayMap = rdCanvas_New(2, Video_pOverlayMapBuffer, Video_pOverlayMapBuffer, 0, 0, newW, newH, 6);
+#endif
     sithCamera_Open(Video_pCanvas, stdDisplay_pCurVideoMode->widthMaybe);
 }
 
@@ -1650,7 +1653,9 @@ int jkMain_SetVideoMode()
     
     rdroid_curAcceleration = 1;
     Video_pCanvas = rdCanvas_New(2, Video_pMenuBuffer, Video_pVbufIdk, 0, 0, newW, newH, 6);
+#if defined(SDL2_RENDER)
     Video_pCanvasOverlayMap = rdCanvas_New(2, Video_pOverlayMapBuffer, Video_pOverlayMapBuffer, 0, 0, newW, newH, 6);
+#endif
 #ifdef JKM_LIGHTING
     if (Main_bMotsCompat) {
         sithRender_SetSomeRenderflag(0xaa);

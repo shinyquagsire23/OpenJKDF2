@@ -110,6 +110,11 @@ void jkGuiRend_DrawRect(stdVBuffer *vbuf, rdRect *rect, int16_t color)
         rect->y = 0;
         rect->height = y + h;
     }
+    // Added: Just don't draw the rect if OOB
+    if (rect->x > vbuf->format.width || rect->y > vbuf->format.height) {
+        return;
+    }
+
     if ( rect->width + rect->x > vbuf->format.width )
         rect->width = vbuf->format.width - rect->x;
     if ( rect->height + rect->y > vbuf->format.height )
@@ -201,6 +206,7 @@ LABEL_22:
             return;
         }
     }
+
     stdDisplay_VBufferUnlock(vbuf);
 }
 
@@ -234,7 +240,7 @@ void jkGuiRend_Paint(jkGuiMenu *menu)
     
     stdControl_ShowCursor(0);
     stdDisplay_SetMasterPalette(jkGuiRend_palette);
-#ifndef TARGET_TWL
+
     if ( menu->texture )
         stdDisplay_VBufferCopy(jkGuiRend_menuBuffer, menu->texture, 0, 0, 0, 0);
 
@@ -246,7 +252,7 @@ void jkGuiRend_Paint(jkGuiMenu *menu)
         clickable = &menu->paElements[++clickableIdx];
     }
 
-#ifdef SDL2_RENDER
+#if defined(SDL2_RENDER) || defined(TARGET_TWL)
     menu->focusedElement = lastFocused;
     menu->lastMouseDownClickable = lastDown;
 #endif
@@ -254,7 +260,7 @@ void jkGuiRend_Paint(jkGuiMenu *menu)
     jkGuiRend_FlipAndDraw(menu, 0);
 
     jkGuiRend_UpdateCursor();
-#endif
+
 }
 
 void jkGuiRend_ElementSetClickShortcutScancode(jkGuiElement *element, int scancode)
@@ -289,7 +295,7 @@ int jkGuiRend_DisplayAndReturnClicked(jkGuiMenu *menu)
         { 
             // Added: this makes the menu that appears when pressing ESC in jkGUISingleTally flicker,
             //        I think due to how we handle window message emulation.
-#ifndef SDL2_RENDER
+#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
             menu->lastClicked = -1;
 #endif
         }
@@ -769,7 +775,7 @@ void jkGuiRend_UpdateAndDrawClickable(jkGuiElement *clickable, jkGuiMenu *menu, 
             menu->lastMouseOverClickable = 0;
         drawFunc(clickable, menu, jkGuiRend_menuBuffer, forceRedraw);
         menu->lastMouseOverClickable = lastSave;
-#ifndef SDL2_RENDER
+#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
         if ( forceRedraw )
             jkGuiRend_FlipAndDraw(menu, drawRect);
 #endif
@@ -777,7 +783,7 @@ void jkGuiRend_UpdateAndDrawClickable(jkGuiElement *clickable, jkGuiMenu *menu, 
     else if ( forceRedraw )
     {
         jkGuiRend_CopyVBuffer(menu, drawRect);
-#ifndef SDL2_RENDER
+#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
         if ( forceRedraw )
             jkGuiRend_FlipAndDraw(menu, drawRect);
 #endif
@@ -794,6 +800,7 @@ void jkGuiRend_UpdateAndDrawClickable(jkGuiElement *clickable, jkGuiMenu *menu, 
 LABEL_47:
     if ( mousePos.x )
         stdControl_ShowCursor(1);
+
 }
 
 int jkGuiRend_InvokeEvent(jkGuiElement *element, jkGuiMenu *menu, int eventType, int eventParam)
@@ -882,7 +889,7 @@ LABEL_12:
     jkGuiElement* element = &menu->paElements[idxOther];
     if ( element && jkGuiRend_sub_5103E0(element) )
     {
-//#ifndef SDL2_RENDER
+//#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
         menu->focusedElement = element;
 //#endif
         if ( focusedElement )
@@ -935,7 +942,7 @@ void jkGuiRend_RenderIdk2_alt(jkGuiMenu *menu)
     jkGuiElement* element = &menu->paElements[idxOther];
     if ( element && jkGuiRend_sub_5103E0(element) )
     {
-#ifndef SDL2_RENDER
+#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
         menu->focusedElement = element;
 #endif
         if ( focusedElement )
@@ -1658,7 +1665,7 @@ LABEL_47:
             break;
 
         case WM_CHAR:
-#ifndef SDL2_RENDER
+#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
             if ( (jkGuiRend_lastKeyScancode != 0xFF0000) & (uint8_t)lParam )
 #endif
                 jkGuiRend_InvokeEvent(jkGuiRend_activeMenu->focusedElement, jkGuiRend_activeMenu, JKGUI_EVENT_CHAR, wParam);

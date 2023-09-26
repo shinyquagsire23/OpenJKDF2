@@ -128,22 +128,23 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
         SDL_SetPaletteColors(overlaySurface->format->palette, tmp, 0, 256);
         free(tmp);
     }
-    
+#endif
     //SDL_SetSurfacePalette(otherSurface, palette);
     //SDL_SetSurfacePalette(menuSurface, palette);
+    uint32_t pitch = newW;
 
-    Video_otherBuf.sdlSurface = otherSurface;
-    Video_menuBuffer.sdlSurface = menuSurface;
-    Video_overlayMapBuffer.sdlSurface = overlaySurface;
+    //Video_otherBuf.sdlSurface = otherSurface;
+    //Video_menuBuffer.sdlSurface = menuSurface;
+    //Video_overlayMapBuffer.sdlSurface = overlaySurface;
 
-    Video_menuBuffer.format.width_in_bytes = menuSurface->pitch;
-    Video_otherBuf.format.width_in_bytes = otherSurface->pitch;
-    Video_overlayMapBuffer.format.width_in_bytes = overlaySurface->pitch;
+    Video_menuBuffer.format.width_in_bytes = pitch;
+    Video_otherBuf.format.width_in_bytes = pitch;
+    //Video_overlayMapBuffer.format.width_in_bytes = overlaySurface->pitch;
     
-    Video_menuBuffer.format.width_in_pixels = menuSurface->pitch;
-    Video_otherBuf.format.width_in_pixels = otherSurface->pitch;
-    Video_overlayMapBuffer.format.width_in_pixels = overlaySurface->pitch;
-#endif
+    Video_menuBuffer.format.width_in_pixels = pitch;
+    Video_otherBuf.format.width_in_pixels = pitch;
+    //Video_overlayMapBuffer.format.width_in_pixels = overlaySurface->pitch;
+
     Video_menuBuffer.format.width = newW;
     Video_otherBuf.format.width = newW;
     //Video_overlayMapBuffer.format.width = newW;
@@ -154,6 +155,15 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
     Video_menuBuffer.format.format.bpp = 8;
     Video_otherBuf.format.format.bpp = 8;
     //Video_overlayMapBuffer.format.format.bpp = 8;
+
+    Video_menuBuffer.format.texture_size_in_bytes = pitch * newH;
+    Video_otherBuf.format.texture_size_in_bytes = pitch * newH;
+
+    //out->format.width = 0;
+    //out->format.width_in_bytes = 0;
+    if (!Video_menuBuffer.surface_lock_alloc)
+        Video_menuBuffer.surface_lock_alloc = std_pHS->alloc(Video_menuBuffer.format.texture_size_in_bytes);
+    //Video_otherBuf.surface_lock_alloc = std_pHS->alloc(Video_otherBuf.format.texture_size_in_bytes);
 
 #if 0
     glGenTextures(1, &Video_menuTexId);
@@ -282,6 +292,7 @@ stdVBuffer* stdDisplay_VBufferNew(stdVBufferTexFmt *fmt, int create_ddraw_surfac
 int stdDisplay_VBufferLock(stdVBuffer *buf)
 {
     if (!buf) return 0;
+    if (!buf->surface_lock_alloc) return 0;
 
     //SDL_LockSurface(buf->sdlSurface);
     //buf->surface_lock_alloc = buf->sdlSurface->pixels;
@@ -309,7 +320,7 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
     }
     
     //if (vbuf == &Video_menuBuffer)
-    //    stdPlatform_Printf("Vbuffer copy to menu %u,%u %ux%u %u,%u\n", rect->x, rect->y, rect->width, rect->height, blit_x, blit_y);
+        //stdPlatform_Printf("Vbuffer copy to menu %u,%u %ux%u %u,%u\n", rect->x, rect->y, rect->width, rect->height, blit_x, blit_y);
     
     if (vbuf->palette)
     {
@@ -342,24 +353,28 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
         SDL_SetPaletteColors(vbuf2->sdlSurface->format->palette, tmp, 0, 256);
         free(tmp);*/
     }
-#if 0
-    SDL_Rect dstRect = {blit_x, blit_y, rect->width, rect->height};
-    SDL_Rect srcRect = {rect->x, rect->y, rect->width, rect->height};
+
+    rdRect dstRect = {blit_x, blit_y, rect->width, rect->height};
+    rdRect srcRect = {rect->x, rect->y, rect->width, rect->height};
     
-    uint8_t* srcPixels = vbuf2->sdlSurface->pixels;
-    uint8_t* dstPixels = vbuf->sdlSurface->pixels;
+    uint8_t* srcPixels = vbuf2->surface_lock_alloc;
+    uint8_t* dstPixels = vbuf->surface_lock_alloc;
     uint32_t srcStride = vbuf2->format.width_in_bytes;
     uint32_t dstStride = vbuf->format.width_in_bytes;
+
+    if (!srcPixels || !dstPixels) {
+        //stdPlatform_Printf("Vbuffer copy missing src or dst %p %p\n", srcPixels, dstPixels);
+    }
 
     int self_copy = 0;
 
     if (dstPixels == srcPixels)
     {
-        size_t buf_len = srcStride * dstRect.w * dstRect.h;
+        size_t buf_len = srcStride * dstRect.width * dstRect.height;
         uint8_t* dstPixels = malloc(buf_len);
         int has_alpha = 0;//!(rect->width == 640);
 
-        SDL_Rect dstRect_inter = {0, 0, rect->width, rect->height};
+        rdRect dstRect_inter = {0, 0, rect->width, rect->height};
 
         for (int i = 0; i < rect->width; i++)
         {
@@ -411,7 +426,6 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
     {
         free(srcPixels);
     }
-#endif
 
     //SDL_BlitSurface(vbuf2->sdlSurface, &srcRect, vbuf->sdlSurface, &dstRect); //TODO error check
     return 1;
@@ -419,7 +433,7 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
 
 int stdDisplay_VBufferFill(stdVBuffer *vbuf, int fillColor, rdRect *rect)
 {
-#if 0
+
     rdRect fallback = {0,0,vbuf->format.width, vbuf->format.height};
     if (!rect)
     {
@@ -429,11 +443,11 @@ int stdDisplay_VBufferFill(stdVBuffer *vbuf, int fillColor, rdRect *rect)
     //if (vbuf == &Video_menuBuffer)
     //    stdPlatform_Printf("Vbuffer fill to menu %u,%u %ux%u\n", rect->x, rect->y, rect->width, rect->height);
 
-    SDL_Rect dstRect = {rect->x, rect->y, rect->width, rect->height};
+    rdRect dstRect = {rect->x, rect->y, rect->width, rect->height};
     
     //printf("%x; %u %u %u %u\n", fillColor, rect->x, rect->y, rect->width, rect->height);
     
-    uint8_t* dstPixels = vbuf->sdlSurface->pixels;
+    uint8_t* dstPixels = vbuf->surface_lock_alloc;
     uint32_t dstStride = vbuf->format.width_in_bytes;
     uint32_t max_idx = dstStride * vbuf->format.height;
     for (int i = 0; i < rect->width; i++)
@@ -449,7 +463,6 @@ int stdDisplay_VBufferFill(stdVBuffer *vbuf, int fillColor, rdRect *rect)
     }
     
     //SDL_FillRect(vbuf, &dstRect, fillColor); //TODO error check
-#endif
     return 1;
 }
 

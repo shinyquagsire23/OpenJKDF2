@@ -45,9 +45,9 @@ u32 uv[] =
     //TEXTURE_PACK(0, inttot16(16)),
     //TEXTURE_PACK(0,0)
 
-    TEXTURE_PACK(0, inttot16(16)),
-    TEXTURE_PACK(inttot16(16),inttot16(16)),
-    TEXTURE_PACK(inttot16(16), 0),
+    TEXTURE_PACK(0, inttot16(256)),
+    TEXTURE_PACK(inttot16(256),inttot16(256)),
+    TEXTURE_PACK(inttot16(256), 0),
     TEXTURE_PACK(0,0)
 };
 
@@ -135,6 +135,7 @@ int std3D_Startup()
 
     glBindTexture(0, textureIDS[0]);
     glTexImage2D(0, 0, GL_RGB256, TEXTURE_SIZE_16 , TEXTURE_SIZE_16, 0, TEXGEN_TEXCOORD, (u8*)i8Bitmap);
+    free(i8Bitmap);
     
     //glBindTexture(0, paletteIDS[0]);
     glColorTableEXT( 0, 0, 256, 0, 0, (u16*)i8Pal );
@@ -210,6 +211,32 @@ void std3D_DrawMenu()
     u16 keysPressed = keysDown();
 
     update_from_display_palette();
+
+    u8* i8Bitmap = malloc(256*256);
+    
+
+    if (Video_menuBuffer.surface_lock_alloc)
+    {
+        uint32_t pitch = Video_menuBuffer.format.width_in_bytes;
+        for (int x = 0; x < 256; x++)
+        {
+            for(int y = 0; y < 256; y++)
+            {
+                i8Bitmap[(y*256)+x] = Video_menuBuffer.surface_lock_alloc[(pitch*y)+x];
+                //Video_menuBuffer.surface_lock_alloc[(pitch*y)+x] = (y*128)+x;
+            }
+        }
+    }
+    else
+    {
+        for (int i = 0; i < 256; i++)
+        {
+            i8Bitmap[i] = i;
+        }
+    }
+    glBindTexture(0, textureIDS[0]);
+    glTexImage2D(0, 0, GL_RGB256, TEXTURE_SIZE_256 , TEXTURE_SIZE_256, 0, TEXGEN_TEXCOORD, (u8*)i8Bitmap);
+    free(i8Bitmap);
 
     glBindTexture(0, textureIDS[nTexture]);
     glColorTableEXT( 0, 0, 256, 0, 0, (u16*)i8Pal );

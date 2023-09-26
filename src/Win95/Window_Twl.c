@@ -48,7 +48,7 @@ extern int Window_needsRecreate;
 void test_display()
 {
     static int idx = 0;
-    swiWaitForVBlank();
+    //swiWaitForVBlank();
     scanKeys();
     int keys = keysDown();
     //if (keys & KEY_START) break;
@@ -101,6 +101,9 @@ int Window_Main_Linux(int argc, char** argv)
     Window_SetFullscreen(fullscreen);
     Window_SetHiDpi(hidpi);
     //Window_RecreateSDL2Window();
+    Window_resized = 1;
+    Window_xSize = 640;
+    Window_ySize = 480;
 
     if (!result) return result;
 
@@ -428,7 +431,7 @@ void Window_SdlUpdate()
 #endif
     if (Window_resized)
     {
-        //jkMain_FixRes();
+        jkMain_FixRes();
         if (!jkGui_SetModeMenu(0))
         {
             stdDisplay_SetMode(0, 0, 0);
@@ -479,6 +482,7 @@ void Window_SdlUpdate()
         if (Window_needsRecreate) {
             std3D_PurgeTextureCache();
             //Window_RecreateSDL2Window();
+            Window_resized = 1;
         }
         
         // Keep menu FPS at 60FPS, to avoid cranking the GPU unnecessarily.
