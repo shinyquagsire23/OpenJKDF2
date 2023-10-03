@@ -493,7 +493,7 @@ void sithCogFunctionPlayer_SetRespawnMask(sithCog *ctx)
 void sithCogFunctionPlayer_ActivateBin(sithCog *ctx)
 {
     int binIdx = sithCogExec_PopInt(ctx);
-    float delay = sithCogExec_PopFlex(ctx);
+    cog_flex_t delay = sithCogExec_PopFlex(ctx);
     sithThing* player = sithCogExec_PopThing(ctx);
 
     if (player
@@ -515,7 +515,7 @@ void sithCogFunctionPlayer_DeactivateBin(sithCog *ctx)
         && player->type == SITH_THING_PLAYER
         && player->actorParams.playerinfo)
     {
-        float ret = sithInventory_DeactivateBin(player, ctx, binIdx);
+        cog_flex_t ret = sithInventory_DeactivateBin(player, ctx, binIdx);
         sithCogExec_PushFlex(ctx, ret);
     }
     else
@@ -550,7 +550,7 @@ void sithCogFunctionPlayer_AddScoreToTeamMembers(sithCog *ctx)
 
 void sithCogFunctionPlayer_SetBinWait(sithCog *ctx)
 {
-    float wait = sithCogExec_PopFlex(ctx);
+    cog_flex_t wait = sithCogExec_PopFlex(ctx);
     int binIdx = sithCogExec_PopInt(ctx);
     sithThing* player = sithCogExec_PopThing(ctx);
 

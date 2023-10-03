@@ -45,9 +45,8 @@ void sithCogFunctionAI_AIJump(sithCog *ctx)
     sithThing *v3; // eax
     sithActor *v4; // eax
     rdVector3 v5; // [esp+8h] [ebp-Ch] BYREF
-    float a1; // [esp+18h] [ebp+4h]
 
-    a1 = sithCogExec_PopFlex(ctx);
+    cog_flex_t a1 = sithCogExec_PopFlex(ctx);
     v2 = sithCogExec_PopVector3(ctx, &v5);
     v3 = sithCogExec_PopThing(ctx);
     
@@ -265,13 +264,11 @@ void sithCogFunctionAI_FirstThingInView(sithCog *ctx)
     sithThing *v3; // ebx
     int v4; // eax
     signed int v5; // [esp+10h] [ebp-38h]
-    float v6; // [esp+14h] [ebp-34h]
     rdMatrix34 v7; // [esp+18h] [ebp-30h] BYREF
-    float a1; // [esp+4Ch] [ebp+4h]
 
     v5 = sithCogExec_PopInt(ctx);
-    a1 = sithCogExec_PopFlex(ctx);
-    v6 = sithCogExec_PopFlex(ctx);
+    cog_flex_t a1 = sithCogExec_PopFlex(ctx);
+    cog_flex_t v6 = sithCogExec_PopFlex(ctx);
     v2 = sithCogExec_PopThing(ctx);
     
     // Added
@@ -523,7 +520,7 @@ void sithCogFunctionAI_AIGetAlignment(sithCog *ctx)
 // MOTS added
 void sithCogFunctionAI_AISetAlignment(sithCog *ctx)
 {
-    float val = sithCogExec_PopFlex(ctx);
+    cog_flex_t val = sithCogExec_PopFlex(ctx);
     sithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing && pThing->thingtype == SITH_THING_ACTOR && pThing->actor && pThing->actor->pAIClass) 
     {
@@ -575,14 +572,13 @@ void sithCogFunctionAI_AIAddAlignmentPriority(sithCog *ctx)
     int *piVar3;
     int val;
     int iVar5;
-    float fVar6;
     float local_4;
 
     local_4 = 1.0;
     iVar5 = -1000;
     val = -1;
     iVar1 = sithCogExec_PopInt(ctx);
-    fVar6 = sithCogExec_PopFlex(ctx);
+    cog_flex_t fVar6 = sithCogExec_PopFlex(ctx);
 
     for (int i = 0; i < 10; i++) {
         if (sithAI_aAlignments[i].bValid == 0) {
