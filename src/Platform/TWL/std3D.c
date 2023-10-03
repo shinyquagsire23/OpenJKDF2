@@ -13,12 +13,25 @@ int nTexture = 0;
 
 uint16_t i8Pal[256];
 
+typedef struct TWLVERTEX
+{
+    v16 x;
+    v16 y;
+    v16 z;
+    float tu;
+    float tv;
+    uint32_t color;
+} TWLVERTEX;
+
 size_t std3D_loadedTexturesAmt = 0;
 static rdTri GL_tmpTris[STD3D_MAX_TRIS] = {0};
 static size_t GL_tmpTrisAmt = 0;
-static D3DVERTEX GL_tmpVertices[STD3D_MAX_VERTICES] = {0};
+static TWLVERTEX GL_tmpVertices[STD3D_MAX_VERTICES] = {0};
 static size_t GL_tmpVerticesAmt = 0;
 static size_t rendered_tris = 0;
+
+static float res_fix_x = (256.0/640.0)/100.0;
+static float res_fix_y = (192.0/480.0)/100.0;
 
 //verticies for the cube
 v16 CubeVectors[] = {
@@ -133,10 +146,11 @@ int std3D_Startup()
 
     // TODO
     vramSetBankA(VRAM_A_TEXTURE);
-    //vramSetBankB(VRAM_B_TEXTURE);
+    vramSetBankB(VRAM_B_TEXTURE);
     //vramSetBankC(VRAM_C_TEXTURE);
-    //vramSetBankD(VRAM_D_TEXTURE);
-    //vramSetBankE(VRAM_E_TEX_PALETTE);
+    vramSetBankD(VRAM_D_TEXTURE);
+    //vramSetBankE(VRAM_E_TEXTURE);
+    vramSetBankE(VRAM_E_TEX_PALETTE);
     vramSetBankF(VRAM_F_TEX_PALETTE_SLOT0);
     //vramSetBankG(VRAM_G_TEX_PALETTE_SLOT5);
 
@@ -169,6 +183,8 @@ int std3D_StartScene()
 {
     rendered_tris = 0;
 
+    glFlush(0);
+
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
 
@@ -181,7 +197,6 @@ int std3D_StartScene()
 int std3D_EndScene()
 {
     glPopMatrix(1);        
-    glFlush(GL_TRANS_MANUALSORT);
     //printf("EndScene\n");
 
     return 0;
@@ -198,29 +213,33 @@ int std3D_RenderListVerticesFinish()
 {
     return 0;
 }
+
+#define COMP_B(c) (c & 0xFF)
+#define COMP_G(c) ((c>>8) & 0xFF)
+#define COMP_R(c) ((c>>16) & 0xFF)
+
 void std3D_DrawRenderList()
 {
     //printf("DrawRenderList %u %u\n", GL_tmpTrisAmt, GL_tmpVerticesAmt);
     if (!GL_tmpTrisAmt) return;
 
-    D3DVERTEX* vertexes = GL_tmpVertices;
+    TWLVERTEX* vertexes = GL_tmpVertices;
     rdTri* tris = GL_tmpTris;
 
     glColor3b(255,255,255);
     glBindTexture(0, textureIDS[2]);
 
-    float res_fix_x = (256.0/640.0)/100.0;
-    float res_fix_y = (192.0/480.0)/100.0;
+    glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK | POLY_MODULATION | POLY_ID(0) ) ;
+    //glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
+    glBegin(GL_TRIANGLES);
 
     for (int j = 0; j < GL_tmpTrisAmt; j++)
     {
-        //glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK | POLY_MODULATION | POLY_ID(j) ) ;
-        glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
-        glBegin(GL_TRIANGLE);
         
-        D3DVERTEX* v1 = &vertexes[tris[j].v1];
-        D3DVERTEX* v2 = &vertexes[tris[j].v2];
-        D3DVERTEX* v3 = &vertexes[tris[j].v3];
+        
+        TWLVERTEX* v1 = &vertexes[tris[j].v1];
+        TWLVERTEX* v2 = &vertexes[tris[j].v2];
+        TWLVERTEX* v3 = &vertexes[tris[j].v3];
 
         //printf("%u: %f %f %f\n", j, v1->x, v1->y, v1->z);
 
@@ -231,28 +250,31 @@ void std3D_DrawRenderList()
         glColor3b((j&0xFF),(j&0xFF),(j&0xFF));
         glVertex3v16(floattov16(v3->x / 100.0), floattov16(v3->y / 100.0), floattov16(v3->z));*/
 
+        GFX_TEX_COORD = TEXTURE_PACK(inttot16(16), inttot16(16));
+        //glColor3b((int)(v3->tu*255.0), (int)(v3->tv*255.0), 255);
+        //glColor3b((j&0xFF),(j&0xFF),(j&0xFF));
+        //glVertex3v16(floattov16(0.0), floattov16(1.92), floattov16(0.6));
+        glColor3b(COMP_R(v3->color),COMP_G(v3->color),COMP_B(v3->color));
+        glVertex3v16(v3->x, v3->y, v3->z);
+
+        GFX_TEX_COORD = TEXTURE_PACK(0, inttot16(16));
+        //glColor3b((int)(v2->tu*255.0), (int)(v2->tv*255.0), 255);
+        //glColor3b((j&0xFF),(j&0xFF),(j&0xFF));
+        //glVertex3v16(floattov16(2.56), floattov16(1.28), floattov16(0.6));
+        glColor3b(COMP_R(v2->color),COMP_G(v2->color),COMP_B(v2->color));
+        glVertex3v16(v2->x, v2->y, v2->z);
 
 
         GFX_TEX_COORD = TEXTURE_PACK(0, inttot16(0));
-        glColor3b((int)(v1->tu*255.0), (int)(v1->tv*255.0), (int)(v1->z*255.0));
+        //glColor3b((int)(v1->tu*255.0), (int)(v1->tv*255.0), 255);
         //glVertex3v16(floattov16(0.0), floattov16(1.28), floattov16(0.6));
-        glVertex3v16(floattov16(v1->x*res_fix_x), floattov16((480.0-v1->y) * res_fix_y), floattov16(-v1->z));
+        glColor3b(COMP_R(v1->color),COMP_G(v1->color),COMP_B(v1->color));
+        glVertex3v16(v1->x, v1->y, v1->z);
 
-        GFX_TEX_COORD = TEXTURE_PACK(0, inttot16(16));
-        glColor3b((int)(v2->tu*255.0), (int)(v2->tv*255.0), (int)(v2->z*255.0));
-        //glColor3b((j&0xFF),(j&0xFF),(j&0xFF));
-        //glVertex3v16(floattov16(2.56), floattov16(1.28), floattov16(0.6));
-        glVertex3v16(floattov16(v2->x*res_fix_x), floattov16((480.0-v2->y) * res_fix_y), floattov16(-v2->z));
-
-        GFX_TEX_COORD = TEXTURE_PACK(inttot16(16), inttot16(16));
-        glColor3b((int)(v3->tu*255.0), (int)(v3->tv*255.0), (int)(v3->z*255.0));
-        //glColor3b((j&0xFF),(j&0xFF),(j&0xFF));
-        //glVertex3v16(floattov16(0.0), floattov16(1.92), floattov16(0.6));
-        glVertex3v16(floattov16(v3->x*res_fix_x), floattov16((480.0-v3->y) * res_fix_y), floattov16(-v3->z));
-
-        glEnd();
+        
     }
-
+    glEnd();
+    //glFlush(0);
     
 
     std3D_ResetRenderList();
@@ -297,7 +319,18 @@ int std3D_AddRenderListVertices(D3DVERTEX *vertices, int count)
         return 0;
     }
     
-    memcpy(&GL_tmpVertices[GL_tmpVerticesAmt], vertices, sizeof(D3DVERTEX) * count);
+    for (int i = 0; i < count; i++)
+    {
+        D3DVERTEX* v = &vertices[i];
+        TWLVERTEX* t = &GL_tmpVertices[GL_tmpVerticesAmt+i];
+
+        t->x = floattov16(v->x * res_fix_x);
+        t->y = floattov16((480.0 - v->y) * res_fix_y);
+        t->z = floattov16(-v->z);
+        t->tu = v->tu;
+        t->tv = v->tv;
+        t->color = v->color;
+    }
     
     GL_tmpVerticesAmt += count;
     

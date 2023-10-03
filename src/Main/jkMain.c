@@ -51,7 +51,9 @@
 #include "Dss/jkDSS.h"
 #include "stdPlatform.h"
 
-#ifdef QOL_IMPROVEMENTS
+#if defined(TARGET_TWL)
+#define TICKRATE_MS (0) // no cap
+#elif defined(QOL_IMPROVEMENTS)
 #define TICKRATE_MS (jkPlayer_fpslimit ? 1000 / jkPlayer_fpslimit : 0) // no cap
 #else
 #define TICKRATE_MS (20) // 50fps

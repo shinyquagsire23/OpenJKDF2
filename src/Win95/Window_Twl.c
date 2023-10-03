@@ -47,10 +47,10 @@ extern int Window_needsRecreate;
 
 void test_display()
 {
-    static int idx = 0;
+    //static int idx = 0;
     //swiWaitForVBlank();
-    scanKeys();
-    int keys = keysDown();
+    //scanKeys();
+    //int keys = keysDown();
     //if (keys & KEY_START) break;
 
 
@@ -67,7 +67,7 @@ void Window_Main_Loop()
     jkMain_GuiAdvance();
     Window_msg_main_handler(g_hWnd, WM_PAINT, 0, 0);
     
-    Window_SdlUpdate();
+    //Window_SdlUpdate();
 }
 
 int Window_Main_Linux(int argc, char** argv)
@@ -153,7 +153,7 @@ int Window_ShowCursorUnwindowed(int a1)
 
 int Window_MessageLoop()
 {
-    jkMain_GuiAdvance();
+    //jkMain_GuiAdvance(); // TODO needed?
     Window_msg_main_handler(g_hWnd, WM_PAINT, 0, 0);
     return 0;
 }
@@ -452,9 +452,9 @@ void Window_SdlUpdate()
     }
     
     static int sampleTime_delay = 0;
-    int sampleTime_roundtrip = 0;//SDL_GetTicks() - Window_lastSampleTime;
-    //printf("%u\n", sampleTime_roundtrip);
-    //Window_lastSampleTime = SDL_GetTicks(); // TODO
+    int sampleTime_roundtrip = stdPlatform_GetTimeMsec() - Window_lastSampleTime;
+    printf("%u\n", sampleTime_roundtrip);
+    Window_lastSampleTime = stdPlatform_GetTimeMsec(); // TODO
 
     static int jkPlayer_enableVsync_last = 0;
     int menu_framelimit_amt_ms = 16;
@@ -479,13 +479,13 @@ void Window_SdlUpdate()
 
         if (!jkGuiBuildMulti_bRendering) {
             std3D_StartScene();
-            jkQuakeConsole_Render();
+            //jkQuakeConsole_Render();
             std3D_DrawMenu();
             std3D_EndScene();
             //SDL_GL_SwapWindow(displayWindow);
         }
         else {
-            jkQuakeConsole_Render();
+            //jkQuakeConsole_Render();
             std3D_DrawMenu();
             //SDL_GL_SwapWindow(displayWindow);
             //menu_framelimit_amt_ms = 64;
@@ -556,7 +556,7 @@ void Window_SdlUpdate()
 void Window_SdlVblank()
 {
     if (Main_bHeadless) return;
-    swiWaitForVBlank();
+    //swiWaitForVBlank();
 }
 
 #endif

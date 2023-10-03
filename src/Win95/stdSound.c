@@ -593,6 +593,7 @@ stdSound_buffer_t* stdSound_BufferCreate(int bStereo, uint32_t nSamplesPerSec, u
 
 void* stdSound_BufferSetData(stdSound_buffer_t* sound, int bufferBytes, int* bufferMaxSize)
 {
+    bufferBytes = 0x100; // HACK
     sound->bufferBytes = bufferBytes;
     
     if (bufferMaxSize)
@@ -601,6 +602,7 @@ void* stdSound_BufferSetData(stdSound_buffer_t* sound, int bufferBytes, int* buf
     if (sound->data && !sound->bIsCopy)
         std_pHS->free(sound->data);
 
+    
     sound->data = std_pHS->alloc(bufferBytes);
     sound->bufferBytes = bufferBytes;
     

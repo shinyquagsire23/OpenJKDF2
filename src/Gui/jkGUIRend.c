@@ -243,8 +243,10 @@ void jkGuiRend_Paint(jkGuiMenu *menu)
     stdControl_ShowCursor(0);
     stdDisplay_SetMasterPalette(jkGuiRend_palette);
 
+#ifndef TARGET_TWL
     if ( menu->texture )
         stdDisplay_VBufferCopy(jkGuiRend_menuBuffer, menu->texture, 0, 0, 0, 0);
+#endif
 
     jkGuiElement* clickable = &menu->paElements[0];
     int clickableIdx = 0;
@@ -401,6 +403,11 @@ void jkGuiRend_gui_sets_handler_framebufs(jkGuiMenu *menu)
         Window_SetDrawHandlers(jkGuiRend_DrawAndFlip, jkGuiRend_Invalidate);
     }
     ++jkGuiRend_HandlerIsSet;
+    
+#ifdef TARGET_TWL
+    if ( menu->texture )
+        stdDisplay_VBufferCopy(jkGuiRend_menuBuffer, menu->texture, 0, 0, 0, 0);
+#endif
     
     jkGuiRend_Paint(menu);
 }

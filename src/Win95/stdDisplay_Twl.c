@@ -321,38 +321,6 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
     
     //if (vbuf == &Video_menuBuffer)
         //stdPlatform_Printf("Vbuffer copy to menu %u,%u %ux%u %u,%u\n", rect->x, rect->y, rect->width, rect->height, blit_x, blit_y);
-    
-    if (vbuf->palette)
-    {
-        rdColor24* pal24 = vbuf->palette;
-        /*SDL_Color* tmp = malloc(sizeof(SDL_Color) * 256);
-        for (int i = 0; i < 256; i++)
-        {
-            tmp[i].r = pal24[i].r;
-            tmp[i].g = pal24[i].g;
-            tmp[i].b = pal24[i].b;
-            tmp[i].a = 0xFF;
-        }
-    
-        SDL_SetPaletteColors(vbuf->sdlSurface->format->palette, tmp, 0, 256);
-        free(tmp);*/
-    }
-    
-    if (vbuf2->palette)
-    {
-        rdColor24* pal24 = vbuf2->palette;
-        /*SDL_Color* tmp = malloc(sizeof(SDL_Color) * 256);
-        for (int i = 0; i < 256; i++)
-        {
-            tmp[i].r = pal24[i].r;
-            tmp[i].g = pal24[i].g;
-            tmp[i].b = pal24[i].b;
-            tmp[i].a = 0xFF;
-        }
-        
-        SDL_SetPaletteColors(vbuf2->sdlSurface->format->palette, tmp, 0, 256);
-        free(tmp);*/
-    }
 
     rdRect dstRect = {blit_x, blit_y, rect->width, rect->height};
     rdRect srcRect = {rect->x, rect->y, rect->width, rect->height};

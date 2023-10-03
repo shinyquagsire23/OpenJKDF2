@@ -1227,7 +1227,7 @@ void Window_RecreateSDL2Window()
 
 void Window_Main_Loop()
 {
-    jkMain_GuiAdvance();
+    jkMain_GuiAdvance(); // TODO needed?
     Window_msg_main_handler(g_hWnd, WM_PAINT, 0, 0);
     
     //Window_SdlUpdate();
