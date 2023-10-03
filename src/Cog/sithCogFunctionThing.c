@@ -2526,7 +2526,6 @@ void sithCogFunctionThing_SetThingJointAngle(sithCog *ctx)
     rdVector3 *prVar1;
     int arg1;
     sithThing *pThing;
-    float fVar2;
 
     cog_flex_t fVar2 = sithCogExec_PopFlex(ctx);
     arg1 = sithCogExec_PopInt(ctx);
