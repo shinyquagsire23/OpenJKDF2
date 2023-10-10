@@ -170,6 +170,10 @@ extern char openjkdf2_aOrigCwd[1024];
 
 void do_hooks();
 
+#ifdef ARCH_WASM
+#include <emscripten.h>
+#endif // ARCH_WASM
+
 #ifdef WIN64_STANDALONE
 #include "exchndl.h"
 
@@ -225,6 +229,25 @@ void* __attribute__((weak)) __memcpy_chk(void * dest, const void * src, size_t l
 
 int main(int argc, char** argv)
 {
+#ifdef ARCH_WASM
+    EM_ASM(
+        FS.mkdir('/jk1/player');
+        FS.mkdir('/mots/player');
+        FS.mkdir('/jk1/persist');
+        FS.mkdir('/mots/persist');
+
+        FS.mount(IDBFS, {}, '/jk1/player');
+        FS.mount(IDBFS, {}, '/mots/player');
+        FS.mount(IDBFS, {}, '/jk1/persist');
+        FS.mount(IDBFS, {}, '/mots/persist');
+
+        // Then sync
+        FS.syncfs(true, function (err) {
+            // Error
+        });
+    );
+#endif // ARCH_WASM
+
 #ifdef TARGET_TWL
     defaultExceptionHandler();
     consoleDebugInit(DebugDevice_NOCASH);

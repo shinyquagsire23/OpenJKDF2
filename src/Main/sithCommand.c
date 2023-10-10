@@ -864,7 +864,8 @@ void sithCommand_LoadBindCallback(const char* pKey, const char* pVal, void* pCtx
 
 void sithCommand_SaveBinds()
 {
-    const char* ext_fpath = "openjkdf2_binds.json";
+    const char* ext_fpath = SITHBINDS_FNAME;
+
     stdJSON_EraseAll(ext_fpath);
     
     char tmp[3];
@@ -878,7 +879,7 @@ void sithCommand_SaveBinds()
 
 void sithCommand_LoadBinds()
 {
-    const char* ext_fpath = "openjkdf2_binds.json";
+    const char* ext_fpath = SITHBINDS_FNAME;
     stdJSON_IterateKeys(ext_fpath, sithCommand_LoadBindCallback, NULL);
 }
 

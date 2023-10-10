@@ -91,7 +91,17 @@ for (int i = 0; i < len; i++)
 
 static int Linux_stdFileClose(stdFile_t fhand)
 {
-    return fclose((void*)fhand);
+    int ret = fclose((void*)fhand);
+
+#ifdef ARCH_WASM
+    EM_ASM(
+        FS.syncfs(false, function (err) {
+            // Error
+        });
+    );
+#endif // ARCH_WASM
+
+    return ret;
 }
 
 

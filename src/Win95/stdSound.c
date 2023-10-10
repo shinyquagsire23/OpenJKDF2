@@ -559,6 +559,8 @@ int stdSound_Startup()
 {
     jkGuiSound_b3DSound = 0;
 
+    printf("Using STDSOUND_NULL as audio backend\n");
+
     return 1;
 }
 
