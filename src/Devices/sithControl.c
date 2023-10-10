@@ -1792,7 +1792,11 @@ void sithControl_InputInit()
     v6 = sithControl_MapAxisFunc(INPUT_FUNC_TURN, AXIS_MOUSE_X, 0xCu);
     if ( v6 )
         v6->binaryAxisVal = 0.4;
+#ifdef QOL_IMPROVEMENTS
+    v7 = sithControl_MapAxisFunc(INPUT_FUNC_PITCH, AXIS_MOUSE_Y, 0xCu); // Non-inverted by default, fight me lol
+#else
     v7 = sithControl_MapAxisFunc(INPUT_FUNC_PITCH, AXIS_MOUSE_Y, 8u);
+#endif
     if ( v7 )
         v7->binaryAxisVal = 0.3;
     v8 = sithControl_MapAxisFunc(INPUT_FUNC_PITCH, AXIS_MOUSE_Z, 0);
