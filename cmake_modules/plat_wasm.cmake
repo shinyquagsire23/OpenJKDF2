@@ -22,7 +22,8 @@ macro(plat_initialize)
     set(USE_FLAGS "-sUSE_SDL=2 -sUSE_SDL_MIXER=2 -sWASM=1 -s ALLOW_MEMORY_GROWTH=1 -sFULL_ES2 -sFULL_ES3 -sUSE_WEBGL2=1 -sASYNCIFY -sINITIAL_MEMORY=200mb -s STACK_SIZE=100mb")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${USE_FLAGS}")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${USE_FLAGS}")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${USE_FLAGS} --profiling --preload-file ${PROJECT_SOURCE_DIR}/wasm_out@/ ")
+    #set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${USE_FLAGS} --profiling --preload-file ${PROJECT_SOURCE_DIR}/wasm_out@/ ")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${USE_FLAGS} --profiling -s FORCE_FILESYSTEM=1 ")
     set(CMAKE_EXECUTABLE_SUFFIX .js)
 
     add_compile_options(-O2 -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces)
@@ -35,4 +36,9 @@ endmacro()
 macro(plat_link_and_package)
     target_link_libraries(${BIN_NAME} PRIVATE -lm -lSDL2 -lSDL2_mixer -lGL -lGLEW -lopenal -lidbfs.js)
     target_link_libraries(sith_engine PRIVATE nlohmann_json::nlohmann_json)
+
+    add_custom_command(TARGET ${BIN_NAME}
+        POST_BUILD
+        COMMAND $ENV{EMSCRIPTEN_ROOT}/tools/file_packager ${CMAKE_CURRENT_BINARY_DIR}/openjkdf2_data.data --preload ${PROJECT_SOURCE_DIR}/wasm_out@/ --js-output=${CMAKE_CURRENT_BINARY_DIR}/openjkdf2_data.js 
+        )
 endmacro()

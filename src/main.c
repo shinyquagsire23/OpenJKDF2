@@ -236,6 +236,10 @@ int main(int argc, char** argv)
         FS.mkdir('/jk1/persist');
         FS.mkdir('/mots/persist');
 
+        //FS.mount(NODEFS, { root: './jk1/episode' }, '/jk1/episode');
+        //FS.createLazyFile('/jk1/episode', "jk1demo.gob", "jk1/episode/jk1demo.gob", true, false);
+        //FS.createLazyFile('/jk1/episode', "jk1mpdem.gob", "jk1/episode/jk1mpdem.gob", true, false);
+
         FS.mount(IDBFS, {}, '/jk1/player');
         FS.mount(IDBFS, {}, '/mots/player');
         FS.mount(IDBFS, {}, '/jk1/persist');
