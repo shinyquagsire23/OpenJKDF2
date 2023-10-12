@@ -119,6 +119,7 @@ void jkMain_UnkTick(int a1);
 void jkMain_UnkLeave(int a1, int a2);
 int jkMain_LoadFile(char *a1);
 int jkMain_loadFile2(char *pGobPath, char *pEpisodeName);
+int jkMain_LoadLevelSingleplayer(char *pGobPath, char *pEpisodeName);
 
 int jkMain_sub_403470(char *a1);
 int jkMain_CdSwitch(int a1, int bIsAPath);

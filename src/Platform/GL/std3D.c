@@ -673,6 +673,8 @@ void std3D_Shutdown()
 
 void std3D_FreeResources()
 {
+    std3D_PurgeTextureCache();
+
     glDeleteProgram(programDefault);
     glDeleteProgram(programMenu);
     std3D_deleteFramebuffer(&std3D_framebuffers[0]);
@@ -802,8 +804,6 @@ int std3D_StartScene()
         loaded_colormap = sithWorld_pCurrentWorld->colormaps;
     }
 
-    
-    
     if (memcmp(displaypal_data, stdDisplay_masterPalette, 0x300))
     {
         glBindTexture(GL_TEXTURE_2D, displaypal_texture);
@@ -3577,8 +3577,13 @@ void std3D_PurgeTextureCache()
         return;
     }
 
-    jk_printf("Purging texture cache...\n");
-    for (int i = 0; i < STD3D_MAX_TEXTURES; i++)
+    if (!std3D_loadedTexturesAmt) {
+        jk_printf("Skipping texture cache purge, nothing loaded.\n");
+        return;
+    }
+
+    jk_printf("Purging texture cache... %x\n", std3D_loadedTexturesAmt);
+    for (int i = 0; i < std3D_loadedTexturesAmt; i++)
     {
         std3D_PurgeTextureEntry(i);
     }

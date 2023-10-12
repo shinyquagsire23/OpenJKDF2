@@ -966,6 +966,44 @@ int jkMain_loadFile2(char *pGobPath, char *pEpisodeName)
     return result;
 }
 
+// Added
+int jkMain_LoadLevelSingleplayer(char *pGobPath, char *pEpisodeName)
+{
+    BOOL v2; // esi
+    int result; // eax
+
+    _strncpy(jkMain_aLevelJklFname, pEpisodeName, 0x7Fu);
+    jkMain_aLevelJklFname[127] = 0;
+    jkSmack_gameMode = 0;
+    jkRes_LoadGob(pGobPath);
+    if ( jkEpisode_mLoad.paEntries )
+    {
+        pHS->free(jkEpisode_mLoad.paEntries);
+        jkEpisode_mLoad.paEntries = 0;
+
+        // Added: prevent UAF
+        jkMain_pEpisodeEnt = NULL;
+        jkMain_pEpisodeEnt2 = NULL;
+    }
+    v2 = jkEpisode_Load(&jkEpisode_mLoad);
+    jkEpisode_idk4(&jkEpisode_mLoad, pEpisodeName);
+    if ( v2 )
+    {
+        result = 1;
+        jkPlayer_dword_525470 = 1;
+        if ( jkGuiRend_thing_five )
+            jkGuiRend_thing_four = 1;
+        jkSmack_stopTick = 1;
+        jkSmack_nextGuiState = 5;
+    }
+    else
+    {
+        Windows_ErrorMsgboxWide("ERR_CANNOT_LOAD_FILE %s", pGobPath);
+        result = 0;
+    }
+    return result;
+}
+
 int jkMain_CdSwitch(int a1, int bIsAPath)
 {
     jkEpisodeEntry *v2; // eax

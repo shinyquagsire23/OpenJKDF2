@@ -228,13 +228,13 @@
 #define SITHCVAR_MAX_NAME_STRLEN (64)
 
 #ifdef ARCH_WASM
-#define SITHCVAR_FNAME ("openjkdf2_cvars.json")
-#define SITHBINDS_FNAME ("openjkdf2_binds.json")
-#define REGISTRY_FNAME ("registry.json")
-#else
 #define SITHCVAR_FNAME ("persist/openjkdf2_cvars.json")
 #define SITHBINDS_FNAME ("persist/openjkdf2_binds.json")
 #define REGISTRY_FNAME ("persist/registry.json")
+#else
+#define SITHCVAR_FNAME ("openjkdf2_cvars.json")
+#define SITHBINDS_FNAME ("openjkdf2_binds.json")
+#define REGISTRY_FNAME ("registry.json")
 #endif
 
 #define STDUPDATER_DEFAULT_URL ("https://api.github.com/repos/shinyquagsire23/OpenJKDF2/releases?per_page=1")
