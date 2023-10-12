@@ -14,6 +14,9 @@ mkdir -p wasm_out/mots
 rm -f wasm_out/openjkdf2.js
 rm -f wasm_out/openjkdf2.wasm
 rm -f wasm_out/openjkdf2.data
+rm -f wasm_out/openjkdf2_data.data
+rm -f wasm_out/openjkdf2_data.js
+rm -f wasm_out/index.html
 rm -rf wasm_out/jk1/resource/shaders
 #mkdir -p wasm_out/jk1/resource/shaders
 rm -rf wasm_out/mots/resource/shaders
@@ -28,6 +31,7 @@ cmake .. --toolchain $(pwd)/../cmake_modules/toolchain_wasm.cmake
 make -j1 VERBOSE=1
 popd
 
+cp packaging/wasm/index.html wasm_out/index.html
 cp build_emcc/openjkdf2.js wasm_out/openjkdf2.js
 cp build_emcc/openjkdf2.wasm wasm_out/openjkdf2.wasm
 cp build_emcc/openjkdf2_data.js wasm_out/openjkdf2_data.js
