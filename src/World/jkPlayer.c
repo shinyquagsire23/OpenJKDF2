@@ -1397,37 +1397,35 @@ void jkPlayer_InitForceBins()
 
 int jkPlayer_GetAlignment()
 {
-    int v0; // edi
-    int v1; // ebx
     float v4;
 
-    v0 = 0;
-    v1 = 0;
+    int bHasDarkPowers = 0;
     for (int i = SITHBIN_F_THROW; i <= SITHBIN_F_DESTRUCTION; ++i )
     {
         if ( sithPlayer_GetBinAmt(i) > 0.0 )
-            v0 = 1;
+            bHasDarkPowers = 1;
     }
 
+    int bHasLightPowers = 0;
     for (int j = SITHBIN_F_HEALING; j <= SITHBIN_F_ABSORB; ++j )
     {
         if ( sithPlayer_GetBinAmt(j) > 0.0 )
-            v1 = 1;
+            bHasLightPowers = 1;
     }
 
-    if (!v0 && !v1)
+    if (!bHasDarkPowers && !v1)
         return 0;
 
-    if ( !v1 )
+    if ( !bHasLightPowers )
     {
         v4 = jkPlayer_CalcAlignment(0); // not mp
         if ( v4 < 0.0 )
             return 2;
 
-        if ( !v1 )
+        if ( !bHasLightPowers )
             return 0;
     }
-    if ( !v0 )
+    if ( !bHasDarkPowers )
     {
         if ( (unsigned int)(__int64)sithPlayer_GetBinAmt(SITHBIN_CHOICE) == 1 )
         {
@@ -1829,41 +1827,44 @@ int jkPlayer_SetProtectionDeadlysight()
     // MOTS TODO
     if (Main_bMotsCompat) return 0;
 
-    int hasNoNeutral = 1;
     int rank = jkPlayer_GetJediRank();
 
     int hasNoDarkside = 1;
     for (int i = SITHBIN_F_THROW; i <= SITHBIN_F_DESTRUCTION; ++i )
     {
-        if ( sithPlayer_GetBinAmt(i) > 0.0 )
+        if (sithPlayer_GetBinAmt(i) > 0.0)
             hasNoDarkside = 0;
     }
 
     int hasFullDarkside = 1;
     for (int j = SITHBIN_F_THROW; j <= SITHBIN_F_DESTRUCTION; ++j )
     {
-        if ( sithPlayer_GetBinAmt(j) < 4.0 )
+        if (sithPlayer_GetBinAmt(j) < 4.0)
             hasFullDarkside = 0;
     }
 
     int hasNoLightside = 1;
     for (int k = SITHBIN_F_HEALING; k <= SITHBIN_F_ABSORB; ++k )
     {
-        if ( sithPlayer_GetBinAmt(k) > 0.0 )
+        if (sithPlayer_GetBinAmt(k) > 0.0)
             hasNoLightside = 0;
     }
 
     int hasFullLightside = 1;
     for (int l = SITHBIN_F_HEALING; l <= SITHBIN_F_ABSORB; ++l )
     {
-        if ( sithPlayer_GetBinAmt(l) < 4.0 )
+        if (sithPlayer_GetBinAmt(l) < 4.0)
             hasFullLightside = 0;
     }
+
+    int hasNoNeutral = 1;
     for (int m = SITHBIN_FP_START; m <= SITHBIN_F_PULL; ++m )
     {
-        if ( m != SITHBIN_JEDI_RANK && sithPlayer_GetBinAmt(m) > 0.0 )
+        if (m == SITHBIN_JEDI_RANK) continue;
+        if (sithPlayer_GetBinAmt(m) > 0.0)
             hasNoNeutral = 0;
     }
+
     if (rank == 8)
     {
         if ( hasFullLightside && hasNoDarkside && hasNoNeutral )
