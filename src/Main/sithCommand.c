@@ -613,6 +613,9 @@ int sithCommand_CmdActivate(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     sithThing *v2; // esi
     int tmp;
 
+    // Added: fixed a nullptr dereference
+    if (!pArgStr) return 0;
+
     if ( sithWorld_pCurrentWorld && (v2 = sithWorld_pCurrentWorld->playerThing) != 0 )
     {
         if ( _sscanf(pArgStr, "%d", &tmp) >= 1
@@ -641,6 +644,9 @@ int sithCommand_CmdActivate(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 int sithCommand_CmdJump(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     int result; // eax
+
+    // MOTS Added: fixed a nullptr dereference
+    if (!pArgStr) return 0;
 
     result = _sscanf(pArgStr, "%d", &pArgStr);
     if ( result )
@@ -734,6 +740,7 @@ int sithCommand_CmdKick(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return 1;
 }
 
+// Added: npc spawn
 int sithCommand_CmdThingNpc(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if (sithNet_isMulti) return 1;
@@ -768,6 +775,7 @@ int sithCommand_CmdThingNpc(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return 1;
 }
 
+// Added: binds
 int sithCommand_CmdBind(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     char tmp[512];
@@ -803,6 +811,7 @@ int sithCommand_CmdBind(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return 1;
 }
 
+// Added: unbinds
 int sithCommand_CmdUnbind(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     char tmp[512];
