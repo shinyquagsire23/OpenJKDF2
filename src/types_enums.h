@@ -1041,6 +1041,13 @@ enum SITHBIN
     SITHBIN_MAX      = 199
 };
 
+enum GOAL_FLAGS
+{
+    GOAL_EXISTS = 1,
+    GOAL_COMPLETE = 2,
+    GOAL_YELLOW = 4,
+};
+
 enum ITEMINFO_FLAGS
 {
     ITEMINFO_VALID   = 1,
