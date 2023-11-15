@@ -1045,7 +1045,7 @@ enum GOAL_FLAGS
 {
     GOAL_EXISTS = 1,
     GOAL_COMPLETE = 2,
-    GOAL_YELLOW = 4,
+    GOAL_SECRET = 4, // Unused, makes text show as yellow
 };
 
 enum ITEMINFO_FLAGS
