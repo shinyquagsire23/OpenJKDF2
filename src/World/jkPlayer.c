@@ -1413,7 +1413,7 @@ int jkPlayer_GetAlignment()
             bHasLightPowers = 1;
     }
 
-    if (!bHasDarkPowers && !v1)
+    if (!bHasDarkPowers && !bHasLightPowers)
         return 0;
 
     if ( !bHasLightPowers )
