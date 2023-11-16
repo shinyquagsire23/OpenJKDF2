@@ -10,6 +10,7 @@ finish-args:
   - --share=ipc  # needed for X11
   - --share=network # needed for networking (Multiplayer/Valve GameNetworkingSockets)
   - --socket=fallback-x11
+  - --socket=wayland
   - --socket=pulseaudio
 
 modules:
