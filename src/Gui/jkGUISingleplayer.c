@@ -107,6 +107,7 @@ int jkGuiSingleplayer_Show()
     char a1[128]; // [esp+58h] [ebp-180h]
     char v24[128]; // [esp+D8h] [ebp-100h]
     char v25[128]; // [esp+158h] [ebp-80h]
+    int debug_episode_idx = 0;
 
     jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiSingleplayer_menu1, &jkGuiSingleplayer_buttons1[2]);
     jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiSingleplayer_menu1, &jkGuiSingleplayer_buttons1[5]);
@@ -207,15 +208,18 @@ int jkGuiSingleplayer_Show()
                         {
                             jkGui_sub_412E20(&jkGuiSingleplayer_menu3, JKGUI_NEWGAME, JKGUI_DEBUGPLAY, JKGUI_DEBUGPLAY);
                             jkGuiRend_DarrayNewStr(&array2, 10, 1);
-                            jkGuiSingleplayer_sub_41AA30(&array2, &jkGuiSingleplayer_buttons3[6], 0, jkRes_episodeGobName, jkGui_episodeLoad.type, jkGui_episodeLoad.numSeq, jkGui_episodeLoad.field_8, jkGui_episodeLoad.paEntries);
+                            jkGuiSingleplayer_sub_41AA30(&array2, &jkGuiSingleplayer_buttons3[6], 0, jkRes_episodeGobName, jkGui_episodeLoad.type, jkGui_episodeLoad.numSeq, jkGui_episodeLoad.currentEpisodeEntryIdx, jkGui_episodeLoad.paEntries);
                             jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiSingleplayer_menu3, &jkGuiSingleplayer_buttons3[7]);
                             jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiSingleplayer_menu3, &jkGuiSingleplayer_buttons3[8]);
                             clicked = jkGuiRend_DisplayAndReturnClicked(&jkGuiSingleplayer_menu3);
+
+                            debug_episode_idx = 0;
                             if ( clicked == 1 )
                             {
                                 v9 = (const char *)jkGuiRend_GetId(&array2, jkGuiSingleplayer_buttons3[6].selectedTextEntry);
-                                _strncpy(v25, v9, 0x7Fu);
+                                _strncpy(v25, v9+sizeof(int), 0x7Fu);
                                 v25[127] = 0;
+                                debug_episode_idx = *(int*)v9; // Added
                             }
                             for ( i = 0; i < (signed int)array2.total; ++i )
                             {
@@ -242,18 +246,33 @@ int jkGuiSingleplayer_Show()
                                 jkEpisode_mLoad.paEntries = (jkEpisodeEntry *)pHS->alloc(aEnts_size);
                                 memcpy(jkEpisode_mLoad.paEntries, jkGui_episodeLoad.paEntries, aEnts_size);
                                 
+                                jkEpisode_mLoad.currentEpisodeEntryIdx = 0;
                                 for (int j = 0; j < jkEpisode_mLoad.numSeq; j++)
                                 {
                                     //printf("%s %s\n", jkEpisode_mLoad.paEntries[j].fileName, v25);
-                                    if (!__strcmpi(jkEpisode_mLoad.paEntries[j].fileName, v25)) {
-                                        jkEpisode_mLoad.field_8 = j;
+                                    if (jkEpisode_mLoad.paEntries[j].lineNum == debug_episode_idx) {
+                                        jkEpisode_mLoad.currentEpisodeEntryIdx = j;
                                         jkMain_pEpisodeEnt = &jkEpisode_mLoad.paEntries[j];
                                         jkMain_pEpisodeEnt2 = &jkEpisode_mLoad.paEntries[j];
                                         break;
                                     }
                                 }
+
+                                if (!jkEpisode_mLoad.currentEpisodeEntryIdx)
+                                {
+                                    for (int j = 0; j < jkEpisode_mLoad.numSeq; j++)
+                                    {
+                                        //printf("%s %s\n", jkEpisode_mLoad.paEntries[j].fileName, v25);
+                                        if (!__strcmpi(jkEpisode_mLoad.paEntries[j].fileName, v25)) {
+                                            jkEpisode_mLoad.currentEpisodeEntryIdx = j;
+                                            jkMain_pEpisodeEnt = &jkEpisode_mLoad.paEntries[j];
+                                            jkMain_pEpisodeEnt2 = &jkEpisode_mLoad.paEntries[j];
+                                            break;
+                                        }
+                                    }
+                                }
 #endif
-                                //printf("pre %x %x %x\n", jkEpisode_mLoad.numSeq, jkEpisode_mLoad.type, jkEpisode_mLoad.field_8);
+                                //printf("pre %x %x %x\n", jkEpisode_mLoad.numSeq, jkEpisode_mLoad.type, jkEpisode_mLoad.currentEpisodeEntryIdx);
                             }
                         }
                     }
@@ -358,10 +377,15 @@ void jkGuiSingleplayer_sub_41AA30(Darray *array, jkGuiElement *element, int a3, 
     {
         while ( stdFileUtil_FindNext(search, &a2) )
         {
-            v14 = (char *)pHS->alloc(_strlen(a2.fpath) + 1);
-            v15 = _strcpy(v14, a2.fpath);
-            v16 = jkGuiTitle_quicksave_related_func1(&strtable, v14);
-            jkGuiRend_DarrayReallocStr(array, v16, (intptr_t)v15);
+            // Added: extended the path alloc to include the real index
+            v14 = (char *)pHS->alloc(_strlen(a2.fpath) + 1 + sizeof(int));
+            v15 = _strcpy(v14+sizeof(int), a2.fpath);
+            v16 = jkGuiTitle_quicksave_related_func1(&strtable, v14+sizeof(int));
+            jkGuiRend_DarrayReallocStr(array, v16, (intptr_t)v14);
+
+            // Added
+            int* stash_idx = (int*)v14;
+            *stash_idx = 0;
             ++v22;
         }
         stdFileUtil_DisposeFind(search);
@@ -375,12 +399,16 @@ void jkGuiSingleplayer_sub_41AA30(Darray *array, jkGuiElement *element, int a3, 
         {
             if ( !v17->type )
             {
-                uint32_t alloc_sz = _strlen(v17->fileName) + 1;
+                // Added: extended the path alloc to include the real index
+                uint32_t alloc_sz = _strlen(v17->fileName) + 1 + sizeof(int);
                 v18 = (char *)pHS->alloc(alloc_sz);
-                v19 = _strncpy(v18, v17->fileName, alloc_sz); // Added: strcpy -> strncpy
-                v20 = jkGuiTitle_quicksave_related_func1(&strtable, v18);
-                jkGuiRend_DarrayReallocStr(array, v20, (intptr_t)v19);
-                
+                v19 = _strncpy(v18+sizeof(int), v17->fileName, alloc_sz); // Added: strcpy -> strncpy, +sizeof(int)
+                v20 = jkGuiTitle_quicksave_related_func1(&strtable, v18+sizeof(int)); // Added: +sizeof(int)
+                jkGuiRend_DarrayReallocStr(array, v20, (intptr_t)v18);
+
+                // Added
+                int* stash_idx = (int*)v18;
+                *stash_idx = v17->lineNum;
             }
             v17++;
 

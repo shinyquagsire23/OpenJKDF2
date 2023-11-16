@@ -284,7 +284,7 @@ int jkEpisode_Load(jkEpisodeLoad *a1)
 
     numSeq = 0;
     a1->numSeq = 0;
-    a1->field_8 = 0;
+    a1->currentEpisodeEntryIdx = 0;
 
     // Added: memleak
     if (a1->paEntries) {
@@ -498,12 +498,12 @@ LABEL_67:
     return a1->paEntries != 0;
 }
 
-jkEpisodeEntry* jkEpisode_idk1(jkEpisodeLoad *a1)
+jkEpisodeEntry* jkEpisode_GetCurrentEpisodeEntry(jkEpisodeLoad *pLoad)
 {
-    return &a1->paEntries[a1->field_8];
+    return &pLoad->paEntries[pLoad->currentEpisodeEntryIdx];
 }
 
-jkEpisodeEntry* jkEpisode_idk2(jkEpisodeLoad *pLoad, int bIsAPath)
+jkEpisodeEntry* jkEpisode_GetNextEntryInDecisionPath(jkEpisodeLoad *pLoad, int bIsAPath)
 {
     int v4; // edi
     int v5; // edx
@@ -511,16 +511,16 @@ jkEpisodeEntry* jkEpisode_idk2(jkEpisodeLoad *pLoad, int bIsAPath)
     jkEpisodeEntry *v7; // ecx
 
     if ( bIsAPath )
-        v4 = pLoad->paEntries[pLoad->field_8].gotoA;
+        v4 = pLoad->paEntries[pLoad->currentEpisodeEntryIdx].gotoA;
     else
-        v4 = pLoad->paEntries[pLoad->field_8].gotoB;
+        v4 = pLoad->paEntries[pLoad->currentEpisodeEntryIdx].gotoB;
     if ( v4 == -1 )
         return 0;
     v5 = pLoad->numSeq;
     v6 = 0;
     if ( v5 <= 0 )
 LABEL_9:
-        Windows_GameErrorMsgbox("ERR_BAD_EPISODE_FILE %d %d", pLoad->field_8, v4);
+        Windows_GameErrorMsgbox("ERR_BAD_EPISODE_FILE %d %d", pLoad->currentEpisodeEntryIdx, v4);
     v7 = pLoad->paEntries;
     while ( v7->lineNum != v4 )
     {
@@ -529,7 +529,7 @@ LABEL_9:
         if ( v6 >= v5 )
             goto LABEL_9;
     }
-    pLoad->field_8 = v6;
+    pLoad->currentEpisodeEntryIdx = v6;
     return &pLoad->paEntries[v6];
 }
 
@@ -548,7 +548,7 @@ int jkEpisode_EndLevel(jkEpisodeLoad *pEpisode, int levelNum)
         if ( ++v2 >= v3 )
             return 0;
     }
-    pEpisode->field_8 = v2;
+    pEpisode->currentEpisodeEntryIdx = v2;
     return 1;
 }
 
@@ -664,7 +664,7 @@ int jkEpisode_idk4(jkEpisodeLoad *pEpisodeLoad, char *pEpisodeName)
         if ( ++v2 >= pEpisodeLoad->numSeq )
             return 0;
     }
-    pEpisodeLoad->field_8 = v2;
+    pEpisodeLoad->currentEpisodeEntryIdx = v2;
     return 1;
 }
 

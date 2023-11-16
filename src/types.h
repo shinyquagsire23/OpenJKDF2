@@ -1783,7 +1783,7 @@ typedef struct jkEpisodeLoad
 {
     jkEpisodeTypeFlags_t type;
     int numSeq;
-    int field_8;
+    int currentEpisodeEntryIdx;
     jkEpisodeEntry* paEntries;
 } jkEpisodeLoad;
 //end jkEpisode

@@ -35,7 +35,7 @@ jkMain_SetVideoModeGdi	.text	00402E40	00000023	00000000	00000000	R	.	.	.	.	.	.	.
 jkMain_InitPlayerThings	.text	00402E70	00000005	00000000	00000000	R	.	.	.	.	.	.	.
 jkMain_do_guistate6	.text	00402E80	0000002D			R	.	.	.	.	.	T	.
 jkMain_EndLevel	.text	00402EB0	000000DE	00000004	00000004	R	.	.	.	.	.	.	.
-jkMain_CdSwitch	.text	00402F90	00000190	00000004	00000008	R	.	.	.	.	.	T	.
+jkMain_StartNextLevelInEpisode	.text	00402F90	00000190	00000004	00000008	R	.	.	.	.	.	T	.
 jkMain_cd_swap_reverify	.text	00403120	00000296	00000090	00000004	R	.	.	.	.	.	T	.
 jkMain_SetMap	.text	004033E0	00000029	00000000	00000004	R	.	.	.	.	.	T	.
 jkMain_MenuReturn	.text	00403410	00000024			R	.	.	.	.	.	.	.
@@ -243,8 +243,8 @@ jkEpisode_Startup	.text	0040D510	00000013			R	.	.	.	.	.	.	.
 jkEpisode_Shutdown	.text	0040D530	00000001	00000000	00000000	R	.	.	.	.	.	.	.
 jkEpisode_UpdateExtra	.text	0040D540	00000017	00000000	00000004	R	.	.	.	.	.	T	.
 jkEpisode_Load	.text	0040D560	000006ED	00000158	00000004	R	.	.	.	.	.	T	.
-jkEpisode_idk1	.text	0040DC50	00000010	00000000	00000004	R	.	.	.	.	.	T	.
-jkEpisode_idk2	.text	0040DC60	00000069	00000010	00000008	R	.	.	.	.	.	T	.
+jkEpisode_GetCurrentEpisodeEntry	.text	0040DC50	00000010	00000000	00000004	R	.	.	.	.	.	T	.
+jkEpisode_GetNextEntryInDecisionPath	.text	0040DC60	00000069	00000010	00000008	R	.	.	.	.	.	T	.
 jkEpisode_EndLevel	.text	0040DCD0	0000003A	00000008	00000008	R	.	.	.	.	.	T	.
 jkEpisode_idk4	.text	0040DD10	00000052	00000010	00000008	R	.	.	.	.	.	T	.
 jkEpisode_LoadVerify	.text	0040DD70	0000053E	000001E0	00000000	R	.	.	.	.	.	.	.

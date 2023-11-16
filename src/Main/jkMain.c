@@ -453,7 +453,7 @@ void jkMain_EndLevelScreenShow(int a1, int a2)
           && (sithPlayer_GetBinAmt(SITHBIN_NEW_STARS) <= 0.0 && sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS) <= 0.0
            || jkGuiForce_Show(1, 0.0, jkMain_dword_552B98, 0, 0, 1) != -1) )
         {
-            jkMain_CdSwitch(0, 1);
+            jkMain_StartNextLevelInEpisode(0, 1);
             return;
         }
     }
@@ -462,13 +462,13 @@ void jkMain_EndLevelScreenShow(int a1, int a2)
         // MOTS added
         if (jkGuiSingleTally_Show() != -1) {
             if (sithPlayer_GetBinAmt(SITHBIN_NEW_STARS) <= 0.0 && sithPlayer_GetBinAmt(SITHBIN_SPEND_STARS) <= 0.0) {
-                jkMain_CdSwitch(0, 1);
+                jkMain_StartNextLevelInEpisode(0, 1);
                 return;
             }
 
             jkPlayer_idkEndLevel();
             if (jkGuiForce_Show(1, 0.0, jkMain_dword_552B98, 0, 0, 1) != -1) {
-                jkMain_CdSwitch(0, 1);
+                jkMain_StartNextLevelInEpisode(0, 1);
                 return;
             }
         }
@@ -840,7 +840,7 @@ void jkMain_ChoiceShow(int a1, int a2)
     }
     else
     {
-        jkMain_CdSwitch(0, v1);
+        jkMain_StartNextLevelInEpisode(0, v1);
     }
 }
 
@@ -918,7 +918,7 @@ int jkMain_LoadFile(char *a1)
         }
         if ( jkEpisode_Load(&jkEpisode_mLoad) )
         {
-            return jkMain_CdSwitch(1, 1);
+            return jkMain_StartNextLevelInEpisode(1, 1);
         }
         else
         {
@@ -1004,7 +1004,7 @@ int jkMain_LoadLevelSingleplayer(char *pGobPath, char *pEpisodeName)
     return result;
 }
 
-int jkMain_CdSwitch(int a1, int bIsAPath)
+int jkMain_StartNextLevelInEpisode(int a1, int bIsAPath)
 {
     jkEpisodeEntry *v2; // eax
     jkEpisodeEntry *v3; // ecx
@@ -1023,7 +1023,7 @@ int jkMain_CdSwitch(int a1, int bIsAPath)
     }
     if ( a1 )
     {
-        v2 = jkEpisode_idk1(&jkEpisode_mLoad);
+        v2 = jkEpisode_GetCurrentEpisodeEntry(&jkEpisode_mLoad);
         v3 = v2;
         jkMain_pEpisodeEnt = v2;
         jkMain_pEpisodeEnt2 = v2;
@@ -1036,8 +1036,8 @@ int jkMain_CdSwitch(int a1, int bIsAPath)
     }
     if ( jkPlayer_dword_525470 )
     {
-        jkMain_pEpisodeEnt = jkEpisode_idk1(&jkEpisode_mLoad);
-        v2 = jkEpisode_idk2(&jkEpisode_mLoad, bIsAPath);
+        jkMain_pEpisodeEnt = jkEpisode_GetCurrentEpisodeEntry(&jkEpisode_mLoad);
+        v2 = jkEpisode_GetNextEntryInDecisionPath(&jkEpisode_mLoad, bIsAPath);
         v3 = jkMain_pEpisodeEnt;
         jkMain_pEpisodeEnt2 = v2;
         jkPlayer_dword_525470 = 0;
@@ -1173,11 +1173,11 @@ int jkMain_cd_swap_reverify(jkEpisodeEntry *ent)
     jkPlayer_WriteConfSwap(&playerThings[playerThingIdx], ent->cdNum, ent->fileName);
     // Added: Move down
     //if ( !v4 )
-    //    return jkMain_CdSwitch(0, 1);
+    //    return jkMain_StartNextLevelInEpisode(0, 1);
 
     // Added: Cutscenes disabled
     if ( jkPlayer_setDisableCutscenes )
-        return jkMain_CdSwitch(0, 1);
+        return jkMain_StartNextLevelInEpisode(0, 1);
 
     _sprintf(v9, "video%c%s", 92, ent->fileName);
     if ( !util_FileExists(v9) ) {
@@ -1185,11 +1185,11 @@ int jkMain_cd_swap_reverify(jkEpisodeEntry *ent)
         v4 = jkRes_LoadCD(ent->cdNum);
 
         if ( !v4 ) {
-            return jkMain_CdSwitch(0, 1);
+            return jkMain_StartNextLevelInEpisode(0, 1);
         }
 
         if ( !util_FileExists(v9) ) {
-            return jkMain_CdSwitch(0, 1);
+            return jkMain_StartNextLevelInEpisode(0, 1);
         }
     }
     jkRes_FileExists(v9, jkMain_aLevelJklFname, 128);
@@ -1221,7 +1221,7 @@ int jkMain_cd_swap_reverify(jkEpisodeEntry *ent)
 int jkMain_SetMap(int levelNum)
 {
     jkEpisode_EndLevel(&jkEpisode_mLoad, levelNum);
-    return jkMain_cd_swap_reverify(jkEpisode_idk1(&jkEpisode_mLoad));
+    return jkMain_cd_swap_reverify(jkEpisode_GetCurrentEpisodeEntry(&jkEpisode_mLoad));
 }
 
 void jkMain_do_guistate6()
@@ -1279,28 +1279,22 @@ int jkMain_MenuReturn()
     return result;
 }
 
-int jkMain_EndLevel(int a1)
+int jkMain_EndLevel(int bIsAPath)
 {
-    jkEpisodeEntry *v1; // esi
-    int v2; // eax
-    int v4; // eax
-
     if (!Main_bMotsCompat && jkEpisode_mLoad.numSeq )
     {
-        v1 = jkEpisode_idk1(&jkEpisode_mLoad);
-        if ( v1->darkpow || v1->lightpow )
+        jkEpisodeEntry* pEpisodeEnt = jkEpisode_GetCurrentEpisodeEntry(&jkEpisode_mLoad);
+        if ( pEpisodeEnt->darkpow || pEpisodeEnt->lightpow )
         {
-            v2 = v1->lightpow;
-            if ( v2 )
+            if ( pEpisodeEnt->lightpow )
             {
-                if ( v2 >= SITHBIN_FP_START && v2 <= SITHBIN_FP_END && jkPlayer_GetChoice() != 2 )
-                    sithInventory_SetCarries(playerThings[playerThingIdx].actorThing, v1->lightpow, 1);
+                if ( pEpisodeEnt->lightpow >= SITHBIN_FP_START && pEpisodeEnt->lightpow <= SITHBIN_FP_END && jkPlayer_GetChoice() != 2 )
+                    sithInventory_SetCarries(playerThings[playerThingIdx].actorThing, pEpisodeEnt->lightpow, 1);
             }
-            v4 = v1->darkpow;
-            if ( v4 )
+            if ( pEpisodeEnt->darkpow )
             {
-                if ( v4 >= SITHBIN_FP_START && v4 <= SITHBIN_FP_END && jkPlayer_GetChoice() != 1 )
-                    sithInventory_SetCarries(playerThings[playerThingIdx].actorThing, v1->darkpow, 1);
+                if ( pEpisodeEnt->darkpow >= SITHBIN_FP_START && pEpisodeEnt->darkpow <= SITHBIN_FP_END && jkPlayer_GetChoice() != 1 )
+                    sithInventory_SetCarries(playerThings[playerThingIdx].actorThing, pEpisodeEnt->darkpow, 1);
             }
         }
     }
@@ -1309,12 +1303,12 @@ int jkMain_EndLevel(int a1)
         jkPlayer_idkEndLevel();
     }
 
-    return jkMain_CdSwitch(0, a1);
+    return jkMain_StartNextLevelInEpisode(0, bIsAPath);
 }
 
 void jkMain_CdSwitchShow(int a1, int a2)
 {
-    jkMain_CdSwitch(0, 1);
+    jkMain_StartNextLevelInEpisode(0, 1);
 }
 
 // MOTS altered
@@ -1348,7 +1342,7 @@ void jkMain_VideoShow(int a1, int a2)
                 break;
             case JK_GAMEMODE_VIDEO3:
             case JK_GAMEMODE_VIDEO4:
-                result = jkMain_CdSwitch(0, 1);
+                result = jkMain_StartNextLevelInEpisode(0, 1);
                 break;
             case JK_GAMEMODE_MOTS_CUTSCENE: // MOTS added
                 if (jkGuiRend_thing_five != 0) {
@@ -1423,7 +1417,7 @@ void jkMain_VideoLeave(int a1, int a2)
 
     jkCutscene_sub_421410();
     if ( a1 == JK_GAMEMODE_VIDEO3 || a1 == JK_GAMEMODE_VIDEO4 )
-        jkMain_CdSwitch(0, 1);
+        jkMain_StartNextLevelInEpisode(0, 1);
 }
 
 void jkMain_CreditsShow(int a1, int a2)

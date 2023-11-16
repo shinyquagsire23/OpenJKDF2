@@ -533,7 +533,7 @@ int jkGuiNetHost_sub_4119D0(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX
             jkRes_episodeGobName,
             jkGui_episodeLoad.type,
             jkGui_episodeLoad.numSeq,
-            jkGui_episodeLoad.field_8,
+            jkGui_episodeLoad.currentEpisodeEntryIdx,
             jkGui_episodeLoad.paEntries);
     }
     else

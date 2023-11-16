@@ -11,7 +11,7 @@
 #define jkMain_InitPlayerThings_ADDR (0x00402E70)
 #define jkMain_do_guistate6_ADDR (0x00402E80)
 #define jkMain_EndLevel_ADDR (0x00402EB0)
-#define jkMain_CdSwitch_ADDR (0x00402F90)
+#define jkMain_StartNextLevelInEpisode_ADDR (0x00402F90)
 #define jkMain_cd_swap_reverify_ADDR (0x00403120)
 #define jkMain_SetMap_ADDR (0x004033E0)
 #define jkMain_MenuReturn_ADDR (0x00403410)
@@ -122,7 +122,7 @@ int jkMain_loadFile2(char *pGobPath, char *pEpisodeName);
 int jkMain_LoadLevelSingleplayer(char *pGobPath, char *pEpisodeName);
 
 int jkMain_sub_403470(char *a1);
-int jkMain_CdSwitch(int a1, int bIsAPath);
+int jkMain_StartNextLevelInEpisode(int a1, int bIsAPath);
 int jkMain_cd_swap_reverify(jkEpisodeEntry *ent);
 int jkMain_SetMap(int levelNum);
 void jkMain_do_guistate6();
@@ -130,7 +130,7 @@ int jkMain_sub_4034D0(char *a1, char *a2, char *a3, wchar_t *a4);
 int jkMain_MissionReload();
 int jkMain_MenuReturn();
 
-int jkMain_EndLevel(int a1);
+int jkMain_EndLevel(int bIsAPath);
 void jkMain_CdSwitchShow(int a1, int a2);
 void jkMain_VideoShow(int a1, int a2);
 void jkMain_VideoTick(int a2);

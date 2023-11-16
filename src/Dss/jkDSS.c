@@ -116,7 +116,7 @@ int jkDSS_idk4()
         {
             if ( sithMulti_leaveJoinType )
             {
-                sithComm_netMsgTmp.pktData[0] = jkEpisode_idk1(&jkEpisode_mLoad)->level;
+                sithComm_netMsgTmp.pktData[0] = jkEpisode_GetCurrentEpisodeEntry(&jkEpisode_mLoad)->level;
                 sithComm_netMsgTmp.netMsg.flag_maybe = 0;
                 sithComm_netMsgTmp.netMsg.cogMsgId = DSS_ENDLEVEL;
                 sithComm_netMsgTmp.netMsg.msg_size = 4;
@@ -212,7 +212,7 @@ void jkDSS_nullsub_2()
 void jkDSS_Write()
 {
     stdConffile_Write(jkRes_episodeGobName, 32);
-    stdConffile_Write((const char*)&jkEpisode_mLoad.field_8, 4);
+    stdConffile_Write((const char*)&jkEpisode_mLoad.currentEpisodeEntryIdx, 4);
 }
 
 void jkDSS_Load()
@@ -221,7 +221,7 @@ void jkDSS_Load()
 
     stdConffile_Read(a1, 32);
     jkRes_LoadGob(a1);
-    stdConffile_Read(&jkEpisode_mLoad.field_8, 4);
+    stdConffile_Read(&jkEpisode_mLoad.currentEpisodeEntryIdx, 4);
 }
 
 int jkDSS_wrap_SendSaberInfo_alt()
@@ -1063,7 +1063,7 @@ void jkDSS_SendEndLevel()
 {
     NETMSG_START;
 
-    NETMSG_PUSHS32(jkEpisode_idk1(&jkEpisode_mLoad)->level);
+    NETMSG_PUSHS32(jkEpisode_GetCurrentEpisodeEntry(&jkEpisode_mLoad)->level);
     NETMSG_END(DSS_ENDLEVEL);
 
     // lol
