@@ -667,7 +667,7 @@ float sithCollision_UpdateThingCollision(sithThing *pThing, rdVector3 *a2, float
     if ( a6 <= 0.0 )
         return 0.0;
     v5 = pThing;
-    if ( !pThing->collide )
+    if (pThing->collide == SITH_COLLIDE_NONE)
     {
         a8 |= 0x5;
     }

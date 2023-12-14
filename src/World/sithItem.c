@@ -54,8 +54,8 @@ void sithItem_Take(sithThing *item, sithThing *actor, int a3)
             // MOTS added
 #ifdef JKM_PARAMS
             if (Main_bMotsCompat) {
-                if (item->collide == 0) {
-                    item->collide = 1;
+                if (item->collide == SITH_COLLIDE_NONE) {
+                    item->collide = SITH_COLLIDE_SPHERE;
                     item->thingflags &= ~SITH_TF_10;
                     item->thingflags |= SITH_TF_DISABLED;
                 }
@@ -85,8 +85,8 @@ void sithItem_Take(sithThing *item, sithThing *actor, int a3)
     {
         sithDSSThing_SendTakeItem(item, actor, 255);
         if (Main_bMotsCompat) {
-            if (item->collide == 1) {
-                item->collide = 0;
+            if (item->collide == SITH_COLLIDE_SPHERE) {
+                item->collide = SITH_COLLIDE_NONE;
                 item->thingflags = item->thingflags | SITH_TF_10;
                 return;
             }
@@ -121,8 +121,8 @@ void sithItem_Remove(sithThing *item)
         item->lifeLeftMs = 0;
         item->thingflags = item->thingflags & ~SITH_TF_DISABLED;
         if (Main_bMotsCompat) {
-            if (item->collide == 0) {
-                item->collide = 1;
+            if (item->collide == SITH_COLLIDE_NONE) {
+                item->collide = SITH_COLLIDE_SPHERE;
                 item->thingflags &= ~SITH_TF_10;
                 return;
             }

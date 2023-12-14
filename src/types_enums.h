@@ -388,7 +388,7 @@ enum SithCollideType
 {
     SITH_COLLIDE_NONE = 0x0,
     SITH_COLLIDE_SPHERE = 0x1,
-    SITH_COLLIDE_2 = 0x2,
+    SITH_COLLIDE_SPHERE_TREE = 0x2,
     SITH_COLLIDE_FACE = 0x3,
 };
 
