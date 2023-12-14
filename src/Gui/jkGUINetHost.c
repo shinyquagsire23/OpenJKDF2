@@ -380,7 +380,7 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
                 *i = '-';
             
             stdString_SafeStrCopy(pMultiEntry->episodeGobName, jkGuiNetHost_aElements[NETHOST_EPISODE_LISTBOX].unistr[jkGuiNetHost_aElements[NETHOST_EPISODE_LISTBOX].selectedTextEntry].c_str, 0x20);
-            stdString_SafeStrCopy(pMultiEntry->mapJklFname, jkGuiNetHost_aElements[NETHOST_LEVEL_LISTBOX].unistr[jkGuiNetHost_aElements[NETHOST_LEVEL_LISTBOX].selectedTextEntry].c_str, 0x80);
+            stdString_SafeStrCopy(pMultiEntry->mapJklFname, jkGuiNetHost_aElements[NETHOST_LEVEL_LISTBOX].unistr[jkGuiNetHost_aElements[NETHOST_LEVEL_LISTBOX].selectedTextEntry].c_str + sizeof(int), 0x80); // Added: +sizeof(int)
             
             v10 = wstr_to_int_clamped(v25, 1, 32);
 
