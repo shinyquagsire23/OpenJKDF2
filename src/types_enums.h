@@ -172,6 +172,8 @@ enum SITH_ITEMFLAG_E // could be jones specific
     SITH_ITEM_RESPAWN_MP = 0x1,
     SITH_ITEM_RESPAWN_SP = 0x2,
     SITH_ITEM_BACKPACK = 0x4,
+    SITH_ITEM_8 = 0x8,
+    SITH_ITEM_10 = 0x10
 };
 
 enum jkEpisodeLoadType
@@ -1432,6 +1434,14 @@ enum SITH_MAPMODE
     MAPMODE_20 = 0x20,
     MAPMODE_40 = 0x40,
     MAPMODE_80 = 0x80,
+};
+
+enum AUTOPICKUP
+{
+    AUTOPICKUP_1 = 1,
+    AUTOPICKUP_DANGEROUS = 2,
+    AUTOPICKUP_4 = 4,
+    AUTOPICKUP_8 = 8,
 };
 
 #endif // _OPENJKDF2_TYPES_ENUMS_H

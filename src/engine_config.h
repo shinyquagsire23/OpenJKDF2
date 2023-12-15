@@ -92,6 +92,9 @@
 #define SITHCOG_NODE_STACKDEPTH (0x200) // JK was 0x200, MoTS is 0x400
 #endif // QOL_IMPROVEMENTS
 
+// Weapon-related limits
+#define MAX_DEFLECTION_BOUNCES (6)
+
 #if defined(TARGET_TWL)
 #define RDCACHE_MAX_TRIS (0x200) // theoretical max 0x800?
 #define RDCACHE_MAX_VERTICES (0x600)

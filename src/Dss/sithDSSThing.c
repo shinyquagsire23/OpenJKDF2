@@ -588,6 +588,8 @@ void sithDSSThing_SendFireProjectile(sithThing *pWeapon, sithThing *pProjectile,
 {
     NETMSG_START;
 
+    //printf("sithDSSThing_SendFireProjectile %x %x (%f %f %f) (%f %f %f) %x %f %x %f\n", pWeapon ? pWeapon->thing_id : -1, pProjectile->thingIdx, pAimError->x, pAimError->y, pAimError->z, pFireOffset->x, pFireOffset->y, pFireOffset->z, anim, scale, scaleFlags, a9);
+
     NETMSG_PUSHS32(pWeapon->thing_id);
     NETMSG_PUSHS16(scaleFlags);
     
@@ -610,7 +612,7 @@ void sithDSSThing_SendFireProjectile(sithThing *pWeapon, sithThing *pProjectile,
     NETMSG_PUSHF32(a9);
     NETMSG_PUSHS32(thingId);
 
-    if (idk == 0) {
+    if (idk == 0 || !Main_bMotsCompat) {
         NETMSG_END(DSS_FIREPROJECTILE);
     }
     else if (Main_bMotsCompat) {
@@ -626,11 +628,16 @@ int sithDSSThing_ProcessFireProjectile(sithCogMsg *msg)
 {
     NETMSG_IN_START(msg);
 
-    sithThing* pThing = sithThing_GetById(NETMSG_POPS32());
+    int idx = NETMSG_POPS32();
+
+    // TODO: bug? if this fails, it might completely screw over save files?
+
+    sithThing* pThing = sithThing_GetById(idx);
     if ( pThing )
     {
         int16_t scaleFlags = NETMSG_POPS16();
-        sithThing* pTemplate = sithTemplate_GetEntryByIdx(NETMSG_POPS16());
+        int16_t templateIdx = NETMSG_POPS16();
+        sithThing* pTemplate = sithTemplate_GetEntryByIdx(templateIdx);
         sithSound* pSound = sithSound_GetFromIdx(NETMSG_POPS16());
         int anim = NETMSG_POPS16();
         rdVector3 aimError = NETMSG_POPVEC3();
@@ -638,6 +645,7 @@ int sithDSSThing_ProcessFireProjectile(sithCogMsg *msg)
         float scale = NETMSG_POPF32();
         float a9 = NETMSG_POPF32();
         int thingId = NETMSG_POPS32();
+        //printf("sithDSSThing_ProcessFireProjectile %x %x (%f %f %f) (%f %f %f) %x %f %x %f\n", idx, templateIdx, aimError.x, aimError.y, aimError.z, fireOffset.x, fireOffset.y, fireOffset.z, anim, scale, scaleFlags, a9);
         sithThing* pThing2 = sithWeapon_FireProjectile_0(
                       pThing,
                       pTemplate,
