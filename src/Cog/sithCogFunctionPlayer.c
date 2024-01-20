@@ -323,17 +323,17 @@ void sithCogFunctionPlayer_SetPlayerSuicides(sithCog *ctx)
 
 void sithCogFunctionPlayer_PickupBackpack(sithCog *ctx)
 {
-    sithThing* backpack = sithCogExec_PopThing(ctx);
-    sithThing* player = sithCogExec_PopThing(ctx);
+    sithThing* pBackpack = sithCogExec_PopThing(ctx);
+    sithThing* pPlayer = sithCogExec_PopThing(ctx);
 
-    if ( player
-      && player->type == SITH_THING_PLAYER
-      && player->actorParams.playerinfo
-      && backpack
-      && backpack->type == SITH_THING_ITEM
-      && (backpack->actorParams.typeflags & 4) != 0 )
+    if ( pPlayer
+      && pPlayer->type == SITH_THING_PLAYER
+      && pPlayer->actorParams.playerinfo
+      && pBackpack
+      && pBackpack->type == SITH_THING_ITEM
+      && pBackpack->itemParams.typeflags & SITH_ITEM_BACKPACK)
     {
-        sithInventory_PickupBackpack(player, backpack);
+        sithInventory_PickupBackpack(pPlayer, pBackpack);
     }
 }
 
@@ -345,7 +345,7 @@ void sithCogFunctionPlayer_NthBackpackBin(sithCog *ctx)
     sithThing* thing = sithCogExec_PopThing(ctx);
     if (thing
         && thing->type == SITH_THING_ITEM
-        && (thing->actorParams.typeflags & SITH_TF_4))
+        && (thing->itemParams.typeflags & SITH_ITEM_BACKPACK))
     {
         ret = sithInventory_NthBackpackBin(thing, n);
         sithCogExec_PushInt(ctx, ret);
@@ -360,7 +360,7 @@ void sithCogFunctionPlayer_NthBackpackValue(sithCog *ctx)
     sithThing* thing = sithCogExec_PopThing(ctx);
     if (thing
         && thing->type == SITH_THING_ITEM
-        && (thing->actorParams.typeflags & SITH_TF_4))
+        && (thing->itemParams.typeflags & SITH_ITEM_BACKPACK))
     {
         ret = sithInventory_NthBackpackValue(thing, n);
         sithCogExec_PushInt(ctx, ret);
@@ -374,7 +374,7 @@ void sithCogFunctionPlayer_NumBackpackItems(sithCog *ctx)
     sithThing* thing = sithCogExec_PopThing(ctx);
     if (thing
         && thing->type == SITH_THING_ITEM
-        && (thing->actorParams.typeflags & SITH_TF_4))
+        && (thing->itemParams.typeflags & SITH_ITEM_BACKPACK))
     {
         ret = sithInventory_NumBackpackItems(thing);
         sithCogExec_PushInt(ctx, ret);
