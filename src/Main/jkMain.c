@@ -182,7 +182,7 @@ int jkMain_SwitchTo5_2()
 
     result = 1;
     jkSmack_gameMode = 4;
-    jkPlayer_dword_525470 = 1;
+    jkPlayer_bLoadingSomething = 1;
     if ( jkGuiRend_thing_five )
         jkGuiRend_thing_four = 1;
     jkSmack_stopTick = 1;
@@ -953,7 +953,7 @@ int jkMain_loadFile2(char *pGobPath, char *pEpisodeName)
     if ( v2 )
     {
         result = 1;
-        jkPlayer_dword_525470 = 1;
+        jkPlayer_bLoadingSomething = 1;
         if ( jkGuiRend_thing_five )
             jkGuiRend_thing_four = 1;
         jkSmack_stopTick = 1;
@@ -990,20 +990,20 @@ int jkMain_CdSwitch(int a1, int bIsAPath)
         v3 = v2;
         jkMain_pEpisodeEnt = v2;
         jkMain_pEpisodeEnt2 = v2;
-        jkPlayer_dword_525470 = 0;
+        jkPlayer_bLoadingSomething = 0;
     }
     else
     {
         v3 = jkMain_pEpisodeEnt;
         v2 = jkMain_pEpisodeEnt2;
     }
-    if ( jkPlayer_dword_525470 )
+    if ( jkPlayer_bLoadingSomething )
     {
         jkMain_pEpisodeEnt = jkEpisode_idk1(&jkEpisode_mLoad);
         v2 = jkEpisode_idk2(&jkEpisode_mLoad, bIsAPath);
         v3 = jkMain_pEpisodeEnt;
         jkMain_pEpisodeEnt2 = v2;
-        jkPlayer_dword_525470 = 0;
+        jkPlayer_bLoadingSomething = 0;
     }
     if ( !v2 )
     {
@@ -1045,7 +1045,7 @@ int jkMain_CdSwitch(int a1, int bIsAPath)
         }
         else
         {
-            jkPlayer_dword_525470 = 1;
+            jkPlayer_bLoadingSomething = 1;
             jkMain_cd_swap_reverify(v2);
             result = 1;
         }
@@ -1210,7 +1210,7 @@ int jkMain_sub_4034D0(char *a1, char *a2, char *a3, wchar_t *a4)
     _wcsncpy(jkMain_wstrIdk, a4, 0x7Fu);
 
     jkMain_wstrIdk[127] = 0;
-    jkPlayer_dword_525470 = 1;
+    jkPlayer_bLoadingSomething = 1;
     if ( jkGuiRend_thing_five )
         jkGuiRend_thing_four = 1;
     jkSmack_stopTick = 1;

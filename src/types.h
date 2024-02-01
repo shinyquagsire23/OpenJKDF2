@@ -2424,8 +2424,8 @@ typedef struct sithActor
 #endif
     rdVector3 lookVector;
     rdVector3 movePos;
-    rdVector3 field_1AC;
-    float field_1B8;
+    rdVector3 toMovePos;
+    float distToMovePos;
     float moveSpeed;
     sithThing* fleeThing;
     rdVector3 field_1C4;

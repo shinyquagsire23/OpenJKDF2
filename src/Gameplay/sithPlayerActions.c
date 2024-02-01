@@ -97,10 +97,10 @@ void sithPlayerActions_JumpWithVel(sithThing *thing, float vel)
         final_vel = thing->actorParams.jumpSpeed * vel;
         if ( (thing->physicsParams.physflags & SITH_PF_CROUCHING) != 0 )
             final_vel = final_vel * 0.7;
-        if ( (thing->physicsParams.physflags & SITH_PF_MIDAIR) != 0 )
+        if ( (thing->physicsParams.physflags & SITH_PF_WATERSURFACE) != 0 )
         {
             rdVector_MultAcc3(&thing->physicsParams.vel, &rdroid_zVector3, final_vel);
-            thing->physicsParams.physflags &= ~SITH_PF_MIDAIR;
+            thing->physicsParams.physflags &= ~SITH_PF_WATERSURFACE;
         }
         else
         {

@@ -32,8 +32,8 @@
 #define sithAI_sub_4EAF40_ADDR (0x004EAF40)
 #define sithAI_CheckSightThing_ADDR (0x004EB090)
 #define sithAI_sub_4EB300_ADDR (0x004EB300)
-#define sithAI_physidk_ADDR (0x004EB4B0)
-#define sithAI_sub_4EB640_ADDR (0x004EB640)
+#define sithAI_CanWalk_ADDR (0x004EB4B0)
+#define sithAI_CanWalk_ExplicitSector_ADDR (0x004EB640)
 #define sithAI_FirstThingInView_ADDR (0x004EB790)
 #define sithAI_sub_4EB860_ADDR (0x004EB860)
 #define sithAI_SetRandomThingLook_ADDR (0x004EB880)
@@ -75,8 +75,8 @@ void sithAI_sub_4EAD60(sithActor *actor);
 void sithAI_sub_4EAF40(sithActor *actor);
 int sithAI_CheckSightThing(sithThing* thing, rdVector3* targetPosition, sithThing* targetThing, float fov, float maxDistance, float unused, rdVector3* targetErrorDir, float* targetDistance);
 int sithAI_sub_4EB300(sithThing *a3, rdVector3 *a4, rdVector3 *arg8, float argC, float arg10, float a7, rdVector3 *a5, float *a8);
-int sithAI_physidk(sithActor *a7, rdVector3 *a4, int *arg8);
-int sithAI_sub_4EB640(sithActor *actor, rdVector3 *a4, sithSector *a2, int *out);
+int sithAI_CanWalk(sithActor *a7, rdVector3 *a4, int *arg8);
+int sithAI_CanWalk_ExplicitSector(sithActor *actor, rdVector3 *a4, sithSector *a2, int *out);
 int sithAI_FirstThingInView(sithSector *sector, rdMatrix34 *out, float autoaimFov, float autoaimMaxDist, int a5, sithThing **thingList, int a7, float a8);
 int sithAI_sub_4EB860(int a1, float a2);
 void sithAI_SetRandomThingLook(rdMatrix34 *a1, sithThing *a2, rdVector3 *a3, float a4);
@@ -114,8 +114,8 @@ sithThing* sithAI_FUN_00539a60(sithActor *pThing);
 //static int (*sithAI_sub_4EB300)(sithThing *a3, rdVector3 *a4, rdVector3 *arg8, float argC, float arg10, float a7, rdVector3 *a5, float *a8) = (void*)sithAI_sub_4EB300_ADDR;
 //static void (*sithAI_idk_msgarrived_target)(sithActor *actor, float deltaSeconds) = (void*)sithAI_idk_msgarrived_target_ADDR;
 //static void (*sithAI_sub_4EAD60)(sithActor *actor) = (void*)sithAI_sub_4EAD60_ADDR;
-//static int (*sithAI_physidk)(sithActor *a7, rdVector3 *a4, int *arg8) = (void*)sithAI_physidk_ADDR;
-//static int (*sithAI_sub_4EB640)(sithActor *arg0, rdVector3 *a4, sithSector *a2, int *argC) = (void*)sithAI_sub_4EB640_ADDR;
+//static int (*sithAI_CanWalk)(sithActor *a7, rdVector3 *a4, int *arg8) = (void*)sithAI_CanWalk_ADDR;
+//static int (*sithAI_CanWalk_ExplicitSector)(sithActor *arg0, rdVector3 *a4, sithSector *a2, int *argC) = (void*)sithAI_CanWalk_ExplicitSector_ADDR;
 //static int (*sithAI_CheckSightThing)(sithThing* thing, rdVector3* targetPosition, sithThing* targetThing, float fov, float maxDistance, float unused, rdVector3* targetErrorDir, float* targetDistance) = (void*)sithAI_CheckSightThing_ADDR;
 
 #endif // _SITHAI_H

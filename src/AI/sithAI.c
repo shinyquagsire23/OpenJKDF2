@@ -767,10 +767,10 @@ void sithAI_idk_msgarrived_target(sithActor *actor, float deltaSeconds)
     {
         rdVector3 tmp;
         actorb = v3->actorParams.maxThrust * deltaSeconds * actor->moveSpeed;
-        rdVector_Sub3(&actor->field_1AC, &actor->movePos, &v3->position);
-        v9 = rdVector_Normalize3Acc(&actor->field_1AC);
-        rdVector_Scale3(&tmp, &actor->field_1AC, actorb);
-        actor->field_1B8 = v9;
+        rdVector_Sub3(&actor->toMovePos, &actor->movePos, &v3->position);
+        v9 = rdVector_Normalize3Acc(&actor->toMovePos);
+        rdVector_Scale3(&tmp, &actor->toMovePos, actorb);
+        actor->distToMovePos = v9;
         if ( (v3->sector->flags & SITHAI_MODE_ATTACKING) == 0 && (v3->physicsParams.physflags & SITH_PF_FLY) == 0 )
             tmp.z = 0.0;
         rdVector_Add3Acc(&tmp, &v3->physicsParams.vel);
@@ -798,7 +798,7 @@ LABEL_15:
                     v3->physicsParams.vel.z = v3->physicsParams.vel.z - -0.5;
                 }
 LABEL_22:
-                if ( actor->field_1B8 <= (double)v3->moveSize )
+                if ( actor->distToMovePos <= (double)v3->moveSize )
                 {
                     rdVector_Zero3(&v3->physicsParams.vel);
                     actor->flags &= ~SITHAI_MODE_MOVING;
@@ -812,7 +812,7 @@ LABEL_22:
             {
                 rdVector_Copy3(&a4, &v3->position);
                 rdVector_MultAcc3(&a4, &v3->physicsParams.vel, deltaSeconds);
-                if ( !sithAI_physidk(actor, &a4, 0) )
+                if ( !sithAI_CanWalk(actor, &a4, 0) )
                 {
                     rdVector_Zero3(&v3->physicsParams.vel);
                     sithAI_SetActorFireTarget(actor, SITHAI_MODE_TARGET_VISIBLE, 0);
@@ -1023,7 +1023,7 @@ int sithAI_CheckSightThing(sithThing *thing, rdVector3 *targetPosition, sithThin
     {
         if ( targetThing->moveType != SITH_MT_PHYSICS )
             return 3;
-        if ( (targetThing->physicsParams.physflags & SITH_PF_MIDAIR) == 0 )
+        if ( (targetThing->physicsParams.physflags & SITH_PF_WATERSURFACE) == 0 )
             return 3;
     }
     if ( (thing->thingflags & SITH_TF_WATER) && !(targetThing->thingflags & SITH_TF_WATER))
@@ -1128,49 +1128,49 @@ int sithAI_sub_4EB300(sithThing *a3, rdVector3 *a4, rdVector3 *arg8, float argC,
 }
 
 // TODO this one has some inlined funcs
-int sithAI_physidk(sithActor *a7, rdVector3 *a4, int *arg8)
+int sithAI_CanWalk(sithActor *actor, rdVector3 *targetPosition, int *out)
 {
-    sithThing *v4; // esi
+    sithThing *actorThing; // esi
     intptr_t result; // eax
     sithSector *v6; // edi
-    sithCollisionSearchEntry *v7; // eax
-    sithSurface *v8; // ecx
-    sithThing *v10; // eax
+    sithCollisionSearchEntry *colSearchEntry; // eax
+    sithSurface *searchSurface; // ecx
+    sithThing *searchThing; // eax
     float a6; // [esp+0h] [ebp-2Ch]
     int v12; // [esp+1Ch] [ebp-10h]
     rdVector3 a5; // [esp+20h] [ebp-Ch] BYREF
     float a7a; // [esp+30h] [ebp+4h]
 
-    v4 = a7->thing;
+    actorThing = actor->thing;
     rdVector_Neg3(&a5, &rdroid_zVector3);
-    a7a = v4->moveSize * 0.25;
+    a7a = actorThing->moveSize * 0.25;
     v12 = 0;
-    result = (intptr_t)sithCollision_GetSectorLookAt(v4->sector, &v4->position, a4, 0.0);
+    result = (intptr_t)sithCollision_GetSectorLookAt(actorThing->sector, &actorThing->position, targetPosition, 0.0);
     v6 = (sithSector *)result;
     if ( !result )
         return result;
-    a6 = sithPhysics_ThingGetInsertOffsetZ(v4) + a7->aiclass->maxStep;
-    sithCollision_SearchRadiusForThings(v6, v4, a4, &a5, a6, a7a, 0x2002);
-    v7 = sithCollision_NextSearchResult();
-    if ( !v7 )
+    a6 = sithPhysics_ThingGetInsertOffsetZ(actorThing) + actor->aiclass->maxStep;
+    sithCollision_SearchRadiusForThings(v6, actorThing, targetPosition, &a5, a6, a7a, 0x2002);
+    colSearchEntry = sithCollision_NextSearchResult();
+    if ( !colSearchEntry )
         goto LABEL_20;
-    while (!(v7->hitType & SITHCOLLISION_WORLD))
+    while (!(colSearchEntry->hitType & SITHCOLLISION_WORLD))
     {
-        if (v7->hitType & SITHCOLLISION_THING)
+        if (colSearchEntry->hitType & SITHCOLLISION_THING)
         {
-            v10 = v7->receiver;
-            if (v10->thingflags & SITH_TF_STANDABLE)
+            searchThing = colSearchEntry->receiver;
+            if (searchThing->thingflags & SITH_TF_STANDABLE)
             {
                 v12 = 1;
-                if ( arg8 )
+                if ( out )
                 {
-                    if ((v4->attach_flags & SITH_ATTACH_THINGSURFACE) && v4->attachedThing == v10 )
+                    if ((actorThing->attach_flags & SITH_ATTACH_THINGSURFACE) && actorThing->attachedThing == searchThing )
                     {
-                        *arg8 = 0;
+                        *out = 0;
                         sithCollision_SearchClose();
                         return 1;
                     }
-                    *arg8 = 1;
+                    *out = 1;
                 }
 LABEL_20:
                 sithCollision_SearchClose();
@@ -1180,63 +1180,63 @@ LABEL_8:
             sithCollision_SearchClose();
             return 0;
         }
-        v7 = sithCollision_NextSearchResult();
-        if ( !v7 )
+        colSearchEntry = sithCollision_NextSearchResult();
+        if ( !colSearchEntry )
             goto LABEL_20;
     }
-    v8 = v7->surface;
-    if ( (v8->surfaceFlags & SITH_SURFACE_AI_CAN_WALK_ON_FLOOR) != 0 )
+    searchSurface = colSearchEntry->surface;
+    if ( (searchSurface->surfaceFlags & SITH_SURFACE_AI_CAN_WALK_ON_FLOOR) != 0 )
         goto LABEL_8;
-    v12 = 2 - ((v8->surfaceFlags & SITH_SURFACE_FLOOR) != 0);
-    if ( !arg8 )
+    v12 = 2 - ((searchSurface->surfaceFlags & SITH_SURFACE_FLOOR) != 0);
+    if ( !out )
         goto LABEL_20;
-    if ( (v4->attach_flags & SITH_ATTACH_WORLDSURFACE) && v4->attachedSurface == v8 )
+    if ( (actorThing->attach_flags & SITH_ATTACH_WORLDSURFACE) && actorThing->attachedSurface == searchSurface )
     {
-        *arg8 = 0;
+        *out = 0;
         sithCollision_SearchClose();
         result = v12;
     }
     else
     {
-        *arg8 = 1;
+        *out = 1;
         sithCollision_SearchClose();
         result = v12;
     }
     return result;
 }
 
-int sithAI_sub_4EB640(sithActor *actor, rdVector3 *a4, sithSector *a2, int *out)
+int sithAI_CanWalk_ExplicitSector(sithActor *actor, rdVector3 *targetPosition, sithSector *a2, int *out)
 {
-    sithThing *v4; // edi
+    sithThing *actorThing; // edi
     int v5; // ebx
-    sithCollisionSearchEntry *v6; // eax
-    sithSurface *v7; // ecx
+    sithCollisionSearchEntry *colSearchEntry; // eax
+    sithSurface *searchSurface; // ecx
     int result; // eax
-    sithThing *v10; // eax
+    sithThing *searchThing; // eax
     float a6; // [esp+0h] [ebp-24h]
     float a7; // [esp+4h] [ebp-20h]
     rdVector3 a5; // [esp+18h] [ebp-Ch] BYREF
 
-    v4 = actor->thing;
+    actorThing = actor->thing;
     rdVector_Neg3(&a5, &rdroid_zVector3);
     v5 = 0;
-    a7 = v4->moveSize * 0.25;
-    a6 = sithPhysics_ThingGetInsertOffsetZ(v4) + actor->aiclass->maxStep;
-    sithCollision_SearchRadiusForThings(a2, v4, a4, &a5, a6, a7, 0x2002);
-    v6 = sithCollision_NextSearchResult();
-    if ( v6 )
+    a7 = actorThing->moveSize * 0.25;
+    a6 = sithPhysics_ThingGetInsertOffsetZ(actorThing) + actor->aiclass->maxStep;
+    sithCollision_SearchRadiusForThings(a2, actorThing, targetPosition, &a5, a6, a7, 0x2002);
+    colSearchEntry = sithCollision_NextSearchResult();
+    if ( colSearchEntry )
     {
         while ( 1 )
         {
-            if ( (v6->hitType & SITHCOLLISION_WORLD) != 0 )
+            if ( (colSearchEntry->hitType & SITHCOLLISION_WORLD) != 0 )
             {
-                v7 = v6->surface;
-                if ( (v7->surfaceFlags & SITH_SURFACE_AI_CAN_WALK_ON_FLOOR) != 0 )
+                searchSurface = colSearchEntry->surface;
+                if ( (searchSurface->surfaceFlags & SITH_SURFACE_AI_CAN_WALK_ON_FLOOR) != 0 )
                     goto LABEL_13;
-                v5 = 2 - ((v7->surfaceFlags & SITH_SURFACE_FLOOR) != 0);
+                v5 = 2 - ((searchSurface->surfaceFlags & SITH_SURFACE_FLOOR) != 0);
                 if ( !out )
                     goto LABEL_19;
-                if ( (v4->attach_flags & SITH_ATTACH_WORLDSURFACE) != 0 && v4->attachedSurface == v7 )
+                if ( (actorThing->attach_flags & SITH_ATTACH_WORLDSURFACE) != 0 && actorThing->attachedSurface == searchSurface )
                 {
                     *out = 0;
                     sithCollision_SearchClose();
@@ -1250,14 +1250,14 @@ int sithAI_sub_4EB640(sithActor *actor, rdVector3 *a4, sithSector *a2, int *out)
                 }
                 return result;
             }
-            if ( (v6->hitType & SITHCOLLISION_THING) != 0 )
+            if ( (colSearchEntry->hitType & SITHCOLLISION_THING) != 0 )
                 break;
-            v6 = sithCollision_NextSearchResult();
-            if ( !v6 )
+            colSearchEntry = sithCollision_NextSearchResult();
+            if ( !colSearchEntry )
                 goto LABEL_13;
         }
-        v10 = v6->receiver;
-        if ( (v10->thingflags & SITH_TF_STANDABLE) == 0 )
+        searchThing = colSearchEntry->receiver;
+        if ( (searchThing->thingflags & SITH_TF_STANDABLE) == 0 )
         {
 LABEL_13:
             sithCollision_SearchClose();
@@ -1266,7 +1266,7 @@ LABEL_13:
         v5 = 1;
         if ( out )
         {
-            if ( (v4->attach_flags & SITH_ATTACH_THINGSURFACE) != 0 && v4->attachedThing == v10 )
+            if ( (actorThing->attach_flags & SITH_ATTACH_THINGSURFACE) != 0 && actorThing->attachedThing == searchThing )
             {
                 *out = 0;
                 sithCollision_SearchClose();
@@ -1538,7 +1538,7 @@ void sithAI_GetThingsInView(sithSector *a1, rdMatrix34 *a2, float a3)
                   && (!v9
                    || !v7->surface->surfaceInfo.face.geometryMode
                    || (v7->surface->surfaceInfo.face.type & 2)
-                   || (v8 && (v8->texture_ptr->alpha_en & 1) != 0)) // Added: v8 nullptr check
+                   || (v8 && (v8->texture_ptr->alpha_en & 1) != 0)) // Added: searchSurface nullptr check
                   && rdVector_Dot3(&a2->lvec, &v7->surface->surfaceInfo.face.normal) < 0.0 )
                 {
                     a3a = v7->mirror->dist + v7->dist + a3;
