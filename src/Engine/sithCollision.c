@@ -116,97 +116,88 @@ sithCollisionSearchEntry* sithCollision_NextSearchResult()
 
 float sithCollision_SearchRadiusForThings(sithSector *pStartSector, sithThing *pThing, const rdVector3 *pStartPos, const rdVector3 *pMoveNorm, float moveDist, float radius, int flags)
 {
-    float v10; // eax
     sithCollisionSearchEntry *i; // ebp
-    sithSector *v13; // esi
-    unsigned int v14; // eax
-    unsigned int v15; // edi
+    sithSector *pSurfAdjSector; // esi
+    unsigned int num; // eax
+    unsigned int chk; // edi
     unsigned int v17; // edx
     unsigned int v18; // ebp
     sithSector *j; // eax
-    sithAdjoin *v20; // ebx
-    sithSector *v21; // esi
-    unsigned int v22; // eax
-    unsigned int v23; // edi
+    sithAdjoin *pAdjoin; // ebx
+    sithSector *pAdjoinSector; // esi
     sithSector *v24; // edx
-    float v25; // [esp+10h] [ebp-8h]
     unsigned int v26; // [esp+10h] [ebp-8h]
-    float a1a; // [esp+1Ch] [ebp+4h]
-    float a5a; // [esp+2Ch] [ebp+14h]
+    float curMoveDist; // [esp+2Ch] [ebp+14h]
 
     sithCollision_searchStackIdx++;
     sithCollision_searchNumResults[sithCollision_searchStackIdx] = 0;
     sithCollision_stackIdk[sithCollision_searchStackIdx] = 1;
-    v25 = moveDist;
+    curMoveDist = moveDist;
     sithCollision_stackSectors[sithCollision_searchStackIdx].sectors[0] = pStartSector;
 
     if ( (flags & RAYCAST_1) == 0 )
-        v25 = sithCollision_UpdateSectorThingCollision(pStartSector, pThing, pStartPos, pMoveNorm, moveDist, radius, flags);
-    sithCollision_sub_4E86D0(pStartSector, pStartPos, pMoveNorm, v25, radius, flags);
+        curMoveDist = sithCollision_UpdateSectorThingCollision(pStartSector, pThing, pStartPos, pMoveNorm, moveDist, radius, flags);
+    sithCollision_sub_4E86D0(pStartSector, pStartPos, pMoveNorm, curMoveDist, radius, flags);
 
-    v10 = v25;
     v26 = 0;
-    a5a = v10;
     for ( i = sithCollision_searchStack[sithCollision_searchStackIdx].collisions; v26 < sithCollision_searchNumResults[sithCollision_searchStackIdx]; ++v26 )
     {
         if ( i->hitType == SITHCOLLISION_ADJOINTOUCH )
         {
-            if ( (flags & RAYCAST_400) != 0 || i->distance <= (double)a5a )
+            if ( (flags & RAYCAST_400) != 0 || i->distance <= (double)curMoveDist )
             {
-                v13 = i->surface->adjoin->sector;
-                a1a = a5a;
-                v14 = sithCollision_stackIdk[sithCollision_searchStackIdx];
-                for (v15 = 0; v15 < v14; v15++)
+                pSurfAdjSector = i->surface->adjoin->sector;
+                num = sithCollision_stackIdk[sithCollision_searchStackIdx];
+                for (chk = 0; chk < num; chk++)
                 {
-                    if ( sithCollision_stackSectors[sithCollision_searchStackIdx].sectors[v15] == v13 )
+                    if ( sithCollision_stackSectors[sithCollision_searchStackIdx].sectors[chk] == pSurfAdjSector )
                         break;
                 }
                 
-                if ( v15 >= v14 && v14 != 64)
+                if ( chk >= num && num != 64)
                 {
-                    sithCollision_stackIdk[sithCollision_searchStackIdx] = v14 + 1;
-                    sithCollision_stackSectors[sithCollision_searchStackIdx].sectors[v14] = v13;
+                    sithCollision_stackIdk[sithCollision_searchStackIdx] = num + 1;
+                    sithCollision_stackSectors[sithCollision_searchStackIdx].sectors[num] = pSurfAdjSector;
                     if ( (flags & RAYCAST_1) == 0 )
-                        a1a = sithCollision_UpdateSectorThingCollision(v13, pThing, pStartPos, pMoveNorm, a5a, radius, flags);
-                    sithCollision_sub_4E86D0(v13, pStartPos, pMoveNorm, a1a, radius, flags);
-                    a5a = a1a;
+                        curMoveDist = sithCollision_UpdateSectorThingCollision(pSurfAdjSector, pThing, pStartPos, pMoveNorm, curMoveDist, radius, flags);
+                    sithCollision_sub_4E86D0(pSurfAdjSector, pStartPos, pMoveNorm, curMoveDist, radius, flags);
                 }
             }
             i->hasBeenEnumerated = 1;
         }
         ++i;
     }
-    if ( a5a != 0.0 && (flags & RAYCAST_800) != 0 )
+    if ( curMoveDist != 0.0 && (flags & RAYCAST_800) != 0 )
     {
         v17 = sithCollision_stackIdk[sithCollision_searchStackIdx];
         for (v18 = 0; v18 < v17; v18++)
         {
             j = sithCollision_stackSectors[sithCollision_searchStackIdx].sectors[v18];
-            for (v20 = j->adjoins; v20 != NULL; v20 = v20->next)
+            for (pAdjoin = j->adjoins; pAdjoin != NULL; pAdjoin = pAdjoin->next)
             {
-                if (!(v20->flags & SITHSURF_ADJOIN_ALLOW_MOVEMENT)) continue;
+                if (!(pAdjoin->flags & SITHSURF_ADJOIN_ALLOW_MOVEMENT)) continue;
 
-                v21 = v20->sector;
-                if (!v21->thingsList) continue;
+                pAdjoinSector = pAdjoin->sector;
+                if (!pAdjoinSector->thingsList) continue;
                 
-                v22 = sithCollision_stackIdk[sithCollision_searchStackIdx];
-                for (v23 = 0; v23 < v22; v23++)
+                num = sithCollision_stackIdk[sithCollision_searchStackIdx];
+                for (chk = 0; chk < num; chk++)
                 {
-                    v24 = sithCollision_stackSectors[sithCollision_searchStackIdx].sectors[v23];
-                    if ( v24 == v21 )
+                    v24 = sithCollision_stackSectors[sithCollision_searchStackIdx].sectors[chk];
+                    if ( v24 == pAdjoinSector )
                         break;
                 }
 
-                if ( v23 >= v22 && v22 != 64)
+                if (chk >= num && num != 64)
                 {
-                    sithCollision_stackIdk[sithCollision_searchStackIdx] = v22 + 1;
-                    sithCollision_stackSectors[sithCollision_searchStackIdx].sectors[v22] = v21;
-                    a5a = sithCollision_UpdateSectorThingCollision(v21, pThing, pStartPos, pMoveNorm, a5a, radius, flags);
+                    sithCollision_stackIdk[sithCollision_searchStackIdx] = num + 1;
+                    sithCollision_stackSectors[sithCollision_searchStackIdx].sectors[num] = pAdjoinSector;
+                    curMoveDist = sithCollision_UpdateSectorThingCollision(pAdjoinSector, pThing, pStartPos, pMoveNorm, curMoveDist, radius, flags);
                 }
             }
         }
     }
-    return a5a;
+    return curMoveDist;
 }
 
 void sithCollision_SearchClose()

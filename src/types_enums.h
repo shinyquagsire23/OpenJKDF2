@@ -405,7 +405,7 @@ enum SithRaycastType
     RAYCAST_100 = 0x100,
     RAYCAST_200 = 0x200, // player?
     RAYCAST_400 = 0x400, // something with radius?
-    RAYCAST_800 = 0x800,
+    RAYCAST_800 = 0x800, // adjoins?
     RAYCAST_1000 = 0x1000,
     RAYCAST_2000 = 0x2000,
     RAYCAST_4000 = 0x4000,
