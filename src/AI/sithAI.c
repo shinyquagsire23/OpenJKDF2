@@ -1205,10 +1205,10 @@ LABEL_8:
     return result;
 }
 
-int sithAI_CanWalk_ExplicitSector(sithActor *actor, rdVector3 *targetPosition, sithSector *a2, int *out)
+int sithAI_CanWalk_ExplicitSector(sithActor *actor, rdVector3 *targetPosition, sithSector *targetSector, int *out)
 {
     sithThing *actorThing; // edi
-    int v5; // ebx
+    int retval; // ebx
     sithCollisionSearchEntry *colSearchEntry; // eax
     sithSurface *searchSurface; // ecx
     int result; // eax
@@ -1219,10 +1219,10 @@ int sithAI_CanWalk_ExplicitSector(sithActor *actor, rdVector3 *targetPosition, s
 
     actorThing = actor->thing;
     rdVector_Neg3(&a5, &rdroid_zVector3);
-    v5 = 0;
+    retval = 0;
     a7 = actorThing->moveSize * 0.25;
     a6 = sithPhysics_ThingGetInsertOffsetZ(actorThing) + actor->aiclass->maxStep;
-    sithCollision_SearchRadiusForThings(a2, actorThing, targetPosition, &a5, a6, a7, 0x2002);
+    sithCollision_SearchRadiusForThings(targetSector, actorThing, targetPosition, &a5, a6, a7, 0x2002);
     colSearchEntry = sithCollision_NextSearchResult();
     if ( colSearchEntry )
     {
@@ -1233,20 +1233,20 @@ int sithAI_CanWalk_ExplicitSector(sithActor *actor, rdVector3 *targetPosition, s
                 searchSurface = colSearchEntry->surface;
                 if ( (searchSurface->surfaceFlags & SITH_SURFACE_AI_CAN_WALK_ON_FLOOR) != 0 )
                     goto LABEL_13;
-                v5 = 2 - ((searchSurface->surfaceFlags & SITH_SURFACE_FLOOR) != 0);
+                retval = 2 - ((searchSurface->surfaceFlags & SITH_SURFACE_FLOOR) != 0);
                 if ( !out )
                     goto LABEL_19;
                 if ( (actorThing->attach_flags & SITH_ATTACH_WORLDSURFACE) != 0 && actorThing->attachedSurface == searchSurface )
                 {
                     *out = 0;
                     sithCollision_SearchClose();
-                    result = v5;
+                    result = retval;
                 }
                 else
                 {
                     *out = 1;
                     sithCollision_SearchClose();
-                    result = v5;
+                    result = retval;
                 }
                 return result;
             }
@@ -1263,7 +1263,7 @@ LABEL_13:
             sithCollision_SearchClose();
             return 0;
         }
-        v5 = 1;
+        retval = 1;
         if ( out )
         {
             if ( (actorThing->attach_flags & SITH_ATTACH_THINGSURFACE) != 0 && actorThing->attachedThing == searchThing )
@@ -1277,7 +1277,7 @@ LABEL_13:
     }
 LABEL_19:
     sithCollision_SearchClose();
-    return v5;
+    return retval;
 }
 
 int sithAI_FirstThingInView(sithSector *sector, rdMatrix34 *out, float autoaimFov, float autoaimMaxDist, int a5, sithThing **thingList, int a7, float a8)
