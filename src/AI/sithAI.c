@@ -1056,7 +1056,7 @@ int sithAI_CheckSightThing(sithThing *thing, rdVector3 *targetPosition, sithThin
     }
 
     v21 = sithCollision_GetSectorLookAt(thing->sector, &thing->position, targetPosition, 0.0);
-    sithCollision_SearchRadiusForThings(v21, thing, targetPosition, targetErrorDir, *targetDistance, 0.0, 0x102);
+    sithCollision_SearchRadiusForThings(v21, thing, targetPosition, targetErrorDir, *targetDistance, 0.0, RAYCAST_100 | RAYCAST_2);
     v22 = sithCollision_NextSearchResult();
     if ( v22 )
     {
@@ -1121,7 +1121,7 @@ int sithAI_sub_4EB300(sithThing *a3, rdVector3 *a4, rdVector3 *arg8, float argC,
     }
 
     v19 = sithCollision_GetSectorLookAt(a3->sector, &a3->position, a4, 0.0);
-    sithCollision_SearchRadiusForThings(v19, a3, a4, a5, *a8, a7, 0x2102);
+    sithCollision_SearchRadiusForThings(v19, a3, a4, a5, *a8, a7, RAYCAST_2000 | RAYCAST_100 | RAYCAST_2);
     v20 = sithCollision_NextSearchResult();
     sithCollision_SearchClose();
     return v20 != 0 ? 3 : 0;
@@ -1136,21 +1136,21 @@ int sithAI_CanWalk(sithActor *actor, rdVector3 *targetPosition, int *out)
     sithCollisionSearchEntry *colSearchEntry; // eax
     sithSurface *searchSurface; // ecx
     sithThing *searchThing; // eax
-    float a6; // [esp+0h] [ebp-2Ch]
+    float searchDist; // [esp+0h] [ebp-2Ch]
     int v12; // [esp+1Ch] [ebp-10h]
-    rdVector3 a5; // [esp+20h] [ebp-Ch] BYREF
-    float a7a; // [esp+30h] [ebp+4h]
+    rdVector3 moveNorm; // [esp+20h] [ebp-Ch] BYREF
+    float searchRadius; // [esp+30h] [ebp+4h]
 
     actorThing = actor->thing;
-    rdVector_Neg3(&a5, &rdroid_zVector3);
-    a7a = actorThing->moveSize * 0.25;
+    rdVector_Neg3(&moveNorm, &rdroid_zVector3);
+    searchRadius = actorThing->moveSize * 0.25;
     v12 = 0;
     result = (intptr_t)sithCollision_GetSectorLookAt(actorThing->sector, &actorThing->position, targetPosition, 0.0);
     v6 = (sithSector *)result;
     if ( !result )
         return result;
-    a6 = sithPhysics_ThingGetInsertOffsetZ(actorThing) + actor->aiclass->maxStep;
-    sithCollision_SearchRadiusForThings(v6, actorThing, targetPosition, &a5, a6, a7a, 0x2002);
+    searchDist = sithPhysics_ThingGetInsertOffsetZ(actorThing) + actor->aiclass->maxStep;
+    sithCollision_SearchRadiusForThings(v6, actorThing, targetPosition, &moveNorm, searchDist, searchRadius, RAYCAST_2000 | RAYCAST_2);
     colSearchEntry = sithCollision_NextSearchResult();
     if ( !colSearchEntry )
         goto LABEL_20;
@@ -1213,16 +1213,16 @@ int sithAI_CanWalk_ExplicitSector(sithActor *actor, rdVector3 *targetPosition, s
     sithSurface *searchSurface; // ecx
     int result; // eax
     sithThing *searchThing; // eax
-    float a6; // [esp+0h] [ebp-24h]
-    float a7; // [esp+4h] [ebp-20h]
-    rdVector3 a5; // [esp+18h] [ebp-Ch] BYREF
+    float searchDist; // [esp+0h] [ebp-24h]
+    float searchRadius; // [esp+4h] [ebp-20h]
+    rdVector3 moveNorm; // [esp+18h] [ebp-Ch] BYREF
 
     actorThing = actor->thing;
-    rdVector_Neg3(&a5, &rdroid_zVector3);
+    rdVector_Neg3(&moveNorm, &rdroid_zVector3);
     retval = 0;
-    a7 = actorThing->moveSize * 0.25;
-    a6 = sithPhysics_ThingGetInsertOffsetZ(actorThing) + actor->aiclass->maxStep;
-    sithCollision_SearchRadiusForThings(targetSector, actorThing, targetPosition, &a5, a6, a7, 0x2002);
+    searchRadius = actorThing->moveSize * 0.25;
+    searchDist = sithPhysics_ThingGetInsertOffsetZ(actorThing) + actor->aiclass->maxStep;
+    sithCollision_SearchRadiusForThings(targetSector, actorThing, targetPosition, &moveNorm, searchDist, searchRadius, RAYCAST_2000 | RAYCAST_2);
     colSearchEntry = sithCollision_NextSearchResult();
     if ( colSearchEntry )
     {

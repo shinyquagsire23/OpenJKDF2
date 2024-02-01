@@ -105,7 +105,7 @@ int sithIntersect_CollideThings(sithThing *thing, const rdVector3 *a2, const rdV
 
     v11 = a6;
     bFaceCollision = 0;
-    if ( (raycastFlags & 0x80u) == 0 && (a6->collide == SITH_COLLIDE_FACE || thing && thing->collide == SITH_COLLIDE_FACE) )
+    if ( (raycastFlags & RAYCAST_80) == 0 && (a6->collide == SITH_COLLIDE_FACE || thing && thing->collide == SITH_COLLIDE_FACE) )
         bFaceCollision = 1;
 
     float unkOut;
@@ -467,7 +467,7 @@ int sithIntersect_sub_508990(rdVector3 *a1, float a2, rdFace *a3, rdVector3 *a4,
 }
 
 // Used for floor collision, probably everything tbh
-int sithIntersect_SphereHit(const rdVector3 *pStartPos, const rdVector3 *pRayDirection, float moveDistance, float radius, rdVector3 *surfaceNormal, rdVector3 *a6, float *pSphereHitDist, int a8)
+int sithIntersect_SphereHit(const rdVector3 *pStartPos, const rdVector3 *pRayDirection, float moveDistance, float radius, rdVector3 *surfaceNormal, rdVector3 *a6, float *pSphereHitDist, int flags)
 {
     double v8; // st7
     double v13; // st7
@@ -485,7 +485,7 @@ int sithIntersect_SphereHit(const rdVector3 *pStartPos, const rdVector3 *pRayDir
     v18 = -rdVector_Dot3(pRayDirection, surfaceNormal);
     if ( v13 < 0.0 )
     {
-        if ( (a8 & RAYCAST_400) != 0 )
+        if ( (flags & RAYCAST_400) != 0 )
             *pSphereHitDist += radius;
         else
             *pSphereHitDist = 0.0;
@@ -613,14 +613,14 @@ int sithIntersect_sub_508D20(const rdVector3 *pStartPos, const rdVector3 *pRayDi
 }
 
 // Seems to handle interaction when crossing adjoins?
-int sithIntersect_sub_5090B0(const rdVector3 *pStartPos, const rdVector3 *pRayDirection, float moveDistance, float radius, sithSurfaceInfo *a5, rdVector3 *a6, float *pSphereHitDist, int a8)
+int sithIntersect_sub_5090B0(const rdVector3 *pStartPos, const rdVector3 *pRayDirection, float moveDistance, float radius, sithSurfaceInfo *a5, rdVector3 *a6, float *pSphereHitDist, int flags)
 {
     sithSurfaceInfo *v8; // edi
     int result; // eax
     rdVector3 v15; // [esp+10h] [ebp-Ch] BYREF
 
     v8 = a5;
-    result = sithIntersect_SphereHit(pStartPos, pRayDirection, moveDistance, radius, &a5->face.normal, &a6[*a5->face.vertexPosIdx], pSphereHitDist, a8);
+    result = sithIntersect_SphereHit(pStartPos, pRayDirection, moveDistance, radius, &a5->face.normal, &a6[*a5->face.vertexPosIdx], pSphereHitDist, flags);
     if ( result )
     {
         if ( radius == 0.0 )

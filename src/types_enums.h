@@ -395,16 +395,16 @@ enum SithCollideType
 enum SithRaycastType
 {
     RAYCAST_1 = 0x1,
-    RAYCAST_2 = 0x2,
-    RAYCAST_4 = 0x4,
+    RAYCAST_2 = 0x2,  // actor?
+    RAYCAST_4 = 0x4,  // path thing?
     RAYCAST_8 = 0x8,
-    RAYCAST_10 = 0x10,
+    RAYCAST_10 = 0x10, // wall?
     RAYCAST_20 = 0x20,
     RAYCAST_40 = 0x40,
     RAYCAST_80 = 0x80,
     RAYCAST_100 = 0x100,
-    RAYCAST_200 = 0x200,
-    RAYCAST_400 = 0x400,
+    RAYCAST_200 = 0x200, // player?
+    RAYCAST_400 = 0x400, // something with radius?
     RAYCAST_800 = 0x800,
     RAYCAST_1000 = 0x1000,
     RAYCAST_2000 = 0x2000,

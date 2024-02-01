@@ -33,7 +33,7 @@ void sithCollision_RegisterCollisionHandler(int idxA, int idxB, void* func, void
 void sithCollision_RegisterHitHandler(int type, void* a2);
 #if 1
 sithCollisionSearchEntry* sithCollision_NextSearchResult();
-float sithCollision_SearchRadiusForThings(sithSector *sector, sithThing *a2, const rdVector3 *position, const rdVector3 *direction, float a5, float range, int flags);
+float sithCollision_SearchRadiusForThings(sithSector* pStartSector, sithThing* pThing, const rdVector3* pStartPos, const rdVector3* pMoveNorm, float moveDist, float radius, int flags);
 void sithCollision_SearchClose();
 float sithCollision_UpdateSectorThingCollision(sithSector *a1, sithThing *sender, const rdVector3 *a2, const rdVector3 *a3, float a4, float range, int flags);
 void sithCollision_sub_4E86D0(sithSector *a1, const rdVector3 *a2, const rdVector3 *a3, float a4, float a5, int unk3Flags);
@@ -41,7 +41,7 @@ sithSector* sithCollision_GetSectorLookAt(sithSector *sector, const rdVector3 *a
 #endif
 void sithCollision_FallHurt(sithThing *thing, float vel);
 void sithCollision_sub_4E7670(sithThing *thing, rdMatrix34 *orient);
-float sithCollision_UpdateThingCollision(sithThing *a3, rdVector3 *a2, float a6, int a8);
+float sithCollision_UpdateThingCollision(sithThing* pThing, rdVector3* a2, float a6, int flags);
 int sithCollision_DefaultHitHandler(sithThing *thing, sithSurface *surface, sithCollisionSearchEntry *a3);
 int sithCollision_DebrisDebrisCollide(sithThing *thing1, sithThing *thing2, sithCollisionSearchEntry *a3, int isInverse);
 int sithCollision_CollideHurt(sithThing *a1, rdVector3 *a2, float a3, int a4);

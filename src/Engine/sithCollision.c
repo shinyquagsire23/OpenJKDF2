@@ -166,7 +166,7 @@ float sithCollision_SearchRadiusForThings(sithSector *pStartSector, sithThing *p
                 {
                     sithCollision_stackIdk[sithCollision_searchStackIdx] = v14 + 1;
                     sithCollision_stackSectors[sithCollision_searchStackIdx].sectors[v14] = v13;
-                    if ( (flags & 1) == 0 )
+                    if ( (flags & RAYCAST_1) == 0 )
                         a1a = sithCollision_UpdateSectorThingCollision(v13, pThing, pStartPos, pMoveNorm, a5a, radius, flags);
                     sithCollision_sub_4E86D0(v13, pStartPos, pMoveNorm, a1a, radius, flags);
                     a5a = a1a;
@@ -241,7 +241,7 @@ float sithCollision_UpdateSectorThingCollision(sithSector *pSector, sithThing *s
     if ( v7 )
     {
         v8 = sender;
-        v10 = flags & 8;
+        v10 = flags & RAYCAST_8;
         while (1)
         {
             if ( (!v10 || (v7->thingflags & SITH_TF_80))
@@ -526,7 +526,7 @@ sithSector* sithCollision_GetSectorLookAt(sithSector *pStartSector, const rdVect
         return pStartSector;
     rdVector_Sub3(&a1, pEndPos, pStartPos);
     a3a = rdVector_Normalize3Acc(&a1);
-    sithCollision_SearchRadiusForThings(pStartSector, 0, pStartPos, &a1, a3a, a5, 1);
+    sithCollision_SearchRadiusForThings(pStartSector, 0, pStartPos, &a1, a3a, a5, RAYCAST_1);
     v7 = sithCollision_searchStackIdx;
     v8 = &sithCollision_searchStack[sithCollision_searchStackIdx];
     while ( 1 )
@@ -617,7 +617,7 @@ void sithCollision_sub_4E7670(sithThing *thing, rdMatrix34 *orient)
     }
 }
 
-float sithCollision_UpdateThingCollision(sithThing *pThing, rdVector3 *a2, float a6, int a8)
+float sithCollision_UpdateThingCollision(sithThing *pThing, rdVector3 *a2, float a6, int flags)
 {
     sithThing *v5; // ebp
     sithThing *v10; // esi
@@ -663,19 +663,19 @@ float sithCollision_UpdateThingCollision(sithThing *pThing, rdVector3 *a2, float
     v5 = pThing;
     if ( !pThing->collide )
     {
-        a8 |= 0x5;
+        flags |= RAYCAST_1 | RAYCAST_4;
     }
     if ( pThing->moveType == SITH_MT_PATH )
     {
-        a8 |= 0x4;
+        flags |= RAYCAST_4;
     }
     if ( pThing->type == SITH_THING_PLAYER )
     {
-        a8 |= 0x200;
+        flags |= RAYCAST_200;
     }
-    if ( (a8 & 1) == 0 )
+    if ( (flags & RAYCAST_1) == 0 )
     {
-        a8 |= 0x800;
+        flags |= RAYCAST_800;
     }
     v10 = pThing->attachedParentMaybe;
     for ( direction = *a2; v10; v10 = v10->childThing )
@@ -723,7 +723,7 @@ LABEL_78:
             if (pThing == sithPlayer_pLocalPlayerThing) {
                 sithCollision_bDebugCollide = 0;
             }
-            sithCollision_SearchRadiusForThings(sectTmp, v5, &v5->position, &direction, a6, v17, a8);
+            sithCollision_SearchRadiusForThings(sectTmp, v5, &v5->position, &direction, a6, v17, flags);
             sithCollision_bDebugCollide = 0; // Added
             v36 = 0; // Added
             while ( 1 )
@@ -896,7 +896,7 @@ LABEL_81:
     {
         if ( v64 == 0.0 )
             return 0.0;
-        if (!(a8 & 0x40))
+        if (!(flags & RAYCAST_40))
         {
             if ( (v5->attach_flags) != 0 && !(v5->attach_flags & SITH_ATTACH_NO_MOVE)
               || (v5->physicsParams.physflags & SITH_PF_FLOORSTICK) != 0
@@ -1130,7 +1130,7 @@ int sithCollision_CollideHurt(sithThing *a1, rdVector3 *a2, float a3, int a4)
 
 int sithCollision_HasLos(sithThing *thing1, sithThing *thing2, int flag)
 {
-    int v3; // edi
+    int searchFlags; // edi
     int v4; // edi
     sithCollisionSearchEntry *v5; // ebp
     double v6; // st7
@@ -1143,12 +1143,12 @@ int sithCollision_HasLos(sithThing *thing1, sithThing *thing2, int flag)
     float a6; // [esp+2Ch] [ebp+Ch]
 
     v12 = 1;
-    v3 = 0x2122;
+    searchFlags = RAYCAST_2000 | RAYCAST_100 | RAYCAST_20 | RAYCAST_2;
     if ( flag )
-        v3 = 0x2022;
+        searchFlags = RAYCAST_2000 | RAYCAST_20 | RAYCAST_2;
     rdVector_Sub3(&a1a, &thing2->position, &thing1->position);
     a6 = rdVector_Normalize3Acc(&a1a);
-    sithCollision_SearchRadiusForThings(thing1->sector, 0, &thing1->position, &a1a, a6, 0.0, v3);
+    sithCollision_SearchRadiusForThings(thing1->sector, 0, &thing1->position, &a1a, a6, 0.0, searchFlags);
     v4 = sithCollision_searchStackIdx;
     v5 = sithCollision_searchStack[sithCollision_searchStackIdx].collisions;
     while ( 1 )
