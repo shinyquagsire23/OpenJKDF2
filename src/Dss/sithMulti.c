@@ -319,7 +319,7 @@ int sithMulti_GetSpawnIdx(sithThing *pPlayerThing)
             &rdroid_zeroVector3,
             0.0,
             pPlayerThing->moveSize,
-            1154);
+            1154, "sithMulti_GetSpawnIdx");
         for ( i = sithCollision_NextSearchResult(); i; i = sithCollision_NextSearchResult() )
         {
             if ( (i->hitType & SITHCOLLISION_THING) != 0 )

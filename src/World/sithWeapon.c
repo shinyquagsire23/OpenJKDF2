@@ -108,7 +108,7 @@ void sithWeapon_sub_4D35E0(sithThing *weapon)
     sector = weapon->sector;
     rdVector_Copy3(&weaponPos_, weaponPos);
     moveSize = weapon->moveSize;
-    sithCollision_SearchRadiusForThings(sector, weapon, &weapon->position, &weaponPos_, weapon->weaponParams.range, moveSize, 0);
+    sithCollision_SearchRadiusForThings(sector, weapon, &weapon->position, &weaponPos_, weapon->weaponParams.range, moveSize, 0, "sithWeapon_sub_4D35E0");
     searchRes = sithCollision_NextSearchResult();
     if ( searchRes )
     {
@@ -250,7 +250,7 @@ void sithWeapon_sub_4D3920(sithThing *weapon)
     range = weapon->weaponParams.range;
     elementSize_ = elementSize;
     sector = weapon->sector;
-    sithCollision_SearchRadiusForThings(sector, weapon, &weapon->position, &lookOrient, range, moveSize, 0);
+    sithCollision_SearchRadiusForThings(sector, weapon, &weapon->position, &lookOrient, range, moveSize, 0, "sithWeapon_sub_4D3920");
     elementSize__ = weapon->weaponParams.elementSize;
     _memcpy(&camera, &weapon->lookOrientation, sizeof(camera));
     vertex.x = 0.0;
@@ -593,7 +593,7 @@ sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileT
         {
             v18 = rdVector_Normalize3(&a5a, &v9->physicsParams.vel) * 3.0;
             a6 = v18 >= 5.0 ? 5.0 : (float)v18;
-            sithCollision_SearchRadiusForThings(v9->sector, v9, &v9->position, &a5a, a6, 0.0, RAYCAST_2);
+            sithCollision_SearchRadiusForThings(v9->sector, v9, &v9->position, &a5a, a6, 0.0, RAYCAST_2, "sithWeapon_FireProjectile_0");
             v19 = sithCollision_NextSearchResult();
             sithCollision_SearchClose();
             if ( v19 )

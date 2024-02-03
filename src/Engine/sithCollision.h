@@ -33,7 +33,7 @@ void sithCollision_RegisterCollisionHandler(int idxA, int idxB, void* func, void
 void sithCollision_RegisterHitHandler(int type, void* a2);
 #if 1
 sithCollisionSearchEntry* sithCollision_NextSearchResult();
-float sithCollision_SearchRadiusForThings(sithSector* pStartSector, sithThing* pThing, const rdVector3* pStartPos, const rdVector3* pMoveNorm, float moveDist, float radius, int flags);
+float sithCollision_SearchRadiusForThings(sithSector* pStartSector, sithThing* pThing, const rdVector3* pStartPos, const rdVector3* pMoveNorm, float moveDist, float radius, int flags, const char* who);
 void sithCollision_SearchClose();
 float sithCollision_UpdateSectorThingCollision(sithSector *a1, sithThing *sender, const rdVector3 *a2, const rdVector3 *a3, float a4, float range, int flags);
 void sithCollision_sub_4E86D0(sithSector *a1, const rdVector3 *a2, const rdVector3 *a3, float a4, float a5, int unk3Flags);

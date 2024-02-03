@@ -79,7 +79,7 @@ void sithExplosion_UpdateForce(sithThing *explosion)
     if ( range > 0.0 && (damage > 0.0 || force > 0.0) )
     {
         sithAIAwareness_AddEntry(explosion->sector, &explosion->position, 1, 3.0, explosion);
-        sithCollision_SearchRadiusForThings(explosion->sector, 0, &explosion->position, &rdroid_zeroVector3, 0.0, range, RAYCAST_400 | RAYCAST_80 | RAYCAST_2);
+        sithCollision_SearchRadiusForThings(explosion->sector, 0, &explosion->position, &rdroid_zeroVector3, 0.0, range, RAYCAST_400 | RAYCAST_80 | RAYCAST_2, "sithExplosion_UpdateForce");
         for ( i = sithCollision_NextSearchResult(); i; i = sithCollision_NextSearchResult() )
         {
             double v3 = i->distance / range;

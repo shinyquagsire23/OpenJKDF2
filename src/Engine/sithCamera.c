@@ -573,7 +573,7 @@ sithSector* sithCamera_create_unk_struct(sithThing *a3, sithSector *a2, rdVector
     v7 = rdVector_Normalize3Acc(&a5);
     a6a = v7;
     v9 = a2;
-    sithCollision_SearchRadiusForThings(a2, a3, a4, &a5, a6a, a7, flags | RAYCAST_800);
+    sithCollision_SearchRadiusForThings(a2, a3, a4, &a5, a6a, a7, flags | RAYCAST_800, "sithCamera_create_unk_struct");
     for ( i = sithCollision_NextSearchResult(); i; i = sithCollision_NextSearchResult() )
     {
         if ( (i->hitType & SITHCOLLISION_ADJOINCROSS) != 0 )
