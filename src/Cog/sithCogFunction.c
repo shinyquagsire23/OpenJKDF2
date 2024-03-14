@@ -1028,76 +1028,72 @@ void sithCogFunction_SetActionCog(sithCog *ctx)
 
 void sithCogFunction_NewColorEffect(sithCog *ctx)
 {
-    sithCog *v1; // esi
-    int v2; // ebx
-    int v3; // ebp
+    int addB; // ebx
+    int addG; // ebp
     int idx; // edi
-    signed int a3; // [esp+10h] [ebp-1Ch]
-    signed int a2; // [esp+14h] [ebp-18h]
-    float a4; // [esp+18h] [ebp-14h]
-    float v8; // [esp+1Ch] [ebp-10h]
-    float v9; // [esp+20h] [ebp-Ch]
-    signed int v10; // [esp+24h] [ebp-8h]
-    float v11; // [esp+28h] [ebp-4h]
-    int a1a; // [esp+30h] [ebp+4h]
+    signed int filterG; // [esp+10h] [ebp-1Ch]
+    signed int filterR; // [esp+14h] [ebp-18h]
+    float tintB; // [esp+18h] [ebp-14h]
+    float tintG; // [esp+1Ch] [ebp-10h]
+    float tintR; // [esp+20h] [ebp-Ch]
+    signed int addR; // [esp+24h] [ebp-8h]
+    float fade; // [esp+28h] [ebp-4h]
+    int filterB; // [esp+30h] [ebp+4h]
 
-    v1 = ctx;
-    v11 = sithCogExec_PopFlex(ctx);
-    v2 = sithCogExec_PopInt(ctx);
-    v3 = sithCogExec_PopInt(ctx);
-    v10 = sithCogExec_PopInt(ctx);
-    a4 = sithCogExec_PopFlex(ctx);
-    v8 = sithCogExec_PopFlex(ctx);
-    v9 = sithCogExec_PopFlex(ctx);
-    a1a = sithCogExec_PopInt(ctx);
-    a3 = sithCogExec_PopInt(v1);
-    a2 = sithCogExec_PopInt(v1);
+    fade = sithCogExec_PopFlex(ctx);
+    addB = sithCogExec_PopInt(ctx);
+    addG = sithCogExec_PopInt(ctx);
+    addR = sithCogExec_PopInt(ctx);
+    tintB = sithCogExec_PopFlex(ctx);
+    tintG = sithCogExec_PopFlex(ctx);
+    tintR = sithCogExec_PopFlex(ctx);
+    filterB = sithCogExec_PopInt(ctx);
+    filterG = sithCogExec_PopInt(ctx);
+    filterR = sithCogExec_PopInt(ctx);
     idx = stdPalEffects_NewRequest(1);
     if ( idx == -1 )
     {
-        sithCogExec_PushInt(v1, -1);
+        sithCogExec_PushInt(ctx, -1);
     }
     else
     {
-        stdPalEffects_SetFilter(idx, a2, a3, a1a);
-        stdPalEffects_SetTint(idx, v9, v8, a4);
-        stdPalEffects_SetAdd(idx, v10, v3, v2);
-        stdPalEffects_SetFade(idx, v11);
-        sithCogExec_PushInt(v1, idx);
+        stdPalEffects_SetFilter(idx, filterR, filterG, filterB);
+        stdPalEffects_SetTint(idx, tintR, tintG, tintB);
+        stdPalEffects_SetAdd(idx, addR, addG, addB);
+        stdPalEffects_SetFade(idx, fade);
+        sithCogExec_PushInt(ctx, idx);
     }
 }
 
 void sithCogFunction_ModifyColorEffect(sithCog *ctx)
 {
-    sithCog *v1; // esi
-    float v2; // ST34_4
-    int v3; // edi
-    int v4; // ebx
-    int v5; // ebp
-    float a4; // ST28_4
-    float v7; // ST2C_4
-    float v8; // ST30_4
-    signed int a3; // ST20_4
-    signed int a2; // ST24_4
-    int v11; // esi
-    int a1a; // [esp+2Ch] [ebp+4h]
+    float fade; // ST34_4
+    int addB; // edi
+    int addG; // ebx
+    int addR; // ebp
+    float tintB; // ST28_4
+    float tintG; // ST2C_4
+    float tintR; // ST30_4
+    signed int filterG; // ST20_4
+    signed int filterR; // ST24_4
+    int idx; // esi
+    int filterB; // [esp+2Ch] [ebp+4h]
 
-    v1 = ctx;
-    v2 = sithCogExec_PopFlex(ctx);
-    v3 = sithCogExec_PopInt(ctx);
-    v4 = sithCogExec_PopInt(ctx);
-    v5 = sithCogExec_PopInt(ctx);
-    a4 = sithCogExec_PopFlex(ctx);
-    v7 = sithCogExec_PopFlex(ctx);
-    v8 = sithCogExec_PopFlex(ctx);
-    a1a = sithCogExec_PopInt(ctx);
-    a3 = sithCogExec_PopInt(v1);
-    a2 = sithCogExec_PopInt(v1);
-    v11 = sithCogExec_PopInt(v1);
-    stdPalEffects_SetFilter(v11, a2, a3, a1a);
-    stdPalEffects_SetTint(v11, v8, v7, a4);
-    stdPalEffects_SetAdd(v11, v5, v4, v3);
-    stdPalEffects_SetFade(v11, v2);
+    fade = sithCogExec_PopFlex(ctx);
+    addB = sithCogExec_PopInt(ctx);
+    addG = sithCogExec_PopInt(ctx);
+    addR = sithCogExec_PopInt(ctx);
+    tintB = sithCogExec_PopFlex(ctx);
+    tintG = sithCogExec_PopFlex(ctx);
+    tintR = sithCogExec_PopFlex(ctx);
+    filterB = sithCogExec_PopInt(ctx);
+    filterG = sithCogExec_PopInt(ctx);
+    filterR = sithCogExec_PopInt(ctx);
+    idx = sithCogExec_PopInt(ctx);
+    stdPalEffects_SetFilter(idx, filterR, filterG, filterB);
+    stdPalEffects_SetTint(idx, tintR, tintG, tintB);
+    stdPalEffects_SetAdd(idx, addR, addG, addB);
+    stdPalEffects_SetFade(idx, fade);
 }
 
 void sithCogFunction_FreeColorEffect(sithCog *ctx)

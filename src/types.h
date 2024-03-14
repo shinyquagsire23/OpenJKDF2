@@ -2983,10 +2983,10 @@ typedef struct stdPalEffectsState
   int field_C;
   int field_10;
   stdPalEffect effect;
-  int field_3C;
-  int field_40;
-  int field_44;
-  int field_48;
+  int bUseFilter;
+  int bUseTint;
+  int bUseAdd;
+  int bUseFade;
 } stdPalEffectsState;
 
 typedef struct stdPalEffectRequest
