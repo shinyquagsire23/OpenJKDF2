@@ -27,7 +27,7 @@ const char *stdControl_aAxisNames[JK_NUM_AXES+1] =
     " "
 };
 
-const stdControlDikStrToNum stdControl_aDikNumToStr[120 + JK_NUM_EXTENDED_KEYS] =
+const stdControlDikStrToNum stdControl_aDikNumToStr[JK_TOTAL_NUM_KEYS] =
 {
   { DIK_ESCAPE,         "DIK_ESCAPE" },
   { DIK_1,              "DIK_1" },
