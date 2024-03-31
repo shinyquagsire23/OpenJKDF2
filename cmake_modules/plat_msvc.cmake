@@ -14,6 +14,7 @@ macro(plat_initialize)
     set(TARGET_USE_CURL FALSE)
     set(TARGET_COMPILE_FREEGLUT TRUE)
     set(TARGET_FIND_OPENAL FALSE)
+    set(TARGET_USE_GAMENETWORKINGSOCKETS FALSE) # TODO why does this keep breaking :(
     set(SDL2_COMMON_LIBS SDL2main SDL::SDL)
     
     set(TARGET_WIN32 TRUE)
