@@ -695,7 +695,7 @@ void jkHud_Draw()
                     v33 = v32->playerThing->rdthing.model3->filename;
                     stdFnames_CopyShortName(tmpFname, 16, v33);
                     jkGuiTitle_sub_4189A0(tmpFname);
-                    v34 = jkStrings_GetText(tmpFname);
+                    v34 = jkStrings_GetUniStringWithFallback(tmpFname);
                     stdString_SafeWStrCopy(jkHud_aPlayerScores[jkHud_numPlayers].modelName, v34, 0x20);
                     v35 = jkHud_numPlayers;
                     v36 = v32->score;
@@ -729,7 +729,7 @@ void jkHud_Draw()
             a4.width = 9;
             a4.x = jkHud_rectViewScores.x + 20;
             a4.height = (*jkHud_pMsgFontSft->bitmap->mipSurfaces)->format.height - 2;
-            v49 = jkStrings_GetText("HUD_TEAMSCORESTITLE");
+            v49 = jkStrings_GetUniStringWithFallback("HUD_TEAMSCORESTITLE");
             stdFont_Draw4(
                 Video_pMenuBuffer,
                 jkHud_pMsgFontSft,
@@ -740,7 +740,7 @@ void jkHud_Draw()
                 1,
                 v49,
                 1);
-            v50 = jkStrings_GetText("HUD_TEAMNAME");
+            v50 = jkStrings_GetUniStringWithFallback("HUD_TEAMNAME");
             stdFont_Draw4(
                 Video_pMenuBuffer,
                 jkHud_pMsgFontSft,
@@ -751,7 +751,7 @@ void jkHud_Draw()
                 0,
                 v50,
                 1);
-            v51 = jkStrings_GetText("HUD_TEAMPLAYERS");
+            v51 = jkStrings_GetUniStringWithFallback("HUD_TEAMPLAYERS");
             stdFont_Draw4(
                 Video_pMenuBuffer,
                 jkHud_pMsgFontSft,
@@ -762,7 +762,7 @@ void jkHud_Draw()
                 0,
                 v51,
                 1);
-            v52 = jkStrings_GetText("HUD_TEAMSCORE");
+            v52 = jkStrings_GetUniStringWithFallback("HUD_TEAMSCORE");
             stdFont_Draw4(
                 Video_pMenuBuffer,
                 jkHud_pMsgFontSft,
@@ -787,20 +787,20 @@ void jkHud_Draw()
                     switch ( v54->field_0 )
                     {
                         case 1:
-                            v55 = jkStrings_GetText("GUI_RED");
+                            v55 = jkStrings_GetUniStringWithFallback("GUI_RED");
                             goto LABEL_115;
                         case 2:
-                            v55 = jkStrings_GetText("GUI_GOLD");
+                            v55 = jkStrings_GetUniStringWithFallback("GUI_GOLD");
                             goto LABEL_115;
                         case 3:
-                            v66 = jkStrings_GetText("GUI_BLUE");
+                            v66 = jkStrings_GetUniStringWithFallback("GUI_BLUE");
                             stdFont_Draw1(Video_pMenuBuffer, jkHud_pMsgFontSft, jkHud_rectViewScores.x + 40, v53, jkHud_rectViewScores.width, v66, 1);
                             goto LABEL_116;
                         case 4:
-                            v55 = jkStrings_GetText("GUI_GREEN");
+                            v55 = jkStrings_GetUniStringWithFallback("GUI_GREEN");
                             goto LABEL_115;
                         default:
-                            v55 = jkStrings_GetText("GUI_NONE");
+                            v55 = jkStrings_GetUniStringWithFallback("GUI_NONE");
 LABEL_115:
                             stdFont_Draw1(Video_pMenuBuffer, jkHud_pMsgFontSft, jkHud_rectViewScores.x + 40, v53, jkHud_rectViewScores.width, v55, 1);
 LABEL_116:
@@ -821,7 +821,7 @@ LABEL_116:
             a4.x = jkHud_rectViewScores.x;
             a4.width = 9;
             a4.height = (*jkHud_pMsgFontSft->bitmap->mipSurfaces)->format.height - 2;
-            v42 = jkStrings_GetText("HUD_PLAYERSCORES");
+            v42 = jkStrings_GetUniStringWithFallback("HUD_PLAYERSCORES");
             stdFont_Draw4(
                 Video_pMenuBuffer,
                 jkHud_pMsgFontSft,
@@ -1288,12 +1288,12 @@ void jkHud_DrawGPU()
                     // MOTS altered here "_SHORT" TODO
                     /*
                             _sprintf(local_11c,"%s_SHORT",&local_14c);
-                            pwVar7 = jkStrings_GetText2(local_11c);
+                            pwVar7 = jkStrings_GetUniString(local_11c);
                             if (pwVar7 == (wchar_t *)0x0) {
-                                pwVar7 = jkStrings_GetText((char *)&local_14c);
+                                pwVar7 = jkStrings_GetUniStringWithFallback((char *)&local_14c);
                             }
                     */
-                    v34 = jkStrings_GetText(tmpFname);
+                    v34 = jkStrings_GetUniStringWithFallback(tmpFname);
                     stdString_SafeWStrCopy(jkHud_aPlayerScores[jkHud_numPlayers].modelName, v34, 0x20);
                     v35 = jkHud_numPlayers;
                     v36 = v32->score;
@@ -1327,7 +1327,7 @@ void jkHud_DrawGPU()
             a4.width = HUD_SCALED(9);
             a4.x = jkHud_rectViewScores.x + HUD_SCALED(20);
             a4.height = HUD_SCALED((*jkHud_pMsgFontSft->bitmap->mipSurfaces)->format.height - 2);
-            v49 = jkStrings_GetText("HUD_TEAMSCORESTITLE");
+            v49 = jkStrings_GetUniStringWithFallback("HUD_TEAMSCORESTITLE");
             stdFont_Draw4GPU(
                 jkHud_pMsgFontSft,
                 jkHud_rectViewScores.x,
@@ -1338,7 +1338,7 @@ void jkHud_DrawGPU()
                 v49,
                 1,
                 jkPlayer_hudScale);
-            v50 = jkStrings_GetText("HUD_TEAMNAME");
+            v50 = jkStrings_GetUniStringWithFallback("HUD_TEAMNAME");
             stdFont_Draw4GPU(
                 jkHud_pMsgFontSft,
                 jkHud_rectViewScores.x + HUD_SCALED(40),
@@ -1349,7 +1349,7 @@ void jkHud_DrawGPU()
                 v50,
                 1,
                 jkPlayer_hudScale);
-            v51 = jkStrings_GetText("HUD_TEAMPLAYERS");
+            v51 = jkStrings_GetUniStringWithFallback("HUD_TEAMPLAYERS");
             stdFont_Draw4GPU(
                 jkHud_pMsgFontSft,
                 jkHud_rectViewScores.x + HUD_SCALED(80),
@@ -1360,7 +1360,7 @@ void jkHud_DrawGPU()
                 v51,
                 1,
                 jkPlayer_hudScale);
-            v52 = jkStrings_GetText("HUD_TEAMSCORE");
+            v52 = jkStrings_GetUniStringWithFallback("HUD_TEAMSCORE");
             stdFont_Draw4GPU(
                 jkHud_pMsgFontSft,
                 jkHud_rectViewScores.x + HUD_SCALED(140),
@@ -1386,20 +1386,20 @@ void jkHud_DrawGPU()
                     switch ( v54->field_0 )
                     {
                         case 1:
-                            v55 = jkStrings_GetText("GUI_RED");
+                            v55 = jkStrings_GetUniStringWithFallback("GUI_RED");
                             goto LABEL_115;
                         case 2:
-                            v55 = jkStrings_GetText("GUI_GOLD");
+                            v55 = jkStrings_GetUniStringWithFallback("GUI_GOLD");
                             goto LABEL_115;
                         case 3:
-                            v66 = jkStrings_GetText("GUI_BLUE");
+                            v66 = jkStrings_GetUniStringWithFallback("GUI_BLUE");
                             stdFont_Draw1GPU(jkHud_pMsgFontSft, jkHud_rectViewScores.x + HUD_SCALED(40), v53, jkHud_rectViewScores.width, v66, 1, jkPlayer_hudScale);
                             goto LABEL_116;
                         case 4:
-                            v55 = jkStrings_GetText("GUI_GREEN");
+                            v55 = jkStrings_GetUniStringWithFallback("GUI_GREEN");
                             goto LABEL_115;
                         default:
-                            v55 = jkStrings_GetText("GUI_NONE");
+                            v55 = jkStrings_GetUniStringWithFallback("GUI_NONE");
 LABEL_115:
                             stdFont_Draw1GPU(jkHud_pMsgFontSft, jkHud_rectViewScores.x + HUD_SCALED(40), v53, jkHud_rectViewScores.width, v55, 1, jkPlayer_hudScale);
 LABEL_116:
@@ -1420,7 +1420,7 @@ LABEL_116:
             a4.x = jkHud_rectViewScores.x;
             a4.width = HUD_SCALED(9);
             a4.height = HUD_SCALED((*jkHud_pMsgFontSft->bitmap->mipSurfaces)->format.height - 2);
-            v42 = jkStrings_GetText("HUD_PLAYERSCORES");
+            v42 = jkStrings_GetUniStringWithFallback("HUD_PLAYERSCORES");
             stdFont_Draw4GPU(
                 jkHud_pMsgFontSft,
                 jkHud_rectViewScores.x,
@@ -1597,13 +1597,13 @@ int jkHud_Chat()
     {
         if ( sithNet_isMulti != 0 )
         {
-            v2 = jkStrings_GetText("HUD_SENDTOALL");
+            v2 = jkStrings_GetUniStringWithFallback("HUD_SENDTOALL");
             stdString_SafeWStrCopy(tmp, v2, 0x80u);
         }
     }
     else
     {
-        v3 = jkStrings_GetText("HUD_COMMAND");
+        v3 = jkStrings_GetUniStringWithFallback("HUD_COMMAND");
         stdString_SafeWStrCopy(tmp, v3, 0x80u);
     }
     v0 = _wcslen(tmp);
@@ -1666,12 +1666,12 @@ void jkHud_SendChat(char a1)
         }
         if ( jkHud_dword_552D10 == -2 )
         {
-            v4 = jkStrings_GetText("HUD_COMMAND");
+            v4 = jkStrings_GetUniStringWithFallback("HUD_COMMAND");
             stdString_SafeWStrCopy(tmp, v4, 0x80u);
         }
         else if ( jkHud_dword_552D10 == -1 )
         {
-            v3 = jkStrings_GetText("HUD_SENDTOALL");
+            v3 = jkStrings_GetUniStringWithFallback("HUD_SENDTOALL");
             stdString_SafeWStrCopy(tmp, v3, 0x80u);
         }
         v2 = _wcslen(tmp);
@@ -1766,12 +1766,12 @@ int jkHud_chat2()
 
     if ( jkHud_dword_552D10 == -2 )
     {
-        v3 = jkStrings_GetText("HUD_COMMAND");
+        v3 = jkStrings_GetUniStringWithFallback("HUD_COMMAND");
         _wcsncpy(a1, v3, 0x80u);
     }
     else if ( jkHud_dword_552D10 == -1 )
     {
-        v2 = jkStrings_GetText("HUD_SENDTOALL");
+        v2 = jkStrings_GetUniStringWithFallback("HUD_SENDTOALL");
         _wcsncpy(a1, v2, 0x80u);
     }
     v0 = _wcslen(a1);

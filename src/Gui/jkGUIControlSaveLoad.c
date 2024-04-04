@@ -15,7 +15,7 @@
 #include "General/stdFileUtil.h"
 #include "Devices/sithControl.h"
 
-static int jkGuiControlSaveLoad_aIdk[2] = {0xD, 0xE};
+static int jkGuiControlSaveLoad_listboxBitmapIndices[2] = {14, 15};
 static wchar_t jkGuiControlSaveLoad_awTmp[256];
 static Darray jkGuiControlSaveLoad_darray;
 static int jkGuiControlSaveLoad_dword_559C80;
@@ -28,15 +28,15 @@ static jkGuiElement jkGuiControlSaveLoad_aElements[9] = {
     { ELEMENT_TEXT, 0, 0, "GUI_CSLENTERSETNAME", 2, { 400, 160, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
     { ELEMENT_TEXTBOX, 0, 0, jkGuiControlSaveLoad_awTmp, 64, { 400, 205, 200, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
     { ELEMENT_TEXT, 0, 0, "GUI_CSLSETSELECT", 2, { 40, 135, 330, 20 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-    { ELEMENT_LISTBOX, 12345, 0, NULL, 0, { 40, 160, 330, 241 }, 1, 0, NULL, NULL, &jkGuiControlSaveLoad_sub_41E470, &jkGuiControlSaveLoad_aIdk, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_LISTBOX, 12345, 0, NULL, 0, { 40, 160, 330, 241 }, 1, 0, NULL, NULL, jkGuiControlSaveLoad_sub_41E470, jkGuiControlSaveLoad_listboxBitmapIndices, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
     { ELEMENT_TEXTBUTTON, 1, 2, "GUI_OK", 3, { 440, 430, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
     { ELEMENT_TEXTBUTTON, -1, 2, "GUI_CANCEL", 3, { 0, 430, 200, 40 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-    { ELEMENT_TEXTBUTTON, 0, 2, "GUI_CSLDELETE", 3, { 230, 430, 180, 40 }, 1, 0, NULL, NULL, &jkGuiControlSaveLoad_ConfirmDelete, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+    { ELEMENT_TEXTBUTTON, 0, 2, "GUI_CSLDELETE", 3, { 230, 430, 180, 40 }, 1, 0, NULL, NULL, jkGuiControlSaveLoad_ConfirmDelete, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
     { ELEMENT_END, 0, 0, NULL, 0, { 0, 0, 0, 0 }, 0, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 }
 };
 
 static jkGuiMenu jkGuiControlSaveLoad_menu = {
-    &jkGuiControlSaveLoad_aElements, -1, 0xFFFF, 0xFFFF, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, 0, NULL, "thermloop01.wav", "thrmlpu2.wav", NULL, NULL, NULL, 0, NULL, NULL
+    jkGuiControlSaveLoad_aElements, -1, 0xFFFF, 0xFFFF, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, 0, NULL, "thermloop01.wav", "thrmlpu2.wav", NULL, NULL, NULL, 0, NULL, NULL
 };
 
 int jkGuiControlSaveLoad_sub_41E470(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int bRedraw)
@@ -75,8 +75,8 @@ int jkGuiControlSaveLoad_ConfirmDelete(jkGuiElement *pElement, jkGuiMenu *pMenu,
     if ( jkGuiControlSaveLoad_aElements[4].selectedTextEntry < jkGuiControlSaveLoad_darray.total )
     {
         v5 = (jkGuiControlInfo *)jkGuiRend_GetId(&jkGuiControlSaveLoad_darray, jkGuiControlSaveLoad_aElements[4].selectedTextEntry);
-        v11 = jkStrings_GetText("GUI_CSLCONFIRM_DELETE");
-        v6 = jkStrings_GetText("GUI_CSLDELETE");
+        v11 = jkStrings_GetUniStringWithFallback("GUI_CSLCONFIRM_DELETE");
+        v6 = jkStrings_GetUniStringWithFallback("GUI_CSLDELETE");
         if ( jkGuiDialog_YesNoDialog(v6, v11) )
         {
             stdString_snprintf(tmp, 128, "controls\\%s", v5->fpath); // Added: sprintf -> snprintf
@@ -180,7 +180,7 @@ int jkGuiControlSaveLoad_Write(int bIdk)
     v1 = "GUI_CSLSAVESET";
     if ( !bIdk )
         v1 = "GUI_CSLLOADSET";
-    jkGuiControlSaveLoad_aElements[0].wstr = (const char *)jkStrings_GetText2(v1);
+    jkGuiControlSaveLoad_aElements[0].wstr = jkStrings_GetUniString(v1);
     jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiControlSaveLoad_menu, &jkGuiControlSaveLoad_aElements[5]);
     jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiControlSaveLoad_menu, &jkGuiControlSaveLoad_aElements[6]);
     _wcsncpy(jkGuiControlSaveLoad_awTmp, jkGuiControlSaveLoad_aUnk, 0xFFu);
@@ -193,7 +193,7 @@ int jkGuiControlSaveLoad_Write(int bIdk)
             goto LABEL_43;
         if ( !bIdk || _wcslen(jkGuiControlSaveLoad_awTmp) )
             break;
-        jkGuiDialog_ErrorDialog(jkStrings_GetText("ERROR"), jkStrings_GetText("GUI_CSLMUSTENTERNAME"));
+        jkGuiDialog_ErrorDialog(jkStrings_GetUniStringWithFallback("ERROR"), jkStrings_GetUniStringWithFallback("GUI_CSLMUSTENTERNAME"));
     }
     if ( jkGuiControlSaveLoad_aElements[4].selectedTextEntry < 0 || jkGuiControlSaveLoad_aElements[4].selectedTextEntry >= jkGuiControlSaveLoad_darray.total )
         v5 = 0;
@@ -246,7 +246,7 @@ int jkGuiControlSaveLoad_Write(int bIdk)
         headerTmp.wstr[63] = 0;
         if ( stdConffile_OpenWrite(fpath) )
         {
-            stdConffile_Write(&headerTmp, sizeof(jkGuiControlInfoHeader));
+            stdConffile_Write((const char*)&headerTmp, sizeof(jkGuiControlInfoHeader));
             sithControl_WriteConf();
             stdConffile_CloseWrite();
             goto LABEL_43;

@@ -72,7 +72,7 @@ int jkGuiDialog_OkCancelDialog(wchar_t *stringA, wchar_t *stringB)
     jkGuiDialog_OkCancel_buttons[1].wstr = stringB;
     jkGuiDialog_OkCancel_menu.texture = jkGuiDialog_sub_416900();
     jkGuiDialog_OkCancel_menu.palette = 0;
-    jkGuiDialog_OkCancel_buttons[2].wstr = jkStrings_GetText("GUI_OK");
+    jkGuiDialog_OkCancel_buttons[2].wstr = jkStrings_GetUniStringWithFallback("GUI_OK");
     jkGuiDialog_OkCancel_buttons[3].bIsVisible = 1;
     jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiDialog_OkCancel_menu, &jkGuiDialog_OkCancel_buttons[2]);
     jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiDialog_OkCancel_menu, &jkGuiDialog_OkCancel_buttons[3]);
@@ -98,7 +98,7 @@ void jkGuiDialog_ErrorDialog(wchar_t *stringA, wchar_t *stringB)
     jkGuiDialog_Ok_buttons[1].wstr = stringB;
     jkGuiDialog_Ok_menu.texture = jkGuiDialog_sub_416900();
     jkGuiDialog_Ok_menu.palette = 0;
-    jkGuiDialog_Ok_buttons[2].wstr = jkStrings_GetText("GUI_OK");
+    jkGuiDialog_Ok_buttons[2].wstr = jkStrings_GetUniStringWithFallback("GUI_OK");
     jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiDialog_Ok_menu, &jkGuiDialog_Ok_buttons[2]);
     jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiDialog_Ok_menu, &jkGuiDialog_Ok_buttons[2]);
     jkGuiRend_DisplayAndReturnClicked(&jkGuiDialog_Ok_menu);
@@ -123,8 +123,8 @@ int jkGuiDialog_YesNoDialog(wchar_t *stringA, wchar_t *stringB)
     jkGuiDialog_OkCancel_buttons[1].wstr = stringB;
     jkGuiDialog_OkCancel_menu.texture = jkGuiDialog_sub_416900();
     jkGuiDialog_OkCancel_menu.palette = 0;
-    jkGuiDialog_OkCancel_buttons[2].wstr = jkStrings_GetText("GUI_YES");
-    jkGuiDialog_OkCancel_buttons[3].wstr = jkStrings_GetText("GUI_NO");
+    jkGuiDialog_OkCancel_buttons[2].wstr = jkStrings_GetUniStringWithFallback("GUI_YES");
+    jkGuiDialog_OkCancel_buttons[3].wstr = jkStrings_GetUniStringWithFallback("GUI_NO");
     jkGuiDialog_OkCancel_buttons[3].bIsVisible = 1;
     jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiDialog_OkCancel_menu, &jkGuiDialog_OkCancel_buttons[2]);
     jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiDialog_OkCancel_menu, &jkGuiDialog_OkCancel_buttons[3]);

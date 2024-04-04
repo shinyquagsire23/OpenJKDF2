@@ -46,19 +46,19 @@
 #define stdDisplay_sub_424440_ADDR (0x0424440)
 #define stdDisplay_SortVideoModes_ADDR (0x04246E0)
 
+extern rdColor24 stdDisplay_masterPalette[256];
+
 void stdDisplay_SetGammaTable(int len, double *table);
 uint8_t* stdDisplay_GetPalette();
 void stdDisplay_GammaCorrect(const void *pPal);
 
+#if !defined(SDL2_RENDER) && defined(WIN32)
 static int (*stdDisplay_DrawAndFlipGdi)(uint32_t) = (void*)stdDisplay_DrawAndFlipGdi_ADDR;
 static int (*stdDisplay_SetCooperativeLevel)(uint32_t) = (void*)stdDisplay_SetCooperativeLevel_ADDR;
 static void (*stdDisplay_422A50)() = (void*)stdDisplay_422A50_ADDR;
 static void (*stdDisplay_ClearMode)() = (void*)stdDisplay_ClearMode_ADDR;
 //static char* (*stdDisplay_GetPalette)() = (void*)stdDisplay_GetPalette_ADDR;
 
-extern rdColor24 stdDisplay_masterPalette[256];
-
-#ifndef SDL2_RENDER
 static int (*stdDisplay_Startup)() = (void*)stdDisplay_Startup_ADDR;
 static int (*stdDisplay_VBufferFill)(stdVBuffer *a2, int fillColor, rdRect *a4) = (void*)stdDisplay_VBufferFill_ADDR;
 static int (*stdDisplay_VBufferCopy)(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int blit_x, int blit_y, rdRect *rect, int alpha_maybe) = (void*)stdDisplay_VBufferCopy_ADDR;
@@ -104,6 +104,10 @@ void stdDisplay_ddraw_surface_flip2();
 void stdDisplay_RestoreDisplayMode();
 stdVBuffer* stdDisplay_VBufferConvertColorFormat(void* a, stdVBuffer* b);
 int stdDisplay_GammaCorrect3(int a1);
+
+int stdDisplay_SetCooperativeLevel(uint32_t a);
+int stdDisplay_DrawAndFlipGdi(uint32_t a);
+void stdDisplay_422A50();
 #endif
 
 #endif // _STDDISPLAY_H

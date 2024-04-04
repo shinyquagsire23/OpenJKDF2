@@ -29,6 +29,8 @@ int sithCvar_Startup()
     jkPlayer_StartupVars();
     stdUpdater_StartupCvars();
 
+    sithCvar_LoadGlobals();
+
     return 1;
 }
 
@@ -93,6 +95,7 @@ int sithCvar_SaveVar(tSithCvar* pCvar, const char* pFpath)
         default:
             return 0;
     }
+
     return 1;
 }
 
@@ -100,7 +103,6 @@ int sithCvar_LoadVar(tSithCvar* pCvar, const char* pFpath)
 {
     char tmp[SITHCVAR_MAX_STRLEN];
     if (!pCvar) return 0;
-    sithCvar_UpdateValInternal(pCvar);
 
     switch (pCvar->type) {
         case CVARTYPE_BOOL:
@@ -113,12 +115,16 @@ int sithCvar_LoadVar(tSithCvar* pCvar, const char* pFpath)
             pCvar->flexVal = stdJSON_GetFloat(pFpath, pCvar->pName, pCvar->flexVal);
             break;
         case CVARTYPE_STR:
+            memset(tmp, 0, SITHCVAR_MAX_STRLEN);
             stdJSON_GetString(pFpath, pCvar->pName, tmp, SITHCVAR_MAX_STRLEN, pCvar->pStrVal);
+            memset((char*)pCvar->pStrVal, 0, SITHCVAR_MAX_STRLEN);
             stdString_SafeStrCopy(pCvar->pStrVal, tmp, SITHCVAR_MAX_STRLEN);
             break;
         default:
             return 0;
     }
+
+    sithCvar_UpdateLinkInternal(pCvar);
     return 1;
 }
 
@@ -204,11 +210,11 @@ int sithCvar_ResetGlobals()
 
 tSithCvar* sithCvar_Find(const char* pName)
 {
-    char tmp[256];
+    char tmp[SITHCVAR_MAX_NAME_STRLEN];
     if (!pName) return NULL;
 
     memset(tmp, 0, sizeof(tmp));
-    stdString_SafeStrCopy(tmp, pName, SITHCVAR_MAX_STRLEN);
+    stdString_SafeStrCopy(tmp, pName, SITHCVAR_MAX_NAME_STRLEN);
     _strtolower(tmp);
 
     tSithCvar* pCvar = (tSithCvar*)stdHashTable_GetKeyVal(sithCvar_pHashTable, tmp);
@@ -219,7 +225,7 @@ int sithCvar_Register(const char* pName, int32_t type, intptr_t defaultVal, void
 {
     if (sithCvar_numRegistered >= SITHCVAR_MAX_CVARS) return 0;
 
-    char* tmp = pHS->alloc(SITHCVAR_MAX_STRLEN);
+    char* tmp = pHS->alloc(SITHCVAR_MAX_NAME_STRLEN);
     if (!tmp) return 0;
 
     tSithCvar* pCvar = &sithCvar_aCvars[sithCvar_numRegistered++];
@@ -252,11 +258,11 @@ int sithCvar_Register(const char* pName, int32_t type, intptr_t defaultVal, void
     pCvar->pLinkPtr = pLinkPtr;
     pCvar->flags = flags;
 
-    memset(pCvar->pNameLower, 0, SITHCVAR_MAX_STRLEN);
-    stdString_SafeStrCopy(pCvar->pNameLower, pName, SITHCVAR_MAX_STRLEN);
+    memset(pCvar->pNameLower, 0, SITHCVAR_MAX_NAME_STRLEN);
+    stdString_SafeStrCopy(pCvar->pNameLower, pName, SITHCVAR_MAX_NAME_STRLEN);
     _strtolower(pCvar->pNameLower);
     stdHashTable_SetKeyVal(sithCvar_pHashTable, pCvar->pNameLower, pCvar);
-    
+
     sithCvar_UpdateLinkInternal(pCvar);
 
     return 1;
@@ -422,11 +428,12 @@ int sithCvar_UpdateLinkInternal(tSithCvar* pCvar)
             *(float*)pCvar->pLinkPtr = pCvar->flexVal;
             break;
         case CVARTYPE_STR:
+            memset((char*)pCvar->pLinkPtr, 0, SITHCVAR_MAX_STRLEN);
             stdString_SafeStrCopy((char*)pCvar->pLinkPtr, pCvar->pStrVal, SITHCVAR_MAX_STRLEN);
             break;
     }
 
-    if (pCvar->flags & CVARFLAG_RESETHUD) {
+    if ((pCvar->flags & CVARFLAG_RESETHUD) && jkHud_bOpened) {
         jkHud_Close();
         jkHud_Open();
     }
@@ -606,4 +613,6 @@ int sithCvar_SetFromString(const char* pName, const char* pStrVal)
             stdString_SafeStrCopy(pCvar->pStrVal, pStrVal, SITHCVAR_MAX_STRLEN);
             return sithCvar_UpdateLinkInternal(pCvar);
     }
+
+    return 0;
 }

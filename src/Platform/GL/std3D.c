@@ -468,13 +468,13 @@ int init_resources()
     std3D_activeFb = 1;
     std3D_pFb = &std3D_framebuffers[0];
     
-    if ((programDefault = std3D_loadProgram("resource/shaders/default")) == 0) return false;
-    if ((programMenu = std3D_loadProgram("resource/shaders/menu")) == 0) return false;
-    if (!std3D_loadSimpleTexProgram("resource/shaders/ui", &std3D_uiProgram)) return false;
-    if (!std3D_loadSimpleTexProgram("resource/shaders/texfbo", &std3D_texFboStage)) return false;
-    if (!std3D_loadSimpleTexProgram("resource/shaders/blur", &std3D_blurStage)) return false;
-    if (!std3D_loadSimpleTexProgram("resource/shaders/ssao", &std3D_ssaoStage)) return false;
-    if (!std3D_loadSimpleTexProgram("resource/shaders/ssao_mix", &std3D_ssaoMixStage)) return false;
+    if ((programDefault = std3D_loadProgram("shaders/default")) == 0) return false;
+    if ((programMenu = std3D_loadProgram("shaders/menu")) == 0) return false;
+    if (!std3D_loadSimpleTexProgram("shaders/ui", &std3D_uiProgram)) return false;
+    if (!std3D_loadSimpleTexProgram("shaders/texfbo", &std3D_texFboStage)) return false;
+    if (!std3D_loadSimpleTexProgram("shaders/blur", &std3D_blurStage)) return false;
+    if (!std3D_loadSimpleTexProgram("shaders/ssao", &std3D_ssaoStage)) return false;
+    if (!std3D_loadSimpleTexProgram("shaders/ssao_mix", &std3D_ssaoMixStage)) return false;
 
     // Attributes/uniforms
     attribute_coord3d = std3D_tryFindAttribute(programDefault, "coord3d");
@@ -673,6 +673,8 @@ void std3D_Shutdown()
 
 void std3D_FreeResources()
 {
+    std3D_PurgeTextureCache();
+
     glDeleteProgram(programDefault);
     glDeleteProgram(programMenu);
     std3D_deleteFramebuffer(&std3D_framebuffers[0]);
@@ -802,8 +804,6 @@ int std3D_StartScene()
         loaded_colormap = sithWorld_pCurrentWorld->colormaps;
     }
 
-    
-    
     if (memcmp(displaypal_data, stdDisplay_masterPalette, 0x300))
     {
         glBindTexture(GL_TEXTURE_2D, displaypal_texture);
@@ -2398,7 +2398,8 @@ void std3D_DoTex(rdDDrawSurface* tex, rdTri* tri, int tris_left)
     }
     //if (tex->emissive_factor[0] != 0.0 || tex->emissive_factor[1] != 0.0 || tex->emissive_factor[2] != 0.0)
     //    stdPlatform_Printf("%f %f %f\n", tex->emissive_factor[0], tex->emissive_factor[1], tex->emissive_factor[2]);
-    glUniform3f(uniform_emissiveFactor, tex->emissive_factor[0], tex->emissive_factor[1], tex->emissive_factor[2]);
+    float emissive_mult = (jkPlayer_enableBloom ? 1.0 : 5.0);
+    glUniform3f(uniform_emissiveFactor, tex->emissive_factor[0] * emissive_mult, tex->emissive_factor[1] * emissive_mult, tex->emissive_factor[2] * emissive_mult);
     glUniform4f(uniform_albedoFactor, tex->albedo_factor[0], tex->albedo_factor[1], tex->albedo_factor[2], tex->albedo_factor[3]);
     if (tex->displacement_factor) {
         //printf("%f\n", tex->displacement_factor);
@@ -3577,8 +3578,13 @@ void std3D_PurgeTextureCache()
         return;
     }
 
-    jk_printf("Purging texture cache...\n");
-    for (int i = 0; i < STD3D_MAX_TEXTURES; i++)
+    if (!std3D_loadedTexturesAmt) {
+        jk_printf("Skipping texture cache purge, nothing loaded.\n");
+        return;
+    }
+
+    jk_printf("Purging texture cache... %x\n", std3D_loadedTexturesAmt);
+    for (int i = 0; i < std3D_loadedTexturesAmt; i++)
     {
         std3D_PurgeTextureEntry(i);
     }

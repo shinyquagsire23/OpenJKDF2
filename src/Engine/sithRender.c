@@ -242,7 +242,7 @@ void sithRender_SetLightMode(rdLightMode_t lightMode)
     sithRender_lightMode = lightMode;
 }
 
-void sithRender_SetTexMode(int texMode)
+void sithRender_SetTexMode(rdTexMode_t texMode)
 {
     sithRender_texMode = texMode;
 }
@@ -334,12 +334,12 @@ void sithRender_Draw()
 
     // Added: noclip
     if (!sithPlayer_bNoClippingRend) {
-        sithRender_Clip(sithCamera_currentCamera->sector, rdCamera_pCurCamera->cameraClipFrustum, 0.0);
+        sithRender_Clip(sithCamera_currentCamera->sector, rdCamera_pCurCamera->pClipFrustum, 0.0);
     }
     else {
         for (int i = 0; i < sithWorld_pCurrentWorld->numSectors; i++)
         {
-            sithRender_Clip(&sithWorld_pCurrentWorld->sectors[i], rdCamera_pCurCamera->cameraClipFrustum, 0.0);
+            sithRender_Clip(&sithWorld_pCurrentWorld->sectors[i], rdCamera_pCurCamera->pClipFrustum, 0.0);
         }
     }
 
@@ -438,7 +438,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
 
     if ( sector->renderTick == sithRender_lastRenderTick )
     {
-        sector->clipFrustum = rdCamera_pCurCamera->cameraClipFrustum;
+        sector->clipFrustum = rdCamera_pCurCamera->pClipFrustum;
     }
     else
     {
@@ -642,7 +642,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
             if ((((unsigned int)meshinfo_out.numVertices >= 3u) || (rdClip_faceStatus & 0x40)) 
                 && ((rdClip_faceStatus & 0x41) || ((adjoinIter->flags & 1) && bAdjoinIsTransparent))) 
             {
-                rdCamera_pCurCamera->projectLst(sithRender_aVerticesTmp_projected, sithRender_aVerticesTmp, meshinfo_out.numVertices);
+                rdCamera_pCurCamera->fnProjectLst(sithRender_aVerticesTmp_projected, sithRender_aVerticesTmp, meshinfo_out.numVertices);
                 
                 v31 = frustumArg;
 
@@ -783,7 +783,7 @@ void sithRender_RenderLevelGeometry()
     sithRender_idxInfo.vertices = sithWorld_pCurrentWorld->verticesTransformed;
     sithRender_idxInfo.paDynamicLight = sithWorld_pCurrentWorld->verticesDynamicLight;
     sithRender_idxInfo.vertexUVs = vertices_uvs;
-    v77 = rdCamera_pCurCamera->cameraClipFrustum;
+    v77 = rdCamera_pCurCamera->pClipFrustum;
 
     for (v72 = 0; v72 < sithRender_numSectors; v72++)
     {
@@ -944,7 +944,7 @@ void sithRender_RenderLevelGeometry()
                 {
                     continue;
                 }
-                rdCamera_pCurCamera->projectLst(procEntry->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
+                rdCamera_pCurCamera->fnProjectLst(procEntry->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
                 if ( sithRender_lightingIRMode )
                 {
                     v49 = sithRender_f_83198C;
@@ -1161,7 +1161,7 @@ void sithRender_RenderLevelGeometry()
                     if ( meshinfo_out.numVertices < 3u )
                         goto LABEL_92;
 
-                    rdCamera_pCurCamera->projectLst(v20->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
+                    rdCamera_pCurCamera->fnProjectLst(v20->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
 
                     if ( sithRender_lightingIRMode )
                     {
@@ -1351,7 +1351,7 @@ LABEL_150:
     }
 
     rdCache_Flush();
-    rdCamera_pCurCamera->cameraClipFrustum = v77;
+    rdCamera_pCurCamera->pClipFrustum = v77;
 }
 
 void sithRender_UpdateAllLights()
@@ -1754,41 +1754,42 @@ void sithRender_RenderThings()
     
 }
 
-int sithRender_RenderThing(sithThing *povThing)
+int sithRender_RenderThing(sithThing *pThing)
 {
     int ret;
 
-    if ( (povThing->thingflags & SITH_TF_INCAMFOV) == 0 && !(g_debugmodeFlags & DEBUGFLAG_NOCLIP)) // Added: don't send sighted stuff in noclip
+    if (!(pThing->thingflags & SITH_TF_INCAMFOV) && !(g_debugmodeFlags & DEBUGFLAG_NOCLIP)) // Added: don't send sighted stuff in noclip
     {
-        if ( (povThing->thingflags & SITH_TF_CAPTURED) != 0 ) 
-            sithCog_SendMessageFromThing(povThing, 0, SITH_MESSAGE_SIGHTED);
-
-        if ( povThing->thingtype == SITH_THING_ACTOR )
-        {
-            if ( povThing->actor )
-            {
-                povThing->actor->flags &= ~SITHAI_MODE_SLEEPING;
-            }
+        if (pThing->thingflags & SITH_TF_CAPTURED) {
+            sithCog_SendMessageFromThing(pThing, 0, SITH_MESSAGE_SIGHTED);
         }
-        povThing->thingflags |= SITH_TF_INCAMFOV;
+
+        if (pThing->thingtype == SITH_THING_ACTOR && pThing->actor)
+        {
+            pThing->actor->flags &= ~SITHAI_MODE_SLEEPING;
+        }
+        pThing->thingflags |= SITH_TF_INCAMFOV;
     }
 
-    povThing->isVisible = bShowInvisibleThings;
-    povThing->lookOrientation.scale = povThing->position;
-    ret = rdThing_Draw(&povThing->rdthing, &povThing->lookOrientation);
-    rdVector_Zero3(&povThing->lookOrientation.scale);
-    if ( sithRender_weaponRenderHandle && (povThing->thingflags & SITH_TF_RENDERWEAPON) != 0 )
-        sithRender_weaponRenderHandle(povThing);
-    if ( povThing->type == SITH_THING_EXPLOSION && (povThing->explosionParams.typeflags & SITHEXPLOSION_FLAG_FLASH_BLINDS_THINGS) != 0 )
+    pThing->isVisible = bShowInvisibleThings;
+    pThing->lookOrientation.scale = pThing->position;
+    ret = rdThing_Draw(&pThing->rdthing, &pThing->lookOrientation);
+    rdVector_Zero3(&pThing->lookOrientation.scale);
+    if (sithRender_weaponRenderHandle && (pThing->thingflags & SITH_TF_RENDERWEAPON)) {
+        sithRender_weaponRenderHandle(pThing);
+    }
+
+    if (pThing->type == SITH_THING_EXPLOSION && (pThing->explosionParams.typeflags & SITHEXPLOSION_FLAG_FLASH_BLINDS_THINGS))
     {
-        float v5 = stdMath_Dist3D1(povThing->screenPos.x, povThing->screenPos.y, povThing->screenPos.z);
-        uint32_t v6 = povThing->explosionParams.flashB;
-        uint32_t v7 = povThing->explosionParams.flashR;
-        uint32_t v8 = povThing->explosionParams.flashB;
-        float v9 = ((double)(v8 + v7 + v6) * 0.013020833 - rdCamera_pCurCamera->attenuationMin * v5) * 0.1;
-        if ( v9 > 0.0 )
-            sithPlayer_AddDyamicAdd((__int64)((double)v7 * v9 - -0.5), (__int64)((double)v6 * v9 - -0.5), (__int64)((double)v8 * v9 - -0.5));
-        povThing->explosionParams.typeflags &= ~SITHEXPLOSION_FLAG_FLASH_BLINDS_THINGS;
+        float cameraDist = stdMath_Dist3D1(pThing->screenPos.x, pThing->screenPos.y, pThing->screenPos.z);
+        uint32_t flashG = pThing->explosionParams.flashG;
+        uint32_t flashR = pThing->explosionParams.flashR;
+        uint32_t flashB = pThing->explosionParams.flashB;
+        float flashMagnitude = ((double)(flashB + flashR + flashG) * 0.013020833 - rdCamera_pCurCamera->attenuationMin * cameraDist) * 0.1;
+        if ( flashMagnitude > 0.0 ) {
+            sithPlayer_AddDyamicAdd((__int64)((double)flashR * flashMagnitude - -0.5), (__int64)((double)flashG * flashMagnitude - -0.5), (__int64)((double)flashB * flashMagnitude - -0.5));
+        }
+        pThing->explosionParams.typeflags &= ~SITHEXPLOSION_FLAG_FLASH_BLINDS_THINGS;
     }
     return ret;
 }
@@ -1887,7 +1888,7 @@ void sithRender_RenderAlphaSurfaces()
         {
             continue;
         }
-        rdCamera_pCurCamera->projectLst(v9->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
+        rdCamera_pCurCamera->fnProjectLst(v9->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
         
         v9->ambientLight = stdMath_Clamp(surfaceSector->extraLight + sithRender_008d4098, 0.0, 1.0);
 

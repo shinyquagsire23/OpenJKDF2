@@ -38,7 +38,7 @@ uint32_t stdSound_ParseWav(stdFile_t sound_file, uint32_t *nSamplesPerSec, int *
         //std_pHS->fileRead(sound_file, &seekPos, 4);
 
         // MoTS added
-        while (!std_pHS->feof(sound_file))
+        while (!std_pHS->fileEof(sound_file))
         {
             std_pHS->fileRead(sound_file, v9, 4);
             std_pHS->fileRead(sound_file, &seekPos, 4);
@@ -559,6 +559,8 @@ int stdSound_Startup()
 {
     jkGuiSound_b3DSound = 0;
 
+    printf("Using STDSOUND_NULL as audio backend\n");
+
     return 1;
 }
 
@@ -593,6 +595,7 @@ stdSound_buffer_t* stdSound_BufferCreate(int bStereo, uint32_t nSamplesPerSec, u
 
 void* stdSound_BufferSetData(stdSound_buffer_t* sound, int bufferBytes, int* bufferMaxSize)
 {
+    bufferBytes = 0x100; // HACK
     sound->bufferBytes = bufferBytes;
     
     if (bufferMaxSize)
@@ -601,6 +604,7 @@ void* stdSound_BufferSetData(stdSound_buffer_t* sound, int bufferBytes, int* buf
     if (sound->data && !sound->bIsCopy)
         std_pHS->free(sound->data);
 
+    
     sound->data = std_pHS->alloc(bufferBytes);
     sound->bufferBytes = bufferBytes;
     

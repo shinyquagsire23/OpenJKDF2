@@ -63,12 +63,12 @@ static jkGuiElement jkGuiGameplay_buttons[44] = {
     {ELEMENT_TEXTBUTTON, 0XFFFFFFFF, 2, "GUI_CANCEL", 3, {0, 430, 200, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
 
 #ifdef QOL_IMPROVEMENTS
-    {ELEMENT_CHECKBOX, 0, 0, L"Show Crosshair with lightsaber", 0, {30, 260, 270, 20}, 1, 0, L"When this is enabled the crosshair is shown when the lightsaber is equipped", 0, 0, 0, {0}, 0},
-    {ELEMENT_CHECKBOX, 0, 0, L"Show Crosshair with fist", 0, {30, 290, 270, 20}, 1, 0, L"When this is enabled the crosshair is shown when the fist is equipped", 0, 0, 0, {0}, 0},
+    {ELEMENT_CHECKBOX, 0, 0, "GUIEXT_SHOW_SABER_CROSSHAIR", 0, {30, 260, 270, 20}, 1, 0, "GUIEXT_SHOW_SABER_CROSSHAIR_HINT", 0, 0, 0, {0}, 0},
+    {ELEMENT_CHECKBOX, 0, 0, "GUIEXT_SHOW_FIST_CROSSHAIR", 0, {30, 290, 270, 20}, 1, 0, "GUIEXT_SHOW_FIST_CROSSHAIR_HINT", 0, 0, 0, {0}, 0},
     
     // 40
-    {ELEMENT_SLIDER, 0, 0, (const char*)10, 50, { 30, 345, 235, 30 }, 1, 0, L"Adjust the size of the crosshair (from 0% to 200%)", jkGuiGameplay_ScaleDraw, 0, slider_images, {0}, 0},
-    {ELEMENT_TEXT,         0,            0, L"Crosshair Scale",                 3, {30, 345-25, 235, 20}, 1,  0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_SLIDER, 0, 0, (const char*)10, 50, { 30, 345, 235, 30 }, 1, 0, "GUIEXT_CROSSHAIR_SCALE_HINT", jkGuiGameplay_ScaleDraw, 0, slider_images, {0}, 0},
+    {ELEMENT_TEXT,         0,            0, "GUIEXT_CROSSHAIR_SCALE",                 3, {30, 345-25, 235, 20}, 1,  0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXT,         0,            0, slider_val_text,        3, {30, 345+30, 235, 20}, 1,  0, 0, 0, 0, 0, {0}, 0},
 #endif /* QOL_IMPROVEMENTS */
  

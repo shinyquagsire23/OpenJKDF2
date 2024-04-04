@@ -4,14 +4,14 @@
 #include "stdPlatform.h"
 #include "jk.h"
 
-#ifdef LINUX
+#ifdef FS_POSIX
 #include "external/fcaseopen/fcaseopen.h"
 #endif
 
 // Added
 int stdMci_bIsGOG = 1;
 
-#ifndef SDL2_RENDER
+#if !defined(SDL2_RENDER) && defined(WIN32)
 
 int stdMci_Startup()
 {
@@ -254,7 +254,7 @@ int stdMci_TryPlay(const char* fpath) {
     char tmp[256];
     strncpy(tmp, fpath, 255);
 
-#ifdef LINUX
+#ifdef FS_POSIX
     char *r = malloc(strlen(tmp) + 16);
     if (casepath(tmp, r))
     {

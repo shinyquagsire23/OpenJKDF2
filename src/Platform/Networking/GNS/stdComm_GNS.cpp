@@ -414,7 +414,7 @@ public:
         memcpy(pMsg, &dataBuf[8], outsize);
         *pLenInOut = outsize;
 
-        sithDplayGNS_verbosePrintf("Recv %x bytes from %x %x (%x)\n", outsize, idFrom, idTo, *(uint32_t*)pMsg);
+        sithDplayGNS_verbosePrintf("Recv %x bytes from %x %x (%s, %x)\n", outsize, idFrom, idTo, sithDSS_IdToStr(*(uint32_t*)pMsg & 0xFF), *(uint32_t*)pMsg);
 
         // We don't need this anymore.
         pIncomingMsg->Release();
@@ -434,7 +434,7 @@ public:
         for ( auto &c: m_mapClients )
         {
             if ( c.first != except && c.second.m_id == idTo ) {
-                sithDplayGNS_verbosePrintf("Sent %x bytes to %x (%x)\n", dwDataSize+8, idTo, *(uint32_t*)lpData);
+                sithDplayGNS_verbosePrintf("Sent %x bytes to %x (%s, %x)\n", dwDataSize+8, idTo, sithDSS_IdToStr(*(uint32_t*)lpData & 0xFF), *(uint32_t*)lpData);
                 SendBytesToClient( c.first, sendBuffer, dwDataSize+8 );
             }
         }
@@ -561,7 +561,7 @@ private:
                         }
                     }
 
-                    availableIds &= ~(1 << (itClient->second.m_id-1));
+                    availableIds &= ~(1ULL << (itClient->second.m_id-1));
                     m_mapClients.erase( itClient );
                 }
                 else
@@ -588,7 +588,7 @@ private:
 
                 // Don't accept if we can't allocate an ID
                 if (ConnectedPlayers() >= 64) {
-                    stdPlatform_Printf("Rejecting request.\n");
+                    stdPlatform_Printf("Rejecting request too many players connected (%u)\n", ConnectedPlayers());
                     break;
                 }
 
@@ -615,8 +615,8 @@ private:
                 int nextId = 0;
                 for (int i = 0; i < 64; i++)
                 {
-                    if (!(availableIds & (1 << i))) {
-                        availableIds |= (1 << i);
+                    if (!(availableIds & (1ULL << i))) {
+                        availableIds |= (1ULL << i);
                         nextId = i+1;
                         break;
                     }
@@ -682,7 +682,7 @@ private:
         //RealConnectedPlayers();
         for (int i = 0; i < 64; i++)
         {
-            if (availableIds & (1 << i)) {
+            if (availableIds & (1ULL << i)) {
                 ret++;
             }
         }
@@ -702,7 +702,7 @@ private:
                 
             }
             else {
-                //availableIds |= (1 << (jkPlayer_playerInfos[i].net_id-1));
+                //availableIds |= (1ULL << (jkPlayer_playerInfos[i].net_id-1));
                 amt++;
             }
         }
@@ -828,7 +828,7 @@ public:
         memcpy(pMsg, &dataBuf[8], outsize);
         *pLenInOut = outsize;
 
-        sithDplayGNS_verbosePrintf("Recv %x bytes from %x %x (%x)\n", pIncomingMsg->m_cbSize, idFrom, idTo, *(uint32_t*)pMsg);
+        sithDplayGNS_verbosePrintf("Recv %x bytes from %x %x (%s, %x)\n", pIncomingMsg->m_cbSize, idFrom, idTo, sithDSS_IdToStr(*(uint32_t*)pMsg & 0xFF), *(uint32_t*)pMsg);
 
         // We don't need this anymore.
         pIncomingMsg->Release();
@@ -844,7 +844,7 @@ public:
 
         memcpy(&sendBuffer[8], lpData, dwDataSize);
 
-        sithDplayGNS_verbosePrintf("Sent %x bytes to %x (%x)\n", dwDataSize+8, idTo, *(uint32_t*)lpData);
+        sithDplayGNS_verbosePrintf("Sent %x bytes to %x (%s, %x)\n", dwDataSize+8, idTo, sithDSS_IdToStr(*(uint32_t*)lpData & 0xFF), *(uint32_t*)lpData);
 
         EResult ret = m_pInterface->SendMessageToConnection( m_hConnection, sendBuffer, dwDataSize+8, k_nSteamNetworkingSend_Reliable, nullptr );
         if (ret < 0) {

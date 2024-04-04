@@ -10,6 +10,7 @@
 #include "General/stdFnames.h"
 #include "General/stdFileUtil.h"
 #include "Main/sithCvar.h"
+#include "Main/jkStrings.h"
 #include "stdPlatform.h"
 
 #ifdef PLATFORM_PHYSFS
@@ -36,20 +37,22 @@ bool stdUpdater_bDownloading;
 bool stdUpdater_bFoundUpdate;
 bool stdUpdater_bCompletedUpdate;
 int stdUpdater_bDisableUpdates = 0;
+int stdUpdater_bTestUpdate = 0;
 
 char stdUpdater_pUpdaterUrl[SITHCVAR_MAX_STRLEN];
 char stdUpdater_pWin64UpdateFilename[SITHCVAR_MAX_STRLEN];
 char stdUpdater_pMacosUpdateFilename[SITHCVAR_MAX_STRLEN];
-char* stdUpdater_pUpdateFilename = "";
+char* stdUpdater_pUpdateFilename = (char*)"";
 
 void stdUpdater_StartupCvars()
 {
     sithCvar_RegisterBool("net_disableUpdates", 0, &stdUpdater_bDisableUpdates, CVARFLAG_GLOBAL);
+    sithCvar_RegisterBool("net_testUpdate", 0, &stdUpdater_bTestUpdate, CVARFLAG_GLOBAL | CVARFLAG_UPDATABLE_DEFAULT);
     sithCvar_RegisterStr("net_updaterUrl", STDUPDATER_DEFAULT_URL, &stdUpdater_pUpdaterUrl, CVARFLAG_GLOBAL | CVARFLAG_UPDATABLE_DEFAULT);
     sithCvar_RegisterStr("net_win64UpdateFilename", STDUPDATER_DEFAULT_WIN64_FILENAME, &stdUpdater_pWin64UpdateFilename, CVARFLAG_GLOBAL | CVARFLAG_UPDATABLE_DEFAULT);
     sithCvar_RegisterStr("net_macosUpdateFilename", STDUPDATER_DEFAULT_MACOS_FILENAME, &stdUpdater_pMacosUpdateFilename, CVARFLAG_GLOBAL | CVARFLAG_UPDATABLE_DEFAULT);
 
-#ifdef defined(WIN64_STANDALONE)
+#if defined(WIN64_STANDALONE)
     stdUpdater_pUpdateFilename = stdUpdater_pWin64UpdateFilename;
 #elif defined(MACOS)
     stdUpdater_pUpdateFilename = stdUpdater_pMacosUpdateFilename;
@@ -70,23 +73,26 @@ int stdUpdater_CheckForUpdates()
 {
     stdUpdater_Reset();
 
-#ifdef PLATFORM_LINUX
+#if defined(PLATFORM_LINUX) || defined(ARCH_WASM) || defined(TARGET_TWL)
     return 0;
-#endif
-
+#else
     if (stdUpdater_bDisableUpdates) {
         return 0;
     }
 
-    char* pData = (char*)stdHttp_Fetch(stdUpdater_pUpdaterUrl);
+    char* pData = NULL;
+    for (int i = 0; i < 2; i++)
+    {
+        pData = (char*)stdHttp_Fetch(stdUpdater_pUpdaterUrl);
+        if (pData) break;
+    }
+    
     if (!pData) {
         return 0;
     }
 
     std::string dataStr(pData);
     free(pData);
-
-    //stdPlatform_Printf("Test: %s\n", dataStr.c_str());
 
     try {
         nlohmann::json json_file = nlohmann::json::parse(dataStr);
@@ -110,8 +116,12 @@ int stdUpdater_CheckForUpdates()
         stdUpdater_strUpdateVersion = entry["tag_name"].get<std::string>();
 
         if (!strcmp(openjkdf2_aReleaseVersion, stdUpdater_strUpdateVersion.c_str())) {
-            return 0;
+            if (!stdUpdater_bTestUpdate) {
+                return 0;
+            }
         }
+
+        stdPlatform_Printf("stdUpdater: An update is available! Current: %s -> Latest: %s\n", openjkdf2_aReleaseVersion, stdUpdater_strUpdateVersion.c_str());
 
         for (int i = 0; i < assets.size(); i++) {
             auto asset = assets[i];
@@ -129,39 +139,43 @@ int stdUpdater_CheckForUpdates()
 
             stdUpdater_strBrowserDownloadUrl = asset["browser_download_url"].get<std::string>();
 
-            stdPlatform_Printf("stdUpdater: An update is available! Current: %s -> Latest: %s\n", openjkdf2_aReleaseVersion, stdUpdater_strUpdateVersion.c_str());
             stdPlatform_Printf("stdUpdater: %s\n", stdUpdater_strBrowserDownloadUrl.c_str());
-            stdUpdater_bFoundUpdate = true;
 
-            return 1;
+            stdUpdater_bFoundUpdate = true;
+            break;
         }
 
-        return 0;
+        if (!stdUpdater_bFoundUpdate) {
+            stdPlatform_Printf("stdUpdater: An update is available, but no payload? updateFilename: %s, updaterURL: %s\n", stdUpdater_pUpdateFilename, stdUpdater_pUpdaterUrl);
+        }
+
+        return 1;
     }
     catch (...)
     {
-        stdPlatform_Printf("stdUpdater: Failed to parse JSON?");
+        stdPlatform_Printf("stdUpdater: Failed to parse JSON?\n");
         return 0;
     }
+#endif // defined(PLATFORM_LINUX) || defined(ARCH_WASM) || defined(TARGET_TWL)
 }
 
-void stdUpdater_GetUpdateText(char* pOut, size_t outSz)
+void stdUpdater_GetUpdateText(wchar_t* pOut, size_t outSz)
 {
     // TODO: i8n
     if (stdUpdater_bCompletedUpdate) {
 #if defined(WIN64_STANDALONE)
-        stdString_snprintf(pOut, outSz, "Update complete, restart to apply.");
+        jk_snwprintf(pOut, outSz/sizeof(wchar_t), jkStrings_GetUniStringWithFallback("GUIEXT_UPDATE_COMPLETE_RESTART"));
 #else
-        stdString_snprintf(pOut, outSz, "Update downloaded, complete installation and restart.");
+        jk_snwprintf(pOut, outSz/sizeof(wchar_t), jkStrings_GetUniStringWithFallback("GUIEXT_UPDATE_COMPLETE_SEMIAUTO"));
 #endif
         return;
     }
     else if (stdUpdater_bDownloading) {
-        stdString_snprintf(pOut, outSz, "Downloading...");
+        jk_snwprintf(pOut, outSz/sizeof(wchar_t), jkStrings_GetUniStringWithFallback("GUIEXT_UPDATE_DOWNLOADING"));
         return;
     }
     
-    stdString_snprintf(pOut, outSz, "An update is available: %s => %s", openjkdf2_aReleaseVersion, stdUpdater_strUpdateVersion.c_str());
+    jk_snwprintf(pOut, outSz/sizeof(wchar_t), jkStrings_GetUniStringWithFallback("GUIEXT_UPDATE_IS_AVAIL"), openjkdf2_aReleaseVersion, stdUpdater_strUpdateVersion.c_str());
 }
 
 void stdUpdater_Win64UpdateThread()
@@ -173,6 +187,7 @@ void stdUpdater_Win64UpdateThread()
 
     char tmp_exepath[512];
     char tmp_zippath[512];
+    char* exe_fname = stdFnames_FindMedName(openjkdf2_pExecutablePath);
     stdFnames_CopyDir(tmp_exepath, sizeof(tmp_exepath), openjkdf2_pExecutablePath);
     stdFnames_MakePath(tmp_zippath, sizeof(tmp_zippath), tmp_exepath, stdUpdater_strDlFname.c_str());
 
@@ -193,8 +208,21 @@ void stdUpdater_Win64UpdateThread()
         {
             char tmp[512];
             char tmp2[512];
-            stdFnames_MakePath(tmp, sizeof(tmp), tmp_exepath, *i);
-            stdString_snprintf(tmp2, sizeof(tmp2), "%s.bak", tmp);
+
+            // TODO: Check openjkdf2-64.exe instead? idk if I'll ever ship two EXEs.
+            // Basically what we're solving for here is if someone renames their EXE to
+            // JediKnight.EXE or JK.EXE for Steam/GOG launchers.
+            if(!__strcmpi(stdFnames_FindExt(*i), "exe"))
+            {
+                stdFnames_MakePath(tmp, sizeof(tmp), tmp_exepath, exe_fname);
+                stdString_snprintf(tmp2, sizeof(tmp2), "%s.bak", tmp);
+            }
+            else
+            {
+                stdFnames_MakePath(tmp, sizeof(tmp), tmp_exepath, *i);
+                stdString_snprintf(tmp2, sizeof(tmp2), "%s.bak", tmp);
+            }
+            
             stdPlatform_Printf("stdUpdater: Renaming: %s -> %s\n", tmp, tmp2);
 
             stdFileUtil_DelFile(tmp2);
@@ -207,7 +235,7 @@ void stdUpdater_Win64UpdateThread()
 
             stdPlatform_Printf("stdUpdater: Writing:  %s\n", tmp);
 
-            PHYSFS_sint64 rc, i;
+            PHYSFS_sint64 rc, i2;
             while (1)
             {
                 rc = PHYSFS_readBytes(f_in, buffer, sizeof (buffer));

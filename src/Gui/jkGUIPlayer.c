@@ -152,7 +152,7 @@ int jkGuiPlayer_sub_410640(Darray *array, jkGuiElement *element)
                     {
                         v5 = 1;
                     }
-                    v6 = jkStrings_GetText(jkGuiPlayer_GuiDifficulties[v5]);
+                    v6 = jkStrings_GetUniStringWithFallback(jkGuiPlayer_GuiDifficulties[v5]);
                     if (v6) // Added: avoid nullptr deref
                         __wcscat(tmp, v6);
                     jkGuiRend_DarrayReallocStr(array, tmp, 0);
@@ -268,9 +268,9 @@ void jkGuiPlayer_ShowNewPlayer(int a1)
                 jkGuiPlayer_menuNewElements[7].selectedTextEntry = 0;
                 break;
             case 3:
-                v9 = jkStrings_GetText("GUI_CONFIRM_REMOVE_PLAYER");
+                v9 = jkStrings_GetUniStringWithFallback("GUI_CONFIRM_REMOVE_PLAYER");
                 jk_snwprintf(v24, 0x100u, v9, a2);
-                v10 = jkStrings_GetText("GUI_REMOVE");
+                v10 = jkStrings_GetUniStringWithFallback("GUI_REMOVE");
                 if ( jkGuiDialog_YesNoDialog(v10, v24) )
                 {
                     stdString_WcharToChar(v20, a2, 127);
@@ -304,18 +304,18 @@ void jkGuiPlayer_ShowNewPlayer(int a1)
                         if ( !util_FileExists(v21) )
                             continue;
                         v6 = 1;
-                        v8 = jkStrings_GetText("ERR_PLAYER_ALREADY_EXISTS");
+                        v8 = jkStrings_GetUniStringWithFallback("ERR_PLAYER_ALREADY_EXISTS");
                     }
                     else
                     {
                         v6 = 1;
-                        v8 = jkStrings_GetText("ERR_BAD_PLAYER_NAME");
+                        v8 = jkStrings_GetUniStringWithFallback("ERR_BAD_PLAYER_NAME");
                     }
                 }
                 else
                 {
                     v6 = 1;
-                    v8 = jkStrings_GetText("ERR_NO_PLAYER_NAME");
+                    v8 = jkStrings_GetUniStringWithFallback("ERR_NO_PLAYER_NAME");
                 }
                 jkGuiPlayer_menuNewElements[8].wstr = v8;
             }

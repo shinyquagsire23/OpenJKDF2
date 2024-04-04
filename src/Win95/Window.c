@@ -26,7 +26,7 @@
 #include <stdio.h>
 #ifndef _WIN32
 #include <unistd.h>
-#endif
+#endif //!_WIN32
 
 #if !defined(WIN64_MINGW) && !defined(_WIN32)
 #include <sys/ioctl.h>
@@ -55,12 +55,12 @@
 #endif
 
 extern int Window_xPos, Window_yPos;
-#endif
+#endif // SDL2_RENDER
 
-int Window_xSize = 640;
-int Window_ySize = 480;
-int Window_screenXSize = 640;
-int Window_screenYSize = 480;
+int Window_xSize = WINDOW_DEFAULT_WIDTH;
+int Window_ySize = WINDOW_DEFAULT_HEIGHT;
+int Window_screenXSize = WINDOW_DEFAULT_WIDTH;
+int Window_screenYSize = WINDOW_DEFAULT_HEIGHT;
 int Window_isHiDpi = 0;
 int Window_isFullscreen = 0;
 int Window_needsRecreate = 0;
@@ -84,10 +84,10 @@ void Window_SetFullscreen(int val)
         // Reset window when exiting fullscreen
         // TODO: Add settings for these sizes maybe?
         if (Window_isFullscreen && !val) {
-            Window_xSize = 640;
-            Window_ySize = 480;
-            Window_screenXSize = 640;
-            Window_screenYSize = 480;
+            Window_xSize = WINDOW_DEFAULT_WIDTH;
+            Window_ySize = WINDOW_DEFAULT_HEIGHT;
+            Window_screenXSize = WINDOW_DEFAULT_WIDTH;
+            Window_screenYSize = WINDOW_DEFAULT_HEIGHT;
 #ifdef SDL2_RENDER
             Window_xPos = SDL_WINDOWPOS_CENTERED;
             Window_yPos = SDL_WINDOWPOS_CENTERED;
@@ -161,13 +161,13 @@ int Window_AddDialogHwnd(HWND a1)
     return 1;
 }
 
-#ifdef SDL2_RENDER
-static int dword_855E98 = 0;
-static int dword_855DE4 = 0;
-#else
+#if !defined(SDL2_RENDER) && defined(WIN32)
 #define dword_855E98 (*(int*)0x855E98)
 #define dword_855DE4 (*(int*)0x855DE4)
-#endif
+#else
+static int dword_855E98 = 0;
+static int dword_855DE4 = 0;
+#endif // SDL2_RENDER
 
 int Window_msg_main_handler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
@@ -245,7 +245,7 @@ int Window_msg_main_handler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
     return v10;
 }
 
-#ifndef SDL2_RENDER
+#if !defined(SDL2_RENDER) && defined(WIN32)
 
 int Window_Main(HINSTANCE hInstance, int a2, char *lpCmdLine, int nShowCmd, LPCSTR lpWindowName)
 {
@@ -957,7 +957,12 @@ void Window_SdlUpdate()
                 break;
             case SDL_QUIT:
                 stdPlatform_Printf("Quit!\n");
-                jkPlayer_WriteConf(jkPlayer_playerShortName); // Added
+
+                // Added
+                if (jkPlayer_bHasLoadedSettingsOnce) {
+                    jkPlayer_WriteConf(jkPlayer_playerShortName);
+                }
+                
                 exit(-1);
                 break;
             default:
@@ -1222,7 +1227,7 @@ void Window_RecreateSDL2Window()
 
 void Window_Main_Loop()
 {
-    jkMain_GuiAdvance();
+    jkMain_GuiAdvance(); // TODO needed?
     Window_msg_main_handler(g_hWnd, WM_PAINT, 0, 0);
     
     //Window_SdlUpdate();
@@ -1280,7 +1285,7 @@ int Window_Main_Linux(int argc, char** argv)
 
     
     Window_RecreateSDL2Window();
-#if !defined(TARGET_ANDROID)
+#if !defined(TARGET_ANDROID) && !defined(ARCH_WASM)
     glewInit();
 #endif
     
@@ -1347,7 +1352,10 @@ int Window_Main_Linux(int argc, char** argv)
     }
 #endif
 
-    jkPlayer_WriteConf(jkPlayer_playerShortName); // Added
+    // Added
+    if (jkPlayer_bHasLoadedSettingsOnce) {
+        jkPlayer_WriteConf(jkPlayer_playerShortName);
+    }
 
     Main_Shutdown();
     return 1;
@@ -1464,7 +1472,7 @@ int Window_MessageLoop()
     return 0;
 }
 
-#endif
+#endif // SDL2_RENDER
 
 void Window_SetDrawHandlers(WindowDrawHandler_t a1, WindowDrawHandler_t a2)
 {

@@ -895,7 +895,7 @@ sithThing* sithInventory_CreateBackpack(sithThing *player)
         return 0;
 
     backpack->itemParams.numBins = 0;
-    backpack->itemParams.typeflags |= THING_TYPEFLAGS_DAMAGE; // ??
+    backpack->itemParams.typeflags |= SITH_ITEM_BACKPACK; 
     
     if (!Main_bMotsCompat)
     {

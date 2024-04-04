@@ -162,7 +162,7 @@ int sithSurface_Load(sithWorld *world)
     for (int v14 = 0; v14 < numSurfaces; v14++)
     {
         rdFace_NewEntry(&world->surfaces[v14].surfaceInfo.face);
-        world->surfaces[v14].field_0 = v14;
+        world->surfaces[v14].index = v14;
     }
     surfaces = world->surfaces;
 

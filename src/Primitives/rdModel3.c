@@ -1142,7 +1142,7 @@ int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
     pCurModel3 = thing->model3;
     rdMatrix_TransformPoint34(&vertex_out, &matrix_4_3->scale, &rdCamera_pCurCamera->view_matrix);
     if ( rdroid_curCullFlags & 2 )
-        frustumCull = rdClip_SphereInFrustrum(rdCamera_pCurCamera->cameraClipFrustum, &vertex_out, pCurModel3->radius);
+        frustumCull = rdClip_SphereInFrustrum(rdCamera_pCurCamera->pClipFrustum, &vertex_out, pCurModel3->radius);
     else
         frustumCull = thing->clippingIdk;
     thingFrustrumCull = frustumCull;
@@ -1255,7 +1255,7 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
 
     rdMatrix_TransformPoint34(&vertex_out, &mat->scale, &rdCamera_pCurCamera->view_matrix);
     if ( thingFrustrumCull )
-        meshFrustrumCull = rdroid_curCullFlags & 1 ? rdClip_SphereInFrustrum(rdCamera_pCurCamera->cameraClipFrustum, &vertex_out, pCurMesh->radius) : 1;
+        meshFrustrumCull = rdroid_curCullFlags & 1 ? rdClip_SphereInFrustrum(rdCamera_pCurCamera->pClipFrustum, &vertex_out, pCurMesh->radius) : 1;
     else
         meshFrustrumCull = 0;
 
@@ -1449,7 +1449,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
     // MOTS added: RGB
     if ((rdGetVertexColorMode() == 0) || (procEntry->lightingMode == 2)) {
         if ( meshFrustrumCull )
-            rdPrimit3_ClipFace(rdCamera_pCurCamera->cameraClipFrustum, geometryMode, lightingMode, textureMode, (rdVertexIdxInfo *)&vertexSrc, &vertexDst, &face->clipIdk);
+            rdPrimit3_ClipFace(rdCamera_pCurCamera->pClipFrustum, geometryMode, lightingMode, textureMode, (rdVertexIdxInfo *)&vertexSrc, &vertexDst, &face->clipIdk);
         else
             rdPrimit3_NoClipFace(geometryMode, lightingMode, textureMode, &vertexSrc, &vertexDst, &face->clipIdk);
     }
@@ -1462,7 +1462,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
         vertexDst.paBlueIntensities = procEntry->paBlueIntensities;
         //printf("%p %p %p, %p %p %p\n", vertexSrc.paRedIntensities, vertexSrc.paGreenIntensities, vertexSrc.paBlueIntensities, vertexDst.paRedIntensities, vertexDst.paGreenIntensities, vertexDst.paBlueIntensities);
         if ( meshFrustrumCull )
-            rdPrimit3_ClipFaceRGB(rdCamera_pCurCamera->cameraClipFrustum, geometryMode, lightingMode, textureMode, &vertexSrc, &vertexDst, &face->clipIdk);
+            rdPrimit3_ClipFaceRGB(rdCamera_pCurCamera->pClipFrustum, geometryMode, lightingMode, textureMode, &vertexSrc, &vertexDst, &face->clipIdk);
         else
             rdPrimit3_NoClipFaceRGB(geometryMode, lightingMode, textureMode, &vertexSrc, &vertexDst, &face->clipIdk);
     }
@@ -1496,7 +1496,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
                       rdCamera_pCurCamera->attenuationMin);
         }
     }
-    rdCamera_pCurCamera->projectLst(vertexDst.verticesOrig, vertexDst.verticesProjected, vertexDst.numVertices);
+    rdCamera_pCurCamera->fnProjectLst(vertexDst.verticesOrig, vertexDst.verticesProjected, vertexDst.numVertices);
     if ( rdroid_curRenderOptions & 2 )
         procEntry->ambientLight = rdCamera_pCurCamera->ambientLight;
     else

@@ -1,5 +1,6 @@
 #include "sithCogFunctionAI.h"
 
+#include "General/stdMath.h" 
 #include "Gameplay/sithTime.h"
 #include "AI/sithAI.h"
 #include "AI/sithAIClass.h"
@@ -9,27 +10,11 @@
 
 void sithCogFunctionAI_AISetMoveSpeed(sithCog *ctx)
 {
-    double v2; // st7
-    sithThing *v3; // eax
-    sithActor *v4; // eax
-    float a1a; // [esp+8h] [ebp+4h]
-
-    v2 = sithCogExec_PopFlex(ctx);
-    a1a = v2;
-    if ( v2 < 0.0 )
+    float moveSpeed = stdMath_Clamp(sithCogExec_PopFlex(ctx), 0.0, 2.0);
+    sithThing* pThing = sithCogExec_PopThing(ctx);
+    if (pThing && pThing->thingtype == SITH_THING_ACTOR && pThing->actor)
     {
-        a1a = 0.0;
-    }
-    else if ( a1a > 2.0 )
-    {
-        a1a = 2.0;
-    }
-    v3 = sithCogExec_PopThing(ctx);
-    if ( v3 && v3->thingtype == SITH_THING_ACTOR )
-    {
-        v4 = v3->actor;
-        if ( v4 )
-            v4->moveSpeed = a1a;
+        pThing->actor->moveSpeed = moveSpeed;
     }
 }
 
@@ -39,21 +24,17 @@ void sithCogFunctionAI_SetMovePos(sithCog *ctx)
     sithActor *v2; // eax
     rdVector3 v3; // [esp+4h] [ebp-Ch] BYREF
 
-    if ( sithCogExec_PopVector3(ctx, &v3) )
+    // TODO: Bug? If the vector is invalid, other args will never get popped.
+    if (sithCogExec_PopVector3(ctx, &v3))
     {
-        v1 = sithCogExec_PopThing(ctx);
+        sithThing* pThing = sithCogExec_PopThing(ctx);
         
         // Added
         if (g_debugmodeFlags & DEBUGFLAG_1) return;
         
-        if ( v1 )
+        if (pThing && pThing->thingtype == SITH_THING_ACTOR && pThing->actor)
         {
-            if ( v1->thingtype == SITH_THING_ACTOR )
-            {
-                v2 = v1->actor;
-                if ( v2 )
-                    sithAI_SetMoveThing(v2, &v3, v2->moveSpeed);
-            }
+            sithAI_SetMoveThing(pThing->actor, &v3, pThing->actor->moveSpeed);
         }
     }
 }
@@ -64,9 +45,8 @@ void sithCogFunctionAI_AIJump(sithCog *ctx)
     sithThing *v3; // eax
     sithActor *v4; // eax
     rdVector3 v5; // [esp+8h] [ebp-Ch] BYREF
-    float a1; // [esp+18h] [ebp+4h]
 
-    a1 = sithCogExec_PopFlex(ctx);
+    cog_flex_t a1 = sithCogExec_PopFlex(ctx);
     v2 = sithCogExec_PopVector3(ctx, &v5);
     v3 = sithCogExec_PopThing(ctx);
     
@@ -101,7 +81,7 @@ void sithCogFunctionAI_AISetMoveFrame(sithCog *ctx)
             v3 = v2->actor;
             if ( v3 )
             {
-                v4 = v3->framesAlloc;
+                v4 = v3->paFrames;
                 if ( v4 )
                 {
                     if ( v1 < v3->loadedFrames )
@@ -129,7 +109,7 @@ void sithCogFunctionAI_AISetMoveThing(sithCog *ctx)
         v3 = v2->actor;
         if ( v3 )
         {
-            v3->thingidk = v1;
+            v3->pMoveThing = v1;
             sithAI_SetMoveThing(v3, &v1->position, v3->moveSpeed);
         }
     }
@@ -141,11 +121,12 @@ void sithCogFunctionAI_AISetLookPos(sithCog *ctx)
     sithActor *v2; // eax
     rdVector3 v3; // [esp+4h] [ebp-Ch] BYREF
 
+    // TODO: Bug? If the vector is invalid, other args will never get popped.
     if ( sithCogExec_PopVector3(ctx, &v3) )
     {
         v1 = sithCogExec_PopThing(ctx);
         
-        // Added
+        // Added: Fully disable AI including cog verbs
         if (g_debugmodeFlags & DEBUGFLAG_1) return;
         
         if ( v1 )
@@ -180,7 +161,7 @@ void sithCogFunctionAI_AISetLookFrame(sithCog *ctx)
             v3 = v2->actor;
             if ( v3 )
             {
-                v4 = v3->framesAlloc;
+                v4 = v3->paFrames;
                 if ( v4 )
                 {
                     if ( v1 < v3->loadedFrames )
@@ -283,13 +264,11 @@ void sithCogFunctionAI_FirstThingInView(sithCog *ctx)
     sithThing *v3; // ebx
     int v4; // eax
     signed int v5; // [esp+10h] [ebp-38h]
-    float v6; // [esp+14h] [ebp-34h]
     rdMatrix34 v7; // [esp+18h] [ebp-30h] BYREF
-    float a1; // [esp+4Ch] [ebp+4h]
 
     v5 = sithCogExec_PopInt(ctx);
-    a1 = sithCogExec_PopFlex(ctx);
-    v6 = sithCogExec_PopFlex(ctx);
+    cog_flex_t a1 = sithCogExec_PopFlex(ctx);
+    cog_flex_t v6 = sithCogExec_PopFlex(ctx);
     v2 = sithCogExec_PopThing(ctx);
     
     // Added
@@ -444,7 +423,7 @@ void sithCogFunctionAI_sub_501330(sithCog *ctx)
         v7 = (void *)v4->func;
         do
         {
-            if ( v3->aiclass->entries[v6].func == v7 )
+            if ( v3->pAIClass->entries[v6].func == v7 )
                 break;
             ++v6;
         }
@@ -492,7 +471,7 @@ void sithCogFunctionAI_AIFlee(sithCog *ctx)
                 if ( v3 )
                 {
                     v4 = v3->flags;
-                    v3->fleeThing = v1;
+                    v3->pFleeThing = v1;
                     if ( (v4 & SITHAI_MODE_FLEEING) == 0 )
                     {
                         v3->flags |= SITHAI_MODE_FLEEING;
@@ -518,9 +497,9 @@ void sithCogFunctionAI_AISetClass(sithCog *ctx)
         v3 = thing->actor;
         if ( v3 )
         {
-            thing->aiclass = aiclass;
+            thing->pAIClass = aiclass;
             v4 = aiclass->numEntries;
-            v3->aiclass = aiclass;
+            v3->pAIClass = aiclass;
             v3->numAIClassEntries = v4;
         }
     }
@@ -530,9 +509,9 @@ void sithCogFunctionAI_AISetClass(sithCog *ctx)
 void sithCogFunctionAI_AIGetAlignment(sithCog *ctx)
 {
     sithThing* pThing = sithCogExec_PopThing(ctx);
-    if (pThing && pThing->thingtype == SITH_THING_ACTOR && pThing->actor && pThing->actor->aiclass) 
+    if (pThing && pThing->thingtype == SITH_THING_ACTOR && pThing->actor && pThing->actor->pAIClass) 
     {
-        sithCogExec_PushFlex(ctx, pThing->actor->aiclass->alignment);
+        sithCogExec_PushFlex(ctx, pThing->actor->pAIClass->alignment);
         return;
     }
     sithCogExec_PushFlex(ctx, 0.0);
@@ -541,11 +520,11 @@ void sithCogFunctionAI_AIGetAlignment(sithCog *ctx)
 // MOTS added
 void sithCogFunctionAI_AISetAlignment(sithCog *ctx)
 {
-    float val = sithCogExec_PopFlex(ctx);
+    cog_flex_t val = sithCogExec_PopFlex(ctx);
     sithThing* pThing = sithCogExec_PopThing(ctx);
-    if (pThing && pThing->thingtype == SITH_THING_ACTOR && pThing->actor && pThing->actor->aiclass) 
+    if (pThing && pThing->thingtype == SITH_THING_ACTOR && pThing->actor && pThing->actor->pAIClass) 
     {
-        pThing->actor->aiclass->alignment = val;
+        pThing->actor->pAIClass->alignment = val;
     }
 }
 
@@ -593,14 +572,13 @@ void sithCogFunctionAI_AIAddAlignmentPriority(sithCog *ctx)
     int *piVar3;
     int val;
     int iVar5;
-    float fVar6;
     float local_4;
 
     local_4 = 1.0;
     iVar5 = -1000;
     val = -1;
     iVar1 = sithCogExec_PopInt(ctx);
-    fVar6 = sithCogExec_PopFlex(ctx);
+    cog_flex_t fVar6 = sithCogExec_PopFlex(ctx);
 
     for (int i = 0; i < 10; i++) {
         if (sithAI_aAlignments[i].bValid == 0) {

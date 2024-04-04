@@ -1,6 +1,7 @@
 #include "sithStrTable.h"
 
 #include "General/stdStrTable.h"
+#include "Main/jkStrings.h" // openjkdf2_i8n override
 #include "jk.h"
 
 static int sithStrTable_bInitted;
@@ -24,10 +25,28 @@ void sithStrTable_Shutdown()
 
 wchar_t* sithStrTable_GetUniString(const char *key)
 {
-    return stdStrTable_GetUniString(&sithStrTable_pSithStrings, key);
+    wchar_t* result = NULL;
+#ifdef QOL_IMPROVEMENTS
+    if (!result) {
+        result = stdStrTable_GetUniString(&jkStrings_tableExtOver, key);
+    }
+#endif
+    if (!result) {
+        result = stdStrTable_GetUniString(&sithStrTable_pSithStrings, key);
+    }
+    return result;
 }
 
-wchar_t* sithStrTable_GetString(char *key)
+wchar_t* sithStrTable_GetUniStringWithFallback(char *key)
 {
-    return stdStrTable_GetString(&sithStrTable_pSithStrings, key);
+    wchar_t* result = NULL;
+#ifdef QOL_IMPROVEMENTS
+    if (!result) {
+        result = stdStrTable_GetUniString(&jkStrings_tableExtOver, key);
+    }
+#endif
+    if (!result) {
+        result = stdStrTable_GetStringWithFallback(&sithStrTable_pSithStrings, key);
+    }
+    return result;
 }

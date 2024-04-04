@@ -134,8 +134,8 @@ void jkGuiMain_Show()
                     v1 = jkGuiMultiplayer_Show();
                     break;
                 case 12:
-                    v4 = jkStrings_GetText("GUI_QUITCONFIRM_Q");
-                    v2 = jkStrings_GetText("GUI_QUITCONFIRM");
+                    v4 = jkStrings_GetUniStringWithFallback("GUI_QUITCONFIRM_Q");
+                    v2 = jkStrings_GetUniStringWithFallback("GUI_QUITCONFIRM");
                     if ( !jkGuiDialog_YesNoDialog(v2, v4) )
                         goto LABEL_12;
 
@@ -278,7 +278,7 @@ void jkGuiMain_PopulateCutscenes(Darray *list, jkGuiElement *element)
         v3 = _strcpy((char *)pHS->alloc(_strlen(v2) + 1), v2);
         stdFnames_CopyShortName(key, 64, v3); // TODO aaaaaaa ??? disassembly was wrong?
         jkGuiTitle_sub_4189A0(key);
-        v5 = jkStrings_GetText2(key);
+        v5 = jkStrings_GetUniString(key);
         jkGuiRend_DarrayReallocStr(list, v5, (intptr_t)v3);
         v2 += 32;
     }

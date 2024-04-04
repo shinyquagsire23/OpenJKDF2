@@ -51,6 +51,11 @@ typedef struct stdGobFile
     stdGob* parent;
     stdGobEntry* entry;
     int32_t seekOffs;
+#ifdef QOL_IMPROVEMENTS
+    uint32_t bIsMemoryMapped;
+    intptr_t pMemory;
+    size_t memorySz;
+#endif
 } stdGobFile;
 
 typedef struct stdGob
@@ -80,7 +85,7 @@ void stdGob_FileClose(stdGobFile *f);
 int stdGob_FSeek(stdGobFile *f, int pos, int whence);
 int32_t stdGob_FTell(stdGobFile *f);
 bool stdGob_FEof(stdGobFile *f);
-size_t stdGob_FileRead(stdGobFile *f, void *out, unsigned int len);
+size_t stdGob_FileRead(stdGobFile *f, void *out, uint32_t len);
 const char* stdGob_FileGets(stdGobFile *f, char *out, unsigned int len);
 const wchar_t* stdGob_FileGetws(stdGobFile *f, wchar_t *out, unsigned int len);
 

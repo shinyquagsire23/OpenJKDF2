@@ -47,7 +47,7 @@ void stdFileUtil_DisposeFind(stdFileSearch *search);
 int stdFileUtil_DelFile(char* lpFileName);
 int stdFileUtil_Deltree(const char* lpPathName);
 
-#ifdef LINUX
+#if defined(PLATFORM_POSIX) && !defined(WIN32)
 int stdFileUtil_MkDir(char* path);
 #else
 //static int (*stdFileUtil_MkDir)(char* lpPathName) = (void*)stdFileUtil_MkDir_ADDR;

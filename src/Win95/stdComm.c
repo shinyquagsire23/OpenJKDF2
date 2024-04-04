@@ -7,7 +7,7 @@
 
 int stdComm_Startup()
 {
-    if ( stdComm_bInitted )
+    if (stdComm_bInitted)
         return 0;
 
 #ifdef TARGET_HAS_DPLAY
@@ -30,7 +30,7 @@ int stdComm_Startup()
 
 void stdComm_Shutdown()
 {
-    if ( stdComm_bInitted )
+    if (stdComm_bInitted)
     {
         DirectPlay_Destroy();
         stdComm_bInitted = 0;
@@ -42,23 +42,21 @@ void stdComm_Shutdown()
 
 int stdComm_EarlyInit()
 {
-    int result; // eax
-
-    result = DirectPlay_EarlyInit(stdComm_waIdk, sithMulti_name);
+    int result = DirectPlay_EarlyInit(stdComm_waIdk, sithMulti_name);
     stdComm_dword_8321F8 = result;
-    if ( result )
+    if (result)
     {
         stdComm_dword_8321DC = 1;
         stdComm_dword_8321E0 = 1;
         stdComm_dplayIdSelf = DirectPlay_CreatePlayer(jkPlayer_playerShortName, 0);
-        if ( stdComm_dplayIdSelf )
+        if (stdComm_dplayIdSelf)
         {
             result = stdComm_dword_8321F8;
-            if ( stdComm_dword_8321F8 == 1 )
+            if (stdComm_dword_8321F8 == 1)
             {
                 stdComm_bIsServer = 1;
             }
-            else if ( stdComm_dword_8321F8 == 2 )
+            else if (stdComm_dword_8321F8 == 2)
             {
                 stdComm_bIsServer = 0;
             }
@@ -161,8 +159,9 @@ int stdComm_DoReceive()
     int v2; // [esp+4h] [ebp-4h] BYREF
 
     v1 = 2048;
-    do
+    do {
         result = DirectPlay_Receive(&v2, (int*)sithComm_netMsgTmp.pktData, &v1);
+    }
     while ( result != -1 );
     return result;
 }
@@ -200,33 +199,23 @@ int stdComm_SendToPlayer(sithCogMsg *msg, int sendto_id)
 
 int DirectPlay_EnumPlayersCallback(DPID dpId, DWORD dwPlayerType, LPCDPNAME lpName, DWORD dwFlags, LPVOID lpContext)
 {
-    uint32_t v5; // esi
-    uint32_t v7; // edx
-    const wchar_t *v8; // eax
-    const wchar_t *v9; // eax
+    if (DirectPlay_numPlayers >= 0x20) return 1;
 
-    v5 = DirectPlay_numPlayers;
-    if ( DirectPlay_numPlayers >= 0x20 )
-        return 1;
-    v7 = DirectPlay_numPlayers;
     _memset(&DirectPlay_aPlayers[DirectPlay_numPlayers], 0, sizeof(sithDplayPlayer));
-    v8 = lpName->lpszShortName;
-    if ( v8 )
+
+    if (lpName->lpszShortName)
     {
-        _wcsncpy(DirectPlay_aPlayers[v5].waName, v8, 0x1Fu);
-        v5 = DirectPlay_numPlayers;
-        v7 = DirectPlay_numPlayers;
+        _wcsncpy(DirectPlay_aPlayers[DirectPlay_numPlayers].waName, lpName->lpszShortName, 0x1Fu);
         DirectPlay_aPlayers[DirectPlay_numPlayers].waName[31] = 0;
     }
-    v9 = lpName->lpszLongName;
-    if ( v9 )
+
+    if (lpName->lpszLongName)
     {
-        _wcsncpy(&DirectPlay_aPlayers[v7].waName[20], v9, 0x1Fu);
-        v5 = DirectPlay_numPlayers;
-        v7 = DirectPlay_numPlayers;
+        _wcsncpy(&DirectPlay_aPlayers[DirectPlay_numPlayers].waName[20], lpName->lpszLongName, 0x1Fu);
         DirectPlay_aPlayers[DirectPlay_numPlayers].field_66 = 0;
     }
-    DirectPlay_numPlayers = v5 + 1;
-    DirectPlay_aPlayers[v7].dpId = dpId;
+
+    DirectPlay_aPlayers[DirectPlay_numPlayers].dpId = dpId;
+    DirectPlay_numPlayers++;
     return 1;
 }

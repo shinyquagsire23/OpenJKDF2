@@ -86,7 +86,7 @@ int sithIntersect_IsSphereInSector(const rdVector3 *pos, float radius, sithSecto
 
 // sithIntersect_sub_508070
 
-int sithIntersect_CollideThings(sithThing *thing, const rdVector3 *a2, const rdVector3 *a3, float a4, float a5, sithThing *a6, int raycastFlags, float *a8, rdMesh **outMesh, rdFace **a10, rdVector3 *a11)
+int sithIntersect_CollideThings(sithThing *pThing, const rdVector3 *a2, const rdVector3 *a3, float a4, float range, sithThing *a6, int raycastFlags, float *a8, rdMesh **outMesh, rdFace **a10, rdVector3 *a11)
 {
     sithThing *v11; // edi
     int result; // eax
@@ -105,70 +105,166 @@ int sithIntersect_CollideThings(sithThing *thing, const rdVector3 *a2, const rdV
 
     v11 = a6;
     bFaceCollision = 0;
-    if ( (raycastFlags & RAYCAST_80) == 0 && (a6->collide == SITH_COLLIDE_FACE || thing && thing->collide == SITH_COLLIDE_FACE) )
-        bFaceCollision = 1;
-
-    float unkOut;
-    if ( sithIntersect_RaySphereIntersection(a2, a3, a4, a5, &a6->position, a6->collideSize, &unkOut, bFaceCollision, raycastFlags) )
+    if ( (raycastFlags & RAYCAST_80) == 0 && (a6->collide == SITH_COLLIDE_FACE || pThing && pThing->collide == SITH_COLLIDE_FACE) )
     {
-        if ( bFaceCollision )
-        {
-            if ( a6->collide == SITH_COLLIDE_FACE )
-            {
-                rdVector_Copy3(&dirVec, a3);
-                v39 = 0;
-                rdVector_Copy3(&posVec, a2);
+        bFaceCollision = 1;
+    }
+
+    // MoTS added: New collision type: tree intersection (one sphere per mesh)
+    int bIsTreeCollide = 0;
+    float collideSize = a6->collideSize;
+    float rangeSize = range;
+    if (Main_bMotsCompat) {
+        if (!(raycastFlags & 0x80u) && (a6->collide == SITH_COLLIDE_SPHERE_TREE || pThing && pThing->collide == SITH_COLLIDE_SPHERE_TREE) ) {
+            bFaceCollision = 1;
+            bIsTreeCollide = 1;
+            if (a6->collide == SITH_COLLIDE_SPHERE_TREE) {
+              collideSize = a6->treeSize;
             }
-            else
-            {
-                v11 = thing;
-                a5 = a6->collideSize;
-                v39 = 1;
-                rdVector_Neg3(&dirVec, a3);
-                rdVector_Copy3(&posVec, &a6->position);
+            else {
+              rangeSize = pThing->treeSize;
+              collideSize = range;
             }
-            rdVector_Copy3(&v11->lookOrientation.scale, &v11->position);
-            a2a = &v11->lookOrientation;
-            rdMatrix_InvertOrtho34(&out, &v11->lookOrientation);
-            rdMatrix_TransformPoint34Acc(&posVec, &out);
-            rdMatrix_TransformVector34Acc(&dirVec, &out);
-            v26 = a11;
-            v27 = v11->rdthing.model3->geosets;
-            v28 = 0;
-            v30 = 0;
-            //printf("aaaaa %f %f %f\n", dirVec.x, dirVec.y, dirVec.z);
-            for (thinga = 0; thinga < v27->numMeshes; thinga++)
-            {
-                v31 = sithIntersect_sub_508400(&posVec, &dirVec, a4, a5, &v27->meshes[v30], a8, a10, v26);
-                if ( v31 )
-                {
-                    v28 = v31;
-                    *outMesh = &v27->meshes[v30];
-                    a4 = *a8;
-                }
-                ++v30;
-            }
-            if ( v28 )
-            {
-                rdMatrix_TransformVector34Acc(v26, a2a);
-                if ( v39 )
-                {
-                    rdVector_Neg3Acc(v26);
-                }
-                v28 |= SITHCOLLISION_THING;
-            }
-            return v28;
-        }
-        else
-        {
-            rdVector_Sub3(a11, a2, &a6->position);
-            rdVector_MultAcc3(a11, a3, unkOut);
-            rdVector_Normalize3Acc(a11);
-            *a8 = unkOut;
-            return SITHCOLLISION_THING;
         }
     }
-    return 0;
+
+    float unkOut;
+    if (!sithIntersect_RaySphereIntersection(a2, a3, a4, rangeSize, &a6->position, collideSize, &unkOut, bFaceCollision, raycastFlags))
+    {
+        return 0;
+    }
+
+    if (!bFaceCollision && MOTS_ONLY_COND(!bIsTreeCollide))
+    {
+        rdVector_Sub3(a11, a2, &a6->position);
+        rdVector_MultAcc3(a11, a3, unkOut);
+        rdVector_Normalize3Acc(a11);
+        *a8 = unkOut;
+        return SITHCOLLISION_THING;
+    }
+
+    if (a6->collide == SITH_COLLIDE_FACE || MOTS_ONLY_FLAG(a6->collide == SITH_COLLIDE_SPHERE_TREE))
+    {
+        rdVector_Copy3(&dirVec, a3);
+        rdVector_Copy3(&posVec, a2);
+        v39 = 0;
+    }
+    else
+    {
+        v11 = pThing;
+        range = a6->collideSize;
+        rdVector_Neg3(&dirVec, a3);
+        rdVector_Copy3(&posVec, &a6->position);
+        v39 = 1;
+    }
+
+    if (MOTS_ONLY_FLAG(bIsTreeCollide))
+    {
+        float tmp = 3.4e+38;
+        rdVector3 tmpVec;
+        rdVector_Zero3(&tmpVec); // Added
+
+        int iVar11 = sithIntersect_TreeIntersection(v11->rdthing.model3->hierarchyNodes, &posVec, &dirVec, a4, range, v11, &tmp, &tmpVec, raycastFlags);
+        if (iVar11 == 0) {
+            return 0;
+        }
+
+        rdVector_Copy3(a11, &posVec);
+        rdVector_MultAcc3(a11, &dirVec, tmp);
+        rdVector_Sub3Acc(a11, &tmpVec);
+        rdVector_Normalize3Acc(a11);
+        
+        if (v39) {
+            rdVector_Neg3Acc(a11);
+        }
+        *a8 = tmp;
+        return 1;
+    }
+
+    rdVector_Copy3(&v11->lookOrientation.scale, &v11->position);
+    a2a = &v11->lookOrientation;
+    rdMatrix_InvertOrtho34(&out, &v11->lookOrientation);
+    rdMatrix_TransformPoint34Acc(&posVec, &out);
+    rdMatrix_TransformVector34Acc(&dirVec, &out);
+    v26 = a11;
+    v27 = v11->rdthing.model3->geosets;
+    v28 = 0;
+    v30 = 0;
+    //printf("aaaaa %f %f %f\n", dirVec.x, dirVec.y, dirVec.z);
+    for (thinga = 0; thinga < v27->numMeshes; thinga++)
+    {
+        v31 = sithIntersect_sub_508400(&posVec, &dirVec, a4, range, &v27->meshes[v30], a8, a10, v26);
+        if ( v31 )
+        {
+            v28 = v31;
+            *outMesh = &v27->meshes[v30];
+            a4 = *a8;
+        }
+        ++v30;
+    }
+    if ( v28 )
+    {
+        rdMatrix_TransformVector34Acc(v26, a2a);
+        if ( v39 )
+        {
+            rdVector_Neg3Acc(v26);
+        }
+        v28 |= SITHCOLLISION_THING;
+    }
+    return v28;
+}
+
+// MoTS added: Tree collision (one sphere per mesh)
+int sithIntersect_TreeIntersection(rdHierarchyNode *paNodes,rdVector3 *pPoseVec,rdVector3 *pDirVec,float a4,float range, sithThing *v11,float *pOut,rdVector3 *pOutVec,int raycastFlags)
+{
+    rdModel3 *prVar1;
+    int iVar2;
+    uint32_t uVar3;
+    rdHierarchyNode *pChildNode;
+    int ret;
+    float local_74;
+    float local_70;
+    rdVector3 local_6c;
+    rdMatrix34 local_60;
+    rdMatrix34 local_30;
+
+    uVar3 = paNodes->meshIdx;
+    ret = 0;
+    if (uVar3 != 0xffffffff) {
+        rdMatrix_Copy34(&local_60, &v11->lookOrientation);
+        rdVector_Copy3(&local_60.scale, &v11->position);
+        rdModel3_GetMeshMatrix(&v11->rdthing, &local_60, uVar3, &local_30);
+        rdVector_Copy3(&local_6c, &local_30.scale);
+        prVar1 = v11->rdthing.model3;
+        uVar3 = (v11->rdthing).geosetSelect;
+        if (uVar3 == 0xffffffff) {
+            uVar3 = prVar1->geosetSelect;
+        }
+        local_70 = prVar1->geosets[uVar3].meshes[paNodes->meshIdx].radius * 0.75;
+        iVar2 = sithIntersect_RaySphereIntersection(pPoseVec, pDirVec, a4, range, &local_6c, local_70, &local_74, 1, raycastFlags);
+        if ((iVar2 != 0) && (local_74 < *pOut)) {
+            *pOut = local_74;
+            rdVector_Copy3(pOutVec, &local_6c);
+            ret = 1;
+        }
+    }
+
+    if (paNodes->numChildren != 0) {
+        pChildNode = paNodes->child;
+        uint32_t local_70_2 = 0;
+        do
+        {
+            if (((v11->rdthing).amputatedJoints[pChildNode->idx] == 0) &&
+               (iVar2 = sithIntersect_TreeIntersection(pChildNode, pPoseVec, pDirVec, a4, range, v11, pOut, pOutVec, raycastFlags),
+               iVar2 != 0)) {
+                ret = 1;
+            }
+            pChildNode = pChildNode->nextSibling;
+            local_70_2++;
+        }
+        while (local_70_2 < paNodes->numChildren);
+    }
+    return ret;
 }
 
 // sithIntersect_sub_508370

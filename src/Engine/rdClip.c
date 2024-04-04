@@ -828,8 +828,8 @@ int rdClip_Line3(rdClipFrustum *clipFrustum, rdVector3 *point1, rdVector3 *point
     if ( !ret )
         return 0;
 
-    rdCamera_pCurCamera->project(&project1, &vertex_out);
-    rdCamera_pCurCamera->project(&project2, &vertex_out2);
+    rdCamera_pCurCamera->fnProject(&project1, &vertex_out);
+    rdCamera_pCurCamera->fnProject(&project2, &vertex_out2);
 
     if ( pointOut1 )
     {

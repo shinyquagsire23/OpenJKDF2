@@ -103,6 +103,7 @@ build_linux_arm64_flatpak/*
 build_linux_x86_64_flatpak/*
 build_android_aarch64/*
 build_android_arm32/*
+build_nintendo_dsi/*
 flatpak_openjkdf2/*
 .flatpak-builder/*
 OpenJKDF2.flatpak
@@ -111,3 +112,4 @@ org.openjkdf2.OpenJKDF2.yml
 packaging/android-project/.gradle/*
 packaging/android-project/app/build/*
 packaging/android-project/app/src/main/jniLibs/*
+packaging/win32/openjkdf2-64.exe.manifest

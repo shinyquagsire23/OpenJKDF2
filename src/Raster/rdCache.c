@@ -27,11 +27,11 @@ int rdCache_Startup()
 
 void rdCache_AdvanceFrame()
 {
-#ifdef SDL2_RENDER
+#if defined(SDL2_RENDER) || defined(TARGET_TWL)
     rdroid_curAcceleration = 1;
 #endif
 
-#ifndef SDL2_RENDER
+#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
     if ( rdroid_curAcceleration > 0 )
 #endif
         std3D_StartScene();
@@ -39,7 +39,7 @@ void rdCache_AdvanceFrame()
 
 void rdCache_FinishFrame()
 {
-#ifndef SDL2_RENDER
+#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
     if ( rdroid_curAcceleration > 0 )
 #endif
         std3D_EndScene();
@@ -109,7 +109,7 @@ void rdCache_Flush()
     {
         _qsort(rdCache_aProcFaces, rdCache_numProcFaces, sizeof(rdProcEntry), (int (__cdecl *)(const void *, const void *))rdCache_ProcFaceCompare);
     }
-#ifndef SDL2_RENDER
+#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
     if ( rdroid_curAcceleration <= 0 )
     {
         if ( rdroid_curOcclusionMethod )
@@ -319,7 +319,7 @@ int rdCache_SendFaceListToHardware()
 
     std3D_ResetRenderList();
     rdCache_ResetRenderList();
-    v7 = rdCamera_pCurCamera->cameraClipFrustum;
+    v7 = rdCamera_pCurCamera->pClipFrustum;
     v8 = 1.0 / v7->field_0.z;
     rend_6c_current_idx = 0;
     v134 = v8;
@@ -341,7 +341,7 @@ int rdCache_SendFaceListToHardware()
             flags_idk_ |= 0x10000;
         }
 
-#ifdef SDL2_RENDER
+#if defined(SDL2_RENDER) || defined(TARGET_TWL)
         d3d_maxVertices = STD3D_MAX_VERTICES;
 #endif
         if ( active_6c->numVertices + rdCache_totalVerts >= d3d_maxVertices )
@@ -1249,7 +1249,7 @@ int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags)
     procFace->y_max = (int32_t)ceilf(y_max);
     procFace->z_min = z_min;
     procFace->z_max = z_max;
-#ifndef SDL2_RENDER
+#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
     if ( procFace->x_min >= (unsigned int)procFace->x_max )
         return 0;
     if ( procFace->y_min >= (unsigned int)procFace->y_max )

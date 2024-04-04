@@ -133,7 +133,7 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     rdSprite *sprite = thing->sprite3;
     rdMatrix_TransformPoint34(&vertex_out, &mat->scale, &rdCamera_pCurCamera->view_matrix);
     if ( rdroid_curCullFlags & 2 )
-        clipResult = rdClip_SphereInFrustrum(rdCamera_pCurCamera->cameraClipFrustum, &vertex_out, sprite->radius);
+        clipResult = rdClip_SphereInFrustrum(rdCamera_pCurCamera->pClipFrustum, &vertex_out, sprite->radius);
     else
         clipResult = thing->clippingIdk;
 
@@ -220,7 +220,7 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
 
     if ( clipResult )
         rdPrimit3_ClipFace(
-            rdCamera_pCurCamera->cameraClipFrustum,
+            rdCamera_pCurCamera->pClipFrustum,
             procEntry->geometryMode,
             procEntry->lightingMode,
             procEntry->textureMode,
@@ -232,7 +232,7 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     if ( mesh_out.numVertices < 3u )
         return 0;
 
-    rdCamera_pCurCamera->projectLst(mesh_out.verticesOrig, mesh_out.verticesProjected, mesh_out.numVertices);
+    rdCamera_pCurCamera->fnProjectLst(mesh_out.verticesOrig, mesh_out.verticesProjected, mesh_out.numVertices);
 
     if ( rdroid_curRenderOptions & 2 )
         procEntry->ambientLight = rdCamera_pCurCamera->ambientLight;

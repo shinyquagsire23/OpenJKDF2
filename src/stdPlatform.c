@@ -16,9 +16,18 @@
 
 #include "SDL2_helper.h"
 
+#ifdef TARGET_TWL
+#include <nds.h>
+#endif
+
 #ifdef PLATFORM_POSIX
 uint32_t Linux_TimeMs()
 {
+    // TWL has hardware timers we can use for accurate ms timing
+#ifdef TARGET_TWL
+    return (uint32_t)(((TIMER1_DATA*(1<<16))+TIMER0_DATA)/32.7285);
+#endif
+
     struct timespec _t;
 
 #if defined(_MSC_VER) && !defined(WIN64_MINGW)
@@ -32,6 +41,9 @@ uint32_t Linux_TimeMs()
 
 uint64_t Linux_TimeUs()
 {
+#ifdef TARGET_TWL
+    return (uint64_t)(((TIMER1_DATA*(1<<16))+TIMER0_DATA)/32728.5);
+#endif
     struct timespec _t;
 
 #if defined(_MSC_VER) && !defined(WIN64_MINGW)
@@ -79,7 +91,17 @@ for (int i = 0; i < len; i++)
 
 static int Linux_stdFileClose(stdFile_t fhand)
 {
-    return fclose((void*)fhand);
+    int ret = fclose((void*)fhand);
+
+#ifdef ARCH_WASM
+    EM_ASM(
+        FS.syncfs(false, function (err) {
+            // Error
+        });
+    );
+#endif // ARCH_WASM
+
+    return ret;
 }
 
 
@@ -95,14 +117,17 @@ static size_t Linux_stdFileWrite(stdFile_t fhand, void* dst, size_t len)
     return fwrite(dst, 1, len, (void*)fhand);
 }
 
-static char* Linux_stdFileGets(stdFile_t fhand, char* dst, size_t len)
+static const char* Linux_stdFileGets(stdFile_t fhand, char* dst, size_t len)
 {
     return fgets(dst, len, (void*)fhand);
 }
 
 static int Linux_stdFseek(stdFile_t fhand, int a, int b)
 {
-    return fseek((void*)fhand, a, b);
+    //printf("fseek? %x %x\n", a, b);
+    int ret = fseek((void*)fhand, a, b);
+    //printf("fseek %x\n", ret);
+    return ret;
 }
 
 static int Linux_stdFtell(stdFile_t fhand)
@@ -112,6 +137,14 @@ static int Linux_stdFtell(stdFile_t fhand)
 
 static void* Linux_alloc(uint32_t len)
 {
+#ifdef TARGET_TWL
+    void* ret = malloc(len);
+    if (!ret) {
+        printf("Failed to allocate %x bytes...\n", len);
+        return NULL;
+    }
+    return ret;
+#endif
     //TODO figure out where we're having alloc issues?
     return malloc(len);
 }
@@ -129,7 +162,7 @@ static void* Linux_realloc(void* ptr, uint32_t len)
 
 static int Linux_stdFeof(stdFile_t fhand)
 {
-    return feof((void*)fhand);
+    return feof((FILE*)fhand);
 }
 
 uint32_t stdPlatform_GetTimeMsec()
@@ -157,7 +190,7 @@ void stdPlatform_InitServices(HostServices *handlers)
     handlers->fileRead = stdFileRead;
     handlers->fileGets = stdFileGets;
     handlers->fileWrite = stdFileWrite;
-    handlers->feof = stdFeof;
+    handlers->fileEof = stdFeof;
     handlers->ftell = stdFtell;
     handlers->fseek = stdFseek;
     handlers->fileSize = stdFileSize;
@@ -181,7 +214,7 @@ void stdPlatform_InitServices(HostServices *handlers)
     handlers->fseek = Linux_stdFseek;
     handlers->ftell = Linux_stdFtell;
     handlers->getTimerTick = Linux_TimeMs;
-    handlers->feof = Linux_stdFeof;
+    handlers->fileEof = Linux_stdFeof;
 #endif
 }
 

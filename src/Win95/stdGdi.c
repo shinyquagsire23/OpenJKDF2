@@ -2,7 +2,7 @@
 
 #include "jk.h"
 
-#ifndef SDL2_RENDER
+#if !defined(SDL2_RENDER) && defined(WIN32)
 
 typedef struct BITMAPINFO_stack
 {

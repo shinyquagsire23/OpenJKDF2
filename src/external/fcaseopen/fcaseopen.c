@@ -8,6 +8,15 @@
 #include <errno.h>
 #include <unistd.h>
 
+#if 0
+static int is_directory(const char *path) {
+   struct stat statbuf;
+   if (stat(path, &statbuf) != 0)
+       return 0;
+   return S_ISDIR(statbuf.st_mode);
+}
+#endif
+
 // r must have strlen(path) + 2 bytes
 int casepath(char const *path, char *r)
 {
@@ -72,9 +81,16 @@ int casepath(char const *path, char *r)
             rl += strlen(c);
             last = 1;
         }
-        
+
         c = strsep(&p, "/");
     }
+
+#if 0
+    // Added
+    if(is_directory(r)) {
+        strcat(r, "/");
+    }
+#endif
     
     if (d) closedir(d);
     return 1;

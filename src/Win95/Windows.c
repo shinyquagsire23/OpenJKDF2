@@ -39,7 +39,7 @@ void Windows_Startup()
     WinIdk_SetDplayGuid(Windows_DplayGuid);
     WinIdk_detect_cpu(Windows_cpu_info);
 
-#ifndef SDL2_RENDER
+#if !defined(SDL2_RENDER) && defined(WIN32)
     wuRegistry_GetString("CD Path", cdPath, 128, Windows_cdpath_default); // ????
 #else
     memset(cdPath, 0, sizeof(cdPath));
@@ -70,7 +70,7 @@ void Windows_Shutdown()
 
 int Windows_InitWindow()
 {
-#ifdef SDL2_RENDER
+#if defined(SDL2_RENDER) || defined(TARGET_TWL)
     return 1;
 #endif
     HDC v2; // esi
@@ -246,15 +246,15 @@ int Windows_ErrorMsgboxWide(const char *a1, ...)
 
     va_start(va, a1);
 #ifndef SDL2_RENDER
-    v1 = jkStrings_GetText(a1);
+    v1 = jkStrings_GetUniStringWithFallback(a1);
     jk_vsnwprintf(Text, 0x400u, v1, va);
-    v4 = jkStrings_GetText("ERROR");
+    v4 = jkStrings_GetUniStringWithFallback("ERROR");
     v2 = stdGdi_GetHwnd();
     return jk_MessageBoxW(v2, Text, v4, 0x10u);
 #else
-    v1 = jkStrings_GetText(a1);
+    v1 = jkStrings_GetUniStringWithFallback(a1);
     jk_vsnwprintf(Text, 0x400u, v1, va);
-    //v4 = jkStrings_GetText("ERROR");
+    //v4 = jkStrings_GetUniStringWithFallback("ERROR");
     stdString_WcharToChar(tmp, Text, 1024);
 
     jk_printf("ERROR: %s\n", tmp);
@@ -275,15 +275,15 @@ int Windows_ErrorMsgbox(const char *a1, ...)
     va_start(va, a1);
 
 #ifndef SDL2_RENDER
-    v1 = jkStrings_GetText(a1);
+    v1 = jkStrings_GetUniStringWithFallback(a1);
     jk_vsnwprintf(Text, 0x200u, v1, va);
-    v4 = jkStrings_GetText("ERROR");
+    v4 = jkStrings_GetUniStringWithFallback("ERROR");
     v2 = stdGdi_GetHwnd();
     return jk_MessageBoxW(v2, Text, v4, 0x10u);
 #else
-    v1 = jkStrings_GetText(a1);
+    v1 = jkStrings_GetUniStringWithFallback(a1);
     jk_vsnwprintf(Text, 0x200u, v1, va);
-    //v4 = jkStrings_GetText("ERROR");
+    //v4 = jkStrings_GetUniStringWithFallback("ERROR");
 
     stdString_WcharToChar(tmp, Text, 512);
 
@@ -304,14 +304,14 @@ void Windows_GameErrorMsgbox(const char *a1, ...)
 
     va_start(va, a1);
 
-#ifndef SDL2_RENDER
-    v1 = jkStrings_GetText(a1);
+#if !defined(SDL2_RENDER) && defined(WIN32)
+    v1 = jkStrings_GetUniStringWithFallback(a1);
     jk_vsnwprintf(Text, 0x200u, v1, va);
-    v3 = jkStrings_GetText("ERROR");
+    v3 = jkStrings_GetUniStringWithFallback("ERROR");
     stdDisplay_ClearMode();
     v2 = stdGdi_GetHwnd();
     jk_MessageBoxW(v2, Text, v3, 0x10u);
-#else
+#elif defined(SDL2_RENDER)
     vsnprintf(tmp, 0x200u, a1, va);
     jk_printf("FATAL ERROR: %s\n", tmp);
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", tmp, NULL);
@@ -319,6 +319,10 @@ void Windows_GameErrorMsgbox(const char *a1, ...)
 #if !defined(ARCH_WASM) && !defined(TARGET_ANDROID)
     InstallHelper_CheckRequiredAssets(1);
 #endif
+#else
+    vsnprintf(tmp, 0x200u, a1, va);
+    jk_printf("FATAL ERROR: %s\n", tmp);
+    while(1);
 #endif
     jk_exit(1);
 }

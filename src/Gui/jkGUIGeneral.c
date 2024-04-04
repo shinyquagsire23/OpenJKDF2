@@ -43,10 +43,10 @@ static jkGuiElement jkGuiGeneral_aElements[23] = {
 
     // 12
 #if defined(QOL_IMPROVEMENTS) && !defined(SDL2_RENDER)
-    {ELEMENT_TEXT,         0,            0, L"FOV",                 3, {20, 240, 300, 30}, 1,  0, 0, 0, 0, 0, {0}, 0},
-    {ELEMENT_SLIDER,       0,            0, (FOV_MAX - FOV_MIN),                    0, {10, 270, 320, 30}, 1, 0, L"Set FOV", jkGuiGeneral_FovDraw, 0, slider_images, {0}, 0},
+    {ELEMENT_TEXT,         0,            0, "GUIEXT_FOV",                 3, {20, 240, 300, 30}, 1,  0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_SLIDER,       0,            0, (FOV_MAX - FOV_MIN),                    0, {10, 270, 320, 30}, 1, 0, "GUIEXT_FOV_HINT", jkGuiGeneral_FovDraw, 0, slider_images, {0}, 0},
     {ELEMENT_TEXT,         0,            0, slider_val_text,        3, {20, 300, 300, 30}, 1,  0, 0, 0, 0, 0, {0}, 0},
-    {ELEMENT_CHECKBOX,     0,            0, L"FOV is vertical (Hor+)",    0, {20, 320, 300, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
+    {ELEMENT_CHECKBOX,     0,            0, "GUIEXT_FOV_VERTICAL",    0, {20, 320, 300, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
 #else
     {ELEMENT_TEXT,         0,            0, L"",                 3, {0, 0, 1, 1}, 1,  0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXT,         0,            0, L"",                 3, {0, 0, 1, 1}, 1,  0, 0, 0, 0, 0, {0}, 0},
@@ -57,7 +57,7 @@ static jkGuiElement jkGuiGeneral_aElements[23] = {
     // 16
 #if defined(QOL_IMPROVEMENTS)
     { ELEMENT_TEXTBUTTON,  GUI_ADVANCED, 2, "GUI_ADVANCED",               3, {220, 430, 200, 40}, 1, 0, NULL,                        0, 0, 0, {0}, 0},
-    { ELEMENT_CHECKBOX,    0,            0, L"Disable mission start confirmation.", 0, {330, 180, 300, 40},  1, 0, L"Enter the mission as soon as the level is loaded.",          0, 0, 0, {0}, 0},
+    { ELEMENT_CHECKBOX,    0,            0, "GUIEXT_DISABLE_MISSION_CONFIRMATION", 0, {330, 180, 300, 40},  1, 0, "GUIEXT_DISABLE_MISSION_CONFIRMATION_HINT",          0, 0, 0, {0}, 0},
 #endif
 
     { ELEMENT_END,         0,            0, NULL,                   0, {0},                 0, 0, NULL,                        0, 0, 0, {0}, 0},
@@ -79,9 +79,9 @@ static jkGuiElement jkGuiGeneral_aElementsAdvanced[22] = {
     { ELEMENT_TEXTBUTTON,  1,            2, "GUI_OK",               3, {440, 430, 200, 40}, 1, 0, NULL,                        0, 0, 0, {0}, 0},
     { ELEMENT_TEXTBUTTON, -1,            2, "GUI_CANCEL",           3, {0, 430, 200, 40},   1, 0, NULL,                        0, 0, 0, {0}, 0},
     
-    { ELEMENT_CHECKBOX,    0,            0, L"Restore inconsistent physics",          0, {20, 190, 300, 40},  1, 0, L"Sets physics delta to the render framerate instead of 150Hz.",          0, 0, 0, {0}, 0},
-    { ELEMENT_CHECKBOX,    0,            0, L"Disable corpse despawning",          0, {20, 150, 300, 40},  1, 0, L"Don't automatically despawn corpse bodies.",          0, 0, 0, {0}, 0},
-    { ELEMENT_CHECKBOX,    0,            0, L"Restore 50Hz midair player physics",          0, {20, 230, 300, 40},  1, 0, L"Player physics and POV will be stepped at 50Hz while midair.",          0, 0, 0, {0}, 0},
+    { ELEMENT_CHECKBOX,    0,            0, "GUIEXT_INCONSISTENT_PHYS",          0, {20, 190, 300, 40},  1, 0, "GUIEXT_INCONSISTENT_PHYS_HINT",          0, 0, 0, {0}, 0},
+    { ELEMENT_CHECKBOX,    0,            0, "GUIEXT_CORPSE_DESPAWN",          0, {20, 150, 300, 40},  1, 0, "GUIEXT_CORPSE_DESPAWN_HINT",          0, 0, 0, {0}, 0},
+    { ELEMENT_CHECKBOX,    0,            0, "GUIEXT_50HZ_MIDAIR_PHYS",          0, {20, 230, 300, 40},  1, 0, "GUIEXT_50HZ_MIDAIR_PHYS_HINT",          0, 0, 0, {0}, 0},
     
     { ELEMENT_END,         0,            0, NULL,                   0, {0},                 0, 0, NULL,                        0, 0, 0, {0}, 0},
 };

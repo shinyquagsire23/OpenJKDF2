@@ -1,0 +1,80 @@
+MSGS 100          # <--- DON'T FORGET TO UPDATE THIS COUNT
+
+#  "<key>"     <unused number>   "<string>"
+
+#******************************
+#  OpenJKDF2 added UI strings
+#******************************
+   "OPENJKDF2_EXAMPLE"    0  "Example!"
+
+#******************************
+#  Gameplay
+#******************************
+   "GUIEXT_SHOW_SABER_CROSSHAIR"          0 "Show Crosshair with lightsaber"
+   "GUIEXT_SHOW_SABER_CROSSHAIR_HINT"     0 "When this is enabled the crosshair is shown when the lightsaber is equipped"
+   "GUIEXT_SHOW_FIST_CROSSHAIR"           0 "Show Crosshair with fist"
+   "GUIEXT_SHOW_FIST_CROSSHAIR_HINT"      0 "When this is enabled the crosshair is shown when the fist is equipped"
+   "GUIEXT_CROSSHAIR_SCALE"               0 "Crosshair Scale"
+   "GUIEXT_CROSSHAIR_SCALE_HINT"          0 "Adjust the size of the crosshair (from 0% to 200%)"
+
+#******************************
+#  Display
+#******************************
+   "GUIEXT_FOV"                           0 "FOV"
+   "GUIEXT_FOV_HINT"                      0 "Set FOV"
+   "GUIEXT_FOV_VERTICAL"                  0 "FOV is vertical (Hor+)"
+   "GUIEXT_EN_FULLSCREEN"                 0 "Enable Fullscreen"
+   "GUIEXT_EN_HIDPI"                      0 "Enable HiDPI"
+   "GUIEXT_EN_TEXTURE_FILTERING"          0 "Enable Texture Filtering"
+   "GUIEXT_EN_SQUARE_ASPECT"              0 "Use 1:1 aspect"
+   "GUIEXT_FPS_LIMIT"                     0 "FPS Limit"
+   "GUIEXT_FPS_LIMIT_HINT"                0 "Set FPS limit"
+   "GUIEXT_EN_VSYNC"                      0 "Enable VSync"
+   "GUIEXT_EN_BLOOM"                      0 "Enable Bloom"
+   "GUIEXT_EN_SSAO"                       0 "Enable SSAO"
+   "GUIEXT_SSAA_MULT"                     0 "SSAA Multiplier:"
+   "GUIEXT_GAMMA_VAL"                     0 "Gamma Value:"
+   "GUIEXT_HUD_SCALE"                     0 "HUD Scale:"
+
+   "GUIEXT_EN_JKGFXMOD"                   0 "Enable jkgfxmod"
+   "GUIEXT_EN_JKGFXMOD_HINT"              0 "Overrides in-game textures with textures from jkgm folder."
+   "GUIEXT_EN_TEXTURE_PRECACHE"           0 "Enable texture precaching"
+   "GUIEXT_EN_TEXTURE_PRECACHE_HINT"      0 "Loads all material textures ahead-of-time instead of just-in-time."
+
+#******************************
+#  Quake Console and Updates
+#******************************
+   "GUIEXT_UPDATE_IS_AVAIL"                   0 "An update is available: %S => %S"
+   "GUIEXT_UPDATE_CLICK_TO_DL"                0 "Click here to download."
+   "GUIEXT_UPDATE_DOWNLOADING"                0 "Downloading..."
+   "GUIEXT_UPDATE_COMPLETE_RESTART"           0 "Update complete, restart to apply."
+   "GUIEXT_UPDATE_COMPLETE_SEMIAUTO"          0 "Update downloaded, complete installation and restart."
+
+
+#******************************
+#  Multiplayer Setup
+#******************************
+   "GUIEXT_DEDICATED_SERVER"        0 "Dedicated Server"
+   "GUIEXT_DEDICATED_SERVER_HINT"   0 "Launch server without participating as a player."
+   "GUIEXT_COOP"                    0 "Experimental Co-op"
+   "GUIEXT_COOP_HINT"               0 "Launch server with actors enabled."
+   "GUIEXT_SERVER_PORT"             0 "Server Port:"
+
+   #"GUIEXT_"                0 ""
+
+#******************************
+#  General
+#******************************
+   "GUIEXT_DISABLE_MISSION_CONFIRMATION"        0 "Disable mission start confirmation."
+   "GUIEXT_DISABLE_MISSION_CONFIRMATION_HINT"   0 "Enter the mission as soon as the level is loaded."
+
+   "GUIEXT_INCONSISTENT_PHYS"                   0 "Restore inconsistent physics"
+   "GUIEXT_INCONSISTENT_PHYS_HINT"              0 "Sets physics delta to the render framerate instead of 150Hz."
+
+   "GUIEXT_CORPSE_DESPAWN"                      0 "Disable corpse despawning"
+   "GUIEXT_CORPSE_DESPAWN_HINT"                 0 "Don't automatically despawn corpse bodies."
+
+   "GUIEXT_50HZ_MIDAIR_PHYS"                    0 "Restore 50Hz midair player physics"
+   "GUIEXT_50HZ_MIDAIR_PHYS_HINT"               0 "Player physics and POV will be stepped at 50Hz while midair."
+
+END

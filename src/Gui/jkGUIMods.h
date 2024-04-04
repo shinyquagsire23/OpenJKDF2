@@ -7,18 +7,7 @@
 #include <locale.h>
 #endif
 
-#if defined(SDL2_RENDER)
-#include <SDL.h>
-#ifndef _WIN32
-#include <unistd.h>
-#endif // _WIN32
-#include <sys/types.h>
-#include <stdbool.h>
-#if defined(LINUX) || defined(MACOS)
-#include <pwd.h>
-#endif // defined(LINUX) || defined(MACOS)
-#include "nfd.h"
-#endif // defined(SDL2_RENDER)
+#include "SDL2_helper.h"
 
 #ifdef LINUX
 #include "external/fcaseopen/fcaseopen.h"

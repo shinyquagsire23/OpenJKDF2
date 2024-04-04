@@ -172,6 +172,8 @@ enum SITH_ITEMFLAG_E // could be jones specific
     SITH_ITEM_RESPAWN_MP = 0x1,
     SITH_ITEM_RESPAWN_SP = 0x2,
     SITH_ITEM_BACKPACK = 0x4,
+    SITH_ITEM_8 = 0x8,
+    SITH_ITEM_10 = 0x10
 };
 
 enum jkEpisodeLoadType
@@ -206,23 +208,29 @@ typedef enum
 #define JK_NUM_MOUSE_AXES       (3)
 #define JK_NUM_AXES             ((JK_JOYSTICK_AXIS_STRIDE * JK_NUM_JOYSTICKS) + JK_NUM_MOUSE_AXES)
 
-#ifndef SDL2_RENDER
+#if defined(SDL2_RENDER) || defined(TARGET_TWL)
+#define JK_NUM_MOUSE_BUTTONS     (4)
+#define JK_NUM_EXT_MOUSE_BUTTONS (1)
+#define JK_NUM_JOY_BUTTONS       (8)
+#define JK_NUM_EXT_JOY_BUTTONS   (24)
+#define JK_NUM_HAT_BUTTONS       (4)
+#else
 #define JK_NUM_MOUSE_BUTTONS     (4)
 #define JK_NUM_EXT_MOUSE_BUTTONS (0)
 #define JK_NUM_JOY_BUTTONS       (8)
 #define JK_NUM_EXT_JOY_BUTTONS   (0)
-#define JK_NUM_HAT_BUTTONS       (4)
-#else
-#define JK_NUM_MOUSE_BUTTONS     (4)
-#define JK_NUM_EXT_MOUSE_BUTTONS (28)
-#define JK_NUM_JOY_BUTTONS       (8)
-#define JK_NUM_EXT_JOY_BUTTONS   (24)
 #define JK_NUM_HAT_BUTTONS       (4)
 #endif
 
 #define JK_JOYSTICK_BUTTON_STRIDE       (JK_NUM_JOY_BUTTONS + JK_NUM_HAT_BUTTONS)
 #define JK_JOYSTICK_EXT_BUTTON_STRIDE   (JK_NUM_EXT_JOY_BUTTONS)
 #define JK_NUM_EXTENDED_KEYS ((JK_JOYSTICK_BUTTON_STRIDE * JK_NUM_JOYSTICKS) + JK_NUM_MOUSE_BUTTONS + JK_NUM_EXT_MOUSE_BUTTONS + (JK_JOYSTICK_EXT_BUTTON_STRIDE * JK_NUM_JOYSTICKS))
+
+#if defined(SDL2_RENDER)
+    #define JK_TOTAL_NUM_KEYS (120+JK_NUM_EXTENDED_KEYS)
+#else
+    #define JK_TOTAL_NUM_KEYS (148)
+#endif
 
 #define JK_NUM_KEYS_ORIG        (0x100 + JK_NUM_EXTENDED_KEYS) // original game had an off-by-one?
 #define JK_NUM_KEYS             (0x100 + JK_NUM_EXTENDED_KEYS)
@@ -388,7 +396,7 @@ enum SithCollideType
 {
     SITH_COLLIDE_NONE = 0x0,
     SITH_COLLIDE_SPHERE = 0x1,
-    SITH_COLLIDE_2 = 0x2,
+    SITH_COLLIDE_SPHERE_TREE = 0x2,
     SITH_COLLIDE_FACE = 0x3,
 };
 
@@ -519,6 +527,8 @@ enum JOINTTYPE
     JOINTTYPE_SECONDARYWEAP  = 4,
     JOINTTYPE_PRIMARYWEAPJOINT  = 5,
     JOINTTYPE_SECONDARYWEAPJOINT  = 6,
+    JOINTTYPE_TURRETPITCH  = 7,
+    JOINTTYPE_TURRETYAW  = 8,
 };
 
 enum DSS_ID
@@ -589,6 +599,8 @@ enum DSS_ID
     DSS_64        = 64,
     DSS_MAX        = 66
 };
+
+const char* sithDSS_IdToStr(int id);
 
 enum sithMultiModeFlags
 {
@@ -1037,6 +1049,13 @@ enum SITHBIN
     SITHBIN_MAX      = 199
 };
 
+enum GOAL_FLAGS
+{
+    GOAL_EXISTS = 1,
+    GOAL_COMPLETE = 2,
+    GOAL_SECRET = 4, // Unused, makes text show as yellow
+};
+
 enum ITEMINFO_FLAGS
 {
     ITEMINFO_VALID   = 1,
@@ -1409,6 +1428,26 @@ enum JKGUI_BM {
     JKGUI_BM_FL_RESET = 32, 
     JKGUI_BM_ARROW_LEFT = 33, 
     JKGUI_BM_ARROW_RIGHT = 34, 
+};
+
+enum SITH_MAPMODE
+{
+    MAPMODE_01 = 0x01,
+    MAPMODE_02 = 0x02,
+    MAPMODE_04 = 0x04,
+    MAPMODE_08 = 0x08,
+    MAPMODE_10 = 0x10,
+    MAPMODE_20 = 0x20,
+    MAPMODE_40 = 0x40,
+    MAPMODE_80 = 0x80,
+};
+
+enum AUTOPICKUP
+{
+    AUTOPICKUP_1 = 1,
+    AUTOPICKUP_DANGEROUS = 2,
+    AUTOPICKUP_4 = 4,
+    AUTOPICKUP_8 = 8,
 };
 
 #endif // _OPENJKDF2_TYPES_ENUMS_H

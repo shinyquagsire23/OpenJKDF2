@@ -63,10 +63,10 @@ void rdDebug_DrawLine3(rdVector3* v1, rdVector3* v2, uint32_t color)
     
     // Clip the lines to the view frustum
     int out1, out2;
-    rdClip_Line3Project(rdCamera_pCurCamera->cameraClipFrustum, &verts[0], &verts[1], &out1, &out2);
+    rdClip_Line3Project(rdCamera_pCurCamera->pClipFrustum, &verts[0], &verts[1], &out1, &out2);
 
     // And project to screen coords
-    rdCamera_pCurCamera->projectLst(&vertsOut, &verts, 2);
+    rdCamera_pCurCamera->fnProjectLst(&vertsOut, &verts, 2);
     
     vertsOut[0].x = (float)(int)vertsOut[0].x + 0.0001;
     vertsOut[0].y = (float)(int)vertsOut[0].y + 0.0001;

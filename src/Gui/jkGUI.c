@@ -103,7 +103,7 @@ void jkGui_InitMenu(jkGuiMenu *menu, stdBitmap *bgBitmap)
 
         if ( iter->hintText )
         {
-            wchar_t* text = jkStrings_GetText2(iter->hintText);
+            wchar_t* text = jkStrings_GetUniString(iter->hintText);
             if ( text ) {
                 iter->wHintText = stdString_FastWCopy(text);
                 iter->wHintTextAlloced = iter->wHintText;
@@ -114,7 +114,7 @@ void jkGui_InitMenu(jkGuiMenu *menu, stdBitmap *bgBitmap)
         {
             if ( iter->str )
             {
-                wchar_t* text = jkStrings_GetText2(iter->str);
+                wchar_t* text = jkStrings_GetUniString(iter->str);
                 if ( text ) {
                     iter->wstr = stdString_FastWCopy(text);
                     iter->strAlloced = (const char*)iter->wstr;
@@ -145,16 +145,18 @@ int jkGui_Startup()
     {
         stdString_snprintf(tmp, 128, "ui\\sft\\%s", jkGui_aFonts[i]);
         jkGui_stdFonts[i] = stdFont_Load(tmp, 1, 0);
-        if (jkGui_stdFonts[i] == NULL)
+        if (jkGui_stdFonts[i] == NULL) {
             Windows_GameErrorMsgbox("ERR_CANNOT_LOAD_FILE %s", tmp);
+        }
     }
 
     for (int i = 0; i < 35; i++)
     {
         stdString_snprintf(tmp, 128, "ui\\bm\\%s", jkGui_aBitmaps[i]);
         jkGui_stdBitmaps[i] = stdBitmap_Load(tmp, 1, 0);
-        if (jkGui_stdBitmaps[i] == NULL)
+        if (jkGui_stdBitmaps[i] == NULL) {
             Windows_GameErrorMsgbox("ERR_CANNOT_LOAD_FILE %s", tmp);
+        }
     }
 
     Window_ShowCursorUnwindowed(Main_bWindowGUI == 0);

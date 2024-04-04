@@ -16,7 +16,7 @@ int sithAIClass_Startup()
 
 void sithAIClass_Shutdown()
 {
-    if ( sithAIClass_hashmap )
+    if (sithAIClass_hashmap)
     {
         stdHashTable_Free(sithAIClass_hashmap);
         sithAIClass_hashmap = 0;
@@ -30,7 +30,7 @@ int sithAIClass_New(sithWorld *world, int a2)
 
     result = (intptr_t)pSithHS->alloc(sizeof(sithAIClass) * a2);
     world->aiclasses = (sithAIClass *)result;
-    if ( result )
+    if (result)
     {
         _memset((void *)result, 0, sizeof(sithAIClass) * a2);
         world->numAIClasses = a2;
@@ -50,43 +50,44 @@ int sithAIClass_ParseSection(sithWorld *world, int a2)
     int numAIClasses; // ebx
     sithAIClass *aiclasses; // eax
 
-    if ( a2 )
+    if (a2) {
         return 0;
+    }
     stdConffile_ReadArgs();
-    if ( _strcmp(stdConffile_entry.args[0].value, "world") || _strcmp(stdConffile_entry.args[1].value, "aiclasses") )
+    if (_strcmp(stdConffile_entry.args[0].value, "world") || _strcmp(stdConffile_entry.args[1].value, "aiclasses")) {
         return 0;
+    }
     numAIClasses = _atoi(stdConffile_entry.args[2].value);
-    if ( !numAIClasses )
-        return 1;
-    aiclasses = (sithAIClass *)pSithHS->alloc(sizeof(sithAIClass) * numAIClasses);
-    world->aiclasses = aiclasses;
-    if ( aiclasses )
-    {
-        _memset(aiclasses, 0, sizeof(sithAIClass) * numAIClasses);
-        world->numAIClassesLoaded = 0;
-        world->numAIClasses = numAIClasses;
-        if ( stdConffile_ReadArgs() )
-        {
-            while ( _strcmp(stdConffile_entry.args[0].value, "end") )
-            {
-                if ( !sithAIClass_Load(stdConffile_entry.args[1].value) )
-                {
-                    stdPrintf(pSithHS->errorPrint, ".\\Ai\\sithAIClass.c", 172, "Parse error while reading aiclasses, line %d.\n", stdConffile_linenum);
-                    return 0;
-                }
-                if ( !stdConffile_ReadArgs() )
-                    break;
-            }
-        }
+    if (!numAIClasses) {
         return 1;
     }
-    else
+    aiclasses = (sithAIClass *)pSithHS->alloc(sizeof(sithAIClass) * numAIClasses);
+    world->aiclasses = aiclasses;
+    if (!aiclasses)
     {
         world->numAIClasses = 0;
         world->numAIClassesLoaded = 0;
         stdPrintf(pSithHS->errorPrint, ".\\Ai\\sithAIClass.c", 176, "Memory error while reading aiclasses, line %d.\n", stdConffile_linenum);
         return 0;
     }
+    
+    _memset(aiclasses, 0, sizeof(sithAIClass) * numAIClasses);
+    world->numAIClassesLoaded = 0;
+    world->numAIClasses = numAIClasses;
+    if ( stdConffile_ReadArgs() )
+    {
+        while ( _strcmp(stdConffile_entry.args[0].value, "end") )
+        {
+            if ( !sithAIClass_Load(stdConffile_entry.args[1].value) )
+            {
+                stdPrintf(pSithHS->errorPrint, ".\\Ai\\sithAIClass.c", 172, "Parse error while reading aiclasses, line %d.\n", stdConffile_linenum);
+                return 0;
+            }
+            if ( !stdConffile_ReadArgs() )
+                break;
+        }
+    }
+    return 1;
 }
 
 sithAIClass* sithAIClass_Load(char *fpath)

@@ -145,7 +145,7 @@ void rdPrimit3_ClipFace(rdClipFrustum *clipFrustum, rdGeoMode_t geoMode, signed 
                 v16 = mesh_out;
             }
             v86 = v17;
-            if ( rdCamera_pCurCamera->projectType == 1 )
+            if (rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective)
 LABEL_26:
                 v16->numVertices = rdClip_Face3S(clipFrustum, v16->verticesProjected, v86);
             else
@@ -176,7 +176,7 @@ LABEL_27:
                 v9 = idxInfoa;
                 v8 = mesh_out;
             }
-            if ( rdCamera_pCurCamera->projectType == 1 )
+            if (rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective)
                 v8->numVertices = rdClip_Face3W(clipFrustum, v8->verticesProjected, v9);
             else
                 v8->numVertices = rdClip_Face3WOrtho(clipFrustum, v8->verticesProjected, v9);
@@ -207,7 +207,7 @@ LABEL_27:
                     while ( v24 );
                     v16 = mesh_out;
                     v86 = idxInfoc;
-                    if ( rdCamera_pCurCamera->projectType != 1 )
+                    if ( rdCamera_pCurCamera->projectType != rdCameraProjectType_Perspective)
                         goto LABEL_27;
                     mesh_out->numVertices = rdClip_Face3S(clipFrustum, mesh_out->verticesProjected, idxInfoc);
                     break;
@@ -236,7 +236,7 @@ LABEL_27:
                     }
 LABEL_25:
                     v86 = v24;
-                    if ( rdCamera_pCurCamera->projectType == 1 )
+                    if ( rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective)
                         goto LABEL_26;
                     goto LABEL_27;
                 case RD_LIGHTMODE_GOURAUD:
@@ -321,7 +321,7 @@ LABEL_25:
                     }
                     v84 = (float*)v37->paDynamicLight;
                     v82 = v37->verticesProjected;
-                    if ( rdCamera_pCurCamera->projectType == 1 )
+                    if (rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective)
                         v37->numVertices = rdClip_Face3GS(clipFrustum, v82, v84, v39);
                     else
                         v37->numVertices = rdClip_Face3GSOrtho(clipFrustum, v82, v84, v39);
@@ -368,7 +368,7 @@ LABEL_25:
                     }
                     v85 = v71->vertexUVs;
                     v83 = v71->verticesProjected;
-                    if ( rdCamera_pCurCamera->projectType == 1 )
+                    if (rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective)
                         v71->numVertices = rdClip_Face3T(clipFrustum, v83, v85, v72);
                     else
                         v71->numVertices = rdClip_Face3TOrtho(clipFrustum, v83, v85, v72);
@@ -459,7 +459,7 @@ LABEL_25:
                         v53 = mesh_out;
                         v55 = idxInfof;
                     }
-                    if ( rdCamera_pCurCamera->projectType == 1 )
+                    if (rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective)
                         v53->numVertices = rdClip_Face3GT(clipFrustum, v53->verticesProjected, v53->vertexUVs, v53->paDynamicLight, v55);
                     else
                         v53->numVertices = rdClip_Face3GTOrtho(clipFrustum, v53->verticesProjected, v53->vertexUVs, v53->paDynamicLight, v55);
@@ -884,9 +884,9 @@ int rdPrimit3_GetScreenCoord(rdVector3 *vec, rdScreenPoint *screenpt)
     rdVector3 a2a; // [esp+Ch] [ebp-Ch] BYREF
 
     rdMatrix_TransformPoint34(&a2a, vec, &rdCamera_pCurCamera->view_matrix);
-    if ( !rdClip_Point3(rdCamera_pCurCamera->cameraClipFrustum, &a2a) )
+    if ( !rdClip_Point3(rdCamera_pCurCamera->pClipFrustum, &a2a) )
         return 0;
-    rdCamera_pCurCamera->project(&v4, &a2a);
+    rdCamera_pCurCamera->fnProject(&v4, &a2a);
     if ( screenpt )
     {
         v2 = v4.y;
@@ -913,8 +913,8 @@ void rdPrimit3_DrawCircle(rdVector3 *pVecPos, float xOffs, float radius, int col
     v7.x = vertex_out.x + xOffs;
     if ( vertex_out.y > 0.0 )
     {
-        rdCamera_pCurCamera->project(&v8, &vertex_out);
-        rdCamera_pCurCamera->project(&v9, &v7);
+        rdCamera_pCurCamera->fnProject(&v8, &vertex_out);
+        rdCamera_pCurCamera->fnProject(&v9, &v7);
         v5 = v9.x - v8.x;
         rdPrimit2_DrawCircle(rdCamera_pCurCamera->canvas, (__int64)(v8.x - -0.5), (__int64)(v8.y - -0.5), v5, radius, color16, mask);
     }
@@ -1210,7 +1210,7 @@ rdPrimit3_ClipFaceRGB
                 prVar19 = prVar19 + 1;
             } while (uVar21 != 0);
         }
-        if (rdCamera_pCurCamera->projectType != 1) {
+        if (rdCamera_pCurCamera->projectType != rdCameraProjectType_Perspective) {
             uVar15 = rdClip_Face3WOrtho(clipFrustum,mesh_out->verticesProjected,idxInfo->numVertices);
             mesh_out->numVertices = uVar15;
             return;
@@ -1238,7 +1238,7 @@ rdPrimit3_ClipFaceRGB
                     prVar19->z = prVar1->z;
                     prVar19 = prVar19 + 1;
                 } while (uVar21 != 0);
-                if (rdCamera_pCurCamera->projectType == 1) {
+                if (rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective) {
                     uVar15 = rdClip_Face3S(clipFrustum,mesh_out->verticesProjected,idxInfo->numVertices);
                     mesh_out->numVertices = uVar15;
                     return;
@@ -1367,7 +1367,7 @@ rdPrimit3_ClipFaceRGB
                     //mesh_out->paBlueIntensities[i] = idxInfo->paBlueIntensities[i] + idxInfo->paDynamicLight[vtxIdx];
                 }
 #endif
-                if (rdCamera_pCurCamera->projectType == 1) {
+                if (rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective) {
                     uVar15 = rdClip_Face3T(clipFrustum,mesh_out->verticesProjected,
                                            mesh_out->vertexUVs,idxInfo->numVertices);
                     mesh_out->numVertices = uVar15;
@@ -1547,7 +1547,7 @@ void rdPrimit3_ClipFaceRGBLevel
                 prVar20++;
             } while (uVar22 != 0);
         }
-        if (rdCamera_pCurCamera->projectType != 1) {
+        if (rdCamera_pCurCamera->projectType != rdCameraProjectType_Perspective) {
             uVar16 = rdClip_Face3WOrtho(clipFrustum,mesh_out->verticesProjected,uVar16);
             mesh_out->numVertices = uVar16;
             return;
@@ -1573,7 +1573,7 @@ void rdPrimit3_ClipFaceRGBLevel
                     rdVector_Copy3(prVar20, prVar1);
                     prVar20++;
                 } while (uVar22 != 0);
-                if (rdCamera_pCurCamera->projectType == 1) {
+                if (rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective) {
                     uVar16 = rdClip_Face3S(clipFrustum,mesh_out->verticesProjected,uVar16);
                     mesh_out->numVertices = uVar16;
                     return;
@@ -1662,7 +1662,7 @@ void rdPrimit3_ClipFaceRGBLevel
                         piVar24++;
                     } while (local_8 != 0);
                 }
-                if (rdCamera_pCurCamera->projectType == 1) {
+                if (rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective) {
                     uVar16 = rdClip_Face3T(clipFrustum,mesh_out->verticesProjected,
                                            mesh_out->vertexUVs,idxInfo->numVertices);
                     mesh_out->numVertices = uVar16;

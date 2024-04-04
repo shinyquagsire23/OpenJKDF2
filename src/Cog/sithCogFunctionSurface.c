@@ -9,12 +9,12 @@
 
 void sithCogFunctionSurface_GetSurfaceAdjoin(sithCog *ctx)
 {
-    sithSurface *surface; // eax
-    uint32_t *v2; // eax
+    sithSurface* pSurface = sithCogExec_PopSurface(ctx);
 
-    surface = sithCogExec_PopSurface(ctx);
-    if ( surface && (v2 = &surface->adjoin->mirror->surface->field_0) != 0 )
-        sithCogExec_PushInt(ctx, *v2);
+    // TODO was this borked in JKDF2 and fixed in MoTS?
+    // Previously: (v2 = &pSurface->adjoin->mirror->surface->index) != 0
+    if ( pSurface && pSurface->adjoin->mirror->surface) 
+        sithCogExec_PushInt(ctx, pSurface->adjoin->mirror->surface->index);
     else
         sithCogExec_PushInt(ctx, -1);
 }
@@ -128,9 +128,9 @@ void sithCogFunctionSurface_SurfaceLightAnim(sithCog *ctx)
     rdSurface *v3; // eax
     float v4; // [esp+0h] [ebp-14h]
 
-    float v5 = sithCogExec_PopFlex(ctx);
-    float v6 = sithCogExec_PopFlex(ctx);
-    float a1 = sithCogExec_PopFlex(ctx);
+    cog_flex_t v5 = sithCogExec_PopFlex(ctx);
+    cog_flex_t v6 = sithCogExec_PopFlex(ctx);
+    cog_flex_t a1 = sithCogExec_PopFlex(ctx);
     sithSurface* v2 = sithCogExec_PopSurface(ctx);
     if ( v2 && v6 >= (double)a1 && v5 > 0.0 && (v4 = v5 * 0.5, v2->surfaceInfo.face.extraLight = a1, (v3 = sithSurface_SurfaceLightAnim(v2, v6, v4)) != 0) )
         sithCogExec_PushInt(ctx, v3->index);
@@ -145,9 +145,8 @@ void sithCogFunctionSurface_SlideWallSurface(sithCog *ctx)
     sithSurface *v4; // edi
     rdSurface *v5; // ebx
     rdVector3 v7; // [esp+Ch] [ebp-Ch] BYREF
-    float scale; // [esp+1Ch] [ebp+4h]
 
-    scale = sithCogExec_PopFlex(ctx) * 0.1;
+    cog_flex_t scale = sithCogExec_PopFlex(ctx) * 0.1;
     pop_vec = sithCogExec_PopVector3(ctx, &v7);
     surface = sithCogExec_PopSurface(ctx);
     v4 = surface;
@@ -477,11 +476,9 @@ void sithCogFunctionSurface_GetFaceTexMode(sithCog *ctx)
 void sithCogFunctionSurface_SetSurfaceLight(sithCog *ctx)
 {
     sithSurface *v2; // ecx
-    float v4; // [esp+4h] [ebp-4h]
-    float a1; // [esp+Ch] [ebp+4h]
 
-    v4 = sithCogExec_PopFlex(ctx);
-    a1 = sithCogExec_PopFlex(ctx);
+    cog_flex_t v4 = sithCogExec_PopFlex(ctx);
+    cog_flex_t a1 = sithCogExec_PopFlex(ctx);
     v2 = sithCogExec_PopSurface(ctx);
     if ( v2 && a1 >= 0.0 )
     {
@@ -573,7 +570,7 @@ void sithCogFunctionSurface_GetSurfaceVertexLight(sithCog *ctx)
 // MOTS added
 void sithCogFunctionSurface_SetSurfaceVertexLight(sithCog *ctx)
 {
-    float val = sithCogExec_PopFlex(ctx);
+    cog_flex_t val = sithCogExec_PopFlex(ctx);
     int num = sithCogExec_PopInt(ctx);
     sithSurface* pSurface = sithCogExec_PopSurface(ctx);
 

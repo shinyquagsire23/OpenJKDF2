@@ -338,8 +338,8 @@ void jkGuiMouse_sub_417100(int a1, int a2)
     }
     else
     {
-        v12 = jkStrings_GetText("ERR_CANNOT_BIND_CONTROL");
-        v11 = jkStrings_GetText("ERROR");
+        v12 = jkStrings_GetUniStringWithFallback("ERR_CANNOT_BIND_CONTROL");
+        v11 = jkStrings_GetUniStringWithFallback("ERROR");
         jkGuiDialog_ErrorDialog(v11, v12);
         jkGuiMouse_sub_416D40(&jkGuiMouse_menu, 0);
         jkGuiRend_Paint(&jkGuiMouse_menu);
@@ -373,7 +373,7 @@ void jkGuiMouse_sub_417210()
     v2 = &jkGuiMouse_aEntries[0];
     for (int i = 0; i < NUM_MOUSE_ENTRIES; i++)
     {
-        v3 = jkStrings_GetText(v2->displayStrKey);
+        v3 = jkStrings_GetUniStringWithFallback(v2->displayStrKey);
 
         // Added
         if (!v3) v3 = L"";
@@ -424,7 +424,7 @@ int jkGuiMouse_EnumBindings(int a1, const char *a2, uint32_t a3, int a4, uint32_
     v8 = &jkGuiMouse_pWStr_5566E8;
     if ( (a3 & 1) == 0 )
         return 1;
-    v9 = jkStrings_GetText2(a2);
+    v9 = jkStrings_GetUniString(a2);
     v15 = v9;
     if ( !v9 )
         return 1;
@@ -448,7 +448,7 @@ int jkGuiMouse_EnumBindings(int a1, const char *a2, uint32_t a3, int a4, uint32_
         {
             strncat(v16, "_K", 0x20u);
         }
-        v8 = jkStrings_GetText(v16);
+        v8 = jkStrings_GetUniStringWithFallback(v16);
         if ( !v8 )
             return 1;
         v9 = v15;
@@ -544,8 +544,8 @@ int jkGuiMouse_ListClicked3(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX
         }
         else
         {
-            v16 = jkStrings_GetText("ERR_CANNOT_BIND_CONTROL");
-            v14 = jkStrings_GetText("ERROR");
+            v16 = jkStrings_GetUniStringWithFallback("ERR_CANNOT_BIND_CONTROL");
+            v14 = jkStrings_GetUniStringWithFallback("ERROR");
             jkGuiDialog_ErrorDialog(v14, v16);
             jkGuiMouse_sub_416D40(&jkGuiMouse_menu, 0);
             jkGuiRend_Paint(&jkGuiMouse_menu);
@@ -614,8 +614,8 @@ int jkGuiMouse_CancelOkClicked(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, 
             }
             else
             {
-                v15 = jkStrings_GetText("ERR_CANNOT_BIND_CONTROL");
-                v13 = jkStrings_GetText("ERROR");
+                v15 = jkStrings_GetUniStringWithFallback("ERR_CANNOT_BIND_CONTROL");
+                v13 = jkStrings_GetUniStringWithFallback("ERROR");
                 jkGuiDialog_ErrorDialog(v13, v15);
                 jkGuiMouse_sub_416D40(&jkGuiMouse_menu, 0);
                 jkGuiRend_Paint(&jkGuiMouse_menu);
@@ -637,8 +637,8 @@ int jkGuiMouse_RestoreDefaultsClicked(jkGuiElement *pClickedElement, jkGuiMenu *
     wchar_t *v7; // [esp-4h] [ebp-8h]
 
     jkGuiRend_PlayWav(pMenu->soundClick);
-    v7 = jkStrings_GetText("GUI_RESTORE_DEFAULTS_Q");
-    v5 = jkStrings_GetText("GUI_RESTORE_DEFAULTS");
+    v7 = jkStrings_GetUniStringWithFallback("GUI_RESTORE_DEFAULTS_Q");
+    v5 = jkStrings_GetUniStringWithFallback("GUI_RESTORE_DEFAULTS");
     if ( jkGuiDialog_YesNoDialog(v5, v7) )
         sithControl_sub_4D7670();
     jkGuiMouse_sub_417210();

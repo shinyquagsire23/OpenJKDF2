@@ -124,11 +124,9 @@ void sithCogFunctionSector_GetSectorLight(sithCog *ctx)
 void sithCogFunctionSector_SetSectorLight(sithCog *ctx)
 {
     sithSector *sector; // ecx
-    float v4; // [esp+4h] [ebp-4h]
-    float extraLight; // [esp+Ch] [ebp+4h]
 
-    v4 = sithCogExec_PopFlex(ctx);
-    extraLight = sithCogExec_PopFlex(ctx);
+    cog_flex_t v4 = sithCogExec_PopFlex(ctx);
+    cog_flex_t extraLight = sithCogExec_PopFlex(ctx);
     sector = sithCogExec_PopSector(ctx);
     if ( sector && extraLight >= 0.0 )
     {
@@ -201,7 +199,7 @@ void sithCogFunctionSector_SetSectorThrust(sithCog *ctx)
 {
     rdVector3 thrust;
 
-    float mult = sithCogExec_PopFlex(ctx);
+    cog_flex_t mult = sithCogExec_PopFlex(ctx);
     int thrust_valid = sithCogExec_PopVector3(ctx, &thrust);
     sithSector* sector = sithCogExec_PopSector(ctx);
 
@@ -358,7 +356,7 @@ void sithCogFunctionSector_GetSectorSurfaceRef(sithCog *ctx)
     v1 = sithCogExec_PopInt(ctx);
     v2 = sithCogExec_PopSector(ctx);
     if ( v2 && (unsigned int)v1 < v2->numSurfaces && v1 >= 0 )
-        sithCogExec_PushInt(ctx, v2->surfaces[v1].field_0);
+        sithCogExec_PushInt(ctx, v2->surfaces[v1].index);
     else
         sithCogExec_PushInt(ctx, -1);
 }
@@ -377,7 +375,7 @@ void sithCogFunctionSector_ChangeAllSectorsLight(sithCog *ctx)
 {
     sithSector *v1; // eax
 
-    float val = sithCogExec_PopFlex(ctx);
+    cog_flex_t val = sithCogExec_PopFlex(ctx);
     for (int i = 0; i < sithWorld_pCurrentWorld->numSectors; i++) {
         sithSector* pSector = &sithWorld_pCurrentWorld->sectors[i];
         pSector->extraLight = val;
@@ -404,7 +402,7 @@ void sithCogFunctionSector_IsSphereInSector(sithCog *ctx)
     rdVector3 tmp;
     
     sithSector* pSector = sithCogExec_PopSector(ctx);
-    float radius = sithCogExec_PopFlex(ctx);
+    cog_flex_t radius = sithCogExec_PopFlex(ctx);
     sithCogExec_PopVector3(ctx,&tmp);
     if (pSector && (0.0 <= radius)) {
         if (sithIntersect_IsSphereInSector(&tmp,radius,pSector)) {
@@ -431,7 +429,7 @@ void sithCogFunctionSector_GetSectorAmbientLight(sithCog *ctx)
 // MOTS added
 void sithCogFunctionSector_SetSectorAmbientLight(sithCog *ctx)
 {
-    float val = sithCogExec_PopFlex(ctx);
+    cog_flex_t val = sithCogExec_PopFlex(ctx);
     sithSector* pSector = sithCogExec_PopSector(ctx);
 
     if (pSector && (0.0 <= val)) {
@@ -448,7 +446,7 @@ void sithCogFunctionSector_GetAmbient(sithCog *ctx)
         return;
     }
 
-    float val = pSector->extraLight + pSector->ambientLight;
+    cog_flex_t val = pSector->extraLight + pSector->ambientLight;
     if (0.0 <= val) {
         if (val <= 1.0) {
             sithCogExec_PushFlex(ctx, val);

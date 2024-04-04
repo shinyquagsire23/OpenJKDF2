@@ -48,7 +48,7 @@ static jkGuiElement jkGuiSound_elements[25] = {
     {ELEMENT_TEXT, 0, 0, "GUI_MAX", 2, {590, 370, 40, 20}, 1, 0, 0, 0, 0, 0, {0}, 0},
 #else
     {ELEMENT_TEXT, 0, 0, "GUI_DIGICHANNELS", 3, {340, 310, 220, 20}, 1, 0, 0, 0, 0, 0, {0}, 0},
-    {ELEMENT_SLIDER, 0, 0, (const char*)16, 0, {300, 335, 320, 30}, 1, 0, "GUI_DIGICHANNELS_HINT", 0, 0, slider_1, {0}, 0},
+    {ELEMENT_SLIDER, 0, 0, (const char*)16, 0, {300, 335, 320, 30}, 1, 0, "GUI_DIGICHANNELS_HINT", 0, 0, slider_images, {0}, 0},
     {ELEMENT_TEXT, 0, 0, "GUI_8", 2, {310, 370, 40, 20}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXT, 0, 0, "GUI_16", 2, {450, 370, 40, 20}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXT, 0, 0, "GUI_24", 2, {590, 370, 40, 20}, 1, 0, 0, 0, 0, 0, {0}, 0},
@@ -113,9 +113,9 @@ int jkGuiSound_Show()
 
     // START MOTS removed:
     if ( jkGuiSound_bLowResSound )
-        v0 = jkStrings_GetText("GUI_LOWRESSOUNDS");
+        v0 = jkStrings_GetUniStringWithFallback("GUI_LOWRESSOUNDS");
     else
-        v0 = jkStrings_GetText("GUI_HIGHRESSOUNDS");
+        v0 = jkStrings_GetUniStringWithFallback("GUI_HIGHRESSOUNDS");
 
     jkGuiSound_elements[8].wstr = v0;
     // END MOTS removed
@@ -144,8 +144,8 @@ int jkGuiSound_Show()
         jkGuiSound_numChannels = jkGuiSound_elements[18].selectedTextEntry + 8;
         if ( jkGuiSound_b3DSound_3 && jkGuiSound_elements[7].selectedTextEntry != jkGuiSound_b3DSound_2 )
         {
-            v4 = jkStrings_GetText("GUISOUND_MUSTRESTART");
-            v2 = jkStrings_GetText("GUISOUND_WARNING");
+            v4 = jkStrings_GetUniStringWithFallback("GUISOUND_MUSTRESTART");
+            v2 = jkStrings_GetUniStringWithFallback("GUISOUND_WARNING");
             jkGuiDialog_ErrorDialog(v2, v4);
             jkGuiSound_b3DSound_2 = jkGuiSound_elements[7].selectedTextEntry;
             wuRegistry_SaveBool("b3DSound", (HKEY)jkGuiSound_elements[7].selectedTextEntry);

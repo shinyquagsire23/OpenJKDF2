@@ -95,11 +95,8 @@ int sithComm_SendMsgToPlayer(sithCogMsg *msg, int a2, int mpFlags, int a4)
     char multiplayerFlags; // bl
     unsigned int curMs; // esi
     __int16 v9; // ax
-    unsigned int v10; // ebx
-    int v11; // edi
     int idx; // ecx
     sithCogMsg *v14; // eax
-    int v16; // eax
     sithCogMsg *v17; // edi
     int v19; // ecx
     int v20; // eax
@@ -121,15 +118,13 @@ int sithComm_SendMsgToPlayer(sithCogMsg *msg, int a2, int mpFlags, int a4)
             v9 = sithComm_msgId;
             if ( !sithComm_msgId )
                 v9 = 1;
-            v10 = jkPlayer_maxPlayers;
-            v11 = a2;
             msg->netMsg.msgId = v9;
             sithComm_msgId = v9 + 1;
             msg->netMsg.field_C = a2;
             idx_ = 0;
             msg->netMsg.timeMs2 = curMs;
             msg->netMsg.field_14 = 0;
-            for (int i = 0; i < v10; i++)
+            for (int i = 0; i < jkPlayer_maxPlayers; i++)
             {
                 if ( i != playerThingIdx && (jkPlayer_playerInfos[i].net_id == a2 || (a2 == -1 || !a2) && (jkPlayer_playerInfos[i].flags & 1) != 0) )
                     msg->netMsg.field_14 |= 1 << i;
@@ -155,22 +150,18 @@ int sithComm_SendMsgToPlayer(sithCogMsg *msg, int a2, int mpFlags, int a4)
 
             if ( idx == 32 )
             {
-                v16 = sithTime_curMs;
                 v17 = &sithComm_MsgTmpBuf[idx_];
-                v17->netMsg.field_18 = sithComm_MsgTmpBuf[idx_].netMsg.field_18 + 1;
-                v17->netMsg.timeMs2 = v16;
-                if ( v10 )
+                v17->netMsg.field_18++;
+                v17->netMsg.timeMs2 = sithTime_curMs;
+                for (unsigned int v15 = 0; v15 < jkPlayer_maxPlayers; v15++)
                 {
-                    for (unsigned int v15 = 0; v15 < jkPlayer_maxPlayers; v15++)
+                    v19 = sithComm_MsgTmpBuf[idx_].netMsg.field_14;
+                    if ( (v19 & (1 << v15)) != 0 )
                     {
-                        v19 = sithComm_MsgTmpBuf[idx_].netMsg.field_14;
-                        if ( (v19 & (1 << v15)) != 0 )
-                        {
-                            if (jkPlayer_playerInfos[v15].net_id)
-                                stdComm_SendToPlayer(v17, jkPlayer_playerInfos[v15].net_id);
-                            else
-                                sithComm_MsgTmpBuf[idx_].netMsg.field_14 = ~(1 << v15) & v19;
-                        }
+                        if (jkPlayer_playerInfos[v15].net_id)
+                            stdComm_SendToPlayer(v17, jkPlayer_playerInfos[v15].net_id);
+                        else
+                            sithComm_MsgTmpBuf[idx_].netMsg.field_14 = ~(1 << v15) & v19;
                     }
                 }
                 if ( !sithComm_MsgTmpBuf[idx_].netMsg.field_14 || sithComm_MsgTmpBuf[idx_].netMsg.field_18 >= 6u )
@@ -184,17 +175,15 @@ int sithComm_SendMsgToPlayer(sithCogMsg *msg, int a2, int mpFlags, int a4)
             ++sithComm_idk2;
             v20 = msg->netMsg.field_14;
             _memcpy(&sithComm_MsgTmpBuf[idx_], msg, sizeof(sithCogMsg));
-            v11 = a2;
             if ( !v20 )
 LABEL_35:
                 msg->netMsg.msgId = 0;
         }
         else
         {
-            v11 = a2;
             msg->netMsg.msgId = 0;
         }
-        ret = stdComm_SendToPlayer(msg, v11);
+        ret = stdComm_SendToPlayer(msg, a2);
     }
     if ( (multiplayerFlags & 4) != 0 )
     {
@@ -204,7 +193,7 @@ LABEL_35:
 }
 
 // MOTS altered
-void sithComm_FileWrite(sithCogMsg *ctx)
+void sithComm_FileWrite(sithCogMsg* ctx)
 {
     // Added: multiple version handling
     if (sithComm_version == 0x7D6) {

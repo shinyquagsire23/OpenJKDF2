@@ -127,12 +127,12 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
             //if (thing->parentSithThing == sithPlayer_pLocalPlayerThing && v4->keyframe)
             //    stdPlatform_Printf("%d %s (%x/%u) %p %x %f\n", i, v4->keyframe->name, v4->keyframe->id, v4->keyframe->id, v4->keyframe, v4->status, v4->playSpeed);
 
-            // Added: joints check
-            if ( v4->status && v4->keyframe && v4->keyframe->joints)
+            // Added: paJoints check
+            if ( v4->status && v4->keyframe && v4->keyframe->paJoints)
             {
                 for (int j = 0; j < v4->keyframe->numJoints2; j++)
                 {
-                    v8 = &v4->keyframe->joints[j];
+                    v8 = &v4->keyframe->paJoints[j];
                     v9 = 0;
                     if (!v8->numAnimEntries) continue;
 
@@ -154,9 +154,9 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
                         v12 = v10 + 1;
 
                         // TODO: TODOA had an OOB access here
-                        if ( v4->field_120 >= (double)v8->animEntries[v10 + 1].frameNum )
+                        if ( v4->field_120 >= (double)v8->paAnimEntries[v10 + 1].frameNum )
                         {
-                            v13 = &v8->animEntries[v10 + 2];
+                            v13 = &v8->paAnimEntries[v10 + 2];
                             do
                             {
                                 if ( v12 == v8->numAnimEntries - 1 )
@@ -210,7 +210,7 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
                     if (v16->status & 2)
                     {
                         v19 = v15->idx;
-                        v20 = &v17->joints[v19]; // overflow in orig? added (moved): v19 < v17->numJoints2
+                        v20 = &v17->paJoints[v19]; // overflow in orig? added (moved): v19 < v17->numJoints2
                         if ( v19 < v17->numJoints2 && v20->numAnimEntries )
                         {
                             if ( v18 >= v73 && (v18 >= v75 || v70 < 1.0) && v19 < v17->numJoints2 )
@@ -225,8 +225,8 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
                                     v21 = 0;
                                 }
 
-                                v23 = v16->field_120 - v20->animEntries[v21].frameNum;
-                                v24 = &v20->animEntries[v21];
+                                v23 = v16->field_120 - v20->paAnimEntries[v21].frameNum;
+                                v24 = &v20->paAnimEntries[v21];
                                 v25 = v24->flags;
                                 if ( (v25 & 1) != 0 )
                                 {

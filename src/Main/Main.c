@@ -97,23 +97,66 @@ static HostServices hs;
 
 #ifdef QOL_IMPROVEMENTS
 int Main_bDedicatedServer = 0;
+int Main_bAutostart = 0;
+int Main_bAutostartSp = 0;
 int Main_bHeadless = 0;
 int Main_bVerboseNetworking = 0;
 int Main_bMotsCompat = 0;
 int Main_bDwCompat = 0;
 int Main_bEnhancedCogVerbs = 0;
+char Main_strEpisode[129];
+char Main_strMap[128+4];
 #endif
 
 #ifdef QOL_IMPROVEMENTS
-int Main_StartupDedicated()
+int Main_StartupDedicated(int bFullyDedicated)
 {
+    char* pRemoveExt;
+    int bExplicitMap = 1;
+    char aTmpPlayerShortName[32];
+    const char* defaultEpisode = Main_bMotsCompat ? "" : "JK1MP";
+    const char* defaultMap = Main_bMotsCompat ? "" : "m2.jkl";
+
     jkSmack_stopTick = 1;
     jkSmack_nextGuiState = JK_GAMEMODE_TITLE;
     Window_SetDrawHandlers(stdDisplay_DrawAndFlipGdi, stdDisplay_SetCooperativeLevel);
 
-    jkPlayer_CreateConf(L"ServerDed");
+    if (!strlen(Main_strEpisode)) {
+        strcpy(Main_strEpisode, defaultEpisode);
+        bExplicitMap = 0;
+    }
+    if (!strlen(Main_strMap)) {
+        strcpy(Main_strEpisode, defaultEpisode); // TODO
+        strcpy(Main_strMap, defaultMap);
+        bExplicitMap = 0;
+    }
+    if (pRemoveExt = strchr(Main_strEpisode, '.')) {
+        *pRemoveExt = 0;
+    }
+    if (pRemoveExt = strchr(Main_strMap, '.')) {
+        *pRemoveExt = 0;
+    }
+    strcat(Main_strMap, ".jkl");
 
-    jkGuiNetHost_bIsDedicated = 1;
+    if (bFullyDedicated) {
+        strcpy(aTmpPlayerShortName, "ServerDed");
+        stdString_CharToWchar(jkPlayer_playerShortName, aTmpPlayerShortName, 31);
+        jkPlayer_playerShortName[31] = 0;
+        jkPlayer_CreateConf(L"ServerDed");
+    }
+    else {
+        wuRegistry_GetString("playerShortName", aTmpPlayerShortName, 32, "ServerDed");
+        stdString_CharToWchar(jkPlayer_playerShortName, aTmpPlayerShortName, 31);
+        jkPlayer_playerShortName[31] = 0;
+        jkPlayer_CreateConf(jkPlayer_playerShortName);
+    }
+    
+
+    // Dedicated player has no control at all
+    if (bFullyDedicated) {
+        jkGuiNetHost_bIsDedicated = 1;
+    }
+
     jkGuiNetHost_SaveSettings();
     jkGuiNetHost_LoadSettings();
 
@@ -141,10 +184,15 @@ int Main_StartupDedicated()
     jkMultiEntry3 v34;
     memset(&v34, 0, sizeof(v34));
 
+    if (bExplicitMap) {
+        wuRegistry_SetString("serverEpisodeGob", Main_strEpisode);
+        wuRegistry_SetString("serverMapJkl", Main_strMap);
+    }
+
     wuRegistry_GetWString("gameName", v34.serverName, 32, L"OpenJKDF2 Dedicated Server");
     wuRegistry_GetWString("serverPassword", v34.wPassword, 32, L"");
-    wuRegistry_GetString("serverEpisodeGob", v34.episodeGobName, 32, "JK1MP");
-    wuRegistry_GetString("serverMapJkl", v34.mapJklFname, 32, "m2.jkl");
+    wuRegistry_GetString("serverEpisodeGob", v34.episodeGobName, 32, Main_strEpisode);
+    wuRegistry_GetString("serverMapJkl", v34.mapJklFname, 32, Main_strMap);
 
     if (_wcslen(v34.wPassword)) {
         jkGuiNetHost_sessionFlags |= SESSIONFLAG_PASSWORD;
@@ -163,7 +211,8 @@ int Main_StartupDedicated()
     sithNet_scorelimit = v34.scoreLimit;
     sithNet_multiplayer_timelimit = v34.timeLimit;
 
-    int v21 = sithMulti_CreatePlayer(
+    if (!Main_bAutostartSp) {
+        int v21 = sithMulti_CreatePlayer(
               v34.serverName,
               v34.wPassword,
               v34.episodeGobName,
@@ -173,24 +222,35 @@ int Main_StartupDedicated()
               v34.multiModeFlags,
               v34.tickRateMs,
               v34.maxRank);
-    if ( v21 == 0x88770118 )
-    {
-        jkGuiDialog_ErrorDialog(jkStrings_GetText("GUINET_HOSTERROR"), jkStrings_GetText("GUINET_USERCANCEL"));
+        if ( v21 == 0x88770118 )
+        {
+            jkGuiDialog_ErrorDialog(jkStrings_GetUniStringWithFallback("GUINET_HOSTERROR"), jkStrings_GetUniStringWithFallback("GUINET_USERCANCEL"));
+        }
+        else if ( v21 )
+        {
+            jkGuiDialog_ErrorDialog(jkStrings_GetUniStringWithFallback("GUINET_HOSTERROR"), jkStrings_GetUniStringWithFallback("GUINET_NOCONNECT"));
+        }
     }
-    else if ( v21 )
-    {
-        jkGuiDialog_ErrorDialog(jkStrings_GetText("GUINET_HOSTERROR"), jkStrings_GetText("GUINET_NOCONNECT"));
-    }
+    
     
     std3D_StartScene();
     std3D_EndScene();
     sithMain_Load("static.jkl");
     jkHudInv_InitItems();
 
-    if ( jkMain_loadFile2(v34.episodeGobName, v34.mapJklFname) )
-    {
-        return 1;
+    if (!Main_bAutostartSp) {
+        if (jkMain_loadFile2(v34.episodeGobName, v34.mapJklFname))
+        {
+            return 1;
+        }
     }
+    else {
+        if (jkMain_LoadLevelSingleplayer(v34.episodeGobName, v34.mapJklFname))
+        {
+            return 1;
+        }
+    }
+    
 
     return 0;
 }
@@ -293,7 +353,7 @@ int Main_Startup(const char *cmdline)
     }
     stdStartup(&hs); // Added
     InstallHelper_SetCwd(); // Added
-    
+
     wuRegistry_Startup(HKEY_LOCAL_MACHINE, "Software\\LucasArts Entertainment Company\\JediKnight\\v1.0", "0.1");
     //stdStartup(&hs); // Moved
 
@@ -359,13 +419,15 @@ int Main_Startup(const char *cmdline)
         jkSmack_Startup();
 
         std3D_Startup(); // Added
+#ifdef QUAKE_CONSOLE
         jkQuakeConsole_Startup(); // Added
+#endif
 
         if (jkRes_LoadCD(0))
         {
 #ifdef QOL_IMPROVEMENTS
-            if (Main_bDedicatedServer) {
-                if (Main_StartupDedicated())
+            if (Main_bDedicatedServer || Main_bAutostart) {
+                if (Main_StartupDedicated(Main_bDedicatedServer))
                 {
                     return 1;
                 }
@@ -383,6 +445,7 @@ int Main_Startup(const char *cmdline)
         }
         return 0;
     }
+
     return 0;
 }
 
@@ -460,10 +523,13 @@ void Main_Shutdown()
 
     // Added
     Main_bDedicatedServer = 0;
+    Main_bAutostart = 0;
     Main_bHeadless = 0;
     Main_bVerboseNetworking = 0;
     Main_bDwCompat = 0;
     Main_bEnhancedCogVerbs = 0;
+    memset(Main_strEpisode, 0, sizeof(Main_strEpisode));
+    memset(Main_strMap, 0, sizeof(Main_strMap));
 
 #ifndef QOL_IMPROVEMENTS
     exit(0);
@@ -587,6 +653,28 @@ void Main_ParseCmdLine(char *cmdline)
         else if (!__strcmpi(v1, "-dedicatedServer") || !__strcmpi(v1, "/dedicatedServer") )
         {
             Main_bDedicatedServer = 1;
+        }
+        else if (!__strcmpi(v1, "-autostart") || !__strcmpi(v1, "/autostart") )
+        {
+            Main_bAutostart = 1;
+        }
+        else if (!__strcmpi(v1, "-sp") || !__strcmpi(v1, "/sp") || !__strcmpi(v1, "-singleplayer") || !__strcmpi(v1, "/singleplayer"))
+        {
+            Main_bAutostartSp = 1;
+        }
+        else if (!__strcmpi(v1, "-mp") || !__strcmpi(v1, "/mp") || !__strcmpi(v1, "-multiplayer") || !__strcmpi(v1, "/multiplayer"))
+        {
+            Main_bAutostartSp = 0;
+        }
+        else if (!__strcmpi(v1, "-episode") || !__strcmpi(v1, "/episode") )
+        {
+            v4 = _strtok(0, " \t");
+            stdString_SafeStrCopy(Main_strEpisode, v4, 0x80);
+        }
+        else if (!__strcmpi(v1, "-map") || !__strcmpi(v1, "/map") )
+        {
+            v4 = _strtok(0, " \t");
+            stdString_SafeStrCopy(Main_strMap, v4, 0x80);
         }
         else if (!__strcmpi(v1, "-headless") || !__strcmpi(v1, "/headless") )
         {

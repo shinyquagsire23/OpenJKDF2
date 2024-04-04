@@ -4,24 +4,27 @@
 #include "General/stdBitmap.h"
 #include "General/stdFont.h"
 #include "General/stdString.h"
-#include "Win95/stdDisplay.h"
+#include "General/stdFnames.h"
 #include "Devices/sithConsole.h"
+#include "Win95/stdDisplay.h"
 #include "Win95/WinIdk.h"
-#include "World/sithThing.h"
 #include "Gameplay/sithInventory.h"
 #include "Gameplay/jkSaber.h"
+#include "World/sithThing.h"
 #include "World/jkPlayer.h"
 #include "World/sithActor.h"
 #include "Main/sithCommand.h"
-#include "Dss/sithMulti.h"
 #include "Main/Main.h"
 #include "Main/jkMain.h"
 #include "Main/jkStrings.h"
+#include "Main/jkQuakeConsole.h"
 #include "stdPlatform.h"
 #include "wprintf.h"
+#include "Dss/sithMulti.h"
+#include "Dss/sithGamesave.h"
 #include "Dss/jkDSS.h"
 #include "../jk.h"
-#include "Main/jkQuakeConsole.h"
+
 
 void jkDev_DrawEntriesGPU();
 void jkDev_BlitLogToScreenGPU();
@@ -684,7 +687,7 @@ int jkDev_CmdAllWeapons(stdDebugConsoleCmd *pCmd, const char *pArgStr)
             sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_EWEB_ROUNDS, 500.0);
         }
 
-        sithConsole_PrintUniStr(jkStrings_GetText("GAME_ALLWEAPONS"));
+        sithConsole_PrintUniStr(jkStrings_GetUniStringWithFallback("GAME_ALLWEAPONS"));
     }
     return 1;
 }
@@ -761,7 +764,7 @@ int jkDev_CmdAllItems(stdDebugConsoleCmd *pCmd, const char *pArgStr)
             sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_PRYBAR, 1.0);
             sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_RADIO, 1.0);
         }
-        sithConsole_PrintUniStr(jkStrings_GetText("GAME_ALLITEMS"));
+        sithConsole_PrintUniStr(jkStrings_GetUniStringWithFallback("GAME_ALLITEMS"));
     }
     return 1;
 }
@@ -798,7 +801,7 @@ int jkDev_CmdLightMaster(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_F_BLINDING, 1.0);
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_F_ABSORB, 1.0);
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_F_PROTECTION, 1.0);
-        sithConsole_PrintUniStr(jkStrings_GetText("GAME_LIGHTMASTER"));
+        sithConsole_PrintUniStr(jkStrings_GetUniStringWithFallback("GAME_LIGHTMASTER"));
     }
     return 1;
 }
@@ -835,7 +838,7 @@ int jkDev_CmdDarkMaster(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_F_LIGHTNING, 1.0);
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_F_DESTRUCTION, 1.0);
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_F_DEADLYSIGHT, 1.0);
-        sithConsole_PrintUniStr(jkStrings_GetText("GAME_DARKMASTER"));
+        sithConsole_PrintUniStr(jkStrings_GetUniStringWithFallback("GAME_DARKMASTER"));
     }
     return 1;
 }
@@ -923,7 +926,7 @@ int jkDev_CmdUberJedi(stdDebugConsoleCmd *pCmd, const char *pArgStr)
             sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_F_DEFENSE, 4.0);
         }
         
-        sithConsole_PrintUniStr(jkStrings_GetText("GAME_UBERJEDI"));
+        sithConsole_PrintUniStr(jkStrings_GetUniStringWithFallback("GAME_UBERJEDI"));
     }
     return 1;
 }
@@ -970,7 +973,7 @@ int jkDev_CmdLevelUp(stdDebugConsoleCmd *pCmd, const char *pArgStr)
             }
         }
 
-        sithConsole_PrintUniStr(jkStrings_GetText("GAME_LEVELUP"));
+        sithConsole_PrintUniStr(jkStrings_GetUniStringWithFallback("GAME_LEVELUP"));
     }
     return 1;
 }
@@ -981,7 +984,7 @@ int jkDev_CmdHeal(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     {
         sithPlayer_pLocalPlayerThing->actorParams.health = sithPlayer_pLocalPlayerThing->actorParams.maxHealth;
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_SHIELDS, 200.0);
-        sithConsole_PrintUniStr(jkStrings_GetText("GAME_HEAL"));
+        sithConsole_PrintUniStr(jkStrings_GetUniStringWithFallback("GAME_HEAL"));
     }
     return 1;
 }
@@ -990,8 +993,8 @@ int jkDev_CmdAllMap(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( !sithNet_isMulti )
     {
-        g_mapModeFlags ^= 0x42u;
-        sithConsole_PrintUniStr(jkStrings_GetText("GAME_ALLMAP"));
+        g_mapModeFlags ^= (MAPMODE_40 | MAPMODE_02);
+        sithConsole_PrintUniStr(jkStrings_GetUniStringWithFallback("GAME_ALLMAP"));
     }
     return 1;
 }
@@ -1001,7 +1004,7 @@ int jkDev_CmdMana(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     if ( !sithNet_isMulti )
     {
         sithInventory_SetBinAmount(sithPlayer_pLocalPlayerThing, SITHBIN_FORCEMANA, 400.0);
-        sithConsole_PrintUniStr(jkStrings_GetText("GAME_MANA"));
+        sithConsole_PrintUniStr(jkStrings_GetUniStringWithFallback("GAME_MANA"));
     }
     return 1;
 }

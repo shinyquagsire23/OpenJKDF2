@@ -116,7 +116,7 @@ int jkDSS_idk4()
         {
             if ( sithMulti_leaveJoinType )
             {
-                sithComm_netMsgTmp.pktData[0] = jkEpisode_idk1(&jkEpisode_mLoad)->level;
+                sithComm_netMsgTmp.pktData[0] = jkEpisode_GetCurrentEpisodeEntry(&jkEpisode_mLoad)->level;
                 sithComm_netMsgTmp.netMsg.flag_maybe = 0;
                 sithComm_netMsgTmp.netMsg.cogMsgId = DSS_ENDLEVEL;
                 sithComm_netMsgTmp.netMsg.msg_size = 4;
@@ -212,7 +212,7 @@ void jkDSS_nullsub_2()
 void jkDSS_Write()
 {
     stdConffile_Write(jkRes_episodeGobName, 32);
-    stdConffile_Write((const char*)&jkEpisode_mLoad.field_8, 4);
+    stdConffile_Write((const char*)&jkEpisode_mLoad.currentEpisodeEntryIdx, 4);
 }
 
 void jkDSS_Load()
@@ -221,7 +221,7 @@ void jkDSS_Load()
 
     stdConffile_Read(a1, 32);
     jkRes_LoadGob(a1);
-    stdConffile_Read(&jkEpisode_mLoad.field_8, 4);
+    stdConffile_Read(&jkEpisode_mLoad.currentEpisodeEntryIdx, 4);
 }
 
 int jkDSS_wrap_SendSaberInfo_alt()
@@ -1044,9 +1044,17 @@ int jkDSS_ProcessJKPrintUniString(sithCogMsg *msg)
     NETMSG_IN_START(msg);
 
     stdString_snprintf(key, 64, "COG_%05d", NETMSG_POPS32());
-    wchar_t* v1 = stdStrTable_GetUniString(&jkCog_strings, key);
+
+    wchar_t* v1 = NULL;
+// Added: Allow openjkdf2_i8n.uni to override everything
+#ifdef QOL_IMPROVEMENTS
+    v1 = stdStrTable_GetUniString(&jkStrings_tableExtOver, key);
     if ( !v1 )
-        v1 = jkStrings_GetText(key);
+#endif
+
+    v1 = stdStrTable_GetUniString(&jkCog_strings, key);
+    if ( !v1 )
+        v1 = jkStrings_GetUniStringWithFallback(key);
     jkDev_PrintUniString(v1);
     return 1;
 }
@@ -1055,7 +1063,7 @@ void jkDSS_SendEndLevel()
 {
     NETMSG_START;
 
-    NETMSG_PUSHS32(jkEpisode_idk1(&jkEpisode_mLoad)->level);
+    NETMSG_PUSHS32(jkEpisode_GetCurrentEpisodeEntry(&jkEpisode_mLoad)->level);
     NETMSG_END(DSS_ENDLEVEL);
 
     // lol

@@ -90,9 +90,15 @@ wchar_t* jkGuiTitle_quicksave_related_func1(stdStrTable *strTable, char *jkl_fna
     stdFnames_CopyShortName(key, 64, jkl_fname);
     jkGuiTitle_sub_4189A0(key);
 
+    // Added: Allow openjkdf2_i8n.uni to override everything
+#ifdef QOL_IMPROVEMENTS
+    retval = stdStrTable_GetUniString(&jkStrings_tableExtOver, key);
+    if ( !retval )
+#endif
+
     retval = stdStrTable_GetUniString(strTable, key);
     if ( !retval )
-        retval = jkStrings_GetText(key);
+        retval = jkStrings_GetUniStringWithFallback(key);
 
     texts = jkGuiTitle_aTexts;
     // Added: cleanup
@@ -108,7 +114,17 @@ wchar_t* jkGuiTitle_quicksave_related_func1(stdStrTable *strTable, char *jkl_fna
     for (int i = 0; i < 20; i++)
     {
         stdString_snprintf(tmp, 64, "%s_TEXT_%02d", key, i);
-        texts->str = stdString_FastWCopy(stdStrTable_GetUniString(&jkCog_strings, tmp));
+
+        wchar_t* pTextStr = NULL;
+
+        // Added: Allow openjkdf2_i8n.uni to override everything
+#ifdef QOL_IMPROVEMENTS
+        pTextStr = stdStrTable_GetUniString(&jkStrings_tableExtOver, key);
+        if ( !pTextStr )
+#endif
+
+        pTextStr = stdStrTable_GetUniString(&jkCog_strings, tmp);
+        texts->str = stdString_FastWCopy(pTextStr);
         ++texts;
     }
 
@@ -233,8 +249,8 @@ void jkGuiTitle_WorldLoadCallback(float percentage)
             jkGuiTitle_elementsLoad[1].selectedTextEntry = (__int64)percentage;
             jkGuiRend_UpdateAndDrawClickable(&jkGuiTitle_elementsLoad[1], &jkGuiTitle_menuLoad, 1);
         }
-#ifdef SDL2_RENDER
-#ifdef PLATFORM_POSIX
+#if defined(SDL2_RENDER) || defined(TARGET_TWL)
+#if defined(PLATFORM_POSIX) && !defined(TARGET_TWL)
     static uint64_t lastRefresh = 0;
     // Only update loading bar at 30fps, so that we don't waste time
     // during vsync.
@@ -267,7 +283,7 @@ void jkGuiTitle_ShowLoadingStatic()
     verMinor = jkGuiTitle_verMinor;
     verMajor = jkGuiTitle_verMajor;
     verMotsStr = L""; // TODO?
-    guiVersionStr = jkStrings_GetText("GUI_VERSION");
+    guiVersionStr = jkStrings_GetUniStringWithFallback("GUI_VERSION");
     jk_snwprintf(jkGuiTitle_versionBuffer, sizeof(jkGuiTitle_versionBuffer) / sizeof(wchar_t), guiVersionStr, verMajor, verMinor, verRevision, verMotsStr);
     jkGuiTitle_elementsLoadStatic[4].wstr = jkGuiTitle_versionBuffer;
     jkGuiTitle_elementsLoadStatic[1].selectedTextEntry = 0;
@@ -316,8 +332,8 @@ void jkGuiTitle_LoadingFinalize()
             if (shouldSkip) break;
             int selected = jkGuiRend_DisplayAndReturnClicked(&jkGuiTitle_menuLoad);
 
-#ifdef SDL2_RENDER
-#ifdef PLATFORM_POSIX
+#if defined(SDL2_RENDER) || defined(TARGET_TWL)
+#if defined(PLATFORM_POSIX) && !defined(TARGET_TWL)
             static uint64_t lastRefresh = 0;
             // Only update loading bar at 30fps, so that we don't waste time
             // during vsync.

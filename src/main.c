@@ -5,6 +5,7 @@
 #include "jk.h"
 #include "types.h"
 
+#ifndef NO_JK_MMAP
 #include "Cog/sithCog.h"
 #include "Cog/sithCogExec.h"
 #include "Cog/jkCog.h"
@@ -158,19 +159,20 @@
 #include "Dss/jkDSS.h"
 #include "Devices/sithComm.h"
 #include "stdPlatform.h"
+#else
+#include "General/stdString.h"
+#include "Win95/Window.h"
+#include "Main/jkMain.h"
+#include "Main/Main.h"
+#endif // NO_JK_MMAP
 
-int openjkdf2_bSkipWorkingDirData = 0;
-int openjkdf2_bIsFirstLaunch = 1;
-int openjkdf2_bIsRunningFromExistingInstall = 0; // 1 is OpenJKDF2 acting as a JK.EXE replacement, 0 is running as a launcher.
-int openjkdf2_bOrigWasRunningFromExistingInstall = 0;
-int openjkdf2_bOrigWasDF2 = 0;
-int openjkdf2_bIsKVM = 1;
-int openjkdf2_restartMode = OPENJKDF2_RESTART_NONE;
-char openjkdf2_aOrigCwd[1024];
-char openjkdf2_aRestartPath[256];
-char* openjkdf2_pExecutablePath = "";
+extern char openjkdf2_aOrigCwd[1024];
 
 void do_hooks();
+
+#ifdef ARCH_WASM
+#include <emscripten.h>
+#endif // ARCH_WASM
 
 #ifdef WIN64_STANDALONE
 #include "exchndl.h"
@@ -199,11 +201,75 @@ void crash_handler_basic(int sig);
 #include <fcntl.h>
 
 #include "SDL2_helper.h"
-
 #endif // LINUX
+
+#ifdef TARGET_TWL
+#include <nds.h>
+
+volatile int frame = 0;
+//---------------------------------------------------------------------------------
+void Vblank() {
+//---------------------------------------------------------------------------------
+    frame++;
+}
+#endif
+
+// HACK: minGW fails on the Github runner??
+#ifdef WIN64_MINGW
+void __attribute__((weak)) __stack_chk_fail(void)
+{
+
+}
+
+void* __attribute__((weak)) __memcpy_chk(void * dest, const void * src, size_t len, size_t destlen)
+{
+    return memcpy(dest, src, len);
+}
+#endif // WIN64_MINGW
 
 int main(int argc, char** argv)
 {
+#ifdef ARCH_WASM
+    EM_ASM(
+        FS.mkdir('/jk1/player');
+        FS.mkdir('/mots/player');
+        FS.mkdir('/jk1/persist');
+        FS.mkdir('/mots/persist');
+
+        //FS.mount(NODEFS, { root: './jk1/episode' }, '/jk1/episode');
+        //FS.createLazyFile('/jk1/episode', "jk1demo.gob", "jk1/episode/jk1demo.gob", true, false);
+        //FS.createLazyFile('/jk1/episode', "jk1mpdem.gob", "jk1/episode/jk1mpdem.gob", true, false);
+
+        FS.mount(IDBFS, {}, '/jk1/player');
+        FS.mount(IDBFS, {}, '/mots/player');
+        FS.mount(IDBFS, {}, '/jk1/persist');
+        FS.mount(IDBFS, {}, '/mots/persist');
+
+        // Then sync
+        FS.syncfs(true, function (err) {
+            // Error
+        });
+    );
+#endif // ARCH_WASM
+
+#ifdef TARGET_TWL
+    defaultExceptionHandler();
+    consoleDebugInit(DebugDevice_NOCASH);
+
+    lcdMainOnTop();
+
+    videoSetMode(MODE_0_3D);
+    consoleInit( NULL, 0, BgType_Text4bpp, BgSize_T_256x256, 23, 2, false, true );
+    consoleDemoInit();
+
+    fatInitDefault();
+
+    // Millisecond timer
+    TIMER0_CR = TIMER_ENABLE|TIMER_DIV_1024;
+    TIMER1_CR = TIMER_ENABLE|TIMER_CASCADE;
+
+    printf("Waddup\n");
+#endif
 #ifdef WIN64_STANDALONE
     FILE* fp;
     AllocConsole();
@@ -522,6 +588,7 @@ __declspec(dllexport) void hook_init(void)
 int yyparse();
 void do_hooks()
 {
+#ifndef NO_JK_MMAP
 #ifndef LINUX
     hook_function(WinMain_ADDR, WinMain_);
 #endif // LINUX
@@ -944,7 +1011,7 @@ void do_hooks()
     hook_function(stdStrTable_Load_ADDR, stdStrTable_Load);
     hook_function(stdStrTable_Free_ADDR, stdStrTable_Free);
     hook_function(stdStrTable_GetUniString_ADDR, stdStrTable_GetUniString);
-    hook_function(stdStrTable_GetString_ADDR, stdStrTable_GetString);
+    hook_function(stdStrTable_GetStringWithFallback_ADDR, stdStrTable_GetStringWithFallback);
     
     // stdPcx
     hook_function(stdPcx_Load_ADDR, stdPcx_Load);
@@ -954,7 +1021,7 @@ void do_hooks()
     hook_function(sithStrTable_Startup_ADDR, sithStrTable_Startup);
     hook_function(sithStrTable_Shutdown_ADDR, sithStrTable_Shutdown);
     hook_function(sithStrTable_GetUniString_ADDR, sithStrTable_GetUniString);
-    hook_function(sithStrTable_GetString_ADDR, sithStrTable_GetString);
+    hook_function(sithStrTable_GetUniStringWithFallback_ADDR, sithStrTable_GetUniStringWithFallback);
 
 #ifndef LINUX
     // stdConsole
@@ -1775,8 +1842,8 @@ void do_hooks()
     // jkStrings
     hook_function(jkStrings_Startup_ADDR, jkStrings_Startup);
     hook_function(jkStrings_Shutdown_ADDR, jkStrings_Shutdown);
-    hook_function(jkStrings_GetText2_ADDR, jkStrings_GetText2);
-    hook_function(jkStrings_GetText_ADDR, jkStrings_GetText);
+    hook_function(jkStrings_GetUniString_ADDR, jkStrings_GetUniString);
+    hook_function(jkStrings_GetUniStringWithFallback_ADDR, jkStrings_GetUniStringWithFallback);
     hook_function(jkStrings_unused_sub_40B490_ADDR, jkStrings_unused_sub_40B490);
     
     // jkControl
@@ -2518,5 +2585,6 @@ void do_hooks()
     hook_function_inv(rdKeyframe_FreeJoints_ADDR, rdKeyframe_FreeJoints);
 #endif
 #endif
+#endif // !NO_JK_MMAP
 }
 #endif // WIN64_STANDALONE

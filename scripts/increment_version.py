@@ -33,7 +33,7 @@ def handle_flatpak_repo(version, commit):
     f.write(contents)
     f.close()
 
-def handle_version_c(version):
+def handle_cmake(version):
     if version[0] == 'v':
         version = version[1:]
 
@@ -42,21 +42,24 @@ def handle_version_c(version):
     minor = version_parts[1]
     patch = version_parts[2]
 
-    f = open("src/version.c", "w")
-    f.write("#include \"types.h\"\n")
-    f.write("#include \"version.h\"\n\n")
-    f.write("const char* openjkdf2_aReleaseVersion = \"v" + version + "\";\n");
-    f.write("const wchar_t* openjkdf2_waReleaseVersion = L\"v" + version + "\";\n");
-    f.write("const char* openjkdf2_aReleaseCommit = OPENJKDF2_RELEASE_COMMIT;\n");
-    f.write("const wchar_t* openjkdf2_waReleaseCommit = OPENJKDF2_RELEASE_COMMIT_W;\n");
-    f.write("const char* openjkdf2_aReleaseCommitShort = OPENJKDF2_RELEASE_COMMIT_SHORT;\n");
-    f.write("const wchar_t* openjkdf2_waReleaseCommitShort = OPENJKDF2_RELEASE_COMMIT_SHORT_W;\n");
-    f.write("const int openjkdf2_releaseVersionMajor = " + major + ";\n");
-    f.write("const int openjkdf2_releaseVersionMinor = " + minor + ";\n");
-    f.write("const int openjkdf2_releaseVersionPatch = " + patch + ";\n");
+    cmake_version = ".".join([major, minor, patch, "0"])
+
+    f = open("cmake_modules/version.cmake", "w")
+    f.write("set(OPENJKDF2_PROJECT_VERSION " + cmake_version + ")\n"
+            "find_package(Git)\n"
+            "execute_process(\n"
+            "    COMMAND git log -1 --format=%H\n"
+            "    OUTPUT_VARIABLE OPENJKDF2_RELEASE_COMMIT\n"
+            "    OUTPUT_STRIP_TRAILING_WHITESPACE\n"
+            ")\n"
+            "execute_process(\n"
+            "    COMMAND git rev-parse --short=8 HEAD\n"
+            "    OUTPUT_VARIABLE OPENJKDF2_RELEASE_COMMIT_SHORT\n"
+            "    OUTPUT_STRIP_TRAILING_WHITESPACE\n"
+            ")");
     f.close()
 
 if __name__ == "__main__":
     handle_flatpak(sys.argv[1])
     handle_flatpak_repo(sys.argv[1], sys.argv[2])
-    handle_version_c(sys.argv[1])
+    handle_cmake(sys.argv[1])

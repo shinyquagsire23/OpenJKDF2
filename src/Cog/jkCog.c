@@ -69,7 +69,7 @@ void jkCog_stub4ArgsRet1(sithCog *ctx)
 
 void jkCog_addLaser(sithCog *ctx)
 {
-    float a = sithCogExec_PopFlex(ctx);
+    cog_flex_t a = sithCogExec_PopFlex(ctx);
     int b = sithCogExec_PopInt(ctx);
     sithThing* c = sithCogExec_PopThing(ctx);
     sithCogExec_PushInt(ctx, -1);
@@ -88,7 +88,7 @@ void jkCog_getLaserId(sithCog *ctx)
 
 void jkCog_addBeam(sithCog *ctx)
 {
-    float a = sithCogExec_PopFlex(ctx);
+    cog_flex_t a = sithCogExec_PopFlex(ctx);
     int b = sithCogExec_PopInt(ctx);
     sithThing* c = sithCogExec_PopThing(ctx);
     sithThing* d = sithCogExec_PopThing(ctx);
@@ -98,19 +98,15 @@ void jkCog_addBeam(sithCog *ctx)
 void jkCog_computeCatapaultVelocity(sithCog *ctx)
 {
     rdVector3 ret;
-    float a = sithCogExec_PopFlex(ctx);
+    cog_flex_t a = sithCogExec_PopFlex(ctx);
     sithThing* b = sithCogExec_PopThing(ctx);
     sithThing* c = sithCogExec_PopThing(ctx);
-    float d = sithCogExec_PopFlex(ctx);
+    cog_flex_t d = sithCogExec_PopFlex(ctx);
     
-    ret.x = b->position.x - c->position.x;
-    ret.y = b->position.y - c->position.y;
-    ret.z = b->position.z - c->position.z;
+    rdVector_Sub3(&ret, &b->position, &c->position);
     float v4 = rdVector_Normalize3Acc(&ret);
     float ctxb = sqrt(v4 * v4 * a / d);
-    ret.x = ret.x * ctxb;
-    ret.y = ret.y * ctxb;
-    ret.z = ret.z * ctxb;
+    rdVector_Scale3Acc(&ret, ctxb);
     sithCogExec_PushVector3(ctx, &ret);
 }
 
@@ -310,7 +306,7 @@ void jkCog_StopPovKey(sithCog *ctx)
     int v2; // edi
     sithThing *actorThing; // eax
     rdPuppet *v5; // eax
-    float a1a; // [esp+Ch] [ebp+4h]
+    cog_flex_t a1a; // [esp+Ch] [ebp+4h]
 
     a1a = sithCogExec_PopFlex(ctx);
     v2 = sithCogExec_PopInt(ctx);
@@ -439,9 +435,16 @@ void jkCog_PrintUniString(sithCog *ctx)
     if ( v2 >= 0 )
         v3 = sithPlayer_GetNumidk(v2);
     stdString_snprintf(key, 64, "COG_%05d", v1);
+
+    // Added: Allow openjkdf2_i8n.uni to override everything
+#ifdef QOL_IMPROVEMENTS
+    v4 = stdStrTable_GetUniString(&jkStrings_tableExtOver, key);
+    if ( !v4 )
+#endif
+
     v4 = stdStrTable_GetUniString(&jkCog_strings, key);
     if ( !v4 )
-        v4 = jkStrings_GetText(key);
+        v4 = jkStrings_GetUniStringWithFallback(key);
     stdString_WcharToChar(v8, v4, 127);
     v8[127] = 0;
     if ( v3 >= 0 )
@@ -527,9 +530,9 @@ void jkCog_SetSaberInfo(sithCog *ctx)
     sithThing *saber_sparks; // ebx
     sithThing *blood_sparks; // ebp
     sithThing *v4; // edi
-    float len; // [esp+10h] [ebp-14h]
-    float tip_rad; // [esp+14h] [ebp-10h]
-    float base_rad; // [esp+18h] [ebp-Ch]
+    cog_flex_t len; // [esp+10h] [ebp-14h]
+    cog_flex_t tip_rad; // [esp+14h] [ebp-10h]
+    cog_flex_t base_rad; // [esp+18h] [ebp-Ch]
     rdMaterial *v9; // [esp+1Ch] [ebp-8h]
     rdMaterial *v10; // [esp+20h] [ebp-4h]
     sithThing *wall_sparks; // [esp+28h] [ebp+4h]
@@ -580,9 +583,9 @@ void jkCog_EnableSaber(sithCog *ctx)
 {
     sithThing *v2; // eax
     sithThing *v3; // esi
-    float a3; // [esp+4h] [ebp-8h]
-    float a2; // [esp+8h] [ebp-4h]
-    float a1a; // [esp+10h] [ebp+4h]
+    cog_flex_t a3; // [esp+4h] [ebp-8h]
+    cog_flex_t a2; // [esp+8h] [ebp-4h]
+    cog_flex_t a1a; // [esp+10h] [ebp+4h]
 
     a1a = sithCogExec_PopFlex(ctx);
     a3 = sithCogExec_PopFlex(ctx);
@@ -613,7 +616,7 @@ void jkCog_SetWaggle(sithCog *ctx)
 {
     sithThing *v2; // eax
     rdVector3 a2; // [esp+4h] [ebp-Ch] BYREF
-    float a1a; // [esp+14h] [ebp+4h]
+    cog_flex_t a1a; // [esp+14h] [ebp+4h]
 
     a1a = sithCogExec_PopFlex(ctx);
     sithCogExec_PopVector3(ctx, &a2);
@@ -644,9 +647,16 @@ void jkCog_StringConcatUnistring(sithCog *pCog)
 
     uniID = sithCogExec_PopInt(pCog);
     stdString_snprintf(key, 32, "COG_%05d", uniID);
+
+// Added: Allow openjkdf2_i8n.uni to override everything
+#ifdef QOL_IMPROVEMENTS
+    str = stdStrTable_GetUniString(&jkStrings_tableExtOver, key);
+    if ( !str )
+#endif
+
     str = stdStrTable_GetUniString(&jkCog_strings, key);
     if ( !str )
-        str = jkStrings_GetText(key);
+        str = jkStrings_GetUniStringWithFallback(key);
 
     finalLen = _wcslen(str) + _wcslen(jkCog_jkstring);
     if (finalLen < 0x81)
@@ -778,7 +788,7 @@ void jkCog_StringConcatFormattedFlex(sithCog *pCog)
 {
     char *v1; // esi
     size_t finalLen; // esi
-    float v3; // [esp+10h] [ebp-20Ch]
+    cog_flex_t v3; // [esp+10h] [ebp-20Ch]
     wchar_t v4[130]; // [esp+14h] [ebp-208h] BYREF
     wchar_t v5[130]; // [esp+118h] [ebp-104h] BYREF
 
@@ -926,7 +936,7 @@ void jkCog_InsideLeia(sithCog *ctx)
 void jkCog_CreateBubble(sithCog *ctx)
 {
     int type = sithCogExec_PopInt(ctx);
-    float radius = sithCogExec_PopFlex(ctx);
+    cog_flex_t radius = sithCogExec_PopFlex(ctx);
     sithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing && radius > 0.0) {
@@ -947,7 +957,7 @@ void jkCog_DestroyBubble(sithCog *ctx)
 void jkCog_GetBubbleDistance(sithCog *ctx)
 {
     int iVar1;
-    float tmp;
+    cog_flex_t tmp;
     
     sithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing == sithPlayer_pLocalPlayerThing) {
@@ -1051,7 +1061,7 @@ void jkCog_SetBubbleType(sithCog *ctx)
 // MOTS added
 void jkCog_SetBubbleRadius(sithCog *ctx)
 {
-    float val = sithCogExec_PopFlex(ctx);
+    cog_flex_t val = sithCogExec_PopFlex(ctx);
     sithThing* pThing = sithCogExec_PopThing(ctx);
     for (int i = 0; i < 64; i++) 
     {
@@ -1184,7 +1194,7 @@ void jkCogExt_GetThingAttachSurface(sithCog* ctx)
         if (pThing->attach_flags == SITH_ATTACH_WORLDSURFACE) {
             sithSurface* pAttached = pThing->attachedSurface;
             if (pAttached) {
-                retval = pAttached->field_0;
+                retval = pAttached->index;
             }
         }
     }
@@ -1228,7 +1238,7 @@ void jkCogExt_GetCameraOffset(sithCog* ctx)
 
 void jkCogExt_SetCameraFov(sithCog* ctx)
 {
-    float fov = sithCogExec_PopFlex(ctx);
+    cog_flex_t fov = sithCogExec_PopFlex(ctx);
     int camIdx = sithCogExec_PopInt(ctx);
 
     // TODO
@@ -1248,7 +1258,7 @@ void jkCogExt_SetCameraOffset(sithCog* ctx)
 
 void jkCogExt_Absolute(sithCog* ctx)
 {
-    float val = sithCogExec_PopFlex(ctx);
+    cog_flex_t val = sithCogExec_PopFlex(ctx);
 
     if (val == (int)val) {
         sithCogExec_PushInt(ctx, abs((int)val));
@@ -1260,53 +1270,53 @@ void jkCogExt_Absolute(sithCog* ctx)
 
 void jkCogExt_Arccosine(sithCog* ctx)
 {
-    float val = sithCogExec_PopFlex(ctx);
+    cog_flex_t val = sithCogExec_PopFlex(ctx);
     sithCogExec_PushFlex(ctx, acos(val) * 57.2957795);
 }
 
 void jkCogExt_Arcsine(sithCog* ctx)
 {
-    float val = sithCogExec_PopFlex(ctx);
+    cog_flex_t val = sithCogExec_PopFlex(ctx);
     sithCogExec_PushFlex(ctx, asin(val) * 57.2957795);
 }
 
 void jkCogExt_Arctangent(sithCog* ctx)
 {
-    float val = sithCogExec_PopFlex(ctx);
+    cog_flex_t val = sithCogExec_PopFlex(ctx);
     sithCogExec_PushFlex(ctx, atan(val) * 57.2957795);
 }
 
 void jkCogExt_Ceiling(sithCog* ctx)
 {
-    float val = sithCogExec_PopFlex(ctx);
+    cog_flex_t val = sithCogExec_PopFlex(ctx);
     sithCogExec_PushFlex(ctx, ceil(val));
 }
 
 void jkCogExt_Cosine(sithCog* ctx)
 {
-    float val = sithCogExec_PopFlex(ctx);
+    cog_flex_t val = sithCogExec_PopFlex(ctx);
     sithCogExec_PushFlex(ctx, cos(val * 0.0174532925));
 }
 
 void jkCogExt_Floor(sithCog* ctx)
 {
-    float val = sithCogExec_PopFlex(ctx);
+    cog_flex_t val = sithCogExec_PopFlex(ctx);
     sithCogExec_PushFlex(ctx, floor(val));
 }
 
 void jkCogExt_Power(sithCog* ctx)
 {
-    float b = sithCogExec_PopFlex(ctx);
-    float a = sithCogExec_PopFlex(ctx);
+    cog_flex_t b = sithCogExec_PopFlex(ctx);
+    cog_flex_t a = sithCogExec_PopFlex(ctx);
     sithCogExec_PushFlex(ctx, pow(a,b));
 }
 
 void jkCogExt_Randomflex(sithCog* ctx)
 {
-    float b = sithCogExec_PopFlex(ctx);
-    float a = sithCogExec_PopFlex(ctx);
-    float f = _frand();
-    float f2 = b-a+1.0;
+    cog_flex_t b = sithCogExec_PopFlex(ctx);
+    cog_flex_t a = sithCogExec_PopFlex(ctx);
+    cog_flex_t f = _frand();
+    cog_flex_t f2 = b-a+1.0;
     sithCogExec_PushFlex(ctx, fmodf(f,f2)+a);
 }
 
@@ -1320,13 +1330,13 @@ void jkCogExt_Randomint(sithCog* ctx)
 
 void jkCogExt_Sine(sithCog* ctx)
 {
-    float val = sithCogExec_PopFlex(ctx);
+    cog_flex_t val = sithCogExec_PopFlex(ctx);
     sithCogExec_PushFlex(ctx, sin(val * 0.0174532925));
 }
 
 void jkCogExt_Squareroot(sithCog* ctx)
 {
-    float val = sithCogExec_PopFlex(ctx);
+    cog_flex_t val = sithCogExec_PopFlex(ctx);
     sithCogExec_PushFlex(ctx, sqrtf(val));
 }
 
@@ -1353,8 +1363,8 @@ void jkCogExt_IsAdjoin(sithCog* ctx)
 
 void jkCogExt_SetGameSpeed(sithCog* ctx)
 {
-    float val = sithCogExec_PopFlex(ctx);
-    float val2 = sithCogExec_PopFlex(ctx);
+    cog_flex_t val = sithCogExec_PopFlex(ctx);
+    cog_flex_t val2 = sithCogExec_PopFlex(ctx);
     //TODO
     Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
 }
@@ -1489,7 +1499,7 @@ void jkCogExt_GetThingJumpSpeed(sithCog* ctx)
 
 void jkCogExt_SetThingAirDrag(sithCog* ctx)
 {
-    float a = sithCogExec_PopFlex(ctx);
+    cog_flex_t a = sithCogExec_PopFlex(ctx);
     sithThing* pThing = sithCogExec_PopThing(ctx);
     Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
 }
@@ -1505,15 +1515,15 @@ void jkCogExt_SetThingEyeOffset(sithCog* ctx)
 
 void jkCogExt_SetThingHeadPitchMinMax(sithCog* ctx)
 {
-    float a = sithCogExec_PopFlex(ctx);
-    float b = sithCogExec_PopFlex(ctx);
+    cog_flex_t a = sithCogExec_PopFlex(ctx);
+    cog_flex_t b = sithCogExec_PopFlex(ctx);
     sithThing* pThing = sithCogExec_PopThing(ctx);
     Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
 }
 
 void jkCogExt_SetThingJumpSpeed(sithCog* ctx)
 {
-    float a = sithCogExec_PopFlex(ctx);
+    cog_flex_t a = sithCogExec_PopFlex(ctx);
     sithThing* pThing = sithCogExec_PopThing(ctx);
     Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
 }

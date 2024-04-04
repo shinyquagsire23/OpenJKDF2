@@ -362,5 +362,4 @@ int stdJSON_EraseAll(const char* pFpath)
     nlohmann::json json_file(nlohmann::json::value_t::object);
     return stdJSON_WriteToFile(pFpath, json_file);
 }
-
 }

@@ -318,7 +318,7 @@ int jkGuiMultiTally_Show(int a1)
         while ( v14 < &jkGuiMultiTally_buttons[39] );
     }
     if ( v2 > 0x10 )
-        jkGuiMultiTally_buttons[87].wstr = jkStrings_GetText("GUI_PAGE1");
+        jkGuiMultiTally_buttons[87].wstr = jkStrings_GetUniStringWithFallback("GUI_PAGE1");
     do
     {
         v15 = 1;
@@ -326,8 +326,8 @@ int jkGuiMultiTally_Show(int a1)
         v17 = v16;
         if ( v16 == -1 )
         {
-            v31 = jkStrings_GetText("GUI_CONFIRM_ABORT");
-            v18 = jkStrings_GetText("GUI_ABORT_GAME");
+            v31 = jkStrings_GetUniStringWithFallback("GUI_CONFIRM_ABORT");
+            v18 = jkStrings_GetUniStringWithFallback("GUI_ABORT_GAME");
             if ( !jkGuiDialog_YesNoDialog(v18, v31) )
                 continue;
         }
@@ -397,7 +397,7 @@ int jkGuiMultiTally_Show(int a1)
             }
             while ( v27 < &jkGuiMultiTally_buttons[39] );
         }
-        jkGuiMultiTally_buttons[87].wstr = jkStrings_GetText("GUI_PAGE2");
+        jkGuiMultiTally_buttons[87].wstr = jkStrings_GetUniStringWithFallback("GUI_PAGE2");
         do
         {
             v28 = 1;
@@ -405,8 +405,8 @@ int jkGuiMultiTally_Show(int a1)
             v17 = v29;
             if ( v29 == -1 )
             {
-                v32 = jkStrings_GetText("GUI_CONFIRM_ABORT");
-                v30 = jkStrings_GetText("GUI_ABORT_GAME");
+                v32 = jkStrings_GetUniStringWithFallback("GUI_CONFIRM_ABORT");
+                v30 = jkStrings_GetUniStringWithFallback("GUI_ABORT_GAME");
                 if ( jkGuiDialog_YesNoDialog(v30, v32) )
                 {
 LABEL_50:
@@ -565,19 +565,19 @@ int jkGuiMultiTally_ShowTeamScores(int a1)
             switch ( v10->field_0 )
             {
                 case 1:
-                    v11 = jkStrings_GetText("GUI_RED");
+                    v11 = jkStrings_GetUniStringWithFallback("GUI_RED");
                     break;
                 case 2:
-                    v11 = jkStrings_GetText("GUI_GOLD");
+                    v11 = jkStrings_GetUniStringWithFallback("GUI_GOLD");
                     break;
                 case 3:
-                    v11 = jkStrings_GetText("GUI_BLUE");
+                    v11 = jkStrings_GetUniStringWithFallback("GUI_BLUE");
                     break;
                 case 4:
-                    v11 = jkStrings_GetText("GUI_GREEN");
+                    v11 = jkStrings_GetUniStringWithFallback("GUI_GREEN");
                     break;
                 default:
-                    v11 = jkStrings_GetText("GUI_NONE");
+                    v11 = jkStrings_GetUniStringWithFallback("GUI_NONE");
                     break;
             }
             pElementIter->wstr = v11;
@@ -601,8 +601,8 @@ int jkGuiMultiTally_ShowTeamScores(int a1)
         v14 = v13;
         if ( v13 == -1 )
         {
-            v17 = jkStrings_GetText("GUI_CONFIRM_ABORT");
-            v15 = jkStrings_GetText("GUI_ABORT_GAME");
+            v17 = jkStrings_GetUniStringWithFallback("GUI_CONFIRM_ABORT");
+            v15 = jkStrings_GetUniStringWithFallback("GUI_ABORT_GAME");
             if ( !jkGuiDialog_YesNoDialog(v15, v17) )
                 continue;
         }

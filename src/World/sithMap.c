@@ -63,7 +63,7 @@ LABEL_10:
         goto LABEL_11;
     }
 
-    if ( (v3->flags & SITH_SECTOR_AUTOMAPVISIBLE) != 0 || (g_mapModeFlags & 2) != 0 )
+    if ( (v3->flags & SITH_SECTOR_AUTOMAPVISIBLE) != 0 || (g_mapModeFlags & MAPMODE_02))
     {
         v3->renderTick = sithRender_lastRenderTick;
         if ( (v3->flags & 0x10) != 0 )
@@ -99,10 +99,10 @@ LABEL_11:
         return;
     }
 
-    if ( (sector->flags & SITH_SECTOR_AUTOMAPVISIBLE) != 0 || (g_mapModeFlags & 2) != 0 )
+    if ( (sector->flags & SITH_SECTOR_AUTOMAPVISIBLE) || (g_mapModeFlags & MAPMODE_02))
     {
         sector->renderTick = sithRender_lastRenderTick;
-        if ( (sector->flags & SITH_SECTOR_AUTOMAPHIDE) != 0 )
+        if (sector->flags & SITH_SECTOR_AUTOMAPHIDE)
             v2 = 1;
         else
             v2 = sithMap_Draw(sector);
@@ -224,10 +224,10 @@ int sithMap_Draw(sithSector *sector)
                             {
                                 point1 = sithMap_pCurWorld->verticesTransformed[v16];
                                 point2 = sithMap_pCurWorld->verticesTransformed[v17];
-                                if ( rdClip_Line3Project(sithMap_pCurCamera->cameraClipFrustum, &point1, &point2, &out1, &out2) )
+                                if ( rdClip_Line3Project(sithMap_pCurCamera->pClipFrustum, &point1, &point2, &out1, &out2) )
                                 {
-                                    sithMap_pCurCamera->project(&v46, &point1);
-                                    sithMap_pCurCamera->project(&v43, &point2);
+                                    sithMap_pCurCamera->fnProject(&v46, &point1);
+                                    sithMap_pCurCamera->fnProject(&v43, &point2);
                                     v18 = 0;
                                     v19 = 0;
                                     if ( sithMap_ctx.numArr )
@@ -279,17 +279,17 @@ LABEL_22:
         }
         while ( v57 < v34 );
     }
-    if ( (g_mapModeFlags & 0x4C) != 0 )
+    if (g_mapModeFlags & (MAPMODE_40 | MAPMODE_08 | MAPMODE_04))
     {
         for ( i = v1->thingsList; i; i = i->nextThing )
         {
-            if ( i != sithWorld_pCurrentWorld->cameraFocus && (i->thingflags & 0x80012) == 0 )
+            if ( i != sithWorld_pCurrentWorld->cameraFocus && (i->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_WILLBEREMOVED)) == 0 )
             {
-                int v37 = (g_mapModeFlags & 0x40) != 0;
+                int v37 = (g_mapModeFlags & MAPMODE_40) != 0;
                 switch ( i->thingtype )
                 {
                     case SITH_THING_PLAYER:
-                        if ( (g_mapModeFlags & 0xC) != 0 )
+                        if (g_mapModeFlags & (MAPMODE_08 | MAPMODE_04))
                             v37 = 1;
                         if ( sithNet_isMulti && (sithNet_MultiModeFlags & MULTIMODEFLAG_TEAMS) != 0 )
                             circleColor = sithMap_ctx.teamColors[i->actorParams.playerinfo->teamNum];
@@ -297,17 +297,17 @@ LABEL_22:
                             circleColor = sithMap_ctx.playerColor & 0xFF;
                         break;
                     case SITH_THING_ACTOR:
-                        if ( (g_mapModeFlags & 8) != 0 )
+                        if (g_mapModeFlags & MAPMODE_08)
                             v37 = 1;
                         circleColor = sithMap_ctx.actorColor & 0xFF;
                         break;
                     case SITH_THING_ITEM:
-                        if ( (g_mapModeFlags & 0x10) != 0 )
+                        if (g_mapModeFlags & MAPMODE_10)
                             v37 = 1;
                         circleColor = sithMap_ctx.itemColor & 0xFF;
                         break;
                     case SITH_THING_WEAPON:
-                        if ( (g_mapModeFlags & 0x20) != 0 )
+                        if (g_mapModeFlags & MAPMODE_20)
                             v37 = 1;
                         circleColor = sithMap_ctx.weaponColor & 0xFF;
                         break;

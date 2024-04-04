@@ -212,16 +212,6 @@ int stdDisplay_SetMasterPalette(uint8_t* pal)
     
     memcpy(stdDisplay_masterPalette, pal24, sizeof(stdDisplay_masterPalette));
     
-    SDL_Color* tmp = malloc(sizeof(SDL_Color) * 256);
-    for (int i = 0; i < 256; i++)
-    {
-        tmp[i].r = pal24[i].r;
-        tmp[i].g = pal24[i].g;
-        tmp[i].b = pal24[i].b;
-        tmp[i].a = 0xFF;
-    }
-    
-    free(tmp);
     return 1;
 }
 
@@ -503,6 +493,10 @@ int stdDisplay_GammaCorrect3(int a1)
     jk_printf("STUB: stdDisplay_GammaCorrect3\n");
     return 1;
 }
+
+int stdDisplay_SetCooperativeLevel(uint32_t a){return 0;}
+int stdDisplay_DrawAndFlipGdi(uint32_t a){return 0;}
+void stdDisplay_422A50(){}
 #endif
 
 void stdDisplay_GammaCorrect(const void *pPal)

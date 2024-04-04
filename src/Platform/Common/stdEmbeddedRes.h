@@ -8,6 +8,7 @@ extern "C" {
 
 #include "types.h"
 
+char* stdEmbeddedRes_LoadOnlyInternal(const char* filepath, size_t* pOutSz);
 char* stdEmbeddedRes_Load(const char* filepath, size_t* pOutSz);
 
 #ifdef __cplusplus

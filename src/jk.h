@@ -1,5 +1,5 @@
-#ifndef JK_H
-#define JK_H
+#ifndef _OPENJKDF2_JK_H
+#define _OPENJKDF2_JK_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,7 +18,7 @@ extern "C" {
 #include <ctype.h>
 #endif
 
-#ifdef MACOS
+#if defined(MACOS) || defined(LINUX) || defined(TARGET_TWL)
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -321,7 +321,7 @@ int jk_GetUpdateRect(HWND hWnd, LPRECT lpRect, BOOL bErase);
 void jk_BeginPaint(int a, struct tagPAINTSTRUCT * lpPaint);
 int jk_vsnwprintf(wchar_t * a, size_t b, const wchar_t *fmt, va_list list);
 void jk_EndPaint(HWND hWnd, const PAINTSTRUCT *lpPaint);
-int stdGdi_GetHInstance();
+HINSTANCE stdGdi_GetHInstance();
 int jk_LoadCursorA(HINSTANCE hInstance, LPCSTR lpCursorName);
 void jk_SetCursor(HCURSOR hCursor);
 void jk_InvalidateRect(HWND hWnd, const RECT *lpRect, BOOL bErase);
@@ -347,7 +347,7 @@ void jk_SetFocus(HWND hWnd);
 void jk_SetActiveWindow(HWND hWnd);
 void jk_ShowCursor(int a);
 void jk_ValidateRect(HWND hWnd, const RECT *lpRect);
-#if !defined(ARCH_WASM) && !defined(TARGET_ANDROID)
+#if !defined(ARCH_WASM)
 int __isspace(int a);
 #endif
 void* _memset(void* ptr, int val, size_t num);
@@ -359,7 +359,7 @@ wchar_t* __wcsrchr(const wchar_t *, wchar_t);
 int __snprintf(char *, size_t, const char *, ...);
 int __vsnprintf(char *a1, size_t a2, const char *fmt, va_list args);
 char* _strstr(const char* a, const char* b);
-#endif
+#endif // WIN32_BLOBS
 
 long jk_wcstol(const wchar_t * nptr, wchar_t ** endptr, int base);
 int _strlen(const char *str);
@@ -375,8 +375,12 @@ void jk_init();
 int _iswspace(int a);
 void jk_fatal();
 
+#define OPENJKDF2_WARN_NULL_PRINT(var) jk_printf("OpenJKDF2 WARN: " #var " is NULL in %s!\n", __func__)
+#define OPENJKDF2_WARN_NULL_NO_RETURN(var) if(!var) { OPENJKDF2_WARN_NULL_PRINT(var); }
+#define OPENJKDF2_WARN_NULL_AND_RETURN(var) if(!var) { OPENJKDF2_WARN_NULL_PRINT(var); return; }
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif // JK_H
+#endif // _OPENJKDF2_JK_H

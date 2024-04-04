@@ -61,7 +61,7 @@ stdBitmap* stdPcx_Load(char *fpath, int create_ddraw_surface, int gpu_mem)
     for (int i = 0; i < mipSurface->format.texture_size_in_bytes; i++ )
     {
         uint8_t v11 = stdFGetc(fhand);
-        if ( (v11 & 0xC0) == -64 )
+        if ((v11 & 0xC0) == 0xC0)
         {
             uint8_t v13 = stdFGetc(fhand);
             uint32_t v16 = (v11 & 0x3F);

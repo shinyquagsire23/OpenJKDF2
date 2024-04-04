@@ -121,7 +121,23 @@ void sithDSSThing_SendSyncThing(sithThing *pThing, int sendto_id, int mpFlags)
 {
     NETMSG_START;
 
-    if (!pThing || !pThing->type || !pThing->sector || !sithThing_GetIdxFromThing(pThing) || MOTS_ONLY_COND(pThing->physicsParams.physflags & SITH_PF_4000000))
+#if 0
+    if (!pThing) {
+        jk_printf("OpenJKDF2 WARN: Thing NULL, not synced.\n");
+        return;
+    }
+    if (!pThing->type) {
+        jk_printf("OpenJKDF2 WARN: Thing type 0, not synced.\n");
+    }
+    if (!pThing->sector) {
+        jk_printf("OpenJKDF2 WARN: Thing sector NULL, not synced.\n");
+    }
+    if (!sithThing_GetIdxFromThing(pThing)) {
+        jk_printf("OpenJKDF2 WARN: Thing not syncable?\n");
+    }
+#endif
+
+    if (!pThing || !pThing->type || !pThing->sector || !sithThing_GetIdxFromThing(pThing) || MOTS_ONLY_FLAG(pThing->physicsParams.physflags & SITH_PF_4000000))
         return;
 
     NETMSG_PUSHS32(pThing->thing_id);
@@ -151,7 +167,7 @@ void sithDSSThing_SendSyncThing(sithThing *pThing, int sendto_id, int mpFlags)
             break;
         case SITH_THING_ITEM:
             NETMSG_PUSHS32(pThing->itemParams.typeflags);
-            if (pThing->itemParams.typeflags & ITEMSTATE_AVAILABLE)
+            if (pThing->itemParams.typeflags & SITH_ITEM_BACKPACK)
             {
                 NETMSG_PUSHS16(pThing->itemParams.numBins);
                 for (int i = 0; i < pThing->itemParams.numBins; i++)
@@ -213,12 +229,18 @@ int sithDSSThing_ProcessSyncThing(sithCogMsg *msg)
         thingflags &= ~SITH_TF_INVULN;
 
     // MoTS added
-    /*
-    if ((((thing->thingflags & SITH_TF_DISABLED) != 0) && ((uVar8 & SITH_TF_DISABLED) == 0)) &&
-       (((thing->type == 5 && (((sithNet_isMulti != 0 && (sithNet_isServer == 0)) && (*(int *)&(thing->typeParams).field_0x10 != 0)))) && ((*(byte *)&thing->typeParams & 1) != 0)))) {
-        sithCog_SendMessageFromThing(thing,thing,SITH_MESSAGE_RESPAWN);
+    if (Main_bMotsCompat)
+    {
+        if ((pThing->thingflags & SITH_TF_DISABLED)
+            && !(thingflags & SITH_TF_DISABLED) 
+            && pThing->type == SITH_THING_ITEM 
+            && sithNet_isMulti 
+            && !sithNet_isServer
+            && pThing->itemParams.respawnFactor != 0 
+            && pThing->itemParams.typeflags & SITH_ITEM_RESPAWN_MP) {
+            sithCog_SendMessageFromThing(pThing, pThing, SITH_MESSAGE_RESPAWN);
+        }
     }
-    */
 
     sithAnimclass* pAnimclass = pThing->animclass;
     pThing->thingflags = thingflags;
@@ -243,7 +265,7 @@ int sithDSSThing_ProcessSyncThing(sithCogMsg *msg)
             break;
         case SITH_THING_ITEM:
             pThing->itemParams.typeflags = NETMSG_POPS32();
-            if (pThing->itemParams.typeflags & ITEMSTATE_AVAILABLE)
+            if (pThing->itemParams.typeflags & SITH_ITEM_BACKPACK)
             {
                 pThing->itemParams.numBins = NETMSG_POPS16();
                 for (int i = 0; i < pThing->itemParams.numBins; i++)
@@ -566,6 +588,8 @@ void sithDSSThing_SendFireProjectile(sithThing *pWeapon, sithThing *pProjectile,
 {
     NETMSG_START;
 
+    //printf("sithDSSThing_SendFireProjectile %x %x (%f %f %f) (%f %f %f) %x %f %x %f\n", pWeapon ? pWeapon->thing_id : -1, pProjectile->thingIdx, pAimError->x, pAimError->y, pAimError->z, pFireOffset->x, pFireOffset->y, pFireOffset->z, anim, scale, scaleFlags, a9);
+
     NETMSG_PUSHS32(pWeapon->thing_id);
     NETMSG_PUSHS16(scaleFlags);
     
@@ -588,7 +612,7 @@ void sithDSSThing_SendFireProjectile(sithThing *pWeapon, sithThing *pProjectile,
     NETMSG_PUSHF32(a9);
     NETMSG_PUSHS32(thingId);
 
-    if (idk == 0) {
+    if (idk == 0 || !Main_bMotsCompat) {
         NETMSG_END(DSS_FIREPROJECTILE);
     }
     else if (Main_bMotsCompat) {
@@ -604,11 +628,16 @@ int sithDSSThing_ProcessFireProjectile(sithCogMsg *msg)
 {
     NETMSG_IN_START(msg);
 
-    sithThing* pThing = sithThing_GetById(NETMSG_POPS32());
+    int idx = NETMSG_POPS32();
+
+    // TODO: bug? if this fails, it might completely screw over save files?
+
+    sithThing* pThing = sithThing_GetById(idx);
     if ( pThing )
     {
         int16_t scaleFlags = NETMSG_POPS16();
-        sithThing* pTemplate = sithTemplate_GetEntryByIdx(NETMSG_POPS16());
+        int16_t templateIdx = NETMSG_POPS16();
+        sithThing* pTemplate = sithTemplate_GetEntryByIdx(templateIdx);
         sithSound* pSound = sithSound_GetFromIdx(NETMSG_POPS16());
         int anim = NETMSG_POPS16();
         rdVector3 aimError = NETMSG_POPVEC3();
@@ -616,6 +645,7 @@ int sithDSSThing_ProcessFireProjectile(sithCogMsg *msg)
         float scale = NETMSG_POPF32();
         float a9 = NETMSG_POPF32();
         int thingId = NETMSG_POPS32();
+        //printf("sithDSSThing_ProcessFireProjectile %x %x (%f %f %f) (%f %f %f) %x %f %x %f\n", idx, templateIdx, aimError.x, aimError.y, aimError.z, fireOffset.x, fireOffset.y, fireOffset.z, anim, scale, scaleFlags, a9);
         sithThing* pThing2 = sithWeapon_FireProjectile_0(
                       pThing,
                       pTemplate,
@@ -1188,7 +1218,7 @@ void sithDSSThing_SendSyncThingAttachment(sithThing *thing, int sendto_id, int m
 
     if (thing->attach_flags & SITH_ATTACH_WORLDSURFACE)
     {
-        NETMSG_PUSHU16(thing->attachedSurface->field_0);
+        NETMSG_PUSHU16(thing->attachedSurface->index);
     }
     else if (thing->attach_flags & (SITH_ATTACH_THING|SITH_ATTACH_THINGSURFACE))
     {

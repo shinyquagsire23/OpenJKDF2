@@ -1,0 +1,14 @@
+MSGS 2          # <--- DON'T FORGET TO UPDATE THIS COUNT
+
+#  "<key>"     <unused number>   "<string>"
+
+#******************************
+#  This file can override the following:
+#   - ui/openjkdf2.uni
+#   - ui/jkstrings.uni
+#   - misc/cogStrings.uni (in some circumstances, WIP)
+#   - misc/sithStrings.uni
+#******************************
+   "OPENJKDF2_EXAMPLE"    0  "Example override!"
+
+END

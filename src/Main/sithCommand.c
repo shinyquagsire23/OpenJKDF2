@@ -154,11 +154,11 @@ LABEL_13:
             stdString_CharToWchar(v9, pCmd->cmdStr, 31);
             v9[31] = 0;
             if ( (*v2 & v3) != 0 )
-                v5 = sithStrTable_GetString("ON");
+                v5 = sithStrTable_GetUniStringWithFallback("ON");
             else
-                v5 = sithStrTable_GetString("OFF");
+                v5 = sithStrTable_GetUniStringWithFallback("OFF");
             v8 = v5;
-            v6 = sithStrTable_GetString("%s_IS_%s");
+            v6 = sithStrTable_GetUniStringWithFallback("%s_IS_%s");
             jk_snwprintf(a1, 0x80u, v6, v9, v8);
             sithConsole_PrintUniStr(a1);
             result = 1;
@@ -375,13 +375,13 @@ int sithCommand_CmdFly(stdDebugConsoleCmd *pCmd, const char *pArgStr)
             {
                 v0->physicsParams.physflags &= ~SITH_PF_FLY;
                 v0->physicsParams.physflags |= SITH_PF_USEGRAVITY;
-                v3 = sithStrTable_GetString("FLYING_OFF");
+                v3 = sithStrTable_GetUniStringWithFallback("FLYING_OFF");
             }
             else
             {
                 v0->physicsParams.physflags &= ~SITH_PF_USEGRAVITY;
                 v0->physicsParams.physflags |= SITH_PF_FLY;
-                v3 = sithStrTable_GetString("FLYING_ON");
+                v3 = sithStrTable_GetUniStringWithFallback("FLYING_ON");
             }
             sithConsole_PrintUniStr(v3);
             return 1;
@@ -613,6 +613,9 @@ int sithCommand_CmdActivate(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     sithThing *v2; // esi
     int tmp;
 
+    // Added: fixed a nullptr dereference
+    if (!pArgStr) return 0;
+
     if ( sithWorld_pCurrentWorld && (v2 = sithWorld_pCurrentWorld->playerThing) != 0 )
     {
         if ( _sscanf(pArgStr, "%d", &tmp) >= 1
@@ -641,6 +644,9 @@ int sithCommand_CmdActivate(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 int sithCommand_CmdJump(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     int result; // eax
+
+    // MOTS Added: fixed a nullptr dereference
+    if (!pArgStr) return 0;
 
     result = _sscanf(pArgStr, "%d", &pArgStr);
     if ( result )
@@ -734,6 +740,7 @@ int sithCommand_CmdKick(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return 1;
 }
 
+// Added: npc spawn
 int sithCommand_CmdThingNpc(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if (sithNet_isMulti) return 1;
@@ -768,6 +775,7 @@ int sithCommand_CmdThingNpc(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return 1;
 }
 
+// Added: binds
 int sithCommand_CmdBind(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     char tmp[512];
@@ -803,6 +811,7 @@ int sithCommand_CmdBind(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return 1;
 }
 
+// Added: unbinds
 int sithCommand_CmdUnbind(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     char tmp[512];
@@ -864,7 +873,8 @@ void sithCommand_LoadBindCallback(const char* pKey, const char* pVal, void* pCtx
 
 void sithCommand_SaveBinds()
 {
-    const char* ext_fpath = "openjkdf2_binds.json";
+    const char* ext_fpath = SITHBINDS_FNAME;
+
     stdJSON_EraseAll(ext_fpath);
     
     char tmp[3];
@@ -878,7 +888,7 @@ void sithCommand_SaveBinds()
 
 void sithCommand_LoadBinds()
 {
-    const char* ext_fpath = "openjkdf2_binds.json";
+    const char* ext_fpath = SITHBINDS_FNAME;
     stdJSON_IterateKeys(ext_fpath, sithCommand_LoadBindCallback, NULL);
 }
 

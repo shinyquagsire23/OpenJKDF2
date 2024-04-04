@@ -122,6 +122,7 @@ int sithGamesave_LoadEntry(char *fpath)
 
     // Added: Fix soundtrack on levels that use disk 2
 #ifdef QOL_IMPROVEMENTS
+    int backup_episodeIdx = jkEpisode_mLoad.currentEpisodeEntryIdx;
     if ( jkEpisode_Load(&jkGui_episodeLoad) )
     {
         if (jkEpisode_mLoad.paEntries) {
@@ -133,16 +134,27 @@ int sithGamesave_LoadEntry(char *fpath)
         jkEpisode_mLoad.paEntries = (jkEpisodeEntry *)pHS->alloc(aEnts_size);
         memcpy(jkEpisode_mLoad.paEntries, jkGui_episodeLoad.paEntries, aEnts_size);
 
-        for (int j = 0; j < jkEpisode_mLoad.numSeq; j++)
+        jkEpisode_mLoad.currentEpisodeEntryIdx = backup_episodeIdx;
+        //printf("asdfasdfasdf %u\n", jkEpisode_mLoad.currentEpisodeEntryIdx);
+        if (jkEpisode_mLoad.currentEpisodeEntryIdx > jkEpisode_mLoad.numSeq) {
+            jkEpisode_mLoad.currentEpisodeEntryIdx = 0;
+        }
+
+        if (!jkEpisode_mLoad.currentEpisodeEntryIdx)
         {
-            //printf("%s %s\n", jkEpisode_mLoad.paEntries[j].fileName, v25);
-            if (!__strcmpi(jkEpisode_mLoad.paEntries[j].fileName, SrcStr)) {
-                jkEpisode_mLoad.field_8 = j;
-                jkMain_pEpisodeEnt = &jkEpisode_mLoad.paEntries[j];
-                jkMain_pEpisodeEnt2 = &jkEpisode_mLoad.paEntries[j];
-                break;
+            for (int j = 0; j < jkEpisode_mLoad.numSeq; j++)
+            {
+                //printf("%s %s\n", jkEpisode_mLoad.paEntries[j].fileName, v25);
+                if (!__strcmpi(jkEpisode_mLoad.paEntries[j].fileName, SrcStr)) {
+                    jkEpisode_mLoad.currentEpisodeEntryIdx = j;
+                    break;
+                }
             }
         }
+
+        jkMain_pEpisodeEnt = &jkEpisode_mLoad.paEntries[jkEpisode_mLoad.currentEpisodeEntryIdx];
+        jkMain_pEpisodeEnt2 = &jkEpisode_mLoad.paEntries[jkEpisode_mLoad.currentEpisodeEntryIdx];
+        //printf("asdfasdfasdf %u %s\n", jkEpisode_mLoad.currentEpisodeEntryIdx, jkEpisode_mLoad.paEntries[jkEpisode_mLoad.currentEpisodeEntryIdx].fileName);
     }
 #endif
 
@@ -251,7 +263,7 @@ skip_free_things:
         jkPlayer_InitSaber();
         sithMain_AutoSave();
 
-        jkGuiDialog_ErrorDialog(jkStrings_GetText("ERROR"), L"This save is outdated and cannot be loaded fully. The level will be restarted with your existing inventory and progress.");
+        jkGuiDialog_ErrorDialog(jkStrings_GetUniStringWithFallback("ERROR"), L"This save is outdated and cannot be loaded fully. The level will be restarted with your existing inventory and progress.");
 
         goto skip_dss;
     }
@@ -325,8 +337,9 @@ int sithGamesave_SerializeAllThings(int mpFlags)
 
     for (uint32_t i = 0; i < 256; i++) // TODO define this maximum
     {
-        if ( sithAI_actors[i].aiclass )
+        if ( sithAI_actors[i].pAIClass ) {
             sithDSS_SendAIStatus(&sithAI_actors[i], 0, mpFlags);
+        }
     }
 
     for (uint32_t i = 0; i < sithWorld_pCurrentWorld->numCogsLoaded; i++)
@@ -504,7 +517,7 @@ int sithGamesave_Flush()
             sithGamesave_saveName[127] = 0;
             _wcsncpy(sithGamesave_wsaveName, sithGamesave_headerTmp.saveName, 0xFFu);
             sithGamesave_wsaveName[255] = 0;
-            sithConsole_PrintUniStr(sithStrTable_GetString("GAME_SAVED"));
+            sithConsole_PrintUniStr(sithStrTable_GetUniStringWithFallback("GAME_SAVED"));
         }
         sithComm_multiplayerFlags = multiplayerFlagsSave;
     }

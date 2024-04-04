@@ -400,9 +400,9 @@ LABEL_19:
     jkGuiJoystick_aElements[27].bIsVisible = 0;
     jkGuiJoystick_aElements[28].bIsVisible = 1;
     if ( v2 == 1 )
-        v8 = jkStrings_GetText("GUI_NO_JOYSTICK");
+        v8 = jkStrings_GetUniStringWithFallback("GUI_NO_JOYSTICK");
     else
-        v8 = jkStrings_GetText("GUI_JOYSTICK_DISABLED");
+        v8 = jkStrings_GetUniStringWithFallback("GUI_JOYSTICK_DISABLED");
     _wcsncpy(jkGuiJoystick_awTmp, v8, 0xFFu);
     jkGuiJoystick_awTmp[255] = 0;
     if ( bRedraw )
@@ -472,8 +472,8 @@ void jkGuiJoystick_BindControl(int a1, int a2)
     }
     else
     {
-        v12 = jkStrings_GetText("ERR_CANNOT_BIND_CONTROL");
-        v11 = jkStrings_GetText("ERROR");
+        v12 = jkStrings_GetUniStringWithFallback("ERR_CANNOT_BIND_CONTROL");
+        v11 = jkStrings_GetUniStringWithFallback("ERROR");
         jkGuiDialog_ErrorDialog(v11, v12);
         jkGuiJoystick_Draw(&jkGuiJoystick_menu, 0);
         jkGuiRend_Paint(&jkGuiJoystick_menu);
@@ -515,7 +515,7 @@ void jkGuiJoystick_sub_41B390()
         v2 = v1->keybits & 0xFF; // Added: 4bit -> 8bit
         v8 = v1->keybits & 0x300; // Added: 4bit -> 8bit
         v3 = v1->keybits & 0x800; // Added: 4bit -> 8bit
-        v4 = jkStrings_GetText(v1->displayStrKey);
+        v4 = jkStrings_GetUniStringWithFallback(v1->displayStrKey);
         if ( v1->inputFunc == -1 )
         {
             v5 = L"--";
@@ -565,7 +565,7 @@ int jkGuiJoystick_EnumFunc(int inputFuncIdx, const char *pInputFuncStr, uint32_t
     v9 = jkGuiJoystick_waIdk2;
     if ( (flags & 1) == 0 )
         return 1;
-    v10 = jkStrings_GetText2(pInputFuncStr);
+    v10 = jkStrings_GetUniString(pInputFuncStr);
     v16 = v10;
     if ( !v10 )
         return 1;
@@ -589,7 +589,7 @@ int jkGuiJoystick_EnumFunc(int inputFuncIdx, const char *pInputFuncStr, uint32_t
         {
             strncat(v17, "_K", 0x20u);
         }
-        v9 = jkStrings_GetText(v17);
+        v9 = jkStrings_GetUniStringWithFallback(v17);
         if ( !v9 )
             return 1;
         v10 = v16;
@@ -695,8 +695,8 @@ int jkGuiJoystick_ClickList3(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouse
         }
         else
         {
-            v18 = jkStrings_GetText("ERR_CANNOT_BIND_CONTROL");
-            v17 = jkStrings_GetText("ERROR");
+            v18 = jkStrings_GetUniStringWithFallback("ERR_CANNOT_BIND_CONTROL");
+            v17 = jkStrings_GetUniStringWithFallback("ERROR");
             jkGuiDialog_ErrorDialog(v17, v18);
             jkGuiJoystick_Draw(&jkGuiJoystick_menu, 0);
             jkGuiRend_Paint(&jkGuiJoystick_menu);
@@ -778,8 +778,8 @@ int jkGuiJoystick_OkCancelClick(jkGuiElement *pElement, jkGuiMenu *pMenu, int mo
                 }
                 else
                 {
-                    v16 = jkStrings_GetText("ERR_CANNOT_BIND_CONTROL");
-                    v15 = jkStrings_GetText("ERROR");
+                    v16 = jkStrings_GetUniStringWithFallback("ERR_CANNOT_BIND_CONTROL");
+                    v15 = jkStrings_GetUniStringWithFallback("ERROR");
                     jkGuiDialog_ErrorDialog(v15, v16);
                     jkGuiJoystick_Draw(&jkGuiJoystick_menu, 0);
                     jkGuiRend_Paint(&jkGuiJoystick_menu);
@@ -804,8 +804,8 @@ int jkGuiJoystick_RestoreDefaultsClick(jkGuiElement *pElement, jkGuiMenu *pMenu,
     if ( jkGuiJoystick_dword_5576F0 )
         return 0;
     jkGuiRend_PlayWav(pMenu->soundClick);
-    v7 = jkStrings_GetText("GUI_RESTORE_DEFAULTS_Q");
-    v6 = jkStrings_GetText("GUI_RESTORE_DEFAULTS");
+    v7 = jkStrings_GetUniStringWithFallback("GUI_RESTORE_DEFAULTS_Q");
+    v6 = jkStrings_GetUniStringWithFallback("GUI_RESTORE_DEFAULTS");
     if ( jkGuiDialog_YesNoDialog(v6, v7) )
         sithControl_JoyInputInit();
     jkGuiJoystick_sub_41B390();
@@ -888,7 +888,7 @@ void jkGuiJoystick_MenuTick(jkGuiMenu *pMenu)
             jkGuiJoystick_aElements[20].bIsVisible = 0;
             jkGuiJoystick_aElements[21].bIsVisible = 0;
             jkGuiJoystick_aElements[22].bIsVisible = 0;
-            v3 = jkStrings_GetText("GUI_CAPTURE_TEXT");
+            v3 = jkStrings_GetUniStringWithFallback("GUI_CAPTURE_TEXT");
             _wcsncpy(jkGuiJoystick_awTmp, v3, 0xFFu);
             jkGuiJoystick_awTmp[255] = 0;
             if ( jkGuiJoystick_dword_557078 )
@@ -1005,7 +1005,7 @@ void jkGuiJoystick_MenuTick(jkGuiMenu *pMenu)
             if (idx < JOYSTICK_MAX_STRS)
             {
                 //printf("%x %x %f %s\n", v19, v9, v12, v8->displayStrKey);
-                v16 = jkStrings_GetText(v8->displayStrKey);
+                v16 = jkStrings_GetUniStringWithFallback(v8->displayStrKey);
                 _wcscpy(v24->aStrings[idx++], v16);
             }
         }

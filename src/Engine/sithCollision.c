@@ -131,11 +131,17 @@ float sithCollision_SearchRadiusForThings(sithSector *pStartSector, sithThing *p
 
     std_pHS->statusPrint("SearchRadiusForThings who:%s  flags:0x%04X\n", who, flags);
 
+
     sithCollision_searchStackIdx++;
     sithCollision_searchNumResults[sithCollision_searchStackIdx] = 0;
     sithCollision_stackIdk[sithCollision_searchStackIdx] = 1;
     curMoveDist = moveDist;
     sithCollision_stackSectors[sithCollision_searchStackIdx].sectors[0] = pStartSector;
+
+    if (!pStartSector) {
+        jk_printf("OpenJKDF2 WARN: sithCollision_SearchRadiusForThings received NULL pStartSector!\n");
+        return 0.0f;
+    }
 
     if ( (flags & RAYCAST_1) == 0 )
         curMoveDist = sithCollision_UpdateSectorThingCollision(pStartSector, pThing, pStartPos, pMoveNorm, moveDist, radius, flags);
@@ -654,7 +660,7 @@ float sithCollision_UpdateThingCollision(sithThing *pThing, rdVector3 *a2, float
     if ( a6 <= 0.0 )
         return 0.0;
     v5 = pThing;
-    if ( !pThing->collide )
+    if (pThing->collide == SITH_COLLIDE_NONE)
     {
         flags |= RAYCAST_1 | RAYCAST_4;
     }

@@ -174,15 +174,15 @@ LABEL_1:
                         v4 = stdComm_OpenConnection((void*)jkGuiMultiplayer_aElements2[3].selectedTextEntry);
                         if ( v4 == 0x887700FA )
                         {
-                            v24 = jkStrings_GetText("GUINET_NOTAVAIL");
-                            v5 = jkStrings_GetText("GUINET_NETERROR");
+                            v24 = jkStrings_GetUniStringWithFallback("GUINET_NOTAVAIL");
+                            v5 = jkStrings_GetUniStringWithFallback("GUINET_NETERROR");
                             jkGuiDialog_ErrorDialog(v5, v24);
                             v3 = -1;
                         }
                         else if ( v4 )
                         {
-                            v25 = jkStrings_GetText("GUINET_NOCONNECT");
-                            v6 = jkStrings_GetText("GUINET_NETERROR");
+                            v25 = jkStrings_GetUniStringWithFallback("GUINET_NOCONNECT");
+                            v6 = jkStrings_GetUniStringWithFallback("GUINET_NETERROR");
                             jkGuiDialog_ErrorDialog(v6, v25);
                             v3 = -1;
                         }
@@ -236,15 +236,15 @@ LABEL_1:
                         v17 = stdComm_OpenConnection((void*)jkGuiMultiplayer_aElements2[3].selectedTextEntry);
                         if ( v17 == 0x887700FA )
                         {
-                            v28 = jkStrings_GetText("GUINET_NOTAVAIL");
-                            v18 = jkStrings_GetText("GUINET_NETERROR");
+                            v28 = jkStrings_GetUniStringWithFallback("GUINET_NOTAVAIL");
+                            v18 = jkStrings_GetUniStringWithFallback("GUINET_NETERROR");
                             jkGuiDialog_ErrorDialog(v18, v28);
                             v16 = -1;
                         }
                         else if ( v17 )
                         {
-                            v29 = jkStrings_GetText("GUINET_NOCONNECT");
-                            v19 = jkStrings_GetText("GUINET_NETERROR");
+                            v29 = jkStrings_GetUniStringWithFallback("GUINET_NOCONNECT");
+                            v19 = jkStrings_GetUniStringWithFallback("GUINET_NETERROR");
                             jkGuiDialog_ErrorDialog(v19, v29);
                             v16 = -1;
                         }
@@ -256,7 +256,7 @@ LABEL_1:
                     jkGuiRend_DarrayFree(&array);
                     if ( v16 != 1 )
                         continue;
-                    v20 = jkStrings_GetText("GUI_DEFAULT_GAME_NAME");
+                    v20 = jkStrings_GetUniStringWithFallback("GUI_DEFAULT_GAME_NAME");
                     jk_snwprintf(v34.serverName, 0x20u, v20, jkPlayer_playerShortName);
                     if ( jkGuiNetHost_Show(&v34) != 1 )
                         goto LABEL_51;
@@ -278,14 +278,14 @@ LABEL_1:
                                       v34.maxRank);
                             if ( v21 == 0x88770118 )
                             {
-                                v31 = jkStrings_GetText("GUINET_USERCANCEL");
-                                v23 = jkStrings_GetText("GUINET_HOSTERROR");
+                                v31 = jkStrings_GetUniStringWithFallback("GUINET_USERCANCEL");
+                                v23 = jkStrings_GetUniStringWithFallback("GUINET_HOSTERROR");
                                 jkGuiDialog_ErrorDialog(v23, v31);
                             }
                             else if ( v21 )
                             {
-                                v30 = jkStrings_GetText("GUINET_NOCONNECT");
-                                v22 = jkStrings_GetText("GUINET_HOSTERROR");
+                                v30 = jkStrings_GetUniStringWithFallback("GUINET_NOCONNECT");
+                                v22 = jkStrings_GetUniStringWithFallback("GUINET_HOSTERROR");
                                 jkGuiDialog_ErrorDialog(v22, v30);
                             }
                             else if ( jkMain_loadFile2(v34.episodeGobName, v34.mapJklFname) )
@@ -318,7 +318,7 @@ LABEL_51:
                 goto LABEL_51;
             if ( jkGuiMultiplayer_aEntries[jkGuiMultiplayer_aElements3[3].selectedTextEntry].field_E0 == 10 )
                 break;
-            jkGuiDialog_ErrorDialog(jkStrings_GetText("GUINET_JOINERROR"), jkStrings_GetText("GUINET_WRONGVERSION"));
+            jkGuiDialog_ErrorDialog(jkStrings_GetUniStringWithFallback("GUINET_JOINERROR"), jkStrings_GetUniStringWithFallback("GUINET_WRONGVERSION"));
 LABEL_28:
             jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiMultiplayer_menu3, &jkGuiMultiplayer_aElements3[9]);
             jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiMultiplayer_menu3, &jkGuiMultiplayer_aElements3[10]);
@@ -342,8 +342,8 @@ LABEL_29:
         // HACK: Actually do passwords correctly
         int check = __wcscmp(jkGuiMultiplayer_aEntries[jkGuiMultiplayer_aElements3[3].selectedTextEntry].wPassword, jkGuiMultiplayer_stru_556168.field_300);
         if (check) {
-            v27 = jkStrings_GetText("GUINET_WRONGPASSWORD");
-            v11 = jkStrings_GetText("GUINET_JOINERROR");
+            v27 = jkStrings_GetUniStringWithFallback("GUINET_WRONGPASSWORD");
+            v11 = jkStrings_GetUniStringWithFallback("GUINET_JOINERROR");
             jkGuiDialog_ErrorDialog(v11, v27);
             goto LABEL_28;
         }
@@ -355,18 +355,18 @@ LABEL_29:
         {
             if ( v10 == 0x8877014A )
             {
-                v27 = jkStrings_GetText("GUINET_GAMEFULL");
-                v11 = jkStrings_GetText("GUINET_JOINERROR");
+                v27 = jkStrings_GetUniStringWithFallback("GUINET_GAMEFULL");
+                v11 = jkStrings_GetUniStringWithFallback("GUINET_JOINERROR");
             }
             else if ( v10 == 0x88770154 )
             {
-                v27 = jkStrings_GetText("GUINET_WRONGPASSWORD");
-                v11 = jkStrings_GetText("GUINET_JOINERROR");
+                v27 = jkStrings_GetUniStringWithFallback("GUINET_WRONGPASSWORD");
+                v11 = jkStrings_GetUniStringWithFallback("GUINET_JOINERROR");
             }
             else
             {
-                v27 = jkStrings_GetText("GUINET_NOGAMECONNECT");
-                v11 = jkStrings_GetText("GUINET_JOINERROR");
+                v27 = jkStrings_GetUniStringWithFallback("GUINET_NOGAMECONNECT");
+                v11 = jkStrings_GetUniStringWithFallback("GUINET_JOINERROR");
             }
             jkGuiDialog_ErrorDialog(v11, v27);
             goto LABEL_28;
@@ -395,7 +395,7 @@ int jkGuiMultiplayer_ShowSynchronizing()
     v2 = jkGui_stdBitmaps[JKGUI_BM_BK_MULTI]->palette;
     g_submodeFlags |= 8u;
     jkGui_SetModeMenu(v2);
-    jkGuiMultiplayer_aElements4[1].wstr = jkStrings_GetText("GUI_SYNCHRONIZING");
+    jkGuiMultiplayer_aElements4[1].wstr = jkStrings_GetUniStringWithFallback("GUI_SYNCHRONIZING");
     jkGuiMultiplayer_menu4.idkFunc = jkGuiMultiplayer_idk;
     jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiMultiplayer_menu4, &jkGuiMultiplayer_aElements4[2]);
     v0 = jkGuiRend_DisplayAndReturnClicked(&jkGuiMultiplayer_menu4);
@@ -414,28 +414,28 @@ int jkGuiMultiplayer_CogMsgHandleJoining(sithCogMsg *msg)
         switch ( msg->pktData[0] )
         {
             case 0:
-                jkGuiMultiplayer_aElements4[1].wstr = jkStrings_GetText("GUINET_JOININGOK");
+                jkGuiMultiplayer_aElements4[1].wstr = jkStrings_GetUniStringWithFallback("GUINET_JOININGOK");
                 jkGuiRend_UpdateAndDrawClickable(&jkGuiMultiplayer_aElements4[1], &jkGuiMultiplayer_menu4, 1);
                 return 1;
             case 1:
-                jkGuiMultiplayer_aElements4[1].wstr = jkStrings_GetText("GUINET_JOININGBUSY");
+                jkGuiMultiplayer_aElements4[1].wstr = jkStrings_GetUniStringWithFallback("GUINET_JOININGBUSY");
                 jkGuiRend_UpdateAndDrawClickable(&jkGuiMultiplayer_aElements4[1], &jkGuiMultiplayer_menu4, 1);
                 return 1;
             case 3:
-                v3 = jkStrings_GetText("GUINET_JOINCANCEL");
-                v2 = jkStrings_GetText("GUINET_JOINERROR");
+                v3 = jkStrings_GetUniStringWithFallback("GUINET_JOINCANCEL");
+                v2 = jkStrings_GetUniStringWithFallback("GUINET_JOINERROR");
                 goto LABEL_9;
             case 4:
-                v3 = jkStrings_GetText("GUINET_WRONGCHECKSUM");
-                v2 = jkStrings_GetText("GUINET_JOINERROR");
+                v3 = jkStrings_GetUniStringWithFallback("GUINET_WRONGCHECKSUM");
+                v2 = jkStrings_GetUniStringWithFallback("GUINET_JOINERROR");
                 goto LABEL_9;
             case 5:
-                v3 = jkStrings_GetText("GUINET_GAMEFULL");
-                v2 = jkStrings_GetText("GUINET_JOINERROR");
+                v3 = jkStrings_GetUniStringWithFallback("GUINET_GAMEFULL");
+                v2 = jkStrings_GetUniStringWithFallback("GUINET_JOINERROR");
                 goto LABEL_9;
             case 6:
-                v3 = jkStrings_GetText("GUINET_WRONGLEVEL");
-                v2 = jkStrings_GetText("GUINET_JOINERROR");
+                v3 = jkStrings_GetUniStringWithFallback("GUINET_WRONGLEVEL");
+                v2 = jkStrings_GetUniStringWithFallback("GUINET_JOINERROR");
 LABEL_9:
                 jkGuiDialog_ErrorDialog(v2, v3);
                 jkGuiMultiplayer_menu4.lastClicked = -2;
@@ -497,7 +497,7 @@ void jkGuiMultiplayer_sub_4140B0(jkGuiMenu *pMenu)
                 else
                 {
                     v8 = dplay_dword_55D618;
-                    v4 = jkStrings_GetText("GUI_NOGAMESTOJOIN");
+                    v4 = jkStrings_GetUniStringWithFallback("GUI_NOGAMESTOJOIN");
                     jkGuiRend_DarrayReallocStr(&jkGuiMultiplayer_stru_5564A8, v4, v8);
                     jkGuiMultiplayer_aElements3[3].enableHover = 1;
                 }
@@ -511,8 +511,8 @@ void jkGuiMultiplayer_sub_4140B0(jkGuiMenu *pMenu)
             }
             else if ( v3 )
             {
-                v9 = jkStrings_GetText("GUINET_NOCONNECT");
-                v7 = jkStrings_GetText("GUINET_JOINERROR");
+                v9 = jkStrings_GetUniStringWithFallback("GUINET_NOCONNECT");
+                v7 = jkStrings_GetUniStringWithFallback("GUINET_JOINERROR");
                 jkGuiDialog_ErrorDialog(v7, v9);
                 pMenu->lastClicked = -1;
             }
@@ -536,7 +536,7 @@ void jkGuiMultiplayer_sub_413E50(int idx)
 
     if ( idx >= 0 )
     {
-        v1 = jkStrings_GetText("GUI_LEVEL");
+        v1 = jkStrings_GetUniStringWithFallback("GUI_LEVEL");
         jk_snwprintf(
             jkGuiMultiplayer_stru_556168.field_0,
             0x80u,
@@ -546,19 +546,19 @@ void jkGuiMultiplayer_sub_413E50(int idx)
             jkGuiMultiplayer_aEntries[idx].mapJklFname);
         stdString_snprintf(v10, 32, "RANK_%d_L", jkGuiMultiplayer_aEntries[idx].maxRank);
         v9 = jkGuiMultiplayer_aEntries[idx].maxRank;
-        v8 = jkStrings_GetText(v10);
+        v8 = jkStrings_GetUniStringWithFallback(v10);
         v7 = jkGuiMultiplayer_aEntries[idx].maxPlayers;
         // Added: dedicated
         if (jkGuiMultiplayer_aEntries[idx].sessionFlags & SESSIONFLAG_ISDEDICATED) {
             v7 -= 1;
         }
         v6 = jkGuiMultiplayer_aEntries[idx].numPlayers;
-        v2 = jkStrings_GetText("GUI_NUM_PLAYERS");
+        v2 = jkStrings_GetUniStringWithFallback("GUI_NUM_PLAYERS");
         jk_snwprintf(jkGuiMultiplayer_stru_556168.field_100, 0x80u, v2, v6, v7, v8, v9);
         jkGui_guid_556040 = jkGuiMultiplayer_aEntries[idx].guidInstance;
         if ( (jkGuiMultiplayer_aEntries[idx].sessionFlags & SESSIONFLAG_PASSWORD) != 0 )
         {
-            v3 = jkStrings_GetText("GUINET_GAMEPASSWORD");
+            v3 = jkStrings_GetUniStringWithFallback("GUINET_GAMEPASSWORD");
             __wcscat(jkGuiMultiplayer_stru_556168.field_100, v3);
             jkGuiRend_SetVisibleAndDraw(&jkGuiMultiplayer_aElements3[5], &jkGuiMultiplayer_menu3, 1);
             jkGuiRend_SetVisibleAndDraw(&jkGuiMultiplayer_aElements3[4], &jkGuiMultiplayer_menu3, 1);
@@ -570,12 +570,12 @@ void jkGuiMultiplayer_sub_413E50(int idx)
         }
         if ( (jkGuiMultiplayer_aEntries[idx].multiModeFlags & MULTIMODEFLAG_TEAMS) != 0 )
         {
-            v4 = jkStrings_GetText("GUINET_GAMETEAM");
+            v4 = jkStrings_GetUniStringWithFallback("GUINET_GAMETEAM");
             __wcscat(jkGuiMultiplayer_stru_556168.field_100, v4);
         }
         if ( (jkGuiMultiplayer_aEntries[idx].sessionFlags & SESSIONFLAG_20) != 0 )
         {
-            v5 = jkStrings_GetText("GUINET_GAMECLOSED");
+            v5 = jkStrings_GetUniStringWithFallback("GUINET_GAMECLOSED");
             jk_snwprintf(jkGuiMultiplayer_stru_556168.field_100, 0x80u, v5);
             jkGuiRend_SetVisibleAndDraw(&jkGuiMultiplayer_aElements3[9], &jkGuiMultiplayer_menu3, 0);
         }
@@ -631,8 +631,8 @@ void jkGuiMultiplayer_idk(jkGuiMenu *pMenu)
         }
         else
         {
-            v3 = jkStrings_GetText("GUINET_NOGAMECONNECT");
-            v2 = jkStrings_GetText("GUINET_JOINERROR");
+            v3 = jkStrings_GetUniStringWithFallback("GUINET_NOGAMECONNECT");
+            v2 = jkStrings_GetUniStringWithFallback("GUINET_JOINERROR");
             jkGuiDialog_ErrorDialog(v2, v3);
             pMenu->lastClicked = -2;
         }
@@ -661,7 +661,7 @@ int jkGuiMultiplayer_Show2()
                 return result;
             g_submodeFlags |= 8;
             jkGui_SetModeMenu(jkGui_stdBitmaps[JKGUI_BM_BK_MULTI]->palette);
-            jkGuiMultiplayer_aElements4[1].wstr = jkStrings_GetText("GUINET_WAITHOSTSETTINGS");
+            jkGuiMultiplayer_aElements4[1].wstr = jkStrings_GetUniStringWithFallback("GUINET_WAITHOSTSETTINGS");
             jkGuiMultiplayer_menu4.idkFunc = jkGuiMultiplayer_sub_4142C0;
             jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiMultiplayer_menu4, &jkGuiMultiplayer_aElements4[2]);
             v2 = jkGuiRend_DisplayAndReturnClicked(&jkGuiMultiplayer_menu4);
@@ -696,8 +696,8 @@ LABEL_10:
                  v8.maxRank);
         if ( v3 == 0x88770118 )
         {
-            v7 = jkStrings_GetText("GUINET_USERCANCEL");
-            v5 = jkStrings_GetText("GUINET_HOSTERROR");
+            v7 = jkStrings_GetUniStringWithFallback("GUINET_USERCANCEL");
+            v5 = jkStrings_GetUniStringWithFallback("GUINET_HOSTERROR");
             jkGuiDialog_ErrorDialog(v5, v7);
         }
         else
@@ -707,8 +707,8 @@ LABEL_10:
                 jkMain_loadFile2(v8.episodeGobName, v8.mapJklFname);
                 return 1;
             }
-            v6 = jkStrings_GetText("GUINET_NOCONNECT");
-            v4 = jkStrings_GetText("GUINET_HOSTERROR");
+            v6 = jkStrings_GetUniStringWithFallback("GUINET_NOCONNECT");
+            v4 = jkStrings_GetUniStringWithFallback("GUINET_HOSTERROR");
             jkGuiDialog_ErrorDialog(v4, v6);
         }
     }
@@ -769,7 +769,7 @@ int jkGuiMultiplayer_ShowWaitHostSettings()
     v2 = jkGui_stdBitmaps[JKGUI_BM_BK_MULTI]->palette;
     g_submodeFlags |= 8u;
     jkGui_SetModeMenu(v2);
-    jkGuiMultiplayer_aElements4[1].wstr = jkStrings_GetText("GUINET_WAITHOSTSETTINGS");
+    jkGuiMultiplayer_aElements4[1].wstr = jkStrings_GetUniStringWithFallback("GUINET_WAITHOSTSETTINGS");
     jkGuiMultiplayer_menu4.idkFunc = jkGuiMultiplayer_sub_4142C0;
     jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiMultiplayer_menu4, &jkGuiMultiplayer_aElements4[2]);
     v0 = jkGuiRend_DisplayAndReturnClicked(&jkGuiMultiplayer_menu4);

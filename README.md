@@ -4,11 +4,11 @@
 
 ## [Latest Releases](https://github.com/shinyquagsire23/OpenJKDF2/releases) | [Report a crash or bug](https://github.com/shinyquagsire23/OpenJKDF2/issues)
 
-OpenJKDF2 is a function-by-function reimplementation of DF2 in C, with 64-bit ports to MacOS and Linux. Files are organized as closely to the original game as possible, based on symbols from the Grim Fandango Remaster Android/Linux/macOS port, as well as scattered assertions from various other games. It also contains the original versions of `byacc` and `flex` used for COG script parsing.
+OpenJKDF2 is a function-by-function reimplementation of DF2 in C, with 64-bit ports to Windows 7+, macOS 10.15+, and Linux. Files are organized as closely to the original game as possible, based on symbols from the Grim Fandango Remaster Android/Linux/macOS port, as well as scattered assertions from various other games. It also contains the original versions of `byacc` and `flex` used for COG script parsing.
 
 OpenJKDF2 does *not* include any original game assets; a valid copy of JKDF2 is *required* and can be purchased from [GOG](https://www.gog.com/game/star_wars_jedi_knight_dark_forces_ii) or [Steam](https://store.steampowered.com/app/32380/STAR_WARS_Jedi_Knight_Dark_Forces_II/). The GOG version is recommended, since it is DRM-free and also includes the soundtrack in Ogg Vorbis format. If you'd like to try before you buy, a WebAssembly demo of OpenJKDF2 can be found at https://maxthomas.dev/openjkdf2/.
 
-Support for playing the original soundtrack from Ogg Vorbis files is primarily supported for the GOG and Steam versions of the game assets. Original disk soundtracks can also be loaded from `MUSIC/1/Track<1..11>.ogg` and `MUSIC/2/Track<1..11>.ogg` for each disk's soundtrack. If files are missing, it will instead attempt to use a GOG track number from `MUSIC/Track<12..32>.ogg`. Dumping the soundtrack from disks at install time is planned for a future release of OpenJKDF2, but is not currently implemented.
+Support for playing the original soundtrack from Ogg Vorbis files is primarily supported for the GOG and Steam versions of the game assets. Original disk soundtracks can also be loaded from `MUSIC/1/Track<2..8>.ogg` and `MUSIC/2/Track<2..12>.ogg` for each disk's soundtrack. If files are missing, it will instead attempt to use a GOG track number from `MUSIC/Track<12..32>.ogg`. Dumping the soundtrack from disks at install time is planned for a future release of OpenJKDF2, but is not currently implemented.
 
 ## Platforms
 OpenJKDF2 supports the following configurations:
@@ -25,12 +25,13 @@ OpenJKDF2 supports the following configurations:
 
 The following implementations are in-progress or planned:
 
-| Configuration | Renderer | Description |
-| --- | --- | --- |
-| Android | OpenGL ES 3 | Not a huge priority, but would be nice to have. |
-| iOS | Metal? | Not a huge priority, but would be nice to have. |
-| Switch libnx | OpenGL ES 3 | Not a huge priority, but would be nice to have. |
-| 32-bit Windows/SDL2 | OpenGL 3.3 | Windows compilation with SDL2 and OpenAL. DirectX dependencies are replaced with SDL2 and OpenAL. Unimplemented functions use JK.EXE as a binary blob? |
+| Configuration | Renderer | Description | Status |
+| --- | --- | --- | --- |
+| Android | OpenGL ES 3 | Not a huge priority, but would be nice to have. | It compiles and renders! Input/menuing is lacking. |
+| iOS | Metal? | Not a huge priority, but would be nice to have. | Not started |
+| Switch libnx | OpenGL ES 3 | Not a huge priority, but would be nice to have. | Not started |
+| 32-bit Windows/SDL2 | OpenGL 3.3 | Windows compilation with SDL2 and OpenAL. DirectX dependencies are replaced with SDL2 and OpenAL. Targeting Windows XP ~ Windows 7 | Not started |
+| 32-bit Windows/DirectX | Direct3D 3 | Faithful decompilation with original DirectX bindings/renderer. | Not started |
 
 Linux building works on AArch64/RPi4 with llvmpipe, but V3D GLES has trouble with palettes.
 
@@ -98,6 +99,10 @@ OpenJKDF2 requires game data from a licensed copy of Jedi Knight: Dark Forces II
 ## Building
 
 See [here](BUILDING.md) for instructions.
+
+## Contributing
+
+Contributions in the form of code cleanup and documentation are highly welcomed. See [CONTRIBUTING.md](CONTRIBUTING.md) for details on what kinds of cleanup tasks still need to be done. OpenJKDF2 is not currently accepting monetary donations, however [detailed bug and crash reports](https://github.com/shinyquagsire23/OpenJKDF2/issues) are always appreciated, including bugs/crashes involving mods.
 
 ## TL;DR: What Isn't Implemented, Yet
  - Load Configuration and Save Configuration in Setup > Controls > Options

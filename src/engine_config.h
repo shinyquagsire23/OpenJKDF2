@@ -33,7 +33,7 @@
 #define CANONICAL_PHYS_TICKRATE (1.0 / 25.0)
 
 // Use microsecond timing to calculate sithTime_deltaSecs/etc
-#ifdef PLATFORM_POSIX
+#if defined(PLATFORM_POSIX) && !defined(TARGET_TWL)
 #define MICROSECOND_TIME
 #endif
 
@@ -65,7 +65,7 @@
 #endif
 
 // World limits
-#ifndef QOL_IMPROVEMENTS
+#if !defined(QOL_IMPROVEMENTS) || defined(TARGET_TWL)
 #define SITH_MAX_THINGS (641)
 #define SITH_MAX_VISIBLE_SECTORS (0x80)
 #define SITH_MAX_VISIBLE_SECTORS_2 (0xA0)
@@ -78,7 +78,7 @@
 #endif // QOL_IMPROVEMENTS
 
 // COG resource limits
-#ifdef QOL_IMPROVEMENTS
+#if defined(QOL_IMPROVEMENTS) && !defined(TARGET_TWL)
 #define SITHCOGVM_MAX_STACKSIZE (0x10000)
 #define SITHCOG_SYMBOL_LIMIT (2048) // JK was 512, MoTS/DW are 1024
 #define SITHCOG_LINKED_SYMBOL_LIMIT (2048)
@@ -92,12 +92,24 @@
 #define SITHCOG_NODE_STACKDEPTH (0x200) // JK was 0x200, MoTS is 0x400
 #endif // QOL_IMPROVEMENTS
 
+// Weapon-related limits
+#define MAX_DEFLECTION_BOUNCES (6)
+
+#if defined(TARGET_TWL)
+#define RDCACHE_MAX_TRIS (0x200) // theoretical max 0x800?
+#define RDCACHE_MAX_VERTICES (0x600)
+
+#define STD3D_MAX_TEXTURES (1024)
+#define STD3D_MAX_UI_TRIS (0x100)
+#define STD3D_MAX_UI_VERTICES (0x100)
+#else
 #define RDCACHE_MAX_TRIS (0x400)
 #define RDCACHE_MAX_VERTICES (0x8000)
 
 #define STD3D_MAX_TEXTURES (4096)
 #define STD3D_MAX_UI_TRIS (0x8000)
 #define STD3D_MAX_UI_VERTICES (0x8000)
+#endif
 
 #define SITHCONTROL_NUM_HANDLERS (9)
 
@@ -202,7 +214,7 @@
 
 #define SITHAI_MAX_ACTORS (256)
 
-#ifdef QOL_IMPROVEMENTS
+#if defined(QOL_IMPROVEMENTS) && !defined(TARGET_TWL)
 #define SITH_MIXER_NUMPLAYINGSOUNDS (256)
 #else
 #define SITH_MIXER_NUMPLAYINGSOUNDS (32)
@@ -214,9 +226,19 @@
 #define JKDEV_NUM_CHEATS (32)
 #endif
 
-#define SITHCVAR_MAX_CVARS (1024)
+#define SITHCVAR_MAX_CVARS (512)
 #define SITHCVAR_MAX_STRLEN (256)
+#define SITHCVAR_MAX_NAME_STRLEN (64)
+
+#ifdef ARCH_WASM
+#define SITHCVAR_FNAME ("persist/openjkdf2_cvars.json")
+#define SITHBINDS_FNAME ("persist/openjkdf2_binds.json")
+#define REGISTRY_FNAME ("persist/registry.json")
+#else
 #define SITHCVAR_FNAME ("openjkdf2_cvars.json")
+#define SITHBINDS_FNAME ("openjkdf2_binds.json")
+#define REGISTRY_FNAME ("registry.json")
+#endif
 
 #define STDUPDATER_DEFAULT_URL ("https://api.github.com/repos/shinyquagsire23/OpenJKDF2/releases?per_page=1")
 #define STDUPDATER_DEFAULT_WIN64_FILENAME ("win64-debug.zip")
@@ -228,6 +250,18 @@
 
 #define COMPAT_SAVE_VERSION (Main_bMotsCompat ? 0x7D6 : 0x6)
 #define JKSAVE_FORMATSTR (Main_bMotsCompat ? "msav%04d.jks" : "save%04d.jks")
+
+extern int Window_isHiDpi;
+#ifdef WIN64_STANDALONE
+#define WINDOW_DEFAULT_WIDTH  (640*2)
+#define WINDOW_DEFAULT_HEIGHT (480*2)
+#else // WIN64_STANDALONE
+#define WINDOW_DEFAULT_WIDTH  (640)
+#define WINDOW_DEFAULT_HEIGHT (480)
+#endif // WIN64_STANDALONE
+
+// TODO: fixed point support?
+typedef float flex_t;
 
 // Disable warnings for Vegetable Studio
 #if 1 && defined _MSC_VER

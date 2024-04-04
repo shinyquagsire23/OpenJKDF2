@@ -52,7 +52,7 @@ int stdStrTable_Load(stdStrTable *strtable, char *fpath)
             {
                 std_pHS->fileGets(fhand, v32, 64);
             }
-            while ( !_strchr(v32, 10) );
+            while ( !_strchr(v32, '\n') );
         }
         for ( i = a1a; __isspace(*i); ++i )
             ;
@@ -237,7 +237,7 @@ wchar_t* stdStrTable_GetUniString(stdStrTable* pTable, const char *key)
     return result;
 }
 
-wchar_t* stdStrTable_GetString(stdStrTable* pTable, char *key)
+wchar_t* stdStrTable_GetStringWithFallback(stdStrTable* pTable, char *key)
 {
     stdStrMsg *v2; // eax
     wchar_t *result; // eax

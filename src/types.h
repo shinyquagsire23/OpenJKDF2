@@ -10,6 +10,18 @@ extern "C" {
 #define AL_SILENCE_DEPRECATION
 #endif
 
+#if (defined(LINUX) || defined(TARGET_TWL)) && !defined(PLAT_MISSING_WIN32)
+#define PLAT_MISSING_WIN32
+#endif
+
+#if defined(LINUX) || defined(TARGET_TWL)
+#define FS_POSIX
+#endif
+
+#if defined(SDL2_RENDER)
+#define QUAKE_CONSOLE
+#endif
+
 // Ghidra tutorial:
 // File > Parse C Source...
 //
@@ -123,7 +135,7 @@ typedef struct GUID_idk
     uint32_t a,b,c,d;
 } GUID_idk;
 
-#ifdef LINUX
+#if defined(PLAT_MISSING_WIN32)
 #define __stdcall
 #define __cdecl
 typedef int HKEY;
@@ -336,7 +348,7 @@ typedef struct Darray Darray;
 
 typedef struct stdControlKeyInfoEntry stdControlKeyInfoEntry;
 
-#ifndef SDL2_RENDER
+#if !defined(SDL2_RENDER) && defined(WIN32)
 typedef IDirectSoundBuffer stdSound_buffer_t;
 typedef IDirectSound3DBuffer stdSound_3dBuffer_t;
 #else // STDSOUND_OPENAL
@@ -475,9 +487,9 @@ typedef struct rdCamera
     float fov_y;
     float screenAspectRatio;
     float orthoScale;
-    rdClipFrustum *cameraClipFrustum;
-    void (*project)(rdVector3 *, rdVector3 *);
-    void (*projectLst)(rdVector3 *, rdVector3 *, unsigned int);
+    rdClipFrustum *pClipFrustum;
+    void (*fnProject)(rdVector3 *, rdVector3 *);
+    void (*fnProjectLst)(rdVector3 *, rdVector3 *, unsigned int);
     float ambientLight;
     int numLights;
     rdLight* lights[64];
@@ -521,7 +533,7 @@ typedef struct rdJoint
     char mesh_name[32];
     uint32_t nodeIdx;
     uint32_t numAnimEntries;
-    rdAnimEntry* animEntries;
+    rdAnimEntry* paAnimEntries;
 } rdJoint;
 
 typedef struct rdKeyframe
@@ -534,7 +546,7 @@ typedef struct rdKeyframe
     float fps;
     uint32_t numFrames;
     uint32_t numJoints2;
-    rdJoint* joints;
+    rdJoint* paJoints;
     uint32_t numMarkers;
     rdMarkers markers;
 } rdKeyframe;
@@ -1400,7 +1412,7 @@ struct rdSurface
 
 typedef struct sithSurface
 {
-    uint32_t field_0;
+    uint32_t index;
     uint32_t field_4;
     sithSector* parent_sector;
     sithAdjoin* adjoin;
@@ -1441,7 +1453,7 @@ typedef struct jkDevLogEnt
     int bDrawEntry;
 } jkDevLogEnt;
 
-#ifdef LINUX
+#ifdef PLAT_MISSING_WIN32
 typedef uint32_t MCIDEVICEID;
 #endif
 
@@ -1771,7 +1783,7 @@ typedef struct jkEpisodeLoad
 {
     jkEpisodeTypeFlags_t type;
     int numSeq;
-    int field_8;
+    int currentEpisodeEntryIdx;
     jkEpisodeEntry* paEntries;
 } jkEpisodeLoad;
 //end jkEpisode
@@ -1794,14 +1806,14 @@ typedef struct HostServicesBasic
     stdFile_t (*fileOpen)(const char *, const char *);
     int (*fileClose)(stdFile_t);
     size_t (*fileRead)(stdFile_t, void *, size_t);
-    char *(*fileGets)(stdFile_t, char *, size_t);
+    const char *(*fileGets)(stdFile_t, char *, size_t);
     size_t (*fileWrite)(stdFile_t, void *, size_t);
-    int (*feof)(stdFile_t);
+    int (*fileEof)(stdFile_t);
     int (*ftell)(stdFile_t);
     int (*fseek)(stdFile_t, int, int);
     int (*fileSize)(stdFile_t);
     int (*filePrintf)(stdFile_t, const char*, ...);
-    wchar_t* (*fileGetws)(stdFile_t, wchar_t *, size_t);
+    const wchar_t* (*fileGetws)(stdFile_t, wchar_t *, size_t);
 } HostServicesBasic;
 
 typedef struct HostServices
@@ -1821,14 +1833,14 @@ typedef struct HostServices
     stdFile_t (*fileOpen)(const char *, const char *);
     int (*fileClose)(stdFile_t);
     size_t (*fileRead)(stdFile_t, void *, size_t);
-    char *(*fileGets)(stdFile_t, char *, size_t);
+    const char *(*fileGets)(stdFile_t, char *, size_t);
     size_t (*fileWrite)(stdFile_t, void *, size_t);
-    int (*feof)(stdFile_t);
+    int (*fileEof)(stdFile_t);
     int (*ftell)(stdFile_t);
     int (*fseek)(stdFile_t, int, int);
     int (*fileSize)(stdFile_t);
     int (*filePrintf)(stdFile_t, const char*, ...);
-    wchar_t* (*fileGetws)(stdFile_t, wchar_t *, size_t);
+    const wchar_t* (*fileGetws)(stdFile_t, wchar_t *, size_t);
     void* (*allocHandle)(size_t);
     void (*freeHandle)(void*);
     void* (*reallocHandle)(void*, size_t);
@@ -2414,7 +2426,7 @@ typedef struct sithActorInstinct
 typedef struct sithActor
 {
     sithThing *thing;
-    sithAIClass *aiclass;
+    sithAIClass *pAIClass;
     int flags;
     sithActorInstinct instincts[16];
     uint32_t numAIClassEntries;
@@ -2427,7 +2439,7 @@ typedef struct sithActor
     rdVector3 toMovePos;
     float distToMovePos;
     float moveSpeed;
-    sithThing* fleeThing;
+    sithThing* pFleeThing;
     rdVector3 field_1C4;
     sithThing* pDistractor;
     rdVector3 field_1D4;
@@ -2438,7 +2450,7 @@ typedef struct sithActor
     rdVector3 field_1F8;
     int field_204;
     rdVector3 blindAimError;
-    sithThing *thingidk;
+    sithThing *pMoveThing;
     rdVector3 movepos;
     int field_224;
     rdVector3 field_228;
@@ -2459,7 +2471,7 @@ typedef struct sithActor
     int field_284;
     int field_288;
     int field_28C;
-    rdVector3 *framesAlloc;
+    rdVector3 *paFrames;
     int loadedFrames;
     int sizeFrames;
 } sithActor;
@@ -2782,7 +2794,7 @@ typedef struct sithThing
     uint32_t field_260;
     float waggle;
     rdVector3 field_268;
-    sithAIClass* aiclass;
+    sithAIClass* pAIClass;
     sithActor* actor;
     char template_name[32];
     sithCog* class_cog;
@@ -3445,6 +3457,7 @@ typedef void (*sithCvarEnumerationFn_t)(tSithCvar*);
 #include "Cog/sithCogFunctionSector.h"
 #include "Cog/sithCogFunctionSound.h"
 #include "General/stdBitmap.h"
+#include "General/stdBitmapRle.h"
 #include "General/stdMath.h"
 #include "General/stdJSON.h"
 #include "Primitives/rdVector.h"

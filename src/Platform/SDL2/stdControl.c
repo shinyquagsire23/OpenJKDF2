@@ -779,7 +779,7 @@ void stdControl_ReadControls()
                     }
                 }
                 
-                int idx = j + (256 + JK_JOYSTICK_BUTTON_STRIDE*i);
+                int idx = j + (KEY_JOY1_B1 + JK_JOYSTICK_BUTTON_STRIDE*i);
                 if (j >= JK_NUM_JOY_BUTTONS) {
                     idx = (j - JK_NUM_JOY_BUTTONS) + (KEY_JOY1_EXT_STARTIDX + (JK_JOYSTICK_EXT_BUTTON_STRIDE*i));
                 }

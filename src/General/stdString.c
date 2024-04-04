@@ -39,7 +39,7 @@ wchar_t* stdString_FastWCopy(const wchar_t *str)
     return result;
 }
 
-int stdString_snprintf(char *out, int num, char *fmt, ...)
+int stdString_snprintf(char *out, int num, const char *fmt, ...)
 {
     int result; // eax
     va_list va; // [esp+18h] [ebp+10h]
