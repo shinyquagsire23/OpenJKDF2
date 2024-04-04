@@ -1053,7 +1053,7 @@ int sithAI_CheckSightThing(sithThing *thing, rdVector3 *targetPosition, sithThin
     }
 
     v21 = sithCollision_GetSectorLookAt(thing->sector, &thing->position, targetPosition, 0.0);
-    sithCollision_SearchRadiusForThings(v21, thing, targetPosition, targetErrorDir, *targetDistance, 0.0, RAYCAST_100 | RAYCAST_2, "sithAI_CheckSightThing");
+    sithCollision_SearchRadiusForThings(v21, thing, targetPosition, targetErrorDir, *targetDistance, 0.0, RAYCAST_100 | RAYCAST_2);
     v22 = sithCollision_NextSearchResult();
     if ( v22 )
     {
@@ -1118,7 +1118,7 @@ int sithAI_sub_4EB300(sithThing *a3, rdVector3 *a4, rdVector3 *arg8, float argC,
     }
 
     v19 = sithCollision_GetSectorLookAt(a3->sector, &a3->position, a4, 0.0);
-    sithCollision_SearchRadiusForThings(v19, a3, a4, a5, *a8, a7, RAYCAST_2000 | RAYCAST_100 | RAYCAST_2, "sithAI_sub_4EB300");
+    sithCollision_SearchRadiusForThings(v19, a3, a4, a5, *a8, a7, RAYCAST_2000 | RAYCAST_100 | RAYCAST_2);
     v20 = sithCollision_NextSearchResult();
     sithCollision_SearchClose();
     return v20 != 0 ? 3 : 0;
@@ -1147,7 +1147,7 @@ int sithAI_CanWalk(sithActor *actor, rdVector3 *targetPosition, int *out)
     if ( !result )
         return result;
     searchDist = sithPhysics_ThingGetInsertOffsetZ(actorThing) + actor->pAIClass->maxStep;
-    sithCollision_SearchRadiusForThings(v6, actorThing, targetPosition, &moveNorm, searchDist, searchRadius, RAYCAST_2000 | RAYCAST_2, "sithAI_CanWalk");
+    sithCollision_SearchRadiusForThings(v6, actorThing, targetPosition, &moveNorm, searchDist, searchRadius, RAYCAST_2000 | RAYCAST_2);
     colSearchEntry = sithCollision_NextSearchResult();
     if ( !colSearchEntry )
         goto LABEL_20;
@@ -1219,7 +1219,7 @@ int sithAI_CanWalk_ExplicitSector(sithActor *actor, rdVector3 *targetPosition, s
     retval = 0;
     searchRadius = actorThing->moveSize * 0.25;
     searchDist = sithPhysics_ThingGetInsertOffsetZ(actorThing) + actor->pAIClass->maxStep;
-    sithCollision_SearchRadiusForThings(targetSector, actorThing, targetPosition, &moveNorm, searchDist, searchRadius, RAYCAST_2000 | RAYCAST_2, "sithAI_CanWalk_ExplicitSector");
+    sithCollision_SearchRadiusForThings(targetSector, actorThing, targetPosition, &moveNorm, searchDist, searchRadius, RAYCAST_2000 | RAYCAST_2);
     colSearchEntry = sithCollision_NextSearchResult();
     if ( colSearchEntry )
     {

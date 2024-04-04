@@ -41,7 +41,7 @@ void sithPhysics_FindFloor(sithThing *pThing, int a3)
 
     if (pThing->sector->flags & SITH_SECTOR_UNDERWATER && pThing->type == SITH_THING_PLAYER)
     {
-        sithCollision_SearchRadiusForThings(pThing->sector, pThing, &pThing->position, &rdroid_zVector3, 0.05, 0.0, RAYCAST_1, "sithPhysics_FindFloor");
+        sithCollision_SearchRadiusForThings(pThing->sector, pThing, &pThing->position, &rdroid_zVector3, 0.05, 0.0, RAYCAST_1);
         v5 = sithCollision_NextSearchResult();
         if ( v5 )
         {
@@ -99,7 +99,7 @@ LABEL_8:
 
         if ( v8 > 0.0 )
         {
-            sithCollision_SearchRadiusForThings(pThing->sector, 0, &pThing->position, &direction, v8, 0.0, searchFlags | RAYCAST_2000 | RAYCAST_800 | RAYCAST_2, "sithPhysics_FindFloor");
+            sithCollision_SearchRadiusForThings(pThing->sector, 0, &pThing->position, &direction, v8, 0.0, searchFlags | RAYCAST_2000 | RAYCAST_800 | RAYCAST_2);
             while ( 1 )
             {
                 for ( i = sithCollision_NextSearchResult(); i; i = sithCollision_NextSearchResult() )
@@ -143,7 +143,7 @@ LABEL_8:
                 if ( pThing->moveSize == 0.0 )
                     break;
                 range = pThing->moveSize;
-                sithCollision_SearchRadiusForThings(pThing->sector, 0, &pThing->position, &direction, v8, range, searchFlags | RAYCAST_2000 | RAYCAST_800 | RAYCAST_2, "sithPhysics_FindFloor");
+                sithCollision_SearchRadiusForThings(pThing->sector, 0, &pThing->position, &direction, v8, range, searchFlags | RAYCAST_2000 | RAYCAST_800 | RAYCAST_2);
             }
         }
         if ( pThing->attach_flags )

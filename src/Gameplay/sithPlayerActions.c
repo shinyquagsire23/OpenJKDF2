@@ -45,7 +45,7 @@ void sithPlayerActions_Activate(sithThing *thing)
             if ( sithComm_multiplayerFlags && v5 >= 0 )
                 sithDSSThing_SendPlayKeyMode(thing, SITH_ANIM_ACTIVATE, thing->rdthing.puppet->tracks[v5].field_130, -1, 255);
             a6 = thing->moveSize - -0.1;
-            sithCollision_SearchRadiusForThings(v4, thing, &thingPos, &out.lvec, a6, 0.025, /*SITH_THING_ACTOR*/RAYCAST_2, "sithPlayerActions_Activate");
+            sithCollision_SearchRadiusForThings(v4, thing, &thingPos, &out.lvec, a6, 0.025, /*SITH_THING_ACTOR*/RAYCAST_2);
             for ( searchResult = sithCollision_NextSearchResult(); searchResult; searchResult = sithCollision_NextSearchResult() )
             {
                 if ( (searchResult->hitType & SITHCOLLISION_WORLD) != 0 )
@@ -210,7 +210,7 @@ sithThing* sithPlayerActions_SpawnThingAtLookAt(sithThing *pPlayerThing, sithThi
     if ( pSectorIter )
     {
         a6 = pPlayerThing->moveSize*10;//pPlayerThing->moveSize - -0.1;
-        sithCollision_SearchRadiusForThings(pSectorIter, pPlayerThing, &thingPos, &out.lvec, a6, 0.025, 0, "sithPlayerActions_SpawnThingAtLookAt");
+        sithCollision_SearchRadiusForThings(pSectorIter, pPlayerThing, &thingPos, &out.lvec, a6, 0.025, 0);
         for ( searchResult = sithCollision_NextSearchResult(); searchResult; searchResult = sithCollision_NextSearchResult() )
         {
             if (searchResult->hitType & SITHCOLLISION_ADJOINCROSS)
