@@ -45,7 +45,7 @@ void sithPlayerActions_Activate(sithThing *thing)
             if ( sithComm_multiplayerFlags && v5 >= 0 )
                 sithDSSThing_SendPlayKeyMode(thing, SITH_ANIM_ACTIVATE, thing->rdthing.puppet->tracks[v5].field_130, -1, 255);
             a6 = thing->moveSize - -0.1;
-            sithCollision_SearchRadiusForThings(v4, thing, &thingPos, &out.lvec, a6, 0.025, SITH_THING_ACTOR);
+            sithCollision_SearchRadiusForThings(v4, thing, &thingPos, &out.lvec, a6, 0.025, /*SITH_THING_ACTOR*/RAYCAST_2);
             for ( searchResult = sithCollision_NextSearchResult(); searchResult; searchResult = sithCollision_NextSearchResult() )
             {
                 if ( (searchResult->hitType & SITHCOLLISION_WORLD) != 0 )
@@ -96,10 +96,10 @@ void sithPlayerActions_JumpWithVel(sithThing *thing, float vel)
         final_vel = thing->actorParams.jumpSpeed * vel;
         if ( (thing->physicsParams.physflags & SITH_PF_CROUCHING) != 0 )
             final_vel = final_vel * 0.7;
-        if ( (thing->physicsParams.physflags & SITH_PF_MIDAIR) != 0 )
+        if ( (thing->physicsParams.physflags & SITH_PF_WATERSURFACE) != 0 )
         {
             rdVector_MultAcc3(&thing->physicsParams.vel, &rdroid_zVector3, final_vel);
-            thing->physicsParams.physflags &= ~SITH_PF_MIDAIR;
+            thing->physicsParams.physflags &= ~SITH_PF_WATERSURFACE;
         }
         else
         {

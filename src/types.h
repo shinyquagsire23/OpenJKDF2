@@ -2436,8 +2436,8 @@ typedef struct sithActor
 #endif
     rdVector3 lookVector;
     rdVector3 movePos;
-    rdVector3 field_1AC;
-    float field_1B8;
+    rdVector3 toMovePos;
+    float distToMovePos;
     float moveSpeed;
     sithThing* pFleeThing;
     rdVector3 field_1C4;
@@ -2995,10 +2995,10 @@ typedef struct stdPalEffectsState
   int field_C;
   int field_10;
   stdPalEffect effect;
-  int field_3C;
-  int field_40;
-  int field_44;
-  int field_48;
+  int bUseFilter;
+  int bUseTint;
+  int bUseAdd;
+  int bUseFade;
 } stdPalEffectsState;
 
 typedef struct stdPalEffectRequest

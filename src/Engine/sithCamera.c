@@ -561,7 +561,7 @@ void sithCamera_SetCameraFocus(sithCamera *camera, sithThing *primary, sithThing
     camera->secondaryFocus = secondary;
 }
 
-sithSector* sithCamera_create_unk_struct(sithThing *a3, sithSector *a2, rdVector3 *a4, rdVector3 *a6, float a7, int arg14)
+sithSector* sithCamera_create_unk_struct(sithThing *a3, sithSector *a2, rdVector3 *a4, rdVector3 *a6, float a7, int flags)
 {
     double v7; // st7
     sithSector *v9; // ebx
@@ -573,7 +573,7 @@ sithSector* sithCamera_create_unk_struct(sithThing *a3, sithSector *a2, rdVector
     v7 = rdVector_Normalize3Acc(&a5);
     a6a = v7;
     v9 = a2;
-    sithCollision_SearchRadiusForThings(a2, a3, a4, &a5, a6a, a7, arg14 | 0x800);
+    sithCollision_SearchRadiusForThings(a2, a3, a4, &a5, a6a, a7, flags | RAYCAST_800);
     for ( i = sithCollision_NextSearchResult(); i; i = sithCollision_NextSearchResult() )
     {
         if ( (i->hitType & SITHCOLLISION_ADJOINCROSS) != 0 )

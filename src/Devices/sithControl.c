@@ -1551,7 +1551,7 @@ void sithControl_FreeCam(sithThing *player)
         if ( (v1->physicsParams.acceleration.x != 0.0 || v1->physicsParams.acceleration.y != 0.0) // TODO verified first comparison?
           && (v1->actorParams.eyePYR.x != 0.0 || v1->actorParams.eyePYR.y != 0.0 || v1->actorParams.eyePYR.z != 0.0)
           && v2
-          && (v1->physicsParams.physflags & SITH_PF_MIDAIR) == 0 )
+          && (v1->physicsParams.physflags & SITH_PF_WATERSURFACE) == 0 )
         {
             rdMatrix_BuildRotate34(&a, &v1->actorParams.eyePYR);
             rdMatrix_TransformVector34Acc(&v1->physicsParams.acceleration, &a);
@@ -1639,7 +1639,7 @@ void sithControl_FreeCam(sithThing *player)
                 if ((g_debugmodeFlags & DEBUGFLAG_NOCLIP)) {
                     
                 }
-                else if ( (v1->physicsParams.physflags & SITH_PF_MIDAIR) != 0 )
+                else if ( (v1->physicsParams.physflags & SITH_PF_WATERSURFACE) != 0 )
                 {
                     if ( tmp )
                         sithPlayerActions_JumpWithVel(v1, 1.0);

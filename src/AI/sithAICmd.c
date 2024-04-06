@@ -299,8 +299,8 @@ int sithAICmd_Follow(sithActor *actor, sithAIClassEntry *aiclass, sithActorInsti
     a1.y = 45.0;
     if ( _frand() <= 0.5 )
         a1.y = -45.0;
-    rdVector_Rotate3(&a4a, &actor->field_1AC, &a1);
-    rdVector_Scale3Acc(&a4a, actor->field_1B8);
+    rdVector_Rotate3(&a4a, &actor->toMovePos, &a1);
+    rdVector_Scale3Acc(&a4a, actor->distToMovePos);
     rdVector_Add3Acc(&a4a, &actor->thing->position);
     sithAI_SetMoveThing(actor, &a4a, actor->moveSpeed);
     instinct->nextUpdate = sithTime_curMs + 1000;
@@ -1051,22 +1051,22 @@ p2 - Max jump dist (Ai Thinks not Actual)
 */
 int sithAICmd_Jump(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, void *extra)
 {
-    sithActor *v5; // edi
-    sithThing *v6; // esi
-    sithSector *v7; // ebx
-    rdVector3 a2; // [esp+Ch] [ebp-18h] BYREF
-    rdVector3 a3; // [esp+18h] [ebp-Ch] BYREF
+    sithActor *_actor; // edi
+    sithThing *actorThing; // esi
+    sithSector *actorSector; // ebx
+    rdVector3 pos; // [esp+Ch] [ebp-18h] BYREF
+    rdVector3 tmpPos; // [esp+18h] [ebp-Ch] BYREF
 
-    v5 = actor;
-    v6 = actor->thing;
-    v7 = actor->thing->sector;
+    _actor = actor;
+    actorThing = actor->thing;
+    actorSector = actor->thing->sector;
     if ( !actor->thing->attach_flags )
         return 0;
     if (!(actor->flags & SITHAI_MODE_MOVING))
         return 0;
-    if ( rdVector_Dot3(&actor->field_228, &v6->physicsParams.vel) > 0.02 )
+    if ( rdVector_Dot3(&actor->field_228, &actorThing->physicsParams.vel) > 0.02 )
         return 0;
-    //*(_QWORD *)&a2.x = sithTime_curMs;
+    //*(_QWORD *)&pos.x = sithTime_curMs;
     if ( (double)sithTime_curMs < instinct->param0 )
         return 0;
 
@@ -1076,33 +1076,33 @@ int sithAICmd_Jump(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinc
         if ( flags != SITHAI_MODE_TARGET_VISIBLE )
             return 0;
 
-        rdVector_Copy3(&a2, &v6->position);
-        rdVector_MultAcc3(&a2, &v5->field_1AC, aiclass->argsAsFloat[2]);
+        rdVector_Copy3(&pos, &actorThing->position);
+        rdVector_MultAcc3(&pos, &_actor->toMovePos, aiclass->argsAsFloat[2]);
 
-        if ( sithAI_physidk(v5, &a2, 0) )
+        if ( sithAI_CanWalk(_actor, &pos, 0) )
         {
-            rdVector_MultAcc3(&v6->physicsParams.vel, &v5->field_1AC, 0.1);
-            sithAI_Jump(v5, &v5->movePos, 1.0);
+            rdVector_MultAcc3(&actorThing->physicsParams.vel, &_actor->toMovePos, 0.1);
+            sithAI_Jump(_actor, &_actor->movePos, 1.0);
             return 1;
         }
         return 1;
     }
-    rdVector_Copy3(&a3, &v6->position);
-    rdVector_MultAcc3(&a3, &rdroid_zVector3, aiclass->argsAsFloat[1]);
-    sithSector* result = sithCollision_GetSectorLookAt(v7, &v6->position, &a3, 0.0);
+    rdVector_Copy3(&tmpPos, &actorThing->position);
+    rdVector_MultAcc3(&tmpPos, &rdroid_zVector3, aiclass->argsAsFloat[1]);
+    sithSector* result = sithCollision_GetSectorLookAt(actorSector, &actorThing->position, &tmpPos, 0.0);
     if ( result )
     {
-        a2.x = v5->field_1AC.x * 0.1 + a3.x;
-        a2.y = v5->field_1AC.y * 0.1 + a3.y;
-        a2.z = a3.z;
-        result = sithCollision_GetSectorLookAt(result, &a3, &a2, 0.0);
+        pos.x = _actor->toMovePos.x * 0.1 + tmpPos.x;
+        pos.y = _actor->toMovePos.y * 0.1 + tmpPos.y;
+        pos.z = tmpPos.z;
+        result = sithCollision_GetSectorLookAt(result, &tmpPos, &pos, 0.0);
         if ( result )
         {
             int tmp;
-            if ( sithAI_sub_4EB640(v5, &a2, result, &tmp) == 1 )
+            if ( sithAI_CanWalk_ExplicitSector(_actor, &pos, result, &tmp) == 1 )
             {
                 if ( tmp )
-                    sithAI_Jump(v5, &a2, 1.0);
+                    sithAI_Jump(_actor, &pos, 1.0);
             }
             return 1;
         }
@@ -1175,7 +1175,7 @@ int sithAICmd_Flee(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinc
                 v19.y = 90.0;
                 if ( _frand() >= 0.5 )
                     v19.y = -90.0;
-                rdVector_Rotate3(&a5, &actor->field_1AC, &v19);
+                rdVector_Rotate3(&a5, &actor->toMovePos, &v19);
             }
             rdVector_Copy3(&movePos, &actor->thing->position);
             rdVector_MultAcc3(&movePos, &a5, aiclass1a);
@@ -1241,7 +1241,7 @@ int sithAICmd_Withdraw(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
                 v17.y = 90.0;
                 if (_frand() >= 0.5)
                     v17.y = -90.0;
-                rdVector_Rotate3(&a5, &actor->field_1AC, &v17);
+                rdVector_Rotate3(&a5, &actor->toMovePos, &v17);
                 v13 = actor->thing;
             }
             rdVector_Copy3(&movePos, &v13->position);

@@ -45,7 +45,7 @@ void sithActor_Tick(sithThing *thing, int deltaMs)
 
     if ( (thing->actorParams.typeflags & SITH_AF_BREATH_UNDER_WATER) == 0 && (thing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
     {
-        if ( (thing->physicsParams.physflags & SITH_PF_MIDAIR) != 0 || (thing->sector && thing->sector->flags & SITH_SECTOR_UNDERWATER) == 0 ) // Added: Sector check
+        if ( (thing->physicsParams.physflags & SITH_PF_WATERSURFACE) != 0 || (thing->sector && thing->sector->flags & SITH_SECTOR_UNDERWATER) == 0 ) // Added: Sector check
         {
             v3 = thing->actorParams.msUnderwater;
             if ( v3 )

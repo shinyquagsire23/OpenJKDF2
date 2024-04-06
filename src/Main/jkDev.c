@@ -566,7 +566,7 @@ int jkDev_Custom_CmdJumpNextCheckpoint(stdDebugConsoleCmd* pCmd, const char* pAr
     if (sithNet_isMulti)
         return 1;
 
-    jkPlayer_dword_525470 = 1;
+    jkPlayer_bLoadingSomething = 1;
     stdString_snprintf(tmp, 128, "%s%s", "_JKAUTO_", sithWorld_pCurrentWorld->map_jkl_fname);
     stdFnames_ChangeExt(tmp, "jks");
     return sithGamesave_Load(tmp, 1, 0);

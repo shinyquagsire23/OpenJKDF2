@@ -18,7 +18,7 @@ void sithPhysics_FindFloor(sithThing *pThing, int a3)
     sithCollisionSearchEntry *i; // esi
     sithThing *v11; // edi
     rdFace *v12; // eax
-    int v14; // [esp+10h] [ebp-20h]
+    int searchFlags; // [esp+10h] [ebp-20h]
     float range; // [esp+14h] [ebp-1Ch]
     rdVector3 direction; // [esp+18h] [ebp-18h] BYREF
     rdVector3 a1; // [esp+24h] [ebp-Ch] BYREF
@@ -35,13 +35,13 @@ void sithPhysics_FindFloor(sithThing *pThing, int a3)
     }
 
     range = 0.0;
-    v14 = 0;
+    searchFlags = 0;
     if (!pThing->sector)
         return;
 
     if (pThing->sector->flags & SITH_SECTOR_UNDERWATER && pThing->type == SITH_THING_PLAYER)
     {
-        sithCollision_SearchRadiusForThings(pThing->sector, pThing, &pThing->position, &rdroid_zVector3, 0.05, 0.0, 1);
+        sithCollision_SearchRadiusForThings(pThing->sector, pThing, &pThing->position, &rdroid_zVector3, 0.05, 0.0, RAYCAST_1);
         v5 = sithCollision_NextSearchResult();
         if ( v5 )
         {
@@ -52,14 +52,14 @@ void sithPhysics_FindFloor(sithThing *pThing, int a3)
                     goto LABEL_8;
             }
             pThing->field_48 = v5->distance;
-            pThing->physicsParams.physflags |= SITH_PF_MIDAIR;
+            pThing->physicsParams.physflags |= SITH_PF_WATERSURFACE;
             sithCollision_SearchClose();
         }
         else
         {
 LABEL_8:
             sithCollision_SearchClose();
-            pThing->physicsParams.physflags &= ~SITH_PF_MIDAIR;
+            pThing->physicsParams.physflags &= ~SITH_PF_WATERSURFACE;
         }
     }
     else
@@ -69,7 +69,7 @@ LABEL_8:
             direction.x = -0.0;
             direction.y = direction.x;
             direction.z = -1.0;
-            v14 = 0x10;
+            searchFlags = RAYCAST_10;
         }
         else
         {
@@ -99,7 +99,7 @@ LABEL_8:
 
         if ( v8 > 0.0 )
         {
-            sithCollision_SearchRadiusForThings(pThing->sector, 0, &pThing->position, &direction, v8, 0.0, v14 | 0x2802);
+            sithCollision_SearchRadiusForThings(pThing->sector, 0, &pThing->position, &direction, v8, 0.0, searchFlags | RAYCAST_2000 | RAYCAST_800 | RAYCAST_2);
             while ( 1 )
             {
                 for ( i = sithCollision_NextSearchResult(); i; i = sithCollision_NextSearchResult() )
@@ -124,7 +124,7 @@ LABEL_8:
                             }
                             
                             // Track thing that can move
-                            if ( (v14 & 0x10) == 0
+                            if ( (searchFlags & RAYCAST_10) == 0
                               || (rdMatrix_TransformVector34(&a1, &v12->normal, &v11->lookOrientation), rdVector_Dot3(&a1, &rdroid_zVector3) >= 0.6) )
                             {
                                 sithThing_LandThing(pThing, v11, i->face, i->sender->vertices, a3);
@@ -143,7 +143,7 @@ LABEL_8:
                 if ( pThing->moveSize == 0.0 )
                     break;
                 range = pThing->moveSize;
-                sithCollision_SearchRadiusForThings(pThing->sector, 0, &pThing->position, &direction, v8, range, v14 | 0x2802);
+                sithCollision_SearchRadiusForThings(pThing->sector, 0, &pThing->position, &direction, v8, range, searchFlags | RAYCAST_2000 | RAYCAST_800 | RAYCAST_2);
             }
         }
         if ( pThing->attach_flags )
@@ -728,7 +728,7 @@ void sithPhysics_ThingPhysUnderwater(sithThing *pThing, float deltaSeconds)
         rdVector_MultAcc3(&a1a, &pThing->sector->thrust, deltaSeconds);
     }
 
-    if ( ((pThing->physicsParams.physflags & SITH_PF_MIDAIR) == 0 || (pThing->thingflags & SITH_TF_DEAD) != 0) && (pThing->physicsParams.physflags & SITH_PF_USEGRAVITY) != 0 )
+    if ( ((pThing->physicsParams.physflags & SITH_PF_WATERSURFACE) == 0 || (pThing->thingflags & SITH_TF_DEAD) != 0) && (pThing->physicsParams.physflags & SITH_PF_USEGRAVITY) != 0 )
     {
         v35 = sithWorld_pCurrentWorld->worldGravity * deltaSeconds * pThing->physicsParams.buoyancy;
         a1a.z -= v35;
@@ -741,7 +741,7 @@ void sithPhysics_ThingPhysUnderwater(sithThing *pThing, float deltaSeconds)
     {
         rdVector_Scale3(&pThing->physicsParams.velocityMaybe, &pThing->physicsParams.vel, deltaSeconds);
     }
-    if ( (pThing->physicsParams.physflags & SITH_PF_MIDAIR) != 0 && pThing->physicsParams.acceleration.z >= 0.0 )
+    if ( (pThing->physicsParams.physflags & SITH_PF_WATERSURFACE) != 0 && pThing->physicsParams.acceleration.z >= 0.0 )
     {
         v51 = pThing->field_48 - 0.01;
         if ( pThing->physicsParams.velocityMaybe.z > 0.0 && pThing->physicsParams.velocityMaybe.z < (double)deltaSeconds * 0.2 ) // verify first

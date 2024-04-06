@@ -403,17 +403,17 @@ enum SithCollideType
 enum SithRaycastType
 {
     RAYCAST_1 = 0x1,
-    RAYCAST_2 = 0x2,
-    RAYCAST_4 = 0x4,
+    RAYCAST_2 = 0x2,  // actor?
+    RAYCAST_4 = 0x4,  // path thing?
     RAYCAST_8 = 0x8,
-    RAYCAST_10 = 0x10,
+    RAYCAST_10 = 0x10, // wall?
     RAYCAST_20 = 0x20,
     RAYCAST_40 = 0x40,
     RAYCAST_80 = 0x80,
     RAYCAST_100 = 0x100,
-    RAYCAST_200 = 0x200,
-    RAYCAST_400 = 0x400,
-    RAYCAST_800 = 0x800,
+    RAYCAST_200 = 0x200, // player?
+    RAYCAST_400 = 0x400, // something with radius?
+    RAYCAST_800 = 0x800, // adjoins?
     RAYCAST_1000 = 0x1000,
     RAYCAST_2000 = 0x2000,
     RAYCAST_4000 = 0x4000,
@@ -1137,7 +1137,7 @@ enum THING_PHYSFLAGS
     SITH_PF_20000 = 0x20000,
     SITH_PF_PARTIALGRAVITY = 0x40000,
     SITH_PF_80000 = 0x80000,
-    SITH_PF_MIDAIR = 0x100000,
+    SITH_PF_WATERSURFACE = 0x100000,
     SITH_PF_200000 = 0x200000,
     SITH_PF_NOTHRUST = 0x400000,
     SITH_PF_800000 = 0x800000,
