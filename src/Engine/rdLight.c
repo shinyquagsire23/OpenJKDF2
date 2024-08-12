@@ -27,7 +27,11 @@ int rdLight_NewEntry(rdLight *light)
     light->direction.y = 0.0;
     light->direction.z = 0.0;
     light->intensity = 1.0;
-    light->color = 0xFFFFFF;
+#ifdef RGB_THING_LIGHTS
+	rdVector_Set3(&light->color, 1.0f, 1.0f, 1.0f);
+#else
+	light->color = 0xFFFFFF;
+#endif
 #ifdef JKM_LIGHTING
     light->angleX = 0.0;
     light->cosAngleX = 0.0;
@@ -75,7 +79,11 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
 #ifdef JKM_LIGHTING
     rdVector3 *localLightDirs, 
 #endif
-    int numLights, rdVector3 *verticesEnd, rdVector3 *vertices, float *vertices_i_end, float *vertices_i, int numVertices, float scalar)
+    int numLights, rdVector3 *verticesEnd, rdVector3 *vertices, float *vertices_i_end, float *vertices_i,
+#ifdef RGB_THING_LIGHTS
+	float* vertices_r, float* vertices_g, float* vertices_b,
+ #endif
+	int numVertices, float scalar)
 {
 #ifndef JKM_LIGHTING
     int vertexLightsSize;
@@ -138,6 +146,11 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
         rdVector3 diff;
         rdVector3 *vertexNormals;
         float *outLights;
+#ifdef RGB_THING_LIGHTS
+		float* outLightsR;
+		float* outLightsG;
+		float* outLightsB;
+#endif
         float *idkIter;
         int i, j;
 
@@ -148,10 +161,20 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
         vertexNormals = verticesEnd;
         idkIter = vertices_i_end;
         outLights = vertices_i;
+#ifdef RGB_THING_LIGHTS
+		outLightsR = vertices_r;
+		outLightsG = vertices_g;
+		outLightsB = vertices_b;
+#endif
         vertexIter = vertices;
         for (j = 0; j < numVertices; j++)
         {
             *outLights = *idkIter;
+		#ifdef RGB_THING_LIGHTS
+			if (outLightsR) *outLightsR = *idkIter;
+			if (outLightsG) *outLightsG = *idkIter;
+			if (outLightsB) *outLightsB = *idkIter;
+		#endif
             meshLightIter = meshLights;
             for (i = 0; i < numLights; i++)
             {
@@ -163,7 +186,15 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
                     rdVector_Normalize3Acc(&diff);
                     lightMagnitude = rdVector_Dot3(vertexNormals, &diff);
                     if ( lightMagnitude > 0.0 )
-                        *outLights += (light->intensity - len * scalar) * lightMagnitude;
+					{
+						float intensity = (light->intensity - len * scalar) * lightMagnitude;
+                        *outLights += intensity;
+#ifdef RGB_THING_LIGHTS
+						if(outLightsR) *outLightsR += intensity * light->color.x;
+						if(outLightsG) *outLightsG += intensity * light->color.y;
+						if(outLightsB) *outLightsB += intensity * light->color.z;
+#endif
+					}
                 }
                 if ( *outLights >= 1.0 )
                     break;
@@ -172,6 +203,11 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
 
             ++vertexIter;
             ++outLights;
+#ifdef RGB_THING_LIGHTS
+			if (outLightsR) ++outLightsR;
+			if (outLightsG) ++outLightsG;
+			if (outLightsB) ++outLightsB;
+#endif
             ++idkIter;
             ++vertexNormals;
         }
@@ -189,17 +225,31 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
     rdVector3 diff;
     rdLight** meshLightIter;
     float* outLights;
+#ifdef RGB_THING_LIGHTS
+	float* outLightsR;
+	float* outLightsG;
+	float* outLightsB;
+#endif
     
     local_28 = 0.0;
     if (numVertices == 0) return 0.0;
     
     outLights = vertices_i;
+#ifdef RGB_THING_LIGHTS
+	outLightsR = vertices_r;
+	outLightsG = vertices_g;
+	outLightsB = vertices_b;
+#endif
     vertexIter = vertices;
     vertexNormals = verticesEnd;
     for (int vertIdx = 0; vertIdx < numVertices; vertIdx++)
     {
         *outLights = *vertices_i_end;
-
+#ifdef RGB_THING_LIGHTS
+		if (vertices_r) *outLightsR = *vertices_i_end;
+		if (vertices_g) *outLightsG = *vertices_i_end;
+		if (vertices_b) *outLightsB = *vertices_i_end;
+#endif
         meshLightIter = meshLights;
         verticesEnd = localLightPoses;
         lightDirIter = localLightDirs;
@@ -216,7 +266,13 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
                     lightMagnitude = rdVector_Dot3(vertexNormals, &diff);
                     if (lightMagnitude > 0.0) 
                     {
-                        *outLights += (light->intensity - fVar8 * scalar) * lightMagnitude;
+						float intensity = (light->intensity - fVar8 * scalar) * lightMagnitude;
+                        *outLights += intensity;
+#ifdef RGB_THING_LIGHTS
+						if (vertices_r) *outLightsR += intensity * light->color.x;
+						if (vertices_g) *outLightsG += intensity * light->color.y;
+						if (vertices_b) *outLightsB += intensity * light->color.z;
+#endif
                     }
                 }
                 else 
@@ -229,15 +285,29 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
                         {
                             fVar1 = (1.0 - (light->cosAngleX - lightMagnitude) * light->lux) * fVar1;
                         }
-                        *outLights += (fVar1 - fVar8 * scalar) * rdVector_Dot3(vertexNormals, lightDirIter);
+						float intensity = (fVar1 - fVar8 * scalar) * rdVector_Dot3(vertexNormals, lightDirIter);
+                        *outLights += intensity;
+#ifdef RGB_THING_LIGHTS
+						if (vertices_r) *outLightsR += intensity * light->color.x;
+						if (vertices_g) *outLightsG += intensity * light->color.y;
+						if (vertices_b) *outLightsB += intensity * light->color.z;
+#endif
                     }
                 }
             }
 
+#ifdef RGB_THING_LIGHTS
+			if (*outLights > 1.0) *outLights = 1.0;
+			if (*vertices_r > 1.0) *outLightsR = 1.0;
+			if (*vertices_g > 1.0) *outLightsG = 1.0;
+			if (*vertices_b > 1.0) *outLightsB = 1.0;
+			if (*outLights == 1.0 && *outLightsR == 1.0 && *outLightsR == 1.0 && *outLightsB == 1.0) break;
+#else
             if (*outLights > 1.0) {
                 *outLights = 1.0;
             }
             if (*outLights == 1.0) break;
+#endif
             meshLightIter++;
             verticesEnd++;
             lightDirIter++;
@@ -247,6 +317,11 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
         vertexNormals++;
         vertexIter++;
         outLights++;
+#ifdef RGB_THING_LIGHTS
+		if (vertices_r) ++outLightsR;
+		if (vertices_g) ++outLightsG;
+		if (vertices_b) ++outLightsB;
+#endif
     } 
     return (double)(local_28 / (float)numVertices);
 #endif

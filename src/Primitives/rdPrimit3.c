@@ -934,6 +934,10 @@ void rdPrimit3_NoClipFaceRGB
     float *pfVar6;
     float *pfVar7;
     float *pfVar8;
+#ifdef RGB_THING_LIGHTS
+	float *pfVarG;
+	float *pfVarB;
+#endif
     int *piVar9;
     float *pfVar10;
     intptr_t iVar11;
@@ -1048,7 +1052,13 @@ void rdPrimit3_NoClipFaceRGB
                 prVar18 = _vertexDst->verticesProjected;
                 pfVar7 = _vertexSrc->paGreenIntensities;
                 piVar14 = _vertexSrc->vertexPosIdx;
-                pfVar8 = _vertexSrc->paDynamicLight;
+			#ifdef RGB_THING_LIGHTS
+                pfVar8 = _vertexSrc->paDynamicLightR;
+				pfVarG = _vertexSrc->paDynamicLightG;
+				pfVarB = _vertexSrc->paDynamicLightB;
+			#else
+				pfVar8 = _vertexSrc->paDynamicLight;
+			#endif
                 pfVar10 = _vertexSrc->paBlueIntensities;
                 float* blueIter = _vertexDst->paBlueIntensities;
                 int idkIn_ = _vertexSrc->numVertices;
@@ -1066,7 +1076,11 @@ void rdPrimit3_NoClipFaceRGB
                         fVar12 = 1.0;
                     }
                     *pfVar6 = fVar12;
+				#ifdef RGB_THING_LIGHTS
+					fVar12 = pfVar7[*piVar14] + pfVarG[*piVar14];
+				#else
                     fVar12 = pfVar7[*piVar14] + pfVar8[*piVar14];
+				#endif
                     if (fVar12 < 0.0) {
                         fVar12 = 0.0;
                     }
@@ -1074,7 +1088,11 @@ void rdPrimit3_NoClipFaceRGB
                         fVar12 = 1.0;
                     }
                     *pfVar5 = fVar12;
+				#ifdef RGB_THING_LIGHTS
+					fVar12 = pfVar10[*piVar14] + pfVarB[*piVar14];
+				#else
                     fVar12 = pfVar10[*piVar14] + pfVar8[*piVar14];
+				#endif
                     if (fVar12 < 0.0) {
                         fVar12 = 0.0;
                     }
@@ -1122,9 +1140,15 @@ void rdPrimit3_NoClipFaceRGB
                     _vertexDst->verticesProjected[i] = _vertexSrc->verticesProjected[vtxIdx];
                     _vertexDst->vertexUVs[i] = _vertexSrc->vertexUVs[uvIdx];
                     rdVector_Add2Acc(&_vertexDst->vertexUVs[i], idkIn);
+				#ifdef RGB_THING_LIGHTS
+					_vertexDst->paRedIntensities[i] = stdMath_Clamp(_vertexSrc->paRedIntensities[vtxIdx] + _vertexSrc->paDynamicLightR[vtxIdx], 0.0, 1.0);
+					_vertexDst->paGreenIntensities[i] = stdMath_Clamp(_vertexSrc->paGreenIntensities[vtxIdx] + _vertexSrc->paDynamicLightG[vtxIdx], 0.0, 1.0);
+					_vertexDst->paBlueIntensities[i] = stdMath_Clamp(_vertexSrc->paBlueIntensities[vtxIdx] + _vertexSrc->paDynamicLightB[vtxIdx], 0.0, 1.0);
+				#else
                     _vertexDst->paRedIntensities[i] = stdMath_Clamp(_vertexSrc->paRedIntensities[vtxIdx] + _vertexSrc->paDynamicLight[vtxIdx], 0.0, 1.0);
                     _vertexDst->paGreenIntensities[i] = stdMath_Clamp(_vertexSrc->paGreenIntensities[vtxIdx] + _vertexSrc->paDynamicLight[vtxIdx], 0.0, 1.0);
                     _vertexDst->paBlueIntensities[i] = stdMath_Clamp(_vertexSrc->paBlueIntensities[vtxIdx] + _vertexSrc->paDynamicLight[vtxIdx], 0.0, 1.0);
+				#endif
                 }
 
                 _vertexDst->numVertices = _vertexSrc->numVertices;
@@ -1151,6 +1175,10 @@ rdPrimit3_ClipFaceRGB
     rdVector3 *prVar3;
     float *pfVar5;
     float *pfVar6;
+#ifdef RGB_THING_LIGHTS
+	float *pfVarG;
+	float *pfVarB;
+#endif
     float *pfVar7;
     float *pfVar8;
     int *piVar9;
@@ -1269,7 +1297,13 @@ rdPrimit3_ClipFaceRGB
             if (idxInfo->numVertices != 0x0) {
                 prVar3 = idxInfo->verticesProjected;
                 pfVar5 = idxInfo->paRedIntensities;
+			#ifdef RGB_THING_LIGHTS
+				pfVar6 = idxInfo->paDynamicLightR;
+				pfVarG = idxInfo->paDynamicLightG;
+				pfVarB = idxInfo->paDynamicLightB;
+			#else
                 pfVar6 = idxInfo->paDynamicLight;
+			#endif
                 prVar19 = mesh_out->verticesProjected;
                 pfVar7 = idxInfo->paGreenIntensities;
                 piVar17 = idxInfo->vertexPosIdx;
@@ -1294,7 +1328,11 @@ rdPrimit3_ClipFaceRGB
                     }
                     pfVar2 = (float *)(iVar20 + (intptr_t)piVar17);
                     *(float *)((intptr_t)pfVar2 + ((intptr_t)pfVar11 - (intptr_t)pfVar10)) = fVar14;
+				#ifdef RGB_THING_LIGHTS
+					fVar14 = pfVar7[iVar12] + pfVarG[iVar12];
+				#else
                     fVar14 = pfVar7[iVar12] + pfVar6[iVar12];
+				#endif
                     if (fVar14 < 0.0) {
                         fVar14 = 0.0;
                     }
@@ -1302,7 +1340,11 @@ rdPrimit3_ClipFaceRGB
                         fVar14 = 1.0;
                     }
                     *pfVar2 = fVar14;
+				#ifdef RGB_THING_LIGHTS
+					fVar14 = pfVar8[iVar12] + pfVarB[iVar12];
+				#else
                     fVar14 = pfVar8[iVar12] + pfVar6[iVar12];
+				#endif
                     if (fVar14 < 0.0) {
                         fVar14 = 0.0;
                     }
@@ -1381,7 +1423,13 @@ rdPrimit3_ClipFaceRGB
                 if (idxInfo->numVertices != 0) {
                     prVar3 = idxInfo->verticesProjected;
                     rdVector2* prVar4 = idxInfo->vertexUVs;
-                    pfVar5 = idxInfo->paDynamicLight;
+#ifdef RGB_THING_LIGHTS
+					pfVar5 = idxInfo->paDynamicLightR;
+					pfVarG = idxInfo->paDynamicLightG;
+					pfVarB = idxInfo->paDynamicLightB;
+#else
+					pfVar5 = idxInfo->paDynamicLight;
+#endif
                     piVar17 = idxInfo->vertexPosIdx;
                     pfVar6 = idxInfo->paRedIntensities;
                     pfVar7 = idxInfo->paGreenIntensities;
@@ -1417,7 +1465,11 @@ rdPrimit3_ClipFaceRGB
                         }
                         *redIter = fVar14;
 
+					#ifdef RGB_THING_LIGHTS
+						fVar14 = pfVar7[iVar12] + pfVarG[iVar12];
+					#else
                         fVar14 = pfVar7[iVar12] + pfVar5[iVar12];
+					#endif
                         if (fVar14 < 0.0) {
                             fVar14 = 0.0;
                         }
@@ -1425,7 +1477,11 @@ rdPrimit3_ClipFaceRGB
                             fVar14 = 1.0;
                         }
                         *greenIter = fVar14;
+					#ifdef RGB_THING_LIGHTS
+						fVar14 = pfVar8[iVar12] + pfVarB[iVar12];
+					#else
                         fVar14 = pfVar8[iVar12] + pfVar5[iVar12];
+					#endif
                         if (fVar14 < 0.0) {
                             fVar14 = 0.0;
                         }
@@ -1495,6 +1551,10 @@ void rdPrimit3_ClipFaceRGBLevel
     rdVector2 *prVar5;
     rdVector3 *prVar7;
     float *pfVar9;
+#ifdef RGB_THING_LIGHTS
+	float* pfVarG;
+	float* pfVarB;
+#endif
     intptr_t iVar12;
     intptr_t iVar13;
     uint32_t uVar14;
@@ -1602,7 +1662,13 @@ void rdPrimit3_ClipFaceRGBLevel
             if (idxInfo->numVertices != 0x0) {
                 prVar7 = idxInfo->vertices;
                 piVar18 = idxInfo->vertexPosIdx;
+			#ifdef RGB_THING_LIGHTS
+				pfVar9 = idxInfo->paDynamicLightR; 
+				pfVarG = idxInfo->paDynamicLightG;
+				pfVarB = idxInfo->paDynamicLightB;
+			#else
                 pfVar9 = idxInfo->paDynamicLight;
+			#endif
                 prVar20 = mesh_out->verticesProjected;
 
                 float* redIter = mesh_out->paRedIntensities;
@@ -1615,9 +1681,15 @@ void rdPrimit3_ClipFaceRGBLevel
                     iVar12 = *piVar18;
                     prVar1 = prVar7 + iVar12;
                     rdVector_Copy3(prVar20, prVar1);
+				#ifdef RGB_THING_LIGHTS
                     *redIter = stdMath_Clamp(idxInfo->paRedIntensities[idxIter] + pfVar9[iVar12], 0.0, 1.0);
-                    *greenIter = stdMath_Clamp(idxInfo->paGreenIntensities[idxIter] + pfVar9[iVar12], 0.0, 1.0);
-                    *blueIter = stdMath_Clamp(idxInfo->paBlueIntensities[idxIter] + pfVar9[iVar12], 0.0, 1.0);
+                    *greenIter = stdMath_Clamp(idxInfo->paGreenIntensities[idxIter] + pfVarG[iVar12], 0.0, 1.0);
+                    *blueIter = stdMath_Clamp(idxInfo->paBlueIntensities[idxIter] + pfVarB[iVar12], 0.0, 1.0);
+				#else
+					*redIter = stdMath_Clamp(idxInfo->paRedIntensities[idxIter] + pfVar9[iVar12], 0.0, 1.0);
+					*greenIter = stdMath_Clamp(idxInfo->paGreenIntensities[idxIter] + pfVar9[iVar12], 0.0, 1.0);
+					*blueIter = stdMath_Clamp(idxInfo->paBlueIntensities[idxIter] + pfVar9[iVar12], 0.0, 1.0);
+				#endif
                     prVar20++;
                     piVar18++;
 
@@ -1681,7 +1753,13 @@ void rdPrimit3_ClipFaceRGBLevel
                     piVar18 = idxInfo->vertexUVIdx;
                     prVar7 = idxInfo->vertices;
                     piVar24 = idxInfo->vertexPosIdx;
+				#ifdef RGB_THING_LIGHTS
+					pfVar9 = idxInfo->paDynamicLightR;
+					pfVarG = idxInfo->paDynamicLightG;
+					pfVarB = idxInfo->paDynamicLightB;
+				#else
                     pfVar9 = idxInfo->paDynamicLight;
+				#endif
                     prVar17 = mesh_out->vertexUVs;
 
                     float* redIter = mesh_out->paRedIntensities;
@@ -1697,9 +1775,15 @@ void rdPrimit3_ClipFaceRGBLevel
                         iVar13 = *piVar18;
                         prVar17->x = prVar5[iVar13].x + idkIn->x;
                         prVar17->y = prVar5[iVar13].y + idkIn->y;
+				#ifdef RGB_THING_LIGHTS
+						* redIter = stdMath_Clamp(pfVar9[iVar12] + idxInfo->paRedIntensities[idxIter], 0.0, 1.0);
+						*greenIter = stdMath_Clamp(pfVarG[iVar12] + idxInfo->paGreenIntensities[idxIter], 0.0, 1.0);
+						*blueIter = stdMath_Clamp(pfVarB[iVar12] + idxInfo->paBlueIntensities[idxIter], 0.0, 1.0);
+				#else
                         *redIter = stdMath_Clamp(pfVar9[iVar12] + idxInfo->paRedIntensities[idxIter], 0.0, 1.0);
                         *greenIter = stdMath_Clamp(pfVar9[iVar12] + idxInfo->paGreenIntensities[idxIter], 0.0, 1.0);
                         *blueIter = stdMath_Clamp(pfVar9[iVar12] + idxInfo->paBlueIntensities[idxIter], 0.0, 1.0);
+				#endif
 
                         local_10++;
                         prVar17++;

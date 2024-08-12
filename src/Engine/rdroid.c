@@ -112,7 +112,11 @@ void rdSetProcFaceUserData(int a1)
 // MOTS added
 void rdSetVertexColorMode(int a1)
 {
+#ifdef RGB_THING_LIGHTS
+	rdroid_curVertexColorMode = 1;
+#else
     rdroid_curVertexColorMode = a1;
+#endif
 }
 
 int rdGetRenderOptions(void)
@@ -163,7 +167,11 @@ int rdGetProcFaceUserData(void)
 // MOTS added
 int rdGetVertexColorMode(void)
 {
+#ifdef RGB_THING_LIGHTS
+	return 1;
+#else
     return rdroid_curVertexColorMode;
+#endif
 }
 
 int rdSetMipDistances(rdVector4 *dists)

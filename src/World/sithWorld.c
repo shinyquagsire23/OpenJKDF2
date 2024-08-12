@@ -270,6 +270,21 @@ int sithWorld_NewEntry(sithWorld *pWorld)
                 return 0;
             _memset(v5, 0, sizeof(float) * pWorld->numVertices);
 
+		#ifdef RGB_THING_LIGHTS
+			pWorld->verticesDynamicLightR = (float*)pSithHS->alloc(sizeof(float) * pWorld->numVertices);
+			if (!pWorld->verticesDynamicLightR)
+				return 0;
+			_memset(pWorld->verticesDynamicLightR, 0, sizeof(float) * pWorld->numVertices);
+			pWorld->verticesDynamicLightG = (float*)pSithHS->alloc(sizeof(float) * pWorld->numVertices);
+			if (!pWorld->verticesDynamicLightG)
+				return 0;
+			_memset(pWorld->verticesDynamicLightG, 0, sizeof(float) * pWorld->numVertices);
+			pWorld->verticesDynamicLightB = (float*)pSithHS->alloc(sizeof(float) * pWorld->numVertices);
+			if (!pWorld->verticesDynamicLightB)
+				return 0;
+			_memset(pWorld->verticesDynamicLightB, 0, sizeof(float) * pWorld->numVertices);
+		#endif
+
             v6 = (int *)pSithHS->alloc(sizeof(int) * pWorld->numVertices);
             pWorld->alloc_unk98 = v6;
             if ( !v6 )
@@ -374,6 +389,23 @@ void sithWorld_FreeEntry(sithWorld *pWorld)
         pSithHS->free(pWorld->verticesDynamicLight);
         pWorld->verticesDynamicLight = 0;
     }
+#ifdef RGB_THING_LIGHTS
+	if (pWorld->verticesDynamicLightR)
+	{
+		pSithHS->free(pWorld->verticesDynamicLightR);
+		pWorld->verticesDynamicLightR = 0;
+	}
+	if (pWorld->verticesDynamicLightG)
+	{
+		pSithHS->free(pWorld->verticesDynamicLightG);
+		pWorld->verticesDynamicLightG = 0;
+	}
+	if (pWorld->verticesDynamicLightB)
+	{
+		pSithHS->free(pWorld->verticesDynamicLightB);
+		pWorld->verticesDynamicLightB = 0;
+	}
+#endif
     if ( pWorld->alloc_unk9c )
     {
         pSithHS->free(pWorld->alloc_unk9c);

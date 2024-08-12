@@ -155,6 +155,9 @@ void sithDSSThing_SendSyncThing(sithThing *pThing, int sendto_id, int mpFlags)
         NETMSG_PUSHS16(pThing->puppet->field_4);
     }
     NETMSG_PUSHS32(pThing->light);
+#ifdef RGB_THING_LIGHTS
+	NETMSG_PUSHVEC3(pThing->lightColor);
+#endif
     switch ( pThing->type )
     {
         case SITH_THING_ACTOR:
@@ -252,7 +255,9 @@ int sithDSSThing_ProcessSyncThing(sithCogMsg *msg)
     }
 
     pThing->light = NETMSG_POPF32();
-
+#ifdef RGB_THING_LIGHTS
+	pThing->lightColor = NETMSG_POPVEC3();
+#endif
     switch ( pThing->type )
     {
         case SITH_THING_ACTOR:

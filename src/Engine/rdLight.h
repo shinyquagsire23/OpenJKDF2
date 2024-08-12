@@ -27,7 +27,11 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
 #ifdef JKM_LIGHTING
     rdVector3 *localLightDirs, 
 #endif
-    int numLights, rdVector3 *verticesEnd, rdVector3 *vertices, float *vertices_i_end, float *vertices_i, int numVertices, float scalar);
+    int numLights, rdVector3 *verticesEnd, rdVector3 *vertices, float *vertices_i_end, float *vertices_i,
+#ifdef RGB_THING_LIGHTS
+	float* vertices_r, float* vertices_g, float* vertices_b,
+#endif
+	int numVertices, float scalar);
 float rdLight_CalcFaceIntensity(rdLight **meshLights, rdVector3 *localLightPoses, int numLights, rdFace *face, rdVector3 *faceNormal, rdVector3 *vertices, float a7);
 
 void rdLight_CalcDistVertexIntensities();

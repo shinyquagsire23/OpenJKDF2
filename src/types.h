@@ -453,8 +453,12 @@ typedef struct rdLight
     uint32_t active;
     rdVector3 direction;
     float intensity;
+#ifdef RGB_THING_LIGHTS
+	rdVector3 color;
+#else
     uint32_t color;
-    
+#endif
+
 #ifdef JKM_LIGHTING
     float angleX;
     float cosAngleX;
@@ -1341,6 +1345,11 @@ typedef struct rdVertexIdxInfo
     rdVector3* vertices;
     rdVector2* vertexUVs;
     float* paDynamicLight;
+#ifdef RGB_THING_LIGHTS
+	float* paDynamicLightR;
+	float* paDynamicLightG;
+	float* paDynamicLightB;
+#endif
     float* intensities;
 #ifdef JKM_LIGHTING
     float* paRedIntensities;
@@ -1357,6 +1366,11 @@ typedef struct rdMeshinfo
     rdVector3* verticesProjected;
     rdVector2* vertexUVs;
     float* paDynamicLight;
+#ifdef RGB_THING_LIGHTS
+	float* paDynamicLightR;
+	float* paDynamicLightG;
+	float* paDynamicLightB;
+#endif
     float* intensities;
 #ifdef JKM_LIGHTING
     float* paRedIntensities;
@@ -2027,6 +2041,11 @@ typedef struct sithWorld
     rdVector3* verticesTransformed;
     int* alloc_unk98;
     float* verticesDynamicLight;
+#ifdef RGB_THING_LIGHTS
+	float* verticesDynamicLightR;
+	float* verticesDynamicLightG;
+	float* verticesDynamicLightB;
+#endif
     int* alloc_unk9c;
     int numVertexUVs;
     rdVector2* vertexUVs;
@@ -2760,6 +2779,9 @@ typedef struct sithThing
     rdThing rdthing;
     rdVector3 screenPos;
     float light;
+#ifdef RGB_THING_LIGHTS
+	rdVector3 lightColor;
+#endif
     float lightMin;
     int isVisible;
     sithSoundClass* soundclass;

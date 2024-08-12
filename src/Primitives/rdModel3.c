@@ -232,6 +232,17 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
                 if ( !mesh->vertices_unk  )
                     goto fail;
                 _memset(mesh->vertices_unk, 0, mesh->numVertices); // bug?
+#ifdef RGB_THING_LIGHTS
+				mesh->paRedIntensities = (float*)rdroid_pHS->alloc(sizeof(float) * mesh->numVertices);
+				if (!mesh->paRedIntensities)
+					goto fail;
+				mesh->paGreenIntensities = (float*)rdroid_pHS->alloc(sizeof(float) * mesh->numVertices);
+				if (!mesh->paGreenIntensities)
+					goto fail;
+				mesh->paBlueIntensities = (float*)rdroid_pHS->alloc(sizeof(float) * mesh->numVertices);
+				if (!mesh->paBlueIntensities)
+					goto fail;
+#endif
             }
             for (vertex_num = 0; vertex_num < mesh->numVertices; vertex_num++)
             {
@@ -250,6 +261,11 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
                 mesh->vertices[vertex_num].y = v_y;
                 mesh->vertices[vertex_num].z = v_z;
                 mesh->vertices_i[vertex_num] = v_i;
+#ifdef RGB_THING_LIGHTS
+				mesh->paRedIntensities[vertex_num] = v_i;
+				mesh->paGreenIntensities[vertex_num] = v_i;
+				mesh->paBlueIntensities[vertex_num] = v_i;
+#endif
             }
 
             if ( !stdConffile_ReadLine()
@@ -1366,6 +1382,11 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
             pCurMesh->vertices,
             pCurMesh->vertices_i,
             pCurMesh->vertices_unk,
+#ifdef RGB_THING_LIGHTS
+			pCurMesh->paRedIntensities,//NULL,
+			pCurMesh->paGreenIntensities,//NULL,
+			pCurMesh->paBlueIntensities,//NULL,
+#endif
             pCurMesh->numVertices,
             rdCamera_pCurCamera->attenuationMin);
     }
@@ -1442,6 +1463,11 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
     vertexDst.verticesOrig = procEntry->vertices;
     vertexDst.vertexUVs = procEntry->vertexUVs;
     vertexDst.paDynamicLight = procEntry->vertexIntensities;
+#ifdef RGB_THING_LIGHTS
+	vertexSrc.paDynamicLightR = procEntry->vertexIntensities;
+	vertexSrc.paDynamicLightG = procEntry->vertexIntensities;
+	vertexSrc.paDynamicLightB = procEntry->vertexIntensities;
+#endif
     vertexSrc.numVertices = face->numVertices;
     vertexSrc.vertexPosIdx = face->vertexPosIdx;
     vertexSrc.vertexUVIdx = face->vertexUVIdx;

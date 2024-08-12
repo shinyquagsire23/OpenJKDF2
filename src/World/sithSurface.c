@@ -322,6 +322,11 @@ int sithSurface_Load(sithWorld *world)
                 surfaceInfo->intensities[(v34*3)+v45] = val; // Added
             }
             surfaceIter->surfaceFlags &= ~SITH_SURFACE_1000000;
+
+			#ifdef RGB_THING_LIGHTS
+				// force colored
+				surfaceIter->surfaceFlags |= SITH_SURFACE_1000000;
+			#endif
         }
         else {
             surfaceInfo->intensities = pSithHS->alloc(sizeof(float) * ((v34 * 4) + 1));

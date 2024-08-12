@@ -432,6 +432,14 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
     rdVector3 vertex_out; // [esp+40h] [ebp-40h] BYREF
     int v45; // [esp+4Ch] [ebp-34h]
     rdTexinfo *v51; // [esp+64h] [ebp-1Ch]
+#ifdef RGB_THING_LIGHTS
+	rdVector3 lightColor;
+	rdMaterial* material;
+	int paletteIndex;
+	unsigned int rmask;
+	unsigned int gmask;
+	unsigned int bmask;
+#endif
 
     //if (sector->id == 92 || sector->id == 67 || sector->id == 66)
     //    stdPlatform_Printf("OpenJKDF2: Render sector %u %x\n", sector->id, sithRender_lastRenderTick);
@@ -489,6 +497,9 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
                 if ( thing->light > 0.0 )
                 {
                     sithRender_aLights[lightIdx].intensity = thing->light;
+				#ifdef RGB_THING_LIGHTS
+					sithRender_aLights[lightIdx].color = thing->lightColor;
+				#endif
                     rdCamera_AddLight(rdCamera_pCurCamera, &sithRender_aLights[lightIdx], &thing->position);
                     lightIdx = ++sithRender_numLights;
                 }
@@ -506,6 +517,33 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
                     if ( thing->actorParams.timeLeftLengthChange > 0.0 )
                     {
                         sithRender_aLights[lightIdx].intensity = thing->actorParams.timeLeftLengthChange;
+#ifdef RGB_THING_LIGHTS
+						rdVector_Set3(&lightColor, 1.0f, 1.0f, 1.0f);
+						if(thing->playerInfo && thing->playerInfo->polyline.tipFace.material && thing->playerInfo->polyline.tipFace.material->texinfos)
+						{
+							material = thing->playerInfo->polyline.tipFace.material;
+							paletteIndex = material->texinfos[0]->header.field_4;
+							if (material->tex_format.bpp == 8)
+							{
+								if (rdColormap_pCurMap)
+								{
+									lightColor.x = (float)rdColormap_pCurMap->colors[paletteIndex].r / 255.0f;
+									lightColor.y = (float)rdColormap_pCurMap->colors[paletteIndex].g / 255.0f;
+									lightColor.z = (float)rdColormap_pCurMap->colors[paletteIndex].b / 255.0f;
+								}
+							}
+							else
+							{
+								rmask = (1u << material->tex_format.r_bits) - 1;
+								gmask = (1u << material->tex_format.g_bits) - 1;
+								bmask = (1u << material->tex_format.b_bits) - 1;
+								lightColor.x = (float)(((paletteIndex >> material->tex_format.r_shift) & rmask) << material->tex_format.r_bitdiff) / 255.0f;
+								lightColor.y = (float)(((paletteIndex >> material->tex_format.g_shift) & gmask) << material->tex_format.g_bitdiff) / 255.0f;
+								lightColor.z = (float)(((paletteIndex >> material->tex_format.b_shift) & bmask) << material->tex_format.b_bitdiff) / 255.0f;
+							}
+							rdVector_Copy3(&sithRender_aLights[lightIdx].color, &lightColor);
+						}
+#endif
                         rdCamera_AddLight(rdCamera_pCurCamera, &sithRender_aLights[lightIdx], &thing->actorParams.saberBladePos);
                         lightIdx = ++sithRender_numLights;
                     }
@@ -522,6 +560,11 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
     sithRender_idxInfo.vertexUVs = sithWorld_pCurrentWorld->vertexUVs;
     sector->clipVisited = 1;
     sithRender_idxInfo.paDynamicLight = sithWorld_pCurrentWorld->verticesDynamicLight;
+#ifdef RGB_THING_LIGHTS
+	sithRender_idxInfo.paDynamicLightR = sithWorld_pCurrentWorld->verticesDynamicLightR;
+	sithRender_idxInfo.paDynamicLightG = sithWorld_pCurrentWorld->verticesDynamicLightG;
+	sithRender_idxInfo.paDynamicLightB = sithWorld_pCurrentWorld->verticesDynamicLightB;
+#endif
 
 #if 0
     if (sector->id == 92)
@@ -782,6 +825,11 @@ void sithRender_RenderLevelGeometry()
     vertices_uvs = sithWorld_pCurrentWorld->vertexUVs;
     sithRender_idxInfo.vertices = sithWorld_pCurrentWorld->verticesTransformed;
     sithRender_idxInfo.paDynamicLight = sithWorld_pCurrentWorld->verticesDynamicLight;
+#ifdef RGB_THING_LIGHTS
+	sithRender_idxInfo.paDynamicLightR = sithWorld_pCurrentWorld->verticesDynamicLightR;
+	sithRender_idxInfo.paDynamicLightG = sithWorld_pCurrentWorld->verticesDynamicLightG;
+	sithRender_idxInfo.paDynamicLightB = sithWorld_pCurrentWorld->verticesDynamicLightB;
+#endif
     sithRender_idxInfo.vertexUVs = vertices_uvs;
     v77 = rdCamera_pCurCamera->pClipFrustum;
 
@@ -889,6 +937,11 @@ void sithRender_RenderLevelGeometry()
                 procEntry->textureMode = texMode2;
                 meshinfo_out.verticesProjected = sithRender_aVerticesTmp;
                 meshinfo_out.paDynamicLight = procEntry->vertexIntensities;
+#ifdef RGB_THING_LIGHTS
+				meshinfo_out.paDynamicLightR = procEntry->paRedIntensities;
+				meshinfo_out.paDynamicLightG = procEntry->paGreenIntensities;
+				meshinfo_out.paDynamicLightB = procEntry->paBlueIntensities;
+#endif
                 sithRender_idxInfo.vertexPosIdx = v65->surfaceInfo.face.vertexPosIdx;
                 meshinfo_out.vertexUVs = procEntry->vertexUVs;
                 sithRender_idxInfo.numVertices = v65->surfaceInfo.face.numVertices;
@@ -1097,6 +1150,11 @@ void sithRender_RenderLevelGeometry()
                     meshinfo_out.vertexUVs = v20->vertexUVs;
                     sithRender_idxInfo.vertexPosIdx = v78;
                     meshinfo_out.paDynamicLight = v20->vertexIntensities;
+#ifdef RGB_THING_LIGHTS
+					meshinfo_out.paDynamicLightR = v20->paRedIntensities;
+					meshinfo_out.paDynamicLightG = v20->paGreenIntensities;
+					meshinfo_out.paDynamicLightB = v20->paBlueIntensities;
+#endif
                     sithRender_idxInfo.vertexUVIdx = v79;
                     
                     // MOTS added
@@ -1406,6 +1464,9 @@ void sithRender_UpdateLights(sithSector *sector, float prev, float dist, int dep
                 if ( i->light > 0.0 )
                 {
                     sithRender_aLights[sithRender_numLights].intensity = i->light;
+#ifdef RGB_THING_LIGHTS
+					sithRender_aLights[sithRender_numLights].color = i->lightColor;
+#endif
                     rdCamera_AddLight(rdCamera_pCurCamera, &sithRender_aLights[sithRender_numLights], &i->position);
                     ++sithRender_numLights;
                 }
@@ -1495,6 +1556,11 @@ void sithRender_RenderDynamicLights()
             if ( sithWorld_pCurrentWorld->alloc_unk9c[idx] != sithRender_lastRenderTick )
             {
                 sithWorld_pCurrentWorld->verticesDynamicLight[idx] = 0.0;
+			#ifdef RGB_THING_LIGHTS
+				sithWorld_pCurrentWorld->verticesDynamicLightR[idx] = 0.0;
+				sithWorld_pCurrentWorld->verticesDynamicLightG[idx] = 0.0;
+				sithWorld_pCurrentWorld->verticesDynamicLightB[idx] = 0.0;
+			#endif
 
                 for (int i = 0; i < numSectorLights; i++)
                 {
@@ -1503,10 +1569,24 @@ void sithRender_RenderDynamicLights()
 
                     // Light is within distance of the vertex
                     if ( distCalc < tmpLights[i]->falloffMax )
-                        sithWorld_pCurrentWorld->verticesDynamicLight[idx] += tmpLights[i]->intensity - distCalc * rdCamera_pCurCamera->attenuationMax;
+					{
+						float intensity = tmpLights[i]->intensity - distCalc * rdCamera_pCurCamera->attenuationMax;
+                        sithWorld_pCurrentWorld->verticesDynamicLight[idx] += intensity;
+					#ifdef RGB_THING_LIGHTS
+						sithWorld_pCurrentWorld->verticesDynamicLightR[idx] += intensity * tmpLights[i]->color.x;
+						sithWorld_pCurrentWorld->verticesDynamicLightG[idx] += intensity * tmpLights[i]->color.y;
+						sithWorld_pCurrentWorld->verticesDynamicLightB[idx] += intensity * tmpLights[i]->color.z;
+					#endif
+					}
 
                     // This vertex is as lit as it can be, stop adding lights to it
-                    if ( sithWorld_pCurrentWorld->verticesDynamicLight[idx] >= 1.0 )
+                    if ( sithWorld_pCurrentWorld->verticesDynamicLight[idx] >= 1.0
+					#ifdef RGB_THING_LIGHTS
+						&& sithWorld_pCurrentWorld->verticesDynamicLightR[idx] >= 1.0
+						&& sithWorld_pCurrentWorld->verticesDynamicLightG[idx] >= 1.0
+						&& sithWorld_pCurrentWorld->verticesDynamicLightB[idx] >= 1.0
+					#endif
+)
                         break;
                 }
                 sithWorld_pCurrentWorld->alloc_unk9c[idx] = sithRender_lastRenderTick;

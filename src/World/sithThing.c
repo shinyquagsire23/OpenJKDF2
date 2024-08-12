@@ -39,7 +39,11 @@
 #include "General/stdMath.h"
 #include "jk.h"
 
+#ifdef RGB_THING_LIGHTS
+#define NUM_THING_PARAMS (75) // JK is 72
+#else
 #define NUM_THING_PARAMS (74) // JK is 72
+#endif
 #define NUM_THING_TYPES (13)
 
 int sithThing_bInitted;
@@ -72,6 +76,9 @@ const char* sithThing_aParams[NUM_THING_PARAMS] = {
     "thingflags",
     "timer",
     "light",
+#ifdef RGB_THING_LIGHTS
+	"lightcolor",
+#endif
     "attach",
     "soundclass",
     "model3d",
@@ -695,6 +702,10 @@ int sithThing_DoesRdThingInit(sithThing* pThing)
 
 #ifdef JKM_LIGHTING
     pThing->archlightIdx = -1; // MOTS added
+#endif
+
+#ifdef RGB_THING_LIGHTS
+	rdVector_Set3(&pThing->lightColor, 1.0f, 1.0f, 1.0f);
 #endif
 
     return out;
@@ -1545,6 +1556,9 @@ int sithThing_Load(sithWorld *pWorld, int a2)
         v16 = v17->signature;
         int lvlb = v17->thingIdx;
         _memset(v17, 0, sizeof(sithThing));
+#ifdef RGB_THING_LIGHTS
+		rdVector_Set3(&v17->lightColor, 1.0f, 1.0f, 1.0f);
+#endif
         _memcpy(&v17->lookOrientation, &rdroid_identMatrix34, sizeof(v17->lookOrientation));
         rdThing_NewEntry(&v17->rdthing, v17);
         v18 = sithWorld_pCurrentWorld;
@@ -1694,6 +1708,9 @@ int sithThing_LoadThingParam(stdConffileArg *arg, sithThing* pThing, int param)
     uint32_t thingType; // eax
     double moveSize; // st7
     double light; // st7
+#ifdef RGB_THING_LIGHTS
+	rdVector3 lightColor;
+#endif
     double lifeLeftSec; // st7
     rdModel3 *pModel; // eax
     rdParticle *pParticle; // edi
@@ -1807,6 +1824,19 @@ int sithThing_LoadThingParam(stdConffileArg *arg, sithThing* pThing, int param)
             pThing->thingflags |= SITH_TF_LIGHT;
             result = 1;
             break;
+#ifdef RGB_THING_LIGHTS
+		case THINGPARAM_LIGHTCOLOR:
+			if (_sscanf(arg->value, "(%f/%f/%f)", &lightColor.x, &lightColor.y, &lightColor.z) == 3)
+			{
+				rdVector_Copy3(&pThing->lightColor, &lightColor);
+				result = 1;
+			}
+			else
+			{
+				result = 0;
+			}
+			break;
+#endif
         case THINGPARAM_SOUNDCLASS:
             pThing->soundclass = sithSoundClass_LoadFile(arg->value);
             result = 1;
