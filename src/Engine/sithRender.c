@@ -49,6 +49,43 @@ int sithRender_008d1668 = 0;
 // Added: safeguard
 int sithRender_adjoinSafeguard = 0;
 
+#ifdef RGB_THING_LIGHTS
+void sithRender_GetSaberLightColor(rdVector3* outColor, sithThing* thing)
+{
+	rdVector3 lightColor;
+	rdMaterial* material;
+	int paletteIndex;
+	unsigned int rmask;
+	unsigned int gmask;
+	unsigned int bmask;
+
+	rdVector_Set3(outColor, 1.0f, 1.0f, 1.0f);
+	if (thing->playerInfo && thing->playerInfo->polyline.tipFace.material && thing->playerInfo->polyline.tipFace.material->texinfos)
+	{
+		material = thing->playerInfo->polyline.tipFace.material;
+		paletteIndex = material->texinfos[0]->header.field_4;
+		if (material->tex_format.bpp == 8)
+		{
+			if (rdColormap_pCurMap)
+			{
+				outColor->x = (float)rdColormap_pCurMap->colors[paletteIndex].r / 255.0f;
+				outColor->y = (float)rdColormap_pCurMap->colors[paletteIndex].g / 255.0f;
+				outColor->z = (float)rdColormap_pCurMap->colors[paletteIndex].b / 255.0f;
+			}
+		}
+		else
+		{
+			rmask = (1u << material->tex_format.r_bits) - 1;
+			gmask = (1u << material->tex_format.g_bits) - 1;
+			bmask = (1u << material->tex_format.b_bits) - 1;
+			outColor->x = (float)(((paletteIndex >> material->tex_format.r_shift) & rmask) << material->tex_format.r_bitdiff) / 255.0f;
+			outColor->y = (float)(((paletteIndex >> material->tex_format.g_shift) & gmask) << material->tex_format.g_bitdiff) / 255.0f;
+			outColor->z = (float)(((paletteIndex >> material->tex_format.b_shift) & bmask) << material->tex_format.b_bitdiff) / 255.0f;
+		}
+	}
+}
+#endif
+
 void sithRender_RenderDebugLight(float intensity, rdVector3* pos)
 {
 #if 0
@@ -432,14 +469,6 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
     rdVector3 vertex_out; // [esp+40h] [ebp-40h] BYREF
     int v45; // [esp+4Ch] [ebp-34h]
     rdTexinfo *v51; // [esp+64h] [ebp-1Ch]
-#ifdef RGB_THING_LIGHTS
-	rdVector3 lightColor;
-	rdMaterial* material;
-	int paletteIndex;
-	unsigned int rmask;
-	unsigned int gmask;
-	unsigned int bmask;
-#endif
 
     //if (sector->id == 92 || sector->id == 67 || sector->id == 66)
     //    stdPlatform_Printf("OpenJKDF2: Render sector %u %x\n", sector->id, sithRender_lastRenderTick);
@@ -511,6 +540,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
                         rdMatrix_TransformPoint34(&vertex_out, &thing->actorParams.lightOffset, &thing->lookOrientation);
                         rdVector_Add3Acc(&vertex_out, &thing->position);
                         sithRender_aLights[sithRender_numLights].intensity = thing->actorParams.lightIntensity;
+						rdVector_Set3(&sithRender_aLights[sithRender_numLights].color, 1.0f, 1.0f, 1.0f);
                         rdCamera_AddLight(rdCamera_pCurCamera, &sithRender_aLights[sithRender_numLights], &vertex_out);
                         lightIdx = ++sithRender_numLights;
                     }
@@ -518,31 +548,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
                     {
                         sithRender_aLights[lightIdx].intensity = thing->actorParams.timeLeftLengthChange;
 #ifdef RGB_THING_LIGHTS
-						rdVector_Set3(&lightColor, 1.0f, 1.0f, 1.0f);
-						if(thing->playerInfo && thing->playerInfo->polyline.tipFace.material && thing->playerInfo->polyline.tipFace.material->texinfos)
-						{
-							material = thing->playerInfo->polyline.tipFace.material;
-							paletteIndex = material->texinfos[0]->header.field_4;
-							if (material->tex_format.bpp == 8)
-							{
-								if (rdColormap_pCurMap)
-								{
-									lightColor.x = (float)rdColormap_pCurMap->colors[paletteIndex].r / 255.0f;
-									lightColor.y = (float)rdColormap_pCurMap->colors[paletteIndex].g / 255.0f;
-									lightColor.z = (float)rdColormap_pCurMap->colors[paletteIndex].b / 255.0f;
-								}
-							}
-							else
-							{
-								rmask = (1u << material->tex_format.r_bits) - 1;
-								gmask = (1u << material->tex_format.g_bits) - 1;
-								bmask = (1u << material->tex_format.b_bits) - 1;
-								lightColor.x = (float)(((paletteIndex >> material->tex_format.r_shift) & rmask) << material->tex_format.r_bitdiff) / 255.0f;
-								lightColor.y = (float)(((paletteIndex >> material->tex_format.g_shift) & gmask) << material->tex_format.g_bitdiff) / 255.0f;
-								lightColor.z = (float)(((paletteIndex >> material->tex_format.b_shift) & bmask) << material->tex_format.b_bitdiff) / 255.0f;
-							}
-							rdVector_Copy3(&sithRender_aLights[lightIdx].color, &lightColor);
-						}
+						sithRender_GetSaberLightColor(&sithRender_aLights[lightIdx].color, thing);
 #endif
                         rdCamera_AddLight(rdCamera_pCurCamera, &sithRender_aLights[lightIdx], &thing->actorParams.saberBladePos);
                         lightIdx = ++sithRender_numLights;
@@ -938,9 +944,9 @@ void sithRender_RenderLevelGeometry()
                 meshinfo_out.verticesProjected = sithRender_aVerticesTmp;
                 meshinfo_out.paDynamicLight = procEntry->vertexIntensities;
 #ifdef RGB_THING_LIGHTS
-				meshinfo_out.paDynamicLightR = procEntry->paRedIntensities;
-				meshinfo_out.paDynamicLightG = procEntry->paGreenIntensities;
-				meshinfo_out.paDynamicLightB = procEntry->paBlueIntensities;
+				meshinfo_out.paDynamicLightR = procEntry->vertexIntensities;
+				meshinfo_out.paDynamicLightG = procEntry->vertexIntensities;
+				meshinfo_out.paDynamicLightB = procEntry->vertexIntensities;
 #endif
                 sithRender_idxInfo.vertexPosIdx = v65->surfaceInfo.face.vertexPosIdx;
                 meshinfo_out.vertexUVs = procEntry->vertexUVs;
@@ -1482,6 +1488,7 @@ void sithRender_UpdateLights(sithSector *sector, float prev, float dist, int dep
                         rdVector_Add3Acc(&vertex_out, &i->position);
                         
                         sithRender_aLights[sithRender_numLights].intensity = i->actorParams.lightIntensity;
+						rdVector_Set3(&sithRender_aLights[sithRender_numLights].color, 1.0f, 1.0f, 1.0f);
                         rdCamera_AddLight(rdCamera_pCurCamera, &sithRender_aLights[sithRender_numLights], &vertex_out);
                         ++sithRender_numLights;
                     }
@@ -1490,6 +1497,9 @@ void sithRender_UpdateLights(sithSector *sector, float prev, float dist, int dep
                     if ( i->actorParams.timeLeftLengthChange > 0.0 )
                     {
                         sithRender_aLights[sithRender_numLights].intensity = i->actorParams.timeLeftLengthChange;
+#ifdef RGB_THING_LIGHTS
+						sithRender_GetSaberLightColor(&sithRender_aLights[sithRender_numLights].color, i);
+#endif
                         rdCamera_AddLight(rdCamera_pCurCamera, &sithRender_aLights[sithRender_numLights], &i->actorParams.saberBladePos);
                         ++sithRender_numLights;
                     }
