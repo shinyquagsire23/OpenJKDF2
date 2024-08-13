@@ -220,6 +220,11 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
             mesh->vertices = 0;
             mesh->vertices_i = 0;
             mesh->vertices_unk = 0;
+		#ifdef RGB_THING_LIGHTS
+			mesh->paRedIntensities = 0;
+			mesh->paGreenIntensities = 0;
+			mesh->paBlueIntensities = 0;
+		#endif
             if ( mesh->numVertices)
             {
                 mesh->vertices = (rdVector3 *)rdroid_pHS->alloc(sizeof(rdVector3) * mesh->numVertices);
