@@ -221,9 +221,9 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
             mesh->vertices_i = 0;
             mesh->vertices_unk = 0;
 		#ifdef RGB_THING_LIGHTS
-			mesh->paRedIntensities = 0;
-			mesh->paGreenIntensities = 0;
-			mesh->paBlueIntensities = 0;
+			mesh->vertices_r = 0;
+			mesh->vertices_g = 0;
+			mesh->vertices_b = 0;
 		#endif
             if ( mesh->numVertices)
             {
@@ -238,15 +238,19 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
                     goto fail;
                 _memset(mesh->vertices_unk, 0, mesh->numVertices); // bug?
 #ifdef RGB_THING_LIGHTS
-				mesh->paRedIntensities = (float*)rdroid_pHS->alloc(sizeof(float) * mesh->numVertices);
-				if (!mesh->paRedIntensities)
+				mesh->vertices_r = (float*)rdroid_pHS->alloc(sizeof(float) * mesh->numVertices);
+				if (!mesh->vertices_r)
 					goto fail;
-				mesh->paGreenIntensities = (float*)rdroid_pHS->alloc(sizeof(float) * mesh->numVertices);
-				if (!mesh->paGreenIntensities)
+				mesh->vertices_g = (float*)rdroid_pHS->alloc(sizeof(float) * mesh->numVertices);
+				if (!mesh->vertices_g)
 					goto fail;
-				mesh->paBlueIntensities = (float*)rdroid_pHS->alloc(sizeof(float) * mesh->numVertices);
-				if (!mesh->paBlueIntensities)
+				mesh->vertices_b = (float*)rdroid_pHS->alloc(sizeof(float) * mesh->numVertices);
+				if (!mesh->vertices_b)
 					goto fail;
+
+				mesh->paRedIntensities = mesh->vertices_r;
+				mesh->paGreenIntensities = mesh->vertices_g;
+				mesh->paBlueIntensities = mesh->vertices_b;
 #endif
             }
             for (vertex_num = 0; vertex_num < mesh->numVertices; vertex_num++)
@@ -267,9 +271,9 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
                 mesh->vertices[vertex_num].z = v_z;
                 mesh->vertices_i[vertex_num] = v_i;
 #ifdef RGB_THING_LIGHTS
-				mesh->paRedIntensities[vertex_num] = v_i;
-				mesh->paGreenIntensities[vertex_num] = v_i;
-				mesh->paBlueIntensities[vertex_num] = v_i;
+				mesh->vertices_r[vertex_num] = v_i;
+				mesh->vertices_g[vertex_num] = v_i;
+				mesh->vertices_b[vertex_num] = v_i;
 #endif
             }
 
@@ -790,12 +794,12 @@ void rdModel3_FreeEntry(rdModel3 *model)
             if (mesh->vertexNormals)
                 rdroid_pHS->free(mesh->vertexNormals);
 		#ifdef RGB_THING_LIGHTS
-			if (mesh->paRedIntensities)
-				rdroid_pHS->free(mesh->paRedIntensities);
-			if (mesh->paGreenIntensities)
-				rdroid_pHS->free(mesh->paGreenIntensities);
-			if (mesh->paBlueIntensities)
-				rdroid_pHS->free(mesh->paBlueIntensities);
+			if (mesh->vertices_r)
+				rdroid_pHS->free(mesh->vertices_r);
+			if (mesh->vertices_g)
+				rdroid_pHS->free(mesh->vertices_g);
+			if (mesh->vertices_b)
+				rdroid_pHS->free(mesh->vertices_b);
 		#endif
         }
         if ( geoset->meshes )
@@ -850,12 +854,12 @@ void rdModel3_FreeEntryGeometryOnly(rdModel3 *model)
             if (mesh->vertexNormals)
                 rdroid_pHS->free(mesh->vertexNormals);
 #ifdef RGB_THING_LIGHTS
-			if (mesh->paRedIntensities)
-				rdroid_pHS->free(mesh->paRedIntensities);
-			if (mesh->paGreenIntensities)
-				rdroid_pHS->free(mesh->paGreenIntensities);
-			if (mesh->paBlueIntensities)
-				rdroid_pHS->free(mesh->paBlueIntensities);
+			if (mesh->vertices_r)
+				rdroid_pHS->free(mesh->vertices_r);
+			if (mesh->vertices_g)
+				rdroid_pHS->free(mesh->vertices_g);
+			if (mesh->vertices_b)
+				rdroid_pHS->free(mesh->vertices_b);
 #endif
         }
         if ( geoset->meshes )
@@ -1408,9 +1412,9 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
             pCurMesh->vertices_i,
             pCurMesh->vertices_unk,
 #ifdef RGB_THING_LIGHTS
-			pCurMesh->paRedIntensities,//NULL,
-			pCurMesh->paGreenIntensities,//NULL,
-			pCurMesh->paBlueIntensities,//NULL,
+			pCurMesh->vertices_r,//NULL,
+			pCurMesh->vertices_g,//NULL,
+			pCurMesh->vertices_b,//NULL,
 #endif
             pCurMesh->numVertices,
             rdCamera_pCurCamera->attenuationMin);

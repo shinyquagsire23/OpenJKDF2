@@ -128,6 +128,11 @@ typedef struct rdMesh
     float* paRedIntensities;
     float* paGreenIntensities;
     float* paBlueIntensities;
+#ifdef RGB_THING_LIGHTS
+	float* vertices_r;
+	float* vertices_g;
+	float* vertices_b;
+#endif
 #endif
     rdFace* faces;
     rdVector3* vertexNormals;
