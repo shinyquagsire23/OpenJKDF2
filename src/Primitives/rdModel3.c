@@ -1484,9 +1484,9 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
     vertexDst.vertexUVs = procEntry->vertexUVs;
     vertexDst.paDynamicLight = procEntry->vertexIntensities;
 #ifdef RGB_THING_LIGHTS
-	vertexSrc.paDynamicLightR = procEntry->vertexIntensities;
-	vertexSrc.paDynamicLightG = procEntry->vertexIntensities;
-	vertexSrc.paDynamicLightB = procEntry->vertexIntensities;
+	vertexSrc.paDynamicLightR = procEntry->paRedIntensities;
+	vertexSrc.paDynamicLightG = procEntry->paGreenIntensities;
+	vertexSrc.paDynamicLightB = procEntry->paBlueIntensities;
 #endif
     vertexSrc.numVertices = face->numVertices;
     vertexSrc.vertexPosIdx = face->vertexPosIdx;
