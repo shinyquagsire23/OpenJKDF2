@@ -2703,6 +2703,9 @@ typedef struct sithThingPhysParams
     float physicsRolloverFrames;
     float field_74;
     float field_78;
+#ifdef DYNAMIC_POV
+	float povOffset;
+#endif
 } sithThingPhysParams;
 
 typedef struct sithThingFrame

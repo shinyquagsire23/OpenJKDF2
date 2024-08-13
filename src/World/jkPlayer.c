@@ -63,6 +63,10 @@ int jkPlayer_setCrosshairOnFist = 1;
 int jkPlayer_bHasLoadedSettingsOnce = 0;
 #endif
 
+#ifdef DYNAMIC_POV
+rdVector3 jkSaber_aimAngles;
+#endif
+
 #ifdef FIXED_TIMESTEP_PHYS
 int jkPlayer_bJankyPhysics = 0;
 #endif
@@ -220,6 +224,10 @@ void jkPlayer_ResetVars()
     jkPlayer_setCrosshairOnFist = 1;
 
     jkPlayer_bHasLoadedSettingsOnce = 0;
+#endif
+
+#ifdef DYNAMIC_POV
+	rdVector_Set3(&jkSaber_aimAngles, 0.0f,0.0f,0.0f);
 #endif
 
 #ifdef FIXED_TIMESTEP_PHYS
@@ -844,6 +852,19 @@ void jkPlayer_DrawPov()
         jkSaber_rotateVec.x = angleCos * jkPlayer_waggleVec.x * velNorm;
         jkSaber_rotateVec.y = angleSin * jkPlayer_waggleVec.y * velNorm;
         jkSaber_rotateVec.z = angleSin * jkPlayer_waggleVec.z * velNorm;
+#ifdef DYNAMIC_POV
+		// Added: take into account rotvel to add a little dynamic rotation to the POV model
+		rdVector3 rotVelNorm;
+		rotVelNorm.x = player->physicsParams.angVel.x / player->physicsParams.maxRotVel;
+		rotVelNorm.y = player->physicsParams.angVel.y / player->physicsParams.maxRotVel;
+		rotVelNorm.z = player->physicsParams.angVel.z / player->physicsParams.maxRotVel;
+		jkSaber_rotateVec.x -= rotVelNorm.x;
+		jkSaber_rotateVec.y -= rotVelNorm.y;
+		jkSaber_rotateVec.z -= rotVelNorm.z;
+
+		// Added: add a small rotation based on pitch
+		jkSaber_rotateVec.x -= player->actorParams.eyePYR.x * 0.06f;
+#endif
         rdMatrix_BuildRotate34(&jkSaber_rotateMat, &jkSaber_rotateVec);
 
 #ifdef SDL2_RENDER
@@ -874,13 +895,51 @@ void jkPlayer_DrawPov()
 
         rdMatrix_Copy34(&viewMat, &sithCamera_currentCamera->viewMat);
         rdVector_Copy3(&trans, &playerThings[playerThingIdx].actorThing->actorParams.eyeOffset);
+
 #ifdef QOL_IMPROVEMENTS
-        // Shift gun down slightly at higher aspect ratios
-        // TODO just make a cvar-alike for this
-        //trans.z += 0.007 * (1.0 / sithCamera_currentCamera->rdCam.screenAspectRatio);
+		// Shift gun down slightly at higher aspect ratios
+		// TODO just make a cvar-alike for this
+		//trans.z += 0.007 * (1.0 / sithCamera_currentCamera->rdCam.screenAspectRatio);
+#endif
+
+#ifdef DYNAMIC_POV
+		// Added: drop/raise the gun a little when jumping/falling
+		trans.z += stdMath_Clamp(0.005f * (player->physicsParams.vel.z / player->physicsParams.maxVel), -0.007f, 0.007f);
+
+		// smooth out crouching and slopes so it's not so static
+		if (player->physicsParams.physflags & SITH_PF_CROUCHING)
+			trans.z -= player->physicsParams.povOffset;
 #endif
         rdVector_Neg3Acc(&trans);
         rdMatrix_PreTranslate34(&viewMat, &trans);
+
+#ifdef DYNAMIC_POV
+		// Added: autoaim rotation
+		if ((sithWeapon_bAutoAim & 1) != 0 && !sithNet_isMulti)
+		{
+			// calculate a coarse auto-aim for some sense of where the weapon is pointing 
+			// since projectiles still come from the fireoffset, we don't want it to wander too far or be precise
+			rdMatrix34 autoAimMat;
+			sithWeapon_ProjectileAutoAim(&autoAimMat, player, &viewMat, &player->position, 10.0f, 20.0f);
+
+			// apply inverse of the original look orient to get a local transform
+			rdMatrix34 invOrient;
+			rdMatrix_InvertOrtho34(&invOrient, &viewMat);
+			rdMatrix_PostMultiply34(&autoAimMat, &invOrient);
+			rdVector_Zero3(&autoAimMat.scale);
+
+			// extract the angles so we can do a lazy interpolation
+			rdVector3 angles;
+			rdMatrix_ExtractAngles34(&autoAimMat, &angles);
+			
+			jkSaber_aimAngles.x = (angles.x - jkSaber_aimAngles.x) * 5.0f * sithTime_deltaSeconds + jkSaber_aimAngles.x;
+			jkSaber_aimAngles.y = (angles.y - jkSaber_aimAngles.y) * 5.0f * sithTime_deltaSeconds + jkSaber_aimAngles.y;
+			jkSaber_aimAngles.z = 0.f;// ignore roll
+			
+			rdMatrix_BuildRotate34(&autoAimMat, &jkSaber_aimAngles);
+			rdMatrix_PreMultiply34(&viewMat, &autoAimMat);
+		}
+#endif
         rdMatrix_PreMultiply34(&viewMat, &jkSaber_rotateMat);
 
         // Moved: see below.

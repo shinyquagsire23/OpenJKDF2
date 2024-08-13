@@ -778,6 +778,11 @@ void sithPhysics_ThingPhysAttached(sithThing *pThing, float deltaSeconds)
     possibly_undef_1 = 0.0;
     possibly_undef_2 = 0.0;
 
+
+#ifdef DYNAMIC_POV
+	pThing->physicsParams.povOffset = 0;
+#endif
+
     rdVector_Zero3(&vel_change);
     v158 = 1.0;
     pThing->physicsParams.physflags &= ~SITH_PF_200000;
@@ -1116,5 +1121,9 @@ void sithPhysics_ThingPhysAttached(sithThing *pThing, float deltaSeconds)
         {
             rdVector_MultAcc3(&pThing->physicsParams.velocityMaybe, &attachedNormal, -v131);
         }
+
+#ifdef DYNAMIC_POV
+		pThing->physicsParams.povOffset = v131;
+#endif
     }
 }
