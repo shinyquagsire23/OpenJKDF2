@@ -1266,7 +1266,11 @@ void rdModel3_DrawHNode(rdHierarchyNode *pNode)
     iter = pNode->child;
     for (int i = 0; i < pNode->numChildren; i++)
     {
-        if ( !pCurThing->amputatedJoints[iter->idx] )
+        if ( !pCurThing->amputatedJoints[iter->idx]
+#ifdef FP_LEGS
+			&& pCurThing->hiddenJoint != iter->idx
+#endif
+		)
             rdModel3_DrawHNode(iter);
         iter = iter->nextSibling;
     }

@@ -76,7 +76,9 @@ int rdThing_SetModel3(rdThing *thing, rdModel3 *model)
     thing->type = RD_THINGTYPE_MODEL;
     thing->model3 = model;
     thing->geosetSelect = -1;
- 
+#ifdef FP_LEGS
+	thing->hiddenJoint = -1;
+#endif
     thing->hierarchyNodeMatrices = (rdMatrix34*)rdroid_pHS->alloc(sizeof(rdMatrix34) * model->numHierarchyNodes);
     
     // moved
@@ -96,8 +98,7 @@ int rdThing_SetModel3(rdThing *thing, rdModel3 *model)
     thing->amputatedJoints = (int *)rdroid_pHS->alloc(sizeof(int) * model->numHierarchyNodes);
     if (!thing->amputatedJoints)
         return 0;
-
-    _memset(thing->amputatedJoints, 0, sizeof(int) * model->numHierarchyNodes);
+	_memset(thing->amputatedJoints, 0, sizeof(int) * model->numHierarchyNodes);
 
     rdHierarchyNode* iter = model->hierarchyNodes;
     for (int i = 0; i < model->numHierarchyNodes; i++)
@@ -192,7 +193,11 @@ void rdThing_AccumulateMatrices(rdThing *thing, rdHierarchyNode *node, rdMatrix3
     childIter = node->child;
     for (int i = 0; i < node->numChildren; i++)
     {
-        if ( !thing->amputatedJoints[childIter->idx] )
+        if ( !thing->amputatedJoints[childIter->idx]		
+		#ifdef FP_LEGS
+			&& thing->hiddenJoint != childIter->idx
+		#endif
+		)
             rdThing_AccumulateMatrices(thing, childIter, &thing->hierarchyNodeMatrices[node->idx]);
         childIter = childIter->nextSibling;
     }

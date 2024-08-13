@@ -2209,6 +2209,9 @@ typedef struct rdThing
     rdMatrix34 *hierarchyNodeMatrices;
     rdVector3* hierarchyNodes2;
     int* amputatedJoints;
+#ifdef FP_LEGS
+	int hiddenJoint;
+#endif
     uint32_t wallCel;
     uint32_t geosetSelect;
     rdGeoMode_t curGeoMode;

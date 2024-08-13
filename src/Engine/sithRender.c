@@ -1340,9 +1340,11 @@ LABEL_150:
                 continue;
             }
 
-            if (!((sithCamera_currentCamera->cameraPerspective & 0xFC) != 0 || i != sithCamera_currentCamera->primaryFocus)) {
+#ifndef FP_LEGS
+			if (!((sithCamera_currentCamera->cameraPerspective & 0xFC) != 0 || i != sithCamera_currentCamera->primaryFocus)) {
                 continue;
             }
+#endif
 
             if (i->rdthing.type != RD_THINGTYPE_MODEL) {
                 continue;
@@ -1650,8 +1652,40 @@ void sithRender_RenderThings()
 
             if ( (thingIter->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_WILLBEREMOVED)) == 0
               && (thingIter->thingflags & SITH_TF_LEVELGEO) == 0
-              && ((sithCamera_currentCamera->cameraPerspective & 0xFC) != 0 || thingIter != sithCamera_currentCamera->primaryFocus) )
+#ifndef FP_LEGS
+			  && ((sithCamera_currentCamera->cameraPerspective & 0xFC) != 0 || thingIter != sithCamera_currentCamera->primaryFocus)
+#endif
+			)
             {
+			#ifdef FP_LEGS
+				thingIter->rdthing.hiddenJoint = -1;
+				// if cam is 1st person and a player is focused, hide the upper body
+				if ((sithCamera_currentCamera->cameraPerspective & 0xFC) == 0 && thingIter == sithCamera_currentCamera->primaryFocus)
+				{
+					if (thingIter->type == SITH_THING_PLAYER)
+					{
+						sithAnimclass* animclass = thingIter->animclass;
+						if (animclass)
+						{
+							int jointIdx = animclass->bodypart_to_joint[JOINTTYPE_TORSO]; // torsto
+							if (jointIdx >= 0)
+							{
+								if (thingIter->rdthing.model3 && jointIdx < thingIter->rdthing.model3->numHierarchyNodes)
+									thingIter->rdthing.hiddenJoint = jointIdx;
+							}
+						}
+						else
+						{
+							continue;
+						}
+					}
+					else
+					{
+						continue;
+					}
+				}
+			#endif
+
                 rdMatrix_TransformPoint34(&thingIter->screenPos, &thingIter->position, &rdCamera_pCurCamera->view_matrix);
                 
                 //printf("%f %f %f ; %f %f %f\n", thingIter->screenPos.x, thingIter->screenPos.y, thingIter->screenPos.z, thingIter->position.x, thingIter->position.y, thingIter->position.z);
