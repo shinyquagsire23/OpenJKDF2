@@ -784,6 +784,14 @@ void rdModel3_FreeEntry(rdModel3 *model)
                 rdroid_pHS->free(mesh->vertices_unk);
             if (mesh->vertexNormals)
                 rdroid_pHS->free(mesh->vertexNormals);
+		#ifdef RGB_THING_LIGHTS
+			if (mesh->paRedIntensities)
+				rdroid_pHS->free(mesh->paRedIntensities);
+			if (mesh->paGreenIntensities)
+				rdroid_pHS->free(mesh->paGreenIntensities);
+			if (mesh->paBlueIntensities)
+				rdroid_pHS->free(mesh->paBlueIntensities);
+		#endif
         }
         if ( geoset->meshes )
             rdroid_pHS->free(geoset->meshes);
@@ -836,6 +844,14 @@ void rdModel3_FreeEntryGeometryOnly(rdModel3 *model)
                 rdroid_pHS->free(mesh->vertices_unk);
             if (mesh->vertexNormals)
                 rdroid_pHS->free(mesh->vertexNormals);
+#ifdef RGB_THING_LIGHTS
+			if (mesh->paRedIntensities)
+				rdroid_pHS->free(mesh->paRedIntensities);
+			if (mesh->paGreenIntensities)
+				rdroid_pHS->free(mesh->paGreenIntensities);
+			if (mesh->paBlueIntensities)
+				rdroid_pHS->free(mesh->paBlueIntensities);
+#endif
         }
         if ( geoset->meshes )
             rdroid_pHS->free(geoset->meshes);

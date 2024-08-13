@@ -189,14 +189,18 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
 					{
 						float intensity = (light->intensity - len * scalar) * lightMagnitude;
                         *outLights += intensity;
-#ifdef RGB_THING_LIGHTS
+					#ifdef RGB_THING_LIGHTS
 						if(outLightsR) *outLightsR += intensity * light->color.x;
 						if(outLightsG) *outLightsG += intensity * light->color.y;
 						if(outLightsB) *outLightsB += intensity * light->color.z;
-#endif
+					#endif
 					}
                 }
-                if ( *outLights >= 1.0 )
+                if ( *outLights >= 1.0
+			#ifdef RGB_THING_LIGHTS
+				&&* outLightsR == 1.0 && *outLightsR == 1.0 && *outLightsB == 1.0
+			#endif
+				)
                     break;
                 ++meshLightIter;
             }
