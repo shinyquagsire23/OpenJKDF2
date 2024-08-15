@@ -924,6 +924,11 @@ void jkPlayer_DrawPov()
 		// Shift gun down slightly at higher aspect ratios
 		// TODO just make a cvar-alike for this
 		//trans.z += 0.007 * (1.0 / sithCamera_currentCamera->rdCam.screenAspectRatio);
+
+		// drop the gun a little with higher FOVs, similar to Quake
+		// this helps prevent the missing parts of the model from showing
+		if(sithCamera_currentCamera->rdCam.fov > 90)
+			trans.z += 0.0001f * (sithCamera_currentCamera->rdCam.fov - 90);
 #endif
 
 #ifdef DYNAMIC_POV
