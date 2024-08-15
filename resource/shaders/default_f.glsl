@@ -322,7 +322,9 @@ void main(void)
     {
         sampled_color = bilinear_paletted();
         color_add = bilinear_paletted_light(index);
-
+	#ifdef CLASSIC_EMISSIVE	
+		emissive = color_add / light_mult;
+	#endif
         if (sampled_color.a < 0.01) {
             discard;
         }
