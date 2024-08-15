@@ -43,6 +43,9 @@ int sithCamera_SetCurrentCamera(sithCamera *camera);
 void sithCamera_SetCameraFocus(sithCamera *camera, sithThing *primary, sithThing *secondary);
 sithSector* sithCamera_create_unk_struct(sithThing* a3, sithSector* a2, rdVector3* a4, rdVector3* a6, float a7, int flags);
 void sithCamera_SetPovShake(rdVector3 *a1, rdVector3 *a2, float a3, float a4);
+#ifdef DYNAMIC_POV
+void sithCamera_SetPovWaggle(rdVector3* waggleVec, float waggleSpeed, float waggleSmooth);
+#endif
 sithThing* sithCamera_GetPrimaryFocus(sithCamera *pCamera);
 sithThing* sithCamera_GetSecondaryFocus(sithCamera *pCamera);
 int sithCamera_SetState(int a1);

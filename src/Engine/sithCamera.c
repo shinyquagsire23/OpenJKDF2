@@ -19,6 +19,13 @@ static rdVector3 sithCamera_trans2 = {0.0, 0.2, 0.0};
 static rdVector3 sithCamera_trans3 = {0.0, 1.0, 1.0};
 static int sithCamera_camIdxToGlobalIdx[2] = {0,1};
 
+#ifdef DYNAMIC_POV
+static rdVector3 sithCamera_povIdleSway = {0.0f, 0.0f, 0.0f};
+static rdVector3 sithCamera_povWaggleVec = {0.0f, 0.0f, 0.0f};
+static float sithCamera_povWaggleSpeed = 0.0f;
+static float sithCamera_povWaggleSmooth = 0.0f;
+#endif
+
 int sithCamera_Startup()
 {
     sithCamera_NewEntry(&sithCamera_cameras[0], 0, 0x1, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
@@ -250,6 +257,19 @@ void sithCamera_FollowFocus(sithCamera *cam)
                 {
                     v76.z = rdMath_clampf(5.0 * rdVector_Dot3(&focusThing->lookOrientation.rvec, &focusThing->physicsParams.vel), -8.0, 8.0); 
                 }
+
+			#ifdef DYNAMIC_POV
+				if (focusThing->type == SITH_THING_ACTOR || focusThing->type == SITH_THING_PLAYER)
+				{
+					// Added: idle sway
+					float swaySide = sinf(sithTime_curSeconds * sithCamera_povWaggleSpeed) * sithCamera_povWaggleVec.x;
+					float swayUp = sinf(2.0f * sithTime_curSeconds * sithCamera_povWaggleSpeed + M_PI) * sithCamera_povWaggleVec.z;
+					sithCamera_povIdleSway.x = (swaySide - sithCamera_povIdleSway.x) * sithTime_deltaSeconds * sithCamera_povWaggleSmooth + sithCamera_povIdleSway.x;
+					sithCamera_povIdleSway.z = (swayUp - sithCamera_povIdleSway.z) * sithTime_deltaSeconds * sithCamera_povWaggleSmooth + sithCamera_povIdleSway.z;
+					v76.x += sithCamera_povIdleSway.x;
+					v76.z += sithCamera_povIdleSway.z;
+				}
+			#endif
 
                 // MOTS added: hmm??
                 if (Main_bMotsCompat || focusThing == sithPlayer_pLocalPlayerThing )
@@ -598,6 +618,15 @@ void sithCamera_SetPovShake(rdVector3 *a1, rdVector3 *a2, float a3, float a4)
     sithCamera_povShakeF1 = a3;
     sithCamera_povShakeF2 = a4;
 }
+
+#ifdef DYNAMIC_POV
+void sithCamera_SetPovWaggle(rdVector3* waggleVec, float waggleSpeed, float waggleSmooth)
+{
+	rdVector_Copy3(&sithCamera_povWaggleVec, waggleVec);
+	sithCamera_povWaggleSpeed = waggleSpeed;
+	sithCamera_povWaggleSmooth = waggleSmooth;
+}
+#endif
 
 sithThing* sithCamera_GetPrimaryFocus(sithCamera *pCamera)
 {

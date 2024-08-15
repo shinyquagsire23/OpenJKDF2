@@ -64,7 +64,13 @@ int jkPlayer_bHasLoadedSettingsOnce = 0;
 #endif
 
 #ifdef DYNAMIC_POV
-rdVector3 jkSaber_aimAngles;
+static rdVector3 jkSaber_aimAngles;
+static rdVector3 jkSaber_swayOffset;
+static rdVector3 jkPlayer_idleWaggleVec;
+static float jkPlayer_idleWaggleSpeed;
+static float jkPlayer_idleWaggleSmooth;
+
+rdVector3 jkPlayer_crosshairPos;
 #endif
 
 #ifdef FIXED_TIMESTEP_PHYS
@@ -227,7 +233,11 @@ void jkPlayer_ResetVars()
 #endif
 
 #ifdef DYNAMIC_POV
-	rdVector_Set3(&jkSaber_aimAngles, 0.0f,0.0f,0.0f);
+	rdVector_Zero3(&jkSaber_aimAngles);
+	rdVector_Zero3(&jkSaber_swayOffset);
+	rdVector_Zero3(&jkPlayer_idleWaggleVec);
+	jkPlayer_idleWaggleSpeed = 0.0f;
+	jkPlayer_idleWaggleSmooth = 0.0f;
 #endif
 
 #ifdef FIXED_TIMESTEP_PHYS
@@ -863,7 +873,11 @@ void jkPlayer_DrawPov()
 		jkSaber_rotateVec.z -= rotVelNorm.z;
 
 		// Added: add a small rotation based on pitch
-		jkSaber_rotateVec.x -= player->actorParams.eyePYR.x * 0.06f;
+		static float lastPitch = 0.0f;
+		float lerpPitch = (player->actorParams.eyePYR.x - lastPitch) * sithTime_deltaSeconds;
+		jkSaber_rotateVec.x -= lerpPitch * 30.0f;
+		lastPitch = player->actorParams.eyePYR.x;
+		//jkSaber_rotateVec.x -= player->actorParams.eyePYR.x * 0.06f;
 #endif
         rdMatrix_BuildRotate34(&jkSaber_rotateMat, &jkSaber_rotateVec);
 
@@ -903,29 +917,42 @@ void jkPlayer_DrawPov()
 #endif
 
 #ifdef DYNAMIC_POV
+		// Added: idle sway
+		float swaySide = sinf(sithTime_curSeconds * jkPlayer_idleWaggleSpeed) * jkPlayer_idleWaggleVec.x;
+		float swayUp = sinf(2.0f * sithTime_curSeconds * jkPlayer_idleWaggleSpeed + M_PI) * jkPlayer_idleWaggleVec.z;
+		jkSaber_swayOffset.x = (swaySide - jkSaber_swayOffset.x) * sithTime_deltaSeconds * jkPlayer_idleWaggleSmooth + jkSaber_swayOffset.x;
+		jkSaber_swayOffset.z = (swayUp - jkSaber_swayOffset.z) * sithTime_deltaSeconds * jkPlayer_idleWaggleSmooth + jkSaber_swayOffset.z;
+		trans.x += jkSaber_swayOffset.x;
+		trans.z += jkSaber_swayOffset.z;
+
 		// Added: drop/raise the gun a little when jumping/falling
 		trans.z += stdMath_Clamp(0.005f * (player->physicsParams.vel.z / player->physicsParams.maxVel), -0.007f, 0.007f);
 
 		// smooth out crouching and slopes so it's not so static
 		if (player->physicsParams.physflags & SITH_PF_CROUCHING)
-			trans.z -= player->physicsParams.povOffset;
+			trans.z -= /*player->physicsParams.povOffset + */ 0.005f;
 #endif
         rdVector_Neg3Acc(&trans);
         rdMatrix_PreTranslate34(&viewMat, &trans);
 
 #ifdef DYNAMIC_POV
-		// Added: autoaim rotation
+		// Added: autoaim pov model orient
+		rdVector3 aimVector = {0.0f, 0.01f, 0.0f};
 		if ((sithWeapon_bAutoAim & 1) != 0 && !sithNet_isMulti)
 		{
 			// calculate a coarse auto-aim for some sense of where the weapon is pointing 
 			// since projectiles still come from the fireoffset, we don't want it to wander too far or be precise
 			rdMatrix34 autoAimMat;
-			sithWeapon_ProjectileAutoAim(&autoAimMat, player, &viewMat, &player->position, 10.0f, 20.0f);
+			sithWeapon_ProjectileAutoAim(&autoAimMat, player, &viewMat, &player->position, 15.0f, 20.0f);
 
 			// apply inverse of the original look orient to get a local transform
 			rdMatrix34 invOrient;
 			rdMatrix_InvertOrtho34(&invOrient, &viewMat);
 			rdMatrix_PostMultiply34(&autoAimMat, &invOrient);
+			
+			// get the aim vector
+			rdVector_Copy3(&aimVector, &autoAimMat.lvec);
+			//rdVector_Scale3Acc(&aimVector, rdVector_Dist3(&player->position, &autoAimMat.scale) * 0.5f);
 			rdVector_Zero3(&autoAimMat.scale);
 
 			// extract the angles so we can do a lazy interpolation
@@ -941,6 +968,14 @@ void jkPlayer_DrawPov()
 		}
 #endif
         rdMatrix_PreMultiply34(&viewMat, &jkSaber_rotateMat);
+
+#ifdef DYNAMIC_POV
+		rdMatrix34 aimMat;
+		rdMatrix_Copy34(&aimMat, &jkSaber_rotateMat);
+		rdMatrix_PreTranslate34(&aimMat, &trans);
+		rdMatrix_TransformPoint34Acc(&aimVector, &aimMat);
+		sithCamera_currentCamera->rdCam.fnProject(&jkPlayer_crosshairPos, &aimVector);
+#endif
 
         // Moved: see below.
 #ifndef SDL2_RENDER
@@ -1113,6 +1148,18 @@ void jkPlayer_SetWaggle(sithThing *player, rdVector3 *waggleVec, float waggleMag
         jkPlayer_waggleMag = waggleMag;
     }
 }
+
+#ifdef DYNAMIC_POV
+void jkPlayer_SetIdleWaggle(sithThing* player, rdVector3* waggleVec, float waggleSpeed, float waggleSmooth)
+{
+	if (player == playerThings[playerThingIdx].actorThing)
+	{
+		rdVector_Copy3(&jkPlayer_idleWaggleVec, waggleVec);
+		jkPlayer_idleWaggleSpeed = waggleSpeed;
+		jkPlayer_idleWaggleSmooth = waggleSmooth;
+	}
+}
+#endif
 
 int jkPlayer_VerifyWcharName(wchar_t *name)
 {

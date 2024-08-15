@@ -26,6 +26,9 @@
 #include "types_enums.h"
 
 //stdBitmap* jkHud_pTestbitmap = NULL;
+#ifdef DYNAMIC_POV
+stdBitmap* jkHud_pCrosshair = NULL;
+#endif
 
 static jkHudFont jkHud_aFonts[6] = {
     {&jkHud_pHelthNumSft, "HelthNum.sft", "HelthNum16.sft"},
@@ -36,7 +39,7 @@ static jkHudFont jkHud_aFonts[6] = {
     {&jkHud_pMsgFontSft, "msgFont.sft", "msgFont16.sft"}, // TODO: msgFonts, msgFont16s
 };
 
-static jkHudBitmap jkHud_aBitmaps[8] = {
+static jkHudBitmap jkHud_aBitmaps[] = {
     {&jkHud_pStatusLeftBm, "statusLeft.bm", "statusLeft16.bm"},
     {&jkHud_pStatusRightBm, "statusRight.bm", "statusRight16.bm"},
     {&jkHud_pFieldlightBm, "stFieldLite.bm", "stFieldLite16.bm"},
@@ -45,6 +48,9 @@ static jkHudBitmap jkHud_aBitmaps[8] = {
     {&jkHud_pStHealthBm, "stHealth.bm", "stHealth16.bm"},
     {&jkHud_pStShieldBm, "stShield.bm", "stShield16.bm"},
     {&jkHud_pStFrcSuperBm, "stFrcSuper.bm", "stFrcSuper16.bm"},
+#ifdef DYNAMIC_POV
+	{&jkHud_pCrosshair, "crosshair.bm", "crosshair16.bm"},
+#endif
 };
 
 void jkHud_DrawGPU();
@@ -92,7 +98,7 @@ int jkHud_Open()
     if ( jkHud_bOpened )
         return 0;
     bitmapIter = &jkHud_aBitmaps[0];
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < ARRAYSIZE(jkHud_aBitmaps); i++)
     {
 #ifndef SDL2_RENDER
         if ( Video_format.format.bpp == 8 )
@@ -629,6 +635,12 @@ void jkHud_Draw()
         v24 = (int32_t)(v20 * 18.0 - -0.5);
         v25 = (int32_t)(v20 * 6.0 - -0.5);
         
+#ifdef DYNAMIC_POV
+		// use projection from the aiming
+		v21 = jkPlayer_crosshairPos.x * Video_modeStruct.aViewSizes[Video_modeStruct.viewSizeIdx].xMax;
+		v23 = jkPlayer_crosshairPos.y * Video_modeStruct.aViewSizes[Video_modeStruct.viewSizeIdx].yMax;
+#endif
+
         rdPrimit2_DrawClippedLine(Video_pCanvas, v22 - v24, v23,       v22 - v25, v23,       tmpInt, -1);
         rdPrimit2_DrawClippedLine(Video_pCanvas, v22 + v25, v23,       v22 + v24, v23,       tmpInt, -1);
         rdPrimit2_DrawClippedLine(Video_pCanvas, v22,       v23 - v24, v22,       v23 - v25, tmpInt, -1);
@@ -1183,6 +1195,12 @@ void jkHud_DrawGPU()
 #endif /* ifdef QOL_IMPROVEMENTS */
   )
     {
+#ifdef DYNAMIC_POV
+		// draw crosshair on projected position
+		v20 = (double)Video_format.height * (0.0015625 / 3.0) * 4.0;
+		std3D_DrawUIBitmapRGBA(jkHud_pCrosshair, 0, jkPlayer_crosshairPos.x, jkPlayer_crosshairPos.y, NULL, jkPlayer_crosshairScale * v20, jkPlayer_crosshairScale * v20, 1, 0xFF, 0xFF, 0xFF, 0xFF);
+		//std3D_DrawUIBitmap(jkHud_pCrosshair, 0, v22, v23, NULL, jkPlayer_crosshairScale, 1);
+#else
         uint32_t tmpInt;
 #ifdef QOL_IMPROVEMENTS
         // Scale crosshair with vertical resolution, not horizontal.
@@ -1220,6 +1238,7 @@ void jkHud_DrawGPU()
         std3D_DrawUIClearedRect(tmpInt, &rect2);
         std3D_DrawUIClearedRect(tmpInt, &rect3);
         std3D_DrawUIClearedRect(tmpInt, &rect4);
+	#endif
 
         //rdRect rect1a = {(double)Video_format.width/2, (double)Video_format.height/2, 20, 20};
         //std3D_DrawUIClearedRect(tmpInt, &rect1a);

@@ -918,6 +918,20 @@ void sithCogFunction_SetPovShake(sithCog *ctx)
     }
 }
 
+#ifdef DYNAMIC_POV
+void sithCogFunction_SetPovWaggle(sithCog* ctx)
+{
+	cog_flex_t waggleSmooth = sithCogExec_PopFlex(ctx);
+	cog_flex_t waggleSpeed = sithCogExec_PopFlex(ctx);
+
+	rdVector3 waggleVec;
+	if (sithCogExec_PopVector3(ctx, &waggleVec))
+	{
+		sithCamera_SetPovWaggle(&waggleVec, waggleSpeed, waggleSmooth);
+	}
+}
+#endif
+
 void sithCogFunction_HeapNew(sithCog *ctx)
 {
     sithCogStackvar *oldHeap; // eax
@@ -1861,6 +1875,9 @@ void sithCogFunction_Startup(void* ctx)
     sithCogScript_RegisterVerb(ctx, sithCogFunction_GetCurrentCamera, "getcurrentcamera");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_CycleCamera, "cyclecamera");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SetPovShake, "setpovshake");
+#ifdef DYNAMIC_POV
+	sithCogScript_RegisterVerb(ctx, sithCogFunction_SetPovWaggle, "setpovwaggle");
+#endif
     sithCogScript_RegisterVerb(ctx, sithCogFunction_SetCameraStateFlags, "setcamerastateflags");
     sithCogScript_RegisterVerb(ctx, sithCogFunction_GetCameraStateFlags, "getcamerastateflags");
     if (Main_bMotsCompat) {

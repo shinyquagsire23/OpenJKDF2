@@ -628,6 +628,26 @@ void jkCog_SetWaggle(sithCog *ctx)
     }
 }
 
+#ifdef DYNAMIC_POV
+void jkCog_SetIdleWaggle(sithCog* ctx)
+{
+	sithThing* pThing;
+	rdVector3 waggleVec;
+	cog_flex_t waggleSpeed;
+	cog_flex_t waggleSmooth;
+
+	waggleSmooth = sithCogExec_PopFlex(ctx);
+	waggleSpeed = sithCogExec_PopFlex(ctx);
+	sithCogExec_PopVector3(ctx, &waggleVec);
+	pThing = sithCogExec_PopThing(ctx);
+	if (pThing)
+	{
+		if (pThing->type == SITH_THING_PLAYER)
+			jkPlayer_SetIdleWaggle(pThing, &waggleVec, waggleSpeed, waggleSmooth);
+	}	
+}
+#endif
+
 void jkCog_GetChoice(sithCog *ctx)
 {
     sithCogExec_PushInt(ctx, jkPlayer_GetChoice());
@@ -1138,6 +1158,10 @@ void jkCog_RegisterVerbs()
     sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_StringOutput, "jkstringoutput");
     sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_GetSaberCam, "jkgetsabercam");
     sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_GetChoice, "jkgetchoice");
+
+#ifdef DYNAMIC_POV
+	sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_SetIdleWaggle, "jksetidlewaggle");
+#endif
 
     if (Main_bMotsCompat) {
         sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_BeginCutscene,"jkbegincutscene");

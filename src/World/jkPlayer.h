@@ -96,6 +96,9 @@ void jkPlayer_DrawPov();
 void jkPlayer_renderSaberWeaponMesh(sithThing *a1);
 void jkPlayer_renderSaberTwinkle(sithThing *player);
 void jkPlayer_SetWaggle(sithThing *player, rdVector3 *waggleVec, float waggleMag);
+#ifdef DYNAMIC_POV
+void jkPlayer_SetIdleWaggle(sithThing* player, rdVector3 *waggleVec, float waggleSpeed, float waggleSmooth);
+#endif
 int jkPlayer_VerifyWcharName(wchar_t *name);
 int jkPlayer_VerifyCharName(char *name);
 void jkPlayer_SetMpcInfo(wchar_t *name, char *model, char *soundclass, char *sidemat, char *tipmat);
@@ -161,6 +164,10 @@ extern int jkPlayer_setCrosshairOnLightsaber;
 extern int jkPlayer_setCrosshairOnFist;
 
 extern int jkPlayer_bHasLoadedSettingsOnce;
+
+#ifdef DYNAMIC_POV
+extern rdVector3 jkPlayer_crosshairPos;
+#endif
 
 #define FOV_MIN (40)
 #define FOV_MAX (170)
