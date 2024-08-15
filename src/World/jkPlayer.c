@@ -859,18 +859,15 @@ void jkPlayer_DrawPov()
         float velNorm = rdVector_Len3(&player->physicsParams.vel) / player->physicsParams.maxVel; // MOTS altered: uses 1.538462 for something (performance hack?)
         if (angleCos > 0) // verify?
             angleCos = -angleCos;
-        jkSaber_rotateVec.x = angleCos * jkPlayer_waggleVec.x * velNorm;
-        jkSaber_rotateVec.y = angleSin * jkPlayer_waggleVec.y * velNorm;
-        jkSaber_rotateVec.z = angleSin * jkPlayer_waggleVec.z * velNorm;
 #ifdef DYNAMIC_POV
 		// Added: take into account rotvel to add a little dynamic rotation to the POV model
 		rdVector3 rotVelNorm;
 		rotVelNorm.x = player->physicsParams.angVel.x / player->physicsParams.maxRotVel;
 		rotVelNorm.y = player->physicsParams.angVel.y / player->physicsParams.maxRotVel;
 		rotVelNorm.z = player->physicsParams.angVel.z / player->physicsParams.maxRotVel;
-		jkSaber_rotateVec.x -= rotVelNorm.x;
-		jkSaber_rotateVec.y -= rotVelNorm.y;
-		jkSaber_rotateVec.z -= rotVelNorm.z;
+		jkSaber_rotateVec.x = -rotVelNorm.x;
+		jkSaber_rotateVec.y = -rotVelNorm.y;
+		jkSaber_rotateVec.z = -rotVelNorm.z;
 
 		// Added: add a small rotation based on pitch
 		static float lastPitch = 0.0f;
@@ -878,6 +875,17 @@ void jkPlayer_DrawPov()
 		jkSaber_rotateVec.x -= lerpPitch * 30.0f;
 		lastPitch = player->actorParams.eyePYR.x;
 		//jkSaber_rotateVec.x -= player->actorParams.eyePYR.x * 0.06f;
+
+		rdMatrix34 rotateMatNoWaggle;
+		rdMatrix_BuildRotate34(&rotateMatNoWaggle, &jkSaber_rotateVec);
+
+		jkSaber_rotateVec.x += angleCos * jkPlayer_waggleVec.x * velNorm;
+		jkSaber_rotateVec.y += angleSin * jkPlayer_waggleVec.y * velNorm;
+		jkSaber_rotateVec.z += angleSin * jkPlayer_waggleVec.z * velNorm;
+#else
+		jkSaber_rotateVec.x = angleCos * jkPlayer_waggleVec.x * velNorm;
+		jkSaber_rotateVec.y = angleSin * jkPlayer_waggleVec.y * velNorm;
+		jkSaber_rotateVec.z = angleSin * jkPlayer_waggleVec.z * velNorm;
 #endif
         rdMatrix_BuildRotate34(&jkSaber_rotateMat, &jkSaber_rotateVec);
 
@@ -971,7 +979,7 @@ void jkPlayer_DrawPov()
 
 #ifdef DYNAMIC_POV
 		rdMatrix34 aimMat;
-		rdMatrix_Copy34(&aimMat, &jkSaber_rotateMat);
+		rdMatrix_Copy34(&aimMat, &rotateMatNoWaggle);
 		rdMatrix_PreTranslate34(&aimMat, &trans);
 		rdMatrix_TransformPoint34Acc(&aimVector, &aimMat);
 		sithCamera_currentCamera->rdCam.fnProject(&jkPlayer_crosshairPos, &aimVector);
