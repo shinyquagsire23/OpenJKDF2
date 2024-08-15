@@ -65,6 +65,7 @@ int jkPlayer_bHasLoadedSettingsOnce = 0;
 
 #ifdef DYNAMIC_POV
 static rdVector3 jkSaber_aimAngles;
+static rdVector3 jkSaber_aimVector;
 static rdVector3 jkSaber_swayOffset;
 static rdVector3 jkPlayer_idleWaggleVec;
 static float jkPlayer_idleWaggleSpeed;
@@ -234,6 +235,7 @@ void jkPlayer_ResetVars()
 
 #ifdef DYNAMIC_POV
 	rdVector_Zero3(&jkSaber_aimAngles);
+	rdVector_Zero3(&jkSaber_aimVector);
 	rdVector_Zero3(&jkSaber_swayOffset);
 	rdVector_Zero3(&jkPlayer_idleWaggleVec);
 	jkPlayer_idleWaggleSpeed = 0.0f;
@@ -974,6 +976,9 @@ void jkPlayer_DrawPov()
 			rdMatrix_BuildRotate34(&autoAimMat, &jkSaber_aimAngles);
 			rdMatrix_PreMultiply34(&viewMat, &autoAimMat);
 		}
+		jkSaber_aimVector.x = (aimVector.x - jkSaber_aimVector.x) * 7.0f * sithTime_deltaSeconds + jkSaber_aimVector.x;
+		jkSaber_aimVector.y = (aimVector.y - jkSaber_aimVector.y) * 7.0f * sithTime_deltaSeconds + jkSaber_aimVector.y;
+		jkSaber_aimVector.z = (aimVector.z - jkSaber_aimVector.z) * 7.0f * sithTime_deltaSeconds + jkSaber_aimVector.z;
 #endif
         rdMatrix_PreMultiply34(&viewMat, &jkSaber_rotateMat);
 
@@ -981,6 +986,7 @@ void jkPlayer_DrawPov()
 		rdMatrix34 aimMat;
 		rdMatrix_Copy34(&aimMat, &rotateMatNoWaggle);
 		rdMatrix_PreTranslate34(&aimMat, &trans);
+		rdVector_Copy3(&aimVector, &jkSaber_aimVector);
 		rdMatrix_TransformPoint34Acc(&aimVector, &aimMat);
 		sithCamera_currentCamera->rdCam.fnProject(&jkPlayer_crosshairPos, &aimVector);
 #endif
