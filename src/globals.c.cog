@@ -142,8 +142,18 @@ void OpenJKDF2_Globals_Reset()
     import glob
     import os
     from pathlib import Path
-    
-    embed_files = glob.glob(str(Path(project_root) / "resource" / "shaders" / "*.glsl"))
+   
+    embed_files = glob.glob(str(Path(project_root) / "resource" / "ui" / "bm" / "*.bm"))
+    for fpath in embed_files:
+        fpath_ = fpath.replace(str(Path(project_root)) + os.sep, "").replace("\\", "/").replace("resource/", "")
+        fname = os.path.basename(fpath)
+        contents = open(fpath, "rb").read()
+        cog.outl("const char %s[%d] = {" % (os.path.splitext(fname)[0] + "data", len(contents),))
+        for byte in contents:
+            cog.out("0x%x," % byte)
+        cog.outl("};")
+
+    embed_files += glob.glob(str(Path(project_root) / "resource" / "shaders" / "*.glsl"))
     embed_files += glob.glob(str(Path(project_root) / "resource" / "ssl" / "*.pem"))
     embed_files += glob.glob(str(Path(project_root) / "resource" / "ui" / "*.uni"))
     cog.outl("const size_t embeddedResource_aFiles_num = %d;" % (len(embed_files),))
@@ -152,14 +162,18 @@ void OpenJKDF2_Globals_Reset()
     for fpath in embed_files:
         fpath_ = fpath.replace(str(Path(project_root)) + os.sep, "").replace("\\", "/").replace("resource/", "")
         fname = os.path.basename(fpath)
-        contents = open(fpath, "r").read()
-
-        cog.outl("{\"%s\", " % (fpath_,))
-
-        for line in contents.split("\n"):
-            cog.outl("\"%s\"" % (line.replace("\"", "\\\"") + "\\n"))
-
-        cog.outl(", 0x%x}," % (len(contents),))
+        fext = os.path.splitext(fpath_)[-1].lower()
+        if fext != ".bm":
+            contents = open(fpath, "r").read()
+            cog.outl("{\"%s\", " % (fpath_,))
+            for line in contents.split("\n"):
+                cog.outl("\"%s\"" % (line.replace("\"", "\\\"") + "\\n"))
+            cog.outl(", 0x%x}," % (len(contents),))
+        else:
+            contents = open(fpath, "rb").read()
+            cog.outl("{\"%s\", " % (fpath_,))
+            cog.out("%s" % (os.path.splitext(fname)[0] + "data"))
+            cog.outl(", 0x%x}," % (len(contents),))
 
     cog.outl("};")
 
