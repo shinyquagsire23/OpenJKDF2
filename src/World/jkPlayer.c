@@ -952,34 +952,36 @@ void jkPlayer_DrawPov()
 
 #ifdef DYNAMIC_POV
 		// Added: autoaim pov model orient
-		rdVector3 aimVector = {0.0f, 0.01f, 0.0f};
+		rdVector3 aimVector = {0.0f, 1.0f, 0.0f};
 		if ((sithWeapon_bAutoAim & 1) != 0 && !sithNet_isMulti)
 		{
 			// calculate a coarse auto-aim for some sense of where the weapon is pointing 
 			// since projectiles still come from the fireoffset, we don't want it to wander too far or be precise
 			rdMatrix34 autoAimMat;
-			sithWeapon_ProjectileAutoAim(&autoAimMat, player, &viewMat, &player->position, 15.0f, 20.0f);
+			sithThing* pTarget = sithWeapon_ProjectileAutoAim(&autoAimMat, player, &viewMat, &player->position, 15.0f, 20.0f);
+			if(pTarget)
+			{		
+				// apply inverse of the original look orient to get a local transform
+				rdMatrix34 invOrient;
+				rdMatrix_InvertOrtho34(&invOrient, &viewMat);
+				rdMatrix_PostMultiply34(&autoAimMat, &invOrient);
+			
+				// get the aim vector
+				rdVector_Sub3(&aimVector, &pTarget->position, &player->position);
+				rdMatrix_TransformVector34Acc(&aimVector, &invOrient);
+				rdVector_Zero3(&autoAimMat.scale);
 
-			// apply inverse of the original look orient to get a local transform
-			rdMatrix34 invOrient;
-			rdMatrix_InvertOrtho34(&invOrient, &viewMat);
-			rdMatrix_PostMultiply34(&autoAimMat, &invOrient);
+				// extract the angles so we can do a lazy interpolation
+				rdVector3 angles;
+				rdMatrix_ExtractAngles34(&autoAimMat, &angles);
 			
-			// get the aim vector
-			rdVector_Copy3(&aimVector, &autoAimMat.lvec);
-			//rdVector_Scale3Acc(&aimVector, rdVector_Dist3(&player->position, &autoAimMat.scale) * 0.5f);
-			rdVector_Zero3(&autoAimMat.scale);
-
-			// extract the angles so we can do a lazy interpolation
-			rdVector3 angles;
-			rdMatrix_ExtractAngles34(&autoAimMat, &angles);
+				jkSaber_aimAngles.x = (angles.x - jkSaber_aimAngles.x) * 5.0f * min(sithTime_curSeconds, 0.02f) + jkSaber_aimAngles.x;
+				jkSaber_aimAngles.y = (angles.y - jkSaber_aimAngles.y) * 5.0f * min(sithTime_curSeconds, 0.02f) + jkSaber_aimAngles.y;
+				jkSaber_aimAngles.z = (angles.z - jkSaber_aimAngles.z) * 5.0f * min(sithTime_curSeconds, 0.02f) + jkSaber_aimAngles.z;
 			
-			jkSaber_aimAngles.x = (angles.x - jkSaber_aimAngles.x) * 5.0f * min(sithTime_curSeconds, 0.02f) + jkSaber_aimAngles.x;
-			jkSaber_aimAngles.y = (angles.y - jkSaber_aimAngles.y) * 5.0f * min(sithTime_curSeconds, 0.02f) + jkSaber_aimAngles.y;
-			jkSaber_aimAngles.z = (angles.z - jkSaber_aimAngles.z) * 5.0f * min(sithTime_curSeconds, 0.02f) + jkSaber_aimAngles.z;
-			
-			rdMatrix_BuildRotate34(&autoAimMat, &jkSaber_aimAngles);
-			rdMatrix_PreMultiply34(&viewMat, &autoAimMat);
+				rdMatrix_BuildRotate34(&autoAimMat, &jkSaber_aimAngles);
+				rdMatrix_PreMultiply34(&viewMat, &autoAimMat);
+			}
 		}
 		jkSaber_aimVector.x = (aimVector.x - jkSaber_aimVector.x) * 7.0f * min(sithTime_curSeconds, 0.02f) + jkSaber_aimVector.x;
 		jkSaber_aimVector.y = (aimVector.y - jkSaber_aimVector.y) * 7.0f * min(sithTime_curSeconds, 0.02f) + jkSaber_aimVector.y;
@@ -989,8 +991,9 @@ void jkPlayer_DrawPov()
 
 #ifdef DYNAMIC_POV
 		rdMatrix34 aimMat;
-		rdMatrix_Copy34(&aimMat, &rotateMatNoWaggle);
+		rdMatrix_Identity34(&aimMat);
 		rdMatrix_PreTranslate34(&aimMat, &trans);
+		rdMatrix_PreMultiply34(&aimMat, &rotateMatNoWaggle);
 		rdVector_Copy3(&aimVector, &jkSaber_aimVector);
 		rdMatrix_TransformPoint34Acc(&aimVector, &aimMat);
 		sithCamera_currentCamera->rdCam.fnProject(&jkPlayer_crosshairPos, &aimVector);
