@@ -2310,8 +2310,8 @@ void std3D_DrawSceneFbo()
     }
 
     glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
-    if (!draw_bloom)
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex1, 0, 0, 1.0, 1.0, jkPlayer_gamma, 0);
+    //if (!draw_bloom)
+        //std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex1, 0, 0, 1.0, 1.0, jkPlayer_gamma, 0);
 
     if (draw_bloom)
     {

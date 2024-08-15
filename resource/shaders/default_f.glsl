@@ -2,6 +2,8 @@
 #define HAS_TEXTUREGATHER
 #endif
 
+#define CLASSIC_EMISSIVE
+
 #ifdef HAS_TEXTUREGATHER
 vec4 impl_textureGather(sampler2D tex, vec2 uv)
 {
@@ -268,6 +270,9 @@ void main(void)
     vec4 palval = texture(worldPalette, vec2(index, 0.5));
     vec4 color_add = vec4(0.0, 0.0, 0.0, 1.0);
     vec4 color_add_emiss = vec4(0.0, 0.0, 0.0, 0.0);
+#ifdef CLASSIC_EMISSIVE
+	vec4 emissive = vec4(0.0);
+#endif
 
     if (tex_mode == TEX_MODE_TEST) {
         sampled_color = vec4(1.0, 1.0, 1.0, 1.0);
@@ -305,6 +310,9 @@ void main(void)
         // Now take our index and look up the corresponding palette value
         vec4 lightPalval = texture(worldPalette, vec2(light_worldpalidx, 0.5));
 
+	#ifdef CLASSIC_EMISSIVE	
+		emissive = lightPalval;
+	#endif
         // Add more of the emissive color depending on the darkness of the fragment
         color_add = (lightPalval  * light_mult); // * (1.0 - light)
         sampled_color = palval;
@@ -339,6 +347,9 @@ void main(void)
     }
 
     vec4 main_color = (sampled_color * vertex_color);
+#ifdef CLASSIC_EMISSIVE
+	main_color.rgb = max(main_color.rgb, emissive.rgb);
+#endif
     vec4 effectAdd_color = vec4(colorEffects_add.r, colorEffects_add.g, colorEffects_add.b, 0.0);
     
     main_color *= albedoFactor_copy;
