@@ -1275,7 +1275,7 @@ int sithWeapon_HandleWeaponKeys(sithThing *player, float a2)
 }
 
 // MOTS altered ??
-void sithWeapon_ProjectileAutoAim(rdMatrix34 *out, sithThing *sender, rdMatrix34 *in, rdVector3 *fireOffset, float autoaimFov, float autoaimMaxDist)
+sithThing* sithWeapon_ProjectileAutoAim(rdMatrix34 *out, sithThing *sender, rdMatrix34 *in, rdVector3 *fireOffset, float autoaimFov, float autoaimMaxDist)
 {
     unsigned int v9; // ebp
     unsigned int v10; // ebx
@@ -1290,7 +1290,7 @@ void sithWeapon_ProjectileAutoAim(rdMatrix34 *out, sithThing *sender, rdMatrix34
     int a4a; // [esp+70h] [ebp+18h]
 
     if ( autoaimFov == 0.0 && autoaimMaxDist == 0.0 )
-        return;
+		return NULL;
     if ( jkPlayer_setDiff == 2 )
     {
         autoaimFov = autoaimFov * g_flt_8BD054;
@@ -1348,8 +1348,10 @@ void sithWeapon_ProjectileAutoAim(rdMatrix34 *out, sithThing *sender, rdMatrix34
         if ( a4a >= 0 ) {
             rdMatrix_LookAt(out, fireOffset, &thingList[a4a]->position, 0.0);
             //jkHud_SetTarget(thingList[a4a]);
+			return thingList[a4a];
         }
     }
+	return NULL;
 }
 
 // MOTS altered ??
