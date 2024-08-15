@@ -262,8 +262,8 @@ void sithCamera_FollowFocus(sithCamera *cam)
 				if (focusThing->type == SITH_THING_ACTOR || focusThing->type == SITH_THING_PLAYER)
 				{
 					// Added: idle sway
-					float swaySide = sinf(sithTime_curSeconds * sithCamera_povWaggleSpeed) * sithCamera_povWaggleVec.x;
-					float swayUp = sinf(2.0f * sithTime_curSeconds * sithCamera_povWaggleSpeed + M_PI) * sithCamera_povWaggleVec.z;
+					float swaySide = sinf(min(sithTime_curSeconds, 0.02f) * sithCamera_povWaggleSpeed) * sithCamera_povWaggleVec.x;
+					float swayUp = sinf(2.0f * min(sithTime_curSeconds, 0.02f) * sithCamera_povWaggleSpeed + M_PI) * sithCamera_povWaggleVec.z;
 					sithCamera_povIdleSway.x = (swaySide - sithCamera_povIdleSway.x) * sithTime_deltaSeconds * sithCamera_povWaggleSmooth + sithCamera_povIdleSway.x;
 					sithCamera_povIdleSway.z = (swayUp - sithCamera_povIdleSway.z) * sithTime_deltaSeconds * sithCamera_povWaggleSmooth + sithCamera_povIdleSway.z;
 					v76.x += sithCamera_povIdleSway.x;
