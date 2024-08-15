@@ -26,6 +26,8 @@ __declspec(dllexport) DWORD NvOptimusEnablement = 1;
 __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 #endif
 
+#define NEW_BLOOM
+
 #define TEX_MODE_TEST 0
 #define TEX_MODE_WORLDPAL 1
 #define TEX_MODE_BILINEAR 2
@@ -117,6 +119,8 @@ std3DSimpleTexStage std3D_texFboStage;
 std3DSimpleTexStage std3D_blurStage;
 std3DSimpleTexStage std3D_ssaoStage;
 std3DSimpleTexStage std3D_ssaoMixStage;
+
+std3DSimpleTexStage std3D_bloomStage;
 
 GLuint blank_tex, blank_tex_white;
 void* blank_data = NULL, *blank_data_white = NULL;
@@ -310,11 +314,18 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     if (jkPlayer_enableBloom)
     {
         pFb->enable_extra |= 1;
+	#ifdef NEW_BLOOM
+		std3D_generateIntermediateFbo(width / 4, height / 4, &pFb->blur1, 1);
+		std3D_generateIntermediateFbo(pFb->blur1.w / 2, pFb->blur1.h / 2, &pFb->blur2, 1);
+		std3D_generateIntermediateFbo(pFb->blur2.w / 2, pFb->blur2.h / 2, &pFb->blur3, 1);
+		std3D_generateIntermediateFbo(pFb->blur3.w / 2, pFb->blur3.h / 2, &pFb->blur4, 1);
+	#else
         std3D_generateIntermediateFbo(width, height, &pFb->blur1, 1);
         //std3D_generateIntermediateFbo(width, height, &pFb->blurBlend, 1);
         std3D_generateIntermediateFbo(pFb->blur1.w/4, pFb->blur1.h/4, &pFb->blur2, 1);
         std3D_generateIntermediateFbo(pFb->blur2.w/4, pFb->blur2.h/4, &pFb->blur3, 1);
         std3D_generateIntermediateFbo(pFb->blur3.w/4, pFb->blur3.h/4, &pFb->blur4, 1);
+	#endif
 
         /*pFb->blur1.iw = width;
         pFb->blur1.ih = height;
@@ -475,6 +486,10 @@ int init_resources()
     if (!std3D_loadSimpleTexProgram("shaders/blur", &std3D_blurStage)) return false;
     if (!std3D_loadSimpleTexProgram("shaders/ssao", &std3D_ssaoStage)) return false;
     if (!std3D_loadSimpleTexProgram("shaders/ssao_mix", &std3D_ssaoMixStage)) return false;
+
+#ifdef NEW_BLOOM
+	if (!std3D_loadSimpleTexProgram("shaders/bloom", &std3D_bloomStage)) return false;
+#endif
 
     // Attributes/uniforms
     attribute_coord3d = std3D_tryFindAttribute(programDefault, "coord3d");
@@ -2315,6 +2330,26 @@ void std3D_DrawSceneFbo()
 
     if (draw_bloom)
     {
+	#ifdef NEW_BLOOM
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		// downscale
+		float uvScale = 1.0f;// 0.25f; // source tex is 4x bigger
+		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur1, std3D_pFb->tex1, 0, 0, uvScale, 1.0, 1.0, 0);
+		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur2, std3D_pFb->blur1.tex, 0, 0, uvScale, 1.0, 1.0, 0);
+		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur3, std3D_pFb->blur2.tex, 0, 0, uvScale, 1.0, 1.0, 0);
+		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur4, std3D_pFb->blur3.tex, 0, 0, uvScale, 1.0, 1.0, 0);
+
+		// upscale + blend
+		//uvScale = 4.0f; // source tex is 4x smaller
+
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur3, std3D_pFb->blur4.tex, 0, 0, uvScale, 1.0, 1.0, 0);
+		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur2, std3D_pFb->blur3.tex, 0, 0, uvScale, 1.0, 1.0, 0);
+		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur1, std3D_pFb->blur2.tex, 0, 0, uvScale, 1.0, 1.0, 0);
+
+		std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur1.tex, 0, 0, 1.0, 1.0f, jkPlayer_gamma, 0);
+
+	#else
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         
         std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->blur1, std3D_pFb->tex1, 0, 0, 16.0, 3.0, 2.0 * rad_scale, 1);
@@ -2339,6 +2374,7 @@ void std3D_DrawSceneFbo()
         std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur2.tex, 0, 0, 1.0, bloom_intensity * 1.0, jkPlayer_gamma, 0);
         std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur3.tex, 0, 0, 1.0, bloom_intensity * 1.0, jkPlayer_gamma, 0);
         std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur4.tex, 0, 0, 1.0, bloom_intensity * 0.8, jkPlayer_gamma, 0);
+	#endif
     }
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
