@@ -262,10 +262,15 @@ void sithCamera_FollowFocus(sithCamera *cam)
 				if (focusThing->type == SITH_THING_ACTOR || focusThing->type == SITH_THING_PLAYER)
 				{
 					// Added: idle sway
-					float swaySide = sinf(min(sithTime_curSeconds, 0.02f) * sithCamera_povWaggleSpeed) * sithCamera_povWaggleVec.x;
-					float swayUp = sinf(2.0f * min(sithTime_curSeconds, 0.02f) * sithCamera_povWaggleSpeed + M_PI) * sithCamera_povWaggleVec.z;
-					sithCamera_povIdleSway.x = (swaySide - sithCamera_povIdleSway.x) * sithTime_deltaSeconds * sithCamera_povWaggleSmooth + sithCamera_povIdleSway.x;
-					sithCamera_povIdleSway.z = (swayUp - sithCamera_povIdleSway.z) * sithTime_deltaSeconds * sithCamera_povWaggleSmooth + sithCamera_povIdleSway.z;
+					float angleSin, angleCos;
+					float swayTime = min(sithTime_curSeconds, 0.02f) * sithCamera_povWaggleSpeed;
+
+					stdMath_SinCos(swayTime, &angleSin, &angleCos);
+					sithCamera_povIdleSway.x = (angleSin * sithCamera_povWaggleVec.x - sithCamera_povIdleSway.x) * sithTime_deltaSeconds * sithCamera_povWaggleSmooth + sithCamera_povIdleSway.x;
+					
+					stdMath_SinCos(2.0f * swayTime + M_PI, &angleSin, &angleCos);
+					sithCamera_povIdleSway.z = (angleSin * sithCamera_povWaggleVec.z - sithCamera_povIdleSway.z) * sithTime_deltaSeconds * sithCamera_povWaggleSmooth + sithCamera_povIdleSway.z;
+					
 					v76.x += sithCamera_povIdleSway.x;
 					v76.z += sithCamera_povIdleSway.z;
 				}

@@ -933,10 +933,15 @@ void jkPlayer_DrawPov()
 
 #ifdef DYNAMIC_POV
 		// Added: idle sway
-		float swaySide = sinf(min(sithTime_curSeconds, 0.02f) * jkPlayer_idleWaggleSpeed) * jkPlayer_idleWaggleVec.x;
-		float swayUp = sinf(2.0f * min(sithTime_curSeconds, 0.02f) * jkPlayer_idleWaggleSpeed + M_PI) * jkPlayer_idleWaggleVec.z;
-		jkSaber_swayOffset.x = (swaySide - jkSaber_swayOffset.x) * sithTime_deltaSeconds * jkPlayer_idleWaggleSmooth + jkSaber_swayOffset.x;
-		jkSaber_swayOffset.z = (swayUp - jkSaber_swayOffset.z) * sithTime_deltaSeconds * jkPlayer_idleWaggleSmooth + jkSaber_swayOffset.z;
+		float swayTime = min(sithTime_curSeconds, 0.02f) * jkPlayer_idleWaggleSpeed;
+
+		stdMath_SinCos(swayTime, &angleSin, &angleCos);
+		jkSaber_swayOffset.x = (angleSin * jkPlayer_idleWaggleVec.x - jkSaber_swayOffset.x) * sithTime_deltaSeconds * jkPlayer_idleWaggleSmooth + jkSaber_swayOffset.x;
+
+		stdMath_SinCos(2.0f * swayTime + M_PI, &angleSin, &angleCos);
+		jkSaber_swayOffset.z = (angleSin * jkPlayer_idleWaggleVec.z - jkSaber_swayOffset.z) * sithTime_deltaSeconds * jkPlayer_idleWaggleSmooth + jkSaber_swayOffset.z;
+		
+		// add the sway offset
 		trans.x += jkSaber_swayOffset.x;
 		trans.z += jkSaber_swayOffset.z;
 
