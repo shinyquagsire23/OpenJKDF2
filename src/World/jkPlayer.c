@@ -933,13 +933,13 @@ void jkPlayer_DrawPov()
 
 #ifdef DYNAMIC_POV
 		// Added: idle sway
-		float swayTime = min(sithTime_curSeconds, 0.02f) * jkPlayer_idleWaggleSpeed;
+		float swayTime = sithTime_curSeconds * jkPlayer_idleWaggleSpeed * (180.0 / M_PI);
 
 		stdMath_SinCos(swayTime, &angleSin, &angleCos);
-		jkSaber_swayOffset.x = (angleSin * jkPlayer_idleWaggleVec.x - jkSaber_swayOffset.x) * sithTime_deltaSeconds * jkPlayer_idleWaggleSmooth + jkSaber_swayOffset.x;
+		jkSaber_swayOffset.x = (angleSin * jkPlayer_idleWaggleVec.x - jkSaber_swayOffset.x) * min(sithTime_deltaSeconds, 0.02f) * jkPlayer_idleWaggleSmooth + jkSaber_swayOffset.x;
 
-		stdMath_SinCos(2.0f * swayTime + M_PI, &angleSin, &angleCos);
-		jkSaber_swayOffset.z = (angleSin * jkPlayer_idleWaggleVec.z - jkSaber_swayOffset.z) * sithTime_deltaSeconds * jkPlayer_idleWaggleSmooth + jkSaber_swayOffset.z;
+		stdMath_SinCos(2.0f * swayTime + 180.0f, &angleSin, &angleCos);
+		jkSaber_swayOffset.z = (angleSin * jkPlayer_idleWaggleVec.z - jkSaber_swayOffset.z) * min(sithTime_deltaSeconds, 0.02f) * jkPlayer_idleWaggleSmooth + jkSaber_swayOffset.z;
 		
 		// add the sway offset
 		trans.x += jkSaber_swayOffset.x;
@@ -980,17 +980,17 @@ void jkPlayer_DrawPov()
 				rdVector3 angles;
 				rdMatrix_ExtractAngles34(&autoAimMat, &angles);
 			
-				jkSaber_aimAngles.x = (angles.x - jkSaber_aimAngles.x) * 6.0f * min(sithTime_curSeconds, 0.02f) + jkSaber_aimAngles.x;
-				jkSaber_aimAngles.y = (angles.y - jkSaber_aimAngles.y) * 6.0f * min(sithTime_curSeconds, 0.02f) + jkSaber_aimAngles.y;
-				jkSaber_aimAngles.z = (angles.z - jkSaber_aimAngles.z) * 6.0f * min(sithTime_curSeconds, 0.02f) + jkSaber_aimAngles.z;
+				jkSaber_aimAngles.x = (angles.x - jkSaber_aimAngles.x) * 6.0f * min(sithTime_deltaSeconds, 0.02f) + jkSaber_aimAngles.x;
+				jkSaber_aimAngles.y = (angles.y - jkSaber_aimAngles.y) * 6.0f * min(sithTime_deltaSeconds, 0.02f) + jkSaber_aimAngles.y;
+				jkSaber_aimAngles.z = (angles.z - jkSaber_aimAngles.z) * 6.0f * min(sithTime_deltaSeconds, 0.02f) + jkSaber_aimAngles.z;
 			
 				rdMatrix_BuildRotate34(&autoAimMat, &jkSaber_aimAngles);
 				rdMatrix_PreMultiply34(&viewMat, &autoAimMat);
 			}
 		}
-		jkSaber_aimVector.x = (aimVector.x - jkSaber_aimVector.x) * 6.0f * min(sithTime_curSeconds, 0.02f) + jkSaber_aimVector.x;
-		jkSaber_aimVector.y = (aimVector.y - jkSaber_aimVector.y) * 6.0f * min(sithTime_curSeconds, 0.02f) + jkSaber_aimVector.y;
-		jkSaber_aimVector.z = (aimVector.z - jkSaber_aimVector.z) * 6.0f * min(sithTime_curSeconds, 0.02f) + jkSaber_aimVector.z;
+		jkSaber_aimVector.x = (aimVector.x - jkSaber_aimVector.x) * 6.0f * min(sithTime_deltaSeconds, 0.02f) + jkSaber_aimVector.x;
+		jkSaber_aimVector.y = (aimVector.y - jkSaber_aimVector.y) * 6.0f * min(sithTime_deltaSeconds, 0.02f) + jkSaber_aimVector.y;
+		jkSaber_aimVector.z = (aimVector.z - jkSaber_aimVector.z) * 6.0f * min(sithTime_deltaSeconds, 0.02f) + jkSaber_aimVector.z;
 #endif
         rdMatrix_PreMultiply34(&viewMat, &jkSaber_rotateMat);
 
