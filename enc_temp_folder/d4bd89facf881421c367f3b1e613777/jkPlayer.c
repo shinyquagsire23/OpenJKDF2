@@ -915,7 +915,13 @@ void jkPlayer_DrawPov()
         }
 
         rdCamera_SetAmbientLight(&sithCamera_currentCamera->rdCam, ambLight);
-        rdColormap_SetCurrent(sithCamera_currentCamera->sector->colormap);
+#ifdef RGB_THING_LIGHTS
+#ifdef AMBIENT_CUBE
+		rdCamera_SetAmbientLight(&sithCamera_currentCamera->rdCam, 0.0f);// a2);
+		rdCamera_SetAmbientCube(&sithCamera_currentCamera->rdCam, sithCamera_currentCamera->sector->ambientCube);
+#endif
+#endif
+		rdColormap_SetCurrent(sithCamera_currentCamera->sector->colormap);
 
         rdMatrix_Copy34(&viewMat, &sithCamera_currentCamera->viewMat);
         rdVector_Copy3(&trans, &playerThings[playerThingIdx].actorThing->actorParams.eyeOffset);
@@ -957,7 +963,7 @@ void jkPlayer_DrawPov()
 
 #ifdef DYNAMIC_POV
 		// Added: autoaim pov model orient
-		rdVector3 aimVector = {0.0f, 5.0f, 0.0f};
+		rdVector3 aimVector = {0.0f, 3.0f, 0.0f};
 		if ((sithWeapon_bAutoAim & 1) != 0 && !sithNet_isMulti)
 		{
 			// calculate a coarse auto-aim for some sense of where the weapon is pointing 
