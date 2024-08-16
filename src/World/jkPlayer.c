@@ -952,7 +952,7 @@ void jkPlayer_DrawPov()
 
 #ifdef DYNAMIC_POV
 		// Added: autoaim pov model orient
-		rdVector3 aimVector = {0.0f, 1.0f, 0.0f};
+		rdVector3 aimVector = {0.0f, 10.0f, 0.0f};
 		if ((sithWeapon_bAutoAim & 1) != 0 && !sithNet_isMulti)
 		{
 			// calculate a coarse auto-aim for some sense of where the weapon is pointing 
