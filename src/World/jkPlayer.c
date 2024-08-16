@@ -988,9 +988,9 @@ void jkPlayer_DrawPov()
 				rdMatrix_PreMultiply34(&viewMat, &autoAimMat);
 			}
 		}
-		jkSaber_aimVector.x = (aimVector.x - jkSaber_aimVector.x) * 6.0f * min(sithTime_deltaSeconds, 0.02f) + jkSaber_aimVector.x;
-		jkSaber_aimVector.y = (aimVector.y - jkSaber_aimVector.y) * 6.0f * min(sithTime_deltaSeconds, 0.02f) + jkSaber_aimVector.y;
-		jkSaber_aimVector.z = (aimVector.z - jkSaber_aimVector.z) * 6.0f * min(sithTime_deltaSeconds, 0.02f) + jkSaber_aimVector.z;
+		jkSaber_aimVector.x = (aimVector.x - jkSaber_aimVector.x) * 8.0f * min(sithTime_deltaSeconds, 0.02f) + jkSaber_aimVector.x;
+		jkSaber_aimVector.y = (aimVector.y - jkSaber_aimVector.y) * 8.0f * min(sithTime_deltaSeconds, 0.02f) + jkSaber_aimVector.y;
+		jkSaber_aimVector.z = (aimVector.z - jkSaber_aimVector.z) * 8.0f * min(sithTime_deltaSeconds, 0.02f) + jkSaber_aimVector.z;
 #endif
         rdMatrix_PreMultiply34(&viewMat, &jkSaber_rotateMat);
 
