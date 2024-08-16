@@ -975,17 +975,17 @@ void jkPlayer_DrawPov()
 				rdVector3 angles;
 				rdMatrix_ExtractAngles34(&autoAimMat, &angles);
 			
-				jkSaber_aimAngles.x = (angles.x - jkSaber_aimAngles.x) * 5.0f * min(sithTime_curSeconds, 0.02f) + jkSaber_aimAngles.x;
-				jkSaber_aimAngles.y = (angles.y - jkSaber_aimAngles.y) * 5.0f * min(sithTime_curSeconds, 0.02f) + jkSaber_aimAngles.y;
-				jkSaber_aimAngles.z = (angles.z - jkSaber_aimAngles.z) * 5.0f * min(sithTime_curSeconds, 0.02f) + jkSaber_aimAngles.z;
+				jkSaber_aimAngles.x = (angles.x - jkSaber_aimAngles.x) * 6.0f * min(sithTime_curSeconds, 0.02f) + jkSaber_aimAngles.x;
+				jkSaber_aimAngles.y = (angles.y - jkSaber_aimAngles.y) * 6.0f * min(sithTime_curSeconds, 0.02f) + jkSaber_aimAngles.y;
+				jkSaber_aimAngles.z = (angles.z - jkSaber_aimAngles.z) * 6.0f * min(sithTime_curSeconds, 0.02f) + jkSaber_aimAngles.z;
 			
 				rdMatrix_BuildRotate34(&autoAimMat, &jkSaber_aimAngles);
 				rdMatrix_PreMultiply34(&viewMat, &autoAimMat);
 			}
 		}
-		jkSaber_aimVector.x = (aimVector.x - jkSaber_aimVector.x) * 7.0f * min(sithTime_curSeconds, 0.02f) + jkSaber_aimVector.x;
-		jkSaber_aimVector.y = (aimVector.y - jkSaber_aimVector.y) * 7.0f * min(sithTime_curSeconds, 0.02f) + jkSaber_aimVector.y;
-		jkSaber_aimVector.z = (aimVector.z - jkSaber_aimVector.z) * 7.0f * min(sithTime_curSeconds, 0.02f) + jkSaber_aimVector.z;
+		jkSaber_aimVector.x = (aimVector.x - jkSaber_aimVector.x) * 6.0f * min(sithTime_curSeconds, 0.02f) + jkSaber_aimVector.x;
+		jkSaber_aimVector.y = (aimVector.y - jkSaber_aimVector.y) * 6.0f * min(sithTime_curSeconds, 0.02f) + jkSaber_aimVector.y;
+		jkSaber_aimVector.z = (aimVector.z - jkSaber_aimVector.z) * 6.0f * min(sithTime_curSeconds, 0.02f) + jkSaber_aimVector.z;
 #endif
         rdMatrix_PreMultiply34(&viewMat, &jkSaber_rotateMat);
 
