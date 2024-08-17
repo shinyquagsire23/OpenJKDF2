@@ -167,6 +167,7 @@ extern int jkPlayer_bHasLoadedSettingsOnce;
 
 #ifdef DYNAMIC_POV
 extern rdVector3 jkPlayer_crosshairPos;
+extern int jkPlayer_aimLock;
 #endif
 
 #define FOV_MIN (40)

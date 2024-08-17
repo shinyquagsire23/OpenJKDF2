@@ -21,7 +21,7 @@ static int slider_images[2] = {JKGUI_BM_SLIDER_BACK_200, JKGUI_BM_SLIDER_THUMB};
 
 void jkGuiGameplay_ScaleDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
 
-static jkGuiElement jkGuiGameplay_buttons[44] = {
+static jkGuiElement jkGuiGameplay_buttons[] = {
     {ELEMENT_TEXT, 0, 0, 0, 3, {0, 410, 640, 20}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXT, 0, 6, "GUI_SETUP", 3, {20, 20, 600, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON, 100, 2, "GUI_GENERAL", 3, {20, 80, 120, 40},  1, 0, "GUI_GENERAL_HINT", 0, 0, 0, {0}, 0},
@@ -30,8 +30,8 @@ static jkGuiElement jkGuiGameplay_buttons[44] = {
     {ELEMENT_TEXTBUTTON, 103, 2, "GUI_SOUND", 3, {380, 80, 120, 40}, 1, 0, "GUI_SOUND_HINT", 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON, 104, 2, "GUI_CONTROLS", 3, {500, 80, 120, 40}, 1, 0, "GUI_CONTROLS_HINT", 0, 0, 0, {0}, 0},
     {ELEMENT_CHECKBOX, 0, 0, "GUI_AUTOAIM", 0, {30, 170, 270, 20}, 1, 0, "GUI_AUTOAIM_HINT", 0, 0, 0, {0}, 0},
-    {ELEMENT_CHECKBOX, 0, 0, "GUI_CROSSHAIR", 0, {30, 200, 270, 20}, 1, 0, "GUI_CROSSHAIR_HINT", 0, 0, 0, {0}, 0},
-    {ELEMENT_CHECKBOX, 0, 0, "GUI_SABERCAM", 0, {30, 230, 270, 20}, 1, 0, "GUI_SABERCAM_HINT", 0, 0, 0, {0}, 0},
+    {ELEMENT_CHECKBOX, 0, 0, "GUI_CROSSHAIR", 0, {30, 190, 270, 20}, 1, 0, "GUI_CROSSHAIR_HINT", 0, 0, 0, {0}, 0},
+    {ELEMENT_CHECKBOX, 0, 0, "GUI_SABERCAM", 0, {30, 210, 270, 20}, 1, 0, "GUI_SABERCAM_HINT", 0, 0, 0, {0}, 0},
     {ELEMENT_TEXT, 0, 0, "GUI_SINGLE", 2, {310, 130, 50, 20}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXT, 0, 0, "GUI_MP", 2, {360, 130, 50, 20}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXT, 0, 0, "GUI_AUTOPICKUP", 2, {400, 170, 240, 20}, 1, 0, 0, 0, 0, 0, {0}, 0},
@@ -63,13 +63,16 @@ static jkGuiElement jkGuiGameplay_buttons[44] = {
     {ELEMENT_TEXTBUTTON, 0XFFFFFFFF, 2, "GUI_CANCEL", 3, {0, 430, 200, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
 
 #ifdef QOL_IMPROVEMENTS
-    {ELEMENT_CHECKBOX, 0, 0, "GUIEXT_SHOW_SABER_CROSSHAIR", 0, {30, 260, 270, 20}, 1, 0, "GUIEXT_SHOW_SABER_CROSSHAIR_HINT", 0, 0, 0, {0}, 0},
+    {ELEMENT_CHECKBOX, 0, 0, "GUIEXT_SHOW_SABER_CROSSHAIR", 0, {30, 270, 270, 20}, 1, 0, "GUIEXT_SHOW_SABER_CROSSHAIR_HINT", 0, 0, 0, {0}, 0},
     {ELEMENT_CHECKBOX, 0, 0, "GUIEXT_SHOW_FIST_CROSSHAIR", 0, {30, 290, 270, 20}, 1, 0, "GUIEXT_SHOW_FIST_CROSSHAIR_HINT", 0, 0, 0, {0}, 0},
     
     // 40
     {ELEMENT_SLIDER, 0, 0, (const char*)10, 50, { 30, 345, 235, 30 }, 1, 0, "GUIEXT_CROSSHAIR_SCALE_HINT", jkGuiGameplay_ScaleDraw, 0, slider_images, {0}, 0},
     {ELEMENT_TEXT,         0,            0, "GUIEXT_CROSSHAIR_SCALE",                 3, {30, 345-25, 235, 20}, 1,  0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXT,         0,            0, slider_val_text,        3, {30, 345+30, 235, 20}, 1,  0, 0, 0, 0, 0, {0}, 0},
+#ifdef DYNAMIC_POV
+	{ELEMENT_CHECKBOX, 0, 0, "GUIEXT_AIMLOCK", 0, {30, 230, 270, 20}, 1, 0, "GUIEXT_AIMLOCK_HINT", 0, 0, 0, {0}, 0},
+#endif
 #endif /* QOL_IMPROVEMENTS */
  
     {ELEMENT_END, 0, 0, 0, 0, {0}, 0, 0, 0, 0, 0, 0, {0}, 0},
@@ -130,6 +133,7 @@ int jkGuiGameplay_Show()
     jkGuiGameplay_buttons[38].selectedTextEntry = jkPlayer_setCrosshairOnLightsaber;
     jkGuiGameplay_buttons[39].selectedTextEntry = jkPlayer_setCrosshairOnFist;
     jkGuiGameplay_buttons[40].selectedTextEntry = jkPlayer_crosshairScale * 5;
+    jkGuiGameplay_buttons[43].selectedTextEntry = jkPlayer_aimLock;
 #endif /* QOL_IMPROVEMENTS */
     
 
@@ -173,6 +177,9 @@ int jkGuiGameplay_Show()
         jkPlayer_setCrosshairOnLightsaber = jkGuiGameplay_buttons[38].selectedTextEntry;
         jkPlayer_setCrosshairOnFist = jkGuiGameplay_buttons[39].selectedTextEntry;
         jkPlayer_crosshairScale = ((float)jkGuiGameplay_buttons[40].selectedTextEntry)*0.2f;
+	#ifdef DYNAMIC_POV
+		jkPlayer_aimLock = (float)jkGuiGameplay_buttons[43].selectedTextEntry;
+	#endif
 #endif /* QOL_IMPROVEMENTS */
     
         jkPlayer_WriteConf(jkPlayer_playerShortName);

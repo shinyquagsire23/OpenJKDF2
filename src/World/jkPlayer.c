@@ -73,6 +73,7 @@ static float jkPlayer_idleWaggleSmooth;
 static rdVector3 jkPlayer_pushAngles;
 
 rdVector3 jkPlayer_crosshairPos;
+int jkPlayer_aimLock = 0;
 #endif
 
 #ifdef FIXED_TIMESTEP_PHYS
@@ -188,6 +189,9 @@ void jkPlayer_StartupVars()
     sithCvar_RegisterFlex("hud_scale",                  2.0,                        &jkPlayer_hudScale,                 CVARFLAG_LOCAL|CVARFLAG_RESETHUD);
     sithCvar_RegisterFlex("hud_crosshairLineWidth",     1.0,                        &jkPlayer_crosshairLineWidth,       CVARFLAG_LOCAL|CVARFLAG_RESETHUD);
     sithCvar_RegisterFlex("hud_crosshairScale",         1.0,                        &jkPlayer_crosshairScale,           CVARFLAG_LOCAL|CVARFLAG_RESETHUD);
+#ifdef DYNAMIC_POV
+	sithCvar_RegisterFlex("hud_aimLock",                1.0,                        &jkPlayer_aimLock,                  CVARFLAG_LOCAL|CVARFLAG_RESETHUD);
+#endif
     sithCvar_RegisterBool("hud_setCrosshairOnLightsaber", 1,                        &jkPlayer_setCrosshairOnLightsaber, CVARFLAG_LOCAL);
     sithCvar_RegisterBool("hud_setCrosshairOnFist",     1,                          &jkPlayer_setCrosshairOnFist,       CVARFLAG_LOCAL);
     sithCvar_RegisterFlex("g_canonicalCogTickrate",     CANONICAL_COG_TICKRATE,     &jkPlayer_canonicalCogTickrate,     CVARFLAG_LOCAL);
@@ -242,6 +246,7 @@ void jkPlayer_ResetVars()
 	rdVector_Zero3(&jkPlayer_pushAngles);
 	jkPlayer_idleWaggleSpeed = 0.0f;
 	jkPlayer_idleWaggleSmooth = 0.0f;
+	jkPlayer_aimLock = 0;
 #endif
 
 #ifdef FIXED_TIMESTEP_PHYS
@@ -583,6 +588,9 @@ void jkPlayer_WriteConf(wchar_t *name)
 
         stdJSON_SaveBool(ext_fpath, "setCrosshairOnLightsaber", jkPlayer_setCrosshairOnLightsaber);
         stdJSON_SaveBool(ext_fpath, "setCrosshairOnFist", jkPlayer_setCrosshairOnFist);
+#ifdef DYNAMIC_POV
+		stdJSON_SaveBool(ext_fpath, "aimLock", jkPlayer_aimLock);
+#endif
 #endif
 #ifdef FIXED_TIMESTEP_PHYS
         stdJSON_SaveBool(ext_fpath, "bJankyPhysics", jkPlayer_bJankyPhysics);
@@ -772,7 +780,9 @@ int jkPlayer_ReadConf(wchar_t *name)
 
         jkPlayer_setCrosshairOnLightsaber = stdJSON_GetBool(ext_fpath, "setCrosshairOnLightsaber", jkPlayer_setCrosshairOnLightsaber);
         jkPlayer_setCrosshairOnFist = stdJSON_GetBool(ext_fpath, "setCrosshairOnFist", jkPlayer_setCrosshairOnFist);
-
+#ifdef DYNAMIC_POV
+		jkPlayer_aimLock = stdJSON_GetFloat(ext_fpath, "aimLock", jkPlayer_aimLock);
+#endif
 #endif
 #ifdef FIXED_TIMESTEP_PHYS
         jkPlayer_bJankyPhysics = stdJSON_GetBool(ext_fpath, "bJankyPhysics", jkPlayer_bJankyPhysics);
@@ -865,27 +875,36 @@ void jkPlayer_DrawPov()
             angleCos = -angleCos;
 #ifdef DYNAMIC_POV
 		// Added: take into account rotvel to add a little dynamic rotation to the POV model
-		rdVector3 rotVelNorm;
-		rotVelNorm.x = player->physicsParams.angVel.x / player->physicsParams.maxRotVel;
-		rotVelNorm.y = player->physicsParams.angVel.y / player->physicsParams.maxRotVel;
-		rotVelNorm.z = player->physicsParams.angVel.z / player->physicsParams.maxRotVel;
-		jkSaber_rotateVec.x = -rotVelNorm.x;
-		jkSaber_rotateVec.y = -rotVelNorm.y;
-		jkSaber_rotateVec.z = -rotVelNorm.z;
-
-		// Added: add a small rotation based on pitch
-		static float lastPitch = 0.0f;
-		float lerpPitch = (player->actorParams.eyePYR.x - lastPitch) * min(sithTime_curSeconds, 0.02f);
-		jkSaber_rotateVec.x -= lerpPitch * 30.0f;
-		lastPitch = player->actorParams.eyePYR.x;
-		//jkSaber_rotateVec.x -= player->actorParams.eyePYR.x * 0.06f;
-
 		rdMatrix34 rotateMatNoWaggle;
-		rdMatrix_BuildRotate34(&rotateMatNoWaggle, &jkSaber_rotateVec);
+		if(!jkPlayer_aimLock)
+		{
+			rdVector3 rotVelNorm;
+			rotVelNorm.x = player->physicsParams.angVel.x / player->physicsParams.maxRotVel;
+			rotVelNorm.y = player->physicsParams.angVel.y / player->physicsParams.maxRotVel;
+			rotVelNorm.z = player->physicsParams.angVel.z / player->physicsParams.maxRotVel;
+			jkSaber_rotateVec.x = -rotVelNorm.x;
+			jkSaber_rotateVec.y = -rotVelNorm.y;
+			jkSaber_rotateVec.z = -rotVelNorm.z;
 
-		jkSaber_rotateVec.x += angleCos * jkPlayer_waggleVec.x * velNorm;
-		jkSaber_rotateVec.y += angleSin * jkPlayer_waggleVec.y * velNorm;
-		jkSaber_rotateVec.z += angleSin * jkPlayer_waggleVec.z * velNorm;
+			// Added: add a small rotation based on pitch
+			static float lastPitch = 0.0f;
+			float lerpPitch = (player->actorParams.eyePYR.x - lastPitch) * min(sithTime_curSeconds, 0.02f);
+			jkSaber_rotateVec.x -= lerpPitch * 30.0f;
+			lastPitch = player->actorParams.eyePYR.x;
+			//jkSaber_rotateVec.x -= player->actorParams.eyePYR.x * 0.06f;
+
+			rdMatrix_BuildRotate34(&rotateMatNoWaggle, &jkSaber_rotateVec);
+			
+			jkSaber_rotateVec.x += angleCos * jkPlayer_waggleVec.x * velNorm;
+			jkSaber_rotateVec.y += angleSin * jkPlayer_waggleVec.y * velNorm;
+			jkSaber_rotateVec.z += angleSin * jkPlayer_waggleVec.z * velNorm;
+		}
+		else
+		{
+			jkSaber_rotateVec.x = angleCos * jkPlayer_waggleVec.x * velNorm;
+			jkSaber_rotateVec.y = angleSin * jkPlayer_waggleVec.y * velNorm;
+			jkSaber_rotateVec.z = angleSin * jkPlayer_waggleVec.z * velNorm;
+		}
 #else
 		jkSaber_rotateVec.x = angleCos * jkPlayer_waggleVec.x * velNorm;
 		jkSaber_rotateVec.y = angleSin * jkPlayer_waggleVec.y * velNorm;
@@ -935,20 +954,23 @@ void jkPlayer_DrawPov()
 
 #ifdef DYNAMIC_POV
 		// Added: idle sway
-		float swayTime = sithTime_curSeconds * jkPlayer_idleWaggleSpeed * (180.0 / M_PI);
+		if (!jkPlayer_aimLock)
+		{
+			float swayTime = sithTime_curSeconds * jkPlayer_idleWaggleSpeed * (180.0 / M_PI);
 
-		stdMath_SinCos(swayTime, &angleSin, &angleCos);
-		jkSaber_swayOffset.x = (angleSin * jkPlayer_idleWaggleVec.x - jkSaber_swayOffset.x) * min(sithTime_deltaSeconds, 0.02f) * jkPlayer_idleWaggleSmooth + jkSaber_swayOffset.x;
+			stdMath_SinCos(swayTime, &angleSin, &angleCos);
+			jkSaber_swayOffset.x = (angleSin * jkPlayer_idleWaggleVec.x - jkSaber_swayOffset.x) * min(sithTime_deltaSeconds, 0.02f) * jkPlayer_idleWaggleSmooth + jkSaber_swayOffset.x;
 
-		stdMath_SinCos(2.0f * swayTime + 180.0f, &angleSin, &angleCos);
-		jkSaber_swayOffset.z = (angleSin * jkPlayer_idleWaggleVec.z - jkSaber_swayOffset.z) * min(sithTime_deltaSeconds, 0.02f) * jkPlayer_idleWaggleSmooth + jkSaber_swayOffset.z;
+			stdMath_SinCos(2.0f * swayTime + 180.0f, &angleSin, &angleCos);
+			jkSaber_swayOffset.z = (angleSin * jkPlayer_idleWaggleVec.z - jkSaber_swayOffset.z) * min(sithTime_deltaSeconds, 0.02f) * jkPlayer_idleWaggleSmooth + jkSaber_swayOffset.z;
 		
-		// add the sway offset
-		trans.x += jkSaber_swayOffset.x;
-		trans.z += jkSaber_swayOffset.z;
+			// add the sway offset
+			trans.x += jkSaber_swayOffset.x;
+			trans.z += jkSaber_swayOffset.z;
 
-		// Added: drop/raise the gun a little when jumping/falling
-		trans.z += stdMath_Clamp(0.005f * (player->physicsParams.vel.z / player->physicsParams.maxVel), -0.007f, 0.007f);
+			// Added: drop/raise the gun a little when jumping/falling
+			trans.z += stdMath_Clamp(0.005f * (player->physicsParams.vel.z / player->physicsParams.maxVel), -0.007f, 0.007f);
+		}
 
 		// smooth out crouching and slopes so it's not so static
 		if (player->physicsParams.physflags & SITH_PF_CROUCHING)
@@ -960,7 +982,7 @@ void jkPlayer_DrawPov()
 #ifdef DYNAMIC_POV
 		// Added: autoaim pov model orient
 		rdVector3 aimVector = {0.0f, 64.0f, 0.0f};
-		if ((sithWeapon_bAutoAim & 1) != 0 && !sithNet_isMulti)
+		if ((sithWeapon_bAutoAim & 1) != 0 && !sithNet_isMulti && !jkPlayer_aimLock)
 		{
 			int hasTarget = 0;
 
@@ -1030,7 +1052,8 @@ void jkPlayer_DrawPov()
 		rdMatrix34 aimMat;
 		rdMatrix_Identity34(&aimMat);
 		rdMatrix_PreTranslate34(&aimMat, &trans);
-		rdMatrix_PreMultiply34(&aimMat, &rotateMatNoWaggle);
+		if(!jkPlayer_aimLock)
+			rdMatrix_PreMultiply34(&aimMat, &rotateMatNoWaggle);
 		rdVector_Copy3(&aimVector, &jkSaber_aimVector);
 		rdMatrix_TransformPoint34Acc(&aimVector, &aimMat);
 		sithCamera_currentCamera->rdCam.fnProject(&jkPlayer_crosshairPos, &aimVector);
