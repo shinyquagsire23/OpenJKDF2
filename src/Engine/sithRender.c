@@ -2035,6 +2035,10 @@ void sithRender_RenderAlphaSurfaces()
 					sithRender_idxInfo.paGreenIntensities +
 					sithRender_idxInfo.numVertices;
 			}
+
+			meshinfo_out.paGreenIntensities = v9->paGreenIntensities;
+			meshinfo_out.paRedIntensities = v9->paRedIntensities;
+			meshinfo_out.paBlueIntensities = v9->paBlueIntensities;
 			rdPrimit3_ClipFaceRGB(surfaceSector->clipFrustum, v9->geometryMode, v9->lightingMode, v9->textureMode, &sithRender_idxInfo, &meshinfo_out, &v0->surfaceInfo.face.clipIdk);
 		}
 #else
