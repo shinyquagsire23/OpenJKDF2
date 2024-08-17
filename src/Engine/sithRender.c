@@ -2008,7 +2008,14 @@ void sithRender_RenderAlphaSurfaces()
         }
 
 #ifdef RGB_THING_LIGHTS
-		if (rdGetVertexColorMode() == 0)
+		// fixme: there's some weird flickering happening on alpha surfaces now...
+		meshinfo_out.paDynamicLightR = v9->vertexIntensities;
+		meshinfo_out.paDynamicLightG = v9->vertexIntensities;
+		meshinfo_out.paDynamicLightB = v9->vertexIntensities;
+		rdPrimit3_ClipFace(surfaceSector->clipFrustum, v9->geometryMode, v9->lightingMode, v9->textureMode, &sithRender_idxInfo, &meshinfo_out, &v0->surfaceInfo.face.clipIdk);
+		
+		// fixme: disabled for now, results in black lighting
+		/*if (rdGetVertexColorMode() == 0)
 		{
 			sithRender_idxInfo.intensities = v0->surfaceInfo.intensities;
 			rdPrimit3_ClipFace(surfaceSector->clipFrustum, v9->geometryMode, v9->lightingMode, v9->textureMode, &sithRender_idxInfo, &meshinfo_out, &v0->surfaceInfo.face.clipIdk);
@@ -2040,7 +2047,7 @@ void sithRender_RenderAlphaSurfaces()
 			meshinfo_out.paRedIntensities = v9->paRedIntensities;
 			meshinfo_out.paBlueIntensities = v9->paBlueIntensities;
 			rdPrimit3_ClipFaceRGB(surfaceSector->clipFrustum, v9->geometryMode, v9->lightingMode, v9->textureMode, &sithRender_idxInfo, &meshinfo_out, &v0->surfaceInfo.face.clipIdk);
-		}
+		}*/
 #else
 		rdPrimit3_ClipFace(surfaceSector->clipFrustum, v9->geometryMode, v9->lightingMode, v9->textureMode, &sithRender_idxInfo, &meshinfo_out, &v0->surfaceInfo.face.clipIdk);
 #endif
