@@ -1157,9 +1157,9 @@ void sithRender_RenderLevelGeometry()
                     sithRender_idxInfo.vertexPosIdx = v78;
                     meshinfo_out.paDynamicLight = v20->vertexIntensities;
 #ifdef RGB_THING_LIGHTS
-					meshinfo_out.paDynamicLightR = v20->paRedIntensities;
-					meshinfo_out.paDynamicLightG = v20->paGreenIntensities;
-					meshinfo_out.paDynamicLightB = v20->paBlueIntensities;
+					meshinfo_out.paDynamicLightR = v20->vertexIntensities;
+					meshinfo_out.paDynamicLightG = v20->vertexIntensities;
+					meshinfo_out.paDynamicLightB = v20->vertexIntensities;
 #endif
                     sithRender_idxInfo.vertexUVIdx = v79;
                     
@@ -2007,8 +2007,40 @@ void sithRender_RenderAlphaSurfaces()
             v9->geometryMode = RD_GEOMODE_SOLIDCOLOR;
         }
 
-        rdPrimit3_ClipFace(surfaceSector->clipFrustum, v9->geometryMode, v9->lightingMode, v9->textureMode, &sithRender_idxInfo, &meshinfo_out, &v0->surfaceInfo.face.clipIdk);
-        if ( meshinfo_out.numVertices < 3u )
+#ifdef RGB_THING_LIGHTS
+		if (rdGetVertexColorMode() == 0)
+		{
+			sithRender_idxInfo.intensities = v0->surfaceInfo.intensities;
+			rdPrimit3_ClipFace(surfaceSector->clipFrustum, v9->geometryMode, v9->lightingMode, v9->textureMode, &sithRender_idxInfo, &meshinfo_out, &v0->surfaceInfo.face.clipIdk);
+		}
+		else
+		{
+			if ((v0->surfaceFlags & SITH_SURFACE_1000000) == 0)
+			{
+				sithRender_idxInfo.paRedIntensities = (v0->surfaceInfo).intensities;
+				sithRender_idxInfo.paGreenIntensities = sithRender_idxInfo.paRedIntensities;
+				sithRender_idxInfo.paBlueIntensities = sithRender_idxInfo.paRedIntensities;
+			}
+			else
+			{
+				sithRender_idxInfo.paRedIntensities =
+					(v0->surfaceInfo).intensities +
+					sithRender_idxInfo.numVertices;
+
+				sithRender_idxInfo.paGreenIntensities =
+					sithRender_idxInfo.paRedIntensities +
+					sithRender_idxInfo.numVertices;
+
+				sithRender_idxInfo.paBlueIntensities =
+					sithRender_idxInfo.paGreenIntensities +
+					sithRender_idxInfo.numVertices;
+			}
+			rdPrimit3_ClipFaceRGB(surfaceSector->clipFrustum, v9->geometryMode, v9->lightingMode, v9->textureMode, &sithRender_idxInfo, &meshinfo_out, &v0->surfaceInfo.face.clipIdk);
+		}
+#else
+		rdPrimit3_ClipFace(surfaceSector->clipFrustum, v9->geometryMode, v9->lightingMode, v9->textureMode, &sithRender_idxInfo, &meshinfo_out, &v0->surfaceInfo.face.clipIdk);
+#endif
+		if ( meshinfo_out.numVertices < 3u )
         {
             continue;
         }
