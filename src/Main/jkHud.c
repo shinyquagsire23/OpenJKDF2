@@ -1197,10 +1197,11 @@ void jkHud_DrawGPU()
     {
 #ifdef DYNAMIC_POV
 		// draw crosshair on projected position
-		v20 = (double)Video_format.height * (0.0015625 / 3.0) * 4.0 * jkPlayer_crosshairScale;
+		v20 = (double)Video_format.height * (0.0015625 / 3.0) * jkPlayer_crosshairScale;
 		double tex_w = jkHud_pCrosshair->mipSurfaces[0]->format.width;
 		double tex_h = jkHud_pCrosshair->mipSurfaces[0]->format.height;
-		std3D_DrawUIBitmapRGBA(jkHud_pCrosshair, 0, jkPlayer_crosshairPos.x - tex_w / 2.0, jkPlayer_crosshairPos.y - tex_h / 2.0, NULL, v20, v20, 1, 0xFF, 0xFF, 0xFF, 0xFF);
+		//v20 *= (32.0f / tex_w);
+		std3D_DrawUIBitmapRGBA(jkHud_pCrosshair, 0, jkPlayer_crosshairPos.x - tex_w * v20 / 2.0, jkPlayer_crosshairPos.y - tex_h * v20 / 2.0, NULL, v20, v20, 1, 0xFF, 0xFF, 0xFF, 0x0);
 		//std3D_DrawUIBitmap(jkHud_pCrosshair, 0, v22, v23, NULL, jkPlayer_crosshairScale, 1);
 #else
         uint32_t tmpInt;
