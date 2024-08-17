@@ -70,6 +70,7 @@ static rdVector3 jkSaber_swayOffset;
 static rdVector3 jkPlayer_idleWaggleVec;
 static float jkPlayer_idleWaggleSpeed;
 static float jkPlayer_idleWaggleSmooth;
+static rdVector3 jkPlayer_pushAngles;
 
 rdVector3 jkPlayer_crosshairPos;
 #endif
@@ -238,6 +239,7 @@ void jkPlayer_ResetVars()
 	rdVector_Zero3(&jkSaber_aimVector);
 	rdVector_Zero3(&jkSaber_swayOffset);
 	rdVector_Zero3(&jkPlayer_idleWaggleVec);
+	rdVector_Zero3(&jkPlayer_pushAngles);
 	jkPlayer_idleWaggleSpeed = 0.0f;
 	jkPlayer_idleWaggleSmooth = 0.0f;
 #endif
@@ -957,32 +959,62 @@ void jkPlayer_DrawPov()
 
 #ifdef DYNAMIC_POV
 		// Added: autoaim pov model orient
-		rdVector3 aimVector = {0.0f, 5.0f, 0.0f};
+		rdVector3 aimVector = {0.0f, 64.0f, 0.0f};
 		if ((sithWeapon_bAutoAim & 1) != 0 && !sithNet_isMulti)
 		{
+			int hasTarget = 0;
+
 			// calculate a coarse auto-aim for some sense of where the weapon is pointing 
 			// since projectiles still come from the fireoffset, we don't want it to wander too far or be precise
 			rdMatrix34 autoAimMat;
 			sithThing* pTarget = sithWeapon_ProjectileAutoAim(&autoAimMat, player, &viewMat, &player->position, 15.0f, 20.0f);
-			if(pTarget)
-			{		
+			if(!pTarget)
+			{
+				// no target, do a sector/thing ray cast to adjust the crosshair distance
+				rdVector3 hitPos;
+				rdVector_Copy3(&hitPos, &player->position);
+				rdVector_MultAcc3(&hitPos, &viewMat.lvec, 1000.0f);
+				sithSector* sector = sithCollision_GetSectorLookAt(player->sector, &player->position, &hitPos, 0.0);
+				if (sector)
+				{
+					rdVector_Sub3(&aimVector, &hitPos, &player->position);
+					rdMatrix_LookAt(&autoAimMat, &player->position, &hitPos, 0.0);
+					hasTarget = 1;
+				}
+			}
+			else
+			{
+				rdVector_Sub3(&aimVector, &pTarget->position, &player->position);
+				hasTarget = 1;
+			}
+
+			if(hasTarget)
+			{
 				// apply inverse of the original look orient to get a local transform
 				rdMatrix34 invOrient;
 				rdMatrix_InvertOrtho34(&invOrient, &viewMat);
 				rdMatrix_PostMultiply34(&autoAimMat, &invOrient);
-			
-				// get the aim vector
-				rdVector_Sub3(&aimVector, &pTarget->position, &player->position);
 				rdMatrix_TransformVector34Acc(&aimVector, &invOrient);
 				rdVector_Zero3(&autoAimMat.scale);
+
+				// if we're very close, lower the weapon
+				static const float aimDist = 0.2f;
+				float aimLen = rdVector_Len3(&aimVector);
+				rdVector3 pushAngles = { 0.0f, 0.0f, 0.0f };
+				if(aimLen <= aimDist)
+				{
+					pushAngles.x = -(aimDist - aimLen) * 25.0f / aimDist;
+				}
+				jkPlayer_pushAngles.x = (pushAngles.x - jkPlayer_pushAngles.x) * 8.0f * min(sithTime_deltaSeconds, 0.02f) + jkPlayer_pushAngles.x;
+				rdMatrix_PreRotate34(&viewMat, &jkPlayer_pushAngles);
 
 				// extract the angles so we can do a lazy interpolation
 				rdVector3 angles;
 				rdMatrix_ExtractAngles34(&autoAimMat, &angles);
 			
-				jkSaber_aimAngles.x = (angles.x - jkSaber_aimAngles.x) * 6.0f * min(sithTime_deltaSeconds, 0.02f) + jkSaber_aimAngles.x;
-				jkSaber_aimAngles.y = (angles.y - jkSaber_aimAngles.y) * 6.0f * min(sithTime_deltaSeconds, 0.02f) + jkSaber_aimAngles.y;
-				jkSaber_aimAngles.z = (angles.z - jkSaber_aimAngles.z) * 6.0f * min(sithTime_deltaSeconds, 0.02f) + jkSaber_aimAngles.z;
+				jkSaber_aimAngles.x = (angles.x - jkSaber_aimAngles.x) * 8.0f * min(sithTime_deltaSeconds, 0.02f) + jkSaber_aimAngles.x;
+				jkSaber_aimAngles.y = (angles.y - jkSaber_aimAngles.y) * 8.0f * min(sithTime_deltaSeconds, 0.02f) + jkSaber_aimAngles.y;
+				jkSaber_aimAngles.z = (angles.z - jkSaber_aimAngles.z) * 8.0f * min(sithTime_deltaSeconds, 0.02f) + jkSaber_aimAngles.z;
 			
 				rdMatrix_BuildRotate34(&autoAimMat, &jkSaber_aimAngles);
 				rdMatrix_PreMultiply34(&viewMat, &autoAimMat);
