@@ -48,7 +48,11 @@ int rdCamera_NewEntry(rdCamera *camera, float fov, float a3, float zNear, float 
         camera->pClipFrustum->field_0.y = zNear;
         camera->pClipFrustum->field_0.z = zFar;
         camera->screenAspectRatio = aspectRatio;
+	#ifdef RGB_AMBIENT
+		rdVector_Zero3(&camera->ambientLight);
+	#else
         camera->ambientLight = 0.0;
+	#endif
         camera->numLights = 0;
         camera->attenuationMin = 0.2;
         camera->attenuationMax = 0.1;
@@ -390,10 +394,17 @@ void rdCamera_PerspProjectSquareLst(rdVector3 *vertices_out, rdVector3 *vertices
     }
 }
 
+#ifdef RGB_AMBIENT
+void rdCamera_SetAmbientLight(rdCamera* camera, rdVector3* amt)
+{
+	rdVector_Copy3(&camera->ambientLight, amt);
+}
+#else
 void rdCamera_SetAmbientLight(rdCamera *camera, float amt)
 {
     camera->ambientLight = amt;
 }
+#endif
 
 void rdCamera_SetAttenuation(rdCamera *camera, float minVal, float maxVal)
 {

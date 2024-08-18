@@ -190,7 +190,11 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     }
     
     procEntry->geometryMode = procEntry->geometryMode;
+#ifdef RGB_AMBIENT
+	if (rdroid_curRenderOptions & 2 && rdCamera_pCurCamera->ambientLight.x >= 1.0 && rdCamera_pCurCamera->ambientLight.y >= 1.0 && rdCamera_pCurCamera->ambientLight.z >= 1.0)
+#else
     if ( rdroid_curRenderOptions & 2 && rdCamera_pCurCamera->ambientLight >= 1.0 )
+#endif
     {
         procEntry->lightingMode = RD_LIGHTMODE_FULLYLIT;
     }
@@ -237,14 +241,25 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
 
     rdCamera_pCurCamera->fnProjectLst(mesh_out.verticesOrig, mesh_out.verticesProjected, mesh_out.numVertices);
 
+#ifdef RGB_AMBIENT
+	if (rdroid_curRenderOptions & 2)
+		rdVector_Copy3(&procEntry->ambientLight, &rdCamera_pCurCamera->ambientLight);
+	else
+		rdVector_Zero3(&procEntry->ambientLight);
+#else
     if ( rdroid_curRenderOptions & 2 )
         procEntry->ambientLight = rdCamera_pCurCamera->ambientLight;
     else
         procEntry->ambientLight = 0.0;
+#endif
 
     if ( procEntry->lightingMode )
     {
-        if ( procEntry->ambientLight < 1.0 )
+#ifdef RGB_AMBIENT
+		if (procEntry->ambientLight.x < 1.0 || procEntry->ambientLight.y < 1.0 || procEntry->ambientLight.z < 1.0)
+#else
+		if ( procEntry->ambientLight < 1.0 )
+#endif
         {
             if ( procEntry->lightingMode == 2 )
             {

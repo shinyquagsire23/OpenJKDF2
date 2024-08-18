@@ -53,7 +53,11 @@ void rdCamera_PerspProject(rdVector3 *out, rdVector3 *v);
 void rdCamera_PerspProjectLst(rdVector3 *vertices_out, rdVector3 *vertices_in, unsigned int num_vertices);
 void rdCamera_PerspProjectSquare(rdVector3 *out, rdVector3 *v);
 void rdCamera_PerspProjectSquareLst(rdVector3 *vertices_out, rdVector3 *vertices_in, unsigned int num_vertices);
-void rdCamera_SetAmbientLight(rdCamera *camera, float amt);
+#ifdef RGB_AMBIENT
+void rdCamera_SetAmbientLight(rdCamera *camera, rdVector3* amt);
+#else
+void rdCamera_SetAmbientLight(rdCamera* camera, float amt);
+#endif
 void rdCamera_SetAttenuation(rdCamera *camera, float minVal, float maxVal);
 int rdCamera_AddLight(rdCamera *camera, rdLight *light, rdVector3 *lightPos);
 int rdCamera_ClearLights(rdCamera *camera);

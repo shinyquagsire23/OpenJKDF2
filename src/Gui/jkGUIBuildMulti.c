@@ -670,7 +670,12 @@ int jkGuiBuildMulti_DisplayModel()
     jkGuiBuildMulti_lightPos.z = 0.0;
     jkGuiBuildMulti_light.intensity = 4.0;
     rdCamera_AddLight(jkGuiBuildMulti_pCamera, &jkGuiBuildMulti_light, &jkGuiBuildMulti_lightPos);
+#ifdef RGB_AMBIENT
+	rdVector3 amb = {0.4, 0.4, 0.4};
+	rdCamera_SetAmbientLight(jkGuiBuildMulti_pCamera, &amb);
+#else
     rdCamera_SetAmbientLight(jkGuiBuildMulti_pCamera, 0.4);
+#endif
     jkGuiBuildMulti_fnMatLoader = rdMaterial_RegisterLoader(jkGuiBuildMulti_MatLoader);
     jkGuiBuildMulti_fnModelLoader = rdModel3_RegisterLoader(jkGuiBuildMulti_ModelLoader);
     jkGuiBuildMulti_fnKeyframeLoader = rdKeyframe_RegisterLoader(jkGuiBuildMulti_KeyframeLoader);

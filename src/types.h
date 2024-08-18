@@ -494,7 +494,11 @@ typedef struct rdCamera
     rdClipFrustum *pClipFrustum;
     void (*fnProject)(rdVector3 *, rdVector3 *);
     void (*fnProjectLst)(rdVector3 *, rdVector3 *, unsigned int);
+#ifdef RGB_AMBIENT
+	rdVector3 ambientLight;
+#else
     float ambientLight;
+#endif
     int numLights;
     rdLight* lights[64];
     rdVector3 lightPositions[64];
@@ -591,7 +595,11 @@ typedef struct rdProcEntry
 #endif
     rdMaterial* material;
     uint32_t wallCel;
-    float ambientLight;
+#ifdef RGB_AMBIENT
+    rdVector3 ambientLight;
+#else
+	float ambientLight;
+#endif
     float light_level_static;
     float extralight;
     rdColormap* colormap;
@@ -2391,6 +2399,9 @@ typedef struct sithSector
 {
     uint32_t id;
     float ambientLight;
+#ifdef RGB_AMBIENT
+	rdVector3 ambientRGB;
+#endif
     float extraLight;
     rdColormap* colormap;
     rdVector3 tint;

@@ -765,7 +765,11 @@ void sithRender_RenderLevelGeometry()
     int v23; // ecx
     int v24; // eax
     unsigned int v28; // ebp
+#ifdef RGB_AMBIENT
+	rdVector3 v29;
+#else
     float v29; // ecx
+#endif
     float *v31; // eax
     unsigned int v32; // ecx
     float *v33; // edx
@@ -778,7 +782,11 @@ void sithRender_RenderLevelGeometry()
     rdTexMode_t texMode; // ecx
     rdTexMode_t texMode2; // eax
     unsigned int num_vertices; // ebp
+#ifdef RGB_AMBIENT
+	rdVector3 v49;
+#else
     float v49; // edx
+#endif
     float *v51; // eax
     unsigned int v52; // ecx
     float *v53; // edx
@@ -796,8 +804,12 @@ void sithRender_RenderLevelGeometry()
     float v67; // [esp+14h] [ebp-50h]
     BOOL v68; // [esp+18h] [ebp-4Ch]
     sithSector *level_idk; // [esp+1Ch] [ebp-48h]
+#ifdef RGB_AMBIENT
+	rdVector3 a2;
+#else
     float a2; // [esp+20h] [ebp-44h]
-    int v71; // [esp+24h] [ebp-40h]
+#endif
+	int v71; // [esp+24h] [ebp-40h]
     int v72; // [esp+28h] [ebp-3Ch]
     rdTexinfo *v73; // [esp+2Ch] [ebp-38h]
     int v74; // [esp+30h] [ebp-34h]
@@ -844,15 +856,28 @@ void sithRender_RenderLevelGeometry()
         level_idk = sithRender_aSectors[v72];
         if ( sithRender_lightingIRMode )
         {
+#ifdef RGB_AMBIENT
+			a2.x = a2.y = a2.z = sithRender_f_83198C;
+			rdCamera_SetAmbientLight(rdCamera_pCurCamera, &a2);
+#else
             a2 = sithRender_f_83198C;
-            rdCamera_SetAmbientLight(rdCamera_pCurCamera, sithRender_f_83198C);
+            rdCamera_SetAmbientLight(rdCamera_pCurCamera, sithRender_f_83198C)
+#endif
         }
         else
         {
+#ifdef RGB_AMBIENT
+			float baseLight = level_idk->extraLight + sithRender_008d4098;
+			a2.x = stdMath_Clamp(baseLight + level_idk->ambientRGB.x, 0.0, 1.0);
+			a2.y = stdMath_Clamp(baseLight + level_idk->ambientRGB.y, 0.0, 1.0);
+			a2.z = stdMath_Clamp(baseLight + level_idk->ambientRGB.z, 0.0, 1.0);
+			rdCamera_SetAmbientLight(rdCamera_pCurCamera, &a2);
+#else
             float baseLight = level_idk->ambientLight + level_idk->extraLight + sithRender_008d4098;
             a2 = stdMath_Clamp(baseLight, 0.0, 1.0);
             rdCamera_SetAmbientLight(rdCamera_pCurCamera, a2);
-        }
+#endif
+		}
         rdColormap_SetCurrent(level_idk->colormap);
         v68 = level_idk->colormap == sithWorld_pCurrentWorld->colormaps;
         rdSetProcFaceUserData(level_idk->id);
@@ -1006,16 +1031,30 @@ void sithRender_RenderLevelGeometry()
                 rdCamera_pCurCamera->fnProjectLst(procEntry->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
                 if ( sithRender_lightingIRMode )
                 {
+#ifdef RGB_AMBIENT
+					v49.x = v49.y = v49.z = sithRender_f_83198C;
+					procEntry->light_level_static = 0.0;
+					rdVector_Copy3(&procEntry->ambientLight, &v49);
+#else
                     v49 = sithRender_f_83198C;
                     procEntry->light_level_static = 0.0;
                     procEntry->ambientLight = v49;
+#endif
                 }
                 else
                 {
+#ifdef RGB_AMBIENT
+					procEntry->ambientLight.x = procEntry->ambientLight.y = procEntry->ambientLight.z = stdMath_Clamp(level_idk->extraLight + sithRender_008d4098, 0.0, 1.0);
+#else
                     procEntry->ambientLight = stdMath_Clamp(level_idk->extraLight + sithRender_008d4098, 0.0, 1.0);
+#endif
                 }
+#ifdef RGB_AMBIENT
+				if (procEntry->ambientLight.x >= 1.0 && procEntry->ambientLight.y >= 1.0 && procEntry->ambientLight.z >= 1.0)
+#else
                 if ( procEntry->ambientLight >= 1.0 )
-                {
+#endif
+				{
                     if ( v68 )
                     {
                         procEntry->lightingMode = RD_LIGHTMODE_FULLYLIT;
@@ -1229,16 +1268,30 @@ void sithRender_RenderLevelGeometry()
 
                     if ( sithRender_lightingIRMode )
                     {
+#ifdef RGB_AMBIENT
+						v29.x = v29.y = v29.z = sithRender_f_83198C;
+						v20->light_level_static = 0.0;
+						rdVector_Copy3(&v20->ambientLight, &v29);
+#else
                         v29 = sithRender_f_83198C;
                         v20->light_level_static = 0.0;
                         v20->ambientLight = v29;
+#endif
                     }
                     else
                     {
+#ifdef RGB_AMBIENT
+						v20->ambientLight.x = v20->ambientLight.y = v20->ambientLight.z = stdMath_Clamp(level_idk->extraLight + sithRender_008d4098, 0.0, 1.0);
+#else
                         v20->ambientLight = stdMath_Clamp(level_idk->extraLight + sithRender_008d4098, 0.0, 1.0);
+#endif
                     }
 
+#ifdef RGB_AMBIENT
+					if (v20->ambientLight.x >= 1.0 && v20->ambientLight.y >= 1.0 && v20->ambientLight.z >= 1.0)
+#else
                     if ( v20->ambientLight >= 1.0 )
+#endif
                     {
                         if ( v68 )
                         {
@@ -1363,8 +1416,12 @@ LABEL_150:
                 continue;
             }
 
+#ifdef RGB_AMBIENT
+			if (a2.x >= 1.0 && a2.y >= 1.0 && a2.z >= 1.0)
+#else
             if ( a2 >= 1.0 )
-                i->rdthing.desiredLightMode = RD_LIGHTMODE_FULLYLIT;
+#endif
+				i->rdthing.desiredLightMode = RD_LIGHTMODE_FULLYLIT;
 
             // MOTS added
 #ifdef JKM_LIGHTING
@@ -1621,8 +1678,12 @@ void sithRender_RenderThings()
     int texMode2; // eax
     rdLightMode_t lightMode; // eax
     float v12; // [esp-Ch] [ebp-28h]
+#ifdef RGB_AMBIENT
+	rdVector3 a2;
+#else
     float a2; // [esp+8h] [ebp-14h]
-    float clipRadius; // [esp+Ch] [ebp-10h]
+#endif
+	float clipRadius; // [esp+Ch] [ebp-10h]
     uint32_t i; // [esp+14h] [ebp-8h]
     BOOL v16; // [esp+18h] [ebp-4h]
 
@@ -1641,12 +1702,23 @@ void sithRender_RenderThings()
         v1 = sithRender_aSectors2[i];
         if ( sithRender_lightingIRMode )
         {
+#ifdef RGB_AMBIENT
+			a2.x = a2.y = a2.z = sithRender_f_831990;
+#else
             a2 = sithRender_f_831990;
+#endif
         }
         else
         {
-            v2 = v1->ambientLight + v1->extraLight + sithRender_008d4098;
+#ifdef RGB_AMBIENT
+			v2 = v1->extraLight + sithRender_008d4098;
+			a2.x = stdMath_Clamp(v1->ambientRGB.x + v2, 0.0, 1.0);
+			a2.y = stdMath_Clamp(v1->ambientRGB.y + v2, 0.0, 1.0);
+			a2.z = stdMath_Clamp(v1->ambientRGB.z + v2, 0.0, 1.0);
+#else
+			v2 = v1->ambientLight + v1->extraLight + sithRender_008d4098;
             a2 = stdMath_Clamp(v2, 0.0, 1.0);
+#endif
         }
         rdColormap_SetCurrent(v1->colormap);
         thingIter = v1->thingsList;
@@ -1815,17 +1887,40 @@ void sithRender_RenderThings()
                     }
                     if ( (thingIter->thingflags & SITH_TF_LIGHT) != 0
                       && thingIter->light > 0.0
-                      && a2 <= stdMath_Clamp(thingIter->light, 0.0, 1.0) )
+					#ifdef RGB_AMBIENT
+						&& (a2.x <= stdMath_Clamp(thingIter->light, 0.0, 1.0) && a2.y <= stdMath_Clamp(thingIter->light, 0.0, 1.0) && a2.z <= stdMath_Clamp(thingIter->light, 0.0, 1.0))
+					#else
+                      && a2 <= stdMath_Clamp(thingIter->light, 0.0, 1.0)
+					#endif 
+					)
                     {
+#ifdef RGB_AMBIENT
+						rdVector3 lightColor;
+						rdVector_Zero3(&lightColor);
+						rdVector_MultAcc3(&lightColor, &thingIter->lightColor, thingIter->light);
+						lightColor.x = stdMath_Clamp(lightColor.x, 0.0, 1.0);
+						lightColor.y = stdMath_Clamp(lightColor.y, 0.0, 1.0);
+						lightColor.z = stdMath_Clamp(lightColor.z, 0.0, 1.0);
+						rdCamera_SetAmbientLight(rdCamera_pCurCamera, &lightColor);
+#else
                         rdCamera_SetAmbientLight(rdCamera_pCurCamera, stdMath_Clamp(thingIter->light, 0.0, 1.0));
-    
+#endif    
                     }
                     else
                     {
-                        rdCamera_SetAmbientLight(rdCamera_pCurCamera, a2);
+#ifdef RGB_AMBIENT
+						rdCamera_SetAmbientLight(rdCamera_pCurCamera, &a2);
+#else
+						rdCamera_SetAmbientLight(rdCamera_pCurCamera, a2);
+#endif
                     }
-                    if ( a2 >= 1.0 )
-                    {
+
+#ifdef RGB_AMBIENT
+					if (a2.x >= 1.0 && a2.y >= 1.0 && a2.z >= 1.0)
+#else
+					if ( a2 >= 1.0 )
+#endif
+					{
                         lightMode = thingIter->rdthing.desiredLightMode;
                         if ( v16 )
                         {
@@ -1837,7 +1932,8 @@ void sithRender_RenderThings()
                                 lightMode = RD_LIGHTMODE_DIFFUSE;
                         }
                     }
-                    else if ( (thingIter->thingflags & SITH_TF_IGNOREGOURAUDDISTANCE) == 0 && yval >= (double)sithWorld_pCurrentWorld->gouradDistance )
+                    else
+					if ( (thingIter->thingflags & SITH_TF_IGNOREGOURAUDDISTANCE) == 0 && yval >= (double)sithWorld_pCurrentWorld->gouradDistance )
                     {
                         lightMode = thingIter->rdthing.desiredLightMode;
                         if ( lightMode > RD_LIGHTMODE_DIFFUSE)
@@ -1922,8 +2018,12 @@ void sithRender_RenderAlphaSurfaces()
 {
     sithSurface *v0; // edi
     sithSector *v1; // esi
-    double v2; // st7
-    unsigned int v4; // ebp
+ #ifdef RGB_AMBIENT
+	rdVector3 v2;
+ #else
+	double v2; // st7
+ #endif
+	unsigned int v4; // ebp
     int v7; // eax
     rdProcEntry *v9; // esi
     float *v20; // eax
@@ -1949,12 +2049,27 @@ void sithRender_RenderAlphaSurfaces()
         surfaceSector = v1;
         if ( sithRender_lightingIRMode )
         {
+#ifdef RGB_AMBIENT
+			rdVector3 amb;
+			amb.x = amb.y = amb.z = sithRender_f_83198C;
+			rdCamera_SetAmbientLight(rdCamera_pCurCamera, &amb);
+#else
             rdCamera_SetAmbientLight(rdCamera_pCurCamera, sithRender_f_83198C);
+#endif
         }
         else
         {
+#ifdef RGB_AMBIENT
+			v2.x = v2.y = v2.z = v1->extraLight + sithRender_008d4098;
+			rdVector_Add3Acc(&v2, &v1->ambientRGB);
+			v2.x = stdMath_Clamp(v2.x, 0.0, 1.0);
+			v2.y = stdMath_Clamp(v2.y, 0.0, 1.0);
+			v2.z = stdMath_Clamp(v2.z, 0.0, 1.0);
+			rdCamera_SetAmbientLight(rdCamera_pCurCamera, &v2);
+#else
             v2 = v1->extraLight + v1->ambientLight + sithRender_008d4098;
             rdCamera_SetAmbientLight(rdCamera_pCurCamera, stdMath_Clamp(v2, 0.0, 1.0));
+#endif
         }
         rdColormap_SetCurrent(v1->colormap);
 
@@ -2057,10 +2172,18 @@ void sithRender_RenderAlphaSurfaces()
         }
         rdCamera_pCurCamera->fnProjectLst(v9->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
         
+#ifdef RGB_AMBIENT
+		v9->ambientLight.x = v9->ambientLight.y = v9->ambientLight.z = stdMath_Clamp(surfaceSector->extraLight + sithRender_008d4098, 0.0, 1.0);
+#else
         v9->ambientLight = stdMath_Clamp(surfaceSector->extraLight + sithRender_008d4098, 0.0, 1.0);
+#endif
 
-        if ( v9->ambientLight < 1.0 )
-        {
+#ifdef RGB_AMBIENT
+		if (v9->ambientLight.x < 1.0 || v9->ambientLight.y < 1.0 || v9->ambientLight.z < 1.0)
+#else
+		if ( v9->ambientLight < 1.0 )
+#endif
+		{
             if ( v9->lightingMode == RD_LIGHTMODE_DIFFUSE)
             {
                 if ( v9->light_level_static >= 1.0 && surfaceSector->colormap == sithWorld_pCurrentWorld->colormaps )

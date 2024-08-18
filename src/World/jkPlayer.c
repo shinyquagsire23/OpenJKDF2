@@ -986,6 +986,14 @@ void jkPlayer_DrawPov()
         rdSetOcclusionMethod(0);
 #endif
 
+#ifdef RGB_AMBIENT
+		rdVector3 ambLight;
+		rdVector_Copy3(&ambLight, &sithCamera_currentCamera->sector->ambientRGB);
+		ambLight.x += sithCamera_currentCamera->sector->extraLight;
+		ambLight.y += sithCamera_currentCamera->sector->extraLight;
+		ambLight.z += sithCamera_currentCamera->sector->extraLight;
+		rdCamera_SetAmbientLight(&sithCamera_currentCamera->rdCam, &ambLight);
+#else
         float ambLight = sithCamera_currentCamera->sector->extraLight + sithCamera_currentCamera->sector->ambientLight;
         if ( ambLight < 0.0 )
         {
@@ -995,9 +1003,10 @@ void jkPlayer_DrawPov()
         {
             ambLight = 1.0;
         }
+		rdCamera_SetAmbientLight(&sithCamera_currentCamera->rdCam, ambLight);
+#endif
 
-        rdCamera_SetAmbientLight(&sithCamera_currentCamera->rdCam, ambLight);
-        rdColormap_SetCurrent(sithCamera_currentCamera->sector->colormap);
+		rdColormap_SetCurrent(sithCamera_currentCamera->sector->colormap);
 
         rdMatrix_Copy34(&viewMat, &sithCamera_currentCamera->viewMat);
         rdVector_Copy3(&trans, &playerThings[playerThingIdx].actorThing->actorParams.eyeOffset);

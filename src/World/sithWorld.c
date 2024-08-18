@@ -328,6 +328,42 @@ int sithWorld_NewEntry(sithWorld *pWorld)
                     sithPhysics_FindFloor(v16, 1);
                 }
             }
+#ifdef RGB_AMBIENT
+			// JED doesn't export colored ambient, so generate it on load
+			for (int i = 0; i < pWorld->numSectors; i++)
+			{
+				sithSector* sector = &pWorld->sectors[i];
+				rdVector_Zero3(&sector->ambientRGB);
+				double sflight = 0.0;
+				float total = 0.00001f;
+				for (int j = 0; j < pWorld->sectors[i].numSurfaces; j++)
+				{
+					sithSurface* surface = &pWorld->sectors[i].surfaces[j];
+					total += surface->surfaceInfo.face.numVertices;
+					for (int k = 0; k < surface->surfaceInfo.face.numVertices; ++k)
+					{
+						sflight += surface->surfaceInfo.face.extraLight;
+
+						rdVector3 col;
+						col.x = surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 1];
+						col.y = surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 2];
+						col.z = surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 3];
+						if (col.x < 0.0)
+							col.x = 0.0;
+						if (col.y < 0.0)
+							col.y = 0.0;
+						if (col.z < 0.0)
+							col.z = 0.0;
+						rdVector_Add3Acc(&sector->ambientRGB, &col);
+					}
+				}
+				sflight /= (float)pWorld->sectors[i].numSurfaces;
+				rdVector_InvScale3Acc(&sector->ambientRGB, total);
+				sector->ambientRGB.x = max(sflight, sector->ambientRGB.x);
+				sector->ambientRGB.y = max(sflight, sector->ambientRGB.y);
+				sector->ambientRGB.z = max(sflight, sector->ambientRGB.z);
+			}
+#endif
             if ( !sithWorld_Verify(pWorld) )
                 return 0;
         }

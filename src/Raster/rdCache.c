@@ -183,7 +183,11 @@ int rdCache_SendFaceListToHardware()
     double v23; // st7
     double v24; // st7
     double v25; // st7
+#ifdef RGB_AMBIENT
+	rdVector3 v26;
+#else
     double v26; // st7
+#endif
     double v27; // st7
     rdVector3 *iterating_6c_vtxs_; // esi
     int v35; // ecx
@@ -263,7 +267,11 @@ int rdCache_SendFaceListToHardware()
     int flags_idk_; // [esp+78h] [ebp-28h]
     int a3; // [esp+7Ch] [ebp-24h]
     int lighting_capability; // [esp+80h] [ebp-20h]
-    float v148; // [esp+84h] [ebp-1Ch]
+#ifdef RGB_AMBIENT
+    rdVector3 v148; // [esp+84h] [ebp-1Ch]
+#else
+	float v148; // [esp+84h] [ebp-1Ch]
+#endif
     int blue; // [esp+8Ch] [ebp-14h]
     int red_and_alpha; // [esp+98h] [ebp-8h]
     int green; // [esp+9Ch] [ebp-4h]
@@ -330,10 +338,18 @@ int rdCache_SendFaceListToHardware()
         mipmap_level = a3;
 
         flags_idk_ = flags_idk;
+
+#ifdef RGB_AMBIENT
+		if ((rdroid_curRenderOptions & 2) != 0)
+			rdVector_Copy3(&v148, &active_6c->ambientLight);
+		else
+			rdVector_Zero3(&v148);
+#else
         if ( (rdroid_curRenderOptions & 2) != 0 )
             v148 = active_6c->ambientLight;
         else
             v148 = 0.0;
+#endif
 
         // Added: We need to know if a face is double-sided
         if (active_6c->type & RD_FF_DOUBLE_SIDED && active_6c->light_flags)
@@ -515,6 +531,65 @@ int rdCache_SendFaceListToHardware()
 
         if ( v11.mipmap_related != 3 )
         {
+#ifdef RGB_AMBIENT
+			rdVector_Copy3(&v26, &v148);
+			if (v11.mipmap_related != 4)
+				continue;
+			if (lighting_capability == 1)
+			{
+				v27 = stdMath_Clamp(active_6c->extralight, 0.0, 1.0);
+
+				if (v27 > v148.x)
+					v26.x = stdMath_Clamp(active_6c->extralight, 0.0, 1.0);
+				else
+					v26.x = v148.x;
+
+				if (v27 > v148.y)
+					v26.y = stdMath_Clamp(active_6c->extralight, 0.0, 1.0);
+				else
+					v26.y = v148.y;
+
+				if (v27 > v148.z)
+					v26.z = stdMath_Clamp(active_6c->extralight, 0.0, 1.0);
+				else
+					v26.z = v148.z;
+
+				active_6c->light_level_static = (v26.x + v26.y + v26.z) * 0.3333f * 255.0;
+			}
+			else if (lighting_capability == 2)
+			{
+				v24 = active_6c->extralight + active_6c->light_level_static;
+				v25 = stdMath_Clamp(v24, 0.0, 1.0);
+				v26.x = stdMath_Clamp(v25, v148.x, 1.0);
+				v26.y = stdMath_Clamp(v25, v148.y, 1.0);
+				v26.z = stdMath_Clamp(v25, v148.z, 1.0);
+
+				active_6c->light_level_static = (v26.x + v26.y + v26.z) * 0.3333f * 255.0;
+			}
+			else if (lighting_capability == 3 && active_6c->numVertices)
+			{
+				//if (rdGetVertexColorMode() == 1)
+				{
+					float* iterRedIntense = active_6c->paRedIntensities;
+					float* iterGreenIntense = active_6c->paGreenIntensities;
+					float* iterBlueIntense = active_6c->paBlueIntensities;
+
+					vert_lights_iter_cnt = active_6c->numVertices;
+					do
+					{
+						*iterRedIntense = stdMath_Clamp(stdMath_Clamp(*iterRedIntense + active_6c->extralight, 0.0, 1.0), v148.x, 1.0) * 255.0;
+						*iterGreenIntense = stdMath_Clamp(stdMath_Clamp(*iterGreenIntense + active_6c->extralight, 0.0, 1.0), v148.y, 1.0) * 255.0;
+						*iterBlueIntense = stdMath_Clamp(stdMath_Clamp(*iterBlueIntense + active_6c->extralight, 0.0, 1.0), v148.z, 1.0) * 255.0;
+
+						++iterRedIntense;
+						++iterGreenIntense;
+						++iterBlueIntense;
+						--vert_lights_iter_cnt;
+					} while (vert_lights_iter_cnt);
+				}
+			}
+#else
+
             v26 = v148;
             if ( v11.mipmap_related != 4 )
                 continue;
@@ -584,7 +659,8 @@ int rdCache_SendFaceListToHardware()
                 }
 
                 //active_6c->light_level_static = v26 * 255.0;
-            }
+			}
+#endif
 
             iterating_6c_vtxs = active_6c->vertices;
             vertex_a = red_and_alpha << 8;
@@ -828,19 +904,62 @@ int rdCache_SendFaceListToHardware()
 solid_tri:
         if ( lighting_capability == 1 )
         {
+	#ifdef RGB_AMBIENT
+			v78 = stdMath_Clamp(active_6c->extralight, 0.0, 1.0);
+			v26.x = stdMath_Clamp(v78, v148.x, 1.0);
+			v26.y = stdMath_Clamp(v78, v148.y, 1.0);
+			v26.z = stdMath_Clamp(v78, v148.z, 1.0);
+			active_6c->light_level_static = (v26.x + v26.y + v26.z) * 0.3333f * 63.0;
+	#else
             v78 = stdMath_Clamp(stdMath_Clamp(active_6c->extralight, 0.0, 1.0), v148, 1.0);
             active_6c->light_level_static = v78 * 63.0;
+	#endif
         }
         else if ( lighting_capability == 2 )
         {
             v75 = active_6c->extralight + active_6c->light_level_static;
 
-            v76 = stdMath_Clamp(stdMath_Clamp(v75, 0.0, 1.0), v148, 1.0);
+#ifdef RGB_AMBIENT
+			v76 = stdMath_Clamp(v75, 0.0, 1.0);
+			v26.x = stdMath_Clamp(v76, v148.x, 1.0);
+			v26.y = stdMath_Clamp(v76, v148.y, 1.0);
+			v26.z = stdMath_Clamp(v76, v148.z, 1.0);
+
+			active_6c->light_level_static = (v26.x + v26.y + v26.z) * 0.3333f * 63.0;
+#else
+			v76 = stdMath_Clamp(stdMath_Clamp(v75, 0.0, 1.0), v148, 1.0);
             active_6c->light_level_static = v76 * 63.0;
+#endif
         }
         else if ( lighting_capability == 3 && active_6c->numVertices )
         {
-            // MOTS added
+#ifdef RGB_AMBIENT
+			//if (rdGetVertexColorMode() == 1)
+			{
+				float* iterRedIntense = active_6c->paRedIntensities;
+				float* iterGreenIntense = active_6c->paGreenIntensities;
+				float* iterBlueIntense = active_6c->paBlueIntensities;
+
+				v71 = active_6c->numVertices;
+				do
+				{
+					v73 = stdMath_Clamp(stdMath_Clamp(*iterRedIntense + active_6c->extralight, 0.0, 1.0), v148.x, 1.0);
+					*iterRedIntense = v73 * 63.0;
+
+					v73 = stdMath_Clamp(stdMath_Clamp(*iterGreenIntense + active_6c->extralight, 0.0, 1.0), v148.y, 1.0);
+					*iterGreenIntense = v73 * 63.0;
+
+					v73 = stdMath_Clamp(stdMath_Clamp(*iterBlueIntense + active_6c->extralight, 0.0, 1.0), v148.z, 1.0);
+					*iterBlueIntense = v73 * 63.0;
+
+					++iterRedIntense;
+					++iterGreenIntense;
+					++iterBlueIntense;
+					--v71;
+				} while (v71);
+			}
+#else
+			// MOTS added
 #ifdef JKM_LIGHTING
             if (rdGetVertexColorMode() == 1) {
                 float* iterRedIntense = active_6c->paRedIntensities;
@@ -883,6 +1002,7 @@ solid_tri:
                 }
                 while ( v71 );
             }
+#endif
             goto LABEL_232;
         }
         else

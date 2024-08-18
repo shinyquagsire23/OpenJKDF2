@@ -327,7 +327,11 @@ int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
     rdVector3 vertex_out; // [esp+18h] [ebp-3Ch]
     rdMatrix34 out; // [esp+24h] [ebp-30h]
     int v35; // [esp+58h] [ebp+4h]
+#ifdef RGB_AMBIENT
+	rdVector3 matrix_4_3a;
+#else
     float matrix_4_3a; // [esp+5Ch] [ebp+8h]
+#endif
 
     particle = thing->particlecloud;
     rdMatrix_TransformPoint34(&vertex_out, &matrix_4_3->scale, &rdCamera_pCurCamera->view_matrix);
@@ -338,13 +342,25 @@ int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
     if ( v3 != 2 )
     {
         rdMatrix_Multiply34(&out, &rdCamera_pCurCamera->view_matrix, matrix_4_3);
-        if ( rdroid_curRenderOptions & 2 )
+#ifdef RGB_AMBIENT
+		if (rdroid_curRenderOptions & 2)
+			rdVector_Copy3(&matrix_4_3a, &rdCamera_pCurCamera->ambientLight);
+		else
+			rdVector_Zero3(&matrix_4_3a);
+		if (matrix_4_3a.x < 1.0 || matrix_4_3a.y < 1.0 || matrix_4_3a.z < 1.0)
+#else
+		if ( rdroid_curRenderOptions & 2 )
             matrix_4_3a = rdCamera_pCurCamera->ambientLight;
         else
             matrix_4_3a = 0.0;
-        if ( matrix_4_3a < 1.0 )
-        {
-            if ( matrix_4_3a > 0.0 )
+		if ( matrix_4_3a < 1.0 )
+#endif
+		{
+#ifdef RGB_AMBIENT
+			if (matrix_4_3a.x > 0.0 || matrix_4_3a.y > 0.0 || matrix_4_3a.z > 0.0)
+#else
+			if ( matrix_4_3a > 0.0 )
+#endif
                 v35 = particle->lightingMode;
             else
                 v35 = 1;
