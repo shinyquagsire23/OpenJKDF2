@@ -136,6 +136,11 @@ rdSprite* sithSprite_LoadEntry(char *fpath)
                         
                         if ( rdSprite_NewEntry(sprite, fpath, typeid, mat, width, height, geometryMode, lightMode, textureMode, extralight, &off) )
                         {
+#ifdef DYNAMIC_POV
+							sprite->id = world->numSpritesLoaded;
+							if (sithWorld_pLoading->level_type_maybe & 1)
+								sprite->id |= 0x8000;
+#endif
                             stdHashTable_SetKeyVal(sithSprite_hashmap, sprite->path, sprite);
                             ++world->numSpritesLoaded;
                             return sprite;

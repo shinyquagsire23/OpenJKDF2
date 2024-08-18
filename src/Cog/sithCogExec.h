@@ -64,6 +64,9 @@ rdMaterial* sithCogExec_PopMaterial(sithCog *ctx);
 rdModel3* sithCogExec_PopModel3(sithCog *ctx);
 rdKeyframe* sithCogExec_PopKeyframe(sithCog *ctx);
 sithAIClass* sithCogExec_PopAIClass(sithCog *ctx);
+#ifdef DYNAMIC_POV
+rdSprite* sithCogExec_PopSprite(sithCog* ctx);
+#endif
 char* sithCogExec_PopString(sithCog *ctx);
 cogSymbolFunc_t sithCogExec_PopSymbolFunc(sithCog *cog_ctx);
 void sithCogExec_PushVar(sithCog *ctx, sithCogStackvar *val);

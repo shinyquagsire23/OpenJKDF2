@@ -774,6 +774,9 @@ enum COG_TYPE
     COG_TYPE_VECTOR = 11,
     COG_TYPE_MODEL = 12,
     COG_TYPE_AICLASS = 13,
+#ifdef DYNAMIC_POV
+	COG_TYPE_SPRITE = 14,
+#endif
 };
 
 enum COG_VARTYPE

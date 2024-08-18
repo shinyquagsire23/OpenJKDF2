@@ -34,6 +34,9 @@ typedef struct rdSprite
     rdFace face;
     rdVector2* vertexUVs;
     rdVector3 offset;
+#ifdef DYNAMIC_POV
+	int id;
+#endif
 } rdSprite;
 
 rdSprite* rdSprite_New(int type, char *fpath, char *materialFpath, float width, float height, int geometryMode, int lightMode, int textureMode, float extraLight, rdVector3 *offset);

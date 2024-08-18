@@ -30,6 +30,9 @@
 #include "stdPlatform.h"
 #include "Dss/sithDSSCog.h"
 #include "Dss/sithMulti.h"
+#ifdef DYNAMIC_POV
+#include "World/sithSprite.h"
+#endif
 
 #include "jk.h"
 
@@ -647,6 +650,9 @@ int sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogReference *cogIdk, char *
     rdModel3 *v15; // eax
     rdKeyframe *v17; // eax
     sithAIClass *v19; // eax
+#ifdef DYNAMIC_POV
+	rdSprite *sprite;
+#endif
 
     switch ( cogIdk->type )
     {
@@ -732,6 +738,19 @@ int sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogReference *cogIdk, char *
             }
             cogSymbol->val.data[0] = v15->id;
             return 1;
+
+		#ifdef DYNAMIC_POV
+		case COG_TYPE_SPRITE:
+			cogSymbol->val.type = COG_VARTYPE_INT;
+			sprite = sithSprite_LoadEntry(val);
+			if (!sprite)
+			{
+				cogSymbol->val.data[0] = -1;
+				return 0;
+			}
+			cogSymbol->val.data[0] = sprite->id;
+			return 1;
+		#endif
 
         case COG_TYPE_AICLASS:
             cogSymbol->val.type = COG_VARTYPE_INT;

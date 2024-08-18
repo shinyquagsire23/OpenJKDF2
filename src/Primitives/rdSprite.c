@@ -41,6 +41,9 @@ int rdSprite_NewEntry(rdSprite *sprite, char *spritepath, int type, char *materi
     sprite->face.textureMode = textureMode;
     sprite->face.extraLight = extraLight;
     sprite->face.material = rdMaterial_Load(material, 0, 0);
+#ifdef DYNAMIC_POV
+	sprite->id = -1;
+#endif
     if ( sprite->face.material )
     {
         sprite->face.numVertices = 4;

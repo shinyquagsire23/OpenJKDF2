@@ -678,6 +678,49 @@ rdModel3* sithCogExec_PopModel3(sithCog *ctx)
     return NULL;
 }
 
+#ifdef DYNAMIC_POV
+rdSprite* sithCogExec_PopSprite(sithCog* ctx)
+{
+	sithCogStackvar tmp;
+	int32_t idx;
+	sithWorld* world = sithWorld_pCurrentWorld;
+	if (!sithCogExec_PopValue(ctx, &tmp))
+	{
+		tmp.type = COG_VARTYPE_INT;
+		tmp.data[0] = -1;
+	}
+
+	if (tmp.type == COG_VARTYPE_INT)
+	{
+		idx = tmp.data[0];
+	}
+	else if (tmp.type == COG_VARTYPE_FLEX)
+	{
+		idx = (int)(double)tmp.dataAsFloat[0];
+	}
+	else
+	{
+		idx = -1;
+	}
+
+	if (idx == -1)
+		return NULL;
+
+	if (idx & 0x8000)
+	{
+		world = sithWorld_pStatic;
+		idx &= ~0x8000; // ?
+	}
+
+	if (world && idx >= 0 && idx < world->numSpritesLoaded)
+	{
+		return &world->sprites[idx];
+	}
+
+	return NULL;
+}
+#endif
+
 rdKeyframe* sithCogExec_PopKeyframe(sithCog *ctx)
 {
     sithCogStackvar tmp;

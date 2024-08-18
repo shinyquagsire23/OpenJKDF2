@@ -110,6 +110,12 @@ int sithCogParse_Load(char *cog_fpath, sithCogScript *cogscript, int unk)
             {
                 sithCogParse_ParseSymbol(cogscript, 12, unk);
             }
+		#ifdef DYNAMIC_POV
+			else if (!_strcmp(stdConffile_entry.args[0].value, "sprite"))
+			{
+				sithCogParse_ParseSymbol(cogscript, COG_TYPE_SPRITE, unk);
+			}
+		#endif
             else if ( !_strcmp(stdConffile_entry.args[0].value, "keyframe") )
             {
                 sithCogParse_ParseSymbol(cogscript, 7, unk);
