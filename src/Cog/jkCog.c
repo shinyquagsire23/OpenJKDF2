@@ -292,7 +292,11 @@ void jkCog_PlayPovKey(sithCog *ctx)
       && ((v5 = actorThing->type, v5 == SITH_THING_ACTOR) || v5 == SITH_THING_PLAYER)
       && (v6 = actorThing->playerInfo->povModel.puppet) != 0 )
     {
+#ifdef DYNAMIC_POV
+		v7 = sithPuppet_StartKey(v6, keyframe, v2, v2 + 2, v1, jkPlayer_PovModelCallback);
+#else
         v7 = sithPuppet_StartKey(v6, keyframe, v2, v2 + 2, v1, 0);
+#endif
         sithCogExec_PushInt(ctx, v7);
     }
     else
@@ -646,6 +650,27 @@ void jkCog_SetIdleWaggle(sithCog* ctx)
 			jkPlayer_SetIdleWaggle(pThing, &waggleVec, waggleSpeed, waggleSmooth);
 	}	
 }
+
+void jkCog_GetMuzzleOffset(sithCog* ctx)
+{
+	rdVector3 muzzleOffset;
+	sithCogExec_PopVector3(ctx, &muzzleOffset);
+	sithThing* pThing = sithCogExec_PopThing(ctx);
+	if (pThing)
+		jkPlayer_GetMuzzleOffset(pThing, &muzzleOffset);
+
+	sithCogExec_PushVector3(ctx, &muzzleOffset);
+}
+
+void jkCog_SetPovAutoAim(sithCog* ctx)
+{
+	float dist = sithCogExec_PopFlex(ctx);
+	float fov = sithCogExec_PopFlex(ctx);
+	sithThing* pThing = sithCogExec_PopThing(ctx);
+	if(pThing)
+		jkPlayer_SetPovAutoAim(pThing, fov, dist);
+}
+
 #endif
 
 void jkCog_GetChoice(sithCog *ctx)
@@ -1161,6 +1186,8 @@ void jkCog_RegisterVerbs()
 
 #ifdef DYNAMIC_POV
 	sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_SetIdleWaggle, "jksetidlewaggle");
+	sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_GetMuzzleOffset, "jkgetmuzzleoffset");
+	sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_SetPovAutoAim, "jksetpovautoaim");
 #endif
 
     if (Main_bMotsCompat) {

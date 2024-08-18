@@ -32,6 +32,10 @@
 #include "General/stdJSON.h"
 #include "Platform/std3D.h"
 #include "Main/sithCvar.h"
+#ifdef DYNAMIC_POV
+#include "World/sithSprite.h"
+#endif
+
 
 // DO NOT FORGET TO ADD TO jkPlayer_ResetVars()
 #ifdef QOL_IMPROVEMENTS
@@ -70,7 +74,10 @@ static rdVector3 jkSaber_swayOffset;
 static rdVector3 jkPlayer_idleWaggleVec;
 static float jkPlayer_idleWaggleSpeed;
 static float jkPlayer_idleWaggleSmooth;
+static float jkPlayer_povAutoAimFov;
+static float jkPlayer_povAutoAimDist;
 static rdVector3 jkPlayer_pushAngles;
+static rdVector3 jkPlayer_muzzleOffset;
 
 rdVector3 jkPlayer_crosshairPos;
 int jkPlayer_aimLock = 0;
@@ -244,9 +251,12 @@ void jkPlayer_ResetVars()
 	rdVector_Zero3(&jkSaber_swayOffset);
 	rdVector_Zero3(&jkPlayer_idleWaggleVec);
 	rdVector_Zero3(&jkPlayer_pushAngles);
+	rdVector_Zero3(&jkPlayer_muzzleOffset);
 	jkPlayer_idleWaggleSpeed = 0.0f;
 	jkPlayer_idleWaggleSmooth = 0.0f;
 	jkPlayer_aimLock = 0;
+	jkPlayer_povAutoAimFov = 0.0f;
+	jkPlayer_povAutoAimDist = 0.0f;
 #endif
 
 #ifdef FIXED_TIMESTEP_PHYS
@@ -817,6 +827,20 @@ int jkPlayer_ReadConf(wchar_t *name)
     return 0;
 }
 
+#ifdef DYNAMIC_POV
+static int jkPlayer_drawMuzzleFlash = 0;
+static int jkPlayer_muzzleFlashNode = -1;
+static rdThing jkPlayer_povMuzzleFlash;
+static rdSprite* jkPlayer_povMuzzleFlashSprite;
+void jkPlayer_PovModelCallback(sithThing* thing, int track, uint32_t a3)
+{
+	if(thing == playerThings[playerThingIdx].actorThing)
+	{
+		jkPlayer_drawMuzzleFlash = (a3 == 4) ? 1 : 0;
+	}
+}
+#endif
+
 void jkPlayer_SetPovModel(jkPlayerInfo *info, rdModel3 *model)
 {
     rdThing *thing; // esi
@@ -827,10 +851,39 @@ void jkPlayer_SetPovModel(jkPlayerInfo *info, rdModel3 *model)
         rdThing_FreeEntry(&info->povModel);
         rdThing_NewEntry(thing, info->actorThing);
 
+#ifdef DYNAMIC_POV
+		rdThing_FreeEntry(&jkPlayer_povMuzzleFlash);
+		rdThing_NewEntry(&jkPlayer_povMuzzleFlash, info->actorThing);
+
+		jkPlayer_povMuzzleFlashSprite = sithSprite_LoadEntry("muzzleflash.spr");
+		if(jkPlayer_povMuzzleFlashSprite)
+			rdThing_SetSprite3(&jkPlayer_povMuzzleFlash, jkPlayer_povMuzzleFlashSprite);
+		jkPlayer_muzzleFlashNode = -1;
+#endif
+
         // Added: nullptr check, for fixing UAF on second world load
         if (model) {
             rdThing_SetModel3(thing, model);
             info->povModel.puppet = rdPuppet_New(thing);
+#ifdef DYNAMIC_POV
+			for (uint32_t i = 0; i < 4; i++)
+			{
+				rdPuppetTrack* track = &info->povModel.puppet->tracks[i];
+				track->callback = jkPlayer_PovModelCallback;
+			}
+
+			// Look for a muzzle node, we do a search instead of using specific anim classes since weapons can have different hierarchy orders
+			for (int i = 0; i < playerThings[playerThingIdx].povModel.model3->numHierarchyNodes; i++)
+			{
+				int l = _strlen(playerThings[playerThingIdx].povModel.model3->hierarchyNodes[i].name);
+				if (l < 5) continue; // sanity check
+				if (!__strcmpi(playerThings[playerThingIdx].povModel.model3->hierarchyNodes[i].name, "k_muzzle"))
+				{
+					jkPlayer_muzzleFlashNode = i;
+					break;
+				}
+			}
+#endif
         }
         else
         {
@@ -981,6 +1034,11 @@ void jkPlayer_DrawPov()
 
 #ifdef DYNAMIC_POV
 		// Added: autoaim pov model orient
+		rdVector_Zero3(&jkPlayer_muzzleOffset);
+
+		rdMatrix34 invOrient;
+		rdMatrix_InvertOrtho34(&invOrient, &viewMat);
+
 		rdVector3 aimVector = {0.0f, 64.0f, 0.0f};
 		if ((sithWeapon_bAutoAim & 1) != 0 && !sithNet_isMulti && !jkPlayer_aimLock)
 		{
@@ -989,7 +1047,7 @@ void jkPlayer_DrawPov()
 			// calculate a coarse auto-aim for some sense of where the weapon is pointing 
 			// since projectiles still come from the fireoffset, we don't want it to wander too far or be precise
 			rdMatrix34 autoAimMat;
-			sithThing* pTarget = sithWeapon_ProjectileAutoAim(&autoAimMat, player, &viewMat, &player->position, 15.0f, 20.0f);
+			sithThing* pTarget = sithWeapon_ProjectileAutoAim(&autoAimMat, player, &viewMat, &player->position, jkPlayer_povAutoAimFov, jkPlayer_povAutoAimDist);
 			if(!pTarget)
 			{
 				// no target, do a sector/thing ray cast to adjust the crosshair distance
@@ -1013,8 +1071,6 @@ void jkPlayer_DrawPov()
 			if(hasTarget)
 			{
 				// apply inverse of the original look orient to get a local transform
-				rdMatrix34 invOrient;
-				rdMatrix_InvertOrtho34(&invOrient, &viewMat);
 				rdMatrix_PostMultiply34(&autoAimMat, &invOrient);
 				rdMatrix_TransformVector34Acc(&aimVector, &invOrient);
 				rdVector_Zero3(&autoAimMat.scale);
@@ -1049,6 +1105,7 @@ void jkPlayer_DrawPov()
         rdMatrix_PreMultiply34(&viewMat, &jkSaber_rotateMat);
 
 #ifdef DYNAMIC_POV
+		// project the aim vector to the screen
 		rdMatrix34 aimMat;
 		rdMatrix_Identity34(&aimMat);
 		rdMatrix_PreTranslate34(&aimMat, &trans);
@@ -1069,6 +1126,26 @@ void jkPlayer_DrawPov()
 #endif
         
         rdThing_Draw(&playerThings[playerThingIdx].povModel, &viewMat);
+
+#ifdef DYNAMIC_POV
+		// if we have a muzzle node, do muzzle stuff
+		if(jkPlayer_muzzleFlashNode >= 0 && jkPlayer_muzzleFlashNode < playerThings[playerThingIdx].povModel.model3->numHierarchyNodes)
+		{
+			// draw the muzzle flash
+			if(jkPlayer_drawMuzzleFlash && jkPlayer_povMuzzleFlash.sprite3)
+				rdSprite_Draw(&jkPlayer_povMuzzleFlash, &playerThings[playerThingIdx].povModel.hierarchyNodeMatrices[jkPlayer_muzzleFlashNode]);
+
+			// update the muzzle offset so we can use it in cog
+			// the offset is in the cameras local frame
+			rdMatrix34 muzzleMat;
+			rdMatrix_Copy34(&muzzleMat, &playerThings[playerThingIdx].povModel.hierarchyNodeMatrices[jkPlayer_muzzleFlashNode]);
+			rdMatrix_PostMultiply34(&muzzleMat, &invOrient);
+			rdVector_Copy3(&jkPlayer_muzzleOffset, &muzzleMat.scale);
+		}
+		else
+			rdVector_Zero3(&jkPlayer_muzzleOffset);
+#endif
+
         rdCache_Flush();
 
         // Added: we want the polyline to render in draw order so the spheres don't clip, 
@@ -1239,6 +1316,28 @@ void jkPlayer_SetIdleWaggle(sithThing* player, rdVector3* waggleVec, float waggl
 		rdVector_Copy3(&jkPlayer_idleWaggleVec, waggleVec);
 		jkPlayer_idleWaggleSpeed = waggleSpeed;
 		jkPlayer_idleWaggleSmooth = waggleSmooth;
+	}
+}
+
+void jkPlayer_GetMuzzleOffset(sithThing* player, rdVector3* muzzleOffset)
+{
+	if (player == playerThings[playerThingIdx].actorThing)
+	{
+		if(rdVector_Len3(&jkPlayer_muzzleOffset) > 0.0f)
+			rdVector_Copy3(muzzleOffset, &jkPlayer_muzzleOffset);
+		else
+			rdVector_Zero3(&jkPlayer_muzzleOffset);
+	}
+	else
+		rdVector_Zero3(&jkPlayer_muzzleOffset);
+}
+
+void jkPlayer_SetPovAutoAim(sithThing* player, float fov, float dist)
+{
+	if (player == playerThings[playerThingIdx].actorThing)
+	{
+		jkPlayer_povAutoAimFov = fov;
+		jkPlayer_povAutoAimDist = dist;
 	}
 }
 #endif

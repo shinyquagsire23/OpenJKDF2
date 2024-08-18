@@ -97,7 +97,10 @@ void jkPlayer_renderSaberWeaponMesh(sithThing *a1);
 void jkPlayer_renderSaberTwinkle(sithThing *player);
 void jkPlayer_SetWaggle(sithThing *player, rdVector3 *waggleVec, float waggleMag);
 #ifdef DYNAMIC_POV
+void jkPlayer_PovModelCallback(sithThing* thing, int track, uint32_t a3);
 void jkPlayer_SetIdleWaggle(sithThing* player, rdVector3 *waggleVec, float waggleSpeed, float waggleSmooth);
+void jkPlayer_GetMuzzleOffset(sithThing* player, rdVector3* muzzleOffset);
+void jkPlayer_SetPovAutoAim(sithThing* player, float fov, float dist);
 #endif
 int jkPlayer_VerifyWcharName(wchar_t *name);
 int jkPlayer_VerifyCharName(char *name);
