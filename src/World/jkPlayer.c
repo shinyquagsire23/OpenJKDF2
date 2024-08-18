@@ -839,6 +839,20 @@ void jkPlayer_PovModelCallback(sithThing* thing, int track, uint32_t a3)
 		jkPlayer_drawMuzzleFlash = (a3 == 4) ? 1 : 0;
 	}
 }
+
+void jkPlayer_SetPovSprite(jkPlayerInfo* info, rdSprite* sprite)
+{
+	// fixme: this should be in the playerinfo
+	if (jkPlayer_povMuzzleFlash.type != 1 || jkPlayer_povMuzzleFlash.sprite3 != sprite)
+	{
+		rdThing_FreeEntry(&jkPlayer_povMuzzleFlash);
+		rdThing_NewEntry(&jkPlayer_povMuzzleFlash, info->actorThing);
+
+		jkPlayer_povMuzzleFlashSprite = sprite;
+		if (sprite)
+			rdThing_SetSprite3(&jkPlayer_povMuzzleFlash, sprite);
+	}
+}
 #endif
 
 void jkPlayer_SetPovModel(jkPlayerInfo *info, rdModel3 *model)
@@ -852,12 +866,6 @@ void jkPlayer_SetPovModel(jkPlayerInfo *info, rdModel3 *model)
         rdThing_NewEntry(thing, info->actorThing);
 
 #ifdef DYNAMIC_POV
-		rdThing_FreeEntry(&jkPlayer_povMuzzleFlash);
-		rdThing_NewEntry(&jkPlayer_povMuzzleFlash, info->actorThing);
-
-		jkPlayer_povMuzzleFlashSprite = sithSprite_LoadEntry("muzzleflash.spr");
-		if(jkPlayer_povMuzzleFlashSprite)
-			rdThing_SetSprite3(&jkPlayer_povMuzzleFlash, jkPlayer_povMuzzleFlashSprite);
 		jkPlayer_muzzleFlashNode = -1;
 #endif
 

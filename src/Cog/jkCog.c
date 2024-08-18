@@ -671,6 +671,16 @@ void jkCog_SetPovAutoAim(sithCog* ctx)
 		jkPlayer_SetPovAutoAim(pThing, fov, dist);
 }
 
+void jkCog_SetPovSprite(sithCog* ctx)
+{
+	rdSprite* pSprite = sithCogExec_PopSprite(ctx);
+	sithThing* pActorThing = sithCogExec_PopThing(ctx);
+	if(pActorThing && pSprite)
+	{
+		if (pActorThing->type == SITH_THING_ACTOR || pActorThing->type == SITH_THING_PLAYER)
+			jkPlayer_SetPovSprite(&pActorThing->playerInfo, pSprite);
+	}
+}
 #endif
 
 void jkCog_GetChoice(sithCog *ctx)
@@ -1188,6 +1198,7 @@ void jkCog_RegisterVerbs()
 	sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_SetIdleWaggle, "jksetidlewaggle");
 	sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_GetMuzzleOffset, "jkgetmuzzleoffset");
 	sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_SetPovAutoAim, "jksetpovautoaim");
+	sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_SetPovSprite, "jksetpovsprite");
 #endif
 
     if (Main_bMotsCompat) {
