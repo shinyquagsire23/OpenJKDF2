@@ -28,6 +28,7 @@
 #include "Gameplay/sithPlayer.h"
 #include "Platform/std3D.h"
 #include "jk.h"
+#include "General/stdMath.h"
 
 // MOTS added
 static sithWorld_ChecksumHandler_t sithWorld_checksumExtraFunc;
@@ -345,15 +346,9 @@ int sithWorld_NewEntry(sithWorld *pWorld)
 						sflight += surface->surfaceInfo.face.extraLight;
 
 						rdVector3 col;
-						col.x = surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 1];
-						col.y = surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 2];
-						col.z = surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 3];
-						if (col.x < 0.0)
-							col.x = 0.0;
-						if (col.y < 0.0)
-							col.y = 0.0;
-						if (col.z < 0.0)
-							col.z = 0.0;
+						col.x = stdMath_Clamp(surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 1], 0.0f, 1.0f);
+						col.y = stdMath_Clamp(surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 2], 0.0f, 1.0f);
+						col.z = stdMath_Clamp(surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 3], 0.0f, 1.0f);
 						rdVector_Add3Acc(&sector->ambientRGB, &col);
 					}
 				}
