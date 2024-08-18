@@ -1109,7 +1109,8 @@ void jkPlayer_DrawPov()
 			
 				jkSaber_aimAngles.x = (angles.x - jkSaber_aimAngles.x) * 8.0f * min(sithTime_deltaSeconds, 0.02f) + jkSaber_aimAngles.x;
 				jkSaber_aimAngles.y = (angles.y - jkSaber_aimAngles.y) * 8.0f * min(sithTime_deltaSeconds, 0.02f) + jkSaber_aimAngles.y;
-				jkSaber_aimAngles.z = (angles.z - jkSaber_aimAngles.z) * 8.0f * min(sithTime_deltaSeconds, 0.02f) + jkSaber_aimAngles.z;
+				// ignore roll, it gets weird
+				//jkSaber_aimAngles.z = (angles.z - jkSaber_aimAngles.z) * 8.0f * min(sithTime_deltaSeconds, 0.02f) + jkSaber_aimAngles.z;
 			
 				rdMatrix_BuildRotate34(&autoAimMat, &jkSaber_aimAngles);
 				rdMatrix_PreMultiply34(&viewMat, &autoAimMat);
