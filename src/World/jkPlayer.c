@@ -923,6 +923,12 @@ void jkPlayer_DrawPov()
 #else
         float waggleAmt = (fabs(player->waggle) > sithTime_deltaSeconds ? sithTime_deltaSeconds : fabs(player->waggle)) * jkPlayer_waggleMag; // scale animation to be in line w/ 50fps og limit
 #endif
+#ifdef DYNAMIC_POV
+		// don't freaking waggle while in the air/jumping, it looks funny
+		if(player->attach_flags == 0)
+			waggleAmt = 0.0f;
+#endif
+
         if ( waggleAmt == 0.0 )
             jkPlayer_waggleAngle = 0.0;
         else
