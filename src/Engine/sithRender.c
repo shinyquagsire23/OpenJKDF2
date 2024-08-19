@@ -969,9 +969,9 @@ void sithRender_RenderLevelGeometry()
                 meshinfo_out.verticesProjected = sithRender_aVerticesTmp;
                 meshinfo_out.paDynamicLight = procEntry->vertexIntensities;
 #ifdef RGB_THING_LIGHTS
-				meshinfo_out.paDynamicLightR = procEntry->vertexIntensities;
-				meshinfo_out.paDynamicLightG = procEntry->vertexIntensities;
-				meshinfo_out.paDynamicLightB = procEntry->vertexIntensities;
+				meshinfo_out.paDynamicLightR = procEntry->paRedIntensities;
+				meshinfo_out.paDynamicLightG = procEntry->paGreenIntensities;
+				meshinfo_out.paDynamicLightB = procEntry->paBlueIntensities;
 #endif
                 sithRender_idxInfo.vertexPosIdx = v65->surfaceInfo.face.vertexPosIdx;
                 meshinfo_out.vertexUVs = procEntry->vertexUVs;
@@ -1196,9 +1196,9 @@ void sithRender_RenderLevelGeometry()
                     sithRender_idxInfo.vertexPosIdx = v78;
                     meshinfo_out.paDynamicLight = v20->vertexIntensities;
 #ifdef RGB_THING_LIGHTS
-					meshinfo_out.paDynamicLightR = v20->vertexIntensities;
-					meshinfo_out.paDynamicLightG = v20->vertexIntensities;
-					meshinfo_out.paDynamicLightB = v20->vertexIntensities;
+					meshinfo_out.paDynamicLightR = v20->paRedIntensities;
+					meshinfo_out.paDynamicLightG = v20->paGreenIntensities;
+					meshinfo_out.paDynamicLightB = v20->paBlueIntensities;
 #endif
                     sithRender_idxInfo.vertexUVIdx = v79;
                     
@@ -2124,9 +2124,9 @@ void sithRender_RenderAlphaSurfaces()
 
 #ifdef RGB_THING_LIGHTS
 		// fixme: there's some weird flickering happening on alpha surfaces now...
-		meshinfo_out.paDynamicLightR = v9->vertexIntensities;
-		meshinfo_out.paDynamicLightG = v9->vertexIntensities;
-		meshinfo_out.paDynamicLightB = v9->vertexIntensities;
+		meshinfo_out.paDynamicLightR = v9->paRedIntensities;
+		meshinfo_out.paDynamicLightG = v9->paGreenIntensities;
+		meshinfo_out.paDynamicLightB = v9->paBlueIntensities;
 		rdPrimit3_ClipFace(surfaceSector->clipFrustum, v9->geometryMode, v9->lightingMode, v9->textureMode, &sithRender_idxInfo, &meshinfo_out, &v0->surfaceInfo.face.clipIdk);
 		
 		// fixme: disabled for now, results in black lighting
