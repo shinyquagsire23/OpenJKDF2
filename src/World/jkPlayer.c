@@ -1077,7 +1077,7 @@ void jkPlayer_DrawPov()
 				// no target, do a sector/thing ray cast to adjust the crosshair distance
 				rdVector3 hitPos;
 				rdVector_Copy3(&hitPos, &player->position);
-				rdVector_MultAcc3(&hitPos, &viewMat.lvec, 1000.0f);
+				rdVector_MultAcc3(&hitPos, &viewMat.lvec, 64.0f);
 				sithSector* sector = sithCollision_GetSectorLookAt(player->sector, &player->position, &hitPos, 0.0);
 				if (sector)
 				{
@@ -1105,7 +1105,7 @@ void jkPlayer_DrawPov()
 				rdVector3 pushAngles = { 0.0f, 0.0f, 0.0f };
 				if(aimLen <= aimDist)
 				{
-					pushAngles.x = -(aimDist - aimLen) * 25.0f / aimDist;
+					pushAngles.x = -(aimDist - aimLen) * 18.0f / aimDist;
 				}
 				jkPlayer_pushAngles.x = (pushAngles.x - jkPlayer_pushAngles.x) * 8.0f * min(sithTime_deltaSeconds, 0.02f) + jkPlayer_pushAngles.x;
 				rdMatrix_PreRotate34(&viewMat, &jkPlayer_pushAngles);
