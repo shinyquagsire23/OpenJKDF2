@@ -50,6 +50,7 @@ int rdCamera_NewEntry(rdCamera *camera, float fov, float a3, float zNear, float 
         camera->screenAspectRatio = aspectRatio;
 	#ifdef RGB_AMBIENT
 		rdVector_Zero3(&camera->ambientLight);
+		rdAmbient_Zero(&camera->ambientCube);
 	#else
         camera->ambientLight = 0.0;
 	#endif
@@ -398,6 +399,10 @@ void rdCamera_PerspProjectSquareLst(rdVector3 *vertices_out, rdVector3 *vertices
 void rdCamera_SetAmbientLight(rdCamera* camera, rdVector3* amt)
 {
 	rdVector_Copy3(&camera->ambientLight, amt);
+}
+void rdCamera_SetAmbientCube(rdCamera* camera, rdAmbient* ambientCube)
+{
+	rdAmbient_Copy(&camera->ambientCube, ambientCube);
 }
 #else
 void rdCamera_SetAmbientLight(rdCamera *camera, float amt)

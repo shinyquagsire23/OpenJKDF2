@@ -993,6 +993,7 @@ void jkPlayer_DrawPov()
 		ambLight.y += sithCamera_currentCamera->sector->extraLight;
 		ambLight.z += sithCamera_currentCamera->sector->extraLight;
 		rdCamera_SetAmbientLight(&sithCamera_currentCamera->rdCam, &ambLight);
+		rdCamera_SetAmbientCube(&sithCamera_currentCamera->rdCam, &sithCamera_currentCamera->sector->ambientCube);
 #else
         float ambLight = sithCamera_currentCamera->sector->extraLight + sithCamera_currentCamera->sector->ambientLight;
         if ( ambLight < 0.0 )

@@ -335,6 +335,9 @@ typedef struct rdMeshinfo rdMeshinfo;
 typedef struct rdLight rdLight;
 typedef struct rdModel3 rdModel3;
 typedef struct rdCanvas rdCanvas;
+#ifdef RGB_AMBIENT
+typedef struct rdAmbient rdAmbient;
+#endif
 
 typedef struct sithGamesave_Header sithGamesave_Header;
 typedef struct jkGuiStringEntry jkGuiStringEntry;
@@ -473,6 +476,13 @@ typedef struct rdLight
     float falloffMax;
 } rdLight;
 
+#ifdef RGB_AMBIENT
+// ambient cube
+typedef struct rdAmbient
+{
+	rdVector3 colors[6];
+} rdAmbient;
+#endif
 
 typedef struct sithCameraRenderInfo
 {
@@ -496,6 +506,7 @@ typedef struct rdCamera
     void (*fnProjectLst)(rdVector3 *, rdVector3 *, unsigned int);
 #ifdef RGB_AMBIENT
 	rdVector3 ambientLight;
+	rdAmbient ambientCube;
 #else
     float ambientLight;
 #endif
@@ -2401,6 +2412,7 @@ typedef struct sithSector
     float ambientLight;
 #ifdef RGB_AMBIENT
 	rdVector3 ambientRGB;
+	rdAmbient ambientCube;
 #endif
     float extraLight;
     rdColormap* colormap;

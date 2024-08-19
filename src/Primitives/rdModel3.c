@@ -1419,6 +1419,8 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
 			pCurMesh->vertices_r,//NULL,
 			pCurMesh->vertices_g,//NULL,
 			pCurMesh->vertices_b,//NULL,
+			&rdCamera_pCurCamera->ambientCube,
+			mat,
 #endif
             pCurMesh->numVertices,
             rdCamera_pCurCamera->attenuationMin);
@@ -1562,6 +1564,11 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
 		rdVector_Copy3(&procEntry->ambientLight, &rdCamera_pCurCamera->ambientLight);
 	else
 		rdVector_Zero3(&procEntry->ambientLight);
+
+	// if we have an ambient cube we can ignore the solid ambient color
+	if(rdModel3_lightingMode == RD_LIGHTMODE_GOURAUD)
+		procEntry->ambientLight.x = procEntry->ambientLight.y = procEntry->ambientLight.z = procEntry->extralight;
+
 #else
     if ( rdroid_curRenderOptions & 2 )
         procEntry->ambientLight = rdCamera_pCurCamera->ambientLight;

@@ -334,7 +334,9 @@ int sithWorld_NewEntry(sithWorld *pWorld)
 			for (int i = 0; i < pWorld->numSectors; i++)
 			{
 				sithSector* sector = &pWorld->sectors[i];
-				rdVector_Zero3(&sector->ambientRGB);
+				rdVector_Zero3(&sector->ambientRGB); // rgb flat ambient (replaces ambient light intensity)
+				rdAmbient_Zero(&sector->ambientCube); // rgb directional ambient
+
 				double sflight = 0.0;
 				float total = 0.00001f;
 				for (int j = 0; j < pWorld->sectors[i].numSurfaces; j++)
@@ -346,17 +348,27 @@ int sithWorld_NewEntry(sithWorld *pWorld)
 						sflight += surface->surfaceInfo.face.extraLight;
 
 						rdVector3 col;
-						col.x = stdMath_Clamp(surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 1], 0.0f, 1.0f);
-						col.y = stdMath_Clamp(surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 2], 0.0f, 1.0f);
-						col.z = stdMath_Clamp(surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 3], 0.0f, 1.0f);
+						col.x = surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 1];
+						col.y = surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 2];
+						col.z = surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 3];
+						
 						rdVector_Add3Acc(&sector->ambientRGB, &col);
+
+						rdAmbient_Acc(&sector->ambientCube, &col, &surface->surfaceInfo.face.normal);
 					}
 				}
 				sflight /= (float)pWorld->sectors[i].numSurfaces;
 				rdVector_InvScale3Acc(&sector->ambientRGB, total);
-				sector->ambientRGB.x = max(sflight, sector->ambientRGB.x);
-				sector->ambientRGB.y = max(sflight, sector->ambientRGB.y);
-				sector->ambientRGB.z = max(sflight, sector->ambientRGB.z);
+				sector->ambientRGB.x = max(sflight, stdMath_Clamp(sector->ambientRGB.x, 0.0f, 1.0f));
+				sector->ambientRGB.y = max(sflight, stdMath_Clamp(sector->ambientRGB.y, 0.0f, 1.0f));
+				sector->ambientRGB.z = max(sflight, stdMath_Clamp(sector->ambientRGB.z, 0.0f, 1.0f));
+				rdAmbient_Scale(&sector->ambientCube, 1.0f / total);
+				for (int a = 0; a < 6; ++a)
+				{
+					sector->ambientCube.colors[a].x = max(sflight, stdMath_Clamp(sector->ambientCube.colors[a].x, 0.0f, 1.0f));
+					sector->ambientCube.colors[a].y = max(sflight, stdMath_Clamp(sector->ambientCube.colors[a].y, 0.0f, 1.0f));
+					sector->ambientCube.colors[a].z = max(sflight, stdMath_Clamp(sector->ambientCube.colors[a].z, 0.0f, 1.0f));
+				}
 			}
 #endif
             if ( !sithWorld_Verify(pWorld) )

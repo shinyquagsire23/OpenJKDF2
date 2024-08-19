@@ -82,6 +82,7 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
     int numLights, rdVector3 *verticesEnd, rdVector3 *vertices, float *vertices_i_end, float *vertices_i,
 #ifdef RGB_THING_LIGHTS
 	float* vertices_r, float* vertices_g, float* vertices_b,
+	rdAmbient* ambient, rdMatrix34* mat,
  #endif
 	int numVertices, float scalar)
 {
@@ -174,6 +175,20 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
 			if (outLightsR) *outLightsR = *idkIter;
 			if (outLightsG) *outLightsG = *idkIter;
 			if (outLightsB) *outLightsB = *idkIter;
+
+#ifdef RGB_AMBIENT
+			// unfortunately the ambient cube is in world space, so we need to
+			// transform the normal to world rather than ambient to local
+			rdVector3 worldNormal;
+			rdMatrix_TransformVector34(&worldNormal, vertexNormals, mat);
+
+			rdVector3 ambientColor;
+			rdAmbient_CalculateVertexColor(ambient, &worldNormal, &ambientColor);
+			
+			if (outLightsR) *outLightsR += ambientColor.x;
+			if (outLightsG) *outLightsG += ambientColor.y;
+			if (outLightsB) *outLightsB += ambientColor.z;
+#endif
 		#endif
             meshLightIter = meshLights;
             for (i = 0; i < numLights; i++)
@@ -198,7 +213,7 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
                 }
                 if ( *outLights >= 1.0
 			#ifdef RGB_THING_LIGHTS
-				&&* outLightsR == 1.0 && *outLightsR == 1.0 && *outLightsB == 1.0
+				&&* outLightsR >= 1.0 && *outLightsR >= 1.0 && *outLightsB >= 1.0
 			#endif
 				)
                     break;
@@ -253,6 +268,18 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
 		if (vertices_r) *outLightsR = *vertices_i_end;
 		if (vertices_g) *outLightsG = *vertices_i_end;
 		if (vertices_b) *outLightsB = *vertices_i_end;
+
+#ifdef RGB_AMBIENT
+		rdVector3 worldNormal;
+		rdMatrix_TransformVector34(&worldNormal, vertexNormals, mat);
+
+		rdVector3 ambientColor;
+		rdAmbient_CalculateVertexColor(ambient, &worldNormal, &ambientColor);
+
+		if (outLightsR) *outLightsR += ambientColor.x;
+		if (outLightsG) *outLightsG += ambientColor.y;
+		if (outLightsB) *outLightsB += ambientColor.z;
+#endif
 #endif
         meshLightIter = meshLights;
         verticesEnd = localLightPoses;
@@ -375,3 +402,39 @@ float rdLight_CalcFaceIntensity(rdLight **meshLights, rdVector3 *localLightPoses
 // TODO? unused
 void rdLight_CalcDistVertexIntensities(){}
 void rdLight_CalcDistFaceIntensity(){}
+
+#ifdef RGB_AMBIENT
+void rdAmbient_Zero(rdAmbient* ambient)
+{
+	memset(ambient, 0, sizeof(rdAmbient));
+}
+
+void rdAmbient_Acc(rdAmbient* ambient, rdVector3* color, rdVector3* dir)
+{
+	rdVector_Add3Acc(&ambient->colors[dir->x < 0.0f ? 1 : 0], color);
+	rdVector_Add3Acc(&ambient->colors[dir->y < 0.0f ? 3 : 2], color);
+	rdVector_Add3Acc(&ambient->colors[dir->z < 0.0f ? 5 : 4], color);
+	//rdVector_MultAcc3(&ambient->colors[dir->x < 0.0f ? 1 : 0], color, dir->x * dir->x);
+	//rdVector_MultAcc3(&ambient->colors[dir->y < 0.0f ? 3 : 2], color, dir->y * dir->y);
+	//rdVector_MultAcc3(&ambient->colors[dir->z < 0.0f ? 5 : 4], color, dir->z * dir->z);
+}
+
+void rdAmbient_Scale(rdAmbient* ambient, float scale)
+{
+	for(int i = 0; i < 6; ++i)
+		rdVector_Scale3Acc(&ambient->colors[i], scale);
+}
+
+void rdAmbient_Copy(rdAmbient* outAmbient, const rdAmbient* ambient)
+{
+	memcpy(outAmbient, ambient, sizeof(rdAmbient));
+}
+
+void rdAmbient_CalculateVertexColor(rdAmbient* ambient, rdVector3* normal, rdVector3* outColor)
+{
+	rdVector_Zero3(outColor);
+	rdVector_MultAcc3(outColor, &ambient->colors[normal->x < 0.0f ? 1 : 0], normal->x * normal->x);
+	rdVector_MultAcc3(outColor, &ambient->colors[normal->y < 0.0f ? 3 : 2], normal->y * normal->y);
+	rdVector_MultAcc3(outColor, &ambient->colors[normal->z < 0.0f ? 5 : 4], normal->z * normal->z);
+}
+#endif
