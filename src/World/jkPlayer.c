@@ -1063,7 +1063,14 @@ void jkPlayer_DrawPov()
 		rdMatrix34 invOrient;
 		rdMatrix_InvertOrtho34(&invOrient, &viewMat);
 
-		rdVector3 aimVector = {0.0f, 64.0f, 0.0f};
+		rdVector3 aimVector = {0.0f, 64.0f, 0.0f}; // default, 64 units forward
+
+		// use the look vector + eye offset to get a better accuracy on the cursor, it's not exactly centered
+		rdMatrix34 invLook;
+		rdMatrix_InvertOrtho34(&invLook, &player->lookOrientation); // inverted so we get the local vector
+		rdMatrix_PreTranslate34(&invLook, &player->actorParams.eyeOffset); // add eye offset
+		rdMatrix_TransformVector34(&aimVector, &player->lookOrientation.lvec, &invLook);
+
 		if ((sithWeapon_bAutoAim & 1) != 0 && !sithNet_isMulti && !jkPlayer_aimLock)
 		{
 			int hasTarget = 0;
@@ -1072,12 +1079,14 @@ void jkPlayer_DrawPov()
 			// since projectiles still come from the fireoffset, we don't want it to wander too far or be precise
 			rdMatrix34 autoAimMat;
 			sithThing* pTarget = sithWeapon_ProjectileAutoAim(&autoAimMat, player, &viewMat, &player->position, jkPlayer_povAutoAimFov, jkPlayer_povAutoAimDist);
+			sithThing* pTarget = sithWeapon_ProjectileAutoAim(&autoAimMat, player, &sithCamera_currentCamera->viewMat, &player->position, jkPlayer_povAutoAimFov, jkPlayer_povAutoAimDist);
 			if(!pTarget)
 			{
 				// no target, do a sector/thing ray cast to adjust the crosshair distance
 				rdVector3 hitPos;
 				rdVector_Copy3(&hitPos, &player->position);
 				rdVector_MultAcc3(&hitPos, &viewMat.lvec, 64.0f);
+				rdVector_MultAcc3(&hitPos, &sithCamera_currentCamera->viewMat.lvec, 64.0f);
 				sithSector* sector = sithCollision_GetSectorLookAt(player->sector, &player->position, &hitPos, 0.0);
 				if (sector)
 				{
@@ -1134,6 +1143,7 @@ void jkPlayer_DrawPov()
 		rdMatrix34 aimMat;
 		rdMatrix_Identity34(&aimMat);
 		rdMatrix_PreTranslate34(&aimMat, &trans);
+		rdMatrix_PreTranslate34(&aimMat, &jkPlayer_muzzleOffset);
 		if(!jkPlayer_aimLock)
 			rdMatrix_PreMultiply34(&aimMat, &rotateMatNoWaggle);
 		rdVector_Copy3(&aimVector, &jkSaber_aimVector);
