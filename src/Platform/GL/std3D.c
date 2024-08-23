@@ -83,6 +83,14 @@ typedef struct std3DFramebuffer
     std3DIntermediateFbo blur2;
     std3DIntermediateFbo blur3;
     std3DIntermediateFbo blur4;
+
+#ifdef NEW_BLOOM
+	// could do intermediate 11x11 gaussian but a few extra downsamples seems simpler
+	std3DIntermediateFbo blur5;
+	std3DIntermediateFbo blur6;
+	std3DIntermediateFbo blur7;
+	std3DIntermediateFbo blur8;
+#endif
     //std3DIntermediateFbo blurBlend;
 
     std3DIntermediateFbo ssaoBlur1;
@@ -319,6 +327,10 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
 		std3D_generateIntermediateFbo(pFb->blur1.w / 2, pFb->blur1.h / 2, &pFb->blur2, 1);
 		std3D_generateIntermediateFbo(pFb->blur2.w / 2, pFb->blur2.h / 2, &pFb->blur3, 1);
 		std3D_generateIntermediateFbo(pFb->blur3.w / 2, pFb->blur3.h / 2, &pFb->blur4, 1);
+		std3D_generateIntermediateFbo(pFb->blur4.w / 2, pFb->blur4.h / 2, &pFb->blur5, 1);
+		std3D_generateIntermediateFbo(pFb->blur5.w / 2, pFb->blur5.h / 2, &pFb->blur6, 1);
+		std3D_generateIntermediateFbo(pFb->blur6.w / 2, pFb->blur6.h / 2, &pFb->blur7, 1);
+		std3D_generateIntermediateFbo(pFb->blur7.w / 2, pFb->blur7.h / 2, &pFb->blur8, 1);
 	#else
         std3D_generateIntermediateFbo(width, height, &pFb->blur1, 1);
         //std3D_generateIntermediateFbo(width, height, &pFb->blurBlend, 1);
@@ -366,6 +378,12 @@ void std3D_deleteFramebuffer(std3DFramebuffer* pFb)
     std3D_deleteIntermediateFbo(&pFb->blur3);
     std3D_deleteIntermediateFbo(&pFb->blur4);
     //std3D_deleteIntermediateFbo(&pFb->blurBlend);
+#ifdef NEW_BLOOM
+	std3D_deleteIntermediateFbo(&pFb->blur5);
+	std3D_deleteIntermediateFbo(&pFb->blur6);
+	std3D_deleteIntermediateFbo(&pFb->blur7);
+	std3D_deleteIntermediateFbo(&pFb->blur8);
+#endif
 
     std3D_deleteIntermediateFbo(&pFb->ssaoBlur1);
     std3D_deleteIntermediateFbo(&pFb->ssaoBlur2);
@@ -2173,6 +2191,7 @@ void std3D_DrawSceneFbo()
         //draw_bloom = 0;
     }
 
+#ifndef NEW_BLOOM // don't need to clear
     if (draw_bloom)
     {
         glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->blur1.fbo);
@@ -2186,6 +2205,7 @@ void std3D_DrawSceneFbo()
         //glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->blurBlend.fbo);
         //glClear( GL_COLOR_BUFFER_BIT );
     }
+#endif
 
     // Clear SSAO stuff
     if (draw_ssao)
@@ -2230,16 +2250,25 @@ void std3D_DrawSceneFbo()
 		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur2, std3D_pFb->blur1.tex, 0, 0, uvScale, 1.0, 1.0, 0);
 		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur3, std3D_pFb->blur2.tex, 0, 0, uvScale, 1.0, 1.0, 0);
 		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur4, std3D_pFb->blur3.tex, 0, 0, uvScale, 1.0, 1.0, 0);
+		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur5, std3D_pFb->blur4.tex, 0, 0, uvScale, 1.0, 1.0, 0);
+		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur6, std3D_pFb->blur5.tex, 0, 0, uvScale, 1.0, 1.0, 0);
+		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur7, std3D_pFb->blur6.tex, 0, 0, uvScale, 1.0, 1.0, 0);
+		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur8, std3D_pFb->blur7.tex, 0, 0, uvScale, 1.0, 1.0, 0);
 
 		// upscale + blend
 		//uvScale = 4.0f; // source tex is 4x smaller
 
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur7, std3D_pFb->blur8.tex, 0, 0, uvScale, 1.0, 1.0, 0);
+		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur6, std3D_pFb->blur7.tex, 0, 0, uvScale, 1.0, 1.0, 0);
+		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur5, std3D_pFb->blur6.tex, 0, 0, uvScale, 1.0, 1.0, 0);
+		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur4, std3D_pFb->blur5.tex, 0, 0, uvScale, 1.0, 1.0, 0);
 		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur3, std3D_pFb->blur4.tex, 0, 0, uvScale, 1.0, 1.0, 0);
 		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur2, std3D_pFb->blur3.tex, 0, 0, uvScale, 1.0, 1.0, 0);
 		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur1, std3D_pFb->blur2.tex, 0, 0, uvScale, 1.0, 1.0, 0);
 
-		std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur1.tex, 0, 0, 1.0, 1.0f, jkPlayer_gamma, 0);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur1.tex, 0, 0, 0.3f, 1.0f, jkPlayer_gamma, 0);
 
 	#else
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
