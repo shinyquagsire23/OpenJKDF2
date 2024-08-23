@@ -1,3 +1,6 @@
+#define NEW_SSAO
+
+
 uniform sampler2D tex;
 uniform sampler2D tex2;
 uniform sampler2D tex3;
@@ -5,12 +8,19 @@ uniform vec2 iResolution;
 uniform float param1;
 uniform float param2;
 uniform float param3;
+
 in vec2 f_uv;
+
 out vec4 fragColor;
 
 #define PI 3.14159265359
 #define AOradius 1.0
+#ifdef NEW_SSAO
 #define Samples 8.0
+#else
+#define Samples 8.0
+#endif
+
 
 // --------------------------------------
 // oldschool rand() from Visual Studio
@@ -54,6 +64,12 @@ float depth(vec2 coord)
     return texture(tex, uv).z;
 }
 
+vec3 getpos(vec2 coord)
+{
+    vec2 uv = coord*vec2(iResolution.y/iResolution.x,1.0);
+    return texture(tex, uv).xyz;
+}
+
 float SSAO(vec2 coord)
 {
     float cd = depth(coord);
@@ -61,8 +77,14 @@ float SSAO(vec2 coord)
     float li = 0.0;
     float count = 0.0;
     vec2 fragCoord = f_uv*iResolution.xy;
+	
+#ifdef NEW_SSAO
+	screenRadius *= 8.0;
+	vec3 pos = getpos(coord);
+	float radius = 0.003f;
+#endif
 
-    vec3 normal = texture(tex2, f_uv).rgb;
+    vec3 normal = texture(tex2, f_uv).rgb;	
     normal *= vec3(1.0, 1.0, -1.0);
     normal = normalize(normal);
 
@@ -96,12 +118,28 @@ float SSAO(vec2 coord)
         p = tbn * p;
 
         vec2 sp = vec2(coord.x + p.x * screenRadius, coord.y + p.y * screenRadius);
+	#ifdef NEW_SSAO
+		vec3 spos = getpos(sp);
+		vec3 v = spos - pos;
+		float dv = dot(v, v);
+		v = normalize(v);
+
+		float l = clamp(-(-2.0 * radius + dv) / radius + 1.0, 0.0, 1.0);
+		l *= clamp((1.0 / 0.3) * dot(normal, v) - 0.3, 0.0, 1.0);
+		li += l;
+        count += 1.0;
+	#else
         float d = depth(sp);
         float at = pow(length(p)-1.0, 2.0);
         li += step(cd + p.z * AOradius, d) * at;
         count += at;
+	#endif
     }
+#ifdef NEW_SSAO
+    return 1.- li / count;
+#else
     return li / count;
+#endif
 }
 
 void main(void)
@@ -122,9 +160,11 @@ void main(void)
     vec3 color = mix(sampled_color.rgb, ao, 1.0 - smoothstep(0.0, 0.99, d*d/1e9));
     //color = mix(color, sampled_color.rgb, 1.0 - smoothstep(0.0, 0.1, d*d/15));
     
+#ifndef NEW_SSAO
     // Color curve stuff, idk
     //color = pow(color,vec3(1.0/2.2)); // gamma
     color = vec3(Cubic(color.r),Cubic(color.g),Cubic(color.b));
+#endif
     color = pow(color, vec3(gamma));
 
     //vec3 normal = texture(tex2, f_uv).rgb;

@@ -26,6 +26,7 @@ __declspec(dllexport) DWORD NvOptimusEnablement = 1;
 __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 #endif
 
+#define NEW_SSAO
 #define NEW_BLOOM
 
 #define TEX_MODE_TEST 0
@@ -312,9 +313,14 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
 
     if (jkPlayer_enableSSAO)
     {
+#ifdef NEW_SSAO
+		std3D_generateIntermediateFbo(width / 2, height / 2, &pFb->ssaoBlur1, 0);
+		std3D_generateIntermediateFbo(pFb->ssaoBlur1.w, pFb->ssaoBlur1.h, &pFb->ssaoBlur2, 0);
+#else
         std3D_generateIntermediateFbo(width, height, &pFb->ssaoBlur1, 0);
         std3D_generateIntermediateFbo(pFb->ssaoBlur1.w/2, pFb->ssaoBlur1.h/2, &pFb->ssaoBlur2, 0);
-        //std3D_generateIntermediateFbo(pFb->ssaoBlur2.w/2, pFb->ssaoBlur2.h/2, &pFb->ssaoBlur3, 0);
+#endif
+		//std3D_generateIntermediateFbo(pFb->ssaoBlur2.w/2, pFb->ssaoBlur2.h/2, &pFb->ssaoBlur3, 0);
 
         pFb->enable_extra |= 2;
     }
