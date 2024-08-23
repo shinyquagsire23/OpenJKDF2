@@ -1113,7 +1113,6 @@ void jkPlayer_DrawPov()
 				// no target, do a sector/thing ray cast to adjust the crosshair distance
 				rdVector3 hitPos;
 				rdVector_Copy3(&hitPos, &player->position);
-				rdVector_MultAcc3(&hitPos, &viewMat.lvec, 64.0f);
 				rdVector_MultAcc3(&hitPos, &sithCamera_currentCamera->viewMat.lvec, 64.0f);
 				sithSector* sector = sithCollision_GetSectorLookAt(player->sector, &player->position, &hitPos, 0.0);
 				if (sector)
