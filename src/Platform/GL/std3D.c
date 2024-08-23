@@ -2085,54 +2085,7 @@ void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo
     menu_u = 1.0;
     menu_v = 1.0;
     menu_x = 0.0;
-
-    GL_tmpVertices[0].x = menu_x;
-    GL_tmpVertices[0].y = 0.0;
-    GL_tmpVertices[0].z = 0.0;
-    GL_tmpVertices[0].tu = 0.0;
-    GL_tmpVertices[0].tv = menu_v;
-    *(uint32_t*)&GL_tmpVertices[0].nx = 0;
-    GL_tmpVertices[0].color = 0xFFFFFFFF;
-    *(uint32_t*)&GL_tmpVertices[0].nz = 0;
-    
-    GL_tmpVertices[1].x = menu_x;
-    GL_tmpVertices[1].y = menu_h;
-    GL_tmpVertices[1].z = 0.0;
-    GL_tmpVertices[1].tu = 0.0;
-    GL_tmpVertices[1].tv = 0.0;
-    *(uint32_t*)&GL_tmpVertices[1].nx = 0;
-    GL_tmpVertices[1].color = 0xFFFFFFFF;
-    *(uint32_t*)&GL_tmpVertices[1].nz = 0;
-    
-    GL_tmpVertices[2].x = menu_x + menu_w;
-    GL_tmpVertices[2].y = menu_h;
-    GL_tmpVertices[2].z = 0.0;
-    GL_tmpVertices[2].tu = menu_u;
-    GL_tmpVertices[2].tv = 0.0;
-    *(uint32_t*)&GL_tmpVertices[2].nx = 0;
-    GL_tmpVertices[2].color = 0xFFFFFFFF;
-    *(uint32_t*)&GL_tmpVertices[2].nz = 0;
-    
-    GL_tmpVertices[3].x = menu_x + menu_w;
-    GL_tmpVertices[3].y = 0.0;
-    GL_tmpVertices[3].z = 0.0;
-    GL_tmpVertices[3].tu = menu_u;
-    GL_tmpVertices[3].tv = menu_v;
-    *(uint32_t*)&GL_tmpVertices[3].nx = 0;
-    GL_tmpVertices[3].color = 0xFFFFFFFF;
-    *(uint32_t*)&GL_tmpVertices[3].nz = 0;
-    
-    GL_tmpTris[0].v1 = 1;
-    GL_tmpTris[0].v2 = 0;
-    GL_tmpTris[0].v3 = 2;
-    
-    GL_tmpTris[1].v1 = 0;
-    GL_tmpTris[1].v2 = 3;
-    GL_tmpTris[1].v3 = 2;
-    
-    GL_tmpVerticesAmt = 4;
-    GL_tmpTrisAmt = 2;
-    
+	    
     glActiveTexture(GL_TEXTURE0 + 0);
     glBindTexture(GL_TEXTURE_2D, texId);
     if (gen_mips)
@@ -2182,68 +2135,7 @@ void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo
 
     }
     
-    rdTri* tris = GL_tmpTris;
-    glEnableVertexAttribArray(pStage->attribute_coord3d);
-    glEnableVertexAttribArray(pStage->attribute_v_color);
-    glEnableVertexAttribArray(pStage->attribute_v_uv);
-
-    glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_all);
-    glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * sizeof(D3DVERTEX), GL_tmpVertices, GL_STREAM_DRAW);
-    glVertexAttribPointer(
-        programMenu_attribute_coord3d, // attribute
-        3,                 // number of elements per vertex, here (x,y,z)
-        GL_FLOAT,          // the type of each element
-        GL_FALSE,          // normalize fixed-point data?
-        sizeof(D3DVERTEX),                 // data stride
-        (GLvoid*)offsetof(D3DVERTEX, x)                  // offset of first element
-    );
-    
-    glVertexAttribPointer(
-        programMenu_attribute_v_color, // attribute
-        4,                 // number of elements per vertex, here (R,G,B,A)
-        GL_UNSIGNED_BYTE,  // the type of each element
-        GL_TRUE,          // normalize fixed-point data?
-        sizeof(D3DVERTEX),                 // no extra data between each position
-        (GLvoid*)offsetof(D3DVERTEX, color) // offset of first element
-    );
-
-    glVertexAttribPointer(
-        programMenu_attribute_v_uv,    // attribute
-        2,                 // number of elements per vertex, here (U,V)
-        GL_FLOAT,          // the type of each element
-        GL_FALSE,          // take our values as-is
-        sizeof(D3DVERTEX),                 // no extra data between each position
-        (GLvoid*)offsetof(D3DVERTEX, tu)                  // offset of first element
-    );
-
-    glEnableVertexAttribArray(pStage->attribute_coord3d);
-    glEnableVertexAttribArray(pStage->attribute_v_color);
-    glEnableVertexAttribArray(pStage->attribute_v_uv);
-    
-    rdDDrawSurface* last_tex = (void*)-1;
-    int last_tex_idx = 0;
-    //GLushort* data_elements = malloc(sizeof(GLushort) * 3 * GL_tmpTrisAmt);
-    for (int j = 0; j < GL_tmpTrisAmt; j++)
-    {
-        data_elements[(j*3)+0] = tris[j].v1;
-        data_elements[(j*3)+1] = tris[j].v2;
-        data_elements[(j*3)+2] = tris[j].v3;
-    }
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, menu_ibo_triangle);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, GL_tmpTrisAmt * 3 * sizeof(GLushort), data_elements, GL_STREAM_DRAW);
-
-    int tris_size;  
-    glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &tris_size);
-    glDrawElements(GL_TRIANGLES, tris_size / sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
-
-    glDisableVertexAttribArray(pStage->attribute_v_uv);
-    glDisableVertexAttribArray(pStage->attribute_v_color);
-    glDisableVertexAttribArray(pStage->attribute_coord3d);
-    
-    //free(data_elements);
-        
-    //glBindTexture(GL_TEXTURE_2D, 0);
+	glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
 void std3D_DrawSceneFbo()
