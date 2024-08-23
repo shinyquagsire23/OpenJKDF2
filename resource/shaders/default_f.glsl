@@ -398,7 +398,7 @@ void main(void)
 
     //if (blend_mode == D3DBLEND_SRCALPHA || blend_mode == D3DBLEND_INVSRCALPHA)
     {
-        should_write_normals = main_color.a;
+        should_write_normals = main_color.a > 0.5 ? 1.0 : 0.0;
     }
 
     //if (sampledEmiss.r != 0.0 || sampledEmiss.g != 0.0 || sampledEmiss.b != 0.0)
