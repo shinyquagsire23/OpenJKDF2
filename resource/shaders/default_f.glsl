@@ -40,7 +40,11 @@ vec4 impl_textureGather(sampler2D tex, vec2 uv)
 }
 #endif
 
+#ifdef CLASSIC_EMISSIVE
+#define LIGHT_DIVISOR (3.0)
+#else
 #define LIGHT_DIVISOR (6.0)
+#endif
 #define TEX_MODE_TEST 0
 #define TEX_MODE_WORLDPAL 1
 #define TEX_MODE_BILINEAR 2
