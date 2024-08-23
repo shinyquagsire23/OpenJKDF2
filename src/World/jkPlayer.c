@@ -1097,15 +1097,17 @@ void jkPlayer_DrawPov()
 		rdMatrix_PreTranslate34(&invLook, &player->actorParams.eyeOffset); // add eye offset
 		rdMatrix_TransformVector34(&aimVector, &player->lookOrientation.lvec, &invLook);
 
-		if ((sithWeapon_bAutoAim & 1) != 0 && !sithNet_isMulti && !jkPlayer_aimLock)
+		if (!jkPlayer_aimLock)
 		{
 			int hasTarget = 0;
 
 			// calculate a coarse auto-aim for some sense of where the weapon is pointing 
 			// since projectiles still come from the fireoffset, we don't want it to wander too far or be precise
 			rdMatrix34 autoAimMat;
-			sithThing* pTarget = sithWeapon_ProjectileAutoAim(&autoAimMat, player, &viewMat, &player->position, jkPlayer_povAutoAimFov, jkPlayer_povAutoAimDist);
-			sithThing* pTarget = sithWeapon_ProjectileAutoAim(&autoAimMat, player, &sithCamera_currentCamera->viewMat, &player->position, jkPlayer_povAutoAimFov, jkPlayer_povAutoAimDist);
+			sithThing* pTarget = NULL;
+			if((sithWeapon_bAutoAim & 1) != 0 && !sithNet_isMulti)
+				pTarget = sithWeapon_ProjectileAutoAim(&autoAimMat, player, &sithCamera_currentCamera->viewMat, &player->position, jkPlayer_povAutoAimFov, jkPlayer_povAutoAimDist);
+
 			if(!pTarget)
 			{
 				// no target, do a sector/thing ray cast to adjust the crosshair distance
