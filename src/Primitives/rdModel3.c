@@ -1568,9 +1568,9 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
 	else
 		rdVector_Zero3(&procEntry->ambientLight);
 
-	// if we have an ambient cube we can ignore the solid ambient color
+	// if we have an ambient cube, dim the ambient a bit to make it pop
 	if(rdModel3_lightingMode == RD_LIGHTMODE_GOURAUD)
-		procEntry->ambientLight.x = procEntry->ambientLight.y = procEntry->ambientLight.z = procEntry->extralight;
+		rdVector_Scale3Acc(&procEntry->ambientLight, 0.75f);
 
 #else
     if ( rdroid_curRenderOptions & 2 )

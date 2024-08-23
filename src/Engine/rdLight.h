@@ -42,6 +42,8 @@ void rdLight_CalcDistFaceIntensity();
 void rdAmbient_Zero(rdAmbient* ambient);
 void rdAmbient_Acc(rdAmbient* ambient, rdVector3* color, rdVector3* dir);
 void rdAmbient_Scale(rdAmbient* ambient, float scale);
+void rdAmbient_Lerp(rdAmbient* out, const rdAmbient* ambient0, const rdAmbient* ambient2, float amount);
+void rdAmbient_AddAcc(rdAmbient* out, const rdAmbient* ambient);
 void rdAmbient_Copy(rdAmbient* outAmbient, const rdAmbient* ambient);
 void rdAmbient_CalculateVertexColor(rdAmbient* ambient, rdVector3* normal, rdVector3* outColor);
 #endif

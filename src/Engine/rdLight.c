@@ -425,6 +425,23 @@ void rdAmbient_Scale(rdAmbient* ambient, float scale)
 		rdVector_Scale3Acc(&ambient->colors[i], scale);
 }
 
+
+void rdAmbient_Lerp(rdAmbient* out, const rdAmbient* ambient0, const rdAmbient* ambient1, float amount)
+{
+	for (int i = 0; i < 6; ++i)
+	{
+		out->colors[i].x = (ambient0->colors[i].x + (ambient1->colors[i].x - ambient0->colors[i].x) * amount);
+		out->colors[i].y = (ambient0->colors[i].y + (ambient1->colors[i].y - ambient0->colors[i].y) * amount);
+		out->colors[i].z = (ambient0->colors[i].z + (ambient1->colors[i].z - ambient0->colors[i].z) * amount);
+	}
+}
+
+void rdAmbient_AddAcc(rdAmbient* out, const rdAmbient* ambient)
+{
+	for (int i = 0; i < 6; ++i)
+		rdVector_Add3Acc(&out->colors[i], &ambient->colors[i]);
+}
+
 void rdAmbient_Copy(rdAmbient* outAmbient, const rdAmbient* ambient)
 {
 	memcpy(outAmbient, ambient, sizeof(rdAmbient));
