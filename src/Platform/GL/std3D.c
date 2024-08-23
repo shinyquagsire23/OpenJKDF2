@@ -75,6 +75,9 @@ typedef struct std3DFramebuffer
     GLuint tex1;
     GLuint tex2;
     GLuint tex3;
+#ifdef DEFERRED_DECALS
+	GLuint tex4;
+#endif
 
     std3DIntermediateFbo window;
     std3DIntermediateFbo main;
@@ -116,6 +119,9 @@ static int std3D_activeFb = 1;
 int init_once = 0;
 GLuint programDefault, programMenu;
 GLint attribute_coord3d, attribute_v_color, attribute_v_light, attribute_v_uv, attribute_v_norm;
+#ifdef DEFERRED_DECALS
+GLint attribute_coordVS;
+#endif
 GLint uniform_mvp, uniform_tex, uniform_texEmiss, uniform_displacement_map, uniform_tex_mode, uniform_blend_mode, uniform_worldPalette, uniform_worldPaletteLights;
 GLint uniform_tint, uniform_filter, uniform_fade, uniform_add, uniform_emissiveFactor, uniform_albedoFactor;
 GLint uniform_light_mult, uniform_displacement_factor, uniform_iResolution;
@@ -183,6 +189,25 @@ extern int jkGuiBuildMulti_bRendering;
 int std3D_bInitted = 0;
 rdColormap std3D_ui_colormap;
 int std3D_bReinitHudElements = 0;
+
+#ifdef DEFERRED_DECALS
+#define STD3D_MAX_DECALS 256
+
+rdDDrawSurface* decal_tex[STD3D_MAX_DECALS];
+rdVector3 decal_verts[STD3D_MAX_DECALS * 8];
+rdMatrix34 decal_mat[STD3D_MAX_DECALS];
+rdVector3 decal_col[STD3D_MAX_DECALS];
+uint32_t decal_flags[STD3D_MAX_DECALS];
+float decal_angle_fades[STD3D_MAX_DECALS];
+int decal_count;
+
+GLuint programDecal;
+GLint decal_attribute_coord3d;
+GLint decal_uniform_mvp, decal_uniform_tex, decal_uniform_texPos, decal_uniform_texLight, decal_uniform_texNormal, decal_uniform_worldPalette;
+GLint decal_uniform_tint, decal_uniform_filter, decal_uniform_fade, decal_uniform_add, decal_uniform_flags, decal_uniform_texmode;
+GLint decal_uniform_matrix, decal_uniform_color, decal_uniform_angle, decal_uniform_iResolution;
+
+#endif
 
 void std3D_generateIntermediateFbo(int32_t width, int32_t height, std3DIntermediateFbo* pFbo, int isFloat)
 {
@@ -298,6 +323,20 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     
     // Attach fbTex to our currently bound framebuffer fb
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, pFb->tex3, 0);
+
+#ifdef DEFERRED_DECALS
+	// annoyingly need a light buffer to transfer lighting info to the decal pass
+	glGenTextures(1, &pFb->tex4);
+	glBindTexture(GL_TEXTURE_2D, pFb->tex4);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	// Attach fbTex to our currently bound framebuffer fb
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, pFb->tex4, 0);
+#endif
 
     // Set up our render buffer
     glGenRenderbuffers(1, &pFb->rbo);
@@ -515,8 +554,15 @@ int init_resources()
 	if (!std3D_loadSimpleTexProgram("shaders/bloom", &std3D_bloomStage)) return false;
 #endif
 
+#ifdef DEFERRED_DECALS
+	if ((programDecal = std3D_loadProgram("shaders/decal")) == 0) return false;
+#endif
+
     // Attributes/uniforms
     attribute_coord3d = std3D_tryFindAttribute(programDefault, "coord3d");
+#ifdef DEFERRED_DECALS
+	attribute_coordVS = std3D_tryFindAttribute(programDefault, "coordVS");
+#endif
     attribute_v_color = std3D_tryFindAttribute(programDefault, "v_color");
     attribute_v_light = std3D_tryFindAttribute(programDefault, "v_light");
     attribute_v_uv = std3D_tryFindAttribute(programDefault, "v_uv");
@@ -544,6 +590,29 @@ int init_resources()
     programMenu_uniform_mvp = std3D_tryFindUniform(programMenu, "mvp");
     programMenu_uniform_tex = std3D_tryFindUniform(programMenu, "tex");
     programMenu_uniform_displayPalette = std3D_tryFindUniform(programMenu, "displayPalette");
+
+#ifdef DEFERRED_DECALS
+	decal_attribute_coord3d = std3D_tryFindAttribute(programDecal, "coord3d");
+	decal_uniform_mvp = std3D_tryFindUniform(programDecal, "mvp");
+	decal_uniform_texPos = std3D_tryFindUniform(programDecal, "texPos");
+	decal_uniform_texLight = std3D_tryFindUniform(programDecal, "texLight");
+	decal_uniform_texNormal = std3D_tryFindUniform(programDecal, "texNormal");
+	decal_uniform_worldPalette = std3D_tryFindUniform(programDecal, "texPalette");
+	decal_uniform_tex = std3D_tryFindUniform(programDecal, "tex");
+
+
+	decal_uniform_tint = std3D_tryFindUniform(programDecal, "colorEffects_tint");
+	decal_uniform_filter = std3D_tryFindUniform(programDecal, "colorEffects_filter");
+	decal_uniform_fade = std3D_tryFindUniform(programDecal, "colorEffects_fade");
+	decal_uniform_add = std3D_tryFindUniform(programDecal, "colorEffects_add");
+
+	decal_uniform_flags = std3D_tryFindUniform(programDecal, "decalFlags");
+	decal_uniform_angle = std3D_tryFindUniform(programDecal, "decalAngleFade");
+	decal_uniform_texmode = std3D_tryFindUniform(programDecal, "texMode");
+	decal_uniform_matrix = std3D_tryFindUniform(programDecal, "decalMatrix");
+	decal_uniform_color = std3D_tryFindUniform(programDecal, "decalColor");
+	decal_uniform_iResolution = std3D_tryFindUniform(programDecal, "iResolution");
+#endif
     
     // Blank texture
     glGenTextures(1, &blank_tex);
@@ -902,11 +971,26 @@ int std3D_StartScene()
         (GLvoid*)offsetof(D3DVERTEX, tu)                  // offset of first element
     );
 
+#ifdef DEFERRED_DECALS
+	glVertexAttribPointer(
+		attribute_coordVS, // attribute
+		3,                 // number of elements per vertex, here (x,y,z)
+		GL_FLOAT,          // the type of each element
+		GL_FALSE,          // normalize fixed-point data?
+		sizeof(D3DVERTEX),                 // data stride
+		(GLvoid*)offsetof(D3DVERTEX, vx)                  // offset of first element
+	);
+#endif
+
     glEnableVertexAttribArray(attribute_coord3d);
     glEnableVertexAttribArray(attribute_v_color);
     glEnableVertexAttribArray(attribute_v_light);
     glEnableVertexAttribArray(attribute_v_uv);
-    
+
+#ifdef DEFERRED_DECALS
+	glEnableVertexAttribArray(attribute_coordVS);
+#endif
+
     return 1;
 }
 
@@ -916,17 +1000,26 @@ int std3D_EndScene()
         last_tex = NULL;
         last_flags = 0;
         std3D_ResetRenderList();
+#ifdef DEFERRED_DECALS
+		std3D_ResetDecalRenderList();
+#endif
         return 1;
     }
 
     glDisableVertexAttribArray(attribute_v_uv);
     glDisableVertexAttribArray(attribute_v_color);
     glDisableVertexAttribArray(attribute_coord3d);
+#ifdef DEFERRED_DECALS
+	glDisableVertexAttribArray(attribute_coordVS);
+#endif
 
     //printf("End draw\n");
     last_tex = NULL;
     last_flags = 0;
     std3D_ResetRenderList();
+#ifdef DEFERRED_DECALS
+	std3D_ResetDecalRenderList();
+#endif
     //printf("%u tris\n", rendered_tris);
     return 1;
 }
@@ -2163,6 +2256,10 @@ void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
+#ifdef DEFERRED_DECALS
+void std3D_DrawDecalList();
+#endif
+
 void std3D_DrawSceneFbo()
 {
     //printf("Draw scene FBO\n");
@@ -2224,6 +2321,10 @@ void std3D_DrawSceneFbo()
     }
 
     float rad_scale = (float)std3D_pFb->w / 640.0;
+
+#ifdef DEFERRED_DECALS
+	std3D_DrawDecalList();
+#endif
 
     if (!draw_ssao)
     {
@@ -2309,7 +2410,8 @@ void std3D_DrawSceneFbo()
 
 void std3D_DoTex(rdDDrawSurface* tex, rdTri* tri, int tris_left)
 {
-    if (!tex) {
+    if (!tex)
+	{
         glActiveTexture(GL_TEXTURE0 + 3);
         glBindTexture(GL_TEXTURE_2D, blank_tex); // emissive
         glActiveTexture(GL_TEXTURE0 + 4);
@@ -2391,8 +2493,12 @@ void std3D_DrawRenderList()
     glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->fbo);
     glUseProgram(programDefault);
 
-    GLenum bufs[4] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3};
-    glDrawBuffers(4, bufs);
+    GLenum bufs[] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3
+	#ifdef DEFERRED_DECALS
+	, GL_COLOR_ATTACHMENT4
+	#endif	
+	};
+    glDrawBuffers(ARRAYSIZE(bufs), bufs);
     
     last_tex = NULL;
 
@@ -2739,6 +2845,271 @@ void std3D_DrawRenderList()
     
     std3D_ResetRenderList();
 }
+
+#ifdef DEFERRED_DECALS
+void std3D_DrawDecalList()
+{
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+	glEnable(GL_CULL_FACE);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->main.fbo);
+
+	// we only need to write color + emissivie
+	GLenum bufs[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+	glDrawBuffers(2, bufs);
+
+	glDepthFunc(GL_ALWAYS);
+	glUseProgram(programDecal);
+
+	glUniform1i(decal_uniform_texPos, 0);
+	glUniform1i(decal_uniform_texLight, 1);
+	glUniform1i(decal_uniform_texNormal, 2);
+	glUniform1i(decal_uniform_worldPalette, 3);
+	glUniform1i(decal_uniform_tex, 4);
+
+	{
+		float maxX, maxY, scaleX, scaleY, width, height;
+
+		float internalWidth = Video_menuBuffer.format.width;
+		float internalHeight = Video_menuBuffer.format.height;
+
+		if (jkGuiBuildMulti_bRendering)
+		{
+			internalWidth = 640.0;
+			internalHeight = 480.0;
+		}
+
+		maxX = 1.0;
+		maxY = 1.0;
+		scaleX = 1.0 / ((double)internalWidth / 2.0);
+		scaleY = 1.0 / ((double)internalHeight / 2.0);
+		width = std3D_pFb->w;
+		height = std3D_pFb->h;
+
+		if (jkGuiBuildMulti_bRendering)
+		{
+			width = 640;
+			height = 480;
+		}
+
+		// JKDF2's vertical FOV is fixed with their projection, for whatever reason. 
+		// This ends up resulting in the view looking squished vertically at wide/ultrawide aspect ratios.
+		// To compensate, we zoom the y axis here.
+		// I also went ahead and fixed vertical displays in the same way because it seems to look better.
+		float zoom_yaspect = (width / height);
+		float zoom_xaspect = (height / width);
+
+		if (height > width)
+		{
+			zoom_yaspect = 1.0;
+		}
+
+		if (width > height)
+		{
+			zoom_xaspect = 1.0;
+		}
+
+		// We no longer need all the weird squishing
+		if (!jkGuiBuildMulti_bRendering)
+		{
+			zoom_yaspect = 1.0;
+			zoom_xaspect = 1.0;
+		}
+
+		float shift_add_x = 0;
+		float shift_add_y = 0;
+
+		if (jkGuiBuildMulti_bRendering)
+		{
+			float menu_w, menu_h, menu_x;
+			menu_w = (double)std3D_pFb->w;
+			menu_h = (double)std3D_pFb->h;
+
+			// Keep 4:3 aspect
+			menu_x = (menu_w - (menu_h * (640.0 / 480.0))) / 2.0;
+
+			width = std3D_pFb->w;
+			height = std3D_pFb->h;
+
+			zoom_xaspect = (height / width);
+
+			shift_add_x = (((1.0 - ((menu_x * zoom_xaspect) / std3D_pFb->w)) + 0.15) * zoom_xaspect);
+			shift_add_y = -0.5;
+			zoom_yaspect = 1.0;
+		}
+
+		float d3dmat[16] = {
+				maxX * scaleX * zoom_xaspect,      0,                                          0,      0, // right
+				0,                                       -maxY * scaleY * zoom_yaspect,               0,      0, // up
+				0,                                       0,                                          1,     0, // forward
+				-(internalWidth / 2) * scaleX * zoom_xaspect + shift_add_x,  (internalHeight / 2) * scaleY * zoom_yaspect + shift_add_y,     (!rdCamera_pCurCamera || rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective) ? -1 : 1,      1  // pos
+		};
+
+		glUniformMatrix4fv(decal_uniform_mvp, 1, GL_FALSE, d3dmat);
+		glViewport(0, 0, width, height);
+		glUniform2f(decal_uniform_iResolution, std3D_pFb->window.iw, std3D_pFb->window.ih);
+	}
+
+	// triangle indices
+	GL_tmpTris[0].v1 = 0;
+	GL_tmpTris[0].v2 = 1;
+	GL_tmpTris[0].v3 = 2;
+	GL_tmpTris[1].v1 = 2;
+	GL_tmpTris[1].v2 = 3;
+	GL_tmpTris[1].v3 = 0;
+
+	GL_tmpTris[2].v1 = 1;
+	GL_tmpTris[2].v2 = 5;
+	GL_tmpTris[2].v3 = 6;
+
+	GL_tmpTris[3].v1 = 6;
+	GL_tmpTris[3].v2 = 2;
+	GL_tmpTris[3].v3 = 1;
+
+	GL_tmpTris[4].v1 = 7;
+	GL_tmpTris[4].v2 = 6;
+	GL_tmpTris[4].v3 = 5;
+
+	GL_tmpTris[5].v1 = 5;
+	GL_tmpTris[5].v2 = 4;
+	GL_tmpTris[5].v3 = 7;
+
+	GL_tmpTris[6].v1 = 4;
+	GL_tmpTris[6].v2 = 0;
+	GL_tmpTris[6].v3 = 3;
+
+	GL_tmpTris[7].v1 = 3;
+	GL_tmpTris[7].v2 = 7;
+	GL_tmpTris[7].v3 = 4;
+
+	GL_tmpTris[8].v1 = 4;
+	GL_tmpTris[8].v2 = 5;
+	GL_tmpTris[8].v3 = 1;
+
+	GL_tmpTris[9].v1 = 1;
+	GL_tmpTris[9].v2 = 0;
+	GL_tmpTris[9].v3 = 4;
+
+	GL_tmpTris[10].v1 = 3;
+	GL_tmpTris[10].v2 = 2;
+	GL_tmpTris[10].v3 = 6;
+
+	GL_tmpTris[11].v1 = 6;
+	GL_tmpTris[11].v2 = 7;
+	GL_tmpTris[11].v3 = 3;
+
+	GL_tmpTrisAmt = 12;
+
+	GLushort data_elements[12 * 3];
+	rdTri* tris = GL_tmpTris;
+	for (int j = 0; j < GL_tmpTrisAmt; j++)
+	{
+		data_elements[(j * 3) + 0] = tris[j].v1;
+		data_elements[(j * 3) + 1] = tris[j].v2;
+		data_elements[(j * 3) + 2] = tris[j].v3;
+	}
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, menu_ibo_triangle);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, GL_tmpTrisAmt * 3 * sizeof(GLushort), data_elements, GL_STREAM_DRAW);
+
+	// decal vertices
+	GL_tmpVerticesAmt = decal_count * 8;
+	for (int v = 0; v < GL_tmpVerticesAmt; ++v)
+	{
+		GL_tmpVertices[v].x = decal_verts[v].x;
+		GL_tmpVertices[v].y = decal_verts[v].y;
+		GL_tmpVertices[v].z = decal_verts[v].z;
+		GL_tmpVertices[v].tu = 0;
+		GL_tmpVertices[v].tv = 0;
+		*(uint32_t*)&GL_tmpVertices[v].nx = 0;
+		GL_tmpVertices[v].color = 0xFFFFFFFF;
+		*(uint32_t*)&GL_tmpVertices[v].nz = 0;
+	}
+
+	glEnableVertexAttribArray(decal_attribute_coord3d);
+	
+	glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_all);
+	glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * sizeof(D3DVERTEX), GL_tmpVertices, GL_STREAM_DRAW);
+	glVertexAttribPointer(
+		decal_attribute_coord3d, // attribute
+		3,                 // number of elements per vertex, here (x,y,z)
+		GL_FLOAT,          // the type of each element
+		GL_FALSE,          // normalize fixed-point data?
+		sizeof(D3DVERTEX),                 // data stride
+		(GLvoid*)offsetof(D3DVERTEX, x)                  // offset of first element
+	);
+
+	glActiveTexture(GL_TEXTURE0 + 0);
+	glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex2);
+	glActiveTexture(GL_TEXTURE0 + 1);
+	glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex4);
+	glActiveTexture(GL_TEXTURE0 + 2);
+	glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex3);
+	glActiveTexture(GL_TEXTURE0 + 3);
+	glBindTexture(GL_TEXTURE_2D, displaypal_texture);
+
+	glUniform3f(decal_uniform_tint, rdroid_curColorEffects.tint.x, rdroid_curColorEffects.tint.y, rdroid_curColorEffects.tint.z);
+	if (rdroid_curColorEffects.filter.x || rdroid_curColorEffects.filter.y || rdroid_curColorEffects.filter.z)
+		glUniform3f(decal_uniform_filter, rdroid_curColorEffects.filter.x ? 1.0 : 0.25, rdroid_curColorEffects.filter.y ? 1.0 : 0.25, rdroid_curColorEffects.filter.z ? 1.0 : 0.25);
+	else
+		glUniform3f(decal_uniform_filter, 1.0, 1.0, 1.0);
+	glUniform1f(decal_uniform_fade, rdroid_curColorEffects.fade);
+	glUniform3f(decal_uniform_add, (float)rdroid_curColorEffects.add.x / 255.0f, (float)rdroid_curColorEffects.add.y / 255.0f, (float)rdroid_curColorEffects.add.z / 255.0f);
+
+	// todo: build a list of batches?
+	int lastTex = 0;
+	for(int i = 0; i < decal_count; ++i)
+	{
+		// don't rebind the same texture over and over
+		// we do this instead of sorting by ID to preserve draw order
+		if(lastTex != decal_tex[i]->texture_id)
+		{
+			glActiveTexture(GL_TEXTURE0 + 4);
+			glBindTexture(GL_TEXTURE_2D, decal_tex[i]->texture_id);
+			lastTex = decal_tex[i]->texture_id;
+		}
+
+		rdVector4 mat[4];
+		rdVector_Set4(&mat[0], decal_mat[i].rvec.x, decal_mat[i].rvec.y, decal_mat[i].rvec.z, 0.0f);
+		rdVector_Set4(&mat[1], decal_mat[i].lvec.x, decal_mat[i].lvec.y, decal_mat[i].lvec.z, 0.0f);
+		rdVector_Set4(&mat[2], decal_mat[i].uvec.x, decal_mat[i].uvec.y, decal_mat[i].uvec.z, 0.0f);
+		rdVector_Set4(&mat[3], decal_mat[i].scale.x, decal_mat[i].scale.y, decal_mat[i].scale.z, 1.0f);
+		glUniformMatrix4fv(decal_uniform_matrix, 1, GL_FALSE, &mat[0].x);
+
+		if (!jkPlayer_enableTextureFilter)
+			glUniform1i(decal_uniform_texmode, decal_tex[i]->is_16bit ? TEX_MODE_16BPP : TEX_MODE_WORLDPAL);
+		else
+			glUniform1i(decal_uniform_texmode, decal_tex[i]->is_16bit ? TEX_MODE_BILINEAR_16BPP : TEX_MODE_BILINEAR);
+
+		glUniform3f(decal_uniform_color, decal_col[i].x, decal_col[i].y, decal_col[i].z);		
+		glUniform1ui(decal_uniform_flags, decal_flags[i]);
+		glUniform1f(decal_uniform_angle, decal_angle_fades[i]);
+
+		if(decal_flags[i] & RD_DECAL_ADD)
+			glBlendFunc(GL_ONE, GL_ONE);
+		else
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		if(decal_flags[i] & RD_DECAL_INSIDE)
+			glCullFace(GL_FRONT);
+		else
+			glCullFace(GL_BACK);
+
+		//int tris_size;
+		//glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &tris_size);
+		glDrawElementsBaseVertex(GL_TRIANGLES, GL_tmpTrisAmt * 3, GL_UNSIGNED_SHORT, 0, i * 8);
+
+		//glDrawElements(GL_TRIANGLES, tris_size / sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
+	}
+
+	glDisableVertexAttribArray(decal_attribute_coord3d);
+
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_FRONT);
+	std3D_ResetDecalRenderList();
+}
+#endif
 
 int std3D_SetCurrentPalette(rdColor24 *a1, int a2)
 {
@@ -3629,3 +4000,28 @@ int std3D_IsReady()
 {
     return has_initted;
 }
+
+#ifdef DEFERRED_DECALS
+void std3D_ResetDecalRenderList()
+{
+	decal_count = 0;
+}
+
+void std3D_DrawDecal(rdDDrawSurface* texture, rdVector3* verts, rdMatrix34* decalMatrix, rdVector3* color, uint32_t flags, float angleFade)
+{
+	if(decal_count >= STD3D_MAX_DECALS || !jkPlayer_enableDecals)
+		return;
+
+	//if (std3D_AddToTextureCache(vbuf, vbuf->ddraw_surface, texture->alpha_en & 1, 0))
+	{
+		decal_tex[decal_count] = texture;// vbuf->ddraw_surface;
+		memcpy(&decal_verts[decal_count * 8], verts, sizeof(rdVector3) * 8);
+		rdMatrix_Copy34(&decal_mat[decal_count], decalMatrix);
+		rdVector_Copy3(&decal_col[decal_count], color);
+		decal_angle_fades[decal_count] = angleFade;
+		decal_flags[decal_count] = flags;
+		++decal_count;
+	}
+}
+
+#endif

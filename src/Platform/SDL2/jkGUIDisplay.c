@@ -38,7 +38,7 @@ static int slider_images[2] = {JKGUI_BM_SLIDER_BACK, JKGUI_BM_SLIDER_THUMB};
 void jkGuiDisplay_FovDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
 void jkGuiDisplay_FramelimitDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
 
-static jkGuiElement jkGuiDisplay_aElements[31] = { 
+static jkGuiElement jkGuiDisplay_aElements[32] = { 
     { ELEMENT_TEXT,        0,            0, NULL,                   3, {0, 410, 640, 20},   1, 0, NULL,                        0, 0, 0, {0}, 0},
     { ELEMENT_TEXT,        0,            6, "GUI_SETUP",            3, {20, 20, 600, 40},   1, 0, NULL,                        0, 0, 0, {0}, 0},
     { ELEMENT_TEXTBUTTON,  GUI_GENERAL,  2, "GUI_GENERAL",          3, {20, 80, 120, 40},   1, 0, "GUI_GENERAL_HINT",          0, 0, 0, {0}, 0},
@@ -54,9 +54,9 @@ static jkGuiElement jkGuiDisplay_aElements[31] = {
     {ELEMENT_SLIDER,       0,            0, (const char*)(FOV_MAX - FOV_MIN),                    0, {10, 160, 320, 30}, 1, 0, "GUIEXT_FOV_HINT", jkGuiDisplay_FovDraw, 0, slider_images, {0}, 0},
     {ELEMENT_TEXT,         0,            0, slider_val_text,        3, {20, 190, 300, 30}, 1,  0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_CHECKBOX,     0,            0, "GUIEXT_FOV_VERTICAL",    0, {20, 210, 200, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
-    {ELEMENT_CHECKBOX,     0,            0, "GUIEXT_EN_FULLSCREEN",    0, {400, 150, 200, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
-    {ELEMENT_CHECKBOX,     0,            0, "GUIEXT_EN_HIDPI",    0, {400, 180, 200, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
-    {ELEMENT_CHECKBOX,     0,            0, "GUIEXT_EN_TEXTURE_FILTERING",    0, {400, 210, 200, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
+    {ELEMENT_CHECKBOX,     0,            0, "GUIEXT_EN_FULLSCREEN",    0, {400, 150, 200, 20}, 1,  0, NULL, 0, 0, 0, {0}, 0},
+    {ELEMENT_CHECKBOX,     0,            0, "GUIEXT_EN_HIDPI",    0, {400, 170, 200, 20}, 1,  0, NULL, 0, 0, 0, {0}, 0},
+    {ELEMENT_CHECKBOX,     0,            0, "GUIEXT_EN_TEXTURE_FILTERING",    0, {400, 190, 200, 20}, 1,  0, NULL, 0, 0, 0, {0}, 0},
     {ELEMENT_CHECKBOX,     0,            0, "GUIEXT_EN_SQUARE_ASPECT",    0, {20, 240, 300, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
 
     // 17
@@ -66,10 +66,10 @@ static jkGuiElement jkGuiDisplay_aElements[31] = {
     {ELEMENT_CHECKBOX,     0,            0, "GUIEXT_EN_VSYNC",    0, {20, 360, 300, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
     
     // 21
-    {ELEMENT_CHECKBOX,     0,            0, "GUIEXT_EN_BLOOM",    0, {400, 240, 300, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
+    {ELEMENT_CHECKBOX,     0,            0, "GUIEXT_EN_BLOOM",    0, {400, 210, 300, 20}, 1,  0, NULL, 0, 0, 0, {0}, 0},
 
     // 22
-    {ELEMENT_CHECKBOX,     0,            0, "GUIEXT_EN_SSAO",    0, {400, 270, 300, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
+    {ELEMENT_CHECKBOX,     0,            0, "GUIEXT_EN_SSAO",    0, {400, 230, 300, 20}, 1,  0, NULL, 0, 0, 0, {0}, 0},
     
     // 23
     { ELEMENT_TEXT,        0,            0, "GUIEXT_SSAA_MULT",            2, {400, 320, 120, 20},   1, 0, NULL,                        0, 0, 0, {0}, 0},
@@ -84,6 +84,11 @@ static jkGuiElement jkGuiDisplay_aElements[31] = {
     { ELEMENT_TEXTBOX,      0,            0, NULL,    100, {530, 380, 80, 20}, 1,  0, NULL, 0, 0, 0, {0}, 0},
 
     { ELEMENT_TEXTBUTTON,  GUI_ADVANCED, 2, "GUI_ADVANCED",               3, {220, 430, 200, 40}, 1, 0, NULL,                        0, 0, 0, {0}, 0},
+
+#ifdef DEFERRED_DECALS
+	// 30
+	{ ELEMENT_CHECKBOX,     0,           0, "GUIEXT_EN_DECALS",    0, {400, 250, 300, 20}, 1,  0, NULL, 0, 0, 0, {0}, 0},
+#endif
 
     { ELEMENT_END,         0,            0, NULL,                   0, {0},                 0, 0, NULL,                        0, 0, 0, {0}, 0},
 };
@@ -210,6 +215,10 @@ int jkGuiDisplay_Show()
     jkGuiDisplay_aElements[21].selectedTextEntry = jkPlayer_enableBloom;
     jkGuiDisplay_aElements[22].selectedTextEntry = jkPlayer_enableSSAO;
 
+#ifdef DEFERRED_DECALS
+	jkGuiDisplay_aElements[30].selectedTextEntry = jkPlayer_enableDecals;
+#endif
+
     jk_snwprintf(render_level, 255, L"%.2f", jkPlayer_ssaaMultiple);
     jk_snwprintf(gamma_level, 255, L"%.2f", jkPlayer_gamma);
     jk_snwprintf(hud_level, 255, L"%.2f", jkPlayer_hudScale);
@@ -233,6 +242,9 @@ continue_menu:
         jkPlayer_enableVsync = jkGuiDisplay_aElements[20].selectedTextEntry;
         jkPlayer_enableBloom = jkGuiDisplay_aElements[21].selectedTextEntry;
         jkPlayer_enableSSAO = jkGuiDisplay_aElements[22].selectedTextEntry;
+#ifdef DEFERRED_DECALS
+		jkPlayer_enableDecals = jkGuiDisplay_aElements[30].selectedTextEntry;
+#endif
 
         char tmp[256];
         stdString_WcharToChar(tmp, render_level, 255);

@@ -35,6 +35,9 @@ int rdThing_SetLight(rdThing *thing, rdLight *light);
 int rdThing_SetSprite3(rdThing *thing, rdSprite *sprite);
 int rdThing_SetPolyline(rdThing *thing, rdPolyLine *polyline);
 int rdThing_SetParticleCloud(rdThing *thing, rdParticle *particle);
+#ifdef DEFERRED_DECALS
+int rdThing_SetDecal(rdThing* thing, rdDecal* decal);
+#endif
 int rdThing_Draw(rdThing *thing, rdMatrix34 *m);
 void rdThing_AccumulateMatrices(rdThing *thing, rdHierarchyNode *node, rdMatrix34 *acc);
 

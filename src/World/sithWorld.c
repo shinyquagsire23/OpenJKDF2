@@ -29,6 +29,9 @@
 #include "Platform/std3D.h"
 #include "jk.h"
 #include "General/stdMath.h"
+#ifdef DEFERRED_DECALS
+#include "World/sithDecal.h"
+#endif
 
 // MOTS added
 static sithWorld_ChecksumHandler_t sithWorld_checksumExtraFunc;
@@ -82,6 +85,9 @@ int sithWorld_Startup()
     sithWorld_SetSectionParser("sectors", sithSector_Load);
     sithWorld_SetSectionParser("models", sithModel_Load);
     sithWorld_SetSectionParser("sprites", sithSprite_Load);
+#ifdef DEFERRED_DECALS
+	sithWorld_SetSectionParser("decals", sithDecal_Load);
+#endif
     sithWorld_SetSectionParser("things", sithThing_Load);
     sithWorld_SetSectionParser("templates", sithTemplate_Load);
     sithWorld_SetSectionParser("materials", sithMaterial_Load);

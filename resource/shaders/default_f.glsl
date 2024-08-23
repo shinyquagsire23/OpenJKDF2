@@ -3,6 +3,7 @@
 #endif
 
 #define CLASSIC_EMISSIVE
+#define DEFERRED_DECALS
 
 #ifdef HAS_TEXTUREGATHER
 vec4 impl_textureGather(sampler2D tex, vec2 uv)
@@ -76,6 +77,25 @@ layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragColorEmiss;
 layout(location = 2) out vec4 fragColorPos;
 layout(location = 3) out vec4 fragColorNormal;
+#ifdef DEFERRED_DECALS
+layout(location = 4) out vec4 fragColorLight;
+
+vec2 oct_wrap(vec2 v)
+{
+	vec2 signs;
+	signs.x = v.x >= 0.0 ? 1.0 : -1.0;
+	signs.y = v.y >= 0.0 ? 1.0 : -1.0;
+    return (1.0 - abs(v.yx)) * (signs);
+}
+
+vec2 encode_octahedron(vec3 v)
+{
+    v /= abs(v.x) + abs(v.y) + abs(v.z);
+    v.xy = v.z >= 0.0 ? v.xy : oct_wrap(v.xy);
+    return clamp(v.xy, vec2(-1.0), vec2(1.0));
+}
+
+#endif
 
 float luminance(vec3 c_rgb)
 {
@@ -251,8 +271,12 @@ vec4 bilinear_paletted_light(float index)
 void main(void)
 {
     float originalZ = gl_FragCoord.z / gl_FragCoord.w;
-    vec3 adjusted_coords = vec3(f_coord.x/iResolution.x, f_coord.y/iResolution.y, originalZ);
-    vec3 adjusted_coords_norms = vec3(gl_FragCoord.x/iResolution.x, gl_FragCoord.y/iResolution.y, 1.0/gl_FragCoord.z);
+#ifdef DEFERRED_DECALS
+    vec3 adjusted_coords = f_coord; // view space position
+#else
+    vec3 adjusted_coords = vec3(f_coord.x/iResolution.x, f_coord.y/iResolution.y, originalZ); // clip space pos
+#endif
+	vec3 adjusted_coords_norms = vec3(gl_FragCoord.x/iResolution.x, gl_FragCoord.y/iResolution.y, 1.0/gl_FragCoord.z);
     vec3 adjusted_coords_parallax = vec3(adjusted_coords_norms.x - 0.5, adjusted_coords_norms.y - 0.5, gl_FragCoord.z);
     vec3 face_normals = normals(adjusted_coords_norms);
     vec3 face_normals_parallax = normals(adjusted_coords_parallax);
@@ -440,7 +464,13 @@ void main(void)
     //test_norms.xyz *= dot(vec3(1.0, 0.0, -0.7), face_normals);
     //fragColor = test_norms;
 
+	gl_FragDepth = gl_FragCoord.z;
     fragColorPos = vec4(adjusted_coords.x, adjusted_coords.y, adjusted_coords.z, should_write_normals);
+#ifdef DEFERRED_DECALS
+	vec2 octaNormal = encode_octahedron(normals(adjusted_coords.xyz)); // encode normal so we can store depth in Z
+    fragColorNormal = vec4(octaNormal.xy, originalZ, should_write_normals);
+	fragColorLight = vec4(vertex_color.rgb, should_write_normals);
+#else
     fragColorNormal = vec4(face_normals, should_write_normals);
-    gl_FragDepth = gl_FragCoord.z;
+#endif
 }

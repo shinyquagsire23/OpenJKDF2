@@ -30,6 +30,10 @@
 #include "Platform/std3D.h"
 #include "stdPlatform.h"
 
+#ifdef DEFERRED_DECALS
+#include "World/sithDecal.h"
+#endif
+
 #ifdef QOL_IMPROVEMENTS
 #if 0
 static rdThing* lightDebugThing = NULL;
@@ -1030,6 +1034,9 @@ void sithRender_RenderLevelGeometry()
                 {
                     continue;
                 }
+#ifdef DEFERRED_DECALS
+				memcpy(procEntry->vertexVS, sithRender_aVerticesTmp, sizeof(rdVector3) * meshinfo_out.numVertices);
+#endif
                 rdCamera_pCurCamera->fnProjectLst(procEntry->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
                 if ( sithRender_lightingIRMode )
                 {
@@ -1266,6 +1273,9 @@ void sithRender_RenderLevelGeometry()
                     if ( meshinfo_out.numVertices < 3u )
                         goto LABEL_92;
 
+#ifdef DEFERRED_DECALS
+					memcpy(v20->vertexVS, sithRender_aVerticesTmp, sizeof(rdVector3) * meshinfo_out.numVertices);
+#endif
                     rdCamera_pCurCamera->fnProjectLst(v20->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
 
                     if ( sithRender_lightingIRMode )
@@ -1385,6 +1395,7 @@ LABEL_150:
         }
 
         rdSetProcFaceUserData(level_idk->id | 0x10000);
+
         int safeguard = 0;
         for ( i = level_idk->thingsList; i; i = i->nextThing )
         {
@@ -2177,6 +2188,9 @@ void sithRender_RenderAlphaSurfaces()
         {
             continue;
         }
+#ifdef DEFERRED_DECALS
+		memcpy(v9->vertexVS, sithRender_aVerticesTmp, sizeof(rdVector3)* meshinfo_out.numVertices);
+#endif
         rdCamera_pCurCamera->fnProjectLst(v9->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
         
 #ifdef RGB_AMBIENT

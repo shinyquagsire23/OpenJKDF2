@@ -1,3 +1,4 @@
+#define DEFERRED_DECALS
 #define NEW_SSAO
 
 
@@ -21,6 +22,23 @@ out vec4 fragColor;
 #define Samples 8.0
 #endif
 
+#ifdef DEFERRED_DECALS
+vec2 oct_wrap(vec2 v)
+{
+	vec2 signs;
+	signs.x = v.x >= 0.0 ? 1.0 : -1.0;
+	signs.y = v.y >= 0.0 ? 1.0 : -1.0;
+    return (1.0 - abs(v.yx)) * (signs);
+}
+
+vec3 decode_octahedron(vec2 p)
+{
+	vec3 n;
+    n.z = 1.0 - abs(p.x) - abs(p.y);
+    n.xy = n.z >= 0.0 ? p.xy : oct_wrap( p.xy );
+    return normalize(n);
+}
+#endif
 
 // --------------------------------------
 // oldschool rand() from Visual Studio
@@ -61,7 +79,11 @@ vec3 hemisphereVolumeRandPoint()
 float depth(vec2 coord)
 {
     vec2 uv = coord*vec2(iResolution.y/iResolution.x,1.0);
+#ifdef DEFERRED_DECALS
+    return texture(tex2, uv).z;
+#else
     return texture(tex, uv).z;
+#endif
 }
 
 vec3 getpos(vec2 coord)
@@ -84,8 +106,12 @@ float SSAO(vec2 coord)
 	float radius = 0.003f;
 #endif
 
+#ifdef DEFERRED_DECALS
+	vec3 normal = decode_octahedron(texture(tex2, f_uv).xy);
+#else
     vec3 normal = texture(tex2, f_uv).rgb;	
     normal *= vec3(1.0, 1.0, -1.0);
+#endif
     normal = normalize(normal);
 
     vec3 rvec = texture(tex3, (f_uv*iResolution.xy) / vec2(4.0)).rgb;

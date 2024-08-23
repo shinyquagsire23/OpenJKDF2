@@ -146,6 +146,14 @@ int rdThing_SetParticleCloud(rdThing *thing, rdParticle *particle)
     return 1;
 }
 
+#ifdef DEFERRED_DECALS
+int rdThing_SetDecal(rdThing* thing, rdDecal* decal)
+{
+	thing->type = RD_THINGTYPE_DECAL;
+	thing->decal = decal;
+}
+#endif
+
 int rdThing_Draw(rdThing *thing, rdMatrix34 *m)
 {
     if (!rdroid_curGeometryMode)
@@ -165,6 +173,10 @@ int rdThing_Draw(rdThing *thing, rdMatrix34 *m)
             return rdParticle_Draw(thing, m);
         case RD_THINGTYPE_POLYLINE:
             return rdPolyLine_Draw(thing, m);
+#ifdef DEFERRED_DECALS
+		case RD_THINGTYPE_DECAL:
+			return rdDecal_Draw(thing, m);
+#endif
     }
     
     // aaaaaaaaaaaaaaaaaa original game returns undefined for other types, this is to replicate that

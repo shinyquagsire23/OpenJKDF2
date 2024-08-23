@@ -20,6 +20,19 @@ static float rdCache_aGreenIntensities[RDCACHE_MAX_VERTICES];
 static float rdCache_aBlueIntensities[RDCACHE_MAX_VERTICES];
 #endif
 
+#ifdef DEFERRED_DECALS
+// maybe this should be a AOS?
+rdVector3 rdCache_aVerticesVS[RDCACHE_MAX_VERTICES] = { 0 };
+rdVector3 rdCache_aDecalColors[256];
+rdMatrix34 rdCache_aDecalMatrices[256];
+rdDecal* rdCache_aDecals[256];
+float rdCache_aDecalScales[256];
+float rdCache_aDecalAngleFades[256];
+int rdCache_numDecals;
+
+void rdCache_FlushDecals();
+#endif
+
 int rdCache_Startup()
 {
     return 1;
@@ -55,6 +68,9 @@ void rdCache_Reset()
     rdCache_ulcExtent.y = 0x7FFFFFFF;
     rdCache_lrcExtent.x = 0;
     rdCache_lrcExtent.y = 0;
+#ifdef DEFERRED_DECALS
+	rdCache_numDecals = 0;
+#endif
 }
 
 void rdCache_ClearFrameCounters()
@@ -86,6 +102,9 @@ rdProcEntry *rdCache_GetProcEntry()
     out_procEntry = &rdCache_aProcFaces[idx];
     out_procEntry->vertices = &rdCache_aVertices[rdCache_numUsedVertices];
     out_procEntry->vertexUVs = &rdCache_aTexVertices[rdCache_numUsedTexVertices];
+#ifdef DEFERRED_DECALS
+	out_procEntry->vertexVS = &rdCache_aVerticesVS[rdCache_numUsedTexVertices];
+#endif
     out_procEntry->vertexIntensities = &rdCache_aIntensities[rdCache_numUsedIntensities];
 #ifdef JKM_LIGHTING
     out_procEntry->paRedIntensities = &rdCache_aRedIntensities[rdCache_numUsedIntensities];
@@ -152,6 +171,9 @@ void rdCache_Flush()
 #endif
     {
         rdCache_SendFaceListToHardware();
+	#ifdef DEFERRED_DECALS
+		rdCache_FlushDecals();
+	#endif
     }
     rdCache_drawnFaces += rdCache_numProcFaces;
     rdCache_Reset();
@@ -663,6 +685,9 @@ int rdCache_SendFaceListToHardware()
 #endif
 
             iterating_6c_vtxs = active_6c->vertices;
+#ifdef DEFERRED_DECALS
+			rdVector3* iter_vs = active_6c->vertexVS;
+#endif
             vertex_a = red_and_alpha << 8;
 
             for (int vtx_idx = 0; vtx_idx < active_6c->numVertices; vtx_idx++)
@@ -679,6 +704,11 @@ int rdCache_SendFaceListToHardware()
                 v38 = d3dvtx_zval * v134;
                 if ( rdCache_dword_865258 != 16 )
                     v38 = 1.0 - v38;
+#ifdef DEFERRED_DECALS
+				rdCache_aHWVertices[rdCache_totalVerts].vx = iter_vs[vtx_idx].x;
+				rdCache_aHWVertices[rdCache_totalVerts].vy = iter_vs[vtx_idx].y;
+				rdCache_aHWVertices[rdCache_totalVerts].vz = iter_vs[vtx_idx].z;
+#endif
                 rdCache_aHWVertices[rdCache_totalVerts].z = v38;
                 rdCache_aHWVertices[rdCache_totalVerts].nx = d3dvtx_zval / 32.0;
                 rdCache_aHWVertices[rdCache_totalVerts].nz = 0.0;
@@ -1395,3 +1425,128 @@ int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags)
         rdCache_lrcExtent.y = procFace->y_max;
     return 1;
 }
+
+#ifdef DEFERRED_DECALS
+void rdCache_DrawDecal(rdDecal* decal, rdMatrix34* matrix, rdVector3* color, float scale, float angleFade)
+{
+	if (rdCache_numDecals >= 256)
+	{
+		rdCache_FlushDecals();
+		rdCache_numDecals = 0;
+	}
+
+	if (!rdMaterial_AddToTextureCache(decal->material, &decal->material->textures[0], 0, 0, 0))
+	{
+		rdCache_FlushDecals();
+		if (!rdMaterial_AddToTextureCache(decal->material, &decal->material->textures[0], 0, 0, 0))
+			return;
+	}
+
+	rdCache_aDecals[rdCache_numDecals] = decal;
+	rdMatrix_Copy34(&rdCache_aDecalMatrices[rdCache_numDecals], matrix);
+	rdVector_Copy3(&rdCache_aDecalColors[rdCache_numDecals], color);
+	rdCache_aDecalScales[rdCache_numDecals] = scale;
+	rdCache_aDecalAngleFades[rdCache_numDecals] = angleFade;
+	++rdCache_numDecals;
+}
+
+void rdCache_FlushDecals()
+{
+	for (int i = 0; i < rdCache_numDecals; ++i)
+	{
+		rdDecal* decal = rdCache_aDecals[i];
+
+		if(!decal->material)
+			continue;
+
+		rdDDrawSurface* tex2_arr_sel = &decal->material->textures[0].alphaMats[0];
+		if(!tex2_arr_sel)
+			continue;
+
+		// copy the matrix for modification, need to do this because it needs to be reused
+		rdMatrix34 decalMatrix;
+		rdMatrix_Copy34(&decalMatrix, &rdCache_aDecalMatrices[i]);
+
+		// apply the size
+		rdVector3 size;
+		rdVector_Scale3(&size, &decal->size, rdCache_aDecalScales[i]);
+		rdMatrix_PreScale34(&decalMatrix, &size);
+
+		// transform it to view space
+		rdMatrix34 decalViewMat;
+		rdMatrix_Multiply34(&decalViewMat, &rdCamera_pCurCamera->view_matrix, &decalMatrix);
+
+		// project the decal box
+		rdVector3 verts[8] =
+		{
+			{ -1.0f, -1.0f,  1.0f },
+			{  1.0f, -1.0f,  1.0f },
+			{  1.0f,  1.0f,  1.0f },
+			{ -1.0f,  1.0f,  1.0f },
+			{ -1.0f, -1.0f, -1.0f },
+			{  1.0f, -1.0f, -1.0f },
+			{  1.0f,  1.0f, -1.0f },
+			{ -1.0f,  1.0f, -1.0f }
+		};
+
+		float inv = 1.0 / rdCamera_pCurCamera->pClipFrustum->field_0.z;
+		for (int v = 0; v < 8; ++v)
+		{
+			rdMatrix_TransformPoint34Acc(&verts[v], &decalViewMat);
+
+			rdVector3 proj;
+			rdCamera_pCurCamera->fnProject(&proj, &verts[v]);
+
+			// this rly needs to be made into a function or something
+			if (proj.z == 0.0)
+				proj.z = 0.0;
+			else
+				proj.z = 1.0 / proj.z;
+			proj.z = proj.z * inv;
+			if (rdCache_dword_865258 != 16)
+				proj.z = 1.0 - proj.z;
+
+			rdVector_Copy3(&verts[v], &proj);
+		}
+
+		// invertortho doesn't handle scale properly so we need to apply the inverse scale manually
+		rdMatrix34 decalMatrixInvScale;
+		rdMatrix_Copy34(&decalMatrixInvScale, &rdCache_aDecalMatrices[i]);
+
+		size.x = 1.0f / size.x;
+		size.y = 1.0f / size.y;
+		size.z = 1.0f / size.z;
+		rdMatrix_PreScale34(&decalMatrixInvScale, &size);
+		rdMatrix_Multiply34(&decalViewMat, &rdCamera_pCurCamera->view_matrix, &decalMatrixInvScale);
+
+		// invert it, so that the drawing is done in local space
+		rdMatrix34 invDecalViewMatrix;
+		rdMatrix_InvertOrtho34(&invDecalViewMatrix, &decalViewMat);
+	
+		// calculate the camera pos in local space
+		// we could probably do this in pure view space but I'm being lazy rn
+		rdMatrix34 invDecalMatrix;
+		rdMatrix_InvertOrtho34(&invDecalMatrix, &decalMatrixInvScale);
+
+		rdVector3 localCamera;
+		rdMatrix_TransformPoint34(&localCamera, &rdCamera_camMatrix.scale, &invDecalMatrix);
+
+		uint32_t extraFlags = 0;
+		float radius = -rdCamera_pCurCamera->pClipFrustum->field_0.y * rdVector_Len3(&size); // give it a radius to account for near plane
+		// fixme: get sithCamera out of here
+		if (localCamera.z - radius >= -1.0f
+			&& localCamera.y - radius >= -1.0f
+			&& localCamera.x - radius >= -1.0f
+			&& localCamera.x + radius <= 1.0f
+			&& localCamera.y + radius <= 1.0f
+			&& localCamera.z + radius <= 1.0f
+			)
+		{
+			extraFlags = RD_DECAL_INSIDE;
+		}
+
+		std3D_DrawDecal(tex2_arr_sel, verts, &invDecalViewMatrix, &rdCache_aDecalColors[i], decal->flags | extraFlags, rdCache_aDecalAngleFades[i]);
+	}
+	rdCache_numDecals = 0;
+}
+#endif

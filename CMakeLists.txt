@@ -107,6 +107,7 @@ add_compile_definitions(
 	RGB_AMBIENT
 	#FP_LEGS
 	DYNAMIC_POV
+	DEFERRED_DECALS
 )
 
 set(CMAKE_C_STANDARD 11)

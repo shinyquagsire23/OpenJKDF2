@@ -65,6 +65,10 @@ float jkPlayer_canonicalPhysTickrate = CANONICAL_PHYS_TICKRATE;
 int jkPlayer_setCrosshairOnLightsaber = 1;
 int jkPlayer_setCrosshairOnFist = 1;
 int jkPlayer_bHasLoadedSettingsOnce = 0;
+
+#ifdef DEFERRED_DECALS
+int jkPlayer_enableDecals = 1;
+#endif
 #endif
 
 #ifdef DYNAMIC_POV
@@ -199,6 +203,9 @@ void jkPlayer_StartupVars()
 #ifdef DYNAMIC_POV
 	sithCvar_RegisterFlex("hud_aimLock",                1.0,                        &jkPlayer_aimLock,                  CVARFLAG_LOCAL|CVARFLAG_RESETHUD);
 #endif
+#ifdef DEFERRED_DECALS
+	sithCvar_RegisterFlex("r_enableDecals",             1.0,                        &jkPlayer_enableDecals,             CVARFLAG_LOCAL | CVARFLAG_RESETHUD);
+#endif
     sithCvar_RegisterBool("hud_setCrosshairOnLightsaber", 1,                        &jkPlayer_setCrosshairOnLightsaber, CVARFLAG_LOCAL);
     sithCvar_RegisterBool("hud_setCrosshairOnFist",     1,                          &jkPlayer_setCrosshairOnFist,       CVARFLAG_LOCAL);
     sithCvar_RegisterFlex("g_canonicalCogTickrate",     CANONICAL_COG_TICKRATE,     &jkPlayer_canonicalCogTickrate,     CVARFLAG_LOCAL);
@@ -243,6 +250,11 @@ void jkPlayer_ResetVars()
     jkPlayer_setCrosshairOnFist = 1;
 
     jkPlayer_bHasLoadedSettingsOnce = 0;
+
+
+#ifdef DEFERRED_DECALS
+	jkPlayer_enableDecals = 1;
+#endif
 #endif
 
 #ifdef DYNAMIC_POV
@@ -601,6 +613,9 @@ void jkPlayer_WriteConf(wchar_t *name)
 #ifdef DYNAMIC_POV
 		stdJSON_SaveBool(ext_fpath, "aimLock", jkPlayer_aimLock);
 #endif
+#ifdef DEFERRED_DECALS
+		stdJSON_SaveBool(ext_fpath, "decals", jkPlayer_enableDecals);
+#endif
 #endif
 #ifdef FIXED_TIMESTEP_PHYS
         stdJSON_SaveBool(ext_fpath, "bJankyPhysics", jkPlayer_bJankyPhysics);
@@ -692,6 +707,13 @@ void jkPlayer_ParseLegacyExt()
         if (_sscanf(stdConffile_aLine, "gamma %f", &jkPlayer_gamma) != 1)
             jkPlayer_gamma = 1.0;
     }
+#ifdef DEFERRED_DECALS
+	if (stdConffile_ReadLine())
+	{
+		if (_sscanf(stdConffile_aLine, "decals %f", &jkPlayer_enableDecals) != 1)
+			jkPlayer_enableDecals = 1.0;
+	}
+#endif
 }
 #endif
 
@@ -792,6 +814,10 @@ int jkPlayer_ReadConf(wchar_t *name)
         jkPlayer_setCrosshairOnFist = stdJSON_GetBool(ext_fpath, "setCrosshairOnFist", jkPlayer_setCrosshairOnFist);
 #ifdef DYNAMIC_POV
 		jkPlayer_aimLock = stdJSON_GetFloat(ext_fpath, "aimLock", jkPlayer_aimLock);
+#endif
+
+#ifdef DEFERRED_DECALS
+		jkPlayer_enableDecals = stdJSON_GetFloat(ext_fpath, "decals", jkPlayer_enableDecals);
 #endif
 #endif
 #ifdef FIXED_TIMESTEP_PHYS

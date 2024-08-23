@@ -598,6 +598,9 @@ typedef struct rdProcEntry
     uint32_t numVertices;
     rdVector3* vertices;
     rdVector2* vertexUVs;
+#ifdef DEFERRED_DECALS
+	rdVector3* vertexVS; // the stupid vertices array is in clip space, but we want to store view/world position
+#endif
     float* vertexIntensities;
 #ifdef JKM_LIGHTING
     float* paRedIntensities;
@@ -784,6 +787,17 @@ typedef struct D3DVERTEX_ext
   #pragma pack(push, 4)
   float lightLevel;
   #pragma pack(pop)
+#ifdef DEFERRED_DECALS
+#pragma pack(push, 4)
+  float vx;
+#pragma pack(pop)
+#pragma pack(push, 4)
+  float vy;
+#pragma pack(pop)
+#pragma pack(push, 4)
+  float vz;
+#pragma pack(pop)
+#endif
 } D3DVERTEX_ext;
 #pragma pack(pop)
 
@@ -1443,6 +1457,20 @@ struct rdSurface
   float field_48;
 };
 
+#ifdef DEFERRED_DECALS
+typedef struct rdDecal
+{
+	char        path[32];
+	rdMaterial* material;
+	uint32_t    flags;
+	rdVector3   color;
+	rdVector3   size;
+	float       fadeTime;
+	float       radius;
+	float       angleFade;
+} rdDecal;
+#endif
+
 typedef struct sithSurface
 {
     uint32_t index;
@@ -2055,6 +2083,11 @@ typedef struct sithWorld
     int numParticlesLoaded;
     int numParticles;
     rdParticle* particles;
+#ifdef DEFERRED_DECALS
+	int numDecalsLoaded;
+	int numDecals;
+	rdDecal* decals;
+#endif
     int numVertices;
     rdVector3* vertices;
     rdVector3* verticesTransformed;
@@ -2214,6 +2247,9 @@ typedef struct rdThing
         rdSprite* sprite3;
         rdParticle* particlecloud;
         rdPolyLine* polyline;
+#ifdef DEFERRED_DECALS
+		rdDecal* decal;
+#endif
 #ifdef GHIDRA_IMPORT
     } containedObj;
 #else
@@ -2593,7 +2629,9 @@ typedef struct sithThingExplosionParams
     uint32_t field_74;
     uint32_t field_78;
     uint32_t field_7C;
-    uint32_t field_80;
+#ifndef DEFERRED_DECALS
+	uint32_t field_80;
+#endif
 } sithThingExplosionParams;
 
 typedef struct sithBackpackItem
@@ -2638,6 +2676,10 @@ typedef struct sithThingWeaponParams
     sithThing* pTargetThing; // 34
     float field_38; // 38
 #endif
+#ifdef DEFERRED_DECALS
+	sithThing* wallHitTemplate;
+#endif
+
     uint32_t field_3C; // 3C
     float range; // 40
     float force; // 3C
@@ -2658,7 +2700,9 @@ typedef struct sithThingWeaponParams
     uint32_t field_78;
     uint32_t field_7C;
     uint32_t field_80;
-    uint32_t field_84;
+#ifndef DEFERRED_DECALS
+	uint32_t field_84;
+#endif
 #ifndef JKM_PARAMS
     uint32_t field_88;
     uint32_t field_8C;
@@ -2859,6 +2903,9 @@ typedef struct sithThing
 
 #ifdef JKM_LIGHTING
     int archlightIdx;
+#endif
+#ifdef DEFERRED_DECALS
+	int initialLifeLeftMs;
 #endif
 } sithThing;
 

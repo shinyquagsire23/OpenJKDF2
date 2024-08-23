@@ -38,11 +38,22 @@
 #include "Dss/sithDSS.h"
 #include "General/stdMath.h"
 #include "jk.h"
+#ifdef DEFERRED_DECALS
+#include "World/sithDecal.h"
+#endif
 
+#ifdef DEFERRED_DECALS
+#ifdef RGB_THING_LIGHTS
+#define NUM_THING_PARAMS (77) // JK is 72
+#else
+#define NUM_THING_PARAMS (76) // JK is 72
+#endif
+#else
 #ifdef RGB_THING_LIGHTS
 #define NUM_THING_PARAMS (75) // JK is 72
 #else
 #define NUM_THING_PARAMS (74) // JK is 72
+#endif
 #endif
 #define NUM_THING_TYPES (13)
 
@@ -104,6 +115,10 @@ const char* sithThing_aParams[NUM_THING_PARAMS] = {
     "mindamage",
     "damageclass",
     "explode",
+#ifdef DEFERRED_DECALS
+	"decal",
+	"wallhit",
+#endif
     "frame",
     "numframes",
     "puppet",
@@ -376,6 +391,16 @@ void sithThing_Remove(sithThing* pThing)
             sithParticle_Remove(pThing);
             break;
         default:
+		#ifdef DEFERRED_DECALS
+			if (pThing->thingflags & SITH_TF_ALIVE_WHILE_VISIBLE)
+			{
+				if (pThing->isVisible + 1 == bShowInvisibleThings)
+				{
+					pThing->lifeLeftMs = pThing->initialLifeLeftMs;
+					break;
+				}
+			}
+		#endif
             pThing->thingflags |= SITH_TF_WILLBEREMOVED;
             if (pThing->thingflags & SITH_TF_CAPTURED && !(pThing->thingflags & SITH_TF_INVULN))
                 sithCog_SendMessageFromThing(pThing, 0, SITH_MESSAGE_REMOVED);
@@ -1711,6 +1736,9 @@ int sithThing_LoadThingParam(stdConffileArg *arg, sithThing* pThing, int param)
 #ifdef RGB_THING_LIGHTS
 	rdVector3 lightColor;
 #endif
+#ifdef DEFERRED_DECALS
+	rdDecal* pDecal;
+#endif
     double lifeLeftSec; // st7
     rdModel3 *pModel; // eax
     rdParticle *pParticle; // edi
@@ -1813,6 +1841,9 @@ int sithThing_LoadThingParam(stdConffileArg *arg, sithThing* pThing, int param)
             if ( lifeLeftSec < 0.0 )
                 goto LABEL_56;
             pThing->lifeLeftMs = (__int64)(lifeLeftSec * 1000.0);
+		#ifdef DEFERRED_DECALS
+			pThing->initialLifeLeftMs = pThing->lifeLeftMs;
+		#endif
             result = 1;
             break;
         case THINGPARAM_LIGHT:
@@ -1927,6 +1958,16 @@ int sithThing_LoadThingParam(stdConffileArg *arg, sithThing* pThing, int param)
             rdThing_SetParticleCloud(&pThing->rdthing, pParticle);
             result = 1;
             break;
+#ifdef DEFERRED_DECALS
+		case THINGPARAM_DECAL:
+			pDecal = sithDecal_LoadEntry(arg->value);
+			if (!pDecal)
+				goto LABEL_58;
+			rdThing_FreeEntry(&pThing->rdthing);
+			rdThing_SetDecal(&pThing->rdthing, pDecal);
+			result = 1;
+			break;
+#endif
         case THINGPARAM_MOVESIZE:
             thingType = pThing->type;
             if ( thingType == SITH_THING_ACTOR || thingType == SITH_THING_PLAYER )

@@ -174,6 +174,10 @@ extern rdVector3 jkPlayer_crosshairPos;
 extern int jkPlayer_aimLock;
 #endif
 
+#ifdef DEFERRED_DECALS
+extern int jkPlayer_enableDecals;
+#endif
+
 #define FOV_MIN (40)
 #define FOV_MAX (170)
 

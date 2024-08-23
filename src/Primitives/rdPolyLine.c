@@ -366,6 +366,9 @@ void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVert
     if ( mesh_out.numVertices < 3 )
         return;
 
+#ifdef DEFERRED_DECALS
+	memcpy(procEntry->vertexVS, mesh_out.verticesProjected, sizeof(rdVector3) * mesh_out.numVertices);
+#endif
     rdCamera_pCurCamera->fnProjectLst(mesh_out.verticesOrig, mesh_out.verticesProjected, mesh_out.numVertices);
 
 #ifdef RGB_AMBIENT

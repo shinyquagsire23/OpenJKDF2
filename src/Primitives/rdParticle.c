@@ -417,6 +417,9 @@ int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
             v27 = v26;
             if ( v26 >= 3 )
             {
+#ifdef DEFERRED_DECALS
+				memcpy(v5->vertexVS, aParticleVerticesTmp, sizeof(rdVector3) * v26);
+#endif
                 rdCamera_pCurCamera->fnProjectLst(v5->vertices, aParticleVerticesTmp, v26);
                 v5->lightingMode = v35;
                 v29 = particle->vertexCel;

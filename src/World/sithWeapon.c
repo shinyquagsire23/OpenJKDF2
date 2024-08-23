@@ -25,6 +25,10 @@
 #include "General/stdMath.h"
 #include "jk.h"
 
+#ifdef DEFERRED_DECALS
+#include "sithDecal.h"
+#endif
+
 // MOTS added
 int sithWeapon_mots_5a3258 = -1;
 int sithWeapon_motsAConv[10] = {
@@ -466,6 +470,12 @@ int sithWeapon_LoadParams(stdConffileArg *arg, sithThing *thing, int param)
             thing->weaponParams.fleshHitTemplate = sithTemplate_GetEntryByName(arg->value);
             return 1;
 
+#ifdef DEFERRED_DECALS
+		case THINGPARAM_WALLHIT:
+			thing->weaponParams.wallHitTemplate = sithTemplate_GetEntryByName(arg->value);
+			return 1;
+#endif
+
         default:
             return 0;
     }
@@ -759,6 +769,40 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
     return 0;
 }
 
+#ifdef DEFERRED_DECALS
+void sithWeapon_WallHitExplode(sithThing* weapon, sithThing* hitTemplate, sithCollisionSearchEntry* collideInfo)
+{
+	if(hitTemplate)
+	{
+		// orient between the hit normal and the incoming direction
+		rdVector3 lookVec;
+		lookVec.x = collideInfo->hitNorm.x - weapon->lookOrientation.lvec.x * 4.0f;
+		lookVec.y = collideInfo->hitNorm.y - weapon->lookOrientation.lvec.y * 4.0f;
+		lookVec.z = collideInfo->hitNorm.z - weapon->lookOrientation.lvec.z * 4.0f;
+		rdVector_Normalize3Acc(&lookVec);
+
+		// orient along the hit normal
+		rdMatrix34 orient;
+		rdMatrix_BuildFromLook34(&orient, &lookVec);
+
+		sithThing* player = sithThing_GetParent(weapon);
+		sithThing* spawned = sithThing_Create(hitTemplate, &weapon->position, &orient, weapon->sector, player);
+		if (spawned)
+		{
+			// Added: second comparison, co-op
+			if (player == sithPlayer_pLocalPlayerThing || player->thingtype == SITH_THING_PLAYER)
+				sithAIAwareness_AddEntry(spawned->sector, &spawned->position, 0, 2.0, player);
+
+			if (weapon->thingflags & SITH_TF_INVULN)
+				spawned->thingflags |= SITH_TF_INVULN;
+
+			if(spawned->rdthing.type == RD_THINGTYPE_DECAL)
+				spawned->rdthing.wallCel = sithTime_curMs;
+		}
+	}
+}
+#endif
+
 // MoTS altered: floor hit explode
 int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithCollisionSearchEntry *a3)
 {
@@ -813,6 +857,10 @@ int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithCollisionSea
     }
     else
     {
+#ifdef DEFERRED_DECALS
+		sithWeapon_WallHitExplode(thing, thing->weaponParams.wallHitTemplate, a3);
+#endif
+
         if ( thing->weaponParams.damage != 0.0 )
             sithSurface_SendDamageToThing(surface, thing, thing->weaponParams.damage, thing->weaponParams.damageClass);
 
