@@ -2095,6 +2095,7 @@ void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo
 {
     glBindFramebuffer(GL_FRAMEBUFFER, pFbo->fbo);
     glDepthFunc(GL_ALWAYS);
+	glDisable(GL_CULL_FACE);
     glUseProgram(pStage->program);
     
     float menu_w, menu_h, menu_u, menu_v, menu_x;
