@@ -688,3 +688,11 @@ void rdVector_ClampValue3(rdVector3* v, float val)
 
     rdVector_ClampRange3(v, -valAbs, valAbs);
 }
+
+void rdVector_Reflect3(rdVector3* v, const rdVector3* incidentVec, const rdVector3* normal)
+{
+	float dp = 2.f * rdVector_Dot3(incidentVec, normal);
+	v->x = incidentVec->x - dp * normal->x;
+	v->y = incidentVec->y - dp * normal->y;
+	v->z = incidentVec->z - dp * normal->z;
+}
