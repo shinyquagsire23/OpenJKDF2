@@ -2266,6 +2266,7 @@ typedef struct rdThing
     int* amputatedJoints;
 #ifdef FP_LEGS
 	int hiddenJoint;
+	int hideWeaponMesh;
 #endif
     uint32_t wallCel;
     uint32_t geosetSelect;

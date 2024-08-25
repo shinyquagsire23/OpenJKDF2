@@ -1260,6 +1260,11 @@ void rdModel3_DrawHNode(rdHierarchyNode *pNode)
 {
     rdHierarchyNode *iter;
 
+#ifdef FP_LEGS
+	if(pNode->idx == pCurThing->hiddenJoint)
+		return;
+#endif
+
     if ( pNode->meshIdx != -1 ) {
 
         // MOTS added:
@@ -1279,11 +1284,7 @@ void rdModel3_DrawHNode(rdHierarchyNode *pNode)
     iter = pNode->child;
     for (int i = 0; i < pNode->numChildren; i++)
     {
-        if ( !pCurThing->amputatedJoints[iter->idx]
-#ifdef FP_LEGS
-			&& pCurThing->hiddenJoint != iter->idx
-#endif
-		)
+        if ( !pCurThing->amputatedJoints[iter->idx])
             rdModel3_DrawHNode(iter);
         iter = iter->nextSibling;
     }

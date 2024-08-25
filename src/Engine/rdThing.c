@@ -205,11 +205,7 @@ void rdThing_AccumulateMatrices(rdThing *thing, rdHierarchyNode *node, rdMatrix3
     childIter = node->child;
     for (int i = 0; i < node->numChildren; i++)
     {
-        if ( !thing->amputatedJoints[childIter->idx]		
-		#ifdef FP_LEGS
-			&& thing->hiddenJoint != childIter->idx
-		#endif
-		)
+        if ( !thing->amputatedJoints[childIter->idx])
             rdThing_AccumulateMatrices(thing, childIter, &thing->hierarchyNodeMatrices[node->idx]);
         childIter = childIter->nextSibling;
     }

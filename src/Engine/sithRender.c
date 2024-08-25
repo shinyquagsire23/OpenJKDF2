@@ -1754,15 +1754,18 @@ void sithRender_RenderThings()
             {
 			#ifdef FP_LEGS
 				thingIter->rdthing.hiddenJoint = -1;
+				thingIter->rdthing.hideWeaponMesh = 0;
 				// if cam is 1st person and a player is focused, hide the upper body
 				if ((sithCamera_currentCamera->cameraPerspective & 0xFC) == 0 && thingIter == sithCamera_currentCamera->primaryFocus)
 				{
 					if (thingIter->type == SITH_THING_PLAYER)
 					{
+						thingIter->rdthing.hideWeaponMesh = 1;
+
 						sithAnimclass* animclass = thingIter->animclass;
 						if (animclass)
 						{
-							int jointIdx = animclass->bodypart_to_joint[JOINTTYPE_TORSO]; // torsto
+							int jointIdx = animclass->bodypart_to_joint[JOINTTYPE_TORSO]; // torso
 							if (jointIdx >= 0)
 							{
 								if (thingIter->rdthing.model3 && jointIdx < thingIter->rdthing.model3->numHierarchyNodes)
@@ -2012,7 +2015,10 @@ int sithRender_RenderThing(sithThing *pThing)
     ret = rdThing_Draw(&pThing->rdthing, &pThing->lookOrientation);
     rdVector_Zero3(&pThing->lookOrientation.scale);
     if (sithRender_weaponRenderHandle && (pThing->thingflags & SITH_TF_RENDERWEAPON)) {
-        sithRender_weaponRenderHandle(pThing);
+	#ifdef FP_LEGS
+		if(!pThing->rdthing.hideWeaponMesh)
+#endif
+			sithRender_weaponRenderHandle(pThing);
     }
 
     if (pThing->type == SITH_THING_EXPLOSION && (pThing->explosionParams.typeflags & SITHEXPLOSION_FLAG_FLASH_BLINDS_THINGS))
