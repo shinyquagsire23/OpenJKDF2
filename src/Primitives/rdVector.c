@@ -696,3 +696,10 @@ void rdVector_Reflect3(rdVector3* v, const rdVector3* incidentVec, const rdVecto
 	v->y = incidentVec->y - dp * normal->y;
 	v->z = incidentVec->z - dp * normal->z;
 }
+
+void rdVector_Average3(rdVector3* out, rdVector3* a, rdVector3* b, rdVector3* c)
+{
+	out->x = (a->x + b->x + c->x) / 3.0f;
+	out->y = (a->y + b->y + c->y) / 3.0f;
+	out->z = (a->z + b->z + c->z) / 3.0f;
+}

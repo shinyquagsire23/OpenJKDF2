@@ -135,5 +135,6 @@ void rdVector_NormalizeAngleAcute3(rdVector3* v);
 void rdVector_ClampRange3(rdVector3* v, float minVal, float maxVal);
 void rdVector_ClampValue3(rdVector3* v, float val);
 void rdVector_Reflect3(rdVector3* v, const rdVector3* incidentVec, const rdVector3* normal);
+void rdVector_Average3(rdVector3* out, rdVector3* a, rdVector3* b, rdVector3* c);
 
 #endif // _RDVECTOR_H
