@@ -32,6 +32,9 @@
 #ifdef DEFERRED_DECALS
 #include "World/sithDecal.h"
 #endif
+#ifdef RAGDOLLS
+#include "Engine/sithRagdoll.h"
+#endif
 
 // MOTS added
 static sithWorld_ChecksumHandler_t sithWorld_checksumExtraFunc;
@@ -100,6 +103,9 @@ int sithWorld_Startup()
     sithWorld_SetSectionParser("soundclass", sithSoundClass_Load);
 #ifdef JKM_LIGHTING
     sithWorld_SetSectionParser("archlighting", sithArchLighting_ParseSection); // MOTS added
+#endif
+#ifdef RAGDOLLS
+	sithWorld_SetSectionParser("ragdolls", sithRagdoll_Load);
 #endif
     sithWorld_bInitted = 1;
     return 1;
@@ -490,6 +496,10 @@ void sithWorld_FreeEntry(sithWorld *pWorld)
     if (pWorld->aArchlights) {
         sithArchLighting_Free(pWorld);
     }
+#endif
+#ifdef RAGDOLLS
+	if (pWorld->ragdolls)
+		sithRagdoll_Free(pWorld);
 #endif
 
     // Added: Fix UAF from previous world's viewmodel anims

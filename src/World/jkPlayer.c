@@ -69,6 +69,10 @@ int jkPlayer_bHasLoadedSettingsOnce = 0;
 #ifdef DEFERRED_DECALS
 int jkPlayer_enableDecals = 1;
 #endif
+
+#ifdef RAGDOLLS
+int jkPlayer_debugRagdolls = 0;
+#endif
 #endif
 
 #ifdef DYNAMIC_POV
@@ -205,6 +209,9 @@ void jkPlayer_StartupVars()
 #endif
 #ifdef DEFERRED_DECALS
 	sithCvar_RegisterFlex("r_enableDecals",             1.0,                        &jkPlayer_enableDecals,             CVARFLAG_LOCAL | CVARFLAG_RESETHUD);
+#endif
+#ifdef RAGDOLLS
+	sithCvar_RegisterInt("r_debugRagdolls", 0, &jkPlayer_debugRagdolls, CVARFLAG_LOCAL | CVARFLAG_UPDATABLE_DEFAULT);
 #endif
     sithCvar_RegisterBool("hud_setCrosshairOnLightsaber", 1,                        &jkPlayer_setCrosshairOnLightsaber, CVARFLAG_LOCAL);
     sithCvar_RegisterBool("hud_setCrosshairOnFist",     1,                          &jkPlayer_setCrosshairOnFist,       CVARFLAG_LOCAL);

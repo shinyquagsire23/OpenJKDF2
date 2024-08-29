@@ -14,6 +14,10 @@
 #include "Primitives/rdPrimit3.h"
 #include "Primitives/rdDebug.h"
 
+#ifdef RAGDOLLS
+#include "Primitives/rdRagdoll.h"
+#endif
+
 model3Loader_t rdModel3_RegisterLoader(model3Loader_t loader)
 {
     model3Loader_t result = pModel3Loader;
@@ -57,6 +61,37 @@ rdModel3* rdModel3_New(char *path)
     }
     return 0;
 }
+
+#ifdef RAGDOLLS
+// todo: pulled from rdThing_AccumulateMatrices, which only uses the thing to access the matrix and amputated joints
+// could just pass those in to a shared function instead (currently ommitted amputated joints)
+void rdModel3_AccumulateMatrices(rdMatrix34* matrices, rdHierarchyNode* node, rdMatrix34* acc)
+{
+	rdHierarchyNode* childIter;
+	rdVector3 negPivot;
+	rdMatrix34 matrix;
+
+	rdMatrix_BuildTranslate34(&matrix, &node->pivot);
+	rdMatrix_PostMultiply34(&matrix, &matrices[node->idx]);
+	if (node->parent)
+	{
+		negPivot.x = -node->parent->pivot.x;
+		negPivot.y = -node->parent->pivot.y;
+		negPivot.z = -node->parent->pivot.z;
+		rdMatrix_PostTranslate34(&matrix, &negPivot);
+	}
+	rdMatrix_Multiply34(&matrices[node->idx], acc, &matrix);
+	if (!node->numChildren)
+		return;
+
+	childIter = node->child;
+	for (int i = 0; i < node->numChildren; i++)
+	{
+		rdModel3_AccumulateMatrices(matrices, childIter, &matrices[node->idx]);
+		childIter = childIter->nextSibling;
+	}
+}
+#endif
 
 // MOTS altered (RGB lights?)
 int rdModel3_Load(char *model_fpath, rdModel3 *model)
@@ -449,6 +484,9 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
     {
         node = &model->hierarchyNodes[idx];
         node->idx = idx;
+	#ifdef RAGDOLLS
+		node->skelJoint = -1;
+	#endif
         if ( !stdConffile_ReadLine()
           || _sscanf(
                  stdConffile_aLine,
@@ -506,6 +544,23 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
     }
 
     rdModel3_CalcNumParents(model); // MOTS added
+
+#ifdef RAGDOLLS
+	// generate base pose matrices
+	if(model->numHierarchyNodes)
+	{
+		model->paBasePoseMatrices = (rdMatrix34*)rdroid_pHS->alloc(sizeof(rdMatrix34) * model->numHierarchyNodes);
+		if (!model->paBasePoseMatrices)
+			goto fail;
+
+		// build the initial matrices, without node rotation to get the base pose
+		for (idx = 0; idx < model->numHierarchyNodes; idx++)
+		{
+			rdMatrix_Build34(&model->paBasePoseMatrices[idx], &model->hierarchyNodes[idx].rot, &model->hierarchyNodes[idx].pos);
+		}
+		rdModel3_AccumulateMatrices(model->paBasePoseMatrices, model->hierarchyNodes, &rdroid_identMatrix34);
+	}
+#endif
 
     stdConffile_Close();
     return 1;
@@ -819,6 +874,11 @@ void rdModel3_FreeEntry(rdModel3 *model)
     }
     if (model->materials )
         rdroid_pHS->free(model->materials);
+
+#ifdef RAGDOLLS
+	if(model->paBasePoseMatrices)
+		rdroid_pHS->free(model->paBasePoseMatrices);
+#endif
 }
 
 void rdModel3_FreeEntryGeometryOnly(rdModel3 *model)

@@ -18,6 +18,11 @@
 #include "Dss/sithDSSThing.h"
 #include "jk.h"
 
+#ifdef RAGDOLLS
+#include "Engine/sithRagdoll.h"
+#include "Primitives/rdRagdoll.h"
+#endif
+
 void sithActor_SetMaxHeathForDifficulty(sithThing *thing)
 {
     if ( jkPlayer_setDiff )
@@ -294,6 +299,11 @@ void sithActor_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4)
                 }
                 else
                 {
+				#ifdef RAGDOLLS
+					if(thing->rdthing.type == RD_THINGTYPE_MODEL && thing->rdthing.model3 && thing->rdthing.model3->pSkel)
+						thing->lifeLeftMs = 250; // don't let it live too long, but let some animation play
+					else
+				#endif
                     thing->lifeLeftMs = 1000;
                 }
             }
@@ -475,6 +485,14 @@ void sithActor_Remove(sithThing *thing)
     thing->physicsParams.physflags |= (SITH_PF_FLOORSTICK|SITH_PF_SURFACEALIGN|SITH_PF_USEGRAVITY);
     thing->lifeLeftMs = jkPlayer_bKeepCorpses ? -1 : 20000; // Added
     sithPhysics_FindFloor(thing, 0);
+#ifdef RAGDOLLS
+	if(thing->rdthing.model3 && thing->rdthing.model3->pSkel)
+	{
+		thing->moveType = SITH_MT_RAGDOLL;
+		rdRagdoll_NewEntry(&thing->rdthing, &thing->physicsParams.vel);
+		sithPuppet_resetidk(thing);
+	}
+#endif
 }
 
 void sithActor_RemoveCorpse(sithThing *corpse)

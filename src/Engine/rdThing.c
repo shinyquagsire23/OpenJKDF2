@@ -4,6 +4,10 @@
 #include "Engine/rdPuppet.h"
 #include "Primitives/rdMatrix.h"
 
+#ifdef RAGDOLLS
+#include "Primitives/rdRagdoll.h"
+#endif
+
 rdThing* rdThing_New(sithThing *parent)
 {
     rdThing *thing;
@@ -32,6 +36,10 @@ int rdThing_NewEntry(rdThing *thing, sithThing *parent)
     thing->curLightMode = RD_LIGHTMODE_GOURAUD;
     thing->curTexMode = RD_TEXTUREMODE_2_UNK;
     thing->parentSithThing = parent;
+#ifdef RAGDOLLS
+	thing->paHierarchyNodeMatricesPrev = 0;
+	thing->pRagdoll = 0;
+#endif
     return 1;
 }
 
@@ -63,6 +71,20 @@ void rdThing_FreeEntry(rdThing *thing)
             rdroid_pHS->free(thing->amputatedJoints);
             thing->amputatedJoints = 0;
         }
+#ifdef RAGDOLLS
+		if (thing->paHierarchyNodeMatricesPrev)
+		{
+			rdroid_pHS->free(thing->paHierarchyNodeMatricesPrev);
+			thing->paHierarchyNodeMatricesPrev = 0;
+		}
+
+		if (thing->pRagdoll)
+		{
+			rdRagdoll_FreeEntry(thing->pRagdoll);
+			rdroid_pHS->free(thing->pRagdoll);
+			thing->pRagdoll = 0;
+		}
+#endif
     }
     if ( thing->puppet )
     {
@@ -100,6 +122,13 @@ int rdThing_SetModel3(rdThing *thing, rdModel3 *model)
     if (!thing->amputatedJoints)
         return 0;
 	_memset(thing->amputatedJoints, 0, sizeof(int) * model->numHierarchyNodes);
+
+#ifdef RAGDOLLS
+	thing->paHierarchyNodeMatricesPrev = (rdMatrix34*)rdroid_pHS->alloc(sizeof(rdMatrix34) * model->numHierarchyNodes);
+	if (!thing->paHierarchyNodeMatricesPrev)
+		return 0;
+	_memset(thing->paHierarchyNodeMatricesPrev, 0, sizeof(rdMatrix34) * model->numHierarchyNodes);
+#endif
 
     rdHierarchyNode* iter = model->hierarchyNodes;
     for (int i = 0; i < model->numHierarchyNodes; i++)
@@ -199,7 +228,14 @@ void rdThing_AccumulateMatrices(rdThing *thing, rdHierarchyNode *node, rdMatrix3
         negPivot.z = -node->parent->pivot.z;
         rdMatrix_PostTranslate34(&matrix, &negPivot);
     }
-    rdMatrix_Multiply34(&thing->hierarchyNodeMatrices[node->idx], acc, &matrix);
+#ifdef RAGDOLLS
+	// this might not be the best place for this, but for now we have a world transform from the ragdoll
+	if (thing->pRagdoll && node->skelJoint != -1)
+		rdMatrix_Copy34(&thing->hierarchyNodeMatrices[node->idx], &thing->pRagdoll->paJointMatrices[node->skelJoint]);
+	else
+#endif
+		rdMatrix_Multiply34(&thing->hierarchyNodeMatrices[node->idx], acc, &matrix);
+
     if (!node->numChildren)
         return;
     

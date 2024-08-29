@@ -1129,6 +1129,9 @@ enum MOVETYPE
     SITH_MT_NONE = 0x0,
     SITH_MT_PHYSICS = 0x1,
     SITH_MT_PATH = 0x2,
+#ifdef RAGDOLLS
+	SITH_MT_RAGDOLL = 0x3,
+#endif
 };
 
 enum THING_PHYSFLAGS

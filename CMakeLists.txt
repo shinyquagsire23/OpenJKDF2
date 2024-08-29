@@ -108,6 +108,7 @@ add_compile_definitions(
 	FP_LEGS
 	DYNAMIC_POV
 	DEFERRED_DECALS
+	RAGDOLLS
 )
 
 set(CMAKE_C_STANDARD 11)

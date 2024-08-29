@@ -339,6 +339,11 @@ typedef struct rdCanvas rdCanvas;
 typedef struct rdAmbient rdAmbient;
 #endif
 
+#ifdef RAGDOLLS
+typedef struct rdRagdollSkeleton rdRagdollSkeleton;
+typedef struct rdRagdoll rdRagdoll;
+#endif
+
 typedef struct sithGamesave_Header sithGamesave_Header;
 typedef struct jkGuiStringEntry jkGuiStringEntry;
 typedef struct jkGuiKeyboardEntry jkGuiKeyboardEntry;
@@ -379,6 +384,11 @@ typedef int (*sithAICommandFunc_t)(sithActor *actor, sithAIClassEntry *a8, sithA
 typedef int (*sithControlEnumFunc_t)(int inputFuncIdx, const char *pInputFuncStr, uint32_t a3, int dxKeyNum, uint32_t a5, int a6, stdControlKeyInfoEntry* pControlEntry, Darray* pDarr);
 typedef int (*sithCollisionHitHandler_t)(sithThing *, sithSurface *, sithCollisionSearchEntry *);
 typedef void (*rdPuppetTrackCallback_t)(sithThing*, int32_t, uint32_t);
+
+#ifdef RAGDOLLS
+typedef rdRagdollSkeleton* (*ragdollLoader_t)(const char*, int);
+typedef int (*ragdollUnloader_t)(rdRagdollSkeleton*);
+#endif
 
 extern int openjkdf2_bSkipWorkingDirData;
 extern int openjkdf2_bIsFirstLaunch;
@@ -2088,6 +2098,11 @@ typedef struct sithWorld
 	int numDecals;
 	rdDecal* decals;
 #endif
+#ifdef RAGDOLLS
+	int numRagdollsLoaded;
+	int numRagdolls;
+	rdRagdollSkeleton* ragdolls;
+#endif
     int numVertices;
     rdVector3* vertices;
     rdVector3* verticesTransformed;
@@ -2275,6 +2290,10 @@ typedef struct rdThing
     rdTexMode_t curTexMode;
     uint32_t clippingIdk;
     sithThing* parentSithThing;
+#ifdef RAGDOLLS
+	rdRagdoll* pRagdoll;
+	rdMatrix34* paHierarchyNodeMatricesPrev;
+#endif
 } rdThing;
 
 typedef struct rdPuppetTrack

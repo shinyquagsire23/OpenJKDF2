@@ -43,6 +43,9 @@
 #ifdef DEFERRED_DECALS
 #include "World/sithDecal.h"
 #endif
+#ifdef RAGDOLLS
+#include "Engine/sithRagdoll.h"
+#endif
 
 #ifdef FIXED_TIMESTEP_PHYS
 #include <math.h>
@@ -77,6 +80,9 @@ int sithMain_Startup(HostServices *commonFuncs)
 #ifdef DEFERRED_DECALS
 	is_started = sithDecal_Startup() & is_started;
 #endif
+#ifdef RAGDOLLS
+	is_started = sithRagdoll_Startup() & is_started;
+#endif
     sithSound_Startup();
     sithSoundMixer_Startup();
     sithWeapon_Startup();
@@ -106,6 +112,9 @@ int sithMain_Startup(HostServices *commonFuncs)
 void sithMain_Shutdown()
 {
     //sithWeapon
+#ifdef RAGDOLLS
+	sithRagdoll_Shutdown();
+#endif
 #ifdef DEFERRED_DECALS
 	sithDecal_Shutdown();
 #endif

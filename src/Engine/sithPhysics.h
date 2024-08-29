@@ -31,6 +31,10 @@ void sithPhysics_ThingPhysPlayer(sithThing *player, float deltaSeconds);
 void sithPhysics_ThingPhysUnderwater(sithThing *pThing, float deltaSeconds);
 void sithPhysics_ThingPhysAttached(sithThing *pThing, float deltaSeconds);
 
+#ifdef RAGDOLLS
+void sithPhysics_ThingPhysRagdoll(sithThing* pThing, float deltaSeconds);
+#endif
+
 static void (*_sithPhysics_ThingPhysAttached)(sithThing *pThing, float deltaSeconds) = (void*)sithPhysics_ThingPhysAttached_ADDR;
 
 #endif // _ENGINE_SITHPHYSICS_H

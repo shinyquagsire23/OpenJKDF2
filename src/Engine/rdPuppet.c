@@ -7,6 +7,10 @@
 #include "stdPlatform.h"
 #include "jk.h"
 
+#ifdef RAGDOLLS
+#include "Primitives/rdRagdoll.h"
+#endif
+
 rdPuppet* rdPuppet_New(rdThing *thing)
 {
     rdPuppet* puppet = (rdPuppet *)rdroid_pHS->alloc(sizeof(rdPuppet));
@@ -110,6 +114,11 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
 
     // Added: Fix a crash?
     if (!thing->hierarchyNodeMatrices) return;
+
+#ifdef RAGDOLLS
+	if (thing->paHierarchyNodeMatricesPrev)
+		_memcpy(thing->paHierarchyNodeMatricesPrev, thing->hierarchyNodeMatrices, sizeof(rdMatrix34) * model->numHierarchyNodes);
+#endif
 
     if ( !puppet || puppet->paused )
     {

@@ -9,6 +9,10 @@
 #include "World/jkPlayer.h"
 #include "jk.h"
 
+#ifdef RAGDOLLS
+#include "Primitives/rdRagdoll.h"
+#endif
+
 void sithPhysics_FindFloor(sithThing *pThing, int a3)
 {
     int v4; // ecx
@@ -1127,3 +1131,284 @@ void sithPhysics_ThingPhysAttached(sithThing *pThing, float deltaSeconds)
 #endif
     }
 }
+
+#ifdef RAGDOLLS
+#include "Primitives/rdRagdoll.h"
+
+float sithPhysics_ragdollBounce = 0.03f;
+float sithPhysics_ragdollDrag = 0.5f;
+
+int sithPhysics_CollideRagdollParticle(sithSector* sector, rdVector3* pos, rdVector3* dir, float radius, rdVector3* hitPosOut, rdVector3* hitNormOut)
+{
+	rdVector_Add3(hitPosOut, pos, dir);
+	rdVector_Zero3(hitNormOut);
+	
+	double v4; // st6
+	sithSector* result; // eax
+	int v7; // edi
+	sithCollisionSearchResult* v8; // ebx
+	sithCollisionSearchEntry* v9; // edx
+	double v10; // st7
+	sithCollisionSearchEntry* v11; // ecx
+	int v12; // esi
+	rdVector3 a1; // [esp+8h] [ebp-Ch] BYREF
+	float a3a; // [esp+1Ch] [ebp+8h]
+
+	int hit = 0;
+
+	//if (sithIntersect_IsSphereInSector(hitPosOut, 0.0, sector))
+		//return hit;
+
+	rdVector_Copy3(&a1, dir);
+	a3a = rdVector_Normalize3Acc(&a1);
+	sithCollision_SearchRadiusForThings(sector, 0, pos, &a1, a3a, radius, RAYCAST_1);
+	v7 = sithCollision_searchStackIdx;
+	v8 = &sithCollision_searchStack[sithCollision_searchStackIdx];
+	while (1)
+	{
+		v9 = 0;
+		v10 = 3.4e38;
+		v11 = (sithCollisionSearchEntry*)v8;
+		if (sithCollision_searchNumResults[v7])
+		{
+			v12 = sithCollision_searchNumResults[v7];
+			do
+			{
+				if (!v11->hasBeenEnumerated)
+				{
+					if (v10 <= v11->distance)
+					{
+						if (v10 == v11->distance && (v9->hitType & (SITHCOLLISION_THINGTOUCH | SITHCOLLISION_THINGCROSS)) != 0 && (v11->hitType & 4) != 0)
+							v9 = v11;
+					}
+					else
+					{
+						v10 = v11->distance;
+						v9 = v11;
+					}
+				}
+				++v11;
+				--v12;
+			} while (v12);
+		}
+		if (v9)
+		{
+			v9->hasBeenEnumerated = 1;
+		}
+		else
+		{
+			sithCollision_searchNumResults[v7] = 0;
+			sithCollision_stackIdk[v7] = 0;
+		}
+		if (!v9)
+			break;
+		if ((v9->hitType & SITHCOLLISION_ADJOINCROSS) == 0)
+		{
+			rdVector_Copy3(hitPosOut, pos);
+			rdVector_MultAcc3(hitPosOut, &a1, v9->distance);
+			rdVector_Copy3(hitNormOut, &v9->hitNorm);
+			hit = 1;
+			break;
+		}
+		sector = v9->surface->adjoin->sector;
+	}
+	result = sector;
+	sithCollision_searchStackIdx = v7 - 1;
+	return hit;
+}
+
+void sithPhysics_UpdateRagdollPositions(sithSector* sector, rdRagdoll* pRagdoll, float deltaSeconds)
+{
+	for (int i = 0; i < pRagdoll->numParticles; ++i)
+	{
+		rdRagdollParticle* pParticle = &pRagdoll->paParticles[i];
+		if (pParticle->nextPosWeight > 0.0)
+		{
+			// normalize the new position accumulator
+			rdVector_InvScale3Acc(&pParticle->nextPosAcc, pParticle->nextPosWeight);
+
+			rdVector3 dir;
+			rdVector_Sub3(&dir, &pParticle->nextPosAcc, &pParticle->pos);
+			rdVector_ClipPrecision3(&dir);
+
+			rdVector3 hitPos, hitNorm;
+			if (!sithPhysics_CollideRagdollParticle(sector, &pParticle->nextPosAcc, &dir, pParticle->radius, &hitPos, &hitNorm))
+			{
+				rdVector_Copy3(&pParticle->pos, &pParticle->nextPosAcc);
+			}
+			else
+			{
+				rdVector_Sub3(&dir, &pParticle->nextPosAcc, &pParticle->lastPos);
+		
+				float dot = rdVector_Dot3(&dir, &hitNorm);
+				if (rdVector_Dot3(&dir, &hitNorm) < 0)
+				{
+					// bounce slightly on hit
+					rdVector3 reflected;
+					rdVector_Reflect3(&reflected, &dir, &hitNorm);
+					rdVector_Scale3Acc(&reflected, sithPhysics_ragdollBounce);
+					rdVector_Sub3(&pParticle->lastPos, &pParticle->pos, &reflected);
+				}
+				pParticle->collided = 1;
+			}
+		}
+		rdVector_Zero3(&pParticle->nextPosAcc);
+		pParticle->nextPosWeight = 0;
+	}
+}
+
+void sithPhysics_ConstrainRagdoll(sithSector* pSector, rdRagdoll* pRagdoll, float deltaSeconds)
+{
+	int iterations = 5;
+	for (int i = 0; i < iterations; ++i)
+	{
+		rdRagdoll_ApplyDistConstraints(pRagdoll);
+		sithPhysics_UpdateRagdollPositions(pSector, pRagdoll, deltaSeconds);
+
+		rdRagdoll_UpdateTriangles(pRagdoll);
+		// fixme: the rotation constraints are introducing a wild amount of energy
+		//rdRagdoll_ApplyRotConstraints(pRagdoll);
+		sithPhysics_UpdateRagdollPositions(pSector, pRagdoll, deltaSeconds);
+	}
+}
+
+void sithPhysics_AccumulateRagdollForces(sithThing* pThing, rdRagdoll* pRagdoll, float deltaSeconds)
+{
+	// todo: sector thrust, etc
+	for (int i = 0; i < pRagdoll->numParticles; ++i)
+	{
+		rdRagdollParticle* pParticle = &pRagdoll->paParticles[i];
+		rdVector_Zero3(&pParticle->forces);
+
+		// gravity
+		// fixme: why is this ridiculously fast?
+		pParticle->forces.z -= sithWorld_pCurrentWorld->worldGravity * deltaSeconds * 0.25f;
+	}
+}
+
+void sithPhysics_UpdateRagdollParticles(rdRagdoll* pRagdoll, float deltaSeconds)
+{
+	// try to account for variable time steps
+	// todo: fixed time step?
+	float timestepRatio = pRagdoll->lastTimeStep ? deltaSeconds / pRagdoll->lastTimeStep : 1.0f;
+	for (int i = 0; i < pRagdoll->numParticles; ++i)
+	{
+		rdRagdollParticle* pParticle = &pRagdoll->paParticles[i];
+		
+		rdVector3 vel;
+		rdVector_Sub3(&vel, &pParticle->pos, &pParticle->lastPos);
+		
+		// normalize suggestion by strike
+		//rdVector_InvScale3Acc(&vel, deltaSeconds);
+
+		rdVector_ClipPrecision3(&vel);
+
+		// apply forces
+		rdVector_MultAcc3(&vel, &pParticle->forces, deltaSeconds);
+
+		// friction
+		//rdVector_Scale3Acc(&vel, timestepRatio * 0.9f);
+		sithPhysics_ApplyDrag(&vel, sithPhysics_ragdollDrag, 0.0f, deltaSeconds);
+
+		// apply dt per strike suggestion
+		//rdVector_Scale3Acc(&vel, timestepRatio * deltaSeconds);
+
+		// copy the old pos
+		rdVector_Copy3(&pParticle->lastPos, &pParticle->pos);
+
+		// add the vel change
+		rdVector_Add3Acc(&pParticle->pos, &vel);
+	}
+}
+
+void sithPhysics_CollideRagdoll(sithThing* pThing, rdRagdoll* pRagdoll, float deltaSeconds)
+{
+	int anyCollision = 0;
+	for (int i = 0; i < pRagdoll->numParticles; ++i)
+	{
+		rdRagdollParticle* pParticle = &pRagdoll->paParticles[i];
+
+		rdVector3 dir;
+		rdVector_Sub3(&dir, &pParticle->pos, &pParticle->lastPos);
+		rdVector_ClipPrecision3(&dir);
+
+		rdVector3 hitPos, hitNorm;
+		rdVector_Zero3(&hitPos);
+		pParticle->collided = sithPhysics_CollideRagdollParticle(pThing->sector, &pParticle->pos, &dir, pParticle->radius, &hitPos, &hitNorm);
+		if (pParticle->collided)
+		{
+			rdVector_Copy3(&pParticle->pos, &pParticle->lastPos);
+
+			rdVector3 reflected;
+			rdVector_Reflect3(&reflected, &dir, &hitNorm);
+			rdVector_Scale3Acc(&reflected, sithPhysics_ragdollBounce);
+			rdVector_Sub3(&pParticle->lastPos, &pParticle->pos, &reflected);
+
+			anyCollision = 1;
+		}
+	}
+
+	// if anything collide, set a timer for expiration
+	if (anyCollision)
+	{
+		// only set a new timer if one wasn't already set
+		pRagdoll->expireMs = !pRagdoll->expireMs ? sithTime_curMs + 2000 : pRagdoll->expireMs;
+	}
+	// otherwise we're free-floating, let the sim run indefinitely until it settles
+	else if (sithTime_curMs < pRagdoll->expireMs)
+	{
+		pRagdoll->expireMs = 0;
+	}
+}
+
+void sithPhysics_ThingPhysRagdoll(sithThing* pThing, float deltaSeconds)
+{
+	rdRagdoll* pRagdoll = pThing->rdthing.pRagdoll;
+	if (!pRagdoll)
+		return;
+
+	// only run while expireMs is 0 or hasn't expired yet
+	// todo: ragdoll can be awoken by setting expireMs to 0 again (ex. if thing affected by an explosion)
+	if (!pRagdoll || pRagdoll->expireMs && pRagdoll->expireMs < sithTime_curMs)
+		return;
+
+	sithPhysics_AccumulateRagdollForces(pThing, pRagdoll, deltaSeconds);
+	sithPhysics_UpdateRagdollParticles(pRagdoll, deltaSeconds);
+
+	sithPhysics_CollideRagdoll(pThing, pRagdoll, deltaSeconds);
+
+	pRagdoll->lastTimeStep = deltaSeconds;
+
+	// apply constraints
+	sithPhysics_ConstrainRagdoll(pThing->sector, pRagdoll, deltaSeconds);
+
+	// build matrices
+	rdRagdoll_UpdateTriangles(pRagdoll);
+	for (int i = 0; i < pRagdoll->pSkel->numJoints; ++i)
+	{
+		rdRagdollJoint* pJoint = &pRagdoll->pSkel->paJoints[i];
+
+		// localize the orientation
+		rdMatrix_Multiply34(&pRagdoll->paJointMatrices[i], &pRagdoll->paTris[pJoint->tri], &pRagdoll->paJointTris[i]);
+
+		rdVector3 pos;
+		rdRagdoll_GetJointPos(&pos, pRagdoll, pJoint);
+		rdMatrix_PostTranslate34(&pRagdoll->paJointMatrices[i], &pos);
+
+		// apply to the pose
+		rdHierarchyNode* pNode = &pRagdoll->pModel->hierarchyNodes[pJoint->node];
+		rdMatrix_PreMultiply34(&pRagdoll->paJointMatrices[i], &pRagdoll->paPoseMatrices[pNode->idx]);
+	}
+
+	// the relative change in the center will be used to update the thing position
+	rdVector3 lastCenter, centerVel;
+	rdVector_Copy3(&lastCenter, &pRagdoll->center);
+	rdRagdoll_UpdateCenter(pRagdoll);
+	rdVector_Sub3(&centerVel, &pRagdoll->center, &lastCenter);
+
+	float velLen = rdVector_Normalize3Acc(&centerVel);
+	if(velLen > 0.0)
+		sithCollision_UpdateThingCollision(pThing, &centerVel, velLen, 0); // verify: is this the right function to call?
+}
+
+#endif

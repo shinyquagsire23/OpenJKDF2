@@ -7,6 +7,12 @@
 #include "stdPlatform.h"
 #include "jk.h"
 
+#ifdef RAGDOLLS
+#include "General/stdFnames.h"
+#include "Engine/sithRagdoll.h"
+#include "Primitives/rdRagdoll.h"
+#endif
+
 static stdHashTable* sithModel_hashtable;
 
 int sithModel_Startup()
@@ -100,6 +106,20 @@ rdModel3* sithModel_LoadEntry(const char *model_3do_fname, int unk)
             return sithModel_LoadEntry("dflt.3do", 1);
         return 0;
     }
+
+#ifdef RAGDOLLS
+	// try to load a default articulated figure
+	if(!model->pSkel && model->numHierarchyNodes && model->hierarchyNodes)
+	{
+		char afname[32];
+		_strncpy(afname, model_3do_fname, 0x1Fu);
+		afname[31] = 0,
+		stdFnames_ChangeExt(&afname, "af");
+		model->pSkel = sithRagdoll_LoadEntry(afname);
+		if(model->pSkel)
+			rdRagdollSkeleton_SetupModel(model->pSkel, model);
+	}
+#endif
     
     model->id = sithWorld_pLoading->numModelsLoaded;
     if (sithWorld_pLoading->level_type_maybe & 1)

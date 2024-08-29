@@ -65,6 +65,9 @@ typedef struct rdHierarchyNode
     rdVector3 pos;
     rdVector3 rot;
     rdMatrix34 posRotMatrix;
+#ifdef RAGDOLLS
+	int skelJoint;
+#endif
 } rdHierarchyNode;
 #else
 typedef struct rdHierarchyNode
@@ -110,6 +113,10 @@ typedef struct rdModel3
     uint32_t field_70;
     uint32_t field_74;
     rdVector3 insertOffset;
+#ifdef RAGDOLLS
+	rdRagdollSkeleton* pSkel;
+	rdMatrix34* paBasePoseMatrices;
+#endif
 } rdModel3;
 
 #ifndef JKM_TYPES

@@ -177,6 +177,9 @@ extern int jkPlayer_aimLock;
 #ifdef DEFERRED_DECALS
 extern int jkPlayer_enableDecals;
 #endif
+#ifdef RAGDOLLS
+extern int jkPlayer_debugRagdolls;
+#endif
 
 #define FOV_MIN (40)
 #define FOV_MAX (170)
