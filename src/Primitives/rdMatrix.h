@@ -121,6 +121,7 @@ void rdMatrix_TransformPointLst44(const rdMatrix44 *m, const rdVector4 *in, rdVe
 
 // Added
 void rdMatrix_Print34(const rdMatrix34 *viewMat);
+int rdMatrix_ExtractAxisAngle34(rdMatrix34* m, rdVector3* axis, float* angle);
 
 extern const rdMatrix34 rdroid_identMatrix34;
 extern const rdMatrix44 rdroid_identMatrix44;
