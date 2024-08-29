@@ -971,10 +971,14 @@ void jkPlayer_DrawPov()
 		rdMatrix34 rotateMatNoWaggle;
 		if(!jkPlayer_aimLock)
 		{
+			float timeScale = 1.0f;
+			if (g_debugmodeFlags & DEBUGFLAG_SLOWMO)
+				timeScale = 0.2;
+
 			rdVector3 rotVelNorm;
-			rotVelNorm.x = player->physicsParams.angVel.x / player->physicsParams.maxRotVel;
-			rotVelNorm.y = player->physicsParams.angVel.y / player->physicsParams.maxRotVel;
-			rotVelNorm.z = player->physicsParams.angVel.z / player->physicsParams.maxRotVel;
+			rotVelNorm.x = timeScale * player->physicsParams.angVel.x / player->physicsParams.maxRotVel;
+			rotVelNorm.y = timeScale * player->physicsParams.angVel.y / player->physicsParams.maxRotVel;
+			rotVelNorm.z = timeScale * player->physicsParams.angVel.z / player->physicsParams.maxRotVel;
 			jkSaber_rotateVec.x = -rotVelNorm.x * 1.5f;
 			jkSaber_rotateVec.y = -rotVelNorm.y * 1.5f;
 			jkSaber_rotateVec.z = -rotVelNorm.z * 1.5f;
