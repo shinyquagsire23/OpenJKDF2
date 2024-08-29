@@ -78,6 +78,7 @@ int rdThing_SetModel3(rdThing *thing, rdModel3 *model)
     thing->geosetSelect = -1;
 #ifdef FP_LEGS
 	thing->hiddenJoint = -1;
+	thing->hideWeaponMesh = 0;
 #endif
     thing->hierarchyNodeMatrices = (rdMatrix34*)rdroid_pHS->alloc(sizeof(rdMatrix34) * model->numHierarchyNodes);
     
