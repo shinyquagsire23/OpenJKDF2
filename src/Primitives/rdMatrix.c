@@ -969,3 +969,32 @@ int rdMatrix_ExtractAxisAngle34(rdMatrix34* m, rdVector3* axis, float* angle)
 	}
 	return 1;
 }
+
+void rdMatrix_BuildFromAxisAngle34(rdMatrix34* m, const rdVector3* axis, float angle)
+{
+	float c, s, t;
+	rdVector3 sv, tv;
+
+	angle = stdMath_NormalizeAngleAcute(angle);
+
+	stdMath_SinCos(angle, &s, &c);
+
+	t = 1.0f - c;
+
+	rdVector_Scale3(&sv, axis, s);
+	rdVector_Scale3(&tv, axis, t);
+
+	m->rvec.x = tv.x * axis->x + c;
+	m->rvec.y = tv.x * axis->y - sv.z;
+	m->rvec.z = tv.x * axis->z + sv.y;
+
+	m->lvec.x = tv.x * axis->y + sv.z;
+	m->lvec.y = tv.y * axis->y + c;
+	m->lvec.z = tv.y * axis->z - sv.x;
+
+	m->uvec.x = tv.x * axis->z - sv.y;
+	m->uvec.y = tv.y * axis->z + sv.x;
+	m->uvec.z = tv.z * axis->z + c;
+
+	m->scale.x = m->scale.y = m->scale.z = 0.0f;
+}
