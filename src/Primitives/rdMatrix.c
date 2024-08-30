@@ -911,90 +911,61 @@ void rdMatrix_Print34(const rdMatrix34 *m)
 
 int rdMatrix_ExtractAxisAngle34(rdMatrix34* m, rdVector3* axis, float* angle)
 {
-	float x, y, z;
-	float epsilon = 0.001;
-	float epsilon2 = 0.01;
+	float trace = m->rvec.x + m->lvec.y + m->uvec.z;
 
-	if ((fabs(m->rvec.y - m->lvec.x) < epsilon)
-		&& (fabs(m->rvec.z - m->uvec.x) < epsilon)
-		&& (fabs(m->lvec.z - m->uvec.y) < epsilon)
-	)
+	if (trace <= -1)
 	{
-		if ((fabs(m->rvec.y + m->lvec.x) < epsilon2)
-			&& (fabs(m->rvec.z + m->uvec.x) < epsilon2)
-			&& (fabs(m->lvec.z + m->uvec.y) < epsilon2)
-			&& (fabs(m->rvec.x + m->lvec.y + m->uvec.z - 3) < epsilon2))
+		if (m->rvec.x >= m->lvec.y && m->rvec.x >= m->uvec.z)
 		{
-			*angle = 0.0f;
-			rdVector_Set3(axis, 1, 0, 0);
-			return 0;
-		}
+			float r = 1 + m->rvec.x - m->lvec.y - m->uvec.z;
+			if (r <= 1e-6f)
+				return 0;
 
-		*angle = 180.0f;
-		float xx = (m->rvec.x + 1.0f) / 2.0f;
-		float yy = (m->lvec.y + 1.0f) / 2.0f;
-		float zz = (m->uvec.z + 1.0f) / 2.0f;
-		float xy = (m->rvec.y + m->lvec.x) / 4.0f;
-		float xz = (m->rvec.z + m->uvec.x) / 4.0f;
-		float yz = (m->lvec.z + m->uvec.y) / 4.0f;
-
-		if ((xx > yy) && (xx > zz))
-		{
-			if (xx < epsilon)
-			{
-				x = 0;
-				y = 0.7071;
-				z = 0.7071;
-			}
-			else
-			{
-				x = stdMath_Sqrt(xx);
-				y = xy / x;
-				z = xz / x;
-			}
+			r = stdMath_Sqrt(r);
+			axis->x = 0.5f * r;
+			axis->y = m->lvec.x / r;
+			axis->z = m->uvec.x / r;
 		}
-		else if (yy > zz)
+		else if (m->lvec.y >= m->uvec.z)
 		{
-			if (yy < epsilon)
-			{
-				x = 0.7071;
-				y = 0;
-				z = 0.7071;
-			}
-			else
-			{
-				y = stdMath_Sqrt(yy);
-				x = xy / y;
-				z = yz / y;
-			}
+			float r = 1 + m->lvec.y - m->rvec.x - m->uvec.z;
+			if (r <= 1e-6f)
+				return 0;
+
+			r = stdMath_Sqrt(r);
+			axis->y = 0.5f * r;
+			axis->x = m->lvec.x / r;
+			axis->z = m->uvec.y / r;
 		}
 		else
 		{
-			if (zz < epsilon)
-			{
-				x = 0.7071;
-				y = 0.7071;
-				z = 0;
-			}
-			else
-			{
-				z = stdMath_Sqrt(zz);
-				x = xz / z;
-				y = yz / z;
-			}
+			float r = 1 + m->lvec.y - m->rvec.x - m->uvec.z;
+			if (r <= 1e-6f)
+				return 0;
+			r = stdMath_Sqrt(r);
+			axis->z = 0.5f * r;
+			axis->x = m->uvec.x / r;
+			axis->y = m->uvec.y / r;
 		}
-		rdVector_Set3(axis, x, y, z);
-		return 0;
+		*angle = 180.0f;
 	}
+	else if (trace >= 3)
+	{
+		rdVector_Set3(axis, 0.0f, 0.0f, 1.0f);
+		*angle = 0;
+	}
+	else
+	{
+		axis->x = m->lvec.z - m->uvec.y;
+		axis->y = m->uvec.x - m->rvec.z;
+		axis->z = m->rvec.y - m->lvec.x;
+		float r = rdVector_Dot3(axis, axis);
+		if (r <= 1e-6f)
+			return 0;
 
-	float s = stdMath_Sqrt((m->uvec.y - m->lvec.z) * (m->uvec.y - m->lvec.z) + (m->rvec.z - m->uvec.x) * (m->rvec.z - m->uvec.x) + (m->lvec.x - m->rvec.y) * (m->lvec.x - m->rvec.y));
-	if (fabs(s) < 0.001)
-		s = 1.0f;
+		rdVector_InvScale3Acc(axis, stdMath_Sqrt(r));
+		*angle = 90.0f - stdMath_ArcSin3((trace - 1.0f) / 2.0f);
 
-	*angle = 90.0f - stdMath_ArcSin3((m->rvec.x + m->lvec.y + m->uvec.z - 1.0f) / 2.0f);
-	x = (m->uvec.y - m->lvec.z) / s;
-	y = (m->rvec.z - m->uvec.x) / s;
-	z = (m->lvec.x - m->rvec.y) / s;
-	rdVector_Set3(axis, x, y, z);
+	}
 	return 1;
 }
