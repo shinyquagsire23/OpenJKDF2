@@ -628,11 +628,33 @@ void jkCog_SetWaggle(sithCog *ctx)
     if ( v2 )
     {
         if ( v2->type == SITH_THING_PLAYER )
-            jkPlayer_SetWaggle(v2, &a2, a1a);
+#ifdef DYNAMIC_POV
+			jkPlayer_SetWaggle(v2, &a2, a1a, 1.0f);
+#else
+			jkPlayer_SetWaggle(v2, &a2, a1a);
+#endif
     }
 }
 
 #ifdef DYNAMIC_POV
+void jkCog_SetWaggleEx(sithCog* ctx)
+{
+	sithThing* v2; // eax
+	rdVector3 a2; // [esp+4h] [ebp-Ch] BYREF
+	cog_flex_t a1a; // [esp+14h] [ebp+4h]
+	cog_flex_t a1b; // [esp+14h] [ebp+4h]
+
+	a1b = sithCogExec_PopFlex(ctx);
+	a1a = sithCogExec_PopFlex(ctx);
+	sithCogExec_PopVector3(ctx, &a2);
+	v2 = sithCogExec_PopThing(ctx);
+	if (v2)
+	{
+		if (v2->type == SITH_THING_PLAYER)
+			jkPlayer_SetWaggle(v2, &a2, a1a, a1b);
+	}
+}
+
 void jkCog_SetIdleWaggle(sithCog* ctx)
 {
 	sithThing* pThing;
@@ -1195,6 +1217,7 @@ void jkCog_RegisterVerbs()
     sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_GetChoice, "jkgetchoice");
 
 #ifdef DYNAMIC_POV
+	sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_SetWaggleEx, "jksetwaggleex");
 	sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_SetIdleWaggle, "jksetidlewaggle");
 	sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_GetMuzzleOffset, "jkgetmuzzleoffset");
 	sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_SetPovAutoAim, "jksetpovautoaim");

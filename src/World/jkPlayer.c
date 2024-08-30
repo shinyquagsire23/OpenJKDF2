@@ -76,6 +76,8 @@ int jkPlayer_debugRagdolls = 0;
 #endif
 
 #ifdef DYNAMIC_POV
+static float jkPlayer_waggleVel;
+
 static rdVector3 jkSaber_aimAngles;
 static rdVector3 jkSaber_aimVector;
 static rdVector3 jkSaber_swayOffset;
@@ -957,8 +959,11 @@ void jkPlayer_DrawPov()
         float waggleAmt = (fabs(player->waggle) > sithTime_deltaSeconds ? sithTime_deltaSeconds : fabs(player->waggle)) * jkPlayer_waggleMag; // scale animation to be in line w/ 50fps og limit
 #endif
 #ifdef DYNAMIC_POV
+		if (jkPlayer_waggleVel < 0)
+			waggleAmt = sithTime_deltaSeconds * jkPlayer_waggleMag;
+
 		// don't freaking waggle while in the air/jumping, it looks funny
-		if(player->attach_flags == 0)
+		if(player->attach_flags == 0 && jkPlayer_waggleVel >= 0.0f)
 			waggleAmt = 0.0f;
 #endif
 
@@ -971,6 +976,11 @@ void jkPlayer_DrawPov()
         float angleSin, angleCos;
         stdMath_SinCos(jkPlayer_waggleAngle, &angleSin, &angleCos);
         float velNorm = rdVector_Len3(&player->physicsParams.vel) / player->physicsParams.maxVel; // MOTS altered: uses 1.538462 for something (performance hack?)
+		if (jkPlayer_waggleVel < 0)
+			velNorm = -jkPlayer_waggleVel;
+		else
+			velNorm *= jkPlayer_waggleVel;
+
         if (angleCos > 0) // verify?
             angleCos = -angleCos;
 #ifdef DYNAMIC_POV
@@ -1372,12 +1382,19 @@ void jkPlayer_renderSaberTwinkle(sithThing *player)
     }
 }
 
-void jkPlayer_SetWaggle(sithThing *player, rdVector3 *waggleVec, float waggleMag)
+#ifdef DYNAMIC_POV
+void jkPlayer_SetWaggle(sithThing *player, rdVector3 *waggleVec, float waggleMag, float velScale)
+#else
+void jkPlayer_SetWaggle(sithThing* player, rdVector3* waggleVec, float waggleMag)
+#endif
 {
     if ( player == playerThings[playerThingIdx].actorThing )
     {
         rdVector_Copy3(&jkPlayer_waggleVec, waggleVec);
         jkPlayer_waggleMag = waggleMag;
+#ifdef DYNAMIC_POV
+		jkPlayer_waggleVel = velScale;
+#endif
     }
 }
 
