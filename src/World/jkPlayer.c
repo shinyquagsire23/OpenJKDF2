@@ -1105,8 +1105,6 @@ void jkPlayer_DrawPov()
 
 #ifdef DYNAMIC_POV
 		// Added: autoaim pov model orient
-		rdVector_Zero3(&jkPlayer_muzzleOffset);
-
 		rdMatrix34 invOrient;
 		rdMatrix_InvertOrtho34(&invOrient, &viewMat);
 
