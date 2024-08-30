@@ -76,7 +76,7 @@ int jkPlayer_debugRagdolls = 0;
 #endif
 
 #ifdef DYNAMIC_POV
-static float jkPlayer_waggleVel;
+static float jkPlayer_waggleVel = 1.0f;
 
 static rdVector3 jkSaber_aimAngles;
 static rdVector3 jkSaber_aimVector;
