@@ -2133,8 +2133,8 @@ int sithRender_RenderThing(sithThing *pThing)
     pThing->lookOrientation.scale = pThing->position;
 #ifdef RAGDOLLS
 	// ragdoll debug draw
-	if ((jkPlayer_debugRagdolls == 1 && pThing->rdthing.pRagdoll
-		|| (jkPlayer_debugRagdolls == 2 || jkPlayer_debugRagdolls == 3) && pThing->rdthing.model3->pSkel) && pThing->rdthing.type == RD_THINGTYPE_MODEL && pThing->rdthing.model3
+	if (pThing->rdthing.type == RD_THINGTYPE_MODEL && pThing->rdthing.model3 && (jkPlayer_debugRagdolls == 1 && pThing->rdthing.pRagdoll
+		|| (jkPlayer_debugRagdolls == 2 || jkPlayer_debugRagdolls == 3) && pThing->rdthing.model3->pSkel)
 	)
 	{
 		ret = 1;
