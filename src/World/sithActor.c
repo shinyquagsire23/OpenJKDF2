@@ -301,7 +301,7 @@ void sithActor_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4)
                 {
 				#ifdef RAGDOLLS
 					if(thing->rdthing.type == RD_THINGTYPE_MODEL && thing->rdthing.model3 && thing->rdthing.model3->pSkel)
-						thing->lifeLeftMs = 250; // don't let it live too long, but let some animation play
+						thing->lifeLeftMs = 350; // don't let it live too long, but let some animation play
 					else
 				#endif
                     thing->lifeLeftMs = 1000;
