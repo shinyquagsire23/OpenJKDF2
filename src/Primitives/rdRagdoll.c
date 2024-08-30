@@ -240,6 +240,68 @@ void rdRagdoll_UpdateBounds(rdRagdoll* pRagdoll)
 	}
 }
 
+void rdRagdoll_CalculateRotFriction(rdRagdoll* pRagdoll)
+{
+	for (int i = 0; i < pRagdoll->pSkel->numRotFric; ++i)
+	{
+		rdRagdollRotFriction* pRotFric = &pRagdoll->pSkel->paRotFrictions[i];
+		rdMatrix_InvertOrtho34(&pRagdoll->paRotFricMatrices[i], &pRagdoll->paTris[pRotFric->tri[1]]);
+		rdMatrix_PreMultiply34(&pRagdoll->paRotFricMatrices[i], &pRagdoll->paTris[pRotFric->tri[0]]);
+	}
+}
+
+void rdRagdoll_ApplyRotFriction(rdRagdoll* pRagdoll, float deltaSeconds)
+{
+	float rotFriction = 0.85f;
+	float rotFricCutoff = 0.1f;
+
+	rdRagdoll_UpdateTriangles(pRagdoll);
+
+	float stopangle = 360.0f * deltaSeconds * rotFricCutoff;
+	float rotfric = 1.0f - pow(rotFriction, deltaSeconds * 1000.0f);
+	
+	for (int i = 0; i < pRagdoll->pSkel->numRotFric; ++i)
+	{
+		rdRagdollRotFriction* pRotFric = &pRagdoll->pSkel->paRotFrictions[i];
+
+		rdMatrix34 rot;
+		rdMatrix_InvertOrtho34(&rot, &pRagdoll->paTris[pRotFric->tri[0]]);
+		rdMatrix_PostMultiply34(&rot, &pRagdoll->paRotFricMatrices[i]);
+		rdMatrix_PostMultiply34(&rot, &pRagdoll->paTris[pRotFric->tri[1]]);
+
+		rdVector3 axis;
+		float angle;
+		if (!rdMatrix_ExtractAxisAngle34(&rot, &axis, &angle))
+			continue;
+
+		angle *= -(fabs(angle) >= stopangle ? rotfric : 1.0f);
+		rdRagdoll_ApplyRotConstraint(pRagdoll, &pRagdoll->pSkel->paTris[pRotFric->tri[0]], &pRagdoll->pSkel->paTris[pRotFric->tri[1]], angle, &axis);
+	}
+
+	for (int i = 0; i < pRagdoll->numParticles; ++i)
+	{
+		rdRagdollParticle* pParticle = &pRagdoll->paParticles[i];
+		if (pParticle->nextPosWeight)
+			rdVector_InvScale3(&pParticle->pos, &pParticle->nextPosAcc, pParticle->nextPosWeight);
+
+		rdVector_Zero3(&pParticle->nextPosAcc);
+		pParticle->nextPosWeight = 0.0f;
+	}
+}
+
+int rdRagdoll_TrisHaveSharedVerts(rdRagdollTri* pTri0, rdRagdollTri* pTri1)
+{
+	for (int i = 0; i < 3; ++i)
+	{
+		for (int j = 0; j < 3; ++j)
+		{
+			if (pTri0->vert[i] == pTri1->vert[j])
+				return 1;
+		}
+	}
+	return 0;
+}
+
 void rdRagdoll_NewEntry(rdThing* pThing, rdVector3* pInitialVel)
 {
 	if (!pThing->model3 || !pThing->model3->pSkel)
@@ -284,6 +346,11 @@ void rdRagdoll_NewEntry(rdThing* pThing, rdVector3* pInitialVel)
 	if (!pRagdoll->paTris)
 		return;
 	_memset(pRagdoll->paTris, 0, sizeof(rdMatrix34) * pRagdoll->pSkel->numTris);
+
+	pRagdoll->paRotFricMatrices = (rdMatrix34*)rdroid_pHS->alloc(sizeof(rdMatrix34) * pRagdoll->pSkel->numRotFric);
+	if (!pRagdoll->paRotFricMatrices)
+		return;
+	_memset(pRagdoll->paRotFricMatrices, 0, sizeof(rdMatrix34) * pRagdoll->pSkel->numRotFric);
 
 	// generate initial particle positions
 	rdVector3 thingVel;
@@ -582,6 +649,31 @@ int rdRagdollSkeleton_LoadEntry(rdRagdollSkeleton* pSkel, const char* fpath)
 		}
 	}
 
+	// build a list for rotation friction from shared triangles
+	pSkel->numRotFric = 0;
+	pSkel->paRotFrictions = (rdRagdollRotFriction*)rdroid_pHS->alloc(sizeof(rdRagdollRotFriction) * pSkel->numTris * pSkel->numTris); // allocate enough for all tris to start
+	if (!pSkel->paRotFrictions)
+		goto done_close;
+
+	for (idx = 0; idx < pSkel->numTris; idx++)
+	{
+		for (idx2 = idx + 1; idx2 < pSkel->numTris; ++idx2)
+		{
+			if (rdRagdoll_TrisHaveSharedVerts(&pSkel->paTris[idx], &pSkel->paTris[idx2]))
+			{
+				pSkel->paRotFrictions[pSkel->numRotFric].tri[0] = idx;
+				pSkel->paRotFrictions[pSkel->numRotFric].tri[1] = idx2;
+				++pSkel->numRotFric;
+			}
+		}
+	}
+
+	// shrink or free
+	if(pSkel->numRotFric)
+		pSkel->paRotFrictions = (rdRagdollRotFriction*)rdroid_pHS->realloc(pSkel->paRotFrictions, sizeof(rdRagdollRotFriction) * pSkel->numRotFric);
+	else
+		rdroid_pHS->free(pSkel->paRotFrictions);
+
 	stdConffile_Close();
 	return 1;	
 
@@ -673,6 +765,51 @@ void rdRagdollSkeleton_SetupModel(rdRagdollSkeleton* pSkel, rdModel3* pModel)
 		// might be better to fix this with accounting for mesh node pivots in the transforms...
 		pConstraint->dist = rdVector_Dist3(&p0, &p1);// * 0.95f;
 	}
+
+	// update triangle matrices
+	// tmp
+	/*rdMatrix34* triMat = (rdMatrix34*)rdroid_pHS->alloc(sizeof(rdMatrix34) * pSkel->numTris);
+
+	for (int i = 0; i < pSkel->numTris; ++i)
+	{
+		rdRagdollTri* pTri = &pSkel->paTris[i];
+		rdMatrix34* pMat = &triMat[i];
+
+		rdRagdollVert* pVert0 = &pSkel->paVerts[pTri->vert[0]];
+		rdRagdollVert* pVert1 = &pSkel->paVerts[pTri->vert[1]];
+		rdRagdollVert* pVert2 = &pSkel->paVerts[pTri->vert[2]];
+
+		rdVector3 p0;
+		rdVector_Add3(&p0, &pModel->paBasePoseMatrices[pVert0->node].scale, &pVert0->offset);
+
+		rdVector3 p1;
+		rdVector_Add3(&p1, &pModel->paBasePoseMatrices[pVert1->node].scale, &pVert1->offset);
+
+		rdVector3 p2;
+		rdVector_Add3(&p2, &pModel->paBasePoseMatrices[pVert2->node].scale, &pVert2->offset);
+
+
+		rdVector_Sub3(&pMat->uvec, &p1, &p0);
+		rdVector_Normalize3Acc(&pMat->uvec);
+
+		rdVector_Sub3(&pMat->rvec, &p2, &p0);
+		rdVector_Normalize3Acc(&pMat->rvec);
+
+		rdVector_Cross3(&pMat->lvec, &pMat->uvec, &pMat->rvec);
+		rdVector_Normalize3Acc(&pMat->lvec);
+
+		rdVector_Cross3(&pMat->rvec, &pMat->lvec, &pMat->uvec);
+		rdVector_Normalize3Acc(&pMat->rvec);
+	}
+
+	for (int i = 0; i < pSkel->numRot; ++i)
+	{
+		rdRagdollRotConstraint* pConstraint = &pSkel->paRotConstraints[i];
+		rdMatrix_InvertOrtho34(&pConstraint->middle, &triMat[pConstraint->tri[1]]);
+		rdMatrix_PostMultiply34(&pConstraint->middle, &triMat[pConstraint->tri[0]]);
+	}
+
+	rdroid_pHS->free(triMat);*/
 }
 
 #endif

@@ -1364,8 +1364,12 @@ void sithPhysics_ThingPhysRagdoll(sithThing* pThing, float deltaSeconds)
 	if (!pRagdoll || pRagdoll->expireMs && pRagdoll->expireMs < sithTime_curMs)
 		return;
 
+	rdRagdoll_CalculateRotFriction(pRagdoll);
+
 	sithPhysics_AccumulateRagdollForces(pThing, pRagdoll, deltaSeconds);
 	sithPhysics_UpdateRagdollParticles(pRagdoll, deltaSeconds);
+
+	rdRagdoll_ApplyRotFriction(pRagdoll, deltaSeconds);
 
 	sithPhysics_CollideRagdoll(pThing, pRagdoll, deltaSeconds);
 

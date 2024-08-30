@@ -42,6 +42,11 @@ typedef struct rdRagdollRotConstraint
 	rdMatrix34 middle;
 } rdRagdollRotConstraint;
 
+typedef struct rdRagdollRotFriction
+{
+	int tri[2];
+} rdRagdollRotFriction;
+
 typedef struct rdRagdollSkeleton
 {
 	char name[32];
@@ -55,6 +60,8 @@ typedef struct rdRagdollSkeleton
 	rdRagdollDistConstraint* paDistConstraints;
 	int numRot;
 	rdRagdollRotConstraint* paRotConstraints;
+	int numRotFric;
+	rdRagdollRotFriction* paRotFrictions;
 } rdRagdollSkeleton;
 
 typedef enum rdRagdollParticleFlags
@@ -87,6 +94,7 @@ typedef struct rdRagdoll
 	rdMatrix34* paJointMatrices;
 	rdMatrix34* paJointTris;
 	rdMatrix34* paTris;
+	rdMatrix34* paRotFricMatrices;
 	float lastTimeStep;
 	int collisions;
 	int expireMs;
@@ -101,6 +109,8 @@ void rdRagdoll_ApplyDistConstraints(rdRagdoll* pRagdoll);
 void rdRagdoll_ApplyRotConstraints(rdRagdoll* pRagdoll);
 void rdRagdoll_UpdateTriangles(rdRagdoll* pRagdoll);
 void rdRagdoll_UpdateBounds(rdRagdoll* pRagdoll);
+
+void rdRagdoll_CalculateRotFriction(rdRagdoll* pRagdoll);
 void rdRagdoll_ApplyRotFriction(rdRagdoll* pRagdoll, float deltaSeconds);
 
 int rdRagdollSkeleton_LoadEntry(rdRagdollSkeleton* pSkel, const char* fpath);
