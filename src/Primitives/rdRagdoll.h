@@ -80,6 +80,7 @@ typedef struct rdRagdoll
 	rdModel3* pModel;
 	rdThing* pThing;
 	rdVector3 center;
+	float radius;
 	int numParticles;
 	rdRagdollParticle* paParticles;
 	rdMatrix34* paPoseMatrices;
@@ -99,7 +100,7 @@ void rdRagdoll_GetJointPos(rdVector3* out, rdRagdoll* pRagdoll, rdRagdollJoint* 
 void rdRagdoll_ApplyDistConstraints(rdRagdoll* pRagdoll);
 void rdRagdoll_ApplyRotConstraints(rdRagdoll* pRagdoll);
 void rdRagdoll_UpdateTriangles(rdRagdoll* pRagdoll);
-void rdRagdoll_UpdateCenter(rdRagdoll* pRagdoll);
+void rdRagdoll_UpdateBounds(rdRagdoll* pRagdoll);
 void rdRagdoll_ApplyRotFriction(rdRagdoll* pRagdoll, float deltaSeconds);
 
 int rdRagdollSkeleton_LoadEntry(rdRagdollSkeleton* pSkel, const char* fpath);

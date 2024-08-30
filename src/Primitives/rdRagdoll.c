@@ -222,7 +222,7 @@ void rdRagdoll_UpdateTriangles(rdRagdoll* pRagdoll)
 	}
 }
 
-void rdRagdoll_UpdateCenter(rdRagdoll* pRagdoll)
+void rdRagdoll_UpdateBounds(rdRagdoll* pRagdoll)
 {
 	rdVector_Zero3(&pRagdoll->center);
 	for (int i = 0; i < pRagdoll->numParticles; ++i)
@@ -231,6 +231,13 @@ void rdRagdoll_UpdateCenter(rdRagdoll* pRagdoll)
 		rdVector_Add3Acc(&pRagdoll->center, &pParticle->pos);
 	}
 	rdVector_InvScale3Acc(&pRagdoll->center, (float)pRagdoll->numParticles);
+
+	pRagdoll->radius = 0.0f;
+	for (int i = 0; i < pRagdoll->numParticles; ++i)
+	{
+		rdRagdollParticle* pParticle = &pRagdoll->paParticles[i];
+		pRagdoll->radius = max(pRagdoll->radius, rdVector_Dist3(&pParticle->pos, &pRagdoll->center));
+	}
 }
 
 void rdRagdoll_NewEntry(rdThing* pThing, rdVector3* pInitialVel)
@@ -350,7 +357,7 @@ void rdRagdoll_NewEntry(rdThing* pThing, rdVector3* pInitialVel)
 		rdMatrix_PostMultiply34(&pConstraint->middle, &pRagdoll->paTris[pConstraint->tri[0]]);
 	}
 
-	rdRagdoll_UpdateCenter(pRagdoll);
+	rdRagdoll_UpdateBounds(pRagdoll);
 }
 
 void rdRagdoll_FreeEntry(rdRagdoll* pRagdoll)

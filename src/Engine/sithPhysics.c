@@ -1403,12 +1403,14 @@ void sithPhysics_ThingPhysRagdoll(sithThing* pThing, float deltaSeconds)
 	// the relative change in the center will be used to update the thing position
 	rdVector3 lastCenter, centerVel;
 	rdVector_Copy3(&lastCenter, &pRagdoll->center);
-	rdRagdoll_UpdateCenter(pRagdoll);
-	rdVector_Sub3(&centerVel, &pRagdoll->center, &lastCenter);
 
+	rdRagdoll_UpdateBounds(pRagdoll);
+	pThing->collideSize = pRagdoll->radius;
+
+	rdVector_Sub3(&centerVel, &pRagdoll->center, &lastCenter);
 	float velLen = rdVector_Normalize3Acc(&centerVel);
 	if(velLen > 0.0)
-		sithCollision_UpdateThingCollision(pThing, &centerVel, velLen, 0); // verify: is this the right function to call?
+		sithCollision_UpdateThingCollision(pThing, &centerVel, velLen, 0);
 }
 
 #endif
