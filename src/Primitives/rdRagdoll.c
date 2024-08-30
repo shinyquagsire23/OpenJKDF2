@@ -137,8 +137,8 @@ void rdRagdoll_ApplyRotConstraint(rdRagdoll* pRagdoll, rdRagdollTri* pTri0, rdRa
 
 	// build rotation matrices
 	rdMatrix34 rot0, rot1;
-	rdMatrix_BuildFromVectorAngle34(&rot0, pAxis, angle * w1);
-	rdMatrix_BuildFromVectorAngle34(&rot1, pAxis,-angle * w0);
+	rdMatrix_BuildFromAxisAngle34(&rot0, pAxis, angle * w1);
+	rdMatrix_BuildFromAxisAngle34(&rot1, pAxis,-angle * w0);
 
 	for (int k = 0; k < 3; ++k)
 	{
@@ -354,7 +354,7 @@ void rdRagdoll_NewEntry(rdThing* pThing, rdVector3* pInitialVel)
 	{
 		rdRagdollRotConstraint* pConstraint = &pRagdoll->pSkel->paRotConstraints[i];
 		rdMatrix_InvertOrtho34(&pConstraint->middle, &pRagdoll->paTris[pConstraint->tri[1]]);
-		rdMatrix_PostMultiply34(&pConstraint->middle, &pRagdoll->paTris[pConstraint->tri[0]]);
+		rdMatrix_PreMultiply34(&pConstraint->middle, &pRagdoll->paTris[pConstraint->tri[0]]);
 	}
 
 	rdRagdoll_UpdateBounds(pRagdoll);
@@ -671,7 +671,7 @@ void rdRagdollSkeleton_SetupModel(rdRagdollSkeleton* pSkel, rdModel3* pModel)
 
 		// scale down the distance slightly so that meshes don't disconnect
 		// might be better to fix this with accounting for mesh node pivots in the transforms...
-		pConstraint->dist = rdVector_Dist3(&p0, &p1) * 0.95f;
+		pConstraint->dist = rdVector_Dist3(&p0, &p1);// * 0.95f;
 	}
 }
 

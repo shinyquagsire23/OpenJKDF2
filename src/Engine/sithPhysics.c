@@ -1266,8 +1266,7 @@ void sithPhysics_ConstrainRagdoll(sithSector* pSector, rdRagdoll* pRagdoll, floa
 		sithPhysics_UpdateRagdollPositions(pSector, pRagdoll, deltaSeconds);
 
 		rdRagdoll_UpdateTriangles(pRagdoll);
-		// fixme: the rotation constraints are introducing a wild amount of energy
-		//rdRagdoll_ApplyRotConstraints(pRagdoll);
+		rdRagdoll_ApplyRotConstraints(pRagdoll);
 		sithPhysics_UpdateRagdollPositions(pSector, pRagdoll, deltaSeconds);
 	}
 }
@@ -1281,8 +1280,7 @@ void sithPhysics_AccumulateRagdollForces(sithThing* pThing, rdRagdoll* pRagdoll,
 		rdVector_Zero3(&pParticle->forces);
 
 		// gravity
-		// fixme: why is this ridiculously fast?
-		pParticle->forces.z -= sithWorld_pCurrentWorld->worldGravity * deltaSeconds * 0.25f;
+		pParticle->forces.z -= sithWorld_pCurrentWorld->worldGravity * deltaSeconds;
 	}
 }
 
@@ -1298,20 +1296,14 @@ void sithPhysics_UpdateRagdollParticles(rdRagdoll* pRagdoll, float deltaSeconds)
 		rdVector3 vel;
 		rdVector_Sub3(&vel, &pParticle->pos, &pParticle->lastPos);
 		
-		// normalize suggestion by strike
-		//rdVector_InvScale3Acc(&vel, deltaSeconds);
-
 		rdVector_ClipPrecision3(&vel);
 
 		// apply forces
 		rdVector_MultAcc3(&vel, &pParticle->forces, deltaSeconds);
 
 		// friction
-		//rdVector_Scale3Acc(&vel, timestepRatio * 0.9f);
-		sithPhysics_ApplyDrag(&vel, sithPhysics_ragdollDrag, 0.0f, deltaSeconds);
-
-		// apply dt per strike suggestion
-		//rdVector_Scale3Acc(&vel, timestepRatio * deltaSeconds);
+		rdVector_Scale3Acc(&vel, timestepRatio * powf(0.995f, deltaSeconds * 1000.0f));
+		//sithPhysics_ApplyDrag(&vel, sithPhysics_ragdollDrag, 0.0f, deltaSeconds);
 
 		// copy the old pos
 		rdVector_Copy3(&pParticle->lastPos, &pParticle->pos);
@@ -1352,7 +1344,7 @@ void sithPhysics_CollideRagdoll(sithThing* pThing, rdRagdoll* pRagdoll, float de
 	if (anyCollision)
 	{
 		// only set a new timer if one wasn't already set
-		pRagdoll->expireMs = !pRagdoll->expireMs ? sithTime_curMs + 2000 : pRagdoll->expireMs;
+		pRagdoll->expireMs = !pRagdoll->expireMs ? sithTime_curMs + 4000 : pRagdoll->expireMs;
 	}
 	// otherwise we're free-floating, let the sim run indefinitely until it settles
 	else if (sithTime_curMs < pRagdoll->expireMs)
