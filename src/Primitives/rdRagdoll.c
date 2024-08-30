@@ -250,15 +250,12 @@ void rdRagdoll_CalculateRotFriction(rdRagdoll* pRagdoll)
 	}
 }
 
-void rdRagdoll_ApplyRotFriction(rdRagdoll* pRagdoll, float deltaSeconds)
+void rdRagdoll_ApplyRotFriction(rdRagdoll* pRagdoll, float deltaSeconds, float friction, float angleThreshold)
 {
-	float rotFriction = 0.85f;
-	float rotFricCutoff = 0.1f;
+	float thresholdDt = angleThreshold * deltaSeconds;
+	float frictionDt = 1.0f - pow(friction, deltaSeconds * 1000.0f);
 
 	rdRagdoll_UpdateTriangles(pRagdoll);
-
-	float stopangle = 360.0f * deltaSeconds * rotFricCutoff;
-	float rotfric = 1.0f - pow(rotFriction, deltaSeconds * 1000.0f);
 	
 	for (int i = 0; i < pRagdoll->pSkel->numRotFric; ++i)
 	{
@@ -274,7 +271,7 @@ void rdRagdoll_ApplyRotFriction(rdRagdoll* pRagdoll, float deltaSeconds)
 		if (!rdMatrix_ExtractAxisAngle34(&rot, &axis, &angle))
 			continue;
 
-		angle *= -(fabs(angle) >= stopangle ? rotfric : 1.0f);
+		angle *= -(fabs(angle) >= thresholdDt ? frictionDt : 1.0f);
 		rdRagdoll_ApplyRotConstraint(pRagdoll, &pRagdoll->pSkel->paTris[pRotFric->tri[0]], &pRagdoll->pSkel->paTris[pRotFric->tri[1]], angle, &axis);
 	}
 

@@ -1137,6 +1137,8 @@ void sithPhysics_ThingPhysAttached(sithThing *pThing, float deltaSeconds)
 
 float sithPhysics_ragdollBounce = 1.0f;
 float sithPhysics_ragdollDrag = 0.5f;
+float sithPhysics_ragdollRotFriction = 0.85f;
+float sithPhysics_ragdollRotFricThreshold = 35.0f;
 
 int sithPhysics_CollideRagdollParticle(sithSector* sector, rdVector3* pos, rdVector3* dir, float radius, rdVector3* hitPosOut, rdVector3* hitNormOut)
 {
@@ -1369,7 +1371,7 @@ void sithPhysics_ThingPhysRagdoll(sithThing* pThing, float deltaSeconds)
 	sithPhysics_AccumulateRagdollForces(pThing, pRagdoll, deltaSeconds);
 	sithPhysics_UpdateRagdollParticles(pRagdoll, deltaSeconds);
 
-	rdRagdoll_ApplyRotFriction(pRagdoll, deltaSeconds);
+	rdRagdoll_ApplyRotFriction(pRagdoll, deltaSeconds, sithPhysics_ragdollRotFriction, sithPhysics_ragdollRotFricThreshold);
 
 	sithPhysics_CollideRagdoll(pThing, pRagdoll, deltaSeconds);
 
