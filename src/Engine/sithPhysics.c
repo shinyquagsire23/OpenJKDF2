@@ -1135,7 +1135,7 @@ void sithPhysics_ThingPhysAttached(sithThing *pThing, float deltaSeconds)
 #ifdef RAGDOLLS
 #include "Primitives/rdRagdoll.h"
 
-float sithPhysics_ragdollBounce = 0.03f;
+float sithPhysics_ragdollBounce = 1.0f;
 float sithPhysics_ragdollDrag = 0.5f;
 
 int sithPhysics_CollideRagdollParticle(sithSector* sector, rdVector3* pos, rdVector3* dir, float radius, rdVector3* hitPosOut, rdVector3* hitNormOut)
