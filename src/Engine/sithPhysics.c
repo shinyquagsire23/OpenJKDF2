@@ -1231,7 +1231,12 @@ void sithPhysics_AccumulateRagdollForces(sithThing* pThing, rdRagdoll* pRagdoll,
 		rdVector_Zero3(&pParticle->forces);
 
 		// gravity
-		pParticle->forces.z -= sithWorld_pCurrentWorld->worldGravity * deltaSeconds;
+		if (pThing->physicsParams.mass != 0.0
+			&& pThing->physicsParams.physflags & SITH_PF_USEGRAVITY
+			&& !(pThing->sector->flags & SITH_SECTOR_NOGRAVITY))
+		{
+			pParticle->forces.z -= sithWorld_pCurrentWorld->worldGravity * deltaSeconds;
+		}
 	}
 }
 
