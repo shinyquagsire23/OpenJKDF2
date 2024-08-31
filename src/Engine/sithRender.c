@@ -2474,7 +2474,7 @@ void sithRender_RenderAlphaSurfaces()
 						}
 					}
 				}
-
+				rdSetProcFaceUserData(surfaceSector->id);
 				v9->wallCel = v0->surfaceInfo.face.wallCel;
 				v9->extralight = v0->surfaceInfo.face.extraLight;
 				v9->material = v0->surfaceInfo.face.material;
