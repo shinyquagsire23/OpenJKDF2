@@ -2249,6 +2249,264 @@ void sithRender_RenderAlphaSurfaces()
             v0->field_4 = sithRender_lastRenderTick;
         }
         
+		// very messy copy from sithRender_RenderLevelGeometry() for colored light
+#ifdef RGB_THING_LIGHTS
+		int v74 = 0;
+		int v76 = v0->surfaceInfo.face.numVertices - 2;
+		int lightMode2;
+		if (v76 > 0)
+		{
+			int v68 = surfaceSector->colormap == sithWorld_pCurrentWorld->colormaps;
+
+			int v18 = v0->surfaceInfo.face.numVertices - 1;
+			int v71 = 1;
+			int v19 = 0;
+			int v24;
+			int v78[3];
+			int v79[3];
+			float v80[3];
+			float tmpGreen[3];
+			float tmpBlue[3];
+			int v28;
+			float* v31;
+			int v32;
+			float* v33;
+			float v34;
+			float v66;
+			int v38;
+			int v39;
+			rdVector3 v29;
+			while (2)
+			{
+				v9 = rdCache_GetProcEntry();
+				if (!v9)
+					goto LABEL_92;
+				v21 = v0->surfaceInfo.face.geometryMode;
+				if (v21 >= sithRender_geoMode)
+					v21 = sithRender_geoMode;
+				v9->geometryMode = v21;
+				lightMode2 = v0->surfaceInfo.face.lightingMode;
+				if (sithRender_lightingIRMode)
+				{
+					if (lightMode2 >= RD_LIGHTMODE_DIFFUSE)
+						lightMode2 = RD_LIGHTMODE_DIFFUSE;
+				}
+				else if (lightMode2 >= sithRender_lightMode)
+				{
+					lightMode2 = sithRender_lightMode;
+				}
+				v23 = sithRender_texMode;
+				v9->lightingMode = lightMode2;
+				v24 = v0->surfaceInfo.face.textureMode;
+				if (v24 >= v23)
+					v24 = v23;
+				v9->textureMode = v24;
+				v78[0] = v0->surfaceInfo.face.vertexPosIdx[v19];
+				v78[1] = v0->surfaceInfo.face.vertexPosIdx[v71];
+				v78[2] = v0->surfaceInfo.face.vertexPosIdx[v18];
+				if (v9->geometryMode >= RD_GEOMODE_TEXTURED)
+				{
+					v79[0] = v0->surfaceInfo.face.vertexUVIdx[v19];
+					v79[1] = v0->surfaceInfo.face.vertexUVIdx[v71];
+					v79[2] = v0->surfaceInfo.face.vertexUVIdx[v18];
+				}
+				meshinfo_out.verticesProjected = sithRender_aVerticesTmp;
+				sithRender_idxInfo.numVertices = 3;
+				meshinfo_out.vertexUVs = v9->vertexUVs;
+				sithRender_idxInfo.vertexPosIdx = v78;
+				meshinfo_out.paDynamicLight = v9->vertexIntensities;
+#ifdef RGB_THING_LIGHTS
+				meshinfo_out.paDynamicLightR = v9->paRedIntensities;
+				meshinfo_out.paDynamicLightG = v9->paGreenIntensities;
+				meshinfo_out.paDynamicLightB = v9->paBlueIntensities;
+#endif
+				sithRender_idxInfo.vertexUVIdx = v79;
+
+				// MOTS added
+				if (rdGetVertexColorMode() == 0)
+				{
+					v80[0] = v0->surfaceInfo.intensities[v19];
+					v80[1] = v0->surfaceInfo.intensities[v71];
+					v80[2] = v0->surfaceInfo.intensities[v18];
+					sithRender_idxInfo.intensities = v80;
+					rdPrimit3_ClipFace(surfaceSector->clipFrustum,
+									   v9->geometryMode,
+									   v9->lightingMode,
+									   v9->textureMode,
+									   &sithRender_idxInfo,
+									   &meshinfo_out,
+									   &v0->surfaceInfo.face.clipIdk);
+				}
+				else
+				{
+
+
+					if ((v0->surfaceFlags & SITH_SURFACE_1000000) == 0)
+					{
+						v80[0] = v0->surfaceInfo.intensities[v19];
+						v80[1] = v0->surfaceInfo.intensities[v71];
+						v80[2] = v0->surfaceInfo.intensities[v18];
+
+						memcpy(tmpBlue, v80, sizeof(float) * 3);
+						memcpy(tmpGreen, v80, sizeof(float) * 3);
+					}
+					else
+					{
+						v80[0] = v0->surfaceInfo.intensities[(v0->surfaceInfo.face.numVertices * 1) + v19];
+						v80[1] = v0->surfaceInfo.intensities[(v0->surfaceInfo.face.numVertices * 1) + v71];
+						v80[2] = v0->surfaceInfo.intensities[(v0->surfaceInfo.face.numVertices * 1) + v18];
+
+						tmpGreen[0] = v0->surfaceInfo.intensities[(v0->surfaceInfo.face.numVertices * 2) + v19];
+						tmpGreen[1] = v0->surfaceInfo.intensities[(v0->surfaceInfo.face.numVertices * 2) + v71];
+						tmpGreen[2] = v0->surfaceInfo.intensities[(v0->surfaceInfo.face.numVertices * 2) + v18];
+
+						tmpBlue[0] = v0->surfaceInfo.intensities[(v0->surfaceInfo.face.numVertices * 3) + v19];
+						tmpBlue[1] = v0->surfaceInfo.intensities[(v0->surfaceInfo.face.numVertices * 3) + v71];
+						tmpBlue[2] = v0->surfaceInfo.intensities[(v0->surfaceInfo.face.numVertices * 3) + v18];
+					}
+
+					sithRender_idxInfo.paRedIntensities = v80;
+					sithRender_idxInfo.paGreenIntensities = tmpGreen;
+					sithRender_idxInfo.paBlueIntensities = tmpBlue;
+
+					meshinfo_out.paRedIntensities = v9->paRedIntensities;
+					meshinfo_out.paGreenIntensities = v9->paGreenIntensities;
+					meshinfo_out.paBlueIntensities = v9->paBlueIntensities;
+
+					rdPrimit3_ClipFaceRGBLevel
+					(surfaceSector->clipFrustum,
+					 v9->geometryMode,
+					 v9->lightingMode,
+					 v9->textureMode,
+					 &sithRender_idxInfo,
+					 &meshinfo_out,
+					 &(v0->surfaceInfo).face.clipIdk);
+				}
+
+				v28 = meshinfo_out.numVertices;
+				if (meshinfo_out.numVertices < 3u)
+					goto LABEL_92;
+
+#ifdef DEFERRED_DECALS
+				memcpy(v9->vertexVS, sithRender_aVerticesTmp, sizeof(rdVector3) * meshinfo_out.numVertices);
+#endif
+				rdCamera_pCurCamera->fnProjectLst(v9->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
+
+				if (sithRender_lightingIRMode)
+				{
+#ifdef RGB_AMBIENT
+					v29.x = v29.y = v29.z = sithRender_f_83198C;
+					v9->light_level_static = 0.0;
+					rdVector_Copy3(&v9->ambientLight, &v29);
+#else
+					v29 = sithRender_f_83198C;
+					v9->light_level_static = 0.0;
+					v9->ambientLight = v29;
+#endif
+				}
+				else
+				{
+#ifdef RGB_AMBIENT
+					v9->ambientLight.x = v9->ambientLight.y = v9->ambientLight.z = stdMath_Clamp(surfaceSector->extraLight + sithRender_008d4098, 0.0, 1.0);
+#else
+					v9->ambientLight = stdMath_Clamp(surfaceSector->extraLight + sithRender_008d4098, 0.0, 1.0);
+#endif
+				}
+
+#ifdef RGB_AMBIENT
+				if (v9->ambientLight.x >= 1.0 && v9->ambientLight.y >= 1.0 && v9->ambientLight.z >= 1.0)
+#else
+				if (v9->ambientLight >= 1.0)
+#endif
+				{
+					if (v68)
+					{
+						v9->lightingMode = RD_LIGHTMODE_FULLYLIT;
+					}
+					else
+					{
+						v9->lightingMode = RD_LIGHTMODE_DIFFUSE;
+						v9->light_level_static = 1.0;
+					}
+				}
+				else if (v9->lightingMode == RD_LIGHTMODE_DIFFUSE)
+				{
+					if (v9->light_level_static >= 1.0 && v68)
+					{
+						v9->lightingMode = RD_LIGHTMODE_FULLYLIT;
+					}
+					else if (v9->light_level_static <= 0.0)
+					{
+						v9->lightingMode = RD_LIGHTMODE_NOTLIT;
+					}
+				}
+				else if ((rdGetVertexColorMode() == 0) && v9->lightingMode == RD_LIGHTMODE_GOURAUD)
+				{
+					v31 = v9->vertexIntensities;
+					v32 = 1;
+					v66 = *v31;
+					if (v28 > 1)
+					{
+						v33 = v31 + 1;
+						do
+						{
+							v34 = fabs(*v33 - v66);
+							if (v34 > 0.015625)
+								break;
+							++v32;
+							++v33;
+						} while (v32 < v28);
+					}
+					if (v32 == v28)
+					{
+						if (v66 != 1.0)
+						{
+							if (v66 == 0.0)
+							{
+								v9->lightingMode = RD_LIGHTMODE_NOTLIT;
+								v9->light_level_static = 0.0;
+							}
+							else
+							{
+								v9->lightingMode = RD_LIGHTMODE_DIFFUSE;
+								v9->light_level_static = v66;
+							}
+						}
+					}
+				}
+
+				v9->wallCel = v0->surfaceInfo.face.wallCel;
+				v9->extralight = v0->surfaceInfo.face.extraLight;
+				v9->material = v0->surfaceInfo.face.material;
+				v38 = v9->geometryMode;
+				v9->light_flags = 0;
+				v9->type = v0->surfaceInfo.face.type;
+				v39 = 1;
+				if (v38 >= 4)
+					v39 = 3;
+				if (v9->lightingMode >= RD_LIGHTMODE_GOURAUD)
+					v39 |= 4u;
+				rdCache_AddProcFace(0, v28, v39);
+			LABEL_92:
+				if ((v74 & 1) != 0)
+				{
+					v19 = v18;
+					v18--;
+				}
+				else
+				{
+					v19 = v71;
+					++v71;
+				}
+				if (++v74 >= v76)
+					goto LABEL_150;
+				continue;
+			}
+		}
+	LABEL_150:
+		;
+	}
+#else
         v9 = rdCache_GetProcEntry();
         if ( !v9 )
         {
@@ -2432,6 +2690,7 @@ void sithRender_RenderAlphaSurfaces()
         rdSetProcFaceUserData(surfaceSector->id);
         rdCache_AddProcFace(0, meshinfo_out.numVertices, v23);
     }
+#endif
     rdCache_Flush();
 #ifdef SDL2_RENDER
     rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
