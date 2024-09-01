@@ -230,7 +230,8 @@ void rdThing_AccumulateMatrices(rdThing *thing, rdHierarchyNode *node, rdMatrix3
     }
 #ifdef RAGDOLLS
 	// this might not be the best place for this, but for now we have a world transform from the ragdoll
-	if (thing->pRagdoll && node->skelJoint != -1)
+	extern int sithPhysics_ragdolls; // low key hate that this is here, find a better way
+	if (sithPhysics_ragdolls && thing->pRagdoll && node->skelJoint != -1)
 		rdMatrix_Copy34(&thing->hierarchyNodeMatrices[node->idx], &thing->pRagdoll->paJointMatrices[node->skelJoint]);
 	else
 #endif

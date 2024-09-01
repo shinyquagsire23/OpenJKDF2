@@ -213,6 +213,8 @@ void jkPlayer_StartupVars()
 	sithCvar_RegisterFlex("r_enableDecals",             1.0,                        &jkPlayer_enableDecals,             CVARFLAG_LOCAL | CVARFLAG_RESETHUD);
 #endif
 #ifdef RAGDOLLS
+	extern int sithPhysics_ragdolls; // ew ew ew
+	sithCvar_RegisterInt("g_ragdolls", 1, &sithPhysics_ragdolls, CVARFLAG_LOCAL | CVARFLAG_UPDATABLE_DEFAULT);
 	sithCvar_RegisterInt("r_debugRagdolls", 0, &jkPlayer_debugRagdolls, CVARFLAG_LOCAL | CVARFLAG_UPDATABLE_DEFAULT);
 #endif
     sithCvar_RegisterBool("hud_setCrosshairOnLightsaber", 1,                        &jkPlayer_setCrosshairOnLightsaber, CVARFLAG_LOCAL);

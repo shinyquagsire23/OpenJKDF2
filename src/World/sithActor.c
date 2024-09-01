@@ -304,7 +304,7 @@ void sithActor_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4)
 					int deathMs = 1000;
 
 					// if the actor is moving quickly, just insta ragdoll
-					if (rdVector_Len3(&thing->physicsParams.vel) > 1.0f)
+					if (rdVector_Len3(&thing->physicsParams.vel) > 1.0f || sithPhysics_ragdolls == 2)
 					{
 						sithActor_Remove(thing);
 					}
@@ -507,7 +507,7 @@ void sithActor_Remove(sithThing *thing)
 	{
 		thing->moveType = SITH_MT_RAGDOLL;
 		rdRagdoll_NewEntry(&thing->rdthing, &thing->physicsParams.vel);
-		sithPuppet_resetidk(thing);
+		//sithPuppet_resetidk(thing);
 	}
 #endif
 }

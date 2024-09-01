@@ -287,7 +287,7 @@ void sithThing_TickAll(float deltaSeconds, int deltaMs)
             sithThing_TickPhysics(pThingIter, deltaSeconds);
 
 #ifdef RAGDOLLS
-			if (pThingIter->moveType != SITH_MT_RAGDOLL)
+			if (pThingIter->moveType != SITH_MT_RAGDOLL || !sithPhysics_ragdolls)
 #endif
             sithPuppet_Tick(pThingIter, deltaSeconds);
             continue;
