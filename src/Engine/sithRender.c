@@ -166,7 +166,7 @@ void sithRender_DrawRagdollDebug(sithThing* pThing)
 			}
 		}
 
-		if (jkPlayer_debugRagdolls == 3 && pThing->rdthing.hierarchyNodeMatrices && pThing->rdthing.model3 && pThing->rdthing.model3->pSkel)
+		if (jkPlayer_debugRagdolls == 3 && pThing->rdthing.hierarchyNodeMatrices && pThing->rdthing.model3 && pThing->rdthing.model3->pSkel && pThing->rdthing.pRagdoll)
 		{
 			rdRagdollSkeleton* skel = pThing->rdthing.model3->pSkel;
 			for (int i = 0; i < skel->numDist; ++i)
@@ -189,7 +189,7 @@ void sithRender_DrawRagdollDebug(sithThing* pThing)
 
 				rdPolyLine debugLine;
 				_memset(&debugLine, 0, sizeof(rdPolyLine));
-				if (rdPolyLine_NewEntry(&debugLine, "dbgragoll", "saberblue1.mat", "saberblue0.mat", constraint->dist, radius0, radius1, RD_GEOMODE_TEXTURED, RD_LIGHTMODE_FULLYLIT, RD_TEXTUREMODE_PERSPECTIVE, 1.0f))
+				if (rdPolyLine_NewEntry(&debugLine, "dbgragoll", "saberblue1.mat", "saberblue0.mat", pThing->rdthing.pRagdoll->paDistConstraintDists[i], radius0, radius1, RD_GEOMODE_TEXTURED, RD_LIGHTMODE_FULLYLIT, RD_TEXTUREMODE_PERSPECTIVE, 1.0f))
 				{
 					rdThing debug;
 					rdThing_NewEntry(&debug, pThing);

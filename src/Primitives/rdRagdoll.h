@@ -32,7 +32,6 @@ typedef struct rdRagdollJoint
 typedef struct rdRagdollDistConstraint
 {
 	int vert[2];
-	float dist;
 } rdRagdollDistConstraint;
 
 typedef struct rdRagdollRotConstraint
@@ -95,6 +94,7 @@ typedef struct rdRagdoll
 	rdMatrix34* paJointTris;
 	rdMatrix34* paTris;
 	rdMatrix34* paRotFricMatrices;
+	float* paDistConstraintDists;
 	float lastTimeStep;
 	int collisions;
 	int expireMs;

@@ -75,7 +75,7 @@ void rdRagdoll_ApplyDistConstraints(rdRagdoll* pRagdoll)
 		rdVector_Add3(&center, &pParticle0->pos, &pParticle1->pos);
 		rdVector_Scale3Acc(&center, 0.5f);
 		
-		rdVector_Scale3Acc(&delta, pConstraint->dist * 0.5f);
+		rdVector_Scale3Acc(&delta, pRagdoll->paDistConstraintDists[i] * 0.5f);
 
 		rdVector3 offset1;
 		rdVector_Sub3(&offset1, &center, &delta);
@@ -348,6 +348,11 @@ void rdRagdoll_NewEntry(rdThing* pThing, rdVector3* pInitialVel)
 	if (!pRagdoll->paRotFricMatrices)
 		return;
 	_memset(pRagdoll->paRotFricMatrices, 0, sizeof(rdMatrix34) * pRagdoll->pSkel->numRotFric);
+	
+	pRagdoll->paDistConstraintDists = (float*)rdroid_pHS->alloc(sizeof(float) * pRagdoll->pSkel->numDist);
+	if (!pRagdoll->paDistConstraintDists)
+		return;
+	_memset(pRagdoll->paDistConstraintDists, 0, sizeof(float) * pRagdoll->pSkel->numDist);
 
 	// generate initial particle positions
 	rdVector3 thingVel;
@@ -412,6 +417,15 @@ void rdRagdoll_NewEntry(rdThing* pThing, rdVector3* pInitialVel)
 		rdMatrix_InvertOrtho34(&pRagdoll->paJointTris[i], &m);
 	}
 
+	// update constraint distances
+	for (int i = 0; i < pRagdoll->pSkel->numDist; ++i)
+	{
+		rdRagdollDistConstraint* pConstraint = &pRagdoll->pSkel->paDistConstraints[i];
+		rdRagdollParticle* pParticle0 = &pRagdoll->paParticles[pConstraint->vert[0]];
+		rdRagdollParticle* pParticle1 = &pRagdoll->paParticles[pConstraint->vert[1]];
+		pRagdoll->paDistConstraintDists[i] = rdVector_Dist3(&pParticle0->pos, &pParticle1->pos);
+	}
+
 	// update triangle matrices
 	rdRagdoll_UpdateTriangles(pRagdoll);
 	for (int i = 0; i < pRagdoll->pSkel->numRot; ++i)
@@ -449,6 +463,12 @@ void rdRagdoll_FreeEntry(rdRagdoll* pRagdoll)
 	{
 		rdroid_pHS->free(pRagdoll->paJointTris);
 		pRagdoll->paJointTris = 0;
+	}
+
+	if (pRagdoll->paDistConstraintDists)
+	{
+		rdroid_pHS->free(pRagdoll->paDistConstraintDists);
+		pRagdoll->paDistConstraintDists = 0;
 	}
 
 	if (pRagdoll->paTris)
@@ -743,70 +763,6 @@ void rdRagdollSkeleton_SetupModel(rdRagdollSkeleton* pSkel, rdModel3* pModel)
 		rdRagdollJoint* pJoint = &pSkel->paJoints[i];
 		pModel->hierarchyNodes[pJoint->node].skelJoint = i;
 	}
-
-	// calculate the distance for constraints from the node base positions
-	for (int i = 0; i < pSkel->numDist; ++i)
-	{
-		rdRagdollDistConstraint* pConstraint = &pSkel->paDistConstraints[i];
-
-		rdRagdollVert* pVert0 = &pSkel->paVerts[pConstraint->vert[0]];
-		rdRagdollVert* pVert1 = &pSkel->paVerts[pConstraint->vert[1]];
-
-		rdVector3 p0;
-		rdVector_Add3(&p0, &pModel->paBasePoseMatrices[pVert0->node].scale, &pVert0->offset);
-
-		rdVector3 p1;
-		rdVector_Add3(&p1, &pModel->paBasePoseMatrices[pVert1->node].scale, &pVert1->offset);
-
-		// scale down the distance slightly so that meshes don't disconnect
-		// might be better to fix this with accounting for mesh node pivots in the transforms...
-		pConstraint->dist = rdVector_Dist3(&p0, &p1);// * 0.95f;
-	}
-
-	// update triangle matrices
-	// tmp
-	/*rdMatrix34* triMat = (rdMatrix34*)rdroid_pHS->alloc(sizeof(rdMatrix34) * pSkel->numTris);
-
-	for (int i = 0; i < pSkel->numTris; ++i)
-	{
-		rdRagdollTri* pTri = &pSkel->paTris[i];
-		rdMatrix34* pMat = &triMat[i];
-
-		rdRagdollVert* pVert0 = &pSkel->paVerts[pTri->vert[0]];
-		rdRagdollVert* pVert1 = &pSkel->paVerts[pTri->vert[1]];
-		rdRagdollVert* pVert2 = &pSkel->paVerts[pTri->vert[2]];
-
-		rdVector3 p0;
-		rdVector_Add3(&p0, &pModel->paBasePoseMatrices[pVert0->node].scale, &pVert0->offset);
-
-		rdVector3 p1;
-		rdVector_Add3(&p1, &pModel->paBasePoseMatrices[pVert1->node].scale, &pVert1->offset);
-
-		rdVector3 p2;
-		rdVector_Add3(&p2, &pModel->paBasePoseMatrices[pVert2->node].scale, &pVert2->offset);
-
-
-		rdVector_Sub3(&pMat->uvec, &p1, &p0);
-		rdVector_Normalize3Acc(&pMat->uvec);
-
-		rdVector_Sub3(&pMat->rvec, &p2, &p0);
-		rdVector_Normalize3Acc(&pMat->rvec);
-
-		rdVector_Cross3(&pMat->lvec, &pMat->uvec, &pMat->rvec);
-		rdVector_Normalize3Acc(&pMat->lvec);
-
-		rdVector_Cross3(&pMat->rvec, &pMat->lvec, &pMat->uvec);
-		rdVector_Normalize3Acc(&pMat->rvec);
-	}
-
-	for (int i = 0; i < pSkel->numRot; ++i)
-	{
-		rdRagdollRotConstraint* pConstraint = &pSkel->paRotConstraints[i];
-		rdMatrix_InvertOrtho34(&pConstraint->middle, &triMat[pConstraint->tri[1]]);
-		rdMatrix_PostMultiply34(&pConstraint->middle, &triMat[pConstraint->tri[0]]);
-	}
-
-	rdroid_pHS->free(triMat);*/
 }
 
 #endif
