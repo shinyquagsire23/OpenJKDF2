@@ -302,7 +302,13 @@ void sithActor_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4)
 				#ifdef RAGDOLLS
 					// use length of death anim before ragdolling/turning to corpse
 					int deathMs = 1000;
-					if(thing->animclass && thing->puppet)
+
+					// if the actor is moving quickly, just insta ragdoll
+					if (rdVector_Len3(&thing->physicsParams.vel) > 1.0f)
+					{
+						sithActor_Remove(thing);
+					}
+					else if(thing->animclass && thing->puppet)
 					{
 						int anim = thing->actorParams.health >= -10.0 ? SITH_ANIM_DEATH2 : SITH_ANIM_DEATH;
 						sithAnimclassMode* mode = &thing->animclass->modes[thing->puppet->majorMode];
