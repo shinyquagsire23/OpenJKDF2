@@ -1347,8 +1347,7 @@ void sithPhysics_ThingPhysRagdoll(sithThing* pThing, float deltaSeconds)
 		rdMatrix_PostTranslate34(&pRagdoll->paJointMatrices[i], &pos);
 
 		// apply to the pose
-		rdHierarchyNode* pNode = &pRagdoll->pModel->hierarchyNodes[pJoint->node];
-		rdMatrix_PreMultiply34(&pRagdoll->paJointMatrices[i], &pRagdoll->paPoseMatrices[pNode->idx]);
+		rdMatrix_PreMultiply34(&pRagdoll->paJointMatrices[i], &pRagdoll->paPoseMatrices[pJoint->node]);
 	}
 
 	// the relative change in the center will be used to update the thing position
