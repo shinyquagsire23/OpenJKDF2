@@ -300,11 +300,22 @@ void sithActor_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4)
                 else
                 {
 				#ifdef RAGDOLLS
-					if(thing->rdthing.type == RD_THINGTYPE_MODEL && thing->rdthing.model3 && thing->rdthing.model3->pSkel)
-						thing->lifeLeftMs = 350; // don't let it live too long, but let some animation play
-					else
-				#endif
+					// use length of death anim before ragdolling/turning to corpse
+					int deathMs = 1000;
+					if(thing->animclass && thing->puppet)
+					{
+						int anim = thing->actorParams.health >= -10.0 ? SITH_ANIM_DEATH2 : SITH_ANIM_DEATH;
+						sithAnimclassMode* mode = &thing->animclass->modes[thing->puppet->majorMode];
+						rdKeyframe* key = mode->keyframe[anim].keyframe;
+						if(key)
+						{
+							deathMs = ((float)key->numFrames / key->fps) * 1000.0f;
+						}
+					}
+					thing->lifeLeftMs = deathMs;
+				#else
                     thing->lifeLeftMs = 1000;
+				#endif
                 }
             }
         }
