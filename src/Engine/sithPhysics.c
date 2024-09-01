@@ -1258,7 +1258,7 @@ void sithPhysics_UpdateRagdollParticles(rdRagdoll* pRagdoll, float deltaSeconds)
 		rdVector_MultAcc3(&vel, &pParticle->forces, deltaSeconds);
 
 		// friction
-		rdVector_Scale3Acc(&vel, timestepRatio * powf(pParticle->collided ? 0.9f : 0.99f, deltaSeconds * 1000.0f));
+		rdVector_Scale3Acc(&vel, timestepRatio * powf(pParticle->collided ? 0.8f : 0.995f, deltaSeconds * 1000.0f));
 		//sithPhysics_ApplyDrag(&vel, sithPhysics_ragdollDrag, 0.0f, deltaSeconds);
 
 		// copy the old pos
