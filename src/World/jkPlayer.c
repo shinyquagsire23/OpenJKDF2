@@ -998,9 +998,9 @@ void jkPlayer_DrawPov()
 			rotVelNorm.x = timeScale * player->physicsParams.angVel.x / player->physicsParams.maxRotVel;
 			rotVelNorm.y = timeScale * player->physicsParams.angVel.y / player->physicsParams.maxRotVel;
 			rotVelNorm.z = timeScale * player->physicsParams.angVel.z / player->physicsParams.maxRotVel;
-			jkSaber_rotateVec.x = -rotVelNorm.x * 1.5f;
-			jkSaber_rotateVec.y = -rotVelNorm.y * 1.5f;
-			jkSaber_rotateVec.z = -rotVelNorm.z * 1.5f;
+			jkSaber_rotateVec.x = -rotVelNorm.x;
+			jkSaber_rotateVec.y = -rotVelNorm.y;
+			jkSaber_rotateVec.z = -rotVelNorm.z;
 
 			// Added: add a small rotation based on pitch
 			static float lastPitch = 0.0f;
