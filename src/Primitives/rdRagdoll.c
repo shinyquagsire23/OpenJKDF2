@@ -505,6 +505,7 @@ int rdRagdollSkeleton_LoadEntry(rdRagdollSkeleton* pSkel, const char* fpath)
 	rdRagdollJoint* joint;
 	rdRagdollDistConstraint* distConstraint;
 	rdRagdollRotConstraint* rotConstraint;
+	int counter;
 
 	stdString_SafeStrCopy(pSkel->name, stdFileFromPath(fpath), 0x20);
 
@@ -521,6 +522,7 @@ int rdRagdollSkeleton_LoadEntry(rdRagdollSkeleton* pSkel, const char* fpath)
 	if (!pSkel->paVerts)
 		goto done_close;
 
+	counter = 0;
 	for (idx = 0; idx < pSkel->numVerts; idx++)
 	{
 		vert = &pSkel->paVerts[idx];
@@ -538,6 +540,13 @@ int rdRagdollSkeleton_LoadEntry(rdRagdollSkeleton* pSkel, const char* fpath)
 		{
 			goto done_close;
 		}
+		++counter;
+	}
+
+	if (counter != pSkel->numVerts)
+	{
+		rdroid_pHS->errorPrint("OpenJKDF2: vertex count mismatch in articulated figure %s, expected %d, got %d\n", fpath, pSkel->numVerts, counter);
+		goto done_close;
 	}
 
 	if (!stdConffile_ReadLine())
@@ -550,6 +559,7 @@ int rdRagdollSkeleton_LoadEntry(rdRagdollSkeleton* pSkel, const char* fpath)
 	if (!pSkel->paTris)
 		goto done_close;
 
+	counter = 0;
 	for (idx = 0; idx < pSkel->numTris; idx++)
 	{
 		tri = &pSkel->paTris[idx];
@@ -564,6 +574,13 @@ int rdRagdollSkeleton_LoadEntry(rdRagdollSkeleton* pSkel, const char* fpath)
 		{
 			goto done_close;
 		}
+		++counter;
+	}
+
+	if (counter != pSkel->numTris)
+	{
+		rdroid_pHS->errorPrint("OpenJKDF2: triangle count mismatch in articulated figure %s, expected %d, got %d\n", fpath, pSkel->numTris, counter);
+		goto done_close;
 	}
 
 	if (!stdConffile_ReadLine())
@@ -576,6 +593,7 @@ int rdRagdollSkeleton_LoadEntry(rdRagdollSkeleton* pSkel, const char* fpath)
 	if (!pSkel->paJoints)
 		goto done_close;
 
+	counter = 0;
 	for (idx = 0; idx < pSkel->numJoints; idx++)
 	{
 		joint = &pSkel->paJoints[idx];
@@ -593,6 +611,13 @@ int rdRagdollSkeleton_LoadEntry(rdRagdollSkeleton* pSkel, const char* fpath)
 		{
 			goto done_close;
 		}
+		++counter;
+	}
+
+	if (counter != pSkel->numJoints)
+	{
+		rdroid_pHS->errorPrint("OpenJKDF2: joint count mismatch in articulated figure %s, expected %d, got %d\n", fpath, pSkel->numJoints, counter);
+		goto done_close;
 	}
 
 	if (!stdConffile_ReadLine())
@@ -607,6 +632,7 @@ int rdRagdollSkeleton_LoadEntry(rdRagdollSkeleton* pSkel, const char* fpath)
 	if (!pSkel->paDistConstraints)
 		goto done_close;
 
+	counter = 0;
 	for (idx = 0; idx < numDist; idx++)
 	{
 		distConstraint = &pSkel->paDistConstraints[idx];
@@ -620,24 +646,13 @@ int rdRagdollSkeleton_LoadEntry(rdRagdollSkeleton* pSkel, const char* fpath)
 		{
 			goto done_close;
 		}
+		++counter;
 	}
 
-	// create the tri constraints
-	for (idx = 0; idx < pSkel->numTris; ++idx)
+	if (counter != numDist)
 	{
-		int distIdx = idx * 3 + numDist;
-	
-		distConstraint = &pSkel->paDistConstraints[distIdx + 0];
-		distConstraint->vert[0] = pSkel->paTris[idx].vert[0];
-		distConstraint->vert[1] = pSkel->paTris[idx].vert[1];
-	
-		distConstraint = &pSkel->paDistConstraints[distIdx + 1];
-		distConstraint->vert[0] = pSkel->paTris[idx].vert[1];
-		distConstraint->vert[1] = pSkel->paTris[idx].vert[2];
-	
-		distConstraint = &pSkel->paDistConstraints[distIdx + 2];
-		distConstraint->vert[0] = pSkel->paTris[idx].vert[0];
-		distConstraint->vert[1] = pSkel->paTris[idx].vert[2];
+		rdroid_pHS->errorPrint("OpenJKDF2: distance constraint count mismatch in articulated figure %s, expected %d, got %d\n", fpath, numDist, counter);
+		goto done_close;
 	}
 
 	if (!stdConffile_ReadLine())
@@ -650,6 +665,7 @@ int rdRagdollSkeleton_LoadEntry(rdRagdollSkeleton* pSkel, const char* fpath)
 	if (!pSkel->paRotConstraints)
 		goto done_close;
 
+	counter = 0;
 	for (idx = 0; idx < pSkel->numRot; idx++)
 	{
 		rotConstraint = &pSkel->paRotConstraints[idx];
@@ -664,6 +680,87 @@ int rdRagdollSkeleton_LoadEntry(rdRagdollSkeleton* pSkel, const char* fpath)
 		{
 			goto done_close;
 		}
+		++counter;
+	}
+
+	if (counter != pSkel->numRot)
+	{
+		rdroid_pHS->errorPrint("OpenJKDF2: angular constraint count mismatch in articulated figure %s, expected %d, got %d\n", fpath, pSkel->numRot, counter);
+		goto done_close;
+	}
+
+	// validate
+	for (idx = 0; idx < pSkel->numTris; ++idx)
+	{
+		for(idx2 = 0; idx2 < 3; ++idx2)
+		{
+			if (pSkel->paTris[idx].vert[idx2] < 0 || pSkel->paTris[idx].vert[idx2] >= pSkel->numVerts)
+			{
+				rdroid_pHS->errorPrint("OpenJKDF2: invalid vertex %d at index %d in triangle setup %d in articulated figure %s\n", pSkel->paTris[idx].vert[idx2], idx2, idx, fpath);
+				goto done_close;
+			}
+		}
+	}
+
+	for (idx = 0; idx < pSkel->numJoints; ++idx)
+	{
+		if (pSkel->paJoints[idx].tri < 0 || pSkel->paJoints[idx].tri >= pSkel->numTris)
+		{
+			rdroid_pHS->errorPrint("OpenJKDF2: invalid triangle %d for joint setup %d in articulated figure %s\n", pSkel->paJoints[idx].tri, idx, fpath);
+			goto done_close;
+		}
+
+		for (idx2 = 0; idx2 < 3; ++idx2)
+		{
+			if (pSkel->paJoints[idx].vert[idx2] < -1 || pSkel->paJoints[idx].vert[idx2] >= 3)
+			{
+				rdroid_pHS->errorPrint("OpenJKDF2: invalid vertex %d at index %d for joint setup %d, must be range 0-2 or -1 to mark unused\n", pSkel->paJoints[idx].vert[idx2], idx2, idx, fpath);
+				goto done_close;
+			}
+		}
+	}
+
+	for (idx = 0; idx < numDist; ++idx)
+	{
+		for (idx2 = 0; idx2 < 2; ++idx2)
+		{
+			if (pSkel->paDistConstraints[idx].vert[idx2] < 0 || pSkel->paDistConstraints[idx].vert[idx2] >= pSkel->numVerts)
+			{
+				rdroid_pHS->errorPrint("OpenJKDF2: invalid vertex %d at index %d for distance constraint %d in articulated figure %s\n", pSkel->paDistConstraints[idx].vert[idx2], idx2, idx, fpath);
+				goto done_close;
+			}
+		}
+	}
+
+
+	for (idx = 0; idx < pSkel->numRot; ++idx)
+	{
+		for (idx2 = 0; idx2 < 2; ++idx2)
+		{
+			if (pSkel->paRotConstraints[idx].tri[idx2] < 0 || pSkel->paRotConstraints[idx].tri[idx2] >= pSkel->numTris)
+			{
+				rdroid_pHS->errorPrint("OpenJKDF2: invalid triangle %d at index %d for angular constraint %d in articulated figure %s\n", pSkel->paRotConstraints[idx].tri[idx2], idx2, idx, fpath);
+				goto done_close;
+			}
+		}
+	}
+
+	// create the tri constraints
+	for (idx = 0; idx < pSkel->numTris; ++idx)
+	{
+		int distIdx = idx * 3 + numDist;
+
+		distConstraint = &pSkel->paDistConstraints[distIdx + 0];
+		distConstraint->vert[0] = pSkel->paTris[idx].vert[0];
+		distConstraint->vert[1] = pSkel->paTris[idx].vert[1];
+
+		distConstraint = &pSkel->paDistConstraints[distIdx + 1];
+		distConstraint->vert[0] = pSkel->paTris[idx].vert[1];
+		distConstraint->vert[1] = pSkel->paTris[idx].vert[2];
+
+		distConstraint = &pSkel->paDistConstraints[distIdx + 2];
+		distConstraint->vert[0] = pSkel->paTris[idx].vert[0];
+		distConstraint->vert[1] = pSkel->paTris[idx].vert[2];
 	}
 
 	// build a list for rotation friction from shared triangles
