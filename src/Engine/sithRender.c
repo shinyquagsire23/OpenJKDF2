@@ -101,26 +101,27 @@ void sithRender_DrawRagdollDebug(sithThing* pThing)
 	{
 		if (jkPlayer_debugRagdolls == 1 && pThing->rdthing.pRagdoll)
 		{
-			rdSprite debugSprite;
-			rdSprite_NewEntry(&debugSprite, "dbgragoll", 2, "sabergreen0.mat", 0.01f, 0.01f, RD_GEOMODE_TEXTURED, RD_LIGHTMODE_FULLYLIT, RD_TEXTUREMODE_AFFINE, 1.0f, &rdroid_zeroVector3);
-
-			rdThing debug;
-			rdThing_NewEntry(&debug, pThing);
-			rdThing_SetSprite3(&debug, &debugSprite);
-
 			if (pThing->rdthing.pRagdoll)
 			{
 				for (int i = 0; i < pThing->rdthing.pRagdoll->numParticles; ++i)
 				{
+					rdRagdollParticle* pParticle = &pThing->rdthing.pRagdoll->paParticles[i];
+
+					rdSprite debugSprite;
+					rdSprite_NewEntry(&debugSprite, "dbgragoll", 0, "sabergreen0.mat", pParticle->radius, pParticle->radius, RD_GEOMODE_TEXTURED, RD_LIGHTMODE_FULLYLIT, RD_TEXTUREMODE_AFFINE, 1.0f, &rdroid_zeroVector3);
+
+					rdThing debug;
+					rdThing_NewEntry(&debug, pThing);
+					rdThing_SetSprite3(&debug, &debugSprite);
 					rdMatrix34 mat;
-					rdMatrix_BuildTranslate34(&mat, &pThing->rdthing.pRagdoll->paParticles[i].pos);
+					rdMatrix_BuildTranslate34(&mat, &pParticle->pos);
 
 					rdSprite_Draw(&debug, &mat);
+
+					rdSprite_FreeEntry(&debugSprite);
+					rdThing_FreeEntry(&debug);
 				}
 			}
-
-			rdSprite_FreeEntry(&debugSprite);
-			rdThing_FreeEntry(&debug);
 		}
 
 		if (jkPlayer_debugRagdolls == 2 && pThing->rdthing.model3->pSkel)
@@ -2133,8 +2134,8 @@ int sithRender_RenderThing(sithThing *pThing)
     pThing->lookOrientation.scale = pThing->position;
 #ifdef RAGDOLLS
 	// ragdoll debug draw
-	if (pThing->rdthing.type == RD_THINGTYPE_MODEL && pThing->rdthing.model3 && (jkPlayer_debugRagdolls == 1 && pThing->rdthing.pRagdoll
-		|| (jkPlayer_debugRagdolls == 2 || jkPlayer_debugRagdolls == 3) && pThing->rdthing.model3->pSkel)
+	if (pThing->rdthing.type == RD_THINGTYPE_MODEL && pThing->rdthing.model3 && ((jkPlayer_debugRagdolls == 1 || jkPlayer_debugRagdolls == 3) && pThing->rdthing.pRagdoll
+		|| (jkPlayer_debugRagdolls == 2) && pThing->rdthing.model3->pSkel)
 	)
 	{
 		ret = 1;
