@@ -1004,7 +1004,7 @@ void jkPlayer_DrawPov()
 
 			// Added: add a small rotation based on pitch
 			static float lastPitch = 0.0f;
-			float lerpPitch = (player->actorParams.eyePYR.x - lastPitch) * min(sithTime_curSeconds, 0.02f);
+			float lerpPitch = (player->actorParams.eyePYR.x - lastPitch) * min(sithTime_deltaSeconds, 0.02f);
 			jkSaber_rotateVec.x -= lerpPitch * 30.0f;
 			lastPitch = player->actorParams.eyePYR.x;
 			//jkSaber_rotateVec.x -= player->actorParams.eyePYR.x * 0.06f;
