@@ -1312,19 +1312,21 @@ void sithPhysics_CollideRagdoll(sithThing* pThing, rdRagdoll* pRagdoll, float de
 
 void sithPhysics_ThingPhysRagdoll(sithThing* pThing, float deltaSeconds)
 {
-	if (!sithPhysics_ragdolls)
+	rdRagdoll* pRagdoll = pThing->rdthing.pRagdoll;
+	if (!pRagdoll || !sithPhysics_ragdolls)
 	{
+		if(pRagdoll)
+		{
+			pRagdoll->expireMs = sithTime_curMs;
+			pRagdoll->lastTimeStep = deltaSeconds;
+		}
 		sithPhysics_ThingTick(pThing, deltaSeconds);
 		return;
 	}
 
-	rdRagdoll* pRagdoll = pThing->rdthing.pRagdoll;
-	if (!pRagdoll)
-		return;
-
 	// only run while expireMs is 0 or hasn't expired yet
 	// todo: ragdoll can be awoken by setting expireMs to 0 again (ex. if thing affected by an explosion)
-	if (!pRagdoll || pRagdoll->expireMs && pRagdoll->expireMs < sithTime_curMs)
+	if (pRagdoll->expireMs && pRagdoll->expireMs < sithTime_curMs)
 		return;
 
 	rdRagdoll_CalculateRotFriction(pRagdoll);
