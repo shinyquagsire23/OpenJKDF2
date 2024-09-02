@@ -994,19 +994,21 @@ void jkPlayer_DrawPov()
 			if (g_debugmodeFlags & DEBUGFLAG_SLOWMO)
 				timeScale = 0.2;
 
+			static rdVector3 lastRotVelNorm = {0,0,0};
 			rdVector3 rotVelNorm;
-			rotVelNorm.x = timeScale * player->physicsParams.angVel.x / player->physicsParams.maxRotVel;
-			rotVelNorm.y = timeScale * player->physicsParams.angVel.y / player->physicsParams.maxRotVel;
-			rotVelNorm.z = timeScale * player->physicsParams.angVel.z / player->physicsParams.maxRotVel;
-			jkSaber_rotateVec.x = -rotVelNorm.x;
-			jkSaber_rotateVec.y = -rotVelNorm.y;
-			jkSaber_rotateVec.z = -rotVelNorm.z;
+			rotVelNorm.x = -timeScale * player->physicsParams.angVel.x / player->physicsParams.maxRotVel;
+			rotVelNorm.y = -timeScale * player->physicsParams.angVel.y / player->physicsParams.maxRotVel;
+			rotVelNorm.z = -timeScale * player->physicsParams.angVel.z / player->physicsParams.maxRotVel;
+			jkSaber_rotateVec.x = lastRotVelNorm.x + (rotVelNorm.x - lastRotVelNorm.x) * 0.8f;
+			jkSaber_rotateVec.y = lastRotVelNorm.y + (rotVelNorm.y - lastRotVelNorm.y) * 0.8f;
+			jkSaber_rotateVec.z = lastRotVelNorm.z + (rotVelNorm.z - lastRotVelNorm.z) * 0.8f;
+			lastRotVelNorm = jkSaber_rotateVec;
 
 			// Added: add a small rotation based on pitch
 			static float lastPitch = 0.0f;
-			float lerpPitch = (player->actorParams.eyePYR.x - lastPitch) * min(sithTime_deltaSeconds, 0.02f);
-			jkSaber_rotateVec.x -= lerpPitch * 30.0f;
-			lastPitch = player->actorParams.eyePYR.x;
+			float lerpPitch = (player->actorParams.eyePYR.x - lastPitch);
+			jkSaber_rotateVec.x -= lerpPitch * 0.2f;
+			lastPitch = lastPitch + lerpPitch * 0.1f;
 			//jkSaber_rotateVec.x -= player->actorParams.eyePYR.x * 0.06f;
 
 			rdMatrix_BuildRotate34(&rotateMatNoWaggle, &jkSaber_rotateVec);
