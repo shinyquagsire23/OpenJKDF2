@@ -35,6 +35,9 @@
 #ifdef RAGDOLLS
 #include "Engine/sithRagdoll.h"
 #endif
+#ifdef POLYLINE_EXT
+#include "World/sithPolyline.h"
+#endif
 
 // MOTS added
 static sithWorld_ChecksumHandler_t sithWorld_checksumExtraFunc;
@@ -106,6 +109,9 @@ int sithWorld_Startup()
 #endif
 #ifdef RAGDOLLS
 	sithWorld_SetSectionParser("ragdolls", sithRagdoll_Load);
+#endif
+#ifdef POLYLINE_EXT
+	sithWorld_SetSectionParser("polylines", sithPolyline_Load);
 #endif
     sithWorld_bInitted = 1;
     return 1;
@@ -500,6 +506,10 @@ void sithWorld_FreeEntry(sithWorld *pWorld)
 #ifdef RAGDOLLS
 	if (pWorld->ragdolls)
 		sithRagdoll_Free(pWorld);
+#endif
+#ifdef POLYLINE_EXT
+	if(pWorld->polylines)
+		sithPolyline_Free(pWorld);
 #endif
 
     // Added: Fix UAF from previous world's viewmodel anims

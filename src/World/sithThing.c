@@ -41,20 +41,11 @@
 #ifdef DEFERRED_DECALS
 #include "World/sithDecal.h"
 #endif
+#ifdef POLYLINE_EXT
+#include "World/sithPolyline.h"
+#endif
 
-#ifdef DEFERRED_DECALS
-#ifdef RGB_THING_LIGHTS
-#define NUM_THING_PARAMS (77) // JK is 72
-#else
-#define NUM_THING_PARAMS (76) // JK is 72
-#endif
-#else
-#ifdef RGB_THING_LIGHTS
-#define NUM_THING_PARAMS (75) // JK is 72
-#else
-#define NUM_THING_PARAMS (74) // JK is 72
-#endif
-#endif
+#define NUM_THING_PARAMS (THINGPARAM_NUM_PARAMS-1)
 #define NUM_THING_TYPES (13)
 
 int sithThing_bInitted;
@@ -162,6 +153,9 @@ const char* sithThing_aParams[NUM_THING_PARAMS] = {
     "chance",
     "orient",
     "fleshhit",
+#ifdef POLYLINE_EXT
+	"polyline",
+#endif
 };
 
 int sithThing_Startup()
@@ -1758,6 +1752,9 @@ int sithThing_LoadThingParam(stdConffileArg *arg, sithThing* pThing, int param)
     rdVector3 orientation; // [esp+10h] [ebp-Ch] BYREF
     uint32_t thingFlags;
     float tmpF;
+#ifdef POLYLINE_EXT
+	rdPolyLine* polyline;
+#endif
 
     switch ( param )
     {
@@ -1998,6 +1995,17 @@ LABEL_56:
             pThing->pTemplate = sithTemplate_GetEntryByName(arg->value);
             result = 1;
             break;
+	#ifdef POLYLINE_EXT
+		case THINGPARAM_POLYLINE:
+			polyline = sithPolyline_LoadEntry(arg->value);
+			if(polyline)
+			{
+				rdThing_FreeEntry(&pThing->rdthing);
+				rdThing_SetPolyline(&pThing->rdthing, polyline);
+			}
+			result = 1;			
+			break;
+	#endif
         case THINGPARAM_ORIENT:
             if ( _sscanf(arg->value, "(%f/%f/%f)", &orientation, &orientation.y, &orientation.z) == 3 )
             {

@@ -109,6 +109,7 @@ add_compile_definitions(
 	DYNAMIC_POV
 	DEFERRED_DECALS
 	RAGDOLLS
+	POLYLINE_EXT
 )
 
 set(CMAKE_C_STANDARD 11)

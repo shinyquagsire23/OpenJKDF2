@@ -46,6 +46,10 @@
 #ifdef RAGDOLLS
 #include "Engine/sithRagdoll.h"
 #endif
+#ifdef POLYLINE_EXT
+#include "World/sithPolyline.h"
+#endif
+
 
 #ifdef FIXED_TIMESTEP_PHYS
 #include <math.h>
@@ -83,6 +87,9 @@ int sithMain_Startup(HostServices *commonFuncs)
 #ifdef RAGDOLLS
 	is_started = sithRagdoll_Startup() & is_started;
 #endif
+#ifdef POLYLINE_EXT
+	sithPolyline_Startup();
+#endif
     sithSound_Startup();
     sithSoundMixer_Startup();
     sithWeapon_Startup();
@@ -112,6 +119,9 @@ int sithMain_Startup(HostServices *commonFuncs)
 void sithMain_Shutdown()
 {
     //sithWeapon
+#ifdef POLYLINE_EXT
+	sithPolyline_Shutdown();
+#endif
 #ifdef RAGDOLLS
 	sithRagdoll_Shutdown();
 #endif

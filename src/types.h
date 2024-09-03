@@ -300,6 +300,7 @@ typedef struct rdParticle rdParticle;
 typedef struct rdProcEntry rdProcEntry;
 typedef struct rdPuppet rdPuppet;
 typedef struct rdSprite rdSprite;
+typedef struct rdPolyLine rdPolyLine;
 typedef struct rdSurface rdSurface;
 typedef struct rdThing rdThing;
 typedef struct rdVertexIdxInfo rdVertexIdxInfo;
@@ -2102,6 +2103,11 @@ typedef struct sithWorld
 	int numRagdollsLoaded;
 	int numRagdolls;
 	rdRagdollSkeleton* ragdolls;
+#endif
+#ifdef POLYLINE_EXT
+	rdPolyLine* polylines;
+	int numPolylines;
+	int numPolylinesLoaded;
 #endif
     int numVertices;
     rdVector3* vertices;
