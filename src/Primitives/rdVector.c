@@ -703,3 +703,10 @@ void rdVector_Average3(rdVector3* out, rdVector3* a, rdVector3* b, rdVector3* c)
 	out->y = (a->y + b->y + c->y) / 3.0f;
 	out->z = (a->z + b->z + c->z) / 3.0f;
 }
+
+void rdVector_Lerp3(rdVector3* out, rdVector3* a, rdVector3* b, float f)
+{
+	out->x = stdMath_Lerp(a->x, b->x, f);
+	out->y = stdMath_Lerp(a->y, b->y, f);
+	out->z = stdMath_Lerp(a->z, b->z, f);
+}

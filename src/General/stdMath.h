@@ -77,6 +77,11 @@ static inline float stdMath_Fabs(float val)
     return fabs(val);
 }
 
+static inline float stdMath_Lerp(float x, float y, float f)
+{
+	return x + (y - x) * f;
+}
+
 static inline int32_t stdMath_ClampInt(int32_t val, int32_t valMin, int32_t valMax)
 {
     if (val < valMin)
