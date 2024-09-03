@@ -2144,6 +2144,12 @@ typedef struct sithWorld
     rdVector4 lodDistance;
     float perspectiveDistance;
     float gouradDistance;
+#ifdef FOG
+	bool fogEnabled;
+	rdVector4 fogColor;
+	float fogStartDepth;
+	float fogEndDepth;
+#endif
     sithThing* cameraFocus;
     sithThing* playerThing;
     uint32_t field_128;

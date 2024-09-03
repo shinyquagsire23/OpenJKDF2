@@ -581,6 +581,13 @@ int sithHeader_Load(sithWorld *pWorld, int junk)
         return 0;
     _sscanf(stdConffile_aLine, "gouraud distance %f", &pWorld->gouradDistance);
 
+#ifdef FOG
+	if (!stdConffile_ReadLine())
+		return 1;
+
+	_sscanf(stdConffile_aLine, "fog %d %f %f %f %f %f %f", &pWorld->fogEnabled, &pWorld->fogColor.x, &pWorld->fogColor.y, &pWorld->fogColor.z, &pWorld->fogColor.w, &pWorld>fogStartDepth, &pWorld->fogEndDepth);
+#endif
+
 // Old-style mipmap/LOD removal
 //#ifdef QOL_IMPROVEMENTS
 #if 0
