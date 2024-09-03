@@ -108,6 +108,18 @@ rdDecal* sithDecal_LoadEntry(char *fpath)
     char decalFpath[128];
 
     world = sithWorld_pLoading;
+
+	if (!sithWorld_pLoading->decals)
+	{
+		sithWorld_pLoading->decals = (rdDecal*)pSithHS->alloc(64 * sizeof(rdDecal));
+		if (sithWorld_pLoading->decals)
+		{
+			sithWorld_pLoading->numDecals = 64;
+			sithWorld_pLoading->numDecalsLoaded = 0;
+			_memset(sithWorld_pLoading->decals, 0, 64 * sizeof(rdDecal));
+		}
+	}
+
     result = (rdDecal*)stdHashTable_GetKeyVal(sithDecal_hashmap, fpath);
     if ( !result )
     {
