@@ -1820,6 +1820,10 @@ void sithRender_RenderThings()
     uint32_t i; // [esp+14h] [ebp-8h]
     BOOL v16; // [esp+18h] [ebp-4h]
 
+#ifdef QOL_IMPROVEMENTS
+	sithThing* lastDrawThing = NULL; // list of things to render after with zwrite off
+#endif
+
     // MoTS added
     sithThing* lastDrawn = NULL;
     if (sithRender_008d1668) {
@@ -2090,6 +2094,27 @@ void sithRender_RenderThings()
                         continue;
                     }
 
+#ifdef QOL_IMPROVEMENTS
+					// Added: special things drawn last with no z write
+					// for now, only polyline so it draws in draw order
+					// but can be used for additive and alpha to prevent
+					// issues with z clipping
+					if (thingIter->rdthing.type == RD_THINGTYPE_POLYLINE)
+					{
+						if(!lastDrawThing)
+						{
+							thingIter->nextDrawThing = NULL;
+							lastDrawThing = thingIter;
+						}
+						else
+						{
+							thingIter->nextDrawThing = lastDrawThing;
+							lastDrawThing = thingIter;
+						}
+						continue;
+					}
+#endif
+
                     if (sithRender_RenderThing(thingIter) ) // MOTS added: flag check
                         ++sithRender_nongeoThingsDrawn;
                 }
@@ -2097,6 +2122,25 @@ void sithRender_RenderThings()
         }
     }
     rdCache_Flush();
+
+#ifdef QOL_IMPROVEMENTS
+	if (lastDrawThing)
+	{
+		rdSetZBufferMethod(RD_ZBUFFER_READ_NOWRITE);
+		for (sithThing* iter = lastDrawThing; iter; )
+		{
+			if (sithRender_RenderThing(iter))
+			{
+				++sithRender_nongeoThingsDrawn;
+			}
+			sithThing* i = iter;
+			iter = iter->nextDrawThing;
+			i->nextDrawThing = NULL;
+		}
+		rdCache_Flush();
+		rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
+	}
+#endif
 
     // MoTS added
     if (lastDrawn) 

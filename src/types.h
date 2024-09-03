@@ -2927,6 +2927,9 @@ typedef struct sithThing
 #ifdef DEFERRED_DECALS
 	int initialLifeLeftMs;
 #endif
+#ifdef QOL_IMPROVEMENTS
+	sithThing* nextDrawThing;
+#endif
 } sithThing;
 
 typedef int (__cdecl *sithThing_handler_t)(sithThing*);
