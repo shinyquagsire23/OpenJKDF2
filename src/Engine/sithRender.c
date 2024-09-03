@@ -46,6 +46,9 @@ static rdMatrix34 lightDebugThing_mat;
 static int lightDebugNum = 0;
 #endif
 
+sithRender_weapRendFunc_t sithRender_weaponRenderOpaqueHandle;
+sithRender_weapRendFunc_t sithRender_weaponRenderAlphaHandle;
+
 #ifdef JKM_LIGHTING
 int sithRender_008d4094 = 0;
 float sithRender_008d4098 = 0.0;
@@ -311,7 +314,12 @@ int sithRender_Startup()
     rdModel3_RegisterLoader(sithModel_LoadEntry);
     rdKeyframe_RegisterLoader(sithKeyFrame_LoadEntry);
     sithRender_flag = 0;
+#ifdef QOL_IMPROVEMENTS
+	sithRender_weaponRenderOpaqueHandle = 0;
+	sithRender_weaponRenderAlphaHandle = 0;
+#else
     sithRender_weaponRenderHandle = 0;
+#endif
 
     return 1;
 }
@@ -2099,7 +2107,9 @@ void sithRender_RenderThings()
 					// for now, only polyline so it draws in draw order
 					// but can be used for additive and alpha to prevent
 					// issues with z clipping
-					if (thingIter->rdthing.type == RD_THINGTYPE_POLYLINE)
+					if (thingIter->rdthing.type == RD_THINGTYPE_POLYLINE // polyline renders no zwrite, draw order
+						|| thingIter->thingflags & SITH_TF_RENDERWEAPON // render weapon may contain a polyline (saber)
+					)
 					{
 						if(!lastDrawThing)
 						{
@@ -2111,7 +2121,10 @@ void sithRender_RenderThings()
 							thingIter->nextDrawThing = lastDrawThing;
 							lastDrawThing = thingIter;
 						}
-						continue;
+
+						// draw as usual for renderweapon
+						if(!(thingIter->thingflags & SITH_TF_RENDERWEAPON))
+							continue;
 					}
 #endif
 
@@ -2129,7 +2142,16 @@ void sithRender_RenderThings()
 		rdSetZBufferMethod(RD_ZBUFFER_READ_NOWRITE);
 		for (sithThing* iter = lastDrawThing; iter; )
 		{
-			if (sithRender_RenderThing(iter))
+			// call the alpha callback for renderweapon
+			if ((iter->thingflags & SITH_TF_RENDERWEAPON))
+			{
+				if(sithRender_weaponRenderAlphaHandle)
+#ifdef FP_LEGS
+					if (!iter->rdthing.hideWeaponMesh)
+#endif
+					sithRender_weaponRenderAlphaHandle(iter);
+			}
+			else if (sithRender_RenderThing(iter))
 			{
 				++sithRender_nongeoThingsDrawn;
 			}
@@ -2192,12 +2214,22 @@ int sithRender_RenderThing(sithThing *pThing)
 #endif
     ret = rdThing_Draw(&pThing->rdthing, &pThing->lookOrientation);
     rdVector_Zero3(&pThing->lookOrientation.scale);
+#ifdef QOL_IMPROVEMENTS
+	if (sithRender_weaponRenderOpaqueHandle && (pThing->thingflags & SITH_TF_RENDERWEAPON))
+	{
+#ifdef FP_LEGS
+		if (!pThing->rdthing.hideWeaponMesh)
+#endif
+			sithRender_weaponRenderOpaqueHandle(pThing);
+	}
+#else
     if (sithRender_weaponRenderHandle && (pThing->thingflags & SITH_TF_RENDERWEAPON)) {
-	#ifdef FP_LEGS
+#ifdef FP_LEGS
 		if(!pThing->rdthing.hideWeaponMesh)
 #endif
 			sithRender_weaponRenderHandle(pThing);
     }
+#endif
 
 #ifdef RAGDOLLS
 	if(jkPlayer_debugRagdolls)
@@ -2742,11 +2774,26 @@ void sithRender_RenderAlphaSurfaces()
 #endif
 }
 
+#ifdef QOL_IMPROVEMENTS
+int sithRender_SetRenderWeaponOpaqueHandle(void* a1)
+{
+	sithRender_weaponRenderOpaqueHandle = a1;
+	return 1;
+}
+
+int sithRender_SetRenderWeaponAlphaHandle(void* a1)
+{
+	sithRender_weaponRenderAlphaHandle = a1;
+	return 1;
+}
+
+#else
 int sithRender_SetRenderWeaponHandle(void *a1)
 {
     sithRender_weaponRenderHandle = a1;
     return 1;
 }
+#endif
 
 // MoTS Added
 void sithRender_WorldFlash(float arg1,float arg2)

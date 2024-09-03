@@ -272,8 +272,13 @@ LABEL_9:
         rdSetRenderOptions(v5);
         Video_pVbufIdk = &Video_bufIdk;
 LABEL_25:
-        sithRender_SetRenderWeaponHandle(jkPlayer_renderSaberWeaponMesh);
-        Video_camera_related();
+#ifdef QOL_IMPROVEMENTS
+		sithRender_SetRenderWeaponOpaqueHandle(jkPlayer_renderWeaponMesh);
+		sithRender_SetRenderWeaponAlphaHandle(jkPlayer_renderSaberBlade);
+#else
+		sithRender_SetRenderWeaponHandle(jkPlayer_renderSaberWeaponMesh);
+#endif
+		Video_camera_related();
         stdPalEffects_RefreshPalette();
         v7 = (char*)stdDisplay_GetPalette();
         sithRender_SetPalette(v7);

@@ -48,7 +48,12 @@ void sithRender_RenderDynamicLights();
 void sithRender_RenderThings();
 int sithRender_RenderThing(sithThing *povThing);
 void sithRender_RenderAlphaSurfaces();
+#ifdef QOL_IMPROVEMENTS
+int sithRender_SetRenderWeaponOpaqueHandle(void* a1);
+int sithRender_SetRenderWeaponAlphaHandle(void* a1);
+#else
 int sithRender_SetRenderWeaponHandle(void *a1);
+#endif
 void sithRender_WorldFlash(float arg1,float arg2);
 
 // Added

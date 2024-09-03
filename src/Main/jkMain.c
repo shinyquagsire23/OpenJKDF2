@@ -1617,7 +1617,12 @@ int jkMain_SetVideoMode()
     }*/
     
     sithControl_Open();
+#ifdef QOL_IMPROVEMENTS
+	sithRender_SetRenderWeaponOpaqueHandle(jkPlayer_renderWeaponMesh);
+	sithRender_SetRenderWeaponAlphaHandle(jkPlayer_renderSaberBlade);
+#else
     sithRender_SetRenderWeaponHandle(jkPlayer_renderSaberWeaponMesh);
+#endif
 
     uint32_t newW = Window_xSize;
     uint32_t newH = Window_ySize;

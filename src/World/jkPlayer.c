@@ -1247,6 +1247,126 @@ void jkPlayer_DrawPov()
     }
 }
 
+#ifdef QOL_IMPROVEMENTS
+
+// split jkPlayer_renderSaberWeaponMesh so we can render the saber blade at the end with blending and proper sorting of the polyline
+void jkPlayer_renderWeaponMesh(sithThing* thing)
+{
+	jkPlayerInfo* playerInfo = thing->playerInfo;
+	if (!playerInfo)
+		return;
+
+	if (!thing->animclass)
+		return;
+
+	int primary_mesh = thing->animclass->bodypart_to_joint[JOINTTYPE_PRIMARYWEAP];
+	rdMatrix34* primaryMat = &thing->rdthing.hierarchyNodeMatrices[primary_mesh];
+	if (thing->jkFlags & JKFLAG_PERSUASION)
+	{
+		if (sithPlayer_pLocalPlayer->iteminfo[SITHBIN_F_SEEING].state & ITEMSTATE_ACTIVATE)
+		{
+			rdGeoMode_t oldGeoMode = thing->rdthing.curGeoMode;
+			thing->rdthing.curGeoMode = thing->rdthing.desiredGeoMode;
+			rdVector_Copy3(&thing->lookOrientation.scale, &thing->position);
+			rdThing_Draw(&thing->rdthing, &thing->lookOrientation);
+
+			thing->lookOrientation.scale.x = 0.0;
+			thing->lookOrientation.scale.y = 0.0;
+			thing->lookOrientation.scale.z = 0.0;
+			thing->rdthing.curGeoMode = oldGeoMode;
+
+			if (playerInfo->rd_thing.model3)
+				rdThing_Draw(&playerInfo->rd_thing, primaryMat);
+		}
+		else
+		{
+			jkPlayer_renderSaberTwinkle(thing);
+		}
+	}
+	else if (thing->rdthing.curGeoMode > RD_GEOMODE_NOTRENDERED)
+	{
+		if (playerInfo->rd_thing.model3)
+			rdThing_Draw(&playerInfo->rd_thing, primaryMat);
+	}
+}
+
+void jkPlayer_renderSaberBlade(sithThing* thing)
+{
+	jkPlayerInfo* playerInfo = thing->playerInfo;
+	if (!playerInfo)
+	{
+		// Added: hackfix for weird blades?
+		if (thing->actorParams.typeflags & SITH_AF_BOSS)
+		{
+			jk_printf("OpenJKDF2: Boss w/o a blade? Fixing... %p\n", thing);
+
+			jkPlayer_FUN_00404fe0(thing);
+
+			sithThing* saberSparks = sithTemplate_GetEntryByName("+ssparks_saber");
+			sithThing* bloodSparks = sithTemplate_GetEntryByName("+ssparks_blood");
+			sithThing* wallSparks = sithTemplate_GetEntryByName("+ssparks_wall");
+			jkSaber_InitializeSaberInfo(thing, "saberred1.mat", "saberred0.mat", 0.0032, 0.0018, 0.12, wallSparks, bloodSparks, saberSparks);
+		}
+		return;
+	}
+
+	if (!thing->animclass)
+		return;
+
+	int primary_mesh = thing->animclass->bodypart_to_joint[JOINTTYPE_PRIMARYWEAP];
+	int secondary_mesh = thing->animclass->bodypart_to_joint[JOINTTYPE_SECONDARYWEAP];
+
+	// Attempt to find a proper secondary weapon hand
+	if (thing->jkFlags & JKFLAG_DUALSABERS && primary_mesh == secondary_mesh && thing->rdthing.model3)
+	{
+		for (int i = 0; i < thing->rdthing.model3->numHierarchyNodes; i++)
+		{
+			int l = _strlen(thing->rdthing.model3->hierarchyNodes[i].name);
+			if (l < 5) continue;
+
+			if (!__strcmpi(thing->rdthing.model3->hierarchyNodes[i].name + (l - 5), "lhand"))
+			{
+				secondary_mesh = i;
+				break;
+			}
+		}
+
+		if (primary_mesh != secondary_mesh)
+		{
+			thing->animclass->bodypart_to_joint[JOINTTYPE_SECONDARYWEAP] = secondary_mesh;
+		}
+	}
+
+	rdMatrix34* primaryMat = &thing->rdthing.hierarchyNodeMatrices[primary_mesh];
+	rdMatrix34* secondaryMat = &thing->rdthing.hierarchyNodeMatrices[secondary_mesh];
+
+	if (thing->jkFlags & JKFLAG_PERSUASION)
+	{
+		if (sithPlayer_pLocalPlayer->iteminfo[SITHBIN_F_SEEING].state & ITEMSTATE_ACTIVATE)
+		{
+			if (thing->jkFlags & JKFLAG_SABERON)
+			{
+				jkSaber_PolylineRand(&playerInfo->polylineThing);
+				rdThing_Draw(&playerInfo->polylineThing, primaryMat);
+				if (thing->jkFlags & JKFLAG_DUALSABERS)
+					rdThing_Draw(&playerInfo->polylineThing, secondaryMat);
+			}
+		}
+	}
+	else if (thing->rdthing.curGeoMode > RD_GEOMODE_NOTRENDERED)
+	{
+		if (thing->jkFlags & JKFLAG_SABERON)
+		{
+			jkSaber_PolylineRand(&playerInfo->polylineThing);
+			rdThing_Draw(&playerInfo->polylineThing, primaryMat);
+			if (thing->jkFlags & JKFLAG_DUALSABERS)
+				rdThing_Draw(&playerInfo->polylineThing, secondaryMat);
+		}
+	}
+}
+
+#else
+
 void jkPlayer_renderSaberWeaponMesh(sithThing *thing)
 {
     jkPlayerInfo* playerInfo = thing->playerInfo;
@@ -1336,6 +1456,8 @@ void jkPlayer_renderSaberWeaponMesh(sithThing *thing)
         }
     }
 }
+
+#endif
 
 void jkPlayer_renderSaberTwinkle(sithThing *player)
 {
