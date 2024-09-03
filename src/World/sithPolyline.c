@@ -138,26 +138,27 @@ rdPolyLine* sithPolyline_LoadEntry(char *fpath)
             _sprintf(lineFpath, "%s%c%s", "misc\\pln", '\\', fpath);
             if ( stdConffile_OpenRead(lineFpath) )
             {
-                if ( stdConffile_ReadArgs() && stdConffile_entry.numArgs >= 9 )
+                if ( stdConffile_ReadArgs() && stdConffile_entry.numArgs >= 10 )
                 {
                     char sidemat[32];
 					char tipmat[32];
 
                     stdString_SafeStrCopy(sidemat, stdConffile_entry.args[0].value, 0x20);
 					stdString_SafeStrCopy(tipmat, stdConffile_entry.args[1].value, 0x20);
-					float length = _atof(stdConffile_entry.args[2].value);
-                    float baserad = _atof(stdConffile_entry.args[3].value);
-                    float tiprad = _atof(stdConffile_entry.args[4].value);
-                    int geometryMode = _atoi(stdConffile_entry.args[5].value);
-                    int lightMode = _atoi(stdConffile_entry.args[6].value);
-                    int textureMode = _atoi(stdConffile_entry.args[7].value);
-                    float extralight = _atof(stdConffile_entry.args[8].value);
+					int flags = _atoi(stdConffile_entry.args[2].value);
+					float length = _atof(stdConffile_entry.args[3].value);
+                    float baserad = _atof(stdConffile_entry.args[4].value);
+                    float tiprad = _atof(stdConffile_entry.args[5].value);
+                    int geometryMode = _atoi(stdConffile_entry.args[6].value);
+                    int lightMode = _atoi(stdConffile_entry.args[7].value);
+                    int textureMode = _atoi(stdConffile_entry.args[8].value);
+                    float extralight = _atof(stdConffile_entry.args[9].value);
                     stdConffile_Close();
                     if (length > 0.0 && baserad > 0.0 && baserad > 0.0 )
-                    {
-                        
+                    {                        
                         if ( rdPolyLine_NewEntry(polyline, fpath, sidemat, tipmat, length, baserad, tiprad, geometryMode, lightMode, textureMode, extralight) )
                         {
+							polyline->edgeFace.type = polyline->tipFace.type = flags;							
                             stdHashTable_SetKeyVal(sithPolyline_hashmap, polyline->fname, polyline);
                             ++world->numPolylinesLoaded;
                             return polyline;
