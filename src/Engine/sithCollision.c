@@ -143,7 +143,7 @@ float sithCollision_SearchRadiusForThings(sithSector *pStartSector, sithThing *p
 
     if ( (flags & RAYCAST_1) == 0 )
         curMoveDist = sithCollision_UpdateSectorThingCollision(pStartSector, pThing, pStartPos, pMoveNorm, moveDist, radius, flags);
-    sithCollision_sub_4E86D0(pStartSector, pStartPos, pMoveNorm, curMoveDist, radius, flags);
+    sithCollision_BuildCollisionList(pStartSector, pStartPos, pMoveNorm, curMoveDist, radius, flags);
 
     v26 = 0;
     for ( i = sithCollision_searchStack[sithCollision_searchStackIdx].collisions; v26 < sithCollision_searchNumResults[sithCollision_searchStackIdx]; ++v26 )
@@ -166,7 +166,7 @@ float sithCollision_SearchRadiusForThings(sithSector *pStartSector, sithThing *p
                     sithCollision_stackSectors[sithCollision_searchStackIdx].sectors[num] = pSurfAdjSector;
                     if ( (flags & RAYCAST_1) == 0 )
                         curMoveDist = sithCollision_UpdateSectorThingCollision(pSurfAdjSector, pThing, pStartPos, pMoveNorm, curMoveDist, radius, flags);
-                    sithCollision_sub_4E86D0(pSurfAdjSector, pStartPos, pMoveNorm, curMoveDist, radius, flags);
+					sithCollision_BuildCollisionList(pSurfAdjSector, pStartPos, pMoveNorm, curMoveDist, radius, flags);
                 }
             }
             i->hasBeenEnumerated = 1;
@@ -315,7 +315,7 @@ LABEL_41:
     return a4;
 }
 
-void sithCollision_sub_4E86D0(sithSector *sector, const rdVector3 *vec1, const rdVector3 *vec2, float a4, float a5, int unk3Flags)
+void sithCollision_BuildCollisionList(sithSector *sector, const rdVector3 *vec1, const rdVector3 *vec2, float a4, float a5, int unk3Flags)
 {
     sithSurface *v12; // esi
     sithAdjoin *v15; // eax

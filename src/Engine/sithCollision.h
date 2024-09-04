@@ -20,7 +20,7 @@
 #define sithCollision_SearchRadiusForThings_ADDR (0x004E8160)
 #define sithCollision_SearchClose_ADDR (0x004E8420)
 #define sithCollision_UpdateSectorThingCollision_ADDR (0x004E8430)
-#define sithCollision_sub_4E86D0_ADDR (0x004E86D0)
+#define sithCollision_BuildCollisionList_ADDR (0x004E86D0)
 #define sithCollision_DefaultHitHandler_ADDR (0x004E8B40)
 #define sithCollision_DebrisDebrisCollide_ADDR (0x004E8C50)
 #define sithCollision_CollideHurt_ADDR (0x004E9090)
@@ -36,7 +36,7 @@ sithCollisionSearchEntry* sithCollision_NextSearchResult();
 float sithCollision_SearchRadiusForThings(sithSector* pStartSector, sithThing* pThing, const rdVector3* pStartPos, const rdVector3* pMoveNorm, float moveDist, float radius, int flags);
 void sithCollision_SearchClose();
 float sithCollision_UpdateSectorThingCollision(sithSector *a1, sithThing *sender, const rdVector3 *a2, const rdVector3 *a3, float a4, float range, int flags);
-void sithCollision_sub_4E86D0(sithSector *a1, const rdVector3 *a2, const rdVector3 *a3, float a4, float a5, int unk3Flags);
+void sithCollision_BuildCollisionList(sithSector *a1, const rdVector3 *a2, const rdVector3 *a3, float a4, float a5, int unk3Flags);
 sithSector* sithCollision_GetSectorLookAt(sithSector *sector, const rdVector3 *a3, rdVector3 *a4, float a5);
 #endif
 void sithCollision_FallHurt(sithThing *thing, float vel);
@@ -54,7 +54,7 @@ static int (*_sithCollision_Startup)() = (void*)sithCollision_Startup_ADDR;
 static sithCollisionSearchEntry* (*sithCollision_NextSearchResult)(void) = (void*)sithCollision_NextSearchResult_ADDR;
 static float (*sithCollision_SearchRadiusForThings)(sithSector *sector, sithThing *a2, rdVector3 *position, const rdVector3 *direction, float a5, float range, int flags) = (void*)sithCollision_SearchRadiusForThings_ADDR;
 static float (*sithCollision_UpdateSectorThingCollision)(sithSector *a1, sithThing *sender, rdVector3 *a2, rdVector3 *a3, float a4, float range, int flags) = (void*)sithCollision_UpdateSectorThingCollision_ADDR;
-static void (*sithCollision_sub_4E86D0)(sithSector *a1, rdVector3 *a2, rdVector3 *a3, float a4, float a5, int a6) = (void*)sithCollision_sub_4E86D0_ADDR;
+static void (*sithCollision_BuildCollisionList)(sithSector *a1, rdVector3 *a2, rdVector3 *a3, float a4, float a5, int a6) = (void*)sithCollision_BuildCollisionList_ADDR;
 static sithSector* (*sithCollision_GetSectorLookAt)(sithSector *sector, rdVector3 *a3, rdVector3 *a4, float a5) = (void*)sithCollision_GetSectorLookAt_ADDR;
 #endif
 

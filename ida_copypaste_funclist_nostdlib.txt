@@ -2365,7 +2365,7 @@ sithCollision_UpdateThingCollision	.text	004E7950	0000080E	00000054	00000010	R	.
 sithCollision_SearchRadiusForThings	.text	004E8160	000002C0	00000018	0000001C	R	.	.	.	.	.	T	.
 sithCollision_SearchClose	.text	004E8420	00000007			R	.	.	.	.	.	.	.
 sithCollision_UpdateSectorThingCollision	.text	004E8430	0000029D	0000001C	0000001C	R	.	.	.	.	.	T	.
-sithCollision_sub_4E86D0	.text	004E86D0	00000462	00000040	00000018	R	.	.	.	.	.	T	.
+sithCollision_BuildCollisionList	.text	004E86D0	00000462	00000040	00000018	R	.	.	.	.	.	T	.
 sithCollision_DefaultHitHandler	.text	004E8B40	00000107	00000008	0000000C	R	.	.	.	.	.	T	.
 sithCollision_DebrisDebrisCollide	.text	004E8C50	00000435	00000038	00000010	R	.	.	.	.	.	T	.
 sithCollision_CollideHurt	.text	004E9090	000004B6	0000000C	00000010	R	.	.	.	.	.	T	.
