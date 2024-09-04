@@ -60,6 +60,10 @@ int sithRender_008d1668 = 0;
 // Added: safeguard
 int sithRender_adjoinSafeguard = 0;
 
+#ifdef QOL_IMPROVEMENTS
+sithThing* sithRender_alphaDrawThing = NULL; // list of things to render after with zwrite off
+#endif
+
 #ifdef RGB_THING_LIGHTS
 void sithRender_GetSaberLightColor(rdVector3* outColor, sithThing* thing)
 {
@@ -573,6 +577,38 @@ void sithRender_Draw()
 
     if ( sithRender_numSurfaces )
         sithRender_RenderAlphaSurfaces();
+
+#ifdef QOL_IMPROVEMENTS
+	// draw list of alpha things
+	if (sithRender_alphaDrawThing)
+	{
+		rdSetZBufferMethod(RD_ZBUFFER_READ_NOWRITE);
+		rdSetSortingMethod(2);
+		for (sithThing* iter = sithRender_alphaDrawThing; iter; )
+		{
+			// call the alpha callback for renderweapon
+			if ((iter->thingflags & SITH_TF_RENDERWEAPON))
+			{
+				if (sithRender_weaponRenderAlphaHandle)
+#ifdef FP_LEGS
+					if (!iter->rdthing.hideWeaponMesh)
+#endif
+						sithRender_weaponRenderAlphaHandle(iter);
+			}
+			else if (sithRender_RenderThing(iter))
+			{
+				++sithRender_nongeoThingsDrawn;
+			}
+			sithThing* i = iter;
+			iter = iter->nextDrawThing;
+			i->nextDrawThing = NULL;
+		}
+	}
+	rdCache_Flush();
+#ifdef SDL2_RENDER
+	rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
+#endif
+#endif
 
     rdSetCullFlags(3);
 #ifdef QOL_IMPROVEMENTS
@@ -1829,7 +1865,7 @@ void sithRender_RenderThings()
     BOOL v16; // [esp+18h] [ebp-4h]
 
 #ifdef QOL_IMPROVEMENTS
-	sithThing* lastDrawThing = NULL; // list of things to render after with zwrite off
+	sithRender_alphaDrawThing = NULL; // list of things to render after with zwrite off
 #endif
 
     // MoTS added
@@ -2111,15 +2147,15 @@ void sithRender_RenderThings()
 						|| thingIter->thingflags & SITH_TF_RENDERWEAPON // render weapon may contain a polyline (saber)
 					)
 					{
-						if(!lastDrawThing)
+						if(!sithRender_alphaDrawThing)
 						{
 							thingIter->nextDrawThing = NULL;
-							lastDrawThing = thingIter;
+							sithRender_alphaDrawThing = thingIter;
 						}
 						else
 						{
-							thingIter->nextDrawThing = lastDrawThing;
-							lastDrawThing = thingIter;
+							thingIter->nextDrawThing = sithRender_alphaDrawThing;
+							sithRender_alphaDrawThing = thingIter;
 						}
 
 						// draw as usual for renderweapon
@@ -2135,34 +2171,6 @@ void sithRender_RenderThings()
         }
     }
     rdCache_Flush();
-
-#ifdef QOL_IMPROVEMENTS
-	if (lastDrawThing)
-	{
-		rdSetZBufferMethod(RD_ZBUFFER_READ_NOWRITE);
-		for (sithThing* iter = lastDrawThing; iter; )
-		{
-			// call the alpha callback for renderweapon
-			if ((iter->thingflags & SITH_TF_RENDERWEAPON))
-			{
-				if(sithRender_weaponRenderAlphaHandle)
-#ifdef FP_LEGS
-					if (!iter->rdthing.hideWeaponMesh)
-#endif
-					sithRender_weaponRenderAlphaHandle(iter);
-			}
-			else if (sithRender_RenderThing(iter))
-			{
-				++sithRender_nongeoThingsDrawn;
-			}
-			sithThing* i = iter;
-			iter = iter->nextDrawThing;
-			i->nextDrawThing = NULL;
-		}
-		rdCache_Flush();
-		rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
-	}
-#endif
 
     // MoTS added
     if (lastDrawn) 
@@ -2768,9 +2776,12 @@ void sithRender_RenderAlphaSurfaces()
         rdCache_AddProcFace(0, meshinfo_out.numVertices, v23);
     }
 #endif
+
+#ifndef QOL_IMPROVEMENTS // moved outside of function to handle alpha things
     rdCache_Flush();
 #ifdef SDL2_RENDER
     rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
+#endif
 #endif
 }
 
