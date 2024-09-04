@@ -93,7 +93,12 @@ void jkPlayer_WriteConf(wchar_t *name);
 int jkPlayer_ReadConf(wchar_t *name);
 void jkPlayer_SetPovModel(jkPlayerInfo *info, rdModel3 *model);
 void jkPlayer_DrawPov();
-void jkPlayer_renderSaberWeaponMesh(sithThing *a1);
+#ifdef QOL_IMPROVEMENTS
+void jkPlayer_renderWeaponMesh(sithThing *a1);
+void jkPlayer_renderSaberBlade(sithThing* a1);
+#else
+void jkPlayer_renderSaberWeaponMesh(sithThing* a1);
+#endif
 void jkPlayer_renderSaberTwinkle(sithThing *player);
 #ifdef DYNAMIC_POV
 void jkPlayer_SetWaggle(sithThing* player, rdVector3* waggleVec, float waggleMag, float velScale);
