@@ -1,3 +1,15 @@
+# This fork
+This fork introduces a variety of new features and experiments. Among them:
+- RGB thing lights (lightcolor template param for things), including lightsaber colored lighting derived from the saber material
+- RGB ambient lighting, including directional ambient cube for gouraud shaded models
+- First person legs
+- Dynamic POV animation, crosshair and autoaim
+- Muzzle flashes (new cog verb + muzzle hierarchy + keyframe markers to activate)
+- Deferred decal rendering (new .dcal file to specify decals, decal template param for things)
+- Experimental ragdolls (new .af file for articulated figure definition, new physics mode using particle verlet integration)
+- Additive blending
+- Polyline upgrades and rendering fixes (new .pln file to specify a polyline def that can be assigned to a thing via template params the same as models and sprites)
+
 # OpenJKDF2
 
 ![MacOS Screenshot](docs/images/screenshot.png)
