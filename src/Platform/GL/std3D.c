@@ -2674,6 +2674,16 @@ void std3D_DrawRenderList()
         glDepthFunc(GL_ALWAYS);
     }
 
+#ifdef ADDITIVE_BLEND
+	if (last_flags & 0x80000)
+	{
+		{
+			glUniform1i(uniform_blend_mode, D3DBLEND_ONE);
+			glBlendFunc(GL_ONE, GL_ONE);
+		}
+	}
+	else
+#endif
     if (last_flags & 0x600) {
         
         if (last_flags & 0x200) {
@@ -2733,6 +2743,16 @@ void std3D_DrawRenderList()
             
             int changed_flags = (last_flags ^ tris[j].flags);
 
+#ifdef ADDITIVE_BLEND
+			if (changed_flags & 0x80000)
+			{
+				{
+					glUniform1i(uniform_blend_mode, D3DBLEND_ONE);
+					glBlendFunc(GL_ONE, GL_ONE);
+				}
+			}
+			else
+#endif
             if (changed_flags & 0x600)
             {
                 if (tris[j].flags & 0x600) {

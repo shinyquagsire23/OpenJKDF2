@@ -528,6 +528,13 @@ int rdCache_SendFaceListToHardware()
 #endif
             }
 
+#ifdef ADDITIVE_BLEND
+			if ((active_6c->type & 0x400) != 0)
+			{
+				flags_idk_ |= 0x80000; // additive
+			}
+#endif
+
             if ( !rdMaterial_AddToTextureCache(v11.material, sith_tex_sel, mipmap_level, alpha_is_opaque, v14) )
             {
                 rdCache_DrawRenderList();
