@@ -9,6 +9,9 @@ This fork introduces a variety of new features and experiments. Among them:
 - Experimental ragdolls (new .af file for articulated figure definition, new physics mode using particle verlet integration)
 - Additive blending
 - Polyline upgrades and rendering fixes (new .pln file to specify a polyline def that can be assigned to a thing via template params the same as models and sprites)
+- Faster bloom
+- Faster SSAO with less halos
+- Tweaked emissives to better match OG JK (using max() rather than add for non-bloom case)
 
 # OpenJKDF2
 
