@@ -638,6 +638,9 @@ typedef struct rdProcEntry
     int y_min_related;
     int y_max_related;
     uint32_t vertexColorMode;
+#ifdef QOL_IMPROVEMENTS
+	int sortId;
+#endif
 } rdProcEntry;
 
 typedef struct v11_struct

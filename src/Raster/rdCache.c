@@ -1317,6 +1317,14 @@ int rdCache_TriCompare(const void* a_, const void* b_)
 
 int rdCache_ProcFaceCompare(rdProcEntry *a, rdProcEntry *b)
 {
+#ifdef QOL_IMPROVEMENTS
+	// Added: sort priority
+	if(a->sortId <= b->sortId)
+		return -1;
+	if (a->sortId >= b->sortId)
+		return 1;
+#endif
+
     if ( a->z_min == b->z_min )
         return 0;
 
