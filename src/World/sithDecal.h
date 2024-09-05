@@ -1,10 +1,10 @@
 #ifndef _SITHDECAL_H
 #define _SITHDECAL_H
 
-#ifdef DEFERRED_DECALS
-
 #include "types.h"
 #include "globals.h"
+
+#ifdef DEFERRED_DECALS
 
 #include "Primitives/rdDecal.h"
 

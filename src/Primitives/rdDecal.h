@@ -1,11 +1,11 @@
 #ifndef _RDDECAL_H
 #define _RDDECAL_H
 
-#ifdef DEFERRED_DECALS
-
 #include "Primitives/rdVector.h"
 #include "Primitives/rdMatrix.h"
 #include "Raster/rdFace.h"
+
+#ifdef DEFERRED_DECALS
 
 typedef struct rdMaterial rdMaterial;
 

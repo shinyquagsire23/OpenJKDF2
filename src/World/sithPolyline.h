@@ -1,10 +1,10 @@
 #ifndef _SITHPOLYLINE_H
 #define _SITHPOLYLINE_H
 
-#ifdef POLYLINE_EXT
-
 #include "types.h"
 #include "globals.h"
+
+#ifdef POLYLINE_EXT
 
 int sithPolyline_Startup();
 void sithPolyline_Shutdown();
