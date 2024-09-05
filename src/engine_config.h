@@ -183,6 +183,20 @@
 #define JOYSTICK_MAX_STRS (3)
 #endif
 
+// Experimental features
+#ifdef QOL_IMPROVEMENTS
+
+#define RGB_THING_LIGHTS     // RGB thing lighting with lightcolor template param
+#define RGB_AMBIENT          // RGB sector ambient with ambient cube for gouraud models
+#define FP_LEGS              // Draws legs in first person
+#define DYNAMIC_POV          // POV enhancements, such as the weapon following the autoaim target, muzzle flashes, sway improvements
+#define DEFERRED_DECALS      // .dcal support and deferred decal rendering path (for blast marks etc)
+#define RAGDOLLS             // .af support and SITH_MT_RAGDOLL physics type for experimental verlet ragdolls
+#define ADDITIVE_BLEND       // additive blending support with a new face flag
+#define POLYLINE_EXT         // .pln support and polyline template param, allows using polylines as rendering primitives for things (ex. blaster bolts)
+
+#endif
+
 //
 // Resource configuration
 //
