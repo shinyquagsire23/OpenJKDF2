@@ -611,7 +611,7 @@ void rdVector_Zero3(rdVector3 *v)
 
 void rdVector_Zero2(rdVector2 *v)
 {
-    rdVector_Copy3(v, &rdroid_zeroVector2);
+    rdVector_Copy2(v, &rdroid_zeroVector2);
 }
 
 int rdVector_IsZero3(rdVector3* v)
