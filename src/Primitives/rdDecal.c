@@ -74,7 +74,7 @@ void rdDecal_Draw(rdThing* thing, rdMatrix34* matrix)
 	rdVector_Copy3(&color, &decal->color);
 	if (decal->fadeTime > 0.0)
 	{
-		float fadeSeconds = (float)(sithTime_curMs - thing->wallCel) / 1000.0f;
+		float fadeSeconds = (float)(sithTime_curMs - thing->createMs) / 1000.0f;
 		//if(fadeSeconds > decal->fadeTime)
 			//return;
 		

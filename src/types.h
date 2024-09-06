@@ -2298,6 +2298,9 @@ typedef struct rdThing
 	int hiddenJoint;
 	int hideWeaponMesh;
 #endif
+#ifdef DEFERRED_DECALS
+	uint32_t createMs;
+#endif
     uint32_t wallCel;
     uint32_t geosetSelect;
     rdGeoMode_t curGeoMode;

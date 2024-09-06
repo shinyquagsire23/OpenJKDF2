@@ -795,9 +795,6 @@ void sithWeapon_WallHitExplode(sithThing* weapon, sithThing* hitTemplate, sithCo
 
 			if (weapon->thingflags & SITH_TF_INVULN)
 				spawned->thingflags |= SITH_TF_INVULN;
-
-			if(spawned->rdthing.type == RD_THINGTYPE_DECAL)
-				spawned->rdthing.wallCel = sithTime_curMs;
 		}
 	}
 }

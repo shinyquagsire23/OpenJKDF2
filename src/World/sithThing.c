@@ -737,6 +737,10 @@ int sithThing_DoesRdThingInit(sithThing* pThing)
 	rdVector_Set3(&pThing->lightColor, 1.0f, 1.0f, 1.0f);
 #endif
 
+#ifdef DEFERRED_DECALS
+	pThing->rdthing.createMs = sithTime_curMs;
+#endif
+
     return out;
 }
 
@@ -1036,6 +1040,10 @@ sithThing* sithThing_sub_4CD8A0(sithThing *pThing, sithThing *a2)
     pThing->thing_id = v11;
     pThing->signature = v10;
     pThing->rdthing.parentSithThing = v12;
+
+#ifdef DEFERRED_DECALS
+	pThing->rdthing.createMs = sithTime_curMs;
+#endif
     return result;
 }
 
