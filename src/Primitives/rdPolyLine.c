@@ -249,45 +249,27 @@ int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix)
     // Blade
     {
 #ifdef QOL_IMPROVEMENTS
-		// Better projection, doesn't singularity at steep angles (ex. against Sariss)
-		// todo: don't do this in world space
-		rdMatrix34 inv;
-		rdMatrix_InvertOrtho34(&inv, &rdCamera_pCurCamera->view_matrix);
-
-		rdVector3 v1;
-		rdVector_Sub3(&v1, &matrix->scale, &inv.scale);
-
-		rdVector3 v2;
-		rdVector_Copy3(&v2, &matrix->scale);
-		rdVector_MultAcc3(&v2, &matrix->lvec, polyline->length);
-
-		rdVector3 v3;
-		rdVector_Sub3(&v3, &v2, &inv.scale);
-
+		// alternative projection, doesn't singularity at steep angles (ex. against Sariss)
 		rdVector3 right;
-		rdVector_Cross3(&right, &v1, &v3);
+		rdVector_Cross3(&right, &out.scale, &vertex_out);
 		rdVector_Normalize3Acc(&right);
 
-		polylineVerts[0].x = v2.x + right.x * polyline->tipRadius;
-		polylineVerts[0].y = v2.y + right.y * polyline->tipRadius;
-		polylineVerts[0].z = v2.z + right.z * polyline->tipRadius;
-		rdMatrix_TransformPoint34Acc(&polylineVerts[0], &rdCamera_pCurCamera->view_matrix);
+		polylineVerts[0].x = vertex_out.x + right.x * polyline->tipRadius;
+		polylineVerts[0].y = vertex_out.y + right.y * polyline->tipRadius;
+		polylineVerts[0].z = vertex_out.z + right.z * polyline->tipRadius;
 
-		polylineVerts[1].x = v2.x + right.x * -polyline->tipRadius;
-		polylineVerts[1].y = v2.y + right.y * -polyline->tipRadius;
-		polylineVerts[1].z = v2.z + right.z * -polyline->tipRadius;
-		rdMatrix_TransformPoint34Acc(&polylineVerts[1], &rdCamera_pCurCamera->view_matrix);
+		polylineVerts[1].x = vertex_out.x + right.x * -polyline->tipRadius;
+		polylineVerts[1].y = vertex_out.y + right.y * -polyline->tipRadius;
+		polylineVerts[1].z = vertex_out.z + right.z * -polyline->tipRadius;
 
-		polylineVerts[2].x = matrix->scale.x + right.x * -polyline->baseRadius;
-		polylineVerts[2].y = matrix->scale.y + right.y * -polyline->baseRadius;
-		polylineVerts[2].z = matrix->scale.z + right.z * -polyline->baseRadius;
-		rdMatrix_TransformPoint34Acc(&polylineVerts[2], &rdCamera_pCurCamera->view_matrix);
+		polylineVerts[2].x = out.scale.x + right.x * -polyline->baseRadius;
+		polylineVerts[2].y = out.scale.y + right.y * -polyline->baseRadius;
+		polylineVerts[2].z = out.scale.z + right.z * -polyline->baseRadius;
 
 
-		polylineVerts[3].x = matrix->scale.x + right.x * polyline->baseRadius;
-		polylineVerts[3].y = matrix->scale.y + right.y * polyline->baseRadius;
-		polylineVerts[3].z = matrix->scale.z + right.z * polyline->baseRadius;
-		rdMatrix_TransformPoint34Acc(&polylineVerts[3], &rdCamera_pCurCamera->view_matrix);
+		polylineVerts[3].x = out.scale.x + right.x * polyline->baseRadius;
+		polylineVerts[3].y = out.scale.y + right.y * polyline->baseRadius;
+		polylineVerts[3].z = out.scale.z + right.z * polyline->baseRadius;
 #else	
         float zdist = vertex_out.z - out.scale.z;
         float xdist = vertex_out.x - out.scale.x;
