@@ -191,7 +191,7 @@ rdColormap std3D_ui_colormap;
 int std3D_bReinitHudElements = 0;
 
 #ifdef DEFERRED_DECALS
-#define STD3D_MAX_DECALS 256
+#define STD3D_MAX_DECALS 512
 
 rdDDrawSurface* decal_tex[STD3D_MAX_DECALS];
 rdVector3 decal_verts[STD3D_MAX_DECALS * 8];
