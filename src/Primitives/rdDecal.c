@@ -62,13 +62,13 @@ void rdDecal_Draw(rdThing* thing, rdMatrix34* matrix)
 {
 	rdDecal* decal = thing->decal;
 	
-	//int clipResult;
-	//rdVector3 viewPos;
-	//rdMatrix_TransformPoint34(&viewPos, &matrix->scale, &rdCamera_pCurCamera->view_matrix);
-	//clipResult = rdClip_SphereInFrustrum(rdCamera_pCurCamera->pClipFrustum, &viewPos, decal->radius);
+	int clipResult;
+	rdVector3 viewPos;
+	rdMatrix_TransformPoint34(&viewPos, &matrix->scale, &rdCamera_pCurCamera->view_matrix);
+	clipResult = rdClip_SphereInFrustrum(rdCamera_pCurCamera->pClipFrustum, &viewPos, decal->radius);
 
-	//if (clipResult == 2)
-		//return;
+	if (clipResult == 2)
+		return;
 
 	rdVector3 color;
 	rdVector_Copy3(&color, &decal->color);
