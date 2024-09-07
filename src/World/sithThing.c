@@ -1980,6 +1980,10 @@ int sithThing_LoadThingParam(stdConffileArg *arg, sithThing* pThing, int param)
 				goto LABEL_58;
 			rdThing_FreeEntry(&pThing->rdthing);
 			rdThing_SetDecal(&pThing->rdthing, pDecal);
+			if (pThing->collideSize == 0.0)
+				pThing->collideSize = pDecal->radius;
+			if (pThing->moveSize == 0.0)
+				pThing->moveSize = pDecal->radius;
 			result = 1;
 			break;
 #endif
