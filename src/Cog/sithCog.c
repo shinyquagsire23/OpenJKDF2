@@ -442,6 +442,27 @@ int sithCog_Open()
             world = world_;
         }
     }
+#ifdef STATIC_JKL_EXT
+	// todo: this should probably be a function to collapse with the above
+	for (int k = 0; k < ARRAY_SIZE(sithWorld_pStaticWorlds); ++k)
+	{
+		if (sithWorld_pStaticWorlds[k])
+		{
+			v2 = sithWorld_pStaticWorlds[k]->cogs;
+			for (int i = 0; i < sithWorld_pStaticWorlds[k]->numCogsLoaded; i++)
+			{
+				for (int j = 0; j < v2->cogscript->numIdk; j++)
+				{
+					v3 = &v2->cogscript->aIdk[j];
+					if (_strlen(v3->value))
+						sithCog_LoadEntry(&v2->pSymbolTable->buckets[v3->hash], v3, v3->value);
+				}
+				sithCog_SendMessage(v2++, SITH_MESSAGE_LOADING, 0, 0, 0, 0, 0);
+				world = world_;
+			}
+		}
+	}
+#endif
     sithCog* cogs = world->cogs;
     v12 = 0;
     if ( world->numCogsLoaded )
@@ -603,7 +624,11 @@ sithCog* sithCog_LoadCogscript(const char *fpath)
     cog->selfCog = cogIdx;
     if (sithWorld_pLoading->level_type_maybe & 1)
     {
+	#ifdef STATIC_JKL_EXT
+		cog->selfCog |= sithWorld_pLoading->idx_offset;
+	#else
         cog->selfCog |= 0x8000;
+	#endif
     }
     _sprintf(cog_fpath, "%s%c%s", "cog", '\\', fpath);
     v7 = (sithCogScript *)stdHashTable_GetKeyVal(sithCog_pScriptHashtable, fpath);
@@ -690,6 +715,22 @@ int sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogReference *cogIdk, char *
                     v17->id = (v17 - sithWorld_pStatic->keyframes) | 0x8000;
                 }
             }
+
+#ifdef STATIC_JKL_EXT
+			// can't tell if this is going to be needed but just in case let's duplicate the hack above
+			for (int i = 0; i < ARRAY_SIZE(sithWorld_pStaticWorlds); ++i)
+			{
+				if(!sithWorld_pStaticWorlds[i]) continue;
+				if (!(v17->id & sithWorld_pStaticWorlds[i]->idx_offset))
+				{
+					v17->id = (v17 - sithWorld_pCurrentWorld->keyframes) & 0xFFFF;
+					if (v17->id >= sithWorld_pStaticWorlds[i]->idx_offset)
+					{
+						v17->id = (v17 - sithWorld_pStatic->keyframes) | sithWorld_pStaticWorlds[i]->idx_offset;
+					}
+				}
+			}
+#endif
 
             cogSymbol->val.data[0] = v17->id;
             return 1;
@@ -1157,6 +1198,17 @@ void sithCog_SendMessageToAll(int cmdid, int senderType, int senderIdx, int sour
         for ( i = 0; i < sithWorld_pStatic->numCogsLoaded; ++i )
             sithCog_SendMessageEx(v9++, cmdid, senderType, senderIdx, sourceType, sourceIdx, 0, arg0, arg1, arg2, arg3);
     }
+#ifdef STATIC_JKL_EXT
+	for (int k = 0; k < ARRAY_SIZE(sithWorld_pStaticWorlds); ++k)
+	{
+		if (sithWorld_pStaticWorlds[k])
+		{
+			v9 = sithWorld_pStaticWorlds[k]->cogs;
+			for (i = 0; i < sithWorld_pStaticWorlds[k]->numCogsLoaded; ++i)
+				sithCog_SendMessageEx(v9++, cmdid, senderType, senderIdx, sourceType, sourceIdx, 0, arg0, arg1, arg2, arg3);
+		}
+	}
+#endif
     if ( sithWorld_pCurrentWorld )
     {
         v11 = sithWorld_pCurrentWorld->cogs;
@@ -1621,7 +1673,18 @@ void sithCogScript_TickAll()
     {
         sithCogScript_Tick(&sithWorld_pCurrentWorld->cogs[i]);
     }
-
+#ifdef STATIC_JKL_EXT
+	for (int k = 0; k < ARRAY_SIZE(sithWorld_pStaticWorlds); ++k)
+	{
+		if (sithWorld_pStaticWorlds[k])
+		{
+			for (uint32_t i = 0; i < sithWorld_pStaticWorlds[k]->numCogsLoaded; i++)
+			{
+				sithCogScript_Tick(&sithWorld_pStaticWorlds[k]->cogs[i]);
+			}
+		}
+	}
+#endif
     if ( sithWorld_pStatic )
     {
         for (uint32_t i = 0; i < sithWorld_pStatic->numCogsLoaded; i++)
@@ -1683,6 +1746,18 @@ int sithCogScript_TimerTick(int deltaMs, sithEventInfo *info)
 
     v2 = sithWorld_pCurrentWorld;
     v3 = info->cogIdx;
+#ifdef STATIC_JKL_EXT
+	for (int i = 0; i < ARRAY_SIZE(sithWorld_pStaticWorlds); ++i)
+	{
+		if (!sithWorld_pStaticWorlds[i]) continue;
+		if ((v3 & sithWorld_pStaticWorlds[i]->idx_offset) != 0)
+		{
+			v2 = sithWorld_pStaticWorlds[i];
+			v3 &= ~sithWorld_pStaticWorlds[i]->idx_offset;
+			break;
+		}
+	}
+#endif
     if ( (v3 & 0x8000u) != 0 )
     {
         v2 = sithWorld_pStatic;
@@ -1753,6 +1828,18 @@ sithCog* sithCog_GetByIdx(int idx)
     sithCog *result; // eax
 
     world = sithWorld_pCurrentWorld;
+#ifdef STATIC_JKL_EXT
+	for (int i = 0; i < ARRAY_SIZE(sithWorld_pStaticWorlds); ++i)
+	{
+		if (!sithWorld_pStaticWorlds[i]) continue;
+		if ((idx & sithWorld_pStaticWorlds[i]->idx_offset) != 0)
+		{
+			world = sithWorld_pStaticWorlds[i];
+			idx &= ~sithWorld_pStaticWorlds[i]->idx_offset;
+			break;
+		}
+	}
+#endif
     if ( (idx & 0x8000) != 0 )
     {
         world = sithWorld_pStatic;

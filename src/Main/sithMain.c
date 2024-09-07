@@ -156,11 +156,48 @@ int sithMain_Load(char *path)
 {
     sithWorld_pStatic = sithWorld_New();
     sithWorld_pStatic->level_type_maybe |= 1;
+#ifdef STATIC_JKL_EXT
+	sithWorld_pStatic->idx_offset = 0x8000; // Added: index offset per jkl
+
+	int res = sithWorld_Load(sithWorld_pStatic, path) != 0;
+
+	// Added: load extra jkls, for patches and mod combos
+	// we could scan for files, but we can't do it with Gobbed files
+	// so the names are just generated for now (static0, static1, etc)
+	char pathNoExt[32];
+	_strncpy(pathNoExt, path, 0x1F);
+	pathNoExt[31] = 0;
+	stdFnames_StripExtAndDot(pathNoExt);
+	for(int i = 0; i < ARRAY_SIZE(sithWorld_pStaticWorlds); ++i)
+	{
+		char fpath[128];
+		sprintf_s(fpath, 128, "%s%d.jkl", pathNoExt, i);
+		sithWorld_pStaticWorlds[i] = sithWorld_New();
+		sithWorld_pStaticWorlds[i]->level_type_maybe |= 1;
+		sithWorld_pStaticWorlds[i]->idx_offset = 0x8000 << (i + 1);
+		if(!sithWorld_Load(sithWorld_pStaticWorlds[i], fpath))
+			sithWorld_pStaticWorlds[i] = NULL; // make sure this is 0 since we test for NULL for existence
+	}
+
+	// make sure all loading still goes through the original static.jkl
+	sithWorld_pLoading = sithWorld_pStatic;
+#else
     return sithWorld_Load(sithWorld_pStatic, path) != 0;
+#endif
 }
 
 void sithMain_Free()
 {
+#ifdef STATIC_JKL_EXT
+	for (int i = 0; i < ARRAY_SIZE(sithWorld_pStaticWorlds); ++i)
+	{
+		if (sithWorld_pStaticWorlds[i])
+		{
+			sithWorld_FreeEntry(sithWorld_pStaticWorlds[i]);
+			sithWorld_pStaticWorlds[i] = 0;
+		}
+	}
+#endif
     if ( sithWorld_pStatic )
     {
         sithWorld_FreeEntry(sithWorld_pStatic);

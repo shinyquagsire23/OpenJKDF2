@@ -34,6 +34,10 @@
 #define sithWorld_FindSectionParser_ADDR (0x004D0E20)
 #define sithWorld_LoadGeoresource_ADDR (0x004D0E70)
 
+#ifdef STATIC_JKL_EXT
+extern sithWorld* sithWorld_pStaticWorlds[4];
+#endif
+
 int sithWorld_Startup();
 void sithWorld_Shutdown();
 void sithWorld_SetLoadPercentCallback(sithWorldProgressCallback_t func);

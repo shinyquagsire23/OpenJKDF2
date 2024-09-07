@@ -34,7 +34,11 @@ int sithTemplate_New(sithWorld *world, unsigned int numTemplates)
         sithThing_DoesRdThingInit(&world->templates[i]);
         if ( world->level_type_maybe & 1 )
         {
+#ifdef STATIC_JKL_EXT
+			world->templates[i].thingIdx = world->idx_offset | i;
+#else
             world->templates[i].thingIdx = 0x8000 | i;
+#endif
         }
         else
         {
@@ -50,6 +54,18 @@ int sithTemplate_New(sithWorld *world, unsigned int numTemplates)
 sithThing* sithTemplate_GetEntryByIdx(int idx)
 {
     sithWorld* world = sithWorld_pCurrentWorld;
+#ifdef STATIC_JKL_EXT
+	for (int i = 0; i < ARRAY_SIZE(sithWorld_pStaticWorlds); ++i)
+	{
+		if (!sithWorld_pStaticWorlds[i]) continue;
+		if ((idx & sithWorld_pStaticWorlds[i]->idx_offset) != 0)
+		{
+			world = sithWorld_pStaticWorlds[i];
+			idx &= ~sithWorld_pStaticWorlds[i]->idx_offset;
+			break;
+		}
+	}
+#endif
     if ( idx & 0x8000 )
     {
         world = sithWorld_pStatic;

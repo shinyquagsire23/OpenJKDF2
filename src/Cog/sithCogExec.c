@@ -393,7 +393,18 @@ sithCog* sithCogExec_PopCog(sithCog *ctx)
 
     if (cogIdx == -1)
         return NULL;
-    
+#ifdef STATIC_JKL_EXT
+	for (int i = 0; i < ARRAY_SIZE(sithWorld_pStaticWorlds); ++i)
+	{
+		if (!sithWorld_pStaticWorlds[i]) continue; 
+		if ((cogIdx & sithWorld_pStaticWorlds[i]->idx_offset) != 0)
+		{
+			world = sithWorld_pStaticWorlds[i];
+			cogIdx &= ~sithWorld_pStaticWorlds[i]->idx_offset;
+			break;
+		}
+	}
+#endif 
     if ( (uint16_t)cogIdx & 0x8000 )
     {
         world = sithWorld_pStatic;
@@ -506,7 +517,18 @@ sithSound* sithCogExec_PopSound(sithCog *ctx)
 
     if (idx == -1)
         return NULL;
-    
+#ifdef STATIC_JKL_EXT
+	for (int i = 0; i < ARRAY_SIZE(sithWorld_pStaticWorlds); ++i)
+	{
+		if (!sithWorld_pStaticWorlds[i]) continue;
+		if ((idx & sithWorld_pStaticWorlds[i]->idx_offset) != 0)
+		{
+			world = sithWorld_pStaticWorlds[i];
+			idx &= ~sithWorld_pStaticWorlds[i]->idx_offset;
+			break;
+		}
+	}
+#endif    
     if ( idx & 0x8000 )
     {
         world = sithWorld_pStatic;
@@ -621,7 +643,18 @@ rdMaterial* sithCogExec_PopMaterial(sithCog *ctx)
 
     if (idx == -1)
         return NULL;
-    
+#ifdef STATIC_JKL_EXT
+	for (int i = 0; i < ARRAY_SIZE(sithWorld_pStaticWorlds); ++i)
+	{
+		if (!sithWorld_pStaticWorlds[i]) continue;
+		if ((idx & sithWorld_pStaticWorlds[i]->idx_offset) != 0)
+		{
+			world = sithWorld_pStaticWorlds[i];
+			idx &= ~sithWorld_pStaticWorlds[i]->idx_offset;
+			break;
+		}
+	}
+#endif    
     if ( idx & 0x8000 )
     {
         world = sithWorld_pStatic;
@@ -663,7 +696,18 @@ rdModel3* sithCogExec_PopModel3(sithCog *ctx)
 
     if (idx == -1)
         return NULL;
-    
+#ifdef STATIC_JKL_EXT
+	for (int i = 0; i < ARRAY_SIZE(sithWorld_pStaticWorlds); ++i)
+	{
+		if (!sithWorld_pStaticWorlds[i]) continue;
+		if ((idx & sithWorld_pStaticWorlds[i]->idx_offset) != 0)
+		{
+			world = sithWorld_pStaticWorlds[i];
+			idx &= ~sithWorld_pStaticWorlds[i]->idx_offset;
+			break;
+		}
+	}
+#endif   
     if ( idx & 0x8000 )
     {
         world = sithWorld_pStatic;
@@ -705,7 +749,18 @@ rdSprite* sithCogExec_PopSprite(sithCog* ctx)
 
 	if (idx == -1)
 		return NULL;
-
+#ifdef STATIC_JKL_EXT
+	for (int i = 0; i < ARRAY_SIZE(sithWorld_pStaticWorlds); ++i)
+	{
+		if (!sithWorld_pStaticWorlds[i]) continue;
+		if ((idx & sithWorld_pStaticWorlds[i]->idx_offset) != 0)
+		{
+			world = sithWorld_pStaticWorlds[i];
+			idx &= ~sithWorld_pStaticWorlds[i]->idx_offset;
+			break;
+		}
+	}
+#endif
 	if (idx & 0x8000)
 	{
 		world = sithWorld_pStatic;
@@ -748,7 +803,18 @@ rdKeyframe* sithCogExec_PopKeyframe(sithCog *ctx)
 
     if (idx == -1)
         return NULL;
-    
+#ifdef STATIC_JKL_EXT
+	for (int i = 0; i < ARRAY_SIZE(sithWorld_pStaticWorlds); ++i)
+	{
+		if (!sithWorld_pStaticWorlds[i]) continue;
+		if ((idx & sithWorld_pStaticWorlds[i]->idx_offset) != 0)
+		{
+			world = sithWorld_pStaticWorlds[i];
+			idx &= ~sithWorld_pStaticWorlds[i]->idx_offset;
+			break;
+		}
+	}
+#endif   
     if ( idx & 0x8000 )
     {
         world = sithWorld_pStatic;

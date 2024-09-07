@@ -175,7 +175,11 @@ LABEL_10:
             v8->id = v11;
             if ( (v10 & 1) != 0 )
             {
+			#ifdef STATIC_JKL_EXT
+				v12 = v11 | v4->idx_offset;
+			#else
                 v12 = v11 | 0x8000;
+			#endif
                 v8->id = v12;
             }
             v4->numMaterialsLoaded = v11 + 1;
@@ -193,6 +197,18 @@ rdMaterial* sithMaterial_GetByIdx(int idx)
     rdMaterial *result; // eax
 
     world = sithWorld_pCurrentWorld;
+#ifdef STATIC_JKL_EXT
+	for (int i = 0; i < ARRAY_SIZE(sithWorld_pStaticWorlds); ++i)
+	{
+		if (!sithWorld_pStaticWorlds[i]) continue;
+		if ((idx & sithWorld_pStaticWorlds[i]->idx_offset) != 0)
+		{
+			world = sithWorld_pStaticWorlds[i];
+			idx &= ~sithWorld_pStaticWorlds[i]->idx_offset;
+			break;
+		}
+	}
+#endif
     if ( (idx & 0x8000) != 0 )
     {
         world = sithWorld_pStatic;

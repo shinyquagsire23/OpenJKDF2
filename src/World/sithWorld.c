@@ -42,6 +42,11 @@
 // MOTS added
 static sithWorld_ChecksumHandler_t sithWorld_checksumExtraFunc;
 
+#ifdef STATIC_JKL_EXT
+// Added: ability to load more than just static.jkl for mod combos
+sithWorld* sithWorld_pStaticWorlds[4];
+#endif
+
 static char jkl_read_copyright[1088];
 
 const char* g_level_header =
@@ -113,6 +118,10 @@ int sithWorld_Startup()
 #ifdef POLYLINE_EXT
 	sithWorld_SetSectionParser("polylines", sithPolyline_Load);
 #endif
+#ifdef STATIC_JKL_EXT
+	for(int i = 0; i < ARRAY_SIZE(sithWorld_pStaticWorlds); ++i)
+		sithWorld_pStaticWorlds[i] = NULL;
+#endif
     sithWorld_bInitted = 1;
     return 1;
 }
@@ -121,6 +130,14 @@ void sithWorld_Shutdown()
 {
     if ( sithWorld_pCurrentWorld )
         pSithHS->free(sithWorld_pCurrentWorld);
+#ifdef STATIC_JKL_EXT
+	for (int i = 0; i < ARRAY_SIZE(sithWorld_pStaticWorlds); ++i)
+	{
+		if (sithWorld_pStaticWorlds[i])
+			sithWorld_FreeEntry(sithWorld_pStaticWorlds[i]);
+		sithWorld_pStaticWorlds[i] = 0;
+	}
+#endif
     if ( sithWorld_pStatic ) {
         //pSithHS->free(sithWorld_pStatic); // Added: Actually free everything
         sithWorld_FreeEntry(sithWorld_pStatic); // Added: Actually free everything
@@ -715,6 +732,19 @@ uint32_t sithWorld_CalcChecksum(sithWorld *pWorld, uint32_t seed)
         hash = sithThing_Checksum(&pWorld->templates[i], hash);
     }
     
+#ifdef STATIC_JKL_EXT
+	for (int i = 0; i < ARRAY_SIZE(sithWorld_pStaticWorlds); ++i)
+	{
+		if (sithWorld_pStaticWorlds[i])
+		{
+			for (uint32_t i = 0; i < sithWorld_pStaticWorlds[i]->numCogsLoaded; i++)
+			{
+				hash = util_Weirdchecksum((uint8_t*)sithWorld_pStaticWorlds[i]->cogScripts[i].script_program, sithWorld_pStaticWorlds[i]->cogScripts[i].codeSize, hash);
+			}
+		}
+	}
+#endif
+
     // Hash static COG __VM bytecode__ (*not* text)
     if (sithWorld_pStatic )
     {

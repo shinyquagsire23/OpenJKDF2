@@ -170,7 +170,11 @@ sithSound* sithSound_LoadEntry(char *sound_fname, int a2)
         sound->id = sithWorld_pLoading->numSoundsLoaded;
         if ((sithWorld_pLoading->level_type_maybe & 1))
         {
+		#ifdef STATIC_JKL_EXT
+			sound->id |= sithWorld_pLoading->idx_offset;
+		#else
             sound->id |= 0x8000;
+		#endif
         }
         stdString_SafeStrCopy(sound->sound_fname, sound_fname, 32);
         sound->bufferBytes = stdSound_ParseWav(sound_file, &sound->sampleRateHz, &sound->bitsPerSample, &sound->bStereo, &sound->seekOffset);
@@ -202,7 +206,18 @@ sithSound* sithSound_LoadEntry(char *sound_fname, int a2)
 sithSound* sithSound_GetFromIdx(int idx)
 {
     sithWorld* world = sithWorld_pCurrentWorld;
-
+#ifdef STATIC_JKL_EXT
+	for (int i = 0; i < ARRAY_SIZE(sithWorld_pStaticWorlds); ++i)
+	{
+		if (!sithWorld_pStaticWorlds[i]) continue;
+		if ((idx & sithWorld_pStaticWorlds[i]->idx_offset) != 0)
+		{
+			world = sithWorld_pStaticWorlds[i];
+			idx &= ~sithWorld_pStaticWorlds[i]->idx_offset;
+			break;
+		}
+	}
+#endif
     if (idx & 0x8000)
     {
         world = sithWorld_pStatic;

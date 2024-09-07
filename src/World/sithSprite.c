@@ -139,7 +139,13 @@ rdSprite* sithSprite_LoadEntry(char *fpath)
 #ifdef DYNAMIC_POV
 							sprite->id = world->numSpritesLoaded;
 							if (sithWorld_pLoading->level_type_maybe & 1)
+							{
+							#ifdef STATIC_JKL_EXT
+								sprite->id |= world->idx_offset;
+							#else
 								sprite->id |= 0x8000;
+							#endif
+							}
 #endif
                             stdHashTable_SetKeyVal(sithSprite_hashmap, sprite->path, sprite);
                             ++world->numSpritesLoaded;

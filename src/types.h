@@ -2082,6 +2082,9 @@ typedef struct sDwLaser tDwLaser;
 typedef struct sithWorld
 {
     uint32_t level_type_maybe;
+#ifdef STATIC_JKL_EXT
+	uint32_t idx_offset;
+#endif
     char map_jkl_fname[32];
     char episodeName[32];
     int numColormaps;

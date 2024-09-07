@@ -173,7 +173,11 @@ LABEL_39:
                                 keyframe->id = world->numKeyframesLoaded;
                                 if ( (world->level_type_maybe & 1) )
                                 {
+								#ifdef STATIC_JKL_EXT
+									keyframe->id |= world->idx_offset;
+								#else
                                     keyframe->id |= 0x8000u;
+								#endif
                                 }
                                 stdHashTable_SetKeyVal(sithPuppet_keyframesHashtable, keyframe->name, keyframe);
                                 v10 = keyframe;
