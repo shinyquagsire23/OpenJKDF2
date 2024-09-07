@@ -2389,6 +2389,14 @@ typedef struct jkSaberCollide
     sithSurface* damagedSurfaces[6];
 } jkSaberCollide;
 
+#ifdef LIGHTSABER_TRAILS
+typedef struct jkSaberTrail
+{
+	rdVector3 lastTip;
+	int32_t   lastTimeMs;
+} jkSaberTrail;
+#endif
+
 typedef struct jkPlayerInfo
 {
     uint32_t field_0;
@@ -2427,6 +2435,9 @@ typedef struct jkPlayerInfo
     float jkmUnk6;
     int personality;
 #endif // JKM_TYPES
+#ifdef LIGHTSABER_TRAILS
+	jkSaberTrail saberTrail[2];
+#endif
 } jkPlayerInfo;
 
 typedef struct jkPlayerMpcInfo

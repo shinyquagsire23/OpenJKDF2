@@ -28,6 +28,15 @@ void jkSaber_SpawnSparks(jkPlayerInfo *pPlayerInfo, rdVector3 *pPos, sithSector 
 void jkSaber_Enable(sithThing *pThing, float damage, float bladeLength, float stunDelay);
 void jkSaber_Disable(sithThing *player);
 
+#ifdef LIGHTSABER_TRAILS
+extern int jkSaber_trails;
+extern float jkSaber_trailMinVel;
+extern float jkSaber_trailMaxVel;
+extern float jkSaber_trailCutoff;
+extern float jkSaber_trailShutter;
+
+void jkSaber_DrawTrail(rdThing* pThing, jkSaberTrail* pSaberTrail, rdMatrix34* pMatrix);
+#endif
 //static void (*jkSaber_UpdateCollision)(sithThing *player, int joint) = (void*)jkSaber_UpdateCollision_ADDR;
 
 #endif // _JKSABER_H

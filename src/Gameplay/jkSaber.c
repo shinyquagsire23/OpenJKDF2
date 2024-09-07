@@ -16,8 +16,17 @@
 #include "Engine/sithCollision.h"
 #include "Main/jkSmack.h"
 #include "General/stdString.h"
+#include "General/stdMath.h"
 
 #include "jk.h"
+
+#ifdef LIGHTSABER_TRAILS
+int jkSaber_trails = 1;
+float jkSaber_trailMinVel = 3.0f;
+float jkSaber_trailMaxVel = 10.0f;
+float jkSaber_trailCutoff = 0.01f;
+float jkSaber_trailShutter = 50.0f;
+#endif
 
 #define JKSABER_EXTENDTIME (0.3000000)
 
@@ -66,6 +75,190 @@ void jkSaber_PolylineRand(rdThing *thing)
     }
 }
 
+#ifdef LIGHTSABER_TRAILS
+void jkSaber_DrawTrail(rdThing* pThing, jkSaberTrail* pSaberTrail, rdMatrix34* pMatrix)
+{
+	if(!jkSaber_trails)
+		return;
+
+	// clamp the time just in case
+	if (pSaberTrail->lastTimeMs > sithTime_curMs)
+		pSaberTrail->lastTimeMs = sithTime_curMs;
+
+	rdMatrix34 mat;
+	rdMatrix_Multiply34(&mat, &rdCamera_pCurCamera->view_matrix, pMatrix);
+
+	rdVector3 basePos;
+	rdMatrix_TransformPoint34(&basePos, &rdroid_zeroVector3, &mat);
+
+	rdVector3 vertex;
+	rdVector_Set3(&vertex, 0.0f, pThing->polyline->length, 0.0f);
+
+	rdVector3 tipPos;
+	rdMatrix_TransformPoint34(&tipPos, &vertex, &mat);
+
+	int32_t diff = sithTime_curMs - pSaberTrail->lastTimeMs;
+	float dt = diff * 0.001f;
+
+	rdVector3 vel;
+	rdVector_Sub3(&vel, &tipPos, &pSaberTrail->lastTip);
+	rdVector_InvScale3Acc(&vel, dt);
+
+	float len = rdVector_Normalize3Acc(&vel);
+	if (len > jkSaber_trailCutoff) // don't bother if it's rly low
+	{
+		len = stdMath_Clamp(len - jkSaber_trailMinVel, 0.0f, jkSaber_trailMaxVel);
+		len *= (1.0f / jkSaber_trailShutter); // scale to desired shutter speed
+		rdVector_Scale3Acc(&vel, len);
+
+		//printf("saber trail: len %f, diff %d, diff seconds %f\n", len, diff, (diff * 0.001));
+
+		rdVector3 oldTipPos;
+		rdVector_Sub3(&oldTipPos, &tipPos, &vel);
+
+		rdVector3 verts[4];
+		rdVector2 uvs[4];
+
+		rdVertexIdxInfo idxInfo;
+		idxInfo.numVertices = 4;
+		idxInfo.vertices = verts;
+		idxInfo.paDynamicLight = 0;
+		idxInfo.intensities = 0;
+
+		// Old tip
+		{
+			float tip_left, tip_bottom, tip_right, tip_top;
+			tip_left = oldTipPos.x - pThing->polyline->tipRadius;
+			tip_bottom = oldTipPos.z - pThing->polyline->tipRadius;
+			tip_right = oldTipPos.x + pThing->polyline->tipRadius;
+			tip_top = oldTipPos.z + pThing->polyline->tipRadius;
+
+			// Tip
+			{
+				verts[0].x = tip_left;
+				verts[0].y = oldTipPos.y - -0.001;
+				verts[0].z = tip_bottom;
+				verts[1].x = tip_right;
+				verts[1].y = oldTipPos.y - -0.001;
+				verts[1].z = tip_bottom;
+				verts[2].x = tip_right;
+				verts[2].y = oldTipPos.y - -0.001;
+				verts[2].z = tip_top;
+				verts[3].x = tip_left;
+				verts[3].y = oldTipPos.y - -0.001;
+				verts[3].z = tip_top;
+				idxInfo.vertices = verts;
+				idxInfo.vertexUVs = pThing->polyline->extraUVFaceMaybe;
+				rdPolyLine_DrawFace(pThing, &pThing->polyline->tipFace, verts, &idxInfo, 0);
+			}
+		}
+
+		// Tip to old tip
+		{
+			rdVector3 right;
+			rdVector_Cross3(&right, &oldTipPos, &tipPos);
+			rdVector_Normalize3Acc(&right);
+
+			verts[0].x = tipPos.x + right.x * pThing->polyline->tipRadius;
+			verts[0].y = tipPos.y + right.y * pThing->polyline->tipRadius;
+			verts[0].z = tipPos.z + right.z * pThing->polyline->tipRadius;
+
+			verts[1].x = tipPos.x + right.x * -pThing->polyline->tipRadius;
+			verts[1].y = tipPos.y + right.y * -pThing->polyline->tipRadius;
+			verts[1].z = tipPos.z + right.z * -pThing->polyline->tipRadius;
+
+			verts[2].x = oldTipPos.x + right.x * -pThing->polyline->tipRadius;
+			verts[2].y = oldTipPos.y + right.y * -pThing->polyline->tipRadius;
+			verts[2].z = oldTipPos.z + right.z * -pThing->polyline->tipRadius;
+
+			verts[3].x = oldTipPos.x + right.x * pThing->polyline->tipRadius;
+			verts[3].y = oldTipPos.y + right.y * pThing->polyline->tipRadius;
+			verts[3].z = oldTipPos.z + right.z * pThing->polyline->tipRadius;
+			
+			idxInfo.vertexUVs = pThing->polyline->extraUVTipMaybe;
+			rdPolyLine_DrawFace(pThing, &pThing->polyline->edgeFace, verts, &idxInfo, 1);
+		}
+
+		// Old tip to base
+		{
+			rdVector3 right;
+			rdVector_Cross3(&right, &basePos, &oldTipPos);
+			rdVector_Normalize3Acc(&right);
+
+			verts[0].x = oldTipPos.x + right.x * pThing->polyline->tipRadius;
+			verts[0].y = oldTipPos.y + right.y * pThing->polyline->tipRadius;
+			verts[0].z = oldTipPos.z + right.z * pThing->polyline->tipRadius;
+
+			verts[1].x = oldTipPos.x + right.x * -pThing->polyline->tipRadius;
+			verts[1].y = oldTipPos.y + right.y * -pThing->polyline->tipRadius;
+			verts[1].z = oldTipPos.z + right.z * -pThing->polyline->tipRadius;
+
+			verts[2].x = basePos.x + right.x * -pThing->polyline->baseRadius;
+			verts[2].y = basePos.y + right.y * -pThing->polyline->baseRadius;
+			verts[2].z = basePos.z + right.z * -pThing->polyline->baseRadius;
+
+			verts[3].x = basePos.x + right.x * pThing->polyline->baseRadius;
+			verts[3].y = basePos.y + right.y * pThing->polyline->baseRadius;
+			verts[3].z = basePos.z + right.z * pThing->polyline->baseRadius;
+
+			idxInfo.vertexUVs = pThing->polyline->extraUVTipMaybe;
+			rdPolyLine_DrawFace(pThing, &pThing->polyline->edgeFace, verts, &idxInfo, 3);
+		}
+
+		// Core
+		{
+			rdVector3 right;
+			rdVector_Cross3(&right, &basePos, &tipPos);
+			rdVector_Normalize3Acc(&right);
+
+			rdVector_Copy3(&verts[0], &tipPos);
+			rdVector_Copy3(&verts[1], &oldTipPos);
+
+			rdVector_Copy3(&verts[2], &basePos);
+			rdVector_MultAcc3(&verts[2], &right, -pThing->polyline->baseRadius * 0.5);
+			
+			rdVector_Copy3(&verts[3], &basePos);
+			rdVector_MultAcc3(&verts[3], &right, pThing->polyline->baseRadius * 0.5f);
+
+			// use the very center (average) UV to get the center color
+			rdVector2 centerUV;
+			rdVector_Zero2(&centerUV);
+			for (int j = 0; j < 4; ++j)
+			{
+				rdVector_Add2Acc(&centerUV, &pThing->polyline->extraUVTipMaybe[j]);
+			}
+			rdVector_Scale2Acc(&centerUV, 0.25f);
+
+			rdVector_Copy2(&uvs[0], &centerUV);
+			rdVector_Copy2(&uvs[1], &centerUV);
+			rdVector_Copy2(&uvs[2], &centerUV);
+			rdVector_Copy2(&uvs[3], &centerUV);
+
+			// the two sided rendering is borked so flip the winding order if needed
+			rdVector3 edges[2];
+			rdVector_Sub3(&edges[0], &verts[1], &verts[0]);
+			rdVector_Sub3(&edges[1], &verts[2], &verts[1]);
+
+			rdVector3 n;
+			rdVector_Cross3(&n, &edges[0], &edges[1]);
+			if (rdVector_Dot3(&n, &verts[0]) > 0.0f)
+			{
+				rdVector3 tmp;
+				tmp = verts[1];
+				verts[1] = verts[0];
+				verts[0] = tmp;
+			}
+
+			idxInfo.vertexUVs = uvs;
+			rdPolyLine_DrawFace(pThing, &pThing->polyline->edgeFace, NULL, &idxInfo, 5);
+		}
+	}
+		
+	rdVector_Copy3(&pSaberTrail->lastTip, &tipPos);
+	pSaberTrail->lastTimeMs = sithTime_curMs;
+}
+#endif
+
 void jkSaber_Draw(rdMatrix34 *posRotMat)
 {
     if ( playerThings[playerThingIdx].actorThing->jkFlags & JKFLAG_SABERON
@@ -76,13 +269,20 @@ void jkSaber_Draw(rdMatrix34 *posRotMat)
         {
             rdPuppet_BuildJointMatrices(&playerThings[playerThingIdx].povModel, posRotMat);
         }
-
         jkSaber_PolylineRand(&playerThings[playerThingIdx].polylineThing);
         rdThing_Draw(&playerThings[playerThingIdx].polylineThing, &playerThings[playerThingIdx].povModel.hierarchyNodeMatrices[5]); // aaaaa hardcoded K_Rhand
-        
+#ifdef LIGHTSABER_TRAILS
+		jkSaber_DrawTrail(&playerThings[playerThingIdx].polylineThing, &playerThings[playerThingIdx].saberTrail[0], &playerThings[playerThingIdx].povModel.hierarchyNodeMatrices[5]);
+#endif
+
         // Added: Dual sabers
         if (playerThings[playerThingIdx].actorThing->jkFlags & JKFLAG_DUALSABERS)
+		{
             rdThing_Draw(&playerThings[playerThingIdx].polylineThing, &playerThings[playerThingIdx].povModel.hierarchyNodeMatrices[2]); // K_Lhand
+#ifdef LIGHTSABER_TRAILS
+			jkSaber_DrawTrail(&playerThings[playerThingIdx].polylineThing, &playerThings[playerThingIdx].saberTrail[1], &playerThings[playerThingIdx].povModel.hierarchyNodeMatrices[2]);
+#endif
+		}
     }
 }
 

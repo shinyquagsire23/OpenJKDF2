@@ -228,6 +228,14 @@ void jkPlayer_StartupVars()
 #ifdef FIXED_TIMESTEP_PHYS
     sithCvar_RegisterBool("g_bJankyPhysics",             0,                         &jkPlayer_bJankyPhysics,            CVARFLAG_LOCAL);
 #endif
+
+#ifdef LIGHTSABER_TRAILS
+	sithCvar_RegisterBool("g_saberTrails", 1, &jkSaber_trails, CVARFLAG_LOCAL | CVARFLAG_UPDATABLE_DEFAULT);
+	sithCvar_RegisterFlex("g_saberTrailMinVel", 1.0f, &jkSaber_trailMinVel, CVARFLAG_LOCAL | CVARFLAG_UPDATABLE_DEFAULT);
+	sithCvar_RegisterFlex("g_saberTrailMaxVel", 4.0f, &jkSaber_trailMaxVel, CVARFLAG_LOCAL | CVARFLAG_UPDATABLE_DEFAULT);
+	sithCvar_RegisterFlex("g_saberTrailCutoff", 0.1f, &jkSaber_trailCutoff, CVARFLAG_LOCAL | CVARFLAG_UPDATABLE_DEFAULT);
+	sithCvar_RegisterFlex("g_saberTrailShutter", 50.0f, &jkSaber_trailShutter, CVARFLAG_LOCAL | CVARFLAG_UPDATABLE_DEFAULT);
+#endif
 }
 
 // Added: Clean reset
@@ -1242,6 +1250,7 @@ void jkPlayer_DrawPov()
         if (playerThings[playerThingIdx].actorThing->jkFlags & JKFLAG_SABERON)
         {
             rdSetZBufferMethod(RD_ZBUFFER_READ_NOWRITE);
+			rdSetSortingMethod(2);
             jkSaber_Draw(&viewMat);
         }
         rdCache_Flush(); // Added: force polyline to be underneath model
@@ -1351,8 +1360,16 @@ void jkPlayer_renderSaberBlade(sithThing* thing)
 			{
 				jkSaber_PolylineRand(&playerInfo->polylineThing);
 				rdThing_Draw(&playerInfo->polylineThing, primaryMat);
+			#ifdef LIGHTSABER_TRAILS
+				jkSaber_DrawTrail(&playerInfo->polylineThing, &playerInfo->saberTrail[0], primaryMat);
+			#endif
 				if (thing->jkFlags & JKFLAG_DUALSABERS)
+				{
 					rdThing_Draw(&playerInfo->polylineThing, secondaryMat);
+				#ifdef LIGHTSABER_TRAILS
+					jkSaber_DrawTrail(&playerInfo->polylineThing, &playerInfo->saberTrail[1], secondaryMat);
+				#endif
+				}
 			}
 		}
 	}
@@ -1362,8 +1379,16 @@ void jkPlayer_renderSaberBlade(sithThing* thing)
 		{
 			jkSaber_PolylineRand(&playerInfo->polylineThing);
 			rdThing_Draw(&playerInfo->polylineThing, primaryMat);
+		#ifdef LIGHTSABER_TRAILS
+			jkSaber_DrawTrail(&playerInfo->polylineThing, &playerInfo->saberTrail[0], primaryMat);
+		#endif
 			if (thing->jkFlags & JKFLAG_DUALSABERS)
+			{
 				rdThing_Draw(&playerInfo->polylineThing, secondaryMat);
+			#ifdef LIGHTSABER_TRAILS
+				jkSaber_DrawTrail(&playerInfo->polylineThing, &playerInfo->saberTrail[1], secondaryMat);
+			#endif
+			}
 		}
 	}
 }
