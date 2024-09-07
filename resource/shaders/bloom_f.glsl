@@ -39,5 +39,5 @@ void main(void)
 	// 			  texture(tex, f_uv + PixSize.xy * a.yx, 0.0) +
 	// 			  texture(tex, f_uv - PixSize.xy * a.yx, 0.0)) / 12.0;
 	
-	fragColor = vec4(Color.rgb, param3);
+	fragColor = vec4(Color.rgb, param2);
 }
