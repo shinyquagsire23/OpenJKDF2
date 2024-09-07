@@ -2377,8 +2377,8 @@ void std3D_DrawSceneFbo()
 		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur2, std3D_pFb->blur3.tex, 0, 0, uvScale, blendLerp, 1.0, 0);
 		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur1, std3D_pFb->blur2.tex, 0, 0, uvScale, blendLerp, 1.0, 0);
 
-		//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
 		std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur1.tex, 0, 0, 1.0f, 7.0f, jkPlayer_gamma, 0);
 
 	#else
