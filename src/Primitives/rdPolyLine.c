@@ -224,7 +224,11 @@ int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix)
         polylineVerts[3].y = vertex_out.y - -0.001;
         polylineVerts[3].z = tip_top;
         idxInfo.vertexUVs = polyline->extraUVFaceMaybe;
-        rdPolyLine_DrawFace(thing, &polyline->tipFace, polylineVerts, &idxInfo);
+        rdPolyLine_DrawFace(thing, &polyline->tipFace, polylineVerts, &idxInfo
+#ifdef QOL_IMPROVEMENTS
+		, 0
+#endif
+		);
     }
 
     // Base
@@ -242,8 +246,12 @@ int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix)
         polylineVerts[3].y = out.scale.y - -0.001;
         polylineVerts[3].z = out.scale.z + polyline->baseRadius;
         idxInfo.vertexUVs = polyline->extraUVFaceMaybe;
-        rdPolyLine_DrawFace(thing, &polyline->tipFace, polylineVerts, &idxInfo);
-    }
+        rdPolyLine_DrawFace(thing, &polyline->tipFace, polylineVerts, &idxInfo
+#ifdef QOL_IMPROVEMENTS
+		, 1
+#endif
+		);
+	}
     
 
     // Blade
@@ -307,12 +315,20 @@ int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix)
         polylineVerts[3].z = (polyline->baseRadius * angSin) + (float)0.0 + out.scale.z;
 #endif
         idxInfo.vertexUVs = polyline->extraUVTipMaybe;
-        rdPolyLine_DrawFace(thing, &polyline->edgeFace, polylineVerts, &idxInfo);
+        rdPolyLine_DrawFace(thing, &polyline->edgeFace, polylineVerts, &idxInfo
+#ifdef QOL_IMPROVEMENTS
+		, 2
+#endif
+	);
     }
     return 1;
 }
 
-void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVertexIdxInfo *idxInfo)
+void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVertexIdxInfo *idxInfo
+#ifdef QOL_IMPROVEMENTS
+	, int sortId
+#endif
+)
 {
     rdProcEntry *procEntry;
     rdMeshinfo mesh_out;
@@ -473,6 +489,10 @@ void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVert
             procEntry->light_level_static = 1.0;
         }
     }
+
+#ifdef QOL_IMPROVEMENTS
+	procEntry->sortId = sortId;
+#endif
     
     int procFaceFlags = 1;
     if ( procEntry->geometryMode >= 4 )
