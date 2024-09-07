@@ -2872,6 +2872,9 @@ void std3D_DrawRenderList()
 #ifdef DEFERRED_DECALS
 void std3D_DrawDecalList()
 {
+	if(decal_count <= 0)
+		return;
+
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
 	glEnable(GL_CULL_FACE);
@@ -3037,7 +3040,7 @@ void std3D_DrawDecalList()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, GL_tmpTrisAmt * 3 * sizeof(GLushort), data_elements, GL_STREAM_DRAW);
 
 	// decal vertices
-	GL_tmpVerticesAmt = decal_count * 8;
+	GL_tmpVerticesAmt = min(decal_count * 8, STD3D_MAX_DECALS-1); // ??? why is this needed ???
 	for (int v = 0; v < GL_tmpVerticesAmt; ++v)
 	{
 		GL_tmpVertices[v].x = decal_verts[v].x;
