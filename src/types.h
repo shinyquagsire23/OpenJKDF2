@@ -130,6 +130,10 @@ typedef uint32_t size_t;
 #endif
 #endif
 
+#ifndef ARRAY_SIZE
+#define ARRAY_SIZE(a) ((sizeof a)/(sizeof a[0]))
+#endif
+
 typedef struct GUID_idk
 {
     uint32_t a,b,c,d;
