@@ -262,9 +262,12 @@ void jkPlayer_ResetVars()
 
     jkPlayer_bHasLoadedSettingsOnce = 0;
 
-
 #ifdef DEFERRED_DECALS
 	jkPlayer_enableDecals = 1;
+#endif
+
+#ifdef RAGDOLLS
+	jkPlayer_debugRagdolls = 0;
 #endif
 #endif
 
