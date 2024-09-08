@@ -125,6 +125,9 @@ GLint attribute_coordVS;
 GLint uniform_mvp, uniform_tex, uniform_texEmiss, uniform_displacement_map, uniform_tex_mode, uniform_blend_mode, uniform_worldPalette, uniform_worldPaletteLights;
 GLint uniform_tint, uniform_filter, uniform_fade, uniform_add, uniform_emissiveFactor, uniform_albedoFactor;
 GLint uniform_light_mult, uniform_displacement_factor, uniform_iResolution;
+#ifdef FOG
+GLint uniform_fog, uniform_fog_color, uniform_fog_start, uniform_fog_end;
+#endif
 
 GLint programMenu_attribute_coord3d, programMenu_attribute_v_color, programMenu_attribute_v_uv, programMenu_attribute_v_norm;
 GLint programMenu_uniform_mvp, programMenu_uniform_tex, programMenu_uniform_displayPalette;
@@ -583,6 +586,12 @@ int init_resources()
     uniform_light_mult = std3D_tryFindUniform(programDefault, "light_mult");
     uniform_displacement_factor = std3D_tryFindUniform(programDefault, "displacement_factor");
     uniform_iResolution = std3D_tryFindUniform(programDefault, "iResolution");
+#ifdef FOG
+	uniform_fog = std3D_tryFindUniform(programDefault, "fogEnabled");
+	uniform_fog_color = std3D_tryFindUniform(programDefault, "fogColor");
+	uniform_fog_start = std3D_tryFindUniform(programDefault, "fogStart");
+	uniform_fog_end = std3D_tryFindUniform(programDefault, "fogEnd");
+#endif
     
     programMenu_attribute_coord3d = std3D_tryFindAttribute(programMenu, "coord3d");
     programMenu_attribute_v_color = std3D_tryFindAttribute(programMenu, "v_color");
@@ -2639,6 +2648,17 @@ void std3D_DrawRenderList()
     glUniform4f(uniform_albedoFactor, 1.0, 1.0, 1.0, 1.0);
     glUniform1f(uniform_light_mult, jkGuiBuildMulti_bRendering ? 0.85 : (jkPlayer_enableBloom ? 0.9 : 0.85));
     glUniform1f(uniform_displacement_factor, 1.0);
+
+#ifdef FOG
+	extern int rdroid_curFogEnabled;
+	extern rdVector4 rdroid_curFogColor;
+	extern float rdroid_curFogStartDepth;
+	extern float rdroid_curFogEndDepth;
+	glUniform1i(uniform_fog, rdroid_curFogEnabled);
+	glUniform4f(uniform_fog_color, rdroid_curFogColor.x, rdroid_curFogColor.y, rdroid_curFogColor.z, rdroid_curFogColor.w);
+	glUniform1f(uniform_fog_start, rdroid_curFogStartDepth);
+	glUniform1f(uniform_fog_end, rdroid_curFogEndDepth);
+#endif
 
     rdTri* tris = GL_tmpTris;
     rdLine* lines = GL_tmpLines;

@@ -9,6 +9,13 @@
 #include "Win95/stdDisplay.h"
 #include "Primitives/rdPrimit3.h"
 
+#ifdef FOG
+int rdroid_curFogEnabled;
+rdVector4 rdroid_curFogColor;
+float rdroid_curFogStartDepth;
+float rdroid_curFogEndDepth;
+#endif
+
 int rdStartup(HostServices *p_hs)
 {
     if (bRDroidStartup)
@@ -42,7 +49,14 @@ int rdOpen(int a1)
     rdroid_curOcclusionMethod = 0;
     rdroid_curCullFlags = 3;
     rdroid_curProcFaceUserData = 0;
-    
+ 
+#ifdef FOG
+	rdroid_curFogEnabled = 0;
+	rdVector_Zero3(&rdroid_curFogColor);
+	rdroid_curFogStartDepth = 0.0f;
+	rdroid_curFogEndDepth = 10000.0f;
+#endif
+
     stdPalEffects_ResetEffect(&rdroid_curColorEffects);
 
     // MOTS added
@@ -118,6 +132,16 @@ void rdSetVertexColorMode(int a1)
     rdroid_curVertexColorMode = a1;
 #endif
 }
+
+#ifdef FOG
+void rdSetFog(int active, const rdVector4* color, float startDepth, float endDepth)
+{
+	rdroid_curFogEnabled = active;
+	rdVector_Copy4(&rdroid_curFogColor, color);
+	rdroid_curFogStartDepth = startDepth;
+	rdroid_curFogEndDepth = endDepth;
+}
+#endif
 
 int rdGetRenderOptions(void)
 {

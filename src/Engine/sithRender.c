@@ -458,6 +458,10 @@ void sithRender_Draw()
     rdSetTextureMode(sithRender_texMode);
     rdSetRenderOptions(rdGetRenderOptions() | 2);
 
+#ifdef FOG
+	rdSetFog(sithWorld_pCurrentWorld->fogEnabled, &sithWorld_pCurrentWorld->fogColor, sithWorld_pCurrentWorld->fogStartDepth, sithWorld_pCurrentWorld->fogEndDepth);
+#endif
+
     if (!sithCamera_currentCamera || !sithCamera_currentCamera->sector)
         return;
 

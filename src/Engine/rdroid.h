@@ -34,6 +34,12 @@
 #define rdClearPostStatistics_ADDR (0x0043AC10)
 
 extern int rdroid_curVertexColorMode;
+#ifdef FOG
+extern int rdroid_curFogEnabled;
+extern rdVector4 rdroid_curFogColor;
+extern float rdroid_curFogStartDepth;
+extern float rdroid_curFogEndDepth;
+#endif
 
 int rdStartup(HostServices *p_hs);
 void rdShutdown();
@@ -50,6 +56,10 @@ void rdSetZBufferMethod(rdZBufferMethod_t val);
 void rdSetCullFlags(int a1);
 void rdSetProcFaceUserData(int a1);
 void rdSetVertexColorMode(int a1);
+
+#ifdef FOG
+void rdSetFog(int active, const rdVector4* color, float startDepth, float endDepth);
+#endif
 
 int rdGetRenderOptions(void);
 int rdGetGeometryMode(void);

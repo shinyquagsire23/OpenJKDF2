@@ -2155,7 +2155,7 @@ typedef struct sithWorld
     float perspectiveDistance;
     float gouradDistance;
 #ifdef FOG
-	bool fogEnabled;
+	int fogEnabled;
 	rdVector4 fogColor;
 	float fogStartDepth;
 	float fogEndDepth;
