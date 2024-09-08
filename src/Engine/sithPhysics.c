@@ -1349,13 +1349,13 @@ void sithPhysics_ThingPhysRagdoll(sithThing* pThing, float deltaSeconds)
 	{
 		rdRagdollJoint* pJoint = &pRagdoll->pSkel->paJoints[i];
 
+		rdMatrix34 jointMat;
+		rdMatrix_Copy34(&jointMat, &pRagdoll->paTris[pJoint->tri]);
+		rdRagdoll_GetJointPos(&jointMat.scale, pRagdoll, pJoint);
+
 		// localize the orientation
-		rdMatrix_Multiply34(&pRagdoll->paJointMatrices[i], &pRagdoll->paTris[pJoint->tri], &pRagdoll->paJointTris[i]);
-
-		rdVector3 pos;
-		rdRagdoll_GetJointPos(&pos, pRagdoll, pJoint);
-		rdMatrix_PostTranslate34(&pRagdoll->paJointMatrices[i], &pos);
-
+		rdMatrix_Multiply34(&pRagdoll->paJointMatrices[i], &jointMat, &pRagdoll->paJointTris[i]);
+		
 		// apply to the pose
 		rdMatrix_PreMultiply34(&pRagdoll->paJointMatrices[i], &pRagdoll->paPoseMatrices[pJoint->node]);
 	}
