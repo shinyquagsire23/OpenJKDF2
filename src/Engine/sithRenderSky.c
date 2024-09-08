@@ -73,6 +73,9 @@ void sithRenderSky_TransformHorizontal(rdProcEntry *a1, sithSurfaceInfo *a2, int
             ++v8;
             v9 = &v7->y;
             v8[-1].z = v15->field_0.z;
+		#ifdef FOG
+			v8[-1].z = v15->field_0.z * 0.1f; // don't render at furthest depth for fog
+		#endif
             v10 = (v8[-1].x - v6->screen_height_half) * sithSector_flt_8553C0;
             ++v7;
             v12 = (v8[-1].y - v6->screen_width_half) * sithSector_flt_8553C0;
