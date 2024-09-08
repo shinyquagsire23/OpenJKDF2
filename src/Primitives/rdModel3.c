@@ -1464,6 +1464,17 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
             }
         }
 
+#ifdef RGB_AMBIENT
+		// rotate the ambient SH to local space
+		rdAmbient localAmbient;
+		localAmbient.r.x = rdCamera_pCurCamera->ambientCube.r.x;
+		localAmbient.g.x = rdCamera_pCurCamera->ambientCube.g.x;
+		localAmbient.b.x = rdCamera_pCurCamera->ambientCube.b.x;
+		rdMatrix_TransformVector34(&localAmbient.r.y, &rdCamera_pCurCamera->ambientCube.r.y, &matInv);
+		rdMatrix_TransformVector34(&localAmbient.g.y, &rdCamera_pCurCamera->ambientCube.g.y, &matInv);
+		rdMatrix_TransformVector34(&localAmbient.b.y, &rdCamera_pCurCamera->ambientCube.b.y, &matInv);
+#endif
+
         // MOTS added assignment
         meshIn->extraLight = rdLight_CalcVertexIntensities(
             apMeshLights,
@@ -1480,8 +1491,9 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
 			pCurMesh->vertices_r,//NULL,
 			pCurMesh->vertices_g,//NULL,
 			pCurMesh->vertices_b,//NULL,
-			&rdCamera_pCurCamera->ambientCube,
-			mat,
+#endif
+#ifdef RGB_AMBIENT
+			&localAmbient,
 #endif
             pCurMesh->numVertices,
             rdCamera_pCurCamera->attenuationMin);
@@ -1631,7 +1643,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
 
 	// if we have an ambient cube, dim the ambient a bit to make it pop
 	if(rdModel3_lightingMode == RD_LIGHTMODE_GOURAUD)
-		rdVector_Scale3Acc(&procEntry->ambientLight, 0.75f);
+		rdVector_Scale3Acc(&procEntry->ambientLight, 0.5f);
 
 #else
     if ( rdroid_curRenderOptions & 2 )

@@ -495,7 +495,7 @@ typedef struct rdLight
 // ambient cube
 typedef struct rdAmbient
 {
-	rdVector3 colors[6];
+	rdVector4 r, g, b;
 } rdAmbient;
 #endif
 

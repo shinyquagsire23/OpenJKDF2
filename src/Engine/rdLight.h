@@ -30,7 +30,9 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
     int numLights, rdVector3 *verticesEnd, rdVector3 *vertices, float *vertices_i_end, float *vertices_i,
 #ifdef RGB_THING_LIGHTS
 	float* vertices_r, float* vertices_g, float* vertices_b,
-	rdAmbient* ambient, rdMatrix34* mat,
+#endif
+#ifdef RGB_AMBIENT
+	rdAmbient* ambient,
 #endif
 	int numVertices, float scalar);
 float rdLight_CalcFaceIntensity(rdLight **meshLights, rdVector3 *localLightPoses, int numLights, rdFace *face, rdVector3 *faceNormal, rdVector3 *vertices, float a7);

@@ -383,9 +383,9 @@ int sithWorld_NewEntry(sithWorld *pWorld)
 						sflight += surface->surfaceInfo.face.extraLight;
 
 						rdVector3 col;
-						col.x = surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 1];
-						col.y = surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 2];
-						col.z = surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 3];
+						col.x = max(surface->surfaceInfo.face.extraLight, surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 1]);
+						col.y = max(surface->surfaceInfo.face.extraLight, surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 2]);
+						col.z = max(surface->surfaceInfo.face.extraLight, surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 3]);
 						
 						rdVector_Add3Acc(&sector->ambientRGB, &col);
 
@@ -400,16 +400,7 @@ int sithWorld_NewEntry(sithWorld *pWorld)
 				}
 				sflight /= (float)pWorld->sectors[i].numSurfaces;
 				rdVector_InvScale3Acc(&sector->ambientRGB, total);
-				sector->ambientRGB.x = max(sflight, stdMath_Clamp(sector->ambientRGB.x, 0.0f, 1.0f));
-				sector->ambientRGB.y = max(sflight, stdMath_Clamp(sector->ambientRGB.y, 0.0f, 1.0f));
-				sector->ambientRGB.z = max(sflight, stdMath_Clamp(sector->ambientRGB.z, 0.0f, 1.0f));
-				rdAmbient_Scale(&sector->ambientCube, 1.0f / total);
-				for (int a = 0; a < 6; ++a)
-				{
-					sector->ambientCube.colors[a].x = max(sflight, stdMath_Clamp(sector->ambientCube.colors[a].x, 0.0f, 1.0f));
-					sector->ambientCube.colors[a].y = max(sflight, stdMath_Clamp(sector->ambientCube.colors[a].y, 0.0f, 1.0f));
-					sector->ambientCube.colors[a].z = max(sflight, stdMath_Clamp(sector->ambientCube.colors[a].z, 0.0f, 1.0f));
-				}
+				rdAmbient_Scale(&sector->ambientCube, 4.0f * M_PI / total); // integration over sphere
 			}
 #endif
             if ( !sithWorld_Verify(pWorld) )

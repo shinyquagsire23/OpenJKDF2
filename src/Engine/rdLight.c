@@ -82,7 +82,9 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
     int numLights, rdVector3 *verticesEnd, rdVector3 *vertices, float *vertices_i_end, float *vertices_i,
 #ifdef RGB_THING_LIGHTS
 	float* vertices_r, float* vertices_g, float* vertices_b,
-	rdAmbient* ambient, rdMatrix34* mat,
+#endif
+#ifdef RGB_AMBIENT
+	rdAmbient* ambient,
  #endif
 	int numVertices, float scalar)
 {
@@ -177,17 +179,18 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
 			if (outLightsB) *outLightsB = *idkIter;
 
 #ifdef RGB_AMBIENT
-			// unfortunately the ambient cube is in world space, so we need to
-			// transform the normal to world rather than ambient to local
-			rdVector3 worldNormal;
-			rdMatrix_TransformVector34(&worldNormal, vertexNormals, mat);
+			rdVector3 ambientDir;
+			rdVector_Copy3(&ambientDir, vertexNormals);
+
+			//float ambientMul = 1.0f;
 
 			rdVector3 ambientColor;
-			rdAmbient_CalculateVertexColor(ambient, &worldNormal, &ambientColor);
+			rdAmbient_CalculateVertexColor(ambient, &ambientDir, &ambientColor);
 			
-			if (outLightsR) *outLightsR += ambientColor.x;
-			if (outLightsG) *outLightsG += ambientColor.y;
-			if (outLightsB) *outLightsB += ambientColor.z;
+			if (outLightsR) *outLightsR += ambientColor.x;// * ambientMul;
+			if (outLightsG) *outLightsG += ambientColor.y;// * ambientMul;
+			if (outLightsB) *outLightsB += ambientColor.z;// * ambientMul;
+
 #endif
 		#endif
             meshLightIter = meshLights;
@@ -270,11 +273,11 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
 		if (vertices_b) *outLightsB = *vertices_i_end;
 
 #ifdef RGB_AMBIENT
-		rdVector3 worldNormal;
-		rdMatrix_TransformVector34(&worldNormal, vertexNormals, mat);
+		//rdVector3 worldNormal;
+		//dMatrix_TransformVector34(&worldNormal, vertexNormals, mat);
 
 		rdVector3 ambientColor;
-		rdAmbient_CalculateVertexColor(ambient, &worldNormal, &ambientColor);
+		rdAmbient_CalculateVertexColor(ambient, &vertexNormals, &ambientColor);
 
 		if (outLightsR) *outLightsR += ambientColor.x;
 		if (outLightsG) *outLightsG += ambientColor.y;
@@ -411,35 +414,49 @@ void rdAmbient_Zero(rdAmbient* ambient)
 
 void rdAmbient_Acc(rdAmbient* ambient, rdVector3* color, rdVector3* dir)
 {
-	rdVector_Add3Acc(&ambient->colors[dir->x < 0.0f ? 1 : 0], color);
-	rdVector_Add3Acc(&ambient->colors[dir->y < 0.0f ? 3 : 2], color);
-	rdVector_Add3Acc(&ambient->colors[dir->z < 0.0f ? 5 : 4], color);
-	//rdVector_MultAcc3(&ambient->colors[dir->x < 0.0f ? 1 : 0], color, dir->x * dir->x);
-	//rdVector_MultAcc3(&ambient->colors[dir->y < 0.0f ? 3 : 2], color, dir->y * dir->y);
-	//rdVector_MultAcc3(&ambient->colors[dir->z < 0.0f ? 5 : 4], color, dir->z * dir->z);
+	static const float c = 0.282094792;
+	static const float k = 0.488602512;
+	//static const float c = 0.886227;
+	//static const float k = 1.02333;
+	
+	rdVector4 shR, shG, shB;
+	shR.x = shG.x = shB.x = c;
+	shR.y = shG.y = shB.y = -k * dir->y;
+	shR.z = shG.z = shB.z =  k * dir->z;
+	shR.w = shG.w = shB.w = -k * dir->x;
+
+	rdVector_Scale4Acc(&shR, color->x);
+	rdVector_Scale4Acc(&shG, color->y);
+	rdVector_Scale4Acc(&shB, color->z);
+
+	rdVector_Add4Acc(&ambient->r, &shR);
+	rdVector_Add4Acc(&ambient->g, &shG);
+	rdVector_Add4Acc(&ambient->b, &shB);
 }
 
 void rdAmbient_Scale(rdAmbient* ambient, float scale)
 {
-	for(int i = 0; i < 6; ++i)
-		rdVector_Scale3Acc(&ambient->colors[i], scale);
+	rdVector_Scale4Acc(&ambient->r, scale);
+	rdVector_Scale4Acc(&ambient->g, scale);
+	rdVector_Scale4Acc(&ambient->b, scale);
 }
 
 
 void rdAmbient_Lerp(rdAmbient* out, const rdAmbient* ambient0, const rdAmbient* ambient1, float amount)
 {
-	for (int i = 0; i < 6; ++i)
-	{
-		out->colors[i].x = (ambient0->colors[i].x + (ambient1->colors[i].x - ambient0->colors[i].x) * amount);
-		out->colors[i].y = (ambient0->colors[i].y + (ambient1->colors[i].y - ambient0->colors[i].y) * amount);
-		out->colors[i].z = (ambient0->colors[i].z + (ambient1->colors[i].z - ambient0->colors[i].z) * amount);
-	}
+	out->r.x = stdMath_Lerp(ambient0->r.y, ambient1->r.y, amount);
+	out->g.x = stdMath_Lerp(ambient0->g.y, ambient1->g.y, amount);
+	out->b.x = stdMath_Lerp(ambient0->b.y, ambient1->b.y, amount);
+	rdVector_Lerp3(&out->r.y, &ambient0->r.y, &ambient1->r.y, amount);
+	rdVector_Lerp3(&out->g.y, &ambient0->g.y, &ambient1->g.y, amount);
+	rdVector_Lerp3(&out->b.y, &ambient0->b.y, &ambient1->b.y, amount);
 }
 
 void rdAmbient_AddAcc(rdAmbient* out, const rdAmbient* ambient)
 {
-	for (int i = 0; i < 6; ++i)
-		rdVector_Add3Acc(&out->colors[i], &ambient->colors[i]);
+	rdVector_Add4Acc(&out->r, &ambient->r);
+	rdVector_Add4Acc(&out->g, &ambient->g);
+	rdVector_Add4Acc(&out->b, &ambient->b);
 }
 
 void rdAmbient_Copy(rdAmbient* outAmbient, const rdAmbient* ambient)
@@ -450,8 +467,18 @@ void rdAmbient_Copy(rdAmbient* outAmbient, const rdAmbient* ambient)
 void rdAmbient_CalculateVertexColor(rdAmbient* ambient, rdVector3* normal, rdVector3* outColor)
 {
 	rdVector_Zero3(outColor);
-	rdVector_MultAcc3(outColor, &ambient->colors[normal->x < 0.0f ? 1 : 0], normal->x * normal->x);
-	rdVector_MultAcc3(outColor, &ambient->colors[normal->y < 0.0f ? 3 : 2], normal->y * normal->y);
-	rdVector_MultAcc3(outColor, &ambient->colors[normal->z < 0.0f ? 5 : 4], normal->z * normal->z);
+
+	static const float c = 0.282094792;
+	static const float k = 0.488602512;
+
+	rdVector4 shN;
+	shN.x =  c;
+	shN.y = -k * normal->y;
+	shN.z =  k * normal->z;
+	shN.w = -k * normal->x;
+
+	outColor->x = max(0.0f, rdVector_Dot4(&shN, &ambient->r)) / M_PI;
+	outColor->y = max(0.0f, rdVector_Dot4(&shN, &ambient->g)) / M_PI;
+	outColor->z = max(0.0f, rdVector_Dot4(&shN, &ambient->b)) / M_PI;
 }
 #endif
