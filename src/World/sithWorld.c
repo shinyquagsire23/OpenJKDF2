@@ -389,7 +389,13 @@ int sithWorld_NewEntry(sithWorld *pWorld)
 						
 						rdVector_Add3Acc(&sector->ambientRGB, &col);
 
-						rdAmbient_Acc(&sector->ambientCube, &col, &surface->surfaceInfo.face.normal);
+						// we get more directionality by using the vertex to sector center instead of surface normal
+						rdVector3* vertex = &sithWorld_pCurrentWorld->vertices[surface->surfaceInfo.face.vertexPosIdx[k]];
+						rdVector3 dirToCenter;
+						rdVector_Sub3(&dirToCenter, vertex, &pWorld->sectors[i].center);
+						rdVector_Normalize3Acc(&dirToCenter);
+
+						rdAmbient_Acc(&sector->ambientCube, &col, &dirToCenter);
 					}
 				}
 				sflight /= (float)pWorld->sectors[i].numSurfaces;
