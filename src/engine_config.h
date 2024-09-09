@@ -187,7 +187,7 @@
 #ifdef QOL_IMPROVEMENTS
 
 #define RGB_THING_LIGHTS     // RGB thing lighting with lightcolor template param
-#define RGB_AMBIENT          // RGB sector ambient with ambient cube for gouraud models
+#define RGB_AMBIENT          // RGB sector ambient with spherical harmonics for gouraud models
 #define FP_LEGS              // Draws legs in first person
 #define DYNAMIC_POV          // POV enhancements, such as the weapon following the autoaim target, muzzle flashes, sway improvements
 #define DEFERRED_DECALS      // .dcal support and deferred decal rendering path (for blast marks etc)
