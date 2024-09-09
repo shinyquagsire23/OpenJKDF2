@@ -1223,6 +1223,48 @@ void jkPlayer_DrawPov()
 		rdVector_Copy3(&aimVector, &jkSaber_aimVector);
 		rdMatrix_TransformPoint34Acc(&aimVector, &aimMat);
 		sithCamera_currentCamera->rdCam.fnProject(&jkPlayer_crosshairPos, &aimVector);
+
+		if (playerThings[playerThingIdx].povModel.frameTrue != rdroid_frameTrue)
+		{
+			rdPuppet_BuildJointMatrices(&playerThings[playerThingIdx].povModel, &viewMat);
+		}
+
+		// if we have a muzzle node, do muzzle stuff
+		if (jkPlayer_muzzleFlashNode >= 0 && jkPlayer_muzzleFlashNode < playerThings[playerThingIdx].povModel.model3->numHierarchyNodes)
+		{
+			// draw the muzzle flash while the timer is valid
+			if (sithTime_curMs < jkPlayer_drawMuzzleFlash && jkPlayer_povMuzzleFlash.sprite3)
+			{
+				rdMatrix34* muzzleMat = &playerThings[playerThingIdx].povModel.hierarchyNodeMatrices[jkPlayer_muzzleFlashNode];
+				rdSprite_Draw(&jkPlayer_povMuzzleFlash, muzzleMat);
+
+				// add a light for the flash
+				static rdLight muzzleLight;
+				rdLight_NewEntry(&muzzleLight);
+				muzzleLight.intensity = jkPlayer_povMuzzleFlash.sprite3->radius * 2.0f;
+#ifdef RGB_THING_LIGHTS
+				rdMaterial_GetFillColor(&muzzleLight.color, jkPlayer_povMuzzleFlash.sprite3->face.material, jkPlayer_povMuzzleFlash.wallCel);
+				rdVector_Scale3Acc(&muzzleLight.color, 1.0f / muzzleLight.intensity); // compensate for the low intensity/range
+#endif
+				// offset the light so it's on the top of the sprite, not the very center
+				// this is to simulate more of an "area light" of the flash wrapping around the POV model
+				rdVector3 pos;
+				rdVector_Copy3(&pos, &muzzleMat->scale);
+				rdVector_MultAcc3(&pos, &viewMat.uvec, jkPlayer_povMuzzleFlash.sprite3->height);
+				rdCamera_AddLight(rdCamera_pCurCamera, &muzzleLight, &pos);
+			}
+
+			// update the muzzle offset so we can use it in cog for weapon offsets etc
+			// the offset is in the cameras local frame
+			rdMatrix34 muzzleMat;
+			rdMatrix_Copy34(&muzzleMat, &playerThings[playerThingIdx].povModel.hierarchyNodeMatrices[jkPlayer_muzzleFlashNode]);
+			rdMatrix_PostMultiply34(&muzzleMat, &invOrient);
+			rdVector_Copy3(&jkPlayer_muzzleOffset, &muzzleMat.scale);
+		}
+		else
+		{
+			rdVector_Zero3(&jkPlayer_muzzleOffset);
+		}
 #endif
 
         // Moved: see below.
@@ -1235,25 +1277,6 @@ void jkPlayer_DrawPov()
 #endif
         
         rdThing_Draw(&playerThings[playerThingIdx].povModel, &viewMat);
-
-#ifdef DYNAMIC_POV
-		// if we have a muzzle node, do muzzle stuff
-		if(jkPlayer_muzzleFlashNode >= 0 && jkPlayer_muzzleFlashNode < playerThings[playerThingIdx].povModel.model3->numHierarchyNodes)
-		{
-			// draw the muzzle flash
-			if(sithTime_curMs < jkPlayer_drawMuzzleFlash && jkPlayer_povMuzzleFlash.sprite3)
-				rdSprite_Draw(&jkPlayer_povMuzzleFlash, &playerThings[playerThingIdx].povModel.hierarchyNodeMatrices[jkPlayer_muzzleFlashNode]);
-
-			// update the muzzle offset so we can use it in cog
-			// the offset is in the cameras local frame
-			rdMatrix34 muzzleMat;
-			rdMatrix_Copy34(&muzzleMat, &playerThings[playerThingIdx].povModel.hierarchyNodeMatrices[jkPlayer_muzzleFlashNode]);
-			rdMatrix_PostMultiply34(&muzzleMat, &invOrient);
-			rdVector_Copy3(&jkPlayer_muzzleOffset, &muzzleMat.scale);
-		}
-		else
-			rdVector_Zero3(&jkPlayer_muzzleOffset);
-#endif
 
         rdCache_Flush();
 
