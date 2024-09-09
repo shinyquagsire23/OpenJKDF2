@@ -74,37 +74,9 @@ sithThing* sithRender_alphaDrawThing = NULL; // list of things to render after w
 #ifdef RGB_THING_LIGHTS
 void sithRender_GetSaberLightColor(rdVector3* outColor, sithThing* thing)
 {
-	rdVector3 lightColor;
-	rdMaterial* material;
-	int paletteIndex;
-	unsigned int rmask;
-	unsigned int gmask;
-	unsigned int bmask;
-
 	rdVector_Set3(outColor, 1.0f, 1.0f, 1.0f);
-	if (thing->playerInfo && thing->playerInfo->polyline.tipFace.material && thing->playerInfo->polyline.tipFace.material->texinfos)
-	{
-		material = thing->playerInfo->polyline.tipFace.material;
-		paletteIndex = material->texinfos[0]->header.field_4;
-		if (material->tex_format.bpp == 8)
-		{
-			if (rdColormap_pCurMap)
-			{
-				outColor->x = (float)rdColormap_pCurMap->colors[paletteIndex].r / 255.0f;
-				outColor->y = (float)rdColormap_pCurMap->colors[paletteIndex].g / 255.0f;
-				outColor->z = (float)rdColormap_pCurMap->colors[paletteIndex].b / 255.0f;
-			}
-		}
-		else
-		{
-			rmask = (1u << material->tex_format.r_bits) - 1;
-			gmask = (1u << material->tex_format.g_bits) - 1;
-			bmask = (1u << material->tex_format.b_bits) - 1;
-			outColor->x = (float)(((paletteIndex >> material->tex_format.r_shift) & rmask) << material->tex_format.r_bitdiff) / 255.0f;
-			outColor->y = (float)(((paletteIndex >> material->tex_format.g_shift) & gmask) << material->tex_format.g_bitdiff) / 255.0f;
-			outColor->z = (float)(((paletteIndex >> material->tex_format.b_shift) & bmask) << material->tex_format.b_bitdiff) / 255.0f;
-		}
-	}
+	if (thing->playerInfo && thing->playerInfo->polyline.tipFace.material)
+		rdMaterial_GetFillColor(outColor, thing->playerInfo->polyline.tipFace.material, 0);
 }
 #endif
 
