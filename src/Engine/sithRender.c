@@ -754,7 +754,9 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
                         rdMatrix_TransformPoint34(&vertex_out, &thing->actorParams.lightOffset, &thing->lookOrientation);
                         rdVector_Add3Acc(&vertex_out, &thing->position);
                         sithRender_aLights[sithRender_numLights].intensity = thing->actorParams.lightIntensity;
+#ifdef RGB_THING_LIGHTS
 						rdVector_Set3(&sithRender_aLights[sithRender_numLights].color, 1.0f, 1.0f, 1.0f);
+#endif
                         rdCamera_AddLight(rdCamera_pCurCamera, &sithRender_aLights[sithRender_numLights], &vertex_out);
                         lightIdx = ++sithRender_numLights;
                     }
