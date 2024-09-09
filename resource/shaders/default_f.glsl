@@ -2,8 +2,10 @@
 #define HAS_TEXTUREGATHER
 #endif
 
+// todo: set these from outside
 #define CLASSIC_EMISSIVE
 #define DEFERRED_DECALS
+//#define FOG
 
 #ifdef HAS_TEXTUREGATHER
 vec4 impl_textureGather(sampler2D tex, vec2 uv)
@@ -71,6 +73,13 @@ uniform vec4 albedoFactor;
 uniform float displacement_factor;
 uniform float light_mult;
 uniform vec2 iResolution;
+
+#ifdef FOG
+uniform int fogEnabled;
+uniform vec4 fogColor;
+uniform float fogStart;
+uniform float fogEnd;
+#endif
 
 in vec4 f_color;
 in float f_light;
@@ -410,6 +419,17 @@ void main(void)
     {
         color_add_emiss.rgb += sampledEmiss.rgb * 0.1;
     }
+	
+#ifdef FOG
+	if(fogEnabled > 0)
+	{
+		float fog_amount = clamp((originalZ - fogStart) / (fogEnd - fogStart), 0.0, 1.0);
+		fog_amount *= fogColor.a;
+
+		main_color.rgb = mix(main_color.rgb, fogColor.rgb, fog_amount);
+		color_add.rgb = mix(color_add.rgb, fogColor.rgb, fog_amount);
+	}
+	#endif
 
     fragColor = main_color + effectAdd_color;// + color_add;
 
