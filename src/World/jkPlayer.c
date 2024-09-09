@@ -1114,7 +1114,7 @@ void jkPlayer_DrawPov()
 
 		// smooth out crouching and slopes so it's not so static
 		if (player->physicsParams.physflags & SITH_PF_CROUCHING)
-			trans.z -= /*player->physicsParams.povOffset + */ 0.005f;
+			trans.z -= /*player->physicsParams.povOffset + */ 0.0025f;
 #endif
         rdVector_Neg3Acc(&trans);
         rdMatrix_PreTranslate34(&viewMat, &trans);
