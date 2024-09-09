@@ -88,6 +88,7 @@ static float jkPlayer_povAutoAimFov;
 static float jkPlayer_povAutoAimDist;
 static rdVector3 jkPlayer_pushAngles;
 static rdVector3 jkPlayer_muzzleOffset;
+static rdVector3 jkPlayer_weaponWallAngles = {-40.0f, 25.0f, -10.0f };
 
 rdVector3 jkPlayer_crosshairPos;
 int jkPlayer_aimLock = 0;
@@ -1169,15 +1170,19 @@ void jkPlayer_DrawPov()
 				rdMatrix_TransformVector34Acc(&aimVector, &invOrient);
 				rdVector_Zero3(&autoAimMat.scale);
 
-				// if we're very close, lower the weapon
-				static const float aimDist = 0.2f;
+				// if we're very close to a wall or blocker, lower the weapon
+				static const float aimDist = 0.1f;
 				float aimLen = rdVector_Len3(&aimVector);
 				rdVector3 pushAngles = { 0.0f, 0.0f, 0.0f };
 				if(aimLen <= aimDist)
 				{
-					pushAngles.x = -(aimDist - aimLen) * 18.0f / aimDist;
+					float aimDiff = (aimDist - aimLen) / aimDist;
+					rdVector_Scale3(&pushAngles, &jkPlayer_weaponWallAngles, aimDiff);
+
+					// adjust the aim vector to match
+					rdVector_Rotate3Acc(&aimVector, &jkPlayer_pushAngles);
 				}
-				jkPlayer_pushAngles.x = (pushAngles.x - jkPlayer_pushAngles.x) * 8.0f * min(sithTime_deltaSeconds, 0.02f) + jkPlayer_pushAngles.x;
+				rdVector_Lerp3(&jkPlayer_pushAngles, &jkPlayer_pushAngles, &pushAngles, 8.0f * min(sithTime_deltaSeconds, 0.02f));
 				rdMatrix_PreRotate34(&viewMat, &jkPlayer_pushAngles);
 
 				// extract the angles so we can do a lazy interpolation
