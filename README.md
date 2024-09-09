@@ -1,5 +1,8 @@
 # This fork
 This fork introduces a variety of new features and experiments. Among them:
+- Fog (Infernal Machine style)
+- Extra static.jkl loading, allows stacking up to 4 extra static.jkls (mod stacking)
+- Lightsaber trail rendering
 - RGB thing lights (lightcolor template param for things), including lightsaber colored lighting derived from the saber material
 - RGB ambient lighting, including directional ambient cube for gouraud shaded models
 - First person legs
