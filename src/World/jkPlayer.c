@@ -887,6 +887,13 @@ void jkPlayer_PovModelCallback(sithThing* thing, int track, uint32_t markerId)
 	{
 		// enable/disable
 		jkPlayer_drawMuzzleFlash = sithTime_curMs + 50; // 50ms
+		
+		// randomize the cel
+		if(jkPlayer_povMuzzleFlash.sprite3 && jkPlayer_povMuzzleFlash.sprite3->face.material)
+		{
+			int celCount = jkPlayer_povMuzzleFlash.sprite3->face.material->num_texinfo;
+			jkPlayer_povMuzzleFlash.wallCel = min(_frand() * celCount, celCount - 1);
+		}
 	}
 }
 
