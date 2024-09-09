@@ -881,11 +881,12 @@ static int jkPlayer_drawMuzzleFlash = 0;
 static int jkPlayer_muzzleFlashNode = -1;
 static rdThing jkPlayer_povMuzzleFlash;
 static rdSprite* jkPlayer_povMuzzleFlashSprite;
-void jkPlayer_PovModelCallback(sithThing* thing, int track, uint32_t a3)
+void jkPlayer_PovModelCallback(sithThing* thing, int track, uint32_t markerId)
 {
-	if(thing == playerThings[playerThingIdx].actorThing)
+	if(thing == playerThings[playerThingIdx].actorThing && markerId == 3)
 	{
-		jkPlayer_drawMuzzleFlash = (a3 == 4) ? 1 : 0;
+		// enable/disable
+		jkPlayer_drawMuzzleFlash = sithTime_curMs + 50; // 50ms
 	}
 }
 
@@ -1233,7 +1234,7 @@ void jkPlayer_DrawPov()
 		if(jkPlayer_muzzleFlashNode >= 0 && jkPlayer_muzzleFlashNode < playerThings[playerThingIdx].povModel.model3->numHierarchyNodes)
 		{
 			// draw the muzzle flash
-			if(jkPlayer_drawMuzzleFlash && jkPlayer_povMuzzleFlash.sprite3)
+			if(sithTime_curMs < jkPlayer_drawMuzzleFlash && jkPlayer_povMuzzleFlash.sprite3)
 				rdSprite_Draw(&jkPlayer_povMuzzleFlash, &playerThings[playerThingIdx].povModel.hierarchyNodeMatrices[jkPlayer_muzzleFlashNode]);
 
 			// update the muzzle offset so we can use it in cog
