@@ -45,6 +45,13 @@ static rdModel3* lightDebugThing_model3 = NULL;
 static rdMatrix34 lightDebugThing_mat;
 static int lightDebugNum = 0;
 #endif
+#ifdef RGB_AMBIENT
+#if 0
+static rdThing* ambientDebugThing = NULL;
+static rdModel3* ambientDebugThing_model3 = NULL;
+static rdMatrix34 ambientDebugThing_mat;
+#endif
+#endif
 
 sithRender_weapRendFunc_t sithRender_weaponRenderOpaqueHandle;
 sithRender_weapRendFunc_t sithRender_weaponRenderAlphaHandle;
@@ -312,6 +319,49 @@ void sithRender_RenderDebugLights()
 }
 #endif
 
+#ifdef RGB_AMBIENT
+
+void sithRender_RenderDebugAmbient(rdVector3* pos)
+{
+#if 0
+	ambientDebugThing->curLightMode = RD_LIGHTMODE_GOURAUD;
+	ambientDebugThing->geosetSelect = 0;
+	ambientDebugThing_model3->geosetSelect = 0;
+	ambientDebugThing->frameTrue = 0;
+
+	rdMatrix_Identity34(&ambientDebugThing_mat);
+	rdVector_Copy3(&ambientDebugThing_mat.scale, pos);
+	rdThing_Draw(ambientDebugThing, &ambientDebugThing_mat);
+#endif
+}
+
+void sithRender_RenderDebugAmbientCubes()
+{
+#if 0
+	if (!sithRender_numSectors)
+		return;
+	sithRender_numLights = 0;
+	rdCamera_ClearLights(rdCamera_pCurCamera);
+
+	for (int k = 0; k < sithRender_numSectors; k++)
+	{
+		sithSector* sectorIter = sithRender_aSectors[k];
+
+		rdVector3 ambientRGB;
+		ambientRGB.x = 0.01f;
+		ambientRGB.y = 0.01f;
+		ambientRGB.z = 0.01f;
+		rdCamera_SetAmbientLight(rdCamera_pCurCamera, &ambientRGB);
+		rdCamera_SetAmbientCube(rdCamera_pCurCamera, &sectorIter->ambientCube);
+
+		sithRender_RenderDebugAmbient(&sectorIter->center);//.dominantDir);
+	}
+	rdCache_Flush();
+#endif
+}
+
+#endif
+
 int sithRender_Startup()
 {
     rdMaterial_RegisterLoader(sithMaterial_LoadEntry);
@@ -365,6 +415,16 @@ int sithRender_Open()
     rdMatrix_Identity34(&lightDebugThing_mat);
 #endif
 #endif
+
+#ifdef RGB_AMBIENT
+#if 0
+	ambientDebugThing = rdThing_New(NULL);
+	if (!ambientDebugThing_model3)
+		ambientDebugThing_model3 = rdModel3_New("dflt2.3DO");
+	rdThing_SetModel3(ambientDebugThing, ambientDebugThing_model3);
+	rdMatrix_Identity34(&ambientDebugThing_mat);
+#endif
+#endif
     
     return 1;
 }
@@ -374,6 +434,13 @@ void sithRender_Close()
     // Added: Light debug
     //rdModel3_Free(lightDebugThing_model3); // TODO figure out weird free issues
     //rdThing_Free(lightDebugThing);
+
+#ifdef RGB_AMBIENT
+#if 0
+	rdModel3_Free(ambientDebugThing_model3);
+	rdThing_Free(ambientDebugThing);
+#endif
+#endif
 
     sithRenderSky_Close();
 }
@@ -617,6 +684,9 @@ void sithRender_Draw()
     rdSetCullFlags(3);
 #ifdef QOL_IMPROVEMENTS
     sithRender_RenderDebugLights();
+#endif
+#ifdef RGB_AMBIENT
+	sithRender_RenderDebugAmbientCubes();
 #endif
 }
 
