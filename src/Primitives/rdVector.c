@@ -710,3 +710,14 @@ void rdVector_Lerp3(rdVector3* out, rdVector3* a, rdVector3* b, float f)
 	out->y = stdMath_Lerp(a->y, b->y, f);
 	out->z = stdMath_Lerp(a->z, b->z, f);
 }
+
+void rdVector_Project3(rdVector3* out, rdVector3* p, rdVector3* o, rdVector3* n)
+{
+	rdVector3 v;
+	rdVector_Sub3(&v, p, o);
+
+	float dist = rdVector_Dot3(&v, n);
+
+	rdVector_Copy3(out, p);
+	rdVector_MultAcc3(out, n, -dist);
+}

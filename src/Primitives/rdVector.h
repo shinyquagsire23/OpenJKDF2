@@ -137,5 +137,6 @@ void rdVector_ClampValue3(rdVector3* v, float val);
 void rdVector_Reflect3(rdVector3* v, const rdVector3* incidentVec, const rdVector3* normal);
 void rdVector_Average3(rdVector3* out, rdVector3* a, rdVector3* b, rdVector3* c);
 void rdVector_Lerp3(rdVector3* out, rdVector3* a, rdVector3* b, float f);
+void rdVector_Project3(rdVector3* out, rdVector3* p, rdVector3* o, rdVector3* n);
 
 #endif // _RDVECTOR_H
