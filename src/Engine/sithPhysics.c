@@ -1144,30 +1144,47 @@ float sithPhysics_ragdollRotFricThreshold = 35.0f;
 
 int sithPhysics_CollideRagdollParticle(sithSector* sector, sithThing* pThing, rdVector3* pos, rdVector3* dir, float radius, rdVector3* hitNormOut)
 {
+	// create a dummy thing for our node
+	sithThing thing;
+	sithThing_DoesRdThingInit(&thing);
+	thing.thingIdx = -1;
+	thing.signature = -1;
+	thing.thing_id = -1;
+	thing.position = *pos;
+	rdMatrix_BuildFromLook34(&thing.lookOrientation, dir);
+	rdVector_Zero3(&thing.lookOrientation.scale);
+	sithThing_EnterSector(&thing, sector, 1, 0);
+	thing.type = SITH_THING_ACTOR;
+	thing.collide = 1;
+	thing.moveSize = thing.collideSize = radius * 4.0f;
+
+	int result = 0;
 	rdVector3 dirNorm;
 	float dirLen = rdVector_Normalize3(&dirNorm, dir);
-	sithCollision_SearchRadiusForThings(sector, pThing, pos, &dirNorm, dirLen, radius, RAYCAST_1 | RAYCAST_2);
+	sithCollision_SearchRadiusForThings(sector, pThing, pos, &dirNorm, dirLen, radius, RAYCAST_2000 | RAYCAST_800 | RAYCAST_2);
 	for (sithCollisionSearchEntry* pEntry = sithCollision_NextSearchResult(); pEntry; pEntry = sithCollision_NextSearchResult())
 	{
 		if ((pEntry->hitType & SITHCOLLISION_WORLD) != 0)
 		{
 			rdVector_Copy3(hitNormOut, &pEntry->hitNorm);
-			sithCollision_SearchClose();
-			return 1;
+			result = 1;
+			break;
 		}
 		if ((pEntry->hitType & SITHCOLLISION_THING) != 0)
 		{
 			if (pEntry->receiver != pThing && pEntry->sender)
 			{
 				rdVector_Copy3(hitNormOut, &pEntry->hitNorm);
-				sithCollision_SearchClose();
-				return 1;
+				result = 1;
+				break;
 			}
 		}
 	}
+	sithThing_LeaveSector(&thing);
+
 	rdVector_Zero3(hitNormOut);
 	sithCollision_SearchClose();
-	return 0;
+	return result;
 }
 
 void sithPhysics_UpdateRagdollPositions(sithSector* sector, sithThing* pThing, rdRagdoll* pRagdoll, float deltaSeconds)
