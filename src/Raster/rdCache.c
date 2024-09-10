@@ -26,7 +26,7 @@ rdVector3 rdCache_aVerticesVS[RDCACHE_MAX_VERTICES] = { 0 };
 rdVector3 rdCache_aDecalColors[256];
 rdMatrix34 rdCache_aDecalMatrices[256];
 rdDecal* rdCache_aDecals[256];
-float rdCache_aDecalScales[256];
+rdVector3 rdCache_aDecalScales[256];
 float rdCache_aDecalAngleFades[256];
 int rdCache_numDecals;
 
@@ -1442,7 +1442,7 @@ int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags)
 }
 
 #ifdef DEFERRED_DECALS
-void rdCache_DrawDecal(rdDecal* decal, rdMatrix34* matrix, rdVector3* color, float scale, float angleFade)
+void rdCache_DrawDecal(rdDecal* decal, rdMatrix34* matrix, rdVector3* color, rdVector3* scale, float angleFade)
 {
 	if (rdCache_numDecals >= 256)
 	{
@@ -1460,7 +1460,7 @@ void rdCache_DrawDecal(rdDecal* decal, rdMatrix34* matrix, rdVector3* color, flo
 	rdCache_aDecals[rdCache_numDecals] = decal;
 	rdMatrix_Copy34(&rdCache_aDecalMatrices[rdCache_numDecals], matrix);
 	rdVector_Copy3(&rdCache_aDecalColors[rdCache_numDecals], color);
-	rdCache_aDecalScales[rdCache_numDecals] = scale;
+	rdCache_aDecalScales[rdCache_numDecals] = *scale;
 	rdCache_aDecalAngleFades[rdCache_numDecals] = angleFade;
 	++rdCache_numDecals;
 }
@@ -1484,7 +1484,9 @@ void rdCache_FlushDecals()
 
 		// apply the size
 		rdVector3 size;
-		rdVector_Scale3(&size, &decal->size, rdCache_aDecalScales[i]);
+		size.x = decal->size.x * rdCache_aDecalScales[i].x;
+		size.y = decal->size.y * rdCache_aDecalScales[i].y;
+		size.z = decal->size.z * rdCache_aDecalScales[i].z;
 		rdMatrix_PreScale34(&decalMatrix, &size);
 
 		// transform it to view space

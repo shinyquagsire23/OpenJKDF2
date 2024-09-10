@@ -181,6 +181,7 @@ int rdThing_SetDecal(rdThing* thing, rdDecal* decal)
 {
 	thing->type = RD_THINGTYPE_DECAL;
 	thing->decal = decal;
+	thing->decalScale.x = thing->decalScale.y = thing->decalScale.z = 1.0f;
 }
 #endif
 

@@ -2307,6 +2307,7 @@ typedef struct rdThing
 #endif
 #ifdef DEFERRED_DECALS
 	uint32_t createMs;
+	rdVector3 decalScale;
 #endif
     uint32_t wallCel;
     uint32_t geosetSelect;
