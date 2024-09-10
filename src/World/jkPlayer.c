@@ -92,6 +92,11 @@ static rdVector3 jkPlayer_weaponWallAngles = {-40.0f, 25.0f, -10.0f };
 
 rdVector3 jkPlayer_crosshairPos;
 int jkPlayer_aimLock = 0;
+
+static int jkPlayer_drawMuzzleFlash = 0;
+static int jkPlayer_muzzleFlashNode = -1;
+static rdThing jkPlayer_povMuzzleFlash;
+static rdSprite* jkPlayer_povMuzzleFlashSprite;
 #endif
 
 #ifdef FIXED_TIMESTEP_PHYS
@@ -287,11 +292,16 @@ void jkPlayer_ResetVars()
 	rdVector_Zero3(&jkPlayer_idleWaggleVec);
 	rdVector_Zero3(&jkPlayer_pushAngles);
 	rdVector_Zero3(&jkPlayer_muzzleOffset);
+	rdVector_Zero3(&jkPlayer_crosshairPos);
 	jkPlayer_idleWaggleSpeed = 0.0f;
 	jkPlayer_idleWaggleSmooth = 0.0f;
 	jkPlayer_aimLock = 0;
 	jkPlayer_povAutoAimFov = 0.0f;
 	jkPlayer_povAutoAimDist = 0.0f;
+	jkPlayer_drawMuzzleFlash = 0;
+	jkPlayer_muzzleFlashNode = -1;
+	rdThing_FreeEntry(&jkPlayer_povMuzzleFlash);
+	jkPlayer_povMuzzleFlashSprite = NULL;
 #endif
 
 #ifdef FIXED_TIMESTEP_PHYS
@@ -877,10 +887,6 @@ int jkPlayer_ReadConf(wchar_t *name)
 }
 
 #ifdef DYNAMIC_POV
-static int jkPlayer_drawMuzzleFlash = 0;
-static int jkPlayer_muzzleFlashNode = -1;
-static rdThing jkPlayer_povMuzzleFlash;
-static rdSprite* jkPlayer_povMuzzleFlashSprite;
 void jkPlayer_PovModelCallback(sithThing* thing, int track, uint32_t markerId)
 {
 	if(thing == playerThings[playerThingIdx].actorThing && markerId == 3)
