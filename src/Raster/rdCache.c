@@ -1494,14 +1494,14 @@ void rdCache_FlushDecals()
 		// project the decal box
 		rdVector3 verts[8] =
 		{
-			{ -1.0f, -1.0f,  1.0f },
-			{  1.0f, -1.0f,  1.0f },
-			{  1.0f,  1.0f,  1.0f },
-			{ -1.0f,  1.0f,  1.0f },
-			{ -1.0f, -1.0f, -1.0f },
-			{  1.0f, -1.0f, -1.0f },
-			{  1.0f,  1.0f, -1.0f },
-			{ -1.0f,  1.0f, -1.0f }
+			{ -0.5f, -0.5f,  0.5f },
+			{  0.5f, -0.5f,  0.5f },
+			{  0.5f,  0.5f,  0.5f },
+			{ -0.5f,  0.5f,  0.5f },
+			{ -0.5f, -0.5f, -0.5f },
+			{  0.5f, -0.5f, -0.5f },
+			{  0.5f,  0.5f, -0.5f },
+			{ -0.5f,  0.5f, -0.5f }
 		};
 
 		float inv = 1.0 / rdCamera_pCurCamera->pClipFrustum->field_0.z;
