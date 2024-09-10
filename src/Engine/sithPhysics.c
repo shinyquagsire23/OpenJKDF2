@@ -1161,7 +1161,7 @@ int sithPhysics_CollideRagdollParticle(sithSector* sector, sithThing* pThing, rd
 	int result = 0;
 	rdVector3 dirNorm;
 	float dirLen = rdVector_Normalize3(&dirNorm, dir);
-	sithCollision_SearchRadiusForThings(sector, pThing, pos, &dirNorm, dirLen, radius, RAYCAST_2000 | RAYCAST_800 | RAYCAST_2);
+	sithCollision_SearchRadiusForThings(sector, &thing, pos, &dirNorm, dirLen, radius, RAYCAST_2000 | RAYCAST_800 | RAYCAST_2);
 	for (sithCollisionSearchEntry* pEntry = sithCollision_NextSearchResult(); pEntry; pEntry = sithCollision_NextSearchResult())
 	{
 		if ((pEntry->hitType & SITHCOLLISION_WORLD) != 0)
