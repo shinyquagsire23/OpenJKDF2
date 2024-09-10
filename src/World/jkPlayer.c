@@ -1028,7 +1028,7 @@ void jkPlayer_DrawPov()
 			static float lastPitch = 0.0f;
 			float lerpPitch = (player->actorParams.eyePYR.x - lastPitch);
 			jkSaber_rotateVec.x -= lerpPitch * 0.2f;
-			lastPitch = lastPitch + lerpPitch * 0.1f;
+			lastPitch = lastPitch + lerpPitch * 0.2f;
 			//jkSaber_rotateVec.x -= player->actorParams.eyePYR.x * 0.06f;
 
 			rdMatrix_BuildRotate34(&rotateMatNoWaggle, &jkSaber_rotateVec);
