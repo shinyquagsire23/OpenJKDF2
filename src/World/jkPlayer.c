@@ -915,6 +915,7 @@ void jkPlayer_SetPovSprite(jkPlayerInfo* info, rdSprite* sprite)
 		if (sprite)
 			rdThing_SetSprite3(&jkPlayer_povMuzzleFlash, sprite);
 	}
+	jkPlayer_drawMuzzleFlash = 0;
 }
 #endif
 
@@ -930,6 +931,7 @@ void jkPlayer_SetPovModel(jkPlayerInfo *info, rdModel3 *model)
 
 #ifdef DYNAMIC_POV
 		jkPlayer_muzzleFlashNode = -1;
+		jkPlayer_drawMuzzleFlash = 0;
 #endif
 
         // Added: nullptr check, for fixing UAF on second world load
