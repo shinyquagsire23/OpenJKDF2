@@ -3826,10 +3826,10 @@ void std3D_Screenshot(const char* pFpath)
 #ifdef TARGET_CAN_JKGM
     if (!std3D_pFb) return;
 
-    uint8_t* data = malloc(std3D_pFb->w * std3D_pFb->h * 3 * sizeof(uint8_t));
+    uint8_t* data = malloc(std3D_pFb->window.w * std3D_pFb->window.h * 3 * sizeof(uint8_t));
     glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->window.fbo);
-    glReadPixels(0, 0, std3D_pFb->w, std3D_pFb->h, GL_RGB, GL_UNSIGNED_BYTE, data);
-    jkgm_write_png(pFpath, std3D_pFb->w, std3D_pFb->h, data);
+    glReadPixels(0, 0, std3D_pFb->window.w, std3D_pFb->window.h, GL_RGB, GL_UNSIGNED_BYTE, data);
+    jkgm_write_png(pFpath, std3D_pFb->window.w, std3D_pFb->window.h, data);
     free(data);
 #endif
 }
