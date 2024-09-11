@@ -351,6 +351,16 @@ void jkPlayer_Shutdown()
             playerThings[i].polylineThing.model3 = 0;
         }
 
+#ifdef LIGHTSABER_TRAILS
+		rdSprite_FreeEntry(&playerThings[i].glowSprite); // Added: prevent memleak
+
+		if (playerThings[i].glowSpriteThing.sprite3)
+		{
+			rdThing_FreeEntry(&playerThings[i].glowSpriteThing);
+			playerThings[i].glowSpriteThing.sprite3 = 0;
+		}
+#endif
+
         rdThing_FreeEntry(&playerThings[i].povModel); // Added: prevent memleak
 
         rdThing_FreeEntry(&playerThings[i].rd_thing); // Added: fix memleak
@@ -363,6 +373,10 @@ void jkPlayer_Shutdown()
         {
             rdThing_FreeEntry(&jkPlayer_otherThings[i].polylineThing);
             jkPlayer_otherThings[i].polylineThing.model3 = 0;
+#ifdef LIGHTSABER_TRAILS
+			rdThing_FreeEntry(&jkPlayer_otherThings[i].glowSpriteThing);
+			jkPlayer_otherThings[i].glowSpriteThing.sprite3 = 0;
+#endif
         }
     }
     _memset(jkPlayer_otherThings, 0, sizeof(jkPlayer_otherThings));
@@ -377,6 +391,16 @@ void jkPlayer_Shutdown()
             rdThing_FreeEntry(&jkPlayer_otherThings[i].polylineThing);
             jkPlayer_aMotsInfos[i].polylineThing.model3 = 0;
         }
+
+#ifdef LIGHTSABER_TRAILS
+		rdSprite_FreeEntry(&jkPlayer_aMotsInfos[i].glowSprite); // Added: prevent memleak
+
+		if (jkPlayer_aMotsInfos[i].glowSpriteThing.sprite3)
+		{
+			rdThing_FreeEntry(&playerThings[i].glowSpriteThing);
+			jkPlayer_aMotsInfos[i].glowSpriteThing.sprite3 = 0;
+		}
+#endif
 
         rdThing_FreeEntry(&jkPlayer_aMotsInfos[i].povModel); // Added: prevent memleak
 
@@ -1244,7 +1268,7 @@ void jkPlayer_DrawPov()
 			if (sithTime_curMs < jkPlayer_drawMuzzleFlash && jkPlayer_povMuzzleFlash.sprite3)
 			{
 				rdMatrix34* muzzleMat = &playerThings[playerThingIdx].povModel.hierarchyNodeMatrices[jkPlayer_muzzleFlashNode];
-				rdSprite_Draw(&jkPlayer_povMuzzleFlash, muzzleMat);
+				rdSprite_Draw(&jkPlayer_povMuzzleFlash, muzzleMat, 0);
 
 				// add a light for the flash
 				static rdLight muzzleLight;

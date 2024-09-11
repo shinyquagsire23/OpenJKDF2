@@ -2702,7 +2702,7 @@ void std3D_DrawRenderList()
 	{
 		{
 			glUniform1i(uniform_blend_mode, D3DBLEND_ONE);
-			glBlendFunc(GL_ONE, GL_ONE);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 		}
 	}
 	else
@@ -2770,8 +2770,8 @@ void std3D_DrawRenderList()
 			if (changed_flags & 0x80000)
 			{
 				{
-					glUniform1i(uniform_blend_mode, D3DBLEND_ONE);
-					glBlendFunc(GL_ONE, GL_ONE);
+					glUniform1i(uniform_blend_mode, D3DBLEND_SRCALPHA);
+					glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 				}
 			}
 			else
@@ -3132,9 +3132,9 @@ void std3D_DrawDecalList()
 		glUniform1ui(decal_uniform_flags, decal_flags[i]);
 		glUniform1f(decal_uniform_angle, decal_angle_fades[i]);
 
-		if(decal_flags[i] & RD_DECAL_ADD)
-			glBlendFunc(GL_ONE, GL_ONE);
-		else
+		//if(decal_flags[i] & RD_DECAL_ADD)
+		//	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		//else
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		if(decal_flags[i] & RD_DECAL_INSIDE)
