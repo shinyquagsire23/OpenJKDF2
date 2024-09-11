@@ -2994,7 +2994,7 @@ void std3D_DrawDecalList()
 
 		glUniformMatrix4fv(decal_uniform_mvp, 1, GL_FALSE, d3dmat);
 		glViewport(0, 0, width, height);
-		glUniform2f(decal_uniform_iResolution, std3D_pFb->window.iw, std3D_pFb->window.ih);
+		glUniform2f(decal_uniform_iResolution, width, height);
 	}
 
 	// triangle indices
