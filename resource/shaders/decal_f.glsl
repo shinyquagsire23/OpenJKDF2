@@ -242,7 +242,7 @@ void main(void)
 	}
 
 	vec4 emissive = vec4(0.0, 0.0, 0.0, 1.0);
-	if(flag2)
+	if(!flag2)
 	{
 		vec3 light = texture(texLight, uv).xyz;
 		sampled_color.rgb *= light.rgb;
