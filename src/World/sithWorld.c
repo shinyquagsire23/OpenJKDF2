@@ -730,13 +730,13 @@ uint32_t sithWorld_CalcChecksum(sithWorld *pWorld, uint32_t seed)
     }
     
 #ifdef STATIC_JKL_EXT
-	for (int i = 0; i < ARRAY_SIZE(sithWorld_pStaticWorlds); ++i)
+	for (int k = 0; k < ARRAY_SIZE(sithWorld_pStaticWorlds); ++k)
 	{
-		if (sithWorld_pStaticWorlds[i])
+		if (sithWorld_pStaticWorlds[k])
 		{
-			for (uint32_t i = 0; i < sithWorld_pStaticWorlds[i]->numCogsLoaded; i++)
+			for (uint32_t i = 0; i < sithWorld_pStaticWorlds[k]->numCogsLoaded; i++)
 			{
-				hash = util_Weirdchecksum((uint8_t*)sithWorld_pStaticWorlds[i]->cogScripts[i].script_program, sithWorld_pStaticWorlds[i]->cogScripts[i].codeSize, hash);
+				hash = util_Weirdchecksum((uint8_t*)sithWorld_pStaticWorlds[k]->cogScripts[i].script_program, sithWorld_pStaticWorlds[k]->cogScripts[i].codeSize, hash);
 			}
 		}
 	}
