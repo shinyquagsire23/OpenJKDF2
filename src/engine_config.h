@@ -77,6 +77,12 @@
 #define SITH_MAX_VISIBLE_ALPHA_SURFACES (1024)
 #endif // QOL_IMPROVEMENTS
 
+#if !defined(QOL_IMPROVEMENTS) || defined(TARGET_TWL)
+#define SITHREND_NUM_LIGHTS (32) // why is this different than the max in rdCamera?
+#else
+#define SITHREND_NUM_LIGHTS (64)
+#endif
+
 // COG resource limits
 #if defined(QOL_IMPROVEMENTS) && !defined(TARGET_TWL)
 #define SITHCOGVM_MAX_STACKSIZE (0x10000)
@@ -176,6 +182,12 @@
 #endif
 
 #define SITHPARTICLE_MAX_PARTICLES (64)
+
+#if !defined(QOL_IMPROVEMENTS) || defined(TARGET_TWL)
+#define RDCAMERA_MAX_LIGHTS 64
+#else
+#define RDCAMERA_MAX_LIGHTS 128
+#endif
 
 #ifdef SDL2_RENDER
 #define JOYSTICK_MAX_STRS (6)

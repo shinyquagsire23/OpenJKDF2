@@ -59,8 +59,6 @@ void sithRender_WorldFlash(float arg1,float arg2);
 // Added
 void sithRender_RenderDebugLight(float intensity, rdVector3* pos);
 
-#define SITHREND_NUM_LIGHTS (32)
-
 static void (*sithRender_Clip_)(sithSector *sector, rdClipFrustum *frustumArg, float a3) = (void*)sithRender_Clip_ADDR;
 static void (*sithRender_UpdateLights_)(sithSector *sector, float a2, float dist) = (void*)sithRender_UpdateLights_ADDR;
 static void (*sithRender_RenderDynamicLights_)() = (void*)sithRender_RenderDynamicLights_ADDR;

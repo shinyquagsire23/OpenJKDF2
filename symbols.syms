@@ -69,7 +69,7 @@ sithRender_f_82F4B0 0x0082F4B0 float = 0.0
 sithRender_idxInfo 0x0082F648 rdVertexIdxInfo
 meshinfo_out 0x0082F490 rdMeshinfo
 sithRender_weaponRenderHandle 0x00831998 sithRender_weapRendFunc_t
-sithRender_aLights 0x0082F668 rdLight[32]
+sithRender_aLights 0x0082F668 rdLight[SITHREND_NUM_LIGHTS]
 sithRender_aSectors 0x0082F110 sithSector*[SITH_MAX_VISIBLE_SECTORS]
 sithRender_clipFrustums 0x0082FEF0 rdClipFrustum[SITH_MAX_VISIBLE_SECTORS]
 sithRender_aSectors2 0x0082FC68 sithSector*[SITH_MAX_VISIBLE_SECTORS_2+2]

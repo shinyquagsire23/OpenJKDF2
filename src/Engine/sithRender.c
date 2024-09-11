@@ -236,7 +236,7 @@ void sithRender_RenderDebugLights()
     //unsigned int v24; // [esp+8h] [ebp-13Ch]
     sithSector **aSectorIter; // [esp+Ch] [ebp-138h]
     float attenuationMax; // [esp+40h] [ebp-104h]
-    rdLight *tmpLights[64]; // [esp+44h] [ebp-100h] BYREF
+    rdLight *tmpLights[RDCAMERA_MAX_LIGHTS]; // [esp+44h] [ebp-100h] BYREF
 
     if (!sithRender_numSectors)
         return;
@@ -1819,7 +1819,7 @@ void sithRender_RenderDynamicLights()
     sithSector *sectorIter;
     rdLight **curCamera_lights;
     unsigned int numSectorLights;
-    rdLight *tmpLights[64];
+    rdLight *tmpLights[RDCAMERA_MAX_LIGHTS];
 
     if (!sithRender_numSectors)
         return;

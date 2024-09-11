@@ -526,8 +526,8 @@ typedef struct rdCamera
     float ambientLight;
 #endif
     int numLights;
-    rdLight* lights[64];
-    rdVector3 lightPositions[64];
+    rdLight* lights[RDCAMERA_MAX_LIGHTS];
+    rdVector3 lightPositions[RDCAMERA_MAX_LIGHTS];
     float attenuationMin;
     float attenuationMax;
 } rdCamera;
