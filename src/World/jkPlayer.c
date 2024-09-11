@@ -1317,7 +1317,7 @@ void jkPlayer_DrawPov()
 #ifdef SDL2_RENDER
         if (playerThings[playerThingIdx].actorThing->jkFlags & JKFLAG_SABERON)
         {
-            rdSetZBufferMethod(RD_ZBUFFER_READ_NOWRITE);
+            //rdSetZBufferMethod(RD_ZBUFFER_READ_NOWRITE);
 			rdSetSortingMethod(2);
             jkSaber_Draw(&viewMat);
         }

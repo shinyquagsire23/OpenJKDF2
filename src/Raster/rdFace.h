@@ -22,7 +22,10 @@ enum RdFaceFlag // Polygon face flags i.e face type -> 3DO & SithSurface
     RD_FF_FOG_ENABLED = 0x100, // Jones specific
     RD_FF_3DO_WHIP_AIM = 0x200, // Jones specific
 #ifdef ADDITIVE_BLEND
-	RD_FF_ADDITIVE = 0x400
+	RD_FF_ADDITIVE = 0x400,
+#endif
+#ifdef VERTEX_COLORS
+	RD_FF_VERTEX_COLORS = 0x800,
 #endif
 };
 
