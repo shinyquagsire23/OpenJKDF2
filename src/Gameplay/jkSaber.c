@@ -28,6 +28,11 @@ float jkSaber_trailCutoff = 0.01f;
 float jkSaber_trailShutter = 50.0f;
 #endif
 
+#ifdef LIGHTSABER_MARKS
+extern sithThing* jkSaber_paDecalThings[256];
+extern int jkSaber_numDecalThings;
+#endif
+
 #define JKSABER_EXTENDTIME (0.3000000)
 
 void jkSaber_InitializeSaberInfo(sithThing *thing, char *material_side_fname, char *material_tip_fname, float base_rad, float tip_rad, float len, sithThing *wall_sparks, sithThing *blood_sparks, sithThing *saber_sparks)
@@ -531,6 +536,165 @@ void  jkSaber_UpdateCollision2(sithThing *pPlayerThing,rdVector3 *pSaberPos,rdVe
     sithCollision_SearchClose();
 }
 
+#ifdef LIGHTSABER_MARKS
+// Added: passive (non-damaging) collision effects
+void jkSaber_SpawnBurn(jkPlayerInfo* pPlayerInfo, rdVector3* pPos, rdVector3* pHitNormal, sithSector* pSector, int sparkType)
+{
+	if (sithTime_curMs < pPlayerInfo->lastMarkSpawnMs + 50)
+		return;
+
+	// todo: skip these for now until we figure out how best to approach them
+	if (sparkType == SPARKTYPE_BLOOD)
+	{
+		return;
+	}
+	else if (sparkType == SPARKTYPE_SABER)
+	{
+		return;
+	}
+
+	// if we don't have a last mark, or we made a huge movement, also spawn sparks
+	if (!pPlayerInfo->lastSaberMark || rdVector_DistSquared3(pPos, &pPlayerInfo->lastSaberMark->position) > 0.004f)
+	{
+		jkSaber_SpawnSparks(pPlayerInfo, pPos, pSector, SPARKTYPE_WALL);
+	}
+
+	// no decals? fo'get abouuut'it
+	if(!jkPlayer_enableDecals)
+		return;
+
+	// todo: some way of setting this template param
+	sithThing* pTemplate = sithTemplate_GetEntryByName("+sbrmrk");
+	if (pTemplate)
+	{
+		rdMatrix34 axis; // orientation of the decal
+		float markLen = 1.0f; // width scale of the decal
+
+		if(pPlayerInfo->lastSaberMark)
+		{
+			// project the positions onto the hit plane
+			rdVector3 projPos, lastProjPos;
+			rdVector_Project3(&projPos, pPos, pPos, pHitNormal);
+			rdVector_Project3(&lastProjPos, &pPlayerInfo->lastSaberMarkPos, pPos, pHitNormal);
+
+			// facing the normal direction
+			rdVector_Copy3(&axis.lvec, pHitNormal);
+			rdVector_Normalize3Acc(&axis.lvec);
+			
+			// right vector aligned to the slash direction
+			rdVector_Sub3(&axis.rvec, &lastProjPos, &projPos);
+			markLen = rdVector_Normalize3Acc(&axis.rvec);
+			
+			// get the up vector
+			rdVector_Cross3(&axis.uvec, &axis.lvec, &axis.rvec);
+				
+			// place the decal in the middle
+			rdVector_Add3(&axis.scale, pPos, &pPlayerInfo->lastSaberMarkPos);
+			rdVector_Scale3Acc(&axis.scale, 0.5f);
+		}
+		else
+		{
+			// no previous mark, start fresh
+			rdMatrix_BuildFromLook34(&axis, pHitNormal);
+			rdVector_Copy3(&axis.scale, pPos);
+		}
+
+
+		// make sure we recycle things otherwise we risk running out of them frequently
+		int decalIdx = (jkSaber_numDecalThings++ % 256);
+		if (jkSaber_paDecalThings[decalIdx])
+		{
+			sithThing_Destroy(jkSaber_paDecalThings[decalIdx]);
+			jkSaber_paDecalThings[decalIdx] = 0;
+		}
+
+		sithThing* pSpawned = sithThing_Create(pTemplate, &axis.scale, &axis, pSector, 0);
+		if (pSpawned)
+		{
+			jkSaber_paDecalThings[decalIdx] = pSpawned;
+
+			pSpawned->prev_thing = pPlayerInfo->actorThing;
+			pPlayerInfo->lastMarkSpawnMs = sithTime_curMs;
+			pSpawned->child_signature = pPlayerInfo->actorThing->signature;
+
+			// adjust the size of the decal (template should be a decal) so it spans the length of the slash
+			pSpawned->rdthing.decalScale.x = 1.7f * markLen / pSpawned->rdthing.decal->size.x;
+
+			rdVector_Copy3(&pPlayerInfo->lastSaberMarkPos, pPos);
+			pPlayerInfo->lastSaberMark = pSpawned;
+		}
+	}
+}
+
+void jkSaber_UpdateEffectCollision(sithThing* pPlayerThing, rdVector3* pSaberPos, rdVector3* pSaberDir, rdVector3* pSaberLastPos, jkSaberCollide* pCollideInfo)
+{
+	// clear the damage list so that it updates every frame
+	pCollideInfo->numDamagedSurfaces = 0;
+
+	sithSector* pSector;
+	sithCollisionSearchEntry* searchResult;
+	sithThing* resultThing;
+	rdVector3 local_54;
+	rdVector3 local_3c;
+	jkPlayerInfo* playerInfo;
+	rdMatrix34 tmpMat;
+
+	playerInfo = pPlayerThing->playerInfo;
+	pSector = sithCollision_GetSectorLookAt(pPlayerThing->sector, &pPlayerThing->position, pSaberPos, 0.0);
+	if (!pSector)
+	{
+		playerInfo->lastSaberMark = 0;
+		return;
+	}
+
+	float saberLength = !(pPlayerThing->jkFlags & JKFLAG_SABERDAMAGE) ? pPlayerThing->playerInfo->polyline.length : pCollideInfo->bladeLength;
+	sithCollision_SearchRadiusForThings(pSector, pPlayerThing, pSaberPos, pSaberDir, saberLength, 0.0, RAYCAST_1); // skipping things for now
+
+	int collisions = 0;
+	sithSector* pSectorIter = pSector;
+	while (1)
+	{
+		searchResult = sithCollision_NextSearchResult();
+		if (!searchResult)
+			break;
+
+		if (searchResult->hitType & SITHCOLLISION_ADJOINCROSS)
+		{
+			pSectorIter = searchResult->surface->adjoin->sector;
+		}
+		else if (searchResult->hitType & SITHCOLLISION_WORLD)
+		{
+			rdVector_Copy3(&local_54, pSaberPos);
+			rdVector_MultAcc3(&local_54, pSaberDir, searchResult->distance - 0.001);
+
+			jkSaber_SpawnBurn(playerInfo, &local_54, &searchResult->hitNorm, pSectorIter, SPARKTYPE_WALL);
+			++collisions;
+
+			if (pCollideInfo->numDamagedSurfaces < 6)
+			{
+				int surfaceNum = 0;
+				for (surfaceNum = 0; surfaceNum < pCollideInfo->numDamagedSurfaces; surfaceNum++)
+				{
+					if (searchResult->surface == pCollideInfo->damagedSurfaces[surfaceNum])
+						break;
+				}
+				if (surfaceNum >= pCollideInfo->numDamagedSurfaces)
+				{
+					sithSurface_SendDamageToThing(searchResult->surface, pPlayerThing, 0.0f, SITH_DAMAGE_SABER);
+					pCollideInfo->damagedSurfaces[pCollideInfo->numDamagedSurfaces++] = searchResult->surface;
+				}
+			}
+			break;
+		}
+	}
+	sithCollision_SearchClose();
+
+	if(!collisions)
+		playerInfo->lastSaberMark = 0;
+}
+
+#endif
+
 // MOTS altered: interpolation and multiple blades
 void jkSaber_UpdateCollision(sithThing *player, int joint, int bSecondary)
 {
@@ -567,6 +731,16 @@ void jkSaber_UpdateCollision(sithThing *player, int joint, int bSecondary)
         playerInfo->saberCollideInfo.numDamagedThings = 0;
         playerInfo->saberCollideInfo.numDamagedSurfaces = 0;
     }
+
+#ifdef LIGHTSABER_MARKS
+	// do a collision check with the blade tip to generate effects like saber marks
+	rdVector3 lastPosWS;
+	rdMatrix_TransformPoint34(&lastPosWS, &playerInfo->saberTrail[bSecondary].lastTip, &rdCamera_camMatrix);
+	jkSaber_UpdateEffectCollision(player, &jointMat.scale, &jointMat.lvec, &lastPosWS, &playerInfo->saberCollideInfo);
+	playerInfo->saberCollideInfo.numDamagedThings = 0;
+	playerInfo->saberCollideInfo.numDamagedSurfaces = 0;
+#endif
+
     if ( !(player->jkFlags & JKFLAG_SABERDAMAGE) )
         return;
     if ( !playerInfo->saberCollideInfo.field_1A4 )
@@ -659,6 +833,9 @@ void jkSaber_Enable(sithThing *pThing, float damage, float bladeLength, float st
     _memset(pThing->playerInfo->saberCollideInfo.damagedSurfaces, 0, sizeof(pThing->playerInfo->saberCollideInfo.damagedSurfaces));
     
     pThing->playerInfo->lastSparkSpawnMs = 0;
+#ifdef LIGHTSABER_MARKS
+	pThing->playerInfo->lastMarkSpawnMs = 0;
+#endif
 
 #ifdef JKM_SABER
     pThing->playerInfo->jkmUnk1 = 0; // MOTS added

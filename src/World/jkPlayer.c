@@ -110,6 +110,11 @@ int jkPlayer_personality = 0;
 float jkPlayer_aMultiParams[0x100];
 #endif
 
+#ifdef LIGHTSABER_MARKS
+sithThing* jkSaber_paDecalThings[256];
+int jkSaber_numDecalThings = 0;
+#endif
+
 int jkPlayer_aMotsFpBins[74] =
 {
     // Category 1
@@ -336,6 +341,9 @@ void jkPlayer_Startup()
 {
     jkPlayer_InitThings();
     _memcpy(&jkSaber_rotateMat, &rdroid_identMatrix34, sizeof(jkSaber_rotateMat));
+#ifdef LIGHTSABER_MARKS
+	memset(jkSaber_paDecalThings, 0, sizeof(sithThing*) * 256);
+#endif
 }
 
 // MOTS altered, also fixed the memleak lol

@@ -2455,6 +2455,11 @@ typedef struct jkPlayerInfo
 #ifdef LIGHTSABER_TRAILS
 	jkSaberTrail saberTrail[2];
 #endif
+#ifdef LIGHTSABER_MARKS
+	uint32_t lastMarkSpawnMs;
+	rdVector3 lastSaberMarkPos;
+	sithThing* lastSaberMark;
+#endif
 } jkPlayerInfo;
 
 typedef struct jkPlayerMpcInfo
