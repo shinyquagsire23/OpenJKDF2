@@ -532,9 +532,11 @@ int rdCache_SendFaceListToHardware()
             }
 
 #ifdef ADDITIVE_BLEND
-			if ((active_6c->type & 0x400) != 0)
-			{
+			if ((active_6c->type & (0x400|0x800)) != 0)
+			{				
 				flags_idk_ |= 0x80000; // additive
+				if((active_6c->type & 0x800) != 0)
+					flags_idk_ |= 0x100000;
 			}
 #endif
 
@@ -1475,7 +1477,7 @@ void rdCache_DrawDecal(rdDecal* decal, rdMatrix34* matrix, rdVector3* color, rdV
 	rdCache_aDecals[rdCache_numDecals] = decal;
 	rdMatrix_Copy34(&rdCache_aDecalMatrices[rdCache_numDecals], matrix);
 	rdVector_Copy3(&rdCache_aDecalColors[rdCache_numDecals], color);
-	rdCache_aDecalScales[rdCache_numDecals] = *scale;
+	rdVector_Copy3(&rdCache_aDecalScales[rdCache_numDecals], scale);
 	rdCache_aDecalAngleFades[rdCache_numDecals] = angleFade;
 	++rdCache_numDecals;
 }
@@ -1564,8 +1566,7 @@ void rdCache_FlushDecals()
 		rdMatrix_TransformPoint34(&localCamera, &rdCamera_camMatrix.scale, &invDecalMatrix);
 
 		uint32_t extraFlags = 0;
-		float radius = -rdCamera_pCurCamera->pClipFrustum->field_0.y * rdVector_Len3(&size); // give it a radius to account for near plane
-		// fixme: get sithCamera out of here
+		float radius = rdCamera_pCurCamera->pClipFrustum->field_0.y; // give it a radius to account for near plane
 		if (localCamera.z - radius >= -1.0f
 			&& localCamera.y - radius >= -1.0f
 			&& localCamera.x - radius >= -1.0f
