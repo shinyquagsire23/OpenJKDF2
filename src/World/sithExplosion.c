@@ -121,7 +121,7 @@ void sithExplosion_UpdateForce(sithThing *explosion)
 
 							// intersect the force with the particle
 							float hitDist;
-							int intersects = sithIntersect_RaySphereIntersection(&v4->position, &forceNorm, len, v4->collideSize, &pParticle->pos, pParticle->radius, &hitDist, 1, 0);
+							int intersects = sithIntersect_RaySphereIntersection(&explosion->position, &forceNorm, len, range, &pParticle->pos, pParticle->radius, &hitDist, 1, 0);
 							if (!intersects)
 								continue;
 
