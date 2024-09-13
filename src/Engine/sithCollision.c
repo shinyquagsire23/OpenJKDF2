@@ -43,7 +43,7 @@ void sithCollide_CollideRagdoll(sithThing* thing, sithThing* thing2, rdVector3* 
 
 			// intersect the move with the particle
 			float hitDist;
-			int intersects = sithIntersect_RaySphereIntersection(&thing->position, &thing2Vel, len, thing->collideSize, &pParticle->pos, pParticle->radius, &hitDist, 1, 0);
+			int intersects = sithIntersect_RaySphereIntersection(&thing2->position, &thing2Vel, len, thing2->collideSize, &pParticle->pos, pParticle->radius, &hitDist, 1, 0);
 			if (!intersects)
 				continue;
 
