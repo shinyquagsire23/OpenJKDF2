@@ -9,6 +9,9 @@
 #include "Engine/sithPhysics.h"
 #include "Primitives/rdMath.h"
 #include "jk.h"
+#ifdef RAGDOLLS
+#include "Primitives/rdRagdoll.h"
+#endif
 
 void sithExplosion_CreateThing(sithThing *explosion)
 {
@@ -102,6 +105,33 @@ void sithExplosion_UpdateForce(sithThing *explosion)
                         rdVector_Scale3(&a2, &i->hitNorm, -(a1a * force));
                         sithPhysics_ThingApplyForce(v4, &a2);
                     }
+#ifdef RAGDOLLS
+					else if ( force != 0.0 && v4->moveType == SITH_MT_RAGDOLL && v4->rdthing.pRagdoll && v4->physicsParams.mass != 0)
+					{
+						rdVector_Scale3(&a2, &i->hitNorm, -(a1a * force));
+
+						rdVector3 forceNorm;
+						float len = rdVector_Normalize3(&forceNorm, &a2);
+
+						// distribute the objects mass across all particles
+						float invMass = (float)v4->rdthing.pRagdoll->numParticles / v4->physicsParams.mass;
+						for (int i = 0; i < v4->rdthing.pRagdoll->numParticles; ++i)
+						{
+							rdRagdollParticle* pParticle = &v4->rdthing.pRagdoll->paParticles[i];
+
+							// intersect the force with the particle
+							float hitDist;
+							int intersects = sithIntersect_RaySphereIntersection(&v4->position, &forceNorm, len, v4->collideSize, &pParticle->pos, pParticle->radius, &hitDist, 1, 0);
+							if (!intersects)
+								continue;
+
+							if (a2.z * invMass > 0.5)
+								sithThing_DetachThing(v4);
+							rdVector_MultAcc3(&pParticle->forces, &a2, invMass);
+							v4->physicsParams.physflags |= SITH_PF_8000;
+						}
+					}
+#endif
                     if ( damage != 0.0 )
                     {
                         sithThing_Damage(v4, explosion, a1a * damage, explosion->explosionParams.damageClass);
