@@ -78,6 +78,7 @@ typedef struct rdRagdollParticle
 	float nextPosWeight;
 	float radius;
 	int collided;
+	sithThing thing;
 } rdRagdollParticle;
 
 typedef struct rdRagdoll

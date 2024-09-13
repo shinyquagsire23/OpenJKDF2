@@ -386,6 +386,19 @@ void rdRagdoll_NewEntry(rdThing* pThing, rdVector3* pInitialVel)
 			pParticle->radius = pRagdoll->pModel->geosets[0].meshes[pRagdoll->pModel->hierarchyNodes[pVert->node].meshIdx].radius * 0.35f;
 		else
 			pParticle->radius = 0.01f;
+
+		// the particle contains a dummy thing for collision handling
+		sithThing_DoesRdThingInit(&pParticle->thing);
+		pParticle->thing.thingIdx = -1;
+		pParticle->thing.signature = -1;
+		pParticle->thing.thing_id = -1;
+		pParticle->thing.type = SITH_THING_ACTOR;
+		pParticle->thing.collide = 1;
+		pParticle->thing.moveSize = pParticle->radius;
+		pParticle->thing.collideSize = pParticle->radius * 4.0f;
+		rdVector_Copy3(&pParticle->thing.position, &pParticle->pos);
+		rdMatrix_Identity34(&pParticle->thing.lookOrientation); // don't think we care about orientation?
+		pParticle->thing.parentThing = pThing->parentSithThing;
 	}
 
 	// build joint matrices

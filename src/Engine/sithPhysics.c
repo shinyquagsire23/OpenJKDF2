@@ -1145,27 +1145,12 @@ float sithPhysics_ragdollRotFricThreshold = 35.0f;
 
 int sithPhysics_CollideRagdollParticle(sithSector* sector, sithThing* pThing, rdVector3* pos, rdVector3* dir, float radius, rdVector3* hitNormOut)
 {
-	// create a dummy thing for our node
-	sithThing thing;
-	sithThing_DoesRdThingInit(&thing);
-	thing.thingIdx = -1;
-	thing.signature = -1;
-	thing.thing_id = -1;
-	thing.position = *pos;
-	rdMatrix_BuildFromLook34(&thing.lookOrientation, dir);
-	rdVector_Zero3(&thing.lookOrientation.scale);
-	sithThing_EnterSector(&thing, sector, 1, 0);
-	thing.type = SITH_THING_ACTOR;
-	thing.collide = 1;
-	thing.moveSize = radius;
-	thing.collideSize = radius * 4.0f;
-
 	uint32_t collideFlags = RAYCAST_2000 | RAYCAST_800 | RAYCAST_2;
 
 	int result = 0;
 	rdVector3 dirNorm;
 	float dirLen = rdVector_Normalize3(&dirNorm, dir);
-	sithCollision_SearchRadiusForThings(sector, &thing, pos, &dirNorm, dirLen, radius, collideFlags);
+	sithCollision_SearchRadiusForThings(sector, pThing, pos, &dirNorm, dirLen, radius, collideFlags);
 	for (sithCollisionSearchEntry* pEntry = sithCollision_NextSearchResult(); pEntry; pEntry = sithCollision_NextSearchResult())
 	{
 		if ((pEntry->hitType & SITHCOLLISION_WORLD) != 0)
@@ -1184,7 +1169,6 @@ int sithPhysics_CollideRagdollParticle(sithSector* sector, sithThing* pThing, rd
 			}
 		}
 	}
-	sithThing_LeaveSector(&thing);
 	sithCollision_SearchClose();
 
 	if (!result)
@@ -1200,6 +1184,8 @@ void sithPhysics_UpdateRagdollPositions(sithSector* sector, sithThing* pThing, r
 		rdRagdollParticle* pParticle = &pRagdoll->paParticles[i];
 		if (pParticle->nextPosWeight > 0.0)
 		{
+			rdVector_Copy3(&pParticle->thing.position, &pParticle->pos);
+
 			// normalize the new position accumulator
 			rdVector_InvScale3Acc(&pParticle->nextPosAcc, pParticle->nextPosWeight);
 
@@ -1208,7 +1194,7 @@ void sithPhysics_UpdateRagdollPositions(sithSector* sector, sithThing* pThing, r
 			rdVector_ClipPrecision3(&dir);
 
 			rdVector3 hitNorm;
-			if (!sithPhysics_CollideRagdollParticle(sector, pThing, &pParticle->nextPosAcc, &dir, pParticle->radius, &hitNorm))
+			if (!sithPhysics_CollideRagdollParticle(sector, &pParticle->thing, &pParticle->nextPosAcc, &dir, pParticle->radius, &hitNorm))
 			{
 				rdVector_Copy3(&pParticle->pos, &pParticle->nextPosAcc);
 			}
@@ -1228,6 +1214,7 @@ void sithPhysics_UpdateRagdollPositions(sithSector* sector, sithThing* pThing, r
 				pParticle->collided = 1;
 			}
 		}
+		rdVector_Copy3(&pParticle->thing.position, &pParticle->pos);
 		rdVector_Zero3(&pParticle->nextPosAcc);
 		pParticle->nextPosWeight = 0;
 	}
@@ -1301,6 +1288,10 @@ void sithPhysics_UpdateRagdollParticles(rdRagdoll* pRagdoll, float deltaSeconds)
 
 		// add the vel change
 		rdVector_Add3Acc(&pParticle->pos, &vel);
+
+		// update the particle thing position and sector
+		rdVector_Copy3(&pParticle->thing.position, &pParticle->pos);
+		sithThing_EnterSector(&pParticle->thing, pRagdoll->pThing->parentSithThing->sector, 1, 0);
 	}
 }
 
@@ -1317,7 +1308,7 @@ void sithPhysics_CollideRagdoll(sithThing* pThing, rdRagdoll* pRagdoll, float de
 		rdVector_ClipPrecision3(&dir);
 
 		rdVector3 hitNorm;
-		pParticle->collided = sithPhysics_CollideRagdollParticle(pThing->sector, pThing, &pParticle->pos, &dir, pParticle->radius, &hitNorm);
+		pParticle->collided = sithPhysics_CollideRagdollParticle(pThing->sector, &pParticle->thing, &pParticle->pos, &dir, pParticle->radius, &hitNorm);
 		if (pParticle->collided)
 		{
 			anyCollision = 1;
@@ -1414,11 +1405,12 @@ void sithPhysics_ThingPhysRagdoll(sithThing* pThing, float deltaSeconds)
 		rdMatrix_PreMultiply34(&pRagdoll->paJointMatrices[i], &pRagdoll->paPoseMatrices[pJoint->node]);
 	}
 
-	// reset forces
+	// reset forces and leave sector
 	for (int i = 0; i < pRagdoll->numParticles; ++i)
 	{
 		rdRagdollParticle* pParticle = &pRagdoll->paParticles[i];
 		rdVector_Zero3(&pParticle->forces);
+		sithThing_LeaveSector(&pParticle->thing);
 	}
 
 	// the relative change in the center will be used to update the thing position
