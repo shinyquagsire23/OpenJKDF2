@@ -641,9 +641,12 @@ typedef struct rdProcEntry
     float z_max;
     int y_min_related;
     int y_max_related;
-    uint32_t vertexColorMode;
+    uint32_t vertexColorMode; // more like vertexLightColorMode (rgb lighting)
 #ifdef QOL_IMPROVEMENTS
 	int sortId;
+#endif
+#ifdef VERTEX_COLORS
+	rdVector3 color;
 #endif
 } rdProcEntry;
 
@@ -2316,6 +2319,9 @@ typedef struct rdThing
     rdTexMode_t curTexMode;
     uint32_t clippingIdk;
     sithThing* parentSithThing;
+#ifdef VERTEX_COLORS
+	rdVector3 color;
+#endif
 #ifdef RAGDOLLS
 	rdRagdoll* pRagdoll;
 	rdMatrix34* paHierarchyNodeMatricesPrev;

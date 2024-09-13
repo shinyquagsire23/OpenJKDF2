@@ -208,6 +208,7 @@
 #define POLYLINE_EXT         // .pln support and polyline template param, allows using polylines as rendering primitives for things (ex. blaster bolts)
 #define LIGHTSABER_TRAILS    // visual enhancement for lightsabers, draws extra tris to simulate lightsaber trails/motion blur
 #define STATIC_JKL_EXT       // load extra .jkl files from resources on startup along side static.jkl
+#define VERTEX_COLORS        // add vertex color face flag to indicate using the rdProcEntry's color field as the vertex color
 //#define FOG                  // infernal machine style fog rendering
 
 #endif

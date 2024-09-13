@@ -111,6 +111,9 @@ rdProcEntry *rdCache_GetProcEntry()
     out_procEntry->paGreenIntensities = &rdCache_aGreenIntensities[rdCache_numUsedIntensities];
     out_procEntry->paBlueIntensities = &rdCache_aBlueIntensities[rdCache_numUsedIntensities];
 #endif
+#ifdef VERTEX_COLORS
+	rdVector_Set3(&out_procEntry->color, 1.0f, 1.0f, 1.0f);
+#endif
     return out_procEntry;
 }
 
@@ -844,6 +847,18 @@ int rdCache_SendFaceListToHardware()
                     vertex_b = (__int64)((double)blue * rdroid_curColorEffects.fade);
                 }
                 
+#ifdef VERTEX_COLORS
+				if (active_6c->type & RD_FF_VERTEX_COLORS)
+				{
+					vertex_r = (__int64)((double)vertex_r * active_6c->color.x);
+					red_and_alpha = vertex_r;
+					vertex_g = (__int64)((double)vertex_g * active_6c->color.y);
+					green = vertex_g;
+					vertex_b = (__int64)((double)vertex_b * active_6c->color.z);
+					blue = vertex_b;
+				}
+#endif
+
                 if ( vertex_r < 0 )
                 {
                     vertex_r = (vertex_r & ~0xFF) | 0;

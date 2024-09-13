@@ -36,6 +36,9 @@ int rdThing_NewEntry(rdThing *thing, sithThing *parent)
     thing->curLightMode = RD_LIGHTMODE_GOURAUD;
     thing->curTexMode = RD_TEXTUREMODE_2_UNK;
     thing->parentSithThing = parent;
+#ifdef VERTEX_COLORS
+	thing->color.x = thing->color.y = thing->color.z = 1.0f;
+#endif
 #ifdef RAGDOLLS
 	thing->paHierarchyNodeMatricesPrev = 0;
 	thing->pRagdoll = 0;

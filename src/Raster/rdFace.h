@@ -25,7 +25,7 @@ enum RdFaceFlag // Polygon face flags i.e face type -> 3DO & SithSurface
 	RD_FF_ADDITIVE = 0x400,
 #endif
 #ifdef VERTEX_COLORS
-	RD_FF_VERTEX_COLORS = 0x800,
+	RD_FF_VERTEX_COLORS = 0x2000,
 #endif
 };
 
