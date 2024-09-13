@@ -1580,6 +1580,10 @@ int sithThing_Load(sithWorld *pWorld, int a2)
     if ( _strcmp(stdConffile_entry.args[1].value, "things") )
         return 0;
     v10 = _atoi(stdConffile_entry.args[2].value);
+#ifdef DEFERRED_DECALS
+	v10 += 512; // make enough space for decals/saber impact marks etc
+#endif
+
     paThings = (sithThing *)pSithHS->alloc(sizeof(sithThing) * v10);
 
     sithWorld_pCurrentWorld->things = paThings;
