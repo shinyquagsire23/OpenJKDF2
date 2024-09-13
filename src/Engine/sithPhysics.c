@@ -1157,12 +1157,15 @@ int sithPhysics_CollideRagdollParticle(sithSector* sector, sithThing* pThing, rd
 	sithThing_EnterSector(&thing, sector, 1, 0);
 	thing.type = SITH_THING_ACTOR;
 	thing.collide = 1;
-	thing.moveSize = thing.collideSize = radius * 4.0f;
+	thing.moveSize = radius;
+	thing.collideSize = radius * 4.0f;
+
+	uint32_t collideFlags = RAYCAST_2000 | RAYCAST_800 | RAYCAST_2;
 
 	int result = 0;
 	rdVector3 dirNorm;
 	float dirLen = rdVector_Normalize3(&dirNorm, dir);
-	sithCollision_SearchRadiusForThings(sector, &thing, pos, &dirNorm, dirLen, radius, RAYCAST_2000 | RAYCAST_800 | RAYCAST_2);
+	sithCollision_SearchRadiusForThings(sector, &thing, pos, &dirNorm, dirLen, radius, collideFlags);
 	for (sithCollisionSearchEntry* pEntry = sithCollision_NextSearchResult(); pEntry; pEntry = sithCollision_NextSearchResult())
 	{
 		if ((pEntry->hitType & SITHCOLLISION_WORLD) != 0)
@@ -1182,9 +1185,11 @@ int sithPhysics_CollideRagdollParticle(sithSector* sector, sithThing* pThing, rd
 		}
 	}
 	sithThing_LeaveSector(&thing);
-
-	rdVector_Zero3(hitNormOut);
 	sithCollision_SearchClose();
+
+	if (!result)
+		rdVector_Zero3(hitNormOut);
+
 	return result;
 }
 
