@@ -13,7 +13,7 @@
 
 typedef struct rdThing rdThing;
 typedef struct rdMaterial rdMaterial;
-#ifndef LIGHTSABER_TRAILS
+#ifndef LIGHTSABER_GLOW
 typedef struct rdSprite
 {
     char path[32];

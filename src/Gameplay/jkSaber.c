@@ -149,7 +149,8 @@ void jkSaber_DrawTrail(rdThing* pThing, jkSaberTrail* pSaberTrail, rdMatrix34* p
 				verts[3].z = tip_top;
 				idxInfo.vertices = verts;
 				idxInfo.vertexUVs = pThing->polyline->extraUVFaceMaybe;
-				rdPolyLine_DrawFace(pThing, &pThing->polyline->tipFace, verts, &idxInfo, 0);
+				pThing->polyline->tipFace.sortId = 0;
+				rdPolyLine_DrawFace(pThing, &pThing->polyline->tipFace, verts, &idxInfo);
 			}
 		}
 
@@ -175,8 +176,9 @@ void jkSaber_DrawTrail(rdThing* pThing, jkSaberTrail* pSaberTrail, rdMatrix34* p
 			verts[3].y = oldTipPos.y + right.y * pThing->polyline->tipRadius;
 			verts[3].z = oldTipPos.z + right.z * pThing->polyline->tipRadius;
 			
+			pThing->polyline->edgeFace.sortId = 1;
 			idxInfo.vertexUVs = pThing->polyline->extraUVTipMaybe;
-			rdPolyLine_DrawFace(pThing, &pThing->polyline->edgeFace, verts, &idxInfo, 1);
+			rdPolyLine_DrawFace(pThing, &pThing->polyline->edgeFace, verts, &idxInfo);
 		}
 
 		// Old tip to base
@@ -201,8 +203,9 @@ void jkSaber_DrawTrail(rdThing* pThing, jkSaberTrail* pSaberTrail, rdMatrix34* p
 			verts[3].y = basePos.y + right.y * pThing->polyline->baseRadius;
 			verts[3].z = basePos.z + right.z * pThing->polyline->baseRadius;
 
+			pThing->polyline->edgeFace.sortId = 3;
 			idxInfo.vertexUVs = pThing->polyline->extraUVTipMaybe;
-			rdPolyLine_DrawFace(pThing, &pThing->polyline->edgeFace, verts, &idxInfo, 3);
+			rdPolyLine_DrawFace(pThing, &pThing->polyline->edgeFace, verts, &idxInfo);
 		}
 
 		// Core
@@ -249,8 +252,10 @@ void jkSaber_DrawTrail(rdThing* pThing, jkSaberTrail* pSaberTrail, rdMatrix34* p
 				verts[0] = tmp;
 			}
 
+			pThing->polyline->edgeFace.sortId = 5;
+
 			idxInfo.vertexUVs = uvs;
-			rdPolyLine_DrawFace(pThing, &pThing->polyline->edgeFace, NULL, &idxInfo, 5);
+			rdPolyLine_DrawFace(pThing, &pThing->polyline->edgeFace, NULL, &idxInfo);
 		}
 	}
 		
