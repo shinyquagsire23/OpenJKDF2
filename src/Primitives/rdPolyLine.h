@@ -18,11 +18,7 @@ void rdPolyLine_Free(rdPolyLine *polyline);
 void rdPolyLine_FreeEntry(rdPolyLine *polyline);
 int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix);
 
-void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVertexIdxInfo *idxInfo
-#ifdef QOL_IMPROVEMENTS
-, int sortId
-#endif
-);
+void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVertexIdxInfo *idxInfo);
 //static void (*rdPolyLine_DrawFace)(rdThing *thing, rdFace *face, rdVector3 *unused, rdVertexIdxInfo *idxInfo) = (void*)rdPolyLine_DrawFace_ADDR;
 
 #endif // _RDPOLYLINE_H

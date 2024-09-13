@@ -223,12 +223,9 @@ int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix)
         polylineVerts[3].x = tip_left;
         polylineVerts[3].y = vertex_out.y - -0.001;
         polylineVerts[3].z = tip_top;
+		polyline->tipFace.sortId = 1;
         idxInfo.vertexUVs = polyline->extraUVFaceMaybe;
-        rdPolyLine_DrawFace(thing, &polyline->tipFace, polylineVerts, &idxInfo
-#ifdef QOL_IMPROVEMENTS
-		, 0
-#endif
-		);
+        rdPolyLine_DrawFace(thing, &polyline->tipFace, polylineVerts, &idxInfo);
     }
 
     // Base
@@ -245,12 +242,9 @@ int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix)
         polylineVerts[3].x = out.scale.x - polyline->baseRadius;
         polylineVerts[3].y = out.scale.y - -0.001;
         polylineVerts[3].z = out.scale.z + polyline->baseRadius;
-        idxInfo.vertexUVs = polyline->extraUVFaceMaybe;
-        rdPolyLine_DrawFace(thing, &polyline->tipFace, polylineVerts, &idxInfo
-#ifdef QOL_IMPROVEMENTS
-		, 1
-#endif
-		);
+		polyline->tipFace.sortId = 1;
+		idxInfo.vertexUVs = polyline->extraUVFaceMaybe;
+        rdPolyLine_DrawFace(thing, &polyline->tipFace, polylineVerts, &idxInfo);
 	}
     
 
@@ -314,21 +308,14 @@ int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix)
         polylineVerts[3].y = out.scale.y;
         polylineVerts[3].z = (polyline->baseRadius * angSin) + (float)0.0 + out.scale.z;
 #endif
+		polyline->edgeFace.sortId = 2;
         idxInfo.vertexUVs = polyline->extraUVTipMaybe;
-        rdPolyLine_DrawFace(thing, &polyline->edgeFace, polylineVerts, &idxInfo
-#ifdef QOL_IMPROVEMENTS
-		, 2
-#endif
-	);
+        rdPolyLine_DrawFace(thing, &polyline->edgeFace, polylineVerts, &idxInfo);
     }
     return 1;
 }
 
-void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVertexIdxInfo *idxInfo
-#ifdef QOL_IMPROVEMENTS
-	, int sortId
-#endif
-)
+void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVertexIdxInfo *idxInfo)
 {
     rdProcEntry *procEntry;
     rdMeshinfo mesh_out;
@@ -491,7 +478,7 @@ void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVert
     }
 
 #ifdef QOL_IMPROVEMENTS
-	procEntry->sortId = sortId;
+	procEntry->sortId = face->sortId;
 #endif
     
     int procFaceFlags = 1;

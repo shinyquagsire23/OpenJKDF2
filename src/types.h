@@ -1449,6 +1449,9 @@ typedef struct rdFace
     rdVector2 clipIdk;
     float extraLight;
     rdVector3 normal;
+#ifdef QOL_IMPROVEMENTS
+	int sortId;
+#endif
 } rdFace;
 
 typedef struct sithSurfaceInfo

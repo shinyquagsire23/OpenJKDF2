@@ -30,6 +30,9 @@ int rdFace_NewEntry(rdFace* out)
     out->clipIdk.x = 0.0;
     out->clipIdk.y = 0.0;
     out->extraLight = 0.0;
+#ifdef QOL_IMPROVEMENTS
+	out->sortId = 0;
+#endif
     return 1;
 }
 
