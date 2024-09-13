@@ -1268,7 +1268,7 @@ void jkPlayer_DrawPov()
 			if (sithTime_curMs < jkPlayer_drawMuzzleFlash && jkPlayer_povMuzzleFlash.sprite3)
 			{
 				rdMatrix34* muzzleMat = &playerThings[playerThingIdx].povModel.hierarchyNodeMatrices[jkPlayer_muzzleFlashNode];
-				rdSprite_Draw(&jkPlayer_povMuzzleFlash, muzzleMat, 0);
+				rdSprite_Draw(&jkPlayer_povMuzzleFlash, muzzleMat);
 
 				// add a light for the flash
 				static rdLight muzzleLight;
