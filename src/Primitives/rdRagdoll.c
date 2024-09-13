@@ -381,8 +381,9 @@ void rdRagdoll_NewEntry(rdThing* pThing, rdVector3* pInitialVel)
 
 		pParticle->flags = pVert->flags;
 
+		// todo: we're gonna need a better way of deciding how big of a radius to make for each particle
 		if (pRagdoll->pModel->hierarchyNodes[pVert->node].meshIdx != -1)
-			pParticle->radius = pRagdoll->pModel->geosets[0].meshes[pRagdoll->pModel->hierarchyNodes[pVert->node].meshIdx].radius * 0.125f;
+			pParticle->radius = pRagdoll->pModel->geosets[0].meshes[pRagdoll->pModel->hierarchyNodes[pVert->node].meshIdx].radius * 0.35f;
 		else
 			pParticle->radius = 0.01f;
 	}
