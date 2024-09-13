@@ -20,6 +20,115 @@ static int sithCollision_initted = 0;
 
 int sithCollision_bDebugCollide = 0;
 
+#ifdef RAGDOLLS
+// todo: move me
+#include "Primitives/rdRagdoll.h"
+
+void sithCollide_CollideRagdoll(sithThing* thing, sithThing* thing2, rdVector3* norm)
+{
+	if (thing->rdthing.pRagdoll && thing->physicsParams.mass != 0)
+	{
+		// distribute the objects mass across all particles
+		float invMass = (float)thing->rdthing.pRagdoll->numParticles / thing->physicsParams.mass;
+
+		for (int i = 0; i < thing->rdthing.pRagdoll->numParticles; ++i)
+		{
+			rdRagdollParticle* pParticle = &thing->rdthing.pRagdoll->paParticles[i];
+
+			rdVector3 vel;
+			rdVector_Sub3(&vel, &pParticle->pos, &pParticle->lastPos);
+
+			float velDiff = rdVector_Dot3(&vel, norm) - rdVector_Dot3(&thing2->physicsParams.vel, norm);
+			velDiff = stdMath_ClipPrecision(velDiff);
+			if (velDiff <= 0.0)
+				continue;
+
+			if ((thing2->physicsParams.physflags & SITH_PF_SURFACEBOUNCE) == 0)
+				velDiff = velDiff * 0.5;
+
+			rdVector3 forceVec;
+			rdVector_Scale3(&forceVec, norm, velDiff);
+			rdVector_Neg3Acc(&forceVec);
+
+			if (forceVec.z * invMass > 0.5)
+				sithThing_DetachThing(thing);
+
+			rdVector_MultAcc3(&pParticle->forces, &forceVec, invMass);
+			thing->physicsParams.physflags |= SITH_PF_8000;
+
+			/*rdVector3 velNorm;
+			float len = rdVector_Normalize3(&velNorm, &vel);
+
+			// intersect the move with the particle
+			float hitDist;
+			int iVar2 = sithIntersect_RaySphereIntersection(&t1->position, &velNorm, len, t1->collideSize, &pParticle->pos, pParticle->radius, &hitDist, 1, 0);
+			if (!iVar2)
+				continue;
+
+			rdVector3 hitNorm;
+			rdVector_Copy3(&hitNorm, &velNorm);
+
+			float velDiff = rdVector_Dot3(&vel, &hitNorm) - rdVector_Dot3(&t1->physicsParams.vel, &hitNorm);
+			velDiff = stdMath_ClipPrecision(velDiff);
+			if (velDiff <= 0.0)
+				continue;
+
+			rdVector3 forceVec;
+			rdVector_Scale3(&forceVec, &hitNorm, velDiff);
+			rdVector_Neg3Acc(&forceVec);
+
+			if (forceVec.z > 0.5)
+				sithThing_DetachThing(t2);
+
+			rdVector_MultAcc3(&pParticle->forces, &forceVec, 1.0f); // todo: particle mass?
+			t2->physicsParams.physflags |= SITH_PF_8000;*/
+		}
+	}
+}
+
+int sithCorpse_Collide(sithThing* thing1, sithThing* thing2, sithCollisionSearchEntry* searchEntry, int isInverse)
+{
+	sithThing* t1; // esi
+	sithThing* t2; // edi
+	if (isInverse)
+	{
+		t1 = thing2;
+		t2 = thing1;
+	}
+	else
+	{
+		t1 = thing1;
+		t2 = thing2;
+	}
+
+	if ((t1->thingflags & SITH_TF_CAPTURED) != 0 && (t1->thingflags & SITH_TF_INVULN) == 0)
+		sithCog_SendMessageFromThing(t1, t2, SITH_MESSAGE_TOUCHED);
+	if ((t2->thingflags & SITH_TF_CAPTURED) != 0 && (t2->thingflags & SITH_TF_INVULN) == 0)
+		sithCog_SendMessageFromThing(t2, t1, SITH_MESSAGE_TOUCHED);
+
+	// reactivate the ragdolls and apply forces
+	if(t1->rdthing.pRagdoll)
+	{
+		t1->rdthing.pRagdoll->expireMs = 0;
+		if (t1->physicsParams.mass != 0)
+		{
+			rdVector3 negHit;
+			rdVector_Neg3(&negHit, &searchEntry->hitNorm);
+			sithCollide_CollideRagdoll(t1, t2, &negHit);
+		}
+	}
+
+	if(t2->rdthing.pRagdoll)
+	{
+		t2->rdthing.pRagdoll->expireMs = 0;
+		if(t2->physicsParams.mass != 0)
+			sithCollide_CollideRagdoll(t2, t1, &searchEntry->hitNorm);
+	}
+
+	return 0;
+}
+#endif
+
 int sithCollision_Startup()
 {
     if ( sithCollision_initted )
@@ -43,6 +152,16 @@ int sithCollision_Startup()
 
     sithCollision_RegisterHitHandler(SITH_THING_ACTOR, (void*)sithActor_sub_4ED1D0);
     sithCollision_RegisterHitHandler(SITH_THING_WEAPON, sithWeapon_HitDebug);
+
+#ifdef RAGDOLLS
+	sithCollision_RegisterCollisionHandler(SITH_THING_CORPSE, SITH_THING_PLAYER, sithCorpse_Collide, 0);
+	sithCollision_RegisterCollisionHandler(SITH_THING_CORPSE, SITH_THING_ACTOR, sithCorpse_Collide, 0);
+	sithCollision_RegisterCollisionHandler(SITH_THING_CORPSE, SITH_THING_WEAPON, sithCorpse_Collide, 0);
+
+	sithCollision_RegisterCollisionHandler(SITH_THING_PLAYER, SITH_THING_CORPSE, sithCorpse_Collide, 0);
+	sithCollision_RegisterCollisionHandler(SITH_THING_ACTOR, SITH_THING_CORPSE, sithCorpse_Collide, 0);
+	sithCollision_RegisterCollisionHandler(SITH_THING_WEAPON, SITH_THING_CORPSE, sithCorpse_Collide, 0);
+#endif
 
     sithCollision_initted = 1;
     return 1;
@@ -253,8 +372,13 @@ float sithCollision_UpdateSectorThingCollision(sithSector *pSector, sithThing *s
                 {
                     if ( sithCollision_collisionHandlers[12 * v8->type + v7->type].handler )
                     {
+					#ifdef RAGDOLLS
+						if (((v8->thingflags & SITH_TF_DEAD) == 0 || v8->rdthing.pRagdoll)
+							&& ((v7->thingflags & SITH_TF_DEAD) == 0 || v7->rdthing.pRagdoll)
+					#else
                         if ( (v8->thingflags & SITH_TF_DEAD) == 0
                           && (v7->thingflags & SITH_TF_DEAD) == 0
+					#endif
                           && (v8->type != SITH_THING_WEAPON
                            || (v8->actorParams.typeflags & SITH_AF_CAN_ROTATE_HEAD) == 0
                            || ((v13 = v8->prev_thing) == 0 || (v14 = v7->prev_thing) == 0 || v13 != v14 || v8->child_signature != v7->child_signature)
