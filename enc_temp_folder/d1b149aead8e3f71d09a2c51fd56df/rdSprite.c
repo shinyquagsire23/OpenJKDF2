@@ -41,9 +41,6 @@ int rdSprite_NewEntry(rdSprite *sprite, char *spritepath, int type, char *materi
     sprite->face.textureMode = textureMode;
     sprite->face.extraLight = extraLight;
     sprite->face.material = rdMaterial_Load(material, 0, 0);
-#ifdef QOL_IMPROVEMENTS
-	sprite->face.sortId = 0;
-#endif
 #ifdef DYNAMIC_POV
 	sprite->id = -1;
 #endif
@@ -245,7 +242,16 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
 #ifdef DEFERRED_DECALS
 	memcpy(procEntry->vertexVS, mesh_out.verticesProjected, sizeof(rdVector3) * mesh_out.numVertices);
 #endif
-    rdCamera_pCurCamera->fnProjectLst(mesh_out.verticesOrig, mesh_out.verticesProjected, mesh_out.numVertices);
+	rdCamera_pCurCamera->fnProjectLst(mesh_out.verticesOrig, mesh_out.verticesProjected, mesh_out.numVertices);
+
+#ifdef OBJECT_MOTION_BLUR
+	for (int i = 0; i < mesh_out.numVertices; ++i)
+	{
+		procEntry->motionVectorsX[i] = 0;//procEntry->vertices[i].x;
+		procEntry->motionVectorsY[i] = 0;//procEntry->vertices[i].y;
+		procEntry->motionVectorsZ[i] = 0;//procEntry->vertices[i].z;
+	}
+#endif
 
 #ifdef RGB_AMBIENT
 	if (rdroid_curRenderOptions & 2)
