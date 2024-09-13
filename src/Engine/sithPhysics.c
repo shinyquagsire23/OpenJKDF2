@@ -11,6 +11,7 @@
 
 #ifdef RAGDOLLS
 #include "Primitives/rdRagdoll.h"
+#include "World/sithSoundClass.h"
 #endif
 
 void sithPhysics_FindFloor(sithThing *pThing, int a3)
@@ -1290,7 +1291,8 @@ void sithPhysics_UpdateRagdollParticles(rdRagdoll* pRagdoll, float deltaSeconds)
 
 void sithPhysics_CollideRagdoll(sithThing* pThing, rdRagdoll* pRagdoll, float deltaSeconds)
 {
-	int anyCollision = 0;
+	float totalImpactSpeed = 0.0f;
+	int anyCollision = 0; // did any particle collide?
 	for (int i = 0; i < pRagdoll->numParticles; ++i)
 	{
 		rdRagdollParticle* pParticle = &pRagdoll->paParticles[i];
@@ -1303,6 +1305,8 @@ void sithPhysics_CollideRagdoll(sithThing* pThing, rdRagdoll* pRagdoll, float de
 		pParticle->collided = sithPhysics_CollideRagdollParticle(pThing->sector, pThing, &pParticle->pos, &dir, pParticle->radius, &hitNorm);
 		if (pParticle->collided)
 		{
+			anyCollision = 1;
+			
 			rdVector_Copy3(&pParticle->pos, &pParticle->lastPos);
 
 			rdVector3 reflected;
@@ -1310,8 +1314,21 @@ void sithPhysics_CollideRagdoll(sithThing* pThing, rdRagdoll* pRagdoll, float de
 			rdVector_Scale3Acc(&reflected, sithPhysics_ragdollBounce);
 			rdVector_Sub3(&pParticle->lastPos, &pParticle->pos, &reflected);
 
-			anyCollision = 1;
+			float impactSpeed = -rdVector_Dot3(&hitNorm, &dir) * 1000.0f;
+			totalImpactSpeed += impactSpeed;
 		}
+	}
+
+	if (anyCollision)
+	{
+		totalImpactSpeed /= (float)anyCollision;
+		if (totalImpactSpeed > 0.1f && (sithTime_curMs - pRagdoll->lastCollideMs > 20))
+		{
+			if (totalImpactSpeed > 1.0)
+				totalImpactSpeed = 1.0;
+			sithSoundClass_PlayThingSoundclass(pThing, SITH_SC_CORPSEHIT, totalImpactSpeed);
+		}
+		pRagdoll->lastCollideMs = sithTime_curMs;
 	}
 
 	// if anything collide, set a timer for expiration

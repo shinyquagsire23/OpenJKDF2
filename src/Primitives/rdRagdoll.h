@@ -98,6 +98,7 @@ typedef struct rdRagdoll
 	float lastTimeStep;
 	int collisions;
 	int expireMs;
+	int lastCollideMs;
 } rdRagdoll;
 
 void rdRagdoll_NewEntry(rdThing* pThing, rdVector3* pInitialVel);
