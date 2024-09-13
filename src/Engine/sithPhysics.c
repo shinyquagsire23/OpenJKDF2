@@ -1248,7 +1248,7 @@ void sithPhysics_AccumulateRagdollForces(sithThing* pThing, rdRagdoll* pRagdoll,
 	for (int i = 0; i < pRagdoll->numParticles; ++i)
 	{
 		rdRagdollParticle* pParticle = &pRagdoll->paParticles[i];
-		rdVector_Zero3(&pParticle->forces);
+		//rdVector_Zero3(&pParticle->forces);
 
 		// gravity
 		if (pThing->physicsParams.mass != 0.0
@@ -1399,6 +1399,13 @@ void sithPhysics_ThingPhysRagdoll(sithThing* pThing, float deltaSeconds)
 		rdMatrix_PreMultiply34(&pRagdoll->paJointMatrices[i], &pRagdoll->paPoseMatrices[pJoint->node]);
 	}
 
+	// reset forces
+	for (int i = 0; i < pRagdoll->numParticles; ++i)
+	{
+		rdRagdollParticle* pParticle = &pRagdoll->paParticles[i];
+		rdVector_Zero3(&pParticle->forces);
+	}
+
 	// the relative change in the center will be used to update the thing position
 	rdVector3 lastCenter, centerVel;
 	rdVector_Copy3(&lastCenter, &pRagdoll->center);
@@ -1408,8 +1415,7 @@ void sithPhysics_ThingPhysRagdoll(sithThing* pThing, float deltaSeconds)
 
 	rdVector_Sub3(&centerVel, &pRagdoll->center, &lastCenter);
 	float velLen = rdVector_Normalize3Acc(&centerVel);
-	if(velLen > 0.0)
-		sithCollision_UpdateThingCollision(pThing, &centerVel, velLen, 0);
+	sithCollision_UpdateThingCollision(pThing, &centerVel, velLen, 0);
 }
 
 #endif
