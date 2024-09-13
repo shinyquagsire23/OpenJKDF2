@@ -26,8 +26,11 @@ int sithCollision_bDebugCollide = 0;
 
 void sithCollide_CollideRagdoll(sithThing* thing, sithThing* thing2, rdVector3* norm)
 {
-	if (thing->rdthing.pRagdoll && thing->physicsParams.mass != 0)
+	if (thing->rdthing.pRagdoll && thing->physicsParams.mass != 0)// && thing->parentThing != thing2)
 	{
+		rdVector3 thing2Vel;
+		float len = rdVector_Normalize3(&thing2Vel, &thing2->physicsParams.vel);
+
 		// distribute the objects mass across all particles
 		float invMass = (float)thing->rdthing.pRagdoll->numParticles / thing->physicsParams.mass;
 
@@ -37,6 +40,12 @@ void sithCollide_CollideRagdoll(sithThing* thing, sithThing* thing2, rdVector3* 
 
 			rdVector3 vel;
 			rdVector_Sub3(&vel, &pParticle->pos, &pParticle->lastPos);
+
+			// intersect the move with the particle
+			float hitDist;
+			int intersects = sithIntersect_RaySphereIntersection(&thing->position, &thing2Vel, len, thing->collideSize, &pParticle->pos, pParticle->radius, &hitDist, 1, 0);
+			if (!intersects)
+				continue;
 
 			float velDiff = rdVector_Dot3(&vel, norm) - rdVector_Dot3(&thing2->physicsParams.vel, norm);
 			velDiff = stdMath_ClipPrecision(velDiff);
@@ -55,33 +64,6 @@ void sithCollide_CollideRagdoll(sithThing* thing, sithThing* thing2, rdVector3* 
 
 			rdVector_MultAcc3(&pParticle->forces, &forceVec, invMass);
 			thing->physicsParams.physflags |= SITH_PF_8000;
-
-			/*rdVector3 velNorm;
-			float len = rdVector_Normalize3(&velNorm, &vel);
-
-			// intersect the move with the particle
-			float hitDist;
-			int iVar2 = sithIntersect_RaySphereIntersection(&t1->position, &velNorm, len, t1->collideSize, &pParticle->pos, pParticle->radius, &hitDist, 1, 0);
-			if (!iVar2)
-				continue;
-
-			rdVector3 hitNorm;
-			rdVector_Copy3(&hitNorm, &velNorm);
-
-			float velDiff = rdVector_Dot3(&vel, &hitNorm) - rdVector_Dot3(&t1->physicsParams.vel, &hitNorm);
-			velDiff = stdMath_ClipPrecision(velDiff);
-			if (velDiff <= 0.0)
-				continue;
-
-			rdVector3 forceVec;
-			rdVector_Scale3(&forceVec, &hitNorm, velDiff);
-			rdVector_Neg3Acc(&forceVec);
-
-			if (forceVec.z > 0.5)
-				sithThing_DetachThing(t2);
-
-			rdVector_MultAcc3(&pParticle->forces, &forceVec, 1.0f); // todo: particle mass?
-			t2->physicsParams.physflags |= SITH_PF_8000;*/
 		}
 	}
 }
