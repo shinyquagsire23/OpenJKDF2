@@ -1249,18 +1249,28 @@ void sithPhysics_ConstrainRagdoll(sithSector* pSector, sithThing* pThing, rdRagd
 
 void sithPhysics_AccumulateRagdollForces(sithThing* pThing, rdRagdoll* pRagdoll, float deltaSeconds)
 {
-	// todo: sector thrust, etc
+	float gravity = sithWorld_pCurrentWorld->worldGravity;
+	if ((pThing->physicsParams.physflags & SITH_PF_PARTIALGRAVITY) != 0)
+		gravity *= 0.5;
+
 	for (int i = 0; i < pRagdoll->numParticles; ++i)
 	{
 		rdRagdollParticle* pParticle = &pRagdoll->paParticles[i];
 		//rdVector_Zero3(&pParticle->forces);
+
+		if (pThing->physicsParams.mass != 0.0
+			&& (pThing->sector->flags & SITH_SECTOR_HASTHRUST)
+			&& !(pThing->physicsParams.physflags & SITH_PF_NOTHRUST))
+		{
+			rdVector_MultAcc3(&pParticle->forces, &pThing->sector->thrust, deltaSeconds);
+		}
 
 		// gravity
 		if (pThing->physicsParams.mass != 0.0
 			&& pThing->physicsParams.physflags & SITH_PF_USEGRAVITY
 			&& !(pThing->sector->flags & SITH_SECTOR_NOGRAVITY))
 		{
-			pParticle->forces.z -= sithWorld_pCurrentWorld->worldGravity * deltaSeconds;
+			pParticle->forces.z -= gravity * deltaSeconds;
 		}
 	}
 }
