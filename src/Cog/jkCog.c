@@ -700,7 +700,7 @@ void jkCog_SetPovSprite(sithCog* ctx)
 	if(pActorThing && pSprite)
 	{
 		if (pActorThing->type == SITH_THING_ACTOR || pActorThing->type == SITH_THING_PLAYER)
-			jkPlayer_SetPovSprite(&pActorThing->playerInfo, pSprite);
+			jkPlayer_SetPovSprite(pActorThing->playerInfo, pSprite);
 	}
 }
 #endif
