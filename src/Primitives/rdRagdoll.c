@@ -271,7 +271,10 @@ void rdRagdoll_ApplyRotFriction(rdRagdoll* pRagdoll, float deltaSeconds, float f
 		if (!rdMatrix_ExtractAxisAngle34(&rot, &axis, &angle))
 			continue;
 
-		angle *= -(fabs(angle) >= thresholdDt ? frictionDt : 1.0f);
+		angle *= -(stdMath_Fabs(angle) >= thresholdDt ? frictionDt : 1.0f);
+		if(stdMath_Fabs(angle) < 0.1f)
+			continue;
+
 		rdRagdoll_ApplyRotConstraint(pRagdoll, &pRagdoll->pSkel->paTris[pRotFric->tri[0]], &pRagdoll->pSkel->paTris[pRotFric->tri[1]], angle, &axis);
 	}
 
