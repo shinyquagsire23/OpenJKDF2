@@ -63,10 +63,32 @@ void jkSaber_InitializeSaberInfo(sithThing *thing, char *material_side_fname, ch
     rdPolyLine_NewEntry(&saberinfo->polyline, "Saber", material_side_fname, material_tip_fname, length, base_rad, tip_rad, 4, 0, 0, 0.0);
     rdThing_NewEntry(&saberinfo->polylineThing, thing);
     rdThing_SetPolyline(&saberinfo->polylineThing, &saberinfo->polyline);
+#ifdef LIGHTSABER_GLOW
+	saberinfo->polyline.tipFace.type |= RD_FF_SCREEN;
+	saberinfo->polyline.edgeFace.type |= RD_FF_SCREEN;
+#endif
     saberinfo->wall_sparks = wall_sparks;
     saberinfo->blood_sparks = blood_sparks;
     saberinfo->saber_sparks = saber_sparks;
     saberinfo->length = len;
+
+#ifdef LIGHTSABER_GLOW
+	rdThing_FreeEntry(&saberinfo->glowSpriteThing);
+	rdSprite_FreeEntry(&saberinfo->glowSprite);
+
+	rdSprite_NewEntry(&saberinfo->glowSprite, "SaberGlow", 2, "saberglow.mat", base_rad * 2.0f * 1.5f, base_rad * 2.0f * 1.5f, 4, 0, 0, 0.0, &rdroid_zeroVector3);
+	rdThing_NewEntry(&saberinfo->glowSpriteThing, thing);
+	rdThing_SetSprite3(&saberinfo->glowSpriteThing, &saberinfo->glowSprite);
+#ifdef VERTEX_COLORS
+	//saberinfo->glowSpriteThing.color.x = saberinfo->glowSpriteThing.color.y = saberinfo->glowSpriteThing.color.z = 0.3f;
+	rdMaterial_GetFillColor(&saberinfo->glowSpriteThing.color, saberinfo->polyline.edgeFace.material, 0);
+	//// give the color some kick
+	//saberinfo->glowSpriteThing.color.x *= saberinfo->glowSpriteThing.color.x;
+	//saberinfo->glowSpriteThing.color.y *= saberinfo->glowSpriteThing.color.y;
+	//saberinfo->glowSpriteThing.color.z *= saberinfo->glowSpriteThing.color.z;
+#endif
+	saberinfo->glowSprite.face.type = RD_FF_ADDITIVE | RD_FF_VERTEX_COLORS;
+#endif
 }
 
 void jkSaber_PolylineRand(rdThing *thing)
@@ -269,6 +291,42 @@ void jkSaber_DrawTrail(rdThing* pThing, jkSaberTrail* pSaberTrail, rdMatrix34* p
 }
 #endif
 
+
+#ifdef LIGHTSABER_GLOW
+// todo: input for different hands
+void jkSaber_DrawGlow()
+{
+	// glow test
+	rdVector3 basePos;
+	rdMatrix_TransformPoint34(&basePos, &rdroid_zeroVector3, &playerThings[playerThingIdx].povModel.hierarchyNodeMatrices[5]);
+
+	rdVector3 vertex;
+	rdVector_Set3(&vertex, 0.0f, playerThings[playerThingIdx].polyline.length, 0.0f);
+
+	rdVector3 tipPos;
+	rdMatrix_TransformPoint34(&tipPos, &vertex, &playerThings[playerThingIdx].povModel.hierarchyNodeMatrices[5]);
+
+	float randOffset = playerThings[playerThingIdx].polyline.edgeFace.clipIdk.y / 80.0f;
+
+	float rad = playerThings[playerThingIdx].glowSprite.width * 0.5f;
+	for (float i = playerThings[playerThingIdx].polyline.length; i > 0; i -= rad)
+	{
+		float dist = (i / playerThings[playerThingIdx].polyline.length) + randOffset;
+		dist -= stdMath_Floor(dist);
+
+		rdVector3 pos;
+		rdVector_Lerp3(&pos, &basePos, &tipPos, dist);
+
+		rdMatrix34 mat;
+		rdMatrix_BuildTranslate34(&mat, &pos);
+		playerThings[playerThingIdx].glowSprite.face.sortId = 0;
+		rdSprite_Draw(&playerThings[playerThingIdx].glowSpriteThing, &mat);
+
+		rad *= 0.99;
+	}
+}
+#endif
+
 void jkSaber_Draw(rdMatrix34 *posRotMat)
 {
     if ( playerThings[playerThingIdx].actorThing->jkFlags & JKFLAG_SABERON
@@ -280,6 +338,9 @@ void jkSaber_Draw(rdMatrix34 *posRotMat)
             rdPuppet_BuildJointMatrices(&playerThings[playerThingIdx].povModel, posRotMat);
         }
         jkSaber_PolylineRand(&playerThings[playerThingIdx].polylineThing);
+#ifdef LIGHTSABER_GLOW
+		jkSaber_DrawGlow();
+#endif
         rdThing_Draw(&playerThings[playerThingIdx].polylineThing, &playerThings[playerThingIdx].povModel.hierarchyNodeMatrices[5]); // aaaaa hardcoded K_Rhand
 #ifdef LIGHTSABER_TRAILS
 		jkSaber_DrawTrail(&playerThings[playerThingIdx].polylineThing, &playerThings[playerThingIdx].saberTrail[0], &playerThings[playerThingIdx].povModel.hierarchyNodeMatrices[5]);
@@ -641,7 +702,6 @@ void jkSaber_SpawnBurn(jkPlayerInfo* pPlayerInfo, rdVector3* pPos, rdVector3* pH
 	}
 }
 
-// todo: get this working for second saber
 void jkSaber_UpdateEffectCollision(sithThing* pPlayerThing, rdVector3* pSaberPos, rdVector3* pSaberDir, rdVector3* pSaberLastPos, jkSaberCollide* pCollideInfo)
 {
 	// clear the damage list so that it updates every frame
