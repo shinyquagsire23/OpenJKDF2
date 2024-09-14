@@ -1189,31 +1189,34 @@ void sithPhysics_UpdateRagdollPositions(sithSector* sector, sithThing* pThing, r
 			// normalize the new position accumulator
 			rdVector_InvScale3Acc(&pParticle->nextPosAcc, pParticle->nextPosWeight);
 
-			rdVector3 dir;
-			rdVector_Sub3(&dir, &pParticle->nextPosAcc, &pParticle->pos);
-			rdVector_ClipPrecision3(&dir);
+			rdVector3 vel;
+			rdVector_Sub3(&vel, &pParticle->nextPosAcc, &pParticle->pos);
+			rdVector_ClipPrecision3(&vel);
+			if(rdVector_IsZero3(&vel))
+				goto update_and_clear;
 
 			rdVector3 hitNorm;
-			if (!sithPhysics_CollideRagdollParticle(sector, &pParticle->thing, &pParticle->nextPosAcc, &dir, pParticle->radius, &hitNorm))
+			if (!sithPhysics_CollideRagdollParticle(sector, &pParticle->thing, &pParticle->nextPosAcc, &vel, pParticle->radius, &hitNorm))
 			{
 				rdVector_Copy3(&pParticle->pos, &pParticle->nextPosAcc);
 			}
 			else
 			{
-				rdVector_Sub3(&dir, &pParticle->nextPosAcc, &pParticle->lastPos);
+				rdVector_Sub3(&vel, &pParticle->nextPosAcc, &pParticle->lastPos);
 		
-				float dot = rdVector_Dot3(&dir, &hitNorm);
-				if (rdVector_Dot3(&dir, &hitNorm) < 0)
+				float dot = rdVector_Dot3(&vel, &hitNorm);
+				if (rdVector_Dot3(&vel, &hitNorm) < 0)
 				{
 					// bounce slightly on hit
 					rdVector3 reflected;
-					rdVector_Reflect3(&reflected, &dir, &hitNorm);
+					rdVector_Reflect3(&reflected, &vel, &hitNorm);
 					rdVector_Scale3Acc(&reflected, sithPhysics_ragdollBounce);
 					rdVector_Sub3(&pParticle->lastPos, &pParticle->pos, &reflected);
 				}
 				pParticle->collided = 1;
 			}
 		}
+	update_and_clear:
 		rdVector_Copy3(&pParticle->thing.position, &pParticle->pos);
 		rdVector_Zero3(&pParticle->nextPosAcc);
 		pParticle->nextPosWeight = 0;
@@ -1273,8 +1276,6 @@ void sithPhysics_UpdateRagdollParticles(rdRagdoll* pRagdoll, float deltaSeconds)
 		
 		rdVector3 vel;
 		rdVector_Sub3(&vel, &pParticle->pos, &pParticle->lastPos);
-		
-		rdVector_ClipPrecision3(&vel);
 
 		// apply forces
 		rdVector_MultAcc3(&vel, &pParticle->forces, deltaSeconds);
@@ -1282,6 +1283,10 @@ void sithPhysics_UpdateRagdollParticles(rdRagdoll* pRagdoll, float deltaSeconds)
 		// friction
 		rdVector_Scale3Acc(&vel, timestepRatio * powf(pParticle->collided ? 0.8f : 0.995f, deltaSeconds * 1000.0f));
 		//sithPhysics_ApplyDrag(&vel, sithPhysics_ragdollDrag, 0.0f, deltaSeconds);
+
+		rdVector_ClipPrecision3(&vel);
+		if (rdVector_IsZero3(&vel))
+			continue;
 
 		// copy the old pos
 		rdVector_Copy3(&pParticle->lastPos, &pParticle->pos);
@@ -1303,12 +1308,14 @@ void sithPhysics_CollideRagdoll(sithThing* pThing, rdRagdoll* pRagdoll, float de
 	{
 		rdRagdollParticle* pParticle = &pRagdoll->paParticles[i];
 
-		rdVector3 dir;
-		rdVector_Sub3(&dir, &pParticle->pos, &pParticle->lastPos);
-		rdVector_ClipPrecision3(&dir);
+		rdVector3 vel;
+		rdVector_Sub3(&vel, &pParticle->pos, &pParticle->lastPos);
+		rdVector_ClipPrecision3(&vel);
+		if (rdVector_IsZero3(&vel))
+			continue;
 
 		rdVector3 hitNorm;
-		pParticle->collided = sithPhysics_CollideRagdollParticle(pThing->sector, &pParticle->thing, &pParticle->pos, &dir, pParticle->radius, &hitNorm);
+		pParticle->collided = sithPhysics_CollideRagdollParticle(pThing->sector, &pParticle->thing, &pParticle->pos, &vel, pParticle->radius, &hitNorm);
 		if (pParticle->collided)
 		{
 			anyCollision = 1;
@@ -1316,11 +1323,11 @@ void sithPhysics_CollideRagdoll(sithThing* pThing, rdRagdoll* pRagdoll, float de
 			rdVector_Copy3(&pParticle->pos, &pParticle->lastPos);
 
 			rdVector3 reflected;
-			rdVector_Reflect3(&reflected, &dir, &hitNorm);
+			rdVector_Reflect3(&reflected, &vel, &hitNorm);
 			rdVector_Scale3Acc(&reflected, sithPhysics_ragdollBounce);
 			rdVector_Sub3(&pParticle->lastPos, &pParticle->pos, &reflected);
 
-			float impactSpeed = -rdVector_Dot3(&hitNorm, &dir) * 1000.0f;
+			float impactSpeed = -rdVector_Dot3(&hitNorm, &vel) * 1000.0f;
 			totalImpactSpeed += impactSpeed;
 		}
 	}
