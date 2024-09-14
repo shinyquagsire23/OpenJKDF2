@@ -618,7 +618,8 @@ void jkSaber_SpawnBurn(jkPlayerInfo* pPlayerInfo, rdVector3* pPos, rdVector3* pH
 			pSpawned->child_signature = pPlayerInfo->actorThing->signature;
 
 			// adjust the size of the decal (template should be a decal) so it spans the length of the slash
-			pSpawned->rdthing.decalScale.x = 1.7f * markLen / pSpawned->rdthing.decal->size.x;
+			if(pPlayerInfo->lastSaberMark)
+				pSpawned->rdthing.decalScale.x = 1.7f * markLen / pSpawned->rdthing.decal->size.x;
 
 			rdVector_Copy3(&pPlayerInfo->lastSaberMarkPos, pPos);
 			pPlayerInfo->lastSaberMark = pSpawned;
