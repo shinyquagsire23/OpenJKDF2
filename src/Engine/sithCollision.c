@@ -15,101 +15,13 @@
 #include "General/stdMath.h"
 #include "Primitives/rdMath.h"
 #include "jk.h"
+#ifdef RAGDOLLS
+#include "Primitives/rdRagdoll.h"
+#endif
 
 static int sithCollision_initted = 0;
 
 int sithCollision_bDebugCollide = 0;
-
-#ifdef RAGDOLLS
-// todo: move me
-#include "Primitives/rdRagdoll.h"
-
-void sithCollide_CollideRagdoll(sithThing* thing, sithThing* thing2, rdVector3* norm)
-{
-	if (thing->rdthing.pRagdoll && thing->physicsParams.mass != 0)// && thing->parentThing != thing2)
-	{
-		rdVector3 thing2Vel;
-		float len = rdVector_Normalize3(&thing2Vel, &thing2->physicsParams.vel);
-
-		// distribute the objects mass across all particles
-		float invMass = (float)thing->rdthing.pRagdoll->numParticles / thing->physicsParams.mass;
-
-		for (int i = 0; i < thing->rdthing.pRagdoll->numParticles; ++i)
-		{
-			rdRagdollParticle* pParticle = &thing->rdthing.pRagdoll->paParticles[i];
-
-			rdVector3 vel;
-			rdVector_Sub3(&vel, &pParticle->pos, &pParticle->lastPos);
-
-			// intersect the move with the particle
-			float hitDist;
-			int intersects = sithIntersect_RaySphereIntersection(&thing2->position, &thing2Vel, len, thing2->collideSize, &pParticle->pos, pParticle->radius, &hitDist, 1, 0);
-			if (!intersects)
-				continue;
-
-			float velDiff = rdVector_Dot3(&vel, norm) - rdVector_Dot3(&thing2->physicsParams.vel, norm);
-			velDiff = stdMath_ClipPrecision(velDiff);
-			if (velDiff <= 0.0)
-				continue;
-
-			if ((thing2->physicsParams.physflags & SITH_PF_SURFACEBOUNCE) == 0)
-				velDiff = velDiff * 0.5;
-
-			rdVector3 forceVec;
-			rdVector_Scale3(&forceVec, norm, velDiff);
-			rdVector_Neg3Acc(&forceVec);
-
-			if (forceVec.z * invMass > 0.5)
-				sithThing_DetachThing(thing);
-
-			rdVector_MultAcc3(&pParticle->forces, &forceVec, invMass);
-			thing->physicsParams.physflags |= SITH_PF_8000;
-		}
-	}
-}
-
-int sithCorpse_Collide(sithThing* thing1, sithThing* thing2, sithCollisionSearchEntry* searchEntry, int isInverse)
-{
-	sithThing* t1; // esi
-	sithThing* t2; // edi
-	if (isInverse)
-	{
-		t1 = thing2;
-		t2 = thing1;
-	}
-	else
-	{
-		t1 = thing1;
-		t2 = thing2;
-	}
-
-	if ((t1->thingflags & SITH_TF_CAPTURED) != 0 && (t1->thingflags & SITH_TF_INVULN) == 0)
-		sithCog_SendMessageFromThing(t1, t2, SITH_MESSAGE_TOUCHED);
-	if ((t2->thingflags & SITH_TF_CAPTURED) != 0 && (t2->thingflags & SITH_TF_INVULN) == 0)
-		sithCog_SendMessageFromThing(t2, t1, SITH_MESSAGE_TOUCHED);
-
-	// reactivate the ragdolls and apply forces
-	if(t1->rdthing.pRagdoll)
-	{
-		t1->rdthing.pRagdoll->expireMs = 0;
-		if (t1->physicsParams.mass != 0)
-		{
-			rdVector3 negHit;
-			rdVector_Neg3(&negHit, &searchEntry->hitNorm);
-			sithCollide_CollideRagdoll(t1, t2, &negHit);
-		}
-	}
-
-	if(t2->rdthing.pRagdoll)
-	{
-		t2->rdthing.pRagdoll->expireMs = 0;
-		if(t2->physicsParams.mass != 0)
-			sithCollide_CollideRagdoll(t2, t1, &searchEntry->hitNorm);
-	}
-
-	return 0;
-}
-#endif
 
 int sithCollision_Startup()
 {
@@ -1378,3 +1290,92 @@ int sithCollision_DebrisPlayerCollide(sithThing *thing, sithThing *thing2, sithC
     }
     return 0;
 }
+
+
+#ifdef RAGDOLLS
+void sithCollide_CollideRagdoll(sithThing* thing, sithThing* thing2, rdVector3* norm)
+{
+	if (thing->rdthing.pRagdoll && thing->physicsParams.mass != 0)// && thing->parentThing != thing2)
+	{
+		rdVector3 thing2Vel;
+		float len = rdVector_Normalize3(&thing2Vel, &thing2->physicsParams.vel);
+
+		// distribute the objects mass across all particles
+		float invMass = (float)thing->rdthing.pRagdoll->numParticles / thing->physicsParams.mass;
+
+		for (int i = 0; i < thing->rdthing.pRagdoll->numParticles; ++i)
+		{
+			rdRagdollParticle* pParticle = &thing->rdthing.pRagdoll->paParticles[i];
+
+			rdVector3 vel;
+			rdVector_Sub3(&vel, &pParticle->pos, &pParticle->lastPos);
+
+			// intersect the move with the particle
+			float hitDist;
+			int intersects = sithIntersect_RaySphereIntersection(&thing2->position, &thing2Vel, len, thing2->collideSize, &pParticle->pos, pParticle->radius, &hitDist, 1, 0);
+			if (!intersects)
+				continue;
+
+			float velDiff = rdVector_Dot3(&vel, norm) - rdVector_Dot3(&thing2->physicsParams.vel, norm);
+			velDiff = stdMath_ClipPrecision(velDiff);
+			if (velDiff <= 0.0)
+				continue;
+
+			if ((thing2->physicsParams.physflags & SITH_PF_SURFACEBOUNCE) == 0)
+				velDiff = velDiff * 0.5;
+
+			rdVector3 forceVec;
+			rdVector_Scale3(&forceVec, norm, velDiff);
+			rdVector_Neg3Acc(&forceVec);
+
+			if (forceVec.z * invMass > 0.5)
+				sithThing_DetachThing(thing);
+
+			rdVector_MultAcc3(&pParticle->forces, &forceVec, invMass);
+			thing->physicsParams.physflags |= SITH_PF_8000;
+		}
+	}
+}
+
+int sithCorpse_Collide(sithThing* thing1, sithThing* thing2, sithCollisionSearchEntry* searchEntry, int isInverse)
+{
+	sithThing* t1; // esi
+	sithThing* t2; // edi
+	if (isInverse)
+	{
+		t1 = thing2;
+		t2 = thing1;
+	}
+	else
+	{
+		t1 = thing1;
+		t2 = thing2;
+	}
+
+	if ((t1->thingflags & SITH_TF_CAPTURED) != 0 && (t1->thingflags & SITH_TF_INVULN) == 0)
+		sithCog_SendMessageFromThing(t1, t2, SITH_MESSAGE_TOUCHED);
+	if ((t2->thingflags & SITH_TF_CAPTURED) != 0 && (t2->thingflags & SITH_TF_INVULN) == 0)
+		sithCog_SendMessageFromThing(t2, t1, SITH_MESSAGE_TOUCHED);
+
+	// reactivate the ragdolls and apply forces
+	if (t1->rdthing.pRagdoll)
+	{
+		t1->rdthing.pRagdoll->expireMs = 0;
+		if (t1->physicsParams.mass != 0)
+		{
+			rdVector3 negHit;
+			rdVector_Neg3(&negHit, &searchEntry->hitNorm);
+			sithCollide_CollideRagdoll(t1, t2, &negHit);
+		}
+	}
+
+	if (t2->rdthing.pRagdoll)
+	{
+		t2->rdthing.pRagdoll->expireMs = 0;
+		if (t2->physicsParams.mass != 0)
+			sithCollide_CollideRagdoll(t2, t1, &searchEntry->hitNorm);
+	}
+
+	return 0;
+}
+#endif

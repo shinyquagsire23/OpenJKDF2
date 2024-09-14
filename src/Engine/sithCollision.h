@@ -49,6 +49,11 @@ int sithCollision_HasLos(sithThing *thing1, sithThing *thing2, int flag);
 void sithCollision_sub_4E77A0(sithThing *thing, rdMatrix34 *a2);
 int sithCollision_DebrisPlayerCollide(sithThing *thing, sithThing *thing2, sithCollisionSearchEntry *searchEnt, int isSolid);
 
+#ifdef RAGDOLLS
+void sithCollide_CollideRagdoll(sithThing* thing, sithThing* thing2, rdVector3* norm);
+int sithCorpse_Collide(sithThing* thing1, sithThing* thing2, sithCollisionSearchEntry* searchEntry, int isInverse);
+#endif
+
 #if 0
 static int (*_sithCollision_Startup)() = (void*)sithCollision_Startup_ADDR;
 static sithCollisionSearchEntry* (*sithCollision_NextSearchResult)(void) = (void*)sithCollision_NextSearchResult_ADDR;
