@@ -1225,7 +1225,7 @@ void sithPhysics_UpdateRagdollPositions(sithSector* sector, sithThing* pThing, r
 
 void sithPhysics_ConstrainRagdoll(sithSector* pSector, sithThing* pThing, rdRagdoll* pRagdoll, float deltaSeconds)
 {
-	int iterations = 5;
+	int iterations = 3;
 	for (int i = 0; i < iterations; ++i)
 	{
 		rdRagdoll_ApplyDistConstraints(pRagdoll);
