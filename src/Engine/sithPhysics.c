@@ -1348,7 +1348,7 @@ void sithPhysics_CollideRagdoll(sithThing* pThing, rdRagdoll* pRagdoll, float de
 	if (anyCollision)
 	{
 		// only set a new timer if one wasn't already set
-		pRagdoll->expireMs = !pRagdoll->expireMs ? sithTime_curMs + 4000 : pRagdoll->expireMs;
+		pRagdoll->expireMs = !pRagdoll->expireMs ? sithTime_curMs + 1500 : pRagdoll->expireMs;
 	}
 	// otherwise we're free-floating, let the sim run indefinitely until it settles
 	else if (sithTime_curMs < pRagdoll->expireMs)
