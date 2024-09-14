@@ -2404,6 +2404,9 @@ typedef struct jkSaberCollide
     sithThing* damagedThings[6];
     uint32_t numDamagedSurfaces;
     sithSurface* damagedSurfaces[6];
+#ifdef LIGHTSABER_MARKS
+	float totalCollisionTime;
+#endif
 } jkSaberCollide;
 
 #ifdef LIGHTSABER_TRAILS
