@@ -554,7 +554,8 @@ void jkSaber_SpawnBurn(jkPlayerInfo* pPlayerInfo, rdVector3* pPos, rdVector3* pH
 	}
 
 	// if we don't have a last mark, or we made a huge movement, also spawn sparks
-	if (!pPlayerInfo->lastSaberMark || rdVector_DistSquared3(pPos, &pPlayerInfo->lastSaberMark->position) > 0.004f)
+	float distSq = 0.0;
+	if (!pPlayerInfo->lastSaberMark || (distSq = rdVector_DistSquared3(pPos, &pPlayerInfo->lastSaberMark->position)) > 0.004f)
 	{
 		jkSaber_SpawnSparks(pPlayerInfo, pPos, pSector, SPARKTYPE_WALL);
 	}
@@ -570,7 +571,7 @@ void jkSaber_SpawnBurn(jkPlayerInfo* pPlayerInfo, rdVector3* pPos, rdVector3* pH
 		rdMatrix34 axis; // orientation of the decal
 		float markLen = 1.0f; // width scale of the decal
 
-		if(pPlayerInfo->lastSaberMark)
+		if(pPlayerInfo->lastSaberMark && distSq > 0.0001f)
 		{
 			// project the positions onto the hit plane
 			rdVector3 projPos, lastProjPos;
