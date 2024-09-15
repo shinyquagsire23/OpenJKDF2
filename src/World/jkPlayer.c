@@ -359,7 +359,7 @@ void jkPlayer_Shutdown()
             playerThings[i].polylineThing.model3 = 0;
         }
 
-#ifdef LIGHTSABER_TRAILS
+#ifdef LIGHTSABER_GLOW
 		rdSprite_FreeEntry(&playerThings[i].glowSprite); // Added: prevent memleak
 
 		if (playerThings[i].glowSpriteThing.sprite3)
@@ -381,7 +381,7 @@ void jkPlayer_Shutdown()
         {
             rdThing_FreeEntry(&jkPlayer_otherThings[i].polylineThing);
             jkPlayer_otherThings[i].polylineThing.model3 = 0;
-#ifdef LIGHTSABER_TRAILS
+#ifdef LIGHTSABER_GLOW
 			rdThing_FreeEntry(&jkPlayer_otherThings[i].glowSpriteThing);
 			jkPlayer_otherThings[i].glowSpriteThing.sprite3 = 0;
 #endif
@@ -400,7 +400,7 @@ void jkPlayer_Shutdown()
             jkPlayer_aMotsInfos[i].polylineThing.model3 = 0;
         }
 
-#ifdef LIGHTSABER_TRAILS
+#ifdef LIGHTSABER_GLOW
 		rdSprite_FreeEntry(&jkPlayer_aMotsInfos[i].glowSprite); // Added: prevent memleak
 
 		if (jkPlayer_aMotsInfos[i].glowSpriteThing.sprite3)

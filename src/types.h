@@ -2279,6 +2279,34 @@ typedef struct rdPolyLine
 }
 rdPolyLine;
 
+#ifdef LIGHTSABER_GLOW
+typedef struct rdSprite
+{
+	char path[32];
+	int type;
+	float radius;
+	uint32_t anonymous_10;
+	uint32_t anonymous_11;
+	uint32_t anonymous_12;
+	uint32_t anonymous_13;
+	uint32_t anonymous_14;
+	uint32_t anonymous_15;
+	uint32_t anonymous_16;
+	uint32_t anonymous_17;
+	uint32_t anonymous_18;
+	float width;
+	float height;
+	float halfWidth;
+	float halfHeight;
+	rdFace face;
+	rdVector2* vertexUVs;
+	rdVector3 offset;
+#ifdef DYNAMIC_POV
+	int id;
+#endif
+} rdSprite;
+#endif
+
 typedef struct rdThing
 {
     int type;
@@ -2457,6 +2485,10 @@ typedef struct jkPlayerInfo
 #endif // JKM_TYPES
 #ifdef LIGHTSABER_TRAILS
 	jkSaberTrail saberTrail[2];
+#endif
+#ifdef LIGHTSABER_GLOW
+	rdSprite glowSprite;
+	rdThing glowSpriteThing;
 #endif
 #ifdef LIGHTSABER_MARKS
 	uint32_t lastMarkSpawnMs;
