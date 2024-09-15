@@ -204,21 +204,21 @@ void rdRagdoll_UpdateTriangles(rdRagdoll* pRagdoll)
 		rdRagdollTri* pTri = &pRagdoll->pSkel->paTris[i];
 		rdMatrix34* pMat = &pRagdoll->paTris[i];
 
-		const rdVector3* pPos0 = &pRagdoll->paParticles[pTri->vert[0]].pos;
-		const rdVector3* pPos1 = &pRagdoll->paParticles[pTri->vert[1]].pos;
-		const rdVector3* pPos2 = &pRagdoll->paParticles[pTri->vert[2]].pos;
+const rdVector3* pPos0 = &pRagdoll->paParticles[pTri->vert[0]].pos;
+const rdVector3* pPos1 = &pRagdoll->paParticles[pTri->vert[1]].pos;
+const rdVector3* pPos2 = &pRagdoll->paParticles[pTri->vert[2]].pos;
 
-		rdVector_Sub3(&pMat->uvec, pPos1, pPos0);
-		rdVector_Normalize3Acc(&pMat->uvec);
-	
-		rdVector_Sub3(&pMat->rvec, pPos2, pPos0);
-		rdVector_Normalize3Acc(&pMat->rvec);
-	
-		rdVector_Cross3(&pMat->lvec, &pMat->uvec, &pMat->rvec);
-		rdVector_Normalize3Acc(&pMat->lvec);
-	
-		rdVector_Cross3(&pMat->rvec, &pMat->lvec, &pMat->uvec);
-		rdVector_Normalize3Acc(&pMat->rvec);
+rdVector_Sub3(&pMat->uvec, pPos1, pPos0);
+rdVector_Normalize3Acc(&pMat->uvec);
+
+rdVector_Sub3(&pMat->rvec, pPos2, pPos0);
+rdVector_Normalize3Acc(&pMat->rvec);
+
+rdVector_Cross3(&pMat->lvec, &pMat->uvec, &pMat->rvec);
+rdVector_Normalize3Acc(&pMat->lvec);
+
+rdVector_Cross3(&pMat->rvec, &pMat->lvec, &pMat->uvec);
+rdVector_Normalize3Acc(&pMat->rvec);
 	}
 }
 
@@ -256,7 +256,7 @@ void rdRagdoll_ApplyRotFriction(rdRagdoll* pRagdoll, float deltaSeconds, float f
 	float frictionDt = 1.0f - pow(friction, deltaSeconds * 1000.0f);
 
 	rdRagdoll_UpdateTriangles(pRagdoll);
-	
+
 	for (int i = 0; i < pRagdoll->pSkel->numRotFric; ++i)
 	{
 		rdRagdollRotFriction* pRotFric = &pRagdoll->pSkel->paRotFrictions[i];
@@ -272,7 +272,7 @@ void rdRagdoll_ApplyRotFriction(rdRagdoll* pRagdoll, float deltaSeconds, float f
 			continue;
 
 		angle *= -(stdMath_Fabs(angle) >= thresholdDt ? frictionDt : 1.0f);
-		if(stdMath_Fabs(angle) < 0.1f)
+		if (stdMath_Fabs(angle) < 0.1f)
 			continue;
 
 		rdRagdoll_ApplyRotConstraint(pRagdoll, &pRagdoll->pSkel->paTris[pRotFric->tri[0]], &pRagdoll->pSkel->paTris[pRotFric->tri[1]], angle, &axis);
@@ -302,71 +302,17 @@ int rdRagdoll_TrisHaveSharedVerts(rdRagdollTri* pTri0, rdRagdollTri* pTri1)
 	return 0;
 }
 
-void rdRagdoll_NewEntry(rdThing* pThing, rdVector3* pInitialVel)
+void rdRagdoll_BuildParticles(rdThing* pThing, rdVector3* pInitialVel)
 {
-	if (!pThing->model3 || !pThing->model3->pSkel)
-		return;
-
-	rdRagdoll* pRagdoll = (rdRagdoll*)rdroid_pHS->alloc(sizeof(rdRagdoll));
-	pThing->pRagdoll = pRagdoll;
-	if (!pRagdoll)
-		return;
-
-	_memset(pRagdoll, 0, sizeof(rdRagdoll));
-
-	pRagdoll->pModel = pThing->model3;
-	pRagdoll->pThing = pThing;
-	pRagdoll->pSkel = pRagdoll->pModel->pSkel;
-	pRagdoll->lastTimeStep = sithTime_deltaSeconds;
-
-	pRagdoll->numParticles = pRagdoll->pSkel->numVerts;
-	pRagdoll->paParticles = (rdRagdollParticle*)rdroid_pHS->alloc(sizeof(rdRagdollParticle) * pRagdoll->numParticles);
-	if (!pRagdoll->paParticles)
-		return;
-
-	_memset(pRagdoll->paParticles, 0, sizeof(rdRagdollParticle) * pRagdoll->numParticles);
-
-	pRagdoll->paPoseMatrices = (rdMatrix34*)rdroid_pHS->alloc(sizeof(rdMatrix34) * pRagdoll->pModel->numHierarchyNodes);
-	if (!pRagdoll->paPoseMatrices)
-		return;
-
-	_memcpy(pRagdoll->paPoseMatrices, pThing->hierarchyNodeMatrices, sizeof(rdMatrix34) * pRagdoll->pModel->numHierarchyNodes);
-
-	pRagdoll->paJointMatrices = (rdMatrix34*)rdroid_pHS->alloc(sizeof(rdMatrix34) * pRagdoll->pSkel->numJoints);
-	if (!pRagdoll->paJointMatrices)
-		return;
-	_memset(pRagdoll->paJointMatrices, 0, sizeof(rdMatrix34) * pRagdoll->pSkel->numJoints);
-	
-	pRagdoll->paJointTris = (rdMatrix34*)rdroid_pHS->alloc(sizeof(rdMatrix34) * pRagdoll->pSkel->numJoints);
-	if (!pRagdoll->paJointTris)
-		return;
-	_memset(pRagdoll->paJointTris, 0, sizeof(rdMatrix34) * pRagdoll->pSkel->numJoints);
-
-	pRagdoll->paTris = (rdMatrix34*)rdroid_pHS->alloc(sizeof(rdMatrix34) * pRagdoll->pSkel->numTris);
-	if (!pRagdoll->paTris)
-		return;
-	_memset(pRagdoll->paTris, 0, sizeof(rdMatrix34) * pRagdoll->pSkel->numTris);
-
-	pRagdoll->paRotFricMatrices = (rdMatrix34*)rdroid_pHS->alloc(sizeof(rdMatrix34) * pRagdoll->pSkel->numRotFric);
-	if (!pRagdoll->paRotFricMatrices)
-		return;
-	_memset(pRagdoll->paRotFricMatrices, 0, sizeof(rdMatrix34) * pRagdoll->pSkel->numRotFric);
-	
-	pRagdoll->paDistConstraintDists = (float*)rdroid_pHS->alloc(sizeof(float) * pRagdoll->pSkel->numDist);
-	if (!pRagdoll->paDistConstraintDists)
-		return;
-	_memset(pRagdoll->paDistConstraintDists, 0, sizeof(float) * pRagdoll->pSkel->numDist);
-
-	// generate initial particle positions
 	rdVector3 thingVel;
 	rdVector_Scale3(&thingVel, pInitialVel, sithTime_deltaSeconds);
 
-	for (int i = 0; i < pRagdoll->numParticles; i++)
+	for (int i = 0; i < pThing->pRagdoll->numParticles; i++)
 	{
 		rdVector3 offset;
 
-		rdRagdollParticle* pParticle = &pRagdoll->paParticles[i];
-		rdRagdollVert* pVert = &pRagdoll->pSkel->paVerts[i];
+		rdRagdollParticle* pParticle = &pThing->pRagdoll->paParticles[i];
+		rdRagdollVert* pVert = &pThing->pRagdoll->pSkel->paVerts[i];
 
 		rdVector_Copy3(&pParticle->pos, &pThing->hierarchyNodeMatrices[pVert->node].scale);
 		rdMatrix_TransformVector34(&offset, &pVert->offset, &pThing->hierarchyNodeMatrices[pVert->node]);
@@ -385,8 +331,8 @@ void rdRagdoll_NewEntry(rdThing* pThing, rdVector3* pInitialVel)
 		pParticle->flags = pVert->flags;
 
 		// todo: we're gonna need a better way of deciding how big of a radius to make for each particle
-		if (pRagdoll->pModel->hierarchyNodes[pVert->node].meshIdx != -1)
-			pParticle->radius = pRagdoll->pModel->geosets[0].meshes[pRagdoll->pModel->hierarchyNodes[pVert->node].meshIdx].radius * 0.35f;
+		if (pThing->pRagdoll->pModel->hierarchyNodes[pVert->node].meshIdx != -1)
+			pParticle->radius = pThing->pRagdoll->pModel->geosets[0].meshes[pThing->pRagdoll->pModel->hierarchyNodes[pVert->node].meshIdx].radius * 0.35f;
 		else
 			pParticle->radius = 0.01f;
 
@@ -403,19 +349,21 @@ void rdRagdoll_NewEntry(rdThing* pThing, rdVector3* pInitialVel)
 		rdMatrix_Identity34(&pParticle->thing.lookOrientation); // don't think we care about orientation?
 		pParticle->thing.parentThing = pThing->parentSithThing;
 	}
+}
 
-	// build joint matrices
+void rdRagdoll_BuildJointMatrices(rdRagdoll* pRagdoll)
+{
 	for (int i = 0; i < pRagdoll->pSkel->numJoints; ++i)
 	{
 		rdRagdollJoint* pJoint = &pRagdoll->pSkel->paJoints[i];
-		rdMatrix_Copy34(&pRagdoll->paJointMatrices[i], &pThing->hierarchyNodeMatrices[pJoint->node]);
+		rdMatrix_Identity34(&pRagdoll->paJointMatrices[i]);
 
 		rdRagdollTri* pTri = &pRagdoll->pSkel->paTris[pJoint->tri];
 
 		rdVector3* pPos0 = &pRagdoll->paParticles[pTri->vert[0]].pos;
 		rdVector3* pPos1 = &pRagdoll->paParticles[pTri->vert[1]].pos;
 		rdVector3* pPos2 = &pRagdoll->paParticles[pTri->vert[2]].pos;
-		
+
 		rdMatrix34 m;
 		rdVector_Sub3(&m.uvec, pPos1, pPos0);
 		rdVector_Normalize3Acc(&m.uvec);
@@ -433,6 +381,12 @@ void rdRagdoll_NewEntry(rdThing* pThing, rdVector3* pInitialVel)
 
 		rdMatrix_InvertOrtho34(&pRagdoll->paJointTris[i], &m);
 	}
+}
+
+void rdRagdoll_BuildRagdoll(rdRagdoll* pRagdoll, rdVector3* pInitialVel)
+{
+	rdRagdoll_BuildParticles(pRagdoll->pThing, pInitialVel);
+	rdRagdoll_BuildJointMatrices(pRagdoll);
 
 	// update constraint distances
 	for (int i = 0; i < pRagdoll->pSkel->numDist; ++i)
@@ -453,6 +407,71 @@ void rdRagdoll_NewEntry(rdThing* pThing, rdVector3* pInitialVel)
 	}
 
 	rdRagdoll_UpdateBounds(pRagdoll);
+}
+
+int rdRagdoll_AllocRagdollData(rdRagdoll* pRagdoll)
+{
+	pRagdoll->numParticles = pRagdoll->pSkel->numVerts;
+	pRagdoll->paParticles = (rdRagdollParticle*)rdroid_pHS->alloc(sizeof(rdRagdollParticle) * pRagdoll->numParticles);
+	if (!pRagdoll->paParticles)
+		return 0;
+
+	pRagdoll->paPoseMatrices = (rdMatrix34*)rdroid_pHS->alloc(sizeof(rdMatrix34) * pRagdoll->pModel->numHierarchyNodes);
+	if (!pRagdoll->paPoseMatrices)
+		return 0;
+
+	pRagdoll->paJointMatrices = (rdMatrix34*)rdroid_pHS->alloc(sizeof(rdMatrix34) * pRagdoll->pSkel->numJoints);
+	if (!pRagdoll->paJointMatrices)
+		return 0;
+
+	pRagdoll->paJointTris = (rdMatrix34*)rdroid_pHS->alloc(sizeof(rdMatrix34) * pRagdoll->pSkel->numJoints);
+	if (!pRagdoll->paJointTris)
+		return 0;
+
+	pRagdoll->paTris = (rdMatrix34*)rdroid_pHS->alloc(sizeof(rdMatrix34) * pRagdoll->pSkel->numTris);
+	if (!pRagdoll->paTris)
+		return 0;
+
+	pRagdoll->paRotFricMatrices = (rdMatrix34*)rdroid_pHS->alloc(sizeof(rdMatrix34) * pRagdoll->pSkel->numRotFric);
+	if (!pRagdoll->paRotFricMatrices)
+		return 0;
+
+	pRagdoll->paDistConstraintDists = (float*)rdroid_pHS->alloc(sizeof(float) * pRagdoll->pSkel->numDist);
+	if (!pRagdoll->paDistConstraintDists)
+		return 0;
+
+	// clear it all
+	_memset(pRagdoll->paParticles, 0, sizeof(rdRagdollParticle) * pRagdoll->numParticles);
+	_memcpy(pRagdoll->paPoseMatrices, pRagdoll->pThing->hierarchyNodeMatrices, sizeof(rdMatrix34) * pRagdoll->pModel->numHierarchyNodes);
+	_memset(pRagdoll->paJointMatrices, 0, sizeof(rdMatrix34) * pRagdoll->pSkel->numJoints);
+	_memset(pRagdoll->paJointTris, 0, sizeof(rdMatrix34) * pRagdoll->pSkel->numJoints);
+	_memset(pRagdoll->paTris, 0, sizeof(rdMatrix34) * pRagdoll->pSkel->numTris);
+	_memset(pRagdoll->paRotFricMatrices, 0, sizeof(rdMatrix34) * pRagdoll->pSkel->numRotFric);
+	_memset(pRagdoll->paDistConstraintDists, 0, sizeof(float) * pRagdoll->pSkel->numDist);
+
+	return 1;
+}
+
+void rdRagdoll_NewEntry(rdThing* pThing, rdVector3* pInitialVel)
+{
+	if (!pThing->model3 || !pThing->model3->pSkel)
+		return;
+
+	rdRagdoll* pRagdoll = (rdRagdoll*)rdroid_pHS->alloc(sizeof(rdRagdoll));
+	pThing->pRagdoll = pRagdoll;
+	if (!pRagdoll)
+		return;
+
+	_memset(pRagdoll, 0, sizeof(rdRagdoll));
+
+	pRagdoll->pModel = pThing->model3;
+	pRagdoll->pThing = pThing;
+	pRagdoll->pSkel = pRagdoll->pModel->pSkel;
+	pRagdoll->lastTimeStep = sithTime_deltaSeconds;
+
+	if(!rdRagdoll_AllocRagdollData(pRagdoll))
+		return;
+	rdRagdoll_BuildRagdoll(pRagdoll, pInitialVel);
 }
 
 void rdRagdoll_FreeEntry(rdRagdoll* pRagdoll)
