@@ -236,7 +236,7 @@ void rdRagdoll_UpdateBounds(rdRagdoll* pRagdoll)
 	for (int i = 0; i < pRagdoll->numParticles; ++i)
 	{
 		rdRagdollParticle* pParticle = &pRagdoll->paParticles[i];
-		pRagdoll->radius = max(pRagdoll->radius, rdVector_Dist3(&pParticle->pos, &pRagdoll->center));
+		pRagdoll->radius = fmax(pRagdoll->radius, rdVector_Dist3(&pParticle->pos, &pRagdoll->center));
 	}
 }
 

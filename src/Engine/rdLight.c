@@ -552,9 +552,9 @@ void rdAmbient_Lerp(rdAmbient* out, const rdAmbient* ambient0, const rdAmbient* 
 
 void rdAmbient_AddAcc(rdAmbient* out, const rdAmbient* ambient)
 {
-	rdVector_Add4Acc(&out->r, &ambient->r);
-	rdVector_Add4Acc(&out->g, &ambient->g);
-	rdVector_Add4Acc(&out->b, &ambient->b);
+	rdVector_Add4Acc((rdVector3*)&out->r, &ambient->r);
+	rdVector_Add4Acc((rdVector3*)&out->g, &ambient->g);
+	rdVector_Add4Acc((rdVector3*)&out->b, &ambient->b);
 }
 
 void rdAmbient_Copy(rdAmbient* outAmbient, const rdAmbient* ambient)
@@ -575,9 +575,9 @@ void rdAmbient_CalculateVertexColor(rdAmbient* ambient, rdVector3* normal, rdVec
 	shN.z =  k * normal->z;
 	shN.w = -k * normal->x;
 
-	outColor->x = max(0.0f, rdVector_Dot4(&shN, &ambient->r)) / M_PI;
-	outColor->y = max(0.0f, rdVector_Dot4(&shN, &ambient->g)) / M_PI;
-	outColor->z = max(0.0f, rdVector_Dot4(&shN, &ambient->b)) / M_PI;
+	outColor->x = fmax(0.0f, rdVector_Dot4(&shN, &ambient->r)) / M_PI;
+	outColor->y = fmax(0.0f, rdVector_Dot4(&shN, &ambient->g)) / M_PI;
+	outColor->z = fmax(0.0f, rdVector_Dot4(&shN, &ambient->b)) / M_PI;
 }
 
 void rdAmbient_UpdateDominantDirection(rdAmbient* ambient)

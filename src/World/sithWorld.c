@@ -397,9 +397,9 @@ int sithWorld_NewEntry(sithWorld *pWorld)
 					for (int k = 0; k < surface->surfaceInfo.face.numVertices; ++k)
 					{
 						rdVector3 col;
-						col.x = max(minlight, surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 1]);
-						col.y = max(minlight, surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 2]);
-						col.z = max(minlight, surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 3]);
+						col.x = fmax(minlight, surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 1]);
+						col.y = fmax(minlight, surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 2]);
+						col.z = fmax(minlight, surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 3]);
 						rdVector_Add3Acc(&sector->ambientRGB, &col);
 
 						// we get more directionality by using the vertex to sector center instead of surface normal
