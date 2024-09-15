@@ -495,7 +495,8 @@ typedef struct rdLight
 // ambient cube
 typedef struct rdAmbient
 {
-	rdVector4 r, g, b;
+	rdVector4 r, g, b; // rgb coefficients (linear SH)
+	rdVector3 dominantDir; // precomputed dominant light direction
 } rdAmbient;
 #endif
 

@@ -481,4 +481,14 @@ void rdAmbient_CalculateVertexColor(rdAmbient* ambient, rdVector3* normal, rdVec
 	outColor->y = max(0.0f, rdVector_Dot4(&shN, &ambient->g)) / M_PI;
 	outColor->z = max(0.0f, rdVector_Dot4(&shN, &ambient->b)) / M_PI;
 }
+
+void rdAmbient_UpdateDominantDirection(rdAmbient* ambient)
+{
+	ambient->dominantDir.x = ambient->r.y * 0.33f + ambient->g.y * 0.59f + ambient->b.y * 0.11f;
+	ambient->dominantDir.y = ambient->r.z * 0.33f + ambient->g.z * 0.59f + ambient->b.z * 0.11f;
+	ambient->dominantDir.z = ambient->r.w * 0.33f + ambient->g.w * 0.59f + ambient->b.w * 0.11f;
+	rdVector_Set3(&ambient->dominantDir, -ambient->dominantDir.z, -ambient->dominantDir.x, ambient->dominantDir.y);
+	rdVector_Normalize3Acc(&ambient->dominantDir);
+}
+
 #endif
