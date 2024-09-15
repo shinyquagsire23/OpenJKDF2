@@ -1291,12 +1291,13 @@ void sithPhysics_UpdateRagdollParticles(rdRagdoll* pRagdoll, float deltaSeconds)
 		// copy the old pos
 		rdVector_Copy3(&pParticle->lastPos, &pParticle->pos);
 
-		// add the vel change
-		rdVector_Add3Acc(&pParticle->pos, &vel);
-
 		// update the particle thing position and sector
 		rdVector_Copy3(&pParticle->thing.position, &pParticle->pos);
+		rdVector_Copy3(&pParticle->thing.physicsParams.vel, &vel); // copy the vel in case we get modified (ex. entering water)
 		sithThing_EnterSector(&pParticle->thing, pRagdoll->pThing->parentSithThing->sector, 1, 0);
+
+		// add the vel
+		rdVector_Add3Acc(&pParticle->pos, &pParticle->thing.physicsParams.vel);
 	}
 }
 
