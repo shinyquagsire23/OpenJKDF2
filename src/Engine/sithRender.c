@@ -1255,6 +1255,15 @@ void sithRender_RenderLevelGeometry()
 #endif
                 rdCamera_pCurCamera->fnProjectLst(procEntry->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
 
+#ifdef OBJECT_MOTION_BLUR
+				for (int i = 0; i < meshinfo_out.numVertices; ++i)
+				{
+					procEntry->motionVectorsX[i] = 0;//procEntry->vertices[i].x;
+					procEntry->motionVectorsY[i] = 0;//procEntry->vertices[i].y;
+					procEntry->motionVectorsZ[i] = 0;//procEntry->vertices[i].z;
+				}
+#endif
+
                 if ( sithRender_lightingIRMode )
                 {
 #ifdef RGB_AMBIENT
