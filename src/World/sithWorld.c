@@ -378,15 +378,28 @@ int sithWorld_NewEntry(sithWorld *pWorld)
 				{
 					sithSurface* surface = &pWorld->sectors[i].surfaces[j];
 					total += surface->surfaceInfo.face.numVertices;
+
+					sflight += surface->surfaceInfo.face.extraLight;
+
+					float minlight = surface->surfaceInfo.face.extraLight;
+					if (surface->surfaceInfo.face.lightingMode == RD_LIGHTMODE_FULLYLIT)
+						minlight = 1.0f;
+
+
+					int emissiveLightLevel = 0;
+					if ((surface->surfaceFlags & SITH_SURFACE_HORIZON_SKY) || (surface->surfaceFlags & SITH_SURFACE_CEILING_SKY))
+						emissiveLightLevel = -1;
+
+					rdVector3 emissive;
+					if(rdMaterial_GetFillColor(&emissive, surface->surfaceInfo.face.material, pWorld->sectors[i].colormap, 0, -1))
+						rdAmbient_Acc(&sector->ambientSH, &emissive, &surface->surfaceInfo.face.normal);
+
 					for (int k = 0; k < surface->surfaceInfo.face.numVertices; ++k)
 					{
-						sflight += surface->surfaceInfo.face.extraLight;
-
 						rdVector3 col;
-						col.x = max(surface->surfaceInfo.face.extraLight, surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 1]);
-						col.y = max(surface->surfaceInfo.face.extraLight, surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 2]);
-						col.z = max(surface->surfaceInfo.face.extraLight, surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 3]);
-						
+						col.x = max(minlight, surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 1]);
+						col.y = max(minlight, surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 2]);
+						col.z = max(minlight, surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 3]);
 						rdVector_Add3Acc(&sector->ambientRGB, &col);
 
 						// we get more directionality by using the vertex to sector center instead of surface normal
