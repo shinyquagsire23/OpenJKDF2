@@ -1351,7 +1351,6 @@ void rdModel3_DrawHNode(rdHierarchyNode *pNode)
 }
 
 // MOTS altered (RGB lights)
-rdVector3* pCurPos = NULL;
 void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
 {
     rdLight **pGeoLight;
@@ -1373,12 +1372,10 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
     if ( meshFrustrumCull == 2 )
         return;
 
-	pCurPos = &vertex_out;
-
     rdMatrix_Multiply34(&out, &rdCamera_pCurCamera->view_matrix, mat);
     rdMatrix_TransformPointLst34(&out, pCurMesh->vertices, aView, pCurMesh->numVertices);
     rdMatrix_InvertOrtho34(&matInv, mat);
-  
+    
     rdModel3_geometryMode = pCurMesh->geometryMode;
     if ( rdModel3_geometryMode >= curGeometryMode )
         rdModel3_geometryMode = curGeometryMode;
@@ -1521,39 +1518,6 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
         }
     }
 
-
-/*#ifdef OBJECT_MOTION_BLUR
-	int geosetNum = 0;
-	if (pCurThing->geosetSelect == -1)
-		geosetNum = pCurModel3->geosetSelect;
-	else
-		geosetNum = pCurThing->geosetSelect;
-
-	if (pCurThing->paLastVerts)
-	{
-		if (pCurThing->paLastVerts[geosetNum])
-		{
-			if (pCurThing->paLastVerts[geosetNum][pCurMesh->mesh_num])
-			{
-				static rdVector3 aViewProj[512];
-				static rdVector3 aLastViewProj[512];
-
-				// somewhat redundant but whatever, also not even sure this behaves outside of the view...
-				rdCamera_pCurCamera->fnProjectLst(aViewProj, aView, pCurMesh->numVertices);
-				rdCamera_pCurCamera->fnProjectLst(aLastViewProj, pCurThing->paLastVerts[geosetNum][pCurMesh->mesh_num], pCurMesh->numVertices);
-
-				for (int v = 0; v < pCurMesh->numVertices; ++v)
-				{
-					pCurThing->paMotionVectors[geosetNum][pCurMesh->mesh_num][v].x = (aViewProj[v].x - aLastViewProj[v].x) / (float)(rdCamera_pCurCamera->canvas->widthMinusOne + 1);
-					pCurThing->paMotionVectors[geosetNum][pCurMesh->mesh_num][v].y = (aViewProj[v].y - aLastViewProj[v].y) / (float)(rdCamera_pCurCamera->canvas->heightMinusOne + 1);
-				}
-
-				memcpy(pCurThing->paLastVerts[geosetNum][pCurMesh->mesh_num], aView, sizeof(rdVector3) * pCurMesh->numVertices);
-			}
-		}
-	}
-#endif*/
-
     rdMatrix_TransformPoint34(&localCamera, &rdCamera_camMatrix.scale, &matInv);
     rdFace* face = &meshIn->faces[0];
     for (int i = 0; i < meshIn->numFaces; i++)
@@ -1574,32 +1538,6 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
         rdModel3_DrawFace(face, flags);
         ++face;
     }
-
-#ifdef OBJECT_MOTION_BLUR
-	int geosetNum = 0;
-	if (pCurThing->geosetSelect == -1)
-		geosetNum = pCurModel3->geosetSelect;
-	else
-		geosetNum = pCurThing->geosetSelect;
-
-	if (pCurThing->paLastVertsX)
-	{
-		if (pCurThing->paLastVertsX[geosetNum])
-		{
-			if (pCurThing->paLastVertsX[geosetNum][pCurMesh->mesh_num])
-			{
-				for (int v = 0; v < pCurMesh->numVertices; ++v)
-				{
-					pCurThing->paLastVertsX[geosetNum][pCurMesh->mesh_num][v] = aView[v].x;
-					pCurThing->paLastVertsY[geosetNum][pCurMesh->mesh_num][v] = aView[v].y;
-					pCurThing->paLastVertsZ[geosetNum][pCurMesh->mesh_num][v] = aView[v].z;
-				}
-				rdVector_Copy3(&pCurThing->paLastPos[geosetNum][pCurMesh->mesh_num], &vertex_out);
-			}
-		}
-	}
-#endif
-	pCurPos = NULL;
 }
 
 // MOTS altered (RGB lights)
@@ -1652,42 +1590,6 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
     vertexSrc.numVertices = face->numVertices;
     vertexSrc.vertexPosIdx = face->vertexPosIdx;
     vertexSrc.vertexUVIdx = face->vertexUVIdx;
-
-#ifdef OBJECT_MOTION_BLUR
-	int geosetNum = 0;
-	if (pCurThing->geosetSelect == -1)
-		geosetNum = pCurModel3->geosetSelect;
-	else
-		geosetNum = pCurThing->geosetSelect;
-	if (pCurThing->paLastVertsX)
-	{
-		if (pCurThing->paLastVertsX[geosetNum])
-		{
-			if (pCurThing->paLastVertsX[geosetNum][pCurMesh->mesh_num])
-			{
-				// fixme: bit of an expensive hack to avoid messing with the existing clip functions
-				//        need to actually pass velocity info into the clip functions to avoid this but they're a mess atm
-				//        for now, clip once with simple clipping with velocity in rgb, then let the renderer clip again
-				rdMeshinfo vertexDstMB;
-				memcpy(&vertexDstMB, &vertexDst, sizeof(vertexDst));
-				vertexDstMB.paRedIntensities = procEntry->motionVectorsX;
-				vertexDstMB.paGreenIntensities = procEntry->motionVectorsY;
-				vertexDstMB.paBlueIntensities = procEntry->motionVectorsZ;
-
-				rdMeshinfo vertesSrcMB;
-				memcpy(&vertesSrcMB, &vertexSrc, sizeof(vertexSrc));
-				vertesSrcMB.paRedIntensities = pCurThing->paLastVertsX[geosetNum][pCurMesh->mesh_num];
-				vertesSrcMB.paGreenIntensities = pCurThing->paLastVertsY[geosetNum][pCurMesh->mesh_num];
-				vertesSrcMB.paBlueIntensities = pCurThing->paLastVertsZ[geosetNum][pCurMesh->mesh_num];
-
-				if (meshFrustrumCull)
-					rdPrimit3_ClipFaceRGB(rdCamera_pCurCamera->pClipFrustum, 5, lightingMode, textureMode, (rdVertexIdxInfo*)&vertesSrcMB, &vertexDstMB, &face->clipIdk);
-				else
-					rdPrimit3_NoClipFaceRGB(5, lightingMode, textureMode, &vertesSrcMB, &vertexDstMB, &face->clipIdk);
-			}
-		}
-	}
-#endif
 
     // MOTS added: RGB
     if ((rdGetVertexColorMode() == 0) || (procEntry->lightingMode == 2)) {
@@ -1743,58 +1645,6 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
 	memcpy(procEntry->vertexVS, vertexDst.verticesProjected, sizeof(rdVector3) * vertexDst.numVertices);
 #endif
     rdCamera_pCurCamera->fnProjectLst(vertexDst.verticesOrig, vertexDst.verticesProjected, vertexDst.numVertices);
-
-#ifdef OBJECT_MOTION_BLUR
-	if(pCurThing->paLastVertsX && pCurThing->paLastVertsX[geosetNum] && pCurThing->paLastVertsX[geosetNum][pCurMesh->mesh_num])
-	{
-		// doing this on cpu is kinda crap but such is life
-		float shutter = sithTime_TickHz / 30.0f;
-
-		// only want object motion, not camera motion
-		// attempt to compensate by using the pivot velocity
-		rdVector3 origProj;
-		rdCamera_pCurCamera->fnProject(&origProj, pCurPos);
-
-		rdVector3 origProjLast;
-		rdCamera_pCurCamera->fnProject(&origProjLast, &pCurThing->paLastPos[geosetNum][pCurMesh->mesh_num]);
-
-		rdVector2 objVel;
-		objVel.x = 0;// (origProj.x - origProjLast.x) * shutter / (float)(rdCamera_pCurCamera->canvas->vbuffer->format.width);;
-		objVel.y = 0;// (origProj.y - origProjLast.y) * shutter / (float)(rdCamera_pCurCamera->canvas->vbuffer->format.height);
-
-		for (int i = 0; i < vertexDst.numVertices; ++i)
-		{
-			// holds the previous view space transformed vertices at this point
-			rdVector3 vert;
-			vert.x = procEntry->motionVectorsX[i];
-			vert.y = procEntry->motionVectorsY[i];
-			vert.z = procEntry->motionVectorsZ[i];
-
-			// now project it to screen space
-			rdVector3 projLast;
-			rdCamera_pCurCamera->fnProject(&projLast, &vert);
-			
-			rdVector3* proj = &vertexDst.verticesOrig[i];
-		
-			procEntry->motionVectorsX[i] = (proj->x - projLast.x) * shutter / (float)(rdCamera_pCurCamera->canvas->vbuffer->format.width) - objVel.x;
-			procEntry->motionVectorsY[i] = (proj->y - projLast.y) * shutter / (float)(rdCamera_pCurCamera->canvas->vbuffer->format.height) - objVel.y;
-			procEntry->motionVectorsZ[i] = 1;
-		
-			float sqLen = procEntry->motionVectorsX[i] * procEntry->motionVectorsX[i] + procEntry->motionVectorsY[i] * procEntry->motionVectorsY[i];
-			if(sqLen < 0.001f)
-				procEntry->motionVectorsZ[i] = 0.f;
-		}
-	}
-	else
-	{
-		for (int i = 0; i < vertexDst.numVertices; ++i)
-		{
-			procEntry->motionVectorsX[i] = 0;
-			procEntry->motionVectorsY[i] = 0;
-			procEntry->motionVectorsZ[i] = 0;
-		}
-	}
-#endif
 
 #ifdef RGB_AMBIENT
 	if (rdroid_curRenderOptions & 2)

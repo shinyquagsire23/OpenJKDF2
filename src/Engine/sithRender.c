@@ -1254,7 +1254,6 @@ void sithRender_RenderLevelGeometry()
 				memcpy(procEntry->vertexVS, sithRender_aVerticesTmp, sizeof(rdVector3) * meshinfo_out.numVertices);
 #endif
                 rdCamera_pCurCamera->fnProjectLst(procEntry->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
-
                 if ( sithRender_lightingIRMode )
                 {
 #ifdef RGB_AMBIENT
@@ -1494,15 +1493,6 @@ void sithRender_RenderLevelGeometry()
 					memcpy(v20->vertexVS, sithRender_aVerticesTmp, sizeof(rdVector3) * meshinfo_out.numVertices);
 #endif
                     rdCamera_pCurCamera->fnProjectLst(v20->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
-
-#ifdef OBJECT_MOTION_BLUR
-					for (int i = 0; i < meshinfo_out.numVertices; ++i)
-					{
-						v20->motionVectorsX[i] = 0;//v20->vertices[i].x;
-						v20->motionVectorsY[i] = 0;//v20->vertices[i].y;
-						v20->motionVectorsZ[i] = 0;//v20->vertices[i].z;
-					}
-#endif
 
                     if ( sithRender_lightingIRMode )
                     {
@@ -2547,15 +2537,6 @@ void sithRender_RenderAlphaSurfaces()
 				memcpy(v9->vertexVS, sithRender_aVerticesTmp, sizeof(rdVector3) * meshinfo_out.numVertices);
 #endif
 				rdCamera_pCurCamera->fnProjectLst(v9->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
-
-#ifdef OBJECT_MOTION_BLUR
-				for (int i = 0; i < meshinfo_out.numVertices; ++i)
-				{
-					v9->motionVectorsX[i] = 0;//v9->vertices[i].x;
-					v9->motionVectorsY[i] = 0;//v9->vertices[i].y;
-					v9->motionVectorsZ[i] = 0;//v9->vertices[i].z;
-				}
-#endif
 
 				if (sithRender_lightingIRMode)
 				{

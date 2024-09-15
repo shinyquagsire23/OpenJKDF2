@@ -129,9 +129,6 @@ GLuint create_shader(const char* shader, GLenum type) {
 #ifdef DEFERRED_DECALS
 	"#define DEFERRED_DECALS\n"
 #endif
-#ifdef OBJECT_MOTION_BLUR
-	"#define OBJECT_MOTION_BLUR\n"
-#endif
 #ifdef FOG
 	"#define FOG\n"
 #endif

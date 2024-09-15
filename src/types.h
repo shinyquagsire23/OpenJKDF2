@@ -617,12 +617,6 @@ typedef struct rdProcEntry
 #ifdef DEFERRED_DECALS
 	rdVector3* vertexVS; // the stupid vertices array is in clip space, but we want to store view/world position
 #endif
-#ifdef OBJECT_MOTION_BLUR
-	// split for clipping hack..
-	float* motionVectorsX;
-	float* motionVectorsY;
-	float* motionVectorsZ;
-#endif
     float* vertexIntensities;
 #ifdef JKM_LIGHTING
     float* paRedIntensities;
@@ -824,17 +818,6 @@ typedef struct D3DVERTEX_ext
 #pragma pack(pop)
 #pragma pack(push, 4)
   float vz;
-#pragma pack(pop)
-#endif
-#ifdef OBJECT_MOTION_BLUR
-#pragma pack(push, 4)
-  float mx;
-#pragma pack(pop)
-#pragma pack(push, 4)
-  float my;
-#pragma pack(pop)
-#pragma pack(push, 4)
-  float mz;
 #pragma pack(pop)
 #endif
 } D3DVERTEX_ext;
@@ -2374,17 +2357,6 @@ typedef struct rdThing
 #ifdef RAGDOLLS
 	rdRagdoll* pRagdoll;
 	rdMatrix34* paHierarchyNodeMatricesPrev;
-#endif
-#ifdef OBJECT_MOTION_BLUR
-	// keep a copy of these values because the model might die before cleanup
-	int geosets;
-	int* nummeshes;
-	// list of previous transformed verts, per geo set, per mesh
-	// split component wise for a clipping hack where we replace the RGB components
-	float*** paLastVertsX;
-	float*** paLastVertsY;
-	float*** paLastVertsZ;
-	rdVector3** paLastPos;
 #endif
 } rdThing;
 

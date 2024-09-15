@@ -75,9 +75,6 @@ typedef struct std3DFramebuffer
 #ifdef DEFERRED_DECALS
 	GLuint tex4;
 #endif
-#ifdef OBJECT_MOTION_BLUR
-	GLuint tex5;
-#endif
 
     std3DIntermediateFbo window;
     std3DIntermediateFbo main;
@@ -101,11 +98,6 @@ typedef struct std3DFramebuffer
     std3DIntermediateFbo ssaoBlur2;
     //std3DIntermediateFbo ssaoBlur3;
 
-#ifdef OBJECT_MOTION_BLUR
-	std3DIntermediateFbo omb1;
-	std3DIntermediateFbo omb2;
-#endif
-
     GLuint rbo;
     int32_t w;
     int32_t h;
@@ -127,9 +119,6 @@ GLint attribute_coord3d, attribute_v_color, attribute_v_light, attribute_v_uv, a
 #ifdef DEFERRED_DECALS
 GLint attribute_coordVS;
 #endif
-#ifdef OBJECT_MOTION_BLUR
-GLint attribute_coordMV;
-#endif
 GLint uniform_mvp, uniform_tex, uniform_texEmiss, uniform_displacement_map, uniform_tex_mode, uniform_blend_mode, uniform_worldPalette, uniform_worldPaletteLights;
 GLint uniform_tint, uniform_filter, uniform_fade, uniform_add, uniform_emissiveFactor, uniform_albedoFactor;
 GLint uniform_light_mult, uniform_displacement_factor, uniform_iResolution;
@@ -147,10 +136,6 @@ std3DSimpleTexStage std3D_ssaoStage;
 std3DSimpleTexStage std3D_ssaoMixStage;
 
 std3DSimpleTexStage std3D_bloomStage;
-
-#ifdef OBJECT_MOTION_BLUR
-std3DSimpleTexStage std3D_ombStage;
-#endif
 
 GLuint blank_tex, blank_tex_white;
 void* blank_data = NULL, *blank_data_white = NULL;
@@ -353,19 +338,6 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, pFb->tex4, 0);
 #endif
 
-#ifdef OBJECT_MOTION_BLUR
-	glGenTextures(1, &pFb->tex5);
-	glBindTexture(GL_TEXTURE_2D, pFb->tex5);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-	// Attach fbTex to our currently bound framebuffer fb
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT5, GL_TEXTURE_2D, pFb->tex5, 0);
-#endif
-
     // Set up our render buffer
     glGenRenderbuffers(1, &pFb->rbo);
     glBindRenderbuffer(GL_RENDERBUFFER, pFb->rbo);
@@ -422,11 +394,6 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
         pFb->blur4.ih = height;*/
     }
 
-#ifdef OBJECT_MOTION_BLUR
-	std3D_generateIntermediateFbo(width, height, &pFb->omb1, 0);
-	std3D_generateIntermediateFbo(width, height, &pFb->omb2, 0);
-#endif
-
     pFb->main.fbo = pFb->fbo;
     pFb->main.tex = pFb->tex1;
     pFb->main.rbo = pFb->rbo;
@@ -466,11 +433,6 @@ void std3D_deleteFramebuffer(std3DFramebuffer* pFb)
     std3D_deleteIntermediateFbo(&pFb->ssaoBlur1);
     std3D_deleteIntermediateFbo(&pFb->ssaoBlur2);
     //std3D_deleteIntermediateFbo(&pFb->ssaoBlur3);
-
-#ifdef OBJECT_MOTION_BLUR
-	std3D_deleteIntermediateFbo(&pFb->omb1);
-	std3D_deleteIntermediateFbo(&pFb->omb2);
-#endif
 }
 
 void std3D_swapFramebuffers()
@@ -592,10 +554,6 @@ int init_resources()
 	if (!std3D_loadSimpleTexProgram("shaders/bloom", &std3D_bloomStage)) return false;
 #endif
 
-#ifdef OBJECT_MOTION_BLUR
-	if (!std3D_loadSimpleTexProgram("shaders/omb", &std3D_ombStage)) return false;
-#endif
-
 #ifdef DEFERRED_DECALS
 	if ((programDecal = std3D_loadProgram("shaders/decal")) == 0) return false;
 #endif
@@ -604,9 +562,6 @@ int init_resources()
     attribute_coord3d = std3D_tryFindAttribute(programDefault, "coord3d");
 #ifdef DEFERRED_DECALS
 	attribute_coordVS = std3D_tryFindAttribute(programDefault, "coordVS");
-#endif
-#ifdef OBJECT_MOTION_BLUR
-	attribute_coordMV = std3D_tryFindAttribute(programDefault, "v_motion");
 #endif
     attribute_v_color = std3D_tryFindAttribute(programDefault, "v_color");
     attribute_v_light = std3D_tryFindAttribute(programDefault, "v_light");
@@ -1033,17 +988,6 @@ int std3D_StartScene()
 	);
 #endif
 
-#ifdef OBJECT_MOTION_BLUR
-	glVertexAttribPointer(
-		attribute_coordMV, // attribute
-		3,                 // number of elements per vertex, here (x,y)
-		GL_FLOAT,          // the type of each element
-		GL_FALSE,          // normalize fixed-point data?
-		sizeof(D3DVERTEX),                 // data stride
-		(GLvoid*)offsetof(D3DVERTEX, mx)                  // offset of first element
-	);
-#endif
-
     glEnableVertexAttribArray(attribute_coord3d);
     glEnableVertexAttribArray(attribute_v_color);
     glEnableVertexAttribArray(attribute_v_light);
@@ -1052,9 +996,7 @@ int std3D_StartScene()
 #ifdef DEFERRED_DECALS
 	glEnableVertexAttribArray(attribute_coordVS);
 #endif
-#ifdef OBJECT_MOTION_BLUR
-	glEnableVertexAttribArray(attribute_coordMV);
-#endif
+
     return 1;
 }
 
@@ -1075,9 +1017,6 @@ int std3D_EndScene()
     glDisableVertexAttribArray(attribute_coord3d);
 #ifdef DEFERRED_DECALS
 	glDisableVertexAttribArray(attribute_coordVS);
-#endif
-#ifdef OBJECT_MOTION_BLUR
-	glDisableVertexAttribArray(attribute_coordMV);
 #endif
 
     //printf("End draw\n");
@@ -2387,24 +2326,16 @@ void std3D_DrawSceneFbo()
         glClear( GL_COLOR_BUFFER_BIT );
     }
 
+    float rad_scale = (float)std3D_pFb->w / 640.0;
+
 #ifdef DEFERRED_DECALS
 	std3D_DrawDecalList();
 #endif
 
-	GLuint tex0 = std3D_pFb->tex0;
-#ifdef OBJECT_MOTION_BLUR
-	glDisable(GL_BLEND);
-	std3D_DrawSimpleTex(&std3D_ombStage, &std3D_pFb->omb1, std3D_pFb->tex0, std3D_pFb->tex5, 0, 0.5, 0.0, 1.0, 0);
-	std3D_DrawSimpleTex(&std3D_ombStage, &std3D_pFb->omb2, std3D_pFb->omb1.tex, std3D_pFb->tex5, 0, 1.0, 1.0, 1.0, 0);
-	tex0 = std3D_pFb->omb2.tex;
-	glEnable(GL_BLEND);
-#endif
-
-    float rad_scale = (float)std3D_pFb->w / 640.0;
     if (!draw_ssao)
     {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, tex0, 0, 0, 1.0, 1.0, jkPlayer_gamma, 0);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex0, 0, 0, 1.0, 1.0, jkPlayer_gamma, 0);
         //std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex1, 0, 0, 0.0, 1.0, jkPlayer_gamma, 0); // test emission output
     }
     else
@@ -2483,11 +2414,6 @@ void std3D_DrawSceneFbo()
         std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur4.tex, 0, 0, 1.0, bloom_intensity * 0.8, jkPlayer_gamma, 0);
 	#endif
     }
-
-	// debug
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex5, 0, 0, 1.0, 1.0, 1.0, 0);
-
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
@@ -2580,9 +2506,6 @@ void std3D_DrawRenderList()
 	#ifdef DEFERRED_DECALS
 	, GL_COLOR_ATTACHMENT4
 	#endif	
-	#ifdef OBJECT_MOTION_BLUR
-	, GL_COLOR_ATTACHMENT5
-	#endif
 	};
     glDrawBuffers(ARRAYSIZE(bufs), bufs);
     

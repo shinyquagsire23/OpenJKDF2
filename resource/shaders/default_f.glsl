@@ -105,12 +105,6 @@ vec2 encode_octahedron(vec3 v)
 
 #endif
 
-#ifdef OBJECT_MOTION_BLUR
-layout(location = 5) out vec4 fragColorVel;
-
-in vec4 f_motion;
-#endif
-
 float luminance(vec3 c_rgb)
 {
     const vec3 W = vec3(0.2125, 0.7154, 0.0721);
@@ -497,9 +491,5 @@ void main(void)
 	fragColorLight = vec4(vertex_color.rgb, should_write_normals);
 #else
     fragColorNormal = vec4(face_normals, should_write_normals);
-#endif
-
-#ifdef OBJECT_MOTION_BLUR
-	fragColorVel = vec4(f_motion.xy / f_motion.w, f_motion.z * gl_FragCoord.w / 128.0, should_write_normals);
 #endif
 }
