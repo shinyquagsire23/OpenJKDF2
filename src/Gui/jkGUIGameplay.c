@@ -133,7 +133,9 @@ int jkGuiGameplay_Show()
     jkGuiGameplay_buttons[38].selectedTextEntry = jkPlayer_setCrosshairOnLightsaber;
     jkGuiGameplay_buttons[39].selectedTextEntry = jkPlayer_setCrosshairOnFist;
     jkGuiGameplay_buttons[40].selectedTextEntry = jkPlayer_crosshairScale * 5;
+#ifdef DYNAMIC_POV
     jkGuiGameplay_buttons[43].selectedTextEntry = jkPlayer_aimLock;
+#endif
 #endif /* QOL_IMPROVEMENTS */
     
 

@@ -1038,14 +1038,14 @@ void jkPlayer_DrawPov()
         float angleSin, angleCos;
         stdMath_SinCos(jkPlayer_waggleAngle, &angleSin, &angleCos);
         float velNorm = rdVector_Len3(&player->physicsParams.vel) / player->physicsParams.maxVel; // MOTS altered: uses 1.538462 for something (performance hack?)
+        if (angleCos > 0) // verify?
+            angleCos = -angleCos;
+#ifdef DYNAMIC_POV
 		if (jkPlayer_waggleVel < 0)
 			velNorm = -jkPlayer_waggleVel;
 		else
 			velNorm *= jkPlayer_waggleVel;
 
-        if (angleCos > 0) // verify?
-            angleCos = -angleCos;
-#ifdef DYNAMIC_POV
 		// Added: take into account rotvel to add a little dynamic rotation to the POV model
 		rdMatrix34 rotateMatNoWaggle;
 		if(!jkPlayer_aimLock)
