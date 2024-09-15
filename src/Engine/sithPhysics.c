@@ -1238,6 +1238,39 @@ void sithPhysics_ConstrainRagdoll(sithSector* pSector, sithThing* pThing, rdRagd
 	}
 }
 
+void sithPhysics_ThingRagdollApplyForce(sithThing* pThing, rdVector3* forceVec, rdVector3* sourcePos, float range)
+{
+	if(!pThing->rdthing.pRagdoll)
+		return;
+
+	rdVector3 forceNorm;
+	float len = rdVector_Normalize3(&forceNorm, forceVec);
+	
+	// reset the timer to activate the ragdoll
+	pThing->rdthing.pRagdoll->expireMs = 0;
+
+	// distribute the objects mass across all particles
+	float invMass = (float)pThing->rdthing.pRagdoll->numParticles / pThing->physicsParams.mass;
+	for (int i = 0; i < pThing->rdthing.pRagdoll->numParticles; ++i)
+	{
+		rdRagdollParticle* pParticle = &pThing->rdthing.pRagdoll->paParticles[i];
+
+		// intersect the force with the particle
+		if(sourcePos)
+		{
+			float hitDist;
+			int intersects = sithIntersect_RaySphereIntersection(sourcePos, &forceNorm, len, range, &pParticle->pos, pParticle->radius, &hitDist, 1, 0);
+			if (!intersects)
+				continue;
+		}
+
+		if (forceVec->z * invMass > 0.5)
+			sithThing_DetachThing(pThing);
+		rdVector_MultAcc3(&pParticle->forces, forceVec, invMass);
+	}
+	pThing->physicsParams.physflags |= SITH_PF_8000;
+}
+
 void sithPhysics_AccumulateRagdollForces(sithThing* pThing, rdRagdoll* pRagdoll, float deltaSeconds)
 {
 	float gravity = sithWorld_pCurrentWorld->worldGravity;
