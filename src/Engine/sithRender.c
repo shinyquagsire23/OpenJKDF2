@@ -1078,7 +1078,7 @@ void sithRender_RenderLevelGeometry()
 			rdAmbient_Zero(&rdCamera_pCurCamera->ambientCube);
 #else
             a2 = sithRender_f_83198C;
-            rdCamera_SetAmbientLight(rdCamera_pCurCamera, sithRender_f_83198C)
+            rdCamera_SetAmbientLight(rdCamera_pCurCamera, sithRender_f_83198C);
 #endif
         }
         else
@@ -2408,7 +2408,11 @@ void sithRender_RenderAlphaSurfaces()
 			float v66;
 			int v38;
 			int v39;
+#ifdef RGB_AMBIENT
 			rdVector3 v29;
+#else
+			float v29;
+#endif
 			while (2)
 			{
 				v9 = rdCache_GetProcEntry();
