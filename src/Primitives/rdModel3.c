@@ -1433,7 +1433,7 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
             ++pGeoLight;
         }
     }
-    else if (rdModel3_lightingMode == RD_LIGHTMODE_GOURAUD)
+    else if (USES_VERTEX_LIGHTING(rdModel3_lightingMode))
     {
         rdModel3_numMeshLights = 0;
         if (rdModel3_numGeoLights > 0)
@@ -1473,9 +1473,13 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
 		rdMatrix_TransformVector34(&localAmbient.r.y, &rdCamera_pCurCamera->ambientSH.r.y, &matInv);
 		rdMatrix_TransformVector34(&localAmbient.g.y, &rdCamera_pCurCamera->ambientSH.g.y, &matInv);
 		rdMatrix_TransformVector34(&localAmbient.b.y, &rdCamera_pCurCamera->ambientSH.b.y, &matInv);
+		rdMatrix_TransformVector34(&localAmbient.dominantDir, &rdCamera_pCurCamera->ambientSH.dominantDir, &matInv);
+#endif
 
+#ifdef SPECULAR_LIGHTING
 		rdVector3 localCamera;
-		rdMatrix_TransformPoint34(&localCamera, &rdCamera_camMatrix.scale, &matInv);
+		if (rdModel3_lightingMode == RD_LIGHTMODE_SPECULAR)
+			rdMatrix_TransformPoint34(&localCamera, &rdCamera_camMatrix.scale, &matInv);
 #endif
 
         // MOTS added assignment
@@ -1497,6 +1501,10 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
 #endif
 #ifdef RGB_AMBIENT
 			&localAmbient,
+#endif
+#ifdef SPECULAR_LIGHTING
+			&localCamera,
+			(rdModel3_lightingMode == RD_LIGHTMODE_SPECULAR),
 #endif
             pCurMesh->numVertices,
             rdCamera_pCurCamera->attenuationMin);
@@ -1645,8 +1653,9 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
 		rdVector_Zero3(&procEntry->ambientLight);
 
 	// if we have an ambient cube, dim the ambient a bit to make it pop
-	if(rdModel3_lightingMode == RD_LIGHTMODE_GOURAUD)
-		rdVector_Scale3Acc(&procEntry->ambientLight, 0.5f);
+	// todo: some kind of flag to indicate when to use dark diffuse
+	if (USES_VERTEX_LIGHTING(rdModel3_lightingMode))
+		rdVector_Scale3Acc(&procEntry->ambientLight, rdModel3_lightingMode == RD_LIGHTMODE_SPECULAR ? 0.2f : 0.5f);
 
 #else
     if ( rdroid_curRenderOptions & 2 )

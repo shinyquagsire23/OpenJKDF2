@@ -296,7 +296,7 @@ void sithRender_RenderDebugLights()
 void sithRender_RenderDebugAmbient(rdVector3* pos)
 {
 #if 0
-	ambientDebugThing->curLightMode = RD_LIGHTMODE_GOURAUD;
+	ambientDebugThing->curLightMode = RD_LIGHTMODE_SPECULAR;
 	ambientDebugThing->geosetSelect = 0;
 	ambientDebugThing_model3->geosetSelect = 0;
 	ambientDebugThing->frameTrue = 0;
@@ -354,7 +354,11 @@ int sithRender_Startup()
 int sithRender_Open()
 {
     sithRender_geoMode = RD_GEOMODE_TEXTURED;
+#ifdef SPECULAR_LIGHTING
+	sithRender_lightMode = RD_LIGHTMODE_SPECULAR;
+#else
     sithRender_lightMode = RD_LIGHTMODE_GOURAUD;
+#endif
     sithRender_texMode = RD_TEXTUREMODE_PERSPECTIVE;
 
     for (int i = 0; i < SITHREND_NUM_LIGHTS; i++)
@@ -2177,8 +2181,13 @@ void sithRender_RenderThings()
                     else
                     {
                         lightMode = thingIter->rdthing.desiredLightMode;
+					#ifdef SPECULAR_LIGHTING
+						if (lightMode > RD_LIGHTMODE_SPECULAR)
+							lightMode = RD_LIGHTMODE_SPECULAR;
+					#else
                         if ( lightMode > RD_LIGHTMODE_GOURAUD)
                             lightMode = RD_LIGHTMODE_GOURAUD;
+					#endif
                     }
                     thingIter->rdthing.curLightMode = lightMode;
                     if (thingIter->thingflags & SITH_TF_80000000) {

@@ -240,6 +240,9 @@ LABEL_25:
                         goto LABEL_26;
                     goto LABEL_27;
                 case RD_LIGHTMODE_GOURAUD:
+			#ifdef SPECULAR_LIGHTING
+				case RD_LIGHTMODE_SPECULAR:
+			#endif
                     v36 = idxInfo;
                     v37 = mesh_out;
                     v38 = idxInfo->intensities;
@@ -373,8 +376,8 @@ LABEL_25:
                     else
                         v71->numVertices = rdClip_Face3TOrtho(clipFrustum, v83, v85, v72);
                 }
-                else if ( lightMode == RD_LIGHTMODE_GOURAUD)
-                {
+                else if (USES_VERTEX_LIGHTING(lightMode))
+				{
                     v52 = idxInfo;
                     v53 = mesh_out;
                     v54 = idxInfo->intensities;
@@ -666,6 +669,9 @@ LABEL_19:
                     }
                     goto LABEL_19;
                 case RD_LIGHTMODE_GOURAUD:
+#ifdef SPECULAR_LIGHTING
+				case RD_LIGHTMODE_SPECULAR:
+#endif
                     v31 = _vertexSrc;
                     v32 = _vertexDst;
                     v33 = _vertexSrc->intensities;
@@ -748,9 +754,14 @@ LABEL_19:
                 return;
             if ( lightMode > RD_LIGHTMODE_DIFFUSE)
             {
+#ifdef SPECULAR_LIGHTING
+				if (lightMode != RD_LIGHTMODE_SPECULAR)
+					return;
+#else
                 if ( lightMode != RD_LIGHTMODE_GOURAUD)
                     return;
-                v46 = _vertexSrc;
+#endif
+				v46 = _vertexSrc;
                 v47 = _vertexDst;
                 v48 = _vertexSrc->intensities;
                 v49 = _vertexSrc->numVertices;
@@ -1132,8 +1143,8 @@ void rdPrimit3_NoClipFaceRGB
 
                 _vertexDst->numVertices = _vertexSrc->numVertices;
             }
-            else if (lightMode == 3) {
-                for (int i = 0; i < _vertexSrc->numVertices; i++)
+            else if (USES_VERTEX_LIGHTING(lightMode)) {
+				for (int i = 0; i < _vertexSrc->numVertices; i++)
                 {
                     int vtxIdx = _vertexSrc->vertexPosIdx[i];
                     int uvIdx = _vertexSrc->vertexUVIdx[i];
@@ -1419,7 +1430,7 @@ rdPrimit3_ClipFaceRGB
                                             mesh_out->vertexUVs,idxInfo->numVertices);
                 mesh_out->numVertices = uVar15;
             }
-            else if (lightMode == 3) {
+            else if (USES_VERTEX_LIGHTING(lightMode)) {
                 if (idxInfo->numVertices != 0) {
                     prVar3 = idxInfo->verticesProjected;
                     rdVector2* prVar4 = idxInfo->vertexUVs;
@@ -1746,7 +1757,7 @@ void rdPrimit3_ClipFaceRGBLevel
                     mesh_out->numVertices = uVar16;
                 }
             }
-            else if (lightMode == 3) {
+			else if (USES_VERTEX_LIGHTING(lightMode)) {
                 if (idxInfo->numVertices != 0) {
                     prVar5 = idxInfo->vertexUVs;
                     local_10 = mesh_out->verticesProjected;

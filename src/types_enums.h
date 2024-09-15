@@ -23,7 +23,11 @@ enum RD_LIGHTMODE
     RD_LIGHTMODE_NOTLIT = 1,
     RD_LIGHTMODE_DIFFUSE = 2,
     RD_LIGHTMODE_GOURAUD = 3,
+#ifdef SPECULAR_LIGHTING
+	RD_LIGHTMODE_SPECULAR = 4, // lightmode was always clamped to 3 so let's make use of 4
+#else
     RD_LIGHTMODE_4_UNK = 4,
+#endif
     RD_LIGHTMODE_5_UNK = 5,
     RD_LIGHTMODE_6_UNK = 6
 };

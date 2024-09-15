@@ -30,11 +30,19 @@ int rdThing_NewEntry(rdThing *thing, sithThing *parent)
     thing->wallCel = -1;
     thing->hierarchyNodeMatrices = 0;
     thing->desiredGeoMode = RD_GEOMODE_TEXTURED;
+#ifdef SPECULAR_LIGHTING
+	thing->desiredLightMode = RD_LIGHTMODE_SPECULAR;
+#else
     thing->desiredLightMode = RD_LIGHTMODE_GOURAUD;
+#endif
     thing->desiredTexMode = RD_TEXTUREMODE_2_UNK;
     thing->curGeoMode = RD_GEOMODE_TEXTURED;
-    thing->curLightMode = RD_LIGHTMODE_GOURAUD;
-    thing->curTexMode = RD_TEXTUREMODE_2_UNK;
+#ifdef SPECULAR_LIGHTING
+	thing->curLightMode = RD_LIGHTMODE_SPECULAR;
+#else
+	thing->curLightMode = RD_LIGHTMODE_GOURAUD;
+#endif
+	thing->curTexMode = RD_TEXTUREMODE_2_UNK;
     thing->parentSithThing = parent;
 #ifdef VERTEX_COLORS
 	thing->color.x = thing->color.y = thing->color.z = 1.0f;

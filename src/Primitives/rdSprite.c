@@ -279,7 +279,7 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
                     procEntry->lightingMode = 0;
                 }
             }
-            else if ( procEntry->lightingMode == 3 )
+            else if ( USES_VERTEX_LIGHTING(procEntry->lightingMode) )
             {
                 int lightIdx;
                 for (lightIdx = 1; lightIdx < mesh_out.numVertices; lightIdx++)

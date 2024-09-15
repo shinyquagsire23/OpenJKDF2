@@ -34,6 +34,10 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
 #ifdef RGB_AMBIENT
 	rdAmbient* ambient,
 #endif
+#ifdef SPECULAR_LIGHTING
+	rdVector3* localCamera,
+	int bApplySpecular,
+#endif
 	int numVertices, float scalar);
 float rdLight_CalcFaceIntensity(rdLight **meshLights, rdVector3 *localLightPoses, int numLights, rdFace *face, rdVector3 *faceNormal, rdVector3 *vertices, float a7);
 

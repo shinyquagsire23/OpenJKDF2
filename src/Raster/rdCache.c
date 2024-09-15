@@ -600,7 +600,7 @@ int rdCache_SendFaceListToHardware()
 
 				active_6c->light_level_static = (v26.x + v26.y + v26.z) * 0.3333f * 255.0;
 			}
-			else if (lighting_capability == 3 && active_6c->numVertices)
+			else if (USES_VERTEX_LIGHTING(lighting_capability) && active_6c->numVertices)
 			{
 				//if (rdGetVertexColorMode() == 1)
 				{
@@ -650,7 +650,7 @@ int rdCache_SendFaceListToHardware()
 
                 active_6c->light_level_static = v26 * 255.0;
             }
-            else if ( lighting_capability == 3 && active_6c->numVertices )
+            else if (USES_VERTEX_LIGHTING(lighting_capability) && active_6c->numVertices )
             {
                 // MOTS added
 #ifdef JKM_LIGHTING
@@ -744,9 +744,9 @@ int rdCache_SendFaceListToHardware()
                 else
                 {
                     // MOTS added
-                    if (rdGetVertexColorMode() != 1 || lighting_capability != 3)
+                    if (rdGetVertexColorMode() != 1 || (!USES_VERTEX_LIGHTING(lighting_capability)))
                     {
-                        if ( lighting_capability == 3 )
+                        if (USES_VERTEX_LIGHTING(lighting_capability))
                             light_level = active_6c->vertexIntensities[vtx_idx];
                         else
                             light_level = active_6c->light_level_static;
@@ -985,7 +985,7 @@ solid_tri:
             active_6c->light_level_static = v76 * 63.0;
 #endif
         }
-        else if ( lighting_capability == 3 && active_6c->numVertices )
+        else if (USES_VERTEX_LIGHTING(lighting_capability) && active_6c->numVertices )
         {
 #ifdef RGB_AMBIENT
 			//if (rdGetVertexColorMode() == 1)
@@ -1104,7 +1104,7 @@ LABEL_232:
                 if (rdGetVertexColorMode() != 1 || lighting_capability != 3)
                 {
                     v91 = (rdColormap *)active_6c->colormap;
-                    if ( lighting_capability == 3 )
+                    if (USES_VERTEX_LIGHTING(lighting_capability))
                         v92 = active_6c->vertexIntensities[vtx_idx];
                     else
                         v92 = active_6c->light_level_static;

@@ -288,7 +288,11 @@ int Main_Startup(const char *cmdline)
     Video_modeStruct.viewSizeIdx = 5;
     Video_modeStruct.Video_8606A4 = 0;
     Video_modeStruct.Video_8606A8 = 1;
+#ifdef SPECULAR_LIGHTING
+	Video_modeStruct.lightMode = RD_LIGHTMODE_SPECULAR;
+#else
     Video_modeStruct.lightMode = 3;
+#endif
     Video_modeStruct.texMode = 1;
     Video_modeStruct.Video_8606B8 = 0;
     Video_modeStruct.Video_8606BC = 0;

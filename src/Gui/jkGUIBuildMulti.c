@@ -634,7 +634,11 @@ int jkGuiBuildMulti_DisplayModel()
     rdColormap_SetCurrent(&jkGuiBuildMulti_colormap);
     rdSetRenderOptions(jkGuiBuildMulti_renderOptions);
     rdSetGeometryMode(RD_GEOMODE_TEXTURED);
-    rdSetLightingMode(RD_LIGHTMODE_GOURAUD);
+#ifdef SPECULAR_LIGHTING
+	rdSetLightingMode(RD_LIGHTMODE_SPECULAR);
+#else
+	rdSetLightingMode(RD_LIGHTMODE_GOURAUD);
+#endif
     rdSetTextureMode(RD_TEXTUREMODE_PERSPECTIVE);
     rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
     rdSetSortingMethod(0);

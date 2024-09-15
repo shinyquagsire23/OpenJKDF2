@@ -430,7 +430,7 @@ void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVert
                     procEntry->lightingMode = 0;
                 }
             }
-            else if ( procEntry->lightingMode == 3 )
+            else if (USES_VERTEX_LIGHTING(procEntry->lightingMode))
             {
                 int i;
                 staticLight = *procEntry->vertexIntensities;
