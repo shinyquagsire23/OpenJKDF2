@@ -89,7 +89,7 @@ void rdDecal_Draw(rdThing* thing, rdMatrix34* matrix)
 		}
 	}
 
-	if (decal->flags & RD_DECAL_ADD
+	if ((decal->flags & RD_DECAL_ADD) && !(decal->flags & RD_DECAL_HEAT)
 		&& color.x <= 0.0
 		&& color.y <= 0.0
 		&& color.z <= 0.0)
