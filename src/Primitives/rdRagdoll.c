@@ -379,7 +379,9 @@ void rdRagdoll_BuildJointMatrices(rdRagdoll* pRagdoll)
 
 		rdRagdoll_GetJointPos(&m.scale, pRagdoll, pJoint);
 
-		rdMatrix_InvertOrtho34(&pRagdoll->paJointTris[i], &m);
+		rdMatrix34 invMat;
+		rdMatrix_InvertOrtho34(&invMat, &m);
+		rdMatrix_Multiply34(&pRagdoll->paJointTris[i], &invMat, &pRagdoll->paPoseMatrices[pJoint->node]);
 	}
 }
 

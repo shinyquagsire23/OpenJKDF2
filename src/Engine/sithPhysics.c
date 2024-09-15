@@ -1395,21 +1395,16 @@ void sithPhysics_ThingPhysRagdoll(sithThing* pThing, float deltaSeconds)
 	// apply constraints
 	sithPhysics_ConstrainRagdoll(pThing->sector, pThing, pRagdoll, deltaSeconds);
 
-	// build matrices
+	// build joint matrices
 	rdRagdoll_UpdateTriangles(pRagdoll);
 	for (int i = 0; i < pRagdoll->pSkel->numJoints; ++i)
 	{
 		rdRagdollJoint* pJoint = &pRagdoll->pSkel->paJoints[i];
 
-		rdMatrix34 jointMat;
-		rdMatrix_Copy34(&jointMat, &pRagdoll->paTris[pJoint->tri]);
-		rdRagdoll_GetJointPos(&jointMat.scale, pRagdoll, pJoint);
-
-		// localize the orientation
-		rdMatrix_Multiply34(&pRagdoll->paJointMatrices[i], &jointMat, &pRagdoll->paJointTris[i]);
-		
-		// apply to the pose
-		rdMatrix_PreMultiply34(&pRagdoll->paJointMatrices[i], &pRagdoll->paPoseMatrices[pJoint->node]);
+		rdVector3 jointPos;
+		rdRagdoll_GetJointPos(&jointPos, pRagdoll, pJoint);		
+		rdMatrix_Multiply34(&pRagdoll->paJointMatrices[i], &pRagdoll->paTris[pJoint->tri], &pRagdoll->paJointTris[i]);
+		rdVector_Add3Acc(&pRagdoll->paJointMatrices[i].scale, &jointPos);
 	}
 
 	// reset forces and leave sector
