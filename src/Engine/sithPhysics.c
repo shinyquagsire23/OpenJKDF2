@@ -1374,7 +1374,6 @@ void sithPhysics_ThingPhysRagdoll(sithThing* pThing, float deltaSeconds)
 	}
 
 	// only run while expireMs is 0 or hasn't expired yet
-	// todo: ragdoll can be awoken by setting expireMs to 0 again (ex. if thing affected by an explosion)
 	if (pRagdoll->expireMs && pRagdoll->expireMs < sithTime_curMs)
 	{
 		// do a normal physics update
