@@ -1225,7 +1225,8 @@ void sithPhysics_UpdateRagdollPositions(sithSector* sector, sithThing* pThing, r
 
 void sithPhysics_ConstrainRagdoll(sithSector* pSector, sithThing* pThing, rdRagdoll* pRagdoll, float deltaSeconds)
 {
-	int iterations = 3;
+	// do fewer iterations if we're not directly visible
+	int iterations = (pThing->isVisible + 1) == bShowInvisibleThings ? 5 : 1;
 	for (int i = 0; i < iterations; ++i)
 	{
 		rdRagdoll_ApplyDistConstraints(pRagdoll);
