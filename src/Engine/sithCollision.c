@@ -54,7 +54,7 @@ int sithCollision_Startup()
 
 	sithCollision_RegisterCollisionHandler(SITH_THING_PLAYER, SITH_THING_CORPSE, sithCorpse_Collide, 0);
 	sithCollision_RegisterCollisionHandler(SITH_THING_ACTOR, SITH_THING_CORPSE, sithCorpse_Collide, 0);
-	sithCollision_RegisterCollisionHandler(SITH_THING_WEAPON, SITH_THING_CORPSE, sithCorpse_Collide, 0);
+	sithCollision_RegisterCollisionHandler(SITH_THING_WEAPON, SITH_THING_CORPSE, sithWeapon_Collide, 0);
 #endif
 
     sithCollision_initted = 1;
@@ -1297,44 +1297,10 @@ void sithCollide_CollideRagdoll(sithThing* thing, sithThing* thing2, rdVector3* 
 {
 	if (thing->rdthing.pRagdoll && thing->physicsParams.mass != 0)// && thing->parentThing != thing2)
 	{
-		rdVector3 thing2Vel;
-		float len = rdVector_Normalize3(&thing2Vel, &thing2->physicsParams.vel);
-
-		// distribute the objects mass across all particles
-		float invMass = (float)thing->rdthing.pRagdoll->numParticles / thing->physicsParams.mass;
-
-		for (int i = 0; i < thing->rdthing.pRagdoll->numParticles; ++i)
-		{
-			rdRagdollParticle* pParticle = &thing->rdthing.pRagdoll->paParticles[i];
-
-			rdVector3 vel;
-			rdVector_Sub3(&vel, &pParticle->pos, &pParticle->lastPos);
-
-			// intersect the move with the particle
-			// fixme: disabled for now because it barely ever picks up intersections? are the particles too small?
-			//float hitDist;
-			//int intersects = sithIntersect_RaySphereIntersection(&thing2->position, &thing2Vel, len, thing2->collideSize, &pParticle->pos, pParticle->radius, &hitDist, 1, 0);
-			//if (!intersects)
-			//	continue;
-
-			float velDiff = rdVector_Dot3(&vel, norm) - rdVector_Dot3(&thing2->physicsParams.vel, norm);
-			velDiff = stdMath_ClipPrecision(velDiff);
-			if (velDiff <= 0.0)
-				continue;
-
-			if ((thing2->physicsParams.physflags & SITH_PF_SURFACEBOUNCE) == 0)
-				velDiff = velDiff * 0.5;
-
-			rdVector3 forceVec;
-			rdVector_Scale3(&forceVec, norm, velDiff);
-			rdVector_Neg3Acc(&forceVec);
-
-			if (forceVec.z * invMass > 0.5)
-				sithThing_DetachThing(thing);
-
-			rdVector_MultAcc3(&pParticle->forces, &forceVec, invMass);
-			thing->physicsParams.physflags |= SITH_PF_8000;
-		}
+		float velDiff = rdVector_Dot3(&thing->physicsParams.vel, norm) - rdVector_Dot3(&thing2->physicsParams.vel, norm);
+		rdVector3 force;
+		rdVector_Scale3(&force, &thing2->physicsParams.vel, velDiff);
+		sithPhysics_ThingRagdollApplyForce(thing, &force, NULL, 0.0f);
 	}
 }
 
@@ -1361,7 +1327,6 @@ int sithCorpse_Collide(sithThing* thing1, sithThing* thing2, sithCollisionSearch
 	// reactivate the ragdolls and apply forces
 	if (t1->rdthing.pRagdoll)
 	{
-		t1->rdthing.pRagdoll->expireMs = 0;
 		if (t1->physicsParams.mass != 0)
 		{
 			rdVector3 negHit;
@@ -1372,11 +1337,15 @@ int sithCorpse_Collide(sithThing* thing1, sithThing* thing2, sithCollisionSearch
 
 	if (t2->rdthing.pRagdoll)
 	{
-		t2->rdthing.pRagdoll->expireMs = 0;
 		if (t2->physicsParams.mass != 0)
 			sithCollide_CollideRagdoll(t2, t1, &searchEntry->hitNorm);
 	}
 
-	return 0;
+	// don't stop players
+	//if(t1->type == SITH_THING_PLAYER)
+		return 0;
+		
+	// for everything else, do typical full-object physics too
+	//return sithCollision_DebrisDebrisCollide(thing1, thing2, searchEntry, isInverse);
 }
 #endif
