@@ -1283,7 +1283,7 @@ void jkPlayer_DrawPov()
 				rdLight_NewEntry(&muzzleLight);
 				muzzleLight.intensity = jkPlayer_povMuzzleFlash.sprite3->radius * 2.0f;
 #ifdef RGB_THING_LIGHTS
-				rdMaterial_GetFillColor(&muzzleLight.color, jkPlayer_povMuzzleFlash.sprite3->face.material, jkPlayer_povMuzzleFlash.wallCel);
+				rdMaterial_GetFillColor(&muzzleLight.color, jkPlayer_povMuzzleFlash.sprite3->face.material, player->sector->colormap, jkPlayer_povMuzzleFlash.wallCel, -1);
 				rdVector_Scale3Acc(&muzzleLight.color, 1.0f / muzzleLight.intensity); // compensate for the low intensity/range
 #endif
 				// offset the light so it's on the top of the sprite, not the very center

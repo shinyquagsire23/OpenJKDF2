@@ -76,7 +76,7 @@ void sithRender_GetSaberLightColor(rdVector3* outColor, sithThing* thing)
 {
 	rdVector_Set3(outColor, 1.0f, 1.0f, 1.0f);
 	if (thing->playerInfo && thing->playerInfo->polyline.tipFace.material)
-		rdMaterial_GetFillColor(outColor, thing->playerInfo->polyline.tipFace.material, 0);
+		rdMaterial_GetFillColor(outColor, thing->playerInfo->polyline.tipFace.material, thing->sector->colormap, 0, -1);
 }
 #endif
 

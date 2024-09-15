@@ -81,7 +81,7 @@ void jkSaber_InitializeSaberInfo(sithThing *thing, char *material_side_fname, ch
 	rdThing_SetSprite3(&saberinfo->glowSpriteThing, &saberinfo->glowSprite);
 #ifdef VERTEX_COLORS
 	//saberinfo->glowSpriteThing.color.x = saberinfo->glowSpriteThing.color.y = saberinfo->glowSpriteThing.color.z = 0.3f;
-	rdMaterial_GetFillColor(&saberinfo->glowSpriteThing.color, saberinfo->polyline.edgeFace.material, 0);
+	rdMaterial_GetFillColor(&saberinfo->glowSpriteThing.color, saberinfo->polyline.edgeFace.material, &sithWorld_pCurrentWorld->colormaps[0], 0, -1);
 	//// give the color some kick
 	//saberinfo->glowSpriteThing.color.x *= saberinfo->glowSpriteThing.color.x;
 	//saberinfo->glowSpriteThing.color.y *= saberinfo->glowSpriteThing.color.y;

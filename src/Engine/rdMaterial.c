@@ -438,7 +438,7 @@ void rdMaterial_ResetCacheInfo(rdMaterial *material)
 }
 
 #ifdef RGB_THING_LIGHTS
-void rdMaterial_GetFillColor(rdVector3* pOutColor, rdMaterial* pMaterial, int cel)
+int rdMaterial_GetFillColor(rdVector3* pOutColor, rdMaterial* pMaterial, rdColormap* pColormap, int cel, int lightLevel)
 {
 	rdVector_Set3(pOutColor, 1.0f, 1.0f, 1.0f);
 	if (pMaterial && pMaterial->texinfos)
@@ -446,15 +446,20 @@ void rdMaterial_GetFillColor(rdVector3* pOutColor, rdMaterial* pMaterial, int ce
 		int paletteIndex = pMaterial->texinfos[0]->header.field_4;
 		if (pMaterial->tex_format.bpp == 8)
 		{
-			if (rdColormap_pCurMap)
+			if (pColormap)
 			{
-				pOutColor->x = (float)rdColormap_pCurMap->colors[paletteIndex].r / 255.0f;
-				pOutColor->y = (float)rdColormap_pCurMap->colors[paletteIndex].g / 255.0f;
-				pOutColor->z = (float)rdColormap_pCurMap->colors[paletteIndex].b / 255.0f;
+				if(lightLevel >= 0)
+					paletteIndex = ((int*)pColormap->lightlevel)[paletteIndex * 64 + lightLevel];
+
+				pOutColor->x = (float)pColormap->colors[paletteIndex].r / 255.0f;
+				pOutColor->y = (float)pColormap->colors[paletteIndex].g / 255.0f;
+				pOutColor->z = (float)pColormap->colors[paletteIndex].b / 255.0f;
 			}
 		}
 		else
 		{
+			if(lightLevel >= 0)
+				return 0;
 			uint32_t rmask = (1u << pMaterial->tex_format.r_bits) - 1;
 			uint32_t gmask = (1u << pMaterial->tex_format.g_bits) - 1;
 			uint32_t bmask = (1u << pMaterial->tex_format.b_bits) - 1;
@@ -462,6 +467,8 @@ void rdMaterial_GetFillColor(rdVector3* pOutColor, rdMaterial* pMaterial, int ce
 			pOutColor->y = (float)(((paletteIndex >> pMaterial->tex_format.g_shift) & gmask) << pMaterial->tex_format.g_bitdiff) / 255.0f;
 			pOutColor->z = (float)(((paletteIndex >> pMaterial->tex_format.b_shift) & bmask) << pMaterial->tex_format.b_bitdiff) / 255.0f;
 		}
+		return 1;
 	}
+	return 0;
 }
 #endif

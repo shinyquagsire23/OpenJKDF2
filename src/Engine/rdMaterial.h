@@ -31,7 +31,7 @@ void rdMaterial_ResetCacheInfo(rdMaterial *material);
 //static void (*rdMaterial_ResetCacheInfo)(rdMaterial *material) = (void*)rdMaterial_ResetCacheInfo_ADDR;
 
 #ifdef RGB_THING_LIGHTS
-void rdMaterial_GetFillColor(rdVector3* pOutColor, rdMaterial* pMaterial, int cel);
+int rdMaterial_GetFillColor(rdVector3* pOutColor, rdMaterial* pMaterial, rdColormap* pColormap, int cel, int lightLevel);
 #endif
 
 //int rdMaterial_AddToTextureCache(rdMaterial *material, sith_tex *a2, int mipmap_level, int no_alpha);
