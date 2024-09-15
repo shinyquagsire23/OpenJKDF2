@@ -95,7 +95,6 @@ int jkPlayer_aimLock = 0;
 
 static int jkPlayer_drawMuzzleFlash = 0;
 static int jkPlayer_muzzleFlashNode = -1;
-static rdSprite* jkPlayer_povMuzzleFlashSprite;
 #endif
 
 #ifdef FIXED_TIMESTEP_PHYS
@@ -304,7 +303,6 @@ void jkPlayer_ResetVars()
 	jkPlayer_povAutoAimDist = 0.0f;
 	jkPlayer_drawMuzzleFlash = 0;
 	jkPlayer_muzzleFlashNode = -1;
-	jkPlayer_povMuzzleFlashSprite = NULL;
 #endif
 
 #ifdef FIXED_TIMESTEP_PHYS
@@ -943,8 +941,6 @@ void jkPlayer_SetPovSprite(jkPlayerInfo* info, rdSprite* sprite)
 	{
 		rdThing_FreeEntry(&info->povSprite);
 		rdThing_NewEntry(&info->povSprite, info->actorThing);
-
-		jkPlayer_povMuzzleFlashSprite = sprite;
 		if (sprite)
 			rdThing_SetSprite3(&info->povSprite, sprite);
 	}
