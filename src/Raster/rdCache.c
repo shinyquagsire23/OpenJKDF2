@@ -33,6 +33,12 @@ int rdCache_numDecals;
 void rdCache_FlushDecals();
 #endif
 
+#ifdef OBJECT_MOTION_BLUR
+float rdCache_aMotionVectorsX[RDCACHE_MAX_VERTICES] = { 0 };
+float rdCache_aMotionVectorsY[RDCACHE_MAX_VERTICES] = { 0 };
+float rdCache_aMotionVectorsZ[RDCACHE_MAX_VERTICES] = { 0 };
+#endif
+
 int rdCache_Startup()
 {
     return 1;
@@ -104,6 +110,11 @@ rdProcEntry *rdCache_GetProcEntry()
     out_procEntry->vertexUVs = &rdCache_aTexVertices[rdCache_numUsedTexVertices];
 #ifdef DEFERRED_DECALS
 	out_procEntry->vertexVS = &rdCache_aVerticesVS[rdCache_numUsedTexVertices];
+#endif
+#ifdef OBJECT_MOTION_BLUR
+	out_procEntry->motionVectorsX = &rdCache_aMotionVectorsX[rdCache_numUsedVertices];
+	out_procEntry->motionVectorsY = &rdCache_aMotionVectorsY[rdCache_numUsedVertices];
+	out_procEntry->motionVectorsZ = &rdCache_aMotionVectorsZ[rdCache_numUsedVertices];
 #endif
     out_procEntry->vertexIntensities = &rdCache_aIntensities[rdCache_numUsedIntensities];
 #ifdef JKM_LIGHTING
@@ -700,6 +711,11 @@ int rdCache_SendFaceListToHardware()
 #ifdef DEFERRED_DECALS
 			rdVector3* iter_vs = active_6c->vertexVS;
 #endif
+#ifdef OBJECT_MOTION_BLUR
+			float* iter_mvx = active_6c->motionVectorsX;
+			float* iter_mvy = active_6c->motionVectorsY;
+			float* iter_mvz = active_6c->motionVectorsZ;
+#endif
             vertex_a = red_and_alpha << 8;
 
             for (int vtx_idx = 0; vtx_idx < active_6c->numVertices; vtx_idx++)
@@ -720,6 +736,18 @@ int rdCache_SendFaceListToHardware()
 				rdCache_aHWVertices[rdCache_totalVerts].vx = iter_vs[vtx_idx].x;
 				rdCache_aHWVertices[rdCache_totalVerts].vy = iter_vs[vtx_idx].y;
 				rdCache_aHWVertices[rdCache_totalVerts].vz = iter_vs[vtx_idx].z;
+#endif
+#ifdef OBJECT_MOTION_BLUR
+				rdCache_aHWVertices[rdCache_totalVerts].mx = iter_mvx[vtx_idx];
+				rdCache_aHWVertices[rdCache_totalVerts].my = iter_mvy[vtx_idx];
+				rdCache_aHWVertices[rdCache_totalVerts].mz = iter_mvz[vtx_idx];
+				//if (iter_mvz[vtx_idx] == 0.0)
+				//	rdCache_aHWVertices[rdCache_totalVerts].mz = 0.0;
+				//else
+				//	rdCache_aHWVertices[rdCache_totalVerts].mz = 1.0 / iter_mvz[vtx_idx];
+				//rdCache_aHWVertices[rdCache_totalVerts].mz *= v134;
+				//if (rdCache_dword_865258 != 16)
+				//	rdCache_aHWVertices[rdCache_totalVerts].mz = 1.0 - rdCache_aHWVertices[rdCache_totalVerts].mz;
 #endif
                 rdCache_aHWVertices[rdCache_totalVerts].z = v38;
                 rdCache_aHWVertices[rdCache_totalVerts].nx = d3dvtx_zval / 32.0;
@@ -833,6 +861,7 @@ int rdCache_SendFaceListToHardware()
                         blue = 0;
                     }
                 }
+
                 if ( v130 )
                 {
                     vertex_r += (__int64)((double)red_and_alpha * red_scalar);

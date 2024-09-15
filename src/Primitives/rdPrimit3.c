@@ -1166,6 +1166,23 @@ void rdPrimit3_NoClipFaceRGB
                 return;
             }
         }
+		return;
+#ifdef OBJECT_MOTION_BLUR
+// total clipping hack to clip prev position without messing with the rdClip routines
+	case 5:
+		for (int i = 0; i < _vertexSrc->numVertices; i++)
+		{
+			int vtxIdx = _vertexSrc->vertexPosIdx[i];
+			_vertexDst->verticesProjected[i] = _vertexSrc->verticesProjected[vtxIdx];
+			_vertexDst->paRedIntensities[i] = _vertexSrc->paRedIntensities[vtxIdx];
+			_vertexDst->paGreenIntensities[i] = _vertexSrc->paGreenIntensities[vtxIdx];
+			_vertexDst->paBlueIntensities[i] = _vertexSrc->paBlueIntensities[vtxIdx];
+		}
+
+		_vertexDst->numVertices = _vertexSrc->numVertices;
+		return;
+
+#endif
     default:
 switchD_0044d5a4_caseD_5:
         return;
@@ -1535,6 +1552,60 @@ rdPrimit3_ClipFaceRGB
                 return;
             }
         }
+		goto switchD_0044c964_caseD_5;
+#ifdef OBJECT_MOTION_BLUR
+// total clipping hack to clip prev position without messing with the rdClip routines
+case 5:
+	if (idxInfo->numVertices != 0)
+	{
+		prVar3 = idxInfo->verticesProjected;
+
+		piVar17 = idxInfo->vertexPosIdx;
+		pfVar6 = idxInfo->paRedIntensities;
+		pfVar7 = idxInfo->paGreenIntensities;
+		pfVar8 = idxInfo->paBlueIntensities;
+
+		pfVar10 = mesh_out->paRedIntensities;
+		local_18 = mesh_out->verticesProjected;
+		pfVar11 = mesh_out->paGreenIntensities;
+		local_10 = idxInfo->numVertices;
+
+		float* xIter = mesh_out->paRedIntensities;
+		float* yIter = mesh_out->paGreenIntensities;
+		float* zIter = mesh_out->paBlueIntensities;
+
+		do
+		{
+			iVar12 = *piVar17;
+			prVar19 = prVar3 + iVar12;
+			local_18->x = prVar19->x;
+			local_18->y = prVar19->y;
+			local_18->z = prVar19->z;
+
+			fVar14 = pfVar6[iVar12];
+			*xIter = fVar14;
+
+			fVar14 = pfVar7[iVar12];
+			*yIter = fVar14;
+			fVar14 = pfVar8[iVar12];
+			*zIter = fVar14;
+			piVar17++;
+
+			local_10--;
+			local_18++;
+
+			xIter++;
+			yIter++;
+			zIter++;
+		} while (local_10 != 0);
+	}
+	uVar15 = rdClip_Face3GSRGB(clipFrustum, mesh_out->verticesProjected,
+							   mesh_out->paRedIntensities, mesh_out->paGreenIntensities,
+							   mesh_out->paBlueIntensities, idxInfo->numVertices);
+	mesh_out->numVertices = uVar15;
+	return;
+
+#endif
     default:
 switchD_0044c964_caseD_5:
         return;
@@ -1834,6 +1905,50 @@ void rdPrimit3_ClipFaceRGBLevel
                 return;
             }
         }
+		return;
+#ifdef OBJECT_MOTION_BLUR
+	// total clipping hack to clip prev position without messing with the rdClip routines
+case 5:
+	if (idxInfo->numVertices != 0)
+	{
+		local_10 = mesh_out->verticesProjected;
+		prVar7 = idxInfo->vertices;
+		piVar24 = idxInfo->vertexPosIdx;
+
+		float* xIter = mesh_out->paRedIntensities;
+		float* yIter = mesh_out->paGreenIntensities;
+		float* zIter = mesh_out->paBlueIntensities;
+
+		int idxIter = 0;
+		local_8 = idxInfo->numVertices;
+		do
+		{
+			iVar12 = *piVar24;
+			prVar20 = prVar7 + iVar12;
+			rdVector_Copy3(local_10, prVar20);
+
+			*xIter = idxInfo->paRedIntensities[idxIter];
+			*yIter = idxInfo->paGreenIntensities[idxIter];
+			*zIter = idxInfo->paBlueIntensities[idxIter];
+
+			local_10++;
+			piVar24++;
+			local_8--;
+
+			xIter++;
+			yIter++;
+			zIter++;
+			idxIter++;
+
+		} while (local_8 != 0);
+	}
+	uVar16 = rdClip_Face3GSRGB(clipFrustum, mesh_out->verticesProjected,
+								mesh_out->paRedIntensities, mesh_out->paGreenIntensities,
+								mesh_out->paBlueIntensities, idxInfo->numVertices);
+	mesh_out->numVertices = uVar16;
+	return;
+
+#endif
     default:
         return;
     }

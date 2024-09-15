@@ -51,6 +51,12 @@ int rdThing_NewEntry(rdThing *thing, sithThing *parent)
 	thing->paHierarchyNodeMatricesPrev = 0;
 	thing->pRagdoll = 0;
 #endif
+#ifdef OBJECT_MOTION_BLUR
+	thing->paLastVertsX = 0;
+	thing->paLastVertsY = 0;
+	thing->paLastVertsZ = 0;
+	thing->paLastPos = 0;
+#endif
     return 1;
 }
 
@@ -96,6 +102,47 @@ void rdThing_FreeEntry(rdThing *thing)
 			thing->pRagdoll = 0;
 		}
 #endif
+#ifdef OBJECT_MOTION_BLUR
+		if (thing->paLastVertsX)
+		{
+			for (int geo = 0; geo < thing->geosets; ++geo)
+			{
+				if (thing->paLastVertsX[geo])
+				{
+					for (int mesh = 0; mesh < thing->nummeshes[geo]; ++mesh)
+					{
+						if (thing->paLastVertsX[geo][mesh])
+						{
+							rdroid_pHS->free(thing->paLastVertsX[geo][mesh]);
+							rdroid_pHS->free(thing->paLastVertsY[geo][mesh]);
+							rdroid_pHS->free(thing->paLastVertsZ[geo][mesh]);
+							thing->paLastVertsX[geo][mesh] = 0;
+							thing->paLastVertsY[geo][mesh] = 0;
+							thing->paLastVertsZ[geo][mesh] = 0;
+						}
+					}
+					
+					rdroid_pHS->free(thing->paLastVertsX[geo]);
+					rdroid_pHS->free(thing->paLastVertsY[geo]);
+					rdroid_pHS->free(thing->paLastVertsZ[geo]);
+					rdroid_pHS->free(thing->paLastPos[geo]);
+					thing->paLastVertsX[geo] = 0;
+					thing->paLastVertsY[geo] = 0;
+					thing->paLastVertsZ[geo] = 0;
+					thing->paLastPos[geo] = 0;
+				}
+			}
+			rdroid_pHS->free(thing->nummeshes);
+
+			rdroid_pHS->free(thing->paLastVertsX);
+			rdroid_pHS->free(thing->paLastVertsY);
+			rdroid_pHS->free(thing->paLastVertsZ);
+			thing->paLastVertsX = 0;
+			thing->paLastVertsY = 0;
+			thing->paLastVertsZ = 0;
+			thing->paLastPos = 0;
+		}
+#endif
     }
     if ( thing->puppet )
     {
@@ -139,6 +186,29 @@ int rdThing_SetModel3(rdThing *thing, rdModel3 *model)
 	if (!thing->paHierarchyNodeMatricesPrev)
 		return 0;
 	_memset(thing->paHierarchyNodeMatricesPrev, 0, sizeof(rdMatrix34) * model->numHierarchyNodes);
+#endif
+
+#ifdef OBJECT_MOTION_BLUR
+	thing->paLastVertsX = rdroid_pHS->alloc(sizeof(float**) * model->numGeosets);
+	thing->paLastVertsY = rdroid_pHS->alloc(sizeof(float**) * model->numGeosets);
+	thing->paLastVertsZ = rdroid_pHS->alloc(sizeof(float**) * model->numGeosets);
+	thing->paLastPos = rdroid_pHS->alloc(sizeof(rdVector3*) * model->numGeosets);
+	thing->geosets = model->numGeosets;
+	thing->nummeshes = rdroid_pHS->alloc(sizeof(int*) * model->numGeosets);
+	for (int geo = 0; geo < thing->model3->numGeosets; ++geo)
+	{
+		thing->paLastVertsX[geo] = rdroid_pHS->alloc(sizeof(float*) * model->geosets[geo].numMeshes);
+		thing->paLastVertsY[geo] = rdroid_pHS->alloc(sizeof(float*) * model->geosets[geo].numMeshes);
+		thing->paLastVertsZ[geo] = rdroid_pHS->alloc(sizeof(float*) * model->geosets[geo].numMeshes);
+		thing->paLastPos[geo] = rdroid_pHS->alloc(sizeof(rdVector3) * model->geosets[geo].numMeshes);
+		thing->nummeshes[geo] = model->geosets[geo].numMeshes;
+		for (int mesh = 0; mesh < thing->model3->geosets[geo].numMeshes; ++mesh)
+		{
+			thing->paLastVertsX[geo][mesh] = rdroid_pHS->alloc(sizeof(float) * model->geosets[geo].meshes[mesh].numVertices);
+			thing->paLastVertsY[geo][mesh] = rdroid_pHS->alloc(sizeof(float) * model->geosets[geo].meshes[mesh].numVertices);
+			thing->paLastVertsZ[geo][mesh] = rdroid_pHS->alloc(sizeof(float) * model->geosets[geo].meshes[mesh].numVertices);
+		}
+	}
 #endif
 
     rdHierarchyNode* iter = model->hierarchyNodes;

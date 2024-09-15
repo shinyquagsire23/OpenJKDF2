@@ -421,7 +421,15 @@ int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
 				memcpy(v5->vertexVS, aParticleVerticesTmp, sizeof(rdVector3) * v26);
 #endif
                 rdCamera_pCurCamera->fnProjectLst(v5->vertices, aParticleVerticesTmp, v26);
-                v5->lightingMode = v35;
+#ifdef OBJECT_MOTION_BLUR
+				for (int i = 0; i < v26; ++i)
+				{
+					v5->motionVectorsX[i] = 0;//v5->vertices[i].x;
+					v5->motionVectorsY[i] = 0;//v5->vertices[i].y;
+					v5->motionVectorsZ[i] = 0;//v5->vertices[i].z;
+				}
+#endif
+				v5->lightingMode = v35;
                 v29 = particle->vertexCel;
                 v5->material = particle->material;
                 v5->ambientLight = matrix_4_3a;
