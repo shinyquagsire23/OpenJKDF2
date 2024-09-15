@@ -50,10 +50,11 @@ enum RD_ZBUFFERMETHOD
 #ifdef DEFERRED_DECALS
 enum RD_DECAL_FLAGS
 {
-	RD_DECAL_NONE = 0x0,
-	RD_DECAL_HEAT = 0x1, // todo: remove me?
-	RD_DECAL_ADD  = 0x2,
-	RD_DECAL_INSIDE = 0x4, // inside volume
+	RD_DECAL_NONE      = 0x0,
+	RD_DECAL_INSIDE    = 0x1, // inside volume
+	RD_DECAL_HEAT      = 0x2, // use temperature for emissive todo: remove me?
+	RD_DECAL_ADD       = 0x4, // additive blending
+	RD_DECAL_RGB_ALPHA = 0x8, // color as alpha
 };
 #endif
 

@@ -223,11 +223,17 @@ void main(void)
 #endif
 
 	// omfg I hate glsl
-	bool flag1 = mod(decalFlags, 2.0) > 0.;
-	bool flag2 = mod(floor(decalFlags / 2.0), 2.0) > 0.;
-	bool flag3 = mod(floor(decalFlags / 4.0), 2.0) > 0.;
+	bool isInside = mod(decalFlags, 2.0) > 0.;
+	bool isHeat = mod(floor(decalFlags / 2.0), 2.0) > 0.;
+	bool isAdditive = mod(floor(decalFlags / 4.0), 2.0) > 0.;
+	bool isRgbAlpha = mod(floor(decalFlags / 8.0), 2.0) > 0.;
 
-	if(flag1)
+	if(isRgbAlpha)
+	{
+		sampled_color.a = max(sampled_color.r, max(sampled_color.g, sampled_color.b));
+	}
+
+	if(isHeat)
 	{
 		//sampled_color.rgb*=sampled_color.rgb;
 		sampled_color.rgb *= decalColor.rgb;
@@ -242,7 +248,7 @@ void main(void)
 	}
 
 	vec4 emissive = vec4(0.0, 0.0, 0.0, 1.0);
-	if(!flag2)
+	if(!isAdditive)
 	{
 		vec3 light = texture(texLight, uv).xyz;
 		sampled_color.rgb *= light.rgb;
@@ -250,7 +256,6 @@ void main(void)
 	else
 	{
 		emissive.rgb = sampled_color.rgb;
-		//sampled_color.a = 0.0;
 	}
 	
 	sampled_color.rgb += colorEffects_add.rgb;
