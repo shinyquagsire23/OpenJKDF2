@@ -26,9 +26,6 @@ __declspec(dllexport) DWORD NvOptimusEnablement = 1;
 __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 #endif
 
-#define NEW_SSAO
-#define NEW_BLOOM
-
 #define TEX_MODE_TEST 0
 #define TEX_MODE_WORLDPAL 1
 #define TEX_MODE_BILINEAR 2

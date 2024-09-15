@@ -2,11 +2,6 @@
 #define HAS_TEXTUREGATHER
 #endif
 
-// todo: set these from outside
-#define CLASSIC_EMISSIVE
-#define DEFERRED_DECALS
-//#define FOG
-
 #ifdef HAS_TEXTUREGATHER
 vec4 impl_textureGather(sampler2D tex, vec2 uv)
 {

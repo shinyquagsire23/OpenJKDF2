@@ -1,7 +1,3 @@
-#define DEFERRED_DECALS
-#define NEW_SSAO
-
-
 uniform sampler2D tex;
 uniform sampler2D tex2;
 uniform sampler2D tex3;

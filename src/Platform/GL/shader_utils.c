@@ -116,6 +116,24 @@ GLuint create_shader(const char* shader, GLenum type) {
     defines = "#define CAN_BILINEAR_FILTER\n";
 #endif
 
+	const char* featureDefines = "\n"
+#ifdef CLASSIC_EMISSIVE
+	"#define CLASSIC_EMISSIVE\n"
+#endif
+#ifdef NEW_BLOOM
+	"#define NEW_BLOOM\n"
+#endif
+#ifdef NEW_SSAO
+	"#define NEW_SSAO\n"
+#endif
+#ifdef DEFERRED_DECALS
+	"#define DEFERRED_DECALS\n"
+#endif
+#ifdef FOG
+	"#define FOG\n"
+#endif
+	;
+
 	// GLES2 precision specifiers
 	const char* precision;
 	precision =
@@ -136,10 +154,11 @@ GLuint create_shader(const char* shader, GLenum type) {
 		version,
 		extensions,
 		defines,
+		featureDefines,
 		precision,
 		source
 	};
-	glShaderSource(res, 5, sources, NULL);
+	glShaderSource(res, 6, sources, NULL);
 	
 	glCompileShader(res);
 	GLint compile_ok = GL_FALSE;

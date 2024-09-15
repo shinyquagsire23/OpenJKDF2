@@ -198,6 +198,9 @@
 // Experimental features
 #ifdef QOL_IMPROVEMENTS
 
+#define CLASSIC_EMISSIVE     // compute emissives using the same approach as stock JK with max(color, emissive), rather than adding it on top as bloom
+#define NEW_SSAO             // disk-to-disk based SSAO with performance improvements
+#define NEW_BLOOM            // optimized downsample based bloom with better performance
 #define RGB_THING_LIGHTS     // RGB thing lighting with lightcolor template param
 #define RGB_AMBIENT          // RGB sector ambient with spherical harmonics for gouraud models
 #define SPECULAR_LIGHTING    // RD_LIGHTMODE_SPECULAR
