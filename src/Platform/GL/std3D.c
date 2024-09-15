@@ -2772,8 +2772,14 @@ void std3D_DrawRenderList()
     }
 
 #ifdef ADDITIVE_BLEND
-	if (last_flags & 0x80000)
+	if (last_flags & 0x180000)
 	{
+		if (last_flags & 0x100000)
+		{
+			glUniform1i(uniform_blend_mode, D3DBLEND_SRCALPHA);
+			glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
+		}
+		else
 		{
 			glUniform1i(uniform_blend_mode, D3DBLEND_SRCALPHA);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE);
@@ -2841,17 +2847,27 @@ void std3D_DrawRenderList()
             int changed_flags = (last_flags ^ tris[j].flags);
 
 #ifdef ADDITIVE_BLEND
-			if (changed_flags & 0x80600)
+			if (changed_flags & 0x180600)
 #else
             if (changed_flags & 0x600)
 #endif
 			{
-				if (tris[j].flags & 0x80000)
+			#ifdef ADDITIVE_BLEND
+				if (tris[j].flags & 0x180000)
 				{
-					glUniform1i(uniform_blend_mode, D3DBLEND_SRCALPHA);
-					glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+					if (tris[j].flags & 0x100000)
+					{
+						glUniform1i(uniform_blend_mode, D3DBLEND_SRCALPHA);
+						glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
+					}
+					else
+					{
+						glUniform1i(uniform_blend_mode, D3DBLEND_SRCALPHA);
+						glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+					}
 				}
 				else
+			#endif
                 if (tris[j].flags & 0x600) {
                     
                     if (tris[j].flags & 0x200) {

@@ -208,7 +208,7 @@
 #define DYNAMIC_POV          // POV enhancements, such as the weapon following the autoaim target, muzzle flashes, sway improvements
 #define DEFERRED_DECALS      // .dcal support and deferred decal rendering path (for blast marks etc)
 #define RAGDOLLS             // .af support and SITH_MT_RAGDOLL physics type for experimental verlet ragdolls
-#define ADDITIVE_BLEND       // additive blending support with a new face flag
+#define ADDITIVE_BLEND       // additive/screen blending support with a new face flags
 #define POLYLINE_EXT         // .pln support and polyline template param, allows using polylines as rendering primitives for things (ex. blaster bolts)
 #define LIGHTSABER_TRAILS    // visual enhancement for lightsabers, draws extra tris to simulate lightsaber trails/motion blur
 #define LIGHTSABER_MARKS     // visual enhancement for lightsabers, draws impact decals with saber collision, requires DEFERRED_DECALS
