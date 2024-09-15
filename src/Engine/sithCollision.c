@@ -1311,10 +1311,11 @@ void sithCollide_CollideRagdoll(sithThing* thing, sithThing* thing2, rdVector3* 
 			rdVector_Sub3(&vel, &pParticle->pos, &pParticle->lastPos);
 
 			// intersect the move with the particle
-			float hitDist;
-			int intersects = sithIntersect_RaySphereIntersection(&thing2->position, &thing2Vel, len, thing2->collideSize, &pParticle->pos, pParticle->radius, &hitDist, 1, 0);
-			if (!intersects)
-				continue;
+			// fixme: disabled for now because it barely ever picks up intersections? are the particles too small?
+			//float hitDist;
+			//int intersects = sithIntersect_RaySphereIntersection(&thing2->position, &thing2Vel, len, thing2->collideSize, &pParticle->pos, pParticle->radius, &hitDist, 1, 0);
+			//if (!intersects)
+			//	continue;
 
 			float velDiff = rdVector_Dot3(&vel, norm) - rdVector_Dot3(&thing2->physicsParams.vel, norm);
 			velDiff = stdMath_ClipPrecision(velDiff);
