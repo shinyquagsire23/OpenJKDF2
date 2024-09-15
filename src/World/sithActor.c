@@ -300,25 +300,59 @@ void sithActor_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4)
                 else
                 {
 				#ifdef RAGDOLLS
-					// use length of death anim before ragdolling/turning to corpse
-					int deathMs = 1000;
+					int removeAsap = (sithPhysics_ragdolls == 2); // immediately remove and ragdoll
+					
+					// if the actor is moving quickly, immediately ragdoll
+					float vellen = rdVector_Len3(&thing->physicsParams.vel);
+					if (vellen > 1.0f)
+						removeAsap = 1;
 
-					// if the actor is moving quickly, just insta ragdoll
-					if (rdVector_Len3(&thing->physicsParams.vel) > 1.0f || sithPhysics_ragdolls == 2)
+					// check for collisions with nearby objects, if anything is close, immediately ragdoll to avoid clipping
+					// ignore anything we're attached to since that's always going to collide
+					rdVector3 velnorm;
+					rdVector_Normalize3(&velnorm, &thing->physicsParams.vel);
+					sithCollision_SearchRadiusForThings(thing->sector, thing, &thing->position, &velnorm, vellen, thing->collideSize, 0);
+					for (sithCollisionSearchEntry* i = sithCollision_NextSearchResult(); i; i = sithCollision_NextSearchResult())
+					{
+						if(i->hitType & SITHCOLLISION_WORLD)
+						{
+							if(!(thing->attach_flags & SITH_ATTACH_WORLDSURFACE) || thing->attachedSurface != i->surface)
+							{
+								removeAsap = 1;
+								break;
+							}
+						}
+						if (i->hitType & SITHCOLLISION_THING)
+						{
+							if (!(thing->attach_flags & SITH_ATTACH_THING) || thing->attachedThing != i->receiver)
+							{
+								removeAsap = 1;
+								break;
+							}
+						}
+					}
+					sithCollision_SearchClose(); 
+					
+					if (!removeAsap)
+					{
+						int deathMs = 1000;
+						if (thing->animclass && thing->puppet)
+						{
+							// use length of death anim before ragdolling/turning to corpse
+							int anim = thing->actorParams.health >= -10.0 ? SITH_ANIM_DEATH2 : SITH_ANIM_DEATH;
+							sithAnimclassMode* mode = &thing->animclass->modes[thing->puppet->majorMode];
+							rdKeyframe* key = mode->keyframe[anim].keyframe;
+							if(key)
+							{
+								deathMs = ((float)key->numFrames / key->fps) * 1000.0f * 0.5f;
+							}
+						}
+						thing->lifeLeftMs = deathMs;
+					}
+					else
 					{
 						sithActor_Remove(thing);
 					}
-					else if(thing->animclass && thing->puppet)
-					{
-						int anim = thing->actorParams.health >= -10.0 ? SITH_ANIM_DEATH2 : SITH_ANIM_DEATH;
-						sithAnimclassMode* mode = &thing->animclass->modes[thing->puppet->majorMode];
-						rdKeyframe* key = mode->keyframe[anim].keyframe;
-						if(key)
-						{
-							deathMs = ((float)key->numFrames / key->fps) * 1000.0f * 0.5f;
-						}
-					}
-					thing->lifeLeftMs = deathMs;
 				#else
                     thing->lifeLeftMs = 1000;
 				#endif
