@@ -2451,6 +2451,9 @@ typedef struct jkPlayerInfo
     uint32_t field_0;
     rdThing rd_thing;
     rdThing povModel;
+#ifdef DYNAMIC_POV
+	rdThing povSprite;
+#endif
     float length;
     uint32_t field_98;
     rdPolyLine polyline;

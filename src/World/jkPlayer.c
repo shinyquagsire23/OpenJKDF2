@@ -95,7 +95,6 @@ int jkPlayer_aimLock = 0;
 
 static int jkPlayer_drawMuzzleFlash = 0;
 static int jkPlayer_muzzleFlashNode = -1;
-static rdThing jkPlayer_povMuzzleFlash;
 static rdSprite* jkPlayer_povMuzzleFlashSprite;
 #endif
 
@@ -305,7 +304,6 @@ void jkPlayer_ResetVars()
 	jkPlayer_povAutoAimDist = 0.0f;
 	jkPlayer_drawMuzzleFlash = 0;
 	jkPlayer_muzzleFlashNode = -1;
-	rdThing_FreeEntry(&jkPlayer_povMuzzleFlash);
 	jkPlayer_povMuzzleFlashSprite = NULL;
 #endif
 
@@ -370,7 +368,9 @@ void jkPlayer_Shutdown()
 #endif
 
         rdThing_FreeEntry(&playerThings[i].povModel); // Added: prevent memleak
-
+#ifdef DYNAMIC_POV
+		rdThing_FreeEntry(&playerThings[i].povSprite);
+#endif
         rdThing_FreeEntry(&playerThings[i].rd_thing); // Added: fix memleak
     }
     _memset(playerThings, 0, sizeof(playerThings));
@@ -411,7 +411,9 @@ void jkPlayer_Shutdown()
 #endif
 
         rdThing_FreeEntry(&jkPlayer_aMotsInfos[i].povModel); // Added: prevent memleak
-
+#ifdef DYNAMIC_POV
+		rdThing_FreeEntry(&jkPlayer_aMotsInfos[i].povSprite);
+#endif
         rdThing_FreeEntry(&jkPlayer_aMotsInfos[i].rd_thing); // Added: fix memleak
     }
     _memset(jkPlayer_aMotsInfos, 0, sizeof(jkPlayer_aMotsInfos));
@@ -927,25 +929,24 @@ void jkPlayer_PovModelCallback(sithThing* thing, int track, uint32_t markerId)
 		jkPlayer_drawMuzzleFlash = sithTime_curMs + 50; // 50ms
 		
 		// randomize the cel
-		if(jkPlayer_povMuzzleFlash.sprite3 && jkPlayer_povMuzzleFlash.sprite3->face.material)
+		if(thing->playerInfo->povSprite.sprite3 && thing->playerInfo->povSprite.sprite3->face.material)
 		{
-			int celCount = jkPlayer_povMuzzleFlash.sprite3->face.material->num_texinfo;
-			jkPlayer_povMuzzleFlash.wallCel = min(_frand() * celCount, celCount - 1);
+			int celCount = thing->playerInfo->povSprite.sprite3->face.material->num_texinfo;
+			thing->playerInfo->povSprite.wallCel = min(_frand() * celCount, celCount - 1);
 		}
 	}
 }
 
 void jkPlayer_SetPovSprite(jkPlayerInfo* info, rdSprite* sprite)
 {
-	// fixme: this should be in the playerinfo
-	if (jkPlayer_povMuzzleFlash.type != 1 || jkPlayer_povMuzzleFlash.sprite3 != sprite)
+	if (info->povSprite.type != 1 || info->povSprite.sprite3 != sprite)
 	{
-		rdThing_FreeEntry(&jkPlayer_povMuzzleFlash);
-		rdThing_NewEntry(&jkPlayer_povMuzzleFlash, info->actorThing);
+		rdThing_FreeEntry(&info->povSprite);
+		rdThing_NewEntry(&info->povSprite, info->actorThing);
 
 		jkPlayer_povMuzzleFlashSprite = sprite;
 		if (sprite)
-			rdThing_SetSprite3(&jkPlayer_povMuzzleFlash, sprite);
+			rdThing_SetSprite3(&info->povSprite, sprite);
 	}
 	jkPlayer_drawMuzzleFlash = 0;
 }
@@ -1273,24 +1274,24 @@ void jkPlayer_DrawPov()
 		if (jkPlayer_muzzleFlashNode >= 0 && jkPlayer_muzzleFlashNode < playerThings[playerThingIdx].povModel.model3->numHierarchyNodes)
 		{
 			// draw the muzzle flash while the timer is valid
-			if (sithTime_curMs < jkPlayer_drawMuzzleFlash && jkPlayer_povMuzzleFlash.sprite3)
+			if (sithTime_curMs < jkPlayer_drawMuzzleFlash && playerThings[playerThingIdx].povSprite.sprite3)
 			{
 				rdMatrix34* muzzleMat = &playerThings[playerThingIdx].povModel.hierarchyNodeMatrices[jkPlayer_muzzleFlashNode];
-				rdSprite_Draw(&jkPlayer_povMuzzleFlash, muzzleMat);
+				rdSprite_Draw(&playerThings[playerThingIdx].povSprite, muzzleMat);
 
 				// add a light for the flash
 				static rdLight muzzleLight;
 				rdLight_NewEntry(&muzzleLight);
-				muzzleLight.intensity = jkPlayer_povMuzzleFlash.sprite3->radius * 2.0f;
+				muzzleLight.intensity = playerThings[playerThingIdx].povSprite.sprite3->radius * 2.0f;
 #ifdef RGB_THING_LIGHTS
-				rdMaterial_GetFillColor(&muzzleLight.color, jkPlayer_povMuzzleFlash.sprite3->face.material, player->sector->colormap, jkPlayer_povMuzzleFlash.wallCel, -1);
+				rdMaterial_GetFillColor(&muzzleLight.color, playerThings[playerThingIdx].povSprite.sprite3->face.material, player->sector->colormap, playerThings[playerThingIdx].povSprite.wallCel, -1);
 				rdVector_Scale3Acc(&muzzleLight.color, 1.0f / muzzleLight.intensity); // compensate for the low intensity/range
 #endif
 				// offset the light so it's on the top of the sprite, not the very center
 				// this is to simulate more of an "area light" of the flash wrapping around the POV model
 				rdVector3 pos;
 				rdVector_Copy3(&pos, &muzzleMat->scale);
-				rdVector_MultAcc3(&pos, &viewMat.uvec, jkPlayer_povMuzzleFlash.sprite3->height);
+				rdVector_MultAcc3(&pos, &viewMat.uvec, playerThings[playerThingIdx].povSprite.sprite3->height);
 				rdCamera_AddLight(rdCamera_pCurCamera, &muzzleLight, &pos);
 			}
 
