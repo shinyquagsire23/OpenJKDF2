@@ -716,22 +716,6 @@ int sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogReference *cogIdk, char *
                 }
             }
 
-#ifdef STATIC_JKL_EXT
-			// can't tell if this is going to be needed but just in case let's duplicate the hack above
-			for (int i = 0; i < ARRAY_SIZE(sithWorld_pStaticWorlds); ++i)
-			{
-				if(!sithWorld_pStaticWorlds[i]) continue;
-				if (!(v17->id & sithWorld_pStaticWorlds[i]->idx_offset))
-				{
-					v17->id = (v17 - sithWorld_pCurrentWorld->keyframes) & 0xFFFF;
-					if (v17->id >= sithWorld_pStaticWorlds[i]->idx_offset)
-					{
-						v17->id = (v17 - sithWorld_pStatic->keyframes) | sithWorld_pStaticWorlds[i]->idx_offset;
-					}
-				}
-			}
-#endif
-
             cogSymbol->val.data[0] = v17->id;
             return 1;
         case COG_TYPE_SOUND:
