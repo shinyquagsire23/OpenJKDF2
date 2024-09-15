@@ -687,8 +687,8 @@ void jkSaber_SpawnBurn(jkPlayerInfo* pPlayerInfo, rdVector3* pPos, rdVector3* pH
 			// we could do this with the last mark, but we want the sounds and effects to play from the spawned template
 			if (pPlayerInfo->lastSaberMark && distSq < 0.0001f)
 			{
-				pSpawned->rdthing.decalScale.x = min(1.0f + pPlayerInfo->saberCollideInfo.totalCollisionTime, 8.0f);
-				pSpawned->rdthing.decalScale.z = min(1.0f + pPlayerInfo->saberCollideInfo.totalCollisionTime, 8.0f);
+				pSpawned->rdthing.decalScale.x = min(1.0f + pPlayerInfo->saberCollideInfo.totalCollisionTime * 10.0f, 4.0f);
+				pSpawned->rdthing.decalScale.z = min(1.0f + pPlayerInfo->saberCollideInfo.totalCollisionTime * 10.0f, 4.0f);
 				pPlayerInfo->saberCollideInfo.totalCollisionTime += sithTime_deltaSeconds;
 			}
 			else
