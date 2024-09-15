@@ -214,6 +214,13 @@
 #define VERTEX_COLORS        // add vertex color face flag to indicate using the rdProcEntry's color field as the vertex color
 //#define FOG                  // infernal machine style fog rendering
 
+// helper to avoid redundantly checking this constantly
+#ifdef SPECULAR_LIGHTING
+#define USES_VERTEX_LIGHTING(LIGHT_MODE) (((LIGHT_MODE) == 3) || ((LIGHT_MODE) == 4))
+#else
+#define USES_VERTEX_LIGHTING(LIGHT_MODE) ((LIGHT_MODE) == 3)
+#endif
+
 #endif
 
 //
