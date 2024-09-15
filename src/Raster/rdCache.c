@@ -1565,7 +1565,7 @@ void rdCache_FlushDecals()
 		rdVector3 localCamera;
 		rdMatrix_TransformPoint34(&localCamera, &rdCamera_camMatrix.scale, &invDecalMatrix);
 
-		uint32_t extraFlags = 0;
+		uint32_t flags = decal->flags;
 		float radius = rdCamera_pCurCamera->pClipFrustum->field_0.y; // give it a radius to account for near plane
 		if (localCamera.z - radius >= -1.0f
 			&& localCamera.y - radius >= -1.0f
@@ -1575,10 +1575,15 @@ void rdCache_FlushDecals()
 			&& localCamera.z + radius <= 1.0f
 			)
 		{
-			extraFlags = RD_DECAL_INSIDE;
+			flags |= RD_DECAL_INSIDE;
+		}
+		else
+		{
+			flags &= ~RD_DECAL_INSIDE;
 		}
 
-		std3D_DrawDecal(tex2_arr_sel, verts, &invDecalViewMatrix, &rdCache_aDecalColors[i], decal->flags | extraFlags, rdCache_aDecalAngleFades[i]);
+
+		std3D_DrawDecal(tex2_arr_sel, verts, &invDecalViewMatrix, &rdCache_aDecalColors[i], flags, rdCache_aDecalAngleFades[i]);
 	}
 	rdCache_numDecals = 0;
 }
