@@ -1379,6 +1379,7 @@ void sithPhysics_ThingPhysRagdoll(sithThing* pThing, float deltaSeconds)
 	{
 		// do a normal physics update
 		sithPhysics_ThingTick(pThing, deltaSeconds);
+		pRagdoll->lastCollideMs = sithTime_curMs;
 		return;
 	}
 
