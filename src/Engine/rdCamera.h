@@ -55,7 +55,7 @@ void rdCamera_PerspProjectSquare(rdVector3 *out, rdVector3 *v);
 void rdCamera_PerspProjectSquareLst(rdVector3 *vertices_out, rdVector3 *vertices_in, unsigned int num_vertices);
 #ifdef RGB_AMBIENT
 void rdCamera_SetAmbientLight(rdCamera *camera, rdVector3* amt);
-void rdCamera_SetAmbientCube(rdCamera* camera, rdAmbient* ambientCube);
+void rdCamera_SetDirectionalAmbientLight(rdCamera* camera, rdAmbient* ambientSH);
 #else
 void rdCamera_SetAmbientLight(rdCamera* camera, float amt);
 #endif

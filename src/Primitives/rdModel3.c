@@ -1467,12 +1467,15 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
 #ifdef RGB_AMBIENT
 		// rotate the ambient SH to local space
 		rdAmbient localAmbient;
-		localAmbient.r.x = rdCamera_pCurCamera->ambientCube.r.x;
-		localAmbient.g.x = rdCamera_pCurCamera->ambientCube.g.x;
-		localAmbient.b.x = rdCamera_pCurCamera->ambientCube.b.x;
-		rdMatrix_TransformVector34(&localAmbient.r.y, &rdCamera_pCurCamera->ambientCube.r.y, &matInv);
-		rdMatrix_TransformVector34(&localAmbient.g.y, &rdCamera_pCurCamera->ambientCube.g.y, &matInv);
-		rdMatrix_TransformVector34(&localAmbient.b.y, &rdCamera_pCurCamera->ambientCube.b.y, &matInv);
+		localAmbient.r.x = rdCamera_pCurCamera->ambientSH.r.x;
+		localAmbient.g.x = rdCamera_pCurCamera->ambientSH.g.x;
+		localAmbient.b.x = rdCamera_pCurCamera->ambientSH.b.x;
+		rdMatrix_TransformVector34(&localAmbient.r.y, &rdCamera_pCurCamera->ambientSH.r.y, &matInv);
+		rdMatrix_TransformVector34(&localAmbient.g.y, &rdCamera_pCurCamera->ambientSH.g.y, &matInv);
+		rdMatrix_TransformVector34(&localAmbient.b.y, &rdCamera_pCurCamera->ambientSH.b.y, &matInv);
+
+		rdVector3 localCamera;
+		rdMatrix_TransformPoint34(&localCamera, &rdCamera_camMatrix.scale, &matInv);
 #endif
 
         // MOTS added assignment

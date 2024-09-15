@@ -370,7 +370,7 @@ int sithWorld_NewEntry(sithWorld *pWorld)
 			{
 				sithSector* sector = &pWorld->sectors[i];
 				rdVector_Zero3(&sector->ambientRGB); // rgb flat ambient (replaces ambient light intensity)
-				rdAmbient_Zero(&sector->ambientCube); // rgb directional ambient
+				rdAmbient_Zero(&sector->ambientSH); // rgb directional ambient
 
 				double sflight = 0.0;
 				float total = 0.00001f;
@@ -395,12 +395,12 @@ int sithWorld_NewEntry(sithWorld *pWorld)
 						rdVector_Sub3(&dirToCenter, vertex, &pWorld->sectors[i].center);
 						rdVector_Normalize3Acc(&dirToCenter);
 
-						rdAmbient_Acc(&sector->ambientCube, &col, &dirToCenter);
+						rdAmbient_Acc(&sector->ambientSH, &col, &dirToCenter);
 					}
 				}
 				sflight /= (float)pWorld->sectors[i].numSurfaces;
 				rdVector_InvScale3Acc(&sector->ambientRGB, total);
-				rdAmbient_Scale(&sector->ambientCube, 4.0f * M_PI / total); // integration over sphere
+				rdAmbient_Scale(&sector->ambientSH, 4.0f * M_PI / total); // integration over sphere
 			}
 #endif
             if ( !sithWorld_Verify(pWorld) )

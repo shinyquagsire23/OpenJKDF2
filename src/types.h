@@ -521,7 +521,7 @@ typedef struct rdCamera
     void (*fnProjectLst)(rdVector3 *, rdVector3 *, unsigned int);
 #ifdef RGB_AMBIENT
 	rdVector3 ambientLight;
-	rdAmbient ambientCube;
+	rdAmbient ambientSH;
 #else
     float ambientLight;
 #endif
@@ -2554,7 +2554,7 @@ typedef struct sithSector
     float ambientLight;
 #ifdef RGB_AMBIENT
 	rdVector3 ambientRGB;
-	rdAmbient ambientCube;
+	rdAmbient ambientSH;
 #endif
     float extraLight;
     rdColormap* colormap;

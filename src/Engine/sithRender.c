@@ -324,7 +324,7 @@ void sithRender_RenderDebugAmbientCubes()
 		ambientRGB.y = 0.01f;
 		ambientRGB.z = 0.01f;
 		rdCamera_SetAmbientLight(rdCamera_pCurCamera, &ambientRGB);
-		rdCamera_SetAmbientCube(rdCamera_pCurCamera, &sectorIter->ambientCube);
+		rdCamera_SetDirectionalAmbientLight(rdCamera_pCurCamera, &sectorIter->ambientSH);
 
 		sithRender_RenderDebugAmbient(&sectorIter->center);//.dominantDir);
 	}
@@ -1075,7 +1075,7 @@ void sithRender_RenderLevelGeometry()
 #ifdef RGB_AMBIENT
 			a2.x = a2.y = a2.z = sithRender_f_83198C;
 			rdCamera_SetAmbientLight(rdCamera_pCurCamera, &a2);
-			rdAmbient_Zero(&rdCamera_pCurCamera->ambientCube);
+			rdAmbient_Zero(&rdCamera_pCurCamera->ambientSH);
 #else
             a2 = sithRender_f_83198C;
             rdCamera_SetAmbientLight(rdCamera_pCurCamera, sithRender_f_83198C);
@@ -1089,7 +1089,7 @@ void sithRender_RenderLevelGeometry()
 			a2.y = stdMath_Clamp(baseLight + level_idk->ambientRGB.y, 0.0, 1.0);
 			a2.z = stdMath_Clamp(baseLight + level_idk->ambientRGB.z, 0.0, 1.0);
 			rdCamera_SetAmbientLight(rdCamera_pCurCamera, &a2);
-			rdCamera_SetAmbientCube(rdCamera_pCurCamera, &level_idk->ambientCube);
+			rdCamera_SetDirectionalAmbientLight(rdCamera_pCurCamera, &level_idk->ambientSH);
 #else
             float baseLight = level_idk->ambientLight + level_idk->extraLight + sithRender_008d4098;
             a2 = stdMath_Clamp(baseLight, 0.0, 1.0);
@@ -2134,7 +2134,7 @@ void sithRender_RenderThings()
 						lightColor.y = stdMath_Clamp(lightColor.y, 0.0, 1.0);
 						lightColor.z = stdMath_Clamp(lightColor.z, 0.0, 1.0);
 						rdCamera_SetAmbientLight(rdCamera_pCurCamera, &lightColor);
-						rdCamera_SetAmbientCube(rdCamera_pCurCamera, &thingIter->sector->ambientCube);
+						rdCamera_SetDirectionalAmbientLight(rdCamera_pCurCamera, &thingIter->sector->ambientSH);
 
 #else
                         rdCamera_SetAmbientLight(rdCamera_pCurCamera, stdMath_Clamp(thingIter->light, 0.0, 1.0));
@@ -2144,7 +2144,7 @@ void sithRender_RenderThings()
                     {
 #ifdef RGB_AMBIENT
 						rdCamera_SetAmbientLight(rdCamera_pCurCamera, &a2);
-						rdCamera_SetAmbientCube(rdCamera_pCurCamera, &thingIter->sector->ambientCube);
+						rdCamera_SetDirectionalAmbientLight(rdCamera_pCurCamera, &thingIter->sector->ambientSH);
 #else
 						rdCamera_SetAmbientLight(rdCamera_pCurCamera, a2);
 #endif
@@ -2346,7 +2346,7 @@ void sithRender_RenderAlphaSurfaces()
 			rdVector3 amb;
 			amb.x = amb.y = amb.z = sithRender_f_83198C;
 			rdCamera_SetAmbientLight(rdCamera_pCurCamera, &amb);
-			rdAmbient_Zero(&rdCamera_pCurCamera->ambientCube);
+			rdAmbient_Zero(&rdCamera_pCurCamera->ambientSH);
 #else
             rdCamera_SetAmbientLight(rdCamera_pCurCamera, sithRender_f_83198C);
 #endif
@@ -2360,7 +2360,7 @@ void sithRender_RenderAlphaSurfaces()
 			v2.y = stdMath_Clamp(v2.y, 0.0, 1.0);
 			v2.z = stdMath_Clamp(v2.z, 0.0, 1.0);
 			rdCamera_SetAmbientLight(rdCamera_pCurCamera, &v2);
-			rdCamera_SetAmbientCube(rdCamera_pCurCamera, &v1->ambientCube);
+			rdCamera_SetDirectionalAmbientLight(rdCamera_pCurCamera, &v1->ambientSH);
 #else
             v2 = v1->extraLight + v1->ambientLight + sithRender_008d4098;
             rdCamera_SetAmbientLight(rdCamera_pCurCamera, stdMath_Clamp(v2, 0.0, 1.0));

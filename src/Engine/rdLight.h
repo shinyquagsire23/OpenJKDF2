@@ -48,6 +48,7 @@ void rdAmbient_Lerp(rdAmbient* out, const rdAmbient* ambient0, const rdAmbient* 
 void rdAmbient_AddAcc(rdAmbient* out, const rdAmbient* ambient);
 void rdAmbient_Copy(rdAmbient* outAmbient, const rdAmbient* ambient);
 void rdAmbient_CalculateVertexColor(rdAmbient* ambient, rdVector3* normal, rdVector3* outColor);
+void rdAmbient_UpdateDominantDirection(rdAmbient* ambient);
 #endif
 
 #endif // _RDLIGHT_H

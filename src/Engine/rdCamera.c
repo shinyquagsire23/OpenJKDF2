@@ -50,7 +50,7 @@ int rdCamera_NewEntry(rdCamera *camera, float fov, float a3, float zNear, float 
         camera->screenAspectRatio = aspectRatio;
 	#ifdef RGB_AMBIENT
 		rdVector_Zero3(&camera->ambientLight);
-		rdAmbient_Zero(&camera->ambientCube);
+		rdAmbient_Zero(&camera->ambientSH);
 	#else
         camera->ambientLight = 0.0;
 	#endif
@@ -400,9 +400,9 @@ void rdCamera_SetAmbientLight(rdCamera* camera, rdVector3* amt)
 {
 	rdVector_Copy3(&camera->ambientLight, amt);
 }
-void rdCamera_SetAmbientCube(rdCamera* camera, rdAmbient* ambientCube)
+void rdCamera_SetDirectionalAmbientLight(rdCamera* camera, rdAmbient* ambientCube)
 {
-	rdAmbient_Copy(&camera->ambientCube, ambientCube);
+	rdAmbient_Copy(&camera->ambientSH, ambientCube);
 }
 #else
 void rdCamera_SetAmbientLight(rdCamera *camera, float amt)
