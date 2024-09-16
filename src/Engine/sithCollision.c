@@ -54,7 +54,12 @@ int sithCollision_Startup()
 
 	sithCollision_RegisterCollisionHandler(SITH_THING_PLAYER, SITH_THING_CORPSE, sithCorpse_Collide, 0);
 	sithCollision_RegisterCollisionHandler(SITH_THING_ACTOR, SITH_THING_CORPSE, sithCorpse_Collide, 0);
-	sithCollision_RegisterCollisionHandler(SITH_THING_WEAPON, SITH_THING_CORPSE, sithWeapon_Collide, 0);
+
+	// actual weapon collision looks better but it's actually kinda annoying during gameplay
+	// because the projectiles collide with the things bounding sphere, often in mid-air while trying
+	// to shoot at other targets behind the body
+	//sithCollision_RegisterCollisionHandler(SITH_THING_WEAPON, SITH_THING_CORPSE, sithWeapon_Collide, 0);
+	sithCollision_RegisterCollisionHandler(SITH_THING_WEAPON, SITH_THING_CORPSE, sithCorpse_Collide, 0);
 #endif
 
     sithCollision_initted = 1;
@@ -1298,9 +1303,16 @@ void sithCollide_CollideRagdoll(sithThing* thing, sithThing* thing2, rdVector3* 
 	if (thing->rdthing.pRagdoll && thing->physicsParams.mass != 0)// && thing->parentThing != thing2)
 	{
 		float velDiff = rdVector_Dot3(&thing->physicsParams.vel, norm) - rdVector_Dot3(&thing2->physicsParams.vel, norm);
+		
+		if ((thing->physicsParams.physflags & SITH_PF_SURFACEBOUNCE) == 0)
+			velDiff = velDiff * 0.5;
+		
+		if (velDiff < 0.0001f)
+			return;
+
 		rdVector3 force;
 		rdVector_Scale3(&force, &thing2->physicsParams.vel, velDiff);
-		sithPhysics_ThingRagdollApplyForce(thing, &force, NULL, 0.0f);
+		sithPhysics_ThingRagdollApplyForce(thing, &thing2->physicsParams.vel, &thing2->position, thing2->collideSize);
 	}
 }
 

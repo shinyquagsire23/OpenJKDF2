@@ -1256,13 +1256,13 @@ void sithPhysics_ThingRagdollApplyForce(sithThing* pThing, rdVector3* forceVec, 
 		rdRagdollParticle* pParticle = &pThing->rdthing.pRagdoll->paParticles[i];
 
 		// intersect the force with the particle
-		if(sourcePos)
-		{
-			float hitDist;
-			int intersects = sithIntersect_RaySphereIntersection(sourcePos, &forceNorm, len, range, &pParticle->pos, pParticle->radius, &hitDist, 1, 0);
-			if (!intersects)
-				continue;
-		}
+		//if(sourcePos)
+		//{
+		//	float hitDist;
+		//	int intersects = sithIntersect_RaySphereIntersection(sourcePos, &forceNorm, len, pParticle->radius, &pParticle->pos, range, &hitDist, 0, 0);
+		//	if (!intersects)
+		//		continue;
+		//}
 
 		if (forceVec->z * invMass > 0.5)
 			sithThing_DetachThing(pThing);
@@ -1458,6 +1458,8 @@ void sithPhysics_ThingPhysRagdoll(sithThing* pThing, float deltaSeconds)
 	pThing->collideSize = pRagdoll->radius;
 
 	rdVector_Sub3(&centerVel, &pRagdoll->center, &lastCenter);
+	rdVector_Copy3(&pThing->physicsParams.vel, &centerVel);
+
 	float velLen = rdVector_Normalize3Acc(&centerVel);
 	sithCollision_UpdateThingCollision(pThing, &centerVel, velLen, 0);
 }
