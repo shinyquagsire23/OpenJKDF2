@@ -1303,16 +1303,16 @@ void sithCollide_CollideRagdoll(sithThing* thing, sithThing* thing2, rdVector3* 
 	if (thing->rdthing.pRagdoll && thing->physicsParams.mass != 0)// && thing->parentThing != thing2)
 	{
 		float velDiff = rdVector_Dot3(&thing->physicsParams.vel, norm) - rdVector_Dot3(&thing2->physicsParams.vel, norm);
-		
+		velDiff = stdMath_ClipPrecision(velDiff);
+		if (velDiff <= 0.0)
+			return;
+
 		if ((thing->physicsParams.physflags & SITH_PF_SURFACEBOUNCE) == 0)
 			velDiff = velDiff * 0.5;
-		
-		if (velDiff < 0.0001f)
-			return;
 
 		rdVector3 force;
 		rdVector_Scale3(&force, &thing2->physicsParams.vel, velDiff);
-		sithPhysics_ThingRagdollApplyForce(thing, &thing2->physicsParams.vel, &thing2->position, thing2->collideSize);
+		sithPhysics_ThingRagdollApplyForce(thing, &force, &thing2->position, thing2->collideSize);
 	}
 }
 
