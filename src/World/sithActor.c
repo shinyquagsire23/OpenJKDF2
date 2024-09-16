@@ -540,6 +540,8 @@ void sithActor_Remove(sithThing *thing)
 	if(thing->rdthing.model3 && thing->rdthing.model3->pSkel)
 	{
 		thing->moveType = SITH_MT_RAGDOLL;
+		thing->collide = SITH_COLLIDE_SPHERE_TREE;
+		thing->treeSize = thing->collideSize;
 		rdRagdoll_NewEntry(&thing->rdthing, &thing->physicsParams.vel);
 		//sithPuppet_resetidk(thing);
 	}

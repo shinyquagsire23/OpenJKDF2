@@ -11,6 +11,9 @@
 #include "Engine/sithCollision.h"
 #include "Primitives/rdMath.h"
 #include "jk.h"
+#ifdef RAGDOLLS
+#include "Primitives/rdRagdoll.h"
+#endif
 
 extern int sithCollision_bDebugCollide;
 
@@ -114,7 +117,10 @@ int sithIntersect_CollideThings(sithThing *pThing, const rdVector3 *a2, const rd
     int bIsTreeCollide = 0;
     float collideSize = a6->collideSize;
     float rangeSize = range;
-    if (Main_bMotsCompat) {
+#ifndef RAGDOLLS // allow tree collision for ragdolls so we can do mesh-sphere collision
+    if (Main_bMotsCompat)
+#endif
+	{
         if (!(raycastFlags & 0x80u) && (a6->collide == SITH_COLLIDE_SPHERE_TREE || pThing && pThing->collide == SITH_COLLIDE_SPHERE_TREE) ) {
             bFaceCollision = 1;
             bIsTreeCollide = 1;
@@ -134,7 +140,13 @@ int sithIntersect_CollideThings(sithThing *pThing, const rdVector3 *a2, const rd
         return 0;
     }
 
-    if (!bFaceCollision && MOTS_ONLY_COND(!bIsTreeCollide))
+    if (!bFaceCollision
+#ifdef RAGDOLLS
+		&& !bIsTreeCollide
+#else
+		&& MOTS_ONLY_COND(!bIsTreeCollide)
+#endif
+	)
     {
         rdVector_Sub3(a11, a2, &a6->position);
         rdVector_MultAcc3(a11, a3, unkOut);
@@ -143,7 +155,13 @@ int sithIntersect_CollideThings(sithThing *pThing, const rdVector3 *a2, const rd
         return SITHCOLLISION_THING;
     }
 
-    if (a6->collide == SITH_COLLIDE_FACE || MOTS_ONLY_FLAG(a6->collide == SITH_COLLIDE_SPHERE_TREE))
+    if (a6->collide == SITH_COLLIDE_FACE
+#ifdef RAGDOLLS
+		|| (a6->collide == SITH_COLLIDE_SPHERE_TREE)
+#else
+		|| MOTS_ONLY_FLAG(a6->collide == SITH_COLLIDE_SPHERE_TREE)
+#endif
+	)
     {
         rdVector_Copy3(&dirVec, a3);
         rdVector_Copy3(&posVec, a2);
@@ -158,7 +176,11 @@ int sithIntersect_CollideThings(sithThing *pThing, const rdVector3 *a2, const rd
         v39 = 1;
     }
 
+#ifdef RAGDOLLS
+	if (bIsTreeCollide)
+#else
     if (MOTS_ONLY_FLAG(bIsTreeCollide))
+#endif
     {
         float tmp = 3.4e+38;
         rdVector3 tmpVec;

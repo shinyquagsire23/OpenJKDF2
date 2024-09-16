@@ -1455,7 +1455,7 @@ void sithPhysics_ThingPhysRagdoll(sithThing* pThing, float deltaSeconds)
 	rdVector_Copy3(&lastCenter, &pRagdoll->center);
 
 	rdRagdoll_UpdateBounds(pRagdoll);
-	pThing->collideSize = pRagdoll->radius;
+	pThing->treeSize = pThing->collideSize = pRagdoll->radius;
 
 	rdVector_Sub3(&centerVel, &pRagdoll->center, &lastCenter);
 	rdVector_Copy3(&pThing->physicsParams.vel, &centerVel);
