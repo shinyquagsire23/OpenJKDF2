@@ -1462,6 +1462,8 @@ void sithPhysics_ThingPhysRagdoll(sithThing* pThing, float deltaSeconds)
 
 	float velLen = rdVector_Normalize3Acc(&centerVel);
 	sithCollision_UpdateThingCollision(pThing, &centerVel, velLen, 0);
+
+	sithPhysics_FindFloor(pThing, 0);
 }
 
 #endif
