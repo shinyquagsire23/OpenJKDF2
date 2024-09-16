@@ -90,6 +90,11 @@ float rdLight_Specular(rdVector3* reflDir, const rdVector3* lightDir, const rdVe
 	brdf *= brdf;
 	return brdf;
 }
+
+float rdLight_Fresnel(const rdVector3* viewDir, const rdVector3* normal, float f0)
+{
+	return f0 + (1.0f - f0) * powf(stdMath_Fabs(1.0f - rdVector_Dot3(normal, viewDir)), 5.0f);
+}
 #endif
 
 double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLightPoses, 
@@ -221,7 +226,7 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
 				rdVector3 reflDir;
 				float brdf = rdLight_Specular(&reflDir, &ambient->dominantDir, &localViewDir, vertexNormals);
 				// add some view based fresnel
-				brdf += 1.0f - stdMath_Clamp(rdVector_Dot3(&localViewDir, vertexNormals), 0.0f, 1.0f);
+				brdf += 0.7f * rdLight_Fresnel(&localViewDir, vertexNormals, 0.0f);
 				rdAmbient_CalculateVertexColor(ambient, &reflDir, &ambientColor);
 
 				if (outLightsR) *outLightsR += ambientColor.x * brdf;
@@ -348,7 +353,7 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
 			rdVector3 reflDir;
 			float brdf = rdLight_Specular(&reflDir, &ambient->dominantDir, &localViewDir, vertexNormals);
 			// add some view based fresnel
-			brdf += 1.0f - stdMath_Clamp(rdVector_Dot3(&localViewDir, vertexNormals), 0.0f, 1.0f);
+			brdf += 0.7f * rdLight_Fresnel(&localViewDir, vertexNormals, 0.0f);
 			rdAmbient_CalculateVertexColor(ambient, &reflDir, &ambientColor);
 
 			if (outLightsR) *outLightsR += ambientColor.x * brdf;
