@@ -204,21 +204,21 @@ void rdRagdoll_UpdateTriangles(rdRagdoll* pRagdoll)
 		rdRagdollTri* pTri = &pRagdoll->pSkel->paTris[i];
 		rdMatrix34* pMat = &pRagdoll->paTris[i];
 
-const rdVector3* pPos0 = &pRagdoll->paParticles[pTri->vert[0]].pos;
-const rdVector3* pPos1 = &pRagdoll->paParticles[pTri->vert[1]].pos;
-const rdVector3* pPos2 = &pRagdoll->paParticles[pTri->vert[2]].pos;
+		const rdVector3* pPos0 = &pRagdoll->paParticles[pTri->vert[0]].pos;
+		const rdVector3* pPos1 = &pRagdoll->paParticles[pTri->vert[1]].pos;
+		const rdVector3* pPos2 = &pRagdoll->paParticles[pTri->vert[2]].pos;
 
-rdVector_Sub3(&pMat->uvec, pPos1, pPos0);
-rdVector_Normalize3Acc(&pMat->uvec);
+		rdVector_Sub3(&pMat->uvec, pPos1, pPos0);
+		rdVector_Normalize3Acc(&pMat->uvec);
 
-rdVector_Sub3(&pMat->rvec, pPos2, pPos0);
-rdVector_Normalize3Acc(&pMat->rvec);
+		rdVector_Sub3(&pMat->rvec, pPos2, pPos0);
+		rdVector_Normalize3Acc(&pMat->rvec);
 
-rdVector_Cross3(&pMat->lvec, &pMat->uvec, &pMat->rvec);
-rdVector_Normalize3Acc(&pMat->lvec);
+		rdVector_Cross3(&pMat->lvec, &pMat->uvec, &pMat->rvec);
+		rdVector_Normalize3Acc(&pMat->lvec);
 
-rdVector_Cross3(&pMat->rvec, &pMat->lvec, &pMat->uvec);
-rdVector_Normalize3Acc(&pMat->rvec);
+		rdVector_Cross3(&pMat->rvec, &pMat->lvec, &pMat->uvec);
+		rdVector_Normalize3Acc(&pMat->rvec);
 	}
 }
 
@@ -342,7 +342,7 @@ void rdRagdoll_BuildParticles(rdThing* pThing, rdVector3* pInitialVel)
 		pParticle->thing.signature = -1;
 		pParticle->thing.thing_id = -1;
 		pParticle->thing.type = SITH_THING_ACTOR;
-		pParticle->thing.collide = 1;
+		pParticle->thing.collide = SITH_COLLIDE_SPHERE;
 		pParticle->thing.moveSize = pParticle->radius;
 		pParticle->thing.collideSize = pParticle->radius;
 		rdVector_Copy3(&pParticle->thing.position, &pParticle->pos);

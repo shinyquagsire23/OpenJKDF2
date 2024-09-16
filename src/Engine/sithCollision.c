@@ -58,8 +58,8 @@ int sithCollision_Startup()
 	// actual weapon collision looks better but it's actually kinda annoying during gameplay
 	// because the projectiles collide with the things bounding sphere, often in mid-air while trying
 	// to shoot at other targets behind the body
-	//sithCollision_RegisterCollisionHandler(SITH_THING_WEAPON, SITH_THING_CORPSE, sithWeapon_Collide, 0);
-	sithCollision_RegisterCollisionHandler(SITH_THING_WEAPON, SITH_THING_CORPSE, sithCorpse_Collide, 0);
+	sithCollision_RegisterCollisionHandler(SITH_THING_WEAPON, SITH_THING_CORPSE, sithWeapon_Collide, 0);
+	//sithCollision_RegisterCollisionHandler(SITH_THING_WEAPON, SITH_THING_CORPSE, sithCorpse_Collide, 0);
 #endif
 
     sithCollision_initted = 1;
