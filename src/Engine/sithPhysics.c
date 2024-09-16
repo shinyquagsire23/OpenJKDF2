@@ -1337,7 +1337,7 @@ void sithPhysics_UpdateRagdollParticles(rdRagdoll* pRagdoll, float deltaSeconds)
 
 void sithPhysics_CollideRagdoll(sithThing* pThing, rdRagdoll* pRagdoll, float deltaSeconds)
 {
-	float totalImpactSpeed = 0.0f;
+	float totalImpactVolume = 0.0f;
 	int anyCollision = 0; // did any particle collide?
 	for (int i = 0; i < pRagdoll->numParticles; ++i)
 	{
@@ -1362,19 +1362,19 @@ void sithPhysics_CollideRagdoll(sithThing* pThing, rdRagdoll* pRagdoll, float de
 			rdVector_Scale3Acc(&reflected, sithPhysics_ragdollBounce);
 			rdVector_Sub3(&pParticle->lastPos, &pParticle->pos, &reflected);
 
-			float impactSpeed = -rdVector_Dot3(&hitNorm, &vel) * 1000.0f;
-			totalImpactSpeed += impactSpeed;
+			float impactVolume = -rdVector_Dot3(&hitNorm, &vel) * 1000.0f;
+			totalImpactVolume += impactVolume;
 		}
 	}
 
 	if (anyCollision)
 	{
-		totalImpactSpeed /= (float)anyCollision;
-		if (totalImpactSpeed > 0.1f && (sithTime_curMs - pRagdoll->lastCollideMs > 20))
+		totalImpactVolume /= (float)anyCollision;
+		if (totalImpactVolume > 0.1f && (sithTime_curMs - pRagdoll->lastCollideMs > 20))
 		{
-			if (totalImpactSpeed > 1.0)
-				totalImpactSpeed = 1.0;
-			sithSoundClass_PlayThingSoundclass(pThing, SITH_SC_CORPSEHIT, totalImpactSpeed);
+			if (totalImpactVolume > 1.0)
+				totalImpactVolume = 1.0;
+			sithSoundClass_PlayThingSoundclass(pThing, SITH_SC_CORPSEHIT, totalImpactVolume);
 		}
 		pRagdoll->lastCollideMs = sithTime_curMs;
 	}
