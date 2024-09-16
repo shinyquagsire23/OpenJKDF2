@@ -1315,8 +1315,8 @@ void sithPhysics_UpdateRagdollParticles(rdRagdoll* pRagdoll, float deltaSeconds)
 		rdVector_MultAcc3(&vel, &pParticle->forces, deltaSeconds);
 
 		// friction
-		rdVector_Scale3Acc(&vel, timestepRatio * powf(pParticle->collided ? 0.8f : 0.995f, deltaSeconds * 1000.0f));
-		//sithPhysics_ApplyDrag(&vel, sithPhysics_ragdollDrag, 0.0f, deltaSeconds);
+		rdVector_Scale3Acc(&vel, timestepRatio * powf(pParticle->collided ? 0.9f : 0.995f, deltaSeconds * 1000.0f));
+		//sithPhysics_ApplyDrag(&vel, pParticle->collided ? pParticle->thing.physicsParams.surfaceDrag : pParticle->thing.physicsParams.airDrag, 0, deltaSeconds);
 
 		rdVector_ClipPrecision3(&vel);
 		if (rdVector_IsZero3(&vel))
