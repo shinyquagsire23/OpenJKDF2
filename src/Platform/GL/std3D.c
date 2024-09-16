@@ -3145,9 +3145,9 @@ void std3D_DrawDecalList()
 		glUniform1ui(decal_uniform_flags, decal_flags[i]);
 		glUniform1f(decal_uniform_angle, decal_angle_fades[i]);
 
-		//if(decal_flags[i] & RD_DECAL_ADD)
-		//	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-		//else
+		if(decal_flags[i] & RD_DECAL_ADD)
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		else
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		if(decal_flags[i] & RD_DECAL_INSIDE)

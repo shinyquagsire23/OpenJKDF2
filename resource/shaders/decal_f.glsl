@@ -193,6 +193,8 @@ void main(void)
 	float index = sampled.r;
     vec4 palval = texture(texPalette, vec2(index, 0.5));
 
+	vec4 emissive = vec4(0.0, 0.0, 0.0, 1.0);
+
 	vec4 sampled_color = vec4(0.0);
 	if (texMode == TEX_MODE_TEST) {
         sampled_color = vec4(1.0, 1.0, 1.0, 1.0);
@@ -241,13 +243,13 @@ void main(void)
 
 		//sampled_color.rgb = 1.0 - exp(-sampled_color.rgb);
 		sampled_color.rgb = blackbody(sampled_color.r);// smoothstep(decalColor.rgb, vec3(0.0), 1.0 - sampled_color.rgb);
+		emissive.rgb = sampled_color.rgb;
 	}
 	else
 	{
 		sampled_color.rgb *= decalColor.rgb;
 	}
 
-	vec4 emissive = vec4(0.0, 0.0, 0.0, 1.0);
 	if(!isAdditive)
 	{
 		vec3 light = texture(texLight, uv).xyz;
