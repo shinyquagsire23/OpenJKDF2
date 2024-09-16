@@ -41,10 +41,11 @@ void rdRagdoll_GetJointPos(rdVector3* out, rdRagdoll* pRagdoll, rdRagdollJoint* 
 {
 	rdVector_Zero3(out);
 
+	rdRagdollTri* pTri = &pRagdoll->pSkel->paTris[pJoint->tri];
+
 	float weight = 0.0f;
 	for (int v = 0; v < 3; ++v)
 	{
-		rdRagdollTri* pTri = &pRagdoll->pSkel->paTris[pJoint->tri];
 		if (pJoint->vert[v] != -1)
 		{
 			rdVector_Add3Acc(out, &pRagdoll->paParticles[pTri->vert[pJoint->vert[v]]].pos);
@@ -56,6 +57,26 @@ void rdRagdoll_GetJointPos(rdVector3* out, rdRagdoll* pRagdoll, rdRagdollJoint* 
 		weight = 1.0f / weight;
 
 	rdVector_Scale3Acc(out, weight);
+}
+
+void rdRagdoll_CalculateJointRadius(rdRagdollJoint* pJoint, rdRagdoll* pRagdoll, rdVector3* pJointCenter)
+{
+	pJoint->radius = 0;
+	
+	rdRagdollTri* pTri = &pRagdoll->pSkel->paTris[pJoint->tri];
+	for (int v = 0; v < 3; ++v)
+	{
+		if (pJoint->vert[v] != -1)
+		{
+			float distToCenter = rdVector_Dist3(&pRagdoll->paParticles[pTri->vert[pJoint->vert[v]]].pos, pJointCenter);
+			if(distToCenter > pJoint->radius)
+				pJoint->radius = distToCenter;
+		}
+	}
+
+	// if the radius is 0 then we're only using 1 vertex, so use the particle radius
+	if (pJoint->radius <= 0.000001f)
+		pJoint->radius = pRagdoll->paParticles[pTri->vert[pJoint->vert[0]]].radius;
 }
 
 void rdRagdoll_ApplyDistConstraints(rdRagdoll* pRagdoll)
@@ -378,6 +399,8 @@ void rdRagdoll_BuildJointMatrices(rdRagdoll* pRagdoll)
 		rdVector_Normalize3Acc(&m.rvec);
 
 		rdRagdoll_GetJointPos(&m.scale, pRagdoll, pJoint);
+
+		rdRagdoll_CalculateJointRadius(pJoint, pRagdoll, &m.scale);
 
 		rdMatrix34 invMat;
 		rdMatrix_InvertOrtho34(&invMat, &m);

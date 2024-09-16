@@ -263,6 +263,10 @@ int sithIntersect_TreeIntersection(rdHierarchyNode *paNodes,rdVector3 *pPoseVec,
             uVar3 = prVar1->geosetSelect;
         }
         local_70 = prVar1->geosets[uVar3].meshes[paNodes->meshIdx].radius * 0.75;
+	#ifdef RAGDOLLS
+		if (v11->rdthing.pRagdoll && paNodes->skelJoint != -1)
+			local_70 = prVar1->pSkel->paJoints[paNodes->skelJoint].radius;
+	#endif
         iVar2 = sithIntersect_RaySphereIntersection(pPoseVec, pDirVec, a4, range, &local_6c, local_70, &local_74, 1, raycastFlags);
         if ((iVar2 != 0) && (local_74 < *pOut)) {
             *pOut = local_74;

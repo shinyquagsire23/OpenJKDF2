@@ -27,6 +27,7 @@ typedef struct rdRagdollJoint
 	int node;
 	int tri;
 	int vert[3];
+	float radius;
 } rdRagdollJoint;
 
 typedef struct rdRagdollDistConstraint
