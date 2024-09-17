@@ -1305,21 +1305,21 @@ enum SITH_TF
 {
     SITH_TF_LIGHT    = 1,
     SITH_TF_WILLBEREMOVED  = 2,
-    SITH_TF_4  = 4,
-    SITH_TF_LEVELGEO  = 8,
-    SITH_TF_10       = 0x10,
+    SITH_TF_MAGSEALED = 4, // Jones: NoWeaponCollide
+    SITH_TF_LEVELGEO  = 8, // Jones: WhipClimable
+	SITH_TF_INVISIBLE = 0x10,
     SITH_TF_20       = 0x20,
     SITH_TF_STANDABLE  = 0x40,
-    SITH_TF_80       = 0x80,
+    SITH_TF_80       = 0x80, // Jones: Mountable
     SITH_TF_INVULN   = 0x100,
     SITH_TF_DEAD     = 0x200,
     SITH_TF_CAPTURED = 0x400,
     SITH_TF_NOIMPACTDAMAGE  = 0x800,
     SITH_TF_NOEASY   = 0x1000,
-    SITH_TF_NOMEDIUM  = 0x2000,
-    SITH_TF_NOHARD   = 0x4000,
+    SITH_TF_NOMEDIUM  = 0x2000, // Jones: Wood
+    SITH_TF_NOHARD   = 0x4000, // Jones: HasShadow
     SITH_TF_8000     = 0x8000,
-    SITH_TF_10000    = 0x10000,
+    SITH_TF_10000    = 0x10000, // Jones: Snow
     SITH_TF_PULSE    = 0x20000,
     SITH_TF_TIMER    = 0x40000,
     SITH_TF_DISABLED  = 0x80000,
@@ -1327,19 +1327,19 @@ enum SITH_TF
     SITH_TF_RENDERWEAPON  = 0x200000,
     SITH_TF_METAL    = 0x400000,
     SITH_TF_EARTH    = 0x800000,
-    SITH_TF_1000000  = 0x1000000,
+    SITH_TF_1000000  = 0x1000000, // Jones: NoSound
     SITH_TF_WATER    = 0x2000000,
-    SITH_TF_IGNOREGOURAUDDISTANCE  = 0x4000000,
+    SITH_TF_IGNOREGOURAUDDISTANCE  = 0x4000000, // Jones: Climable
     SITH_TF_DROWNS   = 0x8000000,
     SITH_TF_WATERCREATURE  = 0x10000000,
     SITH_TF_SPLASHES  = 0x20000000,
 #ifdef DEFERRED_DECALS
-	// seemed unused
+	// todo: move this, maybe SITH_TYPE_DECAL, since Jones uses this for Movable (pushable/pullable) things
 	SITH_TF_ALIVE_WHILE_VISIBLE = 0x40000000,
 #else
-    SITH_TF_40000000 = 0x40000000,
+    SITH_TF_40000000 = 0x40000000, // Jones: Movable
 #endif
-	SITH_TF_80000000 = 0x80000000,
+	SITH_TF_80000000 = 0x80000000, // Jones: WhipSwingable
 };
 
 enum THING_TYPEFLAGS

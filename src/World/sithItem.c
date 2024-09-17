@@ -56,7 +56,7 @@ void sithItem_Take(sithThing *item, sithThing *actor, int a3)
             if (Main_bMotsCompat) {
                 if (item->collide == SITH_COLLIDE_NONE) {
                     item->collide = SITH_COLLIDE_SPHERE;
-                    item->thingflags &= ~SITH_TF_10;
+                    item->thingflags &= ~SITH_TF_INVISIBLE;
                     item->thingflags |= SITH_TF_DISABLED;
                 }
                 float val = item->itemParams.respawn;
@@ -87,7 +87,7 @@ void sithItem_Take(sithThing *item, sithThing *actor, int a3)
         if (Main_bMotsCompat) {
             if (item->collide == SITH_COLLIDE_SPHERE) {
                 item->collide = SITH_COLLIDE_NONE;
-                item->thingflags = item->thingflags | SITH_TF_10;
+                item->thingflags = item->thingflags | SITH_TF_INVISIBLE;
                 return;
             }
         }
@@ -123,7 +123,7 @@ void sithItem_Remove(sithThing *item)
         if (Main_bMotsCompat) {
             if (item->collide == SITH_COLLIDE_NONE) {
                 item->collide = SITH_COLLIDE_SPHERE;
-                item->thingflags &= ~SITH_TF_10;
+                item->thingflags &= ~SITH_TF_INVISIBLE;
                 return;
             }
         }

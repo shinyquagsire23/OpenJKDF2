@@ -739,7 +739,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
 #endif
 
             if ((thing->thingflags & SITH_TF_LIGHT)
-                 && !(thing->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_WILLBEREMOVED)))
+                 && !(thing->thingflags & (SITH_TF_DISABLED| SITH_TF_INVISIBLE |SITH_TF_WILLBEREMOVED)))
             {
                 if ( thing->light > 0.0 )
                 {
@@ -1624,7 +1624,7 @@ LABEL_150:
                 continue;
             }
 
-            if (i->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_WILLBEREMOVED)) {
+            if (i->thingflags & (SITH_TF_DISABLED| SITH_TF_INVISIBLE |SITH_TF_WILLBEREMOVED)) {
                 continue;
             }
 
@@ -1965,7 +1965,7 @@ void sithRender_RenderThings()
                 break;
             }
 
-            if ( (thingIter->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_WILLBEREMOVED)) == 0
+            if ( (thingIter->thingflags & (SITH_TF_DISABLED| SITH_TF_INVISIBLE |SITH_TF_WILLBEREMOVED)) == 0
               && (thingIter->thingflags & SITH_TF_LEVELGEO) == 0
 #ifndef FP_LEGS
 			  && ((sithCamera_currentCamera->cameraPerspective & 0xFC) != 0 || thingIter != sithCamera_currentCamera->primaryFocus)

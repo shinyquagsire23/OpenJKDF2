@@ -685,7 +685,7 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
     }
 
     int bFlagsHadWfImpactSoundFxEarlier = physicsThing->weaponParams.typeflags & SITH_WF_IMPACT_SOUND_FX;
-    if ( physicsThing->weaponParams.typeflags & SITH_WF_IMPACT_SOUND_FX && collidedThing->thingflags & SITH_TF_4
+    if ( physicsThing->weaponParams.typeflags & SITH_WF_IMPACT_SOUND_FX && collidedThing->thingflags & SITH_TF_MAGSEALED
       || collidedThing->thingtype == SITH_THING_COG && physicsThing->weaponParams.typeflags & SITH_WF_RICOCHET_OFF_SURFACE && physicsThing->weaponParams.numDeflectionBounces < 2 )
     {
         if ( ++physicsThing->weaponParams.numDeflectionBounces < MAX_DEFLECTION_BOUNCES )

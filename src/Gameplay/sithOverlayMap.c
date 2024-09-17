@@ -342,7 +342,7 @@ LABEL_30:
     {
         for ( i = v2->thingsList; i; i = i->nextThing )
         {
-            if ( i != sithWorld_pCurrentWorld->cameraFocus && (i->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_WILLBEREMOVED)) == 0 )
+            if ( i != sithWorld_pCurrentWorld->cameraFocus && (i->thingflags & (SITH_TF_DISABLED| SITH_TF_INVISIBLE |SITH_TF_WILLBEREMOVED)) == 0 )
             {
                 v27 = (g_mapModeFlags & MAPMODE_40) != 0;
                 v28 = i->type;
