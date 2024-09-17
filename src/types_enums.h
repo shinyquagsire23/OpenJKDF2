@@ -425,8 +425,8 @@ enum SithRaycastType
     RAYCAST_20 = 0x20,
     RAYCAST_40 = 0x40, // something to do with attachments
     SITH_RAYCAST_COLLIDE_SPHERE_ONLY = 0x80, // only use SITH_COLLIDE_SPHERE for things
-    RAYCAST_100 = 0x100,
-    RAYCAST_200 = 0x200, // player?
+    RAYCAST_100 = 0x100, // ai, related to SITHSURF_ADJOIN_ALLOW_AI_ONLY and SITHSURF_ADJOIN_ALLOW_MOVEMENT
+    RAYCAST_200 = 0x200, // player? also related to SITHSURF_ADJOIN_ALLOW_AI_ONLY
     RAYCAST_400 = 0x400, // something with radius?
     RAYCAST_800 = 0x800, // adjoins?
     RAYCAST_1000 = 0x1000,
