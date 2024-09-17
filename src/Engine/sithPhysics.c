@@ -1249,6 +1249,8 @@ void sithPhysics_ThingRagdollApplyForce(sithThing* pThing, rdVector3* forceVec, 
 	// reset the timer to activate the ragdoll
 	pThing->rdthing.pRagdoll->expireMs = 0;
 
+	float totalForceZ = 0.0f;
+
 	// distribute the objects mass across all particles
 	float invMass = (float)pThing->rdthing.pRagdoll->numParticles / pThing->physicsParams.mass;
 	for (int i = 0; i < pThing->rdthing.pRagdoll->numParticles; ++i)
@@ -1264,10 +1266,13 @@ void sithPhysics_ThingRagdollApplyForce(sithThing* pThing, rdVector3* forceVec, 
 		//		continue;
 		//}
 
-		if (forceVec->z * invMass > 0.5)
-			sithThing_DetachThing(pThing);
+		totalForceZ += forceVec->z;
 		rdVector_MultAcc3(&pParticle->forces, forceVec, invMass);
 	}
+
+	if (totalForceZ * invMass > 0.5)
+		sithThing_DetachThing(pThing);
+
 	pThing->physicsParams.physflags |= SITH_PF_8000;
 }
 
