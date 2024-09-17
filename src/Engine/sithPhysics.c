@@ -148,7 +148,7 @@ LABEL_8:
                 if ( pThing->moveSize == 0.0 )
                     break;
                 range = pThing->moveSize;
-                sithCollision_SearchRadiusForThings(pThing->sector, 0, &pThing->position, &direction, v8, range, searchFlags | RAYCAST_2000 | RAYCAST_800 | RAYCAST_2);
+                sithCollision_SearchRadiusForThings(pThing->sector, 0, &pThing->position, &direction, v8, range, searchFlags | SITH_RAYCAST_ONLY_COG_THINGS | RAYCAST_800 | RAYCAST_2);
             }
         }
         if ( pThing->attach_flags )
@@ -1145,7 +1145,7 @@ float sithPhysics_ragdollRotFricThreshold = 35.0f;
 
 int sithPhysics_CollideRagdollParticle(sithSector* sector, sithThing* pThing, rdVector3* pos, rdVector3* dir, float radius, rdVector3* hitNormOut)
 {
-	uint32_t collideFlags = RAYCAST_2000 | RAYCAST_2;
+	uint32_t collideFlags = /*SITH_RAYCAST_ONLY_COG_THINGS | */ RAYCAST_800 | RAYCAST_2;
 
 	int result = 0;
 	rdVector3 dirNorm;

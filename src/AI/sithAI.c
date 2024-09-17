@@ -1118,7 +1118,7 @@ int sithAI_sub_4EB300(sithThing *a3, rdVector3 *a4, rdVector3 *arg8, float argC,
     }
 
     v19 = sithCollision_GetSectorLookAt(a3->sector, &a3->position, a4, 0.0);
-    sithCollision_SearchRadiusForThings(v19, a3, a4, a5, *a8, a7, RAYCAST_2000 | RAYCAST_100 | RAYCAST_2);
+    sithCollision_SearchRadiusForThings(v19, a3, a4, a5, *a8, a7, SITH_RAYCAST_ONLY_COG_THINGS | RAYCAST_100 | RAYCAST_2);
     v20 = sithCollision_NextSearchResult();
     sithCollision_SearchClose();
     return v20 != 0 ? 3 : 0;
@@ -1147,7 +1147,7 @@ int sithAI_CanWalk(sithActor *actor, rdVector3 *targetPosition, int *out)
     if ( !result )
         return result;
     searchDist = sithPhysics_ThingGetInsertOffsetZ(actorThing) + actor->pAIClass->maxStep;
-    sithCollision_SearchRadiusForThings(v6, actorThing, targetPosition, &moveNorm, searchDist, searchRadius, RAYCAST_2000 | RAYCAST_2);
+    sithCollision_SearchRadiusForThings(v6, actorThing, targetPosition, &moveNorm, searchDist, searchRadius, SITH_RAYCAST_ONLY_COG_THINGS | RAYCAST_2);
     colSearchEntry = sithCollision_NextSearchResult();
     if ( !colSearchEntry )
         goto LABEL_20;

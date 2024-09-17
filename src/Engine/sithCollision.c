@@ -263,7 +263,7 @@ float sithCollision_UpdateSectorThingCollision(sithSector *pSector, sithThing *s
               && ((flags & SITH_RAYCAST_IGNORE_FLOOR) == 0 || (v7->thingflags & SITH_TF_STANDABLE) != 0)
               && v7->collide
               && (v7->thingflags & (SITH_TF_DISABLED|SITH_TF_WILLBEREMOVED)) == 0
-              && ((flags & RAYCAST_2000) == 0 || v7->type == SITH_THING_COG) )
+              && ((flags & SITH_RAYCAST_ONLY_COG_THINGS) == 0 || v7->type == SITH_THING_COG) )
             {
                 if ( !v8 )
                     goto LABEL_41;
@@ -1163,9 +1163,9 @@ int sithCollision_HasLos(sithThing *thing1, sithThing *thing2, int flag)
     float a6; // [esp+2Ch] [ebp+Ch]
 
     v12 = 1;
-    searchFlags = RAYCAST_2000 | RAYCAST_100 | RAYCAST_20 | RAYCAST_2;
+    searchFlags = SITH_RAYCAST_ONLY_COG_THINGS | RAYCAST_100 | RAYCAST_20 | RAYCAST_2;
     if ( flag )
-        searchFlags = RAYCAST_2000 | RAYCAST_20 | RAYCAST_2;
+        searchFlags = SITH_RAYCAST_ONLY_COG_THINGS | RAYCAST_20 | RAYCAST_2;
     rdVector_Sub3(&a1a, &thing2->position, &thing1->position);
     a6 = rdVector_Normalize3Acc(&a1a);
     sithCollision_SearchRadiusForThings(thing1->sector, 0, &thing1->position, &a1a, a6, 0.0, searchFlags);
