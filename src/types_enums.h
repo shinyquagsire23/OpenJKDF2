@@ -417,14 +417,14 @@ enum SithCollideType
 
 enum SithRaycastType
 {
-    RAYCAST_1 = 0x1,
+    SITH_RAYCAST_IGNORE_THINGS = 0x1, // don't collide with things/don't update thing collision
     RAYCAST_2 = 0x2,  // actor?
     RAYCAST_4 = 0x4,  // path thing?
     RAYCAST_8 = 0x8,
-    RAYCAST_10 = 0x10, // wall?
+    SITH_RAYCAST_IGNORE_FLOOR = 0x10, // only collide with non-standable things and non-wall flagged surfaces
     RAYCAST_20 = 0x20,
-    RAYCAST_40 = 0x40,
-    RAYCAST_80 = 0x80,
+    RAYCAST_40 = 0x40, // something to do with attachments
+    SITH_RAYCAST_COLLIDE_SPHERE_ONLY = 0x80, // only use SITH_COLLIDE_SPHERE for things
     RAYCAST_100 = 0x100,
     RAYCAST_200 = 0x200, // player?
     RAYCAST_400 = 0x400, // something with radius?

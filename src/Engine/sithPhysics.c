@@ -46,7 +46,7 @@ void sithPhysics_FindFloor(sithThing *pThing, int a3)
 
     if (pThing->sector->flags & SITH_SECTOR_UNDERWATER && pThing->type == SITH_THING_PLAYER)
     {
-        sithCollision_SearchRadiusForThings(pThing->sector, pThing, &pThing->position, &rdroid_zVector3, 0.05, 0.0, RAYCAST_1);
+        sithCollision_SearchRadiusForThings(pThing->sector, pThing, &pThing->position, &rdroid_zVector3, 0.05, 0.0, SITH_RAYCAST_IGNORE_THINGS);
         v5 = sithCollision_NextSearchResult();
         if ( v5 )
         {
@@ -74,7 +74,7 @@ LABEL_8:
             direction.x = -0.0;
             direction.y = direction.x;
             direction.z = -1.0;
-            searchFlags = RAYCAST_10;
+            searchFlags = SITH_RAYCAST_IGNORE_FLOOR;
         }
         else
         {
@@ -129,7 +129,7 @@ LABEL_8:
                             }
                             
                             // Track thing that can move
-                            if ( (searchFlags & RAYCAST_10) == 0
+                            if ( (searchFlags & SITH_RAYCAST_IGNORE_FLOOR) == 0
                               || (rdMatrix_TransformVector34(&a1, &v12->normal, &v11->lookOrientation), rdVector_Dot3(&a1, &rdroid_zVector3) >= 0.6) )
                             {
                                 sithThing_LandThing(pThing, v11, i->face, i->sender->vertices, a3);

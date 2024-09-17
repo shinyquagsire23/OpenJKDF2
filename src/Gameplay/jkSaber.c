@@ -725,7 +725,7 @@ void jkSaber_UpdateEffectCollision(sithThing* pPlayerThing, rdVector3* pSaberPos
 	}
 
 	float saberLength = !(pPlayerThing->jkFlags & JKFLAG_SABERDAMAGE) ? pPlayerThing->playerInfo->polyline.length : pCollideInfo->bladeLength;
-	sithCollision_SearchRadiusForThings(pSector, pPlayerThing, pSaberPos, pSaberDir, saberLength, 0.0, RAYCAST_1); // skipping things for now
+	sithCollision_SearchRadiusForThings(pSector, pPlayerThing, pSaberPos, pSaberDir, saberLength, 0.0, SITH_RAYCAST_IGNORE_THINGS); // skipping things for now
 
 	int collisions = 0;
 	sithSector* pSectorIter = pSector;

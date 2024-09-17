@@ -108,7 +108,7 @@ int sithIntersect_CollideThings(sithThing *pThing, const rdVector3 *a2, const rd
 
     v11 = a6;
     bFaceCollision = 0;
-    if ( (raycastFlags & RAYCAST_80) == 0 && (a6->collide == SITH_COLLIDE_FACE || pThing && pThing->collide == SITH_COLLIDE_FACE) )
+    if ( (raycastFlags & SITH_RAYCAST_COLLIDE_SPHERE_ONLY) == 0 && (a6->collide == SITH_COLLIDE_FACE || pThing && pThing->collide == SITH_COLLIDE_FACE) )
     {
         bFaceCollision = 1;
     }
@@ -121,7 +121,7 @@ int sithIntersect_CollideThings(sithThing *pThing, const rdVector3 *a2, const rd
     if (Main_bMotsCompat)
 #endif
 	{
-        if (!(raycastFlags & 0x80u) && (a6->collide == SITH_COLLIDE_SPHERE_TREE || pThing && pThing->collide == SITH_COLLIDE_SPHERE_TREE) ) {
+        if (!(raycastFlags & SITH_RAYCAST_COLLIDE_SPHERE_ONLY) && (a6->collide == SITH_COLLIDE_SPHERE_TREE || pThing && pThing->collide == SITH_COLLIDE_SPHERE_TREE) ) {
             bFaceCollision = 1;
             bIsTreeCollide = 1;
             if (a6->collide == SITH_COLLIDE_SPHERE_TREE) {

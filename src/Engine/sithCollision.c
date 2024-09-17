@@ -159,7 +159,7 @@ float sithCollision_SearchRadiusForThings(sithSector *pStartSector, sithThing *p
         return 0.0f;
     }
 
-    if ( (flags & RAYCAST_1) == 0 )
+    if ( (flags & SITH_RAYCAST_IGNORE_THINGS) == 0 )
         curMoveDist = sithCollision_UpdateSectorThingCollision(pStartSector, pThing, pStartPos, pMoveNorm, moveDist, radius, flags);
     sithCollision_BuildCollisionList(pStartSector, pStartPos, pMoveNorm, curMoveDist, radius, flags);
 
@@ -182,7 +182,7 @@ float sithCollision_SearchRadiusForThings(sithSector *pStartSector, sithThing *p
                 {
                     sithCollision_stackIdk[sithCollision_searchStackIdx] = num + 1;
                     sithCollision_stackSectors[sithCollision_searchStackIdx].sectors[num] = pSurfAdjSector;
-                    if ( (flags & RAYCAST_1) == 0 )
+                    if ( (flags & SITH_RAYCAST_IGNORE_THINGS) == 0 )
                         curMoveDist = sithCollision_UpdateSectorThingCollision(pSurfAdjSector, pThing, pStartPos, pMoveNorm, curMoveDist, radius, flags);
 					sithCollision_BuildCollisionList(pSurfAdjSector, pStartPos, pMoveNorm, curMoveDist, radius, flags);
                 }
@@ -260,7 +260,7 @@ float sithCollision_UpdateSectorThingCollision(sithSector *pSector, sithThing *s
         while (1)
         {
             if ( (!v10 || (v7->thingflags & SITH_TF_80))
-              && ((flags & RAYCAST_10) == 0 || (v7->thingflags & SITH_TF_STANDABLE) != 0)
+              && ((flags & SITH_RAYCAST_IGNORE_FLOOR) == 0 || (v7->thingflags & SITH_TF_STANDABLE) != 0)
               && v7->collide
               && (v7->thingflags & (SITH_TF_DISABLED|SITH_TF_WILLBEREMOVED)) == 0
               && ((flags & RAYCAST_2000) == 0 || v7->type == SITH_THING_COG) )
@@ -391,7 +391,7 @@ void sithCollision_BuildCollisionList(sithSector *sector, const rdVector3 *vec1,
         if ( !v15 )
         {
 LABEL_46:
-            if ( (unk3Flags & RAYCAST_4) == 0 && ((unk3Flags & RAYCAST_10) == 0 || (v12->surfaceFlags & SITH_SURFACE_FLOOR) != 0) )
+            if ( (unk3Flags & RAYCAST_4) == 0 && ((unk3Flags & SITH_RAYCAST_IGNORE_FLOOR) == 0 || (v12->surfaceFlags & SITH_SURFACE_FLOOR) != 0) )
             {
                 v35 = sithWorld_pCurrentWorld->vertices;
                 
@@ -441,7 +441,7 @@ LABEL_22:
         // Standing?
         if ( sithIntersect_sub_5090B0(vec1, vec2, a4, a5, &v12->surfaceInfo, sithWorld_pCurrentWorld->vertices, &a7, unk3Flags) )
         {
-            if ( !(unk3Flags & RAYCAST_4) || (unk3Flags & RAYCAST_1) == 0 )
+            if ( !(unk3Flags & RAYCAST_4) || (unk3Flags & SITH_RAYCAST_IGNORE_THINGS) == 0 )
             {
                 v17 = 0;
                 v18 = sithCollision_stackIdk[sithCollision_searchStackIdx];
@@ -480,7 +480,7 @@ LABEL_30:
             if ( (unk3Flags & RAYCAST_2) == 0 && sithIntersect_sub_5090B0(vec1, vec2, a4, 0.0, &v12->surfaceInfo, sithWorld_pCurrentWorld->vertices, &v48, unk3Flags) )
             {
                 v24 = sithCollision_searchStackIdx;
-                if ( (unk3Flags & RAYCAST_4) && (unk3Flags & RAYCAST_1) != 0 )
+                if ( (unk3Flags & RAYCAST_4) && (unk3Flags & SITH_RAYCAST_IGNORE_THINGS) != 0 )
                 {
                     v25 = sithCollision_stackIdk[sithCollision_searchStackIdx];
                     v26 = 0;
@@ -546,7 +546,7 @@ sithSector* sithCollision_GetSectorLookAt(sithSector *pStartSector, const rdVect
         return pStartSector;
     rdVector_Sub3(&a1, pEndPos, pStartPos);
     a3a = rdVector_Normalize3Acc(&a1);
-    sithCollision_SearchRadiusForThings(pStartSector, 0, pStartPos, &a1, a3a, a5, RAYCAST_1);
+    sithCollision_SearchRadiusForThings(pStartSector, 0, pStartPos, &a1, a3a, a5, SITH_RAYCAST_IGNORE_THINGS);
     v7 = sithCollision_searchStackIdx;
     v8 = &sithCollision_searchStack[sithCollision_searchStackIdx];
     while ( 1 )
@@ -683,7 +683,7 @@ float sithCollision_UpdateThingCollision(sithThing *pThing, rdVector3 *a2, float
     v5 = pThing;
     if (pThing->collide == SITH_COLLIDE_NONE)
     {
-        flags |= RAYCAST_1 | RAYCAST_4;
+        flags |= SITH_RAYCAST_IGNORE_THINGS | RAYCAST_4;
     }
     if ( pThing->moveType == SITH_MT_PATH )
     {
@@ -693,7 +693,7 @@ float sithCollision_UpdateThingCollision(sithThing *pThing, rdVector3 *a2, float
     {
         flags |= RAYCAST_200;
     }
-    if ( (flags & RAYCAST_1) == 0 )
+    if ( (flags & SITH_RAYCAST_IGNORE_THINGS) == 0 )
     {
         flags |= RAYCAST_800;
     }
