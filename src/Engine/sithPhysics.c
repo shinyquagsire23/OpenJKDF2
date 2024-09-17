@@ -1145,7 +1145,7 @@ float sithPhysics_ragdollRotFricThreshold = 35.0f;
 
 int sithPhysics_CollideRagdollParticle(sithSector* sector, sithThing* pThing, rdVector3* pos, rdVector3* dir, float radius, rdVector3* hitNormOut)
 {
-	uint32_t collideFlags = 0;//RAYCAST_2000 | RAYCAST_800 | RAYCAST_2;
+	uint32_t collideFlags = RAYCAST_2000 | RAYCAST_2;
 
 	int result = 0;
 	rdVector3 dirNorm;
