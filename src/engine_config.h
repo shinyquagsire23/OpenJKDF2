@@ -203,6 +203,7 @@
 #define NEW_BLOOM            // optimized downsample based bloom with better performance
 #define RGB_THING_LIGHTS     // RGB thing lighting with lightcolor template param
 #define RGB_AMBIENT          // RGB sector ambient with spherical harmonics for gouraud models
+#define HALF_LAMBERT         // use half lambert gouraud for dynamic lights
 #define SPECULAR_LIGHTING    // RD_LIGHTMODE_SPECULAR
 #define FP_LEGS              // Draws legs in first person
 #define DYNAMIC_POV          // POV enhancements, such as the weapon following the autoaim target, muzzle flashes, sway improvements

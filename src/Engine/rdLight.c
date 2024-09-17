@@ -95,6 +95,15 @@ float rdLight_Fresnel(const rdVector3* viewDir, const rdVector3* normal, float f
 {
 	return f0 + (1.0f - f0) * powf(stdMath_Fabs(1.0f - rdVector_Dot3(normal, viewDir)), 5.0f);
 }
+
+#endif
+
+#ifdef HALF_LAMBERT
+float rdLight_HalfLambert(float NdotL)
+{
+	NdotL = NdotL * 0.5f + 0.5f;
+	return NdotL * NdotL;
+}
 #endif
 
 double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLightPoses, 
@@ -246,6 +255,9 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
                 {
                     rdVector_Normalize3Acc(&diff);
                     lightMagnitude = rdVector_Dot3(vertexNormals, &diff);
+				#ifdef HALF_LAMBERT
+					lightMagnitude = rdLight_HalfLambert(lightMagnitude);
+				#endif
                     if ( lightMagnitude > 0.0 )
 					{
 						float intensity = (light->intensity - len * scalar) * lightMagnitude;
@@ -377,7 +389,10 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
                 if (light->type < 3) 
                 {
                     lightMagnitude = rdVector_Dot3(vertexNormals, &diff);
-                    if (lightMagnitude > 0.0) 
+#ifdef HALF_LAMBERT
+					lightMagnitude = rdLight_HalfLambert(lightMagnitude);
+#endif
+					if (lightMagnitude > 0.0) 
                     {
 						float intensity = (light->intensity - fVar8 * scalar) * lightMagnitude;
                         *outLights += intensity;
