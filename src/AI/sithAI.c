@@ -1219,7 +1219,7 @@ int sithAI_CanWalk_ExplicitSector(sithActor *actor, rdVector3 *targetPosition, s
     retval = 0;
     searchRadius = actorThing->moveSize * 0.25;
     searchDist = sithPhysics_ThingGetInsertOffsetZ(actorThing) + actor->pAIClass->maxStep;
-    sithCollision_SearchRadiusForThings(targetSector, actorThing, targetPosition, &moveNorm, searchDist, searchRadius, RAYCAST_2000 | RAYCAST_2);
+    sithCollision_SearchRadiusForThings(targetSector, actorThing, targetPosition, &moveNorm, searchDist, searchRadius, SITH_RAYCAST_ONLY_COG_THINGS | RAYCAST_2);
     colSearchEntry = sithCollision_NextSearchResult();
     if ( colSearchEntry )
     {

@@ -104,7 +104,7 @@ LABEL_8:
 
         if ( v8 > 0.0 )
         {
-            sithCollision_SearchRadiusForThings(pThing->sector, 0, &pThing->position, &direction, v8, 0.0, searchFlags | RAYCAST_2000 | RAYCAST_800 | RAYCAST_2);
+            sithCollision_SearchRadiusForThings(pThing->sector, 0, &pThing->position, &direction, v8, 0.0, searchFlags | SITH_RAYCAST_ONLY_COG_THINGS | RAYCAST_800 | RAYCAST_2);
             while ( 1 )
             {
                 for ( i = sithCollision_NextSearchResult(); i; i = sithCollision_NextSearchResult() )

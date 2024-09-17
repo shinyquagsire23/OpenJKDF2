@@ -430,7 +430,7 @@ enum SithRaycastType
     RAYCAST_400 = 0x400, // something with radius?
     RAYCAST_800 = 0x800, // adjoins?
     RAYCAST_1000 = 0x1000,
-    RAYCAST_2000 = 0x2000,
+    SITH_RAYCAST_ONLY_COG_THINGS = 0x2000, // only SITH_THING_COG things
     RAYCAST_4000 = 0x4000,
     RAYCAST_8000 = 0x8000,
 };
