@@ -501,6 +501,10 @@ void sithRender_Draw()
     rdSetTextureMode(sithRender_texMode);
     rdSetRenderOptions(rdGetRenderOptions() | 2);
 
+#ifdef STENCIL_BUFFER
+	rdSetStencilBufferMethod(RD_STENCIL_NOREAD_NOWRITE);
+#endif
+
 #ifdef FOG
 	rdSetFog(sithWorld_pCurrentWorld->fogEnabled, &sithWorld_pCurrentWorld->fogColor, sithWorld_pCurrentWorld->fogStartDepth, sithWorld_pCurrentWorld->fogEndDepth);
 #endif
@@ -622,6 +626,11 @@ void sithRender_Draw()
 
     sithRender_RenderLevelGeometry();
 
+#ifdef STENCIL_BUFFER
+	// from here on out it's transparents and dynamic objects
+	rdSetStencilBufferMethod(RD_STENCIL_NOREAD_WRITE);
+#endif
+
     if ( sithRender_numSectors2 )
         sithRender_RenderThings();
 
@@ -658,6 +667,10 @@ void sithRender_Draw()
 #ifdef SDL2_RENDER
 	rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
 #endif
+#endif
+
+#ifdef STENCIL_BUFFER
+	rdSetStencilBufferMethod(RD_STENCIL_NOREAD_NOWRITE);
 #endif
 
     rdSetCullFlags(3);
@@ -2253,7 +2266,6 @@ void sithRender_RenderThings()
     if (sithRender_008d1668) {
         rdSetCullFlags(1);
     }
-    
 }
 
 int sithRender_RenderThing(sithThing *pThing)

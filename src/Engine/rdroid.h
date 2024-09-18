@@ -56,6 +56,9 @@ void rdSetZBufferMethod(rdZBufferMethod_t val);
 void rdSetCullFlags(int a1);
 void rdSetProcFaceUserData(int a1);
 void rdSetVertexColorMode(int a1);
+#ifdef STENCIL_BUFFER
+void rdSetStencilBufferMethod(int val);
+#endif
 
 #ifdef FOG
 void rdSetFog(int active, const rdVector4* color, float startDepth, float endDepth);
@@ -71,6 +74,9 @@ int rdGetZBufferMethod(void);
 int rdGetCullFlags(void);
 int rdGetProcFaceUserData(void);
 int rdGetVertexColorMode(void);
+#ifdef STENCIL_BUFFER
+int rdGetStencilBufferMethod();
+#endif
 
 int rdSetMipDistances(rdVector4 *dists);
 int rdSetColorEffects(stdPalEffect *effects);

@@ -16,6 +16,10 @@ float rdroid_curFogStartDepth;
 float rdroid_curFogEndDepth;
 #endif
 
+#ifdef STENCIL_BUFFER
+int rdroid_curStencilMethod = 0;
+#endif
+
 int rdStartup(HostServices *p_hs)
 {
     if (bRDroidStartup)
@@ -133,6 +137,13 @@ void rdSetVertexColorMode(int a1)
 #endif
 }
 
+#ifdef STENCIL_BUFFER
+void rdSetStencilBufferMethod(int val)
+{
+	rdroid_curStencilMethod = val;
+}
+#endif
+
 #ifdef FOG
 void rdSetFog(int active, const rdVector4* color, float startDepth, float endDepth)
 {
@@ -197,6 +208,13 @@ int rdGetVertexColorMode(void)
     return rdroid_curVertexColorMode;
 #endif
 }
+
+#ifdef STENCIL_BUFFER
+int rdGetStencilBufferMethod()
+{
+	return rdroid_curStencilMethod;
+}
+#endif
 
 int rdSetMipDistances(rdVector4 *dists)
 {

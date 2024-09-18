@@ -931,8 +931,14 @@ int std3D_StartScene()
 
     // Technically this should be from Clear2
     glClearColor(0.0, 0.0, 0.0, 1.0);
+#ifdef STENCIL_BUFFER
+	glClearStencil(0);
+	glStencilMask(0xFF);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+#else
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-    
+#endif
+
     if (jkGuiBuildMulti_bRendering && rdColormap_pCurMap && loaded_colormap != rdColormap_pCurMap)
     {
         glBindTexture(GL_TEXTURE_2D, worldpal_texture);
@@ -2798,6 +2804,25 @@ void std3D_DrawRenderList()
     {
         glCullFace(GL_FRONT);
     }
+
+#ifdef STENCIL_BUFFER
+	// todo: should probably pass this in as flags like the depth/cull stuff
+	int stencilMethod = rdGetStencilBufferMethod();
+	int writeStencil = (stencilMethod == RD_STENCIL_NOREAD_WRITE) || (stencilMethod == RD_STENCIL_READ_WRITE);
+	int readStencil = (stencilMethod == RD_STENCIL_READ_NOWRITE) || (stencilMethod == RD_STENCIL_READ_WRITE);
+
+	if(stencilMethod == RD_STENCIL_NOREAD_NOWRITE)
+		glDisable(GL_STENCIL_TEST);
+	else
+		glEnable(GL_STENCIL_TEST);
+
+	if (readStencil)
+		glStencilFunc(GL_EQUAL, 1, 0xFF);
+	else
+		glStencilFunc(GL_ALWAYS, 1, 0xFF);
+	
+	glStencilOp(readStencil ? GL_KEEP : GL_REPLACE, readStencil ? GL_KEEP : GL_REPLACE, writeStencil ? GL_REPLACE : GL_KEEP);
+#endif
     
     for (int j = 0; j < GL_tmpTrisAmt; j++)
     {
@@ -2954,7 +2979,10 @@ void std3D_DrawRenderList()
     // Done drawing    
     glBindTexture(GL_TEXTURE_2D, worldpal_texture);
     glCullFace(GL_FRONT);
-    
+   
+#ifdef STENCIL_BUFFER
+	glDisable(GL_STENCIL_TEST);
+#endif
     std3D_ResetRenderList();
 }
 
@@ -2967,6 +2995,11 @@ void std3D_DrawDecalList()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
 	glEnable(GL_CULL_FACE);
+#ifdef STENCIL_BUFFER
+	glEnable(GL_STENCIL_TEST);
+	glStencilFunc(GL_EQUAL, 0, 0xFF);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+#endif
 
 	glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->main.fbo);
 
@@ -3223,6 +3256,9 @@ void std3D_DrawDecalList()
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_FRONT);
 	std3D_ResetDecalRenderList();
+#ifdef STENCIL_BUFFER
+	glDisable(GL_STENCIL_TEST);
+#endif
 }
 #endif
 
