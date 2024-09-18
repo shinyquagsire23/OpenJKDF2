@@ -217,9 +217,14 @@ int jkGuiSingleplayer_Show()
                             if ( clicked == 1 )
                             {
                                 v9 = (const char *)jkGuiRend_GetId(&array2, jkGuiSingleplayer_buttons3[6].selectedTextEntry);
+							#if 0 // disabled due to crash on free() when including the index
                                 _strncpy(v25, v9+sizeof(int), 0x7Fu);
                                 v25[127] = 0;
                                 debug_episode_idx = *(int*)v9; // Added
+							#else
+								_strncpy(v25, v9, 0x7Fu);
+								v25[127] = 0;
+							#endif
                             }
                             for ( i = 0; i < (signed int)array2.total; ++i )
                             {
@@ -250,7 +255,11 @@ int jkGuiSingleplayer_Show()
                                 for (int j = 0; j < jkEpisode_mLoad.numSeq; j++)
                                 {
                                     //printf("%s %s\n", jkEpisode_mLoad.paEntries[j].fileName, v25);
-                                    if (jkEpisode_mLoad.paEntries[j].lineNum == debug_episode_idx) {
+                                #if 0
+								    if (jkEpisode_mLoad.paEntries[j].lineNum == debug_episode_idx) {
+								#else
+									if (!__strcmpi(jkEpisode_mLoad.paEntries[j].fileName, v25)) {
+								#endif
                                         jkEpisode_mLoad.currentEpisodeEntryIdx = j;
                                         jkMain_pEpisodeEnt = &jkEpisode_mLoad.paEntries[j];
                                         jkMain_pEpisodeEnt2 = &jkEpisode_mLoad.paEntries[j];
@@ -377,6 +386,7 @@ void jkGuiSingleplayer_sub_41AA30(Darray *array, jkGuiElement *element, int a3, 
     {
         while ( stdFileUtil_FindNext(search, &a2) )
         {
+		#if 0 // this crashes on free()
             // Added: extended the path alloc to include the real index
             v14 = (char *)pHS->alloc(_strlen(a2.fpath) + 1 + sizeof(int));
             v15 = _strcpy(v14+sizeof(int), a2.fpath);
@@ -386,6 +396,12 @@ void jkGuiSingleplayer_sub_41AA30(Darray *array, jkGuiElement *element, int a3, 
             // Added
             int* stash_idx = (int*)v14;
             *stash_idx = 0;
+		#else
+			v14 = (char*)pHS->alloc(_strlen(a2.fpath) + 1);
+			v15 = _strcpy(v14, a2.fpath);
+			v16 = jkGuiTitle_quicksave_related_func1(&strtable, v14);
+			jkGuiRend_DarrayReallocStr(array, v16, (intptr_t)v15);
+		#endif
             ++v22;
         }
         stdFileUtil_DisposeFind(search);
@@ -399,6 +415,7 @@ void jkGuiSingleplayer_sub_41AA30(Darray *array, jkGuiElement *element, int a3, 
         {
             if ( !v17->type )
             {
+			#if 0 // this crashes on free()
                 // Added: extended the path alloc to include the real index
                 uint32_t alloc_sz = _strlen(v17->fileName) + 1 + sizeof(int);
                 v18 = (char *)pHS->alloc(alloc_sz);
@@ -409,6 +426,13 @@ void jkGuiSingleplayer_sub_41AA30(Darray *array, jkGuiElement *element, int a3, 
                 // Added
                 int* stash_idx = (int*)v18;
                 *stash_idx = v17->lineNum;
+			#else
+				uint32_t alloc_sz = _strlen(v17->fileName) + 1;
+				v18 = (char*)pHS->alloc(alloc_sz);
+				v19 = _strncpy(v18, v17->fileName, alloc_sz); // Added: strcpy -> strncpy
+				v20 = jkGuiTitle_quicksave_related_func1(&strtable, v18);
+				jkGuiRend_DarrayReallocStr(array, v20, (intptr_t)v19);
+			#endif
             }
             v17++;
 
