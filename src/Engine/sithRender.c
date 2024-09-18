@@ -634,6 +634,10 @@ void sithRender_Draw()
     if ( sithRender_numSectors2 )
         sithRender_RenderThings();
 
+#ifdef DECAL_RENDERING
+	rdCache_FlushDecals();
+#endif
+
     if ( sithRender_numSurfaces )
         sithRender_RenderAlphaSurfaces();
 

@@ -38,6 +38,7 @@ int rdCache_ProcFaceCompare(rdProcEntry *a, rdProcEntry *b);
 int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags);
 
 #ifdef DECAL_RENDERING
+void rdCache_FlushDecals();
 void rdCache_DrawDecal(rdDecal* decal, rdMatrix34* matrix, rdVector3* color, rdVector3* scale, float angleFade);
 #endif
 
