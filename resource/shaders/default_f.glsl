@@ -553,7 +553,7 @@ void main(void)
     //test_norms.xyz *= dot(vec3(1.0, 0.0, -0.7), face_normals);
     //fragColor = test_norms;
 
-	gl_FragDepth = gl_FragCoord.z;
+//	gl_FragDepth = gl_FragCoord.z;
     fragColorPos = vec4(adjusted_coords.x, adjusted_coords.y, adjusted_coords.z, should_write_normals);
 #ifdef DECAL_RENDERING
 	vec2 octaNormal = encode_octahedron(normals(adjusted_coords.xyz)); // encode normal so we can store depth in Z
