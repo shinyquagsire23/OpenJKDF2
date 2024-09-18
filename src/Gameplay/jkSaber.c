@@ -601,16 +601,16 @@ void  jkSaber_UpdateCollision2(sithThing *pPlayerThing,rdVector3 *pSaberPos,rdVe
 // Added: passive (non-damaging) collision effects
 void jkSaber_SpawnBurn(jkPlayerInfo* pPlayerInfo, rdVector3* pPos, rdVector3* pHitNormal, sithSector* pSector, int sparkType)
 {
-	if (sithTime_curMs < pPlayerInfo->lastMarkSpawnMs + 50)
-		return;
-
-	// todo: skip these for now until we figure out how best to approach them
-	if (sparkType == SPARKTYPE_BLOOD)
+	// no decals? fo'get abouuut'it
+	if (!jkPlayer_enableDecals || sithTime_curMs < pPlayerInfo->lastMarkSpawnMs + 50)
 	{
 		return;
 	}
-	else if (sparkType == SPARKTYPE_SABER)
+
+	// todo: skip these for now until we figure out how best to approach them
+	if (sparkType == SPARKTYPE_SABER || sparkType == SPARKTYPE_BLOOD)
 	{
+		pPlayerInfo->saberCollideInfo.totalCollisionTime = 0;
 		return;
 	}
 
@@ -620,10 +620,6 @@ void jkSaber_SpawnBurn(jkPlayerInfo* pPlayerInfo, rdVector3* pPos, rdVector3* pH
 	{
 		jkSaber_SpawnSparks(pPlayerInfo, pPos, pSector, SPARKTYPE_WALL);
 	}
-
-	// no decals? fo'get abouuut'it
-	if(!jkPlayer_enableDecals)
-		return;
 
 	// todo: some way of setting this template param
 	sithThing* pTemplate = sithTemplate_GetEntryByName("+sbrmrk");
