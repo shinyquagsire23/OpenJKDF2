@@ -4137,6 +4137,8 @@ void std3D_DrawDecal(rdDDrawSurface* texture, rdVector3* verts, rdMatrix34* deca
 
 #ifdef GPU_LIGHTING
 
+// todo: once matrices are on the GPU, and we have proper normals, we can revive this and add some CPU based clustering
+// the clusters can be uploaded to a buffer texture or a simple integer texture and read in the shader for per-pixel lighting
 void std3D_ClearLights()
 {
 	numLights = 0;
