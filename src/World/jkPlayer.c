@@ -66,7 +66,7 @@ int jkPlayer_setCrosshairOnLightsaber = 1;
 int jkPlayer_setCrosshairOnFist = 1;
 int jkPlayer_bHasLoadedSettingsOnce = 0;
 
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 int jkPlayer_enableDecals = 1;
 #endif
 
@@ -218,7 +218,7 @@ void jkPlayer_StartupVars()
 #ifdef DYNAMIC_POV
 	sithCvar_RegisterFlex("hud_aimLock",                1.0,                        &jkPlayer_aimLock,                  CVARFLAG_LOCAL|CVARFLAG_RESETHUD);
 #endif
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 	sithCvar_RegisterFlex("r_enableDecals",             1.0,                        &jkPlayer_enableDecals,             CVARFLAG_LOCAL | CVARFLAG_RESETHUD);
 #endif
 #ifdef RAGDOLLS
@@ -279,7 +279,7 @@ void jkPlayer_ResetVars()
 
     jkPlayer_bHasLoadedSettingsOnce = 0;
 
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 	jkPlayer_enableDecals = 1;
 #endif
 
@@ -678,7 +678,7 @@ void jkPlayer_WriteConf(wchar_t *name)
 #ifdef DYNAMIC_POV
 		stdJSON_SaveBool(ext_fpath, "aimLock", jkPlayer_aimLock);
 #endif
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 		stdJSON_SaveBool(ext_fpath, "decals", jkPlayer_enableDecals);
 #endif
 #endif
@@ -772,7 +772,7 @@ void jkPlayer_ParseLegacyExt()
         if (_sscanf(stdConffile_aLine, "gamma %f", &jkPlayer_gamma) != 1)
             jkPlayer_gamma = 1.0;
     }
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 	if (stdConffile_ReadLine())
 	{
 		if (_sscanf(stdConffile_aLine, "decals %f", &jkPlayer_enableDecals) != 1)
@@ -881,7 +881,7 @@ int jkPlayer_ReadConf(wchar_t *name)
 		jkPlayer_aimLock = stdJSON_GetFloat(ext_fpath, "aimLock", jkPlayer_aimLock);
 #endif
 
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 		jkPlayer_enableDecals = stdJSON_GetFloat(ext_fpath, "decals", jkPlayer_enableDecals);
 #endif
 #endif

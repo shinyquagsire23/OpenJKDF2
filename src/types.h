@@ -614,7 +614,7 @@ typedef struct rdProcEntry
     uint32_t numVertices;
     rdVector3* vertices;
     rdVector2* vertexUVs;
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 	rdVector3* vertexVS; // the stupid vertices array is in clip space, but we want to store view/world position
 #endif
     float* vertexIntensities;
@@ -809,7 +809,7 @@ typedef struct D3DVERTEX_ext
   #pragma pack(push, 4)
   float lightLevel;
   #pragma pack(pop)
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 #pragma pack(push, 4)
   float vx;
 #pragma pack(pop)
@@ -1482,7 +1482,7 @@ struct rdSurface
   float field_48;
 };
 
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 typedef struct rdDecal
 {
 	char        path[32];
@@ -2111,7 +2111,7 @@ typedef struct sithWorld
     int numParticlesLoaded;
     int numParticles;
     rdParticle* particles;
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 	int numDecalsLoaded;
 	int numDecals;
 	rdDecal* decals;
@@ -2319,7 +2319,7 @@ typedef struct rdThing
         rdSprite* sprite3;
         rdParticle* particlecloud;
         rdPolyLine* polyline;
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 		rdDecal* decal;
 #endif
 #ifdef GHIDRA_IMPORT
@@ -2340,7 +2340,7 @@ typedef struct rdThing
 	int hiddenJoint;
 	int hideWeaponMesh;
 #endif
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 	uint32_t createMs;
 	rdVector3 decalScale;
 #endif
@@ -2739,7 +2739,7 @@ typedef struct sithThingExplosionParams
     uint32_t field_74;
     uint32_t field_78;
     uint32_t field_7C;
-#ifndef DEFERRED_DECALS
+#ifndef DECAL_RENDERING
 	uint32_t field_80;
 #endif
 } sithThingExplosionParams;
@@ -2786,7 +2786,7 @@ typedef struct sithThingWeaponParams
     sithThing* pTargetThing; // 34
     float field_38; // 38
 #endif
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 	sithThing* wallHitTemplate;
 #endif
 
@@ -2810,7 +2810,7 @@ typedef struct sithThingWeaponParams
     uint32_t field_78;
     uint32_t field_7C;
     uint32_t field_80;
-#ifndef DEFERRED_DECALS
+#ifndef DECAL_RENDERING
 	uint32_t field_84;
 #endif
 #ifndef JKM_PARAMS
@@ -3014,7 +3014,7 @@ typedef struct sithThing
 #ifdef JKM_LIGHTING
     int archlightIdx;
 #endif
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 	int initialLifeLeftMs;
 #endif
 #ifdef QOL_IMPROVEMENTS

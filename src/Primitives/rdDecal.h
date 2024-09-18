@@ -5,7 +5,7 @@
 #include "Primitives/rdMatrix.h"
 #include "Raster/rdFace.h"
 
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 
 typedef struct rdMaterial rdMaterial;
 

@@ -1,6 +1,6 @@
 #include "sithDecal.h"
 
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 
 #include "Primitives/rdDecal.h"
 #include "World/sithWorld.h"

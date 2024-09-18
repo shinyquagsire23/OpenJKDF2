@@ -20,7 +20,7 @@ static float rdCache_aGreenIntensities[RDCACHE_MAX_VERTICES];
 static float rdCache_aBlueIntensities[RDCACHE_MAX_VERTICES];
 #endif
 
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 // maybe this should be a AOS?
 rdVector3 rdCache_aVerticesVS[RDCACHE_MAX_VERTICES] = { 0 };
 rdVector3 rdCache_aDecalColors[256];
@@ -68,7 +68,7 @@ void rdCache_Reset()
     rdCache_ulcExtent.y = 0x7FFFFFFF;
     rdCache_lrcExtent.x = 0;
     rdCache_lrcExtent.y = 0;
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 	rdCache_numDecals = 0;
 #endif
 }
@@ -102,7 +102,7 @@ rdProcEntry *rdCache_GetProcEntry()
     out_procEntry = &rdCache_aProcFaces[idx];
     out_procEntry->vertices = &rdCache_aVertices[rdCache_numUsedVertices];
     out_procEntry->vertexUVs = &rdCache_aTexVertices[rdCache_numUsedTexVertices];
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 	out_procEntry->vertexVS = &rdCache_aVerticesVS[rdCache_numUsedTexVertices];
 #endif
     out_procEntry->vertexIntensities = &rdCache_aIntensities[rdCache_numUsedIntensities];
@@ -174,7 +174,7 @@ void rdCache_Flush()
 #endif
     {
         rdCache_SendFaceListToHardware();
-	#ifdef DEFERRED_DECALS
+	#ifdef DECAL_RENDERING
 		rdCache_FlushDecals();
 	#endif
     }
@@ -697,7 +697,7 @@ int rdCache_SendFaceListToHardware()
 #endif
 
             iterating_6c_vtxs = active_6c->vertices;
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 			rdVector3* iter_vs = active_6c->vertexVS;
 #endif
             vertex_a = red_and_alpha << 8;
@@ -716,7 +716,7 @@ int rdCache_SendFaceListToHardware()
                 v38 = d3dvtx_zval * v134;
                 if ( rdCache_dword_865258 != 16 )
                     v38 = 1.0 - v38;
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 				rdCache_aHWVertices[rdCache_totalVerts].vx = iter_vs[vtx_idx].x;
 				rdCache_aHWVertices[rdCache_totalVerts].vy = iter_vs[vtx_idx].y;
 				rdCache_aHWVertices[rdCache_totalVerts].vz = iter_vs[vtx_idx].z;
@@ -1458,7 +1458,7 @@ int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags)
     return 1;
 }
 
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 void rdCache_DrawDecal(rdDecal* decal, rdMatrix34* matrix, rdVector3* color, rdVector3* scale, float angleFade)
 {
 	if (rdCache_numDecals >= 256)

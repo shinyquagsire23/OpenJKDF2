@@ -1641,7 +1641,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
                       rdCamera_pCurCamera->attenuationMin);
         }
     }
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 	memcpy(procEntry->vertexVS, vertexDst.verticesProjected, sizeof(rdVector3) * vertexDst.numVertices);
 #endif
     rdCamera_pCurCamera->fnProjectLst(vertexDst.verticesOrig, vertexDst.verticesProjected, vertexDst.numVertices);

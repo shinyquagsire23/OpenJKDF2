@@ -187,7 +187,7 @@ int rdThing_SetParticleCloud(rdThing *thing, rdParticle *particle)
     return 1;
 }
 
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 int rdThing_SetDecal(rdThing* thing, rdDecal* decal)
 {
 	thing->type = RD_THINGTYPE_DECAL;
@@ -215,7 +215,7 @@ int rdThing_Draw(rdThing *thing, rdMatrix34 *m)
             return rdParticle_Draw(thing, m);
         case RD_THINGTYPE_POLYLINE:
             return rdPolyLine_Draw(thing, m);
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 		case RD_THINGTYPE_DECAL:
 			return rdDecal_Draw(thing, m);
 #endif

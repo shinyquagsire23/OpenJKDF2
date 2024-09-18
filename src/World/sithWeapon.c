@@ -25,7 +25,7 @@
 #include "General/stdMath.h"
 #include "jk.h"
 
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 #include "sithDecal.h"
 #endif
 
@@ -486,7 +486,7 @@ int sithWeapon_LoadParams(stdConffileArg *arg, sithThing *thing, int param)
             thing->weaponParams.fleshHitTemplate = sithTemplate_GetEntryByName(arg->value);
             return 1;
 
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 		case THINGPARAM_WALLHIT:
 			thing->weaponParams.wallHitTemplate = sithTemplate_GetEntryByName(arg->value);
 			return 1;
@@ -795,7 +795,7 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
     return 0;
 }
 
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 void sithWeapon_WallHitExplode(sithThing* weapon, sithThing* hitTemplate, sithCollisionSearchEntry* collideInfo)
 {
 	if(hitTemplate)
@@ -880,7 +880,7 @@ int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithCollisionSea
     }
     else
     {
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 		sithWeapon_WallHitExplode(thing, thing->weaponParams.wallHitTemplate, a3);
 #endif
 

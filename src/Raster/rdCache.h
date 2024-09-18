@@ -37,7 +37,7 @@ int rdCache_TriCompare(const void* a_, const void* b_);
 int rdCache_ProcFaceCompare(rdProcEntry *a, rdProcEntry *b);
 int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags);
 
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 void rdCache_DrawDecal(rdDecal* decal, rdMatrix34* matrix, rdVector3* color, rdVector3* scale, float angleFade);
 #endif
 

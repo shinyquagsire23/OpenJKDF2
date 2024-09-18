@@ -38,7 +38,7 @@
 #include "Dss/sithDSS.h"
 #include "General/stdMath.h"
 #include "jk.h"
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 #include "World/sithDecal.h"
 #endif
 #ifdef POLYLINE_EXT
@@ -106,7 +106,7 @@ const char* sithThing_aParams[NUM_THING_PARAMS] = {
     "mindamage",
     "damageclass",
     "explode",
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 	"decal",
 	"wallhit",
 #endif
@@ -395,7 +395,7 @@ void sithThing_Remove(sithThing* pThing)
             sithParticle_Remove(pThing);
             break;
         default:
-		#ifdef DEFERRED_DECALS
+		#ifdef DECAL_RENDERING
 			if (pThing->thingflags & SITH_TF_ALIVE_WHILE_VISIBLE)
 			{
 				if (pThing->isVisible + 1 == bShowInvisibleThings)
@@ -737,7 +737,7 @@ int sithThing_DoesRdThingInit(sithThing* pThing)
 	rdVector_Set3(&pThing->lightColor, 1.0f, 1.0f, 1.0f);
 #endif
 
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 	pThing->rdthing.createMs = sithTime_curMs;
 #endif
 
@@ -1041,7 +1041,7 @@ sithThing* sithThing_sub_4CD8A0(sithThing *pThing, sithThing *a2)
     pThing->signature = v10;
     pThing->rdthing.parentSithThing = v12;
 
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 	pThing->rdthing.createMs = sithTime_curMs;
 #endif
     return result;
@@ -1580,7 +1580,7 @@ int sithThing_Load(sithWorld *pWorld, int a2)
     if ( _strcmp(stdConffile_entry.args[1].value, "things") )
         return 0;
     v10 = _atoi(stdConffile_entry.args[2].value);
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 	v10 += 512; // make enough space for decals/saber impact marks etc
 #endif
 
@@ -1752,7 +1752,7 @@ int sithThing_LoadThingParam(stdConffileArg *arg, sithThing* pThing, int param)
 #ifdef RGB_THING_LIGHTS
 	rdVector3 lightColor;
 #endif
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 	rdDecal* pDecal;
 #endif
     double lifeLeftSec; // st7
@@ -1860,7 +1860,7 @@ int sithThing_LoadThingParam(stdConffileArg *arg, sithThing* pThing, int param)
             if ( lifeLeftSec < 0.0 )
                 goto LABEL_56;
             pThing->lifeLeftMs = (__int64)(lifeLeftSec * 1000.0);
-		#ifdef DEFERRED_DECALS
+		#ifdef DECAL_RENDERING
 			pThing->initialLifeLeftMs = pThing->lifeLeftMs;
 		#endif
             result = 1;
@@ -1977,7 +1977,7 @@ int sithThing_LoadThingParam(stdConffileArg *arg, sithThing* pThing, int param)
             rdThing_SetParticleCloud(&pThing->rdthing, pParticle);
             result = 1;
             break;
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 		case THINGPARAM_DECAL:
 			pDecal = sithDecal_LoadEntry(arg->value);
 			if (!pDecal)

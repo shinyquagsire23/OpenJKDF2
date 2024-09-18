@@ -34,7 +34,7 @@
 #include "Primitives/rdRagdoll.h"
 #endif
 
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 #include "World/sithDecal.h"
 #endif
 
@@ -1250,7 +1250,7 @@ void sithRender_RenderLevelGeometry()
                 {
                     continue;
                 }
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 				memcpy(procEntry->vertexVS, sithRender_aVerticesTmp, sizeof(rdVector3) * meshinfo_out.numVertices);
 #endif
                 rdCamera_pCurCamera->fnProjectLst(procEntry->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
@@ -1489,7 +1489,7 @@ void sithRender_RenderLevelGeometry()
                     if ( meshinfo_out.numVertices < 3u )
                         goto LABEL_92;
 
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 					memcpy(v20->vertexVS, sithRender_aVerticesTmp, sizeof(rdVector3) * meshinfo_out.numVertices);
 #endif
                     rdCamera_pCurCamera->fnProjectLst(v20->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
@@ -2533,7 +2533,7 @@ void sithRender_RenderAlphaSurfaces()
 				if (meshinfo_out.numVertices < 3u)
 					goto LABEL_92;
 
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 				memcpy(v9->vertexVS, sithRender_aVerticesTmp, sizeof(rdVector3) * meshinfo_out.numVertices);
 #endif
 				rdCamera_pCurCamera->fnProjectLst(v9->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
@@ -2736,7 +2736,7 @@ void sithRender_RenderAlphaSurfaces()
         {
             continue;
         }
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 		memcpy(v9->vertexVS, sithRender_aVerticesTmp, sizeof(rdVector3)* meshinfo_out.numVertices);
 #endif
         rdCamera_pCurCamera->fnProjectLst(v9->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);

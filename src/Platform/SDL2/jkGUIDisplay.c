@@ -85,7 +85,7 @@ static jkGuiElement jkGuiDisplay_aElements[32] = {
 
     { ELEMENT_TEXTBUTTON,  GUI_ADVANCED, 2, "GUI_ADVANCED",               3, {220, 430, 200, 40}, 1, 0, NULL,                        0, 0, 0, {0}, 0},
 
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 	// 30
 	{ ELEMENT_CHECKBOX,     0,           0, "GUIEXT_EN_DECALS",    0, {400, 250, 300, 20}, 1,  0, NULL, 0, 0, 0, {0}, 0},
 #endif
@@ -215,7 +215,7 @@ int jkGuiDisplay_Show()
     jkGuiDisplay_aElements[21].selectedTextEntry = jkPlayer_enableBloom;
     jkGuiDisplay_aElements[22].selectedTextEntry = jkPlayer_enableSSAO;
 
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 	jkGuiDisplay_aElements[30].selectedTextEntry = jkPlayer_enableDecals;
 #endif
 
@@ -242,7 +242,7 @@ continue_menu:
         jkPlayer_enableVsync = jkGuiDisplay_aElements[20].selectedTextEntry;
         jkPlayer_enableBloom = jkGuiDisplay_aElements[21].selectedTextEntry;
         jkPlayer_enableSSAO = jkGuiDisplay_aElements[22].selectedTextEntry;
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 		jkPlayer_enableDecals = jkGuiDisplay_aElements[30].selectedTextEntry;
 #endif
 

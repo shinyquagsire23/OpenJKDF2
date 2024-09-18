@@ -85,7 +85,7 @@ layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragColorEmiss;
 layout(location = 2) out vec4 fragColorPos;
 layout(location = 3) out vec4 fragColorNormal;
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 layout(location = 4) out vec4 fragColorLight;
 
 vec2 oct_wrap(vec2 v)
@@ -279,7 +279,7 @@ vec4 bilinear_paletted_light(float index)
 void main(void)
 {
     float originalZ = gl_FragCoord.z / gl_FragCoord.w;
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
     vec3 adjusted_coords = f_coord; // view space position
 #else
     vec3 adjusted_coords = vec3(f_coord.x/iResolution.x, f_coord.y/iResolution.y, originalZ); // clip space pos
@@ -485,7 +485,7 @@ void main(void)
 
 	gl_FragDepth = gl_FragCoord.z;
     fragColorPos = vec4(adjusted_coords.x, adjusted_coords.y, adjusted_coords.z, should_write_normals);
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 	vec2 octaNormal = encode_octahedron(normals(adjusted_coords.xyz)); // encode normal so we can store depth in Z
     fragColorNormal = vec4(octaNormal.xy, originalZ, should_write_normals);
 	fragColorLight = vec4(vertex_color.rgb, should_write_normals);

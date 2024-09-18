@@ -126,8 +126,8 @@ GLuint create_shader(const char* shader, GLenum type) {
 #ifdef NEW_SSAO
 	"#define NEW_SSAO\n"
 #endif
-#ifdef DEFERRED_DECALS
-	"#define DEFERRED_DECALS\n"
+#ifdef DECAL_RENDERING
+	"#define DECAL_RENDERING\n"
 #endif
 #ifdef FOG
 	"#define FOG\n"

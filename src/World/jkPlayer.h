@@ -181,7 +181,7 @@ extern rdVector3 jkPlayer_crosshairPos;
 extern int jkPlayer_aimLock;
 #endif
 
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 extern int jkPlayer_enableDecals;
 #endif
 #ifdef RAGDOLLS

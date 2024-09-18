@@ -29,7 +29,7 @@
 #include "Platform/std3D.h"
 #include "jk.h"
 #include "General/stdMath.h"
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 #include "World/sithDecal.h"
 #endif
 #ifdef RAGDOLLS
@@ -96,7 +96,7 @@ int sithWorld_Startup()
     sithWorld_SetSectionParser("sectors", sithSector_Load);
     sithWorld_SetSectionParser("models", sithModel_Load);
     sithWorld_SetSectionParser("sprites", sithSprite_Load);
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 	sithWorld_SetSectionParser("decals", sithDecal_Load);
 #endif
     sithWorld_SetSectionParser("things", sithThing_Load);

@@ -242,7 +242,7 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     if ( mesh_out.numVertices < 3u )
         return 0;
 
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 	memcpy(procEntry->vertexVS, mesh_out.verticesProjected, sizeof(rdVector3) * mesh_out.numVertices);
 #endif
     rdCamera_pCurCamera->fnProjectLst(mesh_out.verticesOrig, mesh_out.verticesProjected, mesh_out.numVertices);

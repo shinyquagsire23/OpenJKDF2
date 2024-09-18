@@ -72,7 +72,7 @@ typedef struct std3DFramebuffer
     GLuint tex1;
     GLuint tex2;
     GLuint tex3;
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 	GLuint tex4;
 #endif
 
@@ -116,7 +116,7 @@ static int std3D_activeFb = 1;
 int init_once = 0;
 GLuint programDefault, programMenu;
 GLint attribute_coord3d, attribute_v_color, attribute_v_light, attribute_v_uv, attribute_v_norm;
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 GLint attribute_coordVS;
 #endif
 GLint uniform_mvp, uniform_tex, uniform_texEmiss, uniform_displacement_map, uniform_tex_mode, uniform_blend_mode, uniform_worldPalette, uniform_worldPaletteLights;
@@ -190,7 +190,7 @@ int std3D_bInitted = 0;
 rdColormap std3D_ui_colormap;
 int std3D_bReinitHudElements = 0;
 
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 #define STD3D_MAX_DECALS 512
 
 rdDDrawSurface* decal_tex[STD3D_MAX_DECALS];
@@ -324,7 +324,7 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     // Attach fbTex to our currently bound framebuffer fb
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, pFb->tex3, 0);
 
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 	// annoyingly need a light buffer to transfer lighting info to the decal pass
 	glGenTextures(1, &pFb->tex4);
 	glBindTexture(GL_TEXTURE_2D, pFb->tex4);
@@ -554,13 +554,13 @@ int init_resources()
 	if (!std3D_loadSimpleTexProgram("shaders/bloom", &std3D_bloomStage)) return false;
 #endif
 
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 	if ((programDecal = std3D_loadProgram("shaders/decal")) == 0) return false;
 #endif
 
     // Attributes/uniforms
     attribute_coord3d = std3D_tryFindAttribute(programDefault, "coord3d");
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 	attribute_coordVS = std3D_tryFindAttribute(programDefault, "coordVS");
 #endif
     attribute_v_color = std3D_tryFindAttribute(programDefault, "v_color");
@@ -597,7 +597,7 @@ int init_resources()
     programMenu_uniform_tex = std3D_tryFindUniform(programMenu, "tex");
     programMenu_uniform_displayPalette = std3D_tryFindUniform(programMenu, "displayPalette");
 
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 	decal_attribute_coord3d = std3D_tryFindAttribute(programDecal, "coord3d");
 	decal_uniform_mvp = std3D_tryFindUniform(programDecal, "mvp");
 	decal_uniform_texPos = std3D_tryFindUniform(programDecal, "texPos");
@@ -977,7 +977,7 @@ int std3D_StartScene()
         (GLvoid*)offsetof(D3DVERTEX, tu)                  // offset of first element
     );
 
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 	glVertexAttribPointer(
 		attribute_coordVS, // attribute
 		3,                 // number of elements per vertex, here (x,y,z)
@@ -993,7 +993,7 @@ int std3D_StartScene()
     glEnableVertexAttribArray(attribute_v_light);
     glEnableVertexAttribArray(attribute_v_uv);
 
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 	glEnableVertexAttribArray(attribute_coordVS);
 #endif
 
@@ -1006,7 +1006,7 @@ int std3D_EndScene()
         last_tex = NULL;
         last_flags = 0;
         std3D_ResetRenderList();
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 		std3D_ResetDecalRenderList();
 #endif
         return 1;
@@ -1015,7 +1015,7 @@ int std3D_EndScene()
     glDisableVertexAttribArray(attribute_v_uv);
     glDisableVertexAttribArray(attribute_v_color);
     glDisableVertexAttribArray(attribute_coord3d);
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 	glDisableVertexAttribArray(attribute_coordVS);
 #endif
 
@@ -1023,7 +1023,7 @@ int std3D_EndScene()
     last_tex = NULL;
     last_flags = 0;
     std3D_ResetRenderList();
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 	std3D_ResetDecalRenderList();
 #endif
     //printf("%u tris\n", rendered_tris);
@@ -2262,7 +2262,7 @@ void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 void std3D_DrawDecalList();
 #endif
 
@@ -2328,7 +2328,7 @@ void std3D_DrawSceneFbo()
 
     float rad_scale = (float)std3D_pFb->w / 640.0;
 
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 	std3D_DrawDecalList();
 #endif
 
@@ -2503,7 +2503,7 @@ void std3D_DrawRenderList()
     glUseProgram(programDefault);
 
     GLenum bufs[] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3
-	#ifdef DEFERRED_DECALS
+	#ifdef DECAL_RENDERING
 	, GL_COLOR_ATTACHMENT4
 	#endif	
 	};
@@ -2902,7 +2902,7 @@ void std3D_DrawRenderList()
     std3D_ResetRenderList();
 }
 
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 void std3D_DrawDecalList()
 {
 	if(decal_count <= 0)
@@ -4060,7 +4060,7 @@ int std3D_IsReady()
     return has_initted;
 }
 
-#ifdef DEFERRED_DECALS
+#ifdef DECAL_RENDERING
 void std3D_ResetDecalRenderList()
 {
 	decal_count = 0;
