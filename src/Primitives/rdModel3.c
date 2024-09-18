@@ -1288,6 +1288,9 @@ int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
     if ( curTextureMode >= rdroid_curTextureMode )
         curTextureMode = rdroid_curTextureMode;
 
+#ifdef GPU_LIGHTING
+	rdModel3_numGeoLights = 0;
+#else
     if ( curLightingMode > RD_LIGHTMODE_NOTLIT)
     {
         rdModel3_numGeoLights = 0;
@@ -1305,6 +1308,7 @@ int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
             }
         }
     }
+#endif
     
     // JKDF2 inlined
     rdModel3_DrawHNode(pCurModel3->hierarchyNodes);
@@ -1408,6 +1412,7 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
     else if (rdModel3_lightingMode == RD_LIGHTMODE_DIFFUSE)
     {
         rdModel3_numMeshLights = 0;
+#ifdef GPU_LIGHTING
         pGeoLight = apGeoLights;
         for (int i = 0; i < rdModel3_numGeoLights; i++)
         {
@@ -1432,10 +1437,12 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
             }
             ++pGeoLight;
         }
+#endif
     }
     else if (USES_VERTEX_LIGHTING(rdModel3_lightingMode))
     {
         rdModel3_numMeshLights = 0;
+#ifdef GPU_LIGHTING
         if (rdModel3_numGeoLights > 0)
         {
             pGeoLight = apGeoLights;
@@ -1463,6 +1470,7 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
                 ++pGeoLight;
             }
         }
+#endif
 
 #ifdef RGB_AMBIENT
 		// rotate the ambient SH to local space

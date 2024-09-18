@@ -129,6 +129,11 @@ void std3D_ResetDecalRenderList();
 void std3D_DrawDecal(rdDDrawSurface* texture, rdVector3* verts, rdMatrix34* decalMatrix, rdVector3* color, uint32_t flags, float angleFade);
 #endif
 
+#ifdef GPU_LIGHTING
+void std3D_ClearLights();
+void std3D_AddLight(rdLight* light, rdVector3* viewPosition);
+#endif
+
 #ifdef __cplusplus
 }
 #endif

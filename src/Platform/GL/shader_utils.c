@@ -132,6 +132,9 @@ GLuint create_shader(const char* shader, GLenum type) {
 #ifdef FOG
 	"#define FOG\n"
 #endif
+#ifdef GPU_LIGHTING
+	"#define GPU_LIGHTING\n"
+#endif
 	;
 
 	// GLES2 precision specifiers

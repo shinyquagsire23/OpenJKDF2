@@ -190,6 +190,37 @@ int std3D_bInitted = 0;
 rdColormap std3D_ui_colormap;
 int std3D_bReinitHudElements = 0;
 
+#ifdef GPU_LIGHTING
+typedef struct std3D_light
+{
+	rdVector4 position;
+	rdVector4 direction_intensity;
+	rdVector4 color;
+	int32_t   type;
+	uint32_t  active;
+	float     falloffMin;
+	float     falloffMax;
+	float     angleX;
+	float     cosAngleX;
+	float     angleY;
+	float     cosAngleY;
+	float     lux;
+	float     padding0;
+	float padding1;
+	float padding2;
+} std3D_light;
+
+int lightsDirty = 0;
+unsigned int numLights = 0;
+std3D_light tmpLights[RDCAMERA_MAX_LIGHTS];
+
+GLuint light_ubo;
+GLuint uniform_lights;
+GLuint uniform_numLights;
+
+void std3D_FlushLights();
+#endif
+
 #ifdef DECAL_RENDERING
 #define STD3D_MAX_DECALS 512
 
@@ -619,6 +650,17 @@ int init_resources()
 	decal_uniform_color = std3D_tryFindUniform(programDecal, "decalColor");
 	decal_uniform_iResolution = std3D_tryFindUniform(programDecal, "iResolution");
 #endif
+
+#ifdef GPU_LIGHTING
+	uniform_lights = glGetUniformBlockIndex(programDefault, "lightBlock");
+
+	glGenBuffers(1, &light_ubo);
+	glBindBuffer(GL_UNIFORM_BUFFER, light_ubo);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(tmpLights), NULL, GL_DYNAMIC_DRAW);
+	glUniformBlockBinding(programDefault, uniform_lights, 0);
+
+	uniform_numLights = std3D_tryFindUniform(programDefault, "numLights");
+#endif
     
     // Blank texture
     glGenTextures(1, &blank_tex);
@@ -837,6 +879,10 @@ void std3D_FreeResources()
     glDeleteBuffers(1, &world_ibo_triangle);
 
     glDeleteBuffers(1, &menu_vbo_all);
+
+#ifdef GPU_LIGHTING
+	glDeleteBuffers(1, &light_ubo);
+#endif
 
     std3D_bReinitHudElements = 1;
 
@@ -2498,6 +2544,11 @@ void std3D_DrawRenderList()
 {
     if (Main_bHeadless) return;
 
+
+#ifdef GPU_LIGHTING
+	std3D_FlushLights();
+#endif
+
     //printf("Draw render list\n");
     glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->fbo);
     glUseProgram(programDefault);
@@ -2655,6 +2706,11 @@ void std3D_DrawRenderList()
 	glUniform4f(uniform_fog_color, rdroid_curFogColor.x, rdroid_curFogColor.y, rdroid_curFogColor.z, rdroid_curFogColor.w);
 	glUniform1f(uniform_fog_start, rdroid_curFogStartDepth);
 	glUniform1f(uniform_fog_end, rdroid_curFogEndDepth);
+#endif
+
+#ifdef GPU_LIGHTING
+	glBindBufferBase(GL_UNIFORM_BUFFER, 0, light_ubo);
+	glUniform1i(uniform_numLights, numLights);
 #endif
 
     rdTri* tris = GL_tmpTris;
@@ -4080,6 +4136,53 @@ void std3D_DrawDecal(rdDDrawSurface* texture, rdVector3* verts, rdMatrix34* deca
 		decal_angle_fades[decal_count] = angleFade;
 		decal_flags[decal_count] = flags;
 		++decal_count;
+	}
+}
+
+#endif
+
+#ifdef GPU_LIGHTING
+
+void std3D_ClearLights()
+{
+	numLights = 0;
+}
+
+void std3D_AddLight(rdLight* light, rdVector3* viewPosition)
+{
+	lightsDirty = 1;
+	std3D_light* light3d = &tmpLights[numLights++];
+	light3d->type = light->type;
+	light3d->active = light->active;
+	light3d->position.x = viewPosition->x;
+	light3d->position.y = viewPosition->y;
+	light3d->position.z = viewPosition->z;
+	light3d->direction_intensity.x = light->direction.x;
+	light3d->direction_intensity.y = light->direction.y;
+	light3d->direction_intensity.z = light->direction.z;
+	light3d->direction_intensity.w = light->intensity;
+	light3d->color.x = light->color.x;
+	light3d->color.y = light->color.y;
+	light3d->color.z = light->color.z;
+	light3d->color.w = 0;
+#ifdef JKM_LIGHTING
+	light3d->angleX = light->angleX;
+	light3d->cosAngleX = light->cosAngleX;
+	light3d->angleY = light->angleY;
+	light3d->cosAngleY = light->cosAngleY;
+	light3d->lux = light->lux;
+#endif
+	light3d->falloffMin = light->falloffMin;
+	light3d->falloffMax = light->falloffMax;
+}
+
+void std3D_FlushLights()
+{
+	if(lightsDirty)
+	{
+		glBindBuffer(GL_UNIFORM_BUFFER, light_ubo);
+		glBufferData(GL_UNIFORM_BUFFER, sizeof(tmpLights), &tmpLights, GL_DYNAMIC_DRAW);
+		lightsDirty = 0;
 	}
 }
 

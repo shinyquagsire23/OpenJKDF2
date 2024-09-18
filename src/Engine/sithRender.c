@@ -544,6 +544,9 @@ void sithRender_Draw()
     sithRender_nongeoThingsDrawn = 0;
     sithRender_geoThingsDrawn = 0;
     rdCamera_ClearLights(rdCamera_pCurCamera);
+#ifdef GPU_LIGHTING
+	std3D_ClearLights();
+#endif
     //printf("------\n");
     sithRender_adjoinSafeguard = 0; // Added: safeguard
 
@@ -1820,6 +1823,14 @@ void sithRender_UpdateLights(sithSector *sector, float prev, float dist, int dep
 
 void sithRender_RenderDynamicLights()
 {
+#ifdef GPU_LIGHTING
+	for (int i = 0; i < rdCamera_pCurCamera->numLights; i++)
+	{
+		rdVector3 viewPos;
+		rdMatrix_TransformPoint34(&viewPos, &rdCamera_pCurCamera->lightPositions[i], &rdCamera_pCurCamera->view_matrix);
+		std3D_AddLight(rdCamera_pCurCamera->lights[i], &viewPos);
+	}
+#else
     sithSector *sectorIter;
     rdLight **curCamera_lights;
     unsigned int numSectorLights;
@@ -1891,6 +1902,7 @@ void sithRender_RenderDynamicLights()
             }
         }
     }
+#endif
 }
 
 // MoTS altered

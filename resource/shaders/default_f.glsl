@@ -276,6 +276,32 @@ vec4 bilinear_paletted_light(float index)
 }
 #endif
 
+#ifdef GPU_LIGHTING
+struct light
+{
+	vec4  position;
+	vec4  direction_intensity;
+	vec4  color;
+	int   type;
+	uint  isActive;
+	float falloffMin;
+	float falloffMax;
+	float angleX;
+	float cosAngleX;
+	float angleY;
+	float cosAngleY;
+	float lux;
+	float padding0;
+	float padding1;
+};
+
+uniform int numLights;
+uniform lightBlock
+{
+	light lights[128];
+};
+#endif
+
 void main(void)
 {
     float originalZ = gl_FragCoord.z / gl_FragCoord.w;
@@ -380,10 +406,54 @@ void main(void)
         vertex_color.a = 1.0;
     }
 
-    vec4 main_color = (sampled_color * vertex_color);
+/*#ifdef GPU_LIGHTING
+	// I'd rather do this in VS to match JK better but nooooo no vertex normals yet...
+	vec3 viewNormals = normals(adjusted_coords.xyz);
+	vec3 viewDir = normalize(-adjusted_coords.xyz);
+	float scalar = 0.4f; // todo: needs to come from rdCamera_pCurCamera->attenuationMin
+	int totalLights = min(numLights, 128);
+	vec3 specLight = vec3(0.0);
+	for(int lid = 0; lid < totalLights; ++lid)
+	{
+		light l = lights[lid];
+		//if(l.isActive == 0u)
+		//	continue;
+
+		vec3 diff = l.position.xyz - adjusted_coords.xyz;
+		float len = length(diff);
+        if ( len < l.falloffMin )
+        {
+            diff = normalize(diff);
+            float lightMagnitude = dot(viewNormals, diff);
+			// half lambert
+			lightMagnitude = lightMagnitude * 0.5 + 0.5;
+			lightMagnitude *= lightMagnitude;
+            if ( lightMagnitude > 0.0 )
+			{
+				float intensity = max(0.0, l.direction_intensity.w - len * scalar) * lightMagnitude;
+                vertex_color.xyz += intensity * l.color.xyz;
+
+				//vec3 reflDir = reflect(-diff, viewNormals);
+				//float brdf = clamp(dot(viewDir, reflDir), 0.0, 1.0);
+				vec3 h = normalize(viewDir + diff);
+				float brdf = clamp(dot(h, viewNormals), 0.0, 1.0);
+				brdf = pow(brdf, 4.0);
+				vertex_color.xyz += brdf * intensity * l.color.xyz;
+			}
+        }
+	}
+	//vertex_color.xyz = clamp(vertex_color.xyz, vec3(0.0), vec3(1.0));
+#endif*/
+
+    vec4 main_color = (sampled_color * vertex_color);// + vec4(specLight.xyz, 0.0);
 #ifdef CLASSIC_EMISSIVE
 	main_color.rgb = max(main_color.rgb, emissive.rgb);
 #endif
+
+#ifdef GPU_LIGHTING
+	//color_add_emiss.xyz += max(vec3(0.0), main_color.xyz - 1.0);
+#endif
+
     vec4 effectAdd_color = vec4(colorEffects_add.r, colorEffects_add.g, colorEffects_add.b, 0.0);
     
     main_color *= albedoFactor_copy;
