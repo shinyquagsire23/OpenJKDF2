@@ -604,6 +604,7 @@ void jkSaber_SpawnBurn(jkPlayerInfo* pPlayerInfo, rdVector3* pPos, rdVector3* pH
 	// no decals? fo'get abouuut'it
 	if (!jkPlayer_enableDecals || sithTime_curMs < pPlayerInfo->lastMarkSpawnMs + 50)
 	{
+		pPlayerInfo->saberCollideInfo.totalCollisionTime = 0;
 		return;
 	}
 
@@ -702,6 +703,7 @@ void jkSaber_SpawnBurn(jkPlayerInfo* pPlayerInfo, rdVector3* pPos, rdVector3* pH
 void jkSaber_UpdateEffectCollision(sithThing* pPlayerThing, rdVector3* pSaberPos, rdVector3* pSaberDir, rdVector3* pSaberLastPos, jkSaberCollide* pCollideInfo)
 {
 	// clear the damage list so that it updates every frame
+	pCollideInfo->numDamagedThings = 0;
 	pCollideInfo->numDamagedSurfaces = 0;
 
 	sithSector* pSector;
@@ -721,7 +723,7 @@ void jkSaber_UpdateEffectCollision(sithThing* pPlayerThing, rdVector3* pSaberPos
 	}
 
 	float saberLength = !(pPlayerThing->jkFlags & JKFLAG_SABERDAMAGE) ? pPlayerThing->playerInfo->polyline.length : pCollideInfo->bladeLength;
-	sithCollision_SearchRadiusForThings(pSector, pPlayerThing, pSaberPos, pSaberDir, saberLength, 0.0, SITH_RAYCAST_IGNORE_THINGS); // skipping things for now
+	sithCollision_SearchRadiusForThings(pSector, pPlayerThing, pSaberPos, pSaberDir, saberLength, 0.0, 0);
 
 	int collisions = 0;
 	sithSector* pSectorIter = pSector;
@@ -734,6 +736,83 @@ void jkSaber_UpdateEffectCollision(sithThing* pPlayerThing, rdVector3* pSaberPos
 		if (searchResult->hitType & SITHCOLLISION_ADJOINCROSS)
 		{
 			pSectorIter = searchResult->surface->adjoin->sector;
+		}
+		else if (searchResult->hitType & SITHCOLLISION_THING) // just do sparks on things
+		{
+			rdVector_Copy3(&local_54, pSaberPos);
+			rdVector_MultAcc3(&local_54, pSaberDir, searchResult->distance);
+
+			resultThing = searchResult->receiver;
+
+			if (resultThing->type == SITH_THING_ITEM || resultThing->type == SITH_THING_EXPLOSION || resultThing->type == SITH_THING_PARTICLE)
+				continue;
+
+			if (resultThing->actorParams.typeflags & SITH_AF_DROID
+				|| resultThing->type != SITH_THING_ACTOR && resultThing->type != SITH_THING_PLAYER)
+			{
+				jkSaber_SpawnSparks(playerInfo, &local_54, pSectorIter, SPARKTYPE_WALL);
+			}
+			if (pCollideInfo->numDamagedThings == 6)
+			{
+				break;
+			}
+
+			int foundIdx = 0;
+			for (foundIdx = 0; foundIdx < pCollideInfo->numDamagedThings; foundIdx++)
+			{
+				if (searchResult->receiver == pCollideInfo->damagedThings[foundIdx])
+					break;
+			}
+
+			if (foundIdx < pCollideInfo->numDamagedThings)
+			{
+				break;
+			}
+
+			if (resultThing->type != SITH_THING_ACTOR
+				&& resultThing->type != SITH_THING_PLAYER
+				|| !(resultThing->actorParams.typeflags & SITH_AF_BLEEDS))
+			{
+				jkSaber_SpawnSparks(playerInfo, &local_54, pSectorIter, SPARKTYPE_BLOOD);
+				pCollideInfo->damagedThings[pCollideInfo->numDamagedThings++] = searchResult->receiver;
+				break;
+			}
+
+			// TODO is this a vector func?
+			rdVector_Sub3(&local_3c, &local_54, &resultThing->position);
+			rdVector_Normalize3Acc(&local_3c);
+			rdMatrix_Copy34(&tmpMat, &resultThing->lookOrientation);
+			if (resultThing->type == SITH_THING_ACTOR || resultThing->type == SITH_THING_PLAYER)
+				rdMatrix_PreRotate34(&tmpMat, &resultThing->actorParams.eyePYR);
+
+			// TODO: is this a vector func?
+			rdVector3 v52 = tmpMat.lvec;
+			rdVector_Normalize3Acc(&v52);
+			if (rdVector_Dot3(&v52, &local_3c) >= resultThing->actorParams.fov
+				&& (_frand() < resultThing->actorParams.chance))
+			{
+				if (!(pPlayerThing->actorParams.typeflags & SITH_AF_INVISIBLE)) // verify
+				{
+					sithSoundClass_PlayModeRandom(pPlayerThing, SITH_SC_DEFLECTED);
+
+					if (_frand() >= 0.5)
+						sithPuppet_PlayMode(resultThing, SITH_ANIM_BLOCK2, 0);
+					else
+						sithPuppet_PlayMode(resultThing, SITH_ANIM_BLOCK, 0);
+
+					jkSaber_SpawnSparks(playerInfo, &local_54, pSectorIter, SPARKTYPE_SABER);
+
+					// do we actually care about doing blocked for this?
+					sithCog_SendMessageFromThing(resultThing, 0, SITH_MESSAGE_BLOCKED);
+					pCollideInfo->damagedThings[pCollideInfo->numDamagedThings++] = searchResult->receiver;
+					break;
+				}
+			}
+
+			jkSaber_SpawnSparks(playerInfo, &local_54, pSectorIter, SPARKTYPE_BLOOD);
+
+			pCollideInfo->damagedThings[pCollideInfo->numDamagedThings++] = searchResult->receiver;
+			break;
 		}
 		else if (searchResult->hitType & SITHCOLLISION_WORLD)
 		{
