@@ -416,11 +416,12 @@ sithThing* sithThing_GetById(int thing_id)
     if ( sithWorld_pCurrentWorld->numThings < 0 )
         return 0;
     
-    for (int i = 0; i < sithWorld_pCurrentWorld->numThings; i++)
+    for (int i = 0; i <= sithWorld_pCurrentWorld->numThings; i++)
     {
         sithThing* iter = &sithWorld_pCurrentWorld->things[i];
-        if (iter->thing_id == thing_id && iter->type != SITH_THING_FREE)
+        if (iter->thing_id == thing_id && iter->type != SITH_THING_FREE) {
             return iter;
+        }
     }
 
     return NULL;
@@ -1008,8 +1009,6 @@ sithThing* sithThing_Create(sithThing *templateThing, const rdVector3 *position,
     unsigned int v15; // edx
     sithThing *v17; // ebx
     int v19; // eax
-    int v20; // ecx
-    int v21; // edx
     sithThing *v26; // eax
 
     if ( sithNet_thingsIdx )
@@ -1064,11 +1063,10 @@ LABEL_24:
         if ( !sithThing_inittedThings )
             sithThing_inittedThings = 1;
         v19 = sithThing_bInitted2;
-        v20 = (playerThingIdx + 1) << 16;
-        v21 = sithThing_inittedThings;
         v17->signature = sithThing_bInitted2;
+        v17->thing_id = sithThing_inittedThings | ((playerThingIdx + 1) << 16);
+        //v17->thing_id = v8 | (1 << 16); // TODO weird MP bug?
         ++sithThing_inittedThings;
-        v17->thing_id = v21 | v20;
         sithThing_bInitted2 = v19 + 1;
         if ( v19 == -1 )
             sithThing_bInitted2 = 1;
@@ -1488,7 +1486,6 @@ int sithThing_Load(sithWorld *pWorld, int a2)
     sithThing *v22; // ebx
     int v23; // eax
     sithSector *v24; // edi
-    int v26; // ecx
     int v27; // edi
     stdConffileArg *v28; // ebx
     rdVector3 a3; // [esp+14h] [ebp-48h] BYREF
@@ -1591,9 +1588,8 @@ int sithThing_Load(sithWorld *pWorld, int a2)
                 sithThing_SetPosAndRot(v21, &pos, &a);
                 sithThing_EnterSector(v21, v24, 1, 1);
                 sithThing_sub_4CD100(v21);
-                v26 = v21->thingIdx;
                 v21->signature = sithThing_bInitted2++;
-                v21->thing_id = v26;
+                v21->thing_id = v21->thingIdx;
                 v27 = 10;
                 if ( stdConffile_entry.numArgs > 10 )
                 {

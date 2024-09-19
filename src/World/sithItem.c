@@ -39,49 +39,7 @@ void sithItem_New(sithThing *out)
 
 void sithItem_Take(sithThing *item, sithThing *actor, int a3)
 {
-    if ( !sithNet_isMulti || a3 )
-    {
-        if ( actor == sithPlayer_pLocalPlayerThing )
-        {
-            sithCog_SendMessageFromThing(item, actor, SITH_MESSAGE_TAKEN);
-        }
-
-        if ( (item->itemParams.typeflags & SITH_ITEM_RESPAWN_SP && !sithNet_isMulti) 
-             || (item->itemParams.typeflags & SITH_ITEM_RESPAWN_MP && sithNet_isMulti) )
-        {
-            item->thingflags |= SITH_TF_DISABLED;
-
-            // MOTS added
-#ifdef JKM_PARAMS
-            if (Main_bMotsCompat) {
-                if (item->collide == SITH_COLLIDE_NONE) {
-                    item->collide = SITH_COLLIDE_SPHERE;
-                    item->thingflags &= ~SITH_TF_10;
-                    item->thingflags |= SITH_TF_DISABLED;
-                }
-                float val = item->itemParams.respawn;
-                if (item->itemParams.respawnFactor != 1.0 && sithNet_isMulti) {
-                    for (int i = 0; i < jkPlayer_maxPlayers; i++) {
-                        if ((jkPlayer_playerInfos[i].flags & 1) && (i != playerThingIdx)) {
-                            val *= item->itemParams.respawnFactor;
-                        }
-                    }
-                }
-
-                item->lifeLeftMs = (int)(val * 1000.0 * (_frand() + 0.75));
-            }
-            else 
-#endif
-            {
-                item->lifeLeftMs = (int)(item->itemParams.respawn * 1000.0);
-            }
-        }
-        else
-        {
-            sithThing_Destroy(item);
-        }
-    }
-    else
+    if (sithNet_isMulti && !a3)
     {
         sithDSSThing_SendTakeItem(item, actor, 255);
         if (Main_bMotsCompat) {
@@ -91,6 +49,47 @@ void sithItem_Take(sithThing *item, sithThing *actor, int a3)
                 return;
             }
         }
+        return;
+    }
+
+    if ( actor == sithPlayer_pLocalPlayerThing )
+    {
+        sithCog_SendMessageFromThing(item, actor, SITH_MESSAGE_TAKEN);
+    }
+
+    if ( (item->itemParams.typeflags & SITH_ITEM_RESPAWN_SP && !sithNet_isMulti) 
+         || (item->itemParams.typeflags & SITH_ITEM_RESPAWN_MP && sithNet_isMulti) )
+    {
+        item->thingflags |= SITH_TF_DISABLED;
+
+        // MOTS added
+#ifdef JKM_PARAMS
+        if (Main_bMotsCompat) {
+            if (item->collide == SITH_COLLIDE_NONE) {
+                item->collide = SITH_COLLIDE_SPHERE;
+                item->thingflags &= ~SITH_TF_10;
+                item->thingflags |= SITH_TF_DISABLED;
+            }
+            float val = item->itemParams.respawn;
+            if (item->itemParams.respawnFactor != 1.0 && sithNet_isMulti) {
+                for (int i = 0; i < jkPlayer_maxPlayers; i++) {
+                    if ((jkPlayer_playerInfos[i].flags & 1) && (i != playerThingIdx)) {
+                        val *= item->itemParams.respawnFactor;
+                    }
+                }
+            }
+
+            item->lifeLeftMs = (int)(val * 1000.0 * (_frand() + 0.75));
+        }
+        else 
+#endif
+        {
+            item->lifeLeftMs = (int)(item->itemParams.respawn * 1000.0);
+        }
+    }
+    else
+    {
+        sithThing_Destroy(item);
     }
 }
 

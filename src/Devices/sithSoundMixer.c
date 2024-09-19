@@ -742,6 +742,11 @@ void sithSoundMixer_Tick(float deltaSecs)
     v1 = sithCamera_currentCamera->sector;
     if ( v1 == sithSoundMixer_pLastSectorSoundSector )
         goto LABEL_72;
+
+    // Added: nullptr deref crash fix
+    if (!sithSoundMixer_pLastSectorSoundSector || !v1)
+        goto LABEL_72;
+
     sithSoundMixer_pLastSectorSoundSector = sithCamera_currentCamera->sector;
     if ( sithSoundMixer_dword_836C00 )
         goto LABEL_10;
