@@ -173,7 +173,7 @@ enum SITH_WF_E
     SITH_WF_INSTANT_IMPACT = 0x2000,
     SITH_WF_DAMAGE_DECAY = 0x4000,
     SITH_WF_OBJECT_TRAIL = 0x8000,
-    SITH_WF_10000 = 0x10000, // short throw? unsure
+	SITH_WF_INSTANT_IMPACT_RANDOM = 0x10000, // similar to SITH_WF_INSTANT_IMPACT but will randomize the trail with respect to trail properties
     SITH_WF_20000 = 0x20000,
     SITH_WF_TRIGGER_AI_AWARENESS = 0x40000,
     SITH_WF_RICOCHET_OFF_SURFACE = 0x80000,

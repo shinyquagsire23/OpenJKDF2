@@ -65,7 +65,7 @@ void sithWeapon_Tick(sithThing* weapon, float deltaSeconds)
     {
         sithWeapon_sub_4D35E0(weapon);
     }
-    else if (typeFlags & SITH_WF_10000)
+    else if (typeFlags & SITH_WF_INSTANT_IMPACT_RANDOM)
     {
         sithWeapon_sub_4D3920(weapon);
     }
