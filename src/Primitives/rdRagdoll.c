@@ -862,7 +862,6 @@ int rdRagdollSkeleton_LoadEntry(rdRagdollSkeleton* pSkel, const char* fpath)
 
 done_close:
 	stdConffile_Close();
-	rdRagdollSkeleton_FreeEntry(pSkel);
 	return 0;
 }
 
