@@ -65,6 +65,10 @@ rdRagdollSkeleton* sithRagdoll_LoadEntry(char *a1)
                 ++sithWorld_pLoading->numRagdollsLoaded;
                 result = skel;
             }
+			else
+			{
+				rdRagdollSkeleton_FreeEntry(skel);
+			}
         }
         else
         {
