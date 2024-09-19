@@ -116,6 +116,8 @@ void rdRagdoll_UpdateBounds(rdRagdoll* pRagdoll);
 void rdRagdoll_CalculateRotFriction(rdRagdoll* pRagdoll);
 void rdRagdoll_ApplyRotFriction(rdRagdoll* pRagdoll, float deltaSeconds, float friction, float angleThreshold);
 
+void rdRagdoll_Stop(rdRagdoll* pRagdoll);
+
 int rdRagdollSkeleton_LoadEntry(rdRagdollSkeleton* pSkel, const char* fpath);
 void rdRagdollSkeleton_FreeEntry(rdRagdollSkeleton* pSkel);
 

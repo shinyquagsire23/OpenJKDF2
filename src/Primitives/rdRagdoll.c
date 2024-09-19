@@ -310,6 +310,12 @@ void rdRagdoll_ApplyRotFriction(rdRagdoll* pRagdoll, float deltaSeconds, float f
 	}
 }
 
+void rdRagdoll_Stop(rdRagdoll* pRagdoll)
+{
+	// force the expire time to be higher than current
+	pRagdoll->expireMs = sithTime_curMs + 1;
+}
+
 int rdRagdoll_TrisHaveSharedVerts(rdRagdollTri* pTri0, rdRagdollTri* pTri1)
 {
 	for (int i = 0; i < 3; ++i)
