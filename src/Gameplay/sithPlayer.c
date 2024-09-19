@@ -346,7 +346,7 @@ void sithPlayer_HandleSentDeathPkt(sithThing *thing)
         sithSoundClass_StopSound(thing, 0);
         sithThing_detachallchildren(thing);
         sithActor_MoveJointsForEyePYR(thing, &rdroid_zeroVector3);
-        thing->physicsParams.physflags &= ~(SITH_PF_CROUCHING|SITH_PF_800|SITH_PF_100);
+        thing->physicsParams.physflags &= ~(SITH_PF_CROUCHING| SITH_PF_NOWALLGRAVITY | SITH_PF_ATTACHED);
         thing->physicsParams.physflags |= (SITH_PF_SURFACEALIGN|SITH_PF_USEGRAVITY);
         thing->actorParams.typeflags &= ~SITH_AF_BLEEDS;
         sithPhysics_ThingStop(thing);
@@ -365,7 +365,7 @@ void sithPlayer_sub_4C9150(sithThing *player, sithThing *killedBy)
     sithPlayerInfo *v5; // edi
 
     v5 = player->actorParams.playerinfo;
-    player->physicsParams.physflags &= ~(SITH_PF_800|SITH_PF_100);
+    player->physicsParams.physflags &= ~(SITH_PF_NOWALLGRAVITY | SITH_PF_ATTACHED);
     player->physicsParams.physflags |= SITH_PF_SURFACEALIGN|SITH_PF_USEGRAVITY;
     player->thingflags |= SITH_TF_DEAD;
     player->actorParams.typeflags &= ~SITH_AF_BLEEDS;
@@ -474,10 +474,10 @@ void sithPlayer_debug_ToNextCheckpoint(sithThing *player)
         v4 = player->templateBase;
         player->actorParams.msUnderwater = 0; // MOTS added
         player->actorParams.health = v4->actorParams.health;
-        if ( (v4->physicsParams.physflags & SITH_PF_800) != 0 )
+        if ( (v4->physicsParams.physflags & SITH_PF_NOWALLGRAVITY) != 0 )
         {
-            player->physicsParams.physflags &= ~(SITH_PF_100|SITH_PF_SURFACEALIGN);
-            player->physicsParams.physflags |= SITH_PF_800;
+            player->physicsParams.physflags &= ~(SITH_PF_ATTACHED |SITH_PF_SURFACEALIGN);
+            player->physicsParams.physflags |= SITH_PF_NOWALLGRAVITY;
         }
         sithActor_MoveJointsForEyePYR(player, &rdroid_zeroVector3);
         if ( player == sithPlayer_pLocalPlayerThing )

@@ -532,7 +532,7 @@ void sithActor_Remove(sithThing *thing)
     thing->thingflags |= SITH_TF_DEAD;
     sithThing_detachallchildren(thing);
     thing->type = SITH_THING_CORPSE;
-    thing->physicsParams.physflags &= ~(SITH_PF_FLY|SITH_PF_800|SITH_PF_100|SITH_PF_WALLSTICK);
+    thing->physicsParams.physflags &= ~(SITH_PF_FLY| SITH_PF_NOWALLGRAVITY | SITH_PF_ATTACHED |SITH_PF_WALLSTICK);
     thing->physicsParams.physflags |= (SITH_PF_FLOORSTICK|SITH_PF_SURFACEALIGN|SITH_PF_USEGRAVITY);
     thing->lifeLeftMs = jkPlayer_bKeepCorpses ? -1 : 20000; // Added
     sithPhysics_FindFloor(thing, 0);

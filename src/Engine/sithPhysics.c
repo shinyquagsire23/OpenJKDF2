@@ -223,7 +223,7 @@ void sithPhysics_ThingApplyForce(sithThing *pThing, rdVector3 *forceVec)
             sithThing_DetachThing(pThing);
 
         rdVector_MultAcc3(&pThing->physicsParams.vel, forceVec, invMass);
-        pThing->physicsParams.physflags |= SITH_PF_8000;
+        pThing->physicsParams.physflags |= SITH_PF_HAS_FORCE;
     }
 }
 
@@ -235,7 +235,7 @@ void sithPhysics_ThingSetLook(sithThing *pThing, const rdVector3 *look, float a3
     v4 = stdMath_ClipPrecision(1.0 - rdVector_Dot3(&pThing->lookOrientation.uvec, look));
     if ( v4 == 0.0 )
     {
-        pThing->physicsParams.physflags |= SITH_PF_100;
+        pThing->physicsParams.physflags |= SITH_PF_ATTACHED;
     }
     else if ( a3 == 0.0 )
     {
@@ -252,7 +252,7 @@ void sithPhysics_ThingSetLook(sithThing *pThing, const rdVector3 *look, float a3
         pThing->lookOrientation.lvec.z = (pThing->lookOrientation.rvec.y * pThing->lookOrientation.uvec.x) - (pThing->lookOrientation.rvec.x * pThing->lookOrientation.uvec.y);
         
 
-        pThing->physicsParams.physflags |= SITH_PF_100;
+        pThing->physicsParams.physflags |= SITH_PF_ATTACHED;
     }
     else
     {
@@ -816,26 +816,26 @@ void sithPhysics_ThingPhysAttached(sithThing *pThing, float deltaSeconds)
         possibly_undef_1 = rdMath_DistancePointToPlane(&pThing->position, &attachedNormal, &a3);
     }
 
-    if (pThing->physicsParams.physflags & SITH_PF_800)
+    if (pThing->physicsParams.physflags & SITH_PF_NOWALLGRAVITY)
     {
         v158 = rdVector_Dot3(&attachedNormal, &rdroid_zVector3);
         if ( v158 < 1.0 )
             possibly_undef_1 = possibly_undef_1 / v158;
     }
 
-    if (!(pThing->physicsParams.physflags & SITH_PF_100))
+    if (!(pThing->physicsParams.physflags & SITH_PF_ATTACHED))
     {
         if ( (pThing->physicsParams.physflags & SITH_PF_SURFACEALIGN) != 0 )
         {
             sithPhysics_ThingSetLook(pThing, &attachedNormal, pThing->physicsParams.orientSpeed * deltaSeconds);
         }
-        else if ( (pThing->physicsParams.physflags & SITH_PF_800) != 0 )
+        else if ( (pThing->physicsParams.physflags & SITH_PF_NOWALLGRAVITY) != 0 )
         {
             sithPhysics_ThingSetLook(pThing, &rdroid_zVector3, pThing->physicsParams.orientSpeed * deltaSeconds);
         }
         else
         {
-            pThing->physicsParams.physflags |= SITH_PF_100;
+            pThing->physicsParams.physflags |= SITH_PF_ATTACHED;
         }
     }
 
@@ -928,7 +928,7 @@ void sithPhysics_ThingPhysAttached(sithThing *pThing, float deltaSeconds)
 
     if (!rdVector_IsZero3(&pThing->physicsParams.vel) && pThing->physicsParams.surfaceDrag != 0.0)
     {
-        if ( (pThing->physicsParams.physflags & SITH_PF_8000) == 0 )
+        if ( (pThing->physicsParams.physflags & SITH_PF_HAS_FORCE) == 0 )
         {
             if ( rdVector_IsZero3(&pThing->physicsParams.acceleration)
               && !(pThing->sector->flags & SITH_SECTOR_HASTHRUST)
@@ -946,7 +946,7 @@ void sithPhysics_ThingPhysAttached(sithThing *pThing, float deltaSeconds)
         }
         else
         {
-            pThing->physicsParams.physflags &= ~SITH_PF_8000;
+            pThing->physicsParams.physflags &= ~SITH_PF_HAS_FORCE;
         }
     }
 
@@ -1118,7 +1118,7 @@ void sithPhysics_ThingPhysAttached(sithThing *pThing, float deltaSeconds)
             v131 = orig_v131;
         }
 
-        if ( (pThing->physicsParams.physflags & SITH_PF_800) != 0 )
+        if ( (pThing->physicsParams.physflags & SITH_PF_NOWALLGRAVITY) != 0 )
         {
             rdVector_MultAcc3(&pThing->physicsParams.velocityMaybe, &rdroid_zVector3, -v131);
         }
@@ -1273,7 +1273,7 @@ void sithPhysics_ThingRagdollApplyForce(sithThing* pThing, rdVector3* forceVec, 
 	if (totalForceZ * invMass > 0.5)
 		sithThing_DetachThing(pThing);
 
-	pThing->physicsParams.physflags |= SITH_PF_8000;
+	pThing->physicsParams.physflags |= SITH_PF_HAS_FORCE;
 }
 
 void sithPhysics_AccumulateRagdollForces(sithThing* pThing, rdRagdoll* pRagdoll, float deltaSeconds)

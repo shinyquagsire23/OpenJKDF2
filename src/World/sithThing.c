@@ -1165,7 +1165,7 @@ LABEL_24:
         if ( (v17->physicsParams.physflags & (SITH_PF_WALLSTICK|SITH_PF_FLOORSTICK)) != 0 )
             sithPhysics_FindFloor(v17, 1);
 LABEL_48:
-        if ( v17->moveType == SITH_MT_PHYSICS && (v17->physicsParams.physflags & SITH_PF_20000) == 0 )
+        if ( v17->moveType == SITH_MT_PHYSICS && (v17->physicsParams.physflags & SITH_PF_DONTROTATEVEL) == 0 )
             rdMatrix_TransformVector34Acc(&v17->physicsParams.vel, &v17->lookOrientation);
     }
     if ( v17->class_cog )
@@ -1266,7 +1266,7 @@ void sithThing_AttachToSurface(sithThing* pThing, sithSurface *surface, int a3)
     pThing->attachedSurface = surface;
     pThing->field_38.z = v8->z;
     pThing->attachedSufaceInfo = &surface->surfaceInfo;
-    pThing->physicsParams.physflags &= ~SITH_PF_100;
+    pThing->physicsParams.physflags &= ~SITH_PF_ATTACHED;
     if ( (surface->surfaceFlags & SITH_SURFACE_SCROLLING) != 0 && pThing->moveType == SITH_MT_PHYSICS )
     {
         sithSurface_DetachThing(surface, &a2a);
@@ -1351,7 +1351,7 @@ void sithThing_LandThing(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3 *a4
         v9->parentThing = a1;
     a1->parentThing = 0;
     a2->attachedParentMaybe = a1;
-    a1->physicsParams.physflags &= ~SITH_PF_100;
+    a1->physicsParams.physflags &= ~SITH_PF_ATTACHED;
     if ( a2->moveType == SITH_MT_PHYSICS )
     {
         rdVector_Sub3Acc(&a1->physicsParams.vel, &a2->physicsParams.vel);

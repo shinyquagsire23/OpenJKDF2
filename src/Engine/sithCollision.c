@@ -1256,7 +1256,7 @@ void sithCollision_sub_4E77A0(sithThing *thing, rdMatrix34 *a2)
             sithCollision_sub_4E77A0(v5, &out);
             if ( v5->moveType == SITH_MT_PHYSICS )
             {
-                v5->physicsParams.physflags &= ~SITH_PF_100;
+                v5->physicsParams.physflags &= ~SITH_PF_ATTACHED;
             }
             v5 = v5->childThing;
         }
