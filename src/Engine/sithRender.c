@@ -1916,7 +1916,7 @@ void sithRender_RenderDynamicLights()
 						&& sithWorld_pCurrentWorld->verticesDynamicLightG[idx] >= 1.0
 						&& sithWorld_pCurrentWorld->verticesDynamicLightB[idx] >= 1.0
 					#endif
-)
+					)
                         break;
                 }
                 sithWorld_pCurrentWorld->alloc_unk9c[idx] = sithRender_lastRenderTick;
