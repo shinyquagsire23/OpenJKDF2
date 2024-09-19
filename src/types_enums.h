@@ -199,7 +199,7 @@ enum SITH_ITEMFLAG_E // could be jones specific
     SITH_ITEM_RESPAWN_SP = 0x2,
     SITH_ITEM_BACKPACK = 0x4,
     SITH_ITEM_8 = 0x8,
-    SITH_ITEM_10 = 0x10
+    SITH_ITEM_ALLOW_COLLISION = 0x10
 };
 
 enum jkEpisodeLoadType

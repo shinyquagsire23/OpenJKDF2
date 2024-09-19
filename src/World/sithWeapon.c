@@ -664,7 +664,7 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
     double v14; // st7
 
     // MoTS added
-    if (MOTS_ONLY_FLAG(collidedThing->type == SITH_THING_ITEM && !(collidedThing->itemParams.typeflags & SITH_ITEM_10))) {
+    if (MOTS_ONLY_FLAG(collidedThing->type == SITH_THING_ITEM && !(collidedThing->itemParams.typeflags & SITH_ITEM_ALLOW_COLLISION))) {
         return 0;
     }
 
