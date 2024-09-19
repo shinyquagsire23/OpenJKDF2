@@ -32,7 +32,7 @@ void sithExplosion_CreateThing(sithThing *explosion)
             explosion->explosionParams.typeflags &= ~SITHEXPLOSION_FLAG_ANIMATED_SPRITE;
         }
     }
-    if ( (explosion->explosionParams.typeflags & SITH_TF_20) != 0 )
+    if ( (explosion->explosionParams.typeflags & SITHEXPLOSION_FLAG_RANDOM_SPRITE_ORIENT) != 0 )
     {
         rot.x = 0.0;
         rot.y = 0.0;
