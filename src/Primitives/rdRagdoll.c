@@ -921,7 +921,20 @@ void rdRagdollSkeleton_SetupModel(rdRagdollSkeleton* pSkel, rdModel3* pModel)
 	for (int i = 0; i < pSkel->numJoints; ++i)
 	{
 		rdRagdollJoint* pJoint = &pSkel->paJoints[i];
-		pModel->hierarchyNodes[pJoint->node].skelJoint = i;
+		if (pJoint->node < 0 || pJoint->node >= pModel->numHierarchyNodes)
+		{
+			printf("Hiearchy node %d referenced by ragdoll joint %d for model %s is invalid\n", pJoint->node, i, pModel->filename);
+			continue;
+		}
+
+		rdHierarchyNode* pNode = &pModel->hierarchyNodes[pJoint->node];
+		if (pNode->skelJoint != -1)
+		{
+			printf("Hiearchy node %d for model %s already has an associated ragdoll joint %d, skpping\n", pJoint->node, pModel->filename, pNode->skelJoint);
+			continue;
+		}
+
+		pNode->skelJoint = i;
 	}
 }
 
