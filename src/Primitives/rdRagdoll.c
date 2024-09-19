@@ -573,7 +573,7 @@ int rdRagdollSkeleton_LoadEntry(rdRagdollSkeleton* pSkel, const char* fpath)
 	stdString_SafeStrCopy(pSkel->name, stdFileFromPath(fpath), 0x20);
 
 	if (!stdConffile_OpenRead(fpath))
-		goto done;
+		return 0;
 
 	if (!stdConffile_ReadLine())
 		goto done_close;
@@ -856,7 +856,7 @@ int rdRagdollSkeleton_LoadEntry(rdRagdollSkeleton* pSkel, const char* fpath)
 
 done_close:
 	stdConffile_Close();
-done:
+	rdRagdollSkeleton_FreeEntry(pSkel);
 	return 0;
 }
 
