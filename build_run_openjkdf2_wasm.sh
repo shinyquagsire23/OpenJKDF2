@@ -1,7 +1,8 @@
 #!/bin/sh
 
 # Run in OpenJKDF2 directory:
-# python -m SimpleHTTPServer
+# python3 -m http.server
+# Navigate to http://localhost:8000/wasm_out/index.html
 
 export OPENJKDF2_RELEASE_COMMIT=$(git log -1 --format="%H")
 export OPENJKDF2_RELEASE_COMMIT_SHORT=$(git rev-parse --short=8 HEAD)

@@ -204,6 +204,9 @@
       Module.setStatus('Downloading...');
       Module['arguments'] = window.location.search.substr(1).replaceAll("=", " ").split('&');
       Module['arguments'] = Module['arguments'].map(i => '-' + i);
+      if (Module['arguments'] == "-") {
+        Module['arguments'] = "";
+      }
       window.onerror = function(event) {
         // TODO: do not warn on ok events like simulating an infinite loop or exitStatus
         Module.setStatus('Exception thrown, see JavaScript console');
