@@ -627,7 +627,7 @@ void jkSaber_SpawnBurn(jkPlayerInfo* pPlayerInfo, rdVector3* pPos, rdVector3* pH
 	if (pTemplate)
 	{
 		rdMatrix34 axis; // orientation of the decal
-		float markLen = 1.0f; // width scale of the decal
+		float markLen = 0.0f; // width scale of the decal
 
 		if(pPlayerInfo->lastSaberMark && distSq > 0.0001f)
 		{
@@ -677,7 +677,7 @@ void jkSaber_SpawnBurn(jkPlayerInfo* pPlayerInfo, rdVector3* pPos, rdVector3* pH
 			pSpawned->child_signature = pPlayerInfo->actorThing->signature;
 
 			// adjust the size of the decal (template should be a decal) so it spans the length of the slash
-			if(pPlayerInfo->lastSaberMark)
+			if(pPlayerInfo->lastSaberMark && markLen > 0.0001f)
 				pSpawned->rdthing.decalScale.x = 1.7f * markLen / pSpawned->rdthing.decal->size.x;
 
 			// if the distance between the 2 points is extremely low gradually scale it up
