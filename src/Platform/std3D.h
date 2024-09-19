@@ -134,6 +134,10 @@ void std3D_ClearLights();
 void std3D_AddLight(rdLight* light, rdVector3* viewPosition);
 #endif
 
+#ifdef PARTICLE_LIGHTS
+void std3D_DrawLight(rdLight* light, rdVector3* position, rdVector3* verts);
+#endif
+
 #ifdef __cplusplus
 }
 #endif

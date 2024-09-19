@@ -18,7 +18,7 @@ out vec4 fragColor;
 #define Samples 8.0
 #endif
 
-#ifdef DECAL_RENDERING
+#ifdef VIEW_SPACE_GBUFFER
 vec2 oct_wrap(vec2 v)
 {
 	vec2 signs;
@@ -75,7 +75,7 @@ vec3 hemisphereVolumeRandPoint()
 float depth(vec2 coord)
 {
     vec2 uv = coord*vec2(iResolution.y/iResolution.x,1.0);
-#ifdef DECAL_RENDERING
+#ifdef VIEW_SPACE_GBUFFER
     return texture(tex2, uv).z;
 #else
     return texture(tex, uv).z;
@@ -102,7 +102,7 @@ float SSAO(vec2 coord)
 	float radius = 0.003f;
 #endif
 
-#ifdef DECAL_RENDERING
+#ifdef VIEW_SPACE_GBUFFER
 	vec3 normal = decode_octahedron(texture(tex2, f_uv).xy);
 #else
     vec3 normal = texture(tex2, f_uv).rgb;	

@@ -314,6 +314,11 @@ void sithParticle_CreateThing(sithThing *thing)
             v18->cloudRadius = v19;
         }
     }
+
+#ifdef PARTICLE_LIGHTS
+	// remove the light flag, since it will be done via particle lights
+	thing->thingflags &= ~SITH_TF_LIGHT;
+#endif
 }
 
 void sithParticle_Remove(sithThing *particle)

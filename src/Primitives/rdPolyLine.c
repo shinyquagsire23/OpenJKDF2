@@ -393,7 +393,7 @@ void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVert
     if ( mesh_out.numVertices < 3 )
         return;
 
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
 	memcpy(procEntry->vertexVS, mesh_out.verticesProjected, sizeof(rdVector3) * mesh_out.numVertices);
 #endif
     rdCamera_pCurCamera->fnProjectLst(mesh_out.verticesOrig, mesh_out.verticesProjected, mesh_out.numVertices);

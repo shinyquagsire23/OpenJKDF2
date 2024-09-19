@@ -85,7 +85,7 @@ layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragColorEmiss;
 layout(location = 2) out vec4 fragColorPos;
 layout(location = 3) out vec4 fragColorNormal;
-#ifdef DECAL_RENDERING
+#ifdef VIEW_SPACE_GBUFFER
 layout(location = 4) out vec4 fragColorLight;
 
 vec2 oct_wrap(vec2 v)
@@ -103,6 +103,9 @@ vec2 encode_octahedron(vec3 v)
     return clamp(v.xy, vec2(-1.0), vec2(1.0));
 }
 
+#endif
+#ifdef DIFFUSE_GBUFFER
+layout(location = 5) out vec4 fragColorDiffuse;
 #endif
 
 float luminance(vec3 c_rgb)
@@ -305,7 +308,7 @@ uniform lightBlock
 void main(void)
 {
     float originalZ = gl_FragCoord.z / gl_FragCoord.w;
-#ifdef DECAL_RENDERING
+#ifdef VIEW_SPACE_GBUFFER
     vec3 adjusted_coords = f_coord; // view space position
 #else
     vec3 adjusted_coords = vec3(f_coord.x/iResolution.x, f_coord.y/iResolution.y, originalZ); // clip space pos
@@ -555,11 +558,14 @@ void main(void)
 
 //	gl_FragDepth = gl_FragCoord.z;
     fragColorPos = vec4(adjusted_coords.x, adjusted_coords.y, adjusted_coords.z, should_write_normals);
-#ifdef DECAL_RENDERING
+#ifdef VIEW_SPACE_GBUFFER
 	vec2 octaNormal = encode_octahedron(normals(adjusted_coords.xyz)); // encode normal so we can store depth in Z
     fragColorNormal = vec4(octaNormal.xy, originalZ, should_write_normals);
 	fragColorLight = vec4(vertex_color.rgb, should_write_normals);
 #else
     fragColorNormal = vec4(face_normals, should_write_normals);
+#endif
+#ifdef DIFFUSE_GBUFFER
+	fragColorDiffuse = sampled_color;
 #endif
 }

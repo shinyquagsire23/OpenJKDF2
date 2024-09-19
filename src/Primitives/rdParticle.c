@@ -381,6 +381,19 @@ int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
             v5 = rdCache_GetProcEntry();
             if ( !v5 )
                 break;
+#ifdef PARTICLE_LIGHTS
+			if(thing->parentSithThing->light > 0.0001f)
+			{
+				rdLight light;
+				rdLight_NewEntry(&light);
+				light.falloffMin = 0.03f;
+				light.intensity = thing->parentSithThing->light / 0.1f;
+				rdMaterial_GetFillColor(&light.color, particle->material, rdColormap_pCurMap, particle->vertexCel[v32], -1);
+				rdCache_DrawLight(&light, &aParticleVertices[v32]);
+			}
+#endif
+
+
             v6 = *(v4 - 1) - particle->radius;
             v7 = v4[1] - particle->radius;
             v8 = *(v4 - 1) + particle->radius;
@@ -417,7 +430,7 @@ int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
             v27 = v26;
             if ( v26 >= 3 )
             {
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
 				memcpy(v5->vertexVS, aParticleVerticesTmp, sizeof(rdVector3) * v26);
 #endif
                 rdCamera_pCurCamera->fnProjectLst(v5->vertices, aParticleVerticesTmp, v26);

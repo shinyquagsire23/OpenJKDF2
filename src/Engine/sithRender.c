@@ -677,6 +677,10 @@ void sithRender_Draw()
 	rdSetStencilBufferMethod(RD_STENCIL_NOREAD_NOWRITE);
 #endif
 
+#ifdef PARTICLE_LIGHTS
+	rdCache_FlushLights();
+#endif
+
     rdSetCullFlags(3);
 #ifdef QOL_IMPROVEMENTS
     sithRender_RenderDebugLights();
@@ -1270,7 +1274,7 @@ void sithRender_RenderLevelGeometry()
                 {
                     continue;
                 }
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
 				memcpy(procEntry->vertexVS, sithRender_aVerticesTmp, sizeof(rdVector3) * meshinfo_out.numVertices);
 #endif
                 rdCamera_pCurCamera->fnProjectLst(procEntry->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
@@ -1509,7 +1513,7 @@ void sithRender_RenderLevelGeometry()
                     if ( meshinfo_out.numVertices < 3u )
                         goto LABEL_92;
 
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
 					memcpy(v20->vertexVS, sithRender_aVerticesTmp, sizeof(rdVector3) * meshinfo_out.numVertices);
 #endif
                     rdCamera_pCurCamera->fnProjectLst(v20->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
@@ -2561,7 +2565,7 @@ void sithRender_RenderAlphaSurfaces()
 				if (meshinfo_out.numVertices < 3u)
 					goto LABEL_92;
 
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
 				memcpy(v9->vertexVS, sithRender_aVerticesTmp, sizeof(rdVector3) * meshinfo_out.numVertices);
 #endif
 				rdCamera_pCurCamera->fnProjectLst(v9->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
@@ -2764,7 +2768,7 @@ void sithRender_RenderAlphaSurfaces()
         {
             continue;
         }
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
 		memcpy(v9->vertexVS, sithRender_aVerticesTmp, sizeof(rdVector3)* meshinfo_out.numVertices);
 #endif
         rdCamera_pCurCamera->fnProjectLst(v9->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);

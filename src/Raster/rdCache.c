@@ -20,9 +20,11 @@ static float rdCache_aGreenIntensities[RDCACHE_MAX_VERTICES];
 static float rdCache_aBlueIntensities[RDCACHE_MAX_VERTICES];
 #endif
 
-#ifdef DECAL_RENDERING
-// maybe this should be a AOS?
+#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
 rdVector3 rdCache_aVerticesVS[RDCACHE_MAX_VERTICES] = { 0 };
+#endif
+
+#ifdef DECAL_RENDERING
 rdVector3 rdCache_aDecalColors[256];
 rdMatrix34 rdCache_aDecalMatrices[256];
 rdDecal* rdCache_aDecals[256];
@@ -31,6 +33,14 @@ float rdCache_aDecalAngleFades[256];
 int rdCache_numDecals;
 
 void rdCache_FlushDecals();
+#endif
+
+#ifdef DECAL_RENDERING
+rdLight rdCache_aLights[4096];
+rdVector3 rdCache_aLightPositions[4096];
+int rdCache_numLights;
+
+void rdCache_FlushLights();
 #endif
 
 int rdCache_Startup()
@@ -102,7 +112,7 @@ rdProcEntry *rdCache_GetProcEntry()
     out_procEntry = &rdCache_aProcFaces[idx];
     out_procEntry->vertices = &rdCache_aVertices[rdCache_numUsedVertices];
     out_procEntry->vertexUVs = &rdCache_aTexVertices[rdCache_numUsedTexVertices];
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
 	out_procEntry->vertexVS = &rdCache_aVerticesVS[rdCache_numUsedTexVertices];
 #endif
     out_procEntry->vertexIntensities = &rdCache_aIntensities[rdCache_numUsedIntensities];
@@ -697,7 +707,7 @@ int rdCache_SendFaceListToHardware()
 #endif
 
             iterating_6c_vtxs = active_6c->vertices;
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
 			rdVector3* iter_vs = active_6c->vertexVS;
 #endif
             vertex_a = red_and_alpha << 8;
@@ -716,7 +726,7 @@ int rdCache_SendFaceListToHardware()
                 v38 = d3dvtx_zval * v134;
                 if ( rdCache_dword_865258 != 16 )
                     v38 = 1.0 - v38;
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
 				rdCache_aHWVertices[rdCache_totalVerts].vx = iter_vs[vtx_idx].x;
 				rdCache_aHWVertices[rdCache_totalVerts].vy = iter_vs[vtx_idx].y;
 				rdCache_aHWVertices[rdCache_totalVerts].vz = iter_vs[vtx_idx].z;
@@ -1586,5 +1596,64 @@ void rdCache_FlushDecals()
 		std3D_DrawDecal(tex2_arr_sel, verts, &invDecalViewMatrix, &rdCache_aDecalColors[i], flags, rdCache_aDecalAngleFades[i]);
 	}
 	rdCache_numDecals = 0;
+}
+#endif
+
+#ifdef PARTICLE_LIGHTS
+void rdCache_DrawLight(rdLight* light, rdVector3* position)
+{
+	if (rdCache_numLights >= 4096)
+	{
+		rdCache_FlushLights();
+		rdCache_numLights = 0;
+	}
+
+	rdCache_aLights[rdCache_numLights] = *light;
+	rdVector_Copy3(&rdCache_aLightPositions[rdCache_numLights], position);
+	++rdCache_numLights;
+}
+
+void rdCache_FlushLights()
+{
+	for (int i = 0; i < rdCache_numLights; ++i)
+	{
+		rdLight* light = &rdCache_aLights[i];
+
+		// todo: sphere?
+		rdVector3 verts[8] =
+		{
+			{ -light->falloffMin, -light->falloffMin,  light->falloffMin },
+			{  light->falloffMin, -light->falloffMin,  light->falloffMin },
+			{  light->falloffMin,  light->falloffMin,  light->falloffMin },
+			{ -light->falloffMin,  light->falloffMin,  light->falloffMin },
+			{ -light->falloffMin, -light->falloffMin, -light->falloffMin },
+			{  light->falloffMin, -light->falloffMin, -light->falloffMin },
+			{  light->falloffMin,  light->falloffMin, -light->falloffMin },
+			{ -light->falloffMin,  light->falloffMin, -light->falloffMin }
+		};
+
+		float inv = 1.0 / rdCamera_pCurCamera->pClipFrustum->field_0.z;
+		for (int v = 0; v < 8; ++v)
+		{
+			rdVector_Add3Acc(&verts[v], &rdCache_aLightPositions[i]);
+
+			rdVector3 proj;
+			rdCamera_pCurCamera->fnProject(&proj, &verts[v]);
+
+			// this rly needs to be made into a function or something
+			if (proj.z == 0.0)
+				proj.z = 0.0;
+			else
+				proj.z = 1.0 / proj.z;
+			proj.z = proj.z * inv;
+			if (rdCache_dword_865258 != 16)
+				proj.z = 1.0 - proj.z;
+
+			rdVector_Copy3(&verts[v], &proj);
+		}
+
+		std3D_DrawLight(light, &rdCache_aLightPositions[i], verts);
+	}
+	rdCache_numLights = 0;
 }
 #endif

@@ -204,6 +204,7 @@
 #define NEW_BLOOM            // optimized downsample based bloom with better performance
 #define RGB_THING_LIGHTS     // RGB thing lighting with lightcolor template param
 #define RGB_AMBIENT          // RGB sector ambient with spherical harmonics for gouraud models
+//#define PARTICLE_LIGHTS      // very simple lights for particle elements, pretty expensive atm with the extra gbuffer at 4k
 //#define GPU_LIGHTING         // move dynamic lighting calculations to GPU
 #define HALF_LAMBERT         // use half lambert gouraud for dynamic lights
 #define SPECULAR_LIGHTING    // RD_LIGHTMODE_SPECULAR

@@ -72,8 +72,11 @@ typedef struct std3DFramebuffer
     GLuint tex1;
     GLuint tex2;
     GLuint tex3;
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
 	GLuint tex4;
+#endif
+#ifdef PARTICLE_LIGHTS
+	GLuint tex5; // todo: merge with tex0 and use a combiner pass to fill with vertex * sampled
 #endif
 
     std3DIntermediateFbo window;
@@ -116,7 +119,7 @@ static int std3D_activeFb = 1;
 int init_once = 0;
 GLuint programDefault, programMenu;
 GLint attribute_coord3d, attribute_v_color, attribute_v_light, attribute_v_uv, attribute_v_norm;
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
 GLint attribute_coordVS;
 #endif
 GLint uniform_mvp, uniform_tex, uniform_texEmiss, uniform_displacement_map, uniform_tex_mode, uniform_blend_mode, uniform_worldPalette, uniform_worldPaletteLights;
@@ -228,6 +231,16 @@ GLint decal_attribute_coord3d;
 GLint decal_uniform_mvp, decal_uniform_tex, decal_uniform_texPos, decal_uniform_texLight, decal_uniform_texNormal, decal_uniform_worldPalette;
 GLint decal_uniform_tint, decal_uniform_filter, decal_uniform_fade, decal_uniform_add, decal_uniform_flags, decal_uniform_texmode;
 GLint decal_uniform_matrix, decal_uniform_color, decal_uniform_angle, decal_uniform_iResolution;
+
+#endif
+
+#ifdef PARTICLE_LIGHTS
+
+GLuint programLight;
+GLint light_attribute_coord3d;
+GLint light_uniform_mvp, light_uniform_texPos, light_uniform_texNormal, light_uniform_texColor;
+GLint light_uniform_tint, light_uniform_filter, light_uniform_fade, light_uniform_add;
+GLint light_uniform_attenuation, light_uniform_color, light_uniform_position, light_uniform_iResolution;
 
 #endif
 
@@ -346,7 +359,7 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     // Attach fbTex to our currently bound framebuffer fb
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, pFb->tex3, 0);
 
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
 	// annoyingly need a light buffer to transfer lighting info to the decal pass
 	glGenTextures(1, &pFb->tex4);
 	glBindTexture(GL_TEXTURE_2D, pFb->tex4);
@@ -358,6 +371,20 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
 
 	// Attach fbTex to our currently bound framebuffer fb
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, pFb->tex4, 0);
+#endif
+
+#ifdef PARTICLE_LIGHTS
+	// diffuse color buffer - can merge with tex0 later
+	glGenTextures(1, &pFb->tex5);
+	glBindTexture(GL_TEXTURE_2D, pFb->tex5);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	// Attach fbTex to our currently bound framebuffer fb
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT5, GL_TEXTURE_2D, pFb->tex5, 0);
 #endif
 
     // Set up our render buffer
@@ -438,6 +465,12 @@ void std3D_deleteFramebuffer(std3DFramebuffer* pFb)
     glDeleteTextures(1, &pFb->tex1);
     glDeleteTextures(1, &pFb->tex2);
     glDeleteTextures(1, &pFb->tex3);
+#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
+	glDeleteTextures(1, &pFb->tex4);
+#endif
+#ifdef PARTICLE_LIGHTS
+	glDeleteTextures(1, &pFb->tex5);
+#endif
     glDeleteRenderbuffers(1, &pFb->rbo);
 
     std3D_deleteIntermediateFbo(&pFb->blur1);
@@ -579,10 +612,12 @@ int init_resources()
 #ifdef DECAL_RENDERING
 	if ((programDecal = std3D_loadProgram("shaders/decal")) == 0) return false;
 #endif
-
+#ifdef PARTICLE_LIGHTS
+	if ((programLight = std3D_loadProgram("shaders/light")) == 0) return false;
+#endif
     // Attributes/uniforms
     attribute_coord3d = std3D_tryFindAttribute(programDefault, "coord3d");
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
 	attribute_coordVS = std3D_tryFindAttribute(programDefault, "coordVS");
 #endif
     attribute_v_color = std3D_tryFindAttribute(programDefault, "v_color");
@@ -640,6 +675,24 @@ int init_resources()
 	decal_uniform_matrix = std3D_tryFindUniform(programDecal, "decalMatrix");
 	decal_uniform_color = std3D_tryFindUniform(programDecal, "decalColor");
 	decal_uniform_iResolution = std3D_tryFindUniform(programDecal, "iResolution");
+#endif
+
+#ifdef PARTICLE_LIGHTS
+	light_attribute_coord3d = std3D_tryFindAttribute(programLight, "coord3d");
+	light_uniform_mvp = std3D_tryFindUniform(programLight, "mvp");
+	light_uniform_texPos = std3D_tryFindUniform(programLight, "texPos");
+	light_uniform_texNormal = std3D_tryFindUniform(programLight, "texNormal");
+	light_uniform_texColor = std3D_tryFindUniform(programLight, "texColor");
+
+	light_uniform_tint = std3D_tryFindUniform(programLight, "colorEffects_tint");
+	light_uniform_filter = std3D_tryFindUniform(programLight, "colorEffects_filter");
+	light_uniform_fade = std3D_tryFindUniform(programLight, "colorEffects_fade");
+	light_uniform_add = std3D_tryFindUniform(programLight, "colorEffects_add");
+
+	light_uniform_attenuation = std3D_tryFindUniform(programLight, "lightAttenuation");
+	light_uniform_color = std3D_tryFindUniform(programLight, "lightColor");
+	light_uniform_position = std3D_tryFindUniform(programLight, "lightPosition");
+	light_uniform_iResolution = std3D_tryFindUniform(programLight, "iResolution");
 #endif
 
 #ifdef GPU_LIGHTING
@@ -920,7 +973,7 @@ void std3D_SetWorldAttribPointers()
 		(GLvoid*)offsetof(D3DVERTEX, tu)                  // offset of first element
 	);
 
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
 	glVertexAttribPointer(
 		attribute_coordVS, // attribute
 		3,                 // number of elements per vertex, here (x,y,z)
@@ -937,7 +990,7 @@ void std3D_SetWorldAttribPointers()
 	glEnableVertexAttribArray(attribute_v_uv);
 	glEnableVertexAttribArray(attribute_coordVS);
 
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
 	glEnableVertexAttribArray(attribute_coordVS);
 #endif
 }
@@ -1060,7 +1113,7 @@ int std3D_EndScene()
     glDisableVertexAttribArray(attribute_v_uv);
     glDisableVertexAttribArray(attribute_v_color);
     glDisableVertexAttribArray(attribute_coord3d);
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
 	glDisableVertexAttribArray(attribute_coordVS);
 #endif
 
@@ -2540,9 +2593,12 @@ void std3D_DrawRenderList()
     glUseProgram(programDefault);
 
     GLenum bufs[] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3
-	#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
 	, GL_COLOR_ATTACHMENT4
-	#endif	
+#endif
+#ifdef PARTICLE_LIGHTS
+,GL_COLOR_ATTACHMENT5
+#endif
 	};
     glDrawBuffers(ARRAYSIZE(bufs), bufs);
     
@@ -2715,8 +2771,8 @@ void std3D_DrawRenderList()
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, world_ibo_triangle);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, GL_tmpTrisAmt * 3 * sizeof(GLushort), world_data_elements, GL_STREAM_DRAW);
-#ifdef DECAL_RENDERING
-	// these aren't guaranteed to be active when a decal flush happens
+#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
+	// these aren't guaranteed to be active when a flush happens
 	std3D_SetWorldAttribPointers();
 #endif
     
@@ -2805,7 +2861,7 @@ void std3D_DrawRenderList()
 	else
 		glStencilFunc(GL_ALWAYS, 1, 0xFF);
 	
-	glStencilOp(readStencil ? GL_KEEP : GL_REPLACE, readStencil ? GL_KEEP : GL_REPLACE, writeStencil ? GL_REPLACE : GL_KEEP);
+	glStencilOp(writeStencil ? GL_KEEP : GL_REPLACE, GL_KEEP, writeStencil ? GL_REPLACE : GL_KEEP);
 #endif
     
     for (int j = 0; j < GL_tmpTrisAmt; j++)
@@ -2942,7 +2998,7 @@ void std3D_DrawRenderList()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
 	glDisableVertexAttribArray(attribute_v_uv);
 	glDisableVertexAttribArray(attribute_v_color);
 	glDisableVertexAttribArray(attribute_coord3d);
@@ -4182,4 +4238,245 @@ void std3D_FlushLights()
 	}
 }
 
+#endif
+
+
+
+#ifdef PARTICLE_LIGHTS
+void std3D_DrawLight(rdLight* light, rdVector3* position, rdVector3* verts)
+{
+	if (Main_bHeadless) return;
+
+	glBlendFunc(GL_ONE, GL_ONE);
+	glEnable(GL_BLEND);
+	glEnable(GL_CULL_FACE);
+#ifdef STENCIL_BUFFER
+	glDisable(GL_STENCIL_TEST);
+	//glStencilFunc(GL_EQUAL, 0, 0xFF);
+	//glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+#endif
+
+	glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->main.fbo);
+
+	// we only need to write color
+	GLenum bufs[] = { GL_COLOR_ATTACHMENT0 };
+	glDrawBuffers(1, bufs);
+
+	glDepthFunc(GL_ALWAYS);
+	glUseProgram(programLight);
+
+	glUniform1i(light_uniform_texPos, 0);
+	glUniform1i(light_uniform_texNormal, 1);
+	glUniform1i(light_uniform_texColor, 2);
+
+	{
+		float maxX, maxY, scaleX, scaleY, width, height;
+
+		float internalWidth = Video_menuBuffer.format.width;
+		float internalHeight = Video_menuBuffer.format.height;
+
+		if (jkGuiBuildMulti_bRendering)
+		{
+			internalWidth = 640.0;
+			internalHeight = 480.0;
+		}
+
+		maxX = 1.0;
+		maxY = 1.0;
+		scaleX = 1.0 / ((double)internalWidth / 2.0);
+		scaleY = 1.0 / ((double)internalHeight / 2.0);
+		width = std3D_pFb->w;
+		height = std3D_pFb->h;
+
+		if (jkGuiBuildMulti_bRendering)
+		{
+			width = 640;
+			height = 480;
+		}
+
+		// JKDF2's vertical FOV is fixed with their projection, for whatever reason. 
+		// This ends up resulting in the view looking squished vertically at wide/ultrawide aspect ratios.
+		// To compensate, we zoom the y axis here.
+		// I also went ahead and fixed vertical displays in the same way because it seems to look better.
+		float zoom_yaspect = (width / height);
+		float zoom_xaspect = (height / width);
+
+		if (height > width)
+		{
+			zoom_yaspect = 1.0;
+		}
+
+		if (width > height)
+		{
+			zoom_xaspect = 1.0;
+		}
+
+		// We no longer need all the weird squishing
+		if (!jkGuiBuildMulti_bRendering)
+		{
+			zoom_yaspect = 1.0;
+			zoom_xaspect = 1.0;
+		}
+
+		float shift_add_x = 0;
+		float shift_add_y = 0;
+
+		if (jkGuiBuildMulti_bRendering)
+		{
+			float menu_w, menu_h, menu_x;
+			menu_w = (double)std3D_pFb->w;
+			menu_h = (double)std3D_pFb->h;
+
+			// Keep 4:3 aspect
+			menu_x = (menu_w - (menu_h * (640.0 / 480.0))) / 2.0;
+
+			width = std3D_pFb->w;
+			height = std3D_pFb->h;
+
+			zoom_xaspect = (height / width);
+
+			shift_add_x = (((1.0 - ((menu_x * zoom_xaspect) / std3D_pFb->w)) + 0.15) * zoom_xaspect);
+			shift_add_y = -0.5;
+			zoom_yaspect = 1.0;
+		}
+
+		float d3dmat[16] = {
+				maxX * scaleX * zoom_xaspect,      0,                                          0,      0, // right
+				0,                                       -maxY * scaleY * zoom_yaspect,               0,      0, // up
+				0,                                       0,                                          1,     0, // forward
+				-(internalWidth / 2) * scaleX * zoom_xaspect + shift_add_x,  (internalHeight / 2) * scaleY * zoom_yaspect + shift_add_y,     (!rdCamera_pCurCamera || rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective) ? -1 : 1,      1  // pos
+		};
+
+		glUniformMatrix4fv(light_uniform_mvp, 1, GL_FALSE, d3dmat);
+		glViewport(0, 0, width, height);
+		glUniform2f(light_uniform_iResolution, width, height);
+	}
+
+	// triangle indices
+	GL_tmpTris[0].v1 = 0;
+	GL_tmpTris[0].v2 = 1;
+	GL_tmpTris[0].v3 = 2;
+	GL_tmpTris[1].v1 = 2;
+	GL_tmpTris[1].v2 = 3;
+	GL_tmpTris[1].v3 = 0;
+
+	GL_tmpTris[2].v1 = 1;
+	GL_tmpTris[2].v2 = 5;
+	GL_tmpTris[2].v3 = 6;
+
+	GL_tmpTris[3].v1 = 6;
+	GL_tmpTris[3].v2 = 2;
+	GL_tmpTris[3].v3 = 1;
+
+	GL_tmpTris[4].v1 = 7;
+	GL_tmpTris[4].v2 = 6;
+	GL_tmpTris[4].v3 = 5;
+
+	GL_tmpTris[5].v1 = 5;
+	GL_tmpTris[5].v2 = 4;
+	GL_tmpTris[5].v3 = 7;
+
+	GL_tmpTris[6].v1 = 4;
+	GL_tmpTris[6].v2 = 0;
+	GL_tmpTris[6].v3 = 3;
+
+	GL_tmpTris[7].v1 = 3;
+	GL_tmpTris[7].v2 = 7;
+	GL_tmpTris[7].v3 = 4;
+
+	GL_tmpTris[8].v1 = 4;
+	GL_tmpTris[8].v2 = 5;
+	GL_tmpTris[8].v3 = 1;
+
+	GL_tmpTris[9].v1 = 1;
+	GL_tmpTris[9].v2 = 0;
+	GL_tmpTris[9].v3 = 4;
+
+	GL_tmpTris[10].v1 = 3;
+	GL_tmpTris[10].v2 = 2;
+	GL_tmpTris[10].v3 = 6;
+
+	GL_tmpTris[11].v1 = 6;
+	GL_tmpTris[11].v2 = 7;
+	GL_tmpTris[11].v3 = 3;
+
+	GL_tmpTrisAmt = 12;
+
+	GLushort data_elements[12 * 3];
+	rdTri* tris = GL_tmpTris;
+	for (int j = 0; j < GL_tmpTrisAmt; j++)
+	{
+		data_elements[(j * 3) + 0] = tris[j].v1;
+		data_elements[(j * 3) + 1] = tris[j].v2;
+		data_elements[(j * 3) + 2] = tris[j].v3;
+	}
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, menu_ibo_triangle);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, GL_tmpTrisAmt * 3 * sizeof(GLushort), data_elements, GL_STREAM_DRAW);
+
+	GL_tmpVerticesAmt = 8;
+	for (int v = 0; v < GL_tmpVerticesAmt; ++v)
+	{
+		GL_tmpVertices[v].x = verts[v].x;
+		GL_tmpVertices[v].y = verts[v].y;
+		GL_tmpVertices[v].z = verts[v].z;
+		GL_tmpVertices[v].tu = 0;
+		GL_tmpVertices[v].tv = 0;
+		*(uint32_t*)&GL_tmpVertices[v].nx = 0;
+		GL_tmpVertices[v].color = 0xFFFFFFFF;
+		*(uint32_t*)&GL_tmpVertices[v].nz = 0;
+	}
+
+	glEnableVertexAttribArray(light_attribute_coord3d);
+
+	glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_all);
+	glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * sizeof(D3DVERTEX), GL_tmpVertices, GL_STREAM_DRAW);
+	glVertexAttribPointer(
+		light_attribute_coord3d, // attribute
+		3,                 // number of elements per vertex, here (x,y,z)
+		GL_FLOAT,          // the type of each element
+		GL_FALSE,          // normalize fixed-point data?
+		sizeof(D3DVERTEX),                 // data stride
+		(GLvoid*)offsetof(D3DVERTEX, x)                  // offset of first element
+	);
+
+	glActiveTexture(GL_TEXTURE0 + 0);
+	glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex2);
+	glActiveTexture(GL_TEXTURE0 + 1);
+	glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex3);
+	glActiveTexture(GL_TEXTURE0 + 2);
+	glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex5);
+
+	glUniform3f(light_uniform_tint, rdroid_curColorEffects.tint.x, rdroid_curColorEffects.tint.y, rdroid_curColorEffects.tint.z);
+	if (rdroid_curColorEffects.filter.x || rdroid_curColorEffects.filter.y || rdroid_curColorEffects.filter.z)
+		glUniform3f(light_uniform_filter, rdroid_curColorEffects.filter.x ? 1.0 : 0.25, rdroid_curColorEffects.filter.y ? 1.0 : 0.25, rdroid_curColorEffects.filter.z ? 1.0 : 0.25);
+	else
+		glUniform3f(light_uniform_filter, 1.0, 1.0, 1.0);
+	glUniform1f(light_uniform_fade, rdroid_curColorEffects.fade);
+	glUniform3f(light_uniform_add, (float)rdroid_curColorEffects.add.x / 255.0f, (float)rdroid_curColorEffects.add.y / 255.0f, (float)rdroid_curColorEffects.add.z / 255.0f);
+
+
+	glUniform3f(light_uniform_position, position->x, position->y, position->z);
+	glUniform3f(light_uniform_color, light->intensity * light->color.x, light->intensity * light->color.y, light->intensity * light->color.z);
+	glUniform1f(light_uniform_attenuation, light->falloffMin);
+
+	glCullFace(GL_BACK);
+
+	glDrawElements(GL_TRIANGLES, GL_tmpTrisAmt * 3, GL_UNSIGNED_SHORT, 0);
+
+	glDisableVertexAttribArray(light_attribute_coord3d);
+
+	glEnable(GL_BLEND);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glDepthFunc(GL_LESS);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendEquation(GL_FUNC_ADD);
+	glCullFace(GL_FRONT);
+#ifdef STENCIL_BUFFER
+	//glDisable(GL_STENCIL_TEST);
+	//glStencilFunc(GL_ALWAYS, 0, 0xFF);
+	//glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
+#endif
+}
 #endif

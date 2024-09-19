@@ -45,7 +45,7 @@ void main(void)
     gl_Position = pos;
     f_color = v_color.bgra;
     f_uv = v_uv;
-#ifdef DECAL_RENDERING
+#ifdef VIEW_SPACE_GBUFFER
     f_coord = coordVS;
 #else
     f_coord = coord3d;
