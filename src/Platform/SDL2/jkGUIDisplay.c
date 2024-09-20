@@ -63,28 +63,25 @@ static jkGuiElement jkGuiDisplay_aElements[] = {
     {ELEMENT_CHECKBOX,     0,            0, "GUIEXT_EN_SQUARE_ASPECT",    0, {20, 240, 300, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
 
     // 17
-    {ELEMENT_TEXT,         0,            0, "GUIEXT_FPS_LIMIT",                 3, {20, 280, 300, 30}, 1,  0, 0, 0, 0, 0, {0}, 0},
-    {ELEMENT_SLIDER,       0,            0, (const char*)(FPS_LIMIT_MAX - FPS_LIMIT_MIN),                    0, {10, 310, 320, 30}, 1, 0, "GUIEXT_FPS_LIMIT_HINT", jkGuiDisplay_FramelimitDraw, 0, slider_images, {0}, 0},
-    {ELEMENT_TEXT,         0,            0, slider_val_text_2,        3, {20, 340, 300, 30}, 1,  0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_CHECKBOX,     0,            0, "GUIEXT_EN_VSYNC",    0, {400, 220, 300, 30}, 1,  0, NULL, 0, 0, 0, {0}, 0},
 
-    // 21
-    { ELEMENT_TEXT,        0,            0, "GUIEXT_SSAA_MULT",            2, {400, 320, 120, 20},   1, 0, NULL,                        0, 0, 0, {0}, 0},
-    { ELEMENT_TEXTBOX,      0,            0, NULL,    100, {530, 320, 80, 20}, 1,  0, NULL, 0, 0, 0, {0}, 0},
+    // 18
+    { ELEMENT_TEXT,        0,            0, "GUIEXT_SSAA_MULT",            2, {20, 320, 120, 20},   1, 0, NULL,                        0, 0, 0, {0}, 0},
+    { ELEMENT_TEXTBOX,      0,            0, NULL,    100, {150, 320, 80, 20}, 1,  0, NULL, 0, 0, 0, {0}, 0},
     
-    // 23
-    { ELEMENT_TEXT,        0,            0, "GUIEXT_GAMMA_VAL",            2, {400, 350, 120, 20},   1, 0, NULL,                        0, 0, 0, {0}, 0},
-    { ELEMENT_TEXTBOX,      0,            0, NULL,    100, {530, 350, 80, 20}, 1,  0, NULL, 0, 0, 0, {0}, 0},
+    // 20
+    { ELEMENT_TEXT,        0,            0, "GUIEXT_GAMMA_VAL",            2, {20, 350, 120, 20},   1, 0, NULL,                        0, 0, 0, {0}, 0},
+    { ELEMENT_TEXTBOX,      0,            0, NULL,    100, {150, 350, 80, 20}, 1,  0, NULL, 0, 0, 0, {0}, 0},
 
-    // 25
-    { ELEMENT_TEXT,        0,            0, "GUIEXT_HUD_SCALE",            2, {400, 380, 120, 20},   1, 0, NULL,                        0, 0, 0, {0}, 0},
-    { ELEMENT_TEXTBOX,      0,            0, NULL,    100, {530, 380, 80, 20}, 1,  0, NULL, 0, 0, 0, {0}, 0},
+    // 22
+    { ELEMENT_TEXT,        0,            0, "GUIEXT_HUD_SCALE",            2, {20, 380, 100, 20},   1, 0, NULL,                        0, 0, 0, {0}, 0},
+    { ELEMENT_TEXTBOX,      0,            0, NULL,    100, {150, 380, 80, 20}, 1,  0, NULL, 0, 0, 0, {0}, 0},
 
-	// 27
-	{ ELEMENT_TEXT,        0,            0, "GUIEXT_EN_COLORDEPTH",  3,  { 400, 165, 100, 25}, 1,  0, 0, 0, 0, 0, {0}, 0},
-	{ ELEMENT_TEXT,        0,            0, NULL,                    3,  { 534, 160, 60, 30 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+	// 24
+	{ ELEMENT_TEXT,        0,            0, "GUIEXT_EN_COLORDEPTH",  3,  { 400, 160, 100, 25}, 1,  0, 0, 0, 0, 0, {0}, 0},
+	{ ELEMENT_TEXT,        0,            0, NULL,                    3,  { 536, 165, 50, 30 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
 	{ ELEMENT_PICBUTTON, 103,            0, NULL,                    33, { 510, 160, 24, 24 }, 1, 0, NULL, NULL, jkGuiDisplay_ColorDepthArrowButtonClickHandler, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-	{ ELEMENT_PICBUTTON, 104,            0, NULL,                    34, { 594, 160, 24, 24 }, 1, 0, NULL, NULL, jkGuiDisplay_ColorDepthArrowButtonClickHandler, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+	{ ELEMENT_PICBUTTON, 104,            0, NULL,                    34, { 584, 160, 24, 24 }, 1, 0, NULL, NULL, jkGuiDisplay_ColorDepthArrowButtonClickHandler, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
 
 
     { ELEMENT_TEXTBUTTON,  GUI_ADVANCED, 2, "GUI_ADVANCED",               3, {220, 430, 200, 40}, 1, 0, NULL,                        0, 0, 0, {0}, 0},
@@ -109,14 +106,19 @@ static jkGuiElement jkGuiDisplay_aElementsAdvanced[] = {
     { ELEMENT_CHECKBOX,    0,            0, "GUIEXT_EN_JKGFXMOD",            0, {20, 150, 300, 40},  1, 0, "GUIEXT_EN_JKGFXMOD_HINT",          0, 0, 0, {0}, 0},
     { ELEMENT_CHECKBOX,    0,            0, "GUIEXT_EN_TEXTURE_PRECACHE",   0, {20, 190, 300, 40},  1, 0, "GUIEXT_EN_TEXTURE_PRECACHE_HINT",          0, 0, 0, {0}, 0},
 
-	// 11
+	 // 11
+	{ELEMENT_TEXT,         0,            0, "GUIEXT_FPS_LIMIT",                 3, {300, 150, 300, 30}, 1,  0, 0, 0, 0, 0, {0}, 0},
+	{ELEMENT_SLIDER,       0,            0, (const char*)(FPS_LIMIT_MAX - FPS_LIMIT_MIN),                    0, {290, 180, 320, 30}, 1, 0, "GUIEXT_FPS_LIMIT_HINT", jkGuiDisplay_FramelimitDraw, 0, slider_images, {0}, 0},
+	{ELEMENT_TEXT,         0,            0, slider_val_text_2,        3, {300, 210, 300, 30}, 1,  0, 0, 0, 0, 0, {0}, 0},
+
+	// 14
 	{ELEMENT_CHECKBOX,     0,            0, "GUIEXT_EN_BLOOM",    0, {20, 230, 300, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
 
-	// 12
+	// 15
 	{ELEMENT_CHECKBOX,     0,            0, "GUIEXT_EN_SSAO",    0, {20, 270, 300, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
 
 #ifdef DECAL_RENDERING
-	// 13
+	// 16
 	{ ELEMENT_CHECKBOX,     0,           0, "GUIEXT_EN_DECALS",    0, {20, 310, 300, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
 #endif
 
@@ -130,14 +132,14 @@ void jkGuiDisplay_Startup()
 {
     jkGui_InitMenu(&jkGuiDisplay_menu, jkGui_stdBitmaps[JKGUI_BM_BK_SETUP]);
     jkGui_InitMenu(&jkGuiDisplay_menuAdvanced, jkGui_stdBitmaps[JKGUI_BM_BK_SETUP]);
-    jkGuiDisplay_aElements[22].wstr = render_level;
+    jkGuiDisplay_aElements[19].wstr = render_level;
 
-    jkGuiDisplay_aElements[24].wstr = gamma_level;
+    jkGuiDisplay_aElements[21].wstr = gamma_level;
 
-    jkGuiDisplay_aElements[26].wstr = hud_level;
+    jkGuiDisplay_aElements[23].wstr = hud_level;
 
 	jk_snwprintf(colordepth_text, 8u, jkPlayer_enable32Bit ? L"32-bit" : L"16-bit");
-	jkGuiDisplay_aElements[28].wstr = colordepth_text;
+	jkGuiDisplay_aElements[25].wstr = colordepth_text;
 
     jk_snwprintf(render_level, 255, L"%.2f", jkPlayer_ssaaMultiple);
     jk_snwprintf(gamma_level, 255, L"%.2f", jkPlayer_gamma);
@@ -163,18 +165,18 @@ void jkGuiDisplay_FovDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vb
 
 void jkGuiDisplay_FramelimitDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw)
 {
-    uint32_t tmp = FPS_LIMIT_MIN + jkGuiDisplay_aElements[18].selectedTextEntry;
+    uint32_t tmp = FPS_LIMIT_MIN + jkGuiDisplay_aElementsAdvanced[12].selectedTextEntry;
     
     if (tmp)
         jk_snwprintf(slider_val_text_2, 5, L"%u", tmp);
     else
         jk_snwprintf(slider_val_text_2, 5, L"None");
 
-    jkGuiDisplay_aElements[19].wstr = slider_val_text_2;
+	jkGuiDisplay_aElementsAdvanced[13].wstr = slider_val_text_2;
     
     jkGuiRend_SliderDraw(element, menu, vbuf, redraw);
     
-    jkGuiRend_UpdateAndDrawClickable(&jkGuiDisplay_aElements[19], menu, 1);
+    jkGuiRend_UpdateAndDrawClickable(&jkGuiDisplay_aElementsAdvanced[13], menu, 1);
 }
 
 int jkGuiDisplay_ShowAdvanced()
@@ -189,11 +191,13 @@ int jkGuiDisplay_ShowAdvanced()
     jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiDisplay_menuAdvanced, &jkGuiDisplay_aElementsAdvanced[8]);
     jkGuiSetup_sub_412EF0(&jkGuiDisplay_menuAdvanced, 0);
 
-	jkGuiDisplay_aElementsAdvanced[11].selectedTextEntry = jkPlayer_enableBloom;
-	jkGuiDisplay_aElementsAdvanced[12].selectedTextEntry = jkPlayer_enableSSAO;
+	jkGuiDisplay_aElementsAdvanced[12].selectedTextEntry = jkPlayer_fpslimit - FPS_LIMIT_MIN;
+
+	jkGuiDisplay_aElementsAdvanced[14].selectedTextEntry = jkPlayer_enableBloom;
+	jkGuiDisplay_aElementsAdvanced[15].selectedTextEntry = jkPlayer_enableSSAO;
 
 #ifdef DECAL_RENDERING
-	jkGuiDisplay_aElementsAdvanced[13].selectedTextEntry = jkPlayer_enableDecals;
+	jkGuiDisplay_aElementsAdvanced[16].selectedTextEntry = jkPlayer_enableDecals;
 #endif
 
     while (1)
@@ -202,13 +206,15 @@ int jkGuiDisplay_ShowAdvanced()
 
         if ( v0 != -1 )
         {
+			jkPlayer_fpslimit = FPS_LIMIT_MIN + jkGuiDisplay_aElementsAdvanced[12].selectedTextEntry;
+
             jkPlayer_bEnableJkgm = jkGuiDisplay_aElementsAdvanced[9].selectedTextEntry;
             jkPlayer_bEnableTexturePrecache = jkGuiDisplay_aElementsAdvanced[10].selectedTextEntry;
 
-			jkPlayer_enableBloom = jkGuiDisplay_aElementsAdvanced[11].selectedTextEntry;
-			jkPlayer_enableSSAO = jkGuiDisplay_aElementsAdvanced[12].selectedTextEntry;
+			jkPlayer_enableBloom = jkGuiDisplay_aElementsAdvanced[14].selectedTextEntry;
+			jkPlayer_enableSSAO = jkGuiDisplay_aElementsAdvanced[15].selectedTextEntry;
 #ifdef DECAL_RENDERING
-			jkPlayer_enableDecals = jkGuiDisplay_aElementsAdvanced[13].selectedTextEntry;
+			jkPlayer_enableDecals = jkGuiDisplay_aElementsAdvanced[16].selectedTextEntry;
 #endif
 
             std3D_PurgeTextureCache();
@@ -236,9 +242,8 @@ int jkGuiDisplay_Show()
     jkGuiDisplay_aElements[15].selectedTextEntry = jkPlayer_enableTextureFilter;
     jkGuiDisplay_aElements[16].selectedTextEntry = jkPlayer_enableOrigAspect;
 
-    jkGuiDisplay_aElements[18].selectedTextEntry = jkPlayer_fpslimit - FPS_LIMIT_MIN;
-    jkGuiDisplay_aElements[20].selectedTextEntry = jkPlayer_enableVsync;
-	jkGuiDisplay_aElements[27].selectedTextEntry = jkPlayer_enable32Bit;
+    jkGuiDisplay_aElements[17].selectedTextEntry = jkPlayer_enableVsync;
+	jkGuiDisplay_aElements[25].selectedTextEntry = jkPlayer_enable32Bit;
 
     jk_snwprintf(render_level, 255, L"%.2f", jkPlayer_ssaaMultiple);
     jk_snwprintf(gamma_level, 255, L"%.2f", jkPlayer_gamma);
@@ -259,9 +264,8 @@ continue_menu:
         Window_SetHiDpi(jkGuiDisplay_aElements[14].selectedTextEntry);
         jkPlayer_enableTextureFilter = jkGuiDisplay_aElements[15].selectedTextEntry;
         jkPlayer_enableOrigAspect = jkGuiDisplay_aElements[16].selectedTextEntry;
-        jkPlayer_fpslimit = FPS_LIMIT_MIN + jkGuiDisplay_aElements[18].selectedTextEntry;
-        jkPlayer_enableVsync = jkGuiDisplay_aElements[20].selectedTextEntry;
-		jkPlayer_enable32Bit = jkGuiDisplay_aElements[27].selectedTextEntry;
+        jkPlayer_enableVsync = jkGuiDisplay_aElements[17].selectedTextEntry;
+		jkPlayer_enable32Bit = jkGuiDisplay_aElements[26].selectedTextEntry;
 
         char tmp[256];
         stdString_WcharToChar(tmp, render_level, 255);
@@ -313,8 +317,8 @@ int jkGuiDisplay_ColorDepthArrowButtonClickHandler(jkGuiElement* pElement, jkGui
 	}
 
 	jk_snwprintf(colordepth_text, 8u, jkPlayer_enable32Bit ? L"32-bit" : L"16-bit");
-	jkGuiDisplay_aElements[28].wstr = colordepth_text;
-	jkGuiRend_UpdateAndDrawClickable(&jkGuiDisplay_aElements[28], pMenu, 1);
+	jkGuiDisplay_aElements[26].wstr = colordepth_text;
+	jkGuiRend_UpdateAndDrawClickable(&jkGuiDisplay_aElements[26], pMenu, 1);
 
 	return 0;
 }
