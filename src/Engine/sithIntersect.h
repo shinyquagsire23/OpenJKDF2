@@ -25,9 +25,9 @@ int sithIntersect_IsSphereInSector(const rdVector3 *pos, float radius, sithSecto
 int sithIntersect_CollideThings(sithThing* thing, const rdVector3* a2, const rdVector3* a3, float a4, float a5, sithThing* a6, int raycastFlags, float* a8, rdMesh** outMesh, rdFace** a10, rdVector3* a11);
 int sithIntersect_TreeIntersection(rdHierarchyNode *paNodes,rdVector3 *pPoseVec,rdVector3 *pDirVec,float a4,float range, sithThing *v11,float *pOut,rdVector3 *pOutVec,int raycastFlags);
 // sithIntersect_sub_508370
-int sithIntersect_sub_508400(rdVector3 *a1, rdVector3 *a2, float a3, float a4, rdMesh *mesh, float *a6, rdFace **faceOut, rdVector3 *a8);
+int sithIntersect_MeshIntersection(rdVector3 *a1, rdVector3 *a2, float a3, float a4, rdMesh *mesh, float *a6, rdFace **faceOut, rdVector3 *a8);
 int sithIntersect_RaySphereIntersection(const rdVector3 *a1, const rdVector3 *a2, float a3, float a4, rdVector3 *a5, float a6, float *a7, int a8, int a9);
-int sithIntersect_sub_508750(rdVector3 *a1, float a2, rdFace *a3, rdVector3 *a4, int *a5);
+int sithIntersect_FaceIntersection(rdVector3 *a1, float a2, rdFace *a3, rdVector3 *a4, int *a5);
 int sithIntersect_sub_508990(rdVector3 *a1, float a2, rdFace *a3, rdVector3 *a4, int a5, rdVector3 *a6);
 int sithIntersect_SphereHit(const rdVector3* pStartPos, const rdVector3* pRayDirection, float moveDistance, float radius, rdVector3* surfaceNormal, rdVector3* a6, float* pSphereHitDist, int flags);
 int sithIntersect_sub_508D20(const rdVector3 *a1, const rdVector3 *a2, float a3, float a4, rdFace *a5, rdVector3 *a6, float *a7, rdVector3 *a8, int a9);

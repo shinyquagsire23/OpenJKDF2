@@ -215,7 +215,7 @@ int sithIntersect_CollideThings(sithThing *pThing, const rdVector3 *a2, const rd
     //printf("aaaaa %f %f %f\n", dirVec.x, dirVec.y, dirVec.z);
     for (thinga = 0; thinga < v27->numMeshes; thinga++)
     {
-        v31 = sithIntersect_sub_508400(&posVec, &dirVec, a4, range, &v27->meshes[v30], a8, a10, v26);
+        v31 = sithIntersect_MeshIntersection(&posVec, &dirVec, a4, range, &v27->meshes[v30], a8, a10, v26);
         if ( v31 )
         {
             v28 = v31;
@@ -297,7 +297,7 @@ int sithIntersect_TreeIntersection(rdHierarchyNode *paNodes,rdVector3 *pPoseVec,
 
 // This handles collisions with non-spherical world thing objects
 // ie, tables and such
-int sithIntersect_sub_508400(rdVector3 *pStartPos, rdVector3 *pRayDirection, float moveDistance, float radius, rdMesh *pMesh, float *pSphereHitDist, rdFace **faceOut, rdVector3 *pPushVelOut)
+int sithIntersect_MeshIntersection(rdVector3 *pStartPos, rdVector3 *pRayDirection, float moveDistance, float radius, rdMesh *pMesh, float *pSphereHitDist, rdFace **faceOut, rdVector3 *pPushVelOut)
 {
     int v11; // ecx
     rdFace *v12; // edx
@@ -400,7 +400,7 @@ LABEL_11:
 
 // ChatGPT says:
 // int checkIntersectionWithFace(rdVector3 *intersectionPoint, float radius, rdFace *pFace, rdVector3 *vertices, int *intersectionType)
-int sithIntersect_sub_508750(rdVector3 *a1, float radius, rdFace *pFace, rdVector3 *a4, int *a5)
+int sithIntersect_FaceIntersection(rdVector3 *a1, float radius, rdFace *pFace, rdVector3 *a4, int *a5)
 {
     double v10; // st7
     int v12; // edx
@@ -679,7 +679,7 @@ int sithIntersect_sub_508D20(const rdVector3 *pStartPos, const rdVector3 *pRayDi
             if ( pPushVelOut )
             {
                 int tmp;
-                if ( sithIntersect_sub_508750(&v45, radius, pFace, aVertices, &tmp) )
+                if (sithIntersect_FaceIntersection(&v45, radius, pFace, aVertices, &tmp) )
                 {
                     if ( tmp )
                         v28 = sithIntersect_sub_508990(&v45, radius, pFace, aVertices, tmp, &projected);
@@ -706,7 +706,7 @@ int sithIntersect_sub_508D20(const rdVector3 *pStartPos, const rdVector3 *pRayDi
             {
                 v35 = radius;
                 int tmp;
-                if ( sithIntersect_sub_508750(&v45, radius, pFace, aVertices, &tmp) )
+                if (sithIntersect_FaceIntersection(&v45, radius, pFace, aVertices, &tmp) )
                 {
                     if ( tmp )
                         result = sithIntersect_sub_508990(&v45, v35, pFace, aVertices, tmp, 0);
@@ -751,7 +751,7 @@ int sithIntersect_sub_5090B0(const rdVector3 *pStartPos, const rdVector3 *pRayDi
             rdVector_MultAcc3(&v15, pRayDirection, *pSphereHitDist);
             
             int tmp = 0;
-            result = sithIntersect_sub_508750(&v15, radius, &v8->face, a6, &tmp);
+            result = sithIntersect_FaceIntersection(&v15, radius, &v8->face, a6, &tmp);
             if ( result )
             {
                 if ( !tmp)
