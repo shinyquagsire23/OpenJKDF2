@@ -40,9 +40,9 @@ macro(postcompile_macos)
         COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/zlib/*/*/libz.1.dylib ${BUNDLE}/Contents/MacOS
         COMMAND install_name_tool -change libz.1.dylib @executable_path/libz.1.dylib ${BUNDLE}/Contents/MacOS/${BIN_NAME}
 
-        COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/openssl@1.1/lib/libcrypto.1.1.dylib @executable_path/libcrypto.1.1.dylib ${BUNDLE}/Contents/MacOS/libGameNetworkingSockets.dylib
-        COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/openssl@1.1/lib/libcrypto.1.1.dylib @executable_path/libcrypto.1.1.dylib ${BUNDLE}/Contents/MacOS/${BIN_NAME}
-        COMMAND cp ${HOMEBREW_PREFIX}/opt/openssl@1.1/lib/libcrypto.1.1.dylib ${BUNDLE}/Contents/MacOS
+        COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/openssl@3/lib/libcrypto.3.dylib @executable_path/libcrypto.3.dylib ${BUNDLE}/Contents/MacOS/libGameNetworkingSockets.dylib
+        COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/openssl@3/lib/libcrypto.3.dylib @executable_path/libcrypto.3.dylib ${BUNDLE}/Contents/MacOS/${BIN_NAME}
+        COMMAND cp ${HOMEBREW_PREFIX}/opt/openssl@3/lib/libcrypto.3.dylib ${BUNDLE}/Contents/MacOS
 
         COMMAND chmod 774 ${BUNDLE}/Contents/MacOS/*.dylib
         COMMAND cp -r ${CMAKE_CURRENT_BINARY_DIR}/openjkdf2-64.dsym ${BUNDLE}/Contents/MacOS/openjkdf2-64.dsym
