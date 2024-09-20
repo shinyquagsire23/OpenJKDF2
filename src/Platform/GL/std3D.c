@@ -294,6 +294,15 @@ void std3D_deleteIntermediateFbo(std3DIntermediateFbo* pFbo)
     glDeleteRenderbuffers(1, &pFbo->rbo);
 }
 
+// color/forward render: 16bpp/32bpp (32bpp when jkgm is on)
+// emissive: 32bpp (2 bits free in alpha)
+// position: 64bpp (not much we can do about this until we move projection to the GPU)
+// normal/depth: 64bpp (JK normals can easily be 8:8 octahedron, can crunch this down to 2 16 bit textures)
+// light: 16bpp (rgb565 minimal precision needed)
+// diffuse: 16bpp (rgb565 minimal precision needed)
+//
+// total: 208bpp/224bpp
+
 void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* pFb)
 {
     // Generate the framebuffer
