@@ -1056,13 +1056,16 @@ int std3D_StartScene()
 
     // Technically this should be from Clear2
     glClearColor(0.0, 0.0, 0.0, 1.0);
+
+	GLuint clearBits = GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT;
+	if(jkGuiBuildMulti_bRendering)
+		clearBits |= GL_COLOR_BUFFER_BIT;
+
 #ifdef STENCIL_BUFFER
 	glClearStencil(0);
 	glStencilMask(0xFF);
-	glClear(/*GL_COLOR_BUFFER_BIT |*/ GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-#else
-    glClear(/*GL_COLOR_BUFFER_BIT | */ GL_DEPTH_BUFFER_BIT);
 #endif
+	glClear(clearBits);
 
     if (jkGuiBuildMulti_bRendering && rdColormap_pCurMap && loaded_colormap != rdColormap_pCurMap)
     {
