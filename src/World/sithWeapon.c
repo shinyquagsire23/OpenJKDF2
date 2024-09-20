@@ -654,7 +654,6 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
         physicsThing->collideSize = 0.0;
         physicsThing->lifeLeftMs = 550;
         sithSoundClass_ThingPlaySoundclass4(physicsThing, SITH_SC_ACTIVATE);
-        printf("Proximity activate: %x\n", physicsThing->thingIdx);
         return 0;
     }
 
@@ -737,14 +736,12 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
             // Proximity mines did the Beep Beep Beep, time to explode
             if (collidedThing->weaponParams.typeflags & SITH_WF_EXPLODE_AT_TIMER_TIMEOUT)
             {
-                printf("Exploding: %x\n", physicsThing->thingIdx);
                 sithWeapon_RemoveAndExplode(physicsThing, physicsThing->weaponParams.explodeTemplate);
                 return 1;
             }
 
             // Gun splat spawning
             sithWeapon_RemoveAndExplode(physicsThing, physicsThing->weaponParams.fleshHitTemplate);
-            printf("Splat: %x\n", physicsThing->thingIdx);
             return 1;
         }
         if (!(physicsThing->weaponParams.typeflags & SITH_WF_ATTACH_TO_THING))
