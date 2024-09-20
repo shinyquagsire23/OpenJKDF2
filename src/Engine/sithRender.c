@@ -53,6 +53,12 @@ static rdMatrix34 ambientDebugThing_mat;
 #endif
 #endif
 
+#ifdef STENCIL_BUFFER
+#define SITHRENDER_STENCIL_WORLD_OPAQUE 0
+#define SITHRENDER_STENCIL_THINGS       1
+#define SITHRENDER_STENCIL_WORLD_ALPHA  2
+#endif
+
 sithRender_weapRendFunc_t sithRender_weaponRenderOpaqueHandle;
 sithRender_weapRendFunc_t sithRender_weaponRenderAlphaHandle;
 
@@ -503,6 +509,7 @@ void sithRender_Draw()
 
 #ifdef STENCIL_BUFFER
 	rdSetStencilBufferMethod(RD_STENCIL_NOREAD_NOWRITE);
+	rdSetStencilRef(SITHRENDER_STENCIL_WORLD_OPAQUE);
 #endif
 
 #ifdef FOG
@@ -629,6 +636,7 @@ void sithRender_Draw()
 #ifdef STENCIL_BUFFER
 	// from here on out it's transparents and dynamic objects
 	rdSetStencilBufferMethod(RD_STENCIL_NOREAD_WRITE);
+	rdSetStencilRef(SITHRENDER_STENCIL_THINGS);
 #endif
 
     if ( sithRender_numSectors2 )
@@ -638,6 +646,10 @@ void sithRender_Draw()
 	rdCache_FlushDecals();
 #endif
 
+#ifdef STENCIL_BUFFER
+	rdSetStencilRef(SITHRENDER_STENCIL_WORLD_ALPHA);
+#endif
+
     if ( sithRender_numSurfaces )
         sithRender_RenderAlphaSurfaces();
 
@@ -645,7 +657,7 @@ void sithRender_Draw()
 	// draw list of alpha things
 	// it would be better to replace alpha surface drawing with a reverse-sector
 	// traversal, only drawing transparent surfaces, then things, then moving onto the next
-	// sector in the list (similar to SITH_TF_LEVEL_GEO things).
+	// sector in the list (similar to SITH_TF_LEVELGEO things).
 	// that would preserve draw order better at the expense of some traversal cost
 	if (sithRender_alphaDrawThing)
 	{
@@ -679,6 +691,7 @@ void sithRender_Draw()
 
 #ifdef STENCIL_BUFFER
 	rdSetStencilBufferMethod(RD_STENCIL_NOREAD_NOWRITE);
+	rdSetStencilRef(0);
 #endif
 
 #ifdef PARTICLE_LIGHTS

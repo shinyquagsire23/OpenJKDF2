@@ -2883,9 +2883,9 @@ void std3D_DrawRenderList()
 		glEnable(GL_STENCIL_TEST);
 
 	if (readStencil)
-		glStencilFunc(GL_EQUAL, 1, 0xFF);
+		glStencilFunc(GL_EQUAL, rdGetStencilRef(), rdGetStencilMask());
 	else
-		glStencilFunc(GL_ALWAYS, 1, 0xFF);
+		glStencilFunc(GL_ALWAYS, rdGetStencilRef(), rdGetStencilMask());
 	
 	glStencilOp(writeStencil ? GL_KEEP : GL_REPLACE, GL_KEEP, writeStencil ? GL_REPLACE : GL_KEEP);
 #endif
@@ -3959,7 +3959,7 @@ void std3D_DrawDecal(rdDDrawSurface* texture, rdVector3* verts, rdMatrix34* deca
 	glEnable(GL_CULL_FACE);
 #ifdef STENCIL_BUFFER
 	glEnable(GL_STENCIL_TEST);
-	glStencilFunc(GL_EQUAL, 0, 0xFF);
+	glStencilFunc(GL_EQUAL, rdGetStencilRef(), rdGetStencilMask());
 	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 #endif
 

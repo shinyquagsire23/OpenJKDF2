@@ -58,6 +58,8 @@ void rdSetProcFaceUserData(int a1);
 void rdSetVertexColorMode(int a1);
 #ifdef STENCIL_BUFFER
 void rdSetStencilBufferMethod(int val);
+void rdSetStencilRef(int val);
+void rdSetStencilMask(int val);
 #endif
 
 #ifdef FOG
@@ -76,6 +78,8 @@ int rdGetProcFaceUserData(void);
 int rdGetVertexColorMode(void);
 #ifdef STENCIL_BUFFER
 int rdGetStencilBufferMethod();
+int rdGetStencilRef();
+int rdGetStencilMask();
 #endif
 
 int rdSetMipDistances(rdVector4 *dists);

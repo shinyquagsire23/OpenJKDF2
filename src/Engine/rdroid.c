@@ -18,6 +18,8 @@ float rdroid_curFogEndDepth;
 
 #ifdef STENCIL_BUFFER
 int rdroid_curStencilMethod = 0;
+int rdroid_curStencilRef = 0;
+int rdroid_curStencilMask = 0xFF;
 #endif
 
 int rdStartup(HostServices *p_hs)
@@ -142,6 +144,16 @@ void rdSetStencilBufferMethod(int val)
 {
 	rdroid_curStencilMethod = val;
 }
+
+void rdSetStencilRef(int val)
+{
+	rdroid_curStencilRef = val;
+}
+
+void rdSetStencilMask(int val)
+{
+	rdroid_curStencilMask = val;
+}
 #endif
 
 #ifdef FOG
@@ -213,6 +225,16 @@ int rdGetVertexColorMode(void)
 int rdGetStencilBufferMethod()
 {
 	return rdroid_curStencilMethod;
+}
+
+int rdGetStencilRef()
+{
+	return rdroid_curStencilRef;
+}
+
+int rdGetStencilMask()
+{
+	return rdroid_curStencilMask;
 }
 #endif
 
