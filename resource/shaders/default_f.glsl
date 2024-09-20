@@ -188,7 +188,7 @@ vec4 bilinear_paletted()
     vec2 originPixCoord = floor(pixCoord);              // Pixel index coordinates of bottom left pixel of set of 4 we will be blending
 
     // For Gather we want UV coordinates of bottom right corner of top left pixel
-    vec2 gUV = (originPixCoord + 1.0f) / colorTextureSize;
+    vec2 gUV = (originPixCoord + 1.0) / colorTextureSize;
 
     vec4 gIndex   = impl_textureGather(tex, gUV);
 
@@ -243,7 +243,7 @@ vec4 bilinear_paletted_light(float index)
     vec2 originPixCoord = floor(pixCoord);              // Pixel index coordinates of bottom left pixel of set of 4 we will be blending
 
     // For Gather we want UV coordinates of bottom right corner of top left pixel
-    vec2 gUV = (originPixCoord + 1.0f) / colorTextureSize;
+    vec2 gUV = (originPixCoord + 1.0) / colorTextureSize;
 
     vec4 gIndex   = impl_textureGather(tex, gUV);
 
@@ -373,9 +373,11 @@ void main(void)
 
 	#ifdef CLASSIC_EMISSIVE	
 		emissive = lightPalval;
-	#endif
+        color_add = lightPalval;
+	#else
         // Add more of the emissive color depending on the darkness of the fragment
         color_add = (lightPalval  * light_mult); // * (1.0 - light)
+	#endif
         sampled_color = palval;
     }
 #ifdef CAN_BILINEAR_FILTER
@@ -527,11 +529,12 @@ void main(void)
     {
         // The emissive maps also include slight amounts of darkly-rendered geometry,
         // so we want to ramp the amount that gets added based on luminance/brightness.
-        
+#ifndef CLASSIC_EMISSIVE        
 
         color_add.r *= luma;
         color_add.g *= luma;
         color_add.b *= luma;
+#endif
     }
 
     vec3 tint = normalize(colorEffects_tint + 1.0) * sqrt(3.0);

@@ -2461,7 +2461,15 @@ void std3D_DrawSceneFbo()
 
     if (draw_bloom)
     {
+		float bloom_intensity = 1.0;
+
 	#ifdef NEW_BLOOM
+		#ifdef CLASSIC_EMISSIVE
+			bloom_intensity = 2.0f;
+		#else
+			bloom_intensity = 7.0f;
+		#endif
+
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		// downscale
 		float uvScale = 1.0f;// 0.25f; // source tex is 4x bigger
@@ -2490,7 +2498,7 @@ void std3D_DrawSceneFbo()
 
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
-		std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur1.tex, 0, 0, 1.0f, 7.0f, jkPlayer_gamma, 0);
+		std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur1.tex, 0, 0, 1.0f, bloom_intensity, jkPlayer_gamma, 0);
 
 	#else
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -2500,7 +2508,6 @@ void std3D_DrawSceneFbo()
         std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->blur3, std3D_pFb->blur2.tex, 0, 0, 16.0, 3.0, 2.0 * rad_scale, 1);
         std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->blur4, std3D_pFb->blur3.tex, 0, 0, 16.0, 3.0, 2.0 * rad_scale, 1);
 
-        float bloom_intensity = 1.0;
         float bloom_gamma = 1.0;
         glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
         /*std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->blurBlend, std3D_pFb->tex1, 0, 0, 1.0, bloom_intensity * 1.0, bloom_gamma, 0);

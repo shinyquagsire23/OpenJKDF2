@@ -54,7 +54,7 @@ void main(void)
 
 #ifdef GPU_LIGHTING
 	vec3 viewDir = normalize(-coordVS.xyz);
-	float scalar = 0.4f; // todo: needs to come from rdCamera_pCurCamera->attenuationMin
+	float scalar = 0.4; // todo: needs to come from rdCamera_pCurCamera->attenuationMin
 	int totalLights = min(numLights, 128);
 	vec3 specLight = vec3(0.0);
 	for(int lid = 0; lid < totalLights; ++lid)

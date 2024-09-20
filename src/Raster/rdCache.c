@@ -761,7 +761,11 @@ int rdCache_SendFaceListToHardware()
                         else
                             light_level = active_6c->light_level_static;
 #ifdef SDL2_RENDER
+#ifdef CLASSIC_EMISSIVE
+						rdCache_aHWVertices[rdCache_totalVerts].lightLevel = 0.0f;
+#else
                         rdCache_aHWVertices[rdCache_totalVerts].lightLevel = light_level / 255.0;
+#endif
 #endif
                         
 
@@ -788,10 +792,14 @@ int rdCache_SendFaceListToHardware()
 
                         // Added for SDL2
 #ifdef SDL2_RENDER
+#ifdef CLASSIC_EMISSIVE
+						rdCache_aHWVertices[rdCache_totalVerts].lightLevel = 0.0f;
+#else
                         double luma = (0.2126 * intRed) + (0.7152 * intGreen) + (0.0722 * intBlue);
                         light_level = luma;
 
                         rdCache_aHWVertices[rdCache_totalVerts].lightLevel = luma / 255.0;
+#endif
 #endif
 
                         vertex_b = (int)intBlue;
@@ -1119,7 +1127,11 @@ LABEL_232:
                     else
                         v92 = active_6c->light_level_static;
 #ifdef SDL2_RENDER
+#ifdef CLASSIC_EMISSIVE
+					rdCache_aHWVertices[rdCache_totalVerts].lightLevel = 0.0f;
+#else
                     rdCache_aHWVertices[rdCache_totalVerts].lightLevel = v92 / 255.0;
+#endif
 #endif
                     v93 = *((uint8_t *)v91->lightlevel + 256 * ((__int64)v92 & 0x3F) + v137->header.field_4);
                     v94 = (uint8_t)v91->colors[v93].g;
