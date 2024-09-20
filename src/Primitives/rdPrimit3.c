@@ -755,7 +755,7 @@ LABEL_19:
             if ( lightMode > RD_LIGHTMODE_DIFFUSE)
             {
 #ifdef SPECULAR_LIGHTING
-				if (lightMode != RD_LIGHTMODE_SPECULAR)
+				if (lightMode != RD_LIGHTMODE_SPECULAR && lightMode != RD_LIGHTMODE_GOURAUD)
 					return;
 #else
                 if ( lightMode != RD_LIGHTMODE_GOURAUD)

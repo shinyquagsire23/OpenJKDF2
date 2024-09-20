@@ -1412,7 +1412,7 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
     else if (rdModel3_lightingMode == RD_LIGHTMODE_DIFFUSE)
     {
         rdModel3_numMeshLights = 0;
-#ifdef GPU_LIGHTING
+#ifndef GPU_LIGHTING
         pGeoLight = apGeoLights;
         for (int i = 0; i < rdModel3_numGeoLights; i++)
         {
@@ -1442,7 +1442,7 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
     else if (USES_VERTEX_LIGHTING(rdModel3_lightingMode))
     {
         rdModel3_numMeshLights = 0;
-#ifdef GPU_LIGHTING
+#ifndef GPU_LIGHTING
         if (rdModel3_numGeoLights > 0)
         {
             pGeoLight = apGeoLights;
