@@ -317,9 +317,10 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     glBindFramebuffer(GL_FRAMEBUFFER, pFb->fbo);
     
     // Set up our framebuffer texture
+	// we never really use the alpha channel, so for 32bit we use deep color, and for 16bit we use 565
     glGenTextures(1, &pFb->tex0);
     glBindTexture(GL_TEXTURE_2D, pFb->tex0);
-    glTexImage2D(GL_TEXTURE_2D, 0, jkPlayer_bEnableJkgm ? GL_RGBA8 : GL_RGB565, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, jkPlayer_enable32Bit ? GL_RGB10_A2 : GL_RGB565, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
