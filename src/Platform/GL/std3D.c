@@ -412,6 +412,8 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
 
         pFb->enable_extra |= 2;
     }
+	else
+		pFb->enable_extra &= ~2;
 
     if (jkPlayer_enableBloom)
     {
@@ -442,6 +444,8 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
         pFb->blur4.iw = width;
         pFb->blur4.ih = height;*/
     }
+	else
+		pFb->enable_extra &= ~1;
 
     pFb->main.fbo = pFb->fbo;
     pFb->main.tex = pFb->tex1;
