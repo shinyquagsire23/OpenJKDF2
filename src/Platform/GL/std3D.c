@@ -124,7 +124,7 @@ GLint attribute_coordVS;
 #endif
 GLint uniform_mvp, uniform_tex, uniform_texEmiss, uniform_displacement_map, uniform_tex_mode, uniform_blend_mode, uniform_worldPalette, uniform_worldPaletteLights;
 GLint uniform_tint, uniform_filter, uniform_fade, uniform_add, uniform_emissiveFactor, uniform_albedoFactor;
-GLint uniform_light_mult, uniform_displacement_factor, uniform_iResolution;
+GLint uniform_light_mult, uniform_displacement_factor, uniform_iResolution, uniform_enableDither;
 #ifdef FOG
 GLint uniform_fog, uniform_fog_color, uniform_fog_start, uniform_fog_end;
 #endif
@@ -658,6 +658,7 @@ int init_resources()
     uniform_light_mult = std3D_tryFindUniform(programDefault, "light_mult");
     uniform_displacement_factor = std3D_tryFindUniform(programDefault, "displacement_factor");
     uniform_iResolution = std3D_tryFindUniform(programDefault, "iResolution");
+	uniform_enableDither = std3D_tryFindUniform(programDefault, "enableDither");
 #ifdef FOG
 	uniform_fog = std3D_tryFindUniform(programDefault, "fogEnabled");
 	uniform_fog_color = std3D_tryFindUniform(programDefault, "fogColor");
@@ -2739,6 +2740,8 @@ void std3D_DrawRenderList()
     }
 
     glUniform2f(uniform_iResolution, width, height);
+
+	glUniform1i(uniform_enableDither, !jkPlayer_enable32Bit);
 
     //rdroid_curColorEffects.tint.x = 0.0;
     //rdroid_curColorEffects.tint.y = 0.5;

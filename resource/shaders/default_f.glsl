@@ -68,6 +68,7 @@ uniform vec4 albedoFactor;
 uniform float displacement_factor;
 uniform float light_mult;
 uniform vec2 iResolution;
+uniform int enableDither;
 
 #ifdef FOG
 uniform int fogEnabled;
@@ -504,17 +505,20 @@ void main(void)
     fragColor = main_color + effectAdd_color;// + color_add;
 
 	// dither the output in case we're using some lower precision output
-	const float DITHER_LUT[16] = {
-		0, 4, 1, 5,
-		6, 2, 7, 3,
-		1, 5, 0, 4,
-		7, 3, 6, 2
-	};
+	if(enableDither > 0)
+	{
+		const float DITHER_LUT[16] = {
+			0, 4, 1, 5,
+			6, 2, 7, 3,
+			1, 5, 0, 4,
+			7, 3, 6, 2
+		};
 
-	int wrap_x = int(mod(gl_FragCoord.x, 3.0));
-	int wrap_y = int(mod(gl_FragCoord.y, 3.0));
-	int wrap_index = wrap_x + wrap_y * 4;
-	fragColor.rgb = min(fragColor.rgb + DITHER_LUT[wrap_index] / 255.0, 1.0);
+		int wrap_x = int(mod(gl_FragCoord.x, 3.0));
+		int wrap_y = int(mod(gl_FragCoord.y, 3.0));
+		int wrap_index = wrap_x + wrap_y * 4;
+		fragColor.rgb = min(fragColor.rgb + DITHER_LUT[wrap_index] / 255.0, 1.0);
+	}
 
     color_add.a = orig_alpha;
 
