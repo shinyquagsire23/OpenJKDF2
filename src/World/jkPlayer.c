@@ -72,7 +72,6 @@ int jkPlayer_enableDecals = 1;
 
 #ifdef RAGDOLLS
 int jkPlayer_ragdolls = 1;
-
 int jkPlayer_debugRagdolls = 0;
 #endif
 #endif
@@ -285,6 +284,7 @@ void jkPlayer_ResetVars()
 #endif
 
 #ifdef RAGDOLLS
+	jkPlayer_ragdolls = 1;
 	jkPlayer_debugRagdolls = 0;
 #endif
 #endif
