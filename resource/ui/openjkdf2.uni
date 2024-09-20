@@ -80,4 +80,7 @@ MSGS 100          # <--- DON'T FORGET TO UPDATE THIS COUNT
    "GUIEXT_50HZ_MIDAIR_PHYS"                    0 "Restore 50Hz midair player physics"
    "GUIEXT_50HZ_MIDAIR_PHYS_HINT"               0 "Player physics and POV will be stepped at 50Hz while midair."
 
+   "GUIEXT_RAGDOLL_PHYS"                        0 "Enable Ragdoll Physics"
+   "GUIEXT_RAGDOLL_PHYS_HINT"                   0 "Enables ragdoll physics simulation when available."
+
 END

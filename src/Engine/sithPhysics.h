@@ -32,7 +32,6 @@ void sithPhysics_ThingPhysUnderwater(sithThing *pThing, float deltaSeconds);
 void sithPhysics_ThingPhysAttached(sithThing *pThing, float deltaSeconds);
 
 #ifdef RAGDOLLS
-extern int sithPhysics_ragdolls;
 void sithPhysics_ThingPhysRagdoll(sithThing* pThing, float deltaSeconds);
 void sithPhysics_ThingRagdollApplyForce(sithThing* pThing, rdVector3* forceVec, rdVector3* sourcePos, float range);
 #endif

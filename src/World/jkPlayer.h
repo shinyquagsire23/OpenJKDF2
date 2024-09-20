@@ -185,6 +185,7 @@ extern int jkPlayer_aimLock;
 extern int jkPlayer_enableDecals;
 #endif
 #ifdef RAGDOLLS
+extern int jkPlayer_ragdolls;
 extern int jkPlayer_debugRagdolls;
 #endif
 

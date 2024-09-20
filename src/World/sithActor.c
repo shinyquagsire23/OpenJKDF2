@@ -300,7 +300,7 @@ void sithActor_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4)
                 else
                 {
 				#ifdef RAGDOLLS
-					int removeAsap = (sithPhysics_ragdolls == 2); // immediately remove and ragdoll
+					int removeAsap = (jkPlayer_ragdolls == 2); // immediately remove and ragdoll
 					
 					// if the actor is moving quickly, immediately ragdoll
 					float vellen = rdVector_Len3(&thing->physicsParams.vel);

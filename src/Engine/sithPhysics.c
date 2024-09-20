@@ -1136,8 +1136,6 @@ void sithPhysics_ThingPhysAttached(sithThing *pThing, float deltaSeconds)
 #ifdef RAGDOLLS
 #include "Primitives/rdRagdoll.h"
 
-int sithPhysics_ragdolls = 1;
-
 float sithPhysics_ragdollBounce = 1.0f;
 float sithPhysics_ragdollDrag = 0.5f;
 float sithPhysics_ragdollRotFriction = 0.85f;
@@ -1400,7 +1398,7 @@ void sithPhysics_CollideRagdoll(sithThing* pThing, rdRagdoll* pRagdoll, float de
 void sithPhysics_ThingPhysRagdoll(sithThing* pThing, float deltaSeconds)
 {
 	rdRagdoll* pRagdoll = pThing->rdthing.pRagdoll;
-	if (!pRagdoll || !sithPhysics_ragdolls)
+	if (!pRagdoll || !jkPlayer_ragdolls)
 	{
 		if(pRagdoll)
 		{
