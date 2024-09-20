@@ -38,6 +38,7 @@ MSGS 100          # <--- DON'T FORGET TO UPDATE THIS COUNT
    "GUIEXT_GAMMA_VAL"                     0 "Gamma Value:"
    "GUIEXT_HUD_SCALE"                     0 "HUD Scale:"
    "GUIEXT_EN_DECALS"                     0 "Decals"
+   "GUIEXT_EN_COLORDEPTH"                 0 "Color Depth"
 
    "GUIEXT_EN_JKGFXMOD"                   0 "Enable jkgfxmod"
    "GUIEXT_EN_JKGFXMOD_HINT"              0 "Overrides in-game textures with textures from jkgm folder."

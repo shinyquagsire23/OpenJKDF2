@@ -325,7 +325,7 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-	if(jkPlayer_bEnableJkgm)
+	if(jkPlayer_enable32Bit)
 		pFb->enable_extra |= 4;
 	else
 		pFb->enable_extra &= ~4;
@@ -1038,7 +1038,7 @@ int std3D_StartScene()
     if (tex_w != std3D_pFb->w || tex_h != std3D_pFb->h 
         || (!(std3D_pFb->enable_extra & 1) && jkPlayer_enableBloom)
         || (!(std3D_pFb->enable_extra & 2) && jkPlayer_enableSSAO)
-		|| (!(std3D_pFb->enable_extra & 4) && jkPlayer_bEnableJkgm))
+		|| (!(std3D_pFb->enable_extra & 4) && jkPlayer_enable32Bit))
     {
         std3D_deleteFramebuffer(std3D_pFb);
         std3D_generateFramebuffer(tex_w, tex_h, std3D_pFb);

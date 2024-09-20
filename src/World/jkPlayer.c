@@ -49,6 +49,7 @@ int jkPlayer_enableBloom = 0;
 int jkPlayer_enableSSAO = 0;
 int jkPlayer_fpslimit = 0;
 int jkPlayer_enableVsync = 0;
+int jkPlayer_enable32Bit = 0;
 float jkPlayer_ssaaMultiple = 1.0;
 float jkPlayer_gamma = 1.0;
 int jkPlayer_bEnableJkgm = 1;

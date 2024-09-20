@@ -155,6 +155,7 @@ extern int jkPlayer_enableOrigAspect;
 extern int jkPlayer_enableBloom;
 extern int jkPlayer_fpslimit;
 extern int jkPlayer_enableVsync;
+extern int jkPlayer_enable32Bit;
 extern float jkPlayer_ssaaMultiple;
 extern int jkPlayer_enableSSAO;
 extern float jkPlayer_gamma;
