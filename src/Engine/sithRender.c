@@ -643,6 +643,10 @@ void sithRender_Draw()
 
 #ifdef QOL_IMPROVEMENTS
 	// draw list of alpha things
+	// it would be better to replace alpha surface drawing with a reverse-sector
+	// traversal, only drawing transparent surfaces, then things, then moving onto the next
+	// sector in the list (similar to SITH_TF_LEVEL_GEO things).
+	// that would preserve draw order better at the expense of some traversal cost
 	if (sithRender_alphaDrawThing)
 	{
 		rdSetZBufferMethod(RD_ZBUFFER_READ_NOWRITE);
