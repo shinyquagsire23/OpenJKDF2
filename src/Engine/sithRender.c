@@ -650,6 +650,7 @@ void sithRender_Draw()
 
 #ifdef STENCIL_BUFFER
 	rdSetStencilRef(SITHRENDER_STENCIL_WORLD_ALPHA);
+	rdSetStencilBufferMethod(RD_STENCIL_NOREAD_WRITE);
 #endif
 
     if ( sithRender_numSurfaces )
