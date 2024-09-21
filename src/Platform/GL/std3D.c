@@ -100,6 +100,10 @@ typedef struct std3DFramebuffer
     std3DIntermediateFbo ssaoBlur2;
     //std3DIntermediateFbo ssaoBlur3;
 
+#if defined(DECAL_RENDERING)
+	std3DIntermediateFbo decalLight;
+#endif
+
     GLuint rbo;
     int32_t w;
     int32_t h;
@@ -416,6 +420,10 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
         stdPlatform_Printf("std3D: ERROR, Framebuffer is incomplete!\n");
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+#ifdef DECAL_RENDERING
+	std3D_generateIntermediateFbo(width, height, &pFb->decalLight, 0);
+#endif
+
     if (jkPlayer_enableSSAO)
     {
 #ifdef NEW_SSAO
@@ -507,6 +515,10 @@ void std3D_deleteFramebuffer(std3DFramebuffer* pFb)
     std3D_deleteIntermediateFbo(&pFb->ssaoBlur1);
     std3D_deleteIntermediateFbo(&pFb->ssaoBlur2);
     //std3D_deleteIntermediateFbo(&pFb->ssaoBlur3);
+
+#ifdef DECAL_RENDERING
+	std3D_deleteIntermediateFbo(&pFb->decalLight);
+#endif
 }
 
 void std3D_swapFramebuffers()
@@ -3973,6 +3985,10 @@ void std3D_DrawDecal(rdDDrawSurface* texture, rdVector3* verts, rdMatrix34* deca
 {
 	if (Main_bHeadless) return;
 
+	// we need a copy of the main buffer for lighting, so copy one
+	// todo: only do this if contents of the backbuffer were changed with a call to std3D_DrawRenderList
+	std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->decalLight, std3D_pFb->tex0, 0, 0, 1.0, 1.0, 1.0, 0);
+
 	// todo: track this so we don't redo it every decal draw
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
@@ -4175,7 +4191,7 @@ void std3D_DrawDecal(rdDDrawSurface* texture, rdVector3* verts, rdMatrix34* deca
 	glActiveTexture(GL_TEXTURE0 + 0);
 	glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex2);
 	glActiveTexture(GL_TEXTURE0 + 1);
-	glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex4);
+	glBindTexture(GL_TEXTURE_2D, std3D_pFb->decalLight.tex);
 	glActiveTexture(GL_TEXTURE0 + 2);
 	glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex3);
 	glActiveTexture(GL_TEXTURE0 + 3);

@@ -1,7 +1,7 @@
 uniform sampler2D texPos;
 uniform sampler2D texLight;
 uniform sampler2D texNormal;
-uniform sampler2D texColor;
+uniform sampler2D texDiffuse;
 uniform sampler2D texPalette;
 uniform sampler2D tex;
 
@@ -256,7 +256,7 @@ void main(void)
 	if(!isAdditive)
 	{
 		vec3 light = texture(texLight, uv).xyz; // contains color * light
-		vec3 color = texture(texColor, uv).xyz; // contains only color
+		vec3 color = texture(texDiffuse, uv).xyz; // contains only color
 
 		// remove the color component, leaving only lighting
 		light /= max(vec3(0.001), color.xyz);

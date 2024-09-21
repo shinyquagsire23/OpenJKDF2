@@ -58,6 +58,10 @@ void rdCache_AdvanceFrame()
     if ( rdroid_curAcceleration > 0 )
 #endif
         std3D_StartScene();
+
+#ifdef DECAL_RENDERING
+	rdCache_numDecals = 0;
+#endif
 }
 
 void rdCache_FinishFrame()
@@ -79,7 +83,7 @@ void rdCache_Reset()
     rdCache_lrcExtent.x = 0;
     rdCache_lrcExtent.y = 0;
 #ifdef DECAL_RENDERING
-	rdCache_numDecals = 0;
+	//rdCache_numDecals = 0;
 #endif
 }
 
@@ -185,7 +189,7 @@ void rdCache_Flush()
     {
         rdCache_SendFaceListToHardware();
 	#ifdef DECAL_RENDERING
-		rdCache_FlushDecals();
+		//rdCache_FlushDecals();
 	#endif
     }
     rdCache_drawnFaces += rdCache_numProcFaces;
@@ -1485,14 +1489,15 @@ void rdCache_DrawDecal(rdDecal* decal, rdMatrix34* matrix, rdVector3* color, rdV
 {
 	if (rdCache_numDecals >= 256)
 	{
-		rdCache_FlushDecals();
-		rdCache_numDecals = 0;
+		return;
+		//rdCache_FlushDecals();
+		//rdCache_numDecals = 0;
 	}
 
 	if (!rdMaterial_AddToTextureCache(decal->material, &decal->material->textures[0], 0, 0, 0))
 	{
-		rdCache_FlushDecals();
-		if (!rdMaterial_AddToTextureCache(decal->material, &decal->material->textures[0], 0, 0, 0))
+		//rdCache_FlushDecals();
+		//if (!rdMaterial_AddToTextureCache(decal->material, &decal->material->textures[0], 0, 0, 0))
 			return;
 	}
 

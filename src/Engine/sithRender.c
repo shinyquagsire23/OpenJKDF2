@@ -643,6 +643,8 @@ void sithRender_Draw()
         sithRender_RenderThings();
 
 #ifdef DECAL_RENDERING
+	rdSetStencilRef(SITHRENDER_STENCIL_WORLD_OPAQUE);
+	rdSetStencilBufferMethod(RD_STENCIL_READ_NOWRITE);
 	rdCache_FlushDecals();
 #endif
 
