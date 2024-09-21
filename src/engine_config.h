@@ -3,6 +3,41 @@
 
 #include "types_enums.h"
 
+// Experimental features
+#ifdef QOL_IMPROVEMENTS
+
+#define STENCIL_BUFFER       // mark the stencil buffer with dynamic/transparent stuff, so we can effectively cull things like decals
+#define CLASSIC_EMISSIVE     // compute emissives using the same approach as stock JK with max(color, emissive), rather than adding it on top as bloom
+#define NEW_SSAO             // disk-to-disk based SSAO with performance improvements
+#define NEW_BLOOM            // optimized downsample based bloom with better performance
+#define RGB_THING_LIGHTS     // RGB thing lighting with lightcolor template param
+#define RGB_AMBIENT          // RGB sector ambient with spherical harmonics for gouraud models
+//#define PARTICLE_LIGHTS      // very simple lights for particle elements, currently only supports flat normals so use for only small lights
+//#define GPU_LIGHTING         // move dynamic lighting calculations to GPU, disabled as it requires proper normals to pass through the clipping stage (needs refactor)
+#define HALF_LAMBERT         // use half lambert gouraud for dynamic lights
+#define SPECULAR_LIGHTING    // RD_LIGHTMODE_SPECULAR
+#define FP_LEGS              // Draws legs in first person
+#define DYNAMIC_POV          // POV enhancements, such as the weapon following the autoaim target, muzzle flashes, sway improvements
+#define DECAL_RENDERING      // .dcal support and decal rendering path (for blast marks etc)
+#define RAGDOLLS             // .af support and SITH_MT_RAGDOLL physics type for experimental verlet ragdolls
+#define ADDITIVE_BLEND       // additive/screen blending support with a new face flags
+#define POLYLINE_EXT         // .pln support and polyline template param, allows using polylines as rendering primitives for things (ex. blaster bolts)
+#define LIGHTSABER_TRAILS    // visual enhancement for lightsabers, draws extra tris to simulate lightsaber trails/motion blur
+#define LIGHTSABER_MARKS     // visual enhancement for lightsabers, draws impact decals with saber collision, requires DECAL_RENDERING
+//#define LIGHTSABER_GLOW    // visual enhancement for lightsabers, draws a sprite-based glow similar to Jedi Outcast/Academy
+#define STATIC_JKL_EXT       // load extra .jkl files from resources on startup along side static.jkl
+#define VERTEX_COLORS        // add vertex color face flag to indicate using the rdProcEntry's color field as the vertex color
+//#define FOG                  // infernal machine style fog rendering
+
+// helper to avoid redundantly checking this constantly
+#ifdef SPECULAR_LIGHTING
+#define USES_VERTEX_LIGHTING(LIGHT_MODE) (((LIGHT_MODE) == 3) || ((LIGHT_MODE) == 4))
+#else
+#define USES_VERTEX_LIGHTING(LIGHT_MODE) ((LIGHT_MODE) == 3)
+#endif
+
+#endif
+
 // If I ever do demo recording, add it here
 #define NEEDS_STEPPED_PHYS (!jkPlayer_bJankyPhysics || sithNet_isMulti)
 
@@ -193,41 +228,6 @@
 #define JOYSTICK_MAX_STRS (6)
 #else
 #define JOYSTICK_MAX_STRS (3)
-#endif
-
-// Experimental features
-#ifdef QOL_IMPROVEMENTS
-
-#define STENCIL_BUFFER       // mark the stencil buffer with dynamic/transparent stuff, so we can effectively cull things like decals
-#define CLASSIC_EMISSIVE     // compute emissives using the same approach as stock JK with max(color, emissive), rather than adding it on top as bloom
-#define NEW_SSAO             // disk-to-disk based SSAO with performance improvements
-#define NEW_BLOOM            // optimized downsample based bloom with better performance
-#define RGB_THING_LIGHTS     // RGB thing lighting with lightcolor template param
-#define RGB_AMBIENT          // RGB sector ambient with spherical harmonics for gouraud models
-//#define PARTICLE_LIGHTS      // very simple lights for particle elements, pretty expensive atm with the extra gbuffer at 4k
-//#define GPU_LIGHTING         // move dynamic lighting calculations to GPU, disabled as it requires proper normals to pass through the clipping stage (needs refactor)
-#define HALF_LAMBERT         // use half lambert gouraud for dynamic lights
-#define SPECULAR_LIGHTING    // RD_LIGHTMODE_SPECULAR
-#define FP_LEGS              // Draws legs in first person
-#define DYNAMIC_POV          // POV enhancements, such as the weapon following the autoaim target, muzzle flashes, sway improvements
-#define DECAL_RENDERING      // .dcal support and decal rendering path (for blast marks etc)
-#define RAGDOLLS             // .af support and SITH_MT_RAGDOLL physics type for experimental verlet ragdolls
-#define ADDITIVE_BLEND       // additive/screen blending support with a new face flags
-#define POLYLINE_EXT         // .pln support and polyline template param, allows using polylines as rendering primitives for things (ex. blaster bolts)
-#define LIGHTSABER_TRAILS    // visual enhancement for lightsabers, draws extra tris to simulate lightsaber trails/motion blur
-#define LIGHTSABER_MARKS     // visual enhancement for lightsabers, draws impact decals with saber collision, requires DECAL_RENDERING
-//#define LIGHTSABER_GLOW    // visual enhancement for lightsabers, draws a sprite-based glow similar to Jedi Outcast/Academy
-#define STATIC_JKL_EXT       // load extra .jkl files from resources on startup along side static.jkl
-#define VERTEX_COLORS        // add vertex color face flag to indicate using the rdProcEntry's color field as the vertex color
-//#define FOG                  // infernal machine style fog rendering
-
-// helper to avoid redundantly checking this constantly
-#ifdef SPECULAR_LIGHTING
-#define USES_VERTEX_LIGHTING(LIGHT_MODE) (((LIGHT_MODE) == 3) || ((LIGHT_MODE) == 4))
-#else
-#define USES_VERTEX_LIGHTING(LIGHT_MODE) ((LIGHT_MODE) == 3)
-#endif
-
 #endif
 
 //
