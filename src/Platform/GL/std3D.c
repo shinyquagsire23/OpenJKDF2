@@ -4192,7 +4192,7 @@ void std3D_DrawDecal(rdDDrawSurface* texture, rdVector3* verts, rdMatrix34* deca
 	glUniform3f(decal_uniform_add, (float)rdroid_curColorEffects.add.x / 255.0f, (float)rdroid_curColorEffects.add.y / 255.0f, (float)rdroid_curColorEffects.add.z / 255.0f);
 
 	// todo: don't rebind the same texture over and over
-	glActiveTexture(GL_TEXTURE0 + 4);
+	glActiveTexture(GL_TEXTURE0 + 5);
 	glBindTexture(GL_TEXTURE_2D, texture->texture_id);
 
 	rdVector4 mat[4];
