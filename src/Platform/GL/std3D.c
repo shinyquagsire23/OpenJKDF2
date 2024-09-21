@@ -2842,6 +2842,7 @@ void std3D_DrawRenderList()
 			glUniform1i(uniform_blend_mode, D3DBLEND_SRCALPHA);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 		}
+		glEnable(GL_BLEND);
 	}
 	else
 #endif
@@ -2855,10 +2856,12 @@ void std3D_DrawRenderList()
             glUniform1i(uniform_blend_mode, D3DBLEND_SRCALPHA);
             glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         }
-    }
+		glEnable(GL_BLEND);
+	}
     else {
         glUniform1i(uniform_blend_mode, D3DBLEND_ONE);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glDisable(GL_BLEND);
     }
 
     if (last_flags & 0x1000)
@@ -2942,6 +2945,7 @@ void std3D_DrawRenderList()
 						glUniform1i(uniform_blend_mode, D3DBLEND_SRCALPHA);
 						glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 					}
+					glEnable(GL_BLEND);
 				}
 				else
 			#endif
@@ -2956,11 +2960,13 @@ void std3D_DrawRenderList()
                         glUniform1i(uniform_blend_mode, D3DBLEND_SRCALPHA);
                         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
                     }
-                }
+					glEnable(GL_BLEND);
+				}
                 else {
                     glUniform1i(uniform_blend_mode, D3DBLEND_ONE);
                     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                }
+					glDisable(GL_BLEND);
+				}
             }
             
             if (changed_flags & 0x1800)
