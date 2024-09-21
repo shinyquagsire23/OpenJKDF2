@@ -372,7 +372,7 @@ void rdRagdoll_BuildParticles(rdThing* pThing, rdVector3* pInitialVel)
 		pParticle->thing.collide = SITH_COLLIDE_SPHERE;
 		pParticle->thing.moveSize = pParticle->radius;
 		pParticle->thing.collideSize = pParticle->radius;
-		pParticle->thing.moveType = SITH_MT_PHYSICS;
+		pParticle->thing.moveType = SITH_MT_NONE;
 		pParticle->thing.prev_thing = pThing->parentSithThing;
 		pParticle->thing.child_signature = pThing->parentSithThing->signature;
 
