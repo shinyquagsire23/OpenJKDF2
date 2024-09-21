@@ -285,7 +285,13 @@ float sithCollision_UpdateSectorThingCollision(sithSector *pSector, sithThing *s
                           && (v7->type != SITH_THING_WEAPON
                            || (v7->actorParams.typeflags & SITH_AF_CAN_ROTATE_HEAD) == 0
                            || ((v15 = v7->prev_thing) == 0 || (v16 = v8->prev_thing) == 0 || v15 != v16 || v7->child_signature != v8->child_signature)
-                           && (v15 != v8 || v7->child_signature != v8->signature)) )
+                           && (v15 != v8 || v7->child_signature != v8->signature)) 
+#ifdef RAGDOLLS
+							// don't collide ragdolls with parent object
+							&& (!v8->rdthing.pRagdoll || v8->prev_thing == 0 || v7->prev_thing == 0 || v8->prev_thing != v7->prev_thing || v8->child_signature != v7->child_signature)
+							&& (!v7->rdthing.pRagdoll || v7->prev_thing == 0 || v8->prev_thing == 0 || v7->prev_thing != v8->prev_thing || v7->child_signature != v8->child_signature)
+#endif
+						)
                         {
                             if ( (v8->attach_flags & (SITH_ATTACH_THINGSURFACE | SITH_ATTACH_THING)) == 0 || v8->attachedThing != v7 || (v8->attach_flags & SITH_ATTACH_NO_MOVE) == 0 && (flags & RAYCAST_40) == 0 )
                             {
