@@ -231,23 +231,23 @@ void rdThing_AccumulateMatrices(rdThing *thing, rdHierarchyNode *node, rdMatrix3
     rdVector3 negPivot;
     rdMatrix34 matrix;
 
-    rdMatrix_BuildTranslate34(&matrix, &node->pivot);
-    rdMatrix_PostMultiply34(&matrix, &thing->hierarchyNodeMatrices[node->idx]);
-    if ( node->parent )
-    {
-        negPivot.x = -node->parent->pivot.x;
-        negPivot.y = -node->parent->pivot.y;
-        negPivot.z = -node->parent->pivot.z;
-        rdMatrix_PostTranslate34(&matrix, &negPivot);
-    }
 #ifdef RAGDOLLS
-	// this might not be the best place for this, but for now we have a world transform from the ragdoll
 	extern int jkPlayer_ragdolls; // low key hate that this is here, find a better way
-	if (jkPlayer_ragdolls && thing->pRagdoll && node->skelJoint != -1)
-		rdMatrix_Copy34(&thing->hierarchyNodeMatrices[node->idx], &thing->pRagdoll->paJointMatrices[node->skelJoint]);
-	else
+	// the join matrix is already copied to hierarchyNodeMatrices in rdPuppet_BuildJointMatrices
+	if (!jkPlayer_ragdolls || !thing->pRagdoll || node->skelJoint == -1)
 #endif
+	{
+		rdMatrix_BuildTranslate34(&matrix, &node->pivot);
+		rdMatrix_PostMultiply34(&matrix, &thing->hierarchyNodeMatrices[node->idx]);
+		if ( node->parent )
+		{
+			negPivot.x = -node->parent->pivot.x;
+			negPivot.y = -node->parent->pivot.y;
+			negPivot.z = -node->parent->pivot.z;
+			rdMatrix_PostTranslate34(&matrix, &negPivot);
+		}
 		rdMatrix_Multiply34(&thing->hierarchyNodeMatrices[node->idx], acc, &matrix);
+	}
 
     if (!node->numChildren)
         return;

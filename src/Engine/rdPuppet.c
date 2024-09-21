@@ -116,10 +116,24 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
     if (!thing->hierarchyNodeMatrices) return;
 
 #ifdef RAGDOLLS
-	if (thing->paHierarchyNodeMatricesPrev)
+	if (thing->paHierarchyNodeMatricesPrev) // todo: only do this when needed
 		_memcpy(thing->paHierarchyNodeMatricesPrev, thing->hierarchyNodeMatrices, sizeof(rdMatrix34) * model->numHierarchyNodes);
-#endif
 
+	extern int jkPlayer_ragdolls; // low key hate that this is here, find a better way
+	if (jkPlayer_ragdolls && thing->pRagdoll)
+	{
+		for (int i = 0; i < model->numHierarchyNodes; i++)
+		{
+			rdHierarchyNode* pNode = &model->hierarchyNodes[i];
+			// note: the joint mat is in world space, rdThing_AccumulateMatrices will simply skip recomputing it
+			if (pNode->skelJoint != -1)
+				rdMatrix_Copy34(&thing->hierarchyNodeMatrices[pNode->idx], &thing->pRagdoll->paJointMatrices[pNode->skelJoint]);
+			else // just copy the local mat as usual for transform with ragdolled parents, note: these are in joint space
+				rdMatrix_Copy34(&thing->hierarchyNodeMatrices[pNode->idx], &model->hierarchyNodes[i].posRotMatrix);
+		}
+	}
+	else
+#endif
     if ( !puppet || puppet->paused )
     {
         for (int i = 0; i < model->numHierarchyNodes; i++)
