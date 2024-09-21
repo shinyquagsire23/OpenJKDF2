@@ -247,7 +247,7 @@ GLint light_uniform_attenuation, light_uniform_color, light_uniform_position, li
 
 #endif
 
-void std3D_generateIntermediateFbo(int32_t width, int32_t height, std3DIntermediateFbo* pFbo, int isFloat)
+void std3D_generateIntermediateFbo(int32_t width, int32_t height, std3DIntermediateFbo* pFbo, int isFloat, int mipMaps)
 {
     // Generate the framebuffer
     memset(pFbo, 0, sizeof(*pFbo));
@@ -271,9 +271,12 @@ void std3D_generateIntermediateFbo(int32_t width, int32_t height, std3DIntermedi
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1);
-    glGenerateMipmap(GL_TEXTURE_2D);
-    
+    if(mipMaps)
+    {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+
     // Attach fbTex to our currently bound framebuffer fb
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pFbo->tex, 0);
 
@@ -387,7 +390,7 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, pFb->tex4, 0);
 
-		// diffuse color buffer
+	// diffuse color buffer
 	glGenTextures(1, &pFb->tex5);
 	glBindTexture(GL_TEXTURE_2D, pFb->tex5);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
@@ -421,19 +424,19 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 #ifdef DECAL_RENDERING
-	std3D_generateIntermediateFbo(width, height, &pFb->decalLight, 0);
+	std3D_generateIntermediateFbo(width, height, &pFb->decalLight, 0, 0);
 #endif
 
     if (jkPlayer_enableSSAO)
     {
 #ifdef NEW_SSAO
-		std3D_generateIntermediateFbo(width / 2, height / 2, &pFb->ssaoBlur1, 0);
-		std3D_generateIntermediateFbo(pFb->ssaoBlur1.w, pFb->ssaoBlur1.h, &pFb->ssaoBlur2, 0);
+		std3D_generateIntermediateFbo(width / 2, height / 2, &pFb->ssaoBlur1, 0, 0);
+		std3D_generateIntermediateFbo(pFb->ssaoBlur1.w, pFb->ssaoBlur1.h, &pFb->ssaoBlur2, 0, 0);
 #else
         std3D_generateIntermediateFbo(width, height, &pFb->ssaoBlur1, 0);
-        std3D_generateIntermediateFbo(pFb->ssaoBlur1.w/2, pFb->ssaoBlur1.h/2, &pFb->ssaoBlur2, 0);
+        std3D_generateIntermediateFbo(pFb->ssaoBlur1.w/2, pFb->ssaoBlur1.h/2, &pFb->ssaoBlur2, 0, 0);
 #endif
-		//std3D_generateIntermediateFbo(pFb->ssaoBlur2.w/2, pFb->ssaoBlur2.h/2, &pFb->ssaoBlur3, 0);
+		//std3D_generateIntermediateFbo(pFb->ssaoBlur2.w/2, pFb->ssaoBlur2.h/2, &pFb->ssaoBlur3, 0, 0);
 
         pFb->enable_extra |= 2;
     }
@@ -444,20 +447,20 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     {
         pFb->enable_extra |= 1;
 	#ifdef NEW_BLOOM
-		std3D_generateIntermediateFbo(width / 4, height / 4, &pFb->blur1, 1);
-		std3D_generateIntermediateFbo(pFb->blur1.w / 2, pFb->blur1.h / 2, &pFb->blur2, 1);
-		std3D_generateIntermediateFbo(pFb->blur2.w / 2, pFb->blur2.h / 2, &pFb->blur3, 1);
-		std3D_generateIntermediateFbo(pFb->blur3.w / 2, pFb->blur3.h / 2, &pFb->blur4, 1);
-		std3D_generateIntermediateFbo(pFb->blur4.w / 2, pFb->blur4.h / 2, &pFb->blur5, 1);
-		std3D_generateIntermediateFbo(pFb->blur5.w / 2, pFb->blur5.h / 2, &pFb->blur6, 1);
-		std3D_generateIntermediateFbo(pFb->blur6.w / 2, pFb->blur6.h / 2, &pFb->blur7, 1);
-		std3D_generateIntermediateFbo(pFb->blur7.w / 2, pFb->blur7.h / 2, &pFb->blur8, 1);
+		std3D_generateIntermediateFbo(width / 4, height / 4, &pFb->blur1, 1, 0);
+		std3D_generateIntermediateFbo(pFb->blur1.w / 2, pFb->blur1.h / 2, &pFb->blur2, 1, 0);
+		std3D_generateIntermediateFbo(pFb->blur2.w / 2, pFb->blur2.h / 2, &pFb->blur3, 1, 0);
+		std3D_generateIntermediateFbo(pFb->blur3.w / 2, pFb->blur3.h / 2, &pFb->blur4, 1, 0);
+		std3D_generateIntermediateFbo(pFb->blur4.w / 2, pFb->blur4.h / 2, &pFb->blur5, 1, 0);
+		std3D_generateIntermediateFbo(pFb->blur5.w / 2, pFb->blur5.h / 2, &pFb->blur6, 1, 0);
+		std3D_generateIntermediateFbo(pFb->blur6.w / 2, pFb->blur6.h / 2, &pFb->blur7, 1, 0);
+		std3D_generateIntermediateFbo(pFb->blur7.w / 2, pFb->blur7.h / 2, &pFb->blur8, 1, 0);
 	#else
-        std3D_generateIntermediateFbo(width, height, &pFb->blur1, 1);
+        std3D_generateIntermediateFbo(width, height, &pFb->blur1, 1, 1);
         //std3D_generateIntermediateFbo(width, height, &pFb->blurBlend, 1);
-        std3D_generateIntermediateFbo(pFb->blur1.w/4, pFb->blur1.h/4, &pFb->blur2, 1);
-        std3D_generateIntermediateFbo(pFb->blur2.w/4, pFb->blur2.h/4, &pFb->blur3, 1);
-        std3D_generateIntermediateFbo(pFb->blur3.w/4, pFb->blur3.h/4, &pFb->blur4, 1);
+        std3D_generateIntermediateFbo(pFb->blur1.w/4, pFb->blur1.h/4, &pFb->blur2, 1, 1);
+        std3D_generateIntermediateFbo(pFb->blur2.w/4, pFb->blur2.h/4, &pFb->blur3, 1, 1);
+        std3D_generateIntermediateFbo(pFb->blur3.w/4, pFb->blur3.h/4, &pFb->blur4, 1, 1);
 	#endif
 
         /*pFb->blur1.iw = width;
