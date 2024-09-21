@@ -766,14 +766,14 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
             // Proximity mines did the Beep Beep Beep, time to explode
             if (collidedThing->weaponParams.typeflags & SITH_WF_EXPLODE_AT_TIMER_TIMEOUT)
             {
-                printf("Exploding: %x\n", physicsThing->thingIdx);
+                //printf("Exploding: %x\n", physicsThing->thingIdx);
                 sithWeapon_RemoveAndExplode(physicsThing, physicsThing->weaponParams.explodeTemplate);
                 return 1;
             }
 
             // Gun splat spawning
             sithWeapon_RemoveAndExplode(physicsThing, physicsThing->weaponParams.fleshHitTemplate);
-            printf("Splat: %x\n", physicsThing->thingIdx);
+            //printf("Splat: %x\n", physicsThing->thingIdx);
 #ifdef RAGDOLLS
 			// kick the ragdoll
 			if (collidedThing->moveType == SITH_MT_RAGDOLL && collidedThing->rdthing.pRagdoll && collidedThing->physicsParams.mass != 0.0)
