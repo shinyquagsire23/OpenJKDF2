@@ -75,10 +75,7 @@ typedef struct std3DFramebuffer
     GLuint tex3; // normals
 #if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
 	GLuint tex4; // post-projection depth (for SSAO stuff), can probably rework to only use position buffer
-	GLuint tex5; // light, can probably deprecate since only decals really care about this
-#endif
-#ifdef PARTICLE_LIGHTS
-	GLuint tex6; // diffuse
+	GLuint tex5; // diffuse
 #endif
 
     std3DIntermediateFbo window;
@@ -230,7 +227,7 @@ void std3D_FlushLights();
 
 GLuint programDecal;
 GLint decal_attribute_coord3d;
-GLint decal_uniform_mvp, decal_uniform_tex, decal_uniform_texPos, decal_uniform_texLight, decal_uniform_texNormal, decal_uniform_worldPalette;
+GLint decal_uniform_mvp, decal_uniform_tex, decal_uniform_texPos, decal_uniform_texLight, decal_uniform_texDiffuse, decal_uniform_texNormal, decal_uniform_worldPalette;
 GLint decal_uniform_tint, decal_uniform_filter, decal_uniform_fade, decal_uniform_add, decal_uniform_flags, decal_uniform_texmode;
 GLint decal_uniform_matrix, decal_uniform_color, decal_uniform_angle, decal_uniform_iResolution;
 
@@ -386,7 +383,7 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, pFb->tex4, 0);
 
-	// annoyingly need a light buffer to transfer lighting info to the decal pass
+		// diffuse color buffer
 	glGenTextures(1, &pFb->tex5);
 	glBindTexture(GL_TEXTURE_2D, pFb->tex5);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
@@ -395,6 +392,7 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
+	// Attach fbTex to our currently bound framebuffer fb
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT5, GL_TEXTURE_2D, pFb->tex5, 0);
 #else
 	glGenTextures(1, &pFb->tex3);
@@ -404,20 +402,6 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-#endif
-
-#ifdef PARTICLE_LIGHTS
-	// diffuse color buffer - can merge with tex0 later
-	glGenTextures(1, &pFb->tex6);
-	glBindTexture(GL_TEXTURE_2D, pFb->tex6);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-	// Attach fbTex to our currently bound framebuffer fb
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT6, GL_TEXTURE_2D, pFb->tex6, 0);
 #endif
 
     // Set up our render buffer
@@ -505,9 +489,6 @@ void std3D_deleteFramebuffer(std3DFramebuffer* pFb)
 #if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
 	glDeleteTextures(1, &pFb->tex4);
 	glDeleteTextures(1, &pFb->tex5);
-#endif
-#ifdef PARTICLE_LIGHTS
-	glDeleteTextures(1, &pFb->tex6);
 #endif
     glDeleteRenderbuffers(1, &pFb->rbo);
 
@@ -699,6 +680,7 @@ int init_resources()
 	decal_uniform_mvp = std3D_tryFindUniform(programDecal, "mvp");
 	decal_uniform_texPos = std3D_tryFindUniform(programDecal, "texPos");
 	decal_uniform_texLight = std3D_tryFindUniform(programDecal, "texLight");
+	decal_uniform_texDiffuse = std3D_tryFindUniform(programDecal, "texDiffuse");
 	decal_uniform_texNormal = std3D_tryFindUniform(programDecal, "texNormal");
 	decal_uniform_worldPalette = std3D_tryFindUniform(programDecal, "texPalette");
 	decal_uniform_tex = std3D_tryFindUniform(programDecal, "tex");
@@ -4013,8 +3995,9 @@ void std3D_DrawDecal(rdDDrawSurface* texture, rdVector3* verts, rdMatrix34* deca
 	glUniform1i(decal_uniform_texPos, 0);
 	glUniform1i(decal_uniform_texLight, 1);
 	glUniform1i(decal_uniform_texNormal, 2);
-	glUniform1i(decal_uniform_worldPalette, 3);
-	glUniform1i(decal_uniform_tex, 4);
+	glUniform1i(decal_uniform_texDiffuse, 3);
+	glUniform1i(decal_uniform_worldPalette, 4);
+	glUniform1i(decal_uniform_tex, 5);
 
 	{
 		float maxX, maxY, scaleX, scaleY, width, height;
@@ -4192,10 +4175,12 @@ void std3D_DrawDecal(rdDDrawSurface* texture, rdVector3* verts, rdMatrix34* deca
 	glActiveTexture(GL_TEXTURE0 + 0);
 	glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex2);
 	glActiveTexture(GL_TEXTURE0 + 1);
-	glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex5);
+	glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex4);
 	glActiveTexture(GL_TEXTURE0 + 2);
 	glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex3);
 	glActiveTexture(GL_TEXTURE0 + 3);
+	glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex5);
+	glActiveTexture(GL_TEXTURE0 + 4);
 	glBindTexture(GL_TEXTURE_2D, displaypal_texture);
 
 	glUniform3f(decal_uniform_tint, rdroid_curColorEffects.tint.x, rdroid_curColorEffects.tint.y, rdroid_curColorEffects.tint.z);

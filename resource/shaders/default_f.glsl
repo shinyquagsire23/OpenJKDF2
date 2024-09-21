@@ -88,7 +88,7 @@ layout(location = 2) out vec4 fragColorPos;
 layout(location = 3) out vec4 fragColorNormal;
 #ifdef VIEW_SPACE_GBUFFER
 layout(location = 4) out vec4 fragDepth;
-layout(location = 5) out vec4 fragColorLight;
+layout(location = 5) out vec4 fragColorDiffuse;
 
 vec2 oct_wrap(vec2 v)
 {
@@ -105,9 +105,6 @@ vec2 encode_octahedron(vec3 v)
     return clamp(v.xy, vec2(-1.0), vec2(1.0)) * 0.5 + 0.5;
 }
 
-#endif
-#ifdef DIFFUSE_GBUFFER
-layout(location = 6) out vec4 fragColorDiffuse;
 #endif
 
 float luminance(vec3 c_rgb)
@@ -580,14 +577,11 @@ void main(void)
 //	gl_FragDepth = gl_FragCoord.z;
     fragColorPos = vec4(adjusted_coords.x, adjusted_coords.y, adjusted_coords.z, should_write_normals);
 #ifdef VIEW_SPACE_GBUFFER
+	fragColorDiffuse = sampled_color;
 	vec2 octaNormal = encode_octahedron(normals(adjusted_coords.xyz)); // encode normal
     fragColorNormal = vec4(octaNormal.xy, 0, should_write_normals);
 	fragDepth = vec4(originalZ, originalZ, originalZ, should_write_normals);
-	fragColorLight = vec4(vertex_color.rgb, should_write_normals);
 #else
     fragColorNormal = vec4(face_normals, should_write_normals);
-#endif
-#ifdef DIFFUSE_GBUFFER
-	fragColorDiffuse = sampled_color;
 #endif
 }
