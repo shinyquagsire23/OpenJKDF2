@@ -109,6 +109,8 @@ vec2 oct_wrap(vec2 v)
 
 vec3 decode_octahedron(vec2 p)
 {
+	p = p * 2.0 - 1.0;
+
 	vec3 n;
     n.z = 1.0 - abs(p.x) - abs(p.y);
     n.xy = n.z >= 0.0 ? p.xy : oct_wrap( p.xy );

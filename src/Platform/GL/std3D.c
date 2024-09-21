@@ -45,7 +45,8 @@ typedef struct std3DSimpleTexStage
     GLint uniform_tex;
     GLint uniform_tex2;
     GLint uniform_tex3;
-    GLint uniform_iResolution;
+	GLint uniform_tex4;
+	GLint uniform_iResolution;
 
     GLint uniform_param1;
     GLint uniform_param2;
@@ -68,15 +69,16 @@ typedef struct std3DIntermediateFbo
 typedef struct std3DFramebuffer
 {
     GLuint fbo;
-    GLuint tex0;
-    GLuint tex1;
-    GLuint tex2;
-    GLuint tex3;
+    GLuint tex0; // color (transparencies, etc)
+    GLuint tex1; // emissive
+    GLuint tex2; // position
+    GLuint tex3; // normals
 #if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
-	GLuint tex4;
+	GLuint tex4; // post-projection depth (for SSAO stuff), can probably rework to only use position buffer
+	GLuint tex5; // light, can probably deprecate since only decals really care about this
 #endif
 #ifdef PARTICLE_LIGHTS
-	GLuint tex5; // todo: merge with tex0 and use a combiner pass to fill with vertex * sampled
+	GLuint tex6; // diffuse
 #endif
 
     std3DIntermediateFbo window;
@@ -363,9 +365,10 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, pFb->tex2, 0);
 
     // Set up our normal fb texture
+#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
     glGenTextures(1, &pFb->tex3);
     glBindTexture(GL_TEXTURE_2D, pFb->tex3);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RG8, width, height, 0, GL_RG, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -374,22 +377,16 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     // Attach fbTex to our currently bound framebuffer fb
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, pFb->tex3, 0);
 
-#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
-	// annoyingly need a light buffer to transfer lighting info to the decal pass
 	glGenTextures(1, &pFb->tex4);
 	glBindTexture(GL_TEXTURE_2D, pFb->tex4);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R16F, width, height, 0, GL_RED, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-	// Attach fbTex to our currently bound framebuffer fb
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, pFb->tex4, 0);
-#endif
 
-#ifdef PARTICLE_LIGHTS
-	// diffuse color buffer - can merge with tex0 later
+	// annoyingly need a light buffer to transfer lighting info to the decal pass
 	glGenTextures(1, &pFb->tex5);
 	glBindTexture(GL_TEXTURE_2D, pFb->tex5);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
@@ -398,8 +395,29 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-	// Attach fbTex to our currently bound framebuffer fb
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT5, GL_TEXTURE_2D, pFb->tex5, 0);
+#else
+	glGenTextures(1, &pFb->tex3);
+	glBindTexture(GL_TEXTURE_2D, pFb->tex3);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+#endif
+
+#ifdef PARTICLE_LIGHTS
+	// diffuse color buffer - can merge with tex0 later
+	glGenTextures(1, &pFb->tex6);
+	glBindTexture(GL_TEXTURE_2D, pFb->tex6);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	// Attach fbTex to our currently bound framebuffer fb
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT6, GL_TEXTURE_2D, pFb->tex6, 0);
 #endif
 
     // Set up our render buffer
@@ -486,9 +504,10 @@ void std3D_deleteFramebuffer(std3DFramebuffer* pFb)
     glDeleteTextures(1, &pFb->tex3);
 #if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
 	glDeleteTextures(1, &pFb->tex4);
+	glDeleteTextures(1, &pFb->tex5);
 #endif
 #ifdef PARTICLE_LIGHTS
-	glDeleteTextures(1, &pFb->tex5);
+	glDeleteTextures(1, &pFb->tex6);
 #endif
     glDeleteRenderbuffers(1, &pFb->rbo);
 
@@ -589,6 +608,7 @@ bool std3D_loadSimpleTexProgram(const char* fpath_base, std3DSimpleTexStage* pOu
     pOut->uniform_tex = std3D_tryFindUniform(pOut->program, "tex");
     pOut->uniform_tex2 = std3D_tryFindUniform(pOut->program, "tex2");
     pOut->uniform_tex3 = std3D_tryFindUniform(pOut->program, "tex3");
+	pOut->uniform_tex4 = std3D_tryFindUniform(pOut->program, "tex4");
 
     pOut->uniform_param1 = std3D_tryFindUniform(pOut->program, "param1");
     pOut->uniform_param2 = std3D_tryFindUniform(pOut->program, "param2");
@@ -2349,7 +2369,8 @@ void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo
     glUniform1i(pStage->uniform_tex, 0);
     glUniform1i(pStage->uniform_tex2, 1);
     glUniform1i(pStage->uniform_tex3, 2);
-    
+	glUniform1i(pStage->uniform_tex4, 3);
+
     {
 
     float maxX, maxY, scaleX, scaleY, width, height;
@@ -2433,12 +2454,13 @@ void std3D_DrawSceneFbo()
 #endif
 
     // Clear SSAO stuff
+	// Eebs: disabled, unnecessary we're going to overwrite the contents with ssao result anyway
     if (draw_ssao)
     {
         glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->ssaoBlur1.fbo);
-        glClear( GL_COLOR_BUFFER_BIT );
+        //glClear( GL_COLOR_BUFFER_BIT );
         glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->ssaoBlur2.fbo);
-        glClear( GL_COLOR_BUFFER_BIT );
+        //glClear( GL_COLOR_BUFFER_BIT );
     }
 
     float rad_scale = (float)std3D_pFb->w / 640.0;
@@ -2450,6 +2472,9 @@ void std3D_DrawSceneFbo()
     }
     else
     {
+		glActiveTexture(GL_TEXTURE0 + 3);
+		glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex4);
+
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         
         std3D_DrawSimpleTex(&std3D_ssaoStage, &std3D_pFb->ssaoBlur1, std3D_pFb->tex2, std3D_pFb->tex3, tiledrand_texture, frameNum, 0.0, 0.0, 0); // test ssao output
@@ -4167,7 +4192,7 @@ void std3D_DrawDecal(rdDDrawSurface* texture, rdVector3* verts, rdMatrix34* deca
 	glActiveTexture(GL_TEXTURE0 + 0);
 	glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex2);
 	glActiveTexture(GL_TEXTURE0 + 1);
-	glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex4);
+	glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex5);
 	glActiveTexture(GL_TEXTURE0 + 2);
 	glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex3);
 	glActiveTexture(GL_TEXTURE0 + 3);

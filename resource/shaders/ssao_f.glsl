@@ -1,6 +1,7 @@
 uniform sampler2D tex;
 uniform sampler2D tex2;
 uniform sampler2D tex3;
+uniform sampler2D tex4;
 uniform vec2 iResolution;
 uniform float param1;
 uniform float param2;
@@ -29,6 +30,8 @@ vec2 oct_wrap(vec2 v)
 
 vec3 decode_octahedron(vec2 p)
 {
+	p = p * 2.0 - 1.0;
+
 	vec3 n;
     n.z = 1.0 - abs(p.x) - abs(p.y);
     n.xy = n.z >= 0.0 ? p.xy : oct_wrap( p.xy );
@@ -76,7 +79,7 @@ float depth(vec2 coord)
 {
     vec2 uv = coord*vec2(iResolution.y/iResolution.x,1.0);
 #ifdef VIEW_SPACE_GBUFFER
-    return texture(tex2, uv).z;
+    return texture(tex4, uv).x;
 #else
     return texture(tex, uv).z;
 #endif
