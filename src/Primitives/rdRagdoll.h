@@ -79,7 +79,7 @@ typedef struct rdRagdollParticle
 	float nextPosWeight;
 	float radius;
 	int collided;
-	sithThing thing;
+	sithThing thing; // not ideal having this in an rd struct
 } rdRagdollParticle;
 
 typedef struct rdRagdoll

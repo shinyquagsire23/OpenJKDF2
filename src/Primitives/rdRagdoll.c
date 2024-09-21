@@ -373,6 +373,9 @@ void rdRagdoll_BuildParticles(rdThing* pThing, rdVector3* pInitialVel)
 		pParticle->thing.moveSize = pParticle->radius;
 		pParticle->thing.collideSize = pParticle->radius;
 		pParticle->thing.moveType = SITH_MT_PHYSICS;
+		pParticle->thing.prev_thing = pThing->parentSithThing;
+		pParticle->thing.child_signature = pThing->parentSithThing->signature;
+
 		_memcpy(&pParticle->thing.physicsParams, &pThing->parentSithThing->physicsParams, sizeof(sithThingPhysParams));
 		pParticle->thing.physicsParams.physflags = 0;
 		rdMatrix_Identity34(&pParticle->thing.lookOrientation); // don't think we care about orientation?
