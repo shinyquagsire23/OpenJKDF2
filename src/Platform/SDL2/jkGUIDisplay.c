@@ -265,7 +265,6 @@ continue_menu:
         jkPlayer_enableTextureFilter = jkGuiDisplay_aElements[15].selectedTextEntry;
         jkPlayer_enableOrigAspect = jkGuiDisplay_aElements[16].selectedTextEntry;
         jkPlayer_enableVsync = jkGuiDisplay_aElements[17].selectedTextEntry;
-		jkPlayer_enable32Bit = jkGuiDisplay_aElements[26].selectedTextEntry;
 
         char tmp[256];
         stdString_WcharToChar(tmp, render_level, 255);
@@ -317,8 +316,8 @@ int jkGuiDisplay_ColorDepthArrowButtonClickHandler(jkGuiElement* pElement, jkGui
 	}
 
 	jk_snwprintf(colordepth_text, 8u, jkPlayer_enable32Bit ? L"32-bit" : L"16-bit");
-	jkGuiDisplay_aElements[26].wstr = colordepth_text;
-	jkGuiRend_UpdateAndDrawClickable(&jkGuiDisplay_aElements[26], pMenu, 1);
+	jkGuiDisplay_aElements[25].wstr = colordepth_text;
+	jkGuiRend_UpdateAndDrawClickable(&jkGuiDisplay_aElements[25], pMenu, 1);
 
 	return 0;
 }

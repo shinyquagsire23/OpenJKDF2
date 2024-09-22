@@ -1062,9 +1062,9 @@ int std3D_StartScene()
     int32_t tex_h = (int32_t)((double)Window_ySize * supersample_level);
 
     if (tex_w != std3D_pFb->w || tex_h != std3D_pFb->h 
-        || (!(std3D_pFb->enable_extra & 1) && jkPlayer_enableBloom)
-        || (!(std3D_pFb->enable_extra & 2) && jkPlayer_enableSSAO)
-		|| (!(std3D_pFb->enable_extra & 4) && jkPlayer_enable32Bit))
+        || (((std3D_pFb->enable_extra & 1) == 1) != jkPlayer_enableBloom)
+        || (((std3D_pFb->enable_extra & 2) == 2) != jkPlayer_enableSSAO)
+		|| (((std3D_pFb->enable_extra & 4) == 4) != jkPlayer_enable32Bit))
     {
         std3D_deleteFramebuffer(std3D_pFb);
         std3D_generateFramebuffer(tex_w, tex_h, std3D_pFb);
