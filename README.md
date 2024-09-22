@@ -1,20 +1,33 @@
 # This fork
-This fork introduces a variety of new features and experiments. Among them:
+This fork introduces a variety of new features and experiments. Among them (not all enabled by default):
+
+Rendering:
 - Fog (Infernal Machine style)
-- Extra static.jkl loading, allows stacking up to 4 extra static.jkls (mod stacking)
-- Lightsaber trail rendering
+- Specular lighting (RD_LIGHTMODE_SPECULAR)
+- Half Lambert diffuse for dynamic lights to soften low poly model shading
+- Stencil buffering for rdroid
+- Early attempt at GPU vertex/pixel lighting
 - RGB thing lights (lightcolor template param for things), including lightsaber colored lighting derived from the saber material
 - RGB ambient lighting, including directional ambient cube for gouraud shaded models
+  Deferred decal rendering (new .dcal file to specify decals, decal template param for things)
+- Deferred AO shadows (via "capsule" style sphere occluders)
+- Deferred particle lights
+- Faster downsample based bloom/glow
+- New SSAO with less halos
+- Additive blending face flag
+- Vertex color tinting
+- Reworked emissives to better match OG JK (using max() rather than add for non-bloom case)
+
+Gameplay:
 - First person legs
+- Lightsaber trails
+- Lightsaber marks
+- JO style saber glow
 - Muzzle flashes (new cog verb + muzzle hierarchy + keyframe markers to activate)
 - Dynamic POV animation, crosshair and autoaim (gun follows aim targets, crosshair reacts to geometry/blockers and better represents trajectory, gun moves dynamically when player moves, requires using new verbs to leverage)
-- Deferred decal rendering (new .dcal file to specify decals, decal template param for things)
+- Extra static.jkl loading, allows stacking up to 4 extra static.jkls (mod stacking)
 - Experimental ragdolls (new .af file for articulated figure definition, new physics mode using particle verlet integration)
-- Additive blending
 - Polyline upgrades and rendering fixes (new .pln file to specify a polyline def that can be assigned to a thing via template params the same as models and sprites)
-- Faster bloom
-- Faster SSAO with less halos
-- Tweaked emissives to better match OG JK (using max() rather than add for non-bloom case)
 
 # OpenJKDF2
 
