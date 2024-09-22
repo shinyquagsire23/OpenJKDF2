@@ -965,6 +965,13 @@ void std3D_FreeResources()
 	glDeleteBuffers(1, &light_ubo);
 #endif
 
+#ifdef DECAL_RENDERING
+	glDeleteProgram(programDecal);
+#endif
+#ifdef PARTICLE_LIGHTS
+	glDeleteProgram(programLight);
+#endif
+
     std3D_bReinitHudElements = 1;
 
     has_initted = false;
