@@ -35,7 +35,7 @@ int rdCache_numDecals;
 void rdCache_FlushDecals();
 #endif
 
-#ifdef DECAL_RENDERING
+#ifdef PARTICLE_LIGHTS
 rdLight rdCache_aLights[4096];
 rdVector3 rdCache_aLightPositions[4096];
 int rdCache_numLights;
