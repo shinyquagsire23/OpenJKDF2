@@ -20,6 +20,34 @@ out vec4 fragColor;
 #endif
 
 #ifdef VIEW_SPACE_GBUFFER
+uniform vec3 cameraLB;
+uniform vec3 cameraLT;
+uniform vec3 cameraRB;
+uniform vec3 cameraRT;
+
+vec3 get_camera_frustum_ray(vec2 uv)
+{
+	//vec3 b = mix(cameraLB.xyz, cameraRB.xyz, uv.x);
+	//vec3 t = mix(cameraLT.xyz, cameraRT.xyz, uv.x);
+	//return mix(b, t, uv.y);
+	
+	// barycentric lerp
+	return ((1.0 - uv.x - uv.y) * cameraLB.xyz + (uv.x * cameraRB.xyz + (uv.y * cameraLT.xyz)));
+}
+
+// Returns the world position from linear depth and a frustum ray
+vec3 get_view_position_from_depth(vec3 cam_vec, float linear_depth)
+{
+	return cam_vec.xyz * linear_depth;
+}
+
+vec3 get_view_position(float linear_depth, vec2 uv)
+{
+	vec3 cam_vec = get_camera_frustum_ray(uv).xyz;
+	return get_view_position_from_depth(cam_vec, linear_depth);
+}
+
+
 vec2 oct_wrap(vec2 v)
 {
 	vec2 signs;
@@ -79,7 +107,7 @@ float depth(vec2 coord)
 {
     vec2 uv = coord*vec2(iResolution.y/iResolution.x,1.0);
 #ifdef VIEW_SPACE_GBUFFER
-    return texture(tex4, uv).x * 128.0 * 128.0;
+    return texture(tex, uv).x * 128.0 * 128.0;
 #else
     return texture(tex, uv).z;
 #endif
@@ -88,7 +116,12 @@ float depth(vec2 coord)
 vec3 getpos(vec2 coord)
 {
     vec2 uv = coord*vec2(iResolution.y/iResolution.x,1.0);
+#ifdef VIEW_SPACE_GBUFFER
+	float depth = texture(tex, uv).x;
+	return get_view_position(depth, uv);
+#else
     return texture(tex, uv).xyz;
+#endif
 }
 
 float SSAO(vec2 coord)

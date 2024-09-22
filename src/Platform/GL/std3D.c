@@ -51,6 +51,12 @@ typedef struct std3DSimpleTexStage
     GLint uniform_param1;
     GLint uniform_param2;
     GLint uniform_param3;
+#ifdef VIEW_SPACE_GBUFFER
+	GLint uniform_rt;
+	GLint uniform_lt;
+	GLint uniform_rb;
+	GLint uniform_lb;
+#endif
 } std3DSimpleTexStage;
 
 typedef struct std3DIntermediateFbo
@@ -623,6 +629,13 @@ bool std3D_loadSimpleTexProgram(const char* fpath_base, std3DSimpleTexStage* pOu
     pOut->uniform_param1 = std3D_tryFindUniform(pOut->program, "param1");
     pOut->uniform_param2 = std3D_tryFindUniform(pOut->program, "param2");
     pOut->uniform_param3 = std3D_tryFindUniform(pOut->program, "param3");
+
+#ifdef VIEW_SPACE_GBUFFER
+	pOut->uniform_rt = std3D_tryFindUniform(pOut->program, "cameraRT");
+	pOut->uniform_lt = std3D_tryFindUniform(pOut->program, "cameraLT");
+	pOut->uniform_rb = std3D_tryFindUniform(pOut->program, "cameraRB");
+	pOut->uniform_lb = std3D_tryFindUniform(pOut->program, "cameraLB");
+#endif
 
     return true;
 }
@@ -2449,6 +2462,12 @@ void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo
     glUniform1f(pStage->uniform_param2, param2);
     glUniform1f(pStage->uniform_param3, param3);
 
+#ifdef VIEW_SPACE_GBUFFER
+	glUniform3fv(pStage->uniform_rt, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->rt);
+	glUniform3fv(pStage->uniform_lt, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->lt);
+	glUniform3fv(pStage->uniform_rb, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->rb);
+	glUniform3fv(pStage->uniform_lb, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->lb);
+#endif
     }
     
 	glDrawArrays(GL_TRIANGLES, 0, 3);
