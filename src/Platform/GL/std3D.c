@@ -73,7 +73,7 @@ typedef struct std3DFramebuffer
     GLuint tex1; // emissive
     GLuint tex2; // position
     GLuint tex3; // normals
-#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
+#ifdef VIEW_SPACE_GBUFFER
 	GLuint tex4; // post-projection depth (for SSAO stuff), can probably rework to only use position buffer
 	GLuint tex5; // diffuse
 #endif
@@ -122,7 +122,7 @@ static int std3D_activeFb = 1;
 int init_once = 0;
 GLuint programDefault, programMenu;
 GLint attribute_coord3d, attribute_v_color, attribute_v_light, attribute_v_uv, attribute_v_norm;
-#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
+#ifdef VIEW_SPACE_GBUFFER
 GLint attribute_coordVS;
 #endif
 GLint uniform_mvp, uniform_tex, uniform_texEmiss, uniform_displacement_map, uniform_tex_mode, uniform_blend_mode, uniform_worldPalette, uniform_worldPaletteLights;
@@ -244,6 +244,15 @@ GLint light_attribute_coord3d;
 GLint light_uniform_mvp, light_uniform_texPos, light_uniform_texNormal, light_uniform_texColor;
 GLint light_uniform_tint, light_uniform_filter, light_uniform_fade, light_uniform_add;
 GLint light_uniform_attenuation, light_uniform_color, light_uniform_position, light_uniform_iResolution;
+
+#endif
+
+#ifdef SPHERE_AO
+
+GLuint programOccluder;
+GLint occluder_attribute_coord3d;
+GLint occluder_uniform_mvp, occluder_uniform_texPos, occluder_uniform_texNormal;
+GLint occluder_uniform_position, occluder_uniform_iResolution;
 
 #endif
 
@@ -369,8 +378,8 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, pFb->tex2, 0);
 
     // Set up our normal fb texture
-#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
-    glGenTextures(1, &pFb->tex3);
+#ifdef VIEW_SPACE_GBUFFER
+	glGenTextures(1, &pFb->tex3);
     glBindTexture(GL_TEXTURE_2D, pFb->tex3);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RG8, width, height, 0, GL_RG, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -497,7 +506,7 @@ void std3D_deleteFramebuffer(std3DFramebuffer* pFb)
     glDeleteTextures(1, &pFb->tex1);
     glDeleteTextures(1, &pFb->tex2);
     glDeleteTextures(1, &pFb->tex3);
-#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
+#ifdef VIEW_SPACE_GBUFFER
 	glDeleteTextures(1, &pFb->tex4);
 	glDeleteTextures(1, &pFb->tex5);
 #endif
@@ -650,9 +659,14 @@ int init_resources()
 #ifdef PARTICLE_LIGHTS
 	if ((programLight = std3D_loadProgram("shaders/light")) == 0) return false;
 #endif
+#ifdef SPHERE_AO
+	if ((programOccluder = std3D_loadProgram("shaders/occ")) == 0) return false;
+#endif
+
+
     // Attributes/uniforms
     attribute_coord3d = std3D_tryFindAttribute(programDefault, "coord3d");
-#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
+#ifdef VIEW_SPACE_GBUFFER
 	attribute_coordVS = std3D_tryFindAttribute(programDefault, "coordVS");
 #endif
     attribute_v_color = std3D_tryFindAttribute(programDefault, "v_color");
@@ -730,6 +744,16 @@ int init_resources()
 	light_uniform_color = std3D_tryFindUniform(programLight, "lightColor");
 	light_uniform_position = std3D_tryFindUniform(programLight, "lightPosition");
 	light_uniform_iResolution = std3D_tryFindUniform(programLight, "iResolution");
+#endif
+
+#ifdef SPHERE_AO
+	occluder_attribute_coord3d = std3D_tryFindAttribute(programOccluder, "coord3d");
+	occluder_uniform_mvp = std3D_tryFindUniform(programOccluder, "mvp");
+	occluder_uniform_texPos = std3D_tryFindUniform(programOccluder, "texPos");
+	occluder_uniform_texNormal = std3D_tryFindUniform(programOccluder, "texNormal");
+
+	occluder_uniform_position = std3D_tryFindUniform(programOccluder, "occluderPosition");
+	occluder_uniform_iResolution = std3D_tryFindUniform(programOccluder, "iResolution");
 #endif
 
 #ifdef GPU_LIGHTING
@@ -971,6 +995,9 @@ void std3D_FreeResources()
 #ifdef PARTICLE_LIGHTS
 	glDeleteProgram(programLight);
 #endif
+#ifdef SPHERE_AO
+	glDeleteProgram(programOccluder);
+#endif
 
     std3D_bReinitHudElements = 1;
 
@@ -1017,7 +1044,7 @@ void std3D_SetWorldAttribPointers()
 		(GLvoid*)offsetof(D3DVERTEX, tu)                  // offset of first element
 	);
 
-#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
+#ifdef VIEW_SPACE_GBUFFER
 	glVertexAttribPointer(
 		attribute_coordVS, // attribute
 		3,                 // number of elements per vertex, here (x,y,z)
@@ -1034,7 +1061,7 @@ void std3D_SetWorldAttribPointers()
 	glEnableVertexAttribArray(attribute_v_uv);
 	glEnableVertexAttribArray(attribute_coordVS);
 
-#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
+#ifdef VIEW_SPACE_GBUFFER
 	glEnableVertexAttribArray(attribute_coordVS);
 #endif
 }
@@ -1161,7 +1188,7 @@ int std3D_EndScene()
     glDisableVertexAttribArray(attribute_v_uv);
     glDisableVertexAttribArray(attribute_v_color);
     glDisableVertexAttribArray(attribute_coord3d);
-#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
+#ifdef VIEW_SPACE_GBUFFER
 	glDisableVertexAttribArray(attribute_coordVS);
 #endif
 
@@ -2653,7 +2680,7 @@ void std3D_DrawRenderList()
     glUseProgram(programDefault);
 
     GLenum bufs[] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3
-#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
+#ifdef VIEW_SPACE_GBUFFER
 	, GL_COLOR_ATTACHMENT4
 #endif
 #ifdef PARTICLE_LIGHTS
@@ -2833,7 +2860,7 @@ void std3D_DrawRenderList()
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, world_ibo_triangle);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, GL_tmpTrisAmt * 3 * sizeof(GLushort), world_data_elements, GL_STREAM_DRAW);
-#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
+#ifdef VIEW_SPACE_GBUFFER
 	// these aren't guaranteed to be active when a flush happens
 	std3D_SetWorldAttribPointers();
 #endif
@@ -3066,7 +3093,7 @@ void std3D_DrawRenderList()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     
-#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
+#ifdef VIEW_SPACE_GBUFFER
 	glDisableVertexAttribArray(attribute_v_uv);
 	glDisableVertexAttribArray(attribute_v_color);
 	glDisableVertexAttribArray(attribute_coord3d);
@@ -4554,4 +4581,237 @@ void std3D_DrawLight(rdLight* light, rdVector3* position, rdVector3* verts)
 	//glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
 #endif
 }
+#endif
+
+#ifdef SPHERE_AO
+
+// todo: use an actual sphere...
+void std3D_DrawOccluder(rdVector3* position, float radius, rdVector3* verts)
+{
+	if (Main_bHeadless) return;
+
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+#ifdef STENCIL_BUFFER
+	glDisable(GL_STENCIL_TEST);
+	//glStencilFunc(GL_EQUAL, 0, 0xFF);
+	//glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+#endif
+
+	glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->main.fbo);
+
+	// we only need to write color
+	GLenum bufs[] = { GL_COLOR_ATTACHMENT0 };
+	glDrawBuffers(1, bufs);
+
+	glDepthFunc(GL_GREATER);
+	glDepthMask(GL_FALSE);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_DST_COLOR, GL_ZERO);
+
+	glUseProgram(programOccluder);
+
+	glUniform1i(occluder_uniform_texPos, 0);
+	glUniform1i(occluder_uniform_texNormal, 1);
+
+	{
+		float maxX, maxY, scaleX, scaleY, width, height;
+
+		float internalWidth = Video_menuBuffer.format.width;
+		float internalHeight = Video_menuBuffer.format.height;
+
+		if (jkGuiBuildMulti_bRendering)
+		{
+			internalWidth = 640.0;
+			internalHeight = 480.0;
+		}
+
+		maxX = 1.0;
+		maxY = 1.0;
+		scaleX = 1.0 / ((double)internalWidth / 2.0);
+		scaleY = 1.0 / ((double)internalHeight / 2.0);
+		width = std3D_pFb->w;
+		height = std3D_pFb->h;
+
+		if (jkGuiBuildMulti_bRendering)
+		{
+			width = 640;
+			height = 480;
+		}
+
+		// JKDF2's vertical FOV is fixed with their projection, for whatever reason. 
+		// This ends up resulting in the view looking squished vertically at wide/ultrawide aspect ratios.
+		// To compensate, we zoom the y axis here.
+		// I also went ahead and fixed vertical displays in the same way because it seems to look better.
+		float zoom_yaspect = (width / height);
+		float zoom_xaspect = (height / width);
+
+		if (height > width)
+		{
+			zoom_yaspect = 1.0;
+		}
+
+		if (width > height)
+		{
+			zoom_xaspect = 1.0;
+		}
+
+		// We no longer need all the weird squishing
+		if (!jkGuiBuildMulti_bRendering)
+		{
+			zoom_yaspect = 1.0;
+			zoom_xaspect = 1.0;
+		}
+
+		float shift_add_x = 0;
+		float shift_add_y = 0;
+
+		if (jkGuiBuildMulti_bRendering)
+		{
+			float menu_w, menu_h, menu_x;
+			menu_w = (double)std3D_pFb->w;
+			menu_h = (double)std3D_pFb->h;
+
+			// Keep 4:3 aspect
+			menu_x = (menu_w - (menu_h * (640.0 / 480.0))) / 2.0;
+
+			width = std3D_pFb->w;
+			height = std3D_pFb->h;
+
+			zoom_xaspect = (height / width);
+
+			shift_add_x = (((1.0 - ((menu_x * zoom_xaspect) / std3D_pFb->w)) + 0.15) * zoom_xaspect);
+			shift_add_y = -0.5;
+			zoom_yaspect = 1.0;
+		}
+
+		float d3dmat[16] = {
+				maxX * scaleX * zoom_xaspect,      0,                                          0,      0, // right
+				0,                                       -maxY * scaleY * zoom_yaspect,               0,      0, // up
+				0,                                       0,                                          1,     0, // forward
+				-(internalWidth / 2) * scaleX * zoom_xaspect + shift_add_x,  (internalHeight / 2) * scaleY * zoom_yaspect + shift_add_y,     (!rdCamera_pCurCamera || rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective) ? -1 : 1,      1  // pos
+		};
+
+		glUniformMatrix4fv(occluder_uniform_mvp, 1, GL_FALSE, d3dmat);
+		glViewport(0, 0, width, height);
+		glUniform2f(occluder_uniform_iResolution, width, height);
+	}
+
+	// triangle indices
+	GL_tmpTris[0].v1 = 0;
+	GL_tmpTris[0].v2 = 1;
+	GL_tmpTris[0].v3 = 2;
+	GL_tmpTris[1].v1 = 2;
+	GL_tmpTris[1].v2 = 3;
+	GL_tmpTris[1].v3 = 0;
+
+	GL_tmpTris[2].v1 = 1;
+	GL_tmpTris[2].v2 = 5;
+	GL_tmpTris[2].v3 = 6;
+
+	GL_tmpTris[3].v1 = 6;
+	GL_tmpTris[3].v2 = 2;
+	GL_tmpTris[3].v3 = 1;
+
+	GL_tmpTris[4].v1 = 7;
+	GL_tmpTris[4].v2 = 6;
+	GL_tmpTris[4].v3 = 5;
+
+	GL_tmpTris[5].v1 = 5;
+	GL_tmpTris[5].v2 = 4;
+	GL_tmpTris[5].v3 = 7;
+
+	GL_tmpTris[6].v1 = 4;
+	GL_tmpTris[6].v2 = 0;
+	GL_tmpTris[6].v3 = 3;
+
+	GL_tmpTris[7].v1 = 3;
+	GL_tmpTris[7].v2 = 7;
+	GL_tmpTris[7].v3 = 4;
+
+	GL_tmpTris[8].v1 = 4;
+	GL_tmpTris[8].v2 = 5;
+	GL_tmpTris[8].v3 = 1;
+
+	GL_tmpTris[9].v1 = 1;
+	GL_tmpTris[9].v2 = 0;
+	GL_tmpTris[9].v3 = 4;
+
+	GL_tmpTris[10].v1 = 3;
+	GL_tmpTris[10].v2 = 2;
+	GL_tmpTris[10].v3 = 6;
+
+	GL_tmpTris[11].v1 = 6;
+	GL_tmpTris[11].v2 = 7;
+	GL_tmpTris[11].v3 = 3;
+
+	GL_tmpTrisAmt = 12;
+
+	GLushort data_elements[12 * 3];
+	rdTri* tris = GL_tmpTris;
+	for (int j = 0; j < GL_tmpTrisAmt; j++)
+	{
+		data_elements[(j * 3) + 0] = tris[j].v1;
+		data_elements[(j * 3) + 1] = tris[j].v2;
+		data_elements[(j * 3) + 2] = tris[j].v3;
+	}
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, menu_ibo_triangle);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, GL_tmpTrisAmt * 3 * sizeof(GLushort), data_elements, GL_STREAM_DRAW);
+
+	GL_tmpVerticesAmt = 8;
+	for (int v = 0; v < GL_tmpVerticesAmt; ++v)
+	{
+		GL_tmpVertices[v].x = verts[v].x;
+		GL_tmpVertices[v].y = verts[v].y;
+		GL_tmpVertices[v].z = verts[v].z;
+		GL_tmpVertices[v].tu = 0;
+		GL_tmpVertices[v].tv = 0;
+		*(uint32_t*)&GL_tmpVertices[v].nx = 0;
+		GL_tmpVertices[v].color = 0xFFFFFFFF;
+		*(uint32_t*)&GL_tmpVertices[v].nz = 0;
+	}
+
+	// todo: optimize this shit
+	glEnableVertexAttribArray(occluder_attribute_coord3d);
+
+	glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_all);
+	glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * sizeof(D3DVERTEX), GL_tmpVertices, GL_STREAM_DRAW);
+	glVertexAttribPointer(
+		occluder_attribute_coord3d, // attribute
+		3,                 // number of elements per vertex, here (x,y,z)
+		GL_FLOAT,          // the type of each element
+		GL_FALSE,          // normalize fixed-point data?
+		sizeof(D3DVERTEX),                 // data stride
+		(GLvoid*)offsetof(D3DVERTEX, x)                  // offset of first element
+	);
+
+	glActiveTexture(GL_TEXTURE0 + 0);
+	glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex2);
+	glActiveTexture(GL_TEXTURE0 + 1);
+	glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex3);
+
+	glUniform4f(occluder_uniform_position, position->x, position->y, position->z, radius);
+
+	glCullFace(GL_FRONT);
+
+	glDrawElements(GL_TRIANGLES, GL_tmpTrisAmt * 3, GL_UNSIGNED_SHORT, 0);
+
+	glDisableVertexAttribArray(occluder_attribute_coord3d);
+
+	glEnable(GL_BLEND);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glDepthFunc(GL_LESS);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendEquation(GL_FUNC_ADD);
+	glCullFace(GL_FRONT);
+#ifdef STENCIL_BUFFER
+	//glDisable(GL_STENCIL_TEST);
+	//glStencilFunc(GL_ALWAYS, 0, 0xFF);
+	//glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
+#endif
+}
+
 #endif

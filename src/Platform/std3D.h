@@ -138,6 +138,10 @@ void std3D_AddLight(rdLight* light, rdVector3* viewPosition);
 void std3D_DrawLight(rdLight* light, rdVector3* position, rdVector3* verts);
 #endif
 
+#ifdef SPHERE_AO
+void std3D_DrawOccluder(rdVector3* position, float radius, rdVector3* verts);
+#endif
+
 #ifdef __cplusplus
 }
 #endif

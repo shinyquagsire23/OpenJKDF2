@@ -430,7 +430,7 @@ int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
             v27 = v26;
             if ( v26 >= 3 )
             {
-#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
+#ifdef VIEW_SPACE_GBUFFER
 				memcpy(v5->vertexVS, aParticleVerticesTmp, sizeof(rdVector3) * v26);
 #endif
                 rdCamera_pCurCamera->fnProjectLst(v5->vertices, aParticleVerticesTmp, v26);

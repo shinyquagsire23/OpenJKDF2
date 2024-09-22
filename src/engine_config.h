@@ -19,6 +19,7 @@
 #define FP_LEGS              // Draws legs in first person
 #define DYNAMIC_POV          // POV enhancements, such as the weapon following the autoaim target, muzzle flashes, sway improvements
 #define DECAL_RENDERING      // .dcal support and decal rendering path (for blast marks etc)
+#define SPHERE_AO            // deferred ambient occlusion via sphere volumes
 #define RAGDOLLS             // .af support and SITH_MT_RAGDOLL physics type for experimental verlet ragdolls
 #define ADDITIVE_BLEND       // additive/screen blending support with a new face flags
 #define POLYLINE_EXT         // .pln support and polyline template param, allows using polylines as rendering primitives for things (ex. blaster bolts)
@@ -34,6 +35,10 @@
 #define USES_VERTEX_LIGHTING(LIGHT_MODE) (((LIGHT_MODE) == 3) || ((LIGHT_MODE) == 4))
 #else
 #define USES_VERTEX_LIGHTING(LIGHT_MODE) ((LIGHT_MODE) == 3)
+#endif
+
+#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS) || defined(SPHERE_AO)
+#define VIEW_SPACE_GBUFFER // store view space data in the gbuffer instead of clip space, important for deferred effects like decals
 #endif
 
 #endif

@@ -126,7 +126,7 @@ GLuint create_shader(const char* shader, GLenum type) {
 #ifdef NEW_SSAO
 	"#define NEW_SSAO\n"
 #endif
-#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
+#ifdef VIEW_SPACE_GBUFFER
 	"#define VIEW_SPACE_GBUFFER\n"
 #endif
 #ifdef FOG

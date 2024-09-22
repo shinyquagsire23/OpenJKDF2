@@ -1379,6 +1379,10 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
     rdMatrix_Multiply34(&out, &rdCamera_pCurCamera->view_matrix, mat);
     rdMatrix_TransformPointLst34(&out, pCurMesh->vertices, aView, pCurMesh->numVertices);
     rdMatrix_InvertOrtho34(&matInv, mat);
+
+#ifdef SPHERE_AO
+	rdCache_DrawOccluder(&out.scale, meshIn->radius);
+#endif
     
     rdModel3_geometryMode = pCurMesh->geometryMode;
     if ( rdModel3_geometryMode >= curGeometryMode )
@@ -1649,7 +1653,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
                       rdCamera_pCurCamera->attenuationMin);
         }
     }
-#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
+#ifdef VIEW_SPACE_GBUFFER
 	memcpy(procEntry->vertexVS, vertexDst.verticesProjected, sizeof(rdVector3) * vertexDst.numVertices);
 #endif
     rdCamera_pCurCamera->fnProjectLst(vertexDst.verticesOrig, vertexDst.verticesProjected, vertexDst.numVertices);

@@ -47,6 +47,11 @@ void rdCache_FlushLights();
 void rdCache_DrawLight(rdLight* light, rdVector3* position);
 #endif
 
+#ifdef SPHERE_AO
+void rdCache_DrawOccluder(rdVector3* position, float radius);
+void rdCache_FlushOccluders();
+#endif
+
 #ifndef __cplusplus
 static void (*rdCache_DrawFaceUser)(rdProcEntry* face) = (void*)rdCache_DrawFaceUser_ADDR;
 static void (*rdCache_DrawFaceN)(rdProcEntry* face) = (void*)rdCache_DrawFaceN_ADDR;

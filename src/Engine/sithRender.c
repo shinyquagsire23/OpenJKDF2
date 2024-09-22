@@ -648,6 +648,11 @@ void sithRender_Draw()
 	rdCache_FlushDecals();
 #endif
 
+#ifdef SPHERE_AO
+	rdSetStencilBufferMethod(RD_STENCIL_NOREAD_NOWRITE);
+	rdCache_FlushOccluders();
+#endif
+
 #ifdef STENCIL_BUFFER
 	rdSetStencilRef(SITHRENDER_STENCIL_WORLD_ALPHA);
 	rdSetStencilBufferMethod(RD_STENCIL_NOREAD_WRITE);
@@ -1294,7 +1299,7 @@ void sithRender_RenderLevelGeometry()
                 {
                     continue;
                 }
-#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
+#ifdef VIEW_SPACE_GBUFFER
 				memcpy(procEntry->vertexVS, sithRender_aVerticesTmp, sizeof(rdVector3) * meshinfo_out.numVertices);
 #endif
                 rdCamera_pCurCamera->fnProjectLst(procEntry->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
@@ -1533,7 +1538,7 @@ void sithRender_RenderLevelGeometry()
                     if ( meshinfo_out.numVertices < 3u )
                         goto LABEL_92;
 
-#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
+#ifdef VIEW_SPACE_GBUFFER
 					memcpy(v20->vertexVS, sithRender_aVerticesTmp, sizeof(rdVector3) * meshinfo_out.numVertices);
 #endif
                     rdCamera_pCurCamera->fnProjectLst(v20->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
@@ -2585,7 +2590,7 @@ void sithRender_RenderAlphaSurfaces()
 				if (meshinfo_out.numVertices < 3u)
 					goto LABEL_92;
 
-#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
+#ifdef VIEW_SPACE_GBUFFER
 				memcpy(v9->vertexVS, sithRender_aVerticesTmp, sizeof(rdVector3) * meshinfo_out.numVertices);
 #endif
 				rdCamera_pCurCamera->fnProjectLst(v9->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
@@ -2788,7 +2793,7 @@ void sithRender_RenderAlphaSurfaces()
         {
             continue;
         }
-#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
+#ifdef VIEW_SPACE_GBUFFER
 		memcpy(v9->vertexVS, sithRender_aVerticesTmp, sizeof(rdVector3)* meshinfo_out.numVertices);
 #endif
         rdCamera_pCurCamera->fnProjectLst(v9->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);

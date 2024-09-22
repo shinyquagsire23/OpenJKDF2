@@ -20,7 +20,7 @@ static float rdCache_aGreenIntensities[RDCACHE_MAX_VERTICES];
 static float rdCache_aBlueIntensities[RDCACHE_MAX_VERTICES];
 #endif
 
-#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
+#ifdef VIEW_SPACE_GBUFFER
 rdVector3 rdCache_aVerticesVS[RDCACHE_MAX_VERTICES] = { 0 };
 #endif
 
@@ -41,6 +41,14 @@ rdVector3 rdCache_aLightPositions[4096];
 int rdCache_numLights;
 
 void rdCache_FlushLights();
+#endif
+
+#ifdef SPHERE_AO
+rdVector3 rdCache_aOccluderPositions[4096];
+float rdCache_aOccluderRadii[4096];
+int rdCache_numOccluders;
+
+void rdCache_FlushOccluders();
 #endif
 
 int rdCache_Startup()
@@ -116,7 +124,7 @@ rdProcEntry *rdCache_GetProcEntry()
     out_procEntry = &rdCache_aProcFaces[idx];
     out_procEntry->vertices = &rdCache_aVertices[rdCache_numUsedVertices];
     out_procEntry->vertexUVs = &rdCache_aTexVertices[rdCache_numUsedTexVertices];
-#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
+#ifdef VIEW_SPACE_GBUFFER
 	out_procEntry->vertexVS = &rdCache_aVerticesVS[rdCache_numUsedTexVertices];
 #endif
     out_procEntry->vertexIntensities = &rdCache_aIntensities[rdCache_numUsedIntensities];
@@ -711,7 +719,7 @@ int rdCache_SendFaceListToHardware()
 #endif
 
             iterating_6c_vtxs = active_6c->vertices;
-#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
+#ifdef VIEW_SPACE_GBUFFER
 			rdVector3* iter_vs = active_6c->vertexVS;
 #endif
             vertex_a = red_and_alpha << 8;
@@ -730,7 +738,7 @@ int rdCache_SendFaceListToHardware()
                 v38 = d3dvtx_zval * v134;
                 if ( rdCache_dword_865258 != 16 )
                     v38 = 1.0 - v38;
-#if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS)
+#ifdef VIEW_SPACE_GBUFFER
 				rdCache_aHWVertices[rdCache_totalVerts].vx = iter_vs[vtx_idx].x;
 				rdCache_aHWVertices[rdCache_totalVerts].vy = iter_vs[vtx_idx].y;
 				rdCache_aHWVertices[rdCache_totalVerts].vz = iter_vs[vtx_idx].z;
@@ -1672,5 +1680,63 @@ void rdCache_FlushLights()
 		std3D_DrawLight(light, &rdCache_aLightPositions[i], verts);
 	}
 	rdCache_numLights = 0;
+}
+#endif
+
+
+
+#ifdef SPHERE_AO
+void rdCache_DrawOccluder(rdVector3* position, float radius)
+{
+	if (rdCache_numOccluders >= 4096)
+		return;
+
+	rdCache_aOccluderRadii[rdCache_numOccluders] = radius;
+	rdVector_Copy3(&rdCache_aOccluderPositions[rdCache_numOccluders], position);
+	++rdCache_numOccluders;
+}
+
+void rdCache_FlushOccluders()
+{
+	for (int i = 0; i < rdCache_numOccluders; ++i)
+	{
+		float radius = rdCache_aOccluderRadii[i];
+
+		// todo: use an actual sphere...
+		rdVector3 verts[8] =
+		{
+			{ -radius, -radius,  radius },
+			{  radius, -radius,  radius },
+			{  radius,  radius,  radius },
+			{ -radius,  radius,  radius },
+			{ -radius, -radius, -radius },
+			{  radius, -radius, -radius },
+			{  radius,  radius, -radius },
+			{ -radius,  radius, -radius }
+		};
+
+		float inv = 1.0 / rdCamera_pCurCamera->pClipFrustum->field_0.z;
+		for (int v = 0; v < 8; ++v)
+		{
+			rdVector_Add3Acc(&verts[v], &rdCache_aOccluderPositions[i]);
+
+			rdVector3 proj;
+			rdCamera_pCurCamera->fnProject(&proj, &verts[v]);
+
+			// this rly needs to be made into a function or something
+			if (proj.z == 0.0)
+				proj.z = 0.0;
+			else
+				proj.z = 1.0 / proj.z;
+			proj.z = proj.z * inv;
+			if (rdCache_dword_865258 != 16)
+				proj.z = 1.0 - proj.z;
+
+			rdVector_Copy3(&verts[v], &proj);
+		}
+
+		std3D_DrawOccluder(&rdCache_aOccluderPositions[i], radius, verts);
+	}
+	rdCache_numOccluders = 0;
 }
 #endif
