@@ -1698,6 +1698,10 @@ void rdCache_DrawOccluder(rdVector3* position, float radius)
 
 void rdCache_FlushOccluders()
 {
+	extern int jkPlayer_enableSSAO;
+	if(!jkPlayer_enableSSAO)
+		return;
+
 	for (int i = 0; i < rdCache_numOccluders; ++i)
 	{
 		float radius = rdCache_aOccluderRadii[i];
