@@ -768,7 +768,7 @@ void sithAI_idk_msgarrived_target(sithActor *actor, float deltaSeconds)
         v9 = rdVector_Normalize3Acc(&actor->toMovePos);
         rdVector_Scale3(&tmp, &actor->toMovePos, actorb);
         actor->distToMovePos = v9;
-        if ( (v3->sector->flags & SITHAI_MODE_ATTACKING) == 0 && (v3->physicsParams.physflags & SITH_PF_FLY) == 0 )
+        if ( (v3->sector->flags & SITH_SECTOR_UNDERWATER) == 0 && (v3->physicsParams.physflags & SITH_PF_FLY) == 0 )
             tmp.z = 0.0;
         rdVector_Add3Acc(&tmp, &v3->physicsParams.vel);
         rdVector_Copy3(&v3->physicsParams.vel, &tmp);
