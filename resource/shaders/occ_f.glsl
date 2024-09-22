@@ -114,23 +114,21 @@ void main(void)
     float solidAngle =  (1.0 - cos(atan(occluderPosition.w / distance))) * smoothstep(0.0, occluderPosition.w, occluderPosition.w - distance);
     float integralSolidAngle = cosTheta * solidAngle;
 
-    float occ = 1.0 - integralSolidAngle * 0.99;
-	//occ = occ * 0.5 + 0.5;
+    float occ = 1.0 - integralSolidAngle * 0.8;
+	if(occ < 1.0/32.0)
+		discard;
 
-	const float DITHER_LUT[16] = {
+	const float DITHER_LUT[16] = float[16](
 			0, 4, 1, 5,
 			6, 2, 7, 3,
 			1, 5, 0, 4,
 			7, 3, 6, 2
-		};
+	);
 
-		int wrap_x = int(mod(gl_FragCoord.x, 3.0));
-		int wrap_y = int(mod(gl_FragCoord.y, 3.0));
-		int wrap_index = wrap_x + wrap_y * 4;
-		occ = min(occ + DITHER_LUT[wrap_index] / 255.0, 1.0);
-
-	//if(occ < 1.0/32.0)
-		//discard;
+	int wrap_x = int(mod(gl_FragCoord.x, 3.0));
+	int wrap_y = int(mod(gl_FragCoord.y, 3.0));
+	int wrap_index = wrap_x + wrap_y * 4;
+	occ = min(occ + DITHER_LUT[wrap_index] / 255.0, 1.0);
 
     fragColor = vec4(occ, occ, occ, 1.0);
 }

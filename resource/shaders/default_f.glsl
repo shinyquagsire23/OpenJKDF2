@@ -508,12 +508,12 @@ void main(void)
 	// dither the output in case we're using some lower precision output
 	if(enableDither > 0)
 	{
-		const float DITHER_LUT[16] = {
-			0, 4, 1, 5,
-			6, 2, 7, 3,
-			1, 5, 0, 4,
-			7, 3, 6, 2
-		};
+		const float DITHER_LUT[16] = float[16](
+				0, 4, 1, 5,
+				6, 2, 7, 3,
+				1, 5, 0, 4,
+				7, 3, 6, 2
+		);
 
 		int wrap_x = int(mod(gl_FragCoord.x, 3.0));
 		int wrap_y = int(mod(gl_FragCoord.y, 3.0));
