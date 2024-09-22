@@ -4364,7 +4364,8 @@ void std3D_DrawLight(rdLight* light, rdVector3* position, rdVector3* verts)
 	GLenum bufs[] = { GL_COLOR_ATTACHMENT0 };
 	glDrawBuffers(1, bufs);
 
-	glDepthFunc(GL_ALWAYS);
+	glDepthFunc(GL_GREATER);
+	glDepthMask(GL_FALSE);
 	glUseProgram(programLight);
 
 	glUniform1i(light_uniform_texPos, 0);
