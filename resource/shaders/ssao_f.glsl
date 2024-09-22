@@ -79,7 +79,7 @@ float depth(vec2 coord)
 {
     vec2 uv = coord*vec2(iResolution.y/iResolution.x,1.0);
 #ifdef VIEW_SPACE_GBUFFER
-    return texture(tex4, uv).x;
+    return texture(tex4, uv).x * 128.0 * 128.0;
 #else
     return texture(tex, uv).z;
 #endif
@@ -181,7 +181,11 @@ void main(void)
 
     vec4 sampled_color = vec4(1.0, 1.0, 1.0, 1.0);
     float d = depth(coord);
+#ifdef NEW_SSAO
+    vec3 ao = vec3(0.9) * SSAO(coord);
+#else
     vec3 ao = vec3(0.7) * SSAO(coord);
+#endif
     vec3 color = mix(sampled_color.rgb, ao, 1.0 - smoothstep(0.0, 0.99, d*d/1e9));
     //color = mix(color, sampled_color.rgb, 1.0 - smoothstep(0.0, 0.1, d*d/15));
     

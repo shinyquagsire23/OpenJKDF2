@@ -5,10 +5,39 @@ uniform vec2 iResolution;
 
 uniform vec4 occluderPosition;
 
+uniform vec3 cameraLB;
+uniform vec3 cameraLT;
+uniform vec3 cameraRB;
+uniform vec3 cameraRT;
+
 in vec4 f_color;
 in vec2 f_uv;
 in vec3 f_coord;
 layout(location = 0) out vec4 fragColor;
+
+
+vec3 get_camera_frustum_ray(vec2 uv)
+{
+	//vec3 b = mix(cameraLB.xyz, cameraRB.xyz, uv.x);
+	//vec3 t = mix(cameraLT.xyz, cameraRT.xyz, uv.x);
+	//return mix(b, t, uv.y);
+	
+	// barycentric lerp
+	return ((1.0 - uv.x - uv.y) * cameraLB.xyz + (uv.x * cameraRB.xyz + (uv.y * cameraLT.xyz)));
+}
+
+// Returns the world position from linear depth and a frustum ray
+vec3 get_view_position_from_depth(vec3 cam_vec, float linear_depth)
+{
+	return cam_vec.xyz * linear_depth;
+}
+
+vec3 get_view_position(float linear_depth, vec2 uv)
+{
+	vec3 cam_vec = get_camera_frustum_ray(uv).xyz;
+	return get_view_position_from_depth(cam_vec, linear_depth);
+}
+
 
 vec2 oct_wrap(vec2 v)
 {
@@ -68,7 +97,9 @@ void main(void)
     vec2 uv = fragCoord/(iResolution.xy);
     vec2 coord = fragCoord/(iResolution.y);
 
-	vec3 pos = texture(texPos, uv).xyz;
+	//vec3 pos = texture(texPos, uv).xyz;
+	float depth = texture(texPos, uv).x;
+	vec3 pos = get_view_position(depth, uv);
 	vec3 normal = decode_octahedron(texture(texNormal, uv).xy);
 
 	//float occ = 1.0 - sphOcclusion(pos, normal, occluderPosition);

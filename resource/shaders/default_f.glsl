@@ -84,11 +84,14 @@ in vec3 f_coord;
 
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragColorEmiss;
+#ifdef VIEW_SPACE_GBUFFER
+layout(location = 2) out vec4 fragColorDepth;
+#else
 layout(location = 2) out vec4 fragColorPos;
+#endif
 layout(location = 3) out vec4 fragColorNormal;
 #ifdef VIEW_SPACE_GBUFFER
-layout(location = 4) out vec4 fragDepth;
-layout(location = 5) out vec4 fragColorDiffuse;
+layout(location = 4) out vec4 fragColorDiffuse;
 
 vec2 oct_wrap(vec2 v)
 {
@@ -575,13 +578,18 @@ void main(void)
     //fragColor = test_norms;
 
 //	gl_FragDepth = gl_FragCoord.z;
-    fragColorPos = vec4(adjusted_coords.x, adjusted_coords.y, adjusted_coords.z, should_write_normals);
 #ifdef VIEW_SPACE_GBUFFER
-	fragColorDiffuse = sampled_color;
+	// output linear depth
+	// nani tf??? what in the world is happening to gl_FragCoord.w??
+	float linearDepth = (1.0 / gl_FragCoord.w) / 128.0f / 128.0f;
+	fragColorDepth = vec4(linearDepth, linearDepth, linearDepth, should_write_normals);
+
 	vec2 octaNormal = encode_octahedron(normals(adjusted_coords.xyz)); // encode normal
     fragColorNormal = vec4(octaNormal.xy, 0, should_write_normals);
-	fragDepth = vec4(originalZ, originalZ, originalZ, should_write_normals);
+
+	fragColorDiffuse = sampled_color; // unlit diffuse color for deferred lights and decals
 #else
+    fragColorPos = vec4(adjusted_coords.x, adjusted_coords.y, adjusted_coords.z, should_write_normals);
     fragColorNormal = vec4(face_normals, should_write_normals);
 #endif
 }

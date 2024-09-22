@@ -66,4 +66,8 @@ void rdCamera_AdvanceFrame();
 float rdCamera_GetMipmapScalar(); // MOTS added
 void rdCamera_SetMipmapScalar(float val); // MOTS added
 
+#ifdef VIEW_SPACE_GBUFFER
+void rdCamera_GetFrustumCornerRays(rdCamera* camera, rdMatrix34* camMat, rdVector3* lt, rdVector3* rt, rdVector3* lb, rdVector3* rb);
+#endif
+
 #endif // _RDCAMERA_H

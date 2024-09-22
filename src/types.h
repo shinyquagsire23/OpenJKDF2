@@ -599,6 +599,9 @@ typedef struct rdClipFrustum
   float right;
   float nearTop;
   float nearLeft;
+#ifdef VIEW_SPACE_GBUFFER
+  rdVector3 lt, rt, lb, rb;
+#endif
 } rdClipFrustum;
 
 

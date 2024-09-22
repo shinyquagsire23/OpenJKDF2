@@ -71,11 +71,10 @@ typedef struct std3DFramebuffer
     GLuint fbo;
     GLuint tex0; // color (transparencies, etc)
     GLuint tex1; // emissive
-    GLuint tex2; // position
+    GLuint tex2; // position/linear depth (if VIEW_SPACE_GBUFFER)
     GLuint tex3; // normals
 #ifdef VIEW_SPACE_GBUFFER
-	GLuint tex4; // post-projection depth (for SSAO stuff), can probably rework to only use position buffer
-	GLuint tex5; // diffuse
+	GLuint tex4; // diffuse
 #endif
 
     std3DIntermediateFbo window;
@@ -227,6 +226,7 @@ GLuint uniform_numLights;
 void std3D_FlushLights();
 #endif
 
+// todo: all these deferred effects share setup, wrap them in a convenience struct like std3DSimpleTexStage
 #ifdef DECAL_RENDERING
 
 GLuint programDecal;
@@ -234,6 +234,7 @@ GLint decal_attribute_coord3d;
 GLint decal_uniform_mvp, decal_uniform_tex, decal_uniform_texPos, decal_uniform_texLight, decal_uniform_texDiffuse, decal_uniform_texNormal, decal_uniform_worldPalette;
 GLint decal_uniform_tint, decal_uniform_filter, decal_uniform_fade, decal_uniform_add, decal_uniform_flags, decal_uniform_texmode;
 GLint decal_uniform_matrix, decal_uniform_color, decal_uniform_angle, decal_uniform_iResolution;
+GLint decal_uniform_rt, decal_uniform_lt, decal_uniform_rb, decal_uniform_lb;
 
 #endif
 
@@ -244,6 +245,7 @@ GLint light_attribute_coord3d;
 GLint light_uniform_mvp, light_uniform_texPos, light_uniform_texNormal, light_uniform_texColor;
 GLint light_uniform_tint, light_uniform_filter, light_uniform_fade, light_uniform_add;
 GLint light_uniform_attenuation, light_uniform_color, light_uniform_position, light_uniform_iResolution;
+GLint light_uniform_rt, light_uniform_lt, light_uniform_rb, light_uniform_lb;
 
 #endif
 
@@ -253,6 +255,7 @@ GLuint programOccluder;
 GLint occluder_attribute_coord3d;
 GLint occluder_uniform_mvp, occluder_uniform_texPos, occluder_uniform_texNormal;
 GLint occluder_uniform_position, occluder_uniform_iResolution;
+GLint occluder_uniform_rt, occluder_uniform_lt, occluder_uniform_rb, occluder_uniform_lb;
 
 #endif
 
@@ -365,10 +368,11 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     // Attach fbTex to our currently bound framebuffer fb
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, pFb->tex1, 0);
 
-    // Set up our position fb texture
+#ifdef VIEW_SPACE_GBUFFER
+	// Set up our depth fb texture
     glGenTextures(1, &pFb->tex2);
     glBindTexture(GL_TEXTURE_2D, pFb->tex2);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R16F, width, height, 0, GL_RED, GL_FLOAT, NULL); // R16F seems fine for current use, can bump to 32 if necessary
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -378,7 +382,6 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, pFb->tex2, 0);
 
     // Set up our normal fb texture
-#ifdef VIEW_SPACE_GBUFFER
 	glGenTextures(1, &pFb->tex3);
     glBindTexture(GL_TEXTURE_2D, pFb->tex3);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RG8, width, height, 0, GL_RG, GL_FLOAT, NULL);
@@ -390,27 +393,29 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     // Attach fbTex to our currently bound framebuffer fb
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, pFb->tex3, 0);
 
+	// diffuse color buffer
 	glGenTextures(1, &pFb->tex4);
 	glBindTexture(GL_TEXTURE_2D, pFb->tex4);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_R16F, width, height, 0, GL_RED, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, pFb->tex4, 0);
-
-	// diffuse color buffer
-	glGenTextures(1, &pFb->tex5);
-	glBindTexture(GL_TEXTURE_2D, pFb->tex5);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	// Attach fbTex to our currently bound framebuffer fb
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT5, GL_TEXTURE_2D, pFb->tex5, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, pFb->tex4, 0);
 #else
+	// Set up our position fb texture
+	glGenTextures(1, &pFb->tex2);
+	glBindTexture(GL_TEXTURE_2D, pFb->tex2);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	// Attach fbTex to our currently bound framebuffer fb
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, pFb->tex2, 0);
+
 	glGenTextures(1, &pFb->tex3);
 	glBindTexture(GL_TEXTURE_2D, pFb->tex3);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
@@ -508,7 +513,6 @@ void std3D_deleteFramebuffer(std3DFramebuffer* pFb)
     glDeleteTextures(1, &pFb->tex3);
 #ifdef VIEW_SPACE_GBUFFER
 	glDeleteTextures(1, &pFb->tex4);
-	glDeleteTextures(1, &pFb->tex5);
 #endif
     glDeleteRenderbuffers(1, &pFb->rbo);
 
@@ -720,6 +724,11 @@ int init_resources()
 	decal_uniform_fade = std3D_tryFindUniform(programDecal, "colorEffects_fade");
 	decal_uniform_add = std3D_tryFindUniform(programDecal, "colorEffects_add");
 
+	decal_uniform_rt = std3D_tryFindUniform(programDecal, "cameraRT");
+	decal_uniform_lt = std3D_tryFindUniform(programDecal, "cameraLT");
+	decal_uniform_rb = std3D_tryFindUniform(programDecal, "cameraRB");
+	decal_uniform_lb = std3D_tryFindUniform(programDecal, "cameraLB");
+
 	decal_uniform_flags = std3D_tryFindUniform(programDecal, "decalFlags");
 	decal_uniform_angle = std3D_tryFindUniform(programDecal, "decalAngleFade");
 	decal_uniform_texmode = std3D_tryFindUniform(programDecal, "texMode");
@@ -740,6 +749,11 @@ int init_resources()
 	light_uniform_fade = std3D_tryFindUniform(programLight, "colorEffects_fade");
 	light_uniform_add = std3D_tryFindUniform(programLight, "colorEffects_add");
 
+	light_uniform_rt = std3D_tryFindUniform(programLight, "cameraRT");
+	light_uniform_lt = std3D_tryFindUniform(programLight, "cameraLT");
+	light_uniform_rb = std3D_tryFindUniform(programLight, "cameraRB");
+	light_uniform_lb = std3D_tryFindUniform(programLight, "cameraLB");
+
 	light_uniform_attenuation = std3D_tryFindUniform(programLight, "lightAttenuation");
 	light_uniform_color = std3D_tryFindUniform(programLight, "lightColor");
 	light_uniform_position = std3D_tryFindUniform(programLight, "lightPosition");
@@ -753,6 +767,12 @@ int init_resources()
 	occluder_uniform_texNormal = std3D_tryFindUniform(programOccluder, "texNormal");
 
 	occluder_uniform_position = std3D_tryFindUniform(programOccluder, "occluderPosition");
+
+	occluder_uniform_rt = std3D_tryFindUniform(programOccluder, "cameraRT");
+	occluder_uniform_lt = std3D_tryFindUniform(programOccluder, "cameraLT");
+	occluder_uniform_rb = std3D_tryFindUniform(programOccluder, "cameraRB");
+	occluder_uniform_lb = std3D_tryFindUniform(programOccluder, "cameraLB");
+
 	occluder_uniform_iResolution = std3D_tryFindUniform(programOccluder, "iResolution");
 #endif
 
@@ -2683,9 +2703,6 @@ void std3D_DrawRenderList()
 #ifdef VIEW_SPACE_GBUFFER
 	, GL_COLOR_ATTACHMENT4
 #endif
-#ifdef PARTICLE_LIGHTS
-,GL_COLOR_ATTACHMENT5
-#endif
 	};
     glDrawBuffers(ARRAYSIZE(bufs), bufs);
     
@@ -4135,6 +4152,11 @@ void std3D_DrawDecal(rdDDrawSurface* texture, rdVector3* verts, rdMatrix34* deca
 		glUniform2f(decal_uniform_iResolution, width, height);
 	}
 
+	glUniform3fv(decal_uniform_rt, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->rt);
+	glUniform3fv(decal_uniform_lt, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->lt);
+	glUniform3fv(decal_uniform_rb, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->rb);
+	glUniform3fv(decal_uniform_lb, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->lb);
+
 	// triangle indices
 	GL_tmpTris[0].v1 = 0;
 	GL_tmpTris[0].v2 = 1;
@@ -4232,7 +4254,7 @@ void std3D_DrawDecal(rdDDrawSurface* texture, rdVector3* verts, rdMatrix34* deca
 	glActiveTexture(GL_TEXTURE0 + 2);
 	glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex3);
 	glActiveTexture(GL_TEXTURE0 + 3);
-	glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex5);
+	glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex4);
 	glActiveTexture(GL_TEXTURE0 + 4);
 	glBindTexture(GL_TEXTURE_2D, displaypal_texture);
 
@@ -4454,6 +4476,11 @@ void std3D_DrawLight(rdLight* light, rdVector3* position, rdVector3* verts)
 		glViewport(0, 0, width, height);
 		glUniform2f(light_uniform_iResolution, width, height);
 	}
+
+	glUniform3fv(light_uniform_rt, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->rt);
+	glUniform3fv(light_uniform_lt, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->lt);
+	glUniform3fv(light_uniform_rb, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->rb);
+	glUniform3fv(light_uniform_lb, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->lb);
 
 	// triangle indices
 	GL_tmpTris[0].v1 = 0;
@@ -4698,6 +4725,11 @@ void std3D_DrawOccluder(rdVector3* position, float radius, rdVector3* verts)
 		glViewport(0, 0, width, height);
 		glUniform2f(occluder_uniform_iResolution, width, height);
 	}
+
+	glUniform3fv(occluder_uniform_rt, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->rt);
+	glUniform3fv(occluder_uniform_lt, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->lt);
+	glUniform3fv(occluder_uniform_rb, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->rb);
+	glUniform3fv(occluder_uniform_lb, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->lb);
 
 	// triangle indices
 	GL_tmpTris[0].v1 = 0;
