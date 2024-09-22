@@ -158,6 +158,7 @@ extern int jkPlayer_enableVsync;
 extern int jkPlayer_enable32Bit;
 extern float jkPlayer_ssaaMultiple;
 extern int jkPlayer_enableSSAO;
+extern int jkPlayer_enableShadows;
 extern float jkPlayer_gamma;
 extern float jkPlayer_hudScale;
 extern float jkPlayer_crosshairLineWidth;

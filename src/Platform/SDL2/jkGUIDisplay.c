@@ -117,9 +117,14 @@ static jkGuiElement jkGuiDisplay_aElementsAdvanced[] = {
 	// 15
 	{ELEMENT_CHECKBOX,     0,            0, "GUIEXT_EN_SSAO",    0, {20, 270, 300, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
 
-#ifdef DECAL_RENDERING
+#ifdef SPHERE_AO
 	// 16
-	{ ELEMENT_CHECKBOX,     0,           0, "GUIEXT_EN_DECALS",    0, {20, 310, 300, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
+	{ ELEMENT_CHECKBOX,     0,           0, "GUIEXT_EN_SHADOWS",    0, {20, 310, 300, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
+#endif
+
+#ifdef DECAL_RENDERING
+	// 17
+	{ ELEMENT_CHECKBOX,     0,           0, "GUIEXT_EN_DECALS",    0, {20, 350, 300, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
 #endif
 
     { ELEMENT_END,         0,            0, NULL,                   0, {0},                 0, 0, NULL,                        0, 0, 0, {0}, 0},
@@ -196,8 +201,13 @@ int jkGuiDisplay_ShowAdvanced()
 	jkGuiDisplay_aElementsAdvanced[14].selectedTextEntry = jkPlayer_enableBloom;
 	jkGuiDisplay_aElementsAdvanced[15].selectedTextEntry = jkPlayer_enableSSAO;
 
+	int id = 16;
+#ifdef SPHERE_AO
+	jkGuiDisplay_aElementsAdvanced[id++].selectedTextEntry = jkPlayer_enableShadows;
+#endif
+
 #ifdef DECAL_RENDERING
-	jkGuiDisplay_aElementsAdvanced[16].selectedTextEntry = jkPlayer_enableDecals;
+	jkGuiDisplay_aElementsAdvanced[id++].selectedTextEntry = jkPlayer_enableDecals;
 #endif
 
     while (1)
@@ -213,8 +223,14 @@ int jkGuiDisplay_ShowAdvanced()
 
 			jkPlayer_enableBloom = jkGuiDisplay_aElementsAdvanced[14].selectedTextEntry;
 			jkPlayer_enableSSAO = jkGuiDisplay_aElementsAdvanced[15].selectedTextEntry;
+
+			id = 16;
+#ifdef SPHERE_AO
+			jkPlayer_enableShadows = jkGuiDisplay_aElementsAdvanced[id++].selectedTextEntry;
+#endif
+
 #ifdef DECAL_RENDERING
-			jkPlayer_enableDecals = jkGuiDisplay_aElementsAdvanced[16].selectedTextEntry;
+			jkPlayer_enableDecals = jkGuiDisplay_aElementsAdvanced[id++].selectedTextEntry;
 #endif
 
             std3D_PurgeTextureCache();
