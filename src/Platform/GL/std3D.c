@@ -855,7 +855,7 @@ int init_resources()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
     glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
     
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, 4, 4, 0, GL_RGB, GL_FLOAT, tiledrand_data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, 4, 4, 0, GL_RGB, GL_FLOAT, tiledrand_data);
 
     unsigned int vao;
     glGenVertexArrays( 1, &vao );
