@@ -2937,6 +2937,7 @@ void std3D_DrawRenderList()
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 		}
 		glEnable(GL_BLEND);
+		lastBlendEnable = 1;
 	}
 	else
 #endif
@@ -2951,12 +2952,32 @@ void std3D_DrawRenderList()
             glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         }
 		glEnable(GL_BLEND);
+		lastBlendEnable = 1;
 	}
     else {
         glUniform1i(uniform_blend_mode, D3DBLEND_ONE);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glDisable(GL_BLEND);
+		lastBlendEnable = 0;
     }
+
+	// this is probably not ideal to do repeatedly mid drawing but the alpha-reject approach to
+	// not writing the gbuffer targets is pretty freaking busted sometimes
+	// todo: cache the state along with the other states, sort draw calls by state
+	if(lastBlendEnable) // only write to color and emissive when blending
+	{
+		GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+		glDrawBuffers(ARRAYSIZE(bufs), bufs);
+	}
+	else // otherwise draw them all
+	{
+		GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3
+	#ifdef VIEW_SPACE_GBUFFER
+		, GL_COLOR_ATTACHMENT4
+	#endif
+		};
+		glDrawBuffers(ARRAYSIZE(bufs), bufs);
+	}
 
     if (last_flags & 0x1000)
     {
@@ -3019,7 +3040,8 @@ void std3D_DrawRenderList()
             std3D_DoTex(tex, &tris[j], GL_tmpTrisAmt-j);
             
             int changed_flags = (last_flags ^ tris[j].flags);
-
+			
+			int blendEnable = 0;
 #ifdef ADDITIVE_BLEND
 			if (changed_flags & 0x180600)
 #else
@@ -3040,6 +3062,7 @@ void std3D_DrawRenderList()
 						glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 					}
 					glEnable(GL_BLEND);
+					blendEnable = 1;
 				}
 				else
 			#endif
@@ -3055,11 +3078,31 @@ void std3D_DrawRenderList()
                         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
                     }
 					glEnable(GL_BLEND);
+					blendEnable = 1;
 				}
                 else {
                     glUniform1i(uniform_blend_mode, D3DBLEND_ONE);
                     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 					glDisable(GL_BLEND);
+					blendEnable = 0;
+				}
+
+				if (blendEnable != lastBlendEnable)
+				{
+					if (blendEnable) // only write to color and emissive when blending
+					{
+						GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+						glDrawBuffers(ARRAYSIZE(bufs), bufs);
+					}
+					else // otherwise draw them all
+					{
+						GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3
+					#ifdef VIEW_SPACE_GBUFFER
+						, GL_COLOR_ATTACHMENT4
+					#endif
+						};
+						glDrawBuffers(ARRAYSIZE(bufs), bufs);
+					}
 				}
             }
             
