@@ -248,6 +248,7 @@ typedef struct std3D_deferredStage
 #endif
 
 #ifdef DECAL_RENDERING
+int lightBufferDirty = 0;
 std3D_deferredStage std3D_decalStage;
 #endif
 
@@ -1169,6 +1170,10 @@ int std3D_StartScene()
 #endif
 
 	std3D_SetWorldAttribPointers();
+
+#ifdef DECAL_RENDERING
+	lightBufferDirty = 1;
+#endif
 
     return 1;
 }
@@ -3170,6 +3175,10 @@ void std3D_DrawRenderList()
     glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &lines_size);
     glDrawElements(GL_LINES, lines_size / sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
 #endif
+
+#ifdef DECAL_RENDERING
+	lightBufferDirty = 1;
+#endif
         
     // Done drawing    
     glBindTexture(GL_TEXTURE_2D, worldpal_texture);
@@ -4325,10 +4334,13 @@ void std3D_DrawDecal(rdDDrawSurface* texture, rdVector3* verts, rdMatrix34* deca
 {
 	if (Main_bHeadless) return;
 
-	// we need a copy of the main buffer for lighting, so copy one
-	// todo: only do this if contents of the backbuffer were changed with a call to std3D_DrawRenderList
-	// or find a better way because this totally sucks
-	std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->decalLight, std3D_pFb->tex0, 0, 0, 1.0, 1.0, 1.0, 0);
+	// we need a copy of the main buffer for lighting, so copy one...
+	// todo: get rid of this... maybe just read the ambient SH for decals and call it a day instead of using the underlying lighting
+	if(lightBufferDirty)
+	{
+		std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->decalLight, std3D_pFb->tex0, 0, 0, 1.0, 1.0, 1.0, 0);
+		lightBufferDirty = 0;
+	}
 
 	// todo: track this so we don't redo it every decal draw
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
