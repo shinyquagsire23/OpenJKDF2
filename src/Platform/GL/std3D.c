@@ -102,7 +102,6 @@ typedef struct std3DFramebuffer
     std3DIntermediateFbo blur4;
 
 #ifdef NEW_BLOOM
-	// could do intermediate 11x11 gaussian but a few extra downsamples seems simpler
 	std3DIntermediateFbo blur5;
 	std3DIntermediateFbo blur6;
 	std3DIntermediateFbo blur7;
