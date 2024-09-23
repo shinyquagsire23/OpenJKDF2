@@ -9,7 +9,8 @@ Rendering:
 - Early attempt at GPU vertex/pixel lighting
 - RGB thing lights (lightcolor template param for things), including lightsaber colored lighting derived from the saber material
 - RGB ambient lighting, including directional ambient cube for gouraud shaded models
-  Deferred decal rendering (new .dcal file to specify decals, decal template param for things)
+- Optimized GBuffer using reconstructed position and smaller formats (16/32 bit options for color/depth, octahedron encoded normals, 2-3x bandwidth savings)
+- Deferred decal rendering (new .dcal file to specify decals, decal template param for things)
 - Deferred AO shadows (via "capsule" style sphere occluders)
 - Deferred particle lights
 - Faster downsample based bloom/glow
