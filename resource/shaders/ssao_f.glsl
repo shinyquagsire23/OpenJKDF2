@@ -179,8 +179,8 @@ float SSAO(vec2 coord)
 	#ifdef NEW_SSAO
 		vec3 spos = getpos(sp);
 		vec3 v = spos - pos;
-		float dv = dot(v, v);
-		v = normalize(v);
+		float dv = dot(v, v) + 1e-3;
+		v /= sqrt(dv);
 
 		float l = clamp(-(-2.0 * radius + dv) / radius + 1.0, 0.0, 1.0);
 		l *= clamp((1.0 / 0.3) * dot(normal, v) - 0.3, 0.0, 1.0);

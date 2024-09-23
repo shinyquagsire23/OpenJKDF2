@@ -2922,6 +2922,7 @@ void std3D_DrawRenderList()
         glDepthFunc(GL_ALWAYS);
     }
 
+	int lastBlendEnable = 0;
 #ifdef ADDITIVE_BLEND
 	if (last_flags & 0x180000)
 	{
