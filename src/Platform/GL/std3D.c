@@ -378,7 +378,7 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
 	// Set up our depth fb texture
     glGenTextures(1, &pFb->tex2);
     glBindTexture(GL_TEXTURE_2D, pFb->tex2);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_R16F, width, height, 0, GL_RED, GL_FLOAT, NULL); // R16F seems fine for current use, can bump to 32 if necessary
+    glTexImage2D(GL_TEXTURE_2D, 0, jkPlayer_enable32Bit ? GL_R32F : GL_R16F, width, height, 0, GL_RED, GL_FLOAT, NULL); // juse use 16 or 32 based on jkPlayer_enable32Bit because why not
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
