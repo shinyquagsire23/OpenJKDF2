@@ -1079,7 +1079,7 @@ rdCache_TriCompare	.text	0043C380	0000003A	00000004	00000008	R	.	.	.	.	.	T	.
 rdCache_DrawFaceN	.text	0043C3C0	00000AC9	00000014	00000004	R	.	.	.	.	.	T	.
 rdCache_DrawFaceZ	.text	0043CED0	00000AC9	00000014	00000004	R	.	.	.	.	.	T	.
 rdCache_DrawFaceUser	.text	0043D9E0	00000747	00000018	00000004	R	.	.	.	.	.	T	.
-rdCache_ProcFaceCompare	.text	0043E170	0000002F	00000000	00000008	R	.	.	.	.	.	T	.
+rdCache_ProcFaceCompareByDistance	.text	0043E170	0000002F	00000000	00000008	R	.	.	.	.	.	T	.
 rdThing_New	.text	0043E1A0	0000005F	00000000	00000004	R	.	.	.	.	.	T	.
 rdThing_NewEntry	.text	0043E200	00000054	00000000	00000008	R	.	.	.	.	.	T	.
 rdThing_Free	.text	0043E260	00000077	00000008	00000004	R	.	.	.	.	.	T	.

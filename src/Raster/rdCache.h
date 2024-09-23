@@ -20,7 +20,7 @@
 #define rdCache_DrawFaceN_ADDR (0x0043C3C0)
 #define rdCache_DrawFaceZ_ADDR (0x0043CED0)
 #define rdCache_DrawFaceUser_ADDR (0x0043D9E0)
-#define rdCache_ProcFaceCompare_ADDR (0x0043E170)
+#define rdCache_ProcFaceCompareByDistance_ADDR (0x0043E170)
 
 int rdCache_Startup();
 void rdCache_AdvanceFrame();
@@ -34,7 +34,10 @@ void rdCache_ResetRenderList();
 void rdCache_DrawRenderList();
 int rdCache_TriCompare(const void* a_, const void* b_);
 
-int rdCache_ProcFaceCompare(rdProcEntry *a, rdProcEntry *b);
+int rdCache_ProcFaceCompareByDistance(rdProcEntry *a, rdProcEntry *b);
+#ifdef QOL_IMPROVEMENTS
+int rdCache_ProcFaceCompareByState(rdProcEntry* a, rdProcEntry* b);
+#endif
 int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags);
 
 #ifdef DECAL_RENDERING

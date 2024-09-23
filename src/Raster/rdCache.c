@@ -151,8 +151,14 @@ void rdCache_Flush()
 
     if ( rdroid_curSortingMethod == 2 )
     {
-        _qsort(rdCache_aProcFaces, rdCache_numProcFaces, sizeof(rdProcEntry), (int (__cdecl *)(const void *, const void *))rdCache_ProcFaceCompare);
+        _qsort(rdCache_aProcFaces, rdCache_numProcFaces, sizeof(rdProcEntry), (int (__cdecl *)(const void *, const void *))rdCache_ProcFaceCompareByDistance);
     }
+#ifdef QOL_IMPROVEMENTS
+    else if ( rdroid_curSortingMethod == 0 )
+    {
+        _qsort(rdCache_aProcFaces, rdCache_numProcFaces, sizeof(rdProcEntry), (int (__cdecl *)(const void *, const void *))rdCache_ProcFaceCompareByState);
+    }
+#endif
 #if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
     if ( rdroid_curAcceleration <= 0 )
     {
@@ -1366,7 +1372,7 @@ int rdCache_TriCompare(const void* a_, const void* b_)
         return tex_a->is_16bit != 0 ? 1 : -1;
 }
 
-int rdCache_ProcFaceCompare(rdProcEntry *a, rdProcEntry *b)
+int rdCache_ProcFaceCompareByDistance(rdProcEntry *a, rdProcEntry *b)
 {
 #ifdef QOL_IMPROVEMENTS
 	// Added: sort priority
@@ -1384,6 +1390,42 @@ int rdCache_ProcFaceCompare(rdProcEntry *a, rdProcEntry *b)
 
     return 1;
 }
+
+#ifdef QOL_IMPROVEMENTS
+// Added: state based sorting, via sort method 0
+int rdCache_GetSortHash(rdProcEntry* proc) // todo: precompute?
+{
+	int hash = 0;
+	hash |= ((proc->type & RD_FF_TEX_TRANSLUCENT) == RD_FF_TEX_TRANSLUCENT) << 31;
+	hash |= ((proc->type & RD_FF_DOUBLE_SIDED) == RD_FF_DOUBLE_SIDED) << 30;
+	//RD_FF_TEX_CLAMP_X
+	//RD_FF_TEX_CLAMP_Y
+	//RD_FF_TEX_FILTER_NEAREST
+	//RD_FF_ZWRITE_DISABLED
+#ifdef ADDITIVE_BLEND
+	hash |= ((proc->type & RD_FF_ADDITIVE) == RD_FF_ADDITIVE) << 30;
+	hash |= ((proc->type & RD_FF_SCREEN) == RD_FF_SCREEN) << 28;
+#endif
+	hash |= (proc->material ? proc->material->id : 0);
+	return hash;
+}
+
+int rdCache_ProcFaceCompareByState(rdProcEntry* a, rdProcEntry* b)
+{
+	//int aSortId = ((a->type) << 16) | (a->material ? a->material->id : 0);
+	//int bSortId = ((b->type) << 16) | (b->material ? b->material->id : 0);
+	int aSortId = rdCache_GetSortHash(a);
+	int bSortId = rdCache_GetSortHash(b);
+
+	if (aSortId == bSortId)
+		return 0;
+
+	if (aSortId >= bSortId)
+		return -1;
+
+	return 1;
+}
+#endif
 
 // MOTS altered
 int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags)
