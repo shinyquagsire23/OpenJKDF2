@@ -2960,22 +2960,16 @@ void std3D_DrawRenderList()
     }
 
 #ifdef STENCIL_BUFFER
-	// todo: should probably pass this in as flags like the depth/cull stuff
-	int stencilMethod = rdGetStencilBufferMethod();
-	int writeStencil = (stencilMethod == RD_STENCIL_NOREAD_WRITE) || (stencilMethod == RD_STENCIL_READ_WRITE);
-	int readStencil = (stencilMethod == RD_STENCIL_READ_NOWRITE) || (stencilMethod == RD_STENCIL_READ_WRITE);
-
-	if(stencilMethod == RD_STENCIL_NOREAD_NOWRITE)
-		glDisable(GL_STENCIL_TEST);
-	else
+	if (last_flags & 0x200000)
+	{
 		glEnable(GL_STENCIL_TEST);
-
-	if (readStencil)
-		glStencilFunc(GL_EQUAL, rdGetStencilRef(), rdGetStencilMask());
+		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+		glStencilFunc(GL_ALWAYS, 1, 0xFF);
+	}
 	else
-		glStencilFunc(GL_ALWAYS, rdGetStencilRef(), rdGetStencilMask());
-	
-	glStencilOp(writeStencil ? GL_KEEP : GL_REPLACE, GL_KEEP, writeStencil ? GL_REPLACE : GL_KEEP);
+	{
+		glDisable(GL_STENCIL_TEST);
+	}
 #endif
     
     for (int j = 0; j < GL_tmpTrisAmt; j++)
@@ -3101,6 +3095,22 @@ void std3D_DrawRenderList()
                     glCullFace(GL_FRONT);
                 }
             }
+
+#ifdef STENCIL_BUFFER
+			if (changed_flags & 0x200000)
+			{
+				if (tris[j].flags & 0x200000)
+				{
+					glEnable(GL_STENCIL_TEST);
+					glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+					glStencilFunc(GL_ALWAYS, 1, 0xFF);
+				}
+				else
+				{
+					glDisable(GL_STENCIL_TEST);
+				}
+			}
+#endif
             
             last_tex = tris[j].texture;
             last_flags = tris[j].flags;
@@ -4328,7 +4338,7 @@ void std3D_DrawDecal(rdDDrawSurface* texture, rdVector3* verts, rdMatrix34* deca
 	glEnable(GL_CULL_FACE);
 #ifdef STENCIL_BUFFER
 	glEnable(GL_STENCIL_TEST);
-	glStencilFunc(GL_EQUAL, rdGetStencilRef(), rdGetStencilMask());
+	glStencilFunc(GL_EQUAL, 0, 0xFF);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 #endif
 

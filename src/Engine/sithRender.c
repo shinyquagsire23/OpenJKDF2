@@ -53,12 +53,6 @@ static rdMatrix34 ambientDebugThing_mat;
 #endif
 #endif
 
-#ifdef STENCIL_BUFFER
-#define SITHRENDER_STENCIL_WORLD_OPAQUE 0
-#define SITHRENDER_STENCIL_THINGS       1
-#define SITHRENDER_STENCIL_WORLD_ALPHA  2
-#endif
-
 sithRender_weapRendFunc_t sithRender_weaponRenderOpaqueHandle;
 sithRender_weapRendFunc_t sithRender_weaponRenderAlphaHandle;
 
@@ -507,11 +501,6 @@ void sithRender_Draw()
     rdSetTextureMode(sithRender_texMode);
     rdSetRenderOptions(rdGetRenderOptions() | 2);
 
-#ifdef STENCIL_BUFFER
-	rdSetStencilBufferMethod(RD_STENCIL_NOREAD_NOWRITE);
-	rdSetStencilRef(SITHRENDER_STENCIL_WORLD_OPAQUE);
-#endif
-
 #ifdef FOG
 	rdSetFog(sithWorld_pCurrentWorld->fogEnabled, &sithWorld_pCurrentWorld->fogColor, sithWorld_pCurrentWorld->fogStartDepth, sithWorld_pCurrentWorld->fogEndDepth);
 #endif
@@ -633,29 +622,15 @@ void sithRender_Draw()
 
     sithRender_RenderLevelGeometry();
 
-#ifdef STENCIL_BUFFER
-	// from here on out it's transparents and dynamic objects
-	rdSetStencilBufferMethod(RD_STENCIL_NOREAD_WRITE);
-	rdSetStencilRef(SITHRENDER_STENCIL_THINGS);
-#endif
-
     if ( sithRender_numSectors2 )
         sithRender_RenderThings();
 
 #ifdef DECAL_RENDERING
-	rdSetStencilRef(SITHRENDER_STENCIL_WORLD_OPAQUE);
-	rdSetStencilBufferMethod(RD_STENCIL_READ_NOWRITE);
 	rdCache_FlushDecals();
 #endif
 
 #ifdef SPHERE_AO
-	rdSetStencilBufferMethod(RD_STENCIL_NOREAD_NOWRITE);
 	rdCache_FlushOccluders();
-#endif
-
-#ifdef STENCIL_BUFFER
-	rdSetStencilRef(SITHRENDER_STENCIL_WORLD_ALPHA);
-	rdSetStencilBufferMethod(RD_STENCIL_NOREAD_WRITE);
 #endif
 
     if ( sithRender_numSurfaces )
@@ -695,11 +670,6 @@ void sithRender_Draw()
 #ifdef SDL2_RENDER
 	rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
 #endif
-#endif
-
-#ifdef STENCIL_BUFFER
-	rdSetStencilBufferMethod(RD_STENCIL_NOREAD_NOWRITE);
-	rdSetStencilRef(0);
 #endif
 
 #ifdef PARTICLE_LIGHTS

@@ -568,6 +568,11 @@ int rdCache_SendFaceListToHardware()
 			}
 #endif
 
+#ifdef STENCIL_BUFFER
+			if(active_6c->extraData & 2)
+				flags_idk_ |= 0x200000; // stencil bit
+#endif
+
             if ( !rdMaterial_AddToTextureCache(v11.material, sith_tex_sel, mipmap_level, alpha_is_opaque, v14) )
             {
                 rdCache_DrawRenderList();
