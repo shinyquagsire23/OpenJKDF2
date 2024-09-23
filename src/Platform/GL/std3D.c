@@ -72,6 +72,15 @@ typedef struct std3DIntermediateFbo
     int32_t ih;
 } std3DIntermediateFbo;
 
+// LadyEebs updated gbuffer:
+// color/forward render: 2-4 bytes per pixel
+// emissive: 2-4 bytes per pixel
+// depth: 2-4 bytes per pixel
+// normal: 2 bytes per pixel
+// diffuse: 2 bytes per pixel
+//
+// total: 10/16 bytes per pixel vs the original 28 bytes per pixel
+// note: the depth can also be replaced with renderbuffer depth readback and linearization to save 2-4 bytes
 typedef struct std3DFramebuffer
 {
     GLuint fbo;
@@ -312,15 +321,6 @@ void std3D_deleteIntermediateFbo(std3DIntermediateFbo* pFbo)
     glDeleteTextures(1, &pFbo->tex);
     glDeleteRenderbuffers(1, &pFbo->rbo);
 }
-
-// color/forward render: 16bpp/32bpp (32bpp when jkgm is on)
-// emissive: 32bpp (2 bits free in alpha)
-// position: 64bpp (not much we can do about this until we move projection to the GPU)
-// normal/depth: 64bpp (JK normals can easily be 8:8 octahedron, can crunch this down to 2 16 bit textures)
-// light: 16bpp (rgb565 minimal precision needed)
-// diffuse: 16bpp (rgb565 minimal precision needed)
-//
-// total: 208bpp/224bpp
 
 void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* pFb)
 {
