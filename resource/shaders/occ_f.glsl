@@ -1,9 +1,13 @@
-uniform sampler2D texPos;
+uniform sampler2D texDepth;
 uniform sampler2D texNormal;
 
 uniform vec2 iResolution;
 
-uniform vec4 occluderPosition;
+uniform uint   volumeFlags;
+uniform vec3   volumePosition;
+uniform float  volumeRadius;
+uniform vec3   volumeColor;
+uniform mat4x4 volumeInvMatrix;
 
 uniform vec3 cameraLB;
 uniform vec3 cameraLT;
@@ -57,38 +61,6 @@ vec3 decode_octahedron(vec2 p)
     return normalize(n);
 }
 
-// https://www.shadertoy.com/view/4djSDy
-float sphOcclusion( in vec3 pos, in vec3 nor, in vec4 sph )
-{
-    vec3  di = sph.xyz - pos;
-    float l  = length(di);
-    float nl = dot(nor,di/l);
-    float h  = l/sph.w;
-    float h2 = h*h;
-    float k2 = 1.0 - h2*nl*nl;
-
-    // above/below horizon
-    // EXACT: Quilez - https://iquilezles.org/articles/sphereao
-    float res = max(0.0,nl)/h2;
-    
-    // intersecting horizon 
-    //if( k2 > 0.001 ) 
-    //{
-    //    #if 1
-    //        // EXACT : Lagarde/de Rousiers - https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
-    //        res = nl*acos(-nl*sqrt( (h2-1.0)/(1.0-nl*nl) )) - sqrt(k2*(h2-1.0));
-    //        res = res/h2 + atan( sqrt(k2/(h2-1.0)));
-    //        res /= 3.141593;
-    //    #else
-    //        // APPROXIMATED : Quilez - https://iquilezles.org/articles/sphereao
-    //        res = (nl*h+1.0)/h2;
-    //        res = 0.33*res*res;
-    //    #endif
-    //}
-
-    return clamp(res, 0.0, 1.0);
-}
-
 void main(void)
 {
     vec2 fragCoord = gl_FragCoord.xy;
@@ -97,21 +69,14 @@ void main(void)
     vec2 uv = fragCoord/(iResolution.xy);
     vec2 coord = fragCoord/(iResolution.y);
 
-	//vec3 pos = texture(texPos, uv).xyz;
-	float depth = texture(texPos, uv).x;
+	float depth = texture(texDepth, uv).x;
 	vec3 pos = get_view_position(depth, uv);
 	vec3 normal = decode_octahedron(texture(texNormal, uv).xy);
 
-	//float occ = 1.0 - sphOcclusion(pos, normal, occluderPosition);
-
-	//vec3 sphereDir = normalize(occluderPosition.xyz - pos.xyz);
-	//float NdotL = max(dot(normal, sphereDir), 0.0);    
-   // float occ = smoothstep(0.0, occluderPosition.w, NdotL);
-
-    vec3 direction = normalize(occluderPosition.xyz - pos.xyz);
+    vec3 direction = normalize(volumePosition.xyz - pos.xyz);
     float cosTheta = dot(normal, direction);
-    float distance = length(occluderPosition.xyz - pos.xyz);
-    float solidAngle =  (1.0 - cos(atan(occluderPosition.w / distance))) * smoothstep(0.0, occluderPosition.w, occluderPosition.w - distance);
+    float distance = length(volumePosition.xyz - pos.xyz);
+    float solidAngle =  (1.0 - cos(atan(volumeRadius / distance))) * smoothstep(0.0, volumeRadius, volumeRadius - distance);
     float integralSolidAngle = cosTheta * solidAngle;
 
     float occ = 1.0 - integralSolidAngle * 0.8;

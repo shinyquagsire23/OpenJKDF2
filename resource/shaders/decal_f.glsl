@@ -1,4 +1,4 @@
-uniform sampler2D texPos;
+uniform sampler2D texDepth;
 uniform sampler2D texLight;
 uniform sampler2D texNormal;
 uniform sampler2D texDiffuse;
@@ -9,10 +9,11 @@ uniform vec2 iResolution;
 
 uniform int texMode;
 
-uniform vec3 decalColor;
-uniform uint decalFlags;
-uniform float decalAngleFade;
-uniform mat4x4 decalMatrix;
+uniform uint   volumeFlags;
+uniform vec3   volumePosition;
+uniform float  volumeRadius;
+uniform vec3   volumeColor;
+uniform mat4x4 volumeInvMatrix;
 
 uniform vec3 colorEffects_tint;
 uniform vec3 colorEffects_filter;
@@ -35,7 +36,6 @@ layout(location = 1) out vec4 fragColorEmissive;
 #define TEX_MODE_BILINEAR 2
 #define TEX_MODE_16BPP 5
 #define TEX_MODE_BILINEAR_16BPP 6
-
 
 #ifdef HAS_TEXTUREGATHER
 vec4 impl_textureGather(sampler2D tex, vec2 uv)
@@ -202,13 +202,12 @@ void main(void)
     vec2 uv = fragCoord/(iResolution.xy);
     vec2 coord = fragCoord/(iResolution.y);
 
-	//vec3 pos = texture(texPos, uv).xyz;// coord*vec2(iResolution.y/iResolution.x,1.0)).xyz;
-	float depth = texture(texPos, uv).x;
+	float depth = texture(texDepth, uv).x;
 	vec3 pos = get_view_position(depth, uv);
-	vec4 objectPosition = decalMatrix * vec4(pos.xyz, 1.0);
+	vec4 objectPosition = volumeInvMatrix * vec4(pos.xyz, 1.0);
 
 	vec3 normal = decode_octahedron(texture(texNormal, uv).xy);
-	vec4 objectNormal = decalMatrix * vec4(normal.xyz, 0.0);
+	vec4 objectNormal = volumeInvMatrix * vec4(normal.xyz, 0.0);
 	objectNormal.xyz = normalize(objectNormal.xyz);
 
 	vec3 falloff = 0.5f - abs(objectPosition.xyz);
@@ -259,10 +258,10 @@ void main(void)
 #endif
 
 	// omfg I hate glsl
-	bool isInside = mod(decalFlags, 2.0) > 0.;
-	bool isHeat = mod(floor(decalFlags / 2.0), 2.0) > 0.;
-	bool isAdditive = mod(floor(decalFlags / 4.0), 2.0) > 0.;
-	bool isRgbAlpha = mod(floor(decalFlags / 8.0), 2.0) > 0.;
+	bool isInside = mod(volumeFlags, 2.0) > 0.;
+	bool isHeat = mod(floor(volumeFlags / 2.0), 2.0) > 0.;
+	bool isAdditive = mod(floor(volumeFlags / 4.0), 2.0) > 0.;
+	bool isRgbAlpha = mod(floor(volumeFlags / 8.0), 2.0) > 0.;
 
 	if(isRgbAlpha)
 	{
@@ -272,16 +271,16 @@ void main(void)
 	if(isHeat)
 	{
 		//sampled_color.rgb*=sampled_color.rgb;
-		sampled_color.rgb *= decalColor.rgb;
-		//sampled_color.rgb = pow(decalColor.rgb, sampled_color.rgb * 100.0f);
+		sampled_color.rgb *= volumeColor.rgb;
+		//sampled_color.rgb = pow(volumeColor.rgb, sampled_color.rgb * 100.0f);
 
 		//sampled_color.rgb = 1.0 - exp(-sampled_color.rgb);
-		sampled_color.rgb = blackbody(sampled_color.r);// smoothstep(decalColor.rgb, vec3(0.0), 1.0 - sampled_color.rgb);
+		sampled_color.rgb = blackbody(sampled_color.r);// smoothstep(volumeColor.rgb, vec3(0.0), 1.0 - sampled_color.rgb);
 		emissive.rgb = sampled_color.rgb;
 	}
 	else
 	{
-		sampled_color.rgb *= decalColor.rgb;
+		sampled_color.rgb *= volumeColor.rgb;
 	}
 
 	if(!isAdditive)
@@ -294,10 +293,6 @@ void main(void)
 		light = clamp(light.xyz, vec3(0.0), vec3(1.0));
 
 		sampled_color.rgb *= light.rgb;
-	}
-	else
-	{
-		emissive.rgb = sampled_color.rgb;
 	}
 	
 	sampled_color.rgb += colorEffects_add.rgb;
@@ -317,6 +312,7 @@ void main(void)
     sampled_color.b *= colorEffects_filter.b;
 
 	// fade out by angle
+	float decalAngleFade = volumeRadius; // stored in radius param
 	if(decalAngleFade > 0.0)
 	{
 		float angleDiff = (objectNormal.y - decalAngleFade) / (1.0 - decalAngleFade);

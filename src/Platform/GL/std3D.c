@@ -232,37 +232,31 @@ GLuint uniform_numLights;
 void std3D_FlushLights();
 #endif
 
-// todo: all these deferred effects share setup, wrap them in a convenience struct like std3DSimpleTexStage
+#ifdef DEFERRED_FRAMEWORK
+typedef struct std3D_deferredStage
+{
+	GLuint program;
+	GLint attribute_coord3d;
+	GLint uniform_texDepth, uniform_texLight, uniform_texDiffuse, uniform_texNormal; // gbuffer textures
+	GLint uniform_tex, uniform_worldPalette, uniform_texmode; // optional texture
+	GLint uniform_mvp, uniform_iResolution; // projection stuff
+	GLint uniform_tint, uniform_filter, uniform_fade, uniform_add; // for emissive, todo: remove me
+	GLint uniform_flags, uniform_objectMatrix, uniform_position, uniform_radius, uniform_color; // general volume params
+	GLint uniform_rt, uniform_lt, uniform_rb, uniform_lb; // frustum corner rays for position reconstruction
+} std3D_deferredStage;
+
+#endif
+
 #ifdef DECAL_RENDERING
-
-GLuint programDecal;
-GLint decal_attribute_coord3d;
-GLint decal_uniform_mvp, decal_uniform_tex, decal_uniform_texPos, decal_uniform_texLight, decal_uniform_texDiffuse, decal_uniform_texNormal, decal_uniform_worldPalette;
-GLint decal_uniform_tint, decal_uniform_filter, decal_uniform_fade, decal_uniform_add, decal_uniform_flags, decal_uniform_texmode;
-GLint decal_uniform_matrix, decal_uniform_color, decal_uniform_angle, decal_uniform_iResolution;
-GLint decal_uniform_rt, decal_uniform_lt, decal_uniform_rb, decal_uniform_lb;
-
+std3D_deferredStage std3D_decalStage;
 #endif
 
 #ifdef PARTICLE_LIGHTS
-
-GLuint programLight;
-GLint light_attribute_coord3d;
-GLint light_uniform_mvp, light_uniform_texPos, light_uniform_texNormal, light_uniform_texColor;
-GLint light_uniform_tint, light_uniform_filter, light_uniform_fade, light_uniform_add;
-GLint light_uniform_attenuation, light_uniform_color, light_uniform_position, light_uniform_iResolution;
-GLint light_uniform_rt, light_uniform_lt, light_uniform_rb, light_uniform_lb;
-
+std3D_deferredStage std3D_lightStage;
 #endif
 
 #ifdef SPHERE_AO
-
-GLuint programOccluder;
-GLint occluder_attribute_coord3d;
-GLint occluder_uniform_mvp, occluder_uniform_texPos, occluder_uniform_texNormal;
-GLint occluder_uniform_position, occluder_uniform_iResolution;
-GLint occluder_uniform_rt, occluder_uniform_lt, occluder_uniform_rb, occluder_uniform_lb;
-
+std3D_deferredStage std3D_occluderStage;
 #endif
 
 void std3D_generateIntermediateFbo(int32_t width, int32_t height, std3DIntermediateFbo* pFbo, int isFloat, int mipMaps)
@@ -640,6 +634,44 @@ bool std3D_loadSimpleTexProgram(const char* fpath_base, std3DSimpleTexStage* pOu
     return true;
 }
 
+#ifdef DEFERRED_FRAMEWORK
+bool std3D_loadDeferredProgram(const char* fpath_base, std3D_deferredStage* pOut)
+{
+	if (!pOut) return false;
+	if ((pOut->program = std3D_loadProgram(fpath_base)) == 0) return false;
+
+	pOut->attribute_coord3d = std3D_tryFindAttribute(pOut->program, "coord3d");
+	
+	pOut->uniform_mvp = std3D_tryFindUniform(pOut->program, "mvp");
+	pOut->uniform_iResolution = std3D_tryFindUniform(pOut->program, "iResolution");
+	
+	pOut->uniform_texDepth = std3D_tryFindUniform(pOut->program, "texDepth");
+	pOut->uniform_texLight = std3D_tryFindUniform(pOut->program, "texLight");
+	pOut->uniform_texDiffuse = std3D_tryFindUniform(pOut->program, "texDiffuse");
+	pOut->uniform_texNormal = std3D_tryFindUniform(pOut->program, "texNormal");
+	
+	pOut->uniform_worldPalette = std3D_tryFindUniform(pOut->program, "texPalette");
+	pOut->uniform_tex = std3D_tryFindUniform(pOut->program, "tex");
+	pOut->uniform_texmode = std3D_tryFindUniform(pOut->program, "texMode");
+
+	pOut->uniform_tint = std3D_tryFindUniform(pOut->program, "colorEffects_tint");
+	pOut->uniform_filter = std3D_tryFindUniform(pOut->program, "colorEffects_filter");
+	pOut->uniform_fade = std3D_tryFindUniform(pOut->program, "colorEffects_fade");
+	pOut->uniform_add = std3D_tryFindUniform(pOut->program, "colorEffects_add");
+
+	pOut->uniform_rt = std3D_tryFindUniform(pOut->program, "cameraRT");
+	pOut->uniform_lt = std3D_tryFindUniform(pOut->program, "cameraLT");
+	pOut->uniform_rb = std3D_tryFindUniform(pOut->program, "cameraRB");
+	pOut->uniform_lb = std3D_tryFindUniform(pOut->program, "cameraLB");
+
+	pOut->uniform_flags = std3D_tryFindUniform(pOut->program, "volumeFlags");
+	pOut->uniform_position = std3D_tryFindUniform(pOut->program, "volumePosition");
+	pOut->uniform_radius = std3D_tryFindUniform(pOut->program, "volumeRadius");
+	pOut->uniform_color = std3D_tryFindUniform(pOut->program, "volumeColor");
+	pOut->uniform_objectMatrix = std3D_tryFindUniform(pOut->program, "volumeInvMatrix");
+}
+#endif
+
 int init_resources()
 {
     stdPlatform_Printf("std3D: OpenGL init...\n");
@@ -672,15 +704,14 @@ int init_resources()
 #endif
 
 #ifdef DECAL_RENDERING
-	if ((programDecal = std3D_loadProgram("shaders/decal")) == 0) return false;
+	if (!std3D_loadDeferredProgram("shaders/decal", &std3D_decalStage)) return false;
 #endif
 #ifdef PARTICLE_LIGHTS
-	if ((programLight = std3D_loadProgram("shaders/light")) == 0) return false;
+	if (!std3D_loadDeferredProgram("shaders/light", &std3D_lightStage)) return false;
 #endif
 #ifdef SPHERE_AO
-	if ((programOccluder = std3D_loadProgram("shaders/occ")) == 0) return false;
+	if (!std3D_loadDeferredProgram("shaders/occ", &std3D_occluderStage)) return false;
 #endif
-
 
     // Attributes/uniforms
     attribute_coord3d = std3D_tryFindAttribute(programDefault, "coord3d");
@@ -721,74 +752,6 @@ int init_resources()
     programMenu_uniform_mvp = std3D_tryFindUniform(programMenu, "mvp");
     programMenu_uniform_tex = std3D_tryFindUniform(programMenu, "tex");
     programMenu_uniform_displayPalette = std3D_tryFindUniform(programMenu, "displayPalette");
-
-#ifdef DECAL_RENDERING
-	decal_attribute_coord3d = std3D_tryFindAttribute(programDecal, "coord3d");
-	decal_uniform_mvp = std3D_tryFindUniform(programDecal, "mvp");
-	decal_uniform_texPos = std3D_tryFindUniform(programDecal, "texPos");
-	decal_uniform_texLight = std3D_tryFindUniform(programDecal, "texLight");
-	decal_uniform_texDiffuse = std3D_tryFindUniform(programDecal, "texDiffuse");
-	decal_uniform_texNormal = std3D_tryFindUniform(programDecal, "texNormal");
-	decal_uniform_worldPalette = std3D_tryFindUniform(programDecal, "texPalette");
-	decal_uniform_tex = std3D_tryFindUniform(programDecal, "tex");
-
-
-	decal_uniform_tint = std3D_tryFindUniform(programDecal, "colorEffects_tint");
-	decal_uniform_filter = std3D_tryFindUniform(programDecal, "colorEffects_filter");
-	decal_uniform_fade = std3D_tryFindUniform(programDecal, "colorEffects_fade");
-	decal_uniform_add = std3D_tryFindUniform(programDecal, "colorEffects_add");
-
-	decal_uniform_rt = std3D_tryFindUniform(programDecal, "cameraRT");
-	decal_uniform_lt = std3D_tryFindUniform(programDecal, "cameraLT");
-	decal_uniform_rb = std3D_tryFindUniform(programDecal, "cameraRB");
-	decal_uniform_lb = std3D_tryFindUniform(programDecal, "cameraLB");
-
-	decal_uniform_flags = std3D_tryFindUniform(programDecal, "decalFlags");
-	decal_uniform_angle = std3D_tryFindUniform(programDecal, "decalAngleFade");
-	decal_uniform_texmode = std3D_tryFindUniform(programDecal, "texMode");
-	decal_uniform_matrix = std3D_tryFindUniform(programDecal, "decalMatrix");
-	decal_uniform_color = std3D_tryFindUniform(programDecal, "decalColor");
-	decal_uniform_iResolution = std3D_tryFindUniform(programDecal, "iResolution");
-#endif
-
-#ifdef PARTICLE_LIGHTS
-	light_attribute_coord3d = std3D_tryFindAttribute(programLight, "coord3d");
-	light_uniform_mvp = std3D_tryFindUniform(programLight, "mvp");
-	light_uniform_texPos = std3D_tryFindUniform(programLight, "texPos");
-	light_uniform_texNormal = std3D_tryFindUniform(programLight, "texNormal");
-	light_uniform_texColor = std3D_tryFindUniform(programLight, "texColor");
-
-	light_uniform_tint = std3D_tryFindUniform(programLight, "colorEffects_tint");
-	light_uniform_filter = std3D_tryFindUniform(programLight, "colorEffects_filter");
-	light_uniform_fade = std3D_tryFindUniform(programLight, "colorEffects_fade");
-	light_uniform_add = std3D_tryFindUniform(programLight, "colorEffects_add");
-
-	light_uniform_rt = std3D_tryFindUniform(programLight, "cameraRT");
-	light_uniform_lt = std3D_tryFindUniform(programLight, "cameraLT");
-	light_uniform_rb = std3D_tryFindUniform(programLight, "cameraRB");
-	light_uniform_lb = std3D_tryFindUniform(programLight, "cameraLB");
-
-	light_uniform_attenuation = std3D_tryFindUniform(programLight, "lightAttenuation");
-	light_uniform_color = std3D_tryFindUniform(programLight, "lightColor");
-	light_uniform_position = std3D_tryFindUniform(programLight, "lightPosition");
-	light_uniform_iResolution = std3D_tryFindUniform(programLight, "iResolution");
-#endif
-
-#ifdef SPHERE_AO
-	occluder_attribute_coord3d = std3D_tryFindAttribute(programOccluder, "coord3d");
-	occluder_uniform_mvp = std3D_tryFindUniform(programOccluder, "mvp");
-	occluder_uniform_texPos = std3D_tryFindUniform(programOccluder, "texPos");
-	occluder_uniform_texNormal = std3D_tryFindUniform(programOccluder, "texNormal");
-
-	occluder_uniform_position = std3D_tryFindUniform(programOccluder, "occluderPosition");
-
-	occluder_uniform_rt = std3D_tryFindUniform(programOccluder, "cameraRT");
-	occluder_uniform_lt = std3D_tryFindUniform(programOccluder, "cameraLT");
-	occluder_uniform_rb = std3D_tryFindUniform(programOccluder, "cameraRB");
-	occluder_uniform_lb = std3D_tryFindUniform(programOccluder, "cameraLB");
-
-	occluder_uniform_iResolution = std3D_tryFindUniform(programOccluder, "iResolution");
-#endif
 
 #ifdef GPU_LIGHTING
 	uniform_lights = glGetUniformBlockIndex(programDefault, "lightBlock");
@@ -1024,13 +987,13 @@ void std3D_FreeResources()
 #endif
 
 #ifdef DECAL_RENDERING
-	glDeleteProgram(programDecal);
+	glDeleteProgram(std3D_decalStage.program);
 #endif
 #ifdef PARTICLE_LIGHTS
-	glDeleteProgram(programLight);
+	glDeleteProgram(std3D_lightStage.program);
 #endif
 #ifdef SPHERE_AO
-	glDeleteProgram(programOccluder);
+	glDeleteProgram(std3D_occluderStage.program);
 #endif
 
     std3D_bReinitHudElements = 1;
@@ -4098,40 +4061,30 @@ int std3D_IsReady()
     return has_initted;
 }
 
-#ifdef DECAL_RENDERING
-void std3D_DrawDecal(rdDDrawSurface* texture, rdVector3* verts, rdMatrix34* decalMatrix, rdVector3* color, uint32_t flags, float angleFade)
+#ifdef DEFERRED_FRAMEWORK
+// fixme: blending state currently set outside due to different formats and behavior
+void std3D_DrawDeferredStage(std3D_deferredStage* pStage, rdVector3* verts, rdDDrawSurface* texture, uint32_t flags, rdVector3* position, float radius, rdVector3* color, rdMatrix34* matrix)
 {
 	if (Main_bHeadless) return;
 
-	// we need a copy of the main buffer for lighting, so copy one
-	// todo: only do this if contents of the backbuffer were changed with a call to std3D_DrawRenderList
-	std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->decalLight, std3D_pFb->tex0, 0, 0, 1.0, 1.0, 1.0, 0);
+	// never write depth
+	glDepthMask(GL_FALSE);
 
-	// todo: track this so we don't redo it every decal draw
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_BLEND);
-	glEnable(GL_CULL_FACE);
-#ifdef STENCIL_BUFFER
-	glEnable(GL_STENCIL_TEST);
-	glStencilFunc(GL_EQUAL, rdGetStencilRef(), rdGetStencilMask());
-	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-#endif
-
+	// bind to main fbo for drawing
 	glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->main.fbo);
 
 	// we only need to write color + emissivie
 	GLenum bufs[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
 	glDrawBuffers(2, bufs);
 
-	glDepthFunc(GL_ALWAYS);
-	glUseProgram(programDecal);
+	glUseProgram(pStage->program);
 
-	glUniform1i(decal_uniform_texPos, 0);
-	glUniform1i(decal_uniform_texLight, 1);
-	glUniform1i(decal_uniform_texNormal, 2);
-	glUniform1i(decal_uniform_texDiffuse, 3);
-	glUniform1i(decal_uniform_worldPalette, 4);
-	glUniform1i(decal_uniform_tex, 5);
+	glUniform1i(pStage->uniform_texDepth, 0);
+	glUniform1i(pStage->uniform_texLight, 1);
+	glUniform1i(pStage->uniform_texNormal, 2);
+	glUniform1i(pStage->uniform_texDiffuse, 3);
+	glUniform1i(pStage->uniform_worldPalette, 4);
+	glUniform1i(pStage->uniform_tex, 5);
 
 	{
 		float maxX, maxY, scaleX, scaleY, width, height;
@@ -4211,15 +4164,15 @@ void std3D_DrawDecal(rdDDrawSurface* texture, rdVector3* verts, rdMatrix34* deca
 				-(internalWidth / 2) * scaleX * zoom_xaspect + shift_add_x,  (internalHeight / 2) * scaleY * zoom_yaspect + shift_add_y,     (!rdCamera_pCurCamera || rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective) ? -1 : 1,      1  // pos
 		};
 
-		glUniformMatrix4fv(decal_uniform_mvp, 1, GL_FALSE, d3dmat);
+		glUniformMatrix4fv(pStage->uniform_mvp, 1, GL_FALSE, d3dmat);
 		glViewport(0, 0, width, height);
-		glUniform2f(decal_uniform_iResolution, width, height);
+		glUniform2f(pStage->uniform_iResolution, width, height);
 	}
 
-	glUniform3fv(decal_uniform_rt, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->rt);
-	glUniform3fv(decal_uniform_lt, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->lt);
-	glUniform3fv(decal_uniform_rb, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->rb);
-	glUniform3fv(decal_uniform_lb, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->lb);
+	glUniform3fv(pStage->uniform_rt, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->rt);
+	glUniform3fv(pStage->uniform_lt, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->lt);
+	glUniform3fv(pStage->uniform_rb, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->rb);
+	glUniform3fv(pStage->uniform_lb, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->lb);
 
 	// triangle indices
 	GL_tmpTris[0].v1 = 0;
@@ -4280,11 +4233,11 @@ void std3D_DrawDecal(rdDDrawSurface* texture, rdVector3* verts, rdMatrix34* deca
 		data_elements[(j * 3) + 2] = tris[j].v3;
 	}
 
-	// todo: try to batch the decals
+	// todo: try to batch?
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, menu_ibo_triangle);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, GL_tmpTrisAmt * 3 * sizeof(GLushort), data_elements, GL_STREAM_DRAW);
 
-	// decal vertices
+	// vertices
 	GL_tmpVerticesAmt = 8;
 	for (int v = 0; v < GL_tmpVerticesAmt; ++v)
 	{
@@ -4298,12 +4251,12 @@ void std3D_DrawDecal(rdDDrawSurface* texture, rdVector3* verts, rdMatrix34* deca
 		*(uint32_t*)&GL_tmpVertices[v].nz = 0;
 	}
 
-	glEnableVertexAttribArray(decal_attribute_coord3d);
+	glEnableVertexAttribArray(pStage->attribute_coord3d);
 
 	glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_all);
 	glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * sizeof(D3DVERTEX), GL_tmpVertices, GL_STREAM_DRAW);
 	glVertexAttribPointer(
-		decal_attribute_coord3d, // attribute
+		pStage->attribute_coord3d, // attribute
 		3,                 // number of elements per vertex, here (x,y,z)
 		GL_FLOAT,          // the type of each element
 		GL_FALSE,          // normalize fixed-point data?
@@ -4321,34 +4274,63 @@ void std3D_DrawDecal(rdDDrawSurface* texture, rdVector3* verts, rdMatrix34* deca
 	glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex4);
 	glActiveTexture(GL_TEXTURE0 + 4);
 	glBindTexture(GL_TEXTURE_2D, displaypal_texture);
-
-	glUniform3f(decal_uniform_tint, rdroid_curColorEffects.tint.x, rdroid_curColorEffects.tint.y, rdroid_curColorEffects.tint.z);
-	if (rdroid_curColorEffects.filter.x || rdroid_curColorEffects.filter.y || rdroid_curColorEffects.filter.z)
-		glUniform3f(decal_uniform_filter, rdroid_curColorEffects.filter.x ? 1.0 : 0.25, rdroid_curColorEffects.filter.y ? 1.0 : 0.25, rdroid_curColorEffects.filter.z ? 1.0 : 0.25);
-	else
-		glUniform3f(decal_uniform_filter, 1.0, 1.0, 1.0);
-	glUniform1f(decal_uniform_fade, rdroid_curColorEffects.fade);
-	glUniform3f(decal_uniform_add, (float)rdroid_curColorEffects.add.x / 255.0f, (float)rdroid_curColorEffects.add.y / 255.0f, (float)rdroid_curColorEffects.add.z / 255.0f);
-
-	// todo: don't rebind the same texture over and over
 	glActiveTexture(GL_TEXTURE0 + 5);
-	glBindTexture(GL_TEXTURE_2D, texture->texture_id);
-
-	rdVector4 mat[4];
-	rdVector_Set4(&mat[0], decalMatrix->rvec.x, decalMatrix->rvec.y, decalMatrix->rvec.z, 0.0f);
-	rdVector_Set4(&mat[1], decalMatrix->lvec.x, decalMatrix->lvec.y, decalMatrix->lvec.z, 0.0f);
-	rdVector_Set4(&mat[2], decalMatrix->uvec.x, decalMatrix->uvec.y, decalMatrix->uvec.z, 0.0f);
-	rdVector_Set4(&mat[3], decalMatrix->scale.x, decalMatrix->scale.y, decalMatrix->scale.z, 1.0f);
-	glUniformMatrix4fv(decal_uniform_matrix, 1, GL_FALSE, &mat[0].x);
+	glBindTexture(GL_TEXTURE_2D, texture ? texture->texture_id : blank_tex_white);
 
 	if (!jkPlayer_enableTextureFilter)
-		glUniform1i(decal_uniform_texmode, texture->is_16bit ? TEX_MODE_16BPP : TEX_MODE_WORLDPAL);
+		glUniform1i(pStage->uniform_texmode, texture && texture->is_16bit ? TEX_MODE_16BPP : TEX_MODE_WORLDPAL);
 	else
-		glUniform1i(decal_uniform_texmode, texture->is_16bit ? TEX_MODE_BILINEAR_16BPP : TEX_MODE_BILINEAR);
+		glUniform1i(pStage->uniform_texmode, texture && texture->is_16bit ? TEX_MODE_BILINEAR_16BPP : TEX_MODE_BILINEAR);
 
-	glUniform3f(decal_uniform_color, color->x, color->y, color->z);
-	glUniform1ui(decal_uniform_flags, flags);
-	glUniform1f(decal_uniform_angle, angleFade);
+	glUniform3f(pStage->uniform_tint, rdroid_curColorEffects.tint.x, rdroid_curColorEffects.tint.y, rdroid_curColorEffects.tint.z);
+	if (rdroid_curColorEffects.filter.x || rdroid_curColorEffects.filter.y || rdroid_curColorEffects.filter.z)
+		glUniform3f(pStage->uniform_filter, rdroid_curColorEffects.filter.x ? 1.0 : 0.25, rdroid_curColorEffects.filter.y ? 1.0 : 0.25, rdroid_curColorEffects.filter.z ? 1.0 : 0.25);
+	else
+		glUniform3f(pStage->uniform_filter, 1.0, 1.0, 1.0);
+	glUniform1f(pStage->uniform_fade, rdroid_curColorEffects.fade);
+	glUniform3f(pStage->uniform_add, (float)rdroid_curColorEffects.add.x / 255.0f, (float)rdroid_curColorEffects.add.y / 255.0f, (float)rdroid_curColorEffects.add.z / 255.0f);
+
+	glUniform1ui(pStage->uniform_flags, flags);
+	glUniform3f(pStage->uniform_position, position->x, position->y, position->z);
+	glUniform1f(pStage->uniform_radius, radius);
+	glUniform3f(pStage->uniform_color, color->x, color->y, color->z);
+
+	rdVector4 mat[4];
+	rdVector_Set4(&mat[0], matrix->rvec.x, matrix->rvec.y, matrix->rvec.z, 0.0f);
+	rdVector_Set4(&mat[1], matrix->lvec.x, matrix->lvec.y, matrix->lvec.z, 0.0f);
+	rdVector_Set4(&mat[2], matrix->uvec.x, matrix->uvec.y, matrix->uvec.z, 0.0f);
+	rdVector_Set4(&mat[3], matrix->scale.x, matrix->scale.y, matrix->scale.z, 1.0f);
+	glUniformMatrix4fv(pStage->uniform_objectMatrix, 1, GL_FALSE, &mat[0].x);
+
+	glDrawElements(GL_TRIANGLES, GL_tmpTrisAmt * 3, GL_UNSIGNED_SHORT, 0);
+
+	glDisableVertexAttribArray(pStage->attribute_coord3d);
+
+	glDepthMask(GL_TRUE);
+}
+#endif
+
+#ifdef DECAL_RENDERING
+void std3D_DrawDecal(rdDDrawSurface* texture, rdVector3* verts, rdMatrix34* decalMatrix, rdVector3* color, uint32_t flags, float angleFade)
+{
+	if (Main_bHeadless) return;
+
+	// we need a copy of the main buffer for lighting, so copy one
+	// todo: only do this if contents of the backbuffer were changed with a call to std3D_DrawRenderList
+	// or find a better way because this totally sucks
+	std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->decalLight, std3D_pFb->tex0, 0, 0, 1.0, 1.0, 1.0, 0);
+
+	// todo: track this so we don't redo it every decal draw
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+	glEnable(GL_CULL_FACE);
+#ifdef STENCIL_BUFFER
+	glEnable(GL_STENCIL_TEST);
+	glStencilFunc(GL_EQUAL, rdGetStencilRef(), rdGetStencilMask());
+	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+#endif
 
 	if (flags & RD_DECAL_ADD)
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
@@ -4360,16 +4342,11 @@ void std3D_DrawDecal(rdDDrawSurface* texture, rdVector3* verts, rdMatrix34* deca
 	else
 		glCullFace(GL_BACK);
 
-	glDrawElements(GL_TRIANGLES, GL_tmpTrisAmt * 3, GL_UNSIGNED_SHORT, 0);
+	std3D_DrawDeferredStage(&std3D_decalStage, verts, texture, flags, &rdroid_zeroVector3, angleFade, color, decalMatrix);
 
-	glDisableVertexAttribArray(decal_attribute_coord3d);
-
-	glEnable(GL_BLEND);
-	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glDepthFunc(GL_LESS);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glBlendEquation(GL_FUNC_ADD);
 	glCullFace(GL_FRONT);
 #ifdef STENCIL_BUFFER
 	glDisable(GL_STENCIL_TEST);
@@ -4443,222 +4420,13 @@ void std3D_DrawLight(rdLight* light, rdVector3* position, rdVector3* verts)
 	//glStencilFunc(GL_EQUAL, 0, 0xFF);
 	//glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 #endif
-
-	glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->main.fbo);
-
-	// we only need to write color
-	GLenum bufs[] = { GL_COLOR_ATTACHMENT0 };
-	glDrawBuffers(1, bufs);
-
 	glDepthFunc(GL_GREATER);
-	glDepthMask(GL_FALSE);
-	glUseProgram(programLight);
+	glCullFace(GL_FRONT);
 
-	glUniform1i(light_uniform_texPos, 0);
-	glUniform1i(light_uniform_texNormal, 1);
-	glUniform1i(light_uniform_texColor, 2);
+	rdVector3 lightColor;
+	rdVector_Scale3(&lightColor, &light->color, light->intensity);
 
-	{
-		float maxX, maxY, scaleX, scaleY, width, height;
-
-		float internalWidth = Video_menuBuffer.format.width;
-		float internalHeight = Video_menuBuffer.format.height;
-
-		if (jkGuiBuildMulti_bRendering)
-		{
-			internalWidth = 640.0;
-			internalHeight = 480.0;
-		}
-
-		maxX = 1.0;
-		maxY = 1.0;
-		scaleX = 1.0 / ((double)internalWidth / 2.0);
-		scaleY = 1.0 / ((double)internalHeight / 2.0);
-		width = std3D_pFb->w;
-		height = std3D_pFb->h;
-
-		if (jkGuiBuildMulti_bRendering)
-		{
-			width = 640;
-			height = 480;
-		}
-
-		// JKDF2's vertical FOV is fixed with their projection, for whatever reason. 
-		// This ends up resulting in the view looking squished vertically at wide/ultrawide aspect ratios.
-		// To compensate, we zoom the y axis here.
-		// I also went ahead and fixed vertical displays in the same way because it seems to look better.
-		float zoom_yaspect = (width / height);
-		float zoom_xaspect = (height / width);
-
-		if (height > width)
-		{
-			zoom_yaspect = 1.0;
-		}
-
-		if (width > height)
-		{
-			zoom_xaspect = 1.0;
-		}
-
-		// We no longer need all the weird squishing
-		if (!jkGuiBuildMulti_bRendering)
-		{
-			zoom_yaspect = 1.0;
-			zoom_xaspect = 1.0;
-		}
-
-		float shift_add_x = 0;
-		float shift_add_y = 0;
-
-		if (jkGuiBuildMulti_bRendering)
-		{
-			float menu_w, menu_h, menu_x;
-			menu_w = (double)std3D_pFb->w;
-			menu_h = (double)std3D_pFb->h;
-
-			// Keep 4:3 aspect
-			menu_x = (menu_w - (menu_h * (640.0 / 480.0))) / 2.0;
-
-			width = std3D_pFb->w;
-			height = std3D_pFb->h;
-
-			zoom_xaspect = (height / width);
-
-			shift_add_x = (((1.0 - ((menu_x * zoom_xaspect) / std3D_pFb->w)) + 0.15) * zoom_xaspect);
-			shift_add_y = -0.5;
-			zoom_yaspect = 1.0;
-		}
-
-		float d3dmat[16] = {
-				maxX * scaleX * zoom_xaspect,      0,                                          0,      0, // right
-				0,                                       -maxY * scaleY * zoom_yaspect,               0,      0, // up
-				0,                                       0,                                          1,     0, // forward
-				-(internalWidth / 2) * scaleX * zoom_xaspect + shift_add_x,  (internalHeight / 2) * scaleY * zoom_yaspect + shift_add_y,     (!rdCamera_pCurCamera || rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective) ? -1 : 1,      1  // pos
-		};
-
-		glUniformMatrix4fv(light_uniform_mvp, 1, GL_FALSE, d3dmat);
-		glViewport(0, 0, width, height);
-		glUniform2f(light_uniform_iResolution, width, height);
-	}
-
-	glUniform3fv(light_uniform_rt, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->rt);
-	glUniform3fv(light_uniform_lt, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->lt);
-	glUniform3fv(light_uniform_rb, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->rb);
-	glUniform3fv(light_uniform_lb, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->lb);
-
-	// triangle indices
-	GL_tmpTris[0].v1 = 0;
-	GL_tmpTris[0].v2 = 1;
-	GL_tmpTris[0].v3 = 2;
-	GL_tmpTris[1].v1 = 2;
-	GL_tmpTris[1].v2 = 3;
-	GL_tmpTris[1].v3 = 0;
-
-	GL_tmpTris[2].v1 = 1;
-	GL_tmpTris[2].v2 = 5;
-	GL_tmpTris[2].v3 = 6;
-
-	GL_tmpTris[3].v1 = 6;
-	GL_tmpTris[3].v2 = 2;
-	GL_tmpTris[3].v3 = 1;
-
-	GL_tmpTris[4].v1 = 7;
-	GL_tmpTris[4].v2 = 6;
-	GL_tmpTris[4].v3 = 5;
-
-	GL_tmpTris[5].v1 = 5;
-	GL_tmpTris[5].v2 = 4;
-	GL_tmpTris[5].v3 = 7;
-
-	GL_tmpTris[6].v1 = 4;
-	GL_tmpTris[6].v2 = 0;
-	GL_tmpTris[6].v3 = 3;
-
-	GL_tmpTris[7].v1 = 3;
-	GL_tmpTris[7].v2 = 7;
-	GL_tmpTris[7].v3 = 4;
-
-	GL_tmpTris[8].v1 = 4;
-	GL_tmpTris[8].v2 = 5;
-	GL_tmpTris[8].v3 = 1;
-
-	GL_tmpTris[9].v1 = 1;
-	GL_tmpTris[9].v2 = 0;
-	GL_tmpTris[9].v3 = 4;
-
-	GL_tmpTris[10].v1 = 3;
-	GL_tmpTris[10].v2 = 2;
-	GL_tmpTris[10].v3 = 6;
-
-	GL_tmpTris[11].v1 = 6;
-	GL_tmpTris[11].v2 = 7;
-	GL_tmpTris[11].v3 = 3;
-
-	GL_tmpTrisAmt = 12;
-
-	GLushort data_elements[12 * 3];
-	rdTri* tris = GL_tmpTris;
-	for (int j = 0; j < GL_tmpTrisAmt; j++)
-	{
-		data_elements[(j * 3) + 0] = tris[j].v1;
-		data_elements[(j * 3) + 1] = tris[j].v2;
-		data_elements[(j * 3) + 2] = tris[j].v3;
-	}
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, menu_ibo_triangle);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, GL_tmpTrisAmt * 3 * sizeof(GLushort), data_elements, GL_STREAM_DRAW);
-
-	GL_tmpVerticesAmt = 8;
-	for (int v = 0; v < GL_tmpVerticesAmt; ++v)
-	{
-		GL_tmpVertices[v].x = verts[v].x;
-		GL_tmpVertices[v].y = verts[v].y;
-		GL_tmpVertices[v].z = verts[v].z;
-		GL_tmpVertices[v].tu = 0;
-		GL_tmpVertices[v].tv = 0;
-		*(uint32_t*)&GL_tmpVertices[v].nx = 0;
-		GL_tmpVertices[v].color = 0xFFFFFFFF;
-		*(uint32_t*)&GL_tmpVertices[v].nz = 0;
-	}
-
-	glEnableVertexAttribArray(light_attribute_coord3d);
-
-	glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_all);
-	glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * sizeof(D3DVERTEX), GL_tmpVertices, GL_STREAM_DRAW);
-	glVertexAttribPointer(
-		light_attribute_coord3d, // attribute
-		3,                 // number of elements per vertex, here (x,y,z)
-		GL_FLOAT,          // the type of each element
-		GL_FALSE,          // normalize fixed-point data?
-		sizeof(D3DVERTEX),                 // data stride
-		(GLvoid*)offsetof(D3DVERTEX, x)                  // offset of first element
-	);
-
-	glActiveTexture(GL_TEXTURE0 + 0);
-	glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex2);
-	glActiveTexture(GL_TEXTURE0 + 1);
-	glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex3);
-	glActiveTexture(GL_TEXTURE0 + 2);
-	glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex5);
-
-	glUniform3f(light_uniform_tint, rdroid_curColorEffects.tint.x, rdroid_curColorEffects.tint.y, rdroid_curColorEffects.tint.z);
-	if (rdroid_curColorEffects.filter.x || rdroid_curColorEffects.filter.y || rdroid_curColorEffects.filter.z)
-		glUniform3f(light_uniform_filter, rdroid_curColorEffects.filter.x ? 1.0 : 0.25, rdroid_curColorEffects.filter.y ? 1.0 : 0.25, rdroid_curColorEffects.filter.z ? 1.0 : 0.25);
-	else
-		glUniform3f(light_uniform_filter, 1.0, 1.0, 1.0);
-	glUniform1f(light_uniform_fade, rdroid_curColorEffects.fade);
-	glUniform3f(light_uniform_add, (float)rdroid_curColorEffects.add.x / 255.0f, (float)rdroid_curColorEffects.add.y / 255.0f, (float)rdroid_curColorEffects.add.z / 255.0f);
-
-
-	glUniform3f(light_uniform_position, position->x, position->y, position->z);
-	glUniform3f(light_uniform_color, light->intensity * light->color.x, light->intensity * light->color.y, light->intensity * light->color.z);
-	glUniform1f(light_uniform_attenuation, light->falloffMin);
-
-	glCullFace(GL_BACK);
-
-	glDrawElements(GL_TRIANGLES, GL_tmpTrisAmt * 3, GL_UNSIGNED_SHORT, 0);
-
-	glDisableVertexAttribArray(light_attribute_coord3d);
+	std3D_DrawDeferredStage(&std3D_lightStage, verts, NULL, 0, position, light->falloffMin, &lightColor, &rdroid_identMatrix34);
 
 	glEnable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
@@ -4686,216 +4454,13 @@ void std3D_DrawOccluder(rdVector3* position, float radius, rdVector3* verts)
 	glEnable(GL_CULL_FACE);
 #ifdef STENCIL_BUFFER
 	glDisable(GL_STENCIL_TEST);
-	//glStencilFunc(GL_EQUAL, 0, 0xFF);
-	//glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 #endif
-
-	glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->main.fbo);
-
-	// we only need to write color
-	GLenum bufs[] = { GL_COLOR_ATTACHMENT0 };
-	glDrawBuffers(1, bufs);
-
 	glDepthFunc(GL_GREATER);
-	glDepthMask(GL_FALSE);
-
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_DST_COLOR, GL_ZERO);
-
-	glUseProgram(programOccluder);
-
-	glUniform1i(occluder_uniform_texPos, 0);
-	glUniform1i(occluder_uniform_texNormal, 1);
-
-	{
-		float maxX, maxY, scaleX, scaleY, width, height;
-
-		float internalWidth = Video_menuBuffer.format.width;
-		float internalHeight = Video_menuBuffer.format.height;
-
-		if (jkGuiBuildMulti_bRendering)
-		{
-			internalWidth = 640.0;
-			internalHeight = 480.0;
-		}
-
-		maxX = 1.0;
-		maxY = 1.0;
-		scaleX = 1.0 / ((double)internalWidth / 2.0);
-		scaleY = 1.0 / ((double)internalHeight / 2.0);
-		width = std3D_pFb->w;
-		height = std3D_pFb->h;
-
-		if (jkGuiBuildMulti_bRendering)
-		{
-			width = 640;
-			height = 480;
-		}
-
-		// JKDF2's vertical FOV is fixed with their projection, for whatever reason. 
-		// This ends up resulting in the view looking squished vertically at wide/ultrawide aspect ratios.
-		// To compensate, we zoom the y axis here.
-		// I also went ahead and fixed vertical displays in the same way because it seems to look better.
-		float zoom_yaspect = (width / height);
-		float zoom_xaspect = (height / width);
-
-		if (height > width)
-		{
-			zoom_yaspect = 1.0;
-		}
-
-		if (width > height)
-		{
-			zoom_xaspect = 1.0;
-		}
-
-		// We no longer need all the weird squishing
-		if (!jkGuiBuildMulti_bRendering)
-		{
-			zoom_yaspect = 1.0;
-			zoom_xaspect = 1.0;
-		}
-
-		float shift_add_x = 0;
-		float shift_add_y = 0;
-
-		if (jkGuiBuildMulti_bRendering)
-		{
-			float menu_w, menu_h, menu_x;
-			menu_w = (double)std3D_pFb->w;
-			menu_h = (double)std3D_pFb->h;
-
-			// Keep 4:3 aspect
-			menu_x = (menu_w - (menu_h * (640.0 / 480.0))) / 2.0;
-
-			width = std3D_pFb->w;
-			height = std3D_pFb->h;
-
-			zoom_xaspect = (height / width);
-
-			shift_add_x = (((1.0 - ((menu_x * zoom_xaspect) / std3D_pFb->w)) + 0.15) * zoom_xaspect);
-			shift_add_y = -0.5;
-			zoom_yaspect = 1.0;
-		}
-
-		float d3dmat[16] = {
-				maxX * scaleX * zoom_xaspect,      0,                                          0,      0, // right
-				0,                                       -maxY * scaleY * zoom_yaspect,               0,      0, // up
-				0,                                       0,                                          1,     0, // forward
-				-(internalWidth / 2) * scaleX * zoom_xaspect + shift_add_x,  (internalHeight / 2) * scaleY * zoom_yaspect + shift_add_y,     (!rdCamera_pCurCamera || rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective) ? -1 : 1,      1  // pos
-		};
-
-		glUniformMatrix4fv(occluder_uniform_mvp, 1, GL_FALSE, d3dmat);
-		glViewport(0, 0, width, height);
-		glUniform2f(occluder_uniform_iResolution, width, height);
-	}
-
-	glUniform3fv(occluder_uniform_rt, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->rt);
-	glUniform3fv(occluder_uniform_lt, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->lt);
-	glUniform3fv(occluder_uniform_rb, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->rb);
-	glUniform3fv(occluder_uniform_lb, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->lb);
-
-	// triangle indices
-	GL_tmpTris[0].v1 = 0;
-	GL_tmpTris[0].v2 = 1;
-	GL_tmpTris[0].v3 = 2;
-	GL_tmpTris[1].v1 = 2;
-	GL_tmpTris[1].v2 = 3;
-	GL_tmpTris[1].v3 = 0;
-
-	GL_tmpTris[2].v1 = 1;
-	GL_tmpTris[2].v2 = 5;
-	GL_tmpTris[2].v3 = 6;
-
-	GL_tmpTris[3].v1 = 6;
-	GL_tmpTris[3].v2 = 2;
-	GL_tmpTris[3].v3 = 1;
-
-	GL_tmpTris[4].v1 = 7;
-	GL_tmpTris[4].v2 = 6;
-	GL_tmpTris[4].v3 = 5;
-
-	GL_tmpTris[5].v1 = 5;
-	GL_tmpTris[5].v2 = 4;
-	GL_tmpTris[5].v3 = 7;
-
-	GL_tmpTris[6].v1 = 4;
-	GL_tmpTris[6].v2 = 0;
-	GL_tmpTris[6].v3 = 3;
-
-	GL_tmpTris[7].v1 = 3;
-	GL_tmpTris[7].v2 = 7;
-	GL_tmpTris[7].v3 = 4;
-
-	GL_tmpTris[8].v1 = 4;
-	GL_tmpTris[8].v2 = 5;
-	GL_tmpTris[8].v3 = 1;
-
-	GL_tmpTris[9].v1 = 1;
-	GL_tmpTris[9].v2 = 0;
-	GL_tmpTris[9].v3 = 4;
-
-	GL_tmpTris[10].v1 = 3;
-	GL_tmpTris[10].v2 = 2;
-	GL_tmpTris[10].v3 = 6;
-
-	GL_tmpTris[11].v1 = 6;
-	GL_tmpTris[11].v2 = 7;
-	GL_tmpTris[11].v3 = 3;
-
-	GL_tmpTrisAmt = 12;
-
-	GLushort data_elements[12 * 3];
-	rdTri* tris = GL_tmpTris;
-	for (int j = 0; j < GL_tmpTrisAmt; j++)
-	{
-		data_elements[(j * 3) + 0] = tris[j].v1;
-		data_elements[(j * 3) + 1] = tris[j].v2;
-		data_elements[(j * 3) + 2] = tris[j].v3;
-	}
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, menu_ibo_triangle);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, GL_tmpTrisAmt * 3 * sizeof(GLushort), data_elements, GL_STREAM_DRAW);
-
-	GL_tmpVerticesAmt = 8;
-	for (int v = 0; v < GL_tmpVerticesAmt; ++v)
-	{
-		GL_tmpVertices[v].x = verts[v].x;
-		GL_tmpVertices[v].y = verts[v].y;
-		GL_tmpVertices[v].z = verts[v].z;
-		GL_tmpVertices[v].tu = 0;
-		GL_tmpVertices[v].tv = 0;
-		*(uint32_t*)&GL_tmpVertices[v].nx = 0;
-		GL_tmpVertices[v].color = 0xFFFFFFFF;
-		*(uint32_t*)&GL_tmpVertices[v].nz = 0;
-	}
-
-	// todo: optimize this shit
-	glEnableVertexAttribArray(occluder_attribute_coord3d);
-
-	glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_all);
-	glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * sizeof(D3DVERTEX), GL_tmpVertices, GL_STREAM_DRAW);
-	glVertexAttribPointer(
-		occluder_attribute_coord3d, // attribute
-		3,                 // number of elements per vertex, here (x,y,z)
-		GL_FLOAT,          // the type of each element
-		GL_FALSE,          // normalize fixed-point data?
-		sizeof(D3DVERTEX),                 // data stride
-		(GLvoid*)offsetof(D3DVERTEX, x)                  // offset of first element
-	);
-
-	glActiveTexture(GL_TEXTURE0 + 0);
-	glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex2);
-	glActiveTexture(GL_TEXTURE0 + 1);
-	glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex3);
-
-	glUniform4f(occluder_uniform_position, position->x, position->y, position->z, radius);
-
 	glCullFace(GL_FRONT);
 
-	glDrawElements(GL_TRIANGLES, GL_tmpTrisAmt * 3, GL_UNSIGNED_SHORT, 0);
-
-	glDisableVertexAttribArray(occluder_attribute_coord3d);
+	std3D_DrawDeferredStage(&std3D_occluderStage, verts, NULL, 0, position, radius, &rdroid_zeroVector3, &rdroid_identMatrix34);
 
 	glEnable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
