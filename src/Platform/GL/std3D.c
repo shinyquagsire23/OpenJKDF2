@@ -253,6 +253,69 @@ typedef struct std3D_deferredStage
 	GLint uniform_rt, uniform_lt, uniform_rb, uniform_lb; // frustum corner rays for position reconstruction
 } std3D_deferredStage;
 
+static int deferred_ibo;
+
+void std3D_setupDeferred()
+{
+	// triangle indices for deferred cube
+	rdTri deferred_tmpTris[12];
+	deferred_tmpTris[0].v1 = 0;
+	deferred_tmpTris[0].v2 = 1;
+	deferred_tmpTris[0].v3 = 2;
+	deferred_tmpTris[1].v1 = 2;
+	deferred_tmpTris[1].v2 = 3;
+	deferred_tmpTris[1].v3 = 0;
+	deferred_tmpTris[2].v1 = 1;
+	deferred_tmpTris[2].v2 = 5;
+	deferred_tmpTris[2].v3 = 6;
+	deferred_tmpTris[3].v1 = 6;
+	deferred_tmpTris[3].v2 = 2;
+	deferred_tmpTris[3].v3 = 1;
+	deferred_tmpTris[4].v1 = 7;
+	deferred_tmpTris[4].v2 = 6;
+	deferred_tmpTris[4].v3 = 5;
+	deferred_tmpTris[5].v1 = 5;
+	deferred_tmpTris[5].v2 = 4;
+	deferred_tmpTris[5].v3 = 7;
+	deferred_tmpTris[6].v1 = 4;
+	deferred_tmpTris[6].v2 = 0;
+	deferred_tmpTris[6].v3 = 3;
+	deferred_tmpTris[7].v1 = 3;
+	deferred_tmpTris[7].v2 = 7;
+	deferred_tmpTris[7].v3 = 4;
+	deferred_tmpTris[8].v1 = 4;
+	deferred_tmpTris[8].v2 = 5;
+	deferred_tmpTris[8].v3 = 1;
+	deferred_tmpTris[9].v1 = 1;
+	deferred_tmpTris[9].v2 = 0;
+	deferred_tmpTris[9].v3 = 4;
+	deferred_tmpTris[10].v1 = 3;
+	deferred_tmpTris[10].v2 = 2;
+	deferred_tmpTris[10].v3 = 6;
+	deferred_tmpTris[11].v1 = 6;
+	deferred_tmpTris[11].v2 = 7;
+	deferred_tmpTris[11].v3 = 3;
+
+	GLushort data_elements[12 * 3];
+	rdTri* tris = deferred_tmpTris;
+	for (int j = 0; j < 12; j++)
+	{
+		data_elements[(j * 3) + 0] = tris[j].v1;
+		data_elements[(j * 3) + 1] = tris[j].v2;
+		data_elements[(j * 3) + 2] = tris[j].v3;
+	}
+
+	glGenBuffers(1, &deferred_ibo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, deferred_ibo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 12 * 3 * sizeof(GLushort), data_elements, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
+void std3D_freeDeferred()
+{
+	glDeleteBuffers(1, &deferred_ibo);
+}
+
 #endif
 
 #ifdef DECAL_RENDERING
@@ -713,6 +776,10 @@ int init_resources()
 	if (!std3D_loadDeferredProgram("shaders/occ", &std3D_occluderStage)) return false;
 #endif
 
+#ifdef DEFERRED_FRAMEWORK
+	std3D_setupDeferred();
+#endif
+
     // Attributes/uniforms
     attribute_coord3d = std3D_tryFindAttribute(programDefault, "coord3d");
 #ifdef VIEW_SPACE_GBUFFER
@@ -995,7 +1062,9 @@ void std3D_FreeResources()
 #ifdef SPHERE_AO
 	glDeleteProgram(std3D_occluderStage.program);
 #endif
-
+#ifdef DEFERRED_FRAMEWORK
+	std3D_freeDeferred();
+#endif
     std3D_bReinitHudElements = 1;
 
     has_initted = false;
@@ -4192,68 +4261,8 @@ void std3D_DrawDeferredStage(std3D_deferredStage* pStage, rdVector3* verts, rdDD
 	glUniform3fv(pStage->uniform_rb, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->rb);
 	glUniform3fv(pStage->uniform_lb, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->lb);
 
-	// triangle indices
-	GL_tmpTris[0].v1 = 0;
-	GL_tmpTris[0].v2 = 1;
-	GL_tmpTris[0].v3 = 2;
-	GL_tmpTris[1].v1 = 2;
-	GL_tmpTris[1].v2 = 3;
-	GL_tmpTris[1].v3 = 0;
-
-	GL_tmpTris[2].v1 = 1;
-	GL_tmpTris[2].v2 = 5;
-	GL_tmpTris[2].v3 = 6;
-
-	GL_tmpTris[3].v1 = 6;
-	GL_tmpTris[3].v2 = 2;
-	GL_tmpTris[3].v3 = 1;
-
-	GL_tmpTris[4].v1 = 7;
-	GL_tmpTris[4].v2 = 6;
-	GL_tmpTris[4].v3 = 5;
-
-	GL_tmpTris[5].v1 = 5;
-	GL_tmpTris[5].v2 = 4;
-	GL_tmpTris[5].v3 = 7;
-
-	GL_tmpTris[6].v1 = 4;
-	GL_tmpTris[6].v2 = 0;
-	GL_tmpTris[6].v3 = 3;
-
-	GL_tmpTris[7].v1 = 3;
-	GL_tmpTris[7].v2 = 7;
-	GL_tmpTris[7].v3 = 4;
-
-	GL_tmpTris[8].v1 = 4;
-	GL_tmpTris[8].v2 = 5;
-	GL_tmpTris[8].v3 = 1;
-
-	GL_tmpTris[9].v1 = 1;
-	GL_tmpTris[9].v2 = 0;
-	GL_tmpTris[9].v3 = 4;
-
-	GL_tmpTris[10].v1 = 3;
-	GL_tmpTris[10].v2 = 2;
-	GL_tmpTris[10].v3 = 6;
-
-	GL_tmpTris[11].v1 = 6;
-	GL_tmpTris[11].v2 = 7;
-	GL_tmpTris[11].v3 = 3;
-
-	GL_tmpTrisAmt = 12;
-
-	GLushort data_elements[12 * 3];
-	rdTri* tris = GL_tmpTris;
-	for (int j = 0; j < GL_tmpTrisAmt; j++)
-	{
-		data_elements[(j * 3) + 0] = tris[j].v1;
-		data_elements[(j * 3) + 1] = tris[j].v2;
-		data_elements[(j * 3) + 2] = tris[j].v3;
-	}
-
-	// todo: try to batch?
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, menu_ibo_triangle);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, GL_tmpTrisAmt * 3 * sizeof(GLushort), data_elements, GL_STREAM_DRAW);
+	// luckily we can precompute the indices
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, deferred_ibo);
 
 	// vertices
 	GL_tmpVerticesAmt = 8;
@@ -4320,7 +4329,7 @@ void std3D_DrawDeferredStage(std3D_deferredStage* pStage, rdVector3* verts, rdDD
 	rdVector_Set4(&mat[3], matrix->scale.x, matrix->scale.y, matrix->scale.z, 1.0f);
 	glUniformMatrix4fv(pStage->uniform_objectMatrix, 1, GL_FALSE, &mat[0].x);
 
-	glDrawElements(GL_TRIANGLES, GL_tmpTrisAmt * 3, GL_UNSIGNED_SHORT, 0);
+	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, 0);
 
 	glDisableVertexAttribArray(pStage->attribute_coord3d);
 
