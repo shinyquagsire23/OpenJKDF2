@@ -1132,6 +1132,16 @@ void std3D_SetWorldAttribPointers()
 #endif
 }
 
+void std3D_useProgram(int program)
+{
+	static int last_program = -1;
+	if (program != last_program)
+	{
+		glUseProgram(program);
+		last_program = program;
+	}
+}
+
 int std3D_StartScene()
 {
     if (Main_bHeadless) return 1;
@@ -1465,7 +1475,7 @@ void std3D_DrawMenu()
     glCullFace(GL_FRONT);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDepthFunc(GL_ALWAYS);
-    glUseProgram(programMenu);
+	std3D_useProgram(programMenu);
     
     float menu_w, menu_h, menu_u, menu_v, menu_x;
     menu_w = (double)Window_xSize;
@@ -1820,7 +1830,7 @@ void std3D_DrawMapOverlay()
     glCullFace(GL_FRONT);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDepthFunc(GL_ALWAYS);
-    glUseProgram(programMenu);
+	std3D_useProgram(programMenu);
     
     float menu_w = (double)Window_xSize;
     float menu_h = (double)Window_ySize;
@@ -2220,7 +2230,7 @@ void std3D_DrawUIRenderList()
     glCullFace(GL_FRONT);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glDepthFunc(GL_ALWAYS);
-    glUseProgram(std3D_uiProgram.program); // TODO: simpler shader
+	std3D_useProgram(std3D_uiProgram.program); // TODO: simpler shader
     
     last_ui_tex = 0;
     last_ui_flags = -1;
@@ -2441,7 +2451,7 @@ void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo
     glBindFramebuffer(GL_FRAMEBUFFER, pFbo->fbo);
     glDepthFunc(GL_ALWAYS);
 	glDisable(GL_CULL_FACE);
-    glUseProgram(pStage->program);
+	std3D_useProgram(pStage->program);
     
     float menu_w, menu_h, menu_u, menu_v, menu_x;
     menu_w = (double)pFbo->w;
@@ -2753,7 +2763,7 @@ void std3D_DrawRenderList()
 
     //printf("Draw render list\n");
     glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->fbo);
-    glUseProgram(programDefault);
+	std3D_useProgram(programDefault);
 
     GLenum bufs[] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3
 #ifdef VIEW_SPACE_GBUFFER
@@ -4164,7 +4174,7 @@ void std3D_DrawDeferredStage(std3D_deferredStage* pStage, rdVector3* verts, rdDD
 	GLenum bufs[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
 	glDrawBuffers(2, bufs);
 
-	glUseProgram(pStage->program);
+	std3D_useProgram(pStage->program);
 
 	glUniform1i(pStage->uniform_texDepth, 0);
 	glUniform1i(pStage->uniform_texLight, 1);
