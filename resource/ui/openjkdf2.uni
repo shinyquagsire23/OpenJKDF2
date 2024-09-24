@@ -11,13 +11,13 @@ MSGS 100          # <--- DON'T FORGET TO UPDATE THIS COUNT
 #  Gameplay
 #******************************
    "GUIEXT_SHOW_SABER_CROSSHAIR"          0 "Show Crosshair with lightsaber"
-   "GUIEXT_SHOW_SABER_CROSSHAIR_HINT"     0 "When this is enabled the crosshair is shown when the lightsaber is equipped"
+   "GUIEXT_SHOW_SABER_CROSSHAIR_HINT"     0 "Display the crosshair when the lightsaber is equipped?"
    "GUIEXT_SHOW_FIST_CROSSHAIR"           0 "Show Crosshair with fist"
-   "GUIEXT_SHOW_FIST_CROSSHAIR_HINT"      0 "When this is enabled the crosshair is shown when the fist is equipped"
+   "GUIEXT_SHOW_FIST_CROSSHAIR_HINT"      0 "Display the crosshair when fists are equipped?"
    "GUIEXT_CROSSHAIR_SCALE"               0 "Crosshair Scale"
    "GUIEXT_CROSSHAIR_SCALE_HINT"          0 "Adjust the size of the crosshair (from 0% to 200%)"
    "GUIEXT_AIMLOCK"                       0 "Lock aim"
-   "GUIEXT_AIMLOCK_HINT"                  0 "Lock weapon and crosshair to screen center"
+   "GUIEXT_AIMLOCK_HINT"                  0 "Lock weapon and crosshair to screen center?"
 
 #******************************
 #  Display
@@ -71,7 +71,7 @@ MSGS 100          # <--- DON'T FORGET TO UPDATE THIS COUNT
 #  General
 #******************************
    "GUIEXT_DISABLE_MISSION_CONFIRMATION"        0 "Disable mission start confirmation."
-   "GUIEXT_DISABLE_MISSION_CONFIRMATION_HINT"   0 "Enter the mission as soon as the level is loaded."
+   "GUIEXT_DISABLE_MISSION_CONFIRMATION_HINT"   0 "Enter the mission as soon as the level is loaded?"
 
    "GUIEXT_INCONSISTENT_PHYS"                   0 "Restore inconsistent physics"
    "GUIEXT_INCONSISTENT_PHYS_HINT"              0 "Sets physics delta to the render framerate instead of 150Hz."
