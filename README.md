@@ -5,7 +5,7 @@ Rendering:
 - Fog (Infernal Machine style)
 - Specular lighting (RD_LIGHTMODE_SPECULAR)
 - Half Lambert diffuse for dynamic lights to soften low poly model shading
-- Stencil buffering for rdroid
+- Stencil buffering to mark dynamic objects
 - Early attempt at GPU vertex/pixel lighting
 - RGB thing lights (lightcolor template param for things), including lightsaber colored lighting derived from the saber material
 - RGB ambient lighting, including directional ambient cube for gouraud shaded models
