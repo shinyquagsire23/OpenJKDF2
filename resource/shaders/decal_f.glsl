@@ -258,10 +258,10 @@ void main(void)
 #endif
 
 	// omfg I hate glsl
-	bool isInside = mod(volumeFlags, 2.0) > 0.;
-	bool isHeat = mod(floor(volumeFlags / 2.0), 2.0) > 0.;
-	bool isAdditive = mod(floor(volumeFlags / 4.0), 2.0) > 0.;
-	bool isRgbAlpha = mod(floor(volumeFlags / 8.0), 2.0) > 0.;
+	bool isInside = (volumeFlags & 0x1u) == 0x1u;// mod(volumeFlags, 2.0) > 0.;
+	bool isHeat = (volumeFlags & 0x2u) == 0x2u;//mod(floor(volumeFlags / 2.0), 2.0) > 0.;
+	bool isAdditive = (volumeFlags & 0x4u) == 0x4u;//mod(floor(volumeFlags / 4.0), 2.0) > 0.;
+	bool isRgbAlpha = (volumeFlags & 0x8u) == 0x8u;//mod(floor(volumeFlags / 8.0), 2.0) > 0.;
 
 	if(isRgbAlpha)
 	{
