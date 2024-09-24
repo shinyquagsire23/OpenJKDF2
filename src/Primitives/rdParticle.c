@@ -386,8 +386,8 @@ int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
 			{
 				rdLight light;
 				rdLight_NewEntry(&light);
-				light.falloffMin = 0.03f;
-				light.intensity = thing->parentSithThing->light * 3.0f;
+				light.falloffMin = 0.01f;
+				light.intensity = thing->parentSithThing->light * 8.0f;
 				rdMaterial_GetFillColor(&light.color, particle->material, rdColormap_pCurMap, particle->vertexCel[v32], -1);
 				rdCache_DrawLight(&light, &aParticleVertices[v32]);
 			}
