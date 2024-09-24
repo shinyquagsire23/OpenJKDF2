@@ -1748,10 +1748,15 @@ LABEL_44:
     if ( procEntry->lightingMode >= 3 )
         flags |= 4u;
 
+	int extraData = 0;
+#ifdef STENCIL_BUFFER
+	extraData |= 2; // mark stencil buffer
+#endif
+
     procEntry->light_flags = lightFlags;
     procEntry->type = face->type;
     procEntry->extralight = face->extraLight;
     procEntry->material = face->material;
-    rdCache_AddProcFace(0, vertexDst.numVertices, flags);
+    rdCache_AddProcFace(extraData, vertexDst.numVertices, flags);
     return 1;
 }

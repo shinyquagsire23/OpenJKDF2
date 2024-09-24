@@ -443,7 +443,12 @@ int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
                 v5->type = 0;
                 v5->wallCel = v30;
                 v5->light_flags = 0;
-                rdCache_AddProcFace(0, v27, 1);
+
+				int extraData = 0;
+#ifdef STENCIL_BUFFER
+				extraData |= 2; // mark stencil buffer
+#endif
+                rdCache_AddProcFace(extraData, v27, 1);
             }
             v4 += 3;
             if ( (unsigned int)++v32 >= particle->numVertices )

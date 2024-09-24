@@ -492,5 +492,9 @@ void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVert
     procEntry->type = face->type;
     procEntry->extralight = face->extraLight;
     procEntry->material = face->material;
-    rdCache_AddProcFace(0, mesh_out.numVertices, procFaceFlags);
+	int extraData = 0;
+#ifdef STENCIL_BUFFER
+	extraData |= 2; // mark stencil buffer
+#endif
+    rdCache_AddProcFace(extraData, mesh_out.numVertices, procFaceFlags);
 }

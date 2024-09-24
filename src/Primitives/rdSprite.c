@@ -336,10 +336,14 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     procEntry->extralight = sprite->face.extraLight;
     procEntry->material = sprite->face.material;
 
+	int extraData = 0;
+#ifdef STENCIL_BUFFER
+	extraData |= 2; // mark stencil buffer
+#endif
 #ifdef VERTEX_COLORS
 	rdVector_Copy3(&procEntry->color, &thing->color);
 #endif
 
-    rdCache_AddProcFace(0, mesh_out.numVertices, procFlags);
+    rdCache_AddProcFace(extraData, mesh_out.numVertices, procFlags);
     return 1;
 }
