@@ -66,16 +66,16 @@ static jkGuiElement jkGuiDisplay_aElements[] = {
     {ELEMENT_CHECKBOX,     0,            0, "GUIEXT_EN_VSYNC",    0, {400, 220, 300, 30}, 1,  0, NULL, 0, 0, 0, {0}, 0},
 
     // 18
-    { ELEMENT_TEXT,        0,            0, "GUIEXT_SSAA_MULT",            2, {20, 320, 120, 20},   1, 0, NULL,                        0, 0, 0, {0}, 0},
-    { ELEMENT_TEXTBOX,      0,            0, NULL,    100, {150, 320, 80, 20}, 1,  0, NULL, 0, 0, 0, {0}, 0},
+    { ELEMENT_TEXT,        0,            0, "GUIEXT_SSAA_MULT",            2, {20, 320, 140, 20},   1, 0, NULL,                        0, 0, 0, {0}, 0},
+    { ELEMENT_TEXTBOX,      0,            0, NULL,    100, {170, 320, 80, 20}, 1,  0, NULL, 0, 0, 0, {0}, 0},
     
     // 20
-    { ELEMENT_TEXT,        0,            0, "GUIEXT_GAMMA_VAL",            2, {20, 350, 120, 20},   1, 0, NULL,                        0, 0, 0, {0}, 0},
-    { ELEMENT_TEXTBOX,      0,            0, NULL,    100, {150, 350, 80, 20}, 1,  0, NULL, 0, 0, 0, {0}, 0},
+    { ELEMENT_TEXT,        0,            0, "GUIEXT_GAMMA_VAL",            2, {20, 350, 140, 20},   1, 0, NULL,                        0, 0, 0, {0}, 0},
+    { ELEMENT_TEXTBOX,      0,            0, NULL,    100, {170, 350, 80, 20}, 1,  0, NULL, 0, 0, 0, {0}, 0},
 
     // 22
-    { ELEMENT_TEXT,        0,            0, "GUIEXT_HUD_SCALE",            2, {20, 380, 100, 20},   1, 0, NULL,                        0, 0, 0, {0}, 0},
-    { ELEMENT_TEXTBOX,      0,            0, NULL,    100, {150, 380, 80, 20}, 1,  0, NULL, 0, 0, 0, {0}, 0},
+    { ELEMENT_TEXT,        0,            0, "GUIEXT_HUD_SCALE",            2, {20, 380, 140, 20},   1, 0, NULL,                        0, 0, 0, {0}, 0},
+    { ELEMENT_TEXTBOX,      0,            0, NULL,    100, {170, 380, 80, 20}, 1,  0, NULL, 0, 0, 0, {0}, 0},
 
 	// 24
 	{ ELEMENT_TEXT,        0,            0, "GUIEXT_EN_COLORDEPTH",  3,  { 400, 160, 100, 25}, 1,  0, 0, 0, 0, 0, {0}, 0},
