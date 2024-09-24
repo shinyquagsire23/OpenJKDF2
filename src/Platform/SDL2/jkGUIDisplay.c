@@ -188,7 +188,7 @@ int jkGuiDisplay_ShowAdvanced()
 {
     int v0; // esi
 
-    jkGui_sub_412E20(&jkGuiDisplay_menuAdvanced, 100, 104, 100);
+    jkGui_sub_412E20(&jkGuiDisplay_menuAdvanced, GUI_DISPLAY, 104, GUI_DISPLAY);
     jkGuiDisplay_aElementsAdvanced[9].selectedTextEntry = jkPlayer_bEnableJkgm;
     jkGuiDisplay_aElementsAdvanced[10].selectedTextEntry = jkPlayer_bEnableTexturePrecache;
     
@@ -246,7 +246,7 @@ int jkGuiDisplay_Show()
 {
     int v0; // esi
 
-    jkGui_sub_412E20(&jkGuiDisplay_menu, 102, 104, 102);
+    jkGui_sub_412E20(&jkGuiDisplay_menu, GUI_DISPLAY, 104, GUI_DISPLAY);
     jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiDisplay_menu, &jkGuiDisplay_aElements[7]);
     jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiDisplay_menu, &jkGuiDisplay_aElements[8]);
     jkGuiSetup_sub_412EF0(&jkGuiDisplay_menu, 0);
