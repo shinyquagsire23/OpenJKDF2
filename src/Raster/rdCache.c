@@ -1540,11 +1540,13 @@ int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags)
 }
 
 #ifdef DECAL_RENDERING
+extern int jkPlayer_enableDecals;
+
 void rdCache_DrawDecal(rdDecal* decal, rdMatrix34* matrix, rdVector3* color, rdVector3* scale, float angleFade)
 {
-	if (rdCache_numDecals >= 256)
+	if (!jkPlayer_enableDecals || rdCache_numDecals >= 256)
 	{
-		return;
+		return; // todo: revive me
 		//rdCache_FlushDecals();
 		//rdCache_numDecals = 0;
 	}
@@ -1566,6 +1568,12 @@ void rdCache_DrawDecal(rdDecal* decal, rdMatrix34* matrix, rdVector3* color, rdV
 
 void rdCache_FlushDecals()
 {
+	if (!jkPlayer_enableDecals)
+	{
+		rdCache_numDecals = 0;
+		return;
+	}
+
 	for (int i = 0; i < rdCache_numDecals; ++i)
 	{
 		rdDecal* decal = rdCache_aDecals[i];
@@ -1733,9 +1741,11 @@ void rdCache_FlushLights()
 
 
 #ifdef SPHERE_AO
+extern int jkPlayer_enableShadows;
+
 void rdCache_DrawOccluder(rdVector3* position, float radius)
 {
-	if (rdCache_numOccluders >= 4096)
+	if (!jkPlayer_enableShadows || rdCache_numOccluders >= 4096)
 		return;
 
 	rdCache_aOccluderRadii[rdCache_numOccluders] = radius;
@@ -1745,9 +1755,11 @@ void rdCache_DrawOccluder(rdVector3* position, float radius)
 
 void rdCache_FlushOccluders()
 {
-	extern int jkPlayer_enableShadows;
-	if(!jkPlayer_enableShadows)
+	if (!jkPlayer_enableShadows)
+	{
+		rdCache_numOccluders = 0;
 		return;
+	}
 
 	for (int i = 0; i < rdCache_numOccluders; ++i)
 	{
