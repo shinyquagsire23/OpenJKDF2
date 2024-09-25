@@ -102,10 +102,10 @@ typedef struct std3DFramebuffer
     std3DIntermediateFbo blur4;
 
 #ifdef NEW_BLOOM
-	std3DIntermediateFbo blur5;
-	std3DIntermediateFbo blur6;
-	std3DIntermediateFbo blur7;
-	std3DIntermediateFbo blur8;
+	//std3DIntermediateFbo blur5;
+	//std3DIntermediateFbo blur6;
+	//std3DIntermediateFbo blur7;
+	//std3DIntermediateFbo blur8;
 #endif
     //std3DIntermediateFbo blurBlend;
 
@@ -529,10 +529,10 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
 		std3D_generateIntermediateFbo(pFb->blur1.w / 2, pFb->blur1.h / 2, &pFb->blur2, 1, 0);
 		std3D_generateIntermediateFbo(pFb->blur2.w / 2, pFb->blur2.h / 2, &pFb->blur3, 1, 0);
 		std3D_generateIntermediateFbo(pFb->blur3.w / 2, pFb->blur3.h / 2, &pFb->blur4, 1, 0);
-		std3D_generateIntermediateFbo(pFb->blur4.w / 2, pFb->blur4.h / 2, &pFb->blur5, 1, 0);
-		std3D_generateIntermediateFbo(pFb->blur5.w / 2, pFb->blur5.h / 2, &pFb->blur6, 1, 0);
-		std3D_generateIntermediateFbo(pFb->blur6.w / 2, pFb->blur6.h / 2, &pFb->blur7, 1, 0);
-		std3D_generateIntermediateFbo(pFb->blur7.w / 2, pFb->blur7.h / 2, &pFb->blur8, 1, 0);
+		//std3D_generateIntermediateFbo(pFb->blur4.w / 2, pFb->blur4.h / 2, &pFb->blur5, 1, 0);
+		//std3D_generateIntermediateFbo(pFb->blur5.w / 2, pFb->blur5.h / 2, &pFb->blur6, 1, 0);
+		//std3D_generateIntermediateFbo(pFb->blur6.w / 2, pFb->blur6.h / 2, &pFb->blur7, 1, 0);
+		//std3D_generateIntermediateFbo(pFb->blur7.w / 2, pFb->blur7.h / 2, &pFb->blur8, 1, 0);
 	#else
         std3D_generateIntermediateFbo(width, height, &pFb->blur1, 1, 1);
         //std3D_generateIntermediateFbo(width, height, &pFb->blurBlend, 1);
@@ -586,10 +586,10 @@ void std3D_deleteFramebuffer(std3DFramebuffer* pFb)
     std3D_deleteIntermediateFbo(&pFb->blur4);
     //std3D_deleteIntermediateFbo(&pFb->blurBlend);
 #ifdef NEW_BLOOM
-	std3D_deleteIntermediateFbo(&pFb->blur5);
-	std3D_deleteIntermediateFbo(&pFb->blur6);
-	std3D_deleteIntermediateFbo(&pFb->blur7);
-	std3D_deleteIntermediateFbo(&pFb->blur8);
+	//std3D_deleteIntermediateFbo(&pFb->blur5);
+	//std3D_deleteIntermediateFbo(&pFb->blur6);
+	//std3D_deleteIntermediateFbo(&pFb->blur7);
+	//std3D_deleteIntermediateFbo(&pFb->blur8);
 #endif
 
     std3D_deleteIntermediateFbo(&pFb->ssaoBlur1);
@@ -2624,10 +2624,10 @@ void std3D_DrawSceneFbo()
 		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur2, std3D_pFb->blur1.tex, 0, 0, uvScale, 1.0, 1.0, 0);
 		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur3, std3D_pFb->blur2.tex, 0, 0, uvScale, 1.0, 1.0, 0);
 		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur4, std3D_pFb->blur3.tex, 0, 0, uvScale, 1.0, 1.0, 0);
-		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur5, std3D_pFb->blur4.tex, 0, 0, uvScale, 1.0, 1.0, 0);
-		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur6, std3D_pFb->blur5.tex, 0, 0, uvScale, 1.0, 1.0, 0);
-		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur7, std3D_pFb->blur6.tex, 0, 0, uvScale, 1.0, 1.0, 0);
-		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur8, std3D_pFb->blur7.tex, 0, 0, uvScale, 1.0, 1.0, 0);
+		//std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur5, std3D_pFb->blur4.tex, 0, 0, uvScale, 1.0, 1.0, 0);
+		//std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur6, std3D_pFb->blur5.tex, 0, 0, uvScale, 1.0, 1.0, 0);
+		//std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur7, std3D_pFb->blur6.tex, 0, 0, uvScale, 1.0, 1.0, 0);
+		//std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur8, std3D_pFb->blur7.tex, 0, 0, uvScale, 1.0, 1.0, 0);
 
 		// upscale + blend
 		//uvScale = 4.0f; // source tex is 4x smaller
@@ -2635,10 +2635,10 @@ void std3D_DrawSceneFbo()
 		float blendLerp = 0.6f;
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		//glBlendFunc(GL_ONE, GL_ONE);
-		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur7, std3D_pFb->blur8.tex, 0, 0, uvScale, blendLerp, 1.0, 0);
-		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur6, std3D_pFb->blur7.tex, 0, 0, uvScale, blendLerp, 1.0, 0);
-		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur5, std3D_pFb->blur6.tex, 0, 0, uvScale, blendLerp, 1.0, 0);
-		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur4, std3D_pFb->blur5.tex, 0, 0, uvScale, blendLerp, 1.0, 0);
+		//std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur7, std3D_pFb->blur8.tex, 0, 0, uvScale, blendLerp, 1.0, 0);
+		//std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur6, std3D_pFb->blur7.tex, 0, 0, uvScale, blendLerp, 1.0, 0);
+		//std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur5, std3D_pFb->blur6.tex, 0, 0, uvScale, blendLerp, 1.0, 0);
+		//std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur4, std3D_pFb->blur5.tex, 0, 0, uvScale, blendLerp, 1.0, 0);
 		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur3, std3D_pFb->blur4.tex, 0, 0, uvScale, blendLerp, 1.0, 0);
 		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur2, std3D_pFb->blur3.tex, 0, 0, uvScale, blendLerp, 1.0, 0);
 		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur1, std3D_pFb->blur2.tex, 0, 0, uvScale, blendLerp, 1.0, 0);
