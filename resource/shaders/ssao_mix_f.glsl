@@ -17,11 +17,10 @@ void main(void)
 #ifdef SSAO_CHECK_LEVELS
     vec4 sampled_color = vec4(0.5, 0.5, 0.5, 1.0);
 #else
-    vec4 sampled_color = vec4(texture(tex2, f_uv).x);
+    vec4 sampled_color = texture(tex2, f_uv);
 #endif
     
-    // The background we're applying to
-    vec4 color = texture(tex, f_uv);
+    vec4 aoColor = vec4(texture(tex, f_uv).x);
 
     float scaleFactor = 1.1;
 
@@ -34,16 +33,16 @@ void main(void)
 #ifdef SSAO_CHECK_LEVELS
         if (f_uv.y > 0.5)
         {
-            fragColor = vec4(scaleFactor * color.rgb * vec3(0.5, 0.5, 0.5), 1.0);
+            fragColor = vec4(scaleFactor * aoColor.rgb * vec3(0.5, 0.5, 0.5), 1.0);
         }
         else
 #endif
         {
-            fragColor = vec4(scaleFactor * color.rgb * sampled_color.rgb, 1.0);
+            fragColor = vec4(scaleFactor * aoColor.rgb * sampled_color.rgb, 1.0);
         }
     }
 #else
-    fragColor = vec4(scaleFactor * color.rgb * sampled_color.rgb, sampled_color.a);
+    fragColor = vec4(scaleFactor * aoColor.rgb * sampled_color.rgb, sampled_color.a);
 #endif
 
     fragColor.rgb = pow(fragColor.rgb, vec3(1.0/param3));
