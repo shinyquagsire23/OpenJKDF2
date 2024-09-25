@@ -331,7 +331,168 @@ std3D_deferredStage std3D_lightStage;
 std3D_deferredStage std3D_occluderStage;
 #endif
 
-void std3D_generateIntermediateFbo(int32_t width, int32_t height, std3DIntermediateFbo* pFbo, int isFloat, int mipMaps)
+static bool std3D_isIntegerFormat(GLuint format)
+{
+	switch (format)
+	{
+	case GL_R8UI:
+	case GL_R16UI:
+	case GL_R16I:
+	case GL_R32UI:
+	case GL_R32I:
+		return true;
+	default:
+		return false;
+	}
+}
+
+static GLuint std3D_getUploadFormat(GLuint format)
+{
+	switch (format)
+	{
+	case GL_R3_G3_B2:
+		return GL_UNSIGNED_BYTE_3_3_2;
+	case GL_RGB565:
+		return GL_UNSIGNED_SHORT_5_6_5;
+	case GL_RGBA4:
+		return GL_UNSIGNED_SHORT_4_4_4_4;
+	case GL_RGB5_A1:
+		return GL_UNSIGNED_SHORT_5_5_5_1;
+	case GL_R8:
+	case GL_RG8:
+	case GL_RGB8:
+	case GL_RGBA8:
+		return GL_UNSIGNED_BYTE;
+	case GL_RGB10_A2:
+		return GL_UNSIGNED_INT_2_10_10_10_REV;
+	case GL_R8_SNORM:
+	case GL_RG8_SNORM:
+	case GL_RGB8_SNORM:
+	case GL_RGBA8_SNORM:
+		return GL_BYTE;
+	case GL_R16:
+	case GL_RG16:
+	case GL_RGB16:
+	case GL_RGBA16:
+		return GL_UNSIGNED_SHORT;
+	case GL_R16_SNORM:
+	case GL_RG16_SNORM:
+	case GL_RGB16_SNORM:
+	case GL_RGBA16_SNORM:
+		return GL_SHORT;
+	case GL_R11F_G11F_B10F:
+	case GL_R16F:
+	case GL_RG16F:
+	case GL_RGB16F:
+	case GL_RGBA16F:
+		return GL_HALF_FLOAT;
+	case GL_R32F:
+	case GL_RG32F:
+	case GL_RGB32F:
+	case GL_RGBA32F:
+		return GL_FLOAT;
+	case GL_R32UI:
+	case GL_RGBA32UI:
+		return GL_UNSIGNED_INT;
+	case GL_R32I:
+		return GL_INT;
+	case GL_R16UI:
+		return GL_UNSIGNED_SHORT;
+	case GL_R16I:
+		return GL_SHORT;
+	case GL_R8UI:
+		return GL_UNSIGNED_BYTE;
+	case GL_RGB4:
+	case GL_RGB5:
+	default:
+		return GL_UNSIGNED_BYTE;
+	};
+}
+
+static uint8_t std3D_getNumChannels(GLuint format)
+{
+	switch (format)
+	{
+	case GL_R8:
+	case GL_R8_SNORM:
+	case GL_R16:
+	case GL_R16_SNORM:
+	case GL_R16F:
+	case GL_R32F:
+	case GL_R8UI:
+	case GL_R16UI:
+	case GL_R16I:
+	case GL_R32UI:
+	case GL_R32I:
+	case GL_DEPTH_COMPONENT16:
+	case GL_DEPTH_COMPONENT24:
+	case GL_DEPTH_COMPONENT32:
+	case GL_DEPTH_COMPONENT32F:
+		return 1;
+	case GL_RG8:
+	case GL_RG8_SNORM:
+	case GL_RG16:
+	case GL_RG16_SNORM:
+	case GL_RG16F:
+	case GL_RG16UI:
+	case GL_RG16I:
+	case GL_RG32F:
+		return 2;
+	case GL_R3_G3_B2:
+	case GL_RGB4:
+	case GL_RGB5:
+	case GL_RGB565:
+	case GL_RGB8:
+	case GL_RGB8_SNORM:
+	case GL_RGB16:
+	case GL_RGB16_SNORM:
+	case GL_RGB16F:
+	case GL_RGB32F:
+	case GL_R11F_G11F_B10F:
+	case GL_SRGB8:
+		return 3;
+	case GL_RGBA4:
+	case GL_RGB5_A1:
+	case GL_RGBA8:
+	case GL_RGBA8_SNORM:
+	case GL_RGB10_A2:
+	case GL_RGBA16:
+	case GL_RGBA16_SNORM:
+	case GL_RGBA16F:
+	case GL_RGBA32F:
+	case GL_RGBA32UI:
+	case GL_SRGB8_ALPHA8:
+		return 4;
+	default:
+		break;
+	}
+	return 0;
+}
+
+static GLuint std3D_getImageFormat(GLuint format)
+{
+	static GLuint typeForChannels[] =
+	{
+		GL_RGB, // 0 channels
+		GL_RED,
+		GL_RG,
+		GL_RGB,
+		GL_RGBA
+	};
+	static GLuint intTypeForChannels[] =
+	{
+		GL_RGB_INTEGER, // 0 channels
+		GL_RED_INTEGER,
+		GL_RG_INTEGER,
+		GL_RGB_INTEGER,
+		GL_RGBA_INTEGER
+	};
+	bool isInteger = std3D_isIntegerFormat(format);
+	int numChannels = std3D_getNumChannels(format);
+	return isInteger ? intTypeForChannels[numChannels] : typeForChannels[numChannels];
+}
+
+void std3D_generateIntermediateFbo(int32_t width, int32_t height, std3DIntermediateFbo* pFbo, uint32_t format, int mipMaps)
 {
     // Generate the framebuffer
     memset(pFbo, 0, sizeof(*pFbo));
@@ -349,7 +510,7 @@ void std3D_generateIntermediateFbo(int32_t width, int32_t height, std3DIntermedi
     // Set up our framebuffer texture
     glGenTextures(1, &pFbo->tex);
     glBindTexture(GL_TEXTURE_2D, pFbo->tex);
-    glTexImage2D(GL_TEXTURE_2D, 0, isFloat ? GL_RGBA16F : GL_RGBA8, width, height, 0, GL_RGBA, isFloat ? GL_FLOAT : GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, std3D_getImageFormat(format), std3D_getUploadFormat(format), NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -502,19 +663,19 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 #ifdef DECAL_RENDERING
-	std3D_generateIntermediateFbo(width, height, &pFb->decalLight, 0, 0);
+	std3D_generateIntermediateFbo(width, height, &pFb->decalLight, jkPlayer_enable32Bit ? GL_RGB10_A2 : GL_RGB5_A1, 0);
 #endif
 
     if (jkPlayer_enableSSAO)
     {
 #ifdef NEW_SSAO
-		std3D_generateIntermediateFbo(width / 2, height / 2, &pFb->ssaoBlur1, 0, 0);
-		std3D_generateIntermediateFbo(pFb->ssaoBlur1.w, pFb->ssaoBlur1.h, &pFb->ssaoBlur2, 0, 0);
+		std3D_generateIntermediateFbo(width / 2, height / 2, &pFb->ssaoBlur1, GL_R8, 0);
+		std3D_generateIntermediateFbo(pFb->ssaoBlur1.w, pFb->ssaoBlur1.h, &pFb->ssaoBlur2, GL_R8, 0);
 #else
         std3D_generateIntermediateFbo(width, height, &pFb->ssaoBlur1, 0);
-        std3D_generateIntermediateFbo(pFb->ssaoBlur1.w/2, pFb->ssaoBlur1.h/2, &pFb->ssaoBlur2, 0, 0);
+        std3D_generateIntermediateFbo(pFb->ssaoBlur1.w/2, pFb->ssaoBlur1.h/2, &pFb->ssaoBlur2, GL_R8, 0);
 #endif
-		//std3D_generateIntermediateFbo(pFb->ssaoBlur2.w/2, pFb->ssaoBlur2.h/2, &pFb->ssaoBlur3, 0, 0);
+		//std3D_generateIntermediateFbo(pFb->ssaoBlur2.w/2, pFb->ssaoBlur2.h/2, &pFb->ssaoBlur3, GL_R8, 0);
 
         pFb->enable_extra |= 2;
     }
@@ -525,20 +686,20 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     {
         pFb->enable_extra |= 1;
 	#ifdef NEW_BLOOM
-		std3D_generateIntermediateFbo(width / 4, height / 4, &pFb->blur1, 1, 0);
-		std3D_generateIntermediateFbo(pFb->blur1.w / 2, pFb->blur1.h / 2, &pFb->blur2, 1, 0);
-		std3D_generateIntermediateFbo(pFb->blur2.w / 2, pFb->blur2.h / 2, &pFb->blur3, 1, 0);
-		std3D_generateIntermediateFbo(pFb->blur3.w / 2, pFb->blur3.h / 2, &pFb->blur4, 1, 0);
-		//std3D_generateIntermediateFbo(pFb->blur4.w / 2, pFb->blur4.h / 2, &pFb->blur5, 1, 0);
-		//std3D_generateIntermediateFbo(pFb->blur5.w / 2, pFb->blur5.h / 2, &pFb->blur6, 1, 0);
-		//std3D_generateIntermediateFbo(pFb->blur6.w / 2, pFb->blur6.h / 2, &pFb->blur7, 1, 0);
-		//std3D_generateIntermediateFbo(pFb->blur7.w / 2, pFb->blur7.h / 2, &pFb->blur8, 1, 0);
+		std3D_generateIntermediateFbo(width / 4, height / 4, &pFb->blur1, GL_RGBA16F, 0);
+		std3D_generateIntermediateFbo(pFb->blur1.w / 2, pFb->blur1.h / 2, &pFb->blur2, GL_RGBA16F, 0);
+		std3D_generateIntermediateFbo(pFb->blur2.w / 2, pFb->blur2.h / 2, &pFb->blur3, GL_RGBA16F, 0);
+		std3D_generateIntermediateFbo(pFb->blur3.w / 2, pFb->blur3.h / 2, &pFb->blur4, GL_RGBA16F, 0);
+		//std3D_generateIntermediateFbo(pFb->blur4.w / 2, pFb->blur4.h / 2, &pFb->blur5,GL_RGBA16F, 0);
+		//std3D_generateIntermediateFbo(pFb->blur5.w / 2, pFb->blur5.h / 2, &pFb->blur6,GL_RGBA16F, 0);
+		//std3D_generateIntermediateFbo(pFb->blur6.w / 2, pFb->blur6.h / 2, &pFb->blur7,GL_RGBA16F, 0);
+		//std3D_generateIntermediateFbo(pFb->blur7.w / 2, pFb->blur7.h / 2, &pFb->blur8,GL_RGBA16F, 0);
 	#else
-        std3D_generateIntermediateFbo(width, height, &pFb->blur1, 1, 1);
+        std3D_generateIntermediateFbo(width, height, &pFb->blur1, GL_RGBA16F, 1);
         //std3D_generateIntermediateFbo(width, height, &pFb->blurBlend, 1);
-        std3D_generateIntermediateFbo(pFb->blur1.w/4, pFb->blur1.h/4, &pFb->blur2, 1, 1);
-        std3D_generateIntermediateFbo(pFb->blur2.w/4, pFb->blur2.h/4, &pFb->blur3, 1, 1);
-        std3D_generateIntermediateFbo(pFb->blur3.w/4, pFb->blur3.h/4, &pFb->blur4, 1, 1);
+        std3D_generateIntermediateFbo(pFb->blur1.w/4, pFb->blur1.h/4, &pFb->blur2, GL_RGBA16F, 1);
+        std3D_generateIntermediateFbo(pFb->blur2.w/4, pFb->blur2.h/4, &pFb->blur3, GL_RGBA16F, 1);
+        std3D_generateIntermediateFbo(pFb->blur3.w/4, pFb->blur3.h/4, &pFb->blur4, GL_RGBA16F, 1);
 	#endif
 
         /*pFb->blur1.iw = width;
