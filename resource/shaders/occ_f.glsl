@@ -83,17 +83,5 @@ void main(void)
 	if(occ < 1.0/32.0)
 		discard;
 
-	const float DITHER_LUT[16] = float[16](
-			0, 4, 1, 5,
-			6, 2, 7, 3,
-			1, 5, 0, 4,
-			7, 3, 6, 2
-	);
-
-	int wrap_x = int(mod(gl_FragCoord.x, 3.0));
-	int wrap_y = int(mod(gl_FragCoord.y, 3.0));
-	int wrap_index = wrap_x + wrap_y * 4;
-	occ = min(occ + DITHER_LUT[wrap_index] / 255.0, 1.0);
-
     fragColor = vec4(occ, occ, occ, 1.0);
 }
