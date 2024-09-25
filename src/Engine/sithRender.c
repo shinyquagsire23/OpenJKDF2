@@ -524,13 +524,15 @@ void sithRender_Draw()
         stdMath_SinCos(sithTime_curSeconds * 100.0, &a3, &a4);
         rdCamera_SetAspectRatio(&sithCamera_currentCamera->rdCam, a3 * 0.016666668 + aspect);
         sithRender_needsAspectReset = 1;
+		sithCamera_currentCamera->rdCam.flags |= 0x1;
     }
     else if ( sithRender_needsAspectReset )
     {
         rdCamera_SetFOV(&sithCamera_currentCamera->rdCam, sithCamera_currentCamera->fov);
         rdCamera_SetAspectRatio(&sithCamera_currentCamera->rdCam, sithCamera_currentCamera->aspectRatio);
         sithRender_needsAspectReset = 0;
-    }
+		sithCamera_currentCamera->rdCam.flags &= ~0x1;
+	}
     rdSetSortingMethod(0);
     rdSetMipDistances(&sithWorld_pCurrentWorld->mipmapDistance);
     rdSetCullFlags(1);

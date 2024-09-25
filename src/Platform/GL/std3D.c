@@ -95,6 +95,8 @@ typedef struct std3DFramebuffer
     std3DIntermediateFbo window;
     std3DIntermediateFbo main;
 
+	std3DIntermediateFbo postfx; // temporary composite space for postfx
+
     int enable_extra;
     std3DIntermediateFbo blur1;
     std3DIntermediateFbo blur2;
@@ -153,8 +155,10 @@ std3DSimpleTexStage std3D_texFboStage;
 std3DSimpleTexStage std3D_blurStage;
 std3DSimpleTexStage std3D_ssaoStage;
 std3DSimpleTexStage std3D_ssaoMixStage;
-
+std3DSimpleTexStage std3D_postfxStage;
+#ifdef NEW_BLOOM
 std3DSimpleTexStage std3D_bloomStage;
+#endif
 
 GLuint blank_tex, blank_tex_white;
 void* blank_data = NULL, *blank_data_white = NULL;
@@ -714,6 +718,8 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
 	else
 		pFb->enable_extra &= ~1;
 
+	std3D_generateIntermediateFbo(width, height, &pFb->postfx, jkPlayer_enable32Bit ? GL_RGB10_A2 : GL_RGB5_A1, 0);
+
     pFb->main.fbo = pFb->fbo;
     pFb->main.tex = pFb->tex1;
     pFb->main.rbo = pFb->rbo;
@@ -922,7 +928,7 @@ int init_resources()
     if (!std3D_loadSimpleTexProgram("shaders/blur", &std3D_blurStage)) return false;
     if (!std3D_loadSimpleTexProgram("shaders/ssao", &std3D_ssaoStage)) return false;
     if (!std3D_loadSimpleTexProgram("shaders/ssao_mix", &std3D_ssaoMixStage)) return false;
-
+	if (!std3D_loadSimpleTexProgram("shaders/postfx", &std3D_postfxStage)) return false;
 #ifdef NEW_BLOOM
 	if (!std3D_loadSimpleTexProgram("shaders/bloom", &std3D_bloomStage)) return false;
 #endif
@@ -2745,8 +2751,8 @@ void std3D_DrawSceneFbo()
     if (!draw_ssao)
     {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex0, 0, 0, 1.0, 1.0, jkPlayer_gamma, 0);
-        //std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex1, 0, 0, 0.0, 1.0, jkPlayer_gamma, 0); // test emission output
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->postfx, std3D_pFb->tex0, 0, 0, 1.0, 1.0, 1.0, 0);
+        //std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->postfx, std3D_pFb->tex1, 0, 0, 0.0, 1.0, 1.0, 0); // test emission output
     }
     else
     {
@@ -2760,12 +2766,12 @@ void std3D_DrawSceneFbo()
         //std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->ssaoBlur3, std3D_pFb->ssaoBlur2.tex, 0, 0, 8.0, 3.0, 4.0);
 
         glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
-        std3D_DrawSimpleTex(&std3D_ssaoMixStage, &std3D_pFb->window, std3D_pFb->ssaoBlur2.tex, std3D_pFb->tex0, 0, 0.0, 0.0, jkPlayer_gamma, 0);
+        std3D_DrawSimpleTex(&std3D_ssaoMixStage, &std3D_pFb->postfx, std3D_pFb->ssaoBlur2.tex, std3D_pFb->tex0, 0, 0.0, 0.0, 1.0, 0);
     }
 
     glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
     //if (!draw_bloom)
-        //std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex1, 0, 0, 1.0, 1.0, jkPlayer_gamma, 0);
+        //std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->postfx, std3D_pFb->tex1, 0, 0, 1.0, 1.0, 1.0, 0);
 
     if (draw_bloom)
     {
@@ -2806,7 +2812,7 @@ void std3D_DrawSceneFbo()
 
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
-		std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur1.tex, 0, 0, 1.0f, bloom_intensity, jkPlayer_gamma, 0);
+		std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->postfx, std3D_pFb->blur1.tex, 0, 0, 1.0f, bloom_intensity, 1.0, 0);
 
 	#else
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -2826,15 +2832,17 @@ void std3D_DrawSceneFbo()
         */
 
         glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
-        //std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blurBlend.tex, 0, 0, 1.0, 1.0, 1.0, 0);
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->tex1, 0, 0, 1.0, 1.5, jkPlayer_gamma, 0);
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur1.tex, 0, 0, 1.0, bloom_intensity * 1.5, jkPlayer_gamma, 0);
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur2.tex, 0, 0, 1.0, bloom_intensity * 1.0, jkPlayer_gamma, 0);
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur3.tex, 0, 0, 1.0, bloom_intensity * 1.0, jkPlayer_gamma, 0);
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->window, std3D_pFb->blur4.tex, 0, 0, 1.0, bloom_intensity * 0.8, jkPlayer_gamma, 0);
+        //std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->postfx, std3D_pFb->blurBlend.tex, 0, 0, 1.0, 1.0, 1.0, 0);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->postfx, std3D_pFb->tex1, 0, 0, 1.0, 1.5, 1.0, 0);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->postfx, std3D_pFb->blur1.tex, 0, 0, 1.0, bloom_intensity * 1.5, 1.0, 0);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->postfx, std3D_pFb->blur2.tex, 0, 0, 1.0, bloom_intensity * 1.0, 1.0, 0);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->postfx, std3D_pFb->blur3.tex, 0, 0, 1.0, bloom_intensity * 1.0, 1.0, 0);
+        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->postfx, std3D_pFb->blur4.tex, 0, 0, 1.0, bloom_intensity * 0.8, 1.0, 0);
 	#endif
     }
+
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	std3D_DrawSimpleTex(&std3D_postfxStage, &std3D_pFb->window, std3D_pFb->postfx.tex, 0, 0, (rdCamera_pCurCamera->flags & 0x1) ? sithTime_curSeconds : -1.0, 1.0, jkPlayer_gamma, 0);
 }
 
 void std3D_DoTex(rdDDrawSurface* tex, rdTri* tri, int tris_left)

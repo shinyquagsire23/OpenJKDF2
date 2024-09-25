@@ -531,6 +531,7 @@ typedef struct rdCamera
     rdVector3 lightPositions[RDCAMERA_MAX_LIGHTS];
     float attenuationMin;
     float attenuationMax;
+	uint32_t flags;
 } rdCamera;
 
 typedef struct rdCanvas
