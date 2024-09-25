@@ -17,7 +17,7 @@ void main(void)
 #ifdef SSAO_CHECK_LEVELS
     vec4 sampled_color = vec4(0.5, 0.5, 0.5, 1.0);
 #else
-    vec4 sampled_color = texture(tex2, f_uv);
+    vec4 sampled_color = vec4(texture(tex2, f_uv).x);
 #endif
     
     // The background we're applying to
