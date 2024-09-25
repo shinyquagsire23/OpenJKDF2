@@ -76,26 +76,27 @@ void rdLight_SetAngles(rdLight *pLight, float angleX, float angleY)
 #endif
 
 #ifdef SPECULAR_LIGHTING
-float rdLight_Specular(rdVector3* reflDir, const rdVector3* lightDir, const rdVector3* viewDir, const rdVector3* normal)
+float rdLight_Specular(const rdVector3* lightDir, const rdVector3* viewDir, const rdVector3* normal)
 {
-	rdVector3 wi;
-	rdVector_Neg3(&wi, lightDir);
-	rdVector_Reflect3(reflDir, &wi, normal);
+	rdVector3 h;
+	rdVector_Add3(&h, lightDir, viewDir);
+	rdVector_Normalize3Acc(&h);
 
-	// note on energy conservation:
-	// phong shininess 4 has energy multiplier of ~1.0 (more like 0.95) according to phong energy conservation equation (n + 2) / (2 * pi)
-	// by happy coincidence we can completely leave it out :P
-	float brdf = stdMath_Clamp(rdVector_Dot3(viewDir, reflDir), 0.0f, 1.0f);
-	brdf *= brdf;
-	brdf *= brdf;
+	float brdf = stdMath_Clamp(rdVector_Dot3(&h, normal), 0.0f, 1.0f);
+	brdf *= brdf; // x2
+	brdf *= brdf; // x4
+	brdf *= brdf; // x8
 	return brdf;
 }
 
 float rdLight_Fresnel(const rdVector3* viewDir, const rdVector3* normal, float f0)
 {
-	return f0 + (1.0f - f0) * powf(stdMath_Fabs(1.0f - rdVector_Dot3(normal, viewDir)), 5.0f);
+	//return f0 + (1.0f - f0) * powf(stdMath_Fabs(1.0f - rdVector_Dot3(normal, viewDir)), 5.0f);
+	float fresnel = stdMath_Fabs(1.0f - rdVector_Dot3(normal, viewDir));
+	fresnel *= fresnel;
+	fresnel *= fresnel;
+	return f0 + (1.0f - f0) * fresnel;
 }
-
 #endif
 
 #ifdef HALF_LAMBERT
@@ -123,6 +124,16 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
  #endif
 	int numVertices, float scalar)
 {
+#ifdef SPECULAR_LIGHTING
+	float c_d = 1.0f;
+	float c_s = 0.0f;
+	if (bApplySpecular)
+	{
+		c_d = 0.3f;
+		c_s = 0.7f;
+	}
+#endif
+
 #ifndef JKM_LIGHTING
     int vertexLightsSize;
     rdVector3* vertexIter;
@@ -225,6 +236,11 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
 			rdVector3 ambientColor;
 			rdAmbient_CalculateVertexColor(ambient, vertexNormals, &ambientColor);
 
+#ifdef SPECULAR_LIGHTING
+			if (bApplySpecular)
+				rdVector_Scale3Acc(&ambientColor, c_d);
+#endif
+
 			if (outLightsR) *outLightsR += ambientColor.x;
 			if (outLightsG) *outLightsG += ambientColor.y;
 			if (outLightsB) *outLightsB += ambientColor.z;
@@ -232,10 +248,16 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
 		#ifdef SPECULAR_LIGHTING
 			if (bApplySpecular)
 			{
-				rdVector3 reflDir;
-				float brdf = rdLight_Specular(&reflDir, &ambient->dominantDir, &localViewDir, vertexNormals);
+				float brdf = rdLight_Specular(&ambient->dominantDir, &localViewDir, vertexNormals);
 				// add some view based fresnel
-				brdf += 0.7f * rdLight_Fresnel(&localViewDir, vertexNormals, 0.0f);
+				brdf += rdLight_Fresnel(&localViewDir, vertexNormals, 0.0f);
+				brdf *= c_s;
+
+				rdVector3 wi;
+				rdVector_Neg3(&wi, &ambient->dominantDir);
+
+				rdVector3 reflDir;
+				rdVector_Reflect3(&reflDir, &wi, vertexNormals);
 				rdAmbient_CalculateVertexColor(ambient, &reflDir, &ambientColor);
 
 				if (outLightsR) *outLightsR += ambientColor.x * brdf;
@@ -261,18 +283,21 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
                     if ( lightMagnitude > 0.0 )
 					{
 						float intensity = (light->intensity - len * scalar) * lightMagnitude;
-                        *outLights += intensity;
+						float diffuseIntensity = intensity;
+#ifdef SPECULAR_LIGHTING
+						diffuseIntensity *= c_d;
+#endif
+						*outLights += diffuseIntensity;
 					#ifdef RGB_THING_LIGHTS
-						if(outLightsR) *outLightsR += intensity * light->color.x;
-						if(outLightsG) *outLightsG += intensity * light->color.y;
-						if(outLightsB) *outLightsB += intensity * light->color.z;
+						if(outLightsR) *outLightsR += diffuseIntensity * light->color.x;
+						if(outLightsG) *outLightsG += diffuseIntensity * light->color.y;
+						if(outLightsB) *outLightsB += diffuseIntensity * light->color.z;
 					#endif
 					
 				#ifdef SPECULAR_LIGHTING
 						if (bApplySpecular)
 						{
-							rdVector3 reflDir;
-							intensity *= rdLight_Specular(&reflDir, &diff, &localViewDir, vertexNormals);
+							intensity *= c_s * rdLight_Specular(&diff, &localViewDir, vertexNormals);
 						}
                         *outLights += intensity;
 					#ifdef RGB_THING_LIGHTS
@@ -354,6 +379,10 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
 #ifdef RGB_AMBIENT
 		rdVector3 ambientColor;
 		rdAmbient_CalculateVertexColor(ambient, vertexNormals, &ambientColor);
+#ifdef SPECULAR_LIGHTING
+		if (bApplySpecular)
+			rdVector_Scale3Acc(&ambientColor, c_d);
+#endif
 
 		if (outLightsR) *outLightsR += ambientColor.x;
 		if (outLightsG) *outLightsG += ambientColor.y;
@@ -362,10 +391,16 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
 	#ifdef SPECULAR_LIGHTING
 		if (bApplySpecular)
 		{
-			rdVector3 reflDir;
-			float brdf = rdLight_Specular(&reflDir, &ambient->dominantDir, &localViewDir, vertexNormals);
+			float brdf = rdLight_Specular(&ambient->dominantDir, &localViewDir, vertexNormals);
 			// add some view based fresnel
-			brdf += 0.7f * rdLight_Fresnel(&localViewDir, vertexNormals, 0.0f);
+			brdf += rdLight_Fresnel(&localViewDir, vertexNormals, 0.0f);
+			brdf *= c_s;
+
+			rdVector3 wi;
+			rdVector_Neg3(&wi, &ambient->dominantDir);
+
+			rdVector3 reflDir;
+			rdVector_Reflect3(&reflDir, &wi, vertexNormals);
 			rdAmbient_CalculateVertexColor(ambient, &reflDir, &ambientColor);
 
 			if (outLightsR) *outLightsR += ambientColor.x * brdf;
@@ -395,25 +430,28 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
 					if (lightMagnitude > 0.0) 
                     {
 						float intensity = (light->intensity - fVar8 * scalar) * lightMagnitude;
-                        *outLights += intensity;
+						float diffuseIntensity = intensity;
+					#ifdef SPECULAR_LIGHTING
+						diffuseIntensity *= c_d;
+					#endif
+                        *outLights += diffuseIntensity;
 					#ifdef RGB_THING_LIGHTS
-						if (vertices_r) *outLightsR += intensity * light->color.x;
-						if (vertices_g) *outLightsG += intensity * light->color.y;
-						if (vertices_b) *outLightsB += intensity * light->color.z;
+						if (vertices_r) *outLightsR += diffuseIntensity * light->color.x;
+						if (vertices_g) *outLightsG += diffuseIntensity * light->color.y;
+						if (vertices_b) *outLightsB += diffuseIntensity * light->color.z;
 					#endif
 
 				#ifdef SPECULAR_LIGHTING
 						if (bApplySpecular)
 						{
-							rdVector3 reflDir;
-							intensity *= rdLight_Specular(&reflDir, &diff, &localViewDir, vertexNormals);
-						}
-                        *outLights += intensity;
-					#ifdef RGB_THING_LIGHTS
-						if (vertices_r) *outLightsR += intensity * light->color.x;
-						if (vertices_g) *outLightsG += intensity * light->color.y;
-						if (vertices_b) *outLightsB += intensity * light->color.z;
-					#endif
+							intensity *= c_s * rdLight_Specular(&diff, &localViewDir, vertexNormals);
+							*outLights += intensity;
+						#ifdef RGB_THING_LIGHTS
+							if (vertices_r) *outLightsR += intensity * light->color.x;
+							if (vertices_g) *outLightsG += intensity * light->color.y;
+							if (vertices_b) *outLightsB += intensity * light->color.z;
+						#endif
+					}
 				#endif
                     }
                 }
@@ -428,25 +466,28 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
                             fVar1 = (1.0 - (light->cosAngleX - lightMagnitude) * light->lux) * fVar1;
                         }
 						float intensity = (fVar1 - fVar8 * scalar) * rdVector_Dot3(vertexNormals, lightDirIter);
-                        *outLights += intensity;
+						float diffuseIntensity = intensity;
+#ifdef SPECULAR_LIGHTING
+						diffuseIntensity *= c_d;
+#endif
+                        *outLights += diffuseIntensity;
 #ifdef RGB_THING_LIGHTS
-						if (vertices_r) *outLightsR += intensity * light->color.x;
-						if (vertices_g) *outLightsG += intensity * light->color.y;
-						if (vertices_b) *outLightsB += intensity * light->color.z;
+						if (vertices_r) *outLightsR += diffuseIntensity * light->color.x;
+						if (vertices_g) *outLightsG += diffuseIntensity * light->color.y;
+						if (vertices_b) *outLightsB += diffuseIntensity * light->color.z;
 #endif
 
 #ifdef SPECULAR_LIGHTING
 						if (bApplySpecular)
 						{
-							rdVector3 reflDir;
-							intensity *= rdLight_Specular(&reflDir, &diff, &localViewDir, vertexNormals);
-						}
-						*outLights += intensity;
+							intensity *= c_s * rdLight_Specular(&diff, &localViewDir, vertexNormals);
+							*outLights += intensity;
 #ifdef RGB_THING_LIGHTS
-						if (vertices_r) *outLightsR += intensity * light->color.x;
-						if (vertices_g) *outLightsG += intensity * light->color.y;
-						if (vertices_b) *outLightsB += intensity * light->color.z;
+							if (vertices_r) *outLightsR += intensity * light->color.x;
+							if (vertices_g) *outLightsG += intensity * light->color.y;
+							if (vertices_b) *outLightsB += intensity * light->color.z;
 #endif
+						}
 #endif
                     }
                 }
