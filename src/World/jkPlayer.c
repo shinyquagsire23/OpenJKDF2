@@ -673,6 +673,7 @@ void jkPlayer_WriteConf(wchar_t *name)
         stdJSON_SaveFloat(ext_fpath, "ssaamultiple", jkPlayer_ssaaMultiple);
         stdJSON_SaveInt(ext_fpath, "enablessao", jkPlayer_enableSSAO);
         stdJSON_SaveFloat(ext_fpath, "gamma", jkPlayer_gamma);
+		stdJSON_SaveInt(ext_fpath, "colordepth", jkPlayer_enable32Bit);
         stdJSON_SaveBool(ext_fpath, "bEnableJkgm", jkPlayer_bEnableJkgm);
         stdJSON_SaveBool(ext_fpath, "bEnableTexturePrecache", jkPlayer_bEnableTexturePrecache);
         stdJSON_SaveBool(ext_fpath, "bKeepCorpses", jkPlayer_bKeepCorpses);
@@ -690,6 +691,10 @@ void jkPlayer_WriteConf(wchar_t *name)
 #ifdef DYNAMIC_POV
 		stdJSON_SaveBool(ext_fpath, "aimLock", jkPlayer_aimLock);
 #endif
+#ifdef RAGDOLLS
+		stdJSON_SaveBool(ext_fpath, "ragdolls", jkPlayer_ragdolls);
+#endif
+
 #ifdef SPHERE_AO
 	stdJSON_SaveBool(ext_fpath, "shadows", jkPlayer_enableShadows);
 #endif
@@ -787,6 +792,21 @@ void jkPlayer_ParseLegacyExt()
         if (_sscanf(stdConffile_aLine, "gamma %f", &jkPlayer_gamma) != 1)
             jkPlayer_gamma = 1.0;
     }
+
+	if (stdConffile_ReadLine())
+	{
+		if (_sscanf(stdConffile_aLine, "colordepth %f", &jkPlayer_enable32Bit) != 1)
+			jkPlayer_enable32Bit = 1;
+	}
+
+#ifdef RAGDOLLS
+	if (stdConffile_ReadLine())
+	{
+		if (_sscanf(stdConffile_aLine, "ragdolls %f", &jkPlayer_ragdolls) != 1)
+			jkPlayer_ragdolls = 1;
+	}	
+#endif
+
 #ifdef SPHERE_AO
 	if (stdConffile_ReadLine())
 	{
@@ -799,6 +819,14 @@ void jkPlayer_ParseLegacyExt()
 	{
 		if (_sscanf(stdConffile_aLine, "decals %f", &jkPlayer_enableDecals) != 1)
 			jkPlayer_enableDecals = 1.0;
+	}
+#endif
+
+#ifdef DYNAMIC_POV
+	if (stdConffile_ReadLine())
+	{
+		if (_sscanf(stdConffile_aLine, "aimLock %f", &jkPlayer_aimLock) != 1)
+			jkPlayer_aimLock = 0;
 	}
 #endif
 }
@@ -884,6 +912,7 @@ int jkPlayer_ReadConf(wchar_t *name)
         jkPlayer_ssaaMultiple = stdJSON_GetFloat(ext_fpath, "ssaamultiple", jkPlayer_ssaaMultiple);
         jkPlayer_enableSSAO = stdJSON_GetInt(ext_fpath, "enablessao", jkPlayer_enableSSAO);
         jkPlayer_gamma = stdJSON_GetFloat(ext_fpath, "gamma", jkPlayer_gamma);
+		jkPlayer_enable32Bit = stdJSON_GetInt(ext_fpath, "colordepth", jkPlayer_enable32Bit);
 
         jkPlayer_bEnableJkgm = stdJSON_GetBool(ext_fpath, "bEnableJkgm", jkPlayer_bEnableJkgm);
         jkPlayer_bEnableTexturePrecache = stdJSON_GetBool(ext_fpath, "bEnableTexturePrecache", jkPlayer_bEnableTexturePrecache);
@@ -899,6 +928,9 @@ int jkPlayer_ReadConf(wchar_t *name)
 
         jkPlayer_setCrosshairOnLightsaber = stdJSON_GetBool(ext_fpath, "setCrosshairOnLightsaber", jkPlayer_setCrosshairOnLightsaber);
         jkPlayer_setCrosshairOnFist = stdJSON_GetBool(ext_fpath, "setCrosshairOnFist", jkPlayer_setCrosshairOnFist);
+#ifdef RAGDOLLS
+		jkPlayer_ragdolls = stdJSON_GetInt(ext_fpath, "ragdolls", jkPlayer_ragdolls);
+#endif
 #ifdef DYNAMIC_POV
 		jkPlayer_aimLock = stdJSON_GetFloat(ext_fpath, "aimLock", jkPlayer_aimLock);
 #endif
