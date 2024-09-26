@@ -80,7 +80,7 @@ void main(void)
     float integralSolidAngle = cosTheta * solidAngle;
 
     float occ = 1.0 - integralSolidAngle * 0.8;
-	if(occ >= 31.0/32.0)
+	if(occ >= 0.999)
 		discard;
 
     fragColor = vec4(occ, occ, occ, 1.0);
