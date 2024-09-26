@@ -4671,12 +4671,12 @@ void std3D_DrawOccluder(rdVector3* position, float radius, rdVector3* verts)
 {
 	if (Main_bHeadless) return;
 
-	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_DEPTH_TEST); // far from ideal but the vis cull helps
 	glEnable(GL_CULL_FACE);
 #ifdef STENCIL_BUFFER
 	glDisable(GL_STENCIL_TEST);
 #endif
-	glDepthFunc(GL_GEQUAL);
+	//glDepthFunc(GL_GEQUAL);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_DST_COLOR, GL_ZERO);
 	glCullFace(GL_FRONT);
