@@ -496,7 +496,7 @@ static GLuint std3D_getImageFormat(GLuint format)
 	return isInteger ? intTypeForChannels[numChannels] : typeForChannels[numChannels];
 }
 
-void std3D_generateIntermediateFbo(int32_t width, int32_t height, std3DIntermediateFbo* pFbo, uint32_t format, int mipMaps)
+void std3D_generateIntermediateFbo(int32_t width, int32_t height, std3DIntermediateFbo* pFbo, uint32_t format, int mipMaps, int useDepth)
 {
     // Generate the framebuffer
     memset(pFbo, 0, sizeof(*pFbo));
@@ -530,13 +530,17 @@ void std3D_generateIntermediateFbo(int32_t width, int32_t height, std3DIntermedi
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pFbo->tex, 0);
 
     // Set up our render buffer
-    glGenRenderbuffers(1, &pFbo->rbo);
-    glBindRenderbuffer(GL_RENDERBUFFER, pFbo->rbo);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	if(useDepth)
+	{
+		glGenRenderbuffers(1, &pFbo->rbo);
+		glBindRenderbuffer(GL_RENDERBUFFER, pFbo->rbo);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+		glBindRenderbuffer(GL_RENDERBUFFER, 0);
     
-    // Bind it to our framebuffer fb
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, pFbo->rbo);
+		// Bind it to our framebuffer fb
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, pFbo->rbo);
+	}
+
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         stdPlatform_Printf("std3D: ERROR, Framebuffer is incomplete!\n");
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -667,19 +671,19 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 #ifdef DECAL_RENDERING
-	std3D_generateIntermediateFbo(width, height, &pFb->decalLight, jkPlayer_enable32Bit ? GL_RGB10_A2 : GL_RGB5_A1, 0);
+	std3D_generateIntermediateFbo(width, height, &pFb->decalLight, jkPlayer_enable32Bit ? GL_RGB10_A2 : GL_RGB5_A1, 0, 0);
 #endif
 
     if (jkPlayer_enableSSAO)
     {
 #ifdef NEW_SSAO
-		std3D_generateIntermediateFbo(width / 2, height / 2, &pFb->ssaoBlur1, GL_R8, 0);
-		std3D_generateIntermediateFbo(pFb->ssaoBlur1.w, pFb->ssaoBlur1.h, &pFb->ssaoBlur2, GL_R8, 0);
+		std3D_generateIntermediateFbo(width / 2, height / 2, &pFb->ssaoBlur1, GL_R8, 0, 0);
+		std3D_generateIntermediateFbo(pFb->ssaoBlur1.w, pFb->ssaoBlur1.h, &pFb->ssaoBlur2, GL_R8, 0, 0);
 #else
-        std3D_generateIntermediateFbo(width, height, &pFb->ssaoBlur1, 0);
-        std3D_generateIntermediateFbo(pFb->ssaoBlur1.w/2, pFb->ssaoBlur1.h/2, &pFb->ssaoBlur2, GL_R8, 0);
+        std3D_generateIntermediateFbo(width, height, &pFb->ssaoBlur1, 0, 0);
+        std3D_generateIntermediateFbo(pFb->ssaoBlur1.w/2, pFb->ssaoBlur1.h/2, &pFb->ssaoBlur2, GL_R8, 0, 0);
 #endif
-		//std3D_generateIntermediateFbo(pFb->ssaoBlur2.w/2, pFb->ssaoBlur2.h/2, &pFb->ssaoBlur3, GL_R8, 0);
+		//std3D_generateIntermediateFbo(pFb->ssaoBlur2.w/2, pFb->ssaoBlur2.h/2, &pFb->ssaoBlur3, GL_R8, 0, 0);
 
         pFb->enable_extra |= 2;
     }
@@ -690,20 +694,20 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     {
         pFb->enable_extra |= 1;
 	#ifdef NEW_BLOOM
-		std3D_generateIntermediateFbo(width / 4, height / 4, &pFb->blur1, GL_RGBA16F, 0);
-		std3D_generateIntermediateFbo(pFb->blur1.w / 2, pFb->blur1.h / 2, &pFb->blur2, GL_RGBA16F, 0);
-		std3D_generateIntermediateFbo(pFb->blur2.w / 2, pFb->blur2.h / 2, &pFb->blur3, GL_RGBA16F, 0);
-		std3D_generateIntermediateFbo(pFb->blur3.w / 2, pFb->blur3.h / 2, &pFb->blur4, GL_RGBA16F, 0);
-		//std3D_generateIntermediateFbo(pFb->blur4.w / 2, pFb->blur4.h / 2, &pFb->blur5,GL_RGBA16F, 0);
-		//std3D_generateIntermediateFbo(pFb->blur5.w / 2, pFb->blur5.h / 2, &pFb->blur6,GL_RGBA16F, 0);
-		//std3D_generateIntermediateFbo(pFb->blur6.w / 2, pFb->blur6.h / 2, &pFb->blur7,GL_RGBA16F, 0);
-		//std3D_generateIntermediateFbo(pFb->blur7.w / 2, pFb->blur7.h / 2, &pFb->blur8,GL_RGBA16F, 0);
+		std3D_generateIntermediateFbo(width / 4, height / 4, &pFb->blur1, GL_RGBA16F, 0, 0);
+		std3D_generateIntermediateFbo(pFb->blur1.w / 2, pFb->blur1.h / 2, &pFb->blur2, GL_RGBA16F, 0, 0);
+		std3D_generateIntermediateFbo(pFb->blur2.w / 2, pFb->blur2.h / 2, &pFb->blur3, GL_RGBA16F, 0, 0);
+		std3D_generateIntermediateFbo(pFb->blur3.w / 2, pFb->blur3.h / 2, &pFb->blur4, GL_RGBA16F, 0, 0);
+		//std3D_generateIntermediateFbo(pFb->blur4.w / 2, pFb->blur4.h / 2, &pFb->blur5,GL_RGBA16F, 0, 0);
+		//std3D_generateIntermediateFbo(pFb->blur5.w / 2, pFb->blur5.h / 2, &pFb->blur6,GL_RGBA16F, 0, 0);
+		//std3D_generateIntermediateFbo(pFb->blur6.w / 2, pFb->blur6.h / 2, &pFb->blur7,GL_RGBA16F, 0, 0);
+		//std3D_generateIntermediateFbo(pFb->blur7.w / 2, pFb->blur7.h / 2, &pFb->blur8,GL_RGBA16F, 0, 0);
 	#else
-        std3D_generateIntermediateFbo(width, height, &pFb->blur1, GL_RGBA16F, 1);
+        std3D_generateIntermediateFbo(width, height, &pFb->blur1, GL_RGBA16F, 1, 0);
         //std3D_generateIntermediateFbo(width, height, &pFb->blurBlend, 1);
-        std3D_generateIntermediateFbo(pFb->blur1.w/4, pFb->blur1.h/4, &pFb->blur2, GL_RGBA16F, 1);
-        std3D_generateIntermediateFbo(pFb->blur2.w/4, pFb->blur2.h/4, &pFb->blur3, GL_RGBA16F, 1);
-        std3D_generateIntermediateFbo(pFb->blur3.w/4, pFb->blur3.h/4, &pFb->blur4, GL_RGBA16F, 1);
+        std3D_generateIntermediateFbo(pFb->blur1.w/4, pFb->blur1.h/4, &pFb->blur2, GL_RGBA16F, 1, 0);
+        std3D_generateIntermediateFbo(pFb->blur2.w/4, pFb->blur2.h/4, &pFb->blur3, GL_RGBA16F, 1, 0);
+        std3D_generateIntermediateFbo(pFb->blur3.w/4, pFb->blur3.h/4, &pFb->blur4, GL_RGBA16F, 1, 0);
 	#endif
 
         /*pFb->blur1.iw = width;
@@ -718,7 +722,7 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
 	else
 		pFb->enable_extra &= ~1;
 
-	std3D_generateIntermediateFbo(width, height, &pFb->postfx, jkPlayer_enable32Bit ? GL_RGB10_A2 : GL_RGB5_A1, 0);
+	std3D_generateIntermediateFbo(width, height, &pFb->postfx, jkPlayer_enable32Bit ? GL_RGB10_A2 : GL_RGB5_A1, 0, 0);
 
     pFb->main.fbo = pFb->fbo;
     pFb->main.tex = pFb->tex1;
