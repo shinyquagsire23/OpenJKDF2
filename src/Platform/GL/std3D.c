@@ -763,6 +763,8 @@ void std3D_deleteFramebuffer(std3DFramebuffer* pFb)
     std3D_deleteIntermediateFbo(&pFb->ssaoBlur2);
     //std3D_deleteIntermediateFbo(&pFb->ssaoBlur3);
 
+	std3D_deleteIntermediateFbo(&pFb->postfx);
+
 #ifdef DECAL_RENDERING
 	std3D_deleteIntermediateFbo(&pFb->decalLight);
 #endif
@@ -2738,7 +2740,7 @@ void std3D_DrawSceneFbo()
 #endif
 
     // Clear SSAO stuff
-	// Eebs: disabled, unnecessary we're going to overwrite the contents with ssao result anyway
+	// disabled, unnecessary we're going to overwrite the contents with ssao result anyway
     if (draw_ssao)
     {
         glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->ssaoBlur1.fbo);
@@ -2746,6 +2748,8 @@ void std3D_DrawSceneFbo()
         glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->ssaoBlur2.fbo);
         //glClear( GL_COLOR_BUFFER_BIT );
     }
+
+	glDisable(GL_BLEND);
 
     float rad_scale = (float)std3D_pFb->w / 640.0;
     if (!draw_ssao)
@@ -2800,6 +2804,7 @@ void std3D_DrawSceneFbo()
 		//uvScale = 4.0f; // source tex is 4x smaller
 
 		float blendLerp = 0.6f;
+		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		//glBlendFunc(GL_ONE, GL_ONE);
 		//std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur7, std3D_pFb->blur8.tex, 0, 0, uvScale, blendLerp, 1.0, 0);
@@ -2841,8 +2846,11 @@ void std3D_DrawSceneFbo()
 	#endif
     }
 
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDisable(GL_BLEND);
 	std3D_DrawSimpleTex(&std3D_postfxStage, &std3D_pFb->window, std3D_pFb->postfx.tex, 0, 0, (rdCamera_pCurCamera->flags & 0x1) ? sithTime_curSeconds : -1.0, 1.0, jkPlayer_gamma, 0);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void std3D_DoTex(rdDDrawSurface* tex, rdTri* tri, int tris_left)
