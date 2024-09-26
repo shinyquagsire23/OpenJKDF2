@@ -1385,6 +1385,12 @@ void jkPlayer_DrawPov()
         rdCache_Flush(); // Added: force polyline to be underneath model
         rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
 #endif
+#ifdef SPHERE_AO
+		rdCache_FlushOccluders();
+#endif
+#ifdef PARTICLE_LIGHTS
+		rdCache_FlushLights();
+#endif
     }
 }
 
