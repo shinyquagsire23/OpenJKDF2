@@ -1673,6 +1673,13 @@ LABEL_150:
 #endif
 				i->rdthing.desiredLightMode = RD_LIGHTMODE_FULLYLIT;
 
+#ifdef QOL_IMPROVEMENTS
+			// Added: properly set the geoset to 0
+			// todo: we may want the geoset select to work here too, perhaps it needs to be in sithRender_RenderThing
+			if (((i->rdthing).type == RD_THINGTYPE_MODEL))
+				i->rdthing.model3->geosetSelect = 0;
+#endif
+
             // MOTS added
 #ifdef JKM_LIGHTING
             if ((i->archlightIdx != -1) && ((i->rdthing).type == RD_THINGTYPE_MODEL)) {
