@@ -1381,9 +1381,9 @@ int rdCache_ProcFaceCompareByDistance(rdProcEntry *a, rdProcEntry *b)
 {
 #ifdef QOL_IMPROVEMENTS
 	// Added: sort priority
-	if(a->sortId <= b->sortId)
+	if(a->sortId < b->sortId)
 		return -1;
-	if (a->sortId >= b->sortId)
+	if (a->sortId > b->sortId)
 		return 1;
 #endif
 
