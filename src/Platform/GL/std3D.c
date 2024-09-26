@@ -4641,7 +4641,7 @@ void std3D_DrawLight(rdLight* light, rdVector3* position, rdVector3* verts)
 	//glStencilFunc(GL_EQUAL, 0, 0xFF);
 	//glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 #endif
-	glDepthFunc(GL_GREATER);
+	glDepthFunc(GL_GEQUAL);
 	glCullFace(GL_FRONT);
 
 	rdVector3 lightColor;
@@ -4676,7 +4676,7 @@ void std3D_DrawOccluder(rdVector3* position, float radius, rdVector3* verts)
 #ifdef STENCIL_BUFFER
 	glDisable(GL_STENCIL_TEST);
 #endif
-	glDepthFunc(GL_GREATER);
+	glDepthFunc(GL_GEQUAL);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_DST_COLOR, GL_ZERO);
 	glCullFace(GL_FRONT);
