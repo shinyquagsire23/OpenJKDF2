@@ -50,7 +50,7 @@ void print_log(GLuint object) {
 	free(log);
 }
 
-GLuint load_shader_file(const char* filepath, GLenum type)
+GLuint load_shader_file(const char* filepath, GLenum type, const char* userDefines)
 {
     char* shader_contents = stdEmbeddedRes_Load(filepath, NULL);
 
@@ -64,7 +64,7 @@ GLuint load_shader_file(const char* filepath, GLenum type)
     
     stdPlatform_Printf("std3D: Parse shader `%s`\n", filepath);
     
-    GLuint ret = create_shader(shader_contents, type);
+    GLuint ret = create_shader(shader_contents, type, userDefines);
     free(shader_contents);
     
     return ret;
@@ -73,7 +73,8 @@ GLuint load_shader_file(const char* filepath, GLenum type)
 /**
  * Compile the shader from file 'filename', with error handling
  */
-GLuint create_shader(const char* shader, GLenum type) {
+GLuint create_shader(const char* shader, GLenum type, const char* userDefines)
+{
 	const GLchar* source = (const GLchar*)shader;
 	GLuint res = glCreateShader(type);
 
@@ -158,10 +159,11 @@ GLuint create_shader(const char* shader, GLenum type) {
 		extensions,
 		defines,
 		featureDefines,
+		userDefines,
 		precision,
 		source
 	};
-	glShaderSource(res, 6, sources, NULL);
+	glShaderSource(res, 7, sources, NULL);
 	
 	glCompileShader(res);
 	GLint compile_ok = GL_FALSE;

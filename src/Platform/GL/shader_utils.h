@@ -11,8 +11,8 @@
 //#include <GL/glew.h>
 
 extern void print_log(GLuint object);
-GLuint load_shader_file(const char* filepath, GLenum type);
-extern GLuint create_shader(const char* filename, GLenum type);
+GLuint load_shader_file(const char* filepath, GLenum type, const char* userDefines);
+extern GLuint create_shader(const char* filename, GLenum type, const char* userDefines);
 
 #endif
 #endif // SDL2_RENDER

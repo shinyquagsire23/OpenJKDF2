@@ -793,7 +793,7 @@ void std3D_swapFramebuffers()
     }
 }
 
-GLuint std3D_loadProgram(const char* fpath_base)
+GLuint std3D_loadProgram(const char* fpath_base, const char* userDefines)
 {
     GLuint out;
     GLint link_ok = GL_FALSE;
@@ -808,8 +808,8 @@ GLuint std3D_loadProgram(const char* fpath_base)
     strcat(tmp_frag, "_f.glsl");
     
     GLuint vs, fs;
-    if ((vs = load_shader_file(tmp_vert, GL_VERTEX_SHADER))   == 0) return 0;
-    if ((fs = load_shader_file(tmp_frag, GL_FRAGMENT_SHADER)) == 0) return 0;
+    if ((vs = load_shader_file(tmp_vert, GL_VERTEX_SHADER, userDefines))   == 0) return 0;
+    if ((fs = load_shader_file(tmp_frag, GL_FRAGMENT_SHADER, userDefines)) == 0) return 0;
     
     free(tmp_vert);
     free(tmp_frag);
@@ -849,7 +849,7 @@ GLint std3D_tryFindUniform(GLuint program, const char* uniform_name)
 bool std3D_loadSimpleTexProgram(const char* fpath_base, std3DSimpleTexStage* pOut)
 {
     if (!pOut) return false;
-    if ((pOut->program = std3D_loadProgram(fpath_base)) == 0) return false;
+    if ((pOut->program = std3D_loadProgram(fpath_base, "")) == 0) return false;
     
     pOut->attribute_coord3d = std3D_tryFindAttribute(pOut->program, "coord3d");
     pOut->attribute_v_color = std3D_tryFindAttribute(pOut->program, "v_color");
@@ -879,7 +879,7 @@ bool std3D_loadSimpleTexProgram(const char* fpath_base, std3DSimpleTexStage* pOu
 bool std3D_loadDeferredProgram(const char* fpath_base, std3D_deferredStage* pOut)
 {
 	if (!pOut) return false;
-	if ((pOut->program = std3D_loadProgram(fpath_base)) == 0) return false;
+	if ((pOut->program = std3D_loadProgram(fpath_base, "")) == 0) return false;
 
 	pOut->attribute_coord3d = std3D_tryFindAttribute(pOut->program, "coord3d");
 	
@@ -932,8 +932,8 @@ int init_resources()
     std3D_activeFb = 1;
     std3D_pFb = &std3D_framebuffers[0];
     
-    if ((programDefault = std3D_loadProgram("shaders/default")) == 0) return false;
-    if ((programMenu = std3D_loadProgram("shaders/menu")) == 0) return false;
+    if ((programDefault = std3D_loadProgram("shaders/default", "")) == 0) return false;
+    if ((programMenu = std3D_loadProgram("shaders/menu", "")) == 0) return false;
     if (!std3D_loadSimpleTexProgram("shaders/ui", &std3D_uiProgram)) return false;
     if (!std3D_loadSimpleTexProgram("shaders/texfbo", &std3D_texFboStage)) return false;
     if (!std3D_loadSimpleTexProgram("shaders/blur", &std3D_blurStage)) return false;
