@@ -85,11 +85,12 @@ in vec3 f_coord;
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragColorEmiss;
 #ifdef VIEW_SPACE_GBUFFER
-layout(location = 2) out vec4 fragColorDepth;
+layout(location = 2) out float fragColorDepth;
+layout(location = 3) out vec2 fragColorNormal;
 #else
 layout(location = 2) out vec4 fragColorPos;
-#endif
 layout(location = 3) out vec4 fragColorNormal;
+#endif
 #ifdef VIEW_SPACE_GBUFFER
 layout(location = 4) out vec4 fragColorDiffuse;
 
@@ -506,20 +507,20 @@ void main(void)
     fragColor = main_color + effectAdd_color;// + color_add;
 
 	// dither the output in case we're using some lower precision output
-	if(enableDither > 0)
-	{
-		const float DITHER_LUT[16] = float[16](
-				0, 4, 1, 5,
-				6, 2, 7, 3,
-				1, 5, 0, 4,
-				7, 3, 6, 2
-		);
-
-		int wrap_x = int(gl_FragCoord.x) % 4;
-		int wrap_y = int(gl_FragCoord.y) % 4;
-		int wrap_index = wrap_x + wrap_y * 4;
-		fragColor.rgb = min(fragColor.rgb + DITHER_LUT[wrap_index] / 255.0, vec3(1.0));
-	}
+	//if(enableDither > 0)
+	//{
+	//	const float DITHER_LUT[16] = float[16](
+	//			0, 4, 1, 5,
+	//			6, 2, 7, 3,
+	//			1, 5, 0, 4,
+	//			7, 3, 6, 2
+	//	);
+	//
+	//	int wrap_x = int(gl_FragCoord.x) % 4;
+	//	int wrap_y = int(gl_FragCoord.y) % 4;
+	//	int wrap_index = wrap_x + wrap_y * 4;
+	//	fragColor.rgb = min(fragColor.rgb + DITHER_LUT[wrap_index] / 255.0, vec3(1.0));
+	//}
 
     color_add.a = orig_alpha;
 
@@ -582,12 +583,14 @@ void main(void)
 	// output linear depth
 	// nani tf??? what in the world is happening to gl_FragCoord.w??
 	float linearDepth = (1.0 / gl_FragCoord.w) / 128.0f / 128.0f;
-	fragColorDepth = vec4(linearDepth, linearDepth, linearDepth, should_write_normals);
+	fragColorDepth = linearDepth;
 
-	vec2 octaNormal = encode_octahedron(normals(adjusted_coords.xyz)); // encode normal
-    fragColorNormal = vec4(octaNormal.xy, 0, should_write_normals);
+	// octahedron encoded normal
+	vec2 octaNormal = encode_octahedron(normals(adjusted_coords.xyz));
+    fragColorNormal = octaNormal.xy;
 
-	fragColorDiffuse = sampled_color; // unlit diffuse color for deferred lights and decals
+	// unlit diffuse color for deferred lights and decals
+	fragColorDiffuse = sampled_color;
 #else
     fragColorPos = vec4(adjusted_coords.x, adjusted_coords.y, adjusted_coords.z, should_write_normals);
     fragColorNormal = vec4(face_normals, should_write_normals);
