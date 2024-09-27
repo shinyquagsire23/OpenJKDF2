@@ -515,8 +515,8 @@ void main(void)
 				7, 3, 6, 2
 		);
 
-		int wrap_x = int(mod(gl_FragCoord.x, 3.0));
-		int wrap_y = int(mod(gl_FragCoord.y, 3.0));
+		int wrap_x = int(gl_FragCoord.x) % 4;
+		int wrap_y = int(gl_FragCoord.y) % 4;
 		int wrap_index = wrap_x + wrap_y * 4;
 		fragColor.rgb = min(fragColor.rgb + DITHER_LUT[wrap_index] / 255.0, vec3(1.0));
 	}
