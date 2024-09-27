@@ -114,6 +114,7 @@ typedef struct std3DFramebuffer
     std3DIntermediateFbo ssaoBlur1;
     std3DIntermediateFbo ssaoBlur2;
     //std3DIntermediateFbo ssaoBlur3;
+	std3DIntermediateFbo halfDepth;
 
 #if defined(DECAL_RENDERING)
 	std3DIntermediateFbo decalLight;
@@ -681,6 +682,7 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
 #ifdef NEW_SSAO
 		std3D_generateIntermediateFbo(width / 2, height / 2, &pFb->ssaoBlur1, GL_R8, 0, 0);
 		std3D_generateIntermediateFbo(pFb->ssaoBlur1.w, pFb->ssaoBlur1.h, &pFb->ssaoBlur2, GL_R8, 0, 0);
+		std3D_generateIntermediateFbo(pFb->ssaoBlur2.w, pFb->ssaoBlur2.h, &pFb->halfDepth, GL_R16F, 0, 0);
 #else
         std3D_generateIntermediateFbo(width, height, &pFb->ssaoBlur1, 0, 0);
         std3D_generateIntermediateFbo(pFb->ssaoBlur1.w/2, pFb->ssaoBlur1.h/2, &pFb->ssaoBlur2, GL_R8, 0, 0);
@@ -767,6 +769,7 @@ void std3D_deleteFramebuffer(std3DFramebuffer* pFb)
 
     std3D_deleteIntermediateFbo(&pFb->ssaoBlur1);
     std3D_deleteIntermediateFbo(&pFb->ssaoBlur2);
+	std3D_deleteIntermediateFbo(&pFb->halfDepth);
     //std3D_deleteIntermediateFbo(&pFb->ssaoBlur3);
 
 	std3D_deleteIntermediateFbo(&pFb->postfx);
@@ -2776,8 +2779,15 @@ void std3D_DrawSceneFbo()
 		glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex4);
 
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        
-        std3D_DrawSimpleTex(&std3D_ssaoStage, &std3D_pFb->ssaoBlur1, std3D_pFb->tex2, std3D_pFb->tex3, tiledrand_texture, frameNum, 0.0, 0.0, 0); // test ssao output
+
+		GLuint depthOrPosTex = std3D_pFb->tex2;
+	#ifdef VIEW_SPACE_GBUFFER
+		// downscale the depth buffer - note: this is a naive point downsample, could do better
+		std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->halfDepth, std3D_pFb->tex2, 0, 0, 1.0, 1.0, 1.0, 0);
+		depthOrPosTex = std3D_pFb->halfDepth.tex;
+	#endif
+
+		std3D_DrawSimpleTex(&std3D_ssaoStage, &std3D_pFb->ssaoBlur1, depthOrPosTex, std3D_pFb->tex3, tiledrand_texture, frameNum, 0.0, 0.0, 0); // test ssao output
         std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->ssaoBlur2, std3D_pFb->ssaoBlur1.tex, 0, 0, 14.0, 3.0, 1.0 * rad_scale, 1);
         //std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->ssaoBlur3, std3D_pFb->ssaoBlur2.tex, 0, 0, 8.0, 3.0, 4.0);
 
