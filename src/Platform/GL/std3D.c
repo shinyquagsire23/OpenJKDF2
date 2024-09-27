@@ -258,6 +258,8 @@ typedef struct std3D_deferredStage
 } std3D_deferredStage;
 
 static int deferred_ibo;
+static std3D_deferredStage std3D_stencilStage;
+static int canUseDepthStencil = 1; // true until zbuffer is cleared mid-frame, which invalidates depth content
 
 void std3D_setupDeferred()
 {
@@ -950,6 +952,7 @@ int init_resources()
 #endif
 
 #ifdef DEFERRED_FRAMEWORK
+	if (!std3D_loadDeferredProgram("shaders/stencil", &std3D_stencilStage)) return false;
 	std3D_setupDeferred();
 #endif
 
@@ -1236,6 +1239,7 @@ void std3D_FreeResources()
 	glDeleteProgram(std3D_occluderStage.program);
 #endif
 #ifdef DEFERRED_FRAMEWORK
+	glDeleteProgram(std3D_stencilStage.program);
 	std3D_freeDeferred();
 #endif
     std3D_bReinitHudElements = 1;
@@ -1368,6 +1372,10 @@ int std3D_StartScene()
 	glStencilMask(0xFF);
 #endif
 	glClear(clearBits);
+
+#ifdef DEFERRED_FRAMEWORK
+	canUseDepthStencil = 1;
+#endif
 
     if (jkGuiBuildMulti_bRendering && rdColormap_pCurMap && loaded_colormap != rdColormap_pCurMap)
     {
@@ -3540,6 +3548,9 @@ int std3D_ClearZBuffer()
     glDepthMask(GL_TRUE);
     glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->fbo);
     glClear(GL_DEPTH_BUFFER_BIT);
+#ifdef DEFERRED_FRAMEWORK
+	canUseDepthStencil = 0; // depth-stencil invald, can't use for deferred optimizations
+#endif
     return 1;
 }
 
@@ -4348,13 +4359,6 @@ void std3D_DrawDeferredStage(std3D_deferredStage* pStage, rdVector3* verts, rdDD
 	// never write depth
 	glDepthMask(GL_FALSE);
 
-	// bind to main fbo for drawing
-	glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->main.fbo);
-
-	// we only need to write color + emissivie
-	GLenum bufs[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-	glDrawBuffers(2, bufs);
-
 	std3D_useProgram(pStage->program);
 
 	glUniform1i(pStage->uniform_texDepth, 0);
@@ -4563,6 +4567,13 @@ void std3D_DrawDecal(rdDDrawSurface* texture, rdVector3* verts, rdMatrix34* deca
 	else
 		glCullFace(GL_BACK);
 
+	// bind to main fbo for drawing
+	glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->main.fbo);
+
+	// we only need to write color + emissivie
+	GLenum bufs[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+	glDrawBuffers(2, bufs);
+
 	std3D_DrawDeferredStage(&std3D_decalStage, verts, texture, flags, &rdroid_zeroVector3, angleFade, color, decalMatrix);
 
 	glEnable(GL_CULL_FACE);
@@ -4647,6 +4658,13 @@ void std3D_DrawLight(rdLight* light, rdVector3* position, rdVector3* verts)
 	rdVector3 lightColor;
 	rdVector_Scale3(&lightColor, &light->color, light->intensity);
 
+	// bind to main fbo for drawing
+	glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->main.fbo);
+
+	// we only need to write color + emissivie
+	GLenum bufs[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+	glDrawBuffers(2, bufs);
+
 	std3D_DrawDeferredStage(&std3D_lightStage, verts, NULL, 0, position, light->falloffMin, &lightColor, &rdroid_identMatrix34);
 
 	glEnable(GL_BLEND);
@@ -4666,24 +4684,62 @@ void std3D_DrawLight(rdLight* light, rdVector3* position, rdVector3* verts)
 
 #ifdef SPHERE_AO
 
-// todo: use an actual sphere...
 void std3D_DrawOccluder(rdVector3* position, float radius, rdVector3* verts)
 {
 	if (Main_bHeadless) return;
 
-	glDisable(GL_DEPTH_TEST); // far from ideal but the vis cull helps
+	// bind to main fbo for drawing
+	glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->main.fbo);
+
+	if (!canUseDepthStencil)
+	{
+		glDisable(GL_DEPTH_TEST);
+#ifdef STENCIL_BUFFER
+		glDisable(GL_STENCIL_TEST);
+#endif
+	}
+	else
+	{
+		glEnable(GL_DEPTH_TEST);
+#ifdef STENCIL_BUFFER
+		glDisable(GL_CULL_FACE);
+		glDrawBuffer(GL_NONE);
+		glEnable(GL_STENCIL_TEST);
+		glClear(GL_STENCIL_BUFFER_BIT);
+		glStencilFunc(GL_ALWAYS, 0, 0);
+		glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP);
+		glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP);
+		std3D_DrawDeferredStage(&std3D_stencilStage, verts, NULL, 0, position, radius, &rdroid_zeroVector3, &rdroid_identMatrix34);
+#endif
+	}
+
+	// we only need to write color 
+	GLenum bufs[1] = { GL_COLOR_ATTACHMENT0 };
+	glDrawBuffers(1, bufs);
+
 	glEnable(GL_CULL_FACE);
 #ifdef STENCIL_BUFFER
-	glDisable(GL_STENCIL_TEST);
+	if (canUseDepthStencil)
+	{
+		glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
+		glDisable(GL_DEPTH_TEST);
+
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_FRONT);
+	}
+	else
 #endif
-	//glDepthFunc(GL_GEQUAL);
+	{
+		glCullFace(GL_FRONT);
+		glDepthFunc(GL_GEQUAL);
+	}
+
+	// multiply blending
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_DST_COLOR, GL_ZERO);
-	glCullFace(GL_FRONT);
 
 	std3D_DrawDeferredStage(&std3D_occluderStage, verts, NULL, 0, position, radius, &rdroid_zeroVector3, &rdroid_identMatrix34);
 
-	glEnable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glDepthFunc(GL_LESS);

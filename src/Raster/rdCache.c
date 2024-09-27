@@ -1765,7 +1765,6 @@ void rdCache_FlushOccluders()
 	{
 		float radius = rdCache_aOccluderRadii[i];
 
-		// todo: use an actual sphere...
 		rdVector3 verts[8] =
 		{
 			{ -radius, -radius,  radius },
@@ -1798,7 +1797,7 @@ void rdCache_FlushOccluders()
 			rdVector_Copy3(&verts[v], &proj);
 		}
 
-		std3D_DrawOccluder(&rdCache_aOccluderPositions[i], radius, verts);
+		std3D_DrawOccluder(&rdCache_aOccluderPositions[i], rdCache_aOccluderRadii[i], verts);
 	}
 	rdCache_numOccluders = 0;
 }
