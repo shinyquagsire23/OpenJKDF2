@@ -161,6 +161,7 @@ std3DSimpleTexStage std3D_postfxStage;
 std3DSimpleTexStage std3D_bloomStage;
 #endif
 
+unsigned int vao;
 GLuint blank_tex, blank_tex_white;
 void* blank_data = NULL, *blank_data_white = NULL;
 GLuint worldpal_texture;
@@ -200,11 +201,13 @@ int last_flags = 0;
 
 D3DVERTEX* world_data_all = NULL;
 GLushort* world_data_elements = NULL;
+GLuint world_vao;
 GLuint world_vbo_all;
 GLuint world_ibo_triangle;
 
 D3DVERTEX* menu_data_all = NULL;
 GLushort* menu_data_elements = NULL;
+GLuint menu_vao;
 GLuint menu_vbo_all;
 GLuint menu_ibo_triangle;
 
@@ -248,6 +251,7 @@ void std3D_FlushLights();
 #ifdef DEFERRED_FRAMEWORK
 typedef struct std3D_deferredStage
 {
+	GLuint vao;
 	GLuint program;
 	GLint attribute_coord3d;
 	GLint uniform_texDepth, uniform_texLight, uniform_texDiffuse, uniform_texNormal; // gbuffer textures
@@ -258,7 +262,8 @@ typedef struct std3D_deferredStage
 	GLint uniform_rt, uniform_lt, uniform_rb, uniform_lb; // frustum corner rays for position reconstruction
 } std3D_deferredStage;
 
-static int deferred_ibo;
+static GLuint deferred_vbo;
+static GLuint deferred_ibo;
 static std3D_deferredStage std3D_stencilStage;
 static int canUseDepthStencil = 1; // true until zbuffer is cleared mid-frame, which invalidates depth content
 
@@ -316,10 +321,16 @@ void std3D_setupDeferred()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, deferred_ibo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 12 * 3 * sizeof(GLushort), data_elements, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	glGenBuffers(1, &deferred_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, deferred_vbo);
+	glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(D3DVERTEX), NULL, GL_STREAM_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void std3D_freeDeferred()
 {
+	glDeleteBuffers(1, &deferred_vbo);
 	glDeleteBuffers(1, &deferred_ibo);
 }
 
@@ -910,8 +921,149 @@ bool std3D_loadDeferredProgram(const char* fpath_base, std3D_deferredStage* pOut
 	pOut->uniform_radius = std3D_tryFindUniform(pOut->program, "volumeRadius");
 	pOut->uniform_color = std3D_tryFindUniform(pOut->program, "volumeColor");
 	pOut->uniform_objectMatrix = std3D_tryFindUniform(pOut->program, "volumeInvMatrix");
+
+	glGenVertexArrays(1, &pOut->vao);
+	glBindVertexArray(pOut->vao);
+
+	glBindBuffer(GL_ARRAY_BUFFER, deferred_vbo);
+
+	glVertexAttribPointer(
+		pOut->attribute_coord3d, // attribute
+		3, // number of elements per vertex, here (x,y,z)
+		GL_FLOAT, // the type of each element
+		GL_FALSE, // normalize fixed-point data?
+		sizeof(D3DVERTEX), // data stride
+		(GLvoid*)offsetof(D3DVERTEX, x) // offset of first element
+	);
+	glEnableVertexAttribArray(pOut->attribute_coord3d);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, deferred_ibo);
+
+	glBindVertexArray(vao);
+
+	return true;
 }
 #endif
+
+void std3D_setupWorldVAO()
+{
+	glGenVertexArrays(1, &world_vao);
+	glBindVertexArray(world_vao);
+
+	// Describe our vertices array to OpenGL (it can't guess its format automatically)
+	glBindBuffer(GL_ARRAY_BUFFER, world_vbo_all);
+	glVertexAttribPointer(
+		attribute_coord3d, // attribute
+		3,                 // number of elements per vertex, here (x,y,z)
+		GL_FLOAT,          // the type of each element
+		GL_FALSE,          // normalize fixed-point data?
+		sizeof(D3DVERTEX),                 // data stride
+		(GLvoid*)offsetof(D3DVERTEX, x)                  // offset of first element
+	);
+
+	glVertexAttribPointer(
+		attribute_v_color, // attribute
+		4,                 // number of elements per vertex, here (R,G,B,A)
+		GL_UNSIGNED_BYTE,  // the type of each element
+		GL_TRUE,          // normalize fixed-point data?
+		sizeof(D3DVERTEX),                 // no extra data between each position
+		(GLvoid*)offsetof(D3DVERTEX, color) // offset of first element
+	);
+
+	glVertexAttribPointer(
+		attribute_v_light, // attribute
+		1,                 // number of elements per vertex, here (L)
+		GL_FLOAT,  // the type of each element
+		GL_FALSE,          // normalize fixed-point data?
+		sizeof(D3DVERTEX),                 // no extra data between each position
+		(GLvoid*)offsetof(D3DVERTEX, lightLevel) // offset of first element
+	);
+
+	glVertexAttribPointer(
+		attribute_v_uv,    // attribute
+		2,                 // number of elements per vertex, here (U,V)
+		GL_FLOAT,          // the type of each element
+		GL_FALSE,          // take our values as-is
+		sizeof(D3DVERTEX),                 // no extra data between each position
+		(GLvoid*)offsetof(D3DVERTEX, tu)                  // offset of first element
+	);
+
+#ifdef VIEW_SPACE_GBUFFER
+	glVertexAttribPointer(
+		attribute_coordVS, // attribute
+		3,                 // number of elements per vertex, here (x,y,z)
+		GL_FLOAT,          // the type of each element
+		GL_FALSE,          // normalize fixed-point data?
+		sizeof(D3DVERTEX),                 // data stride
+		(GLvoid*)offsetof(D3DVERTEX, vx)                  // offset of first element
+	);
+#endif
+
+	glEnableVertexAttribArray(attribute_coord3d);
+	glEnableVertexAttribArray(attribute_v_color);
+	glEnableVertexAttribArray(attribute_v_light);
+	glEnableVertexAttribArray(attribute_v_uv);
+	glEnableVertexAttribArray(attribute_coordVS);
+
+#ifdef VIEW_SPACE_GBUFFER
+	glEnableVertexAttribArray(attribute_coordVS);
+#endif
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, world_ibo_triangle);
+
+	glBindVertexArray(vao);
+}
+
+void std3D_setupMenuVAO()
+{
+	glGenVertexArrays(1, &menu_vao);
+	glBindVertexArray(menu_vao);
+
+	glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_all);
+	glVertexAttribPointer(
+		programMenu_attribute_coord3d, // attribute
+		3,                 // number of elements per vertex, here (x,y,z)
+		GL_FLOAT,          // the type of each element
+		GL_FALSE,          // normalize fixed-point data?
+		sizeof(D3DVERTEX),                 // data stride
+		(GLvoid*)offsetof(D3DVERTEX, x)                  // offset of first element
+	);
+
+	glVertexAttribPointer(
+		programMenu_attribute_v_color, // attribute
+		4,                 // number of elements per vertex, here (R,G,B,A)
+		GL_UNSIGNED_BYTE,  // the type of each element
+		GL_TRUE,          // normalize fixed-point data?
+		sizeof(D3DVERTEX),                 // no extra data between each position
+		(GLvoid*)offsetof(D3DVERTEX, color) // offset of first element
+	);
+
+	/*glVertexAttribPointer(
+		std3D_texFboStage.attribute_v_light, // attribute
+		1,                 // number of elements per vertex, here (L)
+		GL_FLOAT,  // the type of each element
+		GL_FALSE,          // normalize fixed-point data?
+		sizeof(D3DVERTEX),                 // no extra data between each position
+		(GLvoid*)offsetof(D3DVERTEX, lightLevel) // offset of first element
+	);*/
+
+	glVertexAttribPointer(
+		programMenu_attribute_v_uv,    // attribute
+		2,                 // number of elements per vertex, here (U,V)
+		GL_FLOAT,          // the type of each element
+		GL_FALSE,          // take our values as-is
+		sizeof(D3DVERTEX),                 // no extra data between each position
+		(GLvoid*)offsetof(D3DVERTEX, tu)                  // offset of first element
+	);
+
+	glEnableVertexAttribArray(programMenu_attribute_coord3d);
+	glEnableVertexAttribArray(programMenu_attribute_v_color);
+	glEnableVertexAttribArray(programMenu_attribute_v_uv);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, menu_ibo_triangle);
+
+	glBindVertexArray(vao);
+}
 
 int init_resources()
 {
@@ -944,6 +1096,10 @@ int init_resources()
 	if (!std3D_loadSimpleTexProgram("shaders/bloom", &std3D_bloomStage)) return false;
 #endif
 
+#ifdef DEFERRED_FRAMEWORK
+	std3D_setupDeferred();
+#endif
+
 #ifdef DECAL_RENDERING
 	if (!std3D_loadDeferredProgram("shaders/decal", &std3D_decalStage)) return false;
 #endif
@@ -956,7 +1112,6 @@ int init_resources()
 
 #ifdef DEFERRED_FRAMEWORK
 	if (!std3D_loadDeferredProgram("shaders/stencil", &std3D_stencilStage)) return false;
-	std3D_setupDeferred();
 #endif
 
     // Attributes/uniforms
@@ -1124,7 +1279,6 @@ int init_resources()
     
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, 4, 4, 0, GL_RGB, GL_FLOAT, tiledrand_data);
 
-    unsigned int vao;
     glGenVertexArrays( 1, &vao );
     glBindVertexArray( vao ); 
 
@@ -1139,6 +1293,9 @@ int init_resources()
 
     glGenBuffers(1, &menu_vbo_all);
     glGenBuffers(1, &menu_ibo_triangle);
+
+	std3D_setupWorldVAO();
+	std3D_setupMenuVAO();
 
     has_initted = true;
     return true;
@@ -1248,69 +1405,6 @@ void std3D_FreeResources()
     std3D_bReinitHudElements = 1;
 
     has_initted = false;
-}
-
-// todo: this should be done to a dedicated VAO and bound instead
-void std3D_SetWorldAttribPointers()
-{
-	// Describe our vertices array to OpenGL (it can't guess its format automatically)
-	glBindBuffer(GL_ARRAY_BUFFER, world_vbo_all);
-	glVertexAttribPointer(
-		attribute_coord3d, // attribute
-		3,                 // number of elements per vertex, here (x,y,z)
-		GL_FLOAT,          // the type of each element
-		GL_FALSE,          // normalize fixed-point data?
-		sizeof(D3DVERTEX),                 // data stride
-		(GLvoid*)offsetof(D3DVERTEX, x)                  // offset of first element
-	);
-
-	glVertexAttribPointer(
-		attribute_v_color, // attribute
-		4,                 // number of elements per vertex, here (R,G,B,A)
-		GL_UNSIGNED_BYTE,  // the type of each element
-		GL_TRUE,          // normalize fixed-point data?
-		sizeof(D3DVERTEX),                 // no extra data between each position
-		(GLvoid*)offsetof(D3DVERTEX, color) // offset of first element
-	);
-
-	glVertexAttribPointer(
-		attribute_v_light, // attribute
-		1,                 // number of elements per vertex, here (L)
-		GL_FLOAT,  // the type of each element
-		GL_FALSE,          // normalize fixed-point data?
-		sizeof(D3DVERTEX),                 // no extra data between each position
-		(GLvoid*)offsetof(D3DVERTEX, lightLevel) // offset of first element
-	);
-
-	glVertexAttribPointer(
-		attribute_v_uv,    // attribute
-		2,                 // number of elements per vertex, here (U,V)
-		GL_FLOAT,          // the type of each element
-		GL_FALSE,          // take our values as-is
-		sizeof(D3DVERTEX),                 // no extra data between each position
-		(GLvoid*)offsetof(D3DVERTEX, tu)                  // offset of first element
-	);
-
-#ifdef VIEW_SPACE_GBUFFER
-	glVertexAttribPointer(
-		attribute_coordVS, // attribute
-		3,                 // number of elements per vertex, here (x,y,z)
-		GL_FLOAT,          // the type of each element
-		GL_FALSE,          // normalize fixed-point data?
-		sizeof(D3DVERTEX),                 // data stride
-		(GLvoid*)offsetof(D3DVERTEX, vx)                  // offset of first element
-	);
-#endif
-
-	glEnableVertexAttribArray(attribute_coord3d);
-	glEnableVertexAttribArray(attribute_v_color);
-	glEnableVertexAttribArray(attribute_v_light);
-	glEnableVertexAttribArray(attribute_v_uv);
-	glEnableVertexAttribArray(attribute_coordVS);
-
-#ifdef VIEW_SPACE_GBUFFER
-	glEnableVertexAttribArray(attribute_coordVS);
-#endif
 }
 
 void std3D_useProgram(int program)
@@ -1432,8 +1526,6 @@ int std3D_StartScene()
     }
 #endif
 
-	std3D_SetWorldAttribPointers();
-
 #ifdef DECAL_RENDERING
 	lightBufferDirty = 1;
 #endif
@@ -1449,13 +1541,6 @@ int std3D_EndScene()
         std3D_ResetRenderList();
         return 1;
     }
-
-    glDisableVertexAttribArray(attribute_v_uv);
-    glDisableVertexAttribArray(attribute_v_color);
-    glDisableVertexAttribArray(attribute_coord3d);
-#ifdef VIEW_SPACE_GBUFFER
-	glDisableVertexAttribArray(attribute_coordVS);
-#endif
 
     //printf("End draw\n");
     last_tex = NULL;
@@ -1910,47 +1995,9 @@ void std3D_DrawMenu()
 
     D3DVERTEX* vertexes = GL_tmpVertices;
 
-    glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_all);
-    glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * sizeof(D3DVERTEX), GL_tmpVertices, GL_STREAM_DRAW);
-    glVertexAttribPointer(
-        programMenu_attribute_coord3d, // attribute
-        3,                 // number of elements per vertex, here (x,y,z)
-        GL_FLOAT,          // the type of each element
-        GL_FALSE,          // normalize fixed-point data?
-        sizeof(D3DVERTEX),                 // data stride
-        (GLvoid*)offsetof(D3DVERTEX, x)                  // offset of first element
-    );
-    
-    glVertexAttribPointer(
-        programMenu_attribute_v_color, // attribute
-        4,                 // number of elements per vertex, here (R,G,B,A)
-        GL_UNSIGNED_BYTE,  // the type of each element
-        GL_TRUE,          // normalize fixed-point data?
-        sizeof(D3DVERTEX),                 // no extra data between each position
-        (GLvoid*)offsetof(D3DVERTEX, color) // offset of first element
-    );
-
-    /*glVertexAttribPointer(
-        std3D_texFboStage.attribute_v_light, // attribute
-        1,                 // number of elements per vertex, here (L)
-        GL_FLOAT,  // the type of each element
-        GL_FALSE,          // normalize fixed-point data?
-        sizeof(D3DVERTEX),                 // no extra data between each position
-        (GLvoid*)offsetof(D3DVERTEX, lightLevel) // offset of first element
-    );*/
-
-    glVertexAttribPointer(
-        programMenu_attribute_v_uv,    // attribute
-        2,                 // number of elements per vertex, here (U,V)
-        GL_FLOAT,          // the type of each element
-        GL_FALSE,          // take our values as-is
-        sizeof(D3DVERTEX),                 // no extra data between each position
-        (GLvoid*)offsetof(D3DVERTEX, tu)                  // offset of first element
-    );
-
-    glEnableVertexAttribArray(programMenu_attribute_coord3d);
-    glEnableVertexAttribArray(programMenu_attribute_v_color);
-    glEnableVertexAttribArray(programMenu_attribute_v_uv);
+	glBindVertexArray(menu_vao);
+	glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_all);
+	glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * sizeof(D3DVERTEX), GL_tmpVertices, GL_STREAM_DRAW);
 
     {
 
@@ -1994,12 +2041,10 @@ void std3D_DrawMenu()
     glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &tris_size);
     glDrawElements(GL_TRIANGLES, tris_size / sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
 
-    glDisableVertexAttribArray(programMenu_attribute_v_uv);
-    glDisableVertexAttribArray(programMenu_attribute_v_color);
-    glDisableVertexAttribArray(programMenu_attribute_coord3d);
-
     std3D_DrawMapOverlay();
     std3D_DrawUIRenderList();
+
+	glBindVertexArray(vao);
 
     last_flags = 0;
 }
@@ -2057,41 +2102,11 @@ void std3D_DrawMapOverlay()
     glUniform1i(programMenu_uniform_displayPalette, 1);
 
     D3DVERTEX* vertexes = GL_tmpVertices;
-    glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_all);
-    glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * sizeof(D3DVERTEX), GL_tmpVertices, GL_STREAM_DRAW);
-    glVertexAttribPointer(
-        programMenu_attribute_coord3d, // attribute
-        3,                 // number of elements per vertex, here (x,y,z)
-        GL_FLOAT,          // the type of each element
-        GL_FALSE,          // normalize fixed-point data?
-        sizeof(D3DVERTEX),                 // data stride
-        (GLvoid*)offsetof(D3DVERTEX, x)                  // offset of first element
-    );
+	glBindVertexArray(menu_vao);
+	glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_all);
+	glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * sizeof(D3DVERTEX), GL_tmpVertices, GL_STREAM_DRAW);
     
-    glVertexAttribPointer(
-        programMenu_attribute_v_color, // attribute
-        4,                 // number of elements per vertex, here (R,G,B,A)
-        GL_UNSIGNED_BYTE,  // the type of each element
-        GL_TRUE,          // normalize fixed-point data?
-        sizeof(D3DVERTEX),                 // no extra data between each position
-        (GLvoid*)offsetof(D3DVERTEX, color) // offset of first element
-    );
-
-    glVertexAttribPointer(
-        programMenu_attribute_v_uv,    // attribute
-        2,                 // number of elements per vertex, here (U,V)
-        GL_FLOAT,          // the type of each element
-        GL_FALSE,          // take our values as-is
-        sizeof(D3DVERTEX),                 // no extra data between each position
-        (GLvoid*)offsetof(D3DVERTEX, tu)                  // offset of first element
-    );
-
-    glEnableVertexAttribArray(programMenu_attribute_coord3d);
-    glEnableVertexAttribArray(programMenu_attribute_v_color);
-    glEnableVertexAttribArray(programMenu_attribute_v_uv);
-
-
-    {
+	{
 
     float maxX, maxY, scaleX, scaleY, width, height;
 
@@ -2133,9 +2148,7 @@ void std3D_DrawMapOverlay()
     glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &tris_size);
     glDrawElements(GL_TRIANGLES, tris_size / sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
 
-    glDisableVertexAttribArray(programMenu_attribute_v_uv);
-    glDisableVertexAttribArray(programMenu_attribute_v_color);
-    glDisableVertexAttribArray(programMenu_attribute_coord3d);
+	glBindVertexArray(vao);
 }
 
 void std3D_DrawUIBitmapRGBA(stdBitmap* pBmp, int mipIdx, float dstX, float dstY, rdRect* srcRect, float scaleX, float scaleY, int bAlphaOverwrite, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a)
@@ -2485,50 +2498,11 @@ void std3D_DrawUIRenderList()
     }
 
     rdUITri* tris = GL_tmpUITris;
-    glEnableVertexAttribArray(std3D_uiProgram.attribute_coord3d);
-    glEnableVertexAttribArray(std3D_uiProgram.attribute_v_color);
-    glEnableVertexAttribArray(std3D_uiProgram.attribute_v_uv);
-
-    glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_all);
-    glBufferData(GL_ARRAY_BUFFER, GL_tmpUIVerticesAmt * sizeof(D3DVERTEX), GL_tmpUIVertices, GL_STREAM_DRAW);
-    glVertexAttribPointer(
-        std3D_uiProgram.attribute_coord3d, // attribute
-        3,                 // number of elements per vertex, here (x,y,z)
-        GL_FLOAT,          // the type of each element
-        GL_FALSE,          // normalize fixed-point data?
-        sizeof(D3DVERTEX),                 // data stride
-        (GLvoid*)offsetof(D3DVERTEX, x)                  // offset of first element
-    );
     
-    glVertexAttribPointer(
-        std3D_uiProgram.attribute_v_color, // attribute
-        4,                 // number of elements per vertex, here (R,G,B,A)
-        GL_UNSIGNED_BYTE,  // the type of each element
-        GL_TRUE,          // normalize fixed-point data?
-        sizeof(D3DVERTEX),                 // no extra data between each position
-        (GLvoid*)offsetof(D3DVERTEX, color) // offset of first element
-    );
-
-    /*glVertexAttribPointer(
-        std3D_uiProgram.attribute_v_light, // attribute
-        1,                 // number of elements per vertex, here (L)
-        GL_FLOAT,  // the type of each element
-        GL_FALSE,          // normalize fixed-point data?
-        sizeof(D3DVERTEX),                 // no extra data between each position
-        (GLvoid*)offsetof(D3DVERTEX, lightLevel) // offset of first element
-    );*/
-
-    glVertexAttribPointer(
-        std3D_uiProgram.attribute_v_uv,    // attribute
-        2,                 // number of elements per vertex, here (U,V)
-        GL_FLOAT,          // the type of each element
-        GL_FALSE,          // take our values as-is
-        sizeof(D3DVERTEX),                 // no extra data between each position
-        (GLvoid*)offsetof(D3DVERTEX, tu)                  // offset of first element
-    );
-    
-    //glEnableVertexAttribArray(attribute_v_norm);
-
+	glBindVertexArray(menu_vao);
+	glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_all);
+	glBufferData(GL_ARRAY_BUFFER, GL_tmpUIVerticesAmt * sizeof(D3DVERTEX), GL_tmpUIVertices, GL_STREAM_DRAW);
+  
     int last_flags = 0;
     int last_tex_idx = 0;
     //GLushort* menu_data_elements = malloc(sizeof(GLushort) * 3 * GL_tmpTrisAmt);
@@ -2624,10 +2598,8 @@ void std3D_DrawUIRenderList()
     // Done drawing    
     glBindTexture(GL_TEXTURE_2D, blank_tex_white);
 
-    glDisableVertexAttribArray(std3D_uiProgram.attribute_coord3d);
-    glDisableVertexAttribArray(std3D_uiProgram.attribute_v_color);
-    glDisableVertexAttribArray(std3D_uiProgram.attribute_v_uv);
-    
+	glBindVertexArray(vao);
+
     std3D_ResetUIRenderList();
 }
 
@@ -2638,6 +2610,8 @@ void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo
 	glDisable(GL_CULL_FACE);
 	std3D_useProgram(pStage->program);
     
+	glBindVertexArray(vao);
+
     float menu_w, menu_h, menu_u, menu_v, menu_x;
     menu_w = (double)pFbo->w;
     menu_h = (double)pFbo->h;
@@ -3043,8 +3017,9 @@ void std3D_DrawRenderList()
         zoom_yaspect = 1.0;
     }
 
-    glBindBuffer(GL_ARRAY_BUFFER, world_vbo_all);
-    glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * sizeof(D3DVERTEX), vertexes, GL_STREAM_DRAW);
+	glBindVertexArray(world_vao);
+	glBindBuffer(GL_ARRAY_BUFFER, world_vbo_all);
+	glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * sizeof(D3DVERTEX), vertexes, GL_STREAM_DRAW);
     
     glUniform1i(uniform_tex_mode, TEX_MODE_TEST);
     glUniform1i(uniform_blend_mode, 2);
@@ -3143,10 +3118,6 @@ void std3D_DrawRenderList()
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, world_ibo_triangle);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, GL_tmpTrisAmt * 3 * sizeof(GLushort), world_data_elements, GL_STREAM_DRAW);
-#ifdef VIEW_SPACE_GBUFFER
-	// these aren't guaranteed to be active when a flush happens
-	std3D_SetWorldAttribPointers();
-#endif
     
     int do_batch = 0;
     
@@ -3429,13 +3400,7 @@ void std3D_DrawRenderList()
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    
-#ifdef VIEW_SPACE_GBUFFER
-	glDisableVertexAttribArray(attribute_v_uv);
-	glDisableVertexAttribArray(attribute_v_color);
-	glDisableVertexAttribArray(attribute_coord3d);
-	glDisableVertexAttribArray(attribute_coordVS);
-#endif
+	glBindVertexArray(vao);
 
 #if 0
     // Draw all lines
@@ -4467,6 +4432,9 @@ void std3D_DrawDeferredStage(std3D_deferredStage* pStage, rdVector3* verts, rdDD
 	glUniform3fv(pStage->uniform_rb, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->rb);
 	glUniform3fv(pStage->uniform_lb, 1, (float*)&rdCamera_pCurCamera->pClipFrustum->lb);
 
+	glBindVertexArray(pStage->vao);
+	glBindBuffer(GL_ARRAY_BUFFER, deferred_vbo);
+
 	// luckily we can precompute the indices
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, deferred_ibo);
 
@@ -4484,18 +4452,7 @@ void std3D_DrawDeferredStage(std3D_deferredStage* pStage, rdVector3* verts, rdDD
 		*(uint32_t*)&GL_tmpVertices[v].nz = 0;
 	}
 
-	glEnableVertexAttribArray(pStage->attribute_coord3d);
-
-	glBindBuffer(GL_ARRAY_BUFFER, menu_vbo_all);
 	glBufferData(GL_ARRAY_BUFFER, GL_tmpVerticesAmt * sizeof(D3DVERTEX), GL_tmpVertices, GL_STREAM_DRAW);
-	glVertexAttribPointer(
-		pStage->attribute_coord3d, // attribute
-		3,                 // number of elements per vertex, here (x,y,z)
-		GL_FLOAT,          // the type of each element
-		GL_FALSE,          // normalize fixed-point data?
-		sizeof(D3DVERTEX),                 // data stride
-		(GLvoid*)offsetof(D3DVERTEX, x)                  // offset of first element
-	);
 
 	glActiveTexture(GL_TEXTURE0 + 0);
 	glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex2);
@@ -4537,7 +4494,7 @@ void std3D_DrawDeferredStage(std3D_deferredStage* pStage, rdVector3* verts, rdDD
 
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, 0);
 
-	glDisableVertexAttribArray(pStage->attribute_coord3d);
+	glBindVertexArray(vao);
 
 	glDepthMask(GL_TRUE);
 }
