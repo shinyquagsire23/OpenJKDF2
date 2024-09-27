@@ -1250,6 +1250,7 @@ void std3D_FreeResources()
     has_initted = false;
 }
 
+// todo: this should be done to a dedicated VAO and bound instead
 void std3D_SetWorldAttribPointers()
 {
 	// Describe our vertices array to OpenGL (it can't guess its format automatically)
