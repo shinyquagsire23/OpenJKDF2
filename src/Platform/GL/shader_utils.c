@@ -14,6 +14,7 @@
 #include <string.h>
 
 #include "stdPlatform.h"
+#include "General/stdString.h"
 
 #ifdef LINUX
 #include "external/fcaseopen/fcaseopen.h"
@@ -137,6 +138,23 @@ GLuint create_shader(const char* shader, GLenum type, const char* userDefines)
 	"#define GPU_LIGHTING\n"
 #endif
 	;
+
+	char userDefs[1024] = { '\0' };
+	if(userDefines && userDefines[0] != '\0')
+	{
+		char tmp[32];
+		char tmp2[32+9];
+		char* defs = userDefines;
+		while (defs)
+		{
+			defs = stdString_CopyBetweenDelimiter(defs, tmp, 32, ";");
+			if (tmp[0])
+			{
+				stdString_snprintf(tmp2, 32 + 9, "#define %s\n", tmp);
+				strcat_s(userDefs, 1024, tmp2);
+			}
+		}
+	}
 
 	// GLES2 precision specifiers
 	const char* precision;
