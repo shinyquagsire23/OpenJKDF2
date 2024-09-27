@@ -726,7 +726,7 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
 	else
 		pFb->enable_extra &= ~1;
 
-	std3D_generateIntermediateFbo(width, height, &pFb->postfx, jkPlayer_enable32Bit ? GL_RGB10_A2 : GL_RGB5_A1, 0, 0);
+	std3D_generateIntermediateFbo(width, height, &pFb->postfx, GL_RGB10_A2, 0, 0);
 
     pFb->main.fbo = pFb->fbo;
     pFb->main.tex = pFb->tex1;
