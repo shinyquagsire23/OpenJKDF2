@@ -3254,7 +3254,6 @@ void std3D_DrawRenderList()
             
             int changed_flags = (last_flags ^ tris[j].flags);
 			
-			int blendEnable = 0;
 #ifdef ADDITIVE_BLEND
 			if (changed_flags & 0x180600)
 #else
@@ -3275,7 +3274,6 @@ void std3D_DrawRenderList()
 						glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 					}
 					glEnable(GL_BLEND);
-					blendEnable = 1;
 				}
 				else
 			#endif
@@ -3291,33 +3289,43 @@ void std3D_DrawRenderList()
                         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
                     }
 					glEnable(GL_BLEND);
-					blendEnable = 1;
 				}
                 else {
                     glUniform1i(uniform_blend_mode, D3DBLEND_ONE);
                     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 					glDisable(GL_BLEND);
-					blendEnable = 0;
-				}
-
-				if (blendEnable != lastBlendEnable)
-				{
-					if (blendEnable) // only write to color and emissive when blending
-					{
-						GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-						glDrawBuffers(ARRAYSIZE(bufs), bufs);
-					}
-					else // otherwise draw them all
-					{
-						GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3
-					#ifdef VIEW_SPACE_GBUFFER
-						, GL_COLOR_ATTACHMENT4
-					#endif
-						};
-						glDrawBuffers(ARRAYSIZE(bufs), bufs);
-					}
 				}
             }
+
+			int blendEnable = 0;
+#ifdef ADDITIVE_BLEND
+			if (tris[j].flags & 0x180000)
+				blendEnable = 1;
+			else
+#endif
+			if (tris[j].flags & 0x600)
+
+				blendEnable = 1;
+			else
+				blendEnable = 0;
+
+			if (blendEnable != lastBlendEnable)
+			{
+				if (blendEnable) // only write to color and emissive when blending
+				{
+					GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+					glDrawBuffers(ARRAYSIZE(bufs), bufs);
+				}
+				else // otherwise draw them all
+				{
+					GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3
+				#ifdef VIEW_SPACE_GBUFFER
+					, GL_COLOR_ATTACHMENT4
+				#endif
+					};
+					glDrawBuffers(ARRAYSIZE(bufs), bufs);
+				}
+			}
             
             if (changed_flags & 0x1800)
             {
@@ -3370,6 +3378,7 @@ void std3D_DrawRenderList()
             
             last_tex = tris[j].texture;
             last_flags = tris[j].flags;
+			lastBlendEnable = blendEnable;
             last_tex_idx = j;
 
             do_batch = 0;
