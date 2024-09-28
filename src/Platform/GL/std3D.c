@@ -4553,7 +4553,7 @@ void std3D_DrawDecal(rdDDrawSurface* texture, rdVector3* verts, rdMatrix34* deca
 #ifdef STENCIL_BUFFER
 	glDisable(GL_STENCIL_TEST);
 	glStencilFunc(GL_ALWAYS, 0, 0xFF);
-	glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 #endif
 }
 #endif
@@ -4647,7 +4647,7 @@ void std3D_DrawLight(rdLight* light, rdVector3* position, rdVector3* verts)
 #ifdef STENCIL_BUFFER
 	//glDisable(GL_STENCIL_TEST);
 	//glStencilFunc(GL_ALWAYS, 0, 0xFF);
-	//glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
+	//glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 #endif
 }
 #endif
@@ -4680,6 +4680,7 @@ void std3D_DrawOccluder(rdVector3* position, float radius, rdVector3* verts)
 		glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP);
 		glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP);
 		std3D_DrawDeferredStage(&std3D_stencilStage, verts, NULL, 0, position, radius, &rdroid_zeroVector3, &rdroid_identMatrix34);
+		glDisable(GL_DEPTH_TEST);
 #endif
 	}
 
