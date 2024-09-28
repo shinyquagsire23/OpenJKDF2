@@ -61,6 +61,28 @@ vec3 decode_octahedron(vec2 p)
     return normalize(n);
 }
 
+
+float get_bayer_4x4_signed(ivec2 coord)
+{
+	mat4 bayerIndex = mat4(
+		vec4(00.0/16.0, 12.0/16.0, 03.0/16.0, 15.0/16.0),
+		vec4(08.0/16.0, 04.0/16.0, 11.0/16.0, 07.0/16.0),
+		vec4(02.0/16.0, 14.0/16.0, 01.0/16.0, 13.0/16.0),
+		vec4(10.0/16.0, 06.0/16.0, 09.0/16.0, 05.0/16.0)
+	);
+
+	return bayerIndex[coord.x % 4][coord.y % 4] * 2.0 - 1.0;
+}
+
+float apply_bayer_dither(float value, ivec2 coord, float steps)
+{
+	float rcp_steps = 1.0 / (steps - 1.0);
+	float black_limit = 0.5 * (rcp_steps);
+	float biggest = 0.75 * ((1.0 + rcp_steps) - 1.0);
+
+	float bayer = get_bayer_4x4_signed(coord);
+	return bayer * min(value + black_limit, biggest) + value;
+}
 void main(void)
 {
     vec2 fragCoord = gl_FragCoord.xy;
@@ -80,8 +102,14 @@ void main(void)
     float integralSolidAngle = cosTheta * solidAngle;
 
     float occ = 1.0 - integralSolidAngle * 0.8;
-	if(occ >= 0.999)
+#ifdef HIGHCOLOR
+	if(occ >= 31.0 / 32.0)
 		discard;
+	occ = apply_bayer_dither(occ, ivec2(fragCoord), 32);
+#else
+	if(occ >= 1023.0 / 1024.0)
+		discard;
+#endif
 
     fragColor = vec4(occ, occ, occ, 1.0);
 }

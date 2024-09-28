@@ -346,7 +346,7 @@ std3D_deferredStage std3D_lightStage;
 #endif
 
 #ifdef SPHERE_AO
-std3D_deferredStage std3D_occluderStage;
+std3D_deferredStage std3D_occluderStage[2]; // 0 = 32 bit, 1 = 16 bit
 #endif
 
 static bool std3D_isIntegerFormat(GLuint format)
@@ -887,10 +887,10 @@ bool std3D_loadSimpleTexProgram(const char* fpath_base, std3DSimpleTexStage* pOu
 }
 
 #ifdef DEFERRED_FRAMEWORK
-bool std3D_loadDeferredProgram(const char* fpath_base, std3D_deferredStage* pOut)
+bool std3D_loadDeferredProgram(const char* fpath_base, std3D_deferredStage* pOut, const char* defines)
 {
 	if (!pOut) return false;
-	if ((pOut->program = std3D_loadProgram(fpath_base, "")) == 0) return false;
+	if ((pOut->program = std3D_loadProgram(fpath_base, defines)) == 0) return false;
 
 	pOut->attribute_coord3d = std3D_tryFindAttribute(pOut->program, "coord3d");
 	
@@ -1101,17 +1101,18 @@ int init_resources()
 #endif
 
 #ifdef DECAL_RENDERING
-	if (!std3D_loadDeferredProgram("shaders/decal", &std3D_decalStage)) return false;
+	if (!std3D_loadDeferredProgram("shaders/decal", &std3D_decalStage, "")) return false;
 #endif
 #ifdef PARTICLE_LIGHTS
-	if (!std3D_loadDeferredProgram("shaders/light", &std3D_lightStage)) return false;
+	if (!std3D_loadDeferredProgram("shaders/light", &std3D_lightStage, "")) return false;
 #endif
 #ifdef SPHERE_AO
-	if (!std3D_loadDeferredProgram("shaders/occ", &std3D_occluderStage)) return false;
+	if (!std3D_loadDeferredProgram("shaders/occ", &std3D_occluderStage[0], "TRUECOLOR")) return false;
+	if (!std3D_loadDeferredProgram("shaders/occ", &std3D_occluderStage[1], "HIGHCOLOR")) return false;
 #endif
 
 #ifdef DEFERRED_FRAMEWORK
-	if (!std3D_loadDeferredProgram("shaders/stencil", &std3D_stencilStage)) return false;
+	if (!std3D_loadDeferredProgram("shaders/stencil", &std3D_stencilStage, "")) return false;
 #endif
 
     // Attributes/uniforms
@@ -1396,7 +1397,8 @@ void std3D_FreeResources()
 	glDeleteProgram(std3D_lightStage.program);
 #endif
 #ifdef SPHERE_AO
-	glDeleteProgram(std3D_occluderStage.program);
+	glDeleteProgram(std3D_occluderStage[0].program);
+	glDeleteProgram(std3D_occluderStage[1].program);
 #endif
 #ifdef DEFERRED_FRAMEWORK
 	glDeleteProgram(std3D_stencilStage.program);
@@ -4706,7 +4708,7 @@ void std3D_DrawOccluder(rdVector3* position, float radius, rdVector3* verts)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_DST_COLOR, GL_ZERO);
 
-	std3D_DrawDeferredStage(&std3D_occluderStage, verts, NULL, 0, position, radius, &rdroid_zeroVector3, &rdroid_identMatrix34);
+	std3D_DrawDeferredStage(&std3D_occluderStage[!jkPlayer_enable32Bit], verts, NULL, 0, position, radius, &rdroid_zeroVector3, &rdroid_identMatrix34);
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
