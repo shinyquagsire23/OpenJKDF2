@@ -154,7 +154,7 @@ void rdCache_Flush()
         _qsort(rdCache_aProcFaces, rdCache_numProcFaces, sizeof(rdProcEntry), (int (__cdecl *)(const void *, const void *))rdCache_ProcFaceCompareByDistance);
     }
 #ifdef QOL_IMPROVEMENTS
-    else if ( rdroid_curSortingMethod == 0 )
+    else if ( rdroid_curSortingMethod == 1 )
     {
         _qsort(rdCache_aProcFaces, rdCache_numProcFaces, sizeof(rdProcEntry), (int (__cdecl *)(const void *, const void *))rdCache_ProcFaceCompareByState);
     }
