@@ -263,7 +263,11 @@ float sithCollision_UpdateSectorThingCollision(sithSector *pSector, sithThing *s
               && ((flags & SITH_RAYCAST_IGNORE_FLOOR) == 0 || (v7->thingflags & SITH_TF_STANDABLE) != 0)
               && v7->collide
               && (v7->thingflags & (SITH_TF_DISABLED|SITH_TF_WILLBEREMOVED)) == 0
-              && ((flags & SITH_RAYCAST_ONLY_COG_THINGS) == 0 || v7->type == SITH_THING_COG) )
+              && ((flags & SITH_RAYCAST_ONLY_COG_THINGS) == 0 || v7->type == SITH_THING_COG)
+			#ifdef RAGDOLLS
+			  && ((flags & SITH_RAYCAST_IGNORE_CORPSES) == 0 || v7->type != SITH_THING_CORPSE)
+			#endif
+			)
             {
                 if ( !v8 )
                     goto LABEL_41;

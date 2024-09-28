@@ -433,6 +433,9 @@ enum SithRaycastType
     SITH_RAYCAST_ONLY_COG_THINGS = 0x2000, // only SITH_THING_COG things
     RAYCAST_4000 = 0x4000,
     RAYCAST_8000 = 0x8000,
+#ifdef RAGDOLLS
+	SITH_RAYCAST_IGNORE_CORPSES = 0x10000
+#endif
 };
 
 enum SithParticleFlag
