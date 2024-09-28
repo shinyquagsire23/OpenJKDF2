@@ -2844,7 +2844,7 @@ void std3D_DrawSceneFbo()
     }
 
 	glDisable(GL_BLEND);
-	std3D_DrawSimpleTex(&std3D_postfxStage, &std3D_pFb->window, std3D_pFb->postfx.tex, 0, 0, (rdCamera_pCurCamera->flags & 0x1) ? sithTime_curSeconds : -1.0, 1.0, jkPlayer_gamma, 0);
+	std3D_DrawSimpleTex(&std3D_postfxStage, &std3D_pFb->window, std3D_pFb->postfx.tex, 0, 0, (rdCamera_pCurCamera->flags & 0x1) ? sithTime_curSeconds : -1.0, !jkPlayer_enable32Bit, jkPlayer_gamma, 0);
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

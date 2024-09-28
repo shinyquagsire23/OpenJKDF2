@@ -507,20 +507,20 @@ void main(void)
     fragColor = main_color + effectAdd_color;// + color_add;
 
 	// dither the output in case we're using some lower precision output
-	//if(enableDither > 0)
-	//{
-	//	const float DITHER_LUT[16] = float[16](
-	//			0, 4, 1, 5,
-	//			6, 2, 7, 3,
-	//			1, 5, 0, 4,
-	//			7, 3, 6, 2
-	//	);
-	//
-	//	int wrap_x = int(gl_FragCoord.x) % 4;
-	//	int wrap_y = int(gl_FragCoord.y) % 4;
-	//	int wrap_index = wrap_x + wrap_y * 4;
-	//	fragColor.rgb = min(fragColor.rgb + DITHER_LUT[wrap_index] / 255.0, vec3(1.0));
-	//}
+	if(enableDither > 0)
+	{
+		const float DITHER_LUT[16] = float[16](
+				0, 4, 1, 5,
+				6, 2, 7, 3,
+				1, 5, 0, 4,
+				7, 3, 6, 2
+		);	
+
+		int wrap_x = int(gl_FragCoord.x) & 3;
+		int wrap_y = int(gl_FragCoord.y) & 3;
+		int wrap_index = wrap_x + wrap_y * 4;
+		fragColor.rgb = min(fragColor.rgb + DITHER_LUT[wrap_index] / 255.0, vec3(1.0));
+	}
 
     color_add.a = orig_alpha;
 
