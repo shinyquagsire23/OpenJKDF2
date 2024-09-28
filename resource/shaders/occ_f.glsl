@@ -83,25 +83,54 @@ float apply_bayer_dither(float value, ivec2 coord, float steps)
 	float bayer = get_bayer_4x4_signed(coord);
 	return bayer * min(value + black_limit, biggest) + value;
 }
+
+// https://seblagarde.wordpress.com/2014/12/01/inverse-trigonometric-functions-gpu-optimization-for-amd-gcn-architecture/
+// max absolute error 1.3x10^-3
+// Eberly's odd polynomial degree 5 - respect bounds
+// 4 VGPR, 14 FR (10 FR, 1 QR), 2 scalar
+// input [0, infinity] and output [0, PI/2]
+float atanPos(float x) 
+{ 
+    float t0 = (x < 1.0) ? x : 1.0f / x;
+    float t1 = t0 * t0;
+    float poly = 0.0872929;
+    poly = -0.301895 + poly * t1;
+    poly = 1.0f + poly * t1;
+    poly = poly * t0;
+    return (x < 1.0) ? poly : 1.570796 - poly;
+}
+
+// 4 VGPR, 16 FR (12 FR, 1 QR), 2 scalar
+// input [-infinity, infinity] and output [-PI/2, PI/2]
+float atanFast(float x) 
+{     
+    float t0 = atanPos(abs(x));     
+    return (x < 0.0) ? -t0: t0; 
+}
+
 void main(void)
 {
-    vec2 fragCoord = gl_FragCoord.xy;
+	vec2 fragCoord = gl_FragCoord.xy;
 
-    // coordinate
-    vec2 uv = fragCoord/(iResolution.xy);
-    vec2 coord = fragCoord/(iResolution.y);
+	// coordinate
+	vec2 uv = fragCoord/(iResolution.xy);
+	vec2 coord = fragCoord/(iResolution.y);
 
 	float depth = texture(texDepth, uv).x;
 	vec3 pos = get_view_position(depth, uv);
 	vec3 normal = decode_octahedron(texture(texNormal, uv).xy);
 
-    vec3 direction = normalize(volumePosition.xyz - pos.xyz);
-    float cosTheta = dot(normal, direction);
-    float distance = length(volumePosition.xyz - pos.xyz);
-    float solidAngle =  (1.0 - cos(atan(volumeRadius / distance))) * smoothstep(0.0, volumeRadius, volumeRadius - distance);
-    float integralSolidAngle = cosTheta * solidAngle;
+	vec3 direction = (volumePosition.xyz - pos.xyz);
+	float distance = length(volumePosition.xyz - pos.xyz);
+	if(distance > 1e-6)
+		direction /= distance;
 
-    float occ = 1.0 - integralSolidAngle * 0.8;
+	float cosTheta = max(0.0, dot(normal, direction));
+	float solidAngle = (1.0 - cos(atanFast(volumeRadius / distance)));
+	float falloff = smoothstep(0.0, volumeRadius, volumeRadius - distance);
+	float integralSolidAngle = cosTheta * solidAngle * falloff;
+
+	float occ = 1.0 - integralSolidAngle * 0.8;
 #ifdef HIGHCOLOR
 	if(occ >= 31.0 / 32.0)
 		discard;
@@ -111,5 +140,5 @@ void main(void)
 		discard;
 #endif
 
-    fragColor = vec4(occ, occ, occ, 1.0);
+	fragColor = vec4(occ, occ, occ, 1.0);
 }
