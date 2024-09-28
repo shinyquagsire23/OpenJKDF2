@@ -259,7 +259,9 @@ int jkGuiDisplay_Show()
     jkGuiDisplay_aElements[16].selectedTextEntry = jkPlayer_enableOrigAspect;
 
     jkGuiDisplay_aElements[17].selectedTextEntry = jkPlayer_enableVsync;
-	jkGuiDisplay_aElements[25].selectedTextEntry = jkPlayer_enable32Bit;
+
+	jk_snwprintf(colordepth_text, 8u, jkPlayer_enable32Bit ? L"32-bit" : L"16-bit");
+	jkGuiDisplay_aElements[25].wstr = colordepth_text;
 
     jk_snwprintf(render_level, 255, L"%.2f", jkPlayer_ssaaMultiple);
     jk_snwprintf(gamma_level, 255, L"%.2f", jkPlayer_gamma);
