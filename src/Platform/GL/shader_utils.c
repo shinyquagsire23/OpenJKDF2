@@ -177,7 +177,7 @@ GLuint create_shader(const char* shader, GLenum type, const char* userDefines)
 		extensions,
 		defines,
 		featureDefines,
-		userDefines,
+		userDefs,
 		precision,
 		source
 	};
