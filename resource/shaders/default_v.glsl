@@ -39,9 +39,13 @@ uniform lightBlock
 
 void main(void)
 {
+#ifndef RENDER_DROID2
     vec4 pos = mvp * vec4(coord3d, 1.0);
     pos.w = 1.0/(1.0-coord3d.z);
     pos.xyz *= pos.w;
+#else
+    vec4 pos = mvp * vec4(coord3d, 1.0);
+#endif
     gl_Position = pos;
     f_color = v_color.bgra;
     f_uv = v_uv;

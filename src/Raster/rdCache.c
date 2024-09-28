@@ -1358,6 +1358,10 @@ void rdCache_DrawRenderList()
 
         std3D_DrawRenderList();
     }
+
+#ifdef RENDER_DROID2
+	std3D_DrawPrimitiveRenderList();
+#endif
 }
 
 int rdCache_TriCompare(const void* a_, const void* b_)

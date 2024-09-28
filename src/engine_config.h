@@ -6,6 +6,8 @@
 // Experimental features
 #ifdef QOL_IMPROVEMENTS
 
+//#define RENDER_DROID2        // test gpu path, skips rdCache and uses a fixed-function like API to pass information to the GPU for HW transform, clipping and lighting
+
 #define STENCIL_BUFFER       // mark the stencil buffer with dynamic/transparent stuff, so we can effectively cull things like decals
 #define CLASSIC_EMISSIVE     // compute emissives using the same approach as stock JK with max(color, emissive), rather than adding it on top as bloom
 #define NEW_SSAO             // disk-to-disk based SSAO with performance improvements

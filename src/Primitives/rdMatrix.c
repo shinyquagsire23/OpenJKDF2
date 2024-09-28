@@ -998,3 +998,125 @@ void rdMatrix_BuildFromAxisAngle34(rdMatrix34* m, const rdVector3* axis, float a
 
 	m->scale.x = m->scale.y = m->scale.z = 0.0f;
 }
+
+void rdMatrix_Invert44(rdMatrix44* out, const rdMatrix44* m)
+{
+	float A2323 = m->vC.z * m->vD.w - m->vC.w * m->vD.z;
+	float A1323 = m->vC.y * m->vD.w - m->vC.w * m->vD.y;
+	float A1223 = m->vC.y * m->vD.z - m->vC.z * m->vD.y;
+	float A0323 = m->vC.x * m->vD.w - m->vC.w * m->vD.x;
+	float A0223 = m->vC.x * m->vD.z - m->vC.z * m->vD.x;
+	float A0123 = m->vC.x * m->vD.y - m->vC.y * m->vD.x;
+	float A2313 = m->vB.z * m->vD.w - m->vB.w * m->vD.z;
+	float A1313 = m->vC.z * m->vD.w - m->vB.w * m->vD.y;
+	float A1213 = m->vB.y * m->vD.z - m->vB.z * m->vD.y;
+	float A2312 = m->vB.z * m->vC.w - m->vB.w * m->vC.z;
+	float A1312 = m->vB.y * m->vC.w - m->vB.w * m->vC.y;
+	float A1212 = m->vB.y * m->vC.z - m->vB.z * m->vC.y;
+	float A0313 = m->vB.x * m->vD.w - m->vB.w * m->vD.x;
+	float A0213 = m->vB.x * m->vD.z - m->vB.z * m->vD.x;
+	float A0312 = m->vB.x * m->vC.w - m->vB.w * m->vC.x;
+	float A0212 = m->vB.x * m->vC.z - m->vB.z * m->vC.x;
+	float A0113 = m->vB.x * m->vD.y - m->vB.y * m->vD.x;
+	float A0112 = m->vB.x * m->vC.y - m->vB.y * m->vC.x;
+	float det = m->vA.x * (m->vB.y * A2323 - m->vB.z * A1323 + m->vB.w * A1223)
+		- m->vA.y * (m->vB.x * A2323 - m->vB.z * A0323 + m->vB.w * A0223)
+		+ m->vA.z * (m->vB.x * A1323 - m->vB.y * A0323 + m->vB.w * A0123)
+		- m->vA.w * (m->vB.x * A1223 - m->vB.y * A0223 + m->vB.z * A0123);
+	det = 1 / det;
+
+	rdVector_Set4(&out->vA,
+			det * (m->vB.y * A2323 - m->vB.z * A1323 + m->vB.w * A1223),
+			det * -(m->vA.y * A2323 - m->vA.z * A1323 + m->vA.w * A1223),
+			det * (m->vA.y * A2313 - m->vA.z * A1313 + m->vA.w * A1213),
+			det * -(m->vA.y * A2312 - m->vA.z * A1312 + m->vA.w * A1212)
+	);
+	rdVector_Set4(&out->vB,
+		   det * -(m->vB.x * A2323 - m->vB.z * A0323 + m->vB.w * A0223),
+		   det * (m->vA.x * A2323 - m->vA.z * A0323 + m->vA.w * A0223),
+		   det * -(m->vA.x * A2313 - m->vA.z * A0313 + m->vA.w * A0213),
+		   det * (m->vA.x * A2312 - m->vA.z * A0312 + m->vA.w * A0212)
+	);
+	rdVector_Set4(&out->vC,
+		   det * (m->vB.x * A1323 - m->vB.y * A0323 + m->vB.w * A0123),
+		   det * -(m->vA.x * A1323 - m->vA.y * A0323 + m->vA.w * A0123),
+		   det * (m->vA.x * A1313 - m->vA.y * A0313 + m->vA.w * A0113),
+		   det * -(m->vA.x * A1312 - m->vA.y * A0312 + m->vA.w * A0112)
+	);
+	rdVector_Set4(&out->vD,
+		   det * -(m->vB.x * A1223 - m->vB.y * A0223 + m->vB.z * A0123),
+		   det * (m->vA.x * A1223 - m->vA.y * A0223 + m->vA.z * A0123),
+		   det * -(m->vA.x * A1213 - m->vA.y * A0213 + m->vA.z * A0113),
+		   det * (m->vA.x * A1212 - m->vA.y * A0212 + m->vA.z * A0112)
+ );
+}
+
+void rdMatrix_BuildPerspective44(rdMatrix44* out, float fov, float aspect, float znear, float zfar)
+{
+	//float f = 1.0f / stdMath_Tan(fov / 2.0f);	
+	//rdVector_Set4(&out->vA,f / aspect, 0.0f, 0.0f,                          0.0f);
+	//rdVector_Set4(&out->vB,0.0f,       f,    0.0f,                          0.0f);
+	//rdVector_Set4(&out->vC,0.0f,       0.0f, (zfar) / (znear - zfar),      -1.0f);
+	//rdVector_Set4(&out->vD,0.0f,       0.0f, znear * zfar / (znear - zfar), 1.0f);
+
+	//const float w = 1.0f / stdMath_Tan(fov / 2.0f);
+	//const float a = w * aspect;
+	//const float Q = znear / (znear - zfar);
+	//
+	//rdVector_Set4(&out->vA,   w,  0.0f,      0.0f, 0.0f);
+	//rdVector_Set4(&out->vB, 0.0f,    a,      0.0f, 0.0f);
+	//rdVector_Set4(&out->vC, 0.0f, 0.0f,         Q, 1.0f);
+	//rdVector_Set4(&out->vD, 0.0f, 0.0f, -Q * zfar, 1.0f);
+	 
+	//float f = 1.0f / stdMath_Tan(fov / 2.0f);
+	//rdVector_Set4(&out->vA, f / aspect, 0.0f, 0.0f,                          0.0f);
+	//rdVector_Set4(&out->vB, 0.0f,       f,    0.0f,                          0.0f);
+	//rdVector_Set4(&out->vC, 0.0f,       0.0f, (zfar) / (znear - zfar),       1.0f);
+	//rdVector_Set4(&out->vD, 0.0f,       0.0f, -znear * zfar / (znear - zfar), 1.0f);
+
+	float f = 1.0f / stdMath_Tan(fov / 2.0f);
+	rdVector_Set4(&out->vA, f / aspect, 0.0f, 0.0f, 0.0f);
+	rdVector_Set4(&out->vB, 0.0f,      -f,    0.0f,                            0.0f);
+	rdVector_Set4(&out->vC, 0.0f,       0.0f, zfar / (zfar - znear),           1.0f);
+	rdVector_Set4(&out->vD, 0.0f,       0.0f, (zfar * znear) / (znear - zfar), 0.0f); // why w = 0?
+}
+
+void rdMatrix_BuildOrthographic44(rdMatrix44* out, float left, float right, float top, float bottom, float znear, float zfar)
+{
+	out->vA.x = 2.0f / (right - left);
+	out->vA.y = 0.0f;
+	out->vA.z = 0.0f;
+	out->vA.w = 0.0f;
+	out->vB.x = 0.0f;
+	out->vB.y = 2.0f / (top - bottom);
+	out->vB.z = 0.0f;
+	out->vB.w = 0.0f;
+	out->vC.x = 0.0f;
+	out->vC.y = 0.0f;
+	out->vC.z = -2.0f / (zfar - znear);
+	out->vC.w = 0.0f;
+	out->vD.x = (left + right) / (left - right);
+	out->vD.y = (bottom + top) / (bottom - top);
+	out->vD.z = -(zfar + znear) / (zfar - znear);
+	out->vD.w = 1.0f;
+}
+
+void rdMatrix_BuildLookAt34(rdMatrix34* out, const rdVector3* viewer, const rdVector3* target, const rdVector3* up)
+{
+	rdVector3 lvec;
+	rdVector_Sub3(&lvec, target, viewer);
+	rdVector_Normalize3Acc(&lvec);
+
+	rdVector3 rvec;
+	rdVector_Cross3(&rvec, &lvec, up);
+	rdVector_Normalize3Acc(&rvec);
+
+	rdVector3 uvec;
+	rdVector_Cross3(&uvec, &lvec, &rvec);
+	rdVector_Normalize3Acc(&uvec);
+
+	rdVector_Set3(&out->rvec, rvec.x, lvec.x, uvec.x);
+	rdVector_Set3(&out->lvec, rvec.y, lvec.y, uvec.y);
+	rdVector_Set3(&out->uvec, rvec.z, lvec.z, uvec.z);
+	rdVector_Set3(&out->scale, -rdVector_Dot3(&rvec, viewer), -rdVector_Dot3(&lvec, viewer), -rdVector_Dot3(&uvec, viewer));
+}

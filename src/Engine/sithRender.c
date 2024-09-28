@@ -1,4 +1,4 @@
-#include "sithRender.h"
+﻿#include "sithRender.h"
 
 #include <math.h>
 #include <float.h>
@@ -549,6 +549,42 @@ void sithRender_Draw()
 #ifdef GPU_LIGHTING
 	std3D_ClearLights();
 #endif
+
+#ifdef RENDER_DROID2
+	rdMatrixMode(RD_MATRIX_VIEW);
+	rdIdentity();
+	rdLoadMatrix34(&rdCamera_pCurCamera->view_matrix);
+
+	// fucking gl shit
+	rdMatrix44 jkm;
+	rdVector_Set4(&jkm.vA, 1, 0, 0, 0);
+	rdVector_Set4(&jkm.vB, 0, 0, -1, 0);
+	rdVector_Set4(&jkm.vC, 0, 1, 0, 0);
+	rdVector_Set4(&jkm.vD, 0, 0, 0, 1);
+
+	rdMatrix44 inv;
+	rdMatrix_Invert44(&inv, &jkm);
+	rdPostMultiplyMatrix(&inv);
+
+
+	//rdTranspose();
+	//rdVector3 lookAt;
+	//rdVector_Add3(&lookAt, &rdCamera_camMatrix.scale, &rdCamera_camMatrix.lvec);
+	//rdLookat(&rdCamera_camMatrix.scale, &lookAt, &rdCamera_camMatrix.uvec);
+
+	rdMatrixMode(RD_MATRIX_PROJECTION);
+	rdIdentity();
+
+	float fovy = stdMath_ArcTan3(1.0, stdMath_Tan(rdCamera_pCurCamera->fov * 0.5) * rdCamera_pCurCamera->screenAspectRatio) * -2.0;
+
+	//float fovy = 2.0f * atan(stdMath_Tan(rdCamera_pCurCamera->fov / 2.0f) * rdCamera_pCurCamera->screenAspectRatio / 180.0f * M_PI);
+	//fovy *= 180.0f / M_PI;
+	rdPerspective(fovy, 1.0 / rdCamera_pCurCamera->screenAspectRatio, rdCamera_pCurCamera->pClipFrustum->field_0.y, rdCamera_pCurCamera->pClipFrustum->field_0.z);
+
+	rdMatrixMode(RD_MATRIX_MODEL);
+	rdIdentity();
+#endif
+
     //printf("------\n");
     sithRender_adjoinSafeguard = 0; // Added: safeguard
 
@@ -1161,7 +1197,8 @@ void sithRender_RenderLevelGeometry()
                 continue;
             }
 
-            if ( v65->field_4 != sithRender_lastRenderTick )
+#ifndef RENDER_DROID2
+			if ( v65->field_4 != sithRender_lastRenderTick )
             {
                 for (int j = 0; j < v65->surfaceInfo.face.numVertices; j++)
                 {
@@ -1174,9 +1211,112 @@ void sithRender_RenderLevelGeometry()
                 }
                 v65->field_4 = sithRender_lastRenderTick;
             }
+#endif
 
-            if ( (sithRender_flag & 8) == 0 || v65->surfaceInfo.face.numVertices <= 3 || (v65->surfaceFlags & (SITH_SURFACE_CEILING_SKY|SITH_SURFACE_HORIZON_SKY)) != 0 || !v65->surfaceInfo.face.lightingMode )
+#ifndef RENDER_DROID2
+			if ((sithRender_flag & 8) == 0 || v65->surfaceInfo.face.numVertices <= 3 || (v65->surfaceFlags & (SITH_SURFACE_CEILING_SKY | SITH_SURFACE_HORIZON_SKY)) != 0 || !v65->surfaceInfo.face.lightingMode)
+#endif
             {
+			#ifdef RENDER_DROID2
+				if ((v65->surfaceFlags & (SITH_SURFACE_HORIZON_SKY | SITH_SURFACE_CEILING_SKY)) != 0)
+				{
+					geoMode = sithRender_geoMode;
+					if (sithRender_geoMode > RD_GEOMODE_SOLIDCOLOR)
+						geoMode = RD_GEOMODE_SOLIDCOLOR;
+				}
+				else
+				{
+					geoMode = v65->surfaceInfo.face.geometryMode;
+					if (geoMode >= sithRender_geoMode)
+						geoMode = sithRender_geoMode;
+				}
+				rdSetGeoMode(geoMode);
+				
+				lightMode = v65->surfaceInfo.face.lightingMode;
+				if (sithRender_lightingIRMode)
+				{
+					if (lightMode >= RD_LIGHTMODE_DIFFUSE)
+						lightMode = RD_LIGHTMODE_DIFFUSE;
+				}
+				else if (lightMode >= sithRender_lightMode)
+				{
+					lightMode = sithRender_lightMode;
+				}
+				texMode = sithRender_texMode;
+				rdSetLightMode(lightMode);
+				
+				texMode2 = v65->surfaceInfo.face.textureMode;
+				if (texMode2 >= texMode)
+					texMode2 = texMode;
+				rdSetTexMode(texMode2);
+
+				int wallCel = v65->surfaceInfo.face.wallCel;
+				rdBindTexture(surfaceMat, wallCel);
+
+#ifdef RGB_AMBIENT
+				rdVector3 ambientLight;
+#else
+				float ambientLight;
+#endif
+				if (sithRender_lightingIRMode)
+				{
+#ifdef RGB_AMBIENT
+					v49.x = v49.y = v49.z = sithRender_f_83198C;
+					rdVector_Copy3(&ambientLight, &v49);
+#else
+					v49 = sithRender_f_83198C;
+					ambientLight = v49;
+#endif
+				}
+				else
+				{
+#ifdef RGB_AMBIENT
+					ambientLight.x = ambientLight.y = ambientLight.z = stdMath_Clamp(level_idk->extraLight + v65->surfaceInfo.face.extraLight + sithRender_008d4098, 0.0, 1.0);
+#else
+					ambientLight = stdMath_Clamp(level_idk->extraLight + v65->surfaceInfo.face.extraLight + sithRender_008d4098, 0.0, 1.0);
+#endif
+				}
+
+				// todo: sky stuff
+				if (rdBeginPrimitive(RD_PRIMITIVE_TRIANGLE_FAN))
+				{
+					for (int j = 0; j < v65->surfaceInfo.face.numVertices; j++)
+					{
+						int posidx = v65->surfaceInfo.face.vertexPosIdx[j];
+						int uvidx = v65->surfaceInfo.face.vertexUVIdx[j];
+
+						if ((v65->surfaceFlags & SITH_SURFACE_1000000) == 0)
+						{
+							float intensity = v65->surfaceInfo.intensities[j];
+#ifdef RGB_AMBIENT
+							rdColor4f(intensity + ambientLight.x, intensity + ambientLight.y, intensity + ambientLight.z, 1.0f); // todo: alpha
+#else
+							intensity += ambientLight;
+							rdColor4f(intensity, intensity, intensity, 1.0f); // todo: alpha
+#endif
+						}
+						else
+						{
+							float* red = (v65->surfaceInfo).intensities + v65->surfaceInfo.face.numVertices;
+							float* green = red + v65->surfaceInfo.face.numVertices;
+							float* blue = green + v65->surfaceInfo.face.numVertices;
+#ifdef RGB_AMBIENT
+							rdColor4f(red[j] + ambientLight.x, green[j] + ambientLight.y, blue[j] + ambientLight.z, 1.0f); // todo: alpha
+#else
+							rdColor4f(red[j] + ambientLight, green[j] + ambientLight, blue[j] + ambientLight, 1.0f); // todo: alpha
+#endif
+						}
+						rdVector2* uv = &sithWorld_pCurrentWorld->vertexUVs[uvidx];
+						rdTexCoord(uv);
+
+						rdNormal(&v65->surfaceInfo.face.normal);
+						
+						rdVector3* v = &sithWorld_pCurrentWorld->vertices[posidx];
+						rdVertex(v);
+					}
+					rdEndPrimitive();
+				}
+			#else
                 procEntry = rdCache_GetProcEntry();
                 if ( !procEntry )
                     continue;
@@ -1626,7 +1766,8 @@ LABEL_92:
                         goto LABEL_150;
                     continue;
                 }
-            }
+ 		#endif
+           }
 LABEL_150:
             ;    
         }

@@ -834,6 +834,18 @@ typedef D3DVERTEX_ext D3DVERTEX;
 typedef D3DVERTEX_orig D3DVERTEX;
 #endif
 
+#ifdef RENDER_DROID2
+typedef struct rdPrimitive
+{
+	int             type;          // type of primitive
+	rdMatrix44      modelViewProj; // pre-multiplied model view projection matrix
+	rdDDrawSurface* pTexture;      // the texture to apply
+	D3DVERTEX       aVertices[32]; // vertex array, max 32 per primitive
+	int             numVertices;   // number of vertices in the vertex array
+	// todo: state bits, chroma color, etc
+} rdPrimitive;
+#endif
+
 /* 174 */
 typedef DWORD D3DCOLORMODEL;
 

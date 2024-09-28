@@ -310,6 +310,13 @@ uniform lightBlock
 
 void main(void)
 {
+#ifdef RENDER_DROID2
+	fragColor = f_color;
+	return;
+#endif
+
+
+
     float originalZ = gl_FragCoord.z / gl_FragCoord.w;
 #ifdef VIEW_SPACE_GBUFFER
     vec3 adjusted_coords = f_coord; // view space position

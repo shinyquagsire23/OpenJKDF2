@@ -81,4 +81,128 @@ void rdClearPostStatistics();
 
 //#define  (*(int*)0x)
 
+#ifdef RENDER_DROID2
+typedef enum RD_BLEND_MODE
+{
+	RD_BLEND_MODE_NONE = 0,
+	RD_BLEND_MODE_ALPHA = 1
+} RD_BLEND_MODE;
+
+typedef enum RD_COMPARE
+{
+	RD_COMPARE_ALWAYS,
+	RD_COMPARE_LESS,
+	RD_COMPARE_LESS_EQUAL,
+	RD_COMPARE_GREATER,
+	RD_COMPARE_GREATER_EQUAL,
+	RD_COMPARE_EQUAL,
+	RD_COMPARE_NOT_EQUAL,
+	RD_COMPARE_NEVER
+} RD_COMPARE;
+
+typedef enum RD_CULL_MODE
+{
+	RD_CULL_MODE_NONE,
+	RD_CULL_MODE_CCW_ONLY,
+	RD_CULL_MODE_CW_ONLY
+} RD_CULL_MODE;
+
+typedef enum RD_VERTEX_COLOR_MODE
+{
+	RD_VERTEX_COLOR_MODE_LUMINANCE,
+	RD_VERTEX_COLOR_MODE_COLORED,
+} RD_VERTEX_COLOR_MODE;
+
+typedef enum RD_CHROMA_KEY_MODE
+{
+	RD_CHROMA_KEY_DISABLED,
+	RD_CHROMA_KEY_ENABLED,
+} RD_CHROMA_KEY_MODE;
+
+typedef enum RD_PRIMITIVE_TYPE
+{
+	RD_PRIMITIVE_NONE,
+	RD_PRIMITIVE_TRIANGLES,
+	RD_PRIMITIVE_TRIANGLE_FAN,
+	RD_PRIMITIVE_POLYGON,
+} RD_PRIMITIVE_TYPE;
+
+typedef enum RD_MATRIX_MODE
+{
+	RD_MATRIX_MODEL,
+	RD_MATRIX_VIEW,
+	RD_MATRIX_PROJECTION,
+} RD_MATRIX_MODE;
+
+typedef struct rdViewportRect
+{
+	float x;
+	float y;
+	float width;
+	float height;
+	float minDepth;
+	float maxDepth;
+} rdViewportRect;
+
+void rdMatrixMode(RD_MATRIX_MODE mode);
+void rdPerspective(float fov, float aspect, float nearPlane, float farPlane);
+void rdOrthographic(float width, float height, float nearPlane, float farPlane);
+void rdLookat(const rdVector3* pViewer, const rdVector3* pTarget, const rdVector3* pUp);
+void rdTranslate(const rdVector3* pTranslation);
+void rdRotate(const rdVector3* pRotation);
+void rdScale(const rdVector4* pScaling);
+void rdIdentity();
+void rdTranspose();
+void rdLoadMatrix34(const rdMatrix34* pMatrix);
+void rdLoadMatrix(const rdMatrix44* pMatrix);
+void rdPostMultiplyMatrix(const rdMatrix44* pMatrix);
+void rdPreMultiplyMatrix(const rdMatrix44* pMatrix);
+void rdGetMatrix(rdMatrix44* pOut, RD_MATRIX_MODE mode);
+void rdResetMatrices();
+
+void rdViewport(float x, float y, float width, float height, float minDepth, float maxDepth);
+void rdGetViewport(rdViewportRect* pOut);
+
+int rdBeginPrimitive(RD_PRIMITIVE_TYPE type);
+void rdEndPrimitive();
+void rdVertex3f(float x, float y, float z);
+void rdColor4f(float r, float g, float b, float a);
+void rdTexCoord2f(float u, float v);
+void rdNormal3f(float x, float y, float z);
+void rdVertex(const rdVector3* pPos);
+void rdColor(const rdVector4* pCol);
+void rdTexCoord(const rdVector2* pUV);
+void rdNormal(const rdVector3* pNormal);
+
+// render state
+void rdSetZBufferCompare(RD_COMPARE mode);
+void rdSetBlendMode(RD_BLEND_MODE state);
+void rdSetCullMode(RD_CULL_MODE mode);
+void rdSetScissor(int x, int y, int width, int height);
+void rdSetAlphaThreshold(uint8_t threshold);
+void rdSetConstantColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+void rdSetChromaKey(RD_CHROMA_KEY_MODE mode);
+void rdSetChromaKeyValue(uint8_t r, uint8_t g, uint8_t b);
+
+// these names kinda suck, come up with better for per-primitive modes
+void rdSetGeoMode(int a1);
+void rdSetLightMode(int a1);
+void rdSetTexMode(int a1);
+
+// todo:
+// rdDitherMode
+
+void rdClearDepth(uint32_t z);
+void rdClearColor(uint32_t rgba);
+
+int rdBindTexture(rdMaterial* pMaterial, int cel);
+
+int rdBeginLight();
+void rdLightPosition(const rdVector3* pPos);
+void rdLightRadius(float radius);
+void rdLightColor(const rdVector3* color);
+void rdEndLight();
+
+#endif
+
 #endif // _RDROID_H

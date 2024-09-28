@@ -142,6 +142,17 @@ void std3D_DrawLight(rdLight* light, rdVector3* position, rdVector3* verts);
 void std3D_DrawOccluder(rdVector3* position, float radius, rdVector3* verts);
 #endif
 
+// alternative 3d pipeline with HW T&L
+#ifdef RENDER_DROID2
+
+void std3D_AddRenderListPrimitive(rdPrimitive* pPrimitive);
+void std3D_ResetPrimitiveRenderList();
+void std3D_DrawPrimitiveRenderList();
+
+#endif
+
+
+
 #ifdef __cplusplus
 }
 #endif

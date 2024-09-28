@@ -148,6 +148,22 @@ GLint uniform_light_mult, uniform_displacement_factor, uniform_iResolution, unif
 GLint uniform_fog, uniform_fog_color, uniform_fog_start, uniform_fog_end;
 #endif
 
+// todo: make some kind of helper for this, very redundant
+#ifdef RENDER_DROID2
+GLuint programPrimitives;
+GLint prim_attribute_coord3d, prim_attribute_v_color, prim_attribute_v_light, prim_attribute_v_uv, prim_attribute_v_norm;
+#ifdef VIEW_SPACE_GBUFFER
+GLint prim_attribute_coordVS;
+#endif
+GLint prim_uniform_mvp, prim_uniform_viewmat, prim_uniform_tex, prim_uniform_texEmiss, prim_uniform_displacement_map, prim_uniform_tex_mode, prim_uniform_blend_mode, prim_uniform_worldPalette, prim_uniform_worldPaletteLights;
+GLint prim_uniform_tint, prim_uniform_filter, prim_uniform_fade, prim_uniform_add, prim_uniform_emissiveFactor, prim_uniform_albedoFactor;
+GLint prim_uniform_light_mult, prim_uniform_displacement_factor, prim_uniform_iResolution, prim_uniform_enableDither;
+#ifdef FOG
+GLint prim_uniform_fog, prim_uniform_fog_color, prim_uniform_fog_start, prim_uniform_fog_end;
+#endif
+GLuint prim_vao;
+#endif
+
 GLint programMenu_attribute_coord3d, programMenu_attribute_v_color, programMenu_attribute_v_uv, programMenu_attribute_v_norm;
 GLint programMenu_uniform_mvp, programMenu_uniform_tex, programMenu_uniform_displayPalette;
 
@@ -1065,6 +1081,79 @@ void std3D_setupMenuVAO()
 	glBindVertexArray(vao);
 }
 
+#ifdef RENDER_DROID2
+
+void std3D_setupPrimWorldVAO()
+{
+	glGenVertexArrays(1, &prim_vao);
+	glBindVertexArray(prim_vao);
+
+	// Describe our vertices array to OpenGL (it can't guess its format automatically)
+	glBindBuffer(GL_ARRAY_BUFFER, world_vbo_all);
+	glVertexAttribPointer(
+		prim_attribute_coord3d, // attribute
+		3,                 // number of elements per vertex, here (x,y,z)
+		GL_FLOAT,          // the type of each element
+		GL_FALSE,          // normalize fixed-point data?
+		sizeof(D3DVERTEX),                 // data stride
+		(GLvoid*)offsetof(D3DVERTEX, x)                  // offset of first element
+	);
+
+	glVertexAttribPointer(
+		prim_attribute_v_color, // attribute
+		4,                 // number of elements per vertex, here (R,G,B,A)
+		GL_UNSIGNED_BYTE,  // the type of each element
+		GL_TRUE,          // normalize fixed-point data?
+		sizeof(D3DVERTEX),                 // no extra data between each position
+		(GLvoid*)offsetof(D3DVERTEX, color) // offset of first element
+	);
+
+	glVertexAttribPointer(
+		prim_attribute_v_light, // attribute
+		1,                 // number of elements per vertex, here (L)
+		GL_FLOAT,  // the type of each element
+		GL_FALSE,          // normalize fixed-point data?
+		sizeof(D3DVERTEX),                 // no extra data between each position
+		(GLvoid*)offsetof(D3DVERTEX, lightLevel) // offset of first element
+	);
+
+	glVertexAttribPointer(
+		prim_attribute_v_uv,    // attribute
+		2,                 // number of elements per vertex, here (U,V)
+		GL_FLOAT,          // the type of each element
+		GL_FALSE,          // take our values as-is
+		sizeof(D3DVERTEX),                 // no extra data between each position
+		(GLvoid*)offsetof(D3DVERTEX, tu)                  // offset of first element
+	);
+
+#ifdef VIEW_SPACE_GBUFFER
+	glVertexAttribPointer(
+		prim_attribute_coordVS, // attribute
+		3,                 // number of elements per vertex, here (x,y,z)
+		GL_FLOAT,          // the type of each element
+		GL_FALSE,          // normalize fixed-point data?
+		sizeof(D3DVERTEX),                 // data stride
+		(GLvoid*)offsetof(D3DVERTEX, vx)                  // offset of first element
+	);
+#endif
+
+	glEnableVertexAttribArray(prim_attribute_coord3d);
+	glEnableVertexAttribArray(prim_attribute_v_color);
+	glEnableVertexAttribArray(prim_attribute_v_light);
+	glEnableVertexAttribArray(prim_attribute_v_uv);
+	glEnableVertexAttribArray(prim_attribute_coordVS);
+
+#ifdef VIEW_SPACE_GBUFFER
+	glEnableVertexAttribArray(prim_attribute_coordVS);
+#endif
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, world_ibo_triangle);
+
+	glBindVertexArray(vao);
+}
+
+#endif
+
 int init_resources()
 {
     stdPlatform_Printf("std3D: OpenGL init...\n");
@@ -1086,6 +1175,9 @@ int init_resources()
     
     if ((programDefault = std3D_loadProgram("shaders/default", "")) == 0) return false;
     if ((programMenu = std3D_loadProgram("shaders/menu", "")) == 0) return false;
+#ifdef RENDER_DROID2
+	if ((programPrimitives = std3D_loadProgram("shaders/default", "RENDER_DROID2")) == 0) return false;
+#endif
     if (!std3D_loadSimpleTexProgram("shaders/ui", &std3D_uiProgram)) return false;
     if (!std3D_loadSimpleTexProgram("shaders/texfbo", &std3D_texFboStage)) return false;
     if (!std3D_loadSimpleTexProgram("shaders/blur", &std3D_blurStage)) return false;
@@ -1148,6 +1240,41 @@ int init_resources()
 	uniform_fog_end = std3D_tryFindUniform(programDefault, "fogEnd");
 #endif
     
+#ifdef RENDER_DROID2
+	prim_attribute_coord3d = std3D_tryFindAttribute(programPrimitives, "coord3d");
+#ifdef VIEW_SPACE_GBUFFER
+	prim_attribute_coordVS = std3D_tryFindAttribute(programPrimitives, "coordVS");
+#endif
+	prim_attribute_v_color = std3D_tryFindAttribute(programPrimitives, "v_color");
+	prim_attribute_v_light = std3D_tryFindAttribute(programPrimitives, "v_light");
+	prim_attribute_v_uv = std3D_tryFindAttribute(programPrimitives, "v_uv");
+	prim_uniform_mvp = std3D_tryFindUniform(programPrimitives, "mvp");
+	prim_uniform_viewmat = std3D_tryFindUniform(programPrimitives, "viewmat");
+	prim_uniform_tex = std3D_tryFindUniform(programPrimitives, "tex");
+	prim_uniform_texEmiss = std3D_tryFindUniform(programPrimitives, "texEmiss");
+	prim_uniform_worldPalette = std3D_tryFindUniform(programPrimitives, "worldPalette");
+	prim_uniform_worldPaletteLights = std3D_tryFindUniform(programPrimitives, "worldPaletteLights");
+	prim_uniform_displacement_map = std3D_tryFindUniform(programPrimitives, "displacement_map");
+	prim_uniform_tex_mode = std3D_tryFindUniform(programPrimitives, "tex_mode");
+	prim_uniform_blend_mode = std3D_tryFindUniform(programPrimitives, "blend_mode");
+	prim_uniform_tint = std3D_tryFindUniform(programPrimitives, "colorEffects_tint");
+	prim_uniform_filter = std3D_tryFindUniform(programPrimitives, "colorEffects_filter");
+	prim_uniform_fade = std3D_tryFindUniform(programPrimitives, "colorEffects_fade");
+	prim_uniform_add = std3D_tryFindUniform(programPrimitives, "colorEffects_add");
+	prim_uniform_emissiveFactor = std3D_tryFindUniform(programPrimitives, "emissiveFactor");
+	prim_uniform_albedoFactor = std3D_tryFindUniform(programPrimitives, "albedoFactor");
+	prim_uniform_light_mult = std3D_tryFindUniform(programPrimitives, "light_mult");
+	prim_uniform_displacement_factor = std3D_tryFindUniform(programPrimitives, "displacement_factor");
+	prim_uniform_iResolution = std3D_tryFindUniform(programPrimitives, "iResolution");
+	prim_uniform_enableDither = std3D_tryFindUniform(programPrimitives, "enableDither");
+#ifdef FOG
+	prim_uniform_fog = std3D_tryFindUniform(programPrimitives, "fogEnabled");
+	prim_uniform_fog_color = std3D_tryFindUniform(programPrimitives, "fogColor");
+	prim_uniform_fog_start = std3D_tryFindUniform(programPrimitives, "fogStart");
+	prim_uniform_fog_end = std3D_tryFindUniform(programPrimitives, "fogEnd");
+#endif
+#endif
+
     programMenu_attribute_coord3d = std3D_tryFindAttribute(programMenu, "coord3d");
     programMenu_attribute_v_color = std3D_tryFindAttribute(programMenu, "v_color");
     programMenu_attribute_v_uv = std3D_tryFindAttribute(programMenu, "v_uv");
@@ -1297,6 +1424,9 @@ int init_resources()
 
 	std3D_setupWorldVAO();
 	std3D_setupMenuVAO();
+#ifdef RENDER_DROID2
+	std3D_setupPrimWorldVAO();
+#endif
 
     has_initted = true;
     return true;
@@ -1464,7 +1594,9 @@ int std3D_StartScene()
     glClearColor(0.0, 0.0, 0.0, 1.0);
 
 	GLuint clearBits = GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT;
+#ifndef RENDER_DROID2 // tmp: always clear for debugging
 	if(jkGuiBuildMulti_bRendering)
+#endif
 		clearBits |= GL_COLOR_BUFFER_BIT;
 
 #ifdef STENCIL_BUFFER
@@ -4731,6 +4863,233 @@ void std3D_DrawOccluder(rdVector3* position, float radius, rdVector3* verts)
 	//glStencilFunc(GL_ALWAYS, 0, 0xFF);
 	//glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
 #endif
+}
+
+#endif
+
+
+#ifdef RENDER_DROID2
+#define STD3D_MAX_PRIMITIVES 8192
+
+static rdPrimitive GL_tmpPrimitives[STD3D_MAX_PRIMITIVES] = { 0 };
+static size_t GL_tmpPrimitivesAmt = 0;
+
+static D3DVERTEX GL_tmpPrimitiveVertices[STD3D_MAX_PRIMITIVES * 32] = { 0 };
+static size_t GL_tmpPrimitiveVerticesAmt = 0;
+
+void std3D_AddRenderListPrimitive(rdPrimitive* pPrimitive)
+{
+	if (Main_bHeadless)
+		return;
+
+	if (GL_tmpPrimitivesAmt + 1 > STD3D_MAX_PRIMITIVES)
+		return;
+
+	if (GL_tmpPrimitiveVerticesAmt + pPrimitive->numVertices > STD3D_MAX_VERTICES)
+		return;
+
+	memcpy(&GL_tmpPrimitives[GL_tmpPrimitivesAmt], pPrimitive, sizeof(rdPrimitive));
+
+	memcpy(&GL_tmpPrimitiveVertices[GL_tmpPrimitiveVerticesAmt], pPrimitive->aVertices, sizeof(D3DVERTEX) * pPrimitive->numVertices);
+
+	++GL_tmpPrimitivesAmt;
+	GL_tmpPrimitiveVerticesAmt += pPrimitive->numVertices;
+}
+
+void std3D_ResetPrimitiveRenderList()
+{
+	GL_tmpPrimitivesAmt = 0;
+	GL_tmpPrimitiveVerticesAmt = 0;
+}
+
+void std3D_DrawPrimitiveRenderList()
+{
+	if (Main_bHeadless) return;
+
+	glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->fbo);
+	std3D_useProgram(programPrimitives);
+
+	GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3
+#ifdef VIEW_SPACE_GBUFFER
+	, GL_COLOR_ATTACHMENT4
+#endif
+	};
+	glDrawBuffers(ARRAYSIZE(bufs), bufs);
+
+	last_tex = NULL;
+
+	// fixme
+	glDisable(GL_CULL_FACE);
+
+	glBindVertexArray(prim_vao);
+	glBindBuffer(GL_ARRAY_BUFFER, world_vbo_all);
+	glBufferData(GL_ARRAY_BUFFER, GL_tmpPrimitiveVerticesAmt * sizeof(D3DVERTEX), GL_tmpPrimitiveVertices, GL_STREAM_DRAW);
+
+	glUniform1i(prim_uniform_tex_mode, TEX_MODE_TEST);
+	glUniform1i(prim_uniform_blend_mode, 2);
+	glActiveTexture(GL_TEXTURE0 + 4);
+	glBindTexture(GL_TEXTURE_2D, blank_tex);
+	glActiveTexture(GL_TEXTURE0 + 3);
+	glBindTexture(GL_TEXTURE_2D, blank_tex);
+	glActiveTexture(GL_TEXTURE0 + 2);
+	glBindTexture(GL_TEXTURE_2D, worldpal_lights_texture);
+	glActiveTexture(GL_TEXTURE0 + 1);
+	glBindTexture(GL_TEXTURE_2D, worldpal_texture);
+	glActiveTexture(GL_TEXTURE0 + 0);
+	glBindTexture(GL_TEXTURE_2D, blank_tex_white);
+
+	glUniform1i(prim_uniform_tex, 0);
+	glUniform1i(prim_uniform_worldPalette, 1);
+	glUniform1i(prim_uniform_worldPaletteLights, 2);
+	glUniform1i(prim_uniform_texEmiss, 3);
+	glUniform1i(prim_uniform_displacement_map, 4);
+
+	glViewport(0, 0, std3D_pFb->w, std3D_pFb->h);
+
+	glUniform2f(prim_uniform_iResolution, std3D_pFb->w, std3D_pFb->h);
+
+	glUniform1i(prim_uniform_enableDither, !jkPlayer_enable32Bit);
+
+	glUniform3f(prim_uniform_tint, rdroid_curColorEffects.tint.x, rdroid_curColorEffects.tint.y, rdroid_curColorEffects.tint.z);
+	if (rdroid_curColorEffects.filter.x || rdroid_curColorEffects.filter.y || rdroid_curColorEffects.filter.z)
+		glUniform3f(prim_uniform_filter, rdroid_curColorEffects.filter.x ? 1.0 : 0.25, rdroid_curColorEffects.filter.y ? 1.0 : 0.25, rdroid_curColorEffects.filter.z ? 1.0 : 0.25);
+	else
+		glUniform3f(prim_uniform_filter, 1.0, 1.0, 1.0);
+	glUniform1f(prim_uniform_fade, rdroid_curColorEffects.fade);
+	glUniform3f(prim_uniform_add, (float)rdroid_curColorEffects.add.x / 255.0f, (float)rdroid_curColorEffects.add.y / 255.0f, (float)rdroid_curColorEffects.add.z / 255.0f);
+	glUniform3f(prim_uniform_emissiveFactor, 0.0, 0.0, 0.0);
+	glUniform4f(prim_uniform_albedoFactor, 1.0, 1.0, 1.0, 1.0);
+	glUniform1f(prim_uniform_light_mult, jkGuiBuildMulti_bRendering ? 0.85 : (jkPlayer_enableBloom ? 0.9 : 0.85));
+	glUniform1f(prim_uniform_displacement_factor, 1.0);
+
+
+	float maxX, maxY, scaleX, scaleY, width, height;
+
+	float internalWidth = Window_xSize;//Video_menuBuffer.format.width;
+	float internalHeight = Window_ySize;//Video_menuBuffer.format.height;
+
+	if (jkGuiBuildMulti_bRendering)
+	{
+		internalWidth = 640.0;
+		internalHeight = 480.0;
+	}
+
+	maxX = 1.0;
+	maxY = 1.0;
+	scaleX = 1.0 / ((double)internalWidth / 2.0);
+	scaleY = 1.0 / ((double)internalHeight / 2.0);
+	width = Window_xSize;
+	height = Window_ySize;
+
+	if (jkGuiBuildMulti_bRendering)
+	{
+		width = 640;
+		height = 480;
+	}
+
+	// JKDF2's vertical FOV is fixed with their projection, for whatever reason. 
+	// This ends up resulting in the view looking squished vertically at wide/ultrawide aspect ratios.
+	// To compensate, we zoom the y axis here.
+	// I also went ahead and fixed vertical displays in the same way because it seems to look better.
+	float zoom_yaspect = 1.0;
+	float zoom_xaspect = 1.0;
+
+	float shift_add_x = 0;
+	float shift_add_y = 0;
+
+	glActiveTexture(GL_TEXTURE0 + 0);
+	glBindTexture(GL_TEXTURE_2D, blank_tex_white);
+
+	{
+
+		float d3dmat[16] = {
+		   maxX * scaleX,      0,                                          0,      0, // right
+		   0,                                       -maxY * scaleY,               0,      0, // up
+		   0,                                       0,                                          1,     0, // forward
+		   -(width / 2) * scaleX,  (height / 2) * scaleY,     -1,      1  // pos
+		};
+
+		//glUniformMatrix4fv(prim_uniform_mvp, 1, GL_FALSE, d3dmat);
+	}
+
+	// todo: batching, state management, stencil, etc
+	int vertexOffset = 0;
+	for (int j = 0; j < GL_tmpPrimitivesAmt; j++)
+	{
+		//glUniformMatrix4fv(uniform_mvp, 1, GL_FALSE, (float*)&GL_tmpPrimitives[j].modelViewProj);
+		glUniformMatrix4fv(prim_uniform_mvp, 1, GL_FALSE, (float*)&GL_tmpPrimitives[j].modelViewProj);
+
+		if(!GL_tmpPrimitives[j].pTexture)
+		{
+			glActiveTexture(GL_TEXTURE0 + 3);
+			glBindTexture(GL_TEXTURE_2D, blank_tex); // emissive
+			glActiveTexture(GL_TEXTURE0 + 4);
+			glBindTexture(GL_TEXTURE_2D, blank_tex); // displace
+
+			glActiveTexture(GL_TEXTURE0 + 0);
+			glBindTexture(GL_TEXTURE_2D, blank_tex_white);
+			glUniform1i(prim_uniform_tex_mode, TEX_MODE_TEST);
+			glUniform1i(prim_uniform_blend_mode, 2);
+		}
+		else
+		{
+			int tex_id = GL_tmpPrimitives[j].pTexture->texture_id;
+			glActiveTexture(GL_TEXTURE0 + 0);
+			if (tex_id == 0)
+				glBindTexture(GL_TEXTURE_2D, blank_tex_white);
+			else
+				glBindTexture(GL_TEXTURE_2D, tex_id);
+
+			int emiss_tex_id = GL_tmpPrimitives[j].pTexture->emissive_texture_id;
+			glActiveTexture(GL_TEXTURE0 + 3);
+			if (emiss_tex_id == 0)
+				glBindTexture(GL_TEXTURE_2D, blank_tex);
+			else
+				glBindTexture(GL_TEXTURE_2D, emiss_tex_id);
+
+			int displace_tex_id = GL_tmpPrimitives[j].pTexture->displacement_texture_id;
+			glActiveTexture(GL_TEXTURE0 + 4);
+			if (displace_tex_id == 0)
+				glBindTexture(GL_TEXTURE_2D, blank_tex);
+			else
+				glBindTexture(GL_TEXTURE_2D, displace_tex_id);
+
+			float emissive_mult = (jkPlayer_enableBloom ? 1.0 : 5.0);
+			glUniform3f(prim_uniform_emissiveFactor, GL_tmpPrimitives[j].pTexture->emissive_factor[0] * emissive_mult, GL_tmpPrimitives[j].pTexture->emissive_factor[1] * emissive_mult, GL_tmpPrimitives[j].pTexture->emissive_factor[2] * emissive_mult);
+			glUniform4f(prim_uniform_albedoFactor, GL_tmpPrimitives[j].pTexture->albedo_factor[0], GL_tmpPrimitives[j].pTexture->albedo_factor[1], GL_tmpPrimitives[j].pTexture->albedo_factor[2], GL_tmpPrimitives[j].pTexture->albedo_factor[3]);
+			glUniform1f(prim_uniform_displacement_factor, GL_tmpPrimitives[j].pTexture->displacement_factor);
+			glActiveTexture(GL_TEXTURE0 + 0);
+
+			if (!jkPlayer_enableTextureFilter)
+				glUniform1i(prim_uniform_tex_mode, GL_tmpPrimitives[j].pTexture->is_16bit ? TEX_MODE_16BPP : TEX_MODE_WORLDPAL);
+			else
+				glUniform1i(prim_uniform_tex_mode, GL_tmpPrimitives[j].pTexture->is_16bit ? TEX_MODE_BILINEAR_16BPP : TEX_MODE_BILINEAR);
+
+			glActiveTexture(GL_TEXTURE0 + 0);
+
+			if (tex_id == 0)
+				glUniform1i(prim_uniform_tex_mode, TEX_MODE_TEST);
+		}
+
+		// todo: diff primitive types?
+		glDrawArrays(GL_TRIANGLE_FAN, vertexOffset, GL_tmpPrimitives[j].numVertices);
+	
+		vertexOffset += GL_tmpPrimitives[j].numVertices;
+	}
+
+	glBindVertexArray(vao);
+
+#ifdef DECAL_RENDERING
+	lightBufferDirty = 1;
+#endif
+
+	glBindTexture(GL_TEXTURE_2D, worldpal_texture);
+	glCullFace(GL_FRONT);
+
+#ifdef STENCIL_BUFFER
+	glDisable(GL_STENCIL_TEST);
+#endif
+	std3D_ResetPrimitiveRenderList();
 }
 
 #endif
