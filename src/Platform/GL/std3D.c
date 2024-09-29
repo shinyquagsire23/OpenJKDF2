@@ -4874,7 +4874,7 @@ void std3D_DrawOccluder(rdVector3* position, float radius, rdVector3* verts)
 static rdPrimitive GL_tmpPrimitives[STD3D_MAX_PRIMITIVES] = { 0 };
 static size_t GL_tmpPrimitivesAmt = 0;
 
-static D3DVERTEX GL_tmpPrimitiveVertices[STD3D_MAX_PRIMITIVES * 32] = { 0 };
+static D3DVERTEX GL_tmpPrimitiveVertices[STD3D_MAX_PRIMITIVES * 64] = { 0 };
 static size_t GL_tmpPrimitiveVerticesAmt = 0;
 
 void std3D_AddRenderListPrimitive(rdPrimitive* pPrimitive)

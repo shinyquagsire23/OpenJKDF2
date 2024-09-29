@@ -40,7 +40,7 @@ static rdVector2 rdroid_vertexTexCoordState = { 0.0f, 0.0f };
 static rdVector3 rdroid_vertexNormalState = { 0.0f, 0.0f, 0.0f };
 
 static int rdroid_vertexCacheNum = 0;
-static D3DVERTEX rdroid_vertexCache[32];
+static D3DVERTEX rdroid_vertexCache[64];
 static RD_PRIMITIVE_TYPE rdroid_curPrimitiveType = RD_PRIMITIVE_NONE;
 
 static float rdroid_curFov = 90.0f;

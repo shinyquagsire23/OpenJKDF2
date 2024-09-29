@@ -840,7 +840,7 @@ typedef struct rdPrimitive
 	int             type;          // type of primitive
 	rdMatrix44      modelViewProj; // pre-multiplied model view projection matrix
 	rdDDrawSurface* pTexture;      // the texture to apply
-	D3DVERTEX       aVertices[32]; // vertex array, max 32 per primitive
+	D3DVERTEX       aVertices[64]; // vertex array, max 64 per primitive
 	int             numVertices;   // number of vertices in the vertex array
 	// todo: state bits, chroma color, etc
 } rdPrimitive;
