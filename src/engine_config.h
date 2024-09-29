@@ -1,8 +1,6 @@
 #ifndef _OPENJKDF2_ENGINE_CONFIG_H
 #define _OPENJKDF2_ENGINE_CONFIG_H
 
-#include "types_enums.h"
-
 // Experimental features
 #ifdef QOL_IMPROVEMENTS
 
