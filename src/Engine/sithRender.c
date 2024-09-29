@@ -555,31 +555,9 @@ void sithRender_Draw()
 	rdIdentity();
 	rdLoadMatrix34(&rdCamera_pCurCamera->view_matrix);
 
-	// fucking gl shit
-	rdMatrix44 jkm;
-	rdVector_Set4(&jkm.vA, 1, 0, 0, 0);
-	rdVector_Set4(&jkm.vB, 0, 0, -1, 0);
-	rdVector_Set4(&jkm.vC, 0, 1, 0, 0);
-	rdVector_Set4(&jkm.vD, 0, 0, 0, 1);
-
-	rdMatrix44 inv;
-	rdMatrix_Invert44(&inv, &jkm);
-	rdPostMultiplyMatrix(&inv);
-
-
-	//rdTranspose();
-	//rdVector3 lookAt;
-	//rdVector_Add3(&lookAt, &rdCamera_camMatrix.scale, &rdCamera_camMatrix.lvec);
-	//rdLookat(&rdCamera_camMatrix.scale, &lookAt, &rdCamera_camMatrix.uvec);
-
 	rdMatrixMode(RD_MATRIX_PROJECTION);
 	rdIdentity();
-
-	float fovy = stdMath_ArcTan3(1.0, stdMath_Tan(rdCamera_pCurCamera->fov * 0.5) * rdCamera_pCurCamera->screenAspectRatio) * -2.0;
-
-	//float fovy = 2.0f * atan(stdMath_Tan(rdCamera_pCurCamera->fov / 2.0f) * rdCamera_pCurCamera->screenAspectRatio / 180.0f * M_PI);
-	//fovy *= 180.0f / M_PI;
-	rdPerspective(fovy, 1.0 / rdCamera_pCurCamera->screenAspectRatio, rdCamera_pCurCamera->pClipFrustum->field_0.y, rdCamera_pCurCamera->pClipFrustum->field_0.z);
+	rdPerspective(rdCamera_pCurCamera->fov, rdCamera_pCurCamera->screenAspectRatio, rdCamera_pCurCamera->pClipFrustum->field_0.y, rdCamera_pCurCamera->pClipFrustum->field_0.z);
 
 	rdMatrixMode(RD_MATRIX_MODEL);
 	rdIdentity();

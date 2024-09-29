@@ -1051,34 +1051,16 @@ void rdMatrix_Invert44(rdMatrix44* out, const rdMatrix44* m)
  );
 }
 
+// build a perspective projection matrix from horizontal fov and aspect ratio
+// note: this also maps from Z-up world space to Y-up clip-space
 void rdMatrix_BuildPerspective44(rdMatrix44* out, float fov, float aspect, float znear, float zfar)
 {
-	//float f = 1.0f / stdMath_Tan(fov / 2.0f);	
-	//rdVector_Set4(&out->vA,f / aspect, 0.0f, 0.0f,                          0.0f);
-	//rdVector_Set4(&out->vB,0.0f,       f,    0.0f,                          0.0f);
-	//rdVector_Set4(&out->vC,0.0f,       0.0f, (zfar) / (znear - zfar),      -1.0f);
-	//rdVector_Set4(&out->vD,0.0f,       0.0f, znear * zfar / (znear - zfar), 1.0f);
-
-	//const float w = 1.0f / stdMath_Tan(fov / 2.0f);
-	//const float a = w * aspect;
-	//const float Q = znear / (znear - zfar);
-	//
-	//rdVector_Set4(&out->vA,   w,  0.0f,      0.0f, 0.0f);
-	//rdVector_Set4(&out->vB, 0.0f,    a,      0.0f, 0.0f);
-	//rdVector_Set4(&out->vC, 0.0f, 0.0f,         Q, 1.0f);
-	//rdVector_Set4(&out->vD, 0.0f, 0.0f, -Q * zfar, 1.0f);
-	 
-	//float f = 1.0f / stdMath_Tan(fov / 2.0f);
-	//rdVector_Set4(&out->vA, f / aspect, 0.0f, 0.0f,                          0.0f);
-	//rdVector_Set4(&out->vB, 0.0f,       f,    0.0f,                          0.0f);
-	//rdVector_Set4(&out->vC, 0.0f,       0.0f, (zfar) / (znear - zfar),       1.0f);
-	//rdVector_Set4(&out->vD, 0.0f,       0.0f, -znear * zfar / (znear - zfar), 1.0f);
-
-	float f = 1.0f / stdMath_Tan(fov / 2.0f);
-	rdVector_Set4(&out->vA, f / aspect, 0.0f, 0.0f, 0.0f);
-	rdVector_Set4(&out->vB, 0.0f,      -f,    0.0f,                            0.0f);
-	rdVector_Set4(&out->vC, 0.0f,       0.0f, zfar / (zfar - znear),           1.0f);
-	rdVector_Set4(&out->vD, 0.0f,       0.0f, (zfar * znear) / (znear - zfar), 0.0f); // why w = 0?
+	// todo: do we actually want opengl depth?
+	float f = stdMath_Tan(fov / 2);
+	rdVector_Set4(&out->vA, 1.0f / f, 0.0f,                0.0f,                                 0.0f);
+	rdVector_Set4(&out->vB, 0.0f,     0.0f,                (zfar + znear) / (zfar - znear),      1.0f);
+	rdVector_Set4(&out->vC, 0.0f,     1.0f / (f * aspect), 0.0f,                                 0.0f);
+	rdVector_Set4(&out->vD, 0.0f,     0.0f,                2.0f * zfar * znear / (znear - zfar), 0.0f);
 }
 
 void rdMatrix_BuildOrthographic44(rdMatrix44* out, float left, float right, float top, float bottom, float znear, float zfar)
