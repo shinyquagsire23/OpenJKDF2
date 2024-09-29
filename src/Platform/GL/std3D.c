@@ -4885,7 +4885,7 @@ void std3D_AddRenderListPrimitive(rdPrimitive* pPrimitive)
 	if (GL_tmpPrimitivesAmt + 1 > STD3D_MAX_PRIMITIVES)
 		return;
 
-	if (GL_tmpPrimitiveVerticesAmt + pPrimitive->numVertices > STD3D_MAX_VERTICES)
+	if (GL_tmpPrimitiveVerticesAmt + pPrimitive->numVertices > STD3D_MAX_PRIMITIVES * 32)
 		return;
 
 	memcpy(&GL_tmpPrimitives[GL_tmpPrimitivesAmt], pPrimitive, sizeof(rdPrimitive));
@@ -4920,6 +4920,10 @@ void std3D_DrawPrimitiveRenderList()
 
 	// fixme
 	glDisable(GL_CULL_FACE);
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_TRUE);
+	glDepthFunc(GL_LESS);
 
 	glBindVertexArray(prim_vao);
 	glBindBuffer(GL_ARRAY_BUFFER, world_vbo_all);
