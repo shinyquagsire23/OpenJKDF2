@@ -96,6 +96,25 @@ void main(void)
     f_light = v_light;
 
 #ifdef RENDER_DROID2
+	// todo: ambient mode
+	//if (false)
+	//{
+	//	const float c = 0.282094792;
+	//	const float k = 0.488602512;
+	//
+	//	vec4 shN;
+	//	shN.x = c;
+	//	shN.yzw = vec3(-k, k, -k) * f_normal.yzx;
+	//
+	//	vec3 amb;
+	//	amb.x = dot(shN, ambientSH[0]);
+	//	amb.y = dot(shN, ambientSH[1]);
+	//	amb.z = dot(shN, ambientSH[2]);
+	//
+	//	f_color.xyz += max(vec3(0.0), amb) / 3.141592;
+	//}
+
+
 	float scalar = 0.4; // todo: needs to come from rdCamera_pCurCamera->attenuationMin
 	int totalLights = min(numLights, 128);
 	for(int lid = 0; lid < totalLights; ++lid)

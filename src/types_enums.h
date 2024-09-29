@@ -95,7 +95,7 @@ typedef enum RD_COMPARE
 	RD_COMPARE_NEVER
 } RD_COMPARE;
 
-typedef uint8_t rdCullMode_t;
+typedef uint8_t rdCullMode_t; // todo: back/front face culling options
 typedef enum RD_CULL_MODE
 {
 	RD_CULL_MODE_NONE,

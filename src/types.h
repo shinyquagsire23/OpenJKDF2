@@ -853,8 +853,6 @@ typedef struct std3D_RasterState
 	rdScissorMode_t     scissorMode;
 	rdScissorRect       scissor;
 	rdViewportRect      viewport;
-	rdMatrix44          modelMatrix; // object/model matrix
-	rdMatrix44          viewProj;    // pre-multiplied view projection matrix (todo: do we want to pull this out?)
 } std3D_RasterState;
 
 typedef struct std3D_BlendState
@@ -887,6 +885,8 @@ typedef struct std3D_LightingState
 
 typedef struct std3D_DrawCallState
 {
+	rdMatrix44              modelMatrix; // object/model matrix
+	rdMatrix44              viewProj;    // pre-multiplied view projection matrix (todo: do we want to pull this out?)
 	std3D_RasterState       raster;
 	std3D_BlendState        blend;
 	std3D_DepthStencilState depthStencil;

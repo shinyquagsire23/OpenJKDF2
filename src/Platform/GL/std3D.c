@@ -1,4 +1,4 @@
-#include "Platform/std3D.h"
+﻿#include "Platform/std3D.h"
 
 #include "Raster/rdCache.h"
 #include "Win95/stdDisplay.h"
@@ -4948,6 +4948,112 @@ int std3D_DrawCallCompare(std3D_DrawCall* a, std3D_DrawCall* b)
 	return 0;
 }
 
+// todo: track state bits and only apply necessary changes
+void std3D_SetRasterState(std3D_RasterState* pRasterState)
+{
+	glViewport(pRasterState->viewport.x, pRasterState->viewport.y, pRasterState->viewport.width, pRasterState->viewport.height);
+	if(pRasterState->scissorMode == RD_SCISSOR_ENABLED)
+		glEnable(GL_SCISSOR_TEST);
+	else
+		glDisable(GL_SCISSOR_TEST);
+	glScissor(pRasterState->scissor.x, pRasterState->scissor.y, pRasterState->scissor.width, pRasterState->scissor.height);
+
+	if(pRasterState->cullMode == RD_CULL_MODE_NONE)
+		glDisable(GL_CULL_FACE);
+	else
+		glEnable(GL_CULL_FACE);
+
+	glFrontFace(pRasterState->cullMode == RD_CULL_MODE_CCW_ONLY ? GL_CCW : GL_CW);
+
+	//rdGeoMode_t         geoMode;
+	//rdVertexColorMode_t colorMode;
+}
+
+void std3D_SetBlendState(std3D_BlendState* pBlendState)
+{
+	if (pBlendState->blendMode == RD_BLEND_MODE_NONE)
+	{
+		glDisable(GL_BLEND);
+
+		// allow gbuffer writes
+		GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3
+#ifdef VIEW_SPACE_GBUFFER
+	, GL_COLOR_ATTACHMENT4
+#endif
+		};
+		glDrawBuffers(ARRAYSIZE(bufs), bufs);
+	}
+	else
+	{
+		glEnable(GL_BLEND);
+
+		// no gbuffer writes
+		GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+		glDrawBuffers(ARRAYSIZE(bufs), bufs);
+	}
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	// fixme: I don't entirely understand the logic behind this blend mode uniform...
+	glUniform1i(drawcall_uniform_blend_mode, D3DBLEND_SRCALPHA);
+}
+
+void std3D_SetDepthStencilState(std3D_DepthStencilState* pDepthStencilState)
+{
+	if (pDepthStencilState->zmethod == RD_ZBUFFER_NOREAD_NOWRITE)
+	{
+		glDisable(GL_DEPTH_TEST);
+		glDepthMask(GL_FALSE);
+	}
+	else if (pDepthStencilState->zmethod == RD_ZBUFFER_READ_NOWRITE)
+	{
+		glEnable(GL_DEPTH_TEST);
+		glDepthMask(GL_FALSE);
+	}
+	else if (pDepthStencilState->zmethod == RD_ZBUFFER_NOREAD_WRITE)
+	{
+		glDisable(GL_DEPTH_TEST);
+		glDepthMask(GL_TRUE);
+	}
+	else
+	{
+		glEnable(GL_DEPTH_TEST);
+		glDepthMask(GL_TRUE);
+	}
+
+	static const GLuint gl_compares[] =
+	{
+		GL_ALWAYS,
+		GL_LESS,
+		GL_LEQUAL,
+		GL_GREATER,
+		GL_GEQUAL,
+		GL_EQUAL,
+		GL_NOTEQUAL,
+		GL_NEVER
+	};
+	glDepthFunc(gl_compares[pDepthStencilState->zcompare]);
+}
+
+void std3D_SetTextureState(std3D_TextureState* pTexState)
+{
+	std3D_SetTexture(pTexState->pTexture);
+	glUniform1i(drawcall_uniform_uv_mode, pTexState->texMode);
+	if (pTexState->texMode == 6)
+	{
+		// todo: this should be in the state
+		glUniform4f(drawcall_uniform_uv_mode_params0, sithSector_flt_8553C0, sithSector_flt_8553B8, sithSector_flt_8553C4, 0);
+		glUniform4f(drawcall_uniform_uv_mode_params1, sithSector_flt_8553C8, sithSector_flt_8553F4, 0, 0);
+		glUniform2f(drawcall_uniform_uv_offset, sithWorld_pCurrentWorld->horizontalSkyOffs.x, sithWorld_pCurrentWorld->horizontalSkyOffs.y);
+	}
+}
+
+void std3D_SetLightingState(std3D_LightingState* pLightState)
+{
+	glUniform3fv(drawcall_uniform_ambient_color, 1, &pLightState->ambientColor.x);
+	glUniform4fv(drawcall_uniform_ambient_sh, 3, &pLightState->ambientStateSH.r.x);
+	glUniform3fv(drawcall_uniform_ambient_sh_dir, 1, &pLightState->ambientStateSH.dominantDir.x);
+}
+
 void std3D_FlushDrawCalls()
 {
 	if (Main_bHeadless) return;
@@ -4977,8 +5083,6 @@ void std3D_FlushDrawCalls()
 	};
 	glDrawBuffers(ARRAYSIZE(bufs), bufs);
 
-	// fixme
-	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 
 	glEnable(GL_DEPTH_TEST);
@@ -5034,45 +5138,42 @@ void std3D_FlushDrawCalls()
 
 	std3D_DrawCall* pDrawCall = &GL_tmpDrawCalls[0];
 	std3D_RasterState* pRasterState = &pDrawCall->state.raster;
+	std3D_BlendState* pBlendState = &pDrawCall->state.blend;
+	std3D_DepthStencilState* pDepthStencilState = &pDrawCall->state.depthStencil;
 	std3D_TextureState* pTexState = &pDrawCall->state.texture;
 	std3D_LightingState* pLightState = &pDrawCall->state.lighting;
 
 	int do_batch = 0;
 	int batch_verts = 0;
 
+	std3D_DrawCallState lastState = pDrawCall->state;
+
 	int last_tex = pTexState->pTexture->texture_id;
-	std3D_SetTexture(pTexState->pTexture);
+	std3D_SetTextureState(pTexState);
+	std3D_SetLightingState(pLightState);
+	std3D_SetRasterState(pRasterState);
+	std3D_SetBlendState(pBlendState);
+	std3D_SetDepthStencilState(pDepthStencilState);
 
-	rdMatrix44 last_mat = pRasterState->modelMatrix;
-	rdMatrix44 last_viewProj = pRasterState->viewProj;
-	glUniformMatrix4fv(drawcall_uniform_mvp, 1, GL_FALSE, (float*)&pRasterState->viewProj);
-	glUniformMatrix4fv(drawcall_uniform_modelMatrix, 1, GL_FALSE, (float*)&pRasterState->modelMatrix);
-
-	int last_tex_mode = pTexState->texMode;
-	glUniform1i(drawcall_uniform_uv_mode, pTexState->texMode);
-
-	rdVector3 lastAmbientCol = pLightState->ambientColor;
-	rdAmbient lastAmbient = pLightState->ambientStateSH;
-
-	glUniform3fv(drawcall_uniform_ambient_color, 1, &pLightState->ambientColor.x);
-	glUniform4fv(drawcall_uniform_ambient_sh, 3, &pLightState->ambientStateSH.r.x);
-	glUniform3fv(drawcall_uniform_ambient_sh_dir, 1, &pLightState->ambientStateSH.dominantDir.x);
+	rdMatrix44 last_mat = pDrawCall->state.modelMatrix;
+	rdMatrix44 last_viewProj = pDrawCall->state.viewProj;
+	glUniformMatrix4fv(drawcall_uniform_mvp, 1, GL_FALSE, (float*)&pDrawCall->state.viewProj);
+	glUniformMatrix4fv(drawcall_uniform_modelMatrix, 1, GL_FALSE, (float*)&pDrawCall->state.modelMatrix);
 
 	int vertexOffset = 0;
 	for (int j = 0; j < GL_tmpDrawCallAmt; j++)
 	{
 		pDrawCall = &GL_tmpDrawCalls[j];
 		pRasterState = &pDrawCall->state.raster;
+		pBlendState = &pDrawCall->state.blend;
+		pDepthStencilState = &pDrawCall->state.depthStencil;
 		pTexState = &pDrawCall->state.texture;
 		pLightState = &pDrawCall->state.lighting;
 
-		// todo: will a simple memcmp of the entire state struct work for this?
 		if (last_tex != pTexState->pTexture->texture_id
-			|| last_tex_mode != pTexState->texMode
-			|| rdMatrix_Compare44(&last_mat, &pRasterState->modelMatrix) != 0
-			|| rdMatrix_Compare44(&last_viewProj, &pRasterState->viewProj) != 0
-			|| rdVector_Compare3(&lastAmbientCol, &pLightState->ambientColor) != 0
-			|| rdAmbient_Compare(&lastAmbient, &pLightState->ambientStateSH) != 0
+			|| memcmp(&lastState, &pDrawCall->state, sizeof(std3D_DrawCallState)) != 0
+			|| rdMatrix_Compare44(&last_mat, &pDrawCall->state.modelMatrix) != 0
+			|| rdMatrix_Compare44(&last_viewProj, &pDrawCall->state.viewProj) != 0
 		)
 		{
 			do_batch = 1;
@@ -5082,26 +5183,19 @@ void std3D_FlushDrawCalls()
 		{
 			glDrawArrays(GL_TRIANGLES, vertexOffset, batch_verts);
 
-			glUniform3fv(drawcall_uniform_ambient_color, 1, &pLightState->ambientColor.x);
-			glUniform4fv(drawcall_uniform_ambient_sh, 3, &pLightState->ambientStateSH.r.x);
-			glUniform3fv(drawcall_uniform_ambient_sh_dir, 1, &pLightState->ambientStateSH.dominantDir.x);
+			std3D_SetTextureState(pTexState);
+			std3D_SetLightingState(pLightState);
+			std3D_SetRasterState(pRasterState);
+			std3D_SetBlendState(pBlendState);
+			std3D_SetDepthStencilState(pDepthStencilState);
 
-			glUniform1i(drawcall_uniform_uv_mode, pTexState->texMode);
-			if (pTexState->texMode == 6)
-			{
-				glUniform4f(drawcall_uniform_uv_mode_params0, sithSector_flt_8553C0, sithSector_flt_8553B8, sithSector_flt_8553C4, 0);
-				glUniform4f(drawcall_uniform_uv_mode_params1, sithSector_flt_8553C8, sithSector_flt_8553F4, 0, 0);
-				glUniform2f(drawcall_uniform_uv_offset, sithWorld_pCurrentWorld->horizontalSkyOffs.x, sithWorld_pCurrentWorld->horizontalSkyOffs.y);
-			}
-			glUniformMatrix4fv(drawcall_uniform_mvp, 1, GL_FALSE, (float*)&pRasterState->viewProj);
-			glUniformMatrix4fv(drawcall_uniform_modelMatrix, 1, GL_FALSE, (float*)&pRasterState->modelMatrix);
-			std3D_SetTexture(pTexState->pTexture);
+			glUniformMatrix4fv(drawcall_uniform_mvp, 1, GL_FALSE, (float*)&pDrawCall->state.viewProj);
+			glUniformMatrix4fv(drawcall_uniform_modelMatrix, 1, GL_FALSE, (float*)&pDrawCall->state.modelMatrix);
 
 			last_tex = pTexState->pTexture->texture_id;
-			last_mat = pRasterState->modelMatrix;
-			last_tex_mode = pTexState->texMode;
-			lastAmbientCol = pLightState->ambientColor;
-			lastAmbient = pLightState->ambientStateSH;
+			last_mat = pDrawCall->state.modelMatrix;
+			last_viewProj = pDrawCall->state.viewProj;
+			lastState = pDrawCall->state;
 
 			vertexOffset += batch_verts;
 			batch_verts = 0;
@@ -5123,7 +5217,9 @@ void std3D_FlushDrawCalls()
 
 	glBindTexture(GL_TEXTURE_2D, worldpal_texture);
 	glCullFace(GL_FRONT);
-
+	glEnable(GL_BLEND);
+	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_TRUE);
 #ifdef STENCIL_BUFFER
 	glDisable(GL_STENCIL_TEST);
 #endif

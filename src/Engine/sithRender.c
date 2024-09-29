@@ -549,7 +549,15 @@ void sithRender_Draw()
 
 #ifdef RENDER_DROID2
 	rdClearLights();
-	
+
+	// todo: get this out of here
+	extern int Window_xSize;
+	extern int Window_ySize;
+
+	int32_t tex_w = (int32_t)((double)Window_xSize * jkPlayer_ssaaMultiple);
+	int32_t tex_h = (int32_t)((double)Window_ySize * jkPlayer_ssaaMultiple);
+	rdViewport(0, 0, tex_w, tex_h, 0, 1);
+
 	rdMatrixMode(RD_MATRIX_VIEW);
 	rdIdentity();
 	rdLoadMatrix34(&rdCamera_pCurCamera->view_matrix);
@@ -1005,6 +1013,108 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
     sector->clipVisited = v45;
 }
 
+#ifdef RENDER_DROID2
+void sithRender_DrawSurface(sithSurface* surface)
+{
+	if(!surface->surfaceInfo.face.material)
+		return;
+
+	int geoMode;
+	if ((surface->surfaceFlags & (SITH_SURFACE_HORIZON_SKY | SITH_SURFACE_CEILING_SKY)) != 0)
+	{
+		geoMode = sithRender_geoMode;
+		if (sithRender_geoMode > RD_GEOMODE_SOLIDCOLOR)
+			geoMode = RD_GEOMODE_SOLIDCOLOR;
+	}
+	else
+	{
+		geoMode = surface->surfaceInfo.face.geometryMode;
+		if (geoMode >= sithRender_geoMode)
+			geoMode = sithRender_geoMode;
+	}
+	rdSetGeoMode(geoMode);
+
+	int lightMode = surface->surfaceInfo.face.lightingMode;
+	if (sithRender_lightingIRMode)
+	{
+		if (lightMode >= RD_LIGHTMODE_DIFFUSE)
+			lightMode = RD_LIGHTMODE_DIFFUSE;
+	}
+	else if (lightMode >= sithRender_lightMode)
+	{
+		lightMode = sithRender_lightMode;
+	}
+	rdSetLightMode(lightMode);
+
+	int texMode = surface->surfaceInfo.face.textureMode;
+	if (texMode >= sithRender_texMode)
+		texMode = sithRender_texMode;
+
+	// todo: other stuff like ceiling sky
+	if (surface->surfaceFlags & SITH_SURFACE_HORIZON_SKY)
+		texMode = RD_TEXTUREMODE_HORIZON;
+
+	rdSetTexMode(texMode);
+
+	// todo: blend and alpha state
+
+	int wallCel = surface->surfaceInfo.face.wallCel;
+	rdBindTexture(surface->surfaceInfo.face.material, wallCel);
+
+	rdSetAmbientMode(RD_AMBIENT_NONE);
+	if (sithRender_lightingIRMode)
+	{
+		rdAmbientLight(sithRender_f_83198C, sithRender_f_83198C, sithRender_f_83198C);
+	}
+	else
+	{
+		float extra = stdMath_Clamp(surface->parent_sector->extraLight + surface->surfaceInfo.face.extraLight + sithRender_008d4098, 0.0, 1.0);
+		rdAmbientLight(extra, extra, extra);
+	}
+
+	float alpha = 1.0f;
+	if ((surface->surfaceInfo.face.type & RD_FF_TEX_TRANSLUCENT) != 0)
+	{
+		alpha = 90.0f / 255.0f;
+		rdSetBlendMode(RD_BLEND_MODE_ALPHA);
+	}
+	else
+	{
+		rdSetBlendMode(RD_BLEND_MODE_NONE);
+	}
+
+	if (rdBeginPrimitive(RD_PRIMITIVE_TRIANGLE_FAN))
+	{
+		for (int j = 0; j < surface->surfaceInfo.face.numVertices; j++)
+		{
+			int posidx = surface->surfaceInfo.face.vertexPosIdx[j];
+			int uvidx = surface->surfaceInfo.face.vertexUVIdx[j];
+
+			if ((surface->surfaceFlags & SITH_SURFACE_1000000) == 0)
+			{
+				float intensity = surface->surfaceInfo.intensities[j];
+				rdColor4f(intensity, intensity, intensity, alpha);
+			}
+			else
+			{
+				float* red = (surface->surfaceInfo).intensities + surface->surfaceInfo.face.numVertices;
+				float* green = red + surface->surfaceInfo.face.numVertices;
+				float* blue = green + surface->surfaceInfo.face.numVertices;
+				rdColor4f(red[j], green[j], blue[j], alpha);
+			}
+			rdVector2* uv = &sithWorld_pCurrentWorld->vertexUVs[uvidx];
+			rdTexCoord2i(uv->x, uv->y);
+
+			rdNormal(&surface->surfaceInfo.face.normal);
+
+			rdVector3* v = &sithWorld_pCurrentWorld->vertices[posidx];
+			rdVertex(&sithWorld_pCurrentWorld->vertices[posidx]);
+		}
+		rdEndPrimitive();
+	}
+}
+#endif
+
 // MOTS altered
 void sithRender_RenderLevelGeometry()
 {
@@ -1199,85 +1309,7 @@ void sithRender_RenderLevelGeometry()
 #endif
             {
 			#ifdef RENDER_DROID2
-				if ((v65->surfaceFlags & (SITH_SURFACE_HORIZON_SKY | SITH_SURFACE_CEILING_SKY)) != 0)
-				{
-					geoMode = sithRender_geoMode;
-					if (sithRender_geoMode > RD_GEOMODE_SOLIDCOLOR)
-						geoMode = RD_GEOMODE_SOLIDCOLOR;
-				}
-				else
-				{
-					geoMode = v65->surfaceInfo.face.geometryMode;
-					if (geoMode >= sithRender_geoMode)
-						geoMode = sithRender_geoMode;
-				}
-				rdSetGeoMode(geoMode);
-				
-				lightMode = v65->surfaceInfo.face.lightingMode;
-				if (sithRender_lightingIRMode)
-				{
-					if (lightMode >= RD_LIGHTMODE_DIFFUSE)
-						lightMode = RD_LIGHTMODE_DIFFUSE;
-				}
-				else if (lightMode >= sithRender_lightMode)
-				{
-					lightMode = sithRender_lightMode;
-				}
-				texMode = sithRender_texMode;
-				rdSetLightMode(lightMode);
-				
-				texMode2 = v65->surfaceInfo.face.textureMode;
-				if (texMode2 >= texMode)
-					texMode2 = texMode;
-
-				if (v65->surfaceFlags & SITH_SURFACE_HORIZON_SKY)
-					texMode2 = RD_TEXTUREMODE_HORIZON;
-				rdSetTexMode(texMode2);
-
-				int wallCel = v65->surfaceInfo.face.wallCel;
-				rdBindTexture(surfaceMat, wallCel);
-
-				rdSetAmbientMode(RD_AMBIENT_NONE);
-				if (sithRender_lightingIRMode)
-				{
-					rdAmbientLight(sithRender_f_83198C, sithRender_f_83198C, sithRender_f_83198C);
-				}
-				else
-				{
-					float extra = stdMath_Clamp(level_idk->extraLight + v65->surfaceInfo.face.extraLight + sithRender_008d4098, 0.0, 1.0);
-					rdAmbientLight(extra, extra, extra);
-				}
-
-				// todo: sky stuff
-				if (rdBeginPrimitive(RD_PRIMITIVE_TRIANGLE_FAN))
-				{
-					for (int j = 0; j < v65->surfaceInfo.face.numVertices; j++)
-					{
-						int posidx = v65->surfaceInfo.face.vertexPosIdx[j];
-						int uvidx = v65->surfaceInfo.face.vertexUVIdx[j];
-
-						if ((v65->surfaceFlags & SITH_SURFACE_1000000) == 0)
-						{
-							float intensity = v65->surfaceInfo.intensities[j];
-							rdColor4f(intensity, intensity, intensity, 1.0f); // todo: alpha
-						}
-						else
-						{
-							float* red = (v65->surfaceInfo).intensities + v65->surfaceInfo.face.numVertices;
-							float* green = red + v65->surfaceInfo.face.numVertices;
-							float* blue = green + v65->surfaceInfo.face.numVertices;
-							rdColor4f(red[j], green[j], blue[j], 1.0f); // todo: alpha
-						}
-						rdVector2* uv = &sithWorld_pCurrentWorld->vertexUVs[uvidx];
-						rdTexCoord2i(uv->x, uv->y);
-
-						rdNormal(&v65->surfaceInfo.face.normal);
-						
-						rdVector3* v = &sithWorld_pCurrentWorld->vertices[posidx];
-						rdVertex(&sithWorld_pCurrentWorld->vertices[posidx]);
-					}
-					rdEndPrimitive();
-				}
+				sithRender_DrawSurface(v65);
 			#else
                 procEntry = rdCache_GetProcEntry();
                 if ( !procEntry )
@@ -2452,6 +2484,28 @@ int sithRender_RenderThing(sithThing *pThing)
     return ret;
 }
 
+#ifdef RENDER_DROID2
+
+void sithRender_RenderAlphaSurfaces()
+{
+	rdCache_Flush();
+	rdSetZBufferMethod(RD_ZBUFFER_READ_NOWRITE);
+	rdSetOcclusionMethod(0);
+	rdSetSortingMethod(2);
+	rdSetBlendMode(RD_BLEND_MODE_ALPHA);
+
+	for (int i = 0; i < sithRender_numSurfaces; i++)
+	{
+		sithSurface* surface = sithRender_aSurfaces[i];
+		sithSector* sector = surface->parent_sector;
+		rdColormap_SetCurrent(sector->colormap);
+		sithRender_DrawSurface(surface);
+	}
+
+	rdCache_Flush();
+	rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
+}
+#else
 void sithRender_RenderAlphaSurfaces()
 {
     sithSurface *v0; // edi
@@ -2981,6 +3035,7 @@ void sithRender_RenderAlphaSurfaces()
 #endif
 #endif
 }
+#endif
 
 #ifdef QOL_IMPROVEMENTS
 int sithRender_SetRenderWeaponOpaqueHandle(void* a1)

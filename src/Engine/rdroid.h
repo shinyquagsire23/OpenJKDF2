@@ -114,7 +114,7 @@ void rdTexCoord(const rdVector2* pUV);
 void rdNormal(const rdVector3* pNormal);
 
 // render state
-void rdSetZBufferCompare(rdCompare_t mode);
+void rdSetZBufferCompare(rdCompare_t compare);
 void rdSetBlendMode(rdBlendMode_t state);
 void rdSetCullMode(rdCullMode_t mode);
 void rdSetScissor(int x, int y, int width, int height);

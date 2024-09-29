@@ -24,37 +24,74 @@ float rdroid_curFogEndDepth;
 
 void rdMatrixChanged();
 
-static rdCullMode_t rdroid_curCullMode = RD_CULL_MODE_CCW_ONLY;
+static std3D_RasterState       rdroid_rasterState;
+static std3D_BlendState        rdroid_blendState;
+static std3D_DepthStencilState rdroid_depthStencilState;
+static std3D_TextureState      rdroid_textureState;
+static std3D_LightingState     rdroid_lightingState;
 
 static rdMatrixMode_t rdroid_curMatrixMode = RD_MATRIX_MODEL;
-static rdViewportRect rdroid_curViewport;
 static rdMatrix44     rdroid_matrices[3];
+static rdMatrix44     rdroid_curCamMatrix;
+static rdMatrix44     rdroid_curViewProj;
+static rdMatrix44     rdroid_curProjInv;
+static rdMatrix44     rdroid_curViewProjInv;
 
 static rdMaterial* rdroid_curMaterial = NULL;
-static rdDDrawSurface* rdroid_curTexture = NULL;
-static float rdroid_texWidth = 1;
-static float rdroid_texHeight = 1;
+static float       rdroid_texWidth = 1;
+static float       rdroid_texHeight = 1;
 
-static uint32_t rdroid_vertexColorState = 0xFFFFFFFF;
+static uint32_t  rdroid_vertexColorState = 0xFFFFFFFF;
 static rdVector2 rdroid_vertexTexCoordState = { 0.0f, 0.0f };
 static rdVector3 rdroid_vertexNormalState = { 0.0f, 0.0f, 0.0f };
 
-static int rdroid_vertexCacheNum = 0;
-static D3DVERTEX rdroid_vertexCache[64];
+static int               rdroid_vertexCacheNum = 0;
+static D3DVERTEX         rdroid_vertexCache[64];
 static rdPrimitiveType_t rdroid_curPrimitiveType = RD_PRIMITIVE_NONE;
-static rdTexMode_t rdroid_curPrimitiveTexMode = RD_TEXTUREMODE_PERSPECTIVE;
 
-static float rdroid_curFov = 90.0f;
-static rdMatrix44 rdroid_curCamMatrix;
-static rdMatrix44 rdroid_curViewProj;
-static rdMatrix44 rdroid_curProjInv;
-static rdMatrix44 rdroid_curViewProjInv;
-static rdVector3 rdroid_curRotationPYR;
+void rdResetRasterState()
+{
+	rdroid_rasterState.geoMode = RD_GEOMODE_TEXTURED;
+	rdroid_rasterState.colorMode = RD_VERTEX_COLOR_MODE_COLORED;
+	rdroid_rasterState.cullMode = RD_CULL_MODE_CCW_ONLY;
 
-static rdAmbientMode_t rdroid_ambientMode = RD_AMBIENT_COLOR;
-static rdVector3 rdroid_ambientLightState = { 0.0f, 0.0f, 0.0f };
-static rdAmbient rdroid_ambientStateSH;
+	rdroid_rasterState.scissorMode = RD_SCISSOR_DISABLED;
+	rdroid_rasterState.scissor.x = rdroid_rasterState.scissor.y = 0;
+	rdroid_rasterState.scissor.width = 640;
+	rdroid_rasterState.scissor.height = 480;
 
+	rdroid_rasterState.viewport.x = rdroid_rasterState.viewport.y = 0;
+	rdroid_rasterState.viewport.width = 640;
+	rdroid_rasterState.viewport.height = 480;
+	rdroid_rasterState.viewport.minDepth = 0;
+	rdroid_rasterState.viewport.maxDepth = 1;
+}
+
+void rdResetBlendState()
+{
+	rdroid_blendState.blendMode = RD_BLEND_MODE_NONE;
+}
+
+void rdResetDepthStencilState()
+{
+	rdroid_depthStencilState.zmethod = RD_ZBUFFER_READ_WRITE;
+	rdroid_depthStencilState.zcompare = RD_COMPARE_LESS_EQUAL;
+}
+
+void rdResetTextureState()
+{
+	rdroid_textureState.chromaKeyMode = RD_CHROMA_KEY_DISABLED;
+	rdroid_textureState.chromaKeyColor = 0;
+	rdroid_textureState.pTexture = NULL;
+	rdroid_textureState.texMode = RD_TEXTUREMODE_PERSPECTIVE;
+}
+
+void rdResetLightingState()
+{
+	rdroid_lightingState.ambientMode = RD_AMBIENT_NONE;
+	rdVector_Zero3(&rdroid_lightingState.ambientColor);
+	rdAmbient_Zero(&rdroid_lightingState.ambientStateSH);
+}
 #endif
 
 int rdStartup(HostServices *p_hs)
@@ -69,6 +106,11 @@ int rdStartup(HostServices *p_hs)
 
 #ifdef RENDER_DROID2
 	rdResetMatrices();
+	rdResetRasterState();
+	rdResetBlendState();
+	rdResetDepthStencilState();
+	rdResetTextureState();
+	rdResetLightingState();
 #endif
 
     bRDroidStartup = 1;
@@ -311,17 +353,10 @@ void rdClearPostStatistics()
 
 void rdMatrixChanged()
 {
-	// todo: can do this once instead of on every change
-	rdroid_curFov = (2.0 * atanf(1.0f / rdroid_matrices[RD_MATRIX_PROJECTION].vB.y));
 	rdMatrix_Invert44(&rdroid_curCamMatrix, &rdroid_matrices[RD_MATRIX_VIEW]);
 	rdMatrix_Multiply44(&rdroid_curViewProj, &rdroid_matrices[RD_MATRIX_PROJECTION], &rdroid_matrices[RD_MATRIX_VIEW]);
 	rdMatrix_Invert44(&rdroid_curProjInv, &rdroid_matrices[RD_MATRIX_PROJECTION]);
 	rdMatrix_Invert44(&rdroid_curViewProjInv, &rdroid_curViewProj);
-
-	// extract angles doesn't seem to be working here?
-	rdroid_curRotationPYR.y = atan2(rdroid_curCamMatrix.vA.y, rdroid_curCamMatrix.vA.x);
-	rdroid_curRotationPYR.z = atan2(-rdroid_curCamMatrix.vA.z, stdMath_Sqrt(rdroid_curCamMatrix.vB.z * rdroid_curCamMatrix.vB.z + rdroid_curCamMatrix.vC.z * rdroid_curCamMatrix.vC.z));
-	rdroid_curRotationPYR.x = atan2(rdroid_curCamMatrix.vB.z, rdroid_curCamMatrix.vC.z);
 }
 
 void rdMatrixMode(rdMatrixMode_t mode)
@@ -427,18 +462,18 @@ void rdResetMatrices()
 // Viewport
 void rdViewport(float x, float y, float width, float height, float minDepth, float maxDepth)
 {
-	rdroid_curViewport.x = x - 0.5f;
-	rdroid_curViewport.y = y - 0.5f;
-	rdroid_curViewport.width = width;
-	rdroid_curViewport.height = height;
-	rdroid_curViewport.minDepth = minDepth;
-	rdroid_curViewport.maxDepth = maxDepth;
+	rdroid_rasterState.viewport.x = x - 0.5f;
+	rdroid_rasterState.viewport.y = y - 0.5f;
+	rdroid_rasterState.viewport.width = width;
+	rdroid_rasterState.viewport.height = height;
+	rdroid_rasterState.viewport.minDepth = minDepth;
+	rdroid_rasterState.viewport.maxDepth = maxDepth;
 	rdMatrixChanged();
 }
 
 void rdGetViewport(rdViewportRect* pOut)
 {
-	memcpy(pOut, &rdroid_curViewport, sizeof(rdViewportRect));
+	memcpy(pOut, &rdroid_rasterState.viewport, sizeof(rdViewportRect));
 }
 
 // Primitive
@@ -453,7 +488,7 @@ int rdBeginPrimitive(rdPrimitiveType_t type)
 	return 1;
 }
 
-void std3D_AddDrawCall(std3D_DrawCallState* pDrawCallState, D3DVERTEX* paVertices, int numVertices);
+extern void std3D_AddDrawCall(std3D_DrawCallState* pDrawCallState, D3DVERTEX* paVertices, int numVertices);
 
 void rdEndPrimitive()
 {
@@ -461,13 +496,27 @@ void rdEndPrimitive()
 		return;
 
 	std3D_DrawCallState state;
-	rdMatrix_Copy44(&state.raster.modelMatrix, &rdroid_matrices[RD_MATRIX_MODEL]);
-	rdMatrix_Copy44(&state.raster.viewProj, &rdroid_curViewProj);
-	state.texture.pTexture = rdroid_curTexture;
-	state.texture.texMode = rdroid_curPrimitiveTexMode;
-	state.lighting.ambientColor = rdroid_ambientLightState;
-	state.lighting.ambientStateSH = rdroid_ambientStateSH;
-	state.lighting.ambientMode = rdroid_ambientMode;
+	rdMatrix_Copy44(&state.modelMatrix, &rdroid_matrices[RD_MATRIX_MODEL]);
+	rdMatrix_Copy44(&state.viewProj, &rdroid_curViewProj);
+
+	memcpy(&state.raster, &rdroid_rasterState, sizeof(std3D_RasterState));
+	memcpy(&state.blend, &rdroid_blendState, sizeof(std3D_BlendState));
+	memcpy(&state.depthStencil, &rdroid_depthStencilState, sizeof(std3D_DepthStencilState));
+	memcpy(&state.texture, &rdroid_textureState, sizeof(std3D_TextureState));
+	memcpy(&state.lighting, &rdroid_lightingState, sizeof(std3D_LightingState));
+
+	// fixme
+	state.depthStencil.zmethod = rdGetZBufferMethod();
+
+	// clamp to global states
+	if (state.raster.geoMode > rdroid_curGeometryMode)
+		state.raster.geoMode = rdroid_curGeometryMode;
+
+	if(state.texture.texMode > rdroid_curTextureMode)
+		state.texture.texMode = rdroid_curTextureMode;
+	
+	if (state.lighting.lightMode > rdroid_curLightingMode)
+		state.lighting.lightMode = rdroid_curLightingMode;
 
 	int numVertices = 0;
 	D3DVERTEX tmpVerts[64]; // todo: indexing
@@ -545,7 +594,7 @@ void rdTexCoord2f(float u, float v)
 
 void rdTexCoord2i(float u, float v)
 {
-	if(rdroid_curTexture)
+	if(rdroid_textureState.pTexture)
 	{
 		rdroid_vertexTexCoordState.x = (float)u / rdroid_texWidth;
 		rdroid_vertexTexCoordState.y = (float)v / rdroid_texHeight;
@@ -575,7 +624,8 @@ void rdNormal(const rdVector3* pNormal)
 }
 
 // Texture
-// todo: mips? maybe do that in hw?
+// todo: mips? how to do that in hw with current material cache?
+void std3D_GetValidDimension(unsigned int inW, unsigned int inH, unsigned int* outW, unsigned int* outH);
 int rdBindTexture(rdMaterial* pMaterial, int cel)
 {
 	if(!pMaterial)
@@ -590,7 +640,7 @@ int rdBindTexture(rdMaterial* pMaterial, int cel)
 	rdTexture* sith_tex_sel = NULL;
 	if (!texinfo || (texinfo->header.texture_type & 8) == 0)
 	{
-		rdroid_curTexture = NULL;
+		rdroid_textureState.pTexture = NULL;
 	}
 	else
 	{
@@ -598,9 +648,9 @@ int rdBindTexture(rdMaterial* pMaterial, int cel)
 		if (!rdMaterial_AddToTextureCache(pMaterial, sith_tex_sel, 0, alpha_is_opaque, cel))
 			return 0;
 
-		rdroid_curTexture = &sith_tex_sel->alphaMats[0];
+		rdroid_textureState.pTexture = &sith_tex_sel->alphaMats[0];
 		if (alpha_is_opaque)
-			rdroid_curTexture = &sith_tex_sel->opaqueMats[0];
+			rdroid_textureState.pTexture = &sith_tex_sel->opaqueMats[0];
 		
 		uint32_t out_width, out_height;
 		std3D_GetValidDimension(
@@ -628,24 +678,27 @@ void rdClearColor(uint32_t rgba)
 }
 
 // States
-void rdSetZBufferCompare(rdCompare_t mode)
+void rdSetZBufferCompare(rdCompare_t compare)
 {
-	// todo
+	rdroid_depthStencilState.zcompare = compare;
 }
 
 void rdSetBlendMode(rdBlendMode_t state)
 {
-	// todo
+	rdroid_blendState.blendMode = state;
 }
 
 void rdSetCullMode(rdCullMode_t mode)
 {
-	// todo
+	rdroid_rasterState.colorMode = mode;
 }
 
 void rdSetScissor(int x, int y, int width, int height)
 {
-	// todo
+	rdroid_rasterState.scissor.x = x;
+	rdroid_rasterState.scissor.y = y;
+	rdroid_rasterState.scissor.width = width;
+	rdroid_rasterState.scissor.height = height;
 }
 
 void rdSetAlphaThreshold(uint8_t threshold)
@@ -659,27 +712,27 @@ void rdSetConstantColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 
 void rdSetChromaKey(rdChromaKeyMode_t mode)
 {
-	// todo
+	rdroid_textureState.chromaKeyMode = mode;
 }
 
 void rdSetChromaKeyValue(uint8_t r, uint8_t g, uint8_t b)
 {
-	// todo
+	rdroid_textureState.chromaKeyColor = b | (g << 8) | (r << 16);
 }
 
 void rdSetGeoMode(int a1)
 {
-	// todo
+	rdroid_rasterState.geoMode = a1;
 }
 
 void rdSetLightMode(int a1)
 {
-	// todo
+	rdroid_lightingState.lightMode = a1;
 }
 
 void rdSetTexMode(int a1)
 {
-	rdroid_curPrimitiveTexMode = a1;
+	rdroid_textureState.texMode = a1;
 }
 
 // Lighting
@@ -697,17 +750,17 @@ void rdClearLights()
 
 void rdSetAmbientMode(rdAmbientMode_t type)
 {
-	rdroid_ambientMode = type;
+	rdroid_lightingState.ambientMode = type;
 }
 
 void rdAmbientLight(float r, float g, float b)
 {
-	rdVector_Set3(&rdroid_ambientLightState, r, g, b);
+	rdVector_Set3(&rdroid_lightingState.ambientColor, r, g, b);
 }
 
 void rdAmbientLightSH(rdAmbient* amb)
 {
-	rdAmbient_Copy(&rdroid_ambientStateSH, amb);
+	rdAmbient_Copy(&rdroid_lightingState.ambientStateSH, amb);
 }
 
 #endif
