@@ -1102,3 +1102,8 @@ void rdMatrix_BuildLookAt34(rdMatrix34* out, const rdVector3* viewer, const rdVe
 	rdVector_Set3(&out->uvec, rvec.z, lvec.z, uvec.z);
 	rdVector_Set3(&out->scale, -rdVector_Dot3(&rvec, viewer), -rdVector_Dot3(&lvec, viewer), -rdVector_Dot3(&uvec, viewer));
 }
+
+int rdMatrix_Compare44(const rdMatrix44* a, const rdMatrix44* b)
+{
+	return memcmp(a, b, sizeof(rdMatrix44));
+}
