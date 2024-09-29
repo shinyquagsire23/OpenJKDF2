@@ -5019,7 +5019,7 @@ void std3D_DrawPrimitiveRenderList()
 	glDepthMask(GL_TRUE);
 	glDepthFunc(GL_LESS);
 
-	// setup the vertex data, we do this after sorting
+	// setup the vertex data, we do this after sorting to preserve global batch offsets
 	GL_tmpPrimitiveVerticesAmt = 0;
 	for (int i = 0; i < GL_tmpPrimitivesAmt; ++i)
 	{
