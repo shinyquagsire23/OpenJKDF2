@@ -146,6 +146,10 @@ void rdCache_Flush()
     size_t v3; // edi
     rdProcEntry *face; // esi
 
+#ifdef RENDER_DROID2
+	std3D_FlushDrawCalls();
+#endif
+
     if (!rdCache_numProcFaces)
         return;
 
