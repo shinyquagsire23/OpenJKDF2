@@ -2,6 +2,7 @@ in vec3 coord3d;
 in vec4 v_color;
 in float v_light;
 in vec2 v_uv;
+in vec3 v_normal;
 
 in vec3 coordVS;
 
@@ -10,6 +11,8 @@ out vec4 f_color;
 out float f_light;
 out vec2 f_uv;
 out vec3 f_coord;
+out vec3 f_normal;
+out float f_depth;
 
 #ifdef GPU_LIGHTING
 struct light
@@ -37,18 +40,50 @@ uniform lightBlock
 };
 #endif
 
+#ifdef RENDER_DROID2
+uniform int uv_mode;
+uniform vec2 iResolution;
+
+uniform vec4 uv_mode_params0;
+uniform vec4 uv_mode_params1;
+uniform vec2 uv_offset;
+
+noperspective out vec2 f_uv_affine;
+
+vec2 get_horizon_uv(inout vec4 clip_pos)
+{
+	float v10 = (clip_pos.x / clip_pos.w * iResolution.x * 0.5) * uv_mode_params0.x;
+	float v12 = (-clip_pos.y / clip_pos.w * iResolution.y * 0.5) * uv_mode_params0.x;
+
+	vec2 uv;
+	uv.x = v10 * uv_mode_params1.x - v12 * uv_mode_params1.y + (uv_mode_params0.y);
+	uv.y = v12 * uv_mode_params1.x + v10 * uv_mode_params1.y + (uv_mode_params0.z);
+	
+	clip_pos.z = clip_pos.w - 0.25/64.0;
+	
+	return (uv + uv_offset) / 256.0; // todo: from mat
+}
+#endif
+
 void main(void)
 {
 #ifndef RENDER_DROID2
     vec4 pos = mvp * vec4(coord3d, 1.0);
     pos.w = 1.0/(1.0-coord3d.z); // fixme: this doesn't match the projection matrix output AT ALL
-    pos.xyz *= pos.w;
+    pos.xyz *= pos.w; // pretty sure the problem is z here
 #else
     vec4 pos = mvp * vec4(coord3d, 1.0);
+	f_normal = v_normal;
 #endif
+ 	f_depth = pos.w / 128.0;
     gl_Position = pos;
     f_color = v_color.bgra;
     f_uv = v_uv;
+#ifdef RENDER_DROID2
+	f_uv_affine = v_uv;
+	if(uv_mode == 6) // 6 = RD_TEXTUREMODE_HORIZON
+		f_uv_affine = get_horizon_uv(pos);
+#endif
 #ifdef VIEW_SPACE_GBUFFER
     f_coord = coordVS;
 #else

@@ -155,7 +155,8 @@ GLint prim_attribute_coord3d, prim_attribute_v_color, prim_attribute_v_light, pr
 #ifdef VIEW_SPACE_GBUFFER
 GLint prim_attribute_coordVS;
 #endif
-GLint prim_uniform_mvp, prim_uniform_viewmat, prim_uniform_tex, prim_uniform_texEmiss, prim_uniform_displacement_map, prim_uniform_tex_mode, prim_uniform_blend_mode, prim_uniform_worldPalette, prim_uniform_worldPaletteLights;
+GLint prim_uniform_uv_mode, prim_uniform_uv_mode_params0, prim_uniform_uv_mode_params1, prim_uniform_uv_offset;
+GLint prim_uniform_mvp, prim_uniform_tex, prim_uniform_texEmiss, prim_uniform_displacement_map, prim_uniform_tex_mode, prim_uniform_blend_mode, prim_uniform_worldPalette, prim_uniform_worldPaletteLights;
 GLint prim_uniform_tint, prim_uniform_filter, prim_uniform_fade, prim_uniform_add, prim_uniform_emissiveFactor, prim_uniform_albedoFactor;
 GLint prim_uniform_light_mult, prim_uniform_displacement_factor, prim_uniform_iResolution, prim_uniform_enableDither;
 #ifdef FOG
@@ -1125,6 +1126,15 @@ void std3D_setupPrimWorldVAO()
 		sizeof(D3DVERTEX),                 // no extra data between each position
 		(GLvoid*)offsetof(D3DVERTEX, tu)                  // offset of first element
 	);
+	
+	glVertexAttribPointer(
+		prim_attribute_v_norm, // attribute
+			3,                 // number of elements per vertex, here (x,y,z)
+			GL_FLOAT,          // the type of each element
+			GL_FALSE,          // normalize fixed-point data?
+			sizeof(D3DVERTEX), // data stride
+			(GLvoid*)offsetof(D3DVERTEX, nx) // offset of first element
+		);
 
 #ifdef VIEW_SPACE_GBUFFER
 	glVertexAttribPointer(
@@ -1141,7 +1151,7 @@ void std3D_setupPrimWorldVAO()
 	glEnableVertexAttribArray(prim_attribute_v_color);
 	glEnableVertexAttribArray(prim_attribute_v_light);
 	glEnableVertexAttribArray(prim_attribute_v_uv);
-	glEnableVertexAttribArray(prim_attribute_coordVS);
+	glEnableVertexAttribArray(prim_attribute_v_norm);
 
 #ifdef VIEW_SPACE_GBUFFER
 	glEnableVertexAttribArray(prim_attribute_coordVS);
@@ -1248,8 +1258,13 @@ int init_resources()
 	prim_attribute_v_color = std3D_tryFindAttribute(programPrimitives, "v_color");
 	prim_attribute_v_light = std3D_tryFindAttribute(programPrimitives, "v_light");
 	prim_attribute_v_uv = std3D_tryFindAttribute(programPrimitives, "v_uv");
+	prim_attribute_v_norm = std3D_tryFindAttribute(programPrimitives, "v_normal");
 	prim_uniform_mvp = std3D_tryFindUniform(programPrimitives, "mvp");
-	prim_uniform_viewmat = std3D_tryFindUniform(programPrimitives, "viewmat");
+	prim_uniform_uv_mode = std3D_tryFindUniform(programPrimitives, "uv_mode");
+	prim_uniform_uv_mode_params0 = std3D_tryFindUniform(programPrimitives, "uv_mode_params0");
+	prim_uniform_uv_mode_params1 = std3D_tryFindUniform(programPrimitives, "uv_mode_params1");
+	prim_uniform_uv_offset = std3D_tryFindUniform(programPrimitives, "uv_offset");
+
 	prim_uniform_tex = std3D_tryFindUniform(programPrimitives, "tex");
 	prim_uniform_texEmiss = std3D_tryFindUniform(programPrimitives, "texEmiss");
 	prim_uniform_worldPalette = std3D_tryFindUniform(programPrimitives, "worldPalette");
@@ -4885,15 +4900,8 @@ void std3D_AddRenderListPrimitive(rdPrimitive* pPrimitive)
 	if (GL_tmpPrimitivesAmt + 1 > STD3D_MAX_PRIMITIVES)
 		return;
 
-	if (GL_tmpPrimitiveVerticesAmt + pPrimitive->numVertices > STD3D_MAX_PRIMITIVES * 32)
-		return;
-
 	memcpy(&GL_tmpPrimitives[GL_tmpPrimitivesAmt], pPrimitive, sizeof(rdPrimitive));
-
-	memcpy(&GL_tmpPrimitiveVertices[GL_tmpPrimitiveVerticesAmt], pPrimitive->aVertices, sizeof(D3DVERTEX) * pPrimitive->numVertices);
-
 	++GL_tmpPrimitivesAmt;
-	GL_tmpPrimitiveVerticesAmt += pPrimitive->numVertices;
 }
 
 void std3D_ResetPrimitiveRenderList()
@@ -4902,9 +4910,97 @@ void std3D_ResetPrimitiveRenderList()
 	GL_tmpPrimitiveVerticesAmt = 0;
 }
 
+void std3D_SetTexture(rdDDrawSurface* pTexture)
+{
+	if (!pTexture)
+	{
+		glActiveTexture(GL_TEXTURE0 + 3);
+		glBindTexture(GL_TEXTURE_2D, blank_tex); // emissive
+		glActiveTexture(GL_TEXTURE0 + 4);
+		glBindTexture(GL_TEXTURE_2D, blank_tex); // displace
+
+		glActiveTexture(GL_TEXTURE0 + 0);
+		glBindTexture(GL_TEXTURE_2D, blank_tex_white);
+		glUniform1i(prim_uniform_tex_mode, TEX_MODE_TEST);
+		glUniform1i(prim_uniform_blend_mode, 2);
+	}
+	else
+	{
+		int tex_id = pTexture->texture_id;
+		glActiveTexture(GL_TEXTURE0 + 0);
+		if (tex_id == 0)
+			glBindTexture(GL_TEXTURE_2D, blank_tex_white);
+		else
+			glBindTexture(GL_TEXTURE_2D, tex_id);
+
+		int emiss_tex_id = pTexture->emissive_texture_id;
+		glActiveTexture(GL_TEXTURE0 + 3);
+		if (emiss_tex_id == 0)
+			glBindTexture(GL_TEXTURE_2D, blank_tex);
+		else
+			glBindTexture(GL_TEXTURE_2D, emiss_tex_id);
+
+		int displace_tex_id = pTexture->displacement_texture_id;
+		glActiveTexture(GL_TEXTURE0 + 4);
+		if (displace_tex_id == 0)
+			glBindTexture(GL_TEXTURE_2D, blank_tex);
+		else
+			glBindTexture(GL_TEXTURE_2D, displace_tex_id);
+
+		float emissive_mult = (jkPlayer_enableBloom ? 1.0 : 5.0);
+		glUniform3f(prim_uniform_emissiveFactor, pTexture->emissive_factor[0] * emissive_mult, pTexture->emissive_factor[1] * emissive_mult, pTexture->emissive_factor[2] * emissive_mult);
+		glUniform4f(prim_uniform_albedoFactor, pTexture->albedo_factor[0], pTexture->albedo_factor[1], pTexture->albedo_factor[2], pTexture->albedo_factor[3]);
+		glUniform1f(prim_uniform_displacement_factor, pTexture->displacement_factor);
+		glActiveTexture(GL_TEXTURE0 + 0);
+
+		if (!jkPlayer_enableTextureFilter)
+			glUniform1i(prim_uniform_tex_mode, pTexture->is_16bit ? TEX_MODE_16BPP : TEX_MODE_WORLDPAL);
+		else
+			glUniform1i(prim_uniform_tex_mode, pTexture->is_16bit ? TEX_MODE_BILINEAR_16BPP : TEX_MODE_BILINEAR);
+
+		glActiveTexture(GL_TEXTURE0 + 0);
+
+		if (tex_id == 0)
+			glUniform1i(prim_uniform_tex_mode, TEX_MODE_TEST);
+	}
+}
+
+// todo: compute this in rdEndPrimitive instead of during the sort
+int std3D_GetPrimitiveSortHash(rdPrimitive* proc)
+{
+	int hash = 0;
+	//hash |= ((proc->type & RD_FF_TEX_TRANSLUCENT) == RD_FF_TEX_TRANSLUCENT) << 31;
+	//hash |= ((proc->type & RD_FF_DOUBLE_SIDED) == RD_FF_DOUBLE_SIDED) << 30;
+	//RD_FF_TEX_CLAMP_X
+	//RD_FF_TEX_CLAMP_Y
+	//RD_FF_TEX_FILTER_NEAREST
+	//RD_FF_ZWRITE_DISABLED
+#ifdef ADDITIVE_BLEND
+	//hash |= ((proc->type & RD_FF_ADDITIVE) == RD_FF_ADDITIVE) << 30;
+	//hash |= ((proc->type & RD_FF_SCREEN) == RD_FF_SCREEN) << 28;
+#endif
+	hash |= proc->texMode << 16;
+	hash |= (proc->pTexture ? proc->pTexture->texture_id : 0);
+	return hash;
+}
+
+int std3D_PrimitiveCompare(rdPrimitive* a, rdPrimitive* b)
+{
+	int aSortId = std3D_GetPrimitiveSortHash(a);
+	int bSortId = std3D_GetPrimitiveSortHash(b);
+	if (aSortId > bSortId)
+		return 1;
+	if (aSortId < bSortId)
+		return -1;
+	return 0;
+}
+
 void std3D_DrawPrimitiveRenderList()
 {
 	if (Main_bHeadless) return;
+
+	// sort primitives to reduce state changes and maximize batching
+	_qsort(GL_tmpPrimitives, GL_tmpPrimitivesAmt, sizeof(rdPrimitive), (int(__cdecl*)(const void*, const void*))std3D_PrimitiveCompare);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->fbo);
 	std3D_useProgram(programPrimitives);
@@ -4916,14 +5012,22 @@ void std3D_DrawPrimitiveRenderList()
 	};
 	glDrawBuffers(ARRAYSIZE(bufs), bufs);
 
-	last_tex = NULL;
-
 	// fixme
 	glDisable(GL_CULL_FACE);
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
 	glDepthFunc(GL_LESS);
+
+	// setup the vertex data, we do this after sorting
+	GL_tmpPrimitiveVerticesAmt = 0;
+	for (int i = 0; i < GL_tmpPrimitivesAmt; ++i)
+	{
+		if (GL_tmpPrimitiveVerticesAmt + GL_tmpPrimitives[i].numVertices > STD3D_MAX_PRIMITIVES * 64)
+			break;
+		memcpy(&GL_tmpPrimitiveVertices[GL_tmpPrimitiveVerticesAmt], GL_tmpPrimitives[i].aVertices, sizeof(D3DVERTEX) * GL_tmpPrimitives[i].numVertices);
+		GL_tmpPrimitiveVerticesAmt += GL_tmpPrimitives[i].numVertices;
+	}
 
 	glBindVertexArray(prim_vao);
 	glBindBuffer(GL_ARRAY_BUFFER, world_vbo_all);
@@ -4966,120 +5070,60 @@ void std3D_DrawPrimitiveRenderList()
 	glUniform1f(prim_uniform_light_mult, jkGuiBuildMulti_bRendering ? 0.85 : (jkPlayer_enableBloom ? 0.9 : 0.85));
 	glUniform1f(prim_uniform_displacement_factor, 1.0);
 
-
-	float maxX, maxY, scaleX, scaleY, width, height;
-
-	float internalWidth = Window_xSize;//Video_menuBuffer.format.width;
-	float internalHeight = Window_ySize;//Video_menuBuffer.format.height;
-
-	if (jkGuiBuildMulti_bRendering)
-	{
-		internalWidth = 640.0;
-		internalHeight = 480.0;
-	}
-
-	maxX = 1.0;
-	maxY = 1.0;
-	scaleX = 1.0 / ((double)internalWidth / 2.0);
-	scaleY = 1.0 / ((double)internalHeight / 2.0);
-	width = Window_xSize;
-	height = Window_ySize;
-
-	if (jkGuiBuildMulti_bRendering)
-	{
-		width = 640;
-		height = 480;
-	}
-
-	// JKDF2's vertical FOV is fixed with their projection, for whatever reason. 
-	// This ends up resulting in the view looking squished vertically at wide/ultrawide aspect ratios.
-	// To compensate, we zoom the y axis here.
-	// I also went ahead and fixed vertical displays in the same way because it seems to look better.
-	float zoom_yaspect = 1.0;
-	float zoom_xaspect = 1.0;
-
-	float shift_add_x = 0;
-	float shift_add_y = 0;
-
 	glActiveTexture(GL_TEXTURE0 + 0);
 	glBindTexture(GL_TEXTURE_2D, blank_tex_white);
 
-	{
+	int do_batch = 0;
+	int batch_verts = 0;
 
-		float d3dmat[16] = {
-		   maxX * scaleX,      0,                                          0,      0, // right
-		   0,                                       -maxY * scaleY,               0,      0, // up
-		   0,                                       0,                                          1,     0, // forward
-		   -(width / 2) * scaleX,  (height / 2) * scaleY,     -1,      1  // pos
-		};
+	int last_tex = GL_tmpPrimitives[0].pTexture->texture_id;
+	std3D_SetTexture(GL_tmpPrimitives[0].pTexture);
 
-		//glUniformMatrix4fv(prim_uniform_mvp, 1, GL_FALSE, d3dmat);
-	}
+	rdMatrix44 last_mat = GL_tmpPrimitives[0].modelViewProj;
+	glUniformMatrix4fv(prim_uniform_mvp, 1, GL_FALSE, (float*)&GL_tmpPrimitives[0].modelViewProj);
 
-	// todo: batching, state management, stencil, etc
+	int last_tex_mode = GL_tmpPrimitives[0].texMode;
+	glUniform1i(prim_uniform_uv_mode, GL_tmpPrimitives[0].texMode);
+
 	int vertexOffset = 0;
 	for (int j = 0; j < GL_tmpPrimitivesAmt; j++)
 	{
-		//glUniformMatrix4fv(uniform_mvp, 1, GL_FALSE, (float*)&GL_tmpPrimitives[j].modelViewProj);
-		glUniformMatrix4fv(prim_uniform_mvp, 1, GL_FALSE, (float*)&GL_tmpPrimitives[j].modelViewProj);
-
-		if(!GL_tmpPrimitives[j].pTexture)
+		if (last_tex != GL_tmpPrimitives[j].pTexture->texture_id
+			|| last_tex_mode != GL_tmpPrimitives[j].texMode
+			|| rdMatrix_Compare44(&last_mat, &GL_tmpPrimitives[j].modelViewProj) != 0)
 		{
-			glActiveTexture(GL_TEXTURE0 + 3);
-			glBindTexture(GL_TEXTURE_2D, blank_tex); // emissive
-			glActiveTexture(GL_TEXTURE0 + 4);
-			glBindTexture(GL_TEXTURE_2D, blank_tex); // displace
-
-			glActiveTexture(GL_TEXTURE0 + 0);
-			glBindTexture(GL_TEXTURE_2D, blank_tex_white);
-			glUniform1i(prim_uniform_tex_mode, TEX_MODE_TEST);
-			glUniform1i(prim_uniform_blend_mode, 2);
-		}
-		else
-		{
-			int tex_id = GL_tmpPrimitives[j].pTexture->texture_id;
-			glActiveTexture(GL_TEXTURE0 + 0);
-			if (tex_id == 0)
-				glBindTexture(GL_TEXTURE_2D, blank_tex_white);
-			else
-				glBindTexture(GL_TEXTURE_2D, tex_id);
-
-			int emiss_tex_id = GL_tmpPrimitives[j].pTexture->emissive_texture_id;
-			glActiveTexture(GL_TEXTURE0 + 3);
-			if (emiss_tex_id == 0)
-				glBindTexture(GL_TEXTURE_2D, blank_tex);
-			else
-				glBindTexture(GL_TEXTURE_2D, emiss_tex_id);
-
-			int displace_tex_id = GL_tmpPrimitives[j].pTexture->displacement_texture_id;
-			glActiveTexture(GL_TEXTURE0 + 4);
-			if (displace_tex_id == 0)
-				glBindTexture(GL_TEXTURE_2D, blank_tex);
-			else
-				glBindTexture(GL_TEXTURE_2D, displace_tex_id);
-
-			float emissive_mult = (jkPlayer_enableBloom ? 1.0 : 5.0);
-			glUniform3f(prim_uniform_emissiveFactor, GL_tmpPrimitives[j].pTexture->emissive_factor[0] * emissive_mult, GL_tmpPrimitives[j].pTexture->emissive_factor[1] * emissive_mult, GL_tmpPrimitives[j].pTexture->emissive_factor[2] * emissive_mult);
-			glUniform4f(prim_uniform_albedoFactor, GL_tmpPrimitives[j].pTexture->albedo_factor[0], GL_tmpPrimitives[j].pTexture->albedo_factor[1], GL_tmpPrimitives[j].pTexture->albedo_factor[2], GL_tmpPrimitives[j].pTexture->albedo_factor[3]);
-			glUniform1f(prim_uniform_displacement_factor, GL_tmpPrimitives[j].pTexture->displacement_factor);
-			glActiveTexture(GL_TEXTURE0 + 0);
-
-			if (!jkPlayer_enableTextureFilter)
-				glUniform1i(prim_uniform_tex_mode, GL_tmpPrimitives[j].pTexture->is_16bit ? TEX_MODE_16BPP : TEX_MODE_WORLDPAL);
-			else
-				glUniform1i(prim_uniform_tex_mode, GL_tmpPrimitives[j].pTexture->is_16bit ? TEX_MODE_BILINEAR_16BPP : TEX_MODE_BILINEAR);
-
-			glActiveTexture(GL_TEXTURE0 + 0);
-
-			if (tex_id == 0)
-				glUniform1i(prim_uniform_tex_mode, TEX_MODE_TEST);
+			do_batch = 1;
 		}
 
-		// todo: diff primitive types?
-		glDrawArrays(GL_TRIANGLE_FAN, vertexOffset, GL_tmpPrimitives[j].numVertices);
+		if(do_batch)
+		{
+			glDrawArrays(GL_TRIANGLES, vertexOffset, batch_verts);
+
+			glUniform1i(prim_uniform_uv_mode, GL_tmpPrimitives[j].texMode);
+			if (GL_tmpPrimitives[j].texMode == 6)
+			{
+				glUniform4f(prim_uniform_uv_mode_params0, sithSector_flt_8553C0, sithSector_flt_8553B8, sithSector_flt_8553C4, 0);
+				glUniform4f(prim_uniform_uv_mode_params1, sithSector_flt_8553C8, sithSector_flt_8553F4, 0, 0);
+				glUniform2f(prim_uniform_uv_offset, sithWorld_pCurrentWorld->horizontalSkyOffs.x, sithWorld_pCurrentWorld->horizontalSkyOffs.y);
+			}
+			glUniformMatrix4fv(prim_uniform_mvp, 1, GL_FALSE, (float*)&GL_tmpPrimitives[j].modelViewProj);
+			std3D_SetTexture(GL_tmpPrimitives[j].pTexture);
+
+			last_tex = GL_tmpPrimitives[j].pTexture->texture_id;
+			last_mat = GL_tmpPrimitives[j].modelViewProj;
+			last_tex_mode = GL_tmpPrimitives[j].texMode;
+
+			vertexOffset += batch_verts;
+			batch_verts = 0;
+
+			do_batch = 0;
+		}
 	
-		vertexOffset += GL_tmpPrimitives[j].numVertices;
+		batch_verts += GL_tmpPrimitives[j].numVertices;
 	}
+
+	if (batch_verts)
+		glDrawArrays(GL_TRIANGLES, vertexOffset, batch_verts);
 
 	glBindVertexArray(vao);
 

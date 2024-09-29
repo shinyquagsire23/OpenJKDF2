@@ -81,6 +81,13 @@ in vec4 f_color;
 in float f_light;
 in vec2 f_uv;
 in vec3 f_coord;
+in vec3 f_normal;
+in float f_depth;
+
+#ifdef RENDER_DROID2
+uniform int uv_mode;
+noperspective in vec2 f_uv_affine;
+#endif
 
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragColorEmiss;
@@ -329,9 +336,17 @@ void main(void)
     vec3 face_normals_parallax = normals(adjusted_coords_parallax);
 
     vec2 adj_texcoords = f_uv;
-    if(displacement_factor != 0.0) {
+    if(displacement_factor != 0.0)
+	{
         adj_texcoords = parallax_mapping(f_uv, face_normals_parallax, adjusted_coords_parallax);
     }
+#ifdef RENDER_DROID2
+	else
+	{
+		if(uv_mode == 6 || uv_mode == 0)
+			adj_texcoords = f_uv_affine;
+	}
+#endif
 
     vec4 sampled = texture(tex, adj_texcoords);
     vec4 sampledEmiss = texture(texEmiss, adj_texcoords);
@@ -343,6 +358,14 @@ void main(void)
     vec4 color_add_emiss = vec4(0.0, 0.0, 0.0, 0.0);
 #ifdef CLASSIC_EMISSIVE
 	vec4 emissive = vec4(0.0);
+#endif
+
+#ifdef RENDER_DROID2
+	vec3 surfaceNormals = f_normal;
+#elif defined(VIEW_SPACE_GBUFFER)
+	vec3 surfaceNormals = normals(adjusted_coords.xyz);
+#else
+	vec3 surfaceNormals = face_normals;
 #endif
 
     if (tex_mode == TEX_MODE_TEST) {
@@ -588,12 +611,16 @@ void main(void)
 //	gl_FragDepth = gl_FragCoord.z;
 #ifdef VIEW_SPACE_GBUFFER
 	// output linear depth
-	// nani tf??? what in the world is happening to gl_FragCoord.w??
-	float linearDepth = (1.0 / gl_FragCoord.w) / 128.0f / 128.0f;
+//#ifdef RENDER_DROID2
+	float linearDepth = f_depth;
+//else
+//	// nani tf??? what in the world is happening to gl_FragCoord.w??
+//	float linearDepth = (1.0 / gl_FragCoord.w) / 128.0 / 128.0;
+//endif
 	fragColorDepth = linearDepth;
 
 	// octahedron encoded normal
-	vec2 octaNormal = encode_octahedron(normals(adjusted_coords.xyz));
+	vec2 octaNormal = encode_octahedron(surfaceNormals);
     fragColorNormal = octaNormal.xy;
 
 	// unlit diffuse color for deferred lights and decals

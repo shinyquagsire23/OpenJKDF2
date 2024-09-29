@@ -42,6 +42,7 @@ static rdVector3 rdroid_vertexNormalState = { 0.0f, 0.0f, 0.0f };
 static int rdroid_vertexCacheNum = 0;
 static D3DVERTEX rdroid_vertexCache[64];
 static RD_PRIMITIVE_TYPE rdroid_curPrimitiveType = RD_PRIMITIVE_NONE;
+static rdTexMode_t rdroid_curPrimitiveTexMode = RD_TEXTUREMODE_PERSPECTIVE;
 
 static float rdroid_curFov = 90.0f;
 static rdMatrix44 rdroid_curCamMatrix;
@@ -458,11 +459,30 @@ void std3D_AddRenderListPrimitive(rdPrimitive* pPrimitive);
 
 void rdEndPrimitive()
 {
+	if(rdroid_vertexCacheNum == 0)
+		return;
+
 	rdPrimitive prim;
 	rdMatrix_Multiply44(&prim.modelViewProj, &rdroid_matrices[RD_MATRIX_MODEL], &rdroid_curViewProj);
 	prim.pTexture = rdroid_curTexture;
-	memcpy(prim.aVertices, rdroid_vertexCache, sizeof(D3DVERTEX) * rdroid_vertexCacheNum);
-	prim.numVertices = rdroid_vertexCacheNum;
+	prim.texMode = rdroid_curPrimitiveTexMode;
+
+	if (rdroid_curPrimitiveType == RD_PRIMITIVE_TRIANGLES)
+	{
+		prim.numVertices = rdroid_vertexCacheNum;
+		memcpy(prim.aVertices, rdroid_vertexCache, sizeof(D3DVERTEX) * rdroid_vertexCacheNum);
+	}
+	else
+	{
+		prim.numVertices = 3 * (rdroid_vertexCacheNum - 2);
+		for (size_t i = 0; i < rdroid_vertexCacheNum - 2; i++)
+		{
+			prim.aVertices[i * 3 + 0] = rdroid_vertexCache[0];
+			prim.aVertices[i * 3 + 1] = rdroid_vertexCache[i + 1];
+			prim.aVertices[i * 3 + 2] = rdroid_vertexCache[i + 2];
+		}
+	}
+
 	std3D_AddRenderListPrimitive(&prim);
 
 	rdroid_vertexCacheNum = 0;
@@ -651,7 +671,7 @@ void rdSetLightMode(int a1)
 
 void rdSetTexMode(int a1)
 {
-	// todo
+	rdroid_curPrimitiveTexMode = a1;
 }
 
 // Lighting

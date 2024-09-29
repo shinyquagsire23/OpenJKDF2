@@ -1230,6 +1230,9 @@ void sithRender_RenderLevelGeometry()
 				texMode2 = v65->surfaceInfo.face.textureMode;
 				if (texMode2 >= texMode)
 					texMode2 = texMode;
+
+				if (v65->surfaceFlags & SITH_SURFACE_HORIZON_SKY)
+					texMode2 = RD_TEXTUREMODE_HORIZON;
 				rdSetTexMode(texMode2);
 
 				int wallCel = v65->surfaceInfo.face.wallCel;

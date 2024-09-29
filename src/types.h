@@ -843,6 +843,7 @@ typedef struct rdPrimitive
 	D3DVERTEX       aVertices[64]; // vertex array, max 64 per primitive
 	int             numVertices;   // number of vertices in the vertex array
 	// todo: state bits, chroma color, etc
+	rdTexMode_t     texMode;
 } rdPrimitive;
 #endif
 
