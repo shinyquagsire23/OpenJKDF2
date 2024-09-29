@@ -24,9 +24,9 @@ float rdroid_curFogEndDepth;
 
 void rdMatrixChanged();
 
-static RD_CULL_MODE rdroid_curCullMode = RD_CULL_MODE_CCW_ONLY;
+static rdCullMode_t rdroid_curCullMode = RD_CULL_MODE_CCW_ONLY;
 
-static RD_MATRIX_MODE rdroid_curMatrixMode = RD_MATRIX_MODEL;
+static rdMatrixMode_t rdroid_curMatrixMode = RD_MATRIX_MODEL;
 static rdViewportRect rdroid_curViewport;
 static rdMatrix44     rdroid_matrices[3];
 
@@ -41,7 +41,7 @@ static rdVector3 rdroid_vertexNormalState = { 0.0f, 0.0f, 0.0f };
 
 static int rdroid_vertexCacheNum = 0;
 static D3DVERTEX rdroid_vertexCache[64];
-static RD_PRIMITIVE_TYPE rdroid_curPrimitiveType = RD_PRIMITIVE_NONE;
+static rdPrimitiveType_t rdroid_curPrimitiveType = RD_PRIMITIVE_NONE;
 static rdTexMode_t rdroid_curPrimitiveTexMode = RD_TEXTUREMODE_PERSPECTIVE;
 
 static float rdroid_curFov = 90.0f;
@@ -325,7 +325,7 @@ void rdMatrixChanged()
 	rdroid_curRotationPYR.x = atan2(rdroid_curCamMatrix.vB.z, rdroid_curCamMatrix.vC.z);
 }
 
-void rdMatrixMode(RD_MATRIX_MODE mode)
+void rdMatrixMode(rdMatrixMode_t mode)
 {
 	rdroid_curMatrixMode = mode;
 }
@@ -413,7 +413,7 @@ void rdPostMultiplyMatrix(const rdMatrix44* pMatrix)
 	rdMatrixChanged();
 }
 
-void rdGetMatrix(rdMatrix44* out, RD_MATRIX_MODE mode)
+void rdGetMatrix(rdMatrix44* out, rdMatrixMode_t mode)
 {
 	rdMatrix_Copy44(out, &rdroid_matrices[rdroid_curMatrixMode]);
 }
@@ -444,7 +444,7 @@ void rdGetViewport(rdViewportRect* pOut)
 }
 
 // Primitive
-int rdBeginPrimitive(RD_PRIMITIVE_TYPE type)
+int rdBeginPrimitive(rdPrimitiveType_t type)
 {
 	// fail if we're already building a primitive
 	if (rdroid_curPrimitiveType != RD_PRIMITIVE_NONE)
@@ -620,17 +620,17 @@ void rdClearColor(uint32_t rgba)
 }
 
 // States
-void rdSetZBufferCompare(RD_COMPARE mode)
+void rdSetZBufferCompare(rdCompare_t mode)
 {
 	// todo
 }
 
-void rdSetBlendMode(RD_BLEND_MODE state)
+void rdSetBlendMode(rdBlendMode_t state)
 {
 	// todo
 }
 
-void rdSetCullMode(RD_CULL_MODE mode)
+void rdSetCullMode(rdCullMode_t mode)
 {
 	// todo
 }
@@ -649,7 +649,7 @@ void rdSetConstantColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 	// todo
 }
 
-void rdSetChromaKey(RD_CHROMA_KEY_MODE mode)
+void rdSetChromaKey(rdChromaKeyMode_t mode)
 {
 	// todo
 }

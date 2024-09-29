@@ -82,12 +82,14 @@ void rdClearPostStatistics();
 //#define  (*(int*)0x)
 
 #ifdef RENDER_DROID2
+typedef uint8_t rdBlendMode_t;
 typedef enum RD_BLEND_MODE
 {
 	RD_BLEND_MODE_NONE = 0,
 	RD_BLEND_MODE_ALPHA = 1
 } RD_BLEND_MODE;
 
+typedef uint8_t rdCompare_t;
 typedef enum RD_COMPARE
 {
 	RD_COMPARE_ALWAYS,
@@ -100,6 +102,7 @@ typedef enum RD_COMPARE
 	RD_COMPARE_NEVER
 } RD_COMPARE;
 
+typedef uint8_t rdCullMode_t;
 typedef enum RD_CULL_MODE
 {
 	RD_CULL_MODE_NONE,
@@ -107,18 +110,21 @@ typedef enum RD_CULL_MODE
 	RD_CULL_MODE_CW_ONLY
 } RD_CULL_MODE;
 
+typedef uint8_t rdVertexColorMode_t;
 typedef enum RD_VERTEX_COLOR_MODE
 {
 	RD_VERTEX_COLOR_MODE_LUMINANCE,
 	RD_VERTEX_COLOR_MODE_COLORED,
 } RD_VERTEX_COLOR_MODE;
 
+typedef uint8_t rdChromaKeyMode_t;
 typedef enum RD_CHROMA_KEY_MODE
 {
 	RD_CHROMA_KEY_DISABLED,
 	RD_CHROMA_KEY_ENABLED,
 } RD_CHROMA_KEY_MODE;
 
+typedef uint8_t rdPrimitiveType_t;
 typedef enum RD_PRIMITIVE_TYPE
 {
 	RD_PRIMITIVE_NONE,
@@ -127,6 +133,7 @@ typedef enum RD_PRIMITIVE_TYPE
 	RD_PRIMITIVE_POLYGON,
 } RD_PRIMITIVE_TYPE;
 
+typedef uint8_t rdMatrixMode_t;
 typedef enum RD_MATRIX_MODE
 {
 	RD_MATRIX_MODEL,
@@ -144,7 +151,7 @@ typedef struct rdViewportRect
 	float maxDepth;
 } rdViewportRect;
 
-void rdMatrixMode(RD_MATRIX_MODE mode);
+void rdMatrixMode(rdMatrixMode_t mode);
 void rdPerspective(float fov, float aspect, float nearPlane, float farPlane);
 void rdOrthographic(float width, float height, float nearPlane, float farPlane);
 void rdLookat(const rdVector3* pViewer, const rdVector3* pTarget, const rdVector3* pUp);
@@ -157,13 +164,13 @@ void rdLoadMatrix34(const rdMatrix34* pMatrix);
 void rdLoadMatrix(const rdMatrix44* pMatrix);
 void rdPostMultiplyMatrix(const rdMatrix44* pMatrix);
 void rdPreMultiplyMatrix(const rdMatrix44* pMatrix);
-void rdGetMatrix(rdMatrix44* pOut, RD_MATRIX_MODE mode);
+void rdGetMatrix(rdMatrix44* pOut, rdMatrixMode_t mode);
 void rdResetMatrices();
 
 void rdViewport(float x, float y, float width, float height, float minDepth, float maxDepth);
 void rdGetViewport(rdViewportRect* pOut);
 
-int rdBeginPrimitive(RD_PRIMITIVE_TYPE type);
+int rdBeginPrimitive(rdPrimitiveType_t type);
 void rdEndPrimitive();
 void rdVertex3f(float x, float y, float z);
 void rdColor4f(float r, float g, float b, float a);
@@ -176,13 +183,13 @@ void rdTexCoord(const rdVector2* pUV);
 void rdNormal(const rdVector3* pNormal);
 
 // render state
-void rdSetZBufferCompare(RD_COMPARE mode);
-void rdSetBlendMode(RD_BLEND_MODE state);
-void rdSetCullMode(RD_CULL_MODE mode);
+void rdSetZBufferCompare(rdCompare_t mode);
+void rdSetBlendMode(rdBlendMode_t state);
+void rdSetCullMode(rdCullMode_t mode);
 void rdSetScissor(int x, int y, int width, int height);
 void rdSetAlphaThreshold(uint8_t threshold);
 void rdSetConstantColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
-void rdSetChromaKey(RD_CHROMA_KEY_MODE mode);
+void rdSetChromaKey(rdChromaKeyMode_t mode);
 void rdSetChromaKeyValue(uint8_t r, uint8_t g, uint8_t b);
 
 // these names kinda suck, come up with better for per-primitive modes
