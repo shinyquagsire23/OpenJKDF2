@@ -5013,7 +5013,8 @@ void std3D_DrawPrimitiveRenderList()
 	glDrawBuffers(ARRAYSIZE(bufs), bufs);
 
 	// fixme
-	glDisable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
