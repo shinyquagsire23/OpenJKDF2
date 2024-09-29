@@ -4852,8 +4852,8 @@ int std3D_ComputeDrawCallSortHash(std3D_DrawCallState* pState)
 	//hash |= ((proc->type & RD_FF_ADDITIVE) == RD_FF_ADDITIVE) << 30;
 	//hash |= ((proc->type & RD_FF_SCREEN) == RD_FF_SCREEN) << 28;
 #endif
-	sortHash |= pState->texMode << 16;
-	sortHash |= (pState->pTexture ? pState->pTexture->texture_id : 0);
+	sortHash |= pState->texture.texMode << 16;
+	sortHash |= (pState->texture.pTexture ? pState->texture.pTexture->texture_id : 0);
 	return sortHash;
 }
 
@@ -5032,36 +5032,47 @@ void std3D_FlushDrawCalls()
 	glActiveTexture(GL_TEXTURE0 + 0);
 	glBindTexture(GL_TEXTURE_2D, blank_tex_white);
 
+	std3D_DrawCall* pDrawCall = &GL_tmpDrawCalls[0];
+	std3D_RasterState* pRasterState = &pDrawCall->state.raster;
+	std3D_TextureState* pTexState = &pDrawCall->state.texture;
+	std3D_LightingState* pLightState = &pDrawCall->state.lighting;
+
 	int do_batch = 0;
 	int batch_verts = 0;
 
-	int last_tex = GL_tmpDrawCalls[0].state.pTexture->texture_id;
-	std3D_SetTexture(GL_tmpDrawCalls[0].state.pTexture);
+	int last_tex = pTexState->pTexture->texture_id;
+	std3D_SetTexture(pTexState->pTexture);
 
-	rdMatrix44 last_mat = GL_tmpDrawCalls[0].state.modelMatrix;
-	glUniformMatrix4fv(drawcall_uniform_mvp, 1, GL_FALSE, (float*)&GL_tmpDrawCalls[0].state.viewProj);
-	glUniformMatrix4fv(drawcall_uniform_modelMatrix, 1, GL_FALSE, (float*)&GL_tmpDrawCalls[0].state.modelMatrix);
+	rdMatrix44 last_mat = pRasterState->modelMatrix;
+	rdMatrix44 last_viewProj = pRasterState->viewProj;
+	glUniformMatrix4fv(drawcall_uniform_mvp, 1, GL_FALSE, (float*)&pRasterState->viewProj);
+	glUniformMatrix4fv(drawcall_uniform_modelMatrix, 1, GL_FALSE, (float*)&pRasterState->modelMatrix);
 
-	int last_tex_mode = GL_tmpDrawCalls[0].state.texMode;
-	glUniform1i(drawcall_uniform_uv_mode, GL_tmpDrawCalls[0].state.texMode);
+	int last_tex_mode = pTexState->texMode;
+	glUniform1i(drawcall_uniform_uv_mode, pTexState->texMode);
 
-	rdVector3 lastAmbientCol = GL_tmpDrawCalls[0].state.ambientColor;
-	rdAmbient lastAmbient = GL_tmpDrawCalls[0].state.ambientStateSH;
+	rdVector3 lastAmbientCol = pLightState->ambientColor;
+	rdAmbient lastAmbient = pLightState->ambientStateSH;
 
-	glUniform3fv(drawcall_uniform_ambient_color, 1, &GL_tmpDrawCalls[0].state.ambientColor.x);
-	glUniform4fv(drawcall_uniform_ambient_sh, 3, &GL_tmpDrawCalls[0].state.ambientStateSH.r.x);
-	glUniform3fv(drawcall_uniform_ambient_sh_dir, 1, &GL_tmpDrawCalls[0].state.ambientStateSH.dominantDir.x);
+	glUniform3fv(drawcall_uniform_ambient_color, 1, &pLightState->ambientColor.x);
+	glUniform4fv(drawcall_uniform_ambient_sh, 3, &pLightState->ambientStateSH.r.x);
+	glUniform3fv(drawcall_uniform_ambient_sh_dir, 1, &pLightState->ambientStateSH.dominantDir.x);
 
 	int vertexOffset = 0;
 	for (int j = 0; j < GL_tmpDrawCallAmt; j++)
 	{
-		std3D_DrawCall* pDrawCall = &GL_tmpDrawCalls[j];
+		pDrawCall = &GL_tmpDrawCalls[j];
+		pRasterState = &pDrawCall->state.raster;
+		pTexState = &pDrawCall->state.texture;
+		pLightState = &pDrawCall->state.lighting;
 
-		if (last_tex != pDrawCall->state.pTexture->texture_id
-			|| last_tex_mode != pDrawCall->state.texMode
-			|| rdMatrix_Compare44(&last_mat, &pDrawCall->state.modelMatrix) != 0
-			|| rdVector_Compare3(&lastAmbientCol, &pDrawCall->state.ambientColor) != 0
-			|| rdAmbient_Compare(&lastAmbient, &pDrawCall->state.ambientStateSH) != 0
+		// todo: will a simple memcmp of the entire state struct work for this?
+		if (last_tex != pTexState->pTexture->texture_id
+			|| last_tex_mode != pTexState->texMode
+			|| rdMatrix_Compare44(&last_mat, &pRasterState->modelMatrix) != 0
+			|| rdMatrix_Compare44(&last_viewProj, &pRasterState->viewProj) != 0
+			|| rdVector_Compare3(&lastAmbientCol, &pLightState->ambientColor) != 0
+			|| rdAmbient_Compare(&lastAmbient, &pLightState->ambientStateSH) != 0
 		)
 		{
 			do_batch = 1;
@@ -5071,26 +5082,26 @@ void std3D_FlushDrawCalls()
 		{
 			glDrawArrays(GL_TRIANGLES, vertexOffset, batch_verts);
 
-			glUniform3fv(drawcall_uniform_ambient_color, 1, &pDrawCall->state.ambientColor.x);
-			glUniform4fv(drawcall_uniform_ambient_sh, 3, &pDrawCall->state.ambientStateSH.r.x);
-			glUniform3fv(drawcall_uniform_ambient_sh_dir, 1, &pDrawCall->state.ambientStateSH.dominantDir.x);
+			glUniform3fv(drawcall_uniform_ambient_color, 1, &pLightState->ambientColor.x);
+			glUniform4fv(drawcall_uniform_ambient_sh, 3, &pLightState->ambientStateSH.r.x);
+			glUniform3fv(drawcall_uniform_ambient_sh_dir, 1, &pLightState->ambientStateSH.dominantDir.x);
 
-			glUniform1i(drawcall_uniform_uv_mode, pDrawCall->state.texMode);
-			if (pDrawCall->state.texMode == 6)
+			glUniform1i(drawcall_uniform_uv_mode, pTexState->texMode);
+			if (pTexState->texMode == 6)
 			{
 				glUniform4f(drawcall_uniform_uv_mode_params0, sithSector_flt_8553C0, sithSector_flt_8553B8, sithSector_flt_8553C4, 0);
 				glUniform4f(drawcall_uniform_uv_mode_params1, sithSector_flt_8553C8, sithSector_flt_8553F4, 0, 0);
 				glUniform2f(drawcall_uniform_uv_offset, sithWorld_pCurrentWorld->horizontalSkyOffs.x, sithWorld_pCurrentWorld->horizontalSkyOffs.y);
 			}
-			glUniformMatrix4fv(drawcall_uniform_mvp, 1, GL_FALSE, (float*)&pDrawCall->state.viewProj);
-			glUniformMatrix4fv(drawcall_uniform_modelMatrix, 1, GL_FALSE, (float*)&pDrawCall->state.modelMatrix);
-			std3D_SetTexture(pDrawCall->state.pTexture);
+			glUniformMatrix4fv(drawcall_uniform_mvp, 1, GL_FALSE, (float*)&pRasterState->viewProj);
+			glUniformMatrix4fv(drawcall_uniform_modelMatrix, 1, GL_FALSE, (float*)&pRasterState->modelMatrix);
+			std3D_SetTexture(pTexState->pTexture);
 
-			last_tex = pDrawCall->state.pTexture->texture_id;
-			last_mat = pDrawCall->state.modelMatrix;
-			last_tex_mode = pDrawCall->state.texMode;
-			lastAmbientCol = pDrawCall->state.ambientColor;
-			lastAmbient = pDrawCall->state.ambientStateSH;
+			last_tex = pTexState->pTexture->texture_id;
+			last_mat = pRasterState->modelMatrix;
+			last_tex_mode = pTexState->texMode;
+			lastAmbientCol = pLightState->ambientColor;
+			lastAmbient = pLightState->ambientStateSH;
 
 			vertexOffset += batch_verts;
 			batch_verts = 0;

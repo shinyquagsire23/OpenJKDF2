@@ -835,21 +835,68 @@ typedef D3DVERTEX_orig D3DVERTEX;
 #endif
 
 #ifdef RENDER_DROID2
-typedef struct std3D_DrawCallState
+typedef struct rdViewportRect
 {
-	rdMatrix44      modelMatrix;    // object/model matrix
-	rdMatrix44      viewProj;       // pre-multiplied view projection matrix (todo: do we want to pull this out?)
-	rdDDrawSurface* pTexture;       // the texture to apply
-	rdTexMode_t     texMode;        // texture mode to use (affine, perspective, etc)
-	int             ambientMode;    // fixme: rdAmbientMode_t
+	float x, y, width, height, minDepth, maxDepth;
+} rdViewportRect;
+
+typedef struct rdScissorRect
+{
+	float x, y, width, height;
+} rdScissorRect;
+
+typedef struct std3D_RasterState
+{
+	rdGeoMode_t         geoMode;
+	rdVertexColorMode_t colorMode;
+	rdCullMode_t        cullMode;
+	rdScissorMode_t     scissorMode;
+	rdScissorRect       scissor;
+	rdViewportRect      viewport;
+	rdMatrix44          modelMatrix; // object/model matrix
+	rdMatrix44          viewProj;    // pre-multiplied view projection matrix (todo: do we want to pull this out?)
+} std3D_RasterState;
+
+typedef struct std3D_BlendState
+{
+	rdBlendMode_t blendMode; // todo: actual blend funcs ex. RD_ONE etc
+} std3D_BlendState;
+
+typedef struct std3D_DepthStencilState
+{
+	rdZBufferMethod_t zmethod;
+	rdCompare_t       zcompare;
+} std3D_DepthStencilState;
+
+typedef struct std3D_TextureState
+{
+	rdChromaKeyMode_t chromaKeyMode;
+	uint32_t          chromaKeyColor;
+	rdTexMode_t       texMode;
+	rdDDrawSurface*   pTexture;
+} std3D_TextureState;
+
+typedef struct std3D_LightingState
+{
+	rdLightMode_t   lightMode;
+	// todo: make ambient stuff a light type
+	rdAmbientMode_t ambientMode;    // ambient lighting mode
 	rdVector3       ambientColor;   // rgb ambient color
 	rdAmbient       ambientStateSH; // ambient spherical harmonics coefficients and dominant light dir
-	// todo: state bits, chroma color, etc
+} std3D_LightingState;
+
+typedef struct std3D_DrawCallState
+{
+	std3D_RasterState       raster;
+	std3D_BlendState        blend;
+	std3D_DepthStencilState depthStencil;
+	std3D_TextureState      texture;
+	std3D_LightingState     lighting;
 } std3D_DrawCallState;
 
 typedef struct std3D_DrawCall
 {
-	int                 sortHash;      // sort hash=
+	int                 sortHash;      // sort hash
 	int                 firstVertex;   // number of vertices in the vertex array
 	int                 numVertices;   // number of vertices in the vertex array
 	std3D_DrawCallState state;

@@ -82,16 +82,6 @@ void rdClearPostStatistics();
 //#define  (*(int*)0x)
 
 #ifdef RENDER_DROID2
-typedef struct rdViewportRect
-{
-	float x;
-	float y;
-	float width;
-	float height;
-	float minDepth;
-	float maxDepth;
-} rdViewportRect;
-
 void rdMatrixMode(rdMatrixMode_t mode);
 void rdPerspective(float fov, float aspect, float nearPlane, float farPlane);
 void rdOrthographic(float width, float height, float nearPlane, float farPlane);

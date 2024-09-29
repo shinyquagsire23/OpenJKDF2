@@ -425,7 +425,6 @@ void rdResetMatrices()
 }
 
 // Viewport
-
 void rdViewport(float x, float y, float width, float height, float minDepth, float maxDepth)
 {
 	rdroid_curViewport.x = x - 0.5f;
@@ -462,10 +461,13 @@ void rdEndPrimitive()
 		return;
 
 	std3D_DrawCallState state;
-	rdMatrix_Copy44(&state.modelMatrix, &rdroid_matrices[RD_MATRIX_MODEL]);
-	rdMatrix_Copy44(&state.viewProj, &rdroid_curViewProj);
-	state.pTexture = rdroid_curTexture;
-	state.texMode = rdroid_curPrimitiveTexMode;
+	rdMatrix_Copy44(&state.raster.modelMatrix, &rdroid_matrices[RD_MATRIX_MODEL]);
+	rdMatrix_Copy44(&state.raster.viewProj, &rdroid_curViewProj);
+	state.texture.pTexture = rdroid_curTexture;
+	state.texture.texMode = rdroid_curPrimitiveTexMode;
+	state.lighting.ambientColor = rdroid_ambientLightState;
+	state.lighting.ambientStateSH = rdroid_ambientStateSH;
+	state.lighting.ambientMode = rdroid_ambientMode;
 
 	int numVertices = 0;
 	D3DVERTEX tmpVerts[64]; // todo: indexing
@@ -496,8 +498,12 @@ void rdEndPrimitive()
 
 void rdVertex3f(float x, float y, float z)
 {
-	if(rdroid_vertexCacheNum >= 32)
+	if(rdroid_vertexCacheNum >= 24)
+	{
+		// todo: real error callback hooks
+		printf("too many vertices for primitive\n");
 		return;
+	}
 
 	D3DVERTEX* pVert = &rdroid_vertexCache[rdroid_vertexCacheNum++];
 	pVert->x = x;

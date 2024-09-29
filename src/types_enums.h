@@ -103,6 +103,13 @@ typedef enum RD_CULL_MODE
 	RD_CULL_MODE_CW_ONLY
 } RD_CULL_MODE;
 
+typedef uint8_t rdScissorMode_t;
+typedef enum RD_SCISSOR_MODE
+{
+	RD_SCISSOR_DISABLED,
+	RD_SCISSOR_ENABLED
+} RD_SCISSOR_MODE;
+
 typedef uint8_t rdVertexColorMode_t;
 typedef enum RD_VERTEX_COLOR_MODE
 {
