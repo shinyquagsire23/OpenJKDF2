@@ -721,3 +721,13 @@ void rdVector_Project3(rdVector3* out, rdVector3* p, rdVector3* o, rdVector3* n)
 	rdVector_Copy3(out, p);
 	rdVector_MultAcc3(out, n, -dist);
 }
+
+int rdVector_Compare3(const rdVector3* a, const rdVector3* b)
+{
+	return memcmp(a, b, sizeof(rdVector3));
+}
+
+int rdVector_Compare4(const rdVector4* a, const rdVector4* b)
+{
+	return memcmp(a, b, sizeof(rdVector4));
+}

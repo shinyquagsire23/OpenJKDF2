@@ -835,16 +835,25 @@ typedef D3DVERTEX_orig D3DVERTEX;
 #endif
 
 #ifdef RENDER_DROID2
-typedef struct rdPrimitive
+typedef struct std3D_DrawCallState
 {
-	int             type;          // type of primitive
-	rdMatrix44      modelViewProj; // pre-multiplied model view projection matrix
-	rdDDrawSurface* pTexture;      // the texture to apply
-	D3DVERTEX       aVertices[64]; // vertex array, max 64 per primitive
-	int             numVertices;   // number of vertices in the vertex array
+	rdMatrix44      modelMatrix;    // object/model matrix
+	rdMatrix44      viewProj;       // pre-multiplied view projection matrix (todo: do we want to pull this out?)
+	rdDDrawSurface* pTexture;       // the texture to apply
+	rdTexMode_t     texMode;        // texture mode to use (affine, perspective, etc)
+	int             ambientMode;    // fixme: rdAmbientMode_t
+	rdVector3       ambientColor;   // rgb ambient color
+	rdAmbient       ambientStateSH; // ambient spherical harmonics coefficients and dominant light dir
 	// todo: state bits, chroma color, etc
-	rdTexMode_t     texMode;
-} rdPrimitive;
+} std3D_DrawCallState;
+
+typedef struct std3D_DrawCall
+{
+	int                 sortHash;      // sort hash=
+	int                 firstVertex;   // number of vertices in the vertex array
+	int                 numVertices;   // number of vertices in the vertex array
+	std3D_DrawCallState state;
+} std3D_DrawCall;
 #endif
 
 /* 174 */

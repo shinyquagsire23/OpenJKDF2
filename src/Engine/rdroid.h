@@ -89,6 +89,14 @@ typedef enum RD_BLEND_MODE
 	RD_BLEND_MODE_ALPHA = 1
 } RD_BLEND_MODE;
 
+typedef uint8_t rdAmbientMode_t;
+typedef enum RD_AMBIENT_MODE
+{
+	RD_AMBIENT_NONE,
+	RD_AMBIENT_COLOR,
+	RD_AMBIENT_SH,
+} RD_AMBIENT_MODE;
+
 typedef uint8_t rdCompare_t;
 typedef enum RD_COMPARE
 {
@@ -205,11 +213,12 @@ void rdClearColor(uint32_t rgba);
 
 int rdBindTexture(rdMaterial* pMaterial, int cel);
 
-int rdBeginLight();
-void rdLightPosition(const rdVector3* pPos);
-void rdLightRadius(float radius);
-void rdLightColor(const rdVector3* color);
-void rdEndLight();
+int rdAddLight(rdLight* pLight, rdVector3* pPosition);
+void rdClearLights();
+
+void rdSetAmbientMode(rdAmbientMode_t type);
+void rdAmbientLight(float r, float g, float b);
+void rdAmbientLightSH(rdAmbient* amb);
 
 #endif
 

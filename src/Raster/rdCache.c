@@ -1360,7 +1360,7 @@ void rdCache_DrawRenderList()
     }
 
 #ifdef RENDER_DROID2
-	std3D_DrawPrimitiveRenderList();
+	std3D_FlushDrawCalls();
 #endif
 }
 

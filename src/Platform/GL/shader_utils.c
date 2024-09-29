@@ -134,9 +134,6 @@ GLuint create_shader(const char* shader, GLenum type, const char* userDefines)
 #ifdef FOG
 	"#define FOG\n"
 #endif
-#ifdef GPU_LIGHTING
-	"#define GPU_LIGHTING\n"
-#endif
 	;
 
 	char userDefs[1024] = { '\0' };

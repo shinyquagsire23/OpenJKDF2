@@ -14,7 +14,21 @@ out vec3 f_coord;
 out vec3 f_normal;
 out float f_depth;
 
-#ifdef GPU_LIGHTING
+#ifdef RENDER_DROID2
+uniform mat4 modelMatrix;
+uniform int uv_mode;
+uniform vec2 iResolution;
+
+uniform vec4 uv_mode_params0;
+uniform vec4 uv_mode_params1;
+uniform vec2 uv_offset;
+
+uniform vec3 ambientColor;
+uniform vec4 ambientSH[3];
+uniform vec3 ambientDominantDir;
+
+noperspective out vec2 f_uv_affine;
+
 struct light
 {
 	vec4  position;
@@ -38,17 +52,6 @@ uniform lightBlock
 {
 	light lights[128];
 };
-#endif
-
-#ifdef RENDER_DROID2
-uniform int uv_mode;
-uniform vec2 iResolution;
-
-uniform vec4 uv_mode_params0;
-uniform vec4 uv_mode_params1;
-uniform vec2 uv_offset;
-
-noperspective out vec2 f_uv_affine;
 
 vec2 get_horizon_uv(inout vec4 clip_pos)
 {
@@ -72,8 +75,9 @@ void main(void)
     pos.w = 1.0/(1.0-coord3d.z); // fixme: this doesn't match the projection matrix output AT ALL
     pos.xyz *= pos.w; // pretty sure the problem is z here
 #else
-    vec4 pos = mvp * vec4(coord3d, 1.0);
-	f_normal = v_normal;
+	vec4 worldPos = modelMatrix * vec4(coord3d, 1.0);
+    vec4 pos = mvp * worldPos;
+	f_normal = mat3(modelMatrix) * v_normal;
 #endif
  	f_depth = pos.w / 128.0;
     gl_Position = pos;
@@ -91,24 +95,21 @@ void main(void)
 #endif
     f_light = v_light;
 
-#ifdef GPU_LIGHTING
-	vec3 viewDir = normalize(-coordVS.xyz);
+#ifdef RENDER_DROID2
 	float scalar = 0.4; // todo: needs to come from rdCamera_pCurCamera->attenuationMin
 	int totalLights = min(numLights, 128);
-	vec3 specLight = vec3(0.0);
 	for(int lid = 0; lid < totalLights; ++lid)
 	{
 		light l = lights[lid];
 		//if(l.isActive == 0u)
 		//	continue;
 
-		vec3 diff = l.position.xyz - coordVS.xyz;
+		vec3 diff = l.position.xyz - worldPos.xyz;
 		float len = length(diff);
 		if ( len < l.falloffMin )
 		{
-			diff = normalize(diff);
-			// we don't have any normals from the pipeline! this super sucks, just use distance based I guess...
-			float lightMagnitude = 1.0;//dot(viewNormals, diff);
+			diff = normalize(diff);	
+			float lightMagnitude = dot(f_normal, diff);
 			if ( lightMagnitude > 0.0 )
 			{
 				float intensity = max(0.0, l.direction_intensity.w - len * scalar) * lightMagnitude;

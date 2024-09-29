@@ -546,11 +546,10 @@ void sithRender_Draw()
     sithRender_nongeoThingsDrawn = 0;
     sithRender_geoThingsDrawn = 0;
     rdCamera_ClearLights(rdCamera_pCurCamera);
-#ifdef GPU_LIGHTING
-	std3D_ClearLights();
-#endif
 
 #ifdef RENDER_DROID2
+	rdClearLights();
+	
 	rdMatrixMode(RD_MATRIX_VIEW);
 	rdIdentity();
 	rdLoadMatrix34(&rdCamera_pCurCamera->view_matrix);
@@ -1238,28 +1237,15 @@ void sithRender_RenderLevelGeometry()
 				int wallCel = v65->surfaceInfo.face.wallCel;
 				rdBindTexture(surfaceMat, wallCel);
 
-#ifdef RGB_AMBIENT
-				rdVector3 ambientLight;
-#else
-				float ambientLight;
-#endif
+				rdSetAmbientMode(RD_AMBIENT_NONE);
 				if (sithRender_lightingIRMode)
 				{
-#ifdef RGB_AMBIENT
-					v49.x = v49.y = v49.z = sithRender_f_83198C;
-					rdVector_Copy3(&ambientLight, &v49);
-#else
-					v49 = sithRender_f_83198C;
-					ambientLight = v49;
-#endif
+					rdAmbientLight(sithRender_f_83198C, sithRender_f_83198C, sithRender_f_83198C);
 				}
 				else
 				{
-#ifdef RGB_AMBIENT
-					ambientLight.x = ambientLight.y = ambientLight.z = stdMath_Clamp(level_idk->extraLight + v65->surfaceInfo.face.extraLight + sithRender_008d4098, 0.0, 1.0);
-#else
-					ambientLight = stdMath_Clamp(level_idk->extraLight + v65->surfaceInfo.face.extraLight + sithRender_008d4098, 0.0, 1.0);
-#endif
+					float extra = stdMath_Clamp(level_idk->extraLight + v65->surfaceInfo.face.extraLight + sithRender_008d4098, 0.0, 1.0);
+					rdAmbientLight(extra, extra, extra);
 				}
 
 				// todo: sky stuff
@@ -1273,23 +1259,14 @@ void sithRender_RenderLevelGeometry()
 						if ((v65->surfaceFlags & SITH_SURFACE_1000000) == 0)
 						{
 							float intensity = v65->surfaceInfo.intensities[j];
-#ifdef RGB_AMBIENT
-							rdColor4f(intensity + ambientLight.x, intensity + ambientLight.y, intensity + ambientLight.z, 1.0f); // todo: alpha
-#else
-							intensity += ambientLight;
 							rdColor4f(intensity, intensity, intensity, 1.0f); // todo: alpha
-#endif
 						}
 						else
 						{
 							float* red = (v65->surfaceInfo).intensities + v65->surfaceInfo.face.numVertices;
 							float* green = red + v65->surfaceInfo.face.numVertices;
 							float* blue = green + v65->surfaceInfo.face.numVertices;
-#ifdef RGB_AMBIENT
-							rdColor4f(red[j] + ambientLight.x, green[j] + ambientLight.y, blue[j] + ambientLight.z, 1.0f); // todo: alpha
-#else
-							rdColor4f(red[j] + ambientLight, green[j] + ambientLight, blue[j] + ambientLight, 1.0f); // todo: alpha
-#endif
+							rdColor4f(red[j], green[j], blue[j], 1.0f); // todo: alpha
 						}
 						rdVector2* uv = &sithWorld_pCurrentWorld->vertexUVs[uvidx];
 						rdTexCoord2i(uv->x, uv->y);
@@ -1974,13 +1951,10 @@ void sithRender_UpdateLights(sithSector *sector, float prev, float dist, int dep
 
 void sithRender_RenderDynamicLights()
 {
-#ifdef GPU_LIGHTING
+#ifdef RENDER_DROID2
+	// this is now done on the GPU
 	for (int i = 0; i < rdCamera_pCurCamera->numLights; i++)
-	{
-		rdVector3 viewPos;
-		rdMatrix_TransformPoint34(&viewPos, &rdCamera_pCurCamera->lightPositions[i], &rdCamera_pCurCamera->view_matrix);
-		std3D_AddLight(rdCamera_pCurCamera->lights[i], &viewPos);
-	}
+		rdAddLight(rdCamera_pCurCamera->lights[i], &rdCamera_pCurCamera->lightPositions[i]);
 #else
     sithSector *sectorIter;
     rdLight **curCamera_lights;

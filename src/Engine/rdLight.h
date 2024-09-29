@@ -46,6 +46,7 @@ void rdLight_CalcDistFaceIntensity();
 
 #ifdef RGB_AMBIENT
 void rdAmbient_Zero(rdAmbient* ambient);
+int rdAmbient_Compare(const rdAmbient* a, const rdAmbient* b);
 void rdAmbient_Acc(rdAmbient* ambient, rdVector3* color, rdVector3* dir);
 void rdAmbient_Scale(rdAmbient* ambient, float scale);
 void rdAmbient_Lerp(rdAmbient* out, const rdAmbient* ambient0, const rdAmbient* ambient2, float amount);

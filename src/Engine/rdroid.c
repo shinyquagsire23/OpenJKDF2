@@ -51,10 +51,9 @@ static rdMatrix44 rdroid_curProjInv;
 static rdMatrix44 rdroid_curViewProjInv;
 static rdVector3 rdroid_curRotationPYR;
 
-static int rdroid_lightType = 0;
-static rdVector3 rdroid_lightPosState = { 0.0f, 0.0f, 0.0f };
-static float rdroid_lightRadiusState = 0.0f;
-static rdVector3 rdroid_lightColorState = { 0.0f, 0.0f, 0.0f };
+static rdAmbientMode_t rdroid_ambientMode = RD_AMBIENT_COLOR;
+static rdVector3 rdroid_ambientLightState = { 0.0f, 0.0f, 0.0f };
+static rdAmbient rdroid_ambientStateSH;
 
 #endif
 
@@ -455,35 +454,38 @@ int rdBeginPrimitive(rdPrimitiveType_t type)
 	return 1;
 }
 
-void std3D_AddRenderListPrimitive(rdPrimitive* pPrimitive);
+void std3D_AddDrawCall(std3D_DrawCallState* pDrawCallState, D3DVERTEX* paVertices, int numVertices);
 
 void rdEndPrimitive()
 {
 	if(rdroid_vertexCacheNum == 0)
 		return;
 
-	rdPrimitive prim;
-	rdMatrix_Multiply44(&prim.modelViewProj, &rdroid_matrices[RD_MATRIX_MODEL], &rdroid_curViewProj);
-	prim.pTexture = rdroid_curTexture;
-	prim.texMode = rdroid_curPrimitiveTexMode;
+	std3D_DrawCallState state;
+	rdMatrix_Copy44(&state.modelMatrix, &rdroid_matrices[RD_MATRIX_MODEL]);
+	rdMatrix_Copy44(&state.viewProj, &rdroid_curViewProj);
+	state.pTexture = rdroid_curTexture;
+	state.texMode = rdroid_curPrimitiveTexMode;
 
+	int numVertices = 0;
+	D3DVERTEX tmpVerts[64]; // todo: indexing
 	if (rdroid_curPrimitiveType == RD_PRIMITIVE_TRIANGLES)
 	{
-		prim.numVertices = rdroid_vertexCacheNum;
-		memcpy(prim.aVertices, rdroid_vertexCache, sizeof(D3DVERTEX) * rdroid_vertexCacheNum);
+		numVertices = rdroid_vertexCacheNum;
+		memcpy(tmpVerts, rdroid_vertexCache, sizeof(D3DVERTEX) * rdroid_vertexCacheNum);
 	}
 	else
 	{
-		prim.numVertices = 3 * (rdroid_vertexCacheNum - 2);
+		numVertices = 3 * (rdroid_vertexCacheNum - 2);
 		for (size_t i = 0; i < rdroid_vertexCacheNum - 2; i++)
 		{
-			prim.aVertices[i * 3 + 0] = rdroid_vertexCache[0];
-			prim.aVertices[i * 3 + 1] = rdroid_vertexCache[i + 1];
-			prim.aVertices[i * 3 + 2] = rdroid_vertexCache[i + 2];
+			tmpVerts[i * 3 + 0] = rdroid_vertexCache[0];
+			tmpVerts[i * 3 + 1] = rdroid_vertexCache[i + 1];
+			tmpVerts[i * 3 + 2] = rdroid_vertexCache[i + 2];
 		}
 	}
 
-	std3D_AddRenderListPrimitive(&prim);
+	std3D_AddDrawCall(&state, tmpVerts, numVertices);
 
 	rdroid_vertexCacheNum = 0;
 	rdroid_vertexColorState = 0xFFFFFFFF;
@@ -675,36 +677,31 @@ void rdSetTexMode(int a1)
 }
 
 // Lighting
-int rdBeginLight()
+int std3D_AddLight(rdLight* light, rdVector3* viewPosition);
+int rdAddLight(rdLight* pLight, rdVector3* pPosition)
 {
-	if (rdroid_lightType != 0)
-		return 0;
-	// todo
-	rdroid_lightType = 1;
-	return 1;
+	return std3D_AddLight(pLight, pPosition);
 }
 
-void rdLightPosition(const rdVector3* pPos)
+void std3D_ClearLights();
+void rdClearLights()
 {
-	rdVector_Copy3(&rdroid_lightPosState, pPos);
+	std3D_ClearLights();
 }
 
-void rdLightRadius(float radius)
+void rdSetAmbientMode(rdAmbientMode_t type)
 {
-	rdroid_lightRadiusState = radius;
+	rdroid_ambientMode = type;
 }
 
-void rdLightColor(const rdVector3* pColor)
+void rdAmbientLight(float r, float g, float b)
 {
-	rdVector_Copy3(&rdroid_lightColorState, pColor);
+	rdVector_Set3(&rdroid_ambientLightState, r, g, b);
 }
 
-void rdEndLight()
+void rdAmbientLightSH(rdAmbient* amb)
 {
-	if (rdroid_lightType == 0)
-		return;
-	// todo
-	rdroid_lightType = 0;
+	rdAmbient_Copy(&rdroid_ambientStateSH, amb);
 }
 
 #endif

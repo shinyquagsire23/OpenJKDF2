@@ -575,6 +575,11 @@ void rdAmbient_Zero(rdAmbient* ambient)
 	memset(ambient, 0, sizeof(rdAmbient));
 }
 
+int rdAmbient_Compare(const rdAmbient* a, const rdAmbient* b)
+{
+	return memcmp(a, b, sizeof(rdAmbient));
+}
+
 void rdAmbient_Acc(rdAmbient* ambient, rdVector3* color, rdVector3* dir)
 {
 	static const float c = 0.282094792;

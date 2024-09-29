@@ -129,11 +129,6 @@ void std3D_ResetDecalRenderList();
 void std3D_DrawDecal(rdDDrawSurface* texture, rdVector3* verts, rdMatrix34* decalMatrix, rdVector3* color, uint32_t flags, float angleFade);
 #endif
 
-#ifdef GPU_LIGHTING
-void std3D_ClearLights();
-void std3D_AddLight(rdLight* light, rdVector3* viewPosition);
-#endif
-
 #ifdef PARTICLE_LIGHTS
 void std3D_DrawLight(rdLight* light, rdVector3* position, rdVector3* verts);
 #endif
@@ -145,9 +140,11 @@ void std3D_DrawOccluder(rdVector3* position, float radius, rdVector3* verts);
 // alternative 3d pipeline with HW T&L
 #ifdef RENDER_DROID2
 
-void std3D_AddRenderListPrimitive(rdPrimitive* pPrimitive);
-void std3D_ResetPrimitiveRenderList();
-void std3D_DrawPrimitiveRenderList();
+void std3D_ClearLights();
+int std3D_AddLight(rdLight* light, rdVector3* viewPosition);
+void std3D_AddDrawCall(std3D_DrawCallState* pDrawCallState, D3DVERTEX* paVertices, int numVertices);
+void std3D_ResetDrawCalls();
+void std3D_FlushDrawCalls();
 
 #endif
 

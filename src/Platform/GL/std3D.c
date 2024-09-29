@@ -148,21 +148,51 @@ GLint uniform_light_mult, uniform_displacement_factor, uniform_iResolution, unif
 GLint uniform_fog, uniform_fog_color, uniform_fog_start, uniform_fog_end;
 #endif
 
-// todo: make some kind of helper for this, very redundant
 #ifdef RENDER_DROID2
-GLuint programPrimitives;
-GLint prim_attribute_coord3d, prim_attribute_v_color, prim_attribute_v_light, prim_attribute_v_uv, prim_attribute_v_norm;
+typedef struct std3D_light
+{
+	rdVector4 position;
+	rdVector4 direction_intensity;
+	rdVector4 color;
+	int32_t   type;
+	uint32_t  active;
+	float     falloffMin;
+	float     falloffMax;
+	float     angleX;
+	float     cosAngleX;
+	float     angleY;
+	float     cosAngleY;
+	float     lux;
+	float     padding0;
+	float padding1;
+	float padding2;
+} std3D_light;
+
+int lightsDirty = 0;
+unsigned int numLights = 0;
+std3D_light tmpLights[RDCAMERA_MAX_LIGHTS];
+
+GLuint light_ubo;
+GLuint uniform_lights;
+GLuint uniform_numLights;
+
+void std3D_FlushLights();
+
+// todo: clean me
+GLuint drawcall_program;
+GLint drawcall_attribute_coord3d, drawcall_attribute_v_color, drawcall_attribute_v_light, drawcall_attribute_v_uv, drawcall_attribute_v_norm;
 #ifdef VIEW_SPACE_GBUFFER
-GLint prim_attribute_coordVS;
+GLint drawcall_attribute_coordVS;
 #endif
-GLint prim_uniform_uv_mode, prim_uniform_uv_mode_params0, prim_uniform_uv_mode_params1, prim_uniform_uv_offset;
-GLint prim_uniform_mvp, prim_uniform_tex, prim_uniform_texEmiss, prim_uniform_displacement_map, prim_uniform_tex_mode, prim_uniform_blend_mode, prim_uniform_worldPalette, prim_uniform_worldPaletteLights;
-GLint prim_uniform_tint, prim_uniform_filter, prim_uniform_fade, prim_uniform_add, prim_uniform_emissiveFactor, prim_uniform_albedoFactor;
-GLint prim_uniform_light_mult, prim_uniform_displacement_factor, prim_uniform_iResolution, prim_uniform_enableDither;
+GLint drawcall_uniform_ambient_color, drawcall_uniform_ambient_sh, drawcall_uniform_ambient_sh_dir;
+GLint drawcall_uniform_uv_mode, drawcall_uniform_uv_mode_params0, drawcall_uniform_uv_mode_params1, drawcall_uniform_uv_offset;
+GLint drawcall_uniform_mvp, drawcall_uniform_modelMatrix, drawcall_uniform_tex, drawcall_uniform_texEmiss, drawcall_uniform_displacement_map, drawcall_uniform_tex_mode, drawcall_uniform_blend_mode, drawcall_uniform_worldPalette, drawcall_uniform_worldPaletteLights;
+GLint drawcall_uniform_tint, drawcall_uniform_filter, drawcall_uniform_fade, drawcall_uniform_add, drawcall_uniform_emissiveFactor, drawcall_uniform_albedoFactor;
+GLint drawcall_uniform_light_mult, drawcall_uniform_displacement_factor, drawcall_uniform_iResolution, drawcall_uniform_enableDither;
 #ifdef FOG
-GLint prim_uniform_fog, prim_uniform_fog_color, prim_uniform_fog_start, prim_uniform_fog_end;
+GLint drawcall_uniform_fog, drawcall_uniform_fog_color, drawcall_uniform_fog_start, drawcall_uniform_fog_end;
 #endif
-GLuint prim_vao;
+GLuint drawcall_vao;
 #endif
 
 GLint programMenu_attribute_coord3d, programMenu_attribute_v_color, programMenu_attribute_v_uv, programMenu_attribute_v_norm;
@@ -233,37 +263,6 @@ extern int jkGuiBuildMulti_bRendering;
 int std3D_bInitted = 0;
 rdColormap std3D_ui_colormap;
 int std3D_bReinitHudElements = 0;
-
-#ifdef GPU_LIGHTING
-typedef struct std3D_light
-{
-	rdVector4 position;
-	rdVector4 direction_intensity;
-	rdVector4 color;
-	int32_t   type;
-	uint32_t  active;
-	float     falloffMin;
-	float     falloffMax;
-	float     angleX;
-	float     cosAngleX;
-	float     angleY;
-	float     cosAngleY;
-	float     lux;
-	float     padding0;
-	float padding1;
-	float padding2;
-} std3D_light;
-
-int lightsDirty = 0;
-unsigned int numLights = 0;
-std3D_light tmpLights[RDCAMERA_MAX_LIGHTS];
-
-GLuint light_ubo;
-GLuint uniform_lights;
-GLuint uniform_numLights;
-
-void std3D_FlushLights();
-#endif
 
 #ifdef DEFERRED_FRAMEWORK
 typedef struct std3D_deferredStage
@@ -1084,15 +1083,23 @@ void std3D_setupMenuVAO()
 
 #ifdef RENDER_DROID2
 
-void std3D_setupPrimWorldVAO()
+void std3D_setupLightingUBO()
 {
-	glGenVertexArrays(1, &prim_vao);
-	glBindVertexArray(prim_vao);
+	glGenBuffers(1, &light_ubo);
+	glBindBuffer(GL_UNIFORM_BUFFER, light_ubo);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(tmpLights), NULL, GL_DYNAMIC_DRAW);
+	glUniformBlockBinding(drawcall_program, uniform_lights, 0);
+}
+
+void std3D_setupDrawCallVAO()
+{
+	glGenVertexArrays(1, &drawcall_vao);
+	glBindVertexArray(drawcall_vao);
 
 	// Describe our vertices array to OpenGL (it can't guess its format automatically)
 	glBindBuffer(GL_ARRAY_BUFFER, world_vbo_all);
 	glVertexAttribPointer(
-		prim_attribute_coord3d, // attribute
+		drawcall_attribute_coord3d, // attribute
 		3,                 // number of elements per vertex, here (x,y,z)
 		GL_FLOAT,          // the type of each element
 		GL_FALSE,          // normalize fixed-point data?
@@ -1101,7 +1108,7 @@ void std3D_setupPrimWorldVAO()
 	);
 
 	glVertexAttribPointer(
-		prim_attribute_v_color, // attribute
+		drawcall_attribute_v_color, // attribute
 		4,                 // number of elements per vertex, here (R,G,B,A)
 		GL_UNSIGNED_BYTE,  // the type of each element
 		GL_TRUE,          // normalize fixed-point data?
@@ -1110,7 +1117,7 @@ void std3D_setupPrimWorldVAO()
 	);
 
 	glVertexAttribPointer(
-		prim_attribute_v_light, // attribute
+		drawcall_attribute_v_light, // attribute
 		1,                 // number of elements per vertex, here (L)
 		GL_FLOAT,  // the type of each element
 		GL_FALSE,          // normalize fixed-point data?
@@ -1119,7 +1126,7 @@ void std3D_setupPrimWorldVAO()
 	);
 
 	glVertexAttribPointer(
-		prim_attribute_v_uv,    // attribute
+		drawcall_attribute_v_uv,    // attribute
 		2,                 // number of elements per vertex, here (U,V)
 		GL_FLOAT,          // the type of each element
 		GL_FALSE,          // take our values as-is
@@ -1128,7 +1135,7 @@ void std3D_setupPrimWorldVAO()
 	);
 	
 	glVertexAttribPointer(
-		prim_attribute_v_norm, // attribute
+		drawcall_attribute_v_norm, // attribute
 			3,                 // number of elements per vertex, here (x,y,z)
 			GL_FLOAT,          // the type of each element
 			GL_FALSE,          // normalize fixed-point data?
@@ -1138,7 +1145,7 @@ void std3D_setupPrimWorldVAO()
 
 #ifdef VIEW_SPACE_GBUFFER
 	glVertexAttribPointer(
-		prim_attribute_coordVS, // attribute
+		drawcall_attribute_coordVS, // attribute
 		3,                 // number of elements per vertex, here (x,y,z)
 		GL_FLOAT,          // the type of each element
 		GL_FALSE,          // normalize fixed-point data?
@@ -1147,14 +1154,14 @@ void std3D_setupPrimWorldVAO()
 	);
 #endif
 
-	glEnableVertexAttribArray(prim_attribute_coord3d);
-	glEnableVertexAttribArray(prim_attribute_v_color);
-	glEnableVertexAttribArray(prim_attribute_v_light);
-	glEnableVertexAttribArray(prim_attribute_v_uv);
-	glEnableVertexAttribArray(prim_attribute_v_norm);
+	glEnableVertexAttribArray(drawcall_attribute_coord3d);
+	glEnableVertexAttribArray(drawcall_attribute_v_color);
+	glEnableVertexAttribArray(drawcall_attribute_v_light);
+	glEnableVertexAttribArray(drawcall_attribute_v_uv);
+	glEnableVertexAttribArray(drawcall_attribute_v_norm);
 
 #ifdef VIEW_SPACE_GBUFFER
-	glEnableVertexAttribArray(prim_attribute_coordVS);
+	glEnableVertexAttribArray(drawcall_attribute_coordVS);
 #endif
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, world_ibo_triangle);
@@ -1186,7 +1193,7 @@ int init_resources()
     if ((programDefault = std3D_loadProgram("shaders/default", "")) == 0) return false;
     if ((programMenu = std3D_loadProgram("shaders/menu", "")) == 0) return false;
 #ifdef RENDER_DROID2
-	if ((programPrimitives = std3D_loadProgram("shaders/default", "RENDER_DROID2")) == 0) return false;
+	if ((drawcall_program = std3D_loadProgram("shaders/default", "RENDER_DROID2")) == 0) return false;
 #endif
     if (!std3D_loadSimpleTexProgram("shaders/ui", &std3D_uiProgram)) return false;
     if (!std3D_loadSimpleTexProgram("shaders/texfbo", &std3D_texFboStage)) return false;
@@ -1251,43 +1258,48 @@ int init_resources()
 #endif
     
 #ifdef RENDER_DROID2
-	prim_attribute_coord3d = std3D_tryFindAttribute(programPrimitives, "coord3d");
+	drawcall_attribute_coord3d = std3D_tryFindAttribute(drawcall_program, "coord3d");
 #ifdef VIEW_SPACE_GBUFFER
-	prim_attribute_coordVS = std3D_tryFindAttribute(programPrimitives, "coordVS");
+	drawcall_attribute_coordVS = std3D_tryFindAttribute(drawcall_program, "coordVS");
 #endif
-	prim_attribute_v_color = std3D_tryFindAttribute(programPrimitives, "v_color");
-	prim_attribute_v_light = std3D_tryFindAttribute(programPrimitives, "v_light");
-	prim_attribute_v_uv = std3D_tryFindAttribute(programPrimitives, "v_uv");
-	prim_attribute_v_norm = std3D_tryFindAttribute(programPrimitives, "v_normal");
-	prim_uniform_mvp = std3D_tryFindUniform(programPrimitives, "mvp");
-	prim_uniform_uv_mode = std3D_tryFindUniform(programPrimitives, "uv_mode");
-	prim_uniform_uv_mode_params0 = std3D_tryFindUniform(programPrimitives, "uv_mode_params0");
-	prim_uniform_uv_mode_params1 = std3D_tryFindUniform(programPrimitives, "uv_mode_params1");
-	prim_uniform_uv_offset = std3D_tryFindUniform(programPrimitives, "uv_offset");
-
-	prim_uniform_tex = std3D_tryFindUniform(programPrimitives, "tex");
-	prim_uniform_texEmiss = std3D_tryFindUniform(programPrimitives, "texEmiss");
-	prim_uniform_worldPalette = std3D_tryFindUniform(programPrimitives, "worldPalette");
-	prim_uniform_worldPaletteLights = std3D_tryFindUniform(programPrimitives, "worldPaletteLights");
-	prim_uniform_displacement_map = std3D_tryFindUniform(programPrimitives, "displacement_map");
-	prim_uniform_tex_mode = std3D_tryFindUniform(programPrimitives, "tex_mode");
-	prim_uniform_blend_mode = std3D_tryFindUniform(programPrimitives, "blend_mode");
-	prim_uniform_tint = std3D_tryFindUniform(programPrimitives, "colorEffects_tint");
-	prim_uniform_filter = std3D_tryFindUniform(programPrimitives, "colorEffects_filter");
-	prim_uniform_fade = std3D_tryFindUniform(programPrimitives, "colorEffects_fade");
-	prim_uniform_add = std3D_tryFindUniform(programPrimitives, "colorEffects_add");
-	prim_uniform_emissiveFactor = std3D_tryFindUniform(programPrimitives, "emissiveFactor");
-	prim_uniform_albedoFactor = std3D_tryFindUniform(programPrimitives, "albedoFactor");
-	prim_uniform_light_mult = std3D_tryFindUniform(programPrimitives, "light_mult");
-	prim_uniform_displacement_factor = std3D_tryFindUniform(programPrimitives, "displacement_factor");
-	prim_uniform_iResolution = std3D_tryFindUniform(programPrimitives, "iResolution");
-	prim_uniform_enableDither = std3D_tryFindUniform(programPrimitives, "enableDither");
+	drawcall_attribute_v_color = std3D_tryFindAttribute(drawcall_program, "v_color");
+	drawcall_attribute_v_light = std3D_tryFindAttribute(drawcall_program, "v_light");
+	drawcall_attribute_v_uv = std3D_tryFindAttribute(drawcall_program, "v_uv");
+	drawcall_attribute_v_norm = std3D_tryFindAttribute(drawcall_program, "v_normal");
+	drawcall_uniform_mvp = std3D_tryFindUniform(drawcall_program, "mvp");
+	drawcall_uniform_modelMatrix = std3D_tryFindUniform(drawcall_program, "modelMatrix");
+	drawcall_uniform_uv_mode = std3D_tryFindUniform(drawcall_program, "uv_mode");
+	drawcall_uniform_uv_mode_params0 = std3D_tryFindUniform(drawcall_program, "uv_mode_params0");
+	drawcall_uniform_uv_mode_params1 = std3D_tryFindUniform(drawcall_program, "uv_mode_params1");
+	drawcall_uniform_uv_offset = std3D_tryFindUniform(drawcall_program, "uv_offset");
+	drawcall_uniform_ambient_color = std3D_tryFindUniform(drawcall_program, "ambientColor");
+	drawcall_uniform_ambient_sh = std3D_tryFindUniform(drawcall_program, "ambientSH");
+	drawcall_uniform_ambient_sh_dir = std3D_tryFindUniform(drawcall_program, "ambientDominantDir");
+	drawcall_uniform_tex = std3D_tryFindUniform(drawcall_program, "tex");
+	drawcall_uniform_texEmiss = std3D_tryFindUniform(drawcall_program, "texEmiss");
+	drawcall_uniform_worldPalette = std3D_tryFindUniform(drawcall_program, "worldPalette");
+	drawcall_uniform_worldPaletteLights = std3D_tryFindUniform(drawcall_program, "worldPaletteLights");
+	drawcall_uniform_displacement_map = std3D_tryFindUniform(drawcall_program, "displacement_map");
+	drawcall_uniform_tex_mode = std3D_tryFindUniform(drawcall_program, "tex_mode");
+	drawcall_uniform_blend_mode = std3D_tryFindUniform(drawcall_program, "blend_mode");
+	drawcall_uniform_tint = std3D_tryFindUniform(drawcall_program, "colorEffects_tint");
+	drawcall_uniform_filter = std3D_tryFindUniform(drawcall_program, "colorEffects_filter");
+	drawcall_uniform_fade = std3D_tryFindUniform(drawcall_program, "colorEffects_fade");
+	drawcall_uniform_add = std3D_tryFindUniform(drawcall_program, "colorEffects_add");
+	drawcall_uniform_emissiveFactor = std3D_tryFindUniform(drawcall_program, "emissiveFactor");
+	drawcall_uniform_albedoFactor = std3D_tryFindUniform(drawcall_program, "albedoFactor");
+	drawcall_uniform_light_mult = std3D_tryFindUniform(drawcall_program, "light_mult");
+	drawcall_uniform_displacement_factor = std3D_tryFindUniform(drawcall_program, "displacement_factor");
+	drawcall_uniform_iResolution = std3D_tryFindUniform(drawcall_program, "iResolution");
+	drawcall_uniform_enableDither = std3D_tryFindUniform(drawcall_program, "enableDither");
 #ifdef FOG
-	prim_uniform_fog = std3D_tryFindUniform(programPrimitives, "fogEnabled");
-	prim_uniform_fog_color = std3D_tryFindUniform(programPrimitives, "fogColor");
-	prim_uniform_fog_start = std3D_tryFindUniform(programPrimitives, "fogStart");
-	prim_uniform_fog_end = std3D_tryFindUniform(programPrimitives, "fogEnd");
+	drawcall_uniform_fog = std3D_tryFindUniform(drawcall_program, "fogEnabled");
+	drawcall_uniform_fog_color = std3D_tryFindUniform(drawcall_program, "fogColor");
+	drawcall_uniform_fog_start = std3D_tryFindUniform(drawcall_program, "fogStart");
+	drawcall_uniform_fog_end = std3D_tryFindUniform(drawcall_program, "fogEnd");
 #endif
+	uniform_lights = glGetUniformBlockIndex(drawcall_program, "lightBlock");
+	uniform_numLights = std3D_tryFindUniform(drawcall_program, "numLights");
 #endif
 
     programMenu_attribute_coord3d = std3D_tryFindAttribute(programMenu, "coord3d");
@@ -1296,18 +1308,7 @@ int init_resources()
     programMenu_uniform_mvp = std3D_tryFindUniform(programMenu, "mvp");
     programMenu_uniform_tex = std3D_tryFindUniform(programMenu, "tex");
     programMenu_uniform_displayPalette = std3D_tryFindUniform(programMenu, "displayPalette");
-
-#ifdef GPU_LIGHTING
-	uniform_lights = glGetUniformBlockIndex(programDefault, "lightBlock");
-
-	glGenBuffers(1, &light_ubo);
-	glBindBuffer(GL_UNIFORM_BUFFER, light_ubo);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(tmpLights), NULL, GL_DYNAMIC_DRAW);
-	glUniformBlockBinding(programDefault, uniform_lights, 0);
-
-	uniform_numLights = std3D_tryFindUniform(programDefault, "numLights");
-#endif
-    
+   
     // Blank texture
     glGenTextures(1, &blank_tex);
     blank_data = jkgm_alloc_aligned(0x400);
@@ -1440,7 +1441,8 @@ int init_resources()
 	std3D_setupWorldVAO();
 	std3D_setupMenuVAO();
 #ifdef RENDER_DROID2
-	std3D_setupPrimWorldVAO();
+	std3D_setupDrawCallVAO();
+	std3D_setupLightingUBO();
 #endif
 
     has_initted = true;
@@ -1531,8 +1533,9 @@ void std3D_FreeResources()
 
     glDeleteBuffers(1, &menu_vbo_all);
 
-#ifdef GPU_LIGHTING
+#ifdef RENDER_DROID2
 	glDeleteBuffers(1, &light_ubo);
+	glDeleteProgram(drawcall_program);
 #endif
 
 #ifdef DECAL_RENDERING
@@ -3080,10 +3083,6 @@ void std3D_DrawRenderList()
 {
     if (Main_bHeadless) return;
 
-#ifdef GPU_LIGHTING
-	std3D_FlushLights();
-#endif
-
     //printf("Draw render list\n");
     glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->fbo);
 	std3D_useProgram(programDefault);
@@ -3244,11 +3243,6 @@ void std3D_DrawRenderList()
 	glUniform4f(uniform_fog_color, rdroid_curFogColor.x, rdroid_curFogColor.y, rdroid_curFogColor.z, rdroid_curFogColor.w);
 	glUniform1f(uniform_fog_start, rdroid_curFogStartDepth);
 	glUniform1f(uniform_fog_end, rdroid_curFogEndDepth);
-#endif
-
-#ifdef GPU_LIGHTING
-	glBindBufferBase(GL_UNIFORM_BUFFER, 0, light_ubo);
-	glUniform1i(uniform_numLights, numLights);
 #endif
 
     rdTri* tris = GL_tmpTris;
@@ -4714,57 +4708,6 @@ void std3D_DrawDecal(rdDDrawSurface* texture, rdVector3* verts, rdMatrix34* deca
 }
 #endif
 
-#ifdef GPU_LIGHTING
-
-// todo: once matrices are on the GPU, and we have proper normals, we can revive this and add some CPU based clustering
-// the clusters can be uploaded to a buffer texture or a simple integer texture and read in the shader for per-pixel lighting
-void std3D_ClearLights()
-{
-	numLights = 0;
-}
-
-void std3D_AddLight(rdLight* light, rdVector3* viewPosition)
-{
-	lightsDirty = 1;
-	std3D_light* light3d = &tmpLights[numLights++];
-	light3d->type = light->type;
-	light3d->active = light->active;
-	light3d->position.x = viewPosition->x;
-	light3d->position.y = viewPosition->y;
-	light3d->position.z = viewPosition->z;
-	light3d->direction_intensity.x = light->direction.x;
-	light3d->direction_intensity.y = light->direction.y;
-	light3d->direction_intensity.z = light->direction.z;
-	light3d->direction_intensity.w = light->intensity;
-	light3d->color.x = light->color.x;
-	light3d->color.y = light->color.y;
-	light3d->color.z = light->color.z;
-	light3d->color.w = 0;
-#ifdef JKM_LIGHTING
-	light3d->angleX = light->angleX;
-	light3d->cosAngleX = light->cosAngleX;
-	light3d->angleY = light->angleY;
-	light3d->cosAngleY = light->cosAngleY;
-	light3d->lux = light->lux;
-#endif
-	light3d->falloffMin = light->falloffMin;
-	light3d->falloffMax = light->falloffMax;
-}
-
-void std3D_FlushLights()
-{
-	if(lightsDirty)
-	{
-		glBindBuffer(GL_UNIFORM_BUFFER, light_ubo);
-		glBufferData(GL_UNIFORM_BUFFER, sizeof(tmpLights), &tmpLights, GL_DYNAMIC_DRAW);
-		lightsDirty = 0;
-	}
-}
-
-#endif
-
-
-
 #ifdef PARTICLE_LIGHTS
 void std3D_DrawLight(rdLight* light, rdVector3* position, rdVector3* verts)
 {
@@ -4884,30 +4827,61 @@ void std3D_DrawOccluder(rdVector3* position, float radius, rdVector3* verts)
 
 
 #ifdef RENDER_DROID2
-#define STD3D_MAX_PRIMITIVES 8192
+// todo: indexing
+#define STD3D_MAX_DRAW_CALLS 8192
+#define STD3D_MAX_DRAW_CALL_VERTS (STD3D_MAX_DRAW_CALLS * 64)
 
-static rdPrimitive GL_tmpPrimitives[STD3D_MAX_PRIMITIVES] = { 0 };
-static size_t GL_tmpPrimitivesAmt = 0;
+static std3D_DrawCall GL_tmpDrawCalls[STD3D_MAX_DRAW_CALLS] = { 0 };
+static size_t GL_tmpDrawCallAmt = 0;
 
-static D3DVERTEX GL_tmpPrimitiveVertices[STD3D_MAX_PRIMITIVES * 64] = { 0 };
-static size_t GL_tmpPrimitiveVerticesAmt = 0;
+static D3DVERTEX GL_tmpDrawCallVertices[STD3D_MAX_DRAW_CALL_VERTS] = { 0 };
+static size_t GL_tmpDrawCallVerticesAmt = 0;
 
-void std3D_AddRenderListPrimitive(rdPrimitive* pPrimitive)
+static D3DVERTEX GL_tmpDrawCallVerticesSorted[STD3D_MAX_DRAW_CALL_VERTS] = { 0 };
+
+int std3D_ComputeDrawCallSortHash(std3D_DrawCallState* pState)
+{
+	int sortHash = 0;
+	//hash |= ((proc->type & RD_FF_TEX_TRANSLUCENT) == RD_FF_TEX_TRANSLUCENT) << 31;
+	//hash |= ((proc->type & RD_FF_DOUBLE_SIDED) == RD_FF_DOUBLE_SIDED) << 30;
+	//RD_FF_TEX_CLAMP_X
+	//RD_FF_TEX_CLAMP_Y
+	//RD_FF_TEX_FILTER_NEAREST
+	//RD_FF_ZWRITE_DISABLED
+#ifdef ADDITIVE_BLEND
+	//hash |= ((proc->type & RD_FF_ADDITIVE) == RD_FF_ADDITIVE) << 30;
+	//hash |= ((proc->type & RD_FF_SCREEN) == RD_FF_SCREEN) << 28;
+#endif
+	sortHash |= pState->texMode << 16;
+	sortHash |= (pState->pTexture ? pState->pTexture->texture_id : 0);
+	return sortHash;
+}
+
+void std3D_AddDrawCall(std3D_DrawCallState* pDrawCallState, D3DVERTEX* paVertices, int numVertices)
 {
 	if (Main_bHeadless)
 		return;
 
-	if (GL_tmpPrimitivesAmt + 1 > STD3D_MAX_PRIMITIVES)
-		return;
+	if (GL_tmpDrawCallAmt + 1 > STD3D_MAX_DRAW_CALLS)
+		return; // todo: flush here?
 
-	memcpy(&GL_tmpPrimitives[GL_tmpPrimitivesAmt], pPrimitive, sizeof(rdPrimitive));
-	++GL_tmpPrimitivesAmt;
+	if (GL_tmpDrawCallVerticesAmt + numVertices > STD3D_MAX_DRAW_CALL_VERTS)
+		return; // todo: flush here?
+
+	std3D_DrawCall* pDrawCall = &GL_tmpDrawCalls[GL_tmpDrawCallAmt++];
+	pDrawCall->sortHash = std3D_ComputeDrawCallSortHash(pDrawCallState);
+	pDrawCall->state = *pDrawCallState;
+	pDrawCall->firstVertex = GL_tmpDrawCallVerticesAmt;
+	pDrawCall->numVertices = numVertices;
+
+	memcpy(&GL_tmpDrawCallVertices[GL_tmpDrawCallVerticesAmt], paVertices, sizeof(D3DVERTEX) * numVertices);
+	GL_tmpDrawCallVerticesAmt += numVertices;
 }
 
-void std3D_ResetPrimitiveRenderList()
+void std3D_ResetDrawCalls()
 {
-	GL_tmpPrimitivesAmt = 0;
-	GL_tmpPrimitiveVerticesAmt = 0;
+	GL_tmpDrawCallAmt = 0;
+	GL_tmpDrawCallVerticesAmt = 0;
 }
 
 void std3D_SetTexture(rdDDrawSurface* pTexture)
@@ -4921,8 +4895,8 @@ void std3D_SetTexture(rdDDrawSurface* pTexture)
 
 		glActiveTexture(GL_TEXTURE0 + 0);
 		glBindTexture(GL_TEXTURE_2D, blank_tex_white);
-		glUniform1i(prim_uniform_tex_mode, TEX_MODE_TEST);
-		glUniform1i(prim_uniform_blend_mode, 2);
+		glUniform1i(drawcall_uniform_tex_mode, TEX_MODE_TEST);
+		glUniform1i(drawcall_uniform_blend_mode, 2);
 	}
 	else
 	{
@@ -4948,62 +4922,53 @@ void std3D_SetTexture(rdDDrawSurface* pTexture)
 			glBindTexture(GL_TEXTURE_2D, displace_tex_id);
 
 		float emissive_mult = (jkPlayer_enableBloom ? 1.0 : 5.0);
-		glUniform3f(prim_uniform_emissiveFactor, pTexture->emissive_factor[0] * emissive_mult, pTexture->emissive_factor[1] * emissive_mult, pTexture->emissive_factor[2] * emissive_mult);
-		glUniform4f(prim_uniform_albedoFactor, pTexture->albedo_factor[0], pTexture->albedo_factor[1], pTexture->albedo_factor[2], pTexture->albedo_factor[3]);
-		glUniform1f(prim_uniform_displacement_factor, pTexture->displacement_factor);
+		glUniform3f(drawcall_uniform_emissiveFactor, pTexture->emissive_factor[0] * emissive_mult, pTexture->emissive_factor[1] * emissive_mult, pTexture->emissive_factor[2] * emissive_mult);
+		glUniform4f(drawcall_uniform_albedoFactor, pTexture->albedo_factor[0], pTexture->albedo_factor[1], pTexture->albedo_factor[2], pTexture->albedo_factor[3]);
+		glUniform1f(drawcall_uniform_displacement_factor, pTexture->displacement_factor);
 		glActiveTexture(GL_TEXTURE0 + 0);
 
 		if (!jkPlayer_enableTextureFilter)
-			glUniform1i(prim_uniform_tex_mode, pTexture->is_16bit ? TEX_MODE_16BPP : TEX_MODE_WORLDPAL);
+			glUniform1i(drawcall_uniform_tex_mode, pTexture->is_16bit ? TEX_MODE_16BPP : TEX_MODE_WORLDPAL);
 		else
-			glUniform1i(prim_uniform_tex_mode, pTexture->is_16bit ? TEX_MODE_BILINEAR_16BPP : TEX_MODE_BILINEAR);
+			glUniform1i(drawcall_uniform_tex_mode, pTexture->is_16bit ? TEX_MODE_BILINEAR_16BPP : TEX_MODE_BILINEAR);
 
 		glActiveTexture(GL_TEXTURE0 + 0);
 
 		if (tex_id == 0)
-			glUniform1i(prim_uniform_tex_mode, TEX_MODE_TEST);
+			glUniform1i(drawcall_uniform_tex_mode, TEX_MODE_TEST);
 	}
 }
 
-// todo: compute this in rdEndPrimitive instead of during the sort
-int std3D_GetPrimitiveSortHash(rdPrimitive* proc)
+int std3D_DrawCallCompare(std3D_DrawCall* a, std3D_DrawCall* b)
 {
-	int hash = 0;
-	//hash |= ((proc->type & RD_FF_TEX_TRANSLUCENT) == RD_FF_TEX_TRANSLUCENT) << 31;
-	//hash |= ((proc->type & RD_FF_DOUBLE_SIDED) == RD_FF_DOUBLE_SIDED) << 30;
-	//RD_FF_TEX_CLAMP_X
-	//RD_FF_TEX_CLAMP_Y
-	//RD_FF_TEX_FILTER_NEAREST
-	//RD_FF_ZWRITE_DISABLED
-#ifdef ADDITIVE_BLEND
-	//hash |= ((proc->type & RD_FF_ADDITIVE) == RD_FF_ADDITIVE) << 30;
-	//hash |= ((proc->type & RD_FF_SCREEN) == RD_FF_SCREEN) << 28;
-#endif
-	hash |= proc->texMode << 16;
-	hash |= (proc->pTexture ? proc->pTexture->texture_id : 0);
-	return hash;
-}
-
-int std3D_PrimitiveCompare(rdPrimitive* a, rdPrimitive* b)
-{
-	int aSortId = std3D_GetPrimitiveSortHash(a);
-	int bSortId = std3D_GetPrimitiveSortHash(b);
-	if (aSortId > bSortId)
+	if (a->sortHash > b->sortHash)
 		return 1;
-	if (aSortId < bSortId)
+	if (a->sortHash < b->sortHash)
 		return -1;
 	return 0;
 }
 
-void std3D_DrawPrimitiveRenderList()
+void std3D_FlushDrawCalls()
 {
 	if (Main_bHeadless) return;
+	
+	std3D_FlushLights();
 
-	// sort primitives to reduce state changes and maximize batching
-	_qsort(GL_tmpPrimitives, GL_tmpPrimitivesAmt, sizeof(rdPrimitive), (int(__cdecl*)(const void*, const void*))std3D_PrimitiveCompare);
+	// sort draw calls to reduce state changes and maximize batching
+	_qsort(GL_tmpDrawCalls, GL_tmpDrawCallAmt, sizeof(std3D_DrawCall), (int(__cdecl*)(const void*, const void*))std3D_DrawCallCompare);
+
+	// batching needs to follow the draw order, but vertex arrays might be disjointed
+	// build a sorted list of the vertices to ensure sequential vertex access during batch
+	// todo: generate an index buffer instead of copying vertices around
+	GL_tmpDrawCallVerticesAmt = 0;
+	for (int i = 0; i < GL_tmpDrawCallAmt; ++i)
+	{
+		memcpy(&GL_tmpDrawCallVerticesSorted[GL_tmpDrawCallVerticesAmt], &GL_tmpDrawCallVertices[GL_tmpDrawCalls[i].firstVertex], sizeof(D3DVERTEX) * GL_tmpDrawCalls[i].numVertices);
+		GL_tmpDrawCallVerticesAmt += GL_tmpDrawCalls[i].numVertices;
+	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->fbo);
-	std3D_useProgram(programPrimitives);
+	std3D_useProgram(drawcall_program);
 
 	GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3
 #ifdef VIEW_SPACE_GBUFFER
@@ -5020,22 +4985,15 @@ void std3D_DrawPrimitiveRenderList()
 	glDepthMask(GL_TRUE);
 	glDepthFunc(GL_LESS);
 
-	// setup the vertex data, we do this after sorting to preserve global batch offsets
-	GL_tmpPrimitiveVerticesAmt = 0;
-	for (int i = 0; i < GL_tmpPrimitivesAmt; ++i)
-	{
-		if (GL_tmpPrimitiveVerticesAmt + GL_tmpPrimitives[i].numVertices > STD3D_MAX_PRIMITIVES * 64)
-			break;
-		memcpy(&GL_tmpPrimitiveVertices[GL_tmpPrimitiveVerticesAmt], GL_tmpPrimitives[i].aVertices, sizeof(D3DVERTEX) * GL_tmpPrimitives[i].numVertices);
-		GL_tmpPrimitiveVerticesAmt += GL_tmpPrimitives[i].numVertices;
-	}
-
-	glBindVertexArray(prim_vao);
+	glBindVertexArray(drawcall_vao);
 	glBindBuffer(GL_ARRAY_BUFFER, world_vbo_all);
-	glBufferData(GL_ARRAY_BUFFER, GL_tmpPrimitiveVerticesAmt * sizeof(D3DVERTEX), GL_tmpPrimitiveVertices, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, GL_tmpDrawCallVerticesAmt * sizeof(D3DVERTEX), GL_tmpDrawCallVerticesSorted, GL_STREAM_DRAW);
 
-	glUniform1i(prim_uniform_tex_mode, TEX_MODE_TEST);
-	glUniform1i(prim_uniform_blend_mode, 2);
+	glBindBufferBase(GL_UNIFORM_BUFFER, 0, light_ubo);
+	glUniform1i(uniform_numLights, numLights);
+
+	glUniform1i(drawcall_uniform_tex_mode, TEX_MODE_TEST);
+	glUniform1i(drawcall_uniform_blend_mode, 2);
 	glActiveTexture(GL_TEXTURE0 + 4);
 	glBindTexture(GL_TEXTURE_2D, blank_tex);
 	glActiveTexture(GL_TEXTURE0 + 3);
@@ -5047,29 +5005,29 @@ void std3D_DrawPrimitiveRenderList()
 	glActiveTexture(GL_TEXTURE0 + 0);
 	glBindTexture(GL_TEXTURE_2D, blank_tex_white);
 
-	glUniform1i(prim_uniform_tex, 0);
-	glUniform1i(prim_uniform_worldPalette, 1);
-	glUniform1i(prim_uniform_worldPaletteLights, 2);
-	glUniform1i(prim_uniform_texEmiss, 3);
-	glUniform1i(prim_uniform_displacement_map, 4);
+	glUniform1i(drawcall_uniform_tex, 0);
+	glUniform1i(drawcall_uniform_worldPalette, 1);
+	glUniform1i(drawcall_uniform_worldPaletteLights, 2);
+	glUniform1i(drawcall_uniform_texEmiss, 3);
+	glUniform1i(drawcall_uniform_displacement_map, 4);
 
 	glViewport(0, 0, std3D_pFb->w, std3D_pFb->h);
 
-	glUniform2f(prim_uniform_iResolution, std3D_pFb->w, std3D_pFb->h);
+	glUniform2f(drawcall_uniform_iResolution, std3D_pFb->w, std3D_pFb->h);
 
-	glUniform1i(prim_uniform_enableDither, !jkPlayer_enable32Bit);
+	glUniform1i(drawcall_uniform_enableDither, !jkPlayer_enable32Bit);
 
-	glUniform3f(prim_uniform_tint, rdroid_curColorEffects.tint.x, rdroid_curColorEffects.tint.y, rdroid_curColorEffects.tint.z);
+	glUniform3f(drawcall_uniform_tint, rdroid_curColorEffects.tint.x, rdroid_curColorEffects.tint.y, rdroid_curColorEffects.tint.z);
 	if (rdroid_curColorEffects.filter.x || rdroid_curColorEffects.filter.y || rdroid_curColorEffects.filter.z)
-		glUniform3f(prim_uniform_filter, rdroid_curColorEffects.filter.x ? 1.0 : 0.25, rdroid_curColorEffects.filter.y ? 1.0 : 0.25, rdroid_curColorEffects.filter.z ? 1.0 : 0.25);
+		glUniform3f(drawcall_uniform_filter, rdroid_curColorEffects.filter.x ? 1.0 : 0.25, rdroid_curColorEffects.filter.y ? 1.0 : 0.25, rdroid_curColorEffects.filter.z ? 1.0 : 0.25);
 	else
-		glUniform3f(prim_uniform_filter, 1.0, 1.0, 1.0);
-	glUniform1f(prim_uniform_fade, rdroid_curColorEffects.fade);
-	glUniform3f(prim_uniform_add, (float)rdroid_curColorEffects.add.x / 255.0f, (float)rdroid_curColorEffects.add.y / 255.0f, (float)rdroid_curColorEffects.add.z / 255.0f);
-	glUniform3f(prim_uniform_emissiveFactor, 0.0, 0.0, 0.0);
-	glUniform4f(prim_uniform_albedoFactor, 1.0, 1.0, 1.0, 1.0);
-	glUniform1f(prim_uniform_light_mult, jkGuiBuildMulti_bRendering ? 0.85 : (jkPlayer_enableBloom ? 0.9 : 0.85));
-	glUniform1f(prim_uniform_displacement_factor, 1.0);
+		glUniform3f(drawcall_uniform_filter, 1.0, 1.0, 1.0);
+	glUniform1f(drawcall_uniform_fade, rdroid_curColorEffects.fade);
+	glUniform3f(drawcall_uniform_add, (float)rdroid_curColorEffects.add.x / 255.0f, (float)rdroid_curColorEffects.add.y / 255.0f, (float)rdroid_curColorEffects.add.z / 255.0f);
+	glUniform3f(drawcall_uniform_emissiveFactor, 0.0, 0.0, 0.0);
+	glUniform4f(drawcall_uniform_albedoFactor, 1.0, 1.0, 1.0, 1.0);
+	glUniform1f(drawcall_uniform_light_mult, jkGuiBuildMulti_bRendering ? 0.85 : (jkPlayer_enableBloom ? 0.9 : 0.85));
+	glUniform1f(drawcall_uniform_displacement_factor, 1.0);
 
 	glActiveTexture(GL_TEXTURE0 + 0);
 	glBindTexture(GL_TEXTURE_2D, blank_tex_white);
@@ -5077,21 +5035,34 @@ void std3D_DrawPrimitiveRenderList()
 	int do_batch = 0;
 	int batch_verts = 0;
 
-	int last_tex = GL_tmpPrimitives[0].pTexture->texture_id;
-	std3D_SetTexture(GL_tmpPrimitives[0].pTexture);
+	int last_tex = GL_tmpDrawCalls[0].state.pTexture->texture_id;
+	std3D_SetTexture(GL_tmpDrawCalls[0].state.pTexture);
 
-	rdMatrix44 last_mat = GL_tmpPrimitives[0].modelViewProj;
-	glUniformMatrix4fv(prim_uniform_mvp, 1, GL_FALSE, (float*)&GL_tmpPrimitives[0].modelViewProj);
+	rdMatrix44 last_mat = GL_tmpDrawCalls[0].state.modelMatrix;
+	glUniformMatrix4fv(drawcall_uniform_mvp, 1, GL_FALSE, (float*)&GL_tmpDrawCalls[0].state.viewProj);
+	glUniformMatrix4fv(drawcall_uniform_modelMatrix, 1, GL_FALSE, (float*)&GL_tmpDrawCalls[0].state.modelMatrix);
 
-	int last_tex_mode = GL_tmpPrimitives[0].texMode;
-	glUniform1i(prim_uniform_uv_mode, GL_tmpPrimitives[0].texMode);
+	int last_tex_mode = GL_tmpDrawCalls[0].state.texMode;
+	glUniform1i(drawcall_uniform_uv_mode, GL_tmpDrawCalls[0].state.texMode);
+
+	rdVector3 lastAmbientCol = GL_tmpDrawCalls[0].state.ambientColor;
+	rdAmbient lastAmbient = GL_tmpDrawCalls[0].state.ambientStateSH;
+
+	glUniform3fv(drawcall_uniform_ambient_color, 1, &GL_tmpDrawCalls[0].state.ambientColor.x);
+	glUniform4fv(drawcall_uniform_ambient_sh, 3, &GL_tmpDrawCalls[0].state.ambientStateSH.r.x);
+	glUniform3fv(drawcall_uniform_ambient_sh_dir, 1, &GL_tmpDrawCalls[0].state.ambientStateSH.dominantDir.x);
 
 	int vertexOffset = 0;
-	for (int j = 0; j < GL_tmpPrimitivesAmt; j++)
+	for (int j = 0; j < GL_tmpDrawCallAmt; j++)
 	{
-		if (last_tex != GL_tmpPrimitives[j].pTexture->texture_id
-			|| last_tex_mode != GL_tmpPrimitives[j].texMode
-			|| rdMatrix_Compare44(&last_mat, &GL_tmpPrimitives[j].modelViewProj) != 0)
+		std3D_DrawCall* pDrawCall = &GL_tmpDrawCalls[j];
+
+		if (last_tex != pDrawCall->state.pTexture->texture_id
+			|| last_tex_mode != pDrawCall->state.texMode
+			|| rdMatrix_Compare44(&last_mat, &pDrawCall->state.modelMatrix) != 0
+			|| rdVector_Compare3(&lastAmbientCol, &pDrawCall->state.ambientColor) != 0
+			|| rdAmbient_Compare(&lastAmbient, &pDrawCall->state.ambientStateSH) != 0
+		)
 		{
 			do_batch = 1;
 		}
@@ -5100,19 +5071,26 @@ void std3D_DrawPrimitiveRenderList()
 		{
 			glDrawArrays(GL_TRIANGLES, vertexOffset, batch_verts);
 
-			glUniform1i(prim_uniform_uv_mode, GL_tmpPrimitives[j].texMode);
-			if (GL_tmpPrimitives[j].texMode == 6)
-			{
-				glUniform4f(prim_uniform_uv_mode_params0, sithSector_flt_8553C0, sithSector_flt_8553B8, sithSector_flt_8553C4, 0);
-				glUniform4f(prim_uniform_uv_mode_params1, sithSector_flt_8553C8, sithSector_flt_8553F4, 0, 0);
-				glUniform2f(prim_uniform_uv_offset, sithWorld_pCurrentWorld->horizontalSkyOffs.x, sithWorld_pCurrentWorld->horizontalSkyOffs.y);
-			}
-			glUniformMatrix4fv(prim_uniform_mvp, 1, GL_FALSE, (float*)&GL_tmpPrimitives[j].modelViewProj);
-			std3D_SetTexture(GL_tmpPrimitives[j].pTexture);
+			glUniform3fv(drawcall_uniform_ambient_color, 1, &pDrawCall->state.ambientColor.x);
+			glUniform4fv(drawcall_uniform_ambient_sh, 3, &pDrawCall->state.ambientStateSH.r.x);
+			glUniform3fv(drawcall_uniform_ambient_sh_dir, 1, &pDrawCall->state.ambientStateSH.dominantDir.x);
 
-			last_tex = GL_tmpPrimitives[j].pTexture->texture_id;
-			last_mat = GL_tmpPrimitives[j].modelViewProj;
-			last_tex_mode = GL_tmpPrimitives[j].texMode;
+			glUniform1i(drawcall_uniform_uv_mode, pDrawCall->state.texMode);
+			if (pDrawCall->state.texMode == 6)
+			{
+				glUniform4f(drawcall_uniform_uv_mode_params0, sithSector_flt_8553C0, sithSector_flt_8553B8, sithSector_flt_8553C4, 0);
+				glUniform4f(drawcall_uniform_uv_mode_params1, sithSector_flt_8553C8, sithSector_flt_8553F4, 0, 0);
+				glUniform2f(drawcall_uniform_uv_offset, sithWorld_pCurrentWorld->horizontalSkyOffs.x, sithWorld_pCurrentWorld->horizontalSkyOffs.y);
+			}
+			glUniformMatrix4fv(drawcall_uniform_mvp, 1, GL_FALSE, (float*)&pDrawCall->state.viewProj);
+			glUniformMatrix4fv(drawcall_uniform_modelMatrix, 1, GL_FALSE, (float*)&pDrawCall->state.modelMatrix);
+			std3D_SetTexture(pDrawCall->state.pTexture);
+
+			last_tex = pDrawCall->state.pTexture->texture_id;
+			last_mat = pDrawCall->state.modelMatrix;
+			last_tex_mode = pDrawCall->state.texMode;
+			lastAmbientCol = pDrawCall->state.ambientColor;
+			lastAmbient = pDrawCall->state.ambientStateSH;
 
 			vertexOffset += batch_verts;
 			batch_verts = 0;
@@ -5120,7 +5098,7 @@ void std3D_DrawPrimitiveRenderList()
 			do_batch = 0;
 		}
 	
-		batch_verts += GL_tmpPrimitives[j].numVertices;
+		batch_verts += pDrawCall->numVertices;
 	}
 
 	if (batch_verts)
@@ -5138,7 +5116,53 @@ void std3D_DrawPrimitiveRenderList()
 #ifdef STENCIL_BUFFER
 	glDisable(GL_STENCIL_TEST);
 #endif
-	std3D_ResetPrimitiveRenderList();
+	std3D_ResetDrawCalls();
+}
+
+// todo: CPU based clustering for per-pixel lighting
+// the clusters can be uploaded to a buffer texture or a simple integer texture and read in the shader for per-pixel lighting
+void std3D_ClearLights()
+{
+	numLights = 0;
+}
+
+int std3D_AddLight(rdLight* light, rdVector3* position)
+{
+	lightsDirty = 1;
+	std3D_light* light3d = &tmpLights[numLights++];
+	light3d->type = light->type;
+	light3d->active = light->active;
+	light3d->position.x = position->x;
+	light3d->position.y = position->y;
+	light3d->position.z = position->z;
+	light3d->direction_intensity.x = light->direction.x;
+	light3d->direction_intensity.y = light->direction.y;
+	light3d->direction_intensity.z = light->direction.z;
+	light3d->direction_intensity.w = light->intensity;
+	light3d->color.x = light->color.x;
+	light3d->color.y = light->color.y;
+	light3d->color.z = light->color.z;
+	light3d->color.w = 0;
+#ifdef JKM_LIGHTING
+	light3d->angleX = light->angleX;
+	light3d->cosAngleX = light->cosAngleX;
+	light3d->angleY = light->angleY;
+	light3d->cosAngleY = light->cosAngleY;
+	light3d->lux = light->lux;
+#endif
+	light3d->falloffMin = light->falloffMin;
+	light3d->falloffMax = light->falloffMax;
+	return 1;
+}
+
+void std3D_FlushLights()
+{
+	if (lightsDirty)
+	{
+		glBindBuffer(GL_UNIFORM_BUFFER, light_ubo);
+		glBufferData(GL_UNIFORM_BUFFER, sizeof(tmpLights), &tmpLights, GL_DYNAMIC_DRAW);
+		lightsDirty = 0;
+	}
 }
 
 #endif
