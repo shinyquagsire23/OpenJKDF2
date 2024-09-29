@@ -1140,7 +1140,11 @@ void sithRender_RenderLevelGeometry()
         rdSetProcFaceUserData(level_idk->id);
         v65 = level_idk->surfaces;
 
-        for (v75 = 0; v75 < level_idk->numSurfaces; v65->field_4 = sithRender_lastRenderTick, ++v65, v75++)
+//#ifndef RENDER_DROID2
+//        for (v75 = 0; v75 < level_idk->numSurfaces; v65->field_4 = sithRender_lastRenderTick, ++v65, v75++)
+//#else
+		for (v75 = 0; v75 < level_idk->numSurfaces; ++v65, v75++)
+//#endif
         {
             if ( !v65->surfaceInfo.face.geometryMode )
                 continue;
@@ -1175,7 +1179,7 @@ void sithRender_RenderLevelGeometry()
                 continue;
             }
 
-#ifndef RENDER_DROID2
+//#ifndef RENDER_DROID2
 			if ( v65->field_4 != sithRender_lastRenderTick )
             {
                 for (int j = 0; j < v65->surfaceInfo.face.numVertices; j++)
@@ -1189,7 +1193,7 @@ void sithRender_RenderLevelGeometry()
                 }
                 v65->field_4 = sithRender_lastRenderTick;
             }
-#endif
+//#endif
 
 #ifndef RENDER_DROID2
 			if ((sithRender_flag & 8) == 0 || v65->surfaceInfo.face.numVertices <= 3 || (v65->surfaceFlags & (SITH_SURFACE_CEILING_SKY | SITH_SURFACE_HORIZON_SKY)) != 0 || !v65->surfaceInfo.face.lightingMode)
@@ -1285,12 +1289,12 @@ void sithRender_RenderLevelGeometry()
 #endif
 						}
 						rdVector2* uv = &sithWorld_pCurrentWorld->vertexUVs[uvidx];
-						rdTexCoord(uv);
+						rdTexCoord2i(uv->x, uv->y);
 
 						rdNormal(&v65->surfaceInfo.face.normal);
 						
 						rdVector3* v = &sithWorld_pCurrentWorld->vertices[posidx];
-						rdVertex(v);
+						rdVertex(&sithWorld_pCurrentWorld->vertices[posidx]);
 					}
 					rdEndPrimitive();
 				}

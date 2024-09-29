@@ -311,8 +311,8 @@ uniform lightBlock
 void main(void)
 {
 #ifdef RENDER_DROID2
-	fragColor = f_color;
-	return;
+	//fragColor = f_color;
+	//return;
 #endif
 
 

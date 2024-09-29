@@ -167,7 +167,8 @@ int rdBeginPrimitive(RD_PRIMITIVE_TYPE type);
 void rdEndPrimitive();
 void rdVertex3f(float x, float y, float z);
 void rdColor4f(float r, float g, float b, float a);
-void rdTexCoord2f(float u, float v);
+void rdTexCoord2f(float u, float v); // normalized
+void rdTexCoord2i(float u, float v); // unnormalized
 void rdNormal3f(float x, float y, float z);
 void rdVertex(const rdVector3* pPos);
 void rdColor(const rdVector4* pCol);

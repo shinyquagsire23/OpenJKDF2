@@ -32,6 +32,8 @@ static rdMatrix44     rdroid_matrices[3];
 
 static rdMaterial* rdroid_curMaterial = NULL;
 static rdDDrawSurface* rdroid_curTexture = NULL;
+static float rdroid_texWidth = 1;
+static float rdroid_texHeight = 1;
 
 static uint32_t rdroid_vertexColorState = 0xFFFFFFFF;
 static rdVector2 rdroid_vertexTexCoordState = { 0.0f, 0.0f };
@@ -452,6 +454,8 @@ int rdBeginPrimitive(RD_PRIMITIVE_TYPE type)
 	return 1;
 }
 
+void std3D_AddRenderListPrimitive(rdPrimitive* pPrimitive);
+
 void rdEndPrimitive()
 {
 	rdPrimitive prim;
@@ -483,6 +487,7 @@ void rdVertex3f(float x, float y, float z)
 	pVert->ny = rdroid_vertexNormalState.y;
 	pVert->nz = rdroid_vertexNormalState.z;
 	pVert->color = rdroid_vertexColorState;
+	pVert->lightLevel = 0.0f;
 }
 
 void rdVertex(const rdVector3* pPos)
@@ -496,7 +501,7 @@ void rdColor4f(float r, float g, float b, float a)
 	uint32_t ig = stdMath_ClampInt(g * 255, 0, 255);
 	uint32_t ib = stdMath_ClampInt(b * 255, 0, 255);
 	uint32_t ia = stdMath_ClampInt(a * 255, 0, 255);
-	rdroid_vertexColorState = ib | (((uint8_t)ig | ((ia | (uint8_t)ir) << 8)) << 8);
+	rdroid_vertexColorState = ib | (ig << 8) | (ir << 16) | (ia << 24);
 }
 
 void rdColor(const rdVector4* pCol)
@@ -508,6 +513,20 @@ void rdTexCoord2f(float u, float v)
 {
 	rdroid_vertexTexCoordState.x = u;
 	rdroid_vertexTexCoordState.y = v;
+}
+
+void rdTexCoord2i(float u, float v)
+{
+	if(rdroid_curTexture)
+	{
+		rdroid_vertexTexCoordState.x = (float)u / rdroid_texWidth;
+		rdroid_vertexTexCoordState.y = (float)v / rdroid_texHeight;
+	}
+	else
+	{
+		rdroid_vertexTexCoordState.x = (float)u / 32.0f;
+		rdroid_vertexTexCoordState.y = (float)v / 32.0f;
+	}
 }
 
 void rdTexCoord(const rdVector2* pUV)
@@ -554,6 +573,15 @@ int rdBindTexture(rdMaterial* pMaterial, int cel)
 		rdroid_curTexture = &sith_tex_sel->alphaMats[0];
 		if (alpha_is_opaque)
 			rdroid_curTexture = &sith_tex_sel->opaqueMats[0];
+		
+		uint32_t out_width, out_height;
+		std3D_GetValidDimension(
+			sith_tex_sel->texture_struct[0]->format.width,
+			sith_tex_sel->texture_struct[0]->format.height,
+			&out_width,
+			&out_height);
+		rdroid_texWidth = (float)(out_width << 0);
+		rdroid_texHeight = (float)(out_height << 0);	
 	}
 	rdroid_curMaterial = pMaterial;
 
