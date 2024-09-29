@@ -41,7 +41,7 @@ void main(void)
 {
 #ifndef RENDER_DROID2
     vec4 pos = mvp * vec4(coord3d, 1.0);
-    pos.w = 1.0/(1.0-coord3d.z);
+    pos.w = 1.0/(1.0-coord3d.z); // fixme: this doesn't match the projection matrix output AT ALL
     pos.xyz *= pos.w;
 #else
     vec4 pos = mvp * vec4(coord3d, 1.0);
