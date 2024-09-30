@@ -79,7 +79,11 @@ uniform float fogEnd;
 
 in vec4 f_color;
 in float f_light;
+#ifdef RENDER_DROID2
+in vec4 f_uv;
+#else
 in vec2 f_uv;
+#endif
 in vec3 f_coord;
 in vec3 f_normal;
 in float f_depth;
@@ -133,14 +137,14 @@ vec3 normals(vec3 pos) {
     return normalize(cross(fdx, fdy));
 }
 
-mat3 construct_tbn(vec3 vp_normal, vec3 adjusted_coords)
+mat3 construct_tbn(vec2 uv, vec3 vp_normal, vec3 adjusted_coords)
 {
     vec3 n = normalize(vp_normal);
 
     vec3 dp1 = dFdx(adjusted_coords);
     vec3 dp2 = dFdy(adjusted_coords);
-    vec2 duv1 = dFdx(f_uv);
-    vec2 duv2 = dFdy(f_uv);
+    vec2 duv1 = dFdx(uv.xy);
+    vec2 duv2 = dFdy(uv.xy);
 
     vec3 dp2perp = cross(dp2, n);
     vec3 dp1perp = cross(n, dp1);
@@ -159,7 +163,7 @@ vec2 parallax_mapping(vec2 tc, vec3 vp_normal, vec3 adjusted_coords)
     }*/
 
     // The injector world space view position is always considered (0, 0, 0):
-    vec3 view_dir = -normalize(transpose(construct_tbn(vp_normal, adjusted_coords)) * adjusted_coords);
+    vec3 view_dir = -normalize(transpose(construct_tbn(tc, vp_normal, adjusted_coords)) * adjusted_coords);
 
     const float min_layers = 32.0;
     const float max_layers = 128.0;
@@ -191,13 +195,13 @@ vec2 parallax_mapping(vec2 tc, vec3 vp_normal, vec3 adjusted_coords)
 }
 
 #ifdef CAN_BILINEAR_FILTER
-vec4 bilinear_paletted()
+vec4 bilinear_paletted(vec2 uv)
 {
     // Get texture size in pixels:
     vec2 colorTextureSize = vec2(textureSize(tex, 0));
 
     // Convert UV coordinates to pixel coordinates and get pixel index of top left pixel (assuming UVs are relative to top left corner of texture)
-    vec2 pixCoord = f_uv * colorTextureSize - 0.5f;    // First pixel goes from -0.5 to +0.4999 (0.0 is center) last pixel goes from (size - 1.5) to (size - 0.5000001)
+    vec2 pixCoord = uv.xy * colorTextureSize - 0.5f;    // First pixel goes from -0.5 to +0.4999 (0.0 is center) last pixel goes from (size - 1.5) to (size - 0.5000001)
     vec2 originPixCoord = floor(pixCoord);              // Pixel index coordinates of bottom left pixel of set of 4 we will be blending
 
     // For Gather we want UV coordinates of bottom right corner of top left pixel
@@ -235,7 +239,7 @@ vec4 bilinear_paletted()
     return vec4(blendColor.r, blendColor.g, blendColor.b, blendColor.a);
 }
 
-vec4 bilinear_paletted_light(float index)
+vec4 bilinear_paletted_light(vec2 uv, float index)
 {
     // Makes sure light is in a sane range
     float light = clamp(f_light, 0.0, 1.0);
@@ -252,7 +256,7 @@ vec4 bilinear_paletted_light(float index)
     vec2 colorTextureSize = vec2(textureSize(tex, 0));
 
     // Convert UV coordinates to pixel coordinates and get pixel index of top left pixel (assuming UVs are relative to top left corner of texture)
-    vec2 pixCoord = f_uv * colorTextureSize - 0.5f;    // First pixel goes from -0.5 to +0.4999 (0.0 is center) last pixel goes from (size - 1.5) to (size - 0.5000001)
+    vec2 pixCoord = uv.xy * colorTextureSize - 0.5f;    // First pixel goes from -0.5 to +0.4999 (0.0 is center) last pixel goes from (size - 1.5) to (size - 0.5000001)
     vec2 originPixCoord = floor(pixCoord);              // Pixel index coordinates of bottom left pixel of set of 4 we will be blending
 
     // For Gather we want UV coordinates of bottom right corner of top left pixel
@@ -326,6 +330,11 @@ void main(void)
 #endif
 
 
+#ifdef RENDER_DROID2
+    vec3 adj_texcoords = f_uv.xyz / f_uv.w;
+#else
+    vec2 adj_texcoords = f_uv.xy;
+#endif
 
     float originalZ = gl_FragCoord.z / gl_FragCoord.w;
 #ifdef VIEW_SPACE_GBUFFER
@@ -338,21 +347,20 @@ void main(void)
     vec3 face_normals = normals(adjusted_coords_norms);
     vec3 face_normals_parallax = normals(adjusted_coords_parallax);
 
-    vec2 adj_texcoords = f_uv;
     if(displacement_factor != 0.0)
 	{
-        adj_texcoords = parallax_mapping(f_uv, face_normals_parallax, adjusted_coords_parallax);
+        adj_texcoords.xy = parallax_mapping(f_uv.xy, face_normals_parallax, adjusted_coords_parallax);
     }
 #ifdef RENDER_DROID2
 	else
 	{
 		if(uv_mode == 6 || uv_mode == 0)
-			adj_texcoords = f_uv_affine;
+			adj_texcoords.xy = f_uv_affine;
 	}
 #endif
 
-    vec4 sampled = texture(tex, adj_texcoords);
-    vec4 sampledEmiss = texture(texEmiss, adj_texcoords);
+    vec4 sampled = texture(tex, adj_texcoords.xy);
+    vec4 sampledEmiss = texture(texEmiss, adj_texcoords.xy);
     vec4 sampled_color = vec4(1.0, 1.0, 1.0, 1.0);
     vec4 vertex_color = f_color;
     float index = sampled.r;
@@ -419,8 +427,8 @@ void main(void)
 #ifdef CAN_BILINEAR_FILTER
     else if (tex_mode == TEX_MODE_BILINEAR)
     {
-        sampled_color = bilinear_paletted();
-        color_add = bilinear_paletted_light(index);
+        sampled_color = bilinear_paletted(adj_texcoords.xy);
+        color_add = bilinear_paletted_light(adj_texcoords.xy, index);
 	#ifdef CLASSIC_EMISSIVE	
 		emissive = color_add / light_mult;
 	#endif

@@ -807,6 +807,22 @@ typedef struct D3DVERTEX_ext
     D3DVALUE dvTV;
   };
   #pragma pack(pop)
+#ifdef RENDER_DROID2
+#pragma pack(push, 4)
+  union
+  {
+	  D3DVALUE tr;
+	  D3DVALUE dvTR;
+  };
+#pragma pack(pop)
+#pragma pack(push, 4)
+  union
+  {
+	  D3DVALUE tq;
+	  D3DVALUE dvTQ;
+  };
+#pragma pack(pop)
+#endif
   #pragma pack(push, 4)
   uint32_t color;
   #pragma pack(pop)
@@ -874,6 +890,8 @@ typedef struct std3D_TextureState
 	uint32_t          chromaKeyColor;
 	rdTexMode_t       texMode;
 	rdDDrawSurface*   pTexture;
+	rdVector4         texGen;
+	rdVector2         texOffset;
 } std3D_TextureState;
 
 typedef struct std3D_LightingState
@@ -887,6 +905,7 @@ typedef struct std3D_LightingState
 
 typedef struct std3D_DrawCallState
 {
+	int                     sortPriority;
 	rdMatrix44              modelView;
 	rdMatrix44              proj;
 	std3D_RasterState       raster;

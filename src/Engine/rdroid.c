@@ -43,7 +43,7 @@ static float       rdroid_texWidth = 1;
 static float       rdroid_texHeight = 1;
 
 static uint32_t  rdroid_vertexColorState = 0xFFFFFFFF;
-static rdVector2 rdroid_vertexTexCoordState = { 0.0f, 0.0f };
+static rdVector4 rdroid_vertexTexCoordState = { 0.0f, 0.0f, 0.0f, 1.0f };
 static rdVector3 rdroid_vertexNormalState = { 0.0f, 0.0f, 0.0f };
 
 static int               rdroid_vertexCacheNum = 0;
@@ -87,6 +87,8 @@ void rdResetTextureState()
 	rdroid_textureState.chromaKeyColor = 0;
 	rdroid_textureState.pTexture = NULL;
 	rdroid_textureState.texMode = RD_TEXTUREMODE_PERSPECTIVE;
+	rdroid_textureState.texGen.x = rdroid_textureState.texGen.y = rdroid_textureState.texGen.z = 0;
+	rdroid_textureState.texOffset.x = rdroid_textureState.texOffset.y = 0;
 }
 
 void rdResetLightingState()
@@ -553,7 +555,7 @@ void rdEndPrimitive()
 
 	rdroid_vertexCacheNum = 0;
 	rdroid_vertexColorState = 0xFFFFFFFF;
-	rdVector_Set2(&rdroid_vertexTexCoordState, 0.0f, 0.0f);
+	rdVector_Set4(&rdroid_vertexTexCoordState, 0.0f, 0.0f, 0.0f, 1.0f);
 	rdVector_Set3(&rdroid_vertexNormalState, 0.0f, 0.0f, 1.0f);
 	rdroid_curPrimitiveType = RD_PRIMITIVE_NONE;
 }
@@ -573,6 +575,8 @@ void rdVertex3f(float x, float y, float z)
 	pVert->z = z;
 	pVert->tu = rdroid_vertexTexCoordState.x;
 	pVert->tv = rdroid_vertexTexCoordState.y;
+	pVert->tr = rdroid_vertexTexCoordState.z;
+	pVert->tq = rdroid_vertexTexCoordState.w;
 	pVert->nx = rdroid_vertexNormalState.x;
 	pVert->ny = rdroid_vertexNormalState.y;
 	pVert->nz = rdroid_vertexNormalState.z;
@@ -603,6 +607,8 @@ void rdTexCoord2f(float u, float v)
 {
 	rdroid_vertexTexCoordState.x = u;
 	rdroid_vertexTexCoordState.y = v;
+	rdroid_vertexTexCoordState.z = 0;
+	rdroid_vertexTexCoordState.w = 1;
 }
 
 void rdTexCoord2i(float u, float v)
@@ -617,11 +623,20 @@ void rdTexCoord2i(float u, float v)
 		rdroid_vertexTexCoordState.x = (float)u / 32.0f;
 		rdroid_vertexTexCoordState.y = (float)v / 32.0f;
 	}
+	rdroid_vertexTexCoordState.z = 0;
+	rdroid_vertexTexCoordState.w = 1;
 }
 
 void rdTexCoord(const rdVector2* pUV)
 {
 	rdTexCoord2f(pUV->x, pUV->y);
+}
+
+void rdTexCoord4i(float u, float v, float r, float q)
+{
+	rdTexCoord2i(u, v);
+	rdroid_vertexTexCoordState.z = r;
+	rdroid_vertexTexCoordState.w = q;
 }
 
 void rdNormal3f(float x, float y, float z)
@@ -680,6 +695,34 @@ int rdBindTexture(rdMaterial* pMaterial, int cel)
 	rdroid_curMaterial = pMaterial;
 
 	return 1;
+}
+
+void rdTexGenParams(float p0, float p1, float p2, float p3)
+{
+	rdroid_textureState.texGen.x = p0;
+	rdroid_textureState.texGen.y = p1;
+	rdroid_textureState.texGen.z = p2;
+	rdroid_textureState.texGen.w = p3;
+}
+
+void rdTexOffset(float u, float v)
+{
+	rdroid_textureState.texOffset.x = u;
+	rdroid_textureState.texOffset.y = v;
+}
+
+void rdTexOffseti(float u, float v)
+{
+	if (rdroid_textureState.pTexture)
+	{
+		rdroid_textureState.texOffset.x = (float)u / rdroid_texWidth;
+		rdroid_textureState.texOffset.y = (float)v / rdroid_texHeight;
+	}
+	else
+	{
+		rdroid_textureState.texOffset.x = (float)u / 32.0f;
+		rdroid_textureState.texOffset.y = (float)v / 32.0f;
+	}
 }
 
 // Framebuffer

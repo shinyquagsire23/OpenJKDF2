@@ -1,7 +1,11 @@
 in vec3 coord3d;
 in vec4 v_color;
 in float v_light;
+#ifdef RENDER_DROID2
+in vec4 v_uv;
+#else
 in vec2 v_uv;
+#endif
 in vec3 v_normal;
 
 in vec3 coordVS;
@@ -9,7 +13,11 @@ in vec3 coordVS;
 uniform mat4 mvp;
 out vec4 f_color;
 out float f_light;
+#ifdef RENDER_DROID2
+out vec4 f_uv;
+#else
 out vec2 f_uv;
+#endif
 out vec3 f_coord;
 out vec3 f_normal;
 out float f_depth;
@@ -19,8 +27,7 @@ uniform mat4 modelMatrix;
 uniform int uv_mode;
 uniform vec2 iResolution;
 
-uniform vec4 uv_mode_params0;
-uniform vec4 uv_mode_params1;
+uniform vec4 texgen_params;
 uniform vec2 uv_offset;
 
 uniform int lightMode;
@@ -99,18 +106,18 @@ float do_fresnel(vec3 viewDir, vec3 normal, float f0)
 	return f0 + (1.0 - f0) * fresnel;
 }
 
-vec2 get_horizon_uv(inout vec4 clip_pos)
+vec2 do_horizon_uv(inout vec4 clip_pos)
 {
-	float v10 = (clip_pos.x / clip_pos.w * iResolution.x * 0.5) * uv_mode_params0.x;
-	float v12 = (-clip_pos.y / clip_pos.w * iResolution.y * 0.5) * uv_mode_params0.x;
+	float v10 = (clip_pos.x / clip_pos.w * iResolution.x * 0.5) * texgen_params.x;
+	float v12 = (-clip_pos.y / clip_pos.w * iResolution.y * 0.5) * texgen_params.x;
 
 	vec2 uv;
-	uv.x = v10 * uv_mode_params1.x - v12 * uv_mode_params1.y + (uv_mode_params0.y);
-	uv.y = v12 * uv_mode_params1.x + v10 * uv_mode_params1.y + (uv_mode_params0.z);
+	uv.x = v10 * texgen_params.y - v12 * texgen_params.z;
+	uv.y = v12 * texgen_params.y + v10 * texgen_params.z;
 	
 	clip_pos.z = clip_pos.w - 0.25/64.0;
 	
-	return (uv + uv_offset) / 256.0; // todo: from mat
+	return uv / 256.0; // todo: from mat
 }
 #endif
 
@@ -130,9 +137,12 @@ void main(void)
     f_color = v_color.bgra;
     f_uv = v_uv;
 #ifdef RENDER_DROID2
-	f_uv_affine = v_uv;
+	f_uv_affine = v_uv.xy;
 	if(uv_mode == 6) // 6 = RD_TEXTUREMODE_HORIZON
-		f_uv_affine = get_horizon_uv(pos);
+		f_uv_affine = do_horizon_uv(pos);
+
+	f_uv.xy += uv_offset.xy;
+	f_uv_affine.xy += uv_offset.xy;
 #endif
 #ifdef VIEW_SPACE_GBUFFER
     f_coord = coordVS;

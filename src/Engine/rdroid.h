@@ -107,6 +107,7 @@ void rdVertex3f(float x, float y, float z);
 void rdColor4f(float r, float g, float b, float a);
 void rdTexCoord2f(float u, float v); // normalized
 void rdTexCoord2i(float u, float v); // unnormalized
+void rdTexCoord4i(float u, float v, float r, float q); // unnormalized
 void rdNormal3f(float x, float y, float z);
 void rdVertex(const rdVector3* pPos);
 void rdColor(const rdVector4* pCol);
@@ -135,6 +136,9 @@ void rdClearDepth(uint32_t z);
 void rdClearColor(uint32_t rgba);
 
 int rdBindTexture(rdMaterial* pMaterial, int cel);
+void rdTexGenParams(float p0, float p1, float p2, float p3);
+void rdTexOffset(float u, float v);
+void rdTexOffseti(float u, float v);
 
 int rdAddLight(rdLight* pLight, rdVector3* pPosition);
 void rdClearLights();

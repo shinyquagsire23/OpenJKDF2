@@ -185,7 +185,7 @@ GLint drawcall_attribute_coord3d, drawcall_attribute_v_color, drawcall_attribute
 GLint drawcall_attribute_coordVS;
 #endif
 GLint drawcall_uniform_ambient_mode, drawcall_uniform_ambient_color, drawcall_uniform_ambient_sh, drawcall_uniform_ambient_sh_dir;
-GLint drawcall_uniform_uv_mode, drawcall_uniform_uv_mode_params0, drawcall_uniform_uv_mode_params1, drawcall_uniform_uv_offset;
+GLint drawcall_uniform_uv_mode, drawcall_uniform_texgen_params, drawcall_uniform_uv_offset;
 GLint drawcall_uniform_mvp, drawcall_uniform_modelMatrix, drawcall_uniform_tex, drawcall_uniform_texEmiss, drawcall_uniform_displacement_map, drawcall_uniform_tex_mode, drawcall_uniform_blend_mode, drawcall_uniform_worldPalette, drawcall_uniform_worldPaletteLights;
 GLint drawcall_uniform_tint, drawcall_uniform_filter, drawcall_uniform_fade, drawcall_uniform_add, drawcall_uniform_emissiveFactor, drawcall_uniform_albedoFactor;
 GLint drawcall_uniform_light_mode, drawcall_uniform_light_mult, drawcall_uniform_displacement_factor, drawcall_uniform_iResolution, drawcall_uniform_enableDither;
@@ -1127,7 +1127,7 @@ void std3D_setupDrawCallVAO()
 
 	glVertexAttribPointer(
 		drawcall_attribute_v_uv,    // attribute
-		2,                 // number of elements per vertex, here (U,V)
+		4,                 // number of elements per vertex, here (U,V,R,Q)
 		GL_FLOAT,          // the type of each element
 		GL_FALSE,          // take our values as-is
 		sizeof(D3DVERTEX),                 // no extra data between each position
@@ -1269,8 +1269,7 @@ int init_resources()
 	drawcall_uniform_mvp = std3D_tryFindUniform(drawcall_program, "mvp");
 	drawcall_uniform_modelMatrix = std3D_tryFindUniform(drawcall_program, "modelMatrix");
 	drawcall_uniform_uv_mode = std3D_tryFindUniform(drawcall_program, "uv_mode");
-	drawcall_uniform_uv_mode_params0 = std3D_tryFindUniform(drawcall_program, "uv_mode_params0");
-	drawcall_uniform_uv_mode_params1 = std3D_tryFindUniform(drawcall_program, "uv_mode_params1");
+	drawcall_uniform_texgen_params = std3D_tryFindUniform(drawcall_program, "texgen_params");
 	drawcall_uniform_uv_offset = std3D_tryFindUniform(drawcall_program, "uv_offset");
 	drawcall_uniform_ambient_mode = std3D_tryFindUniform(drawcall_program, "ambientMode");
 	drawcall_uniform_ambient_color = std3D_tryFindUniform(drawcall_program, "ambientColor");
@@ -5040,13 +5039,8 @@ void std3D_SetTextureState(std3D_TextureState* pTexState)
 {
 	std3D_SetTexture(pTexState->pTexture);
 	glUniform1i(drawcall_uniform_uv_mode, pTexState->texMode);
-	if (pTexState->texMode == 6)
-	{
-		// todo: this should be in the state
-		glUniform4f(drawcall_uniform_uv_mode_params0, sithSector_flt_8553C0, sithSector_flt_8553B8, sithSector_flt_8553C4, 0);
-		glUniform4f(drawcall_uniform_uv_mode_params1, sithSector_flt_8553C8, sithSector_flt_8553F4, 0, 0);
-		glUniform2f(drawcall_uniform_uv_offset, sithWorld_pCurrentWorld->horizontalSkyOffs.x, sithWorld_pCurrentWorld->horizontalSkyOffs.y);
-	}
+	glUniform4f(drawcall_uniform_texgen_params, pTexState->texGen.x, pTexState->texGen.y, pTexState->texGen.z, pTexState->texGen.w);
+	glUniform2f(drawcall_uniform_uv_offset, pTexState->texOffset.x, pTexState->texOffset.y);
 }
 
 void std3D_SetLightingState(std3D_LightingState* pLightState)
@@ -5174,7 +5168,8 @@ void std3D_FlushDrawCalls()
 		pTexState = &pDrawCall->state.texture;
 		pLightState = &pDrawCall->state.lighting;
 
-		if (pTexState->pTexture && last_tex != pTexState->pTexture->texture_id
+		int texid = pTexState->pTexture ? pTexState->pTexture->texture_id : blank_tex_white;
+		if (last_tex != texid
 			|| memcmp(&lastState, &pDrawCall->state, sizeof(std3D_DrawCallState)) != 0
 			|| rdMatrix_Compare44(&last_mat, &pDrawCall->state.modelView) != 0
 			|| rdMatrix_Compare44(&last_proj, &pDrawCall->state.proj) != 0
@@ -5196,7 +5191,7 @@ void std3D_FlushDrawCalls()
 			glUniformMatrix4fv(drawcall_uniform_mvp, 1, GL_FALSE, (float*)&pDrawCall->state.proj);
 			glUniformMatrix4fv(drawcall_uniform_modelMatrix, 1, GL_FALSE, (float*)&pDrawCall->state.modelView);
 
-			last_tex = pTexState->pTexture ? pTexState->pTexture->texture_id : blank_tex_white;
+			last_tex = texid;
 			last_mat = pDrawCall->state.modelView;
 			last_proj = pDrawCall->state.proj;
 			lastState = pDrawCall->state;

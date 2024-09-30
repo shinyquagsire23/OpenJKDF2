@@ -1052,7 +1052,11 @@ void sithRender_DrawSurface(sithSurface* surface)
 
 	// todo: other stuff like ceiling sky
 	if (surface->surfaceFlags & SITH_SURFACE_HORIZON_SKY)
+	{
 		texMode = RD_TEXTUREMODE_HORIZON;
+		rdTexGenParams(sithSector_flt_8553C0, sithSector_flt_8553C8, sithSector_flt_8553F4, 0);
+		rdTexOffseti(sithWorld_pCurrentWorld->horizontalSkyOffs.x + sithSector_flt_8553B8, sithWorld_pCurrentWorld->horizontalSkyOffs.y + sithSector_flt_8553C4);
+	}
 
 	rdSetTexMode(texMode);
 
@@ -1110,6 +1114,9 @@ void sithRender_DrawSurface(sithSurface* surface)
 		}
 		rdEndPrimitive();
 	}
+
+	rdTexGenParams(0, 0, 0, 0);
+	rdTexOffset(0, 0);
 }
 #endif
 
