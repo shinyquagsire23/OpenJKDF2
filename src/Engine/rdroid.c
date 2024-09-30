@@ -33,6 +33,7 @@ static std3D_LightingState     rdroid_lightingState;
 static rdMatrixMode_t rdroid_curMatrixMode = RD_MATRIX_MODEL;
 static rdMatrix44     rdroid_matrices[3];
 static rdMatrix44     rdroid_curCamMatrix;
+static rdMatrix44     rdroid_curModelView;
 static rdMatrix44     rdroid_curViewProj;
 static rdMatrix44     rdroid_curProjInv;
 static rdMatrix44     rdroid_curViewProjInv;
@@ -364,6 +365,7 @@ void rdClearPostStatistics()
 
 void rdMatrixChanged()
 {
+	rdMatrix_Multiply44(&rdroid_curModelView, &rdroid_matrices[RD_MATRIX_VIEW], &rdroid_matrices[RD_MATRIX_MODEL]);
 	rdMatrix_Invert44(&rdroid_curCamMatrix, &rdroid_matrices[RD_MATRIX_VIEW]);
 	rdMatrix_Multiply44(&rdroid_curViewProj, &rdroid_matrices[RD_MATRIX_PROJECTION], &rdroid_matrices[RD_MATRIX_VIEW]);
 	rdMatrix_Invert44(&rdroid_curProjInv, &rdroid_matrices[RD_MATRIX_PROJECTION]);
@@ -507,8 +509,8 @@ void rdEndPrimitive()
 		return;
 
 	std3D_DrawCallState state;
-	rdMatrix_Copy44(&state.modelMatrix, &rdroid_matrices[RD_MATRIX_MODEL]);
-	rdMatrix_Copy44(&state.viewProj, &rdroid_curViewProj);
+	rdMatrix_Copy44(&state.modelView, &rdroid_curModelView);
+	rdMatrix_Copy44(&state.proj, &rdroid_matrices[RD_MATRIX_PROJECTION]);
 
 	memcpy(&state.raster, &rdroid_rasterState, sizeof(std3D_RasterState));
 	memcpy(&state.blend, &rdroid_blendState, sizeof(std3D_BlendState));
@@ -753,7 +755,13 @@ void rdSetTexMode(int a1)
 int std3D_AddLight(rdLight* light, rdVector3* viewPosition);
 int rdAddLight(rdLight* pLight, rdVector3* pPosition)
 {
-	return std3D_AddLight(pLight, pPosition);
+	rdVector4 pos4;
+	rdVector_Copy3(&pos4, pPosition);
+	pos4.w = 1.0f;
+
+	rdVector4 viewPos;
+	rdMatrix_TransformPoint44(&viewPos, &pos4, &rdroid_matrices[RD_MATRIX_VIEW]);
+	return std3D_AddLight(pLight, (rdVector3*)&viewPos);
 }
 
 void std3D_ClearLights();
@@ -774,7 +782,15 @@ void rdAmbientLight(float r, float g, float b)
 
 void rdAmbientLightSH(rdAmbient* amb)
 {
-	rdAmbient_Copy(&rdroid_lightingState.ambientStateSH, amb);
+	// rotate the ambient SH to view space
+	rdroid_lightingState.ambientStateSH.r.x = amb->r.x;
+	rdroid_lightingState.ambientStateSH.g.x = amb->g.x;
+	rdroid_lightingState.ambientStateSH.b.x = amb->b.x;
+	rdMatrix_TransformVector34(&rdroid_lightingState.ambientStateSH.r.y, &amb->r.y, &rdroid_matrices[RD_MATRIX_VIEW]);
+	rdMatrix_TransformVector34(&rdroid_lightingState.ambientStateSH.g.y, &amb->g.y, &rdroid_matrices[RD_MATRIX_VIEW]);
+	rdMatrix_TransformVector34(&rdroid_lightingState.ambientStateSH.b.y, &amb->b.y, &rdroid_matrices[RD_MATRIX_VIEW]);
+	rdMatrix_TransformVector34(&rdroid_lightingState.ambientStateSH.dominantDir, &amb->dominantDir, &rdroid_matrices[RD_MATRIX_VIEW]);
+	//rdAmbient_Copy(&rdroid_lightingState.ambientStateSH, amb);
 }
 
 #endif

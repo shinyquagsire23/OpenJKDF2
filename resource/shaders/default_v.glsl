@@ -30,7 +30,7 @@ uniform vec4 ambientSH[3];
 uniform vec3 ambientDominantDir;
 
 noperspective out vec2 f_uv_affine;
-flat out vec3 f_face_color;
+out vec3 f_spec;
 
 struct light
 {
@@ -56,6 +56,49 @@ uniform lightBlock
 	light lights[128];
 };
 
+vec3 do_ambient(vec3 normal)
+{
+	const float c = 0.282094792;
+	const float k = 0.488602512;
+	
+	vec4 shN;
+	shN.x =  c;
+	shN.y = -k * normal.y;
+	shN.z =  k * normal.z;
+	shN.w = -k * normal.x;
+				
+	vec3 amb;
+	amb.x = dot(shN, ambientSH[0]);
+	amb.y = dot(shN, ambientSH[1]);
+	amb.z = dot(shN, ambientSH[2]);
+
+	return max(vec3(0.0), amb) / 3.141592;
+}
+
+float do_half_lambert(float ndotl)
+{
+	ndotl = ndotl * 0.5f + 0.5f;
+	return ndotl * ndotl;
+}
+
+float do_specular(vec3 lightDir, vec3 viewDir, vec3 normal)
+{
+	vec3 h = normalize(lightDir + viewDir);
+	float brdf = clamp(dot(h, normal), 0.0, 1.0);
+	brdf *= brdf; // x2
+	brdf *= brdf; // x4
+	brdf *= brdf; // x8
+	return brdf;
+}
+
+float do_fresnel(vec3 viewDir, vec3 normal, float f0)
+{
+	float fresnel = abs(1.0 - dot(normal, viewDir));
+	fresnel *= fresnel;
+	fresnel *= fresnel;
+	return f0 + (1.0 - f0) * fresnel;
+}
+
 vec2 get_horizon_uv(inout vec4 clip_pos)
 {
 	float v10 = (clip_pos.x / clip_pos.w * iResolution.x * 0.5) * uv_mode_params0.x;
@@ -78,8 +121,8 @@ void main(void)
     pos.w = 1.0/(1.0-coord3d.z); // fixme: this doesn't match the projection matrix output AT ALL
     pos.xyz *= pos.w; // pretty sure the problem is z here
 #else
-	vec4 worldPos = modelMatrix * vec4(coord3d, 1.0);
-    vec4 pos = mvp * worldPos;
+	vec4 viewPos = modelMatrix * vec4(coord3d, 1.0);
+    vec4 pos = mvp * viewPos;
 	f_normal = mat3(modelMatrix) * v_normal.xyz;
 #endif
  	f_depth = pos.w / 128.0;
@@ -99,6 +142,8 @@ void main(void)
     f_light = v_light;
 
 #ifdef RENDER_DROID2
+	f_spec = vec3(0.0);
+
 	if(lightMode == 0) // full lit
 	{
 		f_color.xyz = vec3(1.0);
@@ -107,9 +152,10 @@ void main(void)
 	{
 		f_color.xyz = vec3(0.0);
 	}
-	else if(lightMode >= 3 || lightMode == 2 && gl_VertexID == 0) // if gouraud or provoking vertex
+	else if(lightMode >= 2)
 	{
 		vec3 shadeNormal = f_normal;
+		vec3 localViewDir = normalize(-viewPos.xyz);
 
 		float scalar = 0.4; // todo: needs to come from rdCamera_pCurCamera->attenuationMin
 		int totalLights = min(numLights, 128);
@@ -119,10 +165,10 @@ void main(void)
 			//if(l.isActive == 0u)
 			//	continue;
 
-			vec3 diff = l.position.xyz - worldPos.xyz;
+			vec3 diff = l.position.xyz - viewPos.xyz;
 			float len;
 			if (lightMode == 2) // diffuse uses dist to plane
-				len = dot(l.position.xyz - worldPos.xyz, shadeNormal.xyz);
+				len = dot(l.position.xyz - viewPos.xyz, shadeNormal.xyz);
 			else
 				len = length(diff);
 
@@ -130,12 +176,16 @@ void main(void)
 			{
 				diff = normalize(diff);
 				float lightMagnitude = dot(shadeNormal, diff);
-				lightMagnitude = lightMagnitude * 0.5 + 0.5; // half lambert
-				lightMagnitude *= lightMagnitude;
+				if (lightMode > 2)
+					lightMagnitude = do_half_lambert(lightMagnitude);
+
 				if ( lightMagnitude > 0.0 )
 				{
 					float intensity = max(0.0, l.direction_intensity.w - len * scalar) * lightMagnitude;
 					f_color.xyz += intensity * l.color.xyz;
+
+					if(lightMode == 4)
+						f_spec.xyz += intensity * do_specular(diff, localViewDir, shadeNormal);
 				}
 			}
 		}
@@ -145,29 +195,22 @@ void main(void)
 
 		if (ambientMode == 2)
 		{
-			const float c = 0.282094792;
-			const float k = 0.488602512;
-	
-			vec4 shN;
-			shN.x =  c;
-			shN.y = -k * shadeNormal.y;
-			shN.z =  k * shadeNormal.z;
-			shN.w = -k * shadeNormal.x;
+			f_color.xyz += do_ambient(shadeNormal);
+
+			if(lightMode == 4)
+			{
+				float brdf = do_specular(ambientDominantDir, localViewDir, shadeNormal);
 				
-			vec3 amb;
-			amb.x = dot(shN, ambientSH[0]);
-			amb.y = dot(shN, ambientSH[1]);
-			amb.z = dot(shN, ambientSH[2]);
-	
-			f_color.xyz += max(vec3(0.0), amb) / 3.141592;
+				// add some view based fresnel
+				brdf += do_fresnel(localViewDir, shadeNormal, 0.0);
+
+				vec3 reflDir = reflect(-ambientDominantDir, shadeNormal);
+				f_spec.xyz += do_ambient(reflDir) * brdf;
+			}
 		}
 
 		// todo: verify if we want to keep clamping or maybe want something else
 		f_color.xyz = clamp(f_color.xyz, vec3(0.0), vec3(1.0));
-
-		// provoking vertex outputs color for the whole face
-		if(lightMode == 2 && gl_VertexID == 0)
-			f_face_color.xyz = f_color.xyz;
 	}
 #endif
 }

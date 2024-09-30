@@ -5159,10 +5159,10 @@ void std3D_FlushDrawCalls()
 	std3D_SetBlendState(pBlendState);
 	std3D_SetDepthStencilState(pDepthStencilState);
 
-	rdMatrix44 last_mat = pDrawCall->state.modelMatrix;
-	rdMatrix44 last_viewProj = pDrawCall->state.viewProj;
-	glUniformMatrix4fv(drawcall_uniform_mvp, 1, GL_FALSE, (float*)&pDrawCall->state.viewProj);
-	glUniformMatrix4fv(drawcall_uniform_modelMatrix, 1, GL_FALSE, (float*)&pDrawCall->state.modelMatrix);
+	rdMatrix44 last_mat = pDrawCall->state.modelView;
+	rdMatrix44 last_proj = pDrawCall->state.proj;
+	glUniformMatrix4fv(drawcall_uniform_mvp, 1, GL_FALSE, (float*)&pDrawCall->state.proj);
+	glUniformMatrix4fv(drawcall_uniform_modelMatrix, 1, GL_FALSE, (float*)&pDrawCall->state.modelView);
 
 	int vertexOffset = 0;
 	for (int j = 0; j < GL_tmpDrawCallAmt; j++)
@@ -5176,8 +5176,8 @@ void std3D_FlushDrawCalls()
 
 		if (pTexState->pTexture && last_tex != pTexState->pTexture->texture_id
 			|| memcmp(&lastState, &pDrawCall->state, sizeof(std3D_DrawCallState)) != 0
-			|| rdMatrix_Compare44(&last_mat, &pDrawCall->state.modelMatrix) != 0
-			|| rdMatrix_Compare44(&last_viewProj, &pDrawCall->state.viewProj) != 0
+			|| rdMatrix_Compare44(&last_mat, &pDrawCall->state.modelView) != 0
+			|| rdMatrix_Compare44(&last_proj, &pDrawCall->state.proj) != 0
 		)
 		{
 			do_batch = 1;
@@ -5193,13 +5193,12 @@ void std3D_FlushDrawCalls()
 			std3D_SetBlendState(pBlendState);
 			std3D_SetDepthStencilState(pDepthStencilState);
 
-			glUniformMatrix4fv(drawcall_uniform_mvp, 1, GL_FALSE, (float*)&pDrawCall->state.viewProj);
-			glUniformMatrix4fv(drawcall_uniform_modelMatrix, 1, GL_FALSE, (float*)&pDrawCall->state.modelMatrix);
+			glUniformMatrix4fv(drawcall_uniform_mvp, 1, GL_FALSE, (float*)&pDrawCall->state.proj);
+			glUniformMatrix4fv(drawcall_uniform_modelMatrix, 1, GL_FALSE, (float*)&pDrawCall->state.modelView);
 
-			last_tex = pTexState->pTexture->texture_id;
-			last_mat = pDrawCall->state.modelMatrix;
-			last_viewProj = pDrawCall->state.viewProj;
 			last_tex = pTexState->pTexture ? pTexState->pTexture->texture_id : blank_tex_white;
+			last_mat = pDrawCall->state.modelView;
+			last_proj = pDrawCall->state.proj;
 			lastState = pDrawCall->state;
 
 			vertexOffset += batch_verts;

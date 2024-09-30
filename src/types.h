@@ -887,8 +887,8 @@ typedef struct std3D_LightingState
 
 typedef struct std3D_DrawCallState
 {
-	rdMatrix44              modelMatrix; // object/model matrix
-	rdMatrix44              viewProj;    // pre-multiplied view projection matrix (todo: do we want to pull this out?)
+	rdMatrix44              modelView;
+	rdMatrix44              proj;
 	std3D_RasterState       raster;
 	std3D_BlendState        blend;
 	std3D_DepthStencilState depthStencil;

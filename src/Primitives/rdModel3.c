@@ -1610,7 +1610,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
 	// if we have an ambient cube, dim the ambient a bit to make it pop
 	// todo: some kind of flag to indicate when to use dark diffuse
 	if (USES_VERTEX_LIGHTING(lightingMode))
-		rdVector_Scale3Acc(&ambientLight, lightingMode == RD_LIGHTMODE_SPECULAR ? 0.2f : 0.5f);
+		rdVector_Scale3Acc(&ambientLight, 0.35f);
 #else
 	
 	if (rdroid_curRenderOptions & 2)
@@ -1780,7 +1780,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
 	// if we have an ambient cube, dim the ambient a bit to make it pop
 	// todo: some kind of flag to indicate when to use dark diffuse
 	if (USES_VERTEX_LIGHTING(rdModel3_lightingMode))
-		rdVector_Scale3Acc(&procEntry->ambientLight, rdModel3_lightingMode == RD_LIGHTMODE_SPECULAR ? 0.2f : 0.5f);
+		rdVector_Scale3Acc(&procEntry->ambientLight, 0.35f);
 
 #else
     if ( rdroid_curRenderOptions & 2 )
