@@ -609,22 +609,21 @@ void rdAmbient_Scale(rdAmbient* ambient, float scale)
 	rdVector_Scale4Acc(&ambient->b, scale);
 }
 
-
 void rdAmbient_Lerp(rdAmbient* out, const rdAmbient* ambient0, const rdAmbient* ambient1, float amount)
 {
 	out->r.x = stdMath_Lerp(ambient0->r.y, ambient1->r.y, amount);
 	out->g.x = stdMath_Lerp(ambient0->g.y, ambient1->g.y, amount);
 	out->b.x = stdMath_Lerp(ambient0->b.y, ambient1->b.y, amount);
-	rdVector_Lerp3(&out->r.y, &ambient0->r.y, &ambient1->r.y, amount);
-	rdVector_Lerp3(&out->g.y, &ambient0->g.y, &ambient1->g.y, amount);
-	rdVector_Lerp3(&out->b.y, &ambient0->b.y, &ambient1->b.y, amount);
+	rdVector_Lerp3((rdVector3*)&out->r.y, (rdVector3*)&ambient0->r.y, (rdVector3*) &ambient1->r.y, amount);
+	rdVector_Lerp3((rdVector3*)&out->g.y, (rdVector3*)&ambient0->g.y, (rdVector3*) &ambient1->g.y, amount);
+	rdVector_Lerp3((rdVector3*)&out->b.y, (rdVector3*)&ambient0->b.y, (rdVector3*) &ambient1->b.y, amount);
 }
 
 void rdAmbient_AddAcc(rdAmbient* out, const rdAmbient* ambient)
 {
-	rdVector_Add4Acc((rdVector3*)&out->r, &ambient->r);
-	rdVector_Add4Acc((rdVector3*)&out->g, &ambient->g);
-	rdVector_Add4Acc((rdVector3*)&out->b, &ambient->b);
+	rdVector_Add4Acc((rdVector3*)&out->r, (rdVector3*)&ambient->r);
+	rdVector_Add4Acc((rdVector3*)&out->g, (rdVector3*)&ambient->g);
+	rdVector_Add4Acc((rdVector3*)&out->b, (rdVector3*)&ambient->b);
 }
 
 void rdAmbient_Copy(rdAmbient* outAmbient, const rdAmbient* ambient)

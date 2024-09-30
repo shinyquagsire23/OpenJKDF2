@@ -841,9 +841,9 @@ void rdAmbientLightSH(rdAmbient* amb)
 	rdroid_lightingState.ambientStateSH.r.x = amb->r.x;
 	rdroid_lightingState.ambientStateSH.g.x = amb->g.x;
 	rdroid_lightingState.ambientStateSH.b.x = amb->b.x;
-	rdMatrix_TransformVector34(&rdroid_lightingState.ambientStateSH.r.y, &amb->r.y, &viewMat);
-	rdMatrix_TransformVector34(&rdroid_lightingState.ambientStateSH.g.y, &amb->g.y, &viewMat);
-	rdMatrix_TransformVector34(&rdroid_lightingState.ambientStateSH.b.y, &amb->b.y, &viewMat);
+	rdMatrix_TransformVector34((rdVector3*)&rdroid_lightingState.ambientStateSH.r.y, &amb->r.y, &viewMat);
+	rdMatrix_TransformVector34((rdVector3*)&rdroid_lightingState.ambientStateSH.g.y, &amb->g.y, &viewMat);
+	rdMatrix_TransformVector34((rdVector3*)&rdroid_lightingState.ambientStateSH.b.y, &amb->b.y, &viewMat);
 	rdMatrix_TransformVector34(&rdroid_lightingState.ambientStateSH.dominantDir, &amb->dominantDir, &viewMat);
 	//rdAmbient_Copy(&rdroid_lightingState.ambientStateSH, amb);
 }
