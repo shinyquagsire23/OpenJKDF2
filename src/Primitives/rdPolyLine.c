@@ -428,8 +428,7 @@ void rdPolyLine_DrawFace(rdThing* thing, rdFace* face, rdVector3* unused, rdVert
 		rdEndPrimitive();
 	}
 
-	rdSetCullMode(RD_CULL_MODE_CCW_ONLY);
-
+	rdTexOffseti(0, 0);
 	rdMatrixMode(RD_MATRIX_VIEW);
 	rdLoadMatrix(&viewMatrix);
 }
