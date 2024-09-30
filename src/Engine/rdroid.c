@@ -467,7 +467,7 @@ void rdPostMultiplyMatrix(const rdMatrix44* pMatrix)
 
 void rdGetMatrix(rdMatrix44* out, rdMatrixMode_t mode)
 {
-	rdMatrix_Copy44(out, &rdroid_matrices[rdroid_curMatrixMode]);
+	rdMatrix_Copy44(out, &rdroid_matrices[mode]);
 }
 
 void rdResetMatrices()
