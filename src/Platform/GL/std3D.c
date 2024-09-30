@@ -5047,7 +5047,6 @@ void std3D_SetDepthStencilState(std3D_DepthStencilState* pDepthStencilState)
 
 void std3D_SetTextureState(std3D_TextureState* pTexState)
 {
-	std3D_SetTexture(pTexState->pTexture);
 	glUniform1i(drawcall_uniform_uv_mode, pTexState->texMode);
 	glUniform4f(drawcall_uniform_texgen_params, pTexState->texGen.x, pTexState->texGen.y, pTexState->texGen.z, pTexState->texGen.w);
 	glUniform2f(drawcall_uniform_uv_offset, pTexState->texOffset.x, pTexState->texOffset.y);
@@ -5168,6 +5167,7 @@ void std3D_FlushDrawCalls()
 	std3D_SetDepthStencilState(pDepthStencilState);
 	std3D_SetTextureState(pTexState);
 	std3D_SetLightingState(pLightState);
+	std3D_SetTexture(pRasterState->geoMode == RD_GEOMODE_TEXTURED ? pTexState->pTexture : NULL);
 
 	rdMatrix44 last_mat = pDrawCall->state.modelView;
 	rdMatrix44 last_proj = pDrawCall->state.proj;
@@ -5203,6 +5203,7 @@ void std3D_FlushDrawCalls()
 			std3D_SetDepthStencilState(pDepthStencilState);
 			std3D_SetTextureState(pTexState);
 			std3D_SetLightingState(pLightState);
+			std3D_SetTexture(pRasterState->geoMode == RD_GEOMODE_TEXTURED ? pTexState->pTexture : NULL);
 
 			glUniformMatrix4fv(drawcall_uniform_mvp, 1, GL_FALSE, (float*)&pDrawCall->state.proj);
 			glUniformMatrix4fv(drawcall_uniform_modelMatrix, 1, GL_FALSE, (float*)&pDrawCall->state.modelView);

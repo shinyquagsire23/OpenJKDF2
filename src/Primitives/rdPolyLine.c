@@ -377,7 +377,7 @@ void rdPolyLine_DrawFace(rdThing* thing, rdFace* face, rdVector3* unused, rdVert
 
 	rdSortPriority(face->sortId);
 
-	rdBindTexture(face->material, thing->wallCel);
+	rdBindMaterial(face->material, thing->wallCel);
 
 	int extraData = 0;
 #ifdef STENCIL_BUFFER

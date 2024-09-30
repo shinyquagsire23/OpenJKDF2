@@ -140,7 +140,8 @@ void rdSetTexMode(int a1);
 void rdClearDepth(uint32_t z);
 void rdClearColor(uint32_t rgba);
 
-int rdBindTexture(rdMaterial* pMaterial, int cel);
+int rdBindTexture(rdTexture* pTexture);
+int rdBindMaterial(rdMaterial* pMaterial, int cel);
 void rdTexGenParams(float p0, float p1, float p2, float p3);
 void rdTexOffset(float u, float v);
 void rdTexOffseti(float u, float v);

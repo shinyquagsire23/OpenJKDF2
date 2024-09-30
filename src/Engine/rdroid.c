@@ -40,7 +40,6 @@ static rdMatrix44     rdroid_curViewProjInv;
 
 static int rdroid_sortPriority = 0;
 
-static rdMaterial* rdroid_curMaterial = NULL;
 static float       rdroid_texWidth = 1;
 static float       rdroid_texHeight = 1;
 
@@ -658,7 +657,29 @@ void rdNormal(const rdVector3* pNormal)
 // Texture
 // todo: mips? how to do that in hw with current material cache?
 void std3D_GetValidDimension(unsigned int inW, unsigned int inH, unsigned int* outW, unsigned int* outH);
-int rdBindTexture(rdMaterial* pMaterial, int cel)
+int rdBindTexture(rdTexture* pTexture)
+{
+	if (!pTexture)
+		return 0;
+
+	// todo: texture cache here
+	rdroid_textureState.pTexture = &pTexture->alphaMats[0];
+	// todo: move me
+	rdroid_textureState.alphaTest = (pTexture->alpha_en & 1) != 0;
+
+	uint32_t out_width, out_height;
+	std3D_GetValidDimension(
+		pTexture->texture_struct[0]->format.width,
+		pTexture->texture_struct[0]->format.height,
+		&out_width,
+		&out_height);
+	rdroid_texWidth = (float)(out_width << 0);
+	rdroid_texHeight = (float)(out_height << 0);
+
+	return 1;
+}
+
+int rdBindMaterial(rdMaterial* pMaterial, int cel)
 {
 	if(!pMaterial)
 		return 0;
@@ -667,16 +688,19 @@ int rdBindTexture(rdMaterial* pMaterial, int cel)
 
 	cel = stdMath_ClampInt(cel, 0, pMaterial->num_texinfo - 1);
 
-	rdTexinfo* texinfo = pMaterial->texinfos[cel];
+	// set the material fill color
+	rdVector3 fillColor;
+	rdMaterial_GetFillColor(&fillColor, pMaterial, rdColormap_pCurMap, cel, -1);
+	rdSetConstantColorf(fillColor.x, fillColor.y, fillColor.z, 1.f);
 
-	rdTexture* sith_tex_sel = NULL;
+	rdTexinfo* texinfo = pMaterial->texinfos[cel];
 	if (!texinfo || (texinfo->header.texture_type & 8) == 0)
 	{
 		rdroid_textureState.pTexture = NULL;
 	}
 	else
 	{
-		sith_tex_sel = texinfo->texture_ptr;
+		rdTexture* sith_tex_sel = texinfo->texture_ptr;
 		if (!rdMaterial_AddToTextureCache(pMaterial, sith_tex_sel, 0, alpha_is_opaque, cel))
 			return 0;
 
@@ -696,7 +720,6 @@ int rdBindTexture(rdMaterial* pMaterial, int cel)
 		rdroid_texWidth = (float)(out_width << 0);
 		rdroid_texHeight = (float)(out_height << 0);	
 	}
-	rdroid_curMaterial = pMaterial;
 
 	return 1;
 }

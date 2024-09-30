@@ -201,7 +201,7 @@ int rdSprite_Draw(rdThing* thing, rdMatrix34* mat)
 
 	rdSortPriority(sprite->face.sortId);
 
-	rdBindTexture(sprite->face.material, thing->wallCel);
+	rdBindMaterial(sprite->face.material, thing->wallCel);
 
 	int extraData = 0;
 #ifdef STENCIL_BUFFER

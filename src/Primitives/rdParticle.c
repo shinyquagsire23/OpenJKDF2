@@ -350,8 +350,6 @@ int rdParticle_Draw(rdThing* thing, rdMatrix34* mat)
 		rdAmbientLight(0, 0, 0);
 #endif
 
-	rdBindTexture(particle->material, thing->wallCel);
-
 	int extraData = 0;
 #ifdef STENCIL_BUFFER
 	extraData |= 2; // mark stencil buffer
@@ -380,11 +378,7 @@ int rdParticle_Draw(rdThing* thing, rdMatrix34* mat)
 		//}
 #endif
 
-		rdBindTexture(particle->material, particle->vertexCel[j]);
-
-		rdVector3 fillColor;
-		rdMaterial_GetFillColor(&fillColor, particle->material, rdColormap_pCurMap, j, -1);
-		rdSetConstantColorf(fillColor.x, fillColor.y, fillColor.z, 1.f);
+		rdBindMaterial(particle->material, particle->vertexCel[j]);
 
 		float left = aParticleVertices[j].x - particle->radius;
 		float bottom = aParticleVertices[j].z - particle->radius;
