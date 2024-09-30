@@ -669,6 +669,7 @@ void sithRender_Draw()
 	{
 		rdSetZBufferMethod(RD_ZBUFFER_READ_NOWRITE);
 		rdSetSortingMethod(2);
+		//rdSetBlendMode(RD_BLEND_MODE_NONE);
 		for (sithThing* iter = sithRender_alphaDrawThing; iter; )
 		{
 			// call the alpha callback for renderweapon
@@ -2693,6 +2694,7 @@ void sithRender_RenderAlphaSurfaces()
 	}
 
 	rdCache_Flush();
+	rdSetBlendMode(RD_BLEND_MODE_NONE);
 	rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
 }
 #else

@@ -4964,7 +4964,7 @@ void std3D_SetRasterState(std3D_RasterState* pRasterState)
 	else
 		glEnable(GL_CULL_FACE);
 
-	glFrontFace(pRasterState->cullMode == RD_CULL_MODE_CCW_ONLY ? GL_CCW : GL_CW);
+	glFrontFace(pRasterState->cullMode == RD_CULL_MODE_CW_ONLY ? GL_CW : GL_CCW);
 
 	//rdGeoMode_t         geoMode;
 	//rdVertexColorMode_t colorMode;
@@ -4995,7 +4995,10 @@ void std3D_SetBlendState(std3D_BlendState* pBlendState)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// fixme: I don't entirely understand the logic behind this blend mode uniform...
-	glUniform1i(drawcall_uniform_blend_mode, D3DBLEND_SRCALPHA);
+	//if (pBlendState->blendMode == RD_BLEND_MODE_NONE)
+	//	glUniform1i(drawcall_uniform_blend_mode, D3DBLEND_ONE);
+	//else
+		glUniform1i(drawcall_uniform_blend_mode, D3DBLEND_SRCALPHA);
 }
 
 void std3D_SetDepthStencilState(std3D_DepthStencilState* pDepthStencilState)
