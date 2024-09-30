@@ -1058,6 +1058,23 @@ void jkPlayer_DrawPov()
     if (!playerThings[playerThingIdx].povModel.model3)
         return;
 
+#ifdef RENDER_DROID2
+	int32_t tex_w = (int32_t)((double)Window_xSize * jkPlayer_ssaaMultiple);
+	int32_t tex_h = (int32_t)((double)Window_ySize * jkPlayer_ssaaMultiple);
+	rdViewport(0, 0, tex_w, tex_h, 0, 1);
+
+	rdMatrixMode(RD_MATRIX_VIEW);
+	rdIdentity();
+	rdLoadMatrix34(&rdCamera_pCurCamera->view_matrix);
+
+	rdMatrixMode(RD_MATRIX_PROJECTION);
+	rdIdentity();
+	rdPerspective(rdCamera_pCurCamera->fov, rdCamera_pCurCamera->screenAspectRatio, rdCamera_pCurCamera->pClipFrustum->field_0.y, rdCamera_pCurCamera->pClipFrustum->field_0.z);
+
+	rdMatrixMode(RD_MATRIX_MODEL);
+	rdIdentity();
+#endif
+
     if ( playerThings[playerThingIdx].povModel.puppet )
     {
         rdPuppet_UpdateTracks(playerThings[playerThingIdx].povModel.puppet, sithTime_deltaSeconds);
