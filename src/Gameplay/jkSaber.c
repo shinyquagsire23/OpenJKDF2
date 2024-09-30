@@ -601,8 +601,7 @@ void  jkSaber_UpdateCollision2(sithThing *pPlayerThing,rdVector3 *pSaberPos,rdVe
 // Added: passive (non-damaging) collision effects
 void jkSaber_SpawnBurn(jkPlayerInfo* pPlayerInfo, rdVector3* pPos, rdVector3* pHitNormal, sithSector* pSector, int sparkType)
 {
-	// no decals? fo'get abouuut'it
-	if (!jkPlayer_enableDecals || sithTime_curMs < pPlayerInfo->lastMarkSpawnMs + 50)
+	if (sithTime_curMs < pPlayerInfo->lastMarkSpawnMs + 50)
 	{
 		pPlayerInfo->saberCollideInfo.totalCollisionTime = 0;
 		return;
