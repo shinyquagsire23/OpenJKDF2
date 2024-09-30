@@ -227,7 +227,7 @@ int rdSprite_Draw(rdThing* thing, rdMatrix34* mat)
 	{
 		for (int i = 0; i < sprite->face.numVertices; ++i)
 		{
-			rdColor4f(sprite->face.extraLight, sprite->face.extraLight, sprite->face.extraLight, 1.0f);
+			rdColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 			if (sprite->vertexUVs)
 			{
 				rdVector3* uv = &sprite->vertexUVs[i];

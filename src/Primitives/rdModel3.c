@@ -1622,6 +1622,11 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
 	rdAmbientLightSH(&rdCamera_pCurCamera->ambientSH);
 	rdSetAmbientMode(USES_VERTEX_LIGHTING(lightingMode) ? RD_AMBIENT_SH : RD_AMBIENT_COLOR);
 
+	// todo: move this all into rdBindMaterial
+	rdVector3 fillColor;
+	rdMaterial_GetFillColor(&fillColor, face->material, rdColormap_pCurMap, face->wallCel, -1);
+	rdSetConstantColorf(fillColor.x, fillColor.y, fillColor.z, 1.f);
+
 	int isIdentityMap = (rdColormap_pCurMap == rdColormap_pIdentityMap);
 
 	float alpha = 1.0f;

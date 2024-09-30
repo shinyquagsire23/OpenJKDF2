@@ -768,9 +768,19 @@ void rdSetAlphaThreshold(uint8_t threshold)
 {
 	rdroid_textureState.alphaRef = threshold;
 }
+
 void rdSetConstantColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
-	// todo
+	rdroid_textureState.fillColor = b | (g << 8) | (r << 16) | (a << 24);
+}
+
+void rdSetConstantColorf(float r, float g, float b, float a)
+{
+	uint32_t ir = stdMath_ClampInt(r * 255, 0, 255);
+	uint32_t ig = stdMath_ClampInt(g * 255, 0, 255);
+	uint32_t ib = stdMath_ClampInt(b * 255, 0, 255);
+	uint32_t ia = stdMath_ClampInt(a * 255, 0, 255);
+	rdSetConstantColor(ir, ig, ib, ia);
 }
 
 void rdSetChromaKey(rdChromaKeyMode_t mode)

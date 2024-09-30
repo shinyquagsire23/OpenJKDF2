@@ -888,6 +888,7 @@ typedef struct std3D_TextureState
 	uint8_t           alphaRef;
 	rdChromaKeyMode_t chromaKeyMode;
 	uint32_t          chromaKeyColor;
+	uint32_t          fillColor;
 	rdTexMode_t       texMode;
 	rdDDrawSurface*   pTexture;
 	rdVector4         texGen;

@@ -417,7 +417,7 @@ void rdPolyLine_DrawFace(rdThing* thing, rdFace* face, rdVector3* unused, rdVert
 	{
 		for(int i = 0; i < face->numVertices; ++i)
 		{
-			rdColor4f(face->extraLight, face->extraLight, face->extraLight, 1.0f);
+			rdColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 			if(idxInfo->vertexUVs)
 			{
 				rdVector3* uv = &uvs[i];

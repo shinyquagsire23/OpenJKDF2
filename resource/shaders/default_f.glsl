@@ -90,8 +90,9 @@ in float f_depth;
 
 #ifdef RENDER_DROID2
 uniform int lightMode;
-
 uniform int uv_mode;
+uniform vec4 fillColor;
+
 noperspective in vec2 f_uv_affine;
 in vec3 f_spec;
 #endif
@@ -380,7 +381,11 @@ void main(void)
 #endif
 
     if (tex_mode == TEX_MODE_TEST) {
+	#ifdef RENDER_DROID2
+		sampled_color = fillColor;
+	#else
         sampled_color = vec4(1.0, 1.0, 1.0, 1.0);
+	#endif
     }
     else if (tex_mode == TEX_MODE_16BPP
     || tex_mode == TEX_MODE_BILINEAR_16BPP

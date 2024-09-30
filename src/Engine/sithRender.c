@@ -1064,6 +1064,11 @@ void sithRender_DrawSurface(sithSurface* surface)
 	int wallCel = surface->surfaceInfo.face.wallCel;
 	rdBindTexture(surface->surfaceInfo.face.material, wallCel);
 
+	// todo: move this all into rdBindMaterial
+	rdVector3 fillColor;
+	rdMaterial_GetFillColor(&fillColor, surface->surfaceInfo.face.material, rdColormap_pCurMap, wallCel, -1);
+	rdSetConstantColorf(fillColor.x, fillColor.y, fillColor.z, 1.f);
+
 	rdSetAmbientMode(RD_AMBIENT_NONE);
 	if (sithRender_lightingIRMode)
 	{

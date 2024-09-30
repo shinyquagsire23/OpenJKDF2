@@ -186,7 +186,7 @@ GLint drawcall_attribute_coordVS;
 #endif
 GLint drawcall_uniform_ambient_mode, drawcall_uniform_ambient_color, drawcall_uniform_ambient_sh, drawcall_uniform_ambient_sh_dir;
 GLint drawcall_uniform_uv_mode, drawcall_uniform_texgen_params, drawcall_uniform_uv_offset;
-GLint drawcall_uniform_mvp, drawcall_uniform_modelMatrix, drawcall_uniform_tex, drawcall_uniform_texEmiss, drawcall_uniform_displacement_map, drawcall_uniform_tex_mode, drawcall_uniform_blend_mode, drawcall_uniform_worldPalette, drawcall_uniform_worldPaletteLights;
+GLint drawcall_uniform_mvp, drawcall_uniform_modelMatrix, drawcall_uniform_fillColor, drawcall_uniform_tex, drawcall_uniform_texEmiss, drawcall_uniform_displacement_map, drawcall_uniform_tex_mode, drawcall_uniform_blend_mode, drawcall_uniform_worldPalette, drawcall_uniform_worldPaletteLights;
 GLint drawcall_uniform_tint, drawcall_uniform_filter, drawcall_uniform_fade, drawcall_uniform_add, drawcall_uniform_emissiveFactor, drawcall_uniform_albedoFactor;
 GLint drawcall_uniform_light_mode, drawcall_uniform_light_mult, drawcall_uniform_displacement_factor, drawcall_uniform_iResolution, drawcall_uniform_enableDither;
 #ifdef FOG
@@ -1275,6 +1275,7 @@ int init_resources()
 	drawcall_uniform_ambient_color = std3D_tryFindUniform(drawcall_program, "ambientColor");
 	drawcall_uniform_ambient_sh = std3D_tryFindUniform(drawcall_program, "ambientSH");
 	drawcall_uniform_ambient_sh_dir = std3D_tryFindUniform(drawcall_program, "ambientDominantDir");
+	drawcall_uniform_fillColor = std3D_tryFindUniform(drawcall_program, "fillColor");
 	drawcall_uniform_tex = std3D_tryFindUniform(drawcall_program, "tex");
 	drawcall_uniform_texEmiss = std3D_tryFindUniform(drawcall_program, "texEmiss");
 	drawcall_uniform_worldPalette = std3D_tryFindUniform(drawcall_program, "worldPalette");
@@ -4898,7 +4899,12 @@ void std3D_SetTexture(rdDDrawSurface* pTexture)
 		glActiveTexture(GL_TEXTURE0 + 0);
 		glBindTexture(GL_TEXTURE_2D, blank_tex_white);
 		glUniform1i(drawcall_uniform_tex_mode, TEX_MODE_TEST);
-		glUniform1i(drawcall_uniform_blend_mode, 2);
+		glUniform1i(drawcall_uniform_blend_mode, D3DBLEND_ONE);
+	
+		glUniform3f(drawcall_uniform_emissiveFactor, 0, 0, 0);
+		glUniform4f(drawcall_uniform_albedoFactor, 1, 1, 1, 1);
+		glUniform1f(drawcall_uniform_displacement_factor, 0);
+		glActiveTexture(GL_TEXTURE0 + 0);
 	}
 	else
 	{
@@ -5045,6 +5051,12 @@ void std3D_SetTextureState(std3D_TextureState* pTexState)
 	glUniform1i(drawcall_uniform_uv_mode, pTexState->texMode);
 	glUniform4f(drawcall_uniform_texgen_params, pTexState->texGen.x, pTexState->texGen.y, pTexState->texGen.z, pTexState->texGen.w);
 	glUniform2f(drawcall_uniform_uv_offset, pTexState->texOffset.x, pTexState->texOffset.y);
+
+	float a = ((pTexState->fillColor >> 24) & 0xFF) / 255.0f;
+	float r = ((pTexState->fillColor >> 16) & 0xFF) / 255.0f;
+	float g = ((pTexState->fillColor >>  8) & 0xFF) / 255.0f;
+	float b = ((pTexState->fillColor >>  0) & 0xFF) / 255.0f;
+	glUniform4f(drawcall_uniform_fillColor, r, g, b, a);
 }
 
 void std3D_SetLightingState(std3D_LightingState* pLightState)
@@ -5151,11 +5163,11 @@ void std3D_FlushDrawCalls()
 	std3D_DrawCallState lastState = pDrawCall->state;
 
 	int last_tex = pTexState->pTexture ? pTexState->pTexture->texture_id : blank_tex_white;
-	std3D_SetTextureState(pTexState);
-	std3D_SetLightingState(pLightState);
 	std3D_SetRasterState(pRasterState);
 	std3D_SetBlendState(pBlendState);
 	std3D_SetDepthStencilState(pDepthStencilState);
+	std3D_SetTextureState(pTexState);
+	std3D_SetLightingState(pLightState);
 
 	rdMatrix44 last_mat = pDrawCall->state.modelView;
 	rdMatrix44 last_proj = pDrawCall->state.proj;
@@ -5186,11 +5198,11 @@ void std3D_FlushDrawCalls()
 		{
 			glDrawArrays(GL_TRIANGLES, vertexOffset, batch_verts);
 
-			std3D_SetTextureState(pTexState);
-			std3D_SetLightingState(pLightState);
 			std3D_SetRasterState(pRasterState);
 			std3D_SetBlendState(pBlendState);
 			std3D_SetDepthStencilState(pDepthStencilState);
+			std3D_SetTextureState(pTexState);
+			std3D_SetLightingState(pLightState);
 
 			glUniformMatrix4fv(drawcall_uniform_mvp, 1, GL_FALSE, (float*)&pDrawCall->state.proj);
 			glUniformMatrix4fv(drawcall_uniform_modelMatrix, 1, GL_FALSE, (float*)&pDrawCall->state.modelView);
