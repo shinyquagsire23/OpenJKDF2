@@ -125,6 +125,127 @@ void rdSprite_FreeEntry(rdSprite *sprite)
     }
 }
 
+#ifdef RENDER_DROID2
+int rdSprite_Draw(rdThing* thing, rdMatrix34* mat)
+{
+	rdSprite* sprite = thing->sprite3;
+
+	rdVector3 vertex_out;
+	rdMatrix_TransformPoint34(&vertex_out, &mat->scale, &rdCamera_pCurCamera->view_matrix);
+
+	int clipResult;
+	if (rdroid_curCullFlags & 2)
+		clipResult = rdClip_SphereInFrustrum(rdCamera_pCurCamera->pClipFrustum, &vertex_out, sprite->radius);
+	else
+		clipResult = thing->clippingIdk;
+
+	if (clipResult == 2)
+		return 0;
+
+	rdMatrix44 viewMatrix;
+	rdGetMatrix(&viewMatrix, RD_MATRIX_VIEW);
+
+	// vertices are already in view space
+	rdMatrixMode(RD_MATRIX_VIEW);
+	rdIdentity();
+
+	rdMatrixMode(RD_MATRIX_MODEL);
+	rdIdentity();
+
+	rdGeoMode_t curGeometryMode_ = rdroid_curGeometryMode;
+	rdLightMode_t curLightingMode_ = rdroid_curLightingMode;
+	rdTexMode_t curTextureMode_ = rdroid_curTextureMode;
+
+	if (curGeometryMode_ >= sprite->face.geometryMode)
+		curGeometryMode_ = sprite->face.geometryMode;
+
+	if (curGeometryMode_ >= thing->curGeoMode)
+		curGeometryMode_ = thing->curGeoMode;
+	else if (rdroid_curGeometryMode >= sprite->face.geometryMode)
+		curGeometryMode_ = sprite->face.geometryMode;
+	else
+		curGeometryMode_ = rdroid_curGeometryMode;
+
+	rdSetGeoMode(curGeometryMode_);
+
+	if (curLightingMode_ >= sprite->face.lightingMode)
+		curLightingMode_ = sprite->face.lightingMode;
+
+	if (curLightingMode_ >= thing->curLightMode)
+		curLightingMode_ = thing->curLightMode;
+	else if (curLightingMode_ < sprite->face.lightingMode)
+		curLightingMode_ = rdroid_curLightingMode;
+
+	rdSetLightMode(curLightingMode_);
+
+	if (curTextureMode_ >= sprite->face.textureMode)
+		curTextureMode_ = sprite->face.textureMode;
+
+	if (curTextureMode_ >= sprite->face.textureMode)
+		curTextureMode_ = sprite->face.textureMode;
+	else
+		curTextureMode_ = rdroid_curTextureMode;
+	rdSetTexMode(curTextureMode_);
+
+#ifdef RGB_AMBIENT
+	if (rdroid_curRenderOptions & 2)
+		rdAmbientLight(rdCamera_pCurCamera->ambientLight.x, rdCamera_pCurCamera->ambientLight.y, rdCamera_pCurCamera->ambientLight.z);
+	else
+		rdAmbientLight(0, 0, 0);
+#else
+	if (rdroid_curRenderOptions & 2)
+		rdAmbientLight(rdCamera_pCurCamera->ambientLight, rdCamera_pCurCamera->ambientLight, rdCamera_pCurCamera->ambientLight);
+	else
+		rdAmbientLight(0, 0, 0);
+#endif
+
+	rdSortPriority(sprite->face.sortId);
+
+	rdBindTexture(sprite->face.material, thing->wallCel);
+
+	int extraData = 0;
+#ifdef STENCIL_BUFFER
+	extraData |= 2; // mark stencil buffer
+#endif
+
+	rdTexOffseti(sprite->face.clipIdk.x, sprite->face.clipIdk.y);
+
+	rdSprite_inVerts[0].x = sprite->offset.x - sprite->halfWidth + vertex_out.x;
+	rdSprite_inVerts[1].y = sprite->offset.y + vertex_out.y;
+	rdSprite_inVerts[1].z = sprite->offset.z - sprite->halfHeight + vertex_out.z;
+	rdSprite_inVerts[2].x = sprite->halfWidth + sprite->offset.x + vertex_out.x;
+	rdSprite_inVerts[2].y = sprite->offset.y + vertex_out.y;
+	rdSprite_inVerts[2].z = sprite->offset.z + sprite->halfHeight + vertex_out.z;
+	rdSprite_inVerts[0].y = sprite->offset.y + vertex_out.y;
+	rdSprite_inVerts[0].z = sprite->offset.z - sprite->halfHeight + vertex_out.z;
+	rdSprite_inVerts[3].x = sprite->offset.x - sprite->halfWidth + vertex_out.x;
+	rdSprite_inVerts[1].x = sprite->halfWidth + sprite->offset.x + vertex_out.x;
+	rdSprite_inVerts[3].y = sprite->offset.y + vertex_out.y;
+	rdSprite_inVerts[3].z = sprite->offset.z + sprite->halfHeight + vertex_out.z;
+
+	if (rdBeginPrimitive(RD_PRIMITIVE_TRIANGLE_FAN))
+	{
+		for (int i = 0; i < sprite->face.numVertices; ++i)
+		{
+			rdColor4f(sprite->face.extraLight, sprite->face.extraLight, sprite->face.extraLight, 1.0f);
+			if (sprite->vertexUVs)
+			{
+				rdVector3* uv = &sprite->vertexUVs[i];
+				rdTexCoord2i(uv->x, uv->y);
+			}
+			rdVertex(&rdSprite_inVerts[i]);
+		}
+		rdEndPrimitive();
+	}
+
+	rdSortPriority(0);
+	rdTexOffseti(0, 0);
+	rdMatrixMode(RD_MATRIX_VIEW);
+	rdLoadMatrix(&viewMatrix);
+
+	return 1;
+}
+#else
 int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
 {
     rdProcEntry *procEntry;
@@ -347,3 +468,4 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     rdCache_AddProcFace(extraData, mesh_out.numVertices, procFlags);
     return 1;
 }
+#endif
