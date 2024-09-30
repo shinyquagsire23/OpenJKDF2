@@ -4842,7 +4842,7 @@ static D3DVERTEX GL_tmpDrawCallVerticesSorted[STD3D_MAX_DRAW_CALL_VERTS] = { 0 }
 
 int std3D_ComputeDrawCallSortHash(std3D_DrawCallState* pState)
 {
-	int sortHash = 0;
+	int sortHash = pState->sortPriority << 28;
 	//hash |= ((proc->type & RD_FF_TEX_TRANSLUCENT) == RD_FF_TEX_TRANSLUCENT) << 31;
 	//hash |= ((proc->type & RD_FF_DOUBLE_SIDED) == RD_FF_DOUBLE_SIDED) << 30;
 	//RD_FF_TEX_CLAMP_X

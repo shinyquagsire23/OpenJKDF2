@@ -124,6 +124,8 @@ void rdSetConstantColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 void rdSetChromaKey(rdChromaKeyMode_t mode);
 void rdSetChromaKeyValue(uint8_t r, uint8_t g, uint8_t b);
 
+void rdSortPriority(int sortPriority);
+
 // these names kinda suck, come up with better for per-primitive modes
 void rdSetGeoMode(int a1);
 void rdSetLightMode(int a1);

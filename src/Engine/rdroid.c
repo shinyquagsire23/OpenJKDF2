@@ -38,6 +38,8 @@ static rdMatrix44     rdroid_curViewProj;
 static rdMatrix44     rdroid_curProjInv;
 static rdMatrix44     rdroid_curViewProjInv;
 
+static int rdroid_sortPriority = 0;
+
 static rdMaterial* rdroid_curMaterial = NULL;
 static float       rdroid_texWidth = 1;
 static float       rdroid_texHeight = 1;
@@ -116,6 +118,7 @@ int rdStartup(HostServices *p_hs)
 	rdResetDepthStencilState();
 	rdResetTextureState();
 	rdResetLightingState();
+	rdroid_sortPriority = 0;
 #endif
 
     bRDroidStartup = 1;
@@ -513,6 +516,7 @@ void rdEndPrimitive()
 	std3D_DrawCallState state;
 	rdMatrix_Copy44(&state.modelView, &rdroid_curModelView);
 	rdMatrix_Copy44(&state.proj, &rdroid_matrices[RD_MATRIX_PROJECTION]);
+	state.sortPriority = rdroid_sortPriority;
 
 	memcpy(&state.raster, &rdroid_rasterState, sizeof(std3D_RasterState));
 	memcpy(&state.blend, &rdroid_blendState, sizeof(std3D_BlendState));
@@ -749,7 +753,7 @@ void rdSetBlendMode(rdBlendMode_t state)
 
 void rdSetCullMode(rdCullMode_t mode)
 {
-	rdroid_rasterState.colorMode = mode;
+	rdroid_rasterState.cullMode = mode;
 }
 
 void rdSetScissor(int x, int y, int width, int height)
@@ -777,6 +781,11 @@ void rdSetChromaKey(rdChromaKeyMode_t mode)
 void rdSetChromaKeyValue(uint8_t r, uint8_t g, uint8_t b)
 {
 	rdroid_textureState.chromaKeyColor = b | (g << 8) | (r << 16);
+}
+
+void rdSortPriority(int sortPriority)
+{
+	rdroid_sortPriority = sortPriority;
 }
 
 void rdSetGeoMode(int a1)
