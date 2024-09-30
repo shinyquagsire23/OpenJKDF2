@@ -4761,6 +4761,7 @@ void std3D_DrawOccluder(rdVector3* position, float radius, rdVector3* verts)
 	// bind to main fbo for drawing
 	glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->main.fbo);
 
+	canUseDepthStencil = 0; // disable for now, somethings wrong in renderdroid2
 	if (!canUseDepthStencil)
 	{
 		glDisable(GL_DEPTH_TEST);
@@ -4776,7 +4777,7 @@ void std3D_DrawOccluder(rdVector3* position, float radius, rdVector3* verts)
 		glDrawBuffer(GL_NONE);
 		glEnable(GL_STENCIL_TEST);
 		glClear(GL_STENCIL_BUFFER_BIT);
-		glStencilFunc(GL_ALWAYS, 0, 0);
+		glStencilFunc(GL_ALWAYS, 0, 0xFF);
 		glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP);
 		glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP);
 		std3D_DrawDeferredStage(&std3D_stencilStage, verts, NULL, 0, position, radius, &rdroid_zeroVector3, &rdroid_identMatrix34);
