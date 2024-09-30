@@ -372,7 +372,7 @@ void main(void)
 #endif
 
 #ifdef RENDER_DROID2
-	vec3 surfaceNormals = f_normal;
+	vec3 surfaceNormals = normalize(f_normal);
 #elif defined(VIEW_SPACE_GBUFFER)
 	vec3 surfaceNormals = normals(adjusted_coords.xyz);
 #else

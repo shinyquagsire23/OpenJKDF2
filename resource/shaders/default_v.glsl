@@ -130,7 +130,7 @@ void main(void)
 #else
 	vec4 viewPos = modelMatrix * vec4(coord3d, 1.0);
     vec4 pos = mvp * viewPos;
-	f_normal = mat3(modelMatrix) * v_normal.xyz;
+	f_normal = normalize(mat3(modelMatrix) * v_normal.xyz);
 #endif
  	f_depth = pos.w / 128.0;
     gl_Position = pos;
