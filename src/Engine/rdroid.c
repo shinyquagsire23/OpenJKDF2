@@ -80,6 +80,8 @@ void rdResetDepthStencilState()
 
 void rdResetTextureState()
 {
+	rdroid_textureState.alphaTest = 0;
+	rdroid_textureState.alphaRef = 0;
 	rdroid_textureState.chromaKeyMode = RD_CHROMA_KEY_DISABLED;
 	rdroid_textureState.chromaKeyColor = 0;
 	rdroid_textureState.pTexture = NULL;
@@ -339,6 +341,15 @@ void rdFinishFrame()
   rdCache_ClearFrameCounters(); // MOTS removed
   rdActive_ClearFrameCounters(); // MOTS removed
   rdModel3_ClearFrameCounters(); // MOTS removed
+
+#ifdef RENDER_DROID2
+  rdResetMatrices();
+  rdResetRasterState();
+  rdResetBlendState();
+  rdResetDepthStencilState();
+  rdResetTextureState();
+  rdResetLightingState();
+#endif
 }
 
 void rdClearPostStatistics()
@@ -652,6 +663,9 @@ int rdBindTexture(rdMaterial* pMaterial, int cel)
 		if (alpha_is_opaque)
 			rdroid_textureState.pTexture = &sith_tex_sel->opaqueMats[0];
 		
+		// todo: move me
+		rdroid_textureState.alphaTest = (sith_tex_sel->alpha_en & 1) != 0;
+
 		uint32_t out_width, out_height;
 		std3D_GetValidDimension(
 			sith_tex_sel->texture_struct[0]->format.width,
@@ -703,7 +717,7 @@ void rdSetScissor(int x, int y, int width, int height)
 
 void rdSetAlphaThreshold(uint8_t threshold)
 {
-	// todo
+	rdroid_textureState.alphaRef = threshold;
 }
 void rdSetConstantColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {

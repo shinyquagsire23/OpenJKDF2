@@ -868,6 +868,8 @@ typedef struct std3D_DepthStencilState
 
 typedef struct std3D_TextureState
 {
+	uint8_t           alphaTest;
+	uint8_t           alphaRef;
 	rdChromaKeyMode_t chromaKeyMode;
 	uint32_t          chromaKeyColor;
 	rdTexMode_t       texMode;

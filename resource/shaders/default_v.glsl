@@ -23,11 +23,14 @@ uniform vec4 uv_mode_params0;
 uniform vec4 uv_mode_params1;
 uniform vec2 uv_offset;
 
+uniform int lightMode;
+uniform int  ambientMode;
 uniform vec3 ambientColor;
 uniform vec4 ambientSH[3];
 uniform vec3 ambientDominantDir;
 
 noperspective out vec2 f_uv_affine;
+flat out vec3 f_face_color;
 
 struct light
 {
@@ -77,7 +80,7 @@ void main(void)
 #else
 	vec4 worldPos = modelMatrix * vec4(coord3d, 1.0);
     vec4 pos = mvp * worldPos;
-	f_normal = mat3(modelMatrix) * v_normal;
+	f_normal = mat3(modelMatrix) * v_normal.xyz;
 #endif
  	f_depth = pos.w / 128.0;
     gl_Position = pos;
@@ -96,45 +99,75 @@ void main(void)
     f_light = v_light;
 
 #ifdef RENDER_DROID2
-	// todo: ambient mode
-	//if (false)
-	//{
-	//	const float c = 0.282094792;
-	//	const float k = 0.488602512;
-	//
-	//	vec4 shN;
-	//	shN.x = c;
-	//	shN.yzw = vec3(-k, k, -k) * f_normal.yzx;
-	//
-	//	vec3 amb;
-	//	amb.x = dot(shN, ambientSH[0]);
-	//	amb.y = dot(shN, ambientSH[1]);
-	//	amb.z = dot(shN, ambientSH[2]);
-	//
-	//	f_color.xyz += max(vec3(0.0), amb) / 3.141592;
-	//}
-
-
-	float scalar = 0.4; // todo: needs to come from rdCamera_pCurCamera->attenuationMin
-	int totalLights = min(numLights, 128);
-	for(int lid = 0; lid < totalLights; ++lid)
+	if(lightMode == 0) // full lit
 	{
-		light l = lights[lid];
-		//if(l.isActive == 0u)
-		//	continue;
+		f_color.xyz = vec3(1.0);
+	}
+	else if(lightMode == 1) // not lit
+	{
+		f_color.xyz = vec3(0.0);
+	}
+	else if(lightMode >= 3 || lightMode == 2 && gl_VertexID == 0) // if gouraud or provoking vertex
+	{
+		vec3 shadeNormal = f_normal;
 
-		vec3 diff = l.position.xyz - worldPos.xyz;
-		float len = length(diff);
-		if ( len < l.falloffMin )
+		float scalar = 0.4; // todo: needs to come from rdCamera_pCurCamera->attenuationMin
+		int totalLights = min(numLights, 128);
+		for(int lid = 0; lid < totalLights; ++lid)
 		{
-			diff = normalize(diff);	
-			float lightMagnitude = dot(f_normal, diff);
-			if ( lightMagnitude > 0.0 )
+			light l = lights[lid];
+			//if(l.isActive == 0u)
+			//	continue;
+
+			vec3 diff = l.position.xyz - worldPos.xyz;
+			float len;
+			if (lightMode == 2) // diffuse uses dist to plane
+				len = dot(l.position.xyz - worldPos.xyz, shadeNormal.xyz);
+			else
+				len = length(diff);
+
+			if ( len < l.falloffMin )
 			{
-				float intensity = max(0.0, l.direction_intensity.w - len * scalar) * lightMagnitude;
-				f_color.xyz += intensity * l.color.xyz;
+				diff = normalize(diff);
+				float lightMagnitude = dot(shadeNormal, diff);
+				lightMagnitude = lightMagnitude * 0.5 + 0.5; // half lambert
+				lightMagnitude *= lightMagnitude;
+				if ( lightMagnitude > 0.0 )
+				{
+					float intensity = max(0.0, l.direction_intensity.w - len * scalar) * lightMagnitude;
+					f_color.xyz += intensity * l.color.xyz;
+				}
 			}
 		}
+
+		if (ambientMode > 0)
+			f_color.xyz = max(f_color.xyz, ambientColor.xyz);
+
+		if (ambientMode == 2)
+		{
+			const float c = 0.282094792;
+			const float k = 0.488602512;
+	
+			vec4 shN;
+			shN.x =  c;
+			shN.y = -k * shadeNormal.y;
+			shN.z =  k * shadeNormal.z;
+			shN.w = -k * shadeNormal.x;
+				
+			vec3 amb;
+			amb.x = dot(shN, ambientSH[0]);
+			amb.y = dot(shN, ambientSH[1]);
+			amb.z = dot(shN, ambientSH[2]);
+	
+			f_color.xyz += max(vec3(0.0), amb) / 3.141592;
+		}
+
+		// todo: verify if we want to keep clamping or maybe want something else
+		f_color.xyz = clamp(f_color.xyz, vec3(0.0), vec3(1.0));
+
+		// provoking vertex outputs color for the whole face
+		if(lightMode == 2 && gl_VertexID == 0)
+			f_face_color.xyz = f_color.xyz;
 	}
 #endif
 }

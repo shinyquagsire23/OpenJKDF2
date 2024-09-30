@@ -1416,8 +1416,8 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
     else if (rdModel3_lightingMode == RD_LIGHTMODE_DIFFUSE)
     {
         rdModel3_numMeshLights = 0;
-#ifndef GPU_LIGHTING
-        pGeoLight = apGeoLights;
+#ifndef RENDER_DROID2
+		pGeoLight = apGeoLights;
         for (int i = 0; i < rdModel3_numGeoLights; i++)
         {
             int lightIdx = (*pGeoLight)->id;
@@ -1446,7 +1446,7 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
     else if (USES_VERTEX_LIGHTING(rdModel3_lightingMode))
     {
         rdModel3_numMeshLights = 0;
-#ifndef GPU_LIGHTING
+#ifndef RENDER_DROID2
         if (rdModel3_numGeoLights > 0)
         {
             pGeoLight = apGeoLights;
@@ -1476,6 +1476,7 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
         }
 #endif
 
+#ifndef RENDER_DROID2
 #ifdef RGB_AMBIENT
 		// rotate the ambient SH to local space
 		rdAmbient localAmbient;
@@ -1520,8 +1521,9 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
 #endif
             pCurMesh->numVertices,
             rdCamera_pCurCamera->attenuationMin);
-    }
-    else if (rdModel3_lightingMode == RD_LIGHTMODE_6_UNK) // MOTS added
+#endif
+	}
+	else if (rdModel3_lightingMode == RD_LIGHTMODE_6_UNK) // MOTS added
     {
         for (int i = 0; i < meshIn->numFaces; i++)
         {
@@ -1529,6 +1531,11 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
             face->extraLight = meshIn->extraLight;
         }
     }
+
+#ifdef RENDER_DROID2
+	rdMatrixMode(RD_MATRIX_MODEL);
+	rdLoadMatrix34(mat);
+#endif
 
     rdMatrix_TransformPoint34(&localCamera, &rdCamera_camMatrix.scale, &matInv);
     rdFace* face = &meshIn->faces[0];
@@ -1550,11 +1557,113 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
         rdModel3_DrawFace(face, flags);
         ++face;
     }
+
+	rdMatrixMode(RD_MATRIX_MODEL);
+	rdIdentity();
 }
 
 // MOTS altered (RGB lights)
 int rdModel3_DrawFace(rdFace *face, int lightFlags)
 {
+#ifdef RENDER_DROID2
+	// todo: frustum culling? probably overkill for faces tbh
+
+	rdVector3 faceNormal;
+	int flags;
+
+	rdGeoMode_t geometryMode = rdModel3_geometryMode;
+	if (rdModel3_geometryMode >= face->geometryMode)
+		geometryMode = face->geometryMode;
+
+	rdLightMode_t lightingMode = rdModel3_lightingMode;
+	if (rdModel3_lightingMode >= face->lightingMode)
+		lightingMode = face->lightingMode;
+
+	rdTexMode_t textureMode = rdModel3_textureMode;
+	if (rdModel3_textureMode >= face->textureMode)
+		textureMode = face->textureMode;
+
+	if ((face->type & 0x10) != 0)
+		lightingMode = 1;
+
+	if (!face->vertexUVIdx && geometryMode == RD_GEOMODE_TEXTURED)
+		geometryMode = RD_GEOMODE_SOLIDCOLOR;
+
+	rdSetGeoMode(geometryMode);
+	rdSetTexMode(textureMode);
+	rdSetLightMode(lightingMode);
+
+	int extraData = 0;
+#ifdef STENCIL_BUFFER
+	extraData |= 2; // mark stencil buffer
+#endif
+
+	rdBindTexture(face->material, face->wallCel);
+
+	rdVector3 ambientLight;
+#ifdef RGB_AMBIENT
+	if (rdroid_curRenderOptions & 2)
+		rdVector_Copy3(&ambientLight, &rdCamera_pCurCamera->ambientLight);
+	else
+		rdVector_Zero3(&ambientLight);
+
+	// if we have an ambient cube, dim the ambient a bit to make it pop
+	// todo: some kind of flag to indicate when to use dark diffuse
+	if (USES_VERTEX_LIGHTING(lightingMode))
+		rdVector_Scale3Acc(&ambientLight, lightingMode == RD_LIGHTMODE_SPECULAR ? 0.2f : 0.5f);
+#else
+	
+	if (rdroid_curRenderOptions & 2)
+		ambientLight.x = ambientLight.y = ambientLight.z = rdCamera_pCurCamera->ambientLight;
+	else
+		ambientLight.x = ambientLight.y = ambientLight.z = 0.0;
+#endif
+	rdAmbientLight(ambientLight.x + face->extraLight, ambientLight.y + face->extraLight, ambientLight.z + face->extraLight);
+	rdAmbientLightSH(&rdCamera_pCurCamera->ambientSH);
+	rdSetAmbientMode(USES_VERTEX_LIGHTING(lightingMode) ? RD_AMBIENT_SH : RD_AMBIENT_COLOR);
+
+	int isIdentityMap = (rdColormap_pCurMap == rdColormap_pIdentityMap);
+
+	float alpha = 1.0f;
+	if ((face->type & RD_FF_TEX_TRANSLUCENT) != 0)
+	{
+		alpha = 90.0f / 255.0f;
+		rdSetBlendMode(RD_BLEND_MODE_ALPHA);
+	}
+	else
+	{
+		rdSetBlendMode(RD_BLEND_MODE_NONE);
+	}
+
+	if (rdBeginPrimitive(RD_PRIMITIVE_TRIANGLE_FAN))
+	{
+		for (int j = 0; j < face->numVertices; j++)
+		{
+			int posidx = face->vertexPosIdx[j];
+			int uvidx = face->vertexUVIdx[j];
+
+			if (rdGetVertexColorMode() == 0)
+			{
+				float intensity = pCurMesh->vertices_i[j];
+				rdColor4f(intensity, intensity, intensity, alpha);
+			}
+			else
+			{
+				float* red = pCurMesh->vertices_r;
+				float* green = pCurMesh->vertices_g;
+				float* blue = pCurMesh->vertices_b;
+				rdColor4f(red[j], green[j], blue[j], alpha);
+			}
+			rdVector2* uv = &pCurMesh->vertexUVs[uvidx];
+			rdTexCoord2i(uv->x, uv->y);
+
+			rdNormal(lightingMode == RD_LIGHTMODE_DIFFUSE ? &face->normal : &pCurMesh->vertexNormals[posidx]);
+			rdVertex(&pCurMesh->vertices[posidx]);
+		}
+		rdEndPrimitive();
+	}
+	return 1;
+#else
     rdProcEntry *procEntry;
     rdGeoMode_t geometryMode;
     rdLightMode_t lightingMode;
@@ -1759,4 +1868,5 @@ LABEL_44:
     procEntry->material = face->material;
     rdCache_AddProcFace(extraData, vertexDst.numVertices, flags);
     return 1;
+#endif
 }

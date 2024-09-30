@@ -184,11 +184,11 @@ GLint drawcall_attribute_coord3d, drawcall_attribute_v_color, drawcall_attribute
 #ifdef VIEW_SPACE_GBUFFER
 GLint drawcall_attribute_coordVS;
 #endif
-GLint drawcall_uniform_ambient_color, drawcall_uniform_ambient_sh, drawcall_uniform_ambient_sh_dir;
+GLint drawcall_uniform_ambient_mode, drawcall_uniform_ambient_color, drawcall_uniform_ambient_sh, drawcall_uniform_ambient_sh_dir;
 GLint drawcall_uniform_uv_mode, drawcall_uniform_uv_mode_params0, drawcall_uniform_uv_mode_params1, drawcall_uniform_uv_offset;
 GLint drawcall_uniform_mvp, drawcall_uniform_modelMatrix, drawcall_uniform_tex, drawcall_uniform_texEmiss, drawcall_uniform_displacement_map, drawcall_uniform_tex_mode, drawcall_uniform_blend_mode, drawcall_uniform_worldPalette, drawcall_uniform_worldPaletteLights;
 GLint drawcall_uniform_tint, drawcall_uniform_filter, drawcall_uniform_fade, drawcall_uniform_add, drawcall_uniform_emissiveFactor, drawcall_uniform_albedoFactor;
-GLint drawcall_uniform_light_mult, drawcall_uniform_displacement_factor, drawcall_uniform_iResolution, drawcall_uniform_enableDither;
+GLint drawcall_uniform_light_mode, drawcall_uniform_light_mult, drawcall_uniform_displacement_factor, drawcall_uniform_iResolution, drawcall_uniform_enableDither;
 #ifdef FOG
 GLint drawcall_uniform_fog, drawcall_uniform_fog_color, drawcall_uniform_fog_start, drawcall_uniform_fog_end;
 #endif
@@ -1272,6 +1272,7 @@ int init_resources()
 	drawcall_uniform_uv_mode_params0 = std3D_tryFindUniform(drawcall_program, "uv_mode_params0");
 	drawcall_uniform_uv_mode_params1 = std3D_tryFindUniform(drawcall_program, "uv_mode_params1");
 	drawcall_uniform_uv_offset = std3D_tryFindUniform(drawcall_program, "uv_offset");
+	drawcall_uniform_ambient_mode = std3D_tryFindUniform(drawcall_program, "ambientMode");
 	drawcall_uniform_ambient_color = std3D_tryFindUniform(drawcall_program, "ambientColor");
 	drawcall_uniform_ambient_sh = std3D_tryFindUniform(drawcall_program, "ambientSH");
 	drawcall_uniform_ambient_sh_dir = std3D_tryFindUniform(drawcall_program, "ambientDominantDir");
@@ -1288,6 +1289,7 @@ int init_resources()
 	drawcall_uniform_add = std3D_tryFindUniform(drawcall_program, "colorEffects_add");
 	drawcall_uniform_emissiveFactor = std3D_tryFindUniform(drawcall_program, "emissiveFactor");
 	drawcall_uniform_albedoFactor = std3D_tryFindUniform(drawcall_program, "albedoFactor");
+	drawcall_uniform_light_mode = std3D_tryFindUniform(drawcall_program, "lightMode");
 	drawcall_uniform_light_mult = std3D_tryFindUniform(drawcall_program, "light_mult");
 	drawcall_uniform_displacement_factor = std3D_tryFindUniform(drawcall_program, "displacement_factor");
 	drawcall_uniform_iResolution = std3D_tryFindUniform(drawcall_program, "iResolution");
@@ -5049,6 +5051,8 @@ void std3D_SetTextureState(std3D_TextureState* pTexState)
 
 void std3D_SetLightingState(std3D_LightingState* pLightState)
 {
+	glUniform1i(drawcall_uniform_light_mode, pLightState->lightMode);
+	glUniform1i(drawcall_uniform_ambient_mode, pLightState->ambientMode);
 	glUniform3fv(drawcall_uniform_ambient_color, 1, &pLightState->ambientColor.x);
 	glUniform4fv(drawcall_uniform_ambient_sh, 3, &pLightState->ambientStateSH.r.x);
 	glUniform3fv(drawcall_uniform_ambient_sh_dir, 1, &pLightState->ambientStateSH.dominantDir.x);

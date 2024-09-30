@@ -85,8 +85,11 @@ in vec3 f_normal;
 in float f_depth;
 
 #ifdef RENDER_DROID2
+uniform int lightMode;
+
 uniform int uv_mode;
 noperspective in vec2 f_uv_affine;
+flat in vec3 f_face_color;
 #endif
 
 layout(location = 0) out vec4 fragColor;
@@ -361,6 +364,9 @@ void main(void)
 #endif
 
 #ifdef RENDER_DROID2
+	if(lightMode == 2)
+		vertex_color.xyz = f_face_color.xyz;
+
 	vec3 surfaceNormals = f_normal;
 #elif defined(VIEW_SPACE_GBUFFER)
 	vec3 surfaceNormals = normals(adjusted_coords.xyz);
