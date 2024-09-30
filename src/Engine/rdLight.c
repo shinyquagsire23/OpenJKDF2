@@ -621,9 +621,9 @@ void rdAmbient_Lerp(rdAmbient* out, const rdAmbient* ambient0, const rdAmbient* 
 
 void rdAmbient_AddAcc(rdAmbient* out, const rdAmbient* ambient)
 {
-	rdVector_Add4Acc((rdVector3*)&out->r, (rdVector3*)&ambient->r);
-	rdVector_Add4Acc((rdVector3*)&out->g, (rdVector3*)&ambient->g);
-	rdVector_Add4Acc((rdVector3*)&out->b, (rdVector3*)&ambient->b);
+	rdVector_Add4Acc(&out->r, &ambient->r);
+	rdVector_Add4Acc(&out->g, &ambient->g);
+	rdVector_Add4Acc(&out->b, &ambient->b);
 }
 
 void rdAmbient_Copy(rdAmbient* outAmbient, const rdAmbient* ambient)
