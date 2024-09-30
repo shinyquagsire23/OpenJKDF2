@@ -293,6 +293,126 @@ int rdParticle_Write(char *writePath, rdParticle *particle, char *madeBy)
     return 1;
 }
 
+
+#ifdef RENDER_DROID2
+int rdParticle_Draw(rdThing* thing, rdMatrix34* mat)
+{
+	rdParticle* particle = thing->particlecloud;
+
+	rdVector3 vertex_out;
+	rdMatrix_TransformPoint34(&vertex_out, &mat->scale, &rdCamera_pCurCamera->view_matrix);
+
+	int clipResult;
+	if (rdroid_curCullFlags & 2)
+		clipResult = rdClip_SphereInFrustrum(rdCamera_pCurCamera->pClipFrustum, &vertex_out, particle->cloudRadius);
+	else
+		clipResult = thing->clippingIdk;
+
+	if (clipResult == 2)
+		return 0;
+
+	// todo: rdPushMatrix/rdPopMatrix
+	rdMatrix44 viewMatrix;
+	rdGetMatrix(&viewMatrix, RD_MATRIX_VIEW);
+
+	// vertices are already in view space
+	rdMatrixMode(RD_MATRIX_VIEW);
+	rdIdentity();
+
+	rdMatrixMode(RD_MATRIX_MODEL);
+	rdIdentity();
+
+	rdLightMode_t curLightingMode_ = rdroid_curLightingMode;
+	rdTexMode_t curTextureMode_ = rdroid_curTextureMode;
+
+	rdSetGeoMode(RD_GEOMODE_SOLIDCOLOR);
+
+	if (curLightingMode_ >= particle->lightingMode)
+		curLightingMode_ = particle->lightingMode;
+
+	if (curLightingMode_ >= thing->curLightMode)
+		curLightingMode_ = thing->curLightMode;
+	else if (curLightingMode_ < particle->lightingMode)
+		curLightingMode_ = rdroid_curLightingMode;
+
+	rdSetLightMode(curLightingMode_);
+	rdSetTexMode(RD_TEXTUREMODE_AFFINE);
+
+#ifdef RGB_AMBIENT
+	if (rdroid_curRenderOptions & 2)
+		rdAmbientLight(rdCamera_pCurCamera->ambientLight.x, rdCamera_pCurCamera->ambientLight.y, rdCamera_pCurCamera->ambientLight.z);
+	else
+		rdAmbientLight(0, 0, 0);
+#else
+	if (rdroid_curRenderOptions & 2)
+		rdAmbientLight(rdCamera_pCurCamera->ambientLight, rdCamera_pCurCamera->ambientLight, rdCamera_pCurCamera->ambientLight);
+	else
+		rdAmbientLight(0, 0, 0);
+#endif
+
+	rdBindTexture(particle->material, thing->wallCel);
+
+	int extraData = 0;
+#ifdef STENCIL_BUFFER
+	extraData |= 2; // mark stencil buffer
+#endif
+
+	rdSetCullMode(RD_CULL_MODE_NONE);
+
+	// we want everything the same size regardless of distance
+	// transform everything here on CPU instead so we can do the expansion properly
+	// we're still saving on projection and clipping math
+	rdMatrix34 out;
+	rdMatrix_Multiply34(&out, &rdCamera_pCurCamera->view_matrix, mat);
+	rdMatrix_TransformPointLst34(&out, particle->vertices, &aParticleVertices[0], particle->numVertices);
+
+	for(int j = 0; j < particle->numVertices; ++j)
+	{
+#ifdef PARTICLE_LIGHTS
+		//if (thing->parentSithThing->light > 0.0001f)
+		//{
+		//	rdLight light;
+		//	rdLight_NewEntry(&light);
+		//	light.falloffMin = 0.01f;
+		//	light.intensity = thing->parentSithThing->light * 8.0f;
+		//	rdMaterial_GetFillColor(&light.color, particle->material, rdColormap_pCurMap, particle->vertexCel[v32], -1);
+		//	//rdCache_DrawLight(&light, &particle->vertices[v32]);
+		//}
+#endif
+
+		rdBindTexture(particle->material, particle->vertexCel[j]);
+
+		rdVector3 fillColor;
+		rdMaterial_GetFillColor(&fillColor, particle->material, rdColormap_pCurMap, j, -1);
+		rdSetConstantColorf(fillColor.x, fillColor.y, fillColor.z, 1.f);
+
+		float left = aParticleVertices[j].x - particle->radius;
+		float bottom = aParticleVertices[j].z - particle->radius;
+		float right = aParticleVertices[j].x + particle->radius;
+		float top = aParticleVertices[j].z + particle->radius;
+		float depth = aParticleVertices[j].y;
+
+		if (rdBeginPrimitive(RD_PRIMITIVE_TRIANGLE_FAN))
+		{
+			rdColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+			rdVertex3f(left, depth, bottom);
+			rdVertex3f(right, depth, bottom);
+			rdVertex3f(right, depth, top);
+			rdVertex3f(left, depth, top);
+			rdEndPrimitive();
+		}
+	}
+
+	rdSetConstantColor(255, 255, 255, 255);
+	rdSetCullMode(RD_CULL_MODE_CCW_ONLY);
+	rdSortPriority(0);
+	rdTexOffseti(0, 0);
+	rdMatrixMode(RD_MATRIX_VIEW);
+	rdLoadMatrix(&viewMatrix);
+
+	return 1;
+}
+#else
 int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
 {
     rdParticle *particle; // edi
@@ -457,3 +577,4 @@ int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
     }
     return 0;
 }
+#endif
