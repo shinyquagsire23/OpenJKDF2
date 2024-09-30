@@ -315,6 +315,127 @@ int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix)
     return 1;
 }
 
+#ifdef RENDER_DROID2
+void rdPolyLine_DrawFace(rdThing* thing, rdFace* face, rdVector3* unused, rdVertexIdxInfo* idxInfo)
+{
+	rdMatrix44 viewMatrix;
+	rdGetMatrix(&viewMatrix, RD_MATRIX_VIEW);
+
+	// vertices are already in view space
+	rdMatrixMode(RD_MATRIX_VIEW);
+	rdIdentity();
+
+	rdMatrixMode(RD_MATRIX_MODEL);
+	rdIdentity();
+
+	rdGeoMode_t curGeometryMode_ = rdroid_curGeometryMode;
+	rdLightMode_t curLightingMode_ = rdroid_curLightingMode;
+	rdTexMode_t curTextureMode_ = rdroid_curTextureMode;
+
+	if (curGeometryMode_ >= face->geometryMode)
+		curGeometryMode_ = face->geometryMode;
+	
+	if (curGeometryMode_ >= thing->curGeoMode)
+		curGeometryMode_ = thing->curGeoMode;
+	else if (rdroid_curGeometryMode >= face->geometryMode)
+		curGeometryMode_ = face->geometryMode;
+	else
+		curGeometryMode_ = rdroid_curGeometryMode;
+
+	rdSetGeoMode(curGeometryMode_);
+	
+	if (curLightingMode_ >= face->lightingMode)
+		curLightingMode_ = face->lightingMode;
+	
+	if (curLightingMode_ >= thing->curLightMode)
+		curLightingMode_ = thing->curLightMode;
+	else if (curLightingMode_ < face->lightingMode)
+		curLightingMode_ = rdroid_curLightingMode;
+
+	rdSetLightMode(curLightingMode_);
+
+	if (curTextureMode_ >= face->textureMode)
+		curTextureMode_ = face->textureMode;
+	
+	if (curTextureMode_ >= face->textureMode)
+		curTextureMode_ = face->textureMode;
+	else
+		curTextureMode_ = rdroid_curTextureMode;
+	rdSetTexMode(curTextureMode_);
+
+#ifdef RGB_AMBIENT
+	if (rdroid_curRenderOptions & 2)
+		rdAmbientLight(rdCamera_pCurCamera->ambientLight.x, rdCamera_pCurCamera->ambientLight.y, rdCamera_pCurCamera->ambientLight.z);
+	else
+		rdAmbientLight(0, 0, 0);
+#else
+	if (rdroid_curRenderOptions & 2)
+		rdAmbientLight(rdCamera_pCurCamera->ambientLight, rdCamera_pCurCamera->ambientLight, rdCamera_pCurCamera->ambientLight);
+	else
+		rdAmbientLight(0, 0, 0);
+#endif
+
+	// todo sortid
+
+	rdBindTexture(face->material, thing->wallCel);
+
+	int extraData = 0;
+#ifdef STENCIL_BUFFER
+	extraData |= 2; // mark stencil buffer
+#endif
+
+	// quadrilateral projection
+	rdVector3 uvs[4];
+	if (idxInfo->vertexUVs)
+	{
+		rdSetTexMode(RD_TEXTUREMODE_PERSPECTIVE);
+
+		uvs[0].z = uvs[1].z = uvs[2].z = uvs[3].z = 1.0f;
+		rdVector_Copy2((rdVector2*)&uvs[0], &idxInfo->vertexUVs[0]);
+		rdVector_Copy2((rdVector2*)&uvs[1], &idxInfo->vertexUVs[1]);
+		rdVector_Copy2((rdVector2*)&uvs[2], &idxInfo->vertexUVs[2]);
+		rdVector_Copy2((rdVector2*)&uvs[3], &idxInfo->vertexUVs[3]);
+
+		rdVector3 quadCenter;
+		rdMath_IntersectLineSegments(&idxInfo->vertices[2], &idxInfo->vertices[0], &idxInfo->vertices[3], &idxInfo->vertices[1], &quadCenter);
+
+		// compute and apply scale adjustments
+		float dUR = rdVector_Dist3(&idxInfo->vertices[0], &quadCenter);
+		float dUL = rdVector_Dist3(&idxInfo->vertices[1], &quadCenter);
+		float dLL = rdVector_Dist3(&idxInfo->vertices[2], &quadCenter);
+		float dLR = rdVector_Dist3(&idxInfo->vertices[3], &quadCenter);
+
+		rdVector_Scale3Acc(&uvs[0], (dUR + dLL) / dLL);
+		rdVector_Scale3Acc(&uvs[1], (dUL + dLR) / dLR);
+		rdVector_Scale3Acc(&uvs[2], (dLL + dUR) / dUR);
+		rdVector_Scale3Acc(&uvs[3], (dLR + dUL) / dUL);
+	}
+
+	rdTexOffseti(face->clipIdk.x, face->clipIdk.y);
+
+	if(rdBeginPrimitive(RD_PRIMITIVE_TRIANGLE_FAN))
+	{
+		for(int i = 0; i < face->numVertices; ++i)
+		{
+			rdColor4f(face->extraLight, face->extraLight, face->extraLight, 1.0f);
+			if(idxInfo->vertexUVs)
+			{
+				rdVector3* uv = &uvs[i];
+				rdTexCoord4i(uv->x, uv->y, 0.0f, uv->z); // post interpolation uv / q
+			}
+			rdVertex(&idxInfo->vertices[i]);
+		}
+		rdEndPrimitive();
+	}
+
+	rdSetCullMode(RD_CULL_MODE_CCW_ONLY);
+
+	rdMatrixMode(RD_MATRIX_VIEW);
+	rdLoadMatrix(&viewMatrix);
+}
+
+#else
+
 void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVertexIdxInfo *idxInfo)
 {
     rdProcEntry *procEntry;
@@ -498,3 +619,5 @@ void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVert
 #endif
     rdCache_AddProcFace(extraData, mesh_out.numVertices, procFaceFlags);
 }
+
+#endif
