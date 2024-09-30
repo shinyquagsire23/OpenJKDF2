@@ -1640,7 +1640,6 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
 		for (int j = 0; j < face->numVertices; j++)
 		{
 			int posidx = face->vertexPosIdx[j];
-			int uvidx = face->vertexUVIdx[j];
 
 			if (rdGetVertexColorMode() == 0)
 			{
@@ -1654,8 +1653,13 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
 				float* blue = pCurMesh->vertices_b;
 				rdColor4f(red[j], green[j], blue[j], alpha);
 			}
-			rdVector2* uv = &pCurMesh->vertexUVs[uvidx];
-			rdTexCoord2i(uv->x, uv->y);
+
+			if(face->vertexUVIdx)
+			{
+				int uvidx = face->vertexUVIdx[j];
+				rdVector2* uv = &pCurMesh->vertexUVs[uvidx];
+				rdTexCoord2i(uv->x, uv->y);
+			}
 
 			rdNormal(lightingMode == RD_LIGHTMODE_DIFFUSE ? &face->normal : &pCurMesh->vertexNormals[posidx]);
 			rdVertex(&pCurMesh->vertices[posidx]);

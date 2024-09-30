@@ -5152,7 +5152,7 @@ void std3D_FlushDrawCalls()
 
 	std3D_DrawCallState lastState = pDrawCall->state;
 
-	int last_tex = pTexState->pTexture->texture_id;
+	int last_tex = pTexState->pTexture ? pTexState->pTexture->texture_id : blank_tex_white;
 	std3D_SetTextureState(pTexState);
 	std3D_SetLightingState(pLightState);
 	std3D_SetRasterState(pRasterState);
@@ -5174,7 +5174,7 @@ void std3D_FlushDrawCalls()
 		pTexState = &pDrawCall->state.texture;
 		pLightState = &pDrawCall->state.lighting;
 
-		if (last_tex != pTexState->pTexture->texture_id
+		if (pTexState->pTexture && last_tex != pTexState->pTexture->texture_id
 			|| memcmp(&lastState, &pDrawCall->state, sizeof(std3D_DrawCallState)) != 0
 			|| rdMatrix_Compare44(&last_mat, &pDrawCall->state.modelMatrix) != 0
 			|| rdMatrix_Compare44(&last_viewProj, &pDrawCall->state.viewProj) != 0
@@ -5199,6 +5199,7 @@ void std3D_FlushDrawCalls()
 			last_tex = pTexState->pTexture->texture_id;
 			last_mat = pDrawCall->state.modelMatrix;
 			last_viewProj = pDrawCall->state.viewProj;
+			last_tex = pTexState->pTexture ? pTexState->pTexture->texture_id : blank_tex_white;
 			lastState = pDrawCall->state;
 
 			vertexOffset += batch_verts;
