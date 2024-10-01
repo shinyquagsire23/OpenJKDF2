@@ -5172,7 +5172,7 @@ void std3D_FlushDrawCalls()
 	glUniform3f(drawcall_uniform_emissiveFactor, 0.0, 0.0, 0.0);
 	glUniform4f(drawcall_uniform_albedoFactor, 1.0, 1.0, 1.0, 1.0);
 	glUniform1f(drawcall_uniform_light_mult, jkGuiBuildMulti_bRendering ? 0.85 : (jkPlayer_enableBloom ? 0.9 : 0.85));
-	glUniform1f(drawcall_uniform_displacement_factor, 1.0);
+	glUniform1f(drawcall_uniform_displacement_factor, 0.0);
 
 	glActiveTexture(GL_TEXTURE0 + 0);
 	glBindTexture(GL_TEXTURE_2D, blank_tex_white);
