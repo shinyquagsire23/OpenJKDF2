@@ -245,7 +245,7 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
 			if (outLightsG) *outLightsG += ambientColor.y;
 			if (outLightsB) *outLightsB += ambientColor.z;
 			
-		#ifdef SPECULAR_LIGHTING
+		#if defined(SPECULAR_LIGHTING) && !defined(RENDER_DROID2)
 			if (bApplySpecular)
 			{
 				float brdf = rdLight_Specular(&ambient->dominantDir, &localViewDir, vertexNormals);
@@ -379,7 +379,7 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
 #ifdef RGB_AMBIENT
 		rdVector3 ambientColor;
 		rdAmbient_CalculateVertexColor(ambient, vertexNormals, &ambientColor);
-#ifdef SPECULAR_LIGHTING
+#if defined(SPECULAR_LIGHTING) && !defined(RENDER_DROID2)
 		if (bApplySpecular)
 			rdVector_Scale3Acc(&ambientColor, c_d);
 #endif
@@ -388,7 +388,7 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
 		if (outLightsG) *outLightsG += ambientColor.y;
 		if (outLightsB) *outLightsB += ambientColor.z;
 
-	#ifdef SPECULAR_LIGHTING
+	#if defined(SPECULAR_LIGHTING) && !defined(RENDER_DROID2)
 		if (bApplySpecular)
 		{
 			float brdf = rdLight_Specular(&ambient->dominantDir, &localViewDir, vertexNormals);
@@ -570,6 +570,58 @@ void rdLight_CalcDistVertexIntensities(){}
 void rdLight_CalcDistFaceIntensity(){}
 
 #ifdef RGB_AMBIENT
+
+// pre-baked spherical gaussian axis and sharpness
+rdVector4 rdLight_sgBasis[8] =
+{
+	{ 0.752576709,  0.000000000, -0.658504605, 4.93992233},
+	{-0.625373423,  0.572653592, -0.530071616, 4.93992233},
+	{ 0.0818622485,-0.932739854, -0.351133764, 4.93992233},
+	{ 0.603548527,  0.787615955, -0.124057360, 4.93992233},
+	{-0.977106333, -0.172848180,  0.124042749, 4.93992233},
+	{ 0.790152431, -0.502328515,  0.351176947, 4.93992233},
+	{-0.220158905,  0.818896949,  0.530035675, 4.93992233},
+	{-0.346642911, -0.667932153,  0.658563018, 4.93992233}
+};
+
+int rdLight_basisInit = 0;
+
+void rdLight_InitSGBasis()
+{
+/*	if (rdLight_basisInit)
+		return;
+
+	uint32_t N = 8;
+
+	rdVector3 means[8];
+	float inc = M_PI * (3.0f - stdMath_Sqrt(5.0f));
+	float off = 2.0f / N;
+	for (uint32_t k = 0; k < N; ++k)
+	{
+		float y = k * off - 1.0f + (off / 2.0f);
+		float r = stdMath_Sqrt(1.0f - y * y);
+		float phi = k * inc;
+		stdMath_SinCos(phi * 180.0f / M_PI, &means[k].y, &means[k].x);
+		means[k].z = y;
+	}
+
+	for (uint32_t i = 0; i < N; ++i)
+		rdVector_Normalize3((rdVector3*)&rdLight_sgBasis[i], &means[i]);
+
+	float minDP = 1.0f;
+	for (uint32_t i = 1; i < N; ++i)
+	{
+		rdVector3 h;
+		rdVector_Add3(&h, (rdVector3*)&rdLight_sgBasis[i], (rdVector3*)&rdLight_sgBasis[0]);
+		rdVector_Normalize3Acc(&h);
+		minDP = fmin(minDP, rdVector_Dot3(&h, (rdVector3*)&rdLight_sgBasis[0]));
+	}
+
+	float sharpness = (logf(0.65f) * N) / (minDP - 1.0001f);
+	for (uint32_t i = 0; i < N; ++i)
+		rdLight_sgBasis[i].w = sharpness;*/
+}
+
 void rdAmbient_Zero(rdAmbient* ambient)
 {
 	memset(ambient, 0, sizeof(rdAmbient));
@@ -582,6 +634,7 @@ int rdAmbient_Compare(const rdAmbient* a, const rdAmbient* b)
 
 void rdAmbient_Acc(rdAmbient* ambient, rdVector3* color, rdVector3* dir)
 {
+#ifndef RENDER_DROID2
 	static const float c = 0.282094792;
 	static const float k = 0.488602512;
 	//static const float c = 0.886227;
@@ -600,30 +653,34 @@ void rdAmbient_Acc(rdAmbient* ambient, rdVector3* color, rdVector3* dir)
 	rdVector_Add4Acc(&ambient->r, &shR);
 	rdVector_Add4Acc(&ambient->g, &shG);
 	rdVector_Add4Acc(&ambient->b, &shB);
+#else
+	rdLight_InitSGBasis();
+	for (uint32_t sg = 0; sg < 8; ++sg)
+	{
+		rdVector4 sg1 = rdLight_sgBasis[sg];
+		rdVector4 sg2;
+		rdVector_Set4(&sg2, dir->x, dir->y, dir->z, 0.0f);
+		if (rdVector_Dot3((rdVector3*)dir, (rdVector3*)&sg1) > 0.0f)
+		{
+			float dp = rdVector_Dot3((rdVector3*)&sg1, (rdVector3*)&sg2);
+			float factor = (dp - 1.0f) * sg1.w;
+			float wgt = exp(factor);
+			rdVector_MultAcc3(&ambient->sgs[sg], color, wgt);
+		}
+	}
+#endif
 }
 
 void rdAmbient_Scale(rdAmbient* ambient, float scale)
 {
+#ifndef RENDER_DROID2
 	rdVector_Scale4Acc(&ambient->r, scale);
 	rdVector_Scale4Acc(&ambient->g, scale);
 	rdVector_Scale4Acc(&ambient->b, scale);
-}
-
-void rdAmbient_Lerp(rdAmbient* out, const rdAmbient* ambient0, const rdAmbient* ambient1, float amount)
-{
-	out->r.x = stdMath_Lerp(ambient0->r.y, ambient1->r.y, amount);
-	out->g.x = stdMath_Lerp(ambient0->g.y, ambient1->g.y, amount);
-	out->b.x = stdMath_Lerp(ambient0->b.y, ambient1->b.y, amount);
-	rdVector_Lerp3((rdVector3*)&out->r.y, (rdVector3*)&ambient0->r.y, (rdVector3*) &ambient1->r.y, amount);
-	rdVector_Lerp3((rdVector3*)&out->g.y, (rdVector3*)&ambient0->g.y, (rdVector3*) &ambient1->g.y, amount);
-	rdVector_Lerp3((rdVector3*)&out->b.y, (rdVector3*)&ambient0->b.y, (rdVector3*) &ambient1->b.y, amount);
-}
-
-void rdAmbient_AddAcc(rdAmbient* out, const rdAmbient* ambient)
-{
-	rdVector_Add4Acc(&out->r, &ambient->r);
-	rdVector_Add4Acc(&out->g, &ambient->g);
-	rdVector_Add4Acc(&out->b, &ambient->b);
+#else
+	for(int i = 0; i < 8; ++i)
+		rdVector_Scale3Acc(&ambient->sgs[i], scale);
+#endif
 }
 
 void rdAmbient_Copy(rdAmbient* outAmbient, const rdAmbient* ambient)
@@ -635,6 +692,7 @@ void rdAmbient_CalculateVertexColor(rdAmbient* ambient, rdVector3* normal, rdVec
 {
 	rdVector_Zero3(outColor);
 
+#ifndef RENDER_DROID2
 	static const float c = 0.282094792;
 	static const float k = 0.488602512;
 
@@ -647,15 +705,21 @@ void rdAmbient_CalculateVertexColor(rdAmbient* ambient, rdVector3* normal, rdVec
 	outColor->x = fmax(0.0f, rdVector_Dot4(&shN, &ambient->r)) / M_PI;
 	outColor->y = fmax(0.0f, rdVector_Dot4(&shN, &ambient->g)) / M_PI;
 	outColor->z = fmax(0.0f, rdVector_Dot4(&shN, &ambient->b)) / M_PI;
+#else
+	rdLight_InitSGBasis();
+	// todo?
+#endif
 }
 
 void rdAmbient_UpdateDominantDirection(rdAmbient* ambient)
 {
+#ifndef RENDER_DROID2
 	ambient->dominantDir.x = ambient->r.y * 0.33f + ambient->g.y * 0.59f + ambient->b.y * 0.11f;
 	ambient->dominantDir.y = ambient->r.z * 0.33f + ambient->g.z * 0.59f + ambient->b.z * 0.11f;
 	ambient->dominantDir.z = ambient->r.w * 0.33f + ambient->g.w * 0.59f + ambient->b.w * 0.11f;
 	rdVector_Set3(&ambient->dominantDir, -ambient->dominantDir.z, -ambient->dominantDir.x, ambient->dominantDir.y);
 	rdVector_Normalize3Acc(&ambient->dominantDir);
+#endif
 }
 
 #endif

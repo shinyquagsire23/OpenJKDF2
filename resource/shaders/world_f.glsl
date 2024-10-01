@@ -37,11 +37,8 @@ vec4 impl_textureGather(sampler2D tex, vec2 uv)
 }
 #endif
 
-#ifdef CLASSIC_EMISSIVE
 #define LIGHT_DIVISOR (3.0)
-#else
-#define LIGHT_DIVISOR (6.0)
-#endif
+
 #define TEX_MODE_TEST 0
 #define TEX_MODE_WORLDPAL 1
 #define TEX_MODE_BILINEAR 2
@@ -79,10 +76,193 @@ uniform float fogEnd;
 
 in vec4 f_color;
 in float f_light;
-in vec2 f_uv;
+in vec4 f_uv;
 in vec3 f_coord;
 in vec3 f_normal;
 in float f_depth;
+
+noperspective in vec2 f_uv_affine;
+
+uniform mat4 modelMatrix;
+
+uniform int uv_mode;
+uniform vec4 fillColor;
+
+uniform int lightMode;
+uniform int  ambientMode;
+uniform vec3 ambientColor;
+uniform vec4 ambientSH[3];
+uniform vec3 ambientDominantDir;
+uniform vec3 ambientSG[8];
+uniform vec4 ambientSGBasis[8];
+
+struct light
+{
+	vec4  position;
+	vec4  direction_intensity;
+	vec4  color;
+	int   type;
+	uint  isActive;
+	float falloffMin;
+	float falloffMax;
+	float angleX;
+	float cosAngleX;
+	float angleY;
+	float cosAngleY;
+	float lux;
+	float padding0;
+	float padding1;
+};
+
+uniform int numLights;
+uniform lightBlock
+{
+	light lights[128];
+};
+
+// https://therealmjp.github.io/posts/sg-series-part-1-a-brief-and-incomplete-history-of-baked-lighting-representations/
+// SphericalGaussian(dir) := Amplitude * exp(Sharpness * (dot(Axis, dir) - 1.0f))
+struct SG
+{
+    vec3 Amplitude;
+    vec3 Axis;
+    float Sharpness;
+};
+
+SG DistributionTermSG(vec3 direction, float roughness)
+{
+    SG distribution;
+    distribution.Axis = direction;
+    float m2 = roughness * roughness;
+    distribution.Sharpness = 2.0 / m2;
+    distribution.Amplitude = vec3(1.0 / (3.141592 * m2));
+
+    return distribution;
+}
+
+SG WarpDistributionSG(SG ndf, vec3 view)
+{
+    SG warp;
+    warp.Axis = reflect(-view, ndf.Axis);
+    warp.Amplitude = ndf.Amplitude;
+    warp.Sharpness = ndf.Sharpness / (4.0 * max(dot(ndf.Axis, view), 0.1));
+    return warp;
+}
+
+vec3 SGInnerProduct(SG x, SG y)
+{
+    float umLength = length(x.Sharpness * x.Axis + y.Sharpness * y.Axis);
+    vec3 expo = exp(umLength - x.Sharpness - y.Sharpness) * x.Amplitude * y.Amplitude;
+    float other = 1.0 - exp(-2.0 * umLength);
+    return (2.0 * 3.141592 * expo * other) / umLength;
+}
+
+SG CosineLobeSG(vec3 direction)
+{
+    SG cosineLobe;
+    cosineLobe.Axis = direction;
+    cosineLobe.Sharpness = 2.133;
+    cosineLobe.Amplitude = vec3(1.17);
+
+    return cosineLobe;
+}
+
+vec3 SGIrradianceInnerProduct(SG lightingLobe, vec3 normal)
+{
+    SG cosineLobe = CosineLobeSG(normal);
+    return max(SGInnerProduct(lightingLobe, cosineLobe), 0.0f);
+}
+
+vec3 SGIrradiancePunctual(SG lightingLobe, vec3 normal)
+{
+    float cosineTerm = clamp(dot(lightingLobe.Axis, normal), 0.0, 1.0);
+    return cosineTerm * 2.0 * 3.141592 * (lightingLobe.Amplitude) / lightingLobe.Sharpness;
+}
+
+vec3 CalculateAmbientDiffuse(vec3 normal)
+{
+	vec3 ambientDiffuse = vec3(0.0);
+	for(int sg = 0; sg < 8; ++sg)
+	{
+		SG lightSG;
+		lightSG.Amplitude = ambientSG[sg].xyz;
+		lightSG.Axis = ambientSGBasis[sg].xyz;
+		lightSG.Sharpness = ambientSGBasis[sg].w;
+	
+		vec3 diffuse = SGIrradianceInnerProduct(lightSG, normal) / 3.141592;
+		ambientDiffuse.xyz += diffuse;
+	}
+	return ambientDiffuse;
+}
+
+vec3 CalculateAmbientSpecular(vec3 normal, vec3 view, float roughness)
+{
+	//float m2 = roughness * roughness;
+	//float nDotV = clamp(dot(normal.xyz, view.xyz), 0.0, 1.0);
+
+	vec3 ambientSpecular = vec3(0.0);
+	for(int sg = 0; sg < 8; ++sg)
+	{
+		SG ndf = DistributionTermSG(normal, roughness);
+		SG warpedNDF = WarpDistributionSG(ndf, view);
+
+		SG lightSG;
+		lightSG.Amplitude = ambientSG[sg].xyz;
+		lightSG.Axis = ambientSGBasis[sg].xyz;
+		lightSG.Sharpness = ambientSGBasis[sg].w;
+
+		float nDotL = clamp(dot(normal.xyz, warpedNDF.Axis.xyz), 0.0, 1.0);
+
+		// NDF
+		vec3 spec = SGInnerProduct(warpedNDF, lightSG);
+
+		// no Geometry term
+
+		// Fresnel
+		//vec3 h = normalize(warpedNDF.Axis + view);
+		//spec *= specColor + (1.0f - specColor) * pow((1.0f - clamp(dot(warpedNDF.Axis, h), 0.0, 1.0)), 5.0f);
+		
+		spec *= nDotL;
+		ambientSpecular.xyz += spec / 3.141592;
+	}
+	return ambientSpecular;
+}
+
+float do_specular(vec3 lightDir, vec3 viewDir, vec3 normal, float shiny)
+{
+	vec3 h = normalize(lightDir + viewDir);
+	float brdf = clamp(dot(h, normal), 0.0, 1.0);
+	//brdf *= brdf; // x2
+	//brdf *= brdf; // x4
+	//brdf *= brdf; // x8
+	brdf = pow(brdf, shiny) * (shiny + 8.0) / (8.0 * 3.141592);
+	return brdf;
+}
+
+float do_fresnel(vec3 viewDir, vec3 normal, float f0)
+{
+	float fresnel = abs(1.0 - dot(normal, viewDir));
+	fresnel *= fresnel;
+	fresnel *= fresnel;
+	return f0 + (1.0 - f0) * fresnel;
+}
+
+float do_half_lambert(float ndotl)
+{
+	ndotl = ndotl * 0.5f + 0.5f;
+	return ndotl * ndotl;
+}
+
+// https://www.unrealengine.com/en-US/blog/physically-based-shading-on-mobile
+vec3 do_env_brdf(vec3 viewDir, vec3 normal, vec3 f0, float roughness)
+{
+	const vec4 c0 = vec4(-1, -0.0275, -0.572, 0.022);
+	const vec4 c1 = vec4(1, 0.0425, 1.04, -0.04);
+	vec4 r = roughness * c0 + c1;
+	float a004 = min( r.x * r.x, exp2( -9.28 * dot(normal, viewDir) ) ) * r.x + r.y;
+	vec2 AB = vec2( -1.04, 1.04 ) * a004 + r.zw;
+	return f0 * AB.x + AB.y;
+}
 
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragColorEmiss;
@@ -284,35 +464,9 @@ vec4 bilinear_paletted_light(vec2 uv, float index)
 }
 #endif
 
-#ifdef GPU_LIGHTING
-struct light
-{
-	vec4  position;
-	vec4  direction_intensity;
-	vec4  color;
-	int   type;
-	uint  isActive;
-	float falloffMin;
-	float falloffMax;
-	float angleX;
-	float cosAngleX;
-	float angleY;
-	float cosAngleY;
-	float lux;
-	float padding0;
-	float padding1;
-};
-
-uniform int numLights;
-uniform lightBlock
-{
-	light lights[128];
-};
-#endif
-
 void main(void)
 {
-    vec2 adj_texcoords = f_uv.xy;
+    vec3 adj_texcoords = f_uv.xyz / f_uv.w;
 
     float originalZ = gl_FragCoord.z / gl_FragCoord.w;
 #ifdef VIEW_SPACE_GBUFFER
@@ -325,10 +479,15 @@ void main(void)
     vec3 face_normals = normals(adjusted_coords_norms);
     vec3 face_normals_parallax = normals(adjusted_coords_parallax);
 
-    if(displacement_factor != 0.0)
+    //if(displacement_factor != 0.0)
+	//{
+    //    adj_texcoords.xy = parallax_mapping(f_uv.xy, face_normals_parallax, adjusted_coords_parallax);
+    //}
+	//else
 	{
-        adj_texcoords.xy = parallax_mapping(f_uv.xy, face_normals_parallax, adjusted_coords_parallax);
-    }
+		if(uv_mode == 6 || uv_mode == 0)
+			adj_texcoords.xy = f_uv_affine;
+	}
 
     vec4 sampled = texture(tex, adj_texcoords.xy);
     vec4 sampledEmiss = texture(texEmiss, adj_texcoords.xy);
@@ -338,18 +497,12 @@ void main(void)
     vec4 palval = texture(worldPalette, vec2(index, 0.5));
     vec4 color_add = vec4(0.0, 0.0, 0.0, 1.0);
     vec4 color_add_emiss = vec4(0.0, 0.0, 0.0, 0.0);
-#ifdef CLASSIC_EMISSIVE
 	vec4 emissive = vec4(0.0);
-#endif
 
-#if defined(VIEW_SPACE_GBUFFER)
-	vec3 surfaceNormals = normals(adjusted_coords.xyz);
-#else
-	vec3 surfaceNormals = face_normals;
-#endif
+	vec3 surfaceNormals = normalize(f_normal);
 
     if (tex_mode == TEX_MODE_TEST) {
-        sampled_color = vec4(1.0, 1.0, 1.0, 1.0);
+		sampled_color = fillColor;
     }
     else if (tex_mode == TEX_MODE_16BPP
     || tex_mode == TEX_MODE_BILINEAR_16BPP
@@ -384,13 +537,8 @@ void main(void)
         // Now take our index and look up the corresponding palette value
         vec4 lightPalval = texture(worldPalette, vec2(light_worldpalidx, 0.5));
 
-	#ifdef CLASSIC_EMISSIVE	
 		emissive = lightPalval;
         color_add = lightPalval;
-	#else
-        // Add more of the emissive color depending on the darkness of the fragment
-        color_add = (lightPalval  * light_mult); // * (1.0 - light)
-	#endif
         sampled_color = palval;
     }
 #ifdef CAN_BILINEAR_FILTER
@@ -398,9 +546,7 @@ void main(void)
     {
         sampled_color = bilinear_paletted(adj_texcoords.xy);
         color_add = bilinear_paletted_light(adj_texcoords.xy, index);
-	#ifdef CLASSIC_EMISSIVE	
 		emissive = color_add / light_mult;
-	#endif
         if (sampled_color.a < 0.01) {
             discard;
         }
@@ -423,10 +569,97 @@ void main(void)
     {
         vertex_color.a = 1.0;
     }
-    vec4 main_color = (sampled_color * vertex_color);
-#ifdef CLASSIC_EMISSIVE
+
+	vec3 localViewDir = normalize(-f_coord.xyz);
+	vec3 reflVec = reflect(-localViewDir, surfaceNormals);
+
+	vec3 diffuseColor = sampled_color.xyz;
+	vec3 specularColor = vec3(0.0);//min(diffuseColor.xyz, fillColor.xyz);
+	float roughness = 0.1;	
+	//float gloss = 1.0 - roughness;
+	float shiny = 8.0;
+
+	if(lightMode == 4)
+	{
+		// for specular materials, try to split the texture highlights and shadows around the fill color
+		//diffuseColor = min(sampled_color.xyz, fillColor.xyz);
+		//specularColor = max(sampled_color.xyz, fillColor.xyz);
+
+		diffuseColor = vec3(0.0);//min(sampled_color.xyz, fillColor.xyz); // poor woman's highlight removal
+		specularColor = sampled_color.xyz;
+	}
+
+	vec3 diffuseLight = vertex_color.xyz;
+	vec3 specLight = vec3(0.0);
+
+	if(lightMode == 0) // full lit
+	{
+		diffuseLight.xyz = vec3(1.0);
+	}
+	else if(lightMode == 1) // not lit
+	{
+		diffuseLight.xyz = vec3(0.0);
+	}
+	else if(lightMode >= 2)
+	{
+		if (ambientMode == 1)
+		{
+			// original JK behavior seems to be max()
+			diffuseLight.xyz = max(diffuseLight.xyz, ambientColor.xyz);
+		}
+		else if (ambientMode == 2)
+		{
+			if(lightMode == 4)
+				specLight.xyz += CalculateAmbientSpecular(surfaceNormals, localViewDir, roughness);
+			else
+				diffuseLight.xyz += CalculateAmbientDiffuse(surfaceNormals);
+		}
+
+		// https://seblagarde.wordpress.com/2012/06/03/spherical-gaussien-approximation-for-blinn-phong-phong-and-fresnel/
+		// Point lights using SG approximations for consistency
+		#define LN2DIV8               0.08664
+		#define Log2Of1OnLn2_Plus1    1.528766
+		float ModifiedSpecularPower = 1.0 / log(2) * shiny;// * (2.0 / roughness - 2);//exp2(10.0 * gloss + Log2Of1OnLn2_Plus1);
+
+		vec4 R2 = vec4(ModifiedSpecularPower * reflVec, -ModifiedSpecularPower);
+
+		float scalar = 0.4; // todo: needs to come from rdCamera_pCurCamera->attenuationMin
+		int totalLights = min(numLights, 128);
+		for(int lt = 0; lt < totalLights; ++lt)
+		{
+			light l = lights[lt];
+			if(l.isActive == 0u)
+				continue;
+
+			vec3 diff = l.position.xyz - f_coord.xyz;
+			float len;
+			if (lightMode == 2) // diffuse uses dist to plane
+				len = dot(l.position.xyz - f_coord.xyz, surfaceNormals.xyz);
+			else
+				len = length(diff);
+
+			if ( len < l.falloffMin )
+			{
+				diff = normalize(diff);
+				float lightMagnitude = dot(surfaceNormals, diff);
+				if (lightMode > 2)
+					lightMagnitude = do_half_lambert(lightMagnitude);
+
+				if ( lightMagnitude > 0.0 )
+				{
+					float intensity = max(0.0, l.direction_intensity.w - len * scalar) * lightMagnitude;
+					if(lightMode == 4)
+						specLight.xyz += intensity * l.color.xyz * exp2(dot(R2, vec4(diff, 1.0)));
+					else			
+						diffuseLight.xyz += intensity * l.color.xyz;
+				}
+			}
+		}
+		specLight *= (LN2DIV8 * ModifiedSpecularPower + 0.25);
+	}
+
+    vec4 main_color = vec4(diffuseColor.xyz * diffuseLight.xyz + specularColor.xyz * specLight.xyz, vertex_color.a);
 	main_color.rgb = max(main_color.rgb, emissive.rgb);
-#endif
 
 #ifdef GPU_LIGHTING
 	//color_add_emiss.xyz += max(vec3(0.0), main_color.xyz - 1.0);
@@ -501,17 +734,6 @@ void main(void)
         //color_add = vec4(1.0, 1.0, 1.0, 1.0);
         luma = 1.0;
     }
-    else
-    {
-        // The emissive maps also include slight amounts of darkly-rendered geometry,
-        // so we want to ramp the amount that gets added based on luminance/brightness.
-#ifndef CLASSIC_EMISSIVE        
-
-        color_add.r *= luma;
-        color_add.g *= luma;
-        color_add.b *= luma;
-#endif
-    }
 
     vec3 tint = normalize(colorEffects_tint + 1.0) * sqrt(3.0);
 
@@ -535,11 +757,6 @@ void main(void)
         color_add = vec4(0.0, 0.0, 0.0, 0.0);
     }
 
-    if (blend_mode == D3DBLEND_INVSRCALPHA) {
-        //color_add.a = (1.0 - color_add.a);
-        //should_write_normals = 1.0 - should_write_normals;
-    }
-
     fragColorEmiss = color_add_emiss + color_add;
 
     //fragColor = vec4(face_normals_parallax.x, face_normals_parallax.y, face_normals_parallax.z, 1.0);
@@ -548,11 +765,8 @@ void main(void)
     //test_norms.xyz *= dot(vec3(1.0, 0.0, -0.7), face_normals);
     //fragColor = test_norms;
 
-//	gl_FragDepth = gl_FragCoord.z;
-#ifdef VIEW_SPACE_GBUFFER
 	// output linear depth
-	float linearDepth = f_depth;
-	fragColorDepth = linearDepth;
+	fragColorDepth = f_depth;
 
 	// octahedron encoded normal
 	vec2 octaNormal = encode_octahedron(surfaceNormals);
@@ -560,8 +774,4 @@ void main(void)
 
 	// unlit diffuse color for deferred lights and decals
 	fragColorDiffuse = sampled_color;
-#else
-    fragColorPos = vec4(adjusted_coords.x, adjusted_coords.y, adjusted_coords.z, should_write_normals);
-    fragColorNormal = vec4(face_normals, should_write_normals);
-#endif
 }

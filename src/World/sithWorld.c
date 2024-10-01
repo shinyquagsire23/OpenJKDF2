@@ -414,7 +414,9 @@ int sithWorld_NewEntry(sithWorld *pWorld)
 				sflight /= (float)pWorld->sectors[i].numSurfaces;
 				rdVector_InvScale3Acc(&sector->ambientRGB, total);
 				rdAmbient_Scale(&sector->ambientSH, 4.0f * M_PI / total); // integration over sphere
+			#ifndef RENDER_DROID2
 				rdAmbient_UpdateDominantDirection(&sector->ambientSH);
+			#endif
 			}
 #endif
             if ( !sithWorld_Verify(pWorld) )

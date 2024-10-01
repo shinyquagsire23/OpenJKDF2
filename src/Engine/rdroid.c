@@ -530,14 +530,14 @@ void rdEndPrimitive()
 	state.depthStencil.zmethod = rdGetZBufferMethod();
 
 	// clamp to global states
-	if (state.raster.geoMode > rdroid_curGeometryMode)
-		state.raster.geoMode = rdroid_curGeometryMode;
-
-	if(state.texture.texMode > rdroid_curTextureMode)
-		state.texture.texMode = rdroid_curTextureMode;
-	
-	if (state.lighting.lightMode > rdroid_curLightingMode)
-		state.lighting.lightMode = rdroid_curLightingMode;
+	//if (state.raster.geoMode > rdroid_curGeometryMode)
+	//	state.raster.geoMode = rdroid_curGeometryMode;
+	//
+	//if(state.texture.texMode > rdroid_curTextureMode)
+	//	state.texture.texMode = rdroid_curTextureMode;
+	//
+	//if (state.lighting.lightMode > rdroid_curLightingMode)
+	//	state.lighting.lightMode = rdroid_curLightingMode;
 
 	int numVertices = 0;
 	D3DVERTEX tmpVerts[64]; // todo: indexing
@@ -873,6 +873,9 @@ void rdAmbientLight(float r, float g, float b)
 	rdVector_Set3(&rdroid_lightingState.ambientColor, r, g, b);
 }
 
+// todo: completely remove this in favor of a light type
+rdVector4 rdroid_sgBasis[8];
+
 void rdAmbientLightSH(rdAmbient* amb)
 {
 	if (!amb)
@@ -884,6 +887,7 @@ void rdAmbientLightSH(rdAmbient* amb)
 	rdMatrix34 viewMat;
 	rdMatrix_Copy44to34(&viewMat, &rdroid_matrices[RD_MATRIX_VIEW]);
 
+#ifndef RENDER_DROID2
 	// rotate the ambient SH to view space
 	rdroid_lightingState.ambientStateSH.r.x = amb->r.x;
 	rdroid_lightingState.ambientStateSH.g.x = amb->g.x;
@@ -893,6 +897,15 @@ void rdAmbientLightSH(rdAmbient* amb)
 	rdMatrix_TransformVector34((rdVector3*)&rdroid_lightingState.ambientStateSH.b.y, &amb->b.y, &viewMat);
 	rdMatrix_TransformVector34(&rdroid_lightingState.ambientStateSH.dominantDir, &amb->dominantDir, &viewMat);
 	//rdAmbient_Copy(&rdroid_lightingState.ambientStateSH, amb);
+#else
+	for(int i = 0; i < 8; ++i)
+	{
+		rdVector_Copy3(&rdroid_lightingState.ambientStateSH.sgs[i], &amb->sgs[i]);
+
+		rdMatrix_TransformVector34((rdVector3*)&rdroid_sgBasis[i].x, &rdLight_sgBasis[i].x, &viewMat);
+		rdroid_sgBasis[i].w = rdLight_sgBasis[i].w;
+	}
+#endif
 }
 
 #endif

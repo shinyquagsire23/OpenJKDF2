@@ -184,7 +184,7 @@ GLint drawcall_attribute_coord3d, drawcall_attribute_v_color, drawcall_attribute
 #ifdef VIEW_SPACE_GBUFFER
 GLint drawcall_attribute_coordVS;
 #endif
-GLint drawcall_uniform_ambient_mode, drawcall_uniform_ambient_color, drawcall_uniform_ambient_sh, drawcall_uniform_ambient_sh_dir;
+GLint drawcall_uniform_ambient_mode, drawcall_uniform_ambient_color, drawcall_uniform_ambient_sh, drawcall_uniform_ambient_sh_dir, drawcall_uniform_ambient_sg, drawcall_uniform_ambient_sgbasis;
 GLint drawcall_uniform_uv_mode, drawcall_uniform_texgen_params, drawcall_uniform_uv_offset;
 GLint drawcall_uniform_mvp, drawcall_uniform_modelMatrix, drawcall_uniform_fillColor, drawcall_uniform_tex, drawcall_uniform_texEmiss, drawcall_uniform_displacement_map, drawcall_uniform_tex_mode, drawcall_uniform_blend_mode, drawcall_uniform_worldPalette, drawcall_uniform_worldPaletteLights;
 GLint drawcall_uniform_tint, drawcall_uniform_filter, drawcall_uniform_fade, drawcall_uniform_add, drawcall_uniform_emissiveFactor, drawcall_uniform_albedoFactor;
@@ -1193,7 +1193,7 @@ int init_resources()
     if ((programDefault = std3D_loadProgram("shaders/default", "")) == 0) return false;
     if ((programMenu = std3D_loadProgram("shaders/menu", "")) == 0) return false;
 #ifdef RENDER_DROID2
-	if ((drawcall_program = std3D_loadProgram("shaders/default", "RENDER_DROID2")) == 0) return false;
+	if ((drawcall_program = std3D_loadProgram("shaders/world", "")) == 0) return false;
 #endif
     if (!std3D_loadSimpleTexProgram("shaders/ui", &std3D_uiProgram)) return false;
     if (!std3D_loadSimpleTexProgram("shaders/texfbo", &std3D_texFboStage)) return false;
@@ -1275,6 +1275,8 @@ int init_resources()
 	drawcall_uniform_ambient_color = std3D_tryFindUniform(drawcall_program, "ambientColor");
 	drawcall_uniform_ambient_sh = std3D_tryFindUniform(drawcall_program, "ambientSH");
 	drawcall_uniform_ambient_sh_dir = std3D_tryFindUniform(drawcall_program, "ambientDominantDir");
+	drawcall_uniform_ambient_sg = std3D_tryFindUniform(drawcall_program, "ambientSG");
+	drawcall_uniform_ambient_sgbasis = std3D_tryFindUniform(drawcall_program, "ambientSGBasis");
 	drawcall_uniform_fillColor = std3D_tryFindUniform(drawcall_program, "fillColor");
 	drawcall_uniform_tex = std3D_tryFindUniform(drawcall_program, "tex");
 	drawcall_uniform_texEmiss = std3D_tryFindUniform(drawcall_program, "texEmiss");
@@ -5091,8 +5093,13 @@ void std3D_SetLightingState(std3D_LightingState* pLightState)
 	glUniform1i(drawcall_uniform_light_mode, pLightState->lightMode);
 	glUniform1i(drawcall_uniform_ambient_mode, pLightState->ambientMode);
 	glUniform3fv(drawcall_uniform_ambient_color, 1, &pLightState->ambientColor.x);
-	glUniform4fv(drawcall_uniform_ambient_sh, 3, &pLightState->ambientStateSH.r.x);
-	glUniform3fv(drawcall_uniform_ambient_sh_dir, 1, &pLightState->ambientStateSH.dominantDir.x);
+
+	//glUniform4fv(drawcall_uniform_ambient_sh, 3, &pLightState->ambientStateSH.r.x);
+	//glUniform3fv(drawcall_uniform_ambient_sh_dir, 1, &pLightState->ambientStateSH.dominantDir.x);
+	glUniform3fv(drawcall_uniform_ambient_sg, 8, &pLightState->ambientStateSH.sgs[0].x);
+
+	extern rdVector4 rdroid_sgBasis[8]; //eww
+	glUniform4fv(drawcall_uniform_ambient_sgbasis, 8, &rdroid_sgBasis[0].x);
 }
 
 void std3D_FlushDrawCalls()

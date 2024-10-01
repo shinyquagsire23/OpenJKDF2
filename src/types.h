@@ -495,8 +495,12 @@ typedef struct rdLight
 // ambient cube
 typedef struct rdAmbient
 {
+#ifdef RENDER_DROID2
+	rdVector3 sgs[8]; // 8 spherical gaussian lobes
+#else
 	rdVector4 r, g, b; // rgb coefficients (linear SH)
 	rdVector3 dominantDir; // precomputed dominant light direction
+#endif
 } rdAmbient;
 #endif
 

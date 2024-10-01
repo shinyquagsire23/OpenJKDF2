@@ -45,15 +45,17 @@ void rdLight_CalcDistVertexIntensities();
 void rdLight_CalcDistFaceIntensity();
 
 #ifdef RGB_AMBIENT
+extern rdVector4 rdLight_sgBasis[8];
+
 void rdAmbient_Zero(rdAmbient* ambient);
 int rdAmbient_Compare(const rdAmbient* a, const rdAmbient* b);
 void rdAmbient_Acc(rdAmbient* ambient, rdVector3* color, rdVector3* dir);
 void rdAmbient_Scale(rdAmbient* ambient, float scale);
-void rdAmbient_Lerp(rdAmbient* out, const rdAmbient* ambient0, const rdAmbient* ambient2, float amount);
-void rdAmbient_AddAcc(rdAmbient* out, const rdAmbient* ambient);
 void rdAmbient_Copy(rdAmbient* outAmbient, const rdAmbient* ambient);
 void rdAmbient_CalculateVertexColor(rdAmbient* ambient, rdVector3* normal, rdVector3* outColor);
+#ifndef RENDER_DROID2
 void rdAmbient_UpdateDominantDirection(rdAmbient* ambient);
+#endif
 #endif
 
 #endif // _RDLIGHT_H
