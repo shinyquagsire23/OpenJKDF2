@@ -4842,9 +4842,39 @@ static size_t GL_tmpDrawCallVerticesAmt = 0;
 
 static D3DVERTEX GL_tmpDrawCallVerticesSorted[STD3D_MAX_DRAW_CALL_VERTS] = { 0 };
 
-int std3D_ComputeDrawCallSortHash(std3D_DrawCallState* pState)
+uint64_t std3D_SortKeyBits(uint64_t* offset, uint64_t bits, uint64_t size)
 {
-	int sortHash = pState->sortPriority << 28;
+	uint64_t limit = (1 << size) - 1;
+	*offset -= size;
+	bits = (bits & limit) << *offset;
+	return bits;
+}
+
+uint64_t std3D_GetSortKey(std3D_DrawCallState* pState)
+{
+	uint64_t offset = 64;
+	
+	uint64_t sortKey = 0;
+	sortKey |= std3D_SortKeyBits(&offset, pState->sortPriority, 2); // 2
+	sortKey |= std3D_SortKeyBits(&offset, pState->texture.pTexture ? pState->texture.pTexture->texture_id : 0, 16); // 18
+	sortKey |= std3D_SortKeyBits(&offset, pState->blend.blendMode, 1); // 19
+	sortKey |= std3D_SortKeyBits(&offset, pState->depthStencil.zmethod, 2); // 21
+	sortKey |= std3D_SortKeyBits(&offset, pState->depthStencil.zcompare, 3); // 24
+	sortKey |= std3D_SortKeyBits(&offset, pState->raster.cullMode, 3); // 27
+	sortKey |= std3D_SortKeyBits(&offset, pState->texture.alphaTest, 1); // 28
+	sortKey |= std3D_SortKeyBits(&offset, pState->raster.geoMode, 3); // 31
+	sortKey |= std3D_SortKeyBits(&offset, pState->texture.texMode, 3); // 34
+	sortKey |= std3D_SortKeyBits(&offset, pState->lighting.lightMode, 3); // 37
+	sortKey |= std3D_SortKeyBits(&offset, pState->lighting.ambientMode, 2); // 39
+	sortKey |= std3D_SortKeyBits(&offset, pState->texture.chromaKeyMode, 1); // 40
+	sortKey |= std3D_SortKeyBits(&offset, pState->raster.colorMode, 1); // 41
+	sortKey |= std3D_SortKeyBits(&offset, pState->raster.scissorMode, 1); // 42
+
+	// use the rest for depth sorting
+	uint64_t remainingBits = 64 - offset;
+	sortKey |= std3D_SortKeyBits(&offset, (uint64_t)(pState->sortDistance * ((1 << remainingBits) - 1)), remainingBits);
+
+	//sortHash |= (pState->raster.geoMode & 7) << 25;
 	//hash |= ((proc->type & RD_FF_TEX_TRANSLUCENT) == RD_FF_TEX_TRANSLUCENT) << 31;
 	//hash |= ((proc->type & RD_FF_DOUBLE_SIDED) == RD_FF_DOUBLE_SIDED) << 30;
 	//RD_FF_TEX_CLAMP_X
@@ -4855,9 +4885,7 @@ int std3D_ComputeDrawCallSortHash(std3D_DrawCallState* pState)
 	//hash |= ((proc->type & RD_FF_ADDITIVE) == RD_FF_ADDITIVE) << 30;
 	//hash |= ((proc->type & RD_FF_SCREEN) == RD_FF_SCREEN) << 28;
 #endif
-	sortHash |= pState->texture.texMode << 16;
-	sortHash |= (pState->texture.pTexture ? pState->texture.pTexture->texture_id : 0);
-	return sortHash;
+	return sortKey;
 }
 
 void std3D_AddDrawCall(std3D_DrawCallState* pDrawCallState, D3DVERTEX* paVertices, int numVertices)
@@ -4872,7 +4900,7 @@ void std3D_AddDrawCall(std3D_DrawCallState* pDrawCallState, D3DVERTEX* paVertice
 		return; // todo: flush here?
 
 	std3D_DrawCall* pDrawCall = &GL_tmpDrawCalls[GL_tmpDrawCallAmt++];
-	pDrawCall->sortHash = std3D_ComputeDrawCallSortHash(pDrawCallState);
+	pDrawCall->sortKey = std3D_GetSortKey(pDrawCallState);
 	pDrawCall->state = *pDrawCallState;
 	pDrawCall->firstVertex = GL_tmpDrawCallVerticesAmt;
 	pDrawCall->numVertices = numVertices;
@@ -4949,9 +4977,9 @@ void std3D_SetTexture(rdDDrawSurface* pTexture)
 
 int std3D_DrawCallCompare(std3D_DrawCall* a, std3D_DrawCall* b)
 {
-	if (a->sortHash > b->sortHash)
+	if (a->sortKey > b->sortKey)
 		return 1;
-	if (a->sortHash < b->sortHash)
+	if (a->sortKey < b->sortKey)
 		return -1;
 	return 0;
 }
@@ -5186,9 +5214,14 @@ void std3D_FlushDrawCalls()
 
 		int texid = pTexState->pTexture ? pTexState->pTexture->texture_id : blank_tex_white;
 		if (last_tex != texid
-			|| memcmp(&lastState, &pDrawCall->state, sizeof(std3D_DrawCallState)) != 0
-			|| rdMatrix_Compare44(&last_mat, &pDrawCall->state.modelView) != 0
-			|| rdMatrix_Compare44(&last_proj, &pDrawCall->state.proj) != 0
+			//|| memcmp(&lastState, &pDrawCall->state, sizeof(std3D_DrawCallState)) != 0
+			|| memcmp(&lastState.raster, &pDrawCall->state.raster, sizeof(std3D_RasterState)) != 0
+			|| memcmp(&lastState.blend, &pDrawCall->state.blend, sizeof(std3D_BlendState)) != 0
+			|| memcmp(&lastState.depthStencil, &pDrawCall->state.depthStencil, sizeof(std3D_DepthStencilState)) != 0
+			|| memcmp(&lastState.texture, &pDrawCall->state.texture, sizeof(std3D_TextureState)) != 0
+			|| memcmp(&lastState.lighting, &pDrawCall->state.lighting, sizeof(std3D_LightingState)) != 0
+			|| rdMatrix_Compare44(&lastState.modelView, &pDrawCall->state.modelView) != 0
+			|| rdMatrix_Compare44(&lastState.proj, &pDrawCall->state.proj) != 0
 		)
 		{
 			do_batch = 1;

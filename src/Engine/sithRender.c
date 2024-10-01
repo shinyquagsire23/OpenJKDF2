@@ -1074,6 +1074,7 @@ void sithRender_DrawSurface(sithSurface* surface)
 		float extra = stdMath_Clamp(surface->parent_sector->extraLight + surface->surfaceInfo.face.extraLight + sithRender_008d4098, 0.0, 1.0);
 		rdAmbientLight(extra, extra, extra);
 	}
+	rdAmbientLightSH(NULL);
 
 	float alpha = 1.0f;
 	if ((surface->surfaceInfo.face.type & RD_FF_TEX_TRANSLUCENT) != 0)
@@ -1197,6 +1198,7 @@ void sithRender_RenderLevelGeometry()
 					sithRender_aSurfaces[sithRender_numSurfaces++] = surface;
 				continue;
 			}
+			rdSortDistance(0);
 			sithRender_DrawSurface(surface);
 		}
 
@@ -2690,6 +2692,7 @@ void sithRender_RenderAlphaSurfaces()
 		sithSurface* surface = sithRender_aSurfaces[i];
 		sithSector* sector = surface->parent_sector;
 		rdColormap_SetCurrent(sector->colormap);
+		rdSortDistance(rdVector_Dist3(&sithCamera_currentCamera->vec3_1, &sithWorld_pCurrentWorld->vertices[*surface->surfaceInfo.face.vertexPosIdx]));
 		sithRender_DrawSurface(surface);
 	}
 

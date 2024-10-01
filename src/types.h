@@ -907,6 +907,7 @@ typedef struct std3D_LightingState
 typedef struct std3D_DrawCallState
 {
 	int                     sortPriority;
+	float                   sortDistance;
 	rdMatrix44              modelView;
 	rdMatrix44              proj;
 	std3D_RasterState       raster;
@@ -918,7 +919,7 @@ typedef struct std3D_DrawCallState
 
 typedef struct std3D_DrawCall
 {
-	int                 sortHash;      // sort hash
+	uint64_t            sortKey;       // sort key
 	int                 firstVertex;   // number of vertices in the vertex array
 	int                 numVertices;   // number of vertices in the vertex array
 	std3D_DrawCallState state;

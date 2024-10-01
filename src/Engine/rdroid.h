@@ -82,8 +82,9 @@ void rdClearPostStatistics();
 //#define  (*(int*)0x)
 
 #ifdef RENDER_DROID2
+// todo: the original rdProcEntry stuff was somewhat stateless, try to move away from stateful api
 
-// todo: rdPushMatrix/rdPopMatrix
+// todo: rdPushMatrix/rdPopMatrix?
 void rdMatrixMode(rdMatrixMode_t mode);
 void rdPerspective(float fov, float aspect, float nearPlane, float farPlane);
 void rdOrthographic(float width, float height, float nearPlane, float farPlane);
@@ -128,6 +129,7 @@ void rdSetChromaKey(rdChromaKeyMode_t mode);
 void rdSetChromaKeyValue(uint8_t r, uint8_t g, uint8_t b);
 
 void rdSortPriority(int sortPriority);
+void rdSortDistance(float distance);
 
 // these names kinda suck, come up with better for per-primitive modes
 void rdSetGeoMode(int a1);

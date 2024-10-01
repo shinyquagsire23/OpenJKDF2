@@ -200,6 +200,7 @@ int rdSprite_Draw(rdThing* thing, rdMatrix34* mat)
 #endif
 
 	rdSortPriority(sprite->face.sortId);
+	rdSortDistance(vertex_out.y);
 
 	rdBindMaterial(sprite->face.material, thing->wallCel);
 
@@ -239,6 +240,7 @@ int rdSprite_Draw(rdThing* thing, rdMatrix34* mat)
 	}
 
 	rdSortPriority(0);
+	rdSortDistance(0);
 	rdTexOffseti(0, 0);
 	rdMatrixMode(RD_MATRIX_VIEW);
 	rdLoadMatrix(&viewMatrix);

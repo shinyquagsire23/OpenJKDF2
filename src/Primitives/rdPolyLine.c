@@ -209,6 +209,10 @@ int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix)
     tip_right = vertex_out.x + polyline->tipRadius;
     tip_top = vertex_out.z + polyline->tipRadius;
 
+#ifdef RENDER_DROID2
+	rdSortDistance(vertex_out.y);
+#endif
+
     // Tip
     {
         polylineVerts[0].x = tip_left;

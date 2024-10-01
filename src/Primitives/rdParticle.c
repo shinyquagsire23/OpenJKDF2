@@ -356,6 +356,7 @@ int rdParticle_Draw(rdThing* thing, rdMatrix34* mat)
 #endif
 
 	rdSetCullMode(RD_CULL_MODE_NONE);
+	rdSortDistance(vertex_out.y);
 
 	// we want everything the same size regardless of distance
 	// transform everything here on CPU instead so we can do the expansion properly

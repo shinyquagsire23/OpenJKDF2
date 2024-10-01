@@ -39,6 +39,7 @@ static rdMatrix44     rdroid_curProjInv;
 static rdMatrix44     rdroid_curViewProjInv;
 
 static int rdroid_sortPriority = 0;
+static float rdroid_sortDistance = 0;
 
 static float       rdroid_texWidth = 1;
 static float       rdroid_texHeight = 1;
@@ -118,6 +119,7 @@ int rdStartup(HostServices *p_hs)
 	rdResetTextureState();
 	rdResetLightingState();
 	rdroid_sortPriority = 0;
+	rdroid_sortDistance = 0;
 #endif
 
     bRDroidStartup = 1;
@@ -516,6 +518,7 @@ void rdEndPrimitive()
 	rdMatrix_Copy44(&state.modelView, &rdroid_curModelView);
 	rdMatrix_Copy44(&state.proj, &rdroid_matrices[RD_MATRIX_PROJECTION]);
 	state.sortPriority = rdroid_sortPriority;
+	state.sortDistance = rdroid_sortDistance;
 
 	memcpy(&state.raster, &rdroid_rasterState, sizeof(std3D_RasterState));
 	memcpy(&state.blend, &rdroid_blendState, sizeof(std3D_BlendState));
@@ -821,6 +824,11 @@ void rdSortPriority(int sortPriority)
 	rdroid_sortPriority = sortPriority;
 }
 
+void rdSortDistance(float distance)
+{
+	rdroid_sortDistance = distance;
+}
+
 void rdSetGeoMode(int a1)
 {
 	rdroid_rasterState.geoMode = a1;
@@ -867,6 +875,12 @@ void rdAmbientLight(float r, float g, float b)
 
 void rdAmbientLightSH(rdAmbient* amb)
 {
+	if (!amb)
+	{
+		rdAmbient_Zero(&rdroid_lightingState.ambientStateSH);
+		return;
+	}
+
 	rdMatrix34 viewMat;
 	rdMatrix_Copy44to34(&viewMat, &rdroid_matrices[RD_MATRIX_VIEW]);
 

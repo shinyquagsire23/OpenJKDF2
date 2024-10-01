@@ -1535,6 +1535,7 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
 #ifdef RENDER_DROID2
 	rdMatrixMode(RD_MATRIX_MODEL);
 	rdLoadMatrix34(mat);
+	rdSortDistance(vertex_out.y);
 #endif
 
     rdMatrix_TransformPoint34(&localCamera, &rdCamera_camMatrix.scale, &matInv);
@@ -1558,8 +1559,11 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
         ++face;
     }
 
+#ifdef RENDER_DROID2
+	rdSortDistance(0);
 	rdMatrixMode(RD_MATRIX_MODEL);
 	rdIdentity();
+#endif
 }
 
 // MOTS altered (RGB lights)
