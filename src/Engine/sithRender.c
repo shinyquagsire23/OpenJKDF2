@@ -1092,7 +1092,6 @@ void sithRender_DrawSurface(sithSurface* surface)
 		for (int j = 0; j < surface->surfaceInfo.face.numVertices; j++)
 		{
 			int posidx = surface->surfaceInfo.face.vertexPosIdx[j];
-			int uvidx = surface->surfaceInfo.face.vertexUVIdx[j];
 
 			if ((surface->surfaceFlags & SITH_SURFACE_1000000) == 0)
 			{
@@ -1106,8 +1105,13 @@ void sithRender_DrawSurface(sithSurface* surface)
 				float* blue = green + surface->surfaceInfo.face.numVertices;
 				rdColor4f(red[j], green[j], blue[j], alpha);
 			}
-			rdVector2* uv = &sithWorld_pCurrentWorld->vertexUVs[uvidx];
-			rdTexCoord2i(uv->x, uv->y);
+
+			if (surface->surfaceInfo.face.geometryMode >= RD_GEOMODE_TEXTURED && surface->surfaceInfo.face.vertexUVIdx)
+			{
+				int uvidx = surface->surfaceInfo.face.vertexUVIdx[j];
+				rdVector2* uv = &sithWorld_pCurrentWorld->vertexUVs[uvidx];
+				rdTexCoord2i(uv->x, uv->y);
+			}
 
 			rdNormal(&surface->surfaceInfo.face.normal);
 
