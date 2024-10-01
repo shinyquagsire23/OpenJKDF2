@@ -1024,8 +1024,8 @@ void sithRender_DrawSurface(sithSurface* surface)
 	if ((surface->surfaceFlags & (SITH_SURFACE_HORIZON_SKY | SITH_SURFACE_CEILING_SKY)) != 0)
 	{
 		geoMode = sithRender_geoMode;
-		if (sithRender_geoMode > RD_GEOMODE_SOLIDCOLOR)
-			geoMode = RD_GEOMODE_SOLIDCOLOR;
+		if (sithRender_geoMode > RD_GEOMODE_TEXTURED)
+			geoMode = RD_GEOMODE_TEXTURED;
 	}
 	else
 	{
@@ -1056,7 +1056,7 @@ void sithRender_DrawSurface(sithSurface* surface)
 	{
 		texMode = RD_TEXTUREMODE_HORIZON;
 		rdTexGenParams(sithSector_flt_8553C0, sithSector_flt_8553C8, sithSector_flt_8553F4, 0);
-		rdTexOffseti(sithWorld_pCurrentWorld->horizontalSkyOffs.x + sithSector_flt_8553B8, sithWorld_pCurrentWorld->horizontalSkyOffs.y + sithSector_flt_8553C4);
+		rdTexOffseti(sithWorld_pCurrentWorld->horizontalSkyOffs.x + sithSector_flt_8553C4, sithWorld_pCurrentWorld->horizontalSkyOffs.y + sithSector_flt_8553B8);
 	}
 
 	rdSetTexMode(texMode);
