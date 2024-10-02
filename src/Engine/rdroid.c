@@ -540,7 +540,7 @@ void rdEndPrimitive()
 	//	state.lighting.lightMode = rdroid_curLightingMode;
 
 	int numVertices = 0;
-	D3DVERTEX tmpVerts[64]; // todo: indexing
+	D3DVERTEX tmpVerts[66]; // todo: indexing
 	if (rdroid_curPrimitiveType == RD_PRIMITIVE_TRIANGLES)
 	{
 		numVertices = rdroid_vertexCacheNum;
