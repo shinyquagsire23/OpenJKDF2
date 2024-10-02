@@ -574,7 +574,7 @@ void main(void)
 
 	vec3 diffuseColor = sampled_color.xyz;
 	vec3 specularColor = vec3(0.0);//min(diffuseColor.xyz, fillColor.xyz);
-	float roughness = 0.1;	
+	float roughness = 0.01;	
 	//float gloss = 1.0 - roughness;
 	float shiny = 8.0;
 
@@ -584,8 +584,8 @@ void main(void)
 		//diffuseColor = min(sampled_color.xyz, fillColor.xyz);
 		//specularColor = max(sampled_color.xyz, fillColor.xyz);
 
-		diffuseColor = vec3(0.0);//min(sampled_color.xyz, fillColor.xyz); // poor woman's highlight removal
-		specularColor = sampled_color.xyz;
+		//diffuseColor = vec3(0.0);//min(sampled_color.xyz, fillColor.xyz); // poor woman's highlight removal
+		specularColor = sampled_color.xyz;//fillColor.xyz;// sampled_color.xyz;
 	}
 
 	vec3 diffuseLight = vertex_color.xyz;
@@ -601,13 +601,15 @@ void main(void)
 	}
 	else if(lightMode >= 2)
 	{
-		if (ambientMode == 1)
+		if (ambientMode > 0)
 		{
 			// original JK behavior seems to be max()
 			diffuseLight.xyz = max(diffuseLight.xyz, ambientColor.xyz);
 		}
-		else if (ambientMode == 2)
+
+		if (ambientMode == 2)
 		{
+			//diffuseLight.xyz += CalculateAmbientDiffuse(surfaceNormals);
 			if(lightMode == 4)
 				specLight.xyz += CalculateAmbientSpecular(surfaceNormals, localViewDir, roughness);
 			else
@@ -656,6 +658,10 @@ void main(void)
 		}
 		specLight *= (LN2DIV8 * ModifiedSpecularPower + 0.25);
 	}
+
+	// todo: maybe tone map this?
+	diffuseLight = clamp(diffuseLight.xyz, vec3(0.0), vec3(1.0));	
+	specLight = clamp(specLight.xyz, vec3(0.0), vec3(1.0));
 
     vec4 main_color = vec4(diffuseColor.xyz * diffuseLight.xyz + specularColor.xyz * specLight.xyz, vertex_color.a);
 	main_color.rgb = max(main_color.rgb, emissive.rgb);
