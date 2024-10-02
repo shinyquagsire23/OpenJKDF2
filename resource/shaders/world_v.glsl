@@ -25,16 +25,16 @@ noperspective out vec2 f_uv_affine;
 
 vec2 do_horizon_uv(inout vec4 clip_pos)
 {
-	vec2 projXY = vec2(0.5, -0.5) * clip_pos.xy;
+	vec2 projXY = vec2(0.5, 0.5) * clip_pos.xy;
 	projXY = projXY.xy * iResolution.xy * (texgen_params.x / clip_pos.w);
 
 	vec2 uv;
 	uv.x = projXY.x * texgen_params.y + (projXY.y * -texgen_params.z);
 	uv.y = projXY.y * texgen_params.y + (projXY.x *  texgen_params.z);
 	
-	//clip_pos.z = clip_pos.w - 0.25/64.0;
+	clip_pos.z = clip_pos.w - 0.25/64.0;
 	
-	return uv / 128.0 + uv_offset.xy / iResolution.xy; // todo: from mat
+	return (uv + uv_offset.xy) / 128.0; // todo: from mat
 }
 
 void main(void)
