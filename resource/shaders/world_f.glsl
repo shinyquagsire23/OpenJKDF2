@@ -54,6 +54,9 @@ uniform sampler2D texEmiss;
 uniform sampler2D worldPalette;
 uniform sampler2D worldPaletteLights;
 uniform sampler2D displacement_map;
+
+uniform usamplerBuffer lightBuffer;
+
 uniform int tex_mode;
 uniform int blend_mode;
 uniform vec3 colorEffects_tint;
@@ -84,10 +87,13 @@ in float f_depth;
 noperspective in vec2 f_uv_affine;
 
 uniform mat4 modelMatrix;
+uniform mat4 mvp;
 
 uniform int uv_mode;
 uniform vec4 fillColor;
 
+// fixme: specular mode is currently a metal mode, where metalness is assumed to be 1.0 with 0 diffuse component
+// this is pretty limiting atm, I'd like to get some shiny storm troopers but their armor is more like plastic
 uniform int lightMode;
 uniform int  ambientMode;
 uniform vec3 ambientColor;
@@ -119,6 +125,81 @@ uniform lightBlock
 {
 	light lights[128];
 };
+
+// todo: define outside
+#define CLUSTER_MAX_LIGHTS 128u
+#define CLUSTER_BUCKETS_PER_CLUSTER (CLUSTER_MAX_LIGHTS / 32u)
+#define CLUSTER_GRID_SIZE_X 32u
+#define CLUSTER_GRID_SIZE_Y 16u
+#define CLUSTER_GRID_SIZE_Z 48u
+#define CLUSTER_GRID_SIZE_XYZ (CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y * CLUSTER_GRID_SIZE_Z)
+#define CLUSTER_GRID_TOTAL_SIZE (CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y * CLUSTER_GRID_SIZE_Z * CLUSTER_BUCKETS_PER_CLUSTER)
+
+uniform vec2 clusterScaleBias;
+uniform vec2 clusterTileSizes;
+
+uint get_cluster_z_index(float screen_depth)
+{
+	return uint(max(log(screen_depth) * clusterScaleBias.x + clusterScaleBias.y, 0.0));
+}
+
+uint compute_cluster_index(vec2 pixel_pos, float screen_depth)
+{
+	uint z_index = get_cluster_z_index(screen_depth);
+    uvec3 indices = uvec3(uvec2(pixel_pos.xy / clusterTileSizes.xy), z_index);
+    uint cluster = indices.x + indices.y * CLUSTER_GRID_SIZE_X + indices.z * CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y;
+    return cluster;
+}
+
+// not available in GL < 4.0
+// pretty naive approach, can do better
+int findLSB(uint x)
+{
+	int res = -1;
+	for (uint i = 0u; i < 32u; i++)
+	{
+		uint mask = 1u << i;
+		if ((x & mask) == mask)
+		{
+			res = int(i);
+			break;
+		}
+	}
+	return res;
+}
+
+// debug view
+vec3 temperature(float t)
+{
+    vec3 c[10] = vec3[10](
+        vec3(   0.0f/255.0f,   2.0f/255.0f,  91.0f/255.0f ),
+        vec3(   0.0f/255.0f, 108.0f/255.0f, 251.0f/255.0f ),
+        vec3(   0.0f/255.0f, 221.0f/255.0f, 221.0f/255.0f ),
+        vec3(  51.0f/255.0f, 221.0f/255.0f,   0.0f/255.0f ),
+        vec3( 255.0f/255.0f, 252.0f/255.0f,   0.0f/255.0f ),
+        vec3( 255.0f/255.0f, 180.0f/255.0f,   0.0f/255.0f ),
+        vec3( 255.0f/255.0f, 104.0f/255.0f,   0.0f/255.0f ),
+        vec3( 226.0f/255.0f,  22.0f/255.0f,   0.0f/255.0f ),
+        vec3( 191.0f/255.0f,   0.0f/255.0f,  83.0f/255.0f ),
+        vec3( 145.0f/255.0f,   0.0f/255.0f,  65.0f/255.0f ) 
+    );
+
+    float s = t * 10.0f;
+
+    int cur = int(s) <= 9 ? int(s) : 9;
+    int prv = cur >= 1 ? cur-1 : 0;
+    int nxt = cur < 9 ? cur+1 : 9;
+
+    float blur = 0.8f;
+
+    float wc = smoothstep( float(cur)-blur, float(cur)+blur, s ) * (1.0f - smoothstep(float(cur+1)-blur, float(cur+1)+blur, s) );
+    float wp = 1.0f - smoothstep( float(cur)-blur, float(cur)+blur, s );
+    float wn = smoothstep( float(cur+1)-blur, float(cur+1)+blur, s );
+
+    vec3 r = wc*c[cur] + wp*c[prv] + wn*c[nxt];
+    return vec3( clamp(r.x, 0.0f, 1.0f), clamp(r.y,0.0f,1.0f), clamp(r.z,0.0f,1.0f) );
+}
+
 
 // https://therealmjp.github.io/posts/sg-series-part-1-a-brief-and-incomplete-history-of-baked-lighting-representations/
 // SphericalGaussian(dir) := Amplitude * exp(Sharpness * (dot(Axis, dir) - 1.0f))
@@ -228,40 +309,78 @@ vec3 CalculateAmbientSpecular(vec3 normal, vec3 view, float roughness)
 	return ambientSpecular;
 }
 
-float do_specular(vec3 lightDir, vec3 viewDir, vec3 normal, float shiny)
-{
-	vec3 h = normalize(lightDir + viewDir);
-	float brdf = clamp(dot(h, normal), 0.0, 1.0);
-	//brdf *= brdf; // x2
-	//brdf *= brdf; // x4
-	//brdf *= brdf; // x8
-	brdf = pow(brdf, shiny) * (shiny + 8.0) / (8.0 * 3.141592);
-	return brdf;
-}
-
-float do_fresnel(vec3 viewDir, vec3 normal, float f0)
-{
-	float fresnel = abs(1.0 - dot(normal, viewDir));
-	fresnel *= fresnel;
-	fresnel *= fresnel;
-	return f0 + (1.0 - f0) * fresnel;
-}
-
-float do_half_lambert(float ndotl)
+float HalfLambert(float ndotl)
 {
 	ndotl = ndotl * 0.5f + 0.5f;
 	return ndotl * ndotl;
 }
 
-// https://www.unrealengine.com/en-US/blog/physically-based-shading-on-mobile
-vec3 do_env_brdf(vec3 viewDir, vec3 normal, vec3 f0, float roughness)
+void CalculatePointLighting(vec3 normal, vec3 view, inout vec3 diffuseLight, inout vec3 specLight)
 {
-	const vec4 c0 = vec4(-1, -0.0275, -0.572, 0.022);
-	const vec4 c1 = vec4(1, 0.0425, 1.04, -0.04);
-	vec4 r = roughness * c0 + c1;
-	float a004 = min( r.x * r.x, exp2( -9.28 * dot(normal, viewDir) ) ) * r.x + r.y;
-	vec2 AB = vec2( -1.04, 1.04 ) * a004 + r.zw;
-	return f0 * AB.x + AB.y;
+	// https://seblagarde.wordpress.com/2012/06/03/spherical-gaussien-approximation-for-blinn-phong-phong-and-fresnel/
+	// Point lights using SG approximations for consistency and a little speed
+	#define LN2DIV8               0.08664
+	#define Log2Of1OnLn2_Plus1    1.528766
+	float ModifiedSpecularPower = 1.0 / log(2) * 8.0;// * (2.0 / roughness - 2);//exp2(10.0 * gloss + Log2Of1OnLn2_Plus1);
+
+	vec3 reflVec = reflect(-view, normal);
+	vec4 R2 = vec4(ModifiedSpecularPower * reflVec, -ModifiedSpecularPower);
+	float specNormalization = (LN2DIV8 * ModifiedSpecularPower + 0.25);
+
+	float scalar = 0.4; // todo: needs to come from rdCamera_pCurCamera->attenuationMin
+
+	// debug
+	//float lightOverdraw = 0.0;
+	//int totalLights = min(numLights, 128);
+	//for(int light_index = 0; light_index < totalLights; ++light_index)
+
+	uint cluster_index = compute_cluster_index(gl_FragCoord.xy, f_depth);
+	uint bucket_index = cluster_index * CLUSTER_BUCKETS_PER_CLUSTER;
+	for(uint bucket = 0u; bucket < CLUSTER_BUCKETS_PER_CLUSTER; ++bucket)
+	{
+		uint bucket_bits = uint(texelFetch(lightBuffer, int(bucket_index + bucket)).x);
+		while(bucket_bits != 0u)
+		{
+			uint bucket_bit_index = uint(findLSB(int(bucket_bits)));
+			uint light_index = bucket * 32u + bucket_bit_index;
+			bucket_bits &= ~uint(1 << bucket_bit_index);
+				
+			//lightOverdraw += 1.0;
+
+			light l = lights[light_index];
+
+			vec3 diff = l.position.xyz - f_coord.xyz;
+			float len;
+			if (lightMode == 2) // diffuse uses dist to plane
+				len = dot(l.position.xyz - f_coord.xyz, normal.xyz);
+			else
+				len = length(diff);
+
+			// todo: how much branching do we really want to do here?
+			if ( len < l.falloffMin )
+			{
+				diff = normalize(diff);
+				float lightMagnitude = dot(normal, diff);
+				if (lightMode > 2) // gouraud and higher use half lambert
+					lightMagnitude = HalfLambert(lightMagnitude);
+
+				if ( lightMagnitude > 0.0 )
+				{
+					// this is JK's attenuation model
+					float intensity = max(0.0, l.direction_intensity.w - len * scalar) * lightMagnitude;
+					if(lightMode == 4)
+						specLight.xyz += intensity * l.color.xyz * exp2(dot(R2, vec4(diff, 1.0))) * specNormalization;
+					else			
+						diffuseLight.xyz += intensity * l.color.xyz;
+				}
+			}
+		}
+	}
+
+	//specLight *= 0;
+
+	//uint z_index = get_cluster_z_index(f_depth);
+	//diffuseLight = temperature(lightOverdraw / 32.0);
 }
 
 layout(location = 0) out vec4 fragColor;
@@ -468,6 +587,7 @@ void main(void)
 {
     vec3 adj_texcoords = f_uv.xyz / f_uv.w;
 
+	// todo: make sure all the jkgm stuff still works
     float originalZ = gl_FragCoord.z / gl_FragCoord.w;
 #ifdef VIEW_SPACE_GBUFFER
     vec3 adjusted_coords = f_coord; // view space position
@@ -570,13 +690,10 @@ void main(void)
     }
 
 	vec3 localViewDir = normalize(-f_coord.xyz);
-	vec3 reflVec = reflect(-localViewDir, surfaceNormals);
 
 	vec3 diffuseColor = sampled_color.xyz;
 	vec3 specularColor = vec3(0.0);//min(diffuseColor.xyz, fillColor.xyz);
 	float roughness = 0.01;	
-	//float gloss = 1.0 - roughness;
-	float shiny = 8.0;
 
 	if(lightMode == 4)
 	{
@@ -616,47 +733,7 @@ void main(void)
 				diffuseLight.xyz += CalculateAmbientDiffuse(surfaceNormals);
 		}
 
-		// https://seblagarde.wordpress.com/2012/06/03/spherical-gaussien-approximation-for-blinn-phong-phong-and-fresnel/
-		// Point lights using SG approximations for consistency
-		#define LN2DIV8               0.08664
-		#define Log2Of1OnLn2_Plus1    1.528766
-		float ModifiedSpecularPower = 1.0 / log(2) * shiny;// * (2.0 / roughness - 2);//exp2(10.0 * gloss + Log2Of1OnLn2_Plus1);
-
-		vec4 R2 = vec4(ModifiedSpecularPower * reflVec, -ModifiedSpecularPower);
-
-		float scalar = 0.4; // todo: needs to come from rdCamera_pCurCamera->attenuationMin
-		int totalLights = min(numLights, 128);
-		for(int lt = 0; lt < totalLights; ++lt)
-		{
-			light l = lights[lt];
-			if(l.isActive == 0u)
-				continue;
-
-			vec3 diff = l.position.xyz - f_coord.xyz;
-			float len;
-			if (lightMode == 2) // diffuse uses dist to plane
-				len = dot(l.position.xyz - f_coord.xyz, surfaceNormals.xyz);
-			else
-				len = length(diff);
-
-			if ( len < l.falloffMin )
-			{
-				diff = normalize(diff);
-				float lightMagnitude = dot(surfaceNormals, diff);
-				if (lightMode > 2)
-					lightMagnitude = do_half_lambert(lightMagnitude);
-
-				if ( lightMagnitude > 0.0 )
-				{
-					float intensity = max(0.0, l.direction_intensity.w - len * scalar) * lightMagnitude;
-					if(lightMode == 4)
-						specLight.xyz += intensity * l.color.xyz * exp2(dot(R2, vec4(diff, 1.0)));
-					else			
-						diffuseLight.xyz += intensity * l.color.xyz;
-				}
-			}
-		}
-		specLight *= (LN2DIV8 * ModifiedSpecularPower + 0.25);
+		CalculatePointLighting(surfaceNormals, localViewDir, diffuseLight, specLight);
 	}
 
 	// todo: maybe tone map this?
