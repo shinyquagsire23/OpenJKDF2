@@ -377,6 +377,9 @@ int sithWorld_NewEntry(sithWorld *pWorld)
 				for (int j = 0; j < pWorld->sectors[i].numSurfaces; j++)
 				{
 					sithSurface* surface = &pWorld->sectors[i].surfaces[j];
+					if(surface->adjoin && (surface->adjoin->flags & SITHSURF_ADJOIN_VISIBLE))
+						continue; // ignore adjoins
+
 					total += surface->surfaceInfo.face.numVertices;
 
 					sflight += surface->surfaceInfo.face.extraLight;
@@ -391,7 +394,7 @@ int sithWorld_NewEntry(sithWorld *pWorld)
 						emissiveLightLevel = -1;
 
 					rdVector3 emissive;
-					if(rdMaterial_GetFillColor(&emissive, surface->surfaceInfo.face.material, pWorld->sectors[i].colormap, 0, -1))
+					if(rdMaterial_GetFillColor(&emissive, surface->surfaceInfo.face.material, pWorld->sectors[i].colormap, 0, emissiveLightLevel))
 						rdAmbient_Acc(&sector->ambientSH, &emissive, &surface->surfaceInfo.face.normal);
 
 					for (int k = 0; k < surface->surfaceInfo.face.numVertices; ++k)
