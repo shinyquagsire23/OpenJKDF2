@@ -185,7 +185,7 @@ GLint drawcall_attribute_coord3d, drawcall_attribute_v_color, drawcall_attribute
 GLint drawcall_attribute_coordVS;
 #endif
 GLint drawcall_uniform_ambient_mode, drawcall_uniform_ambient_color, drawcall_uniform_ambient_sh, drawcall_uniform_ambient_sh_dir, drawcall_uniform_ambient_sg, drawcall_uniform_ambient_sgbasis;
-GLint drawcall_uniform_uv_mode, drawcall_uniform_texgen_params, drawcall_uniform_uv_offset;
+GLint drawcall_uniform_uv_mode, drawcall_uniform_texgen, drawcall_uniform_texgen_params, drawcall_uniform_uv_offset;
 GLint drawcall_uniform_mvp, drawcall_uniform_modelMatrix, drawcall_uniform_fillColor, drawcall_uniform_tex, drawcall_uniform_texEmiss, drawcall_uniform_displacement_map, drawcall_uniform_tex_mode, drawcall_uniform_blend_mode, drawcall_uniform_worldPalette, drawcall_uniform_worldPaletteLights;
 GLint drawcall_uniform_tint, drawcall_uniform_filter, drawcall_uniform_fade, drawcall_uniform_add, drawcall_uniform_emissiveFactor, drawcall_uniform_albedoFactor;
 GLint drawcall_uniform_light_mode, drawcall_uniform_light_mult, drawcall_uniform_displacement_factor, drawcall_uniform_iResolution, drawcall_uniform_enableDither;
@@ -1269,6 +1269,7 @@ int init_resources()
 	drawcall_uniform_mvp = std3D_tryFindUniform(drawcall_program, "mvp");
 	drawcall_uniform_modelMatrix = std3D_tryFindUniform(drawcall_program, "modelMatrix");
 	drawcall_uniform_uv_mode = std3D_tryFindUniform(drawcall_program, "uv_mode");
+	drawcall_uniform_texgen = std3D_tryFindUniform(drawcall_program, "texgen");
 	drawcall_uniform_texgen_params = std3D_tryFindUniform(drawcall_program, "texgen_params");
 	drawcall_uniform_uv_offset = std3D_tryFindUniform(drawcall_program, "uv_offset");
 	drawcall_uniform_ambient_mode = std3D_tryFindUniform(drawcall_program, "ambientMode");
@@ -5078,7 +5079,8 @@ void std3D_SetDepthStencilState(std3D_DepthStencilState* pDepthStencilState)
 void std3D_SetTextureState(std3D_TextureState* pTexState)
 {
 	glUniform1i(drawcall_uniform_uv_mode, pTexState->texMode);
-	glUniform4f(drawcall_uniform_texgen_params, pTexState->texGen.x, pTexState->texGen.y, pTexState->texGen.z, pTexState->texGen.w);
+	glUniform1i(drawcall_uniform_texgen, pTexState->texGen);
+	glUniform4f(drawcall_uniform_texgen_params, pTexState->texGenParams.x, pTexState->texGenParams.y, pTexState->texGenParams.z, pTexState->texGenParams.w);
 	glUniform2f(drawcall_uniform_uv_offset, pTexState->texOffset.x, pTexState->texOffset.y);
 
 	float a = ((pTexState->fillColor >> 24) & 0xFF) / 255.0f;

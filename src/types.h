@@ -895,7 +895,8 @@ typedef struct std3D_TextureState
 	uint32_t          fillColor;
 	rdTexMode_t       texMode;
 	rdDDrawSurface*   pTexture;
-	rdVector4         texGen;
+	rdTexGen_t        texGen;
+	rdVector4         texGenParams;
 	rdVector2         texOffset;
 } std3D_TextureState;
 

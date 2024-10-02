@@ -479,14 +479,13 @@ void main(void)
     vec3 face_normals = normals(adjusted_coords_norms);
     vec3 face_normals_parallax = normals(adjusted_coords_parallax);
 
-    //if(displacement_factor != 0.0)
-	//{
-    //    adj_texcoords.xy = parallax_mapping(f_uv.xy, face_normals_parallax, adjusted_coords_parallax);
-    //}
-	//else
+    if(displacement_factor != 0.0)
 	{
-		if(uv_mode == 6 || uv_mode == 0)
-			adj_texcoords.xy = f_uv_affine;
+        adj_texcoords.xy = parallax_mapping(f_uv.xy, face_normals_parallax, adjusted_coords_parallax);
+    }
+	else if(uv_mode == 0)
+	{
+		adj_texcoords.xy = f_uv_affine;
 	}
 
     vec4 sampled = texture(tex, adj_texcoords.xy);

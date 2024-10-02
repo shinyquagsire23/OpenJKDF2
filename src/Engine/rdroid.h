@@ -144,6 +144,8 @@ void rdClearColor(uint32_t rgba);
 
 int rdBindTexture(rdTexture* pTexture);
 int rdBindMaterial(rdMaterial* pMaterial, int cel);
+
+void rdTexGen(rdTexGen_t texGen);
 void rdTexGenParams(float p0, float p1, float p2, float p3);
 void rdTexOffset(float u, float v);
 void rdTexOffseti(float u, float v);

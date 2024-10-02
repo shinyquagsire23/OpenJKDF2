@@ -40,10 +40,6 @@ enum RD_TEXTUREMODE
     RD_TEXTUREMODE_2_UNK = 2,
     RD_TEXTUREMODE_3_UNK = 3,
     RD_TEXTUREMODE_4_UNK = 4,
-#ifdef RENDER_DROID2
-	RD_TEXTUREMODE_CEILING = 5,
-	RD_TEXTUREMODE_HORIZON = 6,
-#endif
 };
 
 typedef int32_t rdZBufferMethod_t;
@@ -140,6 +136,14 @@ typedef enum RD_MATRIX_MODE
 	RD_MATRIX_VIEW,
 	RD_MATRIX_PROJECTION,
 } RD_MATRIX_MODE;
+
+typedef int32_t rdTexGen_t;
+enum RD_TEXGEN
+{
+	RD_TEXGEN_NONE = 0,
+	RD_TEXGEN_HORIZON = 1,
+	RD_TEXGEN_CEILING = 2,
+};
 #endif
 
 typedef uint32_t sithCogFlags_t;

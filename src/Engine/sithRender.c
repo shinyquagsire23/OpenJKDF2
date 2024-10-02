@@ -1045,6 +1045,10 @@ void sithRender_DrawSurface(sithSurface* surface)
 	{
 		lightMode = sithRender_lightMode;
 	}
+
+	if ((surface->surfaceFlags & (SITH_SURFACE_HORIZON_SKY | SITH_SURFACE_CEILING_SKY)) != 0)
+		lightMode = RD_LIGHTMODE_FULLYLIT;
+
 	rdSetLightMode(lightMode);
 
 	int texMode = surface->surfaceInfo.face.textureMode;
@@ -1054,9 +1058,17 @@ void sithRender_DrawSurface(sithSurface* surface)
 	// todo: other stuff like ceiling sky
 	if (surface->surfaceFlags & SITH_SURFACE_HORIZON_SKY)
 	{
-		texMode = RD_TEXTUREMODE_HORIZON;
+		texMode = texMode > RD_TEXTUREMODE_AFFINE ? RD_TEXTUREMODE_AFFINE : texMode;
+		rdTexGen(RD_TEXGEN_HORIZON);
 		rdTexGenParams(sithSector_flt_8553C0, sithSector_flt_8553C8, sithSector_flt_8553F4, 0);
 		rdTexOffset(sithWorld_pCurrentWorld->horizontalSkyOffs.x + sithSector_flt_8553C4, sithWorld_pCurrentWorld->horizontalSkyOffs.y + sithSector_flt_8553B8);
+	}
+	else if (surface->surfaceFlags & SITH_SURFACE_CEILING_SKY)
+	{
+		texMode = RD_TEXTUREMODE_PERSPECTIVE;
+		rdTexGen(RD_TEXGEN_CEILING);
+		rdTexGenParams(sithSector_zMaxVec.x, sithSector_zMaxVec.y, sithSector_zMaxVec.z, 0);
+		rdTexOffset(sithWorld_pCurrentWorld->ceilingSkyOffs.x, sithWorld_pCurrentWorld->ceilingSkyOffs.y);
 	}
 
 	rdSetTexMode(texMode);
@@ -1121,6 +1133,7 @@ void sithRender_DrawSurface(sithSurface* surface)
 		rdEndPrimitive();
 	}
 
+	rdTexGen(RD_TEXGEN_NONE);
 	rdTexGenParams(0, 0, 0, 0);
 	rdTexOffset(0, 0);
 }

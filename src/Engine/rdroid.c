@@ -89,7 +89,8 @@ void rdResetTextureState()
 	rdroid_textureState.chromaKeyColor = 0;
 	rdroid_textureState.pTexture = NULL;
 	rdroid_textureState.texMode = RD_TEXTUREMODE_PERSPECTIVE;
-	rdroid_textureState.texGen.x = rdroid_textureState.texGen.y = rdroid_textureState.texGen.z = 0;
+	rdroid_textureState.texGen = RD_TEXGEN_NONE;
+	rdroid_textureState.texGenParams.x = rdroid_textureState.texGenParams.y = rdroid_textureState.texGenParams.z = rdroid_textureState.texGenParams.w = 0;
 	rdroid_textureState.texOffset.x = rdroid_textureState.texOffset.y = 0;
 }
 
@@ -727,12 +728,17 @@ int rdBindMaterial(rdMaterial* pMaterial, int cel)
 	return 1;
 }
 
+void rdTexGen(rdTexGen_t texGen)
+{
+	rdroid_textureState.texGen = texGen;
+}
+
 void rdTexGenParams(float p0, float p1, float p2, float p3)
 {
-	rdroid_textureState.texGen.x = p0;
-	rdroid_textureState.texGen.y = p1;
-	rdroid_textureState.texGen.z = p2;
-	rdroid_textureState.texGen.w = p3;
+	rdroid_textureState.texGenParams.x = p0;
+	rdroid_textureState.texGenParams.y = p1;
+	rdroid_textureState.texGenParams.z = p2;
+	rdroid_textureState.texGenParams.w = p3;
 }
 
 void rdTexOffset(float u, float v)
