@@ -263,7 +263,7 @@ void sithCamera_FollowFocus(sithCamera *cam)
 				{
 					// Added: idle sway
 					float angleSin, angleCos;
-					float swayTime = min(sithTime_curSeconds, 0.02f) * sithCamera_povWaggleSpeed;
+					float swayTime = fmin(sithTime_curSeconds, 0.02f) * sithCamera_povWaggleSpeed;
 
 					stdMath_SinCos(swayTime, &angleSin, &angleCos);
 					sithCamera_povIdleSway.x = (angleSin * sithCamera_povWaggleVec.x - sithCamera_povIdleSway.x) * sithTime_deltaSeconds * sithCamera_povWaggleSmooth + sithCamera_povIdleSway.x;
