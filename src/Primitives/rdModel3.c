@@ -1381,7 +1381,11 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
     rdMatrix_InvertOrtho34(&matInv, mat);
 
 #ifdef SPHERE_AO
-	rdCache_DrawOccluder(&out.scale, meshIn->radius);
+	#ifdef RENDER_DROID2
+		rdAddOccluder(&mat->scale, meshIn->radius);
+	#else
+		rdCache_DrawOccluder(&out.scale, meshIn->radius);
+	#endif
 #endif
     
     rdModel3_geometryMode = pCurMesh->geometryMode;

@@ -147,7 +147,7 @@ void rdCache_Flush()
     rdProcEntry *face; // esi
 
 #ifdef RENDER_DROID2
-	std3D_FlushDrawCalls();
+	//std3D_FlushDrawCalls();
 #endif
 
     if (!rdCache_numProcFaces)
@@ -1364,7 +1364,7 @@ void rdCache_DrawRenderList()
     }
 
 #ifdef RENDER_DROID2
-	std3D_FlushDrawCalls();
+	//std3D_FlushDrawCalls();
 #endif
 }
 

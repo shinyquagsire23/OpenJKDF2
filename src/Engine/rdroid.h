@@ -151,6 +151,7 @@ void rdTexOffset(float u, float v);
 void rdTexOffseti(float u, float v);
 
 int rdAddLight(rdLight* pLight, rdVector3* pPosition);
+void rdAddOccluder(rdVector3* position, float radius);
 void rdClearLights();
 
 void rdSetAmbientMode(rdAmbientMode_t type);

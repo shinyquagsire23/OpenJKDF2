@@ -55,7 +55,7 @@ uniform sampler2D worldPalette;
 uniform sampler2D worldPaletteLights;
 uniform sampler2D displacement_map;
 
-uniform usamplerBuffer lightBuffer;
+uniform usamplerBuffer clusterBuffer;
 
 uniform int tex_mode;
 uniform int blend_mode;
@@ -126,12 +126,25 @@ uniform lightBlock
 	light lights[128];
 };
 
+struct occluder
+{
+	vec4 position;
+};
+
+uniform int numOccluders;
+uniform occluderBlock
+{
+	occluder occluders[128];
+};
+
 // todo: define outside
-#define CLUSTER_MAX_LIGHTS 128u
-#define CLUSTER_BUCKETS_PER_CLUSTER (CLUSTER_MAX_LIGHTS / 32u)
-#define CLUSTER_GRID_SIZE_X 32u
-#define CLUSTER_GRID_SIZE_Y 16u
-#define CLUSTER_GRID_SIZE_Z 48u
+#define CLUSTER_MAX_LIGHTS          128u
+#define CLUSTER_MAX_OCCLUDERS       128u
+#define CLUSTER_MAX_ITEMS           (CLUSTER_MAX_LIGHTS + CLUSTER_MAX_OCCLUDERS)
+#define CLUSTER_BUCKETS_PER_CLUSTER (CLUSTER_MAX_ITEMS / 32u)
+#define CLUSTER_GRID_SIZE_X         32u
+#define CLUSTER_GRID_SIZE_Y         16u
+#define CLUSTER_GRID_SIZE_Z         48u
 #define CLUSTER_GRID_SIZE_XYZ (CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y * CLUSTER_GRID_SIZE_Z)
 #define CLUSTER_GRID_TOTAL_SIZE (CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y * CLUSTER_GRID_SIZE_Z * CLUSTER_BUCKETS_PER_CLUSTER)
 
@@ -140,7 +153,7 @@ uniform vec2 clusterTileSizes;
 
 uint get_cluster_z_index(float screen_depth)
 {
-	return uint(max(log(screen_depth) * clusterScaleBias.x + clusterScaleBias.y, 0.0));
+	return uint(max(log2(screen_depth) * clusterScaleBias.x + clusterScaleBias.y, 0.0));
 }
 
 uint compute_cluster_index(vec2 pixel_pos, float screen_depth)
@@ -168,36 +181,60 @@ int findLSB(uint x)
 	return res;
 }
 
+// https://seblagarde.wordpress.com/2014/12/01/inverse-trigonometric-functions-gpu-optimization-for-amd-gcn-architecture/
+// max absolute error 1.3x10^-3
+// Eberly's odd polynomial degree 5 - respect bounds
+// 4 VGPR, 14 FR (10 FR, 1 QR), 2 scalar
+// input [0, infinity] and output [0, PI/2]
+float atanPos(float x) 
+{ 
+    float t0 = (x < 1.0) ? x : 1.0f / x;
+    float t1 = t0 * t0;
+    float poly = 0.0872929;
+    poly = -0.301895 + poly * t1;
+    poly = 1.0f + poly * t1;
+    poly = poly * t0;
+    return (x < 1.0) ? poly : 1.570796 - poly;
+}
+
+// 4 VGPR, 16 FR (12 FR, 1 QR), 2 scalar
+// input [-infinity, infinity] and output [-PI/2, PI/2]
+float atanFast(float x) 
+{     
+    float t0 = atanPos(abs(x));     
+    return (x < 0.0) ? -t0: t0; 
+}
+
 // debug view
 vec3 temperature(float t)
 {
     vec3 c[10] = vec3[10](
-        vec3(   0.0f/255.0f,   2.0f/255.0f,  91.0f/255.0f ),
-        vec3(   0.0f/255.0f, 108.0f/255.0f, 251.0f/255.0f ),
-        vec3(   0.0f/255.0f, 221.0f/255.0f, 221.0f/255.0f ),
-        vec3(  51.0f/255.0f, 221.0f/255.0f,   0.0f/255.0f ),
-        vec3( 255.0f/255.0f, 252.0f/255.0f,   0.0f/255.0f ),
-        vec3( 255.0f/255.0f, 180.0f/255.0f,   0.0f/255.0f ),
-        vec3( 255.0f/255.0f, 104.0f/255.0f,   0.0f/255.0f ),
-        vec3( 226.0f/255.0f,  22.0f/255.0f,   0.0f/255.0f ),
-        vec3( 191.0f/255.0f,   0.0f/255.0f,  83.0f/255.0f ),
-        vec3( 145.0f/255.0f,   0.0f/255.0f,  65.0f/255.0f ) 
+        vec3(   0.0/255.0,   2.0/255.0,  91.0f/255.0 ),
+        vec3(   0.0/255.0, 108.0/255.0, 251.0f/255.0 ),
+        vec3(   0.0/255.0, 221.0/255.0, 221.0f/255.0 ),
+        vec3(  51.0/255.0, 221.0/255.0,   0.0f/255.0 ),
+        vec3( 255.0/255.0, 252.0/255.0,   0.0f/255.0 ),
+        vec3( 255.0/255.0, 180.0/255.0,   0.0f/255.0 ),
+        vec3( 255.0/255.0, 104.0/255.0,   0.0f/255.0 ),
+        vec3( 226.0/255.0,  22.0/255.0,   0.0f/255.0 ),
+        vec3( 191.0/255.0,   0.0/255.0,  83.0f/255.0 ),
+        vec3( 145.0/255.0,   0.0/255.0,  65.0f/255.0 ) 
     );
 
-    float s = t * 10.0f;
+    float s = t * 10.0;
 
     int cur = int(s) <= 9 ? int(s) : 9;
-    int prv = cur >= 1 ? cur-1 : 0;
-    int nxt = cur < 9 ? cur+1 : 9;
+    int prv = cur >= 1 ? cur - 1 : 0;
+    int nxt = cur < 9 ? cur + 1 : 9;
 
-    float blur = 0.8f;
+    float blur = 0.8;
 
-    float wc = smoothstep( float(cur)-blur, float(cur)+blur, s ) * (1.0f - smoothstep(float(cur+1)-blur, float(cur+1)+blur, s) );
-    float wp = 1.0f - smoothstep( float(cur)-blur, float(cur)+blur, s );
-    float wn = smoothstep( float(cur+1)-blur, float(cur+1)+blur, s );
+    float wc = smoothstep( float(cur) - blur, float(cur) + blur, s ) * (1.0 - smoothstep(float(cur + 1) - blur, float(cur + 1) + blur, s) );
+    float wp = 1.0 - smoothstep( float(cur) - blur, float(cur) + blur, s );
+    float wn = smoothstep( float(cur + 1) - blur, float(cur + 1) + blur, s );
 
-    vec3 r = wc*c[cur] + wp*c[prv] + wn*c[nxt];
-    return vec3( clamp(r.x, 0.0f, 1.0f), clamp(r.y,0.0f,1.0f), clamp(r.z,0.0f,1.0f) );
+    vec3 r = wc * c[cur] + wp * c[prv] + wn * c[nxt];
+    return vec3( clamp(r.x, 0.0f, 1.0), clamp(r.y, 0.0, 1.0), clamp(r.z, 0.0, 1.0) );
 }
 
 
@@ -251,7 +288,7 @@ SG CosineLobeSG(vec3 direction)
 vec3 SGIrradianceInnerProduct(SG lightingLobe, vec3 normal)
 {
     SG cosineLobe = CosineLobeSG(normal);
-    return max(SGInnerProduct(lightingLobe, cosineLobe), 0.0f);
+    return max(SGInnerProduct(lightingLobe, cosineLobe), 0.0);
 }
 
 vec3 SGIrradiancePunctual(SG lightingLobe, vec3 normal)
@@ -301,7 +338,7 @@ vec3 CalculateAmbientSpecular(vec3 normal, vec3 view, float roughness)
 
 		// Fresnel
 		//vec3 h = normalize(warpedNDF.Axis + view);
-		//spec *= specColor + (1.0f - specColor) * pow((1.0f - clamp(dot(warpedNDF.Axis, h), 0.0, 1.0)), 5.0f);
+		//spec *= specColor + (1.0 - specColor) * pow((1.0 - clamp(dot(warpedNDF.Axis, h), 0.0, 1.0)), 5.0);
 		
 		spec *= nDotL;
 		ambientSpecular.xyz += spec / 3.141592;
@@ -311,17 +348,17 @@ vec3 CalculateAmbientSpecular(vec3 normal, vec3 view, float roughness)
 
 float HalfLambert(float ndotl)
 {
-	ndotl = ndotl * 0.5f + 0.5f;
+	ndotl = ndotl * 0.5 + 0.5;
 	return ndotl * ndotl;
 }
 
-void CalculatePointLighting(vec3 normal, vec3 view, inout vec3 diffuseLight, inout vec3 specLight)
+void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, inout vec3 diffuseLight, inout vec3 specLight)
 {
 	// https://seblagarde.wordpress.com/2012/06/03/spherical-gaussien-approximation-for-blinn-phong-phong-and-fresnel/
 	// Point lights using SG approximations for consistency and a little speed
 	#define LN2DIV8               0.08664
 	#define Log2Of1OnLn2_Plus1    1.528766
-	float ModifiedSpecularPower = 1.0 / log(2) * 8.0;// * (2.0 / roughness - 2);//exp2(10.0 * gloss + Log2Of1OnLn2_Plus1);
+	float ModifiedSpecularPower = 1.0 / log(2.0) * 8.0;// * (2.0 / roughness - 2);//exp2(10.0 * gloss + Log2Of1OnLn2_Plus1);
 
 	vec3 reflVec = reflect(-view, normal);
 	vec4 R2 = vec4(ModifiedSpecularPower * reflVec, -ModifiedSpecularPower);
@@ -334,44 +371,51 @@ void CalculatePointLighting(vec3 normal, vec3 view, inout vec3 diffuseLight, ino
 	//int totalLights = min(numLights, 128);
 	//for(int light_index = 0; light_index < totalLights; ++light_index)
 
-	uint cluster_index = compute_cluster_index(gl_FragCoord.xy, f_depth);
-	uint bucket_index = cluster_index * CLUSTER_BUCKETS_PER_CLUSTER;
-	for(uint bucket = 0u; bucket < CLUSTER_BUCKETS_PER_CLUSTER; ++bucket)
+	const uint first_item = 0u;
+	const uint last_item = first_item + CLUSTER_MAX_LIGHTS - 1u;
+	const uint first_bucket = first_item / 32u;
+	const uint last_bucket = min(last_item / 32u, max(0u, CLUSTER_BUCKETS_PER_CLUSTER - 1u));
+	for (uint bucket = first_bucket; bucket <= last_bucket; ++bucket)
 	{
-		uint bucket_bits = uint(texelFetch(lightBuffer, int(bucket_index + bucket)).x);
+		uint bucket_bits = uint(texelFetch(clusterBuffer, int(bucket_index + bucket)).x);
 		while(bucket_bits != 0u)
 		{
-			uint bucket_bit_index = uint(findLSB(int(bucket_bits)));
+			uint bucket_bit_index = uint(findLSB(bucket_bits));
 			uint light_index = bucket * 32u + bucket_bit_index;
-			bucket_bits &= ~uint(1 << bucket_bit_index);
+			bucket_bits ^= uint(1 << bucket_bit_index);
 				
-			//lightOverdraw += 1.0;
-
-			light l = lights[light_index];
-
-			vec3 diff = l.position.xyz - f_coord.xyz;
-			float len;
-			if (lightMode == 2) // diffuse uses dist to plane
-				len = dot(l.position.xyz - f_coord.xyz, normal.xyz);
-			else
-				len = length(diff);
-
-			// todo: how much branching do we really want to do here?
-			if ( len < l.falloffMin )
+			if (light_index >= first_item && light_index <= last_item)
 			{
-				diff = normalize(diff);
-				float lightMagnitude = dot(normal, diff);
-				if (lightMode > 2) // gouraud and higher use half lambert
-					lightMagnitude = HalfLambert(lightMagnitude);
+				//lightOverdraw += 1.0;
 
-				if ( lightMagnitude > 0.0 )
+				light l = lights[light_index];
+
+				vec3 diff = l.position.xyz - f_coord.xyz;
+				float len;
+				if (lightMode == 2) // diffuse uses dist to plane
+					len = dot(l.position.xyz - f_coord.xyz, normal.xyz);
+				else
+					len = length(diff);
+
+				// todo: how much branching do we really want to do here?
+				if ( len < l.falloffMin )
 				{
-					// this is JK's attenuation model
-					float intensity = max(0.0, l.direction_intensity.w - len * scalar) * lightMagnitude;
-					if(lightMode == 4)
-						specLight.xyz += intensity * l.color.xyz * exp2(dot(R2, vec4(diff, 1.0))) * specNormalization;
-					else			
-						diffuseLight.xyz += intensity * l.color.xyz;
+					diff = normalize(diff);
+					float lightMagnitude = dot(normal, diff);
+					//if (lightMode > 2) // gouraud and higher use half lambert
+						//lightMagnitude = HalfLambert(lightMagnitude);
+					lightMagnitude = max(lightMagnitude, 0.0);
+
+					if ( lightMagnitude > 0.0 )
+					{
+						// this is JK's attenuation model, note it depends heavily on scalar being correct
+						float intensity = max(0.0, l.direction_intensity.w - len * scalar) * lightMagnitude;
+						//float intensity = max(0.0, (l.falloffMin - len) / l.falloffMin) * l.direction_intensity.w;
+						if(lightMode == 4)
+							specLight.xyz += intensity * l.color.xyz * exp2(dot(R2, vec4(diff, 1.0))) * specNormalization;
+						else			
+							diffuseLight.xyz += intensity * l.color.xyz;
+					}
 				}
 			}
 		}
@@ -381,6 +425,51 @@ void CalculatePointLighting(vec3 normal, vec3 view, inout vec3 diffuseLight, ino
 
 	//uint z_index = get_cluster_z_index(f_depth);
 	//diffuseLight = temperature(lightOverdraw / 32.0);
+}
+
+float CalculateIndirectShadows(uint bucket_index, vec3 pos, vec3 normal)
+{
+	float shadowing = 1.0;
+
+	const uint first_item = CLUSTER_MAX_LIGHTS;
+	const uint last_item = first_item + CLUSTER_MAX_OCCLUDERS - 1u;
+	const uint first_bucket = first_item / 32u;
+	const uint last_bucket = min(last_item / 32u, max(0u, CLUSTER_BUCKETS_PER_CLUSTER - 1u));
+	for (uint bucket = first_bucket; bucket <= last_bucket; ++bucket)
+	//for (int occluder_index = 0; occluder_index < numOccluders; ++occluder_index)
+	{
+		uint bucket_bits = uint(texelFetch(clusterBuffer, int(bucket_index + bucket)).x);
+		while(bucket_bits != 0u)
+		{
+			uint bucket_bit_index = uint(findLSB(bucket_bits));
+			uint occluder_index = bucket * 32u + bucket_bit_index;
+			bucket_bits ^= uint(1 << bucket_bit_index);
+			
+			if (occluder_index >= first_item && occluder_index <= last_item && shadowing > 1.0 / 255.0)
+			{
+				occluder occ = occluders[occluder_index - first_item];
+				//occluder occ = occluders[occluder_index];// - first_item];
+
+				vec3 direction = (occ.position.xyz - pos.xyz);
+				float len = length(occ.position.xyz - pos.xyz);
+				if ( len < occ.position.w )
+				{
+					direction = normalize(direction);
+
+					float cosTheta = max(0.0, dot(normal, direction));
+					if(cosTheta > 0.0)
+					{
+						float solidAngle = (1.0 - cos(atanFast(occ.position.w / len)));
+						float falloff = smoothstep(0.0, occ.position.w, occ.position.w - len);
+						float integralSolidAngle = cosTheta * solidAngle * falloff;
+						shadowing *= 1.0 - integralSolidAngle * 0.8;
+					}
+				}
+			}
+		}
+	}
+
+	return shadowing;
 }
 
 layout(location = 0) out vec4 fragColor;
@@ -690,6 +779,8 @@ void main(void)
     }
 
 	vec3 localViewDir = normalize(-f_coord.xyz);
+	uint cluster_index = compute_cluster_index(gl_FragCoord.xy, f_coord.y / 128.015625);// f_depth);
+	uint bucket_index = cluster_index * CLUSTER_BUCKETS_PER_CLUSTER;
 
 	vec3 diffuseColor = sampled_color.xyz;
 	vec3 specularColor = vec3(0.0);//min(diffuseColor.xyz, fillColor.xyz);
@@ -732,8 +823,18 @@ void main(void)
 			else
 				diffuseLight.xyz += CalculateAmbientDiffuse(surfaceNormals);
 		}
+		
+		if (numLights > 0)
+			CalculatePointLighting(bucket_index, surfaceNormals, localViewDir, diffuseLight, specLight);
+			
+		//diffuseColor.xyz = vec3(1.0);
 
-		CalculatePointLighting(surfaceNormals, localViewDir, diffuseLight, specLight);
+		if (numOccluders > 0)
+		{
+			float shadows = CalculateIndirectShadows(bucket_index, f_coord.xyz, surfaceNormals);	
+			diffuseLight.xyz *= shadows;
+			specLight.xyz *= shadows;
+		}
 	}
 
 	// todo: maybe tone map this?

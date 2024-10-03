@@ -142,6 +142,7 @@ void std3D_DrawOccluder(rdVector3* position, float radius, rdVector3* verts);
 
 void std3D_ClearLights();
 int std3D_AddLight(rdLight* light, rdVector3* viewPosition);
+void std3D_ClearOccluders();
 void std3D_AddDrawCall(std3D_DrawCallState* pDrawCallState, D3DVERTEX* paVertices, int numVertices);
 void std3D_ResetDrawCalls();
 void std3D_FlushDrawCalls();

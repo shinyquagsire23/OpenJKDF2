@@ -182,6 +182,10 @@ int jkGame_Update()
 #endif
     jkPlayer_DrawPov();
 
+#ifdef RENDER_DROID2
+	std3D_FlushDrawCalls();
+#endif
+
 #if 1
     //if (Main_bMotsCompat)
     ++Video_dword_5528A0; // MOTS added

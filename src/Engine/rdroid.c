@@ -864,9 +864,27 @@ int rdAddLight(rdLight* pLight, rdVector3* pPosition)
 }
 
 void std3D_ClearLights();
+void std3D_ClearOccluders();
 void rdClearLights()
 {
 	std3D_ClearLights();
+	std3D_ClearOccluders(); // todo: move me
+}
+
+extern int jkPlayer_enableShadows;
+void std3D_DrawOccluder(rdVector3* position, float radius, rdVector3* verts);
+void rdAddOccluder(rdVector3* position, float radius)
+{
+	if (!jkPlayer_enableShadows )
+		return;
+	
+	rdVector4 pos4;
+	rdVector_Copy3(&pos4, position);
+	pos4.w = 1.0f;
+	
+	rdVector4 viewPos;
+	rdMatrix_TransformPoint44(&viewPos, &pos4, &rdroid_matrices[RD_MATRIX_VIEW]);
+	std3D_DrawOccluder((rdVector3*)&viewPos, radius, NULL);
 }
 
 void rdSetAmbientMode(rdAmbientMode_t type)

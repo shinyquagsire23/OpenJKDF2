@@ -322,6 +322,11 @@ void rdCamera_Update(rdMatrix34 *orthoProj)
 #ifdef VIEW_SPACE_GBUFFER
 	rdCamera_GetFrustumCornerRays(rdCamera_pCurCamera, orthoProj, &rdCamera_pCurCamera->pClipFrustum->lt, &rdCamera_pCurCamera->pClipFrustum->rt, &rdCamera_pCurCamera->pClipFrustum->lb, &rdCamera_pCurCamera->pClipFrustum->rb);
 #endif
+#ifdef RENDER_DROID2
+	rdMatrixMode(RD_MATRIX_VIEW);
+	rdIdentity();
+	rdLoadMatrix34(&rdCamera_pCurCamera->view_matrix);
+#endif
 }
 
 void rdCamera_OrthoProject(rdVector3* out, rdVector3* v)

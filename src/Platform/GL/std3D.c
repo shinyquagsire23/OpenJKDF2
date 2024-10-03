@@ -152,14 +152,25 @@ GLint uniform_fog, uniform_fog_color, uniform_fog_start, uniform_fog_end;
 
 #ifdef RENDER_DROID2
 
-#define CLUSTER_MAX_LIGHTS (RDCAMERA_MAX_LIGHTS)
-#define CLUSTER_BUCKETS_PER_CLUSTER (CLUSTER_MAX_LIGHTS / 32)
-#define CLUSTER_GRID_SIZE_X 32
-#define CLUSTER_GRID_SIZE_Y 16
-#define CLUSTER_GRID_SIZE_Z 48
+#define CLUSTER_MAX_LIGHTS          128
+#define CLUSTER_MAX_OCCLUDERS       128
+#define CLUSTER_MAX_ITEMS           (CLUSTER_MAX_LIGHTS + CLUSTER_MAX_OCCLUDERS)
+#define CLUSTER_BUCKETS_PER_CLUSTER (CLUSTER_MAX_ITEMS / 32)
+#define CLUSTER_GRID_SIZE_X         32
+#define CLUSTER_GRID_SIZE_Y         16
+#define CLUSTER_GRID_SIZE_Z         48
 
 #define CLUSTER_GRID_SIZE_XYZ (CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y * CLUSTER_GRID_SIZE_Z)
 #define CLUSTER_GRID_TOTAL_SIZE (CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y * CLUSTER_GRID_SIZE_Z * CLUSTER_BUCKETS_PER_CLUSTER)
+
+static int clustersDirty = 0;
+
+float sliceScalingFactor;
+float sliceBiasFactor;
+uint32_t tileSizeX;
+uint32_t tileSizeY;
+GLuint cluster_buffer;
+GLuint cluster_tbo;
 
 typedef struct std3D_light
 {
@@ -176,8 +187,8 @@ typedef struct std3D_light
 	float     cosAngleY;
 	float     lux;
 	float     padding0;
-	float padding1;
-	float padding2;
+	float     padding1;
+	float     padding2;
 } std3D_light;
 
 int lightsDirty = 0;
@@ -188,25 +199,24 @@ GLuint light_ubo;
 GLuint uniform_lights;
 GLuint uniform_numLights;
 
-typedef struct std3D_cluster
-{
-	rdVector4 minBounds;
-	rdVector4 maxBounds;
-} std3D_cluster;
+static uint32_t std3D_clusterBits[CLUSTER_GRID_TOTAL_SIZE];
 
-static int clustersDirty = 0;
-static uint32_t std3D_clusterLights[CLUSTER_GRID_TOTAL_SIZE];
-static std3D_cluster tmpClusters[CLUSTER_GRID_SIZE_XYZ];
-float sliceScalingFactor;
-float sliceBiasFactor;
-uint32_t tileSizeX;
-uint32_t tileSizeY;
-GLuint cluster_buffer;
-GLuint cluster_tbo;
+typedef struct std3D_occluder
+{
+	rdVector4 position;
+} std3D_occluder;
+
+int occludersDirty = 0;
+unsigned int numOccluders = 0;
+static std3D_occluder tmpOccluders[CLUSTER_MAX_OCCLUDERS];
+
+GLuint occluder_ubo;
+GLuint uniform_occluders;
+GLuint uniform_numOccluders;
 
 void std3D_FlushLights();
+void std3D_FlushOccluders();
 void std3D_BuildClusters(rdMatrix44* pProjection);
-void std3D_AssignLightsToClusters(rdMatrix44* pProjection);
 
 // todo: clean me
 GLuint drawcall_program;
@@ -1121,9 +1131,18 @@ void std3D_setupLightingUBO()
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(tmpLights), NULL, GL_DYNAMIC_DRAW);
 	glUniformBlockBinding(drawcall_program, uniform_lights, 0);
 
+	glGenBuffers(1, &occluder_ubo);
+	glBindBuffer(GL_UNIFORM_BUFFER, occluder_ubo);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(tmpOccluders), NULL, GL_DYNAMIC_DRAW);
+	glUniformBlockBinding(drawcall_program, uniform_occluders, 1);
+
 	glGenBuffers(1, &cluster_buffer);
 	glBindBuffer(GL_TEXTURE_BUFFER, cluster_buffer);
-	glBufferData(GL_TEXTURE_BUFFER, sizeof(std3D_clusterLights), NULL, GL_DYNAMIC_DRAW);
+	glBufferData(GL_TEXTURE_BUFFER, sizeof(std3D_clusterBits), NULL, GL_DYNAMIC_DRAW);
+
+	//int maxsize;
+	//glGetIntegerv(GL_MAX_TEXTURE_BUFFER_SIZE, &maxsize);
+	//printf("MAX TEX BUFFER %d\n",  maxsize);
 
 	glGenTextures(1, &cluster_tbo);
 	glBindTexture(GL_TEXTURE_BUFFER, cluster_tbo);
@@ -1346,8 +1365,10 @@ int init_resources()
 	drawcall_uniform_fog_end = std3D_tryFindUniform(drawcall_program, "fogEnd");
 #endif
 	uniform_lights = glGetUniformBlockIndex(drawcall_program, "lightBlock");
-	uniform_numLights = std3D_tryFindUniform(drawcall_program, "numLights");
-	drawcall_uniform_lightbuf = std3D_tryFindUniform(drawcall_program, "lightBuffer");
+	uniform_numLights = std3D_tryFindUniform(drawcall_program, "numLights");	
+	uniform_occluders = glGetUniformBlockIndex(drawcall_program, "occluderBlock");
+	uniform_numOccluders = std3D_tryFindUniform(drawcall_program, "numOccluders");
+	drawcall_uniform_lightbuf = std3D_tryFindUniform(drawcall_program, "clusterBuffer");
 	drawcall_uniform_clusterTileSizes = std3D_tryFindUniform(drawcall_program, "clusterTileSizes");
 	drawcall_uniform_clusterScaleBias = std3D_tryFindUniform(drawcall_program, "clusterScaleBias");
 #endif
@@ -4807,6 +4828,20 @@ void std3D_DrawOccluder(rdVector3* position, float radius, rdVector3* verts)
 {
 	if (Main_bHeadless) return;
 
+#ifdef RENDER_DROID2
+	if (numOccluders >= CLUSTER_MAX_OCCLUDERS)
+		return;
+
+	occludersDirty = 1;
+	clustersDirty = 1;
+
+	std3D_occluder* occ = &tmpOccluders[numOccluders++];
+	occ->position.x = position->x;
+	occ->position.y = position->y;
+	occ->position.z = position->z;
+	occ->position.w = radius;
+
+#else
 	// bind to main fbo for drawing
 	glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->main.fbo);
 
@@ -4871,6 +4906,7 @@ void std3D_DrawOccluder(rdVector3* position, float radius, rdVector3* verts)
 	//glDisable(GL_STENCIL_TEST);
 	//glStencilFunc(GL_ALWAYS, 0, 0xFF);
 	//glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
+#endif
 #endif
 }
 
@@ -5195,6 +5231,9 @@ void std3D_FlushDrawCalls()
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, light_ubo);
 	glUniform1i(uniform_numLights, numLights);
 
+	glBindBufferBase(GL_UNIFORM_BUFFER, 1, occluder_ubo);
+	glUniform1i(uniform_numOccluders, numOccluders);
+
 	glUniform1i(drawcall_uniform_tex_mode, TEX_MODE_TEST);
 	glUniform1i(drawcall_uniform_blend_mode, 2);
 	glActiveTexture(GL_TEXTURE0 + 4);
@@ -5308,9 +5347,12 @@ void std3D_FlushDrawCalls()
 			// perhaps all of this would be better if we just flushed the pipeline on matrix change instead
 			if(rdMatrix_Compare44(&lastState.proj, &pDrawCall->state.proj) != 0)
 			{
+				clustersDirty = 1;
 				std3D_BuildClusters(&pDrawCall->state.proj);
 				glUniform2f(drawcall_uniform_clusterTileSizes, (float)tileSizeX, (float)tileSizeY);
 				glUniform2f(drawcall_uniform_clusterScaleBias, sliceScalingFactor, sliceBiasFactor);
+				glUniform1i(uniform_numLights, numLights);
+				glUniform1i(uniform_numOccluders, numOccluders);
 			}
 
 			last_tex = texid;
@@ -5349,12 +5391,19 @@ void std3D_FlushDrawCalls()
 
 void std3D_ClearLights()
 {
+	lightsDirty = 1;
+	clustersDirty = 1;
 	numLights = 0;
 }
 
 int std3D_AddLight(rdLight* light, rdVector3* position)
 {
+	if(numLights >= CLUSTER_MAX_LIGHTS)
+		return 0;
+
 	lightsDirty = 1;
+	clustersDirty = 1;
+
 	std3D_light* light3d = &tmpLights[numLights++];
 	light3d->type = light->type;
 	light3d->active = light->active;
@@ -5391,6 +5440,23 @@ void std3D_FlushLights()
 	}
 }
 
+void std3D_ClearOccluders()
+{
+	occludersDirty = 1;
+	clustersDirty = 1;
+	numOccluders = 0;
+}
+
+void std3D_FlushOccluders()
+{
+	if (occludersDirty)
+	{
+		glBindBuffer(GL_UNIFORM_BUFFER, occluder_ubo);
+		glBufferData(GL_UNIFORM_BUFFER, sizeof(tmpOccluders), &tmpOccluders, GL_DYNAMIC_DRAW);
+		occludersDirty = 0;
+	}
+}
+
 void std3D_UpdateClipRegionRoot(float nc, float lc, float lz, float Radius, float CameraScale, float* ClipMin, float* ClipMax)
 {
 	float nz = (Radius - nc * lc) / lz;
@@ -5413,7 +5479,7 @@ void std3D_UpdateClipRegion(float lc, float lz, float Radius, float CameraScale,
 	if (d > 0.0f)
 	{
 		float a = Radius * lc;
-		float b = sqrt(d);
+		float b = stdMath_Sqrt(d);
 		float nx0 = (a + b) / lcSqPluslzSq;
 		float nx1 = (a - b) / lcSqPluslzSq;
 		std3D_UpdateClipRegionRoot(nx0, lc, lz, Radius, CameraScale, ClipMin, ClipMax);
@@ -5424,12 +5490,12 @@ void std3D_UpdateClipRegion(float lc, float lz, float Radius, float CameraScale,
 void std3D_ComputeClipRegion(const rdVector3* Center, float Radius, rdMatrix44* pProjection, float Near, rdVector4* ClipRegion)
 {
 	rdVector_Set4(ClipRegion, 1.0f, 1.0f, 0.0f, 0.0f);
-	if ((Center->z + Radius) >= Near)
+	if ((Center->y + Radius) >= Near)
 	{
 		rdVector2 ClipMin = { -1.0f, -1.0f };
 		rdVector2 ClipMax = { +1.0f, +1.0f };
 		std3D_UpdateClipRegion(Center->x, Center->y, Radius, pProjection->vA.x, &ClipMin.x, &ClipMax.x);
-		std3D_UpdateClipRegion(Center->z, Center->y, Radius, pProjection->vC.y, &ClipMin.y, &ClipMax.y);
+		std3D_UpdateClipRegion(-Center->z, Center->y, Radius, pProjection->vC.y, &ClipMin.y, &ClipMax.y);
 		rdVector_Set4(ClipRegion, ClipMin.x, ClipMin.y, ClipMax.x, ClipMax.y);
 	}
 }
@@ -5446,10 +5512,73 @@ void std3D_ComputeBoundingBox(const rdVector3* Center, float Radius, rdMatrix44*
 	Bounds->w = 0.5f * -bounds.y + 0.5f;
 }
 
+void std3D_AssignItemToClusters(int itemIndex, rdVector3* pPosition, float radius, rdMatrix44* pProjection, float znear, float zfar)
+{
+	// use a tight screen space bounding rect to determine which tiles we need to be assigned to
+	rdVector4 rect;
+	std3D_ComputeBoundingBox(pPosition, radius, pProjection, znear, &rect);
+	if (rect.x < rect.z && rect.y < rect.w)
+	{
+		// linear depth for near and far edges of the light
+		float zMin = fmax(0.0f, (pPosition->y - radius) / zfar);
+		float zMax = fmax(0.0f, (pPosition->y + radius) / zfar);
+
+		// non linear depth distribution
+		int zStartIndex = (int)floorf(max(log2f(zMin) * sliceScalingFactor + sliceBiasFactor, 0.0f));
+		int zEndIndex = (int)ceilf(max(log2f(zMax) * sliceScalingFactor + sliceBiasFactor, 0.0f));
+
+		int yStartIndex = (int)floorf(rect.y * (float)CLUSTER_GRID_SIZE_Y);
+		int yEndIndex = (int)ceilf(rect.w * (float)CLUSTER_GRID_SIZE_Y);
+
+		int xStartIndex = (int)floorf(rect.x * (float)CLUSTER_GRID_SIZE_X);
+		int xEndIndex = (int)ceilf(rect.z * (float)CLUSTER_GRID_SIZE_X);
+
+		if ((zStartIndex < 0 && zEndIndex < 0) || (zStartIndex >= (int)CLUSTER_GRID_SIZE_Z && zEndIndex >= (int)CLUSTER_GRID_SIZE_Z))
+			return;
+
+		if ((yStartIndex < 0 && yEndIndex < 0) || (yStartIndex >= (int)CLUSTER_GRID_SIZE_Y && yEndIndex >= (int)CLUSTER_GRID_SIZE_Y))
+			return;
+
+		if ((xStartIndex < 0 && xEndIndex < 0) || (xStartIndex >= (int)CLUSTER_GRID_SIZE_X && xEndIndex >= (int)CLUSTER_GRID_SIZE_X))
+			return;
+
+		zStartIndex = stdMath_ClampInt(zStartIndex, 0, CLUSTER_GRID_SIZE_Z - 1);
+		zEndIndex = stdMath_ClampInt(zEndIndex, 0, CLUSTER_GRID_SIZE_Z - 1);
+
+		yStartIndex = stdMath_ClampInt(yStartIndex, 0, CLUSTER_GRID_SIZE_Y - 1);
+		yEndIndex = stdMath_ClampInt(yEndIndex, 0, CLUSTER_GRID_SIZE_Y - 1);
+
+		xStartIndex = stdMath_ClampInt(xStartIndex, 0, CLUSTER_GRID_SIZE_X - 1);
+		xEndIndex = stdMath_ClampInt(xEndIndex, 0, CLUSTER_GRID_SIZE_X - 1);
+
+		for (uint32_t z = zStartIndex; z <= zEndIndex; ++z)
+		{
+			for (uint32_t y = yStartIndex; y <= yEndIndex; ++y)
+			{
+				for (uint32_t x = xStartIndex; x <= xEndIndex; ++x)
+				{
+					uint32_t clusterID = x + y * CLUSTER_GRID_SIZE_X + z * CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y;
+					uint32_t tile_bucket_index = clusterID * CLUSTER_BUCKETS_PER_CLUSTER;
+
+					const uint32_t bucket_index = itemIndex / 32;
+					const uint32_t bucket_place = itemIndex % 32;
+					std3D_clusterBits[tile_bucket_index + bucket_index] |= (1 << bucket_place); // set bucket bit
+				}
+			}
+		}
+	}
+}
+
 void std3D_BuildClusters(rdMatrix44* pProjection)
 {
-	// flush the lights to make sure they're up to date before we start cluster assignment
+	if(!clustersDirty)
+		return;
+
+	clustersDirty = 0;
+
+	// flush lists to make sure they're up to date before we start cluster assignment
 	std3D_FlushLights();
+	std3D_FlushOccluders();
 
 	// just pull the near/far from the projection matrix
 	// note: common sources list this as [3][2] and [2][2] but we have a rotated projection matrix, so we use [1][2]
@@ -5465,72 +5594,25 @@ void std3D_BuildClusters(rdMatrix44* pProjection)
 	tileSizeY = (uint32_t)ceilf((float)Window_ySize / (float)CLUSTER_GRID_SIZE_Y);
 	
 	// clean slate
-	memset(std3D_clusterLights, 0, sizeof(std3D_clusterLights));
+	memset(std3D_clusterBits, 0, sizeof(std3D_clusterBits));
 
-	// assign lights
+	// assign lights, from 0 to CLUSTER_MAX_LIGHTS-1
 	for (int i = 0; i < numLights; ++i)
 	{
 		if(!tmpLights[i].active)
 			continue;
+		std3D_AssignItemToClusters(i, (rdVector3*)&tmpLights[i].position, tmpLights[i].falloffMin, pProjection, znear, zfar);
+	}
 
-		// use a tight screen space bounding rect to determine which tiles we need to be assigned to
-		rdVector4 rect;
-		std3D_ComputeBoundingBox((rdVector3*)&tmpLights[i].position, tmpLights[i].falloffMin, pProjection, znear, &rect);
-		if (rect.x < rect.z && rect.y < rect.w)
-		{
-			// linear depth for near and far edges of the light
-			float zMin = fmax(0.0f, (tmpLights[i].position.y - tmpLights[i].falloffMin) / zfar);
-			float zMax = fmax(0.0f, (tmpLights[i].position.y + tmpLights[i].falloffMin) / zfar);
-			
-			// non linear depth distribution
-			int zStartIndex = (int)(max(logf(zMin) * sliceScalingFactor + sliceBiasFactor, 0.0f));
-			int zEndIndex = (int)(max(logf(zMax) * sliceScalingFactor + sliceBiasFactor, 0.0f));
-			
-			int yStartIndex = (int)floorf(rect.y * (float)CLUSTER_GRID_SIZE_Y);
-			int yEndIndex = (int)ceilf(rect.w * (float)CLUSTER_GRID_SIZE_Y);
-			
-			int xStartIndex = (int)floorf(rect.x * (float)CLUSTER_GRID_SIZE_X);
-			int xEndIndex = (int)ceilf(rect.z * (float)CLUSTER_GRID_SIZE_X);
-
-			if ((zStartIndex < 0 && zEndIndex < 0) || (zStartIndex >= (int)CLUSTER_GRID_SIZE_Z && zEndIndex >= (int)CLUSTER_GRID_SIZE_Z))
-				continue;
-	
-			if ((yStartIndex < 0 && yEndIndex < 0) || (yStartIndex >= (int)CLUSTER_GRID_SIZE_Y && yEndIndex >= (int)CLUSTER_GRID_SIZE_Y))
-				continue;
-	
-			if ((xStartIndex < 0 && xEndIndex < 0) || (xStartIndex >= (int)CLUSTER_GRID_SIZE_X && xEndIndex >= (int)CLUSTER_GRID_SIZE_X))
-				continue;
-	
-			zStartIndex = stdMath_ClampInt(zStartIndex, 0, CLUSTER_GRID_SIZE_Z - 1);
-			zEndIndex = stdMath_ClampInt(zEndIndex, 0, CLUSTER_GRID_SIZE_Z - 1);
-	
-			yStartIndex = stdMath_ClampInt(yStartIndex, 0, CLUSTER_GRID_SIZE_Y - 1);
-			yEndIndex = stdMath_ClampInt(yEndIndex, 0, CLUSTER_GRID_SIZE_Y - 1);
-	
-			xStartIndex = stdMath_ClampInt(xStartIndex, 0, CLUSTER_GRID_SIZE_X - 1);
-			xEndIndex = stdMath_ClampInt(xEndIndex, 0, CLUSTER_GRID_SIZE_X - 1);
-	
-			for (uint32_t z = zStartIndex; z <= zEndIndex; ++z)
-			{
-				for (uint32_t y = yStartIndex; y <= yEndIndex; ++y)
-				{
-					for (uint32_t x = xStartIndex; x <= xEndIndex; ++x)
-					{
-						uint32_t clusterID = x + y * CLUSTER_GRID_SIZE_X + z * CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y;
-						uint32_t tile_bucket_index = clusterID * CLUSTER_BUCKETS_PER_CLUSTER;
-
-						const uint32_t bucket_index = i / 32;
-						const uint32_t bucket_place = i % 32;
-						std3D_clusterLights[tile_bucket_index + bucket_index] |= (1 << bucket_place); // set bucket bit
-					}
-				}
-			}
-		}
+	// assign occluders, from CLUSTER_MAX_LIGHTS to CLUSTER_MAX_LIGHTS + CLUSTER_MAX_OCCLUDERS - 1
+	for (int i = 0; i < numOccluders; ++i)
+	{
+		std3D_AssignItemToClusters(CLUSTER_MAX_LIGHTS + i, (rdVector3*)&tmpOccluders[i].position, tmpOccluders[i].position.w, pProjection, znear, zfar);
 	}
 
 	// todo: map buffer instead of storing to tmp then uploading?
 	glBindBuffer(GL_TEXTURE_BUFFER, cluster_buffer);
-	glBufferSubData(GL_TEXTURE_BUFFER, 0, sizeof(std3D_clusterLights), (void*)std3D_clusterLights);
+	glBufferSubData(GL_TEXTURE_BUFFER, 0, sizeof(std3D_clusterBits), (void*)std3D_clusterBits);
 	glBindBuffer(GL_TEXTURE_BUFFER, 0);
 }
 
