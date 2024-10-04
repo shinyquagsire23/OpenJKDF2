@@ -142,9 +142,9 @@ uniform occluderBlock
 #define CLUSTER_MAX_OCCLUDERS       128u
 #define CLUSTER_MAX_ITEMS           (CLUSTER_MAX_LIGHTS + CLUSTER_MAX_OCCLUDERS)
 #define CLUSTER_BUCKETS_PER_CLUSTER (CLUSTER_MAX_ITEMS / 32u)
-#define CLUSTER_GRID_SIZE_X         32u
-#define CLUSTER_GRID_SIZE_Y         16u
-#define CLUSTER_GRID_SIZE_Z         48u
+#define CLUSTER_GRID_SIZE_X         16u
+#define CLUSTER_GRID_SIZE_Y         8u
+#define CLUSTER_GRID_SIZE_Z         24u
 #define CLUSTER_GRID_SIZE_XYZ (CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y * CLUSTER_GRID_SIZE_Z)
 #define CLUSTER_GRID_TOTAL_SIZE (CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y * CLUSTER_GRID_SIZE_Z * CLUSTER_BUCKETS_PER_CLUSTER)
 
@@ -153,7 +153,7 @@ uniform vec2 clusterTileSizes;
 
 uint get_cluster_z_index(float screen_depth)
 {
-	return uint(max(log2(screen_depth) * clusterScaleBias.x + clusterScaleBias.y, 0.0));
+	return uint(max(log(screen_depth) * clusterScaleBias.x + clusterScaleBias.y, 0.0));
 }
 
 uint compute_cluster_index(vec2 pixel_pos, float screen_depth)
@@ -371,10 +371,10 @@ void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, inout vec
 	//int totalLights = min(numLights, 128);
 	//for(int light_index = 0; light_index < totalLights; ++light_index)
 
-	const uint first_item = 0u;
-	const uint last_item = first_item + CLUSTER_MAX_LIGHTS - 1u;
-	const uint first_bucket = first_item / 32u;
-	const uint last_bucket = min(last_item / 32u, max(0u, CLUSTER_BUCKETS_PER_CLUSTER - 1u));
+	uint first_item = 0u;
+	uint last_item = first_item + uint(numLights) - 1u;
+	uint first_bucket = first_item / 32u;
+	uint last_bucket = min(last_item / 32u, max(0u, CLUSTER_BUCKETS_PER_CLUSTER - 1u));
 	for (uint bucket = first_bucket; bucket <= last_bucket; ++bucket)
 	{
 		uint bucket_bits = uint(texelFetch(clusterBuffer, int(bucket_index + bucket)).x);
@@ -427,14 +427,15 @@ void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, inout vec
 	//diffuseLight = temperature(lightOverdraw / 32.0);
 }
 
-float CalculateIndirectShadows(uint bucket_index, vec3 pos, vec3 normal)
+vec3 CalculateIndirectShadows(uint bucket_index, vec3 pos, vec3 normal)
 {
 	float shadowing = 1.0;
+	//float overDraw = 0.0;
 
-	const uint first_item = CLUSTER_MAX_LIGHTS;
-	const uint last_item = first_item + CLUSTER_MAX_OCCLUDERS - 1u;
-	const uint first_bucket = first_item / 32u;
-	const uint last_bucket = min(last_item / 32u, max(0u, CLUSTER_BUCKETS_PER_CLUSTER - 1u));
+	uint first_item = CLUSTER_MAX_LIGHTS;
+	uint last_item = first_item + uint(numOccluders) - 1u;
+	uint first_bucket = first_item / 32u;
+	uint last_bucket = min(last_item / 32u, max(0u, CLUSTER_BUCKETS_PER_CLUSTER - 1u));
 	for (uint bucket = first_bucket; bucket <= last_bucket; ++bucket)
 	//for (int occluder_index = 0; occluder_index < numOccluders; ++occluder_index)
 	{
@@ -445,31 +446,41 @@ float CalculateIndirectShadows(uint bucket_index, vec3 pos, vec3 normal)
 			uint occluder_index = bucket * 32u + bucket_bit_index;
 			bucket_bits ^= uint(1 << bucket_bit_index);
 			
-			if (occluder_index >= first_item && occluder_index <= last_item && shadowing > 1.0 / 255.0)
+			if (occluder_index >= first_item && occluder_index <= last_item && shadowing > 5.0 / 255.0)
 			{
+				//overDraw += 1.0;				
+				//occluder occ = occluders[occluder_index];
+
 				occluder occ = occluders[occluder_index - first_item];
-				//occluder occ = occluders[occluder_index];// - first_item];
 
 				vec3 direction = (occ.position.xyz - pos.xyz);
 				float len = length(occ.position.xyz - pos.xyz);
-				if ( len < occ.position.w )
+				if (len < occ.position.w)
 				{
-					direction = normalize(direction);
+					float rcpLen = 1.0 / max(len, 0.0001);
+					direction *= rcpLen;
 
-					float cosTheta = max(0.0, dot(normal, direction));
+					float cosTheta = dot(normal, direction);
 					if(cosTheta > 0.0)
 					{
-						float solidAngle = (1.0 - cos(atanFast(occ.position.w / len)));
-						float falloff = smoothstep(0.0, occ.position.w, occ.position.w - len);
+						float solidAngle = (1.0 - cos(atanFast(occ.position.w * rcpLen)));
+
+						// simplified smoothstep falloff, equivalent to smoothstep(0, occ.position.w, occ.position.w - len)
+						float falloff = clamp((occ.position.w - len) / occ.position.w, 0.0, 1.0);
+						//falloff = falloff * falloff * (3.0 - 2.0 * falloff); the smoothstep part doesn't seem too important
+
 						float integralSolidAngle = cosTheta * solidAngle * falloff;
-						shadowing *= 1.0 - integralSolidAngle * 0.8;
+						shadowing *= 1.0 - integralSolidAngle;
+
+
+
 					}
 				}
 			}
 		}
 	}
 
-	return shadowing;
+	return vec3(shadowing);
 }
 
 layout(location = 0) out vec4 fragColor;
@@ -725,8 +736,10 @@ void main(void)
     )
 
     {
-        if (index == 0.0 && (blend_mode == D3DBLEND_SRCALPHA || blend_mode == D3DBLEND_INVSRCALPHA))
+#ifdef ALPHA_DISCARD
+        if (index == 0.0)// && (blend_mode == D3DBLEND_SRCALPHA || blend_mode == D3DBLEND_INVSRCALPHA))
             discard;
+#endif
 
         // Makes sure light is in a sane range
         float light = clamp(f_light, 0.0, 1.0);
@@ -755,9 +768,11 @@ void main(void)
         sampled_color = bilinear_paletted(adj_texcoords.xy);
         color_add = bilinear_paletted_light(adj_texcoords.xy, index);
 		emissive = color_add / light_mult;
+	#ifdef ALPHA_DISCARD
         if (sampled_color.a < 0.01) {
             discard;
         }
+	#endif
     }
 #endif
 
@@ -765,9 +780,11 @@ void main(void)
 
     if (blend_mode == D3DBLEND_INVSRCALPHA)
     {
+	#ifdef ALPHA_DISCARD
         if (vertex_color.a < 0.01) {
             discard;
         }
+	#endif
         //albedoFactor_copy.a = (1.0 - albedoFactor_copy.a);
         //vertex_color.a = (1.0 - vertex_color.a);
         //sampled_color.a = (1.0 - sampled_color.a);
@@ -779,7 +796,7 @@ void main(void)
     }
 
 	vec3 localViewDir = normalize(-f_coord.xyz);
-	uint cluster_index = compute_cluster_index(gl_FragCoord.xy, f_coord.y / 128.015625);// f_depth);
+	uint cluster_index = compute_cluster_index(gl_FragCoord.xy, f_coord.y);
 	uint bucket_index = cluster_index * CLUSTER_BUCKETS_PER_CLUSTER;
 
 	vec3 diffuseColor = sampled_color.xyz;
@@ -831,7 +848,7 @@ void main(void)
 
 		if (numOccluders > 0)
 		{
-			float shadows = CalculateIndirectShadows(bucket_index, f_coord.xyz, surfaceNormals);	
+			vec3 shadows = CalculateIndirectShadows(bucket_index, f_coord.xyz, surfaceNormals);	
 			diffuseLight.xyz *= shadows;
 			specLight.xyz *= shadows;
 		}
@@ -854,9 +871,11 @@ void main(void)
     float should_write_normals = 1.0;
     float orig_alpha = main_color.a;
 
+#ifdef ALPHA_DISCARD
     if (main_color.a < 0.01 && sampledEmiss.r == 0.0 && sampledEmiss.g == 0.0 && sampledEmiss.b == 0.0) {
         discard;
     }
+#endif
     
     if (blend_mode == D3DBLEND_INVSRCALPHA)
     {

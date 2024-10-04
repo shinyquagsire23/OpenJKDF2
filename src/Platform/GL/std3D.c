@@ -9,6 +9,7 @@
 #include "World/jkPlayer.h"
 #include "General/stdBitmap.h"
 #include "stdPlatform.h"
+#include "Engine/rdClip.h"
 
 #include "jk.h"
 
@@ -156,14 +157,15 @@ GLint uniform_fog, uniform_fog_color, uniform_fog_start, uniform_fog_end;
 #define CLUSTER_MAX_OCCLUDERS       128
 #define CLUSTER_MAX_ITEMS           (CLUSTER_MAX_LIGHTS + CLUSTER_MAX_OCCLUDERS)
 #define CLUSTER_BUCKETS_PER_CLUSTER (CLUSTER_MAX_ITEMS / 32)
-#define CLUSTER_GRID_SIZE_X         32
-#define CLUSTER_GRID_SIZE_Y         16
-#define CLUSTER_GRID_SIZE_Z         48
+#define CLUSTER_GRID_SIZE_X         16
+#define CLUSTER_GRID_SIZE_Y         8
+#define CLUSTER_GRID_SIZE_Z         24
 
 #define CLUSTER_GRID_SIZE_XYZ (CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y * CLUSTER_GRID_SIZE_Z)
 #define CLUSTER_GRID_TOTAL_SIZE (CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y * CLUSTER_GRID_SIZE_Z * CLUSTER_BUCKETS_PER_CLUSTER)
 
 static int clustersDirty = 0;
+static int clusterFrustumFrame = 0;
 
 float sliceScalingFactor;
 float sliceBiasFactor;
@@ -197,8 +199,6 @@ std3D_light tmpLights[CLUSTER_MAX_LIGHTS];
 
 GLuint light_ubo;
 
-static uint32_t std3D_clusterBits[CLUSTER_GRID_TOTAL_SIZE];
-
 typedef struct std3D_occluder
 {
 	rdVector4 position;
@@ -209,6 +209,10 @@ unsigned int numOccluders = 0;
 static std3D_occluder tmpOccluders[CLUSTER_MAX_OCCLUDERS];
 
 GLuint occluder_ubo;
+
+static uint32_t std3D_clusterBits[CLUSTER_GRID_TOTAL_SIZE];
+static rdClipFrustum std3D_clusterFrustums[CLUSTER_GRID_TOTAL_SIZE];
+static uint32_t std3D_clusterFrustumsFrame[CLUSTER_GRID_TOTAL_SIZE];
 
 void std3D_FlushLights();
 void std3D_FlushOccluders();
@@ -236,7 +240,7 @@ typedef struct std3D_worldStage
 #endif
 } std3D_worldStage;
 
-std3D_worldStage worldStages[1];
+std3D_worldStage worldStages[2];
 
 GLint programMenu_attribute_coord3d, programMenu_attribute_v_color, programMenu_attribute_v_uv, programMenu_attribute_v_norm;
 GLint programMenu_uniform_mvp, programMenu_uniform_tex, programMenu_uniform_displayPalette;
@@ -1299,6 +1303,7 @@ int init_resources()
     if ((programMenu = std3D_loadProgram("shaders/menu", "")) == 0) return false;
 #ifdef RENDER_DROID2
 	if (!std3D_loadWorldStage(&worldStages[0], "")) return false;
+	if (!std3D_loadWorldStage(&worldStages[1], "ALPHA_DISCARD")) return false;
 #endif
     if (!std3D_loadSimpleTexProgram("shaders/ui", &std3D_uiProgram)) return false;
     if (!std3D_loadSimpleTexProgram("shaders/texfbo", &std3D_texFboStage)) return false;
@@ -1501,8 +1506,12 @@ int init_resources()
 	std3D_setupWorldVAO();
 	std3D_setupMenuVAO();
 #ifdef RENDER_DROID2
+	memset(std3D_clusterFrustumsFrame, 0, sizeof(std3D_clusterFrustumsFrame));
+
 	std3D_setupDrawCallVAO(&worldStages[0]);
 	std3D_setupLightingUBO(&worldStages[0]);
+	std3D_setupDrawCallVAO(&worldStages[1]);
+	std3D_setupLightingUBO(&worldStages[1]);
 #endif
 
     has_initted = true;
@@ -1595,6 +1604,7 @@ void std3D_FreeResources()
 
 #ifdef RENDER_DROID2
 	glDeleteProgram(worldStages[0].program);
+	glDeleteProgram(worldStages[1].program);
 	glDeleteBuffers(1, &light_ubo);
 	glDeleteBuffers(1, &occluder_ubo);
 	glDeleteBuffers(1, &cluster_buffer);
@@ -4918,6 +4928,14 @@ static size_t GL_tmpDrawCallVerticesAmt = 0;
 
 static D3DVERTEX GL_tmpDrawCallVerticesSorted[STD3D_MAX_DRAW_CALL_VERTS] = { 0 };
 
+int std3D_StatePermutation(std3D_DrawCallState* pState)
+{
+	int permute = 0; // opaque, no discard
+	if(pState->blend.blendMode == RD_BLEND_MODE_ALPHA || pState->texture.alphaTest)
+		permute = 1; // alpha with discard
+	return permute;
+}
+
 uint64_t std3D_SortKeyBits(uint64_t* offset, uint64_t bits, uint64_t size)
 {
 	uint64_t limit = (1 << size) - 1;
@@ -4933,8 +4951,8 @@ uint64_t std3D_GetSortKey(std3D_DrawCallState* pState)
 	uint64_t sortKey = 0;
 	sortKey |= std3D_SortKeyBits(&offset, pState->sortPriority, 2); // 2
 	sortKey |= std3D_SortKeyBits(&offset, pState->texture.pTexture ? pState->texture.pTexture->texture_id : 0, 16); // 18
-	sortKey |= std3D_SortKeyBits(&offset, pState->blend.blendMode, 1); // 19
-	sortKey |= std3D_SortKeyBits(&offset, pState->depthStencil.zmethod, 2); // 21
+	sortKey |= std3D_SortKeyBits(&offset, 1 - pState->blend.blendMode, 1); // 19
+	sortKey |= std3D_SortKeyBits(&offset, 3-pState->depthStencil.zmethod, 2); // 21
 	sortKey |= std3D_SortKeyBits(&offset, pState->depthStencil.zcompare, 3); // 24
 	sortKey |= std3D_SortKeyBits(&offset, pState->raster.cullMode, 3); // 27
 	sortKey |= std3D_SortKeyBits(&offset, pState->texture.alphaTest, 1); // 28
@@ -4948,7 +4966,8 @@ uint64_t std3D_GetSortKey(std3D_DrawCallState* pState)
 
 	// use the rest for depth sorting
 	uint64_t remainingBits = 64 - offset;
-	sortKey |= std3D_SortKeyBits(&offset, (uint64_t)(pState->sortDistance * ((1 << remainingBits) - 1)), remainingBits);
+	float dist = pState->sortDistance / 128.0f;
+	sortKey |= std3D_SortKeyBits(&offset, (uint64_t)(dist * ((1 << remainingBits) - 1)), remainingBits);
 
 	//sortHash |= (pState->raster.geoMode & 7) << 25;
 	//hash |= ((proc->type & RD_FF_TEX_TRANSLUCENT) == RD_FF_TEX_TRANSLUCENT) << 31;
@@ -5081,7 +5100,7 @@ void std3D_SetRasterState(std3D_RasterState* pRasterState)
 	//rdVertexColorMode_t colorMode;
 }
 
-void std3D_SetBlendState(std3D_worldStage* pStage, std3D_BlendState* pBlendState)
+int std3D_SetBlendState(std3D_worldStage* pStage, std3D_BlendState* pBlendState)
 {
 	if (pBlendState->blendMode == RD_BLEND_MODE_NONE)
 	{
@@ -5104,7 +5123,6 @@ void std3D_SetBlendState(std3D_worldStage* pStage, std3D_BlendState* pBlendState
 		GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
 		glDrawBuffers(ARRAYSIZE(bufs), bufs);
 	}
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// fixme: I don't entirely understand the logic behind this blend mode uniform...
 	//if (pBlendState->blendMode == RD_BLEND_MODE_NONE)
@@ -5219,14 +5237,20 @@ void std3D_BindStage(std3D_worldStage* pStage)
 }
 
 // todo/fixme: we're not currently handling viewport changes mid-draw
+static rdMatrix44 oldProj; // keep track of the global projection to avoid redundant cluster building if the matrix doesn't change over the course of several frames
 void std3D_FlushDrawCalls()
 {
 	if (Main_bHeadless) return;
 
 	if(!GL_tmpDrawCallAmt)
 		return;
+
+	if (rdMatrix_Compare44(&oldProj, &GL_tmpDrawCalls[0].state.proj) != 0)
+		clusterFrustumFrame++;
 	
 	std3D_BuildClusters(&GL_tmpDrawCalls[0].state.proj);
+
+	oldProj = GL_tmpDrawCalls[0].state.proj;
 
 	// sort draw calls to reduce state changes and maximize batching
 	_qsort(GL_tmpDrawCalls, GL_tmpDrawCallAmt, sizeof(std3D_DrawCall), (int(__cdecl*)(const void*, const void*))std3D_DrawCallCompare);
@@ -5254,10 +5278,6 @@ void std3D_FlushDrawCalls()
 	glDepthMask(GL_TRUE);
 	glDepthFunc(GL_LESS);
 
-	std3D_worldStage* pStage = &worldStages[0];
-	std3D_BindStage(pStage);
-	glBufferData(GL_ARRAY_BUFFER, GL_tmpDrawCallVerticesAmt * sizeof(D3DVERTEX), GL_tmpDrawCallVerticesSorted, GL_STREAM_DRAW);
-
 	glActiveTexture(GL_TEXTURE0 + 4);
 	glBindTexture(GL_TEXTURE_2D, blank_tex);
 	glActiveTexture(GL_TEXTURE0 + 3);
@@ -5279,6 +5299,11 @@ void std3D_FlushDrawCalls()
 	std3D_LightingState* pLightState = &pDrawCall->state.lighting;
 
 	std3D_DrawCallState lastState = pDrawCall->state;
+
+	int lastPermutation = std3D_StatePermutation(&pDrawCall->state);
+	std3D_worldStage* pStage = &worldStages[lastPermutation];
+	std3D_BindStage(pStage);
+	glBufferData(GL_ARRAY_BUFFER, GL_tmpDrawCallVerticesAmt * sizeof(D3DVERTEX), GL_tmpDrawCallVerticesSorted, GL_STREAM_DRAW);
 
 	int last_tex = pTexState->pTexture ? pTexState->pTexture->texture_id : blank_tex_white;
 	std3D_SetRasterState(pRasterState);
@@ -5324,6 +5349,14 @@ void std3D_FlushDrawCalls()
 		{
 			glDrawArrays(GL_TRIANGLES, vertexOffset, batch_verts);
 
+			int permutation = std3D_StatePermutation(&pDrawCall->state);
+			if (permutation != lastPermutation)
+			{
+				pStage = &worldStages[permutation];
+				std3D_BindStage(pStage);
+				lastPermutation = permutation;
+			}
+
 			std3D_SetRasterState(pRasterState);
 			std3D_SetBlendState(pStage, pBlendState);
 			std3D_SetDepthStencilState(pDepthStencilState);
@@ -5338,6 +5371,8 @@ void std3D_FlushDrawCalls()
 			// perhaps all of this would be better if we just flushed the pipeline on matrix change instead
 			if(rdMatrix_Compare44(&lastState.proj, &pDrawCall->state.proj) != 0)
 			{
+				oldProj = pDrawCall->state.proj;
+				clusterFrustumFrame++;
 				clustersDirty = 1;
 				std3D_BuildClusters(&pDrawCall->state.proj);
 				glUniform2f(pStage->uniform_clusterTileSizes, (float)tileSizeX, (float)tileSizeY);
@@ -5470,7 +5505,7 @@ void std3D_UpdateClipRegion(float lc, float lz, float Radius, float CameraScale,
 	}
 }
 
-void std3D_ComputeClipRegion(const rdVector3* Center, float Radius, rdMatrix44* pProjection, float Near, rdVector4* ClipRegion)
+int std3D_ComputeClipRegion(const rdVector3* Center, float Radius, rdMatrix44* pProjection, float Near, rdVector4* ClipRegion)
 {
 	rdVector_Set4(ClipRegion, 1.0f, 1.0f, 0.0f, 0.0f);
 	if ((Center->y + Radius) >= Near)
@@ -5480,35 +5515,94 @@ void std3D_ComputeClipRegion(const rdVector3* Center, float Radius, rdMatrix44* 
 		std3D_UpdateClipRegion(Center->x, Center->y, Radius, pProjection->vA.x, &ClipMin.x, &ClipMax.x);
 		std3D_UpdateClipRegion(-Center->z, Center->y, Radius, pProjection->vC.y, &ClipMin.y, &ClipMax.y);
 		rdVector_Set4(ClipRegion, ClipMin.x, ClipMin.y, ClipMax.x, ClipMax.y);
+		return 1;
 	}
+	return 0;
 }
 
-// Can actually use this for full deferred pipe too instead of rendering boxes and stenciling
-void std3D_ComputeBoundingBox(const rdVector3* Center, float Radius, rdMatrix44* pProjection, float Near, rdVector4* Bounds)
+int std3D_ComputeBoundingBox(const rdVector3* Center, float Radius, rdMatrix44* pProjection, float Near, rdVector4* Bounds)
 {
 	rdVector4 bounds;
-	std3D_ComputeClipRegion(Center, Radius, pProjection, Near, &bounds);
+	int clipped = std3D_ComputeClipRegion(Center, Radius, pProjection, Near, &bounds);
 
 	Bounds->x = 0.5f *  bounds.x + 0.5f;
 	Bounds->y = 0.5f * -bounds.w + 0.5f;
 	Bounds->z = 0.5f *  bounds.z + 0.5f;
 	Bounds->w = 0.5f * -bounds.y + 0.5f;
+
+	return clipped;
+}
+
+void screen2View(rdVector4* out, rdMatrix44* projInv, rdVector4* screen)
+{
+	rdVector4 ndc;
+	ndc.x = 2.0 * (screen->x / (float)Window_xSize) - 1.0;
+	ndc.y = 2.0 * (screen->y / (float)Window_ySize) - 1.0;
+	ndc.z = 1.0;//screen->z;
+	ndc.w = 1.0;
+
+	rdMatrix_TransformPoint44(out, &ndc, projInv);
+	rdVector_Scale4Acc(out, 1.0f / out->w);
+}
+
+void lineIntersectionWithZPlane(rdVector3* out, rdVector3* startPoint, rdVector3* endPoint, float zDistance)
+{
+	rdVector3 direction;
+	rdVector_Sub3(&direction, endPoint, startPoint);
+	rdVector3 normal = { 0.0, 1.0, 0.0}; // plane normal
+
+	// skip check if the line is parallel to the plane.
+
+	float t = (zDistance - rdVector_Dot3(&normal, startPoint)) / rdVector_Dot3(&normal, &direction);
+	rdVector_Copy3(out, startPoint);
+	rdVector_MultAcc3(out, &direction, t); // the parametric form of the line equation
+}
+
+void std3D_BuildClusterFrustum(rdClipFrustum* pClip, int x, int y, int z, rdMatrix44* pProjection, float znear, float zfar)
+{
+	float minZ = (float)(z + 0) / (float)CLUSTER_GRID_SIZE_Z;
+	float maxZ = (float)(z + 1) / (float)CLUSTER_GRID_SIZE_Z;
+
+	minZ = znear * powf(zfar / znear, minZ);
+	maxZ = znear * powf(zfar / znear, maxZ);
+
+	// some hack to fix aspect ratios/resolutions in jkMain_FixRes means we need to use the canvas size here
+	int screenWidth = rdCamera_pCurCamera->canvas->widthMinusOne + 1;
+	int screenHeight = rdCamera_pCurCamera->canvas->heightMinusOne + 1;
+
+	// y flip
+	int minY = screenHeight - (y + 1) * screenHeight / CLUSTER_GRID_SIZE_Y;
+	int maxY = screenHeight - (y + 0) * screenHeight / CLUSTER_GRID_SIZE_Y;
+	
+	int minX = (x + 0) * screenWidth / CLUSTER_GRID_SIZE_X;
+	int maxX = (x + 1) * screenWidth / CLUSTER_GRID_SIZE_X;
+
+	uint32_t clusterID = x + y * CLUSTER_GRID_SIZE_X + z * CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y;
+
+	rdCamera_BuildClipFrustum(rdCamera_pCurCamera, &std3D_clusterFrustums[clusterID], minX, minY, maxX, maxY);
+	std3D_clusterFrustums[clusterID].field_0.x = 1; // seems to enable far plane test
+	std3D_clusterFrustums[clusterID].field_0.y = minZ;
+	std3D_clusterFrustums[clusterID].field_0.z = maxZ;
+	std3D_clusterFrustumsFrame[clusterID] = clusterFrustumFrame;
 }
 
 void std3D_AssignItemToClusters(int itemIndex, rdVector3* pPosition, float radius, rdMatrix44* pProjection, float znear, float zfar)
 {
-	// use a tight screen space bounding rect to determine which tiles we need to be assigned to
+	// use a tight screen space bounding rect to determine which tiles the item needs to be assigned to
 	rdVector4 rect;
-	std3D_ComputeBoundingBox(pPosition, radius, pProjection, znear, &rect);
+	int clipped = std3D_ComputeBoundingBox(pPosition, radius, pProjection, znear, &rect);
 	if (rect.x < rect.z && rect.y < rect.w)
 	{
 		// linear depth for near and far edges of the light
-		float zMin = fmax(0.0f, (pPosition->y - radius) / zfar);
-		float zMax = fmax(0.0f, (pPosition->y + radius) / zfar);
+		float zMin = fmax(0.0f, (pPosition->y - radius));
+		float zMax = fmax(0.0f, (pPosition->y + radius));
 
 		// non linear depth distribution
-		int zStartIndex = (int)floorf(max(log2f(zMin) * sliceScalingFactor + sliceBiasFactor, 0.0f));
-		int zEndIndex = (int)ceilf(max(log2f(zMax) * sliceScalingFactor + sliceBiasFactor, 0.0f));
+		//int zStartIndex = (int)fmax(0.0f, (logf(fabs(zMin) / znear) * CLUSTER_GRID_SIZE_Z) / logf(zfar / znear));
+		//int zEndIndex = (int)fmax(0.0f, (logf(fabs(zMax) / znear) * CLUSTER_GRID_SIZE_Z) / logf(zfar / znear));
+
+		int zStartIndex = (int)floorf(fmax(0.0f, logf(zMin) * sliceScalingFactor + sliceBiasFactor));
+		int zEndIndex = (int)ceilf(fmax(0.0f, logf(zMax) * sliceScalingFactor + sliceBiasFactor));
 
 		int yStartIndex = (int)floorf(rect.y * (float)CLUSTER_GRID_SIZE_Y);
 		int yEndIndex = (int)ceilf(rect.w * (float)CLUSTER_GRID_SIZE_Y);
@@ -5542,10 +5636,15 @@ void std3D_AssignItemToClusters(int itemIndex, rdVector3* pPosition, float radiu
 				{
 					uint32_t clusterID = x + y * CLUSTER_GRID_SIZE_X + z * CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y;
 					uint32_t tile_bucket_index = clusterID * CLUSTER_BUCKETS_PER_CLUSTER;
+					if(std3D_clusterFrustumsFrame[clusterID] != clusterFrustumFrame)
+						std3D_BuildClusterFrustum(&std3D_clusterFrustums[clusterID], x, y, z, pProjection, znear, zfar);
 
-					const uint32_t bucket_index = itemIndex / 32;
-					const uint32_t bucket_place = itemIndex % 32;
-					std3D_clusterBits[tile_bucket_index + bucket_index] |= (1 << bucket_place); // set bucket bit
+					if(rdClip_SphereInFrustrum(&std3D_clusterFrustums[clusterID], pPosition, radius) != 2)
+					{
+						const uint32_t bucket_index = itemIndex / 32;
+						const uint32_t bucket_place = itemIndex % 32;
+						std3D_clusterBits[tile_bucket_index + bucket_index] |= (1 << bucket_place);
+					}
 				}
 			}
 		}
@@ -5563,7 +5662,7 @@ void std3D_BuildClusters(rdMatrix44* pProjection)
 	std3D_FlushLights();
 	std3D_FlushOccluders();
 
-	// just pull the near/far from the projection matrix
+	// pull the near/far from the projection matrix
 	// note: common sources list this as [3][2] and [2][2] but we have a rotated projection matrix, so we use [1][2]
 	float znear = -pProjection->vD.z / (pProjection->vB.z + 1.0f);
 	float zfar = -pProjection->vD.z / (pProjection->vB.z - 1.0f);
@@ -5573,8 +5672,8 @@ void std3D_BuildClusters(rdMatrix44* pProjection)
 	sliceBiasFactor = -((float)CLUSTER_GRID_SIZE_Z * logf(znear) / logf(zfar / znear));
 
 	// ratio of tile to pixel
-	tileSizeX = (uint32_t)ceilf((float)Window_xSize / (float)CLUSTER_GRID_SIZE_X);
-	tileSizeY = (uint32_t)ceilf((float)Window_ySize / (float)CLUSTER_GRID_SIZE_Y);
+	tileSizeX = (uint32_t)ceilf((float)std3D_pFb->w / (float)CLUSTER_GRID_SIZE_X);
+	tileSizeY = (uint32_t)ceilf((float)std3D_pFb->h / (float)CLUSTER_GRID_SIZE_Y);
 	
 	// clean slate
 	memset(std3D_clusterBits, 0, sizeof(std3D_clusterBits));
