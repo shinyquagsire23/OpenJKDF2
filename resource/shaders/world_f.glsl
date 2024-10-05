@@ -235,7 +235,6 @@ vec3 temperature(float t)
     return vec3( clamp(r.x, 0.0f, 1.0), clamp(r.y, 0.0, 1.0), clamp(r.z, 0.0, 1.0) );
 }
 
-
 // https://therealmjp.github.io/posts/sg-series-part-1-a-brief-and-incomplete-history-of-baked-lighting-representations/
 // SphericalGaussian(dir) := Amplitude * exp(Sharpness * (dot(Axis, dir) - 1.0f))
 struct SG
@@ -389,8 +388,11 @@ void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, inout vec
 				light l = lights[light_index];
 
 				vec3 diff = l.position.xyz - f_coord.xyz;
+
 				float len;
-				if (lightMode == 2) // diffuse uses dist to plane
+
+				// diffuse uses dist to plane
+				if (lightMode == 2)
 					len = dot(l.position.xyz - f_coord.xyz, normal.xyz);
 				else
 					len = length(diff);
@@ -398,7 +400,9 @@ void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, inout vec
 				// todo: how much branching do we really want to do here?
 				if ( len < l.falloffMin )
 				{
-					diff = normalize(diff);
+					float rcpLen = 1.0 / max(len, 0.0001);
+					diff *= rcpLen;
+
 					float lightMagnitude = dot(normal, diff);
 					//if (lightMode > 2) // gouraud and higher use half lambert
 						//lightMagnitude = HalfLambert(lightMagnitude);
