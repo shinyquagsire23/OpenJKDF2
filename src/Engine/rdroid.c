@@ -40,6 +40,7 @@ static rdMatrix44     rdroid_curViewProjInv;
 
 static int rdroid_sortPriority = 0;
 static float rdroid_sortDistance = 0;
+static int rdroid_drawLayer = 0;
 
 static float       rdroid_texWidth = 1;
 static float       rdroid_texHeight = 1;
@@ -520,6 +521,7 @@ void rdEndPrimitive()
 	rdMatrix_Copy44(&state.proj, &rdroid_matrices[RD_MATRIX_PROJECTION]);
 	state.sortPriority = rdroid_sortPriority;
 	state.sortDistance = rdroid_sortDistance;
+	state.drawLayer = rdroid_drawLayer;
 
 	memcpy(&state.raster, &rdroid_rasterState, sizeof(std3D_RasterState));
 	memcpy(&state.blend, &rdroid_blendState, sizeof(std3D_BlendState));
@@ -762,14 +764,9 @@ void rdTexOffseti(float u, float v)
 }
 
 // Framebuffer
-void rdClearDepth(uint32_t z)
+void rdDrawLayer(uint8_t layer)
 {
-	// todo
-}
-
-void rdClearColor(uint32_t rgba)
-{
-	// todo
+	rdroid_drawLayer = layer;
 }
 
 // States
@@ -868,7 +865,11 @@ void std3D_ClearOccluders();
 void rdClearLights()
 {
 	std3D_ClearLights();
-	std3D_ClearOccluders(); // todo: move me
+}
+
+void rdClearOccluders()
+{
+	std3D_ClearOccluders();
 }
 
 extern int jkPlayer_enableShadows;

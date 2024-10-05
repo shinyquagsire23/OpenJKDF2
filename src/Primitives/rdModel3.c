@@ -1269,6 +1269,7 @@ int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
     if ( curGeometryMode >= rdroid_curGeometryMode )
         curGeometryMode = rdroid_curGeometryMode;
 
+#ifndef RENDER_DROID2
 #ifdef RGB_AMBIENT
 	if (rdroid_curRenderOptions & 2 && rdCamera_pCurCamera->ambientLight.x >= 1.0 && rdCamera_pCurCamera->ambientLight.y >= 1.0 && rdCamera_pCurCamera->ambientLight.z >= 1.0)
 #else
@@ -1278,6 +1279,7 @@ int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
         curLightingMode = RD_LIGHTMODE_FULLYLIT;
     }
     else
+#endif
     {
         curLightingMode = pCurThing->curLightMode;
         if ( curLightingMode >= rdroid_curLightingMode )
@@ -1288,7 +1290,7 @@ int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
     if ( curTextureMode >= rdroid_curTextureMode )
         curTextureMode = rdroid_curTextureMode;
 
-#ifdef GPU_LIGHTING
+#ifdef RENDER_DROID2
 	rdModel3_numGeoLights = 0;
 #else
     if ( curLightingMode > RD_LIGHTMODE_NOTLIT)

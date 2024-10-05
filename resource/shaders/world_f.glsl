@@ -104,12 +104,12 @@ noperspective in vec2 f_uv_affine;
 uniform mat4 modelMatrix;
 uniform mat4 mvp;
 
-uniform int uv_mode;
+uniform int  uv_mode;
 uniform vec4 fillColor;
 
 // fixme: specular mode is currently a metal mode, where metalness is assumed to be 1.0 with 0 diffuse component
 // this is pretty limiting atm, I'd like to get some shiny storm troopers but their armor is more like plastic
-uniform int lightMode;
+uniform int  lightMode;
 uniform int  ambientMode;
 uniform vec3 ambientColor;
 uniform vec4 ambientSH[3];
@@ -159,7 +159,7 @@ uniform occluderBlock
 #define CLUSTER_BUCKETS_PER_CLUSTER (CLUSTER_MAX_ITEMS / 32u)
 #define CLUSTER_GRID_SIZE_X         16u
 #define CLUSTER_GRID_SIZE_Y         8u
-#define CLUSTER_GRID_SIZE_Z         24u
+#define CLUSTER_GRID_SIZE_Z         16u
 #define CLUSTER_GRID_SIZE_XYZ (CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y * CLUSTER_GRID_SIZE_Z)
 #define CLUSTER_GRID_TOTAL_SIZE (CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y * CLUSTER_GRID_SIZE_Z * CLUSTER_BUCKETS_PER_CLUSTER)
 
@@ -425,7 +425,7 @@ void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, inout vec
 	//diffuseLight = temperature(lightOverdraw / 32.0);
 }
 
-vec3 CalculateIndirectShadows(uint bucket_index, vec3 pos, vec3 normal)
+float CalculateIndirectShadows(uint bucket_index, vec3 pos, vec3 normal)
 {
 	float shadowing = 1.0;
 	//float overDraw = 0.0;
@@ -465,20 +465,17 @@ vec3 CalculateIndirectShadows(uint bucket_index, vec3 pos, vec3 normal)
 
 						// simplified smoothstep falloff, equivalent to smoothstep(0, occ.position.w, occ.position.w - len)
 						float falloff = clamp((occ.position.w - len) / occ.position.w, 0.0, 1.0);
-						//falloff = falloff * falloff * (3.0 - 2.0 * falloff); the smoothstep part doesn't seem too important
+						falloff = falloff * falloff * (3.0 - 2.0 * falloff);
 
 						float integralSolidAngle = cosTheta * solidAngle * falloff;
 						shadowing *= 1.0 - integralSolidAngle;
-
-
-
 					}
 				}
 			}
 		}
 	}
 
-	return vec3(shadowing);
+	return shadowing;
 }
 
 layout(location = 0) out vec4 fragColor;
@@ -814,6 +811,8 @@ void main(void)
 	vec3 diffuseLight = vertex_color.xyz;
 	vec3 specLight = vec3(0.0);
 
+#ifdef UNLIT
+	// lightMode should always be one of these 2 for UNLIT
 	if(lightMode == 0) // full lit
 	{
 		diffuseLight.xyz = vec3(1.0);
@@ -822,7 +821,8 @@ void main(void)
 	{
 		diffuseLight.xyz = vec3(0.0);
 	}
-	else if(lightMode >= 2)
+#else
+	//if(lightMode >= 2)
 	{
 		if (ambientMode > 0)
 		{
@@ -838,30 +838,27 @@ void main(void)
 			else
 				diffuseLight.xyz += CalculateAmbientDiffuse(surfaceNormals);
 		}
-		
-		if (numLights > 0)
-			CalculatePointLighting(bucket_index, surfaceNormals, localViewDir, diffuseLight, specLight);
 			
-		//diffuseColor.xyz = vec3(1.0);
-
+		float shadows = 1.0;
 		if (numOccluders > 0)
-		{
-			vec3 shadows = CalculateIndirectShadows(bucket_index, f_coord.xyz, surfaceNormals);	
-			diffuseLight.xyz *= shadows;
-			specLight.xyz *= shadows;
-		}
+			shadows = CalculateIndirectShadows(bucket_index, f_coord.xyz, surfaceNormals);	
+		
+		if (numLights > 0 && shadows > 1.0/255.0)
+			CalculatePointLighting(bucket_index, surfaceNormals, localViewDir, diffuseLight, specLight);
+		
+		diffuseLight.xyz *= shadows;
+		specLight.xyz *= shadows;
+
+		//diffuseColor.xyz = vec3(1.0);
 	}
 
 	// todo: maybe tone map this?
 	diffuseLight = clamp(diffuseLight.xyz, vec3(0.0), vec3(1.0));	
 	specLight = clamp(specLight.xyz, vec3(0.0), vec3(1.0));
+#endif
 
     vec4 main_color = vec4(diffuseColor.xyz * diffuseLight.xyz + specularColor.xyz * specLight.xyz, vertex_color.a);
 	main_color.rgb = max(main_color.rgb, emissive.rgb);
-
-#ifdef GPU_LIGHTING
-	//color_add_emiss.xyz += max(vec3(0.0), main_color.xyz - 1.0);
-#endif
 
     vec4 effectAdd_color = vec4(colorEffects_add.r, colorEffects_add.g, colorEffects_add.b, 0.0);
     

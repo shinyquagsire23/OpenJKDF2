@@ -548,7 +548,9 @@ void sithRender_Draw()
     rdCamera_ClearLights(rdCamera_pCurCamera);
 
 #ifdef RENDER_DROID2
+	rdDrawLayer(0);
 	rdClearLights();
+	rdClearOccluders();
 
 	// todo: get this out of here
 	extern int Window_xSize;
@@ -2503,7 +2505,7 @@ void sithRender_RenderThings()
                     if ( (thingIter->thingflags & SITH_TF_LIGHT) != 0
                       && thingIter->light > 0.0
 					#ifdef RGB_AMBIENT
-						&& (a2.x <= stdMath_Clamp(thingIter->light, 0.0, 1.0) && a2.y <= stdMath_Clamp(thingIter->light, 0.0, 1.0) && a2.z <= stdMath_Clamp(thingIter->light, 0.0, 1.0))
+						&& (jkPlayer_enableShadows || a2.x <= stdMath_Clamp(thingIter->light, 0.0, 1.0) && a2.y <= stdMath_Clamp(thingIter->light, 0.0, 1.0) && a2.z <= stdMath_Clamp(thingIter->light, 0.0, 1.0))
 					#else
                       && a2 <= stdMath_Clamp(thingIter->light, 0.0, 1.0)
 					#endif 
@@ -2534,7 +2536,7 @@ void sithRender_RenderThings()
                     }
 
 #ifdef RGB_AMBIENT
-					if (a2.x >= 1.0 && a2.y >= 1.0 && a2.z >= 1.0)
+					if (!jkPlayer_enableShadows && a2.x >= 1.0 && a2.y >= 1.0 && a2.z >= 1.0)
 #else
 					if ( a2 >= 1.0 )
 #endif

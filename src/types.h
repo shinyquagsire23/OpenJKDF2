@@ -909,10 +909,12 @@ typedef struct std3D_LightingState
 	rdAmbient       ambientStateSH; // ambient spherical harmonics coefficients and dominant light dir
 } std3D_LightingState;
 
+// todo: maybe some of this should be split into commands instead of one huge state block
 typedef struct std3D_DrawCallState
 {
 	int                     sortPriority;
 	float                   sortDistance;
+	int                     drawLayer;
 	rdMatrix44              modelView;
 	rdMatrix44              proj;
 	std3D_RasterState       raster;

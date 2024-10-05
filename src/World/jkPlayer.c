@@ -1162,7 +1162,11 @@ void jkPlayer_DrawPov()
 
 #ifdef SDL2_RENDER
         // Force weapon to draw in front of scene
+	#ifdef RENDER_DROID2
+		rdDrawLayer(1);
+	#else
         std3D_ClearZBuffer();
+	#endif
         rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
         rdSetSortingMethod(2);
         rdSetOcclusionMethod(0);

@@ -139,8 +139,7 @@ void rdSetTexMode(int a1);
 // todo:
 // rdDitherMode
 
-void rdClearDepth(uint32_t z);
-void rdClearColor(uint32_t rgba);
+void rdDrawLayer(uint8_t layer);
 
 int rdBindTexture(rdTexture* pTexture);
 int rdBindMaterial(rdMaterial* pMaterial, int cel);
@@ -153,6 +152,8 @@ void rdTexOffseti(float u, float v);
 int rdAddLight(rdLight* pLight, rdVector3* pPosition);
 void rdAddOccluder(rdVector3* position, float radius);
 void rdClearLights();
+
+void rdClearOccluders();
 
 void rdSetAmbientMode(rdAmbientMode_t type);
 void rdAmbientLight(float r, float g, float b);

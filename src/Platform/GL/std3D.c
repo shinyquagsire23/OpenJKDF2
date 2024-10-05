@@ -218,6 +218,21 @@ void std3D_FlushLights();
 void std3D_FlushOccluders();
 void std3D_BuildClusters(rdMatrix44* pProjection);
 
+typedef enum STD3D_DRAW_LIST
+{
+	DRAW_LIST_Z,
+	DRAW_LIST_Z_ALPHATEST,
+
+	DRAW_LIST_COLOR,
+	DRAW_LIST_COLOR_UNLIT,
+	DRAW_LIST_COLOR_ALPHATEST,
+	DRAW_LIST_COLOR_ALPHATEST_UNLIT,
+	DRAW_LIST_COLOR_ALPHABLEND,
+	DRAW_LIST_COLOR_ALPHABLEND_UNLIT,
+
+	DRAW_LIST_COUNT
+} STD3D_DRAW_LIST;
+
 typedef struct std3D_worldStage
 {
 	GLuint program;
@@ -240,7 +255,7 @@ typedef struct std3D_worldStage
 #endif
 } std3D_worldStage;
 
-std3D_worldStage worldStages[2];
+std3D_worldStage worldStages[DRAW_LIST_COUNT];
 
 GLint programMenu_attribute_coord3d, programMenu_attribute_v_color, programMenu_attribute_v_uv, programMenu_attribute_v_norm;
 GLint programMenu_uniform_mvp, programMenu_uniform_tex, programMenu_uniform_displayPalette;
@@ -1009,9 +1024,9 @@ bool std3D_loadDeferredProgram(const char* fpath_base, std3D_deferredStage* pOut
 #endif
 
 #ifdef RENDER_DROID2
-int std3D_loadWorldStage(std3D_worldStage* pStage, const char* defines)
+int std3D_loadWorldStage(std3D_worldStage* pStage, int isZPass, const char* defines)
 {
-	if ((pStage->program = std3D_loadProgram("shaders/world", defines)) == 0) return 0;
+	if ((pStage->program = std3D_loadProgram(isZPass ? "shaders/depth" : "shaders/world", defines)) == 0) return 0;
 
 	pStage->attribute_coord3d = std3D_tryFindAttribute(pStage->program, "coord3d");
 	pStage->attribute_v_color = std3D_tryFindAttribute(pStage->program, "v_color");
@@ -1302,8 +1317,14 @@ int init_resources()
     if ((programDefault = std3D_loadProgram("shaders/default", "")) == 0) return false;
     if ((programMenu = std3D_loadProgram("shaders/menu", "")) == 0) return false;
 #ifdef RENDER_DROID2
-	if (!std3D_loadWorldStage(&worldStages[0], "")) return false;
-	if (!std3D_loadWorldStage(&worldStages[1], "ALPHA_DISCARD")) return false;
+	if (!std3D_loadWorldStage(&worldStages[DRAW_LIST_Z], 1, "Z_PREPASS")) return false;
+	if (!std3D_loadWorldStage(&worldStages[DRAW_LIST_Z_ALPHATEST], 1, "Z_PREPASS;ALPHA_DISCARD")) return false;
+	if (!std3D_loadWorldStage(&worldStages[DRAW_LIST_COLOR], 0, "")) return false;
+	if (!std3D_loadWorldStage(&worldStages[DRAW_LIST_COLOR_UNLIT], 0, "UNLIT")) return false;
+	if (!std3D_loadWorldStage(&worldStages[DRAW_LIST_COLOR_ALPHATEST], 0, "ALPHA_DISCARD")) return false;
+	if (!std3D_loadWorldStage(&worldStages[DRAW_LIST_COLOR_ALPHATEST_UNLIT], 0, "ALPHA_DISCARD;UNLIT")) return false;
+	if (!std3D_loadWorldStage(&worldStages[DRAW_LIST_COLOR_ALPHABLEND], 0, "ALPHA_DISCARD;ALPHABLEND")) return false;
+	if (!std3D_loadWorldStage(&worldStages[DRAW_LIST_COLOR_ALPHABLEND_UNLIT], 0, "ALPHA_DISCARD;ALPHABLEND;UNLIT")) return false;
 #endif
     if (!std3D_loadSimpleTexProgram("shaders/ui", &std3D_uiProgram)) return false;
     if (!std3D_loadSimpleTexProgram("shaders/texfbo", &std3D_texFboStage)) return false;
@@ -1507,11 +1528,11 @@ int init_resources()
 	std3D_setupMenuVAO();
 #ifdef RENDER_DROID2
 	memset(std3D_clusterFrustumsFrame, 0, sizeof(std3D_clusterFrustumsFrame));
-
-	std3D_setupDrawCallVAO(&worldStages[0]);
-	std3D_setupLightingUBO(&worldStages[0]);
-	std3D_setupDrawCallVAO(&worldStages[1]);
-	std3D_setupLightingUBO(&worldStages[1]);
+	for(int i = 0; i < DRAW_LIST_COUNT; ++i)
+	{
+		std3D_setupDrawCallVAO(&worldStages[i]);
+		std3D_setupLightingUBO(&worldStages[i]);
+	}
 #endif
 
     has_initted = true;
@@ -1603,8 +1624,8 @@ void std3D_FreeResources()
     glDeleteBuffers(1, &menu_vbo_all);
 
 #ifdef RENDER_DROID2
-	glDeleteProgram(worldStages[0].program);
-	glDeleteProgram(worldStages[1].program);
+	for(int i = 0; i < DRAW_LIST_COUNT; ++i)
+		glDeleteProgram(worldStages[i].program);
 	glDeleteBuffers(1, &light_ubo);
 	glDeleteBuffers(1, &occluder_ubo);
 	glDeleteBuffers(1, &cluster_buffer);
@@ -4916,29 +4937,56 @@ void std3D_DrawOccluder(rdVector3* position, float radius, rdVector3* verts)
 
 
 #ifdef RENDER_DROID2
+
 // todo: indexing
 #define STD3D_MAX_DRAW_CALLS 8192
 #define STD3D_MAX_DRAW_CALL_VERTS (STD3D_MAX_DRAW_CALLS * 64)
 
-static std3D_DrawCall GL_tmpDrawCalls[STD3D_MAX_DRAW_CALLS] = { 0 };
-static size_t GL_tmpDrawCallAmt = 0;
+typedef struct std3D_DrawCallList
+{
+	size_t         drawCallCount;
+	size_t         drawCallVertexCount;
+	std3D_DrawCall drawCalls[STD3D_MAX_DRAW_CALLS];
+	D3DVERTEX      drawCallVertices[STD3D_MAX_DRAW_CALL_VERTS];
+} std3D_DrawCallList;
 
-static D3DVERTEX GL_tmpDrawCallVertices[STD3D_MAX_DRAW_CALL_VERTS] = { 0 };
-static size_t GL_tmpDrawCallVerticesAmt = 0;
+int std3D_DrawCallCompareSortKey(std3D_DrawCall* a, std3D_DrawCall* b);
+int std3D_DrawCallCompareDepth(std3D_DrawCall* a, std3D_DrawCall* b);
 
-static D3DVERTEX GL_tmpDrawCallVerticesSorted[STD3D_MAX_DRAW_CALL_VERTS] = { 0 };
+typedef int(*std3D_SortFunc)(std3D_DrawCall*, std3D_DrawCall*);
+
+// [draw layers][draw lists]
+static std3D_DrawCallList std3D_drawCallLists[2][DRAW_LIST_COUNT];
+static std3D_SortFunc std3D_drawCallSortFuncs[DRAW_LIST_COUNT] =
+{
+	std3D_DrawCallCompareSortKey, // z sort by state
+	std3D_DrawCallCompareSortKey, // z alpha test sort by state
+	std3D_DrawCallCompareSortKey, // color sort by key
+	std3D_DrawCallCompareSortKey, // alpha test sort by key
+	std3D_DrawCallCompareDepth // alpha blend sort by depth
+};
+static D3DVERTEX std3D_drawCallVerticesSorted[STD3D_MAX_DRAW_CALL_VERTS];
+
+int std3D_HasDepthWrites(std3D_DrawCallState* pState)
+{
+	return pState->depthStencil.zmethod == RD_ZBUFFER_READ_WRITE || pState->depthStencil.zmethod == RD_ZBUFFER_NOREAD_WRITE;
+}
 
 int std3D_StatePermutation(std3D_DrawCallState* pState)
 {
-	int permute = 0; // opaque, no discard
-	if(pState->blend.blendMode == RD_BLEND_MODE_ALPHA || pState->texture.alphaTest)
-		permute = 1; // alpha with discard
+	int lighting = pState->lighting.lightMode >= RD_LIGHTMODE_DIFFUSE;
+
+	int permute = lighting ? DRAW_LIST_COLOR : DRAW_LIST_COLOR_UNLIT; // color opaque, no discard
+	if(pState->blend.blendMode == RD_BLEND_MODE_ALPHA)
+		permute = lighting ? DRAW_LIST_COLOR_ALPHABLEND : DRAW_LIST_COLOR_ALPHABLEND_UNLIT; // alpha blend with discard
+	else if(pState->texture.alphaTest && !std3D_HasDepthWrites(pState))
+		permute = lighting ? DRAW_LIST_COLOR_ALPHATEST : DRAW_LIST_COLOR_ALPHATEST_UNLIT; // alpha with discard (only if no ztest)
 	return permute;
 }
 
 uint64_t std3D_SortKeyBits(uint64_t* offset, uint64_t bits, uint64_t size)
 {
-	uint64_t limit = (1 << size) - 1;
+	uint64_t limit =(size == 64) ? 0xFFFFFFFFFFFFFFFFUL : (1UL << size) - 1UL;
 	*offset -= size;
 	bits = (bits & limit) << *offset;
 	return bits;
@@ -4946,13 +4994,13 @@ uint64_t std3D_SortKeyBits(uint64_t* offset, uint64_t bits, uint64_t size)
 
 uint64_t std3D_GetSortKey(std3D_DrawCallState* pState)
 {
-	uint64_t offset = 64;
+	uint64_t offset = 64L;
 	
 	uint64_t sortKey = 0;
 	sortKey |= std3D_SortKeyBits(&offset, pState->sortPriority, 2); // 2
 	sortKey |= std3D_SortKeyBits(&offset, pState->texture.pTexture ? pState->texture.pTexture->texture_id : 0, 16); // 18
 	sortKey |= std3D_SortKeyBits(&offset, 1 - pState->blend.blendMode, 1); // 19
-	sortKey |= std3D_SortKeyBits(&offset, 3-pState->depthStencil.zmethod, 2); // 21
+	sortKey |= std3D_SortKeyBits(&offset, 3 - pState->depthStencil.zmethod, 2); // 21
 	sortKey |= std3D_SortKeyBits(&offset, pState->depthStencil.zcompare, 3); // 24
 	sortKey |= std3D_SortKeyBits(&offset, pState->raster.cullMode, 3); // 27
 	sortKey |= std3D_SortKeyBits(&offset, pState->texture.alphaTest, 1); // 28
@@ -4965,9 +5013,10 @@ uint64_t std3D_GetSortKey(std3D_DrawCallState* pState)
 	sortKey |= std3D_SortKeyBits(&offset, pState->raster.scissorMode, 1); // 42
 
 	// use the rest for depth sorting
-	uint64_t remainingBits = 64 - offset;
-	float dist = pState->sortDistance / 128.0f;
-	sortKey |= std3D_SortKeyBits(&offset, (uint64_t)(dist * ((1 << remainingBits) - 1)), remainingBits);
+	//uint64_t remainingBits = offset;
+	//uint64_t limit = (offset == 64) ? 0xFFFFFFFFFFFFFFFFUL : (1UL << offset) - 1UL;
+	//float dist = pState->sortDistance / 128.0f;
+	//sortKey |= std3D_SortKeyBits(&offset, (uint64_t)(dist * limit), remainingBits);
 
 	//sortHash |= (pState->raster.geoMode & 7) << 25;
 	//hash |= ((proc->type & RD_FF_TEX_TRANSLUCENT) == RD_FF_TEX_TRANSLUCENT) << 31;
@@ -4983,31 +5032,73 @@ uint64_t std3D_GetSortKey(std3D_DrawCallState* pState)
 	return sortKey;
 }
 
+void std3D_AddListDrawCall(std3D_DrawCallList* pList, std3D_DrawCallState* pDrawCallState, D3DVERTEX* paVertices, int numVertices)
+{
+	if (pList->drawCallCount + 1 > STD3D_MAX_DRAW_CALLS)
+		return; // todo: flush here?
+
+	if (pList->drawCallVertexCount + numVertices > STD3D_MAX_DRAW_CALL_VERTS)
+		return; // todo: flush here?
+
+	std3D_DrawCall* pDrawCall = &pList->drawCalls[pList->drawCallCount++];
+	pDrawCall->sortKey = std3D_GetSortKey(pDrawCallState);
+	pDrawCall->state = *pDrawCallState;
+	pDrawCall->firstVertex = pList->drawCallVertexCount;
+	pDrawCall->numVertices = numVertices;
+
+	memcpy(&pList->drawCallVertices[pList->drawCallVertexCount], paVertices, sizeof(D3DVERTEX) * numVertices);
+	pList->drawCallVertexCount += numVertices;
+}
+
+void std3D_AddZListDrawCall(std3D_DrawCallList* pList, std3D_DrawCallState* pDrawCallState, D3DVERTEX* paVertices, int numVertices)
+{
+	if (pList->drawCallCount + 1 > STD3D_MAX_DRAW_CALLS)
+		return; // todo: flush here?
+
+	if (pList->drawCallVertexCount + numVertices > STD3D_MAX_DRAW_CALL_VERTS)
+		return; // todo: flush here?
+
+	std3D_DrawCall* pDrawCall = &pList->drawCalls[pList->drawCallCount++];
+	pDrawCall->sortKey = std3D_GetSortKey(pDrawCallState);
+	pDrawCall->state = *pDrawCallState;
+	pDrawCall->firstVertex = pList->drawCallVertexCount;
+	pDrawCall->numVertices = numVertices;
+
+	// z lists can ignore these
+	memset(&pDrawCall->state.blend, 0, sizeof(std3D_BlendState));
+	memset(&pDrawCall->state.lighting, 0, sizeof(std3D_LightingState));
+
+	memcpy(&pList->drawCallVertices[pList->drawCallVertexCount], paVertices, sizeof(D3DVERTEX) * numVertices);
+	pList->drawCallVertexCount += numVertices;
+}
+
 void std3D_AddDrawCall(std3D_DrawCallState* pDrawCallState, D3DVERTEX* paVertices, int numVertices)
 {
 	if (Main_bHeadless)
 		return;
 
-	if (GL_tmpDrawCallAmt + 1 > STD3D_MAX_DRAW_CALLS)
-		return; // todo: flush here?
+	int drawLayer = stdMath_ClampInt(pDrawCallState->drawLayer, 0, 1);
 
-	if (GL_tmpDrawCallVerticesAmt + numVertices > STD3D_MAX_DRAW_CALL_VERTS)
-		return; // todo: flush here?
+	// figure out which list we want to draw to
+	int listIndex = std3D_StatePermutation(pDrawCallState);
+	std3D_AddListDrawCall(&std3D_drawCallLists[drawLayer][listIndex], pDrawCallState, paVertices, numVertices);
 
-	std3D_DrawCall* pDrawCall = &GL_tmpDrawCalls[GL_tmpDrawCallAmt++];
-	pDrawCall->sortKey = std3D_GetSortKey(pDrawCallState);
-	pDrawCall->state = *pDrawCallState;
-	pDrawCall->firstVertex = GL_tmpDrawCallVerticesAmt;
-	pDrawCall->numVertices = numVertices;
-
-	memcpy(&GL_tmpDrawCallVertices[GL_tmpDrawCallVerticesAmt], paVertices, sizeof(D3DVERTEX) * numVertices);
-	GL_tmpDrawCallVerticesAmt += numVertices;
+	// for non-blended, add to the z-prepass
+	int writesZ = pDrawCallState->depthStencil.zmethod == RD_ZBUFFER_READ_WRITE || pDrawCallState->depthStencil.zmethod == RD_ZBUFFER_NOREAD_WRITE;
+	if (pDrawCallState->blend.blendMode == RD_BLEND_MODE_NONE && writesZ)
+		std3D_AddZListDrawCall(&std3D_drawCallLists[drawLayer][pDrawCallState->texture.alphaTest], pDrawCallState, paVertices, numVertices);
 }
 
 void std3D_ResetDrawCalls()
 {
-	GL_tmpDrawCallAmt = 0;
-	GL_tmpDrawCallVerticesAmt = 0;
+	for(int j = 0; j < 2; ++j)
+	{
+		for (int i = 0; i < DRAW_LIST_COUNT; ++i)
+		{
+			std3D_drawCallLists[j][i].drawCallCount = 0;
+			std3D_drawCallLists[j][i].drawCallVertexCount = 0;
+		}
+	}
 }
 
 void std3D_SetTexture(std3D_worldStage* pStage, rdDDrawSurface* pTexture)
@@ -5070,11 +5161,20 @@ void std3D_SetTexture(std3D_worldStage* pStage, rdDDrawSurface* pTexture)
 	}
 }
 
-int std3D_DrawCallCompare(std3D_DrawCall* a, std3D_DrawCall* b)
+int std3D_DrawCallCompareSortKey(std3D_DrawCall* a, std3D_DrawCall* b)
 {
 	if (a->sortKey > b->sortKey)
 		return 1;
 	if (a->sortKey < b->sortKey)
+		return -1;
+	return 0;
+}
+
+int std3D_DrawCallCompareDepth(std3D_DrawCall* a, std3D_DrawCall* b)
+{
+	if (a->state.sortDistance > b->state.sortDistance)
+		return 1;
+	if (a->state.sortDistance < b->state.sortDistance)
 		return -1;
 	return 0;
 }
@@ -5131,41 +5231,48 @@ int std3D_SetBlendState(std3D_worldStage* pStage, std3D_BlendState* pBlendState)
 		glUniform1i(pStage->uniform_blend_mode, D3DBLEND_SRCALPHA);
 }
 
-void std3D_SetDepthStencilState(std3D_DepthStencilState* pDepthStencilState)
+void std3D_SetDepthStencilState(std3D_DepthStencilState* pDepthStencilState, int ignoreComparisonState)
 {
 	if (pDepthStencilState->zmethod == RD_ZBUFFER_NOREAD_NOWRITE)
 	{
 		glDisable(GL_DEPTH_TEST);
-		glDepthMask(GL_FALSE);
+		if (!ignoreComparisonState)
+			glDepthMask(GL_FALSE);
 	}
 	else if (pDepthStencilState->zmethod == RD_ZBUFFER_READ_NOWRITE)
 	{
 		glEnable(GL_DEPTH_TEST);
-		glDepthMask(GL_FALSE);
+		if (!ignoreComparisonState)
+			glDepthMask(GL_FALSE);
 	}
 	else if (pDepthStencilState->zmethod == RD_ZBUFFER_NOREAD_WRITE)
 	{
 		glDisable(GL_DEPTH_TEST);
-		glDepthMask(GL_TRUE);
+		if (!ignoreComparisonState)
+			glDepthMask(GL_TRUE);
 	}
 	else
 	{
 		glEnable(GL_DEPTH_TEST);
-		glDepthMask(GL_TRUE);
+		if(!ignoreComparisonState)
+			glDepthMask(GL_TRUE);
 	}
 
-	static const GLuint gl_compares[] =
+	if(!ignoreComparisonState)
 	{
-		GL_ALWAYS,
-		GL_LESS,
-		GL_LEQUAL,
-		GL_GREATER,
-		GL_GEQUAL,
-		GL_EQUAL,
-		GL_NOTEQUAL,
-		GL_NEVER
-	};
-	glDepthFunc(gl_compares[pDepthStencilState->zcompare]);
+		static const GLuint gl_compares[] =
+		{
+			GL_ALWAYS,
+			GL_LESS,
+			GL_LEQUAL,
+			GL_GREATER,
+			GL_GEQUAL,
+			GL_EQUAL,
+			GL_NOTEQUAL,
+			GL_NEVER
+		};
+		glDepthFunc(gl_compares[pDepthStencilState->zcompare]);
+	}
 }
 
 void std3D_SetTextureState(std3D_worldStage* pStage, std3D_TextureState* pTexState)
@@ -5238,32 +5345,132 @@ void std3D_BindStage(std3D_worldStage* pStage)
 
 // todo/fixme: we're not currently handling viewport changes mid-draw
 static rdMatrix44 oldProj; // keep track of the global projection to avoid redundant cluster building if the matrix doesn't change over the course of several frames
-void std3D_FlushDrawCalls()
-{
-	if (Main_bHeadless) return;
 
-	if(!GL_tmpDrawCallAmt)
+void std3D_FlushDrawCallList(std3D_worldStage* pStage, std3D_DrawCallList* pList, std3D_SortFunc sortFunc, int ignoreZStates)
+{
+	if (!pList->drawCallCount)
 		return;
 
-	if (rdMatrix_Compare44(&oldProj, &GL_tmpDrawCalls[0].state.proj) != 0)
+	if (rdMatrix_Compare44(&oldProj, &pList->drawCalls[0].state.proj) != 0)
 		clusterFrustumFrame++;
-	
-	std3D_BuildClusters(&GL_tmpDrawCalls[0].state.proj);
+	std3D_BuildClusters(&pList->drawCalls[0].state.proj);
 
-	oldProj = GL_tmpDrawCalls[0].state.proj;
+	oldProj = pList->drawCalls[0].state.proj;
 
 	// sort draw calls to reduce state changes and maximize batching
-	_qsort(GL_tmpDrawCalls, GL_tmpDrawCallAmt, sizeof(std3D_DrawCall), (int(__cdecl*)(const void*, const void*))std3D_DrawCallCompare);
+	// todo: use a different comparator for different lists (ex. distance priority for transparent)
+	if(sortFunc)
+		_qsort(pList->drawCalls, pList->drawCallCount, sizeof(std3D_DrawCall), (int(__cdecl*)(const void*, const void*))sortFunc);
 
 	// batching needs to follow the draw order, but vertex arrays might be disjointed
 	// build a sorted list of the vertices to ensure sequential vertex access during batch
 	// todo: generate an index buffer instead of copying vertices around
-	GL_tmpDrawCallVerticesAmt = 0;
-	for (int i = 0; i < GL_tmpDrawCallAmt; ++i)
+	int drawCallVerticesCount = 0;
+	for (int i = 0; i < pList->drawCallCount; ++i)
 	{
-		memcpy(&GL_tmpDrawCallVerticesSorted[GL_tmpDrawCallVerticesAmt], &GL_tmpDrawCallVertices[GL_tmpDrawCalls[i].firstVertex], sizeof(D3DVERTEX) * GL_tmpDrawCalls[i].numVertices);
-		GL_tmpDrawCallVerticesAmt += GL_tmpDrawCalls[i].numVertices;
+		memcpy(&std3D_drawCallVerticesSorted[drawCallVerticesCount], &pList->drawCallVertices[pList->drawCalls[i].firstVertex], sizeof(D3DVERTEX) * pList->drawCalls[i].numVertices);
+		drawCallVerticesCount += pList->drawCalls[i].numVertices;
 	}
+
+	std3D_DrawCall* pDrawCall = &pList->drawCalls[0];
+	std3D_RasterState* pRasterState = &pDrawCall->state.raster;
+	std3D_BlendState* pBlendState = &pDrawCall->state.blend;
+	std3D_DepthStencilState* pDepthStencilState = &pDrawCall->state.depthStencil;
+	std3D_TextureState* pTexState = &pDrawCall->state.texture;
+	std3D_LightingState* pLightState = &pDrawCall->state.lighting;
+
+	std3D_DrawCallState lastState = pDrawCall->state;
+
+	std3D_BindStage(pStage);
+	glBufferData(GL_ARRAY_BUFFER, drawCallVerticesCount * sizeof(D3DVERTEX), std3D_drawCallVerticesSorted, GL_STREAM_DRAW);
+
+	int last_tex = pTexState->pTexture ? pTexState->pTexture->texture_id : blank_tex_white;
+	std3D_SetRasterState(pRasterState);
+	std3D_SetBlendState(pStage, pBlendState);
+	std3D_SetDepthStencilState(pDepthStencilState, ignoreZStates);
+	std3D_SetTextureState(pStage, pTexState);
+	std3D_SetLightingState(pStage, pLightState);
+	std3D_SetTexture(pStage, pRasterState->geoMode == RD_GEOMODE_TEXTURED ? pTexState->pTexture : NULL);
+
+	rdMatrix44 last_mat = pDrawCall->state.modelView;
+	rdMatrix44 last_proj = pDrawCall->state.proj;
+	glUniformMatrix4fv(pStage->uniform_mvp, 1, GL_FALSE, (float*)&pDrawCall->state.proj);
+	glUniformMatrix4fv(pStage->uniform_modelMatrix, 1, GL_FALSE, (float*)&pDrawCall->state.modelView);
+
+	int do_batch = 0;
+	int batch_verts = 0;
+	int vertexOffset = 0;
+	for (int j = 0; j < pList->drawCallCount; j++)
+	{
+		pDrawCall = &pList->drawCalls[j];
+		pRasterState = &pDrawCall->state.raster;
+		pBlendState = &pDrawCall->state.blend;
+		pDepthStencilState = &pDrawCall->state.depthStencil;
+		pTexState = &pDrawCall->state.texture;
+		pLightState = &pDrawCall->state.lighting;
+
+		int texid = pTexState->pTexture ? pTexState->pTexture->texture_id : blank_tex_white;
+		if (last_tex != texid
+			//|| memcmp(&lastState, &pDrawCall->state, sizeof(std3D_DrawCallState)) != 0
+			|| memcmp(&lastState.raster, &pDrawCall->state.raster, sizeof(std3D_RasterState)) != 0
+			|| memcmp(&lastState.blend, &pDrawCall->state.blend, sizeof(std3D_BlendState)) != 0
+			|| memcmp(&lastState.depthStencil, &pDrawCall->state.depthStencil, sizeof(std3D_DepthStencilState)) != 0
+			|| memcmp(&lastState.texture, &pDrawCall->state.texture, sizeof(std3D_TextureState)) != 0
+			|| memcmp(&lastState.lighting, &pDrawCall->state.lighting, sizeof(std3D_LightingState)) != 0
+			|| rdMatrix_Compare44(&lastState.modelView, &pDrawCall->state.modelView) != 0
+			|| rdMatrix_Compare44(&lastState.proj, &pDrawCall->state.proj) != 0
+			)
+		{
+			do_batch = 1;
+		}
+
+		if (do_batch)
+		{
+			glDrawArrays(GL_TRIANGLES, vertexOffset, batch_verts);
+
+			std3D_SetRasterState(pRasterState);
+			std3D_SetBlendState(pStage, pBlendState);
+			std3D_SetDepthStencilState(pDepthStencilState, ignoreZStates);
+			std3D_SetTextureState(pStage, pTexState);
+			std3D_SetLightingState(pStage, pLightState);
+			std3D_SetTexture(pStage, pRasterState->geoMode == RD_GEOMODE_TEXTURED ? pTexState->pTexture : NULL);
+
+			glUniformMatrix4fv(pStage->uniform_mvp, 1, GL_FALSE, (float*)&pDrawCall->state.proj);
+			glUniformMatrix4fv(pStage->uniform_modelMatrix, 1, GL_FALSE, (float*)&pDrawCall->state.modelView);
+
+			// if the projection matrix changed then all lighting is invalid, rebuild clusters and assign lights
+			// perhaps all of this would be better if we just flushed the pipeline on matrix change instead
+			if (rdMatrix_Compare44(&lastState.proj, &pDrawCall->state.proj) != 0)
+			{
+				oldProj = pDrawCall->state.proj;
+				clusterFrustumFrame++;
+				clustersDirty = 1;
+				std3D_BuildClusters(&pDrawCall->state.proj);
+				glUniform2f(pStage->uniform_clusterTileSizes, (float)tileSizeX, (float)tileSizeY);
+				glUniform2f(pStage->uniform_clusterScaleBias, sliceScalingFactor, sliceBiasFactor);
+			}
+
+			last_tex = texid;
+			last_mat = pDrawCall->state.modelView;
+			last_proj = pDrawCall->state.proj;
+			lastState = pDrawCall->state;
+
+			vertexOffset += batch_verts;
+			batch_verts = 0;
+
+			do_batch = 0;
+		}
+
+		batch_verts += pDrawCall->numVertices;
+	}
+
+	if (batch_verts)
+		glDrawArrays(GL_TRIANGLES, vertexOffset, batch_verts);
+}
+
+void std3D_FlushDrawCalls()
+{
+	if (Main_bHeadless) return;
 
 	GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 //, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3
 #ifdef VIEW_SPACE_GBUFFER
@@ -5291,110 +5498,25 @@ void std3D_FlushDrawCalls()
 	glActiveTexture(GL_TEXTURE0 + 5);
 	glBindTexture(GL_TEXTURE_BUFFER, cluster_tbo);
 	
-	std3D_DrawCall* pDrawCall = &GL_tmpDrawCalls[0];
-	std3D_RasterState* pRasterState = &pDrawCall->state.raster;
-	std3D_BlendState* pBlendState = &pDrawCall->state.blend;
-	std3D_DepthStencilState* pDepthStencilState = &pDrawCall->state.depthStencil;
-	std3D_TextureState* pTexState = &pDrawCall->state.texture;
-	std3D_LightingState* pLightState = &pDrawCall->state.lighting;
-
-	std3D_DrawCallState lastState = pDrawCall->state;
-
-	int lastPermutation = std3D_StatePermutation(&pDrawCall->state);
-	std3D_worldStage* pStage = &worldStages[lastPermutation];
-	std3D_BindStage(pStage);
-	glBufferData(GL_ARRAY_BUFFER, GL_tmpDrawCallVerticesAmt * sizeof(D3DVERTEX), GL_tmpDrawCallVerticesSorted, GL_STREAM_DRAW);
-
-	int last_tex = pTexState->pTexture ? pTexState->pTexture->texture_id : blank_tex_white;
-	std3D_SetRasterState(pRasterState);
-	std3D_SetBlendState(pStage, pBlendState);
-	std3D_SetDepthStencilState(pDepthStencilState);
-	std3D_SetTextureState(pStage, pTexState);
-	std3D_SetLightingState(pStage, pLightState);
-	std3D_SetTexture(pStage, pRasterState->geoMode == RD_GEOMODE_TEXTURED ? pTexState->pTexture : NULL);
-
-	rdMatrix44 last_mat = pDrawCall->state.modelView;
-	rdMatrix44 last_proj = pDrawCall->state.proj;
-	glUniformMatrix4fv(pStage->uniform_mvp, 1, GL_FALSE, (float*)&pDrawCall->state.proj);
-	glUniformMatrix4fv(pStage->uniform_modelMatrix, 1, GL_FALSE, (float*)&pDrawCall->state.modelView);
-
-	int do_batch = 0;
-	int batch_verts = 0;
-	int vertexOffset = 0;
-	for (int j = 0; j < GL_tmpDrawCallAmt; j++)
+	for (int j = 0; j < 2; ++j)
 	{
-		pDrawCall = &GL_tmpDrawCalls[j];
-		pRasterState = &pDrawCall->state.raster;
-		pBlendState = &pDrawCall->state.blend;
-		pDepthStencilState = &pDrawCall->state.depthStencil;
-		pTexState = &pDrawCall->state.texture;
-		pLightState = &pDrawCall->state.lighting;
-
-		int texid = pTexState->pTexture ? pTexState->pTexture->texture_id : blank_tex_white;
-		if (last_tex != texid
-			//|| memcmp(&lastState, &pDrawCall->state, sizeof(std3D_DrawCallState)) != 0
-			|| memcmp(&lastState.raster, &pDrawCall->state.raster, sizeof(std3D_RasterState)) != 0
-			|| memcmp(&lastState.blend, &pDrawCall->state.blend, sizeof(std3D_BlendState)) != 0
-			|| memcmp(&lastState.depthStencil, &pDrawCall->state.depthStencil, sizeof(std3D_DepthStencilState)) != 0
-			|| memcmp(&lastState.texture, &pDrawCall->state.texture, sizeof(std3D_TextureState)) != 0
-			|| memcmp(&lastState.lighting, &pDrawCall->state.lighting, sizeof(std3D_LightingState)) != 0
-			|| rdMatrix_Compare44(&lastState.modelView, &pDrawCall->state.modelView) != 0
-			|| rdMatrix_Compare44(&lastState.proj, &pDrawCall->state.proj) != 0
-		)
+		for (int i = 0; i < DRAW_LIST_COUNT; ++i)
 		{
-			do_batch = 1;
-		}
-
-		if(do_batch)
-		{
-			glDrawArrays(GL_TRIANGLES, vertexOffset, batch_verts);
-
-			int permutation = std3D_StatePermutation(&pDrawCall->state);
-			if (permutation != lastPermutation)
+			std3D_worldStage* pStage = &worldStages[i];
+			int ignoreZStates = 0;
+			if (i == DRAW_LIST_COLOR || i == DRAW_LIST_COLOR_UNLIT)
 			{
-				pStage = &worldStages[permutation];
-				std3D_BindStage(pStage);
-				lastPermutation = permutation;
+				ignoreZStates = 1; // color list ignores depth state since it was handled in the zprepass
+				glDepthMask(GL_FALSE);
+				glDepthFunc(GL_EQUAL);
 			}
-
-			std3D_SetRasterState(pRasterState);
-			std3D_SetBlendState(pStage, pBlendState);
-			std3D_SetDepthStencilState(pDepthStencilState);
-			std3D_SetTextureState(pStage, pTexState);
-			std3D_SetLightingState(pStage, pLightState);
-			std3D_SetTexture(pStage, pRasterState->geoMode == RD_GEOMODE_TEXTURED ? pTexState->pTexture : NULL);
-
-			glUniformMatrix4fv(pStage->uniform_mvp, 1, GL_FALSE, (float*)&pDrawCall->state.proj);
-			glUniformMatrix4fv(pStage->uniform_modelMatrix, 1, GL_FALSE, (float*)&pDrawCall->state.modelView);
-
-			// if the projection matrix changed then all lighting is invalid, rebuild clusters and assign lights
-			// perhaps all of this would be better if we just flushed the pipeline on matrix change instead
-			if(rdMatrix_Compare44(&lastState.proj, &pDrawCall->state.proj) != 0)
-			{
-				oldProj = pDrawCall->state.proj;
-				clusterFrustumFrame++;
-				clustersDirty = 1;
-				std3D_BuildClusters(&pDrawCall->state.proj);
-				glUniform2f(pStage->uniform_clusterTileSizes, (float)tileSizeX, (float)tileSizeY);
-				glUniform2f(pStage->uniform_clusterScaleBias, sliceScalingFactor, sliceBiasFactor);
-			}
-
-			last_tex = texid;
-			last_mat = pDrawCall->state.modelView;
-			last_proj = pDrawCall->state.proj;
-			lastState = pDrawCall->state;
-
-			vertexOffset += batch_verts;
-			batch_verts = 0;
-
-			do_batch = 0;
+			std3D_FlushDrawCallList(pStage, &std3D_drawCallLists[j][i], std3D_drawCallSortFuncs[i], ignoreZStates);
 		}
-	
-		batch_verts += pDrawCall->numVertices;
+		glDepthMask(GL_TRUE);
+		glClear(GL_DEPTH_BUFFER_BIT);
 	}
 
-	if (batch_verts)
-		glDrawArrays(GL_TRIANGLES, vertexOffset, batch_verts);
+	std3D_ResetDrawCalls();
 
 	glBindVertexArray(vao);
 
@@ -5404,7 +5526,6 @@ void std3D_FlushDrawCalls()
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
 	glDisable(GL_STENCIL_TEST);
-	std3D_ResetDrawCalls();
 }
 
 void std3D_ClearLights()
@@ -5533,31 +5654,6 @@ int std3D_ComputeBoundingBox(const rdVector3* Center, float Radius, rdMatrix44* 
 	return clipped;
 }
 
-void screen2View(rdVector4* out, rdMatrix44* projInv, rdVector4* screen)
-{
-	rdVector4 ndc;
-	ndc.x = 2.0 * (screen->x / (float)Window_xSize) - 1.0;
-	ndc.y = 2.0 * (screen->y / (float)Window_ySize) - 1.0;
-	ndc.z = 1.0;//screen->z;
-	ndc.w = 1.0;
-
-	rdMatrix_TransformPoint44(out, &ndc, projInv);
-	rdVector_Scale4Acc(out, 1.0f / out->w);
-}
-
-void lineIntersectionWithZPlane(rdVector3* out, rdVector3* startPoint, rdVector3* endPoint, float zDistance)
-{
-	rdVector3 direction;
-	rdVector_Sub3(&direction, endPoint, startPoint);
-	rdVector3 normal = { 0.0, 1.0, 0.0}; // plane normal
-
-	// skip check if the line is parallel to the plane.
-
-	float t = (zDistance - rdVector_Dot3(&normal, startPoint)) / rdVector_Dot3(&normal, &direction);
-	rdVector_Copy3(out, startPoint);
-	rdVector_MultAcc3(out, &direction, t); // the parametric form of the line equation
-}
-
 void std3D_BuildClusterFrustum(rdClipFrustum* pClip, int x, int y, int z, rdMatrix44* pProjection, float znear, float zfar)
 {
 	float minZ = (float)(z + 0) / (float)CLUSTER_GRID_SIZE_Z;
@@ -5590,7 +5686,7 @@ void std3D_AssignItemToClusters(int itemIndex, rdVector3* pPosition, float radiu
 {
 	// use a tight screen space bounding rect to determine which tiles the item needs to be assigned to
 	rdVector4 rect;
-	int clipped = std3D_ComputeBoundingBox(pPosition, radius, pProjection, znear, &rect);
+	int clipped = std3D_ComputeBoundingBox(pPosition, radius, pProjection, znear, &rect); // todo: this seems to be a bit expensive, would it be better to use a naive box?
 	if (rect.x < rect.z && rect.y < rect.w)
 	{
 		// linear depth for near and far edges of the light
@@ -5598,9 +5694,6 @@ void std3D_AssignItemToClusters(int itemIndex, rdVector3* pPosition, float radiu
 		float zMax = fmax(0.0f, (pPosition->y + radius));
 
 		// non linear depth distribution
-		//int zStartIndex = (int)fmax(0.0f, (logf(fabs(zMin) / znear) * CLUSTER_GRID_SIZE_Z) / logf(zfar / znear));
-		//int zEndIndex = (int)fmax(0.0f, (logf(fabs(zMax) / znear) * CLUSTER_GRID_SIZE_Z) / logf(zfar / znear));
-
 		int zStartIndex = (int)floorf(fmax(0.0f, logf(zMin) * sliceScalingFactor + sliceBiasFactor));
 		int zEndIndex = (int)ceilf(fmax(0.0f, logf(zMax) * sliceScalingFactor + sliceBiasFactor));
 
@@ -5639,6 +5732,7 @@ void std3D_AssignItemToClusters(int itemIndex, rdVector3* pPosition, float radiu
 					if(std3D_clusterFrustumsFrame[clusterID] != clusterFrustumFrame)
 						std3D_BuildClusterFrustum(&std3D_clusterFrustums[clusterID], x, y, z, pProjection, znear, zfar);
 
+					// todo: optimize this, it's a bit slow
 					if(rdClip_SphereInFrustrum(&std3D_clusterFrustums[clusterID], pPosition, radius) != 2)
 					{
 						const uint32_t bucket_index = itemIndex / 32;
