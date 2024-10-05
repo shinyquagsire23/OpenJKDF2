@@ -284,32 +284,6 @@ vec4 bilinear_paletted_light(vec2 uv, float index)
 }
 #endif
 
-#ifdef GPU_LIGHTING
-struct light
-{
-	vec4  position;
-	vec4  direction_intensity;
-	vec4  color;
-	int   type;
-	uint  isActive;
-	float falloffMin;
-	float falloffMax;
-	float angleX;
-	float cosAngleX;
-	float angleY;
-	float cosAngleY;
-	float lux;
-	float padding0;
-	float padding1;
-};
-
-uniform int numLights;
-uniform lightBlock
-{
-	light lights[128];
-};
-#endif
-
 void main(void)
 {
     vec2 adj_texcoords = f_uv.xy;
@@ -426,10 +400,6 @@ void main(void)
     vec4 main_color = (sampled_color * vertex_color);
 #ifdef CLASSIC_EMISSIVE
 	main_color.rgb = max(main_color.rgb, emissive.rgb);
-#endif
-
-#ifdef GPU_LIGHTING
-	//color_add_emiss.xyz += max(vec3(0.0), main_color.xyz - 1.0);
 #endif
 
     vec4 effectAdd_color = vec4(colorEffects_add.r, colorEffects_add.g, colorEffects_add.b, 0.0);
