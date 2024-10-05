@@ -368,15 +368,15 @@ int rdParticle_Draw(rdThing* thing, rdMatrix34* mat)
 	for(int j = 0; j < particle->numVertices; ++j)
 	{
 #ifdef PARTICLE_LIGHTS
-		//if (thing->parentSithThing->light > 0.0001f)
-		//{
-		//	rdLight light;
-		//	rdLight_NewEntry(&light);
-		//	light.falloffMin = 0.01f;
-		//	light.intensity = thing->parentSithThing->light * 8.0f;
-		//	rdMaterial_GetFillColor(&light.color, particle->material, rdColormap_pCurMap, particle->vertexCel[v32], -1);
-		//	//rdCache_DrawLight(&light, &particle->vertices[v32]);
-		//}
+		if (thing->parentSithThing->light > 0.0001f)
+		{
+			rdLight light;
+			rdLight_NewEntry(&light);
+			light.falloffMin = 0.01f;
+			light.intensity = thing->parentSithThing->light * 8.0f;
+			rdMaterial_GetFillColor(&light.color, particle->material, rdColormap_pCurMap, particle->vertexCel[j], -1);
+			rdAddLight(&light, &particle->vertices[j]);
+		}
 #endif
 
 		rdBindMaterial(particle->material, particle->vertexCel[j]);
