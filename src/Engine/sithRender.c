@@ -764,7 +764,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
         int safeguard = 0;
         while ( thing )
         {
-            if ( lightIdx >= 0x20 )
+            if ( lightIdx >= SITHREND_NUM_LIGHTS)
                 break;
 
             // Added
@@ -796,7 +796,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
                     lightIdx = ++sithRender_numLights;
                 }
 
-                if ( (thing->type == SITH_THING_ACTOR || thing->type == SITH_THING_PLAYER) && lightIdx < 0x20 )
+                if ( (thing->type == SITH_THING_ACTOR || thing->type == SITH_THING_PLAYER) && lightIdx < SITHREND_NUM_LIGHTS)
                 {
                     if ( (thing->actorParams.typeflags & SITH_AF_FIELDLIGHT) != 0 && thing->actorParams.lightIntensity > 0.0 )
                     {
@@ -2114,7 +2114,7 @@ void sithRender_UpdateLights(sithSector *sector, float prev, float dist, int dep
         return;
 
     sector->renderTick = sithRender_lastRenderTick;
-    if ( prev < 2.0 && sithRender_numLights < 0x20)
+    if ( prev < 2.0 && sithRender_numLights < SITHREND_NUM_LIGHTS)
     {
         int safeguard = 0;
         for ( i = sector->thingsList; i; i = i->nextThing )
@@ -2124,7 +2124,7 @@ void sithRender_UpdateLights(sithSector *sector, float prev, float dist, int dep
                 break;
             }
 
-            if ( sithRender_numLights >= 0x20 )
+            if ( sithRender_numLights >= SITHREND_NUM_LIGHTS)
                 break;
 
             if ((i->thingflags & SITH_TF_LIGHT) 
@@ -2140,7 +2140,7 @@ void sithRender_UpdateLights(sithSector *sector, float prev, float dist, int dep
                     ++sithRender_numLights;
                 }
 
-                if ( (i->type == SITH_THING_ACTOR || i->type == SITH_THING_PLAYER) && sithRender_numLights < 0x20 )
+                if ( (i->type == SITH_THING_ACTOR || i->type == SITH_THING_PLAYER) && sithRender_numLights < SITHREND_NUM_LIGHTS)
                 {
                     // Actors all have a small amount of light
                     if ( (i->actorParams.typeflags & SITH_AF_FIELDLIGHT) && i->actorParams.lightIntensity > 0.0 )

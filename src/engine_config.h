@@ -121,7 +121,11 @@
 #if !defined(QOL_IMPROVEMENTS) || defined(TARGET_TWL)
 #define SITHREND_NUM_LIGHTS (32) // why is this different than the max in rdCamera?
 #else
+#ifdef RENDER_DROID2
+#define SITHREND_NUM_LIGHTS (1024)
+#else
 #define SITHREND_NUM_LIGHTS (64)
+#endif
 #endif
 
 // COG resource limits
@@ -234,7 +238,12 @@
 #if !defined(QOL_IMPROVEMENTS) || defined(TARGET_TWL)
 #define RDCAMERA_MAX_LIGHTS 64
 #else
+#ifdef RENDER_DROID2
+#define RDCAMERA_MAX_LIGHTS 1024
+#else
 #define RDCAMERA_MAX_LIGHTS 128
+
+#endif
 #endif
 
 #ifdef SDL2_RENDER

@@ -153,7 +153,7 @@ uniform occluderBlock
 };
 
 // todo: define outside
-#define CLUSTER_MAX_LIGHTS          128u
+#define CLUSTER_MAX_LIGHTS          1024u // match RDCAMERA_MAX_LIGHTS/SITHREND_NUM_LIGHTS
 #define CLUSTER_MAX_OCCLUDERS       128u
 #define CLUSTER_MAX_ITEMS           (CLUSTER_MAX_LIGHTS + CLUSTER_MAX_OCCLUDERS)
 #define CLUSTER_BUCKETS_PER_CLUSTER (CLUSTER_MAX_ITEMS / 32u)
