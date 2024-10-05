@@ -1078,7 +1078,7 @@ void sithRender_DrawSurface(sithSurface* surface)
 	int wallCel = surface->surfaceInfo.face.wallCel;
 	rdBindMaterial(surface->surfaceInfo.face.material, wallCel);
 
-	rdSetAmbientMode(RD_AMBIENT_NONE);
+	rdSetAmbientMode(RD_AMBIENT_COLOR);
 	if (sithRender_lightingIRMode)
 	{
 		rdAmbientLight(sithRender_f_83198C, sithRender_f_83198C, sithRender_f_83198C);
@@ -1217,7 +1217,8 @@ void sithRender_RenderLevelGeometry()
 					sithRender_aSurfaces[sithRender_numSurfaces++] = surface;
 				continue;
 			}
-			rdSortDistance(0);
+			
+			rdSortDistance(rdVector_Dist3(&sithCamera_currentCamera->vec3_1, &sithWorld_pCurrentWorld->vertices[*surface->surfaceInfo.face.vertexPosIdx]));
 			sithRender_DrawSurface(surface);
 		}
 
@@ -1263,7 +1264,7 @@ void sithRender_RenderLevelGeometry()
 			}
 
 #ifdef RGB_AMBIENT
-			if (a2.x >= 1.0 && a2.y >= 1.0 && a2.z >= 1.0)
+			if (!jkPlayer_enableShadows && a2.x >= 1.0 && a2.y >= 1.0 && a2.z >= 1.0)
 #else
 			if (a2 >= 1.0)
 #endif
