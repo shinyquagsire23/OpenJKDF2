@@ -761,6 +761,27 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
         sector->clipFrustum = frustum;
         lightIdx = sithRender_numLights;
 
+#ifdef RENDER_DROID2
+		for (int i = 0; i < sector->numSurfaces; ++i)
+		{
+			if (sector->surfaces[i].surfaceInfo.face.material && sector->surfaces[i].surfaceFlags & SITH_SURFACE_EMISSIVE)
+			{
+				sithRender_aLights[lightIdx].intensity = 0.45f; // todo: compute me from the area of the surface
+				rdMaterial_GetFillColor(&sithRender_aLights[lightIdx].color, sector->surfaces[i].surfaceInfo.face.material, sector->colormap, sector->surfaces[i].surfaceInfo.face.wallCel, -1);
+
+				rdVector3 center;
+				sithSurface_GetCenter(&sector->surfaces[i], &center);
+
+				rdVector3 offset;
+				rdVector_Scale3(&offset, &sector->surfaces[i].surfaceInfo.face.normal, 0.002f);
+				rdVector_Add3Acc(&center, &offset);
+
+				rdCamera_AddLight(rdCamera_pCurCamera, &sithRender_aLights[lightIdx], &center);
+				lightIdx = ++sithRender_numLights;
+			}
+		}
+#endif
+
         int safeguard = 0;
         while ( thing )
         {
@@ -2117,6 +2138,27 @@ void sithRender_UpdateLights(sithSector *sector, float prev, float dist, int dep
     sector->renderTick = sithRender_lastRenderTick;
     if ( prev < 2.0 && sithRender_numLights < SITHREND_NUM_LIGHTS)
     {
+#ifdef RENDER_DROID2
+		for (int i = 0; i < sector->numSurfaces; ++i)
+		{
+			if(sector->surfaces[i].surfaceInfo.face.material && sector->surfaces[i].surfaceFlags & SITH_SURFACE_EMISSIVE)
+			{
+				sithRender_aLights[sithRender_numLights].intensity = 0.45f; // todo: compute me from the area of the surface
+				rdMaterial_GetFillColor(&sithRender_aLights[sithRender_numLights].color, sector->surfaces[i].surfaceInfo.face.material, sector->colormap, sector->surfaces[i].surfaceInfo.face.wallCel, -1);
+
+				rdVector3 center;
+				sithSurface_GetCenter(&sector->surfaces[i], &center);
+
+				rdVector3 offset;
+				rdVector_Scale3(&offset, &sector->surfaces[i].surfaceInfo.face.normal, 0.002f);
+				rdVector_Add3Acc(&center, &offset);
+
+				rdCamera_AddLight(rdCamera_pCurCamera, &sithRender_aLights[sithRender_numLights], &center);
+				++sithRender_numLights;
+			}
+		}
+#endif
+
         int safeguard = 0;
         for ( i = sector->thingsList; i; i = i->nextThing )
         {
