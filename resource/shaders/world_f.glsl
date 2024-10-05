@@ -1,14 +1,11 @@
 #ifdef GL_ARB_texture_gather
-#define HAS_TEXTUREGATHER
-#endif
-
-#ifdef HAS_TEXTUREGATHER
 vec4 impl_textureGather(sampler2D tex, vec2 uv)
 {
     return textureGather(tex, uv);
 }
 #else
-float modI(float a,float b) {
+float modI(float a,float b)
+{
     float m=a-floor((a+0.5)/b)*b;
     return floor(m+0.5);
 }
@@ -34,6 +31,24 @@ vec4 impl_textureGather(sampler2D tex, vec2 uv)
         texelFetch(tex,base+ivec2(1,0),0).x,
         texelFetch(tex,base+ivec2(0,0),0).x
     );
+}
+#endif
+
+// if we don't have native support for findLSB (necessary for the clustered bit scan), implement it
+#ifndef GL_ARB_gpu_shader5
+uint bitCount(uint n)
+{
+    n = ((0xaaaaaaaau & n) >>  1) + (0x55555555u & n);
+    n = ((0xccccccccu & n) >>  2) + (0x33333333u & n);
+    n = ((0xf0f0f0f0u & n) >>  4) + (0x0f0f0f0fu & n);
+    n = ((0xff00ff00u & n) >>  8) + (0x00ff00ffu & n);
+    n = ((0xffff0000u & n) >> 16) + (0x0000ffffu & n);
+    return n;
+}
+
+int findLSB(uint x)
+{
+	return (x == 0u) ? -1 : int(bitCount(~x & (x - 1u)));
 }
 #endif
 
@@ -162,23 +177,6 @@ uint compute_cluster_index(vec2 pixel_pos, float screen_depth)
     uvec3 indices = uvec3(uvec2(pixel_pos.xy / clusterTileSizes.xy), z_index);
     uint cluster = indices.x + indices.y * CLUSTER_GRID_SIZE_X + indices.z * CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y;
     return cluster;
-}
-
-// not available in GL < 4.0
-// pretty naive approach, can do better
-int findLSB(uint x)
-{
-	int res = -1;
-	for (uint i = 0u; i < 32u; i++)
-	{
-		uint mask = 1u << i;
-		if ((x & mask) == mask)
-		{
-			res = int(i);
-			break;
-		}
-	}
-	return res;
 }
 
 // https://seblagarde.wordpress.com/2014/12/01/inverse-trigonometric-functions-gpu-optimization-for-amd-gcn-architecture/
@@ -382,7 +380,7 @@ void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, inout vec
 		{
 			uint bucket_bit_index = uint(findLSB(bucket_bits));
 			uint light_index = bucket * 32u + bucket_bit_index;
-			bucket_bits ^= uint(1 << bucket_bit_index);
+			bucket_bits ^= (1u << bucket_bit_index);
 				
 			if (light_index >= first_item && light_index <= last_item)
 			{
@@ -444,7 +442,7 @@ vec3 CalculateIndirectShadows(uint bucket_index, vec3 pos, vec3 normal)
 		{
 			uint bucket_bit_index = uint(findLSB(bucket_bits));
 			uint occluder_index = bucket * 32u + bucket_bit_index;
-			bucket_bits ^= uint(1 << bucket_bit_index);
+			bucket_bits ^= (1u << bucket_bit_index);
 			
 			if (occluder_index >= first_item && occluder_index <= last_item && shadowing > 5.0 / 255.0)
 			{
