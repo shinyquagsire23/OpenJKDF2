@@ -4941,6 +4941,7 @@ void std3D_DrawOccluder(rdVector3* position, float radius, rdVector3* verts)
 // todo: indexing
 #define STD3D_MAX_DRAW_CALLS 8192
 #define STD3D_MAX_DRAW_CALL_VERTS (STD3D_MAX_DRAW_CALLS * 64)
+#define STD3D_MAX_DRAW_LAYERS 2
 
 typedef struct std3D_DrawCallList
 {
@@ -4956,7 +4957,7 @@ int std3D_DrawCallCompareDepth(std3D_DrawCall* a, std3D_DrawCall* b);
 typedef int(*std3D_SortFunc)(std3D_DrawCall*, std3D_DrawCall*);
 
 // [draw layers][draw lists]
-static std3D_DrawCallList std3D_drawCallLists[2][DRAW_LIST_COUNT];
+static std3D_DrawCallList std3D_drawCallLists[STD3D_MAX_DRAW_LAYERS][DRAW_LIST_COUNT];
 static std3D_SortFunc std3D_drawCallSortFuncs[DRAW_LIST_COUNT] =
 {
 	std3D_DrawCallCompareSortKey, // z sort by state
@@ -4972,7 +4973,7 @@ int std3D_HasDepthWrites(std3D_DrawCallState* pState)
 	return pState->depthStencil.zmethod == RD_ZBUFFER_READ_WRITE || pState->depthStencil.zmethod == RD_ZBUFFER_NOREAD_WRITE;
 }
 
-int std3D_StatePermutation(std3D_DrawCallState* pState)
+int std3D_RenderListForState(std3D_DrawCallState* pState)
 {
 	int lighting = pState->lighting.lightMode >= RD_LIGHTMODE_DIFFUSE;
 
@@ -5077,21 +5078,26 @@ void std3D_AddDrawCall(std3D_DrawCallState* pDrawCallState, D3DVERTEX* paVertice
 	if (Main_bHeadless)
 		return;
 
-	int drawLayer = stdMath_ClampInt(pDrawCallState->drawLayer, 0, 1);
+	int drawLayer = stdMath_ClampInt(pDrawCallState->drawLayer, 0, STD3D_MAX_DRAW_LAYERS - 1);
 
-	// figure out which list we want to draw to
-	int listIndex = std3D_StatePermutation(pDrawCallState);
-	std3D_AddListDrawCall(&std3D_drawCallLists[drawLayer][listIndex], pDrawCallState, paVertices, numVertices);
-
-	// for non-blended, add to the z-prepass
+	// add to z-prepass if applicable
 	int writesZ = pDrawCallState->depthStencil.zmethod == RD_ZBUFFER_READ_WRITE || pDrawCallState->depthStencil.zmethod == RD_ZBUFFER_NOREAD_WRITE;
 	if (pDrawCallState->blend.blendMode == RD_BLEND_MODE_NONE && writesZ)
+	{
 		std3D_AddZListDrawCall(&std3D_drawCallLists[drawLayer][pDrawCallState->texture.alphaTest], pDrawCallState, paVertices, numVertices);
+
+		// the forward pass can now do a simple equal test with no writes
+		pDrawCallState->depthStencil.zcompare = RD_COMPARE_EQUAL;
+		pDrawCallState->depthStencil.zmethod = RD_ZBUFFER_READ_NOWRITE;
+	}
+
+	int listIndex = std3D_RenderListForState(pDrawCallState);
+	std3D_AddListDrawCall(&std3D_drawCallLists[drawLayer][listIndex], pDrawCallState, paVertices, numVertices);
 }
 
 void std3D_ResetDrawCalls()
 {
-	for(int j = 0; j < 2; ++j)
+	for(int j = 0; j < STD3D_MAX_DRAW_LAYERS; ++j)
 	{
 		for (int i = 0; i < DRAW_LIST_COUNT; ++i)
 		{
@@ -5231,48 +5237,41 @@ int std3D_SetBlendState(std3D_worldStage* pStage, std3D_BlendState* pBlendState)
 		glUniform1i(pStage->uniform_blend_mode, D3DBLEND_SRCALPHA);
 }
 
-void std3D_SetDepthStencilState(std3D_DepthStencilState* pDepthStencilState, int ignoreComparisonState)
+void std3D_SetDepthStencilState(std3D_DepthStencilState* pDepthStencilState)
 {
 	if (pDepthStencilState->zmethod == RD_ZBUFFER_NOREAD_NOWRITE)
 	{
 		glDisable(GL_DEPTH_TEST);
-		if (!ignoreComparisonState)
-			glDepthMask(GL_FALSE);
+		glDepthMask(GL_FALSE);
 	}
 	else if (pDepthStencilState->zmethod == RD_ZBUFFER_READ_NOWRITE)
 	{
 		glEnable(GL_DEPTH_TEST);
-		if (!ignoreComparisonState)
-			glDepthMask(GL_FALSE);
+		glDepthMask(GL_FALSE);
 	}
 	else if (pDepthStencilState->zmethod == RD_ZBUFFER_NOREAD_WRITE)
 	{
 		glDisable(GL_DEPTH_TEST);
-		if (!ignoreComparisonState)
-			glDepthMask(GL_TRUE);
+		glDepthMask(GL_TRUE);
 	}
 	else
 	{
 		glEnable(GL_DEPTH_TEST);
-		if(!ignoreComparisonState)
-			glDepthMask(GL_TRUE);
+		glDepthMask(GL_TRUE);
 	}
 
-	if(!ignoreComparisonState)
+	static const GLuint gl_compares[] =
 	{
-		static const GLuint gl_compares[] =
-		{
-			GL_ALWAYS,
-			GL_LESS,
-			GL_LEQUAL,
-			GL_GREATER,
-			GL_GEQUAL,
-			GL_EQUAL,
-			GL_NOTEQUAL,
-			GL_NEVER
-		};
-		glDepthFunc(gl_compares[pDepthStencilState->zcompare]);
-	}
+		GL_ALWAYS,
+		GL_LESS,
+		GL_LEQUAL,
+		GL_GREATER,
+		GL_GEQUAL,
+		GL_EQUAL,
+		GL_NOTEQUAL,
+		GL_NEVER
+	};
+	glDepthFunc(gl_compares[pDepthStencilState->zcompare]);
 }
 
 void std3D_SetTextureState(std3D_worldStage* pStage, std3D_TextureState* pTexState)
@@ -5346,7 +5345,7 @@ void std3D_BindStage(std3D_worldStage* pStage)
 // todo/fixme: we're not currently handling viewport changes mid-draw
 static rdMatrix44 oldProj; // keep track of the global projection to avoid redundant cluster building if the matrix doesn't change over the course of several frames
 
-void std3D_FlushDrawCallList(std3D_worldStage* pStage, std3D_DrawCallList* pList, std3D_SortFunc sortFunc, int ignoreZStates)
+void std3D_FlushDrawCallList(std3D_worldStage* pStage, std3D_DrawCallList* pList, std3D_SortFunc sortFunc)
 {
 	if (!pList->drawCallCount)
 		return;
@@ -5387,7 +5386,7 @@ void std3D_FlushDrawCallList(std3D_worldStage* pStage, std3D_DrawCallList* pList
 	int last_tex = pTexState->pTexture ? pTexState->pTexture->texture_id : blank_tex_white;
 	std3D_SetRasterState(pRasterState);
 	std3D_SetBlendState(pStage, pBlendState);
-	std3D_SetDepthStencilState(pDepthStencilState, ignoreZStates);
+	std3D_SetDepthStencilState(pDepthStencilState);
 	std3D_SetTextureState(pStage, pTexState);
 	std3D_SetLightingState(pStage, pLightState);
 	std3D_SetTexture(pStage, pRasterState->geoMode == RD_GEOMODE_TEXTURED ? pTexState->pTexture : NULL);
@@ -5430,7 +5429,7 @@ void std3D_FlushDrawCallList(std3D_worldStage* pStage, std3D_DrawCallList* pList
 
 			std3D_SetRasterState(pRasterState);
 			std3D_SetBlendState(pStage, pBlendState);
-			std3D_SetDepthStencilState(pDepthStencilState, ignoreZStates);
+			std3D_SetDepthStencilState(pDepthStencilState);
 			std3D_SetTextureState(pStage, pTexState);
 			std3D_SetLightingState(pStage, pLightState);
 			std3D_SetTexture(pStage, pRasterState->geoMode == RD_GEOMODE_TEXTURED ? pTexState->pTexture : NULL);
@@ -5498,19 +5497,12 @@ void std3D_FlushDrawCalls()
 	glActiveTexture(GL_TEXTURE0 + 5);
 	glBindTexture(GL_TEXTURE_BUFFER, cluster_tbo);
 	
-	for (int j = 0; j < 2; ++j)
+	for (int j = 0; j < STD3D_MAX_DRAW_LAYERS; ++j)
 	{
 		for (int i = 0; i < DRAW_LIST_COUNT; ++i)
 		{
 			std3D_worldStage* pStage = &worldStages[i];
-			int ignoreZStates = 0;
-			if (i == DRAW_LIST_COLOR || i == DRAW_LIST_COLOR_UNLIT)
-			{
-				ignoreZStates = 1; // color list ignores depth state since it was handled in the zprepass
-				glDepthMask(GL_FALSE);
-				glDepthFunc(GL_EQUAL);
-			}
-			std3D_FlushDrawCallList(pStage, &std3D_drawCallLists[j][i], std3D_drawCallSortFuncs[i], ignoreZStates);
+			std3D_FlushDrawCallList(pStage, &std3D_drawCallLists[j][i], std3D_drawCallSortFuncs[i]);
 		}
 		glDepthMask(GL_TRUE);
 		glClear(GL_DEPTH_BUFFER_BIT);

@@ -779,7 +779,7 @@ void main(void)
 
     if (blend_mode == D3DBLEND_INVSRCALPHA)
     {
-	#ifdef ALPHA_DISCARD
+	#ifdef ALPHA_BLEND
         if (vertex_color.a < 0.01) {
             discard;
         }
@@ -870,7 +870,7 @@ void main(void)
     float should_write_normals = 1.0;
     float orig_alpha = main_color.a;
 
-#ifdef ALPHA_DISCARD
+#ifdef ALPHA_BLEND
     if (main_color.a < 0.01 && sampledEmiss.r == 0.0 && sampledEmiss.g == 0.0 && sampledEmiss.b == 0.0) {
         discard;
     }
