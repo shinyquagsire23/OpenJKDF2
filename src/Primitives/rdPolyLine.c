@@ -367,6 +367,8 @@ void rdPolyLine_DrawFace(rdThing* thing, rdFace* face, rdVector3* unused, rdVert
 		curTextureMode_ = rdroid_curTextureMode;
 	rdSetTexMode(curTextureMode_);
 
+	rdSetCullMode(RD_CULL_MODE_NONE);
+
 #ifdef RGB_AMBIENT
 	if (rdroid_curRenderOptions & 2)
 		rdAmbientLight(rdCamera_pCurCamera->ambientLight.x, rdCamera_pCurCamera->ambientLight.y, rdCamera_pCurCamera->ambientLight.z);
