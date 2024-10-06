@@ -1664,7 +1664,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
 				rdColor4f(red[j], green[j], blue[j], alpha);
 			}
 
-			if(face->vertexUVIdx)
+			if(face->vertexUVIdx && pCurMesh->vertexUVs)
 			{
 				int uvidx = face->vertexUVIdx[j];
 				rdVector2* uv = &pCurMesh->vertexUVs[uvidx];
