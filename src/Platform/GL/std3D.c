@@ -207,6 +207,7 @@ typedef struct std3D_occluder
 } std3D_occluder;
 
 int occludersDirty = 0;
+unsigned int firstOccluder = 0;
 unsigned int numOccluders = 0;
 static std3D_occluder tmpOccluders[CLUSTER_MAX_OCCLUDERS];
 
@@ -225,6 +226,7 @@ typedef struct std3D_decal
 	float           padding1;
 } std3D_decal;
 int decalsDirty = 0;
+unsigned int firstDecal = 0;
 unsigned int numDecals = 0;
 static std3D_decal tmpDecals[CLUSTER_MAX_DECALS];
 
@@ -289,8 +291,8 @@ typedef struct std3D_worldStage
 #endif
 	GLuint uniform_lightbuf, uniform_clusterScaleBias, uniform_clusterTileSizes;
 	GLuint uniform_lights, uniform_numLights;
-	GLuint uniform_occluders, uniform_numOccluders;
-	GLuint uniform_decals, uniform_numDecals;
+	GLuint uniform_occluders, uniform_numOccluders, uniform_firstOccluder;
+	GLuint uniform_decals, uniform_numDecals, uniform_firstDecal;
 	GLuint vao;
 #endif
 } std3D_worldStage;
@@ -1116,8 +1118,9 @@ int std3D_loadWorldStage(std3D_worldStage* pStage, int isZPass, const char* defi
 #endif
 	pStage->uniform_numLights = std3D_tryFindUniform(pStage->program, "numLights");
 	pStage->uniform_numOccluders = std3D_tryFindUniform(pStage->program, "numOccluders");
+	pStage->uniform_firstOccluder = std3D_tryFindUniform(pStage->program, "firstOccluder");
 	pStage->uniform_numDecals = std3D_tryFindUniform(pStage->program, "numDecals");
-
+	pStage->uniform_firstDecal = std3D_tryFindUniform(pStage->program, "firstDecal");
 	pStage->uniform_lightbuf = std3D_tryFindUniform(pStage->program, "clusterBuffer");
 	pStage->uniform_clusterTileSizes = std3D_tryFindUniform(pStage->program, "clusterTileSizes");
 	pStage->uniform_clusterScaleBias = std3D_tryFindUniform(pStage->program, "clusterScaleBias");
@@ -5411,9 +5414,11 @@ void std3D_BindStage(std3D_worldStage* pStage)
 	glUniform1i(pStage->uniform_numLights, numLights);
 
 	glBindBufferBase(GL_UNIFORM_BUFFER, 1, occluder_ubo);
+	glUniform1i(pStage->uniform_firstOccluder, firstOccluder);
 	glUniform1i(pStage->uniform_numOccluders, numOccluders);
 
 	glBindBufferBase(GL_UNIFORM_BUFFER, 2, decal_ubo);
+	glUniform1i(pStage->uniform_firstDecal, firstDecal);
 	glUniform1i(pStage->uniform_numDecals, numDecals);
 
 	glUniform1i(pStage->uniform_tex_mode, TEX_MODE_TEST);
@@ -5669,7 +5674,7 @@ int std3D_AddLight(rdLight* light, rdVector3* position)
 	light3d->color.x = light->color.x;
 	light3d->color.y = light->color.y;
 	light3d->color.z = light->color.z;
-	light3d->color.w = 0;
+	light3d->color.w = fmin(light->color.x, fmin(light->color.y, light->color.z));
 #ifdef JKM_LIGHTING
 	light3d->angleX = light->angleX;
 	light3d->cosAngleX = light->cosAngleX;
@@ -6050,15 +6055,17 @@ void std3D_BuildClusters(rdMatrix44* pProjection)
 	}
 
 	// assign occluders
+	firstOccluder = numLights;
 	for (int i = 0; i < numOccluders; ++i)
 	{
-		std3D_AssignItemToClusters(CLUSTER_MAX_LIGHTS + i, (rdVector3*)&tmpOccluders[i].position, tmpOccluders[i].position.w, pProjection, znear, zfar);
+		std3D_AssignItemToClusters(firstOccluder + i, (rdVector3*)&tmpOccluders[i].position, tmpOccluders[i].position.w, pProjection, znear, zfar);
 	}
 
 	// assign decals
+	firstDecal = firstOccluder + numOccluders;
 	for (int i = 0; i < numDecals; ++i)
 	{
-		std3D_AssignItemToClusters(CLUSTER_MAX_LIGHTS + CLUSTER_MAX_OCCLUDERS + i, (rdVector3*)&tmpDecals[i].posRad, tmpDecals[i].posRad.w, pProjection, znear, zfar);
+		std3D_AssignItemToClusters(firstDecal + i, (rdVector3*)&tmpDecals[i].posRad, tmpDecals[i].posRad.w, pProjection, znear, zfar);
 	}
 
 	// todo: map buffer instead of storing to tmp then uploading?

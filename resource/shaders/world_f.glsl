@@ -159,6 +159,7 @@ struct occluder
 	vec4 position;
 };
 
+uniform int firstOccluder;
 uniform int numOccluders;
 uniform occluderBlock
 {
@@ -178,6 +179,7 @@ struct decal
 	float padding1;
 };
 
+uniform int firstDecal;
 uniform int numDecals;
 uniform decalBlock
 {
@@ -370,24 +372,26 @@ float HalfLambert(float ndotl)
 	return ndotl * ndotl;
 }
 
+// todo: split the spotlights out
 void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, inout vec3 diffuseLight, inout vec3 specLight)
 {
 	// https://seblagarde.wordpress.com/2012/06/03/spherical-gaussien-approximation-for-blinn-phong-phong-and-fresnel/
 	// Point lights using SG approximations for consistency and a little speed
-	#define LN2DIV8               0.08664
 	#define Log2Of1OnLn2_Plus1    1.528766
 	float ModifiedSpecularPower = 1.0 / log(2.0) * 8.0;// * (2.0 / roughness - 2);//exp2(10.0 * gloss + Log2Of1OnLn2_Plus1);
 
 	vec3 reflVec = reflect(-view, normal);
 	vec4 R2 = vec4(ModifiedSpecularPower * reflVec, -ModifiedSpecularPower);
-	float specNormalization = (LN2DIV8 * ModifiedSpecularPower + 0.25);
 
+	vec3 specAcc = vec3(0);
 	float scalar = 0.4; // todo: needs to come from rdCamera_pCurCamera->attenuationMin
 
 	// debug
 	//float lightOverdraw = 0.0;
 	//int totalLights = min(numLights, 128);
 	//for(int light_index = 0; light_index < totalLights; ++light_index)
+
+	float minLum = 0.0;
 
 	uint first_item = 0u;
 	uint last_item = first_item + uint(numLights) - 1u;
@@ -402,12 +406,11 @@ void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, inout vec
 			uint light_index = bucket * 32u + bucket_bit_index;
 			bucket_bits ^= (1u << bucket_bit_index);
 				
-			if (light_index >= first_item && light_index <= last_item)
+			if (light_index >= first_item && light_index <= last_item && minLum <= 1.0) // bail when we reach white
 			{
 				//lightOverdraw += 1.0;
 
 				light l = lights[light_index];
-
 				vec3 diff = l.position.xyz - f_coord.xyz;
 
 				float len;
@@ -418,35 +421,49 @@ void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, inout vec
 				else
 					len = length(diff);
 
-				// todo: how much branching do we really want to do here?
-				if ( len < l.falloffMin )
+				if ( len >= l.falloffMin )
+					continue;
+
+				float rcpLen = 1.0 / max(len, 0.0001);
+				diff *= rcpLen;
+
+				float intensity = l.direction_intensity.w;
+				if(l.type == 3)
 				{
-					float rcpLen = 1.0 / max(len, 0.0001);
-					diff *= rcpLen;
+					float angle = dot(l.direction_intensity.xyz, diff);
+					if (angle <= l.cosAngleY)
+						continue;
 
-					float lightMagnitude = dot(normal, diff);
-					//if (lightMode > 2) // gouraud and higher use half lambert
-						//lightMagnitude = HalfLambert(lightMagnitude);
-					lightMagnitude = max(lightMagnitude, 0.0);
-
-					if ( lightMagnitude > 0.0 )
-					{
-						// this is JK's attenuation model, note it depends heavily on scalar being correct
-						float intensity = max(0.0, l.direction_intensity.w - len * scalar) * lightMagnitude;
-						//float intensity = max(0.0, (l.falloffMin - len) / l.falloffMin) * l.direction_intensity.w;
-						if(lightMode == 4)
-							specLight.xyz += intensity * l.color.xyz * exp2(dot(R2, vec4(diff, 1.0))) * specNormalization;
-						else			
-							diffuseLight.xyz += intensity * l.color.xyz;
-					}
+					if (angle < l.cosAngleX)
+                        intensity = (1.0 - (l.cosAngleX - angle) * l.lux) * intensity;
 				}
+
+				float lightMagnitude = dot(normal, diff);
+				//if (lightMode > 2) // gouraud and higher use half lambert
+						//lightMagnitude = HalfLambert(lightMagnitude);
+
+				if ( lightMagnitude <= 0.0 )
+					continue;
+
+				// this is JK's attenuation model, note it depends on scalar value matching whatever was used to calculate the intensity, it seems
+				intensity = max(0.0, intensity - len * scalar) * lightMagnitude;
+				
+				//intensity = max(0.0, (l.falloffMin - len) / l.falloffMin) * intensity;
+			
+				if(lightMode == 4)
+					specAcc.xyz += l.color.xyz * (exp2(dot(R2, vec4(diff, 1.0))) * intensity);
+				else			
+					diffuseLight.xyz += l.color.xyz * intensity;
+
+				minLum += l.color.a * intensity;
 			}
 		}
 	}
 
-	//specLight *= 0;
+	#define LN2DIV8               0.08664
+	float specNormalization = (LN2DIV8 * ModifiedSpecularPower + 0.25);
+	specLight = specAcc * specNormalization + specLight;
 
-	//uint z_index = get_cluster_z_index(f_depth);
 	//diffuseLight = temperature(lightOverdraw / 32.0);
 }
 
@@ -455,7 +472,7 @@ float CalculateIndirectShadows(uint bucket_index, vec3 pos, vec3 normal)
 	float shadowing = 1.0;
 	//float overDraw = 0.0;
 
-	uint first_item = CLUSTER_MAX_LIGHTS;
+	uint first_item = uint(firstOccluder);
 	uint last_item = first_item + uint(numOccluders) - 1u;
 	uint first_bucket = first_item / 32u;
 	uint last_bucket = min(last_item / 32u, max(0u, CLUSTER_BUCKETS_PER_CLUSTER - 1u));
@@ -478,24 +495,24 @@ float CalculateIndirectShadows(uint bucket_index, vec3 pos, vec3 normal)
 
 				vec3 direction = (occ.position.xyz - pos.xyz);
 				float len = length(occ.position.xyz - pos.xyz);
-				if (len < occ.position.w)
-				{
-					float rcpLen = 1.0 / max(len, 0.0001);
-					direction *= rcpLen;
+				if (len >= occ.position.w)
+					continue;
 
-					float cosTheta = dot(normal, direction);
-					if(cosTheta > 0.0)
-					{
-						float solidAngle = (1.0 - cos(atanFast(occ.position.w * rcpLen)));
+				float rcpLen = 1.0 / max(len, 0.0001);
+				direction *= rcpLen;
 
-						// simplified smoothstep falloff, equivalent to smoothstep(0, occ.position.w, occ.position.w - len)
-						float falloff = clamp((occ.position.w - len) / occ.position.w, 0.0, 1.0);
-						falloff = falloff * falloff * (3.0 - 2.0 * falloff);
+				float cosTheta = dot(normal, direction);
+				if(cosTheta <= 0.0)
+					continue;
 
-						float integralSolidAngle = cosTheta * solidAngle * falloff;
-						shadowing *= 1.0 - integralSolidAngle;
-					}
-				}
+				float solidAngle = (1.0 - cos(atanFast(occ.position.w * rcpLen)));
+
+				// simplified smoothstep falloff, equivalent to smoothstep(0, occ.position.w, occ.position.w - len)
+				float falloff = clamp((occ.position.w - len) / occ.position.w, 0.0, 1.0);
+				falloff = falloff * falloff * (3.0 - 2.0 * falloff);
+
+				float integralSolidAngle = cosTheta * solidAngle * falloff;
+				shadowing *= 1.0 - integralSolidAngle;
 			}
 		}
 	}
@@ -531,7 +548,7 @@ vec3 blackbody(float t)
 
 void BlendDecals(inout vec3 color, inout vec3 emissive, uint bucket_index, vec3 pos, vec3 normal)
 {
-	uint first_item = CLUSTER_MAX_LIGHTS + CLUSTER_MAX_OCCLUDERS;
+	uint first_item = uint(firstDecal);
 	uint last_item = first_item + uint(numDecals) - 1u;
 	uint first_bucket = first_item / 32u;
 	uint last_bucket = min(last_item / 32u, max(0u, CLUSTER_BUCKETS_PER_CLUSTER - 1u));
@@ -555,8 +572,6 @@ void BlendDecals(inout vec3 color, inout vec3 emissive, uint bucket_index, vec3 
 				vec3 falloff = 0.5f - abs(objectPosition.xyz);
 				if( any(lessThanEqual(falloff, vec3(0.0))) )
 					continue;
-
-				//color += dec.color.rgb;
 				
 				vec2 decalTexCoord = objectPosition.xz + 0.5;
 				decalTexCoord = decalTexCoord.xy * dec.uvScaleBias.zw + dec.uvScaleBias.xy;
