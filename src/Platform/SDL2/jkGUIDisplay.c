@@ -79,7 +79,7 @@ static jkGuiElement jkGuiDisplay_aElements[] = {
 
 	// 24
 	{ ELEMENT_TEXT,        0,            0, "GUIEXT_EN_COLORDEPTH",  3,  { 400, 160, 100, 25}, 1,  0, 0, 0, 0, 0, {0}, 0},
-	{ ELEMENT_TEXT,        0,            0, NULL,                    3,  { 536, 165, 50, 30 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
+	{ ELEMENT_TEXT,        0,            0, NULL,                    3,  { 536, 160, 50, 30 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
 	{ ELEMENT_PICBUTTON, 103,            0, NULL,                    33, { 510, 160, 24, 24 }, 1, 0, NULL, NULL, jkGuiDisplay_ColorDepthArrowButtonClickHandler, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
 	{ ELEMENT_PICBUTTON, 104,            0, NULL,                    34, { 584, 160, 24, 24 }, 1, 0, NULL, NULL, jkGuiDisplay_ColorDepthArrowButtonClickHandler, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
 
