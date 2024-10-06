@@ -414,19 +414,19 @@ void rdLookat(const rdVector3* pViewer, const rdVector3* pTarget, const rdVector
 
 void rdTranslate(const rdVector3* pTranslation)
 {
-	rdMatrix_PostTranslate44(&rdroid_matrices[rdroid_curMatrixMode], pTranslation);
+	rdMatrix_PreTranslate44(&rdroid_matrices[rdroid_curMatrixMode], pTranslation);
 	rdMatrixChanged();
 }
 
 void rdRotate(const rdVector3* pRotation)
 {
-	rdMatrix_PostRotate44(&rdroid_matrices[rdroid_curMatrixMode], pRotation);
+	rdMatrix_PreRotate44(&rdroid_matrices[rdroid_curMatrixMode], pRotation);
 	rdMatrixChanged();
 }
 
 void rdScale(const rdVector4* pScaling)
 {
-	rdMatrix_PostScale44(&rdroid_matrices[rdroid_curMatrixMode], pScaling);
+	rdMatrix_PreScale44(&rdroid_matrices[rdroid_curMatrixMode], pScaling);
 	rdMatrixChanged();
 }
 
