@@ -774,7 +774,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
 				sithSurface_GetCenter(&sector->surfaces[i], &center);
 
 				rdVector3 offset;
-				rdVector_Scale3(&offset, &sector->surfaces[i].surfaceInfo.face.normal, 0.002f);
+				rdVector_Scale3(&offset, &sector->surfaces[i].surfaceInfo.face.normal, 0.0075f);
 				rdVector_Add3Acc(&center, &offset);
 
 				rdCamera_AddLight(rdCamera_pCurCamera, &sithRender_aLights[lightIdx], &center);
@@ -2151,7 +2151,7 @@ void sithRender_UpdateLights(sithSector *sector, float prev, float dist, int dep
 				sithSurface_GetCenter(&sector->surfaces[i], &center);
 
 				rdVector3 offset;
-				rdVector_Scale3(&offset, &sector->surfaces[i].surfaceInfo.face.normal, 0.002f);
+				rdVector_Scale3(&offset, &sector->surfaces[i].surfaceInfo.face.normal, 0.0075f);
 				rdVector_Add3Acc(&center, &offset);
 
 				rdCamera_AddLight(rdCamera_pCurCamera, &sithRender_aLights[sithRender_numLights], &center);
