@@ -661,78 +661,47 @@ void rdMatrix_PostTranslate44(rdMatrix44 *out, rdVector3 *tV)
 void rdMatrix_PreScale34(rdMatrix34 *out, rdVector3 *scale)
 {
     rdMatrix34 tmp;
+	_memcpy(&tmp, &rdroid_identMatrix44, sizeof(tmp));
 
-    tmp.rvec.y = 0.0;
-    tmp.rvec.z = 0.0;
-    tmp.lvec.x = 0.0;
     tmp.rvec.x = scale->x;
     tmp.lvec.y = scale->y;
     tmp.uvec.z = scale->z;
-    tmp.scale.x = 0.0;
-    tmp.scale.y = 0.0;
-    tmp.lvec.z = 0.0;
-    tmp.uvec.x = 0.0;
-    tmp.uvec.y = 0.0;
-    tmp.scale.z = 0.0;
+
     rdMatrix_PreMultiply34(out, &tmp);
 }
 
 void rdMatrix_PreScale44(rdMatrix44 *out, rdVector4 *scale)
 {
     rdMatrix44 tmp;
+	_memcpy(&tmp, &rdroid_identMatrix44, sizeof(tmp));
 
-    tmp.vA.y = 0.0;
-    tmp.vA.z = 0.0;
-    tmp.vB.x = 0.0;
     tmp.vA.x = scale->x;
     tmp.vB.y = scale->y;
     tmp.vC.z = scale->z;
-    tmp.vD.x = 0.0;
-    tmp.vD.y = 0.0;
-    tmp.vB.z = 0.0;
-    tmp.vC.x = 0.0;
-    tmp.vC.y = 0.0;
-    tmp.vA.w = 1.0;
-    tmp.vD.z = 0.0;
+    tmp.vD.w = 1.0;
     rdMatrix_PreMultiply44(out, &tmp);
 }
 
 void rdMatrix_PostScale34(rdMatrix34 *out, rdVector3 *scale)
 {
     rdMatrix34 tmp;
+	_memcpy(&tmp, &rdroid_identMatrix44, sizeof(tmp));
 
-    tmp.rvec.y = 0.0;
-    tmp.rvec.z = 0.0;
-    tmp.lvec.x = 0.0;
     tmp.rvec.x = scale->x;
     tmp.lvec.y = scale->y;
     tmp.uvec.z = scale->z;
-    tmp.scale.x = 0.0;
-    tmp.scale.y = 0.0;
-    tmp.lvec.z = 0.0;
-    tmp.uvec.x = 0.0;
-    tmp.uvec.y = 0.0;
-    tmp.scale.z = 0.0;
     rdMatrix_PostMultiply34(out, &tmp);
 }
 
 void rdMatrix_PostScale44(rdMatrix44 *out, rdVector4 *scale)
 {
     rdMatrix44 tmp;
+	_memcpy(&tmp, &rdroid_identMatrix44, sizeof(tmp));
 
-    tmp.vA.y = 0.0;
-    tmp.vA.z = 0.0;
-    tmp.vB.x = 0.0;
     tmp.vA.x = scale->x;
     tmp.vB.y = scale->y;
     tmp.vC.z = scale->z;
-    tmp.vD.x = 0.0;
-    tmp.vD.y = 0.0;
-    tmp.vB.z = 0.0;
-    tmp.vC.x = 0.0;
-    tmp.vC.y = 0.0;
-    tmp.vA.w = 1.0;
-    tmp.vD.z = 0.0;
+    tmp.vD.w = 1.0;
     rdMatrix_PostMultiply44(out, &tmp);
 }
 
