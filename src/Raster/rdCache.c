@@ -1681,7 +1681,7 @@ void rdCache_FlushDecals()
 		}
 
 
-		std3D_DrawDecal(tex2_arr_sel, verts, &invDecalViewMatrix, &rdCache_aDecalColors[i], flags, rdCache_aDecalAngleFades[i]);
+		std3D_DrawDecal(decal->material->textures[0].texture_struct[0], tex2_arr_sel, verts, &invDecalViewMatrix, &rdCache_aDecalColors[i], flags, rdCache_aDecalAngleFades[i]);
 	}
 	rdCache_numDecals = 0;
 }

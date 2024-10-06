@@ -97,7 +97,29 @@ void rdDecal_Draw(rdThing* thing, rdMatrix34* matrix)
 		return;
 	}
 
+#ifdef RENDER_DROID2
+	rdMatrix34 mat;
+	rdMatrix_Copy34(&mat, matrix);
+
+	rdVector4 size;
+	size.x = decal->size.x * thing->decalScale.x;
+	size.y = decal->size.y * thing->decalScale.y;
+	size.z = decal->size.z * thing->decalScale.z;
+	size.w = 1;
+	//rdMatrix_PreScale34(&mat, &size);
+
+	//rdMatrix_PostMultiply34(&mat, &rdCamera_pCurCamera->view_matrix);
+	rdMatrixMode(RD_MATRIX_MODEL);
+	rdLoadMatrix34(matrix);
+
+	rdScale(&size);
+
+	rdAddDecal(decal, &mat, &color, &thing->decalScale, decal->angleFade);
+
+	rdIdentity();
+#else
 	rdCache_DrawDecal(decal, matrix, &color, &thing->decalScale, decal->angleFade);
+#endif
 
 	return 1;
 }

@@ -151,9 +151,11 @@ void rdTexOffseti(float u, float v);
 
 int rdAddLight(rdLight* pLight, rdVector3* pPosition);
 void rdAddOccluder(rdVector3* position, float radius);
-void rdClearLights();
+void rdAddDecal(rdDecal* decal, rdMatrix34* matrix, rdVector3* color, rdVector3* scale, float angleFade);
 
+void rdClearLights();
 void rdClearOccluders();
+void rdClearDecals();
 
 void rdSetAmbientMode(rdAmbientMode_t type);
 void rdAmbientLight(float r, float g, float b);

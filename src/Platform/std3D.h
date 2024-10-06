@@ -126,7 +126,7 @@ int std3D_IsReady();
 
 #ifdef DECAL_RENDERING
 void std3D_ResetDecalRenderList();
-void std3D_DrawDecal(rdDDrawSurface* texture, rdVector3* verts, rdMatrix34* decalMatrix, rdVector3* color, uint32_t flags, float angleFade);
+void std3D_DrawDecal(stdVBuffer* vbuf, rdDDrawSurface* texture, rdVector3* verts, rdMatrix44* decalMatrix, rdVector3* color, uint32_t flags, float angleFade);
 #endif
 
 #ifdef PARTICLE_LIGHTS
@@ -143,6 +143,7 @@ void std3D_DrawOccluder(rdVector3* position, float radius, rdVector3* verts);
 void std3D_ClearLights();
 int std3D_AddLight(rdLight* light, rdVector3* viewPosition);
 void std3D_ClearOccluders();
+void std3D_ClearDecals();
 void std3D_AddDrawCall(std3D_DrawCallState* pDrawCallState, D3DVERTEX* paVertices, int numVertices);
 void std3D_ResetDrawCalls();
 void std3D_FlushDrawCalls();

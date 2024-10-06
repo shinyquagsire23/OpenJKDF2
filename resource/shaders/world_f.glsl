@@ -71,6 +71,7 @@ uniform sampler2D worldPaletteLights;
 uniform sampler2D displacement_map;
 
 uniform usamplerBuffer clusterBuffer;
+uniform sampler2D decalAtlas;
 
 uniform int tex_mode;
 uniform int blend_mode;
@@ -117,6 +118,18 @@ uniform vec3 ambientDominantDir;
 uniform vec3 ambientSG[8];
 uniform vec4 ambientSGBasis[8];
 
+// todo: define outside
+#define CLUSTER_MAX_LIGHTS          1024u // match RDCAMERA_MAX_LIGHTS/SITHREND_NUM_LIGHTS
+#define CLUSTER_MAX_OCCLUDERS       128u
+#define CLUSTER_MAX_DECALS          256
+#define CLUSTER_MAX_ITEMS           (CLUSTER_MAX_LIGHTS + CLUSTER_MAX_OCCLUDERS + CLUSTER_MAX_DECALS)
+#define CLUSTER_BUCKETS_PER_CLUSTER (CLUSTER_MAX_ITEMS / 32u)
+#define CLUSTER_GRID_SIZE_X         16u
+#define CLUSTER_GRID_SIZE_Y         8u
+#define CLUSTER_GRID_SIZE_Z         16u
+#define CLUSTER_GRID_SIZE_XYZ (CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y * CLUSTER_GRID_SIZE_Z)
+#define CLUSTER_GRID_TOTAL_SIZE (CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y * CLUSTER_GRID_SIZE_Z * CLUSTER_BUCKETS_PER_CLUSTER)
+
 struct light
 {
 	vec4  position;
@@ -138,7 +151,7 @@ struct light
 uniform int numLights;
 uniform lightBlock
 {
-	light lights[128];
+	light lights[CLUSTER_MAX_LIGHTS];
 };
 
 struct occluder
@@ -149,19 +162,27 @@ struct occluder
 uniform int numOccluders;
 uniform occluderBlock
 {
-	occluder occluders[128];
+	occluder occluders[CLUSTER_MAX_OCCLUDERS];
 };
 
-// todo: define outside
-#define CLUSTER_MAX_LIGHTS          1024u // match RDCAMERA_MAX_LIGHTS/SITHREND_NUM_LIGHTS
-#define CLUSTER_MAX_OCCLUDERS       128u
-#define CLUSTER_MAX_ITEMS           (CLUSTER_MAX_LIGHTS + CLUSTER_MAX_OCCLUDERS)
-#define CLUSTER_BUCKETS_PER_CLUSTER (CLUSTER_MAX_ITEMS / 32u)
-#define CLUSTER_GRID_SIZE_X         16u
-#define CLUSTER_GRID_SIZE_Y         8u
-#define CLUSTER_GRID_SIZE_Z         16u
-#define CLUSTER_GRID_SIZE_XYZ (CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y * CLUSTER_GRID_SIZE_Z)
-#define CLUSTER_GRID_TOTAL_SIZE (CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y * CLUSTER_GRID_SIZE_Z * CLUSTER_BUCKETS_PER_CLUSTER)
+struct decal
+{
+	mat4  decalMatrix;
+	mat4  invDecalMatrix;
+	vec4  uvScaleBias;
+	vec4  posRad;
+	vec4  color;
+	uint  flags;
+	float angleFade;
+	float padding0;
+	float padding1;
+};
+
+uniform int numDecals;
+uniform decalBlock
+{
+	decal decals[CLUSTER_MAX_DECALS];
+};
 
 uniform vec2 clusterScaleBias;
 uniform vec2 clusterTileSizes;
@@ -480,6 +501,89 @@ float CalculateIndirectShadows(uint bucket_index, vec3 pos, vec3 normal)
 	}
 
 	return shadowing;
+}
+
+
+vec3 blackbody(float t)
+{
+    t *= 3000.0;
+    
+    float u = ( 0.860117757 + 1.54118254e-4 * t + 1.28641212e-7 * t*t ) 
+            / ( 1.0 + 8.42420235e-4 * t + 7.08145163e-7 * t*t );
+    
+    float v = ( 0.317398726 + 4.22806245e-5 * t + 4.20481691e-8 * t*t ) 
+            / ( 1.0 - 2.89741816e-5 * t + 1.61456053e-7 * t*t );
+
+    float x = 3.0*u / (2.0*u - 8.0*v + 4.0);
+    float y = 2.0*v / (2.0*u - 8.0*v + 4.0);
+    float z = 1.0 - x - y;
+    
+    float Y = 1.0;
+    float X = Y / y * x;
+    float Z = Y / y * z;
+
+    mat3 XYZtoRGB = mat3(3.2404542, -1.5371385, -0.4985314,
+                        -0.9692660,  1.8760108,  0.0415560,
+                         0.0556434, -0.2040259,  1.0572252);
+
+    return max(vec3(0.0), (vec3(X,Y,Z) * XYZtoRGB) * pow(t * 0.0004, 4.0));
+}
+
+void BlendDecals(inout vec3 color, inout vec3 emissive, uint bucket_index, vec3 pos, vec3 normal)
+{
+	uint first_item = CLUSTER_MAX_LIGHTS + CLUSTER_MAX_OCCLUDERS;
+	uint last_item = first_item + uint(numDecals) - 1u;
+	uint first_bucket = first_item / 32u;
+	uint last_bucket = min(last_item / 32u, max(0u, CLUSTER_BUCKETS_PER_CLUSTER - 1u));
+	for (uint bucket = first_bucket; bucket <= last_bucket; ++bucket)
+	{
+		uint bucket_bits = uint(texelFetch(clusterBuffer, int(bucket_index + bucket)).x);
+		while(bucket_bits != 0u)
+		{
+			uint bucket_bit_index = uint(findLSB(bucket_bits));
+			uint decal_index = bucket * 32u + bucket_bit_index;
+			bucket_bits ^= (1u << bucket_bit_index);
+			
+			if (decal_index >= first_item && decal_index <= last_item)
+			{
+				decal dec = decals[decal_index - first_item];
+
+				vec4 objectPosition = inverse(dec.decalMatrix) * vec4(pos.xyz, 1.0);
+				vec3 objectNormal = mat3(dec.invDecalMatrix) * normal.xyz;
+				objectNormal.xyz = normalize(objectNormal.xyz);
+				
+				vec3 falloff = 0.5f - abs(objectPosition.xyz);
+				if( any(lessThanEqual(falloff, vec3(0.0))) )
+					continue;
+
+				//color += dec.color.rgb;
+				
+				vec2 decalTexCoord = objectPosition.xz + 0.5;
+				decalTexCoord = decalTexCoord.xy * dec.uvScaleBias.zw + dec.uvScaleBias.xy;
+				
+				vec4 decalColor = textureLod(decalAtlas, decalTexCoord, 0);
+				
+				bool isHeat = (dec.flags & 0x2u) == 0x2u;
+				bool isAdditive = (dec.flags & 0x4u) == 0x4u;
+				bool isRgbAlpha = (dec.flags & 0x8u) == 0x8u;
+				if(isRgbAlpha)
+					decalColor.a = max(decalColor.r, max(decalColor.g, decalColor.b));
+				
+				decalColor.rgb *= dec.color.rgb;
+				
+				if(isHeat)
+				{
+					decalColor.rgb = blackbody(decalColor.r);
+					emissive.rgb += decalColor.rgb;
+				}
+				
+				if(isAdditive)
+					color.rgb += decalColor.rgb;
+				else
+					color.rgb = mix(color.rgb, decalColor.rgb, decalColor.w);
+			}
+		}
+	}
 }
 
 layout(location = 0) out vec4 fragColor;
@@ -801,6 +905,9 @@ void main(void)
 	vec3 diffuseColor = sampled_color.xyz;
 	vec3 specularColor = vec3(0.0);//min(diffuseColor.xyz, fillColor.xyz);
 	float roughness = 0.01;	
+
+	if(numDecals > 0)
+		BlendDecals(diffuseColor.xyz, emissive.xyz, bucket_index, f_coord.xyz, surfaceNormals);
 
 	if(lightMode == 4)
 	{

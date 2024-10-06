@@ -862,6 +862,7 @@ int rdAddLight(rdLight* pLight, rdVector3* pPosition)
 
 void std3D_ClearLights();
 void std3D_ClearOccluders();
+void std3D_ClearDecals();
 void rdClearLights()
 {
 	std3D_ClearLights();
@@ -870,6 +871,11 @@ void rdClearLights()
 void rdClearOccluders()
 {
 	std3D_ClearOccluders();
+}
+
+void rdClearDecals()
+{
+	std3D_ClearDecals();
 }
 
 extern int jkPlayer_enableShadows;
@@ -886,6 +892,34 @@ void rdAddOccluder(rdVector3* position, float radius)
 	rdVector4 viewPos;
 	rdMatrix_TransformPoint44(&viewPos, &pos4, &rdroid_matrices[RD_MATRIX_VIEW]);
 	std3D_DrawOccluder((rdVector3*)&viewPos, radius, NULL);
+}
+
+extern int jkPlayer_enableDecals;
+void std3D_DrawDecal(stdVBuffer* vbuf, rdDDrawSurface* texture, rdVector3* verts, rdMatrix44* decalMatrix, rdVector3* color, uint32_t flags, float angleFade);
+void rdAddDecal(rdDecal* decal, rdMatrix34* modelMat, rdVector3* color, rdVector3* scale, float angleFade)
+{
+	if(!jkPlayer_enableDecals)
+		return;
+
+	if (!decal->material)
+		return;
+
+	rdTexture* sith_tex_sel = decal->material->texinfos[0]->texture_ptr;
+	if (!rdMaterial_AddToTextureCache(decal->material, sith_tex_sel, 0, 0, 0))
+		return 0;
+
+	rdDDrawSurface* tex2_arr_sel = &sith_tex_sel->alphaMats[0];
+	if (!tex2_arr_sel)
+		return;
+
+//	rdMatrix34 decalMatrix;
+//	rdMatrix_Multiply34(&decalMatrix, &rdroid_matrices[RD_MATRIX_VIEW], modelMat);
+//	rdMatrix_Copy34(&decalMatrix, modelMat);
+
+	rdMatrix44 decalMatrix;
+	rdMatrix_Multiply44(&decalMatrix, &rdroid_matrices[RD_MATRIX_VIEW], &rdroid_matrices[RD_MATRIX_MODEL]);
+
+	std3D_DrawDecal(sith_tex_sel->texture_struct[0], tex2_arr_sel, NULL, &decalMatrix, color, decal->flags, angleFade);
 }
 
 void rdSetAmbientMode(rdAmbientMode_t type)

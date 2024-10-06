@@ -22,6 +22,7 @@
 #include "SDL2_helper.h"
 
 #include "General/stdMath.h"
+#include "General/stdHashTable.h"
 
 #ifdef WIN32
 // Force Optimus/AMD to use non-integrated GPUs by default.
@@ -155,7 +156,8 @@ GLint uniform_fog, uniform_fog_color, uniform_fog_start, uniform_fog_end;
 
 #define CLUSTER_MAX_LIGHTS          1024 // match RDCAMERA_MAX_LIGHTS/SITHREND_NUM_LIGHTS
 #define CLUSTER_MAX_OCCLUDERS       128
-#define CLUSTER_MAX_ITEMS           (CLUSTER_MAX_LIGHTS + CLUSTER_MAX_OCCLUDERS)
+#define CLUSTER_MAX_DECALS          256
+#define CLUSTER_MAX_ITEMS           (CLUSTER_MAX_LIGHTS + CLUSTER_MAX_OCCLUDERS + CLUSTER_MAX_DECALS)
 #define CLUSTER_BUCKETS_PER_CLUSTER (CLUSTER_MAX_ITEMS / 32)
 #define CLUSTER_GRID_SIZE_X         16
 #define CLUSTER_GRID_SIZE_Y         8
@@ -210,12 +212,49 @@ static std3D_occluder tmpOccluders[CLUSTER_MAX_OCCLUDERS];
 
 GLuint occluder_ubo;
 
+typedef struct std3D_decal
+{
+	rdMatrix44      decalMatrix;
+	rdMatrix44      invDecalMatrix;
+	rdVector4       uvScaleBias;
+	rdVector4       posRad;
+	rdVector4       color;
+	uint32_t        flags;
+	float           angleFade;
+	float           padding0;
+	float           padding1;
+} std3D_decal;
+int decalsDirty = 0;
+unsigned int numDecals = 0;
+static std3D_decal tmpDecals[CLUSTER_MAX_DECALS];
+
+GLuint decal_ubo;
+
+typedef struct std3D_decalAtlasNode
+{
+	char name[32];
+	rdRect rect;
+	struct std3D_decalAtlasNode* children[2];
+	rdDDrawSurface* texture;
+} std3D_decalAtlasNode;
+
+#define DECAL_ATLAS_SIZE 1024
+
+static int numAllocNodes = 0;
+static std3D_decalAtlasNode nodePool[(DECAL_ATLAS_SIZE / 4) * (DECAL_ATLAS_SIZE / 4)];
+static std3D_decalAtlasNode decalRootNode;
+static stdHashTable* decalHashTable = NULL;
+
+int std3D_InsertDecalTexture(rdRect* out, stdVBuffer* vbuf, rdDDrawSurface* pTexture);
+void std3D_PurgeDecalAtlas();
+
 static uint32_t std3D_clusterBits[CLUSTER_GRID_TOTAL_SIZE];
 static rdClipFrustum std3D_clusterFrustums[CLUSTER_GRID_TOTAL_SIZE];
 static uint32_t std3D_clusterFrustumsFrame[CLUSTER_GRID_TOTAL_SIZE];
 
 void std3D_FlushLights();
 void std3D_FlushOccluders();
+void std3D_FlushDecals();
 void std3D_BuildClusters(rdMatrix44* pProjection);
 
 typedef enum STD3D_DRAW_LIST
@@ -240,7 +279,7 @@ typedef struct std3D_worldStage
 	GLint uniform_mvp, uniform_modelMatrix;
 	GLint uniform_ambient_mode, uniform_ambient_color, uniform_ambient_sg, uniform_ambient_sgbasis;
 	GLint uniform_uv_mode, uniform_texgen, uniform_texgen_params, uniform_uv_offset;
-	GLint uniform_fillColor, uniform_tex, uniform_texEmiss, uniform_displacement_map;
+	GLint uniform_fillColor, uniform_tex, uniform_texEmiss, uniform_displacement_map, uniform_texDecals;
 	GLint uniform_tex_mode, uniform_blend_mode, uniform_worldPalette, uniform_worldPaletteLights;
 	GLint uniform_tint, uniform_filter, uniform_fade, uniform_add;
 	GLint uniform_emissiveFactor, uniform_albedoFactor, uniform_displacement_factor;
@@ -251,6 +290,7 @@ typedef struct std3D_worldStage
 	GLuint uniform_lightbuf, uniform_clusterScaleBias, uniform_clusterTileSizes;
 	GLuint uniform_lights, uniform_numLights;
 	GLuint uniform_occluders, uniform_numOccluders;
+	GLuint uniform_decals, uniform_numDecals;
 	GLuint vao;
 #endif
 } std3D_worldStage;
@@ -268,6 +308,10 @@ std3DSimpleTexStage std3D_ssaoMixStage;
 std3DSimpleTexStage std3D_postfxStage;
 #ifdef NEW_BLOOM
 std3DSimpleTexStage std3D_bloomStage;
+#endif
+#ifdef RENDER_DROID2
+std3DSimpleTexStage std3D_decalAtlasStage;
+std3DIntermediateFbo decalAtlasFBO;
 #endif
 
 unsigned int vao;
@@ -1050,6 +1094,7 @@ int std3D_loadWorldStage(std3D_worldStage* pStage, int isZPass, const char* defi
 	pStage->uniform_worldPalette = std3D_tryFindUniform(pStage->program, "worldPalette");
 	pStage->uniform_worldPaletteLights = std3D_tryFindUniform(pStage->program, "worldPaletteLights");
 	pStage->uniform_displacement_map = std3D_tryFindUniform(pStage->program, "displacement_map");
+	pStage->uniform_texDecals = std3D_tryFindUniform(pStage->program, "decalAtlas");
 	pStage->uniform_tex_mode = std3D_tryFindUniform(pStage->program, "tex_mode");
 	pStage->uniform_blend_mode = std3D_tryFindUniform(pStage->program, "blend_mode");
 	pStage->uniform_tint = std3D_tryFindUniform(pStage->program, "colorEffects_tint");
@@ -1071,12 +1116,15 @@ int std3D_loadWorldStage(std3D_worldStage* pStage, int isZPass, const char* defi
 #endif
 	pStage->uniform_numLights = std3D_tryFindUniform(pStage->program, "numLights");
 	pStage->uniform_numOccluders = std3D_tryFindUniform(pStage->program, "numOccluders");
+	pStage->uniform_numDecals = std3D_tryFindUniform(pStage->program, "numDecals");
+
 	pStage->uniform_lightbuf = std3D_tryFindUniform(pStage->program, "clusterBuffer");
 	pStage->uniform_clusterTileSizes = std3D_tryFindUniform(pStage->program, "clusterTileSizes");
 	pStage->uniform_clusterScaleBias = std3D_tryFindUniform(pStage->program, "clusterScaleBias");
 
 	pStage->uniform_lights = glGetUniformBlockIndex(pStage->program, "lightBlock");
 	pStage->uniform_occluders = glGetUniformBlockIndex(pStage->program, "occluderBlock");
+	pStage->uniform_decals = glGetUniformBlockIndex(pStage->program, "decalBlock");
 
 	return 1;
 }
@@ -1216,6 +1264,11 @@ void std3D_setupLightingUBO(std3D_worldStage* pStage)
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(tmpOccluders), NULL, GL_DYNAMIC_DRAW);
 	glUniformBlockBinding(pStage->program, pStage->uniform_occluders, 1);
 
+	glGenBuffers(1, &decal_ubo);
+	glBindBuffer(GL_UNIFORM_BUFFER, decal_ubo);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(tmpDecals), NULL, GL_DYNAMIC_DRAW);
+	glUniformBlockBinding(pStage->program, pStage->uniform_decals, 2);
+
 	glGenBuffers(1, &cluster_buffer);
 	glBindBuffer(GL_TEXTURE_BUFFER, cluster_buffer);
 	glBufferData(GL_TEXTURE_BUFFER, sizeof(std3D_clusterBits), NULL, GL_DYNAMIC_DRAW);
@@ -1334,6 +1387,15 @@ int init_resources()
 	if (!std3D_loadSimpleTexProgram("shaders/postfx", &std3D_postfxStage)) return false;
 #ifdef NEW_BLOOM
 	if (!std3D_loadSimpleTexProgram("shaders/bloom", &std3D_bloomStage)) return false;
+#endif
+#ifdef RENDER_DROID2
+	if (!std3D_loadSimpleTexProgram("shaders/decal_insert", &std3D_decalAtlasStage)) return false;
+	std3D_generateIntermediateFbo(DECAL_ATLAS_SIZE, DECAL_ATLAS_SIZE, &decalAtlasFBO, GL_RGBA8, 0, 0);
+
+	decalRootNode.rect.x = 0.0f;
+	decalRootNode.rect.y = 0.0f;
+	decalRootNode.rect.width = DECAL_ATLAS_SIZE;
+	decalRootNode.rect.height = DECAL_ATLAS_SIZE;
 #endif
 
 #ifdef DEFERRED_FRAMEWORK
@@ -1628,6 +1690,7 @@ void std3D_FreeResources()
 		glDeleteProgram(worldStages[i].program);
 	glDeleteBuffers(1, &light_ubo);
 	glDeleteBuffers(1, &occluder_ubo);
+	glDeleteBuffers(1, &decal_ubo);
 	glDeleteBuffers(1, &cluster_buffer);
 	glDeleteTextures(1, &cluster_tbo);
 #endif
@@ -4495,6 +4558,10 @@ void std3D_PurgeTextureCache()
         std3D_PurgeTextureEntry(i);
     }
     std3D_loadedTexturesAmt = 0;
+
+#ifdef RENDER_DROID2
+	std3D_PurgeDecalAtlas();
+#endif
 }
 
 void std3D_InitializeViewport(rdRect *viewRect)
@@ -4747,9 +4814,44 @@ void std3D_DrawDeferredStage(std3D_deferredStage* pStage, rdVector3* verts, rdDD
 #endif
 
 #ifdef DECAL_RENDERING
-void std3D_DrawDecal(rdDDrawSurface* texture, rdVector3* verts, rdMatrix34* decalMatrix, rdVector3* color, uint32_t flags, float angleFade)
+void std3D_DrawDecal(stdVBuffer* vbuf, rdDDrawSurface* texture, rdVector3* verts, rdMatrix44* decalMatrix, rdVector3* color, uint32_t flags, float angleFade)
 {
 	if (Main_bHeadless) return;
+
+#ifdef RENDER_DROID2
+
+	if (numDecals >= CLUSTER_MAX_DECALS)
+		return;
+
+	decalsDirty = 1;
+	clustersDirty = 1;
+
+	rdRect uvScaleBias;
+	if (!std3D_InsertDecalTexture(&uvScaleBias, vbuf, texture))
+		return;
+
+	std3D_decal* decal = &tmpDecals[numDecals++];
+	decal->uvScaleBias.x = (float)uvScaleBias.x / DECAL_ATLAS_SIZE;
+	decal->uvScaleBias.y = (float)uvScaleBias.y / DECAL_ATLAS_SIZE;
+	decal->uvScaleBias.z = (float)uvScaleBias.width / DECAL_ATLAS_SIZE;
+	decal->uvScaleBias.w = (float)uvScaleBias.height / DECAL_ATLAS_SIZE;
+	rdVector_Copy3((rdVector3*)&decal->posRad, (rdVector3*)&decalMatrix->vD);
+
+	rdVector3 diag;
+	diag.x = decalMatrix->vA.x;
+	diag.y = decalMatrix->vB.y;
+	diag.z = decalMatrix->vC.z;
+	decal->posRad.w = rdVector_Len3(&diag);
+
+	rdMatrix_Copy44(&decal->decalMatrix, decalMatrix);
+	rdMatrix_Invert44(&decal->invDecalMatrix, decalMatrix);
+
+	rdVector_Copy3((rdVector3*)&decal->color, color);
+	decal->color.w = 1.0f;
+	decal->flags = flags;
+	decal->angleFade = angleFade;
+
+#else
 
 	// we need a copy of the main buffer for lighting, so copy one...
 	// todo: get rid of this... maybe just read the ambient SH for decals and call it a day instead of using the underlying lighting
@@ -4798,6 +4900,8 @@ void std3D_DrawDecal(rdDDrawSurface* texture, rdVector3* verts, rdMatrix34* deca
 	glDisable(GL_STENCIL_TEST);
 	glStencilFunc(GL_ALWAYS, 0, 0xFF);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+#endif
+
 #endif
 }
 #endif
@@ -4958,14 +5062,7 @@ typedef int(*std3D_SortFunc)(std3D_DrawCall*, std3D_DrawCall*);
 
 // [draw layers][draw lists]
 static std3D_DrawCallList std3D_drawCallLists[STD3D_MAX_DRAW_LAYERS][DRAW_LIST_COUNT];
-static std3D_SortFunc std3D_drawCallSortFuncs[DRAW_LIST_COUNT] =
-{
-	std3D_DrawCallCompareSortKey, // z sort by state
-	std3D_DrawCallCompareSortKey, // z alpha test sort by state
-	std3D_DrawCallCompareSortKey, // color sort by key
-	std3D_DrawCallCompareSortKey, // alpha test sort by key
-	std3D_DrawCallCompareDepth // alpha blend sort by depth
-};
+
 static D3DVERTEX std3D_drawCallVerticesSorted[STD3D_MAX_DRAW_CALL_VERTS];
 
 int std3D_HasDepthWrites(std3D_DrawCallState* pState)
@@ -5068,6 +5165,9 @@ void std3D_AddZListDrawCall(std3D_DrawCallList* pList, std3D_DrawCallState* pDra
 	// z lists can ignore these
 	memset(&pDrawCall->state.blend, 0, sizeof(std3D_BlendState));
 	memset(&pDrawCall->state.lighting, 0, sizeof(std3D_LightingState));
+	if(!pDrawCallState->texture.alphaTest) // non-alpha test doesn't require textures
+		memset(&pDrawCall->state.texture, 0, sizeof(std3D_TextureState));
+
 
 	memcpy(&pList->drawCallVertices[pList->drawCallVertexCount], paVertices, sizeof(D3DVERTEX) * numVertices);
 	pList->drawCallVertexCount += numVertices;
@@ -5313,6 +5413,9 @@ void std3D_BindStage(std3D_worldStage* pStage)
 	glBindBufferBase(GL_UNIFORM_BUFFER, 1, occluder_ubo);
 	glUniform1i(pStage->uniform_numOccluders, numOccluders);
 
+	glBindBufferBase(GL_UNIFORM_BUFFER, 2, decal_ubo);
+	glUniform1i(pStage->uniform_numDecals, numDecals);
+
 	glUniform1i(pStage->uniform_tex_mode, TEX_MODE_TEST);
 	glUniform1i(pStage->uniform_blend_mode, 2);
 	glUniform1i(pStage->uniform_tex, 0);
@@ -5321,6 +5424,7 @@ void std3D_BindStage(std3D_worldStage* pStage)
 	glUniform1i(pStage->uniform_texEmiss, 3);
 	glUniform1i(pStage->uniform_displacement_map, 4);
 	glUniform1i(pStage->uniform_lightbuf, 5);
+	glUniform1i(pStage->uniform_texDecals, 6);
 
 	glUniform2f(pStage->uniform_clusterTileSizes, (float)tileSizeX, (float)tileSizeY);
 	glUniform2f(pStage->uniform_clusterScaleBias, sliceScalingFactor, sliceBiasFactor);
@@ -5364,11 +5468,16 @@ void std3D_FlushDrawCallList(std3D_worldStage* pStage, std3D_DrawCallList* pList
 	// batching needs to follow the draw order, but vertex arrays might be disjointed
 	// build a sorted list of the vertices to ensure sequential vertex access during batch
 	// todo: generate an index buffer instead of copying vertices around
-	int drawCallVerticesCount = 0;
-	for (int i = 0; i < pList->drawCallCount; ++i)
+	D3DVERTEX* vertexArray = pList->drawCallVertices;
+	if (sortFunc)
 	{
-		memcpy(&std3D_drawCallVerticesSorted[drawCallVerticesCount], &pList->drawCallVertices[pList->drawCalls[i].firstVertex], sizeof(D3DVERTEX) * pList->drawCalls[i].numVertices);
-		drawCallVerticesCount += pList->drawCalls[i].numVertices;
+		int drawCallVerticesCount = 0;
+		for (int i = 0; i < pList->drawCallCount; ++i)
+		{
+			memcpy(&std3D_drawCallVerticesSorted[drawCallVerticesCount], &pList->drawCallVertices[pList->drawCalls[i].firstVertex], sizeof(D3DVERTEX) * pList->drawCalls[i].numVertices);
+			drawCallVerticesCount += pList->drawCalls[i].numVertices;
+		}
+		vertexArray = std3D_drawCallVerticesSorted;
 	}
 
 	std3D_DrawCall* pDrawCall = &pList->drawCalls[0];
@@ -5381,7 +5490,7 @@ void std3D_FlushDrawCallList(std3D_worldStage* pStage, std3D_DrawCallList* pList
 	std3D_DrawCallState lastState = pDrawCall->state;
 
 	std3D_BindStage(pStage);
-	glBufferData(GL_ARRAY_BUFFER, drawCallVerticesCount * sizeof(D3DVERTEX), std3D_drawCallVerticesSorted, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, pList->drawCallVertexCount * sizeof(D3DVERTEX), vertexArray, GL_STREAM_DRAW);
 
 	int last_tex = pTexState->pTexture ? pTexState->pTexture->texture_id : blank_tex_white;
 	std3D_SetRasterState(pRasterState);
@@ -5496,14 +5605,26 @@ void std3D_FlushDrawCalls()
 	glBindTexture(GL_TEXTURE_2D, blank_tex_white);
 	glActiveTexture(GL_TEXTURE0 + 5);
 	glBindTexture(GL_TEXTURE_BUFFER, cluster_tbo);
-	
+	glActiveTexture(GL_TEXTURE0 + 6);
+	glBindTexture(GL_TEXTURE_2D, decalAtlasFBO.tex);
+
 	for (int j = 0; j < STD3D_MAX_DRAW_LAYERS; ++j)
 	{
-		for (int i = 0; i < DRAW_LIST_COUNT; ++i)
-		{
-			std3D_worldStage* pStage = &worldStages[i];
-			std3D_FlushDrawCallList(pStage, &std3D_drawCallLists[j][i], std3D_drawCallSortFuncs[i]);
-		}
+		// flush z lists
+		std3D_FlushDrawCallList(&worldStages[DRAW_LIST_Z],           &std3D_drawCallLists[j][DRAW_LIST_Z],           std3D_DrawCallCompareSortKey);
+		std3D_FlushDrawCallList(&worldStages[DRAW_LIST_Z_ALPHATEST], &std3D_drawCallLists[j][DRAW_LIST_Z_ALPHATEST], std3D_DrawCallCompareSortKey);
+
+		// todo: do any necessary opaque-only deferred stuff here
+
+		// flush color lists
+		std3D_FlushDrawCallList(&worldStages[DRAW_LIST_COLOR_UNLIT],            &std3D_drawCallLists[j][DRAW_LIST_COLOR_UNLIT],            std3D_DrawCallCompareSortKey);
+		std3D_FlushDrawCallList(&worldStages[DRAW_LIST_COLOR],                  &std3D_drawCallLists[j][DRAW_LIST_COLOR],                  std3D_DrawCallCompareSortKey);
+		std3D_FlushDrawCallList(&worldStages[DRAW_LIST_COLOR_ALPHATEST_UNLIT],  &std3D_drawCallLists[j][DRAW_LIST_COLOR_ALPHATEST_UNLIT],  std3D_DrawCallCompareSortKey);
+		std3D_FlushDrawCallList(&worldStages[DRAW_LIST_COLOR_ALPHATEST],        &std3D_drawCallLists[j][DRAW_LIST_COLOR_ALPHATEST],        std3D_DrawCallCompareSortKey);
+		std3D_FlushDrawCallList(&worldStages[DRAW_LIST_COLOR_ALPHABLEND],       &std3D_drawCallLists[j][DRAW_LIST_COLOR_ALPHABLEND],       std3D_DrawCallCompareDepth);
+		std3D_FlushDrawCallList(&worldStages[DRAW_LIST_COLOR_ALPHABLEND_UNLIT], &std3D_drawCallLists[j][DRAW_LIST_COLOR_ALPHABLEND_UNLIT], std3D_DrawCallCompareDepth);
+
+		// clear the depth buffer for the next draw layer
 		glDepthMask(GL_TRUE);
 		glClear(GL_DEPTH_BUFFER_BIT);
 	}
@@ -5578,6 +5699,16 @@ void std3D_ClearOccluders()
 	numOccluders = 0;
 }
 
+void std3D_ClearDecals()
+{
+	decalsDirty = 1;
+	clustersDirty = 1;
+	numDecals= 0;
+
+	// tmp debug
+	std3D_PurgeDecalAtlas();
+}
+
 void std3D_FlushOccluders()
 {
 	if (occludersDirty)
@@ -5585,6 +5716,151 @@ void std3D_FlushOccluders()
 		glBindBuffer(GL_UNIFORM_BUFFER, occluder_ubo);
 		glBufferData(GL_UNIFORM_BUFFER, sizeof(tmpOccluders), &tmpOccluders, GL_DYNAMIC_DRAW);
 		occludersDirty = 0;
+	}
+}
+
+void std3D_PurgeDecalAtlas()
+{
+	decalRootNode.children[0] = decalRootNode.children[1] = NULL;
+	numAllocNodes = 0;
+	if(decalHashTable)
+	{
+		stdHashTable_Free(decalHashTable);
+		decalHashTable = 0;
+	}
+}
+
+std3D_decalAtlasNode* std3D_AllocDecalNode()
+{
+	if (numAllocNodes >= (DECAL_ATLAS_SIZE/4)*(DECAL_ATLAS_SIZE/4))
+	{
+		stdPlatform_Printf("std3D: ERROR, Decal node pool is exhausted!\n");
+		return NULL;
+	}
+	std3D_decalAtlasNode* node = &nodePool[numAllocNodes++];
+	memset(node, 0, sizeof(std3D_decalAtlasNode));
+	return node;
+}
+
+std3D_decalAtlasNode* std3D_InsertDecal(std3D_decalAtlasNode* parent, const rdRect* bound, rdDDrawSurface* tex)
+{
+	std3D_decalAtlasNode* newNode;
+	if (parent->children[0]) // if not a leaf, insert into children
+	{
+		newNode = std3D_InsertDecal(parent->children[0], bound, tex);
+		if (newNode)
+			return newNode;
+
+		return std3D_InsertDecal(parent->children[1], bound, tex);
+	}
+	else
+	{
+		// already have one
+		if (parent->texture)
+			return NULL;
+
+		// doesn't fit
+		if (parent->rect.width < bound->width || parent->rect.height < bound->height)
+			return NULL;
+
+		if (parent->rect.width == bound->width && parent->rect.height == bound->height)
+		{
+			sprintf_s(parent->name, 32, "decalTex%d", tex->texture_id);
+			parent->texture = tex;
+			return parent;
+		}
+
+		parent->children[0] = std3D_AllocDecalNode();
+		parent->children[1] = std3D_AllocDecalNode();
+
+		float dw = parent->rect.width - bound->width;
+		float dh = parent->rect.height - bound->height;
+		if (dw > dh)
+		{
+			parent->children[0]->rect = parent->rect;
+			parent->children[1]->rect = parent->rect;
+			parent->children[0]->rect.width = bound->width;
+			parent->children[1]->rect.x = parent->rect.x + bound->width;
+		}
+		else
+		{
+			parent->children[0]->rect = parent->rect;
+			parent->children[1]->rect = parent->rect;
+			parent->children[0]->rect.height = bound->height;
+			parent->children[1]->rect.y = parent->rect.y + bound->height;
+		}
+		return std3D_InsertDecal(parent->children[0], bound, tex);
+	}
+}
+
+int std3D_InsertDecalTexture(rdRect* out, stdVBuffer* vbuf, rdDDrawSurface* pTexture)
+{
+	if(!decalHashTable)
+		decalHashTable = stdHashTable_New(256); // todo: move
+
+	char tmpName[32];
+	sprintf_s(tmpName, 32, "decalTex%d", pTexture->texture_id);
+
+	int32_t index = -1;
+	std3D_decalAtlasNode* findNode = (std3D_decalAtlasNode*)stdHashTable_GetKeyVal(decalHashTable, tmpName);
+	if (findNode)
+	{
+		*out = findNode->rect;
+		return 1;
+	}
+	else
+	{
+		rdRect rect;
+		rect.x = 0;
+		rect.y = 0;
+		rect.width = vbuf->format.width;
+		rect.height = vbuf->format.height;
+
+		std3D_decalAtlasNode* node = std3D_InsertDecal(&decalRootNode, &rect, pTexture);
+		if (node)
+		{
+			glBindFramebuffer(GL_FRAMEBUFFER, decalAtlasFBO.fbo);
+			glDrawBuffer(GL_COLOR_ATTACHMENT0);
+			glDepthFunc(GL_ALWAYS);
+			glDisable(GL_CULL_FACE);
+			glDisable(GL_BLEND);
+			glDepthMask(GL_FALSE);
+			glDisable(GL_DEPTH_TEST);
+			std3D_useProgram(std3D_decalAtlasStage.program);
+
+			glBindVertexArray(vao);
+
+			glActiveTexture(GL_TEXTURE0 + 0);
+			glBindTexture(GL_TEXTURE_2D, pTexture->texture_id);
+			glActiveTexture(GL_TEXTURE0 + 1);
+			glBindTexture(GL_TEXTURE_2D, worldpal_texture);
+
+			glUniform1i(std3D_decalAtlasStage.uniform_tex, 0);
+			glUniform1i(std3D_decalAtlasStage.uniform_tex2, 1);
+			glUniform1f(std3D_decalAtlasStage.uniform_param1, pTexture && pTexture->is_16bit ? TEX_MODE_16BPP : TEX_MODE_WORLDPAL);
+
+			glViewport(node->rect.x, node->rect.y, node->rect.width, node->rect.height);
+
+			glDrawArrays(GL_TRIANGLES, 0, 3);
+
+			stdHashTable_SetKeyVal(decalHashTable, node->name, node);
+			*out = rect;
+		}
+		else
+		{
+			stdPlatform_Printf("std3D: ERROR, Decal texture atlas out of space!\n");
+			return 0;
+		}
+	}
+}
+
+void std3D_FlushDecals()
+{
+	if (decalsDirty)
+	{
+		glBindBuffer(GL_UNIFORM_BUFFER, decal_ubo);
+		glBufferData(GL_UNIFORM_BUFFER, sizeof(tmpDecals), &tmpDecals, GL_DYNAMIC_DRAW);
+		decalsDirty = 0;
 	}
 }
 
@@ -5747,6 +6023,7 @@ void std3D_BuildClusters(rdMatrix44* pProjection)
 	// flush lists to make sure they're up to date before we start cluster assignment
 	std3D_FlushLights();
 	std3D_FlushOccluders();
+	std3D_FlushDecals();
 
 	// pull the near/far from the projection matrix
 	// note: common sources list this as [3][2] and [2][2] but we have a rotated projection matrix, so we use [1][2]
@@ -5764,7 +6041,7 @@ void std3D_BuildClusters(rdMatrix44* pProjection)
 	// clean slate
 	memset(std3D_clusterBits, 0, sizeof(std3D_clusterBits));
 
-	// assign lights, from 0 to CLUSTER_MAX_LIGHTS-1
+	// assign lights
 	for (int i = 0; i < numLights; ++i)
 	{
 		if(!tmpLights[i].active)
@@ -5772,10 +6049,16 @@ void std3D_BuildClusters(rdMatrix44* pProjection)
 		std3D_AssignItemToClusters(i, (rdVector3*)&tmpLights[i].position, tmpLights[i].falloffMin, pProjection, znear, zfar);
 	}
 
-	// assign occluders, from CLUSTER_MAX_LIGHTS to CLUSTER_MAX_LIGHTS + CLUSTER_MAX_OCCLUDERS - 1
+	// assign occluders
 	for (int i = 0; i < numOccluders; ++i)
 	{
 		std3D_AssignItemToClusters(CLUSTER_MAX_LIGHTS + i, (rdVector3*)&tmpOccluders[i].position, tmpOccluders[i].position.w, pProjection, znear, zfar);
+	}
+
+	// assign decals
+	for (int i = 0; i < numDecals; ++i)
+	{
+		std3D_AssignItemToClusters(CLUSTER_MAX_LIGHTS + CLUSTER_MAX_OCCLUDERS + i, (rdVector3*)&tmpDecals[i].posRad, tmpDecals[i].posRad.w, pProjection, znear, zfar);
 	}
 
 	// todo: map buffer instead of storing to tmp then uploading?

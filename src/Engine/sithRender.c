@@ -551,6 +551,7 @@ void sithRender_Draw()
 	rdDrawLayer(0);
 	rdClearLights();
 	rdClearOccluders();
+	rdClearDecals();
 
 	// todo: get this out of here
 	extern int Window_xSize;
