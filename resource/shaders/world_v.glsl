@@ -24,6 +24,63 @@ uniform vec2 uv_offset;
 
 noperspective out vec2 f_uv_affine;
 
+uniform int  lightMode;
+
+uniform vec3 ambientColor;
+uniform vec4 ambientSH[3];
+uniform vec3 ambientDominantDir;
+uniform vec3 ambientSG[8];
+uniform vec4 ambientSGBasis[8];
+
+// https://therealmjp.github.io/posts/sg-series-part-1-a-brief-and-incomplete-history-of-baked-lighting-representations/
+// SphericalGaussian(dir) := Amplitude * exp(Sharpness * (dot(Axis, dir) - 1.0f))
+struct SG
+{
+    vec3 Amplitude;
+    vec3 Axis;
+    float Sharpness;
+};
+
+vec3 SGInnerProduct(SG x, SG y)
+{
+    float umLength = length(x.Sharpness * x.Axis + y.Sharpness * y.Axis);
+    vec3 expo = exp(umLength - x.Sharpness - y.Sharpness) * x.Amplitude * y.Amplitude;
+    float other = 1.0 - exp(-2.0 * umLength);
+    return (2.0 * 3.141592 * expo * other) / umLength;
+}
+
+SG CosineLobeSG(vec3 direction)
+{
+    SG cosineLobe;
+    cosineLobe.Axis = direction;
+    cosineLobe.Sharpness = 2.133;
+    cosineLobe.Amplitude = vec3(1.17);
+
+    return cosineLobe;
+}
+
+vec3 SGIrradianceInnerProduct(SG lightingLobe, vec3 normal)
+{
+    SG cosineLobe = CosineLobeSG(normal);
+    return max(SGInnerProduct(lightingLobe, cosineLobe), 0.0);
+}
+
+vec3 CalculateAmbientDiffuse(vec3 normal)
+{
+	vec3 ambientDiffuse = vec3(0.0);
+	for(int sg = 0; sg < 8; ++sg)
+	{
+		SG lightSG;
+		lightSG.Amplitude = ambientSG[sg].xyz;
+		lightSG.Axis = ambientSGBasis[sg].xyz;
+		lightSG.Sharpness = ambientSGBasis[sg].w;
+	
+		vec3 diffuse = SGIrradianceInnerProduct(lightSG, normal);
+		ambientDiffuse.xyz += diffuse;
+	}
+	return ambientDiffuse;
+}
+
 bool ceiling_intersect(vec3 pos, vec3 dir, vec3 normal, vec3 center, inout float t)
 {
 	float denom = dot(dir, normal);
@@ -99,4 +156,18 @@ void main(void)
 
     f_light = v_light;
  	f_depth = pos.w / 128.0;
+
+#ifdef UNLIT
+	if(lightMode == 0) // full lit
+		f_color.xyz = vec3(1.0);
+	else if(lightMode == 1) // not lit
+		f_color.xyz = vec3(0.0);
+#else
+	// do ambient diffuse in vertex shader
+	if (lightMode >= 2)
+		f_color.xyz = max(f_color.xyz, ambientColor.xyz);
+	
+	if(lightMode >= 3)
+		f_color.xyz += CalculateAmbientDiffuse(f_normal);
+#endif
 }

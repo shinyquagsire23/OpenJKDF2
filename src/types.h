@@ -903,8 +903,6 @@ typedef struct std3D_TextureState
 typedef struct std3D_LightingState
 {
 	rdLightMode_t   lightMode;
-	// todo: make ambient stuff a light type
-	rdAmbientMode_t ambientMode;    // ambient lighting mode
 	rdVector3       ambientColor;   // rgb ambient color
 	rdAmbient       ambientStateSH; // ambient spherical harmonics coefficients and dominant light dir
 } std3D_LightingState;
@@ -912,6 +910,7 @@ typedef struct std3D_LightingState
 // todo: maybe some of this should be split into commands instead of one huge state block
 typedef struct std3D_DrawCallState
 {
+	int                     shaderID;
 	int                     sortPriority;
 	float                   sortDistance;
 	int                     drawLayer;

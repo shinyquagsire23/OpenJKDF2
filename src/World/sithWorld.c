@@ -377,7 +377,7 @@ int sithWorld_NewEntry(sithWorld *pWorld)
 				for (int j = 0; j < pWorld->sectors[i].numSurfaces; j++)
 				{
 					sithSurface* surface = &pWorld->sectors[i].surfaces[j];
-					if(surface->adjoin && (surface->adjoin->flags & SITHSURF_ADJOIN_VISIBLE))
+					if(surface->adjoin && !(surface->adjoin->flags & SITHSURF_ADJOIN_VISIBLE))
 						continue; // ignore adjoins
 
 					total += surface->surfaceInfo.face.numVertices;
@@ -387,7 +387,6 @@ int sithWorld_NewEntry(sithWorld *pWorld)
 					float minlight = surface->surfaceInfo.face.extraLight;
 					if (surface->surfaceInfo.face.lightingMode == RD_LIGHTMODE_FULLYLIT)
 						minlight = 1.0f;
-
 
 					int emissiveLightLevel = 0;
 					if ((surface->surfaceFlags & SITH_SURFACE_HORIZON_SKY) || (surface->surfaceFlags & SITH_SURFACE_CEILING_SKY))
@@ -414,10 +413,12 @@ int sithWorld_NewEntry(sithWorld *pWorld)
 						rdAmbient_Acc(&sector->ambientSH, &col, &dirToCenter);
 					}
 				}
-				sflight /= (float)pWorld->sectors[i].numSurfaces;
+				//sflight /= (float)pWorld->sectors[i].numSurfaces;
 				rdVector_InvScale3Acc(&sector->ambientRGB, total);
+			#ifdef RENDER_DROID2
+				rdAmbient_Scale(&sector->ambientSH, 4.0f / total); // integration over sphere, with PI pre-divided out
+			#else
 				rdAmbient_Scale(&sector->ambientSH, 4.0f * M_PI / total); // integration over sphere
-			#ifndef RENDER_DROID2
 				rdAmbient_UpdateDominantDirection(&sector->ambientSH);
 			#endif
 			}

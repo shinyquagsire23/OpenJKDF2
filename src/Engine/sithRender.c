@@ -354,7 +354,9 @@ int sithRender_Startup()
 int sithRender_Open()
 {
     sithRender_geoMode = RD_GEOMODE_TEXTURED;
-#ifdef SPECULAR_LIGHTING
+#ifdef RENDER_DROID2
+	sithRender_lightMode = RD_LIGHTMODE_SUBSURFACE;
+#elif defined(SPECULAR_LIGHTING)
 	sithRender_lightMode = RD_LIGHTMODE_SPECULAR;
 #else
     sithRender_lightMode = RD_LIGHTMODE_GOURAUD;
@@ -1100,7 +1102,6 @@ void sithRender_DrawSurface(sithSurface* surface)
 	int wallCel = surface->surfaceInfo.face.wallCel;
 	rdBindMaterial(surface->surfaceInfo.face.material, wallCel);
 
-	rdSetAmbientMode(RD_AMBIENT_COLOR);
 	if (sithRender_lightingIRMode)
 	{
 		rdAmbientLight(sithRender_f_83198C, sithRender_f_83198C, sithRender_f_83198C);
@@ -2606,7 +2607,10 @@ void sithRender_RenderThings()
                     else
                     {
                         lightMode = thingIter->rdthing.desiredLightMode;
-					#ifdef SPECULAR_LIGHTING
+					#ifdef RENDER_DROID2
+						if (lightMode > RD_LIGHTMODE_SUBSURFACE)
+							lightMode = RD_LIGHTMODE_SUBSURFACE;
+					#elif defined(SPECULAR_LIGHTING)
 						if (lightMode > RD_LIGHTMODE_SPECULAR)
 							lightMode = RD_LIGHTMODE_SPECULAR;
 					#else

@@ -25,10 +25,11 @@ enum RD_LIGHTMODE
     RD_LIGHTMODE_GOURAUD = 3,
 #ifdef SPECULAR_LIGHTING
 	RD_LIGHTMODE_SPECULAR = 4, // lightmode was always clamped to 3 so let's make use of 4
+	RD_LIGHTMODE_SUBSURFACE = 5, // same for 5
 #else
     RD_LIGHTMODE_4_UNK = 4,
+	RD_LIGHTMODE_5_UNK = 5,
 #endif
-    RD_LIGHTMODE_5_UNK = 5,
     RD_LIGHTMODE_6_UNK = 6
 };
 
@@ -69,14 +70,6 @@ typedef enum RD_BLEND_MODE
 	RD_BLEND_MODE_NONE = 0,
 	RD_BLEND_MODE_ALPHA = 1
 } RD_BLEND_MODE;
-
-typedef uint8_t rdAmbientMode_t;
-typedef enum RD_AMBIENT_MODE
-{
-	RD_AMBIENT_NONE,
-	RD_AMBIENT_COLOR,
-	RD_AMBIENT_SH,
-} RD_AMBIENT_MODE;
 
 typedef uint8_t rdCompare_t;
 typedef enum RD_COMPARE

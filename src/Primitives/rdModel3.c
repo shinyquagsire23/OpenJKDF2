@@ -1630,7 +1630,6 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
 #endif
 	rdAmbientLight(ambientLight.x + face->extraLight, ambientLight.y + face->extraLight, ambientLight.z + face->extraLight);
 	rdAmbientLightSH(&rdCamera_pCurCamera->ambientSH);
-	rdSetAmbientMode(USES_VERTEX_LIGHTING(lightingMode) ? RD_AMBIENT_SH : RD_AMBIENT_COLOR);
 
 	int isIdentityMap = (rdColormap_pCurMap == rdColormap_pIdentityMap);
 

@@ -634,7 +634,9 @@ int jkGuiBuildMulti_DisplayModel()
     rdColormap_SetCurrent(&jkGuiBuildMulti_colormap);
     rdSetRenderOptions(jkGuiBuildMulti_renderOptions);
     rdSetGeometryMode(RD_GEOMODE_TEXTURED);
-#ifdef SPECULAR_LIGHTING
+#ifdef RENDER_DROID2
+	rdSetLightingMode(RD_LIGHTMODE_SUBSURFACE);
+#elif defined(SPECULAR_LIGHTING)
 	rdSetLightingMode(RD_LIGHTMODE_SPECULAR);
 #else
 	rdSetLightingMode(RD_LIGHTMODE_GOURAUD);

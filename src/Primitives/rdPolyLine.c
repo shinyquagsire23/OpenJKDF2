@@ -332,6 +332,10 @@ void rdPolyLine_DrawFace(rdThing* thing, rdFace* face, rdVector3* unused, rdVert
 	rdMatrixMode(RD_MATRIX_MODEL);
 	rdIdentity();
 
+	idxInfo->numVertices = face->numVertices;
+	idxInfo->vertexPosIdx = face->vertexPosIdx;
+	idxInfo->vertexUVIdx = face->vertexUVIdx;
+
 	rdGeoMode_t curGeometryMode_ = rdroid_curGeometryMode;
 	rdLightMode_t curLightingMode_ = rdroid_curLightingMode;
 	rdTexMode_t curTextureMode_ = rdroid_curTextureMode;

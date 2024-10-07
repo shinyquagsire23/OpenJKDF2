@@ -125,6 +125,8 @@ int rdMath_IntersectPointLine(const rdVector3* pPoint, const rdVector3* pStart, 
 
 int rdMath_IntersectLineSegments(const rdVector3* pStartA, const rdVector3* pEndA, const rdVector3* pStartB, const rdVector3* pEndB, rdVector3* pOut)
 {
+	rdVector_Zero3(pOut);
+
 	rdVector3 delta1, delta2, delta;
 	rdVector_Sub3(&delta1, pEndA, pStartA);
 	rdVector_Sub3(&delta2, pEndB, pStartB);

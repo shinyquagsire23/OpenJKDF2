@@ -157,7 +157,6 @@ void rdClearLights();
 void rdClearOccluders();
 void rdClearDecals();
 
-void rdSetAmbientMode(rdAmbientMode_t type);
 void rdAmbientLight(float r, float g, float b);
 void rdAmbientLightSH(rdAmbient* amb);
 

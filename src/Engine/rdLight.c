@@ -664,7 +664,7 @@ void rdAmbient_Acc(rdAmbient* ambient, rdVector3* color, rdVector3* dir)
 		{
 			float dp = rdVector_Dot3((rdVector3*)&sg1, (rdVector3*)&sg2);
 			float factor = (dp - 1.0f) * sg1.w;
-			float wgt = exp(factor);
+			float wgt = exp(factor + 0.0001f);
 			rdVector_MultAcc3(&ambient->sgs[sg], color, wgt);
 		}
 	}

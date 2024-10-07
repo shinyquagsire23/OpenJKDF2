@@ -263,15 +263,30 @@ typedef enum STD3D_DRAW_LIST
 {
 	DRAW_LIST_Z,
 	DRAW_LIST_Z_ALPHATEST,
-
-	DRAW_LIST_COLOR,
-	DRAW_LIST_COLOR_UNLIT,
-	DRAW_LIST_COLOR_ALPHATEST,
-	DRAW_LIST_COLOR_ALPHATEST_UNLIT,
+	DRAW_LIST_COLOR_ZPREPASS,
+	DRAW_LIST_COLOR_NOZPREPASS,
 	DRAW_LIST_COLOR_ALPHABLEND,
-	DRAW_LIST_COLOR_ALPHABLEND_UNLIT,
-
 	DRAW_LIST_COUNT
+} STD3D_DRAW_LIST;
+
+typedef enum STD3D_SHADER_ID
+{
+	SHADER_DEPTH,
+	SHADER_DEPTH_ALPHATEST,
+
+	SHADER_COLOR_UNLIT,
+	SHADER_COLOR,
+	SHADER_COLOR_SPEC,
+
+	SHADER_COLOR_ALPHATEST_UNLIT,
+	SHADER_COLOR_ALPHATEST,
+	SHADER_COLOR_ALPHATEST_SPEC,
+
+	SHADER_COLOR_ALPHABLEND_UNLIT,
+	SHADER_COLOR_ALPHABLEND,
+	SHADER_COLOR_ALPHABLEND_SPEC,
+
+	SHADER_COUNT
 } STD3D_DRAW_LIST;
 
 typedef struct std3D_worldStage
@@ -279,7 +294,7 @@ typedef struct std3D_worldStage
 	GLuint program;
 	GLint attribute_coord3d, attribute_v_color, attribute_v_light, attribute_v_uv, attribute_v_norm;
 	GLint uniform_mvp, uniform_modelMatrix;
-	GLint uniform_ambient_mode, uniform_ambient_color, uniform_ambient_sg, uniform_ambient_sgbasis;
+	GLint uniform_ambient_color, uniform_ambient_sg, uniform_ambient_sgbasis;
 	GLint uniform_uv_mode, uniform_texgen, uniform_texgen_params, uniform_uv_offset;
 	GLint uniform_fillColor, uniform_tex, uniform_texEmiss, uniform_displacement_map, uniform_texDecals;
 	GLint uniform_tex_mode, uniform_blend_mode, uniform_worldPalette, uniform_worldPaletteLights;
@@ -297,7 +312,7 @@ typedef struct std3D_worldStage
 #endif
 } std3D_worldStage;
 
-std3D_worldStage worldStages[DRAW_LIST_COUNT];
+std3D_worldStage worldStages[SHADER_COUNT];
 
 GLint programMenu_attribute_coord3d, programMenu_attribute_v_color, programMenu_attribute_v_uv, programMenu_attribute_v_norm;
 GLint programMenu_uniform_mvp, programMenu_uniform_tex, programMenu_uniform_displayPalette;
@@ -1086,7 +1101,6 @@ int std3D_loadWorldStage(std3D_worldStage* pStage, int isZPass, const char* defi
 	pStage->uniform_texgen = std3D_tryFindUniform(pStage->program, "texgen");
 	pStage->uniform_texgen_params = std3D_tryFindUniform(pStage->program, "texgen_params");
 	pStage->uniform_uv_offset = std3D_tryFindUniform(pStage->program, "uv_offset");
-	pStage->uniform_ambient_mode = std3D_tryFindUniform(pStage->program, "ambientMode");
 	pStage->uniform_ambient_color = std3D_tryFindUniform(pStage->program, "ambientColor");
 	pStage->uniform_ambient_sg = std3D_tryFindUniform(pStage->program, "ambientSG");
 	pStage->uniform_ambient_sgbasis = std3D_tryFindUniform(pStage->program, "ambientSGBasis");
@@ -1373,14 +1387,17 @@ int init_resources()
     if ((programDefault = std3D_loadProgram("shaders/default", "")) == 0) return false;
     if ((programMenu = std3D_loadProgram("shaders/menu", "")) == 0) return false;
 #ifdef RENDER_DROID2
-	if (!std3D_loadWorldStage(&worldStages[DRAW_LIST_Z], 1, "Z_PREPASS")) return false;
-	if (!std3D_loadWorldStage(&worldStages[DRAW_LIST_Z_ALPHATEST], 1, "Z_PREPASS;ALPHA_DISCARD")) return false;
-	if (!std3D_loadWorldStage(&worldStages[DRAW_LIST_COLOR], 0, "")) return false;
-	if (!std3D_loadWorldStage(&worldStages[DRAW_LIST_COLOR_UNLIT], 0, "UNLIT")) return false;
-	if (!std3D_loadWorldStage(&worldStages[DRAW_LIST_COLOR_ALPHATEST], 0, "ALPHA_DISCARD")) return false;
-	if (!std3D_loadWorldStage(&worldStages[DRAW_LIST_COLOR_ALPHATEST_UNLIT], 0, "ALPHA_DISCARD;UNLIT")) return false;
-	if (!std3D_loadWorldStage(&worldStages[DRAW_LIST_COLOR_ALPHABLEND], 0, "ALPHA_DISCARD;ALPHABLEND")) return false;
-	if (!std3D_loadWorldStage(&worldStages[DRAW_LIST_COLOR_ALPHABLEND_UNLIT], 0, "ALPHA_DISCARD;ALPHABLEND;UNLIT")) return false;
+	if (!std3D_loadWorldStage(&worldStages[SHADER_DEPTH], 1, "Z_PREPASS")) return false;
+	if (!std3D_loadWorldStage(&worldStages[SHADER_DEPTH_ALPHATEST], 1, "Z_PREPASS;ALPHA_DISCARD")) return false;
+	if (!std3D_loadWorldStage(&worldStages[SHADER_COLOR], 0, "")) return false;
+	if (!std3D_loadWorldStage(&worldStages[SHADER_COLOR_SPEC], 0, "SPECULAR")) return false;
+	if (!std3D_loadWorldStage(&worldStages[SHADER_COLOR_UNLIT], 0, "UNLIT")) return false;
+	if (!std3D_loadWorldStage(&worldStages[SHADER_COLOR_ALPHATEST], 0, "ALPHA_DISCARD")) return false;
+	if (!std3D_loadWorldStage(&worldStages[SHADER_COLOR_ALPHATEST_SPEC], 0, "ALPHA_DISCARD;SPECULAR")) return false;
+	if (!std3D_loadWorldStage(&worldStages[SHADER_COLOR_ALPHATEST_UNLIT], 0, "ALPHA_DISCARD;UNLIT")) return false;
+	if (!std3D_loadWorldStage(&worldStages[SHADER_COLOR_ALPHABLEND], 0, "ALPHA_DISCARD;ALPHABLEND")) return false;
+	if (!std3D_loadWorldStage(&worldStages[SHADER_COLOR_ALPHABLEND_SPEC], 0, "ALPHA_DISCARD;ALPHABLEND;SPECULAR")) return false;
+	if (!std3D_loadWorldStage(&worldStages[SHADER_COLOR_ALPHABLEND_UNLIT], 0, "ALPHA_DISCARD;ALPHABLEND;UNLIT")) return false;
 #endif
     if (!std3D_loadSimpleTexProgram("shaders/ui", &std3D_uiProgram)) return false;
     if (!std3D_loadSimpleTexProgram("shaders/texfbo", &std3D_texFboStage)) return false;
@@ -1593,7 +1610,7 @@ int init_resources()
 	std3D_setupMenuVAO();
 #ifdef RENDER_DROID2
 	memset(std3D_clusterFrustumsFrame, 0, sizeof(std3D_clusterFrustumsFrame));
-	for(int i = 0; i < DRAW_LIST_COUNT; ++i)
+	for(int i = 0; i < SHADER_COUNT; ++i)
 	{
 		std3D_setupDrawCallVAO(&worldStages[i]);
 		std3D_setupLightingUBO(&worldStages[i]);
@@ -1689,7 +1706,7 @@ void std3D_FreeResources()
     glDeleteBuffers(1, &menu_vbo_all);
 
 #ifdef RENDER_DROID2
-	for(int i = 0; i < DRAW_LIST_COUNT; ++i)
+	for(int i = 0; i < SHADER_COUNT; ++i)
 		glDeleteProgram(worldStages[i].program);
 	glDeleteBuffers(1, &light_ubo);
 	glDeleteBuffers(1, &occluder_ubo);
@@ -5073,18 +5090,6 @@ int std3D_HasDepthWrites(std3D_DrawCallState* pState)
 	return pState->depthStencil.zmethod == RD_ZBUFFER_READ_WRITE || pState->depthStencil.zmethod == RD_ZBUFFER_NOREAD_WRITE;
 }
 
-int std3D_RenderListForState(std3D_DrawCallState* pState)
-{
-	int lighting = pState->lighting.lightMode >= RD_LIGHTMODE_DIFFUSE;
-
-	int permute = lighting ? DRAW_LIST_COLOR : DRAW_LIST_COLOR_UNLIT; // color opaque, no discard
-	if(pState->blend.blendMode == RD_BLEND_MODE_ALPHA)
-		permute = lighting ? DRAW_LIST_COLOR_ALPHABLEND : DRAW_LIST_COLOR_ALPHABLEND_UNLIT; // alpha blend with discard
-	else if(pState->texture.alphaTest && !std3D_HasDepthWrites(pState))
-		permute = lighting ? DRAW_LIST_COLOR_ALPHATEST : DRAW_LIST_COLOR_ALPHATEST_UNLIT; // alpha with discard (only if no ztest)
-	return permute;
-}
-
 uint64_t std3D_SortKeyBits(uint64_t* offset, uint64_t bits, uint64_t size)
 {
 	uint64_t limit =(size == 64) ? 0xFFFFFFFFFFFFFFFFUL : (1UL << size) - 1UL;
@@ -5095,23 +5100,31 @@ uint64_t std3D_SortKeyBits(uint64_t* offset, uint64_t bits, uint64_t size)
 
 uint64_t std3D_GetSortKey(std3D_DrawCallState* pState)
 {
+	int textureID = pState->texture.pTexture ? pState->texture.pTexture->texture_id : 0;
+
 	uint64_t offset = 64L;
 	
 	uint64_t sortKey = 0;
-	sortKey |= std3D_SortKeyBits(&offset, pState->sortPriority, 2); // 2
-	sortKey |= std3D_SortKeyBits(&offset, pState->texture.pTexture ? pState->texture.pTexture->texture_id : 0, 16); // 18
-	sortKey |= std3D_SortKeyBits(&offset, 1 - pState->blend.blendMode, 1); // 19
-	sortKey |= std3D_SortKeyBits(&offset, 3 - pState->depthStencil.zmethod, 2); // 21
-	sortKey |= std3D_SortKeyBits(&offset, pState->depthStencil.zcompare, 3); // 24
-	sortKey |= std3D_SortKeyBits(&offset, pState->raster.cullMode, 3); // 27
-	sortKey |= std3D_SortKeyBits(&offset, pState->texture.alphaTest, 1); // 28
-	sortKey |= std3D_SortKeyBits(&offset, pState->raster.geoMode, 3); // 31
-	sortKey |= std3D_SortKeyBits(&offset, pState->texture.texMode, 3); // 34
-	sortKey |= std3D_SortKeyBits(&offset, pState->lighting.lightMode, 3); // 37
-	sortKey |= std3D_SortKeyBits(&offset, pState->lighting.ambientMode, 2); // 39
-	sortKey |= std3D_SortKeyBits(&offset, pState->texture.chromaKeyMode, 1); // 40
-	sortKey |= std3D_SortKeyBits(&offset, pState->raster.colorMode, 1); // 41
-	sortKey |= std3D_SortKeyBits(&offset, pState->raster.scissorMode, 1); // 42
+	sortKey |= std3D_SortKeyBits(&offset,          pState->sortPriority,  8); // sort priority first
+	sortKey |= std3D_SortKeyBits(&offset,              pState->shaderID,  4); // then sort by shader
+	sortKey |= std3D_SortKeyBits(&offset,                     textureID, 16); // then by texture
+	sortKey |= std3D_SortKeyBits(&offset,  pState->depthStencil.zmethod,  2); // then by zwrite state
+	sortKey |= std3D_SortKeyBits(&offset, pState->depthStencil.zcompare,  3); // then ztest state
+	sortKey |= std3D_SortKeyBits(&offset,       pState->raster.cullMode,  3); // then by face culling
+	sortKey |= std3D_SortKeyBits(&offset,    pState->raster.scissorMode,  3); // then by scissoring
+
+	
+//	sortKey |= std3D_SortKeyBits(&offset, pState->blend.blendMode, 1);
+//	sortKey |= std3D_SortKeyBits(&offset, pState->depthStencil.zmethod, 2);
+//	sortKey |= std3D_SortKeyBits(&offset, pState->depthStencil.zcompare, 3);
+//	sortKey |= std3D_SortKeyBits(&offset, pState->raster.cullMode, 3);
+//	sortKey |= std3D_SortKeyBits(&offset, pState->texture.alphaTest, 1);
+//	sortKey |= std3D_SortKeyBits(&offset, pState->raster.geoMode, 3);
+//	sortKey |= std3D_SortKeyBits(&offset, pState->texture.texMode, 3);
+//	sortKey |= std3D_SortKeyBits(&offset, pState->lighting.lightMode, 3);
+//	sortKey |= std3D_SortKeyBits(&offset, pState->texture.chromaKeyMode, 1);
+//	sortKey |= std3D_SortKeyBits(&offset, pState->raster.colorMode, 1);
+//	sortKey |= std3D_SortKeyBits(&offset, pState->raster.scissorMode, 1);
 
 	// use the rest for depth sorting
 	//uint64_t remainingBits = offset;
@@ -5131,6 +5144,23 @@ uint64_t std3D_GetSortKey(std3D_DrawCallState* pState)
 	//hash |= ((proc->type & RD_FF_SCREEN) == RD_FF_SCREEN) << 28;
 #endif
 	return sortKey;
+}
+
+int std3D_GetShaderID(std3D_DrawCallState* pState)
+{
+	int alphaTest = pState->texture.alphaTest & 1;
+	int blending  = pState->blend.blendMode == RD_BLEND_MODE_ALPHA;
+	int lighting  = pState->lighting.lightMode >= RD_LIGHTMODE_DIFFUSE;
+	int specular  = pState->lighting.lightMode == RD_LIGHTMODE_SPECULAR;
+
+	// todo: clean this up by using some array indexing or something
+	if (blending)
+		return SHADER_COLOR_ALPHABLEND_UNLIT + lighting + specular;
+
+	if (alphaTest)
+		return SHADER_COLOR_ALPHATEST_UNLIT + lighting + specular;
+
+	return SHADER_COLOR_UNLIT + lighting + specular;
 }
 
 void std3D_AddListDrawCall(std3D_DrawCallList* pList, std3D_DrawCallState* pDrawCallState, D3DVERTEX* paVertices, int numVertices)
@@ -5164,13 +5194,13 @@ void std3D_AddZListDrawCall(std3D_DrawCallList* pList, std3D_DrawCallState* pDra
 	pDrawCall->state = *pDrawCallState;
 	pDrawCall->firstVertex = pList->drawCallVertexCount;
 	pDrawCall->numVertices = numVertices;
+	pDrawCall->state.shaderID = pDrawCallState->texture.alphaTest ? SHADER_DEPTH_ALPHATEST : SHADER_DEPTH;
 
 	// z lists can ignore these
 	memset(&pDrawCall->state.blend, 0, sizeof(std3D_BlendState));
 	memset(&pDrawCall->state.lighting, 0, sizeof(std3D_LightingState));
-	if(!pDrawCallState->texture.alphaTest) // non-alpha test doesn't require textures
+	if(!pDrawCallState->texture.alphaTest && pDrawCallState->texture.texGen == RD_TEXGEN_NONE) // non-alpha test with no texgen doesn't require textures
 		memset(&pDrawCall->state.texture, 0, sizeof(std3D_TextureState));
-
 
 	memcpy(&pList->drawCallVertices[pList->drawCallVertexCount], paVertices, sizeof(D3DVERTEX) * numVertices);
 	pList->drawCallVertexCount += numVertices;
@@ -5183,18 +5213,35 @@ void std3D_AddDrawCall(std3D_DrawCallState* pDrawCallState, D3DVERTEX* paVertice
 
 	int drawLayer = stdMath_ClampInt(pDrawCallState->drawLayer, 0, STD3D_MAX_DRAW_LAYERS - 1);
 
+	int blending = pDrawCallState->blend.blendMode == RD_BLEND_MODE_ALPHA;
+	int lighting = pDrawCallState->lighting.lightMode >= RD_LIGHTMODE_DIFFUSE;
+	int specular = pDrawCallState->lighting.lightMode == RD_LIGHTMODE_SPECULAR;
+	
+	int listIndex;
+
 	// add to z-prepass if applicable
-	int writesZ = pDrawCallState->depthStencil.zmethod == RD_ZBUFFER_READ_WRITE || pDrawCallState->depthStencil.zmethod == RD_ZBUFFER_NOREAD_WRITE;
+	int writesZ = std3D_HasDepthWrites(pDrawCallState);
 	if (pDrawCallState->blend.blendMode == RD_BLEND_MODE_NONE && writesZ)
 	{
-		std3D_AddZListDrawCall(&std3D_drawCallLists[drawLayer][pDrawCallState->texture.alphaTest], pDrawCallState, paVertices, numVertices);
+		std3D_AddZListDrawCall(&std3D_drawCallLists[drawLayer][DRAW_LIST_Z + pDrawCallState->texture.alphaTest & 1], pDrawCallState, paVertices, numVertices);
 
 		// the forward pass can now do a simple equal test with no writes
 		pDrawCallState->depthStencil.zcompare = RD_COMPARE_EQUAL;
 		pDrawCallState->depthStencil.zmethod = RD_ZBUFFER_READ_NOWRITE;
+		pDrawCallState->sortPriority = 255; // render first
+		pDrawCallState->texture.alphaTest = 0;
+		pDrawCallState->texture.alphaRef = 0;
+		pDrawCallState->texture.chromaKeyMode = 0;
+		pDrawCallState->texture.chromaKeyColor = 0;
+		pDrawCallState->shaderID = SHADER_COLOR_UNLIT + lighting + specular;
+		listIndex = DRAW_LIST_COLOR_ZPREPASS;
+	}
+	else	
+	{
+		pDrawCallState->shaderID = std3D_GetShaderID(pDrawCallState);
+		listIndex = blending ? DRAW_LIST_COLOR_ALPHABLEND : DRAW_LIST_COLOR_NOZPREPASS;
 	}
 
-	int listIndex = std3D_RenderListForState(pDrawCallState);
 	std3D_AddListDrawCall(&std3D_drawCallLists[drawLayer][listIndex], pDrawCallState, paVertices, numVertices);
 }
 
@@ -5394,7 +5441,6 @@ void std3D_SetTextureState(std3D_worldStage* pStage, std3D_TextureState* pTexSta
 void std3D_SetLightingState(std3D_worldStage* pStage, std3D_LightingState* pLightState)
 {
 	glUniform1i(pStage->uniform_light_mode, pLightState->lightMode);
-	glUniform1i(pStage->uniform_ambient_mode, pLightState->ambientMode);
 	glUniform3fv(pStage->uniform_ambient_color, 1, &pLightState->ambientColor.x);
 	glUniform3fv(pStage->uniform_ambient_sg, 8, &pLightState->ambientStateSH.sgs[0].x);
 
@@ -5454,7 +5500,7 @@ void std3D_BindStage(std3D_worldStage* pStage)
 // todo/fixme: we're not currently handling viewport changes mid-draw
 static rdMatrix44 oldProj; // keep track of the global projection to avoid redundant cluster building if the matrix doesn't change over the course of several frames
 
-void std3D_FlushDrawCallList(std3D_worldStage* pStage, std3D_DrawCallList* pList, std3D_SortFunc sortFunc)
+void std3D_FlushDrawCallList(std3D_DrawCallList* pList, std3D_SortFunc sortFunc)
 {
 	if (!pList->drawCallCount)
 		return;
@@ -5466,7 +5512,6 @@ void std3D_FlushDrawCallList(std3D_worldStage* pStage, std3D_DrawCallList* pList
 	oldProj = pList->drawCalls[0].state.proj;
 
 	// sort draw calls to reduce state changes and maximize batching
-	// todo: use a different comparator for different lists (ex. distance priority for transparent)
 	if(sortFunc)
 		_qsort(pList->drawCalls, pList->drawCallCount, sizeof(std3D_DrawCall), (int(__cdecl*)(const void*, const void*))sortFunc);
 
@@ -5493,6 +5538,8 @@ void std3D_FlushDrawCallList(std3D_worldStage* pStage, std3D_DrawCallList* pList
 	std3D_LightingState* pLightState = &pDrawCall->state.lighting;
 
 	std3D_DrawCallState lastState = pDrawCall->state;
+
+	std3D_worldStage* pStage = &worldStages[pDrawCall->state.shaderID];
 
 	std3D_BindStage(pStage);
 	glBufferData(GL_ARRAY_BUFFER, pList->drawCallVertexCount * sizeof(D3DVERTEX), vertexArray, GL_STREAM_DRAW);
@@ -5525,6 +5572,7 @@ void std3D_FlushDrawCallList(std3D_worldStage* pStage, std3D_DrawCallList* pList
 		int texid = pTexState->pTexture ? pTexState->pTexture->texture_id : blank_tex_white;
 		if (last_tex != texid
 			//|| memcmp(&lastState, &pDrawCall->state, sizeof(std3D_DrawCallState)) != 0
+			|| lastState.shaderID != pDrawCall->state.shaderID
 			|| memcmp(&lastState.raster, &pDrawCall->state.raster, sizeof(std3D_RasterState)) != 0
 			|| memcmp(&lastState.blend, &pDrawCall->state.blend, sizeof(std3D_BlendState)) != 0
 			|| memcmp(&lastState.depthStencil, &pDrawCall->state.depthStencil, sizeof(std3D_DepthStencilState)) != 0
@@ -5540,6 +5588,12 @@ void std3D_FlushDrawCallList(std3D_worldStage* pStage, std3D_DrawCallList* pList
 		if (do_batch)
 		{
 			glDrawArrays(GL_TRIANGLES, vertexOffset, batch_verts);
+
+			if (lastState.shaderID != pDrawCall->state.shaderID)
+			{
+				pStage = &worldStages[pDrawCall->state.shaderID];
+				std3D_BindStage(pStage);
+			}
 
 			std3D_SetRasterState(pRasterState);
 			std3D_SetBlendState(pStage, pBlendState);
@@ -5581,6 +5635,7 @@ void std3D_FlushDrawCallList(std3D_worldStage* pStage, std3D_DrawCallList* pList
 		glDrawArrays(GL_TRIANGLES, vertexOffset, batch_verts);
 }
 
+// fixme: flush this when rdCache_Flush is called instead of trying to lump everything into a bunch of draw lists?
 void std3D_FlushDrawCalls()
 {
 	if (Main_bHeadless) return;
@@ -5616,18 +5671,15 @@ void std3D_FlushDrawCalls()
 	for (int j = 0; j < STD3D_MAX_DRAW_LAYERS; ++j)
 	{
 		// flush z lists
-		std3D_FlushDrawCallList(&worldStages[DRAW_LIST_Z],           &std3D_drawCallLists[j][DRAW_LIST_Z],           std3D_DrawCallCompareSortKey);
-		std3D_FlushDrawCallList(&worldStages[DRAW_LIST_Z_ALPHATEST], &std3D_drawCallLists[j][DRAW_LIST_Z_ALPHATEST], std3D_DrawCallCompareSortKey);
+		std3D_FlushDrawCallList(&std3D_drawCallLists[j][DRAW_LIST_Z],           std3D_DrawCallCompareSortKey);
+		std3D_FlushDrawCallList(&std3D_drawCallLists[j][DRAW_LIST_Z_ALPHATEST], std3D_DrawCallCompareSortKey);
 
 		// todo: do any necessary opaque-only deferred stuff here
 
 		// flush color lists
-		std3D_FlushDrawCallList(&worldStages[DRAW_LIST_COLOR_UNLIT],            &std3D_drawCallLists[j][DRAW_LIST_COLOR_UNLIT],            std3D_DrawCallCompareSortKey);
-		std3D_FlushDrawCallList(&worldStages[DRAW_LIST_COLOR],                  &std3D_drawCallLists[j][DRAW_LIST_COLOR],                  std3D_DrawCallCompareSortKey);
-		std3D_FlushDrawCallList(&worldStages[DRAW_LIST_COLOR_ALPHATEST_UNLIT],  &std3D_drawCallLists[j][DRAW_LIST_COLOR_ALPHATEST_UNLIT],  std3D_DrawCallCompareSortKey);
-		std3D_FlushDrawCallList(&worldStages[DRAW_LIST_COLOR_ALPHATEST],        &std3D_drawCallLists[j][DRAW_LIST_COLOR_ALPHATEST],        std3D_DrawCallCompareSortKey);
-		std3D_FlushDrawCallList(&worldStages[DRAW_LIST_COLOR_ALPHABLEND],       &std3D_drawCallLists[j][DRAW_LIST_COLOR_ALPHABLEND],       std3D_DrawCallCompareDepth);
-		std3D_FlushDrawCallList(&worldStages[DRAW_LIST_COLOR_ALPHABLEND_UNLIT], &std3D_drawCallLists[j][DRAW_LIST_COLOR_ALPHABLEND_UNLIT], std3D_DrawCallCompareDepth);
+		std3D_FlushDrawCallList(&std3D_drawCallLists[j][DRAW_LIST_COLOR_ZPREPASS],   std3D_DrawCallCompareSortKey);
+		std3D_FlushDrawCallList(&std3D_drawCallLists[j][DRAW_LIST_COLOR_NOZPREPASS], std3D_DrawCallCompareSortKey);
+		std3D_FlushDrawCallList(&std3D_drawCallLists[j][DRAW_LIST_COLOR_ALPHABLEND], std3D_DrawCallCompareDepth);
 
 		// clear the depth buffer for the next draw layer
 		glDepthMask(GL_TRUE);

@@ -111,7 +111,7 @@ uniform vec4 fillColor;
 // fixme: specular mode is currently a metal mode, where metalness is assumed to be 1.0 with 0 diffuse component
 // this is pretty limiting atm, I'd like to get some shiny storm troopers but their armor is more like plastic
 uniform int  lightMode;
-uniform int  ambientMode;
+
 uniform vec3 ambientColor;
 uniform vec4 ambientSH[3];
 uniform vec3 ambientDominantDir;
@@ -226,6 +226,14 @@ float atanFast(float x)
     return (x < 0.0) ? -t0: t0; 
 }
 
+float acosFast(float x) 
+{ 
+    x = abs(x); 
+    float res = -0.156583 * x + 1.570796; 
+    res *= sqrt(1.0f - x); 
+    return (x >= 0) ? res : 3.141592 - res; 
+}
+
 // debug view
 vec3 temperature(float t)
 {
@@ -317,6 +325,50 @@ vec3 SGIrradiancePunctual(SG lightingLobe, vec3 normal)
     return cosineTerm * 2.0 * 3.141592 * (lightingLobe.Amplitude) / lightingLobe.Sharpness;
 }
 
+vec3 ApproximateSGIntegral(in SG sg)
+{
+    return 2 * 3.141592 * (sg.Amplitude / sg.Sharpness);
+}
+
+vec3 SGIrradianceFitted(in SG lightingLobe, in vec3 normal)
+{
+    float muDotN = dot(lightingLobe.Axis, normal);
+    float lambda = lightingLobe.Sharpness;
+
+    const float c0 = 0.36f;
+    const float c1 = 1.0f / (4.0f * c0);
+
+    float eml  = exp(-lambda);
+    float em2l = eml * eml;
+    float rl   = 1.0/(lambda);
+
+    float scale = 1.0f + 2.0f * em2l - rl;
+    float bias  = (eml - em2l) * rl - em2l;
+
+    float x  = sqrt(1.0f - scale);
+    float x0 = c0 * muDotN;
+    float x1 = c1 * x;
+
+    float n = x0 + x1;
+
+    float y = (abs(x0) <= x1) ? n * n / x : clamp(muDotN, 0.0, 1.0);
+
+    float normalizedIrradiance = scale * y + bias;
+
+    return normalizedIrradiance * ApproximateSGIntegral(lightingLobe);
+}
+
+SG MakeNormalizedSG(in vec3 axis, in float sharpness)
+{
+    SG sg;
+    sg.Axis = axis;
+    sg.Sharpness = sharpness;
+    sg.Amplitude = 1.0 / ApproximateSGIntegral(sg);
+
+    return sg;
+}
+
+
 vec3 CalculateAmbientDiffuse(vec3 normal)
 {
 	vec3 ambientDiffuse = vec3(0.0);
@@ -327,13 +379,13 @@ vec3 CalculateAmbientDiffuse(vec3 normal)
 		lightSG.Axis = ambientSGBasis[sg].xyz;
 		lightSG.Sharpness = ambientSGBasis[sg].w;
 	
-		vec3 diffuse = SGIrradianceInnerProduct(lightSG, normal) / 3.141592;
+		vec3 diffuse = SGIrradianceInnerProduct(lightSG, normal);
 		ambientDiffuse.xyz += diffuse;
 	}
 	return ambientDiffuse;
 }
 
-vec3 CalculateAmbientSpecular(vec3 normal, vec3 view, float roughness)
+vec3 CalculateAmbientSpecular(vec3 normal, vec3 view, float roughness, vec3 f0)
 {
 	//float m2 = roughness * roughness;
 	//float nDotV = clamp(dot(normal.xyz, view.xyz), 0.0, 1.0);
@@ -358,12 +410,12 @@ vec3 CalculateAmbientSpecular(vec3 normal, vec3 view, float roughness)
 
 		// Fresnel
 		//vec3 h = normalize(warpedNDF.Axis + view);
-		//spec *= specColor + (1.0 - specColor) * pow((1.0 - clamp(dot(warpedNDF.Axis, h), 0.0, 1.0)), 5.0);
+		//spec *= f0 + (1.0 - f0) * exp2(-8.35 * max(0.0, dot(warpedNDF.Axis, h)));
 		
 		spec *= nDotL;
-		ambientSpecular.xyz += spec / 3.141592;
+		ambientSpecular.xyz += spec;
 	}
-	return ambientSpecular;
+	return f0 * ambientSpecular;
 }
 
 float HalfLambert(float ndotl)
@@ -372,26 +424,46 @@ float HalfLambert(float ndotl)
 	return ndotl * ndotl;
 }
 
-// todo: split the spotlights out
-void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, inout vec3 diffuseLight, inout vec3 specLight)
+// fRadius0 : First caps radius (arc length in radians)
+// fRadius1 : Second caps radius (in radians)
+// fDist : Distance between caps (radians between centers of caps)
+float SphericalCapIntersectionAreaFast(float fRadius0, float fRadius1, float fDist)
 {
-	// https://seblagarde.wordpress.com/2012/06/03/spherical-gaussien-approximation-for-blinn-phong-phong-and-fresnel/
-	// Point lights using SG approximations for consistency and a little speed
-	#define Log2Of1OnLn2_Plus1    1.528766
-	float ModifiedSpecularPower = 1.0 / log(2.0) * 8.0;// * (2.0 / roughness - 2);//exp2(10.0 * gloss + Log2Of1OnLn2_Plus1);
+	float fArea;
 
+	if ( fDist <= max(fRadius0, fRadius1) - min(fRadius0, fRadius1) )
+	{
+		// One cap is completely inside the other
+		fArea = 6.283185308f - 6.283185308f * cos( min(fRadius0,fRadius1) );
+	}
+	else if ( fDist >= fRadius0 + fRadius1 )
+	{
+		// No intersection exists
+		fArea = 0;
+	}
+	else
+	{
+		float fDiff = abs(fRadius0 - fRadius1);
+		fArea = smoothstep(0.0f,
+			1.0f,
+			1.0f - clamp((fDist-fDiff)/(fRadius0+fRadius1-fDiff), 0.0, 1.0));
+			fArea *= 6.283185308f - 6.283185308f * cos( min(fRadius0,fRadius1) );
+	}
+	return fArea;
+}
+
+
+// todo: split the spotlights out
+void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, vec4 shadows, vec3 albedo, vec3 f0, float roughness, inout vec3 lightAcc)
+{	
+	// precompute some terms
+	float a = roughness;// * roughness;
+	float a2 = a * a;
+	float rcp_a2 = 1.0 / a2;
+	float aperture = max(sqrt(1.0 - shadows.w), 0.01);
 	vec3 reflVec = reflect(-view, normal);
-	vec4 R2 = vec4(ModifiedSpecularPower * reflVec, -ModifiedSpecularPower);
 
-	vec3 specAcc = vec3(0);
 	float scalar = 0.4; // todo: needs to come from rdCamera_pCurCamera->attenuationMin
-
-	// debug
-	//float lightOverdraw = 0.0;
-	//int totalLights = min(numLights, 128);
-	//for(int light_index = 0; light_index < totalLights; ++light_index)
-
-	float minLum = 0.0;
 
 	uint first_item = 0u;
 	uint last_item = first_item + uint(numLights) - 1u;
@@ -406,10 +478,8 @@ void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, inout vec
 			uint light_index = bucket * 32u + bucket_bit_index;
 			bucket_bits ^= (1u << bucket_bit_index);
 				
-			if (light_index >= first_item && light_index <= last_item && minLum <= 1.0) // bail when we reach white
+			if (light_index >= first_item && light_index <= last_item)// && minLum <= 1.0) // bail when we reach white
 			{
-				//lightOverdraw += 1.0;
-
 				light l = lights[light_index];
 				vec3 diff = l.position.xyz - f_coord.xyz;
 
@@ -439,37 +509,46 @@ void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, inout vec
 				}
 
 				float lightMagnitude = dot(normal, diff);
-				//if (lightMode > 2) // gouraud and higher use half lambert
-						//lightMagnitude = HalfLambert(lightMagnitude);
-
-				if ( lightMagnitude <= 0.0 )
-					continue;
 
 				// this is JK's attenuation model, note it depends on scalar value matching whatever was used to calculate the intensity, it seems
-				intensity = max(0.0, intensity - len * scalar) * lightMagnitude;
-				
-				//intensity = max(0.0, (l.falloffMin - len) / l.falloffMin) * intensity;
-			
-				if(lightMode == 4)
-					specAcc.xyz += l.color.xyz * (exp2(dot(R2, vec4(diff, 1.0))) * intensity);
-				else			
-					diffuseLight.xyz += l.color.xyz * intensity;
+				intensity = max(0.0, intensity - len * scalar);
 
-				minLum += l.color.a * intensity;
+				if(numOccluders > 0)
+				{
+					float localShadow = clamp(dot(shadows.xyz, diff.xyz) / aperture, 0.0, 1.0);
+					lightMagnitude *= localShadow * localShadow;
+				}
+				
+				vec3 cd;
+				if (lightMode == 5)
+				{
+					// https://www.shadertoy.com/view/dltGWl
+					vec3 sss = 0.2 * exp(-3.0 * abs(lightMagnitude) / (fillColor.xyz + 0.001));
+					cd.xyz = (fillColor.xyz * sss + max(0.0, lightMagnitude));
+				}
+				else
+				{
+					cd.xyz = vec3(max(0.0, lightMagnitude));
+				}
+
+				lightMagnitude = max(lightMagnitude, 0.0);
+
+				#ifdef SPECULAR
+					float c = 0.72134752 * rcp_a2 + 0.39674113;
+					vec3 cs = f0 * (lightMagnitude * exp2( c * dot(reflVec, diff) - c ) * (rcp_a2 / 3.141592));
+				#else
+					vec3 cs = vec3(0.0);
+				#endif
+
+				lightAcc.xyz += l.color.xyz * intensity * (albedo * cd + cs);
 			}
 		}
 	}
-
-	#define LN2DIV8               0.08664
-	float specNormalization = (LN2DIV8 * ModifiedSpecularPower + 0.25);
-	specLight = specAcc * specNormalization + specLight;
-
-	//diffuseLight = temperature(lightOverdraw / 32.0);
 }
 
-float CalculateIndirectShadows(uint bucket_index, vec3 pos, vec3 normal)
+vec4 CalculateIndirectShadows(uint bucket_index, vec3 pos, vec3 normal)
 {
-	float shadowing = 1.0;
+	vec4 shadowing = vec4(normal.xyz, 1.0);
 	//float overDraw = 0.0;
 
 	uint first_item = uint(firstOccluder);
@@ -486,7 +565,7 @@ float CalculateIndirectShadows(uint bucket_index, vec3 pos, vec3 normal)
 			uint occluder_index = bucket * 32u + bucket_bit_index;
 			bucket_bits ^= (1u << bucket_bit_index);
 			
-			if (occluder_index >= first_item && occluder_index <= last_item && shadowing > 5.0 / 255.0)
+			if (occluder_index >= first_item && occluder_index <= last_item)
 			{
 				//overDraw += 1.0;				
 				//occluder occ = occluders[occluder_index];
@@ -512,11 +591,12 @@ float CalculateIndirectShadows(uint bucket_index, vec3 pos, vec3 normal)
 				falloff = falloff * falloff * (3.0 - 2.0 * falloff);
 
 				float integralSolidAngle = cosTheta * solidAngle * falloff;
-				shadowing *= 1.0 - integralSolidAngle;
+				shadowing.w *= 1.0 - integralSolidAngle;
+				shadowing.xyz -= direction * integralSolidAngle * 0.5;
 			}
 		}
 	}
-
+	shadowing.xyz = normalize(shadowing.xyz);
 	return shadowing;
 }
 
@@ -801,6 +881,24 @@ vec4 bilinear_paletted_light(vec2 uv, float index)
 }
 #endif
 
+vec3 RGBtoHSV(vec3 c)
+{
+    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+	vec4 p = c.g < c.b ? vec4(c.bg, K.wz) : vec4(c.gb, K.xy);
+    vec4 q = c.r < p.x ? vec4(p.xyw, c.r) : vec4(c.r, p.yzx);
+
+    float d = q.x - min(q.w, q.y);
+    float e = 1.0e-10;
+    return vec3(abs(q.z + (q.w - q.y) / (6.0f * d + e)), d / (q.x + e), q.x);
+}
+
+vec3 HSVtoRGB(vec3 c)
+{
+    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+    return c.z * mix(K.xxx, clamp(p - K.xxx, vec3(0.0), vec3(1.0)), c.y);
+}
+
 void main(void)
 {
     vec3 adj_texcoords = f_uv.xyz / f_uv.w;
@@ -919,71 +1017,59 @@ void main(void)
 
 	vec3 diffuseColor = sampled_color.xyz;
 	vec3 specularColor = vec3(0.0);//min(diffuseColor.xyz, fillColor.xyz);
-	float roughness = 0.01;	
+
+	//float smoothness = max(diffuseColor.r, max(diffuseColor.g, diffuseColor.b));
+	//smoothness = (smoothness + 0.2) / 1.2;
+	//float roughness = 1.0 - smoothness * smoothness;// 0.01;	
+	float roughness = 0.01;
 
 	if(numDecals > 0)
 		BlendDecals(diffuseColor.xyz, emissive.xyz, bucket_index, f_coord.xyz, surfaceNormals);
 
-	if(lightMode == 4)
-	{
-		// for specular materials, try to split the texture highlights and shadows around the fill color
-		//diffuseColor = min(sampled_color.xyz, fillColor.xyz);
-		//specularColor = max(sampled_color.xyz, fillColor.xyz);
+#ifndef UNLIT
+#ifdef SPECULAR
+	// for specular materials, try to split the texture highlights and shadows around the fill color
+	//diffuseColor = min(sampled_color.xyz, fillColor.xyz);
+	//specularColor = max(sampled_color.xyz, fillColor.xyz);
 
-		//diffuseColor = vec3(0.0);//min(sampled_color.xyz, fillColor.xyz); // poor woman's highlight removal
-		specularColor = sampled_color.xyz;//fillColor.xyz;// sampled_color.xyz;
-	}
+	//diffuseColor = vec3(0.0);//min(sampled_color.xyz, fillColor.xyz); // poor woman's highlight removal
+	//specularColor = fillColor.xyz;// sampled_color.xyz;
 
-	vec3 diffuseLight = vertex_color.xyz;
-	vec3 specLight = vec3(0.0);
+	// fill color is effectively an anti-metalness control
+	vec3 avgAlbedo = fillColor.xyz;
+	diffuseColor = mix(vec3(0.0), diffuseColor, avgAlbedo);
+	specularColor = mix(sampled_color.xyz, vec3(0.2), avgAlbedo);
 
-#ifdef UNLIT
-	// lightMode should always be one of these 2 for UNLIT
-	if(lightMode == 0) // full lit
-	{
-		diffuseLight.xyz = vec3(1.0);
-	}
-	else if(lightMode == 1) // not lit
-	{
-		diffuseLight.xyz = vec3(0.0);
-	}
-#else
-	//if(lightMode >= 2)
-	{
-		if (ambientMode > 0)
-		{
-			// original JK behavior seems to be max()
-			diffuseLight.xyz = max(diffuseLight.xyz, ambientColor.xyz);
-		}
+	float smoothness = max(sampled_color.r, max(sampled_color.g, sampled_color.b));
+	roughness = mix(0.2, 0.05, smoothness);
 
-		if (ambientMode == 2)
-		{
-			//diffuseLight.xyz += CalculateAmbientDiffuse(surfaceNormals);
-			if(lightMode == 4)
-				specLight.xyz += CalculateAmbientSpecular(surfaceNormals, localViewDir, roughness);
-			else
-				diffuseLight.xyz += CalculateAmbientDiffuse(surfaceNormals);
-		}
-			
-		float shadows = 1.0;
-		if (numOccluders > 0)
-			shadows = CalculateIndirectShadows(bucket_index, f_coord.xyz, surfaceNormals);	
-		
-		if (numLights > 0 && shadows > 1.0/255.0)
-			CalculatePointLighting(bucket_index, surfaceNormals, localViewDir, diffuseLight, specLight);
-		
-		diffuseLight.xyz *= shadows;
-		specLight.xyz *= shadows;
-
-		//diffuseColor.xyz = vec3(1.0);
-	}
-
-	// todo: maybe tone map this?
-	diffuseLight = clamp(diffuseLight.xyz, vec3(0.0), vec3(1.0));	
-	specLight = clamp(specLight.xyz, vec3(0.0), vec3(1.0));
+//	vec3 avgAlbedo = fillColor.xyz;
+//	vec3 hsv = RGBtoHSV(avgAlbedo);
+//	hsv.z = 1.0 - hsv.z;
+//	specularColor = HSVtoRGB(hsv);
+#endif
 #endif
 
-    vec4 main_color = vec4(diffuseColor.xyz * diffuseLight.xyz + specularColor.xyz * specLight.xyz, vertex_color.a);
+	vec4 main_color = vec4(diffuseColor.xyz, 1.0) * vertex_color.xyzw;
+
+#ifndef UNLIT
+	#ifdef SPECULAR
+		main_color.xyz += CalculateAmbientSpecular(surfaceNormals, localViewDir, 0.01, specularColor.xyz);
+	#endif
+		
+	vec4 shadows = vec4(0.0, 0.0, 0.0, 1.0);
+	if (numOccluders > 0)
+		shadows = CalculateIndirectShadows(bucket_index, f_coord.xyz, surfaceNormals);
+
+	float ao = (shadows.w + 0.1) / 1.1; // remap so we don't overdarken
+	main_color.xyz *= ao;
+	
+	if (numLights > 0)
+		CalculatePointLighting(bucket_index, surfaceNormals, localViewDir, shadows, diffuseColor.xyz, specularColor.xyz, roughness, main_color.xyz);
+	
+	main_color.xyz = clamp(main_color.xyz, vec3(0.0), vec3(1.0));	
+#endif
+
 	main_color.rgb = max(main_color.rgb, emissive.rgb);
 
     vec4 effectAdd_color = vec4(colorEffects_add.r, colorEffects_add.g, colorEffects_add.b, 0.0);
