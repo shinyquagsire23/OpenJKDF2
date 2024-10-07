@@ -918,7 +918,7 @@ void rdAddDecal(rdDecal* decal, rdMatrix34* modelMat, rdVector3* color, rdVector
 	rdMatrix44 decalMatrix;
 	rdMatrix_Multiply44(&decalMatrix, &rdroid_matrices[RD_MATRIX_VIEW], &rdroid_matrices[RD_MATRIX_MODEL]);
 
-	std3D_DrawDecal(sith_tex_sel->texture_struct[0], tex2_arr_sel, NULL, &decalMatrix, color, decal->flags, angleFade);
+	std3D_DrawDecal(sith_tex_sel->texture_struct[0], tex2_arr_sel, scale, &decalMatrix, color, decal->flags, angleFade);
 }
 
 void rdAmbientLight(float r, float g, float b)

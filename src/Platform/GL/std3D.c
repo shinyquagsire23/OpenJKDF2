@@ -4857,11 +4857,12 @@ void std3D_DrawDecal(stdVBuffer* vbuf, rdDDrawSurface* texture, rdVector3* verts
 	decal->uvScaleBias.w = (float)uvScaleBias.height / DECAL_ATLAS_SIZE;
 	rdVector_Copy3((rdVector3*)&decal->posRad, (rdVector3*)&decalMatrix->vD);
 
-	rdVector3 diag;
-	diag.x = decalMatrix->vA.x;
-	diag.y = decalMatrix->vB.y;
-	diag.z = decalMatrix->vC.z;
-	decal->posRad.w = rdVector_Len3(&diag);
+	//rdVector3 diag;
+	//diag.x = decalMatrix->vA.x;
+	//diag.y = decalMatrix->vB.y;
+	//diag.z = decalMatrix->vC.z;
+	//decal->posRad.w = rdVector_Len3(&diag);
+	decal->posRad.w = rdVector_Len3(verts);
 
 	rdMatrix_Copy44(&decal->decalMatrix, decalMatrix);
 	rdMatrix_Invert44(&decal->invDecalMatrix, decalMatrix);
