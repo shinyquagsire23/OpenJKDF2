@@ -3017,6 +3017,7 @@ void std3D_DrawSceneFbo()
 
     glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->window.fbo);
     glClear( GL_COLOR_BUFFER_BIT );
+	glDisable(GL_DEPTH_TEST);
 
     static float frameNum = 1.0;
     //frameNum += (rand() % 16);
@@ -3114,9 +3115,9 @@ void std3D_DrawSceneFbo()
 
 	#ifdef NEW_BLOOM
 		#ifdef CLASSIC_EMISSIVE
-			bloom_intensity = 2.0f;
+			bloom_intensity = 1.0f;
 		#else
-			bloom_intensity = 7.0f;
+			bloom_intensity = 3.0f;
 		#endif
 
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -3137,6 +3138,7 @@ void std3D_DrawSceneFbo()
 		float blendLerp = 0.6f;
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 		//glBlendFunc(GL_ONE, GL_ONE);
 		//std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur7, std3D_pFb->blur8.tex, 0, 0, uvScale, blendLerp, 1.0, 0);
 		//std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur6, std3D_pFb->blur7.tex, 0, 0, uvScale, blendLerp, 1.0, 0);
@@ -3148,7 +3150,7 @@ void std3D_DrawSceneFbo()
 
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
-		std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->postfx, std3D_pFb->blur1.tex, 0, 0, 1.0f, bloom_intensity, 1.0, 0);
+		std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->postfx, std3D_pFb->blur1.tex, 0, 0, 1.0f, bloom_intensity, 1.5, 0);
 
 	#else
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

@@ -917,6 +917,13 @@ void main(void)
         // Makes sure light is in a sane range
         float light = clamp(f_light, 0.0, 1.0);
 
+#ifdef UNLIT
+		if (lightMode == 0)
+			light = 1.0;
+		else
+			light = 0.0;
+#endif
+
         // Special case for lightsabers
         //if (index * 255.0 >= 16.0 && index * 255.0 < 17.0)
         //    light = 0.0;
@@ -947,6 +954,11 @@ void main(void)
         }
 	#endif
     }
+#endif
+
+#ifdef UNLIT
+		if (lightMode == 0)
+			color_add.xyz *= fillColor.xyz;
 #endif
 
     vec4 albedoFactor_copy = albedoFactor;
