@@ -382,9 +382,10 @@ int sithWorld_NewEntry(sithWorld *pWorld)
 
 					total += surface->surfaceInfo.face.numVertices;
 
-					sflight += surface->surfaceInfo.face.extraLight;
+					float el = stdMath_Clamp(surface->surfaceInfo.face.extraLight, 0.0f, 1.0f);
+					sflight += el;
 
-					float minlight = surface->surfaceInfo.face.extraLight;
+					float minlight = el;
 					if (surface->surfaceInfo.face.lightingMode == RD_LIGHTMODE_FULLYLIT)
 						minlight = 1.0f;
 
@@ -399,9 +400,9 @@ int sithWorld_NewEntry(sithWorld *pWorld)
 					for (int k = 0; k < surface->surfaceInfo.face.numVertices; ++k)
 					{
 						rdVector3 col;
-						col.x = fmax(minlight, surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 1]);
-						col.y = fmax(minlight, surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 2]);
-						col.z = fmax(minlight, surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 3]);
+						col.x = stdMath_Clamp(surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 1], minlight, 1.0f);
+						col.y = stdMath_Clamp(surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 2], minlight, 1.0f);
+						col.z = stdMath_Clamp(surface->surfaceInfo.intensities[k + surface->surfaceInfo.face.numVertices * 3], minlight, 1.0f);
 						rdVector_Add3Acc(&sector->ambientRGB, &col);
 
 						// we get more directionality by using the vertex to sector center instead of surface normal
