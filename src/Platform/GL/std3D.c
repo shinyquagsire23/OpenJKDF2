@@ -3866,10 +3866,10 @@ int std3D_ClearZBuffer()
     return 1;
 }
 
-int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_alpha_tex, int no_alpha)
+int std3D_AddToTextureCache(stdVBuffer** vbuf, int numMips, rdDDrawSurface *texture, int is_alpha_tex, int no_alpha)
 {
     if (Main_bHeadless) return 1;
-    if (!vbuf || !texture) return 1;
+    if (!vbuf || !*vbuf || !texture) return 1;
     if (texture->texture_loaded) return 1;
 
     if (std3D_loadedTexturesAmt >= STD3D_MAX_TEXTURES) {
@@ -3880,13 +3880,13 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
     
     GLuint image_texture;
     glGenTextures(1, &image_texture);
-    uint8_t* image_8bpp = vbuf->sdlSurface->pixels;
-    uint16_t* image_16bpp = vbuf->sdlSurface->pixels;
-    uint8_t* pal = vbuf->palette;
+    uint8_t* image_8bpp = (*vbuf)->sdlSurface->pixels;
+    uint16_t* image_16bpp = (*vbuf)->sdlSurface->pixels;
+    uint8_t* pal = (*vbuf)->palette;
     
     uint32_t width, height;
-    width = vbuf->format.width;
-    height = vbuf->format.height;
+    width = (*vbuf)->format.width;
+    height = (*vbuf)->format.height;
 
     glBindTexture(GL_TEXTURE_2D, image_texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -3898,8 +3898,24 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
     //glPixelStorei(GL_PACK_ALIGNMENT, 1);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+#ifdef RENDER_DROID2
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, numMips-1);
+#else
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+#endif
 
+#ifdef RENDER_DROID2
+	if (jkPlayer_enableTextureFilter && texture->is_16bit)
+	{
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	}
+	else
+	{
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+	}
+#else
     if (jkPlayer_enableTextureFilter && texture->is_16bit)
     {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -3910,8 +3926,9 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     }
+#endif
 
-    if (vbuf->format.format.is16bit)
+    if ((*vbuf)->format.format.is16bit)
     {
         texture->is_16bit = 1;
 #if 1
@@ -3919,6 +3936,22 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width, height, 0,  GL_RGB, GL_UNSIGNED_SHORT_5_6_5_REV, image_8bpp);
         else
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0,  GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, image_8bpp);
+#endif
+
+#ifdef RENDER_DROID2
+		for(int mip = 1; mip < numMips; ++mip)
+		{
+			++vbuf;
+
+			image_8bpp = (*vbuf)->sdlSurface->pixels;
+			width = (*vbuf)->format.width;
+			height = (*vbuf)->format.height;
+
+			if (!is_alpha_tex)
+				glTexImage2D(GL_TEXTURE_2D, mip, GL_RGB8, width, height, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5_REV, image_8bpp);
+			else
+				glTexImage2D(GL_TEXTURE_2D, mip, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, image_8bpp);
+		}
 #endif
 
 #ifdef __NOTDEF_FORMAT_CONVERSION
@@ -4024,6 +4057,19 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
 #endif
         texture->is_16bit = 0;
         glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, image_8bpp);
+
+#ifdef RENDER_DROID2
+		for (int mip = 1; mip < numMips; ++mip)
+		{
+			++vbuf;
+
+			image_8bpp = (*vbuf)->sdlSurface->pixels;
+			width = (*vbuf)->format.width;
+			height = (*vbuf)->format.height;
+
+			glTexImage2D(GL_TEXTURE_2D, mip, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, image_8bpp);
+		}
+#endif
 
         texture->pDataDepthConverted = NULL;
     }
@@ -4370,6 +4416,18 @@ void std3D_UpdateSettings()
         if (!std3D_aLoadedTextures[i]) continue;
         glBindTexture(GL_TEXTURE_2D, std3D_aLoadedTextures[i]);
 
+#ifdef RENDER_DROID2
+		if (jkPlayer_enableTextureFilter && tex->is_16bit)
+		{
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		}
+		else
+		{
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+		}
+#else
         if (jkPlayer_enableTextureFilter && tex->is_16bit)
         {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -4380,6 +4438,7 @@ void std3D_UpdateSettings()
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         }
+#endif
 
         if (tex->emissive_texture_id != 0) {
             glBindTexture(GL_TEXTURE_2D, tex->emissive_texture_id);

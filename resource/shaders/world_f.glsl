@@ -1,18 +1,18 @@
-#ifdef GL_ARB_texture_gather
-vec4 impl_textureGather(sampler2D tex, vec2 uv)
-{
-    return textureGather(tex, uv);
-}
-#else
+//#ifdef GL_ARB_texture_gather
+//vec4 impl_textureGather(sampler2D tex, vec2 uv)
+//{
+//    return textureGather(tex, uv);
+//}
+//#else
 float modI(float a,float b)
 {
     float m=a-floor((a+0.5)/b)*b;
     return floor(m+0.5);
 }
 
-vec4 impl_textureGather(sampler2D tex, vec2 uv)
+vec4 impl_textureGather(sampler2D tex, vec2 uv, int lod)
 {
-    ivec2 idims = textureSize(tex,0) - ivec2(1, 1);
+    ivec2 idims = textureSize(tex, lod) - ivec2(1, 1);
     vec2 dims = vec2(idims);
 
     ivec2 base = ivec2(dims*uv);
@@ -26,11 +26,29 @@ vec4 impl_textureGather(sampler2D tex, vec2 uv)
     base.x = int(modI(float(base.x), dims.x));
     base.y = int(modI(float(base.y), dims.y));
 
-    return vec4(texelFetch(tex,base+ivec2(0,1),0).x,
-        texelFetch(tex,base+ivec2(1,1),0).x,
-        texelFetch(tex,base+ivec2(1,0),0).x,
-        texelFetch(tex,base+ivec2(0,0),0).x
+    return vec4(texelFetch(tex,base+ivec2(0,1),lod).x,
+        texelFetch(tex,base+ivec2(1,1),lod).x,
+        texelFetch(tex,base+ivec2(1,0),lod).x,
+        texelFetch(tex,base+ivec2(0,0),lod).x
     );
+}
+//#endif
+
+#ifdef GL_ARB_texture_query_lod
+float impl_textureQueryLod(sampler2D tex, vec2 uv)
+{
+	return textureQueryLOD(tex, uv).x;
+}
+#else
+float impl_textureQueryLod(sampler2D tex, vec2 uv)
+{
+    vec2 dims = textureSize(tex, 0);
+	vec2  texture_coordinate = uv * dims;
+    vec2  dx_vtc        = dFdx(texture_coordinate);
+    vec2  dy_vtc        = dFdy(texture_coordinate);
+    float delta_max_sqr = max(dot(dx_vtc, dx_vtc), dot(dy_vtc, dy_vtc));
+    float mml = 0.5 * log2(delta_max_sqr);
+    return max( 0, mml );
 }
 #endif
 
@@ -104,6 +122,8 @@ noperspective in vec2 f_uv_affine;
 
 uniform mat4 modelMatrix;
 uniform mat4 mvp;
+
+uniform vec2 texsize;
 
 uniform int  uv_mode;
 uniform vec4 fillColor;
@@ -723,8 +743,10 @@ vec2 parallax_mapping(vec2 tc, vec3 vp_normal, vec3 adjusted_coords)
 #ifdef CAN_BILINEAR_FILTER
 vec4 bilinear_paletted(vec2 uv)
 {
+	float mip = impl_textureQueryLod(tex, uv);
+
     // Get texture size in pixels:
-    vec2 colorTextureSize = vec2(textureSize(tex, 0));
+    vec2 colorTextureSize = vec2(textureSize(tex, int(mip)));
 
     // Convert UV coordinates to pixel coordinates and get pixel index of top left pixel (assuming UVs are relative to top left corner of texture)
     vec2 pixCoord = uv.xy * colorTextureSize - 0.5f;    // First pixel goes from -0.5 to +0.4999 (0.0 is center) last pixel goes from (size - 1.5) to (size - 0.5000001)
@@ -733,7 +755,7 @@ vec4 bilinear_paletted(vec2 uv)
     // For Gather we want UV coordinates of bottom right corner of top left pixel
     vec2 gUV = (originPixCoord + 1.0) / colorTextureSize;
 
-    vec4 gIndex   = impl_textureGather(tex, gUV);
+    vec4 gIndex   = impl_textureGather(tex, gUV, int(mip));
 
     vec4 c00   = texture(worldPalette, vec2(gIndex.w, 0.5));
     vec4 c01 = texture(worldPalette, vec2(gIndex.x, 0.5));
@@ -767,6 +789,8 @@ vec4 bilinear_paletted(vec2 uv)
 
 vec4 bilinear_paletted_light(vec2 uv, float index)
 {
+	float mip = impl_textureQueryLod(tex, uv);
+
     // Makes sure light is in a sane range
     float light = clamp(f_light, 0.0, 1.0);
 
@@ -779,7 +803,7 @@ vec4 bilinear_paletted_light(vec2 uv, float index)
     float light_idx = light / LIGHT_DIVISOR;
 
     // Get texture size in pixels:
-    vec2 colorTextureSize = vec2(textureSize(tex, 0));
+    vec2 colorTextureSize = vec2(textureSize(tex, int(mip)));
 
     // Convert UV coordinates to pixel coordinates and get pixel index of top left pixel (assuming UVs are relative to top left corner of texture)
     vec2 pixCoord = uv.xy * colorTextureSize - 0.5f;    // First pixel goes from -0.5 to +0.4999 (0.0 is center) last pixel goes from (size - 1.5) to (size - 0.5000001)
@@ -788,7 +812,7 @@ vec4 bilinear_paletted_light(vec2 uv, float index)
     // For Gather we want UV coordinates of bottom right corner of top left pixel
     vec2 gUV = (originPixCoord + 1.0) / colorTextureSize;
 
-    vec4 gIndex   = impl_textureGather(tex, gUV);
+    vec4 gIndex   = impl_textureGather(tex, gUV, int(mip));
 
     vec4 c00   = texture(worldPalette, vec2(texture(worldPaletteLights, vec2(gIndex.w, light_idx)).r, 0.5));
     vec4 c01 = texture(worldPalette, vec2(texture(worldPaletteLights, vec2(gIndex.x, light_idx)).r, 0.5));

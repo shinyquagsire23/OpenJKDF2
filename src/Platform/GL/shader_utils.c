@@ -102,7 +102,7 @@ GLuint create_shader(const char* shader, GLenum type, const char* userDefines)
 
 #if defined(WIN64_STANDALONE)
     version = "#version 330\n";
-    extensions = "#extension GL_ARB_texture_gather : enable\n#extension GL_ARB_gpu_shader5 : enable\n";
+    extensions = "#extension GL_ARB_texture_gather : enable\n#extension GL_ARB_gpu_shader5 : enable\n#extension GL_ARB_texture_query_lod : enable\n";
     defines = "#define CAN_BILINEAR_FILTER\n#define HAS_MIPS\n";
 #endif
 

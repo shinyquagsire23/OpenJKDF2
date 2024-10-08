@@ -360,6 +360,14 @@ extern int std3D_loadedTexturesAmt;
 // Added: cel_idx
 int rdMaterial_AddToTextureCache(rdMaterial *material, rdTexture *texture, int mipmap_level, int no_alpha, int cel_idx)
 {
+#ifdef RENDER_DROID2
+	// for render droid 2, std3D_AddToTextureCache will upload all mips for hardware mipmapping
+	mipmap_level = 0;
+	stdVBuffer** first = texture->texture_struct;
+#else
+	stdVBuffer** first = &texture->texture_struct[mipmap_level];
+#endif
+
     stdVBuffer* mipmap = texture->texture_struct[mipmap_level];
 
 #ifdef SDL2_RENDER
@@ -383,7 +391,7 @@ int rdMaterial_AddToTextureCache(rdMaterial *material, rdTexture *texture, int m
         }
 #endif
 #endif
-        else if (std3D_AddToTextureCache(mipmap, surface, texture->alpha_en & 1, no_alpha))
+        else if (std3D_AddToTextureCache(first, texture->num_mipmaps, surface, texture->alpha_en & 1, no_alpha))
         {
             //printf("rdmat Init %s %x %x\n", material->mat_fpath, surface->texture_id, std3D_loadedTexturesAmt);
             return 1;
@@ -407,7 +415,7 @@ int rdMaterial_AddToTextureCache(rdMaterial *material, rdTexture *texture, int m
         }
 #endif
 #endif
-        else if (std3D_AddToTextureCache(mipmap, surface, texture->alpha_en & 1, 0))
+        else if (std3D_AddToTextureCache(first, texture->num_mipmaps, surface, texture->alpha_en & 1, 0))
         {
             //printf("rdmat Init %s %x %x\n", material->mat_fpath, surface->texture_id, std3D_loadedTexturesAmt);
             return 1;

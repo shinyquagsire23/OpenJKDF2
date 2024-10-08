@@ -342,7 +342,7 @@ int std3D_ClearZBuffer()
 {
     return 0;
 }
-int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_alpha_tex, int no_alpha)
+int std3D_AddToTextureCache(stdVBuffer *vbuf, int numMips, rdDDrawSurface *texture, int is_alpha_tex, int no_alpha)
 {
     return 1;
 }

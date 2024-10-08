@@ -97,7 +97,7 @@ int std3D_AddRenderListVertices(D3DVERTEX *vertex_array, int count);
 void std3D_UpdateFrameCount(rdDDrawSurface *surface);
 void std3D_PurgeTextureCache();
 int std3D_ClearZBuffer();
-int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_alpha_tex, int no_alpha);
+int std3D_AddToTextureCache(stdVBuffer **vbuf, int numMips, rdDDrawSurface *texture, int is_alpha_tex, int no_alpha);
 void std3D_DrawMenu();
 void std3D_DrawSceneFbo();
 void std3D_FreeResources();
