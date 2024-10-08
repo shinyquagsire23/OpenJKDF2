@@ -840,6 +840,22 @@ vec3 HSVtoRGB(vec3 c)
     return c.z * mix(K.xxx, clamp(p - K.xxx, vec3(0.0), vec3(1.0)), c.y);
 }
 
+// much thanks to Cary Knoop
+// https://forum.blackmagicdesign.com/viewtopic.php?f=21&t=122108
+float rolloff(float x, float cutoff, float soft)
+{
+    float low  = cutoff - soft;
+	float high = cutoff + soft;
+	
+	if(x <= low)
+		return x;
+        
+	if(x >= high)
+		return cutoff;
+	
+	return -1.0f / (4.0f * soft) * (x * x - 2.0f * high * x + low * low);
+}
+
 void main(void)
 {
     vec3 adj_texcoords = f_uv.xyz / f_uv.w;
@@ -960,11 +976,6 @@ void main(void)
 	vec3 specularColor = vec3(0.0);
 	float roughness = 0.0;
 
-	if(numDecals > 0)
-		BlendDecals(diffuseColor.xyz, emissive.xyz, bucket_index, f_coord.xyz, surfaceNormals);
-
-	vec4 main_color = vec4(diffuseColor.xyz, 1.0) * vertex_color.xyzw;
-
 #ifndef UNLIT
 	#ifdef SPECULAR
 		// fill color is effectively an anti-metalness control
@@ -978,13 +989,22 @@ void main(void)
 
 		// try to estimate some roughness variation from the texture
 		float smoothness = max(sampled_color.r, max(sampled_color.g, sampled_color.b));
-		roughness = mix(0.3, 0.1, smoothness); // don't get too rough or there's no point in using specular here
+		roughness = mix(0.2, 0.05, smoothness); // don't get too rough or there's no point in using specular here
 
 		// blend out really dark stuff to fill color with high roughness (ex strifle scopes)
 		float threshold = 1.0 / (15.0 / 255.0);
 		roughness = mix(0.1, roughness, min(smoothness * threshold, 1.0));
 		specularColor = mix(avgAlbedo, specularColor, min(smoothness * threshold, 1.0));
+	#endif
+#endif
 
+	if(numDecals > 0)
+		BlendDecals(diffuseColor.xyz, emissive.xyz, bucket_index, f_coord.xyz, surfaceNormals);
+
+	vec4 main_color = vec4(diffuseColor.xyz, 1.0) * vertex_color.xyzw;
+
+#ifndef UNLIT
+	#ifdef SPECULAR
 		// let's make it happen cap'n
 		main_color.xyz += CalculateAmbientSpecular(surfaceNormals, localViewDir, roughness, specularColor.xyz);
 	#endif
@@ -999,7 +1019,15 @@ void main(void)
 	if (numLights > 0)
 		CalculatePointLighting(bucket_index, surfaceNormals, localViewDir, shadows, diffuseColor.xyz, specularColor.xyz, roughness, main_color.xyz);
 	
-	main_color.xyz = clamp(main_color.xyz, vec3(0.0), vec3(1.0));	
+	//main_color.xyz = clamp(main_color.xyz, vec3(0.0), vec3(1.0));	
+
+	// taper off highlights
+	main_color.r = rolloff(main_color.r, 1.0, 0.2);
+	main_color.g = rolloff(main_color.g, 1.0, 0.2);
+	main_color.b = rolloff(main_color.b, 1.0, 0.2);
+
+	//color_add.xyz += max(main_color.rgb - 1.0, vec3(0.0));
+
 #endif
 
 	main_color.rgb = max(main_color.rgb, emissive.rgb);
