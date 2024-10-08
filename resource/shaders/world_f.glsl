@@ -358,33 +358,6 @@ vec3 SGIrradianceFitted(in SG lightingLobe, in vec3 normal)
     return normalizedIrradiance * ApproximateSGIntegral(lightingLobe);
 }
 
-SG MakeNormalizedSG(in vec3 axis, in float sharpness)
-{
-    SG sg;
-    sg.Axis = axis;
-    sg.Sharpness = sharpness;
-    sg.Amplitude = 1.0 / ApproximateSGIntegral(sg);
-
-    return sg;
-}
-
-
-vec3 CalculateAmbientDiffuse(vec3 normal)
-{
-	vec3 ambientDiffuse = vec3(0.0);
-	for(int sg = 0; sg < 8; ++sg)
-	{
-		SG lightSG;
-		lightSG.Amplitude = ambientSG[sg].xyz;
-		lightSG.Axis = ambientSGBasis[sg].xyz;
-		lightSG.Sharpness = ambientSGBasis[sg].w;
-	
-		vec3 diffuse = SGIrradianceInnerProduct(lightSG, normal);
-		ambientDiffuse.xyz += diffuse;
-	}
-	return ambientDiffuse;
-}
-
 vec3 CalculateAmbientSpecular(vec3 normal, vec3 view, float roughness, vec3 f0)
 {
 	float m2 = roughness * roughness;
@@ -417,41 +390,6 @@ vec3 CalculateAmbientSpecular(vec3 normal, vec3 view, float roughness, vec3 f0)
 	}
 	return ambientSpecular;
 }
-
-float HalfLambert(float ndotl)
-{
-	ndotl = ndotl * 0.5 + 0.5;
-	return ndotl * ndotl;
-}
-
-// fRadius0 : First caps radius (arc length in radians)
-// fRadius1 : Second caps radius (in radians)
-// fDist : Distance between caps (radians between centers of caps)
-float SphericalCapIntersectionAreaFast(float fRadius0, float fRadius1, float fDist)
-{
-	float fArea;
-
-	if ( fDist <= max(fRadius0, fRadius1) - min(fRadius0, fRadius1) )
-	{
-		// One cap is completely inside the other
-		fArea = 6.283185308f - 6.283185308f * cos( min(fRadius0,fRadius1) );
-	}
-	else if ( fDist >= fRadius0 + fRadius1 )
-	{
-		// No intersection exists
-		fArea = 0;
-	}
-	else
-	{
-		float fDiff = abs(fRadius0 - fRadius1);
-		fArea = smoothstep(0.0f,
-			1.0f,
-			1.0f - clamp((fDist-fDiff)/(fRadius0+fRadius1-fDiff), 0.0, 1.0));
-			fArea *= 6.283185308f - 6.283185308f * cos( min(fRadius0,fRadius1) );
-	}
-	return fArea;
-}
-
 
 // todo: split the spotlights out
 void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, vec4 shadows, vec3 albedo, vec3 f0, float roughness, inout vec3 lightAcc)

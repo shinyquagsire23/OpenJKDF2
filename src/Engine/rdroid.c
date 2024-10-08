@@ -42,9 +42,6 @@ static int rdroid_sortPriority = 0;
 static float rdroid_sortDistance = 0;
 static int rdroid_drawLayer = 0;
 
-static float       rdroid_texWidth = 1;
-static float       rdroid_texHeight = 1;
-
 static uint32_t  rdroid_vertexColorState = 0xFFFFFFFF;
 static rdVector4 rdroid_vertexTexCoordState = { 0.0f, 0.0f, 0.0f, 1.0f };
 static rdVector3 rdroid_vertexNormalState = { 0.0f, 0.0f, 0.0f };
@@ -623,8 +620,8 @@ void rdTexCoord2i(float u, float v)
 {
 	if(rdroid_textureState.pTexture)
 	{
-		rdroid_vertexTexCoordState.x = (float)u / rdroid_texWidth;
-		rdroid_vertexTexCoordState.y = (float)v / rdroid_texHeight;
+		rdroid_vertexTexCoordState.x = (float)u / rdroid_textureState.texSize.x;
+		rdroid_vertexTexCoordState.y = (float)v / rdroid_textureState.texSize.y;
 	}
 	else
 	{
@@ -678,8 +675,8 @@ int rdBindTexture(rdTexture* pTexture)
 		pTexture->texture_struct[0]->format.height,
 		&out_width,
 		&out_height);
-	rdroid_texWidth = (float)(out_width << 0);
-	rdroid_texHeight = (float)(out_height << 0);
+	rdroid_textureState.texSize.x = (float)(out_width << 0);
+	rdroid_textureState.texSize.y = (float)(out_height << 0);
 
 	return 1;
 }
@@ -722,8 +719,8 @@ int rdBindMaterial(rdMaterial* pMaterial, int cel)
 			sith_tex_sel->texture_struct[0]->format.height,
 			&out_width,
 			&out_height);
-		rdroid_texWidth = (float)(out_width << 0);
-		rdroid_texHeight = (float)(out_height << 0);	
+		rdroid_textureState.texSize.x = (float)(out_width << 0);
+		rdroid_textureState.texSize.y = (float)(out_height << 0);
 	}
 
 	return 1;
@@ -752,8 +749,8 @@ void rdTexOffseti(float u, float v)
 {
 	if (rdroid_textureState.pTexture)
 	{
-		rdroid_textureState.texOffset.x = (float)u / rdroid_texWidth;
-		rdroid_textureState.texOffset.y = (float)v / rdroid_texHeight;
+		rdroid_textureState.texOffset.x = (float)u / rdroid_textureState.texSize.x;
+		rdroid_textureState.texOffset.y = (float)v / rdroid_textureState.texSize.y;
 	}
 	else
 	{

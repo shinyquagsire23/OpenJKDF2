@@ -18,6 +18,7 @@ uniform mat4 modelMatrix;
 uniform int uv_mode;
 uniform vec2 iResolution;
 
+uniform vec2 texsize;
 uniform int texgen;
 uniform vec4 texgen_params;
 uniform vec2 uv_offset;
@@ -65,6 +66,46 @@ vec3 SGIrradianceInnerProduct(SG lightingLobe, vec3 normal)
     return max(SGInnerProduct(lightingLobe, cosineLobe), 0.0);
 }
 
+vec3 SGIrradiancePunctual(SG lightingLobe, vec3 normal)
+{
+    float cosineTerm = clamp(dot(lightingLobe.Axis, normal), 0.0, 1.0);
+    return cosineTerm * 2.0 * 3.141592 * (lightingLobe.Amplitude) / lightingLobe.Sharpness;
+}
+
+
+vec3 ApproximateSGIntegral(in SG sg)
+{
+    return 2 * 3.141592 * (sg.Amplitude / sg.Sharpness);
+}
+
+vec3 SGIrradianceFitted(in SG lightingLobe, in vec3 normal)
+{
+    float muDotN = dot(lightingLobe.Axis, normal);
+    float lambda = lightingLobe.Sharpness;
+
+    const float c0 = 0.36f;
+    const float c1 = 1.0f / (4.0f * c0);
+
+    float eml  = exp(-lambda);
+    float em2l = eml * eml;
+    float rl   = 1.0/(lambda);
+
+    float scale = 1.0f + 2.0f * em2l - rl;
+    float bias  = (eml - em2l) * rl - em2l;
+
+    float x  = sqrt(1.0f - scale);
+    float x0 = c0 * muDotN;
+    float x1 = c1 * x;
+
+    float n = x0 + x1;
+
+    float y = (abs(x0) <= x1) ? n * n / x : clamp(muDotN, 0.0, 1.0);
+
+    float normalizedIrradiance = scale * y + bias;
+
+    return normalizedIrradiance * ApproximateSGIntegral(lightingLobe);
+}
+
 vec3 CalculateAmbientDiffuse(vec3 normal)
 {
 	vec3 ambientDiffuse = vec3(0.0);
@@ -75,7 +116,7 @@ vec3 CalculateAmbientDiffuse(vec3 normal)
 		lightSG.Axis = ambientSGBasis[sg].xyz;
 		lightSG.Sharpness = ambientSGBasis[sg].w;
 	
-		vec3 diffuse = SGIrradianceInnerProduct(lightSG, normal);
+		vec3 diffuse = SGIrradiancePunctual(lightSG, normal);
 		ambientDiffuse.xyz += diffuse;
 	}
 	return ambientDiffuse;
@@ -117,7 +158,7 @@ vec2 do_ceiling_uv(vec4 view_pos, vec3 world_pos, inout vec4 clip_pos)
 	clip_pos.z = (proj_sky.z / proj_sky.w) * clip_pos.w;
 	//clip_pos.z = clip_pos.w - 0.25/64.0;
 	
-	return (uv + uv_offset.xy) / 128.0; // todo: from mat
+	return (uv + uv_offset.xy) / texsize.xy;
 }
 
 vec2 do_horizon_uv(inout vec4 clip_pos)
@@ -131,7 +172,7 @@ vec2 do_horizon_uv(inout vec4 clip_pos)
 	
 	clip_pos.z = clip_pos.w - 0.25/64.0;
 	
-	return (uv + uv_offset.xy) / 128.0; // todo: from mat
+	return (uv + uv_offset.xy) / texsize.xy;
 }
 
 void main(void)
@@ -141,7 +182,7 @@ void main(void)
 	f_normal = normalize(mat3(modelMatrix) * v_normal.xyz);
 
     gl_Position = pos;
-    f_color = v_color.bgra;
+    f_color = clamp(v_color.bgra, vec4(0.0), vec4(1.0));
 
     f_uv = v_uv;
 	f_uv.xy += uv_offset.xy;
