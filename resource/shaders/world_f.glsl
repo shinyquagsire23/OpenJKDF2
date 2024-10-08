@@ -387,13 +387,13 @@ vec3 CalculateAmbientDiffuse(vec3 normal)
 
 vec3 CalculateAmbientSpecular(vec3 normal, vec3 view, float roughness, vec3 f0)
 {
-	//float m2 = roughness * roughness;
+	float m2 = roughness * roughness;
 	//float nDotV = clamp(dot(normal.xyz, view.xyz), 0.0, 1.0);
 
 	vec3 ambientSpecular = vec3(0.0);
 	for(int sg = 0; sg < 8; ++sg)
 	{
-		SG ndf = DistributionTermSG(normal, roughness);
+		SG ndf = DistributionTermSG(normal, m2);
 		SG warpedNDF = WarpDistributionSG(ndf, view);
 
 		SG lightSG;
@@ -409,13 +409,13 @@ vec3 CalculateAmbientSpecular(vec3 normal, vec3 view, float roughness, vec3 f0)
 		// no Geometry term
 
 		// Fresnel
-		//vec3 h = normalize(warpedNDF.Axis + view);
-		//spec *= f0 + (1.0 - f0) * exp2(-8.35 * max(0.0, dot(warpedNDF.Axis, h)));
+		vec3 h = normalize(warpedNDF.Axis + view);
+		spec *= f0 + (1.0 - f0) * exp2(-8.35 * max(0.0, dot(warpedNDF.Axis, h)));
 		
 		spec *= nDotL;
 		ambientSpecular.xyz += spec;
 	}
-	return f0 * ambientSpecular;
+	return ambientSpecular;
 }
 
 float HalfLambert(float ndotl)
@@ -458,7 +458,7 @@ void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, vec4 shad
 {	
 	// precompute some terms
 	float a = roughness;// * roughness;
-	float a2 = a * a;
+	float a2 = a;// * a;
 	float rcp_a2 = 1.0 / a2;
 	float aperture = max(sqrt(1.0 - shadows.w), 0.01);
 	vec3 reflVec = reflect(-view, normal);
@@ -534,8 +534,11 @@ void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, vec4 shad
 				lightMagnitude = max(lightMagnitude, 0.0);
 
 				#ifdef SPECULAR
+					vec3 h = normalize(diff + view);
+					vec3 f = f0 + (1.0 - f0) * exp2(-8.35 * max(0.0, dot(diff, h)));
+
 					float c = 0.72134752 * rcp_a2 + 0.39674113;
-					vec3 cs = f0 * (lightMagnitude * exp2( c * dot(reflVec, diff) - c ) * (rcp_a2 / 3.141592));
+					vec3 cs = f * (lightMagnitude * exp2( c * dot(reflVec, diff) - c ) * (rcp_a2 / 3.141592));
 				#else
 					vec3 cs = vec3(0.0);
 				#endif
@@ -1041,7 +1044,11 @@ void main(void)
 	specularColor = mix(sampled_color.xyz, vec3(0.2), avgAlbedo);
 
 	float smoothness = max(sampled_color.r, max(sampled_color.g, sampled_color.b));
-	roughness = mix(0.2, 0.05, smoothness);
+	roughness = mix(0.5, 0.1, smoothness);
+
+	float threshold = 1.0 / (15.0 / 255.0); // blend out really dark stuff to fill color with high roughness
+	roughness = mix(0.1, roughness, min(smoothness * threshold, 1.0));
+	specularColor = mix(avgAlbedo, specularColor, min(smoothness * threshold, 1.0));
 
 //	vec3 avgAlbedo = fillColor.xyz;
 //	vec3 hsv = RGBtoHSV(avgAlbedo);
@@ -1054,7 +1061,7 @@ void main(void)
 
 #ifndef UNLIT
 	#ifdef SPECULAR
-		main_color.xyz += CalculateAmbientSpecular(surfaceNormals, localViewDir, 0.01, specularColor.xyz);
+		main_color.xyz += CalculateAmbientSpecular(surfaceNormals, localViewDir, roughness, specularColor.xyz);
 	#endif
 		
 	vec4 shadows = vec4(0.0, 0.0, 0.0, 1.0);
