@@ -3021,7 +3021,11 @@ void std3D_DrawSceneFbo()
     static float frameNum = 1.0;
     //frameNum += (rand() % 16);
 
-    int draw_ssao = jkPlayer_enableSSAO;
+#ifdef RENDER_DROID2
+    int draw_ssao = 0;
+#else
+	int draw_ssao = jkPlayer_enableSSAO;
+#endif
     int draw_bloom = jkPlayer_enableBloom;
 
     float add_luma = (((float)rdroid_curColorEffects.add.x / 255.0f) * 0.2125)
