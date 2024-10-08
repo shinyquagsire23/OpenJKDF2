@@ -1069,7 +1069,8 @@ void jkPlayer_DrawPov()
 
 	rdMatrixMode(RD_MATRIX_PROJECTION);
 	rdIdentity();
-	rdPerspective(rdCamera_pCurCamera->fov, rdCamera_pCurCamera->screenAspectRatio, rdCamera_pCurCamera->pClipFrustum->field_0.y, rdCamera_pCurCamera->pClipFrustum->field_0.z);
+	float fpfov = stdMath_ArcTan3(1.0, stdMath_Tan(55.0f * 0.5f) / rdCamera_pCurCamera->screenAspectRatio) * -2.0;
+	rdPerspective(/*rdCamera_pCurCamera->fov*/fpfov, rdCamera_pCurCamera->screenAspectRatio, rdCamera_pCurCamera->pClipFrustum->field_0.y, rdCamera_pCurCamera->pClipFrustum->field_0.z);
 
 	rdMatrixMode(RD_MATRIX_MODEL);
 	rdIdentity();
@@ -1210,8 +1211,8 @@ void jkPlayer_DrawPov()
 
 		// drop the gun a little with higher FOVs, similar to Quake
 		// this helps prevent the missing parts of the model from showing
-		if(sithCamera_currentCamera->rdCam.fov > 90)
-			trans.z += 0.0001f * (sithCamera_currentCamera->rdCam.fov - 90);
+		//if(sithCamera_currentCamera->rdCam.fov > 90)
+			//trans.z += 0.0001f * (sithCamera_currentCamera->rdCam.fov - 90);
 #endif
 
 #ifdef DYNAMIC_POV
@@ -1355,7 +1356,7 @@ void jkPlayer_DrawPov()
 				// add a light for the flash
 				static rdLight muzzleLight;
 				rdLight_NewEntry(&muzzleLight);
-				muzzleLight.intensity = playerThings[playerThingIdx].povSprite.sprite3->radius * 2.0f;
+				muzzleLight.intensity = playerThings[playerThingIdx].povSprite.sprite3->radius;// * 2.0f;
 #ifdef RGB_THING_LIGHTS
 				rdMaterial_GetFillColor(&muzzleLight.color, playerThings[playerThingIdx].povSprite.sprite3->face.material, player->sector->colormap, playerThings[playerThingIdx].povSprite.wallCel, -1);
 				rdVector_Scale3Acc(&muzzleLight.color, 1.0f / muzzleLight.intensity); // compensate for the low intensity/range
@@ -1365,7 +1366,12 @@ void jkPlayer_DrawPov()
 				rdVector3 pos;
 				rdVector_Copy3(&pos, &muzzleMat->scale);
 				rdVector_MultAcc3(&pos, &viewMat.uvec, playerThings[playerThingIdx].povSprite.sprite3->height);
+			#ifdef RENDER_DROID2
+				muzzleLight.falloffMin = muzzleLight.intensity / rdCamera_pCurCamera->attenuationMin;
+				rdAddLight(&muzzleLight, &pos);
+			#else
 				rdCamera_AddLight(rdCamera_pCurCamera, &muzzleLight, &pos);
+			#endif
 			}
 
 			// update the muzzle offset so we can use it in cog for weapon offsets etc
