@@ -688,6 +688,9 @@ int rdBindMaterial(rdMaterial* pMaterial, int cel)
 
 	int alpha_is_opaque = 0;
 
+	if(cel < 0)
+		cel = pMaterial->celIdx;
+
 	cel = stdMath_ClampInt(cel, 0, pMaterial->num_texinfo - 1);
 
 	// set the material fill color
