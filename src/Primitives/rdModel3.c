@@ -1638,11 +1638,18 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
 	{
 		alpha = 90.0f / 255.0f;
 		rdSetBlendMode(RD_BLEND_MODE_ALPHA);
+		rdSetZBufferMethod(RD_ZBUFFER_READ_NOWRITE);
 	}
 	else
 	{
 		rdSetBlendMode(RD_BLEND_MODE_NONE);
+		rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
 	}
+
+	if ((face->type & RD_FF_DOUBLE_SIDED) != 0)
+		rdSetCullMode(RD_CULL_MODE_NONE);
+	else
+		rdSetCullMode(RD_CULL_MODE_CCW_ONLY);
 
 	if (rdBeginPrimitive(RD_PRIMITIVE_TRIANGLE_FAN))
 	{
