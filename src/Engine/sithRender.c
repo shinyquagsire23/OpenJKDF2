@@ -1046,6 +1046,9 @@ void sithRender_DrawSurface(sithSurface* surface)
 	if(!surface->surfaceInfo.face.material)
 		return;
 
+	int wallCel = surface->surfaceInfo.face.wallCel;
+	rdBindMaterial(surface->surfaceInfo.face.material, wallCel);
+
 	int geoMode;
 	if ((surface->surfaceFlags & (SITH_SURFACE_HORIZON_SKY | SITH_SURFACE_CEILING_SKY)) != 0)
 	{
@@ -1096,11 +1099,12 @@ void sithRender_DrawSurface(sithSurface* surface)
 		rdTexGenParams(sithSector_zMaxVec.x, sithSector_zMaxVec.y, sithSector_zMaxVec.z, 0);
 		rdTexOffset(sithWorld_pCurrentWorld->ceilingSkyOffs.x, sithWorld_pCurrentWorld->ceilingSkyOffs.y);
 	}
+	else
+	{
+		rdTexOffseti(surface->surfaceInfo.face.clipIdk.x, surface->surfaceInfo.face.clipIdk.y);
+	}
 
 	rdSetTexMode(texMode);
-
-	int wallCel = surface->surfaceInfo.face.wallCel;
-	rdBindMaterial(surface->surfaceInfo.face.material, wallCel);
 
 	if (sithRender_lightingIRMode)
 	{
