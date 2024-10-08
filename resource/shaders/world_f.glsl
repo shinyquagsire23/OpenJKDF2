@@ -1006,7 +1006,7 @@ void main(void)
 		// blend out really dark stuff to fill color with high roughness (ex strifle scopes)
 		float threshold = 1.0 / (15.0 / 255.0);
 		roughness = mix(0.1, roughness, min(smoothness * threshold, 1.0));
-		specularColor = mix(avgAlbedo, specularColor, min(smoothness * threshold, 1.0));
+		specularColor = mix(min(avgAlbedo * 2.0, vec3(1.0)), specularColor, min(smoothness * threshold, 1.0));
 	#endif
 #endif
 
