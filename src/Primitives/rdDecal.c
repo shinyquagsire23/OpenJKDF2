@@ -114,7 +114,7 @@ void rdDecal_Draw(rdThing* thing, rdMatrix34* matrix)
 
 	rdScale(&size);
 
-	rdAddDecal(decal, &mat, &color, &thing->decalScale, decal->angleFade);
+	rdAddDecal(decal, &mat, &color, &size, decal->angleFade);
 
 	rdIdentity();
 #else
