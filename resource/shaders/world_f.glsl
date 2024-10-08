@@ -1019,48 +1019,35 @@ void main(void)
 	uint bucket_index = cluster_index * CLUSTER_BUCKETS_PER_CLUSTER;
 
 	vec3 diffuseColor = sampled_color.xyz;
-	vec3 specularColor = vec3(0.0);//min(diffuseColor.xyz, fillColor.xyz);
-
-	//float smoothness = max(diffuseColor.r, max(diffuseColor.g, diffuseColor.b));
-	//smoothness = (smoothness + 0.2) / 1.2;
-	//float roughness = 1.0 - smoothness * smoothness;// 0.01;	
-	float roughness = 0.01;
+	vec3 specularColor = vec3(0.0);
+	float roughness = 0.0;
 
 	if(numDecals > 0)
 		BlendDecals(diffuseColor.xyz, emissive.xyz, bucket_index, f_coord.xyz, surfaceNormals);
-
-#ifndef UNLIT
-#ifdef SPECULAR
-	// for specular materials, try to split the texture highlights and shadows around the fill color
-	//diffuseColor = min(sampled_color.xyz, fillColor.xyz);
-	//specularColor = max(sampled_color.xyz, fillColor.xyz);
-
-	//diffuseColor = vec3(0.0);//min(sampled_color.xyz, fillColor.xyz); // poor woman's highlight removal
-	//specularColor = fillColor.xyz;// sampled_color.xyz;
-
-	// fill color is effectively an anti-metalness control
-	vec3 avgAlbedo = fillColor.xyz;
-	diffuseColor = mix(vec3(0.0), diffuseColor, avgAlbedo);
-	specularColor = mix(sampled_color.xyz, vec3(0.2), avgAlbedo);
-
-	float smoothness = max(sampled_color.r, max(sampled_color.g, sampled_color.b));
-	roughness = mix(0.5, 0.1, smoothness);
-
-	float threshold = 1.0 / (15.0 / 255.0); // blend out really dark stuff to fill color with high roughness
-	roughness = mix(0.1, roughness, min(smoothness * threshold, 1.0));
-	specularColor = mix(avgAlbedo, specularColor, min(smoothness * threshold, 1.0));
-
-//	vec3 avgAlbedo = fillColor.xyz;
-//	vec3 hsv = RGBtoHSV(avgAlbedo);
-//	hsv.z = 1.0 - hsv.z;
-//	specularColor = HSVtoRGB(hsv);
-#endif
-#endif
 
 	vec4 main_color = vec4(diffuseColor.xyz, 1.0) * vertex_color.xyzw;
 
 #ifndef UNLIT
 	#ifdef SPECULAR
+		// fill color is effectively an anti-metalness control
+		vec3 avgAlbedo = fillColor.xyz;
+
+		// blend to metal when dark
+		diffuseColor = mix(vec3(0.0), diffuseColor, avgAlbedo);
+
+		// blend to low-fresnel white when bright
+		specularColor = mix(sampled_color.xyz, vec3(0.2), avgAlbedo);
+
+		// try to estimate some roughness variation from the texture
+		float smoothness = max(sampled_color.r, max(sampled_color.g, sampled_color.b));
+		roughness = mix(0.3, 0.1, smoothness); // don't get too rough or there's no point in using specular here
+
+		// blend out really dark stuff to fill color with high roughness (ex strifle scopes)
+		float threshold = 1.0 / (15.0 / 255.0);
+		roughness = mix(0.1, roughness, min(smoothness * threshold, 1.0));
+		specularColor = mix(avgAlbedo, specularColor, min(smoothness * threshold, 1.0));
+
+		// let's make it happen cap'n
 		main_color.xyz += CalculateAmbientSpecular(surfaceNormals, localViewDir, roughness, specularColor.xyz);
 	#endif
 		
