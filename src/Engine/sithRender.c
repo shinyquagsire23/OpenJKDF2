@@ -512,7 +512,8 @@ void sithRender_Draw()
 
     sithPlayer_SetScreenTint(sithCamera_currentCamera->sector->tint.x, sithCamera_currentCamera->sector->tint.y, sithCamera_currentCamera->sector->tint.z);
 
-    if ( (sithCamera_currentCamera->sector->flags & 2) != 0 )
+	sithCamera_currentCamera->rdCam.flags &= ~0x1;
+	if ( (sithCamera_currentCamera->sector->flags & 2) != 0 )
     {
         float fov = sithCamera_currentCamera->fov;
         float aspect = sithCamera_currentCamera->aspectRatio;
@@ -533,7 +534,6 @@ void sithRender_Draw()
         rdCamera_SetFOV(&sithCamera_currentCamera->rdCam, sithCamera_currentCamera->fov);
         rdCamera_SetAspectRatio(&sithCamera_currentCamera->rdCam, sithCamera_currentCamera->aspectRatio);
         sithRender_needsAspectReset = 0;
-		sithCamera_currentCamera->rdCam.flags &= ~0x1;
 	}
     rdSetSortingMethod(0);
     rdSetMipDistances(&sithWorld_pCurrentWorld->mipmapDistance);
