@@ -1122,10 +1122,12 @@ void sithRender_DrawSurface(sithSurface* surface)
 	{
 		alpha = 90.0f / 255.0f;
 		rdSetBlendMode(RD_BLEND_MODE_ALPHA);
+		rdSetZBufferMethod(RD_ZBUFFER_READ_NOWRITE);
 	}
 	else
 	{
 		rdSetBlendMode(RD_BLEND_MODE_NONE);
+		rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
 	}
 
 	if (rdBeginPrimitive(RD_PRIMITIVE_TRIANGLE_FAN))
@@ -2753,10 +2755,10 @@ int sithRender_RenderThing(sithThing *pThing)
 void sithRender_RenderAlphaSurfaces()
 {
 	rdCache_Flush();
-	rdSetZBufferMethod(RD_ZBUFFER_READ_NOWRITE);
+	//rdSetZBufferMethod(RD_ZBUFFER_READ_NOWRITE);
 	rdSetOcclusionMethod(0);
 	rdSetSortingMethod(2);
-	rdSetBlendMode(RD_BLEND_MODE_ALPHA);
+	//rdSetBlendMode(RD_BLEND_MODE_ALPHA);
 
 	for (int i = 0; i < sithRender_numSurfaces; i++)
 	{
