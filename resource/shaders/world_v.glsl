@@ -195,7 +195,15 @@ void main(void)
 
 	f_coord = viewPos.xyz;
 
+#ifdef UNLIT
+	if (lightMode == 0)
+		f_light = 1.0;
+	else
+		f_light = 0.0;
+#else
     f_light = v_light;
+#endif
+
  	f_depth = pos.w / 128.0;
 
 #ifdef UNLIT

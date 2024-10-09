@@ -1,39 +1,3 @@
-//#ifdef GL_ARB_texture_gather
-//vec4 impl_textureGather(sampler2D tex, vec2 uv)
-//{
-//    return textureGather(tex, uv);
-//}
-//#else
-float modI(float a,float b)
-{
-    float m=a-floor((a+0.5)/b)*b;
-    return floor(m+0.5);
-}
-
-vec4 impl_textureGather(sampler2D tex, vec2 uv, int lod)
-{
-    ivec2 idims = textureSize(tex, lod) - ivec2(1, 1);
-    vec2 dims = vec2(idims);
-
-    ivec2 base = ivec2(dims*uv);
-    if (base.x < 0) {
-        //base.x = -base.x;
-    }
-    if (base.y < 0) {
-        //base.y = -base.y;
-    }
-
-    base.x = int(modI(float(base.x), dims.x));
-    base.y = int(modI(float(base.y), dims.y));
-
-    return vec4(texelFetch(tex,base+ivec2(0,1),lod).x,
-        texelFetch(tex,base+ivec2(1,1),lod).x,
-        texelFetch(tex,base+ivec2(1,0),lod).x,
-        texelFetch(tex,base+ivec2(0,0),lod).x
-    );
-}
-//#endif
-
 #ifdef GL_ARB_texture_query_lod
 float impl_textureQueryLod(sampler2D tex, vec2 uv)
 {
@@ -755,112 +719,66 @@ uint compute_mip_lod(float z_min)
 }
 
 #ifdef CAN_BILINEAR_FILTER
-vec4 bilinear_paletted(vec2 uv)
+void bilinear_paletted(vec2 uv, out vec4 color, out vec4 emissive)
 {
 	float mip = impl_textureQueryLod(tex, uv);
 	mip += 0.5 * float(compute_mip_lod(f_coord.y));
 	mip = min(mip, float(numMips - 1));
 
-    // Get texture size in pixels:
-    vec2 colorTextureSize = vec2(textureSize(tex, int(mip)));
+	ivec2 ires = textureSize( tex, int(mip) );
+	vec2  fres = vec2( ires );
 
-    // Convert UV coordinates to pixel coordinates and get pixel index of top left pixel (assuming UVs are relative to top left corner of texture)
-    vec2 pixCoord = uv.xy * colorTextureSize - 0.5f;    // First pixel goes from -0.5 to +0.4999 (0.0 is center) last pixel goes from (size - 1.5) to (size - 0.5000001)
-    vec2 originPixCoord = floor(pixCoord);              // Pixel index coordinates of bottom left pixel of set of 4 we will be blending
+	vec2 st = uv*fres - 0.5;
+    vec2 i = floor( st );
+    vec2 w = fract( st );
 
-    // For Gather we want UV coordinates of bottom right corner of top left pixel
-    vec2 gUV = (originPixCoord + 1.0) / colorTextureSize;
+	// textureGather doesn't handle mips, need to sample manually
+	// use textureLod instead of texelFetch/manual textureGather to respect sampler states
+	// this should be quite cache friendly so the overhead is minimal
+    float a = textureLod( tex, (i + vec2(0.5,0.5)) / fres, mip ).x;
+    float b = textureLod( tex, (i + vec2(1.5,0.5)) / fres, mip ).x;
+    float c = textureLod( tex, (i + vec2(0.5,1.5)) / fres, mip ).x;
+    float d = textureLod( tex, (i + vec2(1.5,1.5)) / fres, mip ).x;
+	
+	// read the palette
+	vec4 ca = texture(worldPalette, vec2(a, 0.5));
+    vec4 cb = texture(worldPalette, vec2(b, 0.5));
+    vec4 cc = texture(worldPalette, vec2(c, 0.5));
+    vec4 cd = texture(worldPalette, vec2(d, 0.5));
 
-    vec4 gIndex   = impl_textureGather(tex, gUV, int(mip));
-
-    vec4 c00   = texture(worldPalette, vec2(gIndex.w, 0.5));
-    vec4 c01 = texture(worldPalette, vec2(gIndex.x, 0.5));
-    vec4 c11  = texture(worldPalette, vec2(gIndex.y, 0.5));
-    vec4 c10 = texture(worldPalette, vec2(gIndex.z, 0.5));
-
-    if (blend_mode == D3DBLEND_SRCALPHA || blend_mode == D3DBLEND_INVSRCALPHA) {
-        if (gIndex.x == 0.0) {
-            c01.a = 0.0;
+	if (blend_mode == D3DBLEND_SRCALPHA || blend_mode == D3DBLEND_INVSRCALPHA)
+	{
+        if (a == 0.0) {
+            ca.a = 0.0;
         }
-        if (gIndex.y == 0.0) {
-            c11.a = 0.0;
+        if (b == 0.0) {
+            cb.a = 0.0;
         }
-        if (gIndex.z == 0.0) {
-            c10.a = 0.0;
+        if (c == 0.0) {
+            cc.a = 0.0;
         }
-        if (gIndex.w == 0.0) {
-            c00.a = 0.0;
+        if (d == 0.0) {
+            cd.a = 0.0;
         }
     }
 
-    vec2 filterWeight = pixCoord - originPixCoord;
- 
-    // Bi-linear mixing:
-    vec4 temp0 = mix(c01, c11, filterWeight.x);
-    vec4 temp1 = mix(c00, c10, filterWeight.x);
-    vec4 blendColor = mix(temp1, temp0, filterWeight.y);
+	color = mix(mix(ca, cb, w.x), mix(cc, cd, w.x), w.y);
 
-    return vec4(blendColor.r, blendColor.g, blendColor.b, blendColor.a);
-}
-
-vec4 bilinear_paletted_light(vec2 uv, float index)
-{
-	float mip = impl_textureQueryLod(tex, uv);
-	mip += 0.5 * float(compute_mip_lod(f_coord.y));
-	mip = min(mip, float(numMips - 1));
-
-    // Makes sure light is in a sane range
+	// Makes sure light is in a sane range
     float light = clamp(f_light, 0.0, 1.0);
 
-    // Special case for lightsabers
-    //if (index * 255.0 >= 16.0 && index * 255.0 < 17.0)
-    //    light = 0.0;
+	// read the light palette
+	a = texture(worldPaletteLights, vec2(a, light)).x;
+	b = texture(worldPaletteLights, vec2(b, light)).x;
+	c = texture(worldPaletteLights, vec2(c, light)).x;
+	d = texture(worldPaletteLights, vec2(d, light)).x;
 
-    // Take the fragment light, and divide by 4.0 to select for colors
-    // which glow in the dark
-    float light_idx = light / LIGHT_DIVISOR;
-
-    // Get texture size in pixels:
-    vec2 colorTextureSize = vec2(textureSize(tex, int(mip)));
-
-    // Convert UV coordinates to pixel coordinates and get pixel index of top left pixel (assuming UVs are relative to top left corner of texture)
-    vec2 pixCoord = uv.xy * colorTextureSize - 0.5f;    // First pixel goes from -0.5 to +0.4999 (0.0 is center) last pixel goes from (size - 1.5) to (size - 0.5000001)
-    vec2 originPixCoord = floor(pixCoord);              // Pixel index coordinates of bottom left pixel of set of 4 we will be blending
-
-    // For Gather we want UV coordinates of bottom right corner of top left pixel
-    vec2 gUV = (originPixCoord + 1.0) / colorTextureSize;
-
-    vec4 gIndex   = impl_textureGather(tex, gUV, int(mip));
-
-    vec4 c00   = texture(worldPalette, vec2(texture(worldPaletteLights, vec2(gIndex.w, light_idx)).r, 0.5));
-    vec4 c01 = texture(worldPalette, vec2(texture(worldPaletteLights, vec2(gIndex.x, light_idx)).r, 0.5));
-    vec4 c11  = texture(worldPalette, vec2(texture(worldPaletteLights, vec2(gIndex.y, light_idx)).r, 0.5));
-    vec4 c10 = texture(worldPalette, vec2(texture(worldPaletteLights, vec2(gIndex.z, light_idx)).r, 0.5));
-
-    /*if (blend_mode == D3DBLEND_SRCALPHA || blend_mode == D3DBLEND_INVSRCALPHA) {
-        if (gIndex.x == 0.0) {
-            c01.a = 0.0;
-        }
-        if (gIndex.y == 0.0) {
-            c11.a = 0.0;
-        }
-        if (gIndex.z == 0.0) {
-            c10.a = 0.0;
-        }
-        if (gIndex.w == 0.0) {
-            c00.a = 0.0;
-        }
-    }*/
-
-    vec2 filterWeight = pixCoord - originPixCoord;
- 
-    // Bi-linear mixing:
-    vec4 temp0 = mix(c01, c11, filterWeight.x);
-    vec4 temp1 = mix(c00, c10, filterWeight.x);
-    vec4 blendColor = mix(temp1, temp0, filterWeight.y);
-    vec4 light_mult_quad = vec4(light_mult, light_mult, light_mult, 1.0);
-
-    return vec4(blendColor.r, blendColor.g, blendColor.b, 1.0) * light_mult_quad ;//* (1.0 - light) * light_mult;
+	ca = texture(worldPalette, vec2(a, 0.5));
+    cb = texture(worldPalette, vec2(b, 0.5));
+    cc = texture(worldPalette, vec2(c, 0.5));
+    cd = texture(worldPalette, vec2(d, 0.5));
+	
+	emissive = mix(mix(ca, cb, w.x), mix(cc, cd, w.x), w.y);
 }
 #endif
 
@@ -964,13 +882,6 @@ void main(void)
         // Makes sure light is in a sane range
         float light = clamp(f_light, 0.0, 1.0);
 
-#ifdef UNLIT
-		if (lightMode == 0)
-			light = 1.0;
-		else
-			light = 0.0;
-#endif
-
         // Special case for lightsabers
         //if (index * 255.0 >= 16.0 && index * 255.0 < 17.0)
         //    light = 0.0;
@@ -992,8 +903,7 @@ void main(void)
 #ifdef CAN_BILINEAR_FILTER
     else if (tex_mode == TEX_MODE_BILINEAR)
     {
-        sampled_color = bilinear_paletted(adj_texcoords.xy);
-        color_add = bilinear_paletted_light(adj_texcoords.xy, index);
+        bilinear_paletted(adj_texcoords.xy, sampled_color, color_add);
 		emissive = color_add / light_mult;
 	#ifdef ALPHA_DISCARD
         if (sampled_color.a < 0.01) {
