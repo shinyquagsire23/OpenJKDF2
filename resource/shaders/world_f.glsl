@@ -404,10 +404,10 @@ vec3 CalculateAmbientSpecular(vec3 normal, vec3 view, float roughness, vec3 f0)
 
 		// Fresnel
 		vec3 h = normalize(warpedNDF.Axis + view);
-		spec *= f0 + (1.0 - f0) * exp2(-8.35 * max(0.0, dot(warpedNDF.Axis, h)));
+		vec3 f = f0 + (1.0 - f0) * exp2(-8.35 * max(0.0, dot(warpedNDF.Axis, h)));
+		//f *= clamp(dot(f0, vec3(333.0)), 0.0, 1.0); // fade out when spec is less than 0.1% albedo
 		
-		spec *= nDotL;
-		ambientSpecular.xyz += spec;
+		ambientSpecular.xyz = (spec * nDotL) * f + ambientSpecular.xyz;
 	}
 	return ambientSpecular;
 }
@@ -495,9 +495,12 @@ void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, vec4 shad
 				#ifdef SPECULAR
 					vec3 h = normalize(diff + view);
 					vec3 f = f0 + (1.0 - f0) * exp2(-8.35 * max(0.0, dot(diff, h)));
-
+					//f *= clamp(dot(f0, vec3(333.0)), 0.0, 1.0); // fade out when spec is less than 0.1% albedo
+					
 					float c = 0.72134752 * rcp_a2 + 0.39674113;
-					vec3 cs = f * (lightMagnitude * exp2( c * dot(reflVec, diff) - c ) * (rcp_a2 / 3.141592));
+					float d = exp2( c * dot(reflVec, diff) - c ) * (rcp_a2 / 3.141592);
+
+					vec3 cs = f * (lightMagnitude * d);
 				#else
 					vec3 cs = vec3(0.0);
 				#endif
@@ -1044,8 +1047,8 @@ void main(void)
 		specularColor = mix(sampled_color.xyz, vec3(0.2), avgAlbedo);
 
 		// try to estimate some roughness variation from the texture
-		float smoothness = max(sampled_color.r, max(sampled_color.g, sampled_color.b));
-		roughness = mix(0.2, 0.05, smoothness); // don't get too rough or there's no point in using specular here
+		float smoothness = dot(sampled_color.xyz, vec3(0.33,0.59,0.11));// max(sampled_color.r, max(sampled_color.g, sampled_color.b));
+		roughness = max(smoothness, 0.05);//mix(0.2, 0.05, smoothness); // don't get too rough or there's no point in using specular here
 
 		// blend out really dark stuff to fill color with high roughness (ex strifle scopes)
 		float threshold = 1.0 / (15.0 / 255.0);
