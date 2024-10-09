@@ -295,7 +295,7 @@ typedef struct std3D_worldStage
 	GLint attribute_coord3d, attribute_v_color, attribute_v_light, attribute_v_uv, attribute_v_norm;
 	GLint uniform_mvp, uniform_modelMatrix;
 	GLint uniform_ambient_color, uniform_ambient_sg, uniform_ambient_sgbasis;
-	GLint uniform_uv_mode, uniform_texsize, uniform_texgen, uniform_texgen_params, uniform_uv_offset;
+	GLint uniform_uv_mode, uniform_texsize, uniform_texgen, uniform_texgen_params, uniform_uv_offset, uniform_mipDistances;
 	GLint uniform_fillColor, uniform_tex, uniform_texEmiss, uniform_displacement_map, uniform_texDecals;
 	GLint uniform_tex_mode, uniform_blend_mode, uniform_worldPalette, uniform_worldPaletteLights;
 	GLint uniform_tint, uniform_filter, uniform_fade, uniform_add;
@@ -1102,6 +1102,7 @@ int std3D_loadWorldStage(std3D_worldStage* pStage, int isZPass, const char* defi
 	pStage->uniform_texgen = std3D_tryFindUniform(pStage->program, "texgen");
 	pStage->uniform_texgen_params = std3D_tryFindUniform(pStage->program, "texgen_params");
 	pStage->uniform_uv_offset = std3D_tryFindUniform(pStage->program, "uv_offset");
+	pStage->uniform_mipDistances = std3D_tryFindUniform(pStage->program, "mipDistances");
 	pStage->uniform_ambient_color = std3D_tryFindUniform(pStage->program, "ambientColor");
 	pStage->uniform_ambient_sg = std3D_tryFindUniform(pStage->program, "ambientSG");
 	pStage->uniform_ambient_sgbasis = std3D_tryFindUniform(pStage->program, "ambientSGBasis");
@@ -4064,6 +4065,7 @@ int std3D_AddToTextureCache(stdVBuffer** vbuf, int numMips, rdDDrawSurface *text
         glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, image_8bpp);
 
 #ifdef RENDER_DROID2
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, numMips - 1);
 		for (int mip = 1; mip < numMips; ++mip)
 		{
 			++vbuf;
@@ -4074,11 +4076,6 @@ int std3D_AddToTextureCache(stdVBuffer** vbuf, int numMips, rdDDrawSurface *text
 
 			glTexImage2D(GL_TEXTURE_2D, mip, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, image_8bpp);
 		}
-
-		// generate the remaining mips
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, numMips - 1);
-		glGenerateMipmap(GL_TEXTURE_2D);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 #endif
 
         texture->pDataDepthConverted = NULL;
@@ -5508,6 +5505,9 @@ void std3D_SetTextureState(std3D_worldStage* pStage, std3D_TextureState* pTexSta
 	glUniform1i(pStage->uniform_texgen, pTexState->texGen);
 	glUniform4f(pStage->uniform_texgen_params, pTexState->texGenParams.x, pTexState->texGenParams.y, pTexState->texGenParams.z, pTexState->texGenParams.w);
 	glUniform2f(pStage->uniform_uv_offset, pTexState->texOffset.x, pTexState->texOffset.y);
+
+	float mipScale = 1.0 / rdCamera_GetMipmapScalar();
+	glUniform4f(pStage->uniform_mipDistances, mipScale * rdroid_aMipDistances.x, mipScale * rdroid_aMipDistances.y, mipScale * rdroid_aMipDistances.z, mipScale * rdroid_aMipDistances.w);
 
 	float a = ((pTexState->fillColor >> 24) & 0xFF) / 255.0f;
 	float r = ((pTexState->fillColor >> 16) & 0xFF) / 255.0f;

@@ -124,7 +124,7 @@ uniform mat4 modelMatrix;
 uniform mat4 mvp;
 
 uniform vec2 texsize;
-
+uniform vec4 mipDistances;
 uniform int  uv_mode;
 uniform vec4 fillColor;
 
@@ -740,10 +740,21 @@ vec2 parallax_mapping(vec2 tc, vec3 vp_normal, vec3 adjusted_coords)
     return adj_tc;
 }
 
+uint compute_mip_lod(float z_min)
+{
+	vec4 mip_distances = vec4(1,2,3,4);
+	uint mipmap_level = 0;
+	mipmap_level = z_min < mip_distances.x ? mipmap_level : 1;
+	mipmap_level = z_min < mip_distances.y ? mipmap_level : 2;
+	mipmap_level = z_min < mip_distances.z ? mipmap_level : 3;
+	return mipmap_level;
+}
+
 #ifdef CAN_BILINEAR_FILTER
 vec4 bilinear_paletted(vec2 uv)
 {
 	float mip = impl_textureQueryLod(tex, uv);
+	mip += float(compute_mip_lod(f_coord.y));
 
     // Get texture size in pixels:
     vec2 colorTextureSize = vec2(textureSize(tex, int(mip)));
@@ -790,6 +801,7 @@ vec4 bilinear_paletted(vec2 uv)
 vec4 bilinear_paletted_light(vec2 uv, float index)
 {
 	float mip = impl_textureQueryLod(tex, uv);
+	mip += float(compute_mip_lod(f_coord.y));
 
     // Makes sure light is in a sane range
     float light = clamp(f_light, 0.0, 1.0);
@@ -905,8 +917,11 @@ void main(void)
 		adj_texcoords.xy = f_uv_affine;
 	}
 
-    vec4 sampled = texture(tex, adj_texcoords.xy);
-    vec4 sampledEmiss = texture(texEmiss, adj_texcoords.xy);
+	// software actually uses the zmin of the entire face...
+	float mipBias = float(compute_mip_lod(f_coord.y));
+
+    vec4 sampled = texture(tex, adj_texcoords.xy, mipBias);
+    vec4 sampledEmiss = texture(texEmiss, adj_texcoords.xy, mipBias);
     vec4 sampled_color = vec4(1.0, 1.0, 1.0, 1.0);
     vec4 vertex_color = f_color;
     float index = sampled.r;
@@ -1018,9 +1033,9 @@ void main(void)
 		vec3 avgAlbedo = fillColor.xyz;
 
 		// blend to metal when dark
-		diffuseColor = mix(vec3(0.0), diffuseColor, avgAlbedo);
+		diffuseColor = diffuseColor * avgAlbedo;// -> 0 * (1-avgAlbedo) + diffuseColor * avgAlbedo -> mix(vec3(0.0), diffuseColor, avgAlbedo)
 
-		// blend to low-fresnel white when bright
+		// blend to dielectric white when bright
 		specularColor = mix(sampled_color.xyz, vec3(0.2), avgAlbedo);
 
 		// try to estimate some roughness variation from the texture
