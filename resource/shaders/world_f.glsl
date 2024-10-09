@@ -124,6 +124,7 @@ uniform mat4 modelMatrix;
 uniform mat4 mvp;
 
 uniform vec2 texsize;
+uniform int numMips;
 uniform vec4 mipDistances;
 uniform int  uv_mode;
 uniform vec4 fillColor;
@@ -754,7 +755,8 @@ uint compute_mip_lod(float z_min)
 vec4 bilinear_paletted(vec2 uv)
 {
 	float mip = impl_textureQueryLod(tex, uv);
-	mip += float(compute_mip_lod(f_coord.y));
+	mip += 0.5 * float(compute_mip_lod(f_coord.y));
+	mip = min(mip, float(numMips - 1));
 
     // Get texture size in pixels:
     vec2 colorTextureSize = vec2(textureSize(tex, int(mip)));
@@ -801,7 +803,8 @@ vec4 bilinear_paletted(vec2 uv)
 vec4 bilinear_paletted_light(vec2 uv, float index)
 {
 	float mip = impl_textureQueryLod(tex, uv);
-	mip += float(compute_mip_lod(f_coord.y));
+	mip += 0.5 * float(compute_mip_lod(f_coord.y));
+	mip = min(mip, float(numMips - 1));
 
     // Makes sure light is in a sane range
     float light = clamp(f_light, 0.0, 1.0);
@@ -920,6 +923,7 @@ void main(void)
 	// software actually uses the zmin of the entire face
 	// doing it per pixel tends to cause more biasing than intended
 	float mipBias = 0.5 * float(compute_mip_lod(f_coord.y));
+	mipBias = min(mipBias, float(numMips - 1));
 
     vec4 sampled = texture(tex, adj_texcoords.xy, mipBias);
     vec4 sampledEmiss = texture(texEmiss, adj_texcoords.xy, mipBias);

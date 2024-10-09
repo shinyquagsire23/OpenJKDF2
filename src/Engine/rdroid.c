@@ -677,6 +677,7 @@ int rdBindTexture(rdTexture* pTexture)
 		&out_height);
 	rdroid_textureState.texSize.x = (float)(out_width << 0);
 	rdroid_textureState.texSize.y = (float)(out_height << 0);
+	rdroid_textureState.numMips = pTexture->num_mipmaps;
 
 	return 1;
 }
@@ -724,6 +725,7 @@ int rdBindMaterial(rdMaterial* pMaterial, int cel)
 			&out_height);
 		rdroid_textureState.texSize.x = (float)(out_width << 0);
 		rdroid_textureState.texSize.y = (float)(out_height << 0);
+		rdroid_textureState.numMips = sith_tex_sel->num_mipmaps;
 	}
 
 	return 1;
