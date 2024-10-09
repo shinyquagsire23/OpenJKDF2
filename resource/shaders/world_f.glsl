@@ -917,8 +917,9 @@ void main(void)
 		adj_texcoords.xy = f_uv_affine;
 	}
 
-	// software actually uses the zmin of the entire face...
-	float mipBias = float(compute_mip_lod(f_coord.y));
+	// software actually uses the zmin of the entire face
+	// doing it per pixel tends to cause more biasing than intended
+	float mipBias = 0.5 * float(compute_mip_lod(f_coord.y));
 
     vec4 sampled = texture(tex, adj_texcoords.xy, mipBias);
     vec4 sampledEmiss = texture(texEmiss, adj_texcoords.xy, mipBias);
