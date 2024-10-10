@@ -899,6 +899,7 @@ typedef struct std3D_TextureState
 	rdTexGen_t        texGen;
 	rdVector4         texGenParams;
 	rdVector2         texOffset;
+	uint32_t          numMips;
 } std3D_TextureState;
 
 typedef struct std3D_LightingState
