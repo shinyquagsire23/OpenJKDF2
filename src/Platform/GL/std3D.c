@@ -176,6 +176,35 @@ uint32_t tileSizeY;
 GLuint cluster_buffer;
 GLuint cluster_tbo;
 
+// uniforms shared across draw lists during flush
+typedef struct std3D_SharedUniforms
+{
+	rdVector4 tint;
+	rdVector4 filter;
+	rdVector4 add;
+
+	rdVector4 mipDistances;
+
+	float     fade;
+	float     lightMult;
+	uint32_t  enableDither;
+	uint32_t  pad1;
+
+	rdVector2 clusterTileSizes;
+	rdVector2 clusterScaleBias;
+
+	rdVector2 resolution;
+	uint32_t  firstLight; // consider moving to the light block
+	uint32_t  numLights;
+
+	uint32_t  firstOccluder; // consider moving to the occluder block
+	uint32_t  numOccluders;
+	uint32_t  firstDecal; // consider moving to the decal block
+	uint32_t  numDecals;
+} std3D_SharedUniforms;
+
+GLuint shared_ubo;
+
 typedef struct std3D_light
 {
 	rdVector4 position;
@@ -295,19 +324,15 @@ typedef struct std3D_worldStage
 	GLint attribute_coord3d, attribute_v_color, attribute_v_light, attribute_v_uv, attribute_v_norm;
 	GLint uniform_mvp, uniform_modelMatrix;
 	GLint uniform_ambient_color, uniform_ambient_sg, uniform_ambient_sgbasis;
-	GLint uniform_uv_mode, uniform_texsize, uniform_numMips, uniform_texgen, uniform_texgen_params, uniform_uv_offset, uniform_mipDistances;
+	GLint uniform_uv_mode, uniform_texsize, uniform_numMips, uniform_texgen, uniform_texgen_params, uniform_uv_offset;
 	GLint uniform_fillColor, uniform_tex, uniform_texEmiss, uniform_displacement_map, uniform_texDecals;
 	GLint uniform_tex_mode, uniform_blend_mode, uniform_worldPalette, uniform_worldPaletteLights;
-	GLint uniform_tint, uniform_filter, uniform_fade, uniform_add;
 	GLint uniform_emissiveFactor, uniform_albedoFactor, uniform_displacement_factor;
-	GLint uniform_light_mode, uniform_light_mult, uniform_iResolution, uniform_enableDither;
+	GLint uniform_light_mode;
 #ifdef FOG
 	GLint uniform_fog, uniform_fog_color, uniform_fog_start, uniform_fog_end;
 #endif
-	GLuint uniform_lightbuf, uniform_clusterScaleBias, uniform_clusterTileSizes;
-	GLuint uniform_lights, uniform_numLights;
-	GLuint uniform_occluders, uniform_numOccluders, uniform_firstOccluder;
-	GLuint uniform_decals, uniform_numDecals, uniform_firstDecal;
+	GLuint uniform_shared, uniform_lightbuf, uniform_lights, uniform_occluders, uniform_decals;
 	GLuint vao;
 #endif
 } std3D_worldStage;
@@ -1103,7 +1128,6 @@ int std3D_loadWorldStage(std3D_worldStage* pStage, int isZPass, const char* defi
 	pStage->uniform_texgen = std3D_tryFindUniform(pStage->program, "texgen");
 	pStage->uniform_texgen_params = std3D_tryFindUniform(pStage->program, "texgen_params");
 	pStage->uniform_uv_offset = std3D_tryFindUniform(pStage->program, "uv_offset");
-	pStage->uniform_mipDistances = std3D_tryFindUniform(pStage->program, "mipDistances");
 	pStage->uniform_ambient_color = std3D_tryFindUniform(pStage->program, "ambientColor");
 	pStage->uniform_ambient_sg = std3D_tryFindUniform(pStage->program, "ambientSG");
 	pStage->uniform_ambient_sgbasis = std3D_tryFindUniform(pStage->program, "ambientSGBasis");
@@ -1116,32 +1140,18 @@ int std3D_loadWorldStage(std3D_worldStage* pStage, int isZPass, const char* defi
 	pStage->uniform_texDecals = std3D_tryFindUniform(pStage->program, "decalAtlas");
 	pStage->uniform_tex_mode = std3D_tryFindUniform(pStage->program, "tex_mode");
 	pStage->uniform_blend_mode = std3D_tryFindUniform(pStage->program, "blend_mode");
-	pStage->uniform_tint = std3D_tryFindUniform(pStage->program, "colorEffects_tint");
-	pStage->uniform_filter = std3D_tryFindUniform(pStage->program, "colorEffects_filter");
-	pStage->uniform_fade = std3D_tryFindUniform(pStage->program, "colorEffects_fade");
-	pStage->uniform_add = std3D_tryFindUniform(pStage->program, "colorEffects_add");
 	pStage->uniform_emissiveFactor = std3D_tryFindUniform(pStage->program, "emissiveFactor");
 	pStage->uniform_albedoFactor = std3D_tryFindUniform(pStage->program, "albedoFactor");
 	pStage->uniform_light_mode = std3D_tryFindUniform(pStage->program, "lightMode");
-	pStage->uniform_light_mult = std3D_tryFindUniform(pStage->program, "light_mult");
 	pStage->uniform_displacement_factor = std3D_tryFindUniform(pStage->program, "displacement_factor");
-	pStage->uniform_iResolution = std3D_tryFindUniform(pStage->program, "iResolution");
-	pStage->uniform_enableDither = std3D_tryFindUniform(pStage->program, "enableDither");
 #ifdef FOG
 	pStage->uniform_fog = std3D_tryFindUniform(drawcall_program, "fogEnabled");
 	pStage->uniform_fog_color = std3D_tryFindUniform(drawcall_program, "fogColor");
 	pStage->uniform_fog_start = std3D_tryFindUniform(drawcall_program, "fogStart");
 	pStage->uniform_fog_end = std3D_tryFindUniform(drawcall_program, "fogEnd");
 #endif
-	pStage->uniform_numLights = std3D_tryFindUniform(pStage->program, "numLights");
-	pStage->uniform_numOccluders = std3D_tryFindUniform(pStage->program, "numOccluders");
-	pStage->uniform_firstOccluder = std3D_tryFindUniform(pStage->program, "firstOccluder");
-	pStage->uniform_numDecals = std3D_tryFindUniform(pStage->program, "numDecals");
-	pStage->uniform_firstDecal = std3D_tryFindUniform(pStage->program, "firstDecal");
 	pStage->uniform_lightbuf = std3D_tryFindUniform(pStage->program, "clusterBuffer");
-	pStage->uniform_clusterTileSizes = std3D_tryFindUniform(pStage->program, "clusterTileSizes");
-	pStage->uniform_clusterScaleBias = std3D_tryFindUniform(pStage->program, "clusterScaleBias");
-
+	pStage->uniform_shared = glGetUniformBlockIndex(pStage->program, "sharedBlock");
 	pStage->uniform_lights = glGetUniformBlockIndex(pStage->program, "lightBlock");
 	pStage->uniform_occluders = glGetUniformBlockIndex(pStage->program, "occluderBlock");
 	pStage->uniform_decals = glGetUniformBlockIndex(pStage->program, "decalBlock");
@@ -1272,30 +1282,35 @@ void std3D_setupMenuVAO()
 
 #ifdef RENDER_DROID2
 
-void std3D_setupLightingUBO(std3D_worldStage* pStage)
+void std3D_setupUBOs()
 {
+	// shared buffer
+	glGenBuffers(1, &shared_ubo);
+	glBindBuffer(GL_UNIFORM_BUFFER, shared_ubo);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(std3D_SharedUniforms), NULL, GL_DYNAMIC_DRAW);
+
+	// light buffer
 	glGenBuffers(1, &light_ubo);
 	glBindBuffer(GL_UNIFORM_BUFFER, light_ubo);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(tmpLights), NULL, GL_DYNAMIC_DRAW);
-	glUniformBlockBinding(pStage->program, pStage->uniform_lights, 0);
 
+	// occluder buffer
 	glGenBuffers(1, &occluder_ubo);
 	glBindBuffer(GL_UNIFORM_BUFFER, occluder_ubo);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(tmpOccluders), NULL, GL_DYNAMIC_DRAW);
-	glUniformBlockBinding(pStage->program, pStage->uniform_occluders, 1);
 
+	// decal buffer
 	glGenBuffers(1, &decal_ubo);
 	glBindBuffer(GL_UNIFORM_BUFFER, decal_ubo);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(tmpDecals), NULL, GL_DYNAMIC_DRAW);
-	glUniformBlockBinding(pStage->program, pStage->uniform_decals, 2);
 
-	glGenBuffers(1, &cluster_buffer);
-	glBindBuffer(GL_TEXTURE_BUFFER, cluster_buffer);
-	glBufferData(GL_TEXTURE_BUFFER, sizeof(std3D_clusterBits), NULL, GL_DYNAMIC_DRAW);
-
+	// cluster buffer
 	//int maxsize;
 	//glGetIntegerv(GL_MAX_TEXTURE_BUFFER_SIZE, &maxsize);
 	//printf("MAX TEX BUFFER %d\n",  maxsize);
+	glGenBuffers(1, &cluster_buffer);
+	glBindBuffer(GL_TEXTURE_BUFFER, cluster_buffer);
+	glBufferData(GL_TEXTURE_BUFFER, sizeof(std3D_clusterBits), NULL, GL_DYNAMIC_DRAW);
 
 	glGenTextures(1, &cluster_tbo);
 	glBindTexture(GL_TEXTURE_BUFFER, cluster_tbo);
@@ -1303,6 +1318,14 @@ void std3D_setupLightingUBO(std3D_worldStage* pStage)
 
 	glBindBuffer(GL_TEXTURE_BUFFER, 0);
 	glBindTexture(GL_TEXTURE_BUFFER, 0);
+}
+
+void std3D_setupLightingUBO(std3D_worldStage* pStage)
+{
+	glUniformBlockBinding(pStage->program, pStage->uniform_lights, 0);
+	glUniformBlockBinding(pStage->program, pStage->uniform_occluders, 1);
+	glUniformBlockBinding(pStage->program, pStage->uniform_decals, 2);
+	glUniformBlockBinding(pStage->program, pStage->uniform_shared, 3);
 }
 
 void std3D_setupDrawCallVAO(std3D_worldStage* pStage)
@@ -1613,6 +1636,7 @@ int init_resources()
 	std3D_setupMenuVAO();
 #ifdef RENDER_DROID2
 	memset(std3D_clusterFrustumsFrame, 0, sizeof(std3D_clusterFrustumsFrame));
+	std3D_setupUBOs();
 	for(int i = 0; i < SHADER_COUNT; ++i)
 	{
 		std3D_setupDrawCallVAO(&worldStages[i]);
@@ -1711,6 +1735,7 @@ void std3D_FreeResources()
 #ifdef RENDER_DROID2
 	for(int i = 0; i < SHADER_COUNT; ++i)
 		glDeleteProgram(worldStages[i].program);
+	glDeleteBuffers(1, &shared_ubo);
 	glDeleteBuffers(1, &light_ubo);
 	glDeleteBuffers(1, &occluder_ubo);
 	glDeleteBuffers(1, &decal_ubo);
@@ -5332,6 +5357,43 @@ void std3D_ResetDrawCalls()
 	}
 }
 
+void std3D_UpdateSharedUniforms()
+{
+	std3D_SharedUniforms uniforms;
+
+	// uniforms shared across draw lists during flush
+	rdVector_Set4(&uniforms.tint, rdroid_curColorEffects.tint.x, rdroid_curColorEffects.tint.y, rdroid_curColorEffects.tint.z, 0.0f);
+	if (rdroid_curColorEffects.filter.x || rdroid_curColorEffects.filter.y || rdroid_curColorEffects.filter.z)
+		rdVector_Set4(&uniforms.filter, rdroid_curColorEffects.filter.x ? 1.0 : 0.25, rdroid_curColorEffects.filter.y ? 1.0 : 0.25, rdroid_curColorEffects.filter.z ? 1.0 : 0.25, 0.0f);
+	else
+		rdVector_Set4(&uniforms.filter, 1.0, 1.0, 1.0, 1.0f);
+	rdVector_Set4(&uniforms.add, (float)rdroid_curColorEffects.add.x / 255.0f, (float)rdroid_curColorEffects.add.y / 255.0f, (float)rdroid_curColorEffects.add.z / 255.0f, 0.0f);
+	uniforms.fade = rdroid_curColorEffects.fade;
+	
+	uniforms.lightMult = jkGuiBuildMulti_bRendering ? 0.85 : (jkPlayer_enableBloom ? 0.9 : 0.85);
+	
+	uniforms.enableDither = !jkPlayer_enable32Bit;
+
+	rdVector_Set2(&uniforms.clusterTileSizes, (float)tileSizeX, (float)tileSizeY);
+	rdVector_Set2(&uniforms.clusterScaleBias, sliceScalingFactor, sliceBiasFactor);
+	
+	rdVector_Set2(&uniforms.resolution, std3D_pFb->w, std3D_pFb->h);
+
+	uniforms.firstLight = 0;
+	uniforms.numLights = numLights;
+
+	uniforms.firstOccluder = firstOccluder;
+	uniforms.numOccluders = numOccluders;
+	uniforms.firstDecal = firstDecal;
+	uniforms.numDecals = numDecals;
+
+	float mipScale = 1.0 / rdCamera_GetMipmapScalar();
+	rdVector_Set4(&uniforms.mipDistances, mipScale * rdroid_aMipDistances.x, mipScale * rdroid_aMipDistances.y, mipScale * rdroid_aMipDistances.z, mipScale * rdroid_aMipDistances.w);
+
+	glBindBuffer(GL_UNIFORM_BUFFER, shared_ubo);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(std3D_SharedUniforms), &uniforms);
+}
+
 void std3D_SetTexture(std3D_worldStage* pStage, rdDDrawSurface* pTexture)
 {
 	if (!pTexture)
@@ -5508,9 +5570,6 @@ void std3D_SetTextureState(std3D_worldStage* pStage, std3D_TextureState* pTexSta
 	glUniform4f(pStage->uniform_texgen_params, pTexState->texGenParams.x, pTexState->texGenParams.y, pTexState->texGenParams.z, pTexState->texGenParams.w);
 	glUniform2f(pStage->uniform_uv_offset, pTexState->texOffset.x, pTexState->texOffset.y);
 
-	float mipScale = 1.0 / rdCamera_GetMipmapScalar();
-	glUniform4f(pStage->uniform_mipDistances, mipScale * rdroid_aMipDistances.x, mipScale * rdroid_aMipDistances.y, mipScale * rdroid_aMipDistances.z, mipScale * rdroid_aMipDistances.w);
-
 	float a = ((pTexState->fillColor >> 24) & 0xFF) / 255.0f;
 	float r = ((pTexState->fillColor >> 16) & 0xFF) / 255.0f;
 	float g = ((pTexState->fillColor >>  8) & 0xFF) / 255.0f;
@@ -5536,17 +5595,6 @@ void std3D_BindStage(std3D_worldStage* pStage)
 	glBindVertexArray(pStage->vao);
 	glBindBuffer(GL_ARRAY_BUFFER, world_vbo_all);
 
-	glBindBufferBase(GL_UNIFORM_BUFFER, 0, light_ubo);
-	glUniform1i(pStage->uniform_numLights, numLights);
-
-	glBindBufferBase(GL_UNIFORM_BUFFER, 1, occluder_ubo);
-	glUniform1i(pStage->uniform_firstOccluder, firstOccluder);
-	glUniform1i(pStage->uniform_numOccluders, numOccluders);
-
-	glBindBufferBase(GL_UNIFORM_BUFFER, 2, decal_ubo);
-	glUniform1i(pStage->uniform_firstDecal, firstDecal);
-	glUniform1i(pStage->uniform_numDecals, numDecals);
-
 	glUniform1i(pStage->uniform_tex_mode, TEX_MODE_TEST);
 	glUniform1i(pStage->uniform_blend_mode, 2);
 	glUniform1i(pStage->uniform_tex, 0);
@@ -5557,23 +5605,8 @@ void std3D_BindStage(std3D_worldStage* pStage)
 	glUniform1i(pStage->uniform_lightbuf, 5);
 	glUniform1i(pStage->uniform_texDecals, 6);
 
-	glUniform2f(pStage->uniform_clusterTileSizes, (float)tileSizeX, (float)tileSizeY);
-	glUniform2f(pStage->uniform_clusterScaleBias, sliceScalingFactor, sliceBiasFactor);
-	glUniform1i(pStage->uniform_numLights, numLights);
-	glUniform1i(pStage->uniform_numOccluders, numOccluders);
-
-	glUniform2f(pStage->uniform_iResolution, std3D_pFb->w, std3D_pFb->h);
-	glUniform1i(pStage->uniform_enableDither, !jkPlayer_enable32Bit);
-	glUniform3f(pStage->uniform_tint, rdroid_curColorEffects.tint.x, rdroid_curColorEffects.tint.y, rdroid_curColorEffects.tint.z);
-	if (rdroid_curColorEffects.filter.x || rdroid_curColorEffects.filter.y || rdroid_curColorEffects.filter.z)
-		glUniform3f(pStage->uniform_filter, rdroid_curColorEffects.filter.x ? 1.0 : 0.25, rdroid_curColorEffects.filter.y ? 1.0 : 0.25, rdroid_curColorEffects.filter.z ? 1.0 : 0.25);
-	else
-		glUniform3f(pStage->uniform_filter, 1.0, 1.0, 1.0);
-	glUniform1f(pStage->uniform_fade, rdroid_curColorEffects.fade);
-	glUniform3f(pStage->uniform_add, (float)rdroid_curColorEffects.add.x / 255.0f, (float)rdroid_curColorEffects.add.y / 255.0f, (float)rdroid_curColorEffects.add.z / 255.0f);
 	glUniform3f(pStage->uniform_emissiveFactor, 0.0, 0.0, 0.0);
 	glUniform4f(pStage->uniform_albedoFactor, 1.0, 1.0, 1.0, 1.0);
-	glUniform1f(pStage->uniform_light_mult, jkGuiBuildMulti_bRendering ? 0.85 : (jkPlayer_enableBloom ? 0.9 : 0.85));
 	glUniform1f(pStage->uniform_displacement_factor, 0.0);
 }
 
@@ -5609,6 +5642,13 @@ void std3D_FlushDrawCallList(std3D_DrawCallList* pList, std3D_SortFunc sortFunc)
 		}
 		vertexArray = std3D_drawCallVerticesSorted;
 	}
+
+	std3D_UpdateSharedUniforms();
+
+	glBindBufferBase(GL_UNIFORM_BUFFER, 0, light_ubo);
+	glBindBufferBase(GL_UNIFORM_BUFFER, 1, occluder_ubo);
+	glBindBufferBase(GL_UNIFORM_BUFFER, 2, decal_ubo);
+	glBindBufferBase(GL_UNIFORM_BUFFER, 3, shared_ubo);
 
 	std3D_DrawCall* pDrawCall = &pList->drawCalls[0];
 	std3D_RasterState* pRasterState = &pDrawCall->state.raster;
@@ -5693,8 +5733,7 @@ void std3D_FlushDrawCallList(std3D_DrawCallList* pList, std3D_SortFunc sortFunc)
 				clusterFrustumFrame++;
 				clustersDirty = 1;
 				std3D_BuildClusters(&pDrawCall->state.proj);
-				glUniform2f(pStage->uniform_clusterTileSizes, (float)tileSizeX, (float)tileSizeY);
-				glUniform2f(pStage->uniform_clusterScaleBias, sliceScalingFactor, sliceBiasFactor);
+				std3D_UpdateSharedUniforms();
 			}
 
 			last_tex = texid;

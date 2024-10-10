@@ -57,16 +57,9 @@ uniform sampler2D decalAtlas;
 
 uniform int tex_mode;
 uniform int blend_mode;
-uniform vec3 colorEffects_tint;
-uniform vec3 colorEffects_filter;
-uniform float colorEffects_fade;
-uniform vec3 colorEffects_add;
 uniform vec3 emissiveFactor;
 uniform vec4 albedoFactor;
 uniform float displacement_factor;
-uniform float light_mult;
-uniform vec2 iResolution;
-uniform int enableDither;
 
 #ifdef FOG
 uniform int fogEnabled;
@@ -88,8 +81,7 @@ uniform mat4 modelMatrix;
 uniform mat4 mvp;
 
 uniform vec2 texsize;
-uniform int numMips;
-uniform vec4 mipDistances;
+uniform int  numMips;
 uniform int  uv_mode;
 uniform vec4 fillColor;
 
@@ -115,6 +107,32 @@ uniform vec4 ambientSGBasis[8];
 #define CLUSTER_GRID_SIZE_XYZ (CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y * CLUSTER_GRID_SIZE_Z)
 #define CLUSTER_GRID_TOTAL_SIZE (CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y * CLUSTER_GRID_SIZE_Z * CLUSTER_BUCKETS_PER_CLUSTER)
 
+uniform sharedBlock
+{
+	vec4  colorEffects_tint;
+	vec4  colorEffects_filter;
+	vec4  colorEffects_add;
+	
+	vec4  mipDistances;
+
+	float colorEffects_fade;
+	float light_mult;
+	uint  enableDither;
+	uint  pad1;
+
+	vec2  clusterTileSizes;
+	vec2  clusterScaleBias;
+
+	vec2  iResolution;
+	uint  firstLight;
+	uint  numLights;
+
+	uint  firstOccluder;
+	uint  numOccluders;
+	uint  firstDecal;
+	uint  numDecals;
+};
+
 struct light
 {
 	vec4  position;
@@ -133,7 +151,6 @@ struct light
 	float padding1;
 };
 
-uniform int numLights;
 uniform lightBlock
 {
 	light lights[CLUSTER_MAX_LIGHTS];
@@ -144,8 +161,6 @@ struct occluder
 	vec4 position;
 };
 
-uniform int firstOccluder;
-uniform int numOccluders;
 uniform occluderBlock
 {
 	occluder occluders[CLUSTER_MAX_OCCLUDERS];
@@ -164,15 +179,10 @@ struct decal
 	float padding1;
 };
 
-uniform int firstDecal;
-uniform int numDecals;
 uniform decalBlock
 {
 	decal decals[CLUSTER_MAX_DECALS];
 };
-
-uniform vec2 clusterScaleBias;
-uniform vec2 clusterTileSizes;
 
 uint get_cluster_z_index(float screen_depth)
 {
@@ -388,8 +398,8 @@ void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, vec4 shad
 
 	float scalar = 0.4; // todo: needs to come from rdCamera_pCurCamera->attenuationMin
 
-	uint first_item = 0u;
-	uint last_item = first_item + uint(numLights) - 1u;
+	uint first_item = firstLight;
+	uint last_item = first_item + numLights - 1u;
 	uint first_bucket = first_item / 32u;
 	uint last_bucket = min(last_item / 32u, max(0u, CLUSTER_BUCKETS_PER_CLUSTER - 1u));
 	for (uint bucket = first_bucket; bucket <= last_bucket; ++bucket)
@@ -480,8 +490,8 @@ vec4 CalculateIndirectShadows(uint bucket_index, vec3 pos, vec3 normal)
 	vec4 shadowing = vec4(normal.xyz, 1.0);
 	//float overDraw = 0.0;
 
-	uint first_item = uint(firstOccluder);
-	uint last_item = first_item + uint(numOccluders) - 1u;
+	uint first_item = firstOccluder;
+	uint last_item = first_item + numOccluders - 1u;
 	uint first_bucket = first_item / 32u;
 	uint last_bucket = min(last_item / 32u, max(0u, CLUSTER_BUCKETS_PER_CLUSTER - 1u));
 	for (uint bucket = first_bucket; bucket <= last_bucket; ++bucket)
@@ -557,8 +567,8 @@ vec3 blackbody(float t)
 
 void BlendDecals(inout vec3 color, inout vec3 emissive, uint bucket_index, vec3 pos, vec3 normal)
 {
-	uint first_item = uint(firstDecal);
-	uint last_item = first_item + uint(numDecals) - 1u;
+	uint first_item = firstDecal;
+	uint last_item = first_item + numDecals - 1u;
 	uint first_bucket = first_item / 32u;
 	uint last_bucket = min(last_item / 32u, max(0u, CLUSTER_BUCKETS_PER_CLUSTER - 1u));
 	for (uint bucket = first_bucket; bucket <= last_bucket; ++bucket)
@@ -864,7 +874,7 @@ void main(void)
     else if (tex_mode == TEX_MODE_BILINEAR)
     {
         bilinear_paletted(adj_texcoords.xy, sampled_color, color_add);
-		emissive = color_add / light_mult;
+		emissive = color_add;// / light_mult;
 	#ifdef ALPHA_DISCARD
         if (sampled_color.a < 0.01) {
             discard;
@@ -933,7 +943,7 @@ void main(void)
 	#endif
 #endif
 
-	if(numDecals > 0)
+	if(numDecals > 0u)
 		BlendDecals(diffuseColor.xyz, emissive.xyz, bucket_index, f_coord.xyz, surfaceNormals);
 
 #ifndef UNLIT
@@ -943,14 +953,14 @@ void main(void)
 	#endif
 		
 	vec4 shadows = vec4(0.0, 0.0, 0.0, 1.0);
-	if (numOccluders > 0)
+	if (numOccluders > 0u)
 		shadows = CalculateIndirectShadows(bucket_index, f_coord.xyz, surfaceNormals);
 
 	float ao = (shadows.w + 0.1) / 1.1; // remap so we don't overdarken
 	diffuseLight.xyz *= ao;
 	specularLight.xyz *= ao;
 	
-	if (numLights > 0)
+	if (numLights > 0u)
 		CalculatePointLighting(bucket_index, surfaceNormals, localViewDir, shadows, diffuseColor.xyz, specularColor.xyz, roughness, diffuseLight, specularLight);
 	
 	diffuseLight.xyz = clamp(diffuseLight.xyz, vec3(0.0), vec3(1.0));	
@@ -1036,7 +1046,7 @@ void main(void)
         luma = 1.0;
     }
 
-    vec3 tint = normalize(colorEffects_tint + 1.0) * sqrt(3.0);
+    vec3 tint = normalize(colorEffects_tint.xyz + 1.0) * sqrt(3.0);
 
     color_add.r *= tint.r;
     color_add.g *= tint.g;

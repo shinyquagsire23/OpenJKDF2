@@ -15,17 +15,42 @@ out vec3 f_normal;
 out float f_depth;
 
 uniform mat4 modelMatrix;
-uniform int uv_mode;
-uniform vec2 iResolution;
+uniform int  uv_mode;
 
 uniform vec2 texsize;
-uniform int texgen;
+uniform int  texgen;
 uniform vec4 texgen_params;
 uniform vec2 uv_offset;
 
 noperspective out vec2 f_uv_affine;
 
 uniform int  lightMode;
+
+uniform sharedBlock
+{
+	vec4  colorEffects_tint;
+	vec4  colorEffects_filter;
+	vec4  colorEffects_add;
+	
+	vec4  mipDistances;
+
+	float colorEffects_fade;
+	float light_mult;
+	uint  enableDither;
+	uint  pad1;
+
+	vec2  clusterTileSizes;
+	vec2  clusterScaleBias;
+
+	vec2  iResolution;
+	uint  firstLight;
+	uint  numLights;
+
+	uint  firstOccluder;
+	uint  numOccluders;
+	uint  firstDecal;
+	uint  numDecals;
+};
 
 uniform vec3 ambientColor;
 uniform vec4 ambientSH[3];

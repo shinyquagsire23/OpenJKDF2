@@ -30,16 +30,9 @@ uniform sampler2D displacement_map;
 
 uniform int tex_mode;
 uniform int blend_mode;
-uniform vec3 colorEffects_tint;
-uniform vec3 colorEffects_filter;
-uniform float colorEffects_fade;
-uniform vec3 colorEffects_add;
 uniform vec3 emissiveFactor;
 uniform vec4 albedoFactor;
 uniform float displacement_factor;
-uniform float light_mult;
-uniform vec2 iResolution;
-uniform int enableDither;
 
 in vec4 f_color;
 in float f_light;
@@ -50,12 +43,37 @@ in float f_depth;
 
 noperspective in vec2 f_uv_affine;
 
+uniform sharedBlock
+{
+	vec4  colorEffects_tint;
+	vec4  colorEffects_filter;
+	vec4  colorEffects_add;
+	
+	vec4  mipDistances;
+
+	float colorEffects_fade;
+	float light_mult;
+	uint  enableDither;
+	uint  pad1;
+
+	vec2  clusterTileSizes;
+	vec2  clusterScaleBias;
+
+	vec2  iResolution;
+	uint  firstLight;
+	uint  numLights;
+
+	uint  firstOccluder;
+	uint  numOccluders;
+	uint  firstDecal;
+	uint  numDecals;
+};
+
 uniform mat4 modelMatrix;
 uniform mat4 mvp;
 
 uniform int uv_mode;
 uniform vec4 fillColor;
-uniform vec4 mipDistances;
 uniform int numMips;
 
 uint compute_mip_lod(float z_min)
