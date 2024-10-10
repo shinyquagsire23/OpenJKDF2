@@ -154,7 +154,7 @@ GLint uniform_fog, uniform_fog_color, uniform_fog_start, uniform_fog_end;
 
 #ifdef RENDER_DROID2
 
-#define CLUSTER_MAX_LIGHTS          1024 // match RDCAMERA_MAX_LIGHTS/SITHREND_NUM_LIGHTS
+#define CLUSTER_MAX_LIGHTS          256 // match RDCAMERA_MAX_LIGHTS/SITHREND_NUM_LIGHTS
 #define CLUSTER_MAX_OCCLUDERS       128
 #define CLUSTER_MAX_DECALS          256
 #define CLUSTER_MAX_ITEMS           (CLUSTER_MAX_LIGHTS + CLUSTER_MAX_OCCLUDERS + CLUSTER_MAX_DECALS)

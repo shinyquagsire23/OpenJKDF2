@@ -95,7 +95,7 @@ uniform vec3 ambientDominantDir;
 uniform vec3 ambientSG[8];
 
 // todo: define outside
-#define CLUSTER_MAX_LIGHTS          1024u // match RDCAMERA_MAX_LIGHTS/SITHREND_NUM_LIGHTS
+#define CLUSTER_MAX_LIGHTS          256u // match RDCAMERA_MAX_LIGHTS/SITHREND_NUM_LIGHTS
 #define CLUSTER_MAX_OCCLUDERS       128u
 #define CLUSTER_MAX_DECALS          256
 #define CLUSTER_MAX_ITEMS           (CLUSTER_MAX_LIGHTS + CLUSTER_MAX_OCCLUDERS + CLUSTER_MAX_DECALS)
