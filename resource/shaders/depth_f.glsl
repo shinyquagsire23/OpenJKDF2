@@ -45,6 +45,8 @@ noperspective in vec2 f_uv_affine;
 
 uniform sharedBlock
 {
+	vec4  ambientSGBasis[8];
+
 	vec4  colorEffects_tint;
 	vec4  colorEffects_filter;
 	vec4  colorEffects_add;
@@ -70,7 +72,7 @@ uniform sharedBlock
 };
 
 uniform mat4 modelMatrix;
-uniform mat4 mvp;
+uniform mat4 projMatrix;
 
 uniform int uv_mode;
 uniform vec4 fillColor;

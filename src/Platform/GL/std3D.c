@@ -322,10 +322,10 @@ typedef struct std3D_worldStage
 {
 	GLuint program;
 	GLint attribute_coord3d, attribute_v_color, attribute_v_light, attribute_v_uv, attribute_v_norm;
-	GLint uniform_mvp, uniform_modelMatrix;
+	GLint uniform_projection, uniform_modelMatrix;
 	GLint uniform_ambient_color, uniform_ambient_sg;
 	GLint uniform_uv_mode, uniform_texsize, uniform_numMips, uniform_texgen, uniform_texgen_params, uniform_uv_offset;
-	GLint uniform_fillColor, uniform_tex, uniform_texEmiss, uniform_displacement_map, uniform_texDecals;
+	GLint uniform_geo_mode,  uniform_fillColor, uniform_tex, uniform_texEmiss, uniform_displacement_map, uniform_texDecals;
 	GLint uniform_tex_mode, uniform_worldPalette, uniform_worldPaletteLights;
 	GLint uniform_emissiveFactor, uniform_albedoFactor, uniform_displacement_factor;
 	GLint uniform_light_mode;
@@ -1120,7 +1120,7 @@ int std3D_loadWorldStage(std3D_worldStage* pStage, int isZPass, const char* defi
 	pStage->attribute_v_uv = std3D_tryFindAttribute(pStage->program, "v_uv");
 	pStage->attribute_v_norm = std3D_tryFindAttribute(pStage->program, "v_normal");
 
-	pStage->uniform_mvp = std3D_tryFindUniform(pStage->program, "mvp");
+	pStage->uniform_projection = std3D_tryFindUniform(pStage->program, "projMatrix");
 	pStage->uniform_modelMatrix = std3D_tryFindUniform(pStage->program, "modelMatrix");
 	pStage->uniform_uv_mode = std3D_tryFindUniform(pStage->program, "uv_mode");
 	pStage->uniform_numMips = std3D_tryFindUniform(pStage->program, "numMips");
@@ -1140,6 +1140,7 @@ int std3D_loadWorldStage(std3D_worldStage* pStage, int isZPass, const char* defi
 	pStage->uniform_tex_mode = std3D_tryFindUniform(pStage->program, "tex_mode");
 	pStage->uniform_emissiveFactor = std3D_tryFindUniform(pStage->program, "emissiveFactor");
 	pStage->uniform_albedoFactor = std3D_tryFindUniform(pStage->program, "albedoFactor");
+	pStage->uniform_geo_mode = std3D_tryFindUniform(pStage->program, "geoMode");
 	pStage->uniform_light_mode = std3D_tryFindUniform(pStage->program, "lightMode");
 	pStage->uniform_displacement_factor = std3D_tryFindUniform(pStage->program, "displacement_factor");
 #ifdef FOG
@@ -5188,6 +5189,22 @@ int std3D_HasDepthWrites(std3D_DrawCallState* pState)
 	return pState->depthStencil.zmethod == RD_ZBUFFER_READ_WRITE || pState->depthStencil.zmethod == RD_ZBUFFER_NOREAD_WRITE;
 }
 
+GLuint std3D_PrimitiveForGeoMode(rdGeoMode_t geoMode)
+{
+	switch (geoMode)
+	{
+	case RD_GEOMODE_VERTICES:
+		return GL_POINTS;
+	case RD_GEOMODE_WIREFRAME:
+		return GL_LINES;
+	case RD_GEOMODE_SOLIDCOLOR:
+	case RD_GEOMODE_TEXTURED:
+	case RD_GEOMODE_NOTRENDERED:
+	default:
+		return GL_TRIANGLES;
+	}
+}
+
 uint64_t std3D_SortKeyBits(uint64_t* offset, uint64_t bits, uint64_t size)
 {
 	uint64_t limit =(size == 64) ? 0xFFFFFFFFFFFFFFFFUL : (1UL << size) - 1UL;
@@ -5473,7 +5490,7 @@ int std3D_DrawCallCompareDepth(std3D_DrawCall* a, std3D_DrawCall* b)
 }
 
 // todo: track state bits and only apply necessary changes
-void std3D_SetRasterState(std3D_RasterState* pRasterState)
+void std3D_SetRasterState(std3D_worldStage* pStage, std3D_RasterState* pRasterState)
 {
 	glViewport(pRasterState->viewport.x, pRasterState->viewport.y, pRasterState->viewport.width, pRasterState->viewport.height);
 	if(pRasterState->scissorMode == RD_SCISSOR_ENABLED)
@@ -5489,7 +5506,8 @@ void std3D_SetRasterState(std3D_RasterState* pRasterState)
 
 	glFrontFace(pRasterState->cullMode == RD_CULL_MODE_CW_ONLY ? GL_CW : GL_CCW);
 
-	//rdGeoMode_t         geoMode;
+	glUniform1i(pStage->uniform_geo_mode, pRasterState->geoMode);
+
 	//rdVertexColorMode_t colorMode;
 }
 
@@ -5547,6 +5565,19 @@ void std3D_SetTextureState(std3D_worldStage* pStage, std3D_TextureState* pTexSta
 	glUniform4f(pStage->uniform_texgen_params, pTexState->texGenParams.x, pTexState->texGenParams.y, pTexState->texGenParams.z, pTexState->texGenParams.w);
 	glUniform2f(pStage->uniform_uv_offset, pTexState->texOffset.x, pTexState->texOffset.y);
 
+	if(pTexState->pTexture)
+	{
+		glUniform3fv(pStage->uniform_emissiveFactor, 1, pTexState->pTexture->emissive_factor);
+		glUniform4fv(pStage->uniform_albedoFactor, 1, pTexState->pTexture->albedo_factor);
+		glUniform1f(pStage->uniform_displacement_factor, pTexState->pTexture->displacement_factor);
+	}
+	else
+	{
+		glUniform3f(pStage->uniform_emissiveFactor, 0.0, 0.0, 0.0);
+		glUniform4f(pStage->uniform_albedoFactor, 1.0, 1.0, 1.0, 1.0);
+		glUniform1f(pStage->uniform_displacement_factor, 0.0);
+	}
+
 	float a = ((pTexState->fillColor >> 24) & 0xFF) / 255.0f;
 	float r = ((pTexState->fillColor >> 16) & 0xFF) / 255.0f;
 	float g = ((pTexState->fillColor >>  8) & 0xFF) / 255.0f;
@@ -5576,10 +5607,6 @@ void std3D_BindStage(std3D_worldStage* pStage)
 	glUniform1i(pStage->uniform_displacement_map, 4);
 	glUniform1i(pStage->uniform_lightbuf, 5);
 	glUniform1i(pStage->uniform_texDecals, 6);
-
-	glUniform3f(pStage->uniform_emissiveFactor, 0.0, 0.0, 0.0);
-	glUniform4f(pStage->uniform_albedoFactor, 1.0, 1.0, 1.0, 1.0);
-	glUniform1f(pStage->uniform_displacement_factor, 0.0);
 }
 
 // todo/fixme: we're not currently handling viewport changes mid-draw
@@ -5637,7 +5664,7 @@ void std3D_FlushDrawCallList(std3D_DrawCallList* pList, std3D_SortFunc sortFunc)
 	glBufferData(GL_ARRAY_BUFFER, pList->drawCallVertexCount * sizeof(D3DVERTEX), vertexArray, GL_STREAM_DRAW);
 
 	int last_tex = pTexState->pTexture ? pTexState->pTexture->texture_id : blank_tex_white;
-	std3D_SetRasterState(pRasterState);
+	std3D_SetRasterState(pStage, pRasterState);
 	std3D_SetBlendState(pStage, pBlendState);
 	std3D_SetDepthStencilState(pDepthStencilState);
 	std3D_SetTextureState(pStage, pTexState);
@@ -5646,7 +5673,7 @@ void std3D_FlushDrawCallList(std3D_DrawCallList* pList, std3D_SortFunc sortFunc)
 
 	rdMatrix44 last_mat = pDrawCall->state.modelView;
 	rdMatrix44 last_proj = pDrawCall->state.proj;
-	glUniformMatrix4fv(pStage->uniform_mvp, 1, GL_FALSE, (float*)&pDrawCall->state.proj);
+	glUniformMatrix4fv(pStage->uniform_projection, 1, GL_FALSE, (float*)&pDrawCall->state.proj);
 	glUniformMatrix4fv(pStage->uniform_modelMatrix, 1, GL_FALSE, (float*)&pDrawCall->state.modelView);
 
 	int do_batch = 0;
@@ -5679,7 +5706,8 @@ void std3D_FlushDrawCallList(std3D_DrawCallList* pList, std3D_SortFunc sortFunc)
 
 		if (do_batch)
 		{
-			glDrawArrays(GL_TRIANGLES, vertexOffset, batch_verts);
+			GLuint primitiveType = std3D_PrimitiveForGeoMode(lastState.raster.geoMode);
+			glDrawArrays(primitiveType, vertexOffset, batch_verts);
 
 			if (lastState.shaderID != pDrawCall->state.shaderID)
 			{
@@ -5687,14 +5715,14 @@ void std3D_FlushDrawCallList(std3D_DrawCallList* pList, std3D_SortFunc sortFunc)
 				std3D_BindStage(pStage);
 			}
 
-			std3D_SetRasterState(pRasterState);
+			std3D_SetRasterState(pStage, pRasterState);
 			std3D_SetBlendState(pStage, pBlendState);
 			std3D_SetDepthStencilState(pDepthStencilState);
 			std3D_SetTextureState(pStage, pTexState);
 			std3D_SetLightingState(pStage, pLightState);
 			std3D_SetTexture(pStage, pRasterState->geoMode == RD_GEOMODE_TEXTURED ? pTexState->pTexture : NULL);
 
-			glUniformMatrix4fv(pStage->uniform_mvp, 1, GL_FALSE, (float*)&pDrawCall->state.proj);
+			glUniformMatrix4fv(pStage->uniform_projection, 1, GL_FALSE, (float*)&pDrawCall->state.proj);
 			glUniformMatrix4fv(pStage->uniform_modelMatrix, 1, GL_FALSE, (float*)&pDrawCall->state.modelView);
 
 			// if the projection matrix changed then all lighting is invalid, rebuild clusters and assign lights

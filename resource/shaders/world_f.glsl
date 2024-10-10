@@ -77,16 +77,15 @@ in float f_depth;
 noperspective in vec2 f_uv_affine;
 
 uniform mat4 modelMatrix;
-uniform mat4 mvp;
+uniform mat4 projMatrix;
 
 uniform vec2 texsize;
 uniform int  numMips;
 uniform int  uv_mode;
 uniform vec4 fillColor;
 
-// fixme: specular mode is currently a metal mode, where metalness is assumed to be 1.0 with 0 diffuse component
-// this is pretty limiting atm, I'd like to get some shiny storm troopers but their armor is more like plastic
 uniform int  lightMode;
+uniform int  geoMode;
 
 uniform vec3 ambientColor;
 uniform vec4 ambientSH[3];
@@ -836,7 +835,7 @@ void main(void)
 
 	vec3 surfaceNormals = normalize(f_normal);
 
-    if (tex_mode == TEX_MODE_TEST) {
+    if (tex_mode == TEX_MODE_TEST || geoMode <= 3) {
 		sampled_color = fillColor;
     }
     else if (tex_mode == TEX_MODE_16BPP

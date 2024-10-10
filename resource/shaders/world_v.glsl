@@ -6,7 +6,6 @@ in vec3 v_normal;
 
 in vec3 coordVS;
 
-uniform mat4 mvp;
 out vec4 f_color;
 out float f_light;
 out vec4 f_uv;
@@ -14,6 +13,7 @@ out vec3 f_coord;
 out vec3 f_normal;
 out float f_depth;
 
+uniform mat4 projMatrix;
 uniform mat4 modelMatrix;
 uniform int  uv_mode;
 
@@ -179,7 +179,7 @@ vec2 do_ceiling_uv(vec4 view_pos, vec3 world_pos, inout vec4 clip_pos)
 	
 	vec2 uv = sky_pos.xy * 16.0;
 
-	vec4 proj_sky = mvp * modelMatrix * vec4(sky_pos.xyz, 1.0);
+	vec4 proj_sky = projMatrix * modelMatrix * vec4(sky_pos.xyz, 1.0);
 
 	clip_pos.z = (proj_sky.z / proj_sky.w) * clip_pos.w;
 	//clip_pos.z = clip_pos.w - 0.25/64.0;
@@ -204,7 +204,7 @@ vec2 do_horizon_uv(inout vec4 clip_pos)
 void main(void)
 {
 	vec4 viewPos = modelMatrix * vec4(coord3d, 1.0);
-    vec4 pos = mvp * viewPos;
+    vec4 pos = projMatrix * viewPos;
 	f_normal = normalize(mat3(modelMatrix) * v_normal.xyz);
 
     gl_Position = pos;
