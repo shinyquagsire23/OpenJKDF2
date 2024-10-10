@@ -5622,10 +5622,6 @@ void std3D_FlushDrawCallList(std3D_DrawCallList* pList, std3D_SortFunc sortFunc)
 	glBindBufferBase(GL_UNIFORM_BUFFER, 2, decal_ubo);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 3, shared_ubo);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->fbo);
-	GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-	glDrawBuffers(ARRAYSIZE(bufs), bufs);
-
 	std3D_DrawCall* pDrawCall = &pList->drawCalls[0];
 	std3D_RasterState* pRasterState = &pDrawCall->state.raster;
 	std3D_BlendState* pBlendState = &pDrawCall->state.blend;
@@ -5735,13 +5731,10 @@ void std3D_FlushDrawCalls()
 {
 	if (Main_bHeadless) return;
 
-	GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 //, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3
-#ifdef VIEW_SPACE_GBUFFER
-	//, GL_COLOR_ATTACHMENT4
-#endif
-	};
+	glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->fbo);
+	GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
 	glDrawBuffers(ARRAYSIZE(bufs), bufs);
-	
+
 	glViewport(0, 0, std3D_pFb->w, std3D_pFb->h);
 	glCullFace(GL_BACK); // this is flipped compared to old pipe, maybe the proj matrix?
 	glEnable(GL_DEPTH_TEST);
