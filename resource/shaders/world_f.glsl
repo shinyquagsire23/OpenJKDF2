@@ -954,7 +954,7 @@ void main(void)
 	diffuseLight.xyz *= diffuseColor.xyz;
 	//specularLight.xyz *= specularColor.xyz;
 
-	vec4 main_color = vec4(diffuseLight.xyz, 1.0) * vertex_color.xyzw + vec4(specularLight.xyz, 0.0);
+	vec4 main_color = vec4(diffuseLight.xyz, vertex_color.w) + vec4(specularLight.xyz, 0.0);
 	main_color.rgb = max(main_color.rgb, emissive.rgb);
 
     vec4 effectAdd_color = vec4(colorEffects_add.r, colorEffects_add.g, colorEffects_add.b, 0.0);
