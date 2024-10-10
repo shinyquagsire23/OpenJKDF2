@@ -367,8 +367,8 @@ vec3 CalculateAmbientSpecular(vec3 normal, vec3 view, float roughness, vec3 f0)
 		// no Geometry term
 
 		// Fresnel
-		vec3 h = normalize(warpedNDF.Axis + view);
-		vec3 f = f0 + (1.0 - f0) * exp2(-8.35 * max(0.0, dot(warpedNDF.Axis, h)));
+		//vec3 h = normalize(warpedNDF.Axis + view);
+		vec3 f = f0;// + (1.0 - f0) * exp2(-8.35 * max(0.0, dot(warpedNDF.Axis, h)));
 		//f *= clamp(dot(f0, vec3(333.0)), 0.0, 1.0); // fade out when spec is less than 0.1% albedo
 		
 		ambientSpecular.xyz = (spec * nDotL) * f + ambientSpecular.xyz;
@@ -377,7 +377,7 @@ vec3 CalculateAmbientSpecular(vec3 normal, vec3 view, float roughness, vec3 f0)
 }
 
 // todo: split the spotlights out
-void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, vec4 shadows, vec3 albedo, vec3 f0, float roughness, inout vec3 lightAcc)
+void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, vec4 shadows, vec3 albedo, vec3 f0, float roughness, inout vec3 diffuseLight, inout vec3 specularLight)
 {	
 	// precompute some terms
 	float a = roughness;// * roughness;
@@ -456,20 +456,20 @@ void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, vec4 shad
 
 				lightMagnitude = max(lightMagnitude, 0.0);
 
+				diffuseLight += l.color.xyz * intensity * cd;
+
 				#ifdef SPECULAR
-					vec3 h = normalize(diff + view);
-					vec3 f = f0 + (1.0 - f0) * exp2(-8.35 * max(0.0, dot(diff, h)));
+					//vec3 h = normalize(diff + view);
+					vec3 f = f0;// + (1.0 - f0) * exp2(-8.35 * max(0.0, dot(diff, h)));
 					//f *= clamp(dot(f0, vec3(333.0)), 0.0, 1.0); // fade out when spec is less than 0.1% albedo
 					
 					float c = 0.72134752 * rcp_a2 + 0.39674113;
 					float d = exp2( c * dot(reflVec, diff) - c ) * (rcp_a2 / 3.141592);
 
 					vec3 cs = f * (lightMagnitude * d);
-				#else
-					vec3 cs = vec3(0.0);
-				#endif
 
-				lightAcc.xyz += l.color.xyz * intensity * (albedo * cd + cs);
+					specularLight += l.color.xyz * intensity * cs;
+				#endif
 			}
 		}
 	}
@@ -879,19 +879,7 @@ void main(void)
 
         // Makes sure light is in a sane range
         float light = clamp(f_light, 0.0, 1.0);
-
-        // Special case for lightsabers
-        //if (index * 255.0 >= 16.0 && index * 255.0 < 17.0)
-        //    light = 0.0;
-
-        // Take the fragment light, and divide by 4.0 to select for colors
-        // which glow in the dark
-        float light_idx = light / LIGHT_DIVISOR;
-
-        // Get the shaded palette index
-        float light_worldpalidx = texture(worldPaletteLights, vec2(index, light_idx)).r;
-
-        // Now take our index and look up the corresponding palette value
+        float light_worldpalidx = texture(worldPaletteLights, vec2(index, light)).r;
         vec4 lightPalval = texture(worldPalette, vec2(light_worldpalidx, 0.5));
 
 		emissive = lightPalval;
@@ -912,8 +900,8 @@ void main(void)
 #endif
 
 #ifdef UNLIT
-		if (lightMode == 0)
-			color_add.xyz *= fillColor.xyz;
+	if (lightMode == 0)
+		color_add.xyz = fillColor.xyz * 0.5;
 #endif
 
     vec4 albedoFactor_copy = albedoFactor;
@@ -943,37 +931,41 @@ void main(void)
 	vec3 specularColor = vec3(0.0);
 	float roughness = 0.0;
 
+	vec3 diffuseLight = vertex_color.xyz;
+	vec3 specularLight = vec3(0.0);
+
 #ifndef UNLIT
 	#ifdef SPECULAR
+		roughness = 0.05;
+
 		// fill color is effectively an anti-metalness control
 		vec3 avgAlbedo = fillColor.xyz;
-
+		
 		// blend to metal when dark
 		diffuseColor = diffuseColor * avgAlbedo;// -> 0 * (1-avgAlbedo) + diffuseColor * avgAlbedo -> mix(vec3(0.0), diffuseColor, avgAlbedo)
-
+		
 		// blend to dielectric white when bright
-		specularColor = mix(sampled_color.xyz, vec3(0.2), avgAlbedo);
-
-		// try to estimate some roughness variation from the texture
-		float smoothness = dot(sampled_color.xyz, vec3(0.33,0.59,0.11));// max(sampled_color.r, max(sampled_color.g, sampled_color.b));
-		roughness = max(smoothness, 0.05);//mix(0.2, 0.05, smoothness); // don't get too rough or there's no point in using specular here
-
-		// blend out really dark stuff to fill color with high roughness (ex strifle scopes)
-		float threshold = 1.0 / (15.0 / 255.0);
-		roughness = mix(0.1, roughness, min(smoothness * threshold, 1.0));
-		specularColor = mix(min(avgAlbedo * 2.0, vec3(1.0)), specularColor, min(smoothness * threshold, 1.0));
+		specularColor = mix(sampled_color.xyz, vec3(0.5), avgAlbedo);
+		
+		//// try to estimate some roughness variation from the texture
+		//vec3 normalizedColor = min(vec3(1.0), specularColor.xyz / max(vec3(0.01), avgAlbedo.xyz));
+		//float smoothness = dot(normalizedColor.xyz, vec3(0.33,0.59,0.11));// max(sampled_color.r, max(sampled_color.g, sampled_color.b));
+		//roughness = max(smoothness * 0.3, 0.05);//mix(0.2, 0.05, smoothness); // don't get too rough or there's no point in using specular here
+		//
+		//// blend out really dark stuff to fill color with high roughness (ex strifle scopes)
+		//float threshold = 1.0 / (15.0 / 255.0);
+		//roughness = mix(0.1, roughness, min(smoothness * threshold, 1.0));
+		//specularColor = mix(min(avgAlbedo * 2.0, vec3(1.0)), specularColor, min(smoothness * threshold, 1.0));
 	#endif
 #endif
 
 	if(numDecals > 0)
 		BlendDecals(diffuseColor.xyz, emissive.xyz, bucket_index, f_coord.xyz, surfaceNormals);
 
-	vec4 main_color = vec4(diffuseColor.xyz, 1.0) * vertex_color.xyzw;
-
 #ifndef UNLIT
 	#ifdef SPECULAR
 		// let's make it happen cap'n
-		main_color.xyz += CalculateAmbientSpecular(surfaceNormals, localViewDir, roughness, specularColor.xyz);
+		specularLight.xyz += CalculateAmbientSpecular(surfaceNormals, localViewDir, roughness, specularColor.xyz);
 	#endif
 		
 	vec4 shadows = vec4(0.0, 0.0, 0.0, 1.0);
@@ -981,22 +973,25 @@ void main(void)
 		shadows = CalculateIndirectShadows(bucket_index, f_coord.xyz, surfaceNormals);
 
 	float ao = (shadows.w + 0.1) / 1.1; // remap so we don't overdarken
-	main_color.xyz *= ao;
+	diffuseLight.xyz *= ao;
+	specularLight.xyz *= ao;
 	
 	if (numLights > 0)
-		CalculatePointLighting(bucket_index, surfaceNormals, localViewDir, shadows, diffuseColor.xyz, specularColor.xyz, roughness, main_color.xyz);
+		CalculatePointLighting(bucket_index, surfaceNormals, localViewDir, shadows, diffuseColor.xyz, specularColor.xyz, roughness, diffuseLight, specularLight);
 	
-	//main_color.xyz = clamp(main_color.xyz, vec3(0.0), vec3(1.0));	
+	diffuseLight.xyz = clamp(diffuseLight.xyz, vec3(0.0), vec3(1.0));	
+	specularLight.xyz = clamp(specularLight.xyz, vec3(0.0), vec3(1.0));	
 
 	// taper off highlights
-	main_color.r = rolloff(main_color.r, 1.0, 0.2);
-	main_color.g = rolloff(main_color.g, 1.0, 0.2);
-	main_color.b = rolloff(main_color.b, 1.0, 0.2);
-
-	//color_add.xyz += max(main_color.rgb - 1.0, vec3(0.0));
-
+	//specularLight.r = rolloff(specularLight.r, 1.0, 0.2);
+	//specularLight.g = rolloff(specularLight.g, 1.0, 0.2);
+	//specularLight.b = rolloff(specularLight.b, 1.0, 0.2);
 #endif
 
+	diffuseLight.xyz *= diffuseColor.xyz;
+	//specularLight.xyz *= specularColor.xyz;
+
+	vec4 main_color = vec4(diffuseLight.xyz, 1.0) * vertex_color.xyzw + vec4(specularLight.xyz, 0.0);
 	main_color.rgb = max(main_color.rgb, emissive.rgb);
 
     vec4 effectAdd_color = vec4(colorEffects_add.r, colorEffects_add.g, colorEffects_add.b, 0.0);
