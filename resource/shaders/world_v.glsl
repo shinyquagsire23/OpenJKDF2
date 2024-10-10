@@ -28,6 +28,8 @@ uniform int  lightMode;
 
 uniform sharedBlock
 {
+	vec4  ambientSGBasis[8];
+
 	vec4  colorEffects_tint;
 	vec4  colorEffects_filter;
 	vec4  colorEffects_add;
@@ -56,7 +58,6 @@ uniform vec3 ambientColor;
 uniform vec4 ambientSH[3];
 uniform vec3 ambientDominantDir;
 uniform vec3 ambientSG[8];
-uniform vec4 ambientSGBasis[8];
 
 // https://therealmjp.github.io/posts/sg-series-part-1-a-brief-and-incomplete-history-of-baked-lighting-representations/
 // SphericalGaussian(dir) := Amplitude * exp(Sharpness * (dot(Axis, dir) - 1.0f))

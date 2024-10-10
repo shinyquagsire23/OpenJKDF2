@@ -179,6 +179,8 @@ GLuint cluster_tbo;
 // uniforms shared across draw lists during flush
 typedef struct std3D_SharedUniforms
 {
+	rdVector4 sgBasis[8];
+
 	rdVector4 tint;
 	rdVector4 filter;
 	rdVector4 add;
@@ -323,7 +325,7 @@ typedef struct std3D_worldStage
 	GLuint program;
 	GLint attribute_coord3d, attribute_v_color, attribute_v_light, attribute_v_uv, attribute_v_norm;
 	GLint uniform_mvp, uniform_modelMatrix;
-	GLint uniform_ambient_color, uniform_ambient_sg, uniform_ambient_sgbasis;
+	GLint uniform_ambient_color, uniform_ambient_sg;
 	GLint uniform_uv_mode, uniform_texsize, uniform_numMips, uniform_texgen, uniform_texgen_params, uniform_uv_offset;
 	GLint uniform_fillColor, uniform_tex, uniform_texEmiss, uniform_displacement_map, uniform_texDecals;
 	GLint uniform_tex_mode, uniform_blend_mode, uniform_worldPalette, uniform_worldPaletteLights;
@@ -1130,7 +1132,6 @@ int std3D_loadWorldStage(std3D_worldStage* pStage, int isZPass, const char* defi
 	pStage->uniform_uv_offset = std3D_tryFindUniform(pStage->program, "uv_offset");
 	pStage->uniform_ambient_color = std3D_tryFindUniform(pStage->program, "ambientColor");
 	pStage->uniform_ambient_sg = std3D_tryFindUniform(pStage->program, "ambientSG");
-	pStage->uniform_ambient_sgbasis = std3D_tryFindUniform(pStage->program, "ambientSGBasis");
 	pStage->uniform_fillColor = std3D_tryFindUniform(pStage->program, "fillColor");
 	pStage->uniform_tex = std3D_tryFindUniform(pStage->program, "tex");
 	pStage->uniform_texEmiss = std3D_tryFindUniform(pStage->program, "texEmiss");
@@ -5387,6 +5388,9 @@ void std3D_UpdateSharedUniforms()
 	uniforms.firstDecal = firstDecal;
 	uniforms.numDecals = numDecals;
 
+	extern rdVector4 rdroid_sgBasis[8]; //eww
+	memcpy(uniforms.sgBasis, rdroid_sgBasis, sizeof(rdVector4)*8);
+
 	float mipScale = 1.0 / rdCamera_GetMipmapScalar();
 	rdVector_Set4(&uniforms.mipDistances, mipScale * rdroid_aMipDistances.x, mipScale * rdroid_aMipDistances.y, mipScale * rdroid_aMipDistances.z, mipScale * rdroid_aMipDistances.w);
 
@@ -5582,9 +5586,6 @@ void std3D_SetLightingState(std3D_worldStage* pStage, std3D_LightingState* pLigh
 	glUniform1i(pStage->uniform_light_mode, pLightState->lightMode);
 	glUniform3fv(pStage->uniform_ambient_color, 1, &pLightState->ambientColor.x);
 	glUniform3fv(pStage->uniform_ambient_sg, 8, &pLightState->ambientStateSH.sgs[0].x);
-
-	extern rdVector4 rdroid_sgBasis[8]; //eww
-	glUniform4fv(pStage->uniform_ambient_sgbasis, 8, &rdroid_sgBasis[0].x);
 }
 
 void std3D_BindStage(std3D_worldStage* pStage)

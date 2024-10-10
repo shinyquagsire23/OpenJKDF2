@@ -93,7 +93,6 @@ uniform vec3 ambientColor;
 uniform vec4 ambientSH[3];
 uniform vec3 ambientDominantDir;
 uniform vec3 ambientSG[8];
-uniform vec4 ambientSGBasis[8];
 
 // todo: define outside
 #define CLUSTER_MAX_LIGHTS          1024u // match RDCAMERA_MAX_LIGHTS/SITHREND_NUM_LIGHTS
@@ -109,6 +108,8 @@ uniform vec4 ambientSGBasis[8];
 
 uniform sharedBlock
 {
+	vec4  ambientSGBasis[8];
+
 	vec4  colorEffects_tint;
 	vec4  colorEffects_filter;
 	vec4  colorEffects_add;
