@@ -1643,7 +1643,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
 	else
 	{
 		rdSetBlendMode(RD_BLEND_MODE_NONE);
-		rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
+		rdSetZBufferMethod((face->type & RD_FF_ZWRITE_DISABLED) ? RD_ZBUFFER_READ_NOWRITE : RD_ZBUFFER_READ_WRITE);
 	}
 
 	if ((face->type & RD_FF_DOUBLE_SIDED) != 0)
