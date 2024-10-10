@@ -212,18 +212,16 @@ typedef struct std3D_light
 	rdVector4 position;
 	rdVector4 direction_intensity;
 	rdVector4 color;
+
 	int32_t   type;
-	uint32_t  active;
 	float     falloffMin;
 	float     falloffMax;
+	float     lux;
+	
 	float     angleX;
 	float     cosAngleX;
 	float     angleY;
 	float     cosAngleY;
-	float     lux;
-	float     padding0;
-	float     padding1;
-	float     padding2;
 } std3D_light;
 
 int lightsDirty = 0;
@@ -328,7 +326,7 @@ typedef struct std3D_worldStage
 	GLint uniform_ambient_color, uniform_ambient_sg;
 	GLint uniform_uv_mode, uniform_texsize, uniform_numMips, uniform_texgen, uniform_texgen_params, uniform_uv_offset;
 	GLint uniform_fillColor, uniform_tex, uniform_texEmiss, uniform_displacement_map, uniform_texDecals;
-	GLint uniform_tex_mode, uniform_blend_mode, uniform_worldPalette, uniform_worldPaletteLights;
+	GLint uniform_tex_mode, uniform_worldPalette, uniform_worldPaletteLights;
 	GLint uniform_emissiveFactor, uniform_albedoFactor, uniform_displacement_factor;
 	GLint uniform_light_mode;
 #ifdef FOG
@@ -1140,7 +1138,6 @@ int std3D_loadWorldStage(std3D_worldStage* pStage, int isZPass, const char* defi
 	pStage->uniform_displacement_map = std3D_tryFindUniform(pStage->program, "displacement_map");
 	pStage->uniform_texDecals = std3D_tryFindUniform(pStage->program, "decalAtlas");
 	pStage->uniform_tex_mode = std3D_tryFindUniform(pStage->program, "tex_mode");
-	pStage->uniform_blend_mode = std3D_tryFindUniform(pStage->program, "blend_mode");
 	pStage->uniform_emissiveFactor = std3D_tryFindUniform(pStage->program, "emissiveFactor");
 	pStage->uniform_albedoFactor = std3D_tryFindUniform(pStage->program, "albedoFactor");
 	pStage->uniform_light_mode = std3D_tryFindUniform(pStage->program, "lightMode");
@@ -5410,7 +5407,6 @@ void std3D_SetTexture(std3D_worldStage* pStage, rdDDrawSurface* pTexture)
 		glActiveTexture(GL_TEXTURE0 + 0);
 		glBindTexture(GL_TEXTURE_2D, blank_tex_white);
 		glUniform1i(pStage->uniform_tex_mode, TEX_MODE_TEST);
-		glUniform1i(pStage->uniform_blend_mode, D3DBLEND_ONE);
 	
 		glUniform3f(pStage->uniform_emissiveFactor, 0, 0, 0);
 		glUniform4f(pStage->uniform_albedoFactor, 1, 1, 1, 1);
@@ -5500,32 +5496,9 @@ void std3D_SetRasterState(std3D_RasterState* pRasterState)
 int std3D_SetBlendState(std3D_worldStage* pStage, std3D_BlendState* pBlendState)
 {
 	if (pBlendState->blendMode == RD_BLEND_MODE_NONE)
-	{
 		glDisable(GL_BLEND);
-
-		// allow gbuffer writes
-//		GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3
-//#ifdef VIEW_SPACE_GBUFFER
-//			, GL_COLOR_ATTACHMENT4
-//#endif
-//		};
-		GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1  }; // test
-		glDrawBuffers(ARRAYSIZE(bufs), bufs);
-	}
 	else
-	{
 		glEnable(GL_BLEND);
-
-		// no gbuffer writes
-		GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-		glDrawBuffers(ARRAYSIZE(bufs), bufs);
-	}
-
-	// fixme: I don't entirely understand the logic behind this blend mode uniform...
-	//if (pBlendState->blendMode == RD_BLEND_MODE_NONE)
-	//	glUniform1i(drawcall_uniform_blend_mode, D3DBLEND_ONE);
-	//else
-		glUniform1i(pStage->uniform_blend_mode, D3DBLEND_SRCALPHA);
 }
 
 void std3D_SetDepthStencilState(std3D_DepthStencilState* pDepthStencilState)
@@ -5590,14 +5563,12 @@ void std3D_SetLightingState(std3D_worldStage* pStage, std3D_LightingState* pLigh
 
 void std3D_BindStage(std3D_worldStage* pStage)
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->fbo);
 	std3D_useProgram(pStage->program);
 
 	glBindVertexArray(pStage->vao);
 	glBindBuffer(GL_ARRAY_BUFFER, world_vbo_all);
 
 	glUniform1i(pStage->uniform_tex_mode, TEX_MODE_TEST);
-	glUniform1i(pStage->uniform_blend_mode, 2);
 	glUniform1i(pStage->uniform_tex, 0);
 	glUniform1i(pStage->uniform_worldPalette, 1);
 	glUniform1i(pStage->uniform_worldPaletteLights, 2);
@@ -5650,6 +5621,10 @@ void std3D_FlushDrawCallList(std3D_DrawCallList* pList, std3D_SortFunc sortFunc)
 	glBindBufferBase(GL_UNIFORM_BUFFER, 1, occluder_ubo);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 2, decal_ubo);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 3, shared_ubo);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->fbo);
+	GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+	glDrawBuffers(ARRAYSIZE(bufs), bufs);
 
 	std3D_DrawCall* pDrawCall = &pList->drawCalls[0];
 	std3D_RasterState* pRasterState = &pDrawCall->state.raster;
@@ -5827,7 +5802,7 @@ void std3D_ClearLights()
 
 int std3D_AddLight(rdLight* light, rdVector3* position)
 {
-	if(numLights >= CLUSTER_MAX_LIGHTS)
+	if(numLights >= CLUSTER_MAX_LIGHTS || !light->active)
 		return 0;
 
 	lightsDirty = 1;
@@ -5835,7 +5810,6 @@ int std3D_AddLight(rdLight* light, rdVector3* position)
 
 	std3D_light* light3d = &tmpLights[numLights++];
 	light3d->type = light->type;
-	light3d->active = light->active;
 	light3d->position.x = position->x;
 	light3d->position.y = position->y;
 	light3d->position.z = position->z;
@@ -6221,8 +6195,6 @@ void std3D_BuildClusters(rdMatrix44* pProjection)
 	// assign lights
 	for (int i = 0; i < numLights; ++i)
 	{
-		if(!tmpLights[i].active)
-			continue;
 		std3D_AssignItemToClusters(i, (rdVector3*)&tmpLights[i].position, tmpLights[i].falloffMin, pProjection, znear, zfar);
 	}
 

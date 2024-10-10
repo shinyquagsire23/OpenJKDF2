@@ -56,7 +56,6 @@ uniform usamplerBuffer clusterBuffer;
 uniform sampler2D decalAtlas;
 
 uniform int tex_mode;
-uniform int blend_mode;
 uniform vec3 emissiveFactor;
 uniform vec4 albedoFactor;
 uniform float displacement_factor;
@@ -139,17 +138,16 @@ struct light
 	vec4  position;
 	vec4  direction_intensity;
 	vec4  color;
+	
 	int   type;
-	uint  isActive;
 	float falloffMin;
 	float falloffMax;
+	float lux;
+	
 	float angleX;
 	float cosAngleX;
 	float angleY;
 	float cosAngleY;
-	float lux;
-	float padding0;
-	float padding1;
 };
 
 uniform lightBlock
@@ -730,20 +728,17 @@ void bilinear_paletted(vec2 uv, out vec4 color, out vec4 emissive)
     vec4 cc = texture(worldPalette, vec2(c, 0.5));
     vec4 cd = texture(worldPalette, vec2(d, 0.5));
 
-	if (blend_mode == D3DBLEND_SRCALPHA || blend_mode == D3DBLEND_INVSRCALPHA)
-	{
-        if (a == 0.0) {
-            ca.a = 0.0;
-        }
-        if (b == 0.0) {
-            cb.a = 0.0;
-        }
-        if (c == 0.0) {
-            cc.a = 0.0;
-        }
-        if (d == 0.0) {
-            cd.a = 0.0;
-        }
+    if (a == 0.0) {
+        ca.a = 0.0;
+    }
+    if (b == 0.0) {
+        cb.a = 0.0;
+    }
+    if (c == 0.0) {
+        cc.a = 0.0;
+    }
+    if (d == 0.0) {
+        cd.a = 0.0;
     }
 
 	color = mix(mix(ca, cb, w.x), mix(cc, cd, w.x), w.y);
@@ -858,7 +853,7 @@ void main(void)
 
     {
 #ifdef ALPHA_DISCARD
-        if (index == 0.0)// && (blend_mode == D3DBLEND_SRCALPHA || blend_mode == D3DBLEND_INVSRCALPHA))
+        if (index == 0.0)
             discard;
 #endif
 
@@ -890,23 +885,6 @@ void main(void)
 #endif
 
     vec4 albedoFactor_copy = albedoFactor;
-
-    if (blend_mode == D3DBLEND_INVSRCALPHA)
-    {
-	#ifdef ALPHA_BLEND
-        if (vertex_color.a < 0.01) {
-            discard;
-        }
-	#endif
-        //albedoFactor_copy.a = (1.0 - albedoFactor_copy.a);
-        //vertex_color.a = (1.0 - vertex_color.a);
-        //sampled_color.a = (1.0 - sampled_color.a);
-    }
-
-    if (blend_mode != D3DBLEND_SRCALPHA && blend_mode != D3DBLEND_INVSRCALPHA && vertex_color.a != 0.0)
-    {
-        vertex_color.a = 1.0;
-    }
 
 	vec3 localViewDir = normalize(-f_coord.xyz);
 	uint cluster_index = compute_cluster_index(gl_FragCoord.xy, f_coord.y);
@@ -990,14 +968,8 @@ void main(void)
         discard;
     }
 #endif
-    
-    if (blend_mode == D3DBLEND_INVSRCALPHA)
-    {
-        main_color.rgb *= (1.0 - main_color.a);
-        main_color.a = (1.0 - main_color.a);
-    }
 
-    //if (sampledEmiss.r != 0.0 || sampledEmiss.g != 0.0 || sampledEmiss.b != 0.0)
+    if (sampledEmiss.r != 0.0 || sampledEmiss.g != 0.0 || sampledEmiss.b != 0.0)
     {
         color_add.rgb += sampledEmiss.rgb * emissiveFactor * 0.1;
     }
