@@ -1,39 +1,18 @@
-#ifdef GL_ARB_texture_gather
-#define HAS_TEXTUREGATHER
-#endif
-
-#ifdef HAS_TEXTUREGATHER
-vec4 impl_textureGather(sampler2D tex, vec2 uv)
+#ifdef GL_ARB_texture_query_lod
+float impl_textureQueryLod(sampler2D tex, vec2 uv)
 {
-    return textureGather(tex, uv);
+	return textureQueryLOD(tex, uv).x;
 }
 #else
-float modI(float a,float b) {
-    float m=a-floor((a+0.5)/b)*b;
-    return floor(m+0.5);
-}
-
-vec4 impl_textureGather(sampler2D tex, vec2 uv)
+float impl_textureQueryLod(sampler2D tex, vec2 uv)
 {
-    ivec2 idims = textureSize(tex,0) - ivec2(1, 1);
-    vec2 dims = vec2(idims);
-
-    ivec2 base = ivec2(dims*uv);
-    if (base.x < 0) {
-        //base.x = -base.x;
-    }
-    if (base.y < 0) {
-        //base.y = -base.y;
-    }
-
-    base.x = int(modI(float(base.x), dims.x));
-    base.y = int(modI(float(base.y), dims.y));
-
-    return vec4(texelFetch(tex,base+ivec2(0,1),0).x,
-        texelFetch(tex,base+ivec2(1,1),0).x,
-        texelFetch(tex,base+ivec2(1,0),0).x,
-        texelFetch(tex,base+ivec2(0,0),0).x
-    );
+    vec2 dims = textureSize(tex, 0);
+	vec2  texture_coordinate = uv * dims;
+    vec2  dx_vtc        = dFdx(texture_coordinate);
+    vec2  dy_vtc        = dFdy(texture_coordinate);
+    float delta_max_sqr = max(dot(dx_vtc, dx_vtc), dot(dy_vtc, dy_vtc));
+    float mml = 0.5 * log2(delta_max_sqr);
+    return max( 0, mml );
 }
 #endif
 
@@ -76,6 +55,17 @@ uniform mat4 mvp;
 
 uniform int uv_mode;
 uniform vec4 fillColor;
+uniform vec4 mipDistances;
+uniform int numMips;
+
+uint compute_mip_lod(float z_min)
+{
+	uint mipmap_level = 0;
+	mipmap_level = z_min < mipDistances.x ? mipmap_level : 1;
+	mipmap_level = z_min < mipDistances.y ? mipmap_level : 2;
+	mipmap_level = z_min < mipDistances.z ? mipmap_level : 3;
+	return mipmap_level;
+}
 
 float luminance(vec3 c_rgb)
 {
@@ -149,47 +139,48 @@ vec2 parallax_mapping(vec2 tc, vec3 vp_normal, vec3 adjusted_coords)
 #ifdef CAN_BILINEAR_FILTER
 vec4 bilinear_paletted(vec2 uv)
 {
-    // Get texture size in pixels:
-    vec2 colorTextureSize = vec2(textureSize(tex, 0));
+	float mip = impl_textureQueryLod(tex, uv);
+	mip += float(compute_mip_lod(f_coord.y));
+	mip = min(mip, float(numMips - 1));
 
-    // Convert UV coordinates to pixel coordinates and get pixel index of top left pixel (assuming UVs are relative to top left corner of texture)
-    vec2 pixCoord = uv.xy * colorTextureSize - 0.5f;    // First pixel goes from -0.5 to +0.4999 (0.0 is center) last pixel goes from (size - 1.5) to (size - 0.5000001)
-    vec2 originPixCoord = floor(pixCoord);              // Pixel index coordinates of bottom left pixel of set of 4 we will be blending
+	ivec2 ires = textureSize( tex, int(mip) );
+	vec2  fres = vec2( ires );
 
-    // For Gather we want UV coordinates of bottom right corner of top left pixel
-    vec2 gUV = (originPixCoord + 1.0) / colorTextureSize;
+	vec2 st = uv*fres - 0.5;
+    vec2 i = floor( st );
+    vec2 w = fract( st );
 
-    vec4 gIndex   = impl_textureGather(tex, gUV);
+	// textureGather doesn't handle mips, need to sample manually
+	// use textureLod instead of texelFetch/manual textureGather to respect sampler states
+	// this should be quite cache friendly so the overhead is minimal
+    float a = textureLod( tex, (i + vec2(0.5,0.5)) / fres, mip ).x;
+    float b = textureLod( tex, (i + vec2(1.5,0.5)) / fres, mip ).x;
+    float c = textureLod( tex, (i + vec2(0.5,1.5)) / fres, mip ).x;
+    float d = textureLod( tex, (i + vec2(1.5,1.5)) / fres, mip ).x;
+	
+	// read the palette
+	vec4 ca = texture(worldPalette, vec2(a, 0.5));
+    vec4 cb = texture(worldPalette, vec2(b, 0.5));
+    vec4 cc = texture(worldPalette, vec2(c, 0.5));
+    vec4 cd = texture(worldPalette, vec2(d, 0.5));
 
-    vec4 c00   = texture(worldPalette, vec2(gIndex.w, 0.5));
-    vec4 c01 = texture(worldPalette, vec2(gIndex.x, 0.5));
-    vec4 c11  = texture(worldPalette, vec2(gIndex.y, 0.5));
-    vec4 c10 = texture(worldPalette, vec2(gIndex.z, 0.5));
-
-    //if (blend_mode == D3DBLEND_SRCALPHA || blend_mode == D3DBLEND_INVSRCALPHA)
+	//if (blend_mode == D3DBLEND_SRCALPHA || blend_mode == D3DBLEND_INVSRCALPHA)
 	{
-        if (gIndex.x == 0.0) {
-            c01.a = 0.0;
+        if (a == 0.0) {
+            ca.a = 0.0;
         }
-        if (gIndex.y == 0.0) {
-            c11.a = 0.0;
+        if (b == 0.0) {
+            cb.a = 0.0;
         }
-        if (gIndex.z == 0.0) {
-            c10.a = 0.0;
+        if (c == 0.0) {
+            cc.a = 0.0;
         }
-        if (gIndex.w == 0.0) {
-            c00.a = 0.0;
+        if (d == 0.0) {
+            cd.a = 0.0;
         }
     }
 
-    vec2 filterWeight = pixCoord - originPixCoord;
- 
-    // Bi-linear mixing:
-    vec4 temp0 = mix(c01, c11, filterWeight.x);
-    vec4 temp1 = mix(c00, c10, filterWeight.x);
-    vec4 blendColor = mix(temp1, temp0, filterWeight.y);
-
-    return vec4(blendColor.r, blendColor.g, blendColor.b, blendColor.a);
+	return mix(mix(ca, cb, w.x), mix(cc, cd, w.x), w.y);
 }
 #endif
 
@@ -213,7 +204,11 @@ void main(void)
 		adj_texcoords.xy = f_uv_affine;
 	}
 
-    vec4 sampled = texture(tex, adj_texcoords.xy);
+	// software actually uses the zmin of the entire face
+	float mipBias = float(compute_mip_lod(f_coord.y));
+	mipBias = min(mipBias, float(numMips - 1));
+
+    vec4 sampled = texture(tex, adj_texcoords.xy, mipBias);
     
 	vec4 sampled_color = vec4(1.0, 1.0, 1.0, 1.0);
     vec4 vertex_color = f_color;
@@ -249,6 +244,11 @@ void main(void)
 
 	if (sampled_color.a < 0.01)
 		discard;
+
+	// if we want to output some thin gbuffer
+	//fragColorDepth = f_depth;
+    //fragColorNormal = encode_octahedron(f_normal);
+	//fragColorDiffuse = sampled_color;
 
 #endif
 }

@@ -710,11 +710,10 @@ vec2 parallax_mapping(vec2 tc, vec3 vp_normal, vec3 adjusted_coords)
 
 uint compute_mip_lod(float z_min)
 {
-	vec4 mip_distances = vec4(1,2,3,4);
 	uint mipmap_level = 0;
-	mipmap_level = z_min < mip_distances.x ? mipmap_level : 1;
-	mipmap_level = z_min < mip_distances.y ? mipmap_level : 2;
-	mipmap_level = z_min < mip_distances.z ? mipmap_level : 3;
+	mipmap_level = z_min < mipDistances.x ? mipmap_level : 1;
+	mipmap_level = z_min < mipDistances.y ? mipmap_level : 2;
+	mipmap_level = z_min < mipDistances.z ? mipmap_level : 3;
 	return mipmap_level;
 }
 
@@ -722,7 +721,7 @@ uint compute_mip_lod(float z_min)
 void bilinear_paletted(vec2 uv, out vec4 color, out vec4 emissive)
 {
 	float mip = impl_textureQueryLod(tex, uv);
-	mip += 0.5 * float(compute_mip_lod(f_coord.y));
+	mip += float(compute_mip_lod(f_coord.y));
 	mip = min(mip, float(numMips - 1));
 
 	ivec2 ires = textureSize( tex, int(mip) );
@@ -842,8 +841,7 @@ void main(void)
 	}
 
 	// software actually uses the zmin of the entire face
-	// doing it per pixel tends to cause more biasing than intended
-	float mipBias = 0.5 * float(compute_mip_lod(f_coord.y));
+	float mipBias = float(compute_mip_lod(f_coord.y));
 	mipBias = min(mipBias, float(numMips - 1));
 
     vec4 sampled = texture(tex, adj_texcoords.xy, mipBias);
