@@ -612,32 +612,6 @@ void BlendDecals(inout vec3 color, inout vec3 emissive, uint bucket_index, vec3 
 
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragColorEmiss;
-#ifdef VIEW_SPACE_GBUFFER
-layout(location = 2) out float fragColorDepth;
-layout(location = 3) out vec2 fragColorNormal;
-#else
-layout(location = 2) out vec4 fragColorPos;
-layout(location = 3) out vec4 fragColorNormal;
-#endif
-#ifdef VIEW_SPACE_GBUFFER
-layout(location = 4) out vec4 fragColorDiffuse;
-
-vec2 oct_wrap(vec2 v)
-{
-	vec2 signs;
-	signs.x = v.x >= 0.0 ? 1.0 : -1.0;
-	signs.y = v.y >= 0.0 ? 1.0 : -1.0;
-    return (1.0 - abs(v.yx)) * (signs);
-}
-
-vec2 encode_octahedron(vec3 v)
-{
-    v /= abs(v.x) + abs(v.y) + abs(v.z);
-    v.xy = v.z >= 0.0 ? v.xy : oct_wrap(v.xy);
-    return clamp(v.xy, vec2(-1.0), vec2(1.0)) * 0.5 + 0.5;
-}
-
-#endif
 
 float luminance(vec3 c_rgb)
 {
@@ -997,7 +971,7 @@ void main(void)
     vec4 effectAdd_color = vec4(colorEffects_add.r, colorEffects_add.g, colorEffects_add.b, 0.0);
     
     main_color *= albedoFactor_copy;
-    float should_write_normals = 1.0;
+
     float orig_alpha = main_color.a;
 
 #ifdef ALPHA_BLEND
@@ -1010,11 +984,6 @@ void main(void)
     {
         main_color.rgb *= (1.0 - main_color.a);
         main_color.a = (1.0 - main_color.a);
-    }
-
-    //if (blend_mode == D3DBLEND_SRCALPHA || blend_mode == D3DBLEND_INVSRCALPHA)
-    {
-        should_write_normals = main_color.a > 0.5 ? 1.0 : 0.0;
     }
 
     //if (sampledEmiss.r != 0.0 || sampledEmiss.g != 0.0 || sampledEmiss.b != 0.0)
@@ -1056,6 +1025,7 @@ void main(void)
 		fragColor.rgb = min(fragColor.rgb + DITHER_LUT[wrap_index] / 255.0, vec3(1.0));
 	}
 
+#ifndef ALPHA_BLEND
     color_add.a = orig_alpha;
 
     float luma = luminance(color_add.rgb) * 0.5;// * 4.0;
@@ -1082,27 +1052,9 @@ void main(void)
 
     //color_add = vec4(0.0, 0.0, 0.0, 1.0);
 
-    // Dont include any windows or transparent objects in emissivity output
-    if (luma < 0.01 && orig_alpha < 0.5 && (blend_mode == D3DBLEND_SRCALPHA || blend_mode == 6))
-    {
-        color_add = vec4(0.0, 0.0, 0.0, 0.0);
-    }
-
     fragColorEmiss = color_add_emiss + color_add;
-
-    //fragColor = vec4(face_normals_parallax.x, face_normals_parallax.y, face_normals_parallax.z, 1.0);
-    //fragColor = vec4(face_normals*0.5 + 0.5,1.0);
-    //vec4 test_norms = (main_color + effectAdd_color);
-    //test_norms.xyz *= dot(vec3(1.0, 0.0, -0.7), face_normals);
-    //fragColor = test_norms;
-
-	// output linear depth
-	fragColorDepth = f_depth;
-
-	// octahedron encoded normal
-	vec2 octaNormal = encode_octahedron(surfaceNormals);
-    fragColorNormal = octaNormal.xy;
-
-	// unlit diffuse color for deferred lights and decals
-	fragColorDiffuse = sampled_color;
+#else
+    // Dont include any windows or transparent objects in emissivity output
+	fragColorEmiss = vec4(0.0);
+#endif
 }
