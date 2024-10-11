@@ -778,6 +778,7 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     // Attach fbTex to our currently bound framebuffer fb
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, pFb->tex1, 0);
 
+#ifndef RENDER_DROID2
 #ifdef VIEW_SPACE_GBUFFER
 	// Set up our depth fb texture
     glGenTextures(1, &pFb->tex2);
@@ -835,6 +836,7 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 #endif
+#endif
 
     // Set up our render buffer
     glGenRenderbuffers(1, &pFb->rbo);
@@ -848,6 +850,7 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
         stdPlatform_Printf("std3D: ERROR, Framebuffer is incomplete!\n");
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+#ifndef RENDER_DROID2
 #ifdef DECAL_RENDERING
 	std3D_generateIntermediateFbo(width, height, &pFb->decalLight, jkPlayer_enable32Bit ? GL_RGB10_A2 : GL_RGB5_A1, 0, 0);
 #endif
@@ -867,6 +870,7 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
         pFb->enable_extra |= 2;
     }
 	else
+#endif
 		pFb->enable_extra &= ~2;
 
     if (jkPlayer_enableBloom)
