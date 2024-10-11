@@ -131,6 +131,9 @@ GLuint create_shader(const char* shader, GLenum type, const char* userDefines)
 #ifdef VIEW_SPACE_GBUFFER
 	"#define VIEW_SPACE_GBUFFER\n"
 #endif
+#ifdef RENDER_DROID2
+	"#define RENDER_DROID2\n"
+#endif
 #ifdef FOG
 	"#define FOG\n"
 #endif

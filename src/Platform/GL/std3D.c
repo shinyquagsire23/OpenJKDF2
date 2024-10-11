@@ -61,6 +61,12 @@ typedef struct std3DSimpleTexStage
 	GLint uniform_rb;
 	GLint uniform_lb;
 #endif
+#ifdef RENDER_DROID2
+	GLint uniform_tint;
+	GLint uniform_filter;
+	GLint uniform_fade;
+	GLint uniform_add;
+#endif
 } std3DSimpleTexStage;
 
 typedef struct std3DIntermediateFbo
@@ -1049,6 +1055,13 @@ bool std3D_loadSimpleTexProgram(const char* fpath_base, std3DSimpleTexStage* pOu
 	pOut->uniform_lt = std3D_tryFindUniform(pOut->program, "cameraLT");
 	pOut->uniform_rb = std3D_tryFindUniform(pOut->program, "cameraRB");
 	pOut->uniform_lb = std3D_tryFindUniform(pOut->program, "cameraLB");
+#endif
+
+#ifdef RENDER_DROID2
+	pOut->uniform_tint = std3D_tryFindUniform(pOut->program, "colorEffects_tint");
+	pOut->uniform_filter = std3D_tryFindUniform(pOut->program, "colorEffects_filter");
+	pOut->uniform_fade = std3D_tryFindUniform(pOut->program, "colorEffects_fade");
+	pOut->uniform_add = std3D_tryFindUniform(pOut->program, "colorEffects_add");
 #endif
 
     return true;
@@ -3000,6 +3013,16 @@ void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo
     glUniform1i(pStage->uniform_tex2, 1);
     glUniform1i(pStage->uniform_tex3, 2);
 	glUniform1i(pStage->uniform_tex4, 3);
+
+#ifdef RENDER_DROID2
+	glUniform3f(pStage->uniform_tint, rdroid_curColorEffects.tint.x, rdroid_curColorEffects.tint.y, rdroid_curColorEffects.tint.z);
+	if (rdroid_curColorEffects.filter.x || rdroid_curColorEffects.filter.y || rdroid_curColorEffects.filter.z)
+		glUniform3f(pStage->uniform_filter, rdroid_curColorEffects.filter.x ? 1.0 : 0.25, rdroid_curColorEffects.filter.y ? 1.0 : 0.25, rdroid_curColorEffects.filter.z ? 1.0 : 0.25);
+	else
+		glUniform3f(pStage->uniform_filter, 1.0, 1.0, 1.0);
+	glUniform1f(pStage->uniform_fade, rdroid_curColorEffects.fade);
+	glUniform3f(pStage->uniform_add, (float)rdroid_curColorEffects.add.x / 255.0f, (float)rdroid_curColorEffects.add.y / 255.0f, (float)rdroid_curColorEffects.add.z / 255.0f);
+#endif
 
     {
 

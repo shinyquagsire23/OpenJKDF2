@@ -3,6 +3,12 @@ uniform vec2 iResolution;
 uniform float param1;
 uniform float param2;
 uniform float param3;
+
+uniform vec3 colorEffects_tint;
+uniform vec3 colorEffects_filter;
+uniform vec3 colorEffects_add;
+uniform float colorEffects_fade;
+
 in vec4 f_color;
 in vec2 f_uv;
 in vec3 f_coord;
@@ -37,6 +43,18 @@ void main(void)
 	//	
 	//	sampled_color = (pixel00 + (diff0 + diff1 + diff2) / 3.0);
 	//}
+
+#ifdef RENDER_DROID2
+	sampled_color.rgb += colorEffects_add.rgb;
+
+	vec3 half_tint = colorEffects_tint * 0.5;
+	vec3 tint_delta = colorEffects_tint - (half_tint.brr + half_tint.ggb);
+	sampled_color.rgb = clamp(tint_delta.rgb * sampled_color.rgb + sampled_color.rgb, vec3(0.0), vec3(1.0));
+
+	sampled_color.rgb *= colorEffects_fade;
+	sampled_color.rgb *= colorEffects_filter.rgb;
+#endif
+
     fragColor = sampled_color;
     fragColor.rgb = pow(fragColor.rgb, vec3(1.0/param3));
 	fragColor.w = 1.0;

@@ -829,8 +829,6 @@ void main(void)
     vec4 vertex_color = f_color;
     float index = sampled.r;
     vec4 palval = texture(worldPalette, vec2(index, 0.5));
-    vec4 color_add = vec4(0.0, 0.0, 0.0, 1.0);
-    vec4 color_add_emiss = vec4(0.0, 0.0, 0.0, 0.0);
 	vec4 emissive = vec4(0.0);
 
 	vec3 surfaceNormals = normalize(f_normal);
@@ -862,14 +860,12 @@ void main(void)
         vec4 lightPalval = texture(worldPalette, vec2(light_worldpalidx, 0.5));
 
 		emissive = lightPalval;
-        color_add = lightPalval;
         sampled_color = palval;
     }
 #ifdef CAN_BILINEAR_FILTER
     else if (tex_mode == TEX_MODE_BILINEAR)
     {
-        bilinear_paletted(adj_texcoords.xy, sampled_color, color_add);
-		emissive = color_add;// / light_mult;
+        bilinear_paletted(adj_texcoords.xy, sampled_color, emissive);
 	#ifdef ALPHA_DISCARD
         if (sampled_color.a < 0.01) {
             discard;
@@ -880,7 +876,7 @@ void main(void)
 
 #ifdef UNLIT
 	if (lightMode == 0)
-		color_add.xyz = fillColor.xyz * 0.5;
+		emissive.xyz *= fillColor.xyz * 0.5;
 #endif
 
     vec4 albedoFactor_copy = albedoFactor;
@@ -955,8 +951,6 @@ void main(void)
 
 	vec4 main_color = vec4(diffuseLight.xyz, vertex_color.w) + vec4(specularLight.xyz, 0.0);
 	main_color.rgb = max(main_color.rgb, emissive.rgb);
-
-    vec4 effectAdd_color = vec4(colorEffects_add.r, colorEffects_add.g, colorEffects_add.b, 0.0);
     
     main_color *= albedoFactor_copy;
 
@@ -970,12 +964,7 @@ void main(void)
 
     if (sampledEmiss.r != 0.0 || sampledEmiss.g != 0.0 || sampledEmiss.b != 0.0)
     {
-        color_add.rgb += sampledEmiss.rgb * emissiveFactor * 0.1;
-    }
-
-    if (sampledEmiss.r != 0.0 || sampledEmiss.g != 0.0 || sampledEmiss.b != 0.0)
-    {
-        color_add_emiss.rgb += sampledEmiss.rgb * 0.1;
+        emissive.rgb += sampledEmiss.rgb * 0.1;
     }
 	
 #ifdef FOG
@@ -985,11 +974,10 @@ void main(void)
 		fog_amount *= fogColor.a;
 
 		main_color.rgb = mix(main_color.rgb, fogColor.rgb, fog_amount);
-		color_add.rgb = mix(color_add.rgb, fogColor.rgb, fog_amount);
 	}
 	#endif
 
-    fragColor = main_color + effectAdd_color;// + color_add;
+    fragColor = main_color;
 
 	// dither the output in case we're using some lower precision output
 	//if(enableDither > 0)
@@ -1008,33 +996,7 @@ void main(void)
 	//}
 
 #ifndef ALPHA_BLEND
-    color_add.a = orig_alpha;
-
-    float luma = luminance(color_add.rgb) * 0.5;// * 4.0;
-
-    if (emissiveFactor.r != 0.0 || emissiveFactor.g != 0.0 || emissiveFactor.b != 0.0)
-    {
-        //color_add = vec4(1.0, 1.0, 1.0, 1.0);
-        luma = 1.0;
-    }
-
-    vec3 tint = normalize(colorEffects_tint.xyz + 1.0) * sqrt(3.0);
-
-    color_add.r *= tint.r;
-    color_add.g *= tint.g;
-    color_add.b *= tint.b;
-
-    color_add.r *= colorEffects_fade;
-    color_add.g *= colorEffects_fade;
-    color_add.b *= colorEffects_fade;
-
-    color_add.r *= colorEffects_filter.r;
-    color_add.g *= colorEffects_filter.g;
-    color_add.b *= colorEffects_filter.b;
-
-    //color_add = vec4(0.0, 0.0, 0.0, 1.0);
-
-    fragColorEmiss = color_add_emiss + color_add;
+    fragColorEmiss = emissive;
 #else
     // Dont include any windows or transparent objects in emissivity output
 	fragColorEmiss = vec4(0.0);
