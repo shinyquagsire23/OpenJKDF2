@@ -40,7 +40,7 @@ static rdMatrix44     rdroid_curViewProjInv;
 
 static int rdroid_sortPriority = 0;
 static float rdroid_sortDistance = 0;
-static int rdroid_drawLayer = 0;
+static int rdroid_renderPass = 0;
 
 static uint32_t  rdroid_vertexColorState = 0xFFFFFFFF;
 static rdVector4 rdroid_vertexTexCoordState = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -517,7 +517,7 @@ void rdEndPrimitive()
 	rdMatrix_Copy44(&state.proj, &rdroid_matrices[RD_MATRIX_PROJECTION]);
 	state.sortPriority = rdroid_sortPriority;
 	state.sortDistance = rdroid_sortDistance;
-	state.drawLayer = rdroid_drawLayer;
+	state.renderPass = rdroid_renderPass;
 
 	memcpy(&state.raster, &rdroid_rasterState, sizeof(std3D_RasterState));
 	memcpy(&state.blend, &rdroid_blendState, sizeof(std3D_BlendState));
@@ -765,15 +765,17 @@ void rdTexOffseti(float u, float v)
 }
 
 // Framebuffer
-void rdDrawLayer(uint8_t layer)
+extern void std3D_SetRenderClear(int8_t, int);
+void rdRenderPass(int8_t renderPass, int clearDepth)
 {
-	rdroid_drawLayer = layer;
+	std3D_SetRenderClear(renderPass, clearDepth);
+	rdroid_renderPass = renderPass;
 }
 
-extern void std3D_SetDepthRange(int8_t drawLayer, float znearNorm, float zfarNorm);
+extern void std3D_SetDepthRange(int8_t renderPass, float znearNorm, float zfarNorm);
 void rdDepthRange(float znearNorm, float zfarNorm)
 {
-	std3D_SetDepthRange(rdroid_drawLayer, znearNorm, zfarNorm);
+	std3D_SetDepthRange(rdroid_renderPass, znearNorm, zfarNorm);
 }
 
 // States

@@ -147,7 +147,8 @@ void std3D_ClearDecals();
 void std3D_AddDrawCall(std3D_DrawCallState* pDrawCallState, D3DVERTEX* paVertices, int numVertices);
 void std3D_ResetDrawCalls();
 void std3D_FlushDrawCalls();
-void std3D_SetDepthRange(int8_t drawLayer, float znearNorm, float zfarNorm);
+void std3D_SetRenderClear(int8_t renderPass, int clear);
+void std3D_SetDepthRange(int8_t renderPass, float znearNorm, float zfarNorm);
 
 #endif
 

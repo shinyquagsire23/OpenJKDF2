@@ -550,7 +550,7 @@ void sithRender_Draw()
     rdCamera_ClearLights(rdCamera_pCurCamera);
 
 #ifdef RENDER_DROID2
-	rdDrawLayer(0);
+	rdRenderPass(0, 0);
 	rdDepthRange(0.0f, 1.0f);
 	rdClearLights();
 	rdClearOccluders();

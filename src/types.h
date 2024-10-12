@@ -915,7 +915,7 @@ typedef struct std3D_DrawCallState
 	int                     shaderID;
 	int                     sortPriority;
 	float                   sortDistance;
-	int                     drawLayer;
+	int                     renderPass;
 	rdMatrix44              modelView;
 	rdMatrix44              proj;
 	std3D_RasterState       raster;
