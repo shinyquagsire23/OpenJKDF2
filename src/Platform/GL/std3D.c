@@ -6164,6 +6164,8 @@ void std3D_BuildCluster(std3D_Cluster* pCluster, int x, int y, int z, float znea
 		pCluster->maxb.y = fmax(pCluster->maxb.y, corners[c].y);
 		pCluster->maxb.z = fmax(pCluster->maxb.z, corners[c].z);
 	}
+
+	pCluster->lastUpdateFrame = clusterFrustumFrame;
 }
 
 void std3D_AssignItemToClusters(int itemIndex, rdVector3* pPosition, float radius, rdMatrix44* pProjection, float znear, float zfar, rdMatrix44* boxMat)
