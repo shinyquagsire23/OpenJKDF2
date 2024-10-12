@@ -137,6 +137,15 @@ enum RD_TEXGEN
 	RD_TEXGEN_HORIZON = 1,
 	RD_TEXGEN_CEILING = 2,
 };
+
+typedef uint32_t rdRenderPassFlags_t;
+enum RD_RENDERPASS
+{
+	RD_RENDERPASS_NONE        = 0,
+	RD_RENDERPASS_CLEAR_DEPTH = 1,
+	RD_RENDERPASS_NO_DECALS   = 2,
+};
+
 #endif
 
 typedef uint32_t sithCogFlags_t;

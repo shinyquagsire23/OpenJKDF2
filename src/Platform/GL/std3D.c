@@ -324,8 +324,8 @@ typedef struct std3D_RenderPass
 	// todo/fixme: we're not currently handling viewport changes mid-draw
 	rdMatrix44 oldProj; // keep track of the global projection to avoid redundant cluster building if the matrix doesn't change over the course of several frames
 
+	rdRenderPassFlags_t flags;
 	rdVector2 depthRange;
-	int       depthClear;
 
 	int       clustersDirty;       // clusters need rebuilding/refilling
 	int       clusterFrustumFrame; // current frame for clusters, any cluster not matching will have its bounds updated
@@ -5225,16 +5225,9 @@ void std3D_DrawOccluder(rdVector3* position, float radius, rdVector3* verts)
 
 #ifdef RENDER_DROID2
 
-int std3D_DrawCallCompareSortKey(std3D_DrawCall* a, std3D_DrawCall* b);
-int std3D_DrawCallCompareDepth(std3D_DrawCall* a, std3D_DrawCall* b);
-
-typedef int(*std3D_SortFunc)(std3D_DrawCall*, std3D_DrawCall*);
-
-D3DVERTEX std3D_drawCallVerticesSorted[STD3D_MAX_DRAW_CALL_VERTS];
-
-void std3D_SetRenderClear(int8_t renderPass, int clear)
+void std3D_SetRenderPassFlags(int8_t renderPass, rdRenderPassFlags_t renderPassFlags)
 {
-	std3D_renderPasses[renderPass].depthClear = clear;
+	std3D_renderPasses[renderPass].flags = renderPassFlags;
 }
 
 void std3D_SetDepthRange(int8_t renderPass, float znearNorm, float zfarNorm)
@@ -5668,6 +5661,8 @@ void std3D_BindStage(std3D_worldStage* pStage)
 	glUniform1i(pStage->uniform_texDecals, 6);
 }
 
+typedef int(*std3D_SortFunc)(std3D_DrawCall*, std3D_DrawCall*);
+
 void std3D_FlushDrawCallList(std3D_RenderPass* pRenderPass, std3D_DrawCallList* pList, std3D_SortFunc sortFunc)
 {
 	if (!pList->drawCallCount)
@@ -5688,6 +5683,7 @@ void std3D_FlushDrawCallList(std3D_RenderPass* pRenderPass, std3D_DrawCallList* 
 	// batching needs to follow the draw order, but vertex arrays might be disjointed
 	// build a sorted list of the vertices to ensure sequential vertex access during batch
 	// todo: generate an index buffer instead of copying vertices around
+	static D3DVERTEX std3D_drawCallVerticesSorted[STD3D_MAX_DRAW_CALL_VERTS];
 	D3DVERTEX* vertexArray = pList->drawCallVertices;
 	if (sortFunc)
 	{
@@ -5847,7 +5843,7 @@ void std3D_FlushDrawCalls()
 	for (int j = 0; j < STD3D_MAX_RENDER_PASSES; ++j)
 	{
 		// clear the depth buffer if requested
-		if (std3D_renderPasses[j].depthClear)
+		if (std3D_renderPasses[j].flags & RD_RENDERPASS_CLEAR_DEPTH)
 		{
 			glDepthMask(GL_TRUE);
 			glClear(GL_DEPTH_BUFFER_BIT);
@@ -6324,13 +6320,16 @@ void std3D_BuildClusters(std3D_RenderPass* pRenderPass, rdMatrix44* pProjection)
 	//printf("\t%lld us to assign occluders to custers for frame %d with draw layer %d\n", Linux_TimeUs() - occluderTime, rdroid_frameTrue, drawLayer);
 
 	// assign decals
-	int64_t decalTime = Linux_TimeUs();
 	firstDecal = firstOccluder + numOccluders;
-	for (int i = 0; i < numDecals; ++i)
+	if(!(pRenderPass->flags & RD_RENDERPASS_NO_DECALS))
 	{
-		std3D_AssignItemToClusters(pRenderPass, firstDecal + i, (rdVector3*)&tmpDecals[i].posRad, tmpDecals[i].posRad.w, pProjection, znear, zfar, &tmpDecals[i].decalMatrix);
+		int64_t decalTime = Linux_TimeUs();
+		for (int i = 0; i < numDecals; ++i)
+		{
+			std3D_AssignItemToClusters(pRenderPass, firstDecal + i, (rdVector3*)&tmpDecals[i].posRad, tmpDecals[i].posRad.w, pProjection, znear, zfar, &tmpDecals[i].decalMatrix);
+		}
+		//printf("\t%lld us to assign decals to custers for frame %d with draw layer %d\n", Linux_TimeUs() - decalTime, rdroid_frameTrue, drawLayer);
 	}
-	//printf("\t%lld us to assign decals to custers for frame %d with draw layer %d\n", Linux_TimeUs() - decalTime, rdroid_frameTrue, drawLayer);
 
 	// todo: map buffer instead of storing to tmp then uploading?
 	glBindBuffer(GL_TEXTURE_BUFFER, cluster_buffer);

@@ -139,7 +139,7 @@ void rdSetTexMode(int a1);
 // todo:
 // rdDitherMode
 
-void rdRenderPass(int8_t renderPass, int clearDepth);
+void rdRenderPass(int8_t renderPass, rdRenderPassFlags_t renderPassFlags);
 void rdDepthRange(float znearNorm, float zfarNorm);
 
 int rdBindTexture(rdTexture* pTexture);
