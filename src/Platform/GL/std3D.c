@@ -161,20 +161,22 @@ GLint uniform_fog, uniform_fog_color, uniform_fog_start, uniform_fog_end;
 
 #ifdef RENDER_DROID2
 
+#define STD3D_MAX_DRAW_LAYERS 2
+
 #define CLUSTER_MAX_LIGHTS          256 // match RDCAMERA_MAX_LIGHTS/SITHREND_NUM_LIGHTS
 #define CLUSTER_MAX_OCCLUDERS       128
 #define CLUSTER_MAX_DECALS          256
 #define CLUSTER_MAX_ITEMS           (CLUSTER_MAX_LIGHTS + CLUSTER_MAX_OCCLUDERS + CLUSTER_MAX_DECALS)
 #define CLUSTER_BUCKETS_PER_CLUSTER (CLUSTER_MAX_ITEMS / 32)
-#define CLUSTER_GRID_SIZE_X         32
-#define CLUSTER_GRID_SIZE_Y         16
+#define CLUSTER_GRID_SIZE_X         16
+#define CLUSTER_GRID_SIZE_Y         8
 #define CLUSTER_GRID_SIZE_Z         24
 
 #define CLUSTER_GRID_SIZE_XYZ (CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y * CLUSTER_GRID_SIZE_Z)
 #define CLUSTER_GRID_TOTAL_SIZE (CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y * CLUSTER_GRID_SIZE_Z * CLUSTER_BUCKETS_PER_CLUSTER)
 
-static int clustersDirty = 0;
-static int clusterFrustumFrame = 0;
+static int clustersDirty[STD3D_MAX_DRAW_LAYERS] = {0, 0};
+static int clusterFrustumFrame[STD3D_MAX_DRAW_LAYERS] = { 0, 0 };
 
 float sliceScalingFactor;
 float sliceBiasFactor;
@@ -294,12 +296,16 @@ typedef struct std3D_Cluster
 } std3D_Cluster;
 
 static uint32_t std3D_clusterBits[CLUSTER_GRID_TOTAL_SIZE];
-static std3D_Cluster std3D_clusters[CLUSTER_GRID_TOTAL_SIZE];
+
+// each draw layer gets its own cluster state to avoid recomputing the cluster bounds every time the projection changes
+// todo: the entire API needs a refactor to be render-pass based where the proj matrix and other things are set up front and not
+// passed in with the draw calls
+static std3D_Cluster std3D_clusters[STD3D_MAX_DRAW_LAYERS][CLUSTER_GRID_TOTAL_SIZE];
 
 void std3D_FlushLights();
 void std3D_FlushOccluders();
 void std3D_FlushDecals();
-void std3D_BuildClusters(rdMatrix44* pProjection);
+void std3D_BuildClusters(int8_t drawLayer, rdMatrix44* pProjection);
 
 typedef enum STD3D_DRAW_LIST
 {
@@ -4976,7 +4982,7 @@ void std3D_DrawDecal(stdVBuffer* vbuf, rdDDrawSurface* texture, rdVector3* verts
 		return;
 
 	decalsDirty = 1;
-	clustersDirty = 1;
+	clustersDirty[0] = clustersDirty[1] = 1;
 
 	rdRect uvScaleBias;
 	if (!std3D_InsertDecalTexture(&uvScaleBias, vbuf, texture))
@@ -5113,7 +5119,7 @@ void std3D_DrawOccluder(rdVector3* position, float radius, rdVector3* verts)
 		return;
 
 	occludersDirty = 1;
-	clustersDirty = 1;
+	clustersDirty[0] = clustersDirty[1] = 1;
 
 	std3D_occluder* occ = &tmpOccluders[numOccluders++];
 	occ->position.x = position->x;
@@ -5198,7 +5204,6 @@ void std3D_DrawOccluder(rdVector3* position, float radius, rdVector3* verts)
 // todo: indexing
 #define STD3D_MAX_DRAW_CALLS 8192
 #define STD3D_MAX_DRAW_CALL_VERTS (STD3D_MAX_DRAW_CALLS * 64)
-#define STD3D_MAX_DRAW_LAYERS 2
 
 typedef struct std3D_DrawCallList
 {
@@ -5217,6 +5222,14 @@ typedef int(*std3D_SortFunc)(std3D_DrawCall*, std3D_DrawCall*);
 static std3D_DrawCallList std3D_drawCallLists[STD3D_MAX_DRAW_LAYERS][DRAW_LIST_COUNT];
 
 static D3DVERTEX std3D_drawCallVerticesSorted[STD3D_MAX_DRAW_CALL_VERTS];
+
+static rdVector2 std3D_drawLayerDepthRanges[STD3D_MAX_DRAW_LAYERS];
+
+void std3D_SetDepthRange(int8_t drawLayer, float znearNorm, float zfarNorm)
+{
+	std3D_drawLayerDepthRanges[drawLayer].x = znearNorm;
+	std3D_drawLayerDepthRanges[drawLayer].y = zfarNorm;
+}
 
 int std3D_HasDepthWrites(std3D_DrawCallState* pState)
 {
@@ -5644,18 +5657,21 @@ void std3D_BindStage(std3D_worldStage* pStage)
 }
 
 // todo/fixme: we're not currently handling viewport changes mid-draw
-static rdMatrix44 oldProj; // keep track of the global projection to avoid redundant cluster building if the matrix doesn't change over the course of several frames
+static rdMatrix44 oldProj[STD3D_MAX_DRAW_LAYERS]; // keep track of the global projection to avoid redundant cluster building if the matrix doesn't change over the course of several frames
 
-void std3D_FlushDrawCallList(std3D_DrawCallList* pList, std3D_SortFunc sortFunc)
+void std3D_FlushDrawCallList(int8_t drawLayer, std3D_DrawCallList* pList, std3D_SortFunc sortFunc)
 {
 	if (!pList->drawCallCount)
 		return;
 
-	if (rdMatrix_Compare44(&oldProj, &pList->drawCalls[0].state.proj) != 0)
-		clusterFrustumFrame++;
-	std3D_BuildClusters(&pList->drawCalls[0].state.proj);
+	if (rdMatrix_Compare44(&oldProj[drawLayer], &pList->drawCalls[0].state.proj) != 0)
+	{
+		clustersDirty[drawLayer] = 1;
+		clusterFrustumFrame[drawLayer]++;
+	}
+	std3D_BuildClusters(drawLayer, &pList->drawCalls[0].state.proj);
 
-	oldProj = pList->drawCalls[0].state.proj;
+	oldProj[drawLayer] = pList->drawCalls[0].state.proj;
 
 	// sort draw calls to reduce state changes and maximize batching
 	if(sortFunc)
@@ -5763,10 +5779,10 @@ void std3D_FlushDrawCallList(std3D_DrawCallList* pList, std3D_SortFunc sortFunc)
 			// perhaps all of this would be better if we just flushed the pipeline on matrix change instead
 			if (rdMatrix_Compare44(&lastState.proj, &pDrawCall->state.proj) != 0)
 			{
-				oldProj = pDrawCall->state.proj;
-				clusterFrustumFrame++;
-				clustersDirty = 1;
-				std3D_BuildClusters(&pDrawCall->state.proj);
+				oldProj[drawLayer] = pDrawCall->state.proj;
+				clusterFrustumFrame[drawLayer]++;
+				clustersDirty[drawLayer] = 1;
+				std3D_BuildClusters(drawLayer, &pDrawCall->state.proj);
 				std3D_UpdateSharedUniforms();
 			}
 
@@ -5821,15 +5837,15 @@ void std3D_FlushDrawCalls()
 	for (int j = 0; j < STD3D_MAX_DRAW_LAYERS; ++j)
 	{
 		// flush z lists
-		std3D_FlushDrawCallList(&std3D_drawCallLists[j][DRAW_LIST_Z],           std3D_DrawCallCompareSortKey);
-		std3D_FlushDrawCallList(&std3D_drawCallLists[j][DRAW_LIST_Z_ALPHATEST], std3D_DrawCallCompareSortKey);
+		std3D_FlushDrawCallList(j, &std3D_drawCallLists[j][DRAW_LIST_Z],           std3D_DrawCallCompareSortKey);
+		std3D_FlushDrawCallList(j, &std3D_drawCallLists[j][DRAW_LIST_Z_ALPHATEST], std3D_DrawCallCompareSortKey);
 
 		// todo: do any necessary opaque-only deferred stuff here
 
 		// flush color lists
-		std3D_FlushDrawCallList(&std3D_drawCallLists[j][DRAW_LIST_COLOR_ZPREPASS],   std3D_DrawCallCompareSortKey);
-		std3D_FlushDrawCallList(&std3D_drawCallLists[j][DRAW_LIST_COLOR_NOZPREPASS], std3D_DrawCallCompareSortKey);
-		std3D_FlushDrawCallList(&std3D_drawCallLists[j][DRAW_LIST_COLOR_ALPHABLEND], std3D_DrawCallCompareDepth);
+		std3D_FlushDrawCallList(j, &std3D_drawCallLists[j][DRAW_LIST_COLOR_ZPREPASS],   std3D_DrawCallCompareSortKey);
+		std3D_FlushDrawCallList(j, &std3D_drawCallLists[j][DRAW_LIST_COLOR_NOZPREPASS], std3D_DrawCallCompareSortKey);
+		std3D_FlushDrawCallList(j, &std3D_drawCallLists[j][DRAW_LIST_COLOR_ALPHABLEND], std3D_DrawCallCompareDepth);
 
 		// clear the depth buffer for the next draw layer
 		glDepthMask(GL_TRUE);
@@ -5851,7 +5867,7 @@ void std3D_FlushDrawCalls()
 void std3D_ClearLights()
 {
 	lightsDirty = 1;
-	clustersDirty = 1;
+	clustersDirty[0] = clustersDirty[1] = 1;
 	numLights = 0;
 }
 
@@ -5861,7 +5877,7 @@ int std3D_AddLight(rdLight* light, rdVector3* position)
 		return 0;
 
 	lightsDirty = 1;
-	clustersDirty = 1;
+	clustersDirty[0] = clustersDirty[1] = 1;
 
 	std3D_light* light3d = &tmpLights[numLights++];
 	light3d->type = light->type;
@@ -5901,14 +5917,14 @@ void std3D_FlushLights()
 void std3D_ClearOccluders()
 {
 	occludersDirty = 1;
-	clustersDirty = 1;
+	clustersDirty[0] = clustersDirty[1] = 1;
 	numOccluders = 0;
 }
 
 void std3D_ClearDecals()
 {
 	decalsDirty = 1;
-	clustersDirty = 1;
+	clustersDirty[0] = clustersDirty[1] = 1;
 	numDecals= 0;
 
 	// tmp debug
@@ -6128,6 +6144,7 @@ int std3D_ComputeBoundingBox(const rdVector3* Center, float Radius, rdMatrix44* 
 	return clipped;
 }
 
+// unfortunately this is way slower than the frustum approach...
 void std3D_BuildCluster(std3D_Cluster* pCluster, int x, int y, int z, float znear, float zfar)
 {
 	float z0 = (float)(z + 0) / CLUSTER_GRID_SIZE_Z;
@@ -6164,11 +6181,9 @@ void std3D_BuildCluster(std3D_Cluster* pCluster, int x, int y, int z, float znea
 		pCluster->maxb.y = fmax(pCluster->maxb.y, corners[c].y);
 		pCluster->maxb.z = fmax(pCluster->maxb.z, corners[c].z);
 	}
-
-	pCluster->lastUpdateFrame = clusterFrustumFrame;
 }
 
-void std3D_AssignItemToClusters(int itemIndex, rdVector3* pPosition, float radius, rdMatrix44* pProjection, float znear, float zfar, rdMatrix44* boxMat)
+void std3D_AssignItemToClusters(int drawLayer, int itemIndex, rdVector3* pPosition, float radius, rdMatrix44* pProjection, float znear, float zfar, rdVector2* depthRange, rdMatrix44* boxMat)
 {
 	// use a tight screen space bounding rect to determine which tiles the item needs to be assigned to
 	rdVector4 rect;
@@ -6178,6 +6193,10 @@ void std3D_AssignItemToClusters(int itemIndex, rdVector3* pPosition, float radiu
 		// linear depth for near and far edges of the light
 		float zMin = fmax(0.0f, (pPosition->y - radius));
 		float zMax = fmax(0.0f, (pPosition->y + radius));
+
+		// clamp to the depth range
+		zMin = fmax(depthRange->x * zfar, zMin);
+		zMax = fmin(depthRange->y * zfar, zMax);
 
 		// non linear depth distribution
 		int zStartIndex = (int)floorf(fmax(0.0f, logf(zMin) * sliceScalingFactor + sliceBiasFactor));
@@ -6215,15 +6234,20 @@ void std3D_AssignItemToClusters(int itemIndex, rdVector3* pPosition, float radiu
 				{
 					uint32_t clusterID = x + y * CLUSTER_GRID_SIZE_X + z * CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y;
 					uint32_t tile_bucket_index = clusterID * CLUSTER_BUCKETS_PER_CLUSTER;
-					if (std3D_clusters[clusterID].lastUpdateFrame != clusterFrustumFrame)
-						std3D_BuildCluster(&std3D_clusters[clusterID], x, y, z, znear, zfar);
+
+					// note: updating the cluster bounds is by far the most expensive part of this entire thing, avoid doing it!
+					if (std3D_clusters[drawLayer][clusterID].lastUpdateFrame != clusterFrustumFrame[drawLayer])
+					{
+						std3D_BuildCluster(&std3D_clusters[drawLayer][clusterID], x, y, z, znear, zfar);
+						std3D_clusters[drawLayer][clusterID].lastUpdateFrame = clusterFrustumFrame[drawLayer];
+					}
 
 					// todo: spotlight
 					int intersects;
 					if(boxMat)
-						intersects = rdMath_IntersectAABB_OBB(&std3D_clusters[clusterID].minb, &std3D_clusters[clusterID].maxb, boxMat);
+						intersects = rdMath_IntersectAABB_OBB(&std3D_clusters[drawLayer][clusterID].minb, &std3D_clusters[drawLayer][clusterID].maxb, boxMat);
 					else
-						intersects = rdMath_IntersectAABB_Sphere(&std3D_clusters[clusterID].minb, &std3D_clusters[clusterID].maxb, pPosition, radius);
+						intersects = rdMath_IntersectAABB_Sphere(&std3D_clusters[drawLayer][clusterID].minb, &std3D_clusters[drawLayer][clusterID].maxb, pPosition, radius);
 
 					if (intersects)
 					{
@@ -6237,12 +6261,12 @@ void std3D_AssignItemToClusters(int itemIndex, rdVector3* pPosition, float radiu
 	}
 }
 
-void std3D_BuildClusters(rdMatrix44* pProjection)
+void std3D_BuildClusters(int8_t drawLayer, rdMatrix44* pProjection)
 {
-	if(!clustersDirty)
+	if(!clustersDirty[drawLayer])
 		return;
 
-	clustersDirty = 0;
+	clustersDirty[drawLayer] = 0;
 
 	// flush lists to make sure they're up to date before we start cluster assignment
 	std3D_FlushLights();
@@ -6262,33 +6286,43 @@ void std3D_BuildClusters(rdMatrix44* pProjection)
 	tileSizeX = (uint32_t)ceilf((float)std3D_pFb->w / (float)CLUSTER_GRID_SIZE_X);
 	tileSizeY = (uint32_t)ceilf((float)std3D_pFb->h / (float)CLUSTER_GRID_SIZE_Y);
 	
+	int64_t time = Linux_TimeUs();
+
 	// clean slate
 	memset(std3D_clusterBits, 0, sizeof(std3D_clusterBits));
 
 	// assign lights
+	int64_t lighTime = Linux_TimeUs();
 	for (int i = 0; i < numLights; ++i)
 	{
-		std3D_AssignItemToClusters(i, (rdVector3*)&tmpLights[i].position, tmpLights[i].falloffMin, pProjection, znear, zfar, NULL);
+		std3D_AssignItemToClusters(drawLayer, i, (rdVector3*)&tmpLights[i].position, tmpLights[i].falloffMin, pProjection, znear, zfar, &std3D_drawLayerDepthRanges[drawLayer], NULL);
 	}
+	printf("\t%lld us to assign lights to custers for frame %d with draw layer %d\n", Linux_TimeUs() - lighTime, rdroid_frameTrue, drawLayer);
 
 	// assign occluders
+	int64_t occluderTime = Linux_TimeUs();
 	firstOccluder = numLights;
 	for (int i = 0; i < numOccluders; ++i)
 	{
-		std3D_AssignItemToClusters(firstOccluder + i, (rdVector3*)&tmpOccluders[i].position, tmpOccluders[i].position.w, pProjection, znear, zfar, NULL);
+		std3D_AssignItemToClusters(drawLayer, firstOccluder + i, (rdVector3*)&tmpOccluders[i].position, tmpOccluders[i].position.w, pProjection, znear, zfar, &std3D_drawLayerDepthRanges[drawLayer], NULL);
 	}
+	printf("\t%lld us to assign occluders to custers for frame %d with draw layer %d\n", Linux_TimeUs() - occluderTime, rdroid_frameTrue, drawLayer);
 
 	// assign decals
+	int64_t decalTime = Linux_TimeUs();
 	firstDecal = firstOccluder + numOccluders;
 	for (int i = 0; i < numDecals; ++i)
 	{
-		std3D_AssignItemToClusters(firstDecal + i, (rdVector3*)&tmpDecals[i].posRad, tmpDecals[i].posRad.w, pProjection, znear, zfar, &tmpDecals[i].decalMatrix);
+		std3D_AssignItemToClusters(drawLayer, firstDecal + i, (rdVector3*)&tmpDecals[i].posRad, tmpDecals[i].posRad.w, pProjection, znear, zfar, &std3D_drawLayerDepthRanges[drawLayer], &tmpDecals[i].decalMatrix);
 	}
+	printf("\t%lld us to assign decals to custers for frame %d with draw layer %d\n", Linux_TimeUs() - decalTime, rdroid_frameTrue, drawLayer);
 
 	// todo: map buffer instead of storing to tmp then uploading?
 	glBindBuffer(GL_TEXTURE_BUFFER, cluster_buffer);
 	glBufferSubData(GL_TEXTURE_BUFFER, 0, sizeof(std3D_clusterBits), (void*)std3D_clusterBits);
 	glBindBuffer(GL_TEXTURE_BUFFER, 0);
+
+	printf("%lld us to build custers for frame %d with draw layer %d\n", Linux_TimeUs() - time, rdroid_frameTrue, drawLayer);
 }
 
 #endif

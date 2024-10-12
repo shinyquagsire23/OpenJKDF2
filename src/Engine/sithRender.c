@@ -551,6 +551,7 @@ void sithRender_Draw()
 
 #ifdef RENDER_DROID2
 	rdDrawLayer(0);
+	rdDepthRange(0.0f, 1.0f);
 	rdClearLights();
 	rdClearOccluders();
 	rdClearDecals();

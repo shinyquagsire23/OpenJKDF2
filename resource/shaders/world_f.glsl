@@ -98,8 +98,8 @@ uniform vec3 ambientSG[8];
 #define CLUSTER_MAX_DECALS          256
 #define CLUSTER_MAX_ITEMS           (CLUSTER_MAX_LIGHTS + CLUSTER_MAX_OCCLUDERS + CLUSTER_MAX_DECALS)
 #define CLUSTER_BUCKETS_PER_CLUSTER (CLUSTER_MAX_ITEMS / 32u)
-#define CLUSTER_GRID_SIZE_X         32u
-#define CLUSTER_GRID_SIZE_Y         16u
+#define CLUSTER_GRID_SIZE_X         16u
+#define CLUSTER_GRID_SIZE_Y         8u
 #define CLUSTER_GRID_SIZE_Z         24u
 #define CLUSTER_GRID_SIZE_XYZ (CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y * CLUSTER_GRID_SIZE_Z)
 #define CLUSTER_GRID_TOTAL_SIZE (CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y * CLUSTER_GRID_SIZE_Z * CLUSTER_BUCKETS_PER_CLUSTER)
@@ -501,7 +501,7 @@ void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, vec4 shad
 vec4 CalculateIndirectShadows(uint bucket_index, vec3 pos, vec3 normal)
 {
 	vec4 shadowing = vec4(normal.xyz, 1.0);
-	//float overDraw = 0.0;
+	float overdraw = 0.0;
 
 	uint first_item = firstOccluder;
 	uint last_item = first_item + numOccluders - 1u;
@@ -519,7 +519,7 @@ vec4 CalculateIndirectShadows(uint bucket_index, vec3 pos, vec3 normal)
 			
 			if (occluder_index >= first_item && occluder_index <= last_item)
 			{
-				//overDraw += 1.0;				
+				overdraw += 1.0;				
 				//occluder occ = occluders[occluder_index];
 
 				occluder occ = occluders[occluder_index - first_item];

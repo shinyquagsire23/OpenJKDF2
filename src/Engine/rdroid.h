@@ -140,6 +140,7 @@ void rdSetTexMode(int a1);
 // rdDitherMode
 
 void rdDrawLayer(uint8_t layer);
+void rdDepthRange(float znearNorm, float zfarNorm);
 
 int rdBindTexture(rdTexture* pTexture);
 int rdBindMaterial(rdMaterial* pMaterial, int cel);

@@ -1165,6 +1165,8 @@ void jkPlayer_DrawPov()
         // Force weapon to draw in front of scene
 	#ifdef RENDER_DROID2
 		rdDrawLayer(1);
+		// only draw very near the camera
+		rdDepthRange(0.0f, 0.1f / sithCamera_currentCamera->rdCam.pClipFrustum->field_0.z);
 	#else
         std3D_ClearZBuffer();
 	#endif

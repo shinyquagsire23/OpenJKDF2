@@ -770,6 +770,12 @@ void rdDrawLayer(uint8_t layer)
 	rdroid_drawLayer = layer;
 }
 
+extern void std3D_SetDepthRange(int8_t drawLayer, float znearNorm, float zfarNorm);
+void rdDepthRange(float znearNorm, float zfarNorm)
+{
+	std3D_SetDepthRange(rdroid_drawLayer, znearNorm, zfarNorm);
+}
+
 // States
 void rdSetZBufferCompare(rdCompare_t compare)
 {
