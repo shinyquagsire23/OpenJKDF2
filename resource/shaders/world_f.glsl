@@ -610,7 +610,7 @@ void BlendDecals(inout vec3 color, inout vec3 emissive, uint bucket_index, vec3 
 				if( any(lessThanEqual(falloff, vec3(0.0))) )
 					continue;
 				
-				vec2 decalTexCoord = objectPosition.xz * 0.5 + 0.5;
+				vec2 decalTexCoord = objectPosition.xz + 0.5;
 				decalTexCoord = decalTexCoord.xy * dec.uvScaleBias.zw + dec.uvScaleBias.xy;
 				
 				vec4 decalColor = textureLod(decalAtlas, decalTexCoord, 0);
