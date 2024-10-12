@@ -1688,7 +1688,8 @@ int init_resources()
 	std3D_setupWorldVAO();
 	std3D_setupMenuVAO();
 #ifdef RENDER_DROID2
-	memset(std3D_renderPasses, 0, sizeof(std3D_renderPasses));
+	memset(&std3D_renderPasses[0], 0, sizeof(std3D_RenderPass));
+	memset(&std3D_renderPasses[1], 0, sizeof(std3D_RenderPass));
 	std3D_setupUBOs();
 	for(int i = 0; i < SHADER_COUNT; ++i)
 	{
