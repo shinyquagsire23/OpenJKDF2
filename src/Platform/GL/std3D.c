@@ -175,9 +175,6 @@ GLint uniform_fog, uniform_fog_color, uniform_fog_start, uniform_fog_end;
 #define CLUSTER_GRID_SIZE_XYZ (CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y * CLUSTER_GRID_SIZE_Z)
 #define CLUSTER_GRID_TOTAL_SIZE (CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y * CLUSTER_GRID_SIZE_Z * CLUSTER_BUCKETS_PER_CLUSTER)
 
-static int clustersDirty[STD3D_MAX_DRAW_LAYERS] = {0, 0};
-static int clusterFrustumFrame[STD3D_MAX_DRAW_LAYERS] = { 0, 0 };
-
 float sliceScalingFactor;
 float sliceBiasFactor;
 uint32_t tileSizeX;
@@ -301,6 +298,21 @@ static uint32_t std3D_clusterBits[CLUSTER_GRID_TOTAL_SIZE];
 // todo: the entire API needs a refactor to be render-pass based where the proj matrix and other things are set up front and not
 // passed in with the draw calls
 static std3D_Cluster std3D_clusters[STD3D_MAX_DRAW_LAYERS][CLUSTER_GRID_TOTAL_SIZE];
+
+static int clustersDirty[STD3D_MAX_DRAW_LAYERS] = { 0, 0 };
+static int clusterFrustumFrame[STD3D_MAX_DRAW_LAYERS] = { 0, 0 };
+
+// todo: indexing
+#define STD3D_MAX_DRAW_CALLS 8192
+#define STD3D_MAX_DRAW_CALL_VERTS (STD3D_MAX_DRAW_CALLS * 66)
+
+typedef struct std3D_DrawCallList
+{
+	size_t         drawCallCount;
+	size_t         drawCallVertexCount;
+	std3D_DrawCall drawCalls[STD3D_MAX_DRAW_CALLS];
+	D3DVERTEX      drawCallVertices[STD3D_MAX_DRAW_CALL_VERTS];
+} std3D_DrawCallList;
 
 void std3D_FlushLights();
 void std3D_FlushOccluders();
@@ -5201,18 +5213,6 @@ void std3D_DrawOccluder(rdVector3* position, float radius, rdVector3* verts)
 
 #ifdef RENDER_DROID2
 
-// todo: indexing
-#define STD3D_MAX_DRAW_CALLS 8192
-#define STD3D_MAX_DRAW_CALL_VERTS (STD3D_MAX_DRAW_CALLS * 64)
-
-typedef struct std3D_DrawCallList
-{
-	size_t         drawCallCount;
-	size_t         drawCallVertexCount;
-	std3D_DrawCall drawCalls[STD3D_MAX_DRAW_CALLS];
-	D3DVERTEX      drawCallVertices[STD3D_MAX_DRAW_CALL_VERTS];
-} std3D_DrawCallList;
-
 int std3D_DrawCallCompareSortKey(std3D_DrawCall* a, std3D_DrawCall* b);
 int std3D_DrawCallCompareDepth(std3D_DrawCall* a, std3D_DrawCall* b);
 
@@ -5779,6 +5779,8 @@ void std3D_FlushDrawCallList(int8_t drawLayer, std3D_DrawCallList* pList, std3D_
 			// perhaps all of this would be better if we just flushed the pipeline on matrix change instead
 			if (rdMatrix_Compare44(&lastState.proj, &pDrawCall->state.proj) != 0)
 			{
+				stdPlatform_Printf("std3D: Warning, clusters are being rebuilt twice within a draw list flush!\n");
+
 				oldProj[drawLayer] = pDrawCall->state.proj;
 				clusterFrustumFrame[drawLayer]++;
 				clustersDirty[drawLayer] = 1;
@@ -6194,9 +6196,11 @@ void std3D_AssignItemToClusters(int drawLayer, int itemIndex, rdVector3* pPositi
 		float zMin = fmax(0.0f, (pPosition->y - radius));
 		float zMax = fmax(0.0f, (pPosition->y + radius));
 
-		// clamp to the depth range
-		zMin = fmax(depthRange->x * zfar, zMin);
-		zMax = fmin(depthRange->y * zfar, zMax);
+		// skip if out of depth range
+		if(zMin > depthRange->y * zfar) // zmin is further than the range max
+			return;
+		if (zMax < depthRange->x * zfar) // zmax is closer than the range min
+			return;
 
 		// non linear depth distribution
 		int zStartIndex = (int)floorf(fmax(0.0f, logf(zMin) * sliceScalingFactor + sliceBiasFactor));
@@ -6276,11 +6280,11 @@ void std3D_BuildClusters(int8_t drawLayer, rdMatrix44* pProjection)
 	// pull the near/far from the projection matrix
 	// note: common sources list this as [3][2] and [2][2] but we have a rotated projection matrix, so we use [1][2]
 	float znear = -pProjection->vD.z / (pProjection->vB.z + 1.0f);
-	float zfar = -pProjection->vD.z / (pProjection->vB.z - 1.0f);
+	float zfar  = -pProjection->vD.z / (pProjection->vB.z - 1.0f);
 
 	// scale and bias factor for non-linear cluster distribution
 	sliceScalingFactor = (float)CLUSTER_GRID_SIZE_Z / logf(zfar / znear);
-	sliceBiasFactor = -((float)CLUSTER_GRID_SIZE_Z * logf(znear) / logf(zfar / znear));
+	sliceBiasFactor    = -((float)CLUSTER_GRID_SIZE_Z * logf(znear) / logf(zfar / znear));
 
 	// ratio of tile to pixel
 	tileSizeX = (uint32_t)ceilf((float)std3D_pFb->w / (float)CLUSTER_GRID_SIZE_X);
@@ -6297,7 +6301,7 @@ void std3D_BuildClusters(int8_t drawLayer, rdMatrix44* pProjection)
 	{
 		std3D_AssignItemToClusters(drawLayer, i, (rdVector3*)&tmpLights[i].position, tmpLights[i].falloffMin, pProjection, znear, zfar, &std3D_drawLayerDepthRanges[drawLayer], NULL);
 	}
-	printf("\t%lld us to assign lights to custers for frame %d with draw layer %d\n", Linux_TimeUs() - lighTime, rdroid_frameTrue, drawLayer);
+	//printf("\t%lld us to assign lights to custers for frame %d with draw layer %d\n", Linux_TimeUs() - lighTime, rdroid_frameTrue, drawLayer);
 
 	// assign occluders
 	int64_t occluderTime = Linux_TimeUs();
@@ -6306,7 +6310,7 @@ void std3D_BuildClusters(int8_t drawLayer, rdMatrix44* pProjection)
 	{
 		std3D_AssignItemToClusters(drawLayer, firstOccluder + i, (rdVector3*)&tmpOccluders[i].position, tmpOccluders[i].position.w, pProjection, znear, zfar, &std3D_drawLayerDepthRanges[drawLayer], NULL);
 	}
-	printf("\t%lld us to assign occluders to custers for frame %d with draw layer %d\n", Linux_TimeUs() - occluderTime, rdroid_frameTrue, drawLayer);
+	//printf("\t%lld us to assign occluders to custers for frame %d with draw layer %d\n", Linux_TimeUs() - occluderTime, rdroid_frameTrue, drawLayer);
 
 	// assign decals
 	int64_t decalTime = Linux_TimeUs();
@@ -6315,14 +6319,14 @@ void std3D_BuildClusters(int8_t drawLayer, rdMatrix44* pProjection)
 	{
 		std3D_AssignItemToClusters(drawLayer, firstDecal + i, (rdVector3*)&tmpDecals[i].posRad, tmpDecals[i].posRad.w, pProjection, znear, zfar, &std3D_drawLayerDepthRanges[drawLayer], &tmpDecals[i].decalMatrix);
 	}
-	printf("\t%lld us to assign decals to custers for frame %d with draw layer %d\n", Linux_TimeUs() - decalTime, rdroid_frameTrue, drawLayer);
+	//printf("\t%lld us to assign decals to custers for frame %d with draw layer %d\n", Linux_TimeUs() - decalTime, rdroid_frameTrue, drawLayer);
 
 	// todo: map buffer instead of storing to tmp then uploading?
 	glBindBuffer(GL_TEXTURE_BUFFER, cluster_buffer);
 	glBufferSubData(GL_TEXTURE_BUFFER, 0, sizeof(std3D_clusterBits), (void*)std3D_clusterBits);
 	glBindBuffer(GL_TEXTURE_BUFFER, 0);
 
-	printf("%lld us to build custers for frame %d with draw layer %d\n", Linux_TimeUs() - time, rdroid_frameTrue, drawLayer);
+	//printf("%lld us to build custers for frame %d with draw layer %d\n", Linux_TimeUs() - time, rdroid_frameTrue, drawLayer);
 }
 
 #endif
