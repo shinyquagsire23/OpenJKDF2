@@ -98,9 +98,9 @@ uniform vec3 ambientSG[8];
 #define CLUSTER_MAX_DECALS          256
 #define CLUSTER_MAX_ITEMS           (CLUSTER_MAX_LIGHTS + CLUSTER_MAX_OCCLUDERS + CLUSTER_MAX_DECALS)
 #define CLUSTER_BUCKETS_PER_CLUSTER (CLUSTER_MAX_ITEMS / 32u)
-#define CLUSTER_GRID_SIZE_X         16u
-#define CLUSTER_GRID_SIZE_Y         8u
-#define CLUSTER_GRID_SIZE_Z         16u
+#define CLUSTER_GRID_SIZE_X         32u
+#define CLUSTER_GRID_SIZE_Y         16u
+#define CLUSTER_GRID_SIZE_Z         24u
 #define CLUSTER_GRID_SIZE_XYZ (CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y * CLUSTER_GRID_SIZE_Z)
 #define CLUSTER_GRID_TOTAL_SIZE (CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y * CLUSTER_GRID_SIZE_Z * CLUSTER_BUCKETS_PER_CLUSTER)
 
@@ -396,6 +396,8 @@ void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, vec4 shad
 
 	float scalar = 0.4; // todo: needs to come from rdCamera_pCurCamera->attenuationMin
 
+	float overdraw = 0.0;
+
 	uint first_item = firstLight;
 	uint last_item = first_item + numLights - 1u;
 	uint first_bucket = first_item / 32u;
@@ -409,8 +411,14 @@ void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, vec4 shad
 			uint light_index = bucket * 32u + bucket_bit_index;
 			bucket_bits ^= (1u << bucket_bit_index);
 				
-			if (light_index >= first_item && light_index <= last_item)// && minLum <= 1.0) // bail when we reach white
+		#ifdef SPECULAR
+			if (light_index >= first_item && light_index <= last_item)
+		#else
+			if (light_index >= first_item && light_index <= last_item && any(lessThan(diffuseLight, vec3(1.0))))
+		#endif
 			{
+				overdraw += 1.0;
+
 				light l = lights[light_index];
 				vec3 diff = l.position.xyz - f_coord.xyz;
 
@@ -479,8 +487,15 @@ void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, vec4 shad
 					specularLight += l.color.xyz * intensity * cs;
 				#endif
 			}
+			else if (light_index > last_item)
+			{
+				bucket = CLUSTER_BUCKETS_PER_CLUSTER;
+				break;
+			}
 		}
 	}
+
+	//diffuseLight.rgb = temperature(overdraw * 0.125);
 }
 
 vec4 CalculateIndirectShadows(uint bucket_index, vec3 pos, vec3 normal)
@@ -531,6 +546,11 @@ vec4 CalculateIndirectShadows(uint bucket_index, vec3 pos, vec3 normal)
 				shadowing.w *= 1.0 - integralSolidAngle;
 				shadowing.xyz -= direction * integralSolidAngle * 0.5;
 			}
+			else if (occluder_index > last_item)
+			{
+				bucket = CLUSTER_BUCKETS_PER_CLUSTER;
+				break;
+			}
 		}
 	}
 	shadowing.xyz = normalize(shadowing.xyz);
@@ -565,6 +585,8 @@ vec3 blackbody(float t)
 
 void BlendDecals(inout vec3 color, inout vec3 emissive, uint bucket_index, vec3 pos, vec3 normal)
 {
+	float overdraw = 0.0;
+
 	uint first_item = firstDecal;
 	uint last_item = first_item + numDecals - 1u;
 	uint first_bucket = first_item / 32u;
@@ -581,16 +603,14 @@ void BlendDecals(inout vec3 color, inout vec3 emissive, uint bucket_index, vec3 
 			if (decal_index >= first_item && decal_index <= last_item)
 			{
 				decal dec = decals[decal_index - first_item];
+								overdraw += 1.0;
 
-				vec4 objectPosition = inverse(dec.decalMatrix) * vec4(pos.xyz, 1.0);
-				vec3 objectNormal = mat3(dec.invDecalMatrix) * normal.xyz;
-				objectNormal.xyz = normalize(objectNormal.xyz);
-				
+				vec4 objectPosition = inverse(dec.decalMatrix) * vec4(pos.xyz, 1.0);				
 				vec3 falloff = 0.5f - abs(objectPosition.xyz);
 				if( any(lessThanEqual(falloff, vec3(0.0))) )
 					continue;
 				
-				vec2 decalTexCoord = objectPosition.xz + 0.5;
+				vec2 decalTexCoord = objectPosition.xz * 0.5 + 0.5;
 				decalTexCoord = decalTexCoord.xy * dec.uvScaleBias.zw + dec.uvScaleBias.xy;
 				
 				vec4 decalColor = textureLod(decalAtlas, decalTexCoord, 0);
@@ -600,6 +620,9 @@ void BlendDecals(inout vec3 color, inout vec3 emissive, uint bucket_index, vec3 
 				bool isRgbAlpha = (dec.flags & 0x8u) == 0x8u;
 				if(isRgbAlpha)
 					decalColor.a = max(decalColor.r, max(decalColor.g, decalColor.b));
+
+				if(decalColor.a < 0.001)
+					continue;
 				
 				decalColor.rgb *= dec.color.rgb;
 				
@@ -609,13 +632,21 @@ void BlendDecals(inout vec3 color, inout vec3 emissive, uint bucket_index, vec3 
 					emissive.rgb += decalColor.rgb;
 				}
 				
+				float edgeBlend = 1.0 - pow(clamp(abs(objectPosition.z), 0.0, 1.0), 8);
 				if(isAdditive)
-					color.rgb += decalColor.rgb;
+					color.rgb += edgeBlend * decalColor.rgb;
 				else
-					color.rgb = mix(color.rgb, decalColor.rgb, decalColor.w);
+					color.rgb = mix(color.rgb, decalColor.rgb, decalColor.w * edgeBlend);
+			}
+			else if (decal_index > last_item)
+			{
+				bucket = CLUSTER_BUCKETS_PER_CLUSTER;
+				break;
 			}
 		}
 	}
+
+	//color.rgb *= temperature(overdraw * 0.125);
 }
 
 layout(location = 0) out vec4 fragColor;

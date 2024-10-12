@@ -10,6 +10,7 @@
 #include "General/stdBitmap.h"
 #include "stdPlatform.h"
 #include "Engine/rdClip.h"
+#include "Primitives/rdMath.h"
 
 #include "jk.h"
 
@@ -165,8 +166,8 @@ GLint uniform_fog, uniform_fog_color, uniform_fog_start, uniform_fog_end;
 #define CLUSTER_MAX_DECALS          256
 #define CLUSTER_MAX_ITEMS           (CLUSTER_MAX_LIGHTS + CLUSTER_MAX_OCCLUDERS + CLUSTER_MAX_DECALS)
 #define CLUSTER_BUCKETS_PER_CLUSTER (CLUSTER_MAX_ITEMS / 32)
-#define CLUSTER_GRID_SIZE_X         16
-#define CLUSTER_GRID_SIZE_Y         8
+#define CLUSTER_GRID_SIZE_X         32
+#define CLUSTER_GRID_SIZE_Y         16
 #define CLUSTER_GRID_SIZE_Z         24
 
 #define CLUSTER_GRID_SIZE_XYZ (CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y * CLUSTER_GRID_SIZE_Z)
@@ -285,9 +286,15 @@ static stdHashTable* decalHashTable = NULL;
 int std3D_InsertDecalTexture(rdRect* out, stdVBuffer* vbuf, rdDDrawSurface* pTexture);
 void std3D_PurgeDecalAtlas();
 
+typedef struct std3D_Cluster
+{
+	int       lastUpdateFrame;
+	rdVector3 minb;
+	rdVector3 maxb;
+} std3D_Cluster;
+
 static uint32_t std3D_clusterBits[CLUSTER_GRID_TOTAL_SIZE];
-static rdClipFrustum std3D_clusterFrustums[CLUSTER_GRID_TOTAL_SIZE];
-static uint32_t std3D_clusterFrustumsFrame[CLUSTER_GRID_TOTAL_SIZE];
+static std3D_Cluster std3D_clusters[CLUSTER_GRID_TOTAL_SIZE];
 
 void std3D_FlushLights();
 void std3D_FlushOccluders();
@@ -1651,7 +1658,7 @@ int init_resources()
 	std3D_setupWorldVAO();
 	std3D_setupMenuVAO();
 #ifdef RENDER_DROID2
-	memset(std3D_clusterFrustumsFrame, 0, sizeof(std3D_clusterFrustumsFrame));
+	memset(std3D_clusters, 0, sizeof(std3D_clusters));
 	std3D_setupUBOs();
 	for(int i = 0; i < SHADER_COUNT; ++i)
 	{
@@ -4987,7 +4994,7 @@ void std3D_DrawDecal(stdVBuffer* vbuf, rdDDrawSurface* texture, rdVector3* verts
 	//diag.y = decalMatrix->vB.y;
 	//diag.z = decalMatrix->vC.z;
 	//decal->posRad.w = rdVector_Len3(&diag);
-	decal->posRad.w = rdVector_Len3(verts);
+	decal->posRad.w = rdVector_Len3(verts) * 0.5f;
 
 	rdMatrix_Copy44(&decal->decalMatrix, decalMatrix);
 	rdMatrix_Invert44(&decal->invDecalMatrix, decalMatrix);
@@ -6121,35 +6128,45 @@ int std3D_ComputeBoundingBox(const rdVector3* Center, float Radius, rdMatrix44* 
 	return clipped;
 }
 
-void std3D_BuildClusterFrustum(rdClipFrustum* pClip, int x, int y, int z, rdMatrix44* pProjection, float znear, float zfar)
+void std3D_BuildCluster(std3D_Cluster* pCluster, int x, int y, int z, float znear, float zfar)
 {
-	float minZ = (float)(z + 0) / (float)CLUSTER_GRID_SIZE_Z;
-	float maxZ = (float)(z + 1) / (float)CLUSTER_GRID_SIZE_Z;
+	float z0 = (float)(z + 0) / CLUSTER_GRID_SIZE_Z;
+	float z1 = (float)(z + 1) / CLUSTER_GRID_SIZE_Z;
+	z0 = znear * powf(zfar / znear, z0) / zfar; // linear 0-1
+	z1 = znear * powf(zfar / znear, z1) / zfar; // linear 0-1
 
-	minZ = znear * powf(zfar / znear, minZ);
-	maxZ = znear * powf(zfar / znear, maxZ);
+	float v0 = (float)(y + 0) / CLUSTER_GRID_SIZE_Y;
+	float v1 = (float)(y + 1) / CLUSTER_GRID_SIZE_Y;
 
-	// some hack to fix aspect ratios/resolutions in jkMain_FixRes means we need to use the canvas size here
-	int screenWidth = rdCamera_pCurCamera->canvas->widthMinusOne + 1;
-	int screenHeight = rdCamera_pCurCamera->canvas->heightMinusOne + 1;
+	float u0 = (float)(x + 0) / CLUSTER_GRID_SIZE_X;
+	float u1 = (float)(x + 1) / CLUSTER_GRID_SIZE_X;
 
-	// y flip
-	int minY = screenHeight - (y + 1) * screenHeight / CLUSTER_GRID_SIZE_Y;
-	int maxY = screenHeight - (y + 0) * screenHeight / CLUSTER_GRID_SIZE_Y;
-	
-	int minX = (x + 0) * screenWidth / CLUSTER_GRID_SIZE_X;
-	int maxX = (x + 1) * screenWidth / CLUSTER_GRID_SIZE_X;
+	// calculate the corners of the cluster
+	rdVector3 corners[8];
+	rdCamera_GetFrustumRay(rdCamera_pCurCamera, &corners[0], u0, v0, z0);
+	rdCamera_GetFrustumRay(rdCamera_pCurCamera, &corners[1], u1, v0, z0);
+	rdCamera_GetFrustumRay(rdCamera_pCurCamera, &corners[2], u0, v1, z0);
+	rdCamera_GetFrustumRay(rdCamera_pCurCamera, &corners[3], u0, v0, z1);
+	rdCamera_GetFrustumRay(rdCamera_pCurCamera, &corners[4], u1, v1, z0);
+	rdCamera_GetFrustumRay(rdCamera_pCurCamera, &corners[5], u0, v1, z1);
+	rdCamera_GetFrustumRay(rdCamera_pCurCamera, &corners[6], u1, v0, z1);
+	rdCamera_GetFrustumRay(rdCamera_pCurCamera, &corners[7], u1, v1, z1);
 
-	uint32_t clusterID = x + y * CLUSTER_GRID_SIZE_X + z * CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y;
-
-	rdCamera_BuildClipFrustum(rdCamera_pCurCamera, &std3D_clusterFrustums[clusterID], minX, minY, maxX, maxY);
-	std3D_clusterFrustums[clusterID].field_0.x = 1; // seems to enable far plane test
-	std3D_clusterFrustums[clusterID].field_0.y = minZ;
-	std3D_clusterFrustums[clusterID].field_0.z = maxZ;
-	std3D_clusterFrustumsFrame[clusterID] = clusterFrustumFrame;
+	// calculate the AABB of the cluster
+	rdVector_Set3(&pCluster->minb,  10000.0f,  10000.0f,  10000.0f);
+	rdVector_Set3(&pCluster->maxb, -10000.0f, -10000.0f, -10000.0f);
+	for (int c = 0; c < 8; ++c)
+	{
+		pCluster->minb.x = fmin(pCluster->minb.x, corners[c].x);
+		pCluster->minb.y = fmin(pCluster->minb.y, corners[c].y);
+		pCluster->minb.z = fmin(pCluster->minb.z, corners[c].z);
+		pCluster->maxb.x = fmax(pCluster->maxb.x, corners[c].x);
+		pCluster->maxb.y = fmax(pCluster->maxb.y, corners[c].y);
+		pCluster->maxb.z = fmax(pCluster->maxb.z, corners[c].z);
+	}
 }
 
-void std3D_AssignItemToClusters(int itemIndex, rdVector3* pPosition, float radius, rdMatrix44* pProjection, float znear, float zfar)
+void std3D_AssignItemToClusters(int itemIndex, rdVector3* pPosition, float radius, rdMatrix44* pProjection, float znear, float zfar, rdMatrix44* boxMat)
 {
 	// use a tight screen space bounding rect to determine which tiles the item needs to be assigned to
 	rdVector4 rect;
@@ -6196,11 +6213,17 @@ void std3D_AssignItemToClusters(int itemIndex, rdVector3* pPosition, float radiu
 				{
 					uint32_t clusterID = x + y * CLUSTER_GRID_SIZE_X + z * CLUSTER_GRID_SIZE_X * CLUSTER_GRID_SIZE_Y;
 					uint32_t tile_bucket_index = clusterID * CLUSTER_BUCKETS_PER_CLUSTER;
-					if(std3D_clusterFrustumsFrame[clusterID] != clusterFrustumFrame)
-						std3D_BuildClusterFrustum(&std3D_clusterFrustums[clusterID], x, y, z, pProjection, znear, zfar);
+					if (std3D_clusters[clusterID].lastUpdateFrame != clusterFrustumFrame)
+						std3D_BuildCluster(&std3D_clusters[clusterID], x, y, z, znear, zfar);
 
-					// todo: optimize this, it's a bit slow
-					if(rdClip_SphereInFrustrum(&std3D_clusterFrustums[clusterID], pPosition, radius) != 2)
+					// todo: spotlight
+					int intersects;
+					if(boxMat)
+						intersects = rdMath_IntersectAABB_OBB(&std3D_clusters[clusterID].minb, &std3D_clusters[clusterID].maxb, boxMat);
+					else
+						intersects = rdMath_IntersectAABB_Sphere(&std3D_clusters[clusterID].minb, &std3D_clusters[clusterID].maxb, pPosition, radius);
+
+					if (intersects)
 					{
 						const uint32_t bucket_index = itemIndex / 32;
 						const uint32_t bucket_place = itemIndex % 32;
@@ -6243,21 +6266,21 @@ void std3D_BuildClusters(rdMatrix44* pProjection)
 	// assign lights
 	for (int i = 0; i < numLights; ++i)
 	{
-		std3D_AssignItemToClusters(i, (rdVector3*)&tmpLights[i].position, tmpLights[i].falloffMin, pProjection, znear, zfar);
+		std3D_AssignItemToClusters(i, (rdVector3*)&tmpLights[i].position, tmpLights[i].falloffMin, pProjection, znear, zfar, NULL);
 	}
 
 	// assign occluders
 	firstOccluder = numLights;
 	for (int i = 0; i < numOccluders; ++i)
 	{
-		std3D_AssignItemToClusters(firstOccluder + i, (rdVector3*)&tmpOccluders[i].position, tmpOccluders[i].position.w, pProjection, znear, zfar);
+		std3D_AssignItemToClusters(firstOccluder + i, (rdVector3*)&tmpOccluders[i].position, tmpOccluders[i].position.w, pProjection, znear, zfar, NULL);
 	}
 
 	// assign decals
 	firstDecal = firstOccluder + numOccluders;
 	for (int i = 0; i < numDecals; ++i)
 	{
-		std3D_AssignItemToClusters(firstDecal + i, (rdVector3*)&tmpDecals[i].posRad, tmpDecals[i].posRad.w, pProjection, znear, zfar);
+		std3D_AssignItemToClusters(firstDecal + i, (rdVector3*)&tmpDecals[i].posRad, tmpDecals[i].posRad.w, pProjection, znear, zfar, &tmpDecals[i].decalMatrix);
 	}
 
 	// todo: map buffer instead of storing to tmp then uploading?

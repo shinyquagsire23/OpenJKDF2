@@ -577,4 +577,14 @@ void rdCamera_GetFrustumCornerRays(rdCamera* camera, rdMatrix34* camMat, rdVecto
 	rdMatrix_TransformVector34Acc(lb, &camera->view_matrix);
 	rdMatrix_TransformVector34Acc(rb, &camera->view_matrix);
 }
+
+void rdCamera_GetFrustumRay(rdCamera* camera, rdVector3* result, float u, float v, float depth)
+{
+	result->x = ((1.0 - u - v) * camera->pClipFrustum->lb.x + (u * camera->pClipFrustum->rb.x + (v * camera->pClipFrustum->lt.x)));
+	result->y = ((1.0 - u - v) * camera->pClipFrustum->lb.y + (u * camera->pClipFrustum->rb.y + (v * camera->pClipFrustum->lt.y)));
+	result->z = ((1.0 - u - v) * camera->pClipFrustum->lb.z + (u * camera->pClipFrustum->rb.z + (v * camera->pClipFrustum->lt.z)));
+
+	rdVector_Scale3Acc(result, depth);
+}
+
 #endif

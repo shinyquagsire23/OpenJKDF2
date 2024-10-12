@@ -1,4 +1,5 @@
 #include "rdMath.h"
+#include "rdMatrix.h"
 
 #include "General/stdMath.h"
 
@@ -198,4 +199,48 @@ int rdMath_IntersectLineSegments(const rdVector3* pStartA, const rdVector3* pEnd
 		return 1;
 	}
 	return 0;
+}
+
+int rdMath_IntersectAABB_Sphere(rdVector3* minb, rdVector3* maxb, rdVector3* center, float radius)
+{
+	rdVector3 closest;
+	closest.x = fmax(minb->x, fmin(center->x, maxb->x));
+	closest.y = fmax(minb->y, fmin(center->y, maxb->y));
+	closest.z = fmax(minb->z, fmin(center->z, maxb->z));
+
+	rdVector3 dist;
+	rdVector_Sub3(&dist, &closest, center);
+	return rdVector_Dot3(&dist, &dist) <= (radius * radius);
+}
+
+int rdMath_IntersectAABB_OBB(rdVector3* minb, rdVector3* maxb, const rdMatrix44* mat)
+{
+	rdVector4 verts[8] =
+	{
+		{ -0.5f, -0.5f,  0.5f, 1.0f },
+		{  0.5f, -0.5f,  0.5f, 1.0f },
+		{  0.5f,  0.5f,  0.5f, 1.0f },
+		{ -0.5f,  0.5f,  0.5f, 1.0f },
+		{ -0.5f, -0.5f, -0.5f, 1.0f },
+		{  0.5f, -0.5f, -0.5f, 1.0f },
+		{  0.5f,  0.5f, -0.5f, 1.0f },
+		{ -0.5f,  0.5f, -0.5f, 1.0f }
+	};
+
+	rdVector3 obb_minb = { 10000,10000,10000 };
+	rdVector3 obb_maxb = { -10000, -10000, -10000 };
+	for (int i = 0; i < 8; ++i)
+	{
+		rdMatrix_TransformPoint44Acc(&verts[i], mat);
+		obb_minb.x = fmin(obb_minb.x, verts[i].x);
+		obb_minb.y = fmin(obb_minb.y, verts[i].y);
+		obb_minb.z = fmin(obb_minb.z, verts[i].z);
+		obb_maxb.x = fmax(obb_maxb.x, verts[i].x);
+		obb_maxb.y = fmax(obb_maxb.y, verts[i].y);
+		obb_maxb.z = fmax(obb_maxb.z, verts[i].z);
+	}
+
+	return (minb->x <= obb_maxb.x && maxb->x >= obb_minb.x) &&
+		(minb->y <= obb_maxb.y && maxb->y >= obb_minb.y) &&
+		(minb->z <= obb_maxb.z && maxb->z >= obb_minb.z);
 }

@@ -23,4 +23,7 @@ float rdMath_clampf(float d, float min, float max);
 int rdMath_IntersectPointLine(const rdVector3* pPoint, const rdVector3* pStart, const rdVector3* pEnd);
 int rdMath_IntersectLineSegments(const rdVector3* pStartA, const rdVector3* pEndA, const rdVector3* pStartB, const rdVector3* pEndB, rdVector3* pOut);
 
+int rdMath_IntersectAABB_Sphere(rdVector3* minb, rdVector3* maxb, rdVector3* center, float radius);
+int rdMath_IntersectAABB_OBB(rdVector3* minb, rdVector3* maxb, const rdMatrix44* mat);
+
 #endif // _RDMATH_H
