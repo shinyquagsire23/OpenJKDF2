@@ -1091,7 +1091,7 @@ void sithRender_DrawSurface(sithSurface* surface)
 		texMode = texMode > RD_TEXTUREMODE_AFFINE ? RD_TEXTUREMODE_AFFINE : texMode;
 		rdTexGen(RD_TEXGEN_HORIZON);
 		rdTexGenParams(sithSector_flt_8553C0, sithSector_flt_8553C8, sithSector_flt_8553F4, 0);
-		rdTexOffset(sithWorld_pCurrentWorld->horizontalSkyOffs.x + sithSector_flt_8553C4, sithWorld_pCurrentWorld->horizontalSkyOffs.y + sithSector_flt_8553B8);
+		rdTexOffset(sithWorld_pCurrentWorld->horizontalSkyOffs.x + sithSector_flt_8553B8, sithWorld_pCurrentWorld->horizontalSkyOffs.y + sithSector_flt_8553C4);
 	}
 	else if (surface->surfaceFlags & SITH_SURFACE_CEILING_SKY)
 	{
