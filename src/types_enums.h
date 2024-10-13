@@ -64,6 +64,14 @@ enum RD_DECAL_FLAGS
 #endif
 
 #ifdef RENDER_DROID2
+typedef uint32_t rdCaps_t;
+enum RD_CAPS
+{
+	RD_LIGHTING = 0x1,
+	RD_SHADOWS  = 0x2,
+	RD_DECALS   = 0x4,
+};
+
 typedef uint8_t rdBlendMode_t;
 typedef enum RD_BLEND_MODE
 {
@@ -141,9 +149,8 @@ enum RD_TEXGEN
 typedef uint32_t rdRenderPassFlags_t;
 enum RD_RENDERPASS
 {
-	RD_RENDERPASS_NONE        = 0,
-	RD_RENDERPASS_CLEAR_DEPTH = 1,
-	RD_RENDERPASS_NO_DECALS   = 2,
+	RD_RENDERPASS_NONE        = 0x0,
+	RD_RENDERPASS_CLEAR_DEPTH = 0x1,
 };
 
 #endif

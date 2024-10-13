@@ -76,6 +76,7 @@ in float f_depth;
 
 noperspective in vec2 f_uv_affine;
 
+uniform uint renderCaps;
 uniform mat4 modelMatrix;
 uniform mat4 projMatrix;
 
@@ -940,7 +941,7 @@ void main(void)
 	#endif
 #endif
 
-	if(numDecals > 0u)
+	if((renderCaps & 0x4) == 0x4 && numDecals > 0u)
 		BlendDecals(diffuseColor.xyz, emissive.xyz, bucket_index, f_coord.xyz, surfaceNormals);
 
 #ifndef UNLIT
@@ -950,14 +951,14 @@ void main(void)
 	#endif
 		
 	vec4 shadows = vec4(0.0, 0.0, 0.0, 1.0);
-	if (numOccluders > 0u)
+	if ((renderCaps & 0x2) == 0x2 && numOccluders > 0u)
 		shadows = CalculateIndirectShadows(bucket_index, f_coord.xyz, surfaceNormals);
 
 	float ao = (shadows.w + 0.1) / 1.1; // remap so we don't overdarken
 	diffuseLight.xyz *= ao;
 	specularLight.xyz *= ao;
 	
-	if (numLights > 0u)
+	if ((renderCaps & 0x1) == 0x1 && numLights > 0u)
 		CalculatePointLighting(bucket_index, surfaceNormals, localViewDir, shadows, diffuseColor.xyz, specularColor.xyz, roughness, diffuseLight, specularLight);
 	
 	diffuseLight.xyz = clamp(diffuseLight.xyz, vec3(0.0), vec3(1.0));	

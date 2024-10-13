@@ -1165,6 +1165,11 @@ void jkPlayer_DrawPov()
         // Force weapon to draw in front of scene
 	#ifdef RENDER_DROID2
 		rdRenderPass(1, 1);
+		rdDisable(RD_DECALS);
+		if (jkPlayer_enableShadows)
+			rdEnable(RD_SHADOWS);
+		else
+			rdDisable(RD_SHADOWS);
 		// only draw very near the camera
 		rdDepthRange(0.0f, 0.1f / sithCamera_currentCamera->rdCam.pClipFrustum->field_0.z);
 	#else

@@ -371,7 +371,7 @@ typedef struct std3D_worldStage
 	GLint uniform_geo_mode,  uniform_fillColor, uniform_tex, uniform_texEmiss, uniform_displacement_map, uniform_texDecals;
 	GLint uniform_tex_mode, uniform_worldPalette, uniform_worldPaletteLights;
 	GLint uniform_emissiveFactor, uniform_albedoFactor, uniform_displacement_factor;
-	GLint uniform_light_mode;
+	GLint uniform_light_mode, uniform_renderCaps;
 #ifdef FOG
 	GLint uniform_fog, uniform_fog_color, uniform_fog_start, uniform_fog_end;
 #endif
@@ -1196,6 +1196,7 @@ int std3D_loadWorldStage(std3D_worldStage* pStage, int isZPass, const char* defi
 	pStage->uniform_albedoFactor = std3D_tryFindUniform(pStage->program, "albedoFactor");
 	pStage->uniform_geo_mode = std3D_tryFindUniform(pStage->program, "geoMode");
 	pStage->uniform_light_mode = std3D_tryFindUniform(pStage->program, "lightMode");
+	pStage->uniform_renderCaps = std3D_tryFindUniform(pStage->program, "renderCaps");
 	pStage->uniform_displacement_factor = std3D_tryFindUniform(pStage->program, "displacement_factor");
 #ifdef FOG
 	pStage->uniform_fog = std3D_tryFindUniform(drawcall_program, "fogEnabled");
@@ -5728,6 +5729,7 @@ void std3D_FlushDrawCallList(std3D_RenderPass* pRenderPass, std3D_DrawCallList* 
 
 	rdMatrix44 last_mat = pDrawCall->state.modelView;
 	rdMatrix44 last_proj = pDrawCall->state.proj;
+	glUniform1ui(pStage->uniform_renderCaps, pDrawCall->state.renderCaps);
 	glUniformMatrix4fv(pStage->uniform_projection, 1, GL_FALSE, (float*)&pDrawCall->state.proj);
 	glUniformMatrix4fv(pStage->uniform_modelMatrix, 1, GL_FALSE, (float*)&pDrawCall->state.modelView);
 
@@ -5747,6 +5749,7 @@ void std3D_FlushDrawCallList(std3D_RenderPass* pRenderPass, std3D_DrawCallList* 
 		if (last_tex != texid
 			//|| memcmp(&lastState, &pDrawCall->state, sizeof(std3D_DrawCallState)) != 0
 			|| lastState.shaderID != pDrawCall->state.shaderID
+			|| lastState.renderCaps != pDrawCall->state.renderCaps
 			|| memcmp(&lastState.raster, &pDrawCall->state.raster, sizeof(std3D_RasterState)) != 0
 			|| memcmp(&lastState.blend, &pDrawCall->state.blend, sizeof(std3D_BlendState)) != 0
 			|| memcmp(&lastState.depthStencil, &pDrawCall->state.depthStencil, sizeof(std3D_DepthStencilState)) != 0
@@ -5777,6 +5780,7 @@ void std3D_FlushDrawCallList(std3D_RenderPass* pRenderPass, std3D_DrawCallList* 
 			std3D_SetLightingState(pStage, pLightState);
 			std3D_SetTexture(pStage, pRasterState->geoMode == RD_GEOMODE_TEXTURED ? pTexState->pTexture : NULL);
 
+			glUniform1ui(pStage->uniform_renderCaps, pDrawCall->state.renderCaps);
 			glUniformMatrix4fv(pStage->uniform_projection, 1, GL_FALSE, (float*)&pDrawCall->state.proj);
 			glUniformMatrix4fv(pStage->uniform_modelMatrix, 1, GL_FALSE, (float*)&pDrawCall->state.modelView);
 
@@ -6322,15 +6326,12 @@ void std3D_BuildClusters(std3D_RenderPass* pRenderPass, rdMatrix44* pProjection)
 
 	// assign decals
 	firstDecal = firstOccluder + numOccluders;
-	if(!(pRenderPass->flags & RD_RENDERPASS_NO_DECALS))
+	int64_t decalTime = Linux_TimeUs();
+	for (int i = 0; i < numDecals; ++i)
 	{
-		int64_t decalTime = Linux_TimeUs();
-		for (int i = 0; i < numDecals; ++i)
-		{
-			std3D_AssignItemToClusters(pRenderPass, firstDecal + i, (rdVector3*)&tmpDecals[i].posRad, tmpDecals[i].posRad.w, pProjection, znear, zfar, &tmpDecals[i].decalMatrix);
-		}
-		//printf("\t%lld us to assign decals to custers for frame %d with draw layer %d\n", Linux_TimeUs() - decalTime, rdroid_frameTrue, drawLayer);
+		std3D_AssignItemToClusters(pRenderPass, firstDecal + i, (rdVector3*)&tmpDecals[i].posRad, tmpDecals[i].posRad.w, pProjection, znear, zfar, &tmpDecals[i].decalMatrix);
 	}
+	//printf("\t%lld us to assign decals to custers for frame %d with draw layer %d\n", Linux_TimeUs() - decalTime, rdroid_frameTrue, drawLayer);
 
 	// todo: map buffer instead of storing to tmp then uploading?
 	glBindBuffer(GL_TEXTURE_BUFFER, cluster_buffer);

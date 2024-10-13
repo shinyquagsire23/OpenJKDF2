@@ -24,6 +24,8 @@ float rdroid_curFogEndDepth;
 
 void rdMatrixChanged();
 
+static rdCaps_t rdroid_caps = RD_LIGHTING | RD_SHADOWS | RD_DECALS;
+
 static std3D_RasterState       rdroid_rasterState;
 static std3D_BlendState        rdroid_blendState;
 static std3D_DepthStencilState rdroid_depthStencilState;
@@ -365,6 +367,16 @@ void rdClearPostStatistics()
 
 #ifdef RENDER_DROID2
 
+void rdEnable(rdCaps_t cap)
+{
+	rdroid_caps |= cap;
+}
+
+void rdDisable(rdCaps_t cap)
+{
+	rdroid_caps &= ~cap;
+}
+
 // Matrix state
 
 void rdMatrixChanged()
@@ -518,6 +530,7 @@ void rdEndPrimitive()
 	state.sortPriority = rdroid_sortPriority;
 	state.sortDistance = rdroid_sortDistance;
 	state.renderPass = rdroid_renderPass;
+	state.renderCaps = rdroid_caps;
 
 	memcpy(&state.raster, &rdroid_rasterState, sizeof(std3D_RasterState));
 	memcpy(&state.blend, &rdroid_blendState, sizeof(std3D_BlendState));

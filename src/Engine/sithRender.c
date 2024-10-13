@@ -551,6 +551,15 @@ void sithRender_Draw()
 
 #ifdef RENDER_DROID2
 	rdRenderPass(0, 0);
+	rdEnable(RD_LIGHTING);
+	if(jkPlayer_enableShadows)
+		rdEnable(RD_SHADOWS);
+	else
+		rdDisable(RD_SHADOWS);
+	if (jkPlayer_enableDecals)
+		rdEnable(RD_DECALS);
+	else
+		rdDisable(RD_DECALS);
 	rdDepthRange(0.0f, 1.0f);
 	rdClearLights();
 	rdClearOccluders();
@@ -2363,6 +2372,10 @@ void sithRender_RenderThings()
     rdSetOcclusionMethod(0);
     rdSetVertexColorMode(0);
 
+#ifdef RENDER_DROID2
+	rdDisable(RD_DECALS);
+#endif
+
     for ( i = 0; i < sithRender_numSectors2; i++ )
     {
         v1 = sithRender_aSectors2[i];
@@ -2664,6 +2677,13 @@ void sithRender_RenderThings()
         }
     }
     rdCache_Flush();
+
+#ifdef RENDER_DROID2
+	if (jkPlayer_enableDecals)
+		rdEnable(RD_DECALS);
+	else
+		rdDisable(RD_DECALS);
+#endif
 
     // MoTS added
     if (lastDrawn) 

@@ -651,6 +651,38 @@ void sithWeapon_SetTimeLeft(sithThing *weapon, sithThing* a2, float timeLeft)
     }
 }
 
+
+#ifdef DECAL_RENDERING
+void sithWeapon_WallHitExplode(sithThing* weapon, sithThing* hitTemplate, sithCollisionSearchEntry* collideInfo)
+{
+	if (hitTemplate)
+	{
+		// orient between the hit normal and the incoming direction
+		rdVector3 lookVec;
+		lookVec.x = collideInfo->hitNorm.x - weapon->lookOrientation.lvec.x * 4.0f;
+		lookVec.y = collideInfo->hitNorm.y - weapon->lookOrientation.lvec.y * 4.0f;
+		lookVec.z = collideInfo->hitNorm.z - weapon->lookOrientation.lvec.z * 4.0f;
+		rdVector_Normalize3Acc(&lookVec);
+
+		// orient along the hit normal
+		rdMatrix34 orient;
+		rdMatrix_BuildFromLook34(&orient, &lookVec);
+
+		sithThing* player = sithThing_GetParent(weapon);
+		sithThing* spawned = sithThing_Create(hitTemplate, &weapon->position, &orient, weapon->sector, player);
+		if (spawned)
+		{
+			// Added: second comparison, co-op
+			if (player == sithPlayer_pLocalPlayerThing || player->thingtype == SITH_THING_PLAYER)
+				sithAIAwareness_AddEntry(spawned->sector, &spawned->position, 0, 2.0, player);
+
+			if (weapon->thingflags & SITH_TF_INVULN)
+				spawned->thingflags |= SITH_TF_INVULN;
+		}
+	}
+}
+#endif
+
 // MOTS altered
 // TODO: I think there's some inlining happening in here
 int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCollisionSearchEntry *a4, int a5)
@@ -725,6 +757,13 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
 
         if (physicsThing->weaponParams.typeflags & SITH_WF_EXPLODE_ON_SURFACE_HIT)
         {
+			if (collidedThing->thingflags & SITH_TF_LEVELGEO)
+			{
+#ifdef DECAL_RENDERING
+				sithWeapon_WallHitExplode(physicsThing, physicsThing->weaponParams.wallHitTemplate, a4);
+#endif
+			}
+
             sithWeapon_RemoveAndExplode(physicsThing, physicsThing->weaponParams.explodeTemplate);
             return 1;
         }
@@ -794,37 +833,6 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
     }
     return 0;
 }
-
-#ifdef DECAL_RENDERING
-void sithWeapon_WallHitExplode(sithThing* weapon, sithThing* hitTemplate, sithCollisionSearchEntry* collideInfo)
-{
-	if(hitTemplate)
-	{
-		// orient between the hit normal and the incoming direction
-		rdVector3 lookVec;
-		lookVec.x = collideInfo->hitNorm.x - weapon->lookOrientation.lvec.x * 4.0f;
-		lookVec.y = collideInfo->hitNorm.y - weapon->lookOrientation.lvec.y * 4.0f;
-		lookVec.z = collideInfo->hitNorm.z - weapon->lookOrientation.lvec.z * 4.0f;
-		rdVector_Normalize3Acc(&lookVec);
-
-		// orient along the hit normal
-		rdMatrix34 orient;
-		rdMatrix_BuildFromLook34(&orient, &lookVec);
-
-		sithThing* player = sithThing_GetParent(weapon);
-		sithThing* spawned = sithThing_Create(hitTemplate, &weapon->position, &orient, weapon->sector, player);
-		if (spawned)
-		{
-			// Added: second comparison, co-op
-			if (player == sithPlayer_pLocalPlayerThing || player->thingtype == SITH_THING_PLAYER)
-				sithAIAwareness_AddEntry(spawned->sector, &spawned->position, 0, 2.0, player);
-
-			if (weapon->thingflags & SITH_TF_INVULN)
-				spawned->thingflags |= SITH_TF_INVULN;
-		}
-	}
-}
-#endif
 
 // MoTS altered: floor hit explode
 int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithCollisionSearchEntry *a3)

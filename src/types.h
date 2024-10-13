@@ -916,6 +916,7 @@ typedef struct std3D_DrawCallState
 	int                     sortPriority;
 	float                   sortDistance;
 	int                     renderPass;
+	rdCaps_t                renderCaps;
 	rdMatrix44              modelView;
 	rdMatrix44              proj;
 	std3D_RasterState       raster;

@@ -85,6 +85,8 @@ void rdClearPostStatistics();
 // todo: the original rdProcEntry stuff was somewhat stateless, try to move away from stateful api
 
 // todo: rdPushMatrix/rdPopMatrix?
+void rdEnable(rdCaps_t cap);
+void rdDisable(rdCaps_t cap);
 void rdMatrixMode(rdMatrixMode_t mode);
 void rdPerspective(float fov, float aspect, float nearPlane, float farPlane);
 void rdOrthographic(float width, float height, float nearPlane, float farPlane);
