@@ -664,14 +664,17 @@ vec3 normals(vec3 pos) {
     return normalize(cross(fdx, fdy));
 }
 
-mat3 construct_tbn(vec2 uv, vec3 vp_normal, vec3 adjusted_coords)
+mat3 construct_tbn(vec2 uv)
 {
-    vec3 n = normalize(vp_normal);
+	// use face normals for this
+    //vec3 n = normals(f_coord.xyz);
 
-    vec3 dp1 = dFdx(adjusted_coords);
-    vec3 dp2 = dFdy(adjusted_coords);
+    vec3 dp1 = dFdx(f_coord.xyz);
+    vec3 dp2 = dFdy(f_coord.xyz);
     vec2 duv1 = dFdx(uv.xy);
     vec2 duv2 = dFdy(uv.xy);
+
+	vec3 n = normalize(cross(dp1, dp2));
 
     vec3 dp2perp = cross(dp2, n);
     vec3 dp1perp = cross(n, dp1);
@@ -683,14 +686,15 @@ mat3 construct_tbn(vec2 uv, vec3 vp_normal, vec3 adjusted_coords)
     return mat3(t * invmax, b * invmax, n);
 }
 
-vec2 parallax_mapping(vec2 tc, vec3 vp_normal, vec3 adjusted_coords)
+vec2 parallax_mapping(vec2 tc)
 {
     /*if (f_coord.x < 0.5) {
         return tc;
     }*/
 
-    // The injector world space view position is always considered (0, 0, 0):
-    vec3 view_dir = -normalize(transpose(construct_tbn(tc, vp_normal, adjusted_coords)) * adjusted_coords);
+	mat3 tbn = construct_tbn(tc);
+	vec3 localViewDir = normalize(-f_coord.xyz);
+    vec3 view_dir = normalize(transpose(tbn) * localViewDir);
 
     const float min_layers = 32.0;
     const float max_layers = 128.0;
@@ -698,22 +702,22 @@ vec2 parallax_mapping(vec2 tc, vec3 vp_normal, vec3 adjusted_coords)
 
     float layer_depth = 1.0 / num_layers;
     float current_layer_depth = 0.0;
-    vec2 shift_per_layer = (view_dir.xy / view_dir.z) * displacement_factor;
+    vec2 shift_per_layer = (view_dir.xy / -view_dir.z) * displacement_factor;
     vec2 d_tc = shift_per_layer / num_layers;
 
     vec2 current_tc = tc;
-    float current_sample = texture(displacement_map, current_tc).r;
+    float current_sample = textureLod(displacement_map, current_tc, 0).r;
 
     while(current_layer_depth < current_sample) {
         current_tc -= d_tc;
-        current_sample = texture(displacement_map, current_tc).r;
+        current_sample = textureLod(displacement_map, current_tc, 0).r;
         current_layer_depth += layer_depth;
     }
 
     vec2 prev_tc = current_tc + d_tc;
 
     float after_col_depth = current_sample - current_layer_depth;
-    float before_col_depth = texture(displacement_map, prev_tc).r - current_layer_depth + layer_depth;
+    float before_col_depth = textureLod(displacement_map, prev_tc, 0).r - current_layer_depth + layer_depth;
 
     float a = after_col_depth / (after_col_depth - before_col_depth);
     vec2 adj_tc = mix(current_tc, prev_tc, a);
@@ -829,21 +833,9 @@ void main(void)
 {
     vec3 adj_texcoords = f_uv.xyz / f_uv.w;
 
-	// todo: make sure all the jkgm stuff still works
-    float originalZ = gl_FragCoord.z / gl_FragCoord.w;
-#ifdef VIEW_SPACE_GBUFFER
-    vec3 adjusted_coords = f_coord; // view space position
-#else
-    vec3 adjusted_coords = vec3(f_coord.x/iResolution.x, f_coord.y/iResolution.y, originalZ); // clip space pos
-#endif
-	vec3 adjusted_coords_norms = vec3(gl_FragCoord.x/iResolution.x, gl_FragCoord.y/iResolution.y, 1.0/gl_FragCoord.z);
-    vec3 adjusted_coords_parallax = vec3(adjusted_coords_norms.x - 0.5, adjusted_coords_norms.y - 0.5, gl_FragCoord.z);
-    vec3 face_normals = normals(adjusted_coords_norms);
-    vec3 face_normals_parallax = normals(adjusted_coords_parallax);
-
     if(displacement_factor != 0.0)
 	{
-        adj_texcoords.xy = parallax_mapping(f_uv.xy, face_normals_parallax, adjusted_coords_parallax);
+        adj_texcoords.xy = parallax_mapping(adj_texcoords.xy);
     }
 	else if(uv_mode == 0)
 	{
@@ -980,10 +972,15 @@ void main(void)
 	diffuseLight.xyz *= diffuseColor.xyz;
 	//specularLight.xyz *= specularColor.xyz;
 
-	vec4 main_color = vec4(diffuseLight.xyz, vertex_color.w) + vec4(specularLight.xyz, 0.0);
-	main_color.rgb = max(main_color.rgb, emissive.rgb);
-    
+	vec4 main_color = vec4(diffuseLight.xyz, vertex_color.w) + vec4(specularLight.xyz, 0.0);    
     main_color *= albedoFactor_copy;
+	
+	if (sampledEmiss.r != 0.0 || sampledEmiss.g != 0.0 || sampledEmiss.b != 0.0)
+    {
+        emissive.rgb += sampledEmiss.rgb * emissiveFactor;
+    }
+
+	main_color.rgb = max(main_color.rgb, emissive.rgb);
 
     float orig_alpha = main_color.a;
 
@@ -993,10 +990,6 @@ void main(void)
     }
 #endif
 
-    if (sampledEmiss.r != 0.0 || sampledEmiss.g != 0.0 || sampledEmiss.b != 0.0)
-    {
-        emissive.rgb += sampledEmiss.rgb * 0.1;
-    }
 	
 #ifdef FOG
 	if(fogEnabled > 0)
