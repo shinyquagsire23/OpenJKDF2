@@ -189,7 +189,7 @@ vec2 do_ceiling_uv(vec4 view_pos, vec3 world_pos, inout vec4 clip_pos)
 
 vec2 do_horizon_uv(inout vec4 clip_pos)
 {
-	vec2 projXY = vec2(0.5, 0.5) * clip_pos.xy;
+	vec2 projXY = vec2(0.5,-0.5) * clip_pos.xy;
 	projXY = projXY.xy * iResolution.xy * (texgen_params.x / clip_pos.w);
 
 	vec2 uv;
