@@ -137,6 +137,9 @@ sithSurface* sithSurface_sub_4E63B0(int idx);
 void sithSurface_SyncSurface(sithSurface *pSurface);
 void sithSurface_Sync();
 
+// Added
+void sithSurface_GetCenterRadius(sithSurface* surface, rdVector3* outCenter, float* outRadius);
+
 //static void (*sithSurface_Shutdown)() = (void*)sithSurface_Shutdown_ADDR;
 //static int (*sithSurface_Startup)() = (void*)sithSurface_Startup_ADDR;
 static int (*_sithSurface_Load)(sithWorld*) = (void*)sithSurface_Load_ADDR;

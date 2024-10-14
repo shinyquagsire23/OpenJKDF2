@@ -779,15 +779,17 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
 		{
 			if (sector->surfaces[i].surfaceInfo.face.material && sector->surfaces[i].surfaceFlags & SITH_SURFACE_EMISSIVE)
 			{
-				sithRender_aLights[lightIdx].intensity = 0.45f; // todo: compute me from the area of the surface
 				rdMaterial_GetFillColor(&sithRender_aLights[lightIdx].color, sector->surfaces[i].surfaceInfo.face.material, sector->colormap, sector->surfaces[i].surfaceInfo.face.wallCel, -1);
 
+				float radius;
 				rdVector3 center;
-				sithSurface_GetCenter(&sector->surfaces[i], &center);
+				sithSurface_GetCenterRadius(&sector->surfaces[i], &center, &radius);
 
 				rdVector3 offset;
 				rdVector_Scale3(&offset, &sector->surfaces[i].surfaceInfo.face.normal, 0.0075f);
 				rdVector_Add3Acc(&center, &offset);
+
+				sithRender_aLights[lightIdx].intensity = radius / rdCamera_pCurCamera->attenuationMin;
 
 				rdCamera_AddLight(rdCamera_pCurCamera, &sithRender_aLights[lightIdx], &center);
 				lightIdx = ++sithRender_numLights;
@@ -2161,15 +2163,17 @@ void sithRender_UpdateLights(sithSector *sector, float prev, float dist, int dep
 		{
 			if(sector->surfaces[i].surfaceInfo.face.material && sector->surfaces[i].surfaceFlags & SITH_SURFACE_EMISSIVE)
 			{
-				sithRender_aLights[sithRender_numLights].intensity = 0.45f; // todo: compute me from the area of the surface
 				rdMaterial_GetFillColor(&sithRender_aLights[sithRender_numLights].color, sector->surfaces[i].surfaceInfo.face.material, sector->colormap, sector->surfaces[i].surfaceInfo.face.wallCel, -1);
 
+				float radius;
 				rdVector3 center;
-				sithSurface_GetCenter(&sector->surfaces[i], &center);
+				sithSurface_GetCenterRadius(&sector->surfaces[i], &center, &radius);
 
 				rdVector3 offset;
 				rdVector_Scale3(&offset, &sector->surfaces[i].surfaceInfo.face.normal, 0.0075f);
 				rdVector_Add3Acc(&center, &offset);
+
+				sithRender_aLights[sithRender_numLights].intensity = radius / rdCamera_pCurCamera->attenuationMin;
 
 				rdCamera_AddLight(rdCamera_pCurCamera, &sithRender_aLights[sithRender_numLights], &center);
 				++sithRender_numLights;

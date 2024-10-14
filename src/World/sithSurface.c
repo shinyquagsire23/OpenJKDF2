@@ -1123,6 +1123,7 @@ void sithSurface_DetachThing(sithSurface *a1, rdVector3 *out)
     }
 }
 
+// todo: cache this it shouldn't change
 int sithSurface_GetCenter(sithSurface *surface, rdVector3 *out)
 {
     rdVector3 a1a; // [esp+14h] [ebp-18h] BYREF
@@ -1140,6 +1141,17 @@ int sithSurface_GetCenter(sithSurface *surface, rdVector3 *out)
         rdVector_Add3Acc(out, &a2a);
     }
     return sithIntersect_IsSphereInSector(out, 0.0, surface->parent_sector);
+}
+
+void sithSurface_GetCenterRadius(sithSurface* surface, rdVector3* outCenter, float* outRadius)
+{
+	sithSurface_GetCenter(surface, outCenter);
+
+	float rad = 0.0f;
+	for (uint32_t i = 0; i < surface->surfaceInfo.face.numVertices; ++i)
+		rad = fmax(rdVector_DistSquared3(outCenter, &sithWorld_pCurrentWorld->vertices[surface->surfaceInfo.face.vertexPosIdx[i]]), rad);
+
+	*outRadius = sqrtf(rad);
 }
 
 rdSurface* sithSurface_SlideHorizonSky(int skyType, rdVector2 *a2)
