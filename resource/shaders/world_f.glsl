@@ -962,7 +962,7 @@ void main(void)
 		CalculatePointLighting(bucket_index, surfaceNormals, localViewDir, shadows, diffuseColor.xyz, specularColor.xyz, roughness, diffuseLight, specularLight);
 	
 	diffuseLight.xyz = clamp(diffuseLight.xyz, vec3(0.0), vec3(1.0));	
-	specularLight.xyz = clamp(specularLight.xyz, vec3(0.0), vec3(1.0));	
+	specularLight.xyz = clamp(specularLight.xyz, vec3(0.0), vec3(2.0));	
 
 	// taper off highlights
 	//specularLight.r = rolloff(specularLight.r, 1.0, 0.2);
