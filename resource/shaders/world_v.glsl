@@ -38,7 +38,7 @@ uniform sharedBlock
 
 	float colorEffects_fade;
 	float light_mult;
-	uint  enableDither;
+	uint  pad0;
 	uint  pad1;
 
 	vec2  clusterTileSizes;

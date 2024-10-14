@@ -869,6 +869,7 @@ typedef struct std3D_RasterState
 {
 	rdGeoMode_t         geoMode;
 	rdVertexColorMode_t colorMode;
+	rdDitherMode_t      ditherMode;
 	rdCullMode_t        cullMode;
 	rdScissorMode_t     scissorMode;
 	rdScissorRect       scissor;

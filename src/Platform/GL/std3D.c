@@ -195,7 +195,7 @@ typedef struct std3D_SharedUniforms
 
 	float     fade;
 	float     lightMult;
-	uint32_t  enableDither;
+	uint32_t  pad0;
 	uint32_t  pad1;
 
 	rdVector2 clusterTileSizes;
@@ -371,7 +371,7 @@ typedef struct std3D_worldStage
 	GLint uniform_geo_mode,  uniform_fillColor, uniform_tex, uniform_texEmiss, uniform_displacement_map, uniform_texDecals;
 	GLint uniform_tex_mode, uniform_worldPalette, uniform_worldPaletteLights;
 	GLint uniform_emissiveFactor, uniform_albedoFactor, uniform_displacement_factor;
-	GLint uniform_light_mode, uniform_renderCaps;
+	GLint uniform_light_mode, uniform_ditherMode, uniform_renderCaps;
 #ifdef FOG
 	GLint uniform_fog, uniform_fog_color, uniform_fog_start, uniform_fog_end;
 #endif
@@ -1195,6 +1195,7 @@ int std3D_loadWorldStage(std3D_worldStage* pStage, int isZPass, const char* defi
 	pStage->uniform_emissiveFactor = std3D_tryFindUniform(pStage->program, "emissiveFactor");
 	pStage->uniform_albedoFactor = std3D_tryFindUniform(pStage->program, "albedoFactor");
 	pStage->uniform_geo_mode = std3D_tryFindUniform(pStage->program, "geoMode");
+	pStage->uniform_ditherMode = std3D_tryFindUniform(pStage->program, "ditherMode");
 	pStage->uniform_light_mode = std3D_tryFindUniform(pStage->program, "lightMode");
 	pStage->uniform_renderCaps = std3D_tryFindUniform(pStage->program, "renderCaps");
 	pStage->uniform_displacement_factor = std3D_tryFindUniform(pStage->program, "displacement_factor");
@@ -3480,7 +3481,7 @@ void std3D_DrawRenderList()
 
     glUniform2f(uniform_iResolution, width, height);
 
-	glUniform1i(uniform_enableDither, !jkPlayer_enable32Bit);
+	glUniform1i(uniform_enableDither, 0);
 
     //rdroid_curColorEffects.tint.x = 0.0;
     //rdroid_curColorEffects.tint.y = 0.5;
@@ -5441,8 +5442,6 @@ void std3D_UpdateSharedUniforms()
 	
 	uniforms.lightMult = jkGuiBuildMulti_bRendering ? 0.85 : (jkPlayer_enableBloom ? 0.9 : 0.85);
 	
-	uniforms.enableDither = !jkPlayer_enable32Bit;
-
 	rdVector_Set2(&uniforms.clusterTileSizes, (float)tileSizeX, (float)tileSizeY);
 	rdVector_Set2(&uniforms.clusterScaleBias, sliceScalingFactor, sliceBiasFactor);
 	
@@ -5561,6 +5560,7 @@ void std3D_SetRasterState(std3D_worldStage* pStage, std3D_RasterState* pRasterSt
 	glFrontFace(pRasterState->cullMode == RD_CULL_MODE_CW_ONLY ? GL_CW : GL_CCW);
 
 	glUniform1i(pStage->uniform_geo_mode, pRasterState->geoMode);
+	glUniform1i(pStage->uniform_ditherMode, pRasterState->ditherMode);
 
 	//rdVertexColorMode_t colorMode;
 }

@@ -45,6 +45,7 @@ int jkPlayer_fov = 90;
 int jkPlayer_fovIsVertical = 1;
 int jkPlayer_enableTextureFilter = 0;
 int jkPlayer_enableOrigAspect = 0;
+int jkPlayer_enableDithering = 0;
 int jkPlayer_enableBloom = 0;
 int jkPlayer_enableSSAO = 0;
 int jkPlayer_fpslimit = 0;
@@ -206,6 +207,7 @@ void jkPlayer_StartupVars()
     sithCvar_RegisterBool("r_fovIsVertical",            1,                          &jkPlayer_fovIsVertical,            CVARFLAG_LOCAL);
     sithCvar_RegisterBool("r_enableTextureFilter",      0,                          &jkPlayer_enableTextureFilter,      CVARFLAG_LOCAL);
     sithCvar_RegisterBool("r_enableOrigAspect",         0,                          &jkPlayer_enableOrigAspect,         CVARFLAG_LOCAL);
+	sithCvar_RegisterBool("r_dither",                   0,                          &jkPlayer_enableDithering,          CVARFLAG_LOCAL);
     sithCvar_RegisterBool("r_enableBloom",              0,                          &jkPlayer_enableBloom,              CVARFLAG_LOCAL);
     sithCvar_RegisterBool("r_enableSSAO",               0,                          &jkPlayer_enableSSAO,               CVARFLAG_LOCAL);
     sithCvar_RegisterInt("r_fpslimit",                  0,                          &jkPlayer_fpslimit,                 CVARFLAG_LOCAL);
@@ -264,6 +266,7 @@ void jkPlayer_ResetVars()
     jkPlayer_fovIsVertical = 1;
     jkPlayer_enableTextureFilter = 0;
     jkPlayer_enableOrigAspect = 0;
+	jkPlayer_enableDithering = 0;
     jkPlayer_enableBloom = 0;
     jkPlayer_enableSSAO = 0;
     jkPlayer_fpslimit = 0;
@@ -667,6 +670,7 @@ void jkPlayer_WriteConf(wchar_t *name)
         stdJSON_SaveBool(ext_fpath, "windowfullscreen", Window_isFullscreen);
         stdJSON_SaveBool(ext_fpath, "texturefiltering", jkPlayer_enableTextureFilter);
         stdJSON_SaveBool(ext_fpath, "originalaspect", jkPlayer_enableOrigAspect);
+		stdJSON_SaveBool(ext_fpath, "dithering", jkPlayer_enableDithering);
         stdJSON_SaveInt(ext_fpath, "fpslimit", jkPlayer_fpslimit);
         stdJSON_SaveBool(ext_fpath, "enablevsync", jkPlayer_enableVsync);
         stdJSON_SaveBool(ext_fpath, "enablebloom", jkPlayer_enableBloom);
@@ -757,6 +761,12 @@ void jkPlayer_ParseLegacyExt()
         _sscanf(stdConffile_aLine, "originalaspect %d", &jkPlayer_enableOrigAspect);
         jkPlayer_enableOrigAspect = !!jkPlayer_enableOrigAspect;
     }
+
+	if (stdConffile_ReadLine())
+	{
+		_sscanf(stdConffile_aLine, "dithering %d", &jkPlayer_enableDithering);
+		jkPlayer_enableDithering = !!jkPlayer_enableDithering;
+	}
 
     if (stdConffile_ReadLine())
     {
@@ -906,6 +916,7 @@ int jkPlayer_ReadConf(wchar_t *name)
         Window_isFullscreen_tmp = stdJSON_GetBool(ext_fpath, "windowfullscreen", Window_isFullscreen);
         jkPlayer_enableTextureFilter = stdJSON_GetBool(ext_fpath, "texturefiltering", jkPlayer_enableTextureFilter);
         jkPlayer_enableOrigAspect = stdJSON_GetBool(ext_fpath, "originalaspect", jkPlayer_enableOrigAspect);
+		jkPlayer_enableDithering = stdJSON_GetBool(ext_fpath, "dithering", jkPlayer_enableDithering);
         jkPlayer_fpslimit = stdJSON_GetInt(ext_fpath, "fpslimit", jkPlayer_fpslimit);
         jkPlayer_enableVsync = stdJSON_GetBool(ext_fpath, "enablevsync", jkPlayer_enableVsync);
         jkPlayer_enableBloom = stdJSON_GetBool(ext_fpath, "enablebloom", jkPlayer_enableBloom);

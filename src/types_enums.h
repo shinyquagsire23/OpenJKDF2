@@ -138,19 +138,26 @@ typedef enum RD_MATRIX_MODE
 	RD_MATRIX_PROJECTION,
 } RD_MATRIX_MODE;
 
-typedef int32_t rdTexGen_t;
+typedef uint8_t rdTexGen_t;
 enum RD_TEXGEN
 {
-	RD_TEXGEN_NONE = 0,
+	RD_TEXGEN_NONE    = 0,
 	RD_TEXGEN_HORIZON = 1,
 	RD_TEXGEN_CEILING = 2,
 };
 
-typedef uint32_t rdRenderPassFlags_t;
+typedef uint8_t rdRenderPassFlags_t;
 enum RD_RENDERPASS
 {
 	RD_RENDERPASS_NONE        = 0x0,
 	RD_RENDERPASS_CLEAR_DEPTH = 0x1,
+};
+
+typedef uint8_t rdDitherMode_t;
+enum RD_DITHER_MODE
+{
+	RD_DITHER_NONE,
+	RD_DITHER_4x4,
 };
 
 #endif

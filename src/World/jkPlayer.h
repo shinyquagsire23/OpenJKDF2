@@ -152,6 +152,7 @@ extern int jkPlayer_fov;
 extern int jkPlayer_fovIsVertical;
 extern int jkPlayer_enableTextureFilter;
 extern int jkPlayer_enableOrigAspect;
+extern int jkPlayer_enableDithering;
 extern int jkPlayer_enableBloom;
 extern int jkPlayer_fpslimit;
 extern int jkPlayer_enableVsync;

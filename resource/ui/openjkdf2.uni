@@ -26,6 +26,7 @@ MSGS 100          # <--- DON'T FORGET TO UPDATE THIS COUNT
    "GUIEXT_FOV_HINT"                      0 "Set FOV"
    "GUIEXT_FOV_VERTICAL"                  0 "FOV is vertical (Hor+)"
    "GUIEXT_EN_FULLSCREEN"                 0 "Fullscreen"
+   "GUIEXT_EN_DITHER"                     0 "Dithering"
    "GUIEXT_EN_HIDPI"                      0 "High DPI"
    "GUIEXT_EN_TEXTURE_FILTERING"          0 "Texture Filtering"
    "GUIEXT_EN_SQUARE_ASPECT"              0 "Use 1:1 aspect"

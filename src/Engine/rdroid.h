@@ -138,8 +138,7 @@ void rdSetGeoMode(int a1);
 void rdSetLightMode(int a1);
 void rdSetTexMode(int a1);
 
-// todo:
-// rdDitherMode
+void rdDitherMode(rdDitherMode_t mode);
 
 void rdRenderPass(int8_t renderPass, rdRenderPassFlags_t renderPassFlags);
 void rdDepthRange(float znearNorm, float zfarNorm);

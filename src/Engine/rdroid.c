@@ -869,6 +869,11 @@ void rdSetTexMode(int a1)
 	rdroid_textureState.texMode = a1;
 }
 
+void rdDitherMode(rdDitherMode_t mode)
+{
+	rdroid_rasterState.ditherMode = mode;
+}
+
 // Lighting
 int std3D_AddLight(rdLight* light, rdVector3* viewPosition);
 int rdAddLight(rdLight* pLight, rdVector3* pPosition)

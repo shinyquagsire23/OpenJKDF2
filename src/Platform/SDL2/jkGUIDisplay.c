@@ -57,13 +57,13 @@ static jkGuiElement jkGuiDisplay_aElements[] = {
     {ELEMENT_SLIDER,       0,            0, (const char*)(FOV_MAX - FOV_MIN),                    0, {10, 160, 320, 30}, 1, 0, "GUIEXT_FOV_HINT", jkGuiDisplay_FovDraw, 0, slider_images, {0}, 0},
     {ELEMENT_TEXT,         0,            0, slider_val_text,        3, {20, 190, 300, 30}, 1,  0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_CHECKBOX,     0,            0, "GUIEXT_FOV_VERTICAL",    0, {20, 210, 200, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
-    {ELEMENT_CHECKBOX,     0,            0, "GUIEXT_EN_FULLSCREEN",    0, {400, 190, 200, 30}, 1,  0, NULL, 0, 0, 0, {0}, 0},
-    {ELEMENT_CHECKBOX,     0,            0, "GUIEXT_EN_HIDPI",    0, {400, 250, 200, 30}, 1,  0, NULL, 0, 0, 0, {0}, 0},
-    {ELEMENT_CHECKBOX,     0,            0, "GUIEXT_EN_TEXTURE_FILTERING",    0, {400, 280, 200, 30}, 1,  0, NULL, 0, 0, 0, {0}, 0},
+    {ELEMENT_CHECKBOX,     0,            0, "GUIEXT_EN_FULLSCREEN",    0, {400, 220, 200, 30}, 1,  0, NULL, 0, 0, 0, {0}, 0},
+    {ELEMENT_CHECKBOX,     0,            0, "GUIEXT_EN_HIDPI",    0, {400, 280, 200, 30}, 1,  0, NULL, 0, 0, 0, {0}, 0},
+    {ELEMENT_CHECKBOX,     0,            0, "GUIEXT_EN_TEXTURE_FILTERING",    0, {400, 310, 200, 30}, 1,  0, NULL, 0, 0, 0, {0}, 0},
     {ELEMENT_CHECKBOX,     0,            0, "GUIEXT_EN_SQUARE_ASPECT",    0, {20, 240, 300, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
 
     // 17
-    {ELEMENT_CHECKBOX,     0,            0, "GUIEXT_EN_VSYNC",    0, {400, 220, 300, 30}, 1,  0, NULL, 0, 0, 0, {0}, 0},
+    {ELEMENT_CHECKBOX,     0,            0, "GUIEXT_EN_VSYNC",    0, {400, 250, 300, 30}, 1,  0, NULL, 0, 0, 0, {0}, 0},
 
     // 18
     { ELEMENT_TEXT,        0,            0, "GUIEXT_SSAA_MULT",            2, {20, 320, 140, 20},   1, 0, NULL,                        0, 0, 0, {0}, 0},
@@ -83,6 +83,7 @@ static jkGuiElement jkGuiDisplay_aElements[] = {
 	{ ELEMENT_PICBUTTON, 103,            0, NULL,                    33, { 510, 160, 24, 24 }, 1, 0, NULL, NULL, jkGuiDisplay_ColorDepthArrowButtonClickHandler, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
 	{ ELEMENT_PICBUTTON, 104,            0, NULL,                    34, { 584, 160, 24, 24 }, 1, 0, NULL, NULL, jkGuiDisplay_ColorDepthArrowButtonClickHandler, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
 
+	{ELEMENT_CHECKBOX,     0,            0, "GUIEXT_EN_DITHER",    0, {400, 190, 200, 30}, 1,  0, NULL, 0, 0, 0, {0}, 0},
 
     { ELEMENT_TEXTBUTTON,  GUI_ADVANCED, 2, "GUI_ADVANCED",               3, {220, 430, 200, 40}, 1, 0, NULL,                        0, 0, 0, {0}, 0},
 
@@ -257,6 +258,7 @@ int jkGuiDisplay_Show()
     jkGuiDisplay_aElements[14].selectedTextEntry = Window_isHiDpi;
     jkGuiDisplay_aElements[15].selectedTextEntry = jkPlayer_enableTextureFilter;
     jkGuiDisplay_aElements[16].selectedTextEntry = jkPlayer_enableOrigAspect;
+	jkGuiDisplay_aElements[28].selectedTextEntry = jkPlayer_enableDithering;
 
     jkGuiDisplay_aElements[17].selectedTextEntry = jkPlayer_enableVsync;
 
@@ -283,6 +285,7 @@ continue_menu:
         jkPlayer_enableTextureFilter = jkGuiDisplay_aElements[15].selectedTextEntry;
         jkPlayer_enableOrigAspect = jkGuiDisplay_aElements[16].selectedTextEntry;
         jkPlayer_enableVsync = jkGuiDisplay_aElements[17].selectedTextEntry;
+		jkPlayer_enableDithering = jkGuiDisplay_aElements[28].selectedTextEntry;
 
         char tmp[256];
         stdString_WcharToChar(tmp, render_level, 255);

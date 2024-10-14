@@ -87,6 +87,7 @@ uniform vec4 fillColor;
 
 uniform int  lightMode;
 uniform int  geoMode;
+uniform int  ditherMode;
 
 uniform vec3 ambientColor;
 uniform vec4 ambientSH[3];
@@ -117,7 +118,7 @@ uniform sharedBlock
 
 	float colorEffects_fade;
 	float light_mult;
-	uint  enableDither;
+	uint  pad0;
 	uint  pad1;
 
 	vec2  clusterTileSizes;
@@ -1005,20 +1006,20 @@ void main(void)
     fragColor = main_color;
 
 	// dither the output in case we're using some lower precision output
-	//if(enableDither > 0)
-	//{
-	//	const float DITHER_LUT[16] = float[16](
-	//			0, 4, 1, 5,
-	//			6, 2, 7, 3,
-	//			1, 5, 0, 4,
-	//			7, 3, 6, 2
-	//	);	
-	//
-	//	int wrap_x = int(gl_FragCoord.x) & 3;
-	//	int wrap_y = int(gl_FragCoord.y) & 3;
-	//	int wrap_index = wrap_x + wrap_y * 4;
-	//	fragColor.rgb = min(fragColor.rgb + DITHER_LUT[wrap_index] / 255.0, vec3(1.0));
-	//}
+	if(ditherMode == 1)
+	{
+		const float DITHER_LUT[16] = float[16](
+				0, 4, 1, 5,
+				6, 2, 7, 3,
+				1, 5, 0, 4,
+				7, 3, 6, 2
+		);	
+	
+		int wrap_x = int(gl_FragCoord.x) & 3;
+		int wrap_y = int(gl_FragCoord.y) & 3;
+		int wrap_index = wrap_x + wrap_y * 4;
+		fragColor.rgb = min(fragColor.rgb + DITHER_LUT[wrap_index] / 255.0, vec3(1.0));
+	}
 
 #ifndef ALPHA_BLEND
     fragColorEmiss = emissive;

@@ -561,6 +561,7 @@ void sithRender_Draw()
 	else
 		rdDisable(RD_DECALS);
 	rdDepthRange(0.0f, 1.0f);
+	rdDitherMode(jkPlayer_enableDithering ? RD_DITHER_4x4 : RD_DITHER_NONE);
 	rdClearLights();
 	rdClearOccluders();
 	rdClearDecals();
