@@ -27,7 +27,7 @@
 //#define LIGHTSABER_GLOW    // visual enhancement for lightsabers, draws a sprite-based glow similar to Jedi Outcast/Academy
 #define STATIC_JKL_EXT       // load extra .jkl files from resources on startup along side static.jkl
 #define VERTEX_COLORS        // add vertex color face flag to indicate using the rdProcEntry's color field as the vertex color
-//#define FOG                  // infernal machine style fog rendering
+#define FOG                  // infernal machine style fog rendering
 
 // helper to avoid redundantly checking this constantly
 #ifdef SPECULAR_LIGHTING

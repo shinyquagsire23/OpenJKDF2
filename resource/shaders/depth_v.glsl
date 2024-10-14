@@ -17,6 +17,7 @@ out float f_depth;
 uniform mat4 modelMatrix;
 uniform int uv_mode;
 
+uniform vec2 texsize;
 uniform int texgen;
 uniform vec4 texgen_params;
 uniform vec2 uv_offset;
@@ -65,7 +66,7 @@ bool ceiling_intersect(vec3 pos, vec3 dir, vec3 normal, vec3 center, inout float
 	return false;
 }
 
-vec2 do_ceiling_uv(vec4 view_pos, vec3 world_pos, inout vec4 clip_pos)
+vec2 do_ceiling_uv(inout vec4 viewPos, vec3 world_pos, inout vec4 clip_pos)
 {
 	mat4 invMat = inverse(modelMatrix); // fixme: expensive + only works when model component is identity
 	vec3 cam_pos   = (invMat * vec4(0, 0, 0, 1)).xyz;
@@ -80,6 +81,8 @@ vec2 do_ceiling_uv(vec4 view_pos, vec3 world_pos, inout vec4 clip_pos)
 
     vec3 sky_pos = tmp * ray_dir + cam_pos;
 	
+	viewPos.y = sky_pos.y;
+
 	vec2 uv = sky_pos.xy * 16.0;
 
 	vec4 proj_sky = projMatrix * modelMatrix * vec4(sky_pos.xyz, 1.0);
@@ -87,12 +90,12 @@ vec2 do_ceiling_uv(vec4 view_pos, vec3 world_pos, inout vec4 clip_pos)
 	clip_pos.z = (proj_sky.z / proj_sky.w) * clip_pos.w;
 	//clip_pos.z = clip_pos.w - 0.25/64.0;
 	
-	return (uv + uv_offset.xy) / 128.0; // todo: from mat
+	return (uv + uv_offset.xy) / texsize.xy;
 }
 
-vec2 do_horizon_uv(inout vec4 clip_pos)
+vec2 do_horizon_uv(inout vec4 viewPos, inout vec4 clip_pos)
 {
-	vec2 projXY = vec2(0.5, 0.5) * clip_pos.xy;
+	vec2 projXY = vec2(0.5,-0.5) * clip_pos.xy;
 	projXY = projXY.xy * iResolution.xy * (texgen_params.x / clip_pos.w);
 
 	vec2 uv;
@@ -101,8 +104,9 @@ vec2 do_horizon_uv(inout vec4 clip_pos)
 	
 	clip_pos.z = clip_pos.w - 0.25/64.0;
 	
-	return (uv + uv_offset.xy) / 128.0; // todo: from mat
+	return (uv + uv_offset.xy) / texsize.xy;
 }
+
 
 void main(void)
 {
@@ -118,7 +122,7 @@ void main(void)
 	f_uv_affine = v_uv.xy;
 
 	if(texgen == 1) // 1 = RD_TEXGEN_HORIZON
-		f_uv.xy = f_uv_affine = do_horizon_uv(gl_Position);
+		f_uv.xy = f_uv_affine = do_horizon_uv(viewPos, gl_Position);
 	else if(texgen == 2) // 2 = RD_TEXGEN_CEILING
 		f_uv.xy = f_uv_affine = do_ceiling_uv(viewPos, coord3d.xyz, gl_Position);
 

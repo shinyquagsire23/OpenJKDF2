@@ -70,6 +70,7 @@ enum RD_CAPS
 	RD_LIGHTING = 0x1,
 	RD_SHADOWS  = 0x2,
 	RD_DECALS   = 0x4,
+	RD_FOG      = 0x8,
 };
 
 typedef uint8_t rdBlendMode_t;

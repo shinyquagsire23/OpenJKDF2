@@ -996,12 +996,14 @@ void main(void)
 #ifdef FOG
 	if(fogEnabled > 0)
 	{
-		float fog_amount = clamp((originalZ - fogStart) / (fogEnd - fogStart), 0.0, 1.0);
+		float distToCam = length(-f_coord.xyz);
+		float fog_amount = clamp((distToCam - fogStart) / (fogEnd - fogStart), 0.0, 1.0);
 		fog_amount *= fogColor.a;
 
 		main_color.rgb = mix(main_color.rgb, fogColor.rgb, fog_amount);
+		emissive.rgb = mix(emissive.rgb, emissive.rgb, fog_amount);
 	}
-	#endif
+#endif
 
     fragColor = main_color;
 

@@ -103,6 +103,10 @@ void rdPreMultiplyMatrix(const rdMatrix44* pMatrix);
 void rdGetMatrix(rdMatrix44* pOut, rdMatrixMode_t mode);
 void rdResetMatrices();
 
+void rdFogRange(float startDepth, float endDepth);
+void rdFogColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+void rdFogColorf(float r, float g, float b, float a);
+
 void rdViewport(float x, float y, float width, float height, float minDepth, float maxDepth);
 void rdGetViewport(rdViewportRect* pOut);
 

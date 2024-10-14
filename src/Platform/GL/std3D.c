@@ -1200,10 +1200,10 @@ int std3D_loadWorldStage(std3D_worldStage* pStage, int isZPass, const char* defi
 	pStage->uniform_renderCaps = std3D_tryFindUniform(pStage->program, "renderCaps");
 	pStage->uniform_displacement_factor = std3D_tryFindUniform(pStage->program, "displacement_factor");
 #ifdef FOG
-	pStage->uniform_fog = std3D_tryFindUniform(drawcall_program, "fogEnabled");
-	pStage->uniform_fog_color = std3D_tryFindUniform(drawcall_program, "fogColor");
-	pStage->uniform_fog_start = std3D_tryFindUniform(drawcall_program, "fogStart");
-	pStage->uniform_fog_end = std3D_tryFindUniform(drawcall_program, "fogEnd");
+	pStage->uniform_fog = std3D_tryFindUniform(pStage->program, "fogEnabled");
+	pStage->uniform_fog_color = std3D_tryFindUniform(pStage->program, "fogColor");
+	pStage->uniform_fog_start = std3D_tryFindUniform(pStage->program, "fogStart");
+	pStage->uniform_fog_end = std3D_tryFindUniform(pStage->program, "fogEnd");
 #endif
 	pStage->uniform_lightbuf = std3D_tryFindUniform(pStage->program, "clusterBuffer");
 	pStage->uniform_shared = glGetUniformBlockIndex(pStage->program, "sharedBlock");
@@ -5561,6 +5561,16 @@ void std3D_SetRasterState(std3D_worldStage* pStage, std3D_RasterState* pRasterSt
 
 	glUniform1i(pStage->uniform_geo_mode, pRasterState->geoMode);
 	glUniform1i(pStage->uniform_ditherMode, pRasterState->ditherMode);
+
+	glUniform1i(pStage->uniform_fog, pRasterState->fog);
+	glUniform1f(pStage->uniform_fog_start, pRasterState->fogStart);
+	glUniform1f(pStage->uniform_fog_end, pRasterState->fogEnd);
+
+	float a = ((pRasterState->fogColor >> 24) & 0xFF) / 255.0f;
+	float r = ((pRasterState->fogColor >> 16) & 0xFF) / 255.0f;
+	float g = ((pRasterState->fogColor >> 8) & 0xFF) / 255.0f;
+	float b = ((pRasterState->fogColor >> 0) & 0xFF) / 255.0f;
+	glUniform4f(pStage->uniform_fog_color, r, g, b, a);
 
 	//rdVertexColorMode_t colorMode;
 }

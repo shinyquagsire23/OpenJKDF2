@@ -874,6 +874,11 @@ typedef struct std3D_RasterState
 	rdScissorMode_t     scissorMode;
 	rdScissorRect       scissor;
 	rdViewportRect      viewport;
+	// should this even be here?
+	int                 fog;
+	uint32_t            fogColor;
+	float               fogStart;
+	float               fogEnd;
 } std3D_RasterState;
 
 typedef struct std3D_BlendState
