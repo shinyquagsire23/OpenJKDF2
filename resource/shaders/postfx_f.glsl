@@ -22,7 +22,7 @@ void main(void)
 	{
 		float ar = iResolution.x / iResolution.y;
 		vec2 cycle = vec2(1.0, ar) * 3.141592 * 5.0;
-		vec2 amp = vec2(1.0, ar) / 300.0;
+		vec2 amp = vec2(1.0, ar) * 0.5 / 300.0;
 		uv = uv.xy + (sin(uv.yx * cycle.xy + param1) * amp.xy) * (1.0 - amp.xy * 2.0) + amp.xy;
 	}
 
