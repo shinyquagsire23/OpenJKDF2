@@ -1,23 +1,33 @@
 # This fork
 This fork introduces a variety of new features and experiments. Among them (not all enabled by default):
 
-Rendering:
-- Fog (Infernal Machine style)
+Rendering (General):
+- Fog (Infernal Machine style), requires JKL version 2.0 to use
+- Underwater distortion PostFX 
 - Specular lighting (RD_LIGHTMODE_SPECULAR)
-- Half Lambert diffuse for dynamic lights to soften low poly model shading
-- Stencil buffering to mark dynamic objects
-- Early attempt at GPU vertex/pixel lighting
 - RGB thing lights (lightcolor template param for things), including lightsaber colored lighting derived from the saber material
-- RGB ambient lighting, including directional ambient cube for gouraud shaded models
-- Optimized GBuffer using reconstructed position and smaller formats (16/32 bit options for color/depth, octahedron encoded normals, 2-3x bandwidth savings)
-- Deferred decal rendering (new .dcal file to specify decals, decal template param for things)
-- Deferred AO shadows (via "capsule" style sphere occluders)
-- Deferred particle lights
+- RGB ambient lighting, including directional ambient and specular
+- Decal rendering (new .dcal file to specify decals, decal template param for things)
+- AO shadows (via "capsule" style sphere occluders)
+- Dynamic particle lights
 - Faster downsample based bloom/glow
-- New SSAO with less halos
 - Additive blending face flag
 - Vertex color tinting
 - Reworked emissives to better match OG JK (using max() rather than add for non-bloom case)
+
+Render Droid 2:
+- Completely new render pipeline that moves transform and lighting to the GPU
+- Clustered forward rendering, with per pixel lighting, decals and AO/shadow support (just like the old deferred path, but works on transparencies and will work with MSAA once implemented).
+- Quadrilinear texturing for polylines
+- Custom UV behavior, currently only ceiling and horizon sky, but for future spheremaps and others
+- Emissive surface flag, generates a point light at the surface for dynamic lighting (ex. breakable neon signs)
+
+Deprecated Pipeline:
+- Half Lambert diffuse for dynamic lights to soften low poly model shading
+- Stencil buffering to mark dynamic objects
+- Optimized GBuffer using reconstructed position and smaller formats (16/32 bit options for color/depth, octahedron encoded normals, 2-3x bandwidth savings)
+- New SSAO with less halos
+- Particle lights are flat face normals only due to old pipeline limitations
 
 Gameplay:
 - First person legs
