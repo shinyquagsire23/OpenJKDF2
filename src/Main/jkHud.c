@@ -615,6 +615,16 @@ void jkHud_Draw()
     )
 
     {
+#ifdef DYNAMIC_POV
+	// draw crosshair on projected position
+		v20 = (double)Video_format.height * (0.0015625 / 3.0) * jkPlayer_crosshairScale;
+		double tex_w = jkHud_pCrosshair->mipSurfaces[0]->format.width;
+		double tex_h = jkHud_pCrosshair->mipSurfaces[0]->format.height;
+		v21 = v20 * (64.0f / tex_h);
+		v20 *= (64.0f / tex_w);
+		//std3D_DrawUIBitmapRGBA(jkHud_pCrosshair, 0, jkPlayer_crosshairPos.x - tex_w * v20 / 2.0, jkPlayer_crosshairPos.y - tex_h * v20 / 2.0, NULL, v20, v20, 1, 0xFF, 0xFF, 0xFF, 0x0);
+		stdDisplay_VBufferCopy(*jkHud_pCrosshair->mipSurfaces, jkHud_pCrosshair->mipSurfaces[0], jkPlayer_crosshairPos.x - tex_w * v20 / 2.0, jkPlayer_crosshairPos.y - tex_h * v20 / 2.0, 0, 1);
+#else
         uint32_t tmpInt;
 #ifdef QOL_IMPROVEMENTS
         // Scale crosshair with vertical resolution, not horizontal.
@@ -645,6 +655,7 @@ void jkHud_Draw()
         rdPrimit2_DrawClippedLine(Video_pCanvas, v22 + v25, v23,       v22 + v24, v23,       tmpInt, -1);
         rdPrimit2_DrawClippedLine(Video_pCanvas, v22,       v23 - v24, v22,       v23 - v25, tmpInt, -1);
         rdPrimit2_DrawClippedLine(Video_pCanvas, v22,       v23 + v25, v22,       v23 + v24, tmpInt, -1);
+#endif
     }
 
     rdScreenPoint tmpScreenPt;
