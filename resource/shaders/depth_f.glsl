@@ -171,7 +171,7 @@ vec2 parallax_mapping(vec2 tc, vec3 vp_normal, vec3 adjusted_coords)
 vec4 bilinear_paletted(vec2 uv)
 {
 	float mip = impl_textureQueryLod(tex, uv);
-	mip += float(compute_mip_lod(f_coord.y));
+	mip += compute_mip_bias(f_coord.y);
 	mip = min(mip, float(numMips - 1));
 
 	ivec2 ires = textureSize( tex, int(mip) );
