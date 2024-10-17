@@ -339,12 +339,12 @@ int rdParticle_Draw(rdThing* thing, rdMatrix34* mat)
 	rdSetTexMode(RD_TEXTUREMODE_AFFINE);
 
 #ifdef RGB_AMBIENT
-	if (rdroid_curRenderOptions & 2)
+	if (rdroid_curRenderOptions & RD_USE_AMBIENT_LIGHT)
 		rdAmbientLight(rdCamera_pCurCamera->ambientLight.x, rdCamera_pCurCamera->ambientLight.y, rdCamera_pCurCamera->ambientLight.z);
 	else
 		rdAmbientLight(0, 0, 0);
 #else
-	if (rdroid_curRenderOptions & 2)
+	if (rdroid_curRenderOptions & RD_USE_AMBIENT_LIGHT)
 		rdAmbientLight(rdCamera_pCurCamera->ambientLight, rdCamera_pCurCamera->ambientLight, rdCamera_pCurCamera->ambientLight);
 	else
 		rdAmbientLight(0, 0, 0);
@@ -458,13 +458,13 @@ int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
     {
         rdMatrix_Multiply34(&out, &rdCamera_pCurCamera->view_matrix, matrix_4_3);
 #ifdef RGB_AMBIENT
-		if (rdroid_curRenderOptions & 2)
+		if (rdroid_curRenderOptions & RD_USE_AMBIENT_LIGHT)
 			rdVector_Copy3(&matrix_4_3a, &rdCamera_pCurCamera->ambientLight);
 		else
 			rdVector_Zero3(&matrix_4_3a);
 		if (matrix_4_3a.x < 1.0 || matrix_4_3a.y < 1.0 || matrix_4_3a.z < 1.0)
 #else
-		if ( rdroid_curRenderOptions & 2 )
+		if ( rdroid_curRenderOptions & RD_USE_AMBIENT_LIGHT)
             matrix_4_3a = rdCamera_pCurCamera->ambientLight;
         else
             matrix_4_3a = 0.0;

@@ -52,6 +52,14 @@ enum RD_ZBUFFERMETHOD
     RD_ZBUFFER_READ_NOWRITE = 3,
 };
 
+typedef int32_t rdOptions_t;
+enum RD_OPTIONS
+{
+	RD_BACKFACE_CULLING  = 0x1,
+	RD_USE_AMBIENT_LIGHT = 0x2,
+	RD_CLEAR_BUFFERS     = 0x100,
+};
+
 #ifdef DECAL_RENDERING
 enum RD_DECAL_FLAGS
 {

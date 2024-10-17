@@ -1271,9 +1271,9 @@ int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
 
 #ifndef RENDER_DROID2
 #ifdef RGB_AMBIENT
-	if (rdroid_curRenderOptions & 2 && rdCamera_pCurCamera->ambientLight.x >= 1.0 && rdCamera_pCurCamera->ambientLight.y >= 1.0 && rdCamera_pCurCamera->ambientLight.z >= 1.0)
+	if (rdroid_curRenderOptions & RD_USE_AMBIENT_LIGHT && rdCamera_pCurCamera->ambientLight.x >= 1.0 && rdCamera_pCurCamera->ambientLight.y >= 1.0 && rdCamera_pCurCamera->ambientLight.z >= 1.0)
 #else
-    if ( rdroid_curRenderOptions & 2 && rdCamera_pCurCamera->ambientLight >= 1.0 )
+    if ( rdroid_curRenderOptions & RD_USE_AMBIENT_LIGHT && rdCamera_pCurCamera->ambientLight >= 1.0 )
 #endif
     {
         curLightingMode = RD_LIGHTMODE_FULLYLIT;
@@ -1554,7 +1554,7 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
            + (localCamera.z - pCurMesh->vertices[*face->vertexPosIdx].z) * face->normal.z <= 0.0 )
         {
             flags = 1;
-            if ( !(face->type & 1) && rdroid_curRenderOptions & 1 )
+            if ( !(face->type & RD_FF_DOUBLE_SIDED) && (rdroid_curRenderOptions & RD_BACKFACE_CULLING) )
             {
                 ++face;
                 continue;
@@ -1612,7 +1612,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
 
 	rdVector3 ambientLight;
 #ifdef RGB_AMBIENT
-	if (rdroid_curRenderOptions & 2)
+	if (rdroid_curRenderOptions & RD_USE_AMBIENT_LIGHT)
 		rdVector_Copy3(&ambientLight, &rdCamera_pCurCamera->ambientLight);
 	else
 		rdVector_Zero3(&ambientLight);
@@ -1623,7 +1623,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
 		rdVector_Scale3Acc(&ambientLight, 0.35f);
 #else
 	
-	if (rdroid_curRenderOptions & 2)
+	if (rdroid_curRenderOptions & RD_USE_AMBIENT_LIGHT)
 		ambientLight.x = ambientLight.y = ambientLight.z = rdCamera_pCurCamera->ambientLight;
 	else
 		ambientLight.x = ambientLight.y = ambientLight.z = 0.0;
@@ -1788,7 +1788,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
     rdCamera_pCurCamera->fnProjectLst(vertexDst.verticesOrig, vertexDst.verticesProjected, vertexDst.numVertices);
 
 #ifdef RGB_AMBIENT
-	if (rdroid_curRenderOptions & 2)
+	if (rdroid_curRenderOptions & RD_USE_AMBIENT_LIGHT)
 		rdVector_Copy3(&procEntry->ambientLight, &rdCamera_pCurCamera->ambientLight);
 	else
 		rdVector_Zero3(&procEntry->ambientLight);
@@ -1799,7 +1799,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
 		rdVector_Scale3Acc(&procEntry->ambientLight, 0.35f);
 
 #else
-    if ( rdroid_curRenderOptions & 2 )
+    if ( rdroid_curRenderOptions & RD_USE_AMBIENT_LIGHT)
         procEntry->ambientLight = rdCamera_pCurCamera->ambientLight;
     else
         procEntry->ambientLight = 0.0;

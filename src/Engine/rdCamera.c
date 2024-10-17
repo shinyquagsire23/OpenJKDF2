@@ -471,7 +471,7 @@ void rdCamera_AdvanceFrame()
     rdRect a4; // [esp+0h] [ebp-10h] BYREF
 
     v0 = rdCamera_pCurCamera->canvas;
-    if ( (rdroid_curRenderOptions & 0x100) != 0 && (v0->bIdk & 2) != 0 )
+    if ( (rdroid_curRenderOptions & RD_CLEAR_BUFFERS) != 0 && (v0->bIdk & 2) != 0 )
     {
         if ( rdroid_curAcceleration <= 0 )
         {

@@ -397,12 +397,12 @@ int rdCache_SendFaceListToHardware()
         flags_idk_ = flags_idk;
 
 #ifdef RGB_AMBIENT
-		if ((rdroid_curRenderOptions & 2) != 0)
+		if ((rdroid_curRenderOptions & RD_USE_AMBIENT_LIGHT) != 0)
 			rdVector_Copy3(&v148, &active_6c->ambientLight);
 		else
 			rdVector_Zero3(&v148);
 #else
-        if ( (rdroid_curRenderOptions & 2) != 0 )
+        if ( (rdroid_curRenderOptions & RD_USE_AMBIENT_LIGHT) != 0 )
             v148 = active_6c->ambientLight;
         else
             v148 = 0.0;
