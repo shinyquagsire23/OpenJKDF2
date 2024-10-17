@@ -296,7 +296,8 @@ static uint32_t std3D_clusterBits[CLUSTER_GRID_TOTAL_SIZE];
 
 // todo: indexing
 #define STD3D_MAX_DRAW_CALLS 8192
-#define STD3D_MAX_DRAW_CALL_VERTS (STD3D_MAX_DRAW_CALLS * 66)
+#define STD3D_MAX_DRAW_CALL_VERTS (STD3D_MAX_DRAW_CALLS * 24)
+#define STD3D_MAX_DRAW_CALL_INDICES (STD3D_MAX_DRAW_CALLS * 66)
 
 typedef enum STD3D_DRAW_LIST
 {
@@ -310,9 +311,11 @@ typedef enum STD3D_DRAW_LIST
 
 typedef struct std3D_DrawCallList
 {
-	size_t         drawCallCount;
-	size_t         drawCallVertexCount;
+	uint32_t       drawCallCount;
+	uint32_t       drawCallIndexCount;
+	uint32_t       drawCallVertexCount;
 	std3D_DrawCall drawCalls[STD3D_MAX_DRAW_CALLS];
+	uint16_t       drawCallIndices[STD3D_MAX_DRAW_CALL_INDICES];
 	D3DVERTEX      drawCallVertices[STD3D_MAX_DRAW_CALL_VERTS];
 } std3D_DrawCallList;
 
@@ -1387,6 +1390,8 @@ void std3D_setupDrawCallVAO(std3D_worldStage* pStage)
 {
 	glGenVertexArrays(1, &pStage->vao);
 	glBindVertexArray(pStage->vao);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, world_ibo_triangle);
 
 	// Describe our vertices array to OpenGL (it can't guess its format automatically)
 	glBindBuffer(GL_ARRAY_BUFFER, world_vbo_all);
@@ -5333,25 +5338,69 @@ int std3D_GetShaderID(std3D_DrawCallState* pState)
 	return SHADER_COLOR_UNLIT + lighting + specular;
 }
 
-void std3D_AddListDrawCall(std3D_DrawCallList* pList, std3D_DrawCallState* pDrawCallState, D3DVERTEX* paVertices, int numVertices)
+void std3D_AddListVertices(std3D_DrawCall* pDrawCall, rdPrimitiveType_t type, std3D_DrawCallList* pList, D3DVERTEX* paVertices, int numVertices)
 {
-	if (pList->drawCallCount + 1 > STD3D_MAX_DRAW_CALLS)
-		return; // todo: flush here?
+	int firstIndex = pList->drawCallIndexCount;
+	int firstVertex = pList->drawCallVertexCount;
 
-	if (pList->drawCallVertexCount + numVertices > STD3D_MAX_DRAW_CALL_VERTS)
-		return; // todo: flush here?
-
-	std3D_DrawCall* pDrawCall = &pList->drawCalls[pList->drawCallCount++];
-	pDrawCall->sortKey = std3D_GetSortKey(pDrawCallState);
-	pDrawCall->state = *pDrawCallState;
-	pDrawCall->firstVertex = pList->drawCallVertexCount;
-	pDrawCall->numVertices = numVertices;
-
-	memcpy(&pList->drawCallVertices[pList->drawCallVertexCount], paVertices, sizeof(D3DVERTEX) * numVertices);
+	// copy the vertices
+	memcpy(&pList->drawCallVertices[firstVertex], paVertices, sizeof(D3DVERTEX) * numVertices);
 	pList->drawCallVertexCount += numVertices;
+
+	// generate indices
+	if (numVertices <= 3)
+	{
+		// single triangle fast path
+		pList->drawCallIndices[pList->drawCallIndexCount++] = firstVertex + 0;
+		pList->drawCallIndices[pList->drawCallIndexCount++] = firstVertex + 1;
+		pList->drawCallIndices[pList->drawCallIndexCount++] = firstVertex + 2;
+	}
+	else if (type == RD_PRIMITIVE_TRIANGLES)
+	{
+		// generate triangle indices directly
+		int tris = numVertices / 3;
+		for (int i = 0; i < tris; ++i)
+		{
+			pList->drawCallIndices[pList->drawCallIndexCount++] = firstVertex + i + 0;
+			pList->drawCallIndices[pList->drawCallIndexCount++] = firstVertex + i + 1;
+			pList->drawCallIndices[pList->drawCallIndexCount++] = firstVertex + i + 2;
+		}
+	}
+	else if (type == RD_PRIMITIVE_TRIANGLE_FAN)
+	{
+		// build indices from a single corner vertex
+		int tris = numVertices - 2;
+		for (int i = 0; i < tris; i++)
+		{
+			pList->drawCallIndices[pList->drawCallIndexCount++] = firstVertex + 0;
+			pList->drawCallIndices[pList->drawCallIndexCount++] = firstVertex + i + 1;
+			pList->drawCallIndices[pList->drawCallIndexCount++] = firstVertex + i + 2;
+		}
+	}
+	else if (type == RD_PRIMITIVE_POLYGON)
+	{
+		// build indices through simple triangulation
+		int tris = numVertices - 2;
+		int i1 = 0;
+		int i2 = 1;
+		int i3 = numVertices - 1;
+		for (int i = 0; i < tris; ++i)
+		{
+			pList->drawCallIndices[pList->drawCallIndexCount++] = firstVertex + i1;
+			pList->drawCallIndices[pList->drawCallIndexCount++] = firstVertex + i2;
+			pList->drawCallIndices[pList->drawCallIndexCount++] = firstVertex + i3;
+			if ((i & 1) != 0)
+				i1 = i3--;
+			else
+				i1 = i2++;
+		}
+	}
+
+	pDrawCall->firstIndex = firstIndex;
+	pDrawCall->numIndices = pList->drawCallIndexCount - firstIndex;
 }
 
-void std3D_AddZListDrawCall(std3D_DrawCallList* pList, std3D_DrawCallState* pDrawCallState, D3DVERTEX* paVertices, int numVertices)
+void std3D_AddListDrawCall(rdPrimitiveType_t type, std3D_DrawCallList* pList, std3D_DrawCallState* pDrawCallState, D3DVERTEX* paVertices, int numVertices)
 {
 	if (pList->drawCallCount + 1 > STD3D_MAX_DRAW_CALLS)
 		return; // todo: flush here?
@@ -5362,8 +5411,21 @@ void std3D_AddZListDrawCall(std3D_DrawCallList* pList, std3D_DrawCallState* pDra
 	std3D_DrawCall* pDrawCall = &pList->drawCalls[pList->drawCallCount++];
 	pDrawCall->sortKey = std3D_GetSortKey(pDrawCallState);
 	pDrawCall->state = *pDrawCallState;
-	pDrawCall->firstVertex = pList->drawCallVertexCount;
-	pDrawCall->numVertices = numVertices;
+
+	std3D_AddListVertices(pDrawCall, type, pList, paVertices, numVertices);
+}
+
+void std3D_AddZListDrawCall(rdPrimitiveType_t type, std3D_DrawCallList* pList, std3D_DrawCallState* pDrawCallState, D3DVERTEX* paVertices, int numVertices)
+{
+	if (pList->drawCallCount + 1 > STD3D_MAX_DRAW_CALLS)
+		return; // todo: flush here?
+
+	if (pList->drawCallVertexCount + numVertices > STD3D_MAX_DRAW_CALL_VERTS)
+		return; // todo: flush here?
+
+	std3D_DrawCall* pDrawCall = &pList->drawCalls[pList->drawCallCount++];
+	pDrawCall->sortKey = std3D_GetSortKey(pDrawCallState);
+	pDrawCall->state = *pDrawCallState;
 	pDrawCall->state.shaderID = pDrawCallState->texture.alphaTest ? SHADER_DEPTH_ALPHATEST : SHADER_DEPTH;
 
 	// z lists can ignore these
@@ -5372,11 +5434,10 @@ void std3D_AddZListDrawCall(std3D_DrawCallList* pList, std3D_DrawCallState* pDra
 	if(!pDrawCallState->texture.alphaTest && pDrawCallState->texture.texGen == RD_TEXGEN_NONE) // non-alpha test with no texgen doesn't require textures
 		memset(&pDrawCall->state.texture, 0, sizeof(std3D_TextureState));
 
-	memcpy(&pList->drawCallVertices[pList->drawCallVertexCount], paVertices, sizeof(D3DVERTEX) * numVertices);
-	pList->drawCallVertexCount += numVertices;
+	std3D_AddListVertices(pDrawCall, type, pList, paVertices, numVertices);
 }
 
-void std3D_AddDrawCall(std3D_DrawCallState* pDrawCallState, D3DVERTEX* paVertices, int numVertices)
+void std3D_AddDrawCall(rdPrimitiveType_t type, std3D_DrawCallState* pDrawCallState, D3DVERTEX* paVertices, int numVertices)
 {
 	if (Main_bHeadless)
 		return;
@@ -5393,7 +5454,7 @@ void std3D_AddDrawCall(std3D_DrawCallState* pDrawCallState, D3DVERTEX* paVertice
 	int writesZ = std3D_HasDepthWrites(pDrawCallState);
 	if (pDrawCallState->blend.blendMode == RD_BLEND_MODE_NONE && writesZ)
 	{
-		std3D_AddZListDrawCall(&std3D_renderPasses[renderPass].drawCallLists[DRAW_LIST_Z + pDrawCallState->texture.alphaTest & 1], pDrawCallState, paVertices, numVertices);
+		std3D_AddZListDrawCall(type, &std3D_renderPasses[renderPass].drawCallLists[DRAW_LIST_Z + pDrawCallState->texture.alphaTest & 1], pDrawCallState, paVertices, numVertices);
 
 		// the forward pass can now do a simple equal test with no writes
 		pDrawCallState->depthStencil.zcompare = RD_COMPARE_EQUAL;
@@ -5412,7 +5473,7 @@ void std3D_AddDrawCall(std3D_DrawCallState* pDrawCallState, D3DVERTEX* paVertice
 		listIndex = blending ? DRAW_LIST_COLOR_ALPHABLEND : DRAW_LIST_COLOR_NOZPREPASS;
 	}
 
-	std3D_AddListDrawCall(&std3D_renderPasses[renderPass].drawCallLists[listIndex], pDrawCallState, paVertices, numVertices);
+	std3D_AddListDrawCall(type, &std3D_renderPasses[renderPass].drawCallLists[listIndex], pDrawCallState, paVertices, numVertices);
 }
 
 void std3D_ResetDrawCalls()
@@ -5422,6 +5483,7 @@ void std3D_ResetDrawCalls()
 		for (int i = 0; i < DRAW_LIST_COUNT; ++i)
 		{
 			std3D_renderPasses[j].drawCallLists[i].drawCallCount = 0;
+			std3D_renderPasses[j].drawCallLists[i].drawCallIndexCount = 0;
 			std3D_renderPasses[j].drawCallLists[i].drawCallVertexCount = 0;
 		}
 	}
@@ -5662,6 +5724,7 @@ void std3D_BindStage(std3D_worldStage* pStage)
 
 	glBindVertexArray(pStage->vao);
 	glBindBuffer(GL_ARRAY_BUFFER, world_vbo_all);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, world_ibo_triangle);
 
 	glUniform1i(pStage->uniform_tex_mode, TEX_MODE_TEST);
 	glUniform1i(pStage->uniform_tex, 0);
@@ -5692,20 +5755,19 @@ void std3D_FlushDrawCallList(std3D_RenderPass* pRenderPass, std3D_DrawCallList* 
 	if(sortFunc)
 		_qsort(pList->drawCalls, pList->drawCallCount, sizeof(std3D_DrawCall), (int(__cdecl*)(const void*, const void*))sortFunc);
 
-	// batching needs to follow the draw order, but vertex arrays might be disjointed
-	// build a sorted list of the vertices to ensure sequential vertex access during batch
-	// todo: generate an index buffer instead of copying vertices around
-	static D3DVERTEX std3D_drawCallVerticesSorted[STD3D_MAX_DRAW_CALL_VERTS];
-	D3DVERTEX* vertexArray = pList->drawCallVertices;
+	// batching needs to follow the draw order, but index array becomes disjointed after sorting
+	// build a sorted list of indices to ensure sequential access during batching
+	static uint16_t std3D_drawCallIndicesSorted[STD3D_MAX_DRAW_CALL_INDICES];
+	uint16_t* indexArray = pList->drawCallIndices;
 	if (sortFunc)
 	{
-		int drawCallVerticesCount = 0;
+		int drawCallIndexCount = 0;
 		for (int i = 0; i < pList->drawCallCount; ++i)
 		{
-			memcpy(&std3D_drawCallVerticesSorted[drawCallVerticesCount], &pList->drawCallVertices[pList->drawCalls[i].firstVertex], sizeof(D3DVERTEX) * pList->drawCalls[i].numVertices);
-			drawCallVerticesCount += pList->drawCalls[i].numVertices;
+			memcpy(&std3D_drawCallIndicesSorted[drawCallIndexCount], &pList->drawCallIndices[pList->drawCalls[i].firstIndex], sizeof(uint16_t) * pList->drawCalls[i].numIndices);
+			drawCallIndexCount += pList->drawCalls[i].numIndices;
 		}
-		vertexArray = std3D_drawCallVerticesSorted;
+		indexArray = std3D_drawCallIndicesSorted;
 	}
 
 	std3D_UpdateSharedUniforms();
@@ -5727,7 +5789,8 @@ void std3D_FlushDrawCallList(std3D_RenderPass* pRenderPass, std3D_DrawCallList* 
 	std3D_worldStage* pStage = &worldStages[pDrawCall->state.shaderID];
 
 	std3D_BindStage(pStage);
-	glBufferData(GL_ARRAY_BUFFER, pList->drawCallVertexCount * sizeof(D3DVERTEX), vertexArray, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, pList->drawCallVertexCount * sizeof(D3DVERTEX), pList->drawCallVertices, GL_STREAM_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, pList->drawCallIndexCount * sizeof(uint16_t), indexArray, GL_STREAM_DRAW);
 
 	int last_tex = pTexState->pTexture ? pTexState->pTexture->texture_id : blank_tex_white;
 	std3D_SetRasterState(pStage, pRasterState);
@@ -5744,8 +5807,8 @@ void std3D_FlushDrawCallList(std3D_RenderPass* pRenderPass, std3D_DrawCallList* 
 	glUniformMatrix4fv(pStage->uniform_modelMatrix, 1, GL_FALSE, (float*)&pDrawCall->state.modelView);
 
 	int do_batch = 0;
-	int batch_verts = 0;
-	int vertexOffset = 0;
+	int batchIndices = 0;
+	int indexOffset = 0;
 	for (int j = 0; j < pList->drawCallCount; j++)
 	{
 		pDrawCall = &pList->drawCalls[j];
@@ -5774,8 +5837,8 @@ void std3D_FlushDrawCallList(std3D_RenderPass* pRenderPass, std3D_DrawCallList* 
 
 		if (do_batch)
 		{
-			GLuint primitiveType = std3D_PrimitiveForGeoMode(lastState.raster.geoMode);
-			glDrawArrays(primitiveType, vertexOffset, batch_verts);
+			//glDrawArrays(std3D_PrimitiveForGeoMode(lastState.raster.geoMode), vertexOffset, batch_verts);
+			glDrawElements(std3D_PrimitiveForGeoMode(lastState.raster.geoMode), batchIndices, GL_UNSIGNED_SHORT, (void*)(indexOffset * sizeof(uint16_t)));
 
 			if (lastState.shaderID != pDrawCall->state.shaderID)
 			{
@@ -5812,17 +5875,17 @@ void std3D_FlushDrawCallList(std3D_RenderPass* pRenderPass, std3D_DrawCallList* 
 			last_proj = pDrawCall->state.proj;
 			lastState = pDrawCall->state;
 
-			vertexOffset += batch_verts;
-			batch_verts = 0;
+			indexOffset += batchIndices;
+			batchIndices = 0;
 
 			do_batch = 0;
 		}
 
-		batch_verts += pDrawCall->numVertices;
+		batchIndices += pDrawCall->numIndices;
 	}
 
-	if (batch_verts)
-		glDrawArrays(GL_TRIANGLES, vertexOffset, batch_verts);
+	if (batchIndices)
+		glDrawElements(std3D_PrimitiveForGeoMode(pDrawCall->state.raster.geoMode), batchIndices, GL_UNSIGNED_SHORT, (void*)(indexOffset * sizeof(uint16_t)));
 }
 
 // fixme: flush this when rdCache_Flush is called instead of trying to lump everything into a bunch of draw lists?

@@ -546,7 +546,7 @@ int rdBeginPrimitive(rdPrimitiveType_t type)
 	return 1;
 }
 
-extern void std3D_AddDrawCall(std3D_DrawCallState* pDrawCallState, D3DVERTEX* paVertices, int numVertices);
+extern void std3D_AddDrawCall(rdPrimitiveType_t type, std3D_DrawCallState* pDrawCallState, D3DVERTEX* paVertices, int numVertices);
 
 void rdEndPrimitive()
 {
@@ -582,25 +582,7 @@ void rdEndPrimitive()
 	//if (state.lighting.lightMode > rdroid_curLightingMode)
 	//	state.lighting.lightMode = rdroid_curLightingMode;
 
-	int numVertices = 0;
-	D3DVERTEX tmpVerts[66]; // todo: indexing
-	if (rdroid_curPrimitiveType == RD_PRIMITIVE_TRIANGLES)
-	{
-		numVertices = rdroid_vertexCacheNum;
-		memcpy(tmpVerts, rdroid_vertexCache, sizeof(D3DVERTEX) * rdroid_vertexCacheNum);
-	}
-	else
-	{
-		numVertices = 3 * (rdroid_vertexCacheNum - 2);
-		for (size_t i = 0; i < rdroid_vertexCacheNum - 2; i++)
-		{
-			tmpVerts[i * 3 + 0] = rdroid_vertexCache[0];
-			tmpVerts[i * 3 + 1] = rdroid_vertexCache[i + 1];
-			tmpVerts[i * 3 + 2] = rdroid_vertexCache[i + 2];
-		}
-	}
-
-	std3D_AddDrawCall(&state, tmpVerts, numVertices);
+	std3D_AddDrawCall(rdroid_curPrimitiveType, &state, rdroid_vertexCache, rdroid_vertexCacheNum);
 
 	rdroid_vertexCacheNum = 0;
 	rdroid_vertexColorState = 0xFFFFFFFF;

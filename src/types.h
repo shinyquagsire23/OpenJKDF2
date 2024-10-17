@@ -935,8 +935,8 @@ typedef struct std3D_DrawCallState
 typedef struct std3D_DrawCall
 {
 	uint64_t            sortKey;       // sort key
-	int                 firstVertex;   // number of vertices in the vertex array
-	int                 numVertices;   // number of vertices in the vertex array
+	int                 firstIndex;    // first index in index array
+	int                 numIndices;    // number of indices in index array
 	std3D_DrawCallState state;
 } std3D_DrawCall;
 #endif

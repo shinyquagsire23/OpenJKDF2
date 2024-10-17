@@ -144,7 +144,7 @@ void std3D_ClearLights();
 int std3D_AddLight(rdLight* light, rdVector3* viewPosition);
 void std3D_ClearOccluders();
 void std3D_ClearDecals();
-void std3D_AddDrawCall(std3D_DrawCallState* pDrawCallState, D3DVERTEX* paVertices, int numVertices);
+void std3D_AddDrawCall(rdPrimitiveType_t type, std3D_DrawCallState* pDrawCallState, D3DVERTEX* paVertices, int numVertices);
 void std3D_ResetDrawCalls();
 void std3D_FlushDrawCalls();
 void std3D_SetRenderPassFlags(int8_t renderPass, rdRenderPassFlags_t renderPassFlags);
