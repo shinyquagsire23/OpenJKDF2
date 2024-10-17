@@ -5527,7 +5527,7 @@ void std3D_UpdateSharedUniforms()
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(std3D_SharedUniforms), &uniforms);
 }
 
-void std3D_SetTexture(std3D_worldStage* pStage, rdDDrawSurface* pTexture)
+void std3D_SetTexture(std3D_worldStage* pStage, std3D_TextureState* pTexState, rdDDrawSurface* pTexture)
 {
 	if (!pTexture)
 	{
@@ -5574,7 +5574,7 @@ void std3D_SetTexture(std3D_worldStage* pStage, rdDDrawSurface* pTexture)
 		glUniform1f(pStage->uniform_displacement_factor, pTexture->displacement_factor);
 		glActiveTexture(GL_TEXTURE0 + 0);
 
-		if (!jkPlayer_enableTextureFilter)
+		if (!jkPlayer_enableTextureFilter || (pTexState->texFilter == RD_TEXFILTER_NEAREST))
 			glUniform1i(pStage->uniform_tex_mode, pTexture->is_16bit ? TEX_MODE_16BPP : TEX_MODE_WORLDPAL);
 		else
 			glUniform1i(pStage->uniform_tex_mode, pTexture->is_16bit ? TEX_MODE_BILINEAR_16BPP : TEX_MODE_BILINEAR);
@@ -5798,7 +5798,7 @@ void std3D_FlushDrawCallList(std3D_RenderPass* pRenderPass, std3D_DrawCallList* 
 	std3D_SetDepthStencilState(pDepthStencilState);
 	std3D_SetTextureState(pStage, pTexState);
 	std3D_SetLightingState(pStage, pLightState);
-	std3D_SetTexture(pStage, pRasterState->geoMode == RD_GEOMODE_TEXTURED ? pTexState->pTexture : NULL);
+	std3D_SetTexture(pStage, pTexState, pRasterState->geoMode == RD_GEOMODE_TEXTURED ? pTexState->pTexture : NULL);
 
 	rdMatrix44 last_mat = pDrawCall->state.modelView;
 	rdMatrix44 last_proj = pDrawCall->state.proj;
@@ -5851,7 +5851,7 @@ void std3D_FlushDrawCallList(std3D_RenderPass* pRenderPass, std3D_DrawCallList* 
 			std3D_SetDepthStencilState(pDepthStencilState);
 			std3D_SetTextureState(pStage, pTexState);
 			std3D_SetLightingState(pStage, pLightState);
-			std3D_SetTexture(pStage, pRasterState->geoMode == RD_GEOMODE_TEXTURED ? pTexState->pTexture : NULL);
+			std3D_SetTexture(pStage, pTexState, pRasterState->geoMode == RD_GEOMODE_TEXTURED ? pTexState->pTexture : NULL);
 
 			glUniform1ui(pStage->uniform_renderCaps, pDrawCall->state.renderCaps);
 			glUniformMatrix4fv(pStage->uniform_projection, 1, GL_FALSE, (float*)&pDrawCall->state.proj);

@@ -757,6 +757,11 @@ int rdBindMaterial(rdMaterial* pMaterial, int cel)
 	return 1;
 }
 
+void rdTexFilterMode(rdTexFilter_t texFilter)
+{
+	rdroid_textureState.texFilter = texFilter;
+}
+
 void rdTexGen(rdTexGen_t texGen)
 {
 	rdroid_textureState.texGen = texGen;

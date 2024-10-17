@@ -155,6 +155,13 @@ enum RD_TEXGEN
 	RD_TEXGEN_CEILING = 2,
 };
 
+typedef uint8_t rdTexFilter_t;
+enum RD_TEXFILTER
+{
+	RD_TEXFILTER_NEAREST  = 0,
+	RD_TEXFILTER_BILINEAR = 1,
+};
+
 typedef uint8_t rdRenderPassFlags_t;
 enum RD_RENDERPASS
 {

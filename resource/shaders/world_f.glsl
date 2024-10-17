@@ -724,12 +724,23 @@ vec2 parallax_mapping(vec2 tc)
     return adj_tc;
 }
 
-uint compute_mip_lod(float z_min)
+float compute_mip_bias(float z_min)
 {
-	uint mipmap_level = 0;
-	mipmap_level = z_min < mipDistances.x ? mipmap_level : 1;
-	mipmap_level = z_min < mipDistances.y ? mipmap_level : 2;
-	mipmap_level = z_min < mipDistances.z ? mipmap_level : 3;
+	float mipmap_level = 0.0;
+	mipmap_level = z_min < mipDistances.x ? mipmap_level : 1.0;
+	mipmap_level = z_min < mipDistances.y ? mipmap_level : 2.0;
+	mipmap_level = z_min < mipDistances.z ? mipmap_level : 3.0;
+
+	// dither the mip level
+	const mat4 bayerIndex = mat4(
+		vec4(00.0/16.0, 12.0/16.0, 03.0/16.0, 15.0/16.0),
+		vec4(08.0/16.0, 04.0/16.0, 11.0/16.0, 07.0/16.0),
+		vec4(02.0/16.0, 14.0/16.0, 01.0/16.0, 13.0/16.0),
+		vec4(10.0/16.0, 06.0/16.0, 09.0/16.0, 05.0/16.0)
+	);
+	ivec2 coord = ivec2(gl_FragCoord.xy);
+	mipmap_level += bayerIndex[coord.x & 3][coord.y & 3];
+
 	return mipmap_level;
 }
 
@@ -737,7 +748,7 @@ uint compute_mip_lod(float z_min)
 void bilinear_paletted(vec2 uv, out vec4 color, out vec4 emissive)
 {
 	float mip = impl_textureQueryLod(tex, uv);
-	mip += float(compute_mip_lod(f_coord.y));
+	mip += compute_mip_bias(f_coord.y);
 	mip = min(mip, float(numMips - 1));
 
 	ivec2 ires = textureSize( tex, int(mip) );
@@ -842,7 +853,7 @@ void main(void)
 	}
 
 	// software actually uses the zmin of the entire face
-	float mipBias = float(compute_mip_lod(f_coord.y));
+	float mipBias = compute_mip_bias(f_coord.y);
 	mipBias = min(mipBias, float(numMips - 1));
 
     vec4 sampled = texture(tex, adj_texcoords.xy, mipBias);

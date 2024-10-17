@@ -1118,6 +1118,7 @@ void sithRender_DrawSurface(sithSurface* surface)
 	}
 
 	rdSetTexMode(texMode);
+	rdTexFilterMode((surface->surfaceInfo.face.type & RD_FF_TEX_FILTER_NEAREST) ? RD_TEXFILTER_NEAREST : RD_TEXFILTER_BILINEAR);
 
 	if (sithRender_lightingIRMode)
 	{

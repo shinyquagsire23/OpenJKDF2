@@ -903,6 +903,7 @@ typedef struct std3D_TextureState
 	rdDDrawSurface*   pTexture;
 	rdVector2         texSize;
 	rdTexGen_t        texGen;
+	rdTexFilter_t     texFilter;
 	rdVector4         texGenParams;
 	rdVector2         texOffset;
 	uint32_t          numMips;

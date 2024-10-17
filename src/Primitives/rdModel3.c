@@ -1603,6 +1603,8 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
 	rdSetTexMode(textureMode);
 	rdSetLightMode(lightingMode);
 
+	rdTexFilterMode(face->type & RD_FF_TEX_FILTER_NEAREST ? RD_TEXFILTER_NEAREST : RD_TEXFILTER_BILINEAR);
+
 	int extraData = 0;
 #ifdef STENCIL_BUFFER
 	extraData |= 2; // mark stencil buffer
