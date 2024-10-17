@@ -355,13 +355,10 @@ vec3 SGIrradianceFitted(in SG lightingLobe, in vec3 normal)
 
 vec3 CalculateAmbientSpecular(vec3 normal, vec3 view, float roughness, vec3 f0)
 {
-	float m2 = roughness * roughness;
-	//float nDotV = clamp(dot(normal.xyz, view.xyz), 0.0, 1.0);
-
 	vec3 ambientSpecular = vec3(0.0);
 	for(int sg = 0; sg < 8; ++sg)
 	{
-		SG ndf = DistributionTermSG(normal, m2);
+		SG ndf = DistributionTermSG(normal, roughness);
 		SG warpedNDF = WarpDistributionSG(ndf, view);
 
 		SG lightSG;
@@ -377,13 +374,13 @@ vec3 CalculateAmbientSpecular(vec3 normal, vec3 view, float roughness, vec3 f0)
 		// no Geometry term
 
 		// Fresnel
-		//vec3 h = normalize(warpedNDF.Axis + view);
-		vec3 f = f0;// + (1.0 - f0) * exp2(-8.35 * max(0.0, dot(warpedNDF.Axis, h)));
+		vec3 h = normalize(warpedNDF.Axis + view);
+		vec3 f = f0 + (1.0 - f0) * exp2(-8.35 * max(0.0, dot(warpedNDF.Axis, h)));
 		//f *= clamp(dot(f0, vec3(333.0)), 0.0, 1.0); // fade out when spec is less than 0.1% albedo
 		
 		ambientSpecular.xyz = (spec * nDotL) * f + ambientSpecular.xyz;
 	}
-	return ambientSpecular;
+	return ambientSpecular;// * 3.141592;
 }
 
 // todo: split the spotlights out
@@ -477,8 +474,8 @@ void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, vec4 shad
 				diffuseLight += l.color.xyz * intensity * cd;
 
 				#ifdef SPECULAR
-					//vec3 h = normalize(diff + view);
-					vec3 f = f0;// + (1.0 - f0) * exp2(-8.35 * max(0.0, dot(diff, h)));
+					vec3 h = normalize(diff + view);
+					vec3 f = f0 + (1.0 - f0) * exp2(-8.35 * max(0.0, dot(diff, h)));
 					//f *= clamp(dot(f0, vec3(333.0)), 0.0, 1.0); // fade out when spec is less than 0.1% albedo
 					
 					float c = 0.72134752 * rcp_a2 + 0.39674113;
@@ -919,7 +916,7 @@ void main(void)
 
 #ifndef UNLIT
 	#ifdef SPECULAR
-		roughness = 0.05;
+		//roughness = 0.2;
 
 		// fill color is effectively an anti-metalness control
 		vec3 avgAlbedo = fillColor.xyz;
@@ -930,14 +927,13 @@ void main(void)
 		// blend to dielectric white when bright
 		specularColor = mix(sampled_color.xyz, vec3(0.5), avgAlbedo);
 		
-		//// try to estimate some roughness variation from the texture
-		//vec3 normalizedColor = min(vec3(1.0), specularColor.xyz / max(vec3(0.01), avgAlbedo.xyz));
-		//float smoothness = dot(normalizedColor.xyz, vec3(0.33,0.59,0.11));// max(sampled_color.r, max(sampled_color.g, sampled_color.b));
-		//roughness = max(smoothness * 0.3, 0.05);//mix(0.2, 0.05, smoothness); // don't get too rough or there's no point in using specular here
-		//
-		//// blend out really dark stuff to fill color with high roughness (ex strifle scopes)
-		//float threshold = 1.0 / (15.0 / 255.0);
-		//roughness = mix(0.1, roughness, min(smoothness * threshold, 1.0));
+		// try to estimate some roughness variation from the texture
+		float smoothness = max(sampled_color.r, max(sampled_color.g, sampled_color.b));
+		roughness = mix(0.25, 0.05, min(sqrt(smoothness * 2.0), 1.0)); // don't get too rough or there's no point in using specular here
+		
+		// blend out really dark stuff to fill color with high roughness (ex strifle scopes)
+		float threshold = 1.0 / (15.0 / 255.0);
+		roughness = mix(0.05, roughness, min(smoothness * threshold, 1.0));
 		//specularColor = mix(min(avgAlbedo * 2.0, vec3(1.0)), specularColor, min(smoothness * threshold, 1.0));
 	#endif
 #endif
