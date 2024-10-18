@@ -5267,9 +5267,17 @@ void std3D_DrawOccluder(rdVector3* position, float radius, rdVector3* verts)
 
 #ifdef RENDER_DROID2
 
-void std3D_SetRenderPassFlags(int8_t renderPass, rdRenderPassFlags_t renderPassFlags)
+void std3D_BlitFramebuffer(int x, int y, int width, int height, void* pixels)
 {
+	glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->fbo);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_COLOR_ATTACHMENT0);
+
+	glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+}
+
 void std3D_SetRenderPass(const char* name, int8_t renderPass, rdRenderPassFlags_t renderPassFlags)
+{
 	strcpy_s(std3D_renderPasses[renderPass].name, 32, name);
 	std3D_renderPasses[renderPass].flags = renderPassFlags;
 }
