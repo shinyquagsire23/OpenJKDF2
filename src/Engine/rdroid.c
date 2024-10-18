@@ -796,10 +796,10 @@ void rdTexOffseti(float u, float v)
 }
 
 // Framebuffer
-extern void std3D_SetRenderPassFlags(int8_t, rdRenderPassFlags_t);
-void rdRenderPass(int8_t renderPass, rdRenderPassFlags_t renderPassFlags)
+extern void std3D_SetRenderPass(const char* name, int8_t, rdRenderPassFlags_t);
+void rdRenderPass(const char* name, int8_t renderPass, rdRenderPassFlags_t renderPassFlags)
 {
-	std3D_SetRenderPassFlags(renderPass, renderPassFlags);
+	std3D_SetRenderPass(name, renderPass, renderPassFlags);
 	rdroid_renderPass = renderPass;
 }
 

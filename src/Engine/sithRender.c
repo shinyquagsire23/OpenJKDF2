@@ -550,7 +550,7 @@ void sithRender_Draw()
     rdCamera_ClearLights(rdCamera_pCurCamera);
 
 #ifdef RENDER_DROID2
-	rdRenderPass(0, 0);
+	rdRenderPass("sithRender_Draw", 0, 0);
 	rdEnable(RD_LIGHTING);
 	if(jkPlayer_enableShadows)
 		rdEnable(RD_SHADOWS);

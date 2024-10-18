@@ -327,6 +327,7 @@ typedef struct std3D_RenderPass
 	// todo/fixme: we're not currently handling viewport changes mid-draw
 	rdMatrix44 oldProj; // keep track of the global projection to avoid redundant cluster building if the matrix doesn't change over the course of several frames
 
+	char name[32];
 	rdRenderPassFlags_t flags;
 	rdVector2 depthRange;
 
@@ -337,6 +338,7 @@ typedef struct std3D_RenderPass
 	std3D_Cluster clusters[CLUSTER_GRID_TOTAL_SIZE];
 } std3D_RenderPass;
 
+// todo: likely better to just swap to a BeginRenderPass/EndRenderPass in rdroid and call flush in EndRenderPass so we can have as many as we want
 std3D_RenderPass std3D_renderPasses[STD3D_MAX_RENDER_PASSES];
 
 void std3D_FlushLights();
@@ -5267,6 +5269,8 @@ void std3D_DrawOccluder(rdVector3* position, float radius, rdVector3* verts)
 
 void std3D_SetRenderPassFlags(int8_t renderPass, rdRenderPassFlags_t renderPassFlags)
 {
+void std3D_SetRenderPass(const char* name, int8_t renderPass, rdRenderPassFlags_t renderPassFlags)
+	strcpy_s(std3D_renderPasses[renderPass].name, 32, name);
 	std3D_renderPasses[renderPass].flags = renderPassFlags;
 }
 
@@ -5932,8 +5936,6 @@ void std3D_FlushDrawCalls()
 	std3D_pushDebugGroup("std3D_FlushDrawCalls");
 
 	glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->fbo);
-	GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-	glDrawBuffers(ARRAYSIZE(bufs), bufs);
 
 	glViewport(0, 0, std3D_pFb->w, std3D_pFb->h);
 	glCullFace(GL_BACK); // this is flipped compared to old pipe, maybe the proj matrix?

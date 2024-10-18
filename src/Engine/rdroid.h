@@ -144,7 +144,7 @@ void rdSetTexMode(int a1);
 
 void rdDitherMode(rdDitherMode_t mode);
 
-void rdRenderPass(int8_t renderPass, rdRenderPassFlags_t renderPassFlags);
+void rdRenderPass(const char* name, int8_t renderPass, rdRenderPassFlags_t renderPassFlags);
 void rdDepthRange(float znearNorm, float zfarNorm);
 
 int rdBindTexture(rdTexture* pTexture);
