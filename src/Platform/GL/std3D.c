@@ -5960,9 +5960,7 @@ void std3D_FlushDrawCalls()
 
 	for (int j = 0; j < STD3D_MAX_RENDER_PASSES; ++j)
 	{
-		const char label[16];
-		sprintf_s(label, 16, "RenderPass %d", j);
-		std3D_pushDebugGroup(label);
+		std3D_pushDebugGroup(std3D_renderPasses[j].name);
 
 		// clear the depth buffer if requested
 		if (std3D_renderPasses[j].flags & RD_RENDERPASS_CLEAR_DEPTH)
