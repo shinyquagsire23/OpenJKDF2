@@ -5969,11 +5969,16 @@ void std3D_FlushDrawCalls()
 			glClear(GL_DEPTH_BUFFER_BIT);
 		}
 
+		glDrawBuffer(GL_NONE);
+
 		// flush z lists
 		std3D_FlushDrawCallList(&std3D_renderPasses[j], &std3D_renderPasses[j].drawCallLists[DRAW_LIST_Z],           std3D_DrawCallCompareSortKey, "Z Prepass");
 		std3D_FlushDrawCallList(&std3D_renderPasses[j], &std3D_renderPasses[j].drawCallLists[DRAW_LIST_Z_ALPHATEST], std3D_DrawCallCompareSortKey, "Z Prepass Alphatest");
 
 		// todo: do any necessary opaque-only deferred stuff here
+
+		GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+		glDrawBuffers(ARRAYSIZE(bufs), bufs);
 
 		// flush color lists
 		std3D_FlushDrawCallList(&std3D_renderPasses[j], &std3D_renderPasses[j].drawCallLists[DRAW_LIST_COLOR_ZPREPASS],   std3D_DrawCallCompareSortKey, "Color ZPrepass");
