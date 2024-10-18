@@ -720,6 +720,18 @@ static GLuint std3D_getImageFormat(GLuint format)
 	return isInteger ? intTypeForChannels[numChannels] : typeForChannels[numChannels];
 }
 
+static void std3D_pushDebugGroup(const char* name)
+{
+	if(GLEW_KHR_debug)
+		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, name);
+}
+
+static void std3D_popDebugGroup()
+{
+	if(GLEW_KHR_debug)
+		glPopDebugGroup();
+}
+
 void std3D_generateIntermediateFbo(int32_t width, int32_t height, std3DIntermediateFbo* pFbo, uint32_t format, int mipMaps, int useDepth)
 {
     // Generate the framebuffer
@@ -2154,6 +2166,8 @@ void std3D_DrawMenu()
 {
     if (Main_bHeadless) return;
 
+	std3D_pushDebugGroup("std3D_DrawMenu");
+
     //printf("Draw menu\n");
     std3D_DrawSceneFbo();
     //glFlush();
@@ -2465,6 +2479,8 @@ void std3D_DrawMenu()
 	glBindVertexArray(vao);
 
     last_flags = 0;
+
+	std3D_popDebugGroup();
 }
 
 void std3D_DrawMapOverlay()
@@ -3108,6 +3124,8 @@ void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo
 
 void std3D_DrawSceneFbo()
 {
+	std3D_pushDebugGroup("std3D_DrawSceneFbo");
+
     //printf("Draw scene FBO\n");
     glEnable(GL_BLEND);
     
@@ -3177,12 +3195,18 @@ void std3D_DrawSceneFbo()
     float rad_scale = (float)std3D_pFb->w / 640.0;
     if (!draw_ssao)
     {
+		std3D_pushDebugGroup("PostFX Blit");
+
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->postfx, std3D_pFb->tex0, 0, 0, 1.0, 1.0, 1.0, 0);
         //std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->postfx, std3D_pFb->tex1, 0, 0, 0.0, 1.0, 1.0, 0); // test emission output
+
+		std3D_popDebugGroup();
     }
     else
     {
+		std3D_pushDebugGroup("SSAO");
+
 		glActiveTexture(GL_TEXTURE0 + 3);
 		glBindTexture(GL_TEXTURE_2D, std3D_pFb->tex4);
 
@@ -3201,6 +3225,8 @@ void std3D_DrawSceneFbo()
 
         glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
         std3D_DrawSimpleTex(&std3D_ssaoMixStage, &std3D_pFb->postfx, std3D_pFb->ssaoBlur2.tex, std3D_pFb->tex0, 0, 0.0, 0.0, 1.0, 0);
+
+		std3D_popDebugGroup();
     }
 
     glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
@@ -3217,6 +3243,8 @@ void std3D_DrawSceneFbo()
 		#else
 			bloom_intensity = 3.0f;
 		#endif
+
+		std3D_pushDebugGroup("Bloom");
 
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		// downscale
@@ -3250,6 +3278,8 @@ void std3D_DrawSceneFbo()
 		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
 		std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->postfx, std3D_pFb->blur1.tex, 0, 0, 1.0f, bloom_intensity, 1.5, 0);
 
+		std3D_popDebugGroup();
+
 	#else
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         
@@ -3282,6 +3312,8 @@ void std3D_DrawSceneFbo()
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	std3D_popDebugGroup();
 }
 
 void std3D_DoTex(rdDDrawSurface* tex, rdTri* tri, int tris_left)
@@ -5738,10 +5770,12 @@ void std3D_BindStage(std3D_worldStage* pStage)
 
 typedef int(*std3D_SortFunc)(std3D_DrawCall*, std3D_DrawCall*);
 
-void std3D_FlushDrawCallList(std3D_RenderPass* pRenderPass, std3D_DrawCallList* pList, std3D_SortFunc sortFunc)
+void std3D_FlushDrawCallList(std3D_RenderPass* pRenderPass, std3D_DrawCallList* pList, std3D_SortFunc sortFunc, const char* debugName)
 {
 	if (!pList->drawCallCount)
 		return;
+
+	std3D_pushDebugGroup(debugName);
 
 	if (rdMatrix_Compare44(&pRenderPass->oldProj, &pList->drawCalls[0].state.proj) != 0)
 	{
@@ -5886,12 +5920,16 @@ void std3D_FlushDrawCallList(std3D_RenderPass* pRenderPass, std3D_DrawCallList* 
 
 	if (batchIndices)
 		glDrawElements(std3D_PrimitiveForGeoMode(pDrawCall->state.raster.geoMode), batchIndices, GL_UNSIGNED_SHORT, (void*)(indexOffset * sizeof(uint16_t)));
+
+	std3D_popDebugGroup();
 }
 
 // fixme: flush this when rdCache_Flush is called instead of trying to lump everything into a bunch of draw lists?
 void std3D_FlushDrawCalls()
 {
 	if (Main_bHeadless) return;
+
+	std3D_pushDebugGroup("std3D_FlushDrawCalls");
 
 	glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->fbo);
 	GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
@@ -5920,6 +5958,10 @@ void std3D_FlushDrawCalls()
 
 	for (int j = 0; j < STD3D_MAX_RENDER_PASSES; ++j)
 	{
+		const char label[16];
+		sprintf_s(label, 16, "RenderPass %d", j);
+		std3D_pushDebugGroup(label);
+
 		// clear the depth buffer if requested
 		if (std3D_renderPasses[j].flags & RD_RENDERPASS_CLEAR_DEPTH)
 		{
@@ -5928,15 +5970,17 @@ void std3D_FlushDrawCalls()
 		}
 
 		// flush z lists
-		std3D_FlushDrawCallList(&std3D_renderPasses[j], &std3D_renderPasses[j].drawCallLists[DRAW_LIST_Z],           std3D_DrawCallCompareSortKey);
-		std3D_FlushDrawCallList(&std3D_renderPasses[j], &std3D_renderPasses[j].drawCallLists[DRAW_LIST_Z_ALPHATEST], std3D_DrawCallCompareSortKey);
+		std3D_FlushDrawCallList(&std3D_renderPasses[j], &std3D_renderPasses[j].drawCallLists[DRAW_LIST_Z],           std3D_DrawCallCompareSortKey, "Z Prepass");
+		std3D_FlushDrawCallList(&std3D_renderPasses[j], &std3D_renderPasses[j].drawCallLists[DRAW_LIST_Z_ALPHATEST], std3D_DrawCallCompareSortKey, "Z Prepass Alphatest");
 
 		// todo: do any necessary opaque-only deferred stuff here
 
 		// flush color lists
-		std3D_FlushDrawCallList(&std3D_renderPasses[j], &std3D_renderPasses[j].drawCallLists[DRAW_LIST_COLOR_ZPREPASS],   std3D_DrawCallCompareSortKey);
-		std3D_FlushDrawCallList(&std3D_renderPasses[j], &std3D_renderPasses[j].drawCallLists[DRAW_LIST_COLOR_NOZPREPASS], std3D_DrawCallCompareSortKey);
-		std3D_FlushDrawCallList(&std3D_renderPasses[j], &std3D_renderPasses[j].drawCallLists[DRAW_LIST_COLOR_ALPHABLEND], std3D_DrawCallCompareDepth);
+		std3D_FlushDrawCallList(&std3D_renderPasses[j], &std3D_renderPasses[j].drawCallLists[DRAW_LIST_COLOR_ZPREPASS],   std3D_DrawCallCompareSortKey, "Color ZPrepass");
+		std3D_FlushDrawCallList(&std3D_renderPasses[j], &std3D_renderPasses[j].drawCallLists[DRAW_LIST_COLOR_NOZPREPASS], std3D_DrawCallCompareSortKey, "Color No ZPrepass");
+		std3D_FlushDrawCallList(&std3D_renderPasses[j], &std3D_renderPasses[j].drawCallLists[DRAW_LIST_COLOR_ALPHABLEND], std3D_DrawCallCompareDepth, "Color Alphablend");
+		
+		std3D_popDebugGroup();
 	}
 
 	std3D_ResetDrawCalls();
@@ -5949,6 +5993,8 @@ void std3D_FlushDrawCalls()
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
 	glDisable(GL_STENCIL_TEST);
+
+	std3D_popDebugGroup();
 }
 
 void std3D_ClearLights()
@@ -6128,6 +6174,8 @@ int std3D_InsertDecalTexture(rdRect* out, stdVBuffer* vbuf, rdDDrawSurface* pTex
 		std3D_decalAtlasNode* node = std3D_InsertDecal(&decalRootNode, &rect, pTexture);
 		if (node)
 		{
+			std3D_pushDebugGroup("std3D_InsertDecalTexture");
+
 			glBindFramebuffer(GL_FRAMEBUFFER, decalAtlasFBO.fbo);
 			glDrawBuffer(GL_COLOR_ATTACHMENT0);
 			glDepthFunc(GL_ALWAYS);
@@ -6153,6 +6201,9 @@ int std3D_InsertDecalTexture(rdRect* out, stdVBuffer* vbuf, rdDDrawSurface* pTex
 			glDrawArrays(GL_TRIANGLES, 0, 3);
 
 			stdHashTable_SetKeyVal(decalHashTable, node->name, node);
+	
+			std3D_popDebugGroup();
+			
 			*out = rect;
 		}
 		else
