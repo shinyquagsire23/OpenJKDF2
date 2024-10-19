@@ -35,14 +35,14 @@ stdBitmap* stdPcx_Load(char *fpath, int create_ddraw_surface, int gpu_mem)
     bitmap->palFmt = 2;
     bitmap->numMips = 1;
     bitmap->field_68 = 0;
-    bitmap->format.is16bit = 0;
+    bitmap->format.colorMode = STDCOLOR_PAL;
     bitmap->format.bpp = pcxHeader.bitDepth;
 
     bitmap->mipSurfaces = (stdVBuffer **)std_pHS->alloc(sizeof(stdVBuffer *) * 1);
     if ( !bitmap->mipSurfaces )
         goto fail;
     _memset(&format, 0, sizeof(format));
-    format.format.is16bit = 0;
+    format.format.colorMode = STDCOLOR_PAL;
     format.format.bpp = (uint8_t)pcxHeader.bitDepth;
     format.height = pcxHeader.yMax + 1;
     format.width = pcxHeader.stride / (signed int)((unsigned int)pcxHeader.bitDepth >> 3);

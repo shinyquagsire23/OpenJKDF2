@@ -270,7 +270,7 @@ int jkGuiMap_Show()
     v3.width = 520;
     v3.height = 320;
     v3.format.bpp = 8;
-    v3.format.is16bit = 0;
+    v3.format.colorMode = STDCOLOR_PAL;
     jkGuiMap_pVbuffer = stdDisplay_VBufferNew(&v3, 0, 0, 0);
     stdDisplay_VBufferFill(jkGuiMap_pVbuffer, 0, 0);
     if ( rdOpen(0) )

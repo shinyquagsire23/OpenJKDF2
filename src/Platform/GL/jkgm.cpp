@@ -525,7 +525,7 @@ std::string jkgm_get_tex_hash(stdVBuffer *vbuf, rdDDrawSurface *texture, rdMater
     md5Update(&ctx, (uint8_t *)&width, sizeof(uint32_t));
     md5Update(&ctx, (uint8_t *)&height, sizeof(uint32_t));
 
-    if (!vbuf->format.format.is16bit)
+    if (!vbuf->format.format.colorMode)
     {
         for (int i = 0; i < width*height; i++)
         {

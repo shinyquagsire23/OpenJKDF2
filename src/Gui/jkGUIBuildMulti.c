@@ -648,7 +648,7 @@ int jkGuiBuildMulti_DisplayModel()
     v1.format.bpp = 8;
     v1.width = 260;
     v1.height = 260;
-    v1.format.is16bit = 0;
+    v1.format.colorMode = STDCOLOR_PAL;
     jkGuiBuildMulti_pVBuf1 = stdDisplay_VBufferNew(&v1, 0, 0, 0);
     stdDisplay_VBufferFill(jkGuiBuildMulti_pVBuf1, 0, 0);
     _memcpy(&jkGuiBuildMulti_texFmt, &stdDisplay_pCurVideoMode->format, sizeof(jkGuiBuildMulti_texFmt));

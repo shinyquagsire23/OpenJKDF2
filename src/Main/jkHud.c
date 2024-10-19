@@ -663,7 +663,7 @@ void jkHud_Draw()
     {
         float valSin, valCos;
         a2 = sithTime_curSeconds * 200.0;
-        if ( Video_format.format.is16bit )
+        if ( Video_format.format.colorMode)
         {
             stdMath_SinCos(a2, &valSin, &valCos);
             v58 = valSin * 20.0;
@@ -803,7 +803,7 @@ void jkHud_Draw()
                 if ( v54->field_8 )
                 {
                     a4.y = v53 + 1;
-                    if ( Video_format.format.is16bit )
+                    if ( Video_format.format.colorMode)
                         stdDisplay_VBufferFill(Video_pMenuBuffer, jkHud_aTeamColors16bpp[v54->field_0], &a4);
                     else
                         stdDisplay_VBufferFill(Video_pMenuBuffer, jkHud_aTeamColors8bpp[v54->field_0], &a4);
@@ -869,7 +869,7 @@ LABEL_116:
                         v47 = v46->teamNum;
                         if ( v46->teamNum )
                         {
-                            if ( Video_format.format.is16bit )
+                            if ( Video_format.format.colorMode)
                                 v48 = jkHud_aTeamColors16bpp[v47];
                             else
                                 v48 = jkHud_aTeamColors8bpp[v47];
@@ -1264,7 +1264,7 @@ void jkHud_DrawGPU()
     {
         float valSin, valCos;
         a2 = sithTime_curSeconds * 200.0;
-        if ( Video_format.format.is16bit )
+        if ( Video_format.format.colorMode)
         {
             stdMath_SinCos(a2, &valSin, &valCos);
             v58 = valSin * 20.0;
@@ -1412,7 +1412,7 @@ void jkHud_DrawGPU()
                 if ( v54->field_8 )
                 {
                     a4.y = v53 + 1;
-                    /*if ( Video_format.format.is16bit )
+                    /*if ( Video_format.format.colorMode )
                         stdDisplay_VBufferFill(Video_pMenuBuffer, jkHud_aTeamColors16bpp[v54->field_0], &a4);
                     else
                         stdDisplay_VBufferFill(Video_pMenuBuffer, jkHud_aTeamColors8bpp[v54->field_0], &a4);*/
@@ -1479,7 +1479,7 @@ LABEL_116:
                         v47 = v46->teamNum;
                         if ( v46->teamNum )
                         {
-                            if ( Video_format.format.is16bit )
+                            if ( Video_format.format.colorMode )
                                 v48 = jkHud_aTeamColors16bpp[v47];
                             else
                                 v48 = jkHud_aTeamColors8bpp[v47];

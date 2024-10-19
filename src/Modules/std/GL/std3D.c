@@ -989,7 +989,7 @@ void std3D_UploadDrawSurface(std3D_DrawSurface* src, int width, int height, void
 	// temp, currently all RGBA8
 	uint8_t* image_data = malloc(width * height * 4);
 
-	if (0)//src->fmt.format.is16bit)
+	if (0)//src->fmt.format.colorMode)
 	{
 		for (int j = 0; j < height; j++)
 		{
@@ -3368,13 +3368,23 @@ int std3D_AddToTextureCache(stdVBuffer** vbuf, int numMips, rdDDrawSurface *text
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
 	}
 
-    if ((*vbuf)->format.format.is16bit)
+    if ((*vbuf)->format.format.colorMode)
     {
         texture->is_16bit = 1;
-        if (!is_alpha_tex)
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width, height, 0,  GL_RGB, GL_UNSIGNED_SHORT_5_6_5_REV, image_8bpp);
-        else
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0,  GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, image_8bpp);
+		if ((*vbuf)->format.format.bpp == 32)
+		{
+			if (!is_alpha_tex)
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image_8bpp);
+			else
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_8bpp);
+		}
+		else
+		{
+			if (!is_alpha_tex)
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width, height, 0,  GL_RGB, GL_UNSIGNED_SHORT_5_6_5_REV, image_8bpp);
+			else
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0,  GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, image_8bpp);
+		}
 
 		for(int mip = 1; mip < numMips; ++mip)
 		{
@@ -3505,7 +3515,7 @@ int std3D_AddBitmapToTextureCache(stdBitmap *texture, int mipIdx, int is_alpha_t
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     }
 
-    if (vbuf->format.format.is16bit || texture->format.bpp == 16)
+    if (vbuf->format.format.colorMode || texture->format.bpp == 16)
     {
         texture->is_16bit = 1;
 

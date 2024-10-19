@@ -223,7 +223,7 @@ LABEL_9:
     v3 = Video_modeStruct.b3DAccel != 0;
     if ( !v1 && stdDisplay_bModeSet && Video_modeStruct.descIdx == Video_curMode && v3 == stdDisplay_bPaged )
     {
-        if ( !Video_renderSurface[Video_modeStruct.descIdx].format.format.is16bit )
+        if ( !Video_renderSurface[Video_modeStruct.descIdx].format.format.colorMode)
             stdDisplay_GammaCorrect(color_buf);
     }
     else if ( !stdDisplay_SetMode(Video_modeStruct.descIdx, color_buf, v3) )

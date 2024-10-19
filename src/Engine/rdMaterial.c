@@ -159,7 +159,7 @@ int rdMaterial_LoadEntry(char *mat_fpath, rdMaterial *material, int create_ddraw
         format.width = tex_header_1.width;
         format.height = tex_header_1.height;
         bpp = material->tex_format.bpp;
-        format.format.is16bit = material->tex_format.is16bit;
+        format.format.colorMode = material->tex_format.colorMode;
         format.format.bpp = bpp;
         if ( texture->num_mipmaps )
           break;
@@ -197,7 +197,7 @@ LABEL_21:
           (*texture_struct)->format.texture_size_in_bytes);
         stdDisplay_VBufferUnlock(*texture_struct);
 #else
-        std_pHS->fseek(mat_file__, format.width*format.height*(format.format.is16bit?2:1), SEEK_CUR);
+        std_pHS->fseek(mat_file__, format.width*format.height*(format.format.colorMode?2:1), SEEK_CUR);
 #endif
         format.width = (unsigned int)format.width >> 1;
         format.height = (unsigned int)format.height >> 1;

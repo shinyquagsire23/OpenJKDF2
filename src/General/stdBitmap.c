@@ -220,7 +220,7 @@ void stdBitmap_ConvertColorFormat(rdTexformat *formatTo, stdBitmap *bitmap)
 
     formatFrom_ = &bitmap->format;
     formatFrom = &bitmap->format;
-    if ( _memcmp(formatTo, formatFrom, sizeof(rdTexformat)) && (formatFrom_->is16bit || formatTo->is16bit) )
+    if ( _memcmp(formatTo, formatFrom, sizeof(rdTexformat)) && (formatFrom_->colorMode || formatTo->colorMode) )
     {
         v4 = 0;
         if ( bitmap->numMips > 0 )

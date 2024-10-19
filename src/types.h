@@ -1072,7 +1072,7 @@ typedef struct rdDDrawSurface
 
 typedef struct rdTexformat
 {
-    uint32_t is16bit;
+	stdColorMode colorMode;
     uint32_t bpp;
     uint32_t r_bits;
     uint32_t g_bits;

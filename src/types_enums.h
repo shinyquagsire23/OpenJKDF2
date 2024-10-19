@@ -60,6 +60,14 @@ enum RD_OPTIONS
 	RD_CLEAR_BUFFERS     = 0x100,
 };
 
+typedef uint32_t stdColorMode;
+enum STD_COLOR_MODE
+{
+	STDCOLOR_PAL  = 0,
+	STDCOLOR_RGB  = 1,
+	STDCOLOR_RGBA = 2,
+};
+
 #if defined(DECAL_RENDERING) || defined(RENDER_DROID2)
 enum RD_DECAL_FLAGS
 {
