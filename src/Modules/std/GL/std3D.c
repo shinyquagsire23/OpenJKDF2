@@ -440,107 +440,6 @@ int std3D_bInitted = 0;
 rdColormap std3D_ui_colormap;
 int std3D_bReinitHudElements = 0;
 
-#ifdef DEFERRED_FRAMEWORK
-typedef struct std3D_deferredStage
-{
-	GLuint vao;
-	GLuint program;
-	GLint attribute_coord3d;
-	GLint uniform_texDepth, uniform_texLight, uniform_texDiffuse, uniform_texNormal; // gbuffer textures
-	GLint uniform_tex, uniform_worldPalette, uniform_texmode; // optional texture
-	GLint uniform_mvp, uniform_iResolution; // projection stuff
-	GLint uniform_tint, uniform_filter, uniform_fade, uniform_add; // for emissive, todo: remove me
-	GLint uniform_flags, uniform_objectMatrix, uniform_position, uniform_radius, uniform_color; // general volume params
-	GLint uniform_rt, uniform_lt, uniform_rb, uniform_lb; // frustum corner rays for position reconstruction
-} std3D_deferredStage;
-
-static GLuint deferred_vbo;
-static GLuint deferred_ibo;
-static std3D_deferredStage std3D_stencilStage;
-static int canUseDepthStencil = 1; // true until zbuffer is cleared mid-frame, which invalidates depth content
-
-void std3D_setupDeferred()
-{
-	// triangle indices for deferred cube
-	rdTri deferred_tmpTris[12];
-	deferred_tmpTris[0].v1 = 0;
-	deferred_tmpTris[0].v2 = 1;
-	deferred_tmpTris[0].v3 = 2;
-	deferred_tmpTris[1].v1 = 2;
-	deferred_tmpTris[1].v2 = 3;
-	deferred_tmpTris[1].v3 = 0;
-	deferred_tmpTris[2].v1 = 1;
-	deferred_tmpTris[2].v2 = 5;
-	deferred_tmpTris[2].v3 = 6;
-	deferred_tmpTris[3].v1 = 6;
-	deferred_tmpTris[3].v2 = 2;
-	deferred_tmpTris[3].v3 = 1;
-	deferred_tmpTris[4].v1 = 7;
-	deferred_tmpTris[4].v2 = 6;
-	deferred_tmpTris[4].v3 = 5;
-	deferred_tmpTris[5].v1 = 5;
-	deferred_tmpTris[5].v2 = 4;
-	deferred_tmpTris[5].v3 = 7;
-	deferred_tmpTris[6].v1 = 4;
-	deferred_tmpTris[6].v2 = 0;
-	deferred_tmpTris[6].v3 = 3;
-	deferred_tmpTris[7].v1 = 3;
-	deferred_tmpTris[7].v2 = 7;
-	deferred_tmpTris[7].v3 = 4;
-	deferred_tmpTris[8].v1 = 4;
-	deferred_tmpTris[8].v2 = 5;
-	deferred_tmpTris[8].v3 = 1;
-	deferred_tmpTris[9].v1 = 1;
-	deferred_tmpTris[9].v2 = 0;
-	deferred_tmpTris[9].v3 = 4;
-	deferred_tmpTris[10].v1 = 3;
-	deferred_tmpTris[10].v2 = 2;
-	deferred_tmpTris[10].v3 = 6;
-	deferred_tmpTris[11].v1 = 6;
-	deferred_tmpTris[11].v2 = 7;
-	deferred_tmpTris[11].v3 = 3;
-
-	GLushort data_elements[12 * 3];
-	rdTri* tris = deferred_tmpTris;
-	for (int j = 0; j < 12; j++)
-	{
-		data_elements[(j * 3) + 0] = tris[j].v1;
-		data_elements[(j * 3) + 1] = tris[j].v2;
-		data_elements[(j * 3) + 2] = tris[j].v3;
-	}
-
-	glGenBuffers(1, &deferred_ibo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, deferred_ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 12 * 3 * sizeof(GLushort), data_elements, GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-	glGenBuffers(1, &deferred_vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, deferred_vbo);
-	glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(D3DVERTEX), NULL, GL_STREAM_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
-void std3D_freeDeferred()
-{
-	glDeleteBuffers(1, &deferred_vbo);
-	glDeleteBuffers(1, &deferred_ibo);
-}
-
-#endif
-
-#ifdef DECAL_RENDERING
-int lightBufferDirty = 0;
-std3D_deferredStage std3D_decalStage;
-#endif
-
-#ifdef PARTICLE_LIGHTS
-std3D_deferredStage std3D_lightStage;
-#endif
-
-#ifdef SPHERE_AO
-std3D_deferredStage std3D_occluderStage[2]; // 0 = 32 bit, 1 = 16 bit
-#endif
-
 static bool std3D_isIntegerFormat(GLuint format)
 {
 	switch (format)
@@ -3317,9 +3216,6 @@ int std3D_ClearZBuffer()
     glDepthMask(GL_TRUE);
     glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->fbo);
     glClear(GL_DEPTH_BUFFER_BIT);
-#ifdef DEFERRED_FRAMEWORK
-	canUseDepthStencil = 0; // depth-stencil invald, can't use for deferred optimizations
-#endif
     return 1;
 }
 
