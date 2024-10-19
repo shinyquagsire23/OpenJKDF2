@@ -4,7 +4,9 @@
 // Experimental features
 #ifdef QOL_IMPROVEMENTS
 
-//#define RENDER_DROID2        // test gpu path, skips rdCache and uses a fixed-function like API to pass information to the GPU for HW transform, clipping and lighting
+#define RENDER_DROID2        // test gpu path, skips rdCache and uses a fixed-function like API to pass information to the GPU for HW transform, clipping and lighting
+
+//#define HW_VBUFFER // temp stuff, trying to move vbuffer to GPU and use fbos in there so we can render to them
 
 #define STENCIL_BUFFER       // mark the stencil buffer with dynamic/transparent stuff, so we can effectively cull things like decals
 #define CLASSIC_EMISSIVE     // compute emissives using the same approach as stock JK with max(color, emissive), rather than adding it on top as bloom
@@ -34,6 +36,13 @@
 #define USES_VERTEX_LIGHTING(LIGHT_MODE) (((LIGHT_MODE) == 3) || ((LIGHT_MODE) == 4))
 #else
 #define USES_VERTEX_LIGHTING(LIGHT_MODE) ((LIGHT_MODE) == 3)
+#endif
+
+#ifdef RENDER_DROID2
+// these are implicit in RENDER_DROID2, the defines are for the old pipeline
+#undef SPHERE_AO
+#undef PARTICLE_LIGHTS
+#undef DECAL_RENDERING
 #endif
 
 #if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS) || defined(SPHERE_AO)

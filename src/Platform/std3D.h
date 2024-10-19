@@ -8,6 +8,12 @@ extern "C" {
 #include "types.h"
 #include "globals.h"
 
+#ifdef RENDER_DROID2
+
+#include "Modules/std/std3D.h"
+
+#else
+
 #define std3D_Startup_ADDR (0x00429310)
 #define std3D_Shutdown_ADDR (0x00429390)
 #define std3D_FindClosestDevice_ADDR (0x004293B0)
@@ -137,26 +143,10 @@ void std3D_DrawLight(rdLight* light, rdVector3* position, rdVector3* verts);
 void std3D_DrawOccluder(rdVector3* position, float radius, rdVector3* verts);
 #endif
 
-// alternative 3d pipeline with HW T&L
-#ifdef RENDER_DROID2
-
-void std3D_ClearLights();
-int std3D_AddLight(rdLight* light, rdVector3* viewPosition);
-void std3D_ClearOccluders();
-void std3D_ClearDecals();
-void std3D_AddDrawCall(rdPrimitiveType_t type, std3D_DrawCallState* pDrawCallState, D3DVERTEX* paVertices, int numVertices);
-void std3D_ResetDrawCalls();
-void std3D_FlushDrawCalls();
-void std3D_SetRenderPass(const char* name, int8_t renderPass, rdRenderPassFlags_t renderPassFlags);
-void std3D_SetDepthRange(int8_t renderPass, float znearNorm, float zfarNorm);
-
-#endif
-
-
+#endif // RENDER_DROID2
 
 #ifdef __cplusplus
 }
 #endif
-
 
 #endif // _STD3D_H

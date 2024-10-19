@@ -1,6 +1,6 @@
 #include "sithDecal.h"
 
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(RENDER_DROID2)
 
 #include "Primitives/rdDecal.h"
 #include "World/sithWorld.h"

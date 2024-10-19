@@ -118,12 +118,12 @@ static jkGuiElement jkGuiDisplay_aElementsAdvanced[] = {
 	// 15
 	{ELEMENT_CHECKBOX,     0,            0, "GUIEXT_EN_SSAO",    0, {20, 270, 300, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
 
-#ifdef SPHERE_AO
+#if defined(SPHERE_AO) || defined(RENDER_DROID2)
 	// 16
 	{ ELEMENT_CHECKBOX,     0,           0, "GUIEXT_EN_SHADOWS",    0, {20, 310, 300, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
 #endif
 
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(RENDER_DROID2)
 	// 17
 	{ ELEMENT_CHECKBOX,     0,           0, "GUIEXT_EN_DECALS",    0, {20, 350, 300, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
 #endif
@@ -203,11 +203,11 @@ int jkGuiDisplay_ShowAdvanced()
 	jkGuiDisplay_aElementsAdvanced[15].selectedTextEntry = jkPlayer_enableSSAO;
 
 	int id = 16;
-#ifdef SPHERE_AO
+#if defined(SPHERE_AO) || defined(RENDER_DROID2)
 	jkGuiDisplay_aElementsAdvanced[id++].selectedTextEntry = jkPlayer_enableShadows;
 #endif
 
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(RENDER_DROID2)
 	jkGuiDisplay_aElementsAdvanced[id++].selectedTextEntry = jkPlayer_enableDecals;
 #endif
 
@@ -226,11 +226,11 @@ int jkGuiDisplay_ShowAdvanced()
 			jkPlayer_enableSSAO = jkGuiDisplay_aElementsAdvanced[15].selectedTextEntry;
 
 			id = 16;
-#ifdef SPHERE_AO
+#if defined(SPHERE_AO) || defined(RENDER_DROID2)
 			jkPlayer_enableShadows = jkGuiDisplay_aElementsAdvanced[id++].selectedTextEntry;
 #endif
 
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(RENDER_DROID2)
 			jkPlayer_enableDecals = jkGuiDisplay_aElementsAdvanced[id++].selectedTextEntry;
 #endif
 

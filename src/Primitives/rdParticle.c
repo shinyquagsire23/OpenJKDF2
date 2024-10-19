@@ -367,7 +367,6 @@ int rdParticle_Draw(rdThing* thing, rdMatrix34* mat)
 
 	for(int j = 0; j < particle->numVertices; ++j)
 	{
-#ifdef PARTICLE_LIGHTS
 		if (thing->parentSithThing->light > 0.0001f)
 		{
 			rdLight light;
@@ -377,7 +376,6 @@ int rdParticle_Draw(rdThing* thing, rdMatrix34* mat)
 			rdMaterial_GetFillColor(&light.color, particle->material, rdColormap_pCurMap, particle->vertexCel[j], -1);
 			rdAddLight(&light, &aParticleVertices[j]);
 		}
-#endif
 
 		rdBindMaterial(particle->material, particle->vertexCel[j]);
 

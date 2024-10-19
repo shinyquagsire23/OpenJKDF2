@@ -191,7 +191,7 @@ int rdThing_SetParticleCloud(rdThing *thing, rdParticle *particle)
     return 1;
 }
 
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(RENDER_DROID2)
 int rdThing_SetDecal(rdThing* thing, rdDecal* decal)
 {
 	thing->type = RD_THINGTYPE_DECAL;
@@ -221,7 +221,7 @@ int rdThing_Draw(rdThing *thing, rdMatrix34 *m)
             return rdParticle_Draw(thing, m);
         case RD_THINGTYPE_POLYLINE:
             return rdPolyLine_Draw(thing, m);
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(RENDER_DROID2)
 		case RD_THINGTYPE_DECAL:
 			return rdDecal_Draw(thing, m);
 #endif

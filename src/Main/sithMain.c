@@ -40,7 +40,7 @@
 #include "Devices/sithComm.h"
 #include "stdPlatform.h"
 #include "jk.h"
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(RENDER_DROID2)
 #include "World/sithDecal.h"
 #endif
 #ifdef RAGDOLLS
@@ -81,7 +81,7 @@ int sithMain_Startup(HostServices *commonFuncs)
     is_started = sithTemplate_Startup() & is_started;
     is_started = sithModel_Startup() & is_started;
     is_started = sithSurface_Startup() & is_started;
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(RENDER_DROID2)
 	is_started = sithDecal_Startup() & is_started;
 #endif
 #ifdef RAGDOLLS
@@ -125,7 +125,7 @@ void sithMain_Shutdown()
 #ifdef RAGDOLLS
 	sithRagdoll_Shutdown();
 #endif
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(RENDER_DROID2)
 	sithDecal_Shutdown();
 #endif
     sithSoundMixer_Shutdown();

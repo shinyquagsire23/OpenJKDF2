@@ -315,7 +315,7 @@ void sithParticle_CreateThing(sithThing *thing)
         }
     }
 
-#ifdef PARTICLE_LIGHTS
+#if defined(PARTICLE_LIGHTS) || defined(RENDER_DROID2)
 	// remove the light flag, since it will be done via particle lights
 	thing->thingflags &= ~SITH_TF_LIGHT;
 #endif

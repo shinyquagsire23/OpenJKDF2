@@ -9,7 +9,7 @@
 #include "Primitives/rdPrimit3.h"
 #include <math.h>
 
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(RENDER_DROID2)
 
 rdDecal* rdDecal_New(char* fpath, char* materialFpath, uint32_t flags, rdVector3* color, rdVector3* size, float fadeTime, float angleFade)
 {

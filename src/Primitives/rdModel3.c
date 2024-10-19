@@ -1382,12 +1382,10 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
     rdMatrix_TransformPointLst34(&out, pCurMesh->vertices, aView, pCurMesh->numVertices);
     rdMatrix_InvertOrtho34(&matInv, mat);
 
-#ifdef SPHERE_AO
-	#ifdef RENDER_DROID2
-		rdAddOccluder(&mat->scale, meshIn->radius);
-	#else
-		rdCache_DrawOccluder(&out.scale, meshIn->radius);
-	#endif
+#ifdef RENDER_DROID2
+	rdAddOccluder(&mat->scale, meshIn->radius);
+#elif defined(SPHERE_AO)
+	rdCache_DrawOccluder(&out.scale, meshIn->radius);
 #endif
     
     rdModel3_geometryMode = pCurMesh->geometryMode;

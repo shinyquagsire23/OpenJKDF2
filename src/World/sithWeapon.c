@@ -25,7 +25,7 @@
 #include "General/stdMath.h"
 #include "jk.h"
 
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(RENDER_DROID2)
 #include "sithDecal.h"
 #endif
 
@@ -486,7 +486,7 @@ int sithWeapon_LoadParams(stdConffileArg *arg, sithThing *thing, int param)
             thing->weaponParams.fleshHitTemplate = sithTemplate_GetEntryByName(arg->value);
             return 1;
 
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(RENDER_DROID2)
 		case THINGPARAM_WALLHIT:
 			thing->weaponParams.wallHitTemplate = sithTemplate_GetEntryByName(arg->value);
 			return 1;
@@ -652,7 +652,7 @@ void sithWeapon_SetTimeLeft(sithThing *weapon, sithThing* a2, float timeLeft)
 }
 
 
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(RENDER_DROID2)
 void sithWeapon_WallHitExplode(sithThing* weapon, sithThing* hitTemplate, sithCollisionSearchEntry* collideInfo)
 {
 	if (hitTemplate)
@@ -759,7 +759,7 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
         {
 			if (collidedThing->thingflags & SITH_TF_LEVELGEO)
 			{
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(RENDER_DROID2)
 				sithWeapon_WallHitExplode(physicsThing, physicsThing->weaponParams.wallHitTemplate, a4);
 #endif
 			}
@@ -888,7 +888,7 @@ int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithCollisionSea
     }
     else
     {
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(RENDER_DROID2)
 		sithWeapon_WallHitExplode(thing, thing->weaponParams.wallHitTemplate, a3);
 #endif
 

@@ -68,10 +68,10 @@ int jkPlayer_setCrosshairOnLightsaber = 1;
 int jkPlayer_setCrosshairOnFist = 1;
 int jkPlayer_bHasLoadedSettingsOnce = 0;
 
-#ifdef SPHERE_AO
+#if defined(SPHERE_AO) || defined(RENDER_DROID2)
 int jkPlayer_enableShadows = 1;
 #endif
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(RENDER_DROID2)
 int jkPlayer_enableDecals = 1;
 #endif
 
@@ -225,10 +225,10 @@ void jkPlayer_StartupVars()
 #ifdef DYNAMIC_POV
 	sithCvar_RegisterFlex("hud_aimLock",                1.0,                        &jkPlayer_aimLock,                  CVARFLAG_LOCAL|CVARFLAG_RESETHUD);
 #endif
-#ifdef SPHERE_AO
+#if defined(SPHERE_AO) || defined(RENDER_DROID2)
 	sithCvar_RegisterFlex("r_enableShadows", 1.0, &jkPlayer_enableShadows, CVARFLAG_LOCAL | CVARFLAG_RESETHUD);
 #endif
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(RENDER_DROID2)
 	sithCvar_RegisterFlex("r_enableDecals",             1.0,                        &jkPlayer_enableDecals,             CVARFLAG_LOCAL | CVARFLAG_RESETHUD);
 #endif
 #ifdef RAGDOLLS
@@ -289,11 +289,11 @@ void jkPlayer_ResetVars()
 
     jkPlayer_bHasLoadedSettingsOnce = 0;
 
-#ifdef SPHERE_AO
+#if defined(SPHERE_AO) || defined(RENDER_DROID2)
 	jkPlayer_enableShadows = 1;
 #endif
 
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(RENDER_DROID2)
 	jkPlayer_enableDecals = 1;
 #endif
 
@@ -699,10 +699,10 @@ void jkPlayer_WriteConf(wchar_t *name)
 		stdJSON_SaveBool(ext_fpath, "ragdolls", jkPlayer_ragdolls);
 #endif
 
-#ifdef SPHERE_AO
+#if defined(SPHERE_AO) || defined(RENDER_DROID2)
 	stdJSON_SaveBool(ext_fpath, "shadows", jkPlayer_enableShadows);
 #endif
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(RENDER_DROID2)
 		stdJSON_SaveBool(ext_fpath, "decals", jkPlayer_enableDecals);
 #endif
 #endif
@@ -817,14 +817,14 @@ void jkPlayer_ParseLegacyExt()
 	}	
 #endif
 
-#ifdef SPHERE_AO
+#if defined(SPHERE_AO) || defined(RENDER_DROID2)
 	if (stdConffile_ReadLine())
 	{
 		if (_sscanf(stdConffile_aLine, "shadows %f", &jkPlayer_enableShadows) != 1)
 			jkPlayer_enableShadows = 1.0;
 	}
 #endif
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(RENDER_DROID2)
 	if (stdConffile_ReadLine())
 	{
 		if (_sscanf(stdConffile_aLine, "decals %f", &jkPlayer_enableDecals) != 1)
@@ -945,10 +945,10 @@ int jkPlayer_ReadConf(wchar_t *name)
 #ifdef DYNAMIC_POV
 		jkPlayer_aimLock = stdJSON_GetFloat(ext_fpath, "aimLock", jkPlayer_aimLock);
 #endif
-#ifdef SPHERE_AO
+#if defined(SPHERE_AO) || defined(RENDER_DROID2)
 		jkPlayer_enableShadows = stdJSON_GetFloat(ext_fpath, "shadows", jkPlayer_enableShadows);
 #endif
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(RENDER_DROID2)
 		jkPlayer_enableDecals = stdJSON_GetFloat(ext_fpath, "decals", jkPlayer_enableDecals);
 #endif
 #endif

@@ -9,9 +9,47 @@
 #include <math.h>
 
 #ifdef QOL_IMPROVEMENTS
+int rdroid_curVertexColorMode = 0; // MOTS added
+#endif
+
+#ifdef RENDER_DROID2
+int rdCache_Startup()
+{
+	return 1;
+}
+
+void rdCache_AdvanceFrame()
+{
+	rdroid_curAcceleration = 1;
+	std3D_StartScene();
+}
+
+void rdCache_FinishFrame()
+{
+	std3D_EndScene();
+}
+
+void rdCache_Reset()
+{
+}
+
+void rdCache_ClearFrameCounters()
+{
+	rdCache_drawnFaces = 0;
+}
+
+void rdCache_Flush()
+{
+	//std3D_FlushDrawCalls();
+	rdCache_drawnFaces += rdCache_numProcFaces;
+	rdCache_Reset();
+}
+
+#else
+
+#ifdef QOL_IMPROVEMENTS
 static int rdCache_totalLines = 0;
 static rdLine rdCache_aHWLines[1024];
-int rdroid_curVertexColorMode = 0; // MOTS added
 #endif
 
 #ifdef JKM_LIGHTING
@@ -1809,4 +1847,6 @@ void rdCache_FlushOccluders()
 	}
 	rdCache_numOccluders = 0;
 }
+#endif
+
 #endif

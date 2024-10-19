@@ -12,6 +12,7 @@ static rdTexture rdDebug_solidTex = {0};
 
 void rdDebug_DrawScreenLine3(rdVector3* v1, rdVector3* v2, uint32_t color)
 {
+#ifndef RENDER_DROID2
 #ifndef SDL2_RENDER
     return;
 #endif
@@ -48,10 +49,12 @@ void rdDebug_DrawScreenLine3(rdVector3* v1, rdVector3* v2, uint32_t color)
     procEntry->vertices[0] = *v1;
     procEntry->vertices[1] = *v2;
     rdCache_AddProcFace(color, 2, procFaceFlags);
+#endif
 }
 
 void rdDebug_DrawLine3(rdVector3* v1, rdVector3* v2, uint32_t color)
 {
+#ifndef RENDER_DROID2
 #ifndef SDL2_RENDER
     return;
 #endif
@@ -74,10 +77,13 @@ void rdDebug_DrawLine3(rdVector3* v1, rdVector3* v2, uint32_t color)
     vertsOut[1].y = (float)(int)vertsOut[1].y - 0.0001;
     
     rdDebug_DrawScreenLine3(&vertsOut[0], &vertsOut[1], color);
+#endif
 }
 
 void rdDebug_DrawBoundingBox(rdMatrix34* m, float radius, uint32_t color)
 {
+#ifndef RENDER_DROID2
+
 #ifndef SDL2_RENDER
     return;
 #endif
@@ -136,4 +142,5 @@ void rdDebug_DrawBoundingBox(rdMatrix34* m, float radius, uint32_t color)
     rdDebug_DrawLine3(&verts[2], &verts[5], color);
     rdDebug_DrawLine3(&verts[3], &verts[4], color);
     rdDebug_DrawLine3(&verts[0], &verts[7], color);
+#endif
 }

@@ -604,7 +604,7 @@ typedef struct rdClipFrustum
   float right;
   float nearTop;
   float nearLeft;
-#ifdef VIEW_SPACE_GBUFFER
+#if defined(VIEW_SPACE_GBUFFER) || defined(RENDER_DROID2)
   rdVector3 lt, rt, lb, rb;
 #endif
 } rdClipFrustum;
@@ -1594,7 +1594,7 @@ struct rdSurface
   float field_48;
 };
 
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(RENDER_DROID2)
 typedef struct rdDecal
 {
 	char        path[32];
@@ -2223,7 +2223,7 @@ typedef struct sithWorld
     int numParticlesLoaded;
     int numParticles;
     rdParticle* particles;
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(RENDER_DROID2)
 	int numDecalsLoaded;
 	int numDecals;
 	rdDecal* decals;
@@ -2431,7 +2431,7 @@ typedef struct rdThing
         rdSprite* sprite3;
         rdParticle* particlecloud;
         rdPolyLine* polyline;
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(RENDER_DROID2)
 		rdDecal* decal;
 #endif
 #ifdef GHIDRA_IMPORT
@@ -2452,7 +2452,7 @@ typedef struct rdThing
 	int hiddenJoint;
 	int hideWeaponMesh;
 #endif
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(RENDER_DROID2)
 	uint32_t createMs;
 	rdVector3 decalScale;
 #endif
@@ -2851,7 +2851,7 @@ typedef struct sithThingExplosionParams
     uint32_t field_74;
     uint32_t field_78;
     uint32_t field_7C;
-#ifndef DECAL_RENDERING
+#if !defined(DECAL_RENDERING) && !defined(RENDER_DROID2)
 	uint32_t field_80;
 #endif
 } sithThingExplosionParams;
@@ -2898,7 +2898,7 @@ typedef struct sithThingWeaponParams
     sithThing* pTargetThing; // 34
     float field_38; // 38
 #endif
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(RENDER_DROID2)
 	sithThing* wallHitTemplate;
 #endif
 
@@ -2922,7 +2922,7 @@ typedef struct sithThingWeaponParams
     uint32_t field_78;
     uint32_t field_7C;
     uint32_t field_80;
-#ifndef DECAL_RENDERING
+#if !defined(DECAL_RENDERING) && !defined(RENDER_DROID2)
 	uint32_t field_84;
 #endif
 #ifndef JKM_PARAMS
@@ -3126,7 +3126,7 @@ typedef struct sithThing
 #ifdef JKM_LIGHTING
     int archlightIdx;
 #endif
-#ifdef DECAL_RENDERING
+#if defined(DECAL_RENDERING) || defined(RENDER_DROID2)
 	int initialLifeLeftMs;
 #endif
 #ifdef QOL_IMPROVEMENTS

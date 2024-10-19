@@ -319,7 +319,7 @@ void rdCamera_Update(rdMatrix34 *orthoProj)
     rdMatrix_InvertOrtho34(&rdCamera_pCurCamera->view_matrix, orthoProj);
     rdMatrix_Copy34(&rdCamera_camMatrix, orthoProj);
     rdMatrix_ExtractAngles34(&rdCamera_camMatrix, &rdCamera_camRotation);
-#ifdef VIEW_SPACE_GBUFFER
+#if defined(VIEW_SPACE_GBUFFER) || defined(RENDER_DROID2)
 	rdCamera_GetFrustumCornerRays(rdCamera_pCurCamera, orthoProj, &rdCamera_pCurCamera->pClipFrustum->lt, &rdCamera_pCurCamera->pClipFrustum->rt, &rdCamera_pCurCamera->pClipFrustum->lb, &rdCamera_pCurCamera->pClipFrustum->rb);
 #endif
 #ifdef RENDER_DROID2
@@ -507,7 +507,7 @@ void rdCamera_SetMipmapScalar(float val)
     rdCamera_mipmapScalar = val;
 }
 
-#ifdef VIEW_SPACE_GBUFFER
+#if defined(VIEW_SPACE_GBUFFER) || defined(RENDER_DROID2)
 void rdCamera_GetFrustumCornerRays(rdCamera* camera, rdMatrix34* camMat, rdVector3* lt, rdVector3* rt, rdVector3* lb, rdVector3* rb)
 {
 	// todo: do all this math in view space to avoid the view -> world -> view transforms
