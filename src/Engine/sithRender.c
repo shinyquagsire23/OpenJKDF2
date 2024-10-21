@@ -1306,12 +1306,14 @@ void sithRender_RenderLevelGeometry()
 				continue;
 			}
 
+#ifndef RNEDER_DROID2
 #ifdef RGB_AMBIENT
 			if (!jkPlayer_enableShadows && a2.x >= 1.0 && a2.y >= 1.0 && a2.z >= 1.0)
 #else
 			if (a2 >= 1.0)
 #endif
 				i->rdthing.desiredLightMode = RD_LIGHTMODE_FULLYLIT;
+#endif
 
 #ifdef QOL_IMPROVEMENTS
 			// Added: properly set the geoset to 0
@@ -2573,7 +2575,8 @@ void sithRender_RenderThings()
                             texMode = RD_TEXTUREMODE_PERSPECTIVE;
                         thingIter->rdthing.curTexMode = texMode;
                     }
-                    if ( (thingIter->thingflags & SITH_TF_LIGHT) != 0
+#ifndef RENDER_DROID2
+					if ( (thingIter->thingflags & SITH_TF_LIGHT) != 0
                       && thingIter->light > 0.0
 					#ifdef RGB_AMBIENT
 						&& (jkPlayer_enableShadows || a2.x <= stdMath_Clamp(thingIter->light, 0.0, 1.0) && a2.y <= stdMath_Clamp(thingIter->light, 0.0, 1.0) && a2.z <= stdMath_Clamp(thingIter->light, 0.0, 1.0))
@@ -2597,7 +2600,8 @@ void sithRender_RenderThings()
 #endif    
                     }
                     else
-                    {
+#endif
+					{
 #ifdef RGB_AMBIENT
 						rdCamera_SetAmbientLight(rdCamera_pCurCamera, &a2);
 						rdCamera_SetDirectionalAmbientLight(rdCamera_pCurCamera, &thingIter->sector->ambientSH);
@@ -2606,6 +2610,9 @@ void sithRender_RenderThings()
 #endif
                     }
 
+#ifdef RENDER_DROID2
+					lightMode = thingIter->rdthing.desiredLightMode;
+#else
 #ifdef RGB_AMBIENT
 					if (!jkPlayer_enableShadows && a2.x >= 1.0 && a2.y >= 1.0 && a2.z >= 1.0)
 #else
@@ -2624,6 +2631,7 @@ void sithRender_RenderThings()
                         }
                     }
                     else
+#endif
 					if ( (thingIter->thingflags & SITH_TF_IGNOREGOURAUDDISTANCE) == 0 && yval >= (double)sithWorld_pCurrentWorld->gouradDistance )
                     {
                         lightMode = thingIter->rdthing.desiredLightMode;
