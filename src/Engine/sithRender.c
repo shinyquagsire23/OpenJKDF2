@@ -1097,7 +1097,6 @@ void sithRender_DrawSurface(sithSurface* surface)
 	if (texMode >= sithRender_texMode)
 		texMode = sithRender_texMode;
 
-	// todo: other stuff like ceiling sky
 	if (surface->surfaceFlags & SITH_SURFACE_HORIZON_SKY)
 	{
 		texMode = texMode > RD_TEXTUREMODE_AFFINE ? RD_TEXTUREMODE_AFFINE : texMode;
@@ -1192,48 +1191,33 @@ void sithRender_RenderLevelGeometry()
 		rdSetVertexColorMode(1);
 	rdSetSortingMethod(0);
 
-#ifdef RGB_AMBIENT
-	rdVector3 a2;
-#else
-	float a2;
-#endif
-
-	rdClipFrustum* v77 = rdCamera_pCurCamera->pClipFrustum;
-	for (int v72 = 0; v72 < sithRender_numSectors; v72++)
+	rdClipFrustum* clipFrustum = rdCamera_pCurCamera->pClipFrustum;
+	for (int i = 0; i < sithRender_numSectors; ++i)
 	{
-		sithSector* level_idk = sithRender_aSectors[v72];
+		sithSector* pSector = sithRender_aSectors[i];
 		if (sithRender_lightingIRMode)
 		{
-#ifdef RGB_AMBIENT
-			a2.x = a2.y = a2.z = sithRender_f_83198C;
-			rdCamera_SetAmbientLight(rdCamera_pCurCamera, &a2);
+			rdVector3 ambient;
+			ambient.x = ambient.y = ambient.z = sithRender_f_83198C;
+			rdCamera_SetAmbientLight(rdCamera_pCurCamera, &ambient);
 			rdAmbient_Zero(&rdCamera_pCurCamera->ambientSH);
-#else
-			a2 = sithRender_f_83198C;
-			rdCamera_SetAmbientLight(rdCamera_pCurCamera, sithRender_f_83198C);
-#endif
 		}
 		else
 		{
-#ifdef RGB_AMBIENT
-			float baseLight = level_idk->extraLight + sithRender_008d4098;
-			a2.x = stdMath_Clamp(baseLight + level_idk->ambientRGB.x, 0.0, 1.0);
-			a2.y = stdMath_Clamp(baseLight + level_idk->ambientRGB.y, 0.0, 1.0);
-			a2.z = stdMath_Clamp(baseLight + level_idk->ambientRGB.z, 0.0, 1.0);
-			rdCamera_SetAmbientLight(rdCamera_pCurCamera, &a2);
-			rdCamera_SetDirectionalAmbientLight(rdCamera_pCurCamera, &level_idk->ambientSH);
-#else
-			float baseLight = level_idk->ambientLight + level_idk->extraLight + sithRender_008d4098;
-			a2 = stdMath_Clamp(baseLight, 0.0, 1.0);
-			rdCamera_SetAmbientLight(rdCamera_pCurCamera, a2);
-#endif
+			float baseLight = pSector->extraLight + sithRender_008d4098;
+			rdVector3 ambient;
+			ambient.x = stdMath_Clamp(baseLight + pSector->ambientRGB.x, 0.0, 1.0);
+			ambient.y = stdMath_Clamp(baseLight + pSector->ambientRGB.y, 0.0, 1.0);
+			ambient.z = stdMath_Clamp(baseLight + pSector->ambientRGB.z, 0.0, 1.0);
+			rdCamera_SetAmbientLight(rdCamera_pCurCamera, &ambient);
+			rdCamera_SetDirectionalAmbientLight(rdCamera_pCurCamera, &pSector->ambientSH);
 		}
-		rdColormap_SetCurrent(level_idk->colormap);
-		//int v68 = level_idk->colormap == sithWorld_pCurrentWorld->colormaps;
-		//rdSetProcFaceUserData(level_idk->id);
+		rdColormap_SetCurrent(pSector->colormap);
+		//int v68 = pSector->colormap == sithWorld_pCurrentWorld->colormaps;
+		//rdSetProcFaceUserData(pSector->id);
 
-		sithSurface* surface = level_idk->surfaces;
-		for (int v75 = 0; v75 < level_idk->numSurfaces; ++surface, v75++)
+		sithSurface* surface = pSector->surfaces;
+		for (int v75 = 0; v75 < pSector->numSurfaces; ++surface, v75++)
 		{
 			if (!surface->surfaceInfo.face.geometryMode)
 				continue;
@@ -1265,96 +1249,71 @@ void sithRender_RenderLevelGeometry()
 			sithRender_DrawSurface(surface);
 		}
 
-		rdSetProcFaceUserData(level_idk->id | 0x10000);
+		rdSetProcFaceUserData(pSector->id | 0x10000);
 
 		int safeguard = 0;
-		for (sithThing* i = level_idk->thingsList; i; i = i->nextThing)
+		for (sithThing* pThing = pSector->thingsList; pThing; pThing = pThing->nextThing)
 		{
-			// Added: safeguards
 			if (++safeguard >= SITH_MAX_THINGS)
-			{
 				break;
-			}
 
-			if (!(i->thingflags & SITH_TF_LEVELGEO))
-			{
+			if (!(pThing->thingflags & SITH_TF_LEVELGEO))
 				continue;
-			}
 
-			if (i->thingflags & (SITH_TF_DISABLED | SITH_TF_INVISIBLE | SITH_TF_WILLBEREMOVED))
-			{
+			if (pThing->thingflags & (SITH_TF_DISABLED | SITH_TF_INVISIBLE | SITH_TF_WILLBEREMOVED))
 				continue;
-			}
 
 #ifndef FP_LEGS
-			if (!((sithCamera_currentCamera->cameraPerspective & 0xFC) != 0 || i != sithCamera_currentCamera->primaryFocus))
-			{
+			if (!((sithCamera_currentCamera->cameraPerspective & 0xFC) != 0 || pThing != sithCamera_currentCamera->primaryFocus))
 				continue;
-			}
 #endif
 
-			if (i->rdthing.type != RD_THINGTYPE_MODEL)
-			{
+			if (pThing->rdthing.type != RD_THINGTYPE_MODEL)
 				continue;
-			}
 
-			rdMatrix_TransformPoint34(&i->screenPos, &i->position, &rdCamera_pCurCamera->view_matrix);
-			int v63 = rdClip_SphereInFrustrum(level_idk->clipFrustum, &i->screenPos, i->rdthing.model3->radius);
-			i->rdthing.clippingIdk = v63;
-			if (v63 == 2)
-			{
+			rdMatrix_TransformPoint34(&pThing->screenPos, &pThing->position, &rdCamera_pCurCamera->view_matrix);
+			pThing->rdthing.clippingIdk = rdClip_SphereInFrustrum(pSector->clipFrustum, &pThing->screenPos, pThing->rdthing.model3->radius);
+			if (pThing->rdthing.clippingIdk == 2)
 				continue;
-			}
 
-#ifndef RNEDER_DROID2
-#ifdef RGB_AMBIENT
-			if (!jkPlayer_enableShadows && a2.x >= 1.0 && a2.y >= 1.0 && a2.z >= 1.0)
-#else
-			if (a2 >= 1.0)
-#endif
-				i->rdthing.desiredLightMode = RD_LIGHTMODE_FULLYLIT;
-#endif
-
-#ifdef QOL_IMPROVEMENTS
-			// Added: properly set the geoset to 0
-			// todo: we may want the geoset select to work here too, perhaps it needs to be in sithRender_RenderThing
-			if (((i->rdthing).type == RD_THINGTYPE_MODEL))
-				i->rdthing.model3->geosetSelect = 0;
-#endif
+			// Added: set the geoset to 0
+			// todo: geoset selection, perhaps it needs to be in sithRender_RenderThing?
+			if (((pThing->rdthing).type == RD_THINGTYPE_MODEL))
+				pThing->rdthing.model3->geosetSelect = 0;
 
 			// MOTS added
 #ifdef JKM_LIGHTING
-			if ((i->archlightIdx != -1) && ((i->rdthing).type == RD_THINGTYPE_MODEL))
+			if ((pThing->archlightIdx != -1) && ((pThing->rdthing).type == RD_THINGTYPE_MODEL))
 			{
-				rdModel3* iVar22 = i->rdthing.model3;
-				for (int k = 0; k < 4; k++)
+				rdModel3* pModel = pThing->rdthing.model3;
+				for (int k = 0; k < pModel->numGeosets; k++)
 				{
-					for (int j = 0; j < iVar22->geosets[k].numMeshes; j++)
+					for (int j = 0; j < pModel->geosets[k].numMeshes; j++)
 					{
 						if (rdGetVertexColorMode() == 0)
 						{
-							iVar22->geosets[k].meshes[j].vertices_unk = iVar22->geosets[k].meshes[j].vertices_i;
-							iVar22->geosets[k].meshes[j].vertices_i = sithWorld_pCurrentWorld->aArchlights[i->archlightIdx].aMeshes[j].aMono;
+							pModel->geosets[k].meshes[j].vertices_unk = pModel->geosets[k].meshes[j].vertices_i;
+							pModel->geosets[k].meshes[j].vertices_i = sithWorld_pCurrentWorld->aArchlights[pThing->archlightIdx].aMeshes[j].aMono;
 						}
 						else
 						{
-							iVar22->geosets[k].meshes[j].paRedIntensities = sithWorld_pCurrentWorld->aArchlights[i->archlightIdx].aMeshes[j].aRed;
-							iVar22->geosets[k].meshes[j].paGreenIntensities = sithWorld_pCurrentWorld->aArchlights[i->archlightIdx].aMeshes[j].aGreen;
-							iVar22->geosets[k].meshes[j].paBlueIntensities = sithWorld_pCurrentWorld->aArchlights[i->archlightIdx].aMeshes[j].aBlue;
+							pModel->geosets[k].meshes[j].paRedIntensities = sithWorld_pCurrentWorld->aArchlights[pThing->archlightIdx].aMeshes[j].aRed;
+							pModel->geosets[k].meshes[j].paGreenIntensities = sithWorld_pCurrentWorld->aArchlights[pThing->archlightIdx].aMeshes[j].aGreen;
+							pModel->geosets[k].meshes[j].paBlueIntensities = sithWorld_pCurrentWorld->aArchlights[pThing->archlightIdx].aMeshes[j].aBlue;
 						}
 					}
 				}
 			}
-			if ((i->archlightIdx == -1) && (rdGetVertexColorMode() == 1))
+			if ((pThing->archlightIdx == -1) && (rdGetVertexColorMode() == 1))
 			{
-				rdModel3* iVar13 = i->rdthing.model3;
-				for (int k = 0; k < 4; k++)
+				rdModel3* pModel = pThing->rdthing.model3;
+				for (int k = 0; k < pModel->numGeosets; k++)
 				{
-					for (int j = 0; j < iVar13->geosets[k].numMeshes; j++)
+					for (int j = 0; j < pModel->geosets[k].numMeshes; j++)
 					{
-						iVar13->geosets[k].meshes[j].paRedIntensities = iVar13->geosets[k].meshes[j].vertices_i;
-						iVar13->geosets[k].meshes[j].paGreenIntensities = iVar13->geosets[k].meshes[j].vertices_i;
-						iVar13->geosets[k].meshes[j].paBlueIntensities = iVar13->geosets[k].meshes[j].vertices_i;
+						pModel->geosets[k].meshes[j].paRedIntensities = pModel->geosets[k].meshes[j].vertices_i;
+						pModel->geosets[k].meshes[j].paGreenIntensities = pModel->geosets[k].meshes[j].vertices_i;
+						pModel->geosets[k].meshes[j].paBlueIntensities = pModel->geosets[k].meshes[j].vertices_i;
 					}
 				}
 			}
@@ -1364,14 +1323,14 @@ void sithRender_RenderLevelGeometry()
 
 			// MOTS added
 #ifdef JKM_LIGHTING
-			if (((i->archlightIdx != -1) && (i->rdthing.type == RD_THINGTYPE_MODEL)) && (rdGetVertexColorMode() == 0))
+			if (((pThing->archlightIdx != -1) && (pThing->rdthing.type == RD_THINGTYPE_MODEL)) && (rdGetVertexColorMode() == 0))
 			{
-				rdModel3* iVar14 = i->rdthing.model3;
-				for (int k = 0; k < 4; k++)
+				rdModel3* pModel = pThing->rdthing.model3;
+				for (int k = 0; k < pModel->numGeosets; k++)
 				{
-					for (int j = 0; j < iVar14->geosets[k].numMeshes; j++)
+					for (int j = 0; j < pModel->geosets[k].numMeshes; j++)
 					{
-						iVar14->geosets[k].meshes[j].vertices_i = iVar14->geosets[k].meshes[j].vertices_unk;
+						pModel->geosets[k].meshes[j].vertices_i = pModel->geosets[k].meshes[j].vertices_unk;
 					}
 				}
 			}
@@ -1381,7 +1340,7 @@ void sithRender_RenderLevelGeometry()
 	}
 
 	rdCache_Flush();
-	rdCamera_pCurCamera->pClipFrustum = v77;
+	rdCamera_pCurCamera->pClipFrustum = clipFrustum;
 }
 #else
 // MOTS altered
