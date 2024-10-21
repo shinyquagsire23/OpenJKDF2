@@ -394,6 +394,7 @@ void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, vec4 shad
 	vec3 reflVec = reflect(-view, normal);
 
 	float scalar = 0.4; // todo: needs to come from rdCamera_pCurCamera->attenuationMin
+	vec3 sssRadius = fillColor.rgb;
 
 	float overdraw = 0.0;
 
@@ -432,8 +433,8 @@ void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, vec4 shad
 				if ( len >= l.falloffMin )
 					continue;
 
-				float rcpLen = 1.0 / max(len, 0.0001);
-				diff *= rcpLen;
+				if(len > 1e-5)
+					diff /= len;
 
 				float intensity = l.direction_intensity.w;
 				if(l.type == 3)
@@ -446,30 +447,26 @@ void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, vec4 shad
                         intensity = (1.0 - (l.cosAngleX - angle) * l.lux) * intensity;
 				}
 
-				float lightMagnitude = dot(normal, diff);
-
 				// this is JK's attenuation model, note it depends on scalar value matching whatever was used to calculate the intensity, it seems
 				intensity = max(0.0, intensity - len * scalar);
 
-				if(numOccluders > 0)
+				if ((renderCaps & 0x2) == 0x2 && numOccluders > 0u)
 				{
 					float localShadow = clamp(dot(shadows.xyz, diff.xyz) / aperture, 0.0, 1.0);
-					lightMagnitude *= localShadow * localShadow;
+					intensity *= localShadow * localShadow;
 				}
 				
-				vec3 cd;
+				float lightMagnitude = dot(normal, diff);
+				float signedMagnitude = lightMagnitude;
+				lightMagnitude = max(lightMagnitude, 0.0);
+
+				vec3 cd = vec3(lightMagnitude);
 				if (lightMode == 5)
 				{
 					// https://www.shadertoy.com/view/dltGWl
-					vec3 sss = 0.2 * exp(-3.0 * abs(lightMagnitude) / (fillColor.xyz + 0.001));
-					cd.xyz = (fillColor.xyz * sss + max(0.0, lightMagnitude));
+					vec3 sss = 0.2 * exp(-3.0 * abs(signedMagnitude) / (sssRadius.xyz + 0.001));
+					cd.xyz += sssRadius.xyz * sss;
 				}
-				else
-				{
-					cd.xyz = vec3(max(0.0, lightMagnitude));
-				}
-
-				lightMagnitude = max(lightMagnitude, 0.0);
 
 				diffuseLight += l.color.xyz * intensity * cd;
 
@@ -936,7 +933,7 @@ void main(void)
 		diffuseColor = diffuseColor * avgAlbedo;// -> 0 * (1-avgAlbedo) + diffuseColor * avgAlbedo -> mix(vec3(0.0), diffuseColor, avgAlbedo)
 		
 		// blend to dielectric white when bright
-		specularColor = mix(sampled_color.xyz, vec3(0.5), avgAlbedo);
+		specularColor = mix(sampled_color.xyz, vec3(0.2), avgAlbedo);
 		
 		// try to estimate some roughness variation from the texture
 		float smoothness = max(sampled_color.r, max(sampled_color.g, sampled_color.b));
@@ -970,12 +967,12 @@ void main(void)
 		CalculatePointLighting(bucket_index, surfaceNormals, localViewDir, shadows, diffuseColor.xyz, specularColor.xyz, roughness, diffuseLight, specularLight);
 	
 	diffuseLight.xyz = clamp(diffuseLight.xyz, vec3(0.0), vec3(1.0));	
-	specularLight.xyz = clamp(specularLight.xyz, vec3(0.0), vec3(2.0));	
+	//specularLight.xyz = clamp(specularLight.xyz, vec3(0.0), vec3(1.0));	
 
 	// taper off highlights
-	//specularLight.r = rolloff(specularLight.r, 1.0, 0.2);
-	//specularLight.g = rolloff(specularLight.g, 1.0, 0.2);
-	//specularLight.b = rolloff(specularLight.b, 1.0, 0.2);
+	specularLight.r = rolloff(specularLight.r, 1.0, 0.2);
+	specularLight.g = rolloff(specularLight.g, 1.0, 0.2);
+	specularLight.b = rolloff(specularLight.b, 1.0, 0.2);
 #endif
 
 	diffuseLight.xyz *= diffuseColor.xyz;
