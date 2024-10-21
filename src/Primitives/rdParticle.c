@@ -372,8 +372,9 @@ int rdParticle_Draw(rdThing* thing, rdMatrix34* mat)
 			rdLight light;
 			rdLight_NewEntry(&light);
 			light.falloffMin = 0.02f;
-			light.intensity = thing->parentSithThing->light * 2.f;// * 8.0f;
+			light.intensity = light.falloffMin * rdCamera_pCurCamera->attenuationMin;//thing->parentSithThing->light * 2.f;// * 8.0f;
 			rdMaterial_GetFillColor(&light.color, particle->material, rdColormap_pCurMap, particle->vertexCel[j], -1);
+			rdVector_Scale3Acc(&light.color, 2.0f * thing->parentSithThing->light / light.intensity);
 			rdAddLight(&light, &aParticleVertices[j]);
 		}
 
