@@ -679,9 +679,16 @@ int jkGuiBuildMulti_DisplayModel()
 #ifdef RGB_AMBIENT
 	rdVector3 amb = {0.4, 0.4, 0.4};
 	rdCamera_SetAmbientLight(jkGuiBuildMulti_pCamera, &amb);
+
+	rdVector3 ambDir;
+	rdVector_Neg3(&ambDir, &jkGuiBuildMulti_lightPos);
+	rdVector_Normalize3Acc(&ambDir);
+	rdAmbient_Acc(&jkGuiBuildMulti_pCamera->ambientSH, &amb, &ambDir);
+
 #else
     rdCamera_SetAmbientLight(jkGuiBuildMulti_pCamera, 0.4);
 #endif
+
     jkGuiBuildMulti_fnMatLoader = rdMaterial_RegisterLoader(jkGuiBuildMulti_MatLoader);
     jkGuiBuildMulti_fnModelLoader = rdModel3_RegisterLoader(jkGuiBuildMulti_ModelLoader);
     jkGuiBuildMulti_fnKeyframeLoader = rdKeyframe_RegisterLoader(jkGuiBuildMulti_KeyframeLoader);
@@ -724,6 +731,45 @@ void jkGuiBuildMulti_ModelDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVB
         stdDisplay_VBufferLock(jkGuiBuildMulti_pVBuf1);
         rdAdvanceFrame();
 
+#ifdef RENDER_DROID2
+		rdRenderPass("jkGguiBuildMulti_DisplayModel", 0, 0);
+		rdEnable(RD_LIGHTING);
+		rdEnable(RD_SHADOWS);
+		rdDisable(RD_DECALS);
+		rdDepthRange(0.0f, 1.0f);
+		rdDitherMode(jkPlayer_enableDithering ? RD_DITHER_4x4 : RD_DITHER_NONE);
+		rdClearLights();
+		rdClearOccluders();
+		rdClearDecals();
+
+		rdAddLight(&jkGuiBuildMulti_light, &jkGuiBuildMulti_lightPos);
+		rdAmbientLight(jkGuiBuildMulti_pCamera->ambientLight.x, jkGuiBuildMulti_pCamera->ambientLight.y, jkGuiBuildMulti_pCamera->ambientLight.z);
+		rdAmbientLightSH(&jkGuiBuildMulti_pCamera->ambientSH);
+	
+		rdMatrixMode(RD_MATRIX_VIEW);
+		rdIdentity();
+		rdLoadMatrix34(&jkGuiBuildMulti_pCamera->view_matrix);
+
+		rdMatrixMode(RD_MATRIX_PROJECTION);
+		rdIdentity();
+		rdPerspective(jkGuiBuildMulti_pCamera->fov, jkGuiBuildMulti_pCamera->screenAspectRatio, jkGuiBuildMulti_pCamera->pClipFrustum->field_0.y, jkGuiBuildMulti_pCamera->pClipFrustum->field_0.z);
+
+		// set the viewport to the canvas area
+		// it would be nice to render to an FBO or something and just let the blitter handle it...
+		float menu_x = (Window_xSize - (Window_ySize * (640.0 / 480.0))) / 2.0;
+		float menu_w = (Window_ySize * (640.0 / 480.0));
+
+		float x = menu_x + (315.0f / 640.0f) * menu_w;
+		float y = (115.0f / 480.0f) * Window_ySize;
+		float w = (260.0f / 640.0f) * menu_w;
+		float h = (260.0f / 480.0f) * Window_ySize;
+		rdViewport(x, y, w, h, 0, 1);
+
+		// make sure we don't draw out of bounds
+		rdScissorMode(RD_SCISSOR_ENABLED);
+		rdScissor(x, y, w, h);
+#endif
+
         // Added: switched around the order of casting for this...
         v5 = stdPlatform_GetTimeMsec();
         v6 = (v5 - jkGuiBuildMulti_startTimeSecs) * 0.001;
@@ -744,6 +790,10 @@ void jkGuiBuildMulti_ModelDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVB
         rdThing_Draw(jkGuiBuildMulti_thing, &jkGuiBuildMulti_matrix);
         rdThing_Draw(jkGuiBuildMulti_pThingGun, jkGuiBuildMulti_thing->hierarchyNodeMatrices + 12);
         rdFinishFrame();
+#ifdef RENDER_DROID2
+		std3D_FlushDrawCalls();
+		rdScissorMode(RD_SCISSOR_DISABLED);
+#endif
         stdDisplay_VBufferUnlock(jkGuiBuildMulti_pVBuf1);
         rot.x = 0.0;
         rot.z = 0.0;
