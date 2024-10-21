@@ -514,6 +514,19 @@ void rdGetViewport(rdViewportRect* pOut)
 	memcpy(pOut, &rdroid_rasterState.viewport, sizeof(rdViewportRect));
 }
 
+void rdScissorMode(rdScissorMode_t mode)
+{
+	rdroid_rasterState.scissorMode = mode;
+}
+
+void rdScissor(int x, int y, int width, int height)
+{
+	rdroid_rasterState.scissor.x = x;
+	rdroid_rasterState.scissor.y = y;
+	rdroid_rasterState.scissor.width = width;
+	rdroid_rasterState.scissor.height = height;
+}
+
 void rdFogRange(float startDepth, float endDepth)
 {
 	rdroid_rasterState.fogStart = startDepth;
@@ -823,14 +836,6 @@ void rdSetBlendMode(rdBlendMode_t state)
 void rdSetCullMode(rdCullMode_t mode)
 {
 	rdroid_rasterState.cullMode = mode;
-}
-
-void rdSetScissor(int x, int y, int width, int height)
-{
-	rdroid_rasterState.scissor.x = x;
-	rdroid_rasterState.scissor.y = y;
-	rdroid_rasterState.scissor.width = width;
-	rdroid_rasterState.scissor.height = height;
 }
 
 void rdSetAlphaThreshold(uint8_t threshold)
