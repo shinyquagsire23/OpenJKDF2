@@ -33,7 +33,7 @@
 
 // helper to avoid redundantly checking this constantly
 #ifdef SPECULAR_LIGHTING
-#define USES_VERTEX_LIGHTING(LIGHT_MODE) (((LIGHT_MODE) == 3) || ((LIGHT_MODE) == 4))
+#define USES_VERTEX_LIGHTING(LIGHT_MODE) (((LIGHT_MODE) == 3) || ((LIGHT_MODE) == 4)|| ((LIGHT_MODE) == 5))
 #else
 #define USES_VERTEX_LIGHTING(LIGHT_MODE) ((LIGHT_MODE) == 3)
 #endif
