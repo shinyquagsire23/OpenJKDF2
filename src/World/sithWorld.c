@@ -372,13 +372,26 @@ int sithWorld_NewEntry(sithWorld *pWorld)
 				rdVector_Zero3(&sector->ambientRGB); // rgb flat ambient (replaces ambient light intensity)
 				rdAmbient_Zero(&sector->ambientSH); // rgb directional ambient
 
+				//rdVector_Set3(&sector->ambientRGB, sector->ambientLight, sector->ambientLight, sector->ambientLight);
+				//continue;
+
 				double sflight = 0.0;
 				float total = 0.00001f;
 				for (int j = 0; j < pWorld->sectors[i].numSurfaces; j++)
 				{
 					sithSurface* surface = &pWorld->sectors[i].surfaces[j];
+				
+					// ignore invisible surfaces
+					if (surface->surfaceInfo.face.geometryMode == RD_GEOMODE_NOTRENDERED)
+						continue;
+
+					// ignore adjoins
 					if(surface->adjoin && !(surface->adjoin->flags & SITHSURF_ADJOIN_VISIBLE))
-						continue; // ignore adjoins
+						continue;
+						
+					// ignore surfaces with no material
+					if (!surface->surfaceInfo.face.material)
+						continue;
 
 					total += surface->surfaceInfo.face.numVertices;
 
@@ -386,7 +399,7 @@ int sithWorld_NewEntry(sithWorld *pWorld)
 					sflight += el;
 
 					float minlight = el;
-					if (surface->surfaceInfo.face.lightingMode == RD_LIGHTMODE_FULLYLIT)
+					if ((surface->surfaceInfo.face.geometryMode != RD_GEOMODE_NOTRENDERED) && surface->surfaceInfo.face.lightingMode == RD_LIGHTMODE_FULLYLIT)
 						minlight = 1.0f;
 
 					int emissiveLightLevel = 0;
@@ -394,7 +407,7 @@ int sithWorld_NewEntry(sithWorld *pWorld)
 						emissiveLightLevel = -1;
 
 					rdVector3 emissive;
-					if(rdMaterial_GetFillColor(&emissive, surface->surfaceInfo.face.material, pWorld->sectors[i].colormap, 0, emissiveLightLevel))
+					if((surface->surfaceInfo.face.geometryMode != RD_GEOMODE_NOTRENDERED) && rdMaterial_GetFillColor(&emissive, surface->surfaceInfo.face.material, pWorld->sectors[i].colormap, 0, emissiveLightLevel))
 						rdAmbient_Acc(&sector->ambientSH, &emissive, &surface->surfaceInfo.face.normal);
 
 					for (int k = 0; k < surface->surfaceInfo.face.numVertices; ++k)
@@ -417,11 +430,17 @@ int sithWorld_NewEntry(sithWorld *pWorld)
 				//sflight /= (float)pWorld->sectors[i].numSurfaces;
 				rdVector_InvScale3Acc(&sector->ambientRGB, total);
 			#ifdef RENDER_DROID2
-				rdAmbient_Scale(&sector->ambientSH, 4.0f / total); // integration over sphere, with PI pre-divided out
+				rdAmbient_Scale(&sector->ambientSH, 4.0f / total); // integration over sphere
 			#else
 				rdAmbient_Scale(&sector->ambientSH, 4.0f * M_PI / total); // integration over sphere
 				rdAmbient_UpdateDominantDirection(&sector->ambientSH);
 			#endif
+
+				// normalize the color values to the avg intensity and apply the sector ambient light scalar
+				rdVector3 lum = {0.33, 0.55, 0.11};
+				float avg = fmin(1.0f, rdVector_Dot3(&sector->ambientRGB, &lum) + 1e-5f);
+				rdVector_Scale3Acc(&sector->ambientRGB, fmin(1.0f, sector->ambientLight) / avg);
+				rdAmbient_Scale(&sector->ambientSH, fmin(1.0f, sector->ambientLight) / avg);
 			}
 #endif
             if ( !sithWorld_Verify(pWorld) )
