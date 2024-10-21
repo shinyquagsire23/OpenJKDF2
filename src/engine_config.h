@@ -4,10 +4,19 @@
 // Experimental features
 #ifdef QOL_IMPROVEMENTS
 
-#define RENDER_DROID2        // test gpu path, skips rdCache and uses a fixed-function like API to pass information to the GPU for HW transform, clipping and lighting
+#define RENDER_DROID2        // new gpu path, skips rdCache and uses a fixed-function like API to pass information to the GPU for HW transform, clipping and lighting
 
 //#define HW_VBUFFER // temp stuff, trying to move vbuffer to GPU and use fbos in there so we can render to them
 
+// Gameplay features
+#define FP_LEGS              // Draws legs in first person
+#define DYNAMIC_POV          // POV enhancements, such as the weapon following the autoaim target, muzzle flashes, sway improvements
+#define RAGDOLLS             // .af support and SITH_MT_RAGDOLL physics type for experimental verlet ragdolls
+#define LIGHTSABER_TRAILS    // visual enhancement for lightsabers, draws extra tris to simulate lightsaber trails/motion blur
+#define LIGHTSABER_MARKS     // visual enhancement for lightsabers, draws impact decals with saber collision, requires DECAL_RENDERING
+//#define LIGHTSABER_GLOW    // visual enhancement for lightsabers, draws a sprite-based glow similar to Jedi Outcast/Academy
+
+// Old render pipeline features
 #define STENCIL_BUFFER       // mark the stencil buffer with dynamic/transparent stuff, so we can effectively cull things like decals
 #define CLASSIC_EMISSIVE     // compute emissives using the same approach as stock JK with max(color, emissive), rather than adding it on top as bloom
 #define NEW_SSAO             // disk-to-disk based SSAO with performance improvements
@@ -17,19 +26,54 @@
 #define PARTICLE_LIGHTS      // very simple lights for particle elements
 #define HALF_LAMBERT         // use half lambert gouraud for dynamic lights
 #define SPECULAR_LIGHTING    // RD_LIGHTMODE_SPECULAR
-#define FP_LEGS              // Draws legs in first person
-#define DYNAMIC_POV          // POV enhancements, such as the weapon following the autoaim target, muzzle flashes, sway improvements
 #define DECAL_RENDERING      // .dcal support and decal rendering path (for blast marks etc)
 #define SPHERE_AO            // deferred ambient occlusion via sphere volumes
-#define RAGDOLLS             // .af support and SITH_MT_RAGDOLL physics type for experimental verlet ragdolls
 #define ADDITIVE_BLEND       // additive/screen blending support with a new face flags
 #define POLYLINE_EXT         // .pln support and polyline template param, allows using polylines as rendering primitives for things (ex. blaster bolts)
-#define LIGHTSABER_TRAILS    // visual enhancement for lightsabers, draws extra tris to simulate lightsaber trails/motion blur
-#define LIGHTSABER_MARKS     // visual enhancement for lightsabers, draws impact decals with saber collision, requires DECAL_RENDERING
-//#define LIGHTSABER_GLOW    // visual enhancement for lightsabers, draws a sprite-based glow similar to Jedi Outcast/Academy
 #define STATIC_JKL_EXT       // load extra .jkl files from resources on startup along side static.jkl
 #define VERTEX_COLORS        // add vertex color face flag to indicate using the rdProcEntry's color field as the vertex color
 #define FOG                  // infernal machine style fog rendering
+
+#ifdef RENDER_DROID2
+// these are implicit in RENDER_DROID2, the defines are for the old pipeline
+#ifdef SPHERE_AO
+#undef SPHERE_AO
+#endif
+#ifdef PARTICLE_LIGHTS
+#undef PARTICLE_LIGHTS
+#endif
+#ifdef DECAL_RENDERING
+#undef DECAL_RENDERING
+#endif
+#ifdef NEW_BLOOM
+#undef NEW_BLOOM
+#endif
+#ifdef NEW_SSAO
+#undef NEW_SSAO
+#endif
+
+// these are always active for RENDER_DROID2
+#ifndef RGB_AMBIENT
+#define RGB_AMBIENT
+#endif
+#ifndef RGB_THING_LIGHTS
+#define RGB_THING_LIGHTS
+#endif
+#ifndef SPECULAR_LIGHTING
+#define SPECULAR_LIGHTING
+#endif
+#ifndef ADDITIVE_BLEND
+#define ADDITIVE_BLEND
+#endif
+#ifndef POLYLINE_EXT
+#define POLYLINE_EXT
+#endif
+#ifndef VERTEX_COLORS
+#define VERTEX_COLORS
+#endif
+#ifndef FOG
+#define FOG
+#endif
 
 // helper to avoid redundantly checking this constantly
 #ifdef SPECULAR_LIGHTING
@@ -38,11 +82,6 @@
 #define USES_VERTEX_LIGHTING(LIGHT_MODE) ((LIGHT_MODE) == 3)
 #endif
 
-#ifdef RENDER_DROID2
-// these are implicit in RENDER_DROID2, the defines are for the old pipeline
-#undef SPHERE_AO
-#undef PARTICLE_LIGHTS
-#undef DECAL_RENDERING
 #endif
 
 #if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS) || defined(SPHERE_AO)
