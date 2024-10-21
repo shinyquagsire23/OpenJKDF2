@@ -4730,6 +4730,7 @@ void std3D_FlushDrawCalls()
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
 	glDisable(GL_STENCIL_TEST);
+	glDisable(GL_SCISSOR_TEST);
 
 	std3D_popDebugGroup();
 }
