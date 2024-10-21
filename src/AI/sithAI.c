@@ -405,7 +405,7 @@ void sithAI_SetActorFireTarget(sithActor *actor, int a2, intptr_t actorFlags)
             break;
         if (actor->thing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED))
             break;
-        if ( (g_debugmodeFlags & 1) != 0 )
+        if ( (g_debugmodeFlags & DEBUGFLAG_NO_AIEVENTS) != 0 )
             break;
         if ( actor->thing->actorParams.health <= 0.0 )
             break;
@@ -1354,7 +1354,7 @@ int sithAI_FireWeapon(sithActor *actor, float minDistToFire, float maxDistToFire
     v9 = actor->thing;
     v21 = 1.0;
     v20 = 0;
-    if ( (g_debugmodeFlags & 0x80u) != 0
+    if ( (g_debugmodeFlags & DEBUGFLAG_NO_AI) != 0
       || (v9->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED))
       || (v9->sector->flags & SITH_SECTOR_UNDERWATER) && (v9->actorParams.typeflags & SITH_AF_CANTSHOOTUNDERWATER) != 0 )
     {
@@ -1743,7 +1743,7 @@ int sithAI_FUN_0053a520(sithActor *pActor,float param_2,float param_3,float para
     anim = 0;
     thing = pActor->thing;
 
-    if (g_debugmodeFlags & 0x80) {
+    if (g_debugmodeFlags & DEBUGFLAG_NO_AI) {
         return 0;
     }
     if (thing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) {
@@ -1831,7 +1831,7 @@ int sithAI_Leap(sithActor *pActor,float minDist,float maxDist,float minDot,int p
     anim = 0;
     thing = pActor->thing;
     
-    if (g_debugmodeFlags & 0x80) {
+    if (g_debugmodeFlags & DEBUGFLAG_NO_AI) {
         return 0;
     }
     if (thing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) {

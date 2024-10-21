@@ -432,7 +432,7 @@ int sithAICmd_BlindFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorIn
             {
                 sithAI_RandomFireVector(&fireOffs, aiclass->argsAsFloat[5] / fOut);
             }
-            if ( (g_debugmodeFlags & 0x80u) == 0 )
+            if ( (g_debugmodeFlags & DEBUGFLAG_NO_AI) == 0 )
             {
                 sithSoundClass_ThingPlaySoundclass4(weapon, bWhichProjectile + SITH_SC_FIRE1);
                 v11 = sithWeapon_Fire(weapon, projectile, &fireOffs, &actor->blindAimError, 0, bWhichProjectile + SITH_ANIM_FIRE, 1.0, 0, 0.0);
@@ -764,7 +764,7 @@ LABEL_41:
         actor->thing->actorParams.eyePYR.x = v28;
         sithActor_RotateTurretToEyePYR(actor->thing);
 LABEL_50:
-        if ( sithTime_curSeconds > (double)instinct->param0 && (g_debugmodeFlags & 0x80u) == 0 )
+        if ( sithTime_curSeconds > (double)instinct->param0 && (g_debugmodeFlags & DEBUGFLAG_NO_AI) == 0 )
         {
             rdMatrix_Copy34(&v37, v20);
             rdMatrix_PreRotate34(&v37, &actor->thing->actorParams.eyePYR);
@@ -949,7 +949,7 @@ p1 - Time to sleep before check again (msec)
 */
 int sithAICmd_LookForTarget(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, void *extra)
 {
-    if (flags || (g_debugmodeFlags & 0x200))
+    if (flags || (g_debugmodeFlags & DEBUGFLAG_NO_AILOOK_FOR_TARGET))
         return 0;
 
     if ( (actor->flags & SITHAI_MODE_ACTIVE) != 0 )
@@ -1644,7 +1644,7 @@ int sithAICmd_LookForOpposingTarget(sithActor *pActor, sithAIClassEntry *pAiclas
 
     if (flags)
         return 0;
-    if (g_debugmodeFlags & 0x200)
+    if (g_debugmodeFlags & DEBUGFLAG_NO_AILOOK_FOR_TARGET)
         return 0;
 
     if ((pActor->flags & SITHAI_MODE_ACTIVE) == 0)
