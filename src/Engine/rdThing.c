@@ -31,7 +31,7 @@ int rdThing_NewEntry(rdThing *thing, sithThing *parent)
     thing->hierarchyNodeMatrices = 0;
     thing->desiredGeoMode = RD_GEOMODE_TEXTURED;
 #ifdef RENDER_DROID2
-	thing->desiredLightMode = RD_LIGHTMODE_SPECULAR;
+	thing->desiredLightMode = RD_LIGHTMODE_SUBSURFACE;
 #elif defined(SPECULAR_LIGHTING)
 	thing->desiredLightMode = RD_LIGHTMODE_SPECULAR;
 #else
