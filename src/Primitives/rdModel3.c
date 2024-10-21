@@ -1659,7 +1659,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
 
 			if (rdGetVertexColorMode() == 0)
 			{
-				float intensity = pCurMesh->vertices_i[j];
+				float intensity = pCurMesh->vertices_i[posidx];
 				rdColor4f(intensity, intensity, intensity, alpha);
 			}
 			else
@@ -1667,7 +1667,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
 				float* red = pCurMesh->vertices_r;
 				float* green = pCurMesh->vertices_g;
 				float* blue = pCurMesh->vertices_b;
-				rdColor4f(red[j], green[j], blue[j], alpha);
+				rdColor4f(red[posidx], green[posidx], blue[posidx], alpha);
 			}
 
 			if(face->vertexUVIdx && pCurMesh->vertexUVs)
