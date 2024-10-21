@@ -106,7 +106,7 @@ int sithMain_Startup(HostServices *commonFuncs)
 
     // Added
     if (Main_bHeadless || Main_bDedicatedServer) {
-        g_debugmodeFlags |= 0x100;
+        g_debugmodeFlags |= DEBUGFLAG_IN_EDITOR;
     }
 
     if ( !is_started )
@@ -397,7 +397,7 @@ int sithMain_Tick()
                 if ( sithComm_bSyncMultiplayer )
                     sithComm_Sync();
 
-                if ( (g_debugmodeFlags & 1) == 0  && (!sithNet_isMulti || sithNet_isMulti && sithNet_isServer))
+                if ( (g_debugmodeFlags & DEBUGFLAG_NO_AIEVENTS) == 0  && (!sithNet_isMulti || sithNet_isMulti && sithNet_isServer))
                     sithAI_TickAll();
 
                 sithSurface_Tick(sithTime_deltaSeconds);
@@ -432,7 +432,7 @@ int sithMain_Tick()
             if ( sithComm_bSyncMultiplayer )
                 sithComm_Sync();
 
-            if ( (g_debugmodeFlags & 1) == 0 && (!sithNet_isMulti || sithNet_isMulti && sithNet_isServer))
+            if ( (g_debugmodeFlags & DEBUGFLAG_NO_AIEVENTS) == 0 && (!sithNet_isMulti || sithNet_isMulti && sithNet_isServer))
                 sithAI_TickAll();
         
             sithSurface_Tick(sithTime_deltaSeconds);

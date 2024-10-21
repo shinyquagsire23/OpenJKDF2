@@ -848,7 +848,7 @@ int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithCollisionSea
 
     if ( thing->moveType != SITH_MT_PHYSICS )
         return 0;
-    if ( (g_debugmodeFlags & 0x40) != 0 )
+    if ( (g_debugmodeFlags & DEBUGFLAG_PRINT_HITS) != 0 )
     {
         v4 = surface->surfaceInfo.face.material;
         if ( v4 )

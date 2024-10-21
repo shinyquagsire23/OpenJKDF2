@@ -56,7 +56,7 @@ void sithCommand_Startup()
     sithConsole_RegisterDevCmd(sithCommand_CmdTick, "tick", 0);
     sithConsole_RegisterDevCmd(sithCommand_CmdSession, "session", 0);
 
-    if ( (g_debugmodeFlags & 0x100) != 0 )
+    if ( (g_debugmodeFlags & DEBUGFLAG_IN_EDITOR) != 0 )
     {
         sithConsole_RegisterDevCmd(sithConsole_PrintHelp, "help", 0);
         sithConsole_RegisterDevCmd(sithCommand_CheatSetDebugFlags, "disableai", 0);

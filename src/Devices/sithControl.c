@@ -227,7 +227,7 @@ void sithControl_InitFuncToControlType()
     sithControl_inputFuncToControlType[INPUT_FUNC_GAMMA] = 4 | 1;
     sithControl_inputFuncToControlType[INPUT_FUNC_SCREENSHOT] = 4 | 1;
     sithControl_inputFuncToControlType[INPUT_FUNC_TALLY] = 4 | 1;
-    if ( (g_debugmodeFlags & 0x100) != 0 )
+    if ( (g_debugmodeFlags & DEBUGFLAG_IN_EDITOR) != 0 )
         sithControl_inputFuncToControlType[INPUT_FUNC_DEBUG] = 4 | 1;
 }
 
@@ -905,7 +905,7 @@ int sithControl_HandlePlayer(sithThing *player, float deltaSecs)
         goto debug_controls;
     }
 
-    if ( (g_debugmodeFlags & 0x100) == 0 || !sithControl_ReadFunctionMap(INPUT_FUNC_DEBUG, 0) )
+    if ( (g_debugmodeFlags & DEBUGFLAG_IN_EDITOR) == 0 || !sithControl_ReadFunctionMap(INPUT_FUNC_DEBUG, 0) )
     {
         if (player->thingflags & SITH_TF_DEAD)
         {
@@ -1755,7 +1755,7 @@ void sithControl_MapDefaults()
     sithControl_MapFunc(INPUT_FUNC_MAP, DIK_TAB, 0);
     sithControl_MapFunc(INPUT_FUNC_INCREASE, DIK_EQUALS, 0);
     sithControl_MapFunc(INPUT_FUNC_DECREASE, DIK_MINUS, 0);
-    if ( (g_debugmodeFlags & 0x100) != 0 )
+    if ( (g_debugmodeFlags & DEBUGFLAG_IN_EDITOR) != 0 )
         sithControl_MapFunc(INPUT_FUNC_DEBUG, DIK_BACK, 0);// DIK_BACKSPACE
     sithControl_MapFunc(INPUT_FUNC_TALK, DIK_T, 0);
     sithControl_MapFunc(INPUT_FUNC_GAMMA, DIK_F11, 0);

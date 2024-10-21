@@ -310,7 +310,7 @@ void sithPuppet_Tick(sithThing *thing, float deltaSeconds)
     float thinga; // [esp+1Ch] [ebp+4h]
     float a2a; // [esp+20h] [ebp+8h]
 
-    if ( thing->animclass && thing->puppet && thing->rdthing.puppet && (g_debugmodeFlags & 2) == 0 )
+    if ( thing->animclass && thing->puppet && thing->rdthing.puppet && (g_debugmodeFlags & DEBUGFLAG_NO_PUPPETS) == 0 )
     {
         if ( thing->moveType == SITH_MT_PHYSICS )
         {

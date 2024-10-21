@@ -244,7 +244,7 @@ void sithPlayer_debug_loadauto(sithThing *player)
 {
     char v1[128]; // [esp+4h] [ebp-80h] BYREF
 
-    if ( (g_submodeFlags & 1) != 0 || (g_debugmodeFlags & 0x100) != 0 )
+    if ( (g_submodeFlags & 1) != 0 || (g_debugmodeFlags & DEBUGFLAG_IN_EDITOR) != 0 )
     {
         sithPlayer_debug_ToNextCheckpoint(player);
     }
