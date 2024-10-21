@@ -1457,85 +1457,115 @@ void jkCogExt_SetGameSpeed(sithCog* ctx)
 void jkCogExt_GetThingHeadLvec(sithCog* ctx)
 {
     sithThing* pThing = sithCogExec_PopThing(ctx);
+	if (!pThing || (pThing->type != SITH_THING_ACTOR && pThing->type != SITH_THING_PLAYER))
+	{
+		sithCogExec_PushVector3(ctx, &rdroid_zeroVector3);
+		return;
+	}
 
-    // TODO
-    rdVector3 vec = {0};
-    sithCogExec_PushVector3(ctx, &vec);
-    Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
+	float s, c;
+	stdMath_SinCos(pThing->actorParams.eyePYR.x, &s, &c);
+	
+	rdVector3 headLVec;
+	headLVec.x = pThing->lookOrientation.lvec.x * c;
+	headLVec.y = pThing->lookOrientation.lvec.y * c;
+	headLVec.z = s;
+	rdVector_Normalize3Acc(&headLVec);
+
+	sithCogExec_PushVector3(ctx, &headLVec);
 }
 
 void jkCogExt_GetThingHeadPitch(sithCog* ctx)
 {
     sithThing* pThing = sithCogExec_PopThing(ctx);
-    sithCogExec_PushFlex(ctx, 0.0); // TODO
-    Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
+	if (!pThing || (pThing->type != SITH_THING_ACTOR && pThing->type != SITH_THING_PLAYER))
+	{
+		sithCogExec_PushFlex(ctx, 0.0f);
+		return;
+	}
+    sithCogExec_PushFlex(ctx, pThing->actorParams.eyePYR.x);
 }
 
 void jkCogExt_GetThingHeadPYR(sithCog* ctx)
 {
     sithThing* pThing = sithCogExec_PopThing(ctx);
-
-    // TODO
-    rdVector3 vec = {0};
-    sithCogExec_PushVector3(ctx, &vec);
-    Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
+	if (!pThing || (pThing->type != SITH_THING_ACTOR && pThing->type != SITH_THING_PLAYER))
+	{
+		sithCogExec_PushVector3(ctx, &rdroid_zeroVector3);
+		return;
+	}
+    sithCogExec_PushVector3(ctx, &pThing->actorParams.eyePYR);
 }
 
 void jkCogExt_GetThingPYR(sithCog* ctx)
 {
     sithThing* pThing = sithCogExec_PopThing(ctx);
+	if (!pThing)
+	{
+		sithCogExec_PushVector3(ctx, &rdroid_zeroVector3);
+		return;
+	}
 
-    // TODO
-    rdVector3 vec = {0};
-    sithCogExec_PushVector3(ctx, &vec);
-    Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
+    rdVector3 pyr = {0};
+	rdMatrix_ExtractAngles34(&pThing->lookOrientation, &pyr);
+	sithCogExec_PushVector3(ctx, &pyr);
 }
 
 void jkCogExt_SetThingHeadPYR(sithCog* ctx)
 {
-    //TODO
-    rdVector3 vec = {0};
-    sithCogExec_PopVector3(ctx, &vec);
+    rdVector3 pyr = {0};
+    sithCogExec_PopVector3(ctx, &pyr);
     sithThing* pThing = sithCogExec_PopThing(ctx);
-    Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
+	if (!pThing || (pThing->type != SITH_THING_ACTOR && pThing->type != SITH_THING_PLAYER))
+		return;
+	pThing->actorParams.eyePYR = pyr;
 }
 
 void jkCogExt_SetThingPosEx(sithCog* ctx)
 {
-    //TODO
     sithSector* pSector = sithCogExec_PopSector(ctx);
-    rdVector3 vec = {0};
-    sithCogExec_PopVector3(ctx, &vec);
+    rdVector3 pos = {0};
+    sithCogExec_PopVector3(ctx, &pos);
     sithThing* pThing = sithCogExec_PopThing(ctx);
-    Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
+	if (!pThing || !pSector)
+		return;
+
+	rdVector_Copy3(&pThing->position, &pos);
+	sithThing_MoveToSector(pThing, pSector, 0);
 }
 
 void jkCogExt_SetThingPYR(sithCog* ctx)
 {
-    //TODO
-    rdVector3 vec = {0};
-    sithCogExec_PopVector3(ctx, &vec);
+    rdVector3 pyr = {0};
+    sithCogExec_PopVector3(ctx, &pyr);
     sithThing* pThing = sithCogExec_PopThing(ctx);
-    Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
+	if(!pThing)
+		return;
+	rdMatrix_BuildRotate34(&pThing->lookOrientation, &pyr);
 }
 
 void jkCogExt_SetThingLRUVecs(sithCog* ctx)
 {
-    //TODO
-    rdVector3 vec = {0};
-    sithCogExec_PopVector3(ctx, &vec);
-    sithCogExec_PopVector3(ctx, &vec);
-    sithCogExec_PopVector3(ctx, &vec);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
-    Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
+	rdVector3 uvec, lvec, rvec;
+	sithCogExec_PopVector3(ctx, &uvec);
+	sithCogExec_PopVector3(ctx, &lvec);
+	sithCogExec_PopVector3(ctx, &rvec);
+	sithThing* pThing = sithCogExec_PopThing(ctx);
+	if (!pThing)
+		return;
+	pThing->lookOrientation.rvec = rvec;
+	pThing->lookOrientation.lvec = lvec;
+	pThing->lookOrientation.uvec = uvec;
 }
 
 void jkCogExt_SetThingSector(sithCog* ctx)
 {
     sithSector* pSector = sithCogExec_PopSector(ctx);
     sithThing* pThing = sithCogExec_PopThing(ctx);
-    sithCogExec_PushInt(ctx, -1); // TODO
-    Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
+
+	int previousSectorIndex = pThing->sector ? pThing->sector->id : -1;
+	sithThing_MoveToSector(pThing, pSector, 0);
+	sithCogExec_PushInt(ctx, previousSectorIndex);
 }
 
 void jkCogExt_RestoreJoint(sithCog* ctx)
