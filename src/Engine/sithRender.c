@@ -1318,7 +1318,7 @@ void sithRender_RenderLevelGeometry()
 				}
 			}
 #endif // JKM_LIGHTING
-			if (sithRender_RenderThing(i))
+			if (sithRender_RenderThing(pThing))
 				++sithRender_geoThingsDrawn;
 
 			// MOTS added
