@@ -433,8 +433,8 @@ void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, vec4 shad
 				if ( len >= l.falloffMin )
 					continue;
 
-				if(len > 1e-5)
-					diff /= len;
+				float rcpLen = len > 1e-6 ? 1.0 / len : 0.0;
+				diff *= rcpLen;
 
 				float intensity = l.direction_intensity.w;
 				if(l.type == 3)
@@ -455,6 +455,9 @@ void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, vec4 shad
 					float localShadow = clamp(dot(shadows.xyz, diff.xyz) / aperture, 0.0, 1.0);
 					intensity *= localShadow * localShadow;
 				}
+
+				if (intensity <= 0.0)
+					continue;
 				
 				float lightMagnitude = dot(normal, diff);
 				float signedMagnitude = lightMagnitude;
@@ -467,21 +470,25 @@ void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, vec4 shad
 					vec3 sss = 0.2 * exp(-3.0 * abs(signedMagnitude) / (sssRadius.xyz + 0.001));
 					cd.xyz += sssRadius.xyz * sss;
 				}
+				else if(signedMagnitude <= 0.0)
+				{
+					continue;
+				}
 
 				diffuseLight += l.color.xyz * intensity * cd;
 
-				#ifdef SPECULAR
-					vec3 h = normalize(diff + view);
-					vec3 f = f0 + (1.0 - f0) * exp2(-8.35 * max(0.0, dot(diff, h)));
-					//f *= clamp(dot(f0, vec3(333.0)), 0.0, 1.0); // fade out when spec is less than 0.1% albedo
+			#ifdef SPECULAR
+				vec3 h = normalize(diff + view);
+				vec3 f = f0 + (1.0 - f0) * exp2(-8.35 * max(0.0, dot(diff, h)));
+				//f *= clamp(dot(f0, vec3(333.0)), 0.0, 1.0); // fade out when spec is less than 0.1% albedo
 					
-					float c = 0.72134752 * rcp_a2 + 0.39674113;
-					float d = exp2( c * dot(reflVec, diff) - c ) * (rcp_a2 / 3.141592);
+				float c = 0.72134752 * rcp_a2 + 0.39674113;
+				float d = exp2( c * dot(reflVec, diff) - c ) * (rcp_a2 / 3.141592);
 
-					vec3 cs = f * (lightMagnitude * d);
+				vec3 cs = f * (lightMagnitude * d);
 
-					specularLight += l.color.xyz * intensity * cs;
-				#endif
+				specularLight += l.color.xyz * intensity * cs;
+			#endif
 			}
 			else if (light_index > last_item)
 			{
@@ -525,22 +532,26 @@ vec4 CalculateIndirectShadows(uint bucket_index, vec3 pos, vec3 normal)
 				if (len >= occ.position.w)
 					continue;
 
-				float rcpLen = 1.0 / max(len, 0.0001);
+				float rcpLen = len > 1e-6 ? 1.0 / len : 0.0;
 				direction *= rcpLen;
 
 				float cosTheta = dot(normal, direction);
 				if(cosTheta <= 0.0)
 					continue;
 
-				float solidAngle = (1.0 - cos(atanFast(occ.position.w * rcpLen)));
-
 				// simplified smoothstep falloff, equivalent to smoothstep(0, occ.position.w, occ.position.w - len)
 				float falloff = clamp((occ.position.w - len) / occ.position.w, 0.0, 1.0);
 				falloff = falloff * falloff * (3.0 - 2.0 * falloff);
+				if(falloff <= 0.0)
+					continue;
+			
+				float solidAngle = (1.0 - cos(atanFast(occ.position.w * rcpLen)));
+				if(solidAngle <= 0.0)
+					continue;
 
 				float integralSolidAngle = cosTheta * solidAngle * falloff;
 				shadowing.w *= 1.0 - integralSolidAngle;
-				shadowing.xyz -= direction * integralSolidAngle * 0.5;
+				shadowing.xyz -= direction * integralSolidAngle;// * 0.5;
 			}
 			else if (occluder_index > last_item)
 			{
