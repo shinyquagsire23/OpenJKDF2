@@ -100,11 +100,16 @@ typedef struct std3DIntermediateFbo
     int32_t ih;
 } std3DIntermediateFbo;
 
-// todo: the fbo stuff should be moved to stdVBuffer/stdDisplay
+// todo: move to stdVBuffer/stdDisplay?
 typedef struct std3DFramebuffer
 {
+	int enable_extra;
+	int32_t w;
+	int32_t h;
+
     GLuint fbo;
-    GLuint tex0; // color (transparencies, etc)
+	GLuint rbo;
+	GLuint tex0; // color
     GLuint tex1; // emissive
 
     std3DIntermediateFbo window;
@@ -112,19 +117,7 @@ typedef struct std3DFramebuffer
 
 	std3DIntermediateFbo postfx; // temporary composite space for postfx
 
-    int enable_extra;
-    std3DIntermediateFbo blur1;
-    std3DIntermediateFbo blur2;
-    std3DIntermediateFbo blur3;
-    std3DIntermediateFbo blur4;
-	//std3DIntermediateFbo blur5;
-	//std3DIntermediateFbo blur6;
-	//std3DIntermediateFbo blur7;
-	//std3DIntermediateFbo blur8;
-
-    GLuint rbo;
-    int32_t w;
-    int32_t h;
+    std3DIntermediateFbo bloomLayers[4];
 } std3DFramebuffer;
 
 GLint std3D_windowFbo = 0;
@@ -734,26 +727,14 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     if (jkPlayer_enableBloom)
     {
         pFb->enable_extra |= 1;
-		std3D_generateIntermediateFbo(width / 4, height / 4, &pFb->blur1, GL_RGBA16F, 0, 0);
-		std3D_generateIntermediateFbo(pFb->blur1.w / 2, pFb->blur1.h / 2, &pFb->blur2, GL_RGBA16F, 0, 0);
-		std3D_generateIntermediateFbo(pFb->blur2.w / 2, pFb->blur2.h / 2, &pFb->blur3, GL_RGBA16F, 0, 0);
-		std3D_generateIntermediateFbo(pFb->blur3.w / 2, pFb->blur3.h / 2, &pFb->blur4, GL_RGBA16F, 0, 0);
-		//std3D_generateIntermediateFbo(pFb->blur4.w / 2, pFb->blur4.h / 2, &pFb->blur5,GL_RGBA16F, 0, 0);
-		//std3D_generateIntermediateFbo(pFb->blur5.w / 2, pFb->blur5.h / 2, &pFb->blur6,GL_RGBA16F, 0, 0);
-		//std3D_generateIntermediateFbo(pFb->blur6.w / 2, pFb->blur6.h / 2, &pFb->blur7,GL_RGBA16F, 0, 0);
-		//std3D_generateIntermediateFbo(pFb->blur7.w / 2, pFb->blur7.h / 2, &pFb->blur8,GL_RGBA16F, 0, 0);
-
-        /*pFb->blur1.iw = width;
-        pFb->blur1.ih = height;
-        pFb->blur2.iw = width;
-        pFb->blur2.ih = height;
-        pFb->blur3.iw = width;
-        pFb->blur3.ih = height;
-        pFb->blur4.iw = width;
-        pFb->blur4.ih = height;*/
+		std3D_generateIntermediateFbo(width / 4, height / 4, &pFb->bloomLayers[0], GL_RGBA16F, 0, 0);
+		for(int i = 1; i < ARRAY_SIZE(pFb->bloomLayers); ++i)
+			std3D_generateIntermediateFbo(pFb->bloomLayers[i-1].w / 2, pFb->bloomLayers[i - 1].h / 2, &pFb->bloomLayers[i], GL_RGBA16F, 0, 0);
     }
 	else
+	{
 		pFb->enable_extra &= ~1;
+	}
 
 	std3D_generateIntermediateFbo(width, height, &pFb->postfx, GL_RGB10_A2, 0, 0);
 
@@ -779,14 +760,8 @@ void std3D_deleteFramebuffer(std3DFramebuffer* pFb)
     glDeleteTextures(1, &pFb->tex1);
     glDeleteRenderbuffers(1, &pFb->rbo);
 
-    std3D_deleteIntermediateFbo(&pFb->blur1);
-    std3D_deleteIntermediateFbo(&pFb->blur2);
-    std3D_deleteIntermediateFbo(&pFb->blur3);
-    std3D_deleteIntermediateFbo(&pFb->blur4);
-	//std3D_deleteIntermediateFbo(&pFb->blur5);
-	//std3D_deleteIntermediateFbo(&pFb->blur6);
-	//std3D_deleteIntermediateFbo(&pFb->blur7);
-	//std3D_deleteIntermediateFbo(&pFb->blur8);
+	for (int i = 0; i < ARRAY_SIZE(pFb->bloomLayers); ++i)
+		std3D_deleteIntermediateFbo(&pFb->bloomLayers[i]);
 
 	std3D_deleteIntermediateFbo(&pFb->postfx);
 }
@@ -3007,34 +2982,25 @@ void std3D_DrawSceneFbo()
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		// downscale
 		float uvScale = 1.0f;// 0.25f; // source tex is 4x bigger
-		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur1, std3D_pFb->tex1, 0, 0, uvScale, 1.0, 1.0, 0);
-		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur2, std3D_pFb->blur1.tex, 0, 0, uvScale, 1.0, 1.0, 0);
-		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur3, std3D_pFb->blur2.tex, 0, 0, uvScale, 1.0, 1.0, 0);
-		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur4, std3D_pFb->blur3.tex, 0, 0, uvScale, 1.0, 1.0, 0);
-		//std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur5, std3D_pFb->blur4.tex, 0, 0, uvScale, 1.0, 1.0, 0);
-		//std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur6, std3D_pFb->blur5.tex, 0, 0, uvScale, 1.0, 1.0, 0);
-		//std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur7, std3D_pFb->blur6.tex, 0, 0, uvScale, 1.0, 1.0, 0);
-		//std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur8, std3D_pFb->blur7.tex, 0, 0, uvScale, 1.0, 1.0, 0);
 
+		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->bloomLayers[0], std3D_pFb->tex1, 0, 0, uvScale, 1.0, 1.0, 0);
+		for (int i = 1; i < ARRAY_SIZE(std3D_pFb->bloomLayers); ++i)
+			std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->bloomLayers[i], std3D_pFb->bloomLayers[i-1].tex, 0, 0, uvScale, 1.0, 1.0, 0);
+	
 		// upscale + blend
 		//uvScale = 4.0f; // source tex is 4x smaller
-
+	
 		float blendLerp = 0.6f;
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
+	
 		//glBlendFunc(GL_ONE, GL_ONE);
-		//std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur7, std3D_pFb->blur8.tex, 0, 0, uvScale, blendLerp, 1.0, 0);
-		//std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur6, std3D_pFb->blur7.tex, 0, 0, uvScale, blendLerp, 1.0, 0);
-		//std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur5, std3D_pFb->blur6.tex, 0, 0, uvScale, blendLerp, 1.0, 0);
-		//std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur4, std3D_pFb->blur5.tex, 0, 0, uvScale, blendLerp, 1.0, 0);
-		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur3, std3D_pFb->blur4.tex, 0, 0, uvScale, blendLerp, 1.0, 0);
-		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur2, std3D_pFb->blur3.tex, 0, 0, uvScale, blendLerp, 1.0, 0);
-		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->blur1, std3D_pFb->blur2.tex, 0, 0, uvScale, blendLerp, 1.0, 0);
+		for (int i = ARRAY_SIZE(std3D_pFb->bloomLayers) - 2; i >= 0; --i)
+			std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->bloomLayers[i], std3D_pFb->bloomLayers[i + 1].tex, 0, 0, uvScale, blendLerp, 1.0, 0);
 
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
-		std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->postfx, std3D_pFb->blur1.tex, 0, 0, 1.0f, bloom_intensity, 1.5, 0);
+		std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->postfx, std3D_pFb->bloomLayers[0].tex, 0, 0, 1.0f, bloom_intensity, 1.5, 0);
 
 		std3D_popDebugGroup();
     }
