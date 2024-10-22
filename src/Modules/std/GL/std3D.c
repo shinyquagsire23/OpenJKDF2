@@ -3830,32 +3830,24 @@ void std3D_PurgeTextureCache()
 
 void std3D_InitializeViewport(rdRect *viewRect)
 {
-    signed int v1; // ebx
-    signed int height; // ebp
-
-    float viewXMax_2; // [esp+14h] [ebp+4h]
-    float viewRectYMax; // [esp+14h] [ebp+4h]
-
     std3D_rectViewIdk.x = viewRect->x;
-    v1 = viewRect->width;
     std3D_rectViewIdk.y = viewRect->y;
-    std3D_rectViewIdk.width = v1;
-    height = viewRect->height;
+    std3D_rectViewIdk.width = viewRect->width;
+	std3D_rectViewIdk.height = viewRect->height;
+
+	// this looks like some kind of viewport matrix?
     memset(std3D_aViewIdk, 0, sizeof(std3D_aViewIdk));
     std3D_aViewIdk[0] = (float)std3D_rectViewIdk.x;
     std3D_aViewIdk[1] = (float)std3D_rectViewIdk.y;
-    std3D_rectViewIdk.height = height;
-    std3D_aViewTris[0].v1 = 0;
+	std3D_aViewIdk[8] = std3D_aViewIdk[16] = (float)(viewRect->width + std3D_rectViewIdk.x);
+	std3D_aViewIdk[9] = std3D_aViewIdk[1];
+	std3D_aViewIdk[17] = std3D_aViewIdk[25] = (float)(viewRect->height + std3D_rectViewIdk.y);
+	std3D_aViewIdk[24] = std3D_aViewIdk[0];
+
+	// this looks like some kind of screen quad?
+	std3D_aViewTris[0].v1 = 0;
     std3D_aViewTris[0].v2 = 1;
-    viewXMax_2 = (float)(v1 + std3D_rectViewIdk.x);
-    std3D_aViewIdk[8] = viewXMax_2;
-    std3D_aViewIdk[9] = std3D_aViewIdk[1];
-    std3D_aViewIdk[16] = viewXMax_2;
-    viewRectYMax = (float)(height + std3D_rectViewIdk.y);
     std3D_aViewTris[0].texture = 0;
-    std3D_aViewIdk[17] = viewRectYMax;
-    std3D_aViewIdk[25] = viewRectYMax;
-    std3D_aViewIdk[24] = std3D_aViewIdk[0];
     std3D_aViewTris[0].v3 = 2;
     std3D_aViewTris[0].flags = 0x8200;
     std3D_aViewTris[1].v1 = 0;
