@@ -437,10 +437,10 @@ int sithWorld_NewEntry(sithWorld *pWorld)
 			#endif
 
 				// normalize the color values to the avg intensity and apply the sector ambient light scalar
-				rdVector3 lum = {0.33, 0.55, 0.11};
-				float avg = fmin(1.0f, rdVector_Dot3(&sector->ambientRGB, &lum) + 1e-5f);
-				rdVector_Scale3Acc(&sector->ambientRGB, fmin(1.0f, sector->ambientLight) / avg);
-				rdAmbient_Scale(&sector->ambientSH, fmin(1.0f, sector->ambientLight) / avg);
+				//rdVector3 lum = {0.33, 0.55, 0.11};
+				//float avg = fmin(1.0f, rdVector_Dot3(&sector->ambientRGB, &lum) + 1e-5f);
+				//rdVector_Scale3Acc(&sector->ambientRGB, fmin(1.0f, sector->ambientLight) / avg);
+				//rdAmbient_Scale(&sector->ambientSH, fmin(1.0f, sector->ambientLight) / avg);
 			}
 #endif
             if ( !sithWorld_Verify(pWorld) )
