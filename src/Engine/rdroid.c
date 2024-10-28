@@ -409,7 +409,6 @@ void rdDisable(rdCaps_t cap)
 
 // Matrix state
 
-{
 void rdUpdateDirtyState()
 {
 	if (rdroid_dirtyBits & RD_DIRTYBIT_MODELVIEW)
