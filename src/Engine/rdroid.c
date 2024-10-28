@@ -22,7 +22,28 @@ float rdroid_curFogEndDepth;
 #include "General/stdMath.h"
 #include "Primitives/rdQuat.h"
 
-void rdMatrixChanged();
+typedef uint32_t rdDirtyBit;
+enum RD_DIRTYBIT
+{
+	RD_DIRTYBIT_MODEL          = 0x1,
+	RD_DIRTYBIT_VIEW           = 0x2,
+	RD_DIRTYBIT_PROJECTION     = 0x4,
+
+	RD_DIRTYBIT_MODELVIEW      = RD_DIRTYBIT_MODEL | RD_DIRTYBIT_VIEW,
+	RD_DIRTYBIT_VIEWPROJECTION = RD_DIRTYBIT_VIEW | RD_DIRTYBIT_PROJECTION,
+
+	RD_DIRTYBIT_ALL            = 0xFF
+};
+
+static rdDirtyBit rdroid_dirtyBits = RD_DIRTYBIT_ALL;
+static rdDirtyBit rdroid_matrixBit[3] =
+{
+	RD_DIRTYBIT_MODEL,
+	RD_DIRTYBIT_VIEW,
+	RD_DIRTYBIT_PROJECTION
+};
+
+void rdUpdateDirtyState();
 
 static rdCaps_t rdroid_caps = RD_LIGHTING | RD_SHADOWS | RD_DECALS;
 
@@ -388,13 +409,30 @@ void rdDisable(rdCaps_t cap)
 
 // Matrix state
 
-void rdMatrixChanged()
 {
-	rdMatrix_Multiply44(&rdroid_curModelView, &rdroid_matrices[RD_MATRIX_VIEW], &rdroid_matrices[RD_MATRIX_MODEL]);
-	rdMatrix_Invert44(&rdroid_curCamMatrix, &rdroid_matrices[RD_MATRIX_VIEW]);
-	rdMatrix_Multiply44(&rdroid_curViewProj, &rdroid_matrices[RD_MATRIX_PROJECTION], &rdroid_matrices[RD_MATRIX_VIEW]);
-	rdMatrix_Invert44(&rdroid_curProjInv, &rdroid_matrices[RD_MATRIX_PROJECTION]);
-	rdMatrix_Invert44(&rdroid_curViewProjInv, &rdroid_curViewProj);
+void rdUpdateDirtyState()
+{
+	if (rdroid_dirtyBits & RD_DIRTYBIT_MODELVIEW)
+	{
+		rdMatrix_Multiply44(&rdroid_curModelView, &rdroid_matrices[RD_MATRIX_VIEW], &rdroid_matrices[RD_MATRIX_MODEL]);
+	}
+
+	if (rdroid_dirtyBits & RD_DIRTYBIT_VIEW)
+	{
+		rdMatrix_Invert44(&rdroid_curCamMatrix, &rdroid_matrices[RD_MATRIX_VIEW]);
+	}
+	
+	if (rdroid_dirtyBits & RD_DIRTYBIT_VIEWPROJECTION)
+	{
+		rdMatrix_Multiply44(&rdroid_curViewProj, &rdroid_matrices[RD_MATRIX_PROJECTION], &rdroid_matrices[RD_MATRIX_VIEW]);
+		rdMatrix_Invert44(&rdroid_curViewProjInv, &rdroid_curViewProj);
+
+	}
+
+	if (rdroid_dirtyBits & RD_DIRTYBIT_PROJECTION)
+	{
+		rdMatrix_Invert44(&rdroid_curProjInv, &rdroid_matrices[RD_MATRIX_PROJECTION]);
+	}
 }
 
 void rdMatrixMode(rdMatrixMode_t mode)
@@ -407,7 +445,7 @@ void rdPerspective(float fov, float aspect, float nearPlane, float farPlane)
 	rdMatrix44 persp;
 	rdMatrix_BuildPerspective44(&persp, fov, aspect, nearPlane, farPlane);
 	rdMatrix_PreMultiply44(&rdroid_matrices[rdroid_curMatrixMode], &persp);
-	rdMatrixChanged();
+	rdroid_dirtyBits |= rdroid_matrixBit[rdroid_curMatrixMode];
 }
 
 void rdOrthographic(float width, float height, float near_plane, float far_plane)
@@ -415,7 +453,7 @@ void rdOrthographic(float width, float height, float near_plane, float far_plane
 	rdMatrix44 ortho;
 	rdMatrix_BuildOrthographic44(&ortho, -width / 2.0f, width / 2.0f, -height / 2.0f, height / 2.0f, near_plane, far_plane);
 	rdMatrix_PreMultiply44(&rdroid_matrices[rdroid_curMatrixMode], &ortho);
-	rdMatrixChanged();
+	rdroid_dirtyBits |= rdroid_matrixBit[rdroid_curMatrixMode];
 }
 
 void rdLookat(const rdVector3* pViewer, const rdVector3* pTarget, const rdVector3* pUp)
@@ -426,31 +464,31 @@ void rdLookat(const rdVector3* pViewer, const rdVector3* pTarget, const rdVector
 	rdMatrix_Copy34to44(&lookat44, &lookat);
 
 	rdMatrix_PreMultiply44(&rdroid_matrices[rdroid_curMatrixMode], &lookat44);
-	rdMatrixChanged();
+	rdroid_dirtyBits |= rdroid_matrixBit[rdroid_curMatrixMode];
 }
 
 void rdTranslate(const rdVector3* pTranslation)
 {
 	rdMatrix_PreTranslate44(&rdroid_matrices[rdroid_curMatrixMode], pTranslation);
-	rdMatrixChanged();
+	rdroid_dirtyBits |= rdroid_matrixBit[rdroid_curMatrixMode];
 }
 
 void rdRotate(const rdVector3* pRotation)
 {
 	rdMatrix_PreRotate44(&rdroid_matrices[rdroid_curMatrixMode], pRotation);
-	rdMatrixChanged();
+	rdroid_dirtyBits |= rdroid_matrixBit[rdroid_curMatrixMode];
 }
 
 void rdScale(const rdVector4* pScaling)
 {
 	rdMatrix_PreScale44(&rdroid_matrices[rdroid_curMatrixMode], pScaling);
-	rdMatrixChanged();
+	rdroid_dirtyBits |= rdroid_matrixBit[rdroid_curMatrixMode];
 }
 
 void rdIdentity()
 {
 	rdMatrix_Identity44(&rdroid_matrices[rdroid_curMatrixMode]);
-	rdMatrixChanged();
+	rdroid_dirtyBits |= rdroid_matrixBit[rdroid_curMatrixMode];
 }
 
 void rdTranspose()
@@ -458,31 +496,31 @@ void rdTranspose()
 	rdMatrix44 tmp;
 	rdMatrix_Copy44(&tmp, &rdroid_matrices[rdroid_curMatrixMode]);
 	rdMatrix_Transpose44(&rdroid_matrices[rdroid_curMatrixMode], &tmp);
-	rdMatrixChanged();
+	rdroid_dirtyBits |= rdroid_matrixBit[rdroid_curMatrixMode];
 }
 
 void rdLoadMatrix34(const rdMatrix34* pMatrix)
 {
 	rdMatrix_Copy34to44(&rdroid_matrices[rdroid_curMatrixMode], pMatrix);
-	rdMatrixChanged();
+	rdroid_dirtyBits |= rdroid_matrixBit[rdroid_curMatrixMode];
 }
 
 void rdLoadMatrix(const rdMatrix44* pMatrix)
 {
 	rdMatrix_Copy44(&rdroid_matrices[rdroid_curMatrixMode], pMatrix);
-	rdMatrixChanged();
+	rdroid_dirtyBits |= rdroid_matrixBit[rdroid_curMatrixMode];
 }
 
 void rdPreMultiplyMatrix(const rdMatrix44* pMatrix)
 {
 	rdMatrix_PreMultiply44(&rdroid_matrices[rdroid_curMatrixMode], pMatrix);
-	rdMatrixChanged();
+	rdroid_dirtyBits |= rdroid_matrixBit[rdroid_curMatrixMode];
 }
 
 void rdPostMultiplyMatrix(const rdMatrix44* pMatrix)
 {
 	rdMatrix_PostMultiply44(&rdroid_matrices[rdroid_curMatrixMode], pMatrix);
-	rdMatrixChanged();
+	rdroid_dirtyBits |= rdroid_matrixBit[rdroid_curMatrixMode];
 }
 
 void rdGetMatrix(rdMatrix44* out, rdMatrixMode_t mode)
@@ -495,6 +533,9 @@ void rdResetMatrices()
 	rdMatrix_Identity44(&rdroid_matrices[RD_MATRIX_MODEL]);
 	rdMatrix_Identity44(&rdroid_matrices[RD_MATRIX_PROJECTION]);
 	rdMatrix_Identity44(&rdroid_matrices[RD_MATRIX_VIEW]);
+	rdroid_dirtyBits |= rdroid_matrixBit[RD_MATRIX_MODEL];
+	rdroid_dirtyBits |= rdroid_matrixBit[RD_MATRIX_PROJECTION];
+	rdroid_dirtyBits |= rdroid_matrixBit[RD_MATRIX_VIEW];
 }
 
 // Viewport
@@ -506,7 +547,6 @@ void rdViewport(float x, float y, float width, float height, float minDepth, flo
 	rdroid_rasterState.viewport.height = height;
 	rdroid_rasterState.viewport.minDepth = minDepth;
 	rdroid_rasterState.viewport.maxDepth = maxDepth;
-	rdMatrixChanged();
 }
 
 void rdGetViewport(rdViewportRect* pOut)
@@ -565,6 +605,8 @@ void rdEndPrimitive()
 {
 	if(rdroid_vertexCacheNum == 0)
 		return;
+
+	rdUpdateDirtyState();
 
 	std3D_DrawCallState state;
 	rdMatrix_Copy44(&state.modelView, &rdroid_curModelView);
