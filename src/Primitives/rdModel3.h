@@ -216,6 +216,10 @@ void rdModel3_DrawHNode(rdHierarchyNode *pNode);
 void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat);
 int rdModel3_DrawFace(rdFace *face, int lightFlags);
 
+#ifdef RENDER_DROID2
+void rdModel3_DrawOccluders(rdThing* pThing, rdMatrix34* pMat);
+#endif
+
 //static int (__cdecl *rdModel3_CalcVertexNormals)(rdModel3 *model) = (void*)rdModel3_CalcVertexNormals_ADDR;
 
 #endif // _RDMODEL3_H

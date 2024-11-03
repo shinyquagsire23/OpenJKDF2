@@ -2230,6 +2230,41 @@ void sithRender_RenderDynamicLights()
 	// this is now done on the GPU
 	for (int i = 0; i < rdCamera_pCurCamera->numLights; i++)
 		rdAddLight(rdCamera_pCurCamera->lights[i], &rdCamera_pCurCamera->lightPositions[i]);
+
+	// iterate all visible things and add their occluder volumes
+	// todo: cache any frustum tests etc for later
+	//for (int i = 0; i < sithRender_numSectors2; i++)
+	//{
+	//	sithSector* sector = sithRender_aSectors2[i];		
+	//
+	//	int safeguard = 0;
+	//	for (sithThing* thingIter = sector->thingsList; thingIter; thingIter = thingIter->nextThing)
+	//	{
+	//		if (++safeguard >= SITH_MAX_THINGS)
+	//			break;
+	//
+	//		if ((thingIter->thingflags & (SITH_TF_DISABLED | SITH_TF_INVISIBLE | SITH_TF_WILLBEREMOVED)))
+	//			continue;
+	//
+	//		if (thingIter->rdthing.type != RD_THINGTYPE_MODEL)
+	//			continue;
+	//
+	//		// todo: cache me
+	//		rdMatrix_TransformPoint34(&thingIter->screenPos, &thingIter->position, &rdCamera_pCurCamera->view_matrix);
+	//
+	//		// todo: cache me toooo
+	//		float radius = thingIter->rdthing.model3->radius;
+	//		int clippingVal = rdClip_SphereInFrustrum(sector->clipFrustum, &thingIter->screenPos, radius);
+	//	
+	//		thingIter->rdthing.clippingIdk = clippingVal;
+	//		if (clippingVal == 2 || sithRender_008d1668) // MoTS added: sithRender_008d1668
+	//			continue;
+	//
+	//		thingIter->lookOrientation.scale = thingIter->position;
+	//		rdModel3_DrawOccluders(&thingIter->rdthing, &thingIter->lookOrientation);
+	//		rdVector_Zero3(&thingIter->lookOrientation.scale);
+	//	}
+	//}
 #else
     sithSector *sectorIter;
     rdLight **curCamera_lights;

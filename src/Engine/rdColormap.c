@@ -225,6 +225,36 @@ LABEL_26:
         colormap->dword340 = 0;
         colormap->dword344 = 0;
     }
+
+#ifdef RENDER_DROID2
+	//for (int b = 0; b < 256; b += 4)
+	//{
+	//	for (int g = 0; g < 256; g += 4)
+	//	{
+	//		for (int r = 0; r < 256; r += 4)
+	//		{
+	//			float bestdistortion = 1000000.0f;
+	//			int bestcolor = 0;
+	//			for (int i = 0; i < 256; i++)
+	//			{
+	//				rdVector3 pixelCol = { r / 255.0f, g / 255.0f, b / 255.0f };
+	//				rdVector3 paletteColor = { colormap->colors[i].r / 255.0f, colormap->colors[i].g / 255.0f,colormap->colors[i].b / 255.0f };
+	//				float distortion = rdVector_DistSquared3(&pixelCol, &paletteColor);
+	//				if (distortion < bestdistortion)
+	//				{
+	//					if (!distortion)
+	//						break;
+	//
+	//					bestdistortion = distortion;
+	//					bestcolor = i;
+	//				}
+	//			}
+	//			colormap->searchTable[b >> 2][g >> 2][r >> 2] = bestcolor;
+	//		}
+	//	}
+	//}
+#endif
+
     rdroid_pHS->fileClose(colormap_fptr);
     return 1;
 

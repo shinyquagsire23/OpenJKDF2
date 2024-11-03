@@ -1890,3 +1890,59 @@ LABEL_44:
     return 1;
 #endif
 }
+
+#ifdef RENDER_DROID2
+
+void rdModel3_DrawMeshOccluder(rdMesh* meshIn, rdMatrix34* mat)
+{
+	if (!meshIn->geometryMode)
+		return;
+	rdVector3 vertex_out;
+	rdMatrix_TransformPoint34(&vertex_out, &mat->scale, &rdCamera_pCurCamera->view_matrix);
+	int cullFlag = rdroid_curCullFlags & 1 ? rdClip_SphereInFrustrum(rdCamera_pCurCamera->pClipFrustum, &vertex_out, meshIn->radius) : 1;
+	if (cullFlag == 2)
+		return;
+	rdAddOccluder(&mat->scale, meshIn->radius);
+}
+
+void rdModel3_DrawMeshNodeOccluder(rdThing* pThing, rdGeoset* pGeoset, rdHierarchyNode* pNode)
+{
+#ifdef FP_LEGS
+	if (pNode->idx == pThing->hiddenJoint)
+		return;
+#endif
+
+	if (pNode->meshIdx != -1)
+	{
+		if (pNode->flags & 2)
+		{
+			rdHierarchyNode* pParent = pNode->parent;
+			while (pParent && pParent->flags & 2)
+				pParent = pParent->parent;
+
+			if (pParent)
+				pGeoset->meshes[pNode->meshIdx].radius = pGeoset->meshes[pParent->meshIdx].radius;
+		}
+		rdModel3_DrawMeshOccluder(&pGeoset->meshes[pNode->meshIdx], &pThing->hierarchyNodeMatrices[pNode->idx]);
+	}
+
+	rdHierarchyNode* iter = pNode->child;
+	for (int i = 0; i < pNode->numChildren; i++)
+	{
+		if (!pThing->amputatedJoints[iter->idx])
+			rdModel3_DrawMeshNodeOccluder(pThing, pGeoset, iter);
+		iter = iter->nextSibling;
+	}
+}
+
+void rdModel3_DrawOccluders(rdThing* pThing, rdMatrix34* pMat)
+{
+	rdModel3* model3 = pThing->model3;
+	rdGeoset* geoset = &model3->geosets[0];//model3->numGeosets - 1];
+
+	if (pThing->frameTrue != rdroid_frameTrue)
+		rdPuppet_BuildJointMatrices(&pThing, pMat);
+
+	rdModel3_DrawMeshNodeOccluder(pThing, geoset, model3->hierarchyNodes);
+}
+#endif

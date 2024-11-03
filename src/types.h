@@ -1176,6 +1176,10 @@ typedef struct stdFontExtHeader
 typedef struct SDL_Surface SDL_Surface;
 #endif
 
+#ifdef HW_VBUFFER
+typedef struct std3D_DrawSurface std3D_DrawSurface;
+#endif
+
 typedef struct stdVBuffer
 {
     uint32_t bSurfaceLocked;
@@ -1192,6 +1196,9 @@ typedef struct stdVBuffer
     SDL_Surface* sdlSurface;
 #endif
     };
+#ifdef HW_VBUFFER
+	std3D_DrawSurface* device_surface;
+#endif
     void* ddraw_palette; // LPDIRECTDRAWPALETTE
     uint8_t desc[0x6c];
 } stdVBuffer;
@@ -1217,6 +1224,9 @@ typedef struct rdColormap
     void* dword344;
     void* rgb16Alloc;
     void* dword34C;
+#ifdef RENDER_DROID2
+	//uint8_t searchTable[64][64][64];
+#endif
 } rdColormap;
 
 typedef struct rdColormapHeader

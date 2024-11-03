@@ -6,6 +6,8 @@
 #include "Win95/Window.h"
 #include "General/stdColor.h"
 
+#include "Platform/std3D.h"
+
 void stdDisplay_SetGammaTable(int len, double *table)
 {
     stdDisplay_gammaTableLen = len;
@@ -94,7 +96,6 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
     
     _memcpy(&Video_overlayMapBuffer.format, &stdDisplay_pCurVideoMode->format, sizeof(Video_overlayMapBuffer.format));
     
-
     if (Video_bModeSet)
     {
         glDeleteTextures(1, &Video_menuTexId);
@@ -109,8 +110,25 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
         Video_otherBuf.sdlSurface = 0;
         Video_menuBuffer.sdlSurface = 0;
         Video_overlayMapBuffer.sdlSurface = 0;
+
+#ifdef HW_VBUFFER
+		std3D_FreeDrawSurface(Video_otherBuf.device_surface);
+		std3D_FreeDrawSurface(Video_menuBuffer.device_surface);
+		std3D_FreeDrawSurface(Video_overlayMapBuffer.device_surface);
+
+		Video_otherBuf.device_surface = 0;
+		Video_menuBuffer.device_surface = 0;
+		Video_overlayMapBuffer.device_surface = 0;
+#endif
     }
-    
+
+#ifdef HW_VBUFFER
+//if(create_ddraw_surface)
+	Video_otherBuf.device_surface = std3D_AllocDrawSurface(&stdDisplay_pCurVideoMode->format, newW, newH);
+	Video_menuBuffer.device_surface = std3D_AllocDrawSurface(&stdDisplay_pCurVideoMode->format, newW, newH);
+	Video_overlayMapBuffer.device_surface = std3D_AllocDrawSurface(&stdDisplay_pCurVideoMode->format, newW, newH);
+#endif
+
     SDL_Surface* otherSurface = SDL_CreateRGBSurface(0, newW, newH, 8,
                                         0,
                                         0,
@@ -269,6 +287,12 @@ stdVBuffer* stdDisplay_VBufferNew(stdVBufferTexFmt *fmt, int create_ddraw_surfac
     //printf("Failed to allocate VBuffer! %s, w %u h %u bpp %u, rmask %x gmask %x bmask %x amask %x, %x %x %x, %x %x %x\n", SDL_GetError(), fmt->width, fmt->height, fmt->format.bpp, rbitmask, gbitmask, bbitmask, abitmask, fmt->format.r_bits, fmt->format.g_bits, fmt->format.b_bits, fmt->format.r_shift, fmt->format.g_shift, fmt->format.b_shift);
     
     out->sdlSurface = surface;
+
+#ifdef HW_VBUFFER
+	//memcpy(out->palette, palette, );
+	//if(create_ddraw_surface)
+		out->device_surface = std3D_AllocDrawSurface(&out->format, fmt->width, fmt->height);
+#endif
     
     return out;
 }
@@ -285,7 +309,12 @@ int stdDisplay_VBufferLock(stdVBuffer *buf)
 void stdDisplay_VBufferUnlock(stdVBuffer *buf)
 {
     if (!buf) return;
-    
+   #ifdef HW_VBUFFER
+	if (buf->device_surface && buf->surface_lock_alloc)
+	{
+		std3D_UploadDrawSurface(buf->device_surface, buf->format.width, buf->format.height, buf->surface_lock_alloc, buf->palette);
+	}
+   #endif
     buf->surface_lock_alloc = NULL;
     SDL_UnlockSurface(buf->sdlSurface);
 }
@@ -405,6 +434,18 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
     {
         free(srcPixels);
     }
+
+#ifdef HW_VBUFFER
+	if (vbuf != vbuf2)
+	{
+		if (vbuf->device_surface && vbuf2->device_surface)
+		{
+			rdRect dstRect = { blit_x, blit_y, rect->width, rect->height };
+			rdRect srcRect = { rect->x, rect->y, rect->width, rect->height };
+			std3D_BlitDrawSurface(vbuf2->device_surface, &srcRect, vbuf->device_surface, &dstRect);
+		}
+	}
+#endif
     
     //SDL_BlitSurface(vbuf2->sdlSurface, &srcRect, vbuf->sdlSurface, &dstRect); //TODO error check
     return 1;
@@ -442,6 +483,11 @@ int stdDisplay_VBufferFill(stdVBuffer *vbuf, int fillColor, rdRect *rect)
     
     //SDL_FillRect(vbuf, &dstRect, fillColor); //TODO error check
 
+#ifdef HW_VBUFFER
+	if (vbuf->device_surface)
+		std3D_ClearDrawSurface(vbuf->device_surface, fillColor, rect);
+#endif
+
     return 1;
 }
 
@@ -471,6 +517,9 @@ void stdDisplay_VBufferFree(stdVBuffer *vbuf)
 {
     stdDisplay_VBufferUnlock(vbuf);
     SDL_FreeSurface(vbuf->sdlSurface);
+#ifdef HW_VBUFFER
+	std3D_FreeDrawSurface(vbuf->device_surface);
+#endif
     std_pHS->free(vbuf);
 }
 

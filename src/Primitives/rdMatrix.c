@@ -851,6 +851,17 @@ void rdMatrix_TransformPoint44Acc(rdVector4 *a1, const rdMatrix44 *a2)
     rdMatrix_TransformPoint44(a1, &tmp, a2);
 }
 
+void rdMatrix_TransformPoint44Acc3(rdVector3* a1, const rdMatrix44* a2)
+{
+	rdVector4 tmp;
+	rdVector_Set4(&tmp, a1->x, a1->y, a1->z, 1.0f);
+
+	rdVector4 tmp1;
+	rdMatrix_TransformPoint44(&tmp1, &tmp, a2);
+
+	rdVector_Set3(a1, tmp1.x, tmp1.y, tmp1.z);
+}
+
 void rdMatrix_TransformPointLst34(const rdMatrix34 *m, const rdVector3 *in, rdVector3 *out, int num)
 {
     for (int i = 0; i < num; i++)

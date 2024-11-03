@@ -131,6 +131,7 @@ void rdMatrix_BuildPerspective44(rdMatrix44* out, float fov, float aspect, float
 void rdMatrix_BuildOrthographic44(rdMatrix44* out, float left, float right, float top, float bottom, float znear, float zfar);
 
 int rdMatrix_Compare44(const rdMatrix44* a, const rdMatrix44* b);
+void rdMatrix_TransformPoint44Acc3(rdVector3* a1, const rdMatrix44* a2);
 
 extern const rdMatrix34 rdroid_identMatrix34;
 extern const rdMatrix44 rdroid_identMatrix44;
