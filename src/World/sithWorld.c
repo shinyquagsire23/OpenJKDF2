@@ -406,9 +406,9 @@ int sithWorld_NewEntry(sithWorld *pWorld)
 					if ((surface->surfaceFlags & SITH_SURFACE_HORIZON_SKY) || (surface->surfaceFlags & SITH_SURFACE_CEILING_SKY))
 						emissiveLightLevel = -1;
 
-					rdVector3 emissive;
-					if((surface->surfaceInfo.face.geometryMode != RD_GEOMODE_NOTRENDERED) && rdMaterial_GetFillColor(&emissive, surface->surfaceInfo.face.material, pWorld->sectors[i].colormap, 0, emissiveLightLevel))
-						rdAmbient_Acc(&sector->ambientSH, &emissive, &surface->surfaceInfo.face.normal);
+					//rdVector3 emissive;
+					//if((surface->surfaceInfo.face.geometryMode != RD_GEOMODE_NOTRENDERED) && rdMaterial_GetFillColor(&emissive, surface->surfaceInfo.face.material, pWorld->sectors[i].colormap, 0, emissiveLightLevel))
+					//	rdAmbient_Acc(&sector->ambientSH, &emissive, &surface->surfaceInfo.face.normal);
 
 					for (int k = 0; k < surface->surfaceInfo.face.numVertices; ++k)
 					{
