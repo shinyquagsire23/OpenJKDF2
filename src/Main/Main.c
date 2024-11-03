@@ -103,7 +103,7 @@ int Main_bHeadless = 0;
 int Main_bVerboseNetworking = 0;
 int Main_bMotsCompat = 0;
 int Main_bDwCompat = 0;
-int Main_bEnhancedCogVerbs = 0;
+int Main_bEnhancedCogVerbs = 1;
 char Main_strEpisode[129];
 char Main_strMap[128+4];
 #endif
