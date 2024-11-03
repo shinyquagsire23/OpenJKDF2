@@ -763,7 +763,7 @@ void jkGuiBuildMulti_ModelDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVB
 		float y = (115.0f / 480.0f) * Window_ySize;
 		float w = (260.0f / 640.0f) * menu_w;
 		float h = (260.0f / 480.0f) * Window_ySize;
-		rdViewport(x, y, w, h, 0, 1);
+		rdViewport(x, y, w, h);
 
 		// make sure we don't draw out of bounds
 		rdScissorMode(RD_SCISSOR_ENABLED);

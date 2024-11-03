@@ -15,12 +15,6 @@ out float f_depth;
 
 uniform mat4 projMatrix;
 uniform mat4 modelMatrix;
-uniform int  uv_mode;
-
-uniform vec2 texsize;
-uniform int  texgen;
-uniform vec4 texgen_params;
-uniform vec2 uv_offset;
 
 noperspective out vec2 f_uv_affine;
 
@@ -38,20 +32,30 @@ uniform sharedBlock
 
 	float colorEffects_fade;
 	float light_mult;
-	uint  pad0;
-	uint  pad1;
+	vec2  iResolution;
 
 	vec2  clusterTileSizes;
 	vec2  clusterScaleBias;
+};
 
-	vec2  iResolution;
-	uint  firstLight;
-	uint  numLights;
+uniform textureBlock
+{
+	int   tex_mode;
+	int   uv_mode;
+	int   texgen;
+	uint  numMips;
 
-	uint  firstOccluder;
-	uint  numOccluders;
-	uint  firstDecal;
-	uint  numDecals;
+	vec2 texsize;
+	vec2 uv_offset;
+
+	vec4 texgen_params;
+	
+	vec4 fillColor;
+	vec4 albedoFactor;
+	vec4 emissiveFactor;
+
+	float displacement_factor;
+	float texPad0, texPad1, texPad2;
 };
 
 uniform vec3 ambientColor;

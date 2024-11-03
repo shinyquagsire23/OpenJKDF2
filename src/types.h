@@ -855,9 +855,10 @@ typedef D3DVERTEX_orig D3DVERTEX;
 #endif
 
 #ifdef RENDER_DROID2
+
 typedef struct rdViewportRect
 {
-	float x, y, width, height, minDepth, maxDepth;
+	float x, y, width, height;
 } rdViewportRect;
 
 typedef struct rdScissorRect
@@ -865,80 +866,105 @@ typedef struct rdScissorRect
 	float x, y, width, height;
 } rdScissorRect;
 
-typedef struct std3D_RasterState
+// todo: maybe some of this should be split into commands instead of one huge state block?
+typedef struct std3D_DrawCallHeader
 {
-	rdGeoMode_t         geoMode;
-	rdVertexColorMode_t colorMode;
-	rdDitherMode_t      ditherMode;
-	rdCullMode_t        cullMode;
-	rdScissorMode_t     scissorMode;
-	rdScissorRect       scissor;
-	rdViewportRect      viewport;
-	// should this even be here?
-	int                 fog;
-	uint32_t            fogColor;
-	float               fogStart;
-	float               fogEnd;
-} std3D_RasterState;
+	uint32_t                renderPass   : 4;  // 4
+	uint32_t                renderCaps   : 4;  // 8, todo: remove?
+	uint32_t                sortPriority : 24; // 32
+	float                   sortDistance;      // 64
+} std3D_DrawCallHeader;
+static_assert(sizeof(std3D_DrawCallHeader) == sizeof(uint64_t), "std3D_DrawCallHeader not 8 bytes");
 
-typedef struct std3D_BlendState
+typedef union std3D_DrawCallStateBits
 {
-	rdBlendMode_t blendMode; // todo: actual blend funcs ex. RD_ONE etc
-} std3D_BlendState;
+	struct
+	{
+		// raster state
+		uint32_t geoMode     : 3; // 3
+		uint32_t ditherMode  : 1; // 4
+		uint32_t cullMode    : 2; // 6
+		uint32_t scissorMode : 1; // 7
+		// fog state
+		uint32_t fogMode     : 1; // 8
+		// blend state
+		uint32_t blend       : 1; // 9
+		uint32_t srdBlend    : 3; // 12
+		uint32_t dstBlend    : 3; // 15
+		// depth stencil state
+		uint32_t zMethod     : 2; // 17
+		uint32_t zCompare    : 4; // 21
+		// texture state
+		uint32_t texMode     : 3; // 24
+		uint32_t texGen      : 2; // 26
+		uint32_t texFilter   : 1; // 27
+		uint32_t alphaTest   : 1; // 28
+		uint32_t chromaKey   : 1; // 29
+		// lighting state
+		uint32_t lightMode   : 3; // 32
+	};
+	uint32_t data;
+} std3D_DrawCallStateBits;
+static_assert(sizeof(std3D_DrawCallStateBits) == sizeof(uint32_t), "std3D_DrawCallStateBits not 4 bytes");
 
-typedef struct std3D_DepthStencilState
+typedef struct std3D_FogState
 {
-	rdZBufferMethod_t zmethod;
-	rdCompare_t       zcompare;
-} std3D_DepthStencilState;
+	uint32_t color;
+	float    startDepth;
+	float    endDepth;
+} std3D_FogState;
 
 typedef struct std3D_TextureState
 {
-	uint8_t           alphaTest;
-	uint8_t           alphaRef;
-	rdChromaKeyMode_t chromaKeyMode;
-	uint32_t          chromaKeyColor;
-	uint32_t          fillColor;
-	rdTexMode_t       texMode;
-	rdDDrawSurface*   pTexture;
-	rdVector2         texSize;
-	rdTexGen_t        texGen;
-	rdTexFilter_t     texFilter;
-	rdVector4         texGenParams;
-	rdVector2         texOffset;
-	uint32_t          numMips;
+	rdDDrawSurface*      pTexture;
+	rdVector4            texGenParams;
+	rdVector2            texOffset;
+	uint32_t             chromaKeyColor;
+	uint32_t             fillColor;
+	uint8_t              numMips;
+	uint8_t              alphaRef;
 } std3D_TextureState;
+static_assert(sizeof(std3D_TextureState) == sizeof(uint32_t) * 12, "std3D_TextureState not 48 bytes");
 
-typedef struct std3D_LightingState
+typedef struct std3D_LightingState // todo: pack this
 {
-	rdLightMode_t   lightMode;
-	rdVector3       ambientColor;   // rgb ambient color
-	rdAmbient       ambientStateSH; // ambient spherical harmonics coefficients and dominant light dir
+	uint32_t ambientColor;
+	uint32_t ambientLobes[8]; // 8 spherical gaussian lobes
+	//rdVector3 ambientColor;   // rgb ambient color
+	//rdAmbient ambientStateSH; // directional ambient
 } std3D_LightingState;
+static_assert(sizeof(std3D_LightingState) == sizeof(uint32_t) * 9, "std3D_TextureState not 36 bytes");
 
-// todo: maybe some of this should be split into commands instead of one huge state block
+typedef struct std3D_TransformState
+{
+	rdMatrix44     modelView;
+	rdMatrix44     proj;
+} std3D_TransformState;
+
+typedef struct std3D_RasterState
+{
+	rdViewportRect viewport;
+	rdScissorRect  scissor;
+} std3D_RasterState;
+
 typedef struct std3D_DrawCallState
 {
-	int                     shaderID;
-	int                     sortPriority;
-	float                   sortDistance;
-	int                     renderPass;
-	rdCaps_t                renderCaps;
-	rdMatrix44              modelView;
-	rdMatrix44              proj;
-	std3D_RasterState       raster;
-	std3D_BlendState        blend;
-	std3D_DepthStencilState depthStencil;
-	std3D_TextureState      texture;
-	std3D_LightingState     lighting;
+	std3D_DrawCallHeader    header;
+	std3D_DrawCallStateBits stateBits;
+	std3D_TransformState    transformState;
+	std3D_RasterState       rasterState;
+	std3D_FogState          fogState;
+	std3D_TextureState      textureState;
+	std3D_LightingState     lightingState;
 } std3D_DrawCallState;
 
 typedef struct std3D_DrawCall
 {
-	uint64_t            sortKey;       // sort key
-	int                 firstIndex;    // first index in index array
-	int                 numIndices;    // number of indices in index array
 	std3D_DrawCallState state;
+	uint64_t            sortKey;         // sort key
+	uint32_t            firstIndex;      // first index in index array
+	uint32_t            numIndices : 28; // number of indices in index array
+	uint32_t            shaderID   : 4;  // shader ID
 } std3D_DrawCall;
 #endif
 

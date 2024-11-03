@@ -133,6 +133,8 @@ GLuint create_shader(const char* shader, GLenum type, const char* userDefines)
 #endif
 #ifdef RENDER_DROID2
 	"#define RENDER_DROID2\n"
+	"#define NEW_SSAO\n"
+	"#define NEW_BLOOM\n"
 #endif
 #ifdef FOG
 	"#define FOG\n"

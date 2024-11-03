@@ -80,6 +80,10 @@ enum RD_DECAL_FLAGS
 #endif
 
 #ifdef RENDER_DROID2
+
+#define RD_TRUE  1
+#define RD_FALSE 0
+
 typedef uint32_t rdCaps_t;
 enum RD_CAPS
 {
@@ -89,12 +93,18 @@ enum RD_CAPS
 	RD_FOG      = 0x8,
 };
 
-typedef uint8_t rdBlendMode_t;
-typedef enum RD_BLEND_MODE
+typedef uint8_t rdBlend_t;
+typedef enum RD_BLEND
 {
-	RD_BLEND_MODE_NONE = 0,
-	RD_BLEND_MODE_ALPHA = 1
-} RD_BLEND_MODE;
+	RD_BLEND_ZERO        = 0,
+	RD_BLEND_ONE         = 1,
+	RD_BLEND_DSTCOLOR    = 2,
+	RD_BLEND_INVDSTCOLOR = 3,
+	RD_BLEND_SRCALPHA    = 4,
+	RD_BLEND_INVSRCALPHA = 5,
+	RD_BLEND_DSTALPHA    = 6,
+	RD_BLEND_INVDSTALPHA = 7,
+} RD_BLEND;
 
 typedef uint8_t rdCompare_t;
 typedef enum RD_COMPARE
@@ -123,13 +133,6 @@ typedef enum RD_SCISSOR_MODE
 	RD_SCISSOR_DISABLED,
 	RD_SCISSOR_ENABLED
 } RD_SCISSOR_MODE;
-
-typedef uint8_t rdVertexColorMode_t;
-typedef enum RD_VERTEX_COLOR_MODE
-{
-	RD_VERTEX_COLOR_MODE_LUMINANCE,
-	RD_VERTEX_COLOR_MODE_COLORED,
-} RD_VERTEX_COLOR_MODE;
 
 typedef uint8_t rdChromaKeyMode_t;
 typedef enum RD_CHROMA_KEY_MODE

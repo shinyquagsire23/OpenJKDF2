@@ -28,11 +28,7 @@ uniform sampler2D worldPalette;
 uniform sampler2D worldPaletteLights;
 uniform sampler2D displacement_map;
 
-uniform int tex_mode;
 uniform int blend_mode;
-uniform vec3 emissiveFactor;
-uniform vec4 albedoFactor;
-uniform float displacement_factor;
 
 in vec4 f_color;
 in float f_light;
@@ -55,28 +51,34 @@ uniform sharedBlock
 
 	float colorEffects_fade;
 	float light_mult;
-	uint  pad0;
-	uint  pad1;
+	vec2  iResolution;
 
 	vec2  clusterTileSizes;
 	vec2  clusterScaleBias;
+};
 
-	vec2  iResolution;
-	uint  firstLight;
-	uint  numLights;
+uniform textureBlock
+{
+	int   tex_mode;
+	int   uv_mode;
+	int   texgen;
+	uint  numMips;
 
-	uint  firstOccluder;
-	uint  numOccluders;
-	uint  firstDecal;
-	uint  numDecals;
+	vec2 texsize;
+	vec2 uv_offset;
+
+	vec4 texgen_params;
+	
+	vec4 fillColor;
+	vec4 albedoFactor;
+	vec4 emissiveFactor;
+
+	float displacement_factor;
+	float texPad0, texPad1, texPad2;
 };
 
 uniform mat4 modelMatrix;
 uniform mat4 projMatrix;
-
-uniform int uv_mode;
-uniform vec4 fillColor;
-uniform int numMips;
 
 float compute_mip_bias(float z_min)
 {
@@ -215,6 +217,8 @@ vec4 bilinear_paletted(vec2 uv)
 }
 #endif
 
+layout(location = 0) out float fragDepth;
+
 void main(void)
 {
 #ifdef ALPHA_DISCARD
@@ -277,9 +281,9 @@ void main(void)
 		discard;
 
 	// if we want to output some thin gbuffer
-	//fragColorDepth = f_depth;
     //fragColorNormal = encode_octahedron(f_normal);
 	//fragColorDiffuse = sampled_color;
 
 #endif
+	fragDepth = f_depth;
 }

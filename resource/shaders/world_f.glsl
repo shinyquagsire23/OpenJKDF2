@@ -55,17 +55,8 @@ uniform sampler2D displacement_map;
 uniform usamplerBuffer clusterBuffer;
 uniform sampler2D decalAtlas;
 
-uniform int tex_mode;
-uniform vec3 emissiveFactor;
-uniform vec4 albedoFactor;
-uniform float displacement_factor;
-
-#ifdef FOG
-uniform int fogEnabled;
-uniform vec4 fogColor;
-uniform float fogStart;
-uniform float fogEnd;
-#endif
+uniform sampler2D ztex;
+uniform sampler2D ssaotex;
 
 in vec4 f_color;
 in float f_light;
@@ -80,10 +71,44 @@ uniform uint renderCaps;
 uniform mat4 modelMatrix;
 uniform mat4 projMatrix;
 
-uniform vec2 texsize;
-uniform int  numMips;
-uniform int  uv_mode;
-uniform vec4 fillColor;
+
+uniform vec3 cameraRT;
+uniform vec3 cameraLT;
+uniform vec3 cameraRB;
+uniform vec3 cameraLB;
+
+
+vec3 get_camera_frustum_ray(vec2 uv)
+{
+	// barycentric lerp
+	return ((1.0 - uv.x - uv.y) * cameraLB.xyz + (uv.x * cameraRB.xyz + (uv.y * cameraLT.xyz)));
+}
+
+vec3 get_view_position_from_depth(vec3 cam_vec, float linear_depth)
+{
+	return cam_vec.xyz * linear_depth;
+}
+
+uniform vec2 rightTop;
+vec3 get_view_position(float linear_depth, vec2 uv)
+{
+	//vec3 cam_vec = get_camera_frustum_ray(uv).xyz;
+	//return get_view_position_from_depth(cam_vec, linear_depth);
+
+	// todo: this sucks do something better
+	mat4 invProj = inverse(projMatrix);
+
+	vec2 ndc = uv * 2.0 - 1.0;
+    vec3 ray = (invProj * vec4(ndc, 1.0, 1.0)).xyz;
+    return linear_depth * 128.0 * ray;
+
+//	uv = uv * 2.0 - 1.0;
+//	vec2 pnear = uv * rightTop;
+//	float Far = 128.0;
+//	float Near = 1.0 / 64.0;
+//	float pz = -linear_depth * Far;
+//	return vec3(-pz * pnear.x / Near, -pz * pnear.y / Near, pz);
+}
 
 uniform int  lightMode;
 uniform int  geoMode;
@@ -118,20 +143,39 @@ uniform sharedBlock
 
 	float colorEffects_fade;
 	float light_mult;
-	uint  pad0;
-	uint  pad1;
+	vec2  iResolution;
 
 	vec2  clusterTileSizes;
 	vec2  clusterScaleBias;
+};
 
-	vec2  iResolution;
-	uint  firstLight;
-	uint  numLights;
+uniform fogBlock
+{
+	vec4  fogColor;
+	int   fogEnabled;
+	float fogStart;
+	float fogEnd;
+	int   fogPad0;
+};
 
-	uint  firstOccluder;
-	uint  numOccluders;
-	uint  firstDecal;
-	uint  numDecals;
+uniform textureBlock
+{
+	int   tex_mode;
+	int   uv_mode;
+	int   texgen;
+	uint  numMips;
+
+	vec2 texsize;
+	vec2 uv_offset;
+
+	vec4 texgen_params;
+	
+	vec4 fillColor;
+	vec4 albedoFactor;
+	vec4 emissiveFactor;
+
+	float displacement_factor;
+	float texPad0, texPad1, texPad2;
 };
 
 struct light
@@ -153,6 +197,9 @@ struct light
 
 uniform lightBlock
 {
+	uint firstLight;
+	uint numLights;
+	uint lightPad0, lightPad1;
 	light lights[CLUSTER_MAX_LIGHTS];
 };
 
@@ -163,6 +210,9 @@ struct occluder
 
 uniform occluderBlock
 {
+	uint firstOccluder;
+	uint numOccluders;
+	uint occluderPad0, occluderPad1;
 	occluder occluders[CLUSTER_MAX_OCCLUDERS];
 };
 
@@ -181,6 +231,9 @@ struct decal
 
 uniform decalBlock
 {
+	uint  firstDecal;
+	uint  numDecals;
+	uint  decalPad0, decalPad1;
 	decal decals[CLUSTER_MAX_DECALS];
 };
 
@@ -274,7 +327,7 @@ SG DistributionTermSG(vec3 direction, float roughness)
 {
     SG distribution;
     distribution.Axis = direction;
-    float m2 = roughness * roughness;
+    float m2 = max(roughness * roughness, 1e-4);
     distribution.Sharpness = 2.0 / m2;
     distribution.Amplitude = vec3(1.0 / (3.141592 * m2));
 
@@ -374,8 +427,8 @@ vec3 CalculateAmbientSpecular(vec3 normal, vec3 view, float roughness, vec3 f0)
 		// no Geometry term
 
 		// Fresnel
-		vec3 h = normalize(warpedNDF.Axis + view);
-		vec3 f = f0 + (1.0 - f0) * exp2(-8.35 * max(0.0, dot(warpedNDF.Axis, h)));
+		//vec3 h = normalize(warpedNDF.Axis + view);
+		vec3 f = f0;// + (1.0 - f0) * exp2(-8.35 * max(0.0, dot(warpedNDF.Axis, h)));
 		//f *= clamp(dot(f0, vec3(333.0)), 0.0, 1.0); // fade out when spec is less than 0.1% albedo
 		
 		ambientSpecular.xyz = (spec * nDotL) * f + ambientSpecular.xyz;
@@ -414,7 +467,7 @@ void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, vec4 shad
 		#ifdef SPECULAR
 			if (light_index >= first_item && light_index <= last_item)
 		#else
-			if (light_index >= first_item && light_index <= last_item && any(lessThan(diffuseLight, vec3(1.0))))
+			if (light_index >= first_item && light_index <= last_item)// && any(lessThan(diffuseLight, vec3(1.0))))
 		#endif
 			{
 				overdraw += 1.0;
@@ -452,8 +505,8 @@ void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, vec4 shad
 
 				if ((renderCaps & 0x2) == 0x2 && numOccluders > 0u)
 				{
-					float localShadow = clamp(dot(shadows.xyz, diff.xyz) / aperture, 0.0, 1.0);
-					intensity *= localShadow * localShadow;
+					float localShadow = clamp(dot(shadows.xyz, diff.xyz) / max(0.01, aperture), 0.0, 1.0);
+					intensity *= localShadow;// * localShadow;
 				}
 
 				if (intensity <= 0.0)
@@ -478,8 +531,8 @@ void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, vec4 shad
 				diffuseLight += l.color.xyz * intensity * cd;
 
 			#ifdef SPECULAR
-				vec3 h = normalize(diff + view);
-				vec3 f = f0 + (1.0 - f0) * exp2(-8.35 * max(0.0, dot(diff, h)));
+				//vec3 h = normalize(diff + view);
+				vec3 f = f0;// + (1.0 - f0) * exp2(-8.35 * max(0.0, dot(diff, h)));
 				//f *= clamp(dot(f0, vec3(333.0)), 0.0, 1.0); // fade out when spec is less than 0.1% albedo
 					
 				float c = 0.72134752 * rcp_a2 + 0.39674113;
@@ -527,28 +580,45 @@ vec4 CalculateIndirectShadows(uint bucket_index, vec3 pos, vec3 normal)
 
 				occluder occ = occluders[occluder_index - first_item];
 
+				//vec3 direction = (occ.position.xyz - pos.xyz);
+				//float len = length(direction);
+				//float rcpLen = len > 1e-6 ? 1.0 / len : 0.0;
+				//
+				//// the radius is the total range of the effect
+				//float radius = occ.position.w * sqrt(occ.position.w);// * 0.5 / 3.14159;
+				//
+				//float heightAboveHorizon = dot(normal, direction);	
+				//float cosAlpha = dot( normal, direction * rcpLen );
+				//
+				//float horizonScale = clamp((heightAboveHorizon + radius) / (2.0 * radius), 0.0, 1.0);
+				//float factor = radius / len;
+				//float occlusion = cosAlpha * (factor * factor) * horizonScale;
+				//
+				//shadowing.w *= 1.0 - occlusion;
+				//shadowing.xyz -= direction * occlusion;
+
 				vec3 direction = (occ.position.xyz - pos.xyz);
 				float len = length(occ.position.xyz - pos.xyz);
 				if (len >= occ.position.w)
 					continue;
-
+				
 				float rcpLen = len > 1e-6 ? 1.0 / len : 0.0;
 				direction *= rcpLen;
-
+				
 				float cosTheta = dot(normal, direction);
 				if(cosTheta <= 0.0)
 					continue;
-
+				
 				// simplified smoothstep falloff, equivalent to smoothstep(0, occ.position.w, occ.position.w - len)
 				float falloff = clamp((occ.position.w - len) / occ.position.w, 0.0, 1.0);
-				falloff = falloff * falloff * (3.0 - 2.0 * falloff);
+				//falloff = falloff * falloff * (3.0 - 2.0 * falloff);
 				if(falloff <= 0.0)
 					continue;
-			
+				
 				float solidAngle = (1.0 - cos(atanFast(occ.position.w * rcpLen)));
 				if(solidAngle <= 0.0)
 					continue;
-
+				
 				float integralSolidAngle = cosTheta * solidAngle * falloff;
 				shadowing.w *= 1.0 - integralSolidAngle;
 				shadowing.xyz -= direction * integralSolidAngle;// * 0.5;
@@ -847,9 +917,56 @@ float rolloff(float x, float cutoff, float soft)
 	return -1.0f / (4.0f * soft) * (x * x - 2.0f * high * x + low * low);
 }
 
+float upsample_ssao(in vec2 texcoord, in float linearDepth)
+{
+	linearDepth *= 128.0;
+
+	// 2x2 strided sampling, helps hide the dither pattern better
+	vec4 values;
+	values.x = texelFetch(ssaotex, ivec2(texcoord + vec2(0, 0)), 0).x;
+	values.y = texelFetch(ssaotex, ivec2(texcoord + vec2(2, 0)), 0).x;
+	values.z = texelFetch(ssaotex, ivec2(texcoord + vec2(0, 2)), 0).x;
+	values.w = texelFetch(ssaotex, ivec2(texcoord + vec2(2, 2)), 0).x;
+			
+	// seem to get better results with a 1.5 offset here, too lazy to figure out why
+	vec4 depths;
+	depths.x = texelFetch(ztex, ivec2(texcoord + vec2(0.0, 0.0)), 0).x;
+	depths.y = texelFetch(ztex, ivec2(texcoord + vec2(1.5, 0.0)), 0).x;
+	depths.z = texelFetch(ztex, ivec2(texcoord + vec2(0.0, 1.5)), 0).x;
+	depths.w = texelFetch(ztex, ivec2(texcoord + vec2(1.5, 1.5)), 0).x;
+
+	// reject samples that have depth discontinuities
+	vec4 diff = abs(depths / linearDepth - 1.0) * 32.0;
+	vec4 weights = clamp(1.0 - diff, vec4(0.0), vec4(1.0));
+
+	// total weight
+	float totalWeight = weights.x + weights.y + weights.z + weights.w;
+
+	// average when weight is bad
+	if(totalWeight < 1e-4)
+		return (values.x + values.y + values.z + values.w) * 0.25;
+
+	return dot(weights / totalWeight, values);
+}
+
 void main(void)
 {
-    vec3 adj_texcoords = f_uv.xyz / f_uv.w;
+	const float DITHER_LUT[16] = float[16](
+			0, 4, 1, 5,
+			6, 2, 7, 3,
+			1, 5, 0, 4,
+			7, 3, 6, 2
+	);	
+	int wrap_x = int(gl_FragCoord.x) & 3;
+	int wrap_y = int(gl_FragCoord.y) & 3;
+	int wrap_index = wrap_x + wrap_y * 4;
+	float dither = DITHER_LUT[wrap_index] / 255.0;
+   
+	vec3 adj_texcoords = f_uv.xyz / f_uv.w;
+
+	// software actually uses the zmin of the entire face
+	float mipBias = compute_mip_bias(f_coord.y);
+	mipBias = min(mipBias, float(numMips - 1));
 
     if(displacement_factor != 0.0)
 	{
@@ -860,9 +977,28 @@ void main(void)
 		adj_texcoords.xy = f_uv_affine;
 	}
 
-	// software actually uses the zmin of the entire face
-	float mipBias = compute_mip_bias(f_coord.y);
-	mipBias = min(mipBias, float(numMips - 1));
+	//if(texgen == 1) // 1 = RD_TEXGEN_HORIZON
+	//{
+	//	mat4 invMat = inverse(modelMatrix);
+	//	vec3 worldPos = mat3(invMat) * f_coord;
+	//	//worldPos = normalize(worldPos);// * vec3(1.0, 1.0, 2.0));
+	//
+	//	//adj_texcoords.xy = worldPos.xy / (worldPos.z + 1.0) * 0.5 + 0.5;
+	//
+	//	vec3 R = worldPos;
+	//	float r = length(R);
+    //    float c = -R.z / r;
+    //    float theta = acos(c);
+    //    float phi = atan(R.x, -R.y);
+	//	  
+	//	adj_texcoords.x = 0.5 + phi / 6.2831852;
+	//	adj_texcoords.y = 1.0 - theta / 3.1415926;
+	//	adj_texcoords.xy *= vec2(4.0, 2.0);// * vec2(texsize.x / texsize.y, 1.0);
+	//	
+  	//	float seamWidth = 1.0 / texsize.x;
+    //    float seam = max (0.0, 1.0 - abs (R.x / r) / seamWidth) * clamp (1.0 + (R.z / r) / seamWidth, 0.0, 1.0);
+	//	mipBias -= 2.0 * log2(1.0 + c * c) -12.3 * seam;
+	//}
 
     vec4 sampled = texture(tex, adj_texcoords.xy, mipBias);
     vec4 sampledEmiss = texture(texEmiss, adj_texcoords.xy, mipBias);
@@ -928,7 +1064,7 @@ void main(void)
 
 	vec3 diffuseColor = sampled_color.xyz;
 	vec3 specularColor = vec3(0.0);
-	float roughness = 0.0;
+	float roughness = 0.05;
 
 	vec3 diffuseLight = vertex_color.xyz;
 	vec3 specularLight = vec3(0.0);
@@ -939,20 +1075,25 @@ void main(void)
 
 		// fill color is effectively an anti-metalness control
 		vec3 avgAlbedo = fillColor.xyz;
-		
+
+		float avgLum = dot(fillColor.xyz, vec3(0.2126, 0.7152, 0.0722));
+
+		//roughness = mix(0.5, 0.01, avgLum);		
+		//avgLum = avgLum * 0.7 + 0.3;
+
 		// blend to metal when dark
-		diffuseColor = diffuseColor * avgAlbedo;// -> 0 * (1-avgAlbedo) + diffuseColor * avgAlbedo -> mix(vec3(0.0), diffuseColor, avgAlbedo)
+		diffuseColor = sampled_color.xyz * (1.0 - avgLum);//(1.0 - fillColor.xyz);//diffuseColor * avgAlbedo;// -> 0 * (1-avgAlbedo) + diffuseColor * avgAlbedo -> mix(vec3(0.0), diffuseColor, avgAlbedo)
 		
 		// blend to dielectric white when bright
-		specularColor = mix(sampled_color.xyz, vec3(0.2), avgAlbedo);
+		specularColor = mix(fillColor.xyz, (sampled_color.xyz * 0.95 + 0.05), avgLum);//sampled_color.xyz * fillColor.xyz;//vec3(1.0);//mix(sampled_color.xyz, vec3(0.2), avgAlbedo);
 		
 		// try to estimate some roughness variation from the texture
-		float smoothness = max(sampled_color.r, max(sampled_color.g, sampled_color.b));
-		roughness = mix(0.25, 0.05, min(sqrt(smoothness * 2.0), 1.0)); // don't get too rough or there's no point in using specular here
-		
-		// blend out really dark stuff to fill color with high roughness (ex strifle scopes)
-		float threshold = 1.0 / (15.0 / 255.0);
-		roughness = mix(0.05, roughness, min(smoothness * threshold, 1.0));
+	//	float smoothness = max(sampled_color.r, max(sampled_color.g, sampled_color.b));
+	//	roughness = mix(0.25, 0.05, min(sqrt(smoothness * 2.0), 1.0)); // don't get too rough or there's no point in using specular here
+	//	
+	//	// blend out really dark stuff to fill color with high roughness (ex strifle scopes)
+	//	float threshold = 1.0 / (15.0 / 255.0);
+	//	roughness = mix(0.05, roughness, min(smoothness * threshold, 1.0));
 		//specularColor = mix(min(avgAlbedo * 2.0, vec3(1.0)), specularColor, min(smoothness * threshold, 1.0));
 	#endif
 #endif
@@ -970,31 +1111,58 @@ void main(void)
 	if ((renderCaps & 0x2) == 0x2 && numOccluders > 0u)
 		shadows = CalculateIndirectShadows(bucket_index, f_coord.xyz, surfaceNormals);
 
-	float ao = (shadows.w + 0.1) / 1.1; // remap so we don't overdarken
+	float ssao = upsample_ssao(gl_FragCoord.xy, f_depth);
+
+	vec3 ao = vec3(shadows.w * 0.8 + 0.2); // remap so we don't overdarken
+	ao *= ssao;
+
+	// fake multi bounce
+	vec3 albedo = vertex_color.xyz * diffuseColor.xyz;
+	vec3 a =  2.0404 * albedo - 0.3324;
+	vec3 b = -4.7951 * albedo + 0.6417;
+	vec3 c =  2.7552 * albedo + 0.6903;
+	vec3 x = ao;
+	ao = max(x, ((x * a + b) * x + c) * x);	// ao = x * x * x * a - x * x * b + x * c;
+
 	diffuseLight.xyz *= ao;
-	specularLight.xyz *= ao;
+
+	float ndotv = dot(surfaceNormals.xyz, localViewDir.xyz);
+	vec3 specAO = mix(ao * ao, vec3(1.0), clamp(-0.3 * ndotv * ndotv, 0.0, 1.0));
+	specularLight.xyz *= specAO;
 	
-	if ((renderCaps & 0x1) == 0x1 && numLights > 0u)
+	// why is renderCaps not working with SPECULAR?
+	//if ((renderCaps & 0x1) == 0x1 && numLights > 0u)
 		CalculatePointLighting(bucket_index, surfaceNormals, localViewDir, shadows, diffuseColor.xyz, specularColor.xyz, roughness, diffuseLight, specularLight);
 	
-	diffuseLight.xyz = clamp(diffuseLight.xyz, vec3(0.0), vec3(1.0));	
+	//diffuseLight.xyz = clamp(diffuseLight.xyz, vec3(0.0), vec3(1.0));	
 	//specularLight.xyz = clamp(specularLight.xyz, vec3(0.0), vec3(1.0));	
 
-	// taper off highlights
-	specularLight.r = rolloff(specularLight.r, 1.0, 0.2);
-	specularLight.g = rolloff(specularLight.g, 1.0, 0.2);
-	specularLight.b = rolloff(specularLight.b, 1.0, 0.2);
+	// taper off
+//	specularLight.r = rolloff(specularLight.r, 1.0, 0.2);
+//	specularLight.g = rolloff(specularLight.g, 1.0, 0.2);
+//	specularLight.b = rolloff(specularLight.b, 1.0, 0.2);
+//
+//	diffuseLight.r = rolloff(diffuseLight.r, 1.0, 0.2);
+//	diffuseLight.g = rolloff(diffuseLight.g, 1.0, 0.2);
+//	diffuseLight.b = rolloff(diffuseLight.b, 1.0, 0.2);
+
+	//diffuseColor = ao;//1.0);
+	//diffuseLight = vec3(1.0);
 #endif
 
 	diffuseLight.xyz *= diffuseColor.xyz;
 	//specularLight.xyz *= specularColor.xyz;
 
-	vec4 main_color = vec4(diffuseLight.xyz, vertex_color.w) + vec4(specularLight.xyz, 0.0);    
+	vec4 main_color = (vec4(diffuseLight.xyz, vertex_color.w) + vec4(specularLight.xyz, 0.0));// * vec4(sampled_color.xyz, 1.0);   
+
     main_color *= albedoFactor_copy;
 	
+	// add specular to emissive output
+	emissive.rgb += max(vec3(0.0), specularLight.rgb - 1.0 - dither);
+
 	if (sampledEmiss.r != 0.0 || sampledEmiss.g != 0.0 || sampledEmiss.b != 0.0)
     {
-        emissive.rgb += sampledEmiss.rgb * emissiveFactor;
+        emissive.rgb += sampledEmiss.rgb * emissiveFactor.rgb;
     }
 
 	main_color.rgb = max(main_color.rgb, emissive.rgb);
@@ -1024,19 +1192,7 @@ void main(void)
 
 	// dither the output in case we're using some lower precision output
 	if(ditherMode == 1)
-	{
-		const float DITHER_LUT[16] = float[16](
-				0, 4, 1, 5,
-				6, 2, 7, 3,
-				1, 5, 0, 4,
-				7, 3, 6, 2
-		);	
-	
-		int wrap_x = int(gl_FragCoord.x) & 3;
-		int wrap_y = int(gl_FragCoord.y) & 3;
-		int wrap_index = wrap_x + wrap_y * 4;
-		fragColor.rgb = min(fragColor.rgb + DITHER_LUT[wrap_index] / 255.0, vec3(1.0));
-	}
+		fragColor.rgb = min(fragColor.rgb + dither, vec3(1.0));
 
 #ifndef ALPHA_BLEND
     fragColorEmiss = emissive;

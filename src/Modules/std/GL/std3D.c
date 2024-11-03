@@ -42,6 +42,16 @@ __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 #define TEX_MODE_16BPP 5
 #define TEX_MODE_BILINEAR_16BPP 6
 
+#define TEX_SLOT_DIFFUSE         0
+#define TEX_SLOT_WORLD_PAL       1
+#define TEX_SLOT_WORLD_LIGHT_PAL 2
+#define TEX_SLOT_EMISSIVE        3
+#define TEX_SLOT_DISPLACEMENT    4
+#define TEX_SLOT_CLUSTER_BUFFER  5
+#define TEX_SLOT_DECAL_ATLAS     6
+#define TEX_SLOT_DEPTH           7
+#define TEX_SLOT_AO              8
+
 #define STD3D_MAX_RENDER_PASSES     2
 
 #define CLUSTER_MAX_LIGHTS          256 // match RDCAMERA_MAX_LIGHTS/SITHREND_NUM_LIGHTS
@@ -71,6 +81,7 @@ typedef struct std3DSimpleTexStage
     GLint uniform_tex3;
 	GLint uniform_tex4;
 	GLint uniform_iResolution;
+	GLint uniform_proj;
 
     GLint uniform_param1;
     GLint uniform_param2;
@@ -107,8 +118,10 @@ typedef struct std3DFramebuffer
 	int32_t w;
 	int32_t h;
 
-    GLuint fbo;
 	GLuint rbo;
+	GLuint zfbo;
+    GLuint fbo;
+	GLuint ztex;
 	GLuint tex0; // color
     GLuint tex1; // emissive
 
@@ -116,7 +129,8 @@ typedef struct std3DFramebuffer
     std3DIntermediateFbo main;
 
 	std3DIntermediateFbo postfx; // temporary composite space for postfx
-
+	std3DIntermediateFbo ssaoDepth;
+	std3DIntermediateFbo ssao;
     std3DIntermediateFbo bloomLayers[4];
 } std3DFramebuffer;
 
@@ -163,35 +177,52 @@ typedef struct std3D_SharedUniforms
 
 	float     fade;
 	float     lightMult;
-	uint32_t  pad0;
-	uint32_t  pad1;
+	rdVector2 resolution;
 
 	rdVector2 clusterTileSizes;
 	rdVector2 clusterScaleBias;
 
-	rdVector2 resolution;
-	uint32_t  firstLight; // consider moving to the light block
-	uint32_t  numLights;
-
-	uint32_t  firstOccluder; // consider moving to the occluder block
-	uint32_t  numOccluders;
-	uint32_t  firstDecal; // consider moving to the decal block
-	uint32_t  numDecals;
 } std3D_SharedUniforms;
 
 GLuint shared_ubo;
 
-/*typedef struct std3D_MaterialUniforms
+typedef struct std3D_FogUniforms
 {
-	rdVector4 fillColor;
-	rdVector4 albedoFactor;
-	rdVector4 emissiveFactor;
+	rdVector4 fogColor;
+	int32_t   fogEnabled;
+	float     fogStartDepth;
+	float     fogEndDepth;
+	float     fogPad0;
+} std3D_FogUniforms;
 
-	float    displacementFactor;
-	uint32_t lightMode;
-	uint32_t texMode;
-	uint32_t pad1;
-} std3D_MaterialUniforms;*/
+GLuint fog_ubo;
+
+typedef struct std3D_DrawUniforms
+{
+	rdMatrix44 projeciton;
+	rdMatrix44 modelMatrix;
+} std3D_DrawUniforms;
+
+typedef struct std3D_TextureUniforms
+{
+	int32_t   tex_mode;
+	int32_t   uv_mode;
+	int32_t   texgen;
+	uint32_t  numMips;
+
+	rdVector2 texsize;
+	rdVector2 uv_offset;
+
+	rdVector4 texgen_params;
+	
+	rdVector4 fillColor;
+	rdVector4 albedo_factor;
+	rdVector4 emissive_factor;
+
+	float    displacement_factor;
+	float    texPad0, texPad1, texPad2;
+} std3D_TextureUniforms;
+GLuint tex_ubo;
 
 typedef struct std3D_light
 {
@@ -211,8 +242,15 @@ typedef struct std3D_light
 } std3D_light;
 
 int lightsDirty = 0;
-unsigned int numLights = 0;
-std3D_light tmpLights[CLUSTER_MAX_LIGHTS];
+
+typedef struct std3D_LightUniforms
+{
+	uint32_t firstLight;
+	uint32_t numLights;
+	uint32_t lightPad0, lightPad1;
+	std3D_light tmpLights[CLUSTER_MAX_LIGHTS];
+} std3D_LightUniforms;
+std3D_LightUniforms lightUniforms;
 
 GLuint light_ubo;
 
@@ -222,9 +260,16 @@ typedef struct std3D_occluder
 } std3D_occluder;
 
 int occludersDirty = 0;
-unsigned int firstOccluder = 0;
-unsigned int numOccluders = 0;
-static std3D_occluder tmpOccluders[CLUSTER_MAX_OCCLUDERS];
+
+
+typedef struct std3D_OccluderUniforms
+{
+	uint32_t firstOccluder;
+	uint32_t numOccluders;
+	uint32_t occluderPad0, occluderPad1;
+	std3D_occluder tmpOccluders[CLUSTER_MAX_OCCLUDERS];
+} std3D_OccluderUniforms;
+std3D_OccluderUniforms occluderUniforms;
 
 GLuint occluder_ubo;
 
@@ -240,10 +285,18 @@ typedef struct std3D_decal
 	float           padding0;
 	float           padding1;
 } std3D_decal;
+
 int decalsDirty = 0;
-unsigned int firstDecal = 0;
-unsigned int numDecals = 0;
-static std3D_decal tmpDecals[CLUSTER_MAX_DECALS];
+
+typedef struct std3D_DecalUniforms
+{
+	uint32_t firstDecal;
+	uint32_t numDecals;
+	uint32_t decalPad0, decalPad1;
+	std3D_decal tmpDecals[CLUSTER_MAX_DECALS];
+} std3D_DecalUniforms;
+std3D_DecalUniforms decalUniforms;
+
 
 GLuint decal_ubo;
 
@@ -352,15 +405,16 @@ typedef struct std3D_worldStage
 	GLint attribute_coord3d, attribute_v_color, attribute_v_light, attribute_v_uv, attribute_v_norm;
 	GLint uniform_projection, uniform_modelMatrix;
 	GLint uniform_ambient_color, uniform_ambient_sg;
-	GLint uniform_uv_mode, uniform_texsize, uniform_numMips, uniform_texgen, uniform_texgen_params, uniform_uv_offset;
-	GLint uniform_geo_mode,  uniform_fillColor, uniform_tex, uniform_texEmiss, uniform_displacement_map, uniform_texDecals;
-	GLint uniform_tex_mode, uniform_worldPalette, uniform_worldPaletteLights;
-	GLint uniform_emissiveFactor, uniform_albedoFactor, uniform_displacement_factor;
+	GLint uniform_geo_mode,  uniform_fillColor, uniform_tex, uniform_texEmiss, uniform_displacement_map, uniform_texDecals, uniform_texz, uniform_texssao;
+	GLint uniform_worldPalette, uniform_worldPaletteLights;
 	GLint uniform_light_mode, uniform_ditherMode, uniform_renderCaps;
-#ifdef FOG
-	GLint uniform_fog, uniform_fog_color, uniform_fog_start, uniform_fog_end;
-#endif
-	GLuint uniform_shared, uniform_lightbuf, uniform_lights, uniform_occluders, uniform_decals;
+	GLint uniform_shared, uniform_fog, uniform_tex_block, uniform_lightbuf, uniform_lights, uniform_occluders, uniform_decals;
+	GLint uniform_rightTop;
+	GLint uniform_rt;
+	GLint uniform_lt;
+	GLint uniform_rb;
+	GLint uniform_lb;
+
 	GLuint vao;
 } std3D_worldStage;
 
@@ -373,6 +427,7 @@ std3DSimpleTexStage std3D_uiProgram;
 std3DSimpleTexStage std3D_texFboStage;
 std3DSimpleTexStage std3D_postfxStage;
 std3DSimpleTexStage std3D_bloomStage;
+std3DSimpleTexStage std3D_ssaoStage;
 
 std3DSimpleTexStage std3D_decalAtlasStage;
 std3DIntermediateFbo decalAtlasFBO;
@@ -387,7 +442,7 @@ void* worldpal_lights_data = NULL;
 GLuint displaypal_texture;
 void* displaypal_data = NULL;
 GLuint tiledrand_texture;
-rdVector3* tiledrand_data = NULL;
+rdVector3 tiledrand_data[4 * 4];
 
 size_t std3D_loadedUITexturesAmt = 0;
 stdBitmap* std3D_aUIBitmaps[STD3D_MAX_TEXTURES] = {0};
@@ -606,7 +661,7 @@ static void std3D_popDebugGroup()
 		glPopDebugGroup();
 }
 
-void std3D_generateIntermediateFbo(int32_t width, int32_t height, std3DIntermediateFbo* pFbo, uint32_t format, int mipMaps, int useDepth)
+void std3D_generateIntermediateFbo(int32_t width, int32_t height, std3DIntermediateFbo* pFbo, uint32_t format, int mipMaps, int useDepth, int rbo)
 {
     // Generate the framebuffer
     memset(pFbo, 0, sizeof(*pFbo));
@@ -625,16 +680,16 @@ void std3D_generateIntermediateFbo(int32_t width, int32_t height, std3DIntermedi
     glGenTextures(1, &pFbo->tex);
     glBindTexture(GL_TEXTURE_2D, pFbo->tex);
     glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, std3D_getImageFormat(format), std3D_getUploadFormat(format), NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mipMaps ? GL_LINEAR : GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipMaps ? GL_LINEAR : GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-    if(mipMaps)
-    {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
+    //if(mipMaps)
+    //{
+    //    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1);
+    //    glGenerateMipmap(GL_TEXTURE_2D);
+    //}
 
     // Attach fbTex to our currently bound framebuffer fb
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pFbo->tex, 0);
@@ -642,13 +697,20 @@ void std3D_generateIntermediateFbo(int32_t width, int32_t height, std3DIntermedi
     // Set up our render buffer
 	if(useDepth)
 	{
-		glGenRenderbuffers(1, &pFbo->rbo);
-		glBindRenderbuffer(GL_RENDERBUFFER, pFbo->rbo);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
-		glBindRenderbuffer(GL_RENDERBUFFER, 0);
+		if(rbo == 0)
+		{
+			glGenRenderbuffers(1, &pFbo->rbo);
+			glBindRenderbuffer(GL_RENDERBUFFER, pFbo->rbo);
+			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+			glBindRenderbuffer(GL_RENDERBUFFER, 0);
     
-		// Bind it to our framebuffer fb
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, pFbo->rbo);
+			// Bind it to our framebuffer fb
+			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, pFbo->rbo);
+		}
+		else
+		{
+			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+		}
 	}
 
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
@@ -681,8 +743,8 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     glGenTextures(1, &pFb->tex0);
     glBindTexture(GL_TEXTURE_2D, pFb->tex0);
     glTexImage2D(GL_TEXTURE_2D, 0, jkPlayer_enable32Bit ? GL_RGB10_A2 : GL_RGB5_A1, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);//GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);//GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
@@ -704,7 +766,7 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1);
-    glGenerateMipmap(GL_TEXTURE_2D);
+    //glGenerateMipmap(GL_TEXTURE_2D);
     //glGenerateMipmap(GL_TEXTURE_2D);
     
     // Attach fbTex to our currently bound framebuffer fb
@@ -722,21 +784,61 @@ void std3D_generateFramebuffer(int32_t width, int32_t height, std3DFramebuffer* 
         stdPlatform_Printf("std3D: ERROR, Framebuffer is incomplete!\n");
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	pFb->enable_extra &= ~2;
+	glGenFramebuffers(1, &pFb->zfbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, pFb->zfbo);
+
+	glGenTextures(1, &pFb->ztex);
+	glBindTexture(GL_TEXTURE_2D, pFb->ztex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, width, height, 0, GL_RED, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);//_MIPMAP_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);//_MIPMAP_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 2);
+	//glGenerateMipmap(GL_TEXTURE_2D);
+
+	if (jkPlayer_enable32Bit)
+		pFb->enable_extra |= 4;
+	else
+		pFb->enable_extra &= ~4;
+
+	// Attach fbTex to our currently bound framebuffer fb
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pFb->ztex, 0);
+
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, pFb->rbo);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		stdPlatform_Printf("std3D: ERROR, Framebuffer is incomplete!\n");
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	if (jkPlayer_enableSSAO)
+	{
+		int ssao_w = width > 320 ? width / 2 : width;
+		int ssao_h = ssao_w * ((float)height / width);
+
+		std3D_generateIntermediateFbo(width/2, height/2, &pFb->ssaoDepth, GL_R16F, 0, 0, 0);
+		std3D_generateIntermediateFbo(width, height, &pFb->ssao, GL_R8, 0, 1, pFb->rbo);
+		pFb->enable_extra |= 2;
+	}
+	else
+		pFb->enable_extra &= ~2;
 
     if (jkPlayer_enableBloom)
     {
+		int bloom_w = width > 320 ? 640 : 320;
+		int bloom_h = bloom_w * ((float)height / width);
+
         pFb->enable_extra |= 1;
-		std3D_generateIntermediateFbo(width / 4, height / 4, &pFb->bloomLayers[0], GL_RGBA16F, 0, 0);
+		std3D_generateIntermediateFbo(bloom_w, bloom_h, &pFb->bloomLayers[0], GL_RGBA16F, 1, 0, 0);
 		for(int i = 1; i < ARRAY_SIZE(pFb->bloomLayers); ++i)
-			std3D_generateIntermediateFbo(pFb->bloomLayers[i-1].w / 2, pFb->bloomLayers[i - 1].h / 2, &pFb->bloomLayers[i], GL_RGBA16F, 0, 0);
+			std3D_generateIntermediateFbo(pFb->bloomLayers[i-1].w / 2, pFb->bloomLayers[i - 1].h / 2, &pFb->bloomLayers[i], GL_RGBA16F, 1, 0, 0);
     }
 	else
 	{
 		pFb->enable_extra &= ~1;
 	}
 
-	std3D_generateIntermediateFbo(width, height, &pFb->postfx, GL_RGB10_A2, 0, 0);
+	std3D_generateIntermediateFbo(width, height, &pFb->postfx, GL_RGB10_A2, 0, 0, 0);
 
     pFb->main.fbo = pFb->fbo;
     pFb->main.tex = pFb->tex1;
@@ -759,7 +861,11 @@ void std3D_deleteFramebuffer(std3DFramebuffer* pFb)
     glDeleteTextures(1, &pFb->tex0);
     glDeleteTextures(1, &pFb->tex1);
     glDeleteRenderbuffers(1, &pFb->rbo);
+	glDeleteTextures(1, &pFb->ztex);
+	glDeleteFramebuffers(1, &pFb->zfbo);
 
+	std3D_deleteIntermediateFbo(&pFb->ssao);
+	std3D_deleteIntermediateFbo(&pFb->ssaoDepth);
 	for (int i = 0; i < ARRAY_SIZE(pFb->bloomLayers); ++i)
 		std3D_deleteIntermediateFbo(&pFb->bloomLayers[i]);
 
@@ -1095,6 +1201,7 @@ bool std3D_loadSimpleTexProgram(const char* fpath_base, std3DSimpleTexStage* pOu
     pOut->attribute_v_uv = std3D_tryFindAttribute(pOut->program, "v_uv");
     pOut->uniform_mvp = std3D_tryFindUniform(pOut->program, "mvp");
     pOut->uniform_iResolution = std3D_tryFindUniform(pOut->program, "iResolution");
+	pOut->uniform_proj = std3D_tryFindUniform(pOut->program, "proj");
     pOut->uniform_tex = std3D_tryFindUniform(pOut->program, "tex");
     pOut->uniform_tex2 = std3D_tryFindUniform(pOut->program, "tex2");
     pOut->uniform_tex3 = std3D_tryFindUniform(pOut->program, "tex3");
@@ -1124,17 +1231,11 @@ int std3D_loadWorldStage(std3D_worldStage* pStage, int isZPass, const char* defi
 	pStage->attribute_coord3d = std3D_tryFindAttribute(pStage->program, "coord3d");
 	pStage->attribute_v_color = std3D_tryFindAttribute(pStage->program, "v_color");
 	pStage->attribute_v_light = std3D_tryFindAttribute(pStage->program, "v_light");
-	pStage->attribute_v_uv = std3D_tryFindAttribute(pStage->program, "v_uv");
-	pStage->attribute_v_norm = std3D_tryFindAttribute(pStage->program, "v_normal");
+	pStage->attribute_v_uv    = std3D_tryFindAttribute(pStage->program, "v_uv");
+	pStage->attribute_v_norm  = std3D_tryFindAttribute(pStage->program, "v_normal");
 
 	pStage->uniform_projection = std3D_tryFindUniform(pStage->program, "projMatrix");
 	pStage->uniform_modelMatrix = std3D_tryFindUniform(pStage->program, "modelMatrix");
-	pStage->uniform_uv_mode = std3D_tryFindUniform(pStage->program, "uv_mode");
-	pStage->uniform_numMips = std3D_tryFindUniform(pStage->program, "numMips");
-	pStage->uniform_texsize = std3D_tryFindUniform(pStage->program, "texsize");
-	pStage->uniform_texgen = std3D_tryFindUniform(pStage->program, "texgen");
-	pStage->uniform_texgen_params = std3D_tryFindUniform(pStage->program, "texgen_params");
-	pStage->uniform_uv_offset = std3D_tryFindUniform(pStage->program, "uv_offset");
 	pStage->uniform_ambient_color = std3D_tryFindUniform(pStage->program, "ambientColor");
 	pStage->uniform_ambient_sg = std3D_tryFindUniform(pStage->program, "ambientSG");
 	pStage->uniform_fillColor = std3D_tryFindUniform(pStage->program, "fillColor");
@@ -1144,25 +1245,26 @@ int std3D_loadWorldStage(std3D_worldStage* pStage, int isZPass, const char* defi
 	pStage->uniform_worldPaletteLights = std3D_tryFindUniform(pStage->program, "worldPaletteLights");
 	pStage->uniform_displacement_map = std3D_tryFindUniform(pStage->program, "displacement_map");
 	pStage->uniform_texDecals = std3D_tryFindUniform(pStage->program, "decalAtlas");
-	pStage->uniform_tex_mode = std3D_tryFindUniform(pStage->program, "tex_mode");
-	pStage->uniform_emissiveFactor = std3D_tryFindUniform(pStage->program, "emissiveFactor");
-	pStage->uniform_albedoFactor = std3D_tryFindUniform(pStage->program, "albedoFactor");
+	pStage->uniform_texz = std3D_tryFindUniform(pStage->program, "ztex");
+	pStage->uniform_texssao = std3D_tryFindUniform(pStage->program, "ssaotex");
 	pStage->uniform_geo_mode = std3D_tryFindUniform(pStage->program, "geoMode");
 	pStage->uniform_ditherMode = std3D_tryFindUniform(pStage->program, "ditherMode");
 	pStage->uniform_light_mode = std3D_tryFindUniform(pStage->program, "lightMode");
 	pStage->uniform_renderCaps = std3D_tryFindUniform(pStage->program, "renderCaps");
-	pStage->uniform_displacement_factor = std3D_tryFindUniform(pStage->program, "displacement_factor");
-#ifdef FOG
-	pStage->uniform_fog = std3D_tryFindUniform(pStage->program, "fogEnabled");
-	pStage->uniform_fog_color = std3D_tryFindUniform(pStage->program, "fogColor");
-	pStage->uniform_fog_start = std3D_tryFindUniform(pStage->program, "fogStart");
-	pStage->uniform_fog_end = std3D_tryFindUniform(pStage->program, "fogEnd");
-#endif
+
 	pStage->uniform_lightbuf = std3D_tryFindUniform(pStage->program, "clusterBuffer");
 	pStage->uniform_shared = glGetUniformBlockIndex(pStage->program, "sharedBlock");
+	pStage->uniform_fog = glGetUniformBlockIndex(pStage->program, "fogBlock");
+	pStage->uniform_tex_block = glGetUniformBlockIndex(pStage->program, "textureBlock");
 	pStage->uniform_lights = glGetUniformBlockIndex(pStage->program, "lightBlock");
 	pStage->uniform_occluders = glGetUniformBlockIndex(pStage->program, "occluderBlock");
 	pStage->uniform_decals = glGetUniformBlockIndex(pStage->program, "decalBlock");
+
+	pStage->uniform_rightTop = std3D_tryFindUniform(pStage->program, "rightTop");
+	pStage->uniform_rt = std3D_tryFindUniform(pStage->program, "cameraRT");
+	pStage->uniform_lt = std3D_tryFindUniform(pStage->program, "cameraLT");
+	pStage->uniform_rb = std3D_tryFindUniform(pStage->program, "cameraRB");
+	pStage->uniform_lb = std3D_tryFindUniform(pStage->program, "cameraLB");
 
 	return 1;
 }
@@ -1273,25 +1375,39 @@ void std3D_setupMenuVAO()
 
 void std3D_setupUBOs()
 {
+	memset(&lightUniforms,    0,    sizeof(std3D_LightUniforms));
+	memset(&occluderUniforms, 0, sizeof(std3D_OccluderUniforms));
+	memset(&decalUniforms,    0,    sizeof(std3D_DecalUniforms));
+
 	// shared buffer
 	glGenBuffers(1, &shared_ubo);
 	glBindBuffer(GL_UNIFORM_BUFFER, shared_ubo);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(std3D_SharedUniforms), NULL, GL_DYNAMIC_DRAW);
 
+	// fog buffer
+	glGenBuffers(1, &fog_ubo);
+	glBindBuffer(GL_UNIFORM_BUFFER, fog_ubo);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(std3D_FogUniforms), NULL, GL_DYNAMIC_DRAW);
+
+	// texture buffer
+	glGenBuffers(1, &tex_ubo);
+	glBindBuffer(GL_UNIFORM_BUFFER, tex_ubo);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(std3D_TextureUniforms), NULL, GL_DYNAMIC_DRAW);
+
 	// light buffer
 	glGenBuffers(1, &light_ubo);
 	glBindBuffer(GL_UNIFORM_BUFFER, light_ubo);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(tmpLights), NULL, GL_DYNAMIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(std3D_LightUniforms), NULL, GL_DYNAMIC_DRAW);
 
 	// occluder buffer
 	glGenBuffers(1, &occluder_ubo);
 	glBindBuffer(GL_UNIFORM_BUFFER, occluder_ubo);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(tmpOccluders), NULL, GL_DYNAMIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(std3D_OccluderUniforms), NULL, GL_DYNAMIC_DRAW);
 
 	// decal buffer
 	glGenBuffers(1, &decal_ubo);
 	glBindBuffer(GL_UNIFORM_BUFFER, decal_ubo);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(tmpDecals), NULL, GL_DYNAMIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(std3D_DecalUniforms), NULL, GL_DYNAMIC_DRAW);
 
 	// cluster buffer
 	//int maxsize;
@@ -1315,6 +1431,8 @@ void std3D_setupLightingUBO(std3D_worldStage* pStage)
 	glUniformBlockBinding(pStage->program, pStage->uniform_occluders, 1);
 	glUniformBlockBinding(pStage->program, pStage->uniform_decals, 2);
 	glUniformBlockBinding(pStage->program, pStage->uniform_shared, 3);
+	glUniformBlockBinding(pStage->program, pStage->uniform_fog, 4);
+	glUniformBlockBinding(pStage->program, pStage->uniform_tex_block, 5);	
 }
 
 void std3D_setupDrawCallVAO(std3D_worldStage* pStage)
@@ -1417,8 +1535,10 @@ int init_resources()
     if (!std3D_loadSimpleTexProgram("shaders/texfbo", &std3D_texFboStage)) return false;
 	if (!std3D_loadSimpleTexProgram("shaders/postfx", &std3D_postfxStage)) return false;
 	if (!std3D_loadSimpleTexProgram("shaders/bloom", &std3D_bloomStage)) return false;
+	if (!std3D_loadSimpleTexProgram("shaders/ssao", &std3D_ssaoStage)) return false;
 	if (!std3D_loadSimpleTexProgram("shaders/decal_insert", &std3D_decalAtlasStage)) return false;
-	std3D_generateIntermediateFbo(DECAL_ATLAS_SIZE, DECAL_ATLAS_SIZE, &decalAtlasFBO, GL_RGBA8, 0, 0);
+
+	std3D_generateIntermediateFbo(DECAL_ATLAS_SIZE, DECAL_ATLAS_SIZE, &decalAtlasFBO, GL_RGBA8, 0, 0, 0);
 
 	decalRootNode.rect.x = 0.0f;
 	decalRootNode.rect.y = 0.0f;
@@ -1521,18 +1641,14 @@ int init_resources()
 
     // Tiled random
     glGenTextures(1, &tiledrand_texture);
-    if (tiledrand_data) {
-        free(tiledrand_data);
-    }
-    tiledrand_data = malloc(3 * 4 * 4 * sizeof(float));
-    memset(tiledrand_data, 0, 3 * 4 * 4 * sizeof(float));
 
+    memset(tiledrand_data, 0, 4 * 4 * sizeof(rdVector3));
     for (int i = 0; i < 4*4; i++)
     {
         tiledrand_data[i].x = (_frand() * 2.0) - 1.0;
         tiledrand_data[i].y = (_frand() * 2.0) - 1.0;
-        tiledrand_data[i].z = 0.0;
-        rdVector_Normalize3Acc(&tiledrand_data[i]);
+		tiledrand_data[i].z = (_frand() * 2.0) - 1.0;
+		rdVector_Normalize3Acc(&tiledrand_data[i]);
     }
 
     glBindTexture(GL_TEXTURE_2D, tiledrand_texture);
@@ -1710,11 +1826,18 @@ int std3D_StartScene()
 
     if (tex_w != std3D_pFb->w || tex_h != std3D_pFb->h 
         || (((std3D_pFb->enable_extra & 1) == 1) != jkPlayer_enableBloom)
+		|| (((std3D_pFb->enable_extra & 2) == 2) != jkPlayer_enableSSAO)
 		|| (((std3D_pFb->enable_extra & 4) == 4) != jkPlayer_enable32Bit))
     {
         std3D_deleteFramebuffer(std3D_pFb);
         std3D_generateFramebuffer(tex_w, tex_h, std3D_pFb);
     }
+
+	glClearColor(0.0, 0.0, 0.0, 1.0);
+
+	// clear the window buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->window.fbo);
+	glClear(GL_COLOR_BUFFER_BIT);
 
     glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->fbo);
     glEnable(GL_BLEND);
@@ -1725,9 +1848,6 @@ int std3D_StartScene()
     glBlendEquation(GL_FUNC_ADD);
     glCullFace(GL_FRONT);
     //glClampColor(GL_CLAMP_FRAGMENT_COLOR, GL_FALSE);
-
-    // Technically this should be from Clear2
-    glClearColor(0.0, 0.0, 0.0, 1.0);
 
 	GLuint clearBits = GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT;
 	if(jkGuiBuildMulti_bRendering)
@@ -1960,7 +2080,7 @@ void std3D_DrawMenuSubrect2(float x, float y, float w, float h, float dstX, floa
 }
 
 static rdDDrawSurface* test_idk = NULL;
-void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo, GLuint texId, GLuint texId2, GLuint texId3, float param1, float param2, float param3, int gen_mips);
+void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo, GLuint texId, GLuint texId2, GLuint texId3, float param1, float param2, float param3, int gen_mips, const char* debugName);
 void std3D_DrawMapOverlay();
 void std3D_DrawUIRenderList();
 
@@ -1971,8 +2091,15 @@ void std3D_DrawMenu()
 	std3D_pushDebugGroup("std3D_DrawMenu");
 
     //printf("Draw menu\n");
-    std3D_DrawSceneFbo();
+ //   std3D_DrawSceneFbo();
     //glFlush();
+
+	glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->window.fbo);
+	if (!jkGame_isDDraw)// || jkGuiBuildMulti_bRendering)
+	{
+		//glDisable(GL_DEPTH_TEST);
+		//glClear(GL_COLOR_BUFFER_BIT);
+	}
 
     glBindFramebuffer(GL_FRAMEBUFFER, std3D_windowFbo);
     glDepthMask(GL_TRUE);
@@ -2844,8 +2971,10 @@ void std3D_DrawUIRenderList()
     std3D_ResetUIRenderList();
 }
 
-void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo, GLuint texId, GLuint texId2, GLuint texId3, float param1, float param2, float param3, int gen_mips)
+void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo, GLuint texId, GLuint texId2, GLuint texId3, float param1, float param2, float param3, int gen_mips, const char* debugName)
 {
+	std3D_pushDebugGroup(debugName);
+
     glBindFramebuffer(GL_FRAMEBUFFER, pFbo->fbo);
     glDepthFunc(GL_ALWAYS);
 	glDisable(GL_CULL_FACE);
@@ -2923,6 +3052,8 @@ void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo
     }
     
 	glDrawArrays(GL_TRIANGLES, 0, 3);
+
+	std3D_popDebugGroup();
 }
 
 void std3D_DrawSceneFbo()
@@ -2941,7 +3072,7 @@ void std3D_DrawSceneFbo()
     static float frameNum = 1.0;
     //frameNum += (rand() % 16);
 
-    int draw_bloom = jkPlayer_enableBloom;
+	int draw_bloom = jkPlayer_enableBloom;
 
     float add_luma = (((float)rdroid_curColorEffects.add.x / 255.0f) * 0.2125)
                      + (((float)rdroid_curColorEffects.add.y / 255.0f)* 0.7154)
@@ -2955,19 +3086,10 @@ void std3D_DrawSceneFbo()
 
 	glDisable(GL_BLEND);
 
-    {
-		std3D_pushDebugGroup("PostFX Blit");
+	// blit the framebuffer to a higher precision target for postfx composition
+	std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->postfx, std3D_pFb->tex0, 0, 0, 1.0, 1.0, 1.0, 0, "PostFX Blit");
 
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->postfx, std3D_pFb->tex0, 0, 0, 1.0, 1.0, 1.0, 0);
-        //std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->postfx, std3D_pFb->tex1, 0, 0, 0.0, 1.0, 1.0, 0); // test emission output
-
-		std3D_popDebugGroup();
-    }
-   
     glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
-    //if (!draw_bloom)
-        //std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->postfx, std3D_pFb->tex1, 0, 0, 1.0, 1.0, 1.0, 0);
 
     if (draw_bloom)
     {
@@ -2985,112 +3107,33 @@ void std3D_DrawSceneFbo()
 		// downscale
 		float uvScale = 1.0f;// 0.25f; // source tex is 4x bigger
 
-		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->bloomLayers[0], std3D_pFb->tex1, 0, 0, uvScale, 1.0, 1.0, 0);
+		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->bloomLayers[0], std3D_pFb->tex1, 0, 0, uvScale, 1.0, 1.0, 0, "Bloom Downsample");
 		for (int i = 1; i < ARRAY_SIZE(std3D_pFb->bloomLayers); ++i)
-			std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->bloomLayers[i], std3D_pFb->bloomLayers[i-1].tex, 0, 0, uvScale, 1.0, 1.0, 0);
+			std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->bloomLayers[i], std3D_pFb->bloomLayers[i-1].tex, 0, 0, uvScale, 1.0, 1.0, 0, "Bloom Downsample");
 	
 		// upscale + blend
-		//uvScale = 4.0f; // source tex is 4x smaller
-	
 		float blendLerp = 0.6f;
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	
 		//glBlendFunc(GL_ONE, GL_ONE);
 		for (int i = ARRAY_SIZE(std3D_pFb->bloomLayers) - 2; i >= 0; --i)
-			std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->bloomLayers[i], std3D_pFb->bloomLayers[i + 1].tex, 0, 0, uvScale, blendLerp, 1.0, 0);
+			std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->bloomLayers[i], std3D_pFb->bloomLayers[i + 1].tex, 0, 0, uvScale, blendLerp, 1.0, 0, "Bloom Upsample");
 
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
-		std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->postfx, std3D_pFb->bloomLayers[0].tex, 0, 0, 1.0f, bloom_intensity, 1.5, 0);
+		std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->postfx, std3D_pFb->bloomLayers[0].tex, 0, 0, 1.0f, bloom_intensity, 1.5, 0, "Bloom Composite");
 
 		std3D_popDebugGroup();
     }
 
 	glDisable(GL_BLEND);
-	std3D_DrawSimpleTex(&std3D_postfxStage, &std3D_pFb->window, std3D_pFb->postfx.tex, 0, 0, (rdCamera_pCurCamera->flags & 0x1) ? sithTime_curSeconds : -1.0, !jkPlayer_enable32Bit, jkPlayer_gamma, 0);
+	std3D_DrawSimpleTex(&std3D_postfxStage, &std3D_pFb->window, std3D_pFb->postfx.tex, 0, 0, (rdCamera_pCurCamera->flags & 0x1) ? sithTime_curSeconds : -1.0, jkPlayer_enableDithering, jkPlayer_gamma, 0, "Final Output");
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	std3D_popDebugGroup();
-}
-
-void std3D_DoTex(rdDDrawSurface* tex, rdTri* tri, int tris_left)
-{
-    if (!tex)
-	{
-        glActiveTexture(GL_TEXTURE0 + 3);
-        glBindTexture(GL_TEXTURE_2D, blank_tex); // emissive
-        glActiveTexture(GL_TEXTURE0 + 4);
-        glBindTexture(GL_TEXTURE_2D, blank_tex); // displace
-
-        glActiveTexture(GL_TEXTURE0 + 0);
-        glBindTexture(GL_TEXTURE_2D, blank_tex_white);
-        glUniform1i(uniform_tex_mode, TEX_MODE_TEST);
-        glUniform1i(uniform_blend_mode, 2);
-        return;
-    }
-    int tex_id = tex->texture_id;
-    glActiveTexture(GL_TEXTURE0 + 0);
-    if (tex_id == 0)
-        glBindTexture(GL_TEXTURE_2D, blank_tex_white);
-    else
-        glBindTexture(GL_TEXTURE_2D, tex_id);
-
-    int emiss_tex_id = tex->emissive_texture_id;
-    glActiveTexture(GL_TEXTURE0 + 3);
-    if (emiss_tex_id == 0) {
-        glBindTexture(GL_TEXTURE_2D, blank_tex);
-    }
-    else {
-        //printf("emissive tex id %x\n", emiss_tex_id);
-        glBindTexture(GL_TEXTURE_2D, emiss_tex_id);
-
-        // HACK
-        if (tri[0].flags & 0x600) {
-            //glUniform1i(uniform_blend_mode, 6);
-            //last_flags |= 0x200;
-        }
-
-        
-        for (int i = 0; i < tris_left; i++) {
-            if (tri[i].texture != tex) break;
-            if (tri[i].flags & 0x600) {
-                //tri[i].flags |= 0x200;
-            }
-        }
-    }
-
-    int displace_tex_id = tex->displacement_texture_id;
-    glActiveTexture(GL_TEXTURE0 + 4);
-    if (displace_tex_id == 0) {
-        glBindTexture(GL_TEXTURE_2D, blank_tex);
-    }
-    else {
-        glBindTexture(GL_TEXTURE_2D, displace_tex_id);
-    }
-    //if (tex->emissive_factor[0] != 0.0 || tex->emissive_factor[1] != 0.0 || tex->emissive_factor[2] != 0.0)
-    //    stdPlatform_Printf("%f %f %f\n", tex->emissive_factor[0], tex->emissive_factor[1], tex->emissive_factor[2]);
-    float emissive_mult = (jkPlayer_enableBloom ? 1.0 : 5.0);
-    glUniform3f(uniform_emissiveFactor, tex->emissive_factor[0] * emissive_mult, tex->emissive_factor[1] * emissive_mult, tex->emissive_factor[2] * emissive_mult);
-    glUniform4f(uniform_albedoFactor, tex->albedo_factor[0], tex->albedo_factor[1], tex->albedo_factor[2], tex->albedo_factor[3]);
-    if (tex->displacement_factor) {
-        //printf("%f\n", tex->displacement_factor);
-        //tex->displacement_factor = -0.4;
-    }
-    glUniform1f(uniform_displacement_factor, tex->displacement_factor);
-    glActiveTexture(GL_TEXTURE0 + 0);
-
-    if (!jkPlayer_enableTextureFilter)
-        glUniform1i(uniform_tex_mode, tex->is_16bit ? TEX_MODE_16BPP : TEX_MODE_WORLDPAL);
-    else
-        glUniform1i(uniform_tex_mode, tex->is_16bit ? TEX_MODE_BILINEAR_16BPP : TEX_MODE_BILINEAR);
-    
-     glActiveTexture(GL_TEXTURE0 + 0);
-
-    if (tex_id == 0)
-        glUniform1i(uniform_tex_mode, TEX_MODE_TEST);
 }
 
 int std3D_SetCurrentPalette(rdColor24 *a1, int a2)
@@ -3901,7 +3944,7 @@ void std3D_DrawDecal(stdVBuffer* vbuf, rdDDrawSurface* texture, rdVector3* verts
 {
 	if (Main_bHeadless) return;
 
-	if (numDecals >= CLUSTER_MAX_DECALS)
+	if (decalUniforms.numDecals >= CLUSTER_MAX_DECALS)
 		return;
 
 	decalsDirty = 1;
@@ -3911,7 +3954,7 @@ void std3D_DrawDecal(stdVBuffer* vbuf, rdDDrawSurface* texture, rdVector3* verts
 	if (!std3D_InsertDecalTexture(&uvScaleBias, vbuf, texture))
 		return;
 
-	std3D_decal* decal = &tmpDecals[numDecals++];
+	std3D_decal* decal = &decalUniforms.tmpDecals[decalUniforms.numDecals++];
 	decal->uvScaleBias.x = (float)uvScaleBias.x / DECAL_ATLAS_SIZE;
 	decal->uvScaleBias.y = (float)uvScaleBias.y / DECAL_ATLAS_SIZE;
 	decal->uvScaleBias.z = (float)uvScaleBias.width / DECAL_ATLAS_SIZE;
@@ -3938,13 +3981,13 @@ void std3D_DrawOccluder(rdVector3* position, float radius, rdVector3* verts)
 {
 	if (Main_bHeadless) return;
 
-	if (numOccluders >= CLUSTER_MAX_OCCLUDERS)
+	if (occluderUniforms.numOccluders >= CLUSTER_MAX_OCCLUDERS)
 		return;
 
 	occludersDirty = 1;
 	std3D_renderPasses[0].clustersDirty = std3D_renderPasses[1].clustersDirty = 1;
 
-	std3D_occluder* occ = &tmpOccluders[numOccluders++];
+	std3D_occluder* occ = &occluderUniforms.tmpOccluders[occluderUniforms.numOccluders++];
 	occ->position.x = position->x;
 	occ->position.y = position->y;
 	occ->position.z = position->z;
@@ -3974,7 +4017,7 @@ void std3D_SetDepthRange(int8_t renderPass, float znearNorm, float zfarNorm)
 
 int std3D_HasDepthWrites(std3D_DrawCallState* pState)
 {
-	return pState->depthStencil.zmethod == RD_ZBUFFER_READ_WRITE || pState->depthStencil.zmethod == RD_ZBUFFER_NOREAD_WRITE;
+	return pState->stateBits.zMethod == RD_ZBUFFER_READ_WRITE || pState->stateBits.zMethod == RD_ZBUFFER_NOREAD_WRITE;
 }
 
 GLuint std3D_PrimitiveForGeoMode(rdGeoMode_t geoMode)
@@ -4001,60 +4044,27 @@ uint64_t std3D_SortKeyBits(uint64_t* offset, uint64_t bits, uint64_t size)
 	return bits;
 }
 
-uint64_t std3D_GetSortKey(std3D_DrawCallState* pState)
+uint64_t std3D_GetSortKey(std3D_DrawCall* pDrawCall)
 {
-	int textureID = pState->texture.pTexture ? pState->texture.pTexture->texture_id : 0;
+	int textureID = pDrawCall->state.textureState.pTexture ? pDrawCall->state.textureState.pTexture->texture_id : 0;
 
 	uint64_t offset = 64L;
 	
 	uint64_t sortKey = 0;
-	sortKey |= std3D_SortKeyBits(&offset,          pState->sortPriority,  8); // sort priority first
-	sortKey |= std3D_SortKeyBits(&offset,              pState->shaderID,  4); // then sort by shader
-	sortKey |= std3D_SortKeyBits(&offset,                     textureID, 16); // then by texture
-	sortKey |= std3D_SortKeyBits(&offset,  pState->depthStencil.zmethod,  2); // then by zwrite state
-	sortKey |= std3D_SortKeyBits(&offset, pState->depthStencil.zcompare,  3); // then ztest state
-	sortKey |= std3D_SortKeyBits(&offset,       pState->raster.cullMode,  3); // then by face culling
-	sortKey |= std3D_SortKeyBits(&offset,    pState->raster.scissorMode,  3); // then by scissoring
+	sortKey |= std3D_SortKeyBits(&offset, pDrawCall->state.header.sortPriority,  8); // sort priority first
+	sortKey |= std3D_SortKeyBits(&offset,                  pDrawCall->shaderID,  4); // then sort by shader
+	sortKey |= std3D_SortKeyBits(&offset,                            textureID, 16); // then by texture
+	sortKey |= std3D_SortKeyBits(&offset,      pDrawCall->state.stateBits.data, 32); // then by state bits
 
-	
-//	sortKey |= std3D_SortKeyBits(&offset, pState->blend.blendMode, 1);
-//	sortKey |= std3D_SortKeyBits(&offset, pState->depthStencil.zmethod, 2);
-//	sortKey |= std3D_SortKeyBits(&offset, pState->depthStencil.zcompare, 3);
-//	sortKey |= std3D_SortKeyBits(&offset, pState->raster.cullMode, 3);
-//	sortKey |= std3D_SortKeyBits(&offset, pState->texture.alphaTest, 1);
-//	sortKey |= std3D_SortKeyBits(&offset, pState->raster.geoMode, 3);
-//	sortKey |= std3D_SortKeyBits(&offset, pState->texture.texMode, 3);
-//	sortKey |= std3D_SortKeyBits(&offset, pState->lighting.lightMode, 3);
-//	sortKey |= std3D_SortKeyBits(&offset, pState->texture.chromaKeyMode, 1);
-//	sortKey |= std3D_SortKeyBits(&offset, pState->raster.colorMode, 1);
-//	sortKey |= std3D_SortKeyBits(&offset, pState->raster.scissorMode, 1);
-
-	// use the rest for depth sorting
-	//uint64_t remainingBits = offset;
-	//uint64_t limit = (offset == 64) ? 0xFFFFFFFFFFFFFFFFUL : (1UL << offset) - 1UL;
-	//float dist = pState->sortDistance / 128.0f;
-	//sortKey |= std3D_SortKeyBits(&offset, (uint64_t)(dist * limit), remainingBits);
-
-	//sortHash |= (pState->raster.geoMode & 7) << 25;
-	//hash |= ((proc->type & RD_FF_TEX_TRANSLUCENT) == RD_FF_TEX_TRANSLUCENT) << 31;
-	//hash |= ((proc->type & RD_FF_DOUBLE_SIDED) == RD_FF_DOUBLE_SIDED) << 30;
-	//RD_FF_TEX_CLAMP_X
-	//RD_FF_TEX_CLAMP_Y
-	//RD_FF_TEX_FILTER_NEAREST
-	//RD_FF_ZWRITE_DISABLED
-#ifdef ADDITIVE_BLEND
-	//hash |= ((proc->type & RD_FF_ADDITIVE) == RD_FF_ADDITIVE) << 30;
-	//hash |= ((proc->type & RD_FF_SCREEN) == RD_FF_SCREEN) << 28;
-#endif
 	return sortKey;
 }
 
 int std3D_GetShaderID(std3D_DrawCallState* pState)
 {
-	int alphaTest = pState->texture.alphaTest & 1;
-	int blending  = pState->blend.blendMode == RD_BLEND_MODE_ALPHA;
-	int lighting  = pState->lighting.lightMode >= RD_LIGHTMODE_DIFFUSE;
-	int specular  = pState->lighting.lightMode == RD_LIGHTMODE_SPECULAR;
+	int alphaTest = pState->stateBits.alphaTest & 1;
+	int blending  = pState->stateBits.blend & 1;
+	int lighting  = pState->stateBits.lightMode >= RD_LIGHTMODE_DIFFUSE;
+	int specular  = pState->stateBits.lightMode == RD_LIGHTMODE_SPECULAR;
 
 	// todo: clean this up by using some array indexing or something
 	if (blending)
@@ -4128,7 +4138,7 @@ void std3D_AddListVertices(std3D_DrawCall* pDrawCall, rdPrimitiveType_t type, st
 	pDrawCall->numIndices = pList->drawCallIndexCount - firstIndex;
 }
 
-void std3D_AddListDrawCall(rdPrimitiveType_t type, std3D_DrawCallList* pList, std3D_DrawCallState* pDrawCallState, D3DVERTEX* paVertices, int numVertices)
+void std3D_AddListDrawCall(rdPrimitiveType_t type, std3D_DrawCallList* pList, std3D_DrawCallState* pDrawCallState, int shaderID, D3DVERTEX* paVertices, int numVertices)
 {
 	if (pList->drawCallCount + 1 > STD3D_MAX_DRAW_CALLS)
 		return; // todo: flush here?
@@ -4139,6 +4149,7 @@ void std3D_AddListDrawCall(rdPrimitiveType_t type, std3D_DrawCallList* pList, st
 	std3D_DrawCall* pDrawCall = &pList->drawCalls[pList->drawCallCount++];
 	pDrawCall->sortKey = std3D_GetSortKey(pDrawCallState);
 	pDrawCall->state = *pDrawCallState;
+	pDrawCall->shaderID = shaderID;
 
 	std3D_AddListVertices(pDrawCall, type, pList, paVertices, numVertices);
 }
@@ -4154,13 +4165,19 @@ void std3D_AddZListDrawCall(rdPrimitiveType_t type, std3D_DrawCallList* pList, s
 	std3D_DrawCall* pDrawCall = &pList->drawCalls[pList->drawCallCount++];
 	pDrawCall->sortKey = std3D_GetSortKey(pDrawCallState);
 	pDrawCall->state = *pDrawCallState;
-	pDrawCall->state.shaderID = pDrawCallState->texture.alphaTest ? SHADER_DEPTH_ALPHATEST : SHADER_DEPTH;
+	pDrawCall->shaderID = pDrawCallState->stateBits.alphaTest ? SHADER_DEPTH_ALPHATEST : SHADER_DEPTH;
 
-	// z lists can ignore these
-	memset(&pDrawCall->state.blend, 0, sizeof(std3D_BlendState));
-	memset(&pDrawCall->state.lighting, 0, sizeof(std3D_LightingState));
-	if(!pDrawCallState->texture.alphaTest && pDrawCallState->texture.texGen == RD_TEXGEN_NONE) // non-alpha test with no texgen doesn't require textures
-		memset(&pDrawCall->state.texture, 0, sizeof(std3D_TextureState));
+	// z lists can ignore blending, fog, lighting and possibly textures
+	pDrawCall->state.stateBits.ditherMode = 0;
+	pDrawCall->state.stateBits.fogMode = 0;
+	pDrawCall->state.stateBits.blend = 0;
+	pDrawCall->state.stateBits.srdBlend = 1;
+	pDrawCall->state.stateBits.dstBlend = 0;
+	pDrawCall->state.stateBits.lightMode = 0;
+	memset(&pDrawCall->state.fogState, 0, sizeof(std3D_FogState));
+	memset(&pDrawCall->state.lightingState, 0, sizeof(std3D_LightingState));
+	if(!pDrawCallState->stateBits.alphaTest && pDrawCallState->stateBits.texGen == RD_TEXGEN_NONE) // non-alpha test with no texgen doesn't require textures
+		memset(&pDrawCall->state.textureState, 0, sizeof(std3D_TextureState));
 
 	std3D_AddListVertices(pDrawCall, type, pList, paVertices, numVertices);
 }
@@ -4170,38 +4187,41 @@ void std3D_AddDrawCall(rdPrimitiveType_t type, std3D_DrawCallState* pDrawCallSta
 	if (Main_bHeadless)
 		return;
 
-	int renderPass = stdMath_ClampInt(pDrawCallState->renderPass, 0, STD3D_MAX_RENDER_PASSES - 1);
+	int renderPass = stdMath_ClampInt(pDrawCallState->header.renderPass, 0, STD3D_MAX_RENDER_PASSES - 1);
 
-	int blending = pDrawCallState->blend.blendMode == RD_BLEND_MODE_ALPHA;
-	int lighting = pDrawCallState->lighting.lightMode >= RD_LIGHTMODE_DIFFUSE;
-	int specular = pDrawCallState->lighting.lightMode == RD_LIGHTMODE_SPECULAR;
+	int alphaTest = pDrawCallState->stateBits.alphaTest & 1;
+	int blending = pDrawCallState->stateBits.blend & 1;
+	int lighting = pDrawCallState->stateBits.lightMode >= RD_LIGHTMODE_DIFFUSE;
+	int specular = pDrawCallState->stateBits.lightMode == RD_LIGHTMODE_SPECULAR;
 	
 	int listIndex;
+	int shaderID;
 
 	// add to z-prepass if applicable
 	int writesZ = std3D_HasDepthWrites(pDrawCallState);
-	if (pDrawCallState->blend.blendMode == RD_BLEND_MODE_NONE && writesZ)
+	if (!pDrawCallState->stateBits.blend && writesZ)
 	{
-		std3D_AddZListDrawCall(type, &std3D_renderPasses[renderPass].drawCallLists[DRAW_LIST_Z + pDrawCallState->texture.alphaTest & 1], pDrawCallState, paVertices, numVertices);
+		std3D_AddZListDrawCall(type, &std3D_renderPasses[renderPass].drawCallLists[DRAW_LIST_Z + alphaTest], pDrawCallState, paVertices, numVertices);
 
 		// the forward pass can now do a simple equal test with no writes
-		pDrawCallState->depthStencil.zcompare = RD_COMPARE_EQUAL;
-		pDrawCallState->depthStencil.zmethod = RD_ZBUFFER_READ_NOWRITE;
-		pDrawCallState->sortPriority = 255; // render first
-		pDrawCallState->texture.alphaTest = 0;
-		pDrawCallState->texture.alphaRef = 0;
-		pDrawCallState->texture.chromaKeyMode = 0;
-		pDrawCallState->texture.chromaKeyColor = 0;
-		pDrawCallState->shaderID = SHADER_COLOR_UNLIT + lighting + specular;
+		pDrawCallState->header.sortPriority         = 255; // render first
+		pDrawCallState->stateBits.zCompare          = RD_COMPARE_EQUAL;
+		pDrawCallState->stateBits.zMethod           = RD_ZBUFFER_READ_NOWRITE;
+		pDrawCallState->stateBits.alphaTest         = 0;
+		pDrawCallState->stateBits.chromaKey         = 0;
+		pDrawCallState->textureState.alphaRef       = 0;
+		pDrawCallState->textureState.chromaKeyColor = 0;
+
+		shaderID  = SHADER_COLOR_UNLIT + lighting + specular;
 		listIndex = DRAW_LIST_COLOR_ZPREPASS;
 	}
 	else	
 	{
-		pDrawCallState->shaderID = std3D_GetShaderID(pDrawCallState);
+		shaderID = std3D_GetShaderID(pDrawCallState);
 		listIndex = blending ? DRAW_LIST_COLOR_ALPHABLEND : DRAW_LIST_COLOR_NOZPREPASS;
 	}
 
-	std3D_AddListDrawCall(type, &std3D_renderPasses[renderPass].drawCallLists[listIndex], pDrawCallState, paVertices, numVertices);
+	std3D_AddListDrawCall(type, &std3D_renderPasses[renderPass].drawCallLists[listIndex], pDrawCallState, shaderID, paVertices, numVertices);
 }
 
 void std3D_ResetDrawCalls()
@@ -4222,6 +4242,8 @@ void std3D_UpdateSharedUniforms()
 	std3D_SharedUniforms uniforms;
 
 	// uniforms shared across draw lists during flush
+
+	// todo: deprecated, remove
 	rdVector_Set4(&uniforms.tint, rdroid_curColorEffects.tint.x, rdroid_curColorEffects.tint.y, rdroid_curColorEffects.tint.z, 0.0f);
 	if (rdroid_curColorEffects.filter.x || rdroid_curColorEffects.filter.y || rdroid_curColorEffects.filter.z)
 		rdVector_Set4(&uniforms.filter, rdroid_curColorEffects.filter.x ? 1.0 : 0.25, rdroid_curColorEffects.filter.y ? 1.0 : 0.25, rdroid_curColorEffects.filter.z ? 1.0 : 0.25, 0.0f);
@@ -4229,21 +4251,13 @@ void std3D_UpdateSharedUniforms()
 		rdVector_Set4(&uniforms.filter, 1.0, 1.0, 1.0, 1.0f);
 	rdVector_Set4(&uniforms.add, (float)rdroid_curColorEffects.add.x / 255.0f, (float)rdroid_curColorEffects.add.y / 255.0f, (float)rdroid_curColorEffects.add.z / 255.0f, 0.0f);
 	uniforms.fade = rdroid_curColorEffects.fade;
-	
+	////
+
 	uniforms.lightMult = jkGuiBuildMulti_bRendering ? 0.85 : (jkPlayer_enableBloom ? 0.9 : 0.85);
 	
 	rdVector_Set2(&uniforms.clusterTileSizes, (float)tileSizeX, (float)tileSizeY);
-	rdVector_Set2(&uniforms.clusterScaleBias, sliceScalingFactor, sliceBiasFactor);
-	
+	rdVector_Set2(&uniforms.clusterScaleBias, sliceScalingFactor, sliceBiasFactor);	
 	rdVector_Set2(&uniforms.resolution, std3D_pFb->w, std3D_pFb->h);
-
-	uniforms.firstLight = 0;
-	uniforms.numLights = numLights;
-
-	uniforms.firstOccluder = firstOccluder;
-	uniforms.numOccluders = numOccluders;
-	uniforms.firstDecal = firstDecal;
-	uniforms.numDecals = numDecals;
 
 	extern rdVector4 rdroid_sgBasis[8]; //eww
 	memcpy(uniforms.sgBasis, rdroid_sgBasis, sizeof(rdVector4)*8);
@@ -4253,65 +4267,6 @@ void std3D_UpdateSharedUniforms()
 
 	glBindBuffer(GL_UNIFORM_BUFFER, shared_ubo);
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(std3D_SharedUniforms), &uniforms);
-}
-
-void std3D_SetTexture(std3D_worldStage* pStage, std3D_TextureState* pTexState, rdDDrawSurface* pTexture)
-{
-	if (!pTexture)
-	{
-		glActiveTexture(GL_TEXTURE0 + 3);
-		glBindTexture(GL_TEXTURE_2D, blank_tex); // emissive
-		glActiveTexture(GL_TEXTURE0 + 4);
-		glBindTexture(GL_TEXTURE_2D, blank_tex); // displace
-
-		glActiveTexture(GL_TEXTURE0 + 0);
-		glBindTexture(GL_TEXTURE_2D, blank_tex_white);
-		glUniform1i(pStage->uniform_tex_mode, TEX_MODE_TEST);
-	
-		glUniform3f(pStage->uniform_emissiveFactor, 0, 0, 0);
-		glUniform4f(pStage->uniform_albedoFactor, 1, 1, 1, 1);
-		glUniform1f(pStage->uniform_displacement_factor, 0);
-		glActiveTexture(GL_TEXTURE0 + 0);
-	}
-	else
-	{
-		int tex_id = pTexture->texture_id;
-		glActiveTexture(GL_TEXTURE0 + 0);
-		if (tex_id == 0)
-			glBindTexture(GL_TEXTURE_2D, blank_tex_white);
-		else
-			glBindTexture(GL_TEXTURE_2D, tex_id);
-
-		int emiss_tex_id = pTexture->emissive_texture_id;
-		glActiveTexture(GL_TEXTURE0 + 3);
-		if (emiss_tex_id == 0)
-			glBindTexture(GL_TEXTURE_2D, blank_tex);
-		else
-			glBindTexture(GL_TEXTURE_2D, emiss_tex_id);
-
-		int displace_tex_id = pTexture->displacement_texture_id;
-		glActiveTexture(GL_TEXTURE0 + 4);
-		if (displace_tex_id == 0)
-			glBindTexture(GL_TEXTURE_2D, blank_tex);
-		else
-			glBindTexture(GL_TEXTURE_2D, displace_tex_id);
-
-		float emissive_mult = (jkPlayer_enableBloom ? 1.0 : 5.0);
-		glUniform3f(pStage->uniform_emissiveFactor, pTexture->emissive_factor[0] * emissive_mult, pTexture->emissive_factor[1] * emissive_mult, pTexture->emissive_factor[2] * emissive_mult);
-		glUniform4f(pStage->uniform_albedoFactor, pTexture->albedo_factor[0], pTexture->albedo_factor[1], pTexture->albedo_factor[2], pTexture->albedo_factor[3]);
-		glUniform1f(pStage->uniform_displacement_factor, pTexture->displacement_factor);
-		glActiveTexture(GL_TEXTURE0 + 0);
-
-		if (!jkPlayer_enableTextureFilter || (pTexState->texFilter == RD_TEXFILTER_NEAREST))
-			glUniform1i(pStage->uniform_tex_mode, pTexture->is_16bit ? TEX_MODE_16BPP : TEX_MODE_WORLDPAL);
-		else
-			glUniform1i(pStage->uniform_tex_mode, pTexture->is_16bit ? TEX_MODE_BILINEAR_16BPP : TEX_MODE_BILINEAR);
-
-		glActiveTexture(GL_TEXTURE0 + 0);
-
-		if (tex_id == 0)
-			glUniform1i(pStage->uniform_tex_mode, TEX_MODE_TEST);
-	}
 }
 
 int std3D_DrawCallCompareSortKey(std3D_DrawCall* a, std3D_DrawCall* b)
@@ -4325,67 +4280,77 @@ int std3D_DrawCallCompareSortKey(std3D_DrawCall* a, std3D_DrawCall* b)
 
 int std3D_DrawCallCompareDepth(std3D_DrawCall* a, std3D_DrawCall* b)
 {
-	if (a->state.sortDistance > b->state.sortDistance)
+	if (a->state.header.sortDistance > b->state.header.sortDistance)
 		return 1;
-	if (a->state.sortDistance < b->state.sortDistance)
+	if (a->state.header.sortDistance < b->state.header.sortDistance)
 		return -1;
 	return 0;
 }
 
 // todo: track state bits and only apply necessary changes
-void std3D_SetRasterState(std3D_worldStage* pStage, std3D_RasterState* pRasterState)
+void std3D_SetRasterState(std3D_worldStage* pStage, std3D_DrawCallState* pState)
 {
+	std3D_RasterState* pRasterState = &pState->rasterState;
+
 	glViewport(pRasterState->viewport.x, pRasterState->viewport.y, pRasterState->viewport.width, pRasterState->viewport.height);
-	if(pRasterState->scissorMode == RD_SCISSOR_ENABLED)
+	if(pState->stateBits.scissorMode == RD_SCISSOR_ENABLED)
 		glEnable(GL_SCISSOR_TEST);
 	else
 		glDisable(GL_SCISSOR_TEST);
 	glScissor(pRasterState->scissor.x, pRasterState->scissor.y, pRasterState->scissor.width, pRasterState->scissor.height);
 
-	if(pRasterState->cullMode == RD_CULL_MODE_NONE)
+	if(pState->stateBits.cullMode == RD_CULL_MODE_NONE)
 		glDisable(GL_CULL_FACE);
 	else
 		glEnable(GL_CULL_FACE);
 
-	glFrontFace(pRasterState->cullMode == RD_CULL_MODE_CW_ONLY ? GL_CW : GL_CCW);
+	glFrontFace(pState->stateBits.cullMode == RD_CULL_MODE_CW_ONLY ? GL_CW : GL_CCW);
 
-	glUniform1i(pStage->uniform_geo_mode, pRasterState->geoMode);
-	glUniform1i(pStage->uniform_ditherMode, pRasterState->ditherMode);
-
-	glUniform1i(pStage->uniform_fog, pRasterState->fog);
-	glUniform1f(pStage->uniform_fog_start, pRasterState->fogStart);
-	glUniform1f(pStage->uniform_fog_end, pRasterState->fogEnd);
-
-	float a = ((pRasterState->fogColor >> 24) & 0xFF) / 255.0f;
-	float r = ((pRasterState->fogColor >> 16) & 0xFF) / 255.0f;
-	float g = ((pRasterState->fogColor >> 8) & 0xFF) / 255.0f;
-	float b = ((pRasterState->fogColor >> 0) & 0xFF) / 255.0f;
-	glUniform4f(pStage->uniform_fog_color, r, g, b, a);
-
-	//rdVertexColorMode_t colorMode;
+	glUniform1i(pStage->uniform_geo_mode, pState->stateBits.geoMode);
+	glUniform1i(pStage->uniform_ditherMode, pState->stateBits.ditherMode);
 }
 
-int std3D_SetBlendState(std3D_worldStage* pStage, std3D_BlendState* pBlendState)
+void std3D_SetFogState(std3D_worldStage* pStage, std3D_DrawCallState* pState)
 {
-	if (pBlendState->blendMode == RD_BLEND_MODE_NONE)
+	std3D_FogUniforms fog;
+	fog.fogEnabled = pState->stateBits.fogMode;
+	fog.fogStartDepth = pState->fogState.startDepth;
+	fog.fogEndDepth = pState->fogState.endDepth;
+
+	float a = ((pState->fogState.color >> 24) & 0xFF) / 255.0f;
+	float r = ((pState->fogState.color >> 16) & 0xFF) / 255.0f;
+	float g = ((pState->fogState.color >> 8) & 0xFF) / 255.0f;
+	float b = ((pState->fogState.color >> 0) & 0xFF) / 255.0f;
+	rdVector_Set4(&fog.fogColor, r, g, b, a);
+
+	glBindBuffer(GL_UNIFORM_BUFFER, fog_ubo);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(std3D_FogUniforms), &fog);
+}
+
+int std3D_SetBlendState(std3D_worldStage* pStage, std3D_DrawCallState* pState)
+{
+	if (pState->stateBits.blend == 0)
 		glDisable(GL_BLEND);
 	else
 		glEnable(GL_BLEND);
+
+	// todo: use src blend and dst blend
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-void std3D_SetDepthStencilState(std3D_DepthStencilState* pDepthStencilState)
+void std3D_SetDepthStencilState(std3D_DrawCallState* pState)
 {
-	if (pDepthStencilState->zmethod == RD_ZBUFFER_NOREAD_NOWRITE)
+	if (pState->stateBits.zMethod == RD_ZBUFFER_NOREAD_NOWRITE)
 	{
 		glDisable(GL_DEPTH_TEST);
 		glDepthMask(GL_FALSE);
 	}
-	else if (pDepthStencilState->zmethod == RD_ZBUFFER_READ_NOWRITE)
+	else if (pState->stateBits.zMethod == RD_ZBUFFER_READ_NOWRITE)
 	{
 		glEnable(GL_DEPTH_TEST);
 		glDepthMask(GL_FALSE);
 	}
-	else if (pDepthStencilState->zmethod == RD_ZBUFFER_NOREAD_WRITE)
+	else if (pState->stateBits.zMethod == RD_ZBUFFER_NOREAD_WRITE)
 	{
 		glDisable(GL_DEPTH_TEST);
 		glDepthMask(GL_TRUE);
@@ -4407,43 +4372,117 @@ void std3D_SetDepthStencilState(std3D_DepthStencilState* pDepthStencilState)
 		GL_NOTEQUAL,
 		GL_NEVER
 	};
-	glDepthFunc(gl_compares[pDepthStencilState->zcompare]);
+	glDepthFunc(gl_compares[pState->stateBits.zCompare]);
 }
 
-void std3D_SetTextureState(std3D_worldStage* pStage, std3D_TextureState* pTexState)
+void std3D_SetTransformState(std3D_worldStage* pStage, std3D_DrawCallState* pState)
 {
-	glUniform1i(pStage->uniform_uv_mode, pTexState->texMode);
-	glUniform1i(pStage->uniform_numMips, pTexState->numMips);
-	glUniform2f(pStage->uniform_texsize, pTexState->texSize.x, pTexState->texSize.y);
-	glUniform1i(pStage->uniform_texgen, pTexState->texGen);
-	glUniform4f(pStage->uniform_texgen_params, pTexState->texGenParams.x, pTexState->texGenParams.y, pTexState->texGenParams.z, pTexState->texGenParams.w);
-	glUniform2f(pStage->uniform_uv_offset, pTexState->texOffset.x, pTexState->texOffset.y);
+	rdMatrix44* pProjection = &pState->transformState.proj;
 
-	if(pTexState->pTexture)
-	{
-		glUniform3fv(pStage->uniform_emissiveFactor, 1, pTexState->pTexture->emissive_factor);
-		glUniform4fv(pStage->uniform_albedoFactor, 1, pTexState->pTexture->albedo_factor);
-		glUniform1f(pStage->uniform_displacement_factor, pTexState->pTexture->displacement_factor);
-	}
-	else
-	{
-		glUniform3f(pStage->uniform_emissiveFactor, 0.0, 0.0, 0.0);
-		glUniform4f(pStage->uniform_albedoFactor, 1.0, 1.0, 1.0, 1.0);
-		glUniform1f(pStage->uniform_displacement_factor, 0.0);
-	}
+	float fov = 2.0 * atanf(1.0 / pProjection->vC.y);
+	float aspect = pProjection->vC.y / pProjection->vA.x;
+	float znear = -pProjection->vD.z / (pProjection->vB.z + 1.0f);
+	float zfar = -pProjection->vD.z / (pProjection->vB.z - 1.0f);
+
+	float T = znear * tanf(0.5 * fov);
+	float R = aspect * T;
+
+	glUniformMatrix4fv(pStage->uniform_projection, 1, GL_FALSE, (float*)pProjection);
+	glUniform2f(pStage->uniform_rightTop, R, T);
+
+	glUniformMatrix4fv(pStage->uniform_modelMatrix, 1, GL_FALSE, (float*)&pState->transformState.modelView);
+}
+
+void std3D_SetTextureState(std3D_worldStage* pStage, std3D_DrawCallState* pState)
+{
+	std3D_TextureState* pTexState = &pState->textureState;
+	rdDDrawSurface* pTexture = (pState->stateBits.geoMode == RD_GEOMODE_TEXTURED) ? pState->textureState.pTexture : NULL;
+
+	std3D_TextureUniforms tex;
+	tex.uv_mode = pState->stateBits.texMode;
+	tex.texgen = pState->stateBits.texGen;
+	tex.numMips = pTexState->numMips;
+	rdVector_Set2(&tex.uv_offset, pTexState->texOffset.x, pTexState->texOffset.y);
+	rdVector_Set4(&tex.texgen_params, pTexState->texGenParams.x, pTexState->texGenParams.y, pTexState->texGenParams.z, pTexState->texGenParams.w);
 
 	float a = ((pTexState->fillColor >> 24) & 0xFF) / 255.0f;
 	float r = ((pTexState->fillColor >> 16) & 0xFF) / 255.0f;
-	float g = ((pTexState->fillColor >>  8) & 0xFF) / 255.0f;
-	float b = ((pTexState->fillColor >>  0) & 0xFF) / 255.0f;
-	glUniform4f(pStage->uniform_fillColor, r, g, b, a);
+	float g = ((pTexState->fillColor >> 8) & 0xFF) / 255.0f;
+	float b = ((pTexState->fillColor >> 0) & 0xFF) / 255.0f;
+	rdVector_Set4(&tex.fillColor, r, g, b, a);
+
+	if(pTexture)
+	{
+		int tex_id = pTexture->texture_id;
+		glActiveTexture(GL_TEXTURE0 + 0);
+		glBindTexture(GL_TEXTURE_2D, tex_id ? tex_id : blank_tex_white);
+
+		int emiss_tex_id = pTexture->emissive_texture_id;
+		glActiveTexture(GL_TEXTURE0 + 3);
+		glBindTexture(GL_TEXTURE_2D, emiss_tex_id ? emiss_tex_id : blank_tex);
+
+		int displace_tex_id = pTexture->displacement_texture_id;
+		glActiveTexture(GL_TEXTURE0 + 4);
+		glBindTexture(GL_TEXTURE_2D, displace_tex_id ? displace_tex_id : blank_tex);
+		
+		glActiveTexture(GL_TEXTURE0 + 0);
+
+		if (tex_id == 0)
+		{
+			tex.tex_mode = TEX_MODE_TEST;
+		}
+		else
+		{
+			if (!jkPlayer_enableTextureFilter || (pState->stateBits.texFilter == RD_TEXFILTER_NEAREST))
+				tex.tex_mode = pTexture->is_16bit ? TEX_MODE_16BPP : TEX_MODE_WORLDPAL;
+			else
+				tex.tex_mode = pTexture->is_16bit ? TEX_MODE_BILINEAR_16BPP : TEX_MODE_BILINEAR;
+		}
+
+		rdVector_Set2(&tex.texsize, pTexture->width, pTexture->height);
+		rdVector_Set4(&tex.emissive_factor, pTexture->emissive_factor[0], pTexture->emissive_factor[1], pTexture->emissive_factor[2], 1.0f);
+		rdVector_Set4(&tex.albedo_factor, pTexture->albedo_factor[0], pTexture->albedo_factor[1], pTexture->albedo_factor[2], pTexture->albedo_factor[3]);
+		tex.displacement_factor = pTexture->displacement_factor;
+	}
+	else
+	{
+		glActiveTexture(GL_TEXTURE0 + 3);
+		glBindTexture(GL_TEXTURE_2D, blank_tex); // emissive
+		glActiveTexture(GL_TEXTURE0 + 4);
+		glBindTexture(GL_TEXTURE_2D, blank_tex); // displace
+		glActiveTexture(GL_TEXTURE0 + 0);
+		glBindTexture(GL_TEXTURE_2D, blank_tex_white);
+		glActiveTexture(GL_TEXTURE0 + 0);
+
+		tex.tex_mode = TEX_MODE_TEST;
+		rdVector_Set2(&tex.texsize, 1, 1);
+		rdVector_Set4(&tex.emissive_factor, 0.0, 0.0, 0.0, 0.0);
+		rdVector_Set4(&tex.albedo_factor, 1.0, 1.0, 1.0, 1.0);
+		tex.displacement_factor = 0.0;
+	}
+
+	glBindBuffer(GL_UNIFORM_BUFFER, tex_ubo);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(std3D_TextureUniforms), &tex);
 }
 
-void std3D_SetLightingState(std3D_worldStage* pStage, std3D_LightingState* pLightState)
+void std3D_SetLightingState(std3D_worldStage* pStage, std3D_DrawCallState* pState)
 {
-	glUniform1i(pStage->uniform_light_mode, pLightState->lightMode);
-	glUniform3fv(pStage->uniform_ambient_color, 1, &pLightState->ambientColor.x);
-	glUniform3fv(pStage->uniform_ambient_sg, 8, &pLightState->ambientStateSH.sgs[0].x);
+	glUniform1i(pStage->uniform_light_mode, pState->stateBits.lightMode);
+
+	float r = ((pState->lightingState.ambientColor >> 20) & 0x3FF) / 255.0f;
+	float g = ((pState->lightingState.ambientColor >> 10) & 0x3FF) / 255.0f;
+	float b = ((pState->lightingState.ambientColor >>  0) & 0x3FF) / 255.0f;
+	glUniform3f(pStage->uniform_ambient_color, r, g, b);
+
+	rdVector3 sgs[8];
+	for (int i = 0; i < 8; ++i)
+	{
+		float r = ((pState->lightingState.ambientLobes[i] >> 20) & 0x3FF) / 255.0f;
+		float g = ((pState->lightingState.ambientLobes[i] >> 10) & 0x3FF) / 255.0f;
+		float b = ((pState->lightingState.ambientLobes[i] >>  0) & 0x3FF) / 255.0f;
+		rdVector_Set3(&sgs[i], r, g, b);
+	}
+	glUniform3fv(pStage->uniform_ambient_sg, 8, &sgs[0].x);
 }
 
 void std3D_BindStage(std3D_worldStage* pStage)
@@ -4454,17 +4493,36 @@ void std3D_BindStage(std3D_worldStage* pStage)
 	glBindBuffer(GL_ARRAY_BUFFER, world_vbo_all);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, world_ibo_triangle);
 
-	glUniform1i(pStage->uniform_tex_mode, TEX_MODE_TEST);
-	glUniform1i(pStage->uniform_tex, 0);
-	glUniform1i(pStage->uniform_worldPalette, 1);
-	glUniform1i(pStage->uniform_worldPaletteLights, 2);
-	glUniform1i(pStage->uniform_texEmiss, 3);
-	glUniform1i(pStage->uniform_displacement_map, 4);
-	glUniform1i(pStage->uniform_lightbuf, 5);
-	glUniform1i(pStage->uniform_texDecals, 6);
+	glUniform1i(pStage->uniform_tex,                TEX_SLOT_DIFFUSE);
+	glUniform1i(pStage->uniform_worldPalette,       TEX_SLOT_WORLD_PAL);
+	glUniform1i(pStage->uniform_worldPaletteLights, TEX_SLOT_WORLD_LIGHT_PAL);
+	glUniform1i(pStage->uniform_texEmiss,           TEX_SLOT_EMISSIVE);
+	glUniform1i(pStage->uniform_displacement_map,   TEX_SLOT_DISPLACEMENT);
+	glUniform1i(pStage->uniform_lightbuf,           TEX_SLOT_CLUSTER_BUFFER);
+	glUniform1i(pStage->uniform_texDecals,          TEX_SLOT_DECAL_ATLAS);
+	glUniform1i(pStage->uniform_texz,               TEX_SLOT_DEPTH);
+	glUniform1i(pStage->uniform_texssao,            TEX_SLOT_AO);
+}
+
+void std3D_bindTexture(int type, int texId, int slot)
+{
+	glActiveTexture(GL_TEXTURE0 + slot);
+	glBindTexture(type, texId);
 }
 
 typedef int(*std3D_SortFunc)(std3D_DrawCall*, std3D_DrawCall*);
+
+enum STD3D_DIRTYBIT
+{
+	STD3D_STATEBITS = 0x1,
+	STD3D_SHADER    = 0x2,
+	STD3D_CAPS      = 0x4,
+	STD3D_TRANSFORM = 0x8,
+	STD3D_RASTER    = 0x10,
+	STD3D_TEXTURE   = 0x20,
+	STD3D_FOG       = 0x40,
+	STD3D_LIGHTING  = 0x80,
+};
 
 void std3D_FlushDrawCallList(std3D_RenderPass* pRenderPass, std3D_DrawCallList* pList, std3D_SortFunc sortFunc, const char* debugName)
 {
@@ -4473,13 +4531,13 @@ void std3D_FlushDrawCallList(std3D_RenderPass* pRenderPass, std3D_DrawCallList* 
 
 	std3D_pushDebugGroup(debugName);
 
-	if (rdMatrix_Compare44(&pRenderPass->oldProj, &pList->drawCalls[0].state.proj) != 0)
+	if (rdMatrix_Compare44(&pRenderPass->oldProj, &pList->drawCalls[0].state.transformState.proj) != 0)
 	{
 		pRenderPass->clustersDirty = 1;
 		pRenderPass->clusterFrustumFrame++;
 	}
-	std3D_BuildClusters(pRenderPass, &pList->drawCalls[0].state.proj);
-	pRenderPass->oldProj = pList->drawCalls[0].state.proj;
+	std3D_BuildClusters(pRenderPass, &pList->drawCalls[0].state.transformState.proj);
+	pRenderPass->oldProj = pList->drawCalls[0].state.transformState.proj;
 
 	// sort draw calls to reduce state changes and maximize batching
 	if(sortFunc)
@@ -4506,116 +4564,276 @@ void std3D_FlushDrawCallList(std3D_RenderPass* pRenderPass, std3D_DrawCallList* 
 	glBindBufferBase(GL_UNIFORM_BUFFER, 1, occluder_ubo);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 2, decal_ubo);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 3, shared_ubo);
+	glBindBufferBase(GL_UNIFORM_BUFFER, 4, fog_ubo);
+	glBindBufferBase(GL_UNIFORM_BUFFER, 5, tex_ubo);
 
 	std3D_DrawCall* pDrawCall = &pList->drawCalls[0];
-	std3D_RasterState* pRasterState = &pDrawCall->state.raster;
-	std3D_BlendState* pBlendState = &pDrawCall->state.blend;
-	std3D_DepthStencilState* pDepthStencilState = &pDrawCall->state.depthStencil;
-	std3D_TextureState* pTexState = &pDrawCall->state.texture;
-	std3D_LightingState* pLightState = &pDrawCall->state.lighting;
+	std3D_DrawCallState* pState = &pDrawCall->state;
 
 	std3D_DrawCallState lastState = pDrawCall->state;
 
-	std3D_worldStage* pStage = &worldStages[pDrawCall->state.shaderID];
+	int lastShader = pDrawCall->shaderID;
+	std3D_worldStage* pStage = &worldStages[pDrawCall->shaderID];
 
 	std3D_BindStage(pStage);
 	glBufferData(GL_ARRAY_BUFFER, pList->drawCallVertexCount * sizeof(D3DVERTEX), pList->drawCallVertices, GL_STREAM_DRAW);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, pList->drawCallIndexCount * sizeof(uint16_t), indexArray, GL_STREAM_DRAW);
 
-	int last_tex = pTexState->pTexture ? pTexState->pTexture->texture_id : blank_tex_white;
-	std3D_SetRasterState(pStage, pRasterState);
-	std3D_SetBlendState(pStage, pBlendState);
-	std3D_SetDepthStencilState(pDepthStencilState);
-	std3D_SetTextureState(pStage, pTexState);
-	std3D_SetLightingState(pStage, pLightState);
-	std3D_SetTexture(pStage, pTexState, pRasterState->geoMode == RD_GEOMODE_TEXTURED ? pTexState->pTexture : NULL);
+	int last_tex = pState->textureState.pTexture ? pState->textureState.pTexture->texture_id : blank_tex_white;
+	std3D_SetRasterState(pStage, pState);
+	std3D_SetFogState(pStage, pState);
+	std3D_SetBlendState(pStage, pState);
+	std3D_SetDepthStencilState(pState);
+	std3D_SetTextureState(pStage, pState);
+	std3D_SetLightingState(pStage, pState);	
+	std3D_SetTransformState(pStage, pState);
+	
+	glUniform1ui(pStage->uniform_renderCaps, pDrawCall->state.header.renderCaps);
 
-	rdMatrix44 last_mat = pDrawCall->state.modelView;
-	rdMatrix44 last_proj = pDrawCall->state.proj;
-	glUniform1ui(pStage->uniform_renderCaps, pDrawCall->state.renderCaps);
-	glUniformMatrix4fv(pStage->uniform_projection, 1, GL_FALSE, (float*)&pDrawCall->state.proj);
-	glUniformMatrix4fv(pStage->uniform_modelMatrix, 1, GL_FALSE, (float*)&pDrawCall->state.modelView);
-
-	int do_batch = 0;
 	int batchIndices = 0;
 	int indexOffset = 0;
 	for (int j = 0; j < pList->drawCallCount; j++)
 	{
 		pDrawCall = &pList->drawCalls[j];
-		pRasterState = &pDrawCall->state.raster;
-		pBlendState = &pDrawCall->state.blend;
-		pDepthStencilState = &pDrawCall->state.depthStencil;
-		pTexState = &pDrawCall->state.texture;
-		pLightState = &pDrawCall->state.lighting;
+		pState = &pDrawCall->state;
 
-		int texid = pTexState->pTexture ? pTexState->pTexture->texture_id : blank_tex_white;
-		if (last_tex != texid
-			//|| memcmp(&lastState, &pDrawCall->state, sizeof(std3D_DrawCallState)) != 0
-			|| lastState.shaderID != pDrawCall->state.shaderID
-			|| lastState.renderCaps != pDrawCall->state.renderCaps
-			|| memcmp(&lastState.raster, &pDrawCall->state.raster, sizeof(std3D_RasterState)) != 0
-			|| memcmp(&lastState.blend, &pDrawCall->state.blend, sizeof(std3D_BlendState)) != 0
-			|| memcmp(&lastState.depthStencil, &pDrawCall->state.depthStencil, sizeof(std3D_DepthStencilState)) != 0
-			|| memcmp(&lastState.texture, &pDrawCall->state.texture, sizeof(std3D_TextureState)) != 0
-			|| memcmp(&lastState.lighting, &pDrawCall->state.lighting, sizeof(std3D_LightingState)) != 0
-			|| rdMatrix_Compare44(&lastState.modelView, &pDrawCall->state.modelView) != 0
-			|| rdMatrix_Compare44(&lastState.proj, &pDrawCall->state.proj) != 0
-			)
-		{
-			do_batch = 1;
-		}
+		int texid = pState->textureState.pTexture ? pState->textureState.pTexture->texture_id : blank_tex_white;
+		
+		uint32_t dirtyBits = 0;
+		dirtyBits |= (lastShader != pDrawCall->shaderID) ? STD3D_SHADER : 0;
+		dirtyBits |= (last_tex != texid) ? STD3D_TEXTURE : 0;
+		dirtyBits |= (lastState.header.renderCaps != pDrawCall->state.header.renderCaps) ? STD3D_CAPS : 0;
+		dirtyBits |= (lastState.stateBits.data != pDrawCall->state.stateBits.data) ? STD3D_STATEBITS : 0; // todo: this probably triggers too many updates, make it more granular
+		dirtyBits |= (memcmp(&lastState.fogState, &pDrawCall->state.fogState, sizeof(std3D_FogState)) != 0) ? STD3D_FOG : 0;
+		dirtyBits |= (memcmp(&lastState.rasterState, &pDrawCall->state.rasterState, sizeof(std3D_RasterState)) != 0) ? STD3D_RASTER : 0;		
+		dirtyBits |= (memcmp(&lastState.textureState, &pDrawCall->state.textureState, sizeof(std3D_TextureState)) != 0) ? STD3D_TEXTURE : 0;
+		dirtyBits |= (memcmp(&lastState.lightingState, &pDrawCall->state.lightingState, sizeof(std3D_LightingState)) != 0) ? STD3D_LIGHTING : 0;
+		dirtyBits |= (memcmp(&lastState.transformState, &pDrawCall->state.transformState, sizeof(std3D_TransformState)) != 0) ? STD3D_TRANSFORM : 0;
 
-		if (do_batch)
+		if (dirtyBits)
 		{
 			//glDrawArrays(std3D_PrimitiveForGeoMode(lastState.raster.geoMode), vertexOffset, batch_verts);
-			glDrawElements(std3D_PrimitiveForGeoMode(lastState.raster.geoMode), batchIndices, GL_UNSIGNED_SHORT, (void*)(indexOffset * sizeof(uint16_t)));
+			glDrawElements(std3D_PrimitiveForGeoMode(lastState.stateBits.geoMode), batchIndices, GL_UNSIGNED_SHORT, (void*)(indexOffset * sizeof(uint16_t)));
 
-			if (lastState.shaderID != pDrawCall->state.shaderID)
+			if (lastShader != pDrawCall->shaderID)//dirtyBits & STD3D_SHADER)
 			{
-				pStage = &worldStages[pDrawCall->state.shaderID];
+				pStage = &worldStages[pDrawCall->shaderID];
 				std3D_BindStage(pStage);
 			}
 
-			std3D_SetRasterState(pStage, pRasterState);
-			std3D_SetBlendState(pStage, pBlendState);
-			std3D_SetDepthStencilState(pDepthStencilState);
-			std3D_SetTextureState(pStage, pTexState);
-			std3D_SetLightingState(pStage, pLightState);
-			std3D_SetTexture(pStage, pTexState, pRasterState->geoMode == RD_GEOMODE_TEXTURED ? pTexState->pTexture : NULL);
+			if((dirtyBits & STD3D_RASTER) || (dirtyBits & STD3D_STATEBITS))
+				std3D_SetRasterState(pStage, pState);
 
-			glUniform1ui(pStage->uniform_renderCaps, pDrawCall->state.renderCaps);
-			glUniformMatrix4fv(pStage->uniform_projection, 1, GL_FALSE, (float*)&pDrawCall->state.proj);
-			glUniformMatrix4fv(pStage->uniform_modelMatrix, 1, GL_FALSE, (float*)&pDrawCall->state.modelView);
+			if ((dirtyBits & STD3D_FOG) || (dirtyBits & STD3D_STATEBITS))
+				std3D_SetFogState(pStage, pState);
+
+			if (dirtyBits & STD3D_STATEBITS)
+			{
+				std3D_SetBlendState(pStage, pState);
+				std3D_SetDepthStencilState(pState);
+			}
+
+			if ((dirtyBits & STD3D_TEXTURE) || (dirtyBits & STD3D_STATEBITS))
+				std3D_SetTextureState(pStage, pState);
+			
+			if ((dirtyBits & STD3D_LIGHTING) || (dirtyBits & STD3D_STATEBITS))
+				std3D_SetLightingState(pStage, pState);
+			
+			//if ((dirtyBits & STD3D_TRANSFORM))
+				std3D_SetTransformState(pStage, pState);
+		
+			if ((dirtyBits & STD3D_CAPS))
+				glUniform1ui(pStage->uniform_renderCaps, pDrawCall->state.header.renderCaps);
 
 			// if the projection matrix changed then all lighting is invalid, rebuild clusters and assign lights
 			// perhaps all of this would be better if we just flushed the pipeline on matrix change instead
-			if (rdMatrix_Compare44(&lastState.proj, &pDrawCall->state.proj) != 0)
+			if (rdMatrix_Compare44(&lastState.transformState.proj, &pDrawCall->state.transformState.proj) != 0)
 			{
 				stdPlatform_Printf("std3D: Warning, clusters are being rebuilt twice within a draw list flush!\n");
 
-				pRenderPass->oldProj = pDrawCall->state.proj;
+				pRenderPass->oldProj = pDrawCall->state.transformState.proj;
 				pRenderPass->clusterFrustumFrame++;
 				pRenderPass->clustersDirty = 1;
-				std3D_BuildClusters(pRenderPass, &pDrawCall->state.proj);
+				std3D_BuildClusters(pRenderPass, &pDrawCall->state.transformState.proj);
 				std3D_UpdateSharedUniforms();
 			}
 
 			last_tex = texid;
-			last_mat = pDrawCall->state.modelView;
-			last_proj = pDrawCall->state.proj;
-			lastState = pDrawCall->state;
+			lastShader = pDrawCall->shaderID;
+			memcpy(&lastState, &pDrawCall->state, sizeof(std3D_DrawCallState));
 
 			indexOffset += batchIndices;
 			batchIndices = 0;
-
-			do_batch = 0;
 		}
 
 		batchIndices += pDrawCall->numIndices;
 	}
 
 	if (batchIndices)
-		glDrawElements(std3D_PrimitiveForGeoMode(pDrawCall->state.raster.geoMode), batchIndices, GL_UNSIGNED_SHORT, (void*)(indexOffset * sizeof(uint16_t)));
+		glDrawElements(std3D_PrimitiveForGeoMode(pDrawCall->state.stateBits.geoMode), batchIndices, GL_UNSIGNED_SHORT, (void*)(indexOffset * sizeof(uint16_t)));
+
+	std3D_popDebugGroup();
+}
+
+void std3D_DoSSAO()
+{
+	if (!jkPlayer_enableSSAO)
+		return;
+
+	std3D_pushDebugGroup("SSAO");
+
+	// downscale the depth buffer with lower precision
+	std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->ssaoDepth, std3D_pFb->ztex, 0, 0, 1.0, 1.0, 1.0, 0, "Z Downscale");
+
+	// enable depth testing to prevent running SSAO on empty pixels
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_GREATER);
+	glDepthMask(GL_FALSE);
+	glDisable(GL_CULL_FACE);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->ssao.fbo);
+
+	glClearColor(1,1,1,1);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	std3D_useProgram(std3D_ssaoStage.program);
+
+	std3D_bindTexture(GL_TEXTURE_2D, std3D_pFb->ztex,          0);
+	std3D_bindTexture(GL_TEXTURE_2D, std3D_pFb->ssaoDepth.tex, 1);
+	std3D_bindTexture(GL_TEXTURE_2D, tiledrand_texture,        2);
+
+	glUniform1i(std3D_ssaoStage.uniform_tex,  0);
+	glUniform1i(std3D_ssaoStage.uniform_tex2, 1);
+	glUniform1i(std3D_ssaoStage.uniform_tex3, 2);
+
+	glViewport(0, 0, std3D_pFb->ssao.w, std3D_pFb->ssao.h);
+	glUniform2f(std3D_ssaoStage.uniform_iResolution, std3D_pFb->ssao.iw, std3D_pFb->ssao.ih);
+	
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+	
+	std3D_bindTexture(GL_TEXTURE_2D, 0, 0);
+	std3D_bindTexture(GL_TEXTURE_2D, 0, 1);
+	std3D_bindTexture(GL_TEXTURE_2D, 0, 2);
+
+	std3D_popDebugGroup();
+}
+
+void std3D_setupWorldTextures()
+{
+	GLint aotex = jkPlayer_enableSSAO ? std3D_pFb->ssao.tex : blank_tex_white;
+	std3D_bindTexture(GL_TEXTURE_2D, blank_tex_white, TEX_SLOT_DIFFUSE);
+	std3D_bindTexture(GL_TEXTURE_2D, worldpal_texture, TEX_SLOT_WORLD_PAL);
+	std3D_bindTexture(GL_TEXTURE_2D, worldpal_lights_texture, TEX_SLOT_WORLD_LIGHT_PAL);
+	std3D_bindTexture(GL_TEXTURE_2D, blank_tex, TEX_SLOT_EMISSIVE);
+	std3D_bindTexture(GL_TEXTURE_2D, blank_tex, TEX_SLOT_DISPLACEMENT);
+	std3D_bindTexture(GL_TEXTURE_BUFFER, cluster_tbo, TEX_SLOT_CLUSTER_BUFFER);
+	std3D_bindTexture(GL_TEXTURE_2D, decalAtlasFBO.tex, TEX_SLOT_DECAL_ATLAS);
+	std3D_bindTexture(GL_TEXTURE_2D, std3D_pFb->ztex, TEX_SLOT_DEPTH);
+	std3D_bindTexture(GL_TEXTURE_2D, aotex, TEX_SLOT_AO);
+}
+
+void std3D_FlushZDrawCalls(std3D_RenderPass* pRenderPass)
+{
+	std3D_pushDebugGroup("std3D_FlushZDrawCalls");
+
+	glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->zfbo);
+	glDrawBuffer(GL_COLOR_ATTACHMENT0);
+
+	// clear the depth buffer if requested
+	if (pRenderPass->flags & RD_RENDERPASS_CLEAR_DEPTH)
+	{
+		glDepthMask(GL_TRUE);
+		glClearColor(1, 1, 1, 1);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
+
+	std3D_setupWorldTextures();
+
+	std3D_FlushDrawCallList(pRenderPass,           &pRenderPass->drawCallLists[DRAW_LIST_Z], std3D_DrawCallCompareSortKey,           "Z Prepass");
+	std3D_FlushDrawCallList(pRenderPass, &pRenderPass->drawCallLists[DRAW_LIST_Z_ALPHATEST], std3D_DrawCallCompareSortKey, "Z Prepass Alphatest");
+
+	std3D_popDebugGroup();
+}
+
+void std3D_FlushColorDrawCalls(std3D_RenderPass* pRenderPass)
+{
+	std3D_pushDebugGroup("std3D_FlushColorDrawCalls");
+	
+	std3D_setupWorldTextures();
+
+	glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->fbo);
+	GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+	glDrawBuffers(ARRAYSIZE(bufs), bufs);
+
+	std3D_FlushDrawCallList(pRenderPass,   &pRenderPass->drawCallLists[DRAW_LIST_COLOR_ZPREPASS], std3D_DrawCallCompareSortKey,    "Color ZPrepass");
+	std3D_FlushDrawCallList(pRenderPass, &pRenderPass->drawCallLists[DRAW_LIST_COLOR_NOZPREPASS], std3D_DrawCallCompareSortKey, "Color No ZPrepass");
+	std3D_FlushDrawCallList(pRenderPass, &pRenderPass->drawCallLists[DRAW_LIST_COLOR_ALPHABLEND],   std3D_DrawCallCompareDepth,  "Color Alphablend");
+
+	std3D_popDebugGroup();
+}
+
+void std3D_FlushDeferred()
+{
+	std3D_pushDebugGroup("std3D_FlushDeferred");
+
+	std3D_DoSSAO();
+
+	std3D_popDebugGroup();
+}
+
+// writes directly to the final window framebuffer
+void std3D_DoBloom()
+{
+	if (!jkPlayer_enableBloom)
+		return;
+	
+	// todo: cvars
+	const float bloom_intensity = 1.0f;
+	const float bloom_gamma = 1.0f;// 1.5f;
+	const float blendLerp = 0.6f;
+	const float uvScale = 1.0f; // debug for the kernel radius
+
+	std3D_pushDebugGroup("Bloom");
+
+	// downscale layers using a simple gaussian filter
+	std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->bloomLayers[0], std3D_pFb->tex1, 0, 0, uvScale, 1.0, 1.0, 0, "Bloom Downscale");
+	for (int i = 1; i < ARRAY_SIZE(std3D_pFb->bloomLayers); ++i)
+		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->bloomLayers[i], std3D_pFb->bloomLayers[i - 1].tex, 0, 0, uvScale, 1.0, 1.0, 0, "Bloom Downscale");
+
+	// upscale layers and blend upward
+	glEnable(GL_BLEND);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendFunc(GL_ONE, GL_ONE);
+	for (int i = ARRAY_SIZE(std3D_pFb->bloomLayers) - 2; i >= 0; --i)
+		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->bloomLayers[i], std3D_pFb->bloomLayers[i + 1].tex, 0, 0, uvScale, blendLerp, 1.0, 0, "Bloom Upscale");
+
+	// blend to postfx target
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
+	std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->postfx, std3D_pFb->bloomLayers[0].tex, 0, 0, 1.0f, bloom_intensity, bloom_gamma, 0, "Bloom Composite");
+
+	std3D_popDebugGroup();
+}
+
+void std3D_FlushPostFX()
+{
+	std3D_pushDebugGroup("std3D_FlushPostFX");
+
+	glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->window.fbo);
+	//glClear(GL_COLOR_BUFFER_BIT);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_BLEND);
+
+	//if (!jkGame_isDDraw && !jkGuiBuildMulti_bRendering)
+		//return;
+
+	// blit the framebuffer to a higher precision target for postfx composition
+	std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->postfx, std3D_pFb->tex0, 0, 0, 1.0, 1.0, 1.0, 0, "PostFX Blit");
+
+	std3D_DoBloom();
+
+	glDisable(GL_BLEND);
+	std3D_DrawSimpleTex(&std3D_postfxStage, &std3D_pFb->window, std3D_pFb->postfx.tex, 0, 0, (rdCamera_pCurCamera->flags & 0x1) ? sithTime_curSeconds : -1.0, jkPlayer_enableDithering, jkPlayer_gamma, 0, "Final Output");
 
 	std3D_popDebugGroup();
 }
@@ -4627,70 +4845,43 @@ void std3D_FlushDrawCalls()
 
 	std3D_pushDebugGroup("std3D_FlushDrawCalls");
 
-	glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->fbo);
-
 	glViewport(0, 0, std3D_pFb->w, std3D_pFb->h);
-	glCullFace(GL_BACK); // this is flipped compared to old pipe, maybe the proj matrix?
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
 	glDepthFunc(GL_LESS);
-
-	glActiveTexture(GL_TEXTURE0 + 4);
-	glBindTexture(GL_TEXTURE_2D, blank_tex);
-	glActiveTexture(GL_TEXTURE0 + 3);
-	glBindTexture(GL_TEXTURE_2D, blank_tex);
-	glActiveTexture(GL_TEXTURE0 + 2);
-	glBindTexture(GL_TEXTURE_2D, worldpal_lights_texture);
-	glActiveTexture(GL_TEXTURE0 + 1);
-	glBindTexture(GL_TEXTURE_2D, worldpal_texture);
-	glActiveTexture(GL_TEXTURE0 + 0);
-	glBindTexture(GL_TEXTURE_2D, blank_tex_white);
-	glActiveTexture(GL_TEXTURE0 + 5);
-	glBindTexture(GL_TEXTURE_BUFFER, cluster_tbo);
-	glActiveTexture(GL_TEXTURE0 + 6);
-	glBindTexture(GL_TEXTURE_2D, decalAtlasFBO.tex);
+	glCullFace(GL_BACK);
+	glDisable(GL_STENCIL_TEST);
+	glDisable(GL_SCISSOR_TEST);
 
 	for (int j = 0; j < STD3D_MAX_RENDER_PASSES; ++j)
 	{
 		std3D_pushDebugGroup(std3D_renderPasses[j].name);
 
-		// clear the depth buffer if requested
-		if (std3D_renderPasses[j].flags & RD_RENDERPASS_CLEAR_DEPTH)
-		{
-			glDepthMask(GL_TRUE);
-			glClear(GL_DEPTH_BUFFER_BIT);
-		}
+		// fill the depth buffer with opaque draw calls
+		std3D_FlushZDrawCalls(&std3D_renderPasses[j]);
 
-		glDrawBuffer(GL_NONE);
+		// do opaque-only deferred stuff
+		std3D_FlushDeferred();
 
-		// flush z lists
-		std3D_FlushDrawCallList(&std3D_renderPasses[j], &std3D_renderPasses[j].drawCallLists[DRAW_LIST_Z],           std3D_DrawCallCompareSortKey, "Z Prepass");
-		std3D_FlushDrawCallList(&std3D_renderPasses[j], &std3D_renderPasses[j].drawCallLists[DRAW_LIST_Z_ALPHATEST], std3D_DrawCallCompareSortKey, "Z Prepass Alphatest");
-
-		// todo: do any necessary opaque-only deferred stuff here
-
-		GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-		glDrawBuffers(ARRAYSIZE(bufs), bufs);
-
-		// flush color lists
-		std3D_FlushDrawCallList(&std3D_renderPasses[j], &std3D_renderPasses[j].drawCallLists[DRAW_LIST_COLOR_ZPREPASS],   std3D_DrawCallCompareSortKey, "Color ZPrepass");
-		std3D_FlushDrawCallList(&std3D_renderPasses[j], &std3D_renderPasses[j].drawCallLists[DRAW_LIST_COLOR_NOZPREPASS], std3D_DrawCallCompareSortKey, "Color No ZPrepass");
-		std3D_FlushDrawCallList(&std3D_renderPasses[j], &std3D_renderPasses[j].drawCallLists[DRAW_LIST_COLOR_ALPHABLEND], std3D_DrawCallCompareDepth, "Color Alphablend");
+		// draw color passes
+		std3D_FlushColorDrawCalls(& std3D_renderPasses[j]);
 		
 		std3D_popDebugGroup();
 	}
+
+	std3D_FlushPostFX();
 
 	std3D_ResetDrawCalls();
 
 	glBindVertexArray(vao);
 
 	glBindTexture(GL_TEXTURE_2D, worldpal_texture);
-	glCullFace(GL_FRONT);
 	glEnable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
 	glDisable(GL_STENCIL_TEST);
 	glDisable(GL_SCISSOR_TEST);
+	glCullFace(GL_FRONT);
 
 	std3D_popDebugGroup();
 }
@@ -4699,18 +4890,18 @@ void std3D_ClearLights()
 {
 	lightsDirty = 1;
 	std3D_renderPasses[0].clustersDirty = std3D_renderPasses[0].clustersDirty = 1;
-	numLights = 0;
+	lightUniforms.numLights = 0;
 }
 
 int std3D_AddLight(rdLight* light, rdVector3* position)
 {
-	if(numLights >= CLUSTER_MAX_LIGHTS || !light->active)
+	if(lightUniforms.numLights >= CLUSTER_MAX_LIGHTS || !light->active)
 		return 0;
 
 	lightsDirty = 1;
 	std3D_renderPasses[0].clustersDirty = std3D_renderPasses[0].clustersDirty = 1;
 
-	std3D_light* light3d = &tmpLights[numLights++];
+	std3D_light* light3d = &lightUniforms.tmpLights[lightUniforms.numLights++];
 	light3d->type = light->type;
 	light3d->position.x = position->x;
 	light3d->position.y = position->y;
@@ -4740,7 +4931,7 @@ void std3D_FlushLights()
 	if (lightsDirty)
 	{
 		glBindBuffer(GL_UNIFORM_BUFFER, light_ubo);
-		glBufferData(GL_UNIFORM_BUFFER, sizeof(tmpLights), &tmpLights, GL_DYNAMIC_DRAW);
+		glBufferData(GL_UNIFORM_BUFFER, sizeof(std3D_LightUniforms), &lightUniforms, GL_DYNAMIC_DRAW);
 		lightsDirty = 0;
 	}
 }
@@ -4749,14 +4940,14 @@ void std3D_ClearOccluders()
 {
 	occludersDirty = 1;
 	std3D_renderPasses[0].clustersDirty = std3D_renderPasses[0].clustersDirty = 1;
-	numOccluders = 0;
+	occluderUniforms.numOccluders = 0;
 }
 
 void std3D_ClearDecals()
 {
 	decalsDirty = 1;
 	std3D_renderPasses[0].clustersDirty = std3D_renderPasses[0].clustersDirty = 1;
-	numDecals= 0;
+	decalUniforms.numDecals= 0;
 
 	// tmp debug
 	std3D_PurgeDecalAtlas();
@@ -4767,7 +4958,7 @@ void std3D_FlushOccluders()
 	if (occludersDirty)
 	{
 		glBindBuffer(GL_UNIFORM_BUFFER, occluder_ubo);
-		glBufferData(GL_UNIFORM_BUFFER, sizeof(tmpOccluders), &tmpOccluders, GL_DYNAMIC_DRAW);
+		glBufferData(GL_UNIFORM_BUFFER, sizeof(std3D_OccluderUniforms), &occluderUniforms, GL_DYNAMIC_DRAW);
 		occludersDirty = 0;
 	}
 }
@@ -4917,7 +5108,7 @@ void std3D_FlushDecals()
 	if (decalsDirty)
 	{
 		glBindBuffer(GL_UNIFORM_BUFFER, decal_ubo);
-		glBufferData(GL_UNIFORM_BUFFER, sizeof(tmpDecals), &tmpDecals, GL_DYNAMIC_DRAW);
+		glBufferData(GL_UNIFORM_BUFFER, sizeof(std3D_DecalUniforms), &decalUniforms, GL_DYNAMIC_DRAW);
 		decalsDirty = 0;
 	}
 }
@@ -5106,11 +5297,6 @@ void std3D_BuildClusters(std3D_RenderPass* pRenderPass, rdMatrix44* pProjection)
 
 	pRenderPass->clustersDirty = 0;
 
-	// flush lists to make sure they're up to date before we start cluster assignment
-	std3D_FlushLights();
-	std3D_FlushOccluders();
-	std3D_FlushDecals();
-
 	// pull the near/far from the projection matrix
 	// note: common sources list this as [3][2] and [2][2] but we have a rotated projection matrix, so we use [1][2]
 	float znear = -pProjection->vD.z / (pProjection->vB.z + 1.0f);
@@ -5131,29 +5317,34 @@ void std3D_BuildClusters(std3D_RenderPass* pRenderPass, rdMatrix44* pProjection)
 
 	// assign lights
 	int64_t lighTime = Linux_TimeUs();
-	for (int i = 0; i < numLights; ++i)
+	lightUniforms.firstLight = 0;
+	for (int i = 0; i < lightUniforms.numLights; ++i)
 	{
-		std3D_AssignItemToClusters(pRenderPass, i, (rdVector3*)&tmpLights[i].position, tmpLights[i].falloffMin, pProjection, znear, zfar, NULL);
+		std3D_AssignItemToClusters(pRenderPass, lightUniforms.firstLight + i, (rdVector3*)&lightUniforms.tmpLights[i].position, lightUniforms.tmpLights[i].falloffMin, pProjection, znear, zfar, NULL);
 	}
 	//printf("\t%lld us to assign lights to custers for frame %d with draw layer %d\n", Linux_TimeUs() - lighTime, rdroid_frameTrue, drawLayer);
 
 	// assign occluders
 	int64_t occluderTime = Linux_TimeUs();
-	firstOccluder = numLights;
-	for (int i = 0; i < numOccluders; ++i)
+	occluderUniforms.firstOccluder = lightUniforms.firstLight + lightUniforms.numLights;
+	for (int i = 0; i < occluderUniforms.numOccluders; ++i)
 	{
-		std3D_AssignItemToClusters(pRenderPass, firstOccluder + i, (rdVector3*)&tmpOccluders[i].position, tmpOccluders[i].position.w, pProjection, znear, zfar, NULL);
+		std3D_AssignItemToClusters(pRenderPass, occluderUniforms.firstOccluder + i, (rdVector3*)&occluderUniforms.tmpOccluders[i].position, occluderUniforms.tmpOccluders[i].position.w, pProjection, znear, zfar, NULL);
 	}
 	//printf("\t%lld us to assign occluders to custers for frame %d with draw layer %d\n", Linux_TimeUs() - occluderTime, rdroid_frameTrue, drawLayer);
 
 	// assign decals
-	firstDecal = firstOccluder + numOccluders;
+	decalUniforms.firstDecal = occluderUniforms.firstOccluder + occluderUniforms.numOccluders;
 	int64_t decalTime = Linux_TimeUs();
-	for (int i = 0; i < numDecals; ++i)
+	for (int i = 0; i < decalUniforms.numDecals; ++i)
 	{
-		std3D_AssignItemToClusters(pRenderPass, firstDecal + i, (rdVector3*)&tmpDecals[i].posRad, tmpDecals[i].posRad.w, pProjection, znear, zfar, &tmpDecals[i].decalMatrix);
+		std3D_AssignItemToClusters(pRenderPass, decalUniforms.firstDecal + i, (rdVector3*)&decalUniforms.tmpDecals[i].posRad, decalUniforms.tmpDecals[i].posRad.w, pProjection, znear, zfar, &decalUniforms.tmpDecals[i].decalMatrix);
 	}
 	//printf("\t%lld us to assign decals to custers for frame %d with draw layer %d\n", Linux_TimeUs() - decalTime, rdroid_frameTrue, drawLayer);
+
+	std3D_FlushLights();
+	std3D_FlushOccluders();
+	std3D_FlushDecals();
 
 	// todo: map buffer instead of storing to tmp then uploading?
 	glBindBuffer(GL_TEXTURE_BUFFER, cluster_buffer);

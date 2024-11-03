@@ -9,6 +9,92 @@ uniform float param3;
 
 in vec2 f_uv;
 
+#ifdef RENDER_DROID2
+
+out float fragAO;
+
+// depth-only crytek style AO similar to ShaderX7
+// fastest approach I could get at full resolution and that will work with varying input matrices
+void main(void)
+{
+	const float secondPassScale =  0.5f; // scales the radius for the second pass to catch higher frequency details
+	const float radius          =  1.0f; // radius of the sampling kernel
+	const float minDist         =  5.0f; // radius shrinks below this distance to avoid extreme cache thrasing and visual artifacts
+	const float rangeScale      = 0.85f; // gives the raneg scale check a little headroom
+	const float depthTestScale  = 64.0f; // soft depth test factor
+
+	// unrolled kernel building
+	// hopefully constant folded by the compiler (faster than reading a constant buffer)
+	const float offsetStep  = 0.875f;
+	const float sampleScale = 0.025f;
+
+	float offsetScale = 0.0;
+	vec3 sampleKernel[8] = vec3[8]
+	(
+		normalize(vec3( 1, 1, 1)) * sampleScale * (offsetScale += offsetStep),
+		normalize(vec3(-1,-1,-1)) * sampleScale * (offsetScale += offsetStep),
+		normalize(vec3(-1,-1, 1)) * sampleScale * (offsetScale += offsetStep),
+		normalize(vec3(-1, 1,-1)) * sampleScale * (offsetScale += offsetStep),
+		normalize(vec3(-1, 1 ,1)) * sampleScale * (offsetScale += offsetStep),
+		normalize(vec3( 1,-1,-1)) * sampleScale * (offsetScale += offsetStep),
+		normalize(vec3( 1,-1, 1)) * sampleScale * (offsetScale += offsetStep),
+		normalize(vec3( 1, 1,-1)) * sampleScale * (offsetScale += offsetStep)
+	);
+
+	// sample the depth and rotation textures
+	float depth = textureLod(tex, f_uv.xy, 0).x * 128.0; // todo: need to figure out how to not hardcode a far distance here...
+	vec3 rotSample = textureLod(tex3, gl_FragCoord.xy / 4, 0).rgb;
+
+	// shrink the radius closer to the camera
+	vec3 sampleRadius = vec3(radius) * clamp(depth / minDist, 0.0, 1.0);
+
+	// compute factors for the depth comparison, scaled by the distance
+	float range             = rangeScale / sampleRadius.z;     // range around the pixel considered valid
+	float depthTestSoftness = depthTestScale / sampleRadius.z; // softness of the depth test
+
+	// kernel is constant in screen space per ShaderX7 recommendation
+	// ShaderX7 scales the Z by 2, not sure why but we do that here
+	sampleRadius.xyz *= vec3(vec2(1.0 / depth), 2.0);
+
+	// sample and accumulate
+	float ao = 0.0;
+	for (int i = 0; i < 8; ++i)
+	{
+		// reflect the point around the random vector (instead of mul)
+		vec3 samplePos = reflect(sampleKernel[i], rotSample) * sampleRadius;
+
+		// sample 2 radii per sphere point to catch finer details
+		for (int j = 0; j < 2; ++j)
+		{
+			// get the depth of the sphere sample
+			float sampleDepth = textureLod(tex2, f_uv.xy + samplePos.xy, 0).x * 128.0 + samplePos.z;  
+		
+			// soft depth test instead of binary test
+			float diff      = depth - sampleDepth;
+			float depthTest = clamp(-diff * depthTestSoftness, 0.0, 1.0);
+			
+			// slightly different range check than in ShaderX7, better control of the falloff
+			float rangeDiff      = range * diff;
+			float rangeIsInvalid = clamp(abs(rangeDiff), 0.0, 1.0); // range around the sample
+			rangeIsInvalid      += clamp(rangeDiff, 0.0, 1.0);      // double the invalid range in front of the sample
+			
+			// add up the contribution
+			ao += mix(depthTest, 0.5, rangeIsInvalid * 0.5);
+
+			// scale the sample for the next pass so we don't need to recompute it
+			samplePos.xyz *= secondPassScale;
+		}
+	}
+
+	// multiplied by 2 to account for mid-gray average of sphere samples
+	fragAO = ao * (2.0 / 16.0);
+}
+
+
+#else
+
+// legacy
+
 out vec4 fragColor;
 
 #define PI 3.14159265359
@@ -233,3 +319,5 @@ void main(void)
     //fragColor = vec4(normal, 1.0);
     fragColor = vec4(color, 1.0);
 }
+
+#endif

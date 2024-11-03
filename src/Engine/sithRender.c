@@ -687,7 +687,7 @@ void sithRender_Draw()
 	{
 		rdSetZBufferMethod(RD_ZBUFFER_READ_NOWRITE);
 		rdSetSortingMethod(2);
-		//rdSetBlendMode(RD_BLEND_MODE_NONE);
+		//rdSetBlendEnabled(RD_BLEND_MODE_NONE);
 		for (sithThing* iter = sithRender_alphaDrawThing; iter; )
 		{
 			// call the alpha callback for renderweapon
@@ -1131,17 +1131,18 @@ void sithRender_DrawSurface(sithSurface* surface)
 		rdAmbientLight(extra, extra, extra);
 	}
 	rdAmbientLightSH(NULL);
+	//rdAmbientLightSH(&surface->parent_sector->ambientSH);
 
 	float alpha = 1.0f;
 	if ((surface->surfaceInfo.face.type & RD_FF_TEX_TRANSLUCENT) != 0)
 	{
 		alpha = 90.0f / 255.0f;
-		rdSetBlendMode(RD_BLEND_MODE_ALPHA);
+		rdSetBlendEnabled(RD_TRUE);
 		rdSetZBufferMethod(RD_ZBUFFER_READ_NOWRITE);
 	}
 	else
 	{
-		rdSetBlendMode(RD_BLEND_MODE_NONE);
+		rdSetBlendEnabled(RD_FALSE);
 		rdSetZBufferMethod((surface->surfaceInfo.face.type & RD_FF_ZWRITE_DISABLED) ? RD_ZBUFFER_READ_NOWRITE : RD_ZBUFFER_READ_WRITE);
 	}
 
@@ -2754,7 +2755,7 @@ void sithRender_RenderAlphaSurfaces()
 	//rdSetZBufferMethod(RD_ZBUFFER_READ_NOWRITE);
 	rdSetOcclusionMethod(0);
 	rdSetSortingMethod(2);
-	//rdSetBlendMode(RD_BLEND_MODE_ALPHA);
+	//rdSetBlendEnabled(RD_TRUE);
 
 	for (int i = 0; i < sithRender_numSurfaces; i++)
 	{
@@ -2766,7 +2767,7 @@ void sithRender_RenderAlphaSurfaces()
 	}
 
 	rdCache_Flush();
-	rdSetBlendMode(RD_BLEND_MODE_NONE);
+	rdSetBlendEnabled(RD_FALSE);
 	rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
 }
 #else

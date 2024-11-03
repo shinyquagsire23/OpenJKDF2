@@ -84,6 +84,9 @@ void rdClearPostStatistics();
 #ifdef RENDER_DROID2
 // todo: the original rdProcEntry stuff was somewhat stateless, try to move away from stateful api?
 
+#define RD_PACK_COLOR8(r, g, b, a)  (b | (g << 8) | (r << 16) | (a << 24))
+#define RD_PACK_COLOR10(r, g, b, a) (b | (g << 10) | (r << 20) | (a << 30))
+
 // todo: rdPushMatrix/rdPopMatrix?
 // todo: move some modes to rdCaps_t
 void rdEnable(rdCaps_t cap);
@@ -108,7 +111,7 @@ void rdFogRange(float startDepth, float endDepth);
 void rdFogColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 void rdFogColorf(float r, float g, float b, float a);
 
-void rdViewport(float x, float y, float width, float height, float minDepth, float maxDepth);
+void rdViewport(float x, float y, float width, float height);
 void rdGetViewport(rdViewportRect* pOut);
 
 void rdScissorMode(rdScissorMode_t mode);
@@ -129,7 +132,8 @@ void rdNormal(const rdVector3* pNormal);
 
 // render state
 void rdSetZBufferCompare(rdCompare_t compare);
-void rdSetBlendMode(rdBlendMode_t state);
+void rdSetBlendEnabled(int enabled);
+void rdSetBlendMode(rdBlend_t src, rdBlend_t dst);
 void rdSetCullMode(rdCullMode_t mode);
 void rdSetAlphaThreshold(uint8_t threshold);
 void rdSetConstantColorf(float r, float g, float b, float a);

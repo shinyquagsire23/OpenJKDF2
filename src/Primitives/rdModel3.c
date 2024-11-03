@@ -1637,12 +1637,12 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
 	if ((face->type & RD_FF_TEX_TRANSLUCENT) != 0)
 	{
 		alpha = 90.0f / 255.0f;
-		rdSetBlendMode(RD_BLEND_MODE_ALPHA);
+		rdSetBlendEnabled(RD_TRUE);
 		rdSetZBufferMethod(RD_ZBUFFER_READ_NOWRITE);
 	}
 	else
 	{
-		rdSetBlendMode(RD_BLEND_MODE_NONE);
+		rdSetBlendEnabled(RD_FALSE);
 		rdSetZBufferMethod((face->type & RD_FF_ZWRITE_DISABLED) ? RD_ZBUFFER_READ_NOWRITE : RD_ZBUFFER_READ_WRITE);
 	}
 
