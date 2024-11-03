@@ -68,7 +68,10 @@ uniform textureBlock
 	vec2 uv_offset;
 
 	vec4 texgen_params;
-	
+};
+
+uniform materialBlock
+{	
 	vec4 fillColor;
 	vec4 albedoFactor;
 	vec4 emissiveFactor;

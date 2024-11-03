@@ -45,13 +45,6 @@ uniform textureBlock
 	vec2 uv_offset;
 
 	vec4 texgen_params;
-	
-	vec4 fillColor;
-	vec4 albedoFactor;
-	vec4 emissiveFactor;
-
-	float displacement_factor;
-	float texPad0, texPad1, texPad2;
 };
 
 noperspective out vec2 f_uv_affine;

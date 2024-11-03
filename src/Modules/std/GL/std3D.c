@@ -224,6 +224,17 @@ typedef struct std3D_TextureUniforms
 } std3D_TextureUniforms;
 GLuint tex_ubo;
 
+typedef struct std3D_MaterialUniforms
+{
+	rdVector4 fillColor;
+	rdVector4 albedo_factor;
+	rdVector4 emissive_factor;
+
+	float    displacement_factor;
+	float    texPad0, texPad1, texPad2;
+} std3D_MaterialUniforms;
+GLuint material_ubo;
+
 typedef struct std3D_light
 {
 	rdVector4 position;
@@ -408,7 +419,7 @@ typedef struct std3D_worldStage
 	GLint uniform_geo_mode,  uniform_fillColor, uniform_tex, uniform_texEmiss, uniform_displacement_map, uniform_texDecals, uniform_texz, uniform_texssao;
 	GLint uniform_worldPalette, uniform_worldPaletteLights;
 	GLint uniform_light_mode, uniform_ditherMode, uniform_renderCaps;
-	GLint uniform_shared, uniform_fog, uniform_tex_block, uniform_lightbuf, uniform_lights, uniform_occluders, uniform_decals;
+	GLint uniform_shared, uniform_fog, uniform_tex_block, uniform_material, uniform_lightbuf, uniform_lights, uniform_occluders, uniform_decals;
 	GLint uniform_rightTop;
 	GLint uniform_rt;
 	GLint uniform_lt;
@@ -1256,6 +1267,7 @@ int std3D_loadWorldStage(std3D_worldStage* pStage, int isZPass, const char* defi
 	pStage->uniform_shared = glGetUniformBlockIndex(pStage->program, "sharedBlock");
 	pStage->uniform_fog = glGetUniformBlockIndex(pStage->program, "fogBlock");
 	pStage->uniform_tex_block = glGetUniformBlockIndex(pStage->program, "textureBlock");
+	pStage->uniform_material = glGetUniformBlockIndex(pStage->program, "materialBlock");
 	pStage->uniform_lights = glGetUniformBlockIndex(pStage->program, "lightBlock");
 	pStage->uniform_occluders = glGetUniformBlockIndex(pStage->program, "occluderBlock");
 	pStage->uniform_decals = glGetUniformBlockIndex(pStage->program, "decalBlock");
@@ -1394,6 +1406,11 @@ void std3D_setupUBOs()
 	glBindBuffer(GL_UNIFORM_BUFFER, tex_ubo);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(std3D_TextureUniforms), NULL, GL_DYNAMIC_DRAW);
 
+	// material buffer	
+	glGenBuffers(1, &material_ubo);
+	glBindBuffer(GL_UNIFORM_BUFFER, material_ubo);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(std3D_MaterialUniforms), NULL, GL_DYNAMIC_DRAW);
+
 	// light buffer
 	glGenBuffers(1, &light_ubo);
 	glBindBuffer(GL_UNIFORM_BUFFER, light_ubo);
@@ -1433,6 +1450,7 @@ void std3D_setupLightingUBO(std3D_worldStage* pStage)
 	glUniformBlockBinding(pStage->program, pStage->uniform_shared, 3);
 	glUniformBlockBinding(pStage->program, pStage->uniform_fog, 4);
 	glUniformBlockBinding(pStage->program, pStage->uniform_tex_block, 5);	
+	glUniformBlockBinding(pStage->program, pStage->uniform_material, 6);
 }
 
 void std3D_setupDrawCallVAO(std3D_worldStage* pStage)
@@ -3056,86 +3074,6 @@ void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo
 	std3D_popDebugGroup();
 }
 
-void std3D_DrawSceneFbo()
-{
-	std3D_pushDebugGroup("std3D_DrawSceneFbo");
-
-    //printf("Draw scene FBO\n");
-    glEnable(GL_BLEND);
-    
-    glBlendEquation(GL_FUNC_ADD);
-
-    glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->window.fbo);
-    glClear( GL_COLOR_BUFFER_BIT );
-	glDisable(GL_DEPTH_TEST);
-
-    static float frameNum = 1.0;
-    //frameNum += (rand() % 16);
-
-	int draw_bloom = jkPlayer_enableBloom;
-
-    float add_luma = (((float)rdroid_curColorEffects.add.x / 255.0f) * 0.2125)
-                     + (((float)rdroid_curColorEffects.add.y / 255.0f)* 0.7154)
-                     + (((float)rdroid_curColorEffects.add.z / 255.0f) * 0.0721);
-
-    if (!jkGame_isDDraw && !jkGuiBuildMulti_bRendering)
-    {
-        return;
-    }
-
-
-	glDisable(GL_BLEND);
-
-	// blit the framebuffer to a higher precision target for postfx composition
-	std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->postfx, std3D_pFb->tex0, 0, 0, 1.0, 1.0, 1.0, 0, "PostFX Blit");
-
-    glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
-
-    if (draw_bloom)
-    {
-		float bloom_intensity = 1.0;
-
-		#ifdef CLASSIC_EMISSIVE
-			bloom_intensity = 1.0f;
-		#else
-			bloom_intensity = 3.0f;
-		#endif
-
-		std3D_pushDebugGroup("Bloom");
-
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		// downscale
-		float uvScale = 1.0f;// 0.25f; // source tex is 4x bigger
-
-		std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->bloomLayers[0], std3D_pFb->tex1, 0, 0, uvScale, 1.0, 1.0, 0, "Bloom Downsample");
-		for (int i = 1; i < ARRAY_SIZE(std3D_pFb->bloomLayers); ++i)
-			std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->bloomLayers[i], std3D_pFb->bloomLayers[i-1].tex, 0, 0, uvScale, 1.0, 1.0, 0, "Bloom Downsample");
-	
-		// upscale + blend
-		float blendLerp = 0.6f;
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
-		//glBlendFunc(GL_ONE, GL_ONE);
-		for (int i = ARRAY_SIZE(std3D_pFb->bloomLayers) - 2; i >= 0; --i)
-			std3D_DrawSimpleTex(&std3D_bloomStage, &std3D_pFb->bloomLayers[i], std3D_pFb->bloomLayers[i + 1].tex, 0, 0, uvScale, blendLerp, 1.0, 0, "Bloom Upsample");
-
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
-		std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->postfx, std3D_pFb->bloomLayers[0].tex, 0, 0, 1.0f, bloom_intensity, 1.5, 0, "Bloom Composite");
-
-		std3D_popDebugGroup();
-    }
-
-	glDisable(GL_BLEND);
-	std3D_DrawSimpleTex(&std3D_postfxStage, &std3D_pFb->window, std3D_pFb->postfx.tex, 0, 0, (rdCamera_pCurCamera->flags & 0x1) ? sithTime_curSeconds : -1.0, jkPlayer_enableDithering, jkPlayer_gamma, 0, "Final Output");
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	std3D_popDebugGroup();
-}
-
 int std3D_SetCurrentPalette(rdColor24 *a1, int a2)
 {
     return 1;
@@ -4465,6 +4403,36 @@ void std3D_SetTextureState(std3D_worldStage* pStage, std3D_DrawCallState* pState
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(std3D_TextureUniforms), &tex);
 }
 
+void std3D_SetMaterialState(std3D_worldStage* pStage, std3D_DrawCallState* pState)
+{
+	// todo: remove the texture references and use some state stuff?
+	std3D_TextureState* pTexState = &pState->textureState;
+	rdDDrawSurface* pTexture = (pState->stateBits.geoMode == RD_GEOMODE_TEXTURED) ? pState->textureState.pTexture : NULL;
+
+	std3D_MaterialUniforms tex;
+	float a = ((pTexState->fillColor >> 24) & 0xFF) / 255.0f;
+	float r = ((pTexState->fillColor >> 16) & 0xFF) / 255.0f;
+	float g = ((pTexState->fillColor >> 8) & 0xFF) / 255.0f;
+	float b = ((pTexState->fillColor >> 0) & 0xFF) / 255.0f;
+	rdVector_Set4(&tex.fillColor, r, g, b, a);
+
+	if (pTexture)
+	{
+		rdVector_Set4(&tex.emissive_factor, pTexture->emissive_factor[0], pTexture->emissive_factor[1], pTexture->emissive_factor[2], 1.0f);
+		rdVector_Set4(&tex.albedo_factor, pTexture->albedo_factor[0], pTexture->albedo_factor[1], pTexture->albedo_factor[2], pTexture->albedo_factor[3]);
+		tex.displacement_factor = pTexture->displacement_factor;
+	}
+	else
+	{
+		rdVector_Set4(&tex.emissive_factor, 0.0, 0.0, 0.0, 0.0);
+		rdVector_Set4(&tex.albedo_factor, 1.0, 1.0, 1.0, 1.0);
+		tex.displacement_factor = 0.0;
+	}
+
+	glBindBuffer(GL_UNIFORM_BUFFER, material_ubo);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(std3D_MaterialUniforms), &tex);
+}
+
 void std3D_SetLightingState(std3D_worldStage* pStage, std3D_DrawCallState* pState)
 {
 	glUniform1i(pStage->uniform_light_mode, pState->stateBits.lightMode);
@@ -4566,6 +4534,7 @@ void std3D_FlushDrawCallList(std3D_RenderPass* pRenderPass, std3D_DrawCallList* 
 	glBindBufferBase(GL_UNIFORM_BUFFER, 3, shared_ubo);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 4, fog_ubo);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 5, tex_ubo);
+	glBindBufferBase(GL_UNIFORM_BUFFER, 6, material_ubo);
 
 	std3D_DrawCall* pDrawCall = &pList->drawCalls[0];
 	std3D_DrawCallState* pState = &pDrawCall->state;
@@ -4585,6 +4554,7 @@ void std3D_FlushDrawCallList(std3D_RenderPass* pRenderPass, std3D_DrawCallList* 
 	std3D_SetBlendState(pStage, pState);
 	std3D_SetDepthStencilState(pState);
 	std3D_SetTextureState(pStage, pState);
+	std3D_SetMaterialState(pStage, pState);
 	std3D_SetLightingState(pStage, pState);	
 	std3D_SetTransformState(pStage, pState);
 	
@@ -4634,12 +4604,17 @@ void std3D_FlushDrawCallList(std3D_RenderPass* pRenderPass, std3D_DrawCallList* 
 			}
 
 			if ((dirtyBits & STD3D_TEXTURE) || (dirtyBits & STD3D_STATEBITS))
+			{
 				std3D_SetTextureState(pStage, pState);
+
+				// todo: material bits
+				std3D_SetMaterialState(pStage, pState);
+			}
 			
 			if ((dirtyBits & STD3D_LIGHTING) || (dirtyBits & STD3D_STATEBITS))
 				std3D_SetLightingState(pStage, pState);
 			
-			//if ((dirtyBits & STD3D_TRANSFORM))
+			//if ((dirtyBits & STD3D_TRANSFORM)) // fixme: not working?
 				std3D_SetTransformState(pStage, pState);
 		
 			if ((dirtyBits & STD3D_CAPS))
@@ -4788,7 +4763,7 @@ void std3D_DoBloom()
 		return;
 	
 	// todo: cvars
-	const float bloom_intensity = 1.0f;
+	const float bloom_intensity = 1.0f;// 1.0f;
 	const float bloom_gamma = 1.0f;// 1.5f;
 	const float blendLerp = 0.6f;
 	const float uvScale = 1.0f; // debug for the kernel radius
