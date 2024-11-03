@@ -1705,6 +1705,8 @@ int std3D_StartScene()
     double supersample_level = jkPlayer_ssaaMultiple; // Can also be set lower
     int32_t tex_w = (int32_t)((double)Window_xSize * supersample_level);
     int32_t tex_h = (int32_t)((double)Window_ySize * supersample_level);
+	tex_w = (tex_w < 320 ? 320 : tex_w);
+	tex_h = tex_w * (float)Window_ySize / Window_xSize;
 
     if (tex_w != std3D_pFb->w || tex_h != std3D_pFb->h 
         || (((std3D_pFb->enable_extra & 1) == 1) != jkPlayer_enableBloom)

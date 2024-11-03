@@ -572,7 +572,9 @@ void sithRender_Draw()
 
 	int32_t tex_w = (int32_t)((double)Window_xSize * jkPlayer_ssaaMultiple);
 	int32_t tex_h = (int32_t)((double)Window_ySize * jkPlayer_ssaaMultiple);
-	rdViewport(0, 0, tex_w, tex_h, 0, 1);
+	tex_w = (tex_w < 320 ? 320 : tex_w);
+	tex_h = tex_w * (float)Window_ySize / Window_xSize;
+	rdViewport(0, 0, tex_w, tex_h);
 
 	rdMatrixMode(RD_MATRIX_VIEW);
 	rdIdentity();
