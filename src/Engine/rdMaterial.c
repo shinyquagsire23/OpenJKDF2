@@ -183,6 +183,13 @@ LABEL_21:
 #endif
 #endif
 
+		// Added: store the width/height on the texture so it's not 0
+		texture->opaqueMats[mipmap_num].width = format.width;
+		texture->alphaMats[mipmap_num].width = format.width;
+		texture->opaqueMats[mipmap_num].height = format.height;
+		texture->alphaMats[mipmap_num].height = format.height;
+
+
 #ifndef TARGET_TWL
         created_tex = stdDisplay_VBufferNew(&format, create_ddraw_surface, gpu_mem, 0);
         *texture_struct = created_tex;
