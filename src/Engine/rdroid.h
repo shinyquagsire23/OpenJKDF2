@@ -86,11 +86,9 @@ void rdClearPostStatistics();
 
 #define RD_PACK_COLOR8(r, g, b, a)  (b | (g << 8) | (r << 16) | (a << 24))
 #define RD_PACK_COLOR10(r, g, b, a) (b | (g << 10) | (r << 20) | (a << 30))
+#define RD_PACK_COLOR8F(r, g, b, a)  (stdMath_ClampInt(b * 255, 0, 255) | (stdMath_ClampInt(g * 255, 0, 255) << 8) | (stdMath_ClampInt(r * 255, 0, 255) << 16) | (stdMath_ClampInt(a * 255, 0, 255) << 24))
 
 // todo: rdPushMatrix/rdPopMatrix?
-// todo: move some modes to rdCaps_t
-void rdEnable(rdCaps_t cap);
-void rdDisable(rdCaps_t cap);
 void rdMatrixMode(rdMatrixMode_t mode);
 void rdPerspective(float fov, float aspect, float nearPlane, float farPlane);
 void rdOrthographic(float width, float height, float nearPlane, float farPlane);
@@ -132,10 +130,12 @@ void rdNormal(const rdVector3* pNormal);
 
 // render state
 void rdSetZBufferCompare(rdCompare_t compare);
+void rdSetFogMode(rdFogMode_t mode);
 void rdSetBlendEnabled(int enabled);
 void rdSetBlendMode(rdBlend_t src, rdBlend_t dst);
 void rdSetCullMode(rdCullMode_t mode);
-void rdSetAlphaThreshold(uint8_t threshold);
+void rdAlphaTestFunction(rdCompare_t mode);
+void rdSetAlphaTestReference(uint8_t ref);
 void rdSetConstantColorf(float r, float g, float b, float a);
 void rdSetConstantColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 void rdSetChromaKey(rdChromaKeyMode_t mode);
@@ -145,17 +145,20 @@ void rdSortPriority(int sortPriority);
 void rdSortDistance(float distance);
 
 // these names kinda suck, come up with better for per-primitive modes
-void rdSetGeoMode(int a1);
-void rdSetLightMode(int a1);
-void rdSetTexMode(int a1);
+void rdSetGeoMode(rdGeoMode_t a1);
+void rdSetLightMode(rdLightMode_t a1);
+void rdSetTexMode(rdTexMode_t a1);
 
 void rdDitherMode(rdDitherMode_t mode);
+void rdSetGlowIntensity(float intensity);
 
 void rdRenderPass(const char* name, int8_t renderPass, rdRenderPassFlags_t renderPassFlags);
 void rdDepthRange(float znearNorm, float zfarNorm);
 
 int rdBindTexture(rdTexture* pTexture);
 int rdBindMaterial(rdMaterial* pMaterial, int cel);
+
+void rdSetDecalMode(rdDecalMode_t mode);
 
 void rdTexFilterMode(rdTexFilter_t texFilter);
 void rdTexGen(rdTexGen_t texGen);

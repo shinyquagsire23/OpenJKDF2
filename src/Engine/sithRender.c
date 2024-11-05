@@ -550,16 +550,16 @@ void sithRender_Draw()
     rdCamera_ClearLights(rdCamera_pCurCamera);
 
 #ifdef RENDER_DROID2
-	rdRenderPass("sithRender_Draw", 0, 0);
-	rdEnable(RD_LIGHTING);
-	if(jkPlayer_enableShadows)
-		rdEnable(RD_SHADOWS);
-	else
-		rdDisable(RD_SHADOWS);
-	if (jkPlayer_enableDecals)
-		rdEnable(RD_DECALS);
-	else
-		rdDisable(RD_DECALS);
+	rdRenderPass("sithRender_Draw", 0, jkPlayer_enableSSAO ? RD_RENDERPASS_AMBIENT_OCCLUSION : 0);
+
+	rdSetGlowIntensity(0.4f);
+
+	//if(jkPlayer_enableShadows)
+	//	rdSetAmb (RD_SHADOWS);
+	//else
+	//	rdDisable(RD_SHADOWS);
+
+	rdSetDecalMode(jkPlayer_enableDecals ? RD_DECALS_ENABLED : RD_DECALS_DISABLED);
 	rdDepthRange(0.0f, 1.0f);
 	rdDitherMode(jkPlayer_enableDithering ? RD_DITHER_4x4 : RD_DITHER_NONE);
 	rdClearLights();
@@ -2378,7 +2378,7 @@ void sithRender_RenderThings()
     rdSetVertexColorMode(0);
 
 #ifdef RENDER_DROID2
-	rdDisable(RD_DECALS);
+	rdSetDecalMode(RD_DECALS_DISABLED);
 #endif
 
     for ( i = 0; i < sithRender_numSectors2; i++ )
@@ -2690,10 +2690,7 @@ void sithRender_RenderThings()
     rdCache_Flush();
 
 #ifdef RENDER_DROID2
-	if (jkPlayer_enableDecals)
-		rdEnable(RD_DECALS);
-	else
-		rdDisable(RD_DECALS);
+	rdSetDecalMode(jkPlayer_enableDecals ? RD_DECALS_ENABLED : RD_DECALS_DISABLED);
 #endif
 
     // MoTS added

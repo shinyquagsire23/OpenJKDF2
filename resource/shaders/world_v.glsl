@@ -205,8 +205,11 @@ void main(void)
 	vec4 viewPos = modelMatrix * vec4(coord3d, 1.0);
     vec4 pos = projMatrix * viewPos;
 
-	mat3 normalMatrix = mat3(modelMatrix);//transpose(inverse(mat3(modelMatrix))); // if we ever need scaling
+	mat3 normalMatrix = transpose(inverse(mat3(modelMatrix))); // if we ever need scaling
 	f_normal = normalMatrix * v_normal.xyz;
+
+	//if(lightMode < 3)
+		//f_normal = face_normal;
 
     gl_Position = pos;
     f_color = clamp(v_color.bgra, vec4(0.0), vec4(1.0));

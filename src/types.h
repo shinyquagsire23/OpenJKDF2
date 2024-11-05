@@ -869,8 +869,7 @@ typedef struct rdScissorRect
 // todo: maybe some of this should be split into commands instead of one huge state block?
 typedef struct std3D_DrawCallHeader
 {
-	uint32_t                renderPass   : 4;  // 4
-	uint32_t                renderCaps   : 4;  // 8, todo: remove?
+	uint32_t                renderPass   : 8;  // 8
 	uint32_t                sortPriority : 24; // 32
 	float                   sortDistance;      // 64
 } std3D_DrawCallHeader;
@@ -881,24 +880,24 @@ typedef union std3D_DrawCallStateBits
 	struct
 	{
 		// raster state
-		uint32_t geoMode     : 3; // 3
-		uint32_t ditherMode  : 1; // 4
-		uint32_t cullMode    : 2; // 6
-		uint32_t scissorMode : 1; // 7
+		uint32_t geoMode     : 2; // 2
+		uint32_t ditherMode  : 1; // 3
+		uint32_t cullMode    : 2; // 5
+		uint32_t scissorMode : 1; // 6
 		// fog state
-		uint32_t fogMode     : 1; // 8
+		uint32_t fogMode     : 1; // 7
 		// blend state
-		uint32_t blend       : 1; // 9
-		uint32_t srdBlend    : 3; // 12
-		uint32_t dstBlend    : 3; // 15
+		uint32_t blend       : 1; // 8
+		uint32_t srdBlend    : 3; // 11
+		uint32_t dstBlend    : 3; // 14
 		// depth stencil state
-		uint32_t zMethod     : 2; // 17
-		uint32_t zCompare    : 4; // 21
+		uint32_t zMethod     : 2; // 16
+		uint32_t zCompare    : 4; // 20
 		// texture state
-		uint32_t texMode     : 3; // 24
-		uint32_t texGen      : 2; // 26
-		uint32_t texFilter   : 1; // 27
-		uint32_t alphaTest   : 1; // 28
+		uint32_t texMode     : 1; // 21
+		uint32_t texGen      : 2; // 23
+		uint32_t texFilter   : 1; // 24
+		uint32_t alphaTest   : 4; // 28
 		uint32_t chromaKey   : 1; // 29
 		// lighting state
 		uint32_t lightMode   : 3; // 32
@@ -914,26 +913,34 @@ typedef struct std3D_FogState
 	float    endDepth;
 } std3D_FogState;
 
+typedef struct std3D_MaterialState
+{
+	uint32_t fillColor;
+	uint32_t albedo;
+	uint32_t emissive;
+	float    displacement;
+} std3D_MaterialState;
+
 typedef struct std3D_TextureState
 {
 	rdDDrawSurface*      pTexture;
 	rdVector4            texGenParams;
 	rdVector2            texOffset;
 	uint32_t             chromaKeyColor;
-	uint32_t             fillColor;
 	uint8_t              numMips;
 	uint8_t              alphaRef;
 } std3D_TextureState;
-static_assert(sizeof(std3D_TextureState) == sizeof(uint32_t) * 12, "std3D_TextureState not 48 bytes");
+static_assert(sizeof(std3D_TextureState) == sizeof(uint32_t) * 10, "std3D_TextureState not 4 bytes");
 
 typedef struct std3D_LightingState // todo: pack this
 {
+	uint32_t ambientFlags;
 	uint32_t ambientColor;
 	uint32_t ambientLobes[8]; // 8 spherical gaussian lobes
 	//rdVector3 ambientColor;   // rgb ambient color
 	//rdAmbient ambientStateSH; // directional ambient
 } std3D_LightingState;
-static_assert(sizeof(std3D_LightingState) == sizeof(uint32_t) * 9, "std3D_TextureState not 36 bytes");
+static_assert(sizeof(std3D_LightingState) == sizeof(uint32_t) * 10, "std3D_TextureState not 40 bytes");
 
 typedef struct std3D_TransformState
 {
@@ -954,6 +961,7 @@ typedef struct std3D_DrawCallState
 	std3D_TransformState    transformState;
 	std3D_RasterState       rasterState;
 	std3D_FogState          fogState;
+	std3D_MaterialState     materialState;
 	std3D_TextureState      textureState;
 	std3D_LightingState     lightingState;
 } std3D_DrawCallState;

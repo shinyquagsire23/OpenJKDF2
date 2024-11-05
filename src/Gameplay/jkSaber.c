@@ -329,6 +329,10 @@ void jkSaber_DrawGlow()
 
 void jkSaber_Draw(rdMatrix34 *posRotMat)
 {
+#ifdef RENDER_DROID2
+	rdSetGlowIntensity(1.0f);
+#endif
+
     if ( playerThings[playerThingIdx].actorThing->jkFlags & JKFLAG_SABERON
       && playerThings[playerThingIdx].povModel.model3
       && playerThings[playerThingIdx].polylineThing.model3 )
@@ -355,6 +359,10 @@ void jkSaber_Draw(rdMatrix34 *posRotMat)
 #endif
 		}
     }
+
+#ifdef RENDER_DROID2
+	rdSetGlowIntensity(0.4f);
+#endif
 }
 
 void jkSaber_UpdateLength(sithThing *thing)

@@ -38,9 +38,6 @@ enum RD_TEXTUREMODE
 {
     RD_TEXTUREMODE_AFFINE = 0,
     RD_TEXTUREMODE_PERSPECTIVE = 1,
-    RD_TEXTUREMODE_2_UNK = 2,
-    RD_TEXTUREMODE_3_UNK = 3,
-    RD_TEXTUREMODE_4_UNK = 4,
 };
 
 typedef int32_t rdZBufferMethod_t;
@@ -84,15 +81,6 @@ enum RD_DECAL_FLAGS
 #define RD_TRUE  1
 #define RD_FALSE 0
 
-typedef uint32_t rdCaps_t;
-enum RD_CAPS
-{
-	RD_LIGHTING = 0x1,
-	RD_SHADOWS  = 0x2,
-	RD_DECALS   = 0x4,
-	RD_FOG      = 0x8,
-};
-
 typedef uint8_t rdBlend_t;
 typedef enum RD_BLEND
 {
@@ -109,30 +97,30 @@ typedef enum RD_BLEND
 typedef uint8_t rdCompare_t;
 typedef enum RD_COMPARE
 {
-	RD_COMPARE_ALWAYS,
-	RD_COMPARE_LESS,
-	RD_COMPARE_LESS_EQUAL,
-	RD_COMPARE_GREATER,
-	RD_COMPARE_GREATER_EQUAL,
-	RD_COMPARE_EQUAL,
-	RD_COMPARE_NOT_EQUAL,
-	RD_COMPARE_NEVER
+	RD_COMPARE_ALWAYS        = 0,
+	RD_COMPARE_LESS          = 1,
+	RD_COMPARE_LESS_EQUAL    = 2,
+	RD_COMPARE_GREATER       = 3,
+	RD_COMPARE_GREATER_EQUAL = 4,
+	RD_COMPARE_EQUAL         = 5,
+	RD_COMPARE_NOT_EQUAL     = 6,
+	RD_COMPARE_NEVER         = 7
 } RD_COMPARE;
 
 typedef uint8_t rdCullMode_t; // todo: back/front face culling options
-typedef enum RD_CULL_MODE
+typedef enum RD_CULL_MODES
 {
 	RD_CULL_MODE_NONE,
 	RD_CULL_MODE_CCW_ONLY,
 	RD_CULL_MODE_CW_ONLY
-} RD_CULL_MODE;
+} RD_CULL_MODES;
 
 typedef uint8_t rdScissorMode_t;
-typedef enum RD_SCISSOR_MODE
+typedef enum RD_SCISSOR_MODES
 {
 	RD_SCISSOR_DISABLED,
 	RD_SCISSOR_ENABLED
-} RD_SCISSOR_MODE;
+} RD_SCISSOR_MODES;
 
 typedef uint8_t rdChromaKeyMode_t;
 typedef enum RD_CHROMA_KEY_MODE
@@ -176,16 +164,41 @@ enum RD_TEXFILTER
 typedef uint8_t rdRenderPassFlags_t;
 enum RD_RENDERPASS
 {
-	RD_RENDERPASS_NONE        = 0x0,
-	RD_RENDERPASS_CLEAR_DEPTH = 0x1,
+	RD_RENDERPASS_NONE              = 0x0,
+	RD_RENDERPASS_CLEAR_DEPTH       = 0x1,
+	RD_RENDERPASS_AMBIENT_OCCLUSION = 0x2
 };
 
 typedef uint8_t rdDitherMode_t;
 enum RD_DITHER_MODE
 {
-	RD_DITHER_NONE,
-	RD_DITHER_4x4,
+	RD_DITHER_NONE = 0,
+	RD_DITHER_4x4  = 1,
 };
+
+typedef uint8_t rdAmbientOcclusionFlags_t;
+enum RD_AMBIENT_OCCLUSION_FLAGS
+{
+	RD_AO_NONE         = 0x0,
+	RD_AO_OCCLUDERS    = 0x1,
+	RD_AO_SCREEN_SPACE = 0x2,
+};
+
+typedef uint8_t rdDecalMode_t;
+enum RD_DECAL_MODE
+{
+	RD_DECALS_DISABLED = 0,
+	RD_DECALS_ENABLED  = 1
+};
+
+typedef uint8_t rdFogMode_t;
+enum RD_FOG_MODE
+{
+	RD_FOG_DISABLED = 0,
+	RD_FOG_ENABLED  = 1
+};
+
+typedef uint8_t rdDecalMode_t;
 
 #endif
 

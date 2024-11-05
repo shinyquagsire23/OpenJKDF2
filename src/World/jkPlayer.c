@@ -1186,12 +1186,12 @@ void jkPlayer_DrawPov()
 #ifdef SDL2_RENDER
         // Force weapon to draw in front of scene
 	#ifdef RENDER_DROID2
-		rdRenderPass("jkPlayer_DrawPov", 1, RD_RENDERPASS_CLEAR_DEPTH);
-		rdDisable(RD_DECALS);
-		if (jkPlayer_enableShadows)
-			rdEnable(RD_SHADOWS);
-		else
-			rdDisable(RD_SHADOWS);
+		rdRenderPass("jkPlayer_DrawPov", 1, RD_RENDERPASS_CLEAR_DEPTH | (jkPlayer_enableSSAO ? RD_RENDERPASS_AMBIENT_OCCLUSION : 0));
+		rdSetDecalMode(RD_DECALS_DISABLED);
+		//if (jkPlayer_enableShadows)
+		//	rdEnable(RD_SHADOWS);
+		//else
+		//	rdDisable(RD_SHADOWS);
 		// only draw very near the camera
 		rdDepthRange(0.0f, 0.1f / sithCamera_currentCamera->rdCam.pClipFrustum->field_0.z);
 	#else
@@ -1543,6 +1543,9 @@ void jkPlayer_renderSaberBlade(sithThing* thing)
 	rdMatrix34* primaryMat = &thing->rdthing.hierarchyNodeMatrices[primary_mesh];
 	rdMatrix34* secondaryMat = &thing->rdthing.hierarchyNodeMatrices[secondary_mesh];
 
+#ifdef RENDER_DROID2
+	rdSetGlowIntensity(1.0f);
+#endif
 	if (thing->jkFlags & JKFLAG_PERSUASION)
 	{
 		if (sithPlayer_pLocalPlayer->iteminfo[SITHBIN_F_SEEING].state & ITEMSTATE_ACTIVATE)
@@ -1582,6 +1585,9 @@ void jkPlayer_renderSaberBlade(sithThing* thing)
 			}
 		}
 	}
+#ifdef RENDER_DROID2
+	rdSetGlowIntensity(0.4f);
+#endif
 }
 
 #else

@@ -733,9 +733,8 @@ void jkGuiBuildMulti_ModelDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVB
 
 #ifdef RENDER_DROID2
 		rdRenderPass("jkGguiBuildMulti_DisplayModel", 0, 0);
-		rdEnable(RD_LIGHTING);
-		rdEnable(RD_SHADOWS);
-		rdDisable(RD_DECALS);
+		//rdEnable(RD_SHADOWS);
+		rdSetDecalMode(RD_DECALS_DISABLED);
 		rdDepthRange(0.0f, 1.0f);
 		rdDitherMode(jkPlayer_enableDithering ? RD_DITHER_4x4 : RD_DITHER_NONE);
 		rdClearLights();

@@ -204,10 +204,11 @@ int rdSprite_Draw(rdThing* thing, rdMatrix34* mat)
 
 	rdBindMaterial(sprite->face.material, thing->wallCel);
 
-	int extraData = 0;
-#ifdef STENCIL_BUFFER
-	extraData |= 2; // mark stencil buffer
-#endif
+	// temp, make this controllable
+	rdSetGlowIntensity(0.8f);
+
+	int oldZ = rdroid_curZBufferMethod;
+	rdSetZBufferMethod(RD_ZBUFFER_READ_NOWRITE);
 
 	rdTexOffseti(sprite->face.clipIdk.x, sprite->face.clipIdk.y);
 
@@ -244,6 +245,9 @@ int rdSprite_Draw(rdThing* thing, rdMatrix34* mat)
 	rdTexOffseti(0, 0);
 	rdMatrixMode(RD_MATRIX_VIEW);
 	rdLoadMatrix(&viewMatrix);
+	rdSetZBufferMethod(oldZ);
+
+	rdSetGlowIntensity(0.4f);
 
 	return 1;
 }

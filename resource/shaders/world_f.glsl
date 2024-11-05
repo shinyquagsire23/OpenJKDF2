@@ -67,7 +67,6 @@ in float f_depth;
 
 noperspective in vec2 f_uv_affine;
 
-uniform uint renderCaps;
 uniform mat4 modelMatrix;
 uniform mat4 projMatrix;
 
@@ -114,6 +113,7 @@ uniform int  lightMode;
 uniform int  geoMode;
 uniform int  ditherMode;
 
+uniform int aoFlags;
 uniform vec3 ambientColor;
 uniform vec4 ambientSH[3];
 uniform vec3 ambientDominantDir;
@@ -481,9 +481,9 @@ void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, vec4 shad
 				float len;
 
 				// diffuse uses dist to plane
-				if (lightMode == 2)
-					len = dot(l.position.xyz - f_coord.xyz, normal.xyz);
-				else
+				//if (lightMode == 2)
+				//	len = dot(l.position.xyz - f_coord.xyz, normal.xyz);
+				//else
 					len = length(diff);
 
 				if ( len >= l.falloffMin )
@@ -506,7 +506,7 @@ void CalculatePointLighting(uint bucket_index, vec3 normal, vec3 view, vec4 shad
 				// this is JK's attenuation model, note it depends on scalar value matching whatever was used to calculate the intensity, it seems
 				intensity = max(0.0, intensity - len * scalar);
 
-				if ((renderCaps & 0x2) == 0x2 && numOccluders > 0u)
+				if ((aoFlags & 0x1) == 0x1 && numOccluders > 0u)
 				{
 					float localShadow = clamp(dot(shadows.xyz, diff.xyz) / max(0.01, aperture), 0.0, 1.0);
 					intensity *= localShadow;// * localShadow;
@@ -1101,7 +1101,7 @@ void main(void)
 	#endif
 #endif
 
-	if((renderCaps & 0x4) == 0x4 && numDecals > 0u)
+	if(numDecals > 0u)
 		BlendDecals(diffuseColor.xyz, emissive.xyz, bucket_index, f_coord.xyz, surfaceNormals);
 
 #ifndef UNLIT
@@ -1111,13 +1111,16 @@ void main(void)
 	#endif
 		
 	vec4 shadows = vec4(0.0, 0.0, 0.0, 1.0);
-	if ((renderCaps & 0x2) == 0x2 && numOccluders > 0u)
+	if (/*(aoFlags & 0x1) == 0x1 &&*/ numOccluders > 0u)
 		shadows = CalculateIndirectShadows(bucket_index, f_coord.xyz, surfaceNormals);
 
-	float ssao = upsample_ssao(gl_FragCoord.xy, f_depth);
-
 	vec3 ao = vec3(shadows.w * 0.8 + 0.2); // remap so we don't overdarken
-	ao *= ssao;
+	
+	if((aoFlags & 0x2) == 0x2)
+	{
+		float ssao = upsample_ssao(gl_FragCoord.xy, f_depth);
+		ao *= ssao;
+	}
 
 	// fake multi bounce
 	vec3 albedo = vertex_color.xyz * diffuseColor.xyz;
@@ -1133,11 +1136,10 @@ void main(void)
 	vec3 specAO = mix(ao * ao, vec3(1.0), clamp(-0.3 * ndotv * ndotv, 0.0, 1.0));
 	specularLight.xyz *= specAO;
 	
-	// why is renderCaps not working with SPECULAR?
-	//if ((renderCaps & 0x1) == 0x1 && numLights > 0u)
+	if (numLights > 0u)
 		CalculatePointLighting(bucket_index, surfaceNormals, localViewDir, shadows, diffuseColor.xyz, specularColor.xyz, roughness, diffuseLight, specularLight);
 	
-	//diffuseLight.xyz = clamp(diffuseLight.xyz, vec3(0.0), vec3(1.0));	
+	diffuseLight.xyz = clamp(diffuseLight.xyz, vec3(0.0), vec3(1.0));	
 	//specularLight.xyz = clamp(specularLight.xyz, vec3(0.0), vec3(1.0));	
 
 	// taper off
@@ -1161,7 +1163,7 @@ void main(void)
     main_color *= albedoFactor_copy;
 	
 	// add specular to emissive output
-	emissive.rgb += max(vec3(0.0), specularLight.rgb - 1.0 - dither);
+	//emissive.rgb += max(vec3(0.0), specularLight.rgb - 1.0 - dither);
 
 	if (sampledEmiss.r != 0.0 || sampledEmiss.g != 0.0 || sampledEmiss.b != 0.0)
     {
@@ -1198,7 +1200,7 @@ void main(void)
 		fragColor.rgb = min(fragColor.rgb + dither, vec3(1.0));
 
 #ifndef ALPHA_BLEND
-    fragColorEmiss = emissive;
+    fragColorEmiss = emissive * vec4(vec3(emissiveFactor.w), f_color.w);
 #else
     // Dont include any windows or transparent objects in emissivity output
 	fragColorEmiss = vec4(0.0);

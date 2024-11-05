@@ -211,6 +211,9 @@ int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix)
 
 #ifdef RENDER_DROID2
 	rdSortDistance(vertex_out.y);
+
+	// temp, make this controllable
+	rdSetGlowIntensity(1.0f);
 #endif
 
     // Tip
@@ -316,6 +319,11 @@ int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix)
         idxInfo.vertexUVs = polyline->extraUVTipMaybe;
         rdPolyLine_DrawFace(thing, &polyline->edgeFace, polylineVerts, &idxInfo);
     }
+
+#ifdef RENDER_DROID2
+	rdSetGlowIntensity(0.4f);
+#endif
+
     return 1;
 }
 
@@ -388,11 +396,6 @@ void rdPolyLine_DrawFace(rdThing* thing, rdFace* face, rdVector3* unused, rdVert
 	rdSortPriority(face->sortId);
 
 	rdBindMaterial(face->material, thing->wallCel);
-
-	int extraData = 0;
-#ifdef STENCIL_BUFFER
-	extraData |= 2; // mark stencil buffer
-#endif
 
 	// quadrilateral projection
 	rdVector3 uvs[4];

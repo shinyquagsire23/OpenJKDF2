@@ -53,6 +53,7 @@ static std3D_DrawCallStateBits rdroid_stateBits;
 static std3D_TransformState    rdroid_transformState;
 static std3D_RasterState       rdroid_rasterState;
 static std3D_FogState          rdroid_fogState;
+static std3D_MaterialState     rdroid_materialState;
 static std3D_TextureState      rdroid_textureState;
 static std3D_LightingState     rdroid_lightingState;
 
@@ -73,8 +74,6 @@ static rdPrimitiveType_t rdroid_curPrimitiveType = RD_PRIMITIVE_NONE;
 
 void rdResetRasterState()
 {
-	rdroid_dcHeader.renderCaps = RD_LIGHTING | RD_SHADOWS | RD_DECALS;
-
 	rdroid_stateBits.geoMode = RD_GEOMODE_TEXTURED;
 	rdroid_stateBits.cullMode = RD_CULL_MODE_CCW_ONLY;
 
@@ -113,6 +112,14 @@ void rdResetTextureState()
 	rdroid_textureState.texOffset.x = rdroid_textureState.texOffset.y = 0;
 }
 
+void rdResetMaterialState()
+{
+	rdroid_materialState.fillColor    = 0xFFFFFFFF;
+	rdroid_materialState.emissive     = 0xFF000000;
+	rdroid_materialState.albedo       = 0xFFFFFFFF;
+	rdroid_materialState.displacement = 0.0f;
+}
+
 void rdResetLightingState()
 {
 	rdroid_stateBits.lightMode = RD_LIGHTMODE_GOURAUD;
@@ -139,6 +146,7 @@ int rdStartup(HostServices *p_hs)
 	rdResetBlendState();
 	rdResetDepthStencilState();
 	rdResetTextureState();
+	rdResetMaterialState();
 	rdResetLightingState();
 	rdroid_dcHeader.sortPriority = 0;
 	rdroid_dcHeader.sortDistance = 0;
@@ -258,10 +266,7 @@ void rdSetVertexColorMode(int a1)
 void rdSetFog(int active, const rdVector4* color, float startDepth, float endDepth)
 {
 #ifdef RENDER_DROID2
-	if(active)
-		rdEnable(RD_FOG);
-	else
-		rdDisable(RD_FOG);
+	rdSetFogMode(active ? RD_FOG_ENABLED : RD_FOG_DISABLED);
 	rdFogColorf(color->x, color->y, color->z, color->w);
 	rdFogRange(startDepth, endDepth);
 #else
@@ -389,6 +394,7 @@ void rdFinishFrame()
   rdResetBlendState();
   rdResetDepthStencilState();
   rdResetTextureState();
+  rdResetMaterialState();
   rdResetLightingState();
 #endif
 }
@@ -400,16 +406,6 @@ void rdClearPostStatistics()
 
 
 #ifdef RENDER_DROID2
-
-void rdEnable(rdCaps_t cap)
-{
-	rdroid_dcHeader.renderCaps |= cap;
-}
-
-void rdDisable(rdCaps_t cap)
-{
-	rdroid_dcHeader.renderCaps &= ~cap;
-}
 
 // Matrix state
 
@@ -623,6 +619,7 @@ void rdEndPrimitive()
 	memcpy(&state.transformState, &rdroid_transformState, sizeof(std3D_TransformState));
 	memcpy(&state.rasterState,    &rdroid_rasterState,    sizeof(std3D_RasterState));
 	memcpy(&state.fogState,       &rdroid_fogState,       sizeof(std3D_FogState));
+	memcpy(&state.materialState,  &rdroid_materialState,  sizeof(std3D_MaterialState));
 	memcpy(&state.textureState,   &rdroid_textureState,   sizeof(std3D_TextureState));
 	memcpy(&state.lightingState,  &rdroid_lightingState,  sizeof(std3D_LightingState));
 	
@@ -731,12 +728,15 @@ void std3D_GetValidDimension(unsigned int inW, unsigned int inH, unsigned int* o
 int rdBindTexture(rdTexture* pTexture)
 {
 	if (!pTexture)
+	{
+		rdroid_stateBits.alphaTest = 0;
 		return 0;
+	}
 
 	// todo: texture cache here
 	rdroid_textureState.pTexture = &pTexture->alphaMats[0];
 
-	rdroid_stateBits.alphaTest = (pTexture->alpha_en & 1) != 0;
+	rdroid_stateBits.alphaTest = (pTexture->alpha_en & 1) ? RD_COMPARE_LESS : RD_COMPARE_ALWAYS;
 
 	uint32_t out_width, out_height;
 	std3D_GetValidDimension(
@@ -783,6 +783,21 @@ int rdBindMaterial(rdMaterial* pMaterial, int cel)
 		
 		// todo: move me
 		rdroid_stateBits.alphaTest = (sith_tex_sel->alpha_en & 1) != 0;
+
+		if(sith_tex_sel->has_jkgm_override)
+		{
+			uint32_t emissive_rgb = RD_PACK_COLOR8F(rdroid_textureState.pTexture->emissive_factor[0], rdroid_textureState.pTexture->emissive_factor[1], rdroid_textureState.pTexture->emissive_factor[2], 0.0f);
+
+			rdroid_materialState.albedo = RD_PACK_COLOR8F(rdroid_textureState.pTexture->albedo_factor[0], rdroid_textureState.pTexture->albedo_factor[1], rdroid_textureState.pTexture->albedo_factor[2], rdroid_textureState.pTexture->albedo_factor[3]);
+			rdroid_materialState.emissive = (rdroid_materialState.emissive & 0xFF000000) | emissive_rgb;
+			rdroid_materialState.displacement = 0.0f;
+		}
+		else
+		{
+			rdroid_materialState.albedo = 0xFFFFFFFF;
+			rdroid_materialState.emissive &= 0xFF000000;
+			rdroid_materialState.displacement = 0.0f;
+		}
 
 		uint32_t out_width, out_height;
 		std3D_GetValidDimension(
@@ -854,6 +869,11 @@ void rdSetZBufferCompare(rdCompare_t compare)
 	rdroid_stateBits.zCompare = compare;
 }
 
+void rdSetFogMode(rdFogMode_t mode)
+{
+	rdroid_stateBits.fogMode = mode;
+}
+
 void rdSetBlendEnabled(int enabled)
 {
 	rdroid_stateBits.blend = enabled;
@@ -870,14 +890,19 @@ void rdSetCullMode(rdCullMode_t mode)
 	rdroid_stateBits.cullMode = mode;
 }
 
-void rdSetAlphaThreshold(uint8_t threshold)
+void rdAlphaTestFunction(rdCompare_t mode)
 {
-	rdroid_textureState.alphaRef = threshold;
+	// todo
+}
+
+void rdSetAlphaTestReference(uint8_t ref)
+{
+	rdroid_textureState.alphaRef = ref;
 }
 
 void rdSetConstantColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
-	rdroid_textureState.fillColor = RD_PACK_COLOR8(r, g, b, a);
+	rdroid_materialState.fillColor = RD_PACK_COLOR8(r, g, b, a);
 }
 
 void rdSetConstantColorf(float r, float g, float b, float a)
@@ -909,24 +934,34 @@ void rdSortDistance(float distance)
 	rdroid_dcHeader.sortDistance = distance;
 }
 
-void rdSetGeoMode(int a1)
+void rdSetGeoMode(rdGeoMode_t mode)
 {
-	rdroid_stateBits.geoMode = a1;
+	rdroid_stateBits.geoMode = stdMath_ClampInt(mode, RD_GEOMODE_VERTICES, RD_GEOMODE_TEXTURED) - 1;
 }
 
-void rdSetLightMode(int a1)
+void rdSetLightMode(rdLightMode_t mode)
 {
-	rdroid_stateBits.lightMode = a1;
+	rdroid_stateBits.lightMode = stdMath_ClampInt(mode, 0, RD_LIGHTMODE_6_UNK);
 }
 
-void rdSetTexMode(int a1)
+void rdSetTexMode(rdTexMode_t mode)
 {
-	rdroid_stateBits.texMode = a1;
+	rdroid_stateBits.texMode = stdMath_ClampInt(mode, 0, RD_TEXTUREMODE_PERSPECTIVE);
 }
 
 void rdDitherMode(rdDitherMode_t mode)
 {
 	rdroid_stateBits.ditherMode = mode;
+}
+
+void rdSetGlowIntensity(float intensity)
+{
+	rdroid_materialState.emissive = (rdroid_materialState.emissive & 0x00FFFFFF) | (stdMath_ClampInt(intensity * 255, 0, 255) << 24);
+}
+
+void rdSetDecalMode(rdDecalMode_t mode)
+{
+
 }
 
 // Lighting

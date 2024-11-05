@@ -214,13 +214,6 @@ typedef struct std3D_TextureUniforms
 	rdVector2 uv_offset;
 
 	rdVector4 texgen_params;
-	
-	rdVector4 fillColor;
-	rdVector4 albedo_factor;
-	rdVector4 emissive_factor;
-
-	float    displacement_factor;
-	float    texPad0, texPad1, texPad2;
 } std3D_TextureUniforms;
 GLuint tex_ubo;
 
@@ -418,7 +411,7 @@ typedef struct std3D_worldStage
 	GLint uniform_ambient_color, uniform_ambient_sg;
 	GLint uniform_geo_mode,  uniform_fillColor, uniform_tex, uniform_texEmiss, uniform_displacement_map, uniform_texDecals, uniform_texz, uniform_texssao;
 	GLint uniform_worldPalette, uniform_worldPaletteLights;
-	GLint uniform_light_mode, uniform_ditherMode, uniform_renderCaps;
+	GLint uniform_light_mode, uniform_ditherMode, uniform_ao_flags;
 	GLint uniform_shared, uniform_fog, uniform_tex_block, uniform_material, uniform_lightbuf, uniform_lights, uniform_occluders, uniform_decals;
 	GLint uniform_rightTop;
 	GLint uniform_rt;
@@ -1261,7 +1254,7 @@ int std3D_loadWorldStage(std3D_worldStage* pStage, int isZPass, const char* defi
 	pStage->uniform_geo_mode = std3D_tryFindUniform(pStage->program, "geoMode");
 	pStage->uniform_ditherMode = std3D_tryFindUniform(pStage->program, "ditherMode");
 	pStage->uniform_light_mode = std3D_tryFindUniform(pStage->program, "lightMode");
-	pStage->uniform_renderCaps = std3D_tryFindUniform(pStage->program, "renderCaps");
+	pStage->uniform_ao_flags = std3D_tryFindUniform(pStage->program, "aoFlags");
 
 	pStage->uniform_lightbuf = std3D_tryFindUniform(pStage->program, "clusterBuffer");
 	pStage->uniform_shared = glGetUniformBlockIndex(pStage->program, "sharedBlock");
@@ -1796,6 +1789,8 @@ void std3D_FreeResources()
 
 	for(int i = 0; i < SHADER_COUNT; ++i)
 		glDeleteProgram(worldStages[i].program);
+	glDeleteBuffers(1, &tex_ubo);
+	glDeleteBuffers(1, &material_ubo);
 	glDeleteBuffers(1, &shared_ubo);
 	glDeleteBuffers(1, &light_ubo);
 	glDeleteBuffers(1, &occluder_ubo);
@@ -1831,6 +1826,8 @@ int std3D_StartScene()
             exit(-1);
         }
     }
+
+	std3D_pushDebugGroup("std3D_StartScene");
     
     rendered_tris = 0;
     
@@ -1914,6 +1911,8 @@ int std3D_StartScene()
         memcpy(displaypal_data, stdDisplay_masterPalette, 0x300);
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 1, GL_RGB, GL_UNSIGNED_BYTE, displaypal_data);
     }
+
+	std3D_popDebugGroup();
 
     return 1;
 }
@@ -4137,7 +4136,7 @@ void std3D_AddDrawCall(rdPrimitiveType_t type, std3D_DrawCallState* pDrawCallSta
 
 	// add to z-prepass if applicable
 	int writesZ = std3D_HasDepthWrites(pDrawCallState);
-	if (!pDrawCallState->stateBits.blend && writesZ)
+	if (!blending && writesZ)
 	{
 		std3D_AddZListDrawCall(type, &std3D_renderPasses[renderPass].drawCallLists[DRAW_LIST_Z + alphaTest], pDrawCallState, paVertices, numVertices);
 
@@ -4244,7 +4243,7 @@ void std3D_SetRasterState(std3D_worldStage* pStage, std3D_DrawCallState* pState)
 
 	glFrontFace(pState->stateBits.cullMode == RD_CULL_MODE_CW_ONLY ? GL_CW : GL_CCW);
 
-	glUniform1i(pStage->uniform_geo_mode, pState->stateBits.geoMode);
+	glUniform1i(pStage->uniform_geo_mode, pState->stateBits.geoMode + 1);
 	glUniform1i(pStage->uniform_ditherMode, pState->stateBits.ditherMode);
 }
 
@@ -4272,8 +4271,19 @@ int std3D_SetBlendState(std3D_worldStage* pStage, std3D_DrawCallState* pState)
 	else
 		glEnable(GL_BLEND);
 
-	// todo: use src blend and dst blend
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	static GLuint glBlendForRdBlend[] =
+	{
+		GL_ZERO,                // RD_BLEND_ZERO
+		GL_ONE,                 // RD_BLEND_ONE
+		GL_DST_COLOR,           // RD_BLEND_DSTCOLOR
+		GL_ONE_MINUS_DST_COLOR, // RD_BLEND_INVDSTCOLOR
+		GL_SRC_ALPHA,           // RD_BLEND_SRCALPHA
+		GL_ONE_MINUS_SRC_ALPHA, // RD_BLEND_INVSRCALPHA
+		GL_DST_ALPHA,           // RD_BLEND_DSTALPHA
+		GL_ONE_MINUS_DST_ALPHA, // RD_BLEND_INVDSTALPHA
+	};
+	glBlendFunc(glBlendForRdBlend[pState->stateBits.srdBlend], glBlendForRdBlend[pState->stateBits.dstBlend]);
 }
 
 void std3D_SetDepthStencilState(std3D_DrawCallState* pState)
@@ -4334,7 +4344,7 @@ void std3D_SetTransformState(std3D_worldStage* pStage, std3D_DrawCallState* pSta
 void std3D_SetTextureState(std3D_worldStage* pStage, std3D_DrawCallState* pState)
 {
 	std3D_TextureState* pTexState = &pState->textureState;
-	rdDDrawSurface* pTexture = (pState->stateBits.geoMode == RD_GEOMODE_TEXTURED) ? pState->textureState.pTexture : NULL;
+	rdDDrawSurface* pTexture = (pState->stateBits.geoMode + 1 == RD_GEOMODE_TEXTURED) ? pState->textureState.pTexture : NULL;
 
 	std3D_TextureUniforms tex;
 	tex.uv_mode = pState->stateBits.texMode;
@@ -4342,12 +4352,6 @@ void std3D_SetTextureState(std3D_worldStage* pStage, std3D_DrawCallState* pState
 	tex.numMips = pTexState->numMips;
 	rdVector_Set2(&tex.uv_offset, pTexState->texOffset.x, pTexState->texOffset.y);
 	rdVector_Set4(&tex.texgen_params, pTexState->texGenParams.x, pTexState->texGenParams.y, pTexState->texGenParams.z, pTexState->texGenParams.w);
-
-	float a = ((pTexState->fillColor >> 24) & 0xFF) / 255.0f;
-	float r = ((pTexState->fillColor >> 16) & 0xFF) / 255.0f;
-	float g = ((pTexState->fillColor >> 8) & 0xFF) / 255.0f;
-	float b = ((pTexState->fillColor >> 0) & 0xFF) / 255.0f;
-	rdVector_Set4(&tex.fillColor, r, g, b, a);
 
 	if(pTexture)
 	{
@@ -4378,9 +4382,6 @@ void std3D_SetTextureState(std3D_worldStage* pStage, std3D_DrawCallState* pState
 		}
 
 		rdVector_Set2(&tex.texsize, pTexture->width, pTexture->height);
-		rdVector_Set4(&tex.emissive_factor, pTexture->emissive_factor[0], pTexture->emissive_factor[1], pTexture->emissive_factor[2], 1.0f);
-		rdVector_Set4(&tex.albedo_factor, pTexture->albedo_factor[0], pTexture->albedo_factor[1], pTexture->albedo_factor[2], pTexture->albedo_factor[3]);
-		tex.displacement_factor = pTexture->displacement_factor;
 	}
 	else
 	{
@@ -4394,40 +4395,35 @@ void std3D_SetTextureState(std3D_worldStage* pStage, std3D_DrawCallState* pState
 
 		tex.tex_mode = TEX_MODE_TEST;
 		rdVector_Set2(&tex.texsize, 1, 1);
-		rdVector_Set4(&tex.emissive_factor, 0.0, 0.0, 0.0, 0.0);
-		rdVector_Set4(&tex.albedo_factor, 1.0, 1.0, 1.0, 1.0);
-		tex.displacement_factor = 0.0;
 	}
 
 	glBindBuffer(GL_UNIFORM_BUFFER, tex_ubo);
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(std3D_TextureUniforms), &tex);
 }
 
+#define RD_SET_COLOR4(target, color) \
+	rdVector_Set4(target, ((color >> 16) & 0xFF) / 255.0f, ((color >> 8) & 0xFF) / 255.0f, ((color >> 0) & 0xFF) / 255.0f, ((color >> 24) & 0xFF) / 255.0f);
+
 void std3D_SetMaterialState(std3D_worldStage* pStage, std3D_DrawCallState* pState)
 {
-	// todo: remove the texture references and use some state stuff?
-	std3D_TextureState* pTexState = &pState->textureState;
-	rdDDrawSurface* pTexture = (pState->stateBits.geoMode == RD_GEOMODE_TEXTURED) ? pState->textureState.pTexture : NULL;
+	std3D_MaterialState* pMaterialState = &pState->materialState;
+	rdDDrawSurface* pTexture = (pState->stateBits.geoMode + 1 == RD_GEOMODE_TEXTURED) ? pState->textureState.pTexture : NULL;
 
 	std3D_MaterialUniforms tex;
-	float a = ((pTexState->fillColor >> 24) & 0xFF) / 255.0f;
-	float r = ((pTexState->fillColor >> 16) & 0xFF) / 255.0f;
-	float g = ((pTexState->fillColor >> 8) & 0xFF) / 255.0f;
-	float b = ((pTexState->fillColor >> 0) & 0xFF) / 255.0f;
-	rdVector_Set4(&tex.fillColor, r, g, b, a);
+	RD_SET_COLOR4(&tex.fillColor, pMaterialState->fillColor);
 
-	if (pTexture)
+	//if (pTexture)
 	{
-		rdVector_Set4(&tex.emissive_factor, pTexture->emissive_factor[0], pTexture->emissive_factor[1], pTexture->emissive_factor[2], 1.0f);
-		rdVector_Set4(&tex.albedo_factor, pTexture->albedo_factor[0], pTexture->albedo_factor[1], pTexture->albedo_factor[2], pTexture->albedo_factor[3]);
-		tex.displacement_factor = pTexture->displacement_factor;
+		RD_SET_COLOR4(&tex.emissive_factor, pMaterialState->emissive);
+		RD_SET_COLOR4(&tex.albedo_factor, pMaterialState->albedo);
+		tex.displacement_factor = pMaterialState->displacement;
 	}
-	else
-	{
-		rdVector_Set4(&tex.emissive_factor, 0.0, 0.0, 0.0, 0.0);
-		rdVector_Set4(&tex.albedo_factor, 1.0, 1.0, 1.0, 1.0);
-		tex.displacement_factor = 0.0;
-	}
+	//else
+	//{
+	//	RD_SET_COLOR4(&tex.emissive_factor, 0xFF000000);
+	//	RD_SET_COLOR4(&tex.albedo_factor, 0xFFFFFFFF);
+	//	tex.displacement_factor = 0.0;
+	//}
 
 	glBindBuffer(GL_UNIFORM_BUFFER, material_ubo);
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(std3D_MaterialUniforms), &tex);
@@ -4436,6 +4432,7 @@ void std3D_SetMaterialState(std3D_worldStage* pStage, std3D_DrawCallState* pStat
 void std3D_SetLightingState(std3D_worldStage* pStage, std3D_DrawCallState* pState)
 {
 	glUniform1i(pStage->uniform_light_mode, pState->stateBits.lightMode);
+	glUniform1i(pStage->uniform_ao_flags, pState->lightingState.ambientFlags);
 
 	float r = ((pState->lightingState.ambientColor >> 20) & 0x3FF) / 255.0f;
 	float g = ((pState->lightingState.ambientColor >> 10) & 0x3FF) / 255.0f;
@@ -4484,12 +4481,11 @@ enum STD3D_DIRTYBIT
 {
 	STD3D_STATEBITS = 0x1,
 	STD3D_SHADER    = 0x2,
-	STD3D_CAPS      = 0x4,
-	STD3D_TRANSFORM = 0x8,
-	STD3D_RASTER    = 0x10,
-	STD3D_TEXTURE   = 0x20,
-	STD3D_FOG       = 0x40,
-	STD3D_LIGHTING  = 0x80,
+	STD3D_TRANSFORM = 0x4,
+	STD3D_RASTER    = 0x8,
+	STD3D_TEXTURE   = 0x10,
+	STD3D_FOG       = 0x20,
+	STD3D_LIGHTING  = 0x40,
 };
 
 void std3D_FlushDrawCallList(std3D_RenderPass* pRenderPass, std3D_DrawCallList* pList, std3D_SortFunc sortFunc, const char* debugName)
@@ -4558,8 +4554,6 @@ void std3D_FlushDrawCallList(std3D_RenderPass* pRenderPass, std3D_DrawCallList* 
 	std3D_SetLightingState(pStage, pState);	
 	std3D_SetTransformState(pStage, pState);
 	
-	glUniform1ui(pStage->uniform_renderCaps, pDrawCall->state.header.renderCaps);
-
 	int batchIndices = 0;
 	int indexOffset = 0;
 	for (int j = 0; j < pList->drawCallCount; j++)
@@ -4572,18 +4566,18 @@ void std3D_FlushDrawCallList(std3D_RenderPass* pRenderPass, std3D_DrawCallList* 
 		uint32_t dirtyBits = 0;
 		dirtyBits |= (lastShader != pDrawCall->shaderID) ? STD3D_SHADER : 0;
 		dirtyBits |= (last_tex != texid) ? STD3D_TEXTURE : 0;
-		dirtyBits |= (lastState.header.renderCaps != pDrawCall->state.header.renderCaps) ? STD3D_CAPS : 0;
 		dirtyBits |= (lastState.stateBits.data != pDrawCall->state.stateBits.data) ? STD3D_STATEBITS : 0; // todo: this probably triggers too many updates, make it more granular
 		dirtyBits |= (memcmp(&lastState.fogState, &pDrawCall->state.fogState, sizeof(std3D_FogState)) != 0) ? STD3D_FOG : 0;
 		dirtyBits |= (memcmp(&lastState.rasterState, &pDrawCall->state.rasterState, sizeof(std3D_RasterState)) != 0) ? STD3D_RASTER : 0;		
 		dirtyBits |= (memcmp(&lastState.textureState, &pDrawCall->state.textureState, sizeof(std3D_TextureState)) != 0) ? STD3D_TEXTURE : 0;
+		dirtyBits |= (memcmp(&lastState.materialState, &pDrawCall->state.materialState, sizeof(std3D_MaterialState)) != 0) ? STD3D_TEXTURE : 0;
 		dirtyBits |= (memcmp(&lastState.lightingState, &pDrawCall->state.lightingState, sizeof(std3D_LightingState)) != 0) ? STD3D_LIGHTING : 0;
 		dirtyBits |= (memcmp(&lastState.transformState, &pDrawCall->state.transformState, sizeof(std3D_TransformState)) != 0) ? STD3D_TRANSFORM : 0;
 
 		if (dirtyBits)
 		{
 			//glDrawArrays(std3D_PrimitiveForGeoMode(lastState.raster.geoMode), vertexOffset, batch_verts);
-			glDrawElements(std3D_PrimitiveForGeoMode(lastState.stateBits.geoMode), batchIndices, GL_UNSIGNED_SHORT, (void*)(indexOffset * sizeof(uint16_t)));
+			glDrawElements(std3D_PrimitiveForGeoMode(lastState.stateBits.geoMode + 1), batchIndices, GL_UNSIGNED_SHORT, (void*)(indexOffset * sizeof(uint16_t)));
 
 			if (lastShader != pDrawCall->shaderID)//dirtyBits & STD3D_SHADER)
 			{
@@ -4617,9 +4611,6 @@ void std3D_FlushDrawCallList(std3D_RenderPass* pRenderPass, std3D_DrawCallList* 
 			//if ((dirtyBits & STD3D_TRANSFORM)) // fixme: not working?
 				std3D_SetTransformState(pStage, pState);
 		
-			if ((dirtyBits & STD3D_CAPS))
-				glUniform1ui(pStage->uniform_renderCaps, pDrawCall->state.header.renderCaps);
-
 			// if the projection matrix changed then all lighting is invalid, rebuild clusters and assign lights
 			// perhaps all of this would be better if we just flushed the pipeline on matrix change instead
 			if (rdMatrix_Compare44(&lastState.transformState.proj, &pDrawCall->state.transformState.proj) != 0)
@@ -4645,16 +4636,13 @@ void std3D_FlushDrawCallList(std3D_RenderPass* pRenderPass, std3D_DrawCallList* 
 	}
 
 	if (batchIndices)
-		glDrawElements(std3D_PrimitiveForGeoMode(pDrawCall->state.stateBits.geoMode), batchIndices, GL_UNSIGNED_SHORT, (void*)(indexOffset * sizeof(uint16_t)));
+		glDrawElements(std3D_PrimitiveForGeoMode(pDrawCall->state.stateBits.geoMode + 1), batchIndices, GL_UNSIGNED_SHORT, (void*)(indexOffset * sizeof(uint16_t)));
 
 	std3D_popDebugGroup();
 }
 
 void std3D_DoSSAO()
 {
-	if (!jkPlayer_enableSSAO)
-		return;
-
 	std3D_pushDebugGroup("SSAO");
 
 	// downscale the depth buffer with lower precision
@@ -4747,11 +4735,12 @@ void std3D_FlushColorDrawCalls(std3D_RenderPass* pRenderPass)
 	std3D_popDebugGroup();
 }
 
-void std3D_FlushDeferred()
+void std3D_FlushDeferred(std3D_RenderPass* pRenderPass)
 {
 	std3D_pushDebugGroup("std3D_FlushDeferred");
 
-	std3D_DoSSAO();
+	if(pRenderPass->flags & RD_RENDERPASS_AMBIENT_OCCLUSION)
+		std3D_DoSSAO();
 
 	std3D_popDebugGroup();
 }
@@ -4817,6 +4806,7 @@ void std3D_FlushPostFX()
 void std3D_FlushDrawCalls()
 {
 	if (Main_bHeadless) return;
+	if (!has_initted) return;
 
 	std3D_pushDebugGroup("std3D_FlushDrawCalls");
 
@@ -4836,7 +4826,7 @@ void std3D_FlushDrawCalls()
 		std3D_FlushZDrawCalls(&std3D_renderPasses[j]);
 
 		// do opaque-only deferred stuff
-		std3D_FlushDeferred();
+		std3D_FlushDeferred(&std3D_renderPasses[j]);
 
 		// draw color passes
 		std3D_FlushColorDrawCalls(& std3D_renderPasses[j]);

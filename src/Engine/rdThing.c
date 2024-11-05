@@ -37,7 +37,7 @@ int rdThing_NewEntry(rdThing *thing, sithThing *parent)
 #else
     thing->desiredLightMode = RD_LIGHTMODE_GOURAUD;
 #endif
-    thing->desiredTexMode = RD_TEXTUREMODE_2_UNK;
+    thing->desiredTexMode = RD_TEXTUREMODE_PERSPECTIVE;
     thing->curGeoMode = RD_GEOMODE_TEXTURED;
 #ifdef RENDER_DROID2
 	thing->curLightMode = RD_LIGHTMODE_SUBSURFACE;
@@ -46,7 +46,7 @@ int rdThing_NewEntry(rdThing *thing, sithThing *parent)
 #else
 	thing->curLightMode = RD_LIGHTMODE_GOURAUD;
 #endif
-	thing->curTexMode = RD_TEXTUREMODE_2_UNK;
+	thing->curTexMode = RD_TEXTUREMODE_PERSPECTIVE;
     thing->parentSithThing = parent;
 #ifdef VERTEX_COLORS
 	thing->color.x = thing->color.y = thing->color.z = 1.0f;
