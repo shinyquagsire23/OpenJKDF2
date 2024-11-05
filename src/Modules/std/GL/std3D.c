@@ -4241,7 +4241,9 @@ void std3D_SetRasterState(std3D_worldStage* pStage, std3D_DrawCallState* pState)
 	else
 		glEnable(GL_CULL_FACE);
 
-	glFrontFace(pState->stateBits.cullMode == RD_CULL_MODE_CW_ONLY ? GL_CW : GL_CCW);
+	//glFrontFace(pState->stateBits.cullMode == RD_CULL_MODE_CW_ONLY ? GL_CW : GL_CCW);
+	glFrontFace(GL_CCW);
+	glCullFace(pState->stateBits.cullMode == RD_CULL_MODE_BACK ? GL_BACK : GL_FRONT);
 
 	glUniform1i(pStage->uniform_geo_mode, pState->stateBits.geoMode + 1);
 	glUniform1i(pStage->uniform_ditherMode, pState->stateBits.ditherMode);

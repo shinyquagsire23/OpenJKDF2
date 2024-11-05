@@ -1649,7 +1649,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
 	if ((face->type & RD_FF_DOUBLE_SIDED) != 0)
 		rdSetCullMode(RD_CULL_MODE_NONE);
 	else
-		rdSetCullMode(RD_CULL_MODE_CCW_ONLY);
+		rdSetCullMode(RD_CULL_MODE_BACK);
 
 	if (rdBeginPrimitive(RD_PRIMITIVE_TRIANGLE_FAN))
 	{

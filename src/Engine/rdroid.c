@@ -75,7 +75,7 @@ static rdPrimitiveType_t rdroid_curPrimitiveType = RD_PRIMITIVE_NONE;
 void rdResetRasterState()
 {
 	rdroid_stateBits.geoMode = RD_GEOMODE_TEXTURED;
-	rdroid_stateBits.cullMode = RD_CULL_MODE_CCW_ONLY;
+	rdroid_stateBits.cullMode = RD_CULL_MODE_BACK;
 
 	rdroid_stateBits.scissorMode = RD_SCISSOR_DISABLED;
 	rdroid_rasterState.scissor.x = rdroid_rasterState.scissor.y = 0;
