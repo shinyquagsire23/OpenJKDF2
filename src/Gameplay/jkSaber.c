@@ -29,7 +29,7 @@ float jkSaber_trailShutter = 50.0f;
 #endif
 
 #ifdef LIGHTSABER_MARKS
-extern sithThing* jkSaber_paDecalThings[256];
+extern sithThing* jkSaber_paDecalThings[64];
 extern int jkSaber_numDecalThings;
 #endif
 
@@ -601,7 +601,7 @@ void  jkSaber_UpdateCollision2(sithThing *pPlayerThing,rdVector3 *pSaberPos,rdVe
 // Added: passive (non-damaging) collision effects
 void jkSaber_SpawnBurn(jkPlayerInfo* pPlayerInfo, rdVector3* pPos, rdVector3* pHitNormal, sithSector* pSector, int sparkType)
 {
-	if (sithTime_curMs < pPlayerInfo->lastMarkSpawnMs + 50)
+	if (sithTime_curMs < pPlayerInfo->lastMarkSpawnMs + 20)
 	{
 		pPlayerInfo->saberCollideInfo.totalCollisionTime = 0;
 		return;
@@ -659,7 +659,7 @@ void jkSaber_SpawnBurn(jkPlayerInfo* pPlayerInfo, rdVector3* pPos, rdVector3* pH
 
 
 		// make sure we recycle things otherwise we risk running out of them frequently
-		int decalIdx = (jkSaber_numDecalThings++ % 256);
+		int decalIdx = (jkSaber_numDecalThings++ % 64);
 		if (jkSaber_paDecalThings[decalIdx])
 		{
 			sithThing_Destroy(jkSaber_paDecalThings[decalIdx]);

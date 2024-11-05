@@ -116,7 +116,7 @@ float jkPlayer_aMultiParams[0x100];
 #endif
 
 #ifdef LIGHTSABER_MARKS
-sithThing* jkSaber_paDecalThings[256];
+sithThing* jkSaber_paDecalThings[64];
 int jkSaber_numDecalThings = 0;
 #endif
 
