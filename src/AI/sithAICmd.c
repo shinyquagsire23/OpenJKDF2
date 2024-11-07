@@ -991,7 +991,7 @@ int sithAICmd_LookForTarget(sithActor *actor, sithAIClassEntry *aiclass, sithAct
                 psVar3 = sithAICmd_NearestPlayer(actor);
             }
             actor->pDistractor = psVar3;
-            if ((psVar3->thingflags & 0x202) == 0) 
+            if ((psVar3->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0)
             {
                 sithAI_sub_4EAD60(actor);
                 if (actor->field_1F4 == 0) 
@@ -1664,7 +1664,7 @@ int sithAICmd_LookForOpposingTarget(sithActor *pActor, sithAIClassEntry *pAiclas
             psVar3 = sithAI_FUN_00539a60(pActor);
         }
         pActor->pDistractor = psVar3;
-        if ((psVar3 != (sithThing *)0x0) && ((psVar3->thingflags & 0x202) == 0))
+        if ((psVar3 != (sithThing *)0x0) && ((psVar3->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0))
         {
             sithAI_sub_4EAD60(pActor);
             if (pActor->field_1F4 == 0) {

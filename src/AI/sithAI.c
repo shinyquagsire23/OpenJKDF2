@@ -1746,7 +1746,7 @@ int sithAI_FUN_0053a520(sithActor *pActor,float param_2,float param_3,float para
     if (g_debugmodeFlags & 0x80) {
         return 0;
     }
-    if (thing->thingflags & 0x202) {
+    if (thing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) {
         return 0;
     }
     if (thing->sector && thing->sector->flags & SITH_SECTOR_UNDERWATER) // Added: thing->sector
@@ -1834,7 +1834,7 @@ int sithAI_Leap(sithActor *pActor,float minDist,float maxDist,float minDot,int p
     if (g_debugmodeFlags & 0x80) {
         return 0;
     }
-    if (thing->thingflags & 0x202) {
+    if (thing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) {
         return 0;
     }
     if (thing->sector && thing->sector->flags & SITH_SECTOR_UNDERWATER) // Added: thing->sector
@@ -1942,7 +1942,7 @@ sithThing* sithAI_FUN_00539a60(sithActor *pThing)
             {
                 arg8 = &sithWorld_pCurrentWorld->things[iVar5];
                 if (((sithAI_dword_84DE74 & 1 << (arg8->type & 0x1f)) != 0) &&
-                ((arg8->thingflags & 0x80202) == 0)) 
+                ((arg8->thingflags & (SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0))
                 {
                     if (arg8->thingtype == 2) 
                     {
