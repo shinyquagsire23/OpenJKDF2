@@ -90,6 +90,8 @@ void rdResetRasterState()
 void rdResetBlendState()
 {
 	rdroid_stateBits.blend = 0;
+	rdroid_stateBits.srdBlend = RD_BLEND_SRCALPHA;
+	rdroid_stateBits.dstBlend = RD_BLEND_INVSRCALPHA;
 }
 
 void rdResetDepthStencilState()
