@@ -34,19 +34,41 @@ void main(void)
 		vec2 sourceSize = textureSize(tex, 0).xy;
 		
 		vec4 pixel00 = sampled_color;
-		//vec4 pixel01 = texture(tex, uv + vec2(0, -1.0 / sourceSize.y));
-		//vec4 pixel11 = texture(tex, uv + vec2(1.0 / sourceSize.x, -1.0 / sourceSize.y));
-		//vec4 pixel10 = texture(tex, uv + vec2(1.0 / sourceSize.x, 0));
-		vec4 pixel01 = texture(tex, uv - vec2(1.0 / sourceSize.x, 0));
-		vec4 pixel11 = texture(tex, uv + vec2(1.0 / sourceSize.x, 0));
-		vec4 pixel10 = texture(tex, uv + vec2(2.0 / sourceSize.x, 0));
+		vec4 pixel01, pixel11, pixel10;
 
+		if(param2 > 1.0) // 4x1
+		{
+			vec4 pixel01 = texture(tex, uv - vec2(1.0 / sourceSize.x, 0.0));
+			vec4 pixel11 = texture(tex, uv + vec2(1.0 / sourceSize.x, 0.0));
+			vec4 pixel10 = texture(tex, uv + vec2(2.0 / sourceSize.x, 0.0));
+		}
+		else // 2x2
+		{
+			pixel01 = texture(tex, uv + vec2(0.0,                -1.0 / sourceSize.y));
+			pixel11 = texture(tex, uv + vec2(1.0 / sourceSize.x, -1.0 / sourceSize.y));
+			pixel10 = texture(tex, uv + vec2(1.0 / sourceSize.x,  0.0));
+		}	
+	
 		vec4 diff0 = clamp(pixel01 - pixel00, -32.0/255.0, 32.0/255.0);
 		vec4 diff1 = clamp(pixel11 - pixel00, -32.0/255.0, 32.0/255.0);
 		vec4 diff2 = clamp(pixel10 - pixel00, -32.0/255.0, 32.0/255.0);
 		
 		sampled_color = (pixel00 + (diff0 + diff1 + diff2) / 3.0);
 	}
+
+	//vec2 invPixelSize = 1.0 / iResolution.xy;
+	//
+	//sampled_color = vec4(0.0);
+	//sampled_color += 0.37487566 * texture(tex, uv + vec2(-0.75777,-0.75777)*invPixelSize);
+	//sampled_color += 0.37487566 * texture(tex, uv + vec2(0.75777,-0.75777)*invPixelSize);
+	//sampled_color += 0.37487566 * texture(tex, uv + vec2(0.75777,0.75777)*invPixelSize);
+	//sampled_color += 0.37487566 * texture(tex, uv + vec2(-0.75777,0.75777)*invPixelSize);
+ 	//
+	//sampled_color += -0.12487566 * texture(tex, uv + vec2(-2.907,0.0)*invPixelSize);
+	//sampled_color += -0.12487566 * texture(tex, uv + vec2(2.907,0.0)*invPixelSize);
+	//sampled_color += -0.12487566 * texture(tex, uv + vec2(0.0,-2.907)*invPixelSize);
+	//sampled_color += -0.12487566 * texture(tex, uv + vec2(0.0,2.907)*invPixelSize);    
+
 
 #ifdef RENDER_DROID2
 	sampled_color.rgb += colorEffects_add.rgb;
