@@ -36,7 +36,7 @@ enum RD_DIRTYBIT
 };
 
 static rdDirtyBit rdroid_dirtyBits = RD_DIRTYBIT_ALL;
-static rdDirtyBit rdroid_matrixBit[3] =
+static const rdDirtyBit rdroid_matrixBit[3] =
 {
 	RD_DIRTYBIT_MODEL,
 	RD_DIRTYBIT_VIEW,
@@ -58,7 +58,7 @@ static std3D_TextureState      rdroid_textureState;
 static std3D_LightingState     rdroid_lightingState;
 
 static rdMatrixMode_t rdroid_curMatrixMode = RD_MATRIX_MODEL;
-static rdMatrix44     rdroid_matrices[3];
+static rdMatrix44     rdroid_matrices[RD_MATRIX_TYPES];
 static rdMatrix44     rdroid_curCamMatrix;
 static rdMatrix44     rdroid_curViewProj;
 static rdMatrix44     rdroid_curProjInv;
