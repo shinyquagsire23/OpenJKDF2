@@ -894,7 +894,7 @@ void rdSetCullMode(rdCullMode_t mode)
 
 void rdAlphaTestFunction(rdCompare_t mode)
 {
-	// todo
+	rdroid_stateBits.alphaTest = mode;
 }
 
 void rdSetAlphaTestReference(uint8_t ref)
