@@ -356,7 +356,7 @@ void jkPlayer_Startup()
     jkPlayer_InitThings();
     _memcpy(&jkSaber_rotateMat, &rdroid_identMatrix34, sizeof(jkSaber_rotateMat));
 #ifdef LIGHTSABER_MARKS
-	memset(jkSaber_paDecalThings, 0, sizeof(sithThing*) * 256);
+	memset(jkSaber_paDecalThings, 0, sizeof(sithThing*) * 64);
 #endif
 }
 
