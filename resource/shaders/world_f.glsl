@@ -1111,7 +1111,7 @@ void main(void)
 	#endif
 		
 	vec4 shadows = vec4(0.0, 0.0, 0.0, 1.0);
-	if (/*(aoFlags & 0x1) == 0x1 &&*/ numOccluders > 0u)
+	if ((aoFlags & 0x1) == 0x1 && numOccluders > 0u)
 		shadows = CalculateIndirectShadows(bucket_index, f_coord.xyz, surfaceNormals);
 
 	vec3 ao = vec3(shadows.w * 0.8 + 0.2); // remap so we don't overdarken

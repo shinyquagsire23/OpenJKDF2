@@ -1041,6 +1041,11 @@ void rdAddDecal(rdDecal* decal, rdMatrix34* modelMat, rdVector3* color, rdVector
 	std3D_DrawDecal(sith_tex_sel->texture_struct[0], tex2_arr_sel, scale, &decalMatrix, color, decal->flags, angleFade);
 }
 
+void rdAmbientFlags(uint32_t flags)
+{
+	rdroid_lightingState.ambientFlags = flags;
+}
+
 void rdAmbientLight(float r, float g, float b)
 {
 	uint32_t ir = stdMath_ClampInt(r * 255, 0, 1023);

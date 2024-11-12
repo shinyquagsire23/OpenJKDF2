@@ -3189,6 +3189,7 @@ int std3D_AddToTextureCache(stdVBuffer** vbuf, int numMips, rdDDrawSurface *text
     width = (*vbuf)->format.width;
     height = (*vbuf)->format.height;
 
+	glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, image_texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
