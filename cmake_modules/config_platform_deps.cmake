@@ -271,7 +271,11 @@ if(TARGET_USE_GAMENETWORKINGSOCKETS)
     set(GNS_PROTOC_HACK_ZLIB ${GameNetworkingSockets_ROOT}/src/.copied_hack)
     set(GNS_PROTOC_HACK_ZLIB_DIR ${GameNetworkingSockets_ROOT}/src)
     set(GNS_PROTOC_HACK_ZLIB_DIR_2 ${Protobuf_ROOT}/lib)
-    set(GNS_PROTOC_HACK_ZLIB_DIR_3 ${Protoc_ROOT}/lib)
+    if(TARGET_LINUX)
+        set(GNS_PROTOC_HACK_ZLIB_DIR_3 ${Protobuf_ROOT}/lib) # HACK
+    else()
+        set(GNS_PROTOC_HACK_ZLIB_DIR_3 ${Protoc_ROOT}/lib)
+    endif()
     set(GNS_PROTOC_HACK_ZLIB_WILDCARD ${GameNetworkingSockets_ROOT}/src/${CMAKE_SHARED_LIBRARY_PREFIX}${ZLIB_HOST_LIBRARIES}${CMAKE_SHARED_LIBRARY_SUFFIX})
 
     if(PLAT_MSVC)
@@ -296,7 +300,7 @@ if(TARGET_USE_GAMENETWORKINGSOCKETS)
                            COMMAND ${CMAKE_COMMAND} -E copy "${HACK_ZLIB_SRC_DIR}/*.so" "${GNS_PROTOC_HACK_ZLIB_DIR_2}"
                            COMMAND ${CMAKE_COMMAND} -E copy "${HACK_ZLIB_SRC_DIR}/*.dylib" "${GNS_PROTOC_HACK_ZLIB_DIR_3}"
                            COMMAND ${CMAKE_COMMAND} -E copy "${HACK_ZLIB_SRC_DIR}/*.dll" "${GNS_PROTOC_HACK_ZLIB_DIR_3}"
-                           COMMAND ${CMAKE_COMMAND} -E copy "${HACK_ZLIB_SRC_DIR}/*.so" "${GNS_PROTOC_HACK_ZLIB_DIR_3}"
+                           COMMAND ${CMAKE_COMMAND} -E copy "${HACK_ZLIB_SRC_DIR}/*.so" "${GNS_PROTOC_HACK_ZLIB_DIR_}"
                            COMMAND ${CMAKE_COMMAND} -E touch "${GNS_PROTOC_HACK_ZLIB}"
                            )
     endif()
