@@ -54,7 +54,7 @@ jobs:
           # libsdl2-dev libsdl2-mixer-dev libopenal-dev libglew-dev libprotobuf-dev protobuf-compiler
           sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix &&
           sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix &&
-          sudo pip3 --break-system-packages install cogapp
+          sudo pip3 install --break-system-packages cogapp
       - name: Generate CMake Build System
         run: |
           cmake --toolchain cmake_modules/toolchain_mingw.cmake \

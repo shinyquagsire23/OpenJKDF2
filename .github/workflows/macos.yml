@@ -22,7 +22,7 @@ jobs:
           brew unlink python3
           brew upgrade && brew install --overwrite python3
           brew install cmake make imagemagick
-          pip3 --break-system-packages install cogapp generate-iconset
+          pip3 install --break-system-packages cogapp generate-iconset
           brew install openal-soft sdl2 sdl2_mixer glew libmodplug libpng
           brew install openssl@3 protobuf
     - name: cmake
