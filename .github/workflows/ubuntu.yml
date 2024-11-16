@@ -28,7 +28,7 @@ jobs:
           sudo apt-get install -y build-essential cmake make clang python3 python3-pip bison imagemagick zsh \
                                   libgtk-3-dev libsdl2-dev libsdl2-mixer-dev libopenal-dev libglew-dev libssl-dev libprotobuf-dev libpng-dev libcurl4-openssl-dev \
                                   protobuf-compiler &&
-          sudo pip3 install --break-system-packages cogapp
+          sudo pip3 install cogapp
       - name: Generate CMake Build System
         run: cmake -DCMAKE_BUILD_TYPE=Debug -B "$OPENJKDF2_BUILD_DIR"
       - name: Make
