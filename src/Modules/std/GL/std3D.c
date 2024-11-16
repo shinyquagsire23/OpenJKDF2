@@ -356,23 +356,17 @@ typedef struct std3D_DrawCallList
 	D3DVERTEX      drawCallVertices[STD3D_MAX_DRAW_CALL_VERTS];
 } std3D_DrawCallList;
 
-// todo: z state stuff
+// todo/fixme: we're not currently handling viewport changes mid-draw
 typedef struct std3D_RenderPass
 {
-	std3D_DrawCallList drawCallLists[DRAW_LIST_COUNT];
-
-	// todo/fixme: we're not currently handling viewport changes mid-draw
-	rdMatrix44 oldProj; // keep track of the global projection to avoid redundant cluster building if the matrix doesn't change over the course of several frames
-
-	char name[32];
+	char                name[32];
 	rdRenderPassFlags_t flags;
-	rdVector2 depthRange;
-
-	int       clustersDirty;       // clusters need rebuilding/refilling
-	int       clusterFrustumFrame; // current frame for clusters, any cluster not matching will have its bounds updated
-
-	// each render pass gets its own cluster state to avoid recomputing the cluster bounds every time the projection changes
-	std3D_Cluster clusters[CLUSTER_GRID_TOTAL_SIZE];
+	rdVector2           depthRange; // todo: move to draw call render state
+	std3D_DrawCallList  drawCallLists[DRAW_LIST_COUNT];
+	rdMatrix44          oldProj; // keep track of the global projection to avoid redundant cluster building if the matrix doesn't change over the course of several frames
+	int                 clustersDirty;       // clusters need rebuilding/refilling
+	int                 clusterFrustumFrame; // current frame for clusters, any cluster not matching will have its bounds updated
+	std3D_Cluster       clusters[CLUSTER_GRID_TOTAL_SIZE]; // each render pass gets its own cluster state to avoid recomputing the cluster bounds every time the projection changes
 } std3D_RenderPass;
 
 // todo: likely better to just swap to a BeginRenderPass/EndRenderPass in rdroid and call flush in EndRenderPass so we can have as many as we want
