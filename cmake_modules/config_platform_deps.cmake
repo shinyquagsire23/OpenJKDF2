@@ -51,7 +51,9 @@ if(NOT FreeGLUT_FOUND OR CMAKE_CROSSCOMPILING)
 endif()
 
 set(GLEW_USE_STATIC_LIBS TRUE)
-find_package(GLEW 2.2.0)
+if(NOT CMAKE_CROSSCOMPILING)
+    find_package(GLEW 2.2.0)
+endif()
 if((NOT GLEW_FOUND OR CMAKE_CROSSCOMPILING) AND NOT PLAT_WASM)
     message(STATUS "Going to build “GLEW 2.2.0” from Git module")
     include(build_glew)
@@ -269,6 +271,7 @@ if(TARGET_USE_GAMENETWORKINGSOCKETS)
     set(GNS_PROTOC_HACK_ZLIB ${GameNetworkingSockets_ROOT}/src/.copied_hack)
     set(GNS_PROTOC_HACK_ZLIB_DIR ${GameNetworkingSockets_ROOT}/src)
     set(GNS_PROTOC_HACK_ZLIB_DIR_2 ${Protobuf_ROOT}/lib)
+    set(GNS_PROTOC_HACK_ZLIB_DIR_3 ${Protoc_ROOT}/lib)
     set(GNS_PROTOC_HACK_ZLIB_WILDCARD ${GameNetworkingSockets_ROOT}/src/${CMAKE_SHARED_LIBRARY_PREFIX}${ZLIB_HOST_LIBRARIES}${CMAKE_SHARED_LIBRARY_SUFFIX})
 
     if(PLAT_MSVC)
@@ -291,6 +294,9 @@ if(TARGET_USE_GAMENETWORKINGSOCKETS)
                            COMMAND ${CMAKE_COMMAND} -E copy "${HACK_ZLIB_SRC_DIR}/*.dylib" "${GNS_PROTOC_HACK_ZLIB_DIR_2}"
                            COMMAND ${CMAKE_COMMAND} -E copy "${HACK_ZLIB_SRC_DIR}/*.dll" "${GNS_PROTOC_HACK_ZLIB_DIR_2}"
                            COMMAND ${CMAKE_COMMAND} -E copy "${HACK_ZLIB_SRC_DIR}/*.so" "${GNS_PROTOC_HACK_ZLIB_DIR_2}"
+                           COMMAND ${CMAKE_COMMAND} -E copy "${HACK_ZLIB_SRC_DIR}/*.dylib" "${GNS_PROTOC_HACK_ZLIB_DIR_3}"
+                           COMMAND ${CMAKE_COMMAND} -E copy "${HACK_ZLIB_SRC_DIR}/*.dll" "${GNS_PROTOC_HACK_ZLIB_DIR_3}"
+                           COMMAND ${CMAKE_COMMAND} -E copy "${HACK_ZLIB_SRC_DIR}/*.so" "${GNS_PROTOC_HACK_ZLIB_DIR_3}"
                            COMMAND ${CMAKE_COMMAND} -E touch "${GNS_PROTOC_HACK_ZLIB}"
                            )
     endif()
