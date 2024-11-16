@@ -599,7 +599,10 @@ int rdBeginPrimitive(rdPrimitiveType_t type)
 {
 	// fail if we're already building a primitive
 	if (rdroid_curPrimitiveType != RD_PRIMITIVE_NONE)
+	{
+		rdroid_pHS->errorPrint("rdBeginPrimitive: called twice. Missing rdEndPrimitive?\n");
 		return 0;
+	}
 
 	rdroid_vertexCacheNum = 0;
 	rdroid_curPrimitiveType = type;
@@ -610,22 +613,22 @@ extern void std3D_AddDrawCall(rdPrimitiveType_t type, std3D_DrawCallState* pDraw
 
 void rdEndPrimitive()
 {
-	if(rdroid_vertexCacheNum == 0)
-		return;
+	if (rdroid_vertexCacheNum > 0)
+	{
+		rdUpdateDirtyState();
 
-	rdUpdateDirtyState();
-
-	std3D_DrawCallState state;
-	memcpy(&state.header,         &rdroid_dcHeader,       sizeof(std3D_DrawCallHeader));
-	memcpy(&state.stateBits,      &rdroid_stateBits,      sizeof(std3D_DrawCallStateBits));
-	memcpy(&state.transformState, &rdroid_transformState, sizeof(std3D_TransformState));
-	memcpy(&state.rasterState,    &rdroid_rasterState,    sizeof(std3D_RasterState));
-	memcpy(&state.fogState,       &rdroid_fogState,       sizeof(std3D_FogState));
-	memcpy(&state.materialState,  &rdroid_materialState,  sizeof(std3D_MaterialState));
-	memcpy(&state.textureState,   &rdroid_textureState,   sizeof(std3D_TextureState));
-	memcpy(&state.lightingState,  &rdroid_lightingState,  sizeof(std3D_LightingState));
+		std3D_DrawCallState state;
+		memcpy(&state.header,         &rdroid_dcHeader,       sizeof(std3D_DrawCallHeader));
+		memcpy(&state.stateBits,      &rdroid_stateBits,      sizeof(std3D_DrawCallStateBits));
+		memcpy(&state.transformState, &rdroid_transformState, sizeof(std3D_TransformState));
+		memcpy(&state.rasterState,    &rdroid_rasterState,    sizeof(std3D_RasterState));
+		memcpy(&state.fogState,       &rdroid_fogState,       sizeof(std3D_FogState));
+		memcpy(&state.materialState,  &rdroid_materialState,  sizeof(std3D_MaterialState));
+		memcpy(&state.textureState,   &rdroid_textureState,   sizeof(std3D_TextureState));
+		memcpy(&state.lightingState,  &rdroid_lightingState,  sizeof(std3D_LightingState));
 	
-	std3D_AddDrawCall(rdroid_curPrimitiveType, &state, rdroid_vertexCache, rdroid_vertexCacheNum);
+		std3D_AddDrawCall(rdroid_curPrimitiveType, &state, rdroid_vertexCache, rdroid_vertexCacheNum);
+	}
 
 	rdroid_vertexCacheNum = 0;
 	rdroid_vertexColorState = 0xFFFFFFFF;
@@ -638,8 +641,7 @@ void rdVertex3f(float x, float y, float z)
 {
 	if(rdroid_vertexCacheNum >= 24)
 	{
-		// todo: real error callback hooks
-		printf("too many vertices for primitive\n");
+		rdroid_pHS->errorPrint("too many vertices for primitive\n");
 		return;
 	}
 
@@ -694,6 +696,7 @@ void rdTexCoord2i(float u, float v)
 	}
 	else
 	{
+		rdroid_pHS->warningPrint("rdTexCoord2i: called without a texture bound, using default size of 32 pixels.\n");
 		rdroid_vertexTexCoordState.x = (float)u / 32.0f;
 		rdroid_vertexTexCoordState.y = (float)v / 32.0f;
 	}
@@ -754,7 +757,7 @@ int rdBindTexture(rdTexture* pTexture)
 int rdBindMaterial(rdMaterial* pMaterial, int cel)
 {
 	if(!pMaterial)
-		return 0;
+		return 0; // todo: do something when it's null? maybe bind default?
 
 	int alpha_is_opaque = 0;
 
@@ -846,6 +849,7 @@ void rdTexOffseti(float u, float v)
 	}
 	else
 	{
+		rdroid_pHS->warningPrint("rdTexOffseti: called without a texture bound, using default size of 32 pixels.\n");
 		rdroid_textureState.texOffset.x = (float)u / 32.0f;
 		rdroid_textureState.texOffset.y = (float)v / 32.0f;
 	}
