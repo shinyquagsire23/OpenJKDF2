@@ -42,6 +42,8 @@ macro(postcompile_macos)
 
         COMMAND install_name_tool -change ${OPENSSL_CRYPTO_LIBRARY} @executable_path/libcrypto.dylib ${BUNDLE}/Contents/MacOS/libGameNetworkingSockets.dylib
         COMMAND install_name_tool -change ${OPENSSL_CRYPTO_LIBRARY} @executable_path/libcrypto.dylib ${BUNDLE}/Contents/MacOS/${BIN_NAME}
+        COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/openssl@3/lib/libcrypto.3.dylib @executable_path/libcrypto.dylib ${BUNDLE}/Contents/MacOS/libGameNetworkingSockets.dylib
+        COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/openssl@3/lib/libcrypto.3.dylib @executable_path/libcrypto.dylib ${BUNDLE}/Contents/MacOS/${BIN_NAME}
         COMMAND cp ${OPENSSL_CRYPTO_LIBRARY} ${BUNDLE}/Contents/MacOS/libcrypto.dylib
 
         COMMAND chmod 774 ${BUNDLE}/Contents/MacOS/*.dylib
