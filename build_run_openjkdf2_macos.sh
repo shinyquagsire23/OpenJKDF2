@@ -13,7 +13,6 @@ export OPENJKDF2_RELEASE_COMMIT_SHORT=$(git rev-parse --short=8 HEAD)
 mkdir -p build_darwin64 && cd build_darwin64
 
 export PKG_CONFIG_PATH_OLD=$PKG_CONFIG_PATH
-export PKG_CONFIG_PATH=$PKG_CONFIG_PATH_OLD:/opt/homebrew/opt/openssl@3/lib/pkgconfig
 TARGET_BUILD_TESTS=1 DEBUG_QOL_CHEATS=1 OPENJKDF2_NO_ASAN=0 cmake .. &&
 TARGET_BUILD_TESTS=1 DEBUG_QOL_CHEATS=1 OPENJKDF2_NO_ASAN=0 make -j10 &&
 cd .. &&

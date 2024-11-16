@@ -85,7 +85,8 @@ macro(plat_extra_deps)
     find_package(PkgConfig REQUIRED)
 
     if(TARGET_USE_GAMENETWORKINGSOCKETS)
-        find_package(OpenSSL REQUIRED)
+        find_package(OpenSSL REQUIRED Crypto)
         target_link_libraries(sith_engine PUBLIC OpenSSL::Crypto)
+        
     endif()
 endmacro()
