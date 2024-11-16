@@ -294,7 +294,7 @@ void sithCamera_FollowFocus(sithCamera *cam)
             rdMatrix_PostTranslate34(&out, &focusThing->position);
             if ( focusThing->type == SITH_THING_ACTOR || focusThing->type == SITH_THING_PLAYER )
                 rdMatrix_PostTranslate34(&out, &focusThing->actorParams.eyeOffset);
-            cam->sector = sithCamera_create_unk_struct(0, focusThing->sector, &focusThing->position, &out.scale, 0.02, 8704);
+            cam->sector = sithCamera_create_unk_struct(0, focusThing->sector, &focusThing->position, &out.scale, 0.02, RAYCAST_2000 | RAYCAST_200);
             rdVector_Copy3(&v84, &out.scale);
             rdMatrix_Copy34(&cam->viewMat, &out);
 
@@ -306,7 +306,7 @@ void sithCamera_FollowFocus(sithCamera *cam)
             rdMatrix_PreTranslate34(&out, &sithCamera_trans);
             rdMatrix_PreTranslate34(&cam->viewMat, &cam->collisionOffset);
             rdMatrix_LookAt(&cam->viewMat, &cam->viewMat.scale, &out.scale, 0.0);
-            cam->sector = sithCamera_create_unk_struct(0, cam->sector, &v84, &cam->viewMat.scale, 0.02, 8704);
+            cam->sector = sithCamera_create_unk_struct(0, cam->sector, &v84, &cam->viewMat.scale, 0.02, RAYCAST_2000 | RAYCAST_200);
             break;
         case 32:
             rdMatrix_TransformVector34(&a1, &sithCamera_trans2, &sithCamera_focusMat);
@@ -314,7 +314,7 @@ void sithCamera_FollowFocus(sithCamera *cam)
             rdVector_Sub3(&v2, &focusThing->position, &v2);
             rdVector_Add3Acc(&a1, &v2);
             rdMatrix_LookAt(&cam->viewMat, &a1, &v2, 0.0);
-            cam->sector = sithCamera_create_unk_struct(0, focusThing->sector, &focusThing->position, &cam->viewMat.scale, 0.02, 8704);
+            cam->sector = sithCamera_create_unk_struct(0, focusThing->sector, &focusThing->position, &cam->viewMat.scale, 0.02, RAYCAST_2000 | RAYCAST_200);
             rot.x = 0.0;
             rot.y = sithTime_deltaSeconds * 8.0;
             rot.z = 0.0;
@@ -340,7 +340,7 @@ void sithCamera_FollowFocus(sithCamera *cam)
             rdVector_Scale3(&cam->viewMat.scale, &sithCamera_trans3, 0.2);
 
             rdMatrix_PostTranslate34(&cam->viewMat, &focusThing->position);
-            cam->sector = sithCamera_create_unk_struct(0, focusThing->sector, &focusThing->position, &cam->viewMat.scale, 0.02, 8704);
+            cam->sector = sithCamera_create_unk_struct(0, focusThing->sector, &focusThing->position, &cam->viewMat.scale, 0.02, RAYCAST_2000 | RAYCAST_200);
             break;
         case 128:
             rdMatrix_Copy34(&cam->viewMat, &sithCamera_viewMat);
