@@ -271,7 +271,7 @@ if(TARGET_USE_GAMENETWORKINGSOCKETS)
     set(GNS_PROTOC_HACK_ZLIB ${GameNetworkingSockets_ROOT}/src/.copied_hack)
     set(GNS_PROTOC_HACK_ZLIB_DIR ${GameNetworkingSockets_ROOT}/src)
     set(GNS_PROTOC_HACK_ZLIB_DIR_2 ${Protobuf_ROOT}/lib)
-    if(TARGET_LINUX OR NOT Protoc_ROOT)
+    if(NOT CMAKE_CROSSCOMPILING OR NOT Protoc_ROOT)
         set(GNS_PROTOC_HACK_ZLIB_DIR_3 ${Protobuf_ROOT}/lib) # HACK
     else()
         set(GNS_PROTOC_HACK_ZLIB_DIR_3 ${Protoc_ROOT}/lib)
