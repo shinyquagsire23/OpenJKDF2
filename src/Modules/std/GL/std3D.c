@@ -4185,7 +4185,7 @@ void std3D_UpdateSharedUniforms()
 	uniforms.fade = rdroid_curColorEffects.fade;
 	////
 
-	uniforms.lightMult = jkGuiBuildMulti_bRendering ? 0.85 : (jkPlayer_enableBloom ? 0.9 : 0.85);
+	uniforms.lightMult = 1.0;//jkGuiBuildMulti_bRendering ? 0.85 : (jkPlayer_enableBloom ? 0.9 : 0.85);
 	
 	rdVector_Set2(&uniforms.clusterTileSizes, (float)tileSizeX, (float)tileSizeY);
 	rdVector_Set2(&uniforms.clusterScaleBias, sliceScalingFactor, sliceBiasFactor);	
