@@ -18,6 +18,10 @@
 #include "General/stdString.h"
 #include "General/stdMath.h"
 
+#ifdef RAGDOLLS
+#include "Primitives/rdRagdoll.h"
+#endif
+
 #include "jk.h"
 
 #ifdef LIGHTSABER_TRAILS
@@ -468,6 +472,98 @@ void jkSaber_UpdateLength(sithThing *thing)
     }
 }
 
+
+#ifdef RAGDOLLS
+#include "Engine/sithIntersect.h"
+void jkSaber_AmputateRagdoll(sithThing* resultThing, rdMesh* mesh, rdVector3* pHitNorm, sithThing* pPlayer, rdVector3* pSaberPos, rdVector3* pSaberDir, float saberLen, float range)
+{
+	// no mesh, try to find one
+	if (!mesh)
+	{
+		float tmp = 3.4e+38;
+		rdVector3 tmpVec;
+		rdVector_Zero3(&tmpVec); // Added
+		int iVar11 = sithIntersect_TreeIntersection(resultThing->rdthing.model3->hierarchyNodes, pSaberPos, pSaberDir, saberLen, range, resultThing, &tmp, &tmpVec, &mesh, 0);
+		if (iVar11 == 0)
+			return;
+	}
+
+	// if the thing died and ragdolled, see if a limb should be lost
+	if (resultThing->moveType == SITH_MT_RAGDOLL)
+	{
+		rdRagdoll* pRagdoll = resultThing->rdthing.pRagdoll;
+		if (pRagdoll && mesh)
+		{
+			// find the hierarchy node for the mesh
+			rdHierarchyNode* pFoundNode = NULL;
+			for (int node = 0; node < resultThing->rdthing.model3->numHierarchyNodes; ++node)
+			{
+				rdHierarchyNode* pNode = &resultThing->rdthing.model3->hierarchyNodes[node];
+				if (pNode->meshIdx == mesh->mesh_num)
+				{
+					pFoundNode = pNode;
+					break;
+				}
+			}
+
+			if (pFoundNode && pFoundNode->parent && pFoundNode->skelJoint >= 0)
+			{
+				if (!resultThing->rdthing.amputatedJoints[pFoundNode->idx])
+				{
+					// disconnect all distance constraints to the parent joint
+					for (int constraint = 0; constraint < pRagdoll->pSkel->numDist; ++constraint)
+					{
+						rdRagdollDistConstraint* pConstraint = &pRagdoll->pSkel->paDistConstraints[constraint];
+
+						rdRagdollVert* pVert0 = &pRagdoll->pSkel->paVerts[pConstraint->vert[0]];
+						rdRagdollVert* pVert1 = &pRagdoll->pSkel->paVerts[pConstraint->vert[1]];
+
+						if (pVert0->node == pFoundNode->parent->idx
+							|| pVert1->node == pFoundNode->parent->idx)
+						{
+							pRagdoll->paDisabledDistConstraints[constraint] = 1;
+						}
+					}
+
+					// disconnect all rotation constraints to the parent joint
+					for (int constraint = 0; constraint < pRagdoll->pSkel->numRot; ++constraint)
+					{
+						rdRagdollRotConstraint* pConstraint = &pRagdoll->pSkel->paRotConstraints[constraint];
+						for (int tri = 0; tri < 2; ++tri)
+						{
+							rdRagdollTri* pTri = &pRagdoll->pSkel->paTris[pConstraint->tri[tri]];		
+							for (int v = 0; v < 3; ++v)
+							{
+								if(pTri->vert[v] == -1)
+									continue;
+								rdRagdollVert* pVert = &pRagdoll->pSkel->paVerts[pTri->vert[v]];
+								if (pVert->node == pFoundNode->parent->idx)
+								{
+									pRagdoll->paDisabledRotConstraints[constraint] = 1;
+									break;
+								}
+							}
+						}
+					}
+
+					// kick the joint
+					float invMass = (float)pRagdoll->numParticles / resultThing->physicsParams.mass;
+					rdRagdollJoint* pJoint = &pRagdoll->pSkel->paJoints[pFoundNode->skelJoint];
+					for (int v = 0; v < 3; ++v)
+					{
+						if(pJoint->vert[v] >= 0)
+						{
+							rdRagdollParticle* pParticle = &pRagdoll->paParticles[pJoint->vert[v]];
+							rdVector_MultAcc3(&pParticle->forces, pHitNorm, invMass);
+						}
+					}
+				}
+			}
+		}
+	}
+}
+#endif
+
 // MOTS added: split into its own func
 void  jkSaber_UpdateCollision2(sithThing *pPlayerThing,rdVector3 *pSaberPos,rdVector3 *pSaberDir,jkSaberCollide *pCollideInfo)
 {
@@ -483,96 +579,97 @@ void  jkSaber_UpdateCollision2(sithThing *pPlayerThing,rdVector3 *pSaberPos,rdVe
     pSector = sithCollision_GetSectorLookAt(pPlayerThing->sector,&pPlayerThing->position,pSaberPos,0.0);
     if (!pSector) {
         return;
-    }
-    sithCollision_SearchRadiusForThings(pSector,pPlayerThing,pSaberPos,pSaberDir,pCollideInfo->bladeLength,0.0,0);
-    
+	}
+	sithCollision_SearchRadiusForThings(pSector, pPlayerThing, pSaberPos, pSaberDir, pCollideInfo->bladeLength, 0.0, 0);
 
-    sithSector* pSectorIter = pSector;
-    while (1) 
-    {
-        searchResult = sithCollision_NextSearchResult();
-        if (!searchResult)
-            break;
 
-        if (searchResult->hitType & SITHCOLLISION_ADJOINCROSS)
-        {
-            pSectorIter = searchResult->surface->adjoin->sector;
-        }
-        else if (searchResult->hitType & SITHCOLLISION_THING) 
-        {
-            rdVector_Copy3(&local_54, pSaberPos);
-            rdVector_MultAcc3(&local_54, pSaberDir, searchResult->distance);
+	sithSector* pSectorIter = pSector;
+	while (1)
+	{
+		searchResult = sithCollision_NextSearchResult();
+		if (!searchResult)
+			break;
 
-            resultThing = searchResult->receiver;
+		if (searchResult->hitType & SITHCOLLISION_ADJOINCROSS)
+		{
+			pSectorIter = searchResult->surface->adjoin->sector;
+		}
+		else if (searchResult->hitType & SITHCOLLISION_THING)
+		{
+			rdVector_Copy3(&local_54, pSaberPos);
+			rdVector_MultAcc3(&local_54, pSaberDir, searchResult->distance);
 
-            if ( resultThing->type == SITH_THING_ITEM || resultThing->type == SITH_THING_EXPLOSION || resultThing->type == SITH_THING_PARTICLE )
-            {
-                continue;
-            }
-            if (resultThing->actorParams.typeflags & SITH_AF_DROID 
-                || resultThing->type != SITH_THING_ACTOR && resultThing->type != SITH_THING_PLAYER )
-            {
-                jkSaber_SpawnSparks(playerInfo, &local_54, pSectorIter, SPARKTYPE_WALL);
-            }
-            if ( pCollideInfo->numDamagedThings == 6 )
-            {
-                break;
-            }
+			resultThing = searchResult->receiver;
 
-            int foundIdx = 0;
-            for (foundIdx = 0; foundIdx < pCollideInfo->numDamagedThings; foundIdx++ )
-            {
-                if ( searchResult->receiver == pCollideInfo->damagedThings[foundIdx] )
-                    break;
-            }
+			if (resultThing->type == SITH_THING_ITEM || resultThing->type == SITH_THING_EXPLOSION || resultThing->type == SITH_THING_PARTICLE)
+			{
+				continue;
+			}
+			if (resultThing->actorParams.typeflags & SITH_AF_DROID
+				|| resultThing->type != SITH_THING_ACTOR && resultThing->type != SITH_THING_PLAYER)
+			{
+				jkSaber_SpawnSparks(playerInfo, &local_54, pSectorIter, SPARKTYPE_WALL);
+			}
+			if (pCollideInfo->numDamagedThings == 6)
+			{
+				break;
+			}
 
-            if ( foundIdx < pCollideInfo->numDamagedThings )
-            {
-                break;
-            }
+			int foundIdx = 0;
+			for (foundIdx = 0; foundIdx < pCollideInfo->numDamagedThings; foundIdx++)
+			{
+				if (searchResult->receiver == pCollideInfo->damagedThings[foundIdx])
+					break;
+			}
 
-            if ( resultThing->type != SITH_THING_ACTOR 
-                 && resultThing->type != SITH_THING_PLAYER 
-                 || !(resultThing->actorParams.typeflags & SITH_AF_BLEEDS) )
-            {
-                jkSaber_SpawnSparks(playerInfo, &local_54, pSectorIter, SPARKTYPE_BLOOD);
+			if (foundIdx < pCollideInfo->numDamagedThings)
+			{
+				break;
+			}
 
-                sithThing_Damage(searchResult->receiver, pPlayerThing, pCollideInfo->damage, SITH_DAMAGE_SABER);
-                pCollideInfo->damagedThings[pCollideInfo->numDamagedThings++] = searchResult->receiver;
-                break;
-            }
+			if (resultThing->type != SITH_THING_ACTOR
+				&& resultThing->type != SITH_THING_PLAYER
+				|| !(resultThing->actorParams.typeflags & SITH_AF_BLEEDS))
+			{
+				jkSaber_SpawnSparks(playerInfo, &local_54, pSectorIter, SPARKTYPE_BLOOD);
 
-            // TODO is this a vector func?
-            rdVector_Sub3(&local_3c, &local_54, &resultThing->position);
-            rdVector_Normalize3Acc(&local_3c);
-            rdMatrix_Copy34(&tmpMat, &resultThing->lookOrientation);
-            if ( resultThing->type == SITH_THING_ACTOR || resultThing->type == SITH_THING_PLAYER )
-                rdMatrix_PreRotate34(&tmpMat, &resultThing->actorParams.eyePYR);
-                
-            // TODO: is this a vector func?
-            rdVector3 v52 = tmpMat.lvec;
-            rdVector_Normalize3Acc(&v52);
-            if ( rdVector_Dot3(&v52, &local_3c) >= resultThing->actorParams.fov
-              && (_frand() < resultThing->actorParams.chance) )
-            {
-                if (!(pPlayerThing->actorParams.typeflags & SITH_AF_INVISIBLE)) // verify
-                {
-                    sithSoundClass_PlayModeRandom(pPlayerThing, SITH_SC_DEFLECTED);
+				sithThing_Damage(searchResult->receiver, pPlayerThing, pCollideInfo->damage, SITH_DAMAGE_SABER);
+				//jkSaber_AmputateRagdoll(resultThing, searchResult->sender, &searchResult->hitNorm, pPlayerThing, pSaberPos, pSaberDir, pCollideInfo->bladeLength, 0.0);
+				pCollideInfo->damagedThings[pCollideInfo->numDamagedThings++] = searchResult->receiver;
+				break;
+			}
 
-                    if ( _frand() >= 0.5 )
-                        sithPuppet_PlayMode(resultThing, SITH_ANIM_BLOCK2, 0);
-                    else
-                        sithPuppet_PlayMode(resultThing, SITH_ANIM_BLOCK, 0);
+			// TODO is this a vector func?
+			rdVector_Sub3(&local_3c, &local_54, &resultThing->position);
+			rdVector_Normalize3Acc(&local_3c);
+			rdMatrix_Copy34(&tmpMat, &resultThing->lookOrientation);
+			if (resultThing->type == SITH_THING_ACTOR || resultThing->type == SITH_THING_PLAYER)
+				rdMatrix_PreRotate34(&tmpMat, &resultThing->actorParams.eyePYR);
 
-                    jkSaber_SpawnSparks(playerInfo, &local_54, pSectorIter, SPARKTYPE_SABER);
+			// TODO: is this a vector func?
+			rdVector3 v52 = tmpMat.lvec;
+			rdVector_Normalize3Acc(&v52);
+			if (rdVector_Dot3(&v52, &local_3c) >= resultThing->actorParams.fov
+				&& (_frand() < resultThing->actorParams.chance))
+			{
+				if (!(pPlayerThing->actorParams.typeflags & SITH_AF_INVISIBLE)) // verify
+				{
+					sithSoundClass_PlayModeRandom(pPlayerThing, SITH_SC_DEFLECTED);
 
-                    sithCog_SendMessageFromThing(resultThing, 0, SITH_MESSAGE_BLOCKED);
-                    pCollideInfo->damagedThings[pCollideInfo->numDamagedThings++] = searchResult->receiver;
-                    break;
-                }
-            }
+					if (_frand() >= 0.5)
+						sithPuppet_PlayMode(resultThing, SITH_ANIM_BLOCK2, 0);
+					else
+						sithPuppet_PlayMode(resultThing, SITH_ANIM_BLOCK, 0);
 
-            jkSaber_SpawnSparks(playerInfo, &local_54, pSectorIter, SPARKTYPE_BLOOD);
+					jkSaber_SpawnSparks(playerInfo, &local_54, pSectorIter, SPARKTYPE_SABER);
+
+					sithCog_SendMessageFromThing(resultThing, 0, SITH_MESSAGE_BLOCKED);
+					pCollideInfo->damagedThings[pCollideInfo->numDamagedThings++] = searchResult->receiver;
+					break;
+				}
+			}
+
+			jkSaber_SpawnSparks(playerInfo, &local_54, pSectorIter, SPARKTYPE_BLOOD);
 
             sithThing_Damage(resultThing, pPlayerThing, pCollideInfo->damage, SITH_DAMAGE_SABER);
             pCollideInfo->damagedThings[pCollideInfo->numDamagedThings++] = searchResult->receiver;
