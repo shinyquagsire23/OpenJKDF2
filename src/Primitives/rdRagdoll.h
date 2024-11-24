@@ -97,6 +97,8 @@ typedef struct rdRagdoll
 	rdMatrix34* paTris;
 	rdMatrix34* paRotFricMatrices;
 	float* paDistConstraintDists;
+	int* paDisabledDistConstraints;
+	int* paDisabledRotConstraints;
 	float lastTimeStep;
 	int collisions;
 	int expireMs;

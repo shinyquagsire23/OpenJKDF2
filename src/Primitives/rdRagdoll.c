@@ -83,6 +83,9 @@ void rdRagdoll_ApplyDistConstraints(rdRagdoll* pRagdoll)
 {
 	for (int i = 0; i < pRagdoll->pSkel->numDist; ++i)
 	{
+		if (pRagdoll->paDisabledDistConstraints[i])
+			continue;
+
 		rdRagdollDistConstraint* pConstraint = &pRagdoll->pSkel->paDistConstraints[i];
 
 		rdRagdollParticle* pParticle0 = &pRagdoll->paParticles[pConstraint->vert[0]];
@@ -198,6 +201,9 @@ void rdRagdoll_ApplyRotConstraints(rdRagdoll* pRagdoll)
 {
 	for (int i = 0; i < pRagdoll->pSkel->numRot; ++i)
 	{
+		if(pRagdoll->paDisabledRotConstraints[i])
+			continue;
+
 		rdRagdollRotConstraint* pConstraint = &pRagdoll->pSkel->paRotConstraints[i];
 
 		rdMatrix34 rot;
@@ -476,6 +482,14 @@ int rdRagdoll_AllocRagdollData(rdRagdoll* pRagdoll)
 	if (!pRagdoll->paDistConstraintDists)
 		return 0;
 
+	pRagdoll->paDisabledDistConstraints = (int*)rdroid_pHS->alloc(sizeof(int) * pRagdoll->pSkel->numDist);
+	if (!pRagdoll->paDisabledDistConstraints)
+		return 0;
+
+	pRagdoll->paDisabledRotConstraints = (int*)rdroid_pHS->alloc(sizeof(int) * pRagdoll->pSkel->numRot);
+	if (!pRagdoll->paDisabledRotConstraints)
+		return 0;	
+
 	// clear it all
 	_memset(pRagdoll->paParticles, 0, sizeof(rdRagdollParticle) * pRagdoll->numParticles);
 	_memcpy(pRagdoll->paPoseMatrices, pRagdoll->pThing->hierarchyNodeMatrices, sizeof(rdMatrix34) * pRagdoll->pModel->numHierarchyNodes);
@@ -484,6 +498,8 @@ int rdRagdoll_AllocRagdollData(rdRagdoll* pRagdoll)
 	_memset(pRagdoll->paTris, 0, sizeof(rdMatrix34) * pRagdoll->pSkel->numTris);
 	_memset(pRagdoll->paRotFricMatrices, 0, sizeof(rdMatrix34) * pRagdoll->pSkel->numRotFric);
 	_memset(pRagdoll->paDistConstraintDists, 0, sizeof(float) * pRagdoll->pSkel->numDist);
+	_memset(pRagdoll->paDisabledDistConstraints, 0, sizeof(int) * pRagdoll->pSkel->numDist);
+	_memset(pRagdoll->paDisabledRotConstraints, 0, sizeof(int) * pRagdoll->pSkel->numRot);
 
 	return 1;
 }
@@ -541,6 +557,18 @@ void rdRagdoll_FreeEntry(rdRagdoll* pRagdoll)
 	{
 		rdroid_pHS->free(pRagdoll->paDistConstraintDists);
 		pRagdoll->paDistConstraintDists = 0;
+	}
+
+	if (pRagdoll->paDisabledDistConstraints)
+	{
+		rdroid_pHS->free(pRagdoll->paDisabledDistConstraints);
+		pRagdoll->paDisabledDistConstraints = 0;
+	}
+
+	if (pRagdoll->paDisabledRotConstraints)
+	{
+		rdroid_pHS->free(pRagdoll->paDisabledRotConstraints);
+		pRagdoll->paDisabledRotConstraints = 0;
 	}
 
 	if (pRagdoll->paTris)
