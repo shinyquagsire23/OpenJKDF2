@@ -186,7 +186,7 @@ int sithIntersect_CollideThings(sithThing *pThing, const rdVector3 *a2, const rd
         rdVector3 tmpVec;
         rdVector_Zero3(&tmpVec); // Added
 
-        int iVar11 = sithIntersect_TreeIntersection(v11->rdthing.model3->hierarchyNodes, &posVec, &dirVec, a4, range, v11, &tmp, &tmpVec, raycastFlags);
+        int iVar11 = sithIntersect_TreeIntersection(v11->rdthing.model3->hierarchyNodes, &posVec, &dirVec, a4, range, v11, &tmp, &tmpVec, outMesh, raycastFlags);
         if (iVar11 == 0) {
             return 0;
         }
@@ -237,7 +237,8 @@ int sithIntersect_CollideThings(sithThing *pThing, const rdVector3 *a2, const rd
 }
 
 // MoTS added: Tree collision (one sphere per mesh)
-int sithIntersect_TreeIntersection(rdHierarchyNode *paNodes,rdVector3 *pPoseVec,rdVector3 *pDirVec,float a4,float range, sithThing *v11,float *pOut,rdVector3 *pOutVec,int raycastFlags)
+// Added: outMesh
+int sithIntersect_TreeIntersection(rdHierarchyNode *paNodes,rdVector3 *pPoseVec,rdVector3 *pDirVec,float a4,float range, sithThing *v11,float *pOut,rdVector3 *pOutVec, rdMesh** outMesh, int raycastFlags)
 {
     rdModel3 *prVar1;
     int iVar2;
@@ -272,6 +273,7 @@ int sithIntersect_TreeIntersection(rdHierarchyNode *paNodes,rdVector3 *pPoseVec,
             *pOut = local_74;
             rdVector_Copy3(pOutVec, &local_6c);
             ret = 1;
+			*outMesh = &v11->rdthing.model3->geosets[uVar3].meshes[paNodes->meshIdx];
         }
     }
 
@@ -281,7 +283,7 @@ int sithIntersect_TreeIntersection(rdHierarchyNode *paNodes,rdVector3 *pPoseVec,
         do
         {
             if (((v11->rdthing).amputatedJoints[pChildNode->idx] == 0) &&
-               (iVar2 = sithIntersect_TreeIntersection(pChildNode, pPoseVec, pDirVec, a4, range, v11, pOut, pOutVec, raycastFlags),
+               (iVar2 = sithIntersect_TreeIntersection(pChildNode, pPoseVec, pDirVec, a4, range, v11, pOut, pOutVec, outMesh, raycastFlags),
                iVar2 != 0)) {
                 ret = 1;
             }

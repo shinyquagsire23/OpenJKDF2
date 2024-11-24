@@ -1159,7 +1159,7 @@ int sithPhysics_CollideRagdollParticle(sithSector* sector, sithThing* pThing, rd
 		}
 		if ((pEntry->hitType & SITHCOLLISION_THING) != 0)
 		{
-			if (pEntry->receiver != pThing && pEntry->sender)
+			if (pEntry->receiver != pThing && pEntry->face)
 			{
 				rdVector_Copy3(hitNormOut, &pEntry->hitNorm);
 				result = 1;
