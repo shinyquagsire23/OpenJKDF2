@@ -309,29 +309,32 @@ void sithActor_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4)
 
 					// check for collisions with nearby objects, if anything is close, immediately ragdoll to avoid clipping
 					// ignore anything we're attached to since that's always going to collide
-					rdVector3 velnorm;
-					rdVector_Normalize3(&velnorm, &thing->physicsParams.vel);
-					sithCollision_SearchRadiusForThings(thing->sector, thing, &thing->position, &velnorm, vellen, thing->collideSize, 0);
-					for (sithCollisionSearchEntry* i = sithCollision_NextSearchResult(); i; i = sithCollision_NextSearchResult())
+					if(!removeAsap)
 					{
-						if(i->hitType & SITHCOLLISION_WORLD)
+						rdVector3 velnorm;
+						rdVector_Normalize3(&velnorm, &thing->physicsParams.vel);
+						sithCollision_SearchRadiusForThings(thing->sector, thing, &thing->position, &velnorm, vellen, thing->collideSize, 0);
+						for (sithCollisionSearchEntry* i = sithCollision_NextSearchResult(); i; i = sithCollision_NextSearchResult())
 						{
-							if(!(thing->attach_flags & SITH_ATTACH_WORLDSURFACE) || thing->attachedSurface != i->surface)
+							if(i->hitType & SITHCOLLISION_WORLD)
 							{
-								removeAsap = 1;
-								break;
+								if(!(thing->attach_flags & SITH_ATTACH_WORLDSURFACE) || thing->attachedSurface != i->surface)
+								{
+									removeAsap = 1;
+									break;
+								}
+							}
+							if (i->hitType & SITHCOLLISION_THING)
+							{
+								if (!(thing->attach_flags & SITH_ATTACH_THING) || thing->attachedThing != i->receiver)
+								{
+									removeAsap = 1;
+									break;
+								}
 							}
 						}
-						if (i->hitType & SITHCOLLISION_THING)
-						{
-							if (!(thing->attach_flags & SITH_ATTACH_THING) || thing->attachedThing != i->receiver)
-							{
-								removeAsap = 1;
-								break;
-							}
-						}
+						sithCollision_SearchClose(); 
 					}
-					sithCollision_SearchClose(); 
 					
 					if (!removeAsap)
 					{
