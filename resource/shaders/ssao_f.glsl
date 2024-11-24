@@ -88,6 +88,9 @@ void main(void)
 
 	// multiplied by 2 to account for mid-gray average of sphere samples
 	fragAO = ao * (2.0 / 16.0);
+
+	// give it some contrast
+	fragAO *= fragAO * fragAO;
 }
 
 
