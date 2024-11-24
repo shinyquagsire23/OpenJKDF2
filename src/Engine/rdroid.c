@@ -849,9 +849,9 @@ void rdTexOffseti(float u, float v)
 	}
 	else
 	{
-		rdroid_pHS->warningPrint("rdTexOffseti: called without a texture bound, using default size of 32 pixels.\n");
-		rdroid_textureState.texOffset.x = (float)u / 32.0f;
-		rdroid_textureState.texOffset.y = (float)v / 32.0f;
+		//rdroid_pHS->warningPrint("rdTexOffseti: called without a texture bound, using default size of 32 pixels.\n");
+		rdroid_textureState.texOffset.x = 0.0f;// (float)u / 32.0f;
+		rdroid_textureState.texOffset.y = 0.0f;// (float)v / 32.0f;
 	}
 }
 
