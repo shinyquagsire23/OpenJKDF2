@@ -20,7 +20,7 @@ void main(void)
 	const float secondPassScale =  0.5f; // scales the radius for the second pass to catch higher frequency details
 	const float radius          =  1.0f; // radius of the sampling kernel
 	const float minDist         =  5.0f; // radius shrinks below this distance to avoid extreme cache thrasing and visual artifacts
-	const float rangeScale      = 0.85f; // gives the raneg scale check a little headroom
+	const float rangeScale      = 0.85f; // gives the range scale check a little headroom
 	const float depthTestScale  = 64.0f; // soft depth test factor
 
 	// unrolled kernel building
@@ -90,7 +90,7 @@ void main(void)
 	fragAO = ao * (2.0 / 16.0);
 
 	// give it some contrast
-	fragAO *= fragAO * fragAO;
+	fragAO *= fragAO;
 }
 
 
