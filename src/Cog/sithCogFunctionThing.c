@@ -24,6 +24,10 @@
 #include "Main/Main.h"
 #include "jk.h"
 
+#ifdef RAGDOLLS
+#include "Primitives/rdRagdoll.h"
+#endif
+
 void sithCogFunctionThing_createThingAtPos_nr_Mots(sithCog *ctx, int idk, sithThing* pThingIn);
 void sithCogFunctionThing_createThingAtPos_nr(sithCog *ctx, int idk);
 
@@ -286,7 +290,7 @@ void sithCogFunctionThing_DamageThing(sithCog *ctx)
         {
             sithDSSThing_SendDamage(pThing2, pThing, a5, a4, -1, 1);
         }
-        sithCogExec_PushFlex(ctx, sithThing_Damage(pThing2, pThing, a5, a4));
+        sithCogExec_PushFlex(ctx, sithThing_Damage(pThing2, pThing, a5, a4, -1));
     }
     else
     {
@@ -1689,6 +1693,51 @@ void sithCogFunctionThing_AmputateJoint(sithCog *ctx)
     }
 }
 
+#ifdef QOL_IMPROVEMENTS
+// Added
+void sithCogFunctionThing_IsJointAmputated(sithCog* ctx)
+{
+	uint32_t idx = sithCogExec_PopInt(ctx);
+	sithThing* pThing = sithCogExec_PopThing(ctx);
+
+	int result = 0;
+	if (pThing)
+	{
+		rdThing* rdthing = &pThing->rdthing;
+		sithAnimclass* animclass = pThing->animclass;
+		if (animclass && idx < 0xA)
+		{
+			int jointIdx = animclass->bodypart_to_joint[idx];
+			if (jointIdx >= 0)
+			{
+				if (rdthing->model3 && jointIdx < rdthing->model3->numHierarchyNodes)
+					result = rdthing->amputatedJoints[jointIdx];
+			}
+		}
+	}
+	sithCogExec_PushInt(ctx, result);
+}
+
+void sithCogFunctionThing_SetRootJoint(sithCog* ctx)
+{
+	uint32_t idx = sithCogExec_PopInt(ctx);
+	sithThing* pThing = sithCogExec_PopThing(ctx);
+	if (pThing)
+	{
+		rdThing* rdthing = &pThing->rdthing;
+		sithAnimclass* animclass = pThing->animclass;
+		if (animclass && idx < 0xA)
+		{
+			int jointIdx = animclass->bodypart_to_joint[idx];
+			if (jointIdx >= 0)
+			{
+				if (rdthing->model3 && jointIdx < rdthing->model3->numHierarchyNodes)
+					rdthing->rootJoint = jointIdx;
+			}
+		}
+	}
+}
+#endif
 void sithCogFunctionThing_SetActorWeapon(sithCog *ctx)
 {
     sithThing* weapTemplate = sithCogExec_PopTemplate(ctx);
@@ -2747,6 +2796,10 @@ void sithCogFunctionThing_Startup(void* ctx)
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetHealth, "setthinghealth");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetHealth, "sethealth");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_AmputateJoint, "amputatejoint");
+#ifdef QOL_IMPROVEMENTS
+	sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_IsJointAmputated, "isjointamputated");	
+	sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetRootJoint, "setrootjoint");
+#endif
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetActorWeapon, "setactorweapon");
     if (Main_bMotsCompat) {
         sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_GetActorWeaponMots, "getactorweapon");
