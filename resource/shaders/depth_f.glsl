@@ -29,6 +29,7 @@ uniform sampler2D worldPaletteLights;
 uniform sampler2D displacement_map;
 
 uniform int blend_mode;
+uniform int ditherMode;
 
 in vec4 f_color;
 in float f_light;
