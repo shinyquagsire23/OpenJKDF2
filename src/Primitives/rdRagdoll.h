@@ -120,6 +120,8 @@ void rdRagdoll_ApplyRotFriction(rdRagdoll* pRagdoll, float deltaSeconds, float f
 
 void rdRagdoll_Stop(rdRagdoll* pRagdoll);
 
+int rdRagdoll_ParticleValid(rdRagdoll* pRagdoll, int particleIdx);
+
 int rdRagdollSkeleton_LoadEntry(rdRagdollSkeleton* pSkel, const char* fpath);
 void rdRagdollSkeleton_FreeEntry(rdRagdollSkeleton* pSkel);
 

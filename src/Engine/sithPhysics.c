@@ -1159,7 +1159,9 @@ int sithPhysics_CollideRagdollParticle(sithSector* sector, sithThing* pThing, rd
 		}
 		if ((pEntry->hitType & SITHCOLLISION_THING) != 0)
 		{
-			if (pEntry->receiver != pThing && pEntry->face)
+			int parent = sithThing_GetParent(pThing);
+
+			if (pEntry->receiver != pThing && pEntry->receiver->thingIdx != parent && pEntry->face)
 			{
 				rdVector_Copy3(hitNormOut, &pEntry->hitNorm);
 				result = 1;
@@ -1179,6 +1181,9 @@ void sithPhysics_UpdateRagdollPositions(sithSector* sector, sithThing* pThing, r
 {
 	for (int i = 0; i < pRagdoll->numParticles; ++i)
 	{
+		if (!rdRagdoll_ParticleValid(pRagdoll, i))
+			continue;
+
 		rdRagdollParticle* pParticle = &pRagdoll->paParticles[i];
 		if (pParticle->nextPosWeight > 0.0)
 		{
@@ -1253,6 +1258,9 @@ void sithPhysics_ThingRagdollApplyForce(sithThing* pThing, rdVector3* forceVec, 
 	float invMass = (float)pThing->rdthing.pRagdoll->numParticles / pThing->physicsParams.mass;
 	for (int i = 0; i < pThing->rdthing.pRagdoll->numParticles; ++i)
 	{
+		if (!rdRagdoll_ParticleValid(pThing->rdthing.pRagdoll, i))
+			continue;
+
 		rdRagdollParticle* pParticle = &pThing->rdthing.pRagdoll->paParticles[i];
 
 		// intersect the force with the particle
@@ -1282,6 +1290,9 @@ void sithPhysics_AccumulateRagdollForces(sithThing* pThing, rdRagdoll* pRagdoll,
 
 	for (int i = 0; i < pRagdoll->numParticles; ++i)
 	{
+		if (!rdRagdoll_ParticleValid(pRagdoll, i))
+			continue;
+
 		rdRagdollParticle* pParticle = &pRagdoll->paParticles[i];
 		//rdVector_Zero3(&pParticle->forces);
 
@@ -1309,6 +1320,9 @@ void sithPhysics_UpdateRagdollParticles(rdRagdoll* pRagdoll, float deltaSeconds)
 	float timestepRatio = pRagdoll->lastTimeStep ? deltaSeconds / pRagdoll->lastTimeStep : 1.0f;
 	for (int i = 0; i < pRagdoll->numParticles; ++i)
 	{
+		if (!rdRagdoll_ParticleValid(pRagdoll, i))
+			continue;
+
 		rdRagdollParticle* pParticle = &pRagdoll->paParticles[i];
 		
 		rdVector3 vel;
@@ -1344,6 +1358,9 @@ void sithPhysics_CollideRagdoll(sithThing* pThing, rdRagdoll* pRagdoll, float de
 	int anyCollision = 0; // did any particle collide?
 	for (int i = 0; i < pRagdoll->numParticles; ++i)
 	{
+		if(!rdRagdoll_ParticleValid(pRagdoll, i))
+			continue;
+
 		rdRagdollParticle* pParticle = &pRagdoll->paParticles[i];
 
 		rdVector3 vel;
@@ -1439,6 +1456,9 @@ void sithPhysics_ThingPhysRagdoll(sithThing* pThing, float deltaSeconds)
 	{
 		rdRagdollJoint* pJoint = &pRagdoll->pSkel->paJoints[i];
 
+		if(pThing->rdthing.amputatedJoints[pJoint->node])
+			continue;
+
 		rdVector3 jointPos;
 		rdRagdoll_GetJointPos(&jointPos, pRagdoll, pJoint);		
 		rdMatrix_Multiply34(&pRagdoll->paJointMatrices[i], &pRagdoll->paTris[pJoint->tri], &pRagdoll->paJointTris[i]);
@@ -1448,6 +1468,8 @@ void sithPhysics_ThingPhysRagdoll(sithThing* pThing, float deltaSeconds)
 	// reset forces and leave sector
 	for (int i = 0; i < pRagdoll->numParticles; ++i)
 	{
+		if (!rdRagdoll_ParticleValid(pRagdoll, i))
+			continue;
 		rdRagdollParticle* pParticle = &pRagdoll->paParticles[i];
 		rdVector_Zero3(&pParticle->forces);
 		sithThing_LeaveSector(&pParticle->thing);

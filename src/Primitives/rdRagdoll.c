@@ -322,6 +322,14 @@ void rdRagdoll_Stop(rdRagdoll* pRagdoll)
 	pRagdoll->expireMs = sithTime_curMs + 1;
 }
 
+int rdRagdoll_ParticleValid(rdRagdoll* pRagdoll, int particleIdx)
+{
+	rdRagdollVert* pVert = &pRagdoll->pSkel->paVerts[particleIdx];
+	if(pRagdoll->pThing->amputatedJoints[pVert->node])
+		return 0;
+	return 1;
+}
+
 int rdRagdoll_TrisHaveSharedVerts(rdRagdollTri* pTri0, rdRagdollTri* pTri1)
 {
 	for (int i = 0; i < 3; ++i)
