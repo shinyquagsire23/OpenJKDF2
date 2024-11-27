@@ -1468,8 +1468,6 @@ void sithPhysics_ThingPhysRagdoll(sithThing* pThing, float deltaSeconds)
 	// reset forces and leave sector
 	for (int i = 0; i < pRagdoll->numParticles; ++i)
 	{
-		if (!rdRagdoll_ParticleValid(pRagdoll, i))
-			continue;
 		rdRagdollParticle* pParticle = &pRagdoll->paParticles[i];
 		rdVector_Zero3(&pParticle->forces);
 		sithThing_LeaveSector(&pParticle->thing);
