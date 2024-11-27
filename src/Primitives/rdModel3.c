@@ -1313,7 +1313,7 @@ int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
 #endif
     
     // JKDF2 inlined
-    rdModel3_DrawHNode(pCurModel3->hierarchyNodes);
+    rdModel3_DrawHNode(&pCurModel3->hierarchyNodes[thing->rootJoint]); // Added: rootJoint
 #if 0
     rdDebug_DrawBoundingBox(matrix_4_3, pCurModel3->radius, 0xFF0000FF);
 #endif
@@ -1568,6 +1568,21 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
 	rdMatrixMode(RD_MATRIX_MODEL);
 	rdIdentity();
 #endif
+
+	// debug
+	//rdSprite debugSprite;
+	//rdSprite_NewEntry(&debugSprite, "dbgragoll", 0, "sabergreen0.mat", pCurMesh->radius, pCurMesh->radius, RD_GEOMODE_TEXTURED, RD_LIGHTMODE_FULLYLIT, RD_TEXTUREMODE_AFFINE, 1.0f, &rdroid_zeroVector3);
+	//
+	//rdThing debug;
+	//rdThing_NewEntry(&debug, pCurThing);
+	//rdThing_SetSprite3(&debug, &debugSprite);
+	////rdMatrix34 mat;
+	////rdMatrix_BuildTranslate34(&mat, &mat->scale);
+	//
+	//rdSprite_Draw(&debug, mat);
+	//
+	//rdSprite_FreeEntry(&debugSprite);
+	//rdThing_FreeEntry(&debug);
 }
 
 // MOTS altered (RGB lights)
