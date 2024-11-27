@@ -4100,7 +4100,6 @@ void std3D_AddZListDrawCall(rdPrimitiveType_t type, std3D_DrawCallList* pList, s
 	pDrawCall->shaderID = pDrawCallState->stateBits.alphaTest ? SHADER_DEPTH_ALPHATEST : SHADER_DEPTH;
 
 	// z lists can ignore blending, fog, lighting and possibly textures
-	pDrawCall->state.stateBits.ditherMode = 0;
 	pDrawCall->state.stateBits.fogMode = 0;
 	pDrawCall->state.stateBits.blend = 0;
 	pDrawCall->state.stateBits.srdBlend = 1;
