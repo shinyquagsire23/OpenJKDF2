@@ -185,8 +185,9 @@ int sithIntersect_CollideThings(sithThing *pThing, const rdVector3 *a2, const rd
         float tmp = 3.4e+38;
         rdVector3 tmpVec;
         rdVector_Zero3(&tmpVec); // Added
+		rdHierarchyNode* node = NULL;
 
-        int iVar11 = sithIntersect_TreeIntersection(v11->rdthing.model3->hierarchyNodes, &posVec, &dirVec, a4, range, v11, &tmp, &tmpVec, outMesh, raycastFlags);
+        int iVar11 = sithIntersect_TreeIntersection(v11->rdthing.model3->hierarchyNodes, &posVec, &dirVec, a4, range, v11, &tmp, &tmpVec, &node, raycastFlags, NULL);
         if (iVar11 == 0) {
             return 0;
         }
@@ -238,7 +239,7 @@ int sithIntersect_CollideThings(sithThing *pThing, const rdVector3 *a2, const rd
 
 // MoTS added: Tree collision (one sphere per mesh)
 // Added: outMesh
-int sithIntersect_TreeIntersection(rdHierarchyNode *paNodes,rdVector3 *pPoseVec,rdVector3 *pDirVec,float a4,float range, sithThing *v11,float *pOut,rdVector3 *pOutVec, rdMesh** outMesh, int raycastFlags)
+int sithIntersect_TreeIntersection(rdHierarchyNode *paNodes,rdVector3 *pPoseVec,rdVector3 *pDirVec,float a4,float range, sithThing *v11,float *pOut,rdVector3 *pOutVec, rdHierarchyNode** outNode, int raycastFlags, rdVector3* pRefDir)
 {
     rdModel3 *prVar1;
     int iVar2;
@@ -268,13 +269,19 @@ int sithIntersect_TreeIntersection(rdHierarchyNode *paNodes,rdVector3 *pPoseVec,
 		if (v11->rdthing.pRagdoll && paNodes->skelJoint != -1)
 			local_70 = prVar1->pSkel->paJoints[paNodes->skelJoint].radius;
 	#endif
-        iVar2 = sithIntersect_RaySphereIntersection(pPoseVec, pDirVec, a4, range, &local_6c, local_70, &local_74, 1, raycastFlags);
-        if ((iVar2 != 0) && (local_74 < *pOut)) {
-            *pOut = local_74;
-            rdVector_Copy3(pOutVec, &local_6c);
-            ret = 1;
-			*outMesh = &v11->rdthing.model3->geosets[uVar3].meshes[paNodes->meshIdx];
-        }
+
+		// Added: perpendicular check to ref dir
+		float dot = pRefDir ? rdVector_Dot3(pRefDir, &v11->rdthing.hierarchyNodeMatrices[paNodes->idx].lvec) : 0.0f;
+		if(!pRefDir || dot > -0.5 && dot < 0.5)
+		{
+			iVar2 = sithIntersect_RaySphereIntersection(pPoseVec, pDirVec, a4, range, &local_6c, local_70, &local_74, 1, raycastFlags);
+			if ((iVar2 != 0) && (local_74 < *pOut)) {
+				*pOut = local_74;
+				rdVector_Copy3(pOutVec, &local_6c);
+				ret = 1;
+				*outNode = paNodes;
+			}
+		}
     }
 
     if (paNodes->numChildren != 0) {
@@ -283,7 +290,7 @@ int sithIntersect_TreeIntersection(rdHierarchyNode *paNodes,rdVector3 *pPoseVec,
         do
         {
             if (((v11->rdthing).amputatedJoints[pChildNode->idx] == 0) &&
-               (iVar2 = sithIntersect_TreeIntersection(pChildNode, pPoseVec, pDirVec, a4, range, v11, pOut, pOutVec, outMesh, raycastFlags),
+               (iVar2 = sithIntersect_TreeIntersection(pChildNode, pPoseVec, pDirVec, a4, range, v11, pOut, pOutVec, outNode, raycastFlags, pRefDir),
                iVar2 != 0)) {
                 ret = 1;
             }
