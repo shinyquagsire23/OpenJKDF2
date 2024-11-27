@@ -15,6 +15,7 @@
 #define LIGHTSABER_TRAILS    // visual enhancement for lightsabers, draws extra tris to simulate lightsaber trails/motion blur
 #define LIGHTSABER_MARKS     // visual enhancement for lightsabers, draws impact decals with saber collision, requires DECAL_RENDERING
 //#define LIGHTSABER_GLOW    // visual enhancement for lightsabers, draws a sprite-based glow similar to Jedi Outcast/Academy
+#define LIGHTSABER_DISMEMBER // dismemberment enhancements
 
 // Old render pipeline features
 #define STENCIL_BUFFER       // mark the stencil buffer with dynamic/transparent stuff, so we can effectively cull things like decals
