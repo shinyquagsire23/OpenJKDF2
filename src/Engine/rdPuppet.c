@@ -361,8 +361,8 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
     }
 
 	// added
-	if(thing->rootJoint != 0)
-		rdMatrix_Identity34(&thing->hierarchyNodeMatrices[thing->rootJoint]);
+	//if(thing->rootJoint != 0)
+		//rdMatrix_Identity34(&thing->hierarchyNodeMatrices[thing->rootJoint]);
 
     rdThing_AccumulateMatrices(thing, &model->hierarchyNodes[thing->rootJoint], matrix); // Added: rootJoint
     thing->frameTrue = rdroid_frameTrue;

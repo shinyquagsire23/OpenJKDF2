@@ -619,7 +619,7 @@ void sithCollision_FallHurt(sithThing *thing, float vel)
     if ( v2 > 1.0 )
     {
         sithSoundClass_PlayModeRandom(thing, SITH_SC_HITDAMAGED);
-        sithThing_Damage(thing, thing, v2, SITH_DAMAGE_FALL);
+        sithThing_Damage(thing, thing, v2, SITH_DAMAGE_FALL, -1);
     }
 }
 
@@ -727,7 +727,7 @@ float sithCollision_UpdateThingCollision(sithThing *pThing, rdVector3 *a2, float
 
         if ( (v5->thingflags & SITH_TF_NOIMPACTDAMAGE) == 0 )
         {
-            sithThing_Damage(v10, v5, (a6 - v11) * 100.0, SITH_DAMAGE_IMPACT);
+            sithThing_Damage(v10, v5, (a6 - v11) * 100.0, SITH_DAMAGE_IMPACT, -1);
         }
         a6 = v11;
     }
@@ -1023,7 +1023,7 @@ int sithCollision_DebrisDebrisCollide(sithThing *thing1, sithThing *thing2, sith
                 {
                     a1a = v15;
                     a3a = (sendera - a1a) * 100.0;
-                    sithThing_Damage(v5, v4, a3a, SITH_DAMAGE_IMPACT);
+                    sithThing_Damage(v5, v4, a3a, SITH_DAMAGE_IMPACT, -1);
                 }
                 rdVector_Zero3(&v4->field_268);
             }
@@ -1147,7 +1147,7 @@ int sithCollision_CollideHurt(sithThing *a1, rdVector3 *a2, float a3, int a4)
                 if ( v39 > 1.0 )
                 {
                     sithSoundClass_PlayModeRandom(a1, SITH_SC_HITDAMAGED);
-                    sithThing_Damage(a1, a1, v39, SITH_DAMAGE_FALL);
+                    sithThing_Damage(a1, a1, v39, SITH_DAMAGE_FALL, -1);
                 }
             }
         }
@@ -1299,7 +1299,7 @@ int sithCollision_DebrisPlayerCollide(sithThing *thing, sithThing *thing2, sithC
     {
         if ( tmp > 0.25 )
         {
-            sithThing_Damage(thing2, thing, mass * 0.3 * tmp, SITH_DAMAGE_IMPACT);
+            sithThing_Damage(thing2, thing, mass * 0.3 * tmp, SITH_DAMAGE_IMPACT, -1);
         }
         return 1;
     }

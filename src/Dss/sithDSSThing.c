@@ -791,7 +791,7 @@ int sithDSSThing_ProcessDamage(sithCogMsg *msg)
 
         float arg2 = NETMSG_POPF32();
         int16_t arg3 = NETMSG_POPS16();
-        sithThing_Damage(pDamagedThing, pDamagedBy, arg2, arg3);
+        sithThing_Damage(pDamagedThing, pDamagedBy, arg2, arg3, -1);
         return 1;
     }
     return 0;

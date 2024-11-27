@@ -1161,6 +1161,15 @@ void jkCog_GetOpenFrames(sithCog *ctx)
     sithCogExec_PushInt(ctx,Video_dword_5528A0);
 }
 
+#ifdef LIGHTSABER_DISMEMBER
+
+void jkCog_GetSaberDismemberment(sithCog* ctx)
+{
+	sithCogExec_PushInt(ctx, jkSaber_dismember);
+}
+
+#endif
+
 void jkCog_RegisterVerbsExt();
 
 void jkCog_RegisterVerbs()
@@ -1222,6 +1231,10 @@ void jkCog_RegisterVerbs()
 	sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_GetMuzzleOffset, "jkgetmuzzleoffset");
 	sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_SetPovAutoAim, "jksetpovautoaim");
 	sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_SetPovSprite, "jksetpovsprite");
+#endif
+
+#ifdef LIGHTSABER_DISMEMBER
+	sithCogScript_RegisterVerb(sithCog_pSymbolTable, jkCog_GetSaberDismemberment, "jkgetsaberdismemberment");
 #endif
 
     if (Main_bMotsCompat) {

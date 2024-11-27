@@ -93,7 +93,7 @@ void sithThing_LandThing(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3 *a4
 void sithThing_MoveToSector(sithThing* pThing, sithSector *sector, int a4);
 int sithThing_DetachThing(sithThing* pThing);
 void sithThing_Destroy(sithThing* pThing);
-float sithThing_Damage(sithThing *sender, sithThing *reciever, float amount, int damageClass);
+float sithThing_Damage(sithThing *sender, sithThing *reciever, float amount, int damageClass, int hitJoint); // Added: hitJoint
 void sithThing_detachallchildren(sithThing* pThing);
 void sithThing_AttachThing(sithThing *parent, sithThing *child);
 void sithThing_SetSyncFlags(sithThing *pThing, int flags);

@@ -1738,6 +1738,125 @@ void sithCogFunctionThing_SetRootJoint(sithCog* ctx)
 	}
 }
 #endif
+
+#ifdef LIGHTSABER_DISMEMBER
+
+void sithCogFunctionThing_DismemberJoint(sithCog* ctx)
+{
+	sithThing* pBloodTemplate = sithCogExec_PopTemplate(ctx);
+	uint32_t idx = sithCogExec_PopInt(ctx);
+	sithThing* pThing = sithCogExec_PopThing(ctx);
+
+	if (!pThing || !pThing->rdthing.model3 || !pThing->animclass || idx >= 0xA)
+	{
+		sithCogExec_PushInt(ctx, -1);
+		return;
+	}
+	
+	rdThing* rdthing = &pThing->rdthing;
+	sithAnimclass* animclass = pThing->animclass;
+	int jointIdx = animclass->bodypart_to_joint[idx];
+	if (jointIdx >= 0)
+	{
+		if (rdthing->model3 && jointIdx < rdthing->model3->numHierarchyNodes)
+		{
+			if (rdthing->amputatedJoints[jointIdx] == 1) // ignore
+			{
+				sithCogExec_PushInt(ctx, -1);
+				return;
+			}
+
+			// amputate the joint for the existing thing
+			rdthing->amputatedJoints[jointIdx] = 1;
+
+			// create the limb thing
+			rdHierarchyNode* pNode = &rdthing->model3->hierarchyNodes[jointIdx];
+			if(pThing->type && pThing->sector && pNode->meshIdx >= 0)// && rdthing->model3->pSkel)
+			{
+				// temporarily override some things for spawning a copy
+				int type = pThing->type;
+				int thingType = pThing->thingtype;
+				int moveType = pThing->moveType;
+				int flags = pThing->thingflags;
+				sithCog* cog = pThing->class_cog;
+				pThing->type = SITH_THING_CORPSE;
+				pThing->thingtype = SITH_THING_CORPSE;
+				pThing->moveType = SITH_MT_NONE;
+				pThing->class_cog = NULL;
+				pThing->pTemplate = pBloodTemplate;
+
+				// spawn the thing at the position of the root joint
+				if (rdthing->frameTrue != rdroid_frameTrue)
+					rdPuppet_BuildJointMatrices(rdthing, &pThing->lookOrientation);
+
+				//rdMatrix34 lookOrientation;
+				//rdMatrix_Copy34(&lookOrientation, &rdthing->hierarchyNodeMatrices[jointIdx]);
+				//rdVector_Zero3(&lookOrientation.scale);
+				//
+				//rdVector3 position;
+				//rdVector_Copy3(&position, &rdthing->hierarchyNodeMatrices[jointIdx].scale);
+
+				sithThing* pLimb = sithThing_Create(pThing, &pThing->position, &pThing->lookOrientation, pThing->sector, pThing);
+				if (pLimb)
+				{
+					rdThing_SetModel3(&pLimb->rdthing, pThing->rdthing.model3);
+					sithThing_DetachThing(pLimb);
+					pLimb->moveType = SITH_MT_PHYSICS;
+
+					pLimb->collideSize = pLimb->moveSize = rdthing->model3->geosets[0].meshes[pNode->meshIdx].radius * 0.75;
+					//pLimb->lifeLeftMs = 30000.0f;
+					pLimb->lifeLeftMs = jkPlayer_bKeepCorpses ? -1 : 20000;
+
+					pLimb->physicsParams.surfaceDrag = 1.000000;
+					pLimb->physicsParams.airDrag = 4.000000f;
+					pLimb->physicsParams.mass = 15.000000;
+					//pLimb->physicsParams.physflags = SITH_PF_USEGRAVITY | SITH_PF_FLOORSTICK | SITH_PF_SURFACEBOUNCE | SITH_PF_ROTVEL | SITH_PF_FEELBLASTFORCE;
+					pLimb->physicsParams.physflags = (SITH_PF_USEGRAVITY | 0x44261) & ~(SITH_PF_SURFACEALIGN | SITH_PF_FLOORSTICK | SITH_PF_FEELBLASTFORCE | SITH_PF_SURFACEBOUNCE);
+					pLimb->physicsParams.physflags &= ~(SITH_PF_FLY | SITH_PF_NOWALLGRAVITY | SITH_PF_ATTACHED | SITH_PF_WALLSTICK);
+
+					pLimb->physicsParams.buoyancy = 0.500000f;
+					pLimb->physicsParams.maxVel = 15.0f;
+					pLimb->physicsParams.maxRotVel = 15.0f;
+
+					//if (COG_SHOULD_SYNC(ctx))
+					//{
+					//	sithDSSThing_SendCreateThing(pThing, pLimb, pThing, 0, 0, 0, 255, 1);
+					//}
+
+					pLimb->rdthing.rootJoint = jointIdx;
+
+					//sithPuppet_PlayMode(pLimb, SITH_ANIM_DEATH, sithPuppet_DefaultCallback);
+					//memcpy(&pLimb->rdthing.hierarchyNodeMatrices, &rdthing->hierarchyNodeMatrices, sizeof(rdMatrix34) * rdthing->model3->numHierarchyNodes);
+
+
+					//rdVector3 kickVec = { 0.0f, 0.0f, 0.4f };
+					//rdVector_Copy3(&pLimb->physicsParams.vel, &kickVec);
+					rdPuppet_BuildJointMatrices(&pLimb->rdthing, &pLimb->lookOrientation);
+
+#ifdef RAGDOLLS
+					//pLimb->moveType = SITH_MT_RAGDOLL;
+					//pLimb->collide = SITH_COLLIDE_SPHERE_TREE;
+					//pLimb->treeSize = pLimb->collideSize;
+					//rdRagdoll_NewEntry(&pLimb->rdthing, &rdroid_zeroVector3);// &pLimb->physicsParams.vel);
+#endif
+				}
+
+				// restore
+				pThing->type = type;
+				pThing->thingtype = thingType;
+				pThing->moveType = moveType;
+				pThing->class_cog = cog;
+				pThing->thingflags = flags;
+
+				sithCogExec_PushInt(ctx, pLimb ? pLimb->thingIdx : -1);
+				return;
+			}
+		}
+	}
+	sithCogExec_PushInt(ctx, -1);
+}
+#endif
+
 void sithCogFunctionThing_SetActorWeapon(sithCog *ctx)
 {
     sithThing* weapTemplate = sithCogExec_PopTemplate(ctx);
@@ -2799,6 +2918,9 @@ void sithCogFunctionThing_Startup(void* ctx)
 #ifdef QOL_IMPROVEMENTS
 	sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_IsJointAmputated, "isjointamputated");	
 	sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetRootJoint, "setrootjoint");
+#endif
+#ifdef LIGHTSABER_DISMEMBER
+	sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_DismemberJoint, "dismemberjoint");
 #endif
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_SetActorWeapon, "setactorweapon");
     if (Main_bMotsCompat) {

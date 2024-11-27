@@ -73,7 +73,7 @@ void sithActor_Tick(sithThing *thing, int deltaMs)
             thing->actorParams.msUnderwater = v2;
             if ( v2 > 20000 )
             {
-                sithThing_Damage(thing, thing, 10.0, SITH_DAMAGE_DROWN);
+                sithThing_Damage(thing, thing, 10.0, SITH_DAMAGE_DROWN, -1);
                 thing->actorParams.msUnderwater -= 2000;
             }
         }

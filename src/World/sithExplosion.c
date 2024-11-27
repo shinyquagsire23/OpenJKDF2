@@ -114,7 +114,7 @@ void sithExplosion_UpdateForce(sithThing *explosion)
 #endif
                     if ( damage != 0.0 )
                     {
-                        sithThing_Damage(v4, explosion, a1a * damage, explosion->explosionParams.damageClass);
+                        sithThing_Damage(v4, explosion, a1a * damage, explosion->explosionParams.damageClass, -1);
                     }
                 }
             }

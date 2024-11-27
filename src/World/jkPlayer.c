@@ -256,6 +256,10 @@ void jkPlayer_StartupVars()
 	sithCvar_RegisterFlex("g_saberTrailCutoff", 0.1f, &jkSaber_trailCutoff, CVARFLAG_LOCAL | CVARFLAG_UPDATABLE_DEFAULT);
 	sithCvar_RegisterFlex("g_saberTrailShutter", 50.0f, &jkSaber_trailShutter, CVARFLAG_LOCAL | CVARFLAG_UPDATABLE_DEFAULT);
 #endif
+
+#ifdef LIGHTSABER_DISMEMBER
+	sithCvar_RegisterInt("g_saberRealisticCombat", 0, &jkSaber_dismember, CVARFLAG_LOCAL | CVARFLAG_UPDATABLE_DEFAULT);
+#endif
 }
 
 // Added: Clean reset

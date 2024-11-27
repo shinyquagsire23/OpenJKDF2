@@ -28,6 +28,10 @@ void jkSaber_SpawnSparks(jkPlayerInfo *pPlayerInfo, rdVector3 *pPos, sithSector 
 void jkSaber_Enable(sithThing *pThing, float damage, float bladeLength, float stunDelay);
 void jkSaber_Disable(sithThing *player);
 
+#ifdef LIGHTSABER_DISMEMBER
+extern int jkSaber_dismember;
+#endif
+
 #ifdef LIGHTSABER_TRAILS
 extern int jkSaber_trails;
 extern float jkSaber_trailMinVel;

@@ -17,6 +17,7 @@
 #include "Main/jkSmack.h"
 #include "General/stdString.h"
 #include "General/stdMath.h"
+#include "Engine/sithIntersect.h"
 
 #ifdef RAGDOLLS
 #include "Primitives/rdRagdoll.h"
@@ -35,6 +36,10 @@ float jkSaber_trailShutter = 50.0f;
 #ifdef LIGHTSABER_MARKS
 extern sithThing* jkSaber_paDecalThings[64];
 extern int jkSaber_numDecalThings;
+#endif
+
+#ifdef LIGHTSABER_DISMEMBER
+int jkSaber_dismember = 0;
 #endif
 
 #define JKSABER_EXTENDTIME (0.3000000)
@@ -472,93 +477,103 @@ void jkSaber_UpdateLength(sithThing *thing)
     }
 }
 
-
-#ifdef RAGDOLLS
-#include "Engine/sithIntersect.h"
-void jkSaber_AmputateRagdoll(sithThing* resultThing, rdMesh* mesh, rdVector3* pHitNorm, sithThing* pPlayer, rdVector3* pSaberPos, rdVector3* pSaberDir, float saberLen, float range)
+#ifdef LIGHTSABER_MARKS
+// Added: passive (non-damaging) collision effects
+void jkSaber_SpawnBurn(jkPlayerInfo* pPlayerInfo, rdVector3* pPos, rdVector3* pHitNormal, sithSector* pSector, int sparkType)
 {
-	// no mesh, try to find one
-	if (!mesh)
+	if (sithTime_curMs < pPlayerInfo->lastMarkSpawnMs + 20)
 	{
-		float tmp = 3.4e+38;
-		rdVector3 tmpVec;
-		rdVector_Zero3(&tmpVec); // Added
-		int iVar11 = sithIntersect_TreeIntersection(resultThing->rdthing.model3->hierarchyNodes, pSaberPos, pSaberDir, saberLen, range, resultThing, &tmp, &tmpVec, &mesh, 0);
-		if (iVar11 == 0)
-			return;
+		pPlayerInfo->saberCollideInfo.totalCollisionTime = 0;
+		return;
 	}
 
-	// if the thing died and ragdolled, see if a limb should be lost
-	if (resultThing->moveType == SITH_MT_RAGDOLL)
+	// todo: skip these for now until we figure out how best to approach them
+	if (sparkType == SPARKTYPE_SABER || sparkType == SPARKTYPE_BLOOD)
 	{
-		rdRagdoll* pRagdoll = resultThing->rdthing.pRagdoll;
-		if (pRagdoll && mesh)
+		pPlayerInfo->saberCollideInfo.totalCollisionTime = 0;
+		return;
+	}
+
+	// if we don't have a last mark, or we made a huge movement, also spawn sparks
+	float distSq = 0.0;
+	if (!pPlayerInfo->lastSaberMark || (distSq = rdVector_DistSquared3(pPos, &pPlayerInfo->lastSaberMark->position)) > 0.004f)
+	{
+		jkSaber_SpawnSparks(pPlayerInfo, pPos, pSector, SPARKTYPE_WALL);
+	}
+
+	// todo: some way of setting this template param
+	sithThing* pTemplate = sithTemplate_GetEntryByName("+sbrmrk");
+	if (pTemplate)
+	{
+		rdMatrix34 axis; // orientation of the decal
+		float markLen = 0.0f; // width scale of the decal
+
+		if (pPlayerInfo->lastSaberMark && distSq > 0.0001f)
 		{
-			// find the hierarchy node for the mesh
-			rdHierarchyNode* pFoundNode = NULL;
-			for (int node = 0; node < resultThing->rdthing.model3->numHierarchyNodes; ++node)
-			{
-				rdHierarchyNode* pNode = &resultThing->rdthing.model3->hierarchyNodes[node];
-				if (pNode->meshIdx == mesh->mesh_num)
-				{
-					pFoundNode = pNode;
-					break;
-				}
-			}
+			// project the positions onto the hit plane
+			rdVector3 projPos, lastProjPos;
+			rdVector_Project3(&projPos, pPos, pPos, pHitNormal);
+			rdVector_Project3(&lastProjPos, &pPlayerInfo->lastSaberMarkPos, pPos, pHitNormal);
 
-			if (pFoundNode && pFoundNode->parent && pFoundNode->skelJoint >= 0)
-			{
-				if (!resultThing->rdthing.amputatedJoints[pFoundNode->idx])
-				{
-					// disconnect all distance constraints to the parent joint
-					for (int constraint = 0; constraint < pRagdoll->pSkel->numDist; ++constraint)
-					{
-						rdRagdollDistConstraint* pConstraint = &pRagdoll->pSkel->paDistConstraints[constraint];
+			// facing the normal direction
+			rdVector_Copy3(&axis.lvec, pHitNormal);
+			rdVector_Normalize3Acc(&axis.lvec);
 
-						rdRagdollVert* pVert0 = &pRagdoll->pSkel->paVerts[pConstraint->vert[0]];
-						rdRagdollVert* pVert1 = &pRagdoll->pSkel->paVerts[pConstraint->vert[1]];
+			// right vector aligned to the slash direction
+			rdVector_Sub3(&axis.rvec, &lastProjPos, &projPos);
+			markLen = rdVector_Normalize3Acc(&axis.rvec);
 
-						if (pVert0->node == pFoundNode->parent->idx
-							|| pVert1->node == pFoundNode->parent->idx)
-						{
-							pRagdoll->paDisabledDistConstraints[constraint] = 1;
-						}
-					}
+			// get the up vector
+			rdVector_Cross3(&axis.uvec, &axis.lvec, &axis.rvec);
 
-					// disconnect all rotation constraints to the parent joint
-					for (int constraint = 0; constraint < pRagdoll->pSkel->numRot; ++constraint)
-					{
-						rdRagdollRotConstraint* pConstraint = &pRagdoll->pSkel->paRotConstraints[constraint];
-						for (int tri = 0; tri < 2; ++tri)
-						{
-							rdRagdollTri* pTri = &pRagdoll->pSkel->paTris[pConstraint->tri[tri]];		
-							for (int v = 0; v < 3; ++v)
-							{
-								if(pTri->vert[v] == -1)
-									continue;
-								rdRagdollVert* pVert = &pRagdoll->pSkel->paVerts[pTri->vert[v]];
-								if (pVert->node == pFoundNode->parent->idx)
-								{
-									pRagdoll->paDisabledRotConstraints[constraint] = 1;
-									break;
-								}
-							}
-						}
-					}
+			// place the decal in the middle
+			rdVector_Add3(&axis.scale, pPos, &pPlayerInfo->lastSaberMarkPos);
+			rdVector_Scale3Acc(&axis.scale, 0.5f);
+		}
+		else
+		{
+			// no previous mark, start fresh
+			rdMatrix_BuildFromLook34(&axis, pHitNormal);
+			rdVector_Copy3(&axis.scale, pPos);
+		}
 
-					// kick the joint
-					float invMass = (float)pRagdoll->numParticles / resultThing->physicsParams.mass;
-					rdRagdollJoint* pJoint = &pRagdoll->pSkel->paJoints[pFoundNode->skelJoint];
-					for (int v = 0; v < 3; ++v)
-					{
-						if(pJoint->vert[v] >= 0)
-						{
-							rdRagdollParticle* pParticle = &pRagdoll->paParticles[pJoint->vert[v]];
-							rdVector_MultAcc3(&pParticle->forces, pHitNorm, invMass);
-						}
-					}
-				}
-			}
+
+		// make sure we recycle things otherwise we risk running out of them frequently
+		int decalIdx = (jkSaber_numDecalThings++ % 64);
+		if (jkSaber_paDecalThings[decalIdx])
+		{
+			sithThing_Destroy(jkSaber_paDecalThings[decalIdx]);
+			jkSaber_paDecalThings[decalIdx] = 0;
+		}
+
+		sithThing* pSpawned = sithThing_Create(pTemplate, &axis.scale, &axis, pSector, 0);
+		if (pSpawned)
+		{
+			jkSaber_paDecalThings[decalIdx] = pSpawned;
+
+			pSpawned->prev_thing = pPlayerInfo->actorThing;
+			pPlayerInfo->lastMarkSpawnMs = sithTime_curMs;
+			pSpawned->child_signature = pPlayerInfo->actorThing->signature;
+
+			// adjust the size of the decal (template should be a decal) so it spans the length of the slash
+			if (pPlayerInfo->lastSaberMark && markLen > 0.0001f)
+				pSpawned->rdthing.decalScale.x = 1.7f * markLen / pSpawned->rdthing.decal->size.x;
+
+			// if the distance between the 2 points is extremely low gradually scale it up
+			// we could do this with the last mark, but we want the sounds and effects to play from the spawned template
+			//if (pPlayerInfo->lastSaberMark && distSq < 0.0001f)
+			//{
+			//	pSpawned->rdthing.decalScale.x = min(1.0f + pPlayerInfo->saberCollideInfo.totalCollisionTime * 10.0f, 4.0f);
+			//	pSpawned->rdthing.decalScale.z = min(1.0f + pPlayerInfo->saberCollideInfo.totalCollisionTime * 10.0f, 4.0f);
+			//	pPlayerInfo->saberCollideInfo.totalCollisionTime += sithTime_deltaSeconds;
+			//}
+			//else
+			//{
+			//	pPlayerInfo->saberCollideInfo.totalCollisionTime = 0;
+			//}
+
+			rdVector_Copy3(&pPlayerInfo->lastSaberMarkPos, pPos);
+			pPlayerInfo->lastSaberMark = pSpawned;
 		}
 	}
 }
@@ -580,9 +595,25 @@ void  jkSaber_UpdateCollision2(sithThing *pPlayerThing,rdVector3 *pSaberPos,rdVe
     if (!pSector) {
         return;
 	}
-	sithCollision_SearchRadiusForThings(pSector, pPlayerThing, pSaberPos, pSaberDir, pCollideInfo->bladeLength, 0.0, 0);
 
+	int doDamage = 1;
+#ifdef LIGHTSABER_MARKS
+	doDamage = (pPlayerThing->jkFlags & JKFLAG_SABERDAMAGE);
+#endif
+#ifdef LIGHTSABER_DISMEMBER
+	doDamage = doDamage || (jkSaber_dismember == 2); // always damage if jkSaber_dismember = 2
+#endif
 
+	float saberLength = !(pPlayerThing->jkFlags & JKFLAG_SABERDAMAGE) ? pPlayerThing->playerInfo->polyline.length : pCollideInfo->bladeLength;
+#ifdef LIGHTSABER_DISMEMBER
+	if(jkSaber_dismember == 2)
+		saberLength = pPlayerThing->playerInfo->polyline.length;
+#endif
+	sithCollision_SearchRadiusForThings(pSector, pPlayerThing, pSaberPos, pSaberDir, saberLength, 0.0, 0);
+
+#ifdef LIGHTSABER_MARKS
+	int collisions = 0;
+#endif
 	sithSector* pSectorIter = pSector;
 	while (1)
 	{
@@ -627,14 +658,31 @@ void  jkSaber_UpdateCollision2(sithThing *pPlayerThing,rdVector3 *pSaberPos,rdVe
 				break;
 			}
 
+			int jointIndex = -1;
+#ifdef LIGHTSABER_DISMEMBER
+			if(doDamage)
+				jointIndex = sithPuppet_FindDamagedJoint(resultThing, pSaberPos, pSaberDir, saberLength);
+#endif
+
+#ifdef LIGHTSABER_MARKS
+			if(resultThing->type == SITH_THING_ACTOR
+				|| resultThing->type == SITH_THING_PLAYER)
+			{
+				// no health/dead? don't damage
+				// this prevents repeatedly calling the damage function (like in LEC cogs) 
+				if(resultThing->actorParams.health <= 0.0)
+					doDamage = 0;
+			}
+#endif
+	
 			if (resultThing->type != SITH_THING_ACTOR
 				&& resultThing->type != SITH_THING_PLAYER
 				|| !(resultThing->actorParams.typeflags & SITH_AF_BLEEDS))
 			{
 				jkSaber_SpawnSparks(playerInfo, &local_54, pSectorIter, SPARKTYPE_BLOOD);
 
-				sithThing_Damage(searchResult->receiver, pPlayerThing, pCollideInfo->damage, SITH_DAMAGE_SABER);
-				//jkSaber_AmputateRagdoll(resultThing, searchResult->sender, &searchResult->hitNorm, pPlayerThing, pSaberPos, pSaberDir, pCollideInfo->bladeLength, 0.0);
+				if (doDamage) // Added
+					sithThing_Damage(searchResult->receiver, pPlayerThing, pCollideInfo->damage, SITH_DAMAGE_SABER, jointIndex);
 				pCollideInfo->damagedThings[pCollideInfo->numDamagedThings++] = searchResult->receiver;
 				break;
 			}
@@ -671,7 +719,8 @@ void  jkSaber_UpdateCollision2(sithThing *pPlayerThing,rdVector3 *pSaberPos,rdVe
 
 			jkSaber_SpawnSparks(playerInfo, &local_54, pSectorIter, SPARKTYPE_BLOOD);
 
-            sithThing_Damage(resultThing, pPlayerThing, pCollideInfo->damage, SITH_DAMAGE_SABER);
+			if (doDamage) // Added
+				sithThing_Damage(resultThing, pPlayerThing, pCollideInfo->damage, SITH_DAMAGE_SABER, jointIndex);
             pCollideInfo->damagedThings[pCollideInfo->numDamagedThings++] = searchResult->receiver;
             break;
         }
@@ -680,7 +729,12 @@ void  jkSaber_UpdateCollision2(sithThing *pPlayerThing,rdVector3 *pSaberPos,rdVe
             rdVector_Copy3(&local_54, pSaberPos);
             rdVector_MultAcc3(&local_54, pSaberDir, searchResult->distance - 0.001);
             
-            jkSaber_SpawnSparks(playerInfo, &local_54, pSectorIter, SPARKTYPE_WALL);
+#ifdef LIGHTSABER_MARKS
+			jkSaber_SpawnBurn(playerInfo, &local_54, &searchResult->hitNorm, pSectorIter, SPARKTYPE_WALL);
+			++collisions;
+#else
+			jkSaber_SpawnSparks(playerInfo, &local_54, pSectorIter, SPARKTYPE_WALL);
+#endif
 
             if ( pCollideInfo->numDamagedSurfaces < 6 )
             {
@@ -692,7 +746,8 @@ void  jkSaber_UpdateCollision2(sithThing *pPlayerThing,rdVector3 *pSaberPos,rdVe
                 }
                 if ( surfaceNum >= pCollideInfo->numDamagedSurfaces )
                 {
-                    sithSurface_SendDamageToThing(searchResult->surface, pPlayerThing, pCollideInfo->damage, SITH_DAMAGE_SABER);
+					if (doDamage) // Added
+						sithSurface_SendDamageToThing(searchResult->surface, pPlayerThing, pCollideInfo->damage, SITH_DAMAGE_SABER);
                     pCollideInfo->damagedSurfaces[pCollideInfo->numDamagedSurfaces++] = searchResult->surface;
                 }
             }
@@ -700,108 +755,14 @@ void  jkSaber_UpdateCollision2(sithThing *pPlayerThing,rdVector3 *pSaberPos,rdVe
         }
     }
     sithCollision_SearchClose();
+
+#ifdef LIGHTSABER_MARKS
+	if (!collisions)
+		playerInfo->lastSaberMark = 0;
+#endif
 }
 
 #ifdef LIGHTSABER_MARKS
-// Added: passive (non-damaging) collision effects
-void jkSaber_SpawnBurn(jkPlayerInfo* pPlayerInfo, rdVector3* pPos, rdVector3* pHitNormal, sithSector* pSector, int sparkType)
-{
-	if (sithTime_curMs < pPlayerInfo->lastMarkSpawnMs + 20)
-	{
-		pPlayerInfo->saberCollideInfo.totalCollisionTime = 0;
-		return;
-	}
-
-	// todo: skip these for now until we figure out how best to approach them
-	if (sparkType == SPARKTYPE_SABER || sparkType == SPARKTYPE_BLOOD)
-	{
-		pPlayerInfo->saberCollideInfo.totalCollisionTime = 0;
-		return;
-	}
-
-	// if we don't have a last mark, or we made a huge movement, also spawn sparks
-	float distSq = 0.0;
-	if (!pPlayerInfo->lastSaberMark || (distSq = rdVector_DistSquared3(pPos, &pPlayerInfo->lastSaberMark->position)) > 0.004f)
-	{
-		jkSaber_SpawnSparks(pPlayerInfo, pPos, pSector, SPARKTYPE_WALL);
-	}
-
-	// todo: some way of setting this template param
-	sithThing* pTemplate = sithTemplate_GetEntryByName("+sbrmrk");
-	if (pTemplate)
-	{
-		rdMatrix34 axis; // orientation of the decal
-		float markLen = 0.0f; // width scale of the decal
-
-		if(pPlayerInfo->lastSaberMark && distSq > 0.0001f)
-		{
-			// project the positions onto the hit plane
-			rdVector3 projPos, lastProjPos;
-			rdVector_Project3(&projPos, pPos, pPos, pHitNormal);
-			rdVector_Project3(&lastProjPos, &pPlayerInfo->lastSaberMarkPos, pPos, pHitNormal);
-
-			// facing the normal direction
-			rdVector_Copy3(&axis.lvec, pHitNormal);
-			rdVector_Normalize3Acc(&axis.lvec);
-			
-			// right vector aligned to the slash direction
-			rdVector_Sub3(&axis.rvec, &lastProjPos, &projPos);
-			markLen = rdVector_Normalize3Acc(&axis.rvec);
-			
-			// get the up vector
-			rdVector_Cross3(&axis.uvec, &axis.lvec, &axis.rvec);
-				
-			// place the decal in the middle
-			rdVector_Add3(&axis.scale, pPos, &pPlayerInfo->lastSaberMarkPos);
-			rdVector_Scale3Acc(&axis.scale, 0.5f);
-		}
-		else
-		{
-			// no previous mark, start fresh
-			rdMatrix_BuildFromLook34(&axis, pHitNormal);
-			rdVector_Copy3(&axis.scale, pPos);
-		}
-
-
-		// make sure we recycle things otherwise we risk running out of them frequently
-		int decalIdx = (jkSaber_numDecalThings++ % 64);
-		if (jkSaber_paDecalThings[decalIdx])
-		{
-			sithThing_Destroy(jkSaber_paDecalThings[decalIdx]);
-			jkSaber_paDecalThings[decalIdx] = 0;
-		}
-
-		sithThing* pSpawned = sithThing_Create(pTemplate, &axis.scale, &axis, pSector, 0);
-		if (pSpawned)
-		{
-			jkSaber_paDecalThings[decalIdx] = pSpawned;
-
-			pSpawned->prev_thing = pPlayerInfo->actorThing;
-			pPlayerInfo->lastMarkSpawnMs = sithTime_curMs;
-			pSpawned->child_signature = pPlayerInfo->actorThing->signature;
-
-			// adjust the size of the decal (template should be a decal) so it spans the length of the slash
-			if(pPlayerInfo->lastSaberMark && markLen > 0.0001f)
-				pSpawned->rdthing.decalScale.x = 1.7f * markLen / pSpawned->rdthing.decal->size.x;
-
-			// if the distance between the 2 points is extremely low gradually scale it up
-			// we could do this with the last mark, but we want the sounds and effects to play from the spawned template
-			//if (pPlayerInfo->lastSaberMark && distSq < 0.0001f)
-			//{
-			//	pSpawned->rdthing.decalScale.x = min(1.0f + pPlayerInfo->saberCollideInfo.totalCollisionTime * 10.0f, 4.0f);
-			//	pSpawned->rdthing.decalScale.z = min(1.0f + pPlayerInfo->saberCollideInfo.totalCollisionTime * 10.0f, 4.0f);
-			//	pPlayerInfo->saberCollideInfo.totalCollisionTime += sithTime_deltaSeconds;
-			//}
-			//else
-			//{
-			//	pPlayerInfo->saberCollideInfo.totalCollisionTime = 0;
-			//}
-
-			rdVector_Copy3(&pPlayerInfo->lastSaberMarkPos, pPos);
-			pPlayerInfo->lastSaberMark = pSpawned;
-		}
-	}
-}
 
 // todo: get this working for second saber
 void jkSaber_UpdateEffectCollision(sithThing* pPlayerThing, rdVector3* pSaberPos, rdVector3* pSaberDir, rdVector3* pSaberLastPos, jkSaberCollide* pCollideInfo)
@@ -873,11 +834,20 @@ void jkSaber_UpdateEffectCollision(sithThing* pPlayerThing, rdVector3* pSaberPos
 				break;
 			}
 
+			int jointIndex = -1;
+#ifdef LIGHTSABER_DISMEMBER
+			jointIndex = sithPuppet_FindDamagedJoint(resultThing, pSaberPos, pSaberDir, saberLength);
+#endif
+
 			if (resultThing->type != SITH_THING_ACTOR
 				&& resultThing->type != SITH_THING_PLAYER
 				|| !(resultThing->actorParams.typeflags & SITH_AF_BLEEDS))
 			{
 				jkSaber_SpawnSparks(playerInfo, &local_54, pSectorIter, SPARKTYPE_BLOOD);
+#ifdef LIGHTSABER_DISMEMBER
+				if(jkSaber_dismember == 2)
+					sithThing_Damage(searchResult->receiver, pPlayerThing, pCollideInfo->damage, SITH_DAMAGE_SABER, jointIndex);
+#endif
 				pCollideInfo->damagedThings[pCollideInfo->numDamagedThings++] = searchResult->receiver;
 				break;
 			}
@@ -914,7 +884,10 @@ void jkSaber_UpdateEffectCollision(sithThing* pPlayerThing, rdVector3* pSaberPos
 			}
 
 			jkSaber_SpawnSparks(playerInfo, &local_54, pSectorIter, SPARKTYPE_BLOOD);
-
+#ifdef LIGHTSABER_DISMEMBER
+			if (jkSaber_dismember == 2)
+				sithThing_Damage(resultThing, pPlayerThing, pCollideInfo->damage, SITH_DAMAGE_SABER, jointIndex);
+#endif
 			pCollideInfo->damagedThings[pCollideInfo->numDamagedThings++] = searchResult->receiver;
 			break;
 		}
@@ -992,17 +965,23 @@ void jkSaber_UpdateCollision(sithThing *player, int joint, int bSecondary)
 	// do a collision check with the blade tip to generate effects like saber marks
 	rdVector3 lastPosWS;
 	rdMatrix_TransformPoint34(&lastPosWS, &playerInfo->saberTrail[bSecondary].lastTip, &rdCamera_camMatrix);
-	jkSaber_UpdateEffectCollision(player, &jointMat.scale, &jointMat.lvec, &lastPosWS, &playerInfo->saberCollideInfo);
-	playerInfo->saberCollideInfo.numDamagedThings = 0;
-	playerInfo->saberCollideInfo.numDamagedSurfaces = 0;
-#endif
-
+	//jkSaber_UpdateEffectCollision(player, &jointMat.scale, &jointMat.lvec, &lastPosWS, &playerInfo->saberCollideInfo);
+	
+	//if(!player->playerInfo->saberCollideInfo.field_1A4)
+	{
+		playerInfo->saberCollideInfo.numDamagedThings = 0;
+		playerInfo->saberCollideInfo.numDamagedSurfaces = 0;
+	}
+#else
     if ( !(player->jkFlags & JKFLAG_SABERDAMAGE) )
         return;
-    if ( !playerInfo->saberCollideInfo.field_1A4 )
-        return;
+
+	if (!playerInfo->saberCollideInfo.field_1A4)
+		return;
+#endif
     
-    if (!Main_bMotsCompat) {
+    if (!Main_bMotsCompat || !(player->jkFlags & JKFLAG_SABERDAMAGE)) // Added: check for JKFLAG_SABERDAMAGE and don't bother interpolating
+	{
         jkSaber_UpdateCollision2(player,&jointMat.scale, &jointMat.lvec, &playerInfo->saberCollideInfo);
         return;
     }
@@ -1107,5 +1086,10 @@ void jkSaber_Disable(sithThing *player)
     player->playerInfo->saberCollideInfo.field_1A4 = 0;
 #ifdef JKM_SABER
     player->playerInfo->jkmUnk1 = 0; // MOTS added
+#endif
+#ifdef LIGHTSABER_DISMEMBER
+	player->playerInfo->saberCollideInfo.damage = (jkSaber_dismember == 2) ? 25.0f : 0.0f;
+#elif LIGHTSABER_MARKS
+	player->playerInfo->saberCollideInfo.damage = 0;
 #endif
 }

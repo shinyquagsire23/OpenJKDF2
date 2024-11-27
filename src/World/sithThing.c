@@ -469,7 +469,7 @@ void sithThing_Destroy(sithThing* pThing)
         sithCog_SendMessageFromThing(pThing, 0, SITH_MESSAGE_REMOVED);
 }
 
-float sithThing_Damage(sithThing *sender, sithThing *reciever, float amount, int damageClass)
+float sithThing_Damage(sithThing *sender, sithThing *reciever, float amount, int damageClass, int hitJoint)
 {
     float param1; // [esp+0h] [ebp-20h]
 
@@ -485,7 +485,7 @@ float sithThing_Damage(sithThing *sender, sithThing *reciever, float amount, int
     if ( (sender->thingflags & SITH_TF_CAPTURED) != 0 && (sender->thingflags & SITH_TF_INVULN) == 0 )
     {
         param1 = (float)(unsigned int)damageClass;
-        amount = sithCog_SendMessageFromThingEx(sender, reciever, SITH_MESSAGE_DAMAGED, amount, param1, 0.0, 0.0);
+        amount = sithCog_SendMessageFromThingEx(sender, reciever, SITH_MESSAGE_DAMAGED, amount, param1, (float)hitJoint, 0.0);
     }
     if ( amount > 0.0 )
     {
