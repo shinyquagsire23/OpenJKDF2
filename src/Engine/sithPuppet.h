@@ -40,6 +40,9 @@ void sithPuppet_FidgetAnim(sithThing *pThing);
 void sithPuppet_resetidk(sithThing *pThing);
 void sithPuppet_advanceidk(sithThing *pThing, float a2);
 
+// Added
+int sithPuppet_FindDamagedJoint(sithThing* pThing, rdVector3* pPos, rdVector3* pDir, float dirLen);
+
 //static int (*sithPuppet_Startup)() = (void*)sithPuppet_Startup_ADDR;
 //static void (*sithPuppet_FreeEntry)(sithThing *puppet) = (void*)sithPuppet_FreeEntry_ADDR;
 //static void (*sithPuppet_Tick)(sithThing *thing, float a2) = (void*)sithPuppet_Tick_ADDR;

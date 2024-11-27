@@ -6,6 +6,7 @@
 #include "World/sithSector.h"
 #include "World/jkPlayer.h"
 #include "Engine/sithCollision.h"
+#include "Engine/sithIntersect.h"
 #include "Gameplay/sithPlayerActions.h"
 #include "Main/jkGame.h"
 #include "Engine/rdPuppet.h"
@@ -899,4 +900,40 @@ void sithPuppet_advanceidk(sithThing *pThing, float a2)
             }
         }
     }
+}
+
+// Added
+int sithPuppet_FindDamagedJoint(sithThing* pThing, rdVector3* pPos, rdVector3* pDir, float dirLen)
+{
+	if (pThing->rdthing.model3 && pThing->animclass)
+	{
+		rdHierarchyNode* node = NULL;
+		float tmp = 3.4e+38;
+		rdVector3 tmpVec;
+		rdVector_Zero3(&tmpVec);
+		sithIntersect_TreeIntersection(pThing->rdthing.model3->hierarchyNodes, pPos, pDir, dirLen, 0.0f, pThing, &tmp, &tmpVec, &node, 0, pDir);
+
+		if (node)
+		{
+			// select a body part based on the node flags
+			if ((node->type & 0x10) || node->type & 0x1)
+				return JOINTTYPE_TORSO;
+			else if (node->type & 0x8) // head/neck
+				return JOINTTYPE_NECK;
+			else if (node->type & 0x2) // left arm
+				return JOINTTYPE_SECONDARYWEAPJOINT;
+			else if (node->type & 0x4) // right arm
+				return JOINTTYPE_PRIMARYWEAPJOINT;
+			else if (node->type & 0x20) // left leg
+				return JOINTTYPE_LEFTLEG;
+			else if (node->type & 0x40) // right leg
+				return JOINTTYPE_RIGHTLEG;
+			//for (int joint = 0; joint < JOINTTYPE_NUM_JOINTS; ++joint)
+			//{
+			//	if(resultThing->animclass->bodypart_to_joint[joint] == node->idx)
+			//		return joint;
+			//}
+		}
+	}
+	return -1;
 }
