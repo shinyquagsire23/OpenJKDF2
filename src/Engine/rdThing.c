@@ -30,6 +30,7 @@ int rdThing_NewEntry(rdThing *thing, sithThing *parent)
     thing->wallCel = -1;
     thing->hierarchyNodeMatrices = 0;
     thing->desiredGeoMode = RD_GEOMODE_TEXTURED;
+	thing->rootJoint = 0; // Added
 #ifdef RENDER_DROID2
 	thing->desiredLightMode = RD_LIGHTMODE_SUBSURFACE;
 #elif defined(SPECULAR_LIGHTING)
@@ -113,6 +114,7 @@ int rdThing_SetModel3(rdThing *thing, rdModel3 *model)
     thing->type = RD_THINGTYPE_MODEL;
     thing->model3 = model;
     thing->geosetSelect = -1;
+	thing->rootJoint = 0; // Added
 #ifdef FP_LEGS
 	thing->hiddenJoint = -1;
 	thing->hideWeaponMesh = 0;
