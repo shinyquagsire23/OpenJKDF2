@@ -125,7 +125,7 @@ int sithAnimClass_LoadPupEntry(sithAnimclass *animclass, char *fpath)
                     break;
                 bodypart_idx = _atoi(stdConffile_entry.args[0].key);
                 joint_idx = _atoi(stdConffile_entry.args[0].value);
-                if ( bodypart_idx < 0xA )
+                if ( bodypart_idx < JOINTTYPE_NUM_JOINTS )
                     animclass->bodypart_to_joint[bodypart_idx] = joint_idx;
             }
         }
