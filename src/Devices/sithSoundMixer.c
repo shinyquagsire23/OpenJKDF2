@@ -744,7 +744,7 @@ void sithSoundMixer_Tick(float deltaSecs)
         goto LABEL_72;
 
     // Added: nullptr deref crash fix
-    if (!sithSoundMixer_pLastSectorSoundSector || !v1)
+    if (!v1)
         goto LABEL_72;
 
     sithSoundMixer_pLastSectorSoundSector = sithCamera_currentCamera->sector;
