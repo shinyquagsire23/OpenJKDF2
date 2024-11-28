@@ -1782,41 +1782,45 @@ void sithCogFunctionThing_DismemberJoint(sithCog* ctx)
 				pThing->type = SITH_THING_CORPSE;
 				pThing->thingtype = SITH_THING_CORPSE;
 				pThing->moveType = SITH_MT_NONE;
-				pThing->class_cog = NULL;
-				pThing->pTemplate = pBloodTemplate;
+				pThing->class_cog = NULL;//sithCog_LoadCogscript("00_bloodtrail.cog");// NULL;
+				//pThing->pTemplate = pBloodTemplate;
 
 				// spawn the thing at the position of the root joint
 				if (rdthing->frameTrue != rdroid_frameTrue)
 					rdPuppet_BuildJointMatrices(rdthing, &pThing->lookOrientation);
 
-				//rdMatrix34 lookOrientation;
-				//rdMatrix_Copy34(&lookOrientation, &rdthing->hierarchyNodeMatrices[jointIdx]);
-				//rdVector_Zero3(&lookOrientation.scale);
-				//
-				//rdVector3 position;
-				//rdVector_Copy3(&position, &rdthing->hierarchyNodeMatrices[jointIdx].scale);
+				rdMatrix34 lookOrientation;
+				rdMatrix_Copy34(&lookOrientation, &rdthing->hierarchyNodeMatrices[jointIdx]);
+				rdVector_Zero3(&lookOrientation.scale);
+				
+				rdVector3 position;
+				rdVector_Copy3(&position, &rdthing->hierarchyNodeMatrices[jointIdx].scale);
 
 				sithThing* pLimb = sithThing_Create(pThing, &pThing->position, &pThing->lookOrientation, pThing->sector, pThing);
 				if (pLimb)
 				{
+					pLimb->thingflags |= SITH_TF_CAPTURED;
 					rdThing_SetModel3(&pLimb->rdthing, pThing->rdthing.model3);
 					sithThing_DetachThing(pLimb);
-					pLimb->moveType = SITH_MT_PHYSICS;
+				//	pLimb->moveType = SITH_MT_PHYSICS;
 
-					pLimb->collideSize = pLimb->moveSize = rdthing->model3->geosets[0].meshes[pNode->meshIdx].radius * 0.75;
+				//	pLimb->collideSize = pLimb->moveSize = rdthing->model3->geosets[0].meshes[pNode->meshIdx].radius;// * 0.75;
 					//pLimb->lifeLeftMs = 30000.0f;
 					pLimb->lifeLeftMs = jkPlayer_bKeepCorpses ? -1 : 20000;
 
-					pLimb->physicsParams.surfaceDrag = 1.000000;
-					pLimb->physicsParams.airDrag = 4.000000f;
-					pLimb->physicsParams.mass = 15.000000;
-					//pLimb->physicsParams.physflags = SITH_PF_USEGRAVITY | SITH_PF_FLOORSTICK | SITH_PF_SURFACEBOUNCE | SITH_PF_ROTVEL | SITH_PF_FEELBLASTFORCE;
-					pLimb->physicsParams.physflags = (SITH_PF_USEGRAVITY | 0x44261) & ~(SITH_PF_SURFACEALIGN | SITH_PF_FLOORSTICK | SITH_PF_FEELBLASTFORCE | SITH_PF_SURFACEBOUNCE);
-					pLimb->physicsParams.physflags &= ~(SITH_PF_FLY | SITH_PF_NOWALLGRAVITY | SITH_PF_ATTACHED | SITH_PF_WALLSTICK);
+					if(pBloodTemplate)
+						sithThing_Create(pBloodTemplate, &position, &lookOrientation, pLimb->sector, pLimb);
 
-					pLimb->physicsParams.buoyancy = 0.500000f;
-					pLimb->physicsParams.maxVel = 15.0f;
-					pLimb->physicsParams.maxRotVel = 15.0f;
+				//	pLimb->physicsParams.surfaceDrag = 1.000000;
+				//	pLimb->physicsParams.airDrag = 4.000000f;
+				//	pLimb->physicsParams.mass = 15.000000;
+				//	//pLimb->physicsParams.physflags = SITH_PF_USEGRAVITY | SITH_PF_FLOORSTICK | SITH_PF_SURFACEBOUNCE | SITH_PF_ROTVEL | SITH_PF_FEELBLASTFORCE;
+				//	pLimb->physicsParams.physflags = (SITH_PF_USEGRAVITY | 0x44261) & ~(SITH_PF_SURFACEALIGN | SITH_PF_FLOORSTICK | SITH_PF_FEELBLASTFORCE | SITH_PF_SURFACEBOUNCE);
+				//	pLimb->physicsParams.physflags &= ~(SITH_PF_FLY | SITH_PF_NOWALLGRAVITY | SITH_PF_ATTACHED | SITH_PF_WALLSTICK);
+				//
+				//	pLimb->physicsParams.buoyancy = 0.500000f;
+				//	pLimb->physicsParams.maxVel = 15.0f;
+				//	pLimb->physicsParams.maxRotVel = 15.0f;
 
 					//if (COG_SHOULD_SYNC(ctx))
 					//{
@@ -1829,15 +1833,18 @@ void sithCogFunctionThing_DismemberJoint(sithCog* ctx)
 					//memcpy(&pLimb->rdthing.hierarchyNodeMatrices, &rdthing->hierarchyNodeMatrices, sizeof(rdMatrix34) * rdthing->model3->numHierarchyNodes);
 
 
-					//rdVector3 kickVec = { 0.0f, 0.0f, 0.4f };
-					//rdVector_Copy3(&pLimb->physicsParams.vel, &kickVec);
+					rdVector3 kickVec = { 0.0f, 0.7f, 1.4f };
+					rdVector_Copy3(&pLimb->physicsParams.vel, &kickVec);
 					rdPuppet_BuildJointMatrices(&pLimb->rdthing, &pLimb->lookOrientation);
 
 #ifdef RAGDOLLS
+					//if(rdthing->model3->pSkel)
+					//{
 					//pLimb->moveType = SITH_MT_RAGDOLL;
 					//pLimb->collide = SITH_COLLIDE_SPHERE_TREE;
 					//pLimb->treeSize = pLimb->collideSize;
 					//rdRagdoll_NewEntry(&pLimb->rdthing, &rdroid_zeroVector3);// &pLimb->physicsParams.vel);
+					//}
 #endif
 				}
 

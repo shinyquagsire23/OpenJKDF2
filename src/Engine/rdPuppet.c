@@ -352,6 +352,10 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
             rdVector_Add3Acc(&a4, &v15->pos);
             rdVector_Add3Acc(&a3, &v15->rot);
 
+			// Added: if there's a root joint, nullify positions prior to it to avoid offsetting it
+			//if(thing->rootJoint != 0 && v80 < thing->rootJoint)
+				//rdVector_Zero3(&a4);
+
             rdMatrix_Build34(&thing->hierarchyNodeMatrices[v80], &a3, &a4);
             v61 = &thing->hierarchyNodes2[v80];
             if ( !rdVector_IsZero3(v61) )
@@ -362,9 +366,9 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
 
 	// added
 	//if(thing->rootJoint != 0)
-		//rdMatrix_Identity34(&thing->hierarchyNodeMatrices[thing->rootJoint]);
+	//	rdMatrix_Identity34(&thing->hierarchyNodeMatrices[thing->rootJoint]);
 
-    rdThing_AccumulateMatrices(thing, &model->hierarchyNodes[thing->rootJoint], matrix); // Added: rootJoint
+    rdThing_AccumulateMatrices(thing, &model->hierarchyNodes[/*thing->rootJoint*/0], matrix); // Added: rootJoint
     thing->frameTrue = rdroid_frameTrue;
 }
 
