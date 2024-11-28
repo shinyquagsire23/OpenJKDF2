@@ -146,7 +146,11 @@ void sithWeapon_sub_4D35E0(sithThing *weapon)
         }
         if (searchRes->hitType & SITHCOLLISION_THING)
         {
-            sithThing_Damage(searchRes->receiver, weapon, damage_, weapon->weaponParams.damageClass, -1);
+			int joint = -1;
+#ifdef LIGHTSABER_DISMEMBER
+			joint = sithPuppet_FindDamagedJoint(searchRes->receiver, &weapon->position, &weaponPos_, 1.0f);//weapon->weaponParams.range);
+#endif
+			sithThing_Damage(searchRes->receiver, weapon, damage_, weapon->weaponParams.damageClass, joint);
             if ( weapon->weaponParams.force != 0.0 )
             {
                 damageReceiver = searchRes->receiver;
@@ -337,7 +341,11 @@ void sithWeapon_sub_4D3920(sithThing *weapon)
         }
         if ( (searchRes->hitType & SITHCOLLISION_THING) != 0 )
         {
-            sithThing_Damage(searchRes->receiver, weapon, amount, weapon->weaponParams.damageClass, -1);
+			int joint = -1;
+#ifdef LIGHTSABER_DISMEMBER
+			joint = sithPuppet_FindDamagedJoint(searchRes->receiver, &weapon->position, &lookOrient, 1.0f);//range);
+#endif
+            sithThing_Damage(searchRes->receiver, weapon, amount, weapon->weaponParams.damageClass, joint);
             if ( weapon->weaponParams.force != 0.0 )
             {
                 receiveThing = searchRes->receiver;
@@ -751,8 +759,13 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
             return 0;
         }
 
-        if (physicsThing->weaponParams.damage != 0.0) {
-            sithThing_Damage(collidedThing, physicsThing, physicsThing->weaponParams.damage, physicsThing->weaponParams.damageClass, -1);
+        if (physicsThing->weaponParams.damage != 0.0)
+		{
+			int joint = -1;
+#ifdef LIGHTSABER_DISMEMBER
+			joint = sithPuppet_FindDamagedJoint(collidedThing, &physicsThing->position, &physicsThing->lookOrientation.lvec, 1.0f);// a4->distance);
+#endif
+            sithThing_Damage(collidedThing, physicsThing, physicsThing->weaponParams.damage, physicsThing->weaponParams.damageClass, joint);
         }
 
         if (physicsThing->weaponParams.typeflags & SITH_WF_EXPLODE_ON_SURFACE_HIT)
@@ -797,8 +810,13 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
 
     if (sithCollision_DebrisDebrisCollide(physicsThing, collidedThing, a4, a5))
     {
-        if (physicsThing->weaponParams.damage != 0.0) {
-            sithThing_Damage(collidedThing, physicsThing, physicsThing->weaponParams.damage, physicsThing->weaponParams.damageClass, -1);
+        if (physicsThing->weaponParams.damage != 0.0)
+		{
+			int joint = -1;
+#ifdef LIGHTSABER_DISMEMBER
+			joint = sithPuppet_FindDamagedJoint(collidedThing, &physicsThing->position, &physicsThing->lookOrientation.lvec, 1.0f);//a4->distance);
+#endif
+            sithThing_Damage(collidedThing, physicsThing, physicsThing->weaponParams.damage, physicsThing->weaponParams.damageClass, joint);
         }
         if (physicsThing->weaponParams.typeflags & SITH_WF_EXPLODE_ON_THING_HIT)
         {

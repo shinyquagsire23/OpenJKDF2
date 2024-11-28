@@ -911,12 +911,12 @@ int sithPuppet_FindDamagedJoint(sithThing* pThing, rdVector3* pPos, rdVector3* p
 		float tmp = 3.4e+38;
 		rdVector3 tmpVec;
 		rdVector_Zero3(&tmpVec);
-		sithIntersect_TreeIntersection(pThing->rdthing.model3->hierarchyNodes, pPos, pDir, dirLen, 0.0f, pThing, &tmp, &tmpVec, &node, 0, pDir);
+		sithIntersect_TreeIntersection(pThing->rdthing.model3->hierarchyNodes, pPos, pDir, dirLen, 0.0f, pThing, &tmp, &tmpVec, &node, 0, NULL);//pDir);
 
 		if (node)
 		{
 			// select a body part based on the node flags
-			if ((node->type & 0x10) || node->type & 0x1)
+			if (node->type & 0x11) // hip or torso
 				return JOINTTYPE_TORSO;
 			else if (node->type & 0x8) // head/neck
 				return JOINTTYPE_NECK;
@@ -928,11 +928,6 @@ int sithPuppet_FindDamagedJoint(sithThing* pThing, rdVector3* pPos, rdVector3* p
 				return JOINTTYPE_LEFTLEG;
 			else if (node->type & 0x40) // right leg
 				return JOINTTYPE_RIGHTLEG;
-			//for (int joint = 0; joint < JOINTTYPE_NUM_JOINTS; ++joint)
-			//{
-			//	if(resultThing->animclass->bodypart_to_joint[joint] == node->idx)
-			//		return joint;
-			//}
 		}
 	}
 	return -1;
