@@ -5,6 +5,12 @@ set(GLOBALS_H_COG ${PROJECT_SOURCE_DIR}/src/globals.h.cog)
 set(GLOBALS_C_COG ${PROJECT_SOURCE_DIR}/src/globals.c.cog)
 list(APPEND ENGINE_SOURCE_FILES ${GLOBALS_C})
 
+if(NOT PLAT_MSVC)
+    set(PYTHON_EXE "python3")
+else()
+    set(PYTHON_EXE "python")
+endif()
+
 # All of our pre-build steps
 add_custom_command(
     OUTPUT ${GLOBALS_C}
