@@ -108,16 +108,13 @@ void sithSoundMixer_UpdateMusicVolume(float musicVolume)
         if ( !sithSoundMixer_bInitted )
             return;
         sithSoundMixer_bIsMuted = 0;
-        if ( sithSoundMixer_bPlayingMci )
+        if (sithSoundMixer_bPlayingMci && sithSoundMixer_dword_835FCC)
         {
-            if ( sithSoundMixer_dword_835FCC )
+            sithSoundMixer_flt_835FD8 = sithTime_curSeconds - -5.0;
+            if ( !stdMci_CheckStatus() && !stdMci_Play(sithSoundMixer_trackFrom, sithSoundMixer_trackTo) )
             {
-                sithSoundMixer_flt_835FD8 = sithTime_curSeconds - -5.0;
-                if ( !stdMci_CheckStatus() && !stdMci_Play(sithSoundMixer_trackFrom, sithSoundMixer_trackTo) )
-                {
-                    sithSoundMixer_bPlayingMci = 0;
-                    sithSoundMixer_dword_835FCC = 0;
-                }
+                sithSoundMixer_bPlayingMci = 0;
+                sithSoundMixer_dword_835FCC = 0;
             }
         }
     }

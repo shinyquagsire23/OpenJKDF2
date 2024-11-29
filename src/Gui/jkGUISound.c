@@ -74,7 +74,7 @@ void jkGuiSound_Startup()
     jkGuiSound_cutsceneVolume = wuRegistry_GetFloat("cutsceneVolume", jkGuiSound_cutsceneVolume);
 
     jkGuiSound_b3DSound_2 = jkGuiSound_b3DSound;
-    sithSoundMixer_UpdateMusicVolume(jkGuiSound_musicVolume); // TODO
+    sithSoundMixer_UpdateMusicVolume(jkGuiSound_musicVolume);
 
     stdSound_SetMenuVolume(jkGuiSound_sfxVolume);
 }
