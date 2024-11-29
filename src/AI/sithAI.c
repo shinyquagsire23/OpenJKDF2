@@ -271,39 +271,39 @@ void sithAI_FreeEntry(sithThing *thing)
     int v3; // eax
     sithActor *v4; // ecx
 
-    v1 = thing->actor;
-    if ( v1 )
+    sithActor* pActor = thing->actor;
+    if (!pActor)
+        return;
+
+    v2 = pActor - sithAI_actors;
+
+    // Added: fix memleak
+    if (sithAI_actors[v2].paFrames)
     {
-        v2 = v1 - sithAI_actors;
-
-        // Added: fix memleak
-        if (sithAI_actors[v2].paFrames)
-        {
-            pSithHS->free(sithAI_actors[v2].paFrames);
-            sithAI_actors[v2].paFrames = NULL;
-        }
-
-        _memset(&sithAI_actors[v2], 0, sizeof(sithActor));
-        if ( v2 == sithAI_inittedActors )
-        {
-            v3 = v2 - 1;
-            if ( v2 - 1 >= 0 )
-            {
-                v4 = &sithAI_actors[v2];
-                do
-                {
-                    if (v4->thing)
-                        break;
-                    --v3;
-                    v4--;
-                }
-                while ( v3 >= 0 );
-            }
-            sithAI_inittedActors = v3;
-        }
-        thing->actor = 0;
-        sithAI_actorInitted[sithAI_maxActors++] = v2;
+        pSithHS->free(sithAI_actors[v2].paFrames);
+        sithAI_actors[v2].paFrames = NULL;
     }
+
+    _memset(&sithAI_actors[v2], 0, sizeof(sithActor));
+    if (v2 == sithAI_inittedActors)
+    {
+        v3 = v2 - 1;
+        if ( v2 - 1 >= 0 )
+        {
+            v4 = &sithAI_actors[v3];
+            do
+            {
+                if (v4->thing)
+                    break;
+                --v3;
+                v4--;
+            }
+            while ( v3 >= 0 );
+        }
+        sithAI_inittedActors = v3;
+    }
+    thing->actor = 0;
+    sithAI_actorInitted[sithAI_maxActors++] = v2;
 }
 
 void sithAI_TickAll()

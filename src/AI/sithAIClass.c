@@ -199,6 +199,7 @@ int sithAIClass_LoadEntry(char *fpath, sithAIClass *aiclass)
                 entry = &aiclass->entries[nextIdx];
                 if ( nextIdx < 0x10 )
                 {
+                    printf("%s %s\n", fpath, stdConffile_entry.args[0].value);
                     instinct = sithAI_FindCommand(stdConffile_entry.args[0].value);
                     if ( instinct )
                     {
@@ -239,22 +240,11 @@ int sithAIClass_LoadEntry(char *fpath, sithAIClass *aiclass)
 
 void sithAIClass_Free(sithWorld *world)
 {
-    unsigned int v1; // edi
-    int v2; // ebx
-
-    if ( world->aiclasses )
+    if (world->aiclasses)
     {
-        v1 = 0;
-        if ( world->numAIClassesLoaded )
+        for (uint32_t i = 0; i < world->numAIClassesLoaded; i++)
         {
-            v2 = 0;
-            do
-            {
-                stdHashTable_FreeKey(sithAIClass_hashmap, world->aiclasses[v2].fpath);
-                ++v1;
-                ++v2;
-            }
-            while ( v1 < world->numAIClassesLoaded );
+            stdHashTable_FreeKey(sithAIClass_hashmap, world->aiclasses[i].fpath);
         }
         pSithHS->free(world->aiclasses);
         world->aiclasses = 0;
