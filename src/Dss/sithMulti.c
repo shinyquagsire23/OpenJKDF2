@@ -121,52 +121,103 @@ HRESULT sithMulti_CreatePlayer(const wchar_t *a1, const wchar_t *a2, const char 
     return result;
 }
 
+int sithMulti_StartupServer()
+{
+    sithNet_MultiModeFlags = sithMulti_multiModeFlags;
+    sithNet_scorelimit = stdComm_dword_832204;
+    sithNet_multiplayer_timelimit = sithMulti_multiplayerTimelimit;
+    for (uint32_t i = 0; i < 32; ++i )
+    {
+        sithPlayer_sub_4C8910(i);
+        sithPlayer_Startup(i);
+    }
+    sithNet_teamScore[0] = 0;
+    sithNet_teamScore[1] = 0;
+    sithNet_teamScore[2] = 0;
+    sithNet_teamScore[3] = 0;
+    sithNet_teamScore[4] = 0;
+    sithPlayer_sub_4C87C0(0, stdComm_dplayIdSelf);
+    sithPlayer_idk(0);
+    sithPlayer_ResetPalEffects();
+
+    // Added: dedicated server
+    if (jkGuiNetHost_bIsDedicated) {
+        jkPlayer_playerInfos[0].flags = 6;
+        jkPlayer_playerInfos[0].playerThing->thingflags |= SITH_TF_DISABLED;
+        jkPlayer_playerInfos[0].playerThing->attach_flags = 0;
+    }
+
+    if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_100) != 0 )
+    {
+        jkPlayer_playerInfos[0].teamNum = 1;
+    }
+    stdComm_DoReceive();
+    return 1;
+}
+
+int sithMulti_StartupClient()
+{
+    sithNet_isServer = 0;
+    sithNet_isMulti = 1;
+    for (uint32_t i = 0; i < 32; ++i )
+    {
+        sithPlayer_sub_4C8910(i);
+        sithPlayer_Startup(i);
+    }
+    sithNet_teamScore[0] = 0;
+    sithNet_teamScore[1] = 0;
+    sithNet_teamScore[2] = 0;
+    sithNet_teamScore[3] = 0;
+    sithNet_teamScore[4] = 0;
+    stdComm_DoReceive();
+    return 1;
+}
+
+void sithMulti_RemoveAllActorsFromWorld(sithWorld *pWorld)
+{
+    // Added: nullptr check
+    if (!pWorld) {
+        return;
+    }
+
+    sithMulti_dword_83265C = 0;
+
+    // Added: Co-op
+    if (sithMulti_multiModeFlags & MULTIMODEFLAG_COOP) {
+        return;
+    } 
+
+    for (int i = 0; i <= pWorld->numThings; i++)
+    {
+        sithThing* pIter = &pWorld->things[i];
+        if ( pIter->type == SITH_THING_ACTOR )
+        {
+            sithThing_FreeEverythingNet(pIter);
+        }
+        else if ( !sithNet_isServer )
+        {
+            pIter->thingflags |= SITH_TF_INVULN;
+        }
+    }
+}
+
 int sithMulti_Startup()
 {
-    sithWorld *v0; // ebp
-    int *v1; // esi
     int v2; // eax
     int v3; // edi
-    int v4; // ebx
     sithThing **v5; // ebp
-    sithThing *v6; // eax
     int v7; // ecx
-    unsigned int i; // edi
 
-    v0 = sithWorld_pCurrentWorld;
     g_submodeFlags |= 1u;
-    v1 = &sithWorld_pCurrentWorld->numThings;
-    v2 = sithWorld_pCurrentWorld->numThings;
-    v3 = 0;
-    v4 = 0;
     sithMulti_leaveJoinType = 0;
     sithMulti_bTimelimitMet = 0;
     sithComm_multiplayerFlags |= 1u;
     sithComm_bSyncMultiplayer |= 1u;
-    sithMulti_dword_83265C = 0;
 
     // Remove all actor things from the world
-    if (!(sithMulti_multiModeFlags & MULTIMODEFLAG_COOP) && v2 >= 0 ) // Added: Co-op
-    {
-        v5 = &sithWorld_pCurrentWorld->things;
-        do
-        {
-            v6 = &(*v5)[v3];
-            if ( v6->type == SITH_THING_ACTOR )
-            {
-                sithThing_FreeEverythingNet(&(*v5)[v3]);
-            }
-            else if ( !sithNet_isServer )
-            {
-                v6->thingflags |= SITH_TF_INVULN;
-            }
-            ++v4;
-            ++v3;
-        }
-        while ( v4 <= *v1 );
-        v0 = sithWorld_pCurrentWorld;
-    }
-    sithNet_checksum = sithWorld_CalcChecksum(v0, 0/*jkGuiMultiplayer_checksumSeed*/); // Added: TODO fix the checksum seed
+    sithMulti_RemoveAllActorsFromWorld(sithWorld_pCurrentWorld);
+
+    sithNet_checksum = sithWorld_CalcChecksum(sithWorld_pCurrentWorld, 0/*jkGuiMultiplayer_checksumSeed*/); // Added: TODO fix the checksum seed
     sithNet_syncIdx = 0;
     sithSurface_numSurfaces_0 = 0;
     sithSector_numSync = 0;
@@ -174,54 +225,12 @@ int sithMulti_Startup()
     sithComm_ClearMsgTmpBuf();
     if ( stdComm_bIsServer )
     {
-        sithNet_MultiModeFlags = sithMulti_multiModeFlags;
-        sithNet_scorelimit = stdComm_dword_832204;
-        sithNet_multiplayer_timelimit = sithMulti_multiplayerTimelimit;
-        for ( i = 0; i < 32; ++i )
-        {
-            sithPlayer_sub_4C8910(i);
-            sithPlayer_Startup(i);
-        }
-        sithNet_teamScore[0] = 0;
-        sithNet_teamScore[1] = 0;
-        sithNet_teamScore[2] = 0;
-        sithNet_teamScore[3] = 0;
-        sithNet_teamScore[4] = 0;
-        sithPlayer_sub_4C87C0(0, stdComm_dplayIdSelf);
-        sithPlayer_idk(0);
-        sithPlayer_ResetPalEffects();
-
-        // Added: dedicated server
-        if (jkGuiNetHost_bIsDedicated) {
-            jkPlayer_playerInfos[0].flags = 6;
-            jkPlayer_playerInfos[0].playerThing->thingflags |= SITH_TF_DISABLED;
-            jkPlayer_playerInfos[0].playerThing->attach_flags = 0;
-        }
-
-        if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_100) != 0 )
-        {
-            jkPlayer_playerInfos[0].teamNum = 1;
-            stdComm_DoReceive();
-            return 1;
-        }
+        return sithMulti_StartupServer();
     }
     else
     {
-        sithNet_isServer = 0;
-        sithNet_isMulti = 1;
-        for (int i = 0; i < 32; i++)
-        {
-            sithPlayer_sub_4C8910(i);
-            sithPlayer_Startup(i);
-        }
-        sithNet_teamScore[0] = 0;
-        sithNet_teamScore[1] = 0;
-        sithNet_teamScore[2] = 0;
-        sithNet_teamScore[3] = 0;
-        sithNet_teamScore[4] = 0;
+        return sithMulti_StartupClient();
     }
-    stdComm_DoReceive();
-    return 1;
 }
 
 void sithMulti_FreeThing(int a1)
