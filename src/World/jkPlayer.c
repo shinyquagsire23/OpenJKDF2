@@ -828,7 +828,8 @@ void jkPlayer_DrawPov()
 #ifndef QOL_IMPROVEMENTS
         float waggleAmt = (fabs(player->waggle) > 0.02 ? 0.02 : fabs(player->waggle)) * jkPlayer_waggleMag;
 #else
-        float waggleAmt = (fabs(player->waggle) > sithTime_deltaSeconds ? sithTime_deltaSeconds : fabs(player->waggle)) * jkPlayer_waggleMag; // scale animation to be in line w/ 50fps og limit
+        // scale animation to be in line w/ 25fps (presumed 'mastering' FPS of whoever was coding the waggle)
+        float waggleAmt = (fabs(player->waggle) > 0.02 * (sithTime_deltaSeconds / (1.0/25)) ? 0.02 * (sithTime_deltaSeconds / (1.0/25)) : fabs(player->waggle)) * jkPlayer_waggleMag;
 #endif
         if ( waggleAmt == 0.0 )
             jkPlayer_waggleAngle = 0.0;
