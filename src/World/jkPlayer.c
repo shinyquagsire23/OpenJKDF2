@@ -60,6 +60,7 @@ float jkPlayer_canonicalPhysTickrate = CANONICAL_PHYS_TICKRATE;
 
 int jkPlayer_setCrosshairOnLightsaber = 1;
 int jkPlayer_setCrosshairOnFist = 1;
+int jkPlayer_bDisableWeaponWaggle = 0;
 int jkPlayer_bHasLoadedSettingsOnce = 0;
 #endif
 
@@ -178,6 +179,7 @@ void jkPlayer_StartupVars()
     sithCvar_RegisterFlex("hud_crosshairScale",         1.0,                        &jkPlayer_crosshairScale,           CVARFLAG_LOCAL|CVARFLAG_RESETHUD);
     sithCvar_RegisterBool("hud_setCrosshairOnLightsaber", 1,                        &jkPlayer_setCrosshairOnLightsaber, CVARFLAG_LOCAL);
     sithCvar_RegisterBool("hud_setCrosshairOnFist",     1,                          &jkPlayer_setCrosshairOnFist,       CVARFLAG_LOCAL);
+    sithCvar_RegisterBool("hud_disableWeaponWaggle",    0,                          &jkPlayer_bDisableWeaponWaggle,     CVARFLAG_LOCAL);
     sithCvar_RegisterFlex("g_canonicalCogTickrate",     CANONICAL_COG_TICKRATE,     &jkPlayer_canonicalCogTickrate,     CVARFLAG_LOCAL);
     sithCvar_RegisterFlex("g_canonicalPhysTickrate",    CANONICAL_PHYS_TICKRATE,    &jkPlayer_canonicalPhysTickrate,    CVARFLAG_LOCAL);
 
@@ -218,6 +220,7 @@ void jkPlayer_ResetVars()
 
     jkPlayer_setCrosshairOnLightsaber = 1;
     jkPlayer_setCrosshairOnFist = 1;
+    jkPlayer_bDisableWeaponWaggle = 0;
 
     jkPlayer_bHasLoadedSettingsOnce = 0;
 #endif
@@ -561,6 +564,7 @@ void jkPlayer_WriteConf(wchar_t *name)
 
         stdJSON_SaveBool(ext_fpath, "setCrosshairOnLightsaber", jkPlayer_setCrosshairOnLightsaber);
         stdJSON_SaveBool(ext_fpath, "setCrosshairOnFist", jkPlayer_setCrosshairOnFist);
+        stdJSON_SaveBool(ext_fpath, "bDisableWeaponWaggle", jkPlayer_bDisableWeaponWaggle);
 #endif
 #ifdef FIXED_TIMESTEP_PHYS
         stdJSON_SaveBool(ext_fpath, "bJankyPhysics", jkPlayer_bJankyPhysics);
@@ -750,7 +754,7 @@ int jkPlayer_ReadConf(wchar_t *name)
 
         jkPlayer_setCrosshairOnLightsaber = stdJSON_GetBool(ext_fpath, "setCrosshairOnLightsaber", jkPlayer_setCrosshairOnLightsaber);
         jkPlayer_setCrosshairOnFist = stdJSON_GetBool(ext_fpath, "setCrosshairOnFist", jkPlayer_setCrosshairOnFist);
-
+        jkPlayer_bDisableWeaponWaggle = stdJSON_GetBool(ext_fpath, "bDisableWeaponWaggle", jkPlayer_bDisableWeaponWaggle);
 #endif
 #ifdef FIXED_TIMESTEP_PHYS
         jkPlayer_bJankyPhysics = stdJSON_GetBool(ext_fpath, "bJankyPhysics", jkPlayer_bJankyPhysics);
@@ -830,6 +834,10 @@ void jkPlayer_DrawPov()
 #else
         // scale animation to be in line w/ 25fps (presumed 'mastering' FPS of whoever was coding the waggle)
         float waggleAmt = (fabs(player->waggle) > 0.02 * (sithTime_deltaSeconds / (1.0/25)) ? 0.02 * (sithTime_deltaSeconds / (1.0/25)) : fabs(player->waggle)) * jkPlayer_waggleMag;
+
+        if (jkPlayer_bDisableWeaponWaggle) {
+            waggleAmt = 0.0;
+        }
 #endif
         if ( waggleAmt == 0.0 )
             jkPlayer_waggleAngle = 0.0;
@@ -842,6 +850,11 @@ void jkPlayer_DrawPov()
         float velNorm = rdVector_Len3(&player->physicsParams.vel) / player->physicsParams.maxVel; // MOTS altered: uses 1.538462 for something (performance hack?)
         if (angleCos > 0) // verify?
             angleCos = -angleCos;
+#ifdef QOL_IMPROVEMENTS
+        if (jkPlayer_bDisableWeaponWaggle) {
+            velNorm *= 0.5;
+        }
+#endif
         jkSaber_rotateVec.x = angleCos * jkPlayer_waggleVec.x * velNorm;
         jkSaber_rotateVec.y = angleSin * jkPlayer_waggleVec.y * velNorm;
         jkSaber_rotateVec.z = angleSin * jkPlayer_waggleVec.z * velNorm;

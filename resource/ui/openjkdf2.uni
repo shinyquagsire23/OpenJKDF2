@@ -14,6 +14,8 @@ MSGS 100          # <--- DON'T FORGET TO UPDATE THIS COUNT
    "GUIEXT_SHOW_SABER_CROSSHAIR_HINT"     0 "When this is enabled the crosshair is shown when the lightsaber is equipped"
    "GUIEXT_SHOW_FIST_CROSSHAIR"           0 "Show Crosshair with fist"
    "GUIEXT_SHOW_FIST_CROSSHAIR_HINT"      0 "When this is enabled the crosshair is shown when the fist is equipped"
+   "GUIEXT_DISABLE_WAGGLE"                0 "Disable Weapon Waggle"
+   "GUIEXT_DISABLE_WAGGLE_HINT"           0 "Disables weapon waggle when moving"
    "GUIEXT_CROSSHAIR_SCALE"               0 "Crosshair Scale"
    "GUIEXT_CROSSHAIR_SCALE_HINT"          0 "Adjust the size of the crosshair (from 0% to 200%)"
 
