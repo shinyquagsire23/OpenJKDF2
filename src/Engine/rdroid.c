@@ -1029,7 +1029,7 @@ void rdAddDecal(rdDecal* decal, rdMatrix34* modelMat, rdVector3* color, rdVector
 
 	rdTexture* sith_tex_sel = decal->material->texinfos[0]->texture_ptr;
 	if (!rdMaterial_AddToTextureCache(decal->material, sith_tex_sel, 0, 0, 0))
-		return 0;
+		return;
 
 	rdDDrawSurface* tex2_arr_sel = &sith_tex_sel->alphaMats[0];
 	if (!tex2_arr_sel)

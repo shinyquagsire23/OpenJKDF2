@@ -121,7 +121,7 @@ void rdDecal_Draw(rdThing* thing, rdMatrix34* matrix)
 	rdCache_DrawDecal(decal, matrix, &color, &thing->decalScale, decal->angleFade);
 #endif
 
-	return 1;
+	return;
 }
 
 #endif

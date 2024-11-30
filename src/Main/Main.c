@@ -561,59 +561,54 @@ void Main_ShowHelp()
 
 void Main_ParseCmdLine(char *cmdline)
 {
-    char *v1; // esi
-    char *v2; // esi
-    char *v3; // esi
-    char *v4; // eax
-
-    for (v1 = _strtok(cmdline, " \t"); v1; v1 = _strtok(0, " \t"))
+    for (char* pArgTok = _strtok(cmdline, " \t"); pArgTok; pArgTok = _strtok(0, " \t"))
     {
-        if ( !__strcmpi(v1, "-path") || !__strcmpi(v1, "/path") )
+        if ( !__strcmpi(pArgTok, "-path") || !__strcmpi(pArgTok, "/path") )
         {
-            v4 = _strtok(0, " \t");
-            stdString_SafeStrCopy(Main_path, v4, 0x80);
+            char* pArgNext = _strtok(0, " \t");
+            stdString_SafeStrCopy(Main_path, pArgNext, 0x80);
         }
-        else if ( !__strcmpi(v1, "-fail") || !__strcmpi(v1, "/fail") ) // MOTS added
+        else if ( !__strcmpi(pArgTok, "-fail") || !__strcmpi(pArgTok, "/fail") ) // MOTS added
         {
             //Main_failLogFp = fopen("fail.log", "w");
         }
-        else if ( !__strcmpi(v1, "-devMode") || !__strcmpi(v1, "devMode") )
+        else if ( !__strcmpi(pArgTok, "-devMode") || !__strcmpi(pArgTok, "devMode") )
         {
             Main_bDevMode = 1;
             Main_bDisplayConfig = 1;
         }
-        else if (!__strcmpi(v1, "-dispStats") || !__strcmpi(v1, "/dispStats") )
+        else if (!__strcmpi(pArgTok, "-dispStats") || !__strcmpi(pArgTok, "/dispStats") )
         {
             Main_bDispStats = 1;
         }
-        else if (!__strcmpi(v1, "-frameRate") || !__strcmpi(v1, "/frameRate") )
+        else if (!__strcmpi(pArgTok, "-frameRate") || !__strcmpi(pArgTok, "/frameRate") )
         {
             Main_bFrameRate = 1;
         }
-        else if (!__strcmpi(v1, "-windowGUI") || !__strcmpi(v1, "/windowGUI") )
+        else if (!__strcmpi(pArgTok, "-windowGUI") || !__strcmpi(pArgTok, "/windowGUI") )
         {
             Main_bWindowGUI = 1;
         }
-        else if ( !__strcmpi(v1, "-displayConfig") || !__strcmpi(v1, "/displayConfig") )
+        else if ( !__strcmpi(pArgTok, "-displayConfig") || !__strcmpi(pArgTok, "/displayConfig") )
         {
             Main_bDisplayConfig = 1;
         }
-        else if ( !__strcmpi(v1, "-?") || !__strcmpi(v1, "/?") )
+        else if ( !__strcmpi(pArgTok, "-?") || !__strcmpi(pArgTok, "/?") )
         {
             Main_ShowHelp();
         }
-        else if (!__strcmpi(v1, "-debug") || !__strcmpi(v1, "/debug") )
+        else if (!__strcmpi(pArgTok, "-debug") || !__strcmpi(pArgTok, "/debug") )
         {
-            v3 = _strtok(0, " \t");
-            if (!__strcmpi(v3, "con") )
+            char* pArgNext = _strtok(0, " \t");
+            if (!__strcmpi(pArgNext, "con") )
             {
                 Main_logLevel = 1;
             }
-            else if (!__strcmpi(v3, "log") )
+            else if (!__strcmpi(pArgNext, "log") )
             {
                 Main_logLevel = 2;
             }
-            else if (!__strcmpi(v3, "none") )
+            else if (!__strcmpi(pArgNext, "none") )
             {
                 Main_logLevel = 0;
             }
@@ -622,86 +617,86 @@ void Main_ParseCmdLine(char *cmdline)
                 Main_ShowHelp();
             }
         }
-        else if (!__strcmpi(v1, "-verbose") || !__strcmpi(v1, "/verbose") )
+        else if (!__strcmpi(pArgTok, "-verbose") || !__strcmpi(pArgTok, "/verbose") )
         {
-            v2 = _strtok(0, " \t");
-            if ( _atoi(v2) < 0 )
+            char* pArgNext = _strtok(0, " \t");
+            if ( _atoi(pArgNext) < 0 )
             {
                 Main_verboseLevel = 0;
             }
-            else if ( _atoi(v2) > 2 )
+            else if ( _atoi(pArgNext) > 2 )
             {
                 Main_verboseLevel = 2;
             }
             else
             {
-                Main_verboseLevel = _atoi(v2);
+                Main_verboseLevel = _atoi(pArgNext);
             }
         }
-        else if (!__strcmpi(v1, "-noHUD") || !__strcmpi(v1, "/noHUD") )
+        else if (!__strcmpi(pArgTok, "-noHUD") || !__strcmpi(pArgTok, "/noHUD") )
         {
             Main_bNoHUD = 1;
         }
-        else if ( !__strcmpi(v1, "-record") || !__strcmpi(v1, "/record") ) // MOTS added
+        else if ( !__strcmpi(pArgTok, "-record") || !__strcmpi(pArgTok, "/record") ) // MOTS added
         {
             //sithTime_idk_record(0x53,0x53);
             //Main_bRecord = 1;
         }
-        else if ( !__strcmpi(v1, "-fixed") || !__strcmpi(v1, "/fixed") ) // MOTS added
+        else if ( !__strcmpi(pArgTok, "-fixed") || !__strcmpi(pArgTok, "/fixed") ) // MOTS added
         {
             //sithTime_idk_record(0x53,0x53);
         }
-        else if ( !__strcmpi(v1, "-coglog") || !__strcmpi(v1, "/coglog") ) // MOTS added
+        else if ( !__strcmpi(pArgTok, "-coglog") || !__strcmpi(pArgTok, "/coglog") ) // MOTS added
         {
             //Main_cogLogFp = fopen("cog.log", "wc");
         }
 #ifdef QOL_IMPROVEMENTS
-        else if (!__strcmpi(v1, "-dedicatedServer") || !__strcmpi(v1, "/dedicatedServer") )
+        else if (!__strcmpi(pArgTok, "-dedicatedServer") || !__strcmpi(pArgTok, "/dedicatedServer") )
         {
             Main_bDedicatedServer = 1;
         }
-        else if (!__strcmpi(v1, "-autostart") || !__strcmpi(v1, "/autostart") )
+        else if (!__strcmpi(pArgTok, "-autostart") || !__strcmpi(pArgTok, "/autostart") )
         {
             Main_bAutostart = 1;
         }
-        else if (!__strcmpi(v1, "-sp") || !__strcmpi(v1, "/sp") || !__strcmpi(v1, "-singleplayer") || !__strcmpi(v1, "/singleplayer"))
+        else if (!__strcmpi(pArgTok, "-sp") || !__strcmpi(pArgTok, "/sp") || !__strcmpi(pArgTok, "-singleplayer") || !__strcmpi(pArgTok, "/singleplayer"))
         {
             Main_bAutostartSp = 1;
         }
-        else if (!__strcmpi(v1, "-mp") || !__strcmpi(v1, "/mp") || !__strcmpi(v1, "-multiplayer") || !__strcmpi(v1, "/multiplayer"))
+        else if (!__strcmpi(pArgTok, "-mp") || !__strcmpi(pArgTok, "/mp") || !__strcmpi(pArgTok, "-multiplayer") || !__strcmpi(pArgTok, "/multiplayer"))
         {
             Main_bAutostartSp = 0;
         }
-        else if (!__strcmpi(v1, "-episode") || !__strcmpi(v1, "/episode") )
+        else if (!__strcmpi(pArgTok, "-episode") || !__strcmpi(pArgTok, "/episode") )
         {
-            v4 = _strtok(0, " \t");
-            stdString_SafeStrCopy(Main_strEpisode, v4, 0x80);
+            char* pArgNext = _strtok(0, " \t");
+            stdString_SafeStrCopy(Main_strEpisode, pArgNext, 0x80);
         }
-        else if (!__strcmpi(v1, "-map") || !__strcmpi(v1, "/map") )
+        else if (!__strcmpi(pArgTok, "-map") || !__strcmpi(pArgTok, "/map") )
         {
-            v4 = _strtok(0, " \t");
-            stdString_SafeStrCopy(Main_strMap, v4, 0x80);
+            char* pArgNext = _strtok(0, " \t");
+            stdString_SafeStrCopy(Main_strMap, pArgNext, 0x80);
         }
-        else if (!__strcmpi(v1, "-headless") || !__strcmpi(v1, "/headless") )
+        else if (!__strcmpi(pArgTok, "-headless") || !__strcmpi(pArgTok, "/headless") )
         {
             Main_bHeadless = 1;
         }
-        else if (!__strcmpi(v1, "-verboseNetworking") || !__strcmpi(v1, "/verboseNetworking") )
+        else if (!__strcmpi(pArgTok, "-verboseNetworking") || !__strcmpi(pArgTok, "/verboseNetworking") )
         {
             Main_bVerboseNetworking = 1;
         }
-        else if (!__strcmpi(v1, "-motsCompat") || !__strcmpi(v1, "/motsCompat"))
+        else if (!__strcmpi(pArgTok, "-motsCompat") || !__strcmpi(pArgTok, "/motsCompat"))
         {
             Main_bMotsCompat = 1;
         }
-        else if (!__strcmpi(v1, "-enhancedCogVerbs") || !__strcmpi(v1, "/enhancedCogVerbs"))
+        else if (!__strcmpi(pArgTok, "-enhancedCogVerbs") || !__strcmpi(pArgTok, "/enhancedCogVerbs"))
         {
             Main_bEnhancedCogVerbs = 1;
         }
-        else if (!__strcmpi(v1, "-dwCompat") 
-                 || !__strcmpi(v1, "/dwCompat") 
-                 || !__strcmpi(v1, "-droidworksCompat") 
-                 || !__strcmpi(v1, "/droidworksCompat"))
+        else if (!__strcmpi(pArgTok, "-dwCompat") 
+                 || !__strcmpi(pArgTok, "/dwCompat") 
+                 || !__strcmpi(pArgTok, "-droidworksCompat") 
+                 || !__strcmpi(pArgTok, "/droidworksCompat"))
         {
             Main_bDwCompat = 1;
         }

@@ -4,7 +4,9 @@
 // Experimental features
 #ifdef QOL_IMPROVEMENTS
 
+#ifndef MACOS // TODO: Figure out what's going on w/ macOS
 #define RENDER_DROID2        // new gpu path, skips rdCache and uses a fixed-function like API to pass information to the GPU for HW transform, clipping and lighting
+#endif
 
 //#define HW_VBUFFER // temp stuff, trying to move vbuffer to GPU and use fbos in there so we can render to them
 
@@ -76,13 +78,13 @@
 #define FOG
 #endif
 
+#endif // RENDER_DROID2
+
 // helper to avoid redundantly checking this constantly
 #ifdef SPECULAR_LIGHTING
 #define USES_VERTEX_LIGHTING(LIGHT_MODE) (((LIGHT_MODE) == 3) || ((LIGHT_MODE) == 4)|| ((LIGHT_MODE) == 5))
 #else
 #define USES_VERTEX_LIGHTING(LIGHT_MODE) ((LIGHT_MODE) == 3)
-#endif
-
 #endif
 
 #if defined(DECAL_RENDERING) || defined(PARTICLE_LIGHTS) || defined(SPHERE_AO)

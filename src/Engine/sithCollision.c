@@ -348,7 +348,7 @@ LABEL_41:
     return a4;
 }
 
-void sithCollision_BuildCollisionList(sithSector *sector, const rdVector3 *vec1, const rdVector3 *vec2, float a4, float a5, int unk3Flags)
+void sithCollision_BuildCollisionList(sithSector *sector, const rdVector3 *vec1, const rdVector3 *vec2, float a4, float a5, int raycastFlags)
 {
     sithSurface *v12; // esi
     sithAdjoin *v15; // eax
@@ -401,16 +401,16 @@ void sithCollision_BuildCollisionList(sithSector *sector, const rdVector3 *vec1,
         if ( !v15 )
         {
 LABEL_46:
-            if ( (unk3Flags & RAYCAST_4) == 0 && ((unk3Flags & SITH_RAYCAST_IGNORE_FLOOR) == 0 || (v12->surfaceFlags & SITH_SURFACE_FLOOR) != 0) )
+            if ( (raycastFlags & RAYCAST_4) == 0 && ((raycastFlags & SITH_RAYCAST_IGNORE_FLOOR) == 0 || (v12->surfaceFlags & SITH_SURFACE_FLOOR) != 0) )
             {
                 v35 = sithWorld_pCurrentWorld->vertices;
                 
                 if ( rdMath_DistancePointToPlane(&tmp, &v12->surfaceInfo.face.normal, &v35[*v12->surfaceInfo.face.vertexPosIdx]) <= a5 )
                 {
-                    v36 = sithIntersect_sub_508D20(vec1, vec2, a4, a5, &v12->surfaceInfo.face, v35, &a7, &pushVel, unk3Flags);
+                    v36 = sithIntersect_sub_508D20(vec1, vec2, a4, a5, &v12->surfaceInfo.face, v35, &a7, &pushVel, raycastFlags);
                     if ( v36 )
                     {
-                        if ( (unk3Flags & RAYCAST_400) != 0 || rdVector_Dot3(vec2, &pushVel) < 0.0 )
+                        if ( (raycastFlags & RAYCAST_400) != 0 || rdVector_Dot3(vec2, &pushVel) < 0.0 )
                         {
                             v37 = a7;
                             v38 = sithCollision_searchNumResults[sithCollision_searchStackIdx];
@@ -433,25 +433,25 @@ LABEL_46:
             continue;
         }
 
-        if ( (unk3Flags & RAYCAST_4) == 0 )
+        if ( (raycastFlags & RAYCAST_4) == 0 )
         {
-            if ( (unk3Flags & (RAYCAST_1000 | RAYCAST_100)) != 0 && (v15->flags & SITHSURF_ADJOIN_VISIBLE) == 0 )
+            if ( (raycastFlags & (RAYCAST_1000 | RAYCAST_100)) != 0 && (v15->flags & SITHSURF_ADJOIN_VISIBLE) == 0 )
                 goto LABEL_46;
-            if ( (unk3Flags & RAYCAST_200) != 0 )
+            if ( (raycastFlags & RAYCAST_200) != 0 )
             {
-                if ( (unk3Flags & RAYCAST_100) != 0 )
+                if ( (raycastFlags & RAYCAST_100) != 0 )
                     goto LABEL_22;
                 if ( (v15->flags & SITHSURF_ADJOIN_ALLOW_AI_ONLY) != 0 )
                     goto LABEL_46;
             }
-            if ( (unk3Flags & RAYCAST_100) == 0 && (v15->flags & SITHSURF_ADJOIN_ALLOW_MOVEMENT) == 0 )
+            if ( (raycastFlags & RAYCAST_100) == 0 && (v15->flags & SITHSURF_ADJOIN_ALLOW_MOVEMENT) == 0 )
                 goto LABEL_46;
         }
 LABEL_22:
         // Standing?
-        if ( sithIntersect_sub_5090B0(vec1, vec2, a4, a5, &v12->surfaceInfo, sithWorld_pCurrentWorld->vertices, &a7, unk3Flags) )
+        if ( sithIntersect_sub_5090B0(vec1, vec2, a4, a5, &v12->surfaceInfo, sithWorld_pCurrentWorld->vertices, &a7, raycastFlags) )
         {
-            if ( !(unk3Flags & RAYCAST_4) || (unk3Flags & SITH_RAYCAST_IGNORE_THINGS) == 0 )
+            if ( !(raycastFlags & RAYCAST_4) || (raycastFlags & SITH_RAYCAST_IGNORE_THINGS) == 0 )
             {
                 v17 = 0;
                 v18 = sithCollision_stackIdk[sithCollision_searchStackIdx];
@@ -487,10 +487,10 @@ LABEL_30:
             }
 
             // Falling?
-            if ( (unk3Flags & RAYCAST_2) == 0 && sithIntersect_sub_5090B0(vec1, vec2, a4, 0.0, &v12->surfaceInfo, sithWorld_pCurrentWorld->vertices, &v48, unk3Flags) )
+            if ( (raycastFlags & RAYCAST_2) == 0 && sithIntersect_sub_5090B0(vec1, vec2, a4, 0.0, &v12->surfaceInfo, sithWorld_pCurrentWorld->vertices, &v48, raycastFlags) )
             {
                 v24 = sithCollision_searchStackIdx;
-                if ( (unk3Flags & RAYCAST_4) && (unk3Flags & SITH_RAYCAST_IGNORE_THINGS) != 0 )
+                if ( (raycastFlags & RAYCAST_4) && (raycastFlags & SITH_RAYCAST_IGNORE_THINGS) != 0 )
                 {
                     v25 = sithCollision_stackIdk[sithCollision_searchStackIdx];
                     v26 = 0;
@@ -713,7 +713,7 @@ float sithCollision_UpdateThingCollision(sithThing *pThing, rdVector3 *a2, float
         if (v10->attach_flags & SITH_ATTACH_NO_MOVE)
             continue;
 
-        v11 = sithCollision_UpdateThingCollision(v10, a2, a6, 64);
+        v11 = sithCollision_UpdateThingCollision(v10, a2, a6, RAYCAST_40);
         if ( v11 >= a6 ) continue;
         
         if ( (v10->attach_flags & SITH_ATTACH_THINGSURFACE) != 0 )
@@ -1261,7 +1261,7 @@ void sithCollision_sub_4E77A0(sithThing *thing, rdMatrix34 *a2)
             rdVector_Zero3(&out.scale);
             if ( a1a != 0.0 )
             {
-                sithCollision_UpdateThingCollision(v5, &a2a, a1a, 64);
+                sithCollision_UpdateThingCollision(v5, &a2a, a1a, RAYCAST_40);
             }
             sithCollision_sub_4E77A0(v5, &out);
             if ( v5->moveType == SITH_MT_PHYSICS )

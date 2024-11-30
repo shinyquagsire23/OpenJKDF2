@@ -1,6 +1,7 @@
 #include "rdVector.h"
 
 #include <math.h>
+#include <string.h>
 #include "rdMatrix.h"
 #include "General/stdMath.h"
 #include "Primitives/rdMath.h"

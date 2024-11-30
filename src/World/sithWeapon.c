@@ -720,7 +720,6 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
         physicsThing->collideSize = 0.0;
         physicsThing->lifeLeftMs = 550;
         sithSoundClass_ThingPlaySoundclass4(physicsThing, SITH_SC_ACTIVATE);
-        printf("Proximity activate: %x\n", physicsThing->thingIdx);
         return 0;
     }
 
@@ -830,6 +829,7 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
 
             // Gun splat spawning
             sithWeapon_RemoveAndExplode(physicsThing, physicsThing->weaponParams.fleshHitTemplate);
+
             //printf("Splat: %x\n", physicsThing->thingIdx);
 #ifdef RAGDOLLS
 			// kick the ragdoll
@@ -838,6 +838,7 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
 				sithPhysics_ThingRagdollApplyForce(collidedThing, &vel, NULL, 0.0f);// &physicsThing->position, physicsThing->weaponParams.range);
 			}
 #endif
+            
             return 1;
         }
         if (!(physicsThing->weaponParams.typeflags & SITH_WF_ATTACH_TO_THING))

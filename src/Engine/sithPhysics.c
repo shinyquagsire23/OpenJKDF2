@@ -1159,7 +1159,7 @@ int sithPhysics_CollideRagdollParticle(sithSector* sector, sithThing* pThing, rd
 		}
 		if ((pEntry->hitType & SITHCOLLISION_THING) != 0)
 		{
-			int parent = sithThing_GetParent(pThing);
+			sithThing* parent = sithThing_GetParent(pThing);
 
 			if (pEntry->receiver != pThing && pEntry->receiver->thingIdx != parent && pEntry->face)
 			{

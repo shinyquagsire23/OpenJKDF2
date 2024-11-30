@@ -11,7 +11,7 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     env:
       OPENJKDF2_BUILD_DIR: /tmp/OpenJKDF2
@@ -26,32 +26,7 @@ jobs:
           sudo apt-get install \
                        -y --no-install-suggests --no-install-recommends \
                        build-essential devscripts cmake make python3 python3-pip imagemagick &&
-          wget --no-verbose --timeout 30 \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/b/binutils-mingw-w64/binutils-mingw-w64_2.39.90.20221231-1ubuntu1+10.3_all.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/b/binutils-mingw-w64/binutils-mingw-w64-x86-64_2.39.90.20221231-1ubuntu1+10.3_amd64.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/b/binutils-mingw-w64/binutils-mingw-w64-i686_2.39.90.20221231-1ubuntu1+10.3_amd64.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/gcc-mingw-w64_12.2.0-14ubuntu1+25.2_all.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/gcc-mingw-w64-x86-64_12.2.0-14ubuntu1+25.2_all.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/gcc-mingw-w64-i686_12.2.0-14ubuntu1+25.2_all.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/g++-mingw-w64_12.2.0-14ubuntu1+25.2_all.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/g++-mingw-w64-x86-64_12.2.0-14ubuntu1+25.2_all.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/g++-mingw-w64-i686_12.2.0-14ubuntu1+25.2_all.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/gcc-mingw-w64-base_12.2.0-14ubuntu1+25.2_amd64.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/gcc-mingw-w64-x86-64-posix_12.2.0-14ubuntu1+25.2_amd64.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/gcc-mingw-w64-x86-64-win32_12.2.0-14ubuntu1+25.2_amd64.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/gcc-mingw-w64-i686-posix_12.2.0-14ubuntu1+25.2_amd64.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/gcc-mingw-w64-i686-win32_12.2.0-14ubuntu1+25.2_amd64.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/g++-mingw-w64-x86-64-posix_12.2.0-14ubuntu1+25.2_amd64.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/g++-mingw-w64-x86-64-win32_12.2.0-14ubuntu1+25.2_amd64.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/g++-mingw-w64-i686-posix_12.2.0-14ubuntu1+25.2_amd64.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/g++-mingw-w64-i686-win32_12.2.0-14ubuntu1+25.2_amd64.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/m/mingw-w64/mingw-w64_10.0.0-3_all.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/m/mingw-w64/mingw-w64-common_10.0.0-3_all.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/m/mingw-w64/mingw-w64-x86-64-dev_10.0.0-3_all.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/m/mingw-w64/mingw-w64-i686-dev_10.0.0-3_all.deb' &&
-          sudo dpkg --install --force-depends *.deb &&
-          # Equivalent Ubuntu but unavailable MinGW dependencies for building OpenJKDF2 for Windows:
-          # libsdl2-dev libsdl2-mixer-dev libopenal-dev libglew-dev libprotobuf-dev protobuf-compiler
+          sudo apt-get install -y zsh mingw-w64 clang libopenal-dev libglew-dev &&
           sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix &&
           sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix &&
           sudo pip3 install cogapp

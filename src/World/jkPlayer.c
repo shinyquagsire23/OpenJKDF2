@@ -14,6 +14,7 @@
 #include "Engine/rdCamera.h"
 #include "Engine/rdroid.h"
 #include "Engine/rdColormap.h"
+#include "Engine/sithCollision.h"
 #include "World/sithTemplate.h"
 #include "General/stdMath.h"
 #include "Gameplay/sithInventory.h"
@@ -67,6 +68,7 @@ float jkPlayer_canonicalPhysTickrate = CANONICAL_PHYS_TICKRATE;
 
 int jkPlayer_setCrosshairOnLightsaber = 1;
 int jkPlayer_setCrosshairOnFist = 1;
+int jkPlayer_bDisableWeaponWaggle = 0;
 int jkPlayer_bHasLoadedSettingsOnce = 0;
 
 #if defined(SPHERE_AO) || defined(RENDER_DROID2)
@@ -239,6 +241,7 @@ void jkPlayer_StartupVars()
 #endif
     sithCvar_RegisterBool("hud_setCrosshairOnLightsaber", 1,                        &jkPlayer_setCrosshairOnLightsaber, CVARFLAG_LOCAL);
     sithCvar_RegisterBool("hud_setCrosshairOnFist",     1,                          &jkPlayer_setCrosshairOnFist,       CVARFLAG_LOCAL);
+    sithCvar_RegisterBool("hud_disableWeaponWaggle",    0,                          &jkPlayer_bDisableWeaponWaggle,     CVARFLAG_LOCAL);
     sithCvar_RegisterFlex("g_canonicalCogTickrate",     CANONICAL_COG_TICKRATE,     &jkPlayer_canonicalCogTickrate,     CVARFLAG_LOCAL);
     sithCvar_RegisterFlex("g_canonicalPhysTickrate",    CANONICAL_PHYS_TICKRATE,    &jkPlayer_canonicalPhysTickrate,    CVARFLAG_LOCAL);
 
@@ -293,6 +296,7 @@ void jkPlayer_ResetVars()
 
     jkPlayer_setCrosshairOnLightsaber = 1;
     jkPlayer_setCrosshairOnFist = 1;
+    jkPlayer_bDisableWeaponWaggle = 0;
 
     jkPlayer_bHasLoadedSettingsOnce = 0;
 
@@ -700,6 +704,7 @@ void jkPlayer_WriteConf(wchar_t *name)
 
         stdJSON_SaveBool(ext_fpath, "setCrosshairOnLightsaber", jkPlayer_setCrosshairOnLightsaber);
         stdJSON_SaveBool(ext_fpath, "setCrosshairOnFist", jkPlayer_setCrosshairOnFist);
+
 #ifdef DYNAMIC_POV
 		stdJSON_SaveBool(ext_fpath, "aimLock", jkPlayer_aimLock);
 #endif
@@ -713,6 +718,7 @@ void jkPlayer_WriteConf(wchar_t *name)
 #if defined(DECAL_RENDERING) || defined(RENDER_DROID2)
 		stdJSON_SaveBool(ext_fpath, "decals", jkPlayer_enableDecals);
 #endif
+        stdJSON_SaveBool(ext_fpath, "bDisableWeaponWaggle", jkPlayer_bDisableWeaponWaggle);
 #endif
 #ifdef FIXED_TIMESTEP_PHYS
         stdJSON_SaveBool(ext_fpath, "bJankyPhysics", jkPlayer_bJankyPhysics);
@@ -948,6 +954,7 @@ int jkPlayer_ReadConf(wchar_t *name)
 
         jkPlayer_setCrosshairOnLightsaber = stdJSON_GetBool(ext_fpath, "setCrosshairOnLightsaber", jkPlayer_setCrosshairOnLightsaber);
         jkPlayer_setCrosshairOnFist = stdJSON_GetBool(ext_fpath, "setCrosshairOnFist", jkPlayer_setCrosshairOnFist);
+
 #ifdef RAGDOLLS
 		jkPlayer_ragdolls = stdJSON_GetInt(ext_fpath, "ragdolls", jkPlayer_ragdolls);
 #endif
@@ -960,6 +967,7 @@ int jkPlayer_ReadConf(wchar_t *name)
 #if defined(DECAL_RENDERING) || defined(RENDER_DROID2)
 		jkPlayer_enableDecals = stdJSON_GetFloat(ext_fpath, "decals", jkPlayer_enableDecals);
 #endif
+        jkPlayer_bDisableWeaponWaggle = stdJSON_GetBool(ext_fpath, "bDisableWeaponWaggle", jkPlayer_bDisableWeaponWaggle);
 #endif
 #ifdef FIXED_TIMESTEP_PHYS
         jkPlayer_bJankyPhysics = stdJSON_GetBool(ext_fpath, "bJankyPhysics", jkPlayer_bJankyPhysics);
@@ -1008,7 +1016,7 @@ void jkPlayer_PovModelCallback(sithThing* thing, int track, uint32_t markerId)
 		if(thing->playerInfo->povSprite.sprite3 && thing->playerInfo->povSprite.sprite3->face.material)
 		{
 			int celCount = thing->playerInfo->povSprite.sprite3->face.material->num_texinfo;
-			thing->playerInfo->povSprite.wallCel = min(_frand() * celCount, celCount - 1);
+			thing->playerInfo->povSprite.wallCel = stdMath_Min(_frand() * celCount, celCount - 1);
 		}
 	}
 }
@@ -1115,7 +1123,12 @@ void jkPlayer_DrawPov()
 #ifndef QOL_IMPROVEMENTS
         float waggleAmt = (fabs(player->waggle) > 0.02 ? 0.02 : fabs(player->waggle)) * jkPlayer_waggleMag;
 #else
-        float waggleAmt = (fabs(player->waggle) > sithTime_deltaSeconds ? sithTime_deltaSeconds : fabs(player->waggle)) * jkPlayer_waggleMag; // scale animation to be in line w/ 50fps og limit
+        // scale animation to be in line w/ 25fps (presumed 'mastering' FPS of whoever was coding the waggle)
+        float waggleAmt = (fabs(player->waggle) > 0.02 * (sithTime_deltaSeconds / (1.0/25)) ? 0.02 * (sithTime_deltaSeconds / (1.0/25)) : fabs(player->waggle)) * jkPlayer_waggleMag;
+
+        if (jkPlayer_bDisableWeaponWaggle) {
+            waggleAmt = 0.0;
+        }
 #endif
 #ifdef DYNAMIC_POV
 		if (jkPlayer_waggleVel < 0)
@@ -1137,11 +1150,18 @@ void jkPlayer_DrawPov()
         float velNorm = rdVector_Len3(&player->physicsParams.vel) / player->physicsParams.maxVel; // MOTS altered: uses 1.538462 for something (performance hack?)
         if (angleCos > 0) // verify?
             angleCos = -angleCos;
+
 #ifdef DYNAMIC_POV
 		if (jkPlayer_waggleVel < 0)
 			velNorm = -jkPlayer_waggleVel;
 		else
 			velNorm *= jkPlayer_waggleVel;
+
+#ifdef QOL_IMPROVEMENTS
+        if (jkPlayer_bDisableWeaponWaggle) {
+            velNorm *= 0.5;
+        }
+#endif // QOL_IMPROVEMENTS
 
 		// Added: take into account rotvel to add a little dynamic rotation to the POV model
 		rdMatrix34 rotateMatNoWaggle;
@@ -1181,6 +1201,13 @@ void jkPlayer_DrawPov()
 			jkSaber_rotateVec.z = angleSin * jkPlayer_waggleVec.z * velNorm;
 		}
 #else
+
+#ifdef QOL_IMPROVEMENTS
+        if (jkPlayer_bDisableWeaponWaggle) {
+            velNorm *= 0.5;
+        }
+#endif // QOL_IMPROVEMENTS
+
 		jkSaber_rotateVec.x = angleCos * jkPlayer_waggleVec.x * velNorm;
 		jkSaber_rotateVec.y = angleSin * jkPlayer_waggleVec.y * velNorm;
 		jkSaber_rotateVec.z = angleSin * jkPlayer_waggleVec.z * velNorm;
@@ -1255,10 +1282,10 @@ void jkPlayer_DrawPov()
 			float swayTime = sithTime_curSeconds * jkPlayer_idleWaggleSpeed * (180.0 / M_PI);
 
 			stdMath_SinCos(swayTime, &angleSin, &angleCos);
-			jkSaber_swayOffset.x = (angleSin * jkPlayer_idleWaggleVec.x - jkSaber_swayOffset.x) * min(sithTime_deltaSeconds, 0.02f) * jkPlayer_idleWaggleSmooth + jkSaber_swayOffset.x;
+			jkSaber_swayOffset.x = (angleSin * jkPlayer_idleWaggleVec.x - jkSaber_swayOffset.x) * stdMath_Min(sithTime_deltaSeconds, 0.02f) * jkPlayer_idleWaggleSmooth + jkSaber_swayOffset.x;
 
 			stdMath_SinCos(2.0f * swayTime + 180.0f, &angleSin, &angleCos);
-			jkSaber_swayOffset.z = (angleSin * jkPlayer_idleWaggleVec.z - jkSaber_swayOffset.z) * min(sithTime_deltaSeconds, 0.02f) * jkPlayer_idleWaggleSmooth + jkSaber_swayOffset.z;
+			jkSaber_swayOffset.z = (angleSin * jkPlayer_idleWaggleVec.z - jkSaber_swayOffset.z) * stdMath_Min(sithTime_deltaSeconds, 0.02f) * jkPlayer_idleWaggleSmooth + jkSaber_swayOffset.z;
 		
 			// add the sway offset
 			trans.x += jkSaber_swayOffset.x;
@@ -1338,25 +1365,25 @@ void jkPlayer_DrawPov()
 					// adjust the aim vector to match
 					rdVector_Rotate3Acc(&aimVector, &jkPlayer_pushAngles);
 				}
-				rdVector_Lerp3(&jkPlayer_pushAngles, &jkPlayer_pushAngles, &pushAngles, 8.0f * min(sithTime_deltaSeconds, 0.02f));
+				rdVector_Lerp3(&jkPlayer_pushAngles, &jkPlayer_pushAngles, &pushAngles, 8.0f * stdMath_Min(sithTime_deltaSeconds, 0.02f));
 				rdMatrix_PreRotate34(&viewMat, &jkPlayer_pushAngles);
 
 				// extract the angles so we can do a lazy interpolation
 				rdVector3 angles;
 				rdMatrix_ExtractAngles34(&autoAimMat, &angles);
 			
-				jkSaber_aimAngles.x = (angles.x - jkSaber_aimAngles.x) * 8.0f * min(sithTime_deltaSeconds, 0.02f) + jkSaber_aimAngles.x;
-				jkSaber_aimAngles.y = (angles.y - jkSaber_aimAngles.y) * 8.0f * min(sithTime_deltaSeconds, 0.02f) + jkSaber_aimAngles.y;
+				jkSaber_aimAngles.x = (angles.x - jkSaber_aimAngles.x) * 8.0f * stdMath_Min(sithTime_deltaSeconds, 0.02f) + jkSaber_aimAngles.x;
+				jkSaber_aimAngles.y = (angles.y - jkSaber_aimAngles.y) * 8.0f * stdMath_Min(sithTime_deltaSeconds, 0.02f) + jkSaber_aimAngles.y;
 				// ignore roll, it gets weird
-				//jkSaber_aimAngles.z = (angles.z - jkSaber_aimAngles.z) * 8.0f * min(sithTime_deltaSeconds, 0.02f) + jkSaber_aimAngles.z;
+				//jkSaber_aimAngles.z = (angles.z - jkSaber_aimAngles.z) * 8.0f * stdMath_Min(sithTime_deltaSeconds, 0.02f) + jkSaber_aimAngles.z;
 			
 				rdMatrix_BuildRotate34(&autoAimMat, &jkSaber_aimAngles);
 				rdMatrix_PreMultiply34(&viewMat, &autoAimMat);
 			}
 		}
-		jkSaber_aimVector.x = (aimVector.x - jkSaber_aimVector.x) * 8.0f * min(sithTime_deltaSeconds, 0.02f) + jkSaber_aimVector.x;
-		jkSaber_aimVector.y = (aimVector.y - jkSaber_aimVector.y) * 8.0f * min(sithTime_deltaSeconds, 0.02f) + jkSaber_aimVector.y;
-		jkSaber_aimVector.z = (aimVector.z - jkSaber_aimVector.z) * 8.0f * min(sithTime_deltaSeconds, 0.02f) + jkSaber_aimVector.z;
+		jkSaber_aimVector.x = (aimVector.x - jkSaber_aimVector.x) * 8.0f * stdMath_Min(sithTime_deltaSeconds, 0.02f) + jkSaber_aimVector.x;
+		jkSaber_aimVector.y = (aimVector.y - jkSaber_aimVector.y) * 8.0f * stdMath_Min(sithTime_deltaSeconds, 0.02f) + jkSaber_aimVector.y;
+		jkSaber_aimVector.z = (aimVector.z - jkSaber_aimVector.z) * 8.0f * stdMath_Min(sithTime_deltaSeconds, 0.02f) + jkSaber_aimVector.z;
 #endif
         rdMatrix_PreMultiply34(&viewMat, &jkSaber_rotateMat);
 

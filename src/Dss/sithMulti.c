@@ -314,7 +314,7 @@ int sithMulti_GetSpawnIdx(sithThing *pPlayerThing)
             &rdroid_zeroVector3,
             0.0,
             pPlayerThing->moveSize,
-            1154);
+            RAYCAST_400 | SITH_RAYCAST_COLLIDE_SPHERE_ONLY | RAYCAST_2);
         for ( i = sithCollision_NextSearchResult(); i; i = sithCollision_NextSearchResult() )
         {
             if ( (i->hitType & SITHCOLLISION_THING) != 0 )

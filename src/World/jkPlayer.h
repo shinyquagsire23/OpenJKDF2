@@ -176,6 +176,7 @@ extern int jkPlayer_bUseOldPlayerPhysics;
 
 extern int jkPlayer_setCrosshairOnLightsaber;
 extern int jkPlayer_setCrosshairOnFist;
+extern int jkPlayer_bDisableWeaponWaggle;
 
 extern int jkPlayer_bHasLoadedSettingsOnce;
 

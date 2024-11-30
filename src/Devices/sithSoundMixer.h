@@ -81,7 +81,7 @@ int sithSoundMixer_sub_4DD3F0(sithPlayingSound *sound);
 int sithSoundMixer_sub_4DD5D0(sithPlayingSound *sound);
 int32_t sithSoundMixer_GetThingSoundIdx(sithThing *thing, sithSound *sound);
 void sithSoundMixer_StopSound(sithPlayingSound *sound);
-sithPlayingSound* sithSoundMixer_GetSoundFromIdx(signed int idx);
+sithPlayingSound* sithSoundMixer_GetSoundFromIdx(int idx);
 
 //static int (*sithSoundMixer_Startup)() = (void*)sithSoundMixer_Startup_ADDR;
 //static void (*sithSoundMixer_Shutdown)() = (void*)sithSoundMixer_Shutdown_ADDR;

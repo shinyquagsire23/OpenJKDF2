@@ -5,6 +5,7 @@
 #include "General/stdMath.h"
 #include "Raster/rdCache.h"
 #include "Engine/rdColormap.h"
+#include "Primitives/rdMath.h"
 #include "Primitives/rdPrimit3.h"
 #include "Primitives/rdDebug.h"
 #include <math.h>

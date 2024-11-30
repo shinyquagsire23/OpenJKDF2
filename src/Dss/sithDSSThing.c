@@ -196,7 +196,8 @@ int sithDSSThing_ProcessSyncThing(sithCogMsg *msg)
 {
     NETMSG_IN_START(msg);
 
-    sithThing* pThing = sithThing_GetById(NETMSG_POPS32());
+    int id = NETMSG_POPS32();
+    sithThing* pThing = sithThing_GetById(id);
     if ( !pThing )
         return 0;
 
@@ -1336,7 +1337,6 @@ void sithDSSThing_SendTakeItem(sithThing *pItemThing, sithThing *pActor, int mpF
     {
         if ( sithComm_netMsgTmp.netMsg.cogMsgId != DSS_TAKEITEM1 )
         {
-LABEL_12:
             sithItem_Take(pItemThing2, pActor2, 1);
             return;
         }
@@ -1344,7 +1344,8 @@ LABEL_12:
         {
             sithComm_netMsgTmp.netMsg.cogMsgId = DSS_TAKEITEM2;
             sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 1, 1);
-            goto LABEL_12;
+            sithItem_Take(pItemThing2, pActor2, 1);
+            return;
         }
     }
 }
@@ -1368,8 +1369,11 @@ int sithDSSThing_ProcessTakeItem(sithCogMsg *msg)
         sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, v6, 255, 1);
         return 0;
     }
-    v4 = sithThing_GetById(msg->pktData[1]);
-    if ( v2 && v4 )
+    if (msg->pktData[1] == -1) // MOTS added
+        v4 = NULL;
+    else
+        v4 = sithThing_GetById(msg->pktData[1]);
+    if ( v2 /*&& v4*/ ) // MOTS removed nullptr check
     {
         if ( msg->netMsg.cogMsgId == DSS_TAKEITEM1 )
         {

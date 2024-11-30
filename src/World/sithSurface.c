@@ -1269,7 +1269,7 @@ void sithSurface_SendDamageToThing(sithSurface *sender, sithThing *receiver, flo
 {
     float v4; // [esp+0h] [ebp-14h]
 
-    if ( (!sithNet_isMulti || !receiver || (receiver->thingflags & SITH_TF_INVULN) == 0) && (sender->surfaceFlags & 2) != 0 )
+    if ( (!sithNet_isMulti || !receiver || (receiver->thingflags & SITH_TF_INVULN) == 0) && (sender->surfaceFlags & SITH_SURFACE_COG_LINKED) != 0 )
     {
         v4 = (float)(unsigned int)damageType;
         sithCog_SendMessageFromSurfaceEx(sender, receiver, SITH_MESSAGE_DAMAGED, damage, v4, 0.0, 0.0);

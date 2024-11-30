@@ -2550,7 +2550,7 @@ void jkGuiRend_FocusElementDir(jkGuiMenu *pMenu, int dir)
         iter++;
     }
 
-    printf("%u->%u, %u %u, %u %u\n", (int)(focusedElement - pMenu->paElements), (int)(bestCandidate - pMenu->paElements), focusedElement->rect.x, focusedElement->rect.y, bestCandidate->rect.x, bestCandidate->rect.y);
+    //printf("%u->%u, %u %u, %u %u\n", (int)(focusedElement - pMenu->paElements), (int)(bestCandidate - pMenu->paElements), focusedElement->rect.x, focusedElement->rect.y, bestCandidate->rect.x, bestCandidate->rect.y);
 
     jkGuiElement* element = bestCandidate;
     if (!element) return;

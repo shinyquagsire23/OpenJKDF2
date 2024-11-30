@@ -9,7 +9,7 @@ on:
 jobs:
   build:
 
-    runs-on: macos-14
+    runs-on: macos-latest
 
     steps:
     - uses: actions/checkout@v3
@@ -22,8 +22,8 @@ jobs:
           brew unlink python3
           brew upgrade && brew install --overwrite python3
           brew install cmake make imagemagick
-          pip3 install cogapp generate-iconset
+          pip3 install --break-system-packages cogapp generate-iconset
           brew install openal-soft sdl2 sdl2_mixer glew libmodplug libpng
-          brew install openssl@1.1 protobuf
+          brew install openssl@3 protobuf
     - name: cmake
       run: export HOMEBREW_PREFIX="/usr/local" && ./.github/build_macos.sh

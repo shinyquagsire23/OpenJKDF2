@@ -388,8 +388,10 @@ void jkGuiSingleplayer_sub_41AA30(Darray *array, jkGuiElement *element, int a3, 
         {
 		#if 0 // this crashes on free()
             // Added: extended the path alloc to include the real index
-            v14 = (char *)pHS->alloc(_strlen(a2.fpath) + 1 + sizeof(int));
-            v15 = _strcpy(v14+sizeof(int), a2.fpath);
+            uint32_t alloc_sz = _strlen(a2.fpath) + 1 + sizeof(int);
+            v14 = (char *)pHS->alloc(alloc_sz);
+            v15 = _strncpy(v14+sizeof(int), a2.fpath, alloc_sz-sizeof(int)-1);
+            v14[alloc_sz-1] = 0;
             v16 = jkGuiTitle_quicksave_related_func1(&strtable, v14+sizeof(int));
             jkGuiRend_DarrayReallocStr(array, v16, (intptr_t)v14);
 
@@ -419,7 +421,8 @@ void jkGuiSingleplayer_sub_41AA30(Darray *array, jkGuiElement *element, int a3, 
                 // Added: extended the path alloc to include the real index
                 uint32_t alloc_sz = _strlen(v17->fileName) + 1 + sizeof(int);
                 v18 = (char *)pHS->alloc(alloc_sz);
-                v19 = _strncpy(v18+sizeof(int), v17->fileName, alloc_sz); // Added: strcpy -> strncpy, +sizeof(int)
+                v19 = _strncpy(v18+sizeof(int), v17->fileName, alloc_sz-sizeof(int)-1); // Added: strcpy -> strncpy, +sizeof(int)
+                v18[alloc_sz-1] = 0;
                 v20 = jkGuiTitle_quicksave_related_func1(&strtable, v18+sizeof(int)); // Added: +sizeof(int)
                 jkGuiRend_DarrayReallocStr(array, v20, (intptr_t)v18);
 

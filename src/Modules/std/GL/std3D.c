@@ -395,7 +395,7 @@ typedef enum STD3D_SHADER_ID
 	SHADER_COLOR_ALPHABLEND_SPEC,
 
 	SHADER_COUNT
-} STD3D_DRAW_LIST;
+} STD3D_SHADER_ID;
 
 typedef struct std3D_worldStage
 {

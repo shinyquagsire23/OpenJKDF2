@@ -104,6 +104,38 @@ static inline uint8_t stdMath_ClampU8(uint8_t val, uint8_t valMin, uint8_t valMa
     return val;
 }
 
+static inline int32_t stdMath_MinInt(int32_t val, int32_t valMin)
+{
+    if (val < valMin)
+        return val;
+
+    return valMin;
+}
+
+static inline int32_t stdMath_MaxInt(int32_t val, int32_t valMax)
+{
+    if (val > valMax)
+        return val;
+
+    return valMax;
+}
+
+static inline float stdMath_Min(float val, float valMin)
+{
+    if (val < valMin)
+        return val;
+
+    return valMin;
+}
+
+static inline float stdMath_Max(float val, float valMax)
+{
+    if (val > valMax)
+        return val;
+
+    return valMax;
+}
+
 extern const float aSinTable[4096];
 extern const float aTanTable[4096];
 

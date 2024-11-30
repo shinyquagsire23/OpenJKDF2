@@ -1737,7 +1737,7 @@ void sithCogFunction_SendMessageExRadius(sithCog *ctx)
         {
             sender = &sithWorld_pCurrentWorld->things[iVar5_idx];
             if (((((uVar4 & 1 << (sender->type & 0x1f)) != 0) 
-                && ((sender->thingflags & 0x80202) == 0)) 
+                && ((sender->thingflags & (SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0))
                 && ((sender->type != 10 || ((uVar4 & 0x400) != 0)))) 
                 && (fVar3 = (sender->position).x - local_1c.x, fVar1 = (sender->position).y - local_1c.y,
                     fVar2 = (sender->position).z - local_1c.z,

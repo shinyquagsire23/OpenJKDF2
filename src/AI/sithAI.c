@@ -271,39 +271,39 @@ void sithAI_FreeEntry(sithThing *thing)
     int v3; // eax
     sithActor *v4; // ecx
 
-    v1 = thing->actor;
-    if ( v1 )
+    sithActor* pActor = thing->actor;
+    if (!pActor)
+        return;
+
+    v2 = pActor - sithAI_actors;
+
+    // Added: fix memleak
+    if (sithAI_actors[v2].paFrames)
     {
-        v2 = v1 - sithAI_actors;
-
-        // Added: fix memleak
-        if (sithAI_actors[v2].paFrames)
-        {
-            pSithHS->free(sithAI_actors[v2].paFrames);
-            sithAI_actors[v2].paFrames = NULL;
-        }
-
-        _memset(&sithAI_actors[v2], 0, sizeof(sithActor));
-        if ( v2 == sithAI_inittedActors )
-        {
-            v3 = v2 - 1;
-            if ( v2 - 1 >= 0 )
-            {
-                v4 = &sithAI_actors[v2];
-                do
-                {
-                    if (v4->thing)
-                        break;
-                    --v3;
-                    v4--;
-                }
-                while ( v3 >= 0 );
-            }
-            sithAI_inittedActors = v3;
-        }
-        thing->actor = 0;
-        sithAI_actorInitted[sithAI_maxActors++] = v2;
+        pSithHS->free(sithAI_actors[v2].paFrames);
+        sithAI_actors[v2].paFrames = NULL;
     }
+
+    _memset(&sithAI_actors[v2], 0, sizeof(sithActor));
+    if (v2 == sithAI_inittedActors)
+    {
+        v3 = v2 - 1;
+        if ( v2 - 1 >= 0 )
+        {
+            v4 = &sithAI_actors[v3];
+            do
+            {
+                if (v4->thing)
+                    break;
+                --v3;
+                v4--;
+            }
+            while ( v3 >= 0 );
+        }
+        sithAI_inittedActors = v3;
+    }
+    thing->actor = 0;
+    sithAI_actorInitted[sithAI_maxActors++] = v2;
 }
 
 void sithAI_TickAll()
@@ -1746,7 +1746,7 @@ int sithAI_FUN_0053a520(sithActor *pActor,float param_2,float param_3,float para
     if (g_debugmodeFlags & DEBUGFLAG_NO_AI) {
         return 0;
     }
-    if (thing->thingflags & 0x202) {
+    if (thing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) {
         return 0;
     }
     if (thing->sector && thing->sector->flags & SITH_SECTOR_UNDERWATER) // Added: thing->sector
@@ -1834,7 +1834,7 @@ int sithAI_Leap(sithActor *pActor,float minDist,float maxDist,float minDot,int p
     if (g_debugmodeFlags & DEBUGFLAG_NO_AI) {
         return 0;
     }
-    if (thing->thingflags & 0x202) {
+    if (thing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) {
         return 0;
     }
     if (thing->sector && thing->sector->flags & SITH_SECTOR_UNDERWATER) // Added: thing->sector
@@ -1942,7 +1942,7 @@ sithThing* sithAI_FUN_00539a60(sithActor *pThing)
             {
                 arg8 = &sithWorld_pCurrentWorld->things[iVar5];
                 if (((sithAI_dword_84DE74 & 1 << (arg8->type & 0x1f)) != 0) &&
-                ((arg8->thingflags & 0x80202) == 0)) 
+                ((arg8->thingflags & (SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0))
                 {
                     if (arg8->thingtype == 2) 
                     {

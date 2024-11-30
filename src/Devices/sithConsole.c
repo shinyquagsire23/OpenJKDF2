@@ -12,7 +12,6 @@
 int sithConsole_Startup(int maxCmds)
 {
     stdHashTable *v1; // eax
-    stdSound_buffer_t *v2; // eax
     signed int result; // eax
 
     sithConsole_aCmds = (stdDebugConsoleCmd *)pSithHS->alloc(sizeof(stdDebugConsoleCmd) * maxCmds);
@@ -27,10 +26,9 @@ int sithConsole_Startup(int maxCmds)
             DebugGui_fnPrint = 0;
             DebugGui_fnPrintUniStr = 0;
             sithCommand_Startup();
-            v2 = sithSound_InitFromPath("set_vlo2.wav");
-            sithConsole_alertSound = v2;
-            if ( v2 )
-                stdSound_BufferSetVolume(v2, 0.8);
+            sithConsole_alertSound = sithSound_InitFromPath("set_vlo2.wav");
+            if ( sithConsole_alertSound )
+                stdSound_BufferSetVolume(sithConsole_alertSound, 0.8);
             result = 1;
             sithConsole_bInitted = 1;
             return result;
@@ -305,6 +303,10 @@ void sithConsole_AlertSound()
 {
     if ( sithConsole_alertSound )
     {
+#ifdef QOL_IMPROVEMENTS
+        // Original game did not respect SFX volume for this
+        stdSound_BufferSetVolume(sithConsole_alertSound, jkGuiSound_sfxVolume);
+#endif
         stdSound_BufferReset(sithConsole_alertSound);
         stdSound_BufferPlay(sithConsole_alertSound, 0);
     }

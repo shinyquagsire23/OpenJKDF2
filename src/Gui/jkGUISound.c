@@ -41,8 +41,8 @@ static jkGuiElement jkGuiSound_elements[25] = {
     {ELEMENT_TEXT, 0, 0, "GUI_OFF", 2, {300, 280, 40, 20}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXT, 0, 0, "GUI_MAX", 2, {580, 280, 40, 20}, 1, 0, 0, 0, 0, 0, {0}, 0},
 #ifdef SDL2_RENDER
-    {ELEMENT_TEXT, 0, 0, L"Cutscene Volume", 3, {340, 310, 220, 20}, 1, 0, 0, 0, 0, 0, {0}, 0},
-    {ELEMENT_SLIDER, 0, 0, (const char*)100, 0, {300, 335, 320, 30}, 1, 0, L"Set the volume of audio during cutscenes.", 0, 0, slider_images, {0}, 0},
+    {ELEMENT_TEXT, 0, 0, "GUIEXT_CUTSCENE_VOLUME", 3, {340, 310, 220, 20}, 1, 0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_SLIDER, 0, 0, (const char*)100, 0, {300, 335, 320, 30}, 1, 0, "GUIEXT_CUTSCENE_VOLUME_HINT", 0, 0, slider_images, {0}, 0},
     {ELEMENT_TEXT, 0, 0, "GUI_OFF", 2, {310, 370, 40, 20}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXT, 0, 0, L"", 2, {450, 370, 40, 20}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXT, 0, 0, "GUI_MAX", 2, {590, 370, 40, 20}, 1, 0, 0, 0, 0, 0, {0}, 0},
@@ -74,7 +74,7 @@ void jkGuiSound_Startup()
     jkGuiSound_cutsceneVolume = wuRegistry_GetFloat("cutsceneVolume", jkGuiSound_cutsceneVolume);
 
     jkGuiSound_b3DSound_2 = jkGuiSound_b3DSound;
-    sithSoundMixer_UpdateMusicVolume(jkGuiSound_musicVolume); // TODO
+    sithSoundMixer_UpdateMusicVolume(jkGuiSound_musicVolume);
 
     stdSound_SetMenuVolume(jkGuiSound_sfxVolume);
 }

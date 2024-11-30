@@ -25,7 +25,7 @@ rm -f src/globals.c
 mkdir -p build_darwin_x86_64 && pushd build_darwin_x86_64
 
 export PKG_CONFIG_PATH_OLD=$PKG_CONFIG_PATH
-export PKG_CONFIG_PATH=$PKG_CONFIG_PATH_OLD:/usr/local/opt/openssl@1.1/lib/pkgconfig
+#export PKG_CONFIG_PATH=$PKG_CONFIG_PATH_OLD:/usr/local/opt/openssl@3/lib/pkgconfig
 
 cmake .. -DPLAT_MACOS_X86_64=true --toolchain $(pwd)/../cmake_modules/toolchain_macos_x86_64.cmake -DCMAKE_OSX_ARCHITECTURES="x86_64" &&
 cmake .. -DPLAT_MACOS_X86_64=true --toolchain $(pwd)/../cmake_modules/toolchain_macos_x86_64.cmake -DCMAKE_OSX_ARCHITECTURES="x86_64" &&
@@ -45,7 +45,7 @@ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH_OLD
 mkdir -p build_darwin64 && pushd build_darwin64
 
 export PKG_CONFIG_PATH_OLD=$PKG_CONFIG_PATH
-export PKG_CONFIG_PATH=$PKG_CONFIG_PATH_OLD:/opt/homebrew/opt/openssl@1.1/lib/pkgconfig
+#export PKG_CONFIG_PATH=$PKG_CONFIG_PATH_OLD:/opt/homebrew/opt/openssl@3/lib/pkgconfig
 
 cmake .. &&
 (make -j $(nproc) PROTOBUF || make -j1 PROTOBUF) && 
