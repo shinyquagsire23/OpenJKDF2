@@ -27,6 +27,8 @@ jobs:
                        -y --no-install-suggests --no-install-recommends \
                        build-essential devscripts cmake make python3 python3-pip imagemagick &&
           sudo apt-get install -y zsh mingw-w64 clang libopenal-dev libglew-dev &&
+          sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix &&
+          sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix &&
           sudo pip3 install cogapp
       - name: Generate CMake Build System
         run: |
