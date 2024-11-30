@@ -742,10 +742,10 @@ void sithSoundMixer_TickSectorSound()
     if ( sithSoundMixer_pLastSectorSoundSector->sectorSoundVol == 0.0 )
         lastSectorFadingOutSound = NULL;
     v3 = sithSoundMixer_pCurSectorPlayingSound;
-    if ( !lastSectorFadingOutSound && sithSoundMixer_pCurSectorPlayingSound )
+    if (!lastSectorFadingOutSound && sithSoundMixer_pCurSectorPlayingSound)
     {
         v4 = -sithSoundMixer_pCurSectorPlayingSound->vol_2;
-        if ( v4 == 0.0 )
+        if (v4 == 0.0)
         {
             sithSoundMixer_pCurSectorPlayingSound->flags |= SITHSOUNDFLAG_FADING;
             sithSoundMixer_pCurSectorPlayingSound = NULL;
@@ -754,12 +754,10 @@ void sithSoundMixer_TickSectorSound()
         else
         {
             v3->flags &= ~(SITHSOUNDFLAG_FADE_OUT|SITHSOUNDFLAG_FADE_IN|SITHSOUNDFLAG_FADING);
-            v7 = v4;
-            if ( v7 < 0.0 )
-                v7 = -v4;
+            v7 = fabs(v4);
             v3->volume = 0.0;
             v3->volumeVelocity = v7 + v7;
-            if ( v4 < 0.0 ) // TODO verify? v4
+            if (v4 < 0.0) // TODO verify? v4
                 v3->flags |= SITHSOUNDFLAG_FADE_OUT;
             else
                 v3->flags |= SITHSOUNDFLAG_FADE_IN;
@@ -768,68 +766,68 @@ void sithSoundMixer_TickSectorSound()
         }
         return;
     }
-    if ( lastSectorFadingOutSound )
+
+    if (!lastSectorFadingOutSound)
+        return;
+
+    if (!sithSoundMixer_pCurSectorPlayingSound)
     {
-        if ( sithSoundMixer_pCurSectorPlayingSound )
+        sithSoundMixer_pCurSectorPlayingSound = sithSoundMixer_StopSectorSound(lastSectorFadingOutSound);
+
+        if (sithSoundMixer_pCurSectorPlayingSound)
+            sithSoundMixer_FadeSound(sithSoundMixer_pCurSectorPlayingSound, sithSoundMixer_pLastSectorSoundSector->sectorSoundVol, 0.5);
+        return;
+    }
+
+    if (sithSoundMixer_pCurSectorPlayingSound->sound == lastSectorFadingOutSound)
+    {
+        v13 = stdMath_Clamp(sithSoundMixer_pLastSectorSoundSector->sectorSoundVol, 0.0, 1.5);
+        v14 = v13 - sithSoundMixer_pCurSectorPlayingSound->vol_2;
+        if ( v14 == 0.0 )
+            return;
+        v17 = fabs(v14);
+
+        // added copy for later
+        v43 = v14;
+
+        sithSoundMixer_pCurSectorPlayingSound->flags &= ~(SITHSOUNDFLAG_FADE_OUT|SITHSOUNDFLAG_FADE_IN|SITHSOUNDFLAG_FADING);
+    }
+    else
+    {
+        v20 = -sithSoundMixer_pCurSectorPlayingSound->vol_2;
+        if (v20 != 0.0)
         {
-            if ( sithSoundMixer_pCurSectorPlayingSound->sound == lastSectorFadingOutSound )
-            {
-                v13 = stdMath_Clamp(sithSoundMixer_pLastSectorSoundSector->sectorSoundVol, 0.0, 1.5);
-                v14 = v13 - sithSoundMixer_pCurSectorPlayingSound->vol_2;
-                if ( v14 == 0.0 )
-                    return;
-                v17 = fabs(v14);
-
-                // added copy for later
-                v43 = v14;
-
-                sithSoundMixer_pCurSectorPlayingSound->flags &= ~(SITHSOUNDFLAG_FADE_OUT|SITHSOUNDFLAG_FADE_IN|SITHSOUNDFLAG_FADING);
-            }
-            else
-            {
-                v20 = -sithSoundMixer_pCurSectorPlayingSound->vol_2;
-                if ( v20 != 0.0 )
-                {
-                    sithSoundMixer_pCurSectorPlayingSound->flags &= ~(SITHSOUNDFLAG_FADE_OUT|SITHSOUNDFLAG_FADE_IN|SITHSOUNDFLAG_FADING);
-                    v23 = fabs(v20);
-                    v3->volume = 0.0;
-                    v3->volumeVelocity = v23 + v23;
-                    if ( v20 < 0.0 ) // TODO verify? v20 <
-                        v3->flags |= SITHSOUNDFLAG_FADE_OUT;
-                    else
-                        v3->flags |= SITHSOUNDFLAG_FADE_IN;
-                }
-                //printf("%s fade\n", v3->sound->sound_fname);
-                v3->flags |= SITHSOUNDFLAG_FADING;
-                v3 = sithSoundMixer_StopSectorSound(lastSectorFadingOutSound);
-                sithSoundMixer_pCurSectorPlayingSound = v3;
-                if ( !v3 )
-                    return;
-                v13 = stdMath_Clamp(sithSoundMixer_pLastSectorSoundSector->sectorSoundVol, 0.0, 1.5);
-                v31 = v13 - v3->vol_2;
-                if ( v31 == 0.0 )
-                    return;
-                v43 = v31;
-                v17 = v43;
-                v3->flags &= ~(SITHSOUNDFLAG_FADE_OUT|SITHSOUNDFLAG_FADE_IN|SITHSOUNDFLAG_FADING);
-                if ( v17 < 0.0 )
-                    v17 = -v17;
-            }
-            v3->volumeVelocity = v17 + v17;
-            v3->volume = v13;
-            if ( v43 < 0.0 ) // TODO verify? v43 > 0.0
+            sithSoundMixer_pCurSectorPlayingSound->flags &= ~(SITHSOUNDFLAG_FADE_OUT|SITHSOUNDFLAG_FADE_IN|SITHSOUNDFLAG_FADING);
+            v23 = fabs(v20);
+            v3->volume = 0.0;
+            v3->volumeVelocity = v23 + v23;
+            if (v20 < 0.0) // TODO verify? v20 <
                 v3->flags |= SITHSOUNDFLAG_FADE_OUT;
             else
                 v3->flags |= SITHSOUNDFLAG_FADE_IN;
-            
-            return;
         }
-
-        sithSoundMixer_pCurSectorPlayingSound = sithSoundMixer_StopSectorSound(lastSectorFadingOutSound);
-
-        if ( sithSoundMixer_pCurSectorPlayingSound )
-            sithSoundMixer_FadeSound(sithSoundMixer_pCurSectorPlayingSound, sithSoundMixer_pLastSectorSoundSector->sectorSoundVol, 0.5);
+        //printf("%s fade\n", v3->sound->sound_fname);
+        v3->flags |= SITHSOUNDFLAG_FADING;
+        v3 = sithSoundMixer_StopSectorSound(lastSectorFadingOutSound);
+        sithSoundMixer_pCurSectorPlayingSound = v3;
+        if (!v3)
+            return;
+        v13 = stdMath_Clamp(sithSoundMixer_pLastSectorSoundSector->sectorSoundVol, 0.0, 1.5);
+        v31 = v13 - v3->vol_2;
+        if (v31 == 0.0)
+            return;
+        v43 = v31;
+        v17 = fabs(v43);
+        v3->flags &= ~(SITHSOUNDFLAG_FADE_OUT|SITHSOUNDFLAG_FADE_IN|SITHSOUNDFLAG_FADING);
     }
+    v3->volumeVelocity = v17 + v17;
+    v3->volume = v13;
+    if (v43 < 0.0) // TODO verify? v43 > 0.0
+        v3->flags |= SITHSOUNDFLAG_FADE_OUT;
+    else
+        v3->flags |= SITHSOUNDFLAG_FADE_IN;
+    
+    return;
 }
 
 void sithSoundMixer_Tick(float deltaSecs)
@@ -850,7 +848,7 @@ void sithSoundMixer_Tick(float deltaSecs)
     // This was inlined, TODO check Jones3D and see if it had a name
     sithSoundMixer_TickSectorSound();
 
-    for (uint32_t i = 0; i < sithSoundMixer_numSoundsAvailable; i++ )
+    for (uint32_t i = 0; i < sithSoundMixer_numSoundsAvailable; i++)
     {
         sithPlayingSound* soundIter = &sithSoundMixer_aPlayingSounds[i];
         if ( soundIter->sound )
