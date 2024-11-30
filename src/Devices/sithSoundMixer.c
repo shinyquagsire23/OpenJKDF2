@@ -665,10 +665,38 @@ void sithSoundMixer_SetVolume(sithPlayingSound *sound, float volume)
     }
 }
 
-void sithSoundMixer_Tick(float deltaSecs)
+sithPlayingSound* sithSoundMixer_StopSectorSound(sithSound* pSound)
+{
+    if (!sithSoundMixer_bOpened) {
+        return NULL;
+    }
+
+    sithPlayingSound* v28 = sithSoundMixer_PlayingSoundFromSound(pSound, 1);
+    if ( v28 )
+    {
+        if (sithSoundMixer_sub_4DD5D0(v28))
+        {
+            //printf("asdf %s\n", v28->sound->sound_fname);
+            if ( v28->p3DSoundObj )
+                stdSound_3DSetMode(v28->p3DSoundObj, 2);
+            sithSoundMixer_SetVolume(v28, 0.0);
+            stdSound_BufferSetPan(v28->pSoundBuf, 0.0);
+            if ( sithSoundMixer_sub_4DD3F0(v28) )
+            {
+                return v28;
+            }
+        }
+
+        sithSoundMixer_StopSound(v28);
+    }
+
+    return NULL;
+}
+
+void sithSoundMixer_TickSectorSound()
 {
     sithSector *v1; // eax
-    sithSound *v2; // esi
+    sithSound *lastSectorFadingOutSound; // esi
     sithPlayingSound *v3; // ecx
     double v4; // st7
     double v7; // st6
@@ -677,33 +705,16 @@ void sithSoundMixer_Tick(float deltaSecs)
     double v17; // st6
     double v20; // st7
     double v23; // st6
-    sithPlayingSound *v28; // eax
     double v31; // st6
-    sithPlayingSound *v37; // eax
-    sithPlayingSound *v38; // esi
-    unsigned int v40; // edi
-    sithPlayingSound *soundIter; // esi
-    float v42; // [esp+4h] [ebp-10h]
     float v43; // [esp+4h] [ebp-10h]
-    rdVector3 v44; // [esp+8h] [ebp-Ch] BYREF
 
-#ifdef STDSOUND_OPENAL
-    jkGuiSound_numChannels = SITH_MIXER_NUMPLAYINGSOUNDS;
-#endif
-
-    if ( !sithCamera_currentCamera )
-        return;
-    if ( (sithCamera_currentCamera->cameraPerspective & 0xFC) != 0 )
-        sithSoundMixer_pFocusedThing = 0;
-    else
-        sithSoundMixer_pFocusedThing = sithWorld_pCurrentWorld->cameraFocus;
     v1 = sithCamera_currentCamera->sector;
     if ( v1 == sithSoundMixer_pLastSectorSoundSector )
-        goto LABEL_72;
+        return;
 
     // Added: nullptr deref crash fix
     if (!v1)
-        goto LABEL_72;
+        return;
 
     sithSoundMixer_pLastSectorSoundSector = sithCamera_currentCamera->sector;
     if ( sithSoundMixer_dword_836C00 && (v1->flags & 2) == 0)
@@ -727,17 +738,17 @@ void sithSoundMixer_Tick(float deltaSecs)
         }
     }*/
 
-    v2 = sithSoundMixer_pLastSectorSoundSector->sectorSound;
+    lastSectorFadingOutSound = sithSoundMixer_pLastSectorSoundSector->sectorSound;
     if ( sithSoundMixer_pLastSectorSoundSector->sectorSoundVol == 0.0 )
-        v2 = 0;
+        lastSectorFadingOutSound = NULL;
     v3 = sithSoundMixer_pCurSectorPlayingSound;
-    if ( !v2 && sithSoundMixer_pCurSectorPlayingSound )
+    if ( !lastSectorFadingOutSound && sithSoundMixer_pCurSectorPlayingSound )
     {
         v4 = -sithSoundMixer_pCurSectorPlayingSound->vol_2;
         if ( v4 == 0.0 )
         {
             sithSoundMixer_pCurSectorPlayingSound->flags |= SITHSOUNDFLAG_FADING;
-            sithSoundMixer_pCurSectorPlayingSound = 0;
+            sithSoundMixer_pCurSectorPlayingSound = NULL;
             
         }
         else
@@ -752,30 +763,27 @@ void sithSoundMixer_Tick(float deltaSecs)
                 v3->flags |= SITHSOUNDFLAG_FADE_OUT;
             else
                 v3->flags |= SITHSOUNDFLAG_FADE_IN;
-            sithSoundMixer_pCurSectorPlayingSound = 0;
+            sithSoundMixer_pCurSectorPlayingSound = NULL;
             v3->flags |= SITHSOUNDFLAG_FADING;
         }
-        goto LABEL_72;
+        return;
     }
-    if ( v2 )
+    if ( lastSectorFadingOutSound )
     {
         if ( sithSoundMixer_pCurSectorPlayingSound )
         {
-            if ( sithSoundMixer_pCurSectorPlayingSound->sound == v2 )
+            if ( sithSoundMixer_pCurSectorPlayingSound->sound == lastSectorFadingOutSound )
             {
                 v13 = stdMath_Clamp(sithSoundMixer_pLastSectorSoundSector->sectorSoundVol, 0.0, 1.5);
                 v14 = v13 - sithSoundMixer_pCurSectorPlayingSound->vol_2;
                 if ( v14 == 0.0 )
-                    goto LABEL_72;
-                v42 = v14;
-                v17 = v42;
+                    return;
+                v17 = fabs(v14);
 
                 // added copy for later
                 v43 = v14;
 
                 sithSoundMixer_pCurSectorPlayingSound->flags &= ~(SITHSOUNDFLAG_FADE_OUT|SITHSOUNDFLAG_FADE_IN|SITHSOUNDFLAG_FADING);
-                if ( v17 < 0.0 )
-                    v17 = -v17;
             }
             else
             {
@@ -793,46 +801,14 @@ void sithSoundMixer_Tick(float deltaSecs)
                 }
                 //printf("%s fade\n", v3->sound->sound_fname);
                 v3->flags |= SITHSOUNDFLAG_FADING;
-                if ( sithSoundMixer_bOpened == 0 )
-                {
-                    v3 = 0;
-                }
-                else
-                {
-                    v28 = sithSoundMixer_PlayingSoundFromSound(v2, 1);
-                    if ( v28 )
-                    {
-                        if ( !sithSoundMixer_sub_4DD5D0(v28) )
-                            goto LABEL_49;
-
-                        //printf("asdf %s\n", v28->sound->sound_fname);
-                        if ( v28->p3DSoundObj )
-                            stdSound_3DSetMode(v28->p3DSoundObj, 2);
-                        sithSoundMixer_SetVolume(v28, 0.0);
-                        stdSound_BufferSetPan(v28->pSoundBuf, 0.0);
-                        if ( sithSoundMixer_sub_4DD3F0(v28) )
-                        {
-                            v3 = v28;
-                        }
-                        else
-                        {
-LABEL_49:
-                            sithSoundMixer_StopSound(v28);
-                            v3 = 0;
-                        }
-                    }
-                    else
-                    {
-                        v3 = 0;
-                    }
-                }
+                v3 = sithSoundMixer_StopSectorSound(lastSectorFadingOutSound);
                 sithSoundMixer_pCurSectorPlayingSound = v3;
                 if ( !v3 )
-                    goto LABEL_72;
+                    return;
                 v13 = stdMath_Clamp(sithSoundMixer_pLastSectorSoundSector->sectorSoundVol, 0.0, 1.5);
                 v31 = v13 - v3->vol_2;
                 if ( v31 == 0.0 )
-                    goto LABEL_72;
+                    return;
                 v43 = v31;
                 v17 = v43;
                 v3->flags &= ~(SITHSOUNDFLAG_FADE_OUT|SITHSOUNDFLAG_FADE_IN|SITHSOUNDFLAG_FADING);
@@ -846,48 +822,46 @@ LABEL_49:
             else
                 v3->flags |= SITHSOUNDFLAG_FADE_IN;
             
-            goto LABEL_72;
+            return;
         }
 
-        if ( sithSoundMixer_bOpened )
-        {
-            v37 = sithSoundMixer_PlayingSoundFromSound(v2, 1);
-            v38 = v37;
-            if ( v37 )
-            {
-                if ( sithSoundMixer_sub_4DD5D0(v37) )
-                {
-                    if ( v38->p3DSoundObj )
-                        stdSound_3DSetMode(v38->p3DSoundObj, 2);
-                    sithSoundMixer_SetVolume(v38, 0.0);
-                    stdSound_BufferSetPan(v38->pSoundBuf, 0.0);
-                    if ( sithSoundMixer_sub_4DD3F0(v38) )
-                        goto LABEL_70;
-                }
-                sithSoundMixer_StopSound(v38);
-            }
-        }
-        v38 = 0;
-LABEL_70:
-        sithSoundMixer_pCurSectorPlayingSound = v38;
+        sithSoundMixer_pCurSectorPlayingSound = sithSoundMixer_StopSectorSound(lastSectorFadingOutSound);
 
         if ( sithSoundMixer_pCurSectorPlayingSound )
             sithSoundMixer_FadeSound(sithSoundMixer_pCurSectorPlayingSound, sithSoundMixer_pLastSectorSoundSector->sectorSoundVol, 0.5);
     }
+}
 
-LABEL_72:
-    for (v40 = 0; v40 < sithSoundMixer_numSoundsAvailable; v40++ )
+void sithSoundMixer_Tick(float deltaSecs)
+{
+    rdVector3 tmp;
+
+#ifdef STDSOUND_OPENAL
+    jkGuiSound_numChannels = SITH_MIXER_NUMPLAYINGSOUNDS;
+#endif
+
+    if ( !sithCamera_currentCamera )
+        return;
+    if ( (sithCamera_currentCamera->cameraPerspective & 0xFC) != 0 )
+        sithSoundMixer_pFocusedThing = 0;
+    else
+        sithSoundMixer_pFocusedThing = sithWorld_pCurrentWorld->cameraFocus;
+
+    // This was inlined, TODO check Jones3D and see if it had a name
+    sithSoundMixer_TickSectorSound();
+
+    for (uint32_t i = 0; i < sithSoundMixer_numSoundsAvailable; i++ )
     {
-        soundIter = &sithSoundMixer_aPlayingSounds[v40];
+        sithPlayingSound* soundIter = &sithSoundMixer_aPlayingSounds[i];
         if ( soundIter->sound )
         {
-            //jk_printf("tick %u: %s %x, %f %f vol %f\n", v40, soundIter->sound->sound_fname, soundIter->flags, soundIter->distance, soundIter->maxPosition, soundIter->vol_2);
+            //jk_printf("tick %u: %s %x, %f %f vol %f\n", i, soundIter->sound->sound_fname, soundIter->flags, soundIter->distance, soundIter->maxPosition, soundIter->vol_2);
             sithSoundMixer_TickPlayingSound(soundIter, deltaSecs);
         }
     }
     //printf("--- %u\n", sithSoundMixer_activeChannels);
-    rdVector_Scale3(&v44, &sithCamera_currentCamera->vec3_1, 10.0);
-    stdSound_SetPositionOrientation(&v44, &sithCamera_currentCamera->viewMat.lvec, &sithCamera_currentCamera->viewMat.uvec);
+    rdVector_Scale3(&tmp, &sithCamera_currentCamera->vec3_1, 10.0);
+    stdSound_SetPositionOrientation(&tmp, &sithCamera_currentCamera->viewMat.lvec, &sithCamera_currentCamera->viewMat.uvec);
 }
 
 void sithSoundMixer_TickPlayingSound(sithPlayingSound *sound, float deltaSecs)
