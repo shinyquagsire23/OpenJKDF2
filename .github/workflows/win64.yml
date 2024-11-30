@@ -30,21 +30,21 @@ jobs:
                'http://archive.ubuntu.com/ubuntu/pool/universe/b/binutils-mingw-w64/binutils-mingw-w64_2.39.90.20221231-1ubuntu1+10.3_all.deb' \
                'http://archive.ubuntu.com/ubuntu/pool/universe/b/binutils-mingw-w64/binutils-mingw-w64-x86-64_2.39.90.20221231-1ubuntu1+10.3_amd64.deb' \
                'http://archive.ubuntu.com/ubuntu/pool/universe/b/binutils-mingw-w64/binutils-mingw-w64-i686_2.39.90.20221231-1ubuntu1+10.3_amd64.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/gcc-mingw-w64_12.2.0-14ubuntu1+25.2_all.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/gcc-mingw-w64-x86-64_12.2.0-14ubuntu1+25.2_all.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/gcc-mingw-w64-i686_12.2.0-14ubuntu1+25.2_all.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/g++-mingw-w64_12.2.0-14ubuntu1+25.2_all.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/g++-mingw-w64-x86-64_12.2.0-14ubuntu1+25.2_all.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/g++-mingw-w64-i686_12.2.0-14ubuntu1+25.2_all.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/gcc-mingw-w64-base_12.2.0-14ubuntu1+25.2_amd64.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/gcc-mingw-w64-x86-64-posix_12.2.0-14ubuntu1+25.2_amd64.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/gcc-mingw-w64-x86-64-win32_12.2.0-14ubuntu1+25.2_amd64.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/gcc-mingw-w64-i686-posix_12.2.0-14ubuntu1+25.2_amd64.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/gcc-mingw-w64-i686-win32_12.2.0-14ubuntu1+25.2_amd64.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/g++-mingw-w64-x86-64-posix_12.2.0-14ubuntu1+25.2_amd64.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/g++-mingw-w64-x86-64-win32_12.2.0-14ubuntu1+25.2_amd64.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/g++-mingw-w64-i686-posix_12.2.0-14ubuntu1+25.2_amd64.deb' \
-               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/g++-mingw-w64-i686-win32_12.2.0-14ubuntu1+25.2_amd64.deb' \
+               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/gcc-mingw-w64_13.3.0-6ubuntu2+26.5_all.deb' \
+               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/gcc-mingw-w64-x86-64_13.3.0-6ubuntu2+26.5_all.deb' \
+               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/gcc-mingw-w64-i686_13.3.0-6ubuntu2+26.5_all.deb' \
+               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/g++-mingw-w64_13.3.0-6ubuntu2+26.5_all.deb' \
+               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/g++-mingw-w64-x86-64_13.3.0-6ubuntu2+26.5_all.deb' \
+               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/g++-mingw-w64-i686_13.3.0-6ubuntu2+26.5_all.deb' \
+               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/gcc-mingw-w64-base_13.3.0-6ubuntu2+26.5_amd64.deb' \
+               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/gcc-mingw-w64-x86-64-posix_13.3.0-6ubuntu2+26.5_amd64.deb' \
+               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/gcc-mingw-w64-x86-64-win32_13.3.0-6ubuntu2+26.5_amd64.deb' \
+               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/gcc-mingw-w64-i686-posix_13.3.0-6ubuntu2+26.5_amd64.deb' \
+               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/gcc-mingw-w64-i686-win32_13.3.0-6ubuntu2+26.5_amd64.deb' \
+               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/g++-mingw-w64-x86-64-posix_13.3.0-6ubuntu2+26.5_amd64.deb' \
+               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/g++-mingw-w64-x86-64-win32_13.3.0-6ubuntu2+26.5_amd64.deb' \
+               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/g++-mingw-w64-i686-posix_13.3.0-6ubuntu2+26.5_amd64.deb' \
+               'http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/g++-mingw-w64-i686-win32_13.3.0-6ubuntu2+26.5_amd64.deb' \
                'http://archive.ubuntu.com/ubuntu/pool/universe/m/mingw-w64/mingw-w64_10.0.0-3_all.deb' \
                'http://archive.ubuntu.com/ubuntu/pool/universe/m/mingw-w64/mingw-w64-common_10.0.0-3_all.deb' \
                'http://archive.ubuntu.com/ubuntu/pool/universe/m/mingw-w64/mingw-w64-x86-64-dev_10.0.0-3_all.deb' \
