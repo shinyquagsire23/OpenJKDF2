@@ -11,11 +11,11 @@ MSGS 100          # <--- DON'T FORGET TO UPDATE THIS COUNT
 #  Gameplay
 #******************************
    "GUIEXT_SHOW_SABER_CROSSHAIR"          0 "Show Crosshair with lightsaber"
-   "GUIEXT_SHOW_SABER_CROSSHAIR_HINT"     0 "When this is enabled the crosshair is shown when the lightsaber is equipped"
+   "GUIEXT_SHOW_SABER_CROSSHAIR_HINT"     0 "Display the crosshair when the lightsaber is equipped?"
    "GUIEXT_SHOW_FIST_CROSSHAIR"           0 "Show Crosshair with fist"
-   "GUIEXT_SHOW_FIST_CROSSHAIR_HINT"      0 "When this is enabled the crosshair is shown when the fist is equipped"
+   "GUIEXT_SHOW_FIST_CROSSHAIR_HINT"      0 "Display the crosshair when the fists are equipped?"
    "GUIEXT_DISABLE_WAGGLE"                0 "Disable Weapon Waggle"
-   "GUIEXT_DISABLE_WAGGLE_HINT"           0 "Disables weapon waggle when moving"
+   "GUIEXT_DISABLE_WAGGLE_HINT"           0 "Disable weapon waggle when moving?"
    "GUIEXT_CROSSHAIR_SCALE"               0 "Crosshair Scale"
    "GUIEXT_CROSSHAIR_SCALE_HINT"          0 "Adjust the size of the crosshair (from 0% to 200%)"
 
@@ -39,9 +39,16 @@ MSGS 100          # <--- DON'T FORGET TO UPDATE THIS COUNT
    "GUIEXT_HUD_SCALE"                     0 "HUD Scale:"
 
    "GUIEXT_EN_JKGFXMOD"                   0 "Enable jkgfxmod"
-   "GUIEXT_EN_JKGFXMOD_HINT"              0 "Overrides in-game textures with textures from jkgm folder."
+   "GUIEXT_EN_JKGFXMOD_HINT"              0 "Override in-game textures with textures from jkgm folder?"
    "GUIEXT_EN_TEXTURE_PRECACHE"           0 "Enable texture precaching"
-   "GUIEXT_EN_TEXTURE_PRECACHE_HINT"      0 "Loads all material textures ahead-of-time instead of just-in-time."
+   "GUIEXT_EN_TEXTURE_PRECACHE_HINT"      0 "Load all material textures ahead-of-time instead of just-in-time?"
+
+
+#******************************
+#  Sound
+#******************************
+  "GUIEXT_CUTSCENE_VOLUME"                0 "Cutscene Volume"
+  "GUIEXT_CUTSCENE_VOLUME_HINT"           0 "Set the volume of audio during cutscenes"
 
 #******************************
 #  Quake Console and Updates
@@ -67,16 +74,16 @@ MSGS 100          # <--- DON'T FORGET TO UPDATE THIS COUNT
 #******************************
 #  General
 #******************************
-   "GUIEXT_DISABLE_MISSION_CONFIRMATION"        0 "Disable mission start confirmation."
-   "GUIEXT_DISABLE_MISSION_CONFIRMATION_HINT"   0 "Enter the mission as soon as the level is loaded."
+   "GUIEXT_DISABLE_MISSION_CONFIRMATION"        0 "Disable mission start confirmation"
+   "GUIEXT_DISABLE_MISSION_CONFIRMATION_HINT"   0 "Enter the mission as soon as the level is loaded?"
 
    "GUIEXT_INCONSISTENT_PHYS"                   0 "Restore inconsistent physics"
-   "GUIEXT_INCONSISTENT_PHYS_HINT"              0 "Sets physics delta to the render framerate instead of 150Hz."
+   "GUIEXT_INCONSISTENT_PHYS_HINT"              0 "Sets physics delta to the render framerate instead of 150Hz?"
 
    "GUIEXT_CORPSE_DESPAWN"                      0 "Disable corpse despawning"
-   "GUIEXT_CORPSE_DESPAWN_HINT"                 0 "Don't automatically despawn corpse bodies."
+   "GUIEXT_CORPSE_DESPAWN_HINT"                 0 "Prevent despawn for corpse bodies?"
 
    "GUIEXT_50HZ_MIDAIR_PHYS"                    0 "Restore 50Hz midair player physics"
-   "GUIEXT_50HZ_MIDAIR_PHYS_HINT"               0 "Player physics and POV will be stepped at 50Hz while midair."
+   "GUIEXT_50HZ_MIDAIR_PHYS_HINT"               0 "Step player physics and POV at 50Hz while midair?"
 
 END
