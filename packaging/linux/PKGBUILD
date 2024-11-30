@@ -1,0 +1,43 @@
+pkgname="openjkdf2"
+pkgver=0.3.1
+pkgrel=1
+epoch=
+pkgdesc="A cross-platform reimplementation of Jedi Knight: Dark Forces II"
+arch=("x86_64" "aarch64")
+url="https://github.com/shinyquagsire23/OpenJKDF2"
+license=("BSD")
+depends=("imagemagick" "gtk3" "sdl2" "sdl2_mixer" "glew" "openal")
+makedepends=("clang" "cmake" "bison" "python-cogapp")
+checkdepends=()
+optdepends=("innoextract: installing game data from GOG release")
+backup=()
+source=(
+    "$pkgname-$pkgver.tar.gz::https://github.com/shinyquagsire23/OpenJKDF2/archive/refs/tags/v$pkgver.tar.gz"
+    "openjkdf2.desktop"
+    "openjkdf2.sh"
+    "openjkdf2_import.sh")
+md5sums=('7c841a575cb1d64db6ddf0bd82c5bebb'
+         '41fab13ca2b0f4f379a1974bd6ba2517'
+         '36404aac1598ba82f7fbcae2a3736a55'
+         '08c4c18e02a87bb8965cef0410266635')
+
+build() {
+    export CC=clang
+    export CXX=clang++
+    cd "$srcdir/OpenJKDF2-$pkgver"
+    cmake .
+    make
+}
+
+package() {
+    cd "$srcdir/OpenJKDF2-$pkgver"
+    install -DTm644 "packaging/icon.png" "$pkgdir/usr/share/pixmaps/$pkgname.png"
+    install -Dm644 -t "$pkgdir/usr/share/licenses/$pkgname" "LICENSE.md"
+    install -Dm644 -t "$pkgdir/usr/share/doc/$pkgname" "README.md"
+    install -Dm644 -t "$pkgdir/usr/share/doc/$pkgname/docs/images" "docs/images/"*
+    install -Dm644 -t "$pkgdir/usr/share/applications" "../$pkgname.desktop"
+    install -Dm644 -t "$pkgdir/usr/share/$pkgname/resource/shaders" "resource/shaders/"*
+    install -D -t "$pkgdir/usr/share/$pkgname" "openjkdf2-64"
+    install -DT "../openjkdf2.sh" "$pkgdir/usr/bin/openjkdf2"
+    install -DT "../openjkdf2_import.sh" "$pkgdir/usr/bin/openjkdf2_import"
+}
