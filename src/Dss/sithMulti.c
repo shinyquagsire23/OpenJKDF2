@@ -626,7 +626,7 @@ int sithMulti_ProcessJoinLeave(sithCogMsg *msg)
     g_submodeFlags &= ~8u;
     sithThing_sub_4CCE60();
     sithPlayer_sub_4C87C0(v1, v2);
-    sithPlayer_idk(v1);
+    sithPlayer_idk(v1); // sets playerThingIdx and info
     sithPlayer_ResetPalEffects();
     sithEvent_RegisterFunc(2, sithMulti_ServerLeft, sithNet_tickrate, 1);
     sithComm_SetNeedsSync();
@@ -1402,6 +1402,7 @@ void sithMulti_HandleTimeLimit(int deltaMs)
                                         if (v14->rdthing.puppet)
                                             sithDSS_SendSyncPuppet(v14, sithMulti_sendto_id, 255);
                                     }
+                                    break; // Weird?
                                 }
                             }
                         }
