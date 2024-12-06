@@ -420,17 +420,17 @@ void rdMatrix_Identity44(rdMatrix44 *out)
     _memcpy(out, &rdroid_identMatrix44, sizeof(*out));
 }
 
-void rdMatrix_Copy34(rdMatrix34 *dst, rdMatrix34 *src)
+void rdMatrix_Copy34(rdMatrix34 *dst, const rdMatrix34 *src)
 {
     _memcpy(dst, src, sizeof(rdMatrix34));
 }
 
-void rdMatrix_Copy44(rdMatrix44 *dst, rdMatrix44 *src)
+void rdMatrix_Copy44(rdMatrix44 *dst, const rdMatrix44 *src)
 {
     _memcpy(dst, src, sizeof(rdMatrix44));
 }
 
-void rdMatrix_Copy34to44(rdMatrix44 *dst, rdMatrix34 *src)
+void rdMatrix_Copy34to44(rdMatrix44 *dst, const rdMatrix34 *src)
 {
     dst->vA.x = src->rvec.x;
     dst->vB.x = src->lvec.x;
@@ -450,7 +450,7 @@ void rdMatrix_Copy34to44(rdMatrix44 *dst, rdMatrix34 *src)
     dst->vD.w = 1.0;
 }
 
-void rdMatrix_Copy44to34(rdMatrix34 *dst, rdMatrix44 *src)
+void rdMatrix_Copy44to34(rdMatrix34 *dst, const rdMatrix44 *src)
 {
     dst->rvec.x = src->vA.x;
     dst->rvec.y = src->vA.y;
@@ -466,7 +466,7 @@ void rdMatrix_Copy44to34(rdMatrix34 *dst, rdMatrix44 *src)
     dst->scale.z = src->vD.z;
 }
 
-void rdMatrix_Transpose44(rdMatrix44 *out, rdMatrix44 *src)
+void rdMatrix_Transpose44(rdMatrix44 *out, const rdMatrix44 *src)
 {
     rdMatrix44 tmp;
 
@@ -532,7 +532,7 @@ void rdMatrix_Multiply34(rdMatrix34 *out, const rdMatrix34 *mat1, const rdMatrix
                    + mat1->scale.z;
 }
 
-void rdMatrix_Multiply44(rdMatrix44 *out, rdMatrix44 *mat1, rdMatrix44 *mat2)
+void rdMatrix_Multiply44(rdMatrix44 *out, const rdMatrix44 *mat1, const rdMatrix44 *mat2)
 {
     out->vA.x = mat2->vA.y * mat1->vB.x + mat1->vD.x * mat2->vA.w + mat1->vC.x * mat2->vA.z + mat2->vA.x * mat1->vA.x;
     out->vA.y = mat1->vA.y * mat2->vA.x + mat1->vC.y * mat2->vA.z + mat1->vD.y * mat2->vA.w + mat1->vB.y * mat2->vA.y;

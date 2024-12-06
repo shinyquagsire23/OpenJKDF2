@@ -162,7 +162,7 @@ sithThing* sithTemplate_CreateEntry(sithWorld *world)
 
     sithThing_DoesRdThingInit(&tmp);
     result = stdHashTable_GetKeyVal(sithTemplate_hashmap, stdConffile_entry.args[1].value);
-    sithThing_sub_4CD8A0(&tmp, result);
+    sithThing_InstantiateFromTemplate(&tmp, result);
 
     _strncpy(tmp.template_name, stdConffile_entry.args[0].value, 0x1Fu);
     tmp.template_name[31] = 0;

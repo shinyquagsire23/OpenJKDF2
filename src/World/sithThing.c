@@ -43,7 +43,7 @@
 #define NUM_THING_TYPES (13)
 
 int sithThing_bInitted;
-int sithThing_bInitted2;
+int sithThing_bInitted2 = 1;
 
 const char* sithThing_aTypes[NUM_THING_TYPES] = {
     "free",
@@ -547,7 +547,19 @@ void sithThing_freestuff(sithWorld *pWorld)
     }
 }
 
-//sithThing_idkjkl
+void sithThing_idkjkl(void)
+{
+    sithNet_thingsIdx = 0;
+    for (int idx = sithWorld_pCurrentWorld->numThingsLoaded - 1; idx >= 0; idx--)
+    {
+        sithThing* pThing = &sithWorld_pCurrentWorld->things[idx];
+        sithThing_DoesRdThingInit(pThing);
+
+        pThing->thingIdx = idx;
+        pThing->thing_id = -1;
+        sithThing_netidk2(idx);
+    }
+}
 
 void sithThing_sub_4CCE60()
 {
@@ -921,7 +933,78 @@ void sithThing_ExitWater(sithThing* pThing, int a2)
     }
 }
 
-//sithThing_doesinitidk
+// Unused or inlined
+sithThing* sithThing_CreateThingOfType(uint32_t thingType)
+{
+    sithThingFrame *psVar1;
+    sithWorld *pWorld;
+    int iVar3;
+    sithThing *pThingRet;
+    int iVar4;
+
+    pWorld = sithWorld_pCurrentWorld;
+    if (sithNet_thingsIdx == 0) {
+        iVar4 = -1;
+        iVar3 = sithNet_thingsIdx;
+    }
+    else {
+        iVar4 = (int)sithNet_things[sithNet_thingsIdx];
+        iVar3 = sithNet_thingsIdx + -1;
+        sithNet_thingsIdx = iVar3;
+        if (sithWorld_pCurrentWorld->numThings < iVar4) {
+            sithWorld_pCurrentWorld->numThings = iVar4;
+        }
+    }
+    if (iVar4 < 0) {
+        if (((thingType != SITH_THING_EXPLOSION) && (thingType != SITH_THING_DEBRIS)) &&
+                (thingType != SITH_THING_PARTICLE))
+        {
+            int i = 0;
+            for (uint32_t uVar5 = 0; uVar5 < pWorld->numThingsLoaded; uVar5++) {
+                sithThing* pThing = &pWorld->things[uVar5];
+                if (((pThing->thingflags & SITH_TF_WILLBEREMOVED) != 0) ||
+                        (((pThing->type == SITH_THING_DEBRIS || (pThing->type == SITH_THING_PARTICLE))
+                          && (pThing->lifeLeftMs != 0))))
+                {
+                    sithThing_FreeEverythingNet(pThing); // was inlined
+                }
+                iVar3 = sithNet_thingsIdx;
+                if (10 < i) break;
+                i = i + 1;
+            }
+            if (iVar3 == 0) {
+                iVar4 = -1;
+            }
+            else {
+                iVar4 = sithNet_things[iVar3];
+                sithNet_thingsIdx = iVar3 + -1;
+                if (pWorld->numThings < iVar4) {
+                    pWorld->numThings = iVar4;
+                }
+            }
+        }
+        if (iVar4 < 0) {
+            return NULL;
+        }
+    }
+    pThingRet = pWorld->things + iVar4;
+    sithThing_DoesRdThingInit(pThingRet);
+    pThingRet->thingIdx = iVar4;
+    if (sithThing_inittedThings == 0) {
+        sithThing_inittedThings = 1; // TODO: this is a 32-bit write?
+    }
+    iVar3 = playerThingIdx + 1;
+    uint32_t uVar5 = sithThing_inittedThings & 0xffff;
+    sithThing_inittedThings = sithThing_inittedThings + 1;
+    pThingRet->signature = sithThing_bInitted2;
+    sithThing_bInitted2 = sithThing_bInitted2 + 1;
+    pThingRet->thing_id = (iVar3 << 16) | uVar5;
+    //pThingRet->thing_id = uVar5 | (1 << 16); // TODO weird MP bug?
+    if (sithThing_bInitted2 == 0) {
+        sithThing_bInitted2 = 1;
+    }
+    return pThingRet;
+}
 
 void sithThing_SetPosAndRot(sithThing *this, rdVector3 *pos, rdMatrix34 *rot)
 {
@@ -931,19 +1014,19 @@ void sithThing_SetPosAndRot(sithThing *this, rdVector3 *pos, rdMatrix34 *rot)
 }
 
 // MOTS altered
-int sithThing_SetNewModel(sithThing* pThing, rdModel3 *model)
+int sithThing_SetNewModel(sithThing* pThing, rdModel3 *pModel)
 {
     rdThing *v2; // edi
     rdPuppet *v4; // ebx
 
     v2 = &pThing->rdthing;
-    if ( pThing->rdthing.type == RD_THINGTYPE_MODEL && pThing->rdthing.model3 == model )
+    if ( pThing->rdthing.type == RD_THINGTYPE_MODEL && pThing->rdthing.model3 == pModel )
         return 0;
     v4 = pThing->rdthing.puppet;
     pThing->rdthing.puppet = 0;
     rdThing_FreeEntry(&pThing->rdthing);
     rdThing_NewEntry(v2, pThing);
-    rdThing_SetModel3(v2, model);
+    rdThing_SetModel3(v2, pModel);
     pThing->rdthing.puppet = v4;
 
     // MOTS added
@@ -953,7 +1036,7 @@ int sithThing_SetNewModel(sithThing* pThing, rdModel3 *model)
     return 1;
 }
 
-sithThing* sithThing_sub_4CD8A0(sithThing *pThing, sithThing *a2)
+sithThing* sithThing_InstantiateFromTemplate(sithThing *pThing, sithThing *pTemplateThing)
 {
     sithThing *result; // eax
     int v10; // [esp+10h] [ebp-Ch]
@@ -965,9 +1048,9 @@ sithThing* sithThing_sub_4CD8A0(sithThing *pThing, sithThing *a2)
     v11 = pThing->thing_id;
     v10 = pThing->signature;
     v12 = pThing->rdthing.parentSithThing;
-    if ( a2 )
+    if ( pTemplateThing )
     {
-        _memcpy(pThing, a2, sizeof(sithThing));
+        _memcpy(pThing, pTemplateThing, sizeof(sithThing));
         if ( pThing->rdthing.type == RD_THINGTYPE_MODEL )
         {
             rdThing_SetModel3(&pThing->rdthing, pThing->rdthing.model3);
@@ -978,13 +1061,13 @@ sithThing* sithThing_sub_4CD8A0(sithThing *pThing, sithThing *a2)
         }
         if ( pThing->animclass )
             rdPuppet_New(&pThing->rdthing);
-        if ( pThing->moveType == SITH_MT_PATH && a2->trackParams.aFrames )
+        if ( pThing->moveType == SITH_MT_PATH && pTemplateThing->trackParams.aFrames )
         {
             // Added: made this more explicit
-            pThing->trackParams.sizeFrames = a2->trackParams.sizeFrames;
+            pThing->trackParams.sizeFrames = pTemplateThing->trackParams.sizeFrames;
             pThing->trackParams.aFrames = (sithThingFrame *)pSithHS->alloc(sizeof(sithThingFrame) * pThing->trackParams.sizeFrames);
             if (pThing->trackParams.aFrames) // Added: nullptr check
-                _memcpy(pThing->trackParams.aFrames, a2->trackParams.aFrames, sizeof(sithThingFrame) * pThing->trackParams.sizeFrames);
+                _memcpy(pThing->trackParams.aFrames, pTemplateThing->trackParams.aFrames, sizeof(sithThingFrame) * pThing->trackParams.sizeFrames);
         }
     }
     else
@@ -993,148 +1076,53 @@ sithThing* sithThing_sub_4CD8A0(sithThing *pThing, sithThing *a2)
     }
     pThing->thingIdx = thinga;
     result = v12;
-    pThing->templateBase = a2;
+    pThing->templateBase = pTemplateThing;
     pThing->thing_id = v11;
     pThing->signature = v10;
     pThing->rdthing.parentSithThing = v12;
     return result;
 }
 
-sithThing* sithThing_Create(sithThing *templateThing, const rdVector3 *position, const rdMatrix34 *lookOrientation, sithSector *sector, sithThing *prevThing)
+sithThing* sithThing_Create(sithThing *pTemplateThing, const rdVector3 *position, const rdMatrix34 *lookOrientation, sithSector *sector, sithThing *prevThing)
 {
-    int v8; // esi
-    sithThing *v10; // esi
-    unsigned int v12; // ebp
-    unsigned int v13; // edi
-    unsigned int v15; // edx
-    sithThing *v17; // ebx
-    int v19; // eax
-    sithThing *v26; // eax
+    sithThing* pThingRet = sithThing_CreateThingOfType(pTemplateThing->type); // was inlined
 
-    if ( sithNet_thingsIdx )
-    {
-        v8 = sithNet_things[sithNet_thingsIdx];
-        --sithNet_thingsIdx;
-        if ( v8 > sithWorld_pCurrentWorld->numThings )
-            sithWorld_pCurrentWorld->numThings = v8;
-    }
-    else
-    {
-        v8 = -1;
-    }
-    if ( v8 >= 0 )
-        goto LABEL_24;
-
-    if ( templateThing->type != SITH_THING_EXPLOSION && templateThing->type != SITH_THING_DEBRIS && templateThing->type != SITH_THING_PARTICLE )
-    {
-        v10 = sithWorld_pCurrentWorld->things;
-        v12 = 0;
-        for (v13 = 0; v13 < sithWorld_pCurrentWorld->numThingsLoaded; v13++)
-        {
-            if ( (v10->thingflags & SITH_TF_WILLBEREMOVED) != 0
-              || ((v10->type == SITH_THING_DEBRIS) || v10->type == SITH_THING_PARTICLE) && v10->lifeLeftMs )
-            {
-                sithThing_FreeEverythingNet(v10);
-            }
-            v15 = v12++;
-            if ( v15 > 0xA )
-                break;
-            ++v10;
-        }
-        if ( sithNet_thingsIdx )
-        {
-            v8 = sithNet_things[sithNet_thingsIdx];
-            sithNet_thingsIdx--;
-            if ( v8 > sithWorld_pCurrentWorld->numThings )
-                sithWorld_pCurrentWorld->numThings = v8;
-        }
-        else
-        {
-            v8 = -1;
-        }
-    }
-
-    if ( v8 >= 0 )
-    {
-LABEL_24:
-        v17 = &sithWorld_pCurrentWorld->things[v8];
-        sithThing_DoesRdThingInit(v17);
-        v17->thingIdx = v8;
-        if ( !sithThing_inittedThings )
-            sithThing_inittedThings = 1;
-        v19 = sithThing_bInitted2;
-        v17->signature = sithThing_bInitted2;
-        v17->thing_id = sithThing_inittedThings | ((playerThingIdx + 1) << 16);
-        //v17->thing_id = v8 | (1 << 16); // TODO weird MP bug?
-        ++sithThing_inittedThings;
-        sithThing_bInitted2 = v19 + 1;
-        if ( v19 == -1 )
-            sithThing_bInitted2 = 1;
-    }
-    else
-    {
-        v17 = 0;
-    }
-
-    if ( !v17 )
+    if (!pThingRet)
         return 0;
 
-    sithThing_sub_4CD8A0(v17, templateThing);
-    v17->position = *position;
-    _memcpy(&v17->lookOrientation, lookOrientation, sizeof(v17->lookOrientation));
-    rdVector_Zero3(&v17->lookOrientation.scale);
-    rdMatrix_PreMultiply34(&v17->lookOrientation, &templateThing->lookOrientation);
-    sithThing_EnterSector(v17, sector, 1, 0);
-    if ( prevThing )
+    sithThing_InstantiateFromTemplate(pThingRet, pTemplateThing);
+    pThingRet->position = *position;
+    _memcpy(&pThingRet->lookOrientation, lookOrientation, sizeof(pThingRet->lookOrientation));
+    rdVector_Zero3(&pThingRet->lookOrientation.scale);
+    rdMatrix_PreMultiply34(&pThingRet->lookOrientation, &pTemplateThing->lookOrientation);
+    sithThing_EnterSector(pThingRet, sector, 1, 0);
+    if (prevThing)
     {
-        v17->prev_thing = prevThing;
-        v17->child_signature = prevThing->signature;
+        pThingRet->prev_thing = prevThing;
+        pThingRet->child_signature = prevThing->signature;
     }
-    switch ( v17->type )
+
+    sithThing_sub_4CD100(pThingRet); // was inlined
+
+    if ( pThingRet->moveType == SITH_MT_PHYSICS && (pThingRet->physicsParams.physflags & SITH_PF_20000) == 0 )
+        rdMatrix_TransformVector34Acc(&pThingRet->physicsParams.vel, &pThingRet->lookOrientation);
+    if ( pThingRet->class_cog )
+        sithCog_SendMessage(pThingRet->class_cog, SITH_MESSAGE_CREATED, 3, pThingRet->thingIdx, 0, 0, 0);
+    if ( pThingRet->pTemplate )
     {
-        case SITH_THING_ITEM:
-            sithItem_New(v17);
-            break;
-        case SITH_THING_EXPLOSION:
-            sithExplosion_CreateThing(v17);
-            break;
-        case SITH_THING_PARTICLE:
-            sithParticle_CreateThing(v17);
-            break;
-    }
-    if ( v17->rdthing.puppet )
-        sithPuppet_NewEntry(v17);
-    if ( v17->thingtype == SITH_THING_ACTOR )
-        sithAI_NewEntry(v17);
-    if ( v17->soundclass )
-        sithSoundClass_PlayModeRandom(v17, SITH_SC_CREATE);
-    if ( (sithWorld_pCurrentWorld->level_type_maybe & 2) == 0 )
-        goto LABEL_48;
-    if ( v17->moveType == SITH_MT_PHYSICS )
-    {
-        if ( (v17->physicsParams.physflags & (SITH_PF_WALLSTICK|SITH_PF_FLOORSTICK)) != 0 )
-            sithPhysics_FindFloor(v17, 1);
-LABEL_48:
-        if ( v17->moveType == SITH_MT_PHYSICS && (v17->physicsParams.physflags & SITH_PF_20000) == 0 )
-            rdMatrix_TransformVector34Acc(&v17->physicsParams.vel, &v17->lookOrientation);
-    }
-    if ( v17->class_cog )
-        sithCog_SendMessage(v17->class_cog, SITH_MESSAGE_CREATED, 3, v17->thingIdx, 0, 0, 0);
-    if ( v17->pTemplate )
-    {
-        v26 = sithThing_Create(v17->pTemplate, position, lookOrientation, sector, prevThing);
+        sithThing* v26 = sithThing_Create(pThingRet->pTemplate, position, lookOrientation, sector, prevThing);
         if ( v26 )
         {
-            if ( (v17->thingflags & SITH_TF_INVULN) != 0 )
+            if ( (pThingRet->thingflags & SITH_TF_INVULN) != 0 )
             {
                 v26->thingflags |= SITH_TF_INVULN;
             }
         }
     }
-    return v17;
+    return pThingRet;
 }
 
-sithThing* sithThing_SpawnTemplate(sithThing *templateThing, sithThing *spawnThing)
+sithThing* sithThing_SpawnTemplate(sithThing *pTemplateThing, sithThing *spawnThing)
 {
     sithSector *v2; // eax
     sithThing *result; // eax
@@ -1143,13 +1131,13 @@ sithThing* sithThing_SpawnTemplate(sithThing *templateThing, sithThing *spawnThi
     rdVector3 v7; // [esp+18h] [ebp-18h] BYREF
     rdVector3 dstVec; // [esp+24h] [ebp-Ch] BYREF
 
-    if ( templateThing->rdthing.type == RD_THINGTYPE_MODEL )
+    if ( pTemplateThing->rdthing.type == RD_THINGTYPE_MODEL )
     {
-        diffVec = templateThing->rdthing.model3->insertOffset;
+        diffVec = pTemplateThing->rdthing.model3->insertOffset;
     }
-    else if ( templateThing->rdthing.type == RD_THINGTYPE_SPRITE3 )
+    else if ( pTemplateThing->rdthing.type == RD_THINGTYPE_SPRITE3 )
     {
-        diffVec = templateThing->rdthing.sprite3->offset;
+        diffVec = pTemplateThing->rdthing.sprite3->offset;
     }
     else
     {
@@ -1171,7 +1159,7 @@ sithThing* sithThing_SpawnTemplate(sithThing *templateThing, sithThing *spawnThi
     rdMatrix_TransformVector34(&dstVec, &diffVec, &spawnThing->lookOrientation);
     rdVector_Add3(&v7, &dstVec, &spawnThing->position);
     v2 = sithCollision_GetSectorLookAt(spawnThing->sector, &spawnThing->position, &v7, 0.0);
-    result = sithThing_Create(templateThing, &v7, &spawnThing->lookOrientation, v2, 0);
+    result = sithThing_Create(pTemplateThing, &v7, &spawnThing->lookOrientation, v2, 0);
     v4 = result;
     if ( result )
     {
@@ -1476,11 +1464,6 @@ int sithThing_Load(sithWorld *pWorld, int a2)
     int v6; // eax
     int v10; // ebx
     sithThing* paThings; // eax
-    int v13; // ebx
-    int v16; // ecx
-    sithThing *v17; // ebp
-    sithWorld *v18; // edx
-    sithThing *v19; // eax
     int v20; // eax
     sithThing *v21; // esi
     sithThing *v22; // ebx
@@ -1535,23 +1518,8 @@ int sithThing_Load(sithWorld *pWorld, int a2)
     if ( !paThings )
         return 0;
     sithWorld_pCurrentWorld->numThingsLoaded = v10;
+    sithThing_idkjkl();
     sithNet_thingsIdx = 0;
-    for ( v13 = v10 - 1; v13 >= 0; v13--)
-    {
-        v17 = &sithWorld_pCurrentWorld->things[v13];
-        v16 = v17->signature;
-        int lvlb = v17->thingIdx;
-        _memset(v17, 0, sizeof(sithThing));
-        _memcpy(&v17->lookOrientation, &rdroid_identMatrix34, sizeof(v17->lookOrientation));
-        rdThing_NewEntry(&v17->rdthing, v17);
-        v18 = sithWorld_pCurrentWorld;
-        v17->thingIdx = lvlb;
-        v19 = &v18->things[v13];
-        v17->signature = v16;
-        v19->thingIdx = v13;
-        v19->thing_id = -1;
-        sithThing_netidk2(v13);
-    }
     v20 = 0x1000 << jkPlayer_setDiff;
     if ( (g_submodeFlags & 1) != 0 )
         v20 |= 0x8000u;
@@ -1584,7 +1552,7 @@ int sithThing_Load(sithWorld *pWorld, int a2)
                     v21->archlightIdx = v23;
                     //printf("%p %p %x\n", , v21->archlightIdx);
                 }
-                sithThing_sub_4CD8A0(v21, v22);
+                sithThing_InstantiateFromTemplate(v21, v22);
                 sithThing_SetPosAndRot(v21, &pos, &a);
                 sithThing_EnterSector(v21, v24, 1, 1);
                 sithThing_sub_4CD100(v21);
@@ -1622,8 +1590,6 @@ int sithThing_ParseArgs(stdConffileArg *arg, sithThing* pThing)
     int v2; // ebp
     int param; // eax
     int paramIdx; // edi
-    int v7; // eax
-    int v8; // eax
 
     v2 = 0;
     param = (int)stdHashTable_GetKeyVal(sithThing_paramKeyToParamValMap, arg->key);
@@ -1636,21 +1602,19 @@ int sithThing_ParseArgs(stdConffileArg *arg, sithThing* pThing)
     {
         case SITH_THING_ACTOR:
         case SITH_THING_PLAYER:
-            v7 = sithActor_LoadParams(arg, pThing, paramIdx);
-            goto LABEL_10;
+            v2 = sithActor_LoadParams(arg, pThing, paramIdx);
+            break;
         case SITH_THING_WEAPON:
-            v7 = sithWeapon_LoadParams(arg, pThing, paramIdx);
-            goto LABEL_10;
+            v2 = sithWeapon_LoadParams(arg, pThing, paramIdx);
+            break;
         case SITH_THING_ITEM:
-            v7 = sithItem_LoadThingParams(arg, pThing, paramIdx);
-            goto LABEL_10;
+            v2 = sithItem_LoadThingParams(arg, pThing, paramIdx);
+            break;
         case SITH_THING_EXPLOSION:
-            v7 = sithExplosion_LoadThingParams(arg, pThing, paramIdx);
-            goto LABEL_10;
+            v2 = sithExplosion_LoadThingParams(arg, pThing, paramIdx);
+            break;
         case SITH_THING_PARTICLE:
-            v7 = sithParticle_LoadThingParams(arg, pThing, paramIdx);
-LABEL_10:
-            v2 = v7;
+            v2 = sithParticle_LoadThingParams(arg, pThing, paramIdx);
             break;
         default:
             break;
@@ -1659,16 +1623,12 @@ LABEL_10:
         return 1;
     if ( pThing->moveType == SITH_MT_PHYSICS )
     {
-        v8 = sithPhysics_LoadThingParams(arg, pThing, paramIdx);
+        v2 = sithPhysics_LoadThingParams(arg, pThing, paramIdx);
     }
-    else
+    else if ( pThing->moveType != SITH_MT_PATH )
     {
-        if ( pThing->moveType != SITH_MT_PATH )
-            goto LABEL_18;
-        v8 = sithTrackThing_LoadPathParams(arg, pThing, paramIdx);
+        v2 = sithTrackThing_LoadPathParams(arg, pThing, paramIdx);
     }
-    v2 = v8;
-LABEL_18:
     if ( v2 )
         return 1;
     return pThing->thingtype == SITH_THING_ACTOR && sithAI_LoadThingActorParams(arg, pThing, paramIdx);
@@ -2010,14 +1970,17 @@ void sithThing_SetSyncFlags(sithThing *pThing, int flags)
 
 void sithThing_Sync()
 {
-    uint32_t v0; // esi
-    int v1; // eax
-
-
-    for (v0 = 0; v0 < sithNet_syncIdx; v0++)
+    for (uint32_t v0 = 0; v0 < sithNet_syncIdx; v0++)
     {
-        v1 = sithNet_aSyncFlags[v0];
-        if ( (v1 & THING_SYNC_FULL) != 0 )
+        // 1 for multiplayer hackfix
+#if 0
+        if (sithNet_aSyncThings[v0]->thing_id >> 16 != playerThingIdx + 1 || (!(sithNet_aSyncThings[v0]->thing_id >> 16) && !sithNet_isServer)) {
+            printf("%u tried to sync explicitly: 0x%08x type %x, flags %x\n", playerThingIdx, sithNet_aSyncThings[v0]->thing_id, sithNet_aSyncThings[v0]->type, sithNet_aSyncFlags[v0]);
+            continue;
+        }
+        printf("%u Syncing explicitly: 0x%08x type %x, flags %x\n", playerThingIdx, sithNet_aSyncThings[v0]->thing_id, sithNet_aSyncThings[v0]->type, sithNet_aSyncFlags[v0]);
+#endif
+        if (sithNet_aSyncFlags[v0] & THING_SYNC_FULL)
         {
             // Added: this used to be outside the loop?
             sithDSSThing_SendFullDesc(sithNet_aSyncThings[v0], -1, 255);
@@ -2025,21 +1988,21 @@ void sithThing_Sync()
         }
         else
         {
-            if ( (v1 & THING_SYNC_STATE) != 0 )
+            if (sithNet_aSyncFlags[v0] & THING_SYNC_STATE)
                 sithDSSThing_SendSyncThing(sithNet_aSyncThings[v0], -1, 255);
 
-            if ( (sithNet_aSyncFlags[v0] & THING_SYNC_POS) != 0 )
+            if (sithNet_aSyncFlags[v0] & THING_SYNC_POS)
                 sithDSSThing_SendPos(sithNet_aSyncThings[v0], -1, 0);
         }
 
         // Added: Co-op
-        if (sithMulti_multiModeFlags & MULTIMODEFLAG_COOP && (v1 & THING_SYNC_AI)) {
+        if (sithMulti_multiModeFlags & MULTIMODEFLAG_COOP && (sithNet_aSyncFlags[v0] & THING_SYNC_AI)) {
             if (sithNet_aSyncThings[v0]->actor && sithNet_aSyncThings[v0]->actor->pAIClass)
                 sithDSS_SendAIStatus(sithNet_aSyncThings[v0]->actor, -1, 1);
         }
 
         // Added: Co-op
-        if (sithMulti_multiModeFlags & MULTIMODEFLAG_COOP && (v1 & THING_SYNC_PUPPET)) {
+        if (sithMulti_multiModeFlags & MULTIMODEFLAG_COOP && (sithNet_aSyncFlags[v0] & THING_SYNC_PUPPET)) {
             if (sithNet_aSyncThings[v0]->rdthing.puppet)
                 sithDSS_SendSyncPuppet(sithNet_aSyncThings[v0], -1, 255);
         }

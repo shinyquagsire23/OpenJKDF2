@@ -198,6 +198,7 @@ int sithDSSThing_ProcessSyncThing(sithCogMsg *msg)
     if ( !pThing )
         return 0;
 
+    // 1 for multiplayer hackfix:
 #if 0
     // Added: why is this needed???
     if (!pThing->thingtype && pThing->type)
@@ -996,7 +997,7 @@ int sithDSSThing_ProcessFullDesc(sithCogMsg *msg)
     if ( v8 >= sithWorld_pCurrentWorld->numTemplatesLoaded )
         return 0;
 
-    sithThing_sub_4CD8A0(thing, &sithWorld_pCurrentWorld->templates[v8]);
+    sithThing_InstantiateFromTemplate(thing, &sithWorld_pCurrentWorld->templates[v8]);
 
     thing->signature = NETMSG_POPS32();
     thing->thing_id = NETMSG_POPS32();
