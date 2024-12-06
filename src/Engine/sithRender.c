@@ -1764,7 +1764,7 @@ int sithRender_RenderThing(sithThing *pThing)
             sithCog_SendMessageFromThing(pThing, 0, SITH_MESSAGE_SIGHTED);
         }
 
-        if (pThing->thingtype == SITH_THING_ACTOR && pThing->actor)
+        if (pThing->controlType == SITH_CT_AI && pThing->actor)
         {
             pThing->actor->flags &= ~SITHAI_MODE_SLEEPING;
         }

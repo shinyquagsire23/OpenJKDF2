@@ -12,7 +12,7 @@ void sithCogFunctionAI_AISetMoveSpeed(sithCog *ctx)
 {
     float moveSpeed = stdMath_Clamp(sithCogExec_PopFlex(ctx), 0.0, 2.0);
     sithThing* pThing = sithCogExec_PopThing(ctx);
-    if (pThing && pThing->thingtype == SITH_THING_ACTOR && pThing->actor)
+    if (pThing && pThing->controlType == SITH_CT_AI && pThing->actor)
     {
         pThing->actor->moveSpeed = moveSpeed;
     }
@@ -32,7 +32,7 @@ void sithCogFunctionAI_SetMovePos(sithCog *ctx)
         // Added
         if (g_debugmodeFlags & DEBUGFLAG_NO_AIEVENTS) return;
         
-        if (pThing && pThing->thingtype == SITH_THING_ACTOR && pThing->actor)
+        if (pThing && pThing->controlType == SITH_CT_AI && pThing->actor)
         {
             sithAI_SetMoveThing(pThing->actor, &v3, pThing->actor->moveSpeed);
         }
@@ -53,7 +53,7 @@ void sithCogFunctionAI_AIJump(sithCog *ctx)
     // Added
     if (g_debugmodeFlags & DEBUGFLAG_NO_AIEVENTS) return;
     
-    if ( v3 && v2 && v3->attach_flags && v3->thingtype == SITH_THING_ACTOR )
+    if ( v3 && v2 && v3->attach_flags && v3->controlType == SITH_CT_AI )
     {
         v4 = v3->actor;
         if ( v4 )
@@ -76,7 +76,7 @@ void sithCogFunctionAI_AISetMoveFrame(sithCog *ctx)
     
     if ( v2 )
     {
-        if ( v2->thingtype == SITH_THING_ACTOR )
+        if ( v2->controlType == SITH_CT_AI )
         {
             v3 = v2->actor;
             if ( v3 )
@@ -104,7 +104,7 @@ void sithCogFunctionAI_AISetMoveThing(sithCog *ctx)
     // Added
     if (g_debugmodeFlags & DEBUGFLAG_NO_AIEVENTS) return;
     
-    if ( v2 && v1 && v2->thingtype == SITH_THING_ACTOR )
+    if ( v2 && v1 && v2->controlType == SITH_CT_AI )
     {
         v3 = v2->actor;
         if ( v3 )
@@ -131,7 +131,7 @@ void sithCogFunctionAI_AISetLookPos(sithCog *ctx)
         
         if ( v1 )
         {
-            if ( v1->thingtype == SITH_THING_ACTOR )
+            if ( v1->controlType == SITH_CT_AI )
             {
                 v2 = v1->actor;
                 if ( v2 )
@@ -156,7 +156,7 @@ void sithCogFunctionAI_AISetLookFrame(sithCog *ctx)
     
     if ( v2 )
     {
-        if ( v2->thingtype == SITH_THING_ACTOR )
+        if ( v2->controlType == SITH_CT_AI )
         {
             v3 = v2->actor;
             if ( v3 )
@@ -178,7 +178,7 @@ void sithCogFunctionAI_GetMovePos(sithCog *ctx)
     sithActor *v2; // eax
 
     v1 = sithCogExec_PopThing(ctx);
-    if ( v1 && v1->thingtype == SITH_THING_ACTOR )
+    if ( v1 && v1->controlType == SITH_CT_AI )
     {
         v2 = v1->actor;
         if ( v2 )
@@ -201,7 +201,7 @@ void sithCogFunctionAI_AISetMode(sithCog *ctx)
     
     if ( v2 )
     {
-        if ( v2->thingtype == SITH_THING_ACTOR )
+        if ( v2->controlType == SITH_CT_AI )
         {
             v3 = v2->actor;
             if ( v3 )
@@ -221,7 +221,7 @@ void sithCogFunctionAI_AIGetMode(sithCog *ctx)
     sithActor *v2; // eax
 
     v1 = sithCogExec_PopThing(ctx);
-    if ( v1 && v1->thingtype == SITH_THING_ACTOR && (v2 = v1->actor) != 0 )
+    if ( v1 && v1->controlType == SITH_CT_AI && (v2 = v1->actor) != 0 )
         sithCogExec_PushInt(ctx, v2->flags);
     else
         sithCogExec_PushInt(ctx, -1);
@@ -243,7 +243,7 @@ void sithCogFunctionAI_AIClearMode(sithCog *ctx)
     
     if ( thing )
     {
-        if ( thing->thingtype == SITH_THING_ACTOR )
+        if ( thing->controlType == SITH_CT_AI )
         {
             v3 = thing->actor;
             if ( v3 )
@@ -370,7 +370,7 @@ void sithCogFunctionAI_AISetFireTarget(sithCog *ctx)
     
     if ( v2 )
     {
-        if ( v2->thingtype == SITH_THING_ACTOR )
+        if ( v2->controlType == SITH_CT_AI )
         {
             v3 = v2->actor;
             if ( v3 )
@@ -408,7 +408,7 @@ void sithCogFunctionAI_sub_501330(sithCog *ctx)
         goto LABEL_12;
     if ( !v1 )
         goto LABEL_12;
-    if ( v2->thingtype != SITH_THING_ACTOR )
+    if ( v2->controlType != SITH_CT_AI )
         goto LABEL_12;
     v3 = v2->actor;
     if ( !v3 )
@@ -442,7 +442,7 @@ void sithCogFunctionAI_IsAITargetInSight(sithCog *ctx)
     sithActor *v2; // eax
 
     v1 = sithCogExec_PopThing(ctx);
-    if ( v1 && v1->type == SITH_THING_ACTOR && v1->thingtype == SITH_THING_ACTOR && (v2 = v1->actor) != 0 && !v2->field_1F4 )
+    if ( v1 && v1->type == SITH_THING_ACTOR && v1->controlType == SITH_CT_AI && (v2 = v1->actor) != 0 && !v2->field_1F4 )
         sithCogExec_PushInt(ctx, 1);
     else
         sithCogExec_PushInt(ctx, 0);
@@ -465,7 +465,7 @@ void sithCogFunctionAI_AIFlee(sithCog *ctx)
     {
         if ( v2 )
         {
-            if ( v2->type == SITH_THING_ACTOR && v2->thingtype == SITH_THING_ACTOR )
+            if ( v2->type == SITH_THING_ACTOR && v2->controlType == SITH_CT_AI )
             {
                 v3 = v2->actor;
                 if ( v3 )
@@ -492,7 +492,7 @@ void sithCogFunctionAI_AISetClass(sithCog *ctx)
 
     aiclass = sithCogExec_PopAIClass(ctx);
     thing = sithCogExec_PopThing(ctx);
-    if ( aiclass && thing && thing->thingtype == SITH_THING_ACTOR )
+    if ( aiclass && thing && thing->controlType == SITH_CT_AI )
     {
         v3 = thing->actor;
         if ( v3 )
@@ -509,7 +509,7 @@ void sithCogFunctionAI_AISetClass(sithCog *ctx)
 void sithCogFunctionAI_AIGetAlignment(sithCog *ctx)
 {
     sithThing* pThing = sithCogExec_PopThing(ctx);
-    if (pThing && pThing->thingtype == SITH_THING_ACTOR && pThing->actor && pThing->actor->pAIClass) 
+    if (pThing && pThing->controlType == SITH_CT_AI && pThing->actor && pThing->actor->pAIClass) 
     {
         sithCogExec_PushFlex(ctx, pThing->actor->pAIClass->alignment);
         return;
@@ -522,7 +522,7 @@ void sithCogFunctionAI_AISetAlignment(sithCog *ctx)
 {
     cog_flex_t val = sithCogExec_PopFlex(ctx);
     sithThing* pThing = sithCogExec_PopThing(ctx);
-    if (pThing && pThing->thingtype == SITH_THING_ACTOR && pThing->actor && pThing->actor->pAIClass) 
+    if (pThing && pThing->controlType == SITH_CT_AI && pThing->actor && pThing->actor->pAIClass) 
     {
         pThing->actor->pAIClass->alignment = val;
     }
@@ -533,7 +533,7 @@ void sithCogFunctionAI_AISetInterest(sithCog *ctx)
 {
     sithThing* pInterest = sithCogExec_PopThing(ctx);
     sithThing* pThing = sithCogExec_PopThing(ctx);
-    if (pThing && pThing->thingtype == SITH_THING_ACTOR && pThing->actor) 
+    if (pThing && pThing->controlType == SITH_CT_AI && pThing->actor) 
     {
         if (pInterest == sithPlayer_pLocalPlayerThing) {
             pThing->actor->pInterest = 0;
@@ -548,7 +548,7 @@ void sithCogFunctionAI_AISetInterest(sithCog *ctx)
 void sithCogFunctionAI_AIGetInterest(sithCog *ctx)
 {
     sithThing* pThing = sithCogExec_PopThing(ctx);
-    if (pThing && pThing->thingtype == SITH_THING_ACTOR && pThing->actor && pThing->actor->pInterest) 
+    if (pThing && pThing->controlType == SITH_CT_AI && pThing->actor && pThing->actor->pInterest) 
     {
         sithCogExec_PushInt(ctx, pThing->actor->pInterest->thingIdx);
         return;

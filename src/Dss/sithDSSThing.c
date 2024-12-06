@@ -68,7 +68,7 @@ int sithDSSThing_ProcessPos(sithCogMsg *msg)
     int thing_id = NETMSG_POPS32();
 
     sithThing* pThing = sithThing_GetById(thing_id);
-    //printf("sithDSSThing_ProcessPos %x %x\n", thing_id, pThing->thingtype);
+    //printf("sithDSSThing_ProcessPos %x %x\n", thing_id, pThing->controlType);
     if ( !pThing || pThing->type == SITH_THING_FREE || !pThing->sector )
         return 0;
     uint16_t attach_flags = NETMSG_POPU16();
@@ -201,10 +201,14 @@ int sithDSSThing_ProcessSyncThing(sithCogMsg *msg)
     // 1 for multiplayer hackfix:
 #if 0
     // Added: why is this needed???
-    if (!pThing->thingtype && pThing->type)
-        pThing->thingtype = pThing->type;
-    if (pThing->thingtype && !pThing->type)
-        pThing->type = pThing->thingtype;
+    if (!pThing->controlType && pThing->type) {
+        jk_printf("OpenJKDF2 WARN: id %08x pThing->controlType 0, using pThing->type %u\n", id, pThing->type);
+        pThing->controlType = pThing->type;
+    }
+    if (pThing->controlType && !pThing->type) {
+        jk_printf("OpenJKDF2 WARN: id %08x pThing->type 0, using pThing->controlType %u\n", id, pThing->controlType);
+        pThing->type = pThing->controlType;
+    }
 #endif
 
     if ( pThing->type == SITH_THING_FREE )
@@ -1002,7 +1006,7 @@ int sithDSSThing_ProcessFullDesc(sithCogMsg *msg)
     thing->signature = NETMSG_POPS32();
     thing->thing_id = NETMSG_POPS32();
     thing->type = type;
-    //thing->thingtype = type; // Added: why is this needed?
+    //thing->controlType = type; // Added: why is this needed?
     thing->position = NETMSG_POPVEC3();
     thing->lookOrientation.rvec = NETMSG_POPVEC3();
     thing->lookOrientation.lvec = NETMSG_POPVEC3();

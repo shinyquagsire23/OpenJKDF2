@@ -255,12 +255,12 @@ void sithAI_NewEntry(sithThing *thing)
         }
         else
         {
-            thing->thingtype = SITH_THING_FREE;
+            thing->controlType = SITH_CT_NONE;
         }
     }
     else
     {
-        thing->thingtype = SITH_THING_FREE;
+        thing->controlType = SITH_CT_NONE;
     }
 }
 
@@ -1944,7 +1944,7 @@ sithThing* sithAI_FUN_00539a60(sithActor *pThing)
                 if (((sithAI_dword_84DE74 & 1 << (arg8->type & 0x1f)) != 0) &&
                 ((arg8->thingflags & (SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0))
                 {
-                    if (arg8->thingtype == 2) 
+                    if (arg8->controlType == SITH_CT_AI) 
                     {
                         fVar2 = arg8->pAIClass->alignment;
                     }

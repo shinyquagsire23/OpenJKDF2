@@ -360,7 +360,7 @@ int sithDSS_ProcessAIStatus(sithCogMsg *msg)
     thing = sithThing_GetThingByIdx(NETMSG_POPS16());
     if ( !thing )
         return 0;
-    if ( thing->thingtype != SITH_THING_ACTOR )
+    if ( thing->controlType != SITH_CT_AI )
         return 0;
     actor = thing->actor;
     if ( !actor )

@@ -148,7 +148,7 @@ void sithPlayer_idk(int idx)
     sithPlayer_pLocalPlayerThing->thingflags &= ~SITH_TF_INVULN;
 
     // Added: idk why this is needed?
-    sithPlayer_pLocalPlayerThing->thingtype = SITH_THING_PLAYER;
+    //sithPlayer_pLocalPlayerThing->controlType = SITH_CT_10;
 
     _wcsncpy(sithPlayer_pLocalPlayer->player_name, jkPlayer_playerShortName, 0x1Fu);
     sithPlayer_pLocalPlayer->player_name[31] = 0;
@@ -445,7 +445,7 @@ int sithPlayer_sub_4C87C0(int idx, int netId)
     jkPlayer_playerInfos[idx].net_id = netId;
     jkPlayer_playerInfos[idx].playerThing->thingflags &= ~SITH_TF_DISABLED;
 
-    jkPlayer_playerInfos[idx].playerThing->thingtype = SITH_THING_PLAYER; // TODO: WHY IS THIS NEEDED?
+    //jkPlayer_playerInfos[idx].playerThing->controlType = SITH_CT_10; // TODO: WHY IS THIS NEEDED?
 
     return 1;
 }

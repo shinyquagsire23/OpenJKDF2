@@ -111,7 +111,7 @@ float sithActor_Hit(sithThing *sender, sithThing *receiver, float amount, int fl
     }
     if ( receiver )
     {
-        if ( receiver != sender && sender->thingtype == SITH_THING_ACTOR )
+        if ( receiver != sender && sender->controlType == SITH_CT_AI )
             sithAI_SetActorFireTarget(sender->actor, SITHAI_MODE_MOVING, (intptr_t)receiver);
         v7 = sithThing_GetParent(receiver);
         receiver_ = v7;
@@ -128,10 +128,10 @@ float sithActor_Hit(sithThing *sender, sithThing *receiver, float amount, int fl
 
             // MOTS added: alignment
             if (Main_bMotsCompat
-                && sender->thingtype == SITH_THING_ACTOR
+                && sender->controlType == SITH_CT_AI
                 && sender->actor
                 && sender->actor->pAIClass
-                && v7->thingtype == SITH_THING_ACTOR
+                && v7->controlType == SITH_CT_AI
                 && v7->actor
                 && v7->actor->pAIClass) {
 
@@ -304,7 +304,7 @@ void sithActor_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4)
 int sithActor_sub_4ED1D0(sithThing *thing, sithSurface *surface, sithCollisionSearchEntry *searchEnt)
 {
     int ret = sithCollision_DefaultHitHandler(thing, surface, searchEnt);
-    if (ret && thing->thingtype == SITH_THING_ACTOR) {
+    if (ret && thing->controlType == SITH_CT_AI) {
         sithAI_SetActorFireTarget(thing->actor, SITHAI_MODE_ACTIVE, 0);
     }
     return ret;
@@ -386,11 +386,11 @@ int sithActor_ActorActorCollide(sithThing *thing, sithThing *thing2, sithCollisi
     int ret = sithCollision_DebrisDebrisCollide(thing, thing2, a3, a4);
     if (ret)
     {
-        if (thing->thingtype == SITH_THING_ACTOR && thing->actor)
+        if (thing->controlType == SITH_CT_AI && thing->actor)
         {
             sithAI_SetActorFireTarget(thing->actor, SITHAI_MODE_SEARCHING, (intptr_t)thing2);
         }
-        if (thing2->thingtype == SITH_THING_ACTOR && thing2->actor)
+        if (thing2->controlType == SITH_CT_AI && thing2->actor)
         {
             sithAI_SetActorFireTarget(thing2->actor, SITHAI_MODE_SEARCHING, (intptr_t)thing);
         }

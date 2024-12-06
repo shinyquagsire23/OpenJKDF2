@@ -2715,7 +2715,7 @@ typedef struct sithThing
 #endif // JKM_TYPES
     uint32_t type;
     uint32_t moveType;
-    uint32_t thingtype;
+    uint32_t controlType;
     int lifeLeftMs;
     uint32_t timer;
     uint32_t pulse_end_ms;

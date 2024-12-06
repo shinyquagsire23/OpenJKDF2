@@ -221,15 +221,15 @@ void sithThing_TickAll(float deltaSeconds, int deltaMs)
             if ( (pThingIter->thingflags & (SITH_TF_TIMER|SITH_TF_PULSE)) != 0 )
                 sithCog_HandleThingTimerPulse(pThingIter);
 
-            switch ( pThingIter->thingtype )
+            switch ( pThingIter->controlType )
             {
-                case SITH_THING_ACTOR:
+                case SITH_CT_AI:
                     sithAI_Tick(pThingIter, deltaSeconds);
                     break;
-                case SITH_THING_EXPLOSION:
+                case SITH_CT_EXPLOSION:
                     sithExplosion_Tick(pThingIter);
                     break;
-                case SITH_THING_COG:
+                case SITH_CT_PARTICLE:
                     sithParticle_Tick(pThingIter, deltaSeconds);
                     break;
             }
@@ -273,7 +273,7 @@ void sithThing_TickAll(float deltaSeconds, int deltaMs)
         if ( pThingIter->moveType == SITH_MT_PATH && pThingIter->trackParams.aFrames )
             pSithHS->free(pThingIter->trackParams.aFrames);
 
-        if ( pThingIter->thingtype == SITH_THING_ACTOR )
+        if ( pThingIter->controlType == SITH_CT_AI )
             sithAI_FreeEntry(pThingIter);
 
         if ( pThingIter->type == SITH_THING_PARTICLE )
@@ -513,7 +513,7 @@ void sithThing_freestuff(sithWorld *pWorld)
             sithThing_LeaveSector(pThingIter);
         if ( pThingIter->moveType == SITH_MT_PATH && pThingIter->trackParams.aFrames )
             pSithHS->free(pThingIter->trackParams.aFrames);
-        if ( pThingIter->thingtype == SITH_THING_ACTOR || pThingIter->thingtype == SITH_THING_PLAYER) // Added: SITH_THING_PLAYER
+        if ( pThingIter->controlType == SITH_CT_AI /*|| pThingIter->controlType == SITH_CT_10*/) // Added: SITH_THING_PLAYER
             sithAI_FreeEntry(pThingIter);
         if ( pThingIter->type == SITH_THING_PARTICLE )
             sithParticle_FreeEntry(pThingIter);
@@ -610,7 +610,7 @@ void sithThing_FreeEverythingNet(sithThing* pThing)
         sithThing_LeaveSector(pThing);
     if ( pThing->moveType == SITH_MT_PATH && pThing->trackParams.aFrames )
         pSithHS->free(pThing->trackParams.aFrames);
-    if ( pThing->thingtype == SITH_THING_ACTOR )
+    if ( pThing->controlType == SITH_CT_AI )
         sithAI_FreeEntry(pThing);
     if ( pThing->type == SITH_THING_PARTICLE )
         sithParticle_FreeEntry(pThing);
@@ -650,7 +650,7 @@ void sithThing_FreeEverything(sithThing* pThing)
         sithThing_LeaveSector(pThing);
     if ( pThing->moveType == SITH_MT_PATH && pThing->trackParams.aFrames )
         pSithHS->free(pThing->trackParams.aFrames);
-    if ( pThing->thingtype == SITH_THING_ACTOR )
+    if ( pThing->controlType == SITH_CT_AI )
         sithAI_FreeEntry(pThing);
     if ( pThing->type == SITH_THING_PARTICLE )
         sithParticle_FreeEntry(pThing);
@@ -679,7 +679,7 @@ void sithThing_sub_4CD100(sithThing* pThing)
     }
     if ( pThing->rdthing.puppet )
         sithPuppet_NewEntry(pThing);
-    if ( pThing->thingtype == SITH_THING_ACTOR )
+    if ( pThing->controlType == SITH_CT_AI )
         sithAI_NewEntry(pThing);
     if ( pThing->soundclass )
         sithSoundClass_PlayModeRandom(pThing, SITH_SC_CREATE);
@@ -1631,7 +1631,7 @@ int sithThing_ParseArgs(stdConffileArg *arg, sithThing* pThing)
     }
     if ( v2 )
         return 1;
-    return pThing->thingtype == SITH_THING_ACTOR && sithAI_LoadThingActorParams(arg, pThing, paramIdx);
+    return pThing->controlType == SITH_CT_AI && sithAI_LoadThingActorParams(arg, pThing, paramIdx);
 }
 
 // MOTS altered
@@ -1640,8 +1640,6 @@ int sithThing_LoadThingParam(stdConffileArg *arg, sithThing* pThing, int param)
     int v3; // ebp
     const char **v4; // edi
     int v5; // eax
-    int32_t v6; // eax
-    int32_t v7; // eax
     int result; // eax
     sithAIClass *pAIClass; // eax
     sithActor *pActor; // esi
@@ -1675,28 +1673,19 @@ int sithThing_LoadThingParam(stdConffileArg *arg, sithThing* pThing, int param)
             v5 = v3;
 
             pThing->type = v5;
-            v6 = v5 - 2;
-            if ( v6 )
-            {
-                v7 = v6 - 4;
-                if ( v7 )
-                {
-                    if ( v7 != 5 )
-                        goto LABEL_58;
-                    pThing->thingtype = SITH_THING_COG;
-                    result = 1;
-                }
-                else
-                {
-                    pThing->thingtype = SITH_THING_EXPLOSION;
-                    result = 1;
-                }
+            if (v5 == SITH_THING_ACTOR) {
+                pThing->controlType = SITH_CT_AI;
+                return 1;
             }
-            else
-            {
-                pThing->thingtype = SITH_THING_ACTOR;
-                result = 1;
+            if (v5 == SITH_THING_EXPLOSION) {
+                pThing->controlType = SITH_CT_EXPLOSION;
+                return 1;
             }
+            if (v5 == SITH_THING_PARTICLE) {
+                pThing->controlType = SITH_CT_PARTICLE;
+                return 1;
+            }
+            result = 1;
             break;
         case THINGPARAM_COLLIDE:
             collide = _atoi(arg->value);
@@ -1815,7 +1804,7 @@ int sithThing_LoadThingParam(stdConffileArg *arg, sithThing* pThing, int param)
             result = 1;
             break;
         case THINGPARAM_AICLASS:
-            pThing->thingtype = SITH_THING_ACTOR;
+            pThing->controlType = SITH_CT_AI;
             pAIClass = sithAIClass_Load(arg->value);
             pThing->pAIClass = pAIClass;
             pActor = pThing->actor;
@@ -1917,7 +1906,7 @@ uint32_t sithThing_Checksum(sithThing* pThing, unsigned int last_hash)
     hash = util_Weirdchecksum((uint8_t *)&pThing->thingflags, sizeof(uint32_t), last_hash);
     hash = util_Weirdchecksum((uint8_t *)&pThing->type, sizeof(uint32_t), hash);
     hash = util_Weirdchecksum((uint8_t *)&pThing->moveType, sizeof(uint32_t), hash);
-    hash = util_Weirdchecksum((uint8_t *)&pThing->thingtype, sizeof(uint32_t), hash);
+    hash = util_Weirdchecksum((uint8_t *)&pThing->controlType, sizeof(uint32_t), hash);
 
     if ( pThing->moveType == SITH_MT_PHYSICS )
     {

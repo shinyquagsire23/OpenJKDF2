@@ -1255,6 +1255,23 @@ enum THINGTYPE
     */
 };
 
+// Control Type
+enum SITH_CT {
+    SITH_CT_NONE = 0,
+    SITH_CT_1 = 1,
+    SITH_CT_AI = 2,
+    SITH_CT_3 = 3,
+    SITH_CT_4 = 4,
+    SITH_CT_5 = 5,
+    SITH_CT_EXPLOSION = 6,
+    SITH_CT_PARTICLE = 7,
+    SITH_CT_8 = 8,
+    SITH_CT_9 = 9,
+    SITH_CT_10 = 10,
+    SITH_CT_11 = 11,
+    SITH_CT_12 = 12,
+};
+
 enum SITH_DAMAGE
 {
     SITH_DAMAGE_IMPACT   = 0x01,

@@ -591,7 +591,7 @@ sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileT
             if (v19 && v19->hitType & SITHCOLLISION_THING)
             {
                 v20 = v19->receiver;
-                if ( v20->thingtype == SITH_THING_ACTOR )
+                if ( v20->controlType == SITH_CT_AI )
                     sithAI_SetActorFireTarget(v20->actor, SITHAI_MODE_SLEEPING, (intptr_t)v9); // aaaaaaaaa undefined
             }
         }
@@ -659,7 +659,7 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
 
     int bFlagsHadWfImpactSoundFxEarlier = physicsThing->weaponParams.typeflags & SITH_WF_IMPACT_SOUND_FX;
     if ( physicsThing->weaponParams.typeflags & SITH_WF_IMPACT_SOUND_FX && collidedThing->thingflags & SITH_TF_4
-      || collidedThing->thingtype == SITH_THING_COG && physicsThing->weaponParams.typeflags & SITH_WF_RICOCHET_OFF_SURFACE && physicsThing->weaponParams.numDeflectionBounces < 2 )
+      || collidedThing->controlType == SITH_CT_PARTICLE && physicsThing->weaponParams.typeflags & SITH_WF_RICOCHET_OFF_SURFACE && physicsThing->weaponParams.numDeflectionBounces < 2 )
     {
         if ( ++physicsThing->weaponParams.numDeflectionBounces < MAX_DEFLECTION_BOUNCES )
         {
@@ -685,7 +685,7 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
             return result;
         }
     }
-    if ( collidedThing->thingtype != SITH_THING_ACTOR && collidedThing->thingtype != SITH_THING_PLAYER )
+    if ( collidedThing->type != SITH_THING_ACTOR && collidedThing->type != SITH_THING_PLAYER )
     {
         // MoTS added
         if (MOTS_ONLY_FLAG(collidedThing->type == SITH_THING_COG && a5)) {
@@ -860,7 +860,7 @@ void sithWeapon_RemoveAndExplode(sithThing *weapon, sithThing *explodeTemplate)
         if (spawned)
         {
             // Added: second comparison, co-op
-            if (player == sithPlayer_pLocalPlayerThing || player->thingtype == SITH_THING_PLAYER) {
+            if (player == sithPlayer_pLocalPlayerThing || player->type == SITH_THING_PLAYER) {
                 sithAIAwareness_AddEntry(spawned->sector, &spawned->position, 0, 2.0, player);
             }
             if (weapon->thingflags & SITH_TF_INVULN)

@@ -286,7 +286,7 @@ LABEL_22:
             if ( i != sithWorld_pCurrentWorld->cameraFocus && (i->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_WILLBEREMOVED)) == 0 )
             {
                 int v37 = (g_mapModeFlags & MAPMODE_40) != 0;
-                switch ( i->thingtype )
+                switch ( i->type )
                 {
                     case SITH_THING_PLAYER:
                         if (g_mapModeFlags & (MAPMODE_08 | MAPMODE_04))

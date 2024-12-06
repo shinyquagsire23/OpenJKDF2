@@ -463,7 +463,7 @@ float sithPuppet_sub_4E4380(sithThing *thing)
         v14 = -v14;
     if ( v14 <= 0.02 )
     {
-        if ( thing->thingtype == SITH_ANIM_WALK && thing->actor )
+        if ( thing->controlType == SITH_CT_AI && thing->actor )
         {
             thinga = 0.2;
             anim = (thing->actor->flags & SITHAI_MODE_TURNING) != 0 ? SITH_ANIM_TURNLEFT : SITH_ANIM_STAND;
@@ -680,7 +680,7 @@ LABEL_14:
             sithSoundClass_PlayModeRandom(thing, (soundToPlay_base + 4 * v3 + 6));
             return;
         case 3u:
-            if ( thing->thingtype == SITH_THING_ACTOR )
+            if ( thing->controlType == SITH_CT_AI )
             {
                 v12 = thing->actor;
                 if ( v12 )
@@ -729,7 +729,7 @@ LABEL_14:
             {
                 sithPlayerActions_JumpWithVel(thing, 2.0);
 LABEL_50:
-                if ( v11->thingtype == SITH_THING_ACTOR )
+                if ( v11->controlType == SITH_CT_AI )
                     v11->actor->flags |= 1u;
             }
             return;
@@ -750,7 +750,7 @@ LABEL_50:
         case 0xF:
             if (!Main_bMotsCompat) return;
 
-            if ((thing->thingtype == SITH_THING_ACTOR) && (v12 = thing->actor, v12 != (sithActor *)0x0)) {
+            if ((thing->controlType == SITH_CT_AI) && (v12 = thing->actor, v12 != (sithActor *)0x0)) {
                 sithAI_Leap(v12,0.0,0.0,0.0,v12->field_26C,v12->field_264,v12->field_268);
                 return;
             }
@@ -758,7 +758,7 @@ LABEL_50:
         case 0x10:
             if (!Main_bMotsCompat) return;
 
-            if ((thing->thingtype == SITH_THING_ACTOR) && (v12 = thing->actor, v12 != (sithActor *)0x0)) {
+            if ((thing->controlType == SITH_CT_AI) && (v12 = thing->actor, v12 != (sithActor *)0x0)) {
                 sithAI_FUN_0053a520(v12,0.0,0.0,0.0,v12->field_26C,v12->field_264,v12->field_268);
             }
             return;
