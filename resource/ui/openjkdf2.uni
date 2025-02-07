@@ -86,4 +86,9 @@ MSGS 100          # <--- DON'T FORGET TO UPDATE THIS COUNT
    "GUIEXT_50HZ_MIDAIR_PHYS"                    0 "Restore 50Hz midair player physics"
    "GUIEXT_50HZ_MIDAIR_PHYS_HINT"               0 "Step player physics and POV at 50Hz while midair?"
 
+#******************************
+#  Controls
+#******************************
+   "KEY_MOUSE_B5"                               0 "Mouse Button 5"
+
 END
