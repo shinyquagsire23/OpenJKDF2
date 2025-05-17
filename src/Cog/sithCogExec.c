@@ -113,8 +113,17 @@ void sithCogExec_Exec(sithCog *cog_ctx)
                 if (!v12 )
                     break;
                 if (v12->val.type) {
-                    stdPlatform_Printf("OpenJKDF2: Script `%s` attempted to call `%s`, which doesn't exist...\n", cog_ctx->cogscript->cog_fpath, v12->field_18);
-                    break;
+                    // Altered: patch for bad idx value in tmpStackVar->data[0]; code will lookup cog fn by name;
+                    //          this addresses issue with a cog randvec sending in wrong idx id
+                    sithCogSymbol *tmpSithCogSymbol = sithCogParse_GetSymbolVal(sithCog_pSymbolTable, v12->field_18);
+                    // Need to verify for null, name match and type 
+                    if (tmpSithCogSymbol && !strcmp(tmpSithCogSymbol->field_18,v12->field_18) && !tmpSithCogSymbol->val.type ){
+                        //stdPlatform_Printf("OpenJKDF2: Script `%s` Patching call `%s\n", cog_ctx->cogscript->cog_fpath, tmpSithCogSymbol->field_18); 
+                        v12 = tmpSithCogSymbol;
+                    }else{
+                        stdPlatform_Printf("OpenJKDF2: Script `%s` attempted to call `%s`, which doesn't exist...\n", cog_ctx->cogscript->cog_fpath, v12->field_18);
+                        break;
+                    }
                 }
                 if ( v12->val.dataAsFunc ) {
                     //printf("OpenJKDF2: Script `%s` call `%s`\n", cog_ctx->cogscript->cog_fpath, v12->field_18);
