@@ -27,7 +27,7 @@ sithThing* sithAICmd_NearestPlayer(sithActor *actor)
         return sithPlayer_pLocalPlayerThing;
 
     sithThing* closest = sithPlayer_pLocalPlayerThing;
-    flex_t closestDist = 999999.0;
+    flex_t closestDist = FLEX(999999.0);
     for (int i = 0; i < jkPlayer_maxPlayers; i++)
     {
         sithPlayerInfo* playerInfo = &jkPlayer_playerInfos[i];
@@ -184,10 +184,10 @@ int sithAICmd_Follow(sithActor *actor, sithAIClassEntry *aiclass, sithActorInsti
         {
             if ( flags != SITHAI_MODE_FLEEING || (actor->flags & SITHAI_MODE_ACTIVE) == 0 || instinct->param0 == 0.0 )
                 return 0;
-            a4a.x = 0.0;
-            a4a.z = 0.0;
-            a4a.y = (_frand() - 0.5) * 90.0;
-            if ( _frand() >= 0.5 )
+            a4a.x = FLEX(0.0);
+            a4a.z = FLEX(0.0);
+            a4a.y = (_frand() - FLEX(0.5)) * FLEX(90.0);
+            if ( _frand() >= FLEX(0.5) )
             {
                 sithAI_sub_4EAF40(actor);
                 rdVector_Rotate3(&a1, &actor->field_228, &a4a);
@@ -197,9 +197,9 @@ int sithAICmd_Follow(sithActor *actor, sithAIClassEntry *aiclass, sithActorInsti
                 rdVector_Rotate3(&a1, &actor->thing->lookOrientation.lvec, &a4a);
             }
             rdVector_Copy3(&a2, &actor->thing->position);
-            rdVector_MultAcc3(&a2, &a1, 0.7);
+            rdVector_MultAcc3(&a2, &a1, FLEX(0.7));
             sithAI_SetLookFrame(actor, &a2);
-            sithAI_SetMoveThing(actor, &a2, 2.0);
+            sithAI_SetMoveThing(actor, &a2, FLEX(2.0));
             return 0;
         }
     }

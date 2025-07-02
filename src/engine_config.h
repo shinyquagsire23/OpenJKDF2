@@ -265,6 +265,9 @@ extern int Window_isHiDpi;
 // - double to verify flex_t vs flex32_t vs cog_flex_t is working
 // - TODO: fixed point support?
 typedef float flex_t_type;
+typedef double dflex_t_type;
+
+#define FLEX(n) ((flex_t)n)
 
 // Disable warnings for Vegetable Studio
 #if 1 && defined _MSC_VER
