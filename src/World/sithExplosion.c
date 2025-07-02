@@ -73,9 +73,9 @@ void sithExplosion_UpdateForce(sithThing *explosion)
     rdVector3 a2; // [esp+24h] [ebp-3Ch] BYREF
     rdMatrix34 a3; // [esp+30h] [ebp-30h] BYREF
 
-    float range = explosion->explosionParams.range;
-    float force = explosion->explosionParams.force;
-    float damage = explosion->explosionParams.damage;
+    flex_t range = explosion->explosionParams.range;
+    flex_t force = explosion->explosionParams.force;
+    flex_t damage = explosion->explosionParams.damage;
     if ( range > 0.0 && (damage > 0.0 || force > 0.0) )
     {
         sithAIAwareness_AddEntry(explosion->sector, &explosion->position, 1, 3.0, explosion);
@@ -83,7 +83,7 @@ void sithExplosion_UpdateForce(sithThing *explosion)
         for ( i = sithCollision_NextSearchResult(); i; i = sithCollision_NextSearchResult() )
         {
             double v3 = i->distance / range;
-            float a1a = rdMath_clampf(1.0 - (v3 * v3), 0.25, 1.0);
+            flex_t a1a = rdMath_clampf(1.0 - (v3 * v3), 0.25, 1.0);
 
             if ( (i->hitType & SITHCOLLISION_WORLD) != 0 )
             {

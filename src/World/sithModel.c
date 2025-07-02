@@ -27,8 +27,8 @@ void sithModel_Shutdown()
 int sithModel_Load(sithWorld *world, int a2)
 {
     int numModels;
-    float loadStep;
-    float loadProgress;
+    flex_t loadStep;
+    flex_t loadProgress;
 
     if ( a2 )
         return 0;

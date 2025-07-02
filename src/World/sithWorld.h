@@ -37,7 +37,7 @@
 int sithWorld_Startup();
 void sithWorld_Shutdown();
 void sithWorld_SetLoadPercentCallback(sithWorldProgressCallback_t func);
-void sithWorld_UpdateLoadPercent(float percent);
+void sithWorld_UpdateLoadPercent(flex_t percent);
 int sithWorld_Load(sithWorld *pWorld, char *map_jkl_fname);
 sithWorld* sithWorld_New();
 int sithWorld_NewEntry(sithWorld *pWorld);

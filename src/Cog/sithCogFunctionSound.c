@@ -27,8 +27,8 @@ void sithCogFunctionSound_PlaySoundThing(sithCog *ctx)
     sithPlayingSound *playingSound_; // ebp
     int refid_; // eax
     int refid; // eax
-    float minDist_act; // [esp+10h] [ebp-Ch]
-    float maxDist_act_; // [esp+14h] [ebp-8h]
+    flex_t minDist_act; // [esp+10h] [ebp-Ch]
+    flex_t maxDist_act_; // [esp+14h] [ebp-8h]
 
     int flags = sithCogExec_PopInt(ctx);
     cog_flex_t maxDist = sithCogExec_PopFlex(ctx);
@@ -110,8 +110,8 @@ void sithCogFunctionSound_PlaySoundPos(sithCog *ctx)
     sithPlayingSound *playingSound; // eax
     int v7; // ecx
     int refId; // eax
-    float maxDist_act; // [esp+10h] [ebp-14h]
-    float minDist_act; // [esp+28h] [ebp+4h]
+    flex_t maxDist_act; // [esp+10h] [ebp-14h]
+    flex_t minDist_act; // [esp+28h] [ebp+4h]
 
     rdVector3 pos;
 
@@ -128,8 +128,8 @@ void sithCogFunctionSound_PlaySoundPos(sithCog *ctx)
         return;
     }
 
-    minDist_act = minDist >= 0.0 ? (float)(minDist * 0.1) : 0.5;
-    maxDist_act = maxDist >= 0.0 ? (float)(maxDist * 0.1) : 2.5;
+    minDist_act = minDist >= 0.0 ? (flex_t)(minDist * 0.1) : 0.5; // FLEXTODO
+    maxDist_act = maxDist >= 0.0 ? (flex_t)(maxDist * 0.1) : 2.5; // FLEXTODO
     if ( volume < 0.0 )
     {
         volume = 0.0;
@@ -382,8 +382,8 @@ void sithCogFunctionSound_PlaySoundThingLocal(sithCog *ctx)
     sithPlayingSound *playingSound_; // ebp
     int refid_; // eax
     int refid; // eax
-    float minDist_act; // [esp+10h] [ebp-Ch]
-    float maxDist_act_; // [esp+14h] [ebp-8h]
+    flex_t minDist_act; // [esp+10h] [ebp-Ch]
+    flex_t maxDist_act_; // [esp+14h] [ebp-8h]
 
     int flags = sithCogExec_PopInt(ctx);
     cog_flex_t maxDist = sithCogExec_PopFlex(ctx);
@@ -449,8 +449,8 @@ void sithCogFunctionSound_PlaySoundPosLocal(sithCog *ctx)
     sithPlayingSound *playingSound; // eax
     int v7; // ecx
     int refId; // eax
-    float maxDist_act; // [esp+10h] [ebp-14h]
-    float minDist_act; // [esp+28h] [ebp+4h]
+    flex_t maxDist_act; // [esp+10h] [ebp-14h]
+    flex_t minDist_act; // [esp+28h] [ebp+4h]
 
     rdVector3 pos;
 
@@ -467,8 +467,8 @@ void sithCogFunctionSound_PlaySoundPosLocal(sithCog *ctx)
         return;
     }
 
-    minDist_act = minDist >= 0.0 ? (float)(minDist * 0.1) : 0.5;
-    maxDist_act = maxDist >= 0.0 ? (float)(maxDist * 0.1) : 2.5;
+    minDist_act = minDist >= 0.0 ? (flex_t)(minDist * 0.1) : 0.5; // FLEXTODO
+    maxDist_act = maxDist >= 0.0 ? (flex_t)(maxDist * 0.1) : 2.5; // FLEXTODO
     if ( volume < 0.0 )
     {
         volume = 0.0;
@@ -496,8 +496,8 @@ void sithCogFunctionSound_PlaySoundThingAndWait(sithCog *ctx)
     sithPlayingSound *playingSound_; // ebp
     int refid_; // eax
     int refid; // eax
-    float minDist_act; // [esp+10h] [ebp-Ch]
-    float maxDist_act_; // [esp+14h] [ebp-8h]
+    flex_t minDist_act; // [esp+10h] [ebp-Ch]
+    flex_t maxDist_act_; // [esp+14h] [ebp-8h]
 
     int flags = sithCogExec_PopInt(ctx);
     cog_flex_t maxDist = sithCogExec_PopFlex(ctx);

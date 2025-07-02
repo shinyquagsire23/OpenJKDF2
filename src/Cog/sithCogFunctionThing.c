@@ -413,7 +413,7 @@ void sithCogFunctionThing_RotatePivot(sithCog *ctx)
             rdVector3 negRot;
 
             rdVector_Neg3(&negRot, rot);
-            float negSpeed = -speed;
+            flex_t negSpeed = -speed;
             sithTrackThing_RotatePivot(pThing, pos, &negRot, negSpeed);
         }
         else
@@ -471,7 +471,7 @@ void sithCogFunctionThing_SetThingLight(sithCog *ctx)
 
 void sithCogFunctionThing_ThingLightAnim(sithCog *ctx)
 {
-    float idk_; // ST08_4
+    flex_t idk_; // ST08_4
     rdSurface *surface; // eax
 
     cog_flex_t idk = sithCogExec_PopFlex(ctx);
@@ -2545,7 +2545,7 @@ void sithCogFunctionThing_GetThingJointAngle(sithCog *ctx)
 {
     rdVector3 *prVar1;
 
-    float local_4 = -1.0;
+    flex_t local_4 = -1.0;
     int arg1 = sithCogExec_PopInt(ctx);
     sithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)

@@ -61,7 +61,7 @@
 int sithThing_Startup();
 int sithThing_Shutdown();
 void sithThing_SetHandler(sithThing_handler_t handler);
-void sithThing_TickAll(float deltaSeconds, int deltaMs);
+void sithThing_TickAll(flex_t deltaSeconds, int deltaMs);
 void sithThing_Remove(sithThing* pThing);
 sithThing* sithThing_GetParent(sithThing* pThing);
 sithThing* sithThing_GetThingByIdx(int idx);
@@ -84,7 +84,7 @@ void sithThing_ExitWater(sithThing* pThing, int a2);
 uint32_t sithThing_Checksum(sithThing* pThing, unsigned int last_hash);
 int sithThing_netidk2(int a1);
 int sithThing_GetIdxFromThing(sithThing* pThing);
-void sithThing_TickPhysics(sithThing* pThing, float deltaSecs);
+void sithThing_TickPhysics(sithThing* pThing, flex_t deltaSecs);
 void sithThing_freestuff(sithWorld *pWorld);
 void sithThing_Free(sithWorld *pWorld);
 sithThing* sithThing_SpawnTemplate(sithThing *pTemplateThing, sithThing *spawnThing);
@@ -95,7 +95,7 @@ void sithThing_LandThing(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3 *a4
 void sithThing_MoveToSector(sithThing* pThing, sithSector *sector, int a4);
 int sithThing_DetachThing(sithThing* pThing);
 void sithThing_Destroy(sithThing* pThing);
-float sithThing_Damage(sithThing *sender, sithThing *reciever, float amount, int damageClass);
+flex_t sithThing_Damage(sithThing *sender, sithThing *reciever, flex_t amount, int damageClass);
 void sithThing_detachallchildren(sithThing* pThing);
 void sithThing_AttachThing(sithThing *parent, sithThing *child);
 void sithThing_SetSyncFlags(sithThing *pThing, int flags);
@@ -105,14 +105,14 @@ int sithThing_HasAttachment(sithThing* pThing);
 void sithThing_Sync();
 int sithThing_Release(sithThing *pThing);
 
-int sithThing_MotsTick(int param_1,int param_2,float param_3); // MOTS added
+int sithThing_MotsTick(int param_1,int param_2,flex_t param_3); // MOTS added
 
-//static float (*sithThing_Hit)(sithThing *sender, sithThing *receiver, float amount, int a4) = (void*)sithThing_Hit_ADDR;
+//static flex_t (*sithThing_Hit)(sithThing *sender, sithThing *receiver, flex_t amount, int a4) = (void*)sithThing_Hit_ADDR;
 //static void (*sithThing_LandThing)(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3* a4, int a5) = (void*)sithThing_LandThing_ADDR;
 static int (*_sithThing_Load)(sithWorld *pWorld, int a2) = (void*)sithThing_Load_ADDR;
 //static int (*sithThing_LoadThingParam)(stdConffileArg *arg, sithThing* pThing, int param) = (void*)sithThing_LoadThingParam_ADDR;
 //static int (*sithThing_LoadActorPlayerParams)(stdConffileArg *arg, sithThing* pThing, unsigned int param) = (void*)sithThing_LoadActorPlayerParams_ADDR;
-//static void (*sithThing_TickPhysics)(sithThing* pThing, float arg4) = (void*)sithThing_TickPhysics_ADDR;
+//static void (*sithThing_TickPhysics)(sithThing* pThing, flex_t arg4) = (void*)sithThing_TickPhysics_ADDR;
 //static int (__cdecl *sithThing_DoesRdThingInit)(sithThing* pThing) = (void*)0x4CD190;
 //static int (__cdecl *sithThing_InstantiateFromTemplate)(sithThing* pThing, sithThing *a2) = (void*)0x4CD8A0;
 //static signed int (*sithThing_ParseArgs)(stdConffileArg *a1, sithThing* pThing) = (void*)0x004CEB90;
@@ -120,7 +120,7 @@ static int (*_sithThing_Load)(sithWorld *pWorld, int a2) = (void*)sithThing_Load
 
 //static sithThing* (*sithThing_Create)(sithThing *a1, rdVector3 *a2, const rdMatrix34 *a3, sithSector *sector, sithThing *a5) = (void*)sithThing_Create_ADDR;
 //static sithThing* (*sithThing_SpawnTemplate)(sithThing *a1, sithThing *a2) = (void*)sithThing_SpawnTemplate_ADDR;
-//static float (*sithThing_Damage)(sithThing *sender, sithThing *reciever, float amount, int damageClass) = (void*)sithThing_Damage_ADDR;
+//static flex_t (*sithThing_Damage)(sithThing *sender, sithThing *reciever, flex_t amount, int damageClass) = (void*)sithThing_Damage_ADDR;
 //static void (*sithThing_Destroy)(sithThing *a1) = (void*)sithThing_Destroy_ADDR;
 //static void (*sithThing_LeaveSector)(sithThing *a1) = (void*)sithThing_LeaveSector_ADDR;
 //static void (*sithThing_SetPosAndRot)(sithThing* pThing, rdVector3 *pos, rdMatrix34 *rot) = (void*)sithThing_SetPosAndRot_ADDR;

@@ -2,9 +2,9 @@
 
 #include "stdMathTables.h"
 
-float stdMath_FlexPower(float num, int32_t exp)
+flex_t stdMath_FlexPower(flex_t num, int32_t exp)
 {
-    float retval = num;
+    flex_t retval = num;
 
     for (int32_t i = 0; i < exp - 1; ++i)
     {
@@ -13,9 +13,9 @@ float stdMath_FlexPower(float num, int32_t exp)
     return retval;
 }
 
-float stdMath_NormalizeAngle(float angle)
+flex_t stdMath_NormalizeAngle(flex_t angle)
 {
-    float retval;
+    flex_t retval;
 
     if (angle >= 0.0)
     {
@@ -41,18 +41,18 @@ float stdMath_NormalizeAngle(float angle)
     return retval;
 }
 
-float stdMath_NormalizeAngleAcute(float angle)
+flex_t stdMath_NormalizeAngleAcute(flex_t angle)
 {
-    float norm = stdMath_NormalizeAngle(angle);
+    flex_t norm = stdMath_NormalizeAngle(angle);
     if ( norm > 180.0 )
         return -(360.0 - norm);
     return norm;
 }
 
-float stdMath_NormalizeDeltaAngle(float a1, float a2)
+flex_t stdMath_NormalizeDeltaAngle(flex_t a1, flex_t a2)
 {
-    float result;
-    float delta;
+    flex_t result;
+    flex_t delta;
 
     delta = stdMath_NormalizeAngle(a2) - stdMath_NormalizeAngle(a1);
     if ( delta >= 0.0 )
@@ -74,30 +74,30 @@ float stdMath_NormalizeDeltaAngle(float a1, float a2)
     return result;
 }
 
-void stdMath_SinCos(float angle, float *pSinOut, float *pCosOut)
+void stdMath_SinCos(flex_t angle, flex_t *pSinOut, flex_t *pCosOut)
 {
-    float normalized; // st7
-    float v4; // st7
-    float v5; // st7
-    float v6; // [esp+Ch] [ebp-20h]
-    float a1; // [esp+10h] [ebp-1Ch]
+    flex_t normalized; // st7
+    flex_t v4; // st7
+    flex_t v5; // st7
+    flex_t v6; // [esp+Ch] [ebp-20h]
+    flex_t a1; // [esp+10h] [ebp-1Ch]
     int32_t v8; // [esp+14h] [ebp-18h]
-    float v9; // [esp+18h] [ebp-14h]
-    float v10; // [esp+18h] [ebp-14h]
-    float v11; // [esp+18h] [ebp-14h]
-    float v12; // [esp+18h] [ebp-14h]
-    float v13; // [esp+18h] [ebp-14h]
+    flex_t v9; // [esp+18h] [ebp-14h]
+    flex_t v10; // [esp+18h] [ebp-14h]
+    flex_t v11; // [esp+18h] [ebp-14h]
+    flex_t v12; // [esp+18h] [ebp-14h]
+    flex_t v13; // [esp+18h] [ebp-14h]
     int32_t quantized; // [esp+1Ch] [ebp-10h]
     int32_t quantized_plus1; // [esp+20h] [ebp-Ch]
-    float normalized_; // [esp+24h] [ebp-8h]
-    float v17; // [esp+28h] [ebp-4h]
-    float v18; // [esp+28h] [ebp-4h]
-    float v19; // [esp+28h] [ebp-4h]
-    float v20; // [esp+28h] [ebp-4h]
-    float v21; // [esp+28h] [ebp-4h]
-    float v22; // [esp+28h] [ebp-4h]
-    float v23; // [esp+28h] [ebp-4h]
-    float v24; // [esp+28h] [ebp-4h]
+    flex_t normalized_; // [esp+24h] [ebp-8h]
+    flex_t v17; // [esp+28h] [ebp-4h]
+    flex_t v18; // [esp+28h] [ebp-4h]
+    flex_t v19; // [esp+28h] [ebp-4h]
+    flex_t v20; // [esp+28h] [ebp-4h]
+    flex_t v21; // [esp+28h] [ebp-4h]
+    flex_t v22; // [esp+28h] [ebp-4h]
+    flex_t v23; // [esp+28h] [ebp-4h]
+    flex_t v24; // [esp+28h] [ebp-4h]
     
     //_stdMath_SinCos(angle, pSinOut, pCosOut);
     //return;
@@ -201,12 +201,12 @@ void stdMath_SinCos(float angle, float *pSinOut, float *pCosOut)
     }
 }
 
-float stdMath_Dist2D1(float a1, float a2)
+flex_t stdMath_Dist2D1(flex_t a1, flex_t a2)
 {
-  float v3; // [esp+0h] [ebp-18h]
-  float v4; // [esp+4h] [ebp-14h]
-  float v5; // [esp+8h] [ebp-10h]
-  float v6; // [esp+Ch] [ebp-Ch]
+  flex_t v3; // [esp+0h] [ebp-18h]
+  flex_t v4; // [esp+4h] [ebp-14h]
+  flex_t v5; // [esp+8h] [ebp-10h]
+  flex_t v6; // [esp+Ch] [ebp-Ch]
 
   if ( a1 >= 0.0 )
     v6 = a1;
@@ -227,12 +227,12 @@ float stdMath_Dist2D1(float a1, float a2)
   return v3 / 2.0 + v4;
 }
 
-float stdMath_Dist2D2(float a1, float a2)
+flex_t stdMath_Dist2D2(flex_t a1, flex_t a2)
 {
-  float v3; // [esp+0h] [ebp-18h]
-  float v4; // [esp+4h] [ebp-14h]
-  float v5; // [esp+8h] [ebp-10h]
-  float v6; // [esp+Ch] [ebp-Ch]
+  flex_t v3; // [esp+0h] [ebp-18h]
+  flex_t v4; // [esp+4h] [ebp-14h]
+  flex_t v5; // [esp+8h] [ebp-10h]
+  flex_t v6; // [esp+Ch] [ebp-Ch]
 
   if ( a1 >= 0.0 )
     v6 = a1;
@@ -253,12 +253,12 @@ float stdMath_Dist2D2(float a1, float a2)
   return v3 / 4.0 + v4;
 }
 
-float stdMath_Dist2D3(float a1, float a2)
+flex_t stdMath_Dist2D3(flex_t a1, flex_t a2)
 {
-  float v3; // [esp+0h] [ebp-18h]
-  float v4; // [esp+4h] [ebp-14h]
-  float v5; // [esp+8h] [ebp-10h]
-  float v6; // [esp+Ch] [ebp-Ch]
+  flex_t v3; // [esp+0h] [ebp-18h]
+  flex_t v4; // [esp+4h] [ebp-14h]
+  flex_t v5; // [esp+8h] [ebp-10h]
+  flex_t v6; // [esp+Ch] [ebp-Ch]
 
   if ( a1 >= 0.0 )
     v6 = a1;
@@ -279,13 +279,13 @@ float stdMath_Dist2D3(float a1, float a2)
   return v3 * 0.375 + v4;
 }
 
-float stdMath_Dist2D4(float a1, float a2)
+flex_t stdMath_Dist2D4(flex_t a1, flex_t a2)
 {
-  float v3; // [esp+0h] [ebp-1Ch]
-  float v4; // [esp+4h] [ebp-18h]
-  float v5; // [esp+8h] [ebp-14h]
-  float v6; // [esp+Ch] [ebp-10h]
-  float v7; // [esp+10h] [ebp-Ch]
+  flex_t v3; // [esp+0h] [ebp-1Ch]
+  flex_t v4; // [esp+4h] [ebp-18h]
+  flex_t v5; // [esp+8h] [ebp-14h]
+  flex_t v6; // [esp+Ch] [ebp-10h]
+  flex_t v7; // [esp+10h] [ebp-Ch]
 
   if ( a1 >= 0.0 )
     v7 = a1;
@@ -310,14 +310,14 @@ float stdMath_Dist2D4(float a1, float a2)
   return v3;
 }
 
-float stdMath_Dist3D1(float a1, float a2, float a3)
+flex_t stdMath_Dist3D1(flex_t a1, flex_t a2, flex_t a3)
 {
-  float v4; // [esp+0h] [ebp-18h]
-  float v5; // [esp+4h] [ebp-14h]
-  float v6; // [esp+8h] [ebp-10h]
-  float v7; // [esp+Ch] [ebp-Ch]
-  float v8; // [esp+10h] [ebp-8h]
-  float v9; // [esp+14h] [ebp-4h]
+  flex_t v4; // [esp+0h] [ebp-18h]
+  flex_t v5; // [esp+4h] [ebp-14h]
+  flex_t v6; // [esp+8h] [ebp-10h]
+  flex_t v7; // [esp+Ch] [ebp-Ch]
+  flex_t v8; // [esp+10h] [ebp-8h]
+  flex_t v9; // [esp+14h] [ebp-4h]
 
   // Added: fix undef behavior
   v9 = 0.0;
@@ -370,14 +370,14 @@ float stdMath_Dist3D1(float a1, float a2, float a3)
   return v9 / 2.0 + v8 + v7 / 2.0;
 }
 
-float stdMath_Dist3D2(float a1, float a2, float a3)
+flex_t stdMath_Dist3D2(flex_t a1, flex_t a2, flex_t a3)
 {
-  float v4; // [esp+0h] [ebp-18h]
-  float v5; // [esp+4h] [ebp-14h]
-  float v6; // [esp+8h] [ebp-10h]
-  float v7; // [esp+Ch] [ebp-Ch]
-  float v8; // [esp+10h] [ebp-8h]
-  float v9; // [esp+14h] [ebp-4h]
+  flex_t v4; // [esp+0h] [ebp-18h]
+  flex_t v5; // [esp+4h] [ebp-14h]
+  flex_t v6; // [esp+8h] [ebp-10h]
+  flex_t v7; // [esp+Ch] [ebp-Ch]
+  flex_t v8; // [esp+10h] [ebp-8h]
+  flex_t v9; // [esp+14h] [ebp-4h]
 
   // Added: fix undef behavior
   v9 = 0.0;
@@ -430,14 +430,14 @@ float stdMath_Dist3D2(float a1, float a2, float a3)
   return 0.3125 * v9 + v8 + v7 / 2.0;
 }
 
-float stdMath_Dist3D3(float a1, float a2, float a3)
+flex_t stdMath_Dist3D3(flex_t a1, flex_t a2, flex_t a3)
 {
-  float v4; // [esp+0h] [ebp-18h]
-  float v5; // [esp+4h] [ebp-14h]
-  float v6; // [esp+8h] [ebp-10h]
-  float v7; // [esp+Ch] [ebp-Ch]
-  float v8; // [esp+10h] [ebp-8h]
-  float v9; // [esp+14h] [ebp-4h]
+  flex_t v4; // [esp+0h] [ebp-18h]
+  flex_t v5; // [esp+4h] [ebp-14h]
+  flex_t v6; // [esp+8h] [ebp-10h]
+  flex_t v7; // [esp+Ch] [ebp-Ch]
+  flex_t v8; // [esp+10h] [ebp-8h]
+  flex_t v9; // [esp+14h] [ebp-4h]
 
   // Added: fix undef behavior
   v9 = 0.0;
@@ -490,12 +490,12 @@ float stdMath_Dist3D3(float a1, float a2, float a3)
   return 0.34375 * v9 + v8 + v7 / 2.0;
 }
 
-float stdMath_Floor(float a)
+flex_t stdMath_Floor(flex_t a)
 {
     return floorf(a);
 }
 
-float stdMath_Sqrt(float a)
+flex_t stdMath_Sqrt(flex_t a)
 {
     if (a < 0.0)
         return 0.0;
@@ -503,22 +503,22 @@ float stdMath_Sqrt(float a)
     return sqrtf(a);
 }
 
-float stdMath_Tan(float a1)
+flex_t stdMath_Tan(flex_t a1)
 {
     double v1; // st7
-    float v3; // [esp+Ch] [ebp-20h]
-    float a1a; // [esp+10h] [ebp-1Ch]
+    flex_t v3; // [esp+Ch] [ebp-20h]
+    flex_t a1a; // [esp+10h] [ebp-1Ch]
     int32_t v5; // [esp+14h] [ebp-18h]
-    float v6; // [esp+18h] [ebp-14h]
-    float v7; // [esp+18h] [ebp-14h]
+    flex_t v6; // [esp+18h] [ebp-14h]
+    flex_t v7; // [esp+18h] [ebp-14h]
     int32_t v8; // [esp+1Ch] [ebp-10h]
-    float v9; // [esp+20h] [ebp-Ch]
+    flex_t v9; // [esp+20h] [ebp-Ch]
     int32_t v10; // [esp+24h] [ebp-8h]
-    float v11; // [esp+28h] [ebp-4h]
-    float v12; // [esp+28h] [ebp-4h]
-    float v13; // [esp+28h] [ebp-4h]
-    float v14; // [esp+28h] [ebp-4h]
-    float v15; // [esp+34h] [ebp+8h]
+    flex_t v11; // [esp+28h] [ebp-4h]
+    flex_t v12; // [esp+28h] [ebp-4h]
+    flex_t v13; // [esp+28h] [ebp-4h]
+    flex_t v14; // [esp+28h] [ebp-4h]
+    flex_t v15; // [esp+34h] [ebp+8h]
 
     v1 = stdMath_NormalizeAngle(a1);
     v15 = v1;
@@ -583,13 +583,13 @@ float stdMath_Tan(float a1)
     return v9;
 }
 
-float stdMath_ArcSin1(float val)
+flex_t stdMath_ArcSin1(flex_t val)
 {
     double angle; // st7
-    float v2; // [esp+0h] [ebp-14h]
-    float v3; // [esp+4h] [ebp-10h]
-    float v5; // [esp+10h] [ebp-4h]
-    float v6; // [esp+1Ch] [ebp+8h]
+    flex_t v2; // [esp+0h] [ebp-14h]
+    flex_t v3; // [esp+4h] [ebp-10h]
+    flex_t v5; // [esp+10h] [ebp-4h]
+    flex_t v6; // [esp+1Ch] [ebp+8h]
 
     if ( val >= 0.0 )
         v3 = val;
@@ -616,16 +616,16 @@ float stdMath_ArcSin1(float val)
     return angle;
 }
 
-float stdMath_ArcSin2(float val)
+flex_t stdMath_ArcSin2(flex_t val)
 {
     double angle; // st7
-    float v2; // [esp+0h] [ebp-1Ch]
-    float v3; // [esp+4h] [ebp-18h]
-    float v4; // [esp+8h] [ebp-14h]
-    float v5; // [esp+Ch] [ebp-10h]
+    flex_t v2; // [esp+0h] [ebp-1Ch]
+    flex_t v3; // [esp+4h] [ebp-18h]
+    flex_t v4; // [esp+8h] [ebp-14h]
+    flex_t v5; // [esp+Ch] [ebp-10h]
 
-    float v7; // [esp+18h] [ebp-4h]
-    float v8; // [esp+24h] [ebp+8h]
+    flex_t v7; // [esp+18h] [ebp-4h]
+    flex_t v8; // [esp+24h] [ebp+8h]
 
     if ( val >= 0.0 )
         v5 = val;
@@ -654,16 +654,16 @@ float stdMath_ArcSin2(float val)
     return angle;
 }
 
-float stdMath_ArcSin3(float a1)
+flex_t stdMath_ArcSin3(flex_t a1)
 {
-    float v2; // [esp+0h] [ebp-24h]
-    float v3; // [esp+4h] [ebp-20h]
-    float v4; // [esp+8h] [ebp-1Ch]
-    float v5; // [esp+Ch] [ebp-18h]
-    float v6; // [esp+10h] [ebp-14h]
-    float v7; // [esp+14h] [ebp-10h]
-    float v9; // [esp+20h] [ebp-4h]
-    float v10; // [esp+2Ch] [ebp+8h]
+    flex_t v2; // [esp+0h] [ebp-24h]
+    flex_t v3; // [esp+4h] [ebp-20h]
+    flex_t v4; // [esp+8h] [ebp-1Ch]
+    flex_t v5; // [esp+Ch] [ebp-18h]
+    flex_t v6; // [esp+10h] [ebp-14h]
+    flex_t v7; // [esp+14h] [ebp-10h]
+    flex_t v9; // [esp+20h] [ebp-4h]
+    flex_t v10; // [esp+2Ch] [ebp+8h]
 
 
     if ( a1 >= 0.0 )
@@ -691,15 +691,15 @@ float stdMath_ArcSin3(float a1)
         return v9;
 }
 
-float stdMath_ArcTan1(float a1, float a2)
+flex_t stdMath_ArcTan1(flex_t a1, flex_t a2)
 {
     double v3; // st7
-    float v4; // [esp+0h] [ebp-24h]
-    float v5; // [esp+4h] [ebp-20h]
-    float v6; // [esp+Ch] [ebp-18h]
-    float v7; // [esp+1Ch] [ebp-8h]
-    float v8; // [esp+1Ch] [ebp-8h]
-    float v9; // [esp+20h] [ebp-4h]
+    flex_t v4; // [esp+0h] [ebp-24h]
+    flex_t v5; // [esp+4h] [ebp-20h]
+    flex_t v6; // [esp+Ch] [ebp-18h]
+    flex_t v7; // [esp+1Ch] [ebp-8h]
+    flex_t v8; // [esp+1Ch] [ebp-8h]
+    flex_t v9; // [esp+20h] [ebp-4h]
 
     if ( a2 == 0.0 && a1 == 0.0 )
         return 0.0;
@@ -731,16 +731,16 @@ float stdMath_ArcTan1(float a1, float a2)
     return v8;
 }
 
-float stdMath_ArcTan2(float a1, float a2)
+flex_t stdMath_ArcTan2(flex_t a1, flex_t a2)
 {
     double v3; // st7
-    float v4; // [esp+0h] [ebp-28h]
-    float v5; // [esp+4h] [ebp-24h]
-    float v6; // [esp+8h] [ebp-20h]
-    float v7; // [esp+10h] [ebp-18h]
-    float v8; // [esp+20h] [ebp-8h]
-    float v9; // [esp+20h] [ebp-8h]
-    float v10; // [esp+24h] [ebp-4h]
+    flex_t v4; // [esp+0h] [ebp-28h]
+    flex_t v5; // [esp+4h] [ebp-24h]
+    flex_t v6; // [esp+8h] [ebp-20h]
+    flex_t v7; // [esp+10h] [ebp-18h]
+    flex_t v8; // [esp+20h] [ebp-8h]
+    flex_t v9; // [esp+20h] [ebp-8h]
+    flex_t v10; // [esp+24h] [ebp-4h]
 
     if ( a2 == 0.0 && a1 == 0.0 )
         return 0.0;
@@ -773,17 +773,17 @@ float stdMath_ArcTan2(float a1, float a2)
     return v9;
 }
 
-float stdMath_ArcTan3(float a1, float a2)
+flex_t stdMath_ArcTan3(flex_t a1, flex_t a2)
 {
     double v3; // st7
-    float v4; // [esp+0h] [ebp-2Ch]
-    float v5; // [esp+4h] [ebp-28h]
-    float v6; // [esp+8h] [ebp-24h]
-    float v7; // [esp+Ch] [ebp-20h]
-    float v8; // [esp+14h] [ebp-18h]
-    float v9; // [esp+24h] [ebp-8h]
-    float v10; // [esp+24h] [ebp-8h]
-    float v11; // [esp+28h] [ebp-4h]
+    flex_t v4; // [esp+0h] [ebp-2Ch]
+    flex_t v5; // [esp+4h] [ebp-28h]
+    flex_t v6; // [esp+8h] [ebp-24h]
+    flex_t v7; // [esp+Ch] [ebp-20h]
+    flex_t v8; // [esp+14h] [ebp-18h]
+    flex_t v9; // [esp+24h] [ebp-8h]
+    flex_t v10; // [esp+24h] [ebp-8h]
+    flex_t v11; // [esp+28h] [ebp-4h]
 
     if ( a2 == 0.0 && a1 == 0.0 )
         return 0.0;
@@ -817,18 +817,18 @@ float stdMath_ArcTan3(float a1, float a2)
     return v10;
 }
 
-float stdMath_ArcTan4(float a1, float a2)
+flex_t stdMath_ArcTan4(flex_t a1, flex_t a2)
 {
     double v3; // st7
-    float v4; // [esp+0h] [ebp-30h]
-    float v5; // [esp+4h] [ebp-2Ch]
-    float v6; // [esp+8h] [ebp-28h]
-    float v7; // [esp+Ch] [ebp-24h]
-    float v8; // [esp+10h] [ebp-20h]
-    float v9; // [esp+18h] [ebp-18h]
-    float v10; // [esp+28h] [ebp-8h]
-    float v11; // [esp+28h] [ebp-8h]
-    float v12; // [esp+2Ch] [ebp-4h]
+    flex_t v4; // [esp+0h] [ebp-30h]
+    flex_t v5; // [esp+4h] [ebp-2Ch]
+    flex_t v6; // [esp+8h] [ebp-28h]
+    flex_t v7; // [esp+Ch] [ebp-24h]
+    flex_t v8; // [esp+10h] [ebp-20h]
+    flex_t v9; // [esp+18h] [ebp-18h]
+    flex_t v10; // [esp+28h] [ebp-8h]
+    flex_t v11; // [esp+28h] [ebp-8h]
+    flex_t v12; // [esp+2Ch] [ebp-4h]
 
     if ( a2 == 0.0 && a1 == 0.0 )
         return 0.0;
@@ -890,14 +890,14 @@ int32_t stdMath_FloorDivMod(int32_t in1, int32_t in2, int32_t *out1, int32_t *ou
     return result;
 }
 
-float stdMath_ClipPrecision(float val)
+flex_t stdMath_ClipPrecision(flex_t val)
 {
     if (fabs(val) <= 0.00001)
         return 0.0;
     return val;
 }
 
-float stdMath_Clamp(float val, float valMin, float valMax)
+flex_t stdMath_Clamp(flex_t val, flex_t valMin, flex_t valMax)
 {
     if (val < valMin)
         return valMin;
@@ -908,7 +908,7 @@ float stdMath_Clamp(float val, float valMin, float valMax)
     return val;
 }
 
-float stdMath_ClampValue(float val, float valAbsMax)
+flex_t stdMath_ClampValue(flex_t val, flex_t valAbsMax)
 {
     valAbsMax = fabs(valAbsMax);
     

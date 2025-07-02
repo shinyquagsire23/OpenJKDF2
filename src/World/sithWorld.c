@@ -117,7 +117,7 @@ void sithWorld_SetLoadPercentCallback(sithWorldProgressCallback_t func)
     sithWorld_LoadPercentCallback = func;
 }
 
-void sithWorld_UpdateLoadPercent(float percent)
+void sithWorld_UpdateLoadPercent(flex_t percent)
 {
     if ( sithWorld_LoadPercentCallback )
         sithWorld_LoadPercentCallback(percent);
@@ -241,7 +241,7 @@ int sithWorld_NewEntry(sithWorld *pWorld)
     sithSector *v2; // ebx
     int v3; // eax
     rdVector3 *v4; // eax
-    float *v5; // edi
+    flex_t *v5; // edi
     int *v6; // edi
     int *v7; // edi
     sithSector **v8; // edx
@@ -264,11 +264,11 @@ int sithWorld_NewEntry(sithWorld *pWorld)
             if ( !v4 )
                 return 0;
 
-            v5 = (float *)pSithHS->alloc(sizeof(float) * pWorld->numVertices);
+            v5 = (flex_t *)pSithHS->alloc(sizeof(flex_t) * pWorld->numVertices);
             pWorld->verticesDynamicLight = v5;
             if ( !v5 )
                 return 0;
-            _memset(v5, 0, sizeof(float) * pWorld->numVertices);
+            _memset(v5, 0, sizeof(flex_t) * pWorld->numVertices);
 
             v6 = (int *)pSithHS->alloc(sizeof(int) * pWorld->numVertices);
             pWorld->alloc_unk98 = v6;
@@ -646,11 +646,11 @@ int sithWorld_LoadGeoresource(sithWorld *pWorld, int a2)
     unsigned int num_vertices_uvs; // [esp+10h] [ebp-A0h] BYREF
     unsigned int numColormaps; // [esp+14h] [ebp-9Ch] BYREF
     int v_idx; // [esp+18h] [ebp-98h] BYREF
-    float v_x; // [esp+1Ch] [ebp-94h] BYREF
-    float v21; // [esp+20h] [ebp-90h] BYREF
-    float v_y; // [esp+24h] [ebp-8Ch] BYREF
-    float v23; // [esp+28h] [ebp-88h] BYREF
-    float v_z; // [esp+2Ch] [ebp-84h] BYREF
+    flex_t v_x; // [esp+1Ch] [ebp-94h] BYREF
+    flex_t v21; // [esp+20h] [ebp-90h] BYREF
+    flex_t v_y; // [esp+24h] [ebp-8Ch] BYREF
+    flex_t v23; // [esp+28h] [ebp-88h] BYREF
+    flex_t v_z; // [esp+2Ch] [ebp-84h] BYREF
     char colormap_fname[128]; // [esp+30h] [ebp-80h] BYREF
 
     if ( a2 )

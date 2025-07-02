@@ -841,20 +841,20 @@ void sithCog_SendMessageFromThing(sithThing *a1, sithThing *a2, int msg)
     sithCog_SendMessageFromThingEx(a1, a2, msg, 0.0, 0.0, 0.0, 0.0);
 }
 
-float sithCog_SendMessageFromThingEx(sithThing *sender, sithThing *receiver, SITH_MESSAGE message, float param0, float param1, float param2, float param3)
+flex_t sithCog_SendMessageFromThingEx(sithThing *sender, sithThing *receiver, SITH_MESSAGE message, flex_t param0, flex_t param1, flex_t param2, flex_t param3)
 {
     //return _sithCog_SendMessageFromThingEx(sender, receiver, message, param0, param1, param2, param3);
     int v7; // ebx
     int v8; // ebp
     sithCog *v9; // eax
-    float v10; // st7
-    float v11; // st7
+    flex_t v10; // st7
+    flex_t v11; // st7
     sithCog *v12; // eax
-    float v13; // st7
-    float v14; // st7
-    float v16; // st7
-    float v17; // st7
-    float v19; // [esp+10h] [ebp-8h]
+    flex_t v13; // st7
+    flex_t v14; // st7
+    flex_t v16; // st7
+    flex_t v17; // st7
+    flex_t v19; // [esp+10h] [ebp-8h]
     int receivera; // [esp+20h] [ebp+8h]
 
     v19 = 0.0;
@@ -980,13 +980,13 @@ void sithCog_SendMessageFromSurface(sithSurface *surface, sithThing *thing, int 
     sithCog_SendMessageFromSurfaceEx(surface, thing, msg, 0.0, 0.0, 0.0, 0.0);
 }
 
-double sithCog_SendMessageFromSurfaceEx(sithSurface *sender, sithThing *thing, SITH_MESSAGE msg, float a4, float a5, float a6, float a7)
+double sithCog_SendMessageFromSurfaceEx(sithSurface *sender, sithThing *thing, SITH_MESSAGE msg, flex_t a4, flex_t a5, flex_t a6, flex_t a7)
 {
     int v8; // ebp
-    float v9; // ebx
+    flex_t v9; // ebx
     double v11; // st7
     double v12; // st7
-    float v14; // [esp+10h] [ebp-Ch]
+    flex_t v14; // [esp+10h] [ebp-Ch]
     int v15; // [esp+14h] [ebp-8h]
     int sourceType; // [esp+24h] [ebp+8h]
 
@@ -1054,12 +1054,12 @@ void sithCog_SendMessageFromSector(sithSector *sector, sithThing *thing, int mes
     sithCog_SendMessageFromSectorEx(sector, thing, message, 0.0, 0.0, 0.0, 0.0);
 }
 
-float sithCog_SendMessageFromSectorEx(sithSector *a1, sithThing *sourceType, SITH_MESSAGE message, float param0, float param1, float param2, float param3)
+flex_t sithCog_SendMessageFromSectorEx(sithSector *a1, sithThing *sourceType, SITH_MESSAGE message, flex_t param0, flex_t param1, flex_t param2, flex_t param3)
 {
     int v8; // ebp
     double v11; // st7
     double v12; // st7
-    float v13; // [esp+10h] [ebp-Ch]
+    flex_t v13; // [esp+10h] [ebp-Ch]
     int v14; // [esp+14h] [ebp-8h]
     int sourceTypea; // [esp+24h] [ebp+8h]
 
@@ -1125,7 +1125,7 @@ void sithCog_SendSimpleMessageToAll(int a1, int a2, int a3, int a4, int a5)
     sithCog_SendMessageToAll(a1, a2, a3, a4, a5, 0.0, 0.0, 0.0, 0.0);
 }
 
-void sithCog_SendMessageToAll(int cmdid, int senderType, int senderIdx, int sourceType, int sourceIdx, float arg0, float arg1, float arg2, float arg3)
+void sithCog_SendMessageToAll(int cmdid, int senderType, int senderIdx, int sourceType, int sourceIdx, flex_t arg0, flex_t arg1, flex_t arg2, flex_t arg3)
 {
     sithCog *v9; // esi
     unsigned int i; // edi
@@ -1259,7 +1259,7 @@ execute:
     }
 }
 
-float sithCog_SendMessageEx(sithCog *cog, int message, int senderType, int senderIndex, int sourceType, int sourceIndex, int linkId, float param0, float param1, float param2, float param3)
+flex_t sithCog_SendMessageEx(sithCog *cog, int message, int senderType, int senderIndex, int sourceType, int sourceIndex, int linkId, flex_t param0, flex_t param1, flex_t param2, flex_t param3)
 {
     double result; // st7
     sithCogScript *v12; // ebp

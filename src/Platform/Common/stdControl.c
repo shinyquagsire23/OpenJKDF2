@@ -304,9 +304,9 @@ int stdControl_EnableAxis(unsigned int idx)
 
 // readcontrols
 
-float stdControl_ReadAxis(int axisNum)
+flex_t stdControl_ReadAxis(int axisNum)
 {
-    float result; // st7
+    flex_t result; // st7
     int v2; // ecx
     int v3; // edx
     int v4; // eax
@@ -373,10 +373,10 @@ int stdControl_ReadAxisRaw(int axisNum)
     return result;
 }
 
-float stdControl_ReadKeyAsAxis(int keyNum)
+flex_t stdControl_ReadKeyAsAxis(int keyNum)
 {
     uint32_t v1; // eax
-    float result; // st7
+    flex_t result; // st7
 
     if ( !stdControl_bControlsActive || stdControl_bDisableKeyboard )
         return 0.0;
@@ -448,7 +448,7 @@ int stdControl_MessageHandler(HWND hWnd, UINT Msg, WPARAM wParam, HWND lParam, L
     return wParam == 0xF100 || wParam == 0xF140;
 }
 
-void stdControl_SetMouseSensitivity(float xSensitivity, float ySensitivity)
+void stdControl_SetMouseSensitivity(flex_t xSensitivity, flex_t ySensitivity)
 {
     stdControl_mouseXSensitivity = xSensitivity;
     stdControl_mouseYSensitivity = ySensitivity;
@@ -513,7 +513,7 @@ void stdControl_SetKeydown(int keyNum, int bDown, uint32_t readTime)
 
 // readmouse
 
-void stdControl_InitAxis(int index, int stickMin, int stickMax, float multiplier)
+void stdControl_InitAxis(int index, int stickMin, int stickMax, flex_t multiplier)
 {
     int v4; // eax
     int v5; // esi

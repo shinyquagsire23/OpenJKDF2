@@ -54,7 +54,7 @@ void sithWeapon_Startup()
     sithWeapon_InitDefaults();
 }
 
-void sithWeapon_Tick(sithThing* weapon, float deltaSeconds)
+void sithWeapon_Tick(sithThing* weapon, flex_t deltaSeconds)
 {
     sithWeaponFlags_t typeFlags = weapon->weaponParams.typeflags;
     if (typeFlags & SITH_WF_INSTANT_IMPACT) // shooting walls?
@@ -70,7 +70,7 @@ void sithWeapon_Tick(sithThing* weapon, float deltaSeconds)
         if (typeFlags & SITH_WF_DAMAGE_DECAY 
             && weapon->weaponParams.damage > (double)weapon->weaponParams.mindDamage)
         {
-            float v3 = weapon->weaponParams.damage - weapon->weaponParams.rate * deltaSeconds;
+            flex_t v3 = weapon->weaponParams.damage - weapon->weaponParams.rate * deltaSeconds;
             weapon->weaponParams.damage = v3;
             // no idea if this is even correct but it makes sense?
             // c0 | c3, https://c9x.me/x86/html/file_module_x86_id_87.html
@@ -86,7 +86,7 @@ void sithWeapon_Tick(sithThing* weapon, float deltaSeconds)
 // MOTS altered: don't affect cog things?
 void sithWeapon_sub_4D35E0(sithThing *weapon)
 {
-    float damage; // ecx
+    flex_t damage; // ecx
     rdVector3 *weaponPos; // edx
     sithSector *sector; // ebx
     sithCollisionSearchEntry *searchRes; // edi
@@ -94,12 +94,12 @@ void sithWeapon_sub_4D35E0(sithThing *weapon)
     sithThing *explodeTemplate; // eax
     sithThing *trailThing; // eax
     double v19; // st7
-    float moveSize; // [esp-8h] [ebp-40h]
-    float damage_; // [esp+10h] [ebp-28h]
+    flex_t moveSize; // [esp-8h] [ebp-40h]
+    flex_t damage_; // [esp+10h] [ebp-28h]
     rdVector3 weaponPos_; // [esp+14h] [ebp-24h] BYREF
     rdVector3 tmp; // [esp+20h] [ebp-18h] BYREF
     rdVector3 tmp2; // [esp+2Ch] [ebp-Ch] BYREF
-    float elementSize; // [esp+3Ch] [ebp+4h]
+    flex_t elementSize; // [esp+3Ch] [ebp+4h]
 
     damage = weapon->weaponParams.damage;
     weaponPos = &weapon->lookOrientation.lvec;
@@ -186,8 +186,8 @@ LABEL_20:
 
 void sithWeapon_sub_4D3920(sithThing *weapon)
 {
-    float elementSize; // eax
-    float elementSize__; // edx
+    flex_t elementSize; // eax
+    flex_t elementSize__; // edx
     sithCollisionSearchEntry *searchRes; // ebp
     double v5; // st6
     double v6; // st5
@@ -223,16 +223,16 @@ void sithWeapon_sub_4D3920(sithThing *weapon)
     double v43; // st6
     double v44; // st7
     sithSector *sectorLook_; // eax
-    float range; // [esp-Ch] [ebp-CCh]
-    float moveSize; // [esp-8h] [ebp-C8h]
-    float elementSize_; // [esp+14h] [ebp-ACh]
-    float v49; // [esp+14h] [ebp-ACh]
-    float v50; // [esp+18h] [ebp-A8h]
-    float v51; // [esp+18h] [ebp-A8h]
+    flex_t range; // [esp-Ch] [ebp-CCh]
+    flex_t moveSize; // [esp-8h] [ebp-C8h]
+    flex_t elementSize_; // [esp+14h] [ebp-ACh]
+    flex_t v49; // [esp+14h] [ebp-ACh]
+    flex_t v50; // [esp+18h] [ebp-A8h]
+    flex_t v51; // [esp+18h] [ebp-A8h]
     rdVector3 lookOrient; // [esp+1Ch] [ebp-A4h] BYREF
     rdVector3 weaponPos; // [esp+28h] [ebp-98h] BYREF
     rdVector3 a1a; // [esp+34h] [ebp-8Ch] BYREF
-    float amount; // [esp+40h] [ebp-80h]
+    flex_t amount; // [esp+40h] [ebp-80h]
     rdVector3 vertex_out; // [esp+44h] [ebp-7Ch] BYREF
     sithSector *sector; // [esp+50h] [ebp-70h]
     rdVector3 a3; // [esp+54h] [ebp-6Ch] BYREF
@@ -472,7 +472,7 @@ int sithWeapon_LoadParams(stdConffileArg *arg, sithThing *thing, int param)
 }
 
 // Mots added: unused
-sithThing* sithWeapon_FireMots(sithThing *weapon, sithThing *projectile, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, int anim, float scale, int16_t scaleFlags, float a9, int extra)
+sithThing* sithWeapon_FireMots(sithThing *weapon, sithThing *projectile, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, int anim, flex_t scale, int16_t scaleFlags, flex_t a9, int extra)
 {
     sithThing *spawned; // esi
 
@@ -487,7 +487,7 @@ sithThing* sithWeapon_FireMots(sithThing *weapon, sithThing *projectile, rdVecto
     return spawned;
 }
 
-sithThing* sithWeapon_Fire(sithThing *weapon, sithThing *projectile, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, int anim, float scale, int16_t scaleFlags, float a9)
+sithThing* sithWeapon_Fire(sithThing *weapon, sithThing *projectile, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, int anim, flex_t scale, int16_t scaleFlags, flex_t a9)
 {
     sithThing *spawned; // esi
 
@@ -502,7 +502,7 @@ sithThing* sithWeapon_Fire(sithThing *weapon, sithThing *projectile, rdVector3 *
     return spawned;
 }
 
-sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileTemplate, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, int anim, float scale, char scaleFlags, float a9, int extra)
+sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileTemplate, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, int anim, flex_t scale, char scaleFlags, flex_t a9, int extra)
 {
     sithThing *v9; // esi
     double v17; // st7
@@ -512,9 +512,9 @@ sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileT
     rdVector3 a1; // [esp+10h] [ebp-48h] BYREF
     rdVector3 a5a; // [esp+1Ch] [ebp-3Ch] BYREF
     rdMatrix34 a3a; // [esp+28h] [ebp-30h] BYREF
-    float a6a; // [esp+74h] [ebp+1Ch]
-    float a6c; // [esp+74h] [ebp+1Ch]
-    float a6; // [esp+74h] [ebp+1Ch]
+    flex_t a6a; // [esp+74h] [ebp+1Ch]
+    flex_t a6c; // [esp+74h] [ebp+1Ch]
+    flex_t a6; // [esp+74h] [ebp+1Ch]
 
     //return sithWeapon_FireProjectile_0_(sender, projectileTemplate, fireOffset, aimError, fireSound, anim, scale, scaleFlags, a9);
 
@@ -526,7 +526,7 @@ sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileT
     {
         rdMatrix_BuildFromLook34(&a3a, fireOffset);
 
-        float fVar3, fVar2;
+        flex_t fVar3, fVar2;
         if (Main_bMotsCompat) {
             fVar3 = projectileTemplate->physicsParams.vel.z;
             fVar2 = stdMath_ArcTan1(projectileTemplate->physicsParams.vel.y,fVar3);
@@ -548,9 +548,9 @@ sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileT
             return 0;
 
         if (Main_bMotsCompat) {
-            a5a.x = (float)extra;
+            a5a.x = (flex_t)extra; // FLEXTODO
             a5a.y = 0.0;
-            v9->userdata = (float)extra;
+            v9->userdata = (flex_t)extra; // FLEXTODO
         }
 
         if ((scaleFlags & 1) && v9->moveType == SITH_MT_PHYSICS) // Added: physics check
@@ -584,7 +584,7 @@ sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileT
         if ( !sithNet_isMulti && jkPlayer_setDiff && sender == sithPlayer_pLocalPlayerThing && (v9->weaponParams.typeflags & SITH_WF_TRIGGER_AIEVENT) != 0 )
         {
             v18 = rdVector_Normalize3(&a5a, &v9->physicsParams.vel) * 3.0;
-            a6 = v18 >= 5.0 ? 5.0 : (float)v18;
+            a6 = v18 >= 5.0 ? 5.0 : (flex_t)v18; // FLEXTODO
             sithCollision_SearchRadiusForThings(v9->sector, v9, &v9->position, &a5a, a6, 0.0, RAYCAST_2);
             v19 = sithCollision_NextSearchResult();
             sithCollision_SearchClose();
@@ -612,7 +612,7 @@ LABEL_31:
     return v9;
 }
 
-void sithWeapon_SetTimeLeft(sithThing *weapon, sithThing* a2, float timeLeft)
+void sithWeapon_SetTimeLeft(sithThing *weapon, sithThing* a2, flex_t timeLeft)
 {
     unsigned int v3; // eax
     
@@ -961,12 +961,12 @@ int sithWeapon_SelectWeapon(sithThing *player, int binIdx, int a3)
     return 1;
 }
 
-void sithWeapon_SetMountWait(sithThing *a1, float mountWait)
+void sithWeapon_SetMountWait(sithThing *a1, flex_t mountWait)
 {
     sithWeapon_mountWait = mountWait + sithTime_curSeconds;
 }
 
-void sithWeapon_SetFireWait(sithThing *weapon, float firewait)
+void sithWeapon_SetFireWait(sithThing *weapon, flex_t firewait)
 {
     if ( firewait == -1.0 )
     {
@@ -1030,7 +1030,7 @@ void sithWeapon_handle_inv_msgs(sithThing *player)
     }
 }
 
-void sithWeapon_Activate(sithThing *weapon, sithCog *cogCtx, float fireRate, int mode)
+void sithWeapon_Activate(sithThing *weapon, sithCog *cogCtx, flex_t fireRate, int mode)
 {
     sithWeapon_fireRate = fireRate;
     sithWeapon_CurWeaponMode = mode;
@@ -1047,10 +1047,10 @@ void sithWeapon_Activate(sithThing *weapon, sithCog *cogCtx, float fireRate, int
     }
 }
 
-float sithWeapon_Deactivate(sithThing *weapon, sithCog *cogCtx, int mode)
+flex_t sithWeapon_Deactivate(sithThing *weapon, sithCog *cogCtx, int mode)
 {
     int v3; // edx
-    float result; // st7
+    flex_t result; // st7
 
     // Added: bounds check
     if (mode < 0 || mode >= 2)
@@ -1081,7 +1081,7 @@ float sithWeapon_Deactivate(sithThing *weapon, sithCog *cogCtx, int mode)
 int sithWeapon_AutoSelect(sithThing *player, int weapIdx)
 {
     int v7; // [esp+10h] [ebp-4h]
-    float a1a; // [esp+18h] [ebp+4h]
+    flex_t a1a; // [esp+18h] [ebp+4h]
 
     sithInventory_GetCurWeapon(player);
     v7 = -1;
@@ -1093,7 +1093,7 @@ int sithWeapon_AutoSelect(sithThing *player, int weapIdx)
         {
             if (desc->cog)
             {
-                float v5 = sithCog_SendMessageEx(desc->cog, SITH_MESSAGE_AUTOSELECT, SENDERTYPE_SYSTEM, weapIdx, SENDERTYPE_THING, player->thingIdx, 0, 0.0, 0.0, 0.0, 0.0);
+                flex_t v5 = sithCog_SendMessageEx(desc->cog, SITH_MESSAGE_AUTOSELECT, SENDERTYPE_SYSTEM, weapIdx, SENDERTYPE_THING, player->thingIdx, 0, 0.0, 0.0, 0.0, 0.0);
                 if ( v5 > a1a )
                 {
                     a1a = v5;
@@ -1106,9 +1106,9 @@ int sithWeapon_AutoSelect(sithThing *player, int weapIdx)
 }
 
 // MOTS altered TODO?
-int sithWeapon_HandleWeaponKeys(sithThing *player, float a2)
+int sithWeapon_HandleWeaponKeys(sithThing *player, flex_t a2)
 {
-    float *v3; // edi
+    flex_t *v3; // edi
     int v4; // eax
     sithCog *v5; // eax
     int inputFunc; // edi
@@ -1150,7 +1150,7 @@ int sithWeapon_HandleWeaponKeys(sithThing *player, float a2)
                         break;
                 }
                 else {
-                    float fVar7 = 0.0;
+                    flex_t fVar7 = 0.0;
                     int iVar2 = sithInventory_GetCurWeapon(player);
                     int iVar5 = inputFunc + -0xc;
                     if ((iVar5 % 10 != sithWeapon_mots_5a3258 % 10) && ((iVar5 < 0xb && (sithWeapon_motsAConv[iVar5 % 10] != iVar5)))) {
@@ -1220,7 +1220,7 @@ int sithWeapon_HandleWeaponKeys(sithThing *player, float a2)
                 v22 = v20 - 10;
                 if ( sithControl_ReadFunctionMap(v20, &readInput) )
                 {
-                    if (sithThing_MotsTick(3, 0, (float)v22) && !sithWeapon_a8BD030[v25]) // MOTS added
+                    if (sithThing_MotsTick(3, 0, (flex_t)v22) && !sithWeapon_a8BD030[v25]) // MOTS added // FLEXTODO
                     {
                         sithWeapon_a8BD030[v25] = 1;
                         v23 = v19->cog;
@@ -1272,7 +1272,7 @@ int sithWeapon_HandleWeaponKeys(sithThing *player, float a2)
 }
 
 // MOTS altered ??
-void sithWeapon_ProjectileAutoAim(rdMatrix34 *out, sithThing *sender, rdMatrix34 *in, rdVector3 *fireOffset, float autoaimFov, float autoaimMaxDist)
+void sithWeapon_ProjectileAutoAim(rdMatrix34 *out, sithThing *sender, rdMatrix34 *in, rdVector3 *fireOffset, flex_t autoaimFov, flex_t autoaimMaxDist)
 {
     unsigned int v9; // ebp
     unsigned int v10; // ebx
@@ -1283,7 +1283,7 @@ void sithWeapon_ProjectileAutoAim(rdMatrix34 *out, sithThing *sender, rdMatrix34
     rdVector3 v16; // [esp+0h] [ebp-58h] BYREF
     rdVector3 v17; // [esp+Ch] [ebp-4Ch] BYREF
     sithThing *thingList[16]; // [esp+18h] [ebp-40h] BYREF
-    float a3a; // [esp+6Ch] [ebp+14h]
+    flex_t a3a; // [esp+6Ch] [ebp+14h]
     int a4a; // [esp+70h] [ebp+18h]
 
     if ( autoaimFov == 0.0 && autoaimMaxDist == 0.0 )
@@ -1350,21 +1350,21 @@ void sithWeapon_ProjectileAutoAim(rdMatrix34 *out, sithThing *sender, rdMatrix34
 }
 
 // MOTS altered ??
-sithThing* sithWeapon_FireProjectile(sithThing *sender, sithThing *projectileTemplate, sithSound *fireSound, int mode, rdVector3 *fireOffset, rdVector3 *aimError, float scale, int16_t scaleFlags, float autoaimFov, float autoaimMaxDist, int extra)
+sithThing* sithWeapon_FireProjectile(sithThing *sender, sithThing *projectileTemplate, sithSound *fireSound, int mode, rdVector3 *fireOffset, rdVector3 *aimError, flex_t scale, int16_t scaleFlags, flex_t autoaimFov, flex_t autoaimMaxDist, int extra)
 {
     int thingtype; // eax
     double v13; // st7
     double v14; // st6
     double v15; // st7
-    float v16; // esi
+    flex_t v16; // esi
     sithThing *v17; // eax
     sithThing *result; // eax
     rdVector3 v19; // [esp+10h] [ebp-6Ch] BYREF
     rdMatrix34 v20; // [esp+1Ch] [ebp-60h] BYREF
     rdMatrix34 out; // [esp+4Ch] [ebp-30h] BYREF
-    float a1a; // [esp+80h] [ebp+4h]
+    flex_t a1a; // [esp+80h] [ebp+4h]
     sithThing *a1b; // [esp+80h] [ebp+4h]
-    float a5a; // [esp+90h] [ebp+14h]
+    flex_t a5a; // [esp+90h] [ebp+14h]
 
     thingtype = sender->type;
     _memcpy(&out, &sender->lookOrientation, sizeof(out));
@@ -1445,7 +1445,7 @@ LABEL_31:
     return result;
 }
 
-float sithWeapon_GetPriority(sithThing *player, int binIdx, int mode)
+flex_t sithWeapon_GetPriority(sithThing *player, int binIdx, int mode)
 {
     double result; // st7
     sithCog *cog; // eax
@@ -1536,7 +1536,7 @@ void sithWeapon_Syncunused1(sithThing* player)
         int binIdx;
         int iVar2;
         sithItemDescriptor *psVar3;
-        float fVar4;
+        flex_t fVar4;
         
         iVar1 = sithInventory_GetCurWeapon(player);
         iVar1 = sithInventory_SelectWeaponPrior(iVar1);
@@ -1597,7 +1597,7 @@ void sithWeapon_Syncunused2(sithThing* player)
         int binIdx;
         int iVar2;
         sithItemDescriptor *psVar3;
-        float fVar4;
+        flex_t fVar4;
         
         iVar1 = sithInventory_GetCurWeapon(player);
         iVar1 = sithInventory_SelectWeaponPrior(iVar1);
@@ -1649,7 +1649,7 @@ void sithWeapon_Syncunused2(sithThing* player)
     }
 }
 
-void sithWeapon_SetFireRate(sithThing *weapon, float fireRate)
+void sithWeapon_SetFireRate(sithThing *weapon, flex_t fireRate)
 {
     sithWeapon_fireRate = fireRate;
 }

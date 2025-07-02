@@ -65,7 +65,7 @@ void sithCogFunction_GetSourceType(sithCog *ctx)
 
 void sithCogFunction_Rand(sithCog *ctx)
 {
-    float val = _frand();
+    flex_t val = _frand();
     sithCogExec_PushFlex(ctx, val);
 }
 
@@ -1021,11 +1021,11 @@ void sithCogFunction_NewColorEffect(sithCog *ctx)
     int idx; // edi
     signed int filterG; // [esp+10h] [ebp-1Ch]
     signed int filterR; // [esp+14h] [ebp-18h]
-    float tintB; // [esp+18h] [ebp-14h]
-    float tintG; // [esp+1Ch] [ebp-10h]
-    float tintR; // [esp+20h] [ebp-Ch]
+    cog_flex_t tintB; // [esp+18h] [ebp-14h]
+    cog_flex_t tintG; // [esp+1Ch] [ebp-10h]
+    cog_flex_t tintR; // [esp+20h] [ebp-Ch]
     signed int addR; // [esp+24h] [ebp-8h]
-    float fade; // [esp+28h] [ebp-4h]
+    cog_flex_t fade; // [esp+28h] [ebp-4h]
     int filterB; // [esp+30h] [ebp+4h]
 
     fade = sithCogExec_PopFlex(ctx);
@@ -1055,13 +1055,13 @@ void sithCogFunction_NewColorEffect(sithCog *ctx)
 
 void sithCogFunction_ModifyColorEffect(sithCog *ctx)
 {
-    float fade; // ST34_4
+    cog_flex_t fade; // ST34_4
     int addB; // edi
     int addG; // ebx
     int addR; // ebp
-    float tintB; // ST28_4
-    float tintG; // ST2C_4
-    float tintR; // ST30_4
+    cog_flex_t tintB; // ST28_4
+    cog_flex_t tintG; // ST2C_4
+    cog_flex_t tintR; // ST30_4
     signed int filterG; // ST20_4
     signed int filterR; // ST24_4
     int idx; // esi
@@ -1565,8 +1565,8 @@ void sithCogFunction_Wakeup(sithCog *pCtx)
 // MOTS added
 void sithCogFunction_Sin(sithCog *ctx)
 {
-    float outSin;
-    float outCos;
+    cog_flex_t outSin;
+    cog_flex_t outCos;
     
     cog_flex_t angle = sithCogExec_PopFlex(ctx);
     stdMath_SinCos(angle,&outSin,&outCos);
@@ -1576,8 +1576,8 @@ void sithCogFunction_Sin(sithCog *ctx)
 // MOTS added
 void sithCogFunction_Cos(sithCog *ctx)
 {
-    float outSin;
-    float outCos;
+    cog_flex_t outSin;
+    cog_flex_t outCos;
     
     cog_flex_t angle = sithCogExec_PopFlex(ctx);
     stdMath_SinCos(angle,&outSin,&outCos);
@@ -1644,15 +1644,15 @@ void sithCogFunction_GetSysDate(sithCog *ctx)
     SYSTEMTIME local_10;
 
     GetLocalTime(&local_10);
-    local_1c.x = (float)(uint)local_10.wYear;
-    local_1c.y = (float)(uint)local_10.wMonth;
-    local_1c.z = (float)(local_10._6_4_ & 0xffff);
+    local_1c.x = (cog_flex_t)(uint)local_10.wYear;
+    local_1c.y = (cog_flex_t)(uint)local_10.wMonth;
+    local_1c.z = (cog_flex_t)(local_10._6_4_ & 0xffff);
     */
 
     if (tm) {
-        out.x = (float)(tm->tm_year + 1900); // year
-        out.y = (float)(tm->tm_mon + 1); // month
-        out.z = (float)(tm->tm_mday); // day
+        out.x = (cog_flex_t)(tm->tm_year + 1900); // year
+        out.y = (cog_flex_t)(tm->tm_mon + 1); // month
+        out.z = (cog_flex_t)(tm->tm_mday); // day
     }
     else {
         rdVector_Zero3(&out);
@@ -1673,15 +1673,15 @@ void sithCogFunction_GetSysTime(sithCog *ctx)
     /*
     _SYSTEMTIME local_10;
     GetLocalTime(&local_10);
-    out.x = (float)(uint)local_10.wHour;
-    out.y = (float)(uint)local_10.wMinute;
-    out.z = (float)(uint)local_10.wSecond;
+    out.x = (cog_flex_t)(uint)local_10.wHour;
+    out.y = (cog_flex_t)(uint)local_10.wMinute;
+    out.z = (cog_flex_t)(uint)local_10.wSecond;
     */
 
     if (tm) {
-        out.x = (float)(tm->tm_hour);
-        out.y = (float)(tm->tm_min);
-        out.z = (float)(tm->tm_sec);
+        out.x = (cog_flex_t)(tm->tm_hour);
+        out.y = (cog_flex_t)(tm->tm_min);
+        out.z = (cog_flex_t)(tm->tm_sec);
     }
     else {
         rdVector_Zero3(&out);
@@ -1694,9 +1694,9 @@ void sithCogFunction_GetSysTime(sithCog *ctx)
 // MOTS added
 void sithCogFunction_SendMessageExRadius(sithCog *ctx)
 {
-    float fVar1;
-    float fVar2;
-    float fVar3;
+    cog_flex_t fVar1;
+    cog_flex_t fVar2;
+    cog_flex_t fVar3;
     int message;
     uint32_t uVar4;
     int iVar5;

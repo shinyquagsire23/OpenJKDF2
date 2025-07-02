@@ -37,7 +37,7 @@ void sithCogExec_Exec(sithCog *cog_ctx)
     sithCogStackvar val; // [esp+20h] [ebp-80h]
     sithCogStackvar var; // [esp+70h] [ebp-30h]
     sithCogStackvar outVar; // [esp+90h] [ebp-10h]
-    float fTmp;
+    flex_t fTmp;
     int iTmp;
     sithCogStackvar* tmpStackVar;
 
@@ -73,7 +73,7 @@ void sithCogExec_Exec(sithCog *cog_ctx)
             case COG_OPCODE_PUSHFLOAT:
                 iTmp = sithCogExec_PopProgramVal(cog_ctx);
                 val.type = COG_VARTYPE_FLEX;
-                val.dataAsFloat[0] = *(float*)&iTmp;
+                val.dataAsFloat[0] = *(flex_t*)&iTmp;
                 sithCogExec_PushVar(cog_ctx, &val);
                 break;
 
@@ -309,14 +309,14 @@ int sithCogExec_PopValue(sithCog *ctx, sithCogStackvar *stackVar)
     return 1;
 }
 
-float sithCogExec_PopFlex(sithCog *ctx)
+flex_t sithCogExec_PopFlex(sithCog *ctx)
 {
     sithCogStackvar tmp;
     if (!sithCogExec_PopValue(ctx, &tmp))
         return 0.0;
         
     if ( tmp.type == COG_VARTYPE_INT )
-        return (float)tmp.data[0];
+        return (flex_t)tmp.data[0];
     if ( tmp.type == COG_VARTYPE_FLEX )
         return tmp.dataAsFloat[0];
     return 0.0;
@@ -830,7 +830,7 @@ void sithCogExec_PushInt(sithCog *ctx, int val)
     sithCogExec_PushVar(ctx, &v);
 }
 
-void sithCogExec_PushFlex(sithCog *ctx, float val)
+void sithCogExec_PushFlex(sithCog *ctx, flex_t val)
 {
     sithCogStackvar v;
     v.type = COG_VARTYPE_FLEX;
@@ -946,8 +946,8 @@ void sithCogExec_BitOperation(sithCog *cog_ctx, int op)
 // MOTS altered?
 void sithCogExec_MathOperation(sithCog *cog_ctx, int op)
 {
-    float operand_a = sithCogExec_PopFlex(cog_ctx);
-    float operand_b = sithCogExec_PopFlex(cog_ctx);
+    flex_t operand_a = sithCogExec_PopFlex(cog_ctx);
+    flex_t operand_b = sithCogExec_PopFlex(cog_ctx);
     switch ( op )
     {
         case COG_OPCODE_ADD:

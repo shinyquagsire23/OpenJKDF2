@@ -64,7 +64,7 @@ int wuRegistry_SaveInt(LPCSTR lpValueName, int val)
     return 1;
 }
 
-int wuRegistry_SaveFloat(LPCSTR lpValueName, float val)
+int wuRegistry_SaveFloat(LPCSTR lpValueName, flex_t val)
 {
     HKEY v2; // ecx
     HKEY phkResult; // [esp+0h] [ebp-4h] BYREF
@@ -73,7 +73,7 @@ int wuRegistry_SaveFloat(LPCSTR lpValueName, float val)
     phkResult = v2;
     if ( RegOpenKeyExA(wuRegistry_hKey, wuRegistry_lpSubKey, 0, 0xF003Fu, &phkResult) )
         return 0;
-    RegSetValueExA(phkResult, lpValueName, 0, 3u, (const BYTE *)&val, 4u);
+    RegSetValueExA(phkResult, lpValueName, 0, 3u, (const BYTE *)&val, 4u); // FLEXTODO
     RegCloseKey(phkResult);
     return 1;
 }
@@ -97,7 +97,7 @@ int wuRegistry_GetInt(LPCSTR lpValueName, int a2)
     return a2;
 }
 
-float wuRegistry_GetFloat(LPCSTR lpValueName, float v5)
+flex_t wuRegistry_GetFloat(LPCSTR lpValueName, flex_t v5)
 {
     HKEY phkResult; // [esp+0h] [ebp-Ch] BYREF
     DWORD cbData; // [esp+4h] [ebp-8h] BYREF
@@ -109,7 +109,7 @@ float wuRegistry_GetFloat(LPCSTR lpValueName, float v5)
         if ( !RegQueryValueExA(phkResult, lpValueName, 0, (LPDWORD)&lpValueName, Data, &cbData) )
         {
             RegCloseKey(phkResult);
-            return *(float *)Data;
+            return *(flex_t *)Data; // FLEXTODO
         }
         RegCloseKey(phkResult);
     }

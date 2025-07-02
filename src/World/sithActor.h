@@ -19,8 +19,8 @@
 
 void sithActor_SetMaxHeathForDifficulty(sithThing *thing);
 void sithActor_Tick(sithThing *thing, int deltaMs);
-float sithActor_Hit(sithThing *sender, sithThing *receiver, float amount, int flags);
-void sithActor_HurtSound(sithThing *thing, float amount, int hurtType);
+flex_t sithActor_Hit(sithThing *sender, sithThing *receiver, flex_t amount, int flags);
+void sithActor_HurtSound(sithThing *thing, flex_t amount, int hurtType);
 void sithActor_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4);
 int sithActor_sub_4ED1D0(sithThing *thing, sithSurface *surface, sithCollisionSearchEntry *searchEnt);
 void sithActor_MoveJointsForEyePYR(sithThing *actor, const rdVector3 *eyePYR);

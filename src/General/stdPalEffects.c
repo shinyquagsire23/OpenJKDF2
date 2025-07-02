@@ -403,7 +403,7 @@ void stdPalEffects_SetFilter(int idx, int r, int g, int b)
     stdPalEffects_aEffects[idx].effect.filter.z = b;
 }
 
-void stdPalEffects_SetTint(int idx, float r, float g, float b)
+void stdPalEffects_SetTint(int idx, flex_t r, flex_t g, flex_t b)
 {
     stdPalEffects_aEffects[idx].effect.tint.x = r;
     stdPalEffects_aEffects[idx].effect.tint.y = g;
@@ -417,14 +417,14 @@ void stdPalEffects_SetAdd(int idx, int r, int g, int b)
     stdPalEffects_aEffects[idx].effect.add.z = b;
 }
 
-void stdPalEffects_SetFade(int idx, float fade)
+void stdPalEffects_SetFade(int idx, flex_t fade)
 {
     stdPalEffects_aEffects[idx].effect.fade = fade;
 }
 
 // ApplyFilter
 
-void stdPalEffects_ApplyTint(rdColor24 *aPalette, float tintR, float tintG, float tintB)
+void stdPalEffects_ApplyTint(rdColor24 *aPalette, flex_t tintR, flex_t tintG, flex_t tintB)
 {
     double v4; // st7
     double v5; // st5
@@ -440,8 +440,8 @@ void stdPalEffects_ApplyTint(rdColor24 *aPalette, float tintR, float tintG, floa
     int v16; // eax
     signed int v17; // eax
     signed int v18; // eax
-    float aPalettea; // [esp+4h] [ebp+4h]
-    float aPaletteb; // [esp+4h] [ebp+4h]
+    flex_t aPalettea; // [esp+4h] [ebp+4h]
+    flex_t aPaletteb; // [esp+4h] [ebp+4h]
 
     v4 = tintR * 0.5;
     v5 = tintB * 0.5;
@@ -458,7 +458,7 @@ void stdPalEffects_ApplyTint(rdColor24 *aPalette, float tintR, float tintG, floa
     v15 = tintG - v9;
     do
     {
-        v16 = (uint8_t)*(v12 - 2) + (unsigned int)(__int64)((double)(uint8_t)*(v12 - 2) * v11 - -0.5);
+        v16 = (uint8_t)*(v12 - 2) + (unsigned int)(__int64)((double)(uint8_t)*(v12 - 2) * v11 - -0.5); // FLEXTODO
         if ( v16 < 0 )
         {
             v16 = 0;
@@ -468,7 +468,7 @@ void stdPalEffects_ApplyTint(rdColor24 *aPalette, float tintR, float tintG, floa
             v16 = 0xFF;
         }
         *(v12 - 2) = v16;
-        v17 = (uint8_t)*(v12 - 1) + (unsigned int)(__int64)((double)(uint8_t)*(v12 - 1) * v15 - -0.5);
+        v17 = (uint8_t)*(v12 - 1) + (unsigned int)(__int64)((double)(uint8_t)*(v12 - 1) * v15 - -0.5); // FLEXTODO
         if ( v17 < 0 )
         {
             v17 = 0;

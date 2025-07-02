@@ -70,7 +70,7 @@ void sithItem_Take(sithThing *item, sithThing *actor, int a3)
                 item->thingflags &= ~SITH_TF_10;
                 item->thingflags |= SITH_TF_DISABLED;
             }
-            float val = item->itemParams.respawn;
+            flex_t val = item->itemParams.respawn;
             if (item->itemParams.respawnFactor != 1.0 && sithNet_isMulti) {
                 for (int i = 0; i < jkPlayer_maxPlayers; i++) {
                     if ((jkPlayer_playerInfos[i].flags & 1) && (i != playerThingIdx)) {

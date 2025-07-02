@@ -69,8 +69,8 @@ int sithMaterial_Load(sithWorld *world, int a2)
     double v8; // st7
     char *v9; // ecx
     char *a1; // [esp+0h] [ebp-24h]
-    float a1a; // [esp+0h] [ebp-24h]
-    float v12; // [esp+14h] [ebp-10h]
+    flex_t a1a; // [esp+0h] [ebp-24h]
+    flex_t v12; // [esp+14h] [ebp-10h]
 
     v2 = 0;
     if ( a2 && a2 != 3 )

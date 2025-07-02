@@ -20,9 +20,9 @@
 LSTATUS wuRegistry_Startup(HKEY hKey, LPCSTR lpSubKey, BYTE *lpData);
 void wuRegistry_Shutdown();
 int wuRegistry_SaveInt(LPCSTR lpValueName, int val);
-int wuRegistry_SaveFloat(LPCSTR lpValueName, float val);
+int wuRegistry_SaveFloat(LPCSTR lpValueName, flex_t val);
 int wuRegistry_GetInt(LPCSTR lpValueName, int a2);
-float wuRegistry_GetFloat(LPCSTR lpValueName, float v5);
+flex_t wuRegistry_GetFloat(LPCSTR lpValueName, flex_t v5);
 int wuRegistry_SaveBool(LPCSTR lpValueName, int bDefault);
 int wuRegistry_GetBool(LPCSTR lpValueName, int a2);
 int wuRegistry_SaveBytes(LPCSTR lpValueName, BYTE *lpData, DWORD cbData);
@@ -33,10 +33,10 @@ int wuRegistry_GetString(LPCSTR lpValueName, char* lpData, int outSize, const ch
 int wuRegistry_SetWString(LPCSTR lpValueName, const wchar_t *lpData);
 int wuRegistry_GetWString(LPCSTR lpValueName, wchar_t* lpData, int outSize, const wchar_t *outDefault);
 
-//static int (*wuRegistry_SaveFloat)(LPCSTR lpValueName, float val) = (void*)wuRegistry_SaveFloat_ADDR;
+//static int (*wuRegistry_SaveFloat)(LPCSTR lpValueName, flex_t val) = (void*)wuRegistry_SaveFloat_ADDR;
 //static int (*wuRegistry_SaveInt)(LPCSTR lpValueName, int val) = (void*)wuRegistry_SaveInt_ADDR;
 //static int (*wuRegistry_SaveBool)(LPCSTR lpValueName, HKEY phkResult) = (void*)wuRegistry_SaveBool_ADDR;
-//static float (*wuRegistry_GetFloat)(LPCSTR lpValueName, float v5) = (void*)wuRegistry_GetFloat_ADDR;
+//static flex_t (*wuRegistry_GetFloat)(LPCSTR lpValueName, flex_t v5) = (void*)wuRegistry_GetFloat_ADDR;
 //static int (*wuRegistry_GetInt)(LPCSTR lpValueName, int a2) = (void*)wuRegistry_GetInt_ADDR;
 //static LSTATUS (*wuRegistry_SetString)(LPCSTR lpValueName, BYTE *lpData) = (void*)wuRegistry_SetString_ADDR;
 //static int (*wuRegistry_GetString)(LPCSTR lpValueName, LPBYTE lpData, int outSize, char *out) = (void*)wuRegistry_GetString_ADDR;

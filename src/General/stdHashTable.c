@@ -339,9 +339,9 @@ void stdHashTable_PrintDiagnostics(stdHashTable *hashtable)
         while ( bucketIdx2 < hashtable->numBuckets );
     }
     std_pHS->debugPrint(" Maximum Lookups = %d\n", maxLookups);
-    std_pHS->debugPrint(" Filled Indices = %d/%d (%2.2f%%)\n", numFilled, hashtable->numBuckets, (float)numFilled * 100.0 / (float)hashtable->numBuckets);
-    std_pHS->debugPrint(" Average Lookup = %2.2f\n", (float)totalChildren / (float)numFilled);
-    std_pHS->debugPrint(" Weighted Lookup = %2.2f\n", (float)totalChildren / (float)hashtable->numBuckets);
+    std_pHS->debugPrint(" Filled Indices = %d/%d (%2.2f%%)\n", numFilled, hashtable->numBuckets, (flex_t)numFilled * 100.0 / (flex_t)hashtable->numBuckets); // FLEXTODO
+    std_pHS->debugPrint(" Average Lookup = %2.2f\n", (flex_t)totalChildren / (flex_t)numFilled); // FLEXTODO
+    std_pHS->debugPrint(" Weighted Lookup = %2.2f\n", (flex_t)totalChildren / (flex_t)hashtable->numBuckets); // FLEXTODO
     std_pHS->debugPrint("---------------------\n");
 }
 

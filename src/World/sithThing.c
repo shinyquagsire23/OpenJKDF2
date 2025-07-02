@@ -183,7 +183,7 @@ void sithThing_SetHandler(sithThing_handler_t handler)
 }
 
 // MOTS altered?
-void sithThing_TickAll(float deltaSeconds, int deltaMs)
+void sithThing_TickAll(flex_t deltaSeconds, int deltaMs)
 {
     sithThing* pThingIter; // esi
     sithWorld *v6; // edi
@@ -303,13 +303,13 @@ void sithThing_TickAll(float deltaSeconds, int deltaMs)
     }
 }
 
-void sithThing_TickPhysics(sithThing *pThing, float deltaSecs)
+void sithThing_TickPhysics(sithThing *pThing, flex_t deltaSecs)
 {
     int v2; // ebp
     sithSurface *v5; // eax
     rdVector3 v8; // [esp+Ch] [ebp-18h] BYREF
     rdVector3 v1; // [esp+18h] [ebp-Ch] BYREF
-    float arg4a; // [esp+2Ch] [ebp+8h]
+    flex_t arg4a; // [esp+2Ch] [ebp+8h]
 
     v2 = 0;
     if ((pThing->attach_flags & SITH_ATTACH_NO_MOVE))
@@ -434,9 +434,9 @@ void sithThing_Destroy(sithThing* pThing)
         sithCog_SendMessageFromThing(pThing, 0, SITH_MESSAGE_REMOVED);
 }
 
-float sithThing_Damage(sithThing *sender, sithThing *reciever, float amount, int damageClass)
+flex_t sithThing_Damage(sithThing *sender, sithThing *reciever, flex_t amount, int damageClass)
 {
-    float param1; // [esp+0h] [ebp-20h]
+    flex_t param1; // [esp+0h] [ebp-20h]
 
     // Added: noclip
     if (sender == sithPlayer_pLocalPlayerThing && (g_debugmodeFlags & DEBUGFLAG_NOCLIP)) {
@@ -449,7 +449,7 @@ float sithThing_Damage(sithThing *sender, sithThing *reciever, float amount, int
         return 0.0;
     if ( (sender->thingflags & SITH_TF_CAPTURED) != 0 && (sender->thingflags & SITH_TF_INVULN) == 0 )
     {
-        param1 = (float)(unsigned int)damageClass;
+        param1 = (flex_t)(unsigned int)damageClass; // FLEXTODO
         amount = sithCog_SendMessageFromThingEx(sender, reciever, SITH_MESSAGE_DAMAGED, amount, param1, 0.0, 0.0);
     }
     if ( amount > 0.0 )
@@ -1267,7 +1267,7 @@ void sithThing_LandThing(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3 *a4
     int v18; // [esp+10h] [ebp-1Ch]
     rdVector3 a2a; // [esp+14h] [ebp-18h] BYREF
     rdVector3 out; // [esp+20h] [ebp-Ch] BYREF
-    float a1a; // [esp+30h] [ebp+4h]
+    flex_t a1a; // [esp+30h] [ebp+4h]
 
     v18 = 1;
     if ( a1->attach_flags )
@@ -1385,7 +1385,7 @@ int sithThing_DetachThing(sithThing* pThing)
         }
         result = 0;
 
-        _memset(v2, 0, sizeof(uint32_t) + sizeof(rdVector3) + sizeof(sithSurfaceInfo*) + sizeof(float) + sizeof(rdVector3) + sizeof(void*)); // TODO
+        _memset(v2, 0, sizeof(uint32_t) + sizeof(rdVector3) + sizeof(sithSurfaceInfo*) + sizeof(flex_t) + sizeof(rdVector3) + sizeof(void*)); // TODO
         return result;
     }
     v3 = pThing->attachedThing;
@@ -1418,7 +1418,7 @@ LABEL_8:
             result = 0;
             pThing->parentThing = 0;
             pThing->childThing = 0;
-            _memset(v2, 0, sizeof(uint32_t) + sizeof(rdVector3) + sizeof(sithSurfaceInfo*) + sizeof(float) + sizeof(rdVector3) + sizeof(void*));// TODO
+            _memset(v2, 0, sizeof(uint32_t) + sizeof(rdVector3) + sizeof(sithSurfaceInfo*) + sizeof(flex_t) + sizeof(rdVector3) + sizeof(void*));// TODO
             return result;
         }
     }
@@ -1431,7 +1431,7 @@ LABEL_8:
     result = 0;
     pThing->parentThing = 0;
     pThing->childThing = 0;
-    _memset(v2, 0, sizeof(uint32_t) + sizeof(rdVector3) + sizeof(sithSurfaceInfo*) + sizeof(float) + sizeof(rdVector3) + sizeof(void*));// TODO
+    _memset(v2, 0, sizeof(uint32_t) + sizeof(rdVector3) + sizeof(sithSurfaceInfo*) + sizeof(flex_t) + sizeof(rdVector3) + sizeof(void*));// TODO
     return result;
 }
 
@@ -1664,7 +1664,7 @@ int sithThing_LoadThingParam(stdConffileArg *arg, sithThing* pThing, int param)
     sithCog *pCog; // eax
     rdVector3 orientation; // [esp+10h] [ebp-Ch] BYREF
     uint32_t thingFlags;
-    float tmpF;
+    flex_t tmpF;
 
     switch ( param )
     {
@@ -1919,28 +1919,28 @@ uint32_t sithThing_Checksum(sithThing* pThing, unsigned int last_hash)
     if ( pThing->moveType == SITH_MT_PHYSICS )
     {
         hash = util_Weirdchecksum((uint8_t *)&pThing->physicsParams.physflags, sizeof(uint32_t), hash);
-        hash = util_Weirdchecksum((uint8_t *)&pThing->physicsParams.airDrag, sizeof(float), hash);
-        hash = util_Weirdchecksum((uint8_t *)&pThing->physicsParams.surfaceDrag, sizeof(float), hash);
-        hash = util_Weirdchecksum((uint8_t *)&pThing->physicsParams.staticDrag, sizeof(float), hash);
-        hash = util_Weirdchecksum((uint8_t *)&pThing->physicsParams.mass, sizeof(float), hash);
-        hash = util_Weirdchecksum((uint8_t *)&pThing->physicsParams.height, sizeof(float), hash);
+        hash = util_Weirdchecksum((uint8_t *)&pThing->physicsParams.airDrag, sizeof(flex_t), hash);
+        hash = util_Weirdchecksum((uint8_t *)&pThing->physicsParams.surfaceDrag, sizeof(flex_t), hash);
+        hash = util_Weirdchecksum((uint8_t *)&pThing->physicsParams.staticDrag, sizeof(flex_t), hash);
+        hash = util_Weirdchecksum((uint8_t *)&pThing->physicsParams.mass, sizeof(flex_t), hash);
+        hash = util_Weirdchecksum((uint8_t *)&pThing->physicsParams.height, sizeof(flex_t), hash);
     }
     if ( pThing->type == SITH_THING_ACTOR )
     {
         hash = util_Weirdchecksum((uint8_t *)&pThing->actorParams.typeflags, sizeof(uint32_t), hash);
-        hash = util_Weirdchecksum((uint8_t *)&pThing->actorParams.health, sizeof(float), hash);
-        hash = util_Weirdchecksum((uint8_t *)&pThing->actorParams.maxHealth, sizeof(float), hash);
-        hash = util_Weirdchecksum((uint8_t *)&pThing->actorParams.jumpSpeed, sizeof(float), hash);
-        hash = util_Weirdchecksum((uint8_t *)&pThing->actorParams.maxThrust, sizeof(float), hash);
-        hash = util_Weirdchecksum((uint8_t *)&pThing->actorParams.maxRotThrust, sizeof(float), hash);
+        hash = util_Weirdchecksum((uint8_t *)&pThing->actorParams.health, sizeof(flex_t), hash);
+        hash = util_Weirdchecksum((uint8_t *)&pThing->actorParams.maxHealth, sizeof(flex_t), hash);
+        hash = util_Weirdchecksum((uint8_t *)&pThing->actorParams.jumpSpeed, sizeof(flex_t), hash);
+        hash = util_Weirdchecksum((uint8_t *)&pThing->actorParams.maxThrust, sizeof(flex_t), hash);
+        hash = util_Weirdchecksum((uint8_t *)&pThing->actorParams.maxRotThrust, sizeof(flex_t), hash);
     }
     else if ( pThing->type == SITH_THING_WEAPON )
     {
         hash = util_Weirdchecksum((uint8_t *)&pThing->weaponParams.typeflags, sizeof(uint32_t), hash);
-        hash = util_Weirdchecksum((uint8_t *)&pThing->weaponParams.damage, sizeof(float), hash);
+        hash = util_Weirdchecksum((uint8_t *)&pThing->weaponParams.damage, sizeof(flex_t), hash);
         hash = util_Weirdchecksum((uint8_t *)&pThing->weaponParams.unk8, sizeof(uint32_t), hash); // ???
-        hash = util_Weirdchecksum((uint8_t *)&pThing->weaponParams.mindDamage, sizeof(float), hash);
-        hash = util_Weirdchecksum((uint8_t *)&pThing->weaponParams.range, sizeof(float), hash);
+        hash = util_Weirdchecksum((uint8_t *)&pThing->weaponParams.mindDamage, sizeof(flex_t), hash);
+        hash = util_Weirdchecksum((uint8_t *)&pThing->weaponParams.range, sizeof(flex_t), hash);
     }
     return hash;
 }
@@ -2055,13 +2055,13 @@ int sithThing_Release(sithThing *pThing)
 }
 
 // MOTS added
-int sithThing_MotsTick(int param_1,int param_2,float param_3)
+int sithThing_MotsTick(int param_1,int param_2,flex_t param_3)
 {
     if (!Main_bMotsCompat) return 1;
 
     if (sithCog_pActionCog && (sithCog_actionCogIdk & (1 << (param_1 & 0x1f)))) 
     {
-        float fVar1 = sithCog_SendMessageEx(sithCog_pActionCog,SITH_MESSAGE_PLAYERACTION,0,0,0,0,0,(float)param_1,(float)param_2,param_3,0.0);
+        flex_t fVar1 = sithCog_SendMessageEx(sithCog_pActionCog,SITH_MESSAGE_PLAYERACTION,0,0,0,0,0,(flex_t)param_1,(flex_t)param_2,param_3,0.0); // FLEXTODO
         if (fVar1 == 0.0) {
             return 0;
         }

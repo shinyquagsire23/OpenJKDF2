@@ -21,8 +21,8 @@ void std3D_InitializeViewport(rdRect *viewRect)
     signed int v1; // ebx
     signed int height; // ebp
 
-    float viewXMax_2; // [esp+14h] [ebp+4h]
-    float viewRectYMax; // [esp+14h] [ebp+4h]
+    flex_t viewXMax_2; // [esp+14h] [ebp+4h]
+    flex_t viewRectYMax; // [esp+14h] [ebp+4h]
 
     std3D_rectViewIdk.x = viewRect->x;
     v1 = viewRect->width;
@@ -30,16 +30,16 @@ void std3D_InitializeViewport(rdRect *viewRect)
     std3D_rectViewIdk.width = v1;
     height = viewRect->height;
     memset(std3D_aViewIdk, 0, sizeof(std3D_aViewIdk));
-    std3D_aViewIdk[0] = (float)std3D_rectViewIdk.x;
-    std3D_aViewIdk[1] = (float)std3D_rectViewIdk.y;
+    std3D_aViewIdk[0] = (flex_t)std3D_rectViewIdk.x; // FLEXTODO
+    std3D_aViewIdk[1] = (flex_t)std3D_rectViewIdk.y; // FLEXTODO
     std3D_rectViewIdk.height = height;
     std3D_aViewTris[0].v1 = 0;
     std3D_aViewTris[0].v2 = 1;
-    viewXMax_2 = (float)(v1 + std3D_rectViewIdk.x);
+    viewXMax_2 = (flex_t)(v1 + std3D_rectViewIdk.x); // FLEXTODO
     std3D_aViewIdk[8] = viewXMax_2;
     std3D_aViewIdk[9] = std3D_aViewIdk[1];
     std3D_aViewIdk[16] = viewXMax_2;
-    viewRectYMax = (float)(height + std3D_rectViewIdk.y);
+    viewRectYMax = (flex_t)(height + std3D_rectViewIdk.y); // FLEXTODO
     std3D_aViewTris[0].texture = 0;
     std3D_aViewIdk[17] = viewRectYMax;
     std3D_aViewIdk[25] = viewRectYMax;

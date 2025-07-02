@@ -48,7 +48,7 @@ int sithSprite_Load(sithWorld *world, int a2)
     
     sithWorld_UpdateLoadPercent(70.0);
     
-    float loadPercent = 70.0;
+    flex_t loadPercent = 70.0;
     if ( stdConffile_ReadArgs() )
     {
         while ( _memcmp(stdConffile_entry.args[0].value, "end", 4u) )
@@ -69,7 +69,7 @@ int sithSprite_Load(sithWorld *world, int a2)
                     stdConffile_entry.args[1].value);
                 return 0;
             }
-            float percentDelta = 10.0 / (double)sprites_amt;
+            flex_t percentDelta = 10.0 / (double)sprites_amt;
             loadPercent += percentDelta;
             sithWorld_UpdateLoadPercent(loadPercent);
             if ( !stdConffile_ReadArgs() )
@@ -121,12 +121,12 @@ rdSprite* sithSprite_LoadEntry(char *fpath)
 
                     stdString_SafeStrCopy(mat, stdConffile_entry.args[0].value, 0x20);
                     uint32_t typeid = _atoi(stdConffile_entry.args[1].value);
-                    float width = _atof(stdConffile_entry.args[2].value);
-                    float height = _atof(stdConffile_entry.args[3].value);
+                    flex_t width = _atof(stdConffile_entry.args[2].value);
+                    flex_t height = _atof(stdConffile_entry.args[3].value);
                     int geometryMode = _atoi(stdConffile_entry.args[4].value);
                     int lightMode = _atoi(stdConffile_entry.args[5].value);
                     int textureMode = _atoi(stdConffile_entry.args[6].value);
-                    float extralight = _atof(stdConffile_entry.args[7].value);
+                    flex_t extralight = _atof(stdConffile_entry.args[7].value);
                     off.x = _atof(stdConffile_entry.args[8].value);
                     off.y = _atof(stdConffile_entry.args[9].value);
                     off.z = _atof(stdConffile_entry.args[10].value);

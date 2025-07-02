@@ -40,13 +40,13 @@
 
 void sithWeapon_InitDefaults();
 void sithWeapon_Startup();
-void sithWeapon_Tick(sithThing *weapon, float deltaSeconds);
+void sithWeapon_Tick(sithThing *weapon, flex_t deltaSeconds);
 void sithWeapon_sub_4D35E0(sithThing *weapon);
 void sithWeapon_sub_4D3920(sithThing *weapon);
 int sithWeapon_LoadParams(stdConffileArg *arg, sithThing *thing, int param);
-sithThing* sithWeapon_Fire(sithThing *weapon, sithThing *projectile, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, int anim, float scale, int16_t scaleFlags, float a9);
-sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileTemplate, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, int anim, float scale, char scaleFlags, float a9, int extra);
-void sithWeapon_SetTimeLeft(sithThing *weapon, sithThing* a2, float timeLeft);
+sithThing* sithWeapon_Fire(sithThing *weapon, sithThing *projectile, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, int anim, flex_t scale, int16_t scaleFlags, flex_t a9);
+sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileTemplate, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, int anim, flex_t scale, char scaleFlags, flex_t a9, int extra);
+void sithWeapon_SetTimeLeft(sithThing *weapon, sithThing* a2, flex_t timeLeft);
 int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCollisionSearchEntry *a4, int a5);
 int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithCollisionSearchEntry *a3);
 void sithWeapon_Remove(sithThing *weapon);
@@ -54,23 +54,23 @@ void sithWeapon_RemoveAndExplode(sithThing *weapon, sithThing *explodeTemplate);
 void sithWeapon_StartupEntry();
 void sithWeapon_ShutdownEntry();
 int sithWeapon_SelectWeapon(sithThing *player, int binIdx, int a3);
-void sithWeapon_SetMountWait(sithThing *a1, float mountWait);
-void sithWeapon_SetFireWait(sithThing *weapon, float firewait);
+void sithWeapon_SetMountWait(sithThing *a1, flex_t mountWait);
+void sithWeapon_SetFireWait(sithThing *weapon, flex_t firewait);
 void sithWeapon_handle_inv_msgs(sithThing *player);
-void sithWeapon_Activate(sithThing *weapon, sithCog *cogCtx, float fireRate, int mode);
-float sithWeapon_Deactivate(sithThing *weapon, sithCog *cogCtx, int mode);
+void sithWeapon_Activate(sithThing *weapon, sithCog *cogCtx, flex_t fireRate, int mode);
+flex_t sithWeapon_Deactivate(sithThing *weapon, sithCog *cogCtx, int mode);
 int sithWeapon_AutoSelect(sithThing *player, int weapIdx);
-int sithWeapon_HandleWeaponKeys(sithThing *player, float a2);
-void sithWeapon_ProjectileAutoAim(rdMatrix34 *out, sithThing *sender, rdMatrix34 *in, rdVector3 *fireOffset, float autoaimFov, float autoaimMaxDist);
-sithThing* sithWeapon_FireProjectile(sithThing *sender, sithThing *projectileTemplate, sithSound *fireSound, int mode, rdVector3 *fireOffset, rdVector3 *aimError, float scale, int16_t scaleFlags, float autoaimFov, float autoaimMaxDist, int extra);
-float sithWeapon_GetPriority(sithThing *player, int binIdx, int mode);
+int sithWeapon_HandleWeaponKeys(sithThing *player, flex_t a2);
+void sithWeapon_ProjectileAutoAim(rdMatrix34 *out, sithThing *sender, rdMatrix34 *in, rdVector3 *fireOffset, flex_t autoaimFov, flex_t autoaimMaxDist);
+sithThing* sithWeapon_FireProjectile(sithThing *sender, sithThing *projectileTemplate, sithSound *fireSound, int mode, rdVector3 *fireOffset, rdVector3 *aimError, flex_t scale, int16_t scaleFlags, flex_t autoaimFov, flex_t autoaimMaxDist, int extra);
+flex_t sithWeapon_GetPriority(sithThing *player, int binIdx, int mode);
 int sithWeapon_GetCurWeaponMode();
 void sithWeapon_SyncPuppet(sithThing *player);
 int sithWeapon_WriteConf();
 int sithWeapon_ReadConf();
 void sithWeapon_Syncunused1(sithThing* player);
 void sithWeapon_Syncunused2(sithThing* player);
-void sithWeapon_SetFireRate(sithThing *weapon, float fireRate);
+void sithWeapon_SetFireRate(sithThing *weapon, flex_t fireRate);
 
 
 //static void (*sithWeapon_sub_4D35E0)(sithThing *a1) = (void*)sithWeapon_sub_4D35E0_ADDR;
@@ -79,15 +79,15 @@ void sithWeapon_SetFireRate(sithThing *weapon, float fireRate);
 //static void (*sithWeapon_Remove)(sithThing *weapon) = (void*)sithWeapon_Remove_ADDR;
 //static int (*sithWeapon_HitDebug)(sithThing *thing, sithSurface *surface, void *a3) = (void*)sithWeapon_HitDebug_ADDR;
 
-//static void (*sithWeapon_Activate)(sithThing *weapon, sithCog *cogCtx, float fireRate, int mode) = (void*)sithWeapon_Activate_ADDR;
-//static float (*sithWeapon_Deactivate)(sithThing *weapon, sithCog *cogCtx, int mode) = (void*)sithWeapon_Deactivate_ADDR;
-//static void (*sithWeapon_SetFireWait)(sithThing *weapon, float firewait) = (void*)sithWeapon_SetFireWait_ADDR;
-//static void (*sithWeapon_SetMountWait)(sithThing *a1, float mountWait) = (void*)sithWeapon_SetMountWait_ADDR;
+//static void (*sithWeapon_Activate)(sithThing *weapon, sithCog *cogCtx, flex_t fireRate, int mode) = (void*)sithWeapon_Activate_ADDR;
+//static flex_t (*sithWeapon_Deactivate)(sithThing *weapon, sithCog *cogCtx, int mode) = (void*)sithWeapon_Deactivate_ADDR;
+//static void (*sithWeapon_SetFireWait)(sithThing *weapon, flex_t firewait) = (void*)sithWeapon_SetFireWait_ADDR;
+//static void (*sithWeapon_SetMountWait)(sithThing *a1, flex_t mountWait) = (void*)sithWeapon_SetMountWait_ADDR;
 //static int (*sithWeapon_SelectWeapon)(sithThing *player, int binIdx, int a3) = (void*)sithWeapon_SelectWeapon_ADDR;
 //static int (*sithWeapon_AutoSelect)(sithThing *player, int weapIdx) = (void*)sithWeapon_AutoSelect_ADDR;
-//static void (*sithWeapon_ProjectileAutoAim)(rdMatrix34 *a2, sithThing *a3, rdMatrix34 *a4, rdVector3 *a5, float a6, float a7) = (void*)sithWeapon_ProjectileAutoAim_ADDR;
+//static void (*sithWeapon_ProjectileAutoAim)(rdMatrix34 *a2, sithThing *a3, rdMatrix34 *a4, rdVector3 *a5, flex_t a6, flex_t a7) = (void*)sithWeapon_ProjectileAutoAim_ADDR;
 
-static sithThing* (*sithWeapon_FireProjectile_0_)(sithThing *sender, sithThing *projectileTemplate, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, int anim, float scale, char scaleFlags, float a9) = (void*)sithWeapon_FireProjectile_0_ADDR;
-static int (*sithWeapon_HandleWeaponKeys_)(sithThing *a1, float a2) = (void*)sithWeapon_HandleWeaponKeys_ADDR;
+static sithThing* (*sithWeapon_FireProjectile_0_)(sithThing *sender, sithThing *projectileTemplate, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, int anim, flex_t scale, char scaleFlags, flex_t a9) = (void*)sithWeapon_FireProjectile_0_ADDR;
+static int (*sithWeapon_HandleWeaponKeys_)(sithThing *a1, flex_t a2) = (void*)sithWeapon_HandleWeaponKeys_ADDR;
 
 #endif // _SITHWEAPON_H

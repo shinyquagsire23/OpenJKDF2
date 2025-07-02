@@ -33,7 +33,7 @@ int sithArchLighting_ParseSection(sithWorld *pWorld, int unk)
     sithArchLight *psVar3;
     sithArchLightMesh *psVar4;
     uint32_t uVar5;
-    float *pfVar6;
+    flex_t *pfVar6;
     int iVar7;
     uint32_t uVar8;
     sithArchLightMesh *ppvVar11;
@@ -42,8 +42,8 @@ int sithArchLighting_ParseSection(sithWorld *pWorld, int unk)
     char *pcVar11;
     char *pcVar12;
     int bVar13;
-    float fVar15;
-    float fVar14;
+    flex_t fVar15;
+    flex_t fVar14;
     int iStack12;
     
     if (unk) 
@@ -90,14 +90,14 @@ int sithArchLighting_ParseSection(sithWorld *pWorld, int unk)
                         if (!strncmp(stdConffile_entry.args[0].value, "numvertices:", strlen("numvertices:"))) {
                             uVar5 = _atoi(stdConffile_entry.args[1].value);
                             ppvVar11->numVertices = uVar5;
-                            uVar8 = uVar5 * sizeof(float);
-                            pfVar6 = (float *)pSithHS->alloc(uVar8);
+                            uVar8 = uVar5 * sizeof(flex_t);
+                            pfVar6 = (flex_t *)pSithHS->alloc(uVar8);
                             ppvVar11->aMono = pfVar6;
-                            pfVar6 = (float *)pSithHS->alloc(uVar8);
+                            pfVar6 = (flex_t *)pSithHS->alloc(uVar8);
                             ppvVar11->aRed = pfVar6;
-                            pfVar6 = (float *)pSithHS->alloc(uVar8);
+                            pfVar6 = (flex_t *)pSithHS->alloc(uVar8);
                             ppvVar11->aGreen = pfVar6;
-                            pfVar6 = (float *)pSithHS->alloc(uVar8);
+                            pfVar6 = (flex_t *)pSithHS->alloc(uVar8);
                             uVar8 = 0;
                             ppvVar11->aBlue = pfVar6;
                             if (uVar5 != 0) {

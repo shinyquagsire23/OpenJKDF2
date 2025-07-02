@@ -1,4 +1,4 @@
-const float aSinTable[4096] = {
+const flex_t aSinTable[4096] = {
 0.0,
 0.00038300001,
 0.00076700002,
@@ -4097,7 +4097,7 @@ const float aSinTable[4096] = {
 1.0
 };
 
-const float aTanTable[4096] = {
+const flex_t aTanTable[4096] = {
 0.0,
 0.00038300001,
 0.00076700002,

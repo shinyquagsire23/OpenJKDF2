@@ -10,7 +10,7 @@
 
 void sithCogFunctionAI_AISetMoveSpeed(sithCog *ctx)
 {
-    float moveSpeed = stdMath_Clamp(sithCogExec_PopFlex(ctx), 0.0, 2.0);
+    flex_t moveSpeed = stdMath_Clamp(sithCogExec_PopFlex(ctx), 0.0, 2.0);
     sithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing && pThing->controlType == SITH_CT_AI && pThing->actor)
     {
@@ -317,7 +317,7 @@ void sithCogFunctionAI_ThingViewDot(sithCog *ctx)
     sithThing *v1; // ebp
     sithThing *v2; // eax
     sithThing *v3; // ebx
-    float a2; // [esp+0h] [ebp-5Ch]
+    flex_t a2; // [esp+0h] [ebp-5Ch]
     rdVector3 v6; // [esp+14h] [ebp-48h] BYREF
     rdVector3 v7; // [esp+20h] [ebp-3Ch] BYREF
     rdMatrix34 v8; // [esp+2Ch] [ebp-30h] BYREF
@@ -572,7 +572,7 @@ void sithCogFunctionAI_AIAddAlignmentPriority(sithCog *ctx)
     int *piVar3;
     int val;
     int iVar5;
-    float local_4;
+    flex_t local_4;
 
     local_4 = 1.0;
     iVar5 = -1000;
@@ -623,7 +623,7 @@ void sithCogFunctionAI_AIRemoveAlignmentPriority(sithCog *ctx)
 
     if ((-1 < iVar1) && (iVar1 < 11)) 
     {
-        float tmp = 1.0;
+        flex_t tmp = 1.0;
         iVar4 = -1000;
         sithAI_aAlignments[iVar1].bValid = 0;
         for (int i = 0; i < 10; i++) {
@@ -643,9 +643,9 @@ void sithCogFunctionAI_FirstThingInCone(sithCog *ctx)
     sithThing *v3; // ebx
     int v4; // eax
     signed int v5; // [esp+10h] [ebp-38h]
-    float v6; // [esp+14h] [ebp-34h]
+    flex_t v6; // [esp+14h] [ebp-34h]
     rdMatrix34 v7; // [esp+18h] [ebp-30h] BYREF
-    float a1; // [esp+4Ch] [ebp+4h]
+    flex_t a1; // [esp+4Ch] [ebp+4h]
 
     v5 = sithCogExec_PopInt(ctx);
     a1 = sithCogExec_PopFlex(ctx);

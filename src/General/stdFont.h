@@ -38,14 +38,14 @@ void stdFont_Free(stdFont *font);
 uint32_t stdFont_DrawAscii(stdVBuffer *a1, stdFont *a2, unsigned int blit_x, int blit_y, int x_max, char *str, int alpha_maybe);
 int stdFont_sub_4355B0(stdFont *font, uint16_t a2);
 
-uint32_t stdFont_DrawAsciiGPU(stdFont *a2, unsigned int blit_x, int blit_y, int x_max, char *str, int alpha_maybe, float scale);
-uint32_t stdFont_DrawAsciiWidth(stdFont *a2, unsigned int blit_x, int blit_y, int x_max, char *str, int alpha_maybe, float scale);
-int stdFont_Draw4GPU(stdFont *font, int xPos, int yPos, int a5, int a6, int a7, const wchar_t *text, int alpha_maybe, float scale);
-unsigned int stdFont_Draw1GPU(stdFont *font, unsigned int blit_x, int blit_y, int a5, const wchar_t *a6, int alpha_maybe, float scale);
-unsigned int stdFont_Draw1Width(stdFont *font, unsigned int blit_x, int blit_y, int a5, const wchar_t *a6, int alpha_maybe, float scale);
+uint32_t stdFont_DrawAsciiGPU(stdFont *a2, unsigned int blit_x, int blit_y, int x_max, char *str, int alpha_maybe, flex_t scale);
+uint32_t stdFont_DrawAsciiWidth(stdFont *a2, unsigned int blit_x, int blit_y, int x_max, char *str, int alpha_maybe, flex_t scale);
+int stdFont_Draw4GPU(stdFont *font, int xPos, int yPos, int a5, int a6, int a7, const wchar_t *text, int alpha_maybe, flex_t scale);
+unsigned int stdFont_Draw1GPU(stdFont *font, unsigned int blit_x, int blit_y, int a5, const wchar_t *a6, int alpha_maybe, flex_t scale);
+unsigned int stdFont_Draw1Width(stdFont *font, unsigned int blit_x, int blit_y, int a5, const wchar_t *a6, int alpha_maybe, flex_t scale);
 
-unsigned int stdFont_DrawMultilineCenteredGPU(stdFont *font, unsigned int blit_x, int blit_y, int a5, const wchar_t *a6, int alpha_maybe, float scale);
-unsigned int stdFont_DrawMultilineCenteredHeight(stdFont *font, unsigned int blit_x, int blit_y, int a5, const wchar_t *a6, int alpha_maybe, float scale);
+unsigned int stdFont_DrawMultilineCenteredGPU(stdFont *font, unsigned int blit_x, int blit_y, int a5, const wchar_t *a6, int alpha_maybe, flex_t scale);
+unsigned int stdFont_DrawMultilineCenteredHeight(stdFont *font, unsigned int blit_x, int blit_y, int a5, const wchar_t *a6, int alpha_maybe, flex_t scale);
 //static int (*stdFont_DrawAscii)(stdVBuffer *a1, stdFont *a2, unsigned int blit_x, int blit_y, int x_max, char *str, int alpha_maybe) = (void*)stdFont_DrawAscii_ADDR;
 
 //static int (*stdFont_Draw4)(stdVBuffer *a1, stdFont *font, int xPos, int yPos, int a5, int a6, int a7, wchar_t *text, int alpha_maybe) = (void*)stdFont_Draw4_ADDR;

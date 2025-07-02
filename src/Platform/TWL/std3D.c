@@ -8,7 +8,7 @@ int std3D_bReinitHudElements = 0;
 
 int textureIDS[8];
 int paletteIDS[3];
-float fCamera = 1.25;
+flex_t fCamera = 1.25;
 int nTexture = 0;
 
 uint16_t i8Pal[256];
@@ -18,8 +18,8 @@ typedef struct TWLVERTEX
     v16 x;
     v16 y;
     v16 z;
-    float tu;
-    float tv;
+    flex_t tu;
+    flex_t tv;
     uint32_t color;
 } TWLVERTEX;
 
@@ -30,8 +30,8 @@ static TWLVERTEX GL_tmpVertices[STD3D_MAX_VERTICES] = {0};
 static size_t GL_tmpVerticesAmt = 0;
 static size_t rendered_tris = 0;
 
-static float res_fix_x = (256.0/640.0)/100.0;
-static float res_fix_y = (192.0/480.0)/100.0;
+static flex_t res_fix_x = (256.0/640.0)/100.0;
+static flex_t res_fix_y = (192.0/480.0)/100.0;
 
 //verticies for the cube
 v16 CubeVectors[] = {
@@ -370,8 +370,8 @@ void std3D_DrawMenu()
     touchPosition touchXY;
     touchRead(&touchXY);
     if (touchXY.px != 0 || touchXY.py != 0) {
-        fb_shift_x = (int)(((float)touchXY.px / 256.0) * (640-256));
-        fb_shift_y = (int)(((float)touchXY.py / 192.0) * (480-192));
+        fb_shift_x = (int)(((flex_t)touchXY.px / 256.0) * (640-256));// FLEXTODO
+        fb_shift_y = (int)(((flex_t)touchXY.py / 192.0) * (480-192));// FLEXTODO
 
         if (fb_shift_x > 640-256) {
             fb_shift_x = 640-256;
@@ -523,8 +523,8 @@ void std3D_Screenshot(const char* pFpath) {}
 
 void std3D_ResetUIRenderList() {}
 int std3D_AddBitmapToTextureCache(stdBitmap *texture, int mipIdx, int is_alpha_tex, int no_alpha) {}
-void std3D_DrawUIBitmapRGBA(stdBitmap* pBmp, int mipIdx, float dstX, float dstY, rdRect* srcRect, float scaleX, float scaleY, int bAlphaOverwrite, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {}
-void std3D_DrawUIBitmap(stdBitmap* pBmp, int mipIdx, float dstX, float dstY, rdRect* srcRect, float scale, int bAlphaOverwrite) {}
+void std3D_DrawUIBitmapRGBA(stdBitmap* pBmp, int mipIdx, flex_t dstX, flex_t dstY, rdRect* srcRect, flex_t scaleX, flex_t scaleY, int bAlphaOverwrite, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {}
+void std3D_DrawUIBitmap(stdBitmap* pBmp, int mipIdx, flex_t dstX, flex_t dstY, rdRect* srcRect, flex_t scale, int bAlphaOverwrite) {}
 void std3D_DrawUIClearedRect(uint8_t palIdx, rdRect* dstRect) {}
 void std3D_DrawUIClearedRectRGBA(uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a, rdRect* dstRect) {}
 int std3D_IsReady() {}

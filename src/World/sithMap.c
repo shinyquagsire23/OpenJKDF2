@@ -41,7 +41,7 @@ void sithMap_DrawCircle(rdCamera *camera, rdMatrix34 *viewMat)
     int v5; // eax
     sithAdjoin *i; // esi
     int color; // esi
-    float a2a; // [esp+0h] [ebp-20h]
+    flex_t a2a; // [esp+0h] [ebp-20h]
     rdVector3 vertex_out; // [esp+14h] [ebp-Ch] BYREF
 
     sithMain_sub_4C4D80();
@@ -136,14 +136,14 @@ int sithMap_Draw(sithSector *sector)
     int v17; // edi
     int v18; // edi
     unsigned int v19; // ecx
-    float *v20; // esi
+    flex_t *v20; // esi
     double v22; // st7
     int v24; // eax
     int v25; // ecx
     unsigned int v34; // edi
     sithThing *i; // edi
     int circleColor; // esi
-    float xOffs; // [esp+0h] [ebp-94h]
+    flex_t xOffs; // [esp+0h] [ebp-94h]
     rdVector3 vertex_out; // [esp+1Ch] [ebp-78h] BYREF
     rdVector3 v43; // [esp+28h] [ebp-6Ch] BYREF
     rdVector3 point2; // [esp+34h] [ebp-60h] BYREF
@@ -155,9 +155,9 @@ int sithMap_Draw(sithSector *sector)
     int a4; // [esp+64h] [ebp-30h]
     int a5; // [esp+68h] [ebp-2Ch]
     int v52; // [esp+6Ch] [ebp-28h]
-    float v53; // [esp+70h] [ebp-24h]
-    float v54; // [esp+74h] [ebp-20h]
-    float v55; // [esp+78h] [ebp-1Ch]
+    flex_t v53; // [esp+70h] [ebp-24h]
+    flex_t v54; // [esp+74h] [ebp-20h]
+    flex_t v55; // [esp+78h] [ebp-1Ch]
     int v56; // [esp+7Ch] [ebp-18h]
     unsigned int v57; // [esp+80h] [ebp-14h]
     int v58; // [esp+84h] [ebp-10h]

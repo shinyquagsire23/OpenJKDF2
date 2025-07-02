@@ -76,12 +76,12 @@ void sithActor_Tick(sithThing *thing, int deltaMs)
 }
 
 // MOTS altered
-float sithActor_Hit(sithThing *sender, sithThing *receiver, float amount, int flags)
+flex_t sithActor_Hit(sithThing *sender, sithThing *receiver, flex_t amount, int flags)
 {
     sithThing *receiver_; // edi
     double v6; // st7
     sithThing *v7; // eax
-    float fR; // [esp+0h] [ebp-1Ch]
+    flex_t fR; // [esp+0h] [ebp-1Ch]
 
     if ( sithNet_isMulti && (sender->thingflags & SITH_TF_INVULN) != 0 )
     {
@@ -102,7 +102,7 @@ float sithActor_Hit(sithThing *sender, sithThing *receiver, float amount, int fl
                  SITH_MESSAGE_DAMAGED,
                  0x10,
                  amount,
-                 (float)flags,
+                 (flex_t)flags, // FLEXTODO
                  0.0,
                  0.0);
         amount = v6;
@@ -116,7 +116,7 @@ float sithActor_Hit(sithThing *sender, sithThing *receiver, float amount, int fl
         v7 = sithThing_GetParent(receiver);
         receiver_ = v7;
 
-        float damageMult = 1.0;
+        flex_t damageMult = 1.0;
         if ( v7
           && flags != 0x20
           && flags != 0x40
@@ -165,12 +165,12 @@ LABEL_32:
     return amount - sender->actorParams.health;
 }
 
-void sithActor_HurtSound(sithThing *thing, float amount, int hurtType)
+void sithActor_HurtSound(sithThing *thing, flex_t amount, int hurtType)
 {
     if ( thing->actorParams.health <= 0.0 || amount < 3.0 ) return;
 
 
-    float hurt_vol = amount / thing->actorParams.health * 1.5;
+    flex_t hurt_vol = amount / thing->actorParams.health * 1.5;
     if (hurt_vol >= 0.01)
     {
         if (hurt_vol < 0.0)
@@ -500,7 +500,7 @@ int sithActor_LoadParams(stdConffileArg *arg, sithThing *thing, unsigned int par
     double v19; // st7
     double v20; // st7
     double v21; // st7
-    float tmp;
+    flex_t tmp;
     int tmpInt;
 
     switch (param)

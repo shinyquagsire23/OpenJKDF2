@@ -10,9 +10,9 @@ extern "C" {
 typedef void (*stdJSONCallback_t)(const char* pKey, const char* pVal, void *pCtx);
 
 int stdJSON_SaveInt(const char* pFpath, const char* pKey, int val);
-int stdJSON_SaveFloat(const char* pFpath, const char* pKey, float val);
+int stdJSON_SaveFloat(const char* pFpath, const char* pKey, flex_t val);
 int stdJSON_GetInt(const char* pFpath, const char* pKey, int valDefault);
-float stdJSON_GetFloat(const char* pFpath, const char* pKey, float valDefault);
+flex_t stdJSON_GetFloat(const char* pFpath, const char* pKey, flex_t valDefault);
 int stdJSON_SaveBool(const char* pFpath, const char* pKey, int bVal);
 int stdJSON_GetBool(const char* pFpath, const char* pKey, int bValDefault);
 int stdJSON_SaveBytes(const char* pFpath, const char* pKey, uint8_t *lpData, uint32_t lenMax);

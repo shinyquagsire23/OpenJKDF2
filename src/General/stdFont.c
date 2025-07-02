@@ -7,7 +7,7 @@
 #include "Platform/std3D.h"
 #include "World/jkPlayer.h"
 
-#define INT_FLOAT_SCALED(x, s) ((int)((float)(x) * (float)(s)))
+#define INT_FLOAT_SCALED(x, s) ((int)((flex_t)(x) * (flex_t)(s))) // FLEXTODO
 
 stdFont* stdFont_Load(char *fpath, int a2, int a3)
 {
@@ -1166,7 +1166,7 @@ int stdFont_sub_4355B0(stdFont *font, uint16_t a2)
     return v3 != 0;
 }
 
-uint32_t stdFont_DrawAsciiGPU(stdFont *a2, unsigned int blit_x, int blit_y, int x_max, char *str, int alpha_maybe, float scale)
+uint32_t stdFont_DrawAsciiGPU(stdFont *a2, unsigned int blit_x, int blit_y, int x_max, char *str, int alpha_maybe, flex_t scale)
 {
     unsigned int v8; // ebp
     unsigned int v9; // esi
@@ -1276,7 +1276,7 @@ LABEL_29:
     return v9 - v8;
 }
 
-uint32_t stdFont_DrawAsciiWidth(stdFont *a2, unsigned int blit_x, int blit_y, int x_max, char *str, int alpha_maybe, float scale)
+uint32_t stdFont_DrawAsciiWidth(stdFont *a2, unsigned int blit_x, int blit_y, int x_max, char *str, int alpha_maybe, flex_t scale)
 {
     unsigned int v8; // ebp
     unsigned int v9; // esi
@@ -1381,7 +1381,7 @@ LABEL_29:
     return v9 - v8;
 }
 
-int stdFont_Draw4GPU(stdFont *font, int xPos, int yPos, int a5, int a6, int a7, const wchar_t *text, int alpha_maybe, float scale)
+int stdFont_Draw4GPU(stdFont *font, int xPos, int yPos, int a5, int a6, int a7, const wchar_t *text, int alpha_maybe, flex_t scale)
 {
     int v9; // ebp
     const wchar_t *v10; // edi
@@ -1465,7 +1465,7 @@ LABEL_16:
     return stdFont_Draw1GPU(font, xPos + v17, yPos + v18, v15 - v17, text, alpha_maybe, scale);
 }
 
-unsigned int stdFont_Draw1GPU(stdFont *font, unsigned int blit_x, int blit_y, int a5, const wchar_t *a6, int alpha_maybe, float scale)
+unsigned int stdFont_Draw1GPU(stdFont *font, unsigned int blit_x, int blit_y, int a5, const wchar_t *a6, int alpha_maybe, flex_t scale)
 {
     unsigned int v8; // edx
     unsigned int v9; // esi
@@ -1575,7 +1575,7 @@ LABEL_26:
     return v9 - v8;
 }
 
-unsigned int stdFont_Draw1Width(stdFont *font, unsigned int blit_x, int blit_y, int a5, const wchar_t *a6, int alpha_maybe, float scale)
+unsigned int stdFont_Draw1Width(stdFont *font, unsigned int blit_x, int blit_y, int a5, const wchar_t *a6, int alpha_maybe, flex_t scale)
 {
     unsigned int v8; // edx
     unsigned int v9; // esi
@@ -1686,7 +1686,7 @@ LABEL_26:
     return largest_x;//v9 - v8;
 }
 
-unsigned int stdFont_DrawMultilineCenteredGPU(stdFont *font, unsigned int blit_x, int blit_y, int a5, const wchar_t *a6, int alpha_maybe, float scale)
+unsigned int stdFont_DrawMultilineCenteredGPU(stdFont *font, unsigned int blit_x, int blit_y, int a5, const wchar_t *a6, int alpha_maybe, flex_t scale)
 {
     unsigned int v8; // edx
     unsigned int v9; // esi
@@ -1815,7 +1815,7 @@ LABEL_26:
     return (blit_y - orig_blit_y) + INT_FLOAT_SCALED(a5a.height, scale);//v9 - blit_x;
 }
 
-unsigned int stdFont_DrawMultilineCenteredHeight(stdFont *font, unsigned int blit_x, int blit_y, int a5, const wchar_t *a6, int alpha_maybe, float scale)
+unsigned int stdFont_DrawMultilineCenteredHeight(stdFont *font, unsigned int blit_x, int blit_y, int a5, const wchar_t *a6, int alpha_maybe, flex_t scale)
 {
     unsigned int v8; // edx
     unsigned int v9; // esi

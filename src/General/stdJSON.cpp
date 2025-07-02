@@ -118,7 +118,7 @@ int stdJSON_SaveInt(const char* pFpath, const char* pKey, int val)
     return stdJSON_WriteToFile(pFpath, json_file);
 }
 
-int stdJSON_SaveFloat(const char* pFpath, const char* pKey, float val)
+int stdJSON_SaveFloat(const char* pFpath, const char* pKey, flex_t val)
 {
     CHECK_COMMON(pFpath, pKey);
 
@@ -150,7 +150,7 @@ int stdJSON_GetInt(const char* pFpath, const char* pKey, int valDefault)
     return ret.get<int>();
 }
 
-float stdJSON_GetFloat(const char* pFpath, const char* pKey, float valDefault)
+flex_t stdJSON_GetFloat(const char* pFpath, const char* pKey, flex_t valDefault)
 {
     CHECK_COMMON_GET(pFpath, pKey, valDefault);
 
@@ -167,7 +167,7 @@ float stdJSON_GetFloat(const char* pFpath, const char* pKey, float valDefault)
         return valDefault;
     }
 
-    return ret.get<float>();
+    return ret.get<flex_t>();
 }
 
 int stdJSON_SaveBool(const char* pFpath, const char* pKey, int bVal)
