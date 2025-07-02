@@ -16,9 +16,9 @@ const rdMatrix44 rdroid_identMatrix44 = {{1.0, 0.0, 0.0, 0.0},
 
 void rdMatrix_Build34(rdMatrix34 *out, const rdVector3 *rot, const rdVector3 *pos)
 {
-    float x_rad_sin, x_rad_cos;
-    float y_rad_sin, y_rad_cos;
-    float z_rad_sin, z_rad_cos;
+    flex_t x_rad_sin, x_rad_cos;
+    flex_t y_rad_sin, y_rad_cos;
+    flex_t z_rad_sin, z_rad_cos;
     rdVector3 *scale;
 
     scale = &out->scale;
@@ -91,9 +91,9 @@ void rdMatrix_InvertOrtho34(rdMatrix34 *out, const rdMatrix34 *in)
 
 void rdMatrix_Build44(rdMatrix44 *out, const rdVector3 *rot, const rdVector3 *pos)
 {
-    float x_rad_sin, x_rad_cos;
-    float y_rad_sin, y_rad_cos;
-    float z_rad_sin, z_rad_cos;
+    flex_t x_rad_sin, x_rad_cos;
+    flex_t y_rad_sin, y_rad_cos;
+    flex_t z_rad_sin, z_rad_cos;
 
     stdMath_SinCos(rot->x, &x_rad_sin, &x_rad_cos);
     stdMath_SinCos(rot->y, &y_rad_sin, &y_rad_cos);
@@ -125,9 +125,9 @@ void rdMatrix_BuildRotate34(rdMatrix34 *out, const rdVector3 *rot)
 
 void rdMatrix_BuildInverseRotate34(rdMatrix34 *out, const rdVector3 *rot)
 {
-    float x_rad_sin, x_rad_cos;
-    float y_rad_sin, y_rad_cos;
-    float z_rad_sin, z_rad_cos;
+    flex_t x_rad_sin, x_rad_cos;
+    flex_t y_rad_sin, y_rad_cos;
+    flex_t z_rad_sin, z_rad_cos;
 
     stdMath_SinCos(rot->x, &x_rad_sin, &x_rad_cos);
     stdMath_SinCos(rot->y, &y_rad_sin, &y_rad_cos);
@@ -210,12 +210,12 @@ void rdMatrix_BuildScale44(rdMatrix44 *out, const rdVector3 *scale)
     out->vD.w = 1.0;
 }
 
-void rdMatrix_BuildFromVectorAngle34(rdMatrix34 *out, const rdVector3 *v, float angle)
+void rdMatrix_BuildFromVectorAngle34(rdMatrix34 *out, const rdVector3 *v, flex_t angle)
 {
-    float v12;
-    float v44;
-    float v51;
-    float angleRad_sin, angleRad_cos;
+    flex_t v12;
+    flex_t v44;
+    flex_t v51;
+    flex_t angleRad_sin, angleRad_cos;
 
     stdMath_SinCos(angle, &angleRad_sin, &angleRad_cos);
     if ( v->z >= 1.0 )
@@ -268,13 +268,13 @@ void rdMatrix_BuildFromVectorAngle34(rdMatrix34 *out, const rdVector3 *v, float 
 }
 
 // MOTS altered
-void rdMatrix_LookAt(rdMatrix34 *out, const rdVector3 *v1, const rdVector3 *v2, float angle)
+void rdMatrix_LookAt(rdMatrix34 *out, const rdVector3 *v1, const rdVector3 *v2, flex_t angle)
 {
-    float v7;
-    float v11;
-    float v12;
-    float v24;
-    float v25;
+    flex_t v7;
+    flex_t v11;
+    flex_t v12;
+    flex_t v24;
+    flex_t v25;
     rdMatrix34 tmp;
 
     out->lvec.x = v2->x - v1->x;
@@ -321,21 +321,21 @@ void rdMatrix_LookAt(rdMatrix34 *out, const rdVector3 *v1, const rdVector3 *v2, 
 
 void rdMatrix_ExtractAngles34(const rdMatrix34 *in, rdVector3 *out)
 {
-    float v7; // ST08_4
-    float v9; // ST24_4
-    float v11; // ST00_4
+    flex_t v7; // ST08_4
+    flex_t v9; // ST24_4
+    flex_t v11; // ST00_4
     double v13; // st7
-    float v17; // ST00_4
+    flex_t v17; // ST00_4
     double v19; // st7
     double v22; // st7
     double v23; // st7
     long double v25; // st6
-    float v30; // [esp+18h] [ebp-10h]
-    float v31; // [esp+1Ch] [ebp-Ch]
-    float v32; // [esp+20h] [ebp-8h]
-    float v33; // [esp+2Ch] [ebp+4h]
-    float v34; // [esp+30h] [ebp+8h]
-    float v35; // [esp+30h] [ebp+8h]
+    flex_t v30; // [esp+18h] [ebp-10h]
+    flex_t v31; // [esp+1Ch] [ebp-Ch]
+    flex_t v32; // [esp+20h] [ebp-8h]
+    flex_t v33; // [esp+2Ch] [ebp+4h]
+    flex_t v34; // [esp+30h] [ebp+8h]
+    flex_t v35; // [esp+30h] [ebp+8h]
 
     v33 = stdMath_Sqrt((in->lvec.y * in->lvec.y) + (in->lvec.x * in->lvec.x));
     if ( v33 < 0.001 )
@@ -834,9 +834,9 @@ void rdMatrix_TransformVector44(rdMatrix44 *pOut, const rdVector4 *pTrans4, cons
 
 void rdMatrix_TransformVector44Acc(rdVector4 *a1, const rdMatrix44 *a2)
 {
-    float v2; // ST00_4
-    float v3; // ST04_4
-    float v4; // ST08_4
+    flex_t v2; // ST00_4
+    flex_t v3; // ST04_4
+    flex_t v4; // ST08_4
     double v5; // st6
     double v6; // st7
 

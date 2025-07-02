@@ -35,13 +35,13 @@ int sithAI_bOpened = 0;
 int sithAI_bInit = 0;
 sithAICommand* sithAI_commandList = NULL;
 uint32_t sithAI_numCommands = 0;
-float sithAI_flt_84DE58 = 0.0f;
+flex_t sithAI_flt_84DE58 = 0.0f;
 uint32_t sithAI_dword_84DE5C = 0;
 int sithAI_dword_84DE60 = 0;
-float sithAI_flt_84DE64 = 0.0f;
+flex_t sithAI_flt_84DE64 = 0.0f;
 sithThing** sithAI_pThing_84DE68 = NULL;
 int sithAI_dword_84DE6C = 0;
-float sithAI_flt_84DE70 = 0.0f;
+flex_t sithAI_flt_84DE70 = 0.0f;
 int sithAI_dword_84DE74 = 0;
 
 // These are located in a different part of .data?
@@ -53,7 +53,7 @@ int sithAI_inittedActors = 0;
 // MoTS Added
 sithThing* sithAI_pDistractor = NULL;
 
-float sithAI_FLOAT_005a79d8 = 1.0;
+flex_t sithAI_FLOAT_005a79d8 = 1.0;
 
 int sithAI_Startup()
 {
@@ -420,7 +420,7 @@ void sithAI_SetActorFireTarget(sithActor *actor, int a2, intptr_t actorFlags)
         }
 
         if ( a2 == SITHAI_MODE_UNK100 )
-            sithCog_SendMessageFromThingEx(actor->thing, 0, SITH_MESSAGE_AIEVENT, Main_bMotsCompat ? (float)actor->flags : (float)SITHAI_EVENTMODECHANGED, 0.0, 0.0, 0.0);
+            sithCog_SendMessageFromThingEx(actor->thing, 0, SITH_MESSAGE_AIEVENT, Main_bMotsCompat ? (flex_t)actor->flags : (flex_t)SITHAI_EVENTMODECHANGED, 0.0, 0.0, 0.0); // FLEXTODO
 
         v7 = 0;
         for (v7 = 0; v7 < actor->numAIClassEntries; v7++)
@@ -587,9 +587,9 @@ int sithAI_LoadThingActorParams(stdConffileArg *arg, sithThing *thing, int param
     int v5; // ebp
     unsigned int v6; // edi
     rdVector3 *v7; // ecx
-    float v9; // [esp+10h] [ebp-Ch] BYREF
-    float v10; // [esp+14h] [ebp-8h] BYREF
-    float v11; // [esp+18h] [ebp-4h] BYREF
+    flex_t v9; // [esp+10h] [ebp-Ch] BYREF
+    flex_t v10; // [esp+14h] [ebp-8h] BYREF
+    flex_t v11; // [esp+18h] [ebp-4h] BYREF
 
     v3 = thing->actor;
     if ( param == THINGPARAM_FRAME )
@@ -662,7 +662,7 @@ void sithAI_idkframesalloc(sithThing *a2, sithThing *a3, rdVector3 *a4)
     }
 }
 
-void sithAI_Tick(sithThing *thing, float deltaSeconds)
+void sithAI_Tick(sithThing *thing, flex_t deltaSeconds)
 {
     if ( thing->type == SITH_THING_ACTOR && thing->actorParams.health > 0.0 )
     {
@@ -673,7 +673,7 @@ void sithAI_Tick(sithThing *thing, float deltaSeconds)
     }
 }
 
-void sithAI_sub_4EA630(sithActor *actor, float deltaSeconds)
+void sithAI_sub_4EA630(sithActor *actor, flex_t deltaSeconds)
 {
     sithThing *v2; // esi
     rdVector3 *v3; // ebp
@@ -744,7 +744,7 @@ void sithAI_sub_4EA630(sithActor *actor, float deltaSeconds)
 }
 
 // MoTS altered
-void sithAI_idk_msgarrived_target(sithActor *actor, float deltaSeconds)
+void sithAI_idk_msgarrived_target(sithActor *actor, flex_t deltaSeconds)
 {
     sithThing *v3; // esi
     long double v9; // st7
@@ -753,10 +753,10 @@ void sithAI_idk_msgarrived_target(sithActor *actor, float deltaSeconds)
     double v13; // st7
     sithSector *v18; // eax
     int v19; // eax
-    float v20; // [esp+10h] [ebp-20h]
-    float v21; // [esp+14h] [ebp-1Ch]
+    flex_t v20; // [esp+10h] [ebp-20h]
+    flex_t v21; // [esp+14h] [ebp-1Ch]
     rdVector3 a4; // [esp+18h] [ebp-18h] BYREF
-    float actorb; // [esp+34h] [ebp+4h]
+    flex_t actorb; // [esp+34h] [ebp+4h]
 
     // MoTS Added: SITH_AF_FREEZE_MOVEMENT
     v3 = actor->thing;
@@ -859,7 +859,7 @@ void sithAI_SetLookFrame(sithActor *actor, rdVector3 *lookPos)
     }
 }
 
-void sithAI_SetMoveThing(sithActor *actor, rdVector3 *movePos, float moveSpeed)
+void sithAI_SetMoveThing(sithActor *actor, rdVector3 *movePos, flex_t moveSpeed)
 {
     if ( sithTime_curMs >= actor->field_28C || (actor->flags & SITHAI_MODE_MOVING) == 0 )
     {
@@ -870,7 +870,7 @@ void sithAI_SetMoveThing(sithActor *actor, rdVector3 *movePos, float moveSpeed)
     }
 }
 
-void sithAI_Jump(sithActor *actor, rdVector3 *pos, float vel)
+void sithAI_Jump(sithActor *actor, rdVector3 *pos, flex_t vel)
 {
     actor->moveSpeed = 2.0;
     rdVector_Copy3(&actor->movePos, pos);
@@ -890,7 +890,7 @@ void sithAI_sub_4EAD60(sithActor *actor)
     int v5; // eax
     int v6; // eax
     int v9; // [esp+10h] [ebp-4h]
-    float actora; // [esp+18h] [ebp+4h]
+    flex_t actora; // [esp+18h] [ebp+4h]
 
     v2 = actor->thing;
     v9 = actor->field_1F4;
@@ -998,15 +998,15 @@ void sithAI_sub_4EAF40(sithActor *actor)
 }
 
 // MoTS altered
-int sithAI_CheckSightThing(sithThing *thing, rdVector3 *targetPosition, sithThing *targetThing, float fov, float maxDistance, float unused, rdVector3 *targetErrorDir, float *targetDistance)
+int sithAI_CheckSightThing(sithThing *thing, rdVector3 *targetPosition, sithThing *targetThing, flex_t fov, flex_t maxDistance, flex_t unused, rdVector3 *targetErrorDir, flex_t *targetDistance)
 {
     long double v12; // st7
     double v18; // st7
     sithSector *v21; // eax
     sithCollisionSearchEntry *v22; // esi
     sithThing *v23; // eax
-    float a4a; // [esp+18h] [ebp+8h]
-    float a5a; // [esp+2Ch] [ebp+1Ch]
+    flex_t a4a; // [esp+18h] [ebp+8h]
+    flex_t a5a; // [esp+2Ch] [ebp+1Ch]
 
     rdVector_Sub3(targetErrorDir, &targetThing->position, targetPosition);
     v12 = rdVector_Normalize3Acc(targetErrorDir) - targetThing->collideSize;
@@ -1077,14 +1077,14 @@ int sithAI_CheckSightThing(sithThing *thing, rdVector3 *targetPosition, sithThin
 }
 
 // MOTS altered
-int sithAI_sub_4EB300(sithThing *a3, rdVector3 *a4, rdVector3 *arg8, float argC, float arg10, float a7, rdVector3 *a5, float *a8)
+int sithAI_sub_4EB300(sithThing *a3, rdVector3 *a4, rdVector3 *arg8, flex_t argC, flex_t arg10, flex_t a7, rdVector3 *a5, flex_t *a8)
 {
-    float v11; // st7
+    flex_t v11; // st7
     double v16; // st7
     sithSector *v19; // eax
     sithCollisionSearchEntry *v20; // esi
-    float a4a; // [esp+18h] [ebp+8h]
-    float arg8a; // [esp+1Ch] [ebp+Ch]
+    flex_t a4a; // [esp+18h] [ebp+8h]
+    flex_t arg8a; // [esp+1Ch] [ebp+Ch]
  
     rdVector_Sub3(a5, arg8, a4);
     v11 = rdVector_Normalize3Acc(a5);
@@ -1133,10 +1133,10 @@ int sithAI_CanWalk(sithActor *actor, rdVector3 *targetPosition, int *out)
     sithCollisionSearchEntry *colSearchEntry; // eax
     sithSurface *searchSurface; // ecx
     sithThing *searchThing; // eax
-    float searchDist; // [esp+0h] [ebp-2Ch]
+    flex_t searchDist; // [esp+0h] [ebp-2Ch]
     int v12; // [esp+1Ch] [ebp-10h]
     rdVector3 moveNorm; // [esp+20h] [ebp-Ch] BYREF
-    float searchRadius; // [esp+30h] [ebp+4h]
+    flex_t searchRadius; // [esp+30h] [ebp+4h]
 
     actorThing = actor->thing;
     rdVector_Neg3(&moveNorm, &rdroid_zVector3);
@@ -1210,8 +1210,8 @@ int sithAI_CanWalk_ExplicitSector(sithActor *actor, rdVector3 *targetPosition, s
     sithSurface *searchSurface; // ecx
     int result; // eax
     sithThing *searchThing; // eax
-    float searchDist; // [esp+0h] [ebp-24h]
-    float searchRadius; // [esp+4h] [ebp-20h]
+    flex_t searchDist; // [esp+0h] [ebp-24h]
+    flex_t searchRadius; // [esp+4h] [ebp-20h]
     rdVector3 moveNorm; // [esp+18h] [ebp-Ch] BYREF
 
     actorThing = actor->thing;
@@ -1277,7 +1277,7 @@ LABEL_19:
     return retval;
 }
 
-int sithAI_FirstThingInView(sithSector *sector, rdMatrix34 *out, float autoaimFov, float autoaimMaxDist, int a5, sithThing **thingList, int a7, float a8)
+int sithAI_FirstThingInView(sithSector *sector, rdMatrix34 *out, flex_t autoaimFov, flex_t autoaimMaxDist, int a5, sithThing **thingList, int a7, flex_t a8)
 {
     if ( autoaimFov < 0.0 || autoaimMaxDist < 0.0 )
         return 0;
@@ -1294,17 +1294,17 @@ int sithAI_FirstThingInView(sithSector *sector, rdMatrix34 *out, float autoaimFo
     return sithAI_dword_84DE60;
 }
 
-int sithAI_sub_4EB860(int a1, float a2)
+int sithAI_sub_4EB860(int a1, flex_t a2)
 {
     if ( a2 > 0.0 )
         sithMain_sub_4C4D80();
     return 0;
 }
 
-void sithAI_SetRandomThingLook(rdMatrix34 *a1, sithThing *a2, rdVector3 *a3, float a4)
+void sithAI_SetRandomThingLook(rdMatrix34 *a1, sithThing *a2, rdVector3 *a3, flex_t a4)
 {
     rdVector3 rot; // [esp+4h] [ebp-Ch] BYREF
-    float v2; // [esp+1Ch] [ebp+Ch]
+    flex_t v2; // [esp+1Ch] [ebp+Ch]
 
     rdMatrix_LookAt(a1, &a2->position, a3, 0.0);
     if ( a4 > 0.0 )
@@ -1317,7 +1317,7 @@ void sithAI_SetRandomThingLook(rdMatrix34 *a1, sithThing *a2, rdVector3 *a3, flo
     }
 }
 
-void sithAI_RandomFireVector(rdVector3 *out, float magnitude)
+void sithAI_RandomFireVector(rdVector3 *out, flex_t magnitude)
 {
     out->x = ((double)_frand() - 0.5) * magnitude + out->x;
     out->y = ((double)_frand() - 0.5) * magnitude + out->y;
@@ -1336,7 +1336,7 @@ void sithAI_RandomRotationVector(rdVector3 *out)
 }
 
 // MoTS altered
-int sithAI_FireWeapon(sithActor *actor, float minDistToFire, float maxDistToFire, float minDot, float percentageErrorInAim, int bAltFire, int a7)
+int sithAI_FireWeapon(sithActor *actor, flex_t minDistToFire, flex_t maxDistToFire, flex_t minDot, flex_t percentageErrorInAim, int bAltFire, int a7)
 {
     sithThing *v8; // ebp
     sithThing *v9; // edi
@@ -1346,7 +1346,7 @@ int sithAI_FireWeapon(sithActor *actor, float minDistToFire, float maxDistToFire
     sithThing *v16; // eax
     double v19; // st7
     signed int v20; // [esp+10h] [ebp-20h]
-    float v21; // [esp+14h] [ebp-1Ch]
+    flex_t v21; // [esp+14h] [ebp-1Ch]
     rdVector3 v1; // [esp+18h] [ebp-18h] BYREF
     rdVector3 a1a; // [esp+24h] [ebp-Ch] BYREF
 
@@ -1452,7 +1452,7 @@ LABEL_12:
     return 1;
 }
 
-void sithAI_GetThingsInView(sithSector *a1, rdMatrix34 *a2, float a3)
+void sithAI_GetThingsInView(sithSector *a1, rdMatrix34 *a2, flex_t a3)
 {
     sithThing *v4; // esi
     unsigned int v6; // eax
@@ -1460,14 +1460,14 @@ void sithAI_GetThingsInView(sithSector *a1, rdMatrix34 *a2, float a3)
     rdTexinfo *v8; // ebp
     rdMaterial *v9; // ecx
     uint32_t v10; // edx
-    float a3a; // [esp+0h] [ebp-48h]
-    float v12; // [esp+14h] [ebp-34h]
+    flex_t a3a; // [esp+0h] [ebp-48h]
+    flex_t v12; // [esp+14h] [ebp-34h]
     rdVector3 v13; // [esp+18h] [ebp-30h] BYREF
     rdVector3 a1a; // [esp+24h] [ebp-24h] BYREF
     rdVector3 v1; // [esp+30h] [ebp-18h] BYREF
     rdVector3 v16; // [esp+3Ch] [ebp-Ch] BYREF
-    float v17; // [esp+4Ch] [ebp+4h]
-    float a2a; // [esp+50h] [ebp+8h]
+    flex_t v17; // [esp+4Ch] [ebp+4h]
+    flex_t a2a; // [esp+50h] [ebp+8h]
 
     if ( a1->renderTick == sithRender_lastRenderTick )
         return;
@@ -1549,13 +1549,13 @@ void sithAI_GetThingsInView(sithSector *a1, rdMatrix34 *a2, float a3)
 }
 
 // MoTS altered
-int sithAI_CanDetectSightThing(sithActor *actor, sithThing *targetThing, float distance)
+int sithAI_CanDetectSightThing(sithActor *actor, sithThing *targetThing, flex_t distance)
 {
     sithThing *actorThing; // esi
     double clampedDistance; // st7
     sithSector *targetSector; // edx
     int result; // eax
-    float awareness; // [esp+0h] [ebp-4h]
+    flex_t awareness; // [esp+0h] [ebp-4h]
 
     awareness = 1.0;
     actorThing = actor->thing;
@@ -1629,27 +1629,27 @@ void sithAI_SetDistractor(sithThing *pDistractor)
 }
 
 // MOTS added
-void sithAI_AddAlignmentPriority(float param_1)
+void sithAI_AddAlignmentPriority(flex_t param_1)
 {
     sithAI_FLOAT_005a79d8 = param_1;
 }
 
-void sithAI_GetThingsInCone(sithSector *a1, rdMatrix34 *a2, float a3)
+void sithAI_GetThingsInCone(sithSector *a1, rdMatrix34 *a2, flex_t a3)
 {
     sithThing *v4; // esi
     sithAdjoin *v7; // esi
     rdTexinfo *v8; // ebp
     rdMaterial *v9; // ecx
     uint32_t v10; // edx
-    float a3a; // [esp+0h] [ebp-48h]
-    float v12; // [esp+14h] [ebp-34h]
+    flex_t a3a; // [esp+0h] [ebp-48h]
+    flex_t v12; // [esp+14h] [ebp-34h]
     rdVector3 v13; // [esp+18h] [ebp-30h] BYREF
     rdVector3 a1a; // [esp+24h] [ebp-24h] BYREF
     rdVector3 v1; // [esp+30h] [ebp-18h] BYREF
     rdVector3 v16; // [esp+3Ch] [ebp-Ch] BYREF
-    float v17; // [esp+4Ch] [ebp+4h]
-    float a2a; // [esp+50h] [ebp+8h]
-    float local_190[100];
+    flex_t v17; // [esp+4Ch] [ebp+4h]
+    flex_t a2a; // [esp+50h] [ebp+8h]
+    flex_t local_190[100];
 
     // Added: prevent overflow
     if (sithAI_dword_84DE6C > 100) {
@@ -1664,7 +1664,7 @@ void sithAI_GetThingsInCone(sithSector *a1, rdMatrix34 *a2, float a3)
         if ( ((1 << v4->type) & sithAI_dword_84DE74) != 0 && (v4->thingflags & (SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
         {
             rdVector_Sub3(&v13, &v4->position, &a2->scale);
-            float dist = rdVector_Normalize3Acc(&v13);
+            flex_t dist = rdVector_Normalize3Acc(&v13);
             rdVector_Normalize3(&a1a, &a2->uvec);
             rdVector_Normalize3(&v1, &a2->rvec);
             rdVector_Normalize3(&v16, &a2->lvec);
@@ -1693,10 +1693,10 @@ void sithAI_GetThingsInCone(sithSector *a1, rdMatrix34 *a2, float a3)
     for (int i = 0; i < sithAI_dword_84DE60-1; i++) {
         for (int j = 0; j < sithAI_dword_84DE60 - i - 1; j++) {
             if (local_190[j] > local_190[j+1]) {
-                float val_a_1 = local_190[j];
+                flex_t val_a_1 = local_190[j];
                 sithThing* val_a_2 = sithAI_pThing_84DE68[j];
 
-                float val_b_1 = local_190[j+1];
+                flex_t val_b_1 = local_190[j+1];
                 sithThing* val_b_2 = sithAI_pThing_84DE68[j+1];
 
                 local_190[j] = val_b_1;
@@ -1710,7 +1710,7 @@ void sithAI_GetThingsInCone(sithSector *a1, rdMatrix34 *a2, float a3)
 }
 
 // MOTS added
-int sithAI_FirstThingInCone(sithSector *sector, rdMatrix34 *out, float autoaimFov, float autoaimMaxDist, int a5, sithThing **thingList, int a7, float a8)
+int sithAI_FirstThingInCone(sithSector *sector, rdMatrix34 *out, flex_t autoaimFov, flex_t autoaimMaxDist, int a5, sithThing **thingList, int a7, flex_t a8)
 {
     if ( autoaimFov < 0.0 || autoaimMaxDist < 0.0 )
         return 0;
@@ -1728,15 +1728,15 @@ int sithAI_FirstThingInCone(sithSector *sector, rdMatrix34 *out, float autoaimFo
 }
 
 // MOTS added
-int sithAI_FUN_0053a520(sithActor *pActor,float param_2,float param_3,float param_4,int param_5,
-                       float param_6,uint32_t param_7)
+int sithAI_FUN_0053a520(sithActor *pActor,flex_t param_2,flex_t param_3,flex_t param_4,int param_5,
+                       flex_t param_6,uint32_t param_7)
 {
     sithThing *thing;
     sithThing *psVar1;
     sithThing *psVar2;
-    float fVar3;
-    float fVar4;
-    float fVar5;
+    flex_t fVar3;
+    flex_t fVar4;
+    flex_t fVar5;
     int bVar6;
     int anim;
 
@@ -1811,10 +1811,10 @@ LAB_0053a691:
 }
 
 // MOTS added
-int sithAI_Leap(sithActor *pActor,float minDist,float maxDist,float minDot,int param_5,
-                       float param_6,uint32_t param_7)
+int sithAI_Leap(sithActor *pActor,flex_t minDist,flex_t maxDist,flex_t minDot,int param_5,
+                       flex_t param_6,uint32_t param_7)
 {
-    float fVar1;
+    flex_t fVar1;
     sithThing *thing;
     sithThing *psVar2;
     sithThing *psVar3;
@@ -1858,21 +1858,21 @@ LAB_0053a3b9:
         fVar6 = (double)(psVar2->position).x - (double)(psVar3->position).x;
         fVar7 = (double)(psVar2->position).y - (double)(psVar3->position).y;
         fVar8 = (double)(psVar2->position).z - (double)(psVar3->position).z;
-        fVar9 = stdMath_Sqrt(fVar8 * (double)(float)fVar8 + fVar7 * fVar7 + fVar6 * (double)(float)fVar6);
+        fVar9 = stdMath_Sqrt(fVar8 * (double)(flex_t)fVar8 + fVar7 * fVar7 + fVar6 * (double)(flex_t)fVar6); // FLEXTODO
         fVar10 = fVar9 / (double)param_6 - (double) - 0.2;
         fVar1 = sithWorld_pCurrentWorld->worldGravity;
-        (pActor->attackError).x = (float)fVar6;
-        (pActor->attackError).y = (float)fVar7;
-        (pActor->attackError).z = (float)fVar8;
-        pActor->attackDistance = (float)fVar9;
+        (pActor->attackError).x = (flex_t)fVar6; // FLEXTODO
+        (pActor->attackError).y = (flex_t)fVar7; // FLEXTODO
+        (pActor->attackError).z = (flex_t)fVar8; // FLEXTODO
+        pActor->attackDistance = (flex_t)fVar9; // FLEXTODO
         lVar11 = (int64_t)(fVar10 * 1000.0);
         pActor->field_28C = (int)lVar11 + uVar5;
         pActor->flags &= ~(SITHAI_MODE_TURNING | SITHAI_MODE_MOVING);
         sithThing_DetachThing(thing);
-        thing->physicsParams.vel.x = param_6 * (float)fVar6;
-        thing->physicsParams.vel.y = param_6 * (float)fVar7;
+        thing->physicsParams.vel.x = param_6 * (flex_t)fVar6; // FLEXTODO
+        thing->physicsParams.vel.y = param_6 * (flex_t)fVar7; // FLEXTODO
         thing->physicsParams.vel.z =
-            (float)(fVar10 * 0.5 * fVar1 + (float)(param_6 * (float)fVar8));
+            (flex_t)(fVar10 * 0.5 * fVar1 + (flex_t)(param_6 * (flex_t)fVar8)); // FLEXTODO
         sithSoundClass_PlayModeRandom(thing, SITH_SC_JUMP);
         return 1;
     }
@@ -1917,14 +1917,14 @@ sithThing* sithAI_FUN_00539a60(sithActor *pThing)
 {
     sithThing *a3;
     sithAIClass *psVar1;
-    float fVar2;
+    flex_t fVar2;
     int iVar3;
     sithThing *psVar4;
     sithThing *arg8;
     int iVar5;
-    float local_1c;
+    flex_t local_1c;
     int local_18;
-    float local_10;
+    flex_t local_10;
     rdVector3 local_c;
 
     psVar4 = (sithThing *)0x0;

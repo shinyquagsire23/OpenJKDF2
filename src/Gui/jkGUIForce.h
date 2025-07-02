@@ -35,8 +35,8 @@ void jkGuiForce_DarkLightHoverDraw(jkGuiElement *element, jkGuiMenu *menu, stdVB
 //#define jkGuiForce_aBitmaps ((stdBitmap**)0x00856780)
 //#define jkGuiForce_buttons ((jkGuiElement*)0x0052F168)
 //#define jkGuiForce_alignment (*(int*)0x556670)
-//#define jkGuiForce_flt_556674 (*(float*)0x556674)
-//#define jkGuiForce_darkLightBalance (*(float*)0x55668C)
+//#define jkGuiForce_flt_556674 (*(flex_t*)0x556674)
+//#define jkGuiForce_darkLightBalance (*(flex_t*)0x55668C)
 //#define jkGuiForce_numSpendStars (*(int*)0x556680)
 //#define jkGuiForce_menu (*(jkGuiMenu*)0x52FB30)
 

@@ -2370,7 +2370,7 @@ void do_hooks()
 
     //hook_function(Darray_sub_520CB0_ADDR, Darray_sub_520CB0);
     // test saber time
-    //*(float*)0x5220C4 = 0.01f;
+    //*(flex_t*)0x5220C4 = 0.01f;
     
     //hook_function();
     

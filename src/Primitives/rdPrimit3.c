@@ -45,7 +45,7 @@ void rdPrimit3_ClipFace(rdClipFrustum *clipFrustum, rdGeoMode_t geoMode, signed 
     rdVector3 *v35; // ebx
     rdVertexIdxInfo *v36; // eax
     rdMeshinfo *v37; // ebx
-    float *v38; // esi
+    flex_t *v38; // esi
     int v39; // ebp
     int *v40; // ecx
     rdVector3 *v41; // edx
@@ -54,13 +54,13 @@ void rdPrimit3_ClipFace(rdClipFrustum *clipFrustum, rdGeoMode_t geoMode, signed 
     double v45; // st7
     rdVector3 *v46; // esi
     int *v47; // edx
-    float *v48; // edi
+    flex_t *v48; // edi
     int v49; // ecx
     rdVector3 *v50; // eax
     double v51; // st7
     rdVertexIdxInfo *v52; // eax
     rdMeshinfo *v53; // ebx
-    float *v54; // edi
+    flex_t *v54; // edi
     int v55; // ebp
     rdVector3 *v56; // esi
     rdVector2 *v58; // ecx
@@ -87,12 +87,12 @@ void rdPrimit3_ClipFace(rdClipFrustum *clipFrustum, rdGeoMode_t geoMode, signed 
     int v80; // edx
     rdVector3 *v82; // [esp-Ch] [ebp-30h]
     rdVector3 *v83; // [esp-Ch] [ebp-30h]
-    float *v84; // [esp-8h] [ebp-2Ch]
+    flex_t *v84; // [esp-8h] [ebp-2Ch]
     rdVector2 *v85; // [esp-8h] [ebp-2Ch]
     int v86; // [esp-4h] [ebp-28h]
-    float *v87; // [esp+10h] [ebp-14h]
-    float *v88; // [esp+10h] [ebp-14h]
-    float *v89; // [esp+10h] [ebp-14h]
+    flex_t *v87; // [esp+10h] [ebp-14h]
+    flex_t *v88; // [esp+10h] [ebp-14h]
+    flex_t *v89; // [esp+10h] [ebp-14h]
     int v91; // [esp+14h] [ebp-10h]
     rdVector2 *v92; // [esp+18h] [ebp-Ch]
     rdVector2 *v93; // [esp+18h] [ebp-Ch]
@@ -253,9 +253,9 @@ LABEL_25:
                             v40 = v36->vertexPosIdx;
                             v87 = v36->paDynamicLight;
                             v41 = mesh_out->verticesProjected;
-                            float* intenseIter = v38;
+                            flex_t* intenseIter = v38;
                             a7a = v39;
-                            float* lightIter = mesh_out->paDynamicLight;
+                            flex_t* lightIter = mesh_out->paDynamicLight;
                             do
                             {
                                 v43 = *v40;
@@ -312,14 +312,14 @@ LABEL_25:
                                 v51 = v48[v49];
                             }
                             ++v46;
-                            *(float *)&a2b[(intptr_t)v47++] = v51;
+                            *(flex_t *)&a2b[(intptr_t)v47++] = v51;
                             --a7b;
                         }
                         while ( a7b );
                         v37 = mesh_out;
                         v39 = idxInfoe;
                     }
-                    v84 = (float*)v37->paDynamicLight;
+                    v84 = (flex_t*)v37->paDynamicLight;
                     v82 = v37->verticesProjected;
                     if (rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective)
                         v37->numVertices = rdClip_Face3GS(clipFrustum, v82, v84, v39);
@@ -500,7 +500,7 @@ void rdPrimit3_NoClipFace(rdGeoMode_t geoMode, signed int lightMode, int texMode
     rdVector3 *v30; // ebx
     rdMeshinfo *v31; // eax
     rdMeshinfo *v32; // edi
-    float *v33; // esi
+    flex_t *v33; // esi
     int v34; // ebx
     int *v35; // ecx
     rdVector3 *v36; // edx
@@ -511,11 +511,11 @@ void rdPrimit3_NoClipFace(rdGeoMode_t geoMode, signed int lightMode, int texMode
     int *paPosIdx; // ecx
     char *v42; // edi
     rdVector3 *v43; // eax
-    float *v44; // edx
+    flex_t *v44; // edx
     double v45; // st7
     rdMeshinfo *v46; // eax
     rdMeshinfo *v47; // ebp
-    float *v48; // ebx
+    flex_t *v48; // ebx
     int v49; // ecx
     rdVector2 *v50; // edi
     int *v51; // edx
@@ -528,7 +528,7 @@ void rdPrimit3_NoClipFace(rdGeoMode_t geoMode, signed int lightMode, int texMode
     rdVector3 *v58; // edi
     rdVector2 *v59; // ecx
     int v60; // eax
-    float *v61; // esi
+    flex_t *v61; // esi
     double v62; // st7
     rdMeshinfo *v64; // esi
     int v65; // ebx
@@ -548,10 +548,10 @@ void rdPrimit3_NoClipFace(rdGeoMode_t geoMode, signed int lightMode, int texMode
     int v80; // [esp+18h] [ebp-8h]
     int v81; // [esp+1Ch] [ebp-4h]
     char *v82; // [esp+1Ch] [ebp-4h]
-    float *geometryModea; // [esp+24h] [ebp+4h]
-    float *geometryModeb; // [esp+24h] [ebp+4h]
-    float *geometryModec; // [esp+24h] [ebp+4h]
-    float *geometryModed; // [esp+24h] [ebp+4h]
+    flex_t *geometryModea; // [esp+24h] [ebp+4h]
+    flex_t *geometryModeb; // [esp+24h] [ebp+4h]
+    flex_t *geometryModec; // [esp+24h] [ebp+4h]
+    flex_t *geometryModed; // [esp+24h] [ebp+4h]
     int geometryModee; // [esp+24h] [ebp+4h]
     rdVector3 *pVertices; // [esp+28h] [ebp+8h]
     rdVector3 *pVertices_; // [esp+28h] [ebp+8h]
@@ -679,7 +679,7 @@ LABEL_19:
                             pVertices = v31->verticesProjected;
                             v36 = _vertexDst->verticesProjected;
                             geometryModea = v31->paDynamicLight;
-                            float* lightIter = _vertexDst->paDynamicLight;
+                            flex_t* lightIter = _vertexDst->paDynamicLight;
                             clipIdka = v34;
                             do
                             {
@@ -709,7 +709,7 @@ LABEL_19:
                         pVertices_ = v31->verticesProjected;
                         paPosIdx = v31->vertexPosIdx;
                         geometryModeb = v31->paDynamicLight;
-                        float* lightIter = _vertexDst->paDynamicLight;
+                        flex_t* lightIter = _vertexDst->paDynamicLight;
                         do
                         {
                             v43 = &pVertices_[*paPosIdx];
@@ -767,7 +767,7 @@ LABEL_19:
                         geometryModec = v46->paDynamicLight;
                         v53 = _vertexDst->vertexUVs;
                         v79 = vertexSrcf;
-                        float* lightIter = _vertexDst->paDynamicLight;
+                        flex_t* lightIter = _vertexDst->paDynamicLight;
                         do
                         {
                             *v52 = lightingModec[*v51];
@@ -804,7 +804,7 @@ LABEL_19:
                     lightingModed = v46->verticesProjected;
                     geometryModed = v46->paDynamicLight;
                     v59 = _vertexDst->vertexUVs;
-                    float* lightIter = _vertexDst->paDynamicLight;
+                    flex_t* lightIter = _vertexDst->paDynamicLight;
                     v80 = vertexSrcf;
                     int* uvIter = v46->vertexUVIdx;
                     do
@@ -897,9 +897,9 @@ int rdPrimit3_GetScreenCoord(rdVector3 *vec, rdScreenPoint *screenpt)
     return 1;
 }
 
-void rdPrimit3_DrawCircle(rdVector3 *pVecPos, float xOffs, float radius, int color16, int mask)
+void rdPrimit3_DrawCircle(rdVector3 *pVecPos, flex_t xOffs, flex_t radius, int color16, int mask)
 {
-    float v5; // [esp+0h] [ebp-40h]
+    flex_t v5; // [esp+0h] [ebp-40h]
     rdVector3 vertex_out; // [esp+10h] [ebp-30h] BYREF
     rdVector3 v7; // [esp+1Ch] [ebp-24h] BYREF
     rdVector3 v8; // [esp+28h] [ebp-18h] BYREF
@@ -927,17 +927,17 @@ void rdPrimit3_NoClipFaceRGB
 
 {
     rdVector3 *prVar1;
-    float *pfVar2;
+    flex_t *pfVar2;
     rdVector3 *prVar3;
-    float *pfVar4;
-    float *pfVar5;
-    float *pfVar6;
-    float *pfVar7;
-    float *pfVar8;
+    flex_t *pfVar4;
+    flex_t *pfVar5;
+    flex_t *pfVar6;
+    flex_t *pfVar7;
+    flex_t *pfVar8;
     int *piVar9;
-    float *pfVar10;
+    flex_t *pfVar10;
     intptr_t iVar11;
-    float fVar12;
+    flex_t fVar12;
     rdVector2 *prVar13;
     int *piVar14;
     rdVector2 *prVar15;
@@ -1050,7 +1050,7 @@ void rdPrimit3_NoClipFaceRGB
                 piVar14 = _vertexSrc->vertexPosIdx;
                 pfVar8 = _vertexSrc->paDynamicLight;
                 pfVar10 = _vertexSrc->paBlueIntensities;
-                float* blueIter = _vertexDst->paBlueIntensities;
+                flex_t* blueIter = _vertexDst->paBlueIntensities;
                 int idkIn_ = _vertexSrc->numVertices;
                 idxIter = 0;
                 do {
@@ -1147,18 +1147,18 @@ rdPrimit3_ClipFaceRGB
           rdMeshinfo *idxInfo,rdMeshinfo *mesh_out,rdVector2 *idkIn)
 {
     rdVector3 *prVar1;
-    float *pfVar2;
+    flex_t *pfVar2;
     rdVector3 *prVar3;
-    float *pfVar5;
-    float *pfVar6;
-    float *pfVar7;
-    float *pfVar8;
+    flex_t *pfVar5;
+    flex_t *pfVar6;
+    flex_t *pfVar7;
+    flex_t *pfVar8;
     int *piVar9;
-    float *pfVar10;
-    float *pfVar11;
+    flex_t *pfVar10;
+    flex_t *pfVar11;
     intptr_t iVar12;
     intptr_t iVar13;
-    float fVar14;
+    flex_t fVar14;
     uint32_t uVar15;
     rdVector2 *prVar16;
     int *piVar17;
@@ -1292,8 +1292,8 @@ rdPrimit3_ClipFaceRGB
                     else if (fVar14 > 1.0) {
                         fVar14 = 1.0;
                     }
-                    pfVar2 = (float *)(iVar20 + (intptr_t)piVar17);
-                    *(float *)((intptr_t)pfVar2 + ((intptr_t)pfVar11 - (intptr_t)pfVar10)) = fVar14;
+                    pfVar2 = (flex_t *)(iVar20 + (intptr_t)piVar17);
+                    *(flex_t *)((intptr_t)pfVar2 + ((intptr_t)pfVar11 - (intptr_t)pfVar10)) = fVar14;
                     fVar14 = pfVar7[iVar12] + pfVar6[iVar12];
                     if (fVar14 < 0.0) {
                         fVar14 = 0.0;
@@ -1310,7 +1310,7 @@ rdPrimit3_ClipFaceRGB
                         fVar14 = 1.0;
                     }
                     prVar19 = prVar19 + 1;
-                    *(float *)(iVar22 + (intptr_t)piVar17) = fVar14;
+                    *(flex_t *)(iVar22 + (intptr_t)piVar17) = fVar14;
                     piVar17 = piVar17 + 1;
                     idkIn_ -= 1;
                 } while (idkIn_ != 0x0);
@@ -1394,9 +1394,9 @@ rdPrimit3_ClipFaceRGB
                     pfVar11 = mesh_out->paGreenIntensities;
                     local_10 = idxInfo->numVertices;
 
-                    float* redIter = mesh_out->paRedIntensities;
-                    float* greenIter = mesh_out->paGreenIntensities;
-                    float* blueIter = mesh_out->paBlueIntensities;
+                    flex_t* redIter = mesh_out->paRedIntensities;
+                    flex_t* greenIter = mesh_out->paGreenIntensities;
+                    flex_t* blueIter = mesh_out->paBlueIntensities;
 
                     do {
                         iVar12 = *piVar17;
@@ -1489,12 +1489,12 @@ void rdPrimit3_ClipFaceRGBLevel
                rdVertexIdxInfo *idxInfo,rdMeshinfo *mesh_out,rdVector2 *idkIn)
 {
     rdVector3 *prVar1;
-    float *pfVar2;
-    float fVar3;
-    float fVar4;
+    flex_t *pfVar2;
+    flex_t fVar3;
+    flex_t fVar4;
     rdVector2 *prVar5;
     rdVector3 *prVar7;
-    float *pfVar9;
+    flex_t *pfVar9;
     intptr_t iVar12;
     intptr_t iVar13;
     uint32_t uVar14;
@@ -1605,9 +1605,9 @@ void rdPrimit3_ClipFaceRGBLevel
                 pfVar9 = idxInfo->paDynamicLight;
                 prVar20 = mesh_out->verticesProjected;
 
-                float* redIter = mesh_out->paRedIntensities;
-                float* greenIter = mesh_out->paGreenIntensities;
-                float* blueIter = mesh_out->paBlueIntensities;
+                flex_t* redIter = mesh_out->paRedIntensities;
+                flex_t* greenIter = mesh_out->paGreenIntensities;
+                flex_t* blueIter = mesh_out->paBlueIntensities;
 
                 int idxIter = 0;
                 
@@ -1684,9 +1684,9 @@ void rdPrimit3_ClipFaceRGBLevel
                     pfVar9 = idxInfo->paDynamicLight;
                     prVar17 = mesh_out->vertexUVs;
 
-                    float* redIter = mesh_out->paRedIntensities;
-                    float* greenIter = mesh_out->paGreenIntensities;
-                    float* blueIter = mesh_out->paBlueIntensities;
+                    flex_t* redIter = mesh_out->paRedIntensities;
+                    flex_t* greenIter = mesh_out->paGreenIntensities;
+                    flex_t* blueIter = mesh_out->paBlueIntensities;
 
                     int idxIter = 0;
                     local_8 = idxInfo->numVertices;

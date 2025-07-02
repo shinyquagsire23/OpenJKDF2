@@ -98,7 +98,7 @@ void sithPlayer_NewEntry(sithWorld *world)
     }
 }
 
-float sithPlayer_GetBinAmt(int idx)
+flex_t sithPlayer_GetBinAmt(int idx)
 {
     //if (idx)
     //    jk_printf("Get %u: %f\n", idx, jkPlayer_playerInfos[playerThingIdx].iteminfo[idx].ammoAmt);
@@ -106,7 +106,7 @@ float sithPlayer_GetBinAmt(int idx)
     return jkPlayer_playerInfos[playerThingIdx].iteminfo[idx].ammoAmt;
 }
 
-void sithPlayer_SetBinAmt(int idx, float amt)
+void sithPlayer_SetBinAmt(int idx, flex_t amt)
 {
     jkPlayer_playerInfos[playerThingIdx].iteminfo[idx].ammoAmt = amt;
 }
@@ -173,14 +173,14 @@ void sithPlayer_ResetPalEffects()
     sithPlayer_pLocalPlayer->palEffectsIdx2 = stdPalEffects_NewRequest(2);
 }
 
-void sithPlayer_Tick(sithPlayerInfo *playerInfo, float a2)
+void sithPlayer_Tick(sithPlayerInfo *playerInfo, flex_t a2)
 {
     int v2; // edi
     sithThing *v3; // esi
     stdPalEffect *pPalEffect; // ebx
     double v5; // st7
     int v14; // ecx
-    float v20; // [esp+0h] [ebp-4h]
+    flex_t v20; // [esp+0h] [ebp-4h]
 
     v20 = a2 * 0.4;
     v2 = (__int64)(a2 * 256.0 - -0.5);
@@ -259,7 +259,7 @@ void sithPlayer_debug_loadauto(sithThing *player)
     player->lifeLeftMs = 0;
 }
 
-void sithPlayer_SetScreenTint(float tintR, float tintG, float tintB)
+void sithPlayer_SetScreenTint(flex_t tintR, flex_t tintG, flex_t tintB)
 {
     sithThing *focusThing; // eax
     stdPalEffect *pPalEffects; // ecx
@@ -276,7 +276,7 @@ void sithPlayer_SetScreenTint(float tintR, float tintG, float tintB)
     }
 }
 
-void sithPlayer_AddDynamicTint(float fR, float fG, float fB)
+void sithPlayer_AddDynamicTint(flex_t fR, flex_t fG, flex_t fB)
 {
     stdPalEffect *pPalEffects; // ecx
 

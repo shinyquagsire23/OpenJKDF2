@@ -48,10 +48,10 @@ int sithDSSThing_ProcessPos(sithCogMsg *msg);
 void sithDSSThing_SendSyncThing(sithThing *pThing, int sendto_id, int mpFlags);
 int sithDSSThing_ProcessSyncThing(sithCogMsg *msg);
 
-void sithDSSThing_SendPlaySound(sithThing *followThing, rdVector3 *pos, sithSound *sound, float volume, float a5, int flags, int refid, int sendto_id, int mpFlags);
+void sithDSSThing_SendPlaySound(sithThing *followThing, rdVector3 *pos, sithSound *sound, flex32_t volume, flex32_t a5, int flags, int refid, int sendto_id, int mpFlags);
 int sithDSSThing_ProcessPlaySound(sithCogMsg *msg);
 
-void sithDSSThing_SendPlaySoundMode(sithThing *pThing, int16_t a2, int a3, float a4);
+void sithDSSThing_SendPlaySoundMode(sithThing *pThing, int16_t a2, int a3, flex32_t a4);
 int sithDSSThing_ProcessPlaySoundMode(sithCogMsg *msg);
 
 void sithDSSThing_SendPlayKey(sithThing *pThing, rdKeyframe *pRdKeyframe, int a3, int16_t a4, int a5, int a6, int a7);
@@ -63,26 +63,26 @@ int sithDSSThing_ProcessPlayKeyMode(sithCogMsg *msg);
 void sithDSSThing_SendSetThingModel(sithThing *pThing, int sendtoId);
 int sithDSSThing_ProcessSetThingModel(sithCogMsg *msg);
 
-void sithDSSThing_SendStopKey(sithThing *pThing, int a2, float a3, int sendtoId, int mpFlags);
+void sithDSSThing_SendStopKey(sithThing *pThing, int a2, flex32_t a3, int sendtoId, int mpFlags);
 int sithDSSThing_ProcessStopKey(sithCogMsg *msg);
 
-void sithDSSThing_SendStopSound(sithPlayingSound *pSound, float a2, int a3, int a4);
+void sithDSSThing_SendStopSound(sithPlayingSound *pSound, flex32_t a2, int a3, int a4);
 int sithDSSThing_ProcessStopSound(sithCogMsg *msg);
 
-void sithDSSThing_SendFireProjectile(sithThing *pWeapon, sithThing *pProjectile, rdVector3 *pFireOffset, rdVector3 *pAimError, sithSound *pFireSound, int16_t anim, float scale, int16_t scaleFlags, float a9, int thingId, int sendtoId, int mpFlags, int idk);
+void sithDSSThing_SendFireProjectile(sithThing *pWeapon, sithThing *pProjectile, rdVector3 *pFireOffset, rdVector3 *pAimError, sithSound *pFireSound, int16_t anim, flex32_t scale, int16_t scaleFlags, flex32_t a9, int thingId, int sendtoId, int mpFlags, int idk);
 int sithDSSThing_ProcessFireProjectile(sithCogMsg *msg);
 int sithDSSThing_ProcessMOTSNew2(sithCogMsg *msg);
 
 void sithDSSThing_SendDeath(sithThing *sender, sithThing *receiver, char cause, int sendto_id, int mpFlags);
 int sithDSSThing_ProcessDeath(sithCogMsg *msg);
 
-void sithDSSThing_SendDamage(sithThing *pDamagedThing, sithThing *pDamagedBy, float amt, int16_t a4, int sendtoId, int mpFlags);
+void sithDSSThing_SendDamage(sithThing *pDamagedThing, sithThing *pDamagedBy, flex32_t amt, int16_t a4, int sendtoId, int mpFlags);
 int sithDSSThing_ProcessDamage(sithCogMsg *msg);
 
 void sithDSSThing_SendFullDesc(sithThing *thing, int sendto_id, int mpFlags);
 int sithDSSThing_ProcessFullDesc(sithCogMsg *msg);
 
-void sithDSSThing_SendPathMove(sithThing *pThing, int16_t a2, float a3, int a4, int sendtoId, int mpFlags);
+void sithDSSThing_SendPathMove(sithThing *pThing, int16_t a2, flex32_t a3, int a4, int sendtoId, int mpFlags);
 int sithDSSThing_ProcessPathMove(sithCogMsg *msg);
 
 void sithDSSThing_SendSyncThingAttachment(sithThing *thing, int sendto_id, int mpFlags, int a4);
@@ -104,16 +104,16 @@ void sithDSSThing_SendMOTSNew1(sithThing* pThing1, sithThing* pThing2, sithThing
     rdVector3* pVec1, rdVector3* pVec2, int mpFlags, int param_8);
 
 //static void (*sithDSSThing_SendPlayKey)(sithThing *a1, rdKeyframe *a2, int a3, wchar_t a4, int a5, int a6, int a7) = (void*)sithDSSThing_SendPlayKey_ADDR;
-//static void (*sithDSSThing_SendStopKey)(sithThing *a1, int a2, float a3, int a4, int a5) = (void*)sithDSSThing_SendStopKey_ADDR;
+//static void (*sithDSSThing_SendStopKey)(sithThing *a1, int a2, flex32_t a3, int a4, int a5) = (void*)sithDSSThing_SendStopKey_ADDR;
 //static void (*sithDSSThing_SendSetThingModel)(sithThing *a1, int a2) = (void*)sithDSSThing_SendSetThingModel_ADDR;
-//static int (*sithDSSThing_SendStopSound)(sithPlayingSound *a1, float a2, int a3, int a4) = (void*)sithDSSThing_SendStopSound_ADDR;
-//static int (*sithDSSThing_PlaySoundMode)(sithThing *a1, int16_t a2, int a3, float a4) = (void*)sithDSSThing_PlaySoundMode_ADDR;
-//static int (*sithDSSThing_SendFireProjectile)(sithThing *weapon, sithThing *projectile, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, __int16 anim, float scale, __int16 scaleFlags, float a9, int thingId, int a11, int a12) = (void*)sithDSSThing_SendFireProjectile_ADDR;
-//static void (*sithDSSThing_SendPathMove)(sithThing *a1, __int16 a2, float a3, int a4, int a5, int a6) = (void*)sithDSSThing_SendPathMove_ADDR;
+//static int (*sithDSSThing_SendStopSound)(sithPlayingSound *a1, flex32_t a2, int a3, int a4) = (void*)sithDSSThing_SendStopSound_ADDR;
+//static int (*sithDSSThing_PlaySoundMode)(sithThing *a1, int16_t a2, int a3, flex32_t a4) = (void*)sithDSSThing_PlaySoundMode_ADDR;
+//static int (*sithDSSThing_SendFireProjectile)(sithThing *weapon, sithThing *projectile, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, __int16 anim, flex32_t scale, __int16 scaleFlags, flex32_t a9, int thingId, int a11, int a12) = (void*)sithDSSThing_SendFireProjectile_ADDR;
+//static void (*sithDSSThing_SendPathMove)(sithThing *a1, __int16 a2, flex32_t a3, int a4, int a5, int a6) = (void*)sithDSSThing_SendPathMove_ADDR;
 //static void (*sithDSSThing_SendPlayKeyMode)(sithThing *a1, __int16 a2, int a3, int a4, int a5) = (void*)sithDSSThing_SendPlayKeyMode_ADDR;
 //static void (*sithDSSThing_SendDestroyThing)(int a1, int a2) = (void*)sithDSSThing_SendDestroyThing_ADDR;
 //static int (*sithDSSThing_SendCreateThing)(sithThing *a1, sithThing *a2, sithThing *a3, sithSector *a4, int *a5, int *a6, int a7, int a8) = (void*)sithDSSThing_SendCreateThing_ADDR;
-//static void (*sithDSSThing_SendDamage)(sithThing *a1, sithThing *a2, float a3, __int16 a4, int a5, int a6) = (void*)sithDSSThing_SendDamage_ADDR;
+//static void (*sithDSSThing_SendDamage)(sithThing *a1, sithThing *a2, flex32_t a3, __int16 a4, int a5, int a6) = (void*)sithDSSThing_SendDamage_ADDR;
 //static void (*sithDSSThing_SendSyncThing)(sithThing *a1, int a2, int a3) = (void*)sithDSSThing_SendSyncThing_ADDR;
 //static void (*sithDSSThing_SendTakeItem)(sithThing *a1, sithThing *a2, int a3) = (void*)sithDSSThing_SendTakeItem_ADDR;
 

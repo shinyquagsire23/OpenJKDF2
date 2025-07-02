@@ -18,7 +18,7 @@
 #include "Win95/stdSound.h"
 
 // Added
-float jkGuiSound_cutsceneVolume = 1.0;
+flex_t jkGuiSound_cutsceneVolume = 1.0;
 
 static int slider_images[2] = {JKGUI_BM_SLIDER_BACK, JKGUI_BM_SLIDER_THUMB};
 

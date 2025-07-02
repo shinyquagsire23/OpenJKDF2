@@ -307,7 +307,7 @@ void jkGuiMouse_sub_417100(int a1, int a2)
     unsigned int v10; // ecx
     wchar_t *v11; // eax
     wchar_t *v12; // [esp-4h] [ebp-18h]
-    float v13; // [esp+10h] [ebp-4h]
+    flex_t v13; // [esp+10h] [ebp-4h]
 
     v13 = 1.0;
     mapFlags = 0;

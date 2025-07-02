@@ -18,7 +18,7 @@ void rdParticle_RegisterLoader(rdParticleLoader_t loader)
     rdParticle_loader = loader;
 }
 
-rdParticle* rdParticle_New(int numVertices, float size, rdMaterial *material, int lightingMode, int allocateVertices)
+rdParticle* rdParticle_New(int numVertices, flex_t size, rdMaterial *material, int lightingMode, int allocateVertices)
 {
     rdParticle *particle;
 
@@ -29,7 +29,7 @@ rdParticle* rdParticle_New(int numVertices, float size, rdMaterial *material, in
     return particle;
 }
 
-int rdParticle_NewEntry(rdParticle *particle, int numVertices, float size, rdMaterial *material, int lightingMode, int allocateVertices)
+int rdParticle_NewEntry(rdParticle *particle, int numVertices, flex_t size, rdMaterial *material, int lightingMode, int allocateVertices)
 {
     particle->material = material;
     particle->diameter = size;
@@ -129,7 +129,7 @@ int rdParticle_LoadEntry(char *fpath, rdParticle *pParticle)
     rdVector3 *v16; // esi
     int *v17; // edi
     rdVector3 v19; // [esp+10h] [ebp-20h]
-    float size; // [esp+1Ch] [ebp-14h]
+    flex_t size; // [esp+1Ch] [ebp-14h]
     int v21; // [esp+20h] [ebp-10h]
     int versMinor; // [esp+24h] [ebp-Ch]
     int versMajor; // [esp+28h] [ebp-8h]
@@ -297,7 +297,7 @@ int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
 {
     rdParticle *particle; // edi
     int v3; // eax
-    float *v4; // ebx
+    flex_t *v4; // ebx
     rdProcEntry *v5; // esi
     double v6; // st6
     double v7; // st5
@@ -308,17 +308,17 @@ int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
     double v12; // st1
     double v13; // st3
     double v14; // rt1
-    float v15; // ST24_4
+    flex_t v15; // ST24_4
     double v16; // st2
     double v17; // st7
-    float v18; // edx
-    float v19; // ST24_4
+    flex_t v18; // edx
+    flex_t v19; // ST24_4
     double v20; // st5
     double v21; // st2
     double v22; // st7
     rdClipFrustum *v23; // ecx
-    float v24; // eax
-    float v25; // ST24_4
+    flex_t v24; // eax
+    flex_t v25; // ST24_4
     unsigned int v26; // eax
     unsigned int v27; // ebp
     int *v29; // ecx
@@ -327,7 +327,7 @@ int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
     rdVector3 vertex_out; // [esp+18h] [ebp-3Ch]
     rdMatrix34 out; // [esp+24h] [ebp-30h]
     int v35; // [esp+58h] [ebp+4h]
-    float matrix_4_3a; // [esp+5Ch] [ebp+8h]
+    flex_t matrix_4_3a; // [esp+5Ch] [ebp+8h]
 
     particle = thing->particlecloud;
     rdMatrix_TransformPoint34(&vertex_out, &matrix_4_3->scale, &rdCamera_pCurCamera->view_matrix);

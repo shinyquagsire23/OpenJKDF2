@@ -68,15 +68,15 @@ void rdDebug_DrawLine3(rdVector3* v1, rdVector3* v2, uint32_t color)
     // And project to screen coords
     rdCamera_pCurCamera->fnProjectLst(&vertsOut, &verts, 2);
     
-    vertsOut[0].x = (float)(int)vertsOut[0].x + 0.0001;
-    vertsOut[0].y = (float)(int)vertsOut[0].y + 0.0001;
-    vertsOut[1].x = (float)(int)vertsOut[1].x - 0.0001;
-    vertsOut[1].y = (float)(int)vertsOut[1].y - 0.0001;
+    vertsOut[0].x = (flex_t)(int)vertsOut[0].x + 0.0001; // FLEXTODO
+    vertsOut[0].y = (flex_t)(int)vertsOut[0].y + 0.0001; // FLEXTODO
+    vertsOut[1].x = (flex_t)(int)vertsOut[1].x - 0.0001; // FLEXTODO
+    vertsOut[1].y = (flex_t)(int)vertsOut[1].y - 0.0001; // FLEXTODO
     
     rdDebug_DrawScreenLine3(&vertsOut[0], &vertsOut[1], color);
 }
 
-void rdDebug_DrawBoundingBox(rdMatrix34* m, float radius, uint32_t color)
+void rdDebug_DrawBoundingBox(rdMatrix34* m, flex_t radius, uint32_t color)
 {
 #ifndef SDL2_RENDER
     return;

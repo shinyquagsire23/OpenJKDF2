@@ -74,24 +74,24 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
     int v55; // edi
     unsigned int idx; // edi
     rdHierarchyNode *node; // esi
-    float v_z; // [esp+14h] [ebp-80h]
-    float v_y; // [esp+18h] [ebp-7Ch]
-    float v_x; // [esp+1Ch] [ebp-78h]
+    flex_t v_z; // [esp+14h] [ebp-80h]
+    flex_t v_y; // [esp+18h] [ebp-7Ch]
+    flex_t v_x; // [esp+1Ch] [ebp-78h]
     rdFace *face; // [esp+34h] [ebp-60h]
     int v78; // [esp+50h] [ebp-44h]
     int sibling; // [esp+54h] [ebp-40h]
-    float pitch; // [esp+58h] [ebp-3Ch]
-    float v_i; // [esp+5Ch] [ebp-38h]
-    float yaw; // [esp+60h] [ebp-34h]
-    float v_v; // [esp+64h] [ebp-30h]
-    float roll; // [esp+68h] [ebp-2Ch]
+    flex_t pitch; // [esp+58h] [ebp-3Ch]
+    flex_t v_i; // [esp+5Ch] [ebp-38h]
+    flex_t yaw; // [esp+60h] [ebp-34h]
+    flex_t v_v; // [esp+64h] [ebp-30h]
+    flex_t roll; // [esp+68h] [ebp-2Ch]
     int parent; // [esp+6Ch] [ebp-28h]
-    float pivot_x; // [esp+70h] [ebp-24h]
-    float radius; // [esp+74h] [ebp-20h]
-    float pivot_y; // [esp+78h] [ebp-1Ch]
+    flex_t pivot_x; // [esp+70h] [ebp-24h]
+    flex_t radius; // [esp+74h] [ebp-20h]
+    flex_t pivot_y; // [esp+78h] [ebp-1Ch]
     int extralight; // [esp+7Ch] [ebp-18h]
-    float pivot_z; // [esp+80h] [ebp-14h]
-    float v_u; // [esp+84h] [ebp-10h]
+    flex_t pivot_z; // [esp+80h] [ebp-14h]
+    flex_t v_u; // [esp+84h] [ebp-10h]
     int child; // [esp+88h] [ebp-Ch]
     int version_minor; // [esp+8Ch] [ebp-8h]
     int version_major; // [esp+90h] [ebp-4h]
@@ -225,10 +225,10 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
                 mesh->vertices = (rdVector3 *)rdroid_pHS->alloc(sizeof(rdVector3) * mesh->numVertices);
                 if ( !mesh->vertices )
                     goto fail;
-                mesh->vertices_i = (float *)rdroid_pHS->alloc(sizeof(float) * mesh->numVertices);
+                mesh->vertices_i = (flex_t *)rdroid_pHS->alloc(sizeof(flex_t) * mesh->numVertices);
                 if ( !mesh->vertices_i )
                     goto fail;
-                mesh->vertices_unk  = (float *)rdroid_pHS->alloc(sizeof(float) * mesh->numVertices);
+                mesh->vertices_unk  = (flex_t *)rdroid_pHS->alloc(sizeof(flex_t) * mesh->numVertices);
                 if ( !mesh->vertices_unk  )
                     goto fail;
                 _memset(mesh->vertices_unk, 0, mesh->numVertices); // bug?
@@ -912,7 +912,7 @@ rdModel3* rdModel3_Validate(rdModel3 *model)
 
 void rdModel3_CalcBoundingBoxes(rdModel3 *model)
 {
-    float maxDist;
+    flex_t maxDist;
 
     for (int i = 0; i < model->geosets[0].numMeshes; i++)
     {
@@ -921,7 +921,7 @@ void rdModel3_CalcBoundingBoxes(rdModel3 *model)
         for (int j = 0; j < mesh->numVertices; j++)
         {
             rdVector3* vtx = &mesh->vertices[j];
-            float dist = rdVector_Len3(vtx);
+            flex_t dist = rdVector_Len3(vtx);
             if ( dist > maxDist )
             {
                 maxDist = dist;
@@ -961,7 +961,7 @@ void rdModel3_BuildExpandedRadius(rdModel3 *model, rdHierarchyNode *node, const 
         {
             rdVector3* vtx = &mesh->vertices[i];
             rdMatrix_TransformPoint34(&vertex_out, vtx, &out);
-            float dist = rdVector_Len3(&vertex_out);
+            flex_t dist = rdVector_Len3(&vertex_out);
             if ( dist > rdModel3_fRadius )
                 rdModel3_fRadius = dist;
         }
@@ -1309,7 +1309,7 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
                 
                 // MOTS added
                 if ((*pGeoLight)->type == 3) {
-                    float tmpZ = mat->scale.z;
+                    flex_t tmpZ = mat->scale.z;
                     rdVector_Zero3(&mat->scale);
 
                     rdVector3 tmpDir;
@@ -1339,7 +1339,7 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
                     
                     // MOTS added
                     if ((*pGeoLight)->type == 3) {
-                        float tmpZ = mat->scale.z;
+                        flex_t tmpZ = mat->scale.z;
                         rdVector_Zero3(&mat->scale);
 
                         rdVector3 tmpDir;
@@ -1523,7 +1523,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
 
         for (int i = 1; i < vertexDst.numVertices; i++ )
         {
-                float level = procEntry->vertexIntensities[i] - procEntry->vertexIntensities[0];
+                flex_t level = procEntry->vertexIntensities[i] - procEntry->vertexIntensities[0];
                 if ( level < 0.0 )
                     level = -level;
 

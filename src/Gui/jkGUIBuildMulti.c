@@ -688,9 +688,9 @@ void jkGuiBuildMulti_ModelDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVB
     double v6; // st7
     rdPuppet *v7; // [esp-8h] [ebp-24h]
     int64_t v8; // [esp+8h] [ebp-14h]
-    float v9; // [esp+8h] [ebp-14h]
+    flex_t v9; // [esp+8h] [ebp-14h]
     rdVector3 rot; // [esp+10h] [ebp-Ch] BYREF
-    float a2a; // [esp+24h] [ebp+8h]
+    flex_t a2a; // [esp+24h] [ebp+8h]
 
     jkGuiBuildMulti_bRendering = 1;
 

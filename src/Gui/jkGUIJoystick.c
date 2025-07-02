@@ -27,7 +27,7 @@ static Darray jkGuiJoystick_darray;
 static int jkGuiJoystick_dword_557128;
 static Darray jkGuiJoystick_darray2;
 static jkGuiJoystickStrings jkGuiJoystick_strings;
-static float jkGuiJoystick_aFloats[JKGUIJOYSTICK_NUM_ENTRIES];
+static flex_t jkGuiJoystick_aFloats[JKGUIJOYSTICK_NUM_ENTRIES];
 static wchar_t jkGuiJoystick_awTmp[256];
 static Darray jkGuiJoystick_darray3;
 static int jkGuiJoystick_dword_5576F0;
@@ -443,7 +443,7 @@ void jkGuiJoystick_BindControl(int a1, int a2)
     stdControlKeyInfoEntry *v9; // eax
     wchar_t *v11; // eax
     wchar_t *v12; // [esp-4h] [ebp-18h]
-    float v13; // [esp+10h] [ebp-4h]
+    flex_t v13; // [esp+10h] [ebp-4h]
 
     v13 = 1.0;
     v2 = 0;
@@ -857,7 +857,7 @@ void jkGuiJoystick_MenuTick(jkGuiMenu *pMenu)
     jkGuiMenu *v17; // esi
     unsigned int v18; // [esp-4h] [ebp-28h]
     int v19; // [esp-4h] [ebp-28h]
-    float *v20; // [esp+10h] [ebp-14h]
+    flex_t *v20; // [esp+10h] [ebp-14h]
     int v21; // [esp+14h] [ebp-10h]
     int pOut; // [esp+18h] [ebp-Ch] BYREF
     int v23; // [esp+1Ch] [ebp-8h]

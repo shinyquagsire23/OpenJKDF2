@@ -97,7 +97,7 @@ void jkGuiGameplay_Shutdown()
 #ifdef QOL_IMPROVEMENTS
 void jkGuiGameplay_ScaleDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw)
 {
-    float tmp = ((float)jkGuiGameplay_buttons[41].selectedTextEntry)*0.2f;
+    flex_t tmp = ((flex_t)jkGuiGameplay_buttons[41].selectedTextEntry)*0.2f; // FLEXTODO
     
     jk_snwprintf(slider_val_text, 5, L"%f", tmp);
     jkGuiGameplay_buttons[42].wstr = slider_val_text;
@@ -181,7 +181,7 @@ int jkGuiGameplay_Show()
         jkPlayer_setCrosshairOnLightsaber = jkGuiGameplay_buttons[38].selectedTextEntry;
         jkPlayer_setCrosshairOnFist = jkGuiGameplay_buttons[39].selectedTextEntry;
         jkPlayer_bDisableWeaponWaggle = jkGuiGameplay_buttons[40].selectedTextEntry;
-        jkPlayer_crosshairScale = ((float)jkGuiGameplay_buttons[41].selectedTextEntry)*0.2f;
+        jkPlayer_crosshairScale = ((flex_t)jkGuiGameplay_buttons[41].selectedTextEntry)*0.2f; // FLEXTODO
 #endif /* QOL_IMPROVEMENTS */
     
         jkPlayer_WriteConf(jkPlayer_playerShortName);

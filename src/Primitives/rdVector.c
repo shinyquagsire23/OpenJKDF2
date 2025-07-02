@@ -11,14 +11,14 @@ const rdVector3 rdroid_xVector3 = {1.0,0.0,0.0};
 const rdVector3 rdroid_yVector3 = {0.0,1.0,0.0};
 const rdVector3 rdroid_zVector3 = {0.0,0.0,1.0};
 
-rdVector2* rdVector_Set2(rdVector2* v, float x, float y)
+rdVector2* rdVector_Set2(rdVector2* v, flex_t x, flex_t y)
 {
     v->x = x;
     v->y = y;
     return v;
 }
 
-rdVector3* rdVector_Set3(rdVector3* v, float x, float y, float z)
+rdVector3* rdVector_Set3(rdVector3* v, flex_t x, flex_t y, flex_t z)
 {
     v->x = x;
     v->y = y;
@@ -26,7 +26,7 @@ rdVector3* rdVector_Set3(rdVector3* v, float x, float y, float z)
     return v;
 }
 
-rdVector4* rdVector_Set4(rdVector4* v, float x, float y, float z, float w)
+rdVector4* rdVector_Set4(rdVector4* v, flex_t x, flex_t y, flex_t z, flex_t w)
 {
     v->x = x;
     v->y = y;
@@ -201,17 +201,17 @@ rdVector4* rdVector_Sub4Acc(rdVector4* v1, const rdVector4* v2)
     return v1;
 }
 
-float rdVector_Dot2(const rdVector2* v1, const rdVector2* v2)
+flex_t rdVector_Dot2(const rdVector2* v1, const rdVector2* v2)
 {
     return (v1->x * v2->x) + (v1->y * v2->y);
 }
 
-float rdVector_Dot3(const rdVector3* v1, const rdVector3* v2)
+flex_t rdVector_Dot3(const rdVector3* v1, const rdVector3* v2)
 {
     return (v1->x * v2->x) + (v1->y * v2->y) + (v1->z * v2->z);
 }
 
-float rdVector_Dot4(const rdVector4* v1, const rdVector4* v2)
+flex_t rdVector_Dot4(const rdVector4* v1, const rdVector4* v2)
 {
     return (v1->x * v2->x) + (v1->y * v2->y) + (v1->z * v2->z) + (v1->w * v2->w);
 }
@@ -230,24 +230,24 @@ void rdVector_Cross3Acc(rdVector3 *v1, const rdVector3 *v2)
     v1->z = (v2->y * v1->x) - (v1->y * v2->x);
 }
 
-float rdVector_Len2(const rdVector2* v)
+flex_t rdVector_Len2(const rdVector2* v)
 {
     return stdMath_Sqrt(rdVector_Dot2(v,v));
 }
 
-float rdVector_Len3(const rdVector3* v)
+flex_t rdVector_Len3(const rdVector3* v)
 {
     return stdMath_Sqrt(rdVector_Dot3(v,v));
 }
 
-float rdVector_Len4(const rdVector4* v)
+flex_t rdVector_Len4(const rdVector4* v)
 {
     return stdMath_Sqrt(rdVector_Dot4(v,v));
 }
 
-float rdVector_Normalize2(rdVector2 *v1, const rdVector2 *v2)
+flex_t rdVector_Normalize2(rdVector2 *v1, const rdVector2 *v2)
 {
-    float len = rdVector_Len2(v2);
+    flex_t len = rdVector_Len2(v2);
     if (len == 0.0)
     {
         v1->x = v2->x;
@@ -261,9 +261,9 @@ float rdVector_Normalize2(rdVector2 *v1, const rdVector2 *v2)
     return len;
 }
 
-float rdVector_Normalize3(rdVector3 *v1, const rdVector3 *v2)
+flex_t rdVector_Normalize3(rdVector3 *v1, const rdVector3 *v2)
 {
-    float len = rdVector_Len3(v2);
+    flex_t len = rdVector_Len3(v2);
     if (len == 0.0)
     {
         v1->x = v2->x;
@@ -279,15 +279,15 @@ float rdVector_Normalize3(rdVector3 *v1, const rdVector3 *v2)
     return len;
 }
 
-float rdVector_Normalize3Quick(rdVector3 *v1, const rdVector3 *v2)
+flex_t rdVector_Normalize3Quick(rdVector3 *v1, const rdVector3 *v2)
 {
-    float series_1;
-    float series_2;
-    float series_3;
+    flex_t series_1;
+    flex_t series_2;
+    flex_t series_3;
 
-    float x_pos = (v2->x >= 0.0) ? v2->x : -v2->x;
-    float y_pos = (v2->y >= 0.0) ? v2->y : -v2->y;
-    float z_pos = (v2->z >= 0.0) ? v2->z : -v2->z;
+    flex_t x_pos = (v2->x >= 0.0) ? v2->x : -v2->x;
+    flex_t y_pos = (v2->y >= 0.0) ? v2->y : -v2->y;
+    flex_t z_pos = (v2->z >= 0.0) ? v2->z : -v2->z;
 
     series_1 = x_pos;
     series_2 = z_pos;
@@ -322,17 +322,17 @@ float rdVector_Normalize3Quick(rdVector3 *v1, const rdVector3 *v2)
         }
     }
 
-    float len = ((0.34375 * series_3) + (0.25 * series_2) + series_1);
-    float len_recip = 1.0 / len;
+    flex_t len = ((0.34375 * series_3) + (0.25 * series_2) + series_1);
+    flex_t len_recip = 1.0 / len;
     v1->x = v2->x * len_recip;
     v1->y = v2->y * len_recip;
     v1->z = v2->z * len_recip;
     return len;
 }
 
-float rdVector_Normalize4(rdVector4 *v1, const rdVector4 *v2)
+flex_t rdVector_Normalize4(rdVector4 *v1, const rdVector4 *v2)
 {
-    float len = rdVector_Len4(v2);
+    flex_t len = rdVector_Len4(v2);
     if (len == 0.0)
     {
         v1->x = v2->x;
@@ -350,9 +350,9 @@ float rdVector_Normalize4(rdVector4 *v1, const rdVector4 *v2)
     return len;
 }
 
-float rdVector_Normalize2Acc(rdVector2 *v1)
+flex_t rdVector_Normalize2Acc(rdVector2 *v1)
 {
-    float len = rdVector_Len2(v1);
+    flex_t len = rdVector_Len2(v1);
     if (len == 0.0)
     {
         v1->x = v1->x;
@@ -366,9 +366,9 @@ float rdVector_Normalize2Acc(rdVector2 *v1)
     return len;
 }
 
-float rdVector_Normalize3Acc(rdVector3 *v1)
+flex_t rdVector_Normalize3Acc(rdVector3 *v1)
 {
-    float len = rdVector_Len3(v1);
+    flex_t len = rdVector_Len3(v1);
     if (len == 0.0)
     {
         v1->x = v1->x;
@@ -384,15 +384,15 @@ float rdVector_Normalize3Acc(rdVector3 *v1)
     return len;
 }
 
-float rdVector_Normalize3QuickAcc(rdVector3 *v1)
+flex_t rdVector_Normalize3QuickAcc(rdVector3 *v1)
 {
-    float series_1;
-    float series_2;
-    float series_3;
+    flex_t series_1;
+    flex_t series_2;
+    flex_t series_3;
 
-    float x_pos = (v1->x >= 0.0) ? v1->x : -v1->x;
-    float y_pos = (v1->y >= 0.0) ? v1->y : -v1->y;
-    float z_pos = (v1->z >= 0.0) ? v1->z : -v1->z;
+    flex_t x_pos = (v1->x >= 0.0) ? v1->x : -v1->x;
+    flex_t y_pos = (v1->y >= 0.0) ? v1->y : -v1->y;
+    flex_t z_pos = (v1->z >= 0.0) ? v1->z : -v1->z;
 
     series_1 = x_pos;
     series_2 = z_pos;
@@ -427,21 +427,21 @@ float rdVector_Normalize3QuickAcc(rdVector3 *v1)
         }
     }
 
-    float len = ((0.34375 * series_3) + (0.25 * series_2) + series_1);
+    flex_t len = ((0.34375 * series_3) + (0.25 * series_2) + series_1);
     // Added: prevent div 0
     if (len == 0.0) {
         len = 0.00000001;
     }
-    float len_recip = 1.0 / len;
+    flex_t len_recip = 1.0 / len;
     v1->x = v1->x * len_recip;
     v1->y = v1->y * len_recip;
     v1->z = v1->z * len_recip;
     return len;
 }
 
-float rdVector_Normalize4Acc(rdVector4 *v1)
+flex_t rdVector_Normalize4Acc(rdVector4 *v1)
 {
-    float len = rdVector_Len4(v1);
+    flex_t len = rdVector_Len4(v1);
     if (len == 0.0)
     {
         v1->x = v1->x;
@@ -459,14 +459,14 @@ float rdVector_Normalize4Acc(rdVector4 *v1)
     return len;
 }
 
-rdVector2* rdVector_Scale2(rdVector2 *v1, const rdVector2 *v2, float scale)
+rdVector2* rdVector_Scale2(rdVector2 *v1, const rdVector2 *v2, flex_t scale)
 {
     v1->x = v2->x * scale;
     v1->y = v2->y * scale;
     return v1;
 }
 
-rdVector3* rdVector_Scale3(rdVector3 *v1, const rdVector3 *v2, float scale)
+rdVector3* rdVector_Scale3(rdVector3 *v1, const rdVector3 *v2, flex_t scale)
 {
     v1->x = v2->x * scale;
     v1->y = v2->y * scale;
@@ -474,7 +474,7 @@ rdVector3* rdVector_Scale3(rdVector3 *v1, const rdVector3 *v2, float scale)
     return v1;
 }
 
-rdVector4* rdVector_Scale4(rdVector4 *v1, const rdVector4 *v2, float scale)
+rdVector4* rdVector_Scale4(rdVector4 *v1, const rdVector4 *v2, flex_t scale)
 {
     v1->x = v2->x * scale;
     v1->y = v2->y * scale;
@@ -483,14 +483,14 @@ rdVector4* rdVector_Scale4(rdVector4 *v1, const rdVector4 *v2, float scale)
     return v1;
 }
 
-rdVector2* rdVector_Scale2Acc(rdVector2 *v1, float scale)
+rdVector2* rdVector_Scale2Acc(rdVector2 *v1, flex_t scale)
 {
     v1->x = v1->x * scale;
     v1->y = v1->y * scale;
     return v1;
 }
 
-rdVector3* rdVector_Scale3Acc(rdVector3 *v1, float scale)
+rdVector3* rdVector_Scale3Acc(rdVector3 *v1, flex_t scale)
 {
     v1->x = v1->x * scale;
     v1->y = v1->y * scale;
@@ -498,7 +498,7 @@ rdVector3* rdVector_Scale3Acc(rdVector3 *v1, float scale)
     return v1;
 }
 
-rdVector4* rdVector_Scale4Acc(rdVector4 *v1, float scale)
+rdVector4* rdVector_Scale4Acc(rdVector4 *v1, flex_t scale)
 {
     v1->x = v1->x * scale;
     v1->y = v1->y * scale;
@@ -507,14 +507,14 @@ rdVector4* rdVector_Scale4Acc(rdVector4 *v1, float scale)
     return v1;
 }
 
-rdVector2* rdVector_InvScale2(rdVector2 *v1, const rdVector2 *v2, float scale)
+rdVector2* rdVector_InvScale2(rdVector2 *v1, const rdVector2 *v2, flex_t scale)
 {
     v1->x = v2->x / scale;
     v1->y = v2->y / scale;
     return v1;
 }
 
-rdVector3* rdVector_InvScale3(rdVector3 *v1, const rdVector3 *v2, float scale)
+rdVector3* rdVector_InvScale3(rdVector3 *v1, const rdVector3 *v2, flex_t scale)
 {
     v1->x = v2->x / scale;
     v1->y = v2->y / scale;
@@ -522,7 +522,7 @@ rdVector3* rdVector_InvScale3(rdVector3 *v1, const rdVector3 *v2, float scale)
     return v1;
 }
 
-rdVector4* rdVector_InvScale4(rdVector4 *v1, const rdVector4 *v2, float scale)
+rdVector4* rdVector_InvScale4(rdVector4 *v1, const rdVector4 *v2, flex_t scale)
 {
     v1->x = v2->x / scale;
     v1->y = v2->y / scale;
@@ -531,14 +531,14 @@ rdVector4* rdVector_InvScale4(rdVector4 *v1, const rdVector4 *v2, float scale)
     return v1;
 }
 
-rdVector2* rdVector_InvScale2Acc(rdVector2 *v1, float scale)
+rdVector2* rdVector_InvScale2Acc(rdVector2 *v1, flex_t scale)
 {
     v1->x = v1->x / scale;
     v1->y = v1->y / scale;
     return v1;
 }
 
-rdVector3* rdVector_InvScale3Acc(rdVector3 *v1, float scale)
+rdVector3* rdVector_InvScale3Acc(rdVector3 *v1, flex_t scale)
 {
     v1->x = v1->x / scale;
     v1->y = v1->y / scale;
@@ -546,7 +546,7 @@ rdVector3* rdVector_InvScale3Acc(rdVector3 *v1, float scale)
     return v1;
 }
 
-rdVector4* rdVector_InvScale4Acc(rdVector4 *v1, float scale)
+rdVector4* rdVector_InvScale4Acc(rdVector4 *v1, flex_t scale)
 {
     v1->x = v1->x / scale;
     v1->y = v1->y / scale;
@@ -579,7 +579,7 @@ void rdVector_ExtractAngle(const rdVector3 *v1, rdVector3 *out)
 }
 
 // Added
-float rdVector_Dist3(const rdVector3 *v1, const rdVector3 *v2)
+flex_t rdVector_Dist3(const rdVector3 *v1, const rdVector3 *v2)
 {
     rdVector3 tmp;
     
@@ -588,7 +588,7 @@ float rdVector_Dist3(const rdVector3 *v1, const rdVector3 *v2)
 }
 
 // Added
-float rdVector_DistSquared3(const rdVector3 *v1, const rdVector3 *v2)
+flex_t rdVector_DistSquared3(const rdVector3 *v1, const rdVector3 *v2)
 {
     rdVector3 tmp;
     
@@ -596,7 +596,7 @@ float rdVector_DistSquared3(const rdVector3 *v1, const rdVector3 *v2)
     return rdVector_Dot3(&tmp,&tmp);
 }
 
-rdVector3* rdVector_MultAcc3(rdVector3 *v1, const rdVector3 *v2, float scale)
+rdVector3* rdVector_MultAcc3(rdVector3 *v1, const rdVector3 *v2, flex_t scale)
 {
     v1->x += v2->x * scale;
     v1->y += v2->y * scale;
@@ -619,7 +619,7 @@ int rdVector_IsZero3(rdVector3* v)
     return (v->x == 0.0 && v->y == 0.0 && v->z == 0.0);
 }
 
-float rdVector_NormalDot(const rdVector3* v1, const rdVector3* v2, const rdVector3* norm)
+flex_t rdVector_NormalDot(const rdVector3* v1, const rdVector3* v2, const rdVector3* norm)
 {
     return rdMath_DistancePointToPlane(v1, norm, v2);
 }
@@ -645,7 +645,7 @@ void rdVector_NormalizeAngleAcute3(rdVector3* v)
     v->z = stdMath_NormalizeAngleAcute(v->z);
 }
 
-void rdVector_ClampRange3(rdVector3* v, float minVal, float maxVal)
+void rdVector_ClampRange3(rdVector3* v, flex_t minVal, flex_t maxVal)
 {
     if (v->x < minVal)
     {
@@ -678,9 +678,9 @@ void rdVector_ClampRange3(rdVector3* v, float minVal, float maxVal)
     }
 }
 
-void rdVector_ClampValue3(rdVector3* v, float val)
+void rdVector_ClampValue3(rdVector3* v, flex_t val)
 {
-    float valAbs = val;
+    flex_t valAbs = val;
     if (valAbs < 0.0)
     {
         valAbs = -valAbs;

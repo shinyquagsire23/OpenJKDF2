@@ -17,7 +17,7 @@ static int sithInventory_008d60f8;
 static int sithInventory_008d60fc;
 static const int sithInventory_aMotsForcePowerBins[18] = {0, SITHBIN_F_JUMP, SITHBIN_F_SPEED, SITHBIN_F_SEEING, SITHBIN_F_PROJECT, SITHBIN_F_PUSH, SITHBIN_F_PULL, SITHBIN_F_GRIP, SITHBIN_F_FARSIGHT, SITHBIN_F_SABERTHROW, SITHBIN_F_HEALING, SITHBIN_F_PERSUASION, SITHBIN_F_BLINDING, SITHBIN_F_CHAINLIGHT, SITHBIN_F_ABSORB, SITHBIN_F_PROTECTION, SITHBIN_F_DESTRUCTION, SITHBIN_F_DEADLYSIGHT};
 
-void sithInventory_NewEntry(int binIdx, sithCog *cog, char *name, float min, float max, int flags)
+void sithInventory_NewEntry(int binIdx, sithCog *cog, char *name, flex_t min, flex_t max, int flags)
 {
     sithItemDescriptor* desc = &sithInventory_aDescriptors[binIdx];
     
@@ -416,7 +416,7 @@ void sithInventory_SelectPowerFollowing(sithThing *player)
     sithInventory_SelectPower(player, binNum);
 }
 
-int sithInventory_ActivateBin(sithThing *player, sithCog *cog, float delay, int binNum)
+int sithInventory_ActivateBin(sithThing *player, sithCog *cog, flex_t delay, int binNum)
 {
     sithItemInfo *info;
 
@@ -436,10 +436,10 @@ int sithInventory_ActivateBin(sithThing *player, sithCog *cog, float delay, int 
     return 1;
 }
 
-float sithInventory_DeactivateBin(sithThing *player, sithCog *unused, int binNum)
+flex_t sithInventory_DeactivateBin(sithThing *player, sithCog *unused, int binNum)
 {
     sithItemInfo *info;
-    float result;
+    flex_t result;
 
     if ( player->actorParams.playerinfo == (sithPlayerInfo *)-136 || !(sithInventory_aDescriptors[binNum].flags & ITEMINFO_VALID) )
         return 0.0;
@@ -492,7 +492,7 @@ void sithInventory_BinSendDeactivate(sithThing *player, int senderIndex)
     }
 }
 
-float sithInventory_ChangeInv(sithThing *player, int binIdx, float amt)
+flex_t sithInventory_ChangeInv(sithThing *player, int binIdx, flex_t amt)
 {
     sithItemInfo *info;
 
@@ -503,7 +503,7 @@ float sithInventory_ChangeInv(sithThing *player, int binIdx, float amt)
     return sithInventory_SetBinAmount(player, binIdx, info->ammoAmt + amt);
 }
 
-float sithInventory_GetBinAmount(sithThing *player, int binIdx)
+flex_t sithInventory_GetBinAmount(sithThing *player, int binIdx)
 {
     if ( player->actorParams.playerinfo != (sithPlayerInfo *)-136 && sithInventory_aDescriptors[binIdx].flags & ITEMINFO_VALID )
         return player->actorParams.playerinfo->iteminfo[binIdx].ammoAmt;
@@ -511,7 +511,7 @@ float sithInventory_GetBinAmount(sithThing *player, int binIdx)
         return 0.0;
 }
 
-float sithInventory_SetBinAmount(sithThing *player, int binIdx, float amt)
+flex_t sithInventory_SetBinAmount(sithThing *player, int binIdx, flex_t amt)
 {
     sithItemInfo *info;
 
@@ -520,7 +520,7 @@ float sithInventory_SetBinAmount(sithThing *player, int binIdx, float amt)
 
     info = &player->actorParams.playerinfo->iteminfo[binIdx];
     
-    float origAmt = info->ammoAmt;
+    flex_t origAmt = info->ammoAmt;
     info->ammoAmt = amt;
     if ( info->ammoAmt < sithInventory_aDescriptors[binIdx].ammoMin )
     {
@@ -612,20 +612,20 @@ void sithInventory_SerializedWrite(sithThing *thing)
         sithItemInfo* iteminfo = &thing->actorParams.playerinfo->iteminfo[i];
         if ( sithInventory_aDescriptors[i].flags & 1 )
         {
-            *(float *)&std_genBuffer[0] = iteminfo->ammoAmt;
+            *(flex32_t *)&std_genBuffer[0] = iteminfo->ammoAmt; // FLEXTODO
             *(int*)&std_genBuffer[4] = iteminfo->field_4;
-            *(float *)&std_genBuffer[8] = iteminfo->state;
+            *(flex32_t *)&std_genBuffer[8] = iteminfo->state; // FLEXTODO
             stdConffile_Write(std_genBuffer, 12);
         }
     }
 }
 
-float sithInventory_GetMin(sithThing *player, int binIdx)
+flex_t sithInventory_GetMin(sithThing *player, int binIdx)
 {
     return sithInventory_aDescriptors[binIdx].ammoMin;
 }
 
-float sithInventory_GetMax(sithThing *player, int binIdx)
+flex_t sithInventory_GetMax(sithThing *player, int binIdx)
 {
     return sithInventory_aDescriptors[binIdx].ammoMax;
 }
@@ -645,7 +645,7 @@ void sithInventory_UnsetFlags(sithThing *player, int binIdx, int flags)
     sithInventory_aDescriptors[binIdx].flags &= ~flags;
 }
 
-float sithInventory_SendMessageToAllWithState(sithThing *player, int sourceType, int sourceIdx, int msgid, int stateFlags, float param0, float param1, float param2, float param3)
+flex_t sithInventory_SendMessageToAllWithState(sithThing *player, int sourceType, int sourceIdx, int msgid, int stateFlags, flex_t param0, flex_t param1, flex_t param2, flex_t param3)
 {
     for (int i = 0; i < SITHBIN_NUMBINS; i++)
     {
@@ -676,7 +676,7 @@ float sithInventory_SendMessageToAllWithState(sithThing *player, int sourceType,
     return param0;
 }
 
-float sithInventory_SendMessageToAllWithFlag(sithThing *player, int sourceType, int sourceIdx, int msgid, int flags, float param0, float param1, float param2, float param3)
+flex_t sithInventory_SendMessageToAllWithFlag(sithThing *player, int sourceType, int sourceIdx, int msgid, int flags, flex_t param0, flex_t param1, flex_t param2, flex_t param3)
 {
     for (int i = 0; i < SITHBIN_NUMBINS; i++)
     {
@@ -904,7 +904,7 @@ sithThing* sithInventory_CreateBackpack(sithThing *player)
             sithItemDescriptor* desc = &sithInventory_aDescriptors[i];
             if ( desc->flags & ITEMINFO_VALID && (desc->flags & ITEMINFO_MP_BACKPACK))
             {
-                float ammoAmt = 0.0;
+                flex_t ammoAmt = 0.0;
                 if ( player->actorParams.playerinfo != (sithPlayerInfo *)-136 && desc->flags & ITEMINFO_VALID )
                     ammoAmt = player->actorParams.playerinfo->iteminfo[i].ammoAmt;
 
@@ -923,7 +923,7 @@ sithThing* sithInventory_CreateBackpack(sithThing *player)
             sithItemDescriptor* desc = &sithInventory_aDescriptors[i];
             if ( desc->flags & ITEMINFO_VALID && (desc->flags & ITEMINFO_MP_BACKPACK))
             {
-                float ammoAmt = 0.0;
+                flex_t ammoAmt = 0.0;
                 if ( player->actorParams.playerinfo != (sithPlayerInfo *)-136 && desc->flags & ITEMINFO_VALID )
                     ammoAmt = player->actorParams.playerinfo->iteminfo[i].ammoAmt;
 
@@ -940,7 +940,7 @@ sithThing* sithInventory_CreateBackpack(sithThing *player)
             sithItemDescriptor* desc = &sithInventory_aDescriptors[i];
             if ( (i < SITHBIN_MOTS_NONE || i > SITHBIN_MOTS_CARBO_GUN) && desc->flags & ITEMINFO_VALID && (desc->flags & ITEMINFO_MP_BACKPACK))
             {
-                float ammoAmt = 0.0;
+                flex_t ammoAmt = 0.0;
                 if ( player->actorParams.playerinfo != (sithPlayerInfo *)-136 && desc->flags & ITEMINFO_VALID )
                     ammoAmt = player->actorParams.playerinfo->iteminfo[i].ammoAmt;
 
@@ -981,7 +981,7 @@ int sithInventory_NthBackpackBin(sithThing *item, signed int n)
         return item->itemParams.contents[n].binIdx;
 }
 
-float sithInventory_NthBackpackValue(sithThing *item, signed int n)
+flex_t sithInventory_NthBackpackValue(sithThing *item, signed int n)
 {
     if ( n >= item->itemParams.numBins )
         return -1.0;
@@ -995,7 +995,7 @@ int sithInventory_NumBackpackItems(sithThing *item)
 }
 
 // MOTS altered
-int sithInventory_HandleInvSkillKeys(sithThing *player, float deltaSecs)
+int sithInventory_HandleInvSkillKeys(sithThing *player, flex_t deltaSecs)
 {
     sithThing *v1; // edi
     sithKeybind *v2; // esi
@@ -1056,7 +1056,7 @@ int sithInventory_HandleInvSkillKeys(sithThing *player, float deltaSecs)
             if ( v3 != -1 && v2->idk == 1 )
             {
                 v2->idk = 0;
-                sithThing_MotsTick(13,0,(float)v3);
+                sithThing_MotsTick(13,0,(flex_t)v3); // FLEXTODO
                 if ( v3 >= 0
                   && v1->actorParams.playerinfo != (sithPlayerInfo *)-136
                   && (sithInventory_aDescriptors[v3].flags & ITEMINFO_VALID) != 0
@@ -1073,7 +1073,7 @@ int sithInventory_HandleInvSkillKeys(sithThing *player, float deltaSecs)
         if ( sithInventory_bUnk == 1 )
         {
             sithInventory_bUnk = 0;
-            sithThing_MotsTick(12,0,(float)player->actorParams.playerinfo->curItem);
+            sithThing_MotsTick(12,0,(flex_t)player->actorParams.playerinfo->curItem); // FLEXTODO
             v5 = player->actorParams.playerinfo->curItem;
             if ( v5 >= 0 )
             {
@@ -1088,7 +1088,7 @@ int sithInventory_HandleInvSkillKeys(sithThing *player, float deltaSecs)
         if ( sithInventory_bUnkPower == 1 )
         {
             sithInventory_bUnkPower = 0;
-            sithThing_MotsTick(13,0,(float)player->actorParams.playerinfo->curPower);
+            sithThing_MotsTick(13,0,(flex_t)player->actorParams.playerinfo->curPower); // FLEXTODO
             v7 = player->actorParams.playerinfo->curPower;
             if ( v7 >= 0 )
             {
@@ -1112,7 +1112,7 @@ int sithInventory_HandleInvSkillKeys(sithThing *player, float deltaSecs)
             {
                 // MOTS added
                 sithInventory_008d60f8 = 1;
-                if (sithThing_MotsTick(12,1,(float)player->actorParams.playerinfo->curItem))
+                if (sithThing_MotsTick(12,1,(flex_t)player->actorParams.playerinfo->curItem)) // FLEXTODO
                 {
                     v10 = v1->actorParams.playerinfo;
                     v11 = player->actorParams.playerinfo->curItem;
@@ -1133,7 +1133,7 @@ int sithInventory_HandleInvSkillKeys(sithThing *player, float deltaSecs)
         {
             // MOTS added
             if (sithInventory_008d60f8) {
-                sithThing_MotsTick(12,0,(float)player->actorParams.playerinfo->curItem);
+                sithThing_MotsTick(12,0,(flex_t)player->actorParams.playerinfo->curItem); // FLEXTODO
                 sithInventory_008d60f8 = 0;
             }
 
@@ -1159,7 +1159,7 @@ int sithInventory_HandleInvSkillKeys(sithThing *player, float deltaSecs)
             {
                 // MOTS added
                 sithInventory_008d60fc = 1;
-                if (sithThing_MotsTick(13,1,(float)player->actorParams.playerinfo->curItem))
+                if (sithThing_MotsTick(13,1,(flex_t)player->actorParams.playerinfo->curItem)) // FLEXTODO
                 {
                     v15 = v1->actorParams.playerinfo;
                     v16 = player->actorParams.playerinfo->curPower;
@@ -1180,7 +1180,7 @@ int sithInventory_HandleInvSkillKeys(sithThing *player, float deltaSecs)
         {
             // MOTS added
             if (sithInventory_008d60fc) {
-                sithThing_MotsTick(13,0,(float)player->actorParams.playerinfo->curPower);
+                sithThing_MotsTick(13,0,(flex_t)player->actorParams.playerinfo->curPower); // FLEXTODO
                 sithInventory_008d60fc = 0;
             }
 
@@ -1225,10 +1225,10 @@ int sithInventory_HandleInvSkillKeys(sithThing *player, float deltaSecs)
                         {
                             // TODO MOTS added some stuff here?
                             v32 = 0;
-                            if ( (v31 & 8) != 0 && v28->curPower == v27 && sithThing_MotsTick(13, 1, (float)v27)) {
+                            if ( (v31 & 8) != 0 && v28->curPower == v27 && sithThing_MotsTick(13, 1, (flex_t)v27)) { // FLEXTODO
                                 v32 = 1;
                             }
-                            if ( (v31 & 2) != 0 && v28->curItem == v27 && sithThing_MotsTick(12, 1, (float)v27)) {
+                            if ( (v31 & 2) != 0 && v28->curItem == v27 && sithThing_MotsTick(12, 1, (flex_t)v27)) { // FLEXTODO
                                 v32 = 1;
                             }
                             if ( v32 )
@@ -1260,15 +1260,15 @@ int sithInventory_HandleInvSkillKeys(sithThing *player, float deltaSecs)
                         sithInventory_8339EC = 1;
                         if ( (v25 & 8) != 0 )
                         {
-                            if (!sithThing_MotsTick(11, 0, (float)v23)) goto skip_cog;
+                            if (!sithThing_MotsTick(11, 0, (flex_t)v23)) goto skip_cog; // FLEXTODO
                             sithInventory_SelectPower(v1, v23);
-                            if (!sithThing_MotsTick(13, 1, (float)v23)) goto skip_cog;
+                            if (!sithThing_MotsTick(13, 1, (flex_t)v23)) goto skip_cog; // FLEXTODO
                         }
                         else if ( (v25 & 2) != 0 )
                         {
-                            if (!sithThing_MotsTick(10, 0, (float)v23)) goto skip_cog;
+                            if (!sithThing_MotsTick(10, 0, (flex_t)v23)) goto skip_cog; // FLEXTODO
                             sithInventory_SelectItem(v1, v23);
-                            if (!sithThing_MotsTick(12, 1, (float)v23)) goto skip_cog;
+                            if (!sithThing_MotsTick(12, 1, (flex_t)v23)) goto skip_cog; // FLEXTODO
                         }
 
                         if ( sithTime_curSeconds >= (double)v1->actorParams.playerinfo->iteminfo[v23].binWait && v23 >= 0 )
@@ -1291,11 +1291,11 @@ int sithInventory_HandleInvSkillKeys(sithThing *player, float deltaSecs)
                     {
                         if (v25 & 8)
                         {
-                            sithThing_MotsTick(13, 2, (float)v23);
+                            sithThing_MotsTick(13, 2, (flex_t)v23); // FLEXTODO
                         }
                         else if (v25 & 2)
                         {
-                            sithThing_MotsTick(12, 2, (float)v23);
+                            sithThing_MotsTick(12, 2, (flex_t)v23); // FLEXTODO
                         }
                     }
                 }
@@ -1516,7 +1516,7 @@ void sithInventory_SendKilledMessageToAll(sithThing *player, sithThing *sender)
     }
 }
 
-void sithInventory_SetBinWait(sithThing *player, int binIdx, float wait)
+void sithInventory_SetBinWait(sithThing *player, int binIdx, flex_t wait)
 {
     if ( player->actorParams.playerinfo != (sithPlayerInfo *)-136 )
     {

@@ -67,7 +67,7 @@
 #define sithInventory_SetBinWait_ADDR (0x004D32F0)
 #define sithInventory_SelectPower_ADDR (0x004D3330)
 
-void sithInventory_NewEntry(int binIdx, sithCog *cog, char *name, float min, float max, int flags);
+void sithInventory_NewEntry(int binIdx, sithCog *cog, char *name, flex_t min, flex_t max, int flags);
 int sithInventory_GetNumBinsWithFlag(sithThing *thing, int binNum, int flags);
 int sithInventory_GetNumBinsWithFlagRev(sithThing *thing, int binNum, int flags);
 int sithInventory_GetNumItemsPriorToIdx(sithThing *thing, signed int binNumStart);
@@ -91,13 +91,13 @@ int sithInventory_GetPowerFollowing(sithThing *thing, int binNum);
 void sithInventory_SelectPower(sithThing *player, int binNum);
 void sithInventory_SelectPowerPrior(sithThing *player);
 void sithInventory_SelectPowerFollowing(sithThing *player);
-int sithInventory_ActivateBin(sithThing *player, sithCog *cog, float delay, int binNum);
-float sithInventory_DeactivateBin(sithThing *player, sithCog *unused, int binNum);
+int sithInventory_ActivateBin(sithThing *player, sithCog *cog, flex_t delay, int binNum);
+flex_t sithInventory_DeactivateBin(sithThing *player, sithCog *unused, int binNum);
 int sithInventory_BinSendActivate(sithThing *player, int binIdx);
 void sithInventory_BinSendDeactivate(sithThing *player, int senderIndex);
-float sithInventory_ChangeInv(sithThing *player, int binIdx, float amt);
-float sithInventory_GetBinAmount(sithThing *player, int binIdx);
-float sithInventory_SetBinAmount(sithThing *player, int binIdx, float amt);
+flex_t sithInventory_ChangeInv(sithThing *player, int binIdx, flex_t amt);
+flex_t sithInventory_GetBinAmount(sithThing *player, int binIdx);
+flex_t sithInventory_SetBinAmount(sithThing *player, int binIdx, flex_t amt);
 void sithInventory_SetActivate(sithThing *player, int binIdx, int bActivate);
 int sithInventory_GetActivate(sithThing *player, int binIdx);
 void sithInventory_SetAvailable(sithThing *player, int binIdx, int bAvailable);
@@ -106,22 +106,22 @@ void sithInventory_SetCarries(sithThing *player, int binIdx, int bCarries);
 int sithInventory_GetCarries(sithThing *player, int binIdx);
 int sithInventory_IsBackpackable(sithThing *player, int binIdx);
 void sithInventory_SerializedWrite(sithThing *thing);
-float sithInventory_GetMin(sithThing *player, int binIdx);
-float sithInventory_GetMax(sithThing *player, int binIdx);
+flex_t sithInventory_GetMin(sithThing *player, int binIdx);
+flex_t sithInventory_GetMax(sithThing *player, int binIdx);
 void sithInventory_SetFlags(sithThing *player, int binIdx, int flags);
 int sithInventory_GetFlags(sithThing *player, int binIdx);
 void sithInventory_UnsetFlags(sithThing *player, int binIdx, int flags);
-float sithInventory_SendMessageToAllWithState(sithThing *player, int sourceType, int sourceIdx, int msgid, int stateFlags, float param0, float param1, float param2, float param3);
-float sithInventory_SendMessageToAllWithFlag(sithThing *player, int sourceType, int sourceIdx, int msgid, int flags, float param0, float param1, float param2, float param3);
+flex_t sithInventory_SendMessageToAllWithState(sithThing *player, int sourceType, int sourceIdx, int msgid, int stateFlags, flex_t param0, flex_t param1, flex_t param2, flex_t param3);
+flex_t sithInventory_SendMessageToAllWithFlag(sithThing *player, int sourceType, int sourceIdx, int msgid, int flags, flex_t param0, flex_t param1, flex_t param2, flex_t param3);
 void sithInventory_Reset(sithThing *player);
 void sithInventory_ClearUncarried(sithThing *player);
 sithThing* sithInventory_CreateBackpack(sithThing *player);
 void sithInventory_PickupBackpack(sithThing *player, sithThing *backpack);
 int sithInventory_NthBackpackBin(sithThing *player, signed int n);
-float sithInventory_NthBackpackValue(sithThing *item, signed int n);
+flex_t sithInventory_NthBackpackValue(sithThing *item, signed int n);
 int sithInventory_NumBackpackItems(sithThing *item);
-int sithInventory_HandleInvSkillKeys(sithThing *player, float deltaSecs);
-//static int (*sithInventory_HandleInvSkillKeys)(sithThing *player, float b) = (void*)sithInventory_HandleInvSkillKeys_ADDR;
+int sithInventory_HandleInvSkillKeys(sithThing *player, flex_t deltaSecs);
+//static int (*sithInventory_HandleInvSkillKeys)(sithThing *player, flex_t b) = (void*)sithInventory_HandleInvSkillKeys_ADDR;
 void sithInventory_SendFire(sithThing *player);
 sithItemInfo* sithInventory_GetBin(sithThing *player, int binIdx);
 sithItemDescriptor* sithInventory_GetItemDesc(sithThing *player, int idx);
@@ -131,6 +131,6 @@ void sithInventory_SetPowerKeybind(int idx, int binding);
 int sithInventory_GetPowerKeybind(int idx);
 void sithInventory_ClearInventory(sithThing *player);
 void sithInventory_SendKilledMessageToAll(sithThing *player, sithThing *sender);
-void sithInventory_SetBinWait(sithThing *player, int binIdx, float wait);
+void sithInventory_SetBinWait(sithThing *player, int binIdx, flex_t wait);
 
 #endif // _SITHINVENTORY_H

@@ -102,9 +102,9 @@ typedef struct rdModel3
     uint32_t geosetSelect;
     uint32_t numHierarchyNodes;
     rdHierarchyNode* hierarchyNodes;
-    float radius;
+    flex_t radius;
     uint32_t field_60;
-    float field_64;
+    flex_t field_64;
     uint32_t field_68;
     uint32_t field_6C;
     uint32_t field_70;
@@ -122,12 +122,12 @@ typedef struct rdMesh
     int textureMode;
     rdVector3* vertices;
     rdVector2* vertexUVs;
-    float* vertices_i;
-    float* vertices_unk;
+    flex_t* vertices_i;
+    flex_t* vertices_unk;
 #ifdef JKM_LIGHTING
-    float* paRedIntensities;
-    float* paGreenIntensities;
-    float* paBlueIntensities;
+    flex_t* paRedIntensities;
+    flex_t* paGreenIntensities;
+    flex_t* paBlueIntensities;
 #endif
     rdFace* faces;
     rdVector3* vertexNormals;
@@ -135,13 +135,13 @@ typedef struct rdMesh
     int numUVs;
     int numFaces;
 #ifdef JKM_LIGHTING
-    float extraLight;
+    flex_t extraLight;
 #endif
-    float radius;
+    flex_t radius;
     int field_58;
     int field_5C;
     int field_60;
-    float field_64;
+    flex_t field_64;
     int field_68;
     int field_6C;
 } rdMesh;
@@ -156,23 +156,23 @@ typedef struct rdMesh
     int textureMode;
     rdVector3* vertices;
     rdVector2* vertexUVs;
-    float* vertices_i;
-    float* vertices_unk;
-    float* paRedIntensities;
-    float* paGreenIntensities;
-    float* paBlueIntensities;
+    flex_t* vertices_i;
+    flex_t* vertices_unk;
+    flex_t* paRedIntensities;
+    flex_t* paGreenIntensities;
+    flex_t* paBlueIntensities;
     int unk4;
     rdFace* faces;
     rdVector3* vertexNormals;
     int numVertices;
     int numUVs;
     int numFaces;
-    float extraLight;
-    float radius;
+    flex_t extraLight;
+    flex_t radius;
     int field_58;
     int field_5C;
     int field_60;
-    float field_64;
+    flex_t field_64;
     int field_68;
     int field_6C;
     

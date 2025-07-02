@@ -68,7 +68,7 @@ int sithOverlayMap_Render1(rdCanvas *canvas)
 {
     int result; // eax
     sithThing *v2; // ecx
-    float v3; // edx
+    flex_t v3; // edx
     int v5; // ecx
     sithAdjoin *i; // esi
     int v8; // eax
@@ -76,7 +76,7 @@ int sithOverlayMap_Render1(rdCanvas *canvas)
     rdVector3 a3; // [esp+4h] [ebp-1Ch] BYREF
     rdVector3 a1; // [esp+10h] [ebp-10h] BYREF
     int v12; // [esp+1Ch] [ebp-4h]
-    float canvasa; // [esp+28h] [ebp+8h]
+    flex_t canvasa; // [esp+28h] [ebp+8h]
 
     result = sithOverlayMap_bShowMap;
     if (!sithOverlayMap_bShowMap)
@@ -177,7 +177,7 @@ int sithOverlayMap_Render3(sithSector *pSector)
     int v9; // edi
     int v10; // ebx
     unsigned int v11; // ecx
-    float *v12; // edi
+    flex_t *v12; // edi
     double v14; // st7
     char v15; // c0
     int v16; // eax
@@ -196,7 +196,7 @@ int sithOverlayMap_Render3(sithSector *pSector)
     int v31; // edi
     int v32; // eax
     signed int result; // eax
-    float a4; // [esp+0h] [ebp-64h]
+    flex_t a4; // [esp+0h] [ebp-64h]
     rdVector3 v35; // [esp+1Ch] [ebp-48h] BYREF
     rdVector3 a1a; // [esp+28h] [ebp-3Ch] BYREF
     unsigned int v37; // [esp+34h] [ebp-30h]
@@ -205,7 +205,7 @@ int sithOverlayMap_Render3(sithSector *pSector)
     int v46; // [esp+58h] [ebp-Ch]
     int v47; // [esp+5Ch] [ebp-8h]
     sithSurface *a6; // [esp+60h] [ebp-4h]
-    float v49; // [esp+6Ch] [ebp+8h]
+    flex_t v49; // [esp+6Ch] [ebp+8h]
     int circleColor; // [esp+6Ch] [ebp+8h]
 
     int a6_;

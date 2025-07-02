@@ -12,7 +12,7 @@
 static rdVector3 polylineVerts[32]; // idk the size on this
 static rdVector3 rdPolyLine_FaceVerts[32];
 
-rdPolyLine* rdPolyLine_New(char *polyline_fname, char *material_fname, char *material_fname2, float length, float base_rad, float tip_rad, int lightmode, int texmode, int sortingmethod, float extraLight)
+rdPolyLine* rdPolyLine_New(char *polyline_fname, char *material_fname, char *material_fname2, flex_t length, flex_t base_rad, flex_t tip_rad, int lightmode, int texmode, int sortingmethod, flex_t extraLight)
 {
     rdPolyLine* polyline;
 
@@ -25,7 +25,7 @@ rdPolyLine* rdPolyLine_New(char *polyline_fname, char *material_fname, char *mat
     return polyline;
 }
 
-int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *material_side_fname, char *material_tip_fname, float length, float base_rad, float tip_rad, rdGeoMode_t edgeGeometryMode, rdLightMode_t edgeLightingMode, rdTexMode_t edgeTextureMode, float extraLight)
+int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *material_side_fname, char *material_tip_fname, flex_t length, flex_t base_rad, flex_t tip_rad, rdGeoMode_t edgeGeometryMode, rdLightMode_t edgeLightingMode, rdTexMode_t edgeTextureMode, flex_t extraLight)
 {
 
     rdMaterial *mat;
@@ -178,14 +178,14 @@ void rdPolyLine_FreeEntry(rdPolyLine *polyline)
 int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix)
 {
     rdPolyLine *polyline;
-    float length;
+    flex_t length;
     double tip_left;
     double tip_bottom;
     double tip_right;
     double tip_top;
-    float ang;
-    float angSin;
-    float angCos;
+    flex_t ang;
+    flex_t angSin;
+    flex_t angCos;
     rdVector3 vertex_out;
     rdMatrix34 out;
     rdVector3 vertex;
@@ -248,9 +248,9 @@ int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix)
 
     // Blade
     {
-        float zdist = vertex_out.z - out.scale.z;
-        float xdist = vertex_out.x - out.scale.x;
-        float mag = stdMath_Sqrt(xdist * xdist + zdist * zdist);
+        flex_t zdist = vertex_out.z - out.scale.z;
+        flex_t xdist = vertex_out.x - out.scale.x;
+        flex_t mag = stdMath_Sqrt(xdist * xdist + zdist * zdist);
 
         // Added: prevent div 0
         if (mag == 0)
@@ -275,13 +275,13 @@ int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix)
         polylineVerts[1].y = vertex_out.y;
         polylineVerts[1].z = (-polyline->tipRadius * angSin) + (mag * angCos) + out.scale.z;
         
-        polylineVerts[2].x = (-polyline->baseRadius * angCos) - (float)0.0 + out.scale.x;
+        polylineVerts[2].x = (-polyline->baseRadius * angCos) - (flex_t)0.0 + out.scale.x;
         polylineVerts[2].y = out.scale.y;
-        polylineVerts[2].z = (-polyline->baseRadius * angSin) + (float)0.0 + out.scale.z;
+        polylineVerts[2].z = (-polyline->baseRadius * angSin) + (flex_t)0.0 + out.scale.z;
         
-        polylineVerts[3].x = (polyline->baseRadius * angCos) - (float)0.0 + out.scale.x;
+        polylineVerts[3].x = (polyline->baseRadius * angCos) - (flex_t)0.0 + out.scale.x;
         polylineVerts[3].y = out.scale.y;
-        polylineVerts[3].z = (polyline->baseRadius * angSin) + (float)0.0 + out.scale.z;
+        polylineVerts[3].z = (polyline->baseRadius * angSin) + (flex_t)0.0 + out.scale.z;
         idxInfo.vertexUVs = polyline->extraUVTipMaybe;
         rdPolyLine_DrawFace(thing, &polyline->edgeFace, polylineVerts, &idxInfo);
     }
@@ -292,7 +292,7 @@ void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVert
 {
     rdProcEntry *procEntry;
     rdMeshinfo mesh_out;
-    float staticLight;
+    flex_t staticLight;
 
     procEntry = rdCache_GetProcEntry();
     if (!procEntry)

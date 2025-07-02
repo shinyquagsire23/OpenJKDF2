@@ -17,22 +17,22 @@ void rdMath_CalcSurfaceNormal(rdVector3 *out, rdVector3 *edge1, rdVector3 *edge2
     rdMath_ClampVector(out, 0.000001);
 }
 
-float rdMath_DistancePointToPlane(const rdVector3 *light, const rdVector3 *normal, const rdVector3 *vertex)
+flex_t rdMath_DistancePointToPlane(const rdVector3 *light, const rdVector3 *normal, const rdVector3 *vertex)
 {
   return (light->y - vertex->y) * normal->y + (light->z - vertex->z) * normal->z + (light->x - vertex->x) * normal->x;
 }
 
-float rdMath_DeltaAngleNormalizedAbs(rdVector3 *a1, rdVector3 *a2)
+flex_t rdMath_DeltaAngleNormalizedAbs(rdVector3 *a1, rdVector3 *a2)
 {
-    float v2 = rdVector_Dot3(a1, a2);
+    flex_t v2 = rdVector_Dot3(a1, a2);
     if ( v2 == 1.0 )
         return 0.0;
     return 90.0 - stdMath_ArcSin1(v2);
 }
 
-float rdMath_DeltaAngleNormalized(rdVector3 *a1, rdVector3 *a2, rdVector3 *a3)
+flex_t rdMath_DeltaAngleNormalized(rdVector3 *a1, rdVector3 *a2, rdVector3 *a3)
 {
-    float v4 = rdVector_Dot3(a1, a2);
+    flex_t v4 = rdVector_Dot3(a1, a2);
     if ( v4 < -1.0 ) // TODO clamp macro
     {
         v4 = -1.0;
@@ -47,7 +47,7 @@ float rdMath_DeltaAngleNormalized(rdVector3 *a1, rdVector3 *a2, rdVector3 *a3)
     if ( v4 == -1.0 )
         return 180.0;
     
-    float v7 = 90.0 - stdMath_ArcSin1(v4);
+    flex_t v7 = 90.0 - stdMath_ArcSin1(v4);
     
     rdVector3 tmp;
     rdVector_Cross3(&tmp, a1, a2);
@@ -57,7 +57,7 @@ float rdMath_DeltaAngleNormalized(rdVector3 *a1, rdVector3 *a2, rdVector3 *a3)
         return v7;
 }
 
-void rdMath_ClampVector(rdVector3* out, float minVal)
+void rdMath_ClampVector(rdVector3* out, flex_t minVal)
 {
     if ( (out->x < 0.0 ? -out->x : out->x) >= minVal )
         out->x = out->x;
@@ -85,22 +85,22 @@ int rdMath_PointsCollinear(rdVector3 *a1, rdVector3 *a2, rdVector3 *a3)
     rdVector_Normalize3Acc(&b);
     rdVector_Normalize3Acc(&a);
 
-    float v16 = rdVector_Dot3(&a, &b);
+    flex_t v16 = rdVector_Dot3(&a, &b);
     if ( v16 < 0.0 )
         v16 = -v16;
     return (v16 >= 0.99900001 && v16 <= 1.001);
 }
 
 // added
-void rdMath_ClampVectorRange(rdVector3* out, float minVal, float maxVal)
+void rdMath_ClampVectorRange(rdVector3* out, flex_t minVal, flex_t maxVal)
 {
     out->x = rdMath_clampf(out->x, minVal, maxVal);
     out->y = rdMath_clampf(out->y, minVal, maxVal);
     out->z = rdMath_clampf(out->z, minVal, maxVal);
 }
 
-float rdMath_clampf(float d, float min, float max)
+flex_t rdMath_clampf(flex_t d, flex_t min, flex_t max)
 {
-  const float t = d < min ? min : d;
+  const flex_t t = d < min ? min : d;
   return t > max ? max : t;
 }

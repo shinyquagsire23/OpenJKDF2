@@ -53,20 +53,20 @@ int jkGuiSaveLoad_ListClick(jkGuiElement *element, jkGuiMenu *menu, int mouseX, 
 void jkGuiSaveLoad_PopulateInfo(int bRedraw)
 {
     char *v1; // ebx
-    float shieldsAmt; // edx
+    flex_t shieldsAmt; // edx
     jkGuiSaveLoad_Entry *entry; // esi
     wchar_t *v4; // eax
-    float playerHealth; // eax
-    float playerMaxHealth; // ecx
+    flex_t playerHealth; // eax
+    flex_t playerMaxHealth; // ecx
     jkGuiSaveLoad_Entry* v7; // eax
     int v8; // esi
     jkEpisode *episodeIter; // edi
     wchar_t *v10; // eax
     wchar_t *v11; // eax
     wchar_t *saveName; // [esp+10h] [ebp-10h]
-    float playerMaxHealth_; // [esp+14h] [ebp-Ch]
-    float playerHealth_; // [esp+18h] [ebp-8h]
-    float shieldsAmt_; // [esp+1Ch] [ebp-4h]
+    flex_t playerMaxHealth_; // [esp+14h] [ebp-Ch]
+    flex_t playerHealth_; // [esp+18h] [ebp-8h]
+    flex_t shieldsAmt_; // [esp+1Ch] [ebp-4h]
 
     if ( jkGuiSaveLoad_bIsSaveMenu && jkGuiSaveLoad_menu.focusedElement == &jkGuiSaveLoad_aElements[2] )
     {

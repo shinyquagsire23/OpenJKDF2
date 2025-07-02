@@ -24,7 +24,7 @@ void sithPlayerActions_Activate(sithThing *thing)
     int v5; // eax
     sithCollisionSearchEntry *searchResult; // eax
     sithThing *v7; // edx
-    float a6; // [esp+0h] [ebp-58h]
+    flex_t a6; // [esp+0h] [ebp-58h]
     rdVector3 thingPos; // [esp+1Ch] [ebp-3Ch] BYREF
     rdMatrix34 out; // [esp+28h] [ebp-30h] BYREF
 
@@ -81,7 +81,7 @@ void sithPlayerActions_Activate(sithThing *thing)
 }
 
 // MoTS altered
-void sithPlayerActions_JumpWithVel(sithThing *thing, float vel)
+void sithPlayerActions_JumpWithVel(sithThing *thing, flex_t vel)
 {
     double final_vel;
     int isAttachedAndIsSurface; // zf
@@ -182,7 +182,7 @@ sithThing* sithPlayerActions_SpawnThingAtLookAt(sithThing *pPlayerThing, sithThi
     int v5; // eax
     sithCollisionSearchEntry *searchResult; // eax
     sithThing *v7; // edx
-    float a6; // [esp+0h] [ebp-58h]
+    flex_t a6; // [esp+0h] [ebp-58h]
     rdVector3 thingPos; // [esp+1Ch] [ebp-3Ch] BYREF
     rdMatrix34 out; // [esp+28h] [ebp-30h] BYREF
 

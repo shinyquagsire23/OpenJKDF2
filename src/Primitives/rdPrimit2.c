@@ -108,7 +108,7 @@ int rdPrimit2_DrawClippedLine(rdCanvas *pCanvas, int x1, int y1, int x2, int y2,
 }
 
 
-void rdPrimit2_DrawCircle(rdCanvas *pCanvas, int x1, int y1, float a4, float radius, uint16_t color16, int mask)
+void rdPrimit2_DrawCircle(rdCanvas *pCanvas, int x1, int y1, flex_t a4, flex_t radius, uint16_t color16, int mask)
 {
     __int64 v7; // rax
     int v8; // edi
@@ -117,9 +117,9 @@ void rdPrimit2_DrawCircle(rdCanvas *pCanvas, int x1, int y1, float a4, float rad
     int v11; // esi
     int v12; // edi
     double v13; // st7
-    float a2a; // [esp+0h] [ebp-Ch]
-    float a4a; // [esp+4h] [ebp-8h] BYREF
-    float a3a; // [esp+8h] [ebp-4h] BYREF
+    flex_t a2a; // [esp+0h] [ebp-Ch]
+    flex_t a4a; // [esp+4h] [ebp-8h] BYREF
+    flex_t a3a; // [esp+8h] [ebp-4h] BYREF
 
     v7 = (__int64)(a4 - -0.5);
     v8 = x1;

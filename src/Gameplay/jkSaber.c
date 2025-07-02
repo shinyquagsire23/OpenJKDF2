@@ -21,11 +21,11 @@
 
 #define JKSABER_EXTENDTIME (0.3000000)
 
-void jkSaber_InitializeSaberInfo(sithThing *thing, char *material_side_fname, char *material_tip_fname, float base_rad, float tip_rad, float len, sithThing *wall_sparks, sithThing *blood_sparks, sithThing *saber_sparks)
+void jkSaber_InitializeSaberInfo(sithThing *thing, char *material_side_fname, char *material_tip_fname, flex_t base_rad, flex_t tip_rad, flex_t len, sithThing *wall_sparks, sithThing *blood_sparks, sithThing *saber_sparks)
 {
     if (!thing) return; // Added: Fix nullptr deref in Mots cutscenes
 
-    float length = 0.0;
+    flex_t length = 0.0;
     jkPlayerInfo* saberinfo = thing->playerInfo;
     if ( saberinfo->polylineThing.polyline )
     {
@@ -137,8 +137,8 @@ void jkSaber_UpdateLength(sithThing *thing)
 
     if ( thing->jkFlags & JKFLAG_SABEREXTEND)
     {
-        float newLength = playerInfo->polyline.length + (sithTime_deltaSeconds * JKSABER_EXTENDTIME);
-        float deltaLen = newLength / playerInfo->length;
+        flex_t newLength = playerInfo->polyline.length + (sithTime_deltaSeconds * JKSABER_EXTENDTIME);
+        flex_t deltaLen = newLength / playerInfo->length;
 
         thing->jkFlags &= ~JKFLAG_SABERRETRACT;
 
@@ -153,8 +153,8 @@ void jkSaber_UpdateLength(sithThing *thing)
     }
     else if ( thing->jkFlags & JKFLAG_SABERRETRACT )
     {
-        float newLength = playerInfo->polyline.length - (sithTime_deltaSeconds * JKSABER_EXTENDTIME);
-        float deltaLen = newLength / playerInfo->length;
+        flex_t newLength = playerInfo->polyline.length - (sithTime_deltaSeconds * JKSABER_EXTENDTIME);
+        flex_t deltaLen = newLength / playerInfo->length;
 
         thing->jkFlags &= ~JKFLAG_SABEREXTEND;
 
@@ -381,12 +381,12 @@ void jkSaber_UpdateCollision(sithThing *player, int joint, int bSecondary)
         if (bSecondary != 0) {
             storeOrientMat = &playerInfo->jkmSaberUnk2;
         }
-        float fVar1 = sithTime_TickHz * 0.05;
+        flex_t fVar1 = sithTime_TickHz * 0.05;
         rdMatrix_Copy34(&local_60, storeOrientMat);
 
         rdVector_Sub3(&lerpPosDelta, &jointMat.scale, &local_60.scale);
         rdVector_Sub3(&lerpDirDelta, &jointMat.lvec, &local_60.lvec);
-        float local_b8 = fVar1;
+        flex_t local_b8 = fVar1;
         for (; fVar1 < 1.0; fVar1 = local_b8 + fVar1) {
             rdVector_Copy3(&lerpSaberPos, &local_60.scale);
             rdVector_MultAcc3(&lerpSaberPos, &lerpPosDelta, fVar1);
@@ -439,7 +439,7 @@ void jkSaber_SpawnSparks(jkPlayerInfo *pPlayerInfo, rdVector3 *pPos, sithSector 
 }
 
 // MOTS altered
-void jkSaber_Enable(sithThing *pThing, float damage, float bladeLength, float stunDelay)
+void jkSaber_Enable(sithThing *pThing, flex_t damage, flex_t bladeLength, flex_t stunDelay)
 {
     if (!pThing || !pThing->playerInfo) return; // MOTS added
 

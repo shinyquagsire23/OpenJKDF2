@@ -7,7 +7,7 @@
 #define sithPlayerActions_JumpWithVel_ADDR (0x004FC270)
 #define sithPlayerActions_WarpToCheckpoint_ADDR (0x004FC450)
 
-void sithPlayerActions_JumpWithVel(sithThing *thing, float vel);
+void sithPlayerActions_JumpWithVel(sithThing *thing, flex_t vel);
 void sithPlayerActions_Activate(sithThing *thing);
 void sithPlayerActions_WarpToCheckpoint(sithThing *thing, int idx);
 

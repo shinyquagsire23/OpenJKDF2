@@ -21,7 +21,7 @@
 
 static wchar_t jkGuiTitle_tmpBuffer[512];
 static wchar_t jkGuiTitle_versionBuffer[64];
-static float jkGuiTitle_loadPercent;
+static flex_t jkGuiTitle_loadPercent;
 
 static jkGuiElement jkGuiTitle_elementsLoad[6] = {
     {ELEMENT_TEXT,  0,  2,  0,  3, {250, 50, 390, 80},  1,  0,  0,  0,  0,  0, {0},  0},
@@ -229,7 +229,7 @@ void jkGuiTitle_LoadBarDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *
     }
 }
 
-void jkGuiTitle_WorldLoadCallback(float percentage)
+void jkGuiTitle_WorldLoadCallback(flex_t percentage)
 {
     double v1; // st7
 
