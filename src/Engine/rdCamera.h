@@ -5,6 +5,10 @@
 #include "Engine/rdCanvas.h"
 #include "globals.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define rdCamera_New_ADDR (0x00443260)
 #define rdCamera_NewEntry_ADDR (0x00443360)
 #define rdCamera_Free_ADDR (0x00443440)
@@ -60,5 +64,9 @@ int rdCamera_ClearLights(rdCamera *camera);
 void rdCamera_AdvanceFrame();
 flex_t rdCamera_GetMipmapScalar(); // MOTS added
 void rdCamera_SetMipmapScalar(flex_t val); // MOTS added
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _RDCAMERA_H

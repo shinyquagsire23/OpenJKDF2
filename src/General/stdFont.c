@@ -969,7 +969,7 @@ int stdFont_sub_434EC0(stdVBuffer *vBuffer, stdFont *font, int a3, int a4, int a
     v18 = 0;
     if ( !paddings )
         return stdFont_Draw1(vBuffer, font, a3, a4, a5, text, a8);
-    v11 = text;
+    v11 = (wchar_t*)text;
     while ( *v11 )
     {
         v12 = __wcsrchr(v11, 9u);

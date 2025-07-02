@@ -6,6 +6,10 @@
 #include "Primitives/rdVector.h"
 #include "Primitives/rdModel3.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define rdLight_New_ADDR (0x0044B650)
 #define rdLight_NewEntry_ADDR (0x0044B6A0)
 #define rdLight_Free_ADDR (0x0044B6E0)
@@ -32,5 +36,9 @@ flex_t rdLight_CalcFaceIntensity(rdLight **meshLights, rdVector3 *localLightPose
 
 void rdLight_CalcDistVertexIntensities();
 void rdLight_CalcDistFaceIntensity();
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _RDLIGHT_H

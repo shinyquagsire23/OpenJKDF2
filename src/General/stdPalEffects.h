@@ -4,6 +4,10 @@
 #include "types.h"
 #include "globals.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define stdPalEffects_Open_ADDR (0x00428830)
 #define stdPalEffects_Close_ADDR (0x00428890)
 #define stdPalEffects_NewRequest_ADDR (0x004288A0)
@@ -56,5 +60,9 @@ void stdPalEffects_ResetEffect(stdPalEffect *effect);
 //static int (*stdPalEffects_ResetEffect)(stdPalEffect* effect) = (void*)stdPalEffects_ResetEffect_ADDR;
 //static void (*stdPalEffects_UpdatePalette)(void*) = (void*)stdPalEffects_UpdatePalette_ADDR;
 //static void (*stdPalEffects_RefreshPalette)() = (void*)stdPalEffects_RefreshPalette_ADDR;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _STDPALEFFECTS_H

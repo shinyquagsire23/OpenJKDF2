@@ -5,6 +5,10 @@
 #include "globals.h"
 #include "Engine/rdCamera.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define sithCamera_Startup_ADDR (0x004C4DE0)
 #define sithCamera_Shutdown_ADDR (0x004C4EF0)
 #define sithCamera_Open_ADDR (0x004C4F20)
@@ -67,6 +71,10 @@ static int (*sithCamera_NewEntry_)(sithCamera *camera, int a2, int a3, flex_t fo
 //static void (*sithCamera_SetRdCameraAndRenderidk)() = (void*)sithCamera_SetRdCameraAndRenderidk_ADDR;
 //static sithSector* (*sithCamera_create_unk_struct)(sithThing *a3, sithSector *a2, rdVector3 *a4, rdVector3 *a6, flex_t a7, int arg14) = (void*)sithCamera_create_unk_struct_ADDR;
 //static void (*sithCamera_SetsFocus)() = (void*)sithCamera_SetsFocus_ADDR;
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // _SITHCAMERA_H

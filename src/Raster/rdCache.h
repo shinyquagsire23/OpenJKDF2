@@ -5,6 +5,10 @@
 #include "globals.h"
 #include "Engine/rdMaterial.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define rdCache_Startup_ADDR (0x0043AD60)
 #define rdCache_AdvanceFrame_ADDR (0x0043AD70)
 #define rdCache_FinishFrame_ADDR (0x0043AD80)
@@ -49,6 +53,10 @@ static void (*rdCache_DrawFaceZ)(rdProcEntry* face) = (void*)rdCache_DrawFaceZ_A
 
 //static rdProcEntry* (*rdCache_GetProcEntry)(void) = (void*)rdCache_GetProcEntry_ADDR;
 //static int (*__cdecl rdCache_AddProcFace)(int extdata, unsigned int numVertices, char flags) = (void*)rdCache_AddProcFace_ADDR;
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // _RDCACHE_H

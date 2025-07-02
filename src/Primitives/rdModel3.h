@@ -9,6 +9,10 @@
 #include "Engine/rdMaterial.h"
 #include "Primitives/rdMatrix.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define rdModel3_RegisterLoader_ADDR (0x00443DA0)
 #define rdModel3_RegisterUnloader_ADDR (0x00443DB0)
 #define rdModel3_ClearFrameCounters_ADDR (0x00443DC0)
@@ -203,6 +207,10 @@ int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3);
 void rdModel3_DrawHNode(rdHierarchyNode *pNode);
 void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat);
 int rdModel3_DrawFace(rdFace *face, int lightFlags);
+
+#ifdef __cplusplus
+}
+#endif
 
 //static int (__cdecl *rdModel3_CalcVertexNormals)(rdModel3 *model) = (void*)rdModel3_CalcVertexNormals_ADDR;
 
