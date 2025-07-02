@@ -433,6 +433,11 @@ void sithWorld_FreeEntry(sithWorld *pWorld)
 
 int sithHeader_Load(sithWorld *pWorld, int junk)
 {
+    flex32_t tmp;
+    flex32_t tmp2;
+    flex32_t tmp3;
+    flex32_t tmp4;
+
     if ( junk )
         return 0;
     if ( !stdConffile_ReadLine() )
@@ -445,40 +450,58 @@ int sithHeader_Load(sithWorld *pWorld, int junk)
     }
     if ( !stdConffile_ReadLine() )
         return 0;
-    _sscanf(stdConffile_aLine, "world gravity %f", &pWorld->worldGravity);
+    _sscanf(stdConffile_aLine, "world gravity %f", &tmp);
+    pWorld->worldGravity = tmp; // FLEXTODO
     if ( !stdConffile_ReadLine() )
         return 0;
-    _sscanf(stdConffile_aLine, "ceiling sky z %f", &pWorld->ceilingSky);
+    _sscanf(stdConffile_aLine, "ceiling sky z %f", &tmp);
+    pWorld->ceilingSky = tmp; // FLEXTODO
     if ( !stdConffile_ReadLine() )
         return 0;
-    _sscanf(stdConffile_aLine, "horizon distance %f", &pWorld->horizontalDistance);
+    _sscanf(stdConffile_aLine, "horizon distance %f", &tmp);
+    pWorld->horizontalDistance = tmp; // FLEXTODO
     if ( !stdConffile_ReadLine() )
         return 0;
-    _sscanf(stdConffile_aLine, "horizon pixels per rev %f", &pWorld->horizontalPixelsPerRev);
+    _sscanf(stdConffile_aLine, "horizon pixels per rev %f", &tmp);
+    pWorld->horizontalPixelsPerRev = tmp; // FLEXTODO
     if ( !stdConffile_ReadLine() )
         return 0;
-    _sscanf(stdConffile_aLine, "horizon sky offset %f %f", &pWorld->horizontalSkyOffs, &pWorld->horizontalSkyOffs.y);
+    _sscanf(stdConffile_aLine, "horizon sky offset %f %f", &tmp, &tmp2);
+    pWorld->horizontalSkyOffs.x = tmp; // FLEXTODO
+    pWorld->horizontalSkyOffs.y = tmp2; // FLEXTODO
     if ( !stdConffile_ReadLine() )
         return 0;
-    _sscanf(stdConffile_aLine, "ceiling sky offset %f %f", &pWorld->ceilingSkyOffs, &pWorld->ceilingSkyOffs.y);
+    _sscanf(stdConffile_aLine, "ceiling sky offset %f %f", &tmp, &tmp2);
+    pWorld->ceilingSkyOffs.x = tmp; // FLEXTODO
+    pWorld->ceilingSkyOffs.y = tmp2; // FLEXTODO
     if ( !stdConffile_ReadLine() )
         return 0;
     _sscanf(
         stdConffile_aLine,
         "mipmap distances %f %f %f %f",
-        &pWorld->mipmapDistance.x,
-        &pWorld->mipmapDistance.y,
-        &pWorld->mipmapDistance.z,
-        &pWorld->mipmapDistance.w);
+        &tmp,
+        &tmp2,
+        &tmp3,
+        &tmp4);
+    pWorld->mipmapDistance.x = tmp; // FLEXTODO
+    pWorld->mipmapDistance.y = tmp2; // FLEXTODO
+    pWorld->mipmapDistance.z = tmp3; // FLEXTODO
+    pWorld->mipmapDistance.w = tmp4; // FLEXTODO
     if ( !stdConffile_ReadLine() )
         return 0;
-    _sscanf(stdConffile_aLine, "lod distances %f %f %f %f", &pWorld->lodDistance.x, &pWorld->lodDistance.y, &pWorld->lodDistance.z, &pWorld->lodDistance.w);
+    _sscanf(stdConffile_aLine, "lod distances %f %f %f %f", &tmp, &tmp2, &tmp3, &tmp4);
+    pWorld->lodDistance.x = tmp; // FLEXTODO
+    pWorld->lodDistance.y = tmp2; // FLEXTODO
+    pWorld->lodDistance.z = tmp3; // FLEXTODO
+    pWorld->lodDistance.w = tmp4; // FLEXTODO
     if ( !stdConffile_ReadLine() )
         return 0;
-    _sscanf(stdConffile_aLine, "perspective distance %f", &pWorld->perspectiveDistance);
+    _sscanf(stdConffile_aLine, "perspective distance %f", &tmp);
+    pWorld->perspectiveDistance = tmp; // FLEXTODO
     if ( !stdConffile_ReadLine() )
         return 0;
-    _sscanf(stdConffile_aLine, "gouraud distance %f", &pWorld->gouradDistance);
+    _sscanf(stdConffile_aLine, "gouraud distance %f", &tmp);
+    pWorld->gouradDistance = tmp; // FLEXTODO
 
 // Old-style mipmap/LOD removal
 //#ifdef QOL_IMPROVEMENTS
@@ -646,11 +669,11 @@ int sithWorld_LoadGeoresource(sithWorld *pWorld, int a2)
     unsigned int num_vertices_uvs; // [esp+10h] [ebp-A0h] BYREF
     unsigned int numColormaps; // [esp+14h] [ebp-9Ch] BYREF
     int v_idx; // [esp+18h] [ebp-98h] BYREF
-    flex_t v_x; // [esp+1Ch] [ebp-94h] BYREF
-    flex_t v21; // [esp+20h] [ebp-90h] BYREF
-    flex_t v_y; // [esp+24h] [ebp-8Ch] BYREF
-    flex_t v23; // [esp+28h] [ebp-88h] BYREF
-    flex_t v_z; // [esp+2Ch] [ebp-84h] BYREF
+    flex32_t v_x; // [esp+1Ch] [ebp-94h] BYREF
+    flex32_t v21; // [esp+20h] [ebp-90h] BYREF
+    flex32_t v_y; // [esp+24h] [ebp-8Ch] BYREF
+    flex32_t v23; // [esp+28h] [ebp-88h] BYREF
+    flex32_t v_z; // [esp+2Ch] [ebp-84h] BYREF
     char colormap_fname[128]; // [esp+30h] [ebp-80h] BYREF
 
     if ( a2 )

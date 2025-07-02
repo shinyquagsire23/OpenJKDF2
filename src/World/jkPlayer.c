@@ -45,18 +45,18 @@ int jkPlayer_enableBloom = 0;
 int jkPlayer_enableSSAO = 0;
 int jkPlayer_fpslimit = 0;
 int jkPlayer_enableVsync = 0;
-flex_t jkPlayer_ssaaMultiple = 1.0;
-flex_t jkPlayer_gamma = 1.0;
+flex32_t jkPlayer_ssaaMultiple = 1.0;
+flex32_t jkPlayer_gamma = 1.0;
 int jkPlayer_bEnableJkgm = 1;
 int jkPlayer_bEnableTexturePrecache = 1;
 int jkPlayer_bKeepCorpses = 0;
 int jkPlayer_bFastMissionText = 0;
 int jkPlayer_bUseOldPlayerPhysics = 0;
-flex_t jkPlayer_hudScale = 2.0;
-flex_t jkPlayer_crosshairLineWidth = 1.0;
-flex_t jkPlayer_crosshairScale = 1.0;
-flex_t jkPlayer_canonicalCogTickrate = CANONICAL_COG_TICKRATE;
-flex_t jkPlayer_canonicalPhysTickrate = CANONICAL_PHYS_TICKRATE;
+flex32_t jkPlayer_hudScale = 2.0;
+flex32_t jkPlayer_crosshairLineWidth = 1.0;
+flex32_t jkPlayer_crosshairScale = 1.0;
+flex32_t jkPlayer_canonicalCogTickrate = CANONICAL_COG_TICKRATE;
+flex32_t jkPlayer_canonicalPhysTickrate = CANONICAL_PHYS_TICKRATE;
 
 int jkPlayer_setCrosshairOnLightsaber = 1;
 int jkPlayer_setCrosshairOnFist = 1;
@@ -1371,7 +1371,7 @@ int jkPlayer_MPCBinWrite()
 // MOTS added: weird xor crypt
 int jkPlayer_MPCBinRead()
 {
-    flex_t a2;
+    flex32_t a2;
     int v3;
 
     stdConffile_ReadLine();
@@ -1994,7 +1994,7 @@ uint32_t jkPlayer_ChecksumExtra(uint32_t hash)
     uint32_t uVar2;
     int64_t lVar3;
     int local_8c;
-    flex_t local_88;
+    flex32_t local_88;
     int local_84;
     char local_80 [128];
     
@@ -2051,7 +2051,7 @@ int jkPlayer_SetAmmoMaximums(int classIdx)
     int iVar1;
     flex_t *pfVar2;
     int local_8c;
-    flex_t local_88;
+    flex32_t local_88;
     int local_84;
     char local_80 [128];
     

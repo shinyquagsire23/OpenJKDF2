@@ -561,6 +561,7 @@ int sithCommand_CmdWarp(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     int v5; // eax
     sithSector *v6; // edi
     unsigned int i; // esi
+    flex32_t fx, fy, fz, f2x, f2y, f2z;
     rdVector3 a1; // [esp+10h] [ebp-48h] BYREF
     rdVector3 a3a; // [esp+1Ch] [ebp-3Ch] BYREF
     rdMatrix34 a; // [esp+28h] [ebp-30h] BYREF
@@ -575,9 +576,15 @@ int sithCommand_CmdWarp(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         sithConsole_Print("Format: WARP x y z");
         return 0;
     }
-    v5 = _sscanf(pArgStr, "%f %f %f %f %f %f", &a1, &a1.y, &a1.z, &a3a, &a3a.y, &a3a.z);
+    v5 = _sscanf(pArgStr, "%f %f %f %f %f %f", &fx, &fy, &fz, &f2x, &f2y, &f2z);
     if ( v5 < 3 )
         return 0;
+    a1.x = fx; // FLEXTODO
+    a1.y = fy; // FLEXTODO
+    a1.z = fz; // FLEXTODO
+    a3a.x = f2x; // FLEXTODO
+    a3a.y = f2y; // FLEXTODO
+    a3a.z = f2z; // FLEXTODO
 
     if ( v5 == 6 )
         rdMatrix_BuildRotate34(&a, &a3a);

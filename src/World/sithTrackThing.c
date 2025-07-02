@@ -289,16 +289,22 @@ int sithTrackThing_LoadPathParams(stdConffileArg *arg, sithThing *thing, int par
     {
         case THINGPARAM_FRAME:
         {
-            rdVector3 tmpPos;
-            rdVector3 tmpRot;
+            flex32_t tmpPosx, tmpPosy, tmpPosz;
+            flex32_t tmpRotx, tmpRoty, tmpRotz;
 
             if ( thing->trackParams.loadedFrames < thing->trackParams.sizeFrames )
             {
-                if ( _sscanf(arg->value, "(%f/%f/%f:%f/%f/%f)", &tmpPos.x, &tmpPos.y, &tmpPos.z, &tmpRot.x, &tmpRot.y, &tmpRot.z) != 6 )
+                if ( _sscanf(arg->value, "(%f/%f/%f:%f/%f/%f)", &tmpPosx, &tmpPosy, &tmpPosz, &tmpRotx, &tmpRoty, &tmpRotz) != 6 )
                     return 0;
                 sithThingFrame* pFrame = &thing->trackParams.aFrames[thing->trackParams.loadedFrames++];
-                rdVector_Copy3(&pFrame->pos, &tmpPos);
-                rdVector_Copy3(&pFrame->rot, &tmpRot);
+                pFrame->pos.x = tmpPosx; // FLEXTODO
+                pFrame->pos.y = tmpPosy; // FLEXTODO
+                pFrame->pos.z = tmpPosz; // FLEXTODO
+                pFrame->rot.x = tmpRotx; // FLEXTODO
+                pFrame->rot.y = tmpRoty; // FLEXTODO
+                pFrame->rot.z = tmpRotz; // FLEXTODO
+                //rdVector_Copy3(&pFrame->pos, &tmpPos);
+                //rdVector_Copy3(&pFrame->rot, &tmpRot);
             }
             return 1;
         }

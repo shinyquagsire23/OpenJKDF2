@@ -658,9 +658,20 @@ void sithCogParse_LexAddSymbol(const char *symName)
 
 void sithCogParse_LexScanVector3(char* text)
 {
+    // Added: flex_t
+    flex32_t scan_x = 0.0;
+    flex32_t scan_y = 0.0;
+    flex32_t scan_z = 0.0;
+
     rdVector3 scan_in;
     _memset(&scan_in, 0, sizeof(scan_in));
-    _sscanf(text, "'%f %f %f'", &scan_in.x, &scan_in.y, &scan_in.z);
+    _sscanf(text, "'%f %f %f'", &scan_x, &scan_y, &scan_z);
+
+    // Added: flex_t
+    scan_in.x = scan_x; // FLEXTODO
+    scan_in.y = scan_y;
+    scan_in.z = scan_z;
+
     yylval.as_vector = scan_in;
 }
 

@@ -575,7 +575,7 @@ int sithCvar_SetFromString(const char* pName, const char* pStrVal)
         return 0;
     }
 
-    flex_t readValFlex = 0.0;
+    flex32_t readValFlex = 0.0;
     int readValInt = 0;
 
     switch (pCvar->type) {

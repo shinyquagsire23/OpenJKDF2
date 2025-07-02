@@ -128,9 +128,11 @@ int rdParticle_LoadEntry(char *fpath, rdParticle *pParticle)
     int v15; // eax
     rdVector3 *v16; // esi
     int *v17; // edi
-    rdVector3 v19; // [esp+10h] [ebp-20h]
-    flex_t size; // [esp+1Ch] [ebp-14h]
-    int v21; // [esp+20h] [ebp-10h]
+    flex32_t fx;
+    flex32_t fy;
+    flex32_t fz;
+    flex32_t size; // [esp+1Ch] [ebp-14h]
+    flex32_t v21; // [esp+20h] [ebp-10h]
     int versMinor; // [esp+24h] [ebp-Ch]
     int versMajor; // [esp+28h] [ebp-8h]
     int v24; // [esp+2Ch] [ebp-4h]
@@ -156,8 +158,8 @@ int rdParticle_LoadEntry(char *fpath, rdParticle *pParticle)
     if (_sscanf(stdConffile_aLine, " size %f", &size) != 1)
         goto done_close;
 
-    pParticle->diameter = size;
-    pParticle->radius = size * 0.5;
+    pParticle->diameter = size; // FLEXTODO
+    pParticle->radius = size * 0.5; // FLEXTODO
     if (!stdConffile_ReadLine())
         goto done_close;
 
@@ -188,16 +190,16 @@ int rdParticle_LoadEntry(char *fpath, rdParticle *pParticle)
     if ( _sscanf(stdConffile_aLine, " radius %f", &v21) != 1 )
         goto done_close;
 
-    pParticle->cloudRadius = v21;
+    pParticle->cloudRadius = v21; // FLEXTODO
     if (!stdConffile_ReadLine())
         goto done_close;
 
-    if ( _sscanf(stdConffile_aLine, " insert offset %f %f %f", &v19, &v19.y, &v19.z) != 3 )
+    if ( _sscanf(stdConffile_aLine, " insert offset %f %f %f", &fx, &fy, &fz) != 3 )
         goto done_close;
 
-    pParticle->insertOffset.x = v19.x;
-    pParticle->insertOffset.y = v19.y;
-    pParticle->insertOffset.z = v19.z;
+    pParticle->insertOffset.x = fx; // FLEXTODO
+    pParticle->insertOffset.y = fy; // FLEXTODO
+    pParticle->insertOffset.z = fz; // FLEXTODO
     if (!stdConffile_ReadLine())
         goto done_close;
 
@@ -224,14 +226,16 @@ LABEL_28:
                         stdConffile_aLine,
                         " %d: %f %f %f %d",
                         &v24,
-                        &v19,
-                        &v19.y,
-                        &v19.z,
+                        &fx,
+                        &fy,
+                        &fz,
                         v17) == 5
                  && *v17 < v8 )
             {
                 ++v17;
-                *v16 = v19;
+                v16->x = fx; // FLEXTODO
+                v16->y = fy; // FLEXTODO
+                v16->z = fz; // FLEXTODO
                 ++v16;
                 if ( ++v5 >= numVertices )
                     goto LABEL_28;

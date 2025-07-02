@@ -61,13 +61,14 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
     int node_idx;
     int anim_entry_cnt;
     unsigned int num_nodes;
-    rdVector3 pos;
-    rdVector3 orientation;
-    rdVector3 vel;
-    rdVector3 angVel;
+    flex32_t posx, posy, posz;
+    flex32_t orientationx, orientationy, orientationz;
+    flex32_t velx, vely, velz;
+    flex32_t angVelx, angVely, angVelz;
     int entry_num;
     char mesh_name[32];
     unsigned int nodes_read;
+    flex32_t ftmp;
 
     _memset(keyframe, 0, sizeof(rdKeyframe));
     _strncpy(keyframe->name, "UNKNOWN", 0x1Fu);
@@ -107,8 +108,9 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
     if (!stdConffile_ReadLine())
       goto read_fail;
 
-    if (_sscanf(stdConffile_aLine, " fps %f", &keyframe->fps) != 1)
+    if (_sscanf(stdConffile_aLine, " fps %f", &ftmp) != 1)
       goto read_fail;
+    keyframe->fps = ftmp; // FLEXTODO
 
     if (!stdConffile_ReadLine())
       goto read_fail;
@@ -145,8 +147,9 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
         if (!stdConffile_ReadLine())
             break;
         
-        if (_sscanf(stdConffile_aLine, "%f %d", &markers->marker_float[num_markers_read], &markers->marker_int[num_markers_read]) != 2)
+        if (_sscanf(stdConffile_aLine, "%f %d", &ftmp, &markers->marker_int[num_markers_read]) != 2)
             break;
+        markers->marker_float[num_markers_read] = ftmp;
       }
       
       if (num_markers_read < num_markers)
@@ -205,26 +208,34 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
                    &entry_num,
                    &anim_entry->frameNum,
                    &anim_entry->flags,
-                   &pos.x,
-                   &pos.y,
-                   &pos.z,
-                   &orientation.x,
-                   &orientation.y,
-                   &orientation.z) != 9) {
+                   &posx,
+                   &posy,
+                   &posz,
+                   &orientationx,
+                   &orientationy,
+                   &orientationz) != 9) {
               goto read_fail;
             }
             
-            anim_entry->pos = pos;
-            anim_entry->orientation = orientation;
+            anim_entry->pos.x = posx; // FLEXTODO
+            anim_entry->pos.y = posy; // FLEXTODO
+            anim_entry->pos.z = posz; // FLEXTODO
+            anim_entry->orientation.x = orientationx; // FLEXTODO
+            anim_entry->orientation.y = orientationy; // FLEXTODO
+            anim_entry->orientation.z = orientationz; // FLEXTODO
             
             if (!stdConffile_ReadLine()
-              || _sscanf(stdConffile_aLine, " %f %f %f %f %f %f", &vel.x, &vel.y, &vel.z, &angVel.x, &angVel.y, &angVel.z) != 6)
+              || _sscanf(stdConffile_aLine, " %f %f %f %f %f %f", &velx, &vely, &velz, &angVelx, &angVely, &angVelz) != 6)
             {
               goto read_fail;
             }
 
-            anim_entry->vel = vel;
-            anim_entry->angVel = angVel;
+            anim_entry->vel.x = velx; // FLEXTODO
+            anim_entry->vel.y = vely; // FLEXTODO
+            anim_entry->vel.z = velz; // FLEXTODO
+            anim_entry->angVel.x = angVelx; // FLEXTODO
+            anim_entry->angVel.y = angVely; // FLEXTODO
+            anim_entry->angVel.z = angVelz; // FLEXTODO
             anim_entry++;
         }
     }

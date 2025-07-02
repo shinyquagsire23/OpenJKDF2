@@ -587,9 +587,9 @@ int sithAI_LoadThingActorParams(stdConffileArg *arg, sithThing *thing, int param
     int v5; // ebp
     unsigned int v6; // edi
     rdVector3 *v7; // ecx
-    flex_t v9; // [esp+10h] [ebp-Ch] BYREF
-    flex_t v10; // [esp+14h] [ebp-8h] BYREF
-    flex_t v11; // [esp+18h] [ebp-4h] BYREF
+    flex32_t v9; // [esp+10h] [ebp-Ch] BYREF
+    flex32_t v10; // [esp+14h] [ebp-8h] BYREF
+    flex32_t v11; // [esp+18h] [ebp-4h] BYREF
 
     v3 = thing->actor;
     if ( param == THINGPARAM_FRAME )
@@ -598,9 +598,9 @@ int sithAI_LoadThingActorParams(stdConffileArg *arg, sithThing *thing, int param
         if ( v6 < v3->sizeFrames && _sscanf(arg->value, "(%f/%f/%f)", &v9, &v10, &v11) == 3 )
         {
             v7 = &v3->paFrames[v6];
-            v7->x = v9;
-            v7->y = v10;
-            v7->z = v11;
+            v7->x = v9; // FLEXTODO
+            v7->y = v10; // FLEXTODO
+            v7->z = v11; // FLEXTODO
             ++v3->loadedFrames;
             return 1;
         }

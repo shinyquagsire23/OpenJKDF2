@@ -1663,6 +1663,7 @@ int sithThing_LoadThingParam(stdConffileArg *arg, sithThing* pThing, int param)
     sithAnimclass *pAnimClass; // eax
     sithCog *pCog; // eax
     rdVector3 orientation; // [esp+10h] [ebp-Ch] BYREF
+    flex32_t orientationx, orientationy, orientationz;
     uint32_t thingFlags;
     flex_t tmpF;
 
@@ -1871,8 +1872,11 @@ LABEL_56:
             result = 1;
             break;
         case THINGPARAM_ORIENT:
-            if ( _sscanf(arg->value, "(%f/%f/%f)", &orientation, &orientation.y, &orientation.z) == 3 )
+            if ( _sscanf(arg->value, "(%f/%f/%f)", &orientationx, &orientationy, &orientationz) == 3 )
             {
+                orientation.x = orientationx; // FLEXTODO
+                orientation.y = orientationy; // FLEXTODO
+                orientation.z = orientationz; // FLEXTODO
                 rdMatrix_BuildRotate34(&pThing->lookOrientation, &orientation);
 LABEL_58:
                 result = 1;

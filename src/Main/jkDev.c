@@ -595,9 +595,9 @@ int jkDev_CmdDebugFlags2(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 
 int jkDev_CmdWarp(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
-    flex_t v4; // [esp+4h] [ebp-8h] BYREF
-    flex_t v5; // [esp+8h] [ebp-4h] BYREF
-    flex_t v6;
+    flex32_t v4; // [esp+4h] [ebp-8h] BYREF
+    flex32_t v5; // [esp+8h] [ebp-4h] BYREF
+    flex32_t v6;
 
     if ( !sithNet_isMulti )
     {

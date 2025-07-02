@@ -350,7 +350,7 @@ int sithSurface_Load(sithWorld *world)
             return 0;
         
         int idx_unused;
-        flex_t norm_x, norm_y, norm_z;
+        flex32_t norm_x, norm_y, norm_z;
         if (_sscanf(stdConffile_aLine, "%d: %f %f %f", &idx_unused, &norm_x, &norm_y, &norm_z) != 4)
             return 0;
         

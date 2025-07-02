@@ -74,24 +74,24 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
     int v55; // edi
     unsigned int idx; // edi
     rdHierarchyNode *node; // esi
-    flex_t v_z; // [esp+14h] [ebp-80h]
-    flex_t v_y; // [esp+18h] [ebp-7Ch]
-    flex_t v_x; // [esp+1Ch] [ebp-78h]
+    flex32_t v_z; // [esp+14h] [ebp-80h]
+    flex32_t v_y; // [esp+18h] [ebp-7Ch]
+    flex32_t v_x; // [esp+1Ch] [ebp-78h]
     rdFace *face; // [esp+34h] [ebp-60h]
     int v78; // [esp+50h] [ebp-44h]
     int sibling; // [esp+54h] [ebp-40h]
-    flex_t pitch; // [esp+58h] [ebp-3Ch]
-    flex_t v_i; // [esp+5Ch] [ebp-38h]
-    flex_t yaw; // [esp+60h] [ebp-34h]
-    flex_t v_v; // [esp+64h] [ebp-30h]
-    flex_t roll; // [esp+68h] [ebp-2Ch]
+    flex32_t pitch; // [esp+58h] [ebp-3Ch]
+    flex32_t v_i; // [esp+5Ch] [ebp-38h]
+    flex32_t yaw; // [esp+60h] [ebp-34h]
+    flex32_t v_v; // [esp+64h] [ebp-30h]
+    flex32_t roll; // [esp+68h] [ebp-2Ch]
     int parent; // [esp+6Ch] [ebp-28h]
-    flex_t pivot_x; // [esp+70h] [ebp-24h]
-    flex_t radius; // [esp+74h] [ebp-20h]
-    flex_t pivot_y; // [esp+78h] [ebp-1Ch]
-    int extralight; // [esp+7Ch] [ebp-18h]
-    flex_t pivot_z; // [esp+80h] [ebp-14h]
-    flex_t v_u; // [esp+84h] [ebp-10h]
+    flex32_t pivot_x; // [esp+70h] [ebp-24h]
+    flex32_t radius; // [esp+74h] [ebp-20h]
+    flex32_t pivot_y; // [esp+78h] [ebp-1Ch]
+    flex32_t extralight; // [esp+7Ch] [ebp-18h]
+    flex32_t pivot_z; // [esp+80h] [ebp-14h]
+    flex32_t v_u; // [esp+84h] [ebp-10h]
     int child; // [esp+88h] [ebp-Ch]
     int version_minor; // [esp+8Ch] [ebp-8h]
     int version_major; // [esp+90h] [ebp-4h]
@@ -153,16 +153,16 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
     if ( _sscanf(stdConffile_aLine, " radius %f", &radius) != 1 )
         goto fail;
 
-    model->radius = radius;
+    model->radius = radius; // FLEXTODO
     if (!stdConffile_ReadLine())
         goto fail;
 
     if ( _sscanf(stdConffile_aLine, " insert offset %f %f %f", &v_x, &v_y, &v_z) != 3 )
         goto fail;
 
-    model->insertOffset.x = v_x;
-    model->insertOffset.y = v_y;
-    model->insertOffset.z = v_z;
+    model->insertOffset.x = v_x; // FLEXTODO
+    model->insertOffset.y = v_y; // FLEXTODO
+    model->insertOffset.z = v_z; // FLEXTODO
     if (!stdConffile_ReadLine())
         goto fail;
 
@@ -203,7 +203,7 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
             mesh->name[31] = 0;
 
             if ( !stdConffile_ReadLine()
-              || _sscanf(stdConffile_aLine, " radius %f", &mesh->radius) != 1
+              || _sscanf(stdConffile_aLine, " radius %f", &radius) != 1
               || !stdConffile_ReadLine()
               || _sscanf(stdConffile_aLine, " geometrymode %d", &mesh->geometryMode) != 1
               || !stdConffile_ReadLine()
@@ -216,6 +216,7 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
             {
                 goto fail;
             }
+            mesh->radius = radius; // FLEXTODO
             
             mesh->vertices = 0;
             mesh->vertices_i = 0;
@@ -246,10 +247,10 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
                             &v_i) != 5 )
                     goto fail;
 
-                mesh->vertices[vertex_num].x = v_x;
-                mesh->vertices[vertex_num].y = v_y;
-                mesh->vertices[vertex_num].z = v_z;
-                mesh->vertices_i[vertex_num] = v_i;
+                mesh->vertices[vertex_num].x = v_x; // FLEXTODO
+                mesh->vertices[vertex_num].y = v_y; // FLEXTODO
+                mesh->vertices[vertex_num].z = v_z; // FLEXTODO
+                mesh->vertices_i[vertex_num] = v_i; // FLEXTODO
             }
 
             if ( !stdConffile_ReadLine()
@@ -299,9 +300,9 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
                     goto fail;
 
                 vertex_normal = &mesh->vertexNormals[v29];
-                vertex_normal->x = v_x;
-                vertex_normal->y = v_y;
-                vertex_normal->z = v_z;                    
+                vertex_normal->x = v_x; // FLEXTODO
+                vertex_normal->y = v_y; // FLEXTODO
+                vertex_normal->z = v_z; // FLEXTODO
             }
 
             if ( !stdConffile_ReadLine()
@@ -344,8 +345,9 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
                 if ( _sscanf(tmpTxt, "%d", &face->textureMode) != 1 )
                     goto fail;
                 tmpTxt = _strtok(0, " \t");
-                if ( _sscanf(tmpTxt, "%f", &face->extraLight) != 1 )
+                if ( _sscanf(tmpTxt, "%f", &extralight) != 1 )
                     goto fail;
+                face->extraLight = extralight; // FLEXTODO
                 to_num_verts = _strtok(0, " \t");
                 face->numVertices = _atoi(to_num_verts);
                 if ( !face->numVertices )
@@ -397,9 +399,9 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
                     goto fail;
 
 
-                mesh->faces[v55].normal.x = v_x;
-                mesh->faces[v55].normal.y = v_y;
-                mesh->faces[v55].normal.z = v_z;
+                mesh->faces[v55].normal.x = v_x; // FLEXTODO
+                mesh->faces[v55].normal.y = v_y; // FLEXTODO
+                mesh->faces[v55].normal.z = v_z; // FLEXTODO
             }
         }
     }
@@ -469,15 +471,15 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
         else
             node->nextSibling = &model->hierarchyNodes[sibling];
 
-        node->pos.x = v_x;
-        node->pos.y = v_y;
-        node->pos.z = v_z;
-        node->rot.x = pitch;
-        node->rot.y = yaw;
-        node->rot.z = roll;
-        node->pivot.x = pivot_x;
-        node->pivot.y = pivot_y;
-        node->pivot.z = pivot_z;
+        node->pos.x = v_x; // FLEXTODO
+        node->pos.y = v_y; // FLEXTODO
+        node->pos.z = v_z; // FLEXTODO
+        node->rot.x = pitch; // FLEXTODO
+        node->rot.y = yaw; // FLEXTODO
+        node->rot.z = roll; // FLEXTODO
+        node->pivot.x = pivot_x; // FLEXTODO
+        node->pivot.y = pivot_y; // FLEXTODO
+        node->pivot.z = pivot_z; // FLEXTODO
     }
 
     rdModel3_CalcNumParents(model); // MOTS added

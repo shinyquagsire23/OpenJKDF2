@@ -44,6 +44,12 @@ int sithSector_Load(sithWorld *world, int tmp)
     int vtx_idx; // [esp+24h] [ebp-28h] BYREF
     int amount_1; // [esp+28h] [ebp-24h] BYREF
     char sound_fname[32]; // [esp+2Ch] [ebp-20h] BYREF
+    flex32_t tmpf1;
+    flex32_t tmpf2;
+    flex32_t tmpf3;
+    flex32_t tmpf4;
+    flex32_t tmpf5;
+    flex32_t tmpf6;
 
     if ( tmp )
         return 0;
@@ -84,60 +90,82 @@ int sithSector_Load(sithWorld *world, int tmp)
                 break;
             if ( !stdConffile_ReadLine() )
                 break;
-            if ( _sscanf(stdConffile_aLine, " ambient light %f", &sectors->ambientLight) != 1 )
+            if ( _sscanf(stdConffile_aLine, " ambient light %f", &tmpf1) != 1 )
                 break;
+            sectors->ambientLight = tmpf1; // FLEXTODO
             if ( !stdConffile_ReadLine() )
                 break;
-            if ( _sscanf(stdConffile_aLine, " extra light %f", &sectors->extraLight) != 1 )
+            if ( _sscanf(stdConffile_aLine, " extra light %f", &tmpf1) != 1 )
                 break;
+            sectors->extraLight = tmpf1; // FLEXTODO
             if ( !stdConffile_ReadLine() )
                 break;
             if ( _sscanf(stdConffile_aLine, " colormap %d", &tmp) != 1 )
                 break;
             sectors->colormap = &world->colormaps[tmp];
             if ( !stdConffile_ReadLine()
-              || _sscanf(stdConffile_aLine, " tint %f %f %f", &sectors->tint, &sectors->tint.y, &sectors->tint.z) == 3 && !stdConffile_ReadLine() )
+              || _sscanf(stdConffile_aLine, " tint %f %f %f", &tmpf1, &tmpf2, &tmpf3) == 3 && !stdConffile_ReadLine() )
             {
                 break;
             }
+            sectors->tint.x = tmpf1; // FLEXTODO
+            sectors->tint.y = tmpf2; // FLEXTODO
+            sectors->tint.z = tmpf3; // FLEXTODO
             if ( _sscanf(
                      stdConffile_aLine,
                      " boundbox %f %f %f %f %f %f ",
-                     &sectors->boundingbox_onecorner,
-                     &sectors->boundingbox_onecorner.y,
-                     &sectors->boundingbox_onecorner.z,
-                     &sectors->boundingbox_othercorner,
-                     &sectors->boundingbox_othercorner.y,
-                     &sectors->boundingbox_othercorner.z) != 6 )
+                     &tmpf1,
+                     &tmpf2,
+                     &tmpf3,
+                     &tmpf4,
+                     &tmpf5,
+                     &tmpf6) != 6 )
                 break;
+            sectors->boundingbox_onecorner.x = tmpf1; // FLEXTODO
+            sectors->boundingbox_onecorner.y = tmpf2; // FLEXTODO
+            sectors->boundingbox_onecorner.z = tmpf3; // FLEXTODO
+            sectors->boundingbox_othercorner.x = tmpf4; // FLEXTODO
+            sectors->boundingbox_othercorner.y = tmpf5; // FLEXTODO
+            sectors->boundingbox_othercorner.z = tmpf6; // FLEXTODO
             if ( !stdConffile_ReadLine() )
                 break;
             if ( _sscanf(
                      stdConffile_aLine,
                      " collidebox %f %f %f %f %f %f ",
-                     &sectors->collidebox_onecorner,
-                     &sectors->collidebox_onecorner.y,
-                     &sectors->collidebox_onecorner.z,
-                     &sectors->collidebox_othercorner,
-                     &sectors->collidebox_othercorner.y,
-                     &sectors->collidebox_othercorner.z) == 6 )
+                     &tmpf1,
+                     &tmpf2,
+                     &tmpf3,
+                     &tmpf4,
+                     &tmpf5,
+                     &tmpf6) == 6 )
             {
+                sectors->collidebox_onecorner.x = tmpf1; // FLEXTODO
+                sectors->collidebox_onecorner.y = tmpf2; // FLEXTODO
+                sectors->collidebox_onecorner.z = tmpf3; // FLEXTODO
+                sectors->collidebox_othercorner.x = tmpf4; // FLEXTODO
+                sectors->collidebox_othercorner.y = tmpf5; // FLEXTODO
+                sectors->collidebox_othercorner.z = tmpf6; // FLEXTODO
                 sectors->flags |= SITH_SECTOR_HAS_COLLIDE_BOX;
                 if ( !stdConffile_ReadLine() )
                     break;
             }
-            if ( _sscanf(stdConffile_aLine, "sound %s %f", sound_fname, &sectors->sectorSoundVol) == 2 )
+            if ( _sscanf(stdConffile_aLine, "sound %s %f", sound_fname, &tmpf1) == 2 )
             {
+                sectors->sectorSoundVol = tmpf1; // FLEXTODO
                 sectors->sectorSound = sithSound_LoadEntry(sound_fname, 0);
                 if ( !stdConffile_ReadLine() )
                     break;
             }
-            if ( _sscanf(stdConffile_aLine, " center %f %f %f", &sectors->center, &sectors->center.y, &sectors->center.z) != 3 )
+            if ( _sscanf(stdConffile_aLine, " center %f %f %f", &tmpf1, &tmpf2, &tmpf3) != 3 )
                 break;
+            sectors->center.x = tmpf1; // FLEXTODO
+            sectors->center.y = tmpf2; // FLEXTODO
+            sectors->center.z = tmpf3; // FLEXTODO
             if ( !stdConffile_ReadLine() )
                 break;
-            if ( _sscanf(stdConffile_aLine, " radius %f", &sectors->radius) != 1 )
+            if ( _sscanf(stdConffile_aLine, " radius %f", &tmpf1) != 1 )
                 break;
+            sectors->radius = tmpf1; // FLEXTODO
             if ( !stdConffile_ReadLine() )
                 break;
             if ( _sscanf(stdConffile_aLine, " vertices %d", &num_vertices) != 1 )
