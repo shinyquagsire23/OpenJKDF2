@@ -957,7 +957,7 @@ void jkCog_DestroyBubble(sithCog *ctx)
 void jkCog_GetBubbleDistance(sithCog *ctx)
 {
     int iVar1;
-    cog_flex_t tmp;
+    flex_t tmp;
     
     sithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing == sithPlayer_pLocalPlayerThing) {

@@ -37,7 +37,7 @@ void sithMulti_SetHandleridk(sithMultiHandler_t a1)
     sithMulti_handlerIdk = a1;
 }
 
-void sithMulti_SendChat(char *pStr, int arg0, int arg1)
+void sithMulti_SendChat(const char *pStr, int arg0, int arg1)
 {
     unsigned int pStr_len; // esi
 

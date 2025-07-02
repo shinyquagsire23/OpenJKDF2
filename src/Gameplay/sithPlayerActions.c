@@ -157,7 +157,7 @@ void sithPlayerActions_JumpWithVel(sithThing *thing, flex_t vel)
 
 void sithPlayerActions_WarpToCheckpoint(sithThing *thing, int idx)
 {
-    if ( idx < (unsigned int)jkPlayer_maxPlayers )
+    if (idx < (unsigned int)jkPlayer_maxPlayers && idx >= 0) // Added: >=0 check
     {
         if ( (jkPlayer_playerInfos[idx].flags & 2) != 0 )
         {

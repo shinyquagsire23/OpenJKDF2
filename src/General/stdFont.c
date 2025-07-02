@@ -783,7 +783,7 @@ LABEL_27:
                                     v14 = 0;
                                 v8 += v14 + a2->marginY;
                             }
-                            v9 = ++v5 == 0;
+                            v9 = *(++v5) == 0;
                             ++v25;
                             if ( !v9 )
                                 continue;

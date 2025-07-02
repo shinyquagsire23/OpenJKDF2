@@ -64,14 +64,21 @@ uint32_t stdSound_ParseWav(stdFile_t sound_file, uint32_t *nSamplesPerSec, int *
 
 ALCdevice *device;
 ALCcontext *context;
-static rdVector3 stdSound_listenerPos;
+static ALfloat stdSound_listenerPos[3] = {0.0f, 0.0f , 0.0f};
 static ALfloat stdSound_listenerOri[6] = { 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
 
-void stdSound_DS3DToAL(rdVector3* pOut, rdVector3* pIn)
+void stdSound_DS3DToAL(ALfloat* pOut, rdVector3* pIn)
 {
-    pOut->x = pIn->x * 0.1;
-    pOut->y = pIn->y * 0.1;
-    pOut->z = pIn->z * 0.1;
+    pOut[0] = pIn->x * 0.1;
+    pOut[1] = pIn->y * 0.1;
+    pOut[2] = pIn->z * 0.1;
+}
+
+void stdSound_ALToDS3D(rdVector3* pOut, ALfloat* pIn)
+{
+    pOut->x = pIn[0] * 10.0;
+    pOut->y = pIn[1] * 10.0;
+    pOut->z = pIn[2] * 10.0;
 }
 
 int stdSound_Startup()
@@ -164,8 +171,12 @@ stdSound_buffer_t* stdSound_BufferCreate(int bStereo, uint32_t nSamplesPerSec, u
     out->refcnt = 1;
     out->vol = 1.0;
 
-    rdVector_Zero3(&out->pos);
-    rdVector_Zero3(&out->vel);
+    out->pos[0] = 0.0;
+    out->pos[1] = 0.0;
+    out->pos[2] = 0.0;
+    out->vel[0] = 0.0;
+    out->vel[1] = 0.0;
+    out->vel[2] = 0.0;
     
     if (!Main_bHeadless)
         alGenBuffers(1, &out->buffer);
@@ -278,8 +289,8 @@ int stdSound_BufferUnlock(stdSound_buffer_t* sound, void* buffer, int bufferRead
         alGenSources((ALuint)1, &sound->source);
 
         alSourcef(sound->source, AL_PITCH, 1.0);
-        alSourcefv(sound->source, AL_POSITION, (ALfloat*)&sound->pos); // FLEXTODO
-        alSourcefv(sound->source, AL_VELOCITY, (ALfloat*)&sound->vel); // FLEXTODO
+        alSourcefv(sound->source, AL_POSITION, sound->pos);
+        alSourcefv(sound->source, AL_VELOCITY, sound->vel);
         alSourcei(sound->source, AL_SOURCE_RELATIVE, AL_TRUE); // No 3D until we're given a position
         
         //printf("%u %u\n", buf->source, buf->buffer);
@@ -300,8 +311,8 @@ int stdSound_BufferPlay(stdSound_buffer_t* buf, int loop)
         alGenSources((ALuint)1, &buf->source);
 
 	    alSourcef(buf->source, AL_PITCH, 1.0);
-        alSourcefv(buf->source, AL_POSITION, (ALfloat*)&buf->pos); // FLEXTODO
-        alSourcefv(buf->source, AL_VELOCITY, (ALfloat*)&buf->vel); // FLEXTODO
+        alSourcefv(buf->source, AL_POSITION, buf->pos);
+        alSourcefv(buf->source, AL_VELOCITY, buf->vel);
         alSourcei(buf->source, AL_SOURCE_RELATIVE, AL_TRUE); // No 3D until we're given a position
 	    
 	    //printf("%u %u\n", buf->source, buf->buffer);
@@ -326,8 +337,9 @@ void stdSound_BufferRelease(stdSound_buffer_t* sound)
     //if (sound->refcnt > 0)
     //    return;
     
-    if (sound->source)
+    if (sound->source) {
         alSourcei(sound->source, AL_LOOPING, AL_FALSE);
+    }
     //alSourceStop(sound->source);
     
     /*alGetSourcei(sound->source, AL_SOURCE_STATE, &source_state);
@@ -389,8 +401,9 @@ void stdSound_BufferSetFrequency(stdSound_buffer_t* sound, int freq)
 
     flex_t pitch = (double)freq / (double)sound->nSamplesPerSec;
     
-    if (sound->source)
+    if (sound->source) {
         alSourcef(sound->source, AL_PITCH, pitch);
+    }
 }
 
 stdSound_buffer_t* stdSound_BufferDuplicate(stdSound_buffer_t* sound)
@@ -414,8 +427,8 @@ stdSound_buffer_t* stdSound_BufferDuplicate(stdSound_buffer_t* sound)
     out->bIsCopy = 1;
     out->buffer = sound->buffer;
 
-    out->pos = sound->pos;
-    out->vel = sound->vel;
+    memcpy(out->pos, sound->pos, sizeof(out->pos));
+    memcpy(out->vel, sound->vel, sizeof(out->pos));
     
     //stdSound_BufferSetData(out, sound->bufferBytes, NULL);
     
@@ -485,14 +498,14 @@ void stdSound_SetPositionOrientation(rdVector3 *pos, rdVector3 *lvec, rdVector3 
 {
     if (!pos || !lvec || !uvec) return;
 
-    stdSound_DS3DToAL(&stdSound_listenerPos, pos);
+    stdSound_DS3DToAL(stdSound_listenerPos, pos);
 
-    stdSound_DS3DToAL((rdVector3*)&stdSound_listenerOri[0], lvec);
-    stdSound_DS3DToAL((rdVector3*)&stdSound_listenerOri[3], uvec);
+    stdSound_DS3DToAL(&stdSound_listenerOri[0], lvec);
+    stdSound_DS3DToAL(&stdSound_listenerOri[3], uvec);
 
     if (Main_bHeadless) return;
 
-    alListenerfv(AL_POSITION, (ALfloat*)&stdSound_listenerPos); // FLEXTODO
+    alListenerfv(AL_POSITION, stdSound_listenerPos);
     alListenerfv(AL_ORIENTATION, stdSound_listenerOri);
 }
 
@@ -500,7 +513,7 @@ void stdSound_SetPosition(stdSound_buffer_t* pSoundBuf, rdVector3 *pos)
 {
     if (!pSoundBuf || !pos) return;
 
-    stdSound_DS3DToAL(&pSoundBuf->pos, pos);
+    stdSound_DS3DToAL(pSoundBuf->pos, pos);
 
     if (!pSoundBuf->source)
         return;
@@ -508,14 +521,14 @@ void stdSound_SetPosition(stdSound_buffer_t* pSoundBuf, rdVector3 *pos)
     if (Main_bHeadless) return;
 
     alSourcei(pSoundBuf->source, AL_SOURCE_RELATIVE, AL_FALSE);
-    alSourcefv(pSoundBuf->source, AL_POSITION, (ALfloat*)&pSoundBuf->pos); // FLEXTODO
+    alSourcefv(pSoundBuf->source, AL_POSITION, pSoundBuf->pos);
 }
 
 void stdSound_SetVelocity(stdSound_buffer_t* pSoundBuf, rdVector3 *vel)
 {
     if (!pSoundBuf || !vel) return;
 
-    stdSound_DS3DToAL(&pSoundBuf->vel, vel);
+    stdSound_DS3DToAL(pSoundBuf->vel, vel);
 
     if (!pSoundBuf->source)
         return;
@@ -523,15 +536,16 @@ void stdSound_SetVelocity(stdSound_buffer_t* pSoundBuf, rdVector3 *vel)
     if (Main_bHeadless) return;
 
     alSourcei(pSoundBuf->source, AL_SOURCE_RELATIVE, AL_FALSE);
-    alSourcefv(pSoundBuf->source, AL_VELOCITY, (ALfloat*)&pSoundBuf->pos); // FLEXTODO
+    alSourcefv(pSoundBuf->source, AL_VELOCITY, pSoundBuf->vel); // FLEXTODO
 }
 
 int stdSound_IsPlaying(stdSound_buffer_t* pSoundBuf, rdVector3 *pos)
 {
     if (!pSoundBuf) return 0;
 
-    if (pos)
-        rdVector_Copy3(pos, &pSoundBuf->pos);
+    if (pos) {
+        stdSound_ALToDS3D(pos, pSoundBuf->pos);
+    }
     
     if (!pSoundBuf->source)
         return 0;

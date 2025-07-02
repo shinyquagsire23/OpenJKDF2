@@ -24,7 +24,7 @@ int sithConsole_Open(int maxLines);
 void sithConsole_Close();
 void sithConsole_Print(const char *str);
 void sithConsole_PrintUniStr(const wchar_t *a1);
-int sithConsole_TryCommand(char *cmd);
+int sithConsole_TryCommand(const char *cmd);
 int sithConsole_sub_4DA100();
 void sithConsole_AdvanceLogBuf();
 int sithConsole_RegisterDevCmd(DebugConsoleCmd_t fn, char *cmd, int extra);

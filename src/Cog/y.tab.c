@@ -3,7 +3,6 @@ char yysccsid[] = "@(#)yaccpar	1.4 (Berkeley) 02/25/90";
 #endif
 #line 2 "cog.y"
 #include <stdio.h>
-#include "Primitives/rdVector.h"
 #include "sithCogParse.h"
 #include "stdPlatform.h"
 
@@ -16,14 +15,14 @@ char yysccsid[] = "@(#)yaccpar	1.4 (Berkeley) 02/25/90";
 #define memcpy(x,y,z) _memcpy(x,y,z)
 #define strlen(x) _strlen(x)
 #define strcpy(x,y) _strcpy(x,y)
-#line 27 "cog.y"
+#line 26 "cog.y"
 typedef union {
-    rdVector3 as_vector;
+    cog_flex_t as_vector[3];
     float as_float;
     int as_int;
     sith_cog_parser_node* as_node;
 } YYSTYPE;
-#line 27 "y.tab.c"
+#line 26 "y.tab.c"
 #define IDENTIFIER 257
 #define CONSTANT_INT 258
 #define CONSTANT_FLOAT 259
@@ -402,7 +401,7 @@ YYSTYPE yylval;
 #define yystacksize YYSTACKSIZE
 short yyss[YYSTACKSIZE];
 YYSTYPE yyvs[YYSTACKSIZE];
-#line 213 "cog.y"
+#line 212 "cog.y"
 #include "jk.h"
 
 extern char yytext[];
@@ -411,7 +410,7 @@ void yyerror(char* s)
 {
     stdPrintf(pSithHS->errorPrint, ".\\Cog\\sithCogYACC.c", 406, "PARSER %s: line %d.\n", s, yacc_linenum);
 }
-#line 415 "y.tab.c"
+#line 414 "y.tab.c"
 #define YYABORT goto yyabort
 #define YYACCEPT goto yyaccept
 #define YYERROR goto yyerrlab
@@ -552,158 +551,158 @@ yyreduce:
     switch (yyn)
     {
 case 1:
-#line 38 "cog.y"
+#line 37 "cog.y"
 { yyval .as_node = sithCogParse_AddLeaf(COG_OPCODE_PUSHSYMBOL, yyvsp[0].as_int); }
 break;
 case 2:
-#line 39 "cog.y"
+#line 38 "cog.y"
 { yyval .as_node = sithCogParse_AddLeaf(COG_OPCODE_PUSHINT, yyvsp[0].as_int); }
 break;
 case 3:
-#line 40 "cog.y"
+#line 39 "cog.y"
 { yyval .as_node = sithCogParse_AddLeaf(COG_OPCODE_PUSHFLOAT, yyvsp[0].as_int); }
 break;
 case 4:
-#line 41 "cog.y"
+#line 40 "cog.y"
 { yyval .as_node = sithCogParse_AddLeaf(COG_OPCODE_PUSHSYMBOL, yyvsp[0].as_int); }
 break;
 case 5:
-#line 42 "cog.y"
-{ yyval .as_node = sithCogParse_AddLeafVector(COG_OPCODE_PUSHVECTOR, &yyvsp[0].as_vector); }
+#line 41 "cog.y"
+{ yyval .as_node = sithCogParse_AddLeafVector(COG_OPCODE_PUSHVECTOR, yyvsp[0].as_vector); }
 break;
 case 6:
-#line 43 "cog.y"
+#line 42 "cog.y"
 { yyval .as_node = yyvsp[-1].as_node; }
 break;
 case 8:
-#line 48 "cog.y"
+#line 47 "cog.y"
 { yyval .as_node = sithCogParse_AddLinkingNode(yyvsp[-3].as_node, yyvsp[-1].as_node, COG_OPCODE_ARRAYINDEX, 0); }
 break;
 case 9:
-#line 49 "cog.y"
+#line 48 "cog.y"
 { yyval .as_node = sithCogParse_AddLinkingNode(yyvsp[-2].as_node, 0, COG_OPCODE_CALLFUNC, 0); }
 break;
 case 10:
-#line 50 "cog.y"
+#line 49 "cog.y"
 { yyval .as_node = sithCogParse_AddLinkingNode(yyvsp[-1].as_node, yyvsp[-3].as_node, COG_OPCODE_CALLFUNC, 0); }
 break;
 case 12:
-#line 55 "cog.y"
+#line 54 "cog.y"
 { yyval .as_node = sithCogParse_AddLinkingNode(yyvsp[-2].as_node, yyvsp[0].as_node, COG_OPCODE_NOP, 0); }
 break;
 case 13:
-#line 59 "cog.y"
+#line 58 "cog.y"
 { yyval .as_node = sithCogParse_AddLeaf(COG_OPCODE_NEG, 0); }
 break;
 case 14:
-#line 60 "cog.y"
+#line 59 "cog.y"
 { yyval .as_node = sithCogParse_AddLeaf(COG_OPCODE_CMPFALSE, 0); }
 break;
 case 16:
-#line 65 "cog.y"
+#line 64 "cog.y"
 { yyval .as_node = sithCogParse_AddLinkingNode(yyvsp[0].as_node, yyvsp[-1].as_node, COG_OPCODE_NOP, 0); }
 break;
 case 18:
-#line 70 "cog.y"
+#line 69 "cog.y"
 { yyval .as_node = sithCogParse_AddLinkingNode(yyvsp[-2].as_node, yyvsp[0].as_node, COG_OPCODE_MUL, 0); }
 break;
 case 19:
-#line 71 "cog.y"
+#line 70 "cog.y"
 { yyval .as_node = sithCogParse_AddLinkingNode(yyvsp[-2].as_node, yyvsp[0].as_node, COG_OPCODE_DIV, 0); }
 break;
 case 20:
-#line 72 "cog.y"
+#line 71 "cog.y"
 { yyval .as_node = sithCogParse_AddLinkingNode(yyvsp[-2].as_node, yyvsp[0].as_node, COG_OPCODE_MOD, 0); }
 break;
 case 22:
-#line 77 "cog.y"
+#line 76 "cog.y"
 { yyval .as_node = sithCogParse_AddLinkingNode(yyvsp[-2].as_node, yyvsp[0].as_node, COG_OPCODE_ADD, 0); }
 break;
 case 23:
-#line 78 "cog.y"
+#line 77 "cog.y"
 { yyval .as_node = sithCogParse_AddLinkingNode(yyvsp[-2].as_node, yyvsp[0].as_node, COG_OPCODE_SUB, 0); }
 break;
 case 25:
-#line 83 "cog.y"
+#line 82 "cog.y"
 { yyval .as_node = sithCogParse_AddLinkingNode(yyvsp[-2].as_node, yyvsp[0].as_node, COG_OPCODE_CMPLS, 0); }
 break;
 case 26:
-#line 84 "cog.y"
+#line 83 "cog.y"
 { yyval .as_node = sithCogParse_AddLinkingNode(yyvsp[-2].as_node, yyvsp[0].as_node, COG_OPCODE_CMPGT, 0); }
 break;
 case 27:
-#line 85 "cog.y"
+#line 84 "cog.y"
 { yyval .as_node = sithCogParse_AddLinkingNode(yyvsp[-2].as_node, yyvsp[0].as_node, COG_OPCODE_CMPLE, 0); }
 break;
 case 28:
-#line 86 "cog.y"
+#line 85 "cog.y"
 { yyval .as_node = sithCogParse_AddLinkingNode(yyvsp[-2].as_node, yyvsp[0].as_node, COG_OPCODE_CMPGE, 0); }
 break;
 case 30:
-#line 91 "cog.y"
+#line 90 "cog.y"
 { yyval .as_node = sithCogParse_AddLinkingNode(yyvsp[-2].as_node, yyvsp[0].as_node, COG_OPCODE_CMPEQ, 0); }
 break;
 case 31:
-#line 92 "cog.y"
+#line 91 "cog.y"
 { yyval .as_node = sithCogParse_AddLinkingNode(yyvsp[-2].as_node, yyvsp[0].as_node, COG_OPCODE_CMPNE, 0); }
 break;
 case 33:
-#line 97 "cog.y"
+#line 96 "cog.y"
 { yyval .as_node = sithCogParse_AddLinkingNode(yyvsp[-2].as_node, yyvsp[0].as_node, COG_OPCODE_ANDI, 0); }
 break;
 case 35:
-#line 102 "cog.y"
+#line 101 "cog.y"
 { yyval .as_node = sithCogParse_AddLinkingNode(yyvsp[-2].as_node, yyvsp[0].as_node, COG_OPCODE_XORI, 0); }
 break;
 case 37:
-#line 107 "cog.y"
+#line 106 "cog.y"
 { yyval .as_node = sithCogParse_AddLinkingNode(yyvsp[-2].as_node, yyvsp[0].as_node, COG_OPCODE_ORI, 0); }
 break;
 case 39:
-#line 112 "cog.y"
+#line 111 "cog.y"
 { yyval .as_node = sithCogParse_AddLinkingNode(yyvsp[-2].as_node, yyvsp[0].as_node, COG_OPCODE_CMPAND, 0); }
 break;
 case 41:
-#line 117 "cog.y"
+#line 116 "cog.y"
 { yyval .as_node = sithCogParse_AddLinkingNode(yyvsp[-2].as_node, yyvsp[0].as_node, COG_OPCODE_CMPOR, 0); }
 break;
 case 43:
-#line 122 "cog.y"
+#line 121 "cog.y"
 { yyval .as_node = sithCogParse_AddLinkingNode(yyvsp[-2].as_node, yyvsp[0].as_node, COG_OPCODE_ASSIGN, 0); }
 break;
 case 45:
-#line 127 "cog.y"
+#line 126 "cog.y"
 { yyval .as_node = sithCogParse_AddLinkingNode(yyvsp[-2].as_node, yyvsp[0].as_node, COG_OPCODE_NOP, 0); }
 break;
 case 52:
-#line 140 "cog.y"
+#line 139 "cog.y"
 { 
                                                             yyval .as_node = sithCogParse_AddLinkingNode(yyvsp[0].as_node, 0, COG_OPCODE_NOP, 0); 
                                                             yyval .as_node->child_loop_depth = sithCogParse_GetSymbolScriptIdx(yyvsp[-2].as_int);
                                                             }
 break;
 case 53:
-#line 147 "cog.y"
+#line 146 "cog.y"
 { yyval .as_node = sithCogParse_AddLeaf(COG_OPCODE_NOP, 0); }
 break;
 case 54:
-#line 148 "cog.y"
+#line 147 "cog.y"
 { yyval .as_node = yyvsp[-1].as_node; }
 break;
 case 56:
-#line 153 "cog.y"
+#line 152 "cog.y"
 { yyval .as_node = sithCogParse_AddLinkingNode(yyvsp[-1].as_node, yyvsp[0].as_node, COG_OPCODE_NOP, 0);  }
 break;
 case 57:
-#line 157 "cog.y"
+#line 156 "cog.y"
 { yyval .as_node = sithCogParse_AddLeaf(COG_OPCODE_NOP, 0); }
 break;
 case 58:
-#line 158 "cog.y"
+#line 157 "cog.y"
 { /* expression ; */ }
 break;
 case 59:
-#line 162 "cog.y"
+#line 161 "cog.y"
 {
                                                             sith_cog_parser_node* tmp = sithCogParse_AddLinkingNode(yyvsp[0].as_node, 0, COG_OPCODE_NOP, 0);
                                                             tmp->parent_loop_depth = sithCogParse_IncrementLoopdepth();
@@ -712,7 +711,7 @@ case 59:
                                                             }
 break;
 case 60:
-#line 168 "cog.y"
+#line 167 "cog.y"
 {
                                                             sith_cog_parser_node* tmp = sithCogParse_AddLinkingNode(yyvsp[0].as_node, 0, COG_OPCODE_NOP, 0);
                                                             tmp->child_loop_depth = sithCogParse_IncrementLoopdepth();
@@ -723,7 +722,7 @@ case 60:
                                                             }
 break;
 case 61:
-#line 179 "cog.y"
+#line 178 "cog.y"
 {
                                                             sith_cog_parser_node* tmp = sithCogParse_AddLinkingNode(yyvsp[-2].as_node, 0, COG_OPCODE_GOFALSE, 0);/* expression (cond)*/
                                                             yyval .as_node = sithCogParse_AddLinkingNode(tmp, yyvsp[0].as_node, COG_OPCODE_GO, 0);
@@ -734,7 +733,7 @@ case 61:
                                                             }
 break;
 case 62:
-#line 187 "cog.y"
+#line 186 "cog.y"
 {
                                                             yyval .as_node = sithCogParse_AddLinkingNode(yyvsp[-5].as_node, yyvsp[-2].as_node, COG_OPCODE_GOTRUE, 0);
                                                             yyval .as_node->child_loop_depth = sithCogParse_IncrementLoopdepth();
@@ -742,7 +741,7 @@ case 62:
                                                             }
 break;
 case 63:
-#line 192 "cog.y"
+#line 191 "cog.y"
 {
                                                                                  sith_cog_parser_node* tmp = sithCogParse_AddLinkingNode(yyvsp[0].as_node, 0, COG_OPCODE_NOP, 0);
                                                                                  tmp->parent_loop_depth = sithCogParse_IncrementLoopdepth();
@@ -757,18 +756,18 @@ case 63:
                                                                                  }
 break;
 case 64:
-#line 207 "cog.y"
+#line 206 "cog.y"
 { yyval .as_node = sithCogParse_AddLeaf(COG_OPCODE_GO, sithCogParse_GetSymbolScriptIdx(yyvsp[-1].as_int)); }
 break;
 case 65:
-#line 208 "cog.y"
+#line 207 "cog.y"
 { yyval .as_node = sithCogParse_AddLeaf(COG_OPCODE_CALL, sithCogParse_GetSymbolScriptIdx(yyvsp[-1].as_int)); }
 break;
 case 66:
-#line 209 "cog.y"
+#line 208 "cog.y"
 { yyval .as_node = sithCogParse_AddLeaf(COG_OPCODE_RET, 0); }
 break;
-#line 772 "y.tab.c"
+#line 771 "y.tab.c"
     }
     yyssp -= yym;
     yystate = *yyssp;

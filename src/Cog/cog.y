@@ -1,6 +1,5 @@
 %{
 #include <stdio.h>
-#include "Primitives/rdVector.h"
 #include "sithCogParse.h"
 #include "stdPlatform.h"
 
@@ -25,7 +24,7 @@
 %token IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN CALL
 
 %union {
-    rdVector3 as_vector;
+    cog_flex_t as_vector[3];
     float as_float;
     int as_int;
     sith_cog_parser_node* as_node;
@@ -39,7 +38,7 @@ primary_expression
     | CONSTANT_INT       { $$.as_node = sithCogParse_AddLeaf(COG_OPCODE_PUSHINT, $1.as_int); }
     | CONSTANT_FLOAT     { $$.as_node = sithCogParse_AddLeaf(COG_OPCODE_PUSHFLOAT, $1.as_int); }
     | STRING_LITERAL     { $$.as_node = sithCogParse_AddLeaf(COG_OPCODE_PUSHSYMBOL, $1.as_int); }
-    | VECTOR_LITERAL     { $$.as_node = sithCogParse_AddLeafVector(COG_OPCODE_PUSHVECTOR, &$1.as_vector); }
+    | VECTOR_LITERAL     { $$.as_node = sithCogParse_AddLeafVector(COG_OPCODE_PUSHVECTOR, $1.as_vector); }
     | '(' expression ')' { $$.as_node = $2.as_node; }
     ;
 

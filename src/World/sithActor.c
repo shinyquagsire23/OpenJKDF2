@@ -500,7 +500,7 @@ int sithActor_LoadParams(stdConffileArg *arg, sithThing *thing, unsigned int par
     double v19; // st7
     double v20; // st7
     double v21; // st7
-    flex_t tmp;
+    flex32_t tmp, vx, vy, vz;
     int tmpInt;
 
     switch (param)
@@ -563,10 +563,14 @@ int sithActor_LoadParams(stdConffileArg *arg, sithThing *thing, unsigned int par
             v13 = _sscanf(
                       arg->value,
                       "(%f/%f/%f)",
-                      &thing->actorParams.eyeOffset.x,
-                      &thing->actorParams.eyeOffset.y,
-                      &thing->actorParams.eyeOffset.z);
-            goto LABEL_25;
+                      &vx, &vy, &vz);
+            thing->actorParams.eyeOffset.x = vx;
+            thing->actorParams.eyeOffset.y = vy;
+            thing->actorParams.eyeOffset.z = vz;
+            if ( v13 != 3 )
+                goto LABEL_38;
+            result = 1;
+            break;
         case THINGPARAM_MINHEADPITCH:
             result = _sscanf(arg->value, "%f", &tmp);
             if ( result != 1 )
@@ -583,22 +587,23 @@ int sithActor_LoadParams(stdConffileArg *arg, sithThing *thing, unsigned int par
             v13 = _sscanf(
                       arg->value,
                       "(%f/%f/%f)",
-                      &thing->actorParams.fireOffset.x,
-                      &thing->actorParams.fireOffset.y,
-                      &thing->actorParams.fireOffset.z);
-LABEL_25:
+                      &vx, &vy, &vz);
             if ( v13 != 3 )
                 goto LABEL_38;
+            thing->actorParams.fireOffset.x = vx;
+            thing->actorParams.fireOffset.y = vy;
+            thing->actorParams.fireOffset.z = vz;
             result = 1;
             break;
         case THINGPARAM_LIGHTOFFSET:
             if ( _sscanf(
                      arg->value,
                      "(%f/%f/%f)",
-                     &thing->actorParams.lightOffset.x,
-                     &thing->actorParams.lightOffset.y,
-                     &thing->actorParams.lightOffset.z) != 3 )
+                     &vx, &vy, &vz) != 3 )
                 goto LABEL_38;
+            thing->actorParams.lightOffset.x = vx;
+            thing->actorParams.lightOffset.y = vy;
+            thing->actorParams.lightOffset.z = vz;
             thing->thingflags |= SITH_TF_LIGHT;
             result = 1;
             break;

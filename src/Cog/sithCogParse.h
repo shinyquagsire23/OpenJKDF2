@@ -47,7 +47,7 @@ sithCogSymbol* sithCogParse_GetSymbolVal(sithCogSymboltable *pSymbolTable, char 
 sithCogSymbol* sithCogParse_GetSymbol(sithCogSymboltable *table, unsigned int idx);
 int sithCogParse_GetSymbolScriptIdx(unsigned int idx);
 sith_cog_parser_node* sithCogParse_AddLeaf(int op, int val);
-sith_cog_parser_node* sithCogParse_AddLeafVector(int op, rdVector3* vector);
+sith_cog_parser_node* sithCogParse_AddLeafVector(int op, cog_flex_t* vector);
 sith_cog_parser_node* sithCogParse_AddLinkingNode(sith_cog_parser_node* parent, sith_cog_parser_node* child, int opcode, int val);
 void sithCogParse_LexGetSym(char *symName);
 void sithCogParse_LexAddSymbol(const char *symName);
@@ -62,7 +62,7 @@ int sithCogParse_ParseVector(sithCogScript *cogScript, int a2);
 int sithCogParse_ParseMessage(sithCogScript *cogScript);
 
 //sith_cog_parser_node* sithCogParse_AddLinkingNode(sith_cog_parser_node* parent, sith_cog_parser_node* child, int opcode, int val);
-//sith_cog_parser_node* sithCogParse_AddLeafVector(int op, rdVector3* vector);
+//sith_cog_parser_node* sithCogParse_AddLeafVector(int op, cog_flex_t* vector);
 //sith_cog_parser_node* sithCogParse_AddLeaf(int op, int val);
 
 static sithCogSymbol* (__cdecl *sithCogParse_GetSymbol_)(sithCogSymboltable *a1, unsigned int a2) = (void*)sithCogParse_GetSymbol_ADDR;

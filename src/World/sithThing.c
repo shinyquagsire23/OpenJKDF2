@@ -156,7 +156,7 @@ int sithThing_Startup()
             v2 = (const char **)sithThing_aParams;
             while ( 1 )
             {
-                stdHashTable_SetKeyVal(sithThing_paramKeyToParamValMap, *v2++, (void *)v1++);
+                stdHashTable_SetKeyVal(sithThing_paramKeyToParamValMap, *v2++, (void *)(intptr_t)v1++);
                 if ( (intptr_t)v2 >= (intptr_t)&sithThing_aParams[NUM_THING_PARAMS] )
                     break;
             }
@@ -1594,7 +1594,7 @@ int sithThing_ParseArgs(stdConffileArg *arg, sithThing* pThing)
     int v8; // eax
 
     v2 = 0;
-    param = (int)stdHashTable_GetKeyVal(sithThing_paramKeyToParamValMap, arg->key);
+    param = (int)(intptr_t)stdHashTable_GetKeyVal(sithThing_paramKeyToParamValMap, arg->key);
     paramIdx = param;
     if ( !param )
         return 0;
@@ -1665,7 +1665,7 @@ int sithThing_LoadThingParam(stdConffileArg *arg, sithThing* pThing, int param)
     rdVector3 orientation; // [esp+10h] [ebp-Ch] BYREF
     flex32_t orientationx, orientationy, orientationz;
     uint32_t thingFlags;
-    flex_t tmpF;
+    flex32_t tmpF;
 
     switch ( param )
     {

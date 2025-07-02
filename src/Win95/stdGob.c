@@ -422,7 +422,7 @@ const wchar_t* stdGob_FileGetws(stdGobFile *f, wchar_t *out, unsigned int len)
         if (!to_read) {
             return NULL;
         }
-        __wcsncpy(out, (char*)(f->pMemory + f->seekOffs), to_read / sizeof(wchar_t));
+        __wcsncpy(out, (wchar_t*)(f->pMemory + f->seekOffs), to_read / sizeof(wchar_t));
         wchar_t* cutoff = __wcschr(out, '\n');
         if (cutoff) {
             *(++cutoff) = 0;

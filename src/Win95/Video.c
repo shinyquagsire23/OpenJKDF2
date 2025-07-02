@@ -81,7 +81,7 @@ int Video_Startup()
 {
     if (stdDisplay_Startup())
     {
-        stdDisplay_SetGammaTable(10, aGammaTable);
+        stdDisplay_SetGammaTable(10, (double*)aGammaTable); // TODO: actually decode the doubles
         jkHud_Startup();
         if (Main_bMotsCompat) {
             jkHudScope_Startup();

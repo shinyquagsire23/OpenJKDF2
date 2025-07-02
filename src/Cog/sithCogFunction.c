@@ -1565,8 +1565,8 @@ void sithCogFunction_Wakeup(sithCog *pCtx)
 // MOTS added
 void sithCogFunction_Sin(sithCog *ctx)
 {
-    cog_flex_t outSin;
-    cog_flex_t outCos;
+    flex_t outSin;
+    flex_t outCos;
     
     cog_flex_t angle = sithCogExec_PopFlex(ctx);
     stdMath_SinCos(angle,&outSin,&outCos);
@@ -1576,8 +1576,8 @@ void sithCogFunction_Sin(sithCog *ctx)
 // MOTS added
 void sithCogFunction_Cos(sithCog *ctx)
 {
-    cog_flex_t outSin;
-    cog_flex_t outCos;
+    flex_t outSin;
+    flex_t outCos;
     
     cog_flex_t angle = sithCogExec_PopFlex(ctx);
     stdMath_SinCos(angle,&outSin,&outCos);

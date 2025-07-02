@@ -22,7 +22,7 @@
 #include "Primitives/rdVector.h"
 #include "General/stdString.h"
 
-static rdVector2i unk_52B170 = {0xd, 0xe};
+static int jkGuiSingleplayer_unk_52B170[2] = {0xd, 0xe};
 
 static jkGuiElement jkGuiSingleplayer_buttons1[7] = {
     { ELEMENT_TEXT,        0,               0,  NULL,              3, {0,  410,  640, 20},  1,  0,  0,  0,  0,  0, {0},  0},
@@ -43,7 +43,7 @@ static jkGuiElement jkGuiSingleplayer_buttons2[10] = {
     { ELEMENT_TEXTBUTTON,  JKGUI_LOAD,      2, "GUI_LOAD",          3, {430, 90,  200, 40},  1,  0,  0,  0,  0,  0, {0},  0},
     { ELEMENT_TEXTBUTTON,  JKGUI_DEBUGPLAY, 2, "GUI_DEBUG_PLAY",     3, {8,   90,  180, 40},  1,  0,  0,  0,  0,  0, {0},  0},
     { ELEMENT_TEXT,        0,               0, "GUI_CHOOSEEPISODE", 2, {250, 170, 320, 20},  1,  0,  0,  0,  0,  0, {0},  0},
-    { ELEMENT_LISTBOX,     1,               0,  NULL,               0, {250, 210, 320, 170}, 1,  0,  0, 0,  0, &unk_52B170, {0},  0},
+    { ELEMENT_LISTBOX,     1,               0,  NULL,               0, {250, 210, 320, 170}, 1,  0,  0, 0,  0, jkGuiSingleplayer_unk_52B170, {0},  0},
     { ELEMENT_TEXTBUTTON,  1,               2, "GUI_OK",            3, {400, 430, 200, 40},  1,  0,  0,  0,  0,  0, {0},  0},
     { ELEMENT_TEXTBUTTON, -1,               2, "GUI_CANCEL",        3, {200, 430, 200, 40},  1,  0,  0,  0,  0,  0, {0},  0},
     { ELEMENT_END,         0,               0,  NULL,               0, {0},                  0,  0,  0,  0,  0,  0, {0},  0}
@@ -58,7 +58,7 @@ static jkGuiElement jkGuiSingleplayer_buttons3[10] = {
     { ELEMENT_TEXTBUTTON,  JKGUI_LOAD,      2, "GUI_LOAD",          3, {430, 90,  200, 40},  1,  0,  0,  0,  0,  0, {0},  0},
     { ELEMENT_TEXTBUTTON,  JKGUI_DEBUGPLAY, 2, "GUI_DEBUG_PLAY",     3, {8,   90,  180, 40},  1,  0,  0,  0,  0,  0, {0},  0},
     { ELEMENT_TEXT,        0,               0, "GUI_CHOOSELEVEL",   2, {250, 170, 320, 20},  1,  0,  0,  0,  0,  0, {0},  0},
-    { ELEMENT_LISTBOX,     1,               0,  NULL,               0, {250, 210, 320, 170}, 1,  0,  0, 0,  0, &unk_52B170, {0},  0},
+    { ELEMENT_LISTBOX,     1,               0,  NULL,               0, {250, 210, 320, 170}, 1,  0,  0, 0,  0, jkGuiSingleplayer_unk_52B170, {0},  0},
     { ELEMENT_TEXTBUTTON,  1,               2, "GUI_OK",            3, {400, 430, 200, 40},  1,  0,  0,  0,  0,  0, {0},  0},
     { ELEMENT_TEXTBUTTON, -1,               2, "GUI_CANCEL",        3, {200, 430, 200, 40},  1,  0,  0,  0,  0,  0, {0},  0},
     { ELEMENT_END,         0,               0,  NULL,               0, {0},                  0,  0,  0,  0,  0,  0, {0},  0}
@@ -341,15 +341,12 @@ void jkGuiSingleplayer_sub_41AA30(Darray *array, jkGuiElement *element, int a3, 
     stdFileSearch *search; // eax
     stdFileSearch *v13; // esi
     char *v14; // edx
-    char *v15; // ebx
     wchar_t *v16; // eax
     jkEpisodeEntry *v17; // esi
     char *v18; // edx
-    char *v19; // ebx
     wchar_t *v20; // eax
     int v22; // [esp+10h] [ebp-1A4h]
     int v23; // [esp+10h] [ebp-1A4h]
-    stdFileSearch *a1; // [esp+14h] [ebp-1A0h]
     stdStrTable strtable; // [esp+18h] [ebp-19Ch]
     char tmp[128]; // [esp+28h] [ebp-18Ch]
     stdFileSearchResult a2; // [esp+A8h] [ebp-10Ch]
@@ -372,7 +369,6 @@ void jkGuiSingleplayer_sub_41AA30(Darray *array, jkGuiElement *element, int a3, 
     stdString_snprintf(tmp, 128, "episode\\%s\\jkl", episodeDir);
     search = stdFileUtil_NewFind(tmp, 3, "JKL");
     v13 = search;
-    a1 = search;
     if ( search )
     {
         while ( stdFileUtil_FindNext(search, &a2) )
@@ -380,7 +376,7 @@ void jkGuiSingleplayer_sub_41AA30(Darray *array, jkGuiElement *element, int a3, 
             // Added: extended the path alloc to include the real index
             uint32_t alloc_sz = _strlen(a2.fpath) + 1 + sizeof(int);
             v14 = (char *)pHS->alloc(alloc_sz);
-            v15 = _strncpy(v14+sizeof(int), a2.fpath, alloc_sz-sizeof(int)-1);
+            _strncpy(v14+sizeof(int), a2.fpath, alloc_sz-sizeof(int)-1);
             v14[alloc_sz-1] = 0;
             v16 = jkGuiTitle_quicksave_related_func1(&strtable, v14+sizeof(int));
             jkGuiRend_DarrayReallocStr(array, v16, (intptr_t)v14);
@@ -404,7 +400,7 @@ void jkGuiSingleplayer_sub_41AA30(Darray *array, jkGuiElement *element, int a3, 
                 // Added: extended the path alloc to include the real index
                 uint32_t alloc_sz = _strlen(v17->fileName) + 1 + sizeof(int);
                 v18 = (char *)pHS->alloc(alloc_sz);
-                v19 = _strncpy(v18+sizeof(int), v17->fileName, alloc_sz-sizeof(int)-1); // Added: strcpy -> strncpy, +sizeof(int)
+                _strncpy(v18+sizeof(int), v17->fileName, alloc_sz-sizeof(int)-1); // Added: strcpy -> strncpy, +sizeof(int)
                 v18[alloc_sz-1] = 0;
                 v20 = jkGuiTitle_quicksave_related_func1(&strtable, v18+sizeof(int)); // Added: +sizeof(int)
                 jkGuiRend_DarrayReallocStr(array, v20, (intptr_t)v18);

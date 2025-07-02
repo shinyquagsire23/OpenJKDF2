@@ -928,8 +928,8 @@ void std3D_DrawMenuSubrect(flex_t x, flex_t y, flex_t w, flex_t h, flex_t dstX, 
     double tex_w = Video_menuBuffer.format.width;
     double tex_h = Video_menuBuffer.format.height;
 
-    flex_t w_dst = w;
-    flex_t h_dst = h;
+    float w_dst = w;
+    float h_dst = h;
 
     if (scale == 0.0)
     {
@@ -1002,8 +1002,8 @@ void std3D_DrawMenuSubrect2(flex_t x, flex_t y, flex_t w, flex_t h, flex_t dstX,
     double tex_w = Video_menuBuffer.format.width;
     double tex_h = Video_menuBuffer.format.height;
 
-    flex_t w_dst = w;
-    flex_t h_dst = h;
+    float w_dst = w;
+    float h_dst = h;
 
     if (scale == 0.0)
     {
@@ -1089,7 +1089,7 @@ void std3D_DrawMenu()
     glDepthFunc(GL_ALWAYS);
     glUseProgram(programMenu);
     
-    flex_t menu_w, menu_h, menu_u, menu_v, menu_x;
+    float menu_w, menu_h, menu_u, menu_v, menu_x;
     menu_w = (double)Window_xSize;
     menu_h = (double)Window_ySize;
     menu_u = 1.0;
@@ -1224,10 +1224,10 @@ void std3D_DrawMenu()
             subs_h = 80;
         }
 
-        flex_t partial_menu_w = (menu_h * (640.0 / 480.0));
-        flex_t upscale = fake_windowW/640.0;
-        flex_t upscale2 = (fake_windowH - (50 + video_height * upscale))/((double)subs_h);
-        flex_t upscale3 = 1.0;//Window_ySize/480.0;
+        float partial_menu_w = (menu_h * (640.0 / 480.0));
+        float upscale = fake_windowW/640.0;
+        float upscale2 = (fake_windowH - (50 + video_height * upscale))/((double)subs_h);
+        float upscale3 = 1.0;//Window_ySize/480.0;
 
         if (upscale2 < 1.0) {
             upscale2 = 1.0;
@@ -1239,14 +1239,14 @@ void std3D_DrawMenu()
             upscale2 = upscale;
         }
 
-        flex_t shift_y = ((double)Window_ySize - fake_windowH) / 2.0;
-        flex_t shift_x = ((double)Window_xSize - fake_windowW) / 2.0;
+        float shift_y = ((double)Window_ySize - fake_windowH) / 2.0;
+        float shift_x = ((double)Window_xSize - fake_windowW) / 2.0;
 
-        flex_t sub_width = 640*upscale2;
-        flex_t sub_x = (fake_windowW - sub_width) / 2.0;
+        float sub_width = 640*upscale2;
+        float sub_x = (fake_windowW - sub_width) / 2.0;
 
-        flex_t pause_width = 640*upscale3;
-        flex_t pause_x = (fake_windowW - pause_width) / 2.0;
+        float pause_width = 640*upscale3;
+        float pause_x = (fake_windowW - pause_width) / 2.0;
 
         //printf("%f %f, %f %f %f, %d %d\n", sub_x, pause_x, upscale, upscale2, upscale3, Window_xSize, Window_ySize);
 
@@ -1282,7 +1282,7 @@ void std3D_DrawMenu()
         // Main View
         std3D_DrawMenuSubrect(0, 128, menu_w, menu_h-256, 0, 128, 0.0);
 
-        flex_t hudScale = Window_ySize / 480.0;
+        float hudScale = Window_ySize / 480.0;
 
         /*if (menu_w >= 3600)
             hudScale = 4;
@@ -1299,13 +1299,13 @@ void std3D_DrawMenu()
         std3D_DrawMenuSubrect((menu_w / 2) - 128, menu_h - 64, 256, 64, (Window_xSize / 2) - (128*hudScale), Window_ySize - 64*hudScale, hudScale);
 
         // Text
-        flex_t textScale = hudScale;
+        float textScale = hudScale;
         if (jkDev_BMFontHeight > 11) {
-            textScale *= 11.0 / (flex_t)jkDev_BMFontHeight;
+            textScale *= 11.0 / (float)jkDev_BMFontHeight;
         }
-        flex_t textWidth = menu_w - (48*2);
-        flex_t textHeight = jkDev_BMFontHeight * 5.5;
-        flex_t destTextWidth = textWidth * textScale;
+        float textWidth = menu_w - (48*2);
+        float textHeight = jkDev_BMFontHeight * 5.5;
+        float destTextWidth = textWidth * textScale;
         std3D_DrawMenuSubrect(48, 0, menu_w - (48*2), textHeight, (Window_xSize / 2) - (destTextWidth / 2), 0, textScale);
 
         // Active forcepowers/items
@@ -1381,7 +1381,7 @@ void std3D_DrawMenu()
 
     {
 
-    flex_t maxX, maxY, scaleX, scaleY, width, height;
+    float maxX, maxY, scaleX, scaleY, width, height;
 
     scaleX = 1.0/((double)Window_xSize / 2.0);
     scaleY = 1.0/((double)Window_ySize / 2.0);
@@ -1444,8 +1444,8 @@ void std3D_DrawMapOverlay()
     glDepthFunc(GL_ALWAYS);
     glUseProgram(programMenu);
     
-    flex_t menu_w = (double)Window_xSize;
-    flex_t menu_h = (double)Window_ySize;
+    float menu_w = (double)Window_xSize;
+    float menu_h = (double)Window_ySize;
 
     if (!jkGame_isDDraw)
     {
@@ -1520,7 +1520,7 @@ void std3D_DrawMapOverlay()
 
     {
 
-    flex_t maxX, maxY, scaleX, scaleY, width, height;
+    float maxX, maxY, scaleX, scaleY, width, height;
 
     scaleX = 1.0/((double)Window_xSize / 2.0);
     scaleY = 1.0/((double)Window_ySize / 2.0);
@@ -1567,8 +1567,8 @@ void std3D_DrawMapOverlay()
 
 void std3D_DrawUIBitmapRGBA(stdBitmap* pBmp, int mipIdx, flex_t dstX, flex_t dstY, rdRect* srcRect, flex_t scaleX, flex_t scaleY, int bAlphaOverwrite, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a)
 {
-    flex_t internalWidth = Video_menuBuffer.format.width;
-    flex_t internalHeight = Video_menuBuffer.format.height;
+    float internalWidth = Video_menuBuffer.format.width;
+    float internalHeight = Video_menuBuffer.format.height;
 
     if (!pBmp) return;
     if (!pBmp->abLoadedToGPU[mipIdx]) {
@@ -1603,8 +1603,8 @@ void std3D_DrawUIBitmapRGBA(stdBitmap* pBmp, int mipIdx, flex_t dstX, flex_t dst
         h = srcRect->height;
     }
 
-    flex_t w_dst = w;
-    flex_t h_dst = h;
+    float w_dst = w;
+    float h_dst = h;
 
     if (scaleX == 0.0 && scaleY == 0.0)
     {
@@ -1724,8 +1724,8 @@ void std3D_DrawUIClearedRectRGBA(uint8_t color_r, uint8_t color_g, uint8_t color
     double dstX = dstRect->x;
     double dstY = dstRect->y;
 
-    flex_t internalWidth = Video_menuBuffer.format.width;
-    flex_t internalHeight = Video_menuBuffer.format.height;
+    float internalWidth = Video_menuBuffer.format.width;
+    float internalHeight = Video_menuBuffer.format.height;
     if (!internalWidth || !internalHeight) return;
 
     if (jkGuiBuildMulti_bRendering) {
@@ -1750,8 +1750,8 @@ void std3D_DrawUIClearedRectRGBA(uint8_t color_r, uint8_t color_g, uint8_t color
     double x = 0;
     double y = 0;
 
-    flex_t w_dst = w;
-    flex_t h_dst = h;
+    float w_dst = w;
+    float h_dst = h;
     double scale = 1.0;
 
     double dstScaleX = scale;
@@ -1850,10 +1850,10 @@ void std3D_DrawUIRenderList()
     // Generate vertices list
     D3DVERTEX* vertexes = GL_tmpUIVertices;
 
-    flex_t maxX, maxY, scaleX, scaleY, width, height;
+    float maxX, maxY, scaleX, scaleY, width, height;
 
-    flex_t internalWidth = Window_xSize;//Video_menuBuffer.format.width;
-    flex_t internalHeight = Window_ySize;//Video_menuBuffer.format.height;
+    float internalWidth = Window_xSize;//Video_menuBuffer.format.width;
+    float internalHeight = Window_ySize;//Video_menuBuffer.format.height;
 
     if (jkGuiBuildMulti_bRendering) {
         internalWidth = 640.0;
@@ -1876,11 +1876,11 @@ void std3D_DrawUIRenderList()
     // This ends up resulting in the view looking squished vertically at wide/ultrawide aspect ratios.
     // To compensate, we zoom the y axis here.
     // I also went ahead and fixed vertical displays in the same way because it seems to look better.
-    flex_t zoom_yaspect = 1.0;
-    flex_t zoom_xaspect = 1.0;
+    float zoom_yaspect = 1.0;
+    float zoom_xaspect = 1.0;
     
-    flex_t shift_add_x = 0;
-    flex_t shift_add_y = 0;
+    float shift_add_x = 0;
+    float shift_add_y = 0;
     
     glUniform1i(std3D_uiProgram.uniform_tex, 0);
     glUniform1i(std3D_uiProgram.uniform_tex2, 1);
@@ -1902,8 +1902,8 @@ void std3D_DrawUIRenderList()
     glViewport(0, 0, width, height);
     glUniform2f(std3D_uiProgram.uniform_iResolution, internalWidth, internalHeight);
 
-    flex_t param1 = 1.0;
-    flex_t param2 = 1.0;
+    float param1 = 1.0;
+    float param2 = 1.0;
 
     glUniform1f(std3D_uiProgram.uniform_param1, param1);
     glUniform1f(std3D_uiProgram.uniform_param2, param2);
@@ -2064,7 +2064,7 @@ void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo
     glDepthFunc(GL_ALWAYS);
     glUseProgram(pStage->program);
     
-    flex_t menu_w, menu_h, menu_u, menu_v, menu_x;
+    float menu_w, menu_h, menu_u, menu_v, menu_x;
     menu_w = (double)pFbo->w;
     menu_h = (double)pFbo->h;
     menu_u = 1.0;
@@ -2141,7 +2141,7 @@ void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo
     
     {
 
-    flex_t maxX, maxY, scaleX, scaleY, width, height;
+    float maxX, maxY, scaleX, scaleY, width, height;
 
     scaleX = 1.0/((double)pFbo->w / 2.0);
     scaleY = 1.0/((double)pFbo->h / 2.0);
@@ -2241,15 +2241,15 @@ void std3D_DrawSceneFbo()
     glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->window.fbo);
     glClear( GL_COLOR_BUFFER_BIT );
 
-    static flex_t frameNum = 1.0;
+    static float frameNum = 1.0;
     //frameNum += (rand() % 16);
 
     int draw_ssao = jkPlayer_enableSSAO;
     int draw_bloom = jkPlayer_enableBloom;
 
-    flex_t add_luma = (((flex_t)rdroid_curColorEffects.add.x / 255.0f) * 0.2125)
-                     + (((flex_t)rdroid_curColorEffects.add.y / 255.0f)* 0.7154)
-                     + (((flex_t)rdroid_curColorEffects.add.z / 255.0f) * 0.0721); // FLEXTODO
+    float add_luma = (((float)rdroid_curColorEffects.add.x / 255.0f) * 0.2125)
+                     + (((float)rdroid_curColorEffects.add.y / 255.0f)* 0.7154)
+                     + (((float)rdroid_curColorEffects.add.z / 255.0f) * 0.0721); // FLEXTODO
 
     // HACK: Force blinding shouldn't show the SSAO
     if (add_luma >= 0.7) {
@@ -2289,7 +2289,7 @@ void std3D_DrawSceneFbo()
         glClear( GL_COLOR_BUFFER_BIT );
     }
 
-    flex_t rad_scale = (flex_t)std3D_pFb->w / 640.0;
+    float rad_scale = (float)std3D_pFb->w / 640.0;
 
     if (!draw_ssao)
     {
@@ -2322,8 +2322,8 @@ void std3D_DrawSceneFbo()
         std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->blur3, std3D_pFb->blur2.tex, 0, 0, 16.0, 3.0, 2.0 * rad_scale, 1);
         std3D_DrawSimpleTex(&std3D_blurStage, &std3D_pFb->blur4, std3D_pFb->blur3.tex, 0, 0, 16.0, 3.0, 2.0 * rad_scale, 1);
 
-        flex_t bloom_intensity = 1.0;
-        flex_t bloom_gamma = 1.0;
+        float bloom_intensity = 1.0;
+        float bloom_gamma = 1.0;
         glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
         /*std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->blurBlend, std3D_pFb->tex1, 0, 0, 1.0, bloom_intensity * 1.0, bloom_gamma, 0);
         std3D_DrawSimpleTex(&std3D_texFboStage, &std3D_pFb->blurBlend, std3D_pFb->blur1.tex, 0, 0, 1.0, bloom_intensity * 1.0, bloom_gamma, 0);
@@ -2398,7 +2398,7 @@ void std3D_DoTex(rdDDrawSurface* tex, rdTri* tri, int tris_left)
     }
     //if (tex->emissive_factor[0] != 0.0 || tex->emissive_factor[1] != 0.0 || tex->emissive_factor[2] != 0.0)
     //    stdPlatform_Printf("%f %f %f\n", tex->emissive_factor[0], tex->emissive_factor[1], tex->emissive_factor[2]);
-    flex_t emissive_mult = (jkPlayer_enableBloom ? 1.0 : 5.0);
+    float emissive_mult = (jkPlayer_enableBloom ? 1.0 : 5.0);
     glUniform3f(uniform_emissiveFactor, tex->emissive_factor[0] * emissive_mult, tex->emissive_factor[1] * emissive_mult, tex->emissive_factor[2] * emissive_mult);
     glUniform4f(uniform_albedoFactor, tex->albedo_factor[0], tex->albedo_factor[1], tex->albedo_factor[2], tex->albedo_factor[3]);
     if (tex->displacement_factor) {
@@ -2435,10 +2435,10 @@ void std3D_DrawRenderList()
     // Generate vertices list
     D3DVERTEX* vertexes = GL_tmpVertices;
 
-    flex_t maxX, maxY, scaleX, scaleY, width, height;
+    float maxX, maxY, scaleX, scaleY, width, height;
 
-    flex_t internalWidth = Video_menuBuffer.format.width;
-    flex_t internalHeight = Video_menuBuffer.format.height;
+    float internalWidth = Video_menuBuffer.format.width;
+    float internalHeight = Video_menuBuffer.format.height;
 
     if (jkGuiBuildMulti_bRendering) {
         internalWidth = 640.0;
@@ -2461,8 +2461,8 @@ void std3D_DrawRenderList()
     // This ends up resulting in the view looking squished vertically at wide/ultrawide aspect ratios.
     // To compensate, we zoom the y axis here.
     // I also went ahead and fixed vertical displays in the same way because it seems to look better.
-    flex_t zoom_yaspect = (width/height);
-    flex_t zoom_xaspect = (height/width);
+    float zoom_yaspect = (width/height);
+    float zoom_xaspect = (height/width);
 
     if (height > width)
     {
@@ -2480,11 +2480,11 @@ void std3D_DrawRenderList()
         zoom_xaspect = 1.0;
     }
     
-    flex_t shift_add_x = 0;
-    flex_t shift_add_y = 0;
+    float shift_add_x = 0;
+    float shift_add_y = 0;
 
     if (jkGuiBuildMulti_bRendering) {
-        flex_t menu_w, menu_h, menu_x;
+        float menu_w, menu_h, menu_x;
         menu_w = (double)std3D_pFb->w;
         menu_h = (double)std3D_pFb->h;
 
@@ -2561,7 +2561,7 @@ void std3D_DrawRenderList()
     else
         glUniform3f(uniform_filter, 1.0, 1.0, 1.0);
     glUniform1f(uniform_fade, rdroid_curColorEffects.fade);
-    glUniform3f(uniform_add, (flex_t)rdroid_curColorEffects.add.x / 255.0f, (flex_t)rdroid_curColorEffects.add.y / 255.0f, (flex_t)rdroid_curColorEffects.add.z / 255.0f); // FLEXTODO
+    glUniform3f(uniform_add, (float)rdroid_curColorEffects.add.x / 255.0f, (float)rdroid_curColorEffects.add.y / 255.0f, (float)rdroid_curColorEffects.add.z / 255.0f);
     glUniform3f(uniform_emissiveFactor, 0.0, 0.0, 0.0);
     glUniform4f(uniform_albedoFactor, 1.0, 1.0, 1.0, 1.0);
     glUniform1f(uniform_light_mult, jkGuiBuildMulti_bRendering ? 0.85 : (jkPlayer_enableBloom ? 0.9 : 0.85));
@@ -3596,8 +3596,8 @@ void std3D_InitializeViewport(rdRect *viewRect)
     signed int v1; // ebx
     signed int height; // ebp
 
-    flex_t viewXMax_2; // [esp+14h] [ebp+4h]
-    flex_t viewRectYMax; // [esp+14h] [ebp+4h]
+    float viewXMax_2; // [esp+14h] [ebp+4h]
+    float viewRectYMax; // [esp+14h] [ebp+4h]
 
     std3D_rectViewIdk.x = viewRect->x;
     v1 = viewRect->width;
@@ -3605,16 +3605,16 @@ void std3D_InitializeViewport(rdRect *viewRect)
     std3D_rectViewIdk.width = v1;
     height = viewRect->height;
     memset(std3D_aViewIdk, 0, sizeof(std3D_aViewIdk));
-    std3D_aViewIdk[0] = (flex_t)std3D_rectViewIdk.x;
-    std3D_aViewIdk[1] = (flex_t)std3D_rectViewIdk.y;
+    std3D_aViewIdk[0] = (float)std3D_rectViewIdk.x;
+    std3D_aViewIdk[1] = (float)std3D_rectViewIdk.y;
     std3D_rectViewIdk.height = height;
     std3D_aViewTris[0].v1 = 0;
     std3D_aViewTris[0].v2 = 1;
-    viewXMax_2 = (flex_t)(v1 + std3D_rectViewIdk.x);
+    viewXMax_2 = (float)(v1 + std3D_rectViewIdk.x);
     std3D_aViewIdk[8] = viewXMax_2;
     std3D_aViewIdk[9] = std3D_aViewIdk[1];
     std3D_aViewIdk[16] = viewXMax_2;
-    viewRectYMax = (flex_t)(height + std3D_rectViewIdk.y);
+    viewRectYMax = (float)(height + std3D_rectViewIdk.y);
     std3D_aViewTris[0].texture = 0;
     std3D_aViewIdk[17] = viewRectYMax;
     std3D_aViewIdk[25] = viewRectYMax;

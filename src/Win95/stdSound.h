@@ -54,8 +54,8 @@ typedef struct stdALBuffer
     int refcnt;
     flex_t vol;
     int bIsCopy;
-    rdVector3 pos;
-    rdVector3 vel;
+    ALfloat pos[3];
+    ALfloat vel[3];
 } stdALBuffer;
 #else
 typedef struct IDirectSoundBuffer

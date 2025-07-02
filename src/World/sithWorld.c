@@ -859,7 +859,7 @@ void sithWorld_GetMemorySize(sithWorld *pWorld, int *outAllocated, int *outQuant
     outQuantity[5] = pWorld->numSectors;
     for (int i = 0; i < pWorld->numSectors; i++)
     {
-        outAllocated[5] += 4 * pWorld->sectors[i].numVertices + sizeof(sithSector); // TODO bug?
+        outAllocated[5] += sizeof(flex_t) * pWorld->sectors[i].numVertices + sizeof(sithSector); // TODO bug?
     }
     outQuantity[6] = pWorld->numSoundsLoaded;
     for (int i = 0; i < pWorld->numSoundsLoaded; i++)

@@ -875,11 +875,13 @@ char __tolower(char a)
 int msvc_sub_512D30(int a, int b)
 {
     assert(0);
+    return 0;
 }
 
 int jk_MessageBoxW(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType)
 {
     assert(0);
+    return 0;
 }
 
 int stdGdi_GetHwnd()

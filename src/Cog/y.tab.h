@@ -23,7 +23,7 @@
 #define RETURN 279
 #define CALL 280
 typedef union {
-    rdVector3 as_vector;
+    cog_flex_t as_vector[3];
     float as_float;
     int as_int;
     sith_cog_parser_node* as_node;

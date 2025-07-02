@@ -1689,7 +1689,7 @@ LABEL_47:
             jkGuiRend_Paint(jkGuiRend_activeMenu);
             if ( ret )
             {
-                jk_EndPaint(hWnd, &Paint);
+                jk_EndPaint(hWnd, (const PAINTSTRUCT *)&Paint);
                 return 1;
             }
             return 1;

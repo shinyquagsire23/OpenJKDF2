@@ -402,80 +402,48 @@ int sithCommand_CmdFly(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 
 int sithCommand_CmdMem(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
-    sithWorld *v2; // eax
-    signed int result; // eax
-    int v4; // esi
-    int v5; // esi
-    int v6; // esi
-    int v7; // esi
-    int v8; // esi
-    int v9; // esi
-    int v10; // esi
-    int bytesMaterials; // [esp+4h] [ebp-88h] BYREF
-    int v12; // [esp+8h] [ebp-84h]
-    int v13; // [esp+Ch] [ebp-80h]
-    int v14; // [esp+10h] [ebp-7Ch]
-    int v15; // [esp+14h] [ebp-78h]
-    int v16; // [esp+18h] [ebp-74h]
-    int v17; // [esp+20h] [ebp-6Ch]
-    int v18; // [esp+24h] [ebp-68h]
-    int bytesModels; // [esp+2Ch] [ebp-60h]
-    int v20; // [esp+30h] [ebp-5Ch]
-    int qtyMaterials[6]; // [esp+48h] [ebp-44h] BYREF
-    int qtySounds; // [esp+60h] [ebp-2Ch]
-    int v23; // [esp+64h] [ebp-28h]
-    int v24; // [esp+68h] [ebp-24h]
-    int qtyModels; // [esp+70h] [ebp-1Ch]
-    int v26; // [esp+74h] [ebp-18h]
+    int worldAllocatedAmt[17];
+    int worldQuantityAmt[17];
 
-    v2 = sithWorld_pCurrentWorld;
-    if ( pArgStr )
-        v2 = sithWorld_pStatic;
-    if ( v2 )
-    {
-#ifndef LINUX_TMP
-        sithWorld_GetMemorySize(v2, &bytesMaterials, qtyMaterials);
-#endif
-        _sprintf(std_genBuffer, "%5d Materials        %8d bytes.", qtyMaterials[0], bytesMaterials);
-        sithConsole_Print(std_genBuffer);
-        v4 = bytesMaterials;
-        _sprintf(std_genBuffer, "%5d Models           %8d bytes.", qtyModels, bytesModels);
-        sithConsole_Print(std_genBuffer);
-        v5 = bytesModels + v4;
-        _sprintf(std_genBuffer, "%5d Sounds", qtySounds);
-        sithConsole_Print(std_genBuffer);
-        _sprintf(std_genBuffer, "%5d Keyframes        %8d bytes.", v26, v20);
-        sithConsole_Print(std_genBuffer);
-        v6 = v20 + v5;
-        _sprintf(std_genBuffer, "%5d World Vertices   %8d bytes.", qtyMaterials[1], v12);
-        sithConsole_Print(std_genBuffer);
-        v7 = v12 + v6;
-        _sprintf(std_genBuffer, "%5d World TexVerts   %8d bytes.", qtyMaterials[2], v13);
-        sithConsole_Print(std_genBuffer);
-        v8 = v13 + v7;
-        _sprintf(std_genBuffer, "%5d Surfaces         %8d bytes.", qtyMaterials[3], v14);
-        sithConsole_Print(std_genBuffer);
-        v9 = v14 + v8;
-        _sprintf(std_genBuffer, "%5d Sectors          %8d bytes.", qtyMaterials[5], v16);
-        sithConsole_Print(std_genBuffer);
-        v10 = v16 + v9;
-        _sprintf(std_genBuffer, "%5d Cog Scripts\t\t%8d bytes.", v24, v18);
-        sithConsole_Print(std_genBuffer);
-        _sprintf(std_genBuffer, "%5d Cogs             %8d bytes.", v23, v17);
-        sithConsole_Print(std_genBuffer);
-        _sprintf(std_genBuffer, "%5d Adjoins          %8d bytes.", qtyMaterials[4], v15);
-        sithConsole_Print(std_genBuffer);
-        _sprintf(std_genBuffer, "Total Memory Used:   %8d bytes.", v15 + v10);
-        sithConsole_Print(std_genBuffer);
-        sithConsole_Print("(Total does not include sounds & cogs)");
-        result = 1;
+    // TODO: verify the exact indices or just rewrite this
+
+    sithWorld* pWorld = sithWorld_pCurrentWorld;
+    if (pArgStr) {
+        pWorld = sithWorld_pStatic;
     }
-    else
+    if (!pWorld)
     {
         sithConsole_Print("No world.");
-        result = 0;
+        return 0;
     }
-    return result;
+    sithWorld_GetMemorySize(pWorld, worldAllocatedAmt, worldQuantityAmt);
+    _sprintf(std_genBuffer, "%5d Materials        %8d bytes.", worldQuantityAmt[0], worldAllocatedAmt[0]);
+    sithConsole_Print(std_genBuffer);
+    _sprintf(std_genBuffer, "%5d Models           %8d bytes.", worldQuantityAmt[10], worldAllocatedAmt[10]);
+    sithConsole_Print(std_genBuffer);
+    _sprintf(std_genBuffer, "%5d Sounds", worldQuantityAmt[6]);
+    sithConsole_Print(std_genBuffer);
+    _sprintf(std_genBuffer, "%5d Keyframes        %8d bytes.", worldQuantityAmt[11], worldAllocatedAmt[11]);
+    sithConsole_Print(std_genBuffer);
+    _sprintf(std_genBuffer, "%5d World Vertices   %8d bytes.", worldQuantityAmt[1], worldAllocatedAmt[1]);
+    sithConsole_Print(std_genBuffer);
+    _sprintf(std_genBuffer, "%5d World TexVerts   %8d bytes.", worldQuantityAmt[2], worldAllocatedAmt[2]);
+    sithConsole_Print(std_genBuffer);
+    _sprintf(std_genBuffer, "%5d Surfaces         %8d bytes.", worldQuantityAmt[3], worldAllocatedAmt[3]);
+    sithConsole_Print(std_genBuffer);
+    _sprintf(std_genBuffer, "%5d Sectors          %8d bytes.", worldQuantityAmt[5], worldAllocatedAmt[5]);
+    sithConsole_Print(std_genBuffer);
+    _sprintf(std_genBuffer, "%5d Cog Scripts\t\t%8d bytes.", worldQuantityAmt[8], worldAllocatedAmt[8]);
+    sithConsole_Print(std_genBuffer);
+    _sprintf(std_genBuffer, "%5d Cogs             %8d bytes.", worldQuantityAmt[7], worldAllocatedAmt[7]);
+    sithConsole_Print(std_genBuffer);
+    _sprintf(std_genBuffer, "%5d Adjoins          %8d bytes.", worldQuantityAmt[4], worldAllocatedAmt[4]);
+    sithConsole_Print(std_genBuffer);
+    _sprintf(std_genBuffer, "Total Memory Used:   %8d bytes.", worldAllocatedAmt[4] + worldAllocatedAmt[5] + worldAllocatedAmt[3] + worldAllocatedAmt[2] + worldAllocatedAmt[1] + worldAllocatedAmt[11] + worldAllocatedAmt[10] + worldAllocatedAmt[0]);
+    sithConsole_Print(std_genBuffer);
+    sithConsole_Print("(Total does not include sounds & cogs)"); 
+    
+    return 1;
 }
 
 int sithCommand_CmdDynamicMem(stdDebugConsoleCmd *pCmd, const char *pArgStr)
@@ -650,15 +618,16 @@ int sithCommand_CmdActivate(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 
 int sithCommand_CmdJump(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
-    int result; // eax
+    int result;
+    int idx;
 
     // MOTS Added: fixed a nullptr dereference
     if (!pArgStr) return 0;
 
-    result = _sscanf(pArgStr, "%d", &pArgStr);
+    result = _sscanf(pArgStr, "%d", &idx);
     if ( result )
     {
-        sithPlayerActions_WarpToCheckpoint(sithPlayer_pLocalPlayerThing, (int)(pArgStr - 1));
+        sithPlayerActions_WarpToCheckpoint(sithPlayer_pLocalPlayerThing, idx - 1);
         result = 1;
     }
     return result;
@@ -752,10 +721,14 @@ int sithCommand_CmdThingNpc(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if (sithNet_isMulti) return 1;
 
-    char* pArgIter = _strtok(pArgStr, ", \t\n\r");
+    char* pArgStrMutable = malloc(strlen(pArgStr)+1);
+    strcpy(pArgStrMutable, pArgStr);
+
+    char* pArgIter = _strtok(pArgStrMutable, ", \t\n\r");
     if ( !pArgIter ){
         _sprintf(std_genBuffer, "Usage: %s [spawn]\n", pCmd->cmdStr);
         sithConsole_Print(std_genBuffer);
+        free((void*)pArgStrMutable);
         return 1;
     }
 
@@ -764,6 +737,7 @@ int sithCommand_CmdThingNpc(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         if (!pArgIter) {
             _sprintf(std_genBuffer, "Usage: %s spawn <template>\n", pCmd->cmdStr);
             sithConsole_Print(std_genBuffer);
+            free((void*)pArgStrMutable);
             return 1;
         }
         
@@ -779,6 +753,7 @@ int sithCommand_CmdThingNpc(stdDebugConsoleCmd *pCmd, const char *pArgStr)
             sithConsole_Print("No world.");
         }
     }
+    free((void*)pArgStrMutable);
     return 1;
 }
 
@@ -788,10 +763,14 @@ int sithCommand_CmdBind(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     char tmp[512];
     memset(tmp, 0, sizeof(tmp));
 
-    char* pArgIter = _strtok(pArgStr, ", \t\n\r");
+    char* pArgStrMutable = malloc(strlen(pArgStr)+1);
+    strcpy(pArgStrMutable, pArgStr);
+
+    char* pArgIter = _strtok(pArgStrMutable, ", \t\n\r");
     if ( !pArgIter || strlen(pArgIter) > 1) {
         _sprintf(std_genBuffer, "Usage: %s <key> <command...args>\n", pCmd->cmdStr);
         sithConsole_Print(std_genBuffer);
+        free((void*)pArgStrMutable);
         return 1;
     }
 
@@ -800,8 +779,8 @@ int sithCommand_CmdBind(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     pArgIter = _strtok(NULL, ", \t\n\r");
     while (pArgIter)
     {
-        strncat(tmp, pArgIter, sizeof(tmp));
-        strncat(tmp, " ", sizeof(tmp));
+        strncat(tmp, pArgIter, sizeof(tmp)-1);
+        strncat(tmp, " ", sizeof(tmp)-1);
 
         pArgIter = _strtok(NULL, ", \t\n\r");
     }
@@ -813,8 +792,8 @@ int sithCommand_CmdBind(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     else {
         _sprintf(std_genBuffer, "Usage: %s <key> <command...args>\n", pCmd->cmdStr);
         sithConsole_Print(std_genBuffer);
-        return 1;
     }
+    free((void*)pArgStrMutable);
     return 1;
 }
 
@@ -824,16 +803,21 @@ int sithCommand_CmdUnbind(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     char tmp[512];
     memset(tmp, 0, sizeof(tmp));
 
-    char* pArgIter = _strtok(pArgStr, ", \t\n\r");
+    char* pArgStrMutable = malloc(strlen(pArgStr)+1);
+    strcpy(pArgStrMutable, pArgStr);
+
+    char* pArgIter = _strtok(pArgStrMutable, ", \t\n\r");
     if ( !pArgIter || strlen(pArgIter) > 1) {
         _sprintf(std_genBuffer, "Usage: %s <key>\n", pCmd->cmdStr);
         sithConsole_Print(std_genBuffer);
+        free((void*)pArgStrMutable);
         return 1;
     }
 
     uint16_t key = pArgIter[0];
 
     sithCommand_RemoveBind(key);
+    free((void*)pArgStrMutable);
     return 1;
 }
 
@@ -864,10 +848,10 @@ void sithCommand_ShutdownBinds()
     while (pBindIter)
     {
         if (pBindIter->key && pBindIter->pCmd) {
-            free(pBindIter->pCmd);
+            free((void*)pBindIter->pCmd);
         }
         sithCommandBind* pBindIterNext = pBindIter->pNext;
-        free(pBindIter);
+        free((void*)pBindIter);
         pBindIter = pBindIterNext;
     }
     sithCommand_pBinds = NULL;
@@ -924,10 +908,10 @@ void sithCommand_AddBind(uint16_t key, const char* pCmd)
         // Overwrite existing bind
         if (key == pBindIter->key) {
             if (pBindIter->pCmd) {
-                free(pBindIter->pCmd);
+                free((void*)pBindIter->pCmd);
             }
             pBindIter->pCmd = (char*)malloc(strlen(pCmd)+1);
-            strcpy(pBindIter->pCmd, pCmd);
+            strcpy((char*)pBindIter->pCmd, pCmd);
             break;
         }
 
@@ -938,7 +922,7 @@ void sithCommand_AddBind(uint16_t key, const char* pCmd)
 
             pNewBind->key = key;
             pNewBind->pCmd = (char*)malloc(strlen(pCmd)+1);
-            strcpy(pNewBind->pCmd, pCmd);
+            strcpy((char*)pNewBind->pCmd, pCmd);
             pNewBind->pNext = NULL;
             break;
         }
@@ -960,14 +944,14 @@ void sithCommand_RemoveBind(uint16_t key)
         // Overwrite existing bind
         if (key == pBindIter->key) {
             if (pBindIter->pCmd) {
-                free(pBindIter->pCmd);
+                free((void*)pBindIter->pCmd);
             }
 
             sithCommandBind* pBindIterNext = pBindIter->pNext;
             if (pBindIterLast) {
                 pBindIterLast->pNext = pBindIterNext;
             }
-            free(pBindIter);
+            free((void*)pBindIter);
             pBindIter = pBindIterNext;
             continue;
         }

@@ -422,7 +422,7 @@ void jkQuakeConsole_ExecuteCommand(const char* pCmd)
     }
 }
 
-void jkQuakeConsole_SendInput(char wParam, int bIsChar)
+void jkQuakeConsole_SendInput(WPARAM wParam, int bIsChar)
 {
     wchar_t tmp[256]; // [esp+4h] [ebp-100h] BYREF
     char tmp_cvar[SITHCVAR_MAX_STRLEN];
@@ -571,7 +571,7 @@ void jkQuakeConsole_SendInput(char wParam, int bIsChar)
             
             int shouldPrint = !jkQuakeConsole_bHasTabbed;
             int bPrintOnce = 0;
-            char* tabbedStr = NULL;
+            const char* tabbedStr = NULL;
 
             char* baseCmd = (char*)malloc(strlen(jkQuakeConsole_chatStr)+1);
             strcpy(baseCmd, jkQuakeConsole_chatStr);

@@ -92,7 +92,7 @@ static jkGuiElement jkGuiNetHost_aElements[28] =
 
 static jkGuiMenu jkGuiNetHost_menu =
 {
-    &jkGuiNetHost_aElements, 0, 65535, 65535, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, 0, NULL, "thermloop01.wav", "thrmlpu2.wav", NULL, NULL, NULL, 0, NULL, NULL
+    jkGuiNetHost_aElements, 0, 65535, 65535, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, 0, NULL, "thermloop01.wav", "thrmlpu2.wav", NULL, NULL, NULL, 0, NULL, NULL
 };
 
 static jkGuiElement jkGuiNetHost_aSettingsElements[9] =
@@ -112,7 +112,7 @@ static jkGuiElement jkGuiNetHost_aSettingsElements[9] =
 
 static jkGuiMenu jkGuiNetHost_menuSettings =
 {
-    &jkGuiNetHost_aSettingsElements, 0, 65535, 65535, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, 0, NULL, "thermloop01.wav", "thrmlpu2.wav", NULL, NULL, NULL, 0, NULL, NULL
+    jkGuiNetHost_aSettingsElements, 0, 65535, 65535, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, 0, NULL, "thermloop01.wav", "thrmlpu2.wav", NULL, NULL, NULL, 0, NULL, NULL
 };
 
 static int jkGuiNetHost_bInitted;

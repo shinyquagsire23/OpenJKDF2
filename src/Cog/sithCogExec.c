@@ -37,7 +37,6 @@ void sithCogExec_Exec(sithCog *cog_ctx)
     sithCogStackvar val; // [esp+20h] [ebp-80h]
     sithCogStackvar var; // [esp+70h] [ebp-30h]
     sithCogStackvar outVar; // [esp+90h] [ebp-10h]
-    flex_t fTmp;
     int iTmp;
     sithCogStackvar* tmpStackVar;
 
@@ -73,7 +72,7 @@ void sithCogExec_Exec(sithCog *cog_ctx)
             case COG_OPCODE_PUSHFLOAT:
                 iTmp = sithCogExec_PopProgramVal(cog_ctx);
                 val.type = COG_VARTYPE_FLEX;
-                val.dataAsFloat[0] = *(flex_t*)&iTmp;
+                val.dataAsFloat[0] = *(cog_flex_t*)&iTmp;
                 sithCogExec_PushVar(cog_ctx, &val);
                 break;
 
@@ -85,7 +84,7 @@ void sithCogExec_Exec(sithCog *cog_ctx)
                 break;
 
             case COG_OPCODE_PUSHVECTOR:
-                _memcpy(val.data, &cogscript->script_program[cog_ctx->execPos], sizeof(rdVector3));
+                _memcpy(val.data, &cogscript->script_program[cog_ctx->execPos], sizeof(cog_flex_t) * 3);
                 cog_ctx->execPos += 3;
                 val.type = COG_VARTYPE_VECTOR;
                 sithCogExec_PushVar(cog_ctx, &val);
@@ -316,9 +315,9 @@ flex_t sithCogExec_PopFlex(sithCog *ctx)
         return 0.0;
         
     if ( tmp.type == COG_VARTYPE_INT )
-        return (flex_t)tmp.data[0];
+        return (flex_t)tmp.data[0]; // FLEXTODO
     if ( tmp.type == COG_VARTYPE_FLEX )
-        return tmp.dataAsFloat[0];
+        return tmp.dataAsFloat[0]; // FLEXTODO
     return 0.0;
 }
 
@@ -331,7 +330,7 @@ int sithCogExec_PopInt(sithCog *ctx)
     if ( tmp.type == COG_VARTYPE_INT )
         return tmp.data[0];
     if ( tmp.type == COG_VARTYPE_FLEX )
-        return (int)tmp.dataAsFloat[0];
+        return (int)tmp.dataAsFloat[0]; // FLEXTODO
 
     return -1;
 }
@@ -351,6 +350,7 @@ int sithCogExec_PopSymbolIdx(sithCog *ctx)
 int sithCogExec_PopVector3(sithCog *ctx, rdVector3* out)
 {
     sithCogStackvar tmp;
+
     if (!sithCogExec_PopValue(ctx, &tmp))
     {
         _memset(out, 0, sizeof(*out));
@@ -359,7 +359,9 @@ int sithCogExec_PopVector3(sithCog *ctx, rdVector3* out)
     
     if ( tmp.type == COG_VARTYPE_VECTOR )
     {
-        _memcpy(out, &tmp.data[0], sizeof(*out));
+        out->x = tmp.dataAsFloat[0]; // FLEXTODO
+        out->y = tmp.dataAsFloat[1]; // FLEXTODO
+        out->z = tmp.dataAsFloat[2]; // FLEXTODO
         return 1;
     }
 
@@ -384,7 +386,7 @@ sithCog* sithCogExec_PopCog(sithCog *ctx)
     }
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
-        cogIdx = (int)tmp.dataAsFloat[0];
+        cogIdx = (int)tmp.dataAsFloat[0]; // FLEXTODO
     }
     else
     {
@@ -423,7 +425,7 @@ sithThing* sithCogExec_PopThing(sithCog *ctx)
     }
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
-        idx = (int)(double)tmp.dataAsFloat[0];
+        idx = (int)(double)tmp.dataAsFloat[0]; // FLEXTODO
     }
     else
     {
@@ -461,7 +463,7 @@ sithThing* sithCogExec_PopTemplate(sithCog *ctx)
     }
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
-        idx = (int)(double)tmp.dataAsFloat[0];
+        idx = (int)(double)tmp.dataAsFloat[0]; // FLEXTODO
     }
     else
     {
@@ -497,7 +499,7 @@ sithSound* sithCogExec_PopSound(sithCog *ctx)
     }
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
-        idx = (int)(double)tmp.dataAsFloat[0];
+        idx = (int)(double)tmp.dataAsFloat[0]; // FLEXTODO
     }
     else
     {
@@ -539,7 +541,7 @@ sithSector* sithCogExec_PopSector(sithCog *ctx)
     }
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
-        idx = (int)(double)tmp.dataAsFloat[0];
+        idx = (int)(double)tmp.dataAsFloat[0]; // FLEXTODO
     }
     else
     {
@@ -575,7 +577,7 @@ sithSurface* sithCogExec_PopSurface(sithCog *ctx)
     }
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
-        idx = (int)(double)tmp.dataAsFloat[0];
+        idx = (int)(double)tmp.dataAsFloat[0]; // FLEXTODO
     }
     else
     {
@@ -612,7 +614,7 @@ rdMaterial* sithCogExec_PopMaterial(sithCog *ctx)
     }
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
-        idx = (int)(double)tmp.dataAsFloat[0];
+        idx = (int)(double)tmp.dataAsFloat[0]; // FLEXTODO
     }
     else
     {
@@ -654,7 +656,7 @@ rdModel3* sithCogExec_PopModel3(sithCog *ctx)
     }
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
-        idx = (int)(double)tmp.dataAsFloat[0];
+        idx = (int)(double)tmp.dataAsFloat[0]; // FLEXTODO
     }
     else
     {
@@ -696,7 +698,7 @@ rdKeyframe* sithCogExec_PopKeyframe(sithCog *ctx)
     }
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
-        idx = (int)(double)tmp.dataAsFloat[0];
+        idx = (int)(double)tmp.dataAsFloat[0]; // FLEXTODO
     }
     else
     {
@@ -736,7 +738,7 @@ sithAIClass* sithCogExec_PopAIClass(sithCog *ctx)
     }
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
-        idx = (int)(double)tmp.dataAsFloat[0];
+        idx = (int)(double)tmp.dataAsFloat[0]; // FLEXTODO
     }
     else
     {
@@ -834,7 +836,7 @@ void sithCogExec_PushFlex(sithCog *ctx, flex_t val)
 {
     sithCogStackvar v;
     v.type = COG_VARTYPE_FLEX;
-    v.dataAsFloat[0] = val;
+    v.dataAsFloat[0] = val; // FLEXTODO
     sithCogExec_PushVar(ctx, &v);
 }
 

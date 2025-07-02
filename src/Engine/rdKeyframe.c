@@ -206,7 +206,7 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
                    stdConffile_aLine,
                    " %d: %f %x %f %f %f %f %f %f",
                    &entry_num,
-                   &anim_entry->frameNum,
+                   &ftmp,
                    &anim_entry->flags,
                    &posx,
                    &posy,
@@ -217,6 +217,7 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
               goto read_fail;
             }
             
+            anim_entry->frameNum = ftmp; // FLEXTODO
             anim_entry->pos.x = posx; // FLEXTODO
             anim_entry->pos.y = posy; // FLEXTODO
             anim_entry->pos.z = posz; // FLEXTODO

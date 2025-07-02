@@ -45,10 +45,10 @@ void sithCvar_Shutdown()
         tSithCvar* pCvar = &sithCvar_aCvars[i];
 
         if(pCvar->type == CVARTYPE_STR && pCvar->pStrVal) {
-            pHS->free(pCvar->pStrVal);
+            pHS->free((void*)pCvar->pStrVal);
         }
         if (pCvar->pNameLower) {
-            pHS->free(pCvar->pNameLower);
+            pHS->free((void*)pCvar->pNameLower);
         }
     }
 
@@ -118,7 +118,7 @@ int sithCvar_LoadVar(tSithCvar* pCvar, const char* pFpath)
             memset(tmp, 0, SITHCVAR_MAX_STRLEN);
             stdJSON_GetString(pFpath, pCvar->pName, tmp, SITHCVAR_MAX_STRLEN, pCvar->pStrVal);
             memset((char*)pCvar->pStrVal, 0, SITHCVAR_MAX_STRLEN);
-            stdString_SafeStrCopy(pCvar->pStrVal, tmp, SITHCVAR_MAX_STRLEN);
+            stdString_SafeStrCopy((char*)pCvar->pStrVal, tmp, SITHCVAR_MAX_STRLEN);
             break;
         default:
             return 0;
@@ -260,7 +260,7 @@ int sithCvar_Register(const char* pName, int32_t type, intptr_t defaultVal, void
 
     memset(pCvar->pNameLower, 0, SITHCVAR_MAX_NAME_STRLEN);
     stdString_SafeStrCopy(pCvar->pNameLower, pName, SITHCVAR_MAX_NAME_STRLEN);
-    _strtolower(pCvar->pNameLower);
+    _strtolower((char*)pCvar->pNameLower);
     stdHashTable_SetKeyVal(sithCvar_pHashTable, pCvar->pNameLower, pCvar);
 
     sithCvar_UpdateLinkInternal(pCvar);
@@ -575,7 +575,7 @@ int sithCvar_SetFromString(const char* pName, const char* pStrVal)
         return 0;
     }
 
-    flex32_t readValFlex = 0.0;
+    flex_t readValFlex = 0.0;
     int readValInt = 0;
 
     switch (pCvar->type) {

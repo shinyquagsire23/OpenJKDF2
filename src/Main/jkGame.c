@@ -420,16 +420,13 @@ void jkGame_PrecalcViewSizes(int width, int height, jkViewSize *aOut)
 
 void jkGame_ddraw_idk_palettes()
 {
-    char *v0; // eax
-
     if ( Video_bOpened )
     {
         stdDisplay_VBufferFill(Video_pMenuBuffer, Video_fillColor, 0);
         stdDisplay_DDrawGdiSurfaceFlip();
         stdDisplay_ddraw_surface_flip2();
         stdDisplay_VBufferFill(Video_pMenuBuffer, Video_fillColor, 0);
-        v0 = stdDisplay_GetPalette();
-        sithRender_SetPalette(v0);
+        sithRender_SetPalette(stdDisplay_GetPalette());
     }
 }
 

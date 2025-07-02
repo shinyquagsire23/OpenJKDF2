@@ -238,6 +238,8 @@ else()
 endif()
 
 # TODO byacc and flex
+# maxamillion@Maxs-MacBook-Pro Cog % ../../flex/flex -i cog.l
+# maxamillion@Maxs-MacBook-Pro Cog % ../../byacc/yacc -d cog.y
 
 # Allow platforms to add extra dependencies, ie Frameworks on macOS or PkgConfig on Linux
 plat_extra_deps()

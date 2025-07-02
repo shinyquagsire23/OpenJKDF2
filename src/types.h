@@ -3073,7 +3073,7 @@ typedef struct sith_cog_parser_node
     sith_cog_parser_node *child;
     int opcode;
     int value;
-    rdVector3 vector;
+    cog_flex_t vector[3];
 } sith_cog_parser_node;
 
 // jkHud

@@ -652,7 +652,7 @@ int sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogReference *cogIdk, char *
     {
         case COG_TYPE_FLEX:
             cogSymbol->val.type = COG_VARTYPE_FLEX;
-            cogSymbol->val.dataAsFloat[0] = _atof(val);
+            cogSymbol->val.dataAsFloat[0] = _atof(val); // FLEXTODO
             return 1;
 
         case COG_TYPE_TEMPLATE:
@@ -1711,7 +1711,7 @@ int sithCogScript_DevCmdCogStatus(stdDebugConsoleCmd *cmd, const char *extra)
                     v7 = "<null>";
                 _sprintf(std_genBuffer, "  Symbol %d: '%s' ", v6->symbol_id, v7);
                 if ( v6->val.type == 2 )
-                    _sprintf(&std_genBuffer[_strlen(std_genBuffer)], " = %f\n", &v6->val.dataAsFloat[0]);
+                    _sprintf(&std_genBuffer[_strlen(std_genBuffer)], " = %f\n", v6->val.dataAsFloat[0]);
                 else
                     _sprintf(&std_genBuffer[_strlen(std_genBuffer)], " = %d\n", v6->val.data[0]);
                 sithConsole_Print(std_genBuffer);

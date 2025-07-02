@@ -170,7 +170,7 @@ LABEL_19:
         v12 += 3;
     }
     while ( (intptr_t)v12 < (intptr_t)&jkCredits_aPalette[0x300] );
-    stdDisplay_SetMasterPalette(jkCredits_aPalette);
+    stdDisplay_SetMasterPalette((uint8_t*)jkCredits_aPalette);
     v15 = stdDisplay_VBufferNew(&Video_menuBuffer.format, 1, 1, jkCredits_aPalette);
     _memcpy(&v26, &Video_menuBuffer.format, sizeof(v26));
     jkCredits_pVbuffer = v15;
@@ -398,13 +398,13 @@ int jkCredits_Tick()
 
         if ( stdDisplay_VBufferLock(&Video_menuBuffer) )
         {
-            v8 = Video_menuBuffer.surface_lock_alloc;
+            v8 = (uint8_t*)Video_menuBuffer.surface_lock_alloc;
             pAIdk = jkCredits_aIdk;
             v25.x = -Video_menuBuffer.format.width_in_bytes;
             v23 = Video_menuBuffer.surface_lock_alloc;
             v24 = 32;
-            v10 = &Video_menuBuffer.surface_lock_alloc[479 * Video_menuBuffer.format.width_in_bytes];
-            v22 = v10;
+            v10 = (uint8_t*)&Video_menuBuffer.surface_lock_alloc[479 * Video_menuBuffer.format.width_in_bytes];
+            v22 = (char*)v10;
             do
             {
                 v21 = 160;
@@ -436,8 +436,8 @@ int jkCredits_Tick()
                 }
                 while ( v21 );
                 pAIdk += 256;
-                v10 = &v22[v25.x];
-                v8 = &v23[Video_menuBuffer.format.width_in_bytes];
+                v10 = (uint8_t*)&v22[v25.x];
+                v8 = (uint8_t*)&v23[Video_menuBuffer.format.width_in_bytes];
                 v22 += v25.x;
                 v23 += Video_menuBuffer.format.width_in_bytes;
                 --v24;

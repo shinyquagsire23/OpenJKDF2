@@ -144,7 +144,7 @@ void RLE_decompress_type1(uint8_t* out_data, uint32_t out_data_stride, uint8_t *
           op_data = op_data + op2;
           dst_x = dst_x + op1;
         }
-        if (((uint)op_data & 1) != 0) {
+        if (((intptr_t)op_data & 1) != 0) {
           op_data = op_data + 1;
         }
       }
@@ -243,7 +243,7 @@ int main(int argc, char** argv)
     stdFile_t fp = (stdFile_t)fopen(fpath, "rb");
     int has_pal = argc <= 2 ? 0 : rdColormap_LoadEntry(argv[2], &colormap);
     
-    printf("%x %x %x\n", fp, sizeof(header), sizeof(header_ext));
+    printf("%lx %lx %lx\n", fp, sizeof(header), sizeof(header_ext));
     std_pHS->fileRead(fp, &header, sizeof(header));
     std_pHS->fileRead(fp, &header_ext, sizeof(header_ext));
     std_pHS->fileRead(fp, pal_stored, sizeof(pal_stored));

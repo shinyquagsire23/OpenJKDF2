@@ -57,11 +57,11 @@ extern int openjkdf2_bIsKVM;
 static double jkCutscene_audio_us;
 static double jkCutscene_audio_us_slop;
 
-static uint8_t* jkCutscene_audio_buf;
-static uint8_t* jkCutscene_audio_pos;
+static const uint8_t* jkCutscene_audio_buf;
+static const uint8_t* jkCutscene_audio_pos;
 static uint32_t jkCutscene_audio_len;
 
-static uint8_t* jkCutscene_audio_queue[AUDIO_QUEUE_DEPTH] = {0};
+static const uint8_t* jkCutscene_audio_queue[AUDIO_QUEUE_DEPTH] = {0};
 static size_t jkCutscene_audio_queue_lens[AUDIO_QUEUE_DEPTH] = {0};
 static int jkCutscene_audio_queue_read_idx = 0;
 static int jkCutscene_audio_queue_write_idx = 0;
@@ -70,7 +70,7 @@ void smush_audio_callback(const uint8_t* data, size_t len)
 {
     //printf("Callback %p %zx %x %x %x\n", data, len, jkCutscene_pSmush->cur_frame, jkCutscene_pSmush->audio_cur_frame, jkCutscene_audio_queue_write_idx);
     if (jkCutscene_audio_queue[jkCutscene_audio_queue_write_idx]) {
-        free(jkCutscene_audio_queue[jkCutscene_audio_queue_write_idx]);
+        free((void*)jkCutscene_audio_queue[jkCutscene_audio_queue_write_idx]);
         jkCutscene_audio_queue[jkCutscene_audio_queue_write_idx] = NULL;
     }
 
@@ -85,14 +85,14 @@ void jkCutscene_CleanReset()
 #if defined(SDL2_RENDER) || defined(TARGET_TWL)
     for (int i = 0; i < AUDIO_QUEUE_DEPTH; i++) {
         if (jkCutscene_audio_queue[i]) {
-            free(jkCutscene_audio_queue[i]);
+            free((void*)jkCutscene_audio_queue[i]);
         }
 
         jkCutscene_audio_queue[i] = NULL;
         jkCutscene_audio_queue_lens[i] = 0;
     }
     if (jkCutscene_audio_buf) {
-        free(jkCutscene_audio_buf);
+        free((void*)jkCutscene_audio_buf);
         jkCutscene_audio_buf = NULL;
     }
     if (jkCutscene_audio) {
@@ -136,7 +136,7 @@ void jkCutscene_CleanReset()
     jkCutscene_smk_frames = 0;
     jkCutscene_frameBuf = NULL;
     if (jkCutscene_palette) {
-        free(jkCutscene_palette);
+        free((void*)jkCutscene_palette);
     }
     jkCutscene_palette = NULL;
     //jkCutscene_audioBuf = NULL;
@@ -253,7 +253,7 @@ int jkCutscene_sub_421310(char* fpath)
     sithSoundMixer_StopSong();
     stdMci_Stop();
     if (jkCutscene_palette) {
-        free(jkCutscene_palette);
+        free((void*)jkCutscene_palette);
     }
     jkCutscene_palette = malloc(0x300);
     
@@ -268,7 +268,7 @@ int jkCutscene_sub_421310(char* fpath)
     {
         strcpy(tmp, r);
     }
-    free(r);
+    free((void*)r);
 #endif
 
     jkCutscene_pSmush = smush_from_fpath(tmp);
@@ -351,7 +351,7 @@ int jkCutscene_sub_421310(char* fpath)
     else {
         jkCutscene_bSmkValid = 0;
         if (jkCutscene_audio_buf) {
-            free(jkCutscene_audio_buf);
+            free((void*)jkCutscene_audio_buf);
         }
         jkCutscene_audio_buf = NULL;
         jkCutscene_audio_pos = NULL;
@@ -362,7 +362,7 @@ int jkCutscene_sub_421310(char* fpath)
 
         for (int i = 0; i < AUDIO_QUEUE_DEPTH; i++) {
             if (jkCutscene_audio_queue[i]) {
-                free(jkCutscene_audio_queue[i]);
+                free((void*)jkCutscene_audio_queue[i]);
             }
             jkCutscene_audio_queue[i] = NULL;
             jkCutscene_audio_queue_lens[i] = 0;
@@ -458,14 +458,14 @@ int jkCutscene_sub_421410()
 #if defined(SDL2_RENDER) || defined(TARGET_TWL)
     for (int i = 0; i < AUDIO_QUEUE_DEPTH; i++) {
         if (jkCutscene_audio_queue[i]) {
-            free(jkCutscene_audio_queue[i]);
+            free((void*)jkCutscene_audio_queue[i]);
         }
 
         jkCutscene_audio_queue[i] = NULL;
         jkCutscene_audio_queue_lens[i] = 0;
     }
     if (jkCutscene_audio_buf) {
-        free(jkCutscene_audio_buf);
+        free((void*)jkCutscene_audio_buf);
         jkCutscene_audio_buf = NULL;
     }
     if (jkCutscene_audio) {
@@ -754,7 +754,7 @@ int jkCutscene_smacker_process()
     unsigned long frame = 0;
     smk_info_all(jkCutscene_smk, &frame, NULL, NULL);
 
-    uint32_t* subtitle_idx = smk_get_audio(jkCutscene_smk, 1);
+    uint32_t* subtitle_idx = (uint32_t*)smk_get_audio(jkCutscene_smk, 1);
     size_t s = smk_get_audio_size(jkCutscene_smk, 1);
 
     if (s == 4)
@@ -854,7 +854,7 @@ int jkCutscene_smusher_process()
 
         if (jkCutscene_audio_len <= 0) {
             if (jkCutscene_audio_buf) {
-                free(jkCutscene_audio_buf);
+                free((void*)jkCutscene_audio_buf);
                 jkCutscene_audio_buf = NULL;
             }
             jkCutscene_audio_buf = jkCutscene_audio_queue[jkCutscene_audio_queue_read_idx];
@@ -896,7 +896,7 @@ int jkCutscene_smusher_process()
         while (written_len < (len/2) + (slop_bytes)) {
             if (jkCutscene_audio_len <= 0) {
                 if (jkCutscene_audio_buf) {
-                    free(jkCutscene_audio_buf);
+                    free((void*)jkCutscene_audio_buf);
                     jkCutscene_audio_buf = NULL;
                 }
                 jkCutscene_audio_buf = jkCutscene_audio_queue[jkCutscene_audio_queue_read_idx];
@@ -955,7 +955,7 @@ skip_audio:
     unsigned long frame = smush_cur_frame(jkCutscene_pSmush);
     //smk_info_all(jkCutscene_smk, &frame, NULL, NULL);
 
-    //uint32_t* subtitle_idx = smk_get_audio(jkCutscene_smk, 1);
+    //uint32_t* subtitle_idx = (uint32_t*)smk_get_audio(jkCutscene_smk, 1);
     //size_t s = smk_get_audio_size(jkCutscene_smk, 1);
 
     //if (s == 4)

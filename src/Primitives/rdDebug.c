@@ -9,6 +9,7 @@
 
 static rdMaterial rdDebug_solidMat = {0};
 static rdTexture rdDebug_solidTex = {0};
+static rdTexinfo rdDebug_solidTexTexinfo = { .header = {0}, .texext_unk00 = 0, .texture_ptr = &rdDebug_solidTex };
 
 void rdDebug_DrawScreenLine3(rdVector3* v1, rdVector3* v2, uint32_t color)
 {
@@ -23,7 +24,7 @@ void rdDebug_DrawScreenLine3(rdVector3* v1, rdVector3* v2, uint32_t color)
     rdDebug_solidMat.celIdx = 0;
     for (int i = 0; i < 8; i++)
     {
-        rdDebug_solidMat.texinfos[i] = &rdDebug_solidTex;
+        rdDebug_solidMat.texinfos[i] = &rdDebug_solidTexTexinfo;
     }
     
     //printf("%f %f %f, %f %f %f\n", v1->x, v1->y, v1->z, v2->x, v2->y, v2->z);
@@ -66,7 +67,7 @@ void rdDebug_DrawLine3(rdVector3* v1, rdVector3* v2, uint32_t color)
     rdClip_Line3Project(rdCamera_pCurCamera->pClipFrustum, &verts[0], &verts[1], &out1, &out2);
 
     // And project to screen coords
-    rdCamera_pCurCamera->fnProjectLst(&vertsOut, &verts, 2);
+    rdCamera_pCurCamera->fnProjectLst(vertsOut, verts, 2);
     
     vertsOut[0].x = (flex_t)(int)vertsOut[0].x + 0.0001; // FLEXTODO
     vertsOut[0].y = (flex_t)(int)vertsOut[0].y + 0.0001; // FLEXTODO

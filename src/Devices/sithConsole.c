@@ -121,15 +121,19 @@ void sithConsole_PrintUniStr(const wchar_t *a1)
         DebugGui_fnPrintUniStr(a1);
 }
 
-int sithConsole_TryCommand(char *cmd)
+int sithConsole_TryCommand(const char *cmd)
 {
     char *v1; // esi
     stdDebugConsoleCmd *v2; // edi
     char *v3; // eax
     char tmp_cvar[SITHCVAR_MAX_STRLEN];
 
-    _strtolower(cmd);
-    v1 = _strtok(cmd, ", \t\n\r");
+    // Added: mutable copy of cmd
+    char* pCmdMutable = malloc(strlen(cmd)+1);
+    strcpy(pCmdMutable, cmd);
+
+    _strtolower(pCmdMutable); // Added: mutable copy of cmd
+    v1 = _strtok(pCmdMutable, ", \t\n\r"); // Added: mutable copy of cmd
     if ( v1 )
     {
         // Added: cvars
@@ -145,6 +149,7 @@ int sithConsole_TryCommand(char *cmd)
                     {
                         DebugGui_fnPrint(std_genBuffer);
                     }
+                    free((void*)pCmdMutable); // Added: mutable copy of cmd
                     return 0;
                 }
 
@@ -153,6 +158,7 @@ int sithConsole_TryCommand(char *cmd)
                 {
                     DebugGui_fnPrint(std_genBuffer);
                 }
+                free((void*)pCmdMutable); // Added: mutable copy of cmd
                 return 0;
             }
 
@@ -165,8 +171,10 @@ int sithConsole_TryCommand(char *cmd)
                 {
                     DebugGui_fnPrint(std_genBuffer);
                 }
+                free((void*)pCmdMutable); // Added: mutable copy of cmd
                 return 0;
             }
+            free((void*)pCmdMutable); // Added: mutable copy of cmd
             return 1;
         }
 
@@ -175,12 +183,14 @@ int sithConsole_TryCommand(char *cmd)
         {
             v3 = _strtok(0, "\n\r");
             v2->cmdFunc(v2, (const char*)v3);
+            free((void*)pCmdMutable);
             return 1;
         }
         _sprintf(std_genBuffer, "Console command %s not recognized.", v1);
         if ( DebugGui_fnPrint )
         {
             DebugGui_fnPrint(std_genBuffer);
+            free((void*)pCmdMutable); // Added: mutable copy of cmd
             return 0;
         }
         DebugGui_some_num_lines = (DebugGui_some_num_lines + 1) % DebugGui_maxLines;
@@ -190,6 +200,7 @@ int sithConsole_TryCommand(char *cmd)
         stdString_SafeStrCopy(&DebugLog_buffer[128 * DebugGui_some_num_lines], std_genBuffer, 0x80);
         DebugGui_aIdk[DebugGui_some_num_lines] = stdPlatform_GetTimeMsec();
     }
+    free((void*)pCmdMutable); // Added: mutable copy of cmd
     return 0;
 }
 

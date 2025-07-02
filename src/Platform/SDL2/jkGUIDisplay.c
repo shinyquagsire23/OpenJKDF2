@@ -113,6 +113,7 @@ static jkGuiMenu jkGuiDisplay_menuAdvanced = { jkGuiDisplay_aElementsAdvanced, 0
 
 void jkGuiDisplay_Startup()
 {
+    flex32_t ftmp;
     jkGui_InitMenu(&jkGuiDisplay_menu, jkGui_stdBitmaps[JKGUI_BM_BK_SETUP]);
     jkGui_InitMenu(&jkGuiDisplay_menuAdvanced, jkGui_stdBitmaps[JKGUI_BM_BK_SETUP]);
     jkGuiDisplay_aElements[24].wstr = render_level;
@@ -121,9 +122,12 @@ void jkGuiDisplay_Startup()
 
     jkGuiDisplay_aElements[28].wstr = hud_level;
 
-    jk_snwprintf(render_level, 255, L"%.2f", jkPlayer_ssaaMultiple);
-    jk_snwprintf(gamma_level, 255, L"%.2f", jkPlayer_gamma);
-    jk_snwprintf(hud_level, 255, L"%.2f", jkPlayer_hudScale);
+    ftmp = jkPlayer_ssaaMultiple;
+    jk_snwprintf(render_level, 255, L"%.2f", ftmp);
+    ftmp = jkPlayer_gamma;
+    jk_snwprintf(gamma_level, 255, L"%.2f", ftmp);
+    ftmp = jkPlayer_hudScale;
+    jk_snwprintf(hud_level, 255, L"%.2f", ftmp);
 }
 
 void jkGuiDisplay_Shutdown()
@@ -191,6 +195,7 @@ int jkGuiDisplay_ShowAdvanced()
 
 int jkGuiDisplay_Show()
 {
+    flex32_t ftmp;
     int v0; // esi
 
     jkGui_sub_412E20(&jkGuiDisplay_menu, 102, 104, 102);
@@ -210,9 +215,12 @@ int jkGuiDisplay_Show()
     jkGuiDisplay_aElements[21].selectedTextEntry = jkPlayer_enableBloom;
     jkGuiDisplay_aElements[22].selectedTextEntry = jkPlayer_enableSSAO;
 
-    jk_snwprintf(render_level, 255, L"%.2f", jkPlayer_ssaaMultiple);
-    jk_snwprintf(gamma_level, 255, L"%.2f", jkPlayer_gamma);
-    jk_snwprintf(hud_level, 255, L"%.2f", jkPlayer_hudScale);
+    ftmp = jkPlayer_ssaaMultiple;
+    jk_snwprintf(render_level, 255, L"%.2f", ftmp);
+    ftmp = jkPlayer_gamma;
+    jk_snwprintf(gamma_level, 255, L"%.2f", ftmp);
+    ftmp = jkPlayer_hudScale;
+    jk_snwprintf(hud_level, 255, L"%.2f", ftmp);
 
 continue_menu:
     v0 = jkGuiRend_DisplayAndReturnClicked(&jkGuiDisplay_menu);
@@ -237,18 +245,27 @@ continue_menu:
         char tmp[256];
         stdString_WcharToChar(tmp, render_level, 255);
 
-        if(_sscanf(tmp, "%f", &jkPlayer_ssaaMultiple) != 1) {
+        if(_sscanf(tmp, "%f", &ftmp) != 1) {
             jkPlayer_ssaaMultiple = 1.0;
+        }
+        else {
+            jkPlayer_ssaaMultiple = ftmp;
         }
 
         stdString_WcharToChar(tmp, gamma_level, 255);
-        if(_sscanf(tmp, "%f", &jkPlayer_gamma) != 1) {
+        if(_sscanf(tmp, "%f", &ftmp) != 1) {
             jkPlayer_gamma = 1.0;
+        }
+        else {
+            jkPlayer_gamma = ftmp;
         }
 
         stdString_WcharToChar(tmp, hud_level, 255);
-        if(_sscanf(tmp, "%f", &jkPlayer_hudScale) != 1) {
+        if(_sscanf(tmp, "%f", &ftmp) != 1) {
             jkPlayer_hudScale = 1.0;
+        }
+        else {
+            jkPlayer_hudScale = ftmp;
         }
 
         if (jkPlayer_hudScale > 100.0) {

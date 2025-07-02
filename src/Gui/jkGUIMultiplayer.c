@@ -171,7 +171,7 @@ LABEL_1:
                     if ( v3 > 0 )
                     {
                         // TODO if this is a ptr, fix it
-                        v4 = stdComm_OpenConnection((void*)jkGuiMultiplayer_aElements2[3].selectedTextEntry);
+                        v4 = stdComm_OpenConnection((void*)(intptr_t)jkGuiMultiplayer_aElements2[3].selectedTextEntry);
                         if ( v4 == 0x887700FA )
                         {
                             v24 = jkStrings_GetUniStringWithFallback("GUINET_NOTAVAIL");
@@ -233,7 +233,7 @@ LABEL_1:
                     if ( v16 > 0 )
                     {
                         // TODO if this is a ptr, fix it
-                        v17 = stdComm_OpenConnection((void*)jkGuiMultiplayer_aElements2[3].selectedTextEntry);
+                        v17 = stdComm_OpenConnection((void*)(intptr_t)jkGuiMultiplayer_aElements2[3].selectedTextEntry);
                         if ( v17 == 0x887700FA )
                         {
                             v28 = jkStrings_GetUniStringWithFallback("GUINET_NOTAVAIL");

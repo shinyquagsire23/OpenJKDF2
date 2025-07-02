@@ -45,18 +45,18 @@ int jkPlayer_enableBloom = 0;
 int jkPlayer_enableSSAO = 0;
 int jkPlayer_fpslimit = 0;
 int jkPlayer_enableVsync = 0;
-flex32_t jkPlayer_ssaaMultiple = 1.0;
-flex32_t jkPlayer_gamma = 1.0;
+flex_t jkPlayer_ssaaMultiple = 1.0;
+flex_t jkPlayer_gamma = 1.0;
 int jkPlayer_bEnableJkgm = 1;
 int jkPlayer_bEnableTexturePrecache = 1;
 int jkPlayer_bKeepCorpses = 0;
 int jkPlayer_bFastMissionText = 0;
 int jkPlayer_bUseOldPlayerPhysics = 0;
-flex32_t jkPlayer_hudScale = 2.0;
-flex32_t jkPlayer_crosshairLineWidth = 1.0;
-flex32_t jkPlayer_crosshairScale = 1.0;
-flex32_t jkPlayer_canonicalCogTickrate = CANONICAL_COG_TICKRATE;
-flex32_t jkPlayer_canonicalPhysTickrate = CANONICAL_PHYS_TICKRATE;
+flex_t jkPlayer_hudScale = 2.0;
+flex_t jkPlayer_crosshairLineWidth = 1.0;
+flex_t jkPlayer_crosshairScale = 1.0;
+flex_t jkPlayer_canonicalCogTickrate = CANONICAL_COG_TICKRATE;
+flex_t jkPlayer_canonicalPhysTickrate = CANONICAL_PHYS_TICKRATE;
 
 int jkPlayer_setCrosshairOnLightsaber = 1;
 int jkPlayer_setCrosshairOnFist = 1;
@@ -583,6 +583,7 @@ void jkPlayer_WriteConf(wchar_t *name)
 #ifdef QOL_IMPROVEMENTS
 void jkPlayer_ParseLegacyExt()
 {
+    flex32_t ftmp;
     if (stdConffile_ReadLine())
     {
         _sscanf(stdConffile_aLine, "fov %d", &jkPlayer_fov);
@@ -641,8 +642,10 @@ void jkPlayer_ParseLegacyExt()
 
     if (stdConffile_ReadLine())
     {
-        if (_sscanf(stdConffile_aLine, "ssaamultiple %f", &jkPlayer_ssaaMultiple) != 1)
+        if (_sscanf(stdConffile_aLine, "ssaamultiple %f", &ftmp) != 1)
             jkPlayer_ssaaMultiple = 1.0;
+        else
+            jkPlayer_ssaaMultiple = ftmp;
     }
 
     if (stdConffile_ReadLine())
@@ -653,8 +656,10 @@ void jkPlayer_ParseLegacyExt()
 
     if (stdConffile_ReadLine())
     {
-        if (_sscanf(stdConffile_aLine, "gamma %f", &jkPlayer_gamma) != 1)
+        if (_sscanf(stdConffile_aLine, "gamma %f", &ftmp) != 1)
             jkPlayer_gamma = 1.0;
+        else
+            jkPlayer_gamma = ftmp;
     }
 }
 #endif

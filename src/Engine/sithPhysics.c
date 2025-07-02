@@ -290,8 +290,9 @@ void sithPhysics_ApplyDrag(rdVector3 *vec, flex_t drag, flex_t mag, flex_t delta
 
 int sithPhysics_LoadThingParams(stdConffileArg *arg, sithThing *pThing, int param)
 {
-    flex_t tmp;
+    flex32_t tmp;
     int tmpInt;
+    flex32_t velx, vely, velz;
 
     switch ( param )
     {
@@ -346,20 +347,21 @@ int sithPhysics_LoadThingParams(stdConffileArg *arg, sithThing *pThing, int para
             if (_sscanf(
                       arg->value,
                       "(%f/%f/%f)",
-                      &pThing->physicsParams.vel,
-                      &pThing->physicsParams.vel.y,
-                      &pThing->physicsParams.vel.z) != 3)
+                      &velx, &vely, &velz) != 3)
                 return 0;
+            pThing->physicsParams.vel.x = velx;
+            pThing->physicsParams.vel.y = vely;
+            pThing->physicsParams.vel.z = velz;
             return 1;
         case THINGPARAM_ANGVEL:
             if (_sscanf(
                       arg->value,
                       "(%f/%f/%f)",
-                      &pThing->physicsParams.angVel,
-                      &pThing->physicsParams.angVel.y,
-                      &pThing->physicsParams.angVel.z) != 3)
+                      &velx, &vely, &velz) != 3)
                 return 0;
-
+            pThing->physicsParams.angVel.x = velx;
+            pThing->physicsParams.angVel.y = vely;
+            pThing->physicsParams.angVel.z = velz;
             return 1;
         case THINGPARAM_ORIENTSPEED:
             tmp = _atof(arg->value);

@@ -31,7 +31,7 @@ static jkGuiElement jkGuiKeyboard_aElements[19] =
     { ELEMENT_TEXTBUTTON,  107, 2, "GUI_JOYSTICK", 3, { 320, 120, 140, 40 }, 1, 0, "GUI_JOYSTICK_HINT", NULL, NULL, NULL, {0}, 0},
     { ELEMENT_TEXTBUTTON,  108, 2, "GUI_CONTROLOPTIONS", 3, { 460, 120, 140, 40 }, 1, 0, "GUI_CONTROLOPTIONS_HINT", NULL, NULL, NULL, {0}, 0},
     { ELEMENT_TEXT,        0, 2, (const char*)jkGuiKeyboard_wstr_555E18, 3, { 50, 220, 320, 80 }, 1, 0, NULL, NULL, NULL, NULL, {0}, 0},
-    { ELEMENT_LISTBOX,     0, 0, NULL, 0, { 20, 170, 370, 216 }, 1, 0, "GUI_CONTROLSLIST_HINT", NULL, &jkGuiKeyboard_ControlListClicked, &jkGuiKeyboard_listbox_images, {0}, 0},
+    { ELEMENT_LISTBOX,     0, 0, NULL, 0, { 20, 170, 370, 216 }, 1, 0, "GUI_CONTROLSLIST_HINT", NULL, &jkGuiKeyboard_ControlListClicked, jkGuiKeyboard_listbox_images, {0}, 0},
     { ELEMENT_TEXTBUTTON,  0, 2, "GUI_ADD_CONTROL", 3, { 420, 210, 210, 40 }, 1, 0, "GUI_ADD_CONTROL_HINT", NULL, &jkGuiKeyboard_AddControlClicked, NULL, {0}, 0},
     { ELEMENT_TEXTBUTTON,  0, 2, "GUI_REMOVE_CONTROL", 3, { 420, 250, 210, 40 }, 1, 0, "GUI_REMOVE_CONTROL_HINT", NULL, &jkGuiKeyboard_RemoveControlClicked, NULL, {0}, 0},
     { ELEMENT_TEXTBUTTON,  1, 2, "GUI_OK", 3, { 440, 430, 200, 40 }, 1, 0, NULL, NULL, &jkGuiKeyboard_OkClicked, NULL, {0}, 0},
@@ -48,7 +48,7 @@ const char* jkGuiKeyboard_DIKNumToStr(unsigned int idx, char bIsIdxAxis)
     BOOL v2; // eax
     const char *pOutStr; // eax
     int v4; // ecx
-    stdControlDikStrToNum *v5; // eax
+    const stdControlDikStrToNum *v5; // eax
 
     if ( (bIsIdxAxis & 1) != 0 )
     {
@@ -227,7 +227,7 @@ int jkGuiKeyboard_EnumBindings(int inputFuncIdx, const char *pInputFuncStr, uint
     BOOL v10; // eax
     const char *v11; // ecx
     int v12; // ecx
-    stdControlDikStrToNum *v13; // eax
+    const stdControlDikStrToNum *v13; // eax
     jkGuiKeyboardEntry *v14; // eax
     const char *v16; // [esp-8h] [ebp-240h]
     wchar_t *v17; // [esp+14h] [ebp-224h]

@@ -96,7 +96,6 @@ void rdPrimit3_ClipFace(rdClipFrustum *clipFrustum, rdGeoMode_t geoMode, signed 
     int v91; // [esp+14h] [ebp-10h]
     rdVector2 *v92; // [esp+18h] [ebp-Ch]
     rdVector2 *v93; // [esp+18h] [ebp-Ch]
-    int v95; // [esp+1Ch] [ebp-8h]
     char *v97; // [esp+20h] [ebp-4h]
     char *a2b; // [esp+2Ch] [ebp+8h]
     signed int a2d; // [esp+2Ch] [ebp+8h]
@@ -426,7 +425,6 @@ LABEL_25:
                         v89 = v52->paDynamicLight;
                         v65 = mesh_out->vertexUVs;
                         v93 = v52->vertexUVs;
-                        v95 = v55;
                         for (int i = 0; i < idxInfo->numVertices; i++)
                         {
                             v66 = v52->vertexPosIdx[i];
@@ -454,7 +452,6 @@ LABEL_25:
                             ++v64;
                             ++v65;
                             mesh_out->paDynamicLight[i] = v69;
-                            --v95;
                         }
                         v53 = mesh_out;
                         v55 = idxInfof;
@@ -950,8 +947,6 @@ void rdPrimit3_NoClipFaceRGB
     intptr_t iVar22;
     rdVector3 *local_14;
     rdVector2 *local_10;
-
-    uint32_t idxIter = 0;
     
     switch(geoMode) {
     case 0:
@@ -1052,7 +1047,6 @@ void rdPrimit3_NoClipFaceRGB
                 pfVar10 = _vertexSrc->paBlueIntensities;
                 flex_t* blueIter = _vertexDst->paBlueIntensities;
                 int idkIn_ = _vertexSrc->numVertices;
-                idxIter = 0;
                 do {
                     prVar1 = prVar3 + *piVar14;
                     prVar18->x = prVar1->x;
@@ -1088,7 +1082,6 @@ void rdPrimit3_NoClipFaceRGB
                     pfVar6++;
                     blueIter++;
                     idkIn_--;
-                    idxIter++;
                 } while (idkIn_ != 0x0);
                 _vertexDst->numVertices = _vertexSrc->numVertices;
                 return;

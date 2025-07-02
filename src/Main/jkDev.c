@@ -164,7 +164,6 @@ void jkDev_Close()
 void jkDev_DrawLog()
 {
     stdVBuffer *v0; // ecx
-    int v1; // ebp
     signed int v2; // edi
     jkDevLogEnt* v4; // esi
     int v5; // edx
@@ -181,7 +180,6 @@ void jkDev_DrawLog()
 
     jkDev_UpdateEntries();
     v0 = jkDev_vbuf;
-    v1 = 0;
     jkDev_DrawEntries();
 
     if ( v0 )

@@ -290,7 +290,7 @@ int jkGuiSaveLoad_Show(int bIsSave)
     signed int result; // eax
     wchar_t *v26; // [esp-4h] [ebp-298h]
     wchar_t *v27; // [esp-4h] [ebp-298h]
-    wchar_t *v28; // [esp-4h] [ebp-298h]
+    const wchar_t *v28; // [esp-4h] [ebp-298h]
     int v29; // [esp+10h] [ebp-284h] BYREF
     char v30[128]; // [esp+14h] [ebp-280h] BYREF
     wchar_t v31[256]; // [esp+94h] [ebp-200h] BYREF

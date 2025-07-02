@@ -354,7 +354,7 @@ int Main_Startup(const char *cmdline)
     stdStartup(&hs); // Added
     InstallHelper_SetCwd(); // Added
 
-    wuRegistry_Startup(HKEY_LOCAL_MACHINE, "Software\\LucasArts Entertainment Company\\JediKnight\\v1.0", "0.1");
+    wuRegistry_Startup(HKEY_LOCAL_MACHINE, "Software\\LucasArts Entertainment Company\\JediKnight\\v1.0", (BYTE*)"0.1");
     //stdStartup(&hs); // Moved
 
     stdHttp_Startup();
