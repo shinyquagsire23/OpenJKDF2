@@ -1,6 +1,8 @@
 #include "sithArchLighting.h"
 
 #include "jk.h"
+#include "globals.h"
+#include "General/stdConffile.h"
 
 #ifdef JKM_LIGHTING
 

@@ -472,7 +472,7 @@ sithAICommand* sithAI_FindCommand(const char *cmdName)
     return NULL;
 }
 
-int sithAI_PrintThings()
+int sithAI_PrintThings(stdDebugConsoleCmd* a, const char* b)
 {
     int v1; // edi
     sithActor *i; // esi

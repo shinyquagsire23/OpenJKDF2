@@ -47,7 +47,7 @@ static jkGuiElement jkGuiMain_cutscenesElements[5] = {
     {ELEMENT_END, 0, 0, 0, 0, {0}, 0, 0, 0, 0, 0, 0, {0}, 0}
 };
 
-static jkGuiMenu jkGuiMain_cutscenesMenu = {jkGuiMain_cutscenesElements, 0xFFFFFFFF, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
+static jkGuiMenu jkGuiMain_cutscenesMenu = {jkGuiMain_cutscenesElements, -1, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 
 static jkGuiElement jkGuiMain_elements[11] = {
     {ELEMENT_TEXTBUTTON, 10, 5, "GUI_SINGLEPLAYER", 3, {0, 160, 0x280, 0x3C}, 1, 0, 0, 0, 0, 0, {0}, 0},
@@ -67,7 +67,7 @@ static jkGuiElement jkGuiMain_elements[11] = {
     {ELEMENT_END, 0, 0, 0, 0, {0}, 0, 0, 0, 0, 0, 0, {0}, 0}
 };
 
-static jkGuiMenu jkGuiMain_menu = {jkGuiMain_elements, 0xFFFFFFFF, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
+static jkGuiMenu jkGuiMain_menu = {jkGuiMain_elements, -1, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 
 // MOTS altered
 void jkGuiMain_Show()

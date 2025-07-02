@@ -54,7 +54,7 @@ char* stdString_CopyBetweenDelimiter(char *instr, char *outstr, int out_size, ch
 {
     char *out_; // edi
     const char *v5; // ebx
-    char *str_find; // eax
+    const char *str_find; // eax
     char *retval; // ebp
     size_t idk_len; // esi
 
@@ -63,7 +63,7 @@ char* stdString_CopyBetweenDelimiter(char *instr, char *outstr, int out_size, ch
         *outstr = 0;
     v5 = &instr[_strspn(instr, find_str)];
     str_find = _strpbrk(v5, find_str);
-    retval = str_find;
+    retval = (char*)str_find;
     if ( str_find )
     {
         idk_len = str_find - v5;

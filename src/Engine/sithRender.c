@@ -1983,7 +1983,7 @@ void sithRender_RenderAlphaSurfaces()
 #endif
 }
 
-int sithRender_SetRenderWeaponHandle(void *a1)
+int sithRender_SetRenderWeaponHandle(sithRender_weapRendFunc_t a1)
 {
     sithRender_weaponRenderHandle = a1;
     return 1;

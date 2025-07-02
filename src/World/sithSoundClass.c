@@ -264,7 +264,7 @@ int sithSoundClass_LoadEntry(sithSoundClass *soundClass, char *fpath)
             continue;
         }
 
-        soundIdx = (uint32_t)((intptr_t)stdHashTable_GetKeyVal(sithSoundClass_nameToKeyHashtable, (void*)(intptr_t)stdConffile_entry.args[0].value) & 0xFFFFFFFF);
+        soundIdx = (uint32_t)((intptr_t)stdHashTable_GetKeyVal(sithSoundClass_nameToKeyHashtable, (const char*)(intptr_t)stdConffile_entry.args[0].value) & 0xFFFFFFFF);
         if (soundIdx < 0 || soundIdx >= SITH_SC_MAX) {
             continue;
         }

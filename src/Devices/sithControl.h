@@ -68,7 +68,7 @@ flex_t sithControl_GetAxis(int funcIdx);
 int sithControl_ReadFunctionMap(int func, int* out);
 
 void sithControl_sub_4D6930(int a);
-stdControlKeyInfo* sithControl_EnumBindings(sithControlEnumFunc_t pfEnumFunction, int a2, int a3, int a4, void *a5);
+stdControlKeyInfo* sithControl_EnumBindings(sithControlEnumFunc_t pfEnumFunction, int a2, int a3, int a4, Darray *a5);
 void sithControl_sub_4D7670();
 void sithControl_sub_4D7350();
 void sithControl_JoyInputInit();

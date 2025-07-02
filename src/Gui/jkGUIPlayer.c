@@ -34,7 +34,7 @@ static jkGuiElement jkGuiPlayer_menuSelectElements[8] = {
     {ELEMENT_TEXT, 0, 0, 0, 3, {0, 0x19A, 0x280, 0x14}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXT, 0, 5, "GUI_CHOOSEPLAYER", 3, {0, 0x82, 0x280, 0x28}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_LISTBOX, 1, 0, 0, 0, {0x82, 0xC8, 0x17C, 0xB4}, 1, 0, 0, 0, 0, jkGuiPlayer_menuSelectIdk2, {0}, 0},
-    {ELEMENT_TEXTBUTTON, 0xFFFFFFFF, 2, "GUI_CANCEL", 3, {0, 0x1AE, 0xA0, 0x28}, 1, 0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_TEXTBUTTON, -1, 2, "GUI_CANCEL", 3, {0, 0x1AE, 0xA0, 0x28}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON, 2, 2, "GUI_NEWPLAYER", 3, {0xA0, 0x1AE, 0xA0, 0x28}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON, 3, 2, "GUI_REMOVE", 3, {0x140, 0x1AE, 0xA0, 0x28}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON, 1, 2, "GUI_OK", 3, {0x1E0, 0x1AE, 0xA0, 0x28}, 1, 0, 0, 0, 0, 0, {0}, 0},
@@ -53,7 +53,7 @@ static jkGuiElement jkGuiPlayer_menuNewElements[12] = {
     { ELEMENT_CHECKBOX, 0, 0, "GUI_MED", 0, {0xC8, 0x154, 0xC8, 0x14}, 1, 0, 0, 0, jkGuiPlayer_DifficultyDraw, 0, {0}, 0},
     { ELEMENT_CHECKBOX, 0, 0, "GUI_HARD", 0, {0xC8, 0x172, 0xC8, 0x14}, 1, 0, 0, 0, jkGuiPlayer_DifficultyDraw, 0, {0}, 0},
     { ELEMENT_TEXT, 0, 0, 0, 3, {0, 0x19A, 0x280, 0x14}, 1, 0, 0, 0, 0, 0, {0}, 0},
-    { ELEMENT_TEXTBUTTON, 0xFFFFFFFF, 2, "GUI_CANCEL", 3, {0x14, 0x1AE, 0xC8, 0x28}, 1, 0, 0, 0, 0, 0, {0}, 0},
+    { ELEMENT_TEXTBUTTON, -1, 2, "GUI_CANCEL", 3, {0x14, 0x1AE, 0xC8, 0x28}, 1, 0, 0, 0, 0, 0, {0}, 0},
     { ELEMENT_TEXTBUTTON, 1, 2, "GUI_OK", 3, {0x1A4, 0x1AE, 0xC8, 0x28}, 1, 0, 0, 0, 0, 0, {0}, 0},
     { ELEMENT_END, 0, 0, 0, 0, {0}, 0, 0, 0, 0, 0, 0, {0}, 0},
 };

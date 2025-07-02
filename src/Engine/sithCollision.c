@@ -41,7 +41,7 @@ int sithCollision_Startup()
     sithCollision_RegisterCollisionHandler(SITH_THING_WEAPON, SITH_THING_COG, sithWeapon_Collide, 0);
     sithCollision_RegisterCollisionHandler(SITH_THING_ITEM, SITH_THING_PLAYER, sithItem_Collide, 0);
 
-    sithCollision_RegisterHitHandler(SITH_THING_ACTOR, (void*)sithActor_sub_4ED1D0);
+    sithCollision_RegisterHitHandler(SITH_THING_ACTOR, sithActor_sub_4ED1D0);
     sithCollision_RegisterHitHandler(SITH_THING_WEAPON, sithWeapon_HitDebug);
 
     sithCollision_initted = 1;
@@ -58,7 +58,7 @@ int sithCollision_Shutdown()
     return result;
 }
 
-void sithCollision_RegisterCollisionHandler(int type1, int type2, void* pProcessFunc, void* a4)
+void sithCollision_RegisterCollisionHandler(int type1, int type2, sithCollision_collisionHandler_t pProcessFunc, sithCollision_searchHandler_t a4)
 {
     int idx = type2 + 12 * type1;
     sithCollision_collisionHandlers[idx].handler = pProcessFunc;
@@ -73,7 +73,7 @@ void sithCollision_RegisterCollisionHandler(int type1, int type2, void* pProcess
     }
 }
 
-void sithCollision_RegisterHitHandler(int type, void* a2)
+void sithCollision_RegisterHitHandler(int type, sithCollisionHitHandler_t a2)
 {
     sithCollision_funcList[type] = a2;
 }

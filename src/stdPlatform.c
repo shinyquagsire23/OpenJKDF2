@@ -91,7 +91,7 @@ for (int i = 0; i < len; i++)
 
 static int Linux_stdFileClose(stdFile_t fhand)
 {
-    int ret = fclose((void*)fhand);
+    int ret = fclose((FILE*)fhand);
 
 #ifdef ARCH_WASM
     EM_ASM(
@@ -107,32 +107,32 @@ static int Linux_stdFileClose(stdFile_t fhand)
 
 static size_t Linux_stdFileRead(stdFile_t fhand, void* dst, size_t len)
 {
-    size_t val =  fread(dst, 1, len, (void*)fhand);
+    size_t val =  fread(dst, 1, len, (FILE*)fhand);
 
     return val;
 }
 
 static size_t Linux_stdFileWrite(stdFile_t fhand, void* dst, size_t len)
 {
-    return fwrite(dst, 1, len, (void*)fhand);
+    return fwrite(dst, 1, len, (FILE*)fhand);
 }
 
 static const char* Linux_stdFileGets(stdFile_t fhand, char* dst, size_t len)
 {
-    return fgets(dst, len, (void*)fhand);
+    return fgets(dst, len, (FILE*)fhand);
 }
 
 static int Linux_stdFseek(stdFile_t fhand, int a, int b)
 {
     //printf("fseek? %x %x\n", a, b);
-    int ret = fseek((void*)fhand, a, b);
+    int ret = fseek((FILE*)fhand, a, b);
     //printf("fseek %x\n", ret);
     return ret;
 }
 
 static int Linux_stdFtell(stdFile_t fhand)
 {
-    return ftell((void*)fhand);
+    return ftell((FILE*)fhand);
 }
 
 static void* Linux_alloc(uint32_t len)
@@ -179,7 +179,9 @@ void stdPlatform_InitServices(HostServices *handlers)
     handlers->errorPrint = stdPlatform_Printf;
     handlers->some_float = 1000.0;
     handlers->debugPrint = 0;
+#ifndef PLATFORM_POSIX
     handlers->assert = stdPlatform_Assert;
+#endif
     handlers->unk_0 = 0;
 #ifndef PLATFORM_POSIX
     handlers->alloc = daAlloc;
@@ -197,12 +199,12 @@ void stdPlatform_InitServices(HostServices *handlers)
     handlers->fileSize = stdFileSize;
     handlers->filePrintf = stdFilePrintf;
     handlers->fileGetws = stdFileGetws;
-#endif
     handlers->allocHandle = stdPlatform_AllocHandle;
     handlers->freeHandle = stdPlatform_FreeHandle;
     handlers->reallocHandle = stdPlatform_ReallocHandle;
     handlers->lockHandle = stdPlatform_LockHandle;
     handlers->unlockHandle = stdPlatform_UnlockHandle;
+#endif
     
 #ifdef PLATFORM_POSIX
     handlers->alloc = Linux_alloc;

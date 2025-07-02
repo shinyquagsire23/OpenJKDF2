@@ -27,9 +27,9 @@ void sithConsole_PrintUniStr(const wchar_t *a1);
 int sithConsole_TryCommand(const char *cmd);
 int sithConsole_sub_4DA100();
 void sithConsole_AdvanceLogBuf();
-int sithConsole_RegisterDevCmd(DebugConsoleCmd_t fn, char *cmd, int extra);
-int sithConsole_SetPrintFuncs(void *a1, void *a2);
-int sithConsole_PrintHelp();
+int sithConsole_RegisterDevCmd(DebugConsoleCmd_t fn, const char *cmd, int extra);
+int sithConsole_SetPrintFuncs(DebugConsolePrintFunc_t a1, DebugConsolePrintUniStrFunc_t a2);
+int sithConsole_PrintHelp(stdDebugConsoleCmd* a, const char* b);
 void sithConsole_AlertSound();
 
 #endif // _DEVICES_SITHCONSOLE_H

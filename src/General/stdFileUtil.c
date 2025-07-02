@@ -21,7 +21,7 @@
 #include "external/fcaseopen/fcaseopen.h"
 #endif
 
-stdFileSearch* stdFileUtil_NewFind(char *path, int a2, char *extension)
+stdFileSearch* stdFileUtil_NewFind(const char *path, int a2, const char *extension)
 {
     stdFileSearch* search = (stdFileSearch *)std_pHS->alloc(sizeof(stdFileSearch));
     if ( !search ) {

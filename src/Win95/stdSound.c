@@ -157,7 +157,7 @@ void stdSound_SetMenuVolume(flex_t a1)
 
 stdSound_buffer_t* stdSound_BufferCreate(int bStereo, uint32_t nSamplesPerSec, uint16_t bitsPerSample, int bufferLen)
 {
-    stdSound_buffer_t* out = std_pHS->alloc(sizeof(stdSound_buffer_t));
+    stdSound_buffer_t* out = (stdSound_buffer_t*)std_pHS->alloc(sizeof(stdSound_buffer_t));
     if (!out)
         return NULL;
     
@@ -252,8 +252,8 @@ int stdSound_BufferUnlock(stdSound_buffer_t* sound, void* buffer, int bufferRead
         memcpy(tmp, sound->data, sound->bufferBytes);
         memset(sound->data, 0, sound->bufferBytes);
 
-        uint8_t* tmp_8 = tmp;
-        int16_t* out_16 = sound->data;
+        uint8_t* tmp_8 = (uint8_t*)tmp;
+        int16_t* out_16 = (int16_t*)sound->data;
         for (size_t i = 0; i < sound->bufferBytes / 3; i += 1)
         {
             uint32_t val = 0;
@@ -409,7 +409,7 @@ void stdSound_BufferSetFrequency(stdSound_buffer_t* sound, int freq)
 stdSound_buffer_t* stdSound_BufferDuplicate(stdSound_buffer_t* sound)
 {
 #if 1
-    stdSound_buffer_t* out = std_pHS->alloc(sizeof(stdSound_buffer_t));
+    stdSound_buffer_t* out = (stdSound_buffer_t*)std_pHS->alloc(sizeof(stdSound_buffer_t));
     if (!out)
         return NULL;
     

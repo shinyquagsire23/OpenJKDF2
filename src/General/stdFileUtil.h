@@ -40,7 +40,7 @@ typedef struct stdFileSearchResult
     int time_write;
 } stdFileSearchResult;
 
-stdFileSearch* stdFileUtil_NewFind(char *path, int a2, char *extension);
+stdFileSearch* stdFileUtil_NewFind(const char *path, int a2, const char *extension);
 int stdFileUtil_FindNext(stdFileSearch *a1, stdFileSearchResult *a2);
 void stdFileUtil_DisposeFind(stdFileSearch *search);
 

@@ -1129,6 +1129,8 @@ void sithControl_PlayerLook(sithThing *player, flex_t deltaSecs)
     flex_d_t v12; // st6
     rdVector3 a2; // [esp+8h] [ebp-Ch] BYREF
 
+    flex_t local_10 = 0.0;
+
     v3 = 0;
     if ( (player->type == SITH_THING_ACTOR || player->type == SITH_THING_PLAYER) && deltaSecs != 0.0 )
     {
@@ -1137,7 +1139,7 @@ void sithControl_PlayerLook(sithThing *player, flex_t deltaSecs)
             if ( (sithWeapon_controlOptions & 4) == 0 && !sithControl_ReadFunctionMap(INPUT_FUNC_MLOOK, 0) )
                 goto LABEL_20;
 
-            flex_t local_10 = 0.0;
+            
             a2 = player->actorParams.eyePYR;
 
             // Map directly to axis, the value we have is an angular velocity
@@ -1820,7 +1822,7 @@ void sithControl_sub_4D6930(int funcIdx)
     sithControl_inputFuncToControlType[funcIdx] = 5;
 }
 
-stdControlKeyInfo* sithControl_EnumBindings(sithControlEnumFunc_t pfEnumFunction, int a2, int a3, int a4, void *a5)
+stdControlKeyInfo* sithControl_EnumBindings(sithControlEnumFunc_t pfEnumFunction, int a2, int a3, int a4, Darray *a5)
 {
     stdControlKeyInfo *result; // eax
     int v6; // ebp
@@ -1830,7 +1832,7 @@ stdControlKeyInfo* sithControl_EnumBindings(sithControlEnumFunc_t pfEnumFunction
     int v10; // ecx
     int v11; // ebx
     stdControlKeyInfoEntry *v12; // edi
-    void *v13; // edi
+    Darray *v13; // edi
     stdControlKeyInfoEntry *i; // [esp+10h] [ebp-1Ch]
     unsigned int v16; // [esp+14h] [ebp-18h]
     int v17; // [esp+18h] [ebp-14h]

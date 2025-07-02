@@ -34,12 +34,12 @@ static jkGuiElement jkGuiSaveLoad_aElements[15] = {
     {ELEMENT_TEXT, 0, 0, jkGuiSaveLoad_wtextHealth, 0x0, {0x190, 0x14A, 0x0C8, 0x14}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXT, 0, 0, jkGuiSaveLoad_wtextShields, 0, {0x190, 0x168, 0x0C8, 0x14}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON, 1, 2, "GUI_OK", 3, {0x1B8, 0x1AE, 0x0C8, 0x28}, 1, 0, 0, 0, 0, 0, {0}, 0},
-    {ELEMENT_TEXTBUTTON, 0xFFFFFFFF, 0x2, "GUI_CANCEL", 3, {0, 0x1AE, 0x0C8, 0x28}, 1, 0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_TEXTBUTTON, -1, 0x2, "GUI_CANCEL", 3, {0, 0x1AE, 0x0C8, 0x28}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON, 0, 2, "GUI_SLDELETE", 3, {0xE6, 0x1AE, 0x0B4, 0x28}, 1, 0, 0, 0, jkGuiSaveLoad_DeleteOnClick, 0, {0}, 0},
     {ELEMENT_END, 0, 0, 0, 0, {0}, 0, 0, 0, 0, 0, 0, {0}, 0},
 };
 
-static jkGuiMenu jkGuiSaveLoad_menu = {jkGuiSaveLoad_aElements, 0xFFFFFFFF, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
+static jkGuiMenu jkGuiSaveLoad_menu = {jkGuiSaveLoad_aElements, -1, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 
 int jkGuiSaveLoad_ListClick(jkGuiElement *element, jkGuiMenu *menu, int mouseX, int mouseY, BOOL redraw)
 {

@@ -27,7 +27,7 @@ static jkGuiElement jkGuiObjectives_elements[6] = {
     {ELEMENT_END,           0,  0,  0,  0, {0},  0,  0,  0,  0,  0,  0, {0},  0}
 };
 
-static jkGuiMenu jkGuiObjectives_menu = {jkGuiObjectives_elements, 0xFFFFFFFF, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
+static jkGuiMenu jkGuiObjectives_menu = {jkGuiObjectives_elements, -1, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 
 void jkGuiObjectives_CustomRender(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int bRedraw)
 {

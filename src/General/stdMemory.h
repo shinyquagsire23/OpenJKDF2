@@ -24,8 +24,8 @@ stdMemoryAlloc* stdMemory_BlockAlloc(unsigned int allocSize, char *filePath, int
 void stdMemory_BlockFree(stdMemoryAlloc *alloc);
 stdMemoryAlloc* stdMemory_BlockRealloc(stdMemoryAlloc *alloc, int allocSize, char *filePath, int lineNum);
 
-static void* (*daAlloc)(uint32_t) = (void*)daAlloc_ADDR;
-static void (*daFree)(void*) = (void*)daFree_ADDR;
-static void* (*daRealloc)(void*, uint32_t) = (void*)daRealloc_ADDR;
+//static void* (*daAlloc)(uint32_t) = (void*)daAlloc_ADDR;
+//static void (*daFree)(void*) = (void*)daFree_ADDR;
+//static void* (*daRealloc)(void*, uint32_t) = (void*)daRealloc_ADDR;
 
 #endif // _STDMEMORY_H

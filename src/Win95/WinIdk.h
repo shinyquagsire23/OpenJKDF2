@@ -13,7 +13,7 @@ void WinIdk_SetDplayGuid(uint32_t *guid);
 uint32_t *__cdecl WinIdk_GetDplayGuid();
 int WinIdk_detect_cpu(char *a1);
 
-static int (*WinIdk_PrintConsole)(HWND hWnd, LPARAM lParam, int a3) = (void*)WinIdk_PrintConsole_ADDR;
+//static int (*WinIdk_PrintConsole)(HWND hWnd, LPARAM lParam, int a3) = (void*)WinIdk_PrintConsole_ADDR;
 
 // this is technically in another file?
 //static int (*WinIdk_detect_cpu)(char *a1) = (void*)WinIdk_detect_cpu_ADDR;

@@ -29,8 +29,8 @@
 
 int sithCollision_Startup();
 int sithCollision_Shutdown();
-void sithCollision_RegisterCollisionHandler(int idxA, int idxB, void* func, void* a4);
-void sithCollision_RegisterHitHandler(int type, void* a2);
+void sithCollision_RegisterCollisionHandler(int idxA, int idxB, sithCollision_collisionHandler_t func, sithCollision_searchHandler_t a4);
+void sithCollision_RegisterHitHandler(int type, sithCollisionHitHandler_t a2);
 #if 1
 sithCollisionSearchEntry* sithCollision_NextSearchResult();
 flex_t sithCollision_SearchRadiusForThings(sithSector* pStartSector, sithThing* pThing, const rdVector3* pStartPos, const rdVector3* pMoveNorm, flex_t moveDist, flex_t radius, int flags);

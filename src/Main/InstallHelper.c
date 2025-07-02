@@ -42,7 +42,7 @@ int InstallHelper_copy(const char* in_path, const char* out_path)
 {
     size_t n;
     FILE* in=NULL, * out=NULL;
-    char* buf = calloc(BUF_SIZE, 1);
+    char* buf = (char*)calloc(BUF_SIZE, 1);
     if((in = fopen(in_path, "rb")) && (out = fopen(out_path, "wb")))
     while((n = fread(buf, 1, BUF_SIZE, in)) && fwrite(buf, 1, n, out));
     free(buf);
@@ -62,14 +62,14 @@ int InstallHelper_CopyFile(const char* pFolder, const char* pName)
     strncpy(tmpTo, pName, sizeof(tmpTo)-1);
 
 #ifdef LINUX
-    char *r = malloc(strlen(tmp) + 16);
+    char *r = (char*)malloc(strlen(tmp) + 16);
     if (casepath(tmp, r))
     {
         strcpy(tmp, r);
     }
     free(r);
 
-    r = malloc(strlen(tmpTo) + 16);
+    r = (char*)malloc(strlen(tmpTo) + 16);
     if (casepath(tmpTo, r))
     {
         strcpy(tmpTo, r);
@@ -154,14 +154,14 @@ int InstallHelper_CopyFileDisk(const char* pFolder, const char* pName)
     strncpy(tmpTo, pName, sizeof(tmpTo)-1);
 
 #ifdef LINUX
-    char *r = malloc(strlen(tmp) + 16);
+    char *r = (char*)malloc(strlen(tmp) + 16);
     if (casepath(tmp, r))
     {
         strcpy(tmp, r);
     }
     free(r);
 
-    r = malloc(strlen(tmpTo) + 16);
+    r = (char*)malloc(strlen(tmpTo) + 16);
     if (casepath(tmpTo, r))
     {
         strcpy(tmpTo, r);
@@ -1020,7 +1020,7 @@ void InstallHelper_CheckRequiredAssets(int doInstall)
 
     if (!missingRequireds) return;
 
-    bigList = malloc(bigList_len);
+    bigList = (char*)malloc(bigList_len);
     if (!bigList) return;
     memset(bigList, 0, bigList_len);
 

@@ -19,7 +19,7 @@ void rdActive_ClearFrameCounters();
 
 //static int (*rdActive_Startup)(void) = (void*)rdActive_Startup_ADDR;
 //static void (*__cdecl rdActive_AdvanceFrame)(void) = (void*)rdActive_AdvanceFrame_ADDR;
-static void (*__cdecl rdActive_DrawScene)(void) = (void*)rdActive_DrawScene_ADDR;
+//static void (*__cdecl rdActive_DrawScene)(void) = (void*)rdActive_DrawScene_ADDR;
 //static void (*rdActive_ClearFrameCounters)(void) = (void*)rdActive_ClearFrameCounters_ADDR;
 
 #endif // _RDACTIVE_H

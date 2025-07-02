@@ -417,9 +417,9 @@ void yyerror(char* s)
 int
 yyparse()
 {
-    register int yym, yyn, yystate;
+    /*register*/  int yym, yyn, yystate;
 #if YYDEBUG
-    register char *yys;
+    /*register*/  char *yys;
     extern char *getenv();
 
     if (yys = getenv("YYDEBUG"))

@@ -66,7 +66,7 @@ static jkGuiElement jkGuiGameplay_buttons[45] = {
     {ELEMENT_CHECKBOX, 0, 0, 0, 0, {360, 350, 40, 20}, 1, 0, "GUI_KEEPSABER_HINT", 0, 0, 0, {0}, 0},
 
     {ELEMENT_TEXTBUTTON, 1, 2, "GUI_OK", 3, {440, 430, 200, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
-    {ELEMENT_TEXTBUTTON, 0XFFFFFFFF, 2, "GUI_CANCEL", 3, {0, 430, 200, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_TEXTBUTTON, -1, 2, "GUI_CANCEL", 3, {0, 430, 200, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
 
 #ifdef QOL_IMPROVEMENTS
     {ELEMENT_CHECKBOX, 0, 0, "GUIEXT_SHOW_SABER_CROSSHAIR", 0, {30, 230, 270, 20}, 1, 0, "GUIEXT_SHOW_SABER_CROSSHAIR_HINT", 0, 0, 0, {0}, 0},

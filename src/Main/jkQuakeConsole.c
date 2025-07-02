@@ -244,14 +244,14 @@ void jkQuakeConsole_Render()
     if (jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]) {
         flex_t scaleX = screenW / jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]->mipSurfaces[0]->format.width;
         flex_t scaleY = screenH / jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]->mipSurfaces[0]->format.height;
-        rdRect srcRect = {0,20,jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]->mipSurfaces[0]->format.width, jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]->mipSurfaces[0]->format.height*0.5};
+        rdRect srcRect = {0,20,jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]->mipSurfaces[0]->format.width, (int)(jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]->mipSurfaces[0]->format.height*0.5)};
         std3D_DrawUIBitmapRGBA(jkGui_stdBitmaps[JKGUI_BM_BK_MAIN], 0, 0.0, realShadeY, &srcRect, scaleX, scaleY, 0, 80, 80, 80, 192);
 
         rdRect srcRect2 = {0,jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]->mipSurfaces[0]->format.height-4, 1, 2};
         std3D_DrawUIBitmapRGBA(jkGui_stdBitmaps[JKGUI_BM_BK_MAIN], 0, 0.0, realShadeBottom, &srcRect2, (flex_t)screenW, scaleY, 0, 255, 255, 255, 255);
     }
     else {
-        rdRect rect = {0, realShadeY, screenW, screenH / 2};
+        rdRect rect = {0, (int)(realShadeY), (int)(screenW), (int)(screenH / 2)};
         std3D_DrawUIClearedRectRGBA(0, 0, 0, 128, &rect);
     }
 
@@ -766,7 +766,7 @@ void jkQuakeConsole_PrintLine(const char* pLine)
         jkQuakeConsole_aLines[i] = jkQuakeConsole_aLines[i-1];
     }
 
-    char* pNewLine = malloc(strlen(pLine)+2);
+    char* pNewLine = (char*)malloc(strlen(pLine)+2);
     strcpy(pNewLine, pLine);
 
     jkQuakeConsole_aLines[0] = pNewLine;
@@ -795,7 +795,7 @@ void jkQuakeConsole_RecordHistory(const char* pLine)
         jkQuakeConsole_aLastCommands[i] = jkQuakeConsole_aLastCommands[i-1];
     }
 
-    char* pNewLine = malloc(strlen(pLine)+2);
+    char* pNewLine = (char*)malloc(strlen(pLine)+2);
     strcpy(pNewLine, pLine);
 
     jkQuakeConsole_aLastCommands[0] = pNewLine;

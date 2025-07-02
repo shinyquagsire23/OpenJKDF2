@@ -356,11 +356,11 @@ static size_t _ftoa(out_fct_type out, wchar_t* buffer, size_t idx, size_t maxlen
 
   // test for special values
   if (value != value)
-    return _out_rev(out, buffer, idx, maxlen, "nan", 3, width, flags);
+    return _out_rev(out, buffer, idx, maxlen, L"nan", 3, width, flags);
   if (value < -DBL_MAX)
-    return _out_rev(out, buffer, idx, maxlen, "fni-", 4, width, flags);
+    return _out_rev(out, buffer, idx, maxlen, L"fni-", 4, width, flags);
   if (value > DBL_MAX)
-    return _out_rev(out, buffer, idx, maxlen, (flags & FLAGS_PLUS) ? "fni+" : "fni", (flags & FLAGS_PLUS) ? 4U : 3U, width, flags);
+    return _out_rev(out, buffer, idx, maxlen, (flags & FLAGS_PLUS) ? L"fni+" : L"fni", (flags & FLAGS_PLUS) ? 4U : 3U, width, flags);
 
   // test for very large values
   // standard printf behavior is to print EVERY whole number digit -- which could be 100s of characters overflowing your buffers == bad

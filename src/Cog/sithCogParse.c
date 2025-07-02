@@ -511,12 +511,12 @@ void sithCogParse_SetSymbolVal(sithCogSymbol *a1, sithCogStackvar *a2)
 
 sithCogSymbol* sithCogParse_GetSymbolVal(sithCogSymboltable *pSymbolTable, char *a2)
 {
-    void *result; // eax
+    sithCogSymbol *result; // eax
 
     if (!pSymbolTable->hashtable)
         return NULL;
     
-    if (result = stdHashTable_GetKeyVal(pSymbolTable->hashtable, a2))
+    if (result = (sithCogSymbol*)stdHashTable_GetKeyVal(pSymbolTable->hashtable, a2))
         return result;
 
     if (pSymbolTable == sithCog_pSymbolTable) {

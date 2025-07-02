@@ -24,7 +24,7 @@ void sithTemplate_Shutdown()
 
 int sithTemplate_New(sithWorld *world, unsigned int numTemplates)
 {
-    world->templates = pSithHS->alloc(sizeof(sithThing) * numTemplates);
+    world->templates = (sithThing*)pSithHS->alloc(sizeof(sithThing) * numTemplates);
     if (!world->templates)
         return 0;
 
@@ -156,12 +156,12 @@ sithThing* sithTemplate_CreateEntry(sithWorld *world)
     sithThing *result;
     sithThing tmp;
 
-    result = (sithThing *)stdHashTable_GetKeyVal(sithTemplate_hashmap, stdConffile_entry.args[0].value);
+    result = (sithThing *)stdHashTable_GetKeyVal(sithTemplate_hashmap, (const char*)stdConffile_entry.args[0].value);
     if ( result )
         return result;
 
     sithThing_DoesRdThingInit(&tmp);
-    result = stdHashTable_GetKeyVal(sithTemplate_hashmap, stdConffile_entry.args[1].value);
+    result = (sithThing *)stdHashTable_GetKeyVal(sithTemplate_hashmap, (const char*)stdConffile_entry.args[1].value);
     sithThing_InstantiateFromTemplate(&tmp, result);
 
     _strncpy(tmp.template_name, stdConffile_entry.args[0].value, 0x1Fu);

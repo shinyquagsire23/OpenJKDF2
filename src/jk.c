@@ -228,10 +228,10 @@ int (*jk_printf)(const char* fmt, ...) = (void*)0x426E60;
 #define LONG_MIN (~LONG_MAX)
 #endif
 
-long jk_wcstol(const wchar_t *restrict nptr, wchar_t **restrict endptr, int base)
+long jk_wcstol(const wchar_t */*restrict*/ nptr, wchar_t **/*restrict*/ endptr, int base)
 {
     const wchar_t *p = nptr, *endp;
-    _Bool is_neg = 0, overflow = 0;
+    int is_neg = 0, overflow = 0;
     /* Need unsigned so (-LONG_MIN) can fit in these: */
     unsigned long n = 0UL, cutoff;
     int cutlim;
@@ -299,8 +299,8 @@ long jk_wcstol(const wchar_t *restrict nptr, wchar_t **restrict endptr, int base
 
 int _memcmp (const void* str1, const void* str2, size_t count)
 {
-  register const unsigned char *s1 = (const unsigned char*)str1;
-  register const unsigned char *s2 = (const unsigned char*)str2;
+  /*register*/ const unsigned char *s1 = (const unsigned char*)str1;
+  /*register*/ const unsigned char *s2 = (const unsigned char*)str2;
 
   while (count-- > 0)
     {
@@ -755,7 +755,7 @@ size_t _strspn(const char* a, const char* b)
     return strspn(a,b);
 }
 
-char* _strpbrk(const char* a, const char* b)
+const char* _strpbrk(const char* a, const char* b)
 {
     return strpbrk(a,b);
 }
@@ -769,7 +769,7 @@ size_t _wcslen(const wchar_t * str)
 
 char* _strstr(const char* a, const char* b)
 {
-    return strstr(a,b);
+    return strstr((char*)a,(char*)b);
 }
 
 int jk_snwprintf(wchar_t *a1, size_t a2, const wchar_t *fmt, ...)

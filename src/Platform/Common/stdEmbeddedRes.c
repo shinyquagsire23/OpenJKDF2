@@ -54,7 +54,7 @@ for (int i = 0; i < strlen(tmp_filepath); i++)
         size_t len = ftell(f);
         rewind(f);
         
-        file_contents = malloc(len+1);
+        file_contents = (char*)malloc(len+1);
         
         if (fread(file_contents, 1, len, f) != len)
         {
@@ -86,7 +86,7 @@ for (int i = 0; i < strlen(tmp_filepath); i++)
     for (size_t i = 0; i < embeddedResource_aFiles_num; i++)
     {
         if (!strcmp(embeddedResource_aFiles[i].fpath, tmp_filepath)) {
-            file_contents = malloc(embeddedResource_aFiles[i].data_len+1);
+            file_contents = (char*)malloc(embeddedResource_aFiles[i].data_len+1);
             memcpy(file_contents, embeddedResource_aFiles[i].data, embeddedResource_aFiles[i].data_len);
             file_contents[embeddedResource_aFiles[i].data_len] = 0;
 
@@ -121,7 +121,7 @@ for (int i = 0; i < strlen(tmp_filepath); i++)
 #endif
 
 #ifdef FS_POSIX
-    char *r = malloc(strlen(tmp_filepath) + 16);
+    char *r = (char*)malloc(strlen(tmp_filepath) + 16);
     if (casepath(tmp_filepath, r))
     {
         strcpy(tmp_filepath, r);
@@ -138,7 +138,7 @@ retry_file:
         size_t len = ftell(f);
         rewind(f);
         
-        file_contents = malloc(len+1);
+        file_contents = (char*)malloc(len+1);
         
         if (fread(file_contents, 1, len, f) != len)
         {
@@ -181,7 +181,7 @@ retry_file:
         for (size_t i = 0; i < embeddedResource_aFiles_num; i++)
         {
             if (!strcmp(embeddedResource_aFiles[i].fpath, tmp_filepath)) {
-                file_contents = malloc(embeddedResource_aFiles[i].data_len+1);
+                file_contents = (char*)malloc(embeddedResource_aFiles[i].data_len+1);
                 memcpy(file_contents, embeddedResource_aFiles[i].data, embeddedResource_aFiles[i].data_len);
                 file_contents[embeddedResource_aFiles[i].data_len] = 0;
 

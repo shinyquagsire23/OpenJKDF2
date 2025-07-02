@@ -48,7 +48,7 @@ void sithRender_RenderDynamicLights();
 void sithRender_RenderThings();
 int sithRender_RenderThing(sithThing *povThing);
 void sithRender_RenderAlphaSurfaces();
-int sithRender_SetRenderWeaponHandle(void *a1);
+int sithRender_SetRenderWeaponHandle(sithRender_weapRendFunc_t a1);
 void sithRender_WorldFlash(flex_t arg1,flex_t arg2);
 
 // Added

@@ -5,6 +5,10 @@
 #include "rdVector.h"
 #include "hook.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define rdMatrix_Build34_ADDR (0x0043F6F0)
 #define rdMatrix_BuildFromLook34_ADDR (0x0043F820)
 #define rdMatrix_BuildCamera34_ADDR (0x0043F990)
@@ -124,6 +128,10 @@ void rdMatrix_Print34(const rdMatrix34 *viewMat);
 
 extern const rdMatrix34 rdroid_identMatrix34;
 extern const rdMatrix44 rdroid_identMatrix44;
+
+#ifdef __cplusplus
+}
+#endif
 
 //static void (*_rdMatrix_ExtractAngles34)(const rdMatrix34 *in, rdVector3 *out) = (void*)rdMatrix_ExtractAngles34_ADDR;
 

@@ -192,13 +192,13 @@ uint8_t* md5String(char *input){
 	md5Update(&ctx, (uint8_t *)input, strlen(input));
 	md5Finalize(&ctx);
 
-	uint8_t *result = malloc(16);
+	uint8_t *result = (uint8_t*)malloc(16);
 	memcpy(result, ctx.digest, 16);
 	return result;
 }
 
 uint8_t* md5File(FILE *file){
-	char *input_buffer = malloc(1024);
+	char *input_buffer = (char*)malloc(1024);
 	size_t input_size = 0;
 
 	MD5Context ctx;
@@ -212,7 +212,7 @@ uint8_t* md5File(FILE *file){
 
 	free(input_buffer);
 
-	uint8_t *result = malloc(16);
+	uint8_t *result = (uint8_t*)malloc(16);
 	memcpy(result, ctx.digest, 16);
 	return result;
 }

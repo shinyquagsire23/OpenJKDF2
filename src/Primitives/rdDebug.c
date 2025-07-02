@@ -85,7 +85,7 @@ void rdDebug_DrawBoundingBox(rdMatrix34* m, flex_t radius, uint32_t color)
     rdVector3 verts[8];
     
     rdVector3 v1, v2;
-    rdVector3 r3 = {0.3*radius, 0.3*radius, 0.3*radius};
+    rdVector3 r3 = {0.3f*radius, 0.3f*radius, 0.3f*radius};
     rdVector_Zero3(&v1);
     rdVector_Zero3(&v2);
     rdVector_Sub3Acc(&v1, &r3);

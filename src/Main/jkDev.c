@@ -455,7 +455,7 @@ void jkDev_sub_41FC90(int a1)
         jkDev_aEntries[v1].timeMsExpiration = 0;
 }
 
-int jkDev_RegisterCmd(void *pfCheatFunc, const char *pCryptCheatStr, const char *pCheatFlavortext, int extra)
+int jkDev_RegisterCmd(DebugConsoleCmd_t pfCheatFunc, const char *pCryptCheatStr, const char *pCheatFlavortext, int extra)
 {
     if ( jkDev_numCheats == JKDEV_NUM_CHEATS )
         return 0;

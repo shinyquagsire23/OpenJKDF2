@@ -3,6 +3,10 @@
 
 #include "types.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define rdVector_Set2_ADDR    (0x00449280)
 #define rdVector_Set3_ADDR    (0x004492A0)
 #define rdVector_Set4_ADDR    (0x004492C0)
@@ -134,5 +138,9 @@ void rdVector_ClipPrecision3(rdVector3* v);
 void rdVector_NormalizeAngleAcute3(rdVector3* v);
 void rdVector_ClampRange3(rdVector3* v, flex_t minVal, flex_t maxVal);
 void rdVector_ClampValue3(rdVector3* v, flex_t val);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _RDVECTOR_H

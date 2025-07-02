@@ -650,7 +650,7 @@ void stdControl_ToggleCursor(int a)
         }
     }
 
-    SDL_SetRelativeMouseMode(!!a);
+    SDL_SetRelativeMouseMode((SDL_bool)!!a);
 }
 
 static int _cursorState = 0;

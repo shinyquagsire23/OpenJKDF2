@@ -69,7 +69,7 @@ int stdStrTable_Load(stdStrTable *strtable, char *fpath)
         return 0;
     }
     strtable->numMsgs = numMsgs;
-    strtable->msgs = std_pHS->alloc(sizeof(stdStrMsg) * numMsgs);
+    strtable->msgs = (stdStrMsg*)std_pHS->alloc(sizeof(stdStrMsg) * numMsgs);
     if ( !strtable->msgs )
         std_pHS->assert("Out of memory--cannot load string table", ".\\General\\stdStrTable.c", 120);
     _memset(strtable->msgs, 0, sizeof(stdStrMsg) * numMsgs);

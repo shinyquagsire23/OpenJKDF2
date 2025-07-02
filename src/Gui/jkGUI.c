@@ -160,7 +160,7 @@ int jkGui_Startup()
     }
 
     Window_ShowCursorUnwindowed(Main_bWindowGUI == 0);
-    jkGuiRend_SetPalette(jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]->palette);
+    jkGuiRend_SetPalette((uint8_t*)jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]->palette);
     jkGui_bInitialized = 1;
     return 1;
 }

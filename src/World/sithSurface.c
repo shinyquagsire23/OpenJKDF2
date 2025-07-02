@@ -251,19 +251,19 @@ int sithSurface_Load(sithWorld *world)
         if ( v34 > 0x18 )
             return 0;
 
-        face->vertexPosIdx = pSithHS->alloc(sizeof(int) * v34);
+        face->vertexPosIdx = (int*)pSithHS->alloc(sizeof(int) * v34);
         if ( !face->vertexPosIdx )
             return 0;
 
 #ifndef JKM_LIGHTING
-        surfaceInfo->intensities = pSithHS->alloc(sizeof(flex_t) * v34);
+        surfaceInfo->intensities = (flex_t*)pSithHS->alloc(sizeof(flex_t) * v34);
         if ( !surfaceInfo->intensities )
             return 0;
 #endif
 
         if (face->material && (face->material->tex_type & 2))
         {
-            face->vertexUVIdx = pSithHS->alloc(sizeof(int) * v34);
+            face->vertexUVIdx = (int*)pSithHS->alloc(sizeof(int) * v34);
             if ( !face->vertexUVIdx )
                 return 0;
 
@@ -309,7 +309,7 @@ int sithSurface_Load(sithWorld *world)
         testAmt = stdConffile_entry.numArgs - v61;
 
         if (testAmt < v34 * 4) {
-            surfaceInfo->intensities = pSithHS->alloc(sizeof(flex_t) * ((v34 * 4) + 1)); // Added: extra
+            surfaceInfo->intensities = (flex_t*)pSithHS->alloc(sizeof(flex_t) * ((v34 * 4) + 1)); // Added: extra
             memset(surfaceInfo->intensities, 0, sizeof(flex_t) * ((v34 * 4) + 1)); // Added
             if ( !surfaceInfo->intensities )
                 return 0;
@@ -324,7 +324,7 @@ int sithSurface_Load(sithWorld *world)
             surfaceIter->surfaceFlags &= ~SITH_SURFACE_1000000;
         }
         else {
-            surfaceInfo->intensities = pSithHS->alloc(sizeof(flex_t) * ((v34 * 4) + 1));
+            surfaceInfo->intensities = (flex_t*)pSithHS->alloc(sizeof(flex_t) * ((v34 * 4) + 1));
             memset(surfaceInfo->intensities, 0, sizeof(flex_t) * ((v34 * 4) + 1)); // Added
             if ( !surfaceInfo->intensities )
                 return 0;

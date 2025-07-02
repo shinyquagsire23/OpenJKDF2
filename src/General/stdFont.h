@@ -33,13 +33,13 @@ int stdFont_Draw4(stdVBuffer *a1, stdFont *font, int xPos, int yPos, int a5, int
 const wchar_t* stdFont_sub_4352C0(const wchar_t *a1, stdFont *a2, int a3, rdRect *a4, int *a5);
 int stdFont_sub_4357C0(stdFont *a1, const wchar_t *a2, rdRect *a4);
 int stdFont_sub_435810(stdFont *a1, const wchar_t *a2, int a3);
-int stdFont_sub_434EC0(stdVBuffer *a1, stdFont *a2, int a3, int a4, int a5, int *a6, wchar_t *a7, int a8);
+int stdFont_sub_434EC0(stdVBuffer *a1, stdFont *a2, int a3, int a4, int a5, int *a6, const wchar_t *a7, int a8);
 void stdFont_Free(stdFont *font);
 uint32_t stdFont_DrawAscii(stdVBuffer *a1, stdFont *a2, unsigned int blit_x, int blit_y, int x_max, char *str, int alpha_maybe);
 int stdFont_sub_4355B0(stdFont *font, uint16_t a2);
 
-uint32_t stdFont_DrawAsciiGPU(stdFont *a2, unsigned int blit_x, int blit_y, int x_max, char *str, int alpha_maybe, flex_t scale);
-uint32_t stdFont_DrawAsciiWidth(stdFont *a2, unsigned int blit_x, int blit_y, int x_max, char *str, int alpha_maybe, flex_t scale);
+uint32_t stdFont_DrawAsciiGPU(stdFont *a2, unsigned int blit_x, int blit_y, int x_max, const char *str, int alpha_maybe, flex_t scale);
+uint32_t stdFont_DrawAsciiWidth(stdFont *a2, unsigned int blit_x, int blit_y, int x_max, const char *str, int alpha_maybe, flex_t scale);
 int stdFont_Draw4GPU(stdFont *font, int xPos, int yPos, int a5, int a6, int a7, const wchar_t *text, int alpha_maybe, flex_t scale);
 unsigned int stdFont_Draw1GPU(stdFont *font, unsigned int blit_x, int blit_y, int a5, const wchar_t *a6, int alpha_maybe, flex_t scale);
 unsigned int stdFont_Draw1Width(stdFont *font, unsigned int blit_x, int blit_y, int a5, const wchar_t *a6, int alpha_maybe, flex_t scale);

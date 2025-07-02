@@ -502,7 +502,7 @@ void print_backtrace(void)
     }
     full_write(STDERR_FILENO, end, strlen(end));
 
-    char* crash_print = malloc(1024);
+    char* crash_print = (char*)malloc(1024);
     strcpy(crash_print, start);
     for (i = 1; i < bt_size; i++) {
         strcat(crash_print, bt_syms[i]);

@@ -4,6 +4,7 @@
 
 #include "General/stdMath.h"
 #include "Engine/rdroid.h"
+#include "Engine/rdThing.h"
 #include "stdPlatform.h"
 #include "jk.h"
 
@@ -471,7 +472,7 @@ int rdPuppet_AddTrack(rdPuppet *puppet, rdKeyframe *keyframe, int lowPri, int hi
     return result;
 }
 
-void rdPuppet_SetCallback(rdPuppet *a1, int trackNum, void *callback)
+void rdPuppet_SetCallback(rdPuppet *a1, int trackNum, rdPuppetTrackCallback_t callback)
 {
     a1->tracks[trackNum].callback = callback;
 }

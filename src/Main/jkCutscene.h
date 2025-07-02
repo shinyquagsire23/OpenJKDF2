@@ -29,6 +29,6 @@ int jkCutscene_smusher_process();
 //static void (*jkCutscene_Startup)() = (void*)jkCutscene_Startup_ADDR;
 //static void (*jkCutscene_PauseShow)() = (void*)jkCutscene_PauseShow_ADDR;
 //static void (*jkCutscene_sub_421410)() = (void*)jkCutscene_sub_421410_ADDR;
-static int (*_jkCutscene_sub_421310)(char* a1) = (void*)jkCutscene_sub_421310_ADDR;
+//static int (*_jkCutscene_sub_421310)(char* a1) = (void*)jkCutscene_sub_421310_ADDR;
 
 #endif // _JK_CUTSCENE_H

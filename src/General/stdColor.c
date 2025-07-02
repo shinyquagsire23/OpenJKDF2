@@ -1,5 +1,7 @@
 #include "stdColor.h"
 
+#include "jk.h"
+
 int stdColor_Indexed8ToRGB16(uint8_t idx, rdColor24 *pal, rdTexformat *fmt)
 {
     rdColor24 *v3; // esi
@@ -124,4 +126,9 @@ int stdColor_ColorConvertOneRow(uint8_t *outPixels, rdTexformat *formatTo, uint8
         while ( !v21 );
     }
     return result;
+}
+
+int stdColor_GammaCorrect(uint8_t *a1, uint8_t *a2, int a3, flex_d_t a4) {
+    jk_printf("OpenJKDF2: Unimplemented function stdColor_GammaCorrect!!\n");
+    return 1;
 }

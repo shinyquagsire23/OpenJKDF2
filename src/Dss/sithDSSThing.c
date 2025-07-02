@@ -1061,6 +1061,7 @@ int sithDSSThing_ProcessFullDesc(sithCogMsg *msg)
         }
     }
 
+    int playerInfo_idx = -1;
     switch ( thing->type )
     {
         case SITH_THING_ACTOR:
@@ -1075,7 +1076,7 @@ int sithDSSThing_ProcessFullDesc(sithCogMsg *msg)
             thing->actorParams.lightIntensity = NETMSG_POPF32();
             thing->actorParams.field_1BC = NETMSG_POPS32();
             
-            int playerInfo_idx = NETMSG_POPS32();
+            playerInfo_idx = NETMSG_POPS32();
             
             if ( playerInfo_idx >= 0 && playerInfo_idx < 32 )
             {
@@ -1130,7 +1131,7 @@ int sithDSSThing_ProcessFullDesc(sithCogMsg *msg)
         {
             // TODO: verify this doesn't leak memory
             thing->trackParams.sizeFrames = thing->trackParams.loadedFrames;
-            thing->trackParams.aFrames = pSithHS->alloc(sizeof(sithThingFrame) * thing->trackParams.sizeFrames);
+            thing->trackParams.aFrames = (sithThingFrame*)pSithHS->alloc(sizeof(sithThingFrame) * thing->trackParams.sizeFrames);
         }
 
         for (int i = 0; i < thing->trackParams.loadedFrames; i++)

@@ -1211,10 +1211,10 @@ void jkHud_DrawGPU()
         flex_t line_len = v24 - v25 + 1;
         flex_t line_width = jkPlayer_crosshairLineWidth;
 
-        rdRect rect1 = {v22 - v24, v23-(line_width/2), line_len, line_width}; // left
-        rdRect rect2 = {v22 + v25, v23-(line_width/2), line_len, line_width}; // right
-        rdRect rect3 = {v22-(line_width/2), v23 - v24, line_width, line_len}; // up
-        rdRect rect4 = {v22-(line_width/2), v23 + v25, line_width, line_len}; // down
+        rdRect rect1 = {(int)(v22 - v24), (int)(v23-(line_width/2)), (int)(line_len), (int)(line_width)}; // left
+        rdRect rect2 = {(int)(v22 + v25), (int)(v23-(line_width/2)), (int)(line_len), (int)(line_width)}; // right
+        rdRect rect3 = {(int)(v22-(line_width/2)), (int)(v23 - v24), (int)(line_width), (int)(line_len)}; // up
+        rdRect rect4 = {(int)(v22-(line_width/2)), (int)(v23 + v25), (int)(line_width), (int)(line_len)}; // down
 
         std3D_DrawUIClearedRect(tmpInt, &rect1);
         std3D_DrawUIClearedRect(tmpInt, &rect2);

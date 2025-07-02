@@ -2226,7 +2226,7 @@ int jkGuiRend_TextBoxEventHandler(jkGuiElement *element, jkGuiMenu *menu, int ev
         {
             if ( _wcslen((const wchar_t *)v7) < v5->selectedTextEntry - 1 )
             {
-                wchar_t tmp_wchar[2] = {a4, 0}; // Added: ensure null terminator
+                wchar_t tmp_wchar[2] = {(wchar_t)a4, 0}; // Added: ensure null terminator
                 stdString_wstrncat((wchar_t *)v7, v5->selectedTextEntry, v5->texInfo.textHeight, tmp_wchar);
                 v11 = v5->texInfo.textHeight + 1;
                 if ( v11 >= v5->selectedTextEntry - 1 )

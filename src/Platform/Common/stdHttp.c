@@ -16,7 +16,7 @@ char* stdHttp_pDlBuffer = NULL;
 size_t stdHttp_dlBufferMax = 0;
 int32_t stdHttp_dlBufferWritten = 0;
 
-static void* stdHttp_pCaCertBlob = "";
+static void* stdHttp_pCaCertBlob = (void*)"";
 
 static void stdHttp_reset()
 {
@@ -45,7 +45,7 @@ static size_t stdHttp_write_to_buffer(void *contents, size_t size, size_t nmemb,
     int32_t to_write = actual_recv;
 
     if (!stdHttp_pDlBuffer) {
-        stdHttp_pDlBuffer = malloc(to_write*2);
+        stdHttp_pDlBuffer = (char*)malloc(to_write*2);
         memset(stdHttp_pDlBuffer, 0, to_write*2);
         stdHttp_dlBufferMax = to_write*2;
     }
@@ -56,7 +56,7 @@ static size_t stdHttp_write_to_buffer(void *contents, size_t size, size_t nmemb,
         memcpy(tmp, stdHttp_pDlBuffer, stdHttp_dlBufferWritten);
         free(stdHttp_pDlBuffer);
 
-        stdHttp_pDlBuffer = tmp;
+        stdHttp_pDlBuffer = (char*)tmp;
         stdHttp_dlBufferMax = stdHttp_dlBufferMax*2;
     }
 
@@ -99,7 +99,7 @@ void* stdHttp_Fetch(const char* pUrl)
 #ifndef PLATFORM_NO_CACERT_BLOB
     struct curl_blob blob;
     blob.data = stdHttp_pCaCertBlob;
-    blob.len = strlen(blob.data);
+    blob.len = strlen((char*)blob.data);
     blob.flags = CURL_BLOB_COPY;
 #endif
 
@@ -144,7 +144,7 @@ int stdHttp_DownloadToPath(const char* pUrl, const char* pFpath)
 #ifndef PLATFORM_NO_CACERT_BLOB
     struct curl_blob blob;
     blob.data = stdHttp_pCaCertBlob;
-    blob.len = strlen(blob.data);
+    blob.len = strlen((char*)blob.data);
     blob.flags = CURL_BLOB_COPY;
 #endif
 

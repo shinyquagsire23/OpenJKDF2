@@ -129,7 +129,7 @@ int sithConsole_TryCommand(const char *cmd)
     char tmp_cvar[SITHCVAR_MAX_STRLEN];
 
     // Added: mutable copy of cmd
-    char* pCmdMutable = malloc(strlen(cmd)+1);
+    char* pCmdMutable = (char*)malloc(strlen(cmd)+1);
     strcpy(pCmdMutable, cmd);
 
     _strtolower(pCmdMutable); // Added: mutable copy of cmd
@@ -223,7 +223,7 @@ void sithConsole_AdvanceLogBuf()
     }
 }
 
-int sithConsole_RegisterDevCmd(DebugConsoleCmd_t fn, char *cmd, int extra)
+int sithConsole_RegisterDevCmd(DebugConsoleCmd_t fn, const char *cmd, int extra)
 {
     stdDebugConsoleCmd *v4; // [esp-4h] [ebp-4h]
 
@@ -238,14 +238,14 @@ int sithConsole_RegisterDevCmd(DebugConsoleCmd_t fn, char *cmd, int extra)
     return 1;
 }
 
-int sithConsole_SetPrintFuncs(void *a1, void *a2)
+int sithConsole_SetPrintFuncs(DebugConsolePrintFunc_t a1, DebugConsolePrintUniStrFunc_t a2)
 {
     DebugGui_fnPrint = a1;
     DebugGui_fnPrintUniStr = a2;
     return 1;
 }
 
-int sithConsole_PrintHelp()
+int sithConsole_PrintHelp(stdDebugConsoleCmd* a, const char* b)
 {
     uint32_t v0; // esi
     unsigned int v1; // ebp

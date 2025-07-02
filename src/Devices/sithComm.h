@@ -19,7 +19,7 @@ extern int sithComm_version;
 
 int sithComm_Startup();
 void sithComm_Shutdown();
-void sithComm_SetMsgFunc(int msgid, void *func);
+void sithComm_SetMsgFunc(int msgid, cogMsg_Handler func);
 int sithComm_SendMsgToPlayer(sithCogMsg *msg, int a2, int mpFlags, int a4);
 void sithComm_FileWrite(sithCogMsg *ctx);
 int sithComm_Sync();

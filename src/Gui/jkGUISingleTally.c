@@ -23,12 +23,12 @@ static jkGuiElement jkGuiSingleTally_buttons[8] = {
 {ELEMENT_TEXT, 0, 2, 0, 3, {0, 120, 640, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
 {ELEMENT_TEXT, 0, 2, 0, 3, {0, 180, 640, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
 {ELEMENT_CUSTOM, 0, 0, 0, 0, {0, 220, 640, 40}, 1, 0, 0, jkGuiSingleTally_ForceStarsRender, 0, 0, {0}, 0},
-{ELEMENT_TEXTBUTTON, 0xFFFFFFFF, 2, "GUI_QUIT", 3, {0, 420, 150, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
+{ELEMENT_TEXTBUTTON, -1, 2, "GUI_QUIT", 3, {0, 420, 150, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
 {ELEMENT_TEXTBUTTON, 1, 2, "GUI_OK", 3, {490, 420, 150, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
 {ELEMENT_END, 0, 0, 0, 0, {0}, 0, 0, 0, 0, 0, 0, {0}, 0}
 };
 
-static jkGuiMenu jkGuiSingleTally_menu = {jkGuiSingleTally_buttons, 0xFFFFFFFF, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
+static jkGuiMenu jkGuiSingleTally_menu = {jkGuiSingleTally_buttons, -1, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 
 
 int jkGuiSingleTally_Show()

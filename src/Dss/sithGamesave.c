@@ -92,6 +92,9 @@ int sithGamesave_LoadEntry(char *fpath)
     int curMs; // [esp+Ch] [ebp-650h] BYREF
     char SrcStr[32]; // [esp+10h] [ebp-64Ch] BYREF
     sithGamesave_Header header; // [esp+30h] [ebp-62Ch] BYREF
+#ifdef QOL_IMPROVEMENTS
+    int backup_episodeIdx = 0;
+#endif
 
     int bIsOutdatedSave = 0;
 
@@ -122,7 +125,7 @@ int sithGamesave_LoadEntry(char *fpath)
 
     // Added: Fix soundtrack on levels that use disk 2
 #ifdef QOL_IMPROVEMENTS
-    int backup_episodeIdx = jkEpisode_mLoad.currentEpisodeEntryIdx;
+    backup_episodeIdx = jkEpisode_mLoad.currentEpisodeEntryIdx;
     if ( jkEpisode_Load(&jkGui_episodeLoad) )
     {
         if (jkEpisode_mLoad.paEntries) {

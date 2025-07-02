@@ -380,8 +380,8 @@ GLuint std3D_loadProgram(const char* fpath_base)
     GLuint out;
     GLint link_ok = GL_FALSE;
     
-    char* tmp_vert = malloc(strlen(fpath_base) + 32);
-    char* tmp_frag = malloc(strlen(fpath_base) + 32);
+    char* tmp_vert = (char*)malloc(strlen(fpath_base) + 32);
+    char* tmp_frag = (char*)malloc(strlen(fpath_base) + 32);
     
     strcpy(tmp_vert, fpath_base);
     strcat(tmp_vert, "_v.glsl");
@@ -594,11 +594,12 @@ int init_resources()
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, 256, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, displaypal_data);
 
     // Tiled random
+    // FLEXTODO
     glGenTextures(1, &tiledrand_texture);
     if (tiledrand_data) {
         free(tiledrand_data);
     }
-    tiledrand_data = malloc(3 * 4 * 4 * sizeof(float));
+    tiledrand_data = (rdVector3*)malloc(3 * 4 * 4 * sizeof(float));
     memset(tiledrand_data, 0, 3 * 4 * 4 * sizeof(float));
 
     for (int i = 0; i < 4*4; i++)
@@ -624,11 +625,11 @@ int init_resources()
     glGenVertexArrays( 1, &vao );
     glBindVertexArray( vao ); 
 
-    world_data_all = malloc(STD3D_MAX_VERTICES * sizeof(D3DVERTEX));
-    world_data_elements = malloc(sizeof(GLushort) * 3 * STD3D_MAX_TRIS);
+    world_data_all = (D3DVERTEX*)malloc(STD3D_MAX_VERTICES * sizeof(D3DVERTEX));
+    world_data_elements = (GLushort*)malloc(sizeof(GLushort) * 3 * STD3D_MAX_TRIS);
 
-    menu_data_all = malloc(STD3D_MAX_UI_VERTICES * sizeof(D3DVERTEX));
-    menu_data_elements = malloc(sizeof(GLushort) * 3 * STD3D_MAX_UI_TRIS);
+    menu_data_all = (D3DVERTEX*)malloc(STD3D_MAX_UI_VERTICES * sizeof(D3DVERTEX));
+    menu_data_elements = (GLushort*)malloc(sizeof(GLushort) * 3 * STD3D_MAX_UI_TRIS);
 
     glGenBuffers(1, &world_vbo_all);
     glGenBuffers(1, &world_ibo_triangle);
@@ -1404,7 +1405,7 @@ void std3D_DrawMenu()
     
     rdTri* tris = GL_tmpTris;
     
-    rdDDrawSurface* last_tex = (void*)-1;
+    rdDDrawSurface* last_tex = (rdDDrawSurface*)(intptr_t)-1;
     int last_tex_idx = 0;
     //GLushort* data_elements = malloc(sizeof(GLushort) * 3 * GL_tmpTrisAmt);
     for (int j = 0; j < GL_tmpTrisAmt; j++)
@@ -1543,7 +1544,7 @@ void std3D_DrawMapOverlay()
     
     rdTri* tris = GL_tmpTris;
     
-    rdDDrawSurface* last_tex = (void*)-1;
+    rdDDrawSurface* last_tex = (rdDDrawSurface*)(intptr_t)-1;
     int last_tex_idx = 0;
     //GLushort* data_elements = malloc(sizeof(GLushort) * 3 * GL_tmpTrisAmt);
     for (int j = 0; j < GL_tmpTrisAmt; j++)
@@ -2205,7 +2206,7 @@ void std3D_DrawSimpleTex(std3DSimpleTexStage* pStage, std3DIntermediateFbo* pFbo
     glEnableVertexAttribArray(pStage->attribute_v_color);
     glEnableVertexAttribArray(pStage->attribute_v_uv);
     
-    rdDDrawSurface* last_tex = (void*)-1;
+    rdDDrawSurface* last_tex = (rdDDrawSurface*)(intptr_t)-1;
     int last_tex_idx = 0;
     //GLushort* data_elements = malloc(sizeof(GLushort) * 3 * GL_tmpTrisAmt);
     for (int j = 0; j < GL_tmpTrisAmt; j++)
@@ -2526,10 +2527,10 @@ void std3D_DrawRenderList()
     {
     
     float d3dmat[16] = {
-       maxX*scaleX*zoom_xaspect,      0,                                          0,      0, // right
-       0,                                       -maxY*scaleY*zoom_yaspect,               0,      0, // up
+       (float)(maxX*scaleX*zoom_xaspect),      0,                                          0,      0, // right
+       0,                                       (float)(-maxY*scaleY*zoom_yaspect),               0,      0, // up
        0,                                       0,                                          1,     0, // forward
-       -(internalWidth/2)*scaleX*zoom_xaspect + shift_add_x,  (internalHeight/2)*scaleY*zoom_yaspect + shift_add_y,     (!rdCamera_pCurCamera || rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective) ? -1 : 1,      1  // pos
+       (float)(-(internalWidth/2)*scaleX*zoom_xaspect + shift_add_x),  (float)((internalHeight/2)*scaleY*zoom_yaspect + shift_add_y),     (float)((!rdCamera_pCurCamera || rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective) ? -1 : 1),      1  // pos
     };
     
     glUniformMatrix4fv(uniform_mvp, 1, GL_FALSE, d3dmat);
@@ -2884,9 +2885,9 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
     
     GLuint image_texture;
     glGenTextures(1, &image_texture);
-    uint8_t* image_8bpp = vbuf->sdlSurface->pixels;
-    uint16_t* image_16bpp = vbuf->sdlSurface->pixels;
-    uint8_t* pal = vbuf->palette;
+    uint8_t* image_8bpp = (uint8_t*)vbuf->sdlSurface->pixels;
+    uint16_t* image_16bpp = (uint16_t*)vbuf->sdlSurface->pixels;
+    uint8_t* pal = (uint8_t*)vbuf->palette;
     
     uint32_t width, height;
     width = vbuf->format.width;
@@ -3091,9 +3092,9 @@ int std3D_AddBitmapToTextureCache(stdBitmap *texture, int mipIdx, int is_alpha_t
     
     GLuint image_texture;
     glGenTextures(1, &image_texture);
-    uint8_t* image_8bpp = vbuf->sdlSurface->pixels;
-    uint16_t* image_16bpp = vbuf->sdlSurface->pixels;
-    uint8_t* pal = vbuf->palette;
+    uint8_t* image_8bpp = (uint8_t*)vbuf->sdlSurface->pixels;
+    uint16_t* image_16bpp = (uint16_t*)vbuf->sdlSurface->pixels;
+    uint8_t* pal = (uint8_t*)vbuf->palette;
     
     uint32_t width, height;
     width = vbuf->format.width;
@@ -3445,7 +3446,7 @@ void std3D_Screenshot(const char* pFpath)
 #ifdef TARGET_CAN_JKGM
     if (!std3D_pFb) return;
 
-    uint8_t* data = malloc(std3D_pFb->w * std3D_pFb->h * 3 * sizeof(uint8_t));
+    uint8_t* data = (uint8_t*)malloc(std3D_pFb->w * std3D_pFb->h * 3 * sizeof(uint8_t));
     glBindFramebuffer(GL_FRAMEBUFFER, std3D_pFb->fbo);
     glReadPixels(0, 0, std3D_pFb->w, std3D_pFb->h, GL_RGB, GL_UNSIGNED_BYTE, data);
     jkgm_write_png(pFpath, std3D_pFb->w, std3D_pFb->h, data);

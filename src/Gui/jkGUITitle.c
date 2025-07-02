@@ -37,7 +37,7 @@ static jkGuiElement jkGuiTitle_elementsLoad[6] = {
     {ELEMENT_END,  0,  0,  0,  0, {0},  0,  0,  0,  0,  0,  0, {0},  0}
 };
 
-static jkGuiMenu jkGuiTitle_menuLoad = {jkGuiTitle_elementsLoad, 0xFFFFFFFF, 0xFF, 0xE1, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+static jkGuiMenu jkGuiTitle_menuLoad = {jkGuiTitle_elementsLoad, -1, 0xFF, 0xE1, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 static jkGuiElement jkGuiTitle_elementsLoadStatic[6] = {
     {ELEMENT_TEXT,  0,  2, "GUI_LOADING",  3, {60, 280, 520, 30},  1,  0,  0,  0,  0,  0, {0},  0},
@@ -48,7 +48,7 @@ static jkGuiElement jkGuiTitle_elementsLoadStatic[6] = {
     {ELEMENT_END,  0,  0,  0,  0, {0},  0,  0,  0,  0,  0,  0, {0},  0}
 };
 
-static jkGuiMenu jkGuiTitle_menuLoadStatic = {jkGuiTitle_elementsLoadStatic, 0xFFFFFFFF, 0xFF, 0xE3, 0x0F, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+static jkGuiMenu jkGuiTitle_menuLoadStatic = {jkGuiTitle_elementsLoadStatic, -1, 0xFF, 0xE3, 0x0F, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 void jkGuiTitle_Startup()
 {
@@ -282,7 +282,7 @@ void jkGuiTitle_ShowLoadingStatic()
     verRevision = jkGuiTitle_verRevision;
     verMinor = jkGuiTitle_verMinor;
     verMajor = jkGuiTitle_verMajor;
-    verMotsStr = L""; // TODO?
+    verMotsStr = ""; // TODO?
     guiVersionStr = jkStrings_GetUniStringWithFallback("GUI_VERSION");
     jk_snwprintf(jkGuiTitle_versionBuffer, sizeof(jkGuiTitle_versionBuffer) / sizeof(wchar_t), guiVersionStr, verMajor, verMinor, verRevision, verMotsStr);
     jkGuiTitle_elementsLoadStatic[4].wstr = jkGuiTitle_versionBuffer;

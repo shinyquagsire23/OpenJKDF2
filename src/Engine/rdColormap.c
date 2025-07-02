@@ -184,7 +184,7 @@ LABEL_26:
 
     if (colormap->flags & 1) 
     {
-        v10 = rdroid_pHS->alloc(0x10100);
+        v10 = (char*)rdroid_pHS->alloc(0x10100);
         colormap->transparencyAlloc = v10;
         if (!v10)
         {
@@ -321,5 +321,6 @@ int rdColormap_BuildRGB16(uint16_t *paColors16, rdColor24 *paColors24, uint8_t a
 
 int rdColormap_BuildGrayRamp(rdColormap* pColormap) {
     // TODO
+    jk_printf("OpenJKDF2: Unimplemented function rdColormap_BuildGrayRamp!!\n");
     return 1;
 }

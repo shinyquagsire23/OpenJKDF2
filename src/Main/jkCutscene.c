@@ -19,8 +19,14 @@
 #include "stdPlatform.h"
 #include "Platform/std3D.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "smacker.h"
 #include "smush.h"
+#ifdef __cplusplus
+}
+#endif
 
 #include "../jk.h"
 
@@ -263,7 +269,7 @@ int jkCutscene_sub_421310(char* fpath)
     }
 
 #ifdef LINUX
-    char *r = malloc(strlen(tmp) + 16);
+    char *r = (char*)malloc(strlen(tmp) + 16);
     if (casepath(tmp, r))
     {
         strcpy(tmp, r);

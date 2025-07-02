@@ -1287,7 +1287,7 @@ typedef struct sithSound
     int seekOffset;
     int field_40;
     int infoLoaded;
-    void* dsoundBuffer2; // stdSound_buffer_t*
+    stdSound_buffer_t* dsoundBuffer2; // stdSound_buffer_t*
 } sithSound;
 
 typedef int (*sithControl_handler_t)(sithThing*, flex_t);

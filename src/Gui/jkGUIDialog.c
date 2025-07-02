@@ -19,17 +19,17 @@ jkGuiElement jkGuiDialog_Ok_buttons[4] = {
     {ELEMENT_END, 0, 0, 0, 0, {0}, 0, 0, 0, 0, 0, 0, {0}, 0}
 };
 
-static jkGuiMenu jkGuiDialog_Ok_menu  = {jkGuiDialog_Ok_buttons, 0xFFFFFFFF, 0xE1, 0xFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
+static jkGuiMenu jkGuiDialog_Ok_menu  = {jkGuiDialog_Ok_buttons, -1, 0xE1, 0xFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 
 jkGuiElement jkGuiDialog_OkCancel_buttons[5] = {
     {ELEMENT_TEXT, 0, 2, 0, 3, {0x82, 0x8C, 0x186, 0x28}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXT, 0, 0, 0, 3, {0x82, 0xBE, 0x186, 0x5A}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON, 1, 2, "GUI_OK", 3, {0x14A, 0x122, 0xBE, 0x28}, 1, 0, 0, 0, 0, 0, {0}, 0},
-    {ELEMENT_TEXTBUTTON, 0xFFFFFFFF, 2, "GUI_CANCEL", 3, {0x82, 0x122, 0xBE, 0x28}, 1, 0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_TEXTBUTTON, -1, 2, "GUI_CANCEL", 3, {0x82, 0x122, 0xBE, 0x28}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_END, 0, 0, 0, 0, {0}, 0, 0, 0, 0, 0, 0, {0}, 0}
 };
 
-static jkGuiMenu jkGuiDialog_OkCancel_menu  = {jkGuiDialog_OkCancel_buttons, 0xFFFFFFFF, 0xE1, 0xFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
+static jkGuiMenu jkGuiDialog_OkCancel_menu  = {jkGuiDialog_OkCancel_buttons, -1, 0xE1, 0xFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 
 void jkGuiDialog_Startup()
 {

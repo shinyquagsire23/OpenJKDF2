@@ -950,7 +950,7 @@ LABEL_15:
     return v4;
 }
 
-int stdFont_sub_434EC0(stdVBuffer *vBuffer, stdFont *font, int a3, int a4, int a5, int *paddings, wchar_t *text, int a8)
+int stdFont_sub_434EC0(stdVBuffer *vBuffer, stdFont *font, int a3, int a4, int a5, int *paddings, const wchar_t *text, int a8)
 {
     int *paddingList; // ebp
     int padding; // edi
@@ -1166,7 +1166,7 @@ int stdFont_sub_4355B0(stdFont *font, uint16_t a2)
     return v3 != 0;
 }
 
-uint32_t stdFont_DrawAsciiGPU(stdFont *a2, unsigned int blit_x, int blit_y, int x_max, char *str, int alpha_maybe, flex_t scale)
+uint32_t stdFont_DrawAsciiGPU(stdFont *a2, unsigned int blit_x, int blit_y, int x_max, const char *str, int alpha_maybe, flex_t scale)
 {
     unsigned int v8; // ebp
     unsigned int v9; // esi
@@ -1276,7 +1276,7 @@ LABEL_29:
     return v9 - v8;
 }
 
-uint32_t stdFont_DrawAsciiWidth(stdFont *a2, unsigned int blit_x, int blit_y, int x_max, char *str, int alpha_maybe, flex_t scale)
+uint32_t stdFont_DrawAsciiWidth(stdFont *a2, unsigned int blit_x, int blit_y, int x_max, const char *str, int alpha_maybe, flex_t scale)
 {
     unsigned int v8; // ebp
     unsigned int v9; // esi

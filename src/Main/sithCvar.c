@@ -225,7 +225,7 @@ int sithCvar_Register(const char* pName, int32_t type, intptr_t defaultVal, void
 {
     if (sithCvar_numRegistered >= SITHCVAR_MAX_CVARS) return 0;
 
-    char* tmp = pHS->alloc(SITHCVAR_MAX_NAME_STRLEN);
+    char* tmp = (char*)pHS->alloc(SITHCVAR_MAX_NAME_STRLEN);
     if (!tmp) return 0;
 
     tSithCvar* pCvar = &sithCvar_aCvars[sithCvar_numRegistered++];
@@ -247,7 +247,7 @@ int sithCvar_Register(const char* pName, int32_t type, intptr_t defaultVal, void
             break;
         case CVARTYPE_STR:
         {
-            char* pVal = pHS->alloc(SITHCVAR_MAX_STRLEN);
+            char* pVal = (char*)pHS->alloc(SITHCVAR_MAX_STRLEN);
             stdString_SafeStrCopy(pVal, (const char*)defaultVal, SITHCVAR_MAX_STRLEN);
             pCvar->pStrVal = pVal;
             break;
@@ -258,8 +258,8 @@ int sithCvar_Register(const char* pName, int32_t type, intptr_t defaultVal, void
     pCvar->pLinkPtr = pLinkPtr;
     pCvar->flags = flags;
 
-    memset(pCvar->pNameLower, 0, SITHCVAR_MAX_NAME_STRLEN);
-    stdString_SafeStrCopy(pCvar->pNameLower, pName, SITHCVAR_MAX_NAME_STRLEN);
+    memset((void*)pCvar->pNameLower, 0, SITHCVAR_MAX_NAME_STRLEN);
+    stdString_SafeStrCopy((char*)pCvar->pNameLower, pName, SITHCVAR_MAX_NAME_STRLEN);
     _strtolower((char*)pCvar->pNameLower);
     stdHashTable_SetKeyVal(sithCvar_pHashTable, pCvar->pNameLower, pCvar);
 

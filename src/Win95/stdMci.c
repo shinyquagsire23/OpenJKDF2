@@ -255,7 +255,7 @@ int stdMci_TryPlay(const char* fpath) {
     strncpy(tmp, fpath, 255);
 
 #ifdef FS_POSIX
-    char *r = malloc(strlen(tmp) + 16);
+    char *r = (char*)malloc(strlen(tmp) + 16);
     if (casepath(tmp, r))
     {
         strcpy(tmp, r);

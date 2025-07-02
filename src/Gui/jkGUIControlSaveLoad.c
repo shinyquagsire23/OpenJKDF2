@@ -14,6 +14,7 @@
 #include "Win95/stdDisplay.h"
 #include "General/stdFileUtil.h"
 #include "Devices/sithControl.h"
+#include "General/stdConffile.h"
 
 static int jkGuiControlSaveLoad_listboxBitmapIndices[2] = {14, 15};
 static wchar_t jkGuiControlSaveLoad_awTmp[256];

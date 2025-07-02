@@ -1,5 +1,7 @@
 #include "sithComm.h"
 
+#include "General/stdConffile.h"
+#include "Gameplay/sithPlayer.h"
 #include "Dss/sithMulti.h"
 #include "Dss/sithDSSThing.h"
 #include "Dss/sithDSS.h"
@@ -84,7 +86,7 @@ void sithComm_Shutdown()
     sithComm_version = 6;
 }
 
-void sithComm_SetMsgFunc(int msgid, void *func)
+void sithComm_SetMsgFunc(int msgid, cogMsg_Handler func)
 {
     sithComm_msgFuncs[msgid] = func;
 }

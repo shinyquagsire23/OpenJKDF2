@@ -231,7 +231,7 @@ char* stdFnames_MakePath(char *a1, int a2, const char *a3, const char *a4)
     }
 
 #ifdef FS_POSIX
-    char *r = malloc(strlen(a1) + 16);
+    char *r = (char*)malloc(strlen(a1) + 16);
     if (casepath(a1, r))
     {
         if (r[0] == '.' && (r[1] == '/' || r[1] == '\\')) {

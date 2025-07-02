@@ -212,7 +212,13 @@ include(cmake_modules/precompile_globals.cmake)
 #set( CMAKE_VERBOSE_MAKEFILE on )
 
 # Force CXX compilation for all files
-#set_source_files_properties(${ENGINE_SOURCE_FILES} PROPERTIES LANGUAGE CXX )
+file(GLOB ENGINE_SOURCE_FILES_REGLOB ${PROJECT_SOURCE_DIR}/src/*.c
+                       ${PROJECT_SOURCE_DIR}/src/*/*.c
+                       ${PROJECT_SOURCE_DIR}/src/General/*.cpp
+                       ${PROJECT_SOURCE_DIR}/src/Platform/*/*.c
+                       ${PROJECT_SOURCE_DIR}/src/Platform/*/*.cpp)
+list(REMOVE_ITEM ENGINE_SOURCE_FILES_REGLOB ${TEST_SRCS})
+#set_source_files_properties(${ENGINE_SOURCE_FILES_REGLOB} PROPERTIES LANGUAGE CXX )
 
 add_library(sith_engine OBJECT ${ENGINE_SOURCE_FILES})
 plat_specific_deps()

@@ -721,7 +721,7 @@ int sithCommand_CmdThingNpc(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if (sithNet_isMulti) return 1;
 
-    char* pArgStrMutable = malloc(strlen(pArgStr)+1);
+    char* pArgStrMutable = (char*)malloc(strlen(pArgStr)+1);
     strcpy(pArgStrMutable, pArgStr);
 
     char* pArgIter = _strtok(pArgStrMutable, ", \t\n\r");
@@ -763,7 +763,7 @@ int sithCommand_CmdBind(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     char tmp[512];
     memset(tmp, 0, sizeof(tmp));
 
-    char* pArgStrMutable = malloc(strlen(pArgStr)+1);
+    char* pArgStrMutable = (char*)malloc(strlen(pArgStr)+1);
     strcpy(pArgStrMutable, pArgStr);
 
     char* pArgIter = _strtok(pArgStrMutable, ", \t\n\r");
@@ -803,7 +803,7 @@ int sithCommand_CmdUnbind(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     char tmp[512];
     memset(tmp, 0, sizeof(tmp));
 
-    char* pArgStrMutable = malloc(strlen(pArgStr)+1);
+    char* pArgStrMutable = (char*)malloc(strlen(pArgStr)+1);
     strcpy(pArgStrMutable, pArgStr);
 
     char* pArgIter = _strtok(pArgStrMutable, ", \t\n\r");

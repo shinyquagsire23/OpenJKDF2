@@ -26,6 +26,8 @@
 #include "Main/jkEpisode.h"
 #include "Platform/std3D.h"
 #include "Win95/Window.h"
+#include "Engine/rdKeyframe.h"
+#include "General/stdConffile.h"
 
 #include "jk.h"
 #include "types.h"

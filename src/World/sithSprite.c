@@ -120,7 +120,7 @@ rdSprite* sithSprite_LoadEntry(char *fpath)
                     char mat[32];
 
                     stdString_SafeStrCopy(mat, stdConffile_entry.args[0].value, 0x20);
-                    uint32_t typeid = _atoi(stdConffile_entry.args[1].value);
+                    uint32_t type_id = _atoi(stdConffile_entry.args[1].value);
                     flex_t width = _atof(stdConffile_entry.args[2].value);
                     flex_t height = _atof(stdConffile_entry.args[3].value);
                     int geometryMode = _atoi(stdConffile_entry.args[4].value);
@@ -131,10 +131,10 @@ rdSprite* sithSprite_LoadEntry(char *fpath)
                     off.y = _atof(stdConffile_entry.args[9].value);
                     off.z = _atof(stdConffile_entry.args[10].value);
                     stdConffile_Close();
-                    if ( typeid <= 2 && width > 0.0 && height > 0.0 )
+                    if ( type_id <= 2 && width > 0.0 && height > 0.0 )
                     {
                         
-                        if ( rdSprite_NewEntry(sprite, fpath, typeid, mat, width, height, geometryMode, lightMode, textureMode, extralight, &off) )
+                        if ( rdSprite_NewEntry(sprite, fpath, type_id, mat, width, height, geometryMode, lightMode, textureMode, extralight, &off) )
                         {
                             stdHashTable_SetKeyVal(sithSprite_hashmap, sprite->path, sprite);
                             ++world->numSpritesLoaded;
@@ -145,7 +145,7 @@ rdSprite* sithSprite_LoadEntry(char *fpath)
                         }
                     }
                     else { // Added
-                        jk_printf("OpenJKDF2: Failed to read sprite `%s`! typeid %x > 2? width %f height %f\n", spriteFpath, typeid, width, height);
+                        jk_printf("OpenJKDF2: Failed to read sprite `%s`! type_id %x > 2? width %f height %f\n", spriteFpath, type_id, width, height);
                     }
                 }
                 else // Added
