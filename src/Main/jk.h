@@ -44,7 +44,7 @@
 #define jk_UnkTick_ADDR (0x00404580)
 #define jk_UnkLeave_ADDR (0x004045F0)
 
-static int (*jk_MissionReload)() = (void*)jk_MissionReload_ADDR;
-static int (*jk_MenuReturn)() = (void*)jk_MenuReturn_ADDR;
+//static int (*jk_MissionReload)() = (void*)jk_MissionReload_ADDR;
+//static int (*jk_MenuReturn)() = (void*)jk_MenuReturn_ADDR;
 
 #endif // _MAINJK_H

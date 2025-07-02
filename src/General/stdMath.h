@@ -56,7 +56,7 @@ int32_t stdMath_FloorDivMod(int32_t in1, int32_t in2, int32_t *out1, int32_t *ou
 //IMPORT_FUNC(stdMath_ArcTan4, flex_t, (flex_t, flex_t), stdMath_ArcTan4_ADDR)
 //IMPORT_FUNC(stdMath_FloorDivMod, int, (int, int, int*, int*), stdMath_FloorDivMod_ADDR)
 
-static void (*_stdMath_SinCos)(flex_t angle, flex_t *pSinOut, flex_t *pCosOut) = (void*)stdMath_SinCos_ADDR;
+//static void (*_stdMath_SinCos)(flex_t angle, flex_t *pSinOut, flex_t *pCosOut) = (void*)stdMath_SinCos_ADDR;
 
 flex_t stdMath_Dist2D1(flex_t a1, flex_t a2);
 flex_t stdMath_Dist2D2(flex_t a1, flex_t a2);

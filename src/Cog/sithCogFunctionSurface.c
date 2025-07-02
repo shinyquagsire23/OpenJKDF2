@@ -635,7 +635,7 @@ void sithCogFunctionSurface_SetSurfaceVertexLightRGB(sithCog *ctx)
     }
 }
 
-void sithCogFunctionSurface_Startup(void* ctx)
+void sithCogFunctionSurface_Startup(sithCogSymboltable* ctx)
 {
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_GetSurfaceAdjoin, "getsurfaceadjoin");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSurface_GetSurfaceSector, "getsurfacesector");

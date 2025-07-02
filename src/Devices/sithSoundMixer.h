@@ -91,7 +91,7 @@ sithPlayingSound* sithSoundMixer_GetSoundFromIdx(int idx);
 //static sithPlayingSound* (*sithSoundMixer_PlaySoundPosAbsolute)(sithSound *a1, rdVector3 *a2, sithSector *a3, flex_t a4, flex_t a5, flex_t a6, int a7) = (void*)sithSoundMixer_PlaySoundPosAbsolute_ADDR;
 //static int (*sithSoundMixer_StopSound)(sithPlayingSound *a1) = (void*)sithSoundMixer_StopSound_ADDR;
 //static sithPlayingSound* (*sithSoundMixer_GetSoundFromRef)(int a1) = (void*)sithSoundMixer_GetSoundFromRef_ADDR;
-static void (*_sithSoundMixer_FadeSound)(sithPlayingSound *sound, flex_t vol_, flex_t fadeintime_) = (void*)sithSoundMixer_FadeSound_ADDR;
+//static void (*_sithSoundMixer_FadeSound)(sithPlayingSound *sound, flex_t vol_, flex_t fadeintime_) = (void*)sithSoundMixer_FadeSound_ADDR;
 //static void (*sithSoundMixer_SetPitch)(sithPlayingSound *a1, flex_t pitch, flex_t changetime) = (void*)sithSoundMixer_SetPitch_ADDR;
 //static void (*sithSoundMixer_SectorSound)(sithSector *a1, sithSound *a2, flex_t a3) = (void*)sithSoundMixer_SectorSound_ADDR;
 

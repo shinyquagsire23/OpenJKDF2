@@ -211,6 +211,9 @@ include(cmake_modules/precompile_globals.cmake)
 
 #set( CMAKE_VERBOSE_MAKEFILE on )
 
+# Force CXX compilation for all files
+#set_source_files_properties(${ENGINE_SOURCE_FILES} PROPERTIES LANGUAGE CXX )
+
 add_library(sith_engine OBJECT ${ENGINE_SOURCE_FILES})
 plat_specific_deps()
 

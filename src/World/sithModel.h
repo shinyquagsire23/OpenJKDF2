@@ -24,7 +24,7 @@ uint32_t sithModel_GetMemorySize(rdModel3 *model);
 int sithModel_New(sithWorld *world, int num);
 rdModel3* sithModel_GetByIdx(int idx);
 
-static rdModel3* (*sithModel_LoadEntry_)(const char *model_3do_fname, int unk) = (void*)sithModel_LoadEntry_ADDR;
+//static rdModel3* (*sithModel_LoadEntry_)(const char *model_3do_fname, int unk) = (void*)sithModel_LoadEntry_ADDR;
 
 //#define sithModel_hashtable (*(stdHashTable**)0x84DA3C)
 

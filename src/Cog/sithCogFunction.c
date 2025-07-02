@@ -181,7 +181,7 @@ void sithCogFunction_MaterialAnim(sithCog *ctx)
 {
     sithCog *ctx_; // esi
     int popInt; // edi
-    void *material; // ecx
+    rdMaterial *material; // ecx
     rdSurface *v4; // eax
     cog_flex_t popFlex; // [esp+Ch] [ebp+4h]
 
@@ -189,7 +189,7 @@ void sithCogFunction_MaterialAnim(sithCog *ctx)
     ctx_ = ctx;
     popInt = sithCogExec_PopInt(ctx);
     popFlex = sithCogExec_PopFlex(ctx);
-    material = sithCogExec_PopMaterial(ctx_); // TODO rdMaterial*
+    material = sithCogExec_PopMaterial(ctx_);
     if ( !material )
     {
         sithCogExec_PushInt(ctx_, -1);
@@ -1740,7 +1740,7 @@ void sithCogFunction_SendMessageExRadius(sithCog *ctx)
 
 
 
-void sithCogFunction_Startup(void* ctx)
+void sithCogFunction_Startup(sithCogSymboltable* ctx)
 {
     sithCogScript_RegisterVerb(ctx, sithCogFunction_Sleep, "sleep");
     if (Main_bMotsCompat) {

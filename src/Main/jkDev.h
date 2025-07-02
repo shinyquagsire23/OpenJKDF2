@@ -94,6 +94,8 @@ int jkDev_UpdateEntries();
 int jkDev_CmdNoclip(stdDebugConsoleCmd *pCmd, const char *pArgStr);
 #endif
 
+#ifndef SDL2_RENDER
 static int (*jkDev_DialogFunc)(HWND, UINT, WPARAM, LPARAM) = (void*)jkDev_DialogFunc_ADDR;
+#endif
 
 #endif // _JKDEV_H

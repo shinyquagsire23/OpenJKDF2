@@ -51,6 +51,6 @@ void sithDSS_SendMisc(int sendto_id, int mpFlags);
 int sithDSS_ProcessMisc(sithCogMsg *msg);
 
 
-static int (*_sithDSS_ProcessSyncPuppet)(sithCogMsg *msg) = (void*)sithDSS_ProcessSyncPuppet_ADDR;
+//static int (*_sithDSS_ProcessSyncPuppet)(sithCogMsg *msg) = (void*)sithDSS_ProcessSyncPuppet_ADDR;
 
 #endif // _DSS_SITHDSS_H

@@ -3,6 +3,6 @@
 
 #include "Cog/sithCog.h"
 
-void sithCogFunction_Startup(void* ctx);
+void sithCogFunction_Startup(sithCogSymboltable* ctx);
 
 #endif // _SITHCOGFUNCTION_H

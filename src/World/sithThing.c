@@ -1006,11 +1006,11 @@ sithThing* sithThing_CreateThingOfType(uint32_t thingType)
     return pThingRet;
 }
 
-void sithThing_SetPosAndRot(sithThing *this, rdVector3 *pos, rdMatrix34 *rot)
+void sithThing_SetPosAndRot(sithThing *pThing, rdVector3 *pos, rdMatrix34 *rot)
 {
-    rdVector_Copy3(&this->position, pos);
-    rdMatrix_Copy34(&this->lookOrientation, rot);
-    rdVector_Zero3(&this->lookOrientation.scale);
+    rdVector_Copy3(&pThing->position, pos);
+    rdMatrix_Copy34(&pThing->lookOrientation, rot);
+    rdVector_Zero3(&pThing->lookOrientation.scale);
 }
 
 // MOTS altered

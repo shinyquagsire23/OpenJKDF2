@@ -1056,11 +1056,13 @@ void sithCogFunctionThing_PlayKey(sithCog *ctx)
     int popInt = sithCogExec_PopInt(ctx);
     rdKeyframe* keyframe = sithCogExec_PopKeyframe(ctx);
     sithThing* pThing = sithCogExec_PopThing(ctx);
+    rdPuppet* puppet = NULL;
+    int track = 0;
 
     if ( !pThing )
         goto fail;
 
-    rdPuppet* puppet = pThing->rdthing.puppet;
+    puppet = pThing->rdthing.puppet;
     if ( !puppet ) {
         goto fail;
     }
@@ -1075,7 +1077,7 @@ void sithCogFunctionThing_PlayKey(sithCog *ctx)
        goto fail;
     }
     
-    int track = sithPuppet_StartKey(puppet, keyframe, popInt, popInt + 2, trackNum, 0);
+    track = sithPuppet_StartKey(puppet, keyframe, popInt, popInt + 2, trackNum, 0);
     if ( track >= 0 )
     {
         sithCogExec_PushInt(ctx, track);
@@ -2600,7 +2602,7 @@ void sithCogFunctionThing_GetThingInsertOffset(sithCog *ctx)
 
 
 
-void sithCogFunctionThing_Startup(void* ctx)
+void sithCogFunctionThing_Startup(sithCogSymboltable* ctx)
 {
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_WaitForStop, "waitforstop");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionThing_StopThing, "stopthing");

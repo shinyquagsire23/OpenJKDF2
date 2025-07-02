@@ -421,7 +421,7 @@ void sithCogFunctionSector_GetAmbient(sithCog *ctx)
     sithCogExec_PushFlex(ctx,0.0);
 }
 
-void sithCogFunctionSector_Startup(void* ctx)
+void sithCogFunctionSector_Startup(sithCogSymboltable* ctx)
 {
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_GetTint, "getsectortint");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSector_SetTint, "setsectortint");

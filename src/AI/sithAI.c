@@ -441,7 +441,7 @@ void sithAI_SetActorFireTarget(sithActor *actor, int a2, intptr_t actorFlags)
     }
 }
 
-void sithAI_RegisterCommand(char *cmdName, void *func, int param1, int param2, int param3)
+void sithAI_RegisterCommand(const char *cmdName, sithAICommandFunc_t func, int param1, int param2, int param3)
 {
     if ( sithAI_numCommands >= 0x20 )
         return;

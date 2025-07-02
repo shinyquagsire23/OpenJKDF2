@@ -74,7 +74,7 @@ sithThing* sithThing_InstantiateFromTemplate(sithThing *pThing, sithThing *pTemp
 int sithThing_ParseArgs(stdConffileArg *arg, sithThing* pThing);
 int sithThing_Load(sithWorld *pWorld, int a2);
 int sithThing_LoadThingParam(stdConffileArg *arg, sithThing* pThing, int param);
-void sithThing_SetPosAndRot(sithThing *this, rdVector3 *pos, rdMatrix34 *rot);
+void sithThing_SetPosAndRot(sithThing *pThing, rdVector3 *pos, rdMatrix34 *rot);
 int sithThing_SetNewModel(sithThing* pThing, rdModel3 *model);
 void sithThing_LeaveSector(sithThing* pThing);
 void sithThing_EnterSector(sithThing* pThing, sithSector *sector, int a3, int a4);
@@ -109,7 +109,7 @@ int sithThing_MotsTick(int param_1,int param_2,flex_t param_3); // MOTS added
 
 //static flex_t (*sithThing_Hit)(sithThing *sender, sithThing *receiver, flex_t amount, int a4) = (void*)sithThing_Hit_ADDR;
 //static void (*sithThing_LandThing)(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3* a4, int a5) = (void*)sithThing_LandThing_ADDR;
-static int (*_sithThing_Load)(sithWorld *pWorld, int a2) = (void*)sithThing_Load_ADDR;
+//static int (*_sithThing_Load)(sithWorld *pWorld, int a2) = (void*)sithThing_Load_ADDR;
 //static int (*sithThing_LoadThingParam)(stdConffileArg *arg, sithThing* pThing, int param) = (void*)sithThing_LoadThingParam_ADDR;
 //static int (*sithThing_LoadActorPlayerParams)(stdConffileArg *arg, sithThing* pThing, unsigned int param) = (void*)sithThing_LoadActorPlayerParams_ADDR;
 //static void (*sithThing_TickPhysics)(sithThing* pThing, flex_t arg4) = (void*)sithThing_TickPhysics_ADDR;

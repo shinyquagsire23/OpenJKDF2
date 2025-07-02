@@ -577,7 +577,7 @@ void sithCogFunctionPlayer_KillPlayerQuietly(sithCog *ctx)
 
 
 
-void sithCogFunctionPlayer_Startup(void* ctx)
+void sithCogFunctionPlayer_Startup(sithCogSymboltable* ctx)
 {
     sithCogScript_RegisterVerb(ctx, sithCogFunctionPlayer_SetInvActivate, "setinvactivated");
 

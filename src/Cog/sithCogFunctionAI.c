@@ -698,7 +698,7 @@ void sithCogFunctionAI_NextThingInCone(sithCog *ctx)
 
 
 
-void sithCogFunctionAI_Startup(void* ctx)
+void sithCogFunctionAI_Startup(sithCogSymboltable* ctx)
 {
     sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AIGetMode, "aigetmode");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionAI_AISetMode, "aisetmode");

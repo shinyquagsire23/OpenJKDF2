@@ -269,7 +269,9 @@ int rdColormap_Write(char *outpath, rdColormap *colormap)
     _memset(&header, 0, sizeof(header));
     _strncpy((char*)&header.magic, "CMP ", 4);
     header.version = 30;
-    rdVector_Copy3(&header.tint, &colormap->tint);
+    header.tint[0] = colormap->tint.x;
+    header.tint[1] = colormap->tint.y;
+    header.tint[2] = colormap->tint.z;
     header.flags = colormap->flags;
 
     fd = rdroid_pHS->fileOpen(outpath, "wb+");
@@ -314,5 +316,10 @@ int rdColormap_Write(char *outpath, rdColormap *colormap)
 
 int rdColormap_BuildRGB16(uint16_t *paColors16, rdColor24 *paColors24, uint8_t a4, uint8_t a5, uint8_t a6, rdTexformat *format)
 {
+    return 1;
+}
+
+int rdColormap_BuildGrayRamp(rdColormap* pColormap) {
+    // TODO
     return 1;
 }

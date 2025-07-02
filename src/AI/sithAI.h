@@ -59,7 +59,7 @@ void sithAI_FreeEntry(sithThing *thing);
 void sithAI_TickAll();
 void sithAI_TickActor(sithActor *actor);
 void sithAI_SetActorFireTarget(sithActor *actor, int a2, intptr_t a3);
-void sithAI_RegisterCommand(char *cmdName, void *func, int param1, int param2, int param3);
+void sithAI_RegisterCommand(const char *cmdName, sithAICommandFunc_t func, int param1, int param2, int param3);
 sithAICommand* sithAI_FindCommand(const char *cmdName);
 int sithAI_PrintThings();
 int sithAI_PrintThingStatus(stdDebugConsoleCmd* a1, const char *idxStr);

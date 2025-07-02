@@ -443,6 +443,7 @@ int sithCog_Open()
     v12 = 0;
     if ( world->numCogsLoaded )
     {
+        sithCogReference* idk = NULL;
         while ( 1 )
         {
             v10 = 0;
@@ -458,7 +459,7 @@ LABEL_25:
         v13 = cogs->field_4BC;
         while ( 1 )
         {
-            sithCogReference* idk = &cogs->cogscript->aIdk[v10];
+            idk = &cogs->cogscript->aIdk[v10];
             v8 = &cogs->pSymbolTable->buckets[idk->hash];
             v14 = v8;
             if ( (idk->flags & 1) != 0 )
@@ -1554,7 +1555,7 @@ sithCogScript* sithCogScript_LoadEntry(const char *pFpath, int unk)
     return result;
 }
 
-void sithCogScript_RegisterVerb(sithCogSymboltable *a1, cogSymbolFunc_t a2, char *a3)
+void sithCogScript_RegisterVerb(sithCogSymboltable *a1, cogSymbolFunc_t a2, const char *a3)
 {
     sithCogStackvar a2a;
 

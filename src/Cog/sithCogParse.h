@@ -65,7 +65,7 @@ int sithCogParse_ParseMessage(sithCogScript *cogScript);
 //sith_cog_parser_node* sithCogParse_AddLeafVector(int op, cog_flex_t* vector);
 //sith_cog_parser_node* sithCogParse_AddLeaf(int op, int val);
 
-static sithCogSymbol* (__cdecl *sithCogParse_GetSymbol_)(sithCogSymboltable *a1, unsigned int a2) = (void*)sithCogParse_GetSymbol_ADDR;
+//static sithCogSymbol* (__cdecl *sithCogParse_GetSymbol_)(sithCogSymboltable *a1, unsigned int a2) = (void*)sithCogParse_GetSymbol_ADDR;
 //static int (*sithCogParse_RecurseWrite)(sith_cog_parser_node *node) = (void*)sithCogParse_RecurseWrite_ADDR;
 
 int cog_parsescript();

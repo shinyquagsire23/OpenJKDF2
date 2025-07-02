@@ -181,6 +181,7 @@ void stdPlatform_InitServices(HostServices *handlers)
     handlers->debugPrint = 0;
     handlers->assert = stdPlatform_Assert;
     handlers->unk_0 = 0;
+#ifndef PLATFORM_POSIX
     handlers->alloc = daAlloc;
     handlers->free = daFree;
     handlers->realloc =  daRealloc;
@@ -196,6 +197,7 @@ void stdPlatform_InitServices(HostServices *handlers)
     handlers->fileSize = stdFileSize;
     handlers->filePrintf = stdFilePrintf;
     handlers->fileGetws = stdFileGetws;
+#endif
     handlers->allocHandle = stdPlatform_AllocHandle;
     handlers->freeHandle = stdPlatform_FreeHandle;
     handlers->reallocHandle = stdPlatform_ReallocHandle;
@@ -224,7 +226,7 @@ int stdPlatform_Startup()
 }
 
 #ifdef PLATFORM_POSIX
-int stdPrintf(void* a1, char *a2, int line, char *fmt, ...)
+int stdPrintf(int (*a1)(const char *, ...), const char *a2, int line, const char *fmt, ...)
 {
     va_list args;
     va_start (args, fmt);

@@ -1,6 +1,7 @@
 #include "sithCogExec.h"
 
 #include "Cog/sithCog.h"
+#include "Cog/sithCogParse.h"
 #include "jk.h"
 #include "stdPlatform.h"
 #include "World/sithWorld.h"

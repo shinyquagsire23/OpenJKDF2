@@ -56,12 +56,12 @@ void sithRender_RenderDebugLight(flex_t intensity, rdVector3* pos);
 
 #define SITHREND_NUM_LIGHTS (32)
 
-static void (*sithRender_Clip_)(sithSector *sector, rdClipFrustum *frustumArg, flex_t a3) = (void*)sithRender_Clip_ADDR;
-static void (*sithRender_UpdateLights_)(sithSector *sector, flex_t a2, flex_t dist) = (void*)sithRender_UpdateLights_ADDR;
-static void (*sithRender_RenderDynamicLights_)() = (void*)sithRender_RenderDynamicLights_ADDR;
-static void (*sithRender_RenderLevelGeometry_)() = (void*)sithRender_RenderLevelGeometry_ADDR;
+//static void (*sithRender_Clip_)(sithSector *sector, rdClipFrustum *frustumArg, flex_t a3) = (void*)sithRender_Clip_ADDR;
+//static void (*sithRender_UpdateLights_)(sithSector *sector, flex_t a2, flex_t dist) = (void*)sithRender_UpdateLights_ADDR;
+//static void (*sithRender_RenderDynamicLights_)() = (void*)sithRender_RenderDynamicLights_ADDR;
+//static void (*sithRender_RenderLevelGeometry_)() = (void*)sithRender_RenderLevelGeometry_ADDR;
 //static void (*sithRender_RenderThings)() = (void*)sithRender_RenderThings_ADDR;
-static void (*sithRender_RenderAlphaSurfaces_)() = (void*)sithRender_RenderAlphaSurfaces_ADDR;
+//static void (*sithRender_RenderAlphaSurfaces_)() = (void*)sithRender_RenderAlphaSurfaces_ADDR;
 //static int (*sithRender_RenderThing)(sithThing *a2) = (void*)sithRender_RenderThing_ADDR;
 
 #endif // _SITHRENDER_H

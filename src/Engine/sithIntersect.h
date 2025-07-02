@@ -42,8 +42,8 @@ static int (*sithIntersect_sub_508750)(rdVector3 *a1, flex_t a2, rdFace *a3, rdV
 static int (*sithIntersect_sub_5090B0)(const rdVector3 *a1, const rdVector3 *a2, flex_t a3, flex_t a4, sithSurfaceInfo *a5, rdVector3 *a6, flex_t *a7, int raycastFlags) = (void*)sithIntersect_sub_5090B0_ADDR;
 #endif
 
-static int (*_sithIntersect_sub_508D20)(const rdVector3 *a1, const rdVector3 *a2, flex_t a3, flex_t a4, rdFace *a5, rdVector3 *a6, flex_t *a7, rdVector3 *a8, int raycastFlags) = (void*)sithIntersect_sub_508D20_ADDR;
-static int (*_sithIntersect_SphereHit)(rdVector3 *a1, rdVector3 *a2, flex_t a3, flex_t a4, rdVector3 *surfaceNormal, rdVector3 *a6, flex_t *a7, int raycastFlags) = (void*)sithIntersect_SphereHit_ADDR;
+//static int (*_sithIntersect_sub_508D20)(const rdVector3 *a1, const rdVector3 *a2, flex_t a3, flex_t a4, rdFace *a5, rdVector3 *a6, flex_t *a7, rdVector3 *a8, int raycastFlags) = (void*)sithIntersect_sub_508D20_ADDR;
+//static int (*_sithIntersect_SphereHit)(rdVector3 *a1, rdVector3 *a2, flex_t a3, flex_t a4, rdVector3 *surfaceNormal, rdVector3 *a6, flex_t *a7, int raycastFlags) = (void*)sithIntersect_SphereHit_ADDR;
 
 //static int (*sithIntersect_sub_508990)(rdVector3 *a1, flex_t a2, rdFace *a3, rdVector3 *a4, int a5, rdVector3 *a6) = (void*)sithIntersect_sub_508990_ADDR;
 //static int (*sithIntersect_sub_508400)(const rdVector3 *a1, const rdVector3 *a2, flex_t a3, flex_t a4, rdMesh *mesh, flex_t *a6, rdFace **faceOut, rdVector3 *a8) = (void*)sithIntersect_sub_508400_ADDR;

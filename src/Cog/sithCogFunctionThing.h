@@ -4,6 +4,6 @@
 #include "types.h"
 #include "sithCog.h"
 
-void sithCogFunctionThing_Startup(void* ctx);
+void sithCogFunctionThing_Startup(sithCogSymboltable* ctx);
 
 #endif // _SITHCOGFUNCTIONTHING_H

@@ -577,7 +577,7 @@ void sithCogFunctionSound_PlaySoundThingAndWait(sithCog *ctx)
         sithCogExec_PushInt(ctx, -1);
 }
 
-void sithCogFunctionSound_Startup(void* ctx)
+void sithCogFunctionSound_Startup(sithCogSymboltable* ctx)
 {
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_PlaySong, "playsong");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_PlaySoundThing, "playsoundthing");

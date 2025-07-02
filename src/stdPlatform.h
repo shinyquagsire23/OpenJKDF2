@@ -37,12 +37,12 @@ static void (*stdPlatform_UnlockHandle)(uint32_t) = (void*)stdPlatform_UnlockHan
 #endif
 
 #ifndef PLATFORM_POSIX
-static int (*stdPrintf)(void* a1, char *a2, int line, char *fmt, ...) = (void*)0x426D80;
+static int (*stdPrintf)(int (*a1)(const char *, ...), const char *a2, int line, const char *fmt, ...) = (void*)0x426D80;
 static int (*stdPlatform_Printf)(const char *fmt, ...) = (void*)stdPlatform_Printf_ADDR;
 static int (__cdecl *stdPlatform_GetTimeMsec)(void) = (void*)stdPlatform_GetTimeMsec_ADDR;
 #else
 uint64_t Linux_TimeUs();
-int stdPrintf(void* a1, char *a2, int line, char *fmt, ...);
+int stdPrintf(int (*a1)(const char *, ...), const char *a2, int line, const char *fmt, ...);
 int stdPlatform_Printf(const char *fmt, ...);
 uint32_t stdPlatform_GetTimeMsec();
 #endif

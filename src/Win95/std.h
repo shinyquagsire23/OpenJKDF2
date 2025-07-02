@@ -56,16 +56,16 @@ void stdDelay(int unk, flex_t dur);
 //static void (*stdStartup)(struct HostServices *a1) = (void*)stdStartup_ADDR;
 //static void (*stdInitServices)(HostServices *a1) = (void*)stdInitServices_ADDR;
 //static int (*stdConsolePrintf)(const char *a1, ...) = (void*)stdConsolePrintf_ADDR;
-static stdFile_t (*stdFileOpen)(const char*,const char*) = (void*)stdFileOpen_ADDR;
-static int (*stdFileClose)(stdFile_t) = (void*)stdFileClose_ADDR;
-static size_t (*stdFileRead)(stdFile_t,void*,size_t) = (void*)stdFileRead_ADDR;
-static size_t (*stdFileWrite)(stdFile_t,void*,size_t) = (void*)stdFileWrite_ADDR;
-static const char* (*stdFileGets)(stdFile_t,char*,size_t) = (void*)stdFileGets_ADDR;
-static int (*stdFeof)(stdFile_t) = (void*)stdFeof_ADDR;
-static int (*stdFtell)(stdFile_t) = (void*)stdFtell_ADDR;
-static int (*stdFseek)(stdFile_t,int,int) = (void*)stdFseek_ADDR;
-static int (*stdFileSize)(stdFile_t) = (void*)stdFileSize_ADDR;
+//static stdFile_t (*stdFileOpen)(const char*,const char*) = (void*)stdFileOpen_ADDR;
+//static int (*stdFileClose)(stdFile_t) = (void*)stdFileClose_ADDR;
+//static size_t (*stdFileRead)(stdFile_t,void*,size_t) = (void*)stdFileRead_ADDR;
+//static size_t (*stdFileWrite)(stdFile_t,void*,size_t) = (void*)stdFileWrite_ADDR;
+//static const char* (*stdFileGets)(stdFile_t,char*,size_t) = (void*)stdFileGets_ADDR;
+//static int (*stdFeof)(stdFile_t) = (void*)stdFeof_ADDR;
+//static int (*stdFtell)(stdFile_t) = (void*)stdFtell_ADDR;
+//static int (*stdFseek)(stdFile_t,int,int) = (void*)stdFseek_ADDR;
+//static int (*stdFileSize)(stdFile_t) = (void*)stdFileSize_ADDR;
 //static int (*stdFilePrintf)(stdFile_t, const char *, ...) = (void*)stdFilePrintf_ADDR;
-static const wchar_t* (*stdFileGetws)(stdFile_t,wchar_t*,size_t) = (void*)stdFileGetws_ADDR;
+//static const wchar_t* (*stdFileGetws)(stdFile_t,wchar_t*,size_t) = (void*)stdFileGetws_ADDR;
 
 #endif // _STDLEC_H

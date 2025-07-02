@@ -87,7 +87,7 @@ void sithWeapon_SetFireRate(sithThing *weapon, flex_t fireRate);
 //static int (*sithWeapon_AutoSelect)(sithThing *player, int weapIdx) = (void*)sithWeapon_AutoSelect_ADDR;
 //static void (*sithWeapon_ProjectileAutoAim)(rdMatrix34 *a2, sithThing *a3, rdMatrix34 *a4, rdVector3 *a5, flex_t a6, flex_t a7) = (void*)sithWeapon_ProjectileAutoAim_ADDR;
 
-static sithThing* (*sithWeapon_FireProjectile_0_)(sithThing *sender, sithThing *projectileTemplate, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, int anim, flex_t scale, char scaleFlags, flex_t a9) = (void*)sithWeapon_FireProjectile_0_ADDR;
-static int (*sithWeapon_HandleWeaponKeys_)(sithThing *a1, flex_t a2) = (void*)sithWeapon_HandleWeaponKeys_ADDR;
+//static sithThing* (*sithWeapon_FireProjectile_0_)(sithThing *sender, sithThing *projectileTemplate, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, int anim, flex_t scale, char scaleFlags, flex_t a9) = (void*)sithWeapon_FireProjectile_0_ADDR;
+//static int (*sithWeapon_HandleWeaponKeys_)(sithThing *a1, flex_t a2) = (void*)sithWeapon_HandleWeaponKeys_ADDR;
 
 #endif // _SITHWEAPON_H

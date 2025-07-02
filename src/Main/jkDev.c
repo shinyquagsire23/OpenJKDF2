@@ -33,7 +33,7 @@ void jkDev_RenderQuakeConsole();
 // MOTS altered
 void jkDev_Startup()
 {
-#ifndef PLATFORM_POSIX
+#ifndef SDL2_RENDER
     if ( Main_bDevMode && Main_bWindowGUI)
     {
         jkDev_hDlg = jk_CreateDialogParamA(stdGdi_GetHInstance(), (LPCSTR)0x70, 0, jkDev_DialogFunc, 0);
