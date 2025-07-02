@@ -263,11 +263,11 @@ void sithTrackThing_PrepareForOrient(sithThing *thing, rdVector3 *pGoalFrameRot,
     angles.y = stdMath_NormalizeAngleAcute(angles.y);
     angles.z = stdMath_NormalizeAngleAcute(angles.z);
 
-    if (fabs(angles.x) < 2.5)
+    if (stdMath_Fabs(angles.x) < 2.5)
         angles.x = 0.0;
-    if (fabs(angles.y) < 2.5)
+    if (stdMath_Fabs(angles.y) < 2.5)
         angles.y = 0.0;
-    if (fabs(angles.z) < 2.5)
+    if (stdMath_Fabs(angles.z) < 2.5)
         angles.z = 0.0;
 
     if ( !rdVector_IsZero3(&angles) )

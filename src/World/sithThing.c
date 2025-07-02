@@ -848,7 +848,7 @@ void sithThing_EnterWater(sithThing* pThing, int a2)
     {
 #ifdef QOL_IMPROVEMENTS
         // Prevent splash sound spam if they're not actually making significant movement
-        if ( pThing->soundclass && fabs(pThing->physicsParams.vel.z) > 0.02 )  
+        if ( pThing->soundclass && stdMath_Fabs(pThing->physicsParams.vel.z) > 0.02 )  
 #else
         if ( pThing->soundclass )
 #endif

@@ -1,5 +1,6 @@
 #include "rdClip.h"
 
+#include "General/stdMath.h"
 #include "rdCanvas.h"
 #include "jk.h"
 
@@ -2257,7 +2258,7 @@ int rdClip_Face3S(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices)
                 }
                 numVerticesb = frustum->nearLeft * v12;
 
-                if ( fabs(frustuma) <= fabs(v112) )
+                if ( stdMath_Fabs(frustuma) <= stdMath_Fabs(v112) )
                     v20 = (numVerticesb - v7->x) / v112;
                 else
                     v20 = (v12 - v7->y) / frustuma;
@@ -2372,7 +2373,7 @@ int rdClip_Face3S(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices)
                 }
                 v60 = frustum->nearTop * v57;
 
-                if ( fabs(frustumc) <= fabs(v114) )
+                if ( stdMath_Fabs(frustumc) <= stdMath_Fabs(v114) )
                     v66 = (v60 - v49->z) / v114;
                 else
                     v66 = (v57 - v49->y) / frustumc;

@@ -698,7 +698,7 @@ void sithAI_sub_4EA630(sithActor *actor, flex_t deltaSeconds)
     v2 = actor->thing;
     v3 = &actor->lookVector;
     v4 = &actor->thing->lookOrientation;
-    v5 = fabs(rdVector_Dot3(&v4->rvec, &actor->lookVector));
+    v5 = stdMath_Fabs(rdVector_Dot3(&v4->rvec, &actor->lookVector));
     if ( v5 <= 0.01 )
     {
         v10 = &v2->lookOrientation.lvec;
@@ -1392,7 +1392,7 @@ int sithAI_FireWeapon(sithActor *actor, flex_t minDistToFire, flex_t maxDistToFi
         return 0;
     }
 
-    v19 = fabs(rdVector_Dot3(&v9->lookOrientation.rvec, &v1));
+    v19 = stdMath_Fabs(rdVector_Dot3(&v9->lookOrientation.rvec, &v1));
     if ( v19 > 1.0 - minDot )
         return 0;
     

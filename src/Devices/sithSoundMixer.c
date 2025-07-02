@@ -754,7 +754,7 @@ void sithSoundMixer_TickSectorSound()
         else
         {
             v3->flags &= ~(SITHSOUNDFLAG_FADE_OUT|SITHSOUNDFLAG_FADE_IN|SITHSOUNDFLAG_FADING);
-            v7 = fabs(v4);
+            v7 = stdMath_Fabs(v4);
             v3->volume = 0.0;
             v3->volumeVelocity = v7 + v7;
             if (v4 < 0.0) // TODO verify? v4
@@ -785,7 +785,7 @@ void sithSoundMixer_TickSectorSound()
         v14 = v13 - sithSoundMixer_pCurSectorPlayingSound->vol_2;
         if ( v14 == 0.0 )
             return;
-        v17 = fabs(v14);
+        v17 = stdMath_Fabs(v14);
 
         // added copy for later
         v43 = v14;
@@ -798,7 +798,7 @@ void sithSoundMixer_TickSectorSound()
         if (v20 != 0.0)
         {
             sithSoundMixer_pCurSectorPlayingSound->flags &= ~(SITHSOUNDFLAG_FADE_OUT|SITHSOUNDFLAG_FADE_IN|SITHSOUNDFLAG_FADING);
-            v23 = fabs(v20);
+            v23 = stdMath_Fabs(v20);
             v3->volume = 0.0;
             v3->volumeVelocity = v23 + v23;
             if (v20 < 0.0) // TODO verify? v20 <
@@ -817,7 +817,7 @@ void sithSoundMixer_TickSectorSound()
         if (v31 == 0.0)
             return;
         v43 = v31;
-        v17 = fabs(v43);
+        v17 = stdMath_Fabs(v43);
         v3->flags &= ~(SITHSOUNDFLAG_FADE_OUT|SITHSOUNDFLAG_FADE_IN|SITHSOUNDFLAG_FADING);
     }
     v3->volumeVelocity = v17 + v17;
@@ -1161,9 +1161,9 @@ void sithSoundMixer_UpdatePlayingSoundPosition(sithPlayingSound *sound)
             sound->flags |= SITHSOUNDFLAG_UNDERWATER;
     }
 
-    if ( fabs(sound->posRelative.x) > sound->maxPosition
-         || fabs(sound->posRelative.y) > sound->maxPosition
-         || fabs(sound->posRelative.z) > sound->maxPosition)
+    if ( stdMath_Fabs(sound->posRelative.x) > sound->maxPosition
+         || stdMath_Fabs(sound->posRelative.y) > sound->maxPosition
+         || stdMath_Fabs(sound->posRelative.z) > sound->maxPosition)
     {
         sound->distance = sound->maxPosition - -1.0;
     }

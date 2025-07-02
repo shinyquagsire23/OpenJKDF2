@@ -835,10 +835,10 @@ void jkPlayer_DrawPov()
 
         // TODO: I think this explains some weird duplication
 #ifndef QOL_IMPROVEMENTS
-        flex_t waggleAmt = (fabs(player->waggle) > 0.02 ? 0.02 : fabs(player->waggle)) * jkPlayer_waggleMag;
+        flex_t waggleAmt = (stdMath_Fabs(player->waggle) > 0.02 ? 0.02 : stdMath_Fabs(player->waggle)) * jkPlayer_waggleMag;
 #else
         // scale animation to be in line w/ 25fps (presumed 'mastering' FPS of whoever was coding the waggle)
-        flex_t waggleAmt = (fabs(player->waggle) > 0.02 * (sithTime_deltaSeconds / (1.0/25)) ? 0.02 * (sithTime_deltaSeconds / (1.0/25)) : fabs(player->waggle)) * jkPlayer_waggleMag;
+        flex_t waggleAmt = (stdMath_Fabs(player->waggle) > 0.02 * (sithTime_deltaSeconds / (1.0/25)) ? 0.02 * (sithTime_deltaSeconds / (1.0/25)) : stdMath_Fabs(player->waggle)) * jkPlayer_waggleMag;
 
         if (jkPlayer_bDisableWeaponWaggle) {
             waggleAmt = 0.0;

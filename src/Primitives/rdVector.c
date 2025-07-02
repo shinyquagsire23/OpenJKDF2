@@ -626,9 +626,9 @@ flex_t rdVector_NormalDot(const rdVector3* v1, const rdVector3* v2, const rdVect
 
 void rdVector_AbsRound3(rdVector3* v)
 {
-    v->x = stdMath_ClipPrecision(fabs(v->x));
-    v->y = stdMath_ClipPrecision(fabs(v->y));
-    v->z = stdMath_ClipPrecision(fabs(v->z));
+    v->x = stdMath_ClipPrecision(stdMath_Fabs(v->x));
+    v->y = stdMath_ClipPrecision(stdMath_Fabs(v->y));
+    v->z = stdMath_ClipPrecision(stdMath_Fabs(v->z));
 }
 
 void rdVector_ClipPrecision3(rdVector3* v)

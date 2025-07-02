@@ -892,7 +892,7 @@ int32_t stdMath_FloorDivMod(int32_t in1, int32_t in2, int32_t *out1, int32_t *ou
 
 flex_t stdMath_ClipPrecision(flex_t val)
 {
-    if (fabs(val) <= 0.00001)
+    if (stdMath_Fabs(val) <= 0.00001)
         return 0.0;
     return val;
 }
@@ -910,7 +910,7 @@ flex_t stdMath_Clamp(flex_t val, flex_t valMin, flex_t valMax)
 
 flex_t stdMath_ClampValue(flex_t val, flex_t valAbsMax)
 {
-    valAbsMax = fabs(valAbsMax);
+    valAbsMax = stdMath_Fabs(valAbsMax);
     
     if (val < -valAbsMax)
         return -valAbsMax;

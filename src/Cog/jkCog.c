@@ -1264,7 +1264,7 @@ void jkCogExt_Absolute(sithCog* ctx)
         sithCogExec_PushInt(ctx, abs((int)val));
     }
     else {
-        sithCogExec_PushFlex(ctx, fabs(val));
+        sithCogExec_PushFlex(ctx, stdMath_Fabs(val));
     }
 }
 

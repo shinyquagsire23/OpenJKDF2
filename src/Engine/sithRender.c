@@ -988,7 +988,7 @@ void sithRender_RenderLevelGeometry()
                         v53 = v51 + 1;
                         do
                         {
-                            v54 = fabs(*v53 - v67);
+                            v54 = stdMath_Fabs(*v53 - v67);
                             if ( v54 > 0.015625 )
                                 break;
                             ++v52;
@@ -1207,7 +1207,7 @@ void sithRender_RenderLevelGeometry()
                             v33 = v31 + 1;
                             do
                             {
-                                v34 = fabs(*v33 - v66);
+                                v34 = stdMath_Fabs(*v33 - v66);
                                 if ( v34 > 0.015625 )
                                     break;
                                 ++v32;

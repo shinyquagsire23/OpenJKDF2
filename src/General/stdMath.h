@@ -74,7 +74,8 @@ flex_t stdMath_Clamp(flex_t val, flex_t valMin, flex_t valMax);
 flex_t stdMath_ClampValue(flex_t val, flex_t valAbsMax);
 static inline flex_t stdMath_Fabs(flex_t val)
 {
-    return fabs(val);
+    //return fabs(val);
+    return (val < 0.0) ? -val : val;
 }
 
 static inline int32_t stdMath_ClampInt(int32_t val, int32_t valMin, int32_t valMax)

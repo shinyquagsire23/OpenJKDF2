@@ -1,5 +1,6 @@
 #include "sithPuppet.h"
 
+#include "General/stdMath.h"
 #include "General/stdHashTable.h"
 #include "Engine/sithAnimClass.h"
 #include "Gameplay/sithTime.h"
@@ -395,8 +396,8 @@ flex_t sithPuppet_sub_4E4380(sithThing *thing)
         if ( thing->attach_flags || (thing->physicsParams.physflags & SITH_PF_FLY) != 0 || (thing->sector->flags & SITH_ANIM_WALK) != 0 )
         {
             v2 = a1a.y;
-            v5 = fabs(a1a.y);
-            v8 = fabs(a1a.x);
+            v5 = stdMath_Fabs(a1a.y);
+            v8 = stdMath_Fabs(a1a.x);
 
             if ( v5 <= v8 )
             {
