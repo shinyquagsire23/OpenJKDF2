@@ -10,7 +10,7 @@
 #define sithRenderSky_TransformHorizontal_ADDR (0x004F2E30)
 #define sithRenderSky_TransformVertical_ADDR (0x004F2F60)
 
-int sithRenderSky_Open(float horizontalPixelsPerRev, float horizontalDist, float ceilingSky);
+int sithRenderSky_Open(flex_t horizontalPixelsPerRev, flex_t horizontalDist, flex_t ceilingSky);
 void sithRenderSky_Close();
 void sithRenderSky_Update();
 void sithRenderSky_TransformHorizontal(rdProcEntry *a1, sithSurfaceInfo *a2, int num_vertices);

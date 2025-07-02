@@ -7,7 +7,7 @@
 #include "Devices/sithComm.h"
 #include "Main/Main.h"
 
-int sithDSSCog_SendSendTrigger(sithCog *a1, int a2, int a3, int a4, int a5, int a6, int a7, float param0, float param1, float param2, float param3, int a11)
+int sithDSSCog_SendSendTrigger(sithCog *a1, int a2, int a3, int a4, int a5, int a6, int a7, flex32_t param0, flex32_t param1, flex32_t param2, flex32_t param3, int a11)
 {
     int v12; // edi
     sithThing *v13; // eax
@@ -60,10 +60,10 @@ int sithDSSCog_ProcessSendTrigger(sithCogMsg *in_netMsg)
     sithThing *v7; // eax
     int msgid; // eax
     sithThing *v12; // eax
-    float param3; // [esp+10h] [ebp-1Ch]
-    float param2; // [esp+14h] [ebp-18h]
-    float param1; // [esp+18h] [ebp-14h]
-    float param0; // [esp+1Ch] [ebp-10h]
+    flex32_t param3; // [esp+10h] [ebp-1Ch]
+    flex32_t param2; // [esp+14h] [ebp-18h]
+    flex32_t param1; // [esp+18h] [ebp-14h]
+    flex32_t param0; // [esp+1Ch] [ebp-10h]
     sithCog *cog; // [esp+20h] [ebp-Ch]
     int linkId; // [esp+28h] [ebp-4h]
     int sourceType; // [esp+30h] [ebp+4h]

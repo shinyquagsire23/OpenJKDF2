@@ -32,16 +32,16 @@
 #define rdCamera_ClearLights_ADDR (0x00443CF0)
 #define rdCamera_AdvanceFrame_ADDR (0x00443D10)
 
-rdCamera* rdCamera_New(float fov, float x, float y, float z, float aspectRatio);
-int rdCamera_NewEntry(rdCamera *camera, float fov, float a3, float zNear, float zFar, float aspectRatio);
+rdCamera* rdCamera_New(flex_t fov, flex_t x, flex_t y, flex_t z, flex_t aspectRatio);
+int rdCamera_NewEntry(rdCamera *camera, flex_t fov, flex_t a3, flex_t zNear, flex_t zFar, flex_t aspectRatio);
 void rdCamera_Free(rdCamera *camera);
 void rdCamera_FreeEntry(rdCamera *camera);
 int rdCamera_SetCanvas(rdCamera *camera, rdCanvas *canvas);
 int rdCamera_SetCurrent(rdCamera *camera);
-int rdCamera_SetFOV(rdCamera *camera, float fovVal);
+int rdCamera_SetFOV(rdCamera *camera, flex_t fovVal);
 int rdCamera_SetProjectType(rdCamera *camera, int type);
-int rdCamera_SetOrthoScale(rdCamera *camera, float scale);
-int rdCamera_SetAspectRatio(rdCamera *camera, float ratio);
+int rdCamera_SetOrthoScale(rdCamera *camera, flex_t scale);
+int rdCamera_SetAspectRatio(rdCamera *camera, flex_t ratio);
 int rdCamera_BuildFOV(rdCamera *camera);
 int rdCamera_BuildClipFrustum(rdCamera *camera, rdClipFrustum *outClip, signed int height, signed int width, signed int height2, signed int width2);
 void rdCamera_Update(rdMatrix34 *orthoProj);
@@ -53,12 +53,12 @@ void rdCamera_PerspProject(rdVector3 *out, rdVector3 *v);
 void rdCamera_PerspProjectLst(rdVector3 *vertices_out, rdVector3 *vertices_in, unsigned int num_vertices);
 void rdCamera_PerspProjectSquare(rdVector3 *out, rdVector3 *v);
 void rdCamera_PerspProjectSquareLst(rdVector3 *vertices_out, rdVector3 *vertices_in, unsigned int num_vertices);
-void rdCamera_SetAmbientLight(rdCamera *camera, float amt);
-void rdCamera_SetAttenuation(rdCamera *camera, float minVal, float maxVal);
+void rdCamera_SetAmbientLight(rdCamera *camera, flex_t amt);
+void rdCamera_SetAttenuation(rdCamera *camera, flex_t minVal, flex_t maxVal);
 int rdCamera_AddLight(rdCamera *camera, rdLight *light, rdVector3 *lightPos);
 int rdCamera_ClearLights(rdCamera *camera);
 void rdCamera_AdvanceFrame();
-float rdCamera_GetMipmapScalar(); // MOTS added
-void rdCamera_SetMipmapScalar(float val); // MOTS added
+flex_t rdCamera_GetMipmapScalar(); // MOTS added
+void rdCamera_SetMipmapScalar(flex_t val); // MOTS added
 
 #endif // _RDCAMERA_H

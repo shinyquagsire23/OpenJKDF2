@@ -33,31 +33,31 @@ void sithRender_Close();
 void sithRender_Shutdown();
 void sithRender_SetSomeRenderflag(int flag);
 int sithRender_GetSomeRenderFlag();
-void sithRender_EnableIRMode(float a, float b);
+void sithRender_EnableIRMode(flex_t a, flex_t b);
 void sithRender_DisableIRMode();
 void sithRender_SetGeoMode(rdGeoMode_t val);
 void sithRender_SetLightMode(rdLightMode_t a1);
 void sithRender_SetTexMode(rdTexMode_t a1);
 void sithRender_SetPalette(const void *palette);
 void sithRender_Draw();
-void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3);
+void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, flex_t a3);
 void sithRender_RenderLevelGeometry();
 void sithRender_UpdateAllLights();
-void sithRender_UpdateLights(sithSector *sector, float prev, float dist, int depth);
+void sithRender_UpdateLights(sithSector *sector, flex_t prev, flex_t dist, int depth);
 void sithRender_RenderDynamicLights();
 void sithRender_RenderThings();
 int sithRender_RenderThing(sithThing *povThing);
 void sithRender_RenderAlphaSurfaces();
 int sithRender_SetRenderWeaponHandle(void *a1);
-void sithRender_WorldFlash(float arg1,float arg2);
+void sithRender_WorldFlash(flex_t arg1,flex_t arg2);
 
 // Added
-void sithRender_RenderDebugLight(float intensity, rdVector3* pos);
+void sithRender_RenderDebugLight(flex_t intensity, rdVector3* pos);
 
 #define SITHREND_NUM_LIGHTS (32)
 
-static void (*sithRender_Clip_)(sithSector *sector, rdClipFrustum *frustumArg, float a3) = (void*)sithRender_Clip_ADDR;
-static void (*sithRender_UpdateLights_)(sithSector *sector, float a2, float dist) = (void*)sithRender_UpdateLights_ADDR;
+static void (*sithRender_Clip_)(sithSector *sector, rdClipFrustum *frustumArg, flex_t a3) = (void*)sithRender_Clip_ADDR;
+static void (*sithRender_UpdateLights_)(sithSector *sector, flex_t a2, flex_t dist) = (void*)sithRender_UpdateLights_ADDR;
 static void (*sithRender_RenderDynamicLights_)() = (void*)sithRender_RenderDynamicLights_ADDR;
 static void (*sithRender_RenderLevelGeometry_)() = (void*)sithRender_RenderLevelGeometry_ADDR;
 //static void (*sithRender_RenderThings)() = (void*)sithRender_RenderThings_ADDR;

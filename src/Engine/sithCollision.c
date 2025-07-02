@@ -81,7 +81,7 @@ void sithCollision_RegisterHitHandler(int type, void* a2)
 sithCollisionSearchEntry* sithCollision_NextSearchResult()
 {
     sithCollisionSearchEntry* retVal = NULL;
-    float maxDist = 3.4e38;
+    flex_t maxDist = 3.4e38;
     
     for (int i = 0; i < sithCollision_searchNumResults[sithCollision_searchStackIdx]; i++)
     {
@@ -114,7 +114,7 @@ sithCollisionSearchEntry* sithCollision_NextSearchResult()
     }
 }
 
-float sithCollision_SearchRadiusForThings(sithSector *pStartSector, sithThing *pThing, const rdVector3 *pStartPos, const rdVector3 *pMoveNorm, float moveDist, float radius, int flags)
+flex_t sithCollision_SearchRadiusForThings(sithSector *pStartSector, sithThing *pThing, const rdVector3 *pStartPos, const rdVector3 *pMoveNorm, flex_t moveDist, flex_t radius, int flags)
 {
     sithCollisionSearchEntry *i; // ebp
     sithSector *pSurfAdjSector; // esi
@@ -127,7 +127,7 @@ float sithCollision_SearchRadiusForThings(sithSector *pStartSector, sithThing *p
     sithSector *pAdjoinSector; // esi
     sithSector *v24; // edx
     unsigned int v26; // [esp+10h] [ebp-8h]
-    float curMoveDist; // [esp+2Ch] [ebp+14h]
+    flex_t curMoveDist; // [esp+2Ch] [ebp+14h]
 
 
     sithCollision_searchStackIdx++;
@@ -211,7 +211,7 @@ void sithCollision_SearchClose()
     --sithCollision_searchStackIdx;
 }
 
-float sithCollision_UpdateSectorThingCollision(sithSector *pSector, sithThing *sender, const rdVector3 *a2, const rdVector3 *a3, float a4, float range, int flags)
+flex_t sithCollision_UpdateSectorThingCollision(sithSector *pSector, sithThing *sender, const rdVector3 *a2, const rdVector3 *a3, flex_t a4, flex_t range, int flags)
 {
     sithThing *v7; // esi
     sithThing *v8; // ebp
@@ -224,7 +224,7 @@ float sithCollision_UpdateSectorThingCollision(sithSector *pSector, sithThing *s
     int v19; // eax
     rdFace *v21; // ebx
     int v22; // edx
-    float v23; // st7
+    flex_t v23; // st7
     sithCollisionSearchEntry *v24; // ecx
     rdMesh *senderMesh; // edx
     sithCollision_searchHandler_t handler;
@@ -315,7 +315,7 @@ LABEL_41:
     return a4;
 }
 
-void sithCollision_sub_4E86D0(sithSector *sector, const rdVector3 *vec1, const rdVector3 *vec2, float a4, float a5, int raycastFlags)
+void sithCollision_sub_4E86D0(sithSector *sector, const rdVector3 *vec1, const rdVector3 *vec2, flex_t a4, flex_t a5, int raycastFlags)
 {
     sithSurface *v12; // esi
     sithAdjoin *v15; // eax
@@ -341,9 +341,9 @@ void sithCollision_sub_4E86D0(sithSector *sector, const rdVector3 *vec1, const r
     int v38; // edx
     sithCollisionSearchEntry *v40; // eax
     int v42; // [esp+0h] [ebp-40h] BYREF
-    float a7; // [esp+10h] [ebp-30h] BYREF
+    flex_t a7; // [esp+10h] [ebp-30h] BYREF
     int v47; // [esp+20h] [ebp-20h]
-    float v48; // [esp+24h] [ebp-1Ch] BYREF
+    flex_t v48; // [esp+24h] [ebp-1Ch] BYREF
     rdVector3 pushVel; // [esp+34h] [ebp-Ch] BYREF
     rdVector3 tmp;
     
@@ -506,7 +506,7 @@ LABEL_42:
     }
 }
 
-sithSector* sithCollision_GetSectorLookAt(sithSector *pStartSector, const rdVector3 *pStartPos, rdVector3 *pEndPos, float a5)
+sithSector* sithCollision_GetSectorLookAt(sithSector *pStartSector, const rdVector3 *pStartPos, rdVector3 *pEndPos, flex_t a5)
 {
     double v4; // st6
     sithSector *result; // eax
@@ -517,7 +517,7 @@ sithSector* sithCollision_GetSectorLookAt(sithSector *pStartSector, const rdVect
     sithCollisionSearchEntry *v11; // ecx
     int v12; // esi
     rdVector3 a1; // [esp+8h] [ebp-Ch] BYREF
-    float a3a; // [esp+1Ch] [ebp+8h]
+    flex_t a3a; // [esp+1Ch] [ebp+8h]
 
     if ( sithIntersect_IsSphereInSector(pEndPos, 0.0, pStartSector) )
         return pStartSector;
@@ -578,7 +578,7 @@ sithSector* sithCollision_GetSectorLookAt(sithSector *pStartSector, const rdVect
     return result;
 }
 
-void sithCollision_FallHurt(sithThing *thing, float vel)
+void sithCollision_FallHurt(sithThing *thing, flex_t vel)
 {
     double v2; // st7
 
@@ -614,7 +614,7 @@ void sithCollision_sub_4E7670(sithThing *thing, rdMatrix34 *orient)
     }
 }
 
-float sithCollision_UpdateThingCollision(sithThing *pThing, rdVector3 *a2, float a6, int flags)
+flex_t sithCollision_UpdateThingCollision(sithThing *pThing, rdVector3 *a2, flex_t a6, int flags)
 {
     sithThing *v5; // ebp
     sithThing *v10; // esi
@@ -622,7 +622,7 @@ float sithCollision_UpdateThingCollision(sithThing *pThing, rdVector3 *a2, float
     double v12; // st7
     //char v15; // c0
     int v16; // edi
-    float v17; // edx
+    flex_t v17; // edx
     //int v18; // edx
     sithCollisionSearchEntry *v19; // esi
     //double v20; // st7
@@ -643,8 +643,8 @@ float sithCollision_UpdateThingCollision(sithThing *pThing, rdVector3 *a2, float
     sithThing *i; // esi
     int v61; // eax
     sithSurface *amount; // [esp+0h] [ebp-54h]
-    float v64; // [esp+18h] [ebp-3Ch]
-    float v65; // [esp+1Ch] [ebp-38h]
+    flex_t v64; // [esp+18h] [ebp-3Ch]
+    flex_t v65; // [esp+1Ch] [ebp-38h]
     unsigned int v66; // [esp+20h] [ebp-34h]
     rdVector3 direction; // [esp+24h] [ebp-30h] BYREF
     rdVector3 posCopy;
@@ -909,7 +909,7 @@ LABEL_81:
 int sithCollision_DefaultHitHandler(sithThing *thing, sithSurface *surface, sithCollisionSearchEntry *a3)
 {
     sithThing *v3; // esi
-    float a1a; // [esp+Ch] [ebp+4h]
+    flex_t a1a; // [esp+Ch] [ebp+4h]
 
     v3 = thing;
     if ( thing->moveType != SITH_MT_PHYSICS )
@@ -947,14 +947,14 @@ int sithCollision_DebrisDebrisCollide(sithThing *thing1, sithThing *thing2, sith
     double v11; // st7
     //char v14; // c0
     double v15; // st7
-    float a3a; // [esp+0h] [ebp-38h]
+    flex_t a3a; // [esp+0h] [ebp-38h]
     rdVector3 a2; // [esp+14h] [ebp-24h] BYREF
     rdVector3 forceVec; // [esp+20h] [ebp-18h] BYREF
     rdVector3 v19; // [esp+2Ch] [ebp-Ch] BYREF
-    float senderb; // [esp+3Ch] [ebp+4h]
-    float sender; // [esp+3Ch] [ebp+4h]
-    float sendera; // [esp+3Ch] [ebp+4h]
-    float a1a; // [esp+40h] [ebp+8h]
+    flex_t senderb; // [esp+3Ch] [ebp+4h]
+    flex_t sender; // [esp+3Ch] [ebp+4h]
+    flex_t sendera; // [esp+3Ch] [ebp+4h]
+    flex_t a1a; // [esp+40h] [ebp+8h]
 
     if ( isInverse )
     {
@@ -1036,7 +1036,7 @@ int sithCollision_DebrisDebrisCollide(sithThing *thing1, sithThing *thing2, sith
     return 1;
 }
 
-int sithCollision_CollideHurt(sithThing *a1, rdVector3 *a2, float a3, int a4)
+int sithCollision_CollideHurt(sithThing *a1, rdVector3 *a2, flex_t a3, int a4)
 {
     int result; // eax
     double v10; // st6
@@ -1050,9 +1050,9 @@ int sithCollision_CollideHurt(sithThing *a1, rdVector3 *a2, float a3, int a4)
     double v36; // st7
     double v39; // st7
     double v40; // st7
-    float v43; // [esp+8h] [ebp-4h]
-    float a1a; // [esp+10h] [ebp+4h]
-    float amount; // [esp+14h] [ebp+8h]
+    flex_t v43; // [esp+8h] [ebp-4h]
+    flex_t a1a; // [esp+10h] [ebp+4h]
+    flex_t amount; // [esp+14h] [ebp+8h]
 
     if ( a1->moveType != SITH_MT_PHYSICS )
         return 0;
@@ -1137,7 +1137,7 @@ int sithCollision_HasLos(sithThing *thing1, sithThing *thing2, int flag)
     int result; // eax
     int v12; // [esp+10h] [ebp-10h]
     rdVector3 a1a; // [esp+14h] [ebp-Ch] BYREF
-    float a6; // [esp+2Ch] [ebp+Ch]
+    flex_t a6; // [esp+2Ch] [ebp+Ch]
 
     v12 = 1;
     searchFlags = RAYCAST_2000 | RAYCAST_100 | RAYCAST_20 | RAYCAST_2;
@@ -1209,7 +1209,7 @@ void sithCollision_sub_4E77A0(sithThing *thing, rdMatrix34 *a2)
     rdVector3 a2a; // [esp+10h] [ebp-6Ch] BYREF
     rdMatrix34 out; // [esp+1Ch] [ebp-60h] BYREF
     rdMatrix34 mat1; // [esp+4Ch] [ebp-30h] BYREF
-    float a1a; // [esp+84h] [ebp+8h]
+    flex_t a1a; // [esp+84h] [ebp+8h]
 
     if ( thing->attachedParentMaybe )
     {
@@ -1249,9 +1249,9 @@ void sithCollision_sub_4E77A0(sithThing *thing, rdMatrix34 *a2)
 int sithCollision_DebrisPlayerCollide(sithThing *thing, sithThing *thing2, sithCollisionSearchEntry *searchEnt, int isSolid)
 {
     int result; // eax
-    float mass; // [esp+14h] [ebp+4h]
+    flex_t mass; // [esp+14h] [ebp+4h]
 
-    float tmp = 0.0; // Added 0.0, original game overwrites &searchEnt...
+    flex_t tmp = 0.0; // Added 0.0, original game overwrites &searchEnt...
 
     // Added: check move type
     mass = (thing->moveType == SITH_MT_PHYSICS) ? thing->physicsParams.mass : 0.0;

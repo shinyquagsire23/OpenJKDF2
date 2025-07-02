@@ -285,7 +285,7 @@ void sithPuppet_ResetTrack(sithThing *puppet)
 }
 
 // MOTS altered?
-void sithPuppet_Tick(sithThing *thing, float deltaSeconds)
+void sithPuppet_Tick(sithThing *thing, flex_t deltaSeconds)
 {
     double v3; // st7
     sithPuppet *v4; // eax
@@ -303,12 +303,12 @@ void sithPuppet_Tick(sithThing *thing, float deltaSeconds)
     int v19; // eax
     rdMatrix34 *v20; // eax
     rdMatrix34 *v23; // ecx
-    float *v27; // eax
+    flex_t *v27; // eax
     int i; // edx
-    float v31; // [esp+0h] [ebp-18h]
+    flex_t v31; // [esp+0h] [ebp-18h]
     rdVector3 a1a; // [esp+Ch] [ebp-Ch] BYREF
-    float thinga; // [esp+1Ch] [ebp+4h]
-    float a2a; // [esp+20h] [ebp+8h]
+    flex_t thinga; // [esp+1Ch] [ebp+4h]
+    flex_t a2a; // [esp+20h] [ebp+8h]
 
     if ( thing->animclass && thing->puppet && thing->rdthing.puppet && (g_debugmodeFlags & DEBUGFLAG_NO_PUPPETS) == 0 )
     {
@@ -360,7 +360,7 @@ void sithPuppet_Tick(sithThing *thing, float deltaSeconds)
     }
 }
 
-float sithPuppet_sub_4E4380(sithThing *thing)
+flex_t sithPuppet_sub_4E4380(sithThing *thing)
 {
     double v2; // st7
     int v3; // ecx
@@ -377,9 +377,9 @@ float sithPuppet_sub_4E4380(sithThing *thing)
     sithPuppet *v18 = NULL; // edx
     sithAnimclassEntry *v19 = NULL; // edi
     int v20; // eax
-    float v23; // [esp+10h] [ebp-10h]
+    flex_t v23; // [esp+10h] [ebp-10h]
     rdVector3 a1a; // [esp+14h] [ebp-Ch] BYREF
-    float thinga; // [esp+24h] [ebp+4h]
+    flex_t thinga; // [esp+24h] [ebp+4h]
 
     v23 = 0.5;
     if ( !thing->sector
@@ -767,7 +767,7 @@ LABEL_50:
     }
 }
 
-int sithPuppet_StopKey(rdPuppet *pupper, int track, float a3)
+int sithPuppet_StopKey(rdPuppet *pupper, int track, flex_t a3)
 {
     if ( !pupper->tracks[track].keyframe )
         return 0;
@@ -870,15 +870,15 @@ void sithPuppet_resetidk(sithThing *pThing)
     }
 }
 
-void sithPuppet_advanceidk(sithThing *pThing, float a2)
+void sithPuppet_advanceidk(sithThing *pThing, flex_t a2)
 {
     double v3; // st7
     sithPuppet *puppet; // eax
     sithAnimclassEntry *v5; // ecx
     int v6; // ecx
     double v8; // st7
-    float a3; // [esp+0h] [ebp-8h]
-    float thinga; // [esp+Ch] [ebp+4h]
+    flex_t a3; // [esp+0h] [ebp-8h]
+    flex_t thinga; // [esp+Ch] [ebp+4h]
 
     v3 = sithPuppet_sub_4E4380(pThing);
     puppet = pThing->puppet;

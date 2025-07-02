@@ -49,10 +49,6 @@ rdColormap* rdColormap_Load(char *colormap_fname)
 int rdColormap_LoadEntry(char *colormap_fname, rdColormap *colormap)
 {
     intptr_t colormap_fptr; // edi
-    const char *v4; // eax
-    int v6; // eax
-    float v7; // edx
-    float v8; // eax
     uint16_t *rgb16Alloc; // eax
     char *v10; // eax
     void *v11; // eax
@@ -66,17 +62,13 @@ int rdColormap_LoadEntry(char *colormap_fname, rdColormap *colormap)
         stdPlatform_Printf("failed to open colormap `%s`!\n", colormap_fname);
         return 0;
     }
-    v4 = stdFileFromPath(colormap_fname);
-    _strncpy(colormap->colormap_fname, v4, 0x1Fu);
+    _strncpy(colormap->colormap_fname, stdFileFromPath(colormap_fname), 0x1Fu);
     colormap->colormap_fname[31] = 0;
     rdroid_pHS->fileRead(colormap_fptr, &header, 0x40);
-    v6 = header.flags;
-    v7 = header.tint.y;
     colormap->tint.x = header.tint.x;
-    colormap->flags = v6;
-    v8 = header.tint.z;
-    colormap->tint.y = v7;
-    colormap->tint.z = v8;
+    colormap->flags = header.flags;
+    colormap->tint.y = header.tint.y;
+    colormap->tint.z = header.tint.z;
     if ( _strncmp((const char *)&header.magic, "CMP ", 4u) )
     {
         jk_printf("CMP magic in `%s` is invalid!\n", colormap_fname);

@@ -21,7 +21,7 @@ static rdVector2i sithIntersect_unkArr[3] = {
 };
 
 // Added
-int sithIntersect_IsSphereInSectorBox(const rdVector3 *pos, float radius, sithSector *sector)
+int sithIntersect_IsSphereInSectorBox(const rdVector3 *pos, flex_t radius, sithSector *sector)
 {
     rdVector3 *v7; // ebp
     double v8; // st7
@@ -47,7 +47,7 @@ int sithIntersect_IsSphereInSectorBox(const rdVector3 *pos, float radius, sithSe
 
 //sithIntersect_sub_507EA0
 
-int sithIntersect_IsSphereInSector(const rdVector3 *pos, float radius, sithSector *sector)
+int sithIntersect_IsSphereInSector(const rdVector3 *pos, flex_t radius, sithSector *sector)
 {
     rdVector3 *v7; // ebp
     double v8; // st7
@@ -86,7 +86,7 @@ int sithIntersect_IsSphereInSector(const rdVector3 *pos, float radius, sithSecto
 
 // sithIntersect_sub_508070
 
-int sithIntersect_CollideThings(sithThing *pThing, const rdVector3 *a2, const rdVector3 *a3, float a4, float range, sithThing *a6, int raycastFlags, float *a8, rdMesh **outMesh, rdFace **a10, rdVector3 *a11)
+int sithIntersect_CollideThings(sithThing *pThing, const rdVector3 *a2, const rdVector3 *a3, flex_t a4, flex_t range, sithThing *a6, int raycastFlags, flex_t *a8, rdMesh **outMesh, rdFace **a10, rdVector3 *a11)
 {
     sithThing *v11; // edi
     int result; // eax
@@ -112,8 +112,8 @@ int sithIntersect_CollideThings(sithThing *pThing, const rdVector3 *a2, const rd
 
     // MoTS added: New collision type: tree intersection (one sphere per mesh)
     int bIsTreeCollide = 0;
-    float collideSize = a6->collideSize;
-    float rangeSize = range;
+    flex_t collideSize = a6->collideSize;
+    flex_t rangeSize = range;
     if (Main_bMotsCompat) {
         if (!(raycastFlags & 0x80u) && (a6->collide == SITH_COLLIDE_SPHERE_TREE || pThing && pThing->collide == SITH_COLLIDE_SPHERE_TREE) ) {
             bFaceCollision = 1;
@@ -128,7 +128,7 @@ int sithIntersect_CollideThings(sithThing *pThing, const rdVector3 *a2, const rd
         }
     }
 
-    float unkOut;
+    flex_t unkOut;
     if (!sithIntersect_RaySphereIntersection(a2, a3, a4, rangeSize, &a6->position, collideSize, &unkOut, bFaceCollision, raycastFlags))
     {
         return 0;
@@ -160,7 +160,7 @@ int sithIntersect_CollideThings(sithThing *pThing, const rdVector3 *a2, const rd
 
     if (MOTS_ONLY_FLAG(bIsTreeCollide))
     {
-        float tmp = 3.4e+38;
+        flex_t tmp = 3.4e+38;
         rdVector3 tmpVec;
         rdVector_Zero3(&tmpVec); // Added
 
@@ -215,15 +215,15 @@ int sithIntersect_CollideThings(sithThing *pThing, const rdVector3 *a2, const rd
 }
 
 // MoTS added: Tree collision (one sphere per mesh)
-int sithIntersect_TreeIntersection(rdHierarchyNode *paNodes,rdVector3 *pPoseVec,rdVector3 *pDirVec,float a4,float range, sithThing *v11,float *pOut,rdVector3 *pOutVec,int raycastFlags)
+int sithIntersect_TreeIntersection(rdHierarchyNode *paNodes,rdVector3 *pPoseVec,rdVector3 *pDirVec,flex_t a4,flex_t range, sithThing *v11,flex_t *pOut,rdVector3 *pOutVec,int raycastFlags)
 {
     rdModel3 *prVar1;
     int iVar2;
     uint32_t uVar3;
     rdHierarchyNode *pChildNode;
     int ret;
-    float local_74;
-    float local_70;
+    flex_t local_74;
+    flex_t local_70;
     rdVector3 local_6c;
     rdMatrix34 local_60;
     rdMatrix34 local_30;
@@ -271,12 +271,12 @@ int sithIntersect_TreeIntersection(rdHierarchyNode *paNodes,rdVector3 *pPoseVec,
 
 // This handles collisions with non-spherical world thing objects
 // ie, tables and such
-int sithIntersect_sub_508400(rdVector3 *pStartPos, rdVector3 *pRayDirection, float moveDistance, float radius, rdMesh *pMesh, float *pSphereHitDist, rdFace **faceOut, rdVector3 *pPushVelOut)
+int sithIntersect_sub_508400(rdVector3 *pStartPos, rdVector3 *pRayDirection, flex_t moveDistance, flex_t radius, rdMesh *pMesh, flex_t *pSphereHitDist, rdFace **faceOut, rdVector3 *pPushVelOut)
 {
     int v11; // ecx
     rdFace *v12; // edx
     int v24; // [esp+8h] [ebp-18h]
-    float v25; // [esp+Ch] [ebp-14h]
+    flex_t v25; // [esp+Ch] [ebp-14h]
     int v26; // [esp+10h] [ebp-10h]
     rdVector3 pushVel; // [esp+14h] [ebp-Ch] BYREF
 
@@ -307,9 +307,9 @@ int sithIntersect_sub_508400(rdVector3 *pStartPos, rdVector3 *pRayDirection, flo
 }
 
 // ChatGPT says:
-// int sithIntersect_sub_508540(const rdVector3 *startPoint, const rdVector3 *rayDirection, float maxDistance, float sphereRadius, rdVector3 *intersectionPoint, float collisionRadius, float *distance, int bFaceCollision, int raycastFlags)
+// int sithIntersect_sub_508540(const rdVector3 *startPoint, const rdVector3 *rayDirection, flex_t maxDistance, flex_t sphereRadius, rdVector3 *intersectionPoint, flex_t collisionRadius, flex_t *distance, int bFaceCollision, int raycastFlags)
 // "raySphereIntersection"
-int sithIntersect_RaySphereIntersection(const rdVector3 *pStartPos, const rdVector3 *pRayDirection, float maxDistance, float sphereRadius, rdVector3 *pSpherePos, float collisionRadius, float *pDistanceOut, int bFaceCollision, int raycastFlags)
+int sithIntersect_RaySphereIntersection(const rdVector3 *pStartPos, const rdVector3 *pRayDirection, flex_t maxDistance, flex_t sphereRadius, rdVector3 *pSpherePos, flex_t collisionRadius, flex_t *pDistanceOut, int bFaceCollision, int raycastFlags)
 {
     double v15; // st7
     double v16; // rtt
@@ -319,7 +319,7 @@ int sithIntersect_RaySphereIntersection(const rdVector3 *pStartPos, const rdVect
     long double v21; // st6
     long double v22; // st7
     long double v24; // st7
-    float v33; // [esp+20h] [ebp+14h]
+    flex_t v33; // [esp+20h] [ebp+14h]
     rdVector3 tmp;
 
     rdVector_Sub3(&tmp, pSpherePos, pStartPos);
@@ -373,8 +373,8 @@ LABEL_11:
 }
 
 // ChatGPT says:
-// int checkIntersectionWithFace(rdVector3 *intersectionPoint, float radius, rdFace *pFace, rdVector3 *vertices, int *intersectionType)
-int sithIntersect_sub_508750(rdVector3 *a1, float radius, rdFace *pFace, rdVector3 *a4, int *a5)
+// int checkIntersectionWithFace(rdVector3 *intersectionPoint, flex_t radius, rdFace *pFace, rdVector3 *vertices, int *intersectionType)
+int sithIntersect_sub_508750(rdVector3 *a1, flex_t radius, rdFace *pFace, rdVector3 *a4, int *a5)
 {
     double v10; // st7
     int v12; // edx
@@ -458,7 +458,7 @@ int sithIntersect_sub_508750(rdVector3 *a1, float radius, rdFace *pFace, rdVecto
             v14 = v28;
             a1a.x += *(&a4[v19[v23]].x + v13);
             a1a.y += *(&a4[v19[v23]].x + v28);
-            float idk = v30 * a1a.y - v31 * a1a.x;//stdMath_ClipPrecision(); // Added at some point?
+            flex_t idk = v30 * a1a.y - v31 * a1a.x;//stdMath_ClipPrecision(); // Added at some point?
             if ( idk < 0.0 )
             {
                 if ( radius == 0.0 )
@@ -466,7 +466,7 @@ int sithIntersect_sub_508750(rdVector3 *a1, float radius, rdFace *pFace, rdVecto
                 if ( !a5 )
                     return 0;
                 rdVector_Normalize2Acc(&a1a);
-                float idk2 = v30 * a1a.y - v31 * a1a.x;
+                flex_t idk2 = v30 * a1a.y - v31 * a1a.x;
                 
                 // TODO: Somehow we need to return 0 here for slopes which match our current normal?
 
@@ -486,7 +486,7 @@ int sithIntersect_sub_508750(rdVector3 *a1, float radius, rdFace *pFace, rdVecto
 
 // This does something with whether something is a step vs barrier?
 // return 0 allows jumping up on high ledges
-int sithIntersect_sub_508990(rdVector3 *a1, float a2, rdFace *a3, rdVector3 *a4, int a5, rdVector3 *pProjectedOut)
+int sithIntersect_sub_508990(rdVector3 *a1, flex_t a2, rdFace *a3, rdVector3 *a4, int a5, rdVector3 *pProjectedOut)
 {
     rdFace *v6; // ecx
     unsigned int v7; // edi
@@ -499,11 +499,11 @@ int sithIntersect_sub_508990(rdVector3 *a1, float a2, rdFace *a3, rdVector3 *a4,
     //char v18; // c0
     int v19; // ecx
     double v24; // st6
-    float v27; // [esp+4h] [ebp-2Ch]
+    flex_t v27; // [esp+4h] [ebp-2Ch]
     int i; // [esp+8h] [ebp-28h]
     rdVector3 v29; // [esp+Ch] [ebp-24h]
     rdVector3 a1a; // [esp+18h] [ebp-18h] BYREF
-    float v34; // [esp+34h] [ebp+4h]
+    flex_t v34; // [esp+34h] [ebp+4h]
 
     v6 = a3;
     v7 = a3->numVertices;
@@ -563,11 +563,11 @@ int sithIntersect_sub_508990(rdVector3 *a1, float a2, rdFace *a3, rdVector3 *a4,
 }
 
 // Used for floor collision, probably everything tbh
-int sithIntersect_SphereHit(const rdVector3 *pStartPos, const rdVector3 *pRayDirection, float moveDistance, float radius, rdVector3 *surfaceNormal, rdVector3 *a6, float *pSphereHitDist, int flags)
+int sithIntersect_SphereHit(const rdVector3 *pStartPos, const rdVector3 *pRayDirection, flex_t moveDistance, flex_t radius, rdVector3 *surfaceNormal, rdVector3 *a6, flex_t *pSphereHitDist, int flags)
 {
     double v8; // st7
     double v13; // st7
-    float v18; // [esp+18h] [ebp+18h]
+    flex_t v18; // [esp+18h] [ebp+18h]
 
     v8 = rdMath_DistancePointToPlane(pStartPos, surfaceNormal, a6);
     v8 = stdMath_ClipPrecision(v8);
@@ -608,14 +608,14 @@ int sithIntersect_SphereHit(const rdVector3 *pStartPos, const rdVector3 *pRayDir
 }
 
 // ChatGPT says: rayPlaneIntersection
-int sithIntersect_sub_508D20(const rdVector3 *pStartPos, const rdVector3 *pRayDirection, float moveDistance, float radius, rdFace *pFace, rdVector3 *aVertices, float *pSphereHitDist, rdVector3 *pPushVelOut, int raycastFlags)
+int sithIntersect_sub_508D20(const rdVector3 *pStartPos, const rdVector3 *pRayDirection, flex_t moveDistance, flex_t radius, rdFace *pFace, rdVector3 *aVertices, flex_t *pSphereHitDist, rdVector3 *pPushVelOut, int raycastFlags)
 {
     int result; // eax
     int *v18; // edx
     double v21; // st7
     double v25; // st7
     int v28; // esi
-    float v35; // edi
+    flex_t v35; // edi
     int *v36; // edx
     double v37; // st7
     rdVector3 v45; // [esp+10h] [ebp-18h] BYREF
@@ -709,7 +709,7 @@ int sithIntersect_sub_508D20(const rdVector3 *pStartPos, const rdVector3 *pRayDi
 }
 
 // Seems to handle interaction when crossing adjoins?
-int sithIntersect_sub_5090B0(const rdVector3 *pStartPos, const rdVector3 *pRayDirection, float moveDistance, float radius, sithSurfaceInfo *a5, rdVector3 *a6, float *pSphereHitDist, int flags)
+int sithIntersect_sub_5090B0(const rdVector3 *pStartPos, const rdVector3 *pRayDirection, flex_t moveDistance, flex_t radius, sithSurfaceInfo *a5, rdVector3 *a6, flex_t *pSphereHitDist, int flags)
 {
     sithSurfaceInfo *v8; // edi
     int result; // eax

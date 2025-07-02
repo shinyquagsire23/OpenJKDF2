@@ -140,7 +140,7 @@ int sithParticle_LoadThingParams(stdConffileArg *arg, sithThing *thing, int para
     }
 }
 
-void sithParticle_Tick(sithThing *particle, float deltaMs)
+void sithParticle_Tick(sithThing *particle, flex_t deltaMs)
 {
     double v2; // st7
     char typeFlags; // al
@@ -154,10 +154,10 @@ void sithParticle_Tick(sithThing *particle, float deltaMs)
     double v13; // st6
     double v14; // rt2
     double v15; // st6
-    float v16; // [esp+0h] [ebp-44h]
+    flex_t v16; // [esp+0h] [ebp-44h]
     rdVector3 a2a; // [esp+8h] [ebp-3Ch] BYREF
     rdMatrix34 a1a; // [esp+14h] [ebp-30h] BYREF
-    float deltaMsa; // [esp+4Ch] [ebp+8h]
+    flex_t deltaMsa; // [esp+4Ch] [ebp+8h]
 
     v2 = deltaMs + particle->particleParams.field_2C;
     typeFlags = particle->particleParams.typeFlags;
@@ -232,12 +232,12 @@ void sithParticle_CreateThing(sithThing *thing)
     rdVector3 *v16; // eax
     int v17; // eax
     rdParticle *v18; // ecx
-    float v19; // edx
-    float v20; // [esp+10h] [ebp-20h]
-    float v21; // [esp+14h] [ebp-1Ch]
-    float v22; // [esp+18h] [ebp-18h]
+    flex_t v19; // edx
+    flex_t v20; // [esp+10h] [ebp-20h]
+    flex_t v21; // [esp+14h] [ebp-1Ch]
+    flex_t v22; // [esp+18h] [ebp-18h]
     rdVector3 v23; // [esp+24h] [ebp-Ch] BYREF
-    float thinga; // [esp+34h] [ebp+4h]
+    flex_t thinga; // [esp+34h] [ebp+4h]
 
     v1 = 2;
     v3 = &thing->rdthing;

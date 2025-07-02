@@ -11,8 +11,8 @@ int sithKeyFrame_Load(sithWorld *world, int a2)
 {
     unsigned int alloc_size;
 
-    float percent_delta;
-    float load_percent = 80.0;
+    flex_t percent_delta;
+    flex_t load_percent = 80.0;
 
     if ( a2 )
         return 0;

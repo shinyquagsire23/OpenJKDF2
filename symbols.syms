@@ -30,7 +30,7 @@ pModel3Loader 0x0073C2E8 model3Loader_t
 pModel3Unloader 0x0073C2EC model3Unloader_t
 rdModel3_numGeoLights 0x0073C2F0 uint32_t
 rdModel3_numMeshLights 0x0073C2F4 int
-rdModel3_fRadius 0x0073C2F8 float
+rdModel3_fRadius 0x0073C2F8 flex_t
 
 sithPuppet_hashtable 0x00847E88 stdHashTable*
 sithPuppet_keyframesHashtable 0x00847E8C stdHashTable*
@@ -40,10 +40,10 @@ pKeyframeLoader 0x73D608 keyframeLoader_t
 pKeyframeUnloader 0x73D60C keyframeUnloader_t
 
 sithTime_deltaMs 0x00836C08 int32_t
-sithTime_deltaSeconds 0x00836C0C float
-sithTime_TickHz 0x00836C10 float 
+sithTime_deltaSeconds 0x00836C0C flex_t
+sithTime_TickHz 0x00836C10 flex_t 
 sithTime_curMs 0x00836C14 uint32_t
-sithTime_curSeconds 0x00836C18 float
+sithTime_curSeconds 0x00836C18 flex_t
 sithTime_curMsAbsolute 0x00836C1C uint32_t
 sithTime_pauseTimeMs 0x00836C20 int32_t
 sithTime_bRunning 0x00836C24 int
@@ -53,8 +53,8 @@ sithRender_flag 0x008EC364 int
 sithRender_geoMode 0x008EC368 int
 sithRender_lightMode 0x008EC36C int
 sithRender_lightingIRMode 0x00831988 int
-sithRender_f_83198C 0x0083198C float
-sithRender_f_831990 0x00831990 float
+sithRender_f_83198C 0x0083198C flex_t
+sithRender_f_831990 0x00831990 flex_t
 sithRender_needsAspectReset 0x00831994 int
 sithRender_numSectors 0x008318F0 int32_t
 sithRender_numClipFrustums 0x0082FEE8 int32_t
@@ -65,7 +65,7 @@ sithRender_sectorsDrawn 0x0083197C int
 sithRender_numSurfaces 0x0082F4B8 int32_t
 sithRender_geoThingsDrawn 0x00831980 int
 sithRender_nongeoThingsDrawn 0x00831984 int
-sithRender_f_82F4B0 0x0082F4B0 float = 0.0
+sithRender_f_82F4B0 0x0082F4B0 flex_t = 0.0
 sithRender_idxInfo 0x0082F648 rdVertexIdxInfo
 meshinfo_out 0x0082F490 rdMeshinfo
 sithRender_weaponRenderHandle 0x00831998 sithRender_weapRendFunc_t
@@ -85,8 +85,8 @@ sithCamera_state 0x008EE5A4 int
 sithCamera_curCameraIdx 0x008EE5A8 int
 sithCamera_povShakeVector1 0x008EE5AC rdVector3
 sithCamera_povShakeVector2 0x008EE5B8 rdVector3
-sithCamera_povShakeF1 0x008EE5C4 float
-sithCamera_povShakeF2 0x008EE5C8 float
+sithCamera_povShakeF1 0x008EE5C4 flex_t
+sithCamera_povShakeF2 0x008EE5C8 flex_t
 sithCamera_currentCamera 0x0082F104 sithCamera*
 sithCamera_bInitted 0x0082F108 int
 sithCamera_viewMat 0x008EE5E0 rdMatrix34
@@ -117,7 +117,7 @@ sithMaterial_numMaterials 0x00852F80 int
 
 rdCache_aHWSolidTris 0x005703A0 rdTri[RDCACHE_MAX_TRIS]
 rdCache_totalNormalTris 0x005753A0 int
-rdCache_aIntensities 0x005753A8 float[RDCACHE_MAX_VERTICES]
+rdCache_aIntensities 0x005753A8 flex_t[RDCACHE_MAX_VERTICES]
 rdCache_aVertices 0x005953A8 rdVector3[RDCACHE_MAX_VERTICES]
 rdCache_totalVerts 0x005F53A8 int
 rdCache_aTexVertices 0x005F53B0 rdVector2[RDCACHE_MAX_VERTICES]
@@ -159,22 +159,22 @@ sithEvent_bOpen 0x855008 int
 
 rdClip_faceStatus 0x0082EE5C int
 pSourceVert 0x0082EC50 rdVector3*
-workIVerts 0x0082EC58 float[32]
+workIVerts 0x0082EC58 flex_t[32]
 workVerts 0x0082ECD8 rdVector3[32]
 pDestVert 0x0082EB44 rdVector3*
-pDestIVert 0x0082EB48 float*
+pDestIVert 0x0082EB48 flex_t*
 workTVerts 0x0082EB50 rdVector2[32]
-pSourceIVert 0x0082EB38 float*
+pSourceIVert 0x0082EB38 flex_t*
 pSourceTVert 0x0082EB3C rdVector2*
 pDestTVert 0x0082EB40 rdVector2*
 
 sithSoundMixer_dword_835FCC 0x00835FCC int
 sithSoundMixer_bPlayingMci 0x00835FD0 int
 sithSoundMixer_bInitted 0x00835FD4 int
-sithSoundMixer_flt_835FD8 0x00835FD8 float
+sithSoundMixer_flt_835FD8 0x00835FD8 flex_t
 sithSoundMixer_bIsMuted 0x00835FDC int
-sithSoundMixer_musicVolume 0x0054A678 float = 1.0f
-sithSoundMixer_globalVolume 0x0054A67C float = 1.0f
+sithSoundMixer_musicVolume 0x0054A678 flex_t = 1.0f
+sithSoundMixer_globalVolume 0x0054A67C flex_t = 1.0f
 sithSoundMixer_numSoundsAvailable2 0x00835FE0 int
 sithSoundMixer_numSoundsAvailable 0x00835FE4 int
 sithSoundMixer_aPlayingSounds 0x00835FE8 sithPlayingSound[SITH_MIXER_NUMPLAYINGSOUNDS]
@@ -208,7 +208,7 @@ sithControl_aHandlers 0x00833A00 sithControl_handler_t[SITHCONTROL_NUM_HANDLERS]
 sithControl_numHandlers 0x008339F8 int
 sithControl_death_msgtimer 0x0083583C int
 sithControl_vec3_54A570 0x0054A570 rdVector3 = {0.0, -1.0, 0.0}
-sithControl_flt_54A57C 0x0054A57C float = 0.2f
+sithControl_flt_54A57C 0x0054A57C flex_t = 0.2f
 
 sithGamesave_func1 0x00835910 sithSaveHandler_t
 sithGamesave_func2 0x00835908 sithSaveHandler_t
@@ -250,7 +250,7 @@ sithMulti_sendto_id 0x00832644 int
 sithNet_bSyncScores 0x00832648 int
 sithNet_dword_832620 0x00832620 int
 
-sithOverlayMap_flMapSize 0x0054A5E0 float = 100.0
+sithOverlayMap_flMapSize 0x0054A5E0 flex_t = 100.0
 sithOverlayMap_matrix 0x00835840 rdMatrix34
 sithOverlayMap_pPlayer 0x00835870 sithThing*
 sithOverlayMap_pCanvas 0x00835874 rdCanvas*
@@ -325,7 +325,7 @@ sithConsole_idk2 0x008358FC int16_t
 d3d_maxVertices 0x0055C7F0 uint32_t
 d3d_device_ptr 0x0055C7DC d3d_device*
 std3D_rectViewIdk 0x00865320 rdRect
-std3D_aViewIdk 0x008652A0 float[32]
+std3D_aViewIdk 0x008652A0 flex_t[32]
 std3D_aViewTris 0x00865260 rdTri[2]
 std3D_gpuMaxTexSizeMaybe 0x0053D668 int = 1
 std3D_dword_53D66C 0x0053D66C int = 1
@@ -384,11 +384,11 @@ word_860804 0x860804 uint16_t
 word_860806 0x860806 uint16_t
 
 stdControl_bReadMouse 0x0053EEE0 int = 1
-stdControl_updateKHz 0x0053EEE4 float = 1.0f
-stdControl_updateHz 0x0053EEE8 float = 1.0f
-stdControl_mouseXSensitivity 0x0053EEEC float = 1.0f
-stdControl_mouseYSensitivity 0x0053EEF0 float = 1.0f
-stdControl_mouseZSensitivity 0x0053EEF4 float = 1.0f
+stdControl_updateKHz 0x0053EEE4 flex_t = 1.0f
+stdControl_updateHz 0x0053EEE8 flex_t = 1.0f
+stdControl_mouseXSensitivity 0x0053EEEC flex_t = 1.0f
+stdControl_mouseYSensitivity 0x0053EEF0 flex_t = 1.0f
+stdControl_mouseZSensitivity 0x0053EEF4 flex_t = 1.0f
 
 stdControl_aAxisEnabled 0x0055C828 int[JK_NUM_JOYSTICKS]
 stdControl_aAxisPos 0x0055C830 int[JK_NUM_AXES]
@@ -430,7 +430,7 @@ Video_pOtherBuf 0x00552888 stdVBuffer*
 Video_pMenuBuffer 0x0055288C stdVBuffer*
 Video_bInitted 0x005528B4 int
 Video_bOpened 0x005528B8 int
-Video_flt_55289C 0x0055289C float
+Video_flt_55289C 0x0055289C flex_t
 Video_dword_5528A0 0x005528A0 int
 Video_dword_5528A4 0x005528A4 int
 Video_dword_5528A8 0x005528A8 int
@@ -452,9 +452,9 @@ stdConsole_hConsoleOutput 0x00866860 HANDLE
 stdConsole_hConsoleInput 0x00866864 HANDLE
 
 rdRaster_aOneDivXQuantLUT 0x0086ADE0 int[2048]
-rdRaster_aOtherLUT 0x86CDDC float[16]
-rdRaster_aOneDivXLUT 0x0086CE20 float[2048]
-rdRaster_fixedScale 0x00548E28 float = 65536.0f
+rdRaster_aOtherLUT 0x86CDDC flex_t[16]
+rdRaster_aOneDivXLUT 0x0086CE20 flex_t[2048]
+rdRaster_fixedScale 0x00548E28 flex_t = 65536.0f
 
 sithCogFunctionAI_apViewThings 0x00855CE8 sithThing*[32]
 sithCogFunctionAI_unk1 0x00855D68 int
@@ -502,7 +502,7 @@ jkDev_vbuf 0x0055A9C4 stdVBuffer*
 jkDev_BMFontHeight 0x0055A9C8 int
 jkDev_ColorKey 0x0055A9CC int
 jkDev_dword_55A9D0 0x0055A9D0 int
-jkDev_amt 0x0055A9D4 float
+jkDev_amt 0x0055A9D4 flex_t
 
 jkSmack_gameMode 0x00552B78 int
 jkSmack_bInit 0x00552B7C int
@@ -520,7 +520,7 @@ jkEpisode_mLoad 0x00552B68 jkEpisodeLoad
 jkHud_targetRed 0x00525960 uint32_t = 1
 jkHud_targetBlue 0x00525964 uint32_t = 2
 jkHud_targetGreen 0x00525968 uint32_t = 3
-jkHud_aFltIdk 0x00525970 float[6] = {0.2, 0.4, 0.8, 1.0, 2.0, 0.0}
+jkHud_aFltIdk 0x00525970 flex_t[6] = {0.2, 0.4, 0.8, 1.0, 2.0, 0.0}
 jkHud_aColors8bpp 0x00525988 int[6] = {1,2,3,4,5,0}
 //jkHud_aFonts 0x005259A0 
 //jkHud_aBitmaps 0x005259E8 
@@ -683,13 +683,13 @@ sithInventory_bRendIsHidden 0x008339F0 int
 sithInventory_8339F4 0x008339F4 int
 
 sithWeapon_controlOptions 0x008BD020 uint32_t
-g_flt_8BD040 0x008BD040 float
-g_flt_8BD044 0x008BD044 float
-g_flt_8BD048 0x008BD048 float
-g_flt_8BD04C 0x008BD04C float
-g_flt_8BD050 0x008BD050 float
-g_flt_8BD054 0x008BD054 float
-g_flt_8BD058 0x008BD058 float
+g_flt_8BD040 0x008BD040 flex_t
+g_flt_8BD044 0x008BD044 flex_t
+g_flt_8BD048 0x008BD048 flex_t
+g_flt_8BD04C 0x008BD04C flex_t
+g_flt_8BD050 0x008BD050 flex_t
+g_flt_8BD054 0x008BD054 flex_t
+g_flt_8BD058 0x008BD058 flex_t
 sithWeapon_CurWeaponMode 0x008BD064 int
 sithWeapon_bAutoPickup 0x008BD080 int
 sithWeapon_bAutoSwitch 0x008BD084 int
@@ -698,14 +698,14 @@ sithWeapon_bMultiAutoPickup 0x008BD08C int
 sithWeapon_bMultiplayerAutoSwitch 0x008BD090 int
 sithWeapon_bMultiAutoReload 0x008BD094 int
 sithWeapon_bAutoAim 0x008BD098 int
-sithWeapon_mountWait 0x008BD09C float
-sithWeapon_8BD0A0 0x008BD0A0 float[2]
-sithWeapon_fireWait 0x008BD0A8 float
-sithWeapon_fireRate 0x008BD0AC float
-sithWeapon_LastFireTimeSecs 0x008BD0B0 float
+sithWeapon_mountWait 0x008BD09C flex_t
+sithWeapon_8BD0A0 0x008BD0A0 flex_t[2]
+sithWeapon_fireWait 0x008BD0A8 flex_t
+sithWeapon_fireRate 0x008BD0AC flex_t
+sithWeapon_LastFireTimeSecs 0x008BD0B0 flex_t
 sithWeapon_a8BD030 0x008BD030 int[4]
 sithWeapon_8BD05C 0x008BD05C int
-sithWeapon_8BD060 0x008BD060 float
+sithWeapon_8BD060 0x008BD060 flex_t
 sithWeapon_8BD008 0x008BD008 int[6]
 sithWeapon_8BD024 0x008BD024 int
 sithWeapon_senderIndex 0x008BD028 int
@@ -734,9 +734,9 @@ jkPlayer_cutscenePath 0x0085FB40 char[1024]
 jkPlayer_setNumCutscenes 0x0085FF40 int
 jkPlayer_setDiff 0x008EE670 int
 jkPlayer_waggleVec 0x00552BA0 rdVector3
-jkPlayer_waggleMag 0x00552BAC float
+jkPlayer_waggleMag 0x00552BAC flex_t
 jkPlayer_mpcInfoSet 0x00552BB0 int
-jkPlayer_waggleAngle 0x00552BB4 float
+jkPlayer_waggleAngle 0x00552BB4 flex_t
 jkSaber_rotateVec 0x00552BB8 rdVector3
 jkPlayer_name 0x008604C0 wchar_t[32]
 jkPlayer_model 0x00860500 char[32]
@@ -760,17 +760,17 @@ sithAIAwareness_aSectors 0x008553A8 sithSectorAlloc*
 sithAIAwareness_numEntries 0x008553AC int
 sithAIAwareness_bInitted 0x008553B0 int
 sithAIAwareness_timerTicks 0x008553B4 int
-sithSector_flt_8553B8 0x008553B8 float
-sithSector_horizontalPixelsPerRev 0x008553BC float
-sithSector_flt_8553C0 0x008553C0 float
-sithSector_flt_8553C4 0x008553C4 float
-sithSector_flt_8553C8 0x008553C8 float
+sithSector_flt_8553B8 0x008553B8 flex_t
+sithSector_horizontalPixelsPerRev 0x008553BC flex_t
+sithSector_flt_8553C0 0x008553C0 flex_t
+sithSector_flt_8553C4 0x008553C4 flex_t
+sithSector_flt_8553C8 0x008553C8 flex_t
 sithSector_zMaxVec 0x008553D0 rdVector3
-sithSector_ceilingSky 0x008553DC float
+sithSector_ceilingSky 0x008553DC flex_t
 sithSector_zMinVec 0x008553E0 rdVector3
-sithSector_horizontalPixelsPerRev_idk 0x008553EC float
-sithSector_horizontalDist 0x008553F0 float
-sithSector_flt_8553F4 0x008553F4 float
+sithSector_horizontalPixelsPerRev_idk 0x008553EC flex_t
+sithSector_horizontalDist 0x008553F0 flex_t
+sithSector_flt_8553F4 0x008553F4 flex_t
 sithSector_aSyncIdk 0x00855438 sithSector*[16]
 sithSector_aSyncIdk2 0x00855478 int[16]
 sithSector_numSync 0x008554B8 uint32_t
@@ -796,13 +796,13 @@ jkGuiTitle_verRevision 0x00525034 int = 0
 jkGuiTitle_aTexts 0x005568E0 jkGuiStringEntry[20]
 jkGuiTitle_whichLoading 0x00556980 int
 
-jkGuiSound_sfxVolume 0x00547DD0 float = 0.8
+jkGuiSound_sfxVolume 0x00547DD0 flex_t = 0.8
 jkGuiSound_numChannels 0x0054A680 uint32_t = 16
 jkGuiSound_bLowResSound 0x00563700 int
 jkGuiSound_b3DSound 0x00563704 int = 1
 jkGuiSound_b3DSound_2 0x00563708 int = 1
 jkGuiSound_b3DSound_3 0x0056370C int = 1
-jkGuiSound_musicVolume 0x0086077C float
+jkGuiSound_musicVolume 0x0086077C flex_t
 
 jkGui_unkstr 0x856880 char[32]
 jkGui_GdiMode 0x00556020 int
@@ -927,11 +927,11 @@ jkGuiMap_dword_556664 0x00556664 int
 jkGuiMap_dword_556668 0x00556668 int
 jkGuiMap_dword_55666C 0x0055666C int
 
-sithMap_unkArr 0x0052E9E0 float[12] = {0.5, 1.0, 1.5, 2.0, 2.5, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 0.0}
+sithMap_unkArr 0x0052E9E0 flex_t[12] = {0.5, 1.0, 1.5, 2.0, 2.5, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 0.0}
 sithMap_pPlayerThing 0x0084DE78 sithThing*
 sithMap_invMatrix 0x0084DE80 rdMatrix34
-sithMap_flt_84DEA8 0x0084DEA8 float
-sithMap_flt_84DEAC 0x0084DEAC float
+sithMap_flt_84DEA8 0x0084DEA8 flex_t
+sithMap_flt_84DEAC 0x0084DEAC flex_t
 sithMap_ctx 0x0084DEB0 sithMap
 sithMap_pCurWorld 0x0084DEE4 sithWorld*
 sithMap_camera 0x0084DEE8 rdMatrix34

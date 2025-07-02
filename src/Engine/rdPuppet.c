@@ -77,14 +77,14 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
     double v33; // st7
     double v35; // rtt
     double v36; // st4
-    float v42; // edx
+    flex_t v42; // edx
     double v45; // st7
     double v46; // st7
     double v48; // st5
     double v50; // st7
     rdVector3 *v61; // ecx
-    float v70; // [esp+14h] [ebp-70h]
-    float v71; // [esp+18h] [ebp-6Ch]
+    flex_t v70; // [esp+14h] [ebp-70h]
+    flex_t v71; // [esp+18h] [ebp-6Ch]
     int v73; // [esp+1Ch] [ebp-68h]
     int v75; // [esp+20h] [ebp-64h]
     int v77; // [esp+24h] [ebp-60h]
@@ -93,9 +93,9 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
     int v82; // [esp+34h] [ebp-50h]
     rdVector3 a3; // [esp+3Ch] [ebp-48h] BYREF
     rdVector3 a4; // [esp+48h] [ebp-3Ch] BYREF
-    float v86; // [esp+54h] [ebp-30h]
-    float v87; // [esp+58h] [ebp-2Ch]
-    float v88; // [esp+5Ch] [ebp-28h]
+    flex_t v86; // [esp+54h] [ebp-30h]
+    flex_t v87; // [esp+58h] [ebp-2Ch]
+    flex_t v88; // [esp+5Ch] [ebp-28h]
     rdVector3 v89; // [esp+60h] [ebp-24h]
     rdVector3 v90; // [esp+6Ch] [ebp-18h]
     rdVector3 v91; // [esp+78h] [ebp-Ch]
@@ -351,7 +351,7 @@ int rdPuppet_ResetTrack(rdPuppet *puppet, int trackNum)
 }
 
 // MOTS altered
-int rdPuppet_UpdateTracks(rdPuppet *puppet, float deltaSeconds)
+int rdPuppet_UpdateTracks(rdPuppet *puppet, flex_t deltaSeconds)
 {
     //return _rdPuppet_UpdateTracks(puppet, deltaSeconds);
     
@@ -476,7 +476,7 @@ void rdPuppet_SetCallback(rdPuppet *a1, int trackNum, void *callback)
     a1->tracks[trackNum].callback = callback;
 }
 
-int rdPuppet_FadeInTrack(rdPuppet *puppet, int trackNum, float speed)
+int rdPuppet_FadeInTrack(rdPuppet *puppet, int trackNum, flex_t speed)
 {
     puppet->tracks[trackNum].status = puppet->tracks[trackNum].status & ~8u | 6;
     if ( speed <= 0.0 )
@@ -491,7 +491,7 @@ int rdPuppet_FadeInTrack(rdPuppet *puppet, int trackNum, float speed)
     }
 }
 
-void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, float a3)
+void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, flex_t a3)
 {
     //_rdPuppet_AdvanceTrack(puppet, trackNum, a3);
     //return;
@@ -502,8 +502,8 @@ void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, float a3)
     //unsigned int v11; // ebx
     rdKeyframe *v12; // ecx
     int v20; // [esp+14h] [ebp-8h]
-    float v21; // [esp+18h] [ebp-4h]
-    float v22; // [esp+2Ch] [ebp+10h]
+    flex_t v21; // [esp+18h] [ebp-4h]
+    flex_t v22; // [esp+2Ch] [ebp+10h]
 
     v21 = 0.0;
     v20 = 0;
@@ -600,7 +600,7 @@ void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, float a3)
     }
 }
 
-int rdPuppet_FadeOutTrack(rdPuppet *puppet, int trackNum, float speed)
+int rdPuppet_FadeOutTrack(rdPuppet *puppet, int trackNum, flex_t speed)
 {
     puppet->tracks[trackNum].status = puppet->tracks[trackNum].status & ~4u | 8;
     if ( speed <= 0.0 )
@@ -615,7 +615,7 @@ int rdPuppet_FadeOutTrack(rdPuppet *puppet, int trackNum, float speed)
     }
 }
 
-void rdPuppet_SetTrackSpeed(rdPuppet *puppet, int trackNum, float speed)
+void rdPuppet_SetTrackSpeed(rdPuppet *puppet, int trackNum, flex_t speed)
 {
     puppet->tracks[trackNum].speed = speed;
 }

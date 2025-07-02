@@ -178,7 +178,7 @@ int rdSetMipDistances(rdVector4 *dists)
         once = 1;
     }
 
-    float scale_factor = (Video_format.width / 640.0) * 2.0;
+    flex_t scale_factor = (Video_format.width / 640.0) * 2.0;
     rdroid_aMipDistances.x *= scale_factor;
     rdroid_aMipDistances.y *= scale_factor;
     rdroid_aMipDistances.z *= scale_factor;

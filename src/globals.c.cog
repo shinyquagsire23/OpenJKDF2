@@ -54,6 +54,14 @@
                 c_val = "0"
             elif c_type == "float":
                 c_val = "0.0f"
+            elif c_type == "flex_t":
+                c_val = "0.0f"
+            elif c_type == "flex32_t":
+                c_val = "0.0f"
+            elif c_type == "flex64_t":
+                c_val = "0.0f"
+            elif c_type == "cog_flex_t":
+                c_val = "0.0f"
             elif c_type == "double":
                 c_val = "0.0f"
             elif "*" in c_type and "[" not in c_type:
@@ -112,6 +120,14 @@ void OpenJKDF2_Globals_Reset()
             if c_type == "int":
                 c_val = "0"
             elif c_type == "float":
+                c_val = "0.0f"
+            elif c_type == "flex_t":
+                c_val = "0.0f"
+            elif c_type == "flex32_t":
+                c_val = "0.0f"
+            elif c_type == "flex64_t":
+                c_val = "0.0f"
+            elif c_type == "cog_flex_t":
                 c_val = "0.0f"
             elif c_type == "double":
                 c_val = "0.0f"

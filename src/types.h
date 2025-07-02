@@ -244,11 +244,28 @@ typedef intptr_t stdFile_t;
 #ifdef ARCH_64BIT
 //typedef int64_t cog_int_t;
 //typedef double cog_flex_t;
+
+// For serialization, must stay float for save compat
+typedef float flex32_t;
+typedef double flex64_t;
+
+// For intermediate calculations, physics, rendering
+typedef float flex_t;
+
+// For COG compatibility
 typedef int32_t cog_int_t;
-typedef float cog_flex_t;
+typedef flex_t cog_flex_t;
 #else
+// For serialization, must stay float for save compat
+typedef float flex32_t;
+typedef double flex64_t;
+
+// For intermediate calculations, physics, rendering
+typedef float flex_t;
+
+// For COG compatibility
 typedef int32_t cog_int_t;
-typedef float cog_flex_t;
+typedef flex_t cog_flex_t;
 #endif
 
 typedef struct IDirectSound3DBuffer IDirectSound3DBuffer;

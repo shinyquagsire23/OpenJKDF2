@@ -6,7 +6,7 @@
 #include "World/sithSector.h"
 #include "jk.h"
 
-int sithRenderSky_Open(float horizontalPixelsPerRev, float horizontalDist, float ceilingSky)
+int sithRenderSky_Open(flex_t horizontalPixelsPerRev, flex_t horizontalDist, flex_t ceilingSky)
 {
     sithSector_horizontalPixelsPerRev_idk = horizontalPixelsPerRev * 0.0027777778;
     sithSector_horizontalDist = horizontalDist;
@@ -28,7 +28,7 @@ void sithRenderSky_Close()
 void sithRenderSky_Update()
 {
     double v0; // st7
-    float v1; // [esp-Ch] [ebp-Ch]
+    flex_t v1; // [esp-Ch] [ebp-Ch]
 
     v1 = sithCamera_currentCamera->viewPYR.z;
     sithSector_flt_8553C0 = sithSector_horizontalDist / rdCamera_pCurCamera->fov_y;
@@ -46,13 +46,13 @@ void sithRenderSky_TransformHorizontal(rdProcEntry *a1, sithSurfaceInfo *a2, int
     rdCanvas *v6; // esi
     rdVector2 *v7; // eax
     rdVector3 *v8; // edx
-    float *v9; // ecx
+    flex_t *v9; // ecx
     double v10; // st7
     double v12; // st5
     double v13; // st6
     double v14; // st7
     rdClipFrustum *v15; // [esp+10h] [ebp-4h]
-    float a1a; // [esp+18h] [ebp+4h]
+    flex_t a1a; // [esp+18h] [ebp+4h]
 
     geoMode = sithRender_geoMode;
     if ( sithRender_geoMode > RD_GEOMODE_TEXTURED)
@@ -123,7 +123,7 @@ void sithRenderSky_TransformVertical(rdProcEntry *a1, sithSurfaceInfo *a2, rdVec
             a2a.z = a2a.z - sithCamera_currentCamera->vec3_1.z;
             rdVector_Normalize3(&a1a, &a2a);
             
-            float tmp = 0.0;
+            flex_t tmp = 0.0;
             if ( !sithIntersect_SphereHit(&sithCamera_currentCamera->vec3_1, &a1a, 1000.0, 0.0, &sithSector_surfaceNormal, &sithSector_zMaxVec, &tmp, 0) )
                 tmp = 1000.0;
             v9 = v5->vertexUVs;

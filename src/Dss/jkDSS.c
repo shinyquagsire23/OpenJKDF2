@@ -491,9 +491,9 @@ int jkDSS_ProcessJKEnableSaber(sithCogMsg *msg)
     if ( type != SITH_THING_PLAYER && type != SITH_THING_ACTOR )
         return 0;
 
-    float arg1 = NETMSG_POPF32();
-    float arg2 = NETMSG_POPF32();
-    float arg3 = NETMSG_POPF32();
+    flex32_t arg1 = NETMSG_POPF32();
+    flex32_t arg2 = NETMSG_POPF32();
+    flex32_t arg3 = NETMSG_POPF32();
 
     jkSaber_Enable(pThing, arg1, arg2, arg3);
     return 1;
@@ -663,10 +663,10 @@ int jkDSS_ProcessSetSaberInfo2(sithCogMsg *msg)
     playerInfo->maxTwinkles = NETMSG_POPS16();
     playerInfo->twinkleSpawnRate = NETMSG_POPS16();
     playerInfo->length = NETMSG_POPF32();
-    float baseRadius = NETMSG_POPF32();
+    flex32_t baseRadius = NETMSG_POPF32();
     if ( baseRadius != 0.0 )
     {
-        float tipRadius = NETMSG_POPF32();
+        flex32_t tipRadius = NETMSG_POPF32();
         
         NETMSG_POPSTR(material_side_fname, 0x20);
         NETMSG_POPSTR(material_tip_fname, 0x20);

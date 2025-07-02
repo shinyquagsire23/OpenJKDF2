@@ -291,7 +291,7 @@ int sithDSSThing_ProcessSyncThing(sithCogMsg *msg)
     return 1;
 }
 
-void sithDSSThing_SendPlaySound(sithThing *followThing, rdVector3 *pos, sithSound *sound, float volume, float a5, int flags, int refid, int sendto_id, int mpFlags)
+void sithDSSThing_SendPlaySound(sithThing *followThing, rdVector3 *pos, sithSound *sound, flex32_t volume, flex32_t a5, int flags, int refid, int sendto_id, int mpFlags)
 {
     NETMSG_START;
 
@@ -324,8 +324,8 @@ int sithDSSThing_ProcessPlaySound(sithCogMsg *msg)
     NETMSG_IN_START(msg);
 
     int flags = NETMSG_POPU32();
-    float volume = NETMSG_POPF32();
-    float a5 = NETMSG_POPF32();
+    flex32_t volume = NETMSG_POPF32();
+    flex32_t a5 = NETMSG_POPF32();
     int16_t soundIdx = NETMSG_POPS16();
     sithSound* sound = sithSound_GetFromIdx(soundIdx);
 
@@ -358,7 +358,7 @@ int sithDSSThing_ProcessPlaySound(sithCogMsg *msg)
     return 1;
 }
 
-void sithDSSThing_SendPlaySoundMode(sithThing *pThing, int16_t a2, int a3, float a4)
+void sithDSSThing_SendPlaySoundMode(sithThing *pThing, int16_t a2, int a3, flex32_t a4)
 {
     NETMSG_START;
 
@@ -383,7 +383,7 @@ int sithDSSThing_ProcessPlaySoundMode(sithCogMsg *msg)
         return 0;
     
     int v4 = NETMSG_POPS32();
-    float v3 = NETMSG_POPF32();
+    flex32_t v3 = NETMSG_POPF32();
     int16_t idk = NETMSG_POPS16();
 
     if ( v3 >= 0.0 )
@@ -515,7 +515,7 @@ int sithDSSThing_ProcessSetThingModel(sithCogMsg *msg)
     return 0;
 }
 
-void sithDSSThing_SendStopKey(sithThing *pThing, int a2, float a3, int sendtoId, int mpFlags)
+void sithDSSThing_SendStopKey(sithThing *pThing, int a2, flex32_t a3, int sendtoId, int mpFlags)
 {
     NETMSG_START;
 
@@ -557,7 +557,7 @@ int sithDSSThing_ProcessStopKey(sithCogMsg *msg)
     return 1;
 }
 
-void sithDSSThing_SendStopSound(sithPlayingSound *pSound, float a2, int a3, int a4)
+void sithDSSThing_SendStopSound(sithPlayingSound *pSound, flex32_t a2, int a3, int a4)
 {
     NETMSG_START;
 
@@ -574,7 +574,7 @@ int sithDSSThing_ProcessStopSound(sithCogMsg *msg)
     NETMSG_IN_START(msg);
 
     int refid = NETMSG_POPS32();
-    float fadeInTime = NETMSG_POPF32();
+    flex32_t fadeInTime = NETMSG_POPF32();
     sithPlayingSound* pSound = sithSoundMixer_GetSoundFromRef(refid);
     if ( pSound )
     {
@@ -590,7 +590,7 @@ int sithDSSThing_ProcessStopSound(sithCogMsg *msg)
 }
 
 // MoTS altered
-void sithDSSThing_SendFireProjectile(sithThing *pWeapon, sithThing *pProjectile, rdVector3 *pFireOffset, rdVector3 *pAimError, sithSound *pFireSound, int16_t anim, float scale, int16_t scaleFlags, float a9, int thingId, int sendtoId, int mpFlags, int idk)
+void sithDSSThing_SendFireProjectile(sithThing *pWeapon, sithThing *pProjectile, rdVector3 *pFireOffset, rdVector3 *pAimError, sithSound *pFireSound, int16_t anim, flex32_t scale, int16_t scaleFlags, flex32_t a9, int thingId, int sendtoId, int mpFlags, int idk)
 {
     NETMSG_START;
 
@@ -648,8 +648,8 @@ int sithDSSThing_ProcessFireProjectile(sithCogMsg *msg)
         int anim = NETMSG_POPS16();
         rdVector3 aimError = NETMSG_POPVEC3();
         rdVector3 fireOffset = NETMSG_POPVEC3();
-        float scale = NETMSG_POPF32();
-        float a9 = NETMSG_POPF32();
+        flex32_t scale = NETMSG_POPF32();
+        flex32_t a9 = NETMSG_POPF32();
         int thingId = NETMSG_POPS32();
         //printf("sithDSSThing_ProcessFireProjectile %x %x (%f %f %f) (%f %f %f) %x %f %x %f\n", idx, templateIdx, aimError.x, aimError.y, aimError.z, fireOffset.x, fireOffset.y, fireOffset.z, anim, scale, scaleFlags, a9);
         sithThing* pThing2 = sithWeapon_FireProjectile_0(
@@ -686,8 +686,8 @@ int sithDSSThing_ProcessMOTSNew2(sithCogMsg *msg)
         int anim = NETMSG_POPS16();
         rdVector3 aimError = NETMSG_POPVEC3();
         rdVector3 fireOffset = NETMSG_POPVEC3();
-        float scale = NETMSG_POPF32();
-        float a9 = NETMSG_POPF32();
+        flex32_t scale = NETMSG_POPF32();
+        flex32_t a9 = NETMSG_POPF32();
         int thingId = NETMSG_POPS32();
         int idk = NETMSG_POPS32();
         sithThing* pThing2 = sithWeapon_FireProjectile_0(
@@ -757,7 +757,7 @@ int sithDSSThing_ProcessDeath(sithCogMsg *msg)
     return 0;
 }
 
-void sithDSSThing_SendDamage(sithThing *pDamagedThing, sithThing *pDamagedBy, float amt, int16_t a4, int sendtoId, int mpFlags)
+void sithDSSThing_SendDamage(sithThing *pDamagedThing, sithThing *pDamagedBy, flex32_t amt, int16_t a4, int sendtoId, int mpFlags)
 {
     NETMSG_START;
 
@@ -790,7 +790,7 @@ int sithDSSThing_ProcessDamage(sithCogMsg *msg)
         if ( !pDamagedBy )
             pDamagedBy = pDamagedThing;
 
-        float arg2 = NETMSG_POPF32();
+        flex32_t arg2 = NETMSG_POPF32();
         int16_t arg3 = NETMSG_POPS16();
         sithThing_Damage(pDamagedThing, pDamagedBy, arg2, arg3);
         return 1;
@@ -1143,7 +1143,7 @@ int sithDSSThing_ProcessFullDesc(sithCogMsg *msg)
     return 1;
 }
 
-void sithDSSThing_SendPathMove(sithThing *pThing, int16_t a2, float a3, int a4, int sendtoId, int mpFlags)
+void sithDSSThing_SendPathMove(sithThing *pThing, int16_t a2, flex32_t a3, int a4, int sendtoId, int mpFlags)
 {
     rdVector3 out;
 
@@ -1192,7 +1192,7 @@ int sithDSSThing_ProcessPathMove(sithCogMsg *msg)
         
         rdMatrix_BuildRotate34(&pThing->lookOrientation, &lookAngles);
         int arg9 = NETMSG_POPS16();
-        float arg10 = NETMSG_POPF32();
+        flex32_t arg10 = NETMSG_POPF32();
 
         if ( arg0 )
         {
@@ -1479,7 +1479,7 @@ void sithDSSThing_TransitionMovingThing(sithThing *pThing, rdVector3 *pPos, sith
     rdVector_Scale3(&a1, &pThing->physicsParams.vel, 0.25);
     rdVector_Add3Acc(&a1, pPos);
     rdVector_Sub3Acc(&a1, &pThing->position);
-    float v5 = rdVector_Len3(&a1);
+    flex_t v5 = rdVector_Len3(&a1);
     if ( v5 == 0.0 || v5 >= 0.5 )
     {
         rdVector_Copy3(&pThing->position, pPos);

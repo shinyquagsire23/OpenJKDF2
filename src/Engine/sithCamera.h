@@ -31,41 +31,41 @@
 
 int sithCamera_Startup();
 void sithCamera_Shutdown();
-int sithCamera_Open(rdCanvas *canvas, float aspect);
+int sithCamera_Open(rdCanvas *canvas, flex_t aspect);
 void sithCamera_Close();
 void sithCamera_SetsFocus();
-int sithCamera_NewEntry(sithCamera *camera, uint32_t a2, uint32_t a3, float fov, float aspectRatio, rdCanvas *canvas, sithThing *focus_far, sithThing *focus_near);
+int sithCamera_NewEntry(sithCamera *camera, uint32_t a2, uint32_t a3, flex_t fov, flex_t aspectRatio, rdCanvas *canvas, sithThing *focus_far, sithThing *focus_near);
 
 void sithCamera_FollowFocus(sithCamera *cam);
 void sithCamera_SetRdCameraAndRenderidk();
 void sithCamera_DoIdleAnimation();
 int sithCamera_SetCurrentCamera(sithCamera *camera);
 void sithCamera_SetCameraFocus(sithCamera *camera, sithThing *primary, sithThing *secondary);
-sithSector* sithCamera_create_unk_struct(sithThing* a3, sithSector* a2, rdVector3* a4, rdVector3* a6, float a7, int flags);
-void sithCamera_SetPovShake(rdVector3 *a1, rdVector3 *a2, float a3, float a4);
+sithSector* sithCamera_create_unk_struct(sithThing* a3, sithSector* a2, rdVector3* a4, rdVector3* a6, flex_t a7, int flags);
+void sithCamera_SetPovShake(rdVector3 *a1, rdVector3 *a2, flex_t a3, flex_t a4);
 sithThing* sithCamera_GetPrimaryFocus(sithCamera *pCamera);
 sithThing* sithCamera_GetSecondaryFocus(sithCamera *pCamera);
 int sithCamera_SetState(int a1);
 int sithCamera_GetState();
 void sithCamera_CycleCamera();
-void sithCamera_SetZoom(sithCamera *pCamera, float zoomScale, float zoom_2); // MOTS added
+void sithCamera_SetZoom(sithCamera *pCamera, flex_t zoomScale, flex_t zoom_2); // MOTS added
 void sithCamera_UpdateZoom(sithCamera *pCamera);
 
 #ifndef __cplusplus
 //static void (*sithCamera_Shutdown)() = (void*)sithCamera_Shutdown_ADDR;
-static int (*sithCamera_NewEntry_)(sithCamera *camera, int a2, int a3, float fov, float a5, rdCanvas* a6, sithThing *focus_far, sithThing *focus_near) = (void*)sithCamera_NewEntry_ADDR;
+static int (*sithCamera_NewEntry_)(sithCamera *camera, int a2, int a3, flex_t fov, flex_t a5, rdCanvas* a6, sithThing *focus_far, sithThing *focus_near) = (void*)sithCamera_NewEntry_ADDR;
 //static void (*sithCamera_SetCameraFocus)(sithCamera *a1, sithThing *primary, sithThing *secondary) = (void*)sithCamera_SetCameraFocus_ADDR;
 //static sithThing* (*sithCamera_GetPrimaryFocus)(sithCamera *cam) = (void*)sithCamera_GetPrimaryFocus_ADDR;
 //static sithThing* (*sithCamera_GetSecondaryFocus)(sithCamera *cam) = (void*)sithCamera_GetSecondaryFocus_ADDR;
 //static void (*sithCamera_CycleCamera)(void) = (void*)sithCamera_CycleCamera_ADDR;
-//static void (*sithCamera_SetPovShake)(rdVector3 *a1, rdVector3 *a2, float a3, float a4) = (void*)sithCamera_SetPovShake_ADDR;
+//static void (*sithCamera_SetPovShake)(rdVector3 *a1, rdVector3 *a2, flex_t a3, flex_t a4) = (void*)sithCamera_SetPovShake_ADDR;
 //static int (*sithCamera_SetCurrentCamera)(sithCamera *a1) = (void*)sithCamera_SetCurrentCamera_ADDR;
 //static int (*sithCamera_GetState)(void) = (void*)sithCamera_GetState_ADDR;
 //static void (*sithCamera_SetState)(int) = (void*)sithCamera_SetState_ADDR;
 //static void (*sithCamera_Close)() = (void*)sithCamera_Close_ADDR;
 //static void (*sithCamera_FollowFocus)(sithCamera *cam) = (void*)sithCamera_FollowFocus_ADDR;
 //static void (*sithCamera_SetRdCameraAndRenderidk)() = (void*)sithCamera_SetRdCameraAndRenderidk_ADDR;
-//static sithSector* (*sithCamera_create_unk_struct)(sithThing *a3, sithSector *a2, rdVector3 *a4, rdVector3 *a6, float a7, int arg14) = (void*)sithCamera_create_unk_struct_ADDR;
+//static sithSector* (*sithCamera_create_unk_struct)(sithThing *a3, sithSector *a2, rdVector3 *a4, rdVector3 *a6, flex_t a7, int arg14) = (void*)sithCamera_create_unk_struct_ADDR;
 //static void (*sithCamera_SetsFocus)() = (void*)sithCamera_SetsFocus_ADDR;
 #endif
 

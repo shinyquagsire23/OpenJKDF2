@@ -387,9 +387,8 @@ int sithGamesave_SerializeAllThings(int mpFlags)
 int sithGamesave_Write(char *saveFname, int a2, int a3, wchar_t *saveName)
 {
     wchar_t *v5; // esi
-    float *v7; // eax
+    flex_t *v7; // eax
     sithItemInfo *v8; // ecx
-    float v9; // edx
     char tmp_playerName[32]; // [esp+Ch] [ebp-2A0h] BYREF
     char PathName[128]; // [esp+2Ch] [ebp-280h] BYREF
     wchar_t v13[256]; // [esp+ACh] [ebp-200h] BYREF
@@ -441,9 +440,8 @@ int sithGamesave_Write(char *saveFname, int a2, int a3, wchar_t *saveName)
         v8 = sithPlayer_pLocalPlayer->iteminfo;
         do
         {
-            v9 = v8->ammoAmt;
+            *v7++ = v8->ammoAmt;
             ++v8;
-            *v7++ = v9;
         }
         while ( (intptr_t)v7 < (intptr_t)sithGamesave_headerTmp.saveName );
         sithGamesave_currentState = SITH_GS_SAVE;

@@ -19,10 +19,10 @@ void sithPhysics_FindFloor(sithThing *pThing, int a3)
     sithThing *v11; // edi
     rdFace *v12; // eax
     int searchFlags; // [esp+10h] [ebp-20h]
-    float range; // [esp+14h] [ebp-1Ch]
+    flex_t range; // [esp+14h] [ebp-1Ch]
     rdVector3 direction; // [esp+18h] [ebp-18h] BYREF
     rdVector3 a1; // [esp+24h] [ebp-Ch] BYREF
-    float thinga; // [esp+34h] [ebp+4h]
+    flex_t thinga; // [esp+34h] [ebp+4h]
 
     // Added: noclip
     if ((g_debugmodeFlags & DEBUGFLAG_NOCLIP) && pThing == sithPlayer_pLocalPlayerThing)
@@ -153,7 +153,7 @@ LABEL_8:
 
 // Inlined func
 
-void sithPhysics_ThingTick(sithThing *pThing, float deltaSecs)
+void sithPhysics_ThingTick(sithThing *pThing, flex_t deltaSecs)
 {
     if (!pThing->sector)
         return;
@@ -212,7 +212,7 @@ void sithPhysics_ThingApplyForce(sithThing *pThing, rdVector3 *forceVec)
 
     if ( pThing->moveType == SITH_MT_PHYSICS && pThing->physicsParams.mass > 0.0 )
     {
-        float invMass = 1.0 / pThing->physicsParams.mass;
+        flex_t invMass = 1.0 / pThing->physicsParams.mass;
 
         if ( forceVec->z * invMass > 0.5 ) // TODO verify
             sithThing_DetachThing(pThing);
@@ -222,7 +222,7 @@ void sithPhysics_ThingApplyForce(sithThing *pThing, rdVector3 *forceVec)
     }
 }
 
-void sithPhysics_ThingSetLook(sithThing *pThing, const rdVector3 *look, float a3)
+void sithPhysics_ThingSetLook(sithThing *pThing, const rdVector3 *look, flex_t a3)
 {
     double v4; // st7
     double v20; // st7
@@ -267,7 +267,7 @@ void sithPhysics_ThingSetLook(sithThing *pThing, const rdVector3 *look, float a3
     }
 }
 
-void sithPhysics_ApplyDrag(rdVector3 *vec, float drag, float mag, float deltaSecs)
+void sithPhysics_ApplyDrag(rdVector3 *vec, flex_t drag, flex_t mag, flex_t deltaSecs)
 {
     if (mag == 0.0 || rdVector_Len3(vec) >= mag)
     {
@@ -290,7 +290,7 @@ void sithPhysics_ApplyDrag(rdVector3 *vec, float drag, float mag, float deltaSec
 
 int sithPhysics_LoadThingParams(stdConffileArg *arg, sithThing *pThing, int param)
 {
-    float tmp;
+    flex_t tmp;
     int tmpInt;
 
     switch ( param )
@@ -386,10 +386,10 @@ void sithPhysics_ThingStop(sithThing *pThing)
     rdVector_Zero3(&pThing->field_268);
 }
 
-float sithPhysics_ThingGetInsertOffsetZ(sithThing *pThing)
+flex_t sithPhysics_ThingGetInsertOffsetZ(sithThing *pThing)
 {
     double result; // st7
-    float v2; // [esp+4h] [ebp+4h]
+    flex_t v2; // [esp+4h] [ebp+4h]
 
     result = pThing->physicsParams.height;
     if ( result == 0.0 )
@@ -404,13 +404,13 @@ float sithPhysics_ThingGetInsertOffsetZ(sithThing *pThing)
 }
 
 // MOTS altered
-void sithPhysics_ThingPhysGeneral(sithThing *pThing, float deltaSeconds)
+void sithPhysics_ThingPhysGeneral(sithThing *pThing, flex_t deltaSeconds)
 {
     rdVector3 a1a;
     rdVector3 a3;
     rdMatrix34 a;
     int bOverrideIdk = 0;
-    float zOverride = 0.0;
+    flex_t zOverride = 0.0;
 
     rdVector_Zero3(&pThing->physicsParams.addedVelocity);
     rdVector_Zero3(&a1a);
@@ -445,7 +445,7 @@ void sithPhysics_ThingPhysGeneral(sithThing *pThing, float deltaSeconds)
         rdVector3 local_6c, local_78;
 
         rdVector_Sub3(&tmp, &pThing->weaponParams.pTargetThing->position, &pThing->position);
-        float fVar3 = deltaSeconds * pThing->weaponParams.field_38;
+        flex_t fVar3 = deltaSeconds * pThing->weaponParams.field_38;
 
         if (-0.03 <= tmp.z) {
             if (tmp.z > 0.03) {
@@ -469,7 +469,7 @@ void sithPhysics_ThingPhysGeneral(sithThing *pThing, float deltaSeconds)
         else if (tmp.y < -180.0) {
             tmp.y = tmp.y - -360.0;
         }
-        float fVar6 = tmp.y;
+        flex_t fVar6 = tmp.y;
         if (tmp.y < 0.0) {
             fVar6 = -tmp.y;
         }
@@ -521,7 +521,7 @@ void sithPhysics_ThingPhysGeneral(sithThing *pThing, float deltaSeconds)
         && pThing->physicsParams.physflags & SITH_PF_USEGRAVITY
         && !(pThing->sector->flags & SITH_SECTOR_NOGRAVITY))
     {
-        float gravity = sithWorld_pCurrentWorld->worldGravity * deltaSeconds;
+        flex_t gravity = sithWorld_pCurrentWorld->worldGravity * deltaSeconds;
         if ( (pThing->physicsParams.physflags & SITH_PF_PARTIALGRAVITY) != 0 )
             gravity *= 0.5;
         a1a.z = a1a.z - gravity;
@@ -543,13 +543,13 @@ void sithPhysics_ThingPhysGeneral(sithThing *pThing, float deltaSeconds)
 }
 
 // MOTS altered
-void sithPhysics_ThingPhysPlayer(sithThing *player, float deltaSeconds)
+void sithPhysics_ThingPhysPlayer(sithThing *player, flex_t deltaSeconds)
 {
     rdMatrix34 a;
     rdVector3 a3;
     rdVector3 a1a;
     //int bOverrideIdk = 0; // Remove compiler warns
-    float zOverride = 0.0;
+    flex_t zOverride = 0.0;
 
     rdVector_Zero3(&player->physicsParams.addedVelocity);
     if (player->physicsParams.physflags & SITH_PF_ANGTHRUST)
@@ -582,7 +582,7 @@ void sithPhysics_ThingPhysPlayer(sithThing *player, float deltaSeconds)
         rdVector3 local_6c, local_78;
 
         rdVector_Sub3(&tmp, &player->weaponParams.pTargetThing->position, &player->position);
-        float fVar3 = deltaSeconds * player->weaponParams.field_38;
+        flex_t fVar3 = deltaSeconds * player->weaponParams.field_38;
 
         rdVector_Normalize3Acc(&tmp);
         rdMatrix_BuildFromLook34(&local_60,&tmp);
@@ -598,7 +598,7 @@ void sithPhysics_ThingPhysPlayer(sithThing *player, float deltaSeconds)
         else if (tmp.y < -180.0) {
             tmp.y = tmp.y - -360.0;
         }
-        float fVar6 = tmp.y;
+        flex_t fVar6 = tmp.y;
         if (tmp.y < 0.0) {
             fVar6 = -tmp.y;
         }
@@ -633,9 +633,9 @@ void sithPhysics_ThingPhysPlayer(sithThing *player, float deltaSeconds)
 
     // I think all of this is specifically for multiplayer, so that player things
     // sync better between clients.
-    float rolloverCombine = deltaSeconds + player->physicsParams.physicsRolloverFrames;
+    flex_t rolloverCombine = deltaSeconds + player->physicsParams.physicsRolloverFrames;
 
-    float framesToApply = rolloverCombine * OLDSTEP_TARGET_FPS; // get number of 50FPS steps passed
+    flex_t framesToApply = rolloverCombine * OLDSTEP_TARGET_FPS; // get number of 50FPS steps passed
     player->physicsParams.physicsRolloverFrames = rolloverCombine - (double)(unsigned int)(int)framesToApply * OLDSTEP_DELTA_50FPS;
 
     for (int i = (int)framesToApply; i > 0; i--)
@@ -665,7 +665,7 @@ void sithPhysics_ThingPhysPlayer(sithThing *player, float deltaSeconds)
              && (player->physicsParams.physflags & SITH_PF_USEGRAVITY) 
              && !(player->sector->flags & SITH_SECTOR_NOGRAVITY) )
         {
-            float gravity = sithWorld_pCurrentWorld->worldGravity * OLDSTEP_DELTA_50FPS;
+            flex_t gravity = sithWorld_pCurrentWorld->worldGravity * OLDSTEP_DELTA_50FPS;
             if ( (player->physicsParams.physflags & SITH_PF_PARTIALGRAVITY) != 0 )
                 gravity = gravity * 0.5;
             a1a.z = a1a.z - gravity;
@@ -677,7 +677,7 @@ void sithPhysics_ThingPhysPlayer(sithThing *player, float deltaSeconds)
 }
 
 // MOTS altered
-void sithPhysics_ThingPhysUnderwater(sithThing *pThing, float deltaSeconds)
+void sithPhysics_ThingPhysUnderwater(sithThing *pThing, flex_t deltaSeconds)
 {
     double v35; // st6
     double v51; // st7
@@ -756,24 +756,24 @@ void sithPhysics_ThingPhysUnderwater(sithThing *pThing, float deltaSeconds)
 }
 
 // MOTS altered
-void sithPhysics_ThingPhysAttached(sithThing *pThing, float deltaSeconds)
+void sithPhysics_ThingPhysAttached(sithThing *pThing, flex_t deltaSeconds)
 {   
-    float a2a; // [esp+0h] [ebp-94h]
-    float v144; // [esp+4h] [ebp-90h]
-    float possibly_undef_2; // [esp+1Ch] [ebp-78h]
-    float new_z; // [esp+20h] [ebp-74h]
-    float new_x; // [esp+24h] [ebp-70h]
-    float v158; // [esp+28h] [ebp-6Ch]
-    float possibly_undef_1; // [esp+2Ch] [ebp-68h]
-    float new_y; // [esp+30h] [ebp-64h]
-    float new_ya; // [esp+30h] [ebp-64h]
+    flex_t a2a; // [esp+0h] [ebp-94h]
+    flex_t v144; // [esp+4h] [ebp-90h]
+    flex_t possibly_undef_2; // [esp+1Ch] [ebp-78h]
+    flex_t new_z; // [esp+20h] [ebp-74h]
+    flex_t new_x; // [esp+24h] [ebp-70h]
+    flex_t v158; // [esp+28h] [ebp-6Ch]
+    flex_t possibly_undef_1; // [esp+2Ch] [ebp-68h]
+    flex_t new_y; // [esp+30h] [ebp-64h]
+    flex_t new_ya; // [esp+30h] [ebp-64h]
     rdVector3 vel_change; // [esp+34h] [ebp-60h] BYREF
     rdVector3 attachedNormal; // [esp+40h] [ebp-54h] BYREF
     rdVector3 out; // [esp+4Ch] [ebp-48h] BYREF
     rdVector3 a3; // [esp+58h] [ebp-3Ch] BYREF
     rdMatrix34 a; // [esp+64h] [ebp-30h] BYREF
     int bOverrideIdk = 0;
-    float zOverride = 0.0;
+    flex_t zOverride = 0.0;
 
     possibly_undef_1 = 0.0;
     possibly_undef_2 = 0.0;
@@ -852,7 +852,7 @@ void sithPhysics_ThingPhysAttached(sithThing *pThing, float deltaSeconds)
         rdVector3 local_6c, local_78;
 
         rdVector_Sub3(&tmp, &pThing->weaponParams.pTargetThing->position, &pThing->position);
-        float fVar3 = deltaSeconds * pThing->weaponParams.field_38;
+        flex_t fVar3 = deltaSeconds * pThing->weaponParams.field_38;
 
         if (-0.03 <= tmp.z) {
             if (tmp.z > 0.03) {
@@ -876,7 +876,7 @@ void sithPhysics_ThingPhysAttached(sithThing *pThing, float deltaSeconds)
         else if (tmp.y < -180.0) {
             tmp.y = tmp.y - -360.0;
         }
-        float fVar6 = tmp.y;
+        flex_t fVar6 = tmp.y;
         if (tmp.y < 0.0) {
             fVar6 = -tmp.y;
         }
@@ -943,7 +943,7 @@ void sithPhysics_ThingPhysAttached(sithThing *pThing, float deltaSeconds)
     if ( (pThing->physicsParams.physflags & SITH_PF_USESTHRUST) != 0
       && !rdVector_IsZero3(&pThing->physicsParams.acceleration) )
     {
-        float v44 = possibly_undef_2 * deltaSeconds;
+        flex_t v44 = possibly_undef_2 * deltaSeconds;
         if ( (pThing->physicsParams.physflags & SITH_PF_CROUCHING) != 0 )
             v44 = deltaSeconds * 0.8;
         rdVector_Scale3(&vel_change, &pThing->physicsParams.acceleration, v44);
@@ -1009,7 +1009,7 @@ void sithPhysics_ThingPhysAttached(sithThing *pThing, float deltaSeconds)
 
             if ( pThing->physicsParams.mass != 0.0 && (pThing->physicsParams.physflags & SITH_PF_USEGRAVITY) != 0 && (pThing->sector->flags & SITH_PF_USEGRAVITY) == 0 )
             {
-                float v91 = sithWorld_pCurrentWorld->worldGravity * deltaSeconds;
+                flex_t v91 = sithWorld_pCurrentWorld->worldGravity * deltaSeconds;
                 if ( (pThing->physicsParams.physflags & SITH_PF_PARTIALGRAVITY) != 0 )
                     v91 = v91 * 0.5;
                 out.z -= v91;
@@ -1033,13 +1033,13 @@ void sithPhysics_ThingPhysAttached(sithThing *pThing, float deltaSeconds)
       && v158 <= 1.0
       && (possibly_undef_2 < 0.8 || !rdVector_IsZero3(&pThing->physicsParams.vel)) )
     {
-        float v108 = stdMath_Clamp(1.0 - possibly_undef_2, 0.2, 0.8);
+        flex_t v108 = stdMath_Clamp(1.0 - possibly_undef_2, 0.2, 0.8);
         pThing->physicsParams.vel.z -= sithWorld_pCurrentWorld->worldGravity * deltaSeconds * v108;
     }
 
     if ( !rdVector_IsZero3(&pThing->physicsParams.vel) )
     {
-        float v109 = rdVector_Dot3(&attachedNormal, &pThing->physicsParams.vel);
+        flex_t v109 = rdVector_Dot3(&attachedNormal, &pThing->physicsParams.vel);
 
         if ( stdMath_ClipPrecision(v109) != 0.0 )
         {
@@ -1064,14 +1064,14 @@ void sithPhysics_ThingPhysAttached(sithThing *pThing, float deltaSeconds)
         rdVector_Scale3(&pThing->physicsParams.velocityMaybe, &pThing->physicsParams.vel, deltaSeconds);
     }
 
-    float v131;
+    flex_t v131;
     if (pThing->physicsParams.physflags & SITH_PF_CROUCHING)
     {
         v131 = v158 * possibly_undef_1 - (pThing->moveSize - -0.01);
     }
     else
     {
-        float v132 = pThing->physicsParams.height;
+        flex_t v132 = pThing->physicsParams.height;
         if ( v132 == 0.0 )
         {
             if ( pThing->rdthing.type == RD_THINGTYPE_MODEL )
@@ -1088,8 +1088,8 @@ void sithPhysics_ThingPhysAttached(sithThing *pThing, float deltaSeconds)
     if ( v131 != 0.0 )
     {
         // Fix physics being tied to framerate?
-        float orig_v131 = stdMath_ClampValue(v131, deltaSeconds * 0.5);
-        float new_v131 = v131 * (deltaSeconds / CANONICAL_PHYS_TICKRATE);
+        flex_t orig_v131 = stdMath_ClampValue(v131, deltaSeconds * 0.5);
+        flex_t new_v131 = v131 * (deltaSeconds / CANONICAL_PHYS_TICKRATE);
         new_v131 = stdMath_ClampValue(new_v131, deltaSeconds * 0.5);
 
 #ifdef FIXED_TIMESTEP_PHYS

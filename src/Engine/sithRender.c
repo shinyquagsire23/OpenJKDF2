@@ -40,8 +40,8 @@ static int lightDebugNum = 0;
 
 #ifdef JKM_LIGHTING
 int sithRender_008d4094 = 0;
-float sithRender_008d4098 = 0.0;
-float sithRender_008d409c = 0.0;
+flex_t sithRender_008d4098 = 0.0;
+flex_t sithRender_008d409c = 0.0;
 #endif
 
 int sithRender_008d1668 = 0;
@@ -49,7 +49,7 @@ int sithRender_008d1668 = 0;
 // Added: safeguard
 int sithRender_adjoinSafeguard = 0;
 
-void sithRender_RenderDebugLight(float intensity, rdVector3* pos)
+void sithRender_RenderDebugLight(flex_t intensity, rdVector3* pos)
 {
 #if 0
     rdVector3 scale_test;
@@ -88,7 +88,7 @@ void sithRender_RenderDebugLights()
     rdLight **lightIter2; // edi
     //unsigned int v24; // [esp+8h] [ebp-13Ch]
     sithSector **aSectorIter; // [esp+Ch] [ebp-138h]
-    float attenuationMax; // [esp+40h] [ebp-104h]
+    flex_t attenuationMax; // [esp+40h] [ebp-104h]
     rdLight *tmpLights[64]; // [esp+44h] [ebp-100h] BYREF
 
     if (!sithRender_numSectors)
@@ -109,7 +109,7 @@ void sithRender_RenderDebugLights()
         {
             sithRender_RenderDebugLight(rdCamera_pCurCamera->lights[i]->intensity, &rdCamera_pCurCamera->lightPositions[i]);
         
-            /*float distCalc = rdVector_Dist3(&rdCamera_pCurCamera->lightPositions[i], &sectorIter->center);
+            /*flex_t distCalc = rdVector_Dist3(&rdCamera_pCurCamera->lightPositions[i], &sectorIter->center);
             if ( (*curCamera_lights)->falloffMin + sectorIter->radius > distCalc)
             {
                 *lightIter++ = *curCamera_lights;
@@ -129,7 +129,7 @@ void sithRender_RenderDebugLights()
                 for (int i = 0; i < v24; i++)
                 {
                     int id = (*lightIter2)->id;
-                    float distCalc = rdVector_Dist3(&rdCamera_pCurCamera->lightPositions[id], &sithWorld_pCurrentWorld->vertices[idx]);
+                    flex_t distCalc = rdVector_Dist3(&rdCamera_pCurCamera->lightPositions[id], &sithWorld_pCurrentWorld->vertices[idx]);
                     if ( distCalc < (*lightIter2)->falloffMax )
                         sithWorld_pCurrentWorld->verticesDynamicLight[idx] = (*lightIter2)->intensity - distCalc * rdCamera_pCurCamera->attenuationMax + sithWorld_pCurrentWorld->verticesDynamicLight[idx];
                     if ( sithWorld_pCurrentWorld->verticesDynamicLight[idx] >= 1.0 )
@@ -220,7 +220,7 @@ int sithRender_GetSomeRenderFlag()
     return sithRender_flag;
 }
 
-void sithRender_EnableIRMode(float a, float b)
+void sithRender_EnableIRMode(flex_t a, flex_t b)
 {
     sithRender_lightingIRMode = 1;
     sithRender_f_83198C = stdMath_Clamp(a, 0.0, 1.0);
@@ -263,11 +263,11 @@ void sithRender_Draw()
 {
     sithSector *v2; // edi
     sithSector *v4; // eax
-    float a2; // [esp+0h] [ebp-28h]
-    float v7; // [esp+8h] [ebp-20h]
-    float v9; // [esp+8h] [ebp-20h]
-    float a3; // [esp+1Ch] [ebp-Ch] BYREF
-    float a4; // [esp+24h] [ebp-4h] BYREF
+    flex_t a2; // [esp+0h] [ebp-28h]
+    flex_t v7; // [esp+8h] [ebp-20h]
+    flex_t v9; // [esp+8h] [ebp-20h]
+    flex_t a3; // [esp+1Ch] [ebp-Ch] BYREF
+    flex_t a4; // [esp+24h] [ebp-4h] BYREF
 
     //printf("%x %x %x\n", sithRender_texMode, rdroid_curTextureMode, sithRender_lightMode);
 
@@ -292,8 +292,8 @@ void sithRender_Draw()
 
     if ( (sithCamera_currentCamera->sector->flags & 2) != 0 )
     {
-        float fov = sithCamera_currentCamera->fov;
-        float aspect = sithCamera_currentCamera->aspectRatio;
+        flex_t fov = sithCamera_currentCamera->fov;
+        flex_t aspect = sithCamera_currentCamera->aspectRatio;
 
 #ifdef QOL_IMPROVEMENTS
         fov = jkPlayer_fov;
@@ -362,7 +362,7 @@ void sithRender_Draw()
         else {
             local_8 = 0xffffffff;
         }
-        float fVar3 = sithRender_008d4098 - (float)local_8 * sithRender_008d409c * sithTime_deltaSeconds;
+        flex_t fVar3 = sithRender_008d4098 - (flex_t)local_8 * sithRender_008d409c * sithTime_deltaSeconds;
         if (0.0 <= sithRender_008d4098) {
             if (sithRender_008d4098 < 0.0) {
                 iVar6 = 0;
@@ -412,7 +412,7 @@ void sithRender_Draw()
 }
 
 // MOTS altered?
-void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
+void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, flex_t a3)
 {
     //sithRender_Clip_(sector, frustumArg, a3);
     //return;    
@@ -564,7 +564,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
         }
 
         v20 = &sithWorld_pCurrentWorld->vertices[*adjoinSurface->surfaceInfo.face.vertexPosIdx];
-        float dist = (sithCamera_currentCamera->vec3_1.y - v20->y) * adjoinSurface->surfaceInfo.face.normal.y
+        flex_t dist = (sithCamera_currentCamera->vec3_1.y - v20->y) * adjoinSurface->surfaceInfo.face.normal.y
                    + (sithCamera_currentCamera->vec3_1.z - v20->z) * adjoinSurface->surfaceInfo.face.normal.z
                    + (sithCamera_currentCamera->vec3_1.x - v20->x) * adjoinSurface->surfaceInfo.face.normal.x;
 
@@ -653,14 +653,14 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
                 }
                 else
                 {
-                    float minX = FLT_MAX;
-                    float minY = FLT_MAX;
-                    float maxX = -FLT_MAX;
-                    float maxY = -FLT_MAX;
+                    flex_t minX = FLT_MAX;
+                    flex_t minY = FLT_MAX;
+                    flex_t maxX = -FLT_MAX;
+                    flex_t maxY = -FLT_MAX;
                     for (int i = 0; i < meshinfo_out.numVertices; i++)
                     {
-                        float v34 = sithRender_aVerticesTmp_projected[i].x;
-                        float v57 = sithRender_aVerticesTmp_projected[i].y;
+                        flex_t v34 = sithRender_aVerticesTmp_projected[i].x;
+                        flex_t v57 = sithRender_aVerticesTmp_projected[i].y;
                         if (v34 < minX)
                             minX = v34;
                         if (v34 > maxX)
@@ -674,17 +674,17 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
 
                     // Causes random black lines?
 #if 0
-                    float v49 = ceilf(maxY);
-                    float v48 = ceilf(maxX);
-                    float v47 = ceilf(minY);
-                    float v46 = ceilf(minX);
+                    flex_t v49 = ceilf(maxY);
+                    flex_t v48 = ceilf(maxX);
+                    flex_t v47 = ceilf(minY);
+                    flex_t v46 = ceilf(minX);
 #endif
 
                     // Fixed
-                    float v49 = maxY + 1.5;
-                    float v48 = maxX + 1.5;
-                    float v47 = minY - 2.0;//ceilf(minY);
-                    float v46 = minX - 2.0;//ceilf(minX);
+                    flex_t v49 = maxY + 1.5;
+                    flex_t v48 = maxX + 1.5;
+                    flex_t v47 = minY - 2.0;//ceilf(minY);
+                    flex_t v46 = minX - 2.0;//ceilf(minX);
 
                     rdCamera_BuildClipFrustum(rdCamera_pCurCamera, &outClip, (int)(v46 - -0.5), (int)(v47 - -0.5), (int)v48, (int)v49);
                     v31 = &outClip;
@@ -693,7 +693,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, float a3)
                 // Added: noclip
                 if (sithPlayer_bNoClippingRend) continue;
                 
-                float a3a = adjoinIter->dist + adjoinIter->mirror->dist + a3;
+                flex_t a3a = adjoinIter->dist + adjoinIter->mirror->dist + a3;
                 if (!(sithRender_flag & 4) || a3a < sithRender_f_82F4B0 ) // wtf is with this float?
                     sithRender_Clip(adjoinIter->sector, v31, a3a);
             }
@@ -716,10 +716,10 @@ void sithRender_RenderLevelGeometry()
     int v23; // ecx
     int v24; // eax
     unsigned int v28; // ebp
-    float v29; // ecx
-    float *v31; // eax
+    flex_t v29; // ecx
+    flex_t *v31; // eax
     unsigned int v32; // ecx
-    float *v33; // edx
+    flex_t *v33; // edx
     double v34; // st7
     int v38; // ecx
     char v39; // al
@@ -729,10 +729,10 @@ void sithRender_RenderLevelGeometry()
     rdTexMode_t texMode; // ecx
     rdTexMode_t texMode2; // eax
     unsigned int num_vertices; // ebp
-    float v49; // edx
-    float *v51; // eax
+    flex_t v49; // edx
+    flex_t *v51; // eax
     unsigned int v52; // ecx
-    float *v53; // edx
+    flex_t *v53; // edx
     double v54; // st7
     int surfaceFlags; // eax
     int v57; // edx
@@ -743,11 +743,11 @@ void sithRender_RenderLevelGeometry()
     int v63; // eax
     rdTexMode_t texMode3; // [esp-10h] [ebp-74h]
     sithSurface *v65; // [esp+10h] [ebp-54h]
-    float v66; // [esp+14h] [ebp-50h]
-    float v67; // [esp+14h] [ebp-50h]
+    flex_t v66; // [esp+14h] [ebp-50h]
+    flex_t v67; // [esp+14h] [ebp-50h]
     BOOL v68; // [esp+18h] [ebp-4Ch]
     sithSector *level_idk; // [esp+1Ch] [ebp-48h]
-    float a2; // [esp+20h] [ebp-44h]
+    flex_t a2; // [esp+20h] [ebp-44h]
     int v71; // [esp+24h] [ebp-40h]
     int v72; // [esp+28h] [ebp-3Ch]
     rdTexinfo *v73; // [esp+2Ch] [ebp-38h]
@@ -757,9 +757,9 @@ void sithRender_RenderLevelGeometry()
     rdClipFrustum *v77; // [esp+3Ch] [ebp-28h]
     int v78[3]; // [esp+40h] [ebp-24h] BYREF
     int v79[3]; // [esp+4Ch] [ebp-18h] BYREF
-    float v80[3]; // [esp+58h] [ebp-Ch] BYREF
-    float tmpBlue[3];
-    float tmpGreen[3];
+    flex_t v80[3]; // [esp+58h] [ebp-Ch] BYREF
+    flex_t tmpBlue[3];
+    flex_t tmpGreen[3];
 
     if ( rdroid_curAcceleration )
     {
@@ -795,7 +795,7 @@ void sithRender_RenderLevelGeometry()
         }
         else
         {
-            float baseLight = level_idk->ambientLight + level_idk->extraLight + sithRender_008d4098;
+            flex_t baseLight = level_idk->ambientLight + level_idk->extraLight + sithRender_008d4098;
             a2 = stdMath_Clamp(baseLight, 0.0, 1.0);
             rdCamera_SetAmbientLight(rdCamera_pCurCamera, a2);
         }
@@ -1122,8 +1122,8 @@ void sithRender_RenderLevelGeometry()
                             v80[1] = v65->surfaceInfo.intensities[v71];
                             v80[2] = v65->surfaceInfo.intensities[v18];
 
-                            memcpy(tmpBlue, v80, sizeof(float) * 3);
-                            memcpy(tmpGreen, v80, sizeof(float) * 3);
+                            memcpy(tmpBlue, v80, sizeof(flex_t) * 3);
+                            memcpy(tmpGreen, v80, sizeof(flex_t) * 3);
                         }
                         else {
                             v80[0] = v65->surfaceInfo.intensities[(v65->surfaceInfo.face.numVertices * 1) + v19];
@@ -1372,7 +1372,7 @@ void sithRender_UpdateAllLights()
 }
 
 // Added: recursion depth
-void sithRender_UpdateLights(sithSector *sector, float prev, float dist, int depth)
+void sithRender_UpdateLights(sithSector *sector, flex_t prev, flex_t dist, int depth)
 {
     sithThing *i;
     sithAdjoin *j;
@@ -1446,7 +1446,7 @@ void sithRender_UpdateLights(sithSector *sector, float prev, float dist, int dep
     {
         if ( (j->flags & 1) != 0 && j->sector->renderTick != sithRender_lastRenderTick )
         {
-            float nextDist = j->mirror->dist + j->dist + dist + prev;
+            flex_t nextDist = j->mirror->dist + j->dist + dist + prev;
             if ( nextDist < 0.8 || nextDist < 2.0 )
             {
                 j->sector->clipFrustum = sector->clipFrustum;
@@ -1482,7 +1482,7 @@ void sithRender_RenderDynamicLights()
         {
             //sithRender_RenderDebugLight(10.0, &rdCamera_pCurCamera->lightPositions[i]);
         
-            float distCalc = rdVector_Dist3(&rdCamera_pCurCamera->lightPositions[i], &sectorIter->center);
+            flex_t distCalc = rdVector_Dist3(&rdCamera_pCurCamera->lightPositions[i], &sectorIter->center);
             if ( curCamera_lights[i]->falloffMin + sectorIter->radius > distCalc)
             {
                 tmpLights[numSectorLights++] = curCamera_lights[i];
@@ -1499,7 +1499,7 @@ void sithRender_RenderDynamicLights()
                 for (int i = 0; i < numSectorLights; i++)
                 {
                     int id = tmpLights[i]->id;
-                    float distCalc = rdVector_Dist3(&rdCamera_pCurCamera->lightPositions[id], &sithWorld_pCurrentWorld->vertices[idx]);
+                    flex_t distCalc = rdVector_Dist3(&rdCamera_pCurCamera->lightPositions[id], &sithWorld_pCurrentWorld->vertices[idx]);
 
                     // Light is within distance of the vertex
                     if ( distCalc < tmpLights[i]->falloffMax )
@@ -1521,16 +1521,16 @@ void sithRender_RenderThings()
     sithSector *v1; // ebp
     double v2; // st7
     sithThing *thingIter; // esi
-    float radius; // edx
+    flex_t radius; // edx
     int clippingVal; // eax
     sithWorld *curWorld; // edx
     rdModel3 *model3; // ecx
     int texMode; // ecx
     int texMode2; // eax
     rdLightMode_t lightMode; // eax
-    float v12; // [esp-Ch] [ebp-28h]
-    float a2; // [esp+8h] [ebp-14h]
-    float clipRadius; // [esp+Ch] [ebp-10h]
+    flex_t v12; // [esp-Ch] [ebp-28h]
+    flex_t a2; // [esp+8h] [ebp-14h]
+    flex_t clipRadius; // [esp+Ch] [ebp-10h]
     uint32_t i; // [esp+14h] [ebp-8h]
     BOOL v16; // [esp+18h] [ebp-4h]
 
@@ -1613,7 +1613,7 @@ void sithRender_RenderThings()
                         continue;
                     curWorld = sithWorld_pCurrentWorld;
 
-                    float yval = thingIter->screenPos.y;
+                    flex_t yval = thingIter->screenPos.y;
                     // MoTS added
                     if (sithCamera_currentCamera->zoomScale != 1.0) {
                         yval = sithCamera_currentCamera->invZoomScale * (thingIter->screenPos).y;
@@ -1781,11 +1781,11 @@ int sithRender_RenderThing(sithThing *pThing)
 
     if (pThing->type == SITH_THING_EXPLOSION && (pThing->explosionParams.typeflags & SITHEXPLOSION_FLAG_FLASH_BLINDS_THINGS))
     {
-        float cameraDist = stdMath_Dist3D1(pThing->screenPos.x, pThing->screenPos.y, pThing->screenPos.z);
+        flex_t cameraDist = stdMath_Dist3D1(pThing->screenPos.x, pThing->screenPos.y, pThing->screenPos.z);
         uint32_t flashG = pThing->explosionParams.flashG;
         uint32_t flashR = pThing->explosionParams.flashR;
         uint32_t flashB = pThing->explosionParams.flashB;
-        float flashMagnitude = ((double)(flashB + flashR + flashG) * 0.013020833 - rdCamera_pCurCamera->attenuationMin * cameraDist) * 0.1;
+        flex_t flashMagnitude = ((double)(flashB + flashR + flashG) * 0.013020833 - rdCamera_pCurCamera->attenuationMin * cameraDist) * 0.1;
         if ( flashMagnitude > 0.0 ) {
             sithPlayer_AddDyamicAdd((__int64)((double)flashR * flashMagnitude - -0.5), (__int64)((double)flashG * flashMagnitude - -0.5), (__int64)((double)flashB * flashMagnitude - -0.5));
         }
@@ -1802,11 +1802,11 @@ void sithRender_RenderAlphaSurfaces()
     unsigned int v4; // ebp
     int v7; // eax
     rdProcEntry *v9; // esi
-    float *v20; // eax
+    flex_t *v20; // eax
     unsigned int v21; // ecx
-    float *v22; // edx
+    flex_t *v22; // edx
     char v23; // bl
-    float v31; // [esp+4h] [ebp-10h]
+    flex_t v31; // [esp+4h] [ebp-10h]
     sithSector *surfaceSector; // [esp+Ch] [ebp-8h]
 
 #ifdef SDL2_RENDER
@@ -1990,7 +1990,7 @@ int sithRender_SetRenderWeaponHandle(void *a1)
 }
 
 // MoTS Added
-void sithRender_WorldFlash(float arg1,float arg2)
+void sithRender_WorldFlash(flex_t arg1,flex_t arg2)
 {
   if ((arg1 != 0.0) && ((uint16_t)((uint16_t)(arg2 < 0.0) << 8 | (uint16_t)(arg2 == 0.0) << 0xe) == 0)) {
     sithRender_008d4094 = 1;
