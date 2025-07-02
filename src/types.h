@@ -1046,7 +1046,7 @@ typedef struct rdColormapHeader
     uint32_t magic;
     uint32_t version;
     uint32_t flags;
-    rdVector3 tint;
+    flex32_t tint[3];
     uint32_t field_18;
     uint32_t field_1C;
     uint32_t field_20;
@@ -1299,9 +1299,9 @@ typedef struct sithGamesave_Header
     int version;
     char episodeName[128];
     char jklName[128];
-    flex_t playerHealth;
-    flex_t playerMaxHealth;
-    flex_t binAmts[200];
+    flex32_t playerHealth;
+    flex32_t playerMaxHealth;
+    flex32_t binAmts[200];
     wchar_t saveName[256];
 } sithGamesave_Header;
 
@@ -1712,8 +1712,8 @@ typedef struct sithCog
     uint32_t sourceRef;
     uint32_t sourceType;
     uint32_t trigId;
-    flex_t params[4];
-    flex_t returnEx;
+    cog_flex_t params[4];
+    cog_flex_t returnEx;
     sithCogCallstack callstack[4];
     uint32_t calldepth;
     sithCogSymboltable* pSymbolTable;

@@ -1,6 +1,7 @@
 #ifndef _OPENJKDF2_ENGINE_CONFIG_H
 #define _OPENJKDF2_ENGINE_CONFIG_H
 
+#include <float.h>
 #include "types_enums.h"
 
 // If I ever do demo recording, add it here
@@ -264,7 +265,7 @@ extern int Window_isHiDpi;
 // - float for original game behavior
 // - double to verify flex_t vs flex32_t vs cog_flex_t is working
 // - TODO: fixed point support?
-typedef float flex_t_type;
+typedef float flex_t_type; // _Float16
 typedef double flex_d_t_type;
 
 #define FLEX(n) ((flex_t)n)

@@ -65,10 +65,10 @@ int rdColormap_LoadEntry(char *colormap_fname, rdColormap *colormap)
     _strncpy(colormap->colormap_fname, stdFileFromPath(colormap_fname), 0x1Fu);
     colormap->colormap_fname[31] = 0;
     rdroid_pHS->fileRead(colormap_fptr, &header, 0x40);
-    colormap->tint.x = header.tint.x;
+    colormap->tint.x = header.tint[0];
     colormap->flags = header.flags;
-    colormap->tint.y = header.tint.y;
-    colormap->tint.z = header.tint.z;
+    colormap->tint.y = header.tint[1];
+    colormap->tint.z = header.tint[2];
     if ( _strncmp((const char *)&header.magic, "CMP ", 4u) )
     {
         jk_printf("CMP magic in `%s` is invalid!\n", colormap_fname);

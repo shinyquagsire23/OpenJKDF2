@@ -1,6 +1,7 @@
 #include "sithWorld.h"
 
 #include "General/stdConffile.h"
+#include "general/stdString.h"
 #include "World/sithModel.h"
 #include "World/sithSprite.h"
 #include "World/sithTemplate.h"
@@ -694,6 +695,8 @@ int sithWorld_LoadGeoresource(sithWorld *pWorld, int a2)
 
     pWorld->numColormaps = numColormaps;
     pWorld->colormaps = (rdColormap *)pSithHS->alloc(sizeof(rdColormap) * numColormaps);
+    memset(pWorld->colormaps, 0, sizeof(rdColormap) * numColormaps); // Added: prevent freeing issues on load failures
+    
     if (!pWorld->colormaps)
     {
         return 0;
@@ -710,7 +713,8 @@ int sithWorld_LoadGeoresource(sithWorld *pWorld, int a2)
         {
             return 0;
         }
-        _sprintf(colormap_fname, "%s%c%s", "misc\\cmp", '\\', std_genBuffer);
+        
+        stdString_snprintf(colormap_fname, sizeof(colormap_fname), "%s%c%s", "misc\\cmp", '\\', std_genBuffer); // Added: sprintf -> snprintf
         if ( !rdColormap_LoadEntry(colormap_fname, &pWorld->colormaps[i]) )
         {
             return 0;
@@ -794,8 +798,8 @@ LABEL_28:
 
 void sithWorld_sub_4D0A20(sithWorld *pWorld)
 {
-    _memset(pWorld->alloc_unk98, 0, 4 * pWorld->numVertices);
-    _memset(pWorld->alloc_unk9c, 0, 4 * pWorld->numVertices);
+    _memset(pWorld->alloc_unk98, 0, sizeof(int) * pWorld->numVertices);
+    _memset(pWorld->alloc_unk9c, 0, sizeof(int) * pWorld->numVertices);
 
     for (int i = 0; i < pWorld->numSectors; i++)
     {

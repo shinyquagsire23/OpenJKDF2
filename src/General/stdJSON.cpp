@@ -123,7 +123,7 @@ int stdJSON_SaveFloat(const char* pFpath, const char* pKey, flex_t val)
     CHECK_COMMON(pFpath, pKey);
 
     nlohmann::json json_file = stdJSON_OpenAndReadFile(pFpath);
-    json_file[pKey] = val;
+    json_file[pKey] = (double)val; // FLEXTODO
     return stdJSON_WriteToFile(pFpath, json_file);
 }
 
@@ -167,7 +167,7 @@ flex_t stdJSON_GetFloat(const char* pFpath, const char* pKey, flex_t valDefault)
         return valDefault;
     }
 
-    return ret.get<flex_t>();
+    return ret.get<double>(); // FLEXTODO
 }
 
 int stdJSON_SaveBool(const char* pFpath, const char* pKey, int bVal)
