@@ -22,7 +22,7 @@ int stdMci_Play(uint8_t trackFrom, uint8_t trackTo);
 void stdMci_SetVolume(flex_t vol);
 void stdMci_Stop();
 int stdMci_CheckStatus();
-double stdMci_GetTrackLength(int track);
+flex_d_t stdMci_GetTrackLength(int track);
 
 // Added
 extern int stdMci_bIsGOG;

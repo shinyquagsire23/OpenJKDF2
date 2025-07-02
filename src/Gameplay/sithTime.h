@@ -2,6 +2,7 @@
 #define _SITHTIME_H
 
 #include <stdint.h>
+#include "types.h"
 
 #define sithTime_Tick_ADDR (0x004DD640)
 #define sithTime_Pause_ADDR (0x004DD710)
@@ -17,6 +18,6 @@ void sithTime_SetDelta(int deltaMs);
 void sithTime_Startup();
 void sithTime_SetMs(uint32_t curMs);
 
-extern double sithTime_physicsRolloverFrames;
+extern flex_d_t sithTime_physicsRolloverFrames;
 
 #endif // _SITHTIME_H
