@@ -250,7 +250,7 @@ typedef float flex32_t;
 typedef double flex64_t;
 
 // For intermediate calculations, physics, rendering
-typedef float flex_t;
+typedef flex_t_type flex_t;
 
 // For COG compatibility
 typedef int32_t cog_int_t;
@@ -261,7 +261,7 @@ typedef float flex32_t;
 typedef double flex64_t;
 
 // For intermediate calculations, physics, rendering
-typedef float flex_t;
+typedef flex_t_type flex_t;
 
 // For COG compatibility
 typedef int32_t cog_int_t;

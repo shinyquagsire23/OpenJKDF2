@@ -260,8 +260,11 @@ extern int Window_isHiDpi;
 #define WINDOW_DEFAULT_HEIGHT (480)
 #endif // WIN64_STANDALONE
 
-// TODO: fixed point support?
-//typedef float flex_t;
+// The type to use for flex_t:
+// - float for original game behavior
+// - double to verify flex_t vs flex32_t vs cog_flex_t is working
+// - TODO: fixed point support?
+typedef float flex_t_type;
 
 // Disable warnings for Vegetable Studio
 #if 1 && defined _MSC_VER
