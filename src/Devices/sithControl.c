@@ -709,7 +709,7 @@ flex_t sithControl_GetAxis2(int axisNum)
     uint32_t v1; // ebp
     stdControlKeyInfoEntry *entryIter; // esi
     int v3; // ebx
-    double v4; // st7
+    flex_d_t v4; // st7
     flex_t v6; // [esp+10h] [ebp-4h]
 
     v1 = 0;
@@ -770,7 +770,7 @@ flex_t sithControl_ReadAxisStuff(int funcIdx)
     uint32_t v1; // ebp
     stdControlKeyInfoEntry *v2; // esi
     int v3; // ebx
-    double v4; // st7
+    flex_d_t v4; // st7
     flex_t v6; // [esp+8h] [ebp-4h]
 
     v1 = 0;
@@ -821,7 +821,7 @@ flex_t sithControl_GetAxis(int funcIdx)
     stdControlKeyInfoEntry *v2; // esi
     uint32_t v3; // ebp
     int v4; // ebx
-    double v5; // st7
+    flex_d_t v5; // st7
     flex_t v7; // [esp+4h] [ebp-4h]
 
     v7 = 0.0;
@@ -835,7 +835,7 @@ flex_t sithControl_GetAxis(int funcIdx)
             v4 = v2->flags;
             if ( (v4 & 8) != 0 && ((sithWeapon_controlOptions & 0x20) == 0 || v1->dxKeyNum >= AXIS_MOUSE_X) )
             {
-                v5 = (double)stdControl_ReadAxisRaw(v2->dxKeyNum);
+                v5 = (flex_d_t)stdControl_ReadAxisRaw(v2->dxKeyNum);
                 if ( (v4 & 4) != 0 )
                     v5 = -v5;
                 if ( v2->binaryAxisVal != 0.0 )
@@ -865,16 +865,16 @@ int sithControl_HandlePlayer(sithThing *player, flex_t deltaSecs)
 {
     int v3; // esi
     int result; // eax
-    double v7; // st7
-    double v8; // st6
-    double v9; // st7
-    double v10; // st5
-    double v11; // st4
-    double v12; // st3
-    double v13; // st4
-    double v14; // st3
-    double v15; // rt0
-    double v16; // st3
+    flex_d_t v7; // st7
+    flex_d_t v8; // st6
+    flex_d_t v9; // st7
+    flex_d_t v10; // st5
+    flex_d_t v11; // st4
+    flex_d_t v12; // st3
+    flex_d_t v13; // st4
+    flex_d_t v14; // st3
+    flex_d_t v15; // rt0
+    flex_d_t v16; // st3
     wchar_t *v17; // eax
     flex_t v18; // [esp+8h] [ebp-40h]
     rdVector3 a3a; // [esp+Ch] [ebp-3Ch] BYREF
@@ -1122,11 +1122,11 @@ debug_controls:
 void sithControl_PlayerLook(sithThing *player, flex_t deltaSecs)
 {
     int v3; // edi
-    double v5; // st7
-    double v6; // st7
-    double v9;
-    double v8; // st6
-    double v12; // st6
+    flex_d_t v5; // st7
+    flex_d_t v6; // st7
+    flex_d_t v9;
+    flex_d_t v8; // st6
+    flex_d_t v12; // st6
     rdVector3 a2; // [esp+8h] [ebp-Ch] BYREF
 
     v3 = 0;
@@ -1413,12 +1413,12 @@ void sithControl_PlayerMovement(sithThing *player)
     }
 
     int new_state; // eax
-    double v6; // st7
-    double v7; // st6
-    double v11; // st7
-    double y_vel; // st6
+    flex_d_t v6; // st7
+    flex_d_t v7; // st6
+    flex_d_t v11; // st7
+    flex_d_t y_vel; // st6
     int v16; // eax
-    double v17; // st7
+    flex_d_t v17; // st7
     flex_t move_multiplier_a; // [esp+4h] [ebp-8h]
     flex_t move_multiplier_; // [esp+4h] [ebp-8h]
     int v20; // [esp+8h] [ebp-4h] BYREF
@@ -1518,12 +1518,12 @@ void sithControl_FreeCam(sithThing *player)
     sithThing *v1; // esi
     int v2; // ebp
     sithSector *v3; // eax
-    double v5; // st7
-    double v6; // st6
+    flex_d_t v5; // st7
+    flex_d_t v6; // st6
     rdVector3 *v7; // edi
-    double v9; // st7
-    double v11; // st7
-    double v12; // st6
+    flex_d_t v9; // st7
+    flex_d_t v11; // st7
+    flex_d_t v12; // st6
     flex_t v15; // [esp+Ch] [ebp-34h]
     rdMatrix34 a; // [esp+10h] [ebp-30h] BYREF
     int tmp;

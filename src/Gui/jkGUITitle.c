@@ -231,7 +231,7 @@ void jkGuiTitle_LoadBarDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *
 
 void jkGuiTitle_WorldLoadCallback(flex_t percentage)
 {
-    double v1; // st7
+    flex_d_t v1; // st7
 
     if ( jkGuiTitle_loadPercent != (__int64)percentage )
     {

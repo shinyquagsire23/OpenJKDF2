@@ -251,9 +251,9 @@ void jkGuiForce_ChoiceRemoveStar(jkGuiMenu *menu, int fpIdx, int amount)
 
 void jkGuiForce_ChoiceRemoveStars(jkGuiMenu *menu)
 {
-    if ( jkGuiForce_alignment && (double)(unsigned int)stdPlatform_GetTimeMsec() > jkGuiForce_flt_556674 )
+    if ( jkGuiForce_alignment && (flex_d_t)(unsigned int)stdPlatform_GetTimeMsec() > jkGuiForce_flt_556674 )
     {
-        jkGuiForce_flt_556674 = (double)(unsigned int)stdPlatform_GetTimeMsec() - -1000.0;
+        jkGuiForce_flt_556674 = (flex_d_t)(unsigned int)stdPlatform_GetTimeMsec() - -1000.0;
         int beginIdx = SITHBIN_F_THROW;
         int endIdx = SITHBIN_F_DEADLYSIGHT;
         
@@ -479,7 +479,7 @@ int jkGuiForce_ResetClick(jkGuiElement *element, jkGuiMenu *menu, int mouseX, in
     if ( !jkGuiForce_bCanSpendStars )
         return 0;
 
-    sithPlayer_SetBinAmt(SITHBIN_SPEND_STARS, (double)jkGuiForce_numSpendStars);
+    sithPlayer_SetBinAmt(SITHBIN_SPEND_STARS, (flex_d_t)jkGuiForce_numSpendStars);
     for (int i = EIDX_START_FP; i < (Main_bMotsCompat ? EIDX_END_FP : EIDX_END_FP_CLICKABLE); i++)
     {
         flex_t initialForcePoints = (flex_t)jkGuiForce_pElements[i].oldForcePoints; // FLEXTODO

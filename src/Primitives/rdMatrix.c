@@ -324,12 +324,12 @@ void rdMatrix_ExtractAngles34(const rdMatrix34 *in, rdVector3 *out)
     flex_t v7; // ST08_4
     flex_t v9; // ST24_4
     flex_t v11; // ST00_4
-    double v13; // st7
+    flex_d_t v13; // st7
     flex_t v17; // ST00_4
-    double v19; // st7
-    double v22; // st7
-    double v23; // st7
-    long double v25; // st6
+    flex_d_t v19; // st7
+    flex_d_t v22; // st7
+    flex_d_t v23; // st7
+    flex_d_t v25; // st6
     flex_t v30; // [esp+18h] [ebp-10h]
     flex_t v31; // [esp+1Ch] [ebp-Ch]
     flex_t v32; // [esp+20h] [ebp-8h]
@@ -764,15 +764,15 @@ void rdMatrix_GetRowVector44(rdMatrix44 *m, int row, rdVector4 *out)
 
 void rdMatrix_TransformVector34(rdVector3 *out, const rdVector3 *v, const rdMatrix34 *m)
 {
-    double v3; // st5
-    double v4; // st4
-    double v5; // st3
-    double v6; // st6
-    double v7; // st7
-    double v8; // rt2
-    double v9; // st3
-    double v10; // st4
-    double v11; // st5
+    flex_d_t v3; // st5
+    flex_d_t v4; // st4
+    flex_d_t v5; // st3
+    flex_d_t v6; // st6
+    flex_d_t v7; // st7
+    flex_d_t v8; // rt2
+    flex_d_t v9; // st3
+    flex_d_t v10; // st4
+    flex_d_t v11; // st5
 
     v3 = m->uvec.y;
     v4 = m->lvec.y;
@@ -790,15 +790,15 @@ void rdMatrix_TransformVector34(rdVector3 *out, const rdVector3 *v, const rdMatr
 
 void rdMatrix_TransformVector34Acc_0(rdVector3 *a1, const rdVector3 *a2, const rdMatrix34 *a3)
 {
-    double v3; // st5
-    double v4; // st4
-    double v5; // st3
-    double v6; // st6
-    double v7; // st7
-    double v8; // rt2
-    double v9; // st3
-    double v10; // st4
-    double v11; // st5
+    flex_d_t v3; // st5
+    flex_d_t v4; // st4
+    flex_d_t v5; // st3
+    flex_d_t v6; // st6
+    flex_d_t v7; // st7
+    flex_d_t v8; // rt2
+    flex_d_t v9; // st3
+    flex_d_t v10; // st4
+    flex_d_t v11; // st5
 
     v3 = a3->lvec.z;
     v4 = a3->lvec.y;
@@ -837,8 +837,8 @@ void rdMatrix_TransformVector44Acc(rdVector4 *a1, const rdMatrix44 *a2)
     flex_t v2; // ST00_4
     flex_t v3; // ST04_4
     flex_t v4; // ST08_4
-    double v5; // st6
-    double v6; // st7
+    flex_d_t v5; // st6
+    flex_d_t v6; // st7
 
     v2 = a2->vC.x * a1->z + a2->vD.x * a1->w + a2->vB.x * a1->y + a2->vA.x * a1->x;
     v3 = a2->vC.y * a1->z + a2->vD.y * a1->w + a2->vB.y * a1->y + a2->vA.y * a1->x;

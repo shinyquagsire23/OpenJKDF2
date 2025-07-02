@@ -980,12 +980,12 @@ void sithCog_SendMessageFromSurface(sithSurface *surface, sithThing *thing, int 
     sithCog_SendMessageFromSurfaceEx(surface, thing, msg, 0.0, 0.0, 0.0, 0.0);
 }
 
-double sithCog_SendMessageFromSurfaceEx(sithSurface *sender, sithThing *thing, SITH_MESSAGE msg, flex_t a4, flex_t a5, flex_t a6, flex_t a7)
+flex_t sithCog_SendMessageFromSurfaceEx(sithSurface *sender, sithThing *thing, SITH_MESSAGE msg, flex_t a4, flex_t a5, flex_t a6, flex_t a7)
 {
     int v8; // ebp
     flex_t v9; // ebx
-    double v11; // st7
-    double v12; // st7
+    flex_d_t v11; // st7
+    flex_d_t v12; // st7
     flex_t v14; // [esp+10h] [ebp-Ch]
     int v15; // [esp+14h] [ebp-8h]
     int sourceType; // [esp+24h] [ebp+8h]
@@ -1057,8 +1057,8 @@ void sithCog_SendMessageFromSector(sithSector *sector, sithThing *thing, int mes
 flex_t sithCog_SendMessageFromSectorEx(sithSector *a1, sithThing *sourceType, SITH_MESSAGE message, flex_t param0, flex_t param1, flex_t param2, flex_t param3)
 {
     int v8; // ebp
-    double v11; // st7
-    double v12; // st7
+    flex_d_t v11; // st7
+    flex_d_t v12; // st7
     flex_t v13; // [esp+10h] [ebp-Ch]
     int v14; // [esp+14h] [ebp-8h]
     int sourceTypea; // [esp+24h] [ebp+8h]
@@ -1261,7 +1261,7 @@ execute:
 
 flex_t sithCog_SendMessageEx(sithCog *cog, int message, int senderType, int senderIndex, int sourceType, int sourceIndex, int linkId, flex_t param0, flex_t param1, flex_t param2, flex_t param3)
 {
-    double result; // st7
+    flex_d_t result; // st7
     sithCogScript *v12; // ebp
     int v13; // edx
     unsigned int trigIdxMax; // ecx

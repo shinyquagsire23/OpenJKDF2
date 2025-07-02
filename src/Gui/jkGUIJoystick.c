@@ -223,7 +223,7 @@ void jkGuiJoystick_Draw(jkGuiMenu *pMenu, int bRedraw)
     int v4; // esi
     int v5; // ecx
     stdControlKeyInfoEntry *v6; // eax
-    double v7; // st7
+    flex_d_t v7; // st7
     wchar_t *v8; // eax
     jkGuiMenu *v9; // edi
     Darray *v10; // edi
@@ -231,7 +231,7 @@ void jkGuiJoystick_Draw(jkGuiMenu *pMenu, int bRedraw)
     int v12; // eax
     int v13; // esi
     stdControlKeyInfoEntry *v14; // esi
-    double v15; // st7
+    flex_d_t v15; // st7
     int v16; // edx
     uint32_t v17; // eax
     int v18; // eax
@@ -262,9 +262,9 @@ void jkGuiJoystick_Draw(jkGuiMenu *pMenu, int bRedraw)
                     if ( jkGuiJoystick_aElements[22].bIsVisible )
                     {
                         if ( jkGuiJoystick_aElements[22].selectedTextEntry > 50 )
-                            v7 = (double)(jkGuiJoystick_aElements[22].selectedTextEntry - 50) * 0.059999999 - -1.0;
+                            v7 = (flex_d_t)(jkGuiJoystick_aElements[22].selectedTextEntry - 50) * 0.059999999 - -1.0;
                         else
-                            v7 = (double)jkGuiJoystick_aElements[22].selectedTextEntry * 0.015 - -0.25;
+                            v7 = (flex_d_t)jkGuiJoystick_aElements[22].selectedTextEntry * 0.015 - -0.25;
                         v6->binaryAxisVal = v7;
                     }
                     if ( jkGuiJoystick_aElements[20].bIsVisible )
@@ -850,8 +850,8 @@ void jkGuiJoystick_MenuTick(jkGuiMenu *pMenu)
     int v9; // eax
     int v10; // esi
     int v11; // edi
-    double v12; // st7
-    double v14; // st7
+    flex_d_t v12; // st7
+    flex_d_t v14; // st7
     wchar_t *v15; // esi
     wchar_t *v16; // eax
     jkGuiMenu *v17; // esi
@@ -1046,7 +1046,7 @@ int jkGuiJoystick_Show()
 {
     int v0; // edi
     stdControlKeyInfoEntry *v1; // eax
-    double v2; // st7
+    flex_d_t v2; // st7
 
     jkGuiJoystick_dword_557078 = stdControl_bOpen;
     jkGuiJoystick_dword_5576F4 = 0;
@@ -1090,9 +1090,9 @@ int jkGuiJoystick_Show()
         if ( jkGuiJoystick_aElements[22].bIsVisible )
         {
             if ( jkGuiJoystick_aElements[22].selectedTextEntry > 50 )
-                v2 = (double)(jkGuiJoystick_aElements[22].selectedTextEntry - 50) * 0.059999999 - -1.0;
+                v2 = (flex_d_t)(jkGuiJoystick_aElements[22].selectedTextEntry - 50) * 0.059999999 - -1.0;
             else
-                v2 = (double)jkGuiJoystick_aElements[22].selectedTextEntry * 0.015 - -0.25;
+                v2 = (flex_d_t)jkGuiJoystick_aElements[22].selectedTextEntry * 0.015 - -0.25;
             v1->binaryAxisVal = v2;
         }
         if ( jkGuiJoystick_aElements[20].bIsVisible )

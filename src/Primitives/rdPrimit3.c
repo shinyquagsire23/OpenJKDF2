@@ -51,13 +51,13 @@ void rdPrimit3_ClipFace(rdClipFrustum *clipFrustum, rdGeoMode_t geoMode, signed 
     rdVector3 *v41; // edx
     int v43; // eax
     rdVector3 *v44; // edi
-    double v45; // st7
+    flex_d_t v45; // st7
     rdVector3 *v46; // esi
     int *v47; // edx
     flex_t *v48; // edi
     int v49; // ecx
     rdVector3 *v50; // eax
-    double v51; // st7
+    flex_d_t v51; // st7
     rdVertexIdxInfo *v52; // eax
     rdMeshinfo *v53; // ebx
     flex_t *v54; // edi
@@ -67,14 +67,14 @@ void rdPrimit3_ClipFace(rdClipFrustum *clipFrustum, rdGeoMode_t geoMode, signed 
     int v59; // eax
     rdVector3 *v60; // edi
     int v61; // ebx
-    double v62; // st7
+    flex_d_t v62; // st7
     int *v63; // esi
     rdVector3 *v64; // edi
     rdVector2 *v65; // ecx
     int v66; // edx
     rdVector3 *v67; // eax
     int v68; // ebx
-    double v69; // st7
+    flex_d_t v69; // st7
     rdMeshinfo *v71; // esi
     int v72; // ebx
     int *v73; // ecx
@@ -503,13 +503,13 @@ void rdPrimit3_NoClipFace(rdGeoMode_t geoMode, signed int lightMode, int texMode
     rdVector3 *v36; // edx
     int v37; // esi
     int v38; // edi
-    double v39; // st7
+    flex_d_t v39; // st7
     rdVector3 *v40; // esi
     int *paPosIdx; // ecx
     char *v42; // edi
     rdVector3 *v43; // eax
     flex_t *v44; // edx
-    double v45; // st7
+    flex_d_t v45; // st7
     rdMeshinfo *v46; // eax
     rdMeshinfo *v47; // ebp
     flex_t *v48; // ebx
@@ -519,14 +519,14 @@ void rdPrimit3_NoClipFace(rdGeoMode_t geoMode, signed int lightMode, int texMode
     rdVector3 *v52; // esi
     rdVector2 *v53; // ecx
     int v54; // eax
-    double v55; // st7
+    flex_d_t v55; // st7
     rdVector2 *v56; // ebx
     int *v57; // edx
     rdVector3 *v58; // edi
     rdVector2 *v59; // ecx
     int v60; // eax
     flex_t *v61; // esi
-    double v62; // st7
+    flex_d_t v62; // st7
     rdMeshinfo *v64; // esi
     int v65; // ebx
     int *v66; // ecx
@@ -876,7 +876,7 @@ LABEL_19:
 
 int rdPrimit3_GetScreenCoord(rdVector3 *vec, rdScreenPoint *screenpt)
 {
-    double v2; // st7
+    flex_d_t v2; // st7
     rdVector3 v4; // [esp+0h] [ebp-18h] BYREF
     rdVector3 a2a; // [esp+Ch] [ebp-Ch] BYREF
 

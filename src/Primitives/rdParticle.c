@@ -303,23 +303,23 @@ int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
     int v3; // eax
     flex_t *v4; // ebx
     rdProcEntry *v5; // esi
-    double v6; // st6
-    double v7; // st5
-    double v8; // st7
-    double v9; // st4
-    double v10; // st3
-    double v11; // st2
-    double v12; // st1
-    double v13; // st3
-    double v14; // rt1
+    flex_d_t v6; // st6
+    flex_d_t v7; // st5
+    flex_d_t v8; // st7
+    flex_d_t v9; // st4
+    flex_d_t v10; // st3
+    flex_d_t v11; // st2
+    flex_d_t v12; // st1
+    flex_d_t v13; // st3
+    flex_d_t v14; // rt1
     flex_t v15; // ST24_4
-    double v16; // st2
-    double v17; // st7
+    flex_d_t v16; // st2
+    flex_d_t v17; // st7
     flex_t v18; // edx
     flex_t v19; // ST24_4
-    double v20; // st5
-    double v21; // st2
-    double v22; // st7
+    flex_d_t v20; // st5
+    flex_d_t v21; // st2
+    flex_d_t v22; // st7
     rdClipFrustum *v23; // ecx
     flex_t v24; // eax
     flex_t v25; // ST24_4

@@ -23,7 +23,7 @@ void rdLight_FreeEntry(rdLight *light);
 void rdLight_SetAngles(rdLight *pLight, flex_t angleX, flex_t angleY);
 #endif
 
-double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLightPoses, 
+flex_t rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLightPoses, 
 #ifdef JKM_LIGHTING
     rdVector3 *localLightDirs, 
 #endif

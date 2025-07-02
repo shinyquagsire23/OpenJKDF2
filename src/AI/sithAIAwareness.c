@@ -114,7 +114,7 @@ void sithAIAwareness_sub_4F2C30(sithSectorEntry *pSectorEntry, sithSector *pSect
         pSectorAlloc->field_0 = sithAIAwareness_timerTicks;
     }
 
-    if (pSectorAlloc->field_4[pSectorEntry->field_14] < (double)a5)
+    if (pSectorAlloc->field_4[pSectorEntry->field_14] < (flex_d_t)a5)
     {
         pSectorAlloc->field_4[pSectorEntry->field_14] = a5;
         pSectorAlloc->field_10[pSectorEntry->field_14] = *pPos1;

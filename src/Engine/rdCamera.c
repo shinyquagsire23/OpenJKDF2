@@ -188,8 +188,8 @@ int rdCamera_SetAspectRatio(rdCamera *camera, flex_t ratio)
 
 int rdCamera_BuildFOV(rdCamera *camera)
 {
-    double v10; // st3
-    double v15; // st4
+    flex_d_t v10; // st3
+    flex_d_t v15; // st4
     flex_t camerac; // [esp+1Ch] [ebp+4h]
 
     rdClipFrustum* clipFrustum = camera->pClipFrustum;
@@ -202,8 +202,8 @@ int rdCamera_BuildFOV(rdCamera *camera)
         case rdCameraProjectType_Ortho:
         {
             camera->fov_y = 0.0;
-            camerac = ((double)(canvas->heightMinusOne - canvas->yStart) * 0.5) / camera->orthoScale;
-            v15 = ((double)(canvas->widthMinusOne - canvas->xStart) * 0.5) / camera->orthoScale;
+            camerac = ((flex_d_t)(canvas->heightMinusOne - canvas->yStart) * 0.5) / camera->orthoScale;
+            v15 = ((flex_d_t)(canvas->widthMinusOne - canvas->xStart) * 0.5) / camera->orthoScale;
             clipFrustum->orthoLeft = -v15;
             clipFrustum->orthoTop = camerac / camera->screenAspectRatio;
             clipFrustum->orthoRight = v15;
@@ -224,8 +224,8 @@ int rdCamera_BuildFOV(rdCamera *camera)
 #endif
             flex_t width = canvas->xStart;
             flex_t height = canvas->yStart;
-            flex_t project_width_half = overdraw + (canvas->widthMinusOne - (double)width) * 0.5;
-            flex_t project_height_half = overdraw + (canvas->heightMinusOne - (double)height) * 0.5;
+            flex_t project_width_half = overdraw + (canvas->widthMinusOne - (flex_d_t)width) * 0.5;
+            flex_t project_height_half = overdraw + (canvas->heightMinusOne - (flex_d_t)height) * 0.5;
             
             flex_t project_width_half_2 = project_width_half;
             flex_t project_height_half_2 = project_height_half;
@@ -275,11 +275,11 @@ int rdCamera_BuildClipFrustum(rdCamera *camera, rdClipFrustum *outClip, signed i
 #else
     flex_t overdraw = 0.0;
 #endif
-    flex_t project_width_half = overdraw + canvas->screen_width_half - ((double)width - 0.5);
-    flex_t project_height_half = overdraw + canvas->screen_height_half - ((double)height - 0.5);
+    flex_t project_width_half = overdraw + canvas->screen_width_half - ((flex_d_t)width - 0.5);
+    flex_t project_height_half = overdraw + canvas->screen_height_half - ((flex_d_t)height - 0.5);
     
-    flex_t project_width_half_2 = -canvas->screen_width_half + ((double)width2 - 0.5);
-    flex_t project_height_half_2 = -canvas->screen_height_half + ((double)height2 - 0.5);
+    flex_t project_width_half_2 = -canvas->screen_width_half + ((flex_d_t)width2 - 0.5);
+    flex_t project_height_half_2 = -canvas->screen_height_half + ((flex_d_t)height2 - 0.5);
 
     rdVector_Copy3(&outClip->field_0, &cameraClip->field_0);
     

@@ -309,7 +309,7 @@ int sithMulti_GetSpawnIdx(sithThing *pPlayerThing)
         return 0;
     if ( v2 == 1 )
         return v12[0];
-    v7 = (__int64)(_frand() * (double)v2);
+    v7 = (__int64)(_frand() * (flex_d_t)v2);
     if ( v7 > v2 - 1 )
         v7 = v2 - 1;
     while ( 1 )
@@ -349,7 +349,7 @@ void sithMulti_SyncScores()
 
 void sithMulti_HandleDeath(sithPlayerInfo *pPlayerInfo, sithThing *pKilledThing, sithThing *pKilledByThing)
 {
-    double v3; // st7
+    flex_d_t v3; // st7
     wchar_t *v4; // eax
     wchar_t *v5; // eax
     wchar_t *v6; // eax

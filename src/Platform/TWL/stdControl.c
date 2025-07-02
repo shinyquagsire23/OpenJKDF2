@@ -362,7 +362,7 @@ int stdControl_Startup()
     int v5; // ecx
     int v6; // edi
     int v7; // eax
-    double v8; // st7
+    flex_d_t v8; // st7
     UINT v14; // [esp+40h] [ebp-1B4h]
     int *v15; // [esp+44h] [ebp-1B0h]
     int v17; // [esp+58h] [ebp-19Ch]
@@ -433,7 +433,7 @@ int stdControl_Startup()
                 pJoystickIter->uMaxVal = v5;
                 pJoystickIter->dwXoffs = v7;
                 v18 = v5 - v7;
-                v8 = (double)(v5 - v7);
+                v8 = (flex_d_t)(v5 - v7);
                 pJoystickIter->fRangeConversion = 1.0 / v8;
                 if ( 0.1 == 0.0 )
                     pJoystickIter->dwYoffs = 0;
@@ -686,7 +686,7 @@ void stdControl_ToggleMouse()
 
 void stdControl_ReadControls()
 {
-    double khz;
+    flex_d_t khz;
 
     if (!stdControl_bControlsActive)
         return;
@@ -720,7 +720,7 @@ void stdControl_ReadControls()
     stdControl_curReadTime = stdPlatform_GetTimeMsec();
     stdControl_msDelta = stdControl_curReadTime - stdControl_msLast;
     if (stdControl_msDelta != 0)
-        khz = 1.0 / (double)(__int64)(stdControl_msDelta);
+        khz = 1.0 / (flex_d_t)(__int64)(stdControl_msDelta);
     else
         khz = 1.0;
     _memset(stdControl_aAxisPos, 0, sizeof(int) * JK_NUM_AXES);

@@ -563,7 +563,7 @@ void sithCamera_SetCameraFocus(sithCamera *camera, sithThing *primary, sithThing
 
 sithSector* sithCamera_create_unk_struct(sithThing *a3, sithSector *a2, rdVector3 *a4, rdVector3 *a6, flex_t a7, int flags)
 {
-    double v7; // st7
+    flex_d_t v7; // st7
     sithSector *v9; // ebx
     sithCollisionSearchEntry *i; // ecx
     rdVector3 a5; // [esp+Ch] [ebp-Ch] BYREF

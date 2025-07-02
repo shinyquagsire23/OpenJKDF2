@@ -114,7 +114,7 @@ int stdMci_CheckStatus()
     return statusParms.dwReturn != MCI_MODE_STOP;
 }
 
-double stdMci_GetTrackLength(int track)
+flex_d_t stdMci_GetTrackLength(int track)
 {
     MCI_STATUS_PARMS statusParms;
 
@@ -127,7 +127,7 @@ double stdMci_GetTrackLength(int track)
     statusParms.dwTrack = track;
     jk_mciSendCommandA(stdMci_mciId, MCI_STATUS, 0x110u, &statusParms);
 
-    return (double)((statusParms.dwReturn >> 16) & 0xFF) + (double)((statusParms.dwReturn >> 8) & 0xFF) * 60.0;
+    return (flex_d_t)((statusParms.dwReturn >> 16) & 0xFF) + (flex_d_t)((statusParms.dwReturn >> 8) & 0xFF) * 60.0;
 }
 
 #else // LINUX
@@ -204,7 +204,7 @@ int stdMci_CheckStatus()
     return stdMci_music;
 }
 
-double stdMci_GetTrackLength(int track)
+flex_d_t stdMci_GetTrackLength(int track)
 {
     return 0.0;
 }
@@ -397,7 +397,7 @@ int stdMci_Play(uint8_t trackFrom, uint8_t trackTo)
 void stdMci_SetVolume(flex_t vol)
 {
     stdPlatform_Printf("stdMci: Set vol %f\n", vol);
-    uint8_t volQuantized = (uint16_t)(vol * (double)MIX_MAX_VOLUME);
+    uint8_t volQuantized = (uint16_t)(vol * (flex_d_t)MIX_MAX_VOLUME);
     Mix_VolumeMusic(volQuantized);
 }
 
@@ -417,7 +417,7 @@ int stdMci_CheckStatus()
     return (stdMci_music != NULL);
 }
 
-double stdMci_GetTrackLength(int track)
+flex_d_t stdMci_GetTrackLength(int track)
 {
     return 0.0;
 }

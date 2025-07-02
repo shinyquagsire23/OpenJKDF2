@@ -81,7 +81,7 @@ int jkGuiObjectives_Show()
     jkGuiStringEntry *v2; // edi
     wchar_t *v3; // eax
     int v4; // esi
-    double v5; // st7
+    flex_d_t v5; // st7
     wchar_t *v6; // eax
     wchar_t *v7; // eax
     wchar_t *v9; // [esp-4h] [ebp-90h]

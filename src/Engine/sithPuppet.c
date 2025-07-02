@@ -288,14 +288,14 @@ void sithPuppet_ResetTrack(sithThing *puppet)
 // MOTS altered?
 void sithPuppet_Tick(sithThing *thing, flex_t deltaSeconds)
 {
-    double v3; // st7
+    flex_d_t v3; // st7
     sithPuppet *v4; // eax
     sithAnimclassEntry *v5; // ecx
     int v6; // ecx
-    double v8; // st7
+    flex_d_t v8; // st7
     char v9; // c0
     sithPuppet *v10; // eax
-    double v11; // st7
+    flex_d_t v11; // st7
     sithAnimclass *v12; // edx
     sithAnimclassEntry *v13; // eax
     int v14; // eax
@@ -363,16 +363,16 @@ void sithPuppet_Tick(sithThing *thing, flex_t deltaSeconds)
 
 flex_t sithPuppet_sub_4E4380(sithThing *thing)
 {
-    double v2; // st7
+    flex_d_t v2; // st7
     int v3; // ecx
-    double v5; // st6
+    flex_d_t v5; // st6
     char missing_1; // c0
-    double v8; // st5
+    flex_d_t v8; // st5
     char missing_2; // c0
     sithSector *v10 = NULL; // eax
     sithAnimclass *v11 = NULL; // ebp
     sithPuppet *v12 = NULL; // eax
-    double v14; // st6
+    flex_d_t v14; // st6
     char missing_3; // c0
     int anim; // ecx
     sithPuppet *v18 = NULL; // edx
@@ -492,7 +492,7 @@ flex_t sithPuppet_sub_4E4380(sithThing *thing)
         {
             if ( thinga >= 0.0 )
             {
-                if ( thinga < (double)v23 )
+                if ( thinga < (flex_d_t)v23 )
                     anim = SITH_ANIM_WALK;
                 else
                     anim = SITH_ANIM_RUN;
@@ -794,7 +794,7 @@ void sithPuppet_SetArmedMode(sithThing *thing, int mode)
 void sithPuppet_FidgetAnim(sithThing *pThing)
 {
     sithPuppet *puppet; // eax
-    double v2; // st7
+    flex_d_t v2; // st7
     sithAnimclass *v3; // edx
     sithAnimclassEntry *v4; // eax
     int v5; // eax
@@ -805,7 +805,7 @@ void sithPuppet_FidgetAnim(sithThing *pThing)
     int v10; // eax
 
     puppet = pThing->puppet;
-    if ( puppet->currentTrack < 0 && puppet->currentAnimation == 1 && (double)(unsigned int)puppet->animStartedMs - -30000.0 < (double)sithTime_curMs )
+    if ( puppet->currentTrack < 0 && puppet->currentAnimation == 1 && (flex_d_t)(unsigned int)puppet->animStartedMs - -30000.0 < (flex_d_t)sithTime_curMs )
     {
         v2 = _frand();
         if ( v2 >= 0.3 )
@@ -873,11 +873,11 @@ void sithPuppet_resetidk(sithThing *pThing)
 
 void sithPuppet_advanceidk(sithThing *pThing, flex_t a2)
 {
-    double v3; // st7
+    flex_d_t v3; // st7
     sithPuppet *puppet; // eax
     sithAnimclassEntry *v5; // ecx
     int v6; // ecx
-    double v8; // st7
+    flex_d_t v8; // st7
     flex_t a3; // [esp+0h] [ebp-8h]
     flex_t thinga; // [esp+Ch] [ebp+4h]
 

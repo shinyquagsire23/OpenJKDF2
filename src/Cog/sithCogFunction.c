@@ -82,7 +82,7 @@ void sithCogFunction_RandVec(sithCog *ctx)
 void sithCogFunction_Sleep(sithCog *ctx)
 {
     sithCog *ctx_;
-    double fSecs;
+    flex_d_t fSecs;
 
     ctx_ = ctx;
     fSecs = sithCogExec_PopFlex(ctx);
@@ -551,7 +551,7 @@ void sithCogFunction_GetKeyLen(sithCog *ctx)
         return;
     }
 
-    sithCogExec_PushFlex(ctx, (double)keyframe->numFrames / keyframe->fps);
+    sithCogExec_PushFlex(ctx, (flex_d_t)keyframe->numFrames / keyframe->fps);
 }
 
 void sithCogFunction_GetSithMode(sithCog* ctx)
@@ -1483,7 +1483,7 @@ void sithCogFunction_SetTeamScore(sithCog *ctx)
 
 void sithCogFunction_GetTimeLimit(sithCog *a1)
 {
-    cog_flex_t a2 = (double)(unsigned int)sithNet_multiplayer_timelimit * 0.000016666667;
+    cog_flex_t a2 = (flex_d_t)(unsigned int)sithNet_multiplayer_timelimit * 0.000016666667;
     sithCogExec_PushFlex(a1, a2);
 }
 

@@ -142,18 +142,18 @@ int sithParticle_LoadThingParams(stdConffileArg *arg, sithThing *thing, int para
 
 void sithParticle_Tick(sithThing *particle, flex_t deltaMs)
 {
-    double v2; // st7
+    flex_d_t v2; // st7
     char typeFlags; // al
     unsigned int i; // edi
     rdParticle *v5; // eax
     int v6; // ebp
     unsigned int v7; // esi
     int *v8; // eax
-    double v11; // st7
-    double v12; // st7
-    double v13; // st6
-    double v14; // rt2
-    double v15; // st6
+    flex_d_t v11; // st7
+    flex_d_t v12; // st7
+    flex_d_t v13; // st6
+    flex_d_t v14; // rt2
+    flex_d_t v15; // st6
     flex_t v16; // [esp+0h] [ebp-44h]
     rdVector3 a2a; // [esp+8h] [ebp-3Ch] BYREF
     rdMatrix34 a1a; // [esp+14h] [ebp-30h] BYREF
@@ -167,7 +167,7 @@ void sithParticle_Tick(sithThing *particle, flex_t deltaMs)
         i = 0;
         v5 = particle->rdthing.particlecloud;
         v6 = particle->particleParams.material->num_texinfo;
-        v16 = v2 * 1000.0 / (double)(unsigned int)particle->lifeLeftMs * deltaMs;
+        v16 = v2 * 1000.0 / (flex_d_t)(unsigned int)particle->lifeLeftMs * deltaMs;
         if ( v5->numVertices )
         {
             do
@@ -175,7 +175,7 @@ void sithParticle_Tick(sithThing *particle, flex_t deltaMs)
                 v7 = v6 - v5->vertexCel[i] - 1;
                 if ( v6 - v5->vertexCel[i] != 1 )
                 {
-                    if ( (double)v7 * v16 > _frand() )
+                    if ( (flex_d_t)v7 * v16 > _frand() )
                     {
                         v8 = &particle->rdthing.particlecloud->vertexCel[i];
                         ++*v8;
@@ -223,12 +223,12 @@ void sithParticle_CreateThing(sithThing *thing)
     rdMaterial *v6; // eax
     unsigned int v7; // ebx
     rdParticle *v8; // eax
-    double v9; // st7
+    flex_d_t v9; // st7
     unsigned int v10; // ebp
     int v11; // edi
     rdParticle *v13; // ecx
     rdVector3 *v14; // eax
-    double v15; // st7
+    flex_d_t v15; // st7
     rdVector3 *v16; // eax
     int v17; // eax
     rdParticle *v18; // ecx
@@ -293,7 +293,7 @@ void sithParticle_CreateThing(sithThing *thing)
                     v16->z = v16->z * thinga;
                     if ( v7 > 1 && (thing->particleParams.typeFlags & SITHPARTICLE_FLAG_RANDOM_START_CEL) != 0 )
                     {
-                        v17 = (int)(_frand() * (double)v7);
+                        v17 = (int)(_frand() * (flex_d_t)v7);
                         if ( v17 >= v7 - 1 )
                             v17 = v7 - 1;
                         v13 = thing->rdthing.particlecloud;

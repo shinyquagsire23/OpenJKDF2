@@ -27,7 +27,7 @@ void sithRenderSky_Close()
 
 void sithRenderSky_Update()
 {
-    double v0; // st7
+    flex_d_t v0; // st7
     flex_t v1; // [esp-Ch] [ebp-Ch]
 
     v1 = sithCamera_currentCamera->viewPYR.z;
@@ -47,10 +47,10 @@ void sithRenderSky_TransformHorizontal(rdProcEntry *a1, sithSurfaceInfo *a2, int
     rdVector2 *v7; // eax
     rdVector3 *v8; // edx
     flex_t *v9; // ecx
-    double v10; // st7
-    double v12; // st5
-    double v13; // st6
-    double v14; // st7
+    flex_d_t v10; // st7
+    flex_d_t v12; // st5
+    flex_d_t v13; // st6
+    flex_d_t v14; // st7
     rdClipFrustum *v15; // [esp+10h] [ebp-4h]
     flex_t a1a; // [esp+18h] [ebp+4h]
 

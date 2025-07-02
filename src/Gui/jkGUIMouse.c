@@ -138,14 +138,14 @@ void jkGuiMouse_sub_416D40(jkGuiMenu *pMenu, int a2)
     int v3; // eax
     int v4; // esi
     jkGuiMouseSubEntry *v5; // eax
-    double v6; // st7
+    flex_d_t v6; // st7
     jkGuiMenu *v7; // edi
     Darray *v8; // edi
     jkGuiElement *v9; // ebp
     jkGuiMouseSubEntry *v10; // eax
     int v11; // eax
     jkGuiMouseSubEntry *v12; // esi
-    double v13; // st7
+    flex_d_t v13; // st7
     unsigned int v14; // ecx
     int v15; // rax
     int v16; // eax
@@ -170,9 +170,9 @@ void jkGuiMouse_sub_416D40(jkGuiMenu *pMenu, int a2)
             {
                 // Adjusted: More granularity
                 if ( jkGuiMouse_aElements[20].selectedTextEntry > 100 )
-                    v6 = (double)(jkGuiMouse_aElements[20].selectedTextEntry - 100) * (3.0 / 100.0) - -1.0;
+                    v6 = (flex_d_t)(jkGuiMouse_aElements[20].selectedTextEntry - 100) * (3.0 / 100.0) - -1.0;
                 else
-                    v6 = (double)jkGuiMouse_aElements[20].selectedTextEntry * (1.0/100.0);
+                    v6 = (flex_d_t)jkGuiMouse_aElements[20].selectedTextEntry * (1.0/100.0);
                 v5->field_8 = v6;
             }
             if ( jkGuiMouse_aElements[18].bIsVisible )
@@ -653,7 +653,7 @@ int jkGuiMouse_Show()
 {
     int v0; // edi
     jkGuiMouseSubEntry *pSubEnt; // eax
-    double v2; // st7
+    flex_d_t v2; // st7
 
     jkGuiMouse_bOpen = stdControl_bOpen;
     jkGuiRend_DarrayNewStr(&jkGuiMouse_Darray_5566B8, 64, 1);
@@ -681,9 +681,9 @@ int jkGuiMouse_Show()
     if ( jkGuiMouse_aElements[20].bIsVisible )
     {
         if ( jkGuiMouse_aElements[20].selectedTextEntry > 100 )
-            v2 = (double)(jkGuiMouse_aElements[20].selectedTextEntry - 100) * (3.0 / 100.0) - -1.0;
+            v2 = (flex_d_t)(jkGuiMouse_aElements[20].selectedTextEntry - 100) * (3.0 / 100.0) - -1.0;
         else
-            v2 = (double)jkGuiMouse_aElements[20].selectedTextEntry * (1.0/100.0);
+            v2 = (flex_d_t)jkGuiMouse_aElements[20].selectedTextEntry * (1.0/100.0);
         pSubEnt->field_8 = v2;
     }
     if ( jkGuiMouse_aElements[18].bIsVisible )

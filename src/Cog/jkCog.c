@@ -770,7 +770,7 @@ void jkCog_StringConcatFormattedInt(sithCog *ctx)
 
 void jkCog_StringConcatFlex(sithCog *pCog)
 {
-    double v1; // st7
+    flex_d_t v1; // st7
     size_t finalLen; // esi
     wchar_t v3[130]; // [esp+Ch] [ebp-104h] BYREF
 

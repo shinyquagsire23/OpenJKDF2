@@ -23,10 +23,6 @@ static rdVector2i sithIntersect_unkArr[3] = {
 // Added
 int sithIntersect_IsSphereInSectorBox(const rdVector3 *pos, flex_t radius, sithSector *sector)
 {
-    rdVector3 *v7; // ebp
-    double v8; // st7
-    double v10; // st6
-    
     // Added
     if (!sector)
         return 0;
@@ -50,8 +46,7 @@ int sithIntersect_IsSphereInSectorBox(const rdVector3 *pos, flex_t radius, sithS
 int sithIntersect_IsSphereInSector(const rdVector3 *pos, flex_t radius, sithSector *sector)
 {
     rdVector3 *v7; // ebp
-    double v8; // st7
-    double v10; // st6
+    flex_t v8; // st7
     
     // Added
     if (!sector)
@@ -286,7 +281,7 @@ int sithIntersect_sub_508400(rdVector3 *pStartPos, rdVector3 *pRayDirection, fle
     {
         v11 = sithIntersect_sub_508D20(pStartPos, pRayDirection, moveDistance, radius, &pMesh->faces[v26], pMesh->vertices, pSphereHitDist, &pushVel, 0);
         if ( v11
-          && (*pSphereHitDist < (double)moveDistance
+          && (*pSphereHitDist < (flex_d_t)moveDistance
            || v24 != SITHCOLLISION_THINGADJOINCROSS && v11 == SITHCOLLISION_THINGADJOINCROSS
            || rdVector_Dot3(pRayDirection, &pMesh->faces[v26].normal) < v25) )
         {
@@ -311,14 +306,14 @@ int sithIntersect_sub_508400(rdVector3 *pStartPos, rdVector3 *pRayDirection, fle
 // "raySphereIntersection"
 int sithIntersect_RaySphereIntersection(const rdVector3 *pStartPos, const rdVector3 *pRayDirection, flex_t maxDistance, flex_t sphereRadius, rdVector3 *pSpherePos, flex_t collisionRadius, flex_t *pDistanceOut, int bFaceCollision, int raycastFlags)
 {
-    double v15; // st7
-    double v16; // rtt
-    double v17; // st4
-    double v18; // st5
-    double v20; // rtt
-    long double v21; // st6
-    long double v22; // st7
-    long double v24; // st7
+    flex_d_t v15; // st7
+    flex_d_t v16; // rtt
+    flex_d_t v17; // st4
+    flex_d_t v18; // st5
+    flex_d_t v20; // rtt
+    flex_d_t v21; // st6
+    flex_d_t v22; // st7
+    flex_d_t v24; // st7
     flex_t v33; // [esp+20h] [ebp+14h]
     rdVector3 tmp;
 
@@ -376,25 +371,25 @@ LABEL_11:
 // int checkIntersectionWithFace(rdVector3 *intersectionPoint, flex_t radius, rdFace *pFace, rdVector3 *vertices, int *intersectionType)
 int sithIntersect_sub_508750(rdVector3 *a1, flex_t radius, rdFace *pFace, rdVector3 *a4, int *a5)
 {
-    double v10; // st7
+    flex_d_t v10; // st7
     int v12; // edx
     int v13; // ebx
     int v14; // ebp
     int v16; // edx
-    double v17; // st7
+    flex_d_t v17; // st7
     int v18; // eax
     int *v19; // ecx
     int v21; // edi
     int v23; // edx
-    double v25; // [esp+10h] [ebp-20h]
+    flex_d_t v25; // [esp+10h] [ebp-20h]
     int v26; // [esp+10h] [ebp-20h]
-    double v27; // [esp+14h] [ebp-1Ch]
+    flex_d_t v27; // [esp+14h] [ebp-1Ch]
     int v28; // [esp+14h] [ebp-1Ch]
     rdVector2 a1a; // [esp+18h] [ebp-18h] BYREF
-    double v30; // [esp+20h] [ebp-10h]
-    double v31; // [esp+24h] [ebp-Ch]
-    double v32; // [esp+28h] [ebp-8h]
-    double v33; // [esp+2Ch] [ebp-4h]
+    flex_d_t v30; // [esp+20h] [ebp-10h]
+    flex_d_t v31; // [esp+24h] [ebp-Ch]
+    flex_d_t v32; // [esp+28h] [ebp-8h]
+    flex_d_t v33; // [esp+2Ch] [ebp-4h]
     int v34; // [esp+34h] [ebp+4h]
 
     //if (sithCollision_bDebugCollide)
@@ -406,7 +401,7 @@ int sithIntersect_sub_508750(rdVector3 *a1, flex_t radius, rdFace *pFace, rdVect
     v27 = stdMath_Fabs(pFace->normal.y);
     v10 = stdMath_Fabs(pFace->normal.z);
 
-    if ( v25 <= (double)v27 )
+    if ( v25 <= (flex_d_t)v27 )
     {
         if ( v27 > v10 )
         {
@@ -495,10 +490,10 @@ int sithIntersect_sub_508990(rdVector3 *a1, flex_t a2, rdFace *a3, rdVector3 *a4
     int v11; // eax
     rdVector3 *v14; // esi
     rdVector3 *v15; // edi
-    double v16; // st7
+    flex_d_t v16; // st7
     //char v18; // c0
     int v19; // ecx
-    double v24; // st6
+    flex_d_t v24; // st6
     flex_t v27; // [esp+4h] [ebp-2Ch]
     int i; // [esp+8h] [ebp-28h]
     rdVector3 v29; // [esp+Ch] [ebp-24h]
@@ -528,7 +523,7 @@ int sithIntersect_sub_508990(rdVector3 *a1, flex_t a2, rdFace *a3, rdVector3 *a4
                 v19 = SITHCOLLISION_THINGTOUCH;
                 if ( v34 >= 0.0 )
                 {
-                    if ( v34 <= (double)v16 )
+                    if ( v34 <= (flex_d_t)v16 )
                     {
                         rdVector_Copy3(&v29, v14);
                         
@@ -565,8 +560,8 @@ int sithIntersect_sub_508990(rdVector3 *a1, flex_t a2, rdFace *a3, rdVector3 *a4
 // Used for floor collision, probably everything tbh
 int sithIntersect_SphereHit(const rdVector3 *pStartPos, const rdVector3 *pRayDirection, flex_t moveDistance, flex_t radius, rdVector3 *surfaceNormal, rdVector3 *a6, flex_t *pSphereHitDist, int flags)
 {
-    double v8; // st7
-    double v13; // st7
+    flex_d_t v8; // st7
+    flex_d_t v13; // st7
     flex_t v18; // [esp+18h] [ebp+18h]
 
     v8 = rdMath_DistancePointToPlane(pStartPos, surfaceNormal, a6);
@@ -612,12 +607,12 @@ int sithIntersect_sub_508D20(const rdVector3 *pStartPos, const rdVector3 *pRayDi
 {
     int result; // eax
     int *v18; // edx
-    double v21; // st7
-    double v25; // st7
+    flex_d_t v21; // st7
+    flex_d_t v25; // st7
     int v28; // esi
     flex_t v35; // edi
     int *v36; // edx
-    double v37; // st7
+    flex_d_t v37; // st7
     rdVector3 v45; // [esp+10h] [ebp-18h] BYREF
     rdVector3 projected; // [esp+1Ch] [ebp-Ch] BYREF
 

@@ -63,7 +63,7 @@ int sithSurface_Load(sithWorld *world)
     int adjoinIdx; // eax
     sithAdjoin *surfaceAdjoin; // ecx
     int wallCel; // edx
-    double v32; // st7
+    flex_d_t v32; // st7
     char *v33; // eax
     unsigned int v34; // ebp
     unsigned int v40; // ebx
@@ -407,11 +407,11 @@ void sithSurface_SetAdjoins(sithAdjoin *adjoin)
 
 void sithSurface_SetSectorLight(sithSector *sector, flex_t extraLight, flex_t a3, int a4)
 {
-    double v5; // st7
+    flex_d_t v5; // st7
     rdSurface *v6; // eax
     int v7; // edx
     rdSurface *v8; // esi
-    double v9; // st7
+    flex_d_t v9; // st7
     flex_t a1a; // [esp+4h] [ebp+4h]
 
     v5 = extraLight - sector->extraLight;
@@ -563,11 +563,11 @@ void sithSurface_Tick(flex_t deltaSecs)
     int v27; // eax
     rdSurface *v28; // ecx
     int v29; // edx
-    double v31; // st7
+    flex_d_t v31; // st7
     int v33; // ecx
     sithSurface* v34; // eax
     sithThing* v35; // eax
-    double v37; // st7
+    flex_d_t v37; // st7
 
     v2 = 0;
     for (v2 = 0; v2 <= sithSurface_numSurfaces; v2++)
@@ -832,7 +832,7 @@ uint32_t sithSurface_GetSurfaceAnim(sithSurface *surface)
 
 rdSurface* sithSurface_SurfaceLightAnim(sithSurface *surface, flex_t a2, flex_t a3)
 {
-    double v3; // st7
+    flex_d_t v3; // st7
     rdSurface *result; // eax
     int v5; // edx
     rdSurface *v6; // esi
@@ -886,7 +886,7 @@ rdSurface* sithSurface_SlideWall(sithSurface *surface, rdVector3 *a2)
     flex_t v15; // eax
     int v16; // ecx
     rdVector2 *v17; // edx
-    double v18; // st7
+    flex_d_t v18; // st7
 //    char v20; // c3
 //    char v22; // c0
     rdSurface *result; // eax
@@ -1219,10 +1219,10 @@ rdSurface* sithSurface_sub_4F00A0(sithThing *thing, flex_t a2, uint32_t a3)
 
 rdSurface* sithSurface_SetThingLight(sithThing *thing, flex_t a2, flex_t a3, int a4)
 {
-    double v5; // st7
+    flex_d_t v5; // st7
     rdSurface *result; // eax
     int v9; // edx
-    double v11; // st7
+    flex_d_t v11; // st7
     flex_t a1a; // [esp+4h] [ebp+4h]
 
     v5 = a2 - thing->light;

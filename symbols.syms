@@ -365,7 +365,7 @@ WinIdk_aDplayGuid 0x008607F0 uint32_t[4]
 
 stdDisplay_aDevices 0x00868280 stdVideoDevice[16]
 stdDisplay_gammaTableLen 0x055B410 int
-stdDisplay_paGammaTable 0x055B414 double*
+stdDisplay_paGammaTable 0x055B414 flex_d_t*
 stdDisplay_gammaPalette 0x0055ADB8 rdColor24[256]
 stdDisplay_pCurDevice 0x0055B3E8 stdVideoDevice*
 stdDisplay_pCurVideoMode 0x0055B3F0 stdVideoMode*

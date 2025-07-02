@@ -79,7 +79,7 @@ void sithActor_Tick(sithThing *thing, int deltaMs)
 flex_t sithActor_Hit(sithThing *sender, sithThing *receiver, flex_t amount, int flags)
 {
     sithThing *receiver_; // edi
-    double v6; // st7
+    flex_d_t v6; // st7
     sithThing *v7; // eax
     flex_t fR; // [esp+0h] [ebp-1Ch]
 
@@ -491,15 +491,15 @@ void sithActor_RemoveCorpse(sithThing *corpse)
 int sithActor_LoadParams(stdConffileArg *arg, sithThing *thing, unsigned int param)
 {
     int result; // eax
-    double v6; // st7
-    double v9; // st7
-    double v10; // st7
-    double v11; // st7
-    double v12; // st7
+    flex_d_t v6; // st7
+    flex_d_t v9; // st7
+    flex_d_t v10; // st7
+    flex_d_t v11; // st7
+    flex_d_t v12; // st7
     int v13; // eax
-    double v19; // st7
-    double v20; // st7
-    double v21; // st7
+    flex_d_t v19; // st7
+    flex_d_t v20; // st7
+    flex_d_t v21; // st7
     flex32_t tmp, vx, vy, vz;
     int tmpInt;
 
@@ -516,7 +516,7 @@ int sithActor_LoadParams(stdConffileArg *arg, sithThing *thing, unsigned int par
                 goto LABEL_38;
 
             thing->actorParams.health = tmp;
-            if ( tmp < (double)thing->actorParams.maxHealth )
+            if ( tmp < (flex_d_t)thing->actorParams.maxHealth )
                 thing->actorParams.maxHealth = thing->actorParams.maxHealth;
             else
                 thing->actorParams.maxHealth = tmp;

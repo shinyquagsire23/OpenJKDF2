@@ -505,7 +505,7 @@ flex_t stdMath_Sqrt(flex_t a)
 
 flex_t stdMath_Tan(flex_t a1)
 {
-    double v1; // st7
+    flex_d_t v1; // st7
     flex_t v3; // [esp+Ch] [ebp-20h]
     flex_t a1a; // [esp+10h] [ebp-1Ch]
     int32_t v5; // [esp+14h] [ebp-18h]
@@ -585,7 +585,7 @@ flex_t stdMath_Tan(flex_t a1)
 
 flex_t stdMath_ArcSin1(flex_t val)
 {
-    double angle; // st7
+    flex_d_t angle; // st7
     flex_t v2; // [esp+0h] [ebp-14h]
     flex_t v3; // [esp+4h] [ebp-10h]
     flex_t v5; // [esp+10h] [ebp-4h]
@@ -618,7 +618,7 @@ flex_t stdMath_ArcSin1(flex_t val)
 
 flex_t stdMath_ArcSin2(flex_t val)
 {
-    double angle; // st7
+    flex_d_t angle; // st7
     flex_t v2; // [esp+0h] [ebp-1Ch]
     flex_t v3; // [esp+4h] [ebp-18h]
     flex_t v4; // [esp+8h] [ebp-14h]
@@ -693,7 +693,7 @@ flex_t stdMath_ArcSin3(flex_t a1)
 
 flex_t stdMath_ArcTan1(flex_t a1, flex_t a2)
 {
-    double v3; // st7
+    flex_d_t v3; // st7
     flex_t v4; // [esp+0h] [ebp-24h]
     flex_t v5; // [esp+4h] [ebp-20h]
     flex_t v6; // [esp+Ch] [ebp-18h]
@@ -711,7 +711,7 @@ flex_t stdMath_ArcTan1(flex_t a1, flex_t a2)
         v5 = a2;
     else
         v5 = -a2;
-    if ( v5 <= (double)v6 )
+    if ( v5 <= (flex_d_t)v6 )
         v3 = v5 / v6;
     else
         v3 = v6 / v5;
@@ -721,7 +721,7 @@ flex_t stdMath_ArcTan1(flex_t a1, flex_t a2)
     else
         v4 = -v9;
     v7 = (v4 - stdMath_FlexPower(v4, 3) * 0.22629) * (180.0 / M_PI);
-    if ( v6 >= (double)v5 )
+    if ( v6 >= (flex_d_t)v5 )
         v7 = 90.0 - v7;
     v8 = 90.0 - v7;
     if ( a1 < 0.0 )
@@ -733,7 +733,7 @@ flex_t stdMath_ArcTan1(flex_t a1, flex_t a2)
 
 flex_t stdMath_ArcTan2(flex_t a1, flex_t a2)
 {
-    double v3; // st7
+    flex_d_t v3; // st7
     flex_t v4; // [esp+0h] [ebp-28h]
     flex_t v5; // [esp+4h] [ebp-24h]
     flex_t v6; // [esp+8h] [ebp-20h]
@@ -752,7 +752,7 @@ flex_t stdMath_ArcTan2(flex_t a1, flex_t a2)
         v6 = a2;
     else
         v6 = -a2;
-    if ( v6 <= (double)v7 )
+    if ( v6 <= (flex_d_t)v7 )
         v3 = v6 / v7;
     else
         v3 = v7 / v6;
@@ -763,7 +763,7 @@ flex_t stdMath_ArcTan2(flex_t a1, flex_t a2)
         v5 = -v10;
     v4 = v5 - stdMath_FlexPower(v5, 3) / 3.0;
     v8 = (stdMath_FlexPower(v5, 5) * 0.12366 + v4) * (180.0 / M_PI);
-    if ( v7 >= (double)v6 )
+    if ( v7 >= (flex_d_t)v6 )
         v8 = 90.0 - v8;
     v9 = 90.0 - v8;
     if ( a1 < 0.0 )
@@ -775,7 +775,7 @@ flex_t stdMath_ArcTan2(flex_t a1, flex_t a2)
 
 flex_t stdMath_ArcTan3(flex_t a1, flex_t a2)
 {
-    double v3; // st7
+    flex_d_t v3; // st7
     flex_t v4; // [esp+0h] [ebp-2Ch]
     flex_t v5; // [esp+4h] [ebp-28h]
     flex_t v6; // [esp+8h] [ebp-24h]
@@ -795,7 +795,7 @@ flex_t stdMath_ArcTan3(flex_t a1, flex_t a2)
         v7 = a2;
     else
         v7 = -a2;
-    if ( v7 <= (double)v8 )
+    if ( v7 <= (flex_d_t)v8 )
         v3 = v7 / v8;
     else
         v3 = v8 / v7;
@@ -807,7 +807,7 @@ flex_t stdMath_ArcTan3(flex_t a1, flex_t a2)
     v5 = v6 - stdMath_FlexPower(v6, 3) / 3.0;
     v4 = stdMath_FlexPower(v6, 5) / 5.0 + v5;
     v9 = (v4 - stdMath_FlexPower(v6, 7) * 0.083920002) * (180.0 / M_PI);
-    if ( v8 >= (double)v7 )
+    if ( v8 >= (flex_d_t)v7 )
         v9 = 90.0 - v9;
     v10 = 90.0 - v9;
     if ( a1 < 0.0 )
@@ -819,7 +819,7 @@ flex_t stdMath_ArcTan3(flex_t a1, flex_t a2)
 
 flex_t stdMath_ArcTan4(flex_t a1, flex_t a2)
 {
-    double v3; // st7
+    flex_d_t v3; // st7
     flex_t v4; // [esp+0h] [ebp-30h]
     flex_t v5; // [esp+4h] [ebp-2Ch]
     flex_t v6; // [esp+8h] [ebp-28h]
@@ -840,7 +840,7 @@ flex_t stdMath_ArcTan4(flex_t a1, flex_t a2)
         v8 = a2;
     else
         v8 = -a2;
-    if ( v8 <= (double)v9 )
+    if ( v8 <= (flex_d_t)v9 )
         v3 = v8 / v9;
     else
         v3 = v9 / v8;
@@ -853,7 +853,7 @@ flex_t stdMath_ArcTan4(flex_t a1, flex_t a2)
     v5 = stdMath_FlexPower(v7, 5) / 5.0 + v6;
     v4 = v5 - stdMath_FlexPower(v7, 7) / 7.0;
     v10 = (stdMath_FlexPower(v7, 9) * 0.063235 + v4) * (180.0 / M_PI);
-    if ( v9 >= (double)v8 )
+    if ( v9 >= (flex_d_t)v8 )
         v10 = 90.0 - v10;
     v11 = 90.0 - v10;
     if ( a1 < 0.0 )

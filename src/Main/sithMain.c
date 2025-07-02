@@ -248,11 +248,11 @@ int sithMain_Tick()
 #ifdef FIXED_TIMESTEP_PHYS
         if (NEEDS_STEPPED_PHYS) {
             // Run all physics at a fixed timestep
-            double rolloverCombine = sithTime_deltaSeconds + sithTime_physicsRolloverFrames;
+            flex_d_t rolloverCombine = sithTime_deltaSeconds + sithTime_physicsRolloverFrames;
 
-            double framesToApply = rolloverCombine * TARGET_PHYSTICK_FPS; // get number of 50FPS steps passed
+            flex_d_t framesToApply = rolloverCombine * TARGET_PHYSTICK_FPS; // get number of 50FPS steps passed
             uint32_t wholeFramesToApply = (uint32_t)round(framesToApply);
-            sithTime_physicsRolloverFrames = rolloverCombine - (((double)wholeFramesToApply) * DELTA_PHYSTICK_FPS);
+            sithTime_physicsRolloverFrames = rolloverCombine - (((flex_d_t)wholeFramesToApply) * DELTA_PHYSTICK_FPS);
 
             //printf("%f %f\n", framesToApply, rolloverCombine);
 
@@ -293,11 +293,11 @@ int sithMain_Tick()
 #ifdef FIXED_TIMESTEP_PHYS
         if (NEEDS_STEPPED_PHYS) {
             // Run all physics at a fixed timestep
-            double rolloverCombine = sithTime_deltaSeconds + sithTime_physicsRolloverFrames;
+            flex_d_t rolloverCombine = sithTime_deltaSeconds + sithTime_physicsRolloverFrames;
 
-            double framesToApply = rolloverCombine * TARGET_PHYSTICK_FPS; // get number of 50FPS steps passed
+            flex_d_t framesToApply = rolloverCombine * TARGET_PHYSTICK_FPS; // get number of 50FPS steps passed
             uint32_t wholeFramesToApply = (uint32_t)round(framesToApply);
-            sithTime_physicsRolloverFrames = rolloverCombine - (((double)wholeFramesToApply) * DELTA_PHYSTICK_FPS);
+            sithTime_physicsRolloverFrames = rolloverCombine - (((flex_d_t)wholeFramesToApply) * DELTA_PHYSTICK_FPS);
 
             //printf("%f %f\n", framesToApply, rolloverCombine);
 

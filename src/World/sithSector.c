@@ -332,12 +332,12 @@ sithSector* sithSector_sub_4F8D00(sithWorld *pWorld, rdVector3 *pos)
         return 0;
     while ( 1 )
     {
-        if ( pos->x >= (double)v4->boundingbox_onecorner.x
-          && pos->x <= (double)v4->boundingbox_othercorner.x
-          && v4->boundingbox_onecorner.y <= (double)pos->y
-          && v4->boundingbox_othercorner.y >= (double)pos->y )
+        if ( pos->x >= (flex_d_t)v4->boundingbox_onecorner.x
+          && pos->x <= (flex_d_t)v4->boundingbox_othercorner.x
+          && v4->boundingbox_onecorner.y <= (flex_d_t)pos->y
+          && v4->boundingbox_othercorner.y >= (flex_d_t)pos->y )
         {
-            v7 = v4->boundingbox_onecorner.z <= (double)pos->z && v4->boundingbox_othercorner.z >= (double)pos->z;
+            v7 = v4->boundingbox_onecorner.z <= (flex_d_t)pos->z && v4->boundingbox_othercorner.z >= (flex_d_t)pos->z;
             if ( v7 && sithIntersect_IsSphereInSector(pos, 0.0, v4) )
                 break;
         }

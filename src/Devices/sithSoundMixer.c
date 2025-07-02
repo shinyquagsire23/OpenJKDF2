@@ -137,7 +137,7 @@ void sithSoundMixer_ResumeMusic(int bNotInPauseMenu)
       && (bNotInPauseMenu || sithControl_msIdle >= 2000)
 #endif
       && sithSoundMixer_dword_835FCC
-      && (bNotInPauseMenu || sithSoundMixer_flt_835FD8 <= (double)sithTime_curSeconds) )
+      && (bNotInPauseMenu || sithSoundMixer_flt_835FD8 <= (flex_d_t)sithTime_curSeconds) )
     {
         sithSoundMixer_flt_835FD8 = sithTime_curSeconds - -5.0;
         if ( !stdMci_CheckStatus() && !stdMci_Play(sithSoundMixer_trackFrom, sithSoundMixer_trackTo) )
@@ -376,7 +376,7 @@ LABEL_46:
 sithPlayingSound* sithSoundMixer_PlaySoundPosAbsolute(sithSound *a1, rdVector3 *a2, sithSector *a3, flex_t a4, flex_t a5, flex_t a6, int a7)
 {
     int32_t v7; // ebx
-    double v10; // st7
+    flex_d_t v10; // st7
     sithPlayingSound *v11; // ecx
     int v12; // eax
     sithPlayingSound *v14; // eax
@@ -601,7 +601,7 @@ void sithSoundMixer_SetPitch(sithPlayingSound *sound, flex_t pitch, flex_t chang
         if (sound->sound)
         {
             if (sound->pSoundBuf)
-                stdSound_BufferSetFrequency(sound->pSoundBuf, (int)((double)sound->sound->sampleRateHz * pitch));
+                stdSound_BufferSetFrequency(sound->pSoundBuf, (int)((flex_d_t)sound->sound->sampleRateHz * pitch));
         }
     }
 }
@@ -614,14 +614,14 @@ int sithSoundMixer_SetFrequency(sithPlayingSound *sound, flex_t pitch)
     sound->pitch = pitch;
     if (!pSound || !sound->pSoundBuf)
         return 0;
-    stdSound_BufferSetFrequency(sound->pSoundBuf, (int)((double)pSound->sampleRateHz * pitch));
+    stdSound_BufferSetFrequency(sound->pSoundBuf, (int)((flex_d_t)pSound->sampleRateHz * pitch));
     return 1;
 }
 
 void sithSoundMixer_FadeSound(sithPlayingSound *sound, flex_t vol_, flex_t fadeintime_)
 {
-    double v3; // st7
-    double v7; // st6
+    flex_d_t v3; // st7
+    flex_d_t v7; // st6
     flex_t a2; // [esp+0h] [ebp-4h]
 
     vol_ = stdMath_Clamp(vol_, 0.0, 1.5);
@@ -698,14 +698,14 @@ void sithSoundMixer_TickSectorSound()
     sithSector *v1; // eax
     sithSound *lastSectorFadingOutSound; // esi
     sithPlayingSound *v3; // ecx
-    double v4; // st7
-    double v7; // st6
-    double v13; // st7
-    double v14; // st6
-    double v17; // st6
-    double v20; // st7
-    double v23; // st6
-    double v31; // st6
+    flex_d_t v4; // st7
+    flex_d_t v7; // st6
+    flex_d_t v13; // st7
+    flex_d_t v14; // st6
+    flex_d_t v17; // st6
+    flex_d_t v20; // st7
+    flex_d_t v23; // st6
+    flex_d_t v31; // st6
     flex_t v43; // [esp+4h] [ebp-10h]
 
     v1 = sithCamera_currentCamera->sector;
@@ -864,7 +864,7 @@ void sithSoundMixer_Tick(flex_t deltaSecs)
 
 void sithSoundMixer_TickPlayingSound(sithPlayingSound *sound, flex_t deltaSecs)
 {
-    double v4; // st7
+    flex_d_t v4; // st7
     int v8; // eax
     sithSound *v9; // eax
     stdSound_buffer_t *v10; // eax
@@ -911,7 +911,7 @@ void sithSoundMixer_TickPlayingSound(sithPlayingSound *sound, flex_t deltaSecs)
 
     if (sound->flags & SITHSOUNDFLAG_FADE_IN)
     {
-        double v11 = sound->volumeVelocity * deltaSecs + sound->vol_2;
+        flex_d_t v11 = sound->volumeVelocity * deltaSecs + sound->vol_2;
         if ( v11 >= sound->volume )
         {
             v11 = sound->volume;
@@ -932,7 +932,7 @@ void sithSoundMixer_TickPlayingSound(sithPlayingSound *sound, flex_t deltaSecs)
     if (sound->flags & SITHSOUNDFLAG_PER_VEL_PITCH_BEND)
     {
         deltaSecsa = sound->pitchVel * deltaSecs + sound->pitch;
-        if (sound->pitchVel > 0.0 && deltaSecsa > (double)sound->nextPitch || sound->pitchVel < 0.0 && deltaSecsa < (double)sound->nextPitch) // TODO verify sound->pitchVel > 0
+        if (sound->pitchVel > 0.0 && deltaSecsa > (flex_d_t)sound->nextPitch || sound->pitchVel < 0.0 && deltaSecsa < (flex_d_t)sound->nextPitch) // TODO verify sound->pitchVel > 0
         {
             sound->flags &= ~SITHSOUNDFLAG_PER_VEL_PITCH_BEND;
             deltaSecsa = sound->nextPitch;
@@ -949,7 +949,7 @@ void sithSoundMixer_TickPlayingSound(sithPlayingSound *sound, flex_t deltaSecs)
       && (sound->flags & (SITHSOUNDFLAG_FOLLOWSTHING|SITHSOUNDFLAG_ABSOLUTE)))
     {
         sithSoundMixer_UpdatePlayingSoundPosition(sound);
-        if (sound->distance <= (double)sound->maxPosition)
+        if (sound->distance <= (flex_d_t)sound->maxPosition)
         {
             if (!sound->pSoundBuf)
             {
@@ -995,11 +995,11 @@ void sithSoundMixer_TickPlayingSound(sithPlayingSound *sound, flex_t deltaSecs)
 
 void sithSoundMixer_UpdateSoundPos(sithPlayingSound *sound)
 {
-    double v2; // st7
+    flex_d_t v2; // st7
     stdSound_buffer_t *v5; // eax
-    double v6; // st6
-    double v8; // st6
-    double v9; // st6
+    flex_d_t v6; // st6
+    flex_d_t v8; // st6
+    flex_d_t v9; // st6
     flex_t a2; // [esp+0h] [ebp-18h]
     flex_t v16; // [esp+8h] [ebp-10h]
     rdVector3 v17; // [esp+Ch] [ebp-Ch] BYREF

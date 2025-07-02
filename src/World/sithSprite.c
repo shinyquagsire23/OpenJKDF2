@@ -69,7 +69,7 @@ int sithSprite_Load(sithWorld *world, int a2)
                     stdConffile_entry.args[1].value);
                 return 0;
             }
-            flex_t percentDelta = 10.0 / (double)sprites_amt;
+            flex_t percentDelta = 10.0 / (flex_d_t)sprites_amt;
             loadPercent += percentDelta;
             sithWorld_UpdateLoadPercent(loadPercent);
             if ( !stdConffile_ReadArgs() )

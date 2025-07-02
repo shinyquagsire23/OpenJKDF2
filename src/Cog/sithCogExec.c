@@ -425,7 +425,7 @@ sithThing* sithCogExec_PopThing(sithCog *ctx)
     }
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
-        idx = (int)(double)tmp.dataAsFloat[0]; // FLEXTODO
+        idx = (int)(flex_d_t)tmp.dataAsFloat[0]; // FLEXTODO
     }
     else
     {
@@ -463,7 +463,7 @@ sithThing* sithCogExec_PopTemplate(sithCog *ctx)
     }
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
-        idx = (int)(double)tmp.dataAsFloat[0]; // FLEXTODO
+        idx = (int)(flex_d_t)tmp.dataAsFloat[0]; // FLEXTODO
     }
     else
     {
@@ -499,7 +499,7 @@ sithSound* sithCogExec_PopSound(sithCog *ctx)
     }
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
-        idx = (int)(double)tmp.dataAsFloat[0]; // FLEXTODO
+        idx = (int)(flex_d_t)tmp.dataAsFloat[0]; // FLEXTODO
     }
     else
     {
@@ -541,7 +541,7 @@ sithSector* sithCogExec_PopSector(sithCog *ctx)
     }
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
-        idx = (int)(double)tmp.dataAsFloat[0]; // FLEXTODO
+        idx = (int)(flex_d_t)tmp.dataAsFloat[0]; // FLEXTODO
     }
     else
     {
@@ -577,7 +577,7 @@ sithSurface* sithCogExec_PopSurface(sithCog *ctx)
     }
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
-        idx = (int)(double)tmp.dataAsFloat[0]; // FLEXTODO
+        idx = (int)(flex_d_t)tmp.dataAsFloat[0]; // FLEXTODO
     }
     else
     {
@@ -614,7 +614,7 @@ rdMaterial* sithCogExec_PopMaterial(sithCog *ctx)
     }
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
-        idx = (int)(double)tmp.dataAsFloat[0]; // FLEXTODO
+        idx = (int)(flex_d_t)tmp.dataAsFloat[0]; // FLEXTODO
     }
     else
     {
@@ -656,7 +656,7 @@ rdModel3* sithCogExec_PopModel3(sithCog *ctx)
     }
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
-        idx = (int)(double)tmp.dataAsFloat[0]; // FLEXTODO
+        idx = (int)(flex_d_t)tmp.dataAsFloat[0]; // FLEXTODO
     }
     else
     {
@@ -698,7 +698,7 @@ rdKeyframe* sithCogExec_PopKeyframe(sithCog *ctx)
     }
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
-        idx = (int)(double)tmp.dataAsFloat[0]; // FLEXTODO
+        idx = (int)(flex_d_t)tmp.dataAsFloat[0]; // FLEXTODO
     }
     else
     {
@@ -738,7 +738,7 @@ sithAIClass* sithCogExec_PopAIClass(sithCog *ctx)
     }
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
-        idx = (int)(double)tmp.dataAsFloat[0]; // FLEXTODO
+        idx = (int)(flex_d_t)tmp.dataAsFloat[0]; // FLEXTODO
     }
     else
     {

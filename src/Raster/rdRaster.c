@@ -7,8 +7,8 @@ void rdRaster_Startup()
 
     for (int i = 1; i < 2048; i++)
     {
-        rdRaster_aOneDivXLUT[i] = 1.0 / (double)i;
-        rdRaster_aOneDivXQuantLUT[i] = (int)(1.0 / (double)i * 65536.0);
+        rdRaster_aOneDivXLUT[i] = 1.0 / (flex_d_t)i;
+        rdRaster_aOneDivXQuantLUT[i] = (int)(1.0 / (flex_d_t)i * 65536.0);
     }
 
     for (int j = 0; j < 16; j++)

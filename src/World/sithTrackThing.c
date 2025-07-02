@@ -24,11 +24,11 @@ void sithTrackThing_MoveToFrame(sithThing *thing, int goalFrame, flex_t a3)
 void sithTrackThing_Arrivedidk(sithThing *thing)
 {
     sithThingFrame *v4; // edx
-    long double v8; // st7
-    long double v9; // st6
+    flex_d_t v8; // st7
+    flex_d_t v9; // st6
     sithThingFrame *v12; // eax
-    long double v15; // st7
-    long double v16; // st6
+    flex_d_t v15; // st7
+    flex_d_t v16; // st6
     flex_t thinga; // [esp+10h] [ebp+4h]
 
     int goalFrame = thing->goalframe;
@@ -91,13 +91,13 @@ void sithTrackThing_Arrivedidk(sithThing *thing)
 
 void sithTrackThing_Tick(sithThing *thing, flex_t deltaSeconds)
 {
-    double v4; // st7
-    double v5; // st7
-    double v18; // st7
-    double v22; // st7
-    double v26; // st7
-    double v30; // st7
-    double v31; // st7
+    flex_d_t v4; // st7
+    flex_d_t v5; // st7
+    flex_d_t v18; // st7
+    flex_d_t v22; // st7
+    flex_d_t v26; // st7
+    flex_d_t v30; // st7
+    flex_d_t v31; // st7
     flex_t a6; // [esp+0h] [ebp-50h]
     flex_t v41; // [esp+4h] [ebp-4Ch]
     flex_t v42; // [esp+4h] [ebp-4Ch]
@@ -176,7 +176,7 @@ void sithTrackThing_Tick(sithThing *thing, flex_t deltaSeconds)
                 }
                 if ( (thing->trackParams.flags & 1) != 0 )
                 {
-                    if ( thing->trackParams.field_1C <= (double)deltaSeconds )
+                    if ( thing->trackParams.field_1C <= (flex_d_t)deltaSeconds )
                         v22 = thing->trackParams.field_1C;
                     else
                         v22 = deltaSeconds;
@@ -400,10 +400,10 @@ void sithTrackThing_RotatePivot(sithThing *thing, rdVector3 *a2, rdVector3 *a3, 
 
 void sithTrackThing_Rotate(sithThing *trackThing, rdVector3 *rot)
 {
-    double v2; // st7
-    double v4; // st6
-    double v5; // st6
-    double v6; // st6
+    flex_d_t v2; // st7
+    flex_d_t v4; // st6
+    flex_d_t v5; // st6
+    flex_d_t v6; // st6
     flex_t v9; // [esp+14h] [ebp+4h]
     flex_t v10; // [esp+14h] [ebp+4h]
     flex_t v11; // [esp+14h] [ebp+4h]

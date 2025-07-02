@@ -678,20 +678,20 @@ void sithAI_sub_4EA630(sithActor *actor, flex_t deltaSeconds)
     sithThing *v2; // esi
     rdVector3 *v3; // ebp
     rdMatrix34 *v4; // ebx
-    double v5; // st7
-    double v6; // st5
-    double v7; // st7
-    double v8; // st4
-    double v9; // st6
+    flex_d_t v5; // st7
+    flex_d_t v6; // st5
+    flex_d_t v7; // st7
+    flex_d_t v8; // st4
+    flex_d_t v9; // st6
     rdVector3 *v10; // edi
-    double v11; // st5
-    double v12; // st5
-    double v13; // st4
-    double v14; // st7
-    double v15; // st7
-    double v16; // st6
-    double v17; // st5
-    double v18; // st7
+    flex_d_t v11; // st5
+    flex_d_t v12; // st5
+    flex_d_t v13; // st4
+    flex_d_t v14; // st7
+    flex_d_t v15; // st7
+    flex_d_t v16; // st6
+    flex_d_t v17; // st5
+    flex_d_t v18; // st7
     int v19; // eax
     rdVector3 *v20; // [esp-8h] [ebp-14h]
 
@@ -747,10 +747,10 @@ void sithAI_sub_4EA630(sithActor *actor, flex_t deltaSeconds)
 void sithAI_idk_msgarrived_target(sithActor *actor, flex_t deltaSeconds)
 {
     sithThing *v3; // esi
-    long double v9; // st7
-    double v10; // st5
-    double v11; // st6
-    double v13; // st7
+    flex_d_t v9; // st7
+    flex_d_t v10; // st5
+    flex_d_t v11; // st6
+    flex_d_t v13; // st7
     sithSector *v18; // eax
     int v19; // eax
     flex_t v20; // [esp+10h] [ebp-20h]
@@ -795,7 +795,7 @@ LABEL_15:
                     v3->physicsParams.vel.z = v3->physicsParams.vel.z - FLEX(-0.5);
                 }
 LABEL_22:
-                if ( actor->distToMovePos <= (double)v3->moveSize )
+                if ( actor->distToMovePos <= (flex_d_t)v3->moveSize )
                 {
                     rdVector_Zero3(&v3->physicsParams.vel);
                     actor->flags &= ~SITHAI_MODE_MOVING;
@@ -827,7 +827,7 @@ LABEL_22:
 void sithAI_SetLookFrame(sithActor *actor, rdVector3 *lookPos)
 {
     sithThingActorParams *v5; // edi
-    double v6; // st7
+    flex_d_t v6; // st7
     rdVector3 a2a; // [esp+Ch] [ebp-Ch] BYREF
 
     rdVector_Sub3(&actor->lookVector, lookPos, &actor->thing->position);
@@ -1000,8 +1000,8 @@ void sithAI_sub_4EAF40(sithActor *actor)
 // MoTS altered
 int sithAI_CheckSightThing(sithThing *thing, rdVector3 *targetPosition, sithThing *targetThing, flex_t fov, flex_t maxDistance, flex_t unused, rdVector3 *targetErrorDir, flex_t *targetDistance)
 {
-    long double v12; // st7
-    double v18; // st7
+    flex_d_t v12; // st7
+    flex_d_t v18; // st7
     sithSector *v21; // eax
     sithCollisionSearchEntry *v22; // esi
     sithThing *v23; // eax
@@ -1080,7 +1080,7 @@ int sithAI_CheckSightThing(sithThing *thing, rdVector3 *targetPosition, sithThin
 int sithAI_sub_4EB300(sithThing *a3, rdVector3 *a4, rdVector3 *arg8, flex_t argC, flex_t arg10, flex_t a7, rdVector3 *a5, flex_t *a8)
 {
     flex_t v11; // st7
-    double v16; // st7
+    flex_d_t v16; // st7
     sithSector *v19; // eax
     sithCollisionSearchEntry *v20; // esi
     flex_t a4a; // [esp+18h] [ebp+8h]
@@ -1319,9 +1319,9 @@ void sithAI_SetRandomThingLook(rdMatrix34 *a1, sithThing *a2, rdVector3 *a3, fle
 
 void sithAI_RandomFireVector(rdVector3 *out, flex_t magnitude)
 {
-    out->x = ((double)_frand() - 0.5) * magnitude + out->x;
-    out->y = ((double)_frand() - 0.5) * magnitude + out->y;
-    out->z = ((double)_frand() - 0.5) * magnitude + out->z;
+    out->x = ((flex_d_t)_frand() - 0.5) * magnitude + out->x;
+    out->y = ((flex_d_t)_frand() - 0.5) * magnitude + out->y;
+    out->z = ((flex_d_t)_frand() - 0.5) * magnitude + out->z;
     rdVector_Normalize3Acc(out);
 }
 
@@ -1341,10 +1341,10 @@ int sithAI_FireWeapon(sithActor *actor, flex_t minDistToFire, flex_t maxDistToFi
     sithThing *v8; // ebp
     sithThing *v9; // edi
     sithThing *v11; // ecx
-    double v14; // rt2
+    flex_d_t v14; // rt2
     int16_t v15; // bx
     sithThing *v16; // eax
-    double v19; // st7
+    flex_d_t v19; // st7
     signed int v20; // [esp+10h] [ebp-20h]
     flex_t v21; // [esp+14h] [ebp-1Ch]
     rdVector3 v1; // [esp+18h] [ebp-18h] BYREF
@@ -1384,7 +1384,7 @@ int sithAI_FireWeapon(sithActor *actor, flex_t minDistToFire, flex_t maxDistToFi
     }
     if ( actor->field_288 > sithTime_curMs || actor->field_1F4 )
         return 0;
-    if ( actor->attackDistance < (double)minDistToFire || actor->attackDistance > (double)maxDistToFire )
+    if ( actor->attackDistance < (flex_d_t)minDistToFire || actor->attackDistance > (flex_d_t)maxDistToFire )
         return 0;
 
     // MoTS added
@@ -1425,7 +1425,7 @@ LABEL_12:
     }
     if ( (a7 & 2) != 0 && v8->moveType == SITH_MT_PHYSICS) // Added: physics check
     {
-        double yvel = 0.00001;
+        flex_d_t yvel = 0.00001;
         // Added: div 0 fix
         if (v8->physicsParams.vel.y != FLEX(0.0)) {
             yvel = v8->physicsParams.vel.y;
@@ -1494,9 +1494,9 @@ void sithAI_GetThingsInView(sithSector *a1, rdMatrix34 *a2, flex_t a3)
                 rdVector_Normalize3(&v16, &a2->lvec);
                 v17 = rdVector_Dot3(&a1a, &v13);
                 a2a = rdVector_Dot3(&v1, &v13);
-                if ( v17 > (double)sithAI_flt_84DE58
+                if ( v17 > (flex_d_t)sithAI_flt_84DE58
                   || v17 < -sithAI_flt_84DE58
-                  || a2a > (double)sithAI_flt_84DE64
+                  || a2a > (flex_d_t)sithAI_flt_84DE64
                   || a2a < -sithAI_flt_84DE64
                   || (v12 = rdVector_Dot3(&v16, &v13), v12 < FLEX(0.0)) )
                 {
@@ -1515,7 +1515,7 @@ void sithAI_GetThingsInView(sithSector *a1, rdMatrix34 *a2, flex_t a3)
         }
         while ( v4 );
     }
-    if ( a3 <= (double)sithAI_flt_84DE70 )
+    if ( a3 <= (flex_d_t)sithAI_flt_84DE70 )
     {
         v7 = a1->adjoins;
         if ( v7 )
@@ -1552,7 +1552,7 @@ void sithAI_GetThingsInView(sithSector *a1, rdMatrix34 *a2, flex_t a3)
 int sithAI_CanDetectSightThing(sithActor *actor, sithThing *targetThing, flex_t distance)
 {
     sithThing *actorThing; // esi
-    double clampedDistance; // st7
+    flex_d_t clampedDistance; // st7
     sithSector *targetSector; // edx
     int result; // eax
     flex_t awareness; // [esp+0h] [ebp-4h]
@@ -1670,9 +1670,9 @@ void sithAI_GetThingsInCone(sithSector *a1, rdMatrix34 *a2, flex_t a3)
             rdVector_Normalize3(&v16, &a2->lvec);
             v17 = rdVector_Dot3(&a1a, &v13);
             a2a = rdVector_Dot3(&v1, &v13);
-            if ( v17 > (double)sithAI_flt_84DE58
+            if ( v17 > (flex_d_t)sithAI_flt_84DE58
               || v17 < -sithAI_flt_84DE58
-              || a2a > (double)sithAI_flt_84DE64
+              || a2a > (flex_d_t)sithAI_flt_84DE64
               || a2a < -sithAI_flt_84DE64
               || (v12 = rdVector_Dot3(&v16, &v13), v12 < FLEX(0.0)) )
             {
@@ -1821,11 +1821,11 @@ int sithAI_Leap(sithActor *pActor,flex_t minDist,flex_t maxDist,flex_t minDot,in
     int bVar4;
     uint32_t uVar5;
     int anim;
-    double fVar6;
-    double fVar7;
-    double fVar8;
-    double fVar9;
-    double fVar10;
+    flex_d_t fVar6;
+    flex_d_t fVar7;
+    flex_d_t fVar8;
+    flex_d_t fVar9;
+    flex_d_t fVar10;
     int64_t lVar11;
 
     anim = 0;
@@ -1855,11 +1855,11 @@ int sithAI_Leap(sithActor *pActor,flex_t minDist,flex_t maxDist,flex_t minDot,in
 LAB_0053a3b9:
         psVar2 = pActor->pDistractor;
         psVar3 = pActor->thing;
-        fVar6 = (double)(psVar2->position).x - (double)(psVar3->position).x;
-        fVar7 = (double)(psVar2->position).y - (double)(psVar3->position).y;
-        fVar8 = (double)(psVar2->position).z - (double)(psVar3->position).z;
-        fVar9 = stdMath_Sqrt(fVar8 * (double)(flex_t)fVar8 + fVar7 * fVar7 + fVar6 * (double)(flex_t)fVar6); // FLEXTODO
-        fVar10 = fVar9 / (double)param_6 - (double) - 0.2;
+        fVar6 = (flex_d_t)(psVar2->position).x - (flex_d_t)(psVar3->position).x;
+        fVar7 = (flex_d_t)(psVar2->position).y - (flex_d_t)(psVar3->position).y;
+        fVar8 = (flex_d_t)(psVar2->position).z - (flex_d_t)(psVar3->position).z;
+        fVar9 = stdMath_Sqrt(fVar8 * (flex_d_t)(flex_t)fVar8 + fVar7 * fVar7 + fVar6 * (flex_d_t)(flex_t)fVar6); // FLEXTODO
+        fVar10 = fVar9 / (flex_d_t)param_6 - (flex_d_t) - 0.2;
         fVar1 = sithWorld_pCurrentWorld->worldGravity;
         (pActor->attackError).x = (flex_t)fVar6; // FLEXTODO
         (pActor->attackError).y = (flex_t)fVar7; // FLEXTODO

@@ -1029,10 +1029,10 @@ void jkPlayer_renderSaberTwinkle(sithThing *player)
         playerInfo->bRenderTwinkleParticle = 1;
         
         //TODO: macro bug?
-        if ((_frand() * (double)playerInfo->twinkleSpawnRate) <= playerInfo->maxTwinkles )
+        if ((_frand() * (flex_d_t)playerInfo->twinkleSpawnRate) <= playerInfo->maxTwinkles )
             playerInfo->numTwinkles = playerInfo->maxTwinkles;
         else
-            playerInfo->numTwinkles = (int)(_frand() * (double)playerInfo->twinkleSpawnRate);
+            playerInfo->numTwinkles = (int)(_frand() * (flex_d_t)playerInfo->twinkleSpawnRate);
 
         playerInfo->nextTwinkleRandMs += 2000;
     }
@@ -1352,8 +1352,8 @@ int jkPlayer_MPCWrite(sithPlayerInfo* unk, wchar_t *mpcName, wchar_t *playerName
 int jkPlayer_MPCBinWrite()
 {
     int v0; // esi
-    double v1; // st7
-    double v2; // st7
+    flex_d_t v1; // st7
+    flex_d_t v2; // st7
 
     if (!stdConffile_Printf("\nforcepowers:\n") )
         return 0;
@@ -2141,7 +2141,7 @@ int jkPlayer_SyncForcePowers(int rank,int bIsMulti)
     flex_t *pfVar4;
     int iVar5;
     int iVar6;
-    double dVar8;
+    flex_d_t dVar8;
     flex_t fVar9;
     int *local_c;
     int local_8;

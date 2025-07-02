@@ -16,7 +16,7 @@ static size_t sithTime_deltaUs_history_collected_entries = 0;
 #endif
 
 // Added
-double sithTime_physicsRolloverFrames = 0.0;
+flex_d_t sithTime_physicsRolloverFrames = 0.0;
 
 // MOTS altered
 void sithTime_Tick()
@@ -66,7 +66,7 @@ void sithTime_SetDelta(int deltaMs)
         sithTime_deltaMs = SITHTIME_MAXDELTA;
     }
     if (g_debugmodeFlags & DEBUGFLAG_SLOWMO) {
-        sithTime_deltaMs = (uint32_t)((double)sithTime_deltaMs * 0.2);
+        sithTime_deltaMs = (uint32_t)((flex_d_t)sithTime_deltaMs * 0.2);
     }
     sithTime_curMs += sithTime_deltaMs;
 #ifdef MICROSECOND_TIME
@@ -80,10 +80,10 @@ void sithTime_SetDelta(int deltaMs)
         sithTime_deltaUs = SITHTIME_MAXDELTA_US;
     }
     if (g_debugmodeFlags & DEBUGFLAG_SLOWMO) {
-        sithTime_deltaUs = (uint64_t)((double)sithTime_deltaUs * 0.2);
+        sithTime_deltaUs = (uint64_t)((flex_d_t)sithTime_deltaUs * 0.2);
     }
     sithTime_curUsAbsolute = Linux_TimeUs();
-    sithTime_deltaSeconds = (double)sithTime_deltaUs * 0.001 * 0.001;
+    sithTime_deltaSeconds = (flex_d_t)sithTime_deltaUs * 0.001 * 0.001;
 
 #ifdef TIME_PROFILING
     sithTime_deltaUs_history[sithTime_deltaUs_history_idx++] = sithTime_deltaUs;
@@ -110,10 +110,10 @@ void sithTime_SetDelta(int deltaMs)
     printf("%u %u %f %llu %llu %llu\n", sithTime_deltaMs, sithTime_deltaUs, sithTime_deltaSeconds, avg_us, largest_us, smallest_us);
 #endif // TIME_PROFILING
 #else
-    sithTime_deltaSeconds = (double)sithTime_deltaMs * 0.001;
+    sithTime_deltaSeconds = (flex_d_t)sithTime_deltaMs * 0.001;
 #endif
     sithTime_TickHz = 1.0 / sithTime_deltaSeconds;
-    sithTime_curSeconds = (double)sithTime_curMs * 0.001;
+    sithTime_curSeconds = (flex_d_t)sithTime_curMs * 0.001;
 }
 
 void sithTime_Startup()
@@ -144,6 +144,6 @@ void sithTime_SetMs(uint32_t curMs)
     sithTime_TickHz = 0.0;
     sithTime_curMs = curMs;
     sithTime_deltaMs = 0;
-    sithTime_curSeconds = (double)curMs * 0.001;
+    sithTime_curSeconds = (flex_d_t)curMs * 0.001;
     sithTime_curMsAbsolute = stdPlatform_GetTimeMsec();
 }

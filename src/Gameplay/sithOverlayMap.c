@@ -36,7 +36,7 @@ void sithOverlayMap_ToggleMapDrawn()
 
 void sithOverlayMap_FuncIncrease()
 {
-    double v0; // st7
+    flex_d_t v0; // st7
 
     if ( sithOverlayMap_bShowMap )
     {
@@ -51,7 +51,7 @@ void sithOverlayMap_FuncIncrease()
 
 void sithOverlayMap_FuncDecrease()
 {
-    double v0; // st7
+    flex_d_t v0; // st7
 
     if ( sithOverlayMap_bShowMap )
     {
@@ -178,14 +178,14 @@ int sithOverlayMap_Render3(sithSector *pSector)
     int v10; // ebx
     unsigned int v11; // ecx
     flex_t *v12; // edi
-    double v14; // st7
+    flex_d_t v14; // st7
     char v15; // c0
     int v16; // eax
     int v17; // ecx
     unsigned int v18; // ecx
     int v19; // cf
-    double v21; // st7
-    double v23; // st7
+    flex_d_t v21; // st7
+    flex_d_t v23; // st7
     int v24; // eax
     char v25; // cl
     sithThing *i; // ebx
@@ -329,9 +329,9 @@ LABEL_30:
         rdVector_Scale3(&tmp, &v2->center, sithOverlayMap_flMapSize);
         v37 = (int)tmp.y;
         v49 = v2->radius * sithOverlayMap_flMapSize;
-        v21 = (double)((int)(sithOverlayMap_x1 + (int)tmp.x));
-        if ( v21 >= (double)sithOverlayMap_pCanvas->xStart - v49 && v21 <= (double)sithOverlayMap_pCanvas->widthMinusOne + v49
-          || ((v23 = (double)((int)(sithOverlayMap_y1 - v37)), v23 < (double)sithOverlayMap_pCanvas->yStart - v49) || v23 > (double)sithOverlayMap_pCanvas->heightMinusOne + v49 ? (v24 = 0) : (v24 = 1),
+        v21 = (flex_d_t)((int)(sithOverlayMap_x1 + (int)tmp.x));
+        if ( v21 >= (flex_d_t)sithOverlayMap_pCanvas->xStart - v49 && v21 <= (flex_d_t)sithOverlayMap_pCanvas->widthMinusOne + v49
+          || ((v23 = (flex_d_t)((int)(sithOverlayMap_y1 - v37)), v23 < (flex_d_t)sithOverlayMap_pCanvas->yStart - v49) || v23 > (flex_d_t)sithOverlayMap_pCanvas->heightMinusOne + v49 ? (v24 = 0) : (v24 = 1),
               v24) )
         {
             v47 = 1;

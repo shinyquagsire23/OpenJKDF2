@@ -66,7 +66,7 @@ int sithMaterial_Load(sithWorld *world, int a2)
     int result; // eax
 
     rdMaterial *v7; // eax
-    double v8; // st7
+    flex_d_t v8; // st7
     char *v9; // ecx
     char *a1; // [esp+0h] [ebp-24h]
     flex_t a1a; // [esp+0h] [ebp-24h]
@@ -86,7 +86,7 @@ int sithMaterial_Load(sithWorld *world, int a2)
 
             sithMaterial_New(world, a2);
 
-            v12 = 45.0 / (double)(unsigned int)a2;
+            v12 = 45.0 / (flex_d_t)(unsigned int)a2;
 
             // Added: memleak. TODO: static.jkl??
             if (sithMaterial_aMaterials) {
@@ -108,7 +108,7 @@ int sithMaterial_Load(sithWorld *world, int a2)
                     v9 = stdConffile_entry.args[3].value;
                     world->materials2[v2].x = v8;
                     world->materials2[v2++].y = _atof(v9);
-                    a1a = (double)(unsigned int)v2 * v12 - -5.0;
+                    a1a = (flex_d_t)(unsigned int)v2 * v12 - -5.0;
                     sithWorld_UpdateLoadPercent(a1a);
                     if ( !stdConffile_ReadArgs() )
                         break;

@@ -116,7 +116,7 @@ void rdPrimit2_DrawCircle(rdCanvas *pCanvas, int x1, int y1, flex_t a4, flex_t r
     int v10; // ebp
     int v11; // esi
     int v12; // edi
-    double v13; // st7
+    flex_d_t v13; // st7
     flex_t a2a; // [esp+0h] [ebp-Ch]
     flex_t a4a; // [esp+4h] [ebp-8h] BYREF
     flex_t a3a; // [esp+8h] [ebp-4h] BYREF

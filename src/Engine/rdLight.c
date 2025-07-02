@@ -63,7 +63,7 @@ void rdLight_SetAngles(rdLight *pLight, flex_t angleX, flex_t angleY)
     stdMath_SinCos(angleY, &local_4, &pLight->cosAngleY);
 
     // Grim Fandango added: divide safety
-    double denom = (pLight->cosAngleX - pLight->cosAngleY);
+    flex_d_t denom = (pLight->cosAngleX - pLight->cosAngleY);
     if (denom != 0.0) {
         pLight->lux = 1.0 / denom;
     }
@@ -71,7 +71,7 @@ void rdLight_SetAngles(rdLight *pLight, flex_t angleX, flex_t angleY)
 }
 #endif
 
-double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLightPoses, 
+flex_t rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLightPoses, 
 #ifdef JKM_LIGHTING
     rdVector3 *localLightDirs, 
 #endif
@@ -248,7 +248,7 @@ double rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
         vertexIter++;
         outLights++;
     } 
-    return (double)(local_28 / (flex_t)numVertices);
+    return (flex_t)(local_28 / (flex_t)numVertices);
 #endif
 }
 

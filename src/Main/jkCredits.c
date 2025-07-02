@@ -286,7 +286,7 @@ int jkCredits_Tick()
 
     //pHS->some_float = 60.0;
 
-    v0 = -jkCredits_dword_55AD68 - (int64_t)((double)(pHS->getTimerTick() - jkCredits_startMs) * (1.0 / pHS->some_float) * -40.0);
+    v0 = -jkCredits_dword_55AD68 - (int64_t)((flex_d_t)(pHS->getTimerTick() - jkCredits_startMs) * (1.0 / pHS->some_float) * -40.0);
     jkCredits_dword_55AD68 += v0;
     if ( v0 )
     {

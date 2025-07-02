@@ -1019,10 +1019,10 @@ void rdModel3_CalcFaceNormals(rdModel3 *model)
 
 void rdModel3_CalcVertexNormals(rdModel3 *model)
 {
-    double v10; // st7
-    double v11; // st6
-    double v12; // st5
-    double v13; // st4
+    flex_d_t v10; // st7
+    flex_d_t v11; // st6
+    flex_d_t v12; // st5
+    flex_d_t v13; // st4
     unsigned int v15; // eax
     rdVector3 *v19; // ecx
     int v22; // edx

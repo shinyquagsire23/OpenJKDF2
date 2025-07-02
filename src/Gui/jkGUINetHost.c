@@ -341,7 +341,7 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
     jkGuiNetHost_aElements[NETHOST_PORT_TEXTBOX].wstr = jkGuiNetHost_portText;
     jkGuiNetHost_aElements[NETHOST_PORT_TEXTBOX].selectedTextEntry = 31;
 #endif
-    jk_snwprintf(v26, 0x20u, L"%d", (unsigned int)(__int64)((double)(unsigned int)jkGuiNetHost_timeLimit * 0.000016666667));
+    jk_snwprintf(v26, 0x20u, L"%d", (unsigned int)(__int64)((flex_d_t)(unsigned int)jkGuiNetHost_timeLimit * 0.000016666667));
     jkGuiNetHost_aElements[NETHOST_TIMELIMIT_TEXTBOX].wstr = v26;
     jkGuiNetHost_aElements[NETHOST_TIMELIMIT_TEXTBOX].selectedTextEntry = 4;
     __snprintf(v29, 32, "RANK_%d_L", jkGuiNetHost_maxRank); // sprintf -> snprintf
@@ -397,7 +397,7 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
             jkGuiNetHost_maxPlayers = v10;
             pMultiEntry->maxRank = jkGuiNetHost_maxRank;
             v23 = wstr_to_int_clamped(v26, 1, 100);
-            v11 = (__int64)((double)v23 * 60000.0);
+            v11 = (__int64)((flex_d_t)v23 * 60000.0);
             pMultiEntry->timeLimit = v11;
             jkGuiNetHost_timeLimit = v11;
             if ( jkGuiNetHost_aElements[NETHOST_TIMELIMIT_CHECKBOX].selectedTextEntry )

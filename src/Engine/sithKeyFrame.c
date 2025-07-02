@@ -25,7 +25,7 @@ int sithKeyFrame_Load(sithWorld *world, int a2)
     if ( !numKeyframes )
         return 1;
 
-    percent_delta = 15.0 / (double)numKeyframes;
+    percent_delta = 15.0 / (flex_d_t)numKeyframes;
     if ( !sithKeyFrame_New(world, numKeyframes) )
     {
         stdPrintf(pSithHS->errorPrint, ".\\Engine\\sithPuppet.c", 1538, "Memory error while reading keyframes, line %d.\n", stdConffile_linenum, 0, 0, 0);

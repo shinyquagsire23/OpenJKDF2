@@ -150,7 +150,7 @@ flex_t sithCollision_SearchRadiusForThings(sithSector *pStartSector, sithThing *
     {
         if ( i->hitType == SITHCOLLISION_ADJOINTOUCH )
         {
-            if ( (flags & RAYCAST_400) != 0 || i->distance <= (double)curMoveDist )
+            if ( (flags & RAYCAST_400) != 0 || i->distance <= (flex_d_t)curMoveDist )
             {
                 pSurfAdjSector = i->surface->adjoin->sector;
                 num = sithCollision_stackIdk[sithCollision_searchStackIdx];
@@ -323,21 +323,21 @@ void sithCollision_sub_4E86D0(sithSector *sector, const rdVector3 *vec1, const r
     unsigned int v18; // edi
     sithSector **v19; // eax
     int v20; // ecx
-    double v21; // st7
+    flex_d_t v21; // st7
     sithCollisionSearchEntry *v23; // eax
     int v24; // ecx
     unsigned int v25; // edi
     unsigned int v26; // edx
     sithSector **v27; // eax
     int v28; // edx
-    double v29; // st7
+    flex_d_t v29; // st7
     sithCollisionSearchEntry *v31; // eax
     int v32; // edx
-    double v33; // st7
+    flex_d_t v33; // st7
     sithCollisionSearchEntry *v34; // eax
     rdVector3 *v35; // ecx
     int v36; // ecx
-    double v37; // st7
+    flex_d_t v37; // st7
     int v38; // edx
     sithCollisionSearchEntry *v40; // eax
     int v42; // [esp+0h] [ebp-40h] BYREF
@@ -508,12 +508,12 @@ LABEL_42:
 
 sithSector* sithCollision_GetSectorLookAt(sithSector *pStartSector, const rdVector3 *pStartPos, rdVector3 *pEndPos, flex_t a5)
 {
-    double v4; // st6
+    flex_d_t v4; // st6
     sithSector *result; // eax
     int v7; // edi
     sithCollisionSearchResult *v8; // ebx
     sithCollisionSearchEntry *v9; // edx
-    double v10; // st7
+    flex_d_t v10; // st7
     sithCollisionSearchEntry *v11; // ecx
     int v12; // esi
     rdVector3 a1; // [esp+8h] [ebp-Ch] BYREF
@@ -580,7 +580,7 @@ sithSector* sithCollision_GetSectorLookAt(sithSector *pStartSector, const rdVect
 
 void sithCollision_FallHurt(sithThing *thing, flex_t vel)
 {
-    double v2; // st7
+    flex_d_t v2; // st7
 
     v2 = (vel - 2.5) * (vel - 2.5) * 45.0;
     if ( v2 > 1.0 )
@@ -618,25 +618,25 @@ flex_t sithCollision_UpdateThingCollision(sithThing *pThing, rdVector3 *a2, flex
 {
     sithThing *v5; // ebp
     sithThing *v10; // esi
-    double v11; // st7
-    double v12; // st7
+    flex_d_t v11; // st7
+    flex_d_t v12; // st7
     //char v15; // c0
     int v16; // edi
     flex_t v17; // edx
     //int v18; // edx
     sithCollisionSearchEntry *v19; // esi
-    //double v20; // st7
+    //flex_d_t v20; // st7
     //sithCollisionSearchEntry *v21; // ecx
     int v22; // ebx
-    double v23; // st6
-    double v24; // st7
-    double v25; // st7
-    double v30; // st5
+    flex_d_t v23; // st6
+    flex_d_t v24; // st7
+    flex_d_t v25; // st7
+    flex_d_t v30; // st5
     sithThing *v34; // ecx
     int v35; // eax
     int v36; // eax
     sithSurface *v37; // eax
-    double v44; // st7
+    flex_d_t v44; // st7
     //char v46; // c3
     //char v49; // c0
     //char v52; // c0
@@ -735,7 +735,7 @@ LABEL_78:
                     rdVector_Copy3(&v5->position, &posCopy);
                     rdVector_MultAcc3(&v5->position, &direction, v19->distance);
                 }
-                if ( v19->distance >= (double)a6 )
+                if ( v19->distance >= (flex_d_t)a6 )
                 {
                     rdVector_Zero3(&v5->field_268);
                 }
@@ -942,11 +942,11 @@ int sithCollision_DebrisDebrisCollide(sithThing *thing1, sithThing *thing2, sith
 {
     sithThing *v4; // esi
     sithThing *v5; // edi
-    double v6; // st6
+    flex_d_t v6; // st6
     //char v9; // c0
-    double v11; // st7
+    flex_d_t v11; // st7
     //char v14; // c0
-    double v15; // st7
+    flex_d_t v15; // st7
     flex_t a3a; // [esp+0h] [ebp-38h]
     rdVector3 a2; // [esp+14h] [ebp-24h] BYREF
     rdVector3 forceVec; // [esp+20h] [ebp-18h] BYREF
@@ -1039,17 +1039,17 @@ int sithCollision_DebrisDebrisCollide(sithThing *thing1, sithThing *thing2, sith
 int sithCollision_CollideHurt(sithThing *a1, rdVector3 *a2, flex_t a3, int a4)
 {
     int result; // eax
-    double v10; // st6
-    double v19; // st7
-    double v22; // st7
-    double v26; // st7
-    double v31; // st6
-    double v32; // st7
-    double v33; // st5
-    double v35; // st7
-    double v36; // st7
-    double v39; // st7
-    double v40; // st7
+    flex_d_t v10; // st6
+    flex_d_t v19; // st7
+    flex_d_t v22; // st7
+    flex_d_t v26; // st7
+    flex_d_t v31; // st6
+    flex_d_t v32; // st7
+    flex_d_t v33; // st5
+    flex_d_t v35; // st7
+    flex_d_t v36; // st7
+    flex_d_t v39; // st7
+    flex_d_t v40; // st7
     flex_t v43; // [esp+8h] [ebp-4h]
     flex_t a1a; // [esp+10h] [ebp+4h]
     flex_t amount; // [esp+14h] [ebp+8h]
@@ -1130,7 +1130,7 @@ int sithCollision_HasLos(sithThing *thing1, sithThing *thing2, int flag)
     int searchFlags; // edi
     int v4; // edi
     sithCollisionSearchEntry *v5; // ebp
-    double v6; // st7
+    flex_d_t v6; // st7
     sithCollisionSearchEntry *v7; // edx
     sithCollisionSearchEntry *v8; // ecx
     sithThing *v10; // edx

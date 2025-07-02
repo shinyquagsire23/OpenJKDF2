@@ -479,7 +479,7 @@ void sithCogFunctionThing_ThingLightAnim(sithCog *ctx)
     cog_flex_t light = sithCogExec_PopFlex(ctx);
     sithThing* pThing = sithCogExec_PopThing(ctx);
     if ( pThing
-      && light2 >= (double)light
+      && light2 >= (flex_d_t)light
       && idk > 0.0
       && (idk_ = idk * 0.5, pThing->light = light, (surface = sithSurface_SetThingLight(pThing, light2, idk_, 1)) != 0) )
     {
@@ -1636,7 +1636,7 @@ void sithCogFunctionThing_GetLifeLeft(sithCog *ctx)
     sithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
     {
-        sithCogExec_PushFlex(ctx, (double)(unsigned int)pThing->lifeLeftMs * 0.001);
+        sithCogExec_PushFlex(ctx, (flex_d_t)(unsigned int)pThing->lifeLeftMs * 0.001);
     }
 }
 

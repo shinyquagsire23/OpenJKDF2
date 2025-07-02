@@ -22,7 +22,7 @@ void sithExplosion_CreateThing(sithThing *explosion)
         v3 = explosion->rdthing.sprite3->face.material;
         if ( v3 && (v4 = v3->num_texinfo, v4 > 1) )
         {
-            sithSurface_sub_4F00A0(explosion, (double)v4 / (double)(unsigned int)explosion->lifeLeftMs * 1000.0, 0x200000); // TODO enum
+            sithSurface_sub_4F00A0(explosion, (flex_d_t)v4 / (flex_d_t)(unsigned int)explosion->lifeLeftMs * 1000.0, 0x200000); // TODO enum
         }
         else
         {
@@ -40,8 +40,8 @@ void sithExplosion_CreateThing(sithThing *explosion)
 
 void sithExplosion_Tick(sithThing *explosion)
 {
-    double v5; // st7
-    double v6; // st6
+    flex_d_t v5; // st7
+    flex_d_t v6; // st6
 
     if ((explosion->explosionParams.typeflags & SITHEXPLOSION_FLAG_HAS_BLAST_PHASE)
       && explosion->lifeLeftMs <= explosion->explosionParams.blastTime)
@@ -54,13 +54,13 @@ void sithExplosion_Tick(sithThing *explosion)
     {
         if (explosion->lifeLeftMs <= explosion->explosionParams.blastTime)
         {
-            v5 = (double)explosion->lifeLeftMs;
-            v6 = (double)explosion->explosionParams.blastTime;
+            v5 = (flex_d_t)explosion->lifeLeftMs;
+            v6 = (flex_d_t)explosion->explosionParams.blastTime;
         }
         else
         {
-            v5 = (double)(explosion->explosionParams.lifeLeftMs - explosion->lifeLeftMs);
-            v6 = (double)(unsigned int)(explosion->explosionParams.lifeLeftMs - explosion->explosionParams.blastTime);
+            v5 = (flex_d_t)(explosion->explosionParams.lifeLeftMs - explosion->lifeLeftMs);
+            v6 = (flex_d_t)(unsigned int)(explosion->explosionParams.lifeLeftMs - explosion->explosionParams.blastTime);
         }
         explosion->light = explosion->explosionParams.maxLight * (v5 / v6) + explosion->lightMin;
     }
@@ -82,7 +82,7 @@ void sithExplosion_UpdateForce(sithThing *explosion)
         sithCollision_SearchRadiusForThings(explosion->sector, 0, &explosion->position, &rdroid_zeroVector3, 0.0, range, RAYCAST_400 | RAYCAST_80 | RAYCAST_2);
         for ( i = sithCollision_NextSearchResult(); i; i = sithCollision_NextSearchResult() )
         {
-            double v3 = i->distance / range;
+            flex_d_t v3 = i->distance / range;
             flex_t a1a = rdMath_clampf(1.0 - (v3 * v3), 0.25, 1.0);
 
             if ( (i->hitType & SITHCOLLISION_WORLD) != 0 )

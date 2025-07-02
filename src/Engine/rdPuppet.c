@@ -69,19 +69,19 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
     unsigned int v19; // ecx
     rdJoint *v20; // edx
     uint32_t v21; // eax
-    double v23; // st7
+    flex_d_t v23; // st7
     rdAnimEntry *v24; // eax
     int v25; // ecx
-    double v29; // st6
-    double v30; // st7
-    double v33; // st7
-    double v35; // rtt
-    double v36; // st4
+    flex_d_t v29; // st6
+    flex_d_t v30; // st7
+    flex_d_t v33; // st7
+    flex_d_t v35; // rtt
+    flex_d_t v36; // st4
     flex_t v42; // edx
-    double v45; // st7
-    double v46; // st7
-    double v48; // st5
-    double v50; // st7
+    flex_d_t v45; // st7
+    flex_d_t v46; // st7
+    flex_d_t v48; // st5
+    flex_d_t v50; // st7
     rdVector3 *v61; // ecx
     flex_t v70; // [esp+14h] [ebp-70h]
     flex_t v71; // [esp+18h] [ebp-6Ch]
@@ -154,7 +154,7 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
                         v12 = v10 + 1;
 
                         // TODO: TODOA had an OOB access here
-                        if ( v4->field_120 >= (double)v8->paAnimEntries[v10 + 1].frameNum )
+                        if ( v4->field_120 >= (flex_d_t)v8->paAnimEntries[v10 + 1].frameNum )
                         {
                             v13 = &v8->paAnimEntries[v10 + 2];
                             do
@@ -163,7 +163,7 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
                                 {
                                     v9 = 1;
                                 }
-                                else if ( v4->field_120 >= (double)v13->frameNum )
+                                else if ( v4->field_120 >= (flex_d_t)v13->frameNum )
                                 {
                                     ++v12;
                                     v13++;
@@ -498,7 +498,7 @@ void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, flex_t a3)
     
     rdKeyframe *v4; // ecx
     rdPuppetTrack *v5; // esi
-    double v6; // st7
+    flex_d_t v6; // st7
     //unsigned int v11; // ebx
     rdKeyframe *v12; // ecx
     int v20; // [esp+14h] [ebp-8h]
@@ -512,7 +512,7 @@ void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, flex_t a3)
     if ( !v4 || a3 == 0.0 )
         return;
     v22 = a3 + puppet->tracks[trackNum].field_124;
-    v6 = (double)v4->numFrames;
+    v6 = (flex_d_t)v4->numFrames;
     puppet->tracks[trackNum].field_120 = v22;
 
     if ( v22 >= v6 )
@@ -539,7 +539,7 @@ void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, flex_t a3)
         {
             v21 = floorf(v22 / v6);
             size_t v11 = sizeof(uint32_t) * puppet->rdthing->model3->numHierarchyNodes;
-            puppet->tracks[trackNum].field_120 -= (double)puppet->tracks[trackNum].keyframe->numFrames * v21;
+            puppet->tracks[trackNum].field_120 -= (flex_d_t)puppet->tracks[trackNum].keyframe->numFrames * v21;
             
             // Added: Added in Grim Fandango, bounds checks
             if (puppet->rdthing->model3->numHierarchyNodes < 0x40)
@@ -557,9 +557,9 @@ void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, flex_t a3)
             {
                 for (uint32_t v13 = 0; v13 < v4->numMarkers; v13++)
                 {
-                    if ( v4->markers.marker_float[v13] > (double)puppet->tracks[trackNum].field_120 )
+                    if ( v4->markers.marker_float[v13] > (flex_d_t)puppet->tracks[trackNum].field_120 )
                         break;
-                    if ( v4->markers.marker_float[v13] > (double)puppet->tracks[trackNum].field_124 || puppet->tracks[trackNum].field_124 == 0.0 )
+                    if ( v4->markers.marker_float[v13] > (flex_d_t)puppet->tracks[trackNum].field_124 || puppet->tracks[trackNum].field_124 == 0.0 )
                     {
                         puppet->tracks[trackNum].callback(puppet->rdthing->parentSithThing, trackNum, v4->markers.marker_int[v13]);
                     }
@@ -569,8 +569,8 @@ void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, flex_t a3)
             {
                 for (uint32_t v17 = 0; v17 < v4->numMarkers; v17++)
                 {
-                    if ( v4->markers.marker_float[v17] > (double)puppet->tracks[trackNum].field_124
-                      || v4->markers.marker_float[v17] <= (double)puppet->tracks[trackNum].field_120 )
+                    if ( v4->markers.marker_float[v17] > (flex_d_t)puppet->tracks[trackNum].field_124
+                      || v4->markers.marker_float[v17] <= (flex_d_t)puppet->tracks[trackNum].field_120 )
                     {
                         puppet->tracks[trackNum].callback(puppet->rdthing->parentSithThing, trackNum, v4->markers.marker_int[v17]);
                     }

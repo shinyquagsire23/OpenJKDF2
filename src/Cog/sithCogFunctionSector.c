@@ -1,5 +1,6 @@
 #include "sithCogFunctionSector.h"
 
+#include "General/stdMath.h"
 #include "Cog/sithCogExec.h"
 #include "World/sithSector.h"
 #include "World/sithWorld.h"
@@ -26,54 +27,15 @@ void sithCogFunctionSector_GetTint(sithCog *ctx)
 void sithCogFunctionSector_SetTint(sithCog *ctx)
 {
     sithSector *sector; // ecx
-    double v2; // st7
-    double v3; // st7
-    double v4; // st7
     rdVector3 poppedVector; // [esp+4h] [ebp-Ch] BYREF
 
     sithCogExec_PopVector3(ctx, &poppedVector);
     sector = sithCogExec_PopSector(ctx);
     if ( sector )
     {
-        if ( poppedVector.x < 0.0 )
-        {
-            v2 = 0.0;
-        }
-        else if ( poppedVector.x > 1.0 )
-        {
-            v2 = 1.0;
-        }
-        else
-        {
-            v2 = poppedVector.x;
-        }
-        sector->tint.x = v2;
-        if ( poppedVector.y < 0.0 )
-        {
-            v3 = 0.0;
-        }
-        else if ( poppedVector.y > 1.0 )
-        {
-            v3 = 1.0;
-        }
-        else
-        {
-            v3 = poppedVector.y;
-        }
-        sector->tint.y = v3;
-        if ( poppedVector.z < 0.0 )
-        {
-            v4 = 0.0;
-        }
-        else if ( poppedVector.z > 1.0 )
-        {
-            v4 = 1.0;
-        }
-        else
-        {
-            v4 = poppedVector.z;
-        }
-        sector->tint.z = v4;
+        sector->tint.x = stdMath_Clamp(poppedVector.x, 0.0, 1.0);
+        sector->tint.y = stdMath_Clamp(poppedVector.y, 0.0, 1.0);
+        sector->tint.z = stdMath_Clamp(poppedVector.z, 0.0, 1.0);
         if ( COG_SHOULD_SYNC(ctx) )
         {
             sithSector_SyncSector(sector, 1);

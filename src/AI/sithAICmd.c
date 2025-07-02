@@ -167,7 +167,7 @@ int sithAICmd_Follow(sithActor *actor, sithAIClassEntry *aiclass, sithActorInsti
     sithAIClassEntry *v8; // ebx
     sithActorInstinct *v9; // edi
     int v10; // eax
-    double v16; // st7
+    flex_d_t v16; // st7
     rdVector3 a4a; // [esp+10h] [ebp-3Ch] BYREF
     rdVector3 arg8a; // [esp+1Ch] [ebp-30h] BYREF
     rdVector3 a1; // [esp+28h] [ebp-24h] BYREF
@@ -317,7 +317,7 @@ p4 - 0 single dir strafe, 1 random strafe
 int sithAICmd_CircleStrafe(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, intptr_t otherFlags)
 {
     int v8; // edi
-    double v13; // st7
+    flex_d_t v13; // st7
     sithAIClass *v15; // edx
     rdVector3 movePos; // [esp+10h] [ebp-30h] BYREF
     rdVector3 a2a; // [esp+1Ch] [ebp-24h] BYREF
@@ -330,7 +330,7 @@ int sithAICmd_CircleStrafe(sithActor *actor, sithAIClassEntry *aiclass, sithActo
     {
         v8 = aiclass->argsAsInt[4];
         sithAI_sub_4EAF40(actor);
-        if ( aiclass->argsAsFloat[2] >= (double)actor->currentDistanceFromTarget && !actor->field_238 )
+        if ( aiclass->argsAsFloat[2] >= (flex_d_t)actor->currentDistanceFromTarget && !actor->field_238 )
         {
             rdVector_Scale3(&a2a, &actor->field_228, -actor->currentDistanceFromTarget);
             if ( v8
@@ -426,7 +426,7 @@ int sithAICmd_BlindFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorIn
             return 1;
         }
         if ( !sithAI_sub_4EB300(weapon, &weapon->position, &actor->field_1F8, aiclass->argsAsFloat[3], 10.0, projectile->moveSize, &fireOffs, &fOut)
-          && fOut >= (double)aiclass->argsAsFloat[4] )
+          && fOut >= (flex_d_t)aiclass->argsAsFloat[4] )
         {
             if ( actor->attackDistance != 0.0 && aiclass->argsAsFloat[5] != 0.0 )
             {
@@ -645,10 +645,10 @@ int sithAICmd_TurretFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorI
     sithThing *v15; // eax
     sithThing *v16; // ecx
     rdMatrix34 *v20; // esi
-    double v23; // st7
-    double v24; // st7
-    double v25; // st7
-    double v28; // st7
+    flex_d_t v23; // st7
+    flex_d_t v24; // st7
+    flex_d_t v25; // st7
+    flex_d_t v28; // st7
     sithThing *v29; // eax
     flex_t v31; // [esp+10h] [ebp-60h]
     flex_t v32; // [esp+14h] [ebp-5Ch]
@@ -712,7 +712,7 @@ int sithAICmd_TurretFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorI
         {
             a3.y = -flagsa;
         }
-        else if ( a3.y > (double)flagsa )
+        else if ( a3.y > (flex_d_t)flagsa )
         {
             a3.y = flagsa;
         }
@@ -720,7 +720,7 @@ int sithAICmd_TurretFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorI
         {
             a3.x = -actora;
         }
-        else if ( a3.x > (double)actora )
+        else if ( a3.x > (flex_d_t)actora )
         {
             a3.x = actora;
         }
@@ -764,7 +764,7 @@ LABEL_41:
         actor->thing->actorParams.eyePYR.x = v28;
         sithActor_RotateTurretToEyePYR(actor->thing);
 LABEL_50:
-        if ( sithTime_curSeconds > (double)instinct->param0 && (g_debugmodeFlags & DEBUGFLAG_NO_AI) == 0 )
+        if ( sithTime_curSeconds > (flex_d_t)instinct->param0 && (g_debugmodeFlags & DEBUGFLAG_NO_AI) == 0 )
         {
             rdMatrix_Copy34(&v37, v20);
             rdMatrix_PreRotate34(&v37, &actor->thing->actorParams.eyePYR);
@@ -783,7 +783,7 @@ LABEL_50:
         instinct->param0 = sithTime_curSeconds - 1.0;
         instinct->param1 = aiclass->argsAsFloat[7] * 0.001 + sithTime_curSeconds;
     }
-    else if ( sithTime_curSeconds > (double)instinct->param1 )
+    else if ( sithTime_curSeconds > (flex_d_t)instinct->param1 )
     {
         sithActor_SpawnDeadBodyMaybe(actor->thing, actor->thing, 2);
         return 0;
@@ -791,7 +791,7 @@ LABEL_50:
     actor->thing->actorParams.eyePYR.y = _frand() * (flagsa + flagsa) - flagsa;
     actor->thing->actorParams.eyePYR.x = _frand() * (actora + actora) - actora;
     sithActor_RotateTurretToEyePYR(actor->thing);
-    if ( sithTime_curSeconds > (double)instinct->param0 )
+    if ( sithTime_curSeconds > (flex_d_t)instinct->param0 )
     {
         _memcpy(&v37, &actor->thing->lookOrientation, sizeof(v37));
         rdMatrix_PreRotate34(&v37, &actor->thing->actorParams.eyePYR);
@@ -821,7 +821,7 @@ int sithAICmd_Listen(sithActor *actor, sithAIClassEntry *aiclass, sithActorInsti
     flex_t *v11; // ecx
     int v12; // edi
     int v13; // ecx
-    double v14; // st7
+    flex_d_t v14; // st7
     sithThing *v15; // ebp
     sithActorInstinct *instinct_; // edi
     sithThing *v17; // ebx
@@ -893,7 +893,7 @@ LABEL_26:
         if ( *v11 != 0.0 )
         {
             v13 = sithAI_sub_4EB300(v6, &v6->position, v10, -1.0, actor_->pAIClass->sightDist, 0.0, &a5, &tmp);
-            if ( tmp <= (double)actor_->pAIClass->hearDist
+            if ( tmp <= (flex_d_t)actor_->pAIClass->hearDist
               && (!v13
                || tmp < 1.0 && v6->lookOrientation.lvec.y * a5.y + v6->lookOrientation.lvec.z * a5.z + v6->lookOrientation.lvec.x * a5.x > 0.5) )
             {
@@ -1067,10 +1067,10 @@ int sithAICmd_Jump(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinc
     if ( rdVector_Dot3(&actor->field_228, &actorThing->physicsParams.vel) > 0.02 )
         return 0;
     //*(_QWORD *)&pos.x = sithTime_curMs;
-    if ( (double)sithTime_curMs < instinct->param0 )
+    if ( (flex_d_t)sithTime_curMs < instinct->param0 )
         return 0;
 
-    instinct->param0 = aiclass->argsAsFloat[0] + (double)sithTime_curMs;
+    instinct->param0 = aiclass->argsAsFloat[0] + (flex_d_t)sithTime_curMs;
     if ( flags != SITHAI_MODE_SEARCHING && flags != SITHAI_MODE_ACTIVE )
     {
         if ( flags != SITHAI_MODE_TARGET_VISIBLE )
@@ -1118,7 +1118,7 @@ p2 - Duration of flee in seconds (10s is default)
 int sithAICmd_Flee(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, void *extra)
 {
     int v7; // ecx
-    double v8; // st7
+    flex_d_t v8; // st7
     int result; // eax
     sithThing *v11; // edi
     int v12; // eax
@@ -1368,7 +1368,7 @@ p1 - Radius to roam from home
 */
 int sithAICmd_Roam(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, void *extra)
 {
-    double randVal; // st6
+    flex_d_t randVal; // st6
     rdVector3 *v13; // [esp-8h] [ebp-30h]
     rdVector3 movePos; // [esp+4h] [ebp-24h] BYREF
     rdVector3 v16; // [esp+10h] [ebp-18h] BYREF
@@ -1449,7 +1449,7 @@ int sithAICmd_SenseDanger(sithActor *actor, sithAIClassEntry *aiclass, sithActor
     }
     if ( flags != 1 )
     {
-        if ( flags == 2 && v7->field_4[1] > (double)aiclass->argsAsFloat[0] )
+        if ( flags == 2 && v7->field_4[1] > (flex_d_t)aiclass->argsAsFloat[0] )
         {
             v8 = v7->field_58[1];
             if ( v8 )
@@ -1487,7 +1487,7 @@ p1 - Time till reengaging (msec)
 int sithAICmd_HitAndRun(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, void *extra)
 {
     int result; // eax
-    double v8; // st7
+    flex_d_t v8; // st7
 
     if ( flags )
         return 0;
@@ -1537,7 +1537,7 @@ int sithAICmd_Retreat(sithActor *actor, sithAIClassEntry *aiclass, sithActorInst
     if ( (actor->flags & SITHAI_MODE_ATTACKING) == 0 )
         return 0;
 
-    if ( aiclass->argsAsFloat[3] != 0.0 && aiclass->argsAsFloat[3] < (double)instinct->param0 )
+    if ( aiclass->argsAsFloat[3] != 0.0 && aiclass->argsAsFloat[3] < (flex_d_t)instinct->param0 )
     {
         instinct->field_0 |= 1;
         return 0;
@@ -1590,7 +1590,7 @@ p1 - %chance of say (0 never, 1 always)
 */
 int sithAICmd_Talk(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, void *extra)
 {
-    double healthPercent; // st7
+    flex_d_t healthPercent; // st7
 
     instinct->nextUpdate = sithTime_curMs + aiclass->argsAsInt[0];
     if ( aiclass->argsAsFloat[1] <= _frand() )

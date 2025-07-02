@@ -355,7 +355,7 @@ sithPlayingSound* sithSoundClass_ThingPlaySoundclass5(sithThing *thing, int sc_i
             v5 = v4->listIdx;
             if ( v5 > 1 )
             {
-                v6 = (uint32_t)((double)v5 * a3);
+                v6 = (uint32_t)((flex_d_t)v5 * a3);
                 if ( v6 > v5 - 1 )
                     v6 = v5 - 1;
                 if ( v6 > 1 )
@@ -452,7 +452,7 @@ sithPlayingSound* sithSoundClass_PlayModeRandom(sithThing *thing, uint32_t a2)
         {
             if ( v3->listIdx > 1u )
             {
-                v5 = (uint32_t)(_frand() * (double)v3->listIdx);
+                v5 = (uint32_t)(_frand() * (flex_d_t)v3->listIdx);
                 if ( v5 > v3->listIdx - 1 )
                     v5 = v3->listIdx - 1;
                 for ( ; v5; v5-- )

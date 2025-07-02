@@ -132,7 +132,7 @@ void sithCogFunctionSurface_SurfaceLightAnim(sithCog *ctx)
     cog_flex_t v6 = sithCogExec_PopFlex(ctx);
     cog_flex_t a1 = sithCogExec_PopFlex(ctx);
     sithSurface* v2 = sithCogExec_PopSurface(ctx);
-    if ( v2 && v6 >= (double)a1 && v5 > 0.0 && (v4 = v5 * 0.5, v2->surfaceInfo.face.extraLight = a1, (v3 = sithSurface_SurfaceLightAnim(v2, v6, v4)) != 0) )
+    if ( v2 && v6 >= (flex_d_t)a1 && v5 > 0.0 && (v4 = v5 * 0.5, v2->surfaceInfo.face.extraLight = a1, (v3 = sithSurface_SurfaceLightAnim(v2, v6, v4)) != 0) )
         sithCogExec_PushInt(ctx, v3->index);
     else
         sithCogExec_PushInt(ctx, -1);

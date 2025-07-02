@@ -14,27 +14,17 @@
 #include "Main/jkGame.h"
 #include "World/jkPlayer.h"
 
-static uint32_t aGammaTable[20] = {
-    0x00000000,
-    0x3FF00000,
-    0xD1745D17,
-    0x3FED1745,
-    0xAAAAAAAB,
-    0x3FEAAAAA,
-    0xB6DB6DB7,
-    0x3FE6DB6D,
-    0x00000000,
-    0x3FE40000,
-    0x71C71C72,
-    0x3FE1C71C,
-    0x35E50D79,
-    0x3FE0D794,
-    0x00000000,
-    0x3FE00000,
-    0x9E79E79E,
-    0x3FDE79E7,
-    0x6F4DE9BE,
-    0x3FDBD37A,
+static flex_d_t aGammaTable[10] = {
+    1.0,
+    0.9090909090909091,
+    0.8333333333333334,
+    0.7142857142857143,
+    0.625,
+    0.5555555555555556,
+    0.5263157894736842,
+    0.5,
+    0.47619047619047616,
+    0.4347826086956522,
 };
 
 #ifdef SDL2_RENDER
@@ -81,7 +71,7 @@ int Video_Startup()
 {
     if (stdDisplay_Startup())
     {
-        stdDisplay_SetGammaTable(10, (double*)aGammaTable); // TODO: actually decode the doubles
+        stdDisplay_SetGammaTable(10, aGammaTable); // TODO: actually decode the flex_d_ts
         jkHud_Startup();
         if (Main_bMotsCompat) {
             jkHudScope_Startup();
@@ -142,7 +132,7 @@ int Video_camera_related()
     v11 = v2;
     if ( v1 == Video_format.width && v2 == Video_format.height )
         v10 = 1;
-    a1 = (double)(unsigned int)v1 * 0.5;
+    a1 = (flex_d_t)(unsigned int)v1 * 0.5;
     v3 = (int64_t)(Video_modeStruct.aViewSizes[Video_modeStruct.viewSizeIdx].xMax - a1);
     if ( (int)v3 < 0 )
     {
@@ -156,12 +146,12 @@ int Video_camera_related()
     {
         x = (int64_t)(Video_modeStruct.aViewSizes[Video_modeStruct.viewSizeIdx].xMax - a1);
     }
-    v5 = (int64_t)(Video_modeStruct.aViewSizes[Video_modeStruct.viewSizeIdx].yMax - (double)v2 * 0.5);
+    v5 = (int64_t)(Video_modeStruct.aViewSizes[Video_modeStruct.viewSizeIdx].yMax - (flex_d_t)v2 * 0.5);
     if ( (int)v5 >= 0 )
     {
         y = Video_format.height - 1;
         if ( (int)v5 <= Video_format.height - 1 )
-            y = (int64_t)(Video_modeStruct.aViewSizes[Video_modeStruct.viewSizeIdx].yMax - (double)v2 * 0.5);
+            y = (int64_t)(Video_modeStruct.aViewSizes[Video_modeStruct.viewSizeIdx].yMax - (flex_d_t)v2 * 0.5);
     }
     w = x + v1 - 1;
     if ( w > Video_format.width - 1 )

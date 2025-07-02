@@ -80,14 +80,14 @@ int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *materi
         if ( !extraUVTipMaybe )
             return 0;
         v22 = polyline->edgeFace.material->texinfos[0]->texture_ptr->texture_struct[0];
-        extraUVTipMaybe[0].x = (double)((unsigned int)v22->format.width) - 0.01;
+        extraUVTipMaybe[0].x = (flex_d_t)((unsigned int)v22->format.width) - 0.01;
         extraUVTipMaybe[0].y = 0.0;
         extraUVTipMaybe[1].x = 0.0;
         extraUVTipMaybe[1].y = 0.0;
         extraUVTipMaybe[2].x = 0.0;
-        extraUVTipMaybe[2].y = (double)((unsigned int)v22->format.height) - 0.01;
-        extraUVTipMaybe[3].x = (double)((unsigned int)v22->format.width) - 0.01;
-        extraUVTipMaybe[3].y = (double)((unsigned int)v22->format.height) - 0.01;
+        extraUVTipMaybe[2].y = (flex_d_t)((unsigned int)v22->format.height) - 0.01;
+        extraUVTipMaybe[3].x = (flex_d_t)((unsigned int)v22->format.width) - 0.01;
+        extraUVTipMaybe[3].y = (flex_d_t)((unsigned int)v22->format.height) - 0.01;
     }
     polyline->tipFace.textureMode = edgeTextureMode;
     polyline->textureMode = edgeTextureMode;
@@ -120,14 +120,14 @@ int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *materi
         if ( !extraUVFaceMaybe )
             return 0;
         v22 = polyline->tipFace.material->texinfos[0]->texture_ptr->texture_struct[0];
-        extraUVFaceMaybe[0].x = (double)((unsigned int)v22->format.width) - 0.01;
+        extraUVFaceMaybe[0].x = (flex_d_t)((unsigned int)v22->format.width) - 0.01;
         extraUVFaceMaybe[0].y = 0.0;
         extraUVFaceMaybe[1].x = 0.0;
         extraUVFaceMaybe[1].y = 0.0;
         extraUVFaceMaybe[2].x = 0.0;
-        extraUVFaceMaybe[2].y = (double)((unsigned int)v22->format.height) - 0.01;
-        extraUVFaceMaybe[3].x = (double)((unsigned int)v22->format.width) - 0.01;
-        extraUVFaceMaybe[3].y = (double)((unsigned int)v22->format.height) - 0.01;
+        extraUVFaceMaybe[2].y = (flex_d_t)((unsigned int)v22->format.height) - 0.01;
+        extraUVFaceMaybe[3].x = (flex_d_t)((unsigned int)v22->format.width) - 0.01;
+        extraUVFaceMaybe[3].y = (flex_d_t)((unsigned int)v22->format.height) - 0.01;
     }
     return 1;
 }
@@ -179,10 +179,10 @@ int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix)
 {
     rdPolyLine *polyline;
     flex_t length;
-    double tip_left;
-    double tip_bottom;
-    double tip_right;
-    double tip_top;
+    flex_d_t tip_left;
+    flex_d_t tip_bottom;
+    flex_d_t tip_right;
+    flex_d_t tip_top;
     flex_t ang;
     flex_t angSin;
     flex_t angCos;

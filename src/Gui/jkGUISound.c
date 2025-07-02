@@ -126,11 +126,11 @@ int jkGuiSound_Show()
     v1 = jkGuiRend_DisplayAndReturnClicked(&jkGuiSound_menu);
     if ( v1 != -1 )
     {
-        jkGuiSound_musicVolume = (double)jkGuiSound_elements[10].selectedTextEntry * 0.01;
-        jkGuiSound_sfxVolume = (double)jkGuiSound_elements[14].selectedTextEntry * 0.01;
+        jkGuiSound_musicVolume = (flex_d_t)jkGuiSound_elements[10].selectedTextEntry * 0.01;
+        jkGuiSound_sfxVolume = (flex_d_t)jkGuiSound_elements[14].selectedTextEntry * 0.01;
         
 #ifdef SDL2_RENDER
-        jkGuiSound_cutsceneVolume = (double)jkGuiSound_elements[18].selectedTextEntry * 0.01;
+        jkGuiSound_cutsceneVolume = (flex_d_t)jkGuiSound_elements[18].selectedTextEntry * 0.01;
         jkGuiSound_numChannels = 256;
         jkGuiSound_b3DSound_2 = jkGuiSound_elements[7].selectedTextEntry;
         jkGuiSound_b3DSound = jkGuiSound_b3DSound_2;

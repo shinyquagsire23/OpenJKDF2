@@ -320,7 +320,7 @@ void jkHud_Draw()
     stdFont *healthFont; // edi
     int v18; // eax
     stdFont *ammoFont; // esi
-    double v20; // st7
+    flex_d_t v20; // st7
     int32_t v21; // rax
     int v22; // esi
     int v23; // edi
@@ -612,14 +612,14 @@ void jkHud_Draw()
         uint32_t tmpInt;
 #ifdef QOL_IMPROVEMENTS
         // Scale crosshair with vertical resolution, not horizontal.
-        v20 = (double)Video_format.height * (0.0015625 / 3.0) * 4.0;
+        v20 = (flex_d_t)Video_format.height * (0.0015625 / 3.0) * 4.0;
 #else
-        v20 = (double)Video_format.width * 0.0015625;
+        v20 = (flex_d_t)Video_format.width * 0.0015625;
 #endif // QOL_IMPROVEMENTS
         v21 = (int32_t)(v20 + v20 + Video_modeStruct.aViewSizes[Video_modeStruct.viewSizeIdx].xMax - -0.5);
         v22 = v21;
-        v23 = (int32_t)((double)(unsigned int)Video_format.height * 0.0020833334
-                      + (double)(unsigned int)Video_format.height * 0.0020833334
+        v23 = (int32_t)((flex_d_t)(unsigned int)Video_format.height * 0.0020833334
+                      + (flex_d_t)(unsigned int)Video_format.height * 0.0020833334
                       + Video_modeStruct.aViewSizes[Video_modeStruct.viewSizeIdx].yMax
                       - -0.5);
         if ( Video_format.format.bpp == 8 )
@@ -921,7 +921,7 @@ void jkHud_DrawGPU()
     stdFont *healthFont; // edi
     int v18; // eax
     stdFont *ammoFont; // esi
-    double v20; // st7
+    flex_d_t v20; // st7
     int32_t v21; // rax
     int v22; // esi
     int v23; // edi
@@ -1186,14 +1186,14 @@ void jkHud_DrawGPU()
         uint32_t tmpInt;
 #ifdef QOL_IMPROVEMENTS
         // Scale crosshair with vertical resolution, not horizontal.
-        v20 = (double)Video_format.height * (0.0015625 / 3.0) * 4.0;
+        v20 = (flex_d_t)Video_format.height * (0.0015625 / 3.0) * 4.0;
 #else
-        v20 = (double)Video_format.width * 0.0015625;
+        v20 = (flex_d_t)Video_format.width * 0.0015625;
 #endif // QOL_IMPROVEMENTS
         v21 = (int32_t)(v20 + v20 + Video_modeStruct.aViewSizes[Video_modeStruct.viewSizeIdx].xMax - -0.5);
         v22 = v21;
-        v23 = (int32_t)((double)(unsigned int)Video_format.height * 0.0020833334
-                      + (double)(unsigned int)Video_format.height * 0.0020833334
+        v23 = (int32_t)((flex_d_t)(unsigned int)Video_format.height * 0.0020833334
+                      + (flex_d_t)(unsigned int)Video_format.height * 0.0020833334
                       + Video_modeStruct.aViewSizes[Video_modeStruct.viewSizeIdx].yMax
                       - -0.5);
         if ( Video_format.format.bpp == 8 )
@@ -1221,7 +1221,7 @@ void jkHud_DrawGPU()
         std3D_DrawUIClearedRect(tmpInt, &rect3);
         std3D_DrawUIClearedRect(tmpInt, &rect4);
 
-        //rdRect rect1a = {(double)Video_format.width/2, (double)Video_format.height/2, 20, 20};
+        //rdRect rect1a = {(flex_d_t)Video_format.width/2, (flex_d_t)Video_format.height/2, 20, 20};
         //std3D_DrawUIClearedRect(tmpInt, &rect1a);
     }
 

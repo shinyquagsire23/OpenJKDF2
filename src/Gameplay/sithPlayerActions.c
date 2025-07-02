@@ -83,7 +83,7 @@ void sithPlayerActions_Activate(sithThing *thing)
 // MoTS altered
 void sithPlayerActions_JumpWithVel(sithThing *thing, flex_t vel)
 {
-    double final_vel;
+    flex_d_t final_vel;
     int isAttachedAndIsSurface; // zf
     int v12; // eax
     int jumpSound; // edi

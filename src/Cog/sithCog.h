@@ -85,7 +85,7 @@ void sithCogSurface_Startup(void* a1);
 void sithCog_SendMessageFromThing(sithThing *a1, sithThing *a2, int msg);
 flex_t sithCog_SendMessageFromThingEx(sithThing *sender, sithThing *receiver, SITH_MESSAGE message, flex_t param0, flex_t param1, flex_t param2, flex_t param3);
 void sithCog_SendMessageFromSurface(sithSurface *surface, sithThing *thing, int msg);
-double sithCog_SendMessageFromSurfaceEx(sithSurface *sender, sithThing *thing, SITH_MESSAGE msg, flex_t a4, flex_t a5, flex_t a6, flex_t a7);
+flex_t sithCog_SendMessageFromSurfaceEx(sithSurface *sender, sithThing *thing, SITH_MESSAGE msg, flex_t a4, flex_t a5, flex_t a6, flex_t a7);
 void sithCog_SendMessageFromSector(sithSector *sector, sithThing *thing, int message);
 flex_t sithCog_SendMessageFromSectorEx(sithSector *a1, sithThing *sourceType, SITH_MESSAGE message, flex_t param0, flex_t param1, flex_t param2, flex_t param3);
 void sithCog_SendSimpleMessageToAll(int a1, int a2, int a3, int a4, int a5);

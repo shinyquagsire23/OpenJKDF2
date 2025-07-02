@@ -796,7 +796,7 @@ void sithThing_EnterSector(sithThing* pThing, sithSector *sector, int a3, int a4
     {
         if (i == pThing) {
             pThing->sector = sector; // just in case?
-            jk_printf("OpenJKDF2: Tried to double enter sector??\n");
+            jk_printf("OpenJKDF2: Tried to flex_d_t enter sector??\n");
             return;
         }
     }
@@ -1182,7 +1182,7 @@ void sithThing_AttachToSurface(sithThing* pThing, sithSurface *surface, int a3)
     int *v6; // eax
     sithWorld *v7; // edx
     rdVector3 *v8; // ecx
-    double v14; // st7
+    flex_d_t v14; // st7
     int v15; // edi
     rdVector3 a2a; // [esp+Ch] [ebp-Ch] BYREF
 
@@ -1262,8 +1262,8 @@ void sithThing_LandThing(sithThing *a1, sithThing *a2, rdFace *a3, rdVector3 *a4
     int *v7; // eax
     int v8; // eax
     sithThing *v9; // eax
-    double v14; // st6
-    double downward_velocity; // st7
+    flex_d_t v14; // st6
+    flex_d_t downward_velocity; // st7
     int v18; // [esp+10h] [ebp-1Ch]
     rdVector3 a2a; // [esp+14h] [ebp-18h] BYREF
     rdVector3 out; // [esp+20h] [ebp-Ch] BYREF
@@ -1362,7 +1362,7 @@ int sithThing_DetachThing(sithThing* pThing)
 {
     uint32_t *v2; // edi
     sithThing *v3; // ebx
-    double v12; // rt2
+    flex_d_t v12; // rt2
     sithThing *v13; // ecx
     sithThing *v14; // eax
     int result; // eax
@@ -1652,11 +1652,11 @@ int sithThing_LoadThingParam(stdConffileArg *arg, sithThing* pThing, int param)
     sithAIClass *pAIClass; // eax
     sithActor *pActor; // esi
     int collide; // eax
-    double size; // st7
+    flex_d_t size; // st7
     uint32_t thingType; // eax
-    double moveSize; // st7
-    double light; // st7
-    double lifeLeftSec; // st7
+    flex_d_t moveSize; // st7
+    flex_d_t light; // st7
+    flex_d_t lifeLeftSec; // st7
     rdModel3 *pModel; // eax
     rdParticle *pParticle; // edi
     rdSprite *pSprite; // eax

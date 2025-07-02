@@ -163,11 +163,11 @@ int rdCache_SendFaceListToHardware()
 {
     int v0; // ecx
     int v1; // edx
-    double v2; // st7
-    double v3; // st6
-    double v4; // st5
+    flex_d_t v2; // st7
+    flex_d_t v3; // st6
+    flex_d_t v4; // st5
     rdClipFrustum *v7; // edx
-    double v8; // st7
+    flex_d_t v8; // st7
     int mipmap_level; // edi
     rdProcEntry *active_6c; // esi
     v11_struct v11; // edx
@@ -178,30 +178,30 @@ int rdCache_SendFaceListToHardware()
     rdDDrawSurface *tex2_arr_sel; // eax
     flex_t *vert_lights_iter; // ecx
     int vert_lights_iter_cnt; // edx
-    double v21; // st7
-    double v22; // st7
-    double v23; // st7
-    double v24; // st7
-    double v25; // st7
-    double v26; // st7
-    double v27; // st7
+    flex_d_t v21; // st7
+    flex_d_t v22; // st7
+    flex_d_t v23; // st7
+    flex_d_t v24; // st7
+    flex_d_t v25; // st7
+    flex_d_t v26; // st7
+    flex_d_t v27; // st7
     rdVector3 *iterating_6c_vtxs_; // esi
     int v35; // ecx
-    double v36; // st7
-    double d3dvtx_zval; // st7
-    double v38; // st6
-    double light_level; // st7
+    flex_d_t v36; // st7
+    flex_d_t d3dvtx_zval; // st7
+    flex_d_t v38; // st6
+    flex_d_t light_level; // st7
     int vertex_g; // ebx
     int vertex_r; // edi
     rdColormap *v45; // eax
-    double v47; // st7
+    flex_d_t v47; // st7
     __int64 v48; // rax
-    double v49; // st7
+    flex_d_t v49; // st7
     int vertex_b; // cl
     rdProcEntry *v52; // esi
     int final_vertex_color; // eax
     rdVector2 *uvs_in_pixels; // eax
-    double tex_v; // st7
+    flex_d_t tex_v; // st7
     int v61; // ecx
     int lighting_maybe_2; // edx
     unsigned int v63; // edi
@@ -210,17 +210,17 @@ int rdCache_SendFaceListToHardware()
     size_t tri_idx; // eax
     flex_t *v70; // ecx
     int v71; // edx
-    double v72; // st7
-    double v73; // st7
-    double v75; // st7
-    double v76; // st7
-    double v78; // st7
+    flex_d_t v72; // st7
+    flex_d_t v73; // st7
+    flex_d_t v75; // st7
+    flex_d_t v76; // st7
+    flex_d_t v78; // st7
     rdDDrawSurface *v80; // edx
-    double v87; // st7
-    double v88; // st7
-    double v89; // st6
+    flex_d_t v87; // st7
+    flex_d_t v88; // st7
+    flex_d_t v89; // st6
     rdColormap *v91; // esi
-    double v92; // st7
+    flex_d_t v92; // st7
     int v93; // eax
     int v94; // ebx
     int v95; // edx
@@ -228,7 +228,7 @@ int rdCache_SendFaceListToHardware()
     int v97; // eax
     int v98; // ecx
     __int64 v100; // rax
-    double v101; // st7
+    flex_d_t v101; // st7
     uint8_t v103; // cl
     int v104; // eax
     unsigned int v108; // edi
@@ -335,7 +335,7 @@ int rdCache_SendFaceListToHardware()
         else
             v148 = 0.0;
 
-        // Added: We need to know if a face is double-sided
+        // Added: We need to know if a face is flex_d_t-sided
         if (active_6c->type & RD_FF_DOUBLE_SIDED && active_6c->light_flags)
         {
             flags_idk_ |= 0x10000;
@@ -427,31 +427,31 @@ int rdCache_SendFaceListToHardware()
             mipmap_level = 1;
             if (sith_tex_sel->num_mipmaps == 2)
             {
-                if ( z_min <= (double)rdroid_aMipDistances.y )
+                if ( z_min <= (flex_d_t)rdroid_aMipDistances.y )
                 {
                     mipmap_level = 0;
                 }
             }
             else if (sith_tex_sel->num_mipmaps == 3)
             {
-                if ( z_min <= (double)rdroid_aMipDistances.x )
+                if ( z_min <= (flex_d_t)rdroid_aMipDistances.x )
                 {
                     mipmap_level = 0;
                 }
-                else if ( z_min > (double)rdroid_aMipDistances.y )
+                else if ( z_min > (flex_d_t)rdroid_aMipDistances.y )
                 {
                     mipmap_level = 2;
                 }
             }
             else if (sith_tex_sel->num_mipmaps == 4)
             {
-                if ( z_min <= (double)rdroid_aMipDistances.x )
+                if ( z_min <= (flex_d_t)rdroid_aMipDistances.x )
                 {
                     mipmap_level = 0;
                 }
-                else if ( z_min > (double)rdroid_aMipDistances.y )
+                else if ( z_min > (flex_d_t)rdroid_aMipDistances.y )
                 {
-                    if ( z_min > (double)rdroid_aMipDistances.z )
+                    if ( z_min > (flex_d_t)rdroid_aMipDistances.z )
                         mipmap_level = 3;
                     else
                         mipmap_level = 2;
@@ -654,13 +654,13 @@ int rdCache_SendFaceListToHardware()
                     {
                         //printf("%f\n", active_6c->paRedIntensities[vtx_idx]);
                         light_level = 1.0;
-                        double intRed = active_6c->paRedIntensities[vtx_idx];
-                        double intGreen = active_6c->paGreenIntensities[vtx_idx];
-                        double intBlue = active_6c->paBlueIntensities[vtx_idx];
+                        flex_d_t intRed = active_6c->paRedIntensities[vtx_idx];
+                        flex_d_t intGreen = active_6c->paGreenIntensities[vtx_idx];
+                        flex_d_t intBlue = active_6c->paBlueIntensities[vtx_idx];
 
                         // Added for SDL2
 #ifdef SDL2_RENDER
-                        double luma = (0.2126 * intRed) + (0.7152 * intGreen) + (0.0722 * intBlue);
+                        flex_d_t luma = (0.2126 * intRed) + (0.7152 * intGreen) + (0.0722 * intBlue);
                         light_level = luma;
 
                         rdCache_aHWVertices[rdCache_totalVerts].lightLevel = luma / 255.0;
@@ -686,11 +686,11 @@ int rdCache_SendFaceListToHardware()
                 v45 = active_6c->colormap;
                 if ( v45 != rdColormap_pIdentityMap )
                 {
-                    v47 = v45->tint.y * (double)green;
-                    vertex_r = (uint8_t)(__int64)(v45->tint.x * (double)red_and_alpha);
+                    v47 = v45->tint.y * (flex_d_t)green;
+                    vertex_r = (uint8_t)(__int64)(v45->tint.x * (flex_d_t)red_and_alpha);
                     red_and_alpha = vertex_r;
                     v48 = (__int64)v47;
-                    v49 = v45->tint.z * (double)blue;
+                    v49 = v45->tint.z * (flex_d_t)blue;
                     vertex_g = (uint8_t)v48;
                     green = (uint8_t)v48;
                     vertex_b = (uint8_t)(__int64)v49;
@@ -717,18 +717,18 @@ int rdCache_SendFaceListToHardware()
                 }
                 if ( v130 )
                 {
-                    vertex_r += (__int64)((double)red_and_alpha * red_scalar);
+                    vertex_r += (__int64)((flex_d_t)red_and_alpha * red_scalar);
                     red_and_alpha = vertex_r;
-                    vertex_g += (__int64)((double)green * green_scalar);
+                    vertex_g += (__int64)((flex_d_t)green * green_scalar);
                     green = vertex_g;
-                    vertex_b += (__int64)((double)blue * blue_scalar);
+                    vertex_b += (__int64)((flex_d_t)blue * blue_scalar);
                     blue = vertex_b;
                 }
                 if ( rdroid_curColorEffects.fade < 1.0 )
                 {
-                    vertex_r = (__int64)((double)red_and_alpha * rdroid_curColorEffects.fade);
-                    vertex_g = (__int64)((double)green * rdroid_curColorEffects.fade);
-                    vertex_b = (__int64)((double)blue * rdroid_curColorEffects.fade);
+                    vertex_r = (__int64)((flex_d_t)red_and_alpha * rdroid_curColorEffects.fade);
+                    vertex_g = (__int64)((flex_d_t)green * rdroid_curColorEffects.fade);
+                    vertex_b = (__int64)((flex_d_t)blue * rdroid_curColorEffects.fade);
                 }
                 
                 if ( vertex_r < 0 )
@@ -950,9 +950,9 @@ LABEL_232:
                 {
                     v91 = (rdColormap *)active_6c->colormap;
                     uint8_t baseLight = *((uint8_t *)v91->lightlevel + v137->header.field_4);
-                    double intRed = active_6c->paRedIntensities[vtx_idx] * 255.0 - 0.5;
-                    double intGreen = active_6c->paGreenIntensities[vtx_idx] * 255.0 - 0.5;
-                    double intBlue = active_6c->paBlueIntensities[vtx_idx] * 255.0 - 0.5;
+                    flex_d_t intRed = active_6c->paRedIntensities[vtx_idx] * 255.0 - 0.5;
+                    flex_d_t intGreen = active_6c->paGreenIntensities[vtx_idx] * 255.0 - 0.5;
+                    flex_d_t intBlue = active_6c->paBlueIntensities[vtx_idx] * 255.0 - 0.5;
 
 
                     intRed += (flex_t)v91->colors[baseLight].r; // FLEXTODO
@@ -971,10 +971,10 @@ LABEL_232:
 
             if ( v91 != rdColormap_pIdentityMap )
             {
-                v96 = (uint8_t)(__int64)(v91->tint.x * (double)red_and_alpha);
+                v96 = (uint8_t)(__int64)(v91->tint.x * (flex_d_t)red_and_alpha);
                 red_and_alpha = v96;
-                v100 = (__int64)(v91->tint.y * (double)green);
-                v101 = v91->tint.z * (double)blue;
+                v100 = (__int64)(v91->tint.y * (flex_d_t)green);
+                v101 = v91->tint.z * (flex_d_t)blue;
                 v94 = (uint8_t)v100;
                 green = (uint8_t)v100;
                 blue = (uint8_t)(__int64)v101;
@@ -997,17 +997,17 @@ LABEL_232:
             }
             if ( v130 )
             {
-                v96 += (__int64)((double)red_and_alpha * red_scalar);
+                v96 += (__int64)((flex_d_t)red_and_alpha * red_scalar);
                 red_and_alpha = v96;
-                v94 += (__int64)((double)green * green_scalar);
+                v94 += (__int64)((flex_d_t)green * green_scalar);
                 green = v94;
-                blue += (__int64)((double)blue * blue_scalar);
+                blue += (__int64)((flex_d_t)blue * blue_scalar);
             }
             if ( rdroid_curColorEffects.fade < 1.0 )
             {
-                v96 = (__int64)((double)red_and_alpha * rdroid_curColorEffects.fade);
-                v94 = (__int64)((double)green * rdroid_curColorEffects.fade);
-                blue = (__int64)((double)blue * rdroid_curColorEffects.fade);
+                v96 = (__int64)((flex_d_t)red_and_alpha * rdroid_curColorEffects.fade);
+                v94 = (__int64)((flex_d_t)green * rdroid_curColorEffects.fade);
+                blue = (__int64)((flex_d_t)blue * rdroid_curColorEffects.fade);
             }
             if ( v96 < 0 )
             {
@@ -1177,9 +1177,9 @@ int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags)
     rdProcEntry *procFace; // esi
     int v9; // ecx
     rdVector3 *v10; // edx
-    double y_min_related; // ebx
-    double v12; // st7
-    double y_max_related; // [esp+Ch] [ebp-18h]
+    flex_d_t y_min_related; // ebx
+    flex_d_t v12; // st7
+    flex_d_t y_max_related; // [esp+Ch] [ebp-18h]
     flex_t v27; // [esp+10h] [ebp-14h]
     flex_t z_max; // [esp+14h] [ebp-10h]
     flex_t z_min; // [esp+18h] [ebp-Ch]

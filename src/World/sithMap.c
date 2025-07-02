@@ -137,7 +137,7 @@ int sithMap_Draw(sithSector *sector)
     int v18; // edi
     unsigned int v19; // ecx
     flex_t *v20; // esi
-    double v22; // st7
+    flex_d_t v22; // st7
     int v24; // eax
     int v25; // ecx
     unsigned int v34; // edi

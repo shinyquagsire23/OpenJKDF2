@@ -71,10 +71,10 @@ int rdSprite_NewEntry(rdSprite *sprite, char *spritepath, int type, char *materi
                 uint32_t* v24 = (uint32_t*)sprite->face.material->texinfos[0]->texture_ptr->texture_struct[0];
 
                 sprite->vertexUVs[0].x = 0.5;
-                sprite->vertexUVs[0].y = (double)v24[4] - 0.5;
-                sprite->vertexUVs[1].x = (double)v24[3] - 0.5;
-                sprite->vertexUVs[1].y = (double)v24[4] - 0.5;
-                sprite->vertexUVs[2].x = (double)v24[3] - 0.5;
+                sprite->vertexUVs[0].y = (flex_d_t)v24[4] - 0.5;
+                sprite->vertexUVs[1].x = (flex_d_t)v24[3] - 0.5;
+                sprite->vertexUVs[1].y = (flex_d_t)v24[4] - 0.5;
+                sprite->vertexUVs[2].x = (flex_d_t)v24[3] - 0.5;
                 sprite->vertexUVs[2].y = 0.5;
                 sprite->vertexUVs[3].x = 0.5;
                 sprite->vertexUVs[3].y = 0.5;

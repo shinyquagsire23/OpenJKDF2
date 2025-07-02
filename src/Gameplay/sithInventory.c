@@ -428,7 +428,7 @@ int sithInventory_ActivateBin(sithThing *player, sithCog *cog, flex_t delay, int
     info->activatedTimeSecs = sithTime_curSeconds;
     if ( delay <= 0.0 )
         info->binWait = -1.0;
-    if (info->binWait != -1.0 && sithTime_curSeconds >= (double)info->binWait )
+    if (info->binWait != -1.0 && sithTime_curSeconds >= (flex_d_t)info->binWait )
     {
         sithCog_SendMessageEx(cog, SITH_MESSAGE_FIRE, SENDERTYPE_SYSTEM, binNum, SENDERTYPE_THING, player->thingIdx, 0, 0.0, 0.0, 0.0, 0.0);
         info->binWait = sithTime_curSeconds + info->activationDelaySecs;
@@ -1117,7 +1117,7 @@ int sithInventory_HandleInvSkillKeys(sithThing *player, flex_t deltaSecs)
                     v10 = v1->actorParams.playerinfo;
                     v11 = player->actorParams.playerinfo->curItem;
                     sithInventory_bUnk = 1;
-                    if ( sithTime_curSeconds >= (double)v10->iteminfo[v11].binWait && v11 >= SENDERTYPE_0 )
+                    if ( sithTime_curSeconds >= (flex_d_t)v10->iteminfo[v11].binWait && v11 >= SENDERTYPE_0 )
                     {
                         if ( sithInventory_GetAvailable(v1, v11) )
                         {
@@ -1164,7 +1164,7 @@ int sithInventory_HandleInvSkillKeys(sithThing *player, flex_t deltaSecs)
                     v15 = v1->actorParams.playerinfo;
                     v16 = player->actorParams.playerinfo->curPower;
                     sithInventory_bUnkPower = 1;
-                    if ( sithTime_curSeconds >= (double)v15->iteminfo[v16].binWait && v16 >= SENDERTYPE_0 )
+                    if ( sithTime_curSeconds >= (flex_d_t)v15->iteminfo[v16].binWait && v16 >= SENDERTYPE_0 )
                     {
                         if ( sithInventory_GetAvailable(v1, v16) )
                         {
@@ -1271,7 +1271,7 @@ int sithInventory_HandleInvSkillKeys(sithThing *player, flex_t deltaSecs)
                             if (!sithThing_MotsTick(12, 1, (flex_t)v23)) goto skip_cog; // FLEXTODO
                         }
 
-                        if ( sithTime_curSeconds >= (double)v1->actorParams.playerinfo->iteminfo[v23].binWait && v23 >= 0 )
+                        if ( sithTime_curSeconds >= (flex_d_t)v1->actorParams.playerinfo->iteminfo[v23].binWait && v23 >= 0 )
                         {
                             if ( sithInventory_GetAvailable(v1, v23) )
                             {

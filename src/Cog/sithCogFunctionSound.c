@@ -21,7 +21,7 @@ void sithCogFunctionSound_PlaySong(sithCog *ctx)
 
 void sithCogFunctionSound_PlaySoundThing(sithCog *ctx)
 {
-    double maxDist_act; // st7
+    flex_d_t maxDist_act; // st7
     __int32 flagsTmp; // ebx
     sithPlayingSound *playingSound; // eax
     sithPlayingSound *playingSound_; // ebp
@@ -138,7 +138,7 @@ void sithCogFunctionSound_PlaySoundPos(sithCog *ctx)
     {
         volume = 1.5;
     }
-    if ( minDist_act > (double)maxDist_act )
+    if ( minDist_act > (flex_d_t)maxDist_act )
         maxDist_act = minDist_act;
     flagsTmp = flags | SITHSOUNDFLAG_ABSOLUTE;
     playingSound = sithSoundMixer_PlaySoundPosAbsolute(pSound, &pos, 0, volume, minDist_act, maxDist_act, flagsTmp);
@@ -365,7 +365,7 @@ void sithCogFunctionSound_GetSoundLen(sithCog *ctx)
 
     if (pSound)
     {
-        sithCogExec_PushFlex(ctx, (double)pSound->sound_len * 0.001);
+        sithCogExec_PushFlex(ctx, (flex_d_t)pSound->sound_len * 0.001);
     }
     else
     {
@@ -376,7 +376,7 @@ void sithCogFunctionSound_GetSoundLen(sithCog *ctx)
 // MOTS added
 void sithCogFunctionSound_PlaySoundThingLocal(sithCog *ctx)
 {
-    double maxDist_act; // st7
+    flex_d_t maxDist_act; // st7
     __int32 flagsTmp; // ebx
     sithPlayingSound *playingSound; // eax
     sithPlayingSound *playingSound_; // ebp
@@ -477,7 +477,7 @@ void sithCogFunctionSound_PlaySoundPosLocal(sithCog *ctx)
     {
         volume = 1.5;
     }
-    if ( minDist_act > (double)maxDist_act )
+    if ( minDist_act > (flex_d_t)maxDist_act )
         maxDist_act = minDist_act;
     playingSound = sithSoundMixer_PlaySoundPosAbsolute(pSound, &pos, 0, volume, minDist_act, maxDist_act, flags | SITHSOUNDFLAG_ABSOLUTE);
 
@@ -490,7 +490,7 @@ void sithCogFunctionSound_PlaySoundPosLocal(sithCog *ctx)
 // Droidworks added
 void sithCogFunctionSound_PlaySoundThingAndWait(sithCog *ctx)
 {
-    double maxDist_act; // st7
+    flex_d_t maxDist_act; // st7
     __int32 flagsTmp; // ebx
     sithPlayingSound *playingSound; // eax
     sithPlayingSound *playingSound_; // ebp

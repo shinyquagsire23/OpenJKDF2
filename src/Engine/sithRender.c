@@ -720,7 +720,7 @@ void sithRender_RenderLevelGeometry()
     flex_t *v31; // eax
     unsigned int v32; // ecx
     flex_t *v33; // edx
-    double v34; // st7
+    flex_d_t v34; // st7
     int v38; // ecx
     char v39; // al
     rdProcEntry *procEntry; // esi
@@ -733,7 +733,7 @@ void sithRender_RenderLevelGeometry()
     flex_t *v51; // eax
     unsigned int v52; // ecx
     flex_t *v53; // edx
-    double v54; // st7
+    flex_d_t v54; // st7
     int surfaceFlags; // eax
     int v57; // edx
     rdMaterial *v58; // ecx
@@ -1519,7 +1519,7 @@ void sithRender_RenderDynamicLights()
 void sithRender_RenderThings()
 {
     sithSector *v1; // ebp
-    double v2; // st7
+    flex_d_t v2; // st7
     sithThing *thingIter; // esi
     flex_t radius; // edx
     int clippingVal; // eax
@@ -1628,7 +1628,7 @@ void sithRender_RenderThings()
                             case 1:
                                 break;
                             case 2:
-                                if ( yval < (double)sithWorld_pCurrentWorld->lodDistance.y )
+                                if ( yval < (flex_d_t)sithWorld_pCurrentWorld->lodDistance.y )
                                 {
                                     model3->geosetSelect = 0;
                                 }
@@ -1638,11 +1638,11 @@ void sithRender_RenderThings()
                                 }
                                 break;
                             case 3:
-                                if ( yval < (double)sithWorld_pCurrentWorld->lodDistance.x )
+                                if ( yval < (flex_d_t)sithWorld_pCurrentWorld->lodDistance.x )
                                 {
                                     model3->geosetSelect = 0;
                                 }
-                                else if ( yval >= (double)sithWorld_pCurrentWorld->lodDistance.y )
+                                else if ( yval >= (flex_d_t)sithWorld_pCurrentWorld->lodDistance.y )
                                 {
                                     model3->geosetSelect = 2;
                                 }
@@ -1653,13 +1653,13 @@ void sithRender_RenderThings()
 
                                 break;
                             default:
-                                if ( yval < (double)sithWorld_pCurrentWorld->lodDistance.x )
+                                if ( yval < (flex_d_t)sithWorld_pCurrentWorld->lodDistance.x )
                                 {
                                     model3->geosetSelect = 0;
                                 }
-                                else if ( yval < (double)sithWorld_pCurrentWorld->lodDistance.y )
+                                else if ( yval < (flex_d_t)sithWorld_pCurrentWorld->lodDistance.y )
                                     model3->geosetSelect = 1;
-                                else if ( yval >= (double)sithWorld_pCurrentWorld->lodDistance.z )
+                                else if ( yval >= (flex_d_t)sithWorld_pCurrentWorld->lodDistance.z )
                                     model3->geosetSelect = 3;
                                 else
                                     model3->geosetSelect = 2;
@@ -1668,7 +1668,7 @@ void sithRender_RenderThings()
                     }
                     
                     texMode = thingIter->rdthing.desiredTexMode;
-                    if ( yval >= (double)curWorld->perspectiveDistance )
+                    if ( yval >= (flex_d_t)curWorld->perspectiveDistance )
                     {
                         thingIter->rdthing.curTexMode = texMode > RD_TEXTUREMODE_AFFINE ? RD_TEXTUREMODE_AFFINE : texMode;
                     }
@@ -1679,7 +1679,7 @@ void sithRender_RenderThings()
                             texMode2 = thingIter->rdthing.desiredTexMode;
                         thingIter->rdthing.curTexMode = texMode2;
                     }
-                    if ( yval >= (double)curWorld->perspectiveDistance )
+                    if ( yval >= (flex_d_t)curWorld->perspectiveDistance )
                     {
                         thingIter->rdthing.curTexMode = texMode > RD_TEXTUREMODE_AFFINE ? RD_TEXTUREMODE_AFFINE : texMode;
                     }
@@ -1713,7 +1713,7 @@ void sithRender_RenderThings()
                                 lightMode = RD_LIGHTMODE_DIFFUSE;
                         }
                     }
-                    else if ( (thingIter->thingflags & SITH_TF_IGNOREGOURAUDDISTANCE) == 0 && yval >= (double)sithWorld_pCurrentWorld->gouradDistance )
+                    else if ( (thingIter->thingflags & SITH_TF_IGNOREGOURAUDDISTANCE) == 0 && yval >= (flex_d_t)sithWorld_pCurrentWorld->gouradDistance )
                     {
                         lightMode = thingIter->rdthing.desiredLightMode;
                         if ( lightMode > RD_LIGHTMODE_DIFFUSE)
@@ -1785,9 +1785,9 @@ int sithRender_RenderThing(sithThing *pThing)
         uint32_t flashG = pThing->explosionParams.flashG;
         uint32_t flashR = pThing->explosionParams.flashR;
         uint32_t flashB = pThing->explosionParams.flashB;
-        flex_t flashMagnitude = ((double)(flashB + flashR + flashG) * 0.013020833 - rdCamera_pCurCamera->attenuationMin * cameraDist) * 0.1;
+        flex_t flashMagnitude = ((flex_d_t)(flashB + flashR + flashG) * 0.013020833 - rdCamera_pCurCamera->attenuationMin * cameraDist) * 0.1;
         if ( flashMagnitude > 0.0 ) {
-            sithPlayer_AddDyamicAdd((__int64)((double)flashR * flashMagnitude - -0.5), (__int64)((double)flashG * flashMagnitude - -0.5), (__int64)((double)flashB * flashMagnitude - -0.5));
+            sithPlayer_AddDyamicAdd((__int64)((flex_d_t)flashR * flashMagnitude - -0.5), (__int64)((flex_d_t)flashG * flashMagnitude - -0.5), (__int64)((flex_d_t)flashB * flashMagnitude - -0.5));
         }
         pThing->explosionParams.typeflags &= ~SITHEXPLOSION_FLAG_FLASH_BLINDS_THINGS;
     }
@@ -1798,7 +1798,7 @@ void sithRender_RenderAlphaSurfaces()
 {
     sithSurface *v0; // edi
     sithSector *v1; // esi
-    double v2; // st7
+    flex_d_t v2; // st7
     unsigned int v4; // ebp
     int v7; // eax
     rdProcEntry *v9; // esi

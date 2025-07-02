@@ -399,7 +399,7 @@ void stdSound_BufferSetFrequency(stdSound_buffer_t* sound, int freq)
 {
     if (Main_bHeadless) return;
 
-    flex_t pitch = (double)freq / (double)sound->nSamplesPerSec;
+    flex_t pitch = (flex_d_t)freq / (flex_d_t)sound->nSamplesPerSec;
     
     if (sound->source) {
         alSourcef(sound->source, AL_PITCH, pitch);
@@ -658,7 +658,7 @@ void stdSound_BufferSetPan(stdSound_buffer_t* a1, flex_t a2)
 
 void stdSound_BufferSetFrequency(stdSound_buffer_t* sound, int freq)
 {
-    flex_t pitch = (double)freq / (double)sound->nSamplesPerSec;
+    flex_t pitch = (flex_d_t)freq / (flex_d_t)sound->nSamplesPerSec;
 }
 
 stdSound_buffer_t* stdSound_BufferDuplicate(stdSound_buffer_t* sound)

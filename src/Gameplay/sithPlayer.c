@@ -178,7 +178,7 @@ void sithPlayer_Tick(sithPlayerInfo *playerInfo, flex_t a2)
     int v2; // edi
     sithThing *v3; // esi
     stdPalEffect *pPalEffect; // ebx
-    double v5; // st7
+    flex_d_t v5; // st7
     int v14; // ecx
     flex_t v20; // [esp+0h] [ebp-4h]
 
@@ -263,7 +263,7 @@ void sithPlayer_SetScreenTint(flex_t tintR, flex_t tintG, flex_t tintB)
 {
     sithThing *focusThing; // eax
     stdPalEffect *pPalEffects; // ecx
-    double v8; // st7
+    flex_d_t v8; // st7
 
     focusThing = sithWorld_pCurrentWorld->cameraFocus;
     if ( (focusThing->type & 0xA) != 0 ) // ???

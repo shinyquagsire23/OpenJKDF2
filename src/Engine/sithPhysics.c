@@ -13,8 +13,8 @@ void sithPhysics_FindFloor(sithThing *pThing, int a3)
 {
     int v4; // ecx
     sithCollisionSearchEntry *v5; // eax
-    double v8; // st7
-    double v9; // st7
+    flex_d_t v8; // st7
+    flex_d_t v9; // st7
     sithCollisionSearchEntry *i; // esi
     sithThing *v11; // edi
     rdFace *v12; // eax
@@ -224,8 +224,8 @@ void sithPhysics_ThingApplyForce(sithThing *pThing, rdVector3 *forceVec)
 
 void sithPhysics_ThingSetLook(sithThing *pThing, const rdVector3 *look, flex_t a3)
 {
-    double v4; // st7
-    double v20; // st7
+    flex_d_t v4; // st7
+    flex_d_t v20; // st7
 
     v4 = stdMath_ClipPrecision(1.0 - rdVector_Dot3(&pThing->lookOrientation.uvec, look));
     if ( v4 == 0.0 )
@@ -273,7 +273,7 @@ void sithPhysics_ApplyDrag(rdVector3 *vec, flex_t drag, flex_t mag, flex_t delta
     {
         if (drag != 0.0)
         {
-            double scaled = deltaSecs * drag;
+            flex_d_t scaled = deltaSecs * drag;
             if (scaled > 1.0)
                 scaled = 1.0;
 
@@ -390,7 +390,7 @@ void sithPhysics_ThingStop(sithThing *pThing)
 
 flex_t sithPhysics_ThingGetInsertOffsetZ(sithThing *pThing)
 {
-    double result; // st7
+    flex_d_t result; // st7
     flex_t v2; // [esp+4h] [ebp+4h]
 
     result = pThing->physicsParams.height;
@@ -638,7 +638,7 @@ void sithPhysics_ThingPhysPlayer(sithThing *player, flex_t deltaSeconds)
     flex_t rolloverCombine = deltaSeconds + player->physicsParams.physicsRolloverFrames;
 
     flex_t framesToApply = rolloverCombine * OLDSTEP_TARGET_FPS; // get number of 50FPS steps passed
-    player->physicsParams.physicsRolloverFrames = rolloverCombine - (double)(unsigned int)(int)framesToApply * OLDSTEP_DELTA_50FPS;
+    player->physicsParams.physicsRolloverFrames = rolloverCombine - (flex_d_t)(unsigned int)(int)framesToApply * OLDSTEP_DELTA_50FPS;
 
     for (int i = (int)framesToApply; i > 0; i--)
     {
@@ -681,8 +681,8 @@ void sithPhysics_ThingPhysPlayer(sithThing *player, flex_t deltaSeconds)
 // MOTS altered
 void sithPhysics_ThingPhysUnderwater(sithThing *pThing, flex_t deltaSeconds)
 {
-    double v35; // st6
-    double v51; // st7
+    flex_d_t v35; // st6
+    flex_d_t v51; // st7
     rdVector3 a1a; // [esp+24h] [ebp-48h] BYREF
     rdVector3 a3; // [esp+30h] [ebp-3Ch] BYREF
     rdMatrix34 tmpMat; // [esp+3Ch] [ebp-30h] BYREF
@@ -746,7 +746,7 @@ void sithPhysics_ThingPhysUnderwater(sithThing *pThing, flex_t deltaSeconds)
     if ( (pThing->physicsParams.physflags & SITH_PF_WATERSURFACE) != 0 && pThing->physicsParams.acceleration.z >= 0.0 )
     {
         v51 = pThing->field_48 - 0.01;
-        if ( pThing->physicsParams.velocityMaybe.z > 0.0 && pThing->physicsParams.velocityMaybe.z < (double)deltaSeconds * 0.2 ) // verify first
+        if ( pThing->physicsParams.velocityMaybe.z > 0.0 && pThing->physicsParams.velocityMaybe.z < (flex_d_t)deltaSeconds * 0.2 ) // verify first
             pThing->physicsParams.velocityMaybe.z = 0.0;
         if ( v51 > 0.0 )
         {
