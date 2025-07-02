@@ -21,7 +21,7 @@
 #define sithMain_set_sithmode_5_ADDR (0x004C4DB0)
 #define sithMain_SetEpisodeName_ADDR (0x004C4DC0)
 
-extern float sithMain_lastAspect;
+extern flex_t sithMain_lastAspect;
 
 int sithMain_Startup(HostServices *commonFuncs);
 void sithMain_Shutdown();

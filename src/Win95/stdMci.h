@@ -19,7 +19,7 @@
 int stdMci_Startup();
 void stdMci_Shutdown();
 int stdMci_Play(uint8_t trackFrom, uint8_t trackTo);
-void stdMci_SetVolume(float vol);
+void stdMci_SetVolume(flex_t vol);
 void stdMci_Stop();
 int stdMci_CheckStatus();
 double stdMci_GetTrackLength(int track);

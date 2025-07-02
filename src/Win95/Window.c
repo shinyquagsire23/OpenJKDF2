@@ -402,15 +402,16 @@ void Window_HandleMouseMove(SDL_MouseMotionEvent *event)
 
     if (!jkGame_isDDraw)
     {
-        float fX = (float)x;
-        float fY = (float)y;
+        // FLEXTODO
+        flex_t fX = (flex_t)x;
+        flex_t fY = (flex_t)y;
 
         // Keep 4:3 aspect
-        float menu_x = ((float)Window_screenXSize - ((float)Window_screenYSize * (640.0 / 480.0))) / 2.0;
-        float menu_w = ((float)Window_screenYSize * (640.0 / 480.0));
+        flex_t menu_x = ((flex_t)Window_screenXSize - ((flex_t)Window_screenYSize * (640.0 / 480.0))) / 2.0;
+        flex_t menu_w = ((flex_t)Window_screenYSize * (640.0 / 480.0));
 
-        Window_mouseX = (int)(((fX - menu_x) / (float)menu_w) * 640.0);
-        Window_mouseY = (int)((fY / (float)Window_screenYSize) * 480.0);
+        Window_mouseX = (int)(((fX - menu_x) / (flex_t)menu_w) * 640.0);
+        Window_mouseY = (int)((fY / (flex_t)Window_screenYSize) * 480.0);
         //printf("%d %d\n", Window_mouseX, Window_mouseY);
     }
     else

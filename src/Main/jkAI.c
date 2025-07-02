@@ -52,15 +52,15 @@ int jkAI_SaberFighting(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
     unsigned int v11; // eax
     int v12; // eax
     sithThing *v13; // ecx
-    float *v14; // ecx
+    flex_t *v14; // ecx
     int v17_lo; // rax lo
     double v18; // st7
     int v19; // ebx
     signed int v20; // edi
     sithThing *v21; // ecx
     int v23; // eax
-    float a2a; // [esp+1Ch] [ebp+4h]
-    float a3a; // [esp+28h] [ebp+10h]
+    flex_t a2a; // [esp+1Ch] [ebp+4h]
+    flex_t a3a; // [esp+28h] [ebp+10h]
 
     v5 = 0;
     if ( flags )
@@ -235,7 +235,7 @@ int jkAI_SpecialAttack(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
                         if ( aiclassa >= 0 )
                         {
                             v15 = actor->thing;
-                            instinct->param0 = (float)aiclassa;
+                            instinct->param0 = (flex_t)aiclassa;
                             jkSaber_Enable(v15, aiclass->argsAsFloat[7], 0.3, 0.0);
                             sithAI_SetMoveThing(actor, &actor->field_1D4, 4.0);
                             v16 = aiclass->argsAsInt[4] + sithTime_curMs;
@@ -283,10 +283,10 @@ int jkAI_ForcePowers(sithActor *actor, sithAIClassEntry *aiclass, sithActorInsti
     double v7; // st6
     int v8; // eax
     int v9; // eax
-    float v12; // [esp+0h] [ebp-28h]
-    float v13; // [esp+4h] [ebp-24h]
+    flex_t v12; // [esp+0h] [ebp-28h]
+    flex_t v13; // [esp+4h] [ebp-24h]
     int v14; // [esp+20h] [ebp-8h]
-    float instincta; // [esp+34h] [ebp+Ch]
+    flex_t instincta; // [esp+34h] [ebp+Ch]
 
     v6 = 0;
     v14 = 0;
@@ -318,8 +318,8 @@ int jkAI_ForcePowers(sithActor *actor, sithAIClassEntry *aiclass, sithActorInsti
 LABEL_25:
     if ( v6 )
     {
-        v13 = (float)v14;
-        v12 = (float)(unsigned int)actor->pDistractor->thingIdx;
+        v13 = (flex_t)v14;
+        v12 = (flex_t)(unsigned int)actor->pDistractor->thingIdx;
         sithCog_SendMessageFromThingEx(actor->thing, 0, SITH_MESSAGE_USER0, v12, v13, 0.0, 0.0);
         instinct->nextUpdate = sithTime_curMs + aiclass->argsAsInt[v6 + 9];
     }

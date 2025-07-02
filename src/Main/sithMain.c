@@ -45,7 +45,7 @@
 #include <math.h>
 #endif
 
-float sithMain_lastAspect = 1.0;
+flex_t sithMain_lastAspect = 1.0;
 
 int sithMain_Startup(HostServices *commonFuncs)
 {
@@ -256,7 +256,7 @@ int sithMain_Tick()
 
             //printf("%f %f\n", framesToApply, rolloverCombine);
 
-            float tmp = sithTime_deltaSeconds;
+            flex_t tmp = sithTime_deltaSeconds;
             uint32_t tmp2 = sithTime_deltaMs;
             sithTime_deltaSeconds = DELTA_PHYSTICK_FPS;
             sithTime_deltaMs = (int)(DELTA_PHYSTICK_FPS * 1000.0);
@@ -309,11 +309,11 @@ int sithMain_Tick()
             }
             sithControl_FinishRead();
 
-            float tmp = sithTime_deltaSeconds;
+            flex_t tmp = sithTime_deltaSeconds;
             uint32_t tmp2 = sithTime_deltaMs;
-            float tmp3 = sithTime_TickHz;
-            float tmp4 = stdControl_updateKHz;
-            float tmp5 = stdControl_updateHz;
+            flex_t tmp3 = sithTime_TickHz;
+            flex_t tmp4 = stdControl_updateKHz;
+            flex_t tmp5 = stdControl_updateHz;
             uint32_t tmp6 = sithTime_curMs;
             sithTime_curMs -= sithTime_deltaMs;
             sithTime_deltaSeconds = DELTA_PHYSTICK_FPS;
@@ -407,7 +407,7 @@ void sithMain_UpdateCamera()
         if (sithCamera_currentCamera && sithCamera_currentCamera->rdCam.canvas)
         {
             // Set screen aspect ratio
-            float aspect = sithCamera_currentCamera->rdCam.canvas->screen_width_half / sithCamera_currentCamera->rdCam.canvas->screen_height_half;
+            flex_t aspect = sithCamera_currentCamera->rdCam.canvas->screen_width_half / sithCamera_currentCamera->rdCam.canvas->screen_height_half;
             
             //if (aspect != sithMain_lastAspect)
             if (!Main_bMotsCompat)

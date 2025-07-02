@@ -51,7 +51,7 @@ int stdAssert(const char *pMsg, const char *pFileName, int lineNo);
 void* stdDebugMalloc(unsigned int amt);
 void stdDebugFree(void *p);
 void* stdDebugRealloc(void *p, unsigned int amt);
-void stdDelay(int unk, float dur);
+void stdDelay(int unk, flex_t dur);
 
 //static void (*stdStartup)(struct HostServices *a1) = (void*)stdStartup_ADDR;
 //static void (*stdInitServices)(HostServices *a1) = (void*)stdInitServices_ADDR;

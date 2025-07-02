@@ -11,6 +11,6 @@
 int jkControl_Startup();
 int jkControl_Shutdown();
 void jkControl_nullsub_37();
-int jkControl_HandleHudKeys(sithThing *player, float b);
+int jkControl_HandleHudKeys(sithThing *player, flex_t b);
 
 #endif // _JKCONTROL_H

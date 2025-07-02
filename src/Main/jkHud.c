@@ -353,21 +353,21 @@ void jkHud_Draw()
     int v53; // esi
     jkHudTeamScore *v54; // edi
     wchar_t *v55; // eax
-    float v56; // [esp+0h] [ebp-168h]
-    float v57; // [esp+0h] [ebp-168h]
-    float v58; // [esp+0h] [ebp-168h]
-    float v59; // [esp+0h] [ebp-168h]
-    float v60; // [esp+0h] [ebp-168h]
-    float a2; // [esp+4h] [ebp-164h]
-    float a2a; // [esp+4h] [ebp-164h]
-    float a2b; // [esp+4h] [ebp-164h]
-    float a2c; // [esp+4h] [ebp-164h]
-    float a2d; // [esp+4h] [ebp-164h]
+    flex_t v56; // [esp+0h] [ebp-168h]
+    flex_t v57; // [esp+0h] [ebp-168h]
+    flex_t v58; // [esp+0h] [ebp-168h]
+    flex_t v59; // [esp+0h] [ebp-168h]
+    flex_t v60; // [esp+0h] [ebp-168h]
+    flex_t a2; // [esp+4h] [ebp-164h]
+    flex_t a2a; // [esp+4h] [ebp-164h]
+    flex_t a2b; // [esp+4h] [ebp-164h]
+    flex_t a2c; // [esp+4h] [ebp-164h]
+    flex_t a2d; // [esp+4h] [ebp-164h]
     wchar_t *v66; // [esp+8h] [ebp-160h]
     rdRect a4; // [esp+28h] [ebp-140h] BYREF
     char tmp[32]; // [esp+48h] [ebp-120h] BYREF
     wchar_t a6[128]; // [esp+68h] [ebp-100h] BYREF
-    float tmpFloat1;
+    flex_t tmpFloat1;
 
     if (!jkHud_bOpened)
         return;
@@ -638,7 +638,7 @@ void jkHud_Draw()
     rdScreenPoint tmpScreenPt;
     if ( jkHud_bHasTarget && jkHud_pTargetThing && rdPrimit3_GetScreenCoord(&jkHud_pTargetThing->position, &tmpScreenPt) )
     {
-        float valSin, valCos;
+        flex_t valSin, valCos;
         a2 = sithTime_curSeconds * 200.0;
         if ( Video_format.format.is16bit )
         {
@@ -954,21 +954,21 @@ void jkHud_DrawGPU()
     int v53; // esi
     jkHudTeamScore *v54; // edi
     wchar_t *v55; // eax
-    float v56; // [esp+0h] [ebp-168h]
-    float v57; // [esp+0h] [ebp-168h]
-    float v58; // [esp+0h] [ebp-168h]
-    float v59; // [esp+0h] [ebp-168h]
-    float v60; // [esp+0h] [ebp-168h]
-    float a2; // [esp+4h] [ebp-164h]
-    float a2a; // [esp+4h] [ebp-164h]
-    float a2b; // [esp+4h] [ebp-164h]
-    float a2c; // [esp+4h] [ebp-164h]
-    float a2d; // [esp+4h] [ebp-164h]
+    flex_t v56; // [esp+0h] [ebp-168h]
+    flex_t v57; // [esp+0h] [ebp-168h]
+    flex_t v58; // [esp+0h] [ebp-168h]
+    flex_t v59; // [esp+0h] [ebp-168h]
+    flex_t v60; // [esp+0h] [ebp-168h]
+    flex_t a2; // [esp+4h] [ebp-164h]
+    flex_t a2a; // [esp+4h] [ebp-164h]
+    flex_t a2b; // [esp+4h] [ebp-164h]
+    flex_t a2c; // [esp+4h] [ebp-164h]
+    flex_t a2d; // [esp+4h] [ebp-164h]
     wchar_t *v66; // [esp+8h] [ebp-160h]
     rdRect a4; // [esp+28h] [ebp-140h] BYREF
     char tmp[32]; // [esp+48h] [ebp-120h] BYREF
     wchar_t a6[128]; // [esp+68h] [ebp-100h] BYREF
-    float tmpFloat1;
+    flex_t tmpFloat1;
 
     if (!jkHud_bOpened)
         return;
@@ -1052,7 +1052,7 @@ void jkHud_DrawGPU()
                 jkHud_pFieldlightBm->yPos,
                 0,
                 1);*/
-            std3D_DrawUIBitmap(jkHud_pFieldlightBm, v6, jkHud_rightBlitX + (int)((float)jkHud_pFieldlightBm->xPos * jkPlayer_hudScale), jkHud_rightBlitY + (int)((float)jkHud_pFieldlightBm->yPos * jkPlayer_hudScale), NULL, jkPlayer_hudScale, 1);
+            std3D_DrawUIBitmap(jkHud_pFieldlightBm, v6, jkHud_rightBlitX + (int)((flex_t)jkHud_pFieldlightBm->xPos * jkPlayer_hudScale), jkHud_rightBlitY + (int)((flex_t)jkHud_pFieldlightBm->yPos * jkPlayer_hudScale), NULL, jkPlayer_hudScale, 1);
         }
         v7 = (int32_t)sithInventory_GetBinAmount(v4, SITHBIN_FORCEMANA);
         if ( v7 < 0 )
@@ -1208,8 +1208,8 @@ void jkHud_DrawGPU()
         //rdPrimit2_DrawClippedLine(Video_pCanvas, v22,       v23 - v24, v22,       v23 - v25, tmpInt, -1);
         //rdPrimit2_DrawClippedLine(Video_pCanvas, v22,       v23 + v25, v22,       v23 + v24, tmpInt, -1);
 
-        float line_len = v24 - v25 + 1;
-        float line_width = jkPlayer_crosshairLineWidth;
+        flex_t line_len = v24 - v25 + 1;
+        flex_t line_width = jkPlayer_crosshairLineWidth;
 
         rdRect rect1 = {v22 - v24, v23-(line_width/2), line_len, line_width}; // left
         rdRect rect2 = {v22 + v25, v23-(line_width/2), line_len, line_width}; // right
@@ -1228,7 +1228,7 @@ void jkHud_DrawGPU()
     rdScreenPoint tmpScreenPt;
     if ( jkHud_bHasTarget && jkHud_pTargetThing && rdPrimit3_GetScreenCoord(&jkHud_pTargetThing->position, &tmpScreenPt) )
     {
-        float valSin, valCos;
+        flex_t valSin, valCos;
         a2 = sithTime_curSeconds * 200.0;
         if ( Video_format.format.is16bit )
         {

@@ -243,7 +243,7 @@ int sithCvar_Register(const char* pName, int32_t type, intptr_t defaultVal, void
             pCvar->intVal = (int32_t)defaultVal;
             break;
         case CVARTYPE_FLEX:
-            pCvar->flexVal = *(float*)&defaultVal;
+            pCvar->flexVal = *(flex_t*)&defaultVal;
             break;
         case CVARTYPE_STR:
         {
@@ -283,10 +283,10 @@ int sithCvar_RegisterInt(const char* pName, int32_t val, void* pLinkPtr, uint32_
     return sithCvar_Register(pName, CVARTYPE_INT, (intptr_t)val, pLinkPtr, flags);
 }
 
-int sithCvar_RegisterFlex(const char* pName, float val, void* pLinkPtr, uint32_t flags)
+int sithCvar_RegisterFlex(const char* pName, flex_t val, void* pLinkPtr, uint32_t flags)
 {
     intptr_t valRaw = 0;
-    *(float*)&valRaw = val;
+    *(flex_t*)&valRaw = val;
 
     return sithCvar_Register(pName, CVARTYPE_FLEX, valRaw, pLinkPtr, flags);
 }
@@ -371,7 +371,7 @@ int sithCvar_SetInt(const char* pName, int32_t val)
     return sithCvar_UpdateLinkInternal(pCvar);
 }
 
-int sithCvar_SetFlex(const char* pName, float val)
+int sithCvar_SetFlex(const char* pName, flex_t val)
 {
     if (!pName) return 0;
 
@@ -425,7 +425,7 @@ int sithCvar_UpdateLinkInternal(tSithCvar* pCvar)
             *(int32_t*)pCvar->pLinkPtr = pCvar->intVal;
             break;
         case CVARTYPE_FLEX:
-            *(float*)pCvar->pLinkPtr = pCvar->flexVal;
+            *(flex_t*)pCvar->pLinkPtr = pCvar->flexVal;
             break;
         case CVARTYPE_STR:
             memset((char*)pCvar->pLinkPtr, 0, SITHCVAR_MAX_STRLEN);
@@ -453,7 +453,7 @@ int sithCvar_UpdateValInternal(tSithCvar* pCvar)
             pCvar->intVal = *(int32_t*)pCvar->pLinkPtr;
             break;
         case CVARTYPE_FLEX:
-            pCvar->flexVal = *(float*)pCvar->pLinkPtr;
+            pCvar->flexVal = *(flex_t*)pCvar->pLinkPtr;
             break;
         case CVARTYPE_STR:
             stdString_SafeStrCopy(pCvar->pStrVal, (char*)pCvar->pLinkPtr, SITHCVAR_MAX_STRLEN);
@@ -510,7 +510,7 @@ int32_t sithCvar_GetInt(const char* pName)
     return pCvar->intVal;
 }
 
-float sithCvar_GetFlex(const char* pName)
+flex_t sithCvar_GetFlex(const char* pName)
 {
     if (!pName) return -1;
 
@@ -575,7 +575,7 @@ int sithCvar_SetFromString(const char* pName, const char* pStrVal)
         return 0;
     }
 
-    float readValFlex = 0.0;
+    flex_t readValFlex = 0.0;
     int readValInt = 0;
 
     switch (pCvar->type) {

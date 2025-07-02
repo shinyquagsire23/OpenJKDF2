@@ -577,25 +577,25 @@ int jkEpisode_UpdateExtra(sithThing *pPlayerThing)
         uint32_t bubbleType;
         int local_14;
         int bHasBubble;
-        float bubbleRadSqrd;
+        flex_t bubbleRadSqrd;
 
         sithThing* pBubbleThing = NULL;
         bHasBubble = jkEpisode_GetBubbleInfo(pPlayerThing,&bubbleType,&pBubbleThing,&bubbleRadSqrd);
         iVar4 = 0;
         if (bHasBubble == 0) {
             if (playerThings[playerThingIdx].jkmUnk4 != 0) {
-                sithCog_SendMessageFromThingEx(pPlayerThing, NULL, SITH_MESSAGE_EXITBUBBLE,(float)playerThings[playerThingIdx].jkmUnk5,0.0,0.0,0.0);
+                sithCog_SendMessageFromThingEx(pPlayerThing, NULL, SITH_MESSAGE_EXITBUBBLE,(flex_t)playerThings[playerThingIdx].jkmUnk5,0.0,0.0,0.0);
 
                 for (int binIdx = 0; binIdx < SITHBIN_NUMBINS; binIdx++) 
                 {
                     if (sithInventory_GetAvailable(pPlayerThing, binIdx) && (sithInventory_aDescriptors[binIdx].flags & 8) && sithInventory_aDescriptors[binIdx].cog) {
-                        sithCog_SendMessageEx(sithInventory_aDescriptors[binIdx].cog, SITH_MESSAGE_EXITBUBBLE, SENDERTYPE_THING, pPlayerThing->thingIdx, 0,-1,0,(float)playerThings[playerThingIdx].jkmUnk5,0.0,0.0,0.0);
+                        sithCog_SendMessageEx(sithInventory_aDescriptors[binIdx].cog, SITH_MESSAGE_EXITBUBBLE, SENDERTYPE_THING, pPlayerThing->thingIdx, 0,-1,0,(flex_t)playerThings[playerThingIdx].jkmUnk5,0.0,0.0,0.0);
                     }
                 }
             }
         }
         else if (playerThings[playerThingIdx].jkmUnk4 == 0) {
-            sithCog_SendMessageFromThingEx(pPlayerThing,pBubbleThing,SITH_MESSAGE_ENTERBUBBLE,(float)bubbleType,0.0,0.0,0.0);
+            sithCog_SendMessageFromThingEx(pPlayerThing,pBubbleThing,SITH_MESSAGE_ENTERBUBBLE,(flex_t)bubbleType,0.0,0.0,0.0);
             if (!pBubbleThing) {
                 uVar5 = 0xffffffff;
                 iVar4 = 0;
@@ -608,23 +608,23 @@ int jkEpisode_UpdateExtra(sithThing *pPlayerThing)
             for (int binIdx = 0; binIdx < SITHBIN_NUMBINS; binIdx++) 
             {
                 if (sithInventory_GetAvailable(pPlayerThing, binIdx) && (sithInventory_aDescriptors[binIdx].flags & 8) && sithInventory_aDescriptors[binIdx].cog) {
-                    sithCog_SendMessageEx(sithInventory_aDescriptors[binIdx].cog, SITH_MESSAGE_ENTERBUBBLE, SENDERTYPE_THING, pPlayerThing->thingIdx, iVar4,uVar5,0,(float)playerThings[playerThingIdx].jkmUnk5,0.0,0.0,0.0);
+                    sithCog_SendMessageEx(sithInventory_aDescriptors[binIdx].cog, SITH_MESSAGE_ENTERBUBBLE, SENDERTYPE_THING, pPlayerThing->thingIdx, iVar4,uVar5,0,(flex_t)playerThings[playerThingIdx].jkmUnk5,0.0,0.0,0.0);
                 }
             }
         }
         else {
-            if ((float)playerThings[playerThingIdx].jkmUnk5 != (float)bubbleType) 
+            if ((flex_t)playerThings[playerThingIdx].jkmUnk5 != (flex_t)bubbleType) 
             {
-                sithCog_SendMessageFromThingEx(pPlayerThing, NULL, SITH_MESSAGE_EXITBUBBLE,(float)playerThings[playerThingIdx].jkmUnk5,0.0,0.0,0.0);
+                sithCog_SendMessageFromThingEx(pPlayerThing, NULL, SITH_MESSAGE_EXITBUBBLE,(flex_t)playerThings[playerThingIdx].jkmUnk5,0.0,0.0,0.0);
                 
                 for (int binIdx = 0; binIdx < SITHBIN_NUMBINS; binIdx++) 
                 {
                     if (sithInventory_GetAvailable(pPlayerThing, binIdx) && (sithInventory_aDescriptors[binIdx].flags & 8) && sithInventory_aDescriptors[binIdx].cog) {
-                        sithCog_SendMessageEx(sithInventory_aDescriptors[binIdx].cog, SITH_MESSAGE_EXITBUBBLE, SENDERTYPE_THING, pPlayerThing->thingIdx, 0,-1,0,(float)playerThings[playerThingIdx].jkmUnk5,0.0,0.0,0.0);
+                        sithCog_SendMessageEx(sithInventory_aDescriptors[binIdx].cog, SITH_MESSAGE_EXITBUBBLE, SENDERTYPE_THING, pPlayerThing->thingIdx, 0,-1,0,(flex_t)playerThings[playerThingIdx].jkmUnk5,0.0,0.0,0.0);
                     }
                 }
 
-                sithCog_SendMessageFromThingEx(pPlayerThing,pBubbleThing,SITH_MESSAGE_ENTERBUBBLE,(float)bubbleType,0.0,0.0,0.0);
+                sithCog_SendMessageFromThingEx(pPlayerThing,pBubbleThing,SITH_MESSAGE_ENTERBUBBLE,(flex_t)bubbleType,0.0,0.0,0.0);
                 
                 if (!pBubbleThing) {
                     uVar5 = 0xffffffff;
@@ -638,7 +638,7 @@ int jkEpisode_UpdateExtra(sithThing *pPlayerThing)
                 for (int binIdx = 0; binIdx < SITHBIN_NUMBINS; binIdx++) 
                 {
                     if (sithInventory_GetAvailable(pPlayerThing, binIdx) && (sithInventory_aDescriptors[binIdx].flags & 8) && sithInventory_aDescriptors[binIdx].cog) {
-                        sithCog_SendMessageEx(sithInventory_aDescriptors[binIdx].cog, SITH_MESSAGE_ENTERBUBBLE, SENDERTYPE_THING, pPlayerThing->thingIdx, iVar4,uVar5,0,(float)playerThings[playerThingIdx].jkmUnk5,0.0,0.0,0.0);
+                        sithCog_SendMessageEx(sithInventory_aDescriptors[binIdx].cog, SITH_MESSAGE_ENTERBUBBLE, SENDERTYPE_THING, pPlayerThing->thingIdx, iVar4,uVar5,0,(flex_t)playerThings[playerThingIdx].jkmUnk5,0.0,0.0,0.0);
                     }
                 }
             }
@@ -706,7 +706,7 @@ LABEL_7:
 }
 
 // MOTS added
-void jkEpisode_CreateBubble(sithThing *pThing,float radius,uint32_t type)
+void jkEpisode_CreateBubble(sithThing *pThing,flex_t radius,uint32_t type)
 {
     int iVar1;
     jkBubbleInfo *pjVar2;
@@ -752,11 +752,11 @@ void jkEpisode_DestroyBubble(sithThing *pThing)
 }
 
 // MOTS added
-int jkEpisode_GetBubbleInfo(sithThing *pThing,uint32_t *pTypeOut,sithThing **pThingOut,float *pOut)
+int jkEpisode_GetBubbleInfo(sithThing *pThing,uint32_t *pTypeOut,sithThing **pThingOut,flex_t *pOut)
 {
     sithThing *psVar1;
-    float fVar3;
-    float fVar4;
+    flex_t fVar3;
+    flex_t fVar4;
     jkBubbleInfo *pjVar7;
     int iVar8;
     jkBubbleInfo *pjVar9;

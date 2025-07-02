@@ -369,7 +369,7 @@ int _strncmp(const char *s1, const char *s2, size_t n);
 int __wcscmp(const wchar_t *a, const wchar_t *b);
 int __wcsicmp(const wchar_t *a, const wchar_t *b);
 
-float _frand();
+flex_t _frand();
 
 void jk_init();
 int _iswspace(int a);

@@ -17,7 +17,7 @@
 void jkHudInv_DrawGPU();
 
 // MOTS added
-float jkHud_aBinMaxAmt[SITHBIN_NUMBINS] = {0};
+flex_t jkHud_aBinMaxAmt[SITHBIN_NUMBINS] = {0};
 
 // MOTS altered
 int jkHudInv_ItemDatLoad(char *fpath)
@@ -26,8 +26,8 @@ int jkHudInv_ItemDatLoad(char *fpath)
     unsigned int v3; // ebp
     sithCog *cog_; // eax
     sithCog *cog; // [esp+10h] [ebp-10h]
-    float max; // [esp+18h] [ebp-8h]
-    float min; // [esp+1Ch] [ebp-4h]
+    flex_t max; // [esp+18h] [ebp-8h]
+    flex_t min; // [esp+1Ch] [ebp-4h]
     int flags;
 
     if (!stdConffile_OpenRead(fpath))

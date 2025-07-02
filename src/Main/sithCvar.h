@@ -21,13 +21,13 @@ int sithCvar_Register(const char* pName, int32_t type, intptr_t defaultVal, void
 int sithCvar_RegisterStr(const char* pName, const char* pVal, void* pLinkPtr, uint32_t flags);
 int sithCvar_RegisterBool(const char* pName, int32_t val, void* pLinkPtr, uint32_t flags);
 int sithCvar_RegisterInt(const char* pName, int32_t val, void* pLinkPtr, uint32_t flags);
-int sithCvar_RegisterFlex(const char* pName, float val, void* pLinkPtr, uint32_t flags);
+int sithCvar_RegisterFlex(const char* pName, flex_t val, void* pLinkPtr, uint32_t flags);
 
 int sithCvar_SetRaw(const char* pName, intptr_t val);
 int sithCvar_SetStr(const char* pName, const char* pVal);
 int sithCvar_SetBool(const char* pName, int32_t val);
 int sithCvar_SetInt(const char* pName, int32_t val);
-int sithCvar_SetFlex(const char* pName, float val);
+int sithCvar_SetFlex(const char* pName, flex_t val);
 
 int sithCvar_Link(const char* pName, void* pLinkPtr);
 int sithCvar_UpdateLink(const char* pName);
@@ -37,7 +37,7 @@ int sithCvar_UpdateValInternal(tSithCvar* pCvar);
 const char* sithCvar_GetStr(const char* pName);
 int32_t sithCvar_GetBool(const char* pName);
 int32_t sithCvar_GetInt(const char* pName);
-float sithCvar_GetFlex(const char* pName);
+flex_t sithCvar_GetFlex(const char* pName);
 
 void sithCvar_Enumerate(sithCvarEnumerationFn_t fnCallback);
 void sithCvar_ToString(const char* pName, char* pOut, int outSize);

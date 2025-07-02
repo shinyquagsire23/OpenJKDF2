@@ -127,7 +127,7 @@ int Video_camera_related()
     int v8; // edx
     int v10; // [esp+10h] [ebp-20h]
     signed int v11; // [esp+14h] [ebp-1Ch]
-    float a1; // [esp+18h] [ebp-18h]
+    flex_t a1; // [esp+18h] [ebp-18h]
     int a1a; // [esp+18h] [ebp-18h]
     rdRect viewRect; // [esp+20h] [ebp-10h] BYREF
 

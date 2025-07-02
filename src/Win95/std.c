@@ -139,7 +139,7 @@ void* stdDebugRealloc(void *p, unsigned int amt)
 }
 
 
-void stdDelay(int unk, float dur)
+void stdDelay(int unk, flex_t dur)
 {
     int ts = (__int64)(dur * std_pHS->some_float - -0.5) + std_pHS->getTimerTick();
     while ( std_pHS->getTimerTick() < ts ) {

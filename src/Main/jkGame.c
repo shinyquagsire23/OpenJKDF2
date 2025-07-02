@@ -358,15 +358,15 @@ void jkGame_PrecalcViewSizes(int width, int height, jkViewSize *aOut)
 {
     double v5; // st7
     double v6; // st6
-    float v7; // [esp+4h] [ebp-Ch]
-    float v8;
-    float widtha; // [esp+14h] [ebp+4h]
-    float widthb; // [esp+14h] [ebp+4h]
-    float heighta; // [esp+18h] [ebp+8h]
+    flex_t v7; // [esp+4h] [ebp-Ch]
+    flex_t v8;
+    flex_t widtha; // [esp+14h] [ebp+4h]
+    flex_t widthb; // [esp+14h] [ebp+4h]
+    flex_t heighta; // [esp+18h] [ebp+8h]
 
     v5 = (double)width;
 
-    widtha = (float)height;
+    widtha = (flex_t)height;
     heighta = widtha;
     v6 = widtha * 0.5;
     widthb = v5 * 0.5;

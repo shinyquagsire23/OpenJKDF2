@@ -67,7 +67,7 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
 
     //if (jkGame_isDDraw)
     {
-        newW = (uint32_t)((float)Window_xSize * ((480.0*2.0)/Window_ySize));
+        newW = (uint32_t)((flex_t)Window_xSize * ((480.0*2.0)/Window_ySize));
         newH = 480*2;
     }
 

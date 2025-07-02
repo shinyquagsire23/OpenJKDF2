@@ -15,9 +15,9 @@ int rdroid_curVertexColorMode = 0; // MOTS added
 #endif
 
 #ifdef JKM_LIGHTING
-static float rdCache_aRedIntensities[RDCACHE_MAX_VERTICES];
-static float rdCache_aGreenIntensities[RDCACHE_MAX_VERTICES];
-static float rdCache_aBlueIntensities[RDCACHE_MAX_VERTICES];
+static flex_t rdCache_aRedIntensities[RDCACHE_MAX_VERTICES];
+static flex_t rdCache_aGreenIntensities[RDCACHE_MAX_VERTICES];
+static flex_t rdCache_aBlueIntensities[RDCACHE_MAX_VERTICES];
 #endif
 
 int rdCache_Startup()
@@ -176,7 +176,7 @@ int rdCache_SendFaceListToHardware()
     rdTexinfo *v15; // eax
     rdTexture *sith_tex_sel; // esi
     rdDDrawSurface *tex2_arr_sel; // eax
-    float *vert_lights_iter; // ecx
+    flex_t *vert_lights_iter; // ecx
     int vert_lights_iter_cnt; // edx
     double v21; // st7
     double v22; // st7
@@ -208,7 +208,7 @@ int rdCache_SendFaceListToHardware()
     int tri; // eax
     int lighting_maybe; // ebx
     size_t tri_idx; // eax
-    float *v70; // ecx
+    flex_t *v70; // ecx
     int v71; // edx
     double v72; // st7
     double v73; // st7
@@ -239,19 +239,19 @@ int rdCache_SendFaceListToHardware()
     rdTri *v114; // eax
     int v115; // ebx
     unsigned int v117; // eax
-    float actual_width; // [esp+1Ch] [ebp-84h]
-    float actual_height; // [esp+20h] [ebp-80h]
-    float v121; // [esp+24h] [ebp-7Ch]
-    float green_scalar; // [esp+34h] [ebp-6Ch]
-    float blue_scalar; // [esp+38h] [ebp-68h]
+    flex_t actual_width; // [esp+1Ch] [ebp-84h]
+    flex_t actual_height; // [esp+20h] [ebp-80h]
+    flex_t v121; // [esp+24h] [ebp-7Ch]
+    flex_t green_scalar; // [esp+34h] [ebp-6Ch]
+    flex_t blue_scalar; // [esp+38h] [ebp-68h]
     int rend_6c_current_idx; // [esp+3Ch] [ebp-64h]
-    float red_scalar; // [esp+40h] [ebp-60h]
+    flex_t red_scalar; // [esp+40h] [ebp-60h]
     int v129; // [esp+44h] [ebp-5Ch]
     int v130; // [esp+48h] [ebp-58h]
     int vertex_a; // [esp+4Ch] [ebp-54h]
     int alpha_upshifta; // [esp+4Ch] [ebp-54h]
     int alpha_is_opaque; // [esp+50h] [ebp-50h]
-    float v134; // [esp+54h] [ebp-4Ch]
+    flex_t v134; // [esp+54h] [ebp-4Ch]
     int tri_vert_idx; // [esp+58h] [ebp-48h]
     int flags_idk; // [esp+60h] [ebp-40h]
     rdTexinfo *v137; // [esp+64h] [ebp-3Ch]
@@ -263,7 +263,7 @@ int rdCache_SendFaceListToHardware()
     int flags_idk_; // [esp+78h] [ebp-28h]
     int a3; // [esp+7Ch] [ebp-24h]
     int lighting_capability; // [esp+80h] [ebp-20h]
-    float v148; // [esp+84h] [ebp-1Ch]
+    flex_t v148; // [esp+84h] [ebp-1Ch]
     int blue; // [esp+8Ch] [ebp-14h]
     int red_and_alpha; // [esp+98h] [ebp-8h]
     int green; // [esp+9Ch] [ebp-4h]
@@ -422,7 +422,7 @@ int rdCache_SendFaceListToHardware()
         {
             sith_tex_sel = v15->texture_ptr;
 
-            float z_min = active_6c->z_min * rdCamera_GetMipmapScalar(); // MOTS added
+            flex_t z_min = active_6c->z_min * rdCamera_GetMipmapScalar(); // MOTS added
             
             mipmap_level = 1;
             if (sith_tex_sel->num_mipmaps == 2)
@@ -509,8 +509,8 @@ int rdCache_SendFaceListToHardware()
                 &out_width,
                 &out_height);
             v11.mipmap_related = mipmap_related;
-            actual_width = (float)(out_width << mipmap_level);
-            actual_height = (float)(out_height << mipmap_level);
+            actual_width = (flex_t)(out_width << mipmap_level); // FLEXTODO
+            actual_height = (flex_t)(out_height << mipmap_level); // FLEXTODO
         }
 
         if ( v11.mipmap_related != 3 )
@@ -546,9 +546,9 @@ int rdCache_SendFaceListToHardware()
                 // MOTS added
 #ifdef JKM_LIGHTING
                 if (rdGetVertexColorMode() == 1) {
-                    float* iterRedIntense = active_6c->paRedIntensities;
-                    float* iterGreenIntense = active_6c->paGreenIntensities;
-                    float* iterBlueIntense = active_6c->paBlueIntensities;
+                    flex_t* iterRedIntense = active_6c->paRedIntensities;
+                    flex_t* iterGreenIntense = active_6c->paGreenIntensities;
+                    flex_t* iterBlueIntense = active_6c->paBlueIntensities;
 
                     vert_lights_iter_cnt = active_6c->numVertices;
                     do
@@ -843,9 +843,9 @@ solid_tri:
             // MOTS added
 #ifdef JKM_LIGHTING
             if (rdGetVertexColorMode() == 1) {
-                float* iterRedIntense = active_6c->paRedIntensities;
-                float* iterGreenIntense = active_6c->paGreenIntensities;
-                float* iterBlueIntense = active_6c->paBlueIntensities;
+                flex_t* iterRedIntense = active_6c->paRedIntensities;
+                flex_t* iterGreenIntense = active_6c->paGreenIntensities;
+                flex_t* iterBlueIntense = active_6c->paBlueIntensities;
 
                 v71 = active_6c->numVertices;
                 do
@@ -955,9 +955,9 @@ LABEL_232:
                     double intBlue = active_6c->paBlueIntensities[vtx_idx] * 255.0 - 0.5;
 
 
-                    intRed += (float)v91->colors[baseLight].r;
-                    intGreen += (float)v91->colors[baseLight].r;
-                    intBlue += (float)v91->colors[baseLight].r;
+                    intRed += (flex_t)v91->colors[baseLight].r; // FLEXTODO
+                    intGreen += (flex_t)v91->colors[baseLight].r; // FLEXTODO
+                    intBlue += (flex_t)v91->colors[baseLight].r; // FLEXTODO
 
                     v94 = (uint8_t)stdMath_Clamp(intGreen, 0.0, 255.0);
                     v95 = (uint8_t)stdMath_Clamp(intBlue, 0.0, 255.0);
@@ -1180,16 +1180,16 @@ int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags)
     double y_min_related; // ebx
     double v12; // st7
     double y_max_related; // [esp+Ch] [ebp-18h]
-    float v27; // [esp+10h] [ebp-14h]
-    float z_max; // [esp+14h] [ebp-10h]
-    float z_min; // [esp+18h] [ebp-Ch]
-    float y_max; // [esp+1Ch] [ebp-8h]
-    float y_min; // [esp+20h] [ebp-4h]
-    float x_min; // [esp+2Ch] [ebp+8h]
-    float extdataa; // [esp+2Ch] [ebp+8h]
-    float extdatab; // [esp+2Ch] [ebp+8h]
-    float extdatac; // [esp+2Ch] [ebp+8h]
-    float x_max; // [esp+30h] [ebp+Ch]
+    flex_t v27; // [esp+10h] [ebp-14h]
+    flex_t z_max; // [esp+14h] [ebp-10h]
+    flex_t z_min; // [esp+18h] [ebp-Ch]
+    flex_t y_max; // [esp+1Ch] [ebp-8h]
+    flex_t y_min; // [esp+20h] [ebp-4h]
+    flex_t x_min; // [esp+2Ch] [ebp+8h]
+    flex_t extdataa; // [esp+2Ch] [ebp+8h]
+    flex_t extdatab; // [esp+2Ch] [ebp+8h]
+    flex_t extdatac; // [esp+2Ch] [ebp+8h]
+    flex_t x_max; // [esp+30h] [ebp+Ch]
 
     if ( rdCache_numProcFaces >= RDCACHE_MAX_TRIS )
         return 0;
@@ -1226,12 +1226,12 @@ int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags)
             if ( v10->y < y_min )
             {
                 y_min = v10->y;
-                y_min_related = (float)v9;
+                y_min_related = (flex_t)v9; // FLEXTODO
             }
             if ( v10->y > y_max )
             {
                 y_max = v10->y;
-                y_max_related = (float)v9;
+                y_max_related = (flex_t)v9; // FLEXTODO
             }
             if ( v10->z < z_min )
                 z_min = v10->z;

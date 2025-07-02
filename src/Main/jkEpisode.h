@@ -25,9 +25,9 @@ int jkEpisode_UpdateExtra(sithThing *thing);
 int jkEpisode_idk4(jkEpisodeLoad *pEpisodeLoad, char *pEpisodeName);
 int jkEpisode_idk6(const char *pName);
 
-void jkEpisode_CreateBubble(sithThing *pThing,float radius,uint32_t type); // MOTS added
+void jkEpisode_CreateBubble(sithThing *pThing,flex_t radius,uint32_t type); // MOTS added
 void jkEpisode_DestroyBubble(sithThing *pThing); // MOTS added
-int jkEpisode_GetBubbleInfo(sithThing *pThing,uint32_t *pTypeOut,sithThing **pThingOut,float *pOut); // MOTS added
+int jkEpisode_GetBubbleInfo(sithThing *pThing,uint32_t *pTypeOut,sithThing **pThingOut,flex_t *pOut); // MOTS added
 
 //static int (*jkEpisode_Startup)() = (void*)jkEpisode_Startup_ADDR;
 //static int (*jkEpisode_Load)(jkEpisodeLoad *a1) = (void*)jkEpisode_Load_ADDR;
