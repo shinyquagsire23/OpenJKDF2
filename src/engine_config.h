@@ -261,7 +261,7 @@ extern int Window_isHiDpi;
 #endif // WIN64_STANDALONE
 
 // TODO: fixed point support?
-typedef float flex_t;
+//typedef float flex_t;
 
 // Disable warnings for Vegetable Studio
 #if 1 && defined _MSC_VER
