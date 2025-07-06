@@ -65,7 +65,7 @@ void sithCogFunction_GetSourceType(sithCog *ctx)
 
 void sithCogFunction_Rand(sithCog *ctx)
 {
-    flex_t val = _frand();
+    cog_flex_t val = _frand();
     sithCogExec_PushFlex(ctx, val);
 }
 

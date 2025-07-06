@@ -309,14 +309,14 @@ int sithCogExec_PopValue(sithCog *ctx, sithCogStackvar *stackVar)
     return 1;
 }
 
-flex_t sithCogExec_PopFlex(sithCog *ctx)
+cog_flex_t sithCogExec_PopFlex(sithCog *ctx)
 {
     sithCogStackvar tmp;
     if (!sithCogExec_PopValue(ctx, &tmp))
         return 0.0;
         
     if ( tmp.type == COG_VARTYPE_INT )
-        return (flex_t)tmp.data[0]; // FLEXTODO
+        return (cog_flex_t)tmp.data[0]; // FLEXTODO
     if ( tmp.type == COG_VARTYPE_FLEX )
         return tmp.dataAsFloat[0]; // FLEXTODO
     return 0.0;
@@ -426,7 +426,7 @@ sithThing* sithCogExec_PopThing(sithCog *ctx)
     }
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
-        idx = (int)(flex_d_t)tmp.dataAsFloat[0]; // FLEXTODO
+        idx = (int)(flex64_t)tmp.dataAsFloat[0]; // FLEXTODO
     }
     else
     {
@@ -464,7 +464,7 @@ sithThing* sithCogExec_PopTemplate(sithCog *ctx)
     }
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
-        idx = (int)(flex_d_t)tmp.dataAsFloat[0]; // FLEXTODO
+        idx = (int)(flex64_t)tmp.dataAsFloat[0]; // FLEXTODO
     }
     else
     {
@@ -500,7 +500,7 @@ sithSound* sithCogExec_PopSound(sithCog *ctx)
     }
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
-        idx = (int)(flex_d_t)tmp.dataAsFloat[0]; // FLEXTODO
+        idx = (int)(flex64_t)tmp.dataAsFloat[0]; // FLEXTODO
     }
     else
     {
@@ -542,7 +542,7 @@ sithSector* sithCogExec_PopSector(sithCog *ctx)
     }
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
-        idx = (int)(flex_d_t)tmp.dataAsFloat[0]; // FLEXTODO
+        idx = (int)(flex64_t)tmp.dataAsFloat[0]; // FLEXTODO
     }
     else
     {
@@ -578,7 +578,7 @@ sithSurface* sithCogExec_PopSurface(sithCog *ctx)
     }
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
-        idx = (int)(flex_d_t)tmp.dataAsFloat[0]; // FLEXTODO
+        idx = (int)(flex64_t)tmp.dataAsFloat[0]; // FLEXTODO
     }
     else
     {
@@ -615,7 +615,7 @@ rdMaterial* sithCogExec_PopMaterial(sithCog *ctx)
     }
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
-        idx = (int)(flex_d_t)tmp.dataAsFloat[0]; // FLEXTODO
+        idx = (int)(flex64_t)tmp.dataAsFloat[0]; // FLEXTODO
     }
     else
     {
@@ -657,7 +657,7 @@ rdModel3* sithCogExec_PopModel3(sithCog *ctx)
     }
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
-        idx = (int)(flex_d_t)tmp.dataAsFloat[0]; // FLEXTODO
+        idx = (int)(flex64_t)tmp.dataAsFloat[0]; // FLEXTODO
     }
     else
     {
@@ -699,7 +699,7 @@ rdKeyframe* sithCogExec_PopKeyframe(sithCog *ctx)
     }
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
-        idx = (int)(flex_d_t)tmp.dataAsFloat[0]; // FLEXTODO
+        idx = (int)(flex64_t)tmp.dataAsFloat[0]; // FLEXTODO
     }
     else
     {
@@ -739,7 +739,7 @@ sithAIClass* sithCogExec_PopAIClass(sithCog *ctx)
     }
     else if ( tmp.type == COG_VARTYPE_FLEX )
     {
-        idx = (int)(flex_d_t)tmp.dataAsFloat[0]; // FLEXTODO
+        idx = (int)(flex64_t)tmp.dataAsFloat[0]; // FLEXTODO
     }
     else
     {
@@ -833,7 +833,7 @@ void sithCogExec_PushInt(sithCog *ctx, int val)
     sithCogExec_PushVar(ctx, &v);
 }
 
-void sithCogExec_PushFlex(sithCog *ctx, flex_t val)
+void sithCogExec_PushFlex(sithCog *ctx, cog_flex_t val)
 {
     sithCogStackvar v;
     v.type = COG_VARTYPE_FLEX;
@@ -949,8 +949,8 @@ void sithCogExec_BitOperation(sithCog *cog_ctx, int op)
 // MOTS altered?
 void sithCogExec_MathOperation(sithCog *cog_ctx, int op)
 {
-    flex_t operand_a = sithCogExec_PopFlex(cog_ctx);
-    flex_t operand_b = sithCogExec_PopFlex(cog_ctx);
+    cog_flex_t operand_a = sithCogExec_PopFlex(cog_ctx);
+    cog_flex_t operand_b = sithCogExec_PopFlex(cog_ctx);
     switch ( op )
     {
         case COG_OPCODE_ADD:
@@ -963,7 +963,7 @@ void sithCogExec_MathOperation(sithCog *cog_ctx, int op)
             sithCogExec_PushFlex(cog_ctx, operand_a * operand_b);
             break;
         case COG_OPCODE_DIV:
-            sithCogExec_PushFlex(cog_ctx, (operand_a == 0.0) ? (flex_t)0.0 : operand_b / operand_a);
+            sithCogExec_PushFlex(cog_ctx, (operand_a == 0.0) ? (cog_flex_t)0.0 : operand_b / operand_a);
             break;
         case COG_OPCODE_MOD:
             sithCogExec_PushFlex(cog_ctx, fmod((float)operand_b, (float)operand_a));

@@ -83,22 +83,22 @@ void sithCogFunctionSector_Startup(sithCogSymboltable* a1);
 void sithCogSurface_Startup(sithCogSymboltable* a1);
 
 void sithCog_SendMessageFromThing(sithThing *a1, sithThing *a2, int msg);
-flex_t sithCog_SendMessageFromThingEx(sithThing *sender, sithThing *receiver, SITH_MESSAGE message, flex_t param0, flex_t param1, flex_t param2, flex_t param3);
+cog_flex_t sithCog_SendMessageFromThingEx(sithThing *sender, sithThing *receiver, SITH_MESSAGE message, cog_flex_t param0, cog_flex_t param1, cog_flex_t param2, cog_flex_t param3);
 void sithCog_SendMessageFromSurface(sithSurface *surface, sithThing *thing, int msg);
-flex_t sithCog_SendMessageFromSurfaceEx(sithSurface *sender, sithThing *thing, SITH_MESSAGE msg, flex_t a4, flex_t a5, flex_t a6, flex_t a7);
+cog_flex_t sithCog_SendMessageFromSurfaceEx(sithSurface *sender, sithThing *thing, SITH_MESSAGE msg, cog_flex_t a4, cog_flex_t a5, cog_flex_t a6, cog_flex_t a7);
 void sithCog_SendMessageFromSector(sithSector *sector, sithThing *thing, int message);
-flex_t sithCog_SendMessageFromSectorEx(sithSector *a1, sithThing *sourceType, SITH_MESSAGE message, flex_t param0, flex_t param1, flex_t param2, flex_t param3);
+cog_flex_t sithCog_SendMessageFromSectorEx(sithSector *a1, sithThing *sourceType, SITH_MESSAGE message, cog_flex_t param0, cog_flex_t param1, cog_flex_t param2, cog_flex_t param3);
 void sithCog_SendSimpleMessageToAll(int a1, int a2, int a3, int a4, int a5);
-void sithCog_SendMessageToAll(int cmdid, int senderType, int senderIdx, int sourceType, int sourceIdx, flex_t arg0, flex_t arg1, flex_t arg2, flex_t arg3);
+void sithCog_SendMessageToAll(int cmdid, int senderType, int senderIdx, int sourceType, int sourceIdx, cog_flex_t arg0, cog_flex_t arg1, cog_flex_t arg2, cog_flex_t arg3);
 void sithCog_SendMessage(sithCog *cog, int msgid, int senderType, int senderIndex, int sourceType, int sourceIndex, int linkId);
-flex_t sithCog_SendMessageEx(sithCog *cog, int message, int senderType, int senderIndex, int sourceType, int sourceIndex, int linkId, flex_t param0, flex_t param1, flex_t param2, flex_t param3);
+cog_flex_t sithCog_SendMessageEx(sithCog *cog, int message, int senderType, int senderIndex, int sourceType, int sourceIndex, int linkId, cog_flex_t param0, cog_flex_t param1, cog_flex_t param2, cog_flex_t param3);
 void sithCog_Free(sithWorld *world);
 
 //static int (*_sithCog_Open)() = (void*)sithCog_Open_ADDR;
-//static double (*sithCog_SendMessageFromSurfaceEx)(sithSurface *a1, sithThing *a2, int a3, flex_t a4, flex_t a5, flex_t a6, flex_t a7) = (void*)sithCog_SendMessageFromSurfaceEx_ADDR;
-//static flex_t (*_sithCog_SendMessageFromThingEx)(sithThing *sender, sithThing *receiver, SITH_MESSAGE message, flex_t param0, flex_t param1, flex_t param2, flex_t param3) = (void*)sithCog_SendMessageFromThingEx_ADDR;
-//static void (*sithCog_SendMessageFromSectorEx)(sithSector *a1, sithThing *sourceType, SITH_MESSAGE message, flex_t param0, flex_t param1, flex_t param2, flex_t param3) = (void*)sithCog_SendMessageFromSectorEx_ADDR;
-//static void (*sithCog_SendMessageToAll)(int cmdid, int senderType, int senderIdx, int sourceType, int sourceIdx, flex_t arg0, flex_t arg1, flex_t arg2, flex_t arg3) = (void*)sithCog_SendMessageToAll_ADDR;
+//static double (*sithCog_SendMessageFromSurfaceEx)(sithSurface *a1, sithThing *a2, int a3, cog_flex_t a4, cog_flex_t a5, cog_flex_t a6, cog_flex_t a7) = (void*)sithCog_SendMessageFromSurfaceEx_ADDR;
+//static cog_flex_t (*_sithCog_SendMessageFromThingEx)(sithThing *sender, sithThing *receiver, SITH_MESSAGE message, cog_flex_t param0, cog_flex_t param1, cog_flex_t param2, cog_flex_t param3) = (void*)sithCog_SendMessageFromThingEx_ADDR;
+//static void (*sithCog_SendMessageFromSectorEx)(sithSector *a1, sithThing *sourceType, SITH_MESSAGE message, cog_flex_t param0, cog_flex_t param1, cog_flex_t param2, cog_flex_t param3) = (void*)sithCog_SendMessageFromSectorEx_ADDR;
+//static void (*sithCog_SendMessageToAll)(int cmdid, int senderType, int senderIdx, int sourceType, int sourceIdx, cog_flex_t arg0, cog_flex_t arg1, cog_flex_t arg2, cog_flex_t arg3) = (void*)sithCog_SendMessageToAll_ADDR;
 //static void (*sithCog_Free)(sithWorld* world) = (void*)sithCog_Free_ADDR;
 //static void (*sithCogScript_Tick)(sithCog* cog) = (void*)sithCogScript_Tick_ADDR;
 

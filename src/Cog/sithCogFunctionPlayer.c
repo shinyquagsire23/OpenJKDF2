@@ -82,7 +82,7 @@ void sithCogFunctionPlayer_SetGoalFlags(sithCog *ctx)
     sithThing* player = sithCogExec_PopThing(ctx);
     if (player && player->type == SITH_THING_PLAYER && player->actorParams.playerinfo && binIdx < SITHBIN_NUMBINS)
     {
-        flex_t amt = (flex_t)((int)sithInventory_GetBinAmount(player, binIdx) | flags); // FLEXTODO
+        cog_flex_t amt = (cog_flex_t)((int)sithInventory_GetBinAmount(player, binIdx) | flags); // FLEXTODO
         sithInventory_SetBinAmount(player, binIdx, amt);
     }
 }
@@ -94,7 +94,7 @@ void sithCogFunctionPlayer_ClearGoalFlags(sithCog *ctx)
     sithThing* player = sithCogExec_PopThing(ctx);
     if (player && player->type == SITH_THING_PLAYER && player->actorParams.playerinfo && binIdx < SITHBIN_NUMBINS)
     {
-        flex_t amt = (flex_t)((int)sithInventory_GetBinAmount(player, binIdx) & ~flags); // FLEXTODO
+        cog_flex_t amt = (cog_flex_t)((int)sithInventory_GetBinAmount(player, binIdx) & ~flags); // FLEXTODO
         sithInventory_SetBinAmount(player, binIdx, amt);
     }
 }

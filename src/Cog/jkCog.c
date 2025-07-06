@@ -104,8 +104,8 @@ void jkCog_computeCatapaultVelocity(sithCog *ctx)
     cog_flex_t d = sithCogExec_PopFlex(ctx);
     
     rdVector_Sub3(&ret, &b->position, &c->position);
-    flex_t v4 = rdVector_Normalize3Acc(&ret);
-    flex_t ctxb = stdMath_Sqrt(v4 * v4 * a / d);
+    cog_flex_t v4 = rdVector_Normalize3Acc(&ret);
+    cog_flex_t ctxb = stdMath_Sqrt(v4 * v4 * a / d);
     rdVector_Scale3Acc(&ret, ctxb);
     sithCogExec_PushVector3(ctx, &ret);
 }
