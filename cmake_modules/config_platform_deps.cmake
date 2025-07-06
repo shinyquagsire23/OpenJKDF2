@@ -44,6 +44,11 @@ if(DEBUG_QOL_CHEATS)
     add_definitions(-DDEBUG_QOL_CHEATS)
 endif()
 
+# Enables Cxx compiling for fixed point templates
+if(EXPERIMENTAL_FIXED_POINT)
+    add_definitions(-DEXPERIMENTAL_FIXED_POINT)
+endif()
+
 find_package(GLUT)
 if(NOT FreeGLUT_FOUND OR CMAKE_CROSSCOMPILING)
     message(STATUS "Going to build “FreeGLUT 3.4.0” from Git module")

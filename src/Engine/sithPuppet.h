@@ -33,7 +33,7 @@ void sithPuppet_ResetTrack(sithThing *puppet);
 void sithPuppet_Tick(sithThing *thing, flex_t deltaSeconds);
 flex_t sithPuppet_sub_4E4380(sithThing *thing);
 void sithPuppet_sub_4E4A20(sithThing *thing, sithAnimclassEntry *animClass);
-void sithPuppet_DefaultCallback(sithThing *thing, int track, uint32_t a3);
+void sithPuppet_DefaultCallback(sithThing *thing, int32_t track, uint32_t a3);
 int sithPuppet_StopKey(rdPuppet *pupper, int track, flex_t a3);
 void sithPuppet_SetArmedMode(sithThing *thing, int mode);
 void sithPuppet_FidgetAnim(sithThing *pThing);

@@ -13,7 +13,7 @@
 #include "Devices/sithConsole.h"
 #include "Platform/wuRegistry.h"
 #include "Main/jkQuakeConsole.h"
-
+#include "Gui/jkGuiRend.h"
 
 #ifdef TARGET_TWL
 

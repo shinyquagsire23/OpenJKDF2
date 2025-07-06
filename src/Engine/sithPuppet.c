@@ -607,7 +607,7 @@ void sithPuppet_sub_4E4A20(sithThing *thing, sithAnimclassEntry *animClass)
 }
 
 // MOTS altered
-void sithPuppet_DefaultCallback(sithThing *thing, int track, uint32_t a3)
+void sithPuppet_DefaultCallback(sithThing *thing, int32_t track, uint32_t a3)
 {
     unsigned int v3; // esi
     sithPuppet *sithPup; // eax

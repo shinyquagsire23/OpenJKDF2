@@ -327,7 +327,7 @@ int jkCutscene_sub_421310(char* fpath)
         
         // Start audio stuff
         jkCutscene_audioFull = stdSound_BufferCreate(a_c[0] == 2, a_r[0], a_d[0], totalAudioSize);
-        int maxSize;
+        int32_t maxSize;
         void* audioBuf = stdSound_BufferSetData(jkCutscene_audioFull, totalAudioSize, &maxSize);
         uint64_t copiedSize = 0;
         for (size_t i = 0; i < jkCutscene_smk_frames; i++)
@@ -398,7 +398,7 @@ int jkCutscene_sub_421310(char* fpath)
         jkCutscene_audio_us = 0.0; // audio_depth_us / 2.0
         jkCutscene_audio_us_slop = audio_depth_us / 4.0;
         
-        int len;
+        int32_t len;
         uint8_t* stream;
 
         jkCutscene_audio = stdSound_BufferCreate(1, 22050, 16, AUDIO_BUFS_DEPTH);
@@ -889,7 +889,7 @@ int jkCutscene_smusher_process()
         }
 
         stdSound_BufferReset(buf);
-        int len = 0;
+        int32_t len = 0;
         uint8_t* stream = (uint8_t*)stdSound_BufferSetData(buf, AUDIO_BUFS_DEPTH, &len);
         uint8_t* stream_iter = stream;
         uint32_t stream_left = len;

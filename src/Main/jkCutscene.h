@@ -20,10 +20,10 @@ int jkCutscene_smack_related_loops();
 int jkCutscene_PauseShow(int unk);
 int jkCutscene_Handler(HWND a1, UINT a2, WPARAM a3, LPARAM a4, LRESULT *a5);
 
-#ifdef SDL2_RENDER
+//#ifdef SDL2_RENDER
 int jkCutscene_smacker_process();
 int jkCutscene_smusher_process();
-#endif
+//#endif
 
 //static void (*jkCutscene_Shutdown)() = (void*)jkCutscene_Shutdown_ADDR;
 //static void (*jkCutscene_Startup)() = (void*)jkCutscene_Startup_ADDR;

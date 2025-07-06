@@ -72,6 +72,7 @@ else()
 endif()
 
 set(DEBUG_QOL_CHEATS $ENV{DEBUG_QOL_CHEATS})
+set(EXPERIMENTAL_FIXED_POINT $ENV{EXPERIMENTAL_FIXED_POINT})
 
 # Options for compiling
 if(DEFINED ENV{OPENJKDF2_NO_ASAN})
@@ -218,7 +219,9 @@ file(GLOB ENGINE_SOURCE_FILES_REGLOB ${PROJECT_SOURCE_DIR}/src/*.c
                        ${PROJECT_SOURCE_DIR}/src/Platform/*/*.c
                        ${PROJECT_SOURCE_DIR}/src/Platform/*/*.cpp)
 list(REMOVE_ITEM ENGINE_SOURCE_FILES_REGLOB ${TEST_SRCS})
-#set_source_files_properties(${ENGINE_SOURCE_FILES_REGLOB} PROPERTIES LANGUAGE CXX )
+if (EXPERIMENTAL_FIXED_POINT)
+    set_source_files_properties(${ENGINE_SOURCE_FILES_REGLOB} PROPERTIES LANGUAGE CXX )
+endif()
 
 add_library(sith_engine OBJECT ${ENGINE_SOURCE_FILES})
 plat_specific_deps()
@@ -240,9 +243,11 @@ else()
     target_link_libraries(${BIN_NAME} PRIVATE ${SDL2_COMMON_LIBS} sith_engine)
 
     if(TARGET_BUILD_TESTS AND TARGET_MACOS)
-        add_executable(rle_test src/Tests/rle_test.c)
-        target_link_libraries(rle_test PRIVATE ${SDL2_COMMON_LIBS} sith_engine)
-        macos_target_add_standard_deps(rle_test)
+        if(NOT EXPERIMENTAL_FIXED_POINT)
+            add_executable(rle_test src/Tests/rle_test.c)
+            target_link_libraries(rle_test PRIVATE ${SDL2_COMMON_LIBS} sith_engine)
+            macos_target_add_standard_deps(rle_test)
+        endif()
     endif()
 endif()
 

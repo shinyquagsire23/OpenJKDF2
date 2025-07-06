@@ -220,7 +220,7 @@ stdSound_buffer_t* stdSound_BufferCreate(int bStereo, uint32_t nSamplesPerSec, u
     return out;
 }
 
-void* stdSound_BufferSetData(stdSound_buffer_t* sound, int bufferBytes, int* bufferMaxSize)
+void* stdSound_BufferSetData(stdSound_buffer_t* sound, int bufferBytes, int32_t* bufferMaxSize)
 {
     sound->bufferBytes = bufferBytes;
     
@@ -588,7 +588,7 @@ void stdSound_SetMenuVolume(flex_t a1)
 
 stdSound_buffer_t* stdSound_BufferCreate(int bStereo, uint32_t nSamplesPerSec, uint16_t bitsPerSample, int bufferLen)
 {
-    stdSound_buffer_t* out = std_pHS->alloc(sizeof(stdSound_buffer_t));
+    stdSound_buffer_t* out = (stdSound_buffer_t*)std_pHS->alloc(sizeof(stdSound_buffer_t));
     if (!out)
         return NULL;
     
@@ -607,7 +607,7 @@ stdSound_buffer_t* stdSound_BufferCreate(int bStereo, uint32_t nSamplesPerSec, u
     return out;
 }
 
-void* stdSound_BufferSetData(stdSound_buffer_t* sound, int bufferBytes, int* bufferMaxSize)
+void* stdSound_BufferSetData(stdSound_buffer_t* sound, int bufferBytes, int32_t* bufferMaxSize)
 {
     bufferBytes = 0x100; // HACK
     sound->bufferBytes = bufferBytes;
@@ -663,7 +663,7 @@ void stdSound_BufferSetFrequency(stdSound_buffer_t* sound, int freq)
 
 stdSound_buffer_t* stdSound_BufferDuplicate(stdSound_buffer_t* sound)
 {
-    stdSound_buffer_t* out = std_pHS->alloc(sizeof(stdSound_buffer_t));
+    stdSound_buffer_t* out = (stdSound_buffer_t*)std_pHS->alloc(sizeof(stdSound_buffer_t));
     if (!out)
         return NULL;
     

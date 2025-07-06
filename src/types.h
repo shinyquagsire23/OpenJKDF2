@@ -2,7 +2,7 @@
 #define TYPES_H
 
 #ifdef __cplusplus
-#if 0
+#ifdef EXPERIMENTAL_FIXED_POINT
 #include "fixed.h"
 #endif
 #endif
@@ -260,13 +260,13 @@ typedef float flex32_t;
 typedef double flex64_t;
 
 // For intermediate calculations, physics, rendering
+#ifdef EXPERIMENTAL_FIXED_POINT
+// Fixed point experiment
+typedef numeric::fixed<16, 16> flex_t;
+typedef numeric::fixed<16, 16> flex_d_t;
+#else
 typedef flex_t_type flex_t;
 typedef flex_d_t_type flex_d_t;
-
-// Fixed point experiment
-#if 0
-//typedef numeric::fixed<16, 16> flex_t;
-//typedef numeric::fixed<16, 16> flex_d_t;
 #endif
 
 // For COG compatibility
@@ -1840,9 +1840,9 @@ typedef struct HostServicesBasic
     int (*debugPrint)(const char *, ...);
     void (*assert)(const char *, const char *, int);
     int unk_0;
-    void *(*alloc)(unsigned int);
+    void *(*alloc)(uint32_t);
     void (*free)(void *);
-    void *(*realloc)(void *, unsigned int);
+    void *(*realloc)(void *, uint32_t);
     uint32_t (*getTimerTick)();
     stdFile_t (*fileOpen)(const char *, const char *);
     int (*fileClose)(stdFile_t);
@@ -1867,9 +1867,9 @@ typedef struct HostServices
     int (*debugPrint)(const char *, ...);
     void (*assert)(const char *, const char *, int);
     uint32_t unk_0;
-    void *(*alloc)(unsigned int);
+    void *(*alloc)(uint32_t);
     void (*free)(void *);
-    void *(*realloc)(void *, unsigned int);
+    void *(*realloc)(void *, uint32_t);
     uint32_t (*getTimerTick)();
     stdFile_t (*fileOpen)(const char *, const char *);
     int (*fileClose)(stdFile_t);

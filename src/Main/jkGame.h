@@ -46,8 +46,10 @@ void jkGame_Gamma();
 
 #ifdef SDL2_RENDER
 void jkGame_Screenshot();
-#else
+#elif defined(WIN32)
 static void (*jkGame_Screenshot)() = (void*)jkGame_Screenshot_ADDR;
+#else
+static void jkGame_Screenshot(){}
 #endif
 
 #endif // _JKGAME_H

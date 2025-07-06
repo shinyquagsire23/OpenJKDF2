@@ -83,8 +83,9 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
 
     if (Video_bModeSet)
     {
-        glDeleteTextures(1, &Video_menuTexId);
-        glDeleteTextures(1, &Video_overlayTexId);
+        //glDeleteTextures(1, &Video_menuTexId);
+        //glDeleteTextures(1, &Video_overlayTexId);
+        
         //if (Video_otherBuf.sdlSurface)
         //    SDL_FreeSurface(Video_otherBuf.sdlSurface);
         //if (Video_menuBuffer.sdlSurface)
@@ -162,7 +163,7 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
     //out->format.width = 0;
     //out->format.width_in_bytes = 0;
     if (!Video_menuBuffer.surface_lock_alloc)
-        Video_menuBuffer.surface_lock_alloc = std_pHS->alloc(Video_menuBuffer.format.texture_size_in_bytes);
+        Video_menuBuffer.surface_lock_alloc = (char*)std_pHS->alloc(Video_menuBuffer.format.texture_size_in_bytes);
     //Video_otherBuf.surface_lock_alloc = std_pHS->alloc(Video_otherBuf.format.texture_size_in_bytes);
 
 #if 0
@@ -227,7 +228,7 @@ int stdDisplay_SetMasterPalette(uint8_t* pal)
 
 stdVBuffer* stdDisplay_VBufferNew(stdVBufferTexFmt *fmt, int create_ddraw_surface, int gpu_mem, const void* palette)
 {
-    stdVBuffer* out = std_pHS->alloc(sizeof(stdVBuffer));
+    stdVBuffer* out = (stdVBuffer*)std_pHS->alloc(sizeof(stdVBuffer));
     
     _memset(out, 0, sizeof(*out));
     
@@ -240,7 +241,7 @@ stdVBuffer* stdDisplay_VBufferNew(stdVBufferTexFmt *fmt, int create_ddraw_surfac
 
     //out->format.width = 0;
     //out->format.width_in_bytes = 0;
-    out->surface_lock_alloc = std_pHS->alloc(out->format.texture_size_in_bytes);
+    out->surface_lock_alloc = (char*)std_pHS->alloc(out->format.texture_size_in_bytes);
     
     //if (fmt->format.g_bits == 6) // RGB565
     {
@@ -325,8 +326,8 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
     rdRect dstRect = {blit_x, blit_y, rect->width, rect->height};
     rdRect srcRect = {rect->x, rect->y, rect->width, rect->height};
     
-    uint8_t* srcPixels = vbuf2->surface_lock_alloc;
-    uint8_t* dstPixels = vbuf->surface_lock_alloc;
+    uint8_t* srcPixels = (uint8_t*)vbuf2->surface_lock_alloc;
+    uint8_t* dstPixels = (uint8_t*)vbuf->surface_lock_alloc;
     uint32_t srcStride = vbuf2->format.width_in_bytes;
     uint32_t dstStride = vbuf->format.width_in_bytes;
 
@@ -340,7 +341,7 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
     if (dstPixels == srcPixels)
     {
         size_t buf_len = srcStride * dstRect.width * dstRect.height;
-        uint8_t* dstPixels = malloc(buf_len);
+        uint8_t* dstPixels = (uint8_t*)malloc(buf_len);
         int has_alpha = 0;//!(rect->width == 640);
 
         rdRect dstRect_inter = {0, 0, rect->width, rect->height};
@@ -416,7 +417,7 @@ int stdDisplay_VBufferFill(stdVBuffer *vbuf, int fillColor, rdRect *rect)
     
     //printf("%x; %u %u %u %u\n", fillColor, rect->x, rect->y, rect->width, rect->height);
     
-    uint8_t* dstPixels = vbuf->surface_lock_alloc;
+    uint8_t* dstPixels = (uint8_t*)vbuf->surface_lock_alloc;
     uint32_t dstStride = vbuf->format.width_in_bytes;
     uint32_t max_idx = dstStride * vbuf->format.height;
 

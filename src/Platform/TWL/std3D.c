@@ -157,7 +157,7 @@ int std3D_Startup()
     glGenTextures(2, &textureIDS[0]);
     //glGenTextures(1, &paletteIDS[0]);
 
-    u8* i8Bitmap = malloc(16*16);
+    u8* i8Bitmap = (u8*)malloc(16*16);
     for (int i = 0; i < 256; i++)
     {
         i8Bitmap[i] = i;
@@ -364,8 +364,8 @@ void std3D_DrawMenu()
 
     update_from_display_palette();
 
-    u8* i8Bitmap = malloc(256*64);
-    u8* i8Bitmap2 = malloc(256*128);
+    u8* i8Bitmap = (u8*)malloc(256*64);
+    u8* i8Bitmap2 = (u8*)malloc(256*128);
 
     touchPosition touchXY;
     touchRead(&touchXY);

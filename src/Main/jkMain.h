@@ -161,7 +161,7 @@ void jkMain_StartupCutscene(char *pCutsceneStr); // MOTS added
 //static int (*jkMain_sub_403470)(char *a1) = (void*)jkMain_sub_403470_ADDR;
 //static int (*jkMain_loadFile2)(char*, char*) = (void*)jkMain_loadFile2_ADDR;
 
-#ifdef SDL2_RENDER
+#if defined(SDL2_RENDER) || defined(TARGET_TWL)
 //int jkMain_SetVideoMode();
 void jkMain_FixRes();
 #else

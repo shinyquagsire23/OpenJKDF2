@@ -13,8 +13,8 @@ export OPENJKDF2_RELEASE_COMMIT_SHORT=$(git rev-parse --short=8 HEAD)
 mkdir -p build_darwin64 && cd build_darwin64
 
 export PKG_CONFIG_PATH_OLD=$PKG_CONFIG_PATH
-TARGET_BUILD_TESTS=1 DEBUG_QOL_CHEATS=1 OPENJKDF2_NO_ASAN=0 cmake .. &&
-TARGET_BUILD_TESTS=1 DEBUG_QOL_CHEATS=1 OPENJKDF2_NO_ASAN=0 make -j10 &&
+TARGET_BUILD_TESTS=1 DEBUG_QOL_CHEATS=1 OPENJKDF2_NO_ASAN=0 EXPERIMENTAL_FIXED_POINT=0 cmake .. &&
+TARGET_BUILD_TESTS=1 DEBUG_QOL_CHEATS=1 OPENJKDF2_NO_ASAN=0 EXPERIMENTAL_FIXED_POINT=0 make -j10 &&
 cd .. &&
 #cp resource/shaders/* DF2/resource/shaders/ &&
 mkdir -p "/Users/maxamillion/Library/Application Support/OpenJKDF2/openjkdf2/resource/shaders/" &&

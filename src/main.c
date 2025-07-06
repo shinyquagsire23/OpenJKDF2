@@ -205,6 +205,7 @@ void crash_handler_basic(int sig);
 
 #ifdef TARGET_TWL
 #include <nds.h>
+#include <fat.h>
 
 volatile int frame = 0;
 //---------------------------------------------------------------------------------

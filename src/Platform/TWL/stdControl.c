@@ -741,7 +741,7 @@ void stdControl_ReadControls()
 
     if ( !stdControl_bDisableKeyboard )
     {
-        const uint8_t *state = stdControl_aInput1;
+        const uint8_t *state = (const uint8_t*)stdControl_aInput1;
         for (int i = 0; i < 256; i++)
         {
             int s = !!state[i];

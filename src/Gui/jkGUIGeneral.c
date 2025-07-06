@@ -44,7 +44,7 @@ static jkGuiElement jkGuiGeneral_aElements[23] = {
     // 12
 #if defined(QOL_IMPROVEMENTS) && !defined(SDL2_RENDER)
     {ELEMENT_TEXT,         0,            0, "GUIEXT_FOV",                 3, {20, 240, 300, 30}, 1,  0, 0, 0, 0, 0, {0}, 0},
-    {ELEMENT_SLIDER,       0,            0, (FOV_MAX - FOV_MIN),                    0, {10, 270, 320, 30}, 1, 0, "GUIEXT_FOV_HINT", jkGuiGeneral_FovDraw, 0, slider_images, {0}, 0},
+    {ELEMENT_SLIDER,       0,            0, (void*)(FOV_MAX - FOV_MIN),                    0, {10, 270, 320, 30}, 1, 0, "GUIEXT_FOV_HINT", jkGuiGeneral_FovDraw, 0, slider_images, {0}, 0},
     {ELEMENT_TEXT,         0,            0, slider_val_text,        3, {20, 300, 300, 30}, 1,  0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_CHECKBOX,     0,            0, "GUIEXT_FOV_VERTICAL",    0, {20, 320, 300, 40}, 1,  0, NULL, 0, 0, 0, {0}, 0},
 #else
