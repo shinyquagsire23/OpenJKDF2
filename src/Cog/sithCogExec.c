@@ -963,10 +963,10 @@ void sithCogExec_MathOperation(sithCog *cog_ctx, int op)
             sithCogExec_PushFlex(cog_ctx, operand_a * operand_b);
             break;
         case COG_OPCODE_DIV:
-            sithCogExec_PushFlex(cog_ctx, (operand_a == 0.0) ? 0.0 : operand_b / operand_a);
+            sithCogExec_PushFlex(cog_ctx, (operand_a == 0.0) ? (flex_t)0.0 : operand_b / operand_a);
             break;
         case COG_OPCODE_MOD:
-            sithCogExec_PushFlex(cog_ctx, fmod(operand_b, operand_a));
+            sithCogExec_PushFlex(cog_ctx, fmod((float)operand_b, (float)operand_a));
             break;
         case COG_OPCODE_CMPGT:
             sithCogExec_PushInt(cog_ctx, (operand_b > operand_a) ? 1 : 0);

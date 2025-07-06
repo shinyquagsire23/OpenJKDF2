@@ -1,11 +1,11 @@
 #ifndef _STDFILEUTIL_H
 #define _STDFILEUTIL_H
 
+#include "types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "types.h"
 
 #define stdFileUtil_NewFind_ADDR (0x00431740)
 #define stdFileUtil_DisposeFind_ADDR (0x004317E0)

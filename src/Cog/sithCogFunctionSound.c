@@ -128,8 +128,8 @@ void sithCogFunctionSound_PlaySoundPos(sithCog *ctx)
         return;
     }
 
-    minDist_act = minDist >= 0.0 ? (flex_t)(minDist * 0.1) : 0.5; // FLEXTODO
-    maxDist_act = maxDist >= 0.0 ? (flex_t)(maxDist * 0.1) : 2.5; // FLEXTODO
+    minDist_act = minDist >= 0.0 ? (flex_t)(minDist * (flex_t)0.1) : (flex_t)0.5; // FLEXTODO
+    maxDist_act = maxDist >= 0.0 ? (flex_t)(maxDist * (flex_t)0.1) : (flex_t)2.5; // FLEXTODO
     if ( volume < 0.0 )
     {
         volume = 0.0;
@@ -467,8 +467,8 @@ void sithCogFunctionSound_PlaySoundPosLocal(sithCog *ctx)
         return;
     }
 
-    minDist_act = minDist >= 0.0 ? (flex_t)(minDist * 0.1) : 0.5; // FLEXTODO
-    maxDist_act = maxDist >= 0.0 ? (flex_t)(maxDist * 0.1) : 2.5; // FLEXTODO
+    minDist_act = minDist >= 0.0 ? (flex_t)(minDist * (flex_t)0.1) : (flex_t)0.5; // FLEXTODO
+    maxDist_act = maxDist >= 0.0 ? (flex_t)(maxDist * (flex_t)0.1) : (flex_t)2.5; // FLEXTODO
     if ( volume < 0.0 )
     {
         volume = 0.0;

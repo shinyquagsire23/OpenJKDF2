@@ -1,13 +1,13 @@
 #ifndef _RDMATERIAL_H
 #define _RDMATERIAL_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "types.h"
 #include "globals.h"
 #include "Win95/stdVBuffer.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define rdMaterial_RegisterLoader_ADDR (0x0044A110)
 #define rdMaterial_RegisterUnloader_ADDR (0x0044A120)

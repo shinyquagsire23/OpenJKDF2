@@ -105,7 +105,7 @@ void jkCog_computeCatapaultVelocity(sithCog *ctx)
     
     rdVector_Sub3(&ret, &b->position, &c->position);
     flex_t v4 = rdVector_Normalize3Acc(&ret);
-    flex_t ctxb = sqrt(v4 * v4 * a / d);
+    flex_t ctxb = stdMath_Sqrt(v4 * v4 * a / d);
     rdVector_Scale3Acc(&ret, ctxb);
     sithCogExec_PushVector3(ctx, &ret);
 }
@@ -1337,7 +1337,7 @@ void jkCogExt_Sine(sithCog* ctx)
 void jkCogExt_Squareroot(sithCog* ctx)
 {
     cog_flex_t val = sithCogExec_PopFlex(ctx);
-    sithCogExec_PushFlex(ctx, sqrtf(val));
+    sithCogExec_PushFlex(ctx, stdMath_Sqrt(val));
 }
 
 void jkCogExt_GetHotkeyCog(sithCog* ctx)

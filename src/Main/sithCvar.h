@@ -1,11 +1,11 @@
 #ifndef _OPENJKDF2_SITH_CVAR_H
 #define _OPENJKDF2_SITH_CVAR_H
 
+#include "types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "types.h"
 
 int sithCvar_Startup();
 void sithCvar_Shutdown();

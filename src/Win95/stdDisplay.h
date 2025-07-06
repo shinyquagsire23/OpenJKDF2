@@ -48,7 +48,7 @@
 
 extern rdColor24 stdDisplay_masterPalette[256];
 
-void stdDisplay_SetGammaTable(int len, double *table);
+void stdDisplay_SetGammaTable(int len, flex_d_t *table);
 uint8_t* stdDisplay_GetPalette();
 void stdDisplay_GammaCorrect(const void *pPal);
 

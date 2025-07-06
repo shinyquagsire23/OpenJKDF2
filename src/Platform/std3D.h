@@ -1,12 +1,12 @@
 #ifndef _STD3D_H
 #define _STD3D_H
 
+#include "types.h"
+#include "globals.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "types.h"
-#include "globals.h"
 
 #define std3D_Startup_ADDR (0x00429310)
 #define std3D_Shutdown_ADDR (0x00429390)

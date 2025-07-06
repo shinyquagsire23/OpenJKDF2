@@ -1,11 +1,11 @@
 #ifndef _PLATFORM_GL_JKGM_H
 #define _PLATFORM_GL_JKGM_H
 
+#include "types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "types.h"
 
 typedef void (*stdJSONCallback_t)(const char* pKey, const char* pVal, void *pCtx);
 

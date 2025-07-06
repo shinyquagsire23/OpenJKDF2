@@ -5,6 +5,10 @@
 #include "types.h"
 #include "globals.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define rdColormap_SetCurrent_ADDR (0x00442510)
 #define rdColormap_SetIdentity_ADDR (0x00442560)
 #define rdColormap_Load_ADDR (0x004425A0)
@@ -32,5 +36,9 @@ int rdColormap_BuildGrayRamp(rdColormap* pColormap);
 //static int (*rdColormap_BuildGrayRamp)(rdColormap *colormap) = (void*)rdColormap_BuildGrayRamp_ADDR;
 //static int (*rdColormap_BuildRGB16)(uint16_t *a2, rdColor24 *a3, uint8_t a4, uint8_t a5, uint8_t a6, rdTexformat *format) = (void*)rdColormap_BuildRGB16_ADDR;
 //static int (__cdecl *rdColormap_LoadEntry)(char *colormap_fname, rdColormap *colormap) = (void*)rdColormap_LoadEntry_ADDR;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _RDCOLORMAP_H

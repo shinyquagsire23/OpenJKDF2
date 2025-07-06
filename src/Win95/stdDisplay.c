@@ -6,7 +6,7 @@
 #include "Win95/Window.h"
 #include "General/stdColor.h"
 
-void stdDisplay_SetGammaTable(int len, double *table)
+void stdDisplay_SetGammaTable(int len, flex_d_t *table)
 {
     stdDisplay_gammaTableLen = len;
     stdDisplay_paGammaTable = table;

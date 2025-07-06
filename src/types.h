@@ -2,6 +2,12 @@
 #define TYPES_H
 
 #ifdef __cplusplus
+#if 0
+#include "fixed.h"
+#endif
+#endif
+
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -241,6 +247,10 @@ typedef intptr_t stdFile_t;
 typedef intptr_t stdFile_t;
 #endif
 
+#ifdef __cplusplus
+}
+#endif
+
 #ifdef ARCH_64BIT
 //typedef int64_t cog_int_t;
 //typedef double cog_flex_t;
@@ -253,10 +263,18 @@ typedef double flex64_t;
 typedef flex_t_type flex_t;
 typedef flex_d_t_type flex_d_t;
 
+// Fixed point experiment
+#if 0
+//typedef numeric::fixed<16, 16> flex_t;
+//typedef numeric::fixed<16, 16> flex_d_t;
+#endif
+
 // For COG compatibility
 typedef int32_t cog_int_t;
 typedef flex32_t cog_flex_t;
+
 #else
+
 // For serialization, must stay float for save compat
 typedef float flex32_t;
 typedef double flex64_t;
@@ -268,6 +286,10 @@ typedef flex_d_t_type flex_d_t;
 // For COG compatibility
 typedef int32_t cog_int_t;
 typedef flex32_t cog_flex_t;
+#endif
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 typedef struct IDirectSound3DBuffer IDirectSound3DBuffer;

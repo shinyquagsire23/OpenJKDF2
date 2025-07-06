@@ -357,7 +357,7 @@ void rdCamera_OrthoProjectSquareLst(rdVector3 *vertices_out, rdVector3 *vertices
 void rdCamera_PerspProject(rdVector3 *out, rdVector3 *v)
 {
     out->x = (rdCamera_pCurCamera->fov_y / v->y) * v->x + rdCamera_pCurCamera->canvas->screen_height_half;
-    out->y = rdCamera_pCurCamera->canvas->screen_width_half - (jkPlayer_enableOrigAspect ? rdCamera_pCurCamera->screenAspectRatio : 1.0) * (rdCamera_pCurCamera->fov_y / v->y) * v->z;
+    out->y = rdCamera_pCurCamera->canvas->screen_width_half - (jkPlayer_enableOrigAspect ? rdCamera_pCurCamera->screenAspectRatio : (flex_t)1.0) * (rdCamera_pCurCamera->fov_y / v->y) * v->z;
     out->z = v->y;
 
     //printf("%f %f %f -> %f %f %f\n", v->x, v->y, v->z, out->x, out->y, out->z);

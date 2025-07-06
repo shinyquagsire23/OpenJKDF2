@@ -540,7 +540,7 @@ sithSector* sithCollision_GetSectorLookAt(sithSector *pStartSector, const rdVect
                 {
                     if ( v10 <= v11->distance )
                     {
-                        if ( v10 == v11->distance && (v9->hitType & (SITHCOLLISION_THINGTOUCH | SITHCOLLISION_THINGCROSS)) != 0 && (v11->hitType & 4) != 0 )
+                        if ( v10 == v11->distance && (v9 && v9->hitType & (SITHCOLLISION_THINGTOUCH | SITHCOLLISION_THINGCROSS)) != 0 && (v11->hitType & 4) != 0 ) // Added: v9 null check
                             v9 = v11;
                     }
                     else
@@ -1254,7 +1254,7 @@ int sithCollision_DebrisPlayerCollide(sithThing *thing, sithThing *thing2, sithC
     flex_t tmp = 0.0; // Added 0.0, original game overwrites &searchEnt...
 
     // Added: check move type
-    mass = (thing->moveType == SITH_MT_PHYSICS) ? thing->physicsParams.mass : 0.0;
+    mass = (thing->moveType == SITH_MT_PHYSICS) ? thing->physicsParams.mass : (flex_t)0.0;
 
     if ( isSolid )
         return sithCollision_DebrisDebrisCollide(thing, thing2, searchEnt, isSolid);

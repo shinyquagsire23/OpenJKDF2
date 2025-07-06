@@ -37,7 +37,7 @@ extern "C" {
 static smush_ctx* jkCutscene_pSmush;
 static smk jkCutscene_smk;
 static int jkCutscene_bSmkValid = 0;
-static flex_d_t jkCutscene_smk_usf;
+static flex64_t jkCutscene_smk_usf;
 static unsigned long jkCutscene_smk_w, jkCutscene_smk_h, jkCutscene_smk_frames;
 static stdVBuffer* jkCutscene_frameBuf = NULL;
 static void* jkCutscene_palette = NULL;
@@ -50,9 +50,9 @@ static int jkCutscene_audioFlip = 0;
 
 // TODO actually fill this in with an alternative Smack decoder
 
-static flex_d_t last_displayFrame = 0;
-static flex_d_t last_audioUs = 0;
-static flex_d_t extraUs = 0;
+static flex64_t last_displayFrame = 0;
+static flex64_t last_audioUs = 0;
+static flex64_t extraUs = 0;
 extern int openjkdf2_bIsKVM;
 
 // Smush
@@ -60,8 +60,8 @@ extern int openjkdf2_bIsKVM;
 #define AUDIO_BUFS_DEPTH (0x800000)
 #define AUDIO_MAXIMUM_ALLOWED_SLOP_BYTES (0x8000)
 
-static flex_d_t jkCutscene_audio_us;
-static flex_d_t jkCutscene_audio_us_slop;
+static flex64_t jkCutscene_audio_us;
+static flex64_t jkCutscene_audio_us_slop;
 
 static const uint8_t* jkCutscene_audio_buf;
 static const uint8_t* jkCutscene_audio_pos;
@@ -382,7 +382,7 @@ int jkCutscene_sub_421310(char* fpath)
         jkCutscene_smk_frames = smush_num_frames(jkCutscene_pSmush);
         jkCutscene_smk_w = smush_video_width(jkCutscene_pSmush);
         jkCutscene_smk_h = smush_video_height(jkCutscene_pSmush);
-        jkCutscene_smk_usf = 1000000.0 / (flex_d_t)smush_video_fps(jkCutscene_pSmush);
+        jkCutscene_smk_usf = 1000000.0 / (flex64_t)smush_video_fps(jkCutscene_pSmush);
 
         jk_printf("Opened file %s as Smush\nWidth: %lu\nHeight: %lu\nFrames: %lu\nFPS: %f\n", tmp, jkCutscene_smk_w, jkCutscene_smk_h, jkCutscene_smk_frames, 1000000.0 / jkCutscene_smk_usf);
 
@@ -394,7 +394,7 @@ int jkCutscene_sub_421310(char* fpath)
         stdDisplay_VBufferFill(jkCutscene_frameBuf, 0, NULL);
 
         // Keep half of AUDIO_BUFS_DEPTH empty to allow time adjustments
-        flex_d_t audio_depth_us = ((flex_d_t)(AUDIO_BUFS_DEPTH / 4) / 22050.0) * 1000000.0;
+        flex64_t audio_depth_us = ((flex64_t)(AUDIO_BUFS_DEPTH / 4) / 22050.0) * 1000000.0;
         jkCutscene_audio_us = 0.0; // audio_depth_us / 2.0
         jkCutscene_audio_us_slop = audio_depth_us / 4.0;
         
@@ -741,10 +741,10 @@ int jkCutscene_smacker_process()
         return 0;
     }
 
-    flex_d_t cur_displayFrame = (flex_d_t)Linux_TimeUs();
+    flex64_t cur_displayFrame = (flex64_t)Linux_TimeUs();
 
-    flex_d_t usPerFrame = jkCutscene_smk_usf;
-    flex_d_t delta = cur_displayFrame - last_displayFrame;
+    flex64_t usPerFrame = jkCutscene_smk_usf;
+    flex64_t delta = cur_displayFrame - last_displayFrame;
     if (delta <= usPerFrame) return 0;
     //printf("%f %f %f\n", delta, usPerFrame, extraUs);
 
@@ -812,20 +812,20 @@ int jkCutscene_smusher_process()
         return 0;
     }
 
-    flex_d_t cur_displayFrame = (flex_d_t)Linux_TimeUs();
+    flex64_t cur_displayFrame = (flex64_t)Linux_TimeUs();
 
-    flex_d_t usPerFrame = jkCutscene_smk_usf;
-    flex_d_t delta = cur_displayFrame - last_displayFrame;
+    flex64_t usPerFrame = jkCutscene_smk_usf;
+    flex64_t delta = cur_displayFrame - last_displayFrame;
 
-    flex_d_t cur_audioUs = (flex_d_t)Linux_TimeUs();
+    flex64_t cur_audioUs = (flex64_t)Linux_TimeUs();
 
-    flex_d_t slop = jkCutscene_audio_us - (cur_audioUs - last_audioUs);
+    flex64_t slop = jkCutscene_audio_us - (cur_audioUs - last_audioUs);
     //printf("%f %f\n", slop, jkCutscene_audio_us_slop);
 
     if (cur_audioUs - last_audioUs >= jkCutscene_audio_us - jkCutscene_audio_us_slop) {
 
-        flex_d_t stutter_compensate = 0.0;
-        flex_d_t slop = jkCutscene_audio_us - (cur_audioUs - last_audioUs);
+        flex64_t stutter_compensate = 0.0;
+        flex64_t slop = jkCutscene_audio_us - (cur_audioUs - last_audioUs);
         //printf("next! %p %f %f %f %f\n", jkCutscene_audio_queue_read_idx, cur_audioUs - last_audioUs, slop, jkCutscene_audio_us, jkCutscene_audio_us_slop);
 
         
@@ -939,7 +939,7 @@ int jkCutscene_smusher_process()
         stdSound_BufferUnlock(buf, stream, len);
         stdSound_BufferPlay(buf, 0);
 
-        jkCutscene_audio_us = ((flex_d_t)(written_len / 4) / 22050.0) * 1000000.0;
+        jkCutscene_audio_us = ((flex64_t)(written_len / 4) / 22050.0) * 1000000.0;
         jkCutscene_audio_us += stutter_compensate; // If we were late...
 
         last_audioUs = Linux_TimeUs();

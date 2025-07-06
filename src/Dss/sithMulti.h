@@ -1,12 +1,12 @@
 #ifndef _SITHMULTI_H
 #define _SITHMULTI_H
 
+#include "types.h"
+#include "globals.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "types.h"
-#include "globals.h"
 
 #define sithMulti_Startup_ADDR (0x004C9AE0)
 #define sithMulti_Shutdown_ADDR (0x004C9CB0)

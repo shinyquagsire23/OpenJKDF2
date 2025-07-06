@@ -84,20 +84,20 @@ int rdClip_Line2(rdCanvas *canvas, signed int *pX1, signed int *pY1, signed int 
         {
             fX1 = x_clipped;
             fY1 = y_clipped;
-            clipOutcodeX1Y1 = rdClip_CalcOutcode2(canvas, round(x_clipped), round(y_clipped));
+            clipOutcodeX1Y1 = rdClip_CalcOutcode2(canvas, (float)round((float)x_clipped), round((float)y_clipped));
         }
         else
         {
             fX2 = x_clipped;
             fY2 = y_clipped;
-            clipOutcodeX2Y2 = rdClip_CalcOutcode2(canvas, round(x_clipped), round(y_clipped));
+            clipOutcodeX2Y2 = rdClip_CalcOutcode2(canvas, (float)round((float)x_clipped), round((float)y_clipped));
         }
     }
     
-    *pX1 = round(fX1);
-    *pY1 = round(fY1);
-    *pX2 = round(fX2);
-    *pY2 = round(fY2);
+    *pX1 = (float)round((float)fX1);
+    *pY1 = (float)round((float)fY1);
+    *pX2 = (float)round((float)fX2);
+    *pY2 = (float)round((float)fY2);
     return 1;
 }
 

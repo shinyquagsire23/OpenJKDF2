@@ -1,10 +1,6 @@
 #ifndef _OPENJKDF2_JK_H
 #define _OPENJKDF2_JK_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "engine_config.h"
 #include "types.h"
 #include <stdio.h>
@@ -34,6 +30,10 @@ extern "C" {
 #define VM_VAR(name, type, ptr) \
     type* name ## _ptr = (type*)ptr;
 #define VM_VAR_DECL(name, type) extern type* name ## _ptr;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 //static void (*jk_main)(uint32_t a, uint32_t b, char* c, int d, char* e) = (void*)0x50E750;
 

@@ -1,16 +1,16 @@
 #ifndef _WIN95_STDCOMM_H
 #define _WIN95_STDCOMM_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "types.h"
 #include "globals.h"
 
 #include "Platform/Networking/Basic/stdComm_basic.h"
 #include "Platform/Networking/GNS/stdComm_GNS.h"
 #include "Platform/Networking/None/stdComm_none.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define stdComm_Startup_ADDR (0x004C9530)
 #define stdComm_Shutdown_ADDR (0x004C9550)

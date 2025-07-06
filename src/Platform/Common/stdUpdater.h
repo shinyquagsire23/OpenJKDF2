@@ -1,11 +1,11 @@
 #ifndef _PLATFORM_COMMON_STD_UPDATER_H
 #define _PLATFORM_COMMON_STD_UPDATER_H
 
+#include "types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "types.h"
 
 void stdUpdater_StartupCvars();
 int stdUpdater_CheckForUpdates();

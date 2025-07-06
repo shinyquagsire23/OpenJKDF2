@@ -390,7 +390,7 @@ int sithGamesave_SerializeAllThings(int mpFlags)
 int sithGamesave_Write(char *saveFname, int a2, int a3, wchar_t *saveName)
 {
     wchar_t *v5; // esi
-    flex_t *v7; // eax
+    flex32_t *v7; // eax
     sithItemInfo *v8; // ecx
     char tmp_playerName[32]; // [esp+Ch] [ebp-2A0h] BYREF
     char PathName[128]; // [esp+2Ch] [ebp-280h] BYREF

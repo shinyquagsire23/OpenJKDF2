@@ -1,11 +1,11 @@
 #ifndef _JKSTRINGS_H
 #define _JKSTRINGS_H
 
+#include "types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "types.h"
 
 #define jkStrings_Startup_ADDR (0x0040B3F0)
 #define jkStrings_Shutdown_ADDR (0x0040B410)
