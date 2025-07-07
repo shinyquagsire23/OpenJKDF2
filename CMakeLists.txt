@@ -217,7 +217,9 @@ file(GLOB ENGINE_SOURCE_FILES_REGLOB ${PROJECT_SOURCE_DIR}/src/*.c
                        ${PROJECT_SOURCE_DIR}/src/*/*.c
                        ${PROJECT_SOURCE_DIR}/src/General/*.cpp
                        ${PROJECT_SOURCE_DIR}/src/Platform/*/*.c
-                       ${PROJECT_SOURCE_DIR}/src/Platform/*/*.cpp)
+                       ${PROJECT_SOURCE_DIR}/src/Platform/*/*/*.c
+                       ${PROJECT_SOURCE_DIR}/src/Platform/*/*.cpp
+                       ${PROJECT_SOURCE_DIR}/src/Platform/*/*/*.cpp)
 list(REMOVE_ITEM ENGINE_SOURCE_FILES_REGLOB ${TEST_SRCS})
 if (EXPERIMENTAL_FIXED_POINT)
     set_source_files_properties(${ENGINE_SOURCE_FILES_REGLOB} PROPERTIES LANGUAGE CXX )

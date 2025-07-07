@@ -865,7 +865,7 @@ void jkPlayer_DrawPov()
         jkSaber_rotateVec.z = angleSin * jkPlayer_waggleVec.z * velNorm;
         rdMatrix_BuildRotate34(&jkSaber_rotateMat, &jkSaber_rotateVec);
 
-#ifdef SDL2_RENDER
+#if defined(SDL2_RENDER) || defined(TARGET_TWL)
         // Force weapon to draw in front of scene
         std3D_ClearZBuffer();
         rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
@@ -898,12 +898,21 @@ void jkPlayer_DrawPov()
         // TODO just make a cvar-alike for this
         //trans.z += 0.007 * (1.0 / sithCamera_currentCamera->rdCam.screenAspectRatio);
 #endif
+
+        // Shift gun up slightly
+#ifdef TARGET_TWL
+        //trans.y -= 0.037;
+        trans.z -= 0.013; //45deg fov
+        //trans.x += 0.009; //30deg fov
+        //trans.z -= 0.017; //30deg fov
+#endif
+
         rdVector_Neg3Acc(&trans);
         rdMatrix_PreTranslate34(&viewMat, &trans);
         rdMatrix_PreMultiply34(&viewMat, &jkSaber_rotateMat);
 
         // Moved: see below.
-#ifndef SDL2_RENDER
+#if !(defined(SDL2_RENDER) || defined(TARGET_TWL))
         // Render saber if applicable
         if (playerThings[playerThingIdx].actorThing->jkFlags & JKFLAG_SABERON)
         {
@@ -916,7 +925,7 @@ void jkPlayer_DrawPov()
 
         // Added: we want the polyline to render in draw order so the spheres don't clip, 
         // but we want the POV model to be aware of the depths still.
-#ifdef SDL2_RENDER
+#if defined(SDL2_RENDER) || defined(TARGET_TWL)
         if (playerThings[playerThingIdx].actorThing->jkFlags & JKFLAG_SABERON)
         {
             rdSetZBufferMethod(RD_ZBUFFER_READ_NOWRITE);

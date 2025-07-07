@@ -374,7 +374,9 @@ int rdCache_SendFaceListToHardware()
             red_and_alpha = 255;
         }
 
+#ifndef TARGET_TWL
         if ( expected_alpha != 255 && !std3D_HasModulateAlpha() && !std3D_HasAlphaFlatStippled() )
+#endif
         {
             red_and_alpha = 255;
             alpha_is_opaque = 1;
@@ -461,6 +463,39 @@ int rdCache_SendFaceListToHardware()
             {
                 mipmap_level = 0;
             }
+
+            // Look for the closest mipmap that's been loaded
+#ifdef TARGET_TWL
+            int mipmap_level_orig = mipmap_level;
+            stdVBuffer* mipmap = sith_tex_sel->texture_struct[mipmap_level];
+
+            alpha_is_opaque = 1;
+            while (!mipmap && mipmap_level < sith_tex_sel->num_mipmaps) {
+                mipmap = sith_tex_sel->texture_struct[mipmap_level];
+                if (mipmap) {
+                    break;
+                }
+
+                mipmap_level += 1;
+            }
+
+            if (!mipmap) {
+                mipmap_level = mipmap_level_orig;
+                while (!mipmap && mipmap_level > 0) {
+                    mipmap = sith_tex_sel->texture_struct[mipmap_level];
+                    if (mipmap) {
+                        break;
+                    }
+
+                    mipmap_level -= 1;
+                }
+            }
+
+            if (!mipmap) {
+                mipmap_level = mipmap_level_orig;
+            }
+#endif
+
             a3 = mipmap_level;
 
             if ( (sith_tex_sel->alpha_en & 1) != 0 && std3D_HasAlpha() )

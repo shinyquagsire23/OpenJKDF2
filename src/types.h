@@ -251,7 +251,6 @@ typedef intptr_t stdFile_t;
 }
 #endif
 
-#ifdef ARCH_64BIT
 //typedef int64_t cog_int_t;
 //typedef double cog_flex_t;
 
@@ -272,21 +271,6 @@ typedef flex_d_t_type flex_d_t;
 // For COG compatibility
 typedef int32_t cog_int_t;
 typedef flex32_t cog_flex_t;
-
-#else
-
-// For serialization, must stay float for save compat
-typedef float flex32_t;
-typedef double flex64_t;
-
-// For intermediate calculations, physics, rendering
-typedef flex_t_type flex_t;
-typedef flex_d_t_type flex_d_t;
-
-// For COG compatibility
-typedef int32_t cog_int_t;
-typedef flex32_t cog_flex_t;
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -805,9 +789,73 @@ typedef struct D3DVERTEX_ext
 } D3DVERTEX_ext;
 #pragma pack(pop)
 
+
+#pragma pack(push, 4)
+typedef struct D3DVERTEX_twl
+{
+  union ALIGNED_(4)
+  {
+    flex_t x;
+    flex_t dvX;
+  };
+  #pragma pack(push, 4)
+  union
+  {
+    flex_t y;
+    flex_t dvY;
+  };
+  #pragma pack(pop)
+  #pragma pack(push, 4)
+  union
+  {
+    flex_t z;
+    flex_t dvZ;
+  };
+  #pragma pack(pop)
+  #pragma pack(push, 4)
+  union
+  {
+    flex_t nx;
+    flex_t dvNX;
+  };
+  #pragma pack(pop)
+  #pragma pack(push, 4)
+  union
+  {
+    flex_t ny;
+    flex_t dvNY;
+    uint32_t color;
+  };
+  #pragma pack(pop)
+  #pragma pack(push, 4)
+  union
+  {
+    flex_t nz;
+    flex_t dvNZ;
+  };
+  #pragma pack(pop)
+  #pragma pack(push, 4)
+  union
+  {
+    flex_t tu;
+    flex_t dvTU;
+  };
+  #pragma pack(pop)
+  #pragma pack(push, 4)
+  union
+  {
+    flex_t tv;
+    flex_t dvTV;
+  };
+  #pragma pack(pop)
+} D3DVERTEX_twl;
+#pragma pack(pop)
+
 // TODO: Differentiate by renderer, not SDL2
 #ifdef SDL2_RENDER
 typedef D3DVERTEX_ext D3DVERTEX;
+#elif defined(TARGET_TWL)
+typedef D3DVERTEX_twl D3DVERTEX;
 #else
 typedef D3DVERTEX_orig D3DVERTEX;
 #endif

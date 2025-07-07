@@ -8,8 +8,13 @@
 #define NEEDS_STEPPED_PHYS (!jkPlayer_bJankyPhysics || sithNet_isMulti)
 
 // Settings for stepped physics
+#ifdef TARGET_TWL
+#define TARGET_PHYSTICK_FPS (30.0)
+#define DELTA_PHYSTICK_FPS (1.0/TARGET_PHYSTICK_FPS)
+#else
 #define TARGET_PHYSTICK_FPS (sithNet_isMulti ? (sithNet_tickrate < 100 ? 150.0 : 50.0) : 150.0)
 #define DELTA_PHYSTICK_FPS (1.0/TARGET_PHYSTICK_FPS)
+#endif
 
 // Settings for the old stepped physics
 #define OLDSTEP_TARGET_FPS (sithNet_isMulti ? (sithNet_tickrate < 100 ? 150.0 : 50.0) : 50.0)
@@ -66,10 +71,15 @@
 #endif
 
 // World limits
-#if !defined(QOL_IMPROVEMENTS) || defined(TARGET_TWL)
+#if !defined(QOL_IMPROVEMENTS)
 #define SITH_MAX_THINGS (641)
 #define SITH_MAX_VISIBLE_SECTORS (0x80)
 #define SITH_MAX_VISIBLE_SECTORS_2 (0xA0)
+#define SITH_MAX_VISIBLE_ALPHA_SURFACES (32)
+#elif defined(TARGET_TWL)
+#define SITH_MAX_THINGS (641)
+#define SITH_MAX_VISIBLE_SECTORS (64)
+#define SITH_MAX_VISIBLE_SECTORS_2 (64+32)
 #define SITH_MAX_VISIBLE_ALPHA_SURFACES (32)
 #else // QOL_IMPROVEMENTS
 #define SITH_MAX_THINGS (32000)
@@ -170,6 +180,10 @@
 #define SITHCAMERA_ZNEAR_FIRSTPERSON (1.0 / 128.0)
 #define SITHCAMERA_ZNEAR (1.0 / 64.0)
 #define SITHCAMERA_ZFAR (128.0)
+#elif defined(TARGET_TWL)
+#define SITHCAMERA_ZNEAR_FIRSTPERSON (1.0 / 64.0)
+#define SITHCAMERA_ZNEAR (1.0 / 64.0)
+#define SITHCAMERA_ZFAR (64.0)
 #else
 #define SITHCAMERA_ZNEAR_FIRSTPERSON (1.0 / 64.0)
 #define SITHCAMERA_ZNEAR (1.0 / 64.0)

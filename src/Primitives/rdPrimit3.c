@@ -14,6 +14,11 @@ void rdPrimit3_ClearFrameCounters()
 
 void rdPrimit3_ClipFace(rdClipFrustum *clipFrustum, rdGeoMode_t geoMode, signed int lightMode, int texMode, rdVertexIdxInfo *idxInfo, rdMeshinfo *mesh_out, rdVector2 *idkIn)
 {
+#ifdef TARGET_TWL
+    //rdPrimit3_NoClipFace(geoMode, lightMode, texMode, idxInfo, mesh_out, idkIn);
+    //return;
+#endif
+
     rdVertexIdxInfo *v7; // eax
     rdMeshinfo *v8; // ebx
     int v9; // esi

@@ -451,6 +451,10 @@ public: // conversion to basic types
 		return static_cast<uint8_t>((data_ & integer_mask) >> fractional_bits);
 	}
 
+	constexpr uint16_t to_int16() const {
+		return static_cast<int16_t>((data_ & integer_mask) >> fractional_bits);
+	}
+
 	constexpr uint16_t to_uint16() const {
 		return static_cast<uint16_t>((data_ & integer_mask) >> fractional_bits);
 	}
@@ -459,16 +463,24 @@ public: // conversion to basic types
 		return static_cast<int>((data_ & integer_mask) >> fractional_bits);
 	}
 
+	constexpr unsigned int to_uint() const {
+		return static_cast<unsigned int>((data_ & integer_mask) >> fractional_bits);
+	}
+
+	constexpr int to_int32() const {
+		return static_cast<int32_t>((data_ & integer_mask) >> fractional_bits);
+	}
+
+	constexpr int to_uint32() const {
+		return static_cast<uint32_t>((data_ & integer_mask) >> fractional_bits);
+	}
+
 	constexpr int64_t to_int64() const {
 		return static_cast<int64_t>((data_ & integer_mask) >> fractional_bits);
 	}
 
 	constexpr uint64_t to_uint64() const {
 		return static_cast<uint64_t>((data_ & integer_mask) >> fractional_bits);
-	}
-
-	constexpr unsigned int to_uint() const {
-		return static_cast<unsigned int>((data_ & integer_mask) >> fractional_bits);
 	}
 
 	constexpr float to_float() const {
@@ -487,8 +499,20 @@ public: // conversion to basic types
         return to_uint8();
     }
 
+    operator int16_t() const {
+        return to_int16();
+    }
+
     operator uint16_t() const {
         return to_uint16();
+    }
+
+    operator int32_t() const {
+        return to_int32();
+    }
+
+    operator uint32_t() const {
+        return to_uint32();
     }
 
 	operator int64_t() const {
@@ -500,9 +524,10 @@ public: // conversion to basic types
     }
 
     operator bool() const {
-        return (bool)!!to_int();
+        return (bool)!!to_int32();
     }
 
+#ifdef TARGET_TWL
     operator int() const {
         return to_int();
     }
@@ -510,6 +535,7 @@ public: // conversion to basic types
     operator unsigned int() const {
         return to_uint();
     }
+#endif
 
     operator float() const {
         return to_float(); 

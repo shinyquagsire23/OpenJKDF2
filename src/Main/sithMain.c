@@ -399,34 +399,51 @@ int sithMain_Tick()
 
 void sithMain_UpdateCamera()
 {
+#if defined(TARGET_TWL)
+    jkPlayer_fov = 90.0;
+    jkPlayer_bJankyPhysics = 1;
+#endif
+
     if ( (g_submodeFlags & 8) == 0 )
     {
         sithMain_sub_4C4D80();
 
-#ifdef QOL_IMPROVEMENTS
+#if defined(QOL_IMPROVEMENTS)
         if (sithCamera_currentCamera && sithCamera_currentCamera->rdCam.canvas)
         {
             // Set screen aspect ratio
             flex_t aspect = sithCamera_currentCamera->rdCam.canvas->screen_width_half / sithCamera_currentCamera->rdCam.canvas->screen_height_half;
-            
-            //if (aspect != sithMain_lastAspect)
-            if (!Main_bMotsCompat)
-            {
-                rdCamera_SetAspectRatio(&sithCamera_currentCamera->rdCam, aspect);
-                rdCamera_SetFOV(&sithCamera_currentCamera->rdCam, jkPlayer_fov);
-                rdCamera_SetOrthoScale(&sithCamera_currentCamera->rdCam, 250.0);
-            }
-            else {
-                rdCamera_SetAspectRatio(&sithCamera_currentCamera->rdCam, aspect);
+#if defined(TARGET_TWL)
+            aspect = 256.0/192.0;
+            static flex_t sithMain_UpdateCamera_lastFov = 90.0;
+            static void* sithMain_UpdateCamera_lastCamera = NULL;
 
-                // We still need this override for cameras that don't have zoom (third-person)
-                if (sithCamera_currentCamera->cameraPerspective != 1) {
+            if (aspect != sithMain_lastAspect || jkPlayer_fov != sithMain_UpdateCamera_lastFov || sithMain_UpdateCamera_lastCamera != sithCamera_currentCamera) {
+#endif
+                if (!Main_bMotsCompat)
+                {
+                    rdCamera_SetAspectRatio(&sithCamera_currentCamera->rdCam, aspect);
                     rdCamera_SetFOV(&sithCamera_currentCamera->rdCam, jkPlayer_fov);
+                    rdCamera_SetOrthoScale(&sithCamera_currentCamera->rdCam, 250.0);
                 }
-                rdCamera_SetOrthoScale(&sithCamera_currentCamera->rdCam, 250.0);
+                else {
+                    rdCamera_SetAspectRatio(&sithCamera_currentCamera->rdCam, aspect);
+
+                    // We still need this override for cameras that don't have zoom (third-person)
+                    if (sithCamera_currentCamera->cameraPerspective != 1) {
+                        rdCamera_SetFOV(&sithCamera_currentCamera->rdCam, jkPlayer_fov);
+                    }
+                    rdCamera_SetOrthoScale(&sithCamera_currentCamera->rdCam, 250.0);
+                }
+#if defined(TARGET_TWL)
             }
-            
+#endif
+
             sithMain_lastAspect = aspect;
+#if defined(TARGET_TWL)
+            sithMain_UpdateCamera_lastFov = jkPlayer_fov;
+            sithMain_UpdateCamera_lastCamera = sithCamera_currentCamera;
+#endif
         }
 #endif
 

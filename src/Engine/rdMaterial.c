@@ -183,7 +183,7 @@ LABEL_21:
 #endif
 #endif
 
-#ifndef TARGET_TWL
+#if !defined(TARGET_TWL)
         created_tex = stdDisplay_VBufferNew(&format, create_ddraw_surface, gpu_mem, 0);
         *texture_struct = created_tex;
         if ( !created_tex )
@@ -197,7 +197,30 @@ LABEL_21:
           (*texture_struct)->format.texture_size_in_bytes);
         stdDisplay_VBufferUnlock(*texture_struct);
 #else
-        std_pHS->fseek(mat_file__, format.width*format.height*(format.format.is16bit?2:1), SEEK_CUR);
+        texture->alphaMats[mipmap_num].width = format.width;
+        texture->alphaMats[mipmap_num].height = format.height;
+        texture->opaqueMats[mipmap_num].width = format.width;
+        texture->opaqueMats[mipmap_num].height = format.height;
+
+        // Limit textures that are loaded on TWL
+        if (!tex_header_1.alpha_en && (format.width <= 64 || mipmap_num >= texture->num_mipmaps-2 || mipmap_num >= texture->num_mipmaps-1)) {
+            created_tex = stdDisplay_VBufferNew(&format, create_ddraw_surface, gpu_mem, 0);
+            *texture_struct = created_tex;
+            (*texture_struct)->format.texture_size_in_bytes = format.width*format.height*(format.format.is16bit?2:1);
+            if ( !created_tex )
+              break;
+            if ( texture->alpha_en & 1 )
+              stdDisplay_VBufferSetColorKey(created_tex, texture->color_transparent);
+            stdDisplay_VBufferLock(*texture_struct);
+            rdroid_pHS->fileRead(
+              mat_file__,
+              (void *)(*texture_struct)->surface_lock_alloc,
+              (*texture_struct)->format.texture_size_in_bytes);
+            stdDisplay_VBufferUnlock(*texture_struct);
+        }
+        else {
+            std_pHS->fseek(mat_file__, format.width*format.height*(format.format.is16bit?2:1), SEEK_CUR);
+        }
 #endif
         format.width = (unsigned int)format.width >> 1;
         format.height = (unsigned int)format.height >> 1;

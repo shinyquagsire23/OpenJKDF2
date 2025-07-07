@@ -273,6 +273,13 @@ void sithRender_Draw()
 
     //lightDebugNum = 0; // Added
 
+#ifdef TARGET_TWL
+    //sithRender_geoMode = RD_GEOMODE_TEXTURED;
+    //sithRender_lightMode = RD_LIGHTMODE_FULLYLIT;
+    //sithRender_texMode = RD_TEXTUREMODE_PERSPECTIVE;
+    rdroid_curVertexColorMode = 0;
+#endif
+
     sithRenderSky_Update();
     if (!sithRender_geoMode)
         return;
@@ -290,6 +297,7 @@ void sithRender_Draw()
 
     sithPlayer_SetScreenTint(sithCamera_currentCamera->sector->tint.x, sithCamera_currentCamera->sector->tint.y, sithCamera_currentCamera->sector->tint.z);
 
+#ifndef TARGET_TWL
     if ( (sithCamera_currentCamera->sector->flags & 2) != 0 )
     {
         flex_t fov = sithCamera_currentCamera->fov;
@@ -311,6 +319,8 @@ void sithRender_Draw()
         rdCamera_SetAspectRatio(&sithCamera_currentCamera->rdCam, sithCamera_currentCamera->aspectRatio);
         sithRender_needsAspectReset = 0;
     }
+#endif
+
     rdSetSortingMethod(0);
     rdSetMipDistances(&sithWorld_pCurrentWorld->mipmapDistance);
     rdSetCullFlags(1);
@@ -332,6 +342,7 @@ void sithRender_Draw()
         sithPlayer_bNoClippingRend = 0;
     }
 
+    // TWL: 26ms
     // Added: noclip
     if (!sithPlayer_bNoClippingRend) {
         sithRender_Clip(sithCamera_currentCamera->sector, rdCamera_pCurCamera->pClipFrustum, 0.0);
@@ -343,6 +354,7 @@ void sithRender_Draw()
         }
     }
 
+    // TWL: 0ms
     sithRender_UpdateAllLights();
     
     if ( (sithRender_flag & 2) != 0 )
@@ -397,11 +409,14 @@ void sithRender_Draw()
     }
 #endif
 
+    // TWL: 123ms
     sithRender_RenderLevelGeometry();
 
+    // TWL: 125ms
     if ( sithRender_numSectors2 )
         sithRender_RenderThings();
 
+    // TWL: 0ms
     if ( sithRender_numSurfaces )
         sithRender_RenderAlphaSurfaces();
 
@@ -567,6 +582,12 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, flex_t a3)
         flex_t dist = (sithCamera_currentCamera->vec3_1.y - v20->y) * adjoinSurface->surfaceInfo.face.normal.y
                    + (sithCamera_currentCamera->vec3_1.z - v20->z) * adjoinSurface->surfaceInfo.face.normal.z
                    + (sithCamera_currentCamera->vec3_1.x - v20->x) * adjoinSurface->surfaceInfo.face.normal.x;
+
+#ifdef TARGET_TWL
+        if (dist > 1.5) {
+            continue;
+        }
+#endif
 
         if ( dist > 0.0 || (dist == 0.0 && sector == sithCamera_currentCamera->sector))
         {
@@ -1350,6 +1371,7 @@ LABEL_150:
         ++sithRender_sectorsDrawn;
     }
 
+    // TWL: 5-27ms
     rdCache_Flush();
     rdCamera_pCurCamera->pClipFrustum = v77;
 }
@@ -1623,6 +1645,9 @@ void sithRender_RenderThings()
                     {
                         model3 = thingIter->rdthing.model3;
 
+#ifdef TARGET_TWL
+                        //model3->geosetSelect = model3->numGeosets-1;
+#else
                         switch ( model3->numGeosets )
                         {
                             case 1:
@@ -1665,6 +1690,7 @@ void sithRender_RenderThings()
                                     model3->geosetSelect = 2;
                                 break;
                         }
+#endif
                     }
                     
                     texMode = thingIter->rdthing.desiredTexMode;

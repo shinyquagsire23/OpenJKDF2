@@ -254,6 +254,9 @@ int main(int argc, char** argv)
 #endif // ARCH_WASM
 
 #ifdef TARGET_TWL
+    if (isDSiMode()) {
+        setCpuClock(1);    
+    }
     defaultExceptionHandler();
     consoleDebugInit(DebugDevice_NOCASH);
 

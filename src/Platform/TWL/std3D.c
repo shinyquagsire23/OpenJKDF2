@@ -2,16 +2,25 @@
 
 #include <nds.h>
 
+#include "General/stdBitmap.h"
 #include "Win95/stdDisplay.h"
+#include "stdPlatform.h"
 
 int std3D_bReinitHudElements = 0;
 
 int textureIDS[8];
 int paletteIDS[3];
-flex_t fCamera = 1.25;
+flex_t fCamera = 1.0;
 int nTexture = 0;
 
 uint16_t i8Pal[256];
+uint16_t i8PalWorld[256];
+
+//stdBitmap* std3D_aUIBitmaps[STD3D_MAX_TEXTURES] = {0};
+//int std3D_aUITextures[STD3D_MAX_TEXTURES] = {0};
+rdDDrawSurface* std3D_aLoadedSurfaces[STD3D_MAX_TEXTURES] = {0};
+int std3D_aLoadedTextures[STD3D_MAX_TEXTURES] = {0};
+//size_t std3D_loadedUITexturesAmt = 0;
 
 typedef struct TWLVERTEX
 {
@@ -30,8 +39,10 @@ static TWLVERTEX GL_tmpVertices[STD3D_MAX_VERTICES] = {0};
 static size_t GL_tmpVerticesAmt = 0;
 static size_t rendered_tris = 0;
 
-static flex_t res_fix_x = (256.0/640.0)/100.0;
-static flex_t res_fix_y = (192.0/480.0)/100.0;
+static flex_t res_fix_x = (1.0/640.0);
+static flex_t res_fix_y = (1.0/480.0);
+
+static float test_idk = 32.0;
 
 //verticies for the cube
 v16 CubeVectors[] = {
@@ -128,6 +139,26 @@ static void update_from_display_palette()
     }
 }
 
+static void* loaded_colormap = NULL;
+
+static void update_from_world_palette()
+{
+    if (sithWorld_pCurrentWorld && sithWorld_pCurrentWorld->colormaps && loaded_colormap != sithWorld_pCurrentWorld->colormaps)
+    {
+
+        for (int i = 0; i < 256; i++) {
+            u8 rval = sithWorld_pCurrentWorld->colormaps->colors[i].r;
+            u8 gval = sithWorld_pCurrentWorld->colormaps->colors[i].g;
+            u8 bval = sithWorld_pCurrentWorld->colormaps->colors[i].b;
+            i8PalWorld[i] = RGB15((rval>>3),(gval>>3),(bval>>3));
+        }
+
+        loaded_colormap = sithWorld_pCurrentWorld->colormaps;
+    }
+
+    
+}
+
 int std3D_Startup()
 {
     // initialize gl
@@ -171,32 +202,152 @@ int std3D_Startup()
     //glBindTexture(0, paletteIDS[0]);
     glColorTableEXT( 0, 0, 256, 0, 0, (u16*)i8Pal );
 
+    glResetMatrixStack();
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     //gluPerspective(70, 256.0 / 192.0, 0.1, 40);
-    glOrtho(0.0, 2.56, 0.0, 1.92, 0.1, 100);
+    glOrtho(0.0, 2.56, 0.0, 1.92, 0.01, 100);
+    //glFrustum(0.0, 0.256, 0.0, 0.192, 0.1, 100);
+
+    glMatrixMode(GL_TEXTURE);
+    glLoadIdentity();
+
+    MATRIX_MULT3x3 = floattof32(1.0F);
+    MATRIX_MULT3x3 = 0;
+    MATRIX_MULT3x3 = 0;
+
+    MATRIX_MULT3x3 = 0;
+    MATRIX_MULT3x3 = floattof32(1.0F);
+    MATRIX_MULT3x3 = 0;
+
+    MATRIX_MULT3x3 = 0;
+    MATRIX_MULT3x3 = 0;
+    MATRIX_MULT3x3 = floattof32(1.0F);
 
     return 0;
 }
 void std3D_Shutdown() {}
+
+/*
+                                                  | b11 b12 b13 b14 |
+  | c11 c12 c13 c14 |  =  | a11 a12 a13 a14 |  *  | b21 b22 b23 b24 |
+                                                  | b31 b32 b33 b34 |
+                                                  | b41 b42 b43 b44 |
+
+The formula for calculating the separate elements is same as above,
+
+  cyx = ay1*b1x + ay2*b2x + ay3*b3x + ay4*b4x
+
+
+c14 = a11*b14 + a12*b24 + a13*b34 + a14*b44
+*/
+
+void glOrthof32_mod(int left, int right, int bottom, int top, int zNear, int zFar, int w) {
+    MATRIX_LOAD4x4 = divf32(inttof32(2), right - left);
+    MATRIX_LOAD4x4 = 0;
+    MATRIX_LOAD4x4 = 0;
+    MATRIX_LOAD4x4 = floattof32(0.0f);
+
+    MATRIX_LOAD4x4 = 0;
+    MATRIX_LOAD4x4 = -divf32(inttof32(2), top - bottom);
+    MATRIX_LOAD4x4 = 0;
+    MATRIX_LOAD4x4 = floattof32(0.0f);
+
+    MATRIX_LOAD4x4 = 0;
+    MATRIX_LOAD4x4 = 0;
+    MATRIX_LOAD4x4 = floattof32(1.0F);
+    MATRIX_LOAD4x4 = floattof32(0.0F);
+
+    MATRIX_LOAD4x4 = -divf32(right + left, right - left);//0;
+    MATRIX_LOAD4x4 = divf32(top + bottom, top - bottom); //0;
+    MATRIX_LOAD4x4 = floattof32(0.0F);//-divf32(zFar + zNear, zFar - zNear);//0;
+    MATRIX_LOAD4x4 = floattof32(1.0f);
+}
+
+void glOrtho_mod(float left, float right, float bottom, float top, float zNear, float zFar, float w) {
+    glOrthof32_mod(floattof32(left), floattof32(right), floattof32(bottom), floattof32(top), floattof32(zNear), floattof32(zFar), floattof32(w));
+}
+
+
+void wOverridef32(int w) {
+    MATRIX_LOAD4x4 = floattof32(1.0f);
+    MATRIX_LOAD4x4 = 0;
+    MATRIX_LOAD4x4 = 0;
+    MATRIX_LOAD4x4 = 0;
+
+    MATRIX_LOAD4x4 = 0;
+    MATRIX_LOAD4x4 = floattof32(1.0f);
+    MATRIX_LOAD4x4 = 0;
+    MATRIX_LOAD4x4 = 0;
+
+    MATRIX_LOAD4x4 = 0;
+    MATRIX_LOAD4x4 = 0;
+    MATRIX_LOAD4x4 = floattof32(1.0F);
+    MATRIX_LOAD4x4 = 0;
+
+    MATRIX_LOAD4x4 = 0;
+    MATRIX_LOAD4x4 = 0;
+    MATRIX_LOAD4x4 = 0;
+    MATRIX_LOAD4x4 = w;
+}
+
+void wOverride(float w) {
+    wOverridef32(floattof32(w));
+}
+
 int std3D_StartScene()
 {
     rendered_tris = 0;
 
-    glFlush(0);
+    glFlush(GL_WBUFFERING); // GL_WBUFFERING
 
     glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
+    //glPushMatrix();
 
-    gluLookAt(  0.0, 0.0, fCamera,      //camera possition 
-        0.0, 0.0, 0.0,      //look at
-        0.0, 1.0, 0.0);     //up
+    glLoadIdentity();
+
+    if (jkGame_isDDraw) {
+        
+
+        test_idk += 0.001;
+        glMatrixMode(GL_PROJECTION);
+        //glPushMatrix();
+        //glLoadIdentity();
+        //gluPerspective(70, 256.0 / 192.0, 0.1, 40);
+        //glOrtho(0.0, 2.56, 0.0, 1.92, 0.001, 1.0);
+        glOrtho_mod(0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0);
+        //glFrustum(0.0, 2.56, 0.0, 1.92, 2.0, 0.0);
+        //printf("%f\n",(256.0/192.0)+test_idk);
+#if 0
+        int clip_current[16];
+        float clip_current_f[16];
+        glGetFixed(GL_GET_MATRIX_PROJECTION, clip_current);
+        for (int i = 0; i < 16; i++) {
+            clip_current_f[i] = f32tofloat(clip_current[i]);
+        }
+        printf("%f %f %f %f\n", clip_current_f[0], clip_current_f[0+1], clip_current_f[0+2], clip_current_f[0+3]);
+        printf("%f %f %f %f\n", clip_current_f[4], clip_current_f[4+1], clip_current_f[4+2], clip_current_f[4+3]);
+        printf("%f %f %f %f\n", clip_current_f[8], clip_current_f[8+1], clip_current_f[8+2], clip_current_f[8+3]);
+        printf("%f %f %f %f\n", clip_current_f[12], clip_current_f[12+1], clip_current_f[12+2], clip_current_f[12+3]);
+#endif
+    }
+    
 
     return 0;
 }
 int std3D_EndScene()
 {
-    glPopMatrix(1);        
+    glMatrixMode(GL_MODELVIEW);
+    //glPopMatrix(1);
+
+    if (jkGame_isDDraw) {
+        glMatrixMode(GL_PROJECTION);
+        //glPopMatrix(1);
+    }
     //printf("EndScene\n");
 
     return 0;
@@ -226,8 +377,14 @@ void std3D_DrawRenderList()
     TWLVERTEX* vertexes = GL_tmpVertices;
     rdTri* tris = GL_tmpTris;
 
+    update_from_world_palette();
+
+    glBindTexture(0, textureIDS[nTexture]);
+    glColorTableEXT( 0, 0, 256, 0, 0, (u16*)i8PalWorld );
+
     glColor3b(255,255,255);
-    glBindTexture(0, textureIDS[2]);
+    //glBindTexture(0, textureIDS[2]);
+
 
     glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK | POLY_MODULATION | POLY_ID(0) ) ;
     //glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
@@ -236,7 +393,18 @@ void std3D_DrawRenderList()
     for (int j = 0; j < GL_tmpTrisAmt; j++)
     {
         
-        
+        rdDDrawSurface* tex = tris[j].texture;
+        int tex_id = textureIDS[2];
+        int tex_w = tex->width;
+        int tex_h = tex->height;
+        if (tex) {
+            tex_id = tex->texture_id;
+        }
+        glBindTexture(0, tex_id);
+        //glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S | GL_TEXTURE_WRAP_T | TEXGEN_POSITION);
+        //printf("tri %d %dx%d\n", tex_id, tex_w, tex_h);
+
+
         TWLVERTEX* v1 = &vertexes[tris[j].v1];
         TWLVERTEX* v2 = &vertexes[tris[j].v2];
         TWLVERTEX* v3 = &vertexes[tris[j].v3];
@@ -250,27 +418,67 @@ void std3D_DrawRenderList()
         glColor3b((j&0xFF),(j&0xFF),(j&0xFF));
         glVertex3v16(floattov16(v3->x / 100.0), floattov16(v3->y / 100.0), floattov16(v3->z));*/
 
-        GFX_TEX_COORD = TEXTURE_PACK(inttot16(16), inttot16(16));
-        //glColor3b((int)(v3->tu*255.0), (int)(v3->tv*255.0), 255);
-        //glColor3b((j&0xFF),(j&0xFF),(j&0xFF));
-        //glVertex3v16(floattov16(0.0), floattov16(1.92), floattov16(0.6));
-        glColor3b(COMP_R(v3->color),COMP_G(v3->color),COMP_B(v3->color));
-        glVertex3v16(v3->x, v3->y, v3->z);
+        {
+            //glMatrixMode(GL_PROJECTION);
+            //glOrtho_mod(0.0, 2.56, 0.0, 1.92, 0.0, 1.0, (float)v3->z);
+            float v3_w = 1.0/((1.0-f32tofloat(v3->z)) * SITHCAMERA_ZFAR);
+            //float v3_w = (f32tofloat(v3->z));
+            //float v3_w = (1.0-f32tofloat(v3->z) * (1.0/64));
+            //float v3_w = (1.0/f32tofloat(v3->z));
+            glMatrixMode(GL_MODELVIEW);
+            wOverride(v3_w);
 
-        GFX_TEX_COORD = TEXTURE_PACK(0, inttot16(16));
-        //glColor3b((int)(v2->tu*255.0), (int)(v2->tv*255.0), 255);
-        //glColor3b((j&0xFF),(j&0xFF),(j&0xFF));
-        //glVertex3v16(floattov16(2.56), floattov16(1.28), floattov16(0.6));
-        glColor3b(COMP_R(v2->color),COMP_G(v2->color),COMP_B(v2->color));
-        glVertex3v16(v2->x, v2->y, v2->z);
+            //GFX_TEX_COORD = TEXTURE_PACK(inttot16(tex_w), inttot16(tex_h));
+            GFX_TEX_COORD = TEXTURE_PACK(inttot16((int)(v3->tu*tex_w)), inttot16((int)(v3->tv*tex_h)));
+            //glColor3b((int)(v3->tu*255.0), (int)(v3->tv*255.0), 255);
+            //glColor3b((j&0xFF),(j&0xFF),(j&0xFF));
+            //glVertex3v16(floattov16(0.0), floattov16(1.92), floattov16(0.6));
+            glColor3b(COMP_R(v3->color),COMP_G(v3->color),COMP_B(v3->color));
+            //glColor3b(0xFF, 0x00, 0x00);
+            glVertex3v16(floattov16((f32tofloat(v3->x)*v3_w)), floattov16((f32tofloat(v3->y)*v3_w)), floattov16(f32tofloat(v3->z)*v3_w));
+        }
+        
+        {
+            //glMatrixMode(GL_PROJECTION);
+            //glOrtho_mod(0.0, 2.56, 0.0, 1.92, 0.0, 1.0, (float)v2->z);
+            float v2_w = 1.0/((1.0-f32tofloat(v2->z)) * SITHCAMERA_ZFAR);
+            //float v2_w = (f32tofloat(v2->z));
+            //float v2_w = (1.0-f32tofloat(v2->z) * (1.0/64));
+            //float v2_w = (1.0/f32tofloat(v2->z));
+            glMatrixMode(GL_MODELVIEW);
+            wOverride(v2_w);
 
+            //GFX_TEX_COORD = TEXTURE_PACK(0, inttot16(tex_h));
+            GFX_TEX_COORD = TEXTURE_PACK(inttot16((int)(v2->tu*tex_w)), inttot16((int)(v2->tv*tex_h)));
+            //glColor3b((int)(v2->tu*255.0), (int)(v2->tv*255.0), 255);
+            //glColor3b((j&0xFF),(j&0xFF),(j&0xFF));
+            //glVertex3v16(floattov16(2.56), floattov16(1.28), floattov16(0.6));
+            glColor3b(COMP_R(v2->color),COMP_G(v2->color),COMP_B(v2->color));
+            //glColor3b(0, 0xff, 0x00);
+            glVertex3v16(floattov16((f32tofloat(v2->x)*v2_w)), floattov16((f32tofloat(v2->y)*v2_w)), floattov16(f32tofloat(v2->z)*v2_w));
 
-        GFX_TEX_COORD = TEXTURE_PACK(0, inttot16(0));
-        //glColor3b((int)(v1->tu*255.0), (int)(v1->tv*255.0), 255);
-        //glVertex3v16(floattov16(0.0), floattov16(1.28), floattov16(0.6));
-        glColor3b(COMP_R(v1->color),COMP_G(v1->color),COMP_B(v1->color));
-        glVertex3v16(v1->x, v1->y, v1->z);
+        }
+        
+        {
+            //glMatrixMode(GL_PROJECTION);
+            //glOrtho_mod(0.0, 2.56, 0.0, 1.92, 0.0, 1.0, (float)v1->z);
+            float v1_w = 1.0/((1.0-f32tofloat(v1->z)) * SITHCAMERA_ZFAR);
+            //float v1_w = (f32tofloat(v1->z));
+            //float v1_w = (1.0-f32tofloat(v1->z) * (1.0/64));
+            //float v1_w = (1.0/f32tofloat(v1->z));
+            glMatrixMode(GL_MODELVIEW);
+            wOverride(v1_w);
 
+            //GFX_TEX_COORD = TEXTURE_PACK(0, inttot16(0));
+            GFX_TEX_COORD = TEXTURE_PACK(inttot16((int)(v1->tu*tex_w)), inttot16((int)(v1->tv*tex_h)));
+            //glColor3b((int)(v1->tu*255.0), (int)(v1->tv*255.0), 255);
+            //glVertex3v16(floattov16(0.0), floattov16(1.28), floattov16(0.6));
+            glColor3b(COMP_R(v1->color),COMP_G(v1->color),COMP_B(v1->color));
+            //glColor3b(0, 0x00, 0xff);
+            glVertex3v16(floattov16((f32tofloat(v1->x)*v1_w)), floattov16((f32tofloat(v1->y)*v1_w)), floattov16(f32tofloat(v1->z)*v1_w));
+            //printf("%f %f\n", v1_w, test_idk);
+        }
+        
         
     }
     glEnd();
@@ -312,6 +520,10 @@ void std3D_AddRenderListTris(rdTri *tris, unsigned int num_tris)
 }
 void std3D_AddRenderListLines(rdLine* lines, uint32_t num_lines) {}
 
+#define flextov16(n) ((v16)((int32_t)n.to_raw() >> (16-12)))
+
+//#define flextov16(n) (floattov16((float)n))
+
 int std3D_AddRenderListVertices(D3DVERTEX *vertices, int count)
 {
     if (GL_tmpVerticesAmt + count >= STD3D_MAX_VERTICES)
@@ -324,9 +536,22 @@ int std3D_AddRenderListVertices(D3DVERTEX *vertices, int count)
         D3DVERTEX* v = &vertices[i];
         TWLVERTEX* t = &GL_tmpVertices[GL_tmpVerticesAmt+i];
 
-        t->x = floattov16(v->x * res_fix_x);
-        t->y = floattov16((480.0 - v->y) * res_fix_y);
-        t->z = floattov16(-v->z);
+        flex_t twl_z = (float)v->z;
+        flex_t twl_x = (v->x * res_fix_x);// * (256.0/128.0);
+        flex_t twl_y = (v->y * res_fix_y);// * (256.0/128.0);
+        
+        //printf("%f\n", (float)v->z);
+
+#ifndef EXPERIMENTAL_FIXED_POINT
+        t->x = floattov16(twl_x);
+        t->y = floattov16(twl_y);
+        t->z = floattov16(twl_z);
+#else
+        t->x = flextov16(twl_x);
+        t->y = flextov16(twl_y);
+        t->z = flextov16(twl_z);
+#endif
+        
         t->tu = v->tu;
         t->tv = v->tv;
         t->color = v->color;
@@ -337,13 +562,222 @@ int std3D_AddRenderListVertices(D3DVERTEX *vertices, int count)
     return 1;
 }
 void std3D_UpdateFrameCount(rdDDrawSurface *surface) {}
-void std3D_PurgeTextureCache() {}
 int std3D_ClearZBuffer()
 {
     return 0;
 }
+
+int std3D_twl_dims_convert_to_e(int width) {
+    int width_e = TEXTURE_SIZE_8;
+    if (width == 16) {
+        width_e = TEXTURE_SIZE_16;
+    }
+    else if (width == 32) {
+        width_e = TEXTURE_SIZE_32;
+    }
+    else if (width == 64) {
+        width_e = TEXTURE_SIZE_64;
+    }
+    else if (width == 128) {
+        width_e = TEXTURE_SIZE_128;
+    }
+    else if (width == 256) {
+        width_e = TEXTURE_SIZE_256;
+    }
+    else if (width == 512) {
+        width_e = TEXTURE_SIZE_512;
+    }
+    else {
+        printf("Failed to find size for width: %d\n", width);
+    }
+
+    return width_e;
+}
 int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_alpha_tex, int no_alpha)
 {
+    //printf("Add to cache %p %p\n", vbuf, texture);
+    //if (Main_bHeadless) return 1;
+    if (!vbuf || !texture) return 1;
+    if (texture->texture_loaded) return 1;
+
+    if (std3D_loadedTexturesAmt >= STD3D_MAX_TEXTURES) {
+        stdPlatform_Printf("ERROR: Texture cache exhausted!! Ask ShinyQuagsire to increase the size.\n");
+        return 1;
+    }
+    
+    int image_texture;
+    glGenTextures(1, &image_texture);
+    uint8_t* image_8bpp = (uint8_t*)vbuf->surface_lock_alloc;
+    uint16_t* image_16bpp = (uint16_t*)vbuf->surface_lock_alloc;
+    uint8_t* pal = (uint8_t*)vbuf->palette;
+    
+    uint32_t width, height;
+    width = vbuf->format.width;
+    height = vbuf->format.height;
+
+    glBindTexture(GL_TEXTURE_2D, image_texture);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S);
+    glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T);
+    //glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+    //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    //glPixelStorei(GL_PACK_ALIGNMENT, 1);
+
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+
+    if (vbuf->format.format.is16bit)
+    {
+#if 0
+        texture->is_16bit = 1;
+#if 1
+        if (!is_alpha_tex)
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width, height, 0,  GL_RGB, GL_UNSIGNED_SHORT_5_6_5_REV, image_8bpp);
+        else
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0,  GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, image_8bpp);
+#endif
+
+#ifdef __NOTDEF_FORMAT_CONVERSION
+        void* image_data = malloc(width*height*4);
+    
+        for (int j = 0; j < height; j++)
+        {
+            for (int i = 0; i < width; i++)
+            {
+                uint32_t index = (i*height) + j;
+                uint32_t val_rgba = 0x00000000;
+                
+                uint16_t val = image_16bpp[index];
+                if (!is_alpha_tex) // RGB565
+                {
+                    uint8_t val_a1 = 1;
+                    uint8_t val_r5 = (val >> 11) & 0x1F;
+                    uint8_t val_g6 = (val >> 5) & 0x3F;
+                    uint8_t val_b5 = (val >> 0) & 0x1F;
+
+                    uint8_t val_a8 = val_a1 ? 0xFF : 0x0;
+                    uint8_t val_r8 = ( val_r5 * 527 + 23 ) >> 6;
+                    uint8_t val_g8 = ( val_g6 * 259 + 33 ) >> 6;
+                    uint8_t val_b8 = ( val_b5 * 527 + 23 ) >> 6;
+
+#ifdef __NOTDEF_TRANSPARENT_BLACK
+                    uint8_t transparent_r8 = (vbuf->transparent_color >> 16) & 0xFF;
+                    uint8_t transparent_g8 = (vbuf->transparent_color >> 8) & 0xFF;
+                    uint8_t transparent_b8 = (vbuf->transparent_color >> 0) & 0xFF;
+
+                    if (val_r8 == transparent_r8 && val_g8 == transparent_g8 && val_b8 == transparent_b8) {
+                        val_a1 = 0;
+                    }
+#endif // __NOTDEF_TRANSPARENT_BLACK
+
+                    val_rgba |= (val_a8 << 24);
+                    val_rgba |= (val_b8 << 16);
+                    val_rgba |= (val_g8 << 8);
+                    val_rgba |= (val_r8 << 0);
+                }
+                else // RGB1555
+                {
+                    uint8_t val_a1 = (val >> 15);
+                    uint8_t val_r5 = (val >> 10) & 0x1F;
+                    uint8_t val_g5 = (val >> 5) & 0x1F;
+                    uint8_t val_b5 = (val >> 0) & 0x1F;
+
+                    uint8_t val_a8 = val_a1 ? 0xFF : 0x0;
+                    uint8_t val_r8 = ( val_r5 * 527 + 23 ) >> 6;
+                    uint8_t val_g8 = ( val_g5 * 527 + 23 ) >> 6;
+                    uint8_t val_b8 = ( val_b5 * 527 + 23 ) >> 6;
+
+                    val_rgba |= (val_a8 << 24);
+                    val_rgba |= (val_b8 << 16);
+                    val_rgba |= (val_g8 << 8);
+                    val_rgba |= (val_r8 << 0);
+                }
+                    
+                *(uint32_t*)(image_data + index*4) = val_rgba;
+            }
+        }
+        
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, image_data);
+
+        texture->pDataDepthConverted = image_data;
+#endif // __NOTDEF_FORMAT_CONVERSION
+#endif
+    }
+    else {
+#if 0
+        void* image_data = malloc(width*height*4);
+    
+        for (int j = 0; j < height; j++)
+        {
+            for (int i = 0; i < width; i++)
+            {
+                uint32_t index = (i*height) + j;
+                uint32_t val_rgba = 0xFF000000;
+                
+                if (pal)
+                {
+                    uint8_t val = image_8bpp[index];
+                    val_rgba |= (pal[(val * 3) + 2] << 16);
+                    val_rgba |= (pal[(val * 3) + 1] << 8);
+                    val_rgba |= (pal[(val * 3) + 0] << 0);
+                }
+                else
+                {
+                    uint8_t val = image_8bpp[index];
+                    rdColor24* pal_master = (rdColor24*)sithWorld_pCurrentWorld->colormaps->colors;//stdDisplay_gammaPalette;
+                    rdColor24* color = &pal_master[val];
+                    val_rgba |= (color->r << 16);
+                    val_rgba |= (color->g << 8);
+                    val_rgba |= (color->b << 0);
+                }
+                
+                *(uint32_t*)(image_data + index*4) = val_rgba;
+            }
+        }
+        
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+
+        texture->pDataDepthConverted = image_data;
+#endif
+        int width_e = std3D_twl_dims_convert_to_e(width);
+        int height_e = std3D_twl_dims_convert_to_e(height);
+
+        texture->is_16bit = 0;
+        //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB256, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, image_8bpp);
+        glTexImage2D(0, 0, GL_RGB256, width_e, height_e, 0, GL_TEXTURE_WRAP_S | GL_TEXTURE_WRAP_T | TEXGEN_TEXCOORD, (u8*)image_8bpp);
+
+        //texture->pDataDepthConverted = NULL;
+    }
+
+    
+    //std3D_aLoadedSurfaces[std3D_loadedTexturesAmt] = texture;
+    //std3D_aLoadedTextures[std3D_loadedTexturesAmt++] = image_texture;
+    
+    /*ext->surfacebuf = image_data;
+    ext->surfacetex = image_texture;
+    ext->surfacepaltex = pal_texture;*/
+    
+    texture->texture_id = image_texture;
+    //texture->emissive_texture_id = 0;
+    //texture->displacement_texture_id = 0;
+    texture->texture_loaded = 1;
+#if 0
+    texture->emissive_factor[0] = 0.0;
+    texture->emissive_factor[1] = 0.0;
+    texture->emissive_factor[2] = 0.0;
+    texture->albedo_factor[0] = 1.0;
+    texture->albedo_factor[1] = 1.0;
+    texture->albedo_factor[2] = 1.0;
+    texture->albedo_factor[3] = 1.0;
+    texture->displacement_factor = 0.0;
+    texture->albedo_data = NULL;
+    texture->displacement_data = NULL;
+    texture->emissive_data = NULL;
+#endif
+
+    glBindTexture(GL_TEXTURE_2D, textureIDS[2]);
+    
     return 1;
 }
 
@@ -354,13 +788,19 @@ void std3D_DrawMenu()
 {
     if (jkGame_isDDraw) return;
 
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    //gluPerspective(70, 256.0 / 192.0, 0.1, 40);
+    glOrtho(0.0, 2.56, 0.0, 1.92, 0.1, 100);
+
     //printf("std3D_DrawMenu\n");
-    /*glMatrixMode(GL_MODELVIEW);
+    glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
 
     gluLookAt(  0.0, 0.0, fCamera,      //camera possition 
         0.0, 0.0, 0.0,      //look at
-        0.0, 1.0, 0.0);     //up*/
+        0.0, 1.0, 0.0);     //up
 
     update_from_display_palette();
 
@@ -483,6 +923,12 @@ void std3D_DrawMenu()
 
     //glFlush(GL_TRANS_MANUALSORT);
 
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix(1);
+
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix(1);
+
 }
 void std3D_DrawSceneFbo() {}
 void std3D_FreeResources() {}
@@ -512,12 +958,136 @@ int std3D_HasAlpha() { return 0; }
 int std3D_HasAlphaFlatStippled() { return 0; }
 int std3D_HasModulateAlpha() { return 0; }
 
+void std3D_PurgeBitmapRefs(stdBitmap *pBitmap)
+{
+#if 0
+    for (int i = 0; i < STD3D_MAX_TEXTURES; i++)
+    {
+        int texId = std3D_aUITextures[i];
+        stdBitmap* tex = std3D_aUIBitmaps[i];
+        if (!tex) continue;
+        if (tex != pBitmap) continue;
 
+        for (int j = 0; j < tex->numMips; j++)
+        {
+            if (tex->aTextureIds[j] == texId) {
+                std3D_PurgeUIEntry(i, j);
+                break;
+            }
+        }
+    }
+#endif
+}
 
-void std3D_PurgeUIEntry(int i, int idx) {}
-void std3D_PurgeTextureEntry(int i) {}
-void std3D_PurgeBitmapRefs(stdBitmap *pBitmap) {}
-void std3D_PurgeSurfaceRefs(rdDDrawSurface *texture) {}
+void std3D_PurgeSurfaceRefs(rdDDrawSurface *texture)
+{
+    for (int i = 0; i < STD3D_MAX_TEXTURES; i++)
+    {
+        rdDDrawSurface* tex = std3D_aLoadedSurfaces[i];
+        if (!tex) continue;
+        if (tex != texture) continue;
+
+        std3D_PurgeTextureEntry(i);
+    }
+}
+
+void std3D_PurgeTextureEntry(int i) {
+    if (std3D_aLoadedTextures[i]) {
+        glDeleteTextures(1, &std3D_aLoadedTextures[i]);
+        std3D_aLoadedTextures[i] = 0;
+    }
+
+    rdDDrawSurface* tex = std3D_aLoadedSurfaces[i];
+    if (!tex) return;
+
+#if 0
+    if (tex->pDataDepthConverted != NULL) {
+        free(tex->pDataDepthConverted);
+        tex->pDataDepthConverted = NULL;
+    }
+
+    if (tex->albedo_data != NULL) {
+        //jkgm_aligned_free(tex->albedo_data);
+        tex->albedo_data = NULL;
+    }
+
+    if (tex->emissive_data != NULL) {
+        //jkgm_aligned_free(tex->emissive_data);
+        tex->emissive_data = NULL;
+    }
+
+    if (tex->displacement_data != NULL) {
+        //jkgm_aligned_free(tex->displacement_data);
+        tex->displacement_data = NULL;
+    }
+
+    if (tex->emissive_texture_id != 0) {
+        glDeleteTextures(1, &tex->emissive_texture_id);
+        tex->emissive_texture_id = 0;
+    }
+
+    if (tex->displacement_texture_id != 0) {
+        glDeleteTextures(1, &tex->displacement_texture_id);
+        tex->displacement_texture_id = 0;
+    }
+
+    tex->emissive_factor[0] = 0.0;
+    tex->emissive_factor[1] = 0.0;
+    tex->emissive_factor[2] = 0.0;
+    tex->albedo_factor[0] = 1.0;
+    tex->albedo_factor[1] = 1.0;
+    tex->albedo_factor[2] = 1.0;
+    tex->albedo_factor[3] = 1.0;
+    tex->displacement_factor = 0.0;
+#endif
+    tex->texture_loaded = 0;
+    tex->texture_id = 0;
+
+    std3D_aLoadedSurfaces[i] = NULL;
+}
+
+void std3D_PurgeUIEntry(int i, int idx) {
+#if 0
+    if (std3D_aUITextures[i]) {
+        glDeleteTextures(1, &std3D_aUITextures[i]);
+        std3D_aUITextures[i] = 0;
+    }
+
+    stdBitmap* tex = std3D_aUIBitmaps[i];
+    if (!tex) return;
+
+    tex->abLoadedToGPU[idx] = 0;
+    tex->aTextureIds[idx] = 0;
+    free(tex->paDataDepthConverted[idx]);
+    tex->paDataDepthConverted[idx] = NULL;
+
+    std3D_aUIBitmaps[i] = NULL;
+    std3D_loadedUITexturesAmt--;
+#endif
+}
+
+void std3D_PurgeTextureCache()
+{
+#if 0
+    if (Main_bHeadless) {
+        std3D_loadedTexturesAmt = 0;
+        return;
+    }
+#endif
+
+    if (!std3D_loadedTexturesAmt) {
+        jk_printf("Skipping texture cache purge, nothing loaded.\n");
+        return;
+    }
+
+    jk_printf("Purging texture cache... %x\n", std3D_loadedTexturesAmt);
+    for (int i = 0; i < std3D_loadedTexturesAmt; i++)
+    {
+        std3D_PurgeTextureEntry(i);
+    }
+    std3D_loadedTexturesAmt = 0;
+}
+
 void std3D_UpdateSettings() {}
 void std3D_Screenshot(const char* pFpath) {}
 

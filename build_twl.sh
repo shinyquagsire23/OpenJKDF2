@@ -15,9 +15,9 @@ OPENJKDF2_BUILD_DIR=$(pwd)
 # Prevent macOS headers from getting linked in
 export -n SDKROOT MACOSX_DEPLOYMENT_TARGET CPLUS_INCLUDE_PATH C_INCLUDE_PATH
 
-export EXPERIMENTAL_FIXED_POINT=1
-cmake .. --toolchain $(pwd)/../cmake_modules/toolchain_twl.cmake &&
-(make -j $(nproc) openjkdf2.nds || make -j1 openjkdf2.nds)
+EXPERIMENTAL_FIXED_POINT=1
+EXPERIMENTAL_FIXED_POINT=$EXPERIMENTAL_FIXED_POINT cmake .. --toolchain $(pwd)/../cmake_modules/toolchain_twl.cmake &&
+(EXPERIMENTAL_FIXED_POINT=$EXPERIMENTAL_FIXED_POINT make -j $(nproc) openjkdf2.nds || EXPERIMENTAL_FIXED_POINT=$EXPERIMENTAL_FIXED_POINT make -j1 openjkdf2.nds)
 if [ $? -ne 0 ]; then
     exit -1
 fi
