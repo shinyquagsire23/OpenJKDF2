@@ -114,7 +114,7 @@ int sithMulti_ProcessJoinLeave(sithCogMsg *msg);
 int sithMulti_ProcessPing(sithCogMsg *msg);
 int sithMulti_ProcessPingResponse(sithCogMsg *msg);
 int sithMulti_ProcessQuit(sithCogMsg *msg);
-int sithMulti_ServerLeft(int a, sithEventInfo* b);
+int sithMulti_ServerLeft(int32_t a, sithEventInfo* b);
 void sithMulti_SendLeaveJoin(int sendtoId, int bSync);
 int sithMulti_ProcessLeaveJoin(sithCogMsg *msg);
 void sithMulti_sub_4CA470(int a1);

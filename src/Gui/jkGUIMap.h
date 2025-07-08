@@ -17,9 +17,9 @@ void jkGuiMap_Startup();
 void jkGuiMap_Shutdown();
 void jkGuiMap_DrawMapScreen(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw);
 void jkGuiMap_sub_415720(jkGuiMenu *menu);
-int jkGuiMap_sub_415B40(jkGuiElement* pElement, jkGuiMenu *menu, int mouseX, int mouseY, int bRedraw);
-int jkGuiMap_sub_415B60(jkGuiElement* pElement, jkGuiMenu *menu, int mouseX, int mouseY, int bRedraw);
-int jkGuiMap_sub_415B70(jkGuiElement* pElement, jkGuiMenu *menu, int mouseX, int mouseY, int bRedraw);
+int jkGuiMap_sub_415B40(jkGuiElement* pElement, jkGuiMenu *menu, int32_t mouseX, int32_t mouseY, int bRedraw);
+int jkGuiMap_sub_415B60(jkGuiElement* pElement, jkGuiMenu *menu, int32_t mouseX, int32_t mouseY, int bRedraw);
+int jkGuiMap_sub_415B70(jkGuiElement* pElement, jkGuiMenu *menu, int32_t mouseX, int32_t mouseY, int bRedraw);
 int jkGuiMap_Show();
 
 //static int (*jkGuiMap_Show)() = (void*)jkGuiMap_Show_ADDR;

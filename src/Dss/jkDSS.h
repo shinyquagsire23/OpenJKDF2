@@ -37,7 +37,7 @@
 #define jkDSS_ProcessSetTeam_ADDR (0x0040D450)
 
 int jkDSS_Startup();
-int jkDSS_JKM1(int unused1, sithEventInfo* unused2); // MOTS added
+int jkDSS_JKM1(int32_t unused1, sithEventInfo* unused2); // MOTS added
 void jkDSS_Shutdown();
 int jkDSS_idk4();
 void jkDSS_playerconfig_idksync();

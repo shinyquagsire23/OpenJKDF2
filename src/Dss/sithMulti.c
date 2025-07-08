@@ -720,7 +720,7 @@ int sithMulti_ProcessQuit(sithCogMsg *msg)
     return 1;
 }
 
-int sithMulti_ServerLeft(int a, sithEventInfo* b)
+int sithMulti_ServerLeft(int32_t a, sithEventInfo* b)
 {
     unsigned int v0; // edi
     sithPlayerInfo* v1; // esi

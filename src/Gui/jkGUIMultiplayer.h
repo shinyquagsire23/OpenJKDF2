@@ -41,7 +41,7 @@ void jkGuiMultiplayer_idk(jkGuiMenu *pMenu);
 int jkGuiMultiplayer_CogMsgHandleJoining(sithCogMsg *msg);
 void jkGuiMultiplayer_sub_4140B0(jkGuiMenu *pMenu);
 void jkGuiMultiplayer_sub_413E50(int idx);
-int jkGuiMultiplayer_sub_413E00(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int bRedraw);
+int jkGuiMultiplayer_sub_413E00(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, int bRedraw);
 
 int jkGuiMultiplayer_Show2();
 void jkGuiMultiplayer_sub_4142C0(jkGuiMenu *pMenu);

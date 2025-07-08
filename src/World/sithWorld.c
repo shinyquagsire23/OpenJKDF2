@@ -243,8 +243,8 @@ int sithWorld_NewEntry(sithWorld *pWorld)
     int v3; // eax
     rdVector3 *v4; // eax
     flex_t *v5; // edi
-    int *v6; // edi
-    int *v7; // edi
+    int32_t *v6; // edi
+    int32_t *v7; // edi
     sithSector **v8; // edx
     int v9; // edi
     sithAdjoin *adjoinIter; // eax
@@ -271,13 +271,13 @@ int sithWorld_NewEntry(sithWorld *pWorld)
                 return 0;
             _memset(v5, 0, sizeof(flex_t) * pWorld->numVertices);
 
-            v6 = (int *)pSithHS->alloc(sizeof(int) * pWorld->numVertices);
+            v6 = (int32_t *)pSithHS->alloc(sizeof(int32_t) * pWorld->numVertices);
             pWorld->alloc_unk98 = v6;
             if ( !v6 )
                 return 0;
             _memset(v6, 0, sizeof(int) * pWorld->numVertices);
 
-            v7 = (int *)pSithHS->alloc(sizeof(int) * pWorld->numVertices);
+            v7 = (int32_t *)pSithHS->alloc(sizeof(int32_t) * pWorld->numVertices);
             pWorld->alloc_unk9c = v7;
             if ( !v7 )
                 return 0;

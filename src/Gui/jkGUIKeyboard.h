@@ -21,15 +21,15 @@
 
 const char* jkGuiKeyboard_DIKNumToStr(unsigned int idx, char bIsIdxAxis);
 int jkGuiKeyboard_sub_411E40(Darray *pDarr);
-int jkGuiKeyboard_RemoveControlClicked(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int mouseX, int mouseY, BOOL redraw);
+int jkGuiKeyboard_RemoveControlClicked(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, BOOL redraw);
 void jkGuiKeyboard_sub_411F40(jkGuiElement *pElement, Darray *pDarr);
-int jkGuiKeyboard_EnumBindings(int inputFuncIdx, const char *pInputFuncStr, uint32_t a3, int dxKeyNum, uint32_t a5, int flags, stdControlKeyInfoEntry *pControlEntry, Darray *pDarr);
-int jkGuiKeyboard_AddControlClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, BOOL redraw);
+int jkGuiKeyboard_EnumBindings(int32_t inputFuncIdx, const char *pInputFuncStr, uint32_t a3, int32_t dxKeyNum, uint32_t a5, int32_t flags, stdControlKeyInfoEntry *pControlEntry, Darray *pDarr);
+int jkGuiKeyboard_AddControlClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, BOOL redraw);
 void jkGuiKeyboard_sub_4123C0(jkGuiMenu *pMenu);
-int jkGuiKeyboard_OkClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, BOOL redraw);
-int jkGuiKeyboard_CancelClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, BOOL redraw);
-int jkGuiKeyboard_ControlListClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, BOOL redraw);
-int jkGuiKeyboard_RestoreDefaultsClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, BOOL redraw);
+int jkGuiKeyboard_OkClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, BOOL redraw);
+int jkGuiKeyboard_CancelClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, BOOL redraw);
+int jkGuiKeyboard_ControlListClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, BOOL redraw);
+int jkGuiKeyboard_RestoreDefaultsClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, BOOL redraw);
 int jkGuiKeyboard_Show();
 void jkGuiKeyboard_Startup();
 void jkGuiKeyboard_Shutdown();

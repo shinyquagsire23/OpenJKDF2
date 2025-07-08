@@ -75,7 +75,7 @@ void jkGuiEsc_Shutdown()
 
 void jkGuiEsc_Show()
 {
-    signed int v3; // eax
+    int32_t v3; // eax
 
     if ( sithNet_isMulti )
     {

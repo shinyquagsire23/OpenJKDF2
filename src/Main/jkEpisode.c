@@ -537,7 +537,7 @@ int jkEpisode_EndLevel(jkEpisodeLoad *pEpisode, int levelNum)
 {
     int v2; // eax
     int v3; // edx
-    int *i; // ecx
+    int32_t *i; // ecx
 
     v2 = 0;
     v3 = pEpisode->numSeq;

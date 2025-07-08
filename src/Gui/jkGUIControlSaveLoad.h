@@ -10,8 +10,8 @@
 #define jkGuiControlSaveLoad_Startup_ADDR (0x0041EBA0)
 #define jkGuiControlSaveLoad_Shutdown_ADDR (0x0041EBC0)
 
-int jkGuiControlSaveLoad_sub_41E470(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int bRedraw);
-int jkGuiControlSaveLoad_ConfirmDelete(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int bRedraw);
+int jkGuiControlSaveLoad_sub_41E470(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, int bRedraw);
+int jkGuiControlSaveLoad_ConfirmDelete(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, int bRedraw);
 void jkGuiControlSaveLoad_FindFile();
 int jkGuiControlSaveLoad_Write(int bIdk);
 void jkGuiControlSaveLoad_Startup();

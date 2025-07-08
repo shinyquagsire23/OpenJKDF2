@@ -19,8 +19,8 @@ void jkGuiNetHost_Shutdown();
 int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry);
 
 int jkGuiNetHost_sub_4118C0(jkMultiEntry3 *pEntry);
-int jkGuiNetHost_sub_4119D0(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int redraw);
-int jkGuiNetHost_sub_411AE0(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int redraw);
+int jkGuiNetHost_sub_4119D0(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, int redraw);
+int jkGuiNetHost_sub_411AE0(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, int redraw);
 
 //static int (*jkGuiNetHost_Startup)() = (void*)jkGuiNetHost_Startup_ADDR;
 //static void (*jkGuiNetHost_Shutdown)() = (void*)jkGuiNetHost_Shutdown_ADDR;

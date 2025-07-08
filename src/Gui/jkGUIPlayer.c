@@ -27,8 +27,8 @@ static int jkGuiPlayer_bInitted = 0;
 static wchar_t jkGuiPlayer_awTmp_555D28[0x100] = {0};
 static char* jkGuiPlayer_GuiDifficulties[3] = {"GUI_EASY", "GUI_MED", "GUI_HARD"};
 
-static int jkGuiPlayer_menuSelectIdk[2] = {0xFA, 0};
-static int jkGuiPlayer_menuSelectIdk2[2] = {0xd, 0xe};
+static int32_t jkGuiPlayer_menuSelectIdk[2] = {0xFA, 0};
+static int32_t jkGuiPlayer_menuSelectIdk2[2] = {0xd, 0xe};
 
 static jkGuiElement jkGuiPlayer_menuSelectElements[8] = {
     {ELEMENT_TEXT, 0, 0, 0, 3, {0, 0x19A, 0x280, 0x14}, 1, 0, 0, 0, 0, 0, {0}, 0},
@@ -336,7 +336,7 @@ void jkGuiPlayer_ShowNewPlayer(int a1)
     jkGuiRend_DarrayFree(&a1a);
 }
 
-int jkGuiPlayer_DifficultyDraw(jkGuiElement *element, jkGuiMenu *menu, int mouseX, int mouseY, int bRedraw)
+int jkGuiPlayer_DifficultyDraw(jkGuiElement *element, jkGuiMenu *menu, int32_t mouseX, int32_t mouseY, int bRedraw)
 {
     jkGuiPlayer_menuNewElements[5].selectedTextEntry = 0;
     jkGuiPlayer_menuNewElements[6].selectedTextEntry = 0;

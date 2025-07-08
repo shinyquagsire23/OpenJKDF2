@@ -216,18 +216,6 @@ int std3D_Startup()
     glMatrixMode(GL_TEXTURE);
     glLoadIdentity();
 
-    MATRIX_MULT3x3 = floattof32(1.0F);
-    MATRIX_MULT3x3 = 0;
-    MATRIX_MULT3x3 = 0;
-
-    MATRIX_MULT3x3 = 0;
-    MATRIX_MULT3x3 = floattof32(1.0F);
-    MATRIX_MULT3x3 = 0;
-
-    MATRIX_MULT3x3 = 0;
-    MATRIX_MULT3x3 = 0;
-    MATRIX_MULT3x3 = floattof32(1.0F);
-
     return 0;
 }
 void std3D_Shutdown() {}
@@ -246,30 +234,26 @@ The formula for calculating the separate elements is same as above,
 c14 = a11*b14 + a12*b24 + a13*b34 + a14*b44
 */
 
-void glOrthof32_mod(int left, int right, int bottom, int top, int zNear, int zFar, int w) {
-    MATRIX_LOAD4x4 = divf32(inttof32(2), right - left);
+void std3DTwl_LoadProjection() {
+    MATRIX_LOAD4x4 = floattof32(2.0f);
     MATRIX_LOAD4x4 = 0;
     MATRIX_LOAD4x4 = 0;
     MATRIX_LOAD4x4 = floattof32(0.0f);
 
     MATRIX_LOAD4x4 = 0;
-    MATRIX_LOAD4x4 = -divf32(inttof32(2), top - bottom);
+    MATRIX_LOAD4x4 = -floattof32(2.0f);
     MATRIX_LOAD4x4 = 0;
     MATRIX_LOAD4x4 = floattof32(0.0f);
 
     MATRIX_LOAD4x4 = 0;
     MATRIX_LOAD4x4 = 0;
-    MATRIX_LOAD4x4 = floattof32(1.0F);
     MATRIX_LOAD4x4 = floattof32(0.0F);
+    MATRIX_LOAD4x4 = floattof32(1.0F);
 
-    MATRIX_LOAD4x4 = -divf32(right + left, right - left);//0;
-    MATRIX_LOAD4x4 = divf32(top + bottom, top - bottom); //0;
+    MATRIX_LOAD4x4 = -floattof32(1.0f);//0;
+    MATRIX_LOAD4x4 = floattof32(1.0f);; //0;
     MATRIX_LOAD4x4 = floattof32(0.0F);//-divf32(zFar + zNear, zFar - zNear);//0;
-    MATRIX_LOAD4x4 = floattof32(1.0f);
-}
-
-void glOrtho_mod(float left, float right, float bottom, float top, float zNear, float zFar, float w) {
-    glOrthof32_mod(floattof32(left), floattof32(right), floattof32(bottom), floattof32(top), floattof32(zNear), floattof32(zFar), floattof32(w));
+    MATRIX_LOAD4x4 = floattof32(0.0f);
 }
 
 
@@ -287,12 +271,12 @@ void wOverridef32(int w) {
     MATRIX_LOAD4x4 = 0;
     MATRIX_LOAD4x4 = 0;
     MATRIX_LOAD4x4 = floattof32(1.0F);
-    MATRIX_LOAD4x4 = 0;
+    MATRIX_LOAD4x4 = floattof32(1.0F);
 
     MATRIX_LOAD4x4 = 0;
     MATRIX_LOAD4x4 = 0;
     MATRIX_LOAD4x4 = 0;
-    MATRIX_LOAD4x4 = w;
+    MATRIX_LOAD4x4 = 0;
 }
 
 void wOverride(float w) {
@@ -303,7 +287,7 @@ int std3D_StartScene()
 {
     rendered_tris = 0;
 
-    glFlush(GL_WBUFFERING); // GL_WBUFFERING
+    //glFlush(GL_WBUFFERING); // GL_WBUFFERING
 
     glMatrixMode(GL_MODELVIEW);
     //glPushMatrix();
@@ -319,9 +303,13 @@ int std3D_StartScene()
         //glLoadIdentity();
         //gluPerspective(70, 256.0 / 192.0, 0.1, 40);
         //glOrtho(0.0, 2.56, 0.0, 1.92, 0.001, 1.0);
-        glOrtho_mod(0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0);
+        std3DTwl_LoadProjection();
         //glFrustum(0.0, 2.56, 0.0, 1.92, 2.0, 0.0);
         //printf("%f\n",(256.0/192.0)+test_idk);
+
+        glMatrixMode(GL_MODELVIEW);
+        wOverride(0);
+
 #if 0
         int clip_current[16];
         float clip_current_f[16];
@@ -349,6 +337,8 @@ int std3D_EndScene()
         //glPopMatrix(1);
     }
     //printf("EndScene\n");
+
+    glFlush(GL_WBUFFERING); // GL_WBUFFERING
 
     return 0;
 }
@@ -385,7 +375,6 @@ void std3D_DrawRenderList()
     glColor3b(255,255,255);
     //glBindTexture(0, textureIDS[2]);
 
-
     glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK | POLY_MODULATION | POLY_ID(0) ) ;
     //glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
     glBegin(GL_TRIANGLES);
@@ -409,79 +398,46 @@ void std3D_DrawRenderList()
         TWLVERTEX* v2 = &vertexes[tris[j].v2];
         TWLVERTEX* v3 = &vertexes[tris[j].v3];
 
-        //printf("%u: %f %f %f\n", j, v1->x, v1->y, v1->z);
-
-        /*glColor3b((j&0xFF),(j&0xFF),(j&0xFF));
-        glVertex3v16(floattov16(v1->x / 100.0), floattov16(v1->y / 100.0), floattov16(v1->z));
-        glColor3b((j&0xFF),(j&0xFF),(j&0xFF));
-        glVertex3v16(floattov16(v2->x / 100.0), floattov16(v2->y / 100.0), floattov16(v2->z));
-        glColor3b((j&0xFF),(j&0xFF),(j&0xFF));
-        glVertex3v16(floattov16(v3->x / 100.0), floattov16(v3->y / 100.0), floattov16(v3->z));*/
-
         {
-            //glMatrixMode(GL_PROJECTION);
-            //glOrtho_mod(0.0, 2.56, 0.0, 1.92, 0.0, 1.0, (float)v3->z);
-            float v3_w = 1.0/((1.0-f32tofloat(v3->z)) * SITHCAMERA_ZFAR);
-            //float v3_w = (f32tofloat(v3->z));
-            //float v3_w = (1.0-f32tofloat(v3->z) * (1.0/64));
-            //float v3_w = (1.0/f32tofloat(v3->z));
-            glMatrixMode(GL_MODELVIEW);
-            wOverride(v3_w);
-
-            //GFX_TEX_COORD = TEXTURE_PACK(inttot16(tex_w), inttot16(tex_h));
-            GFX_TEX_COORD = TEXTURE_PACK(inttot16((int)(v3->tu*tex_w)), inttot16((int)(v3->tv*tex_h)));
+            if (tex_id != textureIDS[2]) {
+                GFX_TEX_COORD = TEXTURE_PACK(inttot16((int)(v3->tu*tex_w)), inttot16((int)(v3->tv*tex_h)));    
+            }
+            
             //glColor3b((int)(v3->tu*255.0), (int)(v3->tv*255.0), 255);
             //glColor3b((j&0xFF),(j&0xFF),(j&0xFF));
             //glVertex3v16(floattov16(0.0), floattov16(1.92), floattov16(0.6));
             glColor3b(COMP_R(v3->color),COMP_G(v3->color),COMP_B(v3->color));
             //glColor3b(0xFF, 0x00, 0x00);
-            glVertex3v16(floattov16((f32tofloat(v3->x)*v3_w)), floattov16((f32tofloat(v3->y)*v3_w)), floattov16(f32tofloat(v3->z)*v3_w));
+            glVertex3v16(v3->x, v3->y, v3->z);
         }
         
         {
-            //glMatrixMode(GL_PROJECTION);
-            //glOrtho_mod(0.0, 2.56, 0.0, 1.92, 0.0, 1.0, (float)v2->z);
-            float v2_w = 1.0/((1.0-f32tofloat(v2->z)) * SITHCAMERA_ZFAR);
-            //float v2_w = (f32tofloat(v2->z));
-            //float v2_w = (1.0-f32tofloat(v2->z) * (1.0/64));
-            //float v2_w = (1.0/f32tofloat(v2->z));
-            glMatrixMode(GL_MODELVIEW);
-            wOverride(v2_w);
-
-            //GFX_TEX_COORD = TEXTURE_PACK(0, inttot16(tex_h));
-            GFX_TEX_COORD = TEXTURE_PACK(inttot16((int)(v2->tu*tex_w)), inttot16((int)(v2->tv*tex_h)));
+            if (tex_id != textureIDS[2]) {
+                GFX_TEX_COORD = TEXTURE_PACK(inttot16((int)(v2->tu*tex_w)), inttot16((int)(v2->tv*tex_h)));
+            }
             //glColor3b((int)(v2->tu*255.0), (int)(v2->tv*255.0), 255);
             //glColor3b((j&0xFF),(j&0xFF),(j&0xFF));
             //glVertex3v16(floattov16(2.56), floattov16(1.28), floattov16(0.6));
             glColor3b(COMP_R(v2->color),COMP_G(v2->color),COMP_B(v2->color));
             //glColor3b(0, 0xff, 0x00);
-            glVertex3v16(floattov16((f32tofloat(v2->x)*v2_w)), floattov16((f32tofloat(v2->y)*v2_w)), floattov16(f32tofloat(v2->z)*v2_w));
+            glVertex3v16(v2->x, v2->y, v2->z);
 
         }
         
         {
-            //glMatrixMode(GL_PROJECTION);
-            //glOrtho_mod(0.0, 2.56, 0.0, 1.92, 0.0, 1.0, (float)v1->z);
-            float v1_w = 1.0/((1.0-f32tofloat(v1->z)) * SITHCAMERA_ZFAR);
-            //float v1_w = (f32tofloat(v1->z));
-            //float v1_w = (1.0-f32tofloat(v1->z) * (1.0/64));
-            //float v1_w = (1.0/f32tofloat(v1->z));
-            glMatrixMode(GL_MODELVIEW);
-            wOverride(v1_w);
-
-            //GFX_TEX_COORD = TEXTURE_PACK(0, inttot16(0));
-            GFX_TEX_COORD = TEXTURE_PACK(inttot16((int)(v1->tu*tex_w)), inttot16((int)(v1->tv*tex_h)));
+            if (tex_id != textureIDS[2]) {
+                GFX_TEX_COORD = TEXTURE_PACK(inttot16((int)(v1->tu*tex_w)), inttot16((int)(v1->tv*tex_h)));
+            }
             //glColor3b((int)(v1->tu*255.0), (int)(v1->tv*255.0), 255);
             //glVertex3v16(floattov16(0.0), floattov16(1.28), floattov16(0.6));
             glColor3b(COMP_R(v1->color),COMP_G(v1->color),COMP_B(v1->color));
             //glColor3b(0, 0x00, 0xff);
-            glVertex3v16(floattov16((f32tofloat(v1->x)*v1_w)), floattov16((f32tofloat(v1->y)*v1_w)), floattov16(f32tofloat(v1->z)*v1_w));
-            //printf("%f %f\n", v1_w, test_idk);
+            glVertex3v16(v1->x, v1->y, v1->z);
         }
         
         
     }
-    glEnd();
+    //glEnd();
     //glFlush(0);
     
 
@@ -520,7 +476,7 @@ void std3D_AddRenderListTris(rdTri *tris, unsigned int num_tris)
 }
 void std3D_AddRenderListLines(rdLine* lines, uint32_t num_lines) {}
 
-#define flextov16(n) ((v16)((int32_t)n.to_raw() >> (16-12)))
+#define flextov16(n) ((v16)((int32_t)n.to_raw() >> (15-12)))
 
 //#define flextov16(n) (floattov16((float)n))
 
@@ -536,12 +492,10 @@ int std3D_AddRenderListVertices(D3DVERTEX *vertices, int count)
         D3DVERTEX* v = &vertices[i];
         TWLVERTEX* t = &GL_tmpVertices[GL_tmpVerticesAmt+i];
 
-        flex_t twl_z = (float)v->z;
-        flex_t twl_x = (v->x * res_fix_x);// * (256.0/128.0);
-        flex_t twl_y = (v->y * res_fix_y);// * (256.0/128.0);
+        flex_t twl_z = (flex_t)1.0/(((flex_t)1.0-v->z) * (flex_t)SITHCAMERA_ZFAR);//(float)v->z;
+        flex_t twl_x = (v->x * res_fix_x) * twl_z;// * (256.0/128.0);
+        flex_t twl_y = (v->y * res_fix_y) * twl_z;// * (256.0/128.0);
         
-        //printf("%f\n", (float)v->z);
-
 #ifndef EXPERIMENTAL_FIXED_POINT
         t->x = floattov16(twl_x);
         t->y = floattov16(twl_y);

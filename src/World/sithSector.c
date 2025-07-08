@@ -32,7 +32,7 @@ int sithSector_Load(sithWorld *world, int tmp)
     sithSector *v6; // eax
     unsigned int v7; // ecx
     sithSector *sectors; // esi
-    int *sector_vertices; // eax
+    int32_t *sector_vertices; // eax
     int v13; // edi
     unsigned int v15; // eax
     void *v16; // ecx
@@ -170,7 +170,7 @@ int sithSector_Load(sithWorld *world, int tmp)
                 break;
             if ( _sscanf(stdConffile_aLine, " vertices %d", &num_vertices) != 1 )
                 break;
-            sector_vertices = (int *)pSithHS->alloc(4 * num_vertices);
+            sector_vertices = (int32_t *)pSithHS->alloc(sizeof(int32_t) * num_vertices);
             sectors->verticeIdxs = sector_vertices;
             if ( !sector_vertices )
                 break;

@@ -94,7 +94,7 @@ int jkDSS_Startup()
     return 1;
 }
 
-int jkDSS_JKM1(int unused1, sithEventInfo* unused2)
+int jkDSS_JKM1(int32_t unused1, sithEventInfo* unused2)
 {
     if (jkDSS_005aec8c != 0) {
         jkDSS_SendSaberInfo_alt_Mots(sithPlayer_pLocalPlayerThing,jkGuiMultiplayer_mpcInfo.model,jkGuiMultiplayer_mpcInfo.soundClass,jkGuiMultiplayer_mpcInfo.sideMat,jkGuiMultiplayer_mpcInfo.tipMat,jkGuiMultiplayer_mpcInfo.personality);

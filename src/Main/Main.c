@@ -96,14 +96,14 @@
 static HostServices hs;
 
 #ifdef QOL_IMPROVEMENTS
-int Main_bDedicatedServer = 0;
-int Main_bAutostart = 0;
-int Main_bAutostartSp = 0;
-int Main_bHeadless = 0;
-int Main_bVerboseNetworking = 0;
-int Main_bMotsCompat = 0;
-int Main_bDwCompat = 0;
-int Main_bEnhancedCogVerbs = 0;
+int32_t Main_bDedicatedServer = 0;
+int32_t Main_bAutostart = 0;
+int32_t Main_bAutostartSp = 0;
+int32_t Main_bHeadless = 0;
+int32_t Main_bVerboseNetworking = 0;
+int32_t Main_bMotsCompat = 0;
+int32_t Main_bDwCompat = 0;
+int32_t Main_bEnhancedCogVerbs = 0;
 char Main_strEpisode[129];
 char Main_strMap[128+4];
 #endif

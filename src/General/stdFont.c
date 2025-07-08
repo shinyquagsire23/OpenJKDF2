@@ -950,9 +950,9 @@ LABEL_15:
     return v4;
 }
 
-int stdFont_sub_434EC0(stdVBuffer *vBuffer, stdFont *font, int a3, int a4, int a5, int *paddings, const wchar_t *text, int a8)
+int stdFont_sub_434EC0(stdVBuffer *vBuffer, stdFont *font, int a3, int a4, int a5, int32_t *paddings, const wchar_t *text, int a8)
 {
-    int *paddingList; // ebp
+    int32_t *paddingList; // ebp
     int padding; // edi
     wchar_t *v11; // ebx
     wchar_t *v12; // eax

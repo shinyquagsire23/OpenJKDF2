@@ -52,7 +52,7 @@ enum jkGuiNetHostAdvancedElement_t
     NETHOST_TICKRATE_TEXTBOX = 3,
 };
 
-static int jkGuiNetHost_aIdk[2] = {0xd, 0xe};
+static int32_t jkGuiNetHost_aIdk[2] = {0xd, 0xe};
 
 // MOTS altered
 static jkGuiElement jkGuiNetHost_aElements[28] =
@@ -517,7 +517,7 @@ int jkGuiNetHost_sub_4118C0(jkMultiEntry3 *pEntry)
 }
 
 // MOTS altered
-int jkGuiNetHost_sub_4119D0(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int redraw)
+int jkGuiNetHost_sub_4119D0(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, int redraw)
 {
     if ( mouseX != -1 || mouseY != -1 )
         jkGuiRend_ClickSound(pElement, pMenu, mouseX, mouseY, redraw);
@@ -570,7 +570,7 @@ int jkGuiNetHost_sub_4119D0(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX
     return 0;
 }
 
-int jkGuiNetHost_sub_411AE0(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int redraw)
+int jkGuiNetHost_sub_411AE0(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, int redraw)
 {
     wchar_t *v7; // eax
     int v9; // [esp-8h] [ebp-28h]

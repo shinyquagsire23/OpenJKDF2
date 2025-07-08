@@ -12,6 +12,6 @@
 int jkGuiPlayer_Startup();
 void jkGuiPlayer_Shutdown();
 void jkGuiPlayer_ShowNewPlayer(int a1);
-int jkGuiPlayer_DifficultyDraw(jkGuiElement *element, jkGuiMenu *menu, int mouseX, int mouseY, int bRedraw);
+int jkGuiPlayer_DifficultyDraw(jkGuiElement *element, jkGuiMenu *menu, int32_t mouseX, int32_t mouseY, int bRedraw);
 
 #endif // _JKGUIPLAYER_H

@@ -22,23 +22,23 @@
 #include <math.h>
 
 // MOTS added
-int sithCogExec_009d39b0 = 0;
+int32_t sithCogExec_009d39b0 = 0;
 sithCog* sithCogExec_pIdkMotsCtx = NULL;
 sithCog* sithCog_pActionCog = NULL;
-int sithCog_actionCogIdk = 0;
+int32_t sithCog_actionCogIdk = 0;
 
 void sithCogExec_Exec(sithCog *cog_ctx)
 {
     sithCogScript *cogscript;
-    int op;
+    int32_t op;
     sithCogSymbol *v12; // eax
     cogSymbolFunc_t func; // eax
-    int *vec; // ecx
+    int32_t *vec; // ecx
     int32_t v19; // eax
     sithCogStackvar val; // [esp+20h] [ebp-80h]
     sithCogStackvar var; // [esp+70h] [ebp-30h]
     sithCogStackvar outVar; // [esp+90h] [ebp-10h]
-    int iTmp;
+    int32_t iTmp;
     sithCogStackvar* tmpStackVar;
 
     // MOTS added
@@ -223,9 +223,9 @@ void sithCogExec_Exec(sithCog *cog_ctx)
     }
 }
 
-void sithCogExec_ExecCog(sithCog *ctx, int trigIdx)
+void sithCogExec_ExecCog(sithCog *ctx, int32_t trigIdx)
 {
-    int trigPc;
+    int32_t trigPc;
 
     trigPc = ctx->cogscript->triggers[trigIdx].trigPc;
     if ( trigPc >= 0 )
@@ -253,12 +253,12 @@ void sithCogExec_ExecCog(sithCog *ctx, int trigIdx)
     }
 }
 
-int sithCogExec_PopValue(sithCog *ctx, sithCogStackvar *stackVar)
+int32_t sithCogExec_PopValue(sithCog *ctx, sithCogStackvar *stackVar)
 {
 
     sithCogStackvar *tmp; // eax
-    int *v5; // edx
-    int type; // ecx
+    int32_t *v5; // edx
+    int32_t type; // ecx
     intptr_t d0; // edx
     intptr_t d1;
     intptr_t d2;
@@ -322,7 +322,7 @@ cog_flex_t sithCogExec_PopFlex(sithCog *ctx)
     return 0.0;
 }
 
-int sithCogExec_PopInt(sithCog *ctx)
+int32_t sithCogExec_PopInt(sithCog *ctx)
 {
     sithCogStackvar tmp;
     if (!sithCogExec_PopValue(ctx, &tmp))
@@ -336,7 +336,7 @@ int sithCogExec_PopInt(sithCog *ctx)
     return -1;
 }
 
-int sithCogExec_PopSymbolIdx(sithCog *ctx)
+int32_t sithCogExec_PopSymbolIdx(sithCog *ctx)
 {
     sithCogStackvar tmp;
     if (!sithCogExec_PopValue(ctx, &tmp))
@@ -348,7 +348,7 @@ int sithCogExec_PopSymbolIdx(sithCog *ctx)
     return 0;
 }
 
-int sithCogExec_PopVector3(sithCog *ctx, rdVector3* out)
+int32_t sithCogExec_PopVector3(sithCog *ctx, rdVector3* out)
 {
     sithCogStackvar tmp;
 
@@ -402,7 +402,7 @@ sithCog* sithCogExec_PopCog(sithCog *ctx)
         world = sithWorld_pStatic;
         cogIdx &= ~0x8000;
     }
-    if ( world && cogIdx >= 0 && (unsigned int)cogIdx < world->numCogsLoaded )
+    if ( world && cogIdx >= 0 && (uint32_t )cogIdx < world->numCogsLoaded )
         return &world->cogs[cogIdx];
 
     return NULL;
@@ -788,8 +788,8 @@ cogSymbolFunc_t sithCogExec_PopSymbolFunc(sithCog *cog_ctx)
 
 char* sithCogExec_PopString(sithCog *ctx)
 {
-    unsigned int v1; // eax
-    int v2; // eax
+    uint32_t v1; // eax
+    int32_t v2; // eax
     sithCogSymbol *v5; // eax
     char *result; // eax
 
@@ -825,7 +825,7 @@ void sithCogExec_PushVar(sithCog *ctx, sithCogStackvar *val)
     ++ctx->stackPos;
 }
 
-void sithCogExec_PushInt(sithCog *ctx, int val)
+void sithCogExec_PushInt(sithCog *ctx, int32_t val)
 {
     sithCogStackvar v;
     v.type = COG_VARTYPE_INT;
@@ -851,7 +851,7 @@ void sithCogExec_PushVector3(sithCog *ctx, const rdVector3* val)
     sithCogExec_PushVar(ctx, &v);
 }
 
-int sithCogExec_PopProgramVal(sithCog *ctx)
+int32_t sithCogExec_PopProgramVal(sithCog *ctx)
 {
     if ( ctx->execPos >= ctx->cogscript->codeSize - 1 )
         return COG_OPCODE_RET;
@@ -899,7 +899,7 @@ void sithCogExec_Ret(sithCog *ctx)
     }
 }
 
-int sithCogExec_PopStackVar(sithCog *cog, sithCogStackvar *out)
+int32_t sithCogExec_PopStackVar(sithCog *cog, sithCogStackvar *out)
 {
     sithCogStackvar *pop; // eax
 
@@ -916,10 +916,10 @@ int sithCogExec_PopStackVar(sithCog *cog, sithCogStackvar *out)
 }
 
 // MOTS altered?
-void sithCogExec_BitOperation(sithCog *cog_ctx, int op)
+void sithCogExec_BitOperation(sithCog *cog_ctx, int32_t op)
 {
-    int operand_a = sithCogExec_PopInt(cog_ctx);
-    int operand_b = sithCogExec_PopInt(cog_ctx);
+    int32_t operand_a = sithCogExec_PopInt(cog_ctx);
+    int32_t operand_b = sithCogExec_PopInt(cog_ctx);
     switch ( op )
     {
         case COG_OPCODE_CMPAND:
@@ -947,7 +947,7 @@ void sithCogExec_BitOperation(sithCog *cog_ctx, int op)
 }
 
 // MOTS altered?
-void sithCogExec_MathOperation(sithCog *cog_ctx, int op)
+void sithCogExec_MathOperation(sithCog *cog_ctx, int32_t op)
 {
     cog_flex_t operand_a = sithCogExec_PopFlex(cog_ctx);
     cog_flex_t operand_b = sithCogExec_PopFlex(cog_ctx);

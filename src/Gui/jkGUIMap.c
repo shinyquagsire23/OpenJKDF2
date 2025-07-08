@@ -15,8 +15,8 @@
 #include "Platform/stdControl.h"
 #include "Engine/rdroid.h"
 
-static int jkGuiMap_idk2[12] = { 24, 25, 26, 18, 10, 19, 27, 28, 20, 21, 22, 0 };
-static int jkGuiMap_idk[5] = {0, 0x38, 1, 0x37, 0x18};
+static int32_t jkGuiMap_idk2[12] = { 24, 25, 26, 18, 10, 19, 27, 28, 20, 21, 22, 0 };
+static int32_t jkGuiMap_idk[5] = {0, 0x38, 1, 0x37, 0x18};
 
 static jkGuiElement jkGuiMap_aElements[16] =
 {
@@ -86,7 +86,7 @@ void jkGuiMap_DrawMapScreen(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *
 
 void jkGuiMap_sub_415720(jkGuiMenu *menu)
 {
-    unsigned int v1; // edi
+    uint32_t v1; // edi
     jkGuiElement *v2; // eax
     int v3; // eax
     int v4; // eax
@@ -225,18 +225,18 @@ LABEL_26:
     }
 }
 
-int jkGuiMap_sub_415B40(jkGuiElement* pElement, jkGuiMenu *menu, int mouseX, int mouseY, int bRedraw)
+int jkGuiMap_sub_415B40(jkGuiElement* pElement, jkGuiMenu *menu, int32_t mouseX, int32_t mouseY, int bRedraw)
 {
     jkGuiMap_dword_556664 = jkGuiMap_dword_556664 == 0;
     return 0;
 }
 
-int jkGuiMap_sub_415B60(jkGuiElement* pElement, jkGuiMenu *menu, int mouseX, int mouseY, int bRedraw)
+int jkGuiMap_sub_415B60(jkGuiElement* pElement, jkGuiMenu *menu, int32_t mouseX, int32_t mouseY, int bRedraw)
 {
     return 0;
 }
 
-int jkGuiMap_sub_415B70(jkGuiElement* pElement, jkGuiMenu *menu, int mouseX, int mouseY, int bRedraw)
+int jkGuiMap_sub_415B70(jkGuiElement* pElement, jkGuiMenu *menu, int32_t mouseX, int32_t mouseY, int bRedraw)
 {
     rdVector3 a2a; // [esp+0h] [ebp-Ch] BYREF
 

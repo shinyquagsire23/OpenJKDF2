@@ -83,7 +83,7 @@ static int jkGuiForce_bCanSpendStars;
 static flex_t jkGuiForce_isMulti;
 static stdBitmap* jkGuiForce_aBitmaps[19];
 
-static int jkGuiForce_sliderBitmapIndices[2] = {16, 15};
+static int32_t jkGuiForce_sliderBitmapIndices[2] = {16, 15};
 
 static wchar_t jkGuiForce_waTmp[400];
 
@@ -383,12 +383,12 @@ void jkGuiForce_ForceStarsDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffe
     }
 }
 
-int jkGuiForce_ExtraClick(jkGuiElement *element, jkGuiMenu *menu, int a, int b, int c)
+int jkGuiForce_ExtraClick(jkGuiElement *element, jkGuiMenu *menu, int32_t a, int32_t b, int c)
 {
     return 0;
 }
 
-int jkGuiForce_ButtonClick(jkGuiElement *element, jkGuiMenu *menu, int a, int b, int c)
+int jkGuiForce_ButtonClick(jkGuiElement *element, jkGuiMenu *menu, int32_t a, int32_t b, int c)
 {
     if ( !jkGuiForce_bCanSpendStars )
         return 0;
@@ -474,7 +474,7 @@ LAB_00418eb2:
 }
 
 // MOTS altered
-int jkGuiForce_ResetClick(jkGuiElement *element, jkGuiMenu *menu, int mouseX, int mouseY, int bRedraw)
+int jkGuiForce_ResetClick(jkGuiElement *element, jkGuiMenu *menu, int32_t mouseX, int32_t mouseY, int bRedraw)
 {
     if ( !jkGuiForce_bCanSpendStars )
         return 0;

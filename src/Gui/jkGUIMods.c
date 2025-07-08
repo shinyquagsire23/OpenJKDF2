@@ -60,7 +60,7 @@ enum jkGuiModsButton_t
     JKGUIMODS_BTN_OPENRESOURCEFOLDER = 10,
 };
 
-static int jkGuiMods_listboxBitmapIndices[2] = {14, 15};
+static int32_t jkGuiMods_listboxBitmapIndices[2] = {14, 15};
 
 static jkGuiElement jkGuiMods_aElements[9] = {
     {ELEMENT_TEXT, 0, 5, L"Expansions & Mods", 3, {0, 30, 640, 60}, 1, 0, 0, 0, 0, 0, {0}, 0},

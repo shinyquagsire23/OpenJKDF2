@@ -33,7 +33,7 @@ int stdFont_Draw4(stdVBuffer *a1, stdFont *font, int xPos, int yPos, int a5, int
 const wchar_t* stdFont_sub_4352C0(const wchar_t *a1, stdFont *a2, int a3, rdRect *a4, int *a5);
 int stdFont_sub_4357C0(stdFont *a1, const wchar_t *a2, rdRect *a4);
 int stdFont_sub_435810(stdFont *a1, const wchar_t *a2, int a3);
-int stdFont_sub_434EC0(stdVBuffer *a1, stdFont *a2, int a3, int a4, int a5, int *a6, const wchar_t *a7, int a8);
+int stdFont_sub_434EC0(stdVBuffer *a1, stdFont *a2, int a3, int a4, int a5, int32_t *a6, const wchar_t *a7, int a8);
 void stdFont_Free(stdFont *font);
 uint32_t stdFont_DrawAscii(stdVBuffer *a1, stdFont *a2, unsigned int blit_x, int blit_y, int x_max, char *str, int alpha_maybe);
 int stdFont_sub_4355B0(stdFont *font, uint16_t a2);

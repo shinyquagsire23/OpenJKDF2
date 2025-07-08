@@ -19,7 +19,7 @@
 
 #include "jk.h"
 
-static int jkGuiSaveLoad_listIdk[2] = {0xd, 0xe};
+static int32_t jkGuiSaveLoad_listIdk[2] = {0xd, 0xe};
 
 static jkGuiElement jkGuiSaveLoad_aElements[15] = {
     {ELEMENT_TEXT, 0, 5, 0, 3, {0x32, 0x32, 0x1F4, 0x1E}, 1, 0, 0, 0, 0, 0, {0}, 0},
@@ -41,7 +41,7 @@ static jkGuiElement jkGuiSaveLoad_aElements[15] = {
 
 static jkGuiMenu jkGuiSaveLoad_menu = {jkGuiSaveLoad_aElements, -1, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 
-int jkGuiSaveLoad_ListClick(jkGuiElement *element, jkGuiMenu *menu, int mouseX, int mouseY, BOOL redraw)
+int jkGuiSaveLoad_ListClick(jkGuiElement *element, jkGuiMenu *menu, int32_t mouseX, int32_t mouseY, BOOL redraw)
 {
     jkGuiRend_ClickSound(element, menu, mouseX, mouseY, redraw);
     if ( redraw )
@@ -146,7 +146,7 @@ LABEL_15:
     }
 }
 
-int jkGuiSaveLoad_DeleteOnClick(jkGuiElement *element, jkGuiMenu *menu, int mouseX, int mouseY, int bRedraw)
+int jkGuiSaveLoad_DeleteOnClick(jkGuiElement *element, jkGuiMenu *menu, int32_t mouseX, int32_t mouseY, int bRedraw)
 {
     jkGuiSaveLoad_Entry *v2; // esi
     wchar_t *wstr_del; // eax
@@ -267,7 +267,7 @@ int jkGuiSaveLoad_Show(int bIsSave)
 {
     const char *v1; // eax
     int v2; // eax
-    signed int v3; // edi
+    int32_t v3; // edi
     wchar_t *v4; // eax
     int v5; // eax
     jkGuiSaveLoad_Entry *v6; // esi
@@ -287,7 +287,7 @@ int jkGuiSaveLoad_Show(int bIsSave)
     wchar_t *v22; // eax
     int j; // esi
     jkGuiSaveLoad_Entry *v24; // eax
-    signed int result; // eax
+    int32_t result; // eax
     wchar_t *v26; // [esp-4h] [ebp-298h]
     wchar_t *v27; // [esp-4h] [ebp-298h]
     const wchar_t *v28; // [esp-4h] [ebp-298h]
@@ -444,7 +444,7 @@ LABEL_46:
     return result;
 }
 
-int jkGuiSaveLoad_PopulateInfoInit(jkGuiElement *a1, jkGuiMenu *a2, int a3, int a4, BOOL redraw)
+int jkGuiSaveLoad_PopulateInfoInit(jkGuiElement *a1, jkGuiMenu *a2, int32_t a3, int32_t a4, BOOL redraw)
 {
     jkGuiSaveLoad_PopulateInfo(1);
     return 0;

@@ -111,13 +111,13 @@ int sithSound_New(sithWorld *world, int num)
 
 sithSound* sithSound_LoadEntry(char *sound_fname, int a2)
 {
-    int sound_file; // ebp
+    int32_t sound_file; // ebp
     sithSound *sound; // esi
-    int v5; // edi
+    int32_t v5; // edi
     char *v6; // esi
-    unsigned int v7; // eax
-    unsigned int v10; // eax
-    unsigned int frequencyKHz; // eax
+    uint32_t v7; // eax
+    uint32_t v10; // eax
+    uint32_t frequencyKHz; // eax
     struct HostServices *v12; // ecx
     char tmp[128]; // [esp+14h] [ebp-80h] BYREF
     char tmp2[128];
@@ -388,11 +388,11 @@ stdSound_buffer_t* sithSound_InitFromPath(char *path)
     int bufferLen; // edi
     stdSound_buffer_t *createdBuf; // eax
     stdSound_buffer_t *dsoundBuf; // esi
-    int bStereo; // [esp+Ch] [ebp-94h] BYREF
+    int32_t bStereo; // [esp+Ch] [ebp-94h] BYREF
     int32_t bufferMaxSize; // [esp+10h] [ebp-90h] BYREF
     uint32_t nSamplesPerSec; // [esp+14h] [ebp-8Ch] BYREF
-    int seekOffs; // [esp+18h] [ebp-88h] BYREF
-    int bitsPerSample; // [esp+1Ch] [ebp-84h] BYREF
+    int32_t seekOffs; // [esp+18h] [ebp-88h] BYREF
+    int32_t bitsPerSample; // [esp+1Ch] [ebp-84h] BYREF
     char tmp[128]; // [esp+20h] [ebp-80h] BYREF
 
     if (!path)

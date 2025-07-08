@@ -141,12 +141,12 @@ void jkGuiTitle_UnkDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf
     int v4; // esi
     jkGuiStringEntry *v5; // ecx
     wchar_t *v6; // ebx
-    signed int result; // eax
+    int32_t result; // eax
     int v8; // ecx
     int v9; // edi
     int v10; // edx
     int v11; // edx
-    signed int v12; // edi
+    int32_t v12; // edi
     stdFont **v13; // edx
     int v14; // esi
     rdRect a4a; // [esp+10h] [ebp-10h] BYREF
@@ -182,7 +182,7 @@ void jkGuiTitle_UnkDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf
             stdFont_Draw3(vbuf, v13[result], v4, &a4a, 1, v6, 1);
             v14 = stdFont_sub_4357C0(menu->fonts[v12], v6, &a4a) + v4;
             result = (*menu->fonts[v12]->bitmap->mipSurfaces)->format.height;
-            v4 = ((unsigned int)(3 * result) >> 2) + v14;
+            v4 = ((uint32_t )(3 * result) >> 2) + v14;
             v5 = v16;
         }
         v16 = ++v5;

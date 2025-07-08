@@ -16,7 +16,7 @@
 #include "Devices/sithControl.h"
 #include "General/stdConffile.h"
 
-static int jkGuiControlSaveLoad_listboxBitmapIndices[2] = {14, 15};
+static int32_t jkGuiControlSaveLoad_listboxBitmapIndices[2] = {14, 15};
 static wchar_t jkGuiControlSaveLoad_awTmp[256];
 static Darray jkGuiControlSaveLoad_darray;
 static int jkGuiControlSaveLoad_dword_559C80;
@@ -40,10 +40,10 @@ static jkGuiMenu jkGuiControlSaveLoad_menu = {
     jkGuiControlSaveLoad_aElements, -1, 0xFFFF, 0xFFFF, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, 0, NULL, "thermloop01.wav", "thrmlpu2.wav", NULL, NULL, NULL, 0, NULL, NULL
 };
 
-int jkGuiControlSaveLoad_sub_41E470(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int bRedraw)
+int jkGuiControlSaveLoad_sub_41E470(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, int bRedraw)
 {
     wchar_t *v5; // eax
-    signed int result; // eax
+    int32_t result; // eax
 
     jkGuiRend_ClickSound(pElement, pMenu, mouseX, mouseY, bRedraw);
     if ( jkGuiControlSaveLoad_dword_559C84
@@ -62,7 +62,7 @@ int jkGuiControlSaveLoad_sub_41E470(jkGuiElement *pElement, jkGuiMenu *pMenu, in
     return result;
 }
 
-int jkGuiControlSaveLoad_ConfirmDelete(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int bRedraw)
+int jkGuiControlSaveLoad_ConfirmDelete(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, int bRedraw)
 {
     jkGuiControlInfo *v5; // esi
     wchar_t *v6; // eax
@@ -150,7 +150,7 @@ int jkGuiControlSaveLoad_Write(int bIdk)
 {
     const char *v1; // eax
     int v2; // eax
-    signed int v3; // edi
+    int32_t v3; // edi
     jkGuiControlInfo *v5; // eax
     char *v6; // eax
     int v7; // edx
@@ -160,7 +160,7 @@ int jkGuiControlSaveLoad_Write(int bIdk)
     int i; // eax
     int k; // esi
     void *v16; // eax
-    signed int result; // eax
+    int32_t result; // eax
     int j; // esi
     void *v19; // eax
     int v21; // [esp+10h] [ebp-188h] BYREF

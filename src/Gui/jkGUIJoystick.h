@@ -24,22 +24,22 @@
 #define jkGuiJoystick_Shutdown_ADDR (0x0041C1E0)
 
 void jkGuiJoystick_nullsub_51();
-int jkGuiJoystick_ClickList1(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int bRedraw);
-void jkGuiJoystick_Draw(jkGuiMenu *pMenu, int bRedraw);
-int jkGuiJoystick_ClickList2(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int bRedraw);
+int jkGuiJoystick_ClickList1(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, BOOL bRedraw);
+void jkGuiJoystick_Draw(jkGuiMenu *pMenu, BOOL bRedraw);
+int jkGuiJoystick_ClickList2(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, BOOL bRedraw);
 void jkGuiJoystick_BindControl(int a1, int a2);
 void jkGuiJoystick_sub_41B390();
-int jkGuiJoystick_EnumFunc(int inputFuncIdx, const char *pInputFuncStr, uint32_t flags, int dxKeyNum, uint32_t dikNum, int flags2, stdControlKeyInfoEntry *pControlEntry, Darray *pDarr);
-int jkGuiJoystick_ClickList3(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int bRedraw);
-int jkGuiJoystick_AddEditClick(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int bRedraw);
-int jkGuiJoystick_RemoveClick(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int bRedraw);
-int jkGuiJoystick_OkCancelClick(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int bRedraw);
-int jkGuiJoystick_RestoreDefaultsClick(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int bRedraw);
-int jkGuiJoystick_CaptureClick(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int bRedraw);
-int jkGuiJoystick_CalibrateClick(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int bRedraw);
+int jkGuiJoystick_EnumFunc(int32_t inputFuncIdx, const char *pInputFuncStr, uint32_t flags, int32_t dxKeyNum, uint32_t dikNum, int32_t flags2, stdControlKeyInfoEntry *pControlEntry, Darray *pDarr);
+int jkGuiJoystick_ClickList3(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, BOOL bRedraw);
+int jkGuiJoystick_AddEditClick(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, BOOL bRedraw);
+int jkGuiJoystick_RemoveClick(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, BOOL bRedraw);
+int jkGuiJoystick_OkCancelClick(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, BOOL bRedraw);
+int jkGuiJoystick_RestoreDefaultsClick(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, BOOL bRedraw);
+int jkGuiJoystick_CaptureClick(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, BOOL bRedraw);
+int jkGuiJoystick_CalibrateClick(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, BOOL bRedraw);
 void jkGuiJoystick_MenuTick(jkGuiMenu *pMenu);
-int jkGuiJoystick_Show();
-int jkGuiJoystick_DisableJoystickClick(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, int bRedraw);
+int32_t jkGuiJoystick_Show();
+int jkGuiJoystick_DisableJoystickClick(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, BOOL bRedraw);
 void jkGuiJoystick_Startup();
 void jkGuiJoystick_Shutdown();
 

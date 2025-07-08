@@ -10,12 +10,12 @@
 #define Main_FPrintf_ADDR (0x00401870)
 
 #ifdef QOL_IMPROVEMENTS
-extern int Main_bDedicatedServer;
-extern int Main_bHeadless;
-extern int Main_bVerboseNetworking;
-extern int Main_bMotsCompat;
-extern int Main_bDwCompat;
-extern int Main_bEnhancedCogVerbs;
+extern int32_t Main_bDedicatedServer;
+extern int32_t Main_bHeadless;
+extern int32_t Main_bVerboseNetworking;
+extern int32_t Main_bMotsCompat;
+extern int32_t Main_bDwCompat;
+extern int32_t Main_bEnhancedCogVerbs;
 #endif
 
 int Main_Startup(const char *cmdline);

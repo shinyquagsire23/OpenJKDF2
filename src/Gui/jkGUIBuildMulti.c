@@ -66,8 +66,8 @@ jkGuiMenu jkGuiBuildMulti_menu =
 
 
 
-static int listbox_images[2] = {JKGUI_BM_UP_15, JKGUI_BM_DOWN_15};
-static int listbox_images2[2] = {JKGUI_BM_UP_15, JKGUI_BM_DOWN_15};
+static int32_t listbox_images[2] = {JKGUI_BM_UP_15, JKGUI_BM_DOWN_15};
+static int32_t listbox_images2[2] = {JKGUI_BM_UP_15, JKGUI_BM_DOWN_15};
 
 static jkGuiElement jkGuiBuildMulti_menuEditCharacter_buttons[17] =
 {
@@ -211,7 +211,7 @@ static jkGuiMenu jkGuiBuildMulti_menuLoadCharacter =
     jkGuiBuildMulti_menuLoadCharacter_buttons, -1, 65535, 65535, 15, NULL, NULL, jkGui_stdBitmaps, jkGui_stdFonts, 0, NULL, "thermloop01.wav", "thrmlpu2.wav", NULL, NULL, NULL, 0, NULL, NULL
 };
 
-static int jkGuiBuildMulti_bInitted = 0;
+static int32_t jkGuiBuildMulti_bInitted = 0;
 static wchar_t jkGuiBuildMulti_wPlayerShortName[64];
 static jkPlayerMpcInfo jkGuiBuildMulti_aMpcInfo[32];
 static wchar_t jkGuiBuildMulti_wTmp[128];
@@ -236,19 +236,19 @@ static rdLight jkGuiBuildMulti_light;
 static rdMatrix34 jkGuiBuildMulti_matrix;
 static stdVBuffer* jkGuiBuildMulti_pVBuf1 = NULL;
 static stdVBuffer* jkGuiBuildMulti_pVBuf2 = NULL;
-static int jkGuiBuildMulti_trackNum = 0;
+static int32_t jkGuiBuildMulti_trackNum = 0;
 static wchar_t jkGuiBuildMulti_waTmp[128];
 static wchar_t jkGuiBuildMulti_waTmp2[32];
 static stdBitmap **jkGuiBuildMulti_apSaberBitmaps = NULL;
 static jkSaberInfo *jkGame_aSabers = NULL;
-static int jkGuiBuildMulti_bSabersLoaded = 0;
-static int jkGuiBuildMulti_bEditShowing = 0;
-static int jkGuiBuildMulti_numModels = 0;
-static int jkGuiBuildMulti_numSabers = 0;
-static int jkGuiBuildMulti_saberIdx = 0;
-static int jkGuiBuildMulti_modelIdx = 0;
+static int32_t jkGuiBuildMulti_bSabersLoaded = 0;
+static int32_t jkGuiBuildMulti_bEditShowing = 0;
+static int32_t jkGuiBuildMulti_numModels = 0;
+static int32_t jkGuiBuildMulti_numSabers = 0;
+static int32_t jkGuiBuildMulti_saberIdx = 0;
+static int32_t jkGuiBuildMulti_modelIdx = 0;
 static jkMultiModelInfo *jkGuiBuildMulti_aModels = NULL;
-static int jkGuiBuildMulti_renderOptions = 0x103;
+static int32_t jkGuiBuildMulti_renderOptions = 0x103;
 static rdVector3 jkGuiBuildMulti_projectRot;
 static rdVector3 jkGuiBuildMulti_projectPos;
 static stdVBufferTexFmt jkGuiBuildMulti_texFmt;
@@ -267,7 +267,7 @@ static rdRect jkGuiBuildMulti_rect_5353C8 = {315, 115, 260, 260};
 #endif
 
 // Added
-int jkGuiBuildMulti_bRendering = 0;
+int32_t jkGuiBuildMulti_bRendering = 0;
 
 void jkGuiBuildMulti_StartupEditCharacter()
 {
@@ -343,7 +343,7 @@ void jkGuiBuildMulti_ThingInit(char *pModelFpath)
 {
     rdPuppet *pPuppet; // [esp-8h] [ebp-18h]
 
-    int tmp = jkGuiBuildMulti_bRendering; // Added
+    int32_t tmp = jkGuiBuildMulti_bRendering; // Added
     jkGuiBuildMulti_bRendering = 1; // Added
 
     jkGuiBuildMulti_model = rdModel3_New(pModelFpath);
@@ -363,7 +363,7 @@ void jkGuiBuildMulti_ThingInit(char *pModelFpath)
 
 void jkGuiBuildMulti_ThingCleanup()
 {
-    int tmp = jkGuiBuildMulti_bRendering; // Added
+    int32_t tmp = jkGuiBuildMulti_bRendering; // Added
     jkGuiBuildMulti_bRendering = 1; // Added
 
     // Added
@@ -378,30 +378,30 @@ void jkGuiBuildMulti_ThingCleanup()
 }
 
 // MOTS altered
-int jkGuiBuildMulti_ShowEditCharacter(int bIdk)
+int jkGuiBuildMulti_ShowEditCharacter(BOOL bIdk)
 {
-    int v1; // esi
+    int32_t v1; // esi
     wchar_t *v2; // eax
     wchar_t *v3; // eax
-    int v4; // esi
+    int32_t v4; // esi
     jkSaberInfo *v5; // ecx
     jkSaberInfo *v6; // ecx
     stdBitmap *v7; // eax
-    int v8; // ebp
+    int32_t v8; // ebp
     jkSaberInfo * v9; // edi
     jkMultiModelInfo *v10; // eax
-    int v11; // eax
-    int v12; // edi
+    int32_t v11; // eax
+    int32_t v12; // edi
     jkMultiModelInfo *v13; // ebp
     rdPuppet *v14; // eax
     wchar_t *v15; // eax
-    int v16; // esi
-    int v17; // eax
-    int v18; // edi
-    int i; // esi
+    int32_t v16; // esi
+    int32_t v17; // eax
+    int32_t v18; // edi
+    int32_t i; // esi
     wchar_t *v21; // [esp-4h] [ebp-190h]
-    int idx; // [esp+10h] [ebp-17Ch] BYREF
-    int _v23;
+    int32_t idx; // [esp+10h] [ebp-17Ch] BYREF
+    int32_t _v23;
     int64_t v23; // [esp+14h] [ebp-178h]
     char v24[32]; // [esp+1Ch] [ebp-170h] BYREF
     char tmp1[32]; // [esp+2Ch] [ebp-160h] BYREF
@@ -628,7 +628,7 @@ int jkGuiBuildMulti_DisplayModel()
 {
     stdVBufferTexFmt v1; // [esp+8h] [ebp-4Ch] BYREF
 
-    int tmp = jkGuiBuildMulti_bRendering; // Added
+    int32_t tmp = jkGuiBuildMulti_bRendering; // Added
     jkGuiBuildMulti_bRendering = 1; // Added
 
     rdOpen(0);
@@ -678,13 +678,13 @@ int jkGuiBuildMulti_DisplayModel()
     jkGuiBuildMulti_fnKeyframeLoader = rdKeyframe_RegisterLoader(jkGuiBuildMulti_KeyframeLoader);
     jkGuiBuildMulti_pModelGun = rdModel3_New("bryg.3do");
     jkGuiBuildMulti_pThingGun = rdThing_New(0);
-    int ret = rdThing_SetModel3(jkGuiBuildMulti_pThingGun, jkGuiBuildMulti_pModelGun);
+    int32_t ret = rdThing_SetModel3(jkGuiBuildMulti_pThingGun, jkGuiBuildMulti_pModelGun);
 
     jkGuiBuildMulti_bRendering = tmp; // Added
     return ret;
 }
 
-void jkGuiBuildMulti_ModelDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVBuffer *pVbuf, int redraw)
+void jkGuiBuildMulti_ModelDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVBuffer *pVbuf, BOOL redraw)
 {
     uint32_t v5; // st7
     flex_d_t v6; // st7
@@ -745,11 +745,11 @@ void jkGuiBuildMulti_ModelDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVB
     }
 }
 
-void jkGuiBuildMulti_SaberDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVBuffer *pVbuf, int redraw)
+void jkGuiBuildMulti_SaberDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVBuffer *pVbuf, BOOL redraw)
 {
     stdBitmap *pSabBm; // eax
-    signed int bmWidth; // esi
-    signed int bmHeight; // esi
+    int32_t bmWidth; // esi
+    int32_t bmHeight; // esi
     rdRect rect; // [esp+4h] [ebp-10h] BYREF
 
     pSabBm = jkGuiBuildMulti_apSaberBitmaps[jkGuiBuildMulti_saberIdx];
@@ -767,7 +767,7 @@ void jkGuiBuildMulti_SaberDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVB
 }
 
 // MOTS altered
-int jkGuiBuildMulti_SaberButtonClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, BOOL redraw)
+int jkGuiBuildMulti_SaberButtonClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, BOOL redraw)
 {
     int v2; // eax
     wchar_t *v3; // eax
@@ -1108,7 +1108,7 @@ int jkGuiBuildMulti_Show2(Darray *pDarray, jkGuiElement *pElement, int minIdk, i
 int jkGuiBuildMulti_ShowNewCharacter(int rank, int bGameFormatIsJK, int bHasNoValidChars)
 {
     wchar_t *v4; // eax
-    signed int v5; // esi
+    int32_t v5; // esi
     wchar_t *v6; // eax
     int v7; // esi
     int v8; // ebp
@@ -1300,7 +1300,7 @@ LABEL_16:
 }
 
 
-int jkGuiBuildMulti_FUN_00420930(jkGuiElement *pElement,jkGuiMenu *pMenu,int mouseX,int mouseY, BOOL redraw)
+int jkGuiBuildMulti_FUN_00420930(jkGuiElement *pElement,jkGuiMenu *pMenu,int32_t mouseX,int32_t mouseY, BOOL redraw)
 {
     jkGuiBuildMulti_pNewCharacterElements[6].selectedTextEntry = 1;
     jkGuiBuildMulti_pNewCharacterElements[5].selectedTextEntry = 0;
@@ -1326,7 +1326,7 @@ int jkGuiBuildMulti_FUN_00420930(jkGuiElement *pElement,jkGuiMenu *pMenu,int mou
     return 0;
 }
 
-int jkGuiBuildMulti_FUN_004209b0(jkGuiElement *pElement,jkGuiMenu *pMenu, int mouseX, int mouseY, BOOL redraw)
+int jkGuiBuildMulti_FUN_004209b0(jkGuiElement *pElement,jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, BOOL redraw)
 {
     jkGuiBuildMulti_pNewCharacterElements[6].selectedTextEntry = 0;
     jkGuiBuildMulti_pNewCharacterElements[5].selectedTextEntry = 1;
@@ -1352,12 +1352,12 @@ int jkGuiBuildMulti_FUN_004209b0(jkGuiElement *pElement,jkGuiMenu *pMenu, int mo
     return 0;
 }
 
-int jkGuiBuildMulti_menuNewCharacter_rankArrowButtonClickHandler(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, BOOL a5)
+int jkGuiBuildMulti_menuNewCharacter_rankArrowButtonClickHandler(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, BOOL a5)
 {
-    signed int v2; // esi
+    int32_t v2; // esi
     wchar_t *v3; // eax
-    signed int v4; // esi
-    signed int v6; // [esp-8h] [ebp-1Ch]
+    int32_t v4; // esi
+    int32_t v6; // [esp-8h] [ebp-1Ch]
     wchar_t *v7; // [esp-4h] [ebp-18h]
     char tmp[32+1]; // [esp+4h] [ebp-10h] BYREF
 
@@ -1395,7 +1395,7 @@ int jkGuiBuildMulti_ShowLoad(jkPlayerMpcInfo *pPlayerMpcInfo, char *pStrEpisode,
 {
     wchar_t *v5; // eax
     int v6; // eax
-    unsigned int v7; // edi
+    uint32_t v7; // edi
     jkEpisode *v8; // ebp
     int v9; // esi
     wchar_t *v10; // eax
@@ -1651,7 +1651,7 @@ void jkGuiBuildMulti_sub_41D680(jkGuiMenu *pMenu, int idx)
     }
 }
 
-int jkGuiBuildMulti_sub_41D830(jkGuiElement *pElement, jkGuiMenu *pMenu, int mouseX, int mouseY, BOOL redraw)
+int jkGuiBuildMulti_sub_41D830(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, BOOL redraw)
 {
     if ( mouseX != -1 || mouseY != -1 )
         jkGuiRend_ClickSound(pElement, pMenu, mouseX, mouseY, redraw);

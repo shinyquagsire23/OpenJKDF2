@@ -32,7 +32,7 @@ void sithAIAwareness_Shutdown()
     sithAIAwareness_bInitted = 0;
 }
 
-int sithAIAwareness_AddEntry(sithSector *sector, rdVector3 *pos, int a3, flex_t a4, sithThing *thing)
+int sithAIAwareness_AddEntry(sithSector *sector, rdVector3 *pos, int32_t a3, flex_t a4, sithThing *thing)
 {
     if (!sithAI_bOpened) {
         return 0;
@@ -51,7 +51,7 @@ int sithAIAwareness_AddEntry(sithSector *sector, rdVector3 *pos, int a3, flex_t 
     return 1;
 }
 
-int sithAIAwareness_Tick(int a, sithEventInfo* b)
+int sithAIAwareness_Tick(int32_t a, sithEventInfo* b)
 {
     // Added: co-op
     if (sithNet_isMulti && !sithNet_isServer) {

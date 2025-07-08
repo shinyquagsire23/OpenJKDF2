@@ -5,6 +5,7 @@
 #include "Platform/std3D.h"
 #include "Engine/rdColormap.h"
 #include "General/stdMath.h"
+#include "stdPlatform.h"
 
 #include <math.h>
 

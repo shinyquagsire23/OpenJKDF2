@@ -181,16 +181,16 @@ int sithCogParse_LoadEntry(sithCogScript *script)
     sith_cog_parser_node *v3; // esi
     int v5; // eax
     int v6; // eax
-    int *script_program; // eax
+    int32_t *script_program; // eax
     signed int result; // eax
     sith_cog_parser_node *cur_instr; // esi
     int script_prog_curidx; // ecx
-    int *script_prog_next; // edx
+    int32_t *script_prog_next; // edx
     sith_cog_parser_node *node_parent; // eax
     int op; // eax
     int stack_pos; // ecx
     int v15; // eax
-    int *v17; // edx
+    int32_t *v17; // edx
     int next_stackpos; // ecx
 
     fhand = stdConffile_GetFileHandle();
@@ -248,7 +248,7 @@ LABEL_16:
                 v6 = v3->parent_loop_depth;
                 if ( v6 )
                     cog_parser_node_stackpos[v6] = cogvm_stackpos;
-                script_program = (int *)pSithHS->alloc(sizeof(int) * cogvm_stackpos + sizeof(int));
+                script_program = (int32_t *)pSithHS->alloc(sizeof(int32_t) * cogvm_stackpos + sizeof(int32_t));
                 script->script_program = script_program;
                 if ( !script_program )
                     goto LABEL_19;

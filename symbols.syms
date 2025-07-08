@@ -521,7 +521,7 @@ jkHud_targetRed 0x00525960 uint32_t = 1
 jkHud_targetBlue 0x00525964 uint32_t = 2
 jkHud_targetGreen 0x00525968 uint32_t = 3
 jkHud_aFltIdk 0x00525970 flex_t[6] = {0.2, 0.4, 0.8, 1.0, 2.0, 0.0}
-jkHud_aColors8bpp 0x00525988 int[6] = {1,2,3,4,5,0}
+jkHud_aColors8bpp 0x00525988 int32_t[6] = {1,2,3,4,5,0}
 //jkHud_aFonts 0x005259A0 
 //jkHud_aBitmaps 0x005259E8 
 jkHud_aTeamColors8bpp 0x00525A48 int[5] = {0x0, 0x6, 0x69, 0x1F, 0x2}
@@ -535,7 +535,7 @@ jkHud_chatStrPos 0x00552CB8 int
 jkHud_rightBlitY 0x00552CBC int
 jkHud_aTeamScores 0x00552CC0 jkHudTeamScore[5]
 jkHud_dword_552D10 0x00552D10 int
-jkHud_aColors16bpp 0x00552D18 int[6]
+jkHud_aColors16bpp 0x00552D18 int32_t[6]
 jkHud_aPlayerScores 0x00552D30 jkHudPlayerScore[32]
 jkHud_blittedAmmoAmt 0x00553E30 int
 jkHud_idk14 0x00553E34 int
@@ -880,7 +880,7 @@ cog_parser_node_stackpos 0x008554C8 int[SITHCOG_NODE_STACKDEPTH]
 cogvm_stackpos 0x00855CD8 int
 cogparser_nodes_alloc 0x00855CD0 sith_cog_parser_node*
 cogparser_topnode 0x00855CCC sith_cog_parser_node*
-cogvm_stack 0x00855CC8 int*
+cogvm_stack 0x00855CC8 int32_t*
 cogparser_num_nodes 0x00855CE0 int
 cogparser_current_nodeidx 0x00855CDC int
 parsing_script 0x00855CD4 sithCogScript*

@@ -33,10 +33,10 @@
 
 #include "jk.h"
 
-static int sithCog_bInitted = 0;
+static int32_t sithCog_bInitted = 0;
 
 // MOTS altered
-int sithCog_Startup()
+int32_t sithCog_Startup()
 {
     struct cogSymbol a2; // [esp+8h] [ebp-10h]
 
@@ -140,7 +140,7 @@ int sithCog_Startup()
 }
 
 // Added: Register all new COG verbs last
-int sithCog_StartupEnhanced()
+int32_t sithCog_StartupEnhanced()
 {
     if (!Main_bEnhancedCogVerbs) return 1;
 
@@ -404,10 +404,10 @@ void sithCog_Shutdown()
     sithCog_actionCogIdk = 0;
 }
 
-int sithCog_Open()
+int32_t sithCog_Open()
 {
     sithWorld *world; // ecx
-    signed int result; // eax
+    int32_t result; // eax
     sithCog *v2; // ebx
     sithCogReference *v3; // ebp
     sithCog *v5; // ebp
@@ -427,9 +427,9 @@ int sithCog_Open()
     if ( sithWorld_pStatic )
     {
         v2 = sithWorld_pStatic->cogs;
-        for (int i = 0; i < sithWorld_pStatic->numCogsLoaded; i++)
+        for (int32_t i = 0; i < sithWorld_pStatic->numCogsLoaded; i++)
         {
-            for (int j = 0; j < v2->cogscript->numIdk; j++)
+            for (int32_t j = 0; j < v2->cogscript->numIdk; j++)
             {
                 v3 = &v2->cogscript->aIdk[j];
                 if ( _strlen(v3->value) )
@@ -513,19 +513,19 @@ void sithCog_Close()
 // MOTS altered?
 int sithCog_Load(sithWorld *world, int a2)
 {
-    int num_cogs; // esi
-    signed int result; // eax
+    int32_t num_cogs; // esi
+    int32_t result; // eax
     sithCog *cogs; // eax
-    unsigned int v7; // eax
-    int *v8; // ebx
+    uint32_t v7; // eax
+    int32_t *v8; // ebx
     sithCog *v9; // eax
-    unsigned int v15; // eax
+    uint32_t v15; // eax
     sithCogSymboltable *cogscript_symboltable; // edx
-    int v17; // ecx
+    int32_t v17; // ecx
     sithCogScript *v18; // ebp
     char **v19; // edi
     char *v21; // esi
-    unsigned int v22; // [esp+10h] [ebp-88h]
+    uint32_t v22; // [esp+10h] [ebp-88h]
     uint32_t v23; // [esp+14h] [ebp-84h]
     char cog_fpath[32]; // [esp+18h] [ebp-80h] BYREF
 
@@ -585,12 +585,12 @@ int sithCog_Load(sithWorld *world, int a2)
 
 sithCog* sithCog_LoadCogscript(const char *fpath)
 {
-    unsigned int cogIdx; // eax
+    uint32_t cogIdx; // eax
     sithCogSymboltable *result; // eax
     sithCog *cog; // ebx
     sithCogScript *v7; // eax
     sithCogScript *v8; // esi
-    unsigned int v9; // eax
+    uint32_t v9; // eax
     char cog_fpath[128]; // [esp+10h] [ebp-80h] BYREF
 
     cogIdx = sithWorld_pLoading->numCogsLoaded;
@@ -637,7 +637,7 @@ sithCog* sithCog_LoadCogscript(const char *fpath)
     return NULL;
 }
 
-int sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogReference *cogIdk, char *val)
+int32_t sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogReference *cogIdk, char *val)
 {
     sithCogSymbol *v5; // esi
     sithCogSymbol *v7; // ecx
@@ -756,19 +756,19 @@ int sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogReference *cogIdk, char *
     }
 }
 
-int sithCog_ThingsSectorsRegSymbolIdk(sithCog *cog, sithCogReference *idk, sithCogSymbol *symbol)
+int32_t sithCog_ThingsSectorsRegSymbolIdk(sithCog *cog, sithCogReference *idk, sithCogSymbol *symbol)
 {
     cog_int_t v3; // eax
-    int v5; // ebx
-    int v6; // edi
+    int32_t v5; // ebx
+    int32_t v6; // edi
     sithSurface *v7; // esi
-    int v8; // eax
-    int v10; // eax
-    int v11; // ebx
-    int v12; // edi
+    int32_t v8; // eax
+    int32_t v10; // eax
+    int32_t v11; // ebx
+    int32_t v12; // edi
     sithSector *v13; // esi
-    int v17; // ebx
-    int v18; // edi
+    int32_t v17; // ebx
+    int32_t v18; // edi
     sithThing *v19; // esi
 
     v3 = symbol->val.data[0];
@@ -837,7 +837,7 @@ int sithCog_ThingsSectorsRegSymbolIdk(sithCog *cog, sithCogReference *idk, sithC
     return 1;
 }
 
-void sithCog_SendMessageFromThing(sithThing *a1, sithThing *a2, int msg)
+void sithCog_SendMessageFromThing(sithThing *a1, sithThing *a2, int32_t msg)
 {
     sithCog_SendMessageFromThingEx(a1, a2, msg, 0.0, 0.0, 0.0, 0.0);
 }
@@ -845,8 +845,8 @@ void sithCog_SendMessageFromThing(sithThing *a1, sithThing *a2, int msg)
 cog_flex_t sithCog_SendMessageFromThingEx(sithThing *sender, sithThing *receiver, SITH_MESSAGE message, cog_flex_t param0, cog_flex_t param1, cog_flex_t param2, cog_flex_t param3)
 {
     //return _sithCog_SendMessageFromThingEx(sender, receiver, message, param0, param1, param2, param3);
-    int v7; // ebx
-    int v8; // ebp
+    int32_t v7; // ebx
+    int32_t v8; // ebp
     sithCog *v9; // eax
     cog_flex_t v10; // st7
     cog_flex_t v11; // st7
@@ -856,7 +856,7 @@ cog_flex_t sithCog_SendMessageFromThingEx(sithThing *sender, sithThing *receiver
     cog_flex_t v16; // st7
     cog_flex_t v17; // st7
     cog_flex_t v19; // [esp+10h] [ebp-8h]
-    int receivera; // [esp+20h] [ebp+8h]
+    int32_t receivera; // [esp+20h] [ebp+8h]
 
     v19 = 0.0;
     if ( message == SITH_MESSAGE_DAMAGED )
@@ -924,7 +924,7 @@ cog_flex_t sithCog_SendMessageFromThingEx(sithThing *sender, sithThing *receiver
                 v19 = v14 + v19;
         }
     }
-    for (int i = 0; i < sithCog_numThingLinks; i++)
+    for (int32_t i = 0; i < sithCog_numThingLinks; i++)
     {
         sithCogThingLink* v15 = &sithCog_aThingLinks[i];
         if ( v15->thing == sender && v15->signature == sender->signature && (receivera & v15->mask) != 0 )
@@ -976,20 +976,20 @@ cog_flex_t sithCog_SendMessageFromThingEx(sithThing *sender, sithThing *receiver
     return v19;
 }
 
-void sithCog_SendMessageFromSurface(sithSurface *surface, sithThing *thing, int msg)
+void sithCog_SendMessageFromSurface(sithSurface *surface, sithThing *thing, int32_t msg)
 {
     sithCog_SendMessageFromSurfaceEx(surface, thing, msg, 0.0, 0.0, 0.0, 0.0);
 }
 
 cog_flex_t sithCog_SendMessageFromSurfaceEx(sithSurface *sender, sithThing *thing, SITH_MESSAGE msg, cog_flex_t a4, cog_flex_t a5, cog_flex_t a6, cog_flex_t a7)
 {
-    int v8; // ebp
+    int32_t v8; // ebp
     cog_flex_t v9; // ebx
     cog_flex_t v11; // st7
     cog_flex_t v12; // st7
     cog_flex_t v14; // [esp+10h] [ebp-Ch]
-    int v15; // [esp+14h] [ebp-8h]
-    int sourceType; // [esp+24h] [ebp+8h]
+    int32_t v15; // [esp+14h] [ebp-8h]
+    int32_t sourceType; // [esp+24h] [ebp+8h]
 
     v14 = 0.0;
     if ( thing )
@@ -1006,7 +1006,7 @@ cog_flex_t sithCog_SendMessageFromSurfaceEx(sithSurface *sender, sithThing *thin
     }
     
     v9 = a4;
-    for (int i = 0; i < sithCog_numSurfaceLinks; i++)
+    for (int32_t i = 0; i < sithCog_numSurfaceLinks; i++)
     {
         sithCogSurfaceLink* surfaceLink = &sithCog_aSurfaceLinks[i];
         if ( surfaceLink->surface == sender && (surfaceLink->mask & v15) != 0 )
@@ -1050,19 +1050,19 @@ cog_flex_t sithCog_SendMessageFromSurfaceEx(sithSurface *sender, sithThing *thin
     return v14;
 }
 
-void sithCog_SendMessageFromSector(sithSector *sector, sithThing *thing, int message)
+void sithCog_SendMessageFromSector(sithSector *sector, sithThing *thing, int32_t message)
 {
     sithCog_SendMessageFromSectorEx(sector, thing, message, 0.0, 0.0, 0.0, 0.0);
 }
 
 cog_flex_t sithCog_SendMessageFromSectorEx(sithSector *a1, sithThing *sourceType, SITH_MESSAGE message, cog_flex_t param0, cog_flex_t param1, cog_flex_t param2, cog_flex_t param3)
 {
-    int v8; // ebp
+    int32_t v8; // ebp
     cog_flex_t v11; // st7
     cog_flex_t v12; // st7
     cog_flex_t v13; // [esp+10h] [ebp-Ch]
-    int v14; // [esp+14h] [ebp-8h]
-    int sourceTypea; // [esp+24h] [ebp+8h]
+    int32_t v14; // [esp+14h] [ebp-8h]
+    int32_t sourceTypea; // [esp+24h] [ebp+8h]
 
     v13 = 0.0;
     if ( sourceType )
@@ -1079,7 +1079,7 @@ cog_flex_t sithCog_SendMessageFromSectorEx(sithSector *a1, sithThing *sourceType
     }
     if ( &sithCog_aSectorLinks[sithCog_numSectorLinks] > sithCog_aSectorLinks )
     {
-        for (int i = 0; i < sithCog_numSectorLinks; i++)
+        for (int32_t i = 0; i < sithCog_numSectorLinks; i++)
         {
             sithCogSectorLink* link = &sithCog_aSectorLinks[i];
             if ( link->sector == a1 && (link->mask & v14) != 0 )
@@ -1121,17 +1121,17 @@ cog_flex_t sithCog_SendMessageFromSectorEx(sithSector *a1, sithThing *sourceType
     return v13;
 }
 
-void sithCog_SendSimpleMessageToAll(int a1, int a2, int a3, int a4, int a5)
+void sithCog_SendSimpleMessageToAll(int32_t a1, int32_t a2, int32_t a3, int32_t a4, int32_t a5)
 {
     sithCog_SendMessageToAll(a1, a2, a3, a4, a5, 0.0, 0.0, 0.0, 0.0);
 }
 
-void sithCog_SendMessageToAll(int cmdid, int senderType, int senderIdx, int sourceType, int sourceIdx, cog_flex_t arg0, cog_flex_t arg1, cog_flex_t arg2, cog_flex_t arg3)
+void sithCog_SendMessageToAll(int32_t cmdid, int32_t senderType, int32_t senderIdx, int32_t sourceType, int32_t sourceIdx, cog_flex_t arg0, cog_flex_t arg1, cog_flex_t arg2, cog_flex_t arg3)
 {
     sithCog *v9; // esi
-    unsigned int i; // edi
+    uint32_t i; // edi
     sithCog *v11; // esi
-    unsigned int j; // edi
+    uint32_t j; // edi
 
     if ( sithWorld_pStatic )
     {
@@ -1147,10 +1147,10 @@ void sithCog_SendMessageToAll(int cmdid, int senderType, int senderIdx, int sour
     }
 }
 
-void sithCog_SendMessage(sithCog *cog, int msgid, int senderType, int senderIndex, int sourceType, int sourceIndex, int linkId)
+void sithCog_SendMessage(sithCog *cog, int32_t msgid, int32_t senderType, int32_t senderIndex, int32_t sourceType, int32_t sourceIndex, int32_t linkId)
 {
     sithCogScript *v7; // ebp
-    unsigned int v10; // edi
+    uint32_t v10; // edi
 
     if (!cog)
         return;
@@ -1260,13 +1260,13 @@ execute:
     }
 }
 
-cog_flex_t sithCog_SendMessageEx(sithCog *cog, int message, int senderType, int senderIndex, int sourceType, int sourceIndex, int linkId, cog_flex_t param0, cog_flex_t param1, cog_flex_t param2, cog_flex_t param3)
+cog_flex_t sithCog_SendMessageEx(sithCog *cog, int32_t message, int32_t senderType, int32_t senderIndex, int32_t sourceType, int32_t sourceIndex, int32_t linkId, cog_flex_t param0, cog_flex_t param1, cog_flex_t param2, cog_flex_t param3)
 {
     cog_flex_t result; // st7
     sithCogScript *v12; // ebp
-    int v13; // edx
-    unsigned int trigIdxMax; // ecx
-    unsigned int trigIdx; // edi
+    int32_t v13; // edx
+    uint32_t trigIdxMax; // ecx
+    uint32_t trigIdx; // edi
     sithCogTrigger *trig; // eax
 
     if ( !cog )
@@ -1411,15 +1411,15 @@ execute:
 
 void sithCog_Free(sithWorld *world)
 {
-    int v2; // edi
+    int32_t v2; // edi
     sithCogScript *v4; // esi
     uint32_t v5; // ebx
-    unsigned int i; // ebx
+    uint32_t i; // ebx
     sithCog *v9; // esi
 
     if ( world->cogScripts )
     {
-        for (int i = 0; i < world->numCogScriptsLoaded; i++)
+        for (int32_t i = 0; i < world->numCogScriptsLoaded; i++)
         {
             v4 = &world->cogScripts[i];
             sithCogParse_FreeSymboltable(v4->pSymbolTable);
@@ -1445,7 +1445,7 @@ void sithCog_Free(sithWorld *world)
     }
     if ( world->cogs )
     {
-        for (int i = 0; i < world->numCogsLoaded; i++ )
+        for (int32_t i = 0; i < world->numCogsLoaded; i++ )
         {
             v9 = &world->cogs[i];
             sithCogParse_FreeSymboltable(v9->pSymbolTable);
@@ -1479,13 +1479,13 @@ void sithCog_HandleThingTimerPulse(sithThing *thing)
 // MOTS altered?
 int sithCogScript_Load(sithWorld *lvl, int a2)
 {
-    int numCogScripts; // esi
-    signed int result; // eax
+    int32_t numCogScripts; // esi
+    int32_t result; // eax
     sithCogScript *cogScripts; // edi
     char *v5; // esi
     sithWorld *v6; // edi
-    unsigned int v7; // eax
-    int v8; // esi
+    uint32_t v7; // eax
+    int32_t v8; // esi
     char cog_fpath[128]; // [esp+10h] [ebp-80h] BYREF
 
     // Added: ??
@@ -1529,10 +1529,10 @@ int sithCogScript_Load(sithWorld *lvl, int a2)
     return result;
 }
 
-sithCogScript* sithCogScript_LoadEntry(const char *pFpath, int unk)
+sithCogScript* sithCogScript_LoadEntry(const char *pFpath, int32_t unk)
 {
     sithCogScript *result; // eax
-    unsigned int v4; // eax
+    uint32_t v4; // eax
     sithCogScript *v5; // edi
     char v6[128]; // [esp+8h] [ebp-80h] BYREF
 
@@ -1568,7 +1568,7 @@ void sithCogScript_RegisterVerb(sithCogSymboltable *a1, cogSymbolFunc_t a2, cons
     }
 }
 
-void sithCogScript_RegisterMessageSymbol(sithCogSymboltable *a1, int a2, const char *a3)
+void sithCogScript_RegisterMessageSymbol(sithCogSymboltable *a1, int32_t a2, const char *a3)
 {
     sithCogStackvar a2a; // [esp+0h] [ebp-10h] BYREF
 
@@ -1581,7 +1581,7 @@ void sithCogScript_RegisterMessageSymbol(sithCogSymboltable *a1, int a2, const c
     }
 }
 
-void sithCogScript_RegisterGlobalMessage(sithCogSymboltable *a1, const char *a2, int a3)
+void sithCogScript_RegisterGlobalMessage(sithCogSymboltable *a1, const char *a2, int32_t a3)
 {
     sithCogStackvar a2a; // [esp+0h] [ebp-10h] BYREF
 
@@ -1657,10 +1657,10 @@ void sithCogScript_Tick(sithCog *cog)
     }
 }
 
-int sithCogScript_TimerTick(int deltaMs, sithEventInfo *info)
+int sithCogScript_TimerTick(int32_t deltaMs, sithEventInfo *info)
 {
     sithWorld *v2; // ecx
-    int v3; // eax
+    int32_t v3; // eax
     sithCog *v4; // eax
 
     v2 = sithWorld_pCurrentWorld;
@@ -1685,7 +1685,7 @@ int sithCogScript_DevCmdCogStatus(stdDebugConsoleCmd *cmd, const char *extra)
     sithWorld *world; // esi
     sithCog *v3; // ebp
     sithCogSymboltable *v4; // eax
-    unsigned int v5; // ebx
+    uint32_t v5; // ebx
     sithCogSymbol *v6; // esi
     const char *v7; // eax
     uint32_t tmp;
@@ -1729,7 +1729,7 @@ int sithCogScript_DevCmdCogStatus(stdDebugConsoleCmd *cmd, const char *extra)
     return 1;
 }
 
-sithCog* sithCog_GetByIdx(int idx)
+sithCog* sithCog_GetByIdx(int32_t idx)
 {
     sithWorld *world; // ecx
     sithCog *result; // eax
