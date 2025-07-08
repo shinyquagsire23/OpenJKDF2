@@ -401,7 +401,7 @@ void sithMain_UpdateCamera()
 {
 #if defined(TARGET_TWL)
     jkPlayer_fov = 90.0;
-    jkPlayer_bJankyPhysics = 1;
+    jkPlayer_bJankyPhysics = 0;
 #endif
 
     if ( (g_submodeFlags & 8) == 0 )
@@ -418,7 +418,7 @@ void sithMain_UpdateCamera()
             static flex_t sithMain_UpdateCamera_lastFov = 90.0;
             static void* sithMain_UpdateCamera_lastCamera = NULL;
 
-            if (aspect != sithMain_lastAspect || jkPlayer_fov != sithMain_UpdateCamera_lastFov || sithMain_UpdateCamera_lastCamera != sithCamera_currentCamera) {
+            if (aspect != sithMain_lastAspect || jkPlayer_fov != sithCamera_currentCamera->rdCam.fov || jkPlayer_fov != sithMain_UpdateCamera_lastFov || sithMain_UpdateCamera_lastCamera != sithCamera_currentCamera) {
 #endif
                 if (!Main_bMotsCompat)
                 {

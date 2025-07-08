@@ -9,7 +9,7 @@
 
 // Settings for stepped physics
 #ifdef TARGET_TWL
-#define TARGET_PHYSTICK_FPS (30.0)
+#define TARGET_PHYSTICK_FPS (20.0)
 #define DELTA_PHYSTICK_FPS (1.0/TARGET_PHYSTICK_FPS)
 #else
 #define TARGET_PHYSTICK_FPS (sithNet_isMulti ? (sithNet_tickrate < 100 ? 150.0 : 50.0) : 150.0)
@@ -100,7 +100,7 @@
 #define SITHCOG_SYMBOL_LIMIT (1024) // JK was 512, MoTS/DW are 1024
 #define SITHCOG_LINKED_SYMBOL_LIMIT (256)
 #define SITHCOG_MAX_LINKS (512)
-#define SITHCOG_NODE_STACKDEPTH (0x200) // JK was 0x200, MoTS is 0x400
+#define SITHCOG_NODE_STACKDEPTH (0x400) // JK was 0x200, MoTS is 0x400
 #endif // QOL_IMPROVEMENTS
 
 // Weapon-related limits
@@ -110,7 +110,7 @@
 #define RDCACHE_MAX_TRIS (0x800) // theoretical max 0x800?
 #define RDCACHE_MAX_VERTICES (0x600)
 
-#define STD3D_MAX_TEXTURES (1024)
+#define STD3D_MAX_TEXTURES (512)
 #define STD3D_MAX_UI_TRIS (0x100)
 #define STD3D_MAX_UI_VERTICES (0x100)
 #else

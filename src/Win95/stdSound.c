@@ -13,6 +13,9 @@ flex_t stdSound_fMenuVolume = 1.0f;
 
 uint32_t stdSound_ParseWav(stdFile_t sound_file, uint32_t *nSamplesPerSec, int32_t *bitsPerSample, int32_t *bStereo, int32_t *seekOffset)
 {
+#ifdef TARGET_TWL
+    return 0;
+#endif
     unsigned int result; // eax
     char v9[4]; // [esp+Ch] [ebp-14h] BYREF
     stdWaveFormat v10; // [esp+10h] [ebp-10h] BYREF

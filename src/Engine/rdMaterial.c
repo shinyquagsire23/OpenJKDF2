@@ -203,7 +203,7 @@ LABEL_21:
         texture->opaqueMats[mipmap_num].height = format.height;
 
         // Limit textures that are loaded on TWL
-        if (!tex_header_1.alpha_en && (format.width <= 64 || mipmap_num >= texture->num_mipmaps-2 || mipmap_num >= texture->num_mipmaps-1)) {
+        if (!tex_header_1.alpha_en && (format.width <= 32 || mipmap_num >= texture->num_mipmaps-1)) {
             created_tex = stdDisplay_VBufferNew(&format, create_ddraw_surface, gpu_mem, 0);
             *texture_struct = created_tex;
             (*texture_struct)->format.texture_size_in_bytes = format.width*format.height*(format.format.is16bit?2:1);

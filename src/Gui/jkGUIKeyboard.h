@@ -19,7 +19,7 @@
 #define jkGuiKeyboard_Startup_ADDR (0x00412970)
 #define jkGuiKeyboard_Shutdown_ADDR (0x00412990)
 
-const char* jkGuiKeyboard_DIKNumToStr(unsigned int idx, char bIsIdxAxis);
+const char* jkGuiKeyboard_DIKNumToStr(uint32_t idx, char bIsIdxAxis);
 int jkGuiKeyboard_sub_411E40(Darray *pDarr);
 int jkGuiKeyboard_RemoveControlClicked(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, BOOL redraw);
 void jkGuiKeyboard_sub_411F40(jkGuiElement *pElement, Darray *pDarr);

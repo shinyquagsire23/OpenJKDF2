@@ -1474,7 +1474,12 @@ void sithControl_PlayerMovement(sithThing *player)
         else
         {
             // Player yaw handling
+#ifdef QOL_IMPROVEMENTS
+            // Scale appropriately to high and low framerates
+            player->physicsParams.angVel.y = sithControl_GetAxis(INPUT_FUNC_TURN) * 25.0;
+#else
             player->physicsParams.angVel.y = sithControl_GetAxis(INPUT_FUNC_TURN) * sithTime_TickHz;
+#endif
             if ( move_multiplier > 1.0 )
                 move_multiplier_ = move_multiplier;
             else
@@ -1482,7 +1487,7 @@ void sithControl_PlayerMovement(sithThing *player)
             
 #ifdef QOL_IMPROVEMENTS
             // Scale appropriately to high framerates
-            player->physicsParams.angVel.y += (sithTime_TickHz / 50.0) * sithControl_ReadAxisStuff(INPUT_FUNC_TURN) * player->actorParams.maxRotThrust * move_multiplier_;
+            player->physicsParams.angVel.y += sithControl_ReadAxisStuff(INPUT_FUNC_TURN) * player->actorParams.maxRotThrust * move_multiplier_;
 #else
             player->physicsParams.angVel.y += sithControl_ReadAxisStuff(INPUT_FUNC_TURN) * player->actorParams.maxRotThrust * move_multiplier_;
 #endif
@@ -1583,11 +1588,13 @@ void sithControl_FreeCam(sithThing *player)
         {
             // Why did MoTS do this lol
             v7->x = (Main_bMotsCompat ? -1 : 1) * sithControl_GetAxis2(INPUT_FUNC_SLIDE) * (v1->actorParams.extraSpeed + v1->actorParams.maxThrust) * 0.7;
-            v1->physicsParams.angVel.y = sithControl_GetAxis(INPUT_FUNC_TURN) * sithTime_TickHz;
+            
 #ifdef QOL_IMPROVEMENTS
             // Scale appropriately to high framerates
-            v1->physicsParams.angVel.y +=  (sithTime_TickHz / 50.0) * sithControl_ReadAxisStuff(INPUT_FUNC_TURN) * v1->actorParams.maxRotThrust;
+            v1->physicsParams.angVel.y = sithControl_GetAxis(INPUT_FUNC_TURN) * 25.0;
+            v1->physicsParams.angVel.y +=  sithControl_ReadAxisStuff(INPUT_FUNC_TURN) * v1->actorParams.maxRotThrust;
 #else
+            v1->physicsParams.angVel.y = sithControl_GetAxis(INPUT_FUNC_TURN) * sithTime_TickHz;
             v1->physicsParams.angVel.y += sithControl_ReadAxisStuff(INPUT_FUNC_TURN) * v1->actorParams.maxRotThrust;
 #endif
         }
@@ -1779,18 +1786,18 @@ void sithControl_InputInit()
     sithControl_MapDefaults();
     sithControl_MapAxisFunc(INPUT_FUNC_FORWARD, AXIS_JOY1_Y, 4u);
     sithControl_MapAxisFunc(INPUT_FUNC_TURN, AXIS_JOY1_X, 4u);
+#ifndef TARGET_TWL
     sithControl_DefaultHelper(INPUT_FUNC_FIRE1, KEY_JOY1_B1, 2);
     sithControl_DefaultHelper(INPUT_FUNC_FIRE2, KEY_JOY1_B2, 2);
     sithControl_DefaultHelper(INPUT_FUNC_ACTIVATE, KEY_JOY1_B3, 2);
     sithControl_MapFunc(INPUT_FUNC_JUMP, KEY_JOY1_B4, 0);
-#ifndef TARGET_TWL
     sithControl_MapFunc(INPUT_FUNC_PITCH, KEY_JOY1_HUP, 4);
     sithControl_MapFunc(INPUT_FUNC_PITCH, KEY_JOY1_HDOWN, 0);
     sithControl_MapFunc(INPUT_FUNC_SLIDE, KEY_JOY1_HLEFT, 4);
     sithControl_MapFunc(INPUT_FUNC_SLIDE, KEY_JOY1_HRIGHT, 0);
-#endif
     sithControl_MapFunc(INPUT_FUNC_NEXTINV, KEY_JOY1_B5, 0);
     sithControl_MapFunc(INPUT_FUNC_USEINV, KEY_JOY1_B7, 0);
+#endif
     v6 = sithControl_MapAxisFunc(INPUT_FUNC_TURN, AXIS_MOUSE_X, 0xCu);
     if ( v6 )
         v6->binaryAxisVal = 0.4;
@@ -1799,7 +1806,7 @@ void sithControl_InputInit()
 #else
     v7 = sithControl_MapAxisFunc(INPUT_FUNC_PITCH, AXIS_MOUSE_Y, 8u);
 #endif
-    if ( v7 )
+    if ( v7 ) 
         v7->binaryAxisVal = 0.3;
     v8 = sithControl_MapAxisFunc(INPUT_FUNC_PITCH, AXIS_MOUSE_Z, 0);
     if ( v8 )
@@ -1814,6 +1821,14 @@ void sithControl_InputInit()
     sithControl_MapFunc(INPUT_FUNC_FORWARD, KEY_JOY1_HDOWN, 4);
     sithControl_MapFunc(INPUT_FUNC_TURN, KEY_JOY1_HLEFT, 0);
     sithControl_MapFunc(INPUT_FUNC_TURN, KEY_JOY1_HRIGHT, 4);
+    sithControl_DefaultHelper(INPUT_FUNC_FIRE1, KEY_JOY1_B1, 2);
+    sithControl_DefaultHelper(INPUT_FUNC_DUCK, KEY_JOY1_B2, 0);
+    sithControl_DefaultHelper(INPUT_FUNC_ACTIVATE, KEY_JOY1_B3, 2);
+    sithControl_MapFunc(INPUT_FUNC_JUMP, KEY_JOY1_B4, 0);
+    sithControl_MapFunc(INPUT_FUNC_NEXTINV, KEY_JOY1_B5, 0); // L
+    sithControl_MapFunc(INPUT_FUNC_NEXTWEAPON, KEY_JOY1_B6, 0); // R
+    sithControl_MapFunc(INPUT_FUNC_USEINV, KEY_JOY1_B7, 0);
+    sithWeapon_controlOptions |= 2;
 #endif
 }
 
