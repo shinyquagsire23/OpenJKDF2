@@ -89,7 +89,7 @@ void stdMath_SinCos(flex_t angle, flex_t *pSinOut, flex_t *pCosOut)
     flex_t v13; // [esp+18h] [ebp-14h]
     int32_t quantized; // [esp+1Ch] [ebp-10h]
     int32_t quantized_plus1; // [esp+20h] [ebp-Ch]
-    flex_t normalized_; // [esp+24h] [ebp-8h]
+    flex32_t normalized_; // why tho (flex_t broke TWL matrix rotations)
     flex_t v17; // [esp+28h] [ebp-4h]
     flex_t v18; // [esp+28h] [ebp-4h]
     flex_t v19; // [esp+28h] [ebp-4h]
@@ -126,7 +126,7 @@ void stdMath_SinCos(flex_t angle, flex_t *pSinOut, flex_t *pCosOut)
     v6 = a1 - stdMath_Floor(a1);
     quantized = (int32_t)a1;
     // TODO quantized is set to -0x800000000??
-#ifdef ARCH_64BIT
+#if defined(ARCH_64BIT) || defined(EXPERIMENTAL_FIXED_POINT)
     if (quantized > 0x8000 || quantized < -0x8000)
     {
         quantized = 0;
@@ -492,7 +492,7 @@ flex_t stdMath_Dist3D3(flex_t a1, flex_t a2, flex_t a3)
 
 flex_t stdMath_Floor(flex_t a)
 {
-    return floorf(a);
+    return floorf((float)a);
 }
 
 flex_t stdMath_Sqrt(flex_t a)
@@ -500,7 +500,7 @@ flex_t stdMath_Sqrt(flex_t a)
     if (a < 0.0)
         return 0.0;
 
-    return sqrtf(a);
+    return sqrtf((float)a);
 }
 
 flex_t stdMath_Tan(flex_t a1)

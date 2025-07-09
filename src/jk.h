@@ -3,6 +3,7 @@
 
 #include "engine_config.h"
 #include "types.h"
+#include "stdPlatform.h"
 #include <stdio.h>
 
 #ifdef ARCH_WASM

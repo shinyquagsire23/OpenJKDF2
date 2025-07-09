@@ -25,6 +25,7 @@ void jkSmack_Startup()
 
 void jkSmack_Shutdown()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__); // Added
     jkSmack_bInit = 0;
     if ( jkEpisode_mLoad.paEntries )
     {

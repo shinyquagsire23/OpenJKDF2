@@ -35,6 +35,8 @@ void Windows_Startup()
 {
     char cdPath[128]; // [esp+0h] [ebp-80h] BYREF
 
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
+
     Windows_bInitted = 1;
     WinIdk_SetDplayGuid(Windows_DplayGuid);
     WinIdk_detect_cpu(Windows_cpu_info);
@@ -51,6 +53,8 @@ void Windows_Startup()
 
 void Windows_Shutdown()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
+
     Window_RemoveMsgHandler(Windows_DefaultHandler);
     wuRegistry_Shutdown();
 

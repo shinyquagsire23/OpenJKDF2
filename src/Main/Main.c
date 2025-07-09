@@ -451,6 +451,8 @@ int Main_Startup(const char *cmdline)
 
 void Main_Shutdown()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
+
     std3D_Shutdown(); // Added
     jkQuakeConsole_Shutdown();
 
@@ -530,6 +532,8 @@ void Main_Shutdown()
     Main_bEnhancedCogVerbs = 0;
     memset(Main_strEpisode, 0, sizeof(Main_strEpisode));
     memset(Main_strMap, 0, sizeof(Main_strMap));
+
+    stdPlatform_Printf("OpenJKDF2: %s done\n", __func__);
 
 #ifndef QOL_IMPROVEMENTS
     exit(0);

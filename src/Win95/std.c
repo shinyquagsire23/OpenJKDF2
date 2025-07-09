@@ -29,6 +29,8 @@ void stdStartup(HostServices* pServices)
 
 void stdShutdown()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
+    
 #ifdef ARCH_X86
 #ifndef LINUX
     asm volatile ("fldcw\t%0" : "=m" (word_860800));

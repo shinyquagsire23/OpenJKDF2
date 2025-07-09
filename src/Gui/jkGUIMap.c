@@ -47,7 +47,7 @@ void jkGuiMap_Startup()
 
 void jkGuiMap_Shutdown()
 {
-    ;
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__); // Added
 }
 
 void jkGuiMap_DrawMapScreen(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw)

@@ -99,6 +99,7 @@ int sithMain_Startup(HostServices *commonFuncs)
 
 void sithMain_Shutdown()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
     //sithWeapon
     sithSoundMixer_Shutdown();
     sithSound_Shutdown();
@@ -133,6 +134,7 @@ int sithMain_Load(char *path)
 
 void sithMain_Free()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
     if ( sithWorld_pStatic )
     {
         sithWorld_FreeEntry(sithWorld_pStatic);

@@ -19,9 +19,6 @@ void rdMatrix_Build34(rdMatrix34 *out, const rdVector3 *rot, const rdVector3 *po
     flex_t x_rad_sin, x_rad_cos;
     flex_t y_rad_sin, y_rad_cos;
     flex_t z_rad_sin, z_rad_cos;
-    rdVector3 *scale;
-
-    scale = &out->scale;
 
     stdMath_SinCos(rot->x, &x_rad_sin, &x_rad_cos);
     stdMath_SinCos(rot->y, &y_rad_sin, &y_rad_cos);
@@ -35,9 +32,9 @@ void rdMatrix_Build34(rdMatrix34 *out, const rdVector3 *rot, const rdVector3 *po
     out->uvec.x = ((z_rad_cos * y_rad_sin) * x_rad_sin) + (z_rad_sin * y_rad_cos);
     out->uvec.y = -x_rad_sin * (y_rad_cos * z_rad_cos) + (y_rad_sin*z_rad_sin);
     out->uvec.z = z_rad_cos * x_rad_cos;
-    scale->x = pos->x;
-    scale->y = pos->y;
-    scale->z = pos->z;
+    out->scale.x = pos->x;
+    out->scale.y = pos->y;
+    out->scale.z = pos->z;
 }
 
 void rdMatrix_BuildFromLook34(rdMatrix34 *out, const rdVector3 *lookAt)
@@ -340,18 +337,16 @@ void rdMatrix_ExtractAngles34(const rdMatrix34 *in, rdVector3 *out)
     v33 = stdMath_Sqrt((in->lvec.y * in->lvec.y) + (in->lvec.x * in->lvec.x));
     if ( v33 < 0.001 )
     {
-        v13 = 90.0 - stdMath_ArcSin3(in->rvec.x);
+        out->z = 90.0 - stdMath_ArcSin3(in->rvec.x);
         
-        // TODO ?? some floating point comparison, ah 41h
         if ( -in->lvec.y > 0.0 && in->lvec.z > 0.0 || -in->rvec.y < 0.0 && in->lvec.z < 0.0 )
-            v13 = -v13;
-        out->z = v13;
+            out->z = -out->z;
         out->y = 0.0;
     }
     else
     {
         out->y = 90.0 - stdMath_ArcSin3(in->lvec.y / v33);
-        if (in->lvec.x > 0.0) // TODO ?? some floating point comparison, ah 41h
+        if (in->lvec.x > 0.0)
             out->y = -out->y;
     }
     if ( v33 >= 0.001 )
@@ -376,7 +371,7 @@ void rdMatrix_ExtractAngles34(const rdMatrix34 *in, rdVector3 *out)
         out->x = -out->x;
     v23 = -in->lvec.y;
     v25 = stdMath_Sqrt(v23 * v23 + (in->lvec.x * in->lvec.x));
-    if (v25 >= 0.001) // TODO verify
+    if (v25 >= 0.001)
     {
         v35 = (v23 * -in->rvec.x + -in->rvec.y * in->lvec.x) / v25;
         if ( v35 < 1.0 )

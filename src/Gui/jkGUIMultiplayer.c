@@ -80,6 +80,8 @@ wchar_t jkGuiMultiplayer_ipText[256];
 
 void jkGuiMultiplayer_Startup()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__); // Added
+    
     jkGui_InitMenu(&jkGuiMultiplayer_menu, jkGui_stdBitmaps[JKGUI_BM_BK_MULTI]);
     jkGui_InitMenu(&jkGuiMultiplayer_menu2, jkGui_stdBitmaps[JKGUI_BM_BK_MULTI]);
     jkGui_InitMenu(&jkGuiMultiplayer_menu3, jkGui_stdBitmaps[JKGUI_BM_BK_MULTI]);
@@ -95,6 +97,8 @@ void jkGuiMultiplayer_Startup()
 
 void jkGuiMultiplayer_Shutdown()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__); // Added
+
     jkGuiMultiplayer_bInitted = 0;
 }
 

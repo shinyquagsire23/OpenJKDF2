@@ -44,6 +44,10 @@
 #define SITH_SURFACE_HORIZONSKY (0x200)
 #define SITH_SURFACE_CEILINGSKY (0x400)
 
+#ifdef TARGET_TWL
+extern uint8_t sithSurface_skyColorGuess;
+#endif
+
 enum SithSurfaceFlag
 {
     SITH_SURFACE_FLOOR = 0x1,

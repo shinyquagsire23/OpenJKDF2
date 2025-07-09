@@ -265,6 +265,8 @@ void jkGuiNetHost_LoadSettings()
 
 void jkGuiNetHost_Startup()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__); // Added
+    
     jkGui_InitMenu(&jkGuiNetHost_menu, jkGui_stdBitmaps[JKGUI_BM_BK_MULTI]);
     jkGui_InitMenu(&jkGuiNetHost_menuSettings, jkGui_stdBitmaps[JKGUI_BM_BK_SETUP]);
     
@@ -274,6 +276,8 @@ void jkGuiNetHost_Startup()
 
 void jkGuiNetHost_Shutdown()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__); // Added
+
     jkGuiNetHost_SaveSettings();
     jkGuiNetHost_bInitted = 0;
 

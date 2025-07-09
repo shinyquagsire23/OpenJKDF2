@@ -674,6 +674,8 @@ void jkGuiForce_Startup()
 
 void jkGuiForce_Shutdown()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__); // Added
+    
     for (int i = 0; i < (Main_bMotsCompat ? 19 : 17); i++)
     {
         if ( jkGuiForce_aBitmaps[i] )

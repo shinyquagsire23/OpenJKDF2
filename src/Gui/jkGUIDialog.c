@@ -39,7 +39,7 @@ void jkGuiDialog_Startup()
 
 void jkGuiDialog_Shutdown()
 {
-    ;
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__); // Added
 }
 
 stdVBuffer *jkGuiDialog_sub_416900()

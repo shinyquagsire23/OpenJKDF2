@@ -91,7 +91,7 @@ void jkGuiGameplay_Startup()
 
 void jkGuiGameplay_Shutdown()
 {
-    ;
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__); // Added
 }
 
 #ifdef QOL_IMPROVEMENTS

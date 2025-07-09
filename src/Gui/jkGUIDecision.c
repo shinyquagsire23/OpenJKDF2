@@ -29,6 +29,7 @@ void jkGuiDecision_Startup()
 
 void jkGuiDecision_Shutdown()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__); // Added
 }
 
 int jkGuiDecision_Show()

@@ -949,12 +949,16 @@ void jkHudInv_Close()
 
 int jkHudInv_Startup()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
+    
     _memset(&jkHudInv_itemTexfmt, 0, sizeof(rdTexformat)); // sizeof(jkHudInv_itemTexfmt)
     return 1;
 }
 
 int jkHudInv_Shutdown()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
+
     jkHudInv_Close(); // Added: memleak
 
     if ( jkHudInv_aItems )

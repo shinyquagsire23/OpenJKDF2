@@ -369,6 +369,15 @@ int main(int argc, char** argv)
 
     //*(u32*)0x0D000000 = 0x12345678;
     //printf("%x %x\n", *(u32*)0x0C000000, *(u32*)0x0D000000);
+
+
+    scanKeys();
+    u16 keys_held = keysHeld();
+
+    if (!!(keys_held & KEY_B)) {
+        Main_bMotsCompat = 1;
+    }
+
 #endif
 #ifdef WIN64_STANDALONE
     FILE* fp;

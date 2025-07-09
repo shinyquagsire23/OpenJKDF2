@@ -33,6 +33,8 @@ void jkDev_RenderQuakeConsole();
 // MOTS altered
 void jkDev_Startup()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
+    
 #if !defined(SDL2_RENDER) && defined(WIN32)
     if ( Main_bDevMode && Main_bWindowGUI)
     {
@@ -104,6 +106,8 @@ void jkDev_Startup()
 
 void jkDev_Shutdown()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
+
     if ( jkDev_cheatHashtable )
     {
         stdHashTable_Free(jkDev_cheatHashtable);

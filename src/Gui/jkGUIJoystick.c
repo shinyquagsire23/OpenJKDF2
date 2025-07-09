@@ -1135,6 +1135,8 @@ void jkGuiJoystick_Startup()
 
 void jkGuiJoystick_Shutdown()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__); // Added
+    
     // Added: clean reset
     jkGuiJoystick_dword_557078 = 0;
     memset(&jkGuiJoystick_aUnk1, 0, sizeof(jkGuiJoystick_aUnk1));

@@ -24,6 +24,8 @@ static int jkControl_bInit;
 
 int jkControl_Startup()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
+    
     sithControl_Startup();
     sithControl_AddInputHandler(sithControl_HandlePlayer);
     sithControl_AddInputHandler(sithWeapon_HandleWeaponKeys);
@@ -37,6 +39,8 @@ int jkControl_Startup()
 
 int jkControl_Shutdown()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
+
     sithControl_Shutdown(); // Added
     jkControl_bInit = 0;
     return 1;

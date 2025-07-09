@@ -720,17 +720,17 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, flex_t a3)
 
                     // Causes random black lines?
 #if 0
-                    flex_t v49 = ceilf(maxY);
-                    flex_t v48 = ceilf(maxX);
-                    flex_t v47 = ceilf(minY);
-                    flex_t v46 = ceilf(minX);
+                    flex_t v49 = stdMath_Ceil(maxY);
+                    flex_t v48 = stdMath_Ceil(maxX);
+                    flex_t v47 = stdMath_Ceil(minY);
+                    flex_t v46 = stdMath_Ceil(minX);
 #endif
 
                     // Fixed
                     flex_t v49 = maxY + 1.5;
                     flex_t v48 = maxX + 1.5;
-                    flex_t v47 = minY - 2.0;//ceilf(minY);
-                    flex_t v46 = minX - 2.0;//ceilf(minX);
+                    flex_t v47 = minY - 2.0;//stdMath_Ceil(minY);
+                    flex_t v46 = minX - 2.0;//stdMath_Ceil(minX);
 
                     rdCamera_BuildClipFrustum(rdCamera_pCurCamera, &outClip, (int)(v46 - -0.5), (int)(v47 - -0.5), (int)v48, (int)v49);
                     v31 = &outClip;

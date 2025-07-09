@@ -1271,44 +1271,44 @@ void jkCogExt_Absolute(sithCog* ctx)
 void jkCogExt_Arccosine(sithCog* ctx)
 {
     cog_flex_t val = sithCogExec_PopFlex(ctx);
-    sithCogExec_PushFlex(ctx, acos(val) * 57.2957795);
+    sithCogExec_PushFlex(ctx, acos((float)val) * 57.2957795);
 }
 
 void jkCogExt_Arcsine(sithCog* ctx)
 {
     cog_flex_t val = sithCogExec_PopFlex(ctx);
-    sithCogExec_PushFlex(ctx, asin(val) * 57.2957795);
+    sithCogExec_PushFlex(ctx, asin((float)val) * 57.2957795);
 }
 
 void jkCogExt_Arctangent(sithCog* ctx)
 {
     cog_flex_t val = sithCogExec_PopFlex(ctx);
-    sithCogExec_PushFlex(ctx, atan(val) * 57.2957795);
+    sithCogExec_PushFlex(ctx, atan((float)val) * 57.2957795);
 }
 
 void jkCogExt_Ceiling(sithCog* ctx)
 {
     cog_flex_t val = sithCogExec_PopFlex(ctx);
-    sithCogExec_PushFlex(ctx, ceil(val));
+    sithCogExec_PushFlex(ctx, ceil((float)val));
 }
 
 void jkCogExt_Cosine(sithCog* ctx)
 {
     cog_flex_t val = sithCogExec_PopFlex(ctx);
-    sithCogExec_PushFlex(ctx, cos(val * 0.0174532925));
+    sithCogExec_PushFlex(ctx, cos((float)val * 0.0174532925));
 }
 
 void jkCogExt_Floor(sithCog* ctx)
 {
     cog_flex_t val = sithCogExec_PopFlex(ctx);
-    sithCogExec_PushFlex(ctx, floor(val));
+    sithCogExec_PushFlex(ctx, floor((float)val));
 }
 
 void jkCogExt_Power(sithCog* ctx)
 {
     cog_flex_t b = sithCogExec_PopFlex(ctx);
     cog_flex_t a = sithCogExec_PopFlex(ctx);
-    sithCogExec_PushFlex(ctx, pow(a,b));
+    sithCogExec_PushFlex(ctx, pow((float)a,(float)b));
 }
 
 void jkCogExt_Randomflex(sithCog* ctx)
@@ -1317,7 +1317,7 @@ void jkCogExt_Randomflex(sithCog* ctx)
     cog_flex_t a = sithCogExec_PopFlex(ctx);
     cog_flex_t f = _frand();
     cog_flex_t f2 = b-a+1.0;
-    sithCogExec_PushFlex(ctx, fmodf(f,f2)+a);
+    sithCogExec_PushFlex(ctx, fmodf((float)f,(float)f2)+a);
 }
 
 void jkCogExt_Randomint(sithCog* ctx)

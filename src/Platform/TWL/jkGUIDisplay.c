@@ -128,7 +128,7 @@ void jkGuiDisplay_Startup()
 
 void jkGuiDisplay_Shutdown()
 {
-    ;
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__); // Added
 }
 
 void jkGuiDisplay_FovDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int redraw)

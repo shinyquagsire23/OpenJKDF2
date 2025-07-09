@@ -11,6 +11,8 @@
 
 int rdStartup(HostServices *p_hs)
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
+    
     if (bRDroidStartup)
         return 1;
 
@@ -25,6 +27,8 @@ int rdStartup(HostServices *p_hs)
 
 void rdShutdown()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
+
     if (bRDroidStartup)
         bRDroidStartup = 0;
 }

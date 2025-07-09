@@ -78,6 +78,14 @@ static inline flex_t stdMath_Fabs(flex_t val)
     return (val < 0.0) ? -val : val;
 }
 
+static inline flex_t stdMath_Fmod(flex_t a, flex_t b) {
+    return (flex_t)fmod((float)a, (float)b);
+} 
+
+static inline flex_t stdMath_Ceil(flex_t a) {
+    return (flex_t)ceilf((float)a);
+} 
+
 static inline int32_t stdMath_ClampInt(int32_t val, int32_t valMin, int32_t valMax)
 {
     if (val < valMin)

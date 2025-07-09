@@ -107,6 +107,8 @@ int Window_Main_Linux(int argc, char** argv)
 
     if (!result) return result;
 
+    std3D_FreeResources();
+
 #if 0
     if (Main_bHeadless)
     {

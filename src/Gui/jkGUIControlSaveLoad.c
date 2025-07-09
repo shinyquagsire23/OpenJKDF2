@@ -298,9 +298,11 @@ void jkGuiControlSaveLoad_Startup()
 
 void jkGuiControlSaveLoad_Shutdown()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__); // Added
+
     // Added: clean reset
     memset(jkGuiControlSaveLoad_awTmp, 0, sizeof(jkGuiControlSaveLoad_awTmp));
-    memset(&jkGuiControlSaveLoad_darray, 0, sizeof(jkGuiControlSaveLoad_darray)); // TODO free?
+    memset(&jkGuiControlSaveLoad_darray, 0, sizeof(jkGuiControlSaveLoad_darray)); // TODO free? memleak
     jkGuiControlSaveLoad_dword_559C80 = 0;
     jkGuiControlSaveLoad_dword_559C84 = 0;
     memset(jkGuiControlSaveLoad_tmp, 0, sizeof(jkGuiControlSaveLoad_tmp));

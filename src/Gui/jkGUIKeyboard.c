@@ -549,5 +549,5 @@ void jkGuiKeyboard_Startup()
 
 void jkGuiKeyboard_Shutdown()
 {
-    ;
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__); // Added
 }

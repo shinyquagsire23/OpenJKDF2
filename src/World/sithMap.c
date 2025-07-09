@@ -1,5 +1,6 @@
 #include "sithMap.h"
 
+#include "General/stdMath.h"
 #include "World/sithThing.h"
 #include "Main/sithMain.h"
 #include "Engine/rdroid.h"
@@ -258,7 +259,7 @@ LABEL_22:
                                         v25 = sithMap_ctx.anonymous_1[sithMap_ctx.numArr - 1];
                                         v24 = 0xCCCCCCCC;
                                     }
-                                    if ( rdPrimit2_DrawClippedLine(sithMap_pCurCamera->canvas, ceilf(v46.x), ceilf(v46.y), ceilf(v43.x), ceilf(v43.y), (uint8_t)v25, v24) )
+                                    if ( rdPrimit2_DrawClippedLine(sithMap_pCurCamera->canvas, stdMath_Ceil(v46.x), stdMath_Ceil(v46.y), stdMath_Ceil(v43.x), stdMath_Ceil(v43.y), (uint8_t)v25, v24) )
                                         v56 = 1;
                                 }
                             }

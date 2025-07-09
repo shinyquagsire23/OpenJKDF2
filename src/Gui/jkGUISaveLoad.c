@@ -457,5 +457,5 @@ void jkGuiSaveLoad_Startup()
 
 void jkGuiSaveLoad_Shutdown()
 {
-    ;
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__); // Added
 }

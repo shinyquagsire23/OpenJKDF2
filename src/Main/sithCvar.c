@@ -18,6 +18,8 @@ static int sithCvar_bInitted = 0;
 
 int sithCvar_Startup()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
+    
     if (sithCvar_bInitted) return 1;
 
     sithCvar_numRegistered = 0;
@@ -36,6 +38,8 @@ int sithCvar_Startup()
 
 void sithCvar_Shutdown()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
+
     if (!sithCvar_bInitted) return;
 
     sithCvar_SaveGlobals();

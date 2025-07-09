@@ -92,6 +92,8 @@ int Video_Startup()
 
 void Video_Shutdown()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
+    
     sithCamera_Shutdown();
     jkHud_Shutdown();
     if (Main_bMotsCompat) {

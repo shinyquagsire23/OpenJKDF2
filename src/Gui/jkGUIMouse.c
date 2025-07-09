@@ -707,6 +707,8 @@ void jkGuiMouse_Startup()
 
 void jkGuiMouse_Shutdown()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__); // Added
+    
     // Added: clean reset
     jkGuiMouse_dword_530328 = -1;
     jkGuiMouse_dword_53032C = -1;

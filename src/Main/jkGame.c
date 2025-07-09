@@ -27,6 +27,8 @@
 
 int jkGame_Startup()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
+    
     sithWorld_SetSectionParser("jk", jkGame_ParseSection);
     jkGame_bInitted = 1;
     return 1;
@@ -48,6 +50,8 @@ void jkGame_ForceRefresh()
 
 void jkGame_Shutdown()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
+    
     jkGame_bInitted = 0;
 }
 

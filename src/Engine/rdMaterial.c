@@ -203,7 +203,7 @@ LABEL_21:
         texture->opaqueMats[mipmap_num].height = format.height;
 
         // Limit textures that are loaded on TWL
-        if (!tex_header_1.alpha_en && (format.width <= 32 || mipmap_num >= texture->num_mipmaps-1)) {
+        if (format.width <= 32 || mipmap_num >= texture->num_mipmaps-1) {
             created_tex = stdDisplay_VBufferNew(&format, create_ddraw_surface, gpu_mem, 0);
             *texture_struct = created_tex;
             (*texture_struct)->format.texture_size_in_bytes = format.width*format.height*(format.format.is16bit?2:1);
@@ -351,8 +351,8 @@ void rdMaterial_FreeEntry(rdMaterial* material)
         {
             rdDDrawSurface* surface = &pTex->alphaMats[j];
 
-#ifdef SDL2_RENDER
-            //printf("Deinit %s %x\n", material->mat_fpath, surface->texture_id);
+#if defined(SDL2_RENDER) || defined(TARGET_TWL)
+            stdPlatform_Printf("OpenJKDF2: rdMaterial_FreeEntry %s %x\n", material->mat_fpath, surface->texture_id);
             std3D_PurgeSurfaceRefs(surface);
 #if defined(TARGET_CAN_JKGM)
             jkgm_free_cache_entry(surface->cache_entry);
@@ -448,7 +448,7 @@ void rdMaterial_ResetCacheInfo(rdMaterial *material)
         for (int j = 0; j < texIter->num_mipmaps; j++)
         {
             rdDDrawSurface* matIter = &texIter->alphaMats[j];
-#ifdef SDL2_RENDER
+#if defined(SDL2_RENDER) || defined(TARGET_TWL)
             std3D_PurgeSurfaceRefs(matIter);
 #endif
             matIter->texture_loaded = 0;

@@ -135,6 +135,7 @@ void jkQuakeConsole_Startup()
 
 void jkQuakeConsole_Shutdown()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
     stdFont_Free(jkQuakeConsole_pFont);
     jkQuakeConsole_pFont = NULL;
 

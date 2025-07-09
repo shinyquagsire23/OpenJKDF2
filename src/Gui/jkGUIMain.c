@@ -252,6 +252,8 @@ LABEL_17:
 
 void jkGuiMain_Startup()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__); // Added
+    
     jkGui_InitMenu(&jkGuiMain_menu, jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]);
 
     // Added: clean reset
@@ -260,6 +262,8 @@ void jkGuiMain_Startup()
 
 void jkGuiMain_Shutdown()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__); // Added
+
     // Added: clean reset
     jkGuiCutscenes_initted = 0;
 }

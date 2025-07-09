@@ -856,6 +856,7 @@ int jkGuiBuildMulti_Startup()
 
 void jkGuiBuildMulti_Shutdown()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__); // Added
     jkGuiBuildMulti_bInitted = 0;
 
     // Added: clean reset

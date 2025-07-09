@@ -61,6 +61,8 @@ void jkGuiTitle_Startup()
 
 void jkGuiTitle_Shutdown()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__); // Added
+    
     // Added: clean reset
     memset(jkGuiTitle_versionBuffer, 0, sizeof(jkGuiTitle_versionBuffer));
     jkGuiTitle_loadPercent = 0;

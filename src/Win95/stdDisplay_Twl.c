@@ -239,6 +239,10 @@ stdVBuffer* stdDisplay_VBufferNew(stdVBufferTexFmt *fmt, int create_ddraw_surfac
     out->format.width_in_pixels = fmt->width;
     out->format.texture_size_in_bytes = fmt->width * fmt->height;
 
+    if (fmt->format.bpp == 16) {
+        out->format.texture_size_in_bytes *= 2;
+    }
+
     //out->format.width = 0;
     //out->format.width_in_bytes = 0;
     out->surface_lock_alloc = (char*)std_pHS->alloc(out->format.texture_size_in_bytes);
@@ -493,6 +497,10 @@ int stdDisplay_VBufferSetColorKey(stdVBuffer *vbuf, int color)
 
 void stdDisplay_VBufferFree(stdVBuffer *vbuf)
 {
+    // Added: Safety fallbacks
+    if (!vbuf) {
+        return;
+    }
     stdDisplay_VBufferUnlock(vbuf);
     //SDL_FreeSurface(vbuf->sdlSurface);
     if (vbuf->surface_lock_alloc)

@@ -47,7 +47,7 @@ void jkGuiControlOptions_Startup()
 
 void jkGuiControlOptions_Shutdown()
 {
-    ;
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__); // Added
 }
 
 // MOTS altered

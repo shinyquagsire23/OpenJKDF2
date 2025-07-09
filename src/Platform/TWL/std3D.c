@@ -2,8 +2,10 @@
 
 #include <nds.h>
 
+#include "General/stdMath.h"
 #include "General/stdBitmap.h"
 #include "Win95/stdDisplay.h"
+#include "World/sithSurface.h"
 #include "stdPlatform.h"
 
 int std3D_bReinitHudElements = 0;
@@ -43,6 +45,10 @@ static flex_t res_fix_x = (1.0/640.0);
 static flex_t res_fix_y = (1.0/480.0);
 
 static float test_idk = 32.0;
+int std3D_bHasInitted = 0;
+int std3D_bPurgeTexturesOnEnd = 0;
+uint16_t std3D_fogDepth = 0x6000;
+uint8_t std3D_fogColorIdx = 0;
 
 //verticies for the cube
 v16 CubeVectors[] = {
@@ -159,6 +165,31 @@ static void update_from_world_palette()
     
 }
 
+int std3D_LoadResources() {
+    if (std3D_bHasInitted) {
+        return 1;
+    }
+    glGenTextures(2, &textureIDS[0]);
+    //glGenTextures(1, &paletteIDS[0]);
+
+    u8* i8Bitmap = (u8*)malloc(16*16);
+    for (int i = 0; i < 256; i++)
+    {
+        i8Bitmap[i] = i;
+    }
+    //glBindTexture(0, textureIDS[2]);
+    //glTexImage2D(0, 0, GL_RGB256, TEXTURE_SIZE_16, TEXTURE_SIZE_16, 0, TEXGEN_TEXCOORD, (u8*)i8Bitmap);
+    free(i8Bitmap);
+
+    update_from_display_palette();
+    
+    //glBindTexture(0, paletteIDS[0]);
+    glColorTableEXT( 0, 0, 256, 0, 0, (u16*)i8Pal );
+
+    std3D_bHasInitted = 1;
+    return 1;
+}
+
 int std3D_Startup()
 {
     // initialize gl
@@ -167,6 +198,7 @@ int std3D_Startup()
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_ANTIALIAS);
     glEnable(GL_BLEND);
+    glEnable(GL_FOG);
 
     // setup the rear plane
     glClearColor(0,0,0,31); // BG must be opaque for AA to work
@@ -185,22 +217,7 @@ int std3D_Startup()
     vramSetBankF(VRAM_F_TEX_PALETTE_SLOT0);
     //vramSetBankG(VRAM_G_TEX_PALETTE_SLOT5);
 
-    glGenTextures(2, &textureIDS[0]);
-    //glGenTextures(1, &paletteIDS[0]);
-
-    u8* i8Bitmap = (u8*)malloc(16*16);
-    for (int i = 0; i < 256; i++)
-    {
-        i8Bitmap[i] = i;
-    }
-    //glBindTexture(0, textureIDS[2]);
-    //glTexImage2D(0, 0, GL_RGB256, TEXTURE_SIZE_16, TEXTURE_SIZE_16, 0, TEXGEN_TEXCOORD, (u8*)i8Bitmap);
-    free(i8Bitmap);
-
-    update_from_display_palette();
-    
-    //glBindTexture(0, paletteIDS[0]);
-    glColorTableEXT( 0, 0, 256, 0, 0, (u16*)i8Pal );
+    std3D_LoadResources();
 
     glResetMatrixStack();
 
@@ -218,7 +235,9 @@ int std3D_Startup()
 
     return 0;
 }
-void std3D_Shutdown() {}
+void std3D_Shutdown() {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
+}
 
 /*
                                                   | b11 b12 b13 b14 |
@@ -285,6 +304,9 @@ void wOverride(float w) {
 
 int std3D_StartScene()
 {
+    if (!std3D_bHasInitted) {
+        std3D_LoadResources();
+    }
     rendered_tris = 0;
 
     //glFlush(GL_WBUFFERING); // GL_WBUFFERING
@@ -322,6 +344,25 @@ int std3D_StartScene()
         printf("%f %f %f %f\n", clip_current_f[8], clip_current_f[8+1], clip_current_f[8+2], clip_current_f[8+3]);
         printf("%f %f %f %f\n", clip_current_f[12], clip_current_f[12+1], clip_current_f[12+2], clip_current_f[12+3]);
 #endif
+
+        //std3D_fogDepth -= 4;
+        std3D_fogDepth = 5;
+        
+        // TODO: Make this dynamic based on the furthest Z?
+        glFogShift(11);
+        glFogOffset(std3D_fogDepth & 0x7FFF);
+        rdColor24 skyColor = sithWorld_pCurrentWorld->colormaps->colors[sithSurface_skyColorGuess];
+        glFogColor(skyColor.r >> 3, skyColor.g >> 3, skyColor.b >> 3, 31);
+        glClearColor(skyColor.r >> 3, skyColor.g >> 3, skyColor.b >> 3, 31);
+        for (int i = 0; i < 32; i++) {
+            glFogDensity(i, stdMath_ClampInt((i-6)*6, 0, 127));
+        }
+        glFogDensity(31,127);
+
+    }
+    else {
+        //glFogOffset(0x6000);
+        std3D_fogDepth = 0x6000;
     }
     
 
@@ -338,7 +379,12 @@ int std3D_EndScene()
     }
     //printf("EndScene\n");
 
-    glFlush(GL_WBUFFERING); // GL_WBUFFERING
+    glFlush(GL_WBUFFERING | GL_TRANS_MANUALSORT); // GL_WBUFFERING
+
+    if (std3D_bPurgeTexturesOnEnd) {
+        std3D_PurgeTextureCache();
+        std3D_bPurgeTexturesOnEnd = 0;
+    }
 
     return 0;
 }
@@ -358,6 +404,7 @@ int std3D_RenderListVerticesFinish()
 #define COMP_B(c) (c & 0xFF)
 #define COMP_G(c) ((c>>8) & 0xFF)
 #define COMP_R(c) ((c>>16) & 0xFF)
+#define COMP_A(c) ((c>>24) & 0xFF)
 
 void std3D_DrawRenderList()
 {
@@ -375,9 +422,13 @@ void std3D_DrawRenderList()
     glColor3b(255,255,255);
     //glBindTexture(0, textureIDS[2]);
 
-    glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK | POLY_MODULATION | POLY_ID(0) ) ;
     //glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
-    glBegin(GL_TRIANGLES);
+    int polyid = 0;
+    int last_alpha = -1;
+    uint32_t last_flags = 0;
+
+    //glPolyFmt(POLY_ALPHA(last_alpha) | POLY_CULL_BACK | POLY_MODULATION | POLY_ID(polyid++) ) ;
+    //glBegin(GL_TRIANGLES);
 
     for (int j = 0; j < GL_tmpTrisAmt; j++)
     {
@@ -386,6 +437,7 @@ void std3D_DrawRenderList()
         int tex_id = textureIDS[2];
         int tex_w = tex->width;
         int tex_h = tex->height;
+        uint32_t flags = (tris[j].flags & 0x20000);
         if (tex) {
             tex_id = tex->texture_id;
         }
@@ -397,6 +449,20 @@ void std3D_DrawRenderList()
         TWLVERTEX* v1 = &vertexes[tris[j].v1];
         TWLVERTEX* v2 = &vertexes[tris[j].v2];
         TWLVERTEX* v3 = &vertexes[tris[j].v3];
+
+        int avg_alpha = COMP_A(v3->color) + COMP_A(v2->color) + COMP_A(v1->color);
+        if (avg_alpha != 0x2FD) {
+            avg_alpha = ((avg_alpha / 3) >> 3) & 0x1F;
+        }
+        else {
+            avg_alpha = 0x1F;
+        }
+        if (avg_alpha != last_alpha || (flags & 0x20000) != (last_flags & 0x20000)) {
+            glPolyFmt(POLY_ALPHA(avg_alpha) | POLY_CULL_BACK | POLY_MODULATION | POLY_ID(polyid++) | ((flags & 0x20000) ? 0 : POLY_FOG) ) ;
+            glBegin(GL_TRIANGLES);
+        }
+        last_alpha = avg_alpha;
+        last_flags = flags;
 
         {
             if (tex_id != textureIDS[2]) {
@@ -459,6 +525,7 @@ int std3D_DrawOverlay()
 }
 void std3D_UnloadAllTextures()
 {
+    std3D_PurgeTextureCache();
     std3D_loadedTexturesAmt = 0;
 }
 
@@ -476,7 +543,7 @@ void std3D_AddRenderListTris(rdTri *tris, unsigned int num_tris)
 }
 void std3D_AddRenderListLines(rdLine* lines, uint32_t num_lines) {}
 
-#define flextov16(n) ((v16)((int32_t)n.to_raw() >> (15-12)))
+#define flextov16(n) ((v16)((int32_t)n.to_raw() >> (16-12)))
 
 //#define flextov16(n) (floattov16((float)n))
 
@@ -523,7 +590,10 @@ int std3D_ClearZBuffer()
 
 int std3D_twl_dims_convert_to_e(int width) {
     int width_e = TEXTURE_SIZE_8;
-    if (width == 16) {
+    if (width == 8) {
+        width_e = TEXTURE_SIZE_8;
+    }
+    else if (width == 16) {
         width_e = TEXTURE_SIZE_16;
     }
     else if (width == 32) {
@@ -560,7 +630,11 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
     }
     
     int image_texture;
-    glGenTextures(1, &image_texture);
+    int res = glGenTextures(1, &image_texture);
+    if (!res) {
+        stdPlatform_Printf("Out of VRAM!\n");
+        return 0;
+    }
     uint8_t* image_8bpp = (uint8_t*)vbuf->surface_lock_alloc;
     uint16_t* image_16bpp = (uint16_t*)vbuf->surface_lock_alloc;
     uint8_t* pal = (uint8_t*)vbuf->palette;
@@ -581,16 +655,23 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
     //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
     //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 
+    int width_e = std3D_twl_dims_convert_to_e(width);
+    int height_e = std3D_twl_dims_convert_to_e(height);
+    res = 0;
+
     if (vbuf->format.format.is16bit)
     {
-#if 0
-        texture->is_16bit = 1;
 #if 1
+        texture->is_16bit = 1;
+#if 0
         if (!is_alpha_tex)
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width, height, 0,  GL_RGB, GL_UNSIGNED_SHORT_5_6_5_REV, image_8bpp);
         else
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0,  GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, image_8bpp);
 #endif
+        if (!is_alpha_tex) {
+            res = glTexImage2D(0, 0, GL_RGBA, width_e, height_e, 0, GL_TEXTURE_WRAP_S | GL_TEXTURE_WRAP_T | TEXGEN_TEXCOORD | GL_TEXTURE_COLOR0_TRANSPARENT, (u8*)image_16bpp);
+        }
 
 #ifdef __NOTDEF_FORMAT_CONVERSION
         void* image_data = malloc(width*height*4);
@@ -694,19 +775,28 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
 
         texture->pDataDepthConverted = image_data;
 #endif
-        int width_e = std3D_twl_dims_convert_to_e(width);
-        int height_e = std3D_twl_dims_convert_to_e(height);
 
         texture->is_16bit = 0;
         //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB256, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, image_8bpp);
-        glTexImage2D(0, 0, GL_RGB256, width_e, height_e, 0, GL_TEXTURE_WRAP_S | GL_TEXTURE_WRAP_T | TEXGEN_TEXCOORD, (u8*)image_8bpp);
+        res = glTexImage2D(0, 0, GL_RGB256, width_e, height_e, 0, GL_TEXTURE_WRAP_S | GL_TEXTURE_WRAP_T | TEXGEN_TEXCOORD | (is_alpha_tex ? GL_TEXTURE_COLOR0_TRANSPARENT : 0), (u8*)image_8bpp);
 
         //texture->pDataDepthConverted = NULL;
     }
 
+    if (!res) {
+        stdPlatform_Printf("Out of VRAM!\n");
+        glDeleteTextures(1, &image_texture);
+
+        std3D_bPurgeTexturesOnEnd = 1;
+        return 1; // Kinda hacky, don't alert rdCache
+
+        // TODO: Free any unused textures instead of having a white texture for one frame
+        //return std3D_AddToTextureCache(vbuf, texture, is_alpha_tex, no_alpha);
+    }
+
     
-    //std3D_aLoadedSurfaces[std3D_loadedTexturesAmt] = texture;
-    //std3D_aLoadedTextures[std3D_loadedTexturesAmt++] = image_texture;
+    std3D_aLoadedSurfaces[std3D_loadedTexturesAmt] = texture;
+    std3D_aLoadedTextures[std3D_loadedTexturesAmt++] = image_texture;
     
     /*ext->surfacebuf = image_data;
     ext->surfacetex = image_texture;
@@ -885,7 +975,17 @@ void std3D_DrawMenu()
 
 }
 void std3D_DrawSceneFbo() {}
-void std3D_FreeResources() {}
+void std3D_FreeResources() {
+    std3D_PurgeTextureCache();
+
+    glResetTextures();
+    
+    loaded_colormap = NULL;
+
+    std3D_bReinitHudElements = 1;
+
+    std3D_bHasInitted = 0;
+}
 void std3D_InitializeViewport(rdRect *viewRect) {}
 int std3D_GetValidDimensions(int a1, int a2, int a3, int a4)
 {
@@ -908,9 +1008,9 @@ int std3D_CreateExecuteBuffer()
     return 0;
 }
 
-int std3D_HasAlpha() { return 0; }
-int std3D_HasAlphaFlatStippled() { return 0; }
-int std3D_HasModulateAlpha() { return 0; }
+int std3D_HasAlpha() { return 1; }
+int std3D_HasAlphaFlatStippled() { return 1; }
+int std3D_HasModulateAlpha() { return 1; }
 
 void std3D_PurgeBitmapRefs(stdBitmap *pBitmap)
 {
@@ -935,6 +1035,7 @@ void std3D_PurgeBitmapRefs(stdBitmap *pBitmap)
 
 void std3D_PurgeSurfaceRefs(rdDDrawSurface *texture)
 {
+    //stdPlatform_Printf("std3D_PurgeSurfaceRefs\n");
     for (int i = 0; i < STD3D_MAX_TEXTURES; i++)
     {
         rdDDrawSurface* tex = std3D_aLoadedSurfaces[i];
@@ -946,6 +1047,7 @@ void std3D_PurgeSurfaceRefs(rdDDrawSurface *texture)
 }
 
 void std3D_PurgeTextureEntry(int i) {
+    stdPlatform_Printf("std3D_PurgeTextureEntry %d\n", i);
     if (std3D_aLoadedTextures[i]) {
         glDeleteTextures(1, &std3D_aLoadedTextures[i]);
         std3D_aLoadedTextures[i] = 0;
@@ -1034,12 +1136,15 @@ void std3D_PurgeTextureCache()
         return;
     }
 
-    jk_printf("Purging texture cache... %x\n", std3D_loadedTexturesAmt);
+    stdPlatform_Printf("Purging texture cache... %x\n", std3D_loadedTexturesAmt);
     for (int i = 0; i < std3D_loadedTexturesAmt; i++)
     {
         std3D_PurgeTextureEntry(i);
     }
     std3D_loadedTexturesAmt = 0;
+
+    glResetTextures();
+    std3D_bHasInitted = 0;
 }
 
 void std3D_UpdateSettings() {}

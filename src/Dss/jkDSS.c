@@ -63,6 +63,8 @@ int jkDSS_005aec8c = 0;
 
 int jkDSS_Startup()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
+    
     sithComm_SetMsgFunc(DSS_JKENABLESABER, jkDSS_ProcessJKEnableSaber);
     sithComm_SetMsgFunc(DSS_SABERINFO3, jkDSS_ProcessSetSaberInfo2);
     sithComm_SetMsgFunc(DSS_JKSETWEAPONMESH, jkDSS_ProcessJKSetWeaponMesh);
@@ -104,7 +106,7 @@ int jkDSS_JKM1(int32_t unused1, sithEventInfo* unused2)
 
 void jkDSS_Shutdown()
 {
-    ;
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
 }
 
 // MOTS altered

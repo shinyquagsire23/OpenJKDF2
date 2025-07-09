@@ -469,6 +469,10 @@ int stdDisplay_VBufferSetColorKey(stdVBuffer *vbuf, int color)
 
 void stdDisplay_VBufferFree(stdVBuffer *vbuf)
 {
+    // Added: Safety fallbacks
+    if (!vbuf) {
+        return;
+    }
     stdDisplay_VBufferUnlock(vbuf);
     SDL_FreeSurface(vbuf->sdlSurface);
     std_pHS->free(vbuf);

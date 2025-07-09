@@ -172,6 +172,8 @@ void jkCutscene_CleanReset()
 // MOTS altered
 void jkCutscene_Startup(char *fpath)
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
+    
     jkCutscene_CleanReset();
 
     stdStrTable_Load(&jkCutscene_strings, fpath); // MOTS removed
@@ -204,6 +206,8 @@ void jkCutscene_Startup(char *fpath)
 // MOTS altered
 void jkCutscene_Shutdown()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
+
     if ( jkCutscene_subtitlefont )
     {
         stdFont_Free(jkCutscene_subtitlefont);
@@ -450,6 +454,8 @@ int jkCutscene_sub_421310(char* fpath)
 
 int jkCutscene_sub_421410()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
+    
 #if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
     if ( !jkCutscene_isRendering )
         return 0;

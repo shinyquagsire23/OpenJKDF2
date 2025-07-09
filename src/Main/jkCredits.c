@@ -17,6 +17,8 @@ static stdVBuffer* jkCredits_pVbufferTmp;
 
 void jkCredits_Startup(char *fpath)
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
+    
     stdStrTable_Load(&jkCredits_table, fpath);
     jkCredits_fontLarge = stdFont_Load("ui\\sft\\creditlarge.sft", 0, 0);
     jkCredits_fontSmall = stdFont_Load("ui\\sft\\creditsmall.sft", 0, 0);
@@ -26,6 +28,7 @@ void jkCredits_Startup(char *fpath)
 
 void jkCredits_Shutdown()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
     if ( jkCredits_fontLarge )
     {
         stdFont_Free(jkCredits_fontLarge);

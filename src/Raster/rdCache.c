@@ -375,9 +375,7 @@ int rdCache_SendFaceListToHardware()
             red_and_alpha = 255;
         }
 
-#ifndef TARGET_TWL
         if ( expected_alpha != 255 && !std3D_HasModulateAlpha() && !std3D_HasAlphaFlatStippled() )
-#endif
         {
             red_and_alpha = 255;
             alpha_is_opaque = 1;
@@ -548,6 +546,13 @@ int rdCache_SendFaceListToHardware()
             actual_width = (flex_t)(out_width << mipmap_level); // FLEXTODO
             actual_height = (flex_t)(out_height << mipmap_level); // FLEXTODO
         }
+
+#ifdef TARGET_TWL
+        // We need to know if a triangle is sky texture (affine texture)
+        if (active_6c->textureMode == RD_TEXTUREMODE_AFFINE) {
+            flags_idk_ |= 0x20000;
+        }
+#endif
 
         if ( v11.mipmap_related != 3 )
         {
@@ -1279,10 +1284,10 @@ int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags)
         while ( v9 < num_vertices );
     }
 
-    procFace->x_min = (int32_t)ceilf(x_min);
-    procFace->x_max = (int32_t)ceilf(x_max);
-    procFace->y_min = (int32_t)ceilf(y_min);
-    procFace->y_max = (int32_t)ceilf(y_max);
+    procFace->x_min = (int32_t)stdMath_Ceil(x_min);
+    procFace->x_max = (int32_t)stdMath_Ceil(x_max);
+    procFace->y_min = (int32_t)stdMath_Ceil(y_min);
+    procFace->y_max = (int32_t)stdMath_Ceil(y_max);
     procFace->z_min = z_min;
     procFace->z_max = z_max;
 #if !defined(SDL2_RENDER) && !defined(TARGET_TWL)

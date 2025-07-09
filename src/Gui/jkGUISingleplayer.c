@@ -82,6 +82,7 @@ void jkGuiSingleplayer_Startup()
 
 void jkGuiSingleplayer_Shutdown()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__); // Added
     // Added: memleak
     if ( jkGui_episodeLoad.paEntries )
     {

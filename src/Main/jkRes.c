@@ -17,6 +17,8 @@ static int jkRes_bInit;
 
 int jkRes_Startup(HostServices *a1)
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
+    
     if ( jkRes_bInit )
         return 0;
 
@@ -38,6 +40,8 @@ int jkRes_Startup(HostServices *a1)
 
 int jkRes_Shutdown()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
+
     if (!jkRes_bInit)
         return 0;
 

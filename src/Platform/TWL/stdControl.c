@@ -789,8 +789,18 @@ void stdControl_ReadControls()
         else {
             stdControl_aAxisPos[AXIS_JOY1_Y] = 0;
         }
-        
     }
+
+    static touchPosition lastTouchXY;
+    touchPosition touchXY;
+    touchRead(&touchXY);
+    if (touchXY.px != 0 || touchXY.py != 0) {
+        if (lastTouchXY.px != 0 || lastTouchXY.py != 0) {
+            Window_lastXRel = touchXY.px - lastTouchXY.px;
+            Window_lastYRel = touchXY.py - lastTouchXY.py;
+        }
+    }
+    lastTouchXY = touchXY;
 
     stdControl_ReadMouse();
     stdControl_msLast = stdControl_curReadTime;

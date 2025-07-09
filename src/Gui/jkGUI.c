@@ -143,6 +143,8 @@ int jkGui_Startup()
     char playerShortName[32];
     char tmp[128];
 
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
+
     stdString_WcharToChar(playerShortName, jkPlayer_playerShortName, 31);
     playerShortName[31] = 0;
     wuRegistry_GetString("playerShortName", playerShortName, 32, playerShortName);
@@ -201,6 +203,8 @@ int jkGui_Startup()
 
 void jkGui_Shutdown()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
+
     char playerShortName[32];
 
     for (int i = 0; i < 12; i++)

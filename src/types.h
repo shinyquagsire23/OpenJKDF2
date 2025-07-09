@@ -261,8 +261,8 @@ typedef double flex64_t;
 // For intermediate calculations, physics, rendering
 #ifdef EXPERIMENTAL_FIXED_POINT
 // Fixed point experiment
-typedef numeric::fixed<17, 15> flex_t;
-typedef numeric::fixed<17, 15> flex_d_t;
+typedef numeric::fixed<16, 16> flex_t;
+typedef numeric::fixed<16, 16> flex_d_t;
 #else
 typedef flex_t_type flex_t;
 typedef flex_d_t_type flex_d_t;

@@ -99,6 +99,8 @@ void jkGuiGeneral_Startup()
 
 void jkGuiGeneral_Shutdown()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__); // Added
+    
     // Added: clean restart
     memset(slider_val_text, 0, sizeof(slider_val_text));
 }

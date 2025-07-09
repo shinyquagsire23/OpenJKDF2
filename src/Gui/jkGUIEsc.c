@@ -70,6 +70,8 @@ void jkGuiEsc_Startup()
 
 void jkGuiEsc_Shutdown()
 {
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__); // Added
+    
     jkGuiEsc_bInitialized = 0;
 }
 
