@@ -1011,7 +1011,7 @@ int jkDSS_Processx36_setwaggle(sithCogMsg *msg)
     return 1;
 }
 
-void jkDSS_SendJKPrintUniString(int a1, unsigned int a2)
+void jkDSS_SendJKPrintUniString(int a1, uint32_t a2)
 {
     int v2; // eax
 
@@ -1110,9 +1110,9 @@ void jkDSS_SendSetTeam(int16_t teamNum)
 // MOTS altered
 int jkDSS_ProcessSetTeam(sithCogMsg *pMsg)
 {
-    unsigned int playerIdx; // edx
-    unsigned int teamNum; // ecx
-    unsigned int v4; // esi
+    uint32_t playerIdx; // edx
+    uint32_t teamNum; // ecx
+    uint32_t v4; // esi
     rdModel3 *v5; // eax
 
     int personality = -1;

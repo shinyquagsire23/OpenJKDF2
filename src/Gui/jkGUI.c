@@ -22,8 +22,16 @@
 #include "Main/jkStrings.h"
 #include "Cog/jkCog.h"
 
+#ifdef TARGET_TWL
+#include <nds.h>
+#endif
+
 const char* jkGui_aBitmaps[35] = {
+#ifdef TARGET_TWL
     "bkMain.bm",
+#else
+    "bkMain.bm",
+#endif
     "bkSingle.bm",
     "bkMulti.bm",
     "bkSetup.bm",
@@ -143,21 +151,47 @@ int jkGui_Startup()
 
     for (int i = 0; i < 12; i++)
     {
+        // TODO: Eviction caching for stdBitmap, rdMaterial
+#ifdef TARGET_TWL
+        int replace_lut[] = {0,1,2,3,4,2,3,4,2,3,4,2};
+        if (openjkdf2_bIsLowMemoryPlatform && i >= 5) {
+            jkGui_stdFonts[i] = jkGui_stdFonts[replace_lut[i]];
+            continue;
+        }
+#endif
         stdString_snprintf(tmp, 128, "ui\\sft\\%s", jkGui_aFonts[i]);
         jkGui_stdFonts[i] = stdFont_Load(tmp, 1, 0);
         if (jkGui_stdFonts[i] == NULL) {
             Windows_GameErrorMsgbox("ERR_CANNOT_LOAD_FILE %s", tmp);
         }
     }
+#ifdef TARGET_TWL
+    stdPlatform_Printf("after fonts 0x%x 0x%x\n", (intptr_t)getHeapLimit() - (intptr_t)getHeapEnd(), (intptr_t)getHeapEnd() - (intptr_t)getHeapStart());
+#endif
 
     for (int i = 0; i < 35; i++)
     {
+        // TODO: Eviction caching for stdBitmap, rdMaterial
+#ifdef TARGET_TWL
+        if (i >= 1 && i <= 6) {
+            jkGui_stdBitmaps[i] = jkGui_stdBitmaps[0];
+            continue;
+        }
+        if (i >= 7 && i <= 11) {
+            jkGui_stdBitmaps[i] = jkGui_stdBitmaps[0];
+            continue;
+        }
+#endif
         stdString_snprintf(tmp, 128, "ui\\bm\\%s", jkGui_aBitmaps[i]);
         jkGui_stdBitmaps[i] = stdBitmap_Load(tmp, 1, 0);
         if (jkGui_stdBitmaps[i] == NULL) {
             Windows_GameErrorMsgbox("ERR_CANNOT_LOAD_FILE %s", tmp);
         }
     }
+    // TODO: Eviction caching for stdBitmap, rdMaterial
+#ifdef TARGET_TWL
+    stdPlatform_Printf("after bms 0x%x 0x%x\n", (intptr_t)getHeapLimit() - (intptr_t)getHeapEnd(), (intptr_t)getHeapEnd() - (intptr_t)getHeapStart());
+#endif
 
     Window_ShowCursorUnwindowed(Main_bWindowGUI == 0);
     jkGuiRend_SetPalette((uint8_t*)jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]->palette);
@@ -171,12 +205,25 @@ void jkGui_Shutdown()
 
     for (int i = 0; i < 12; i++)
     {
+#ifdef TARGET_TWL
+        if (i >= 5) {
+            continue;
+        }
+#endif
         stdFont_Free(jkGui_stdFonts[i]);
         jkGui_stdFonts[i] = NULL;
     }
 
     for (int i = 0; i < 35; i++)
     {
+#ifdef TARGET_TWL
+        if (i >= 1 && i <= 6) {
+            continue;
+        }
+        if (i >= 7 && i <= 11) {
+            continue;
+        }
+#endif
         stdBitmap_Free(jkGui_stdBitmaps[i]);
         jkGui_stdBitmaps[i] = NULL;
     }

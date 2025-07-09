@@ -30,6 +30,7 @@
 #include "Main/jkStrings.h"
 #include "Main/jkMain.h"
 #include "Main/jkEpisode.h"
+#include "stdPlatform.h"
 #include "jk.h"
 
 void sithGamesave_Setidk(sithSaveHandler_t a1, sithSaveHandler_t a2, sithSaveHandler_t a3, sithSaveHandler_t a4, sithSaveHandler_t a5)
@@ -89,11 +90,11 @@ int sithGamesave_Load(char *saveFname, int debugNextCheckpoint, int a3)
 // MOTS altered
 int sithGamesave_LoadEntry(char *fpath)
 {
-    int curMs; // [esp+Ch] [ebp-650h] BYREF
+    uint32_t curMs; // [esp+Ch] [ebp-650h] BYREF
     char SrcStr[32]; // [esp+10h] [ebp-64Ch] BYREF
     sithGamesave_Header header; // [esp+30h] [ebp-62Ch] BYREF
 #ifdef QOL_IMPROVEMENTS
-    int backup_episodeIdx = 0;
+    int32_t backup_episodeIdx = 0;
 #endif
 
     int bIsOutdatedSave = 0;
@@ -182,8 +183,8 @@ LABEL_11:
     stdPalEffects_ResetEffectsState(&stdPalEffects_state);
     if ( sithGamesave_func2 )
         sithGamesave_func2();
-    if ( !stdConffile_Read(&curMs, 4) )
-        goto load_fail;
+    if ( !stdConffile_Read(&curMs, sizeof(uint32_t)) )
+        goto load_fail; // TODO: is this a memleak?
     sithTime_SetMs(curMs);
     
     // Added: split this apart, g_sithMode is a struct...
@@ -224,22 +225,27 @@ skip_free_things:
             }
         }
 
-        if ( !stdConffile_Read(&sithComm_netMsgTmp.netMsg.cogMsgId, 4) )
+        if ( !stdConffile_Read(&sithComm_netMsgTmp.netMsg.cogMsgId, sizeof(int32_t)) )
         {
             break;
         }
         
-        if (!stdConffile_Read(&sithComm_netMsgTmp.netMsg.msg_size, 4))
+        if (!stdConffile_Read(&sithComm_netMsgTmp.netMsg.msg_size, sizeof(int32_t)))
         {
-            jk_printf("OpenJKDF2: Save load failed to read msg_size\n");
+            stdPlatform_Printf("OpenJKDF2: Save load failed to read msg_size\n");
             goto load_fail;
         }
 
         //printf("%x %x\n", sithComm_netMsgTmp.netMsg.cogMsgId, sithComm_netMsgTmp.netMsg.msg_size);
+
+        if (sithComm_netMsgTmp.netMsg.msg_size > sizeof(sithComm_netMsgTmp.pktData)) {
+            stdPlatform_Printf("OpenJKDF2: Save load failed to read msg, size 0x%x is too large.\n", sithComm_netMsgTmp.netMsg.msg_size);
+            goto load_fail;
+        }
         
         if (!(!sithComm_netMsgTmp.netMsg.msg_size || stdConffile_Read(sithComm_netMsgTmp.pktData, sithComm_netMsgTmp.netMsg.msg_size)))
         {
-            jk_printf("OpenJKDF2: Save load failed to read msg sized %x\n", sithComm_netMsgTmp.netMsg.msg_size);
+            stdPlatform_Printf("OpenJKDF2: Save load failed to read msg sized %x\n", sithComm_netMsgTmp.netMsg.msg_size);
             goto load_fail;
         }
 
@@ -250,7 +256,7 @@ skip_free_things:
         
         if (!sithComm_InvokeMsgByIdx(&sithComm_netMsgTmp))
         {
-            jk_printf("OpenJKDF2: Save load failed to invoke msg %u\n", sithComm_netMsgTmp.netMsg.cogMsgId);
+            stdPlatform_Printf("OpenJKDF2: Save load failed to invoke msg %u\n", sithComm_netMsgTmp.netMsg.cogMsgId);
 #ifndef SDL2_RENDER
             // Linux fails on SyncSound only
             goto load_fail;
@@ -302,9 +308,9 @@ load_fail:
 // MOTS altered
 int sithGamesave_SerializeAllThings(int mpFlags)
 {
-    unsigned int v15; // ebx
+    uint32_t v15; // ebx
     int v16; // ebp
-    unsigned int v17; // ebx
+    uint32_t v17; // ebx
     int v18; // ebp
     int v19; // ebx
     sithItemDescriptor *v20; // esi
@@ -496,7 +502,7 @@ int sithGamesave_Flush()
         if ( sithGamesave_funcWrite )
             sithGamesave_funcWrite();
         stdConffile_Write((const char*)sithWorld_pCurrentWorld->map_jkl_fname, 32);
-        stdConffile_Write((const char*)&sithTime_curMs, sizeof(sithTime_curMs));
+        stdConffile_Write((const char*)&sithTime_curMs, sizeof(uint32_t));
         
         // Added: split this apart, g_sithMode is a struct...
         stdConffile_Write((const char*)&g_sithMode, sizeof(int32_t));

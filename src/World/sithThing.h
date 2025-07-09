@@ -81,7 +81,7 @@ void sithThing_EnterSector(sithThing* pThing, sithSector *sector, int a3, int a4
 sithThing* sithThing_CreateThingOfType(uint32_t thingType);
 void sithThing_EnterWater(sithThing* pThing, int a2);
 void sithThing_ExitWater(sithThing* pThing, int a2);
-uint32_t sithThing_Checksum(sithThing* pThing, unsigned int last_hash);
+uint32_t sithThing_Checksum(sithThing* pThing, uint32_t last_hash);
 int sithThing_netidk2(int a1);
 int sithThing_GetIdxFromThing(sithThing* pThing);
 void sithThing_TickPhysics(sithThing* pThing, flex_t deltaSecs);

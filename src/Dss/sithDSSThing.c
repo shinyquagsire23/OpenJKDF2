@@ -17,6 +17,7 @@
 #include "World/sithWeapon.h"
 #include "World/sithTrackThing.h"
 #include "Devices/sithComm.h"
+#include "stdPlatform.h"
 #include "jk.h"
 
 void sithDSSThing_SendPos(sithThing *pThing, int sendto_id, int bSync)
@@ -1127,10 +1128,25 @@ int sithDSSThing_ProcessFullDesc(sithCogMsg *msg)
         thing->trackParams.orientation = NETMSG_POPVEC3();
         thing->trackParams.loadedFrames = NETMSG_POPS16();
 
+        if (thing->trackParams.sizeFrames && thing->trackParams.loadedFrames < 0) {
+            stdPlatform_Printf("OpenJKDF2: Serialized thing has underflowed trackParams.loadedFrames 0x%x, size 0x%x\n", thing->trackParams.loadedFrames, thing->trackParams.sizeFrames);
+            return 0;
+        }
+        else if (!thing->trackParams.sizeFrames && thing->trackParams.loadedFrames < 0) {
+            stdPlatform_Printf("OpenJKDF2: Serialized thing has underflowed trackParams.loadedFrames 0x%x, size 0x%x, recovering?\n", thing->trackParams.loadedFrames, thing->trackParams.sizeFrames);
+            stdPlatform_Printf("OpenJKDF2: Template ID %x, %s\n", v8, sithWorld_pCurrentWorld->templates[v8].template_name);
+            thing->trackParams.loadedFrames = thing->trackParams.sizeFrames;
+        }
+
         if ( thing->trackParams.loadedFrames )
         {
             // TODO: verify this doesn't leak memory
             thing->trackParams.sizeFrames = thing->trackParams.loadedFrames;
+
+            // Prevent memleaks
+            if (thing->trackParams.aFrames) {
+                pSithHS->free(thing->trackParams.aFrames);
+            }
             thing->trackParams.aFrames = (sithThingFrame*)pSithHS->alloc(sizeof(sithThingFrame) * thing->trackParams.sizeFrames);
         }
 
@@ -1477,7 +1493,22 @@ void sithDSSThing_TransitionMovingThing(sithThing *pThing, rdVector3 *pPos, sith
 {
     rdVector3 a1; // [esp+8h] [ebp-Ch] BYREF
 
+#ifdef QOL_IMPROVEMENTS
+    if ( pThing->moveType == SITH_MT_PHYSICS )
+    {
+        rdVector_Scale3(&a1, &pThing->physicsParams.vel, 0.25);
+    }
+    else if (pThing->moveType == SITH_MT_PATH) {
+        stdPlatform_Printf("OpenJKDDF2: attempted sithDSSThing_TransitionMovingThing on track thing! This would corrupt state in the original game.\n");
+        //rdVector_Scale3(&a1, &pThing->trackParams.vel, 0.25); // TODO: idk if we want this?
+    }
+    else {
+        stdPlatform_Printf("OpenJKDDF2: attempted sithDSSThing_TransitionMovingThing on non-physics thing!\n");
+    }
+#else
     rdVector_Scale3(&a1, &pThing->physicsParams.vel, 0.25);
+#endif
+
     rdVector_Add3Acc(&a1, pPos);
     rdVector_Sub3Acc(&a1, &pThing->position);
     flex_t v5 = rdVector_Len3(&a1);
@@ -1488,7 +1519,21 @@ void sithDSSThing_TransitionMovingThing(sithThing *pThing, rdVector3 *pPos, sith
     }
     else
     {
+#ifdef QOL_IMPROVEMENTS
+    if ( pThing->moveType == SITH_MT_PHYSICS )
+    {
         rdVector_Scale3(&pThing->physicsParams.vel, &a1, 4.0);
+    }
+    else if (pThing->moveType == SITH_MT_PATH) {
+        stdPlatform_Printf("OpenJKDDF2: attempted sithDSSThing_TransitionMovingThing on track thing! This would corrupt state in the original game.\n");
+        //rdVector_Scale3(&a1, &pThing->trackParams.vel, 4.0); // TODO: idk if we want this?
+    }
+    else {
+        stdPlatform_Printf("OpenJKDDF2: attempted sithDSSThing_TransitionMovingThing on non-physics thing!\n");
+    }
+#else
+        rdVector_Scale3(&pThing->physicsParams.vel, &a1, 4.0);
+#endif
     }
 }
 

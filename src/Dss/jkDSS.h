@@ -78,7 +78,7 @@ int jkDSS_Processx33(sithCogMsg *msg);
 int jkDSS_Sendx36();
 int jkDSS_Processx36_setwaggle(sithCogMsg *msg);
 
-void jkDSS_SendJKPrintUniString(int a1, unsigned int a2);
+void jkDSS_SendJKPrintUniString(int a1, uint32_t a2);
 int jkDSS_ProcessJKPrintUniString(sithCogMsg *msg);
 
 void jkDSS_SendEndLevel();
@@ -90,7 +90,7 @@ int jkDSS_ProcessSetTeam(sithCogMsg *pMsg);
 //static void (*jkDSS_Shutdown)() = (void*)jkDSS_Shutdown_ADDR;
 //static int (*jkDSS_wrap_SendSaberInfo_alt)() = (void*)jkDSS_wrap_SendSaberInfo_alt_ADDR;
 //static int (*jkDSS_SendEndLevel)() = (void*)jkDSS_SendEndLevel_ADDR;
-//static int (*jkDSS_SendJKPrintUniString)(int a1, unsigned int a2) = (void*)jkDSS_SendJKPrintUniString_ADDR;
+//static int (*jkDSS_SendJKPrintUniString)(int a1, uint32_t a2) = (void*)jkDSS_SendJKPrintUniString_ADDR;
 //static int (*jkDSS_SendJKSetWeaponMesh)(sithThing *a1) = (void*)jkDSS_SendJKSetWeaponMesh_ADDR;
 //static int (*jkDSS_SendSetSaberInfo)(sithThing *a1) = (void*)jkDSS_SendSetSaberInfo_ADDR;
 //static int (*jkDSS_SendSetSaberInfo2)(sithThing *a1) = (void*)jkDSS_SendSetSaberInfo2_ADDR;

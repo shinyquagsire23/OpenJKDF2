@@ -138,9 +138,12 @@ static int Linux_stdFtell(stdFile_t fhand)
 static void* Linux_alloc(uint32_t len)
 {
 #ifdef TARGET_TWL
+    //printf("alloc %x\n", len);
+    //printf("heap 0x%x 0x%x\n", (intptr_t)getHeapLimit() - (intptr_t)getHeapEnd(), (intptr_t)getHeapEnd() - (intptr_t)getHeapStart());
     void* ret = malloc(len);
     if (!ret) {
         printf("Failed to allocate %x bytes...\n", len);
+        while (1) {}
         return NULL;
     }
     return ret;
@@ -205,7 +208,7 @@ void stdPlatform_InitServices(HostServices *handlers)
     handlers->lockHandle = stdPlatform_LockHandle;
     handlers->unlockHandle = stdPlatform_UnlockHandle;
 #endif
-    
+
 #ifdef PLATFORM_POSIX
     handlers->alloc = Linux_alloc;
     handlers->free = Linux_free;

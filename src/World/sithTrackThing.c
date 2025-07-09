@@ -1,5 +1,6 @@
 #include "sithTrackThing.h"
 
+#include "stdPlatform.h"
 #include "General/stdConffile.h"
 #include "General/stdMath.h"
 #include "World/sithSoundClass.h"
@@ -306,6 +307,10 @@ int sithTrackThing_LoadPathParams(stdConffileArg *arg, sithThing *thing, int par
                 //rdVector_Copy3(&pFrame->pos, &tmpPos);
                 //rdVector_Copy3(&pFrame->rot, &tmpRot);
             }
+            else {
+                // Added: print
+                stdPlatform_Printf("OpenJKDF2: THINGPARAM_FRAME `%s` was ignored because thing->trackParams.loadedFrames (%d) >= thing->trackParams.sizeFrames (%d)\n", arg->value, thing->trackParams.loadedFrames < thing->trackParams.sizeFrames);
+            }
             return 1;
         }
 
@@ -315,8 +320,11 @@ int sithTrackThing_LoadPathParams(stdConffileArg *arg, sithThing *thing, int par
                 return 0;
 
             int numFrames = _atoi(arg->value);
-            if ( numFrames < 1 )
+            if ( numFrames < 1 ) {
+                // Added: print
+                stdPlatform_Printf("OpenJKDF2: THINGPARAM_NUMFRAMES (0x%x, %s) < 1??\n", numFrames, arg->value);
                 return 0;
+            }
 
             size_t alloc_sz = sizeof(sithThingFrame) * numFrames;
             thing->trackParams.aFrames = (sithThingFrame*)pSithHS->alloc(alloc_sz);
@@ -350,36 +358,18 @@ void sithTrackThing_Stop(sithThing *thing)
 
 void sithTrackThing_idkpathmove(sithThing *thing, sithThing *thing2, rdVector3 *a3)
 {
-    sithThingFrame *v3; // eax
-    sithThingFrame *v4; // esi
-    uint32_t v6; // ebp
-    uint32_t v7; // edi
-    int v8; // ebp
     sithThingFrame *v9; // esi
-    uint32_t v10; // eax
     rdVector3 a1a; // [esp+10h] [ebp-Ch] BYREF
 
-    v3 = (sithThingFrame *)pSithHS->alloc(sizeof(sithThingFrame) * thing2->trackParams.sizeFrames);
-    v4 = thing2->trackParams.aFrames;
-    thing->trackParams.aFrames = v3;
-    _memcpy(v3, v4, sizeof(sithThingFrame) * thing2->trackParams.sizeFrames);
-    v6 = thing2->trackParams.loadedFrames;
-    v7 = 0;
+    thing->trackParams.aFrames = (sithThingFrame *)pSithHS->alloc(sizeof(sithThingFrame) * thing2->trackParams.sizeFrames);
+    _memcpy(thing->trackParams.aFrames, thing2->trackParams.aFrames, sizeof(sithThingFrame) * thing2->trackParams.sizeFrames);
     thing->trackParams.sizeFrames = thing2->trackParams.sizeFrames;
-    thing->trackParams.loadedFrames = v6;
-    if ( v6 )
+    thing->trackParams.loadedFrames = thing2->trackParams.loadedFrames;
+    for (uint32_t v7 = 0; v7 < thing->trackParams.loadedFrames; v7++)
     {
-        v8 = 0;
-        do
-        {
-            v9 = &thing->trackParams.aFrames[v8];
-            rdVector_Rotate3(&a1a, a3, &v9->rot);
-            v10 = thing->trackParams.loadedFrames;
-            ++v7;
-            ++v8;
-            rdVector_Add3Acc(&v9->pos, &a1a);
-        }
-        while ( v7 < v10 );
+        v9 = &thing->trackParams.aFrames[v7];
+        rdVector_Rotate3(&a1a, a3, &v9->rot);
+        rdVector_Add3Acc(&v9->pos, &a1a);
     }
 }
 

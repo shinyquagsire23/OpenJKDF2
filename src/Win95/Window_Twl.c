@@ -153,6 +153,9 @@ int Window_ShowCursorUnwindowed(int a1)
 
 int Window_MessageLoop()
 {
+#ifdef TARGET_TWL
+    //printf("heap 0x%x 0x%x 0x%x\n", (intptr_t)getHeapLimit() - (intptr_t)getHeapEnd(), (intptr_t)getHeapEnd() - (intptr_t)getHeapStart(), (intptr_t)getHeapLimit());
+#endif
     //jkMain_GuiAdvance(); // TODO needed?
     Window_msg_main_handler(g_hWnd, WM_PAINT, 0, 0);
     return 0;
@@ -453,7 +456,7 @@ void Window_SdlUpdate()
     
     static int sampleTime_delay = 0;
     int sampleTime_roundtrip = stdPlatform_GetTimeMsec() - Window_lastSampleTime;
-    printf("total %u\n", sampleTime_roundtrip);
+    //printf("total %u heap 0x%x 0x%x\n", sampleTime_roundtrip, (intptr_t)getHeapLimit() - (intptr_t)getHeapEnd(), (intptr_t)getHeapEnd() - (intptr_t)getHeapStart());
     Window_lastSampleTime = stdPlatform_GetTimeMsec(); // TODO
 
     static int jkPlayer_enableVsync_last = 0;

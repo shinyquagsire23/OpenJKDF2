@@ -280,6 +280,31 @@ void sithRender_Draw()
     rdroid_curVertexColorMode = 0;
 #endif
 
+    // Keeping this here in case I need to check for weird corruption again
+#if 0
+    for (int i = 0; i < sithWorld_pCurrentWorld->numThingsLoaded; i++)
+    {
+        sithThing* v16 = &sithWorld_pCurrentWorld->things[i];
+        if (v16->moveType == SITH_MT_PATH)
+        {
+            if (v16->trackParams.loadedFrames < 0) {
+                stdPlatform_Printf("OpenJKDF2: Track thing 0x%x %s has corrupted loadedFrames %x %x\n", i, v16->template_name, v16->trackParams.loadedFrames, v16->trackParams.sizeFrames);
+            }
+        }
+    }
+
+    for (int i = 0; i < sithWorld_pCurrentWorld->numTemplatesLoaded; i++)
+    {
+        sithThing* v16 = &sithWorld_pCurrentWorld->templates[i];
+        if (v16->moveType == SITH_MT_PATH)
+        {
+            if (v16->trackParams.loadedFrames < 0 || v16->trackParams.sizeFrames <= 0) {
+                stdPlatform_Printf("OpenJKDF2: Template track thing 0x%x %s has corrupted loadedFrames %x %x\n", i, v16->template_name, v16->trackParams.loadedFrames, v16->trackParams.sizeFrames);
+            }
+        }
+    }
+#endif
+
     sithRenderSky_Update();
     if (!sithRender_geoMode)
         return;

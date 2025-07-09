@@ -408,6 +408,8 @@ extern int32_t openjkdf2_bIsRunningFromExistingInstall;
 extern int32_t openjkdf2_bOrigWasRunningFromExistingInstall;
 extern int32_t openjkdf2_bOrigWasDF2;
 extern int32_t openjkdf2_restartMode;
+extern int32_t openjkdf2_bIsLowMemoryPlatform;
+extern int32_t openjkdf2_bIsExtraLowMemoryPlatform;
 extern char openjkdf2_aRestartPath[256];
 extern int32_t Main_bMotsCompat;
 extern int32_t Main_bDwCompat;
@@ -2780,8 +2782,8 @@ typedef struct sithThingFrame
 
 typedef struct sithThingTrackParams
 {
-    uint32_t sizeFrames;
-    uint32_t loadedFrames;
+    int32_t sizeFrames;
+    int32_t loadedFrames;
     sithThingFrame *aFrames;
     uint32_t flags;
     rdVector3 vel;

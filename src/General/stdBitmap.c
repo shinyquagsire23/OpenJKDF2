@@ -177,8 +177,16 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
             lockAlloc += surface->format.width_in_bytes;
         }
         stdDisplay_VBufferUnlock(surface);
-        if ( (out->palFmt & 1) != 0 )
+        if ( (out->palFmt & 1) != 0 ) {
             stdDisplay_VBufferSetColorKey(surface, out->colorkey);
+        }
+        // TODO: Eviction caching for stdBitmap, rdMaterial
+#ifdef TARGET_TWL
+        if (openjkdf2_bIsExtraLowMemoryPlatform && vbufTexFmt.width == 640 && vbufTexFmt.height == 480){
+            std_pHS->free(surface->surface_lock_alloc);
+            surface->surface_lock_alloc = NULL;
+        }
+#endif
     }
 
     if ( (out->palFmt & 2) != 0 )

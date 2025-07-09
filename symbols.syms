@@ -226,29 +226,29 @@ sithGamesave_headerTmp 0x00835918 sithGamesave_Header
 rdCamera_pCurCamera 0x0073A3D0 rdCamera*
 rdCamera_camMatrix 0x0086EE40 rdMatrix34
 
-sithNet_MultiModeFlags 0x008C4BA0 int
-sithNet_scorelimit 0x008C4BAC int
-sithNet_teamScore 0x008C4BC0 int[5]
-sithNet_multiplayer_timelimit 0x008C4BD4 int
-sithMulti_multiplayerTimelimit 0x0083261C int
-sithNet_isMulti 0x00832624 int
-sithNet_isServer 0x00832628 int
-sithMulti_bTimelimitMet 0x00832638 int
-sithNet_serverNetId 0x008C4BA4 int
-sithNet_things 0x008326AC int[SITH_MAX_THINGS]
-sithNet_thingsIdx 0x008330F0 int
-sithNet_syncIdx 0x008330F4 int
-sithNet_aSyncFlags 0x008330B0 int[SITH_MAX_SYNC_THINGS]
+sithNet_MultiModeFlags 0x008C4BA0 int32_t 
+sithNet_scorelimit 0x008C4BAC int32_t 
+sithNet_teamScore 0x008C4BC0 int32_t [5]
+sithNet_multiplayer_timelimit 0x008C4BD4 int32_t 
+sithMulti_multiplayerTimelimit 0x0083261C int32_t 
+sithNet_isMulti 0x00832624 int32_t 
+sithNet_isServer 0x00832628 int32_t 
+sithMulti_bTimelimitMet 0x00832638 int32_t 
+sithNet_serverNetId 0x008C4BA4 int32_t 
+sithNet_things 0x008326AC int32_t [SITH_MAX_THINGS]
+sithNet_thingsIdx 0x008330F0 int32_t 
+sithNet_syncIdx 0x008330F4 int32_t 
+sithNet_aSyncFlags 0x008330B0 int32_t [SITH_MAX_SYNC_THINGS]
 sithNet_aSyncThings 0x00832668 sithThing*[SITH_MAX_SYNC_THINGS]
-sithNet_tickrate 0x005490D4 int = 180
-sithNet_dword_8C4BA8 0x008C4BA8 int
-sithNet_dword_83262C 0x0083262C int
-sithMulti_leaveJoinType 0x0083263C int
-sithNet_checksum 0x00832630 int
-sithNet_bNeedsFullThingSyncForLeaveJoin 0x00832640 int
-sithMulti_sendto_id 0x00832644 int
-sithNet_bSyncScores 0x00832648 int
-sithNet_dword_832620 0x00832620 int
+sithNet_tickrate 0x005490D4 int32_t  = 180
+sithNet_dword_8C4BA8 0x008C4BA8 int32_t 
+sithNet_dword_83262C 0x0083262C int32_t 
+sithMulti_leaveJoinType 0x0083263C int32_t 
+sithNet_checksum 0x00832630 int32_t 
+sithNet_bNeedsFullThingSyncForLeaveJoin 0x00832640 int32_t 
+sithMulti_sendto_id 0x00832644 int32_t 
+sithNet_bSyncScores 0x00832648 int32_t 
+sithNet_dword_832620 0x00832620 int32_t 
 
 sithOverlayMap_flMapSize 0x0054A5E0 flex_t = 100.0
 sithOverlayMap_matrix 0x00835840 rdMatrix34

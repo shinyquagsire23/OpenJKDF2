@@ -337,7 +337,7 @@ void jkHud_Draw()
     int v35; // edx
     int v36; // ecx
     jkHudTeamScore* v39; // ecx
-    int *v40; // eax
+    int32_t *v40; // eax
     int v41; // edx
     wchar_t *v42; // eax
     int v43; // eax
@@ -938,7 +938,7 @@ void jkHud_DrawGPU()
     int v35; // edx
     int v36; // ecx
     jkHudTeamScore* v39; // ecx
-    int *v40; // eax
+    int32_t *v40; // eax
     int v41; // edx
     wchar_t *v42; // eax
     int v43; // eax

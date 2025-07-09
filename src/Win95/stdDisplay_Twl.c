@@ -303,14 +303,20 @@ int stdDisplay_VBufferLock(stdVBuffer *buf)
 void stdDisplay_VBufferUnlock(stdVBuffer *buf)
 {
     if (!buf) return;
+
+    /*if (buf->format.width == 640 && buf->format.height == 480) {
+        if (buf->surface_lock_alloc)
+            std_pHS->free(buf->surface_lock_alloc);
+        
+        buf->surface_lock_alloc = NULL;
+    }*/
     
-    //buf->surface_lock_alloc = NULL;
     //SDL_UnlockSurface(buf->sdlSurface);
 }
 
 int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int blit_x, int blit_y, rdRect *rect, int alpha_maybe)
 {
-    if (!vbuf || !vbuf2) return 1;
+    if (!vbuf) return 1;
     
     rdRect fallback = {0,0,vbuf2->format.width, vbuf2->format.height};
     if (!rect)
@@ -326,10 +332,31 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
     rdRect dstRect = {blit_x, blit_y, rect->width, rect->height};
     rdRect srcRect = {rect->x, rect->y, rect->width, rect->height};
     
-    uint8_t* srcPixels = (uint8_t*)vbuf2->surface_lock_alloc;
+    uint8_t* srcPixels = vbuf2 ? (uint8_t*)vbuf2->surface_lock_alloc : NULL;
     uint8_t* dstPixels = (uint8_t*)vbuf->surface_lock_alloc;
-    uint32_t srcStride = vbuf2->format.width_in_bytes;
+    uint32_t srcStride = vbuf2 ? vbuf2->format.width_in_bytes : NULL;
     uint32_t dstStride = vbuf->format.width_in_bytes;
+
+    if (!srcPixels && dstPixels) {
+        int has_alpha = !(rect->width == 640) && (alpha_maybe & 1);
+        for (int i = 0; i < rect->width; i++)
+        {
+            for (int j = 0; j < rect->height; j++)
+            {
+                //if ((uint32_t)(i + srcRect.x) >= (uint32_t)vbuf2->format.width) continue;
+                //if ((uint32_t)(j + srcRect.y) >= (uint32_t)vbuf2->format.height) continue;
+                
+                uint8_t pixel = 0;//srcPixels[(i + srcRect.x) + ((j + srcRect.y)*srcStride)];
+
+                if (!pixel && has_alpha) continue;
+                if ((uint32_t)(i + dstRect.x) >= (uint32_t)vbuf->format.width) continue;
+                if ((uint32_t)(j + dstRect.y) >= (uint32_t)vbuf->format.height) continue;
+
+                dstPixels[(i + dstRect.x) + ((j + dstRect.y)*dstStride)] = pixel;
+            }
+        }
+        return 1;
+    }
 
     if (!srcPixels || !dstPixels) {
         //stdPlatform_Printf("Vbuffer copy missing src or dst %p %p\n", srcPixels, dstPixels);
@@ -470,6 +497,7 @@ void stdDisplay_VBufferFree(stdVBuffer *vbuf)
     //SDL_FreeSurface(vbuf->sdlSurface);
     if (vbuf->surface_lock_alloc)
         std_pHS->free(vbuf->surface_lock_alloc);
+    vbuf->surface_lock_alloc = NULL;
     std_pHS->free(vbuf);
 }
 

@@ -4,6 +4,8 @@
 #include "types.h"
 #include "globals.h"
 
+#include "stdPlatform.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -46,18 +48,26 @@ extern "C" {
 
 #define NETMSG_START intptr_t craftingPacket = (intptr_t)&sithComm_netMsgTmp.pktData[0];
 #define NETMSG_START_2 intptr_t craftingPacket = (intptr_t)&stdComm_cogMsgTmp.pktData[0];
+
+// TODO: Just rewrite all of this with memcpys
+#ifdef TARGET_TWL // Prevent aligned stores/loads
+#define FIX_ALIGN(t) ((craftingPacket & (sizeof(t)-1)) ? /*stdPlatform_Printf("Bump %p\n", craftingPacket),*/ craftingPacket += (sizeof(t) - (craftingPacket & (sizeof(t)-1))), 1 : 1)
+#else
+#define FIX_ALIGN(t) (1)
+#endif
+
 #define NETMSG_PUSHU8(x) {*(uint8_t*)craftingPacket = (uint8_t)(x); craftingPacket += sizeof(uint8_t);};
-#define NETMSG_PUSHU16(x) {*(uint16_t*)craftingPacket = (uint16_t)(x); craftingPacket += sizeof(uint16_t);};
-#define NETMSG_PUSHS16(x) {*(int16_t*)craftingPacket = (int16_t)(x); craftingPacket += sizeof(int16_t);};
-#define NETMSG_PUSHU32(x) {*(uint32_t*)craftingPacket = (uint32_t)(x); craftingPacket += sizeof(uint32_t);};
-#define NETMSG_PUSHS32(x) {*(int32_t*)craftingPacket = (int32_t)(x); craftingPacket += sizeof(int32_t);};
-#define NETMSG_PUSHF32(x) {*(flex32_t*)craftingPacket = (flex32_t)(x); craftingPacket += sizeof(flex32_t);};
-#define NETMSG_PUSHVEC2(x) {*(rdVector2*)craftingPacket = (x); craftingPacket += sizeof(rdVector2);};
-#define NETMSG_PUSHVEC3(x) {*(rdVector3*)craftingPacket = (x); craftingPacket += sizeof(rdVector3);};
-#define NETMSG_PUSHVEC3I(x) {*(rdVector3i*)craftingPacket = (x); craftingPacket += sizeof(rdVector3i);};
-#define NETMSG_PUSHMAT34(x) {*(rdMatrix34*)craftingPacket = (x); craftingPacket += sizeof(rdMatrix34);};
+#define NETMSG_PUSHU16(x) {FIX_ALIGN(uint16_t); *(uint16_t*)craftingPacket = (uint16_t)(x); craftingPacket += sizeof(uint16_t);};
+#define NETMSG_PUSHS16(x) {FIX_ALIGN(int16_t); *(int16_t*)craftingPacket = (int16_t)(x); craftingPacket += sizeof(int16_t);};
+#define NETMSG_PUSHU32(x) {FIX_ALIGN(uint32_t); *(uint32_t*)craftingPacket = (uint32_t)(x); craftingPacket += sizeof(uint32_t);};
+#define NETMSG_PUSHS32(x) {FIX_ALIGN(int32_t); *(int32_t*)craftingPacket = (int32_t)(x); craftingPacket += sizeof(int32_t);};
+#define NETMSG_PUSHF32(x) {FIX_ALIGN(flex32_t); *(flex32_t*)craftingPacket = (flex32_t)(x); craftingPacket += sizeof(flex32_t);};
+#define NETMSG_PUSHVEC2(x) {FIX_ALIGN(uint32_t); *(rdVector2*)craftingPacket = (x); craftingPacket += sizeof(rdVector2);};
+#define NETMSG_PUSHVEC3(x) {FIX_ALIGN(uint32_t); *(rdVector3*)craftingPacket = (x); craftingPacket += sizeof(rdVector3);};
+#define NETMSG_PUSHVEC3I(x) {FIX_ALIGN(uint32_t); *(rdVector3i*)craftingPacket = (x); craftingPacket += sizeof(rdVector3i);};
+#define NETMSG_PUSHMAT34(x) {FIX_ALIGN(uint32_t); *(rdMatrix34*)craftingPacket = (x); craftingPacket += sizeof(rdMatrix34);};
 #define NETMSG_PUSHSTR(x,l) {_strncpy((char*)craftingPacket, (x), (l)-1); ((char*)craftingPacket)[(l)-1] = 0; craftingPacket += (l);};
-#define NETMSG_PUSHWSTR(x,l) {_wcsncpy((wchar_t*)craftingPacket, (x), (l)-1); ((wchar_t*)craftingPacket)[(l)-1] = 0; craftingPacket += (l*sizeof(wchar_t));};
+#define NETMSG_PUSHWSTR(x,l) {FIX_ALIGN(uint16_t); _wcsncpy((wchar_t*)craftingPacket, (x), (l)-1); ((wchar_t*)craftingPacket)[(l)-1] = 0; craftingPacket += (l*sizeof(wchar_t));};
 #define NETMSG_END(msgid) { size_t len = (intptr_t)craftingPacket - (intptr_t)&sithComm_netMsgTmp.pktData[0]; \
                             sithComm_netMsgTmp.netMsg.flag_maybe = 0; \
                             sithComm_netMsgTmp.netMsg.cogMsgId = msgid; \
@@ -77,18 +87,25 @@ uint16_t _readingOutU16; int16_t _readingOutS16; uint32_t _readingOutU32; \
 int32_t _readingOutS32; flex32_t _readingOutFloat; rdVector2 _readingOutV2; \
 rdVector3 _readingOutV3; rdVector3i _readingOutV3i; rdMatrix34 _readingOutM34;
 
+// TODO: Just rewrite all of this with memcpys
+#ifdef TARGET_TWL // Prevent unaligned stores and loads
+#define CHECK_ALIGN(t) ((((intptr_t)_readingPacket) & (sizeof(t)-1)) ? _readingPacket += (sizeof(t) - (((intptr_t)_readingPacket) & (sizeof(t)-1))), 1 : 1)
+#else
+#define CHECK_ALIGN(t) (1)
+#endif
+
 #define NETMSG_POPU8() (_readingOutU8 = *(uint8_t*)_readingPacket, _readingPacket += sizeof(uint8_t), _readingOutU8)
-#define NETMSG_POPU16() (_readingOutU16 = *(uint16_t*)_readingPacket, _readingPacket += sizeof(uint16_t), _readingOutU16)
-#define NETMSG_POPS16() (_readingOutS16 = *(int16_t*)_readingPacket, _readingPacket += sizeof(int16_t), _readingOutS16)
-#define NETMSG_POPU32() (_readingOutU32 = *(uint32_t*)_readingPacket, _readingPacket += sizeof(uint32_t), _readingOutU32)
-#define NETMSG_POPS32() (_readingOutS32 = *(int32_t*)_readingPacket, _readingPacket += sizeof(int32_t), _readingOutS32)
-#define NETMSG_POPF32() (_readingOutFloat = *(flex32_t*)_readingPacket, _readingPacket += sizeof(flex32_t), _readingOutFloat)
-#define NETMSG_POPVEC2() (_readingOutV2 = *(rdVector2*)_readingPacket, _readingPacket += sizeof(rdVector2), _readingOutV2)
-#define NETMSG_POPVEC3() (_readingOutV3 = *(rdVector3*)_readingPacket, _readingPacket += sizeof(rdVector3), _readingOutV3)
-#define NETMSG_POPVEC3I() (_readingOutV3i = *(rdVector3i*)_readingPacket, _readingPacket += sizeof(rdVector3i), _readingOutV3i)
-#define NETMSG_POPMAT34() (_readingOutM34 = *(rdMatrix34*)_readingPacket, _readingPacket += sizeof(rdMatrix34), _readingOutM34)
+#define NETMSG_POPU16() (CHECK_ALIGN(uint16_t), _readingOutU16 = *(uint16_t*)_readingPacket, _readingPacket += sizeof(uint16_t), _readingOutU16)
+#define NETMSG_POPS16() (CHECK_ALIGN(int16_t), _readingOutS16 = *(int16_t*)_readingPacket, _readingPacket += sizeof(int16_t), _readingOutS16)
+#define NETMSG_POPU32() (CHECK_ALIGN(uint32_t), _readingOutU32 = *(uint32_t*)_readingPacket, _readingPacket += sizeof(uint32_t), _readingOutU32)
+#define NETMSG_POPS32() (CHECK_ALIGN(int32_t), _readingOutS32 = *(int32_t*)_readingPacket, _readingPacket += sizeof(int32_t), _readingOutS32)
+#define NETMSG_POPF32() (CHECK_ALIGN(flex32_t), _readingOutFloat = *(flex32_t*)_readingPacket, _readingPacket += sizeof(flex32_t), _readingOutFloat)
+#define NETMSG_POPVEC2() (CHECK_ALIGN(uint32_t), _readingOutV2 = *(rdVector2*)_readingPacket, _readingPacket += sizeof(rdVector2), _readingOutV2)
+#define NETMSG_POPVEC3() (CHECK_ALIGN(uint32_t), _readingOutV3 = *(rdVector3*)_readingPacket, _readingPacket += sizeof(rdVector3), _readingOutV3)
+#define NETMSG_POPVEC3I() (CHECK_ALIGN(uint32_t), _readingOutV3i = *(rdVector3i*)_readingPacket, _readingPacket += sizeof(rdVector3i), _readingOutV3i)
+#define NETMSG_POPMAT34() (CHECK_ALIGN(uint32_t), _readingOutM34 = *(rdMatrix34*)_readingPacket, _readingPacket += sizeof(rdMatrix34), _readingOutM34)
 #define NETMSG_POPSTR(x,l) { _strncpy((x), (char*)_readingPacket, (l)-1); (x)[(l)-1] = 0; _readingPacket += (l); }
-#define NETMSG_POPWSTR(x,l) { _wcsncpy((x), (wchar_t*)_readingPacket, (l)-1); (x)[(l)-1] = 0; _readingPacket += (l*sizeof(wchar_t)); }
+#define NETMSG_POPWSTR(x,l) { CHECK_ALIGN(uint16_t), _wcsncpy((x), (wchar_t*)_readingPacket, (l)-1); (x)[(l)-1] = 0; _readingPacket += (l*sizeof(wchar_t)); }
 #define NETMSG_IN_END {}
 
 extern int jkGuiNetHost_bIsDedicated;
@@ -106,7 +123,7 @@ int sithMulti_SendJoinRequest(int sendto_id);
 int sithMulti_GetSpawnIdx(sithThing *pPlayerThing);
 void sithMulti_SyncScores();
 void sithMulti_HandleDeath(sithPlayerInfo *pPlayerInfo, sithThing *pKilledThing, sithThing *pKilledByThing);
-void sithMulti_EndLevel(unsigned int a1, int a2);
+void sithMulti_EndLevel(uint32_t a1, int a2);
 void sithMulti_SendWelcome(int a1, int playerIdx, int sendtoId);
 void sithMulti_SendQuit(int idx);
 int sithMulti_LobbyMessage();
@@ -118,7 +135,7 @@ int sithMulti_ServerLeft(int32_t a, sithEventInfo* b);
 void sithMulti_SendLeaveJoin(int sendtoId, int bSync);
 int sithMulti_ProcessLeaveJoin(sithCogMsg *msg);
 void sithMulti_sub_4CA470(int a1);
-void sithMulti_InitTick(unsigned int tickrate);
+void sithMulti_InitTick(uint32_t tickrate);
 int sithMulti_ProcessJoinRequest(sithCogMsg *msg);
 void sithMulti_HandleTimeLimit(int deltaMs);
 uint32_t sithMulti_IterPlayersnothingidk(int net_id);

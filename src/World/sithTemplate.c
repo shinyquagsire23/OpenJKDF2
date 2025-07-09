@@ -2,6 +2,7 @@
 
 #include "World/sithThing.h"
 #include "World/sithWorld.h"
+#include "General/stdString.h"
 #include "General/stdConffile.h"
 #include "General/stdHashTable.h"
 
@@ -160,12 +161,14 @@ sithThing* sithTemplate_CreateEntry(sithWorld *world)
     if ( result )
         return result;
 
+    // Added: memset for consistent behavior
+    memset(&tmp, 0, sizeof(tmp));
+
     sithThing_DoesRdThingInit(&tmp);
     result = (sithThing *)stdHashTable_GetKeyVal(sithTemplate_hashmap, (const char*)stdConffile_entry.args[1].value);
     sithThing_InstantiateFromTemplate(&tmp, result);
 
-    _strncpy(tmp.template_name, stdConffile_entry.args[0].value, 0x1Fu);
-    tmp.template_name[31] = 0;
+    stdString_SafeStrCopy(tmp.template_name, stdConffile_entry.args[0].value, sizeof(tmp.template_name));
 
     for (int i = 2; i < stdConffile_entry.numArgs; i++)
     {

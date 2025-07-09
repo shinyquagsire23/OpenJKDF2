@@ -125,9 +125,9 @@ void sithDSS_SendSurfaceStatus(sithSurface *surface, int sendto_id, int mpFlags)
 
 int sithDSS_ProcessSurfaceStatus(sithCogMsg *msg)
 {
-    unsigned int v1; // eax
+    uint32_t v1; // eax
     sithSurface *surface; // edi
-    signed int v4; // ecx
+    int32_t v4; // ecx
     
     NETMSG_IN_START(msg);
 

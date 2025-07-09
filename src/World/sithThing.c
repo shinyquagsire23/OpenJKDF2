@@ -187,14 +187,14 @@ void sithThing_TickAll(flex_t deltaSeconds, int deltaMs)
 {
     sithThing* pThingIter; // esi
     sithWorld *v6; // edi
-    int v7; // edx
-    int v8; // eax
-    int v9; // eax
+    int32_t v7; // edx
+    int32_t v8; // eax
+    int32_t v9; // eax
 
     if ( sithWorld_pCurrentWorld->numThings < 0 )
         return;
 
-    for (int i = 0; i < sithWorld_pCurrentWorld->numThings+1; i++)
+    for (int32_t i = 0; i < sithWorld_pCurrentWorld->numThings+1; i++)
     {
         pThingIter = &sithWorld_pCurrentWorld->things[i];
         if (!pThingIter->type)
@@ -305,7 +305,7 @@ void sithThing_TickAll(flex_t deltaSeconds, int deltaMs)
 
 void sithThing_TickPhysics(sithThing *pThing, flex_t deltaSecs)
 {
-    int v2; // ebp
+    int32_t v2; // ebp
     sithSurface *v5; // eax
     rdVector3 v8; // [esp+Ch] [ebp-18h] BYREF
     rdVector3 v1; // [esp+18h] [ebp-Ch] BYREF
@@ -416,7 +416,7 @@ sithThing* sithThing_GetById(int thing_id)
     if ( sithWorld_pCurrentWorld->numThings < 0 )
         return 0;
     
-    for (int i = 0; i <= sithWorld_pCurrentWorld->numThings; i++)
+    for (int32_t i = 0; i <= sithWorld_pCurrentWorld->numThings; i++)
     {
         sithThing* iter = &sithWorld_pCurrentWorld->things[i];
         if (iter->thing_id == thing_id && iter->type != SITH_THING_FREE) {
@@ -491,15 +491,15 @@ void sithThing_freestuff(sithWorld *pWorld)
 {
     sithThing* pThingIter; // esi
     sithWorld *v3; // edx
-    int v4; // esi
-    int v5; // eax
-    int v7; // eax
+    int32_t v4; // esi
+    int32_t v5; // eax
+    int32_t v7; // eax
 
     // Added: !world check
     if (!pWorld || !pWorld->things)
         return;
 
-    for (int v9 = 0; v9 < pWorld->numThingsLoaded; v9++)
+    for (int32_t v9 = 0; v9 < pWorld->numThingsLoaded; v9++)
     {
         pThingIter = &pWorld->things[v9];
         if (!pThingIter->type)
@@ -550,7 +550,7 @@ void sithThing_freestuff(sithWorld *pWorld)
 void sithThing_idkjkl(void)
 {
     sithNet_thingsIdx = 0;
-    for (int idx = sithWorld_pCurrentWorld->numThingsLoaded - 1; idx >= 0; idx--)
+    for (int32_t idx = sithWorld_pCurrentWorld->numThingsLoaded - 1; idx >= 0; idx--)
     {
         sithThing* pThing = &sithWorld_pCurrentWorld->things[idx];
         sithThing_DoesRdThingInit(pThing);
@@ -563,10 +563,10 @@ void sithThing_idkjkl(void)
 
 void sithThing_sub_4CCE60()
 {
-    int v1; // edx
-    int *v2; // ebp
-    int v6; // eax
-    int v8; // ecx
+    int32_t v1; // edx
+    int32_t *v2; // ebp
+    int32_t v6; // eax
+    int32_t v8; // ecx
 
     sithNet_thingsIdx = 0;
     sithWorld_pCurrentWorld->numThings = -1;
@@ -598,9 +598,9 @@ void sithThing_sub_4CCE60()
 
 void sithThing_FreeEverythingNet(sithThing* pThing)
 {
-    int v2; // esi
-    int v3; // eax
-    int v5; // eax
+    int32_t v2; // esi
+    int32_t v3; // eax
+    int32_t v5; // eax
 
     if ( sithNet_isMulti && sithNet_isServer && (pThing->thing_id & 0xFFFF0000) == 0 )
         sithMulti_FreeThing(pThing->thing_id);
@@ -696,8 +696,8 @@ void sithThing_sub_4CD100(sithThing* pThing)
 int sithThing_DoesRdThingInit(sithThing* pThing)
 {
 
-    int idx = pThing->thingIdx;
-    int sig = pThing->signature;
+    int32_t idx = pThing->thingIdx;
+    int32_t sig = pThing->signature;
 
     _memset(pThing, 0, sizeof(sithThing));
     _memcpy(&pThing->lookOrientation, &rdroid_identMatrix34, sizeof(pThing->lookOrientation));
@@ -1186,6 +1186,17 @@ void sithThing_AttachToSurface(sithThing* pThing, sithSurface *surface, int a3)
     int v15; // edi
     rdVector3 a2a; // [esp+Ch] [ebp-Ch] BYREF
 
+    // Added: Safety checking
+    if (!pThing) {
+        stdPlatform_Printf("OpenJKDF2: NULL pThing in sithThing_AttachToSurface!\n");
+        return;
+    }
+    // Added: Safety checking
+    if (pThing->moveType != SITH_MT_PHYSICS) {
+        stdPlatform_Printf("OpenJKDF2: Non-physics pThing in sithThing_AttachToSurface!\n");
+        return;
+    }
+
     v4 = 1;
     v5 = pThing->attach_flags;
     if ( v5 )
@@ -1460,22 +1471,22 @@ void sithThing_detachallchildren(sithThing* pThing)
 int sithThing_Load(sithWorld *pWorld, int a2)
 {
     sithThing *v4; // esi
-    int v5; // esi
-    int v6; // eax
-    int v10; // ebx
+    int32_t v5; // esi
+    int32_t v6; // eax
+    int32_t v10; // ebx
     sithThing* paThings; // eax
-    int v20; // eax
+    int32_t v20; // eax
     sithThing *v21; // esi
     sithThing *v22; // ebx
-    int v23; // eax
+    int32_t v23; // eax
     sithSector *v24; // edi
-    int v27; // edi
+    int32_t v27; // edi
     stdConffileArg *v28; // ebx
     rdVector3 a3; // [esp+14h] [ebp-48h] BYREF
     rdVector3 pos; // [esp+20h] [ebp-3Ch] BYREF
     rdMatrix34 a; // [esp+2Ch] [ebp-30h] BYREF
-    int v36; // [esp+64h] [ebp+8h]
-    int v38; // [esp+64h] [ebp+8h]
+    int32_t v36; // [esp+64h] [ebp+8h]
+    int32_t v38; // [esp+64h] [ebp+8h]
 
     sithThing_bInitted2 = 1;
     if ( a2 && pWorld->things )
@@ -1587,11 +1598,11 @@ int sithThing_Load(sithWorld *pWorld, int a2)
 
 int sithThing_ParseArgs(stdConffileArg *arg, sithThing* pThing)
 {
-    int v2; // ebp
-    int param; // eax
-    int paramIdx; // edi
-    int v7; // eax
-    int v8; // eax
+    int32_t v2; // ebp
+    int32_t param; // eax
+    int32_t paramIdx; // edi
+    int32_t v7; // eax
+    int32_t v8; // eax
 
     v2 = 0;
     param = (int)(intptr_t)stdHashTable_GetKeyVal(sithThing_paramKeyToParamValMap, arg->key);
@@ -1645,13 +1656,13 @@ LABEL_18:
 // MOTS altered
 int sithThing_LoadThingParam(stdConffileArg *arg, sithThing* pThing, int param)
 {
-    int v3; // ebp
+    int32_t v3; // ebp
     const char **v4; // edi
-    int v5; // eax
-    int result; // eax
+    int32_t v5; // eax
+    int32_t result; // eax
     sithAIClass *pAIClass; // eax
     sithActor *pActor; // esi
-    int collide; // eax
+    int32_t collide; // eax
     flex_d_t size; // st7
     uint32_t thingType; // eax
     flex_d_t moveSize; // st7
@@ -1898,7 +1909,7 @@ LABEL_59:
 
 int sithThing_GetIdxFromThing(sithThing* pThing)
 {
-    unsigned int v1; // ecx
+    uint32_t v1; // ecx
     int result; // eax
 
     result = 0;
@@ -1911,7 +1922,7 @@ int sithThing_GetIdxFromThing(sithThing* pThing)
     return result;
 }
 
-uint32_t sithThing_Checksum(sithThing* pThing, unsigned int last_hash)
+uint32_t sithThing_Checksum(sithThing* pThing, uint32_t last_hash)
 {
     uint32_t hash;
 
@@ -2023,7 +2034,7 @@ int sithThing_ShouldSync(sithThing* pThing)
 
 int sithThing_netidk2(int a1)
 {
-    int v1; // eax
+    int32_t v1; // eax
 
     if ( a1 == sithWorld_pCurrentWorld->numThings )
     {
