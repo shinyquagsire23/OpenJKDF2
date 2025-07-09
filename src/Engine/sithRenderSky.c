@@ -79,6 +79,9 @@ void sithRenderSky_TransformVertical(rdProcEntry *pProcEntry, sithSurfaceInfo *p
     pProcEntry->geometryMode = sithRender_geoMode > RD_GEOMODE_TEXTURED ? RD_GEOMODE_TEXTURED : sithRender_geoMode;
     pProcEntry->lightingMode = sithRender_lightMode > RD_LIGHTMODE_FULLYLIT ? RD_LIGHTMODE_FULLYLIT : sithRender_lightMode;
     // Weird, no texture mode, though idk if the affine mode even worked
+#ifdef TARGET_TWL
+    pProcEntry->textureMode = sithRender_texMode > RD_TEXTUREMODE_AFFINE ? RD_TEXTUREMODE_AFFINE : sithRender_texMode;
+#endif
 
     for (uint32_t i = 0; i < num_vertices; i++)
     {
