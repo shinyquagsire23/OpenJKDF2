@@ -1281,6 +1281,14 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
         rdModel3_lightingMode = curLightingMode;
     }
 
+// This function = 1ms or so
+#ifdef TARGET_TWL
+    //thingFrustrumCull = 0;
+    //meshFrustrumCull = 0;
+    // TODO: Check if it's really that expensive
+    rdModel3_lightingMode = RD_LIGHTMODE_DIFFUSE;
+#endif
+
     rdModel3_textureMode = pCurMesh->textureMode;
     if ( rdModel3_textureMode >= curTextureMode )
         rdModel3_textureMode = curTextureMode;
@@ -1304,7 +1312,10 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
         for (int i = 0; i < rdModel3_numGeoLights; i++)
         {
             int lightIdx = (*pGeoLight)->id;
-            if ( (*pGeoLight)->falloffMin + pCurMesh->radius > rdVector_Dist3(&rdCamera_pCurCamera->lightPositions[lightIdx], &mat->scale) )
+
+            // Added: dist -> dist squared
+            flex_t dist = (*pGeoLight)->falloffMin + pCurMesh->radius;
+            if ( dist*dist > rdVector_DistSquared3(&rdCamera_pCurCamera->lightPositions[lightIdx], &mat->scale) )
             {
                 apMeshLights[rdModel3_numMeshLights] = *pGeoLight;
                 rdMatrix_TransformPoint34(&rdModel3_aLocalLightPos[rdModel3_numMeshLights], &rdCamera_pCurCamera->lightPositions[lightIdx], &matInv);
@@ -1328,32 +1339,32 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
     else if (rdModel3_lightingMode == RD_LIGHTMODE_GOURAUD)
     {
         rdModel3_numMeshLights = 0;
-        if (rdModel3_numGeoLights > 0)
+        pGeoLight = apGeoLights;
+        for (int i = 0; i < rdModel3_numGeoLights; i++)
         {
-            pGeoLight = apGeoLights;
-            for (int i = 0; i < rdModel3_numGeoLights; i++)
+            int lightIdx = (*pGeoLight)->id;
+
+            // Added: dist -> dist squared
+            flex_t dist = (*pGeoLight)->falloffMin + pCurMesh->radius;
+            if ( dist*dist > rdVector_DistSquared3(&rdCamera_pCurCamera->lightPositions[lightIdx], &mat->scale) )
             {
-                int lightIdx = (*pGeoLight)->id;
-                if ( (*pGeoLight)->falloffMin + pCurMesh->radius > rdVector_Dist3(&rdCamera_pCurCamera->lightPositions[lightIdx], &mat->scale) )
-                {
-                    apMeshLights[rdModel3_numMeshLights] = *pGeoLight;
-                    rdMatrix_TransformPoint34(&rdModel3_aLocalLightPos[rdModel3_numMeshLights], &rdCamera_pCurCamera->lightPositions[lightIdx], &matInv);
-                    
-                    // MOTS added
-                    if ((*pGeoLight)->type == 3) {
-                        flex_t tmpZ = mat->scale.z;
-                        rdVector_Zero3(&mat->scale);
+                apMeshLights[rdModel3_numMeshLights] = *pGeoLight;
+                rdMatrix_TransformPoint34(&rdModel3_aLocalLightPos[rdModel3_numMeshLights], &rdCamera_pCurCamera->lightPositions[lightIdx], &matInv);
+                
+                // MOTS added
+                if ((*pGeoLight)->type == 3) {
+                    flex_t tmpZ = mat->scale.z;
+                    rdVector_Zero3(&mat->scale);
 
-                        rdVector3 tmpDir;
-                        rdVector_Neg3(&tmpDir, &(*pGeoLight)->direction);
-                        rdMatrix_TransformPoint34(&rdModel3_aLocalLightDir[rdModel3_numMeshLights], &tmpDir, &matInv);
-                        mat->scale.z = tmpZ;
-                    }
-
-                    ++rdModel3_numMeshLights;
+                    rdVector3 tmpDir;
+                    rdVector_Neg3(&tmpDir, &(*pGeoLight)->direction);
+                    rdMatrix_TransformPoint34(&rdModel3_aLocalLightDir[rdModel3_numMeshLights], &tmpDir, &matInv);
+                    mat->scale.z = tmpZ;
                 }
-                ++pGeoLight;
+
+                ++rdModel3_numMeshLights;
             }
+            ++pGeoLight;
         }
 
         // MOTS added assignment
@@ -1380,6 +1391,10 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
         }
     }
 
+
+    int test = stdPlatform_GetTimeMsec();
+    // This is about 1/2 of the render time for E-11, 1/4 for saber
+    // Before this is about 1/2 the render time for saber
     rdMatrix_TransformPoint34(&localCamera, &rdCamera_camMatrix.scale, &matInv);
     rdFace* face = &meshIn->faces[0];
     for (int i = 0; i < meshIn->numFaces; i++)
@@ -1397,9 +1412,13 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
             }
         }
 
+        // Everything except rdModel3_DrawFace: 2ms
         rdModel3_DrawFace(face, flags);
         ++face;
     }
+extern int jkPlayer_checkPov;
+    if (jkPlayer_checkPov)
+        printf("%d\n", stdPlatform_GetTimeMsec() - test);
 }
 
 // MOTS altered (RGB lights)
@@ -1415,6 +1434,10 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
     procEntry = rdCache_GetProcEntry();
     if ( !procEntry )
         return 0;
+
+#ifdef TARGET_TWL
+    rdModel3_lightingMode = RD_LIGHTMODE_DIFFUSE;
+#endif
 
     geometryMode = rdModel3_geometryMode;
     if ( rdModel3_geometryMode >= face->geometryMode )
@@ -1449,7 +1472,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
     vertexSrc.vertexUVIdx = face->vertexUVIdx;
 
     // MOTS added: RGB
-    if ((rdGetVertexColorMode() == 0) || (procEntry->lightingMode == 2)) {
+    if ((rdGetVertexColorMode() == 0) || (procEntry->lightingMode == RD_LIGHTMODE_DIFFUSE)) {
         if ( meshFrustrumCull )
             rdPrimit3_ClipFace(rdCamera_pCurCamera->pClipFrustum, geometryMode, lightingMode, textureMode, (rdVertexIdxInfo *)&vertexSrc, &vertexDst, &face->clipIdk);
         else
@@ -1472,7 +1495,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
     if ( vertexDst.numVertices < 3u )
         return 0;
 
-    if ( procEntry->lightingMode == 2 )
+    if ( procEntry->lightingMode == RD_LIGHTMODE_DIFFUSE )
     {
         if ( lightFlags )
         {
@@ -1508,7 +1531,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
     procEntry->wallCel = face->wallCel;
     if ( procEntry->ambientLight < 1.0 )
     {
-        if ( procEntry->lightingMode == 2 )
+        if ( procEntry->lightingMode == RD_LIGHTMODE_DIFFUSE )
         {
             if ( procEntry->light_level_static >= 1.0 && isIdentityMap )
             {
@@ -1520,7 +1543,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
             }
             goto LABEL_44;
         }
-        if ( (rdGetVertexColorMode() != 0) || procEntry->lightingMode != 3 )
+        if ( (rdGetVertexColorMode() != 0) || procEntry->lightingMode != RD_LIGHTMODE_GOURAUD )
             goto LABEL_44;
 
         for (int i = 1; i < vertexDst.numVertices; i++ )

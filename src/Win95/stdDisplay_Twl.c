@@ -8,6 +8,7 @@
 #include "General/stdColor.h"
 
 #include <assert.h>
+#include <nds.h>
 
 uint32_t Video_menuTexId = 0;
 uint32_t Video_overlayTexId = 0;
@@ -228,7 +229,14 @@ int stdDisplay_SetMasterPalette(uint8_t* pal)
 
 stdVBuffer* stdDisplay_VBufferNew(stdVBufferTexFmt *fmt, int create_ddraw_surface, int gpu_mem, const void* palette)
 {
+    if ((intptr_t)getHeapLimit() - (intptr_t)getHeapEnd() < 0x40000) {
+        return NULL;
+    }
+
     stdVBuffer* out = (stdVBuffer*)std_pHS->alloc(sizeof(stdVBuffer));
+    if (!out) {
+        return NULL;
+    }
     
     _memset(out, 0, sizeof(*out));
     
@@ -246,6 +254,10 @@ stdVBuffer* stdDisplay_VBufferNew(stdVBufferTexFmt *fmt, int create_ddraw_surfac
     //out->format.width = 0;
     //out->format.width_in_bytes = 0;
     out->surface_lock_alloc = (char*)std_pHS->alloc(out->format.texture_size_in_bytes);
+    if (!out->surface_lock_alloc) {
+        std_pHS->free(out);
+        return NULL;
+    }
     
     //if (fmt->format.g_bits == 6) // RGB565
     {

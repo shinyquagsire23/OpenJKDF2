@@ -243,6 +243,11 @@
 #define SITH_MIXER_NUMPLAYINGSOUNDS (32)
 #endif
 
+// Deferred loading and LRU unloading
+#if defined(QOL_IMPROVEMENTS)
+#define RDMATERIAL_LRU_LOAD_UNLOAD
+#endif
+
 #ifdef QOL_IMPROVEMENTS
 #define JKDEV_NUM_CHEATS (64)
 #else

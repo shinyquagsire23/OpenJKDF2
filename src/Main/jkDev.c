@@ -127,6 +127,10 @@ int jkDev_Open()
     if ( jkDev_bOpened )
         return 0;
 
+    // Added: Prevent crashes
+    if ( Main_bNoHUD )
+        return 1;
+
     v1 = jkHud_pMsgFontSft->bitmap->mipSurfaces;
     jkDev_log_55A4A4 = 0;
     jkDev_BMFontHeight = (*v1)->format.height;
@@ -182,6 +186,10 @@ void jkDev_DrawLog()
     int v14; // eax
     rdRect a4; // [esp+10h] [ebp-10h] BYREF
 
+    // Added: Prevent crashes
+    if ( Main_bNoHUD )
+        return;
+
     jkDev_UpdateEntries();
     v0 = jkDev_vbuf;
     jkDev_DrawEntries();
@@ -229,6 +237,10 @@ void jkDev_BlitLogToScreen()
     int v5; // ecx
     int v6; // eax
     rdRect v7; // [esp+0h] [ebp-10h] BYREF
+
+    // Added: Prevent crashes
+    if ( Main_bNoHUD )
+        return;
 
 #ifdef SDL2_RENDER
     jkDev_BlitLogToScreenGPU();
@@ -280,6 +292,10 @@ void jkDev_BlitLogToScreenGPU()
     int v5; // ecx
     int v6; // eax
     rdRect v7; // [esp+0h] [ebp-10h] BYREF
+
+    // Added: Prevent crashes
+    if ( Main_bNoHUD )
+        return;
 
     if (!jkDev_vbuf) return;
 
@@ -1083,6 +1099,10 @@ void jkDev_DrawEntries()
     signed int v1; // edi
     jkDevLogEnt* v3; // esi
     rdRect a4; // [esp+8h] [ebp-10h] BYREF
+
+#ifdef TARGET_TWL
+    return;
+#endif
 
     // Added: GPU rendered text
 #ifdef SDL2_RENDER

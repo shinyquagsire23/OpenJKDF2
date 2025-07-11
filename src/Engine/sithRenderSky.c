@@ -50,7 +50,7 @@ void sithRenderSky_TransformHorizontal(rdProcEntry *pProcEntry, sithSurfaceInfo 
 
     while ( num_vertices )
     {
-        pVertXYZ->z = rdCamera_pCurCamera->pClipFrustum->field_0.z; // zFar
+        pVertXYZ->z = rdCamera_pCurCamera->pClipFrustum->zFar; // zFar
 #ifdef TARGET_TWL
         pVertXYZ->z = 2.0f; // TODO figure out actual zfar or do this hack somewhere else
 #endif
@@ -106,7 +106,7 @@ void sithRenderSky_TransformVertical(rdProcEntry *pProcEntry, sithSurfaceInfo *p
         // TODO: There's a bug where facing a vertical wall of sky starts dividing strangely
 #ifdef QOL_IMPROVEMENTS
         // Added: Clip Z to zfar
-        pProcEntry->vertices[i].z = stdMath_Clamp(pProcEntry->vertices[i].z, 0.0f, rdCamera_pCurCamera->pClipFrustum->field_0.z);
+        pProcEntry->vertices[i].z = stdMath_Clamp(pProcEntry->vertices[i].z, 0.0f, rdCamera_pCurCamera->pClipFrustum->zFar);
 #endif
 #ifdef TARGET_TWL
         pProcEntry->vertices[i].z = 2.0f; // TODO figure out actual zfar or do this hack somewhere else

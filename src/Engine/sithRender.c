@@ -322,6 +322,7 @@ void sithRender_Draw()
 
     sithPlayer_SetScreenTint(sithCamera_currentCamera->sector->tint.x, sithCamera_currentCamera->sector->tint.y, sithCamera_currentCamera->sector->tint.z);
 
+    // TODO: Verify this is expensive
 #ifndef TARGET_TWL
     if ( (sithCamera_currentCamera->sector->flags & 2) != 0 )
     {
@@ -608,8 +609,9 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, flex_t a3)
                    + (sithCamera_currentCamera->vec3_1.z - v20->z) * adjoinSurface->surfaceInfo.face.normal.z
                    + (sithCamera_currentCamera->vec3_1.x - v20->x) * adjoinSurface->surfaceInfo.face.normal.x;
 
+        // Avoid rendering adjoins if they're far enough away
 #ifdef TARGET_TWL
-        if (dist > 1.5) {
+        if (dist > 2.5) {
             continue;
         }
 #endif
@@ -807,6 +809,10 @@ void sithRender_RenderLevelGeometry()
     flex_t tmpBlue[3];
     flex_t tmpGreen[3];
 
+#ifdef TARGET_TWL
+    int skip_this_surface = 1;
+#endif
+
     if ( rdroid_curAcceleration )
     {
         rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
@@ -899,6 +905,7 @@ void sithRender_RenderLevelGeometry()
                 v65->field_4 = sithRender_lastRenderTick;
             }
 
+            // Render sky vertices specifically?
             if ( (sithRender_flag & 8) == 0 || v65->surfaceInfo.face.numVertices <= 3 || (v65->surfaceFlags & (SITH_SURFACE_CEILING_SKY|SITH_SURFACE_HORIZON_SKY)) != 0 || !v65->surfaceInfo.face.lightingMode )
             {
                 procEntry = rdCache_GetProcEntry();
@@ -991,6 +998,7 @@ void sithRender_RenderLevelGeometry()
                     continue;
                 }
                 rdCamera_pCurCamera->fnProjectLst(procEntry->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
+
                 if ( sithRender_lightingIRMode )
                 {
                     v49 = sithRender_f_83198C;
@@ -1203,6 +1211,26 @@ void sithRender_RenderLevelGeometry()
                                    &(v65->surfaceInfo).face.clipIdk);
                     }
 
+                    // Avoid projecting vertices if they're far away enough, skipping sky
+                    // vertices because they're important for aesthetics
+#ifdef TARGET_TWL
+                    skip_this_surface = 1;
+                    surfaceFlags = v65->surfaceFlags;
+                    if (!(surfaceFlags & (SITH_SURFACE_HORIZON_SKY | SITH_SURFACE_CEILING_SKY)))
+                    {
+                        for (int i = 0; i < meshinfo_out.numVertices; i++) {
+                            //printf("%f\n", (float)v20->vertices[i].y);
+                            if (sithRender_aVerticesTmp[i].y < 2.2) {
+                                skip_this_surface = 0;
+                                break;
+                            }
+                        }
+                        if (skip_this_surface) {
+                            goto LABEL_92;
+                        }
+                    }
+#endif
+
                     v28 = meshinfo_out.numVertices;
                     if ( meshinfo_out.numVertices < 3u )
                         goto LABEL_92;
@@ -1396,8 +1424,10 @@ LABEL_150:
         ++sithRender_sectorsDrawn;
     }
 
+#ifndef TARGET_TWL
     // TWL: 5-27ms
     rdCache_Flush();
+#endif
     rdCamera_pCurCamera->pClipFrustum = v77;
 }
 
@@ -1661,6 +1691,7 @@ void sithRender_RenderThings()
                     curWorld = sithWorld_pCurrentWorld;
 
                     flex_t yval = thingIter->screenPos.y;
+
                     // MoTS added
                     if (sithCamera_currentCamera->zoomScale != 1.0) {
                         yval = sithCamera_currentCamera->invZoomScale * (thingIter->screenPos).y;
@@ -1670,9 +1701,6 @@ void sithRender_RenderThings()
                     {
                         model3 = thingIter->rdthing.model3;
 
-#ifdef TARGET_TWL
-                        //model3->geosetSelect = model3->numGeosets-1;
-#else
                         switch ( model3->numGeosets )
                         {
                             case 1:
@@ -1691,6 +1719,7 @@ void sithRender_RenderThings()
                                 if ( yval < (flex_d_t)sithWorld_pCurrentWorld->lodDistance.x )
                                 {
                                     model3->geosetSelect = 0;
+                                    
                                 }
                                 else if ( yval >= (flex_d_t)sithWorld_pCurrentWorld->lodDistance.y )
                                 {
@@ -1715,7 +1744,6 @@ void sithRender_RenderThings()
                                     model3->geosetSelect = 2;
                                 break;
                         }
-#endif
                     }
                     
                     texMode = thingIter->rdthing.desiredTexMode;
@@ -1788,7 +1816,11 @@ void sithRender_RenderThings()
             }
         }
     }
+
+    // DSi doesn't really have Z buffer options, so just batch everything
+#ifndef TARGET_TWL
     rdCache_Flush();
+#endif
 
     // MoTS added
     if (lastDrawn) 
@@ -1797,7 +1829,11 @@ void sithRender_RenderThings()
             ++sithRender_nongeoThingsDrawn;
         }
     }
+
+    // DSi doesn't really have Z buffer options, so just batch everything
+#ifndef TARGET_TWL
     rdCache_Flush();
+#endif
 
     if (sithRender_008d1668) {
         rdSetCullFlags(1);
@@ -1824,11 +1860,23 @@ int sithRender_RenderThing(sithThing *pThing)
 
     pThing->isVisible = bShowInvisibleThings;
     pThing->lookOrientation.scale = pThing->position;
+
+#ifdef TARGET_TWL
+    int skip_this_thing = 0;
+    if (pThing->screenPos.y > 2.0) {
+        skip_this_thing = 1;
+    }
+    if (!skip_this_thing) {
+#endif
+
     ret = rdThing_Draw(&pThing->rdthing, &pThing->lookOrientation);
     rdVector_Zero3(&pThing->lookOrientation.scale);
     if (sithRender_weaponRenderHandle && (pThing->thingflags & SITH_TF_RENDERWEAPON)) {
         sithRender_weaponRenderHandle(pThing);
     }
+#ifdef TARGET_TWL
+    }
+#endif
 
     if (pThing->type == SITH_THING_EXPLOSION && (pThing->explosionParams.typeflags & SITHEXPLOSION_FLAG_FLASH_BLINDS_THINGS))
     {
@@ -2028,7 +2076,11 @@ void sithRender_RenderAlphaSurfaces()
         rdSetProcFaceUserData(surfaceSector->id);
         rdCache_AddProcFace(0, meshinfo_out.numVertices, v23);
     }
+
+    // DSi doesn't really have Z buffer options, so just batch everything
+#ifndef TARGET_TWL
     rdCache_Flush();
+#endif
 #ifdef SDL2_RENDER
     rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
 #endif

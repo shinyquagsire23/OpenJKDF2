@@ -168,7 +168,7 @@ int rdCache_SendFaceListToHardware()
     flex_d_t v3; // st6
     flex_d_t v4; // st5
     rdClipFrustum *v7; // edx
-    flex_d_t v8; // st7
+    flex_d_t invZFar; // st7
     int mipmap_level; // edi
     rdProcEntry *active_6c; // esi
     v11_struct v11; // edx
@@ -252,7 +252,6 @@ int rdCache_SendFaceListToHardware()
     int vertex_a; // [esp+4Ch] [ebp-54h]
     int alpha_upshifta; // [esp+4Ch] [ebp-54h]
     int alpha_is_opaque; // [esp+50h] [ebp-50h]
-    flex_t v134; // [esp+54h] [ebp-4Ch]
     int tri_vert_idx; // [esp+58h] [ebp-48h]
     int flags_idk; // [esp+60h] [ebp-40h]
     rdTexinfo *v137; // [esp+64h] [ebp-3Ch]
@@ -321,9 +320,8 @@ int rdCache_SendFaceListToHardware()
     std3D_ResetRenderList();
     rdCache_ResetRenderList();
     v7 = rdCamera_pCurCamera->pClipFrustum;
-    v8 = 1.0 / v7->field_0.z;
+    invZFar = 1.0 / v7->zFar;
     rend_6c_current_idx = 0;
-    v134 = v8;
     
     for (rend_6c_current_idx = 0; rend_6c_current_idx < rdCache_numProcFaces; rend_6c_current_idx++)
     {        
@@ -388,6 +386,9 @@ int rdCache_SendFaceListToHardware()
         {
             continue;
         }
+
+        // Added
+        rdMaterial_EnsureData(v11.material);
 
         v14 = active_6c->wallCel;
         if ( v14 == -1 )
@@ -635,17 +636,32 @@ int rdCache_SendFaceListToHardware()
                 rdCache_aHWVertices[rdCache_totalVerts].x = (iterating_6c_vtxs[vtx_idx].x); // Added: The original game rounded to ints here (with ceilf?)
                 iterating_6c_vtxs_ = active_6c->vertices;
                 rdCache_aHWVertices[rdCache_totalVerts].y = (active_6c->vertices[vtx_idx].y); // Added: The original game rounded to ints here (with ceilf?)
+
+                // DSi prefers z vertices directly
+#ifdef TARGET_TWL
+                v36 = iterating_6c_vtxs_[vtx_idx].z;
+                iterating_6c_vtxs = iterating_6c_vtxs_;
+                d3dvtx_zval = iterating_6c_vtxs_[vtx_idx].z;
+                v38 = (flex_t)1.0 - d3dvtx_zval;
+#else
                 v36 = iterating_6c_vtxs_[vtx_idx].z;
                 iterating_6c_vtxs = iterating_6c_vtxs_;
                 if ( v36 == 0.0 )
                     d3dvtx_zval = 0.0;
                 else
                     d3dvtx_zval = 1.0 / iterating_6c_vtxs_[vtx_idx].z;
-                v38 = d3dvtx_zval * v134;
+                v38 = d3dvtx_zval * invZFar;
+#endif
                 if ( rdCache_dword_865258 != 16 )
                     v38 = 1.0 - v38;
                 rdCache_aHWVertices[rdCache_totalVerts].z = v38;
+
+                // Don't waste time with this on DSi
+#ifdef TARGET_TWL
+                rdCache_aHWVertices[rdCache_totalVerts].nx = 0.0;
+#else
                 rdCache_aHWVertices[rdCache_totalVerts].nx = d3dvtx_zval / 32.0;
+#endif
                 rdCache_aHWVertices[rdCache_totalVerts].nz = 0.0;
                 if ( lighting_capability == 0 )
                 {
@@ -940,16 +956,27 @@ LABEL_232:
             rdCache_aHWVertices[rdCache_totalVerts].y = (active_6c->vertices[tmpiter].y);  // Added: The original game rounded to ints here (with ceilf?)
             v87 = active_6c->vertices[tmpiter].z;
 
+            // DSi prefers z vertices directly
+#ifdef TARGET_TWL
+            v88 = 1.0 - active_6c->vertices[tmpiter].z;
+            v89 = v88;
+#else
             if ( v87 == 0.0 )
                 v88 = 0.0;
             else
                 v88 = 1.0 / active_6c->vertices[tmpiter].z;
-            v89 = v88 * v134;
+            v89 = v88 * invZFar;
+#endif
             if ( rdCache_dword_865258 != 16 )
                 v89 = 1.0 - v89;
             rdCache_aHWVertices[rdCache_totalVerts].z = v89;
 
+            // Don't waste time with this on DSi
+#ifdef TARGET_TWL
+            rdCache_aHWVertices[rdCache_totalVerts].nx = 0.0;
+#else
             rdCache_aHWVertices[rdCache_totalVerts].nx = v88 / 32.0;
+#endif
             rdCache_aHWVertices[rdCache_totalVerts].nz = 0.0;
             if ( lighting_capability == 0 )
             {

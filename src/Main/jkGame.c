@@ -141,14 +141,14 @@ int jkGame_Update()
     // HACK HACK HACK: Adjust zNear depending on if we're using the scope/camera views
 #if defined(SDL2_RENDER) || defined(TARGET_TWL)
     if (sithCamera_cameras[0].rdCam.pClipFrustum) {
-        sithCamera_cameras[0].rdCam.pClipFrustum->field_0.y = SITHCAMERA_ZNEAR_FIRSTPERSON;
+        sithCamera_cameras[0].rdCam.pClipFrustum->zNear = SITHCAMERA_ZNEAR_FIRSTPERSON;
 
         if (Main_bMotsCompat) {
             if (playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_SCOPEHUD) {
-                sithCamera_cameras[0].rdCam.pClipFrustum->field_0.y = SITHCAMERA_ZNEAR;
+                sithCamera_cameras[0].rdCam.pClipFrustum->zNear = SITHCAMERA_ZNEAR;
             }
             if ((playerThings[playerThingIdx].actorThing->actorParams.typeflags & SITH_AF_80000000) != 0) {
-                sithCamera_cameras[0].rdCam.pClipFrustum->field_0.y = SITHCAMERA_ZNEAR;
+                sithCamera_cameras[0].rdCam.pClipFrustum->zNear = SITHCAMERA_ZNEAR;
             }
         }
     }
@@ -335,7 +335,15 @@ int jkGame_Update()
     int jkGame_Delta_UpdateCamera_DrawPov = jkGame_Update_DrawPov - jkGame_Update_UpdateCamera;
     int jkGame_Delta_DrawPov_HudDrawn = jkGame_Update_HudDrawn - jkGame_Update_DrawPov;
     int jkGame_Delta_HudDrawn_End = jkGame_Update_End - jkGame_Update_HudDrawn;
-    //printf("deltas clr=%d %d wrld=%d pov=%d %d %d\n", jkGame_Delta_Start_ClearScreen, jkGame_Delta_ClearScreen_AdvanceFrame, jkGame_Delta_AdvanceFrame_UpdateCamera, jkGame_Delta_UpdateCamera_DrawPov, jkGame_Delta_DrawPov_HudDrawn, jkGame_Delta_HudDrawn_End);
+    
+    static int last_time_ms = 0;
+    int now_ms = stdPlatform_GetTimeMsec();
+    int total_delta = now_ms - last_time_ms;
+    last_time_ms = now_ms;
+    extern int std3D_timeWastedWaitingAround;
+    stdPlatform_Printf("dlt all=%d clr=%d %d wrld=%d\n pov=%d hud=%d drw=%d wst=%d\n", total_delta-std3D_timeWastedWaitingAround, jkGame_Delta_Start_ClearScreen, jkGame_Delta_ClearScreen_AdvanceFrame, jkGame_Delta_AdvanceFrame_UpdateCamera, jkGame_Delta_UpdateCamera_DrawPov, jkGame_Delta_DrawPov_HudDrawn, jkGame_Delta_HudDrawn_End, std3D_timeWastedWaitingAround);
+    //world=28 drw=15 emu
+    //world=48 drw=33 dsi, 33 down to 25 with jank phys?
 #endif
 
     return result;

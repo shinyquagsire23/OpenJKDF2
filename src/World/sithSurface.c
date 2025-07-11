@@ -220,6 +220,7 @@ int sithSurface_Load(sithWorld *world)
 #ifdef TARGET_TWL
             if (face->material) {
                 rdMaterial* mat = face->material;
+                rdMaterial_EnsureData(mat);
                 rdTexture* texture = &mat->textures[0];
                 stdVBuffer* lowestMipBuf = NULL;
                 for (int mip = 0; mip < texture->num_mipmaps; mip++) {

@@ -36,10 +36,10 @@ macro(plat_initialize)
 
     set(TARGET_TWL TRUE)
 
-    add_link_options(-mthumb -mthumb-interwork -fno-exceptions -fshort-wchar -L${LIBNDS}/lib -L${DEVKITARM}/arm-none-eabi/lib/ -Wl,--gc-sections)
-    add_compile_options(-mthumb -mthumb-interwork -fno-exceptions -march=armv5te -mtune=arm946e-s -fomit-frame-pointer -ffast-math -Wl,--gc-sections)
+    add_link_options(-mthumb -mthumb-interwork -fno-exceptions -fshort-wchar -L${LIBNDS}/lib -L${DEVKITARM}/arm-none-eabi/lib/ -Wl,--gc-sections -ffunction-sections)
+    add_compile_options(-mthumb -mthumb-interwork -fno-exceptions -march=armv5te -mtune=arm946e-s -fomit-frame-pointer -ffast-math -Wl,--gc-sections -ffunction-sections)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
-    add_compile_options(-Os -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces)
+    add_compile_options(-O3 -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces)
     include_directories(${LIBNDS}/include)
 endmacro()
 

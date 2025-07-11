@@ -816,6 +816,7 @@ void jkPlayer_SetPovModel(jkPlayerInfo *info, rdModel3 *model)
     }
 }
 
+int jkPlayer_checkPov = 0;
 void jkPlayer_DrawPov()
 {
     rdVector3 trans;
@@ -901,8 +902,9 @@ void jkPlayer_DrawPov()
 
         // Shift gun up slightly
 #ifdef TARGET_TWL
-        //trans.y -= 0.037;
-        trans.z -= 0.013; //45deg fov
+        //trans.y -= 0.037; //znear 16
+        //trans.z += 0.013; //znear 16
+
         //trans.x += 0.009; //30deg fov
         //trans.z -= 0.017; //30deg fov
 #endif
@@ -920,8 +922,16 @@ void jkPlayer_DrawPov()
         }
 #endif
         
+        //printf("pov in\n");
+        //jkPlayer_checkPov = 1;
         rdThing_Draw(&playerThings[playerThingIdx].povModel, &viewMat);
+        //jkPlayer_checkPov = 0;
+        //printf("pov done\n");
+
+        // DSi doesn't really have Z buffer stuff so just batch everything
+#ifndef TARGET_TWL
         rdCache_Flush();
+#endif
 
         // Added: we want the polyline to render in draw order so the spheres don't clip, 
         // but we want the POV model to be aware of the depths still.
@@ -931,7 +941,11 @@ void jkPlayer_DrawPov()
             rdSetZBufferMethod(RD_ZBUFFER_READ_NOWRITE);
             jkSaber_Draw(&viewMat);
         }
+
+
+#ifndef TARGET_TWL
         rdCache_Flush(); // Added: force polyline to be underneath model
+#endif
         rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
 #endif
     }

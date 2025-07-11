@@ -41,35 +41,43 @@ static TWLVERTEX GL_tmpVertices[STD3D_MAX_VERTICES] = {0};
 static size_t GL_tmpVerticesAmt = 0;
 static size_t rendered_tris = 0;
 
-static flex_t res_fix_x = (1.0/640.0);
-static flex_t res_fix_y = (1.0/480.0);
+static flex_t res_fix_x = (1.0/(640.0-(2.5*256.0/640.0)));
+static flex_t res_fix_y = (1.0/(480.0-(2.5*192.0/480.0)));
 
 static float test_idk = 32.0;
 int std3D_bHasInitted = 0;
 int std3D_bPurgeTexturesOnEnd = 0;
 uint16_t std3D_fogDepth = 0x6000;
 uint8_t std3D_fogColorIdx = 0;
+int std3D_bTwlFlipTextures = 0;
+int std3D_bNeedsToPurgeMenuBuffers = 0;
+int std3D_timeWastedWaitingAround = 0;
+
+u8* i8Bitmap = NULL;
+u8* i8Bitmap2 = NULL;
+u8* i8Bitmap_flip = NULL;
+u8* i8Bitmap2_flip = NULL;
 
 //verticies for the cube
 v16 CubeVectors[] = {
     floattov16(0.0), floattov16(0.0), floattov16(0.5), 
-    floattov16(2.56),  floattov16(0.0), floattov16(0.5),
-    floattov16(2.56),  floattov16(0.0), floattov16(-0.5),
+    floattov16(2.56-0.005),  floattov16(0.0), floattov16(0.5),
+    floattov16(2.56-0.005),  floattov16(0.0), floattov16(-0.5),
     floattov16(0.0), floattov16(0.0), floattov16(-0.5),
 
     floattov16(0.0), floattov16(1.28),  floattov16(0.5), 
-    floattov16(2.56),  floattov16(1.28),  floattov16(0.5),
-    floattov16(2.56),  floattov16(1.28),  floattov16(-0.5),
+    floattov16(2.56-0.005),  floattov16(1.28),  floattov16(0.5),
+    floattov16(2.56-0.005),  floattov16(1.28),  floattov16(-0.5),
     floattov16(0.0), floattov16(1.28),  floattov16(-0.5),
 
     floattov16(0.0), floattov16(1.28), floattov16(0.5), 
-    floattov16(2.56),  floattov16(1.28), floattov16(0.5),
-    floattov16(2.56),  floattov16(1.28), floattov16(-0.5),
+    floattov16(2.56-0.005),  floattov16(1.28), floattov16(0.5),
+    floattov16(2.56-0.005),  floattov16(1.28), floattov16(-0.5),
     floattov16(0.0), floattov16(1.28), floattov16(-0.5),
 
-    floattov16(0.0), floattov16(1.92),  floattov16(0.5), 
-    floattov16(2.56),  floattov16(1.92),  floattov16(0.5),
-    floattov16(2.56),  floattov16(1.92),  floattov16(-0.5),
+    floattov16(0.0), floattov16(1.92-0.005),  floattov16(0.5), 
+    floattov16(2.56-0.005),  floattov16(1.92-0.005),  floattov16(0.5),
+    floattov16(2.56-0.005),  floattov16(1.92-0.005),  floattov16(-0.5),
     floattov16(0.0), floattov16(1.92),  floattov16(-0.5)
 };
 
@@ -169,17 +177,8 @@ int std3D_LoadResources() {
     if (std3D_bHasInitted) {
         return 1;
     }
-    glGenTextures(2, &textureIDS[0]);
+    glGenTextures(4, &textureIDS[0]);
     //glGenTextures(1, &paletteIDS[0]);
-
-    u8* i8Bitmap = (u8*)malloc(16*16);
-    for (int i = 0; i < 256; i++)
-    {
-        i8Bitmap[i] = i;
-    }
-    //glBindTexture(0, textureIDS[2]);
-    //glTexImage2D(0, 0, GL_RGB256, TEXTURE_SIZE_16, TEXTURE_SIZE_16, 0, TEXGEN_TEXCOORD, (u8*)i8Bitmap);
-    free(i8Bitmap);
 
     update_from_display_palette();
     
@@ -237,6 +236,16 @@ int std3D_Startup()
 }
 void std3D_Shutdown() {
     stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
+
+    free(i8Bitmap);
+    i8Bitmap = NULL;
+    free(i8Bitmap2);
+    i8Bitmap2 = NULL;
+
+    free(i8Bitmap_flip);
+    i8Bitmap_flip = NULL;
+    free(i8Bitmap2_flip);
+    i8Bitmap2_flip = NULL;
 }
 
 /*
@@ -302,8 +311,28 @@ void wOverride(float w) {
     wOverridef32(floattof32(w));
 }
 
+int std3D_finishingFrameIdx = 0;
+
+// We want to defer waiting for vblank for as long as possible,
+// so that we spend 100% of our CPU time instead of having 0-16ms busy waits
+void std3D_ActuallyNeedToWaitForGeometryToFinish() {
+    if (std3D_finishingFrameIdx <= std3D_frameCount) {
+        int before_ms = stdPlatform_GetTimeMsec();
+        while (GFX_STATUS & (1<<27)) {
+            ;
+        }
+        std3D_timeWastedWaitingAround = stdPlatform_GetTimeMsec() - before_ms;
+        std3D_finishingFrameIdx = std3D_frameCount;
+    }
+}
+
 int std3D_StartScene()
 {
+    // At this point, everything in the game has updated, so now we wait for vsync
+    //std3D_ActuallyNeedToWaitForGeometryToFinish();
+
+    ++std3D_frameCount;
+
     if (!std3D_bHasInitted) {
         std3D_LoadResources();
     }
@@ -311,57 +340,36 @@ int std3D_StartScene()
 
     //glFlush(GL_WBUFFERING); // GL_WBUFFERING
 
-    glMatrixMode(GL_MODELVIEW);
-    //glPushMatrix();
-
-    glLoadIdentity();
-
     if (jkGame_isDDraw) {
+        if (std3D_bNeedsToPurgeMenuBuffers) {
+            std3D_ActuallyNeedToWaitForGeometryToFinish();
+            std3D_PurgeEntireTextureCache();
+            std3D_bNeedsToPurgeMenuBuffers = 0;
+
+            glMatrixMode(GL_PROJECTION);
+            std3DTwl_LoadProjection();
+
+            glMatrixMode(GL_MODELVIEW);
+            wOverride(0);
+
+            std3D_fogDepth = 5;
         
-
-        test_idk += 0.001;
-        glMatrixMode(GL_PROJECTION);
-        //glPushMatrix();
-        //glLoadIdentity();
-        //gluPerspective(70, 256.0 / 192.0, 0.1, 40);
-        //glOrtho(0.0, 2.56, 0.0, 1.92, 0.001, 1.0);
-        std3DTwl_LoadProjection();
-        //glFrustum(0.0, 2.56, 0.0, 1.92, 2.0, 0.0);
-        //printf("%f\n",(256.0/192.0)+test_idk);
-
-        glMatrixMode(GL_MODELVIEW);
-        wOverride(0);
-
-#if 0
-        int clip_current[16];
-        float clip_current_f[16];
-        glGetFixed(GL_GET_MATRIX_PROJECTION, clip_current);
-        for (int i = 0; i < 16; i++) {
-            clip_current_f[i] = f32tofloat(clip_current[i]);
+            // TODO: Make this dynamic based on the furthest Z?
+            glFogShift(11);
+            glFogOffset(std3D_fogDepth & 0x7FFF);
+            rdColor24 skyColor = sithWorld_pCurrentWorld->colormaps->colors[sithSurface_skyColorGuess];
+            glFogColor(skyColor.r >> 3, skyColor.g >> 3, skyColor.b >> 3, 31);
+            glClearColor(skyColor.r >> 3, skyColor.g >> 3, skyColor.b >> 3, 31);
+            for (int i = 0; i < 32; i++) {
+                glFogDensity(i, stdMath_ClampInt((i-6)*6, 0, 127));
+            }
+            glFogDensity(31,127);
         }
-        printf("%f %f %f %f\n", clip_current_f[0], clip_current_f[0+1], clip_current_f[0+2], clip_current_f[0+3]);
-        printf("%f %f %f %f\n", clip_current_f[4], clip_current_f[4+1], clip_current_f[4+2], clip_current_f[4+3]);
-        printf("%f %f %f %f\n", clip_current_f[8], clip_current_f[8+1], clip_current_f[8+2], clip_current_f[8+3]);
-        printf("%f %f %f %f\n", clip_current_f[12], clip_current_f[12+1], clip_current_f[12+2], clip_current_f[12+3]);
-#endif
-
-        //std3D_fogDepth -= 4;
-        std3D_fogDepth = 5;
-        
-        // TODO: Make this dynamic based on the furthest Z?
-        glFogShift(11);
-        glFogOffset(std3D_fogDepth & 0x7FFF);
-        rdColor24 skyColor = sithWorld_pCurrentWorld->colormaps->colors[sithSurface_skyColorGuess];
-        glFogColor(skyColor.r >> 3, skyColor.g >> 3, skyColor.b >> 3, 31);
-        glClearColor(skyColor.r >> 3, skyColor.g >> 3, skyColor.b >> 3, 31);
-        for (int i = 0; i < 32; i++) {
-            glFogDensity(i, stdMath_ClampInt((i-6)*6, 0, 127));
-        }
-        glFogDensity(31,127);
-
     }
     else {
         //glFogOffset(0x6000);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
         std3D_fogDepth = 0x6000;
     }
     
@@ -370,19 +378,50 @@ int std3D_StartScene()
 }
 int std3D_EndScene()
 {
-    glMatrixMode(GL_MODELVIEW);
+    //glMatrixMode(GL_MODELVIEW);
     //glPopMatrix(1);
 
     if (jkGame_isDDraw) {
-        glMatrixMode(GL_PROJECTION);
+        //glMatrixMode(GL_PROJECTION);
         //glPopMatrix(1);
     }
-    //printf("EndScene\n");
 
+#if 0
+    static int last_ms = 0;
+    int cur_ms = stdPlatform_GetTimeMsec();
+    printf("EndScene %d\n", cur_ms - last_ms);
+    last_ms = cur_ms;
+#endif
+
+    //int before_ms = stdPlatform_GetTimeMsec();
+    glFlush(GL_WBUFFERING | GL_TRANS_MANUALSORT); // This doesn't force the CPU to wait for blank, but bit 27 in GFX_STATUS will clear after vblank
+    std3D_finishingFrameIdx = std3D_frameCount;
+    //swiWaitForVBlank();
+    //std3D_timeWastedWaitingAround = stdPlatform_GetTimeMsec() - before_ms;
+
+#if 0
+    cur_ms = stdPlatform_GetTimeMsec();
+    printf("EndScene2 %d\n", cur_ms - last_ms);
+    last_ms = cur_ms;
     glFlush(GL_WBUFFERING | GL_TRANS_MANUALSORT); // GL_WBUFFERING
+    //swiWaitForVBlank();
+    while (GFX_STATUS & (1<<27)) {
+        ;
+    }
+
+    cur_ms = stdPlatform_GetTimeMsec();
+    printf("EndScene3 %d\n\n\n\n\n\n", cur_ms - last_ms);
+    last_ms = cur_ms;
+    glFlush(GL_WBUFFERING | GL_TRANS_MANUALSORT); // GL_WBUFFERING
+    //swiWaitForVBlank();
+    while (GFX_STATUS & (1<<27)) {
+        ;
+    }
+#endif
 
     if (std3D_bPurgeTexturesOnEnd) {
-        std3D_PurgeTextureCache();
+        std3D_ActuallyNeedToWaitForGeometryToFinish();
+        std3D_PurgeEntireTextureCache();
         std3D_bPurgeTexturesOnEnd = 0;
     }
 
@@ -414,13 +453,15 @@ void std3D_DrawRenderList()
     TWLVERTEX* vertexes = GL_tmpVertices;
     rdTri* tris = GL_tmpTris;
 
+    std3D_ActuallyNeedToWaitForGeometryToFinish();
+
     update_from_world_palette();
 
     glBindTexture(0, textureIDS[nTexture]);
     glColorTableEXT( 0, 0, 256, 0, 0, (u16*)i8PalWorld );
 
     glColor3b(255,255,255);
-    //glBindTexture(0, textureIDS[2]);
+    //glBindTexture(0, textureIDS[4]);
 
     //glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
     int polyid = 0;
@@ -434,14 +475,19 @@ void std3D_DrawRenderList()
     {
         
         rdDDrawSurface* tex = tris[j].texture;
-        int tex_id = textureIDS[2];
+        int tex_id = -1;
         int tex_w = tex->width;
         int tex_h = tex->height;
-        uint32_t flags = (tris[j].flags & 0x20000);
+        uint32_t flags = tris[j].flags;
         if (tex) {
             tex_id = tex->texture_id;
         }
-        glBindTexture(0, tex_id);
+        if (tex_id != -1) {
+            glBindTexture(0, tex_id);
+        }
+        else {
+            glBindTexture(0, textureIDS[4]);
+        }
         //glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S | GL_TEXTURE_WRAP_T | TEXGEN_POSITION);
         //printf("tri %d %dx%d\n", tex_id, tex_w, tex_h);
 
@@ -457,15 +503,16 @@ void std3D_DrawRenderList()
         else {
             avg_alpha = 0x1F;
         }
-        if (avg_alpha != last_alpha || (flags & 0x20000) != (last_flags & 0x20000)) {
-            glPolyFmt(POLY_ALPHA(avg_alpha) | POLY_CULL_BACK | POLY_MODULATION | POLY_ID(polyid++) | ((flags & 0x20000) ? 0 : POLY_FOG) ) ;
+        if (avg_alpha != last_alpha || (flags & 0x20000) != (last_flags & 0x20000) || (flags & 0x10000) != (last_flags & 0x10000)) {
+            glEnd();
+            glPolyFmt(POLY_ALPHA(avg_alpha) | ((flags & 0x10000) ? POLY_CULL_NONE : POLY_CULL_BACK) | POLY_MODULATION | POLY_ID(polyid++) | ((flags & 0x20000) ? 0 : POLY_FOG) ) ;
             glBegin(GL_TRIANGLES);
         }
         last_alpha = avg_alpha;
         last_flags = flags;
 
         {
-            if (tex_id != textureIDS[2]) {
+            if (tex_id != -1) {
                 GFX_TEX_COORD = TEXTURE_PACK(inttot16((int)(v3->tu*tex_w)), inttot16((int)(v3->tv*tex_h)));    
             }
             
@@ -478,7 +525,7 @@ void std3D_DrawRenderList()
         }
         
         {
-            if (tex_id != textureIDS[2]) {
+            if (tex_id != -1) {
                 GFX_TEX_COORD = TEXTURE_PACK(inttot16((int)(v2->tu*tex_w)), inttot16((int)(v2->tv*tex_h)));
             }
             //glColor3b((int)(v2->tu*255.0), (int)(v2->tv*255.0), 255);
@@ -491,7 +538,7 @@ void std3D_DrawRenderList()
         }
         
         {
-            if (tex_id != textureIDS[2]) {
+            if (tex_id != -1) {
                 GFX_TEX_COORD = TEXTURE_PACK(inttot16((int)(v1->tu*tex_w)), inttot16((int)(v1->tv*tex_h)));
             }
             //glColor3b((int)(v1->tu*255.0), (int)(v1->tv*255.0), 255);
@@ -503,7 +550,7 @@ void std3D_DrawRenderList()
         
         
     }
-    //glEnd();
+    glEnd();
     //glFlush(0);
     
 
@@ -525,7 +572,7 @@ int std3D_DrawOverlay()
 }
 void std3D_UnloadAllTextures()
 {
-    std3D_PurgeTextureCache();
+    std3D_PurgeEntireTextureCache();
     std3D_loadedTexturesAmt = 0;
 }
 
@@ -543,8 +590,6 @@ void std3D_AddRenderListTris(rdTri *tris, unsigned int num_tris)
 }
 void std3D_AddRenderListLines(rdLine* lines, uint32_t num_lines) {}
 
-#define flextov16(n) ((v16)((int32_t)n.to_raw() >> (16-12)))
-
 //#define flextov16(n) (floattov16((float)n))
 
 int std3D_AddRenderListVertices(D3DVERTEX *vertices, int count)
@@ -559,7 +604,7 @@ int std3D_AddRenderListVertices(D3DVERTEX *vertices, int count)
         D3DVERTEX* v = &vertices[i];
         TWLVERTEX* t = &GL_tmpVertices[GL_tmpVerticesAmt+i];
 
-        flex_t twl_z = (flex_t)1.0/(((flex_t)1.0-v->z) * (flex_t)SITHCAMERA_ZFAR);//(float)v->z;
+        flex_t twl_z = v->z;//(float)v->z;
         flex_t twl_x = (v->x * res_fix_x) * twl_z;// * (256.0/128.0);
         flex_t twl_y = (v->y * res_fix_y) * twl_z;// * (256.0/128.0);
         
@@ -582,7 +627,70 @@ int std3D_AddRenderListVertices(D3DVERTEX *vertices, int count)
     
     return 1;
 }
-void std3D_UpdateFrameCount(rdDDrawSurface *surface) {}
+
+// From https://github.com/smlu/OpenJones3D/blob/main/Libs/std/Win95/std3D.c
+void std3D_UpdateFrameCount(rdDDrawSurface *pTexture) {
+    pTexture->frameNum = std3D_frameCount;
+    std3D_RemoveTextureFromCacheList(pTexture);
+    std3D_AddTextureToCacheList(pTexture);
+}
+
+// From https://github.com/smlu/OpenJones3D/blob/main/Libs/std/Win95/std3D.c
+void std3D_RemoveTextureFromCacheList(rdDDrawSurface *pCacheTexture) {
+    if ( pCacheTexture == std3D_pFirstTexCache )
+    {
+        std3D_pFirstTexCache = pCacheTexture->pNextCachedTexture;
+        if ( std3D_pFirstTexCache )
+        {
+            std3D_pFirstTexCache->pPrevCachedTexture = NULL;
+            if ( !std3D_pFirstTexCache->pNextCachedTexture ) {
+                std3D_pLastTexCache = std3D_pFirstTexCache;
+            }
+        }
+        else {
+            std3D_pLastTexCache = NULL;
+        }
+    }
+    else if ( pCacheTexture == std3D_pLastTexCache )
+    {
+        std3D_pLastTexCache = pCacheTexture->pPrevCachedTexture;
+        pCacheTexture->pPrevCachedTexture->pNextCachedTexture = NULL;
+    }
+    else
+    {
+        pCacheTexture->pPrevCachedTexture->pNextCachedTexture = pCacheTexture->pNextCachedTexture;
+        pCacheTexture->pNextCachedTexture->pPrevCachedTexture = pCacheTexture->pPrevCachedTexture;
+    }
+
+    pCacheTexture->pNextCachedTexture = NULL;
+    pCacheTexture->pPrevCachedTexture = NULL;
+    pCacheTexture->frameNum = 0;
+
+    --std3D_numCachedTextures;
+    //std3D_pCurDevice->availableMemory += pCacheTexture->textureSize;
+}
+
+// From https://github.com/smlu/OpenJones3D/blob/main/Libs/std/Win95/std3D.c
+void std3D_AddTextureToCacheList(rdDDrawSurface *pTexture) {
+    if ( std3D_pFirstTexCache )
+    {
+        std3D_pLastTexCache->pNextCachedTexture = pTexture;
+        pTexture->pPrevCachedTexture            = std3D_pLastTexCache;
+        pTexture->pNextCachedTexture            = NULL;
+        std3D_pLastTexCache                     = pTexture;
+    }
+    else
+    {
+        std3D_pLastTexCache          = pTexture;
+        std3D_pFirstTexCache         = pTexture;
+        pTexture->pPrevCachedTexture = NULL;
+        pTexture->pNextCachedTexture = NULL;
+    }
+
+    ++std3D_numCachedTextures;
+    //std3D_pCurDevice->availableMemory -= pTexture->textureSize;
+}
+
 int std3D_ClearZBuffer()
 {
     return 0;
@@ -617,6 +725,28 @@ int std3D_twl_dims_convert_to_e(int width) {
 
     return width_e;
 }
+
+int std3D_EstimateTWLSize(int width_e, int height_e, int type) {
+    int size = 1 << (width_e + height_e + 6);
+
+    switch (type) {
+        case GL_RGB:
+        case GL_RGBA:
+            size = size << 1;
+            break;
+        case GL_RGB4:
+        case GL_COMPRESSED:
+            size = size >> 2;
+            break;
+        case GL_RGB16:
+            size = size >> 1;
+            break;
+        default:
+            break;
+    }
+    return size;
+}
+
 int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_alpha_tex, int no_alpha)
 {
     //printf("Add to cache %p %p\n", vbuf, texture);
@@ -626,14 +756,24 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
 
     if (std3D_loadedTexturesAmt >= STD3D_MAX_TEXTURES) {
         stdPlatform_Printf("ERROR: Texture cache exhausted!! Ask ShinyQuagsire to increase the size.\n");
+        std3D_bPurgeTexturesOnEnd = 1;
+        return 1;
+    }
+
+    if (!vbuf->surface_lock_alloc) {
+        stdPlatform_Printf("VBuffer missing surface!\n");
         return 1;
     }
     
     int image_texture;
     int res = glGenTextures(1, &image_texture);
     if (!res) {
-        stdPlatform_Printf("Out of VRAM!\n");
-        return 0;
+        res = std3D_PurgeTextureCache(texture->textureSize);
+        if (!res) {
+            stdPlatform_Printf("Out of texture IDs!\n");
+            std3D_bPurgeTexturesOnEnd = 1;
+            return 1;
+        }
     }
     uint8_t* image_8bpp = (uint8_t*)vbuf->surface_lock_alloc;
     uint16_t* image_16bpp = (uint16_t*)vbuf->surface_lock_alloc;
@@ -657,10 +797,14 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
 
     int width_e = std3D_twl_dims_convert_to_e(width);
     int height_e = std3D_twl_dims_convert_to_e(height);
+    int32_t textureSize = 0;
     res = 0;
 
     if (vbuf->format.format.is16bit)
     {
+        //textureSize = width * height * sizeof(uint16_t);
+        textureSize = std3D_EstimateTWLSize(width_e, height_e, GL_RGBA);
+        DC_FlushRange((u8*)image_8bpp, textureSize); // TODO remove if updating libnds
 #if 1
         texture->is_16bit = 1;
 #if 0
@@ -670,7 +814,13 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0,  GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, image_8bpp);
 #endif
         if (!is_alpha_tex) {
-            res = glTexImage2D(0, 0, GL_RGBA, width_e, height_e, 0, GL_TEXTURE_WRAP_S | GL_TEXTURE_WRAP_T | TEXGEN_TEXCOORD | GL_TEXTURE_COLOR0_TRANSPARENT, (u8*)image_16bpp);
+            res = glTexImage2D(0, 0, GL_RGBA, width_e, height_e, 0, GL_TEXTURE_WRAP_S | GL_TEXTURE_WRAP_T | TEXGEN_TEXCOORD, (u8*)image_16bpp);
+            if (!res) {
+                res = std3D_PurgeTextureCache(textureSize);
+                if (res) {
+                    res = glTexImage2D(0, 0, GL_RGBA, width_e, height_e, 0, GL_TEXTURE_WRAP_S | GL_TEXTURE_WRAP_T | TEXGEN_TEXCOORD, (u8*)image_16bpp);
+                }
+            }
         }
 
 #ifdef __NOTDEF_FORMAT_CONVERSION
@@ -776,9 +926,20 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
         texture->pDataDepthConverted = image_data;
 #endif
 
+        //textureSize = width * height * sizeof(uint8_t);
+
+        textureSize = std3D_EstimateTWLSize(width_e, height_e, GL_RGB256);
+        DC_FlushRange((u8*)image_8bpp, textureSize); // TODO remove if updating libnds
+
         texture->is_16bit = 0;
         //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB256, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, image_8bpp);
         res = glTexImage2D(0, 0, GL_RGB256, width_e, height_e, 0, GL_TEXTURE_WRAP_S | GL_TEXTURE_WRAP_T | TEXGEN_TEXCOORD | (is_alpha_tex ? GL_TEXTURE_COLOR0_TRANSPARENT : 0), (u8*)image_8bpp);
+        if (!res) {
+            res = std3D_PurgeTextureCache(textureSize);
+            if (res) {
+                res = glTexImage2D(0, 0, GL_RGB256, width_e, height_e, 0, GL_TEXTURE_WRAP_S | GL_TEXTURE_WRAP_T | TEXGEN_TEXCOORD | (is_alpha_tex ? GL_TEXTURE_COLOR0_TRANSPARENT : 0), (u8*)image_8bpp);
+            }
+        }
 
         //texture->pDataDepthConverted = NULL;
     }
@@ -788,15 +949,26 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
         glDeleteTextures(1, &image_texture);
 
         std3D_bPurgeTexturesOnEnd = 1;
+        glBindTexture(GL_TEXTURE_2D, textureIDS[4]);
         return 1; // Kinda hacky, don't alert rdCache
 
         // TODO: Free any unused textures instead of having a white texture for one frame
         //return std3D_AddToTextureCache(vbuf, texture, is_alpha_tex, no_alpha);
     }
 
-    
-    std3D_aLoadedSurfaces[std3D_loadedTexturesAmt] = texture;
-    std3D_aLoadedTextures[std3D_loadedTexturesAmt++] = image_texture;
+    int foundTextureSlot = -1;
+    for (int i = 0; i < std3D_loadedTexturesAmt; i++) {
+        if (!std3D_aLoadedSurfaces[i] && !std3D_aLoadedTextures[i]) {
+            foundTextureSlot = i;
+            std3D_aLoadedSurfaces[i] = texture;
+            std3D_aLoadedTextures[i] = image_texture;
+            break;
+        }
+    }
+    if (foundTextureSlot == -1) {
+        std3D_aLoadedSurfaces[std3D_loadedTexturesAmt] = texture;
+        std3D_aLoadedTextures[std3D_loadedTexturesAmt++] = image_texture;
+    }
     
     /*ext->surfacebuf = image_data;
     ext->surfacetex = image_texture;
@@ -806,6 +978,7 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
     //texture->emissive_texture_id = 0;
     //texture->displacement_texture_id = 0;
     texture->texture_loaded = 1;
+    texture->textureSize = textureSize;
 #if 0
     texture->emissive_factor[0] = 0.0;
     texture->emissive_factor[1] = 0.0;
@@ -820,7 +993,7 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
     texture->emissive_data = NULL;
 #endif
 
-    glBindTexture(GL_TEXTURE_2D, textureIDS[2]);
+    glBindTexture(GL_TEXTURE_2D, textureIDS[4]);
     
     return 1;
 }
@@ -831,25 +1004,6 @@ int fb_shift_y = 128;
 void std3D_DrawMenu()
 {
     if (jkGame_isDDraw) return;
-
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
-    glLoadIdentity();
-    //gluPerspective(70, 256.0 / 192.0, 0.1, 40);
-    glOrtho(0.0, 2.56, 0.0, 1.92, 0.1, 100);
-
-    //printf("std3D_DrawMenu\n");
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-
-    gluLookAt(  0.0, 0.0, fCamera,      //camera possition 
-        0.0, 0.0, 0.0,      //look at
-        0.0, 1.0, 0.0);     //up
-
-    update_from_display_palette();
-
-    u8* i8Bitmap = (u8*)malloc(256*64);
-    u8* i8Bitmap2 = (u8*)malloc(256*128);
 
     touchPosition touchXY;
     touchRead(&touchXY);
@@ -871,6 +1025,16 @@ void std3D_DrawMenu()
         }
     }
 
+    if (!i8Bitmap) {
+        i8Bitmap = (u8*)malloc(256*64);
+        i8Bitmap2 = (u8*)malloc(256*128);
+        i8Bitmap_flip = (u8*)malloc(256*64);
+        i8Bitmap2_flip = (u8*)malloc(256*128);
+    }
+
+    u8* whichBitmap = std3D_bTwlFlipTextures ? i8Bitmap : i8Bitmap_flip;
+    u8* whichBitmap2 = std3D_bTwlFlipTextures ? i8Bitmap2 : i8Bitmap2_flip;
+
     if (Video_menuBuffer.surface_lock_alloc)
     {
         uint32_t pitch = Video_menuBuffer.format.width_in_bytes;
@@ -878,7 +1042,7 @@ void std3D_DrawMenu()
         {
             for(int y = 0; y < 64; y++)
             {
-                i8Bitmap[(y*256)+x] = Video_menuBuffer.surface_lock_alloc[(pitch*(y+fb_shift_y))+(x+fb_shift_x)];
+                whichBitmap[(y*256)+x] = Video_menuBuffer.surface_lock_alloc[(pitch*(y+fb_shift_y))+(x+fb_shift_x)];
                 //Video_menuBuffer.surface_lock_alloc[(pitch*y)+x] = (y*128)+x;
             }
         }
@@ -887,19 +1051,40 @@ void std3D_DrawMenu()
         {
             for(int y = 0; y < 128; y++)
             {
-                i8Bitmap2[(y*256)+x] = Video_menuBuffer.surface_lock_alloc[(pitch*((y+fb_shift_y)+64))+(x+fb_shift_x)];
+                whichBitmap2[(y*256)+x] = Video_menuBuffer.surface_lock_alloc[(pitch*((y+fb_shift_y)+64))+(x+fb_shift_x)];
                 //Video_menuBuffer.surface_lock_alloc[(pitch*y)+x] = (y*128)+x;
             }
         }
     }
-    
-    glBindTexture(0, textureIDS[0]);
-    glTexImage2D(0, 0, GL_RGB256, TEXTURE_SIZE_256, TEXTURE_SIZE_64, 0, TEXGEN_TEXCOORD, (u8*)i8Bitmap);
 
-    glBindTexture(0, textureIDS[1]);
-    glTexImage2D(0, 0, GL_RGB256, TEXTURE_SIZE_256, TEXTURE_SIZE_128, 0, TEXGEN_TEXCOORD, (u8*)i8Bitmap2);
-    free(i8Bitmap);
-    free(i8Bitmap2);
+    DC_FlushRange((u8*)whichBitmap, 256*64);
+    DC_FlushRange((u8*)whichBitmap2, 256*128);
+
+    std3D_ActuallyNeedToWaitForGeometryToFinish();
+
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    //gluPerspective(70, 256.0 / 192.0, 0.1, 40);
+    glOrtho(0.0, 2.55, 0.0, 1.91, 0.1, 100);
+
+    //printf("std3D_DrawMenu\n");
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+
+    gluLookAt(  0.0, 0.0, fCamera,      //camera possition 
+        0.0, 0.0, 0.0,      //look at
+        0.0, 1.0, 0.0);     //up
+
+    update_from_display_palette();
+    
+    glBindTexture(0, textureIDS[std3D_bTwlFlipTextures ? 0 : 2]);
+    glTexImage2D(0, 0, GL_RGB256, TEXTURE_SIZE_256, TEXTURE_SIZE_64, 0, TEXGEN_TEXCOORD, (u8*)whichBitmap);
+
+    glBindTexture(0, textureIDS[std3D_bTwlFlipTextures ? 1 : 3]);
+    glTexImage2D(0, 0, GL_RGB256, TEXTURE_SIZE_256, TEXTURE_SIZE_128, 0, TEXGEN_TEXCOORD, (u8*)whichBitmap2);
+
+    std3D_bNeedsToPurgeMenuBuffers = 1;
     
 
     glBindTexture(0, textureIDS[nTexture]);
@@ -916,8 +1101,8 @@ void std3D_DrawMenu()
         {
             //glAssignColorTable(0,paletteIDS[0]);
 
-            glBindTexture(0, textureIDS[i]);
-            //glBindTexture(0, textureIDS[2]);
+            glBindTexture(0, textureIDS[i+(std3D_bTwlFlipTextures?0:2)]);
+            //glBindTexture(0, textureIDS[4]);
             glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK | POLY_MODULATION | POLY_ID(polyid) ) ;
             glBegin(GL_QUAD);
             drawQuad(i);
@@ -928,9 +1113,11 @@ void std3D_DrawMenu()
         
     }
 
+    std3D_bTwlFlipTextures = !std3D_bTwlFlipTextures;
+
 #if 0
     glColor3b(255,255,255);
-    glBindTexture(0, textureIDS[2]);
+    glBindTexture(0, textureIDS[4]);
     for (int j = 0; j < 1; j++)
     {
         //glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK | POLY_MODULATION | POLY_ID(j) ) ;
@@ -976,7 +1163,7 @@ void std3D_DrawMenu()
 }
 void std3D_DrawSceneFbo() {}
 void std3D_FreeResources() {
-    std3D_PurgeTextureCache();
+    std3D_PurgeEntireTextureCache();
 
     glResetTextures();
     
@@ -1047,8 +1234,9 @@ void std3D_PurgeSurfaceRefs(rdDDrawSurface *texture)
 }
 
 void std3D_PurgeTextureEntry(int i) {
-    stdPlatform_Printf("std3D_PurgeTextureEntry %d\n", i);
+    //stdPlatform_Printf("std3D_PurgeTextureEntry %d\n", i);
     if (std3D_aLoadedTextures[i]) {
+        std3D_ActuallyNeedToWaitForGeometryToFinish();
         glDeleteTextures(1, &std3D_aLoadedTextures[i]);
         std3D_aLoadedTextures[i] = 0;
     }
@@ -1100,6 +1288,7 @@ void std3D_PurgeTextureEntry(int i) {
     tex->texture_id = 0;
 
     std3D_aLoadedSurfaces[i] = NULL;
+    //std3D_loadedTexturesAmt--;
 }
 
 void std3D_PurgeUIEntry(int i, int idx) {
@@ -1122,7 +1311,42 @@ void std3D_PurgeUIEntry(int i, int idx) {
 #endif
 }
 
-void std3D_PurgeTextureCache()
+// From https://github.com/smlu/OpenJones3D/blob/main/Libs/std/Win95/std3D.c
+int std3D_PurgeTextureCache(size_t size)
+{
+    size_t purgedBytes = 0;
+    for ( rdDDrawSurface* pCacheTexture = std3D_pFirstTexCache; pCacheTexture && pCacheTexture->frameNum != std3D_frameCount; pCacheTexture = pCacheTexture->pNextCachedTexture )
+    {
+        if ( pCacheTexture->textureSize == size )
+        {
+            //IDirect3DTexture2_Release(pCacheTexture->pD3DCachedTex);
+            std3D_PurgeSurfaceRefs(pCacheTexture);
+            //pCacheTexture->pD3DCachedTex = NULL;
+            std3D_RemoveTextureFromCacheList(pCacheTexture);
+            return 1;
+        }
+    }
+
+    rdDDrawSurface* pNextCachedTexture = NULL;
+    for ( rdDDrawSurface* pCacheTexture = std3D_pFirstTexCache; pCacheTexture && purgedBytes < size; pCacheTexture = pNextCachedTexture )
+    {
+        pNextCachedTexture = pCacheTexture->pNextCachedTexture;
+        if ( pCacheTexture->frameNum != std3D_frameCount )
+        {
+            //if ( pCacheTexture->pD3DCachedTex ) { // Added: Added check for null pointer
+                //IDirect3DTexture2_Release(pCacheTexture->pD3DCachedTex);
+                std3D_PurgeSurfaceRefs(pCacheTexture);
+            //}
+            //pCacheTexture->pD3DCachedTex = NULL;
+            purgedBytes += pCacheTexture->textureSize;
+            std3D_RemoveTextureFromCacheList(pCacheTexture);
+        }
+    }
+
+    return purgedBytes != 0;
+}
+
+void std3D_PurgeEntireTextureCache()
 {
 #if 0
     if (Main_bHeadless) {
@@ -1135,6 +1359,8 @@ void std3D_PurgeTextureCache()
         //jk_printf("Skipping texture cache purge, nothing loaded.\n");
         return;
     }
+
+    std3D_ActuallyNeedToWaitForGeometryToFinish();
 
     stdPlatform_Printf("Purging texture cache... %x\n", std3D_loadedTexturesAmt);
     for (int i = 0; i < std3D_loadedTexturesAmt; i++)

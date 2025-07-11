@@ -153,13 +153,25 @@ int Window_ShowCursorUnwindowed(int a1)
     return stdControl_ShowCursor(a1);
 }
 
+int last_draw_ms = 0;
 int Window_MessageLoop()
 {
 #ifdef TARGET_TWL
     //printf("heap 0x%x 0x%x 0x%x\n", (intptr_t)getHeapLimit() - (intptr_t)getHeapEnd(), (intptr_t)getHeapEnd() - (intptr_t)getHeapStart(), (intptr_t)getHeapLimit());
 #endif
     //jkMain_GuiAdvance(); // TODO needed?
-    Window_msg_main_handler(g_hWnd, WM_PAINT, 0, 0);
+    jkGuiRend_UpdateController();
+
+    touchPosition touchXY;
+    touchRead(&touchXY);
+    if (touchXY.px != 0 || touchXY.py != 0) {
+        Window_msg_main_handler(g_hWnd, WM_PAINT, 0, 0);
+    }
+    //if (stdPlatform_GetTimeMsec() - last_draw_ms > 1000) {
+        //Window_msg_main_handler(g_hWnd, WM_PAINT, 0, 0);
+        //last_draw_ms = stdPlatform_GetTimeMsec();
+    //}
+    //Window_msg_main_handler(g_hWnd, WM_PAINT, 0, 0);
     return 0;
 }
 
@@ -480,7 +492,7 @@ void Window_SdlUpdate()
 
         //SDL_SetRelativeMouseMode(SDL_FALSE);
 
-        jkGuiRend_UpdateController();
+        //jkGuiRend_UpdateController();
 
         if (!jkGuiBuildMulti_bRendering) {
             std3D_StartScene();
@@ -497,9 +509,10 @@ void Window_SdlUpdate()
         }
 
         if (Window_needsRecreate) {
-            std3D_PurgeTextureCache();
+            std3D_PurgeEntireTextureCache();
             //Window_RecreateSDL2Window();
             Window_resized = 1;
+            Window_needsRecreate = 0;
         }
         
         // Keep menu FPS at 60FPS, to avoid cranking the GPU unnecessarily.

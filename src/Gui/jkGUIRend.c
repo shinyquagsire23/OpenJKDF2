@@ -788,7 +788,7 @@ void jkGuiRend_UpdateAndDrawClickable(jkGuiElement *clickable, jkGuiMenu *menu, 
             menu->lastMouseOverClickable = 0;
         drawFunc(clickable, menu, jkGuiRend_menuBuffer, forceRedraw);
         menu->lastMouseOverClickable = lastSave;
-#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
+#if !defined(SDL2_RENDER)
         if ( forceRedraw )
             jkGuiRend_FlipAndDraw(menu, drawRect);
 #endif
@@ -796,7 +796,7 @@ void jkGuiRend_UpdateAndDrawClickable(jkGuiElement *clickable, jkGuiMenu *menu, 
     else if ( forceRedraw )
     {
         jkGuiRend_CopyVBuffer(menu, drawRect);
-#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
+#if !defined(SDL2_RENDER)
         if ( forceRedraw )
             jkGuiRend_FlipAndDraw(menu, drawRect);
 #endif

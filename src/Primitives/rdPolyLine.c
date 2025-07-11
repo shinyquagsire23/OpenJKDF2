@@ -59,6 +59,7 @@ int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *materi
     polyline->edgeFace.material = rdMaterial_Load(material_side_fname, 0, 0);
     if ( !polyline->edgeFace.material )
         return 0;
+    rdMaterial_EnsureData(polyline->edgeFace.material); // Added: TWL
     polyline->edgeFace.numVertices = 4;
     vertexPosIdx = (int *)rdroid_pHS->alloc(sizeof(int) * polyline->edgeFace.numVertices);
     polyline->edgeFace.vertexPosIdx = vertexPosIdx;
@@ -100,6 +101,7 @@ int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *materi
     polyline->tipFace.material = rdMaterial_Load(material_tip_fname, 0, 0);
     if ( !polyline->tipFace.material )
         return 0;
+    rdMaterial_EnsureData(polyline->tipFace.material); // Added: TWL
     polyline->tipFace.numVertices = 4;
     vertexPosIdx = (int *)rdroid_pHS->alloc(sizeof(int) * polyline->tipFace.numVertices);
     polyline->tipFace.vertexPosIdx = vertexPosIdx;
@@ -119,6 +121,7 @@ int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *materi
         polyline->extraUVFaceMaybe = extraUVFaceMaybe;
         if ( !extraUVFaceMaybe )
             return 0;
+        // Odd quirk: This requires the material be actually loaded
         v22 = polyline->tipFace.material->texinfos[0]->texture_ptr->texture_struct[0];
         extraUVFaceMaybe[0].x = (flex_d_t)((unsigned int)v22->format.width) - 0.01;
         extraUVFaceMaybe[0].y = 0.0;

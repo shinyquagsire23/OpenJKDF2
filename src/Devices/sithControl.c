@@ -1268,7 +1268,12 @@ void sithControl_PlayerMovementMots(sithThing *player)
     iVar2 = sithControl_ReadFunctionMap(INPUT_FUNC_SLIDETOGGLE,&local_4);
     if (iVar2 == 0) {
         fVar4 = sithControl_GetAxis(INPUT_FUNC_TURN);
+#ifdef QOL_IMPROVEMENTS
+        // Scale appropriately to high framerates
+        fVar4 = fVar4 * 25.0;
+#else
         fVar4 = fVar4 * sithTime_TickHz;
+#endif
         if (1.0 <= move_multiplier) {
             local_8 = 1.0;
         }
@@ -1278,7 +1283,7 @@ void sithControl_PlayerMovementMots(sithThing *player)
         fVar3 = sithControl_ReadAxisStuff(INPUT_FUNC_TURN);
 #ifdef QOL_IMPROVEMENTS
         // Scale appropriately to high framerates
-        fVar3 *= (sithTime_TickHz / 50.0);
+        //fVar3 *= (sithTime_TickHz / 50.0);
 #endif
 
         fVar4 += fVar3 * thing->actorParams.maxRotThrust * local_8;

@@ -306,6 +306,9 @@ int Main_Startup(const char *cmdline)
     jkGuiSound_musicVolume = 1.0;
     stdPlatform_Printf("%s\n", Main_path);
     Main_ParseCmdLine((char *)cmdline);
+#ifdef TARGET_TWL
+    Main_bNoHUD = 1;
+#endif
 
     if ( Main_logLevel == 1 )
     {

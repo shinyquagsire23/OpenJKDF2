@@ -674,7 +674,7 @@ void std3D_Shutdown()
 
 void std3D_FreeResources()
 {
-    std3D_PurgeTextureCache();
+    std3D_PurgeEntireTextureCache();
 
     glDeleteProgram(programDefault);
     glDeleteProgram(programMenu);
@@ -733,6 +733,8 @@ void std3D_FreeResources()
 int std3D_StartScene()
 {
     if (Main_bHeadless) return 1;
+
+    ++std3D_frameCount;
 
     //printf("Begin draw\n");
     if (!has_initted)
@@ -3359,8 +3361,14 @@ int std3D_AddBitmapToTextureCache(stdBitmap *texture, int mipIdx, int is_alpha_t
     return 1;
 }
 
-void std3D_UpdateFrameCount(rdDDrawSurface *surface)
-{
+void std3D_UpdateFrameCount(rdDDrawSurface *pTexture) {
+    pTexture->frameNum = std3D_frameCount;
+    std3D_RemoveTextureFromCacheList(pTexture);
+    std3D_AddTextureToCacheList(pTexture);
+}
+void std3D_RemoveTextureFromCacheList(rdDDrawSurface *surface) {
+}
+void std3D_AddTextureToCacheList(rdDDrawSurface *surface) {
 }
 
 // Added helpers
@@ -3572,7 +3580,7 @@ void std3D_PurgeUIEntry(int i, int idx) {
     std3D_loadedUITexturesAmt--;
 }
 
-void std3D_PurgeTextureCache()
+void std3D_PurgeEntireTextureCache()
 {
     if (Main_bHeadless) {
         std3D_loadedTexturesAmt = 0;

@@ -43,7 +43,7 @@ sithTime_deltaMs 0x00836C08 int32_t
 sithTime_deltaSeconds 0x00836C0C flex_t
 sithTime_TickHz 0x00836C10 flex_t 
 sithTime_curMs 0x00836C14 uint32_t
-sithTime_curSeconds 0x00836C18 flex_t
+sithTime_curSeconds 0x00836C18 flex32_t
 sithTime_curMsAbsolute 0x00836C1C uint32_t
 sithTime_pauseTimeMs 0x00836C20 int32_t
 sithTime_bRunning 0x00836C24 int
@@ -327,11 +327,15 @@ d3d_device_ptr 0x0055C7DC d3d_device*
 std3D_rectViewIdk 0x00865320 rdRect
 std3D_aViewIdk 0x008652A0 flex_t[32]
 std3D_aViewTris 0x00865260 rdTri[2]
-std3D_gpuMaxTexSizeMaybe 0x0053D668 int = 1
-std3D_dword_53D66C 0x0053D66C int = 1
-std3D_dword_53D670 0x0053D670 int = 0x100
-std3D_dword_53D674 0x0053D674 int = 0x100
+std3D_gpuMaxTexSizeMaybe 0x0053D668 int32_t = 1
+std3D_dword_53D66C 0x0053D66C int32_t = 1
+std3D_dword_53D670 0x0053D670 int32_t = 0x100
+std3D_dword_53D674 0x0053D674 int32_t = 0x100
+std3D_frameCount 0c0053d678 int32_t = 1
 std3D_renderList 0x0055C7D0 intptr_t
+std3D_numCachedTextures 0x0055C7F4 int32_t
+std3D_pFirstTexCache 0x0055C7F8 rdDDrawSurface*
+std3D_pLastTexCache 0x0055C7Fc rdDDrawSurface* 
 
 stdComm_dword_8321F8 0x008321F8 int
 stdComm_bInitted 0x008321D8 int
@@ -698,14 +702,14 @@ sithWeapon_bMultiAutoPickup 0x008BD08C int
 sithWeapon_bMultiplayerAutoSwitch 0x008BD090 int
 sithWeapon_bMultiAutoReload 0x008BD094 int
 sithWeapon_bAutoAim 0x008BD098 int
-sithWeapon_mountWait 0x008BD09C flex_t
+sithWeapon_mountWait 0x008BD09C flex32_t
 sithWeapon_8BD0A0 0x008BD0A0 flex_t[2]
-sithWeapon_fireWait 0x008BD0A8 flex_t
-sithWeapon_fireRate 0x008BD0AC flex_t
-sithWeapon_LastFireTimeSecs 0x008BD0B0 flex_t
+sithWeapon_fireWait 0x008BD0A8 flex32_t
+sithWeapon_fireRate 0x008BD0AC flex32_t
+sithWeapon_LastFireTimeSecs 0x008BD0B0 flex32_t
 sithWeapon_a8BD030 0x008BD030 int[4]
 sithWeapon_8BD05C 0x008BD05C int
-sithWeapon_8BD060 0x008BD060 flex_t
+sithWeapon_8BD060 0x008BD060 flex32_t
 sithWeapon_8BD008 0x008BD008 int[6]
 sithWeapon_8BD024 0x008BD024 int
 sithWeapon_senderIndex 0x008BD028 int

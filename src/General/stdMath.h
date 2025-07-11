@@ -83,7 +83,12 @@ static inline flex_t stdMath_Fmod(flex_t a, flex_t b) {
 } 
 
 static inline flex_t stdMath_Ceil(flex_t a) {
+#if defined(EXPERIMENTAL_FIXED_POINT)
+    // This ceil is made of floor
+    return flexdirect(a.to_raw() & 0xFFFF0000);
+#else
     return (flex_t)ceilf((float)a);
+#endif
 } 
 
 static inline int32_t stdMath_ClampInt(int32_t val, int32_t valMin, int32_t valMax)

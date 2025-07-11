@@ -177,21 +177,31 @@ int rdSetMipDistances(rdVector4 *dists)
 #ifdef QOL_IMPROVEMENTS
     static rdVector4 origLod;
     static int once = 0;
+    static sithWorld* onceWorld = NULL;
+    if (onceWorld != sithWorld_pCurrentWorld) {
+        once = 0;
+    }
     if (!once) {
         origLod = sithWorld_pCurrentWorld->lodDistance;
         once = 1;
     }
-
+    onceWorld = sithWorld_pCurrentWorld;
+#ifdef TARGET_TWL
+    flex_t scale_factor = 0.7;
+#else
     flex_t scale_factor = (Video_format.width / 640.0) * 2.0;
+#endif
     rdroid_aMipDistances.x *= scale_factor;
     rdroid_aMipDistances.y *= scale_factor;
     rdroid_aMipDistances.z *= scale_factor;
     rdroid_aMipDistances.w *= scale_factor;
 
-    sithWorld_pCurrentWorld->lodDistance.x = origLod.x * scale_factor;
-    sithWorld_pCurrentWorld->lodDistance.y = origLod.y * scale_factor;
-    sithWorld_pCurrentWorld->lodDistance.z = origLod.z * scale_factor;
-    sithWorld_pCurrentWorld->lodDistance.w = origLod.w * scale_factor;
+    if (sithWorld_pCurrentWorld) {
+        sithWorld_pCurrentWorld->lodDistance.x = origLod.x * scale_factor;
+        sithWorld_pCurrentWorld->lodDistance.y = origLod.y * scale_factor;
+        sithWorld_pCurrentWorld->lodDistance.z = origLod.z * scale_factor;
+        sithWorld_pCurrentWorld->lodDistance.w = origLod.w * scale_factor;
+    }
 #endif
 
     return 1;

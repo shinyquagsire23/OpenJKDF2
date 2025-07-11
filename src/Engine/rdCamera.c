@@ -27,7 +27,7 @@ rdCamera* rdCamera_New(flex_t fov, flex_t x, flex_t y, flex_t z, flex_t aspectRa
     return out;
 }
 
-int rdCamera_NewEntry(rdCamera *camera, flex_t fov, flex_t a3, flex_t zNear, flex_t zFar, flex_t aspectRatio)
+int rdCamera_NewEntry(rdCamera *camera, flex_t fov, BOOL bClipFar, flex_t zNear, flex_t zFar, flex_t aspectRatio)
 {
     if (!camera)
         return 0;
@@ -44,9 +44,9 @@ int rdCamera_NewEntry(rdCamera *camera, flex_t fov, flex_t a3, flex_t zNear, fle
         rdCamera_SetFOV(camera, fov);
         rdCamera_SetOrthoScale(camera, 1.0);
 
-        camera->pClipFrustum->field_0.x = a3;
-        camera->pClipFrustum->field_0.y = zNear;
-        camera->pClipFrustum->field_0.z = zFar;
+        camera->pClipFrustum->bClipFar = bClipFar;
+        camera->pClipFrustum->zNear = zNear;
+        camera->pClipFrustum->zFar = zFar;
         camera->screenAspectRatio = aspectRatio;
         camera->ambientLight = 0.0;
         camera->numLights = 0;
@@ -281,7 +281,9 @@ int rdCamera_BuildClipFrustum(rdCamera *camera, rdClipFrustum *outClip, signed i
     flex_t project_width_half_2 = -canvas->screen_width_half + ((flex_d_t)width2 - 0.5);
     flex_t project_height_half_2 = -canvas->screen_height_half + ((flex_d_t)height2 - 0.5);
 
-    rdVector_Copy3(&outClip->field_0, &cameraClip->field_0);
+    outClip->bClipFar = cameraClip->bClipFar;
+    outClip->zNear = cameraClip->zNear;
+    outClip->zFar = cameraClip->zFar;
     
     flex_t fov_calc = camera->fov_y;
     flex_t fov_calc_height = camera->fov_y;

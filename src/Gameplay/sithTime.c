@@ -113,7 +113,7 @@ void sithTime_SetDelta(int deltaMs)
     sithTime_deltaSeconds = (flex_d_t)sithTime_deltaMs * 0.001;
 #endif
     sithTime_TickHz = 1.0 / sithTime_deltaSeconds;
-    sithTime_curSeconds = (flex_d_t)sithTime_curMs * 0.001;
+    sithTime_curSeconds = (flex32_t)sithTime_curMs * 0.001;
 }
 
 void sithTime_Startup()
@@ -144,6 +144,6 @@ void sithTime_SetMs(uint32_t curMs)
     sithTime_TickHz = 0.0;
     sithTime_curMs = curMs;
     sithTime_deltaMs = 0;
-    sithTime_curSeconds = (flex_d_t)curMs * 0.001;
+    sithTime_curSeconds = (flex32_t)curMs * 0.001;
     sithTime_curMsAbsolute = stdPlatform_GetTimeMsec();
 }

@@ -789,6 +789,13 @@ void stdControl_ReadControls()
         else {
             stdControl_aAxisPos[AXIS_JOY1_Y] = 0;
         }
+
+        static int sampleTime_last = 0;
+        if (keys_held & KEY_SELECT) {
+            int sampleTime_roundtrip = stdPlatform_GetTimeMsec() - sampleTime_last;
+            stdPlatform_Printf("total %u heap 0x%x 0x%x\n", sampleTime_roundtrip, (intptr_t)getHeapLimit() - (intptr_t)getHeapEnd(), (intptr_t)getHeapEnd() - (intptr_t)getHeapStart());
+        }
+        sampleTime_last = stdPlatform_GetTimeMsec();
     }
 
     static touchPosition lastTouchXY;

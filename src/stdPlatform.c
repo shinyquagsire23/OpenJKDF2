@@ -143,7 +143,7 @@ static void* Linux_alloc(uint32_t len)
     void* ret = malloc(len);
     if (!ret) {
         printf("Failed to allocate %x bytes...\n", len);
-        while (1) {}
+        //while (1) {}
         return NULL;
     }
     return ret;

@@ -1,6 +1,9 @@
 #include "stdMath.h"
 
 #include "stdMathTables.h"
+#ifdef TARGET_TWL
+#include <nds/arm9/math.h>
+#endif
 
 flex_t stdMath_FlexPower(flex_t num, int32_t exp)
 {
@@ -492,15 +495,80 @@ flex_t stdMath_Dist3D3(flex_t a1, flex_t a2, flex_t a3)
 
 flex_t stdMath_Floor(flex_t a)
 {
+#if defined(EXPERIMENTAL_FIXED_POINT)
+    return flexdirect(a.to_raw() & 0xFFFF0000);
+#else
     return floorf((float)a);
+#endif
+}
+
+// From https://github.com/chmike/fpsqrt/blob/master/fpsqrt.c
+int32_t sqrt_fx16_16_to_fx16_16(int32_t v) {
+    uint32_t t, q, b, r;
+    r = (int32_t)v; 
+    q = 0;          
+    b = 0x40000000UL;
+    if( r < 0x40000200 )
+    {
+        while( b != 0x40 )
+        {
+            t = q + b;
+            if( r >= t )
+            {
+                r -= t;
+                q = t + b; // equivalent to q += 2*b
+            }
+            r <<= 1;
+            b >>= 1;
+        }
+        q >>= 8;
+        return q;
+    }
+    while( b > 0x40 )
+    {
+        t = q + b;
+        if( r >= t )
+        {
+            r -= t;
+            q = t + b; // equivalent to q += 2*b
+        }
+        if( (r & 0x80000000) != 0 )
+        {
+            q >>= 1;
+            b >>= 1;
+            r >>= 1;
+            while( b > 0x20 )
+            {
+                t = q + b;
+                if( r >= t )
+                {
+                    r -= t;
+                    q = t + b;
+                }
+                r <<= 1;
+                b >>= 1;
+            }
+            q >>= 7;
+            return q;
+        }
+        r <<= 1;
+        b >>= 1;
+    }
+    q >>= 8;
+    return q;
 }
 
 flex_t stdMath_Sqrt(flex_t a)
 {
-    if (a < 0.0)
-        return 0.0;
+    if (a < (flex_t)0.0)
+        return (flex_t)0.0;
 
+#if defined(EXPERIMENTAL_FIXED_POINT) && defined(TARGET_TWL)
+    //return f32toflex(sqrtf32(flextof32(a)));
+    return flexdirect(sqrt_fx16_16_to_fx16_16(a.to_raw()));
+#else
     return sqrtf((float)a);
+#endif
 }
 
 flex_t stdMath_Tan(flex_t a1)

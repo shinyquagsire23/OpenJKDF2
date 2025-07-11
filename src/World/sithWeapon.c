@@ -961,12 +961,12 @@ int sithWeapon_SelectWeapon(sithThing *player, int binIdx, int a3)
     return 1;
 }
 
-void sithWeapon_SetMountWait(sithThing *a1, flex_t mountWait)
+void sithWeapon_SetMountWait(sithThing *a1, flex32_t mountWait)
 {
     sithWeapon_mountWait = mountWait + sithTime_curSeconds;
 }
 
-void sithWeapon_SetFireWait(sithThing *weapon, flex_t firewait)
+void sithWeapon_SetFireWait(sithThing *weapon, flex32_t firewait)
 {
     if ( firewait == -1.0 )
     {
@@ -1649,7 +1649,7 @@ void sithWeapon_Syncunused2(sithThing* player)
     }
 }
 
-void sithWeapon_SetFireRate(sithThing *weapon, flex_t fireRate)
+void sithWeapon_SetFireRate(sithThing *weapon, flex32_t fireRate)
 {
     sithWeapon_fireRate = fireRate;
 }

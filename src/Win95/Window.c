@@ -1020,7 +1020,7 @@ void Window_SdlUpdate()
         }
 
         if (Window_needsRecreate) {
-            std3D_PurgeTextureCache();
+            std3D_PurgeEntireTextureCache();
             Window_RecreateSDL2Window();
         }
         

@@ -54,8 +54,8 @@ void sithWeapon_RemoveAndExplode(sithThing *weapon, sithThing *explodeTemplate);
 void sithWeapon_StartupEntry();
 void sithWeapon_ShutdownEntry();
 int sithWeapon_SelectWeapon(sithThing *player, int binIdx, int a3);
-void sithWeapon_SetMountWait(sithThing *a1, flex_t mountWait);
-void sithWeapon_SetFireWait(sithThing *weapon, flex_t firewait);
+void sithWeapon_SetMountWait(sithThing *a1, flex32_t mountWait);
+void sithWeapon_SetFireWait(sithThing *weapon, flex32_t firewait);
 void sithWeapon_handle_inv_msgs(sithThing *player);
 void sithWeapon_Activate(sithThing *weapon, sithCog *cogCtx, flex_t fireRate, int mode);
 flex_t sithWeapon_Deactivate(sithThing *weapon, sithCog *cogCtx, int mode);
@@ -70,7 +70,7 @@ int sithWeapon_WriteConf();
 int sithWeapon_ReadConf();
 void sithWeapon_Syncunused1(sithThing* player);
 void sithWeapon_Syncunused2(sithThing* player);
-void sithWeapon_SetFireRate(sithThing *weapon, flex_t fireRate);
+void sithWeapon_SetFireRate(sithThing *weapon, flex32_t fireRate);
 
 
 //static void (*sithWeapon_sub_4D35E0)(sithThing *a1) = (void*)sithWeapon_sub_4D35E0_ADDR;

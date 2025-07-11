@@ -152,6 +152,10 @@ void jkHudInv_Draw()
     wchar_t a6[3]; // [esp+28h] [ebp-18h] BYREF
     wchar_t v48[3]; // [esp+30h] [ebp-10h] BYREF
     wchar_t v50[3]; // [esp+38h] [ebp-8h] BYREF
+#ifdef TARGET_TWL
+    if ( Main_bNoHUD )
+        return;
+#endif
 
 #ifdef SDL2_RENDER
     jkHudInv_DrawGPU();
@@ -822,6 +826,11 @@ void jkHudInv_LoadItemRes()
     char a1[32]; // [esp+10h] [ebp-A0h] BYREF
     char v18[128]; // [esp+30h] [ebp-80h] BYREF
 
+#ifdef TARGET_TWL
+    if ( Main_bNoHUD )
+        return;
+#endif
+
 #ifndef SDL2_RENDER
     v0 = stdDisplay_pCurVideoMode->format.format.bpp;
 #else
@@ -943,6 +952,11 @@ void jkHudInv_LoadItemRes()
 
 void jkHudInv_Close()
 {
+#ifdef TARGET_TWL
+    if ( Main_bNoHUD )
+        return;
+#endif
+
     stdFont_Free(jkHudInv_font);
     jkHudInv_font = 0;
 }

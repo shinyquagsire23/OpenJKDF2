@@ -307,6 +307,7 @@ rdMaterial* jkGuiBuildMulti_MatLoader(const char *pMatFname, int a, int b)
         _sprintf(mat_fpath, "mat%c%s", '\\', pMatFname);
         rdMaterial_LoadEntry(mat_fpath, pMaterial, 0, 0);
     }
+    rdMaterial_EnsureData(pMaterial); // Added: TWL
     return pMaterial;
 }
 

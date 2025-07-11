@@ -403,7 +403,8 @@ void sithMain_UpdateCamera()
 {
 #if defined(TARGET_TWL)
     jkPlayer_fov = 90.0;
-    jkPlayer_bJankyPhysics = 0;
+    jkPlayer_bJankyPhysics = 1;
+    jkPlayer_fovIsVertical = 0;
 #endif
 
     if ( (g_submodeFlags & 8) == 0 )

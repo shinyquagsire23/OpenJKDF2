@@ -94,8 +94,11 @@ void std3D_UnloadAllTextures();
 void std3D_AddRenderListTris(rdTri *tris, unsigned int num_tris);
 void std3D_AddRenderListLines(rdLine* lines, uint32_t num_lines);
 int std3D_AddRenderListVertices(D3DVERTEX *vertex_array, int count);
-void std3D_UpdateFrameCount(rdDDrawSurface *surface);
-void std3D_PurgeTextureCache();
+void std3D_UpdateFrameCount(rdDDrawSurface *pTexture);
+void std3D_RemoveTextureFromCacheList(rdDDrawSurface *pCacheTexture); // TODO: mark the address for this
+void std3D_AddTextureToCacheList(rdDDrawSurface *pTexture); // TODO: mark the address for this
+int std3D_PurgeTextureCache(size_t size);
+void std3D_PurgeEntireTextureCache();
 int std3D_ClearZBuffer();
 int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_alpha_tex, int no_alpha);
 void std3D_DrawMenu();

@@ -77,6 +77,14 @@ typedef uint32_t size_t;
 #define DW_LASERS
 #endif
 
+#ifdef TARGET_TWL
+//#include <nds.h>
+#define flextov16(n) ((v16)((int32_t)n.to_raw() >> (16-12)))
+#define flextof32(n) ((int32_t)((int32_t)n.to_raw() >> (16-12)))
+#define f32toflex(n) (numeric::fixed<16, 16>::from_base(n<<(16-12)))
+#define flexdirect(n) (numeric::fixed<16, 16>::from_base(n))
+#endif
+
 #include "types_win_enums.h"
 #include "types_enums.h"
 #include "engine_config.h"
@@ -580,7 +588,9 @@ typedef struct rdKeyframe
 
 typedef struct rdClipFrustum
 {
-  rdVector3 field_0;
+  int bClipFar;
+  flex_t zNear;
+  flex_t zFar;
   flex_t orthoLeft;
   flex_t orthoTop;
   flex_t orthoRight;
@@ -971,10 +981,16 @@ typedef struct rdDDrawSurface
     uint32_t is_16bit;
     uint32_t width;
     uint32_t height;
-    uint32_t texture_area;
-    uint32_t gpu_accel_maybe;
-    rdDDrawSurface* tex_prev;
-    rdDDrawSurface* tex_next;
+
+    uint32_t textureSize;
+    uint32_t frameNum;
+    rdDDrawSurface* pPrevCachedTexture;
+    rdDDrawSurface* pNextCachedTexture;
+    
+    //uint32_t texture_area;
+    //uint32_t gpu_accel_maybe;
+    //rdDDrawSurface* tex_prev;
+    //rdDDrawSurface* tex_next;
 #ifdef SDL2_RENDER
     uint32_t emissive_texture_id;
     uint32_t displacement_texture_id;
@@ -1198,7 +1214,7 @@ typedef struct rdMaterial
 {
     uint32_t tex_type;
     char mat_fpath[32];
-#ifdef SDL2_RENDER
+#if defined(SDL2_RENDER) || defined(RDMATERIAL_LRU_LOAD_UNLOAD)
     char mat_full_fpath[256];
 #endif
     uint32_t id;
@@ -1209,6 +1225,9 @@ typedef struct rdMaterial
     rdTexinfo *texinfos[16];
     uint32_t num_textures;
     rdTexture* textures;
+#ifdef RDMATERIAL_LRU_LOAD_UNLOAD
+    BOOL bDataLoaded;
+#endif
 } rdMaterial;
 
 struct sithPuppet
