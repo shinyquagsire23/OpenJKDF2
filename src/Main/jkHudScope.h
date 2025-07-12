@@ -5,8 +5,8 @@
 
 void jkHudScope_Startup(void);
 void jkHudScope_Shutdown(void);
-int jkHudScope_Open(void);
+MATH_FUNC int jkHudScope_Open(void);
 void jkHudScope_Close(void);
-void jkHudScope_Draw(void);
+MATH_FUNC void jkHudScope_Draw(void);
 
 #endif // _MAIN_JKHUDSCOPE_H

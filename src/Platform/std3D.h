@@ -85,15 +85,15 @@ void std3D_Shutdown();
 int std3D_StartScene();
 int std3D_EndScene();
 void std3D_ResetRenderList();
-int std3D_RenderListVerticesFinish();
-void std3D_DrawRenderList();
+MATH_FUNC int std3D_RenderListVerticesFinish();
+MATH_FUNC void std3D_DrawRenderList();
 int std3D_SetCurrentPalette(rdColor24 *a1, int a2);
 void std3D_GetValidDimension(unsigned int inW, unsigned int inH, unsigned int *outW, unsigned int *outH);
 int std3D_DrawOverlay();
 void std3D_UnloadAllTextures();
-void std3D_AddRenderListTris(rdTri *tris, unsigned int num_tris);
-void std3D_AddRenderListLines(rdLine* lines, uint32_t num_lines);
-int std3D_AddRenderListVertices(D3DVERTEX *vertex_array, int count);
+MATH_FUNC void std3D_AddRenderListTris(rdTri *tris, unsigned int num_tris);
+MATH_FUNC void std3D_AddRenderListLines(rdLine* lines, uint32_t num_lines);
+MATH_FUNC int std3D_AddRenderListVertices(D3DVERTEX *vertex_array, int count);
 void std3D_UpdateFrameCount(rdDDrawSurface *pTexture);
 void std3D_RemoveTextureFromCacheList(rdDDrawSurface *pCacheTexture); // TODO: mark the address for this
 void std3D_AddTextureToCacheList(rdDDrawSurface *pTexture); // TODO: mark the address for this

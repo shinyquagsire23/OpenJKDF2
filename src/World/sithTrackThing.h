@@ -21,7 +21,7 @@
 
 void sithTrackThing_MoveToFrame(sithThing *thing, int goalFrame, flex_t a3);
 void sithTrackThing_Arrivedidk(sithThing *thing);
-void sithTrackThing_Tick(sithThing *thing, flex_t deltaSeconds);
+MATH_FUNC void sithTrackThing_Tick(sithThing *thing, flex_t deltaSeconds);
 void sithTrackThing_BlockedIdk(sithThing* pThing);
 void sithTrackThing_StoppedMoving(sithThing* pThing);
 void sithTrackThing_PrepareForOrient(sithThing *thing, rdVector3 *a2, flex_t a3);

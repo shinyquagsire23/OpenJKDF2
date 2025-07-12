@@ -14,7 +14,7 @@
 void jkCredits_Startup(char *fpath);
 void jkCredits_Shutdown();
 int jkCredits_Show();
-int jkCredits_Tick();
+MATH_FUNC int jkCredits_Tick();
 int jkCredits_Skip();
 int jkCredits_Handler(HWND a1, UINT a2, WPARAM a3, HWND a4, LRESULT *a5);
 

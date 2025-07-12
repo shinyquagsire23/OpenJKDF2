@@ -43,7 +43,7 @@ void sithPlayer_SetBinAmt(int idx, flex_t amt);
 int sithPlayer_GetNum(sithThing *player);
 void sithPlayer_ResetPalEffects();
 void sithPlayer_idk(int idx);
-void sithPlayer_Tick(sithPlayerInfo *playerInfo, flex_t a2);
+MATH_FUNC void sithPlayer_Tick(sithPlayerInfo *playerInfo, flex_t a2);
 void sithPlayer_debug_loadauto(sithThing *player);
 void sithPlayer_SetScreenTint(flex_t tintR, flex_t tintG, flex_t tintB);
 void sithPlayer_AddDynamicTint(flex_t fR, flex_t fG, flex_t fB);

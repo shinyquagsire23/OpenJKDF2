@@ -90,8 +90,8 @@ extern jkEpisodeEntry* jkMain_pEpisodeEnt2;
 
 void jkMain_Startup();
 void jkMain_Shutdown();
-int jkMain_SetVideoMode();
-void jkMain_SetVideoModeGdi();
+MATH_FUNC int jkMain_SetVideoMode();
+MATH_FUNC void jkMain_SetVideoModeGdi();
 void jkMain_InitPlayerThings();
 int jkMain_SwitchTo5_2();
 int jkMain_SwitchTo5(char *pJklFname);
@@ -163,7 +163,7 @@ void jkMain_StartupCutscene(char *pCutsceneStr); // MOTS added
 
 #if defined(SDL2_RENDER) || defined(TARGET_TWL)
 //int jkMain_SetVideoMode();
-void jkMain_FixRes();
+MATH_FUNC void jkMain_FixRes();
 #else
 //static int (*jkMain_SetVideoMode)() = (void*)jkMain_SetVideoMode_ADDR;
 #endif

@@ -120,7 +120,7 @@ int sithMulti_Startup();
 void sithMulti_FreeThing(int a1);
 void sithMulti_Shutdown();
 int sithMulti_SendJoinRequest(int sendto_id);
-int sithMulti_GetSpawnIdx(sithThing *pPlayerThing);
+MATH_FUNC int sithMulti_GetSpawnIdx(sithThing *pPlayerThing);
 void sithMulti_SyncScores();
 void sithMulti_HandleDeath(sithPlayerInfo *pPlayerInfo, sithThing *pKilledThing, sithThing *pKilledByThing);
 void sithMulti_EndLevel(uint32_t a1, int a2);

@@ -17,16 +17,16 @@
 #define sithActor_RemoveCorpse_ADDR (0x004ED7B0)
 #define sithActor_LoadParams_ADDR (0x004ED7E0)
 
-void sithActor_SetMaxHeathForDifficulty(sithThing *thing);
+MATH_FUNC void sithActor_SetMaxHeathForDifficulty(sithThing *thing);
 void sithActor_Tick(sithThing *thing, int deltaMs);
-flex_t sithActor_Hit(sithThing *sender, sithThing *receiver, flex_t amount, int flags);
+MATH_FUNC flex_t sithActor_Hit(sithThing *sender, sithThing *receiver, flex_t amount, int flags);
 void sithActor_HurtSound(sithThing *thing, flex_t amount, int hurtType);
 void sithActor_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4);
 int sithActor_sub_4ED1D0(sithThing *thing, sithSurface *surface, sithCollisionSearchEntry *searchEnt);
-void sithActor_MoveJointsForEyePYR(sithThing *actor, const rdVector3 *eyePYR);
+MATH_FUNC void sithActor_MoveJointsForEyePYR(sithThing *actor, const rdVector3 *eyePYR);
 int sithActor_ActorActorCollide(sithThing *thing, sithThing *thing2, sithCollisionSearchEntry *a3, int a4);
 void sithActor_RotateTurretToEyePYR(sithThing *a1);
-int sithActor_thing_anim_blocked(sithThing *a1, sithThing *thing2, sithCollisionSearchEntry *a3);
+MATH_FUNC int sithActor_thing_anim_blocked(sithThing *a1, sithThing *thing2, sithCollisionSearchEntry *a3);
 void sithActor_Remove(sithThing *thing);
 void sithActor_RemoveCorpse(sithThing *corpse);
 int sithActor_LoadParams(stdConffileArg *arg, sithThing *thing, unsigned int param);

@@ -28,10 +28,11 @@ BOOL jkHud_shouldCrosshairBeShownForWeapon(sithThing *player);
 
 int jkHud_Startup();
 void jkHud_Shutdown();
-int jkHud_Open();
+MATH_FUNC int jkHud_Open();
 void jkHud_Close();
 int jkHud_ClearRects(int unk);
-void jkHud_Draw();
+MATH_FUNC void jkHud_Draw();
+MATH_FUNC void jkHud_DrawGPU();
 int jkHud_GetWeaponAmmo(sithThing *player);
 int jkHud_Chat();
 void jkHud_SendChat(char a1);

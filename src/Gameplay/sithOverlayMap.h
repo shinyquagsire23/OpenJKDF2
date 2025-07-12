@@ -20,10 +20,10 @@ void sithOverlayMap_ToggleMapDrawn();
 void sithOverlayMap_FuncIncrease();
 void sithOverlayMap_FuncDecrease();
 
-int sithOverlayMap_Render1(rdCanvas *canvas);
-void sithOverlayMap_Render2(sithSector *sector);
-int sithOverlayMap_Render3(sithSector *pSector);
-int sithOverlayMap_Render4(sithSurface *a1, int a2, int a3);
+MATH_FUNC int sithOverlayMap_Render1(rdCanvas *canvas);
+MATH_FUNC void sithOverlayMap_Render2(sithSector *sector);
+MATH_FUNC int sithOverlayMap_Render3(sithSector *pSector);
+MATH_FUNC int sithOverlayMap_Render4(sithSurface *a1, int a2, int a3);
 
 //static int (*sithOverlayMap_Render1)(rdCanvas* canvas) = (void*)sithOverlayMap_Render1_ADDR;
 //static int (*sithOverlayMap_ToggleMapDrawn)() = (void*)sithOverlayMap_ToggleMapDrawn_ADDR;

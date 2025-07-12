@@ -1440,10 +1440,10 @@ LABEL_150:
     }
     
 
-#ifndef TARGET_TWL
+//#ifndef TARGET_TWL
     // TWL: 5-27ms
     rdCache_Flush();
-#endif
+//#endif
     rdCamera_pCurCamera->pClipFrustum = v77;
 }
 
@@ -1834,9 +1834,9 @@ void sithRender_RenderThings()
     }
 
     // DSi doesn't really have Z buffer options, so just batch everything
-#ifndef TARGET_TWL
+//#ifndef TARGET_TWL
     rdCache_Flush();
-#endif
+//#endif
 
     // MoTS added
     if (lastDrawn) 
@@ -1847,9 +1847,9 @@ void sithRender_RenderThings()
     }
 
     // DSi doesn't really have Z buffer options, so just batch everything
-#ifndef TARGET_TWL
+//#ifndef TARGET_TWL
     rdCache_Flush();
-#endif
+//#endif
 
     if (sithRender_008d1668) {
         rdSetCullFlags(1);
@@ -2094,9 +2094,9 @@ void sithRender_RenderAlphaSurfaces()
     }
 
     // DSi doesn't really have Z buffer options, so just batch everything
-#ifndef TARGET_TWL
+//#ifndef TARGET_TWL
     rdCache_Flush();
-#endif
+//#endif
 #ifdef SDL2_RENDER
     rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
 #endif

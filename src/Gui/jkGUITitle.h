@@ -20,7 +20,7 @@ char jkGuiTitle_sub_4189A0(char *a1);
 wchar_t* jkGuiTitle_quicksave_related_func1(stdStrTable *strTable, char *jkl_fname);
 void jkGuiTitle_UnkDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int a4);
 void jkGuiTitle_LoadBarDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int a4);
-void jkGuiTitle_WorldLoadCallback(flex_t percentage);
+MATH_FUNC void jkGuiTitle_WorldLoadCallback(flex_t percentage);
 void jkGuiTitle_ShowLoadingStatic();
 void jkGuiTitle_ShowLoading(char *a1, wchar_t *a2);
 void jkGuiTitle_LoadingFinalize();

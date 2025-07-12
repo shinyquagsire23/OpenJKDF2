@@ -90,7 +90,7 @@ int stdDisplay_SetMasterPalette(uint8_t* pal);
 int stdDisplay_DDrawGdiSurfaceFlip();
 int stdDisplay_ddraw_waitforvblank();
 int stdDisplay_ClearRect(stdVBuffer *buf, int fillColor, rdRect *rect);
-int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged);
+MATH_FUNC int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged);
 int stdDisplay_FindClosestMode(render_pair *a1, struct stdVideoMode *render_surface, unsigned int max_modes);
 int stdDisplay_FindClosestDevice(void* a);
 int stdDisplay_Open(int a); // MOTS altered (added a video mode)

@@ -13,10 +13,10 @@
 
 int sithMap_Startup(sithMap* map);
 int sithMap_Shutdown();
-void sithMap_DrawCircle(rdCamera *camera, rdMatrix34 *viewMat);
-void sithMap_sub_4EC4D0(sithSector *sector);
-int sithMap_Draw(sithSector *sector);
-int sithMap_IsSurfaceDrawable(sithSurface *pSurface, int idx, int idx2);
+MATH_FUNC void sithMap_DrawCircle(rdCamera *camera, rdMatrix34 *viewMat);
+MATH_FUNC void sithMap_sub_4EC4D0(sithSector *sector);
+MATH_FUNC int sithMap_Draw(sithSector *sector);
+MATH_FUNC int sithMap_IsSurfaceDrawable(sithSurface *pSurface, int idx, int idx2);
 
 //static int (*sithMap_Draw)(sithSector *sector) = (void*)sithMap_Draw_ADDR;
 

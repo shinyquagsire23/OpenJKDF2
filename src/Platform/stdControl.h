@@ -34,18 +34,18 @@ void stdControl_InitSdlJoysticks();
 
 void stdControl_Reset();
 int stdControl_EnableAxis(unsigned int idx);
-flex_t stdControl_ReadAxis(int axisNum);
-int stdControl_ReadAxisRaw(int axisNum);
-flex_t stdControl_ReadKeyAsAxis(int keyNum);
-int stdControl_ReadAxisAsKey(int axisNum);
-int stdControl_ReadKey(int keyNum, int *pOut);
+MATH_FUNC flex_t stdControl_ReadAxis(int axisNum);
+MATH_FUNC int stdControl_ReadAxisRaw(int axisNum);
+MATH_FUNC flex_t stdControl_ReadKeyAsAxis(int keyNum);
+MATH_FUNC int stdControl_ReadAxisAsKey(int axisNum);
+MATH_FUNC int stdControl_ReadKey(int keyNum, int *pOut);
 void stdControl_FinishRead();
 int stdControl_MessageHandler(HWND hWnd, UINT Msg, WPARAM wParam, HWND lParam, LRESULT* unused);
 void stdControl_SetMouseSensitivity(flex_t xSensitivity, flex_t ySensitivity);
 void stdControl_SetKeydown(int keyNum, int bDown, uint32_t readTime);
 void stdControl_SetSDLKeydown(int keyNum, int bDown, uint32_t readTime);
 
-void stdControl_InitAxis(int index, int stickMin, int stickMax, flex_t multiplier);
+MATH_FUNC void stdControl_InitAxis(int index, int stickMin, int stickMax, flex_t multiplier);
 
 #if !defined(SDL2_RENDER) && defined(WIN32)
 static int (*stdControl_Startup)() = (void*)stdControl_Startup_ADDR;

@@ -27,13 +27,13 @@ extern "C" {
 #define rdCache_ProcFaceCompare_ADDR (0x0043E170)
 
 int rdCache_Startup();
-void rdCache_AdvanceFrame();
-void rdCache_FinishFrame();
-void rdCache_Reset();
+MATH_FUNC void rdCache_AdvanceFrame();
+MATH_FUNC void rdCache_FinishFrame();
+MATH_FUNC void rdCache_Reset();
 void rdCache_ClearFrameCounters();
 rdProcEntry *rdCache_GetProcEntry();
 void rdCache_Flush();
-int rdCache_SendFaceListToHardware();
+MATH_FUNC int rdCache_SendFaceListToHardware();
 void rdCache_ResetRenderList();
 MATH_FUNC void rdCache_DrawRenderList();
 int rdCache_TriCompare(const void* a_, const void* b_);

@@ -362,7 +362,7 @@ LABEL_22:
 int rdMaterial_LoadEntry(char *mat_fpath, rdMaterial *material, int create_ddraw_surface, int gpu_mem)
 {
     _memset(material, 0, sizeof(rdMaterial));
-    return rdMaterial_LoadEntry_Common(mat_fpath, material, create_ddraw_surface, gpu_mem, 0);
+    return rdMaterial_LoadEntry_Common(mat_fpath, material, create_ddraw_surface, gpu_mem, !openjkdf2_bIsExtraLowMemoryPlatform);
 }
 
 int rdMaterial_LoadEntry_Deferred(rdMaterial *material, int create_ddraw_surface, int gpu_mem)

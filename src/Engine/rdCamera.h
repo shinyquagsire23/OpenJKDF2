@@ -40,7 +40,7 @@ rdCamera* rdCamera_New(flex_t fov, flex_t x, flex_t y, flex_t z, flex_t aspectRa
 int rdCamera_NewEntry(rdCamera *camera, flex_t fov, BOOL bClipFar, flex_t zNear, flex_t zFar, flex_t aspectRatio);
 void rdCamera_Free(rdCamera *camera);
 void rdCamera_FreeEntry(rdCamera *camera);
-int rdCamera_SetCanvas(rdCamera *camera, rdCanvas *canvas);
+MATH_FUNC int rdCamera_SetCanvas(rdCamera *camera, rdCanvas *canvas);
 int rdCamera_SetCurrent(rdCamera *camera);
 MATH_FUNC int rdCamera_SetFOV(rdCamera *camera, flex_t fovVal);
 int rdCamera_SetProjectType(rdCamera *camera, int type);

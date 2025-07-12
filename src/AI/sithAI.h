@@ -93,7 +93,7 @@ MATH_FUNC int sithAI_FUN_0053a520(sithActor *pActor,flex_t param_2,flex_t param_
                        flex_t param_6,uint32_t param_7);
 MATH_FUNC int sithAI_Leap(sithActor *pActor,flex_t minDist,flex_t maxDist,flex_t minDot,int param_5,
                        flex_t param_6,uint32_t param_7);
-sithThing* sithAI_FUN_00539a60(sithActor *pThing);
+MATH_FUNC sithThing* sithAI_FUN_00539a60(sithActor *pThing);
 
 //static int (*sithAI_Startup)() = (void*)sithAI_Startup_ADDR;
 //static int (*sithAI_LoadThingActorParams)(stdConffileArg *arg, sithThing *thing, int param) = (void*)sithAI_LoadThingActorParams_ADDR;

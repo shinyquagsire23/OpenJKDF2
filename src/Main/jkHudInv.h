@@ -16,10 +16,11 @@
 
 int jkHudInv_ItemDatLoad(char *fpath);
 void jkHudInv_ClearRects();
-void jkHudInv_Draw();
+MATH_FUNC void jkHudInv_Draw();
+MATH_FUNC void jkHudInv_DrawGPU();
 void jkHudInv_InputInit();
 int jkHudInv_InitItems();
-void jkHudInv_LoadItemRes();
+MATH_FUNC void jkHudInv_LoadItemRes();
 void jkHudInv_Close();
 int jkHudInv_Startup();
 int jkHudInv_Shutdown();

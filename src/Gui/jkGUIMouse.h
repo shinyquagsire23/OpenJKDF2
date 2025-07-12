@@ -30,7 +30,7 @@
 //static int (*jkGuiMouse_Show)() = (void*)jkGuiMouse_Show_ADDR;
 
 int jkGuiMouse_ListClicked1(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, BOOL redraw);
-void jkGuiMouse_sub_416D40(jkGuiMenu *pMenu, int a2);
+MATH_FUNC void jkGuiMouse_sub_416D40(jkGuiMenu *pMenu, int a2);
 int jkGuiMouse_ListClicked2(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, BOOL redraw);
 void jkGuiMouse_sub_417100(int a1, int a2);
 void jkGuiMouse_sub_417210();
@@ -40,7 +40,7 @@ int jkGuiMouse_AddEditControlsClicked(jkGuiElement *pClickedElement, jkGuiMenu *
 int jkGuiMouse_RemoveClicked(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, BOOL redraw);
 int jkGuiMouse_CancelOkClicked(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, BOOL redraw);
 int jkGuiMouse_RestoreDefaultsClicked(jkGuiElement *pClickedElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, BOOL redraw);
-int jkGuiMouse_Show();
+MATH_FUNC int jkGuiMouse_Show();
 void jkGuiMouse_Startup();
 void jkGuiMouse_Shutdown();
 

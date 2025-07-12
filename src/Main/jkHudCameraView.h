@@ -5,8 +5,8 @@
 
 void jkHudCameraView_Startup(void);
 void jkHudCameraView_Shutdown(void);
-int jkHudCameraView_Open(void);
+MATH_FUNC int jkHudCameraView_Open(void);
 void jkHudCameraView_Close(void);
-void jkHudCameraView_Draw(void);
+MATH_FUNC void jkHudCameraView_Draw(void);
 
 #endif // _MAIN_JKHUDCAMERAVIEW_H

@@ -6,4 +6,6 @@
 
 void sithCogFunctionThing_Startup(sithCogSymboltable* ctx);
 
+//MATH_FUNC void sithCogFunctionThing_InterpolatePYR(sithCog *ctx);
+
 #endif // _SITHCOGFUNCTIONTHING_H

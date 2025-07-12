@@ -40,15 +40,15 @@
 
 void sithWeapon_InitDefaults();
 void sithWeapon_Startup();
-void sithWeapon_Tick(sithThing *weapon, flex_t deltaSeconds);
-void sithWeapon_sub_4D35E0(sithThing *weapon);
-void sithWeapon_sub_4D3920(sithThing *weapon);
+MATH_FUNC void sithWeapon_Tick(sithThing *weapon, flex_t deltaSeconds);
+MATH_FUNC void sithWeapon_sub_4D35E0(sithThing *weapon);
+MATH_FUNC void sithWeapon_sub_4D3920(sithThing *weapon);
 int sithWeapon_LoadParams(stdConffileArg *arg, sithThing *thing, int param);
-sithThing* sithWeapon_Fire(sithThing *weapon, sithThing *projectile, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, int anim, flex_t scale, int16_t scaleFlags, flex_t a9);
-sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileTemplate, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, int anim, flex_t scale, char scaleFlags, flex_t a9, int extra);
+MATH_FUNC sithThing* sithWeapon_Fire(sithThing *weapon, sithThing *projectile, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, int anim, flex_t scale, int16_t scaleFlags, flex_t a9);
+MATH_FUNC sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileTemplate, rdVector3 *fireOffset, rdVector3 *aimError, sithSound *fireSound, int anim, flex_t scale, char scaleFlags, flex_t a9, int extra);
 void sithWeapon_SetTimeLeft(sithThing *weapon, sithThing* a2, flex_t timeLeft);
-int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCollisionSearchEntry *a4, int a5);
-int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithCollisionSearchEntry *a3);
+MATH_FUNC int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCollisionSearchEntry *a4, int a5);
+MATH_FUNC int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithCollisionSearchEntry *a3);
 void sithWeapon_Remove(sithThing *weapon);
 void sithWeapon_RemoveAndExplode(sithThing *weapon, sithThing *explodeTemplate);
 void sithWeapon_StartupEntry();
@@ -61,8 +61,8 @@ void sithWeapon_Activate(sithThing *weapon, sithCog *cogCtx, flex_t fireRate, in
 flex_t sithWeapon_Deactivate(sithThing *weapon, sithCog *cogCtx, int mode);
 int sithWeapon_AutoSelect(sithThing *player, int weapIdx);
 int sithWeapon_HandleWeaponKeys(sithThing *player, flex_t a2);
-void sithWeapon_ProjectileAutoAim(rdMatrix34 *out, sithThing *sender, rdMatrix34 *in, rdVector3 *fireOffset, flex_t autoaimFov, flex_t autoaimMaxDist);
-sithThing* sithWeapon_FireProjectile(sithThing *sender, sithThing *projectileTemplate, sithSound *fireSound, int mode, rdVector3 *fireOffset, rdVector3 *aimError, flex_t scale, int16_t scaleFlags, flex_t autoaimFov, flex_t autoaimMaxDist, int extra);
+MATH_FUNC void sithWeapon_ProjectileAutoAim(rdMatrix34 *out, sithThing *sender, rdMatrix34 *in, rdVector3 *fireOffset, flex_t autoaimFov, flex_t autoaimMaxDist);
+MATH_FUNC sithThing* sithWeapon_FireProjectile(sithThing *sender, sithThing *projectileTemplate, sithSound *fireSound, int mode, rdVector3 *fireOffset, rdVector3 *aimError, flex_t scale, int16_t scaleFlags, flex_t autoaimFov, flex_t autoaimMaxDist, int extra);
 flex_t sithWeapon_GetPriority(sithThing *player, int binIdx, int mode);
 int sithWeapon_GetCurWeaponMode();
 void sithWeapon_SyncPuppet(sithThing *player);

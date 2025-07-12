@@ -5,4 +5,6 @@
 
 void sithCogFunctionSector_Startup(sithCogSymboltable* ctx);
 
+//MATH_FUNC void sithCogFunctionSector_SetSectorThrust(sithCog *ctx);
+
 #endif // _SITHCOGFUNCTIONSECTOR_H

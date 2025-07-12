@@ -12,7 +12,7 @@
 
 int sithItem_Collide(sithThing *a1, sithThing *a2, sithCollisionSearchEntry *a4, int a5);
 void sithItem_New(sithThing *out);
-void sithItem_Take(sithThing *item, sithThing *actor, int a3);
+MATH_FUNC void sithItem_Take(sithThing *item, sithThing *actor, int a3);
 void sithItem_Remove(sithThing *item);
 int sithItem_LoadThingParams(stdConffileArg *arg, sithThing *thing, int paramIdx);
 

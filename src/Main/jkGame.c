@@ -341,7 +341,7 @@ int jkGame_Update()
     int total_delta = now_ms - last_time_ms;
     last_time_ms = now_ms;
     extern int std3D_timeWastedWaitingAround;
-    stdPlatform_Printf("dlt all=%d clr=%d %d wrld=%d\n pov=%d hud=%d drw=%d wst=%d\n", total_delta-std3D_timeWastedWaitingAround, jkGame_Delta_Start_ClearScreen, jkGame_Delta_ClearScreen_AdvanceFrame, jkGame_Delta_AdvanceFrame_UpdateCamera, jkGame_Delta_UpdateCamera_DrawPov, jkGame_Delta_DrawPov_HudDrawn, jkGame_Delta_HudDrawn_End, std3D_timeWastedWaitingAround);
+    //stdPlatform_Printf("dlt all=%d clr=%d %d wrld=%d\n pov=%d hud=%d drw=%d wst=%d\n", total_delta-std3D_timeWastedWaitingAround, jkGame_Delta_Start_ClearScreen, jkGame_Delta_ClearScreen_AdvanceFrame, jkGame_Delta_AdvanceFrame_UpdateCamera, jkGame_Delta_UpdateCamera_DrawPov, jkGame_Delta_DrawPov_HudDrawn, jkGame_Delta_HudDrawn_End, std3D_timeWastedWaitingAround);
     //world=28 drw=15 emu
     //world=48 drw=33 dsi, 33 down to 25 with jank phys?
 #endif

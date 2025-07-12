@@ -30,7 +30,7 @@ void sithPuppet_sub_4E4760(sithThing *thing, int a2);
 int sithPuppet_PlayMode(sithThing *thing, signed int anim, rdPuppetTrackCallback_t callback);
 int sithPuppet_StartKey(rdPuppet *puppet, rdKeyframe *keyframe, int a3, int a4, int a5, rdPuppetTrackCallback_t callback);
 void sithPuppet_ResetTrack(sithThing *puppet);
-void sithPuppet_Tick(sithThing *thing, flex_t deltaSeconds);
+MATH_FUNC void sithPuppet_Tick(sithThing *thing, flex_t deltaSeconds);
 flex_t sithPuppet_sub_4E4380(sithThing *thing);
 void sithPuppet_sub_4E4A20(sithThing *thing, sithAnimclassEntry *animClass);
 void sithPuppet_DefaultCallback(sithThing *thing, int32_t track, uint32_t a3);

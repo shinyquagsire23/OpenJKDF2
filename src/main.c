@@ -282,6 +282,7 @@ void initSystem(void) {
     extern void *fake_heap_start, *fake_heap_end;
     if (isDSiMode()) {
         setCpuClock(true);
+        *(u32*)0x4004008 |= 0x8F;
 
         fake_heap_start = (void*)((intptr_t)getHeapStart() - 0x02000000 + 0x0C000000);
         if (*(u32*)0x4004008 & 0x4000) {

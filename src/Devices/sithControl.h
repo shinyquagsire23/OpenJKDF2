@@ -63,9 +63,9 @@ void sithControl_ReadControls();
 void sithControl_FinishRead();
 void sithControl_MapDefaults();
 void sithControl_InputInit();
-flex_t sithControl_GetAxis2(int axisNum);
-flex_t sithControl_ReadAxisStuff(int funcIdx);
-flex_t sithControl_GetAxis(int funcIdx);
+MATH_FUNC flex_t sithControl_GetAxis2(int axisNum);
+MATH_FUNC flex_t sithControl_ReadAxisStuff(int funcIdx);
+MATH_FUNC flex_t sithControl_GetAxis(int funcIdx);
 int sithControl_ReadFunctionMap(int func, int* out);
 
 void sithControl_sub_4D6930(int a);

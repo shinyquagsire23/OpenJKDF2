@@ -168,6 +168,12 @@ static void update_from_world_palette()
         }
 
         loaded_colormap = sithWorld_pCurrentWorld->colormaps;
+
+        glBindTexture(0, paletteIDS[0]);
+        glColorTableEXT( 0, 0, 256, 0, 0, (u16*)i8PalWorld );
+
+        glBindTexture(0, textureIDS[4]);
+        glColorTableEXT( 0, 0, 256, 0, 0, (u16*)i8PalWorld );
     }
 
     
@@ -178,7 +184,7 @@ int std3D_LoadResources() {
         return 1;
     }
     glGenTextures(4, &textureIDS[0]);
-    //glGenTextures(1, &paletteIDS[0]);
+    glGenTextures(1, &paletteIDS[0]);
 
     update_from_display_palette();
     
@@ -318,7 +324,7 @@ int std3D_finishingFrameIdx = 0;
 // We want to defer waiting for vblank for as long as possible,
 // so that we spend 100% of our CPU time instead of having 0-16ms busy waits
 void std3D_ActuallyNeedToWaitForGeometryToFinish() {
-    if (std3D_finishingFrameIdx <= std3D_frameCount) {
+    if (std3D_finishingFrameIdx < std3D_frameCount) {
         int before_ms = stdPlatform_GetTimeMsec();
         while (GFX_STATUS & (1<<27)) {
             ;
@@ -459,8 +465,7 @@ void std3D_DrawRenderList()
 
     update_from_world_palette();
 
-    glBindTexture(0, textureIDS[nTexture]);
-    glColorTableEXT( 0, 0, 256, 0, 0, (u16*)i8PalWorld );
+    glBindTexture(0, textureIDS[4]);
 
     glColor3b(255,255,255);
     //glBindTexture(0, textureIDS[4]);
@@ -766,6 +771,8 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
         stdPlatform_Printf("VBuffer missing surface!\n");
         return 1;
     }
+
+    update_from_world_palette();
     
     int image_texture;
     int res = glGenTextures(1, &image_texture);
@@ -785,7 +792,12 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
     width = vbuf->format.width;
     height = vbuf->format.height;
 
+    // SCFG9 = 0x8307F100
+    //*(u32*)0x4004008 |= 0x8F;
+    printf("%x\n", *(u32*)0x4004008);
+
     glBindTexture(GL_TEXTURE_2D, image_texture);
+    glAssignColorTable(GL_TEXTURE_2D, paletteIDS[0]);
     //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S);
@@ -1003,7 +1015,7 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
 int fb_shift_x = 192;
 int fb_shift_y = 128;
 
-void std3D_DrawMenu()
+MATH_FUNC void std3D_DrawMenu()
 {
     if (jkGame_isDDraw) return;
 
@@ -1372,6 +1384,7 @@ void std3D_PurgeEntireTextureCache()
     std3D_loadedTexturesAmt = 0;
 
     glResetTextures();
+    loaded_colormap = NULL;
     std3D_bHasInitted = 0;
 }
 
