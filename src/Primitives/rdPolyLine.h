@@ -16,9 +16,9 @@ rdPolyLine* rdPolyLine_New(char *polyline_fname, char *material_fname, char *mat
 int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *material_side_fname, char *material_tip_fname, flex_t length, flex_t base_rad, flex_t tip_rad, rdGeoMode_t edgeGeometryMode, rdLightMode_t edgeLightingMode, rdTexMode_t edgeTextureMode, flex_t extraLight);
 void rdPolyLine_Free(rdPolyLine *polyline);
 void rdPolyLine_FreeEntry(rdPolyLine *polyline);
-int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix);
+MATH_FUNC int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix);
 
-void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVertexIdxInfo *idxInfo);
+MATH_FUNC void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVertexIdxInfo *idxInfo);
 //static void (*rdPolyLine_DrawFace)(rdThing *thing, rdFace *face, rdVector3 *unused, rdVertexIdxInfo *idxInfo) = (void*)rdPolyLine_DrawFace_ADDR;
 
 #endif // _RDPOLYLINE_H

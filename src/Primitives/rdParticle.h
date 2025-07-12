@@ -44,7 +44,7 @@ void rdParticle_FreeEntry(rdParticle *particle);
 rdParticle* rdParticle_Load(char *path);
 int rdParticle_LoadEntry(char *fpath, rdParticle *particle);
 int rdParticle_Write(char *writePath, rdParticle *particle, char *madeBy);
-int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3);
+MATH_FUNC int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3);
 
 //static void (*rdParticle_Draw)(rdThing *thing, rdMatrix34 *matrix) = (void*)rdParticle_Draw_ADDR;
 

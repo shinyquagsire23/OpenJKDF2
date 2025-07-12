@@ -195,18 +195,18 @@ void rdModel3_Free(rdModel3 *model);
 void rdModel3_FreeEntry(rdModel3 *model);
 void rdModel3_FreeEntryGeometryOnly(rdModel3 *model);
 rdModel3* rdModel3_Validate(rdModel3 *model);
-void rdModel3_CalcBoundingBoxes(rdModel3 *model);
-void rdModel3_BuildExpandedRadius(rdModel3 *model, rdHierarchyNode *node, const rdMatrix34 *matrix);
-void rdModel3_CalcFaceNormals(rdModel3 *model);
-void rdModel3_CalcVertexNormals(rdModel3 *model);
-void rdModel3_CalcNumParents(rdModel3* pModel); // MOTS added
+MATH_FUNC void rdModel3_CalcBoundingBoxes(rdModel3 *model);
+MATH_FUNC void rdModel3_BuildExpandedRadius(rdModel3 *model, rdHierarchyNode *node, const rdMatrix34 *matrix);
+MATH_FUNC void rdModel3_CalcFaceNormals(rdModel3 *model);
+MATH_FUNC void rdModel3_CalcVertexNormals(rdModel3 *model);
+MATH_FUNC void rdModel3_CalcNumParents(rdModel3* pModel); // MOTS added
 rdHierarchyNode* rdModel3_FindNamedNode(char *name, rdModel3 *model);
-int rdModel3_GetMeshMatrix(rdThing *thing, rdMatrix34 *matrix, uint32_t nodeIdx, rdMatrix34 *out);
-int rdModel3_ReplaceMesh(rdModel3 *model, int geosetIdx, int meshIdx, rdMesh *in);
-int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3);
-void rdModel3_DrawHNode(rdHierarchyNode *pNode);
-void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat);
-int rdModel3_DrawFace(rdFace *face, int lightFlags);
+MATH_FUNC int rdModel3_GetMeshMatrix(rdThing *thing, rdMatrix34 *matrix, uint32_t nodeIdx, rdMatrix34 *out);
+MATH_FUNC int rdModel3_ReplaceMesh(rdModel3 *model, int geosetIdx, int meshIdx, rdMesh *in);
+MATH_FUNC int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3);
+MATH_FUNC void rdModel3_DrawHNode(rdHierarchyNode *pNode);
+MATH_FUNC void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat);
+MATH_FUNC int rdModel3_DrawFace(rdFace *face, int lightFlags);
 
 #ifdef __cplusplus
 }

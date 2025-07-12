@@ -973,6 +973,9 @@ rdSurface* sithSurface_SlideWall(sithSurface *surface, rdVector3 *a2)
     a1.x = v31.x - v30.x;
     v28 = v15;
     a1.y = v31.y - v30.y;
+
+    // Added: fixed point hanged here
+    int fallback = 0;
     for ( a1.z = v31.z - v30.z; rdVector_Len3(&a1) < 0.0001; v28 = v17[v16].y )
     {
         if ( ++v7 == surface->surfaceInfo.face.numVertices )
@@ -981,6 +984,12 @@ rdSurface* sithSurface_SlideWall(sithSurface *surface, rdVector3 *a2)
         v16 = surface->surfaceInfo.face.vertexUVIdx[v7];
         v17 = v6->vertexUVs;
         v25 = v17[v16].x;
+
+        // Added: fixed point hanged here
+        fallback++;
+        if (fallback > 100) {
+            break;
+        }
     }
     rdVector_Sub3Acc(&v30, &v31);
     v26 = v25 - v35.x;

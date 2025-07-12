@@ -46,8 +46,8 @@ int sithSoundMixer_Startup();
 void sithSoundMixer_Shutdown();
 int sithSoundMixer_PlaySong(unsigned int trackFrom, unsigned int trackTo, unsigned int trackNum, int a4);
 void sithSoundMixer_StopSong();
-void sithSoundMixer_UpdateMusicVolume(flex_t musicVolume);
-void sithSoundMixer_SetMusicVol(flex_t volume);
+MATH_FUNC void sithSoundMixer_UpdateMusicVolume(flex_t musicVolume);
+MATH_FUNC void sithSoundMixer_SetMusicVol(flex_t volume);
 void sithSoundMixer_ResumeMusic(int a1);
 int sithSoundMixer_Open();
 void sithSoundMixer_Close();
@@ -60,14 +60,14 @@ sithPlayingSound* sithSoundMixer_PlaySoundPosAbsolute(sithSound *a1, rdVector3 *
 sithPlayingSound* sithSoundMixer_PlaySoundPosThing(sithSound *sound, sithThing *a2, flex_t a3, flex_t a4, flex_t a5, int flags);
 void sithSoundMixer_PlayingSoundReset(sithPlayingSound *sound);
 void sithSoundMixer_Reset();
-void sithSoundMixer_SetPitch(sithPlayingSound *sound, flex_t pitch, flex_t changetime);
+MATH_FUNC void sithSoundMixer_SetPitch(sithPlayingSound *sound, flex_t pitch, flex_t changetime);
 int sithSoundMixer_SetFrequency(sithPlayingSound *sound, flex_t pitch);
 void sithSoundMixer_FadeSound(sithPlayingSound *sound, flex_t vol_, flex_t fadeintime_);
 void sithSoundMixer_SetVolume(sithPlayingSound *sound, flex_t volume);
 
-void sithSoundMixer_Tick(flex_t deltaSecs);
-void sithSoundMixer_TickPlayingSound(sithPlayingSound *sound, flex_t deltaSecs);
-void sithSoundMixer_UpdateSoundPos(sithPlayingSound *sound);
+MATH_FUNC void sithSoundMixer_Tick(flex_t deltaSecs);
+MATH_FUNC void sithSoundMixer_TickPlayingSound(sithPlayingSound *sound, flex_t deltaSecs);
+MATH_FUNC void sithSoundMixer_UpdateSoundPos(sithPlayingSound *sound);
 void sithSoundMixer_SetVelocity(sithPlayingSound *sound);
 
 void sithSoundMixer_SyncSounds();
@@ -75,7 +75,7 @@ void sithSoundMixer_FreePlayingSound(sithPlayingSound *sound);
 
 void sithSoundMixer_FreeThing(sithThing *thing);
 sithPlayingSound* sithSoundMixer_GetSoundFromRef(int refid);
-void sithSoundMixer_UpdatePlayingSoundPosition(sithPlayingSound *sound);
+MATH_FUNC void sithSoundMixer_UpdatePlayingSoundPosition(sithPlayingSound *sound);
 void sithSoundMixer_SectorSound(sithSector *sector, sithSound *sound, flex_t vol);
 int sithSoundMixer_sub_4DD3F0(sithPlayingSound *sound);
 int sithSoundMixer_sub_4DD5D0(sithPlayingSound *sound);

@@ -35,11 +35,11 @@ rdProcEntry *rdCache_GetProcEntry();
 void rdCache_Flush();
 int rdCache_SendFaceListToHardware();
 void rdCache_ResetRenderList();
-void rdCache_DrawRenderList();
+MATH_FUNC void rdCache_DrawRenderList();
 int rdCache_TriCompare(const void* a_, const void* b_);
 
 int rdCache_ProcFaceCompare(rdProcEntry *a, rdProcEntry *b);
-int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags);
+MATH_FUNC int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags);
 
 #ifndef __cplusplus
 static void (*rdCache_DrawFaceUser)(rdProcEntry* face) = (void*)rdCache_DrawFaceUser_ADDR;

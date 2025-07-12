@@ -22,23 +22,23 @@
 #define rdClip_Face3GTOrtho_ADDR (0x004748D0)
 #define rdClip_SphereInFrustrum_ADDR (0x004756E0)
 
-int rdClip_Line2(rdCanvas *canvas, signed int *pX1, signed int *pY1, signed int *pX2, signed int *pY2);
-int rdClip_CalcOutcode2(rdCanvas *canvas, int x, int y);
-int rdClip_Point3(rdClipFrustum *clipFrustum, rdVector3 *point);
-int rdClip_Line3Project(rdClipFrustum *clipFrustum, rdVector3 *point1, rdVector3 *point2, int *out1, int *out2);
-int rdClip_Line3Ortho(rdClipFrustum *clipFrustum, rdVector3 *point1, rdVector3 *point2, int *out1, int *out2);
-int rdClip_Line3(rdClipFrustum *clipFrustum, rdVector3 *point1, rdVector3 *point2, rdVector3 *pointOut1, rdVector3 *pointOut2, int *out1, int *out2);
+MATH_FUNC int rdClip_Line2(rdCanvas *canvas, signed int *pX1, signed int *pY1, signed int *pX2, signed int *pY2);
+MATH_FUNC int rdClip_CalcOutcode2(rdCanvas *canvas, int x, int y);
+MATH_FUNC int rdClip_Point3(rdClipFrustum *clipFrustum, rdVector3 *point);
+MATH_FUNC int rdClip_Line3Project(rdClipFrustum *clipFrustum, rdVector3 *point1, rdVector3 *point2, int *out1, int *out2);
+MATH_FUNC int rdClip_Line3Ortho(rdClipFrustum *clipFrustum, rdVector3 *point1, rdVector3 *point2, int *out1, int *out2);
+MATH_FUNC int rdClip_Line3(rdClipFrustum *clipFrustum, rdVector3 *point1, rdVector3 *point2, rdVector3 *pointOut1, rdVector3 *pointOut2, int *out1, int *out2);
 
-int rdClip_SphereInFrustrum(rdClipFrustum *frust, rdVector3 *pos, flex_t rad);
+MATH_FUNC int rdClip_SphereInFrustrum(rdClipFrustum *frust, rdVector3 *pos, flex_t rad);
 
-int rdClip_Face3W(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices);
-int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, flex_t *a4, int numVertices);
-int rdClip_Face3S(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices);
-int rdClip_Face3GS(rdClipFrustum *frustum, rdVector3 *vertices, flex_t *a3, int numVertices);
-int rdClip_Face3T(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, int numVertices);
+MATH_FUNC int rdClip_Face3W(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices);
+MATH_FUNC int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, flex_t *a4, int numVertices);
+MATH_FUNC int rdClip_Face3S(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices);
+MATH_FUNC int rdClip_Face3GS(rdClipFrustum *frustum, rdVector3 *vertices, flex_t *a3, int numVertices);
+MATH_FUNC int rdClip_Face3T(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, int numVertices);
 
-int rdClip_Face3GSRGB(rdClipFrustum *frustum, rdVector3 *vertices, flex_t *pR, flex_t *pG, flex_t *pB, int numVertices);
-int rdClip_Face3GTRGB(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, flex_t *pR, flex_t *pG, flex_t *pB, int numVertices);
+MATH_FUNC int rdClip_Face3GSRGB(rdClipFrustum *frustum, rdVector3 *vertices, flex_t *pR, flex_t *pG, flex_t *pB, int numVertices);
+MATH_FUNC int rdClip_Face3GTRGB(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, flex_t *pR, flex_t *pG, flex_t *pB, int numVertices);
 
 //static int (__cdecl *rdClip_SphereInFrustrum)(rdClipFrustum *frust, rdVector3 *pos, flex_t rad) = (void*)rdClip_SphereInFrustrum_ADDR;
 //static int (*rdClip_Face3SOrtho)(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices) = (void*)rdClip_Face3SOrtho_ADDR;

@@ -558,13 +558,38 @@ int32_t sqrt_fx16_16_to_fx16_16(int32_t v) {
     return q;
 }
 
+#ifdef TARGET_TWL
+s32 sqrtf32_mine(s32 a)
+{
+    REG_SQRT_PARAM = ((s64)a) << 12;
+
+    while(REG_SQRTCNT & SQRT_BUSY);
+
+    return REG_SQRT_RESULT;
+}
+#endif
+
 flex_t stdMath_Sqrt(flex_t a)
 {
+#if 0
+    static int last_frame = 0;
+    static int num_sqrts = 0;
+    extern int std3D_frameCount;
+    if (last_frame != std3D_frameCount) {
+        printf("sqrts %d\n", num_sqrts);
+        last_frame = std3D_frameCount;
+        num_sqrts = 0;
+    }
+    num_sqrts += 1;
+#endif
+
     if (a < (flex_t)0.0)
         return (flex_t)0.0;
 
-#if defined(EXPERIMENTAL_FIXED_POINT) && defined(TARGET_TWL)
-    //return f32toflex(sqrtf32(flextof32(a)));
+#if defined(TARGET_TWL)
+    //return f32toflex(sqrtf32_mine(flextof32(a)));
+    return flexdirect(sqrt_fx16_16_to_fx16_16(a.to_raw()));
+#elif defined(EXPERIMENTAL_FIXED_POINT)
     return flexdirect(sqrt_fx16_16_to_fx16_16(a.to_raw()));
 #else
     return sqrtf((float)a);

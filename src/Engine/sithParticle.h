@@ -19,9 +19,9 @@ void sithParticle_Shutdown();
 rdParticle* sithParticle_LoadEntry(const char *a1);
 int sithParticle_New(sithWorld *world, int numParticles);
 int sithParticle_LoadThingParams(stdConffileArg *arg, sithThing *thing, int param);
-void sithParticle_Tick(sithThing *particle, flex_t deltaMs);
-void sithParticle_CreateThing(sithThing *thing);
-void sithParticle_Remove(sithThing *particle);
+MATH_FUNC void sithParticle_Tick(sithThing *particle, flex_t deltaMs);
+MATH_FUNC void sithParticle_CreateThing(sithThing *thing);
+MATH_FUNC void sithParticle_Remove(sithThing *particle);
 void sithParticle_FreeEntry(sithThing *thing);
 void sithParticle_Free(sithWorld *world);
 

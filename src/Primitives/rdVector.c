@@ -5,6 +5,10 @@
 #include "General/stdMath.h"
 #include "Primitives/rdMath.h"
 
+#ifdef TARGET_TWL
+#include <nds.h>
+#endif
+
 const rdVector2 rdroid_zeroVector2 = {0.0, 0.0};
 const rdVector3 rdroid_zeroVector3 = {0.0,0.0,0.0};
 const rdVector3 rdroid_xVector3 = {1.0,0.0,0.0};
@@ -261,8 +265,48 @@ flex_t rdVector_Normalize2(rdVector2 *v1, const rdVector2 *v2)
     return len;
 }
 
+#ifdef TARGET_TWL
+s32 divf32_mine(s32 num, s32 den)
+{
+    REG_DIV_NUMER = ((s64)num) << 12;
+    REG_DIV_DENOM_L = den;
+
+    while(REG_DIVCNT & DIV_BUSY);
+
+    return (REG_DIV_RESULT_L);
+}
+#endif
+
 flex_t rdVector_Normalize3(rdVector3 *v1, const rdVector3 *v2)
 {
+#ifdef TARGET_TWL
+#if 0
+    static int last_frame = 0;
+    static int num_sqrts = 0;
+    extern int std3D_frameCount;
+    if (last_frame != std3D_frameCount) {
+        printf("norms %d\n", num_sqrts);
+        last_frame = std3D_frameCount;
+        num_sqrts = 0;
+    }
+    num_sqrts += 1;
+#endif
+
+    flex_t len = rdVector_Len3(v2);
+    if (len == 0.0)
+    {
+        v1->x = v2->x;
+        v1->y = v2->y;
+        v1->z = v2->z;
+    }
+    else
+    {
+        v1->x = f32toflex(divf32_mine(flextof32(v2->x), flextof32(len)));
+        v1->y = f32toflex(divf32_mine(flextof32(v2->y), flextof32(len)));
+        v1->z = f32toflex(divf32_mine(flextof32(v2->z), flextof32(len)));
+    }
+    return len;
+#else
     flex_t len = rdVector_Len3(v2);
     if (len == 0.0)
     {
@@ -277,6 +321,7 @@ flex_t rdVector_Normalize3(rdVector3 *v1, const rdVector3 *v2)
         v1->z = v2->z / len;
     }
     return len;
+#endif
 }
 
 flex_t rdVector_Normalize3Quick(rdVector3 *v1, const rdVector3 *v2)

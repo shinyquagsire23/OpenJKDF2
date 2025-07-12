@@ -82,6 +82,9 @@ typedef uint32_t size_t;
 #define flextov16(n) ((v16)((int32_t)n.to_raw() >> (16-12)))
 #define flextof32(n) ((int32_t)((int32_t)n.to_raw() >> (16-12)))
 #define f32toflex(n) (numeric::fixed<16, 16>::from_base(n<<(16-12)))
+#endif
+
+#ifdef EXPERIMENTAL_FIXED_POINT
 #define flexdirect(n) (numeric::fixed<16, 16>::from_base(n))
 #endif
 

@@ -1391,21 +1391,29 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
         }
     }
 
-
-    int test = stdPlatform_GetTimeMsec();
     // This is about 1/2 of the render time for E-11, 1/4 for saber
     // Before this is about 1/2 the render time for saber
     rdMatrix_TransformPoint34(&localCamera, &rdCamera_camMatrix.scale, &matInv);
     rdFace* face = &meshIn->faces[0];
+
+    // Be extra sure we're setting backface culling
+#ifdef TARGET_TWL
+    rdroid_curRenderOptions |= 1;
+#endif
+
     for (int i = 0; i < meshIn->numFaces; i++)
     {
         int flags = 0;
-        if ( (localCamera.y - pCurMesh->vertices[*face->vertexPosIdx].y) * face->normal.y
+        flex_t normalCheck = (localCamera.y - pCurMesh->vertices[*face->vertexPosIdx].y) * face->normal.y
            + (localCamera.x - pCurMesh->vertices[*face->vertexPosIdx].x) * face->normal.x
-           + (localCamera.z - pCurMesh->vertices[*face->vertexPosIdx].z) * face->normal.z <= 0.0 )
+           + (localCamera.z - pCurMesh->vertices[*face->vertexPosIdx].z) * face->normal.z;
+        
+        // Allow rendering faces facing away from camera if they're double-sided,
+        // or we aren't doing backface culling
+        if ( normalCheck <= 0.0 )
         {
             flags = 1;
-            if ( !(face->type & 1) && rdroid_curRenderOptions & 1 )
+            if ( !(face->type & 1) && (rdroid_curRenderOptions & 1) )
             {
                 ++face;
                 continue;
@@ -1416,9 +1424,6 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
         rdModel3_DrawFace(face, flags);
         ++face;
     }
-extern int jkPlayer_checkPov;
-    if (jkPlayer_checkPov)
-        printf("%d\n", stdPlatform_GetTimeMsec() - test);
 }
 
 // MOTS altered (RGB lights)
@@ -1435,6 +1440,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
     if ( !procEntry )
         return 0;
 
+    // Force diffuse lighting, we can't be ballers on DSi
 #ifdef TARGET_TWL
     rdModel3_lightingMode = RD_LIGHTMODE_DIFFUSE;
 #endif
@@ -1453,7 +1459,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
 
     // MOTS added
     if ((face->type & 0x10) != 0) {
-        procEntry->lightingMode = 1;
+        procEntry->lightingMode = RD_LIGHTMODE_NOTLIT;
     }
 
     // Added: safeguard
@@ -1535,11 +1541,11 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
         {
             if ( procEntry->light_level_static >= 1.0 && isIdentityMap )
             {
-                procEntry->lightingMode = 0;
+                procEntry->lightingMode = RD_LIGHTMODE_FULLYLIT;
             }
             else if ( procEntry->light_level_static <= 0.0 )
             {
-                procEntry->lightingMode = 1;
+                procEntry->lightingMode = RD_LIGHTMODE_NOTLIT;
             }
             goto LABEL_44;
         }
@@ -1560,33 +1566,33 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
         {
             if ( procEntry->vertexIntensities[0] == 0.0 )
             {
-                procEntry->lightingMode = 1;
+                procEntry->lightingMode = RD_LIGHTMODE_NOTLIT;
                 procEntry->light_level_static = 0.0;
             }
             else
             {
-                procEntry->lightingMode = 2;
+                procEntry->lightingMode = RD_LIGHTMODE_DIFFUSE;
                 procEntry->light_level_static = procEntry->vertexIntensities[0];
             }
             goto LABEL_44;
         }
         if ( isIdentityMap )
         {
-            procEntry->lightingMode = 0;
+            procEntry->lightingMode = RD_LIGHTMODE_FULLYLIT;
             goto LABEL_44;
         }
 
-        procEntry->lightingMode = 2;
+        procEntry->lightingMode = RD_LIGHTMODE_DIFFUSE;
         procEntry->light_level_static = 1.0;
         goto LABEL_44;
     }
     if ( !isIdentityMap )
     {
-        procEntry->lightingMode = 2;
+        procEntry->lightingMode = RD_LIGHTMODE_DIFFUSE;
         procEntry->light_level_static = 1.0;
         goto LABEL_44;
     }
-    procEntry->lightingMode = 0;
+    procEntry->lightingMode = RD_LIGHTMODE_FULLYLIT;
 
 LABEL_44:
     flags = 1;

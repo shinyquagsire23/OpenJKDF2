@@ -46,10 +46,11 @@ void sithControl_Close();
 void sithControl_InitFuncToControlType();
 void sithControl_Tick(flex_t deltaSecs, int deltaMs);
 void sithControl_AddInputHandler(sithControl_handler_t a1);
-int sithControl_HandlePlayer(sithThing *player_, flex_t a2);
-void sithControl_PlayerLook(sithThing *player, flex_t deltaSecs);
-void sithControl_PlayerMovement(sithThing *player);
-void sithControl_FreeCam(sithThing *player);
+MATH_FUNC int sithControl_HandlePlayer(sithThing *player_, flex_t a2);
+MATH_FUNC void sithControl_PlayerLook(sithThing *player, flex_t deltaSecs);
+MATH_FUNC void sithControl_PlayerMovement(sithThing *player);
+MATH_FUNC void sithControl_PlayerMovementMots(sithThing *player);
+MATH_FUNC void sithControl_FreeCam(sithThing *player);
 
 stdControlKeyInfoEntry* sithControl_MapFunc(int funcIdx, int keyNum, int flags);
 stdControlKeyInfoEntry* sithControl_MapAxisFunc(int funcIdx, int dxKeyNum, uint32_t flags);

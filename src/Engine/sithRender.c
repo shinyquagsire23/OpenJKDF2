@@ -317,6 +317,11 @@ void sithRender_Draw()
     rdSetTextureMode(sithRender_texMode);
     rdSetRenderOptions(rdGetRenderOptions() | 2);
 
+    // Somehow backface culling on models got unset...?
+#ifdef QOL_IMPROVEMENTS
+    rdSetRenderOptions(rdGetRenderOptions() | 1);
+#endif
+
     if (!sithCamera_currentCamera || !sithCamera_currentCamera->sector)
         return;
 
@@ -435,10 +440,11 @@ void sithRender_Draw()
     }
 #endif
 
-    // TWL: 123ms
+    // TWL: 16ms
     sithRender_RenderLevelGeometry();
 
-    // TWL: 125ms
+
+    // TWL: 10-20ms
     if ( sithRender_numSectors2 )
         sithRender_RenderThings();
 
@@ -831,6 +837,11 @@ void sithRender_RenderLevelGeometry()
     }
     rdSetSortingMethod(0);
 
+#ifdef TARGET_TWL
+    rdSetVertexColorMode(0);
+    //sithRender_SetLightMode(RD_LIGHTMODE_DIFFUSE);
+#endif
+
     vertices_uvs = sithWorld_pCurrentWorld->vertexUVs;
     sithRender_idxInfo.vertices = sithWorld_pCurrentWorld->verticesTransformed;
     sithRender_idxInfo.paDynamicLight = sithWorld_pCurrentWorld->verticesDynamicLight;
@@ -839,6 +850,7 @@ void sithRender_RenderLevelGeometry()
 
     for (v72 = 0; v72 < sithRender_numSectors; v72++)
     {
+        // Surfaces are 13ms on landing terminal spawn
         level_idk = sithRender_aSectors[v72];
         if ( sithRender_lightingIRMode )
         {
@@ -1339,6 +1351,7 @@ LABEL_150:
             ;    
         }
 
+        // Surprisingly, this is a fairly minimal cost to the entire render, 3ms on landing terminal spawn
         rdSetProcFaceUserData(level_idk->id | 0x10000);
         int safeguard = 0;
         for ( i = level_idk->thingsList; i; i = i->nextThing )
@@ -1405,6 +1418,7 @@ LABEL_150:
                 }
             }
 #endif // JKM_LIGHTING
+
             if ( sithRender_RenderThing(i) )
                 ++sithRender_geoThingsDrawn;
 
@@ -1421,8 +1435,10 @@ LABEL_150:
             }
 #endif
         }
+
         ++sithRender_sectorsDrawn;
     }
+    
 
 #ifndef TARGET_TWL
     // TWL: 5-27ms

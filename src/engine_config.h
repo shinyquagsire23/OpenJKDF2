@@ -97,7 +97,7 @@
 #define SITHCOG_NODE_STACKDEPTH (0x800) // JK was 0x200, MoTS is 0x400
 #elif defined(TARGET_TWL)
 
-#define SITHCOGVM_MAX_STACKSIZE (32)
+#define SITHCOGVM_MAX_STACKSIZE (64)
 #define SITHCOG_SYMBOL_LIMIT (1024) // JK was 512, MoTS/DW are 1024
 #define SITHCOG_LINKED_SYMBOL_LIMIT (256)
 #define SITHCOG_MAX_LINKS (512)
@@ -316,6 +316,14 @@ typedef double flex_d_t_type;
 #pragma warning(disable: 4715) // not all control paths return a value
 #pragma warning(disable: 4716) // 'blahblah': must return a value
 #pragma warning(disable: 5105) // macro expansion producing 'defined' has undefined behavior
+#endif
+
+// Optimize for math operations, depending on the architecture
+// TODO: Have a TARGET_ARMvIDK or something
+#ifdef TARGET_TWL
+#define MATH_FUNC __attribute__((target("arm")))
+#else
+#define MATH_FUNC
 #endif
 
 #endif // _OPENJKDF2_ENGINE_CONFIG_H

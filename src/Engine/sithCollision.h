@@ -32,22 +32,22 @@ int sithCollision_Shutdown();
 void sithCollision_RegisterCollisionHandler(int idxA, int idxB, sithCollision_collisionHandler_t func, sithCollision_searchHandler_t a4);
 void sithCollision_RegisterHitHandler(int type, sithCollisionHitHandler_t a2);
 #if 1
-sithCollisionSearchEntry* sithCollision_NextSearchResult();
-flex_t sithCollision_SearchRadiusForThings(sithSector* pStartSector, sithThing* pThing, const rdVector3* pStartPos, const rdVector3* pMoveNorm, flex_t moveDist, flex_t radius, int flags);
-void sithCollision_SearchClose();
-flex_t sithCollision_UpdateSectorThingCollision(sithSector *a1, sithThing *sender, const rdVector3 *a2, const rdVector3 *a3, flex_t a4, flex_t range, int flags);
-void sithCollision_sub_4E86D0(sithSector *a1, const rdVector3 *a2, const rdVector3 *a3, flex_t a4, flex_t a5, int raycastFlags);
-sithSector* sithCollision_GetSectorLookAt(sithSector *sector, const rdVector3 *a3, rdVector3 *a4, flex_t a5);
+MATH_FUNC sithCollisionSearchEntry* sithCollision_NextSearchResult();
+MATH_FUNC flex_t sithCollision_SearchRadiusForThings(sithSector* pStartSector, sithThing* pThing, const rdVector3* pStartPos, const rdVector3* pMoveNorm, flex_t moveDist, flex_t radius, int flags);
+MATH_FUNC void sithCollision_SearchClose();
+MATH_FUNC flex_t sithCollision_UpdateSectorThingCollision(sithSector *a1, sithThing *sender, const rdVector3 *a2, const rdVector3 *a3, flex_t a4, flex_t range, int flags);
+MATH_FUNC void sithCollision_sub_4E86D0(sithSector *a1, const rdVector3 *a2, const rdVector3 *a3, flex_t a4, flex_t a5, int raycastFlags);
+MATH_FUNC sithSector* sithCollision_GetSectorLookAt(sithSector *sector, const rdVector3 *a3, rdVector3 *a4, flex_t a5);
 #endif
-void sithCollision_FallHurt(sithThing *thing, flex_t vel);
-void sithCollision_sub_4E7670(sithThing *thing, rdMatrix34 *orient);
-flex_t sithCollision_UpdateThingCollision(sithThing* pThing, rdVector3* a2, flex_t a6, int flags);
-int sithCollision_DefaultHitHandler(sithThing *thing, sithSurface *surface, sithCollisionSearchEntry *a3);
-int sithCollision_DebrisDebrisCollide(sithThing *thing1, sithThing *thing2, sithCollisionSearchEntry *a3, int isInverse);
-int sithCollision_CollideHurt(sithThing *a1, rdVector3 *a2, flex_t a3, int a4);
-int sithCollision_HasLos(sithThing *thing1, sithThing *thing2, int flag);
-void sithCollision_sub_4E77A0(sithThing *thing, rdMatrix34 *a2);
-int sithCollision_DebrisPlayerCollide(sithThing *thing, sithThing *thing2, sithCollisionSearchEntry *searchEnt, int isSolid);
+MATH_FUNC void sithCollision_FallHurt(sithThing *thing, flex_t vel);
+MATH_FUNC void sithCollision_sub_4E7670(sithThing *thing, rdMatrix34 *orient);
+MATH_FUNC flex_t sithCollision_UpdateThingCollision(sithThing* pThing, rdVector3* a2, flex_t a6, int flags);
+MATH_FUNC int sithCollision_DefaultHitHandler(sithThing *thing, sithSurface *surface, sithCollisionSearchEntry *a3);
+MATH_FUNC int sithCollision_DebrisDebrisCollide(sithThing *thing1, sithThing *thing2, sithCollisionSearchEntry *a3, int isInverse);
+MATH_FUNC int sithCollision_CollideHurt(sithThing *a1, rdVector3 *a2, flex_t a3, int a4);
+MATH_FUNC int sithCollision_HasLos(sithThing *thing1, sithThing *thing2, int flag);
+MATH_FUNC void sithCollision_sub_4E77A0(sithThing *thing, rdMatrix34 *a2);
+MATH_FUNC int sithCollision_DebrisPlayerCollide(sithThing *thing, sithThing *thing2, sithCollisionSearchEntry *searchEnt, int isSolid);
 
 #if 0
 static int (*_sithCollision_Startup)() = (void*)sithCollision_Startup_ADDR;

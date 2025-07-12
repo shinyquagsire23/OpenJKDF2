@@ -246,6 +246,8 @@ void std3D_Shutdown() {
     i8Bitmap_flip = NULL;
     free(i8Bitmap2_flip);
     i8Bitmap2_flip = NULL;
+
+    std3D_FreeResources();
 }
 
 /*
@@ -504,7 +506,7 @@ void std3D_DrawRenderList()
             avg_alpha = 0x1F;
         }
         if (avg_alpha != last_alpha || (flags & 0x20000) != (last_flags & 0x20000) || (flags & 0x10000) != (last_flags & 0x10000)) {
-            glEnd();
+            //glEnd();
             glPolyFmt(POLY_ALPHA(avg_alpha) | ((flags & 0x10000) ? POLY_CULL_NONE : POLY_CULL_BACK) | POLY_MODULATION | POLY_ID(polyid++) | ((flags & 0x20000) ? 0 : POLY_FOG) ) ;
             glBegin(GL_TRIANGLES);
         }
@@ -550,7 +552,7 @@ void std3D_DrawRenderList()
         
         
     }
-    glEnd();
+    //glEnd();
     //glFlush(0);
     
 

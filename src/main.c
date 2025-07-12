@@ -295,6 +295,8 @@ void initSystem(void) {
             openjkdf2_bIsExtraLowMemoryPlatform = 1;
         }
         REG_EXMEMCNT &= ~(1<<15);
+        REG_SQRTCNT = SQRT_64;
+        REG_DIVCNT = DIV_64_32;
     }
 
     irqInit();

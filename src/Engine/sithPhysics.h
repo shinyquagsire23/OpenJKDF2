@@ -18,18 +18,18 @@
 #define sithPhysics_ThingPhysUnderwater_ADDR (0x004F6D80)
 #define sithPhysics_ThingPhysAttached_ADDR (0x004F7430)
 
-void sithPhysics_FindFloor(sithThing *pThing, int a3);
-void sithPhysics_ThingTick(sithThing *pThing, flex_t force);
-void sithPhysics_ThingApplyForce(sithThing *pThing, rdVector3 *forceVec);
-void sithPhysics_ThingSetLook(sithThing *pThing, const rdVector3 *look, flex_t a3);
-void sithPhysics_ApplyDrag(rdVector3 *vec, flex_t drag, flex_t mag, flex_t dragCoef);
-int sithPhysics_LoadThingParams(stdConffileArg *arg, sithThing *pThing, int param);
-void sithPhysics_ThingStop(sithThing *pThing);
-flex_t sithPhysics_ThingGetInsertOffsetZ(sithThing *pThing);
-void sithPhysics_ThingPhysGeneral(sithThing *pThing, flex_t deltaSeconds);
-void sithPhysics_ThingPhysPlayer(sithThing *player, flex_t deltaSeconds);
-void sithPhysics_ThingPhysUnderwater(sithThing *pThing, flex_t deltaSeconds);
-void sithPhysics_ThingPhysAttached(sithThing *pThing, flex_t deltaSeconds);
+MATH_FUNC void sithPhysics_FindFloor(sithThing *pThing, int a3);
+MATH_FUNC void sithPhysics_ThingTick(sithThing *pThing, flex_t force);
+MATH_FUNC void sithPhysics_ThingApplyForce(sithThing *pThing, rdVector3 *forceVec);
+MATH_FUNC void sithPhysics_ThingSetLook(sithThing *pThing, const rdVector3 *look, flex_t a3);
+MATH_FUNC void sithPhysics_ApplyDrag(rdVector3 *vec, flex_t drag, flex_t mag, flex_t dragCoef);
+MATH_FUNC int sithPhysics_LoadThingParams(stdConffileArg *arg, sithThing *pThing, int param);
+MATH_FUNC void sithPhysics_ThingStop(sithThing *pThing);
+MATH_FUNC flex_t sithPhysics_ThingGetInsertOffsetZ(sithThing *pThing);
+MATH_FUNC void sithPhysics_ThingPhysGeneral(sithThing *pThing, flex_t deltaSeconds);
+MATH_FUNC void sithPhysics_ThingPhysPlayer(sithThing *player, flex_t deltaSeconds);
+MATH_FUNC void sithPhysics_ThingPhysUnderwater(sithThing *pThing, flex_t deltaSeconds);
+MATH_FUNC void sithPhysics_ThingPhysAttached(sithThing *pThing, flex_t deltaSeconds);
 
 //static void (*_sithPhysics_ThingPhysAttached)(sithThing *pThing, flex_t deltaSeconds) = (void*)sithPhysics_ThingPhysAttached_ADDR;
 

@@ -40,7 +40,7 @@ void sithCamera_Close();
 void sithCamera_SetsFocus();
 int sithCamera_NewEntry(sithCamera *camera, uint32_t a2, uint32_t a3, flex_t fov, flex_t aspectRatio, rdCanvas *canvas, sithThing *focus_far, sithThing *focus_near);
 
-void sithCamera_FollowFocus(sithCamera *cam);
+MATH_FUNC void sithCamera_FollowFocus(sithCamera *cam);
 void sithCamera_SetRdCameraAndRenderidk();
 void sithCamera_DoIdleAnimation();
 int sithCamera_SetCurrentCamera(sithCamera *camera);
@@ -52,8 +52,8 @@ sithThing* sithCamera_GetSecondaryFocus(sithCamera *pCamera);
 int sithCamera_SetState(int a1);
 int sithCamera_GetState();
 void sithCamera_CycleCamera();
-void sithCamera_SetZoom(sithCamera *pCamera, flex_t zoomScale, flex_t zoom_2); // MOTS added
-void sithCamera_UpdateZoom(sithCamera *pCamera);
+MATH_FUNC void sithCamera_SetZoom(sithCamera *pCamera, flex_t zoomScale, flex_t zoom_2); // MOTS added
+MATH_FUNC void sithCamera_UpdateZoom(sithCamera *pCamera);
 
 #ifndef __cplusplus
 //static void (*sithCamera_Shutdown)() = (void*)sithCamera_Shutdown_ADDR;

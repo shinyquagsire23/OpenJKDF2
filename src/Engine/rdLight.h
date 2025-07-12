@@ -24,18 +24,18 @@ int rdLight_NewEntry(rdLight *light);
 void rdLight_Free(rdLight *light);
 void rdLight_FreeEntry(rdLight *light);
 #ifdef JKM_LIGHTING
-void rdLight_SetAngles(rdLight *pLight, flex_t angleX, flex_t angleY);
+MATH_FUNC void rdLight_SetAngles(rdLight *pLight, flex_t angleX, flex_t angleY);
 #endif
 
-flex_t rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLightPoses, 
+MATH_FUNC flex_t rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLightPoses, 
 #ifdef JKM_LIGHTING
     rdVector3 *localLightDirs, 
 #endif
     int numLights, rdVector3 *verticesEnd, rdVector3 *vertices, flex_t *vertices_i_end, flex_t *vertices_i, int numVertices, flex_t scalar);
-flex_t rdLight_CalcFaceIntensity(rdLight **meshLights, rdVector3 *localLightPoses, int numLights, rdFace *face, rdVector3 *faceNormal, rdVector3 *vertices, flex_t a7);
+MATH_FUNC flex_t rdLight_CalcFaceIntensity(rdLight **meshLights, rdVector3 *localLightPoses, int numLights, rdFace *face, rdVector3 *faceNormal, rdVector3 *vertices, flex_t a7);
 
-void rdLight_CalcDistVertexIntensities();
-void rdLight_CalcDistFaceIntensity();
+MATH_FUNC void rdLight_CalcDistVertexIntensities();
+MATH_FUNC void rdLight_CalcDistFaceIntensity();
 
 #ifdef __cplusplus
 }
