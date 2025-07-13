@@ -188,7 +188,10 @@ void Window_SdlUpdate()
 
     //printf("Heap: 0x%x/0x%x %p\n",  getHeapEnd() - getHeapStart(), getHeapLimit() - getHeapStart(), getHeapStart());
 
-    scanKeys();
+    if (!jkGame_isDDraw)
+    {
+        scanKeys();
+    }
     u16 keysPressed = keysDown();
     if (keysPressed & KEY_START) {
         Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_ESCAPE, 0);

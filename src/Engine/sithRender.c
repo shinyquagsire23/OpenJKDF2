@@ -817,6 +817,7 @@ void sithRender_RenderLevelGeometry()
 
 #ifdef TARGET_TWL
     int skip_this_surface = 1;
+    rdroid_curAcceleration = 1;
 #endif
 
     if ( rdroid_curAcceleration )
@@ -840,6 +841,7 @@ void sithRender_RenderLevelGeometry()
 #ifdef TARGET_TWL
     //rdSetVertexColorMode(0);
     //sithRender_SetLightMode(RD_LIGHTMODE_DIFFUSE);
+    //printf("%x %x %x %x\n", rdroid_curVertexColorMode, sithRender_flag, rdroid_curAcceleration, sithRender_lightMode);
 #endif
 
     vertices_uvs = sithWorld_pCurrentWorld->vertexUVs;
@@ -1874,7 +1876,7 @@ int sithRender_RenderThing(sithThing *pThing)
         pThing->thingflags |= SITH_TF_INCAMFOV;
     }
 
-    pThing->isVisible = bShowInvisibleThings;
+    pThing->lastRenderedTickIdx = jkPlayer_currentTickIdx;
     pThing->lookOrientation.scale = pThing->position;
 
 #ifdef TARGET_TWL

@@ -40,8 +40,8 @@ int rdCanvas_NewEntry(rdCanvas *canvas, int bIdk, stdVBuffer *vbuf, stdVBuffer *
         canvas->widthMinusOne = vbuf->format.width - 1;
         canvas->heightMinusOne = vbuf->format.height - 1;
     }
-    canvas->screen_height_half = (flex_d_t)(canvas->widthMinusOne - canvas->xStart + 1) * 0.5 + (flex_d_t)canvas->xStart;
-    canvas->screen_width_half = (flex_d_t)(canvas->heightMinusOne - canvas->yStart + 1) * 0.5 + (flex_d_t)canvas->yStart;
+    canvas->half_screen_width = (flex_d_t)(canvas->widthMinusOne - canvas->xStart + 1) * 0.5 + (flex_d_t)canvas->xStart;
+    canvas->half_screen_height = (flex_d_t)(canvas->heightMinusOne - canvas->yStart + 1) * 0.5 + (flex_d_t)canvas->yStart;
     return 1;
 }
 

@@ -103,12 +103,11 @@ void stdMath_SinCos(flex_t angle, flex_t *pSinOut, flex_t *pCosOut)
     //return;
 
     normalized = stdMath_NormalizeAngle(angle);
-    normalized_ = normalized;
     if ( normalized >= 90.0 )
     {
-        if ( normalized_ >= 180.0 )
+        if ( normalized >= 180.0 )
         {
-            if ( normalized_ >= 270.0 )
+            if ( normalized >= 270.0 )
                 v8 = 3;
             else
                 v8 = 2;
@@ -122,7 +121,13 @@ void stdMath_SinCos(flex_t angle, flex_t *pSinOut, flex_t *pCosOut)
     {
         v8 = 0;
     }
-    a1 = normalized_ * 45.511112;
+
+    // Dance around the precision for fixed point
+#ifdef QOL_IMPROVEMENTS
+    a1 = (normalized / 90.0) * 4096.0;
+#else
+    a1 = normalized * (4096.0/90.0);
+#endif
     v6 = a1 - stdMath_Floor(a1);
     quantized = (int32_t)a1;
     // TODO quantized is set to -0x800000000??
@@ -973,8 +978,10 @@ int32_t stdMath_FloorDivMod(int32_t in1, int32_t in2, int32_t *out1, int32_t *ou
 
 flex_t stdMath_ClipPrecision(flex_t val)
 {
+#ifndef EXPERIMENTAL_FIXED_POINT
     if (stdMath_Fabs(val) <= 0.00001)
         return 0.0;
+#endif
     return val;
 }
 

@@ -894,10 +894,10 @@ void sithAI_sub_4EAD60(sithActor *actor)
 
     v2 = actor->thing;
     v9 = actor->field_1F4;
-    if ( actor->field_1E0 == bShowInvisibleThings )
+    if ( actor->field_1E0 == jkPlayer_currentTickIdx )
         return;
 
-    actor->field_1E0 = bShowInvisibleThings;
+    actor->field_1E0 = jkPlayer_currentTickIdx;
     v3 = v2->actorParams.templateWeapon;
     if ( v3 )
         actora = v3->moveSize;
@@ -954,9 +954,9 @@ void sithAI_sub_4EAF40(sithActor *actor)
     int v4; // eax
 
     v1 = actor->field_238;
-    if ( actor->field_224 != bShowInvisibleThings )
+    if ( actor->field_224 != jkPlayer_currentTickIdx )
     {
-        actor->field_224 = bShowInvisibleThings;
+        actor->field_224 = jkPlayer_currentTickIdx;
         if ( actor->pMoveThing )
         {
             if ( (actor->pMoveThing->actorParams.typeflags & SITH_AF_INVISIBLE) || (actor->thing->actorParams.typeflags & SITH_AF_COMBO_BLIND) != 0 )

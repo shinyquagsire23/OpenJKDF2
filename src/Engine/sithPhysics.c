@@ -495,7 +495,7 @@ void sithPhysics_ThingPhysGeneral(sithThing *pThing, flex_t deltaSeconds)
         if (pThing->physicsParams.physflags & SITH_PF_FLY)
             rdMatrix_TransformVector34Acc(&pThing->physicsParams.vel, &a);
 
-        if ( ((bShowInvisibleThings + (pThing->thingIdx & 0xFF)) & 7) == 0 )
+        if ( ((jkPlayer_currentTickIdx + (pThing->thingIdx & 0xFF)) & 7) == 0 )
             rdMatrix_Normalize34(&pThing->lookOrientation);
     }
 
@@ -624,7 +624,7 @@ void sithPhysics_ThingPhysPlayer(sithThing *player, flex_t deltaSeconds)
         if (player->physicsParams.physflags & SITH_PF_FLY)
             rdMatrix_TransformVector34Acc(&player->physicsParams.vel, &a);
 
-        if ( ((bShowInvisibleThings + (player->thingIdx & 0xFF)) & 7) == 0 )
+        if ( ((jkPlayer_currentTickIdx + (player->thingIdx & 0xFF)) & 7) == 0 )
             rdMatrix_Normalize34(&player->lookOrientation);
     }
 
@@ -712,7 +712,7 @@ void sithPhysics_ThingPhysUnderwater(sithThing *pThing, flex_t deltaSeconds)
     {
         rdMatrix_BuildRotate34(&tmpMat, &a3);
         sithCollision_sub_4E7670(pThing, &tmpMat);
-        if ( (((bShowInvisibleThings & 0xFF) + (pThing->thingIdx & 0xFF)) & 7) == 0 )
+        if ( (((jkPlayer_currentTickIdx & 0xFF) + (pThing->thingIdx & 0xFF)) & 7) == 0 )
             rdMatrix_Normalize34(&pThing->lookOrientation);
     }
     if ( pThing->physicsParams.airDrag != 0.0 )
@@ -906,7 +906,7 @@ void sithPhysics_ThingPhysAttached(sithThing *pThing, flex_t deltaSeconds)
             rdVector_Scale3Acc(&pThing->physicsParams.vel, 1.0 - possibly_undef_2);
             rdVector_MultAcc3(&pThing->physicsParams.vel, &out, possibly_undef_2);
         }
-        if ( (((bShowInvisibleThings & 0xFF) + (pThing->thingIdx & 0xFF)) & 7) == 0 )
+        if ( (((jkPlayer_currentTickIdx & 0xFF) + (pThing->thingIdx & 0xFF)) & 7) == 0 )
             rdMatrix_Normalize34(&pThing->lookOrientation);
     }
     if ( possibly_undef_2 < 0.25 )
@@ -986,7 +986,7 @@ void sithPhysics_ThingPhysAttached(sithThing *pThing, flex_t deltaSeconds)
                 sithCollision_sub_4E7670(pThing, &a);
                 if ( (pThing->physicsParams.physflags & SITH_PF_FLY) != 0 )
                     rdMatrix_TransformVector34Acc(&pThing->physicsParams.vel, &a);
-                if ( ((bShowInvisibleThings + (pThing->thingIdx & 0xFF)) & 7) == 0 )
+                if ( ((jkPlayer_currentTickIdx + (pThing->thingIdx & 0xFF)) & 7) == 0 )
                     rdMatrix_Normalize34(&pThing->lookOrientation);
             }
 
@@ -1050,6 +1050,10 @@ void sithPhysics_ThingPhysAttached(sithThing *pThing, flex_t deltaSeconds)
             if (NEEDS_STEPPED_PHYS)
                 v109 *= (deltaSeconds / CANONICAL_PHYS_TICKRATE);
 #endif
+#ifdef EXPERIMENTAL_FIXED_POINT
+            if (!(NEEDS_STEPPED_PHYS))
+                v109 *= (deltaSeconds / CANONICAL_PHYS_TICKRATE);
+#endif
             rdVector_MultAcc3(&pThing->physicsParams.vel, &attachedNormal, -v109);
         }
     }
@@ -1101,6 +1105,9 @@ void sithPhysics_ThingPhysAttached(sithThing *pThing, flex_t deltaSeconds)
             v131 = orig_v131;
 #else
         v131 = orig_v131;
+#endif
+#ifdef EXPERIMENTAL_FIXED_POINT
+        v131 = new_v131;
 #endif
 
         // Added: Fix turret slowly drifting up?

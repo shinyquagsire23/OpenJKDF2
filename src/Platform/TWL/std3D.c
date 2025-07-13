@@ -41,8 +41,8 @@ static TWLVERTEX GL_tmpVertices[STD3D_MAX_VERTICES] = {0};
 static size_t GL_tmpVerticesAmt = 0;
 static size_t rendered_tris = 0;
 
-static flex_t res_fix_x = (1.0/(640.0-(2.5*256.0/640.0)));
-static flex_t res_fix_y = (1.0/(480.0-(2.5*192.0/480.0)));
+const static flex_t res_fix_x = (1.0/(640.0-(2.5*256.0/640.0)));
+const static flex_t res_fix_y = (1.0/(480.0-(2.5*192.0/480.0)));
 
 static float test_idk = 32.0;
 int std3D_bHasInitted = 0;
@@ -57,6 +57,9 @@ u8* i8Bitmap = NULL;
 u8* i8Bitmap2 = NULL;
 u8* i8Bitmap_flip = NULL;
 u8* i8Bitmap2_flip = NULL;
+
+D3DVERTEX* tmpD3DVertices = NULL;
+rdTri* tmpTris = NULL;
 
 //verticies for the cube
 v16 CubeVectors[] = {
@@ -455,11 +458,17 @@ int std3D_RenderListVerticesFinish()
 
 void std3D_DrawRenderList()
 {
+    std3D_ResetRenderList();
+}
+
+void std3D_DrawRenderListReal()
+{
     //printf("DrawRenderList %u %u\n", GL_tmpTrisAmt, GL_tmpVerticesAmt);
     if (!GL_tmpTrisAmt) return;
 
-    TWLVERTEX* vertexes = GL_tmpVertices;
-    rdTri* tris = GL_tmpTris;
+    //TWLVERTEX* vertexes = GL_tmpVertices;
+    D3DVERTEX* vertexes = tmpD3DVertices;
+    rdTri* tris = tmpTris;//GL_tmpTris;
 
     std3D_ActuallyNeedToWaitForGeometryToFinish();
 
@@ -499,10 +508,11 @@ void std3D_DrawRenderList()
         //printf("tri %d %dx%d\n", tex_id, tex_w, tex_h);
 
 
-        TWLVERTEX* v1 = &vertexes[tris[j].v1];
-        TWLVERTEX* v2 = &vertexes[tris[j].v2];
-        TWLVERTEX* v3 = &vertexes[tris[j].v3];
+        D3DVERTEX* v1 = &vertexes[tris[j].v1];
+        D3DVERTEX* v2 = &vertexes[tris[j].v2];
+        D3DVERTEX* v3 = &vertexes[tris[j].v3];
 
+#if 0
         int avg_alpha = COMP_A(v3->color) + COMP_A(v2->color) + COMP_A(v1->color);
         if (avg_alpha != 0x2FD) {
             avg_alpha = ((avg_alpha / 3) >> 3) & 0x1F;
@@ -510,6 +520,8 @@ void std3D_DrawRenderList()
         else {
             avg_alpha = 0x1F;
         }
+#endif
+        int avg_alpha = COMP_A(v3->color) >> 3;
         if (avg_alpha != last_alpha || (flags & 0x20000) != (last_flags & 0x20000) || (flags & 0x10000) != (last_flags & 0x10000)) {
             //glEnd();
             glPolyFmt(POLY_ALPHA(avg_alpha) | ((flags & 0x10000) ? POLY_CULL_NONE : POLY_CULL_BACK) | POLY_MODULATION | POLY_ID(polyid++) | ((flags & 0x20000) ? 0 : POLY_FOG) ) ;
@@ -520,7 +532,7 @@ void std3D_DrawRenderList()
 
         {
             if (tex_id != -1) {
-                GFX_TEX_COORD = TEXTURE_PACK(inttot16((int)(v3->tu*tex_w)), inttot16((int)(v3->tv*tex_h)));    
+                GFX_TEX_COORD = TEXTURE_PACK(inttot16((int)(v3->tu)), inttot16((int)(v3->tv)));    
             }
             
             //glColor3b((int)(v3->tu*255.0), (int)(v3->tv*255.0), 255);
@@ -528,31 +540,31 @@ void std3D_DrawRenderList()
             //glVertex3v16(floattov16(0.0), floattov16(1.92), floattov16(0.6));
             glColor3b(COMP_R(v3->color),COMP_G(v3->color),COMP_B(v3->color));
             //glColor3b(0xFF, 0x00, 0x00);
-            glVertex3v16(v3->x, v3->y, v3->z);
+            glVertex3v16(flextov16(v3->x), flextov16(v3->y), flextov16(v3->z));
         }
         
         {
             if (tex_id != -1) {
-                GFX_TEX_COORD = TEXTURE_PACK(inttot16((int)(v2->tu*tex_w)), inttot16((int)(v2->tv*tex_h)));
+                GFX_TEX_COORD = TEXTURE_PACK(inttot16((int)(v2->tu)), inttot16((int)(v2->tv)));
             }
             //glColor3b((int)(v2->tu*255.0), (int)(v2->tv*255.0), 255);
             //glColor3b((j&0xFF),(j&0xFF),(j&0xFF));
             //glVertex3v16(floattov16(2.56), floattov16(1.28), floattov16(0.6));
             glColor3b(COMP_R(v2->color),COMP_G(v2->color),COMP_B(v2->color));
             //glColor3b(0, 0xff, 0x00);
-            glVertex3v16(v2->x, v2->y, v2->z);
+             glVertex3v16(flextov16(v2->x), flextov16(v2->y), flextov16(v2->z));
 
         }
         
         {
             if (tex_id != -1) {
-                GFX_TEX_COORD = TEXTURE_PACK(inttot16((int)(v1->tu*tex_w)), inttot16((int)(v1->tv*tex_h)));
+                GFX_TEX_COORD = TEXTURE_PACK(inttot16((int)(v1->tu)), inttot16((int)(v1->tv)));
             }
             //glColor3b((int)(v1->tu*255.0), (int)(v1->tv*255.0), 255);
             //glVertex3v16(floattov16(0.0), floattov16(1.28), floattov16(0.6));
             glColor3b(COMP_R(v1->color),COMP_G(v1->color),COMP_B(v1->color));
             //glColor3b(0, 0x00, 0xff);
-            glVertex3v16(v1->x, v1->y, v1->z);
+             glVertex3v16(flextov16(v1->x), flextov16(v1->y), flextov16(v1->z));
         }
         
         
@@ -561,7 +573,7 @@ void std3D_DrawRenderList()
     //glFlush(0);
     
 
-    std3D_ResetRenderList();
+    //std3D_ResetRenderList();
 }
 int std3D_SetCurrentPalette(rdColor24 *a1, int a2)
 {
@@ -585,6 +597,8 @@ void std3D_UnloadAllTextures()
 
 void std3D_AddRenderListTris(rdTri *tris, unsigned int num_tris) 
 {
+    // HACK: Avoid copies
+#if 0
     //printf("Add %u tris\n", num_tris);
     if (GL_tmpTrisAmt + num_tris > STD3D_MAX_TRIS)
     {
@@ -592,8 +606,13 @@ void std3D_AddRenderListTris(rdTri *tris, unsigned int num_tris)
     }
     
     memcpy(&GL_tmpTris[GL_tmpTrisAmt], tris, sizeof(rdTri) * num_tris);
-    
-    GL_tmpTrisAmt += num_tris;
+#endif
+    tmpTris = tris;
+    GL_tmpTrisAmt = num_tris;
+
+    std3D_DrawRenderListReal();
+
+    rendered_tris += GL_tmpTrisAmt;
 }
 void std3D_AddRenderListLines(rdLine* lines, uint32_t num_lines) {}
 
@@ -601,6 +620,9 @@ void std3D_AddRenderListLines(rdLine* lines, uint32_t num_lines) {}
 
 int std3D_AddRenderListVertices(D3DVERTEX *vertices, int count)
 {
+    // HACK: Avoid copies
+    tmpD3DVertices = vertices;
+#if 0
     if (GL_tmpVerticesAmt + count >= STD3D_MAX_VERTICES)
     {
         return 0;
@@ -629,8 +651,8 @@ int std3D_AddRenderListVertices(D3DVERTEX *vertices, int count)
         t->tv = v->tv;
         t->color = v->color;
     }
-    
-    GL_tmpVerticesAmt += count;
+#endif
+    GL_tmpVerticesAmt = count;
     
     return 1;
 }

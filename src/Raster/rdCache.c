@@ -108,7 +108,9 @@ void rdCache_Flush()
 
     if ( rdroid_curSortingMethod == 2 )
     {
+#ifndef TARGET_TWL
         _qsort(rdCache_aProcFaces, rdCache_numProcFaces, sizeof(rdProcEntry), (int (__cdecl *)(const void *, const void *))rdCache_ProcFaceCompare);
+#endif
     }
 #if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
     if ( rdroid_curAcceleration <= 0 )
@@ -157,6 +159,11 @@ void rdCache_Flush()
     rdCache_drawnFaces += rdCache_numProcFaces;
     rdCache_Reset();
 }
+
+#ifdef TARGET_TWL
+const static flex_t res_fix_x = (1.0/512.0);
+const static flex_t res_fix_y = (1.0/384.0);
+#endif
 
 #if 1
 
@@ -312,6 +319,10 @@ int rdCache_SendFaceListToHardware()
         v1 = 1;
         v129 = 1;
     }
+#ifdef TARGET_TWL
+    // TODO: this breaks transparent color-only surfaces, maybe just check tri flags?
+    rdSetVertexColorMode(1);
+#endif
     if ( v0 || v1 || (rdGetVertexColorMode() == 1)) // MOTS added
     {
         flags_idk |= 0x8000;
@@ -633,9 +644,11 @@ int rdCache_SendFaceListToHardware()
 
             for (int vtx_idx = 0; vtx_idx < active_6c->numVertices; vtx_idx++)
             {
+#ifndef TARGET_TWL
                 rdCache_aHWVertices[rdCache_totalVerts].x = (iterating_6c_vtxs[vtx_idx].x); // Added: The original game rounded to ints here (with ceilf?)
-                iterating_6c_vtxs_ = active_6c->vertices;
                 rdCache_aHWVertices[rdCache_totalVerts].y = (active_6c->vertices[vtx_idx].y); // Added: The original game rounded to ints here (with ceilf?)
+#endif
+                iterating_6c_vtxs_ = active_6c->vertices;
 
                 // DSi prefers z vertices directly
 #ifdef TARGET_TWL
@@ -654,6 +667,10 @@ int rdCache_SendFaceListToHardware()
 #endif
                 if ( rdCache_dword_865258 != 16 )
                     v38 = 1.0 - v38;
+#ifdef TARGET_TWL
+                rdCache_aHWVertices[rdCache_totalVerts].x = (active_6c->vertices[vtx_idx].x * res_fix_x) * v38; // Added: The original game rounded to ints here (with ceilf?)
+                rdCache_aHWVertices[rdCache_totalVerts].y = (active_6c->vertices[vtx_idx].y * res_fix_y) * v38; // Added: The original game rounded to ints here (with ceilf?)
+#endif
                 rdCache_aHWVertices[rdCache_totalVerts].z = v38;
 
                 // Don't waste time with this on DSi
@@ -798,9 +815,15 @@ int rdCache_SendFaceListToHardware()
                 // For some reason, ny holds the vertex color.
                 rdCache_aHWVertices[rdCache_totalVerts].color = final_vertex_color;
                 uvs_in_pixels = v52->vertexUVs;
-                
+
+                // DSi wants UVs in pixels
+#ifdef TARGET_TWL
+                rdCache_aHWVertices[rdCache_totalVerts].tu = uvs_in_pixels[vtx_idx].x >> mipmap_level;
+                rdCache_aHWVertices[rdCache_totalVerts].tv = uvs_in_pixels[vtx_idx].y >> mipmap_level;
+#else
                 rdCache_aHWVertices[rdCache_totalVerts].tu = uvs_in_pixels[vtx_idx].x / actual_width;
                 rdCache_aHWVertices[rdCache_totalVerts].tv = uvs_in_pixels[vtx_idx].y / actual_height;
+#endif
                 
                 ++rdCache_totalVerts;
             }
@@ -931,8 +954,10 @@ LABEL_232:
         alpha_upshifta = red_and_alpha << 8;
         for (int vtx_idx = 0; vtx_idx < active_6c->numVertices; vtx_idx++)
         {
+#ifndef TARGET_TWL
             rdCache_aHWVertices[rdCache_totalVerts].x = (active_6c->vertices[tmpiter].x);  // Added: The original game rounded to ints here (with ceilf?)
             rdCache_aHWVertices[rdCache_totalVerts].y = (active_6c->vertices[tmpiter].y);  // Added: The original game rounded to ints here (with ceilf?)
+#endif
             v87 = active_6c->vertices[tmpiter].z;
 
             // DSi prefers z vertices directly
@@ -948,6 +973,10 @@ LABEL_232:
 #endif
             if ( rdCache_dword_865258 != 16 )
                 v89 = 1.0 - v89;
+#ifdef TARGET_TWL
+            rdCache_aHWVertices[rdCache_totalVerts].x = ((active_6c->vertices[tmpiter].x * res_fix_x) * v89);  // Added: The original game rounded to ints here (with ceilf?)
+            rdCache_aHWVertices[rdCache_totalVerts].y = ((active_6c->vertices[tmpiter].y * res_fix_y) * v89);  // Added: The original game rounded to ints here (with ceilf?)
+#endif
             rdCache_aHWVertices[rdCache_totalVerts].z = v89;
 
             // Don't waste time with this on DSi
@@ -1171,8 +1200,10 @@ void rdCache_DrawRenderList()
             std3D_AddRenderListVertices(rdCache_aHWVertices, rdCache_totalVerts);
         }
         std3D_RenderListVerticesFinish();
+#ifndef TARGET_TWL
         if ( rdroid_curZBufferMethod == RD_ZBUFFER_READ_WRITE )
             _qsort(rdCache_aHWNormalTris, rdCache_totalNormalTris, sizeof(rdTri), rdCache_TriCompare);
+#endif
         if ( rdCache_totalSolidTris )
             std3D_AddRenderListTris(rdCache_aHWSolidTris, rdCache_totalSolidTris);
         if ( rdCache_totalNormalTris )

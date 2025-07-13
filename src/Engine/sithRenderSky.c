@@ -55,8 +55,8 @@ void sithRenderSky_TransformHorizontal(rdProcEntry *pProcEntry, sithSurfaceInfo 
         pVertXYZ->z = 2.0f; // TODO figure out actual zfar or do this hack somewhere else
 #endif
 
-        tmp1 = (pVertXYZ->x - rdCamera_pCurCamera->canvas->screen_height_half) * sithSector_flt_8553C0;
-        tmp2 = (pVertXYZ->y - rdCamera_pCurCamera->canvas->screen_width_half) * sithSector_flt_8553C0;
+        tmp1 = (pVertXYZ->x - rdCamera_pCurCamera->canvas->half_screen_width) * sithSector_flt_8553C0;
+        tmp2 = (pVertXYZ->y - rdCamera_pCurCamera->canvas->half_screen_height) * sithSector_flt_8553C0;
         pVertUV->x = tmp1 * sithSector_flt_8553C8 - tmp2 * sithSector_flt_8553F4 + sithSector_flt_8553B8;
         pVertUV->y = tmp2 * sithSector_flt_8553C8 + tmp1 * sithSector_flt_8553F4 + sithSector_flt_8553C4;
         rdVector_Add2Acc(pVertUV, &sithWorld_pCurrentWorld->horizontalSkyOffs);

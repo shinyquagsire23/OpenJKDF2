@@ -60,7 +60,7 @@ void jkSaber_PolylineRand(rdThing *thing)
     rdPolyLine* line = thing->polyline;
     if ( line )
     {
-        if ( !(bShowInvisibleThings & 0xF) )
+        if ( !(jkPlayer_currentTickIdx & 0xF) )
             line->edgeFace.clipIdk.y = 0.0;
         line->edgeFace.clipIdk.y += (_frand() - 0.8) * 80.0;
     }

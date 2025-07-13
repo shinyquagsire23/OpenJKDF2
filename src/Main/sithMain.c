@@ -45,6 +45,7 @@
 #include <math.h>
 #endif
 
+// Added: FoV fixes
 flex_t sithMain_lastAspect = 1.0;
 
 int sithMain_Startup(HostServices *commonFuncs)
@@ -184,7 +185,7 @@ int sithMain_Mode1Init_3(char *fpath)
 
 int sithMain_Open()
 {
-    bShowInvisibleThings = 0;
+    jkPlayer_currentTickIdx = 0;
     sithRender_lastRenderTick = 1;
     sithWorld_sub_4D0A20(sithWorld_pCurrentWorld);
     sithEvent_Open();
@@ -227,6 +228,9 @@ void sithMain_SetEndLevel()
     sithMain_bEndLevel = 1;
 }
 
+int sithMain_tickStartMs;
+int sithMain_tickEndMs;
+
 // MOTS altered
 int sithMain_Tick()
 {
@@ -242,6 +246,8 @@ int sithMain_Tick()
     }
 #endif
     
+    sithMain_tickStartMs = stdPlatform_GetTimeMsec(); // Added: perf analyzing
+
     if ( (g_submodeFlags & 8) != 0 )
     {
         sithTime_Tick();
@@ -287,7 +293,7 @@ int sithMain_Tick()
         //sithWorld_pCurrentWorld->playerThing->physicsParams.physflags |= SITH_PF_FLY;
         //sithWorld_pCurrentWorld->playerThing->physicsParams.physflags &= ~SITH_PF_USEGRAVITY;
         
-        ++bShowInvisibleThings;
+        ++jkPlayer_currentTickIdx;
         sithMain_sub_4C4D80();
         sithSoundMixer_ResumeMusic(0);
         sithTime_Tick();
@@ -395,6 +401,9 @@ int sithMain_Tick()
         sithConsole_AdvanceLogBuf();
         sithMulti_HandleTimeLimit(sithTime_deltaMs);
         sithGamesave_Flush();
+
+        sithMain_tickEndMs = stdPlatform_GetTimeMsec();
+
         return 0;
     }
 }
@@ -415,9 +424,11 @@ void sithMain_UpdateCamera()
         if (sithCamera_currentCamera && sithCamera_currentCamera->rdCam.canvas)
         {
             // Set screen aspect ratio
-            flex_t aspect = sithCamera_currentCamera->rdCam.canvas->screen_width_half / sithCamera_currentCamera->rdCam.canvas->screen_height_half;
+            flex_t aspect = sithCamera_currentCamera->rdCam.canvas->half_screen_height / sithCamera_currentCamera->rdCam.canvas->half_screen_width;
 #if defined(TARGET_TWL)
-            aspect = 256.0/192.0;
+            aspect = 192.0/256.0;
+            sithCamera_currentCamera->rdCam.canvas->half_screen_width = 256.0;
+            sithCamera_currentCamera->rdCam.canvas->half_screen_height = 192.0;
             static flex_t sithMain_UpdateCamera_lastFov = 90.0;
             static void* sithMain_UpdateCamera_lastCamera = NULL;
 

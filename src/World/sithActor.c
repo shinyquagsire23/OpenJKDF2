@@ -480,7 +480,7 @@ void sithActor_Remove(sithThing *thing)
 void sithActor_RemoveCorpse(sithThing *corpse)
 {
     // Added: retain corpses option
-    if (jkPlayer_bKeepCorpses || corpse->isVisible + 1 == bShowInvisibleThings ) {
+    if (jkPlayer_bKeepCorpses || corpse->lastRenderedTickIdx + 1 == jkPlayer_currentTickIdx ) {
         corpse->lifeLeftMs = 3000;
     }
     else {

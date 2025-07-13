@@ -1238,7 +1238,7 @@ void sithCollision_sub_4E77A0(sithThing *thing, rdMatrix34 *a2)
             v5 = v5->childThing;
         }
     }
-    else if ( (((bShowInvisibleThings & 0xFF) + (thing->thingIdx & 0xFF)) & 7) == 0 )
+    else if ( (((jkPlayer_currentTickIdx & 0xFF) + (thing->thingIdx & 0xFF)) & 7) == 0 )
     {
         rdMatrix_Normalize34(a2);
     }

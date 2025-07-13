@@ -472,7 +472,7 @@ flex_t sithPuppet_sub_4E4380(sithThing *thing)
         else
         {
             thinga = thing->physicsParams.angVel.y * 0.0002;
-            if ( (((bShowInvisibleThings & 0xFF) + (thing->thingIdx & 0xFF)) & 3) != 0 )
+            if ( (((jkPlayer_currentTickIdx & 0xFF) + (thing->thingIdx & 0xFF)) & 3) != 0 )
                 return thinga;
             if ( thinga >= -0.01 )
             {

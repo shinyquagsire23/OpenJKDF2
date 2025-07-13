@@ -1173,7 +1173,7 @@ void sithDSSThing_SendPathMove(sithThing *pThing, int16_t a2, flex32_t a3, int a
 
     NETMSG_PUSHS32(a4);
     NETMSG_PUSHS32(pThing->thing_id);
-    NETMSG_PUSHU32(bShowInvisibleThings);
+    NETMSG_PUSHU32(jkPlayer_currentTickIdx);
     NETMSG_PUSHS16(pThing->sector->id);
     NETMSG_PUSHVEC3(pThing->position);
     rdMatrix_ExtractAngles34(&pThing->lookOrientation, &out);

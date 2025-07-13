@@ -4,6 +4,7 @@
 #include "Win95/Window.h"
 #include "stdPlatform.h"
 #include "Main/jkQuakeConsole.h"
+#include "Main/jkDev.h"
 
 #include <nds.h>
 
@@ -793,7 +794,10 @@ void stdControl_ReadControls()
         static int sampleTime_last = 0;
         if (keys_held & KEY_SELECT) {
             int sampleTime_roundtrip = stdPlatform_GetTimeMsec() - sampleTime_last;
-            stdPlatform_Printf("total %u heap 0x%x 0x%x\n", sampleTime_roundtrip, (intptr_t)getHeapLimit() - (intptr_t)getHeapEnd(), (intptr_t)getHeapEnd() - (intptr_t)getHeapStart());
+            //stdPlatform_Printf("total %u heap 0x%x 0x%x\n", sampleTime_roundtrip, (intptr_t)getHeapLimit() - (intptr_t)getHeapEnd(), (intptr_t)getHeapEnd() - (intptr_t)getHeapStart());
+        }
+        if (keysPressed & KEY_SELECT) {
+            jkDev_CmdNoclip(NULL, NULL);
         }
         sampleTime_last = stdPlatform_GetTimeMsec();
     }

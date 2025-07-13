@@ -1440,7 +1440,7 @@ void sithCogFunctionThing_IsThingVisible(sithCog *ctx)
     sithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing)
-        sithCogExec_PushInt(ctx, pThing->isVisible + 1 >= (unsigned int)bShowInvisibleThings);
+        sithCogExec_PushInt(ctx, pThing->lastRenderedTickIdx + 1 >= (unsigned int)jkPlayer_currentTickIdx);
     else
         sithCogExec_PushInt(ctx, 0);
 }

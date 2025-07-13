@@ -78,7 +78,7 @@ void sithWeapon_Tick(sithThing* weapon, flex_t deltaSeconds)
                 v3 = weapon->weaponParams.mindDamage;
             weapon->weaponParams.damage = v3;
         }
-        if ( (typeFlags & SITH_WF_TRIGGER_AI_AWARENESS) != 0 && (((uint8_t)bShowInvisibleThings + (weapon->thingIdx & 0xFF)) & 7) == 0 )
+        if ( (typeFlags & SITH_WF_TRIGGER_AI_AWARENESS) != 0 && (((uint8_t)jkPlayer_currentTickIdx + (weapon->thingIdx & 0xFF)) & 7) == 0 )
             sithAIAwareness_AddEntry(weapon->sector, &weapon->position, 2, 2.0, weapon);
     }
 }

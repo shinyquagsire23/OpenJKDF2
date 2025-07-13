@@ -41,6 +41,9 @@ void sithMain_SetEpisodeName(char *text);
 void sithMain_AutoSave();
 void sithMain_sub_4C4D80();
 
+extern int sithMain_tickStartMs;
+extern int sithMain_tickEndMs;
+
 //static int (*sithMain_Startup)() = (void*)sithMain_Startup_ADDR;
 //static int (*sithMain_Tick)() = (void*)sithMain_Tick_ADDR;
 //static void (*sithMain_AutoSave)() = (void*)sithMain_AutoSave_ADDR;

@@ -1615,7 +1615,9 @@ void sithControl_FreeCam(sithThing *player)
                     mult *= 5.0;
                 }
                 else if (sithControl_ReadFunctionMap(INPUT_FUNC_JUMP, &tmp)) {
+#ifndef TARGET_TWL
                     mult *= 5.0;
+#endif
                 }
                 if (sithControl_ReadFunctionMap(INPUT_FUNC_DUCK, &tmp)) {
                     mult *= 0.5;
@@ -1627,6 +1629,14 @@ void sithControl_FreeCam(sithThing *player)
                 rdMatrix_BuildRotate34(&a, &v1->actorParams.eyePYR);
                 rdVector_Zero3(&addVec);
                 rdVector_MultAcc3(&addVec, &rdroid_yVector3, sithControl_ReadAxisStuff(INPUT_FUNC_FORWARD) * mult);
+#ifdef TARGET_TWL
+                if (sithControl_ReadFunctionMap(INPUT_FUNC_JUMP, &tmp)) {
+                    rdVector_MultAcc3(&addVec, &rdroid_zVector3, 1.0);
+                }
+                if (sithControl_ReadFunctionMap(INPUT_FUNC_DUCK, &tmp)) {
+                    rdVector_MultAcc3(&addVec, &rdroid_zVector3, -1.0);
+                }
+#endif
 
                 rdMatrix_TransformVector34Acc(&addVec, &a);
                 rdMatrix_TransformVector34Acc(&addVec, &v1->lookOrientation);
@@ -1651,7 +1661,7 @@ void sithControl_FreeCam(sithThing *player)
             {
                 // Added: noclip
                 if ((g_debugmodeFlags & DEBUGFLAG_NOCLIP)) {
-                    
+
                 }
                 else if ( (v1->physicsParams.physflags & SITH_PF_WATERSURFACE) != 0 )
                 {

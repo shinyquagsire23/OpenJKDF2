@@ -720,7 +720,6 @@ jkPlayer_numOtherThings 0x0085FF44 int
 jkPlayer_numThings 0x0085B560 int
 jkPlayer_otherThings 0x008592E0 jkPlayerInfo[NUM_JKPLAYER_THINGS]
 jkPlayer_bLoadingSomething 0x00525470 int = 1
-bShowInvisibleThings 0x8EE640 int
 playerThingIdx 0x83199C int
 jkPlayer_maxPlayers 0x8319A0 uint32_t
 sithPlayer_pLocalPlayerThing 0x8319A4 sithThing*
@@ -736,6 +735,7 @@ jkPlayer_setDisableCutscenes 0x00860778 int
 jkPlayer_aCutsceneVal 0x0085FAC0 int[32]
 jkPlayer_cutscenePath 0x0085FB40 char[1024]
 jkPlayer_setNumCutscenes 0x0085FF40 int
+jkPlayer_currentTickIdx 0x8EE640 int
 jkPlayer_setDiff 0x008EE670 int
 jkPlayer_waggleVec 0x00552BA0 rdVector3
 jkPlayer_waggleMag 0x00552BAC flex_t

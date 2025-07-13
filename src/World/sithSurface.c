@@ -620,7 +620,7 @@ void sithSurface_Tick(flex_t deltaSecs)
                         v10->surfaceInfo.face.clipIdk.x += scroll_x;
                         v10->surfaceInfo.face.clipIdk.y += scroll_y;
 
-                        if ( ((v2 + bShowInvisibleThings) & 0xF) == 0 )
+                        if ( ((v2 + jkPlayer_currentTickIdx) & 0xF) == 0 )
                         {
                             v10->surfaceInfo.face.clipIdk.x = stdMath_Fmod(v10->surfaceInfo.face.clipIdk.x, 1024.0);
                             v10->surfaceInfo.face.clipIdk.y = stdMath_Fmod(v10->surfaceInfo.face.clipIdk.y, 1024.0);
@@ -782,7 +782,7 @@ void sithSurface_ScrollSky(rdSurface *surface, int skyType, flex_t deltaSecs, ui
         sithWorld_pCurrentWorld->horizontalSkyOffs.x = offs_x;
         sithWorld_pCurrentWorld->horizontalSkyOffs.y = offs_y;
 
-        if ( ((bShowInvisibleThings + a4) & 0xF) == 0 )
+        if ( ((jkPlayer_currentTickIdx + a4) & 0xF) == 0 )
         {
             sithWorld_pCurrentWorld->horizontalSkyOffs.x = stdMath_Fmod(offs_x, 1024.0);
             sithWorld_pCurrentWorld->horizontalSkyOffs.y = stdMath_Fmod(offs_y, 1024.0);
@@ -796,7 +796,7 @@ void sithSurface_ScrollSky(rdSurface *surface, int skyType, flex_t deltaSecs, ui
         sithWorld_pCurrentWorld->ceilingSkyOffs.x = offs_x;
         sithWorld_pCurrentWorld->ceilingSkyOffs.y = offs_y;
 
-        if ( ((bShowInvisibleThings + a4) & 0xF) == 0 )
+        if ( ((jkPlayer_currentTickIdx + a4) & 0xF) == 0 )
         {
             sithWorld_pCurrentWorld->ceilingSkyOffs.x = stdMath_Fmod(offs_x, 1024.0);
             sithWorld_pCurrentWorld->ceilingSkyOffs.y = stdMath_Fmod(offs_y, 1024.0);

@@ -251,6 +251,8 @@ void jkMain_GuiAdvance()
                 if ( sithMain_bEndLevel )
                 {
                     sithMain_bEndLevel = 0;
+                    if (Main_bMotsCompat)
+                        jkPlayer_idkEndLevel(); // MOTS added
                     jkMain_EndLevel(1);
                 }
                 jkPlayer_nullsub_1(&playerThings[playerThingIdx]);
@@ -331,53 +333,58 @@ void jkMain_EscapeMenuTick(int a2)
     unsigned int v1; // esi
     int v3; // esi
 
-    if ( sithNet_isMulti )
+    if (!sithNet_isMulti) {
+        return;
+    }
+
+    if (thing_six) {
+        return;
+    }
+    
+    if (!thing_eight) {
+        return;
+    }
+
+    v1 = stdPlatform_GetTimeMsec();
+    
+    if (v1 > jkMain_lastTickMs + TICKRATE_MS)
     {
-        if ( !thing_six )
+        jkMain_lastTickMs = v1;
+        if (sithMain_Tick()) return;
+    }
+    
+    if ( g_sithMode == 5 )
+    {
+        if ( jkGuiRend_thing_five )
+            jkGuiRend_thing_four = 1;
+        jkSmack_stopTick = 1;
+        jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
+    }
+    else
+    {
+        if ( sithMulti_bTimelimitMet )
         {
-            if ( thing_eight )
-            {
-                v1 = stdPlatform_GetTimeMsec();
-                
-                if (v1 > jkMain_lastTickMs + TICKRATE_MS)
-                {
-                    jkMain_lastTickMs = v1;
-                    if (sithMain_Tick()) return;
-                }
-                
-                if ( g_sithMode == 5 )
-                {
-                    if ( jkGuiRend_thing_five )
-                        jkGuiRend_thing_four = 1;
-                    jkSmack_stopTick = 1;
-                    jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
-                }
-                else
-                {
-                    if ( sithMulti_bTimelimitMet )
-                    {
-                        sithMulti_bTimelimitMet = 0;
-                        if ( sithNet_isServer )
-                            jkDSS_SendEndLevel();
-                    }
-                    if ( sithMain_bEndLevel )
-                    {
-                        sithMain_bEndLevel = 0;
-                        jkMain_EndLevel(1);
-                    }
-                    jkPlayer_nullsub_1(&playerThings[playerThingIdx]);
-                    jkGame_dword_552B5C += stdPlatform_GetTimeMsec() - v1;
-                    v3 = stdPlatform_GetTimeMsec();
-                    if ( g_app_suspended && a2 != 6 ) {
-#ifdef SDL2_RENDER
-                    if (jkMain_lastTickMs == v1)
-#endif
-                        jkGame_Update();
-                    }
-                    jkGame_updateMsecsTotal += stdPlatform_GetTimeMsec() - v3;
-                }
-            }
+            sithMulti_bTimelimitMet = 0;
+            if ( sithNet_isServer )
+                jkDSS_SendEndLevel();
         }
+        if ( sithMain_bEndLevel )
+        {
+            sithMain_bEndLevel = 0;
+            if (Main_bMotsCompat)
+                jkPlayer_idkEndLevel(); // MOTS added
+            jkMain_EndLevel(1);
+        }
+        jkPlayer_nullsub_1(&playerThings[playerThingIdx]);
+        jkGame_dword_552B5C += stdPlatform_GetTimeMsec() - v1;
+        v3 = stdPlatform_GetTimeMsec();
+        if ( g_app_suspended && a2 != 6 ) {
+#ifdef SDL2_RENDER
+        if (jkMain_lastTickMs == v1)
+#endif
+            jkGame_Update();
+        }
+        jkGame_updateMsecsTotal += stdPlatform_GetTimeMsec() - v3;
     }
 }
 
@@ -684,52 +691,54 @@ void jkMain_GameplayTick(int a2)
     unsigned int v1; // esi
     int v3; // esi
 
-    if ( !thing_six )
+    if (thing_six) {
+        return;
+    }
+    
+    if (!thing_eight) {
+        return;
+    }
+
+    v1 = stdPlatform_GetTimeMsec();
+    
+    if (v1 > jkMain_lastTickMs + TICKRATE_MS)
     {
-        if ( thing_eight )
+        jkMain_lastTickMs = v1;
+        if (sithMain_Tick()) return;
+    }
+    
+    if ( g_sithMode == 5 )
+    {
+        if ( jkGuiRend_thing_five )
+            jkGuiRend_thing_four = 1;
+        jkSmack_stopTick = 1;
+        jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
+    }
+    else
+    {
+        if ( sithMulti_bTimelimitMet )
         {
-            v1 = stdPlatform_GetTimeMsec();
-            
-            if (v1 > jkMain_lastTickMs + TICKRATE_MS)
-            {
-                jkMain_lastTickMs = v1;
-                if (sithMain_Tick()) return;
-            }
-            
-            if ( g_sithMode == 5 )
-            {
-                if ( jkGuiRend_thing_five )
-                    jkGuiRend_thing_four = 1;
-                jkSmack_stopTick = 1;
-                jkSmack_nextGuiState = JK_GAMEMODE_MAIN;
-            }
-            else
-            {
-                if ( sithMulti_bTimelimitMet )
-                {
-                    sithMulti_bTimelimitMet = 0;
-                    if ( sithNet_isServer )
-                        jkDSS_SendEndLevel();
-                }
-                if ( sithMain_bEndLevel )
-                {
-                    sithMain_bEndLevel = 0;
-                    if (Main_bMotsCompat)
-                        jkPlayer_idkEndLevel(); // MOTS added
-                    jkMain_EndLevel(1);
-                }
-                jkPlayer_nullsub_1(&playerThings[playerThingIdx]);
-                jkGame_dword_552B5C += stdPlatform_GetTimeMsec() - v1;
-                v3 = stdPlatform_GetTimeMsec();
-                if ( g_app_suspended && a2 != 6 ) {
-#ifdef SDL2_RENDER
-                    if (jkMain_lastTickMs == v1)
-#endif
-                    jkGame_Update();
-                }
-                jkGame_updateMsecsTotal += stdPlatform_GetTimeMsec() - v3;
-            }
+            sithMulti_bTimelimitMet = 0;
+            if ( sithNet_isServer )
+                jkDSS_SendEndLevel();
         }
+        if ( sithMain_bEndLevel )
+        {
+            sithMain_bEndLevel = 0;
+            if (Main_bMotsCompat)
+                jkPlayer_idkEndLevel(); // MOTS added
+            jkMain_EndLevel(1);
+        }
+        jkPlayer_nullsub_1(&playerThings[playerThingIdx]);
+        jkGame_dword_552B5C += stdPlatform_GetTimeMsec() - v1;
+        v3 = stdPlatform_GetTimeMsec();
+        if ( g_app_suspended && a2 != 6 ) {
+#ifdef SDL2_RENDER
+            if (jkMain_lastTickMs == v1)
+#endif
+            jkGame_Update();
+        }
+        jkGame_updateMsecsTotal += stdPlatform_GetTimeMsec() - v3;
     }
 }
 

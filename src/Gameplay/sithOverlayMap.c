@@ -87,12 +87,12 @@ int sithOverlayMap_Render1(rdCanvas *canvas)
     rdSetLightingMode(1);
     sithOverlayMap_inst.world = sithWorld_pCurrentWorld;
     v2 = sithWorld_pCurrentWorld->playerThing;
-    v3 = canvas->screen_height_half;
+    v3 = canvas->half_screen_width;
     sithOverlayMap_pCanvas = canvas;
     sithOverlayMap_pPlayer = v2;
     v12 = (int)v3;
     sithOverlayMap_x1 = v12;
-    v12 = (int)canvas->screen_width_half;
+    v12 = (int)canvas->half_screen_height;
     a3.x = 0.0;
     a3.y = -sithCamera_currentCamera->viewPYR.y;
     sithOverlayMap_y1 = v12;

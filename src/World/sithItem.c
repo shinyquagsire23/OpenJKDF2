@@ -106,7 +106,7 @@ void sithItem_Remove(sithThing *item)
          || !sithNet_isMulti && !(item->itemParams.typeflags & SITH_ITEM_RESPAWN_SP)
          || sithNet_isMulti && !(item->itemParams.typeflags & SITH_ITEM_RESPAWN_MP))
     {
-        if ( item->isVisible + 1 == bShowInvisibleThings )
+        if ( item->lastRenderedTickIdx + 1 == jkPlayer_currentTickIdx )
             item->lifeLeftMs = 3000;
         else
             sithThing_Destroy(item);

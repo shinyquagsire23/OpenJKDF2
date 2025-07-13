@@ -540,8 +540,8 @@ typedef struct rdCanvas
 {
     uint32_t bIdk;
     stdVBuffer* vbuffer;
-    flex_t screen_height_half;
-    flex_t screen_width_half;
+    flex_t half_screen_width;
+    flex_t half_screen_height;
     stdVBuffer* d3d_vbuf;
     uint32_t field_14;
     int32_t xStart;
@@ -2874,7 +2874,7 @@ typedef struct sithThing
     rdVector3 screenPos;
     flex_t light;
     flex_t lightMin;
-    int32_t isVisible;
+    int32_t lastRenderedTickIdx;
     sithSoundClass* soundclass;
     sithAnimclass* animclass;
     sithPuppet* puppet;

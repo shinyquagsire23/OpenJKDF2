@@ -186,10 +186,6 @@ void sithThing_SetHandler(sithThing_handler_t handler)
 void sithThing_TickAll(flex_t deltaSeconds, int deltaMs)
 {
     sithThing* pThingIter; // esi
-    sithWorld *v6; // edi
-    int32_t v7; // edx
-    int32_t v8; // eax
-    int32_t v9; // eax
 
     if ( sithWorld_pCurrentWorld->numThings < 0 )
         return;
@@ -199,6 +195,9 @@ void sithThing_TickAll(flex_t deltaSeconds, int deltaMs)
         pThingIter = &sithWorld_pCurrentWorld->things[i];
         if (!pThingIter->type)
             continue;
+#ifdef TARGET_TWL
+        int bCanUpdateOffscreen = (((uint8_t)jkPlayer_currentTickIdx + (pThingIter->thingIdx & 0xFF)) & 0x7F) == 0;
+#endif
 
         if (!(pThingIter->thingflags & SITH_TF_WILLBEREMOVED))
         {
@@ -224,6 +223,10 @@ void sithThing_TickAll(flex_t deltaSeconds, int deltaMs)
             switch ( pThingIter->controlType )
             {
                 case SITH_CT_AI:
+                    // CPU optimization testing
+#ifdef TARGET_TWL
+                    if (pThingIter->type == SITH_THING_PLAYER || pThingIter->lastRenderedTickIdx >= jkPlayer_currentTickIdx-3 || bCanUpdateOffscreen)
+#endif
                     sithAI_Tick(pThingIter, deltaSeconds);
                     break;
                 case SITH_CT_EXPLOSION:
@@ -249,57 +252,32 @@ void sithThing_TickAll(flex_t deltaSeconds, int deltaMs)
                 sithThing_handler(pThingIter);
             if ( pThingIter->moveType == SITH_MT_PHYSICS )
             {
+                // CPU optimization testing
+#ifdef TARGET_TWL
+                if (pThingIter->type == SITH_THING_PLAYER || pThingIter->lastRenderedTickIdx >= jkPlayer_currentTickIdx-3 || bCanUpdateOffscreen)
+#endif
                 sithPhysics_ThingTick(pThingIter, deltaSeconds);
             }
             else if ( pThingIter->moveType == SITH_MT_PATH )
             {
                 sithTrackThing_Tick(pThingIter, deltaSeconds);
             }
+
+            // CPU optimization testing
+#ifdef TARGET_TWL
+            if (pThingIter->type == SITH_THING_PLAYER || pThingIter->lastRenderedTickIdx >= jkPlayer_currentTickIdx-3 || bCanUpdateOffscreen)
+#endif
             sithThing_TickPhysics(pThingIter, deltaSeconds);
 
+            // CPU optimization testing
+#ifdef TARGET_TWL
+            if (pThingIter->type == SITH_THING_PLAYER || pThingIter->lastRenderedTickIdx >= jkPlayer_currentTickIdx-3 || bCanUpdateOffscreen)
+#endif
             sithPuppet_Tick(pThingIter, deltaSeconds);
             continue;
         }
 
-        if ( sithNet_isMulti && sithNet_isServer && (pThingIter->thing_id & 0xFFFF0000) == 0 )
-            sithMulti_FreeThing(pThingIter->thing_id);
-
-        if ( pThingIter->attach_flags )
-            sithThing_DetachThing(pThingIter);
-
-        if ( pThingIter->sector )
-            sithThing_LeaveSector(pThingIter);
-
-        if ( pThingIter->moveType == SITH_MT_PATH && pThingIter->trackParams.aFrames )
-            pSithHS->free(pThingIter->trackParams.aFrames);
-
-        if ( pThingIter->controlType == SITH_CT_AI )
-            sithAI_FreeEntry(pThingIter);
-
-        if ( pThingIter->type == SITH_THING_PARTICLE )
-            sithParticle_FreeEntry(pThingIter);
-
-        if ( pThingIter->animclass )
-            sithPuppet_FreeEntry(pThingIter);
-
-        rdThing_FreeEntry(&pThingIter->rdthing);
-        sithSoundMixer_FreeThing(pThingIter);
-
-        v7 = pThingIter->thingIdx;
-        pThingIter->type = SITH_THING_FREE;
-        v8 = sithWorld_pCurrentWorld->numThings;
-        pThingIter->signature = 0;
-        pThingIter->thing_id = -1;
-        if ( v7 == v8 )
-        {
-            for (v9 = v7 - 1; v9 >= 0; --v9)
-            {
-                if (sithWorld_pCurrentWorld->things[v9].type)
-                    break;
-            }
-            sithWorld_pCurrentWorld->numThings = v9;
-        }
-        sithNet_things[1 + sithNet_thingsIdx++] = v7;
+        sithThing_FreeEverythingNet(pThingIter); // Was inlined
     }
 }
 
@@ -489,11 +467,7 @@ void sithThing_Free(sithWorld *pWorld)
 
 void sithThing_freestuff(sithWorld *pWorld)
 {
-    sithThing* pThingIter; // esi
-    sithWorld *v3; // edx
-    int32_t v4; // esi
-    int32_t v5; // eax
-    int32_t v7; // eax
+    sithThing* pThingIter;
 
     // Added: !world check
     if (!pWorld || !pWorld->things)
@@ -505,45 +479,7 @@ void sithThing_freestuff(sithWorld *pWorld)
         if (!pThingIter->type)
             continue;
 
-        if ( sithNet_isMulti && sithNet_isServer && (pThingIter->thing_id & 0xFFFF0000) == 0 )
-            sithMulti_FreeThing(pThingIter->thing_id);
-        if ( pThingIter->attach_flags )
-            sithThing_DetachThing(pThingIter);
-        if ( pThingIter->sector )
-            sithThing_LeaveSector(pThingIter);
-        if ( pThingIter->moveType == SITH_MT_PATH && pThingIter->trackParams.aFrames )
-            pSithHS->free(pThingIter->trackParams.aFrames);
-        if ( pThingIter->controlType == SITH_CT_AI /*|| pThingIter->controlType == SITH_CT_10*/) // Added: SITH_THING_PLAYER
-            sithAI_FreeEntry(pThingIter);
-        if ( pThingIter->type == SITH_THING_PARTICLE )
-            sithParticle_FreeEntry(pThingIter);
-        if ( pThingIter->animclass )
-            sithPuppet_FreeEntry(pThingIter);
-        rdThing_FreeEntry(&pThingIter->rdthing);
-        sithSoundMixer_FreeThing(pThingIter);
-        v3 = sithWorld_pCurrentWorld;
-        pThingIter->type = SITH_THING_FREE;
-        pThingIter->signature = 0;
-        pThingIter->thing_id = -1;
-        v4 = pThingIter->thingIdx;
-        if ( v4 == v3->numThings )
-        {
-            v5 = v4 - 1;
-            if ( v4 - 1 >= 0 )
-            {
-                do
-                {
-                    if (v3->things[v5].type)
-                        break;
-                    --v5;
-                }
-                while ( v5 >= 0 );
-            }
-            v3->numThings = v5;
-        }
-        v7 = sithNet_thingsIdx;
-        sithNet_things[1 + sithNet_thingsIdx] = v4;
-        sithNet_thingsIdx = v7 + 1;
+        sithThing_FreeEverythingNet(pThingIter);
     }
 }
 
@@ -604,23 +540,9 @@ void sithThing_FreeEverythingNet(sithThing* pThing)
 
     if ( sithNet_isMulti && sithNet_isServer && (pThing->thing_id & 0xFFFF0000) == 0 )
         sithMulti_FreeThing(pThing->thing_id);
-    if ( pThing->attach_flags )
-        sithThing_DetachThing(pThing);
-    if ( pThing->sector )
-        sithThing_LeaveSector(pThing);
-    if ( pThing->moveType == SITH_MT_PATH && pThing->trackParams.aFrames )
-        pSithHS->free(pThing->trackParams.aFrames);
-    if ( pThing->controlType == SITH_CT_AI )
-        sithAI_FreeEntry(pThing);
-    if ( pThing->type == SITH_THING_PARTICLE )
-        sithParticle_FreeEntry(pThing);
-    if ( pThing->animclass )
-        sithPuppet_FreeEntry(pThing);
-    rdThing_FreeEntry(&pThing->rdthing);
-    sithSoundMixer_FreeThing(pThing);
-    pThing->type = SITH_THING_FREE;
-    pThing->signature = 0;
-    pThing->thing_id = -1;
+
+    sithThing_FreeEverything(pThing); // Inlined
+
     v2 = pThing->thingIdx;
     if ( v2 == sithWorld_pCurrentWorld->numThings )
     {
