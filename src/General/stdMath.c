@@ -1,9 +1,6 @@
 #include "stdMath.h"
 
 #include "stdMathTables.h"
-#ifdef TARGET_TWL
-#include <nds/arm9/math.h>
-#endif
 
 flex_t stdMath_FlexPower(flex_t num, int32_t exp)
 {
@@ -496,7 +493,7 @@ flex_t stdMath_Dist3D3(flex_t a1, flex_t a2, flex_t a3)
 flex_t stdMath_Floor(flex_t a)
 {
 #if defined(EXPERIMENTAL_FIXED_POINT)
-    return flexdirect(a.to_raw() & 0xFFFF0000);
+    return flexdirect(a.to_raw() & ~((1<<FIXED_POINT_DECIMAL_BITS)-1));
 #else
     return floorf((float)a);
 #endif
@@ -558,17 +555,6 @@ int32_t sqrt_fx16_16_to_fx16_16(int32_t v) {
     return q;
 }
 
-#ifdef TARGET_TWL
-s32 sqrtf32_mine(s32 a)
-{
-    REG_SQRT_PARAM = ((s64)a) << 12;
-
-    while(REG_SQRTCNT & SQRT_BUSY);
-
-    return REG_SQRT_RESULT;
-}
-#endif
-
 flex_t stdMath_Sqrt(flex_t a)
 {
 #if 0
@@ -588,9 +574,11 @@ flex_t stdMath_Sqrt(flex_t a)
 
 #if defined(TARGET_TWL)
     //return f32toflex(sqrtf32_mine(flextof32(a)));
-    return flexdirect(sqrt_fx16_16_to_fx16_16(a.to_raw()));
+    //return flexdirect(sqrt_fx16_16_to_fx16_16(a.to_raw()));
+    return sqrtfixed_mine(a);
 #elif defined(EXPERIMENTAL_FIXED_POINT)
-    return flexdirect(sqrt_fx16_16_to_fx16_16(a.to_raw()));
+    //return flexdirect(sqrt_fx16_16_to_fx16_16(a.to_raw()));
+    return sqrtf((float)a);
 #else
     return sqrtf((float)a);
 #endif

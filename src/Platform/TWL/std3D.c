@@ -637,9 +637,10 @@ int std3D_AddRenderListVertices(D3DVERTEX *vertices, int count)
 
 // From https://github.com/smlu/OpenJones3D/blob/main/Libs/std/Win95/std3D.c
 void std3D_UpdateFrameCount(rdDDrawSurface *pTexture) {
-    pTexture->frameNum = std3D_frameCount;
+    //pTexture->frameNum = std3D_frameCount; // lol LEC bug
     std3D_RemoveTextureFromCacheList(pTexture);
     std3D_AddTextureToCacheList(pTexture);
+    pTexture->frameNum = std3D_frameCount;
 }
 
 // From https://github.com/smlu/OpenJones3D/blob/main/Libs/std/Win95/std3D.c
@@ -705,7 +706,10 @@ int std3D_ClearZBuffer()
 
 int std3D_twl_dims_convert_to_e(int width) {
     int width_e = TEXTURE_SIZE_8;
-    if (width == 8) {
+    if (width < 8) {
+        width_e = TEXTURE_SIZE_8;
+    }
+    else if (width == 8) {
         width_e = TEXTURE_SIZE_8;
     }
     else if (width == 16) {
@@ -773,8 +777,21 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
     }
 
     update_from_world_palette();
+
+    uint8_t* image_8bpp = (uint8_t*)vbuf->surface_lock_alloc;
+    uint16_t* image_16bpp = (uint16_t*)vbuf->surface_lock_alloc;
+    uint8_t* pal = (uint8_t*)vbuf->palette;
     
+    uint32_t width = vbuf->format.width;
+    uint32_t height = vbuf->format.height;
+
+    int width_e = std3D_twl_dims_convert_to_e(width);
+    int height_e = std3D_twl_dims_convert_to_e(height);
+    int32_t textureSize = std3D_EstimateTWLSize(width_e, height_e, vbuf->format.format.is16bit ? GL_RGBA : GL_RGB256);
+    texture->textureSize = textureSize;
+
     int image_texture;
+    int image_upsized = 0;
     int res = glGenTextures(1, &image_texture);
     if (!res) {
         res = std3D_PurgeTextureCache(texture->textureSize);
@@ -784,17 +801,10 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
             return 1;
         }
     }
-    uint8_t* image_8bpp = (uint8_t*)vbuf->surface_lock_alloc;
-    uint16_t* image_16bpp = (uint16_t*)vbuf->surface_lock_alloc;
-    uint8_t* pal = (uint8_t*)vbuf->palette;
-    
-    uint32_t width, height;
-    width = vbuf->format.width;
-    height = vbuf->format.height;
 
     // SCFG9 = 0x8307F100
     //*(u32*)0x4004008 |= 0x8F;
-    printf("%x\n", *(u32*)0x4004008);
+    //printf("%x\n", *(u32*)0x4004008);
 
     glBindTexture(GL_TEXTURE_2D, image_texture);
     glAssignColorTable(GL_TEXTURE_2D, paletteIDS[0]);
@@ -809,16 +819,29 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
     //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
     //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 
-    int width_e = std3D_twl_dims_convert_to_e(width);
-    int height_e = std3D_twl_dims_convert_to_e(height);
-    int32_t textureSize = 0;
     res = 0;
+
+    if ((width < 8 || height < 8) && !vbuf->format.format.is16bit) {
+        uint8_t* image_8bpp_orig = image_8bpp;
+        int real_width = width < 8 ? 8 : width;
+        int real_height = height < 8 ? 8 : height;
+        int sz = std3D_EstimateTWLSize(width_e, height_e, GL_RGB256);
+        image_8bpp = (uint8_t*)malloc(sz);
+        memset(image_8bpp, 0, sz);
+        image_upsized = 1;
+
+        // We have to replicate the tiling behavior
+        for (int i = 0; i < real_width; i++) {
+            for (int j = 0; j < real_height; j++) {
+                image_8bpp[(j*real_width) + i] = image_8bpp_orig[((j%height)*width)+(i%width)];
+            }
+        }
+    }
+
+    DC_FlushRange((u8*)image_8bpp, textureSize); // TODO remove if updating libnds
 
     if (vbuf->format.format.is16bit)
     {
-        //textureSize = width * height * sizeof(uint16_t);
-        textureSize = std3D_EstimateTWLSize(width_e, height_e, GL_RGBA);
-        DC_FlushRange((u8*)image_8bpp, textureSize); // TODO remove if updating libnds
 #if 1
         texture->is_16bit = 1;
 #if 0
@@ -942,9 +965,6 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
 
         //textureSize = width * height * sizeof(uint8_t);
 
-        textureSize = std3D_EstimateTWLSize(width_e, height_e, GL_RGB256);
-        DC_FlushRange((u8*)image_8bpp, textureSize); // TODO remove if updating libnds
-
         texture->is_16bit = 0;
         //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB256, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, image_8bpp);
         res = glTexImage2D(0, 0, GL_RGB256, width_e, height_e, 0, GL_TEXTURE_WRAP_S | GL_TEXTURE_WRAP_T | TEXGEN_TEXCOORD | (is_alpha_tex ? GL_TEXTURE_COLOR0_TRANSPARENT : 0), (u8*)image_8bpp);
@@ -956,6 +976,10 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
         }
 
         //texture->pDataDepthConverted = NULL;
+    }
+
+    if (image_upsized) {
+        free(image_8bpp);
     }
 
     if (!res) {
@@ -992,7 +1016,6 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
     //texture->emissive_texture_id = 0;
     //texture->displacement_texture_id = 0;
     texture->texture_loaded = 1;
-    texture->textureSize = textureSize;
 #if 0
     texture->emissive_factor[0] = 0.0;
     texture->emissive_factor[1] = 0.0;
@@ -1329,9 +1352,12 @@ void std3D_PurgeUIEntry(int i, int idx) {
 int std3D_PurgeTextureCache(size_t size)
 {
     size_t purgedBytes = 0;
-    for ( rdDDrawSurface* pCacheTexture = std3D_pFirstTexCache; pCacheTexture && pCacheTexture->frameNum != std3D_frameCount; pCacheTexture = pCacheTexture->pNextCachedTexture )
+    printf("Purge %zx...\n", size);
+
+    // On DSi, we can't purge the current frame nor the previous, because the previous is being rastered constantly by the hardware
+    for ( rdDDrawSurface* pCacheTexture = std3D_pFirstTexCache; pCacheTexture && !(pCacheTexture->frameNum == std3D_frameCount || pCacheTexture->frameNum == std3D_frameCount-1); pCacheTexture = pCacheTexture->pNextCachedTexture )
     {
-        if ( pCacheTexture->textureSize == size )
+        if ( pCacheTexture->textureSize == size)
         {
             //IDirect3DTexture2_Release(pCacheTexture->pD3DCachedTex);
             std3D_PurgeSurfaceRefs(pCacheTexture);
@@ -1341,11 +1367,15 @@ int std3D_PurgeTextureCache(size_t size)
         }
     }
 
+    printf("Nuclear Purge...\n");
+
     rdDDrawSurface* pNextCachedTexture = NULL;
     for ( rdDDrawSurface* pCacheTexture = std3D_pFirstTexCache; pCacheTexture && purgedBytes < size; pCacheTexture = pNextCachedTexture )
     {
         pNextCachedTexture = pCacheTexture->pNextCachedTexture;
-        if ( pCacheTexture->frameNum != std3D_frameCount )
+
+        // On DSi, we can't purge the current frame nor the previous, because the previous is being rastered constantly by the hardware
+        if (!(pCacheTexture->frameNum == std3D_frameCount || pCacheTexture->frameNum == std3D_frameCount-1))
         {
             //if ( pCacheTexture->pD3DCachedTex ) { // Added: Added check for null pointer
                 //IDirect3DTexture2_Release(pCacheTexture->pD3DCachedTex);

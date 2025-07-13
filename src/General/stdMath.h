@@ -3,6 +3,10 @@
 
 #include "hook.h"
 
+#ifdef TARGET_TWL
+#include <nds/arm9/math.h>
+#endif
+
 #define _USE_MATH_DEFINES
 #include <math.h>
 
@@ -85,7 +89,7 @@ static inline flex_t stdMath_Fmod(flex_t a, flex_t b) {
 static inline flex_t stdMath_Ceil(flex_t a) {
 #if defined(EXPERIMENTAL_FIXED_POINT)
     // This ceil is made of floor
-    return flexdirect(a.to_raw() & 0xFFFF0000);
+    return flexdirect(a.to_raw() & ~((1<<FIXED_POINT_DECIMAL_BITS)-1));
 #else
     return (flex_t)ceilf((float)a);
 #endif
@@ -112,6 +116,46 @@ static inline uint8_t stdMath_ClampU8(uint8_t val, uint8_t valMin, uint8_t valMa
 
     return val;
 }
+
+#ifdef TARGET_TWL
+static inline flex_t divflex_mine(flex_t num, flex_t den)
+{
+    REG_DIV_NUMER = ((s64)num.to_raw()) << FIXED_POINT_DECIMAL_BITS;
+    REG_DIV_DENOM_L = den.to_raw();
+
+    while(REG_DIVCNT & DIV_BUSY);
+
+    return flexdirect(REG_DIV_RESULT_L);
+}
+
+static inline s32 divf32_mine(s32 num, s32 den)
+{
+    REG_DIV_NUMER = ((s64)num) << 12;
+    REG_DIV_DENOM_L = den;
+
+    while(REG_DIVCNT & DIV_BUSY);
+
+    return (REG_DIV_RESULT_L);
+}
+
+static inline flex_t sqrtfixed_mine(flex_t a)
+{
+    REG_SQRT_PARAM = ((s64)a.to_raw()) << FIXED_POINT_DECIMAL_BITS;
+
+    while(REG_SQRTCNT & SQRT_BUSY);
+
+    return flexdirect(REG_SQRT_RESULT);
+}
+
+static inline flex_t sqrt64fixed_mine(s64 a)
+{
+    REG_SQRT_PARAM = ((s64)a) << FIXED_POINT_DECIMAL_BITS;
+
+    while(REG_SQRTCNT & SQRT_BUSY);
+
+    return flexdirect(REG_SQRT_RESULT);
+}
+#endif
 
 extern const flex_t aSinTable[4096];
 extern const flex_t aTanTable[4096];

@@ -241,7 +241,12 @@ flex_t rdVector_Len2(const rdVector2* v)
 
 flex_t rdVector_Len3(const rdVector3* v)
 {
+#ifdef TARGET_TWL
+    int64_t val = ((int64_t)v->x.to_raw()*v->x.to_raw())+((int64_t)v->y.to_raw()*v->y.to_raw())+((int64_t)v->z.to_raw()*v->z.to_raw());
+    return sqrt64fixed_mine(val>>FIXED_POINT_DECIMAL_BITS);
+#else
     return stdMath_Sqrt(rdVector_Dot3(v,v));
+#endif
 }
 
 flex_t rdVector_Len4(const rdVector4* v)
@@ -265,18 +270,6 @@ flex_t rdVector_Normalize2(rdVector2 *v1, const rdVector2 *v2)
     return len;
 }
 
-#ifdef TARGET_TWL
-s32 divf32_mine(s32 num, s32 den)
-{
-    REG_DIV_NUMER = ((s64)num) << 12;
-    REG_DIV_DENOM_L = den;
-
-    while(REG_DIVCNT & DIV_BUSY);
-
-    return (REG_DIV_RESULT_L);
-}
-#endif
-
 flex_t rdVector_Normalize3(rdVector3 *v1, const rdVector3 *v2)
 {
 #ifdef TARGET_TWL
@@ -292,7 +285,8 @@ flex_t rdVector_Normalize3(rdVector3 *v1, const rdVector3 *v2)
     num_sqrts += 1;
 #endif
 
-    flex_t len = rdVector_Len3(v2);
+    flex_t len = sqrt64fixed_mine(((int64_t)v2->x.to_raw()*v2->x.to_raw())+((int64_t)v2->y.to_raw()*v2->y.to_raw())+((int64_t)v2->z.to_raw()*v2->z.to_raw()));
+    //flex_t len = rdVector_Len3(v2);
     if (len == 0.0)
     {
         v1->x = v2->x;
@@ -301,9 +295,13 @@ flex_t rdVector_Normalize3(rdVector3 *v1, const rdVector3 *v2)
     }
     else
     {
-        v1->x = f32toflex(divf32_mine(flextof32(v2->x), flextof32(len)));
-        v1->y = f32toflex(divf32_mine(flextof32(v2->y), flextof32(len)));
-        v1->z = f32toflex(divf32_mine(flextof32(v2->z), flextof32(len)));
+        v1->x = divflex_mine(v2->x, len);
+        v1->y = divflex_mine(v2->y, len);
+        v1->z = divflex_mine(v2->z, len);
+
+        //v1->x = f32toflex(divf32_mine(flextof32(v2->x), flextof32(len)));
+        //v1->y = f32toflex(divf32_mine(flextof32(v2->y), flextof32(len)));
+        //v1->z = f32toflex(divf32_mine(flextof32(v2->z), flextof32(len)));
     }
     return len;
 #else

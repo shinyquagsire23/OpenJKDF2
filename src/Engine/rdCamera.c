@@ -358,8 +358,9 @@ void rdCamera_OrthoProjectSquareLst(rdVector3 *vertices_out, rdVector3 *vertices
 
 void rdCamera_PerspProject(rdVector3 *out, rdVector3 *v)
 {
-    out->x = (rdCamera_pCurCamera->fov_y / v->y) * v->x + rdCamera_pCurCamera->canvas->screen_height_half;
-    out->y = rdCamera_pCurCamera->canvas->screen_width_half - (jkPlayer_enableOrigAspect ? rdCamera_pCurCamera->screenAspectRatio : (flex_t)1.0) * (rdCamera_pCurCamera->fov_y / v->y) * v->z;
+    flex_t fov_y_calc = (rdCamera_pCurCamera->fov_y / v->y);
+    out->x = rdCamera_pCurCamera->canvas->screen_height_half + (v->x * fov_y_calc);
+    out->y = rdCamera_pCurCamera->canvas->screen_width_half - (jkPlayer_enableOrigAspect ? rdCamera_pCurCamera->screenAspectRatio : (flex_t)1.0) * fov_y_calc * v->z;
     out->z = v->y;
 
     //printf("%f %f %f -> %f %f %f\n", v->x, v->y, v->z, out->x, out->y, out->z);
@@ -377,8 +378,9 @@ void rdCamera_PerspProjectLst(rdVector3 *vertices_out, rdVector3 *vertices_in, u
 
 void rdCamera_PerspProjectSquare(rdVector3 *out, rdVector3 *v)
 {
-    out->x = (rdCamera_pCurCamera->fov_y / v->y) * v->x + rdCamera_pCurCamera->canvas->screen_height_half;
-    out->y = rdCamera_pCurCamera->canvas->screen_width_half - v->z * (rdCamera_pCurCamera->fov_y / v->y);
+    flex_t fov_y_calc = (rdCamera_pCurCamera->fov_y / v->y);
+    out->x = rdCamera_pCurCamera->canvas->screen_height_half + (v->x * fov_y_calc);
+    out->y = rdCamera_pCurCamera->canvas->screen_width_half - (v->z * fov_y_calc);
     out->z = v->y;
 }
 

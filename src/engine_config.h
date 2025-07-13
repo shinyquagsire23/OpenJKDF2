@@ -295,6 +295,12 @@ extern int Window_isHiDpi;
 typedef float flex_t_type; // _Float16
 typedef double flex_d_t_type;
 
+// Fixed point experiment
+#ifdef EXPERIMENTAL_FIXED_POINT
+#define FIXED_POINT_DECIMAL_BITS (16)
+#define FIXED_POINT_WHOLE_BITS   (32-FIXED_POINT_DECIMAL_BITS)
+#endif
+
 #define FLEX(n) ((flex_t)n)
 
 // Disable warnings for Vegetable Studio

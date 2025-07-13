@@ -4446,7 +4446,7 @@ int rdClip_Face3GSRGB(rdClipFrustum *frustum,rdVector3 *vertices,flex_t *pR,flex
                             pDestVert = prVar17;
                             pfVar23 = pfVar22;
                             fVar11 = frustum->zFar;
-                            if (((uint16_t)((uint16_t)(prVar20->y < fVar11) << 8 | (uint16_t)(prVar20->y == fVar11) << 0xe) != 0) || (fVar11 = frustum->zFar, pfVar27 = pfVar25, prVar17 = prVar16, (uint16_t)((uint16_t)(*pfVar19 < fVar11) << 8 | (uint16_t)(*pfVar19 == fVar11) << 0xe) != 0)) {
+                            if ((prVar20->y <= fVar11) || (fVar11 = frustum->zFar, pfVar27 = pfVar25, prVar17 = prVar16, (*pfVar19 <= fVar11))) {
                                 if (((prVar20->y != frustum->zFar) && (*pfVar19 != frustum->zFar)) && ((fVar11 = frustum->zFar, (uint16_t)((uint16_t)(prVar20->y < fVar11) << 8 | (uint16_t)(prVar20->y == fVar11) << 0xe) == 0 || (fVar11 = frustum->zFar, (uint16_t)((uint16_t)(*pfVar19 < fVar11) << 8 | (uint16_t)(*pfVar19 == fVar11) << 0xe) == 0)))) {
                                     fVar8 = (frustum->zFar - prVar20->y) / (*pfVar19 - prVar20->y);
                                     prVar16->y = frustum->zFar;

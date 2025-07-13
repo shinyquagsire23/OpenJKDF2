@@ -277,7 +277,7 @@ void sithRender_Draw()
     //sithRender_geoMode = RD_GEOMODE_TEXTURED;
     //sithRender_lightMode = RD_LIGHTMODE_FULLYLIT;
     //sithRender_texMode = RD_TEXTUREMODE_PERSPECTIVE;
-    rdroid_curVertexColorMode = 0;
+    //rdroid_curVertexColorMode = 0;
 #endif
 
     // Keeping this here in case I need to check for weird corruption again
@@ -838,7 +838,7 @@ void sithRender_RenderLevelGeometry()
     rdSetSortingMethod(0);
 
 #ifdef TARGET_TWL
-    rdSetVertexColorMode(0);
+    //rdSetVertexColorMode(0);
     //sithRender_SetLightMode(RD_LIGHTMODE_DIFFUSE);
 #endif
 
@@ -1294,7 +1294,7 @@ void sithRender_RenderLevelGeometry()
                             do
                             {
                                 v34 = stdMath_Fabs(*v33 - v66);
-                                if ( v34 > 0.015625 )
+                                if ( v34 > (1.0/64.0) )
                                     break;
                                 ++v32;
                                 ++v33;
@@ -1440,10 +1440,10 @@ LABEL_150:
     }
     
 
-//#ifndef TARGET_TWL
+#ifndef TARGET_TWL
     // TWL: 5-27ms
     rdCache_Flush();
-//#endif
+#endif
     rdCamera_pCurCamera->pClipFrustum = v77;
 }
 
@@ -1834,9 +1834,9 @@ void sithRender_RenderThings()
     }
 
     // DSi doesn't really have Z buffer options, so just batch everything
-//#ifndef TARGET_TWL
+#ifndef TARGET_TWL
     rdCache_Flush();
-//#endif
+#endif
 
     // MoTS added
     if (lastDrawn) 
@@ -1847,9 +1847,9 @@ void sithRender_RenderThings()
     }
 
     // DSi doesn't really have Z buffer options, so just batch everything
-//#ifndef TARGET_TWL
+#ifndef TARGET_TWL
     rdCache_Flush();
-//#endif
+#endif
 
     if (sithRender_008d1668) {
         rdSetCullFlags(1);
@@ -2094,9 +2094,9 @@ void sithRender_RenderAlphaSurfaces()
     }
 
     // DSi doesn't really have Z buffer options, so just batch everything
-//#ifndef TARGET_TWL
+#ifndef TARGET_TWL
     rdCache_Flush();
-//#endif
+#endif
 #ifdef SDL2_RENDER
     rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
 #endif

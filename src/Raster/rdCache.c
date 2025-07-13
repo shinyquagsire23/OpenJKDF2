@@ -787,31 +787,10 @@ int rdCache_SendFaceListToHardware()
                     vertex_g = (__int64)((flex_d_t)green * rdroid_curColorEffects.fade);
                     vertex_b = (__int64)((flex_d_t)blue * rdroid_curColorEffects.fade);
                 }
-                
-                if ( vertex_r < 0 )
-                {
-                    vertex_r = (vertex_r & ~0xFF) | 0;
-                }
-                else if ( vertex_r > 255 )
-                {
-                    vertex_r = (vertex_r & ~0xFF) | 0xFF;
-                }
-                if ( vertex_g < 0 )
-                {
-                    vertex_g = (vertex_g & ~0xFF) | 0;
-                }
-                else if ( vertex_g > 255 )
-                {
-                    vertex_g = (vertex_g & ~0xFF) | 0xFF;
-                }
-                if ( vertex_b < 0 )
-                {
-                    vertex_b = (vertex_b & ~0xFF) | 0;
-                }
-                else if ( vertex_b > 255 )
-                {
-                    vertex_b = (vertex_b & ~0xFF) | 0xFF;
-                }
+
+                vertex_r = stdMath_ClampInt(vertex_r, 0, 255);
+                vertex_g = stdMath_ClampInt(vertex_g, 0, 255);
+                vertex_b = stdMath_ClampInt(vertex_b, 0, 255);
 
                 v52 = active_6c;
                 final_vertex_color = vertex_b | (((uint8_t)vertex_g | ((vertex_a | (uint8_t)vertex_r) << 8)) << 8);

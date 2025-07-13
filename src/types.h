@@ -1,6 +1,17 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+#ifdef TARGET_TWL
+//#include <nds.h>
+#define flextov16(n) ((v16)((int32_t)n.to_raw() >> (FIXED_POINT_DECIMAL_BITS-12)))
+#define flextof32(n) ((int32_t)((int32_t)n.to_raw() >> (FIXED_POINT_DECIMAL_BITS-12)))
+#define f32toflex(n) (numeric::fixed<FIXED_POINT_WHOLE_BITS, FIXED_POINT_DECIMAL_BITS>::from_base(n<<(FIXED_POINT_DECIMAL_BITS-12)))
+#endif
+
+#ifdef EXPERIMENTAL_FIXED_POINT
+#define flexdirect(n) (numeric::fixed<FIXED_POINT_WHOLE_BITS, FIXED_POINT_DECIMAL_BITS>::from_base(n))
+#endif
+
 #ifdef __cplusplus
 #ifdef EXPERIMENTAL_FIXED_POINT
 #include "fixed.h"
@@ -75,17 +86,6 @@ typedef uint32_t size_t;
 
 #ifdef DW_TYPES
 #define DW_LASERS
-#endif
-
-#ifdef TARGET_TWL
-//#include <nds.h>
-#define flextov16(n) ((v16)((int32_t)n.to_raw() >> (16-12)))
-#define flextof32(n) ((int32_t)((int32_t)n.to_raw() >> (16-12)))
-#define f32toflex(n) (numeric::fixed<16, 16>::from_base(n<<(16-12)))
-#endif
-
-#ifdef EXPERIMENTAL_FIXED_POINT
-#define flexdirect(n) (numeric::fixed<16, 16>::from_base(n))
 #endif
 
 #include "types_win_enums.h"
@@ -272,8 +272,8 @@ typedef double flex64_t;
 // For intermediate calculations, physics, rendering
 #ifdef EXPERIMENTAL_FIXED_POINT
 // Fixed point experiment
-typedef numeric::fixed<16, 16> flex_t;
-typedef numeric::fixed<16, 16> flex_d_t;
+typedef numeric::fixed<FIXED_POINT_WHOLE_BITS, FIXED_POINT_DECIMAL_BITS> flex_t;
+typedef numeric::fixed<FIXED_POINT_WHOLE_BITS, FIXED_POINT_DECIMAL_BITS> flex_d_t;
 #else
 typedef flex_t_type flex_t;
 typedef flex_d_t_type flex_d_t;
