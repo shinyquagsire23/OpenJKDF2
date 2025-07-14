@@ -261,7 +261,7 @@ int rdCamera_BuildFOV(rdCamera *camera)
     return 1;
 }
 
-int rdCamera_BuildClipFrustum(rdCamera *camera, rdClipFrustum *outClip, signed int height, signed int width, signed int height2, signed int width2)
+int rdCamera_BuildClipFrustum(rdCamera *camera, rdClipFrustum *outClip, signed int minX, signed int minY, signed int maxX, signed int maxY)
 {   
     //jk_printf("%u %u %u %u\n", height, width, height2, width2);
 
@@ -271,15 +271,15 @@ int rdCamera_BuildClipFrustum(rdCamera *camera, rdClipFrustum *outClip, signed i
         return 0;
 
 #ifdef QOL_IMPROVEMENTS
-    flex_t overdraw = 1.0; // Added: HACK for 1px off on the bottom of the screen
+    flex_t overdraw = 0.0; // Added: HACK for 1px off on the bottom of the screen
 #else
     flex_t overdraw = 0.0;
 #endif
-    flex_t project_width_half = overdraw + canvas->half_screen_height - ((flex_d_t)width - 0.5);
-    flex_t project_height_half = overdraw + canvas->half_screen_width - ((flex_d_t)height - 0.5);
+    flex_t project_width_half = overdraw + canvas->half_screen_height - ((flex_d_t)minY - 0.5);
+    flex_t project_height_half = overdraw + canvas->half_screen_width - ((flex_d_t)minX - 0.5);
     
-    flex_t project_width_half_2 = -canvas->half_screen_height + ((flex_d_t)width2 - 0.5);
-    flex_t project_height_half_2 = -canvas->half_screen_width + ((flex_d_t)height2 - 0.5);
+    flex_t project_width_half_2 = -canvas->half_screen_height + ((flex_d_t)maxY - 0.5);
+    flex_t project_height_half_2 = -canvas->half_screen_width + ((flex_d_t)maxX - 0.5);
 
     outClip->bClipFar = cameraClip->bClipFar;
     outClip->zNear = cameraClip->zNear;

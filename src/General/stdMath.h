@@ -117,6 +117,9 @@ static inline uint8_t stdMath_ClampU8(uint8_t val, uint8_t valMin, uint8_t valMa
     return val;
 }
 
+#define stdMath_Min(a,b) ((a)<(b)?(a):(b))
+#define stdMath_Max(a,b) ((a)>(b)?(a):(b))
+
 #ifdef TARGET_TWL
 static inline flex_t divflex_mine(flex_t num, flex_t den)
 {

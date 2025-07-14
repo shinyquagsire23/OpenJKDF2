@@ -1531,6 +1531,13 @@ typedef struct sithSurface
     sithAdjoin* adjoin;
     uint32_t surfaceFlags;
     sithSurfaceInfo surfaceInfo;
+#ifdef QOL_IMPROVEMENTS
+    int timesClipped;
+    flex_t minX;
+    flex_t maxX;
+    flex_t minY;
+    flex_t maxY;
+#endif
 } sithSurface;
 
 typedef int (*rdMaterialUnloader_t)(rdMaterial*);

@@ -138,9 +138,20 @@ static int Linux_stdFtell(stdFile_t fhand)
 static void* Linux_alloc(uint32_t len)
 {
 #ifdef TARGET_TWL
+    intptr_t highwater = (intptr_t)getHeapLimit() - (intptr_t)getHeapEnd();
+    intptr_t future_highwater = (intptr_t)getHeapLimit() - (intptr_t)getHeapEnd() - len;
+    static int highwater_once = 0;
+    static volatile void* dummy = NULL;
+
     //printf("alloc %x\n", len);
     //printf("heap 0x%x 0x%x\n", (intptr_t)getHeapLimit() - (intptr_t)getHeapEnd(), (intptr_t)getHeapEnd() - (intptr_t)getHeapStart());
+    // HACK: libnds is dumb or something idk, touchscreen stops working when we cross this point
     void* ret = malloc(len);
+    while (!openjkdf2_bIsExtraLowMemoryPlatform && (intptr_t)ret >= (intptr_t)(0x0D000000-0x10000) && (intptr_t)ret <= (intptr_t)(0x0D000000+0x80000)) {
+        dummy = malloc(0x100000);
+        ret = malloc(len);
+        //printf("%p\n", ret);
+    }
     if (!ret) {
         printf("Failed to allocate %x bytes...\n", len);
         //while (1) {}

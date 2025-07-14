@@ -373,6 +373,9 @@ void sithRender_Draw()
         sithPlayer_bNoClippingRend = 0;
     }
 
+#ifdef TARGET_TWL
+    int test = stdPlatform_GetTimeMsec();
+#endif
     // TWL: 26ms
     // Added: noclip
     if (!sithPlayer_bNoClippingRend) {
@@ -384,6 +387,9 @@ void sithRender_Draw()
             sithRender_Clip(&sithWorld_pCurrentWorld->sectors[i], rdCamera_pCurCamera->pClipFrustum, 0.0);
         }
     }
+#ifdef TARGET_TWL
+    printf("%d\n", stdPlatform_GetTimeMsec() - test);
+#endif
 
     // TWL: 0ms
     sithRender_UpdateAllLights();
@@ -480,6 +486,20 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, flex_t a3)
     int v45; // [esp+4Ch] [ebp-34h]
     rdTexinfo *v51; // [esp+64h] [ebp-1Ch]
 
+    // Added: Prevent crashing
+    if (sithRender_numClipFrustums >= SITH_MAX_VISIBLE_SECTORS) {
+        jk_printf("OpenJKDF2: Hit max visible sector clip frustums.\n");
+        return;
+    }
+
+    // Clip visited hardening
+    // Does not help much, but no visual harm either
+#ifdef QOL_IMPROVEMENTS
+    if (sector->clipVisited == sithRender_lastRenderTick) {
+        return;
+    }
+#endif
+
     //if (sector->id == 92 || sector->id == 67 || sector->id == 66)
     //    stdPlatform_Printf("OpenJKDF2: Render sector %u %x\n", sector->id, sithRender_lastRenderTick);
 
@@ -567,7 +587,13 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, flex_t a3)
     v45 = sector->clipVisited;
     sithRender_idxInfo.vertices = sithWorld_pCurrentWorld->verticesTransformed;
     sithRender_idxInfo.vertexUVs = sithWorld_pCurrentWorld->vertexUVs;
+
+    // Clip visited hardening
+#ifdef QOL_IMPROVEMENTS
+    sector->clipVisited = sithRender_lastRenderTick;
+#else
     sector->clipVisited = 1;
+#endif
     sithRender_idxInfo.paDynamicLight = sithWorld_pCurrentWorld->verticesDynamicLight;
 
 #if 0
@@ -617,13 +643,22 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, flex_t a3)
 
         // Avoid rendering adjoins if they're far enough away
 #ifdef TARGET_TWL
-        if (dist > 2.5) {
+        if (dist > 3.0) {
+            // Doesn't help, causes visual issues
+            //adjoinIter->sector->clipVisited = sithRender_lastRenderTick;
+
             continue;
         }
 #endif
 
         if ( dist > 0.0 || (dist == 0.0 && sector == sithCamera_currentCamera->sector))
         {
+            int bAdjoinIsTransparent = (((!adjoinSurface->surfaceInfo.face.material ||
+                        (adjoinSurface->surfaceInfo.face.geometryMode == 0)) ||
+                       ((adjoinSurface->surfaceInfo.face.type & 2))) ||
+                      (v51 && (v51->header.texture_type & 8) && (v51->texture_ptr->alpha_en & 1))
+                      );
+
             if ( adjoinSurface->field_4 != sithRender_lastRenderTick )
             {
                 for (int i = 0; i < adjoinSurface->surfaceInfo.face.numVertices; i++)
@@ -636,11 +671,37 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, flex_t a3)
                     }
                 }
                 adjoinSurface->field_4 = sithRender_lastRenderTick;
+#ifdef QOL_IMPROVEMENTS
+                adjoinSurface->timesClipped = 1;
+#endif
             }
             else {
                 // Added?
                 //continue;
+
+                // slight improvement, visual issues
+                /*if (adjoinSurface->frustum == frustumArg) {
+                    continue;
+                }*/
+
+                // doesn't help, severely hurts perf
+                /*flex_t a3a = adjoinIter->dist + adjoinIter->mirror->dist + a3;
+                if (!(sithRender_flag & 4) || a3a < sithRender_f_82F4B0 ) // wtf is with this float?
+                    sithRender_Clip(adjoinIter->sector, frustumArg, a3a);
+                continue;*/
+
+                // Droidworks has a peculiar area where this function would shoot upwards of 70ms
+                // just clipping some adjoin in an open space, so we cap the number of times a surface
+                // can be clipped
+#ifdef QOL_IMPROVEMENTS
+                if (adjoinSurface->timesClipped >= SITH_MAX_SURFACE_CLIP_ITERS) {
+                    continue;
+                }
+#endif
             }
+
+            
+
             sithRender_idxInfo.numVertices = adjoinSurface->surfaceInfo.face.numVertices;
             sithRender_idxInfo.vertexPosIdx = adjoinSurface->surfaceInfo.face.vertexPosIdx;
             meshinfo_out.verticesProjected = sithRender_aVerticesTmp;
@@ -658,12 +719,6 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, flex_t a3)
                         || (v51 && (v51->header.texture_type & 8) != 0 && (v51->texture_ptr->alpha_en & 1) != 0)
                         ))) ) // Added: v51 nullptr check
 #endif
-
-            int bAdjoinIsTransparent = (((!adjoinSurface->surfaceInfo.face.material ||
-                        (adjoinSurface->surfaceInfo.face.geometryMode == 0)) ||
-                       ((adjoinSurface->surfaceInfo.face.type & 2))) ||
-                      (v51 && (v51->header.texture_type & 8) && (v51->texture_ptr->alpha_en & 1))
-                      );
 
 #ifdef QOL_IMPROVEMENTS
             // Added: Somehow the clipping changed enough to cause a bug in MoTS Lv12.
@@ -703,6 +758,12 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, flex_t a3)
                 // no frustum culling
                 if ((rdClip_faceStatus & 0x41) != 0)
                 {
+#ifdef QOL_IMPROVEMENTS
+                   /* if (adjoinSurface->timesClipped > 1) {
+                        adjoinSurface->timesClipped = SITH_MAX_SURFACE_CLIP_ITERS;
+                    }
+                    adjoinSurface->timesClipped++;*/
+#endif
                     v31 = frustumArg;
                 }
                 else
@@ -735,10 +796,38 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, flex_t a3)
 #endif
 
                     // Fixed
-                    flex_t v49 = maxY + 1.5;
-                    flex_t v48 = maxX + 1.5;
-                    flex_t v47 = minY - 2.0;//stdMath_Ceil(minY);
                     flex_t v46 = minX - 2.0;//stdMath_Ceil(minX);
+                    flex_t v47 = minY - 2.0;//stdMath_Ceil(minY);
+                    flex_t v48 = maxX + 1.5;
+                    flex_t v49 = maxY + 1.5;
+                    
+                    // Check that the new frustum will be smaller than the last, 
+                    //  if it won't be then stop recursing on this surface--
+                    // the clipping will just return the same vertices
+                    //  and waste time.
+#ifdef QOL_IMPROVEMENTS
+                    int bFrustumSmaller = (v46 > adjoinSurface->minX 
+                                            && v48 < adjoinSurface->maxX 
+                                            && v47 > adjoinSurface->minY 
+                                            && v49 < adjoinSurface->maxY);
+                    if ((adjoinSurface->timesClipped > 1) && !bFrustumSmaller) {
+                        adjoinSurface->timesClipped = SITH_MAX_SURFACE_CLIP_ITERS;
+                        //printf("yay\n");
+                    }
+                    else {
+                        adjoinSurface->timesClipped++;
+                        adjoinSurface->minX = stdMath_Max(v46, adjoinSurface->minX);
+                        adjoinSurface->minY = stdMath_Max(v47, adjoinSurface->minY);
+                        adjoinSurface->maxX = stdMath_Min(v48, adjoinSurface->maxX);
+                        adjoinSurface->maxY = stdMath_Min(v49, adjoinSurface->maxY);
+
+                        /*adjoinMirrorSurface->timesClipped++;
+                        adjoinMirrorSurface->minX = adjoinSurface->minX;
+                        adjoinMirrorSurface->minY = adjoinSurface->minY;
+                        adjoinMirrorSurface->maxX = adjoinSurface->maxX;
+                        adjoinMirrorSurface->maxY = adjoinSurface->maxY;*/
+                    }
+#endif
 
                     rdCamera_BuildClipFrustum(rdCamera_pCurCamera, &outClip, (int)(v46 - -0.5), (int)(v47 - -0.5), (int)v48, (int)v49);
                     v31 = &outClip;
