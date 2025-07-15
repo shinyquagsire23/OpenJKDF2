@@ -158,6 +158,15 @@ static inline flex_t sqrt64fixed_mine(s64 a)
 
     return flexdirect(REG_SQRT_RESULT);
 }
+
+static inline flex_t sqrt64fixed_mine_2(s64 a)
+{
+    REG_SQRT_PARAM = ((s64)a);
+
+    while(REG_SQRTCNT & SQRT_BUSY);
+
+    return flexdirect(REG_SQRT_RESULT);
+}
 #endif
 
 extern const flex_t aSinTable[4096];

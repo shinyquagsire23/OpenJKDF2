@@ -243,7 +243,7 @@ flex_t rdVector_Len3(const rdVector3* v)
 {
 #ifdef TARGET_TWL
     int64_t val = ((int64_t)v->x.to_raw()*v->x.to_raw())+((int64_t)v->y.to_raw()*v->y.to_raw())+((int64_t)v->z.to_raw()*v->z.to_raw());
-    return sqrt64fixed_mine(val>>FIXED_POINT_DECIMAL_BITS);
+    return sqrt64fixed_mine_2(val);
 #else
     return stdMath_Sqrt(rdVector_Dot3(v,v));
 #endif

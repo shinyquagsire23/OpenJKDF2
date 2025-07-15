@@ -217,7 +217,9 @@ int rdCamera_BuildFOV(rdCamera *camera)
         
         case rdCameraProjectType_Perspective:
         {
-#ifdef QOL_IMPROVEMENTS
+#ifdef TARGET_TWL
+            flex_t overdraw = 0.0;
+#elif defined(QOL_IMPROVEMENTS)
             flex_t overdraw = 1.0; // Added: HACK for 1px off on the bottom of the screen
 #else
             flex_t overdraw = 0.0;
@@ -270,8 +272,10 @@ int rdCamera_BuildClipFrustum(rdCamera *camera, rdClipFrustum *outClip, signed i
     if ( !canvas )
         return 0;
 
-#ifdef QOL_IMPROVEMENTS
-    flex_t overdraw = 0.0; // Added: HACK for 1px off on the bottom of the screen
+#ifdef TARGET_TWL
+    flex_t overdraw = 0.0;
+#elif defined(QOL_IMPROVEMENTS)
+    flex_t overdraw = 1.0; // Added: HACK for 1px off on the bottom of the screen
 #else
     flex_t overdraw = 0.0;
 #endif
@@ -307,6 +311,13 @@ int rdCamera_BuildClipFrustum(rdCamera *camera, rdClipFrustum *outClip, signed i
     outClip->right = project_height_half_2 / fov_calc;
     outClip->nearTop = (project_width_half - -1.0) / fov_calc_height;
     outClip->nearLeft = -(project_height_half - -1.0) / fov_calc;
+
+#ifdef QOL_IMPROVEMENTS
+    outClip->minX = minX;
+    outClip->minY = minY;
+    outClip->maxX = maxX;
+    outClip->maxY = maxY;
+#endif
 
     return 1;
 }

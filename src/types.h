@@ -604,6 +604,12 @@ typedef struct rdClipFrustum
   flex_t right;
   flex_t nearTop;
   flex_t nearLeft;
+#ifdef QOL_IMPROVEMENTS
+  flex_t minX;
+  flex_t minY;
+  flex_t maxX;
+  flex_t maxY;
+#endif
 } rdClipFrustum;
 
 
@@ -1283,6 +1289,15 @@ typedef struct sithAdjoin
     uint32_t field_14;
     flex_t dist;
     rdVector3 field_1C;
+#ifdef TARGET_TWL
+    int timesClipped;
+    flex_t minX;
+    flex_t maxX;
+    flex_t minY;
+    flex_t maxY;
+    flex_t minZ;
+    flex_t maxZ;
+#endif
 } sithAdjoin;
 
 #pragma pack(push, 4)
@@ -1531,13 +1546,6 @@ typedef struct sithSurface
     sithAdjoin* adjoin;
     uint32_t surfaceFlags;
     sithSurfaceInfo surfaceInfo;
-#ifdef QOL_IMPROVEMENTS
-    int timesClipped;
-    flex_t minX;
-    flex_t maxX;
-    flex_t minY;
-    flex_t maxY;
-#endif
 } sithSurface;
 
 typedef int (*rdMaterialUnloader_t)(rdMaterial*);
@@ -2511,6 +2519,9 @@ typedef struct sithSector
     uint32_t renderTick;
     uint32_t clipVisited;
     rdClipFrustum* clipFrustum;
+#ifdef TARGET_TWL
+    uint32_t geoRenderTick;
+#endif
 } sithSector;
 
 typedef struct sithSectorEntry

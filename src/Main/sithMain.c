@@ -246,6 +246,16 @@ int sithMain_Tick()
     }
 #endif
     
+#ifdef TARGET_TWL
+    // Fallback to stepped 30Hz physics if ms delta is very high
+    if (sithTime_deltaMs > 55) {
+        jkPlayer_bJankyPhysics = 0;
+    }
+    else {
+        jkPlayer_bJankyPhysics = 1;
+    }
+#endif
+
     sithMain_tickStartMs = stdPlatform_GetTimeMsec(); // Added: perf analyzing
 
     if ( (g_submodeFlags & 8) != 0 )
@@ -412,7 +422,7 @@ void sithMain_UpdateCamera()
 {
 #if defined(TARGET_TWL)
     jkPlayer_fov = 90.0;
-    jkPlayer_bJankyPhysics = 0;
+    jkPlayer_bJankyPhysics = 1;
     jkPlayer_fovIsVertical = 0;
 #endif
 
