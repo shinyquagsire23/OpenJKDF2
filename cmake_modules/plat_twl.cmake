@@ -4,7 +4,7 @@ macro(plat_initialize)
     set(BIN_NAME "openjkdf2.elf")
     set(NDS_NAME "openjkdf2.nds")
 
-    set(GAME_ICON ${DEVKITPRO}/libnds/icon.bmp)
+    set(GAME_ICON ${PROJECT_SOURCE_DIR}/packaging/dsi/icon.bmp)
     set(GAME_TITLE OpenJKDF2)
     set(GAME_SUBTITLE1 subtitle1)
     set(GAME_SUBTITLE2 subtitle2)
@@ -36,10 +36,10 @@ macro(plat_initialize)
 
     set(TARGET_TWL TRUE)
 
-    add_link_options(-mthumb -mthumb-interwork -fno-exceptions -fshort-wchar -L${LIBNDS}/lib -L${DEVKITARM}/arm-none-eabi/lib/ -Wl,--gc-sections -ffunction-sections)
-    add_compile_options(-mthumb -mthumb-interwork -fno-exceptions -march=armv5te -mtune=arm946e-s -fomit-frame-pointer -ffast-math -Wl,--gc-sections -ffunction-sections)
+    add_link_options(-g -mthumb -mthumb-interwork -fno-exceptions -fshort-wchar -L${LIBNDS}/lib -L${BLOCKSDS}/libs/maxmod -Wl,--gc-sections -ffunction-sections  --specs=${BLOCKSDS_SPECS})
+    add_compile_options(-g -mthumb -mthumb-interwork -fno-exceptions -mcpu=arm946e-s+nofp -fomit-frame-pointer -ffast-math -Wl,--gc-sections -ffunction-sections --specs=${BLOCKSDS_SPECS})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
-    add_compile_options(-O3 -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces)
+    add_compile_options(-O2 -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces -fno-delete-null-pointer-checks)
     include_directories(${LIBNDS}/include)
 endmacro()
 
@@ -48,10 +48,10 @@ macro(plat_specific_deps)
 endmacro()
 
 macro(plat_link_and_package)
-    target_link_libraries(${BIN_NAME} PRIVATE -lm -lfat -lnds9)
+    target_link_libraries(${BIN_NAME} PRIVATE -lstdc++ -lc -lm -lnds9)
     target_link_libraries(sith_engine PRIVATE nlohmann_json::nlohmann_json)
 
-    target_link_options(${BIN_NAME} PRIVATE -T${PROJECT_SOURCE_DIR}/cmake_modules/openjkdf2_dsi_arm9.mem -T${PROJECT_SOURCE_DIR}/cmake_modules/openjkdf2_ds_arm9.ld -Wl,--no-warn-rwx-segments -Wl,-Map,openjkdf2.map ${DEVKITARM}/arm-none-eabi/lib/ds_arm9_crt0.o)
+    target_link_options(${BIN_NAME} PRIVATE -Wl,--no-warn-rwx-segments -Wl,-Map,openjkdf2.map)
 
     add_custom_target(${NDS_NAME} ALL
         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${BIN_NAME}

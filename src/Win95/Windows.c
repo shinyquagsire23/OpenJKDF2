@@ -46,6 +46,7 @@ void Windows_Startup()
 #else
     memset(cdPath, 0, sizeof(cdPath));
 #endif
+
     jkRes_LoadCd(cdPath);
     Windows_installType = wuRegistry_GetInt("InstallType", 9);
     Window_AddMsgHandler(Windows_DefaultHandler);

@@ -4,6 +4,11 @@
 #include "General/stdMemory.h"
 #include "Main/jkQuakeConsole.h"
 
+#ifdef TARGET_TWL
+#include <nds.h>
+#include "Platform/TWL/dlmalloc.h"
+#endif
+
 #ifdef PLATFORM_POSIX
 #include <stdlib.h>
 #include <stdio.h>
@@ -16,17 +21,13 @@
 
 #include "SDL2_helper.h"
 
-#ifdef TARGET_TWL
-#include <nds.h>
-#endif
-
 #ifdef PLATFORM_POSIX
 uint32_t Linux_TimeMs()
 {
     // TWL has hardware timers we can use for accurate ms timing
-#ifdef TARGET_TWL
+#if defined(TARGET_TWL)
     return (uint32_t)(((TIMER1_DATA*(1<<16))+TIMER0_DATA)/32.7285);
-#endif
+#else
 
     struct timespec _t;
 
@@ -37,13 +38,14 @@ uint32_t Linux_TimeMs()
 #endif
 
     return _t.tv_sec*1000 + lround(_t.tv_nsec/1.0e6);
+#endif
 }
 
 uint64_t Linux_TimeUs()
 {
-#ifdef TARGET_TWL
+#if defined(TARGET_TWL)
     return (uint64_t)(((TIMER1_DATA*(1<<16))+TIMER0_DATA)/32728.5);
-#endif
+#else
     struct timespec _t;
 
 #if defined(_MSC_VER) && !defined(WIN64_MINGW)
@@ -53,10 +55,17 @@ uint64_t Linux_TimeUs()
 #endif
 
     return _t.tv_sec*1000000 + lround(_t.tv_nsec/1.0e3);
+#endif
 }
 
 static stdFile_t Linux_stdFileOpen(const char* fpath, const char* mode)
 {
+    // TODO figure out melonds failing
+#ifdef TARGET_TWL
+    if (!strcmp(mode, "w") || !strcmp(mode, "wb")) {
+        return 0;
+    }
+#endif
     char tmp[512];
     size_t len = strlen(fpath);
 
@@ -83,7 +92,11 @@ for (int i = 0; i < len; i++)
 }
 #endif
 
+#ifndef TARGET_TWL
     stdFile_t ret = (stdFile_t)fcaseopen(tmp, mode);
+#else
+    stdFile_t ret = (stdFile_t)fopen(tmp, mode);
+#endif
     //printf("File open `%s`->`%s` mode `%s`, ret %x\n", fpath, tmp, mode, ret);
     
     return ret;
@@ -138,23 +151,17 @@ static int Linux_stdFtell(stdFile_t fhand)
 static void* Linux_alloc(uint32_t len)
 {
 #ifdef TARGET_TWL
-    intptr_t highwater = (intptr_t)getHeapLimit() - (intptr_t)getHeapEnd();
-    intptr_t future_highwater = (intptr_t)getHeapLimit() - (intptr_t)getHeapEnd() - len;
-    static int highwater_once = 0;
-    static volatile void* dummy = NULL;
-
-    //printf("alloc %x\n", len);
-    //printf("heap 0x%x 0x%x\n", (intptr_t)getHeapLimit() - (intptr_t)getHeapEnd(), (intptr_t)getHeapEnd() - (intptr_t)getHeapStart());
-    // HACK: libnds is dumb or something idk, touchscreen stops working when we cross this point
-    void* ret = malloc(len);
-    while (!openjkdf2_bIsExtraLowMemoryPlatform && (intptr_t)ret >= (intptr_t)(0x0D000000-0x10000) && (intptr_t)ret <= (intptr_t)(0x0D000000+0x80000)) {
-        dummy = malloc(0x100000);
-        ret = malloc(len);
-        //printf("%p\n", ret);
+    extern mspace openjkdf2_mem_alt_mspace;
+    void* ret = mspace_malloc(openjkdf2_mem_alt_mspace, len + sizeof(uint32_t));
+    if (ret) {
+        *(uint32_t*)ret = 0xF00FDAAD;
+        return (void*)((intptr_t)ret + sizeof(uint32_t));
     }
+
+    ret = malloc(len);
     if (!ret) {
         printf("Failed to allocate %x bytes...\n", len);
-        //while (1) {}
+        while (1) {}
         return NULL;
     }
     return ret;
@@ -165,11 +172,28 @@ static void* Linux_alloc(uint32_t len)
 
 static void Linux_free(void* ptr)
 {
+#ifdef TARGET_TWL
+    extern mspace openjkdf2_mem_alt_mspace;
+    if (*(uint32_t*)((intptr_t)ptr - sizeof(uint32_t)) == 0xF00FDAAD) {
+        mspace_free(openjkdf2_mem_alt_mspace, (void*)((intptr_t)ptr - sizeof(uint32_t)));
+        return;
+    }
+#endif
     return free(ptr);
 }
 
 static void* Linux_realloc(void* ptr, uint32_t len)
 {
+#ifdef TARGET_TWL
+    if (!ptr) {
+        return Linux_alloc(len);
+    }
+    extern mspace openjkdf2_mem_alt_mspace;
+    if (*(uint32_t*)((intptr_t)ptr - sizeof(uint32_t)) == 0xF00FDAAD) {
+        void* ret = mspace_realloc(openjkdf2_mem_alt_mspace, (void*)((intptr_t)ptr - sizeof(uint32_t)), len + sizeof(uint32_t));
+        return (void*)((intptr_t)ret + sizeof(uint32_t));
+    }
+#endif
     //printf("%p %zx\n", ptr, len);
     return realloc(ptr, len);
 }

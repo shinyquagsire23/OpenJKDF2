@@ -659,6 +659,9 @@ int std3D_AddRenderListVertices(D3DVERTEX *vertices, int count)
 
 // From https://github.com/smlu/OpenJones3D/blob/main/Libs/std/Win95/std3D.c
 void std3D_UpdateFrameCount(rdDDrawSurface *pTexture) {
+    if (!pTexture) {
+        return;
+    }
     //pTexture->frameNum = std3D_frameCount; // lol LEC bug
     std3D_RemoveTextureFromCacheList(pTexture);
     std3D_AddTextureToCacheList(pTexture);
@@ -667,6 +670,10 @@ void std3D_UpdateFrameCount(rdDDrawSurface *pTexture) {
 
 // From https://github.com/smlu/OpenJones3D/blob/main/Libs/std/Win95/std3D.c
 void std3D_RemoveTextureFromCacheList(rdDDrawSurface *pCacheTexture) {
+    if (!pCacheTexture) {
+        return;
+    }
+
     if ( pCacheTexture == std3D_pFirstTexCache )
     {
         std3D_pFirstTexCache = pCacheTexture->pNextCachedTexture;
@@ -688,8 +695,10 @@ void std3D_RemoveTextureFromCacheList(rdDDrawSurface *pCacheTexture) {
     }
     else
     {
-        pCacheTexture->pPrevCachedTexture->pNextCachedTexture = pCacheTexture->pNextCachedTexture;
-        pCacheTexture->pNextCachedTexture->pPrevCachedTexture = pCacheTexture->pPrevCachedTexture;
+        if (pCacheTexture->pPrevCachedTexture)
+            pCacheTexture->pPrevCachedTexture->pNextCachedTexture = pCacheTexture->pNextCachedTexture;
+        if (pCacheTexture->pNextCachedTexture)
+            pCacheTexture->pNextCachedTexture->pPrevCachedTexture = pCacheTexture->pPrevCachedTexture;
     }
 
     pCacheTexture->pNextCachedTexture = NULL;
@@ -702,6 +711,10 @@ void std3D_RemoveTextureFromCacheList(rdDDrawSurface *pCacheTexture) {
 
 // From https://github.com/smlu/OpenJones3D/blob/main/Libs/std/Win95/std3D.c
 void std3D_AddTextureToCacheList(rdDDrawSurface *pTexture) {
+    if (!pTexture) {
+        return;
+    }
+
     if ( std3D_pFirstTexCache )
     {
         std3D_pLastTexCache->pNextCachedTexture = pTexture;
@@ -786,6 +799,8 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
     //if (Main_bHeadless) return 1;
     if (!vbuf || !texture) return 1;
     if (texture->texture_loaded) return 1;
+    texture->pNextCachedTexture = NULL;
+    texture->pPrevCachedTexture = NULL;
 
     if (std3D_loadedTexturesAmt >= STD3D_MAX_TEXTURES) {
         stdPlatform_Printf("ERROR: Texture cache exhausted!! Ask ShinyQuagsire to increase the size.\n");

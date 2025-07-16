@@ -91,8 +91,46 @@ static nlohmann::json stdJSON_OpenAndReadFile(const char* pFpath)
     return json_file;
 }
 
+#if 0
 static int stdJSON_WriteToFile(const char* pFpath, nlohmann::json& json_file)
 {
+    if (!pFpath)
+    {
+        stdPlatform_Printf("ERROR: Failed to open `(NULL)`!\n");
+        return 0;
+    }
+
+    printf("asdf %s\n", pFpath);
+
+    FILE* f = fopen("sd:/test_idk.json", "w");
+    if (!f) {
+        stdPlatform_Printf("ERROR: Failed to open `%s`!\n", pFpath);
+        return 0;
+    }
+
+    std::string s = json_file.dump(4, ' ', true);
+    size_t sz_expect = strlen(s.c_str());
+    size_t sz = fwrite(s.c_str(), 1, sz_expect, f);
+    if (sz != sz_expect)
+    {
+        stdPlatform_Printf("ERROR: Failed to write `%s`!\n", pFpath);
+        return 0;
+    }
+    return 1;
+}
+#endif
+
+static int stdJSON_WriteToFile(const char* pFpath, nlohmann::json& json_file)
+{
+    if (!pFpath)
+    {
+        stdPlatform_Printf("ERROR: Failed to open `(NULL)`!\n");
+        return 0;
+    }
+#ifdef TARGET_TWL
+    return 1;
+#endif
+
     fs::path json_path = {pFpath};
     std::ofstream o(json_path);
     if (!o)

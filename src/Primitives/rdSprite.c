@@ -72,8 +72,8 @@ int rdSprite_NewEntry(rdSprite *sprite, char *spritepath, int type, char *materi
                 
                 // Odd quirk: This requires the material be actually loaded
                 stdVBuffer* v24 = sprite->face.material->texinfos[0]->texture_ptr->texture_struct[0];
-                int32_t width = v24->format.width;
-                int32_t height = v24->format.height;
+                int32_t width = v24 ? v24->format.width : 1; // Added: nullptr check and fallback
+                int32_t height = v24 ? v24->format.height : 1; // Added: nullptr check and fallback
 
                 sprite->vertexUVs[0].x = 0.5;
                 sprite->vertexUVs[0].y = (flex_d_t)height - 0.5;

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #make flex/flex
 #make byacc/yacc
 

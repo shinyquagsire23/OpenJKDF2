@@ -81,14 +81,14 @@ int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *materi
         if ( !extraUVTipMaybe )
             return 0;
         v22 = polyline->edgeFace.material->texinfos[0]->texture_ptr->texture_struct[0];
-        extraUVTipMaybe[0].x = (flex_d_t)((unsigned int)v22->format.width) - 0.01;
+        extraUVTipMaybe[0].x = (flex_d_t)(v22 ? (unsigned int)v22->format.width : 1) - 0.01;// Added: nullptr check and fallback
         extraUVTipMaybe[0].y = 0.0;
         extraUVTipMaybe[1].x = 0.0;
         extraUVTipMaybe[1].y = 0.0;
         extraUVTipMaybe[2].x = 0.0;
-        extraUVTipMaybe[2].y = (flex_d_t)((unsigned int)v22->format.height) - 0.01;
-        extraUVTipMaybe[3].x = (flex_d_t)((unsigned int)v22->format.width) - 0.01;
-        extraUVTipMaybe[3].y = (flex_d_t)((unsigned int)v22->format.height) - 0.01;
+        extraUVTipMaybe[2].y = (flex_d_t)(v22 ? (unsigned int)v22->format.height : 1) - 0.01;// Added: nullptr check and fallback
+        extraUVTipMaybe[3].x = (flex_d_t)(v22 ? (unsigned int)v22->format.width : 1) - 0.01;// Added: nullptr check and fallback
+        extraUVTipMaybe[3].y = (flex_d_t)(v22 ? (unsigned int)v22->format.height : 1) - 0.01;// Added: nullptr check and fallback
     }
     polyline->tipFace.textureMode = edgeTextureMode;
     polyline->textureMode = edgeTextureMode;
@@ -123,14 +123,14 @@ int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *materi
             return 0;
         // Odd quirk: This requires the material be actually loaded
         v22 = polyline->tipFace.material->texinfos[0]->texture_ptr->texture_struct[0];
-        extraUVFaceMaybe[0].x = (flex_d_t)((unsigned int)v22->format.width) - 0.01;
+        extraUVFaceMaybe[0].x = (flex_d_t)(v22 ? (unsigned int)v22->format.width : 1.0) - 0.01; // Added: nullptr check and fallback
         extraUVFaceMaybe[0].y = 0.0;
         extraUVFaceMaybe[1].x = 0.0;
         extraUVFaceMaybe[1].y = 0.0;
         extraUVFaceMaybe[2].x = 0.0;
-        extraUVFaceMaybe[2].y = (flex_d_t)((unsigned int)v22->format.height) - 0.01;
-        extraUVFaceMaybe[3].x = (flex_d_t)((unsigned int)v22->format.width) - 0.01;
-        extraUVFaceMaybe[3].y = (flex_d_t)((unsigned int)v22->format.height) - 0.01;
+        extraUVFaceMaybe[2].y = (flex_d_t)(v22 ? (unsigned int)v22->format.height : 1.0) - 0.01; // Added: nullptr check and fallback
+        extraUVFaceMaybe[3].x = (flex_d_t)(v22 ? (unsigned int)v22->format.width : 1.0) - 0.01; // Added: nullptr check and fallback
+        extraUVFaceMaybe[3].y = (flex_d_t)(v22 ? (unsigned int)v22->format.height : 1.0) - 0.01; // Added: nullptr check and fallback
     }
     return 1;
 }

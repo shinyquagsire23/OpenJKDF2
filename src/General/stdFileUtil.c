@@ -15,7 +15,9 @@
 #endif
 #include <sys/stat.h>
 #ifndef _WIN32
+#ifndef TARGET_TWL
 #include <ftw.h>
+#endif
 #endif
 
 #include "external/fcaseopen/fcaseopen.h"
@@ -50,6 +52,8 @@ stdFileSearch* stdFileUtil_NewFind(const char *path, int a2, const char *extensi
             search->path[i] = '/';
     }
 #endif
+
+    stdPlatform_Printf("OpenJKDF2: %s %s\n", __func__, search->path);
     
     return search;
 }
@@ -269,7 +273,14 @@ int stdFileUtil_FindNext(stdFileSearch *a1, stdFileSearchResult *a2)
     }
     else
     {
+#ifdef TARGET_TWL
+        getcwd(tmp, 128-1);
+        //strncpy(tmp, pcwd, 128-1);
+        strncat(tmp, "/", 128-1);
+        strncat(tmp, a1->path, 128-1);
+#else
         strncpy(tmp, a1->path, 128);
+#endif
 
         // Clear out extension
         // TODO: ehhhh
@@ -292,7 +303,11 @@ int stdFileUtil_FindNext(stdFileSearch *a1, stdFileSearchResult *a2)
                 tmp[i] = '/';
             }
         }
+        if (tmp[strlen(tmp)-1] = '/') {
+            tmp[strlen(tmp)-1] = 0;
+        }
 
+        errno = 0;
         a1->num_found = scandir(tmp, &a1->namelist, search_ext ? parse_ext : NULL, alphasort);
         
         if (!a1->namelist) return 0;

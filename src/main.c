@@ -206,6 +206,8 @@ void crash_handler_basic(int sig);
 #ifdef TARGET_TWL
 #include <nds.h>
 #include <fat.h>
+#include <nds/arm9/dldi.h>
+#include "Platform/TWL/dlmalloc.h"
 
 volatile int frame = 0;
 //---------------------------------------------------------------------------------
@@ -251,11 +253,36 @@ __TransferRegion volatile * __transferRegion() {
 #ifdef __cplusplus
 extern "C" {
 #endif
-void initSystem(void) {
-//---------------------------------------------------------------------------------
-    register int i;
-    // stop timers and dma
-    for (i=0; i<4; i++)
+
+mspace openjkdf2_mem_alt_mspace;
+void initSystem(void)
+{
+    extern void *fake_heap_start, *fake_heap_end;
+    if (isDSiMode()) {
+        setCpuClock(true); 
+
+        //fake_heap_start = (void*)((intptr_t)getHeapStart() - 0x02000000 + 0x0C000000);
+        if (peripheralSlot2Init(SLOT2_PERIPHERAL_EXTRAM)) {
+            peripheralSlot2Open(SLOT2_PERIPHERAL_EXTRAM);
+            peripheralSlot2EnableCache(true);
+
+            openjkdf2_mem_alt_mspace = create_mspace_with_base(peripheralSlot2RamStart(), peripheralSlot2RamSize(), 0);
+            //peripheralSlot2RamStart();
+            //peripheralSlot2RamSize();
+
+            //fake_heap_end = (void*)0x0E000000;
+            openjkdf2_bIsLowMemoryPlatform = 1;
+            openjkdf2_bIsExtraLowMemoryPlatform = 0;
+        }
+        else {
+            //fake_heap_end = (void*)0x0D000000;
+            openjkdf2_bIsLowMemoryPlatform = 1;
+            openjkdf2_bIsExtraLowMemoryPlatform = 1;
+        }
+    }
+
+    // Stop timers and dma
+    for (int i = 0; i < 4; i++)
     {
         DMA_CR(i) = 0;
         DMA_SRC(i) = 0;
@@ -264,41 +291,23 @@ void initSystem(void) {
         TIMER_DATA(i) = 0;
     }
 
+    // Setup exception handler
+#ifdef NDEBUG
+    releaseExceptionHandler();
+#else
+    defaultExceptionHandler();
+#endif
 
-    // clear video display registers
-    dmaFillWords(0, (void*)0x04000000, 0x56);
-    dmaFillWords(0, (void*)0x04001008, 0x56);
+    // Clear video display registers
+    dmaFillWords(0, (void *)0x04000000, 0x58);
+    dmaFillWords(0, (void *)0x04001008, 0x58 - 8);
+
+    // Turn on power for 2D video
+    REG_POWERCNT = (POWER_LCD | POWER_2D_A | POWER_2D_B | POWER_SWAP_LCDS) & 0xFFFF;
 
     videoSetModeSub(0);
 
     vramDefault();
-
-    VRAM_E_CR = 0;
-    VRAM_F_CR = 0;
-    VRAM_G_CR = 0;
-    VRAM_H_CR = 0;
-    VRAM_I_CR = 0;
-
-    extern void *fake_heap_start, *fake_heap_end;
-    if (isDSiMode()) {
-        setCpuClock(true);
-        *(u32*)0x4004008 |= 0x8F;
-
-        fake_heap_start = (void*)((intptr_t)getHeapStart() - 0x02000000 + 0x0C000000);
-        if (*(u32*)0x4004008 & 0x4000) {
-            fake_heap_end = (void*)0x0E000000;
-            openjkdf2_bIsLowMemoryPlatform = 1;
-            openjkdf2_bIsExtraLowMemoryPlatform = 0;
-        }
-        else {
-            fake_heap_end = (void*)0x0D000000;
-            openjkdf2_bIsLowMemoryPlatform = 1;
-            openjkdf2_bIsExtraLowMemoryPlatform = 1;
-        }
-        REG_EXMEMCNT &= ~(1<<15);
-        REG_SQRTCNT = SQRT_64;
-        REG_DIVCNT = DIV_64_32;
-    }
 
     irqInit();
     fifoInit();
@@ -306,15 +315,13 @@ void initSystem(void) {
     fifoSetValue32Handler(FIFO_SYSTEM, systemValueHandler, 0);
     fifoSetDatamsgHandler(FIFO_SYSTEM, systemMsgHandler, 0);
 
-    __transferRegion()->buttons = 0xffff;
+    extern time_t *punixTime;
+    punixTime = (time_t *)memUncached((void *)&__transferRegion()->unixTime);
 
-    //punixTime = (time_t*)memUncached((void *)&__transferRegion()->unixTime);
-
-    //extern  char *fake_heap_end;
-    __transferRegion()->bootcode = (struct __bootstub *)fake_heap_end;
+    __transferRegion()->bootcode = __system_bootstub;
     irqEnable(IRQ_VBLANK);
-
 }
+
 #ifdef __cplusplus
 }
 #endif
@@ -346,11 +353,24 @@ int main(int argc, char** argv)
 #endif // ARCH_WASM
 
 #ifdef TARGET_TWL
-    
+    *(u32*)0x4004008 |= 0x8F;
+    REG_EXMEMCNT &= ~(1<<15);
+    REG_SQRTCNT = SQRT_64;
+    REG_DIVCNT = DIV_64_32;
 
+#if 0
     if (isDSiMode()) {
-        setCpuClock(1);    
+        setCpuClock(1); 
+        if (isHwDebugger()) {
+            openjkdf2_bIsLowMemoryPlatform = 1;
+            openjkdf2_bIsExtraLowMemoryPlatform = 0;
+        }
+        else {
+            openjkdf2_bIsLowMemoryPlatform = 1;
+            openjkdf2_bIsExtraLowMemoryPlatform = 1;
+        }
     }
+#endif
     defaultExceptionHandler();
     consoleDebugInit(DebugDevice_NOCASH);
 
@@ -360,16 +380,30 @@ int main(int argc, char** argv)
     consoleInit( NULL, 0, BgType_Text4bpp, BgSize_T_256x256, 23, 2, false, true );
     consoleDemoInit();
 
-    fatInitDefault();
+    printf("Waddup\n");
+
+    printf("DLDI name:\n%s\n\n", io_dldi_data->friendlyName);
+    printf("DSi mode: %d\n\n", isDSiMode());
+
+    bool init_ok = fatInitDefault();
+    if (!init_ok)
+    {
+        perror("fatInitDefault()");
+    }
+    else
+    {
+        char *cwd = getcwd(NULL, 0);
+        printf("Current dir: %s\n\n", cwd);
+        free(cwd);
+    }
 
     // Millisecond timer
     TIMER0_CR = TIMER_ENABLE|TIMER_DIV_1024;
     TIMER1_CR = TIMER_ENABLE|TIMER_CASCADE;
 
-    printf("Waddup\n");
-    printf("heap 0x%x 0x%x\n", (intptr_t)getHeapLimit() - (intptr_t)getHeapEnd(), (intptr_t)getHeapEnd() - (intptr_t)getHeapStart());
+    printf("heap free=0x%x\n  allocated=0x%x\n", (intptr_t)getHeapLimit() - (intptr_t)getHeapEnd(), (intptr_t)getHeapEnd() - (intptr_t)getHeapStart());
 
-    printf("heap 0x%p 0x%p 0x%p\n", (intptr_t)getHeapStart(), (intptr_t)getHeapEnd(), (intptr_t)getHeapLimit());
+    printf("heap start=0x%p\n  end=0x%p\n  limit=0x%p\n", (intptr_t)getHeapStart(), (intptr_t)getHeapEnd(), (intptr_t)getHeapLimit());
 
     //*(u32*)0x0D000000 = 0x12345678;
     //printf("%x %x\n", *(u32*)0x0C000000, *(u32*)0x0D000000);
@@ -381,6 +415,26 @@ int main(int argc, char** argv)
     if (!!(keys_held & KEY_B)) {
         Main_bMotsCompat = 1;
     }
+
+    const char* tmpDir = fatGetDefaultDrive();
+    chdir(tmpDir);
+
+    char *cwd = getcwd(NULL, 0);
+        printf("Current dir: %s\n\n", cwd);
+        free(cwd);
+
+#if 0
+    FILE* test = fopen("sd:/test_write.txt", "wb");
+    if (test) {
+        fwrite("asdf", 4, 1, test);
+        printf("Got file open!\n");
+        fclose(test);
+    }
+    else {
+        printf("Failed to open.\n");
+    }
+#endif
+
 
 #endif
 #ifdef WIN64_STANDALONE
@@ -413,7 +467,7 @@ int main(int argc, char** argv)
     }
 #endif // WIN64_STANDALONE
 
-#if !defined(ARCH_WASM) && !defined(TARGET_ANDROID)
+#if !defined(ARCH_WASM) && !defined(TARGET_ANDROID) && !defined(TARGET_TWL)
     openjkdf2_pExecutablePath = argv[0];
 #endif // !ARCH_WASM
 

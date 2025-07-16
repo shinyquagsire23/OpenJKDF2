@@ -8,6 +8,10 @@
 #include "Main/jkRes.h"
 #include "stdPlatform.h"
 
+#ifdef TARGET_TWL
+#include <unistd.h>
+#endif
+
 #if defined(SDL2_RENDER) && !defined(ARCH_WASM) && !defined(TARGET_ANDROID)
 
 const char* aRequiredAssets[] = {
