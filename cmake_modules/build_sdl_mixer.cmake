@@ -40,7 +40,7 @@ endif()
 if(PLAT_MSVC)
     set(SDL_MIXER_PATCH_COMMAND git submodule update --init)
 else()
-    set(SDL_MIXER_PATCH_COMMAND cd ${CMAKE_SOURCE_DIR}/lib/SDL_mixer && chmod +x ${CMAKE_SOURCE_DIR}/lib/SDL_mixer/external/download.sh && ${CMAKE_SOURCE_DIR}/lib/SDL_mixer/external/download.sh || true)
+    set(SDL_MIXER_PATCH_COMMAND cd ${CMAKE_SOURCE_DIR}/lib/SDL_mixer/external/ogg && git apply ${PROJECT_SOURCE_DIR}/lib/ogg_fix.patch && cd ${CMAKE_SOURCE_DIR}/lib/SDL_mixer && chmod +x ${CMAKE_SOURCE_DIR}/lib/SDL_mixer/external/download.sh && ${CMAKE_SOURCE_DIR}/lib/SDL_mixer/external/download.sh || true)
 endif()
 
 ExternalProject_Add(
@@ -69,6 +69,8 @@ ExternalProject_Add(
                         -DSDL2MIXER_VORBIS:STRING=VORBISFILE
                         -DSDL2MIXER_VORBIS_VORBISFILE_SHARED:BOOL=FALSE
                         -DSDL2MIXER_OPUS_SHARED:BOOL=FALSE
+                        -DSDL2MIXER_WAVPACK:BOOL=FALSE
+                        -DCMAKE_POLICY_VERSION_MINIMUM=3.5
                         
     CMAKE_CACHE_ARGS
                         -DSDL2_DIR:STRING=${SDL_ROOT}/../

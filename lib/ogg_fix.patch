@@ -1,0 +1,14 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 14fd5be..120eaf5 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -133,7 +133,7 @@ install(TARGETS ogg
+     FRAMEWORK DESTINATION ${CMAKE_INSTALL_PREFIX}
+     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ogg
+ )
+-if(0)  # libsdl-org: cannot export a target twice (fixes 'export called with target "vorbis" which requires target "ogg" that is not in this export set, but in multiple other export sets')
++if(1)  # libsdl-org: cannot export a target twice (fixes 'export called with target "vorbis" which requires target "ogg" that is not in this export set, but in multiple other export sets')
+ export(EXPORT OggTargets NAMESPACE Ogg:: FILE OggTargets.cmake)
+ endif()
+ if(INSTALL_CMAKE_PACKAGE_MODULE)
+ 

@@ -35,6 +35,7 @@ ExternalProject_Add(
                         -DPHYSFS_BUILD_TEST:BOOL=FALSE
                         -DPHYSFS_BUILD_DOCS:BOOL=FALSE
                         -DZLIB_ROOT:PATH=${ZLIB_ROOT}
+                        -DCMAKE_POLICY_VERSION_MINIMUM=3.5
     PATCH_COMMAND git apply ${PROJECT_SOURCE_DIR}/lib/physfs_macos.patch || true
     CMAKE_CACHE_ARGS    ${OPTIONAL_LIBRARY_LIBS}
     DEPENDS             ZLIB::ZLIB

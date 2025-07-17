@@ -36,6 +36,7 @@ ExternalProject_Add(
                         ${ZLIB_TOOLCHAIN_ARG}
                         -DCMAKE_BUILD_TYPE:STRING=Release
                         -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
+                        -DCMAKE_POLICY_VERSION_MINIMUM=3.5
     BUILD_BYPRODUCTS    ${ZLIB_STATIC_LIBRARY_PATH} ${ZLIB_SHARED_LIBRARY_PATH}
 )
 

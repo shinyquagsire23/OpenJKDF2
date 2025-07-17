@@ -485,7 +485,7 @@ void sithRender_Draw()
 
 #ifdef TARGET_TWL
     int testAlphaEnd = stdPlatform_GetTimeMsec();
-    printf("clp=%d lts=%d geo=%d thg=%d al=%d %d\n", testClipEnd - testClip, testLightsEnd - testLights, testLevelGeoEnd - testLevelGeo, testThingsEnd - testThings, testAlphaEnd - testAlpha, sithRender_numSectors);
+    //printf("clp=%d lts=%d geo=%d thg=%d al=%d %d\n", testClipEnd - testClip, testLightsEnd - testLights, testLevelGeoEnd - testLevelGeo, testThingsEnd - testThings, testAlphaEnd - testAlpha, sithRender_numSectors);
 #endif
 }
 
@@ -928,6 +928,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, flex_t a3, i
     sector->clipVisited = v45;
 }
 
+#ifdef TARGET_TWL
 // TODO: clean this up of ifdefs
 void sithRender_NoClip(sithSector *sector, rdClipFrustum *frustumArg, flex_t a3, int depth)
 {
@@ -1177,6 +1178,7 @@ void sithRender_NoClip(sithSector *sector, rdClipFrustum *frustumArg, flex_t a3,
     }
     //sector->clipVisited = v45;
 }
+#endif
 
 // MOTS altered
 void sithRender_RenderLevelGeometry()
@@ -2320,7 +2322,7 @@ int sithRender_RenderThing(sithThing *pThing)
 
 #ifdef TARGET_TWL
     int skip_this_thing = 0;
-    if (pThing->screenPos.y > 2.0) {
+    if (pThing->screenPos.y - (pThing->rdthing.type == RD_THINGTYPE_MODEL ? pThing->rdthing.model3->radius : (flex_t)0.0) > 2.0) {
         skip_this_thing = 1;
     }
     if (!skip_this_thing) {

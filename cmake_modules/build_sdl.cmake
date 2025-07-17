@@ -36,6 +36,7 @@ ExternalProject_Add(
                         -DSDL_STATIC:BOOL=TRUE
                         -DSDL_TEST:BOOL=FALSE
                         -DSDL_HIDAPI:BOOL=${SDL_HIDAPI}
+                        -DCMAKE_POLICY_VERSION_MINIMUM=3.5
     BUILD_BYPRODUCTS    ${SDL_LIBRARIES}
 )
 
