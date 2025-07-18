@@ -33,6 +33,21 @@ void rdMaterial_ResetCacheInfo(rdMaterial *material);
 
 //int rdMaterial_AddToTextureCache(rdMaterial *material, sith_tex *a2, int mipmap_level, int no_alpha);
 
+
+
+#if defined(RDMATERIAL_LRU_LOAD_UNLOAD)
+
+void rdMaterial_EvictData(rdMaterial *pMaterial);
+
+// Based on https://github.com/smlu/OpenJones3D/blob/main/Libs/std/Win95/std3D.c
+void rdMaterial_UpdateFrameCount(rdMaterial *pMaterial);
+void rdMaterial_RemoveMaterialFromCacheList(rdMaterial *pCacheMaterial);
+void rdMaterial_AddMaterialToCacheList(rdMaterial *pMaterial);
+int rdMaterial_PurgeMaterialCache();
+int rdMaterial_PurgeEntireMaterialCache();
+
+#endif // defined(RDMATERIAL_LRU_LOAD_UNLOAD)
+
 #ifdef __cplusplus
 }
 #endif

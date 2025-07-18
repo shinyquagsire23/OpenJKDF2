@@ -65,6 +65,9 @@ void jkHudCameraView_Shutdown(void)
 
 int jkHudCameraView_Open(void)
 {
+#ifdef TARGET_TWL
+    return 1;
+#endif
     int iVar1;
     int iVar2;
     stdBitmap *psVar3;
@@ -155,6 +158,9 @@ int jkHudCameraView_Open(void)
 
 void jkHudCameraView_Close(void)
 {
+#ifdef TARGET_TWL
+    return;
+#endif
     jkHudMotsBitmap *pjVar1;
     jkHudMotsFont *pjVar2;
     
@@ -184,6 +190,9 @@ void jkHudCameraView_Close(void)
 
 void jkHudCameraView_Draw(void)
 {
+#ifdef TARGET_TWL
+    return;
+#endif
     if (!jkHudCameraView_bOpened) return;
     if (sithWorld_pCurrentWorld->playerThing->type != SITH_THING_PLAYER) return;
 

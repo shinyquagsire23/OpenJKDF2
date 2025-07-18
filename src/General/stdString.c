@@ -46,6 +46,7 @@ int stdString_snprintf(char *out, int num, const char *fmt, ...)
 
     va_start(va, fmt);
     result = __vsnprintf(out, num - 1, fmt, va);
+    va_end(va);
     out[num - 1] = 0;
     return result;
 }

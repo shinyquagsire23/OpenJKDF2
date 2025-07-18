@@ -4,6 +4,7 @@
 
 #include "stdPlatform.h"
 #include "General/stdLinklist.h"
+#include "General/crc32.h"
 #include <math.h>
 #include <stdlib.h>
 
@@ -52,12 +53,17 @@ uint32_t stdHashTable_HashStringToIdx(const char *data, uint32_t numBuckets)
     
     if (!data || !data[0]) return 0; // Added
 
+#ifdef STDHASHTABLE_CRC32_KEYS
+    // TODO: check performance on this
+    hash = crc32(data, strlen(data));
+#else
     hash = 0;
     for ( i = *data; i; ++data )
     {
         hash = (65599 * hash) + i;
         i = (uint8_t)data[1];
     }
+#endif
     return hash % numBuckets;
 }
 
@@ -70,7 +76,7 @@ stdHashTable* stdHashTable_New(int maxEntries)
     int actualNumBuckets = 1999;
     signed int v7;
 
-    hashtable = (stdHashTable *)std_pHS->alloc(sizeof(stdLinklist));
+    hashtable = (stdHashTable *)std_pHS->alloc(sizeof(stdHashTable));
     if (!hashtable)
         return NULL;
     
@@ -187,7 +193,7 @@ int stdHashTable_SetKeyVal(stdHashTable *hashmap, const char *key, void *value)
     stdLinklist *v10; // esi
 
     // ADDED
-    if (!hashmap)
+    if (!hashmap || !key)
         return 0;
 
     if (stdHashTable_GetKeyVal(hashmap, key))
@@ -204,14 +210,22 @@ int stdHashTable_SetKeyVal(stdHashTable *hashmap, const char *key, void *value)
         //printf("Alloc to %p: %p\n", v9, new_child);
 
         _memset(new_child, 0, sizeof(*new_child));
+#ifdef STDHASHTABLE_CRC32_KEYS
+        new_child->keyCrc32 = crc32(key, strlen(key));
+#else
         new_child->key = key;
+#endif
         new_child->value = value;
         stdLinklist_InsertAfter(v10, new_child);
     }
     else
     {
         _memset(v9, 0, sizeof(*v9));
+#ifdef STDHASHTABLE_CRC32_KEYS
+        v9->keyCrc32 = crc32(key, strlen(key));
+#else
         v9->key = key;
+#endif
         v9->value = value;
     }
     return 1;
@@ -220,30 +234,45 @@ int stdHashTable_SetKeyVal(stdHashTable *hashmap, const char *key, void *value)
 void* stdHashTable_GetKeyVal(stdHashTable *hashmap, const char *key)
 {
     stdLinklist *i;
-    const char *key_iter;
     stdLinklist *foundKey;
 
-    if (!hashmap)
-        return 0;
+    if (!hashmap || !key) // Added: key nullptr check
+        return NULL;
+
+#ifdef STDHASHTABLE_CRC32_KEYS
+    uint32_t keyCrc32 = crc32(key, strlen(key));
+#endif
 
     foundKey = 0;
     for ( i = &hashmap->buckets[hashmap->keyHashToIndex(key, hashmap->numBuckets)]; i; i = i->next )
     {
-      key_iter = (const char *)i->key;
-      if ( !key_iter )
-      {
-        foundKey = 0;
-        break;
-      }
-      if ( !_strcmp(key_iter, key) )
-      {
-        foundKey = i;
-        break;
-      }
+#ifdef STDHASHTABLE_CRC32_KEYS
+        if (!i->keyCrc32) {
+            foundKey = 0;
+            break;
+        }
+        if (i->keyCrc32 == keyCrc32) {
+            foundKey = i;
+            break;
+        }
+#else
+        const char* key_iter = (const char *)i->key;
+        if ( !key_iter )
+        {
+            foundKey = 0;
+            break;
+        }
+        if ( !_strcmp(key_iter, key) )
+        {
+            foundKey = i;
+            break;
+        }
+#endif
     }
 
-    if (foundKey)
+    if (foundKey) {
         return foundKey->value;
+    }
 
     return 0;
 }
@@ -253,17 +282,30 @@ int stdHashTable_FreeKey(stdHashTable *hashtable, char *key)
     int v2;
     stdLinklist *foundKey;
     stdLinklist *i;
-    const char *key_iter;
     stdLinklist *bucketTopKey;
 
-    if (!hashtable)
+    if (!hashtable || !key) // Added: key nullptr
         return 0;
+
+#ifdef STDHASHTABLE_CRC32_KEYS
+    uint32_t keyCrc32 = crc32(key, strlen(key));
+#endif
 
     foundKey = 0;
     v2 = hashtable->keyHashToIndex(key, hashtable->numBuckets);
     for ( i = &hashtable->buckets[v2]; i; i = i->next )
     {
-        key_iter = i->key;
+#ifdef STDHASHTABLE_CRC32_KEYS
+        if (!i->keyCrc32) {
+            break;
+        }
+        if (i->keyCrc32 == keyCrc32)
+        {
+            foundKey = i;
+            break;
+        }
+#else
+        const char* key_iter = i->key;
         if ( !key_iter )
             break;
         if ( !_strcmp(key_iter, key) )
@@ -271,6 +313,7 @@ int stdHashTable_FreeKey(stdHashTable *hashtable, char *key)
             foundKey = i;
             break;
         }
+#endif
     }
 
     if ( !foundKey )
@@ -283,7 +326,11 @@ int stdHashTable_FreeKey(stdHashTable *hashtable, char *key)
         stdLinklist* pNext = foundKey->next;
         if ( pNext )
         {
+#ifdef STDHASHTABLE_CRC32_KEYS
+            bucketTopKey->keyCrc32 = pNext->keyCrc32;
+#else
             bucketTopKey->key = pNext->key;
+#endif
             bucketTopKey->value = pNext->value;
 
             stdLinklist_InsertReplace(pNext, bucketTopKey);
@@ -293,7 +340,11 @@ int stdHashTable_FreeKey(stdHashTable *hashtable, char *key)
         {
             bucketTopKey->prev = NULL;
             bucketTopKey->next = NULL;
+#ifdef STDHASHTABLE_CRC32_KEYS
+            bucketTopKey->keyCrc32 = 0;
+#else
             bucketTopKey->key = NULL;
+#endif
             bucketTopKey->value = 0;
         }
     }

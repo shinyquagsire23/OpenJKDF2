@@ -20,7 +20,12 @@ typedef struct stdLinklist
 {
     stdLinklist* prev;
     stdLinklist* next;
-    const char* key;
+    union {
+        const char* key;
+#ifdef STDHASHTABLE_CRC32_KEYS
+        uint32_t keyCrc32;
+#endif
+    };
     void* value;
 } stdLinklist;
 

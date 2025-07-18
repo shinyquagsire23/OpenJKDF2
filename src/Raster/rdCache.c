@@ -422,12 +422,12 @@ int rdCache_SendFaceListToHardware()
 
         v15 = v11.material->texinfos[v14];
         v137 = v15;
-        if ( v11.mipmap_related == 4 && (v15->header.texture_type & 8) == 0 )
+        if ( v11.mipmap_related == 4 && (v15 && v15->header.texture_type & 8) == 0 ) // Added: v15 nullptr check
         {
             v11.mipmap_related = 3;
             mipmap_related = 3;
         }
-        if ( !v15 || (v15->header.texture_type & 8) == 0 )
+        if ( !v15 || (v15->header.texture_type & 8) == 0 || !v15->texture_ptr ) // Added: !v15->texture_ptr
         {
             tex2_arr_sel = 0;
         }
@@ -549,11 +549,19 @@ int rdCache_SendFaceListToHardware()
             if ( alpha_is_opaque )
                 tex2_arr_sel = &sith_tex_sel->opaqueMats[mipmap_level];
 
-            std3D_GetValidDimension(
-                sith_tex_sel->texture_struct[mipmap_level]->format.width,
-                sith_tex_sel->texture_struct[mipmap_level]->format.height,
-                &out_width,
-                &out_height);
+            // Added: nullptr check and fallback
+            if (sith_tex_sel && sith_tex_sel->texture_struct[mipmap_level]) {
+                std3D_GetValidDimension(
+                    sith_tex_sel->texture_struct[mipmap_level]->format.width,
+                    sith_tex_sel->texture_struct[mipmap_level]->format.height,
+                    &out_width,
+                    &out_height);
+            }
+            else {
+                out_width = 8;
+                out_height = 8;
+            }
+            
             v11.mipmap_related = mipmap_related;
             actual_width = (flex_t)(out_width << mipmap_level); // FLEXTODO
             actual_height = (flex_t)(out_height << mipmap_level); // FLEXTODO
@@ -986,7 +994,21 @@ LABEL_232:
             rdCache_aHWVertices[rdCache_totalVerts].nx = v88 / 32.0;
 #endif
             rdCache_aHWVertices[rdCache_totalVerts].nz = 0.0;
-            if ( lighting_capability == 0 )
+
+            // Added: nullptr check and fallback
+            if (!(rdColormap *)active_6c->colormap || !v137) {
+                v93 = 0xFF;
+                v94 = 0xFF;
+                v95 = 0xFF;
+                v96 = 0xFF;
+                red_and_alpha = v96;
+                green = v94;
+                blue = v95;
+                v91 = (rdColormap *)active_6c->colormap;
+                goto skip_colormap_deref;
+            }
+
+            if ( lighting_capability == 0) // Added: v137 nullptr check
             {
                 v91 = (rdColormap *)active_6c->colormap;
                 v97 = v137->header.field_4;
@@ -1044,8 +1066,8 @@ LABEL_232:
                 }
 #endif
             }
-
-            if ( v91 != rdColormap_pIdentityMap )
+skip_colormap_deref:
+            if ( v91 && v91 != rdColormap_pIdentityMap ) // Added: nullptr check
             {
                 v96 = (uint8_t)(__int64)(v91->tint.x * (flex_d_t)red_and_alpha);
                 red_and_alpha = v96;

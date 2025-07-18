@@ -285,7 +285,7 @@ flex_t rdVector_Normalize3(rdVector3 *v1, const rdVector3 *v2)
     num_sqrts += 1;
 #endif
 
-    flex_t len = sqrt64fixed_mine(((int64_t)v2->x.to_raw()*v2->x.to_raw())+((int64_t)v2->y.to_raw()*v2->y.to_raw())+((int64_t)v2->z.to_raw()*v2->z.to_raw()));
+    flex_t len = sqrt64fixed_mine_2(((int64_t)v2->x.to_raw()*v2->x.to_raw())+((int64_t)v2->y.to_raw()*v2->y.to_raw())+((int64_t)v2->z.to_raw()*v2->z.to_raw()));
     //flex_t len = rdVector_Len3(v2);
     if (len == 0.0)
     {

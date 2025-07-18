@@ -268,10 +268,10 @@ if(NOT OPENJKDF2_NO_ASAN)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fsanitize=float-divide-by-zero")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address -fsanitize=float-divide-by-zero")
     set(SANITIZE_ADDRESS TRUE)
-    target_link_libraries(${BIN_NAME} PRIVATE "-static-libsan")
+    #target_link_libraries(${BIN_NAME} PRIVATE "-static-libsan")
 
-    #add_compile_options(-fsanitize=leak)
-    #add_link_options(-fsanitize=leak)
+    add_compile_options(-fsanitize=leak)
+    add_link_options(-fsanitize=leak)
 endif()
 
 include(cmake_modules/misc_stdcpp_fs_fix.cmake)

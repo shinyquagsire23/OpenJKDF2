@@ -18,7 +18,7 @@ void jkGob_Shutdown()
 {
     stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
 
-#ifndef SDL2_RENDER
+#if !defined(SDL2_RENDER) && defined(WIN32)
     jk_ChangeDisplaySettingsA(0, 0);
 #endif
 }

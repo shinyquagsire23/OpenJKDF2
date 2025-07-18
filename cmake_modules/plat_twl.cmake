@@ -36,10 +36,10 @@ macro(plat_initialize)
 
     set(TARGET_TWL TRUE)
 
-    add_link_options(-g -mthumb -mthumb-interwork -fno-exceptions -fshort-wchar -L${LIBNDS}/lib -L${BLOCKSDS}/libs/maxmod -Wl,--gc-sections -ffunction-sections  --specs=${BLOCKSDS_SPECS})
+    add_link_options(-g -mthumb -mthumb-interwork -fno-exceptions -fshort-wchar -L${LIBNDS}/lib -L${BLOCKSDS}/libs/maxmod -Wl,--gc-sections -ffunction-sections  --specs=${BLOCKSDS_SPECS} -Wl,--wrap,malloc -Wl,--wrap,free -Wl,--wrap,realloc)
     add_compile_options(-g -mthumb -mthumb-interwork -fno-exceptions -mcpu=arm946e-s+nofp -fomit-frame-pointer -ffast-math -Wl,--gc-sections -ffunction-sections --specs=${BLOCKSDS_SPECS})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
-    add_compile_options(-O2 -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces -fno-delete-null-pointer-checks)
+    add_compile_options(-O1 -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces -fno-delete-null-pointer-checks -Wl,--wrap,malloc -Wl,--wrap,free -Wl,--wrap,realloc)
     include_directories(${LIBNDS}/include)
 endmacro()
 

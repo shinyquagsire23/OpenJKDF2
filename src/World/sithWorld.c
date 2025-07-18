@@ -191,7 +191,7 @@ LABEL_11:
                         _sprintf(tmp, "%f seconds to parse section %s -- FAILED!\n", (flex32_t)v6 * 0.001, section);
                         sithConsole_Print(tmp);
 #ifdef TARGET_TWL
-                        stdPlatform_Printf("heap 0x%x 0x%x\n", (intptr_t)getHeapLimit() - (intptr_t)getHeapEnd(), (intptr_t)getHeapEnd() - (intptr_t)getHeapStart());
+                        stdPlatform_PrintHeapStats();
 #endif
                         goto LABEL_19;
                     }
@@ -199,7 +199,7 @@ LABEL_11:
                     _sprintf(tmp, "%f seconds to parse section %s.\n", (flex32_t)v6 * 0.001, section);
                     sithConsole_Print(tmp);
 #ifdef TARGET_TWL
-                    stdPlatform_Printf("heap 0x%x 0x%x\n", (intptr_t)getHeapLimit() - (intptr_t)getHeapEnd(), (intptr_t)getHeapEnd() - (intptr_t)getHeapStart());
+                    stdPlatform_PrintHeapStats();
 #endif
                 }
             }

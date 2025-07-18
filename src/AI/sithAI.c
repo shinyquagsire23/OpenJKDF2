@@ -1413,7 +1413,8 @@ LABEL_12:
     if ( (a7 & 1) != 0 )
     {
         v11 = actor->pDistractor;
-        if ( v11->moveType == SITH_MT_PHYSICS
+        // Added: nullptr check
+        if ( v11 && v11->moveType == SITH_MT_PHYSICS
           && !rdVector_IsZero3(&v11->physicsParams.vel) )
         {
             rdVector_Scale3(&a1a, &v1, v8->physicsParams.vel.y);

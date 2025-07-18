@@ -1233,9 +1233,13 @@ typedef struct rdMaterial
     uint32_t celIdx;
     rdTexinfo *texinfos[16];
     uint32_t num_textures;
-    rdTexture* textures;
+    rdTexture *textures;
 #ifdef RDMATERIAL_LRU_LOAD_UNLOAD
     BOOL bDataLoaded;
+    int frameNum;
+    int refcnt;
+    rdMaterial* pPrevCachedMaterial;
+    rdMaterial* pNextCachedMaterial;
 #endif
 } rdMaterial;
 

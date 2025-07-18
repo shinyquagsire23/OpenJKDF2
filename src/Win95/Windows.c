@@ -259,6 +259,7 @@ int Windows_ErrorMsgboxWide(const char *a1, ...)
 #else
     v1 = jkStrings_GetUniStringWithFallback(a1);
     jk_vsnwprintf(Text, 0x400u, v1, va);
+    va_end(va);
     //v4 = jkStrings_GetUniStringWithFallback("ERROR");
     stdString_WcharToChar(tmp, Text, 1024);
 
@@ -288,6 +289,7 @@ int Windows_ErrorMsgbox(const char *a1, ...)
 #else
     v1 = jkStrings_GetUniStringWithFallback(a1);
     jk_vsnwprintf(Text, 0x200u, v1, va);
+    va_end(va);
     //v4 = jkStrings_GetUniStringWithFallback("ERROR");
 
     stdString_WcharToChar(tmp, Text, 512);
@@ -326,6 +328,7 @@ void Windows_GameErrorMsgbox(const char *a1, ...)
 #endif
 #else
     vsnprintf(tmp, 0x200u, a1, va);
+    va_end(va);
     jk_printf("FATAL ERROR: %s\n", tmp);
     while(1);
 #endif

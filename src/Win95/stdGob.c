@@ -176,7 +176,7 @@ stdGobFile* stdGob_FileOpen(stdGob *gob, const char *filepath)
     int v5;
 
     // Embedded resources
-#ifdef QOL_IMPROVEMENTS
+#if defined(QOL_IMPROVEMENTS) && !defined(TARGET_TWL)
     size_t sz = 0;
     void* data = stdEmbeddedRes_LoadOnlyInternal(filepath, &sz);
     if (data) {

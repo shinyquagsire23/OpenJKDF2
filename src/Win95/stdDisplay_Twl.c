@@ -229,10 +229,6 @@ int stdDisplay_SetMasterPalette(uint8_t* pal)
 
 stdVBuffer* stdDisplay_VBufferNew(stdVBufferTexFmt *fmt, int create_ddraw_surface, int gpu_mem, const void* palette)
 {
-    if ((intptr_t)getHeapLimit() - (intptr_t)getHeapEnd() < 0x40000) {
-        return NULL;
-    }
-
     stdVBuffer* out = (stdVBuffer*)std_pHS->alloc(sizeof(stdVBuffer));
     if (!out) {
         return NULL;
@@ -384,7 +380,7 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
     if (dstPixels == srcPixels)
     {
         size_t buf_len = srcStride * dstRect.width * dstRect.height;
-        uint8_t* dstPixels = (uint8_t*)malloc(buf_len);
+        uint8_t* dstPixels = (uint8_t*)std_pHS->alloc(buf_len);
         int has_alpha = 0;//!(rect->width == 640);
 
         rdRect dstRect_inter = {0, 0, rect->width, rect->height};
@@ -437,7 +433,7 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
 
     if (self_copy)
     {
-        free(srcPixels);
+        std_pHS->free(srcPixels);
     }
 
     //SDL_BlitSurface(vbuf2->sdlSurface, &srcRect, vbuf->sdlSurface, &dstRect); //TODO error check

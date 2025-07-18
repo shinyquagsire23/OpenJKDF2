@@ -231,100 +231,13 @@ void* __attribute__((weak)) __memcpy_chk(void * dest, const void * src, size_t l
 #endif // WIN64_MINGW
 
 #ifdef TARGET_TWL
-
-//---------------------------------------------------------------------------------
-typedef struct __TransferRegion {
-//---------------------------------------------------------------------------------
-    vs16 touchX,   touchY;      // TSC X, Y
-    vs16 touchXpx, touchYpx;    // TSC X, Y pixel values
-    vs16 touchZ1,  touchZ2;     // TSC x-panel measurements
-    vu16 buttons;               // X, Y, /PENIRQ buttons
-    time_t  unixTime;
-    struct __bootstub *bootcode;
-} __TransferRegion, * __pTransferRegion;
-
-#define transfer (*(__TransferRegion volatile *)(0x02FFF000))
-
-static inline
-__TransferRegion volatile * __transferRegion() {
-    return &transfer;
-}
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 mspace openjkdf2_mem_alt_mspace;
-void initSystem(void)
-{
-    extern void *fake_heap_start, *fake_heap_end;
-    if (isDSiMode()) {
-        setCpuClock(true); 
+mspace openjkdf2_mem_main_mspace;
 
-        //fake_heap_start = (void*)((intptr_t)getHeapStart() - 0x02000000 + 0x0C000000);
-        if (peripheralSlot2Init(SLOT2_PERIPHERAL_EXTRAM)) {
-            peripheralSlot2Open(SLOT2_PERIPHERAL_EXTRAM);
-            peripheralSlot2EnableCache(true);
-
-            openjkdf2_mem_alt_mspace = create_mspace_with_base(peripheralSlot2RamStart(), peripheralSlot2RamSize(), 0);
-            //peripheralSlot2RamStart();
-            //peripheralSlot2RamSize();
-
-            //fake_heap_end = (void*)0x0E000000;
-            openjkdf2_bIsLowMemoryPlatform = 1;
-            openjkdf2_bIsExtraLowMemoryPlatform = 0;
-        }
-        else {
-            //fake_heap_end = (void*)0x0D000000;
-            openjkdf2_bIsLowMemoryPlatform = 1;
-            openjkdf2_bIsExtraLowMemoryPlatform = 1;
-        }
-    }
-
-    // Stop timers and dma
-    for (int i = 0; i < 4; i++)
-    {
-        DMA_CR(i) = 0;
-        DMA_SRC(i) = 0;
-        DMA_DEST(i) = 0;
-        TIMER_CR(i) = 0;
-        TIMER_DATA(i) = 0;
-    }
-
-    // Setup exception handler
-#ifdef NDEBUG
-    releaseExceptionHandler();
-#else
-    defaultExceptionHandler();
-#endif
-
-    // Clear video display registers
-    dmaFillWords(0, (void *)0x04000000, 0x58);
-    dmaFillWords(0, (void *)0x04001008, 0x58 - 8);
-
-    // Turn on power for 2D video
-    REG_POWERCNT = (POWER_LCD | POWER_2D_A | POWER_2D_B | POWER_SWAP_LCDS) & 0xFFFF;
-
-    videoSetModeSub(0);
-
-    vramDefault();
-
-    irqInit();
-    fifoInit();
-
-    fifoSetValue32Handler(FIFO_SYSTEM, systemValueHandler, 0);
-    fifoSetDatamsgHandler(FIFO_SYSTEM, systemMsgHandler, 0);
-
-    extern time_t *punixTime;
-    punixTime = (time_t *)memUncached((void *)&__transferRegion()->unixTime);
-
-    __transferRegion()->bootcode = __system_bootstub;
-    irqEnable(IRQ_VBLANK);
-}
-
-#ifdef __cplusplus
-}
-#endif
+intptr_t openjkdf2_mem_alt_mspace_start;
+intptr_t openjkdf2_mem_alt_mspace_end;
+intptr_t openjkdf2_mem_main_mspace_start;
+intptr_t openjkdf2_mem_main_mspace_end;
 #endif
 
 int main(int argc, char** argv)
@@ -353,24 +266,11 @@ int main(int argc, char** argv)
 #endif // ARCH_WASM
 
 #ifdef TARGET_TWL
-    *(u32*)0x4004008 |= 0x8F;
-    REG_EXMEMCNT &= ~(1<<15);
+    extern int32_t openjkdf2_mem_alt_mspace_valid;
+
     REG_SQRTCNT = SQRT_64;
     REG_DIVCNT = DIV_64_32;
 
-#if 0
-    if (isDSiMode()) {
-        setCpuClock(1); 
-        if (isHwDebugger()) {
-            openjkdf2_bIsLowMemoryPlatform = 1;
-            openjkdf2_bIsExtraLowMemoryPlatform = 0;
-        }
-        else {
-            openjkdf2_bIsLowMemoryPlatform = 1;
-            openjkdf2_bIsExtraLowMemoryPlatform = 1;
-        }
-    }
-#endif
     defaultExceptionHandler();
     consoleDebugInit(DebugDevice_NOCASH);
 
@@ -381,6 +281,36 @@ int main(int argc, char** argv)
     consoleDemoInit();
 
     printf("Waddup\n");
+
+    if (isDSiMode()) {
+        *(u32*)0x4004008 |= 0x8F;
+        REG_EXMEMCNT &= ~(1<<15);
+
+        setCpuClock(1); 
+    }
+
+    if (peripheralSlot2Init(SLOT2_PERIPHERAL_EXTRAM)) {
+        peripheralSlot2Open(SLOT2_PERIPHERAL_EXTRAM);
+        peripheralSlot2EnableCache(true);
+
+        size_t alt_sz = peripheralSlot2RamSize() - 0x1000;
+        openjkdf2_mem_alt_mspace_start = (intptr_t)peripheralSlot2RamStart();
+        openjkdf2_mem_alt_mspace_end = openjkdf2_mem_alt_mspace_start + alt_sz;
+
+        openjkdf2_mem_alt_mspace = create_mspace_with_base((void*)openjkdf2_mem_alt_mspace_start, alt_sz, 0);
+        openjkdf2_mem_alt_mspace_valid = 1;
+
+        printf("Added extra 0x%zx bytes to heap.\n", alt_sz);
+
+        openjkdf2_bIsLowMemoryPlatform = 1;
+        openjkdf2_bIsExtraLowMemoryPlatform = 0;
+    }
+    else {
+        printf("No extra RAM available to use.\n");
+
+        openjkdf2_bIsLowMemoryPlatform = 1;
+        openjkdf2_bIsExtraLowMemoryPlatform = 1;
+    }
 
     printf("DLDI name:\n%s\n\n", io_dldi_data->friendlyName);
     printf("DSi mode: %d\n\n", isDSiMode());
@@ -405,9 +335,36 @@ int main(int argc, char** argv)
 
     printf("heap start=0x%p\n  end=0x%p\n  limit=0x%p\n", (intptr_t)getHeapStart(), (intptr_t)getHeapEnd(), (intptr_t)getHeapLimit());
 
+    printf("ext heap start=%p, size=%x\n", peripheralSlot2RamStart(), peripheralSlot2RamSize());
     //*(u32*)0x0D000000 = 0x12345678;
     //printf("%x %x\n", *(u32*)0x0C000000, *(u32*)0x0D000000);
 
+#if 0
+    // This memleaks with jkRes_pHS! but not with pLowLevelHS so it's my fault, somewhere
+    int i = 0;
+    while(1) {
+        FILE* f = fopen("test_nonexistant.txt", "rb");
+        printf("Opened file %d\n", i);
+        if (f) {
+            fclose(f);
+            printf("Closed file %d\n", i);
+        }
+
+        stdPlatform_PrintHeapStats();
+        i++;
+    }
+#endif
+
+    // Nice for debugging
+#if 0
+    while (1) {
+        scanKeys();
+        u16 keys_held = keysHeld();
+        if (!!(keys_held & KEY_A)) {
+            break;
+        }
+    }
+#endif
 
     scanKeys();
     u16 keys_held = keysHeld();

@@ -134,10 +134,13 @@ int stdConffile_Printf(char *fmt, ...)
     va_list va;
 
     va_start(va, fmt);
-    if ( !writeFile || !fmt )
+    if ( !writeFile || !fmt ) {
+        va_end(va);
         return 0;
+    }
 
     len = __vsnprintf(printfBuffer, STDCONF_LINEBUFFER_LEN, fmt, va);
+    va_end(va);
     return std_pHS->fileWrite(writeFile, printfBuffer, len) == len;
 }
 

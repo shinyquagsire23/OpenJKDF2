@@ -115,7 +115,7 @@ int TryCreateDirectory(LPCSTR lpPathName)
     {
         size_t i;
 
-        (p=strncpy((char *)malloc(1+i), lpPathName, i=p-lpPathName))[i] = '\0';
+        (p=strncpy((char *)std_pHS->alloc(1+i), lpPathName, i=p-lpPathName))[i] = '\0';
         b = TryCreateDirectory(p);
         free(p);
         b = b ? CreateDirectoryA(lpPathName, 0) : 0;
@@ -310,7 +310,7 @@ int stdFileUtil_FindNext(stdFileSearch *a1, stdFileSearchResult *a2)
         errno = 0;
         a1->num_found = scandir(tmp, &a1->namelist, search_ext ? parse_ext : NULL, alphasort);
         
-        if (!a1->namelist) return 0;
+        if (!a1->namelist || a1->num_found <= 0) return 0;
         
         iter = a1->namelist[2];
         a1->isNotFirst = 2;

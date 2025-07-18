@@ -246,6 +246,14 @@
 #define SITH_MIXER_NUMPLAYINGSOUNDS (32)
 #endif
 
+
+//
+// Misc optimizations/features
+//
+#if defined(TARGET_TWL)
+#define STDHASHTABLE_CRC32_KEYS
+#endif
+
 // Deferred loading and LRU unloading
 #if defined(QOL_IMPROVEMENTS)
 #define RDMATERIAL_LRU_LOAD_UNLOAD

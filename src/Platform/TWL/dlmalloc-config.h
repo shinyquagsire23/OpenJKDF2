@@ -11,6 +11,7 @@
 #define FOOTERS			0
 #define NO_MALLOC_STATS		1
 #define PROCEED_ON_ERROR	1
-#define malloc_getpagesize	4096
+#define malloc_getpagesize	128
+#define DEFAULT_GRANULARITY (32)
 
 #endif
