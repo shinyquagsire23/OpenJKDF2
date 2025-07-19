@@ -571,7 +571,7 @@ typedef struct rdJoint
 #ifdef SITH_DEBUG_STRUCT_NAMES
     char mesh_name[32];
 #endif
-    uint32_t nodeIdx;
+    int32_t nodeIdx;
     uint32_t numAnimEntries;
     rdAnimEntry* paAnimEntries;
 } rdJoint;

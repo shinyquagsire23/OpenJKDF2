@@ -215,6 +215,9 @@
 #define STDGOB_MAX_GOBS (64)
 #endif
 
+#define RDPUPPET_MAX_TRACKS (4)
+#define RDPUPPET_MAX_NODES (64)
+
 #ifdef SDL2_RENDER
 #define JOYSTICK_MAX_STRS (6)
 #else
