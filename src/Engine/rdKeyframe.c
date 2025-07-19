@@ -2,6 +2,7 @@
 
 #include "Engine/rdroid.h"
 #include "General/stdConffile.h"
+#include "General/stdString.h"
 #include "stdPlatform.h"
 #include "Win95/std.h"
 #include "jk.h"

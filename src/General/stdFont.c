@@ -6,6 +6,7 @@
 #include "Win95/std.h"
 #include "Platform/std3D.h"
 #include "World/jkPlayer.h"
+#include "General/stdString.h"
 
 #define INT_FLOAT_SCALED(x, s) ((int)((flex_t)(x) * (flex_t)(s))) // FLEXTODO
 
@@ -79,7 +80,7 @@ stdFont* stdFont_Load(char *fpath, int a2, int a3)
 
     // TODO: maybe Jones/MoTS had hashtable changes here to avoid copies of fonts?
 #ifdef SITH_DEBUG_STRUCT_NAMES
-    stdString_SafeWStrCopy(fontAlloc_->name, fname, 32);
+    stdString_SafeStrCopy(fontAlloc_->name, fname, 32);
 #endif
     pEntries = fontAlloc_->charsetHead.pEntries;
     charMin = fontAlloc_->charsetHead.charFirst;
