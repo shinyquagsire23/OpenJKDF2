@@ -61,7 +61,7 @@ int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *materi
     polyline->edgeFace.material = rdMaterial_Load(material_side_fname, 0, 0);
     if ( !polyline->edgeFace.material )
         return 0;
-    rdMaterial_EnsureData(polyline->edgeFace.material); // Added: TWL
+    rdMaterial_EnsureDataForced(polyline->edgeFace.material); // Added: TWL
     polyline->edgeFace.numVertices = 4;
     vertexPosIdx = (int *)rdroid_pHS->alloc(sizeof(int) * polyline->edgeFace.numVertices);
     polyline->edgeFace.vertexPosIdx = vertexPosIdx;
@@ -97,6 +97,7 @@ int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *materi
         extraUVTipMaybe[3].x = (flex_d_t)(v22 ? (unsigned int)v22->format.width : 1) - 0.01;// Added: nullptr check and fallback
         extraUVTipMaybe[3].y = (flex_d_t)(v22 ? (unsigned int)v22->format.height : 1) - 0.01;// Added: nullptr check and fallback
     }
+    rdMaterial_OptionalFree(polyline->edgeFace.material); // Added: TWL
     polyline->tipFace.textureMode = edgeTextureMode;
     polyline->textureMode = edgeTextureMode;
     polyline->lightingMode = edgeLightingMode;
@@ -108,7 +109,7 @@ int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *materi
     polyline->tipFace.material = rdMaterial_Load(material_tip_fname, 0, 0);
     if ( !polyline->tipFace.material )
         return 0;
-    rdMaterial_EnsureData(polyline->tipFace.material); // Added: TWL
+    rdMaterial_EnsureDataForced(polyline->tipFace.material); // Added: TWL
     polyline->tipFace.numVertices = 4;
     vertexPosIdx = (int *)rdroid_pHS->alloc(sizeof(int) * polyline->tipFace.numVertices);
     polyline->tipFace.vertexPosIdx = vertexPosIdx;
@@ -143,6 +144,7 @@ int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *materi
         extraUVFaceMaybe[3].x = (flex_d_t)(v22 ? (unsigned int)v22->format.width : 1.0) - 0.01; // Added: nullptr check and fallback
         extraUVFaceMaybe[3].y = (flex_d_t)(v22 ? (unsigned int)v22->format.height : 1.0) - 0.01; // Added: nullptr check and fallback
     }
+    rdMaterial_OptionalFree(polyline->tipFace.material); // Added: TWL
     return 1;
 }
 

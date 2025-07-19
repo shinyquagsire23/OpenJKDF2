@@ -613,7 +613,7 @@ sithCog* sithCog_LoadCogscript(const char *fpath)
         v9 = sithWorld_pLoading->numCogScriptsLoaded;
         if ( v9 < sithWorld_pLoading->numCogScripts && (v8 = &sithWorld_pLoading->cogScripts[v9], sithCogParse_Load(cog_fpath, v8, 0)) )
         {
-            stdHashTable_SetKeyVal(sithCog_pScriptHashtable, v8->cog_fpath, v8);
+            stdHashTable_SetKeyVal(sithCog_pScriptHashtable, cog_fpath, v8); // Added: v8 -> no v8 for cog_fpath
             ++sithWorld_pLoading->numCogScriptsLoaded;
         }
         else
@@ -624,7 +624,7 @@ sithCog* sithCog_LoadCogscript(const char *fpath)
     if ( !v8 )
         return 0;
 #ifdef SITH_DEBUG_STRUCT_NAMES
-    stdString_SafeStrCopy(cog->cogscript_fpath, v8->cog_fpath, 32);
+    stdString_SafeStrCopy(cog->cogscript_fpath, cog_fpath, 32); // v8 -> no v8 for cog_fpath
 #endif
     cog->cogscript = v8;
     cog->flags = v8->flags;
@@ -1458,12 +1458,26 @@ void sithCog_Free(sithWorld *world)
                     v4->aIdk[v5].desc = NULL;
                 }
             }
+#ifdef COG_DYNAMIC_IDK
+            if (v4->aIdk)
+                pSithHS->free(v4->aIdk);
+            v4->aIdk = NULL;
+#endif
+#ifdef COG_DYNAMIC_TRIGGERS
+            if (v4->triggers)
+                pSithHS->free(v4->triggers);
+            v4->triggers = NULL;
+#endif
             if ( v4->script_program )
             {
                 pSithHS->free(v4->script_program);
                 v4->script_program = 0;
             }
+#ifdef STDHASHTABLE_CRC32_KEYS
+            stdHashTable_FreeKeyCrc32(sithCog_pScriptHashtable, v4->pathCrc);
+#else
             stdHashTable_FreeKey(sithCog_pScriptHashtable, v4->cog_fpath);
+#endif
         }
         pSithHS->free(world->cogScripts);
         world->cogScripts = 0;
@@ -1578,7 +1592,7 @@ sithCogScript* sithCogScript_LoadEntry(const char *pFpath, int32_t unk)
         v4 = sithWorld_pLoading->numCogScriptsLoaded;
         if ( v4 < sithWorld_pLoading->numCogScripts && (v5 = &sithWorld_pLoading->cogScripts[v4], sithCogParse_Load(v6, v5, unk)) )
         {
-            stdHashTable_SetKeyVal(sithCog_pScriptHashtable, v5->cog_fpath, v5);
+            stdHashTable_SetKeyVal(sithCog_pScriptHashtable, pFpath, v5); // Added: cog_fpath -> pFpath
             ++sithWorld_pLoading->numCogScriptsLoaded;
             result = v5;
         }

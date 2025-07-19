@@ -8,6 +8,7 @@
 #include "stdPlatform.h"
 #include "Win95/std.h"
 #include "General/stdConffile.h"
+#include "General/stdString.h"
 
 #include "jk.h"
 
@@ -56,9 +57,13 @@ int sithCogParse_Load(char *cog_fpath, sithCogScript *cogscript, int unk)
     sithCogParse_lastParsedFile = cog_fpath;
 
     _memset(cogscript, 0, sizeof(sithCogScript));
-    _strncpy(cogscript->cog_fpath, stdFileFromPath(cog_fpath), 0x1Fu);
+#ifdef STDHASHTABLE_CRC32_KEYS
+    const char* fname = stdFileFromPath(cog_fpath);
+    cogscript->pathCrc = crc32(fname, strlen(fname));
+#else
+    stdString_SafeStrCopy(cogscript->cog_fpath, stdFileFromPath(cog_fpath), 32);
+#endif
     _memset(cog_parser_node_stackpos, 0xFFu, sizeof(cog_parser_node_stackpos));
-    cogscript->cog_fpath[31] = 0;
     cog_yacc_loop_depth = 1;
 
     if ( !stdConffile_ReadArgs() )
@@ -314,7 +319,9 @@ LABEL_32:
 
 #ifdef QOL_IMPROVEMENTS
     if (yynerrs) {
+#ifdef SITH_DEBUG_STRUCT_NAMES
         jk_printf("OpenJKDF2: PARSER error was in file: %s\n", script->cog_fpath);
+#endif
     }
 #endif
 
@@ -785,6 +792,10 @@ int sithCogParse_ParseSymbol(sithCogScript *cogScript, int a2, int unk)
     symbol->val.dataAsPtrs[1] = 0;
     symbol->val.dataAsPtrs[2] = 0;
     symbol->val.dataAsName = 0;
+
+#ifdef COG_DYNAMIC_IDK
+    cogScript->aIdk = (sithCogReference*)pSithHS->realloc(cogScript->aIdk, sizeof(sithCogReference) * (cogScript->numIdk+1));
+#endif
     
     cogIdk = &cogScript->aIdk[cogScript->numIdk];
     _memset(cogIdk, 0, sizeof(sithCogReference));
@@ -823,8 +834,7 @@ int sithCogParse_ParseSymbol(sithCogScript *cogScript, int a2, int unk)
     {
         if ( stdConffile_entry.args[1].value != stdConffile_entry.args[1].key )
         {
-            _strncpy(cogScript->aIdk[cogScript->numIdk].value, stdConffile_entry.args[1].value, 0x1Fu);
-            cogScript->aIdk[cogScript->numIdk].value[31] = 0;
+            stdString_SafeStrCopy(cogScript->aIdk[cogScript->numIdk].value, stdConffile_entry.args[1].value, 32);
         }
     }
     ++cogScript->numIdk;
@@ -865,6 +875,10 @@ int sithCogParse_ParseFlex(sithCogScript *cogScript, int a2)
         }
     }
     
+#ifdef COG_DYNAMIC_IDK
+    cogScript->aIdk = (sithCogReference*)pSithHS->realloc(cogScript->aIdk, sizeof(sithCogReference) * (cogScript->numIdk+1));
+#endif
+
     sithCogReference* cogIdk = &cogScript->aIdk[cogScript->numIdk];
     _memset(cogIdk, 0, sizeof(sithCogReference)); // added
     cogIdk->type = COG_TYPE_FLEX; // hmm
@@ -910,6 +924,10 @@ int sithCogParse_ParseInt(sithCogScript *cogScript, int a2)
         }
     }
     
+#ifdef COG_DYNAMIC_IDK
+    cogScript->aIdk = (sithCogReference*)pSithHS->realloc(cogScript->aIdk, sizeof(sithCogReference) * (cogScript->numIdk+1));
+#endif
+
     sithCogReference* cogIdk = &cogScript->aIdk[cogScript->numIdk];
     _memset(cogIdk, 0, sizeof(sithCogReference)); // added
     cogIdk->type = COG_TYPE_INT; // hmmm
@@ -954,6 +972,10 @@ int sithCogParse_ParseVector(sithCogScript *cogScript, int a2)
             v20 = _strcpy((char *)pSithHS->alloc(_strlen(arg->value) + 1), arg->value);
         }
     }
+
+#ifdef COG_DYNAMIC_IDK
+    cogScript->aIdk = (sithCogReference*)pSithHS->realloc(cogScript->aIdk, sizeof(sithCogReference) * (cogScript->numIdk+1));
+#endif
     
     sithCogReference* cogIdk = &cogScript->aIdk[cogScript->numIdk];
     _memset(cogIdk, 0, sizeof(sithCogReference)); // added
@@ -979,6 +1001,10 @@ int sithCogParse_ParseMessage(sithCogScript *cogScript)
     
     //printf("Add message? %x %x %s\n", symbolGet->val.data[0], symbol->field_14, stdConffile_entry.args[1].value);
     
+#ifdef COG_DYNAMIC_TRIGGERS
+    cogScript->triggers = (sithCogTrigger*)pSithHS->realloc(cogScript->triggers, sizeof(sithCogTrigger) * (cogScript->num_triggers+1));
+#endif
+
     symbol->val.dataAsName = symbolGet->val.dataAsName;
     symbol->val.type = COG_TYPE_INT;
     cogScript->triggers[cogScript->num_triggers].trigId = symbolGet->val.data[0];

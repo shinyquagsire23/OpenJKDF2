@@ -203,6 +203,18 @@
 
 #define SITHPARTICLE_MAX_PARTICLES (64)
 
+#ifdef TARGET_TWL
+#define RDCAMERA_MAX_LIGHTS (8)
+#else
+#define RDCAMERA_MAX_LIGHTS (64)
+#endif
+
+#ifdef TARGET_TWL
+#define STDGOB_MAX_GOBS (8)
+#else
+#define STDGOB_MAX_GOBS (64)
+#endif
+
 #ifdef SDL2_RENDER
 #define JOYSTICK_MAX_STRS (6)
 #else
@@ -255,6 +267,8 @@
 #undef SITH_DEBUG_STRUCT_NAMES
 #define STDHASHTABLE_CRC32_KEYS
 #define COG_DYNAMIC_STACKS
+#define COG_DYNAMIC_IDK
+#define COG_DYNAMIC_TRIGGERS
 #define COG_DYNAMIC_STACKS_INCREMENT (32)
 #endif
 

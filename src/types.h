@@ -530,8 +530,8 @@ typedef struct rdCamera
     void (*fnProjectLst)(rdVector3 *, rdVector3 *, unsigned int);
     flex_t ambientLight;
     int32_t numLights;
-    rdLight* lights[64];
-    rdVector3 lightPositions[64];
+    rdLight* lights[RDCAMERA_MAX_LIGHTS];
+    rdVector3 lightPositions[RDCAMERA_MAX_LIGHTS];
     flex_t attenuationMin;
     flex_t attenuationMax;
 } rdCamera;
@@ -1237,7 +1237,7 @@ typedef struct rdMaterial
 #ifndef SITH_DEBUG_STRUCT_NAMES
     union {
 #endif
-    char mat_full_fpath[256];
+    char mat_full_fpath[128];
 #ifndef SITH_DEBUG_STRUCT_NAMES
     char mat_fpath[32];
     };
@@ -2013,7 +2013,7 @@ typedef struct jkResGobDirectory
 {
   char name[128];
   int32_t numGobs;
-  stdGob *gobs[64];
+  stdGob *gobs[STDGOB_MAX_GOBS];
 } jkResGobDirectory;
 
 typedef struct jkRes
@@ -2094,13 +2094,28 @@ typedef struct sithCogReference
 typedef struct sithCogScript
 {
     sithCogFlags_t flags;
+#ifdef SITH_DEBUG_STRUCT_NAMES
     char cog_fpath[32];
+#endif
+#ifdef STDHASHTABLE_CRC32_KEYS
+    uint32_t pathCrc;
+#endif
     int32_t* script_program;
     uint32_t codeSize;
     sithCogSymboltable *pSymbolTable;
     uint32_t num_triggers;
+
+#ifdef COG_DYNAMIC_TRIGGERS
+    sithCogTrigger* triggers;
+#else
     sithCogTrigger triggers[32];
+#endif
+
+#ifdef COG_DYNAMIC_IDK
+    sithCogReference* aIdk;
+#else    
     sithCogReference aIdk[128];
+#endif
     uint32_t numIdk;
 } sithCogScript;
 

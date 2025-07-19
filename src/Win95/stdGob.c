@@ -45,8 +45,7 @@ int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
     stdGobFile *v9; // eax
     stdGobHeader header; // [esp+10h] [ebp-Ch]
 
-    _strncpy(gob->fpath, fname, 0x7Fu);
-    gob->fpath[127] = 0;
+    stdString_SafeStrCopy(gob->fpath, fname, 128);
     gob->numFilesOpen = a3;
     gob->lastReadFile = 0;
 
@@ -115,7 +114,12 @@ int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
     // Added
     _memset(gob->entries, 0, sizeof(stdGobEntry) * gob->numFiles);
 
+    // We're not adding anything so like, keep it small?
+#ifdef TARGET_TWL
+    gob->entriesHashtable = stdHashTable_New(gob->numFiles);
+#else
     gob->entriesHashtable = stdHashTable_New(1024);
+#endif
     for (int v4 = 0; v4 < gob->numFiles; v4++)
     {
         pGobHS->fileRead(gob->fhand, &gob->entries[v4], sizeof(stdGobEntry));

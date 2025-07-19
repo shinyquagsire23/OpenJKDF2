@@ -255,7 +255,7 @@ int jkRes_LoadNew(jkResGobDirectory *resGob, char *name, int a3)
         v15 = stdFileUtil_NewFind("mods", 3, JKRES_GOB_EXT);
         while (stdFileUtil_FindNext(v15, &v18))
         {
-            if ( resGob->numGobs >= 0x40u )
+            if ( resGob->numGobs >= STDGOB_MAX_GOBS )
                 break;
             if ( v18.fpath[0] != '.' )
             {
@@ -272,7 +272,7 @@ int jkRes_LoadNew(jkResGobDirectory *resGob, char *name, int a3)
     v15 = stdFileUtil_NewFind(name, 3, JKRES_GOB_EXT);
     while (stdFileUtil_FindNext(v15, &v18))
     {
-        if ( resGob->numGobs >= 0x40u )
+        if ( resGob->numGobs >= STDGOB_MAX_GOBS )
             break;
         if ( v18.fpath[0] != '.' )
         {
@@ -299,7 +299,7 @@ int jkRes_NewGob(jkResGobDirectory *gobFullpath, char *gobFolder, char *gobFname
     stdString_snprintf(jkRes_idkGobPath, 0x80u, "%s%c%s", gobFolder, LEC_PATH_SEPARATOR_CHR, gobFname);
     if ( util_FileExists(jkRes_idkGobPath) )
     {
-        if ( gobFullpath->numGobs < 0x40u )
+        if ( gobFullpath->numGobs < STDGOB_MAX_GOBS )
         {
             gobFullpath->gobs[gobFullpath->numGobs] = stdGob_Load(jkRes_idkGobPath, 16, 0);
             if ( gobFullpath->gobs[gobFullpath->numGobs] )

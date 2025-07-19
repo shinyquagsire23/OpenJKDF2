@@ -106,6 +106,7 @@ void sithAIAwareness_sub_4F2C30(sithSectorEntry *pSectorEntry, sithSector *pSect
     OPENJKDF2_WARN_NULL_AND_RETURN(pSector);
     OPENJKDF2_WARN_NULL_AND_RETURN(pPos1);
     OPENJKDF2_WARN_NULL_AND_RETURN(pPos2);
+    OPENJKDF2_WARN_NULL_AND_RETURN(sithAIAwareness_aSectors);
 
     sithSectorAlloc* pSectorAlloc = &sithAIAwareness_aSectors[pSector->id];
     if (pSectorAlloc->field_0 != sithAIAwareness_timerTicks)

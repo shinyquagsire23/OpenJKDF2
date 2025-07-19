@@ -2,6 +2,7 @@
 
 #include "stdPlatform.h"
 #include "General/stdHashTable.h"
+#include "General/stdString.h"
 #include "Devices/sithSound.h"
 #include "Devices/sithSoundMixer.h"
 #include "Win95/stdSound.h"
@@ -196,13 +197,17 @@ int sithSoundClass_Load(sithWorld *world, int a2)
                 if ( idx != sithWorld_pLoading->numSoundClasses )
                 {
                     current_soundclass = &sithWorld_pLoading->soundclasses[idx];
-                    _strncpy(current_soundclass->snd_fname, v6, 0x1Fu);
-                    current_soundclass->snd_fname[31] = 0;
+#ifdef STDHASHTABLE_CRC32_KEYS
+                    current_soundclass->nameCrc = crc32(v6, strlen(v6));
+#endif
+#ifdef SITH_DEBUG_STRUCT_NAMES
+                    stdString_SafeStrCopy(current_soundclass->snd_fname, v6, 32);
+#endif
                     if ( sithSoundClass_LoadEntry(current_soundclass, soundclass_fname) )
                     {
                         v10 = sithSoundClass_hashtable;
                         ++sithWorld_pLoading->numSoundClassesLoaded;
-                        stdHashTable_SetKeyVal(v10, current_soundclass->snd_fname, current_soundclass);
+                        stdHashTable_SetKeyVal(v10, v6, current_soundclass); // current_soundclass->snd_fname -> v6
                     }
                 }
             }
@@ -235,13 +240,17 @@ sithSoundClass* sithSoundClass_LoadFile(char *fpath)
     if ( v3 == v1->numSoundClasses )
         return 0;
     v4 = &v1->soundclasses[v3];
-    _strncpy(v4->snd_fname, fpath, 0x1Fu);
-    v4->snd_fname[31] = 0;
+#ifdef STDHASHTABLE_CRC32_KEYS
+    v4->nameCrc = crc32(fpath, strlen(fpath));
+#endif
+#ifdef SITH_DEBUG_STRUCT_NAMES
+    stdString_SafeStrCopy(v4->snd_fname, fpath, 32);
+#endif
     if ( !sithSoundClass_LoadEntry(v4, v6) )
         return 0;
     v5 = sithSoundClass_hashtable;
     ++v1->numSoundClassesLoaded;
-    stdHashTable_SetKeyVal(v5, v4->snd_fname, v4);
+    stdHashTable_SetKeyVal(v5, fpath, v4); // Added: v4->snd_fname -> fpath
     return v4;
 }
 
@@ -413,7 +422,11 @@ void sithSoundClass_Free2(sithWorld *world)
     for (v8 = 0; v8 < world->numSoundClassesLoaded; v8++)
     {
         v2 = &world->soundclasses[v8];
+#ifdef STDHASHTABLE_CRC32_KEYS
+        stdHashTable_FreeKeyCrc32(sithSoundClass_hashtable, v2->nameCrc);
+#else
         stdHashTable_FreeKey(sithSoundClass_hashtable, v2->snd_fname);
+#endif
         v3 = v2->entries;
         for (int i = 0; i < SITH_SC_MAX; i++)
         {

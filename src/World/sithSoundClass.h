@@ -135,7 +135,12 @@ typedef struct sithSoundClassEntry
 
 typedef struct sithSoundClass
 {
+#ifdef SITH_DEBUG_STRUCT_NAMES
     char snd_fname[32];
+#endif
+#ifdef STDHASHTABLE_CRC32_KEYS
+    uint32_t nameCrc;
+#endif
     sithSoundClassEntry *entries[SITH_SC_MAX];
 } sithSoundClass;
 
