@@ -1,5 +1,6 @@
 #include "rdColormap.h"
 
+#include "General/stdString.h"
 #include "Engine/rdroid.h"
 #include "Platform/std3D.h"
 #include "Win95/std.h"
@@ -38,7 +39,10 @@ rdColormap* rdColormap_Load(char *colormap_fname)
         return NULL;
     }
 
+#ifdef SITH_DEBUG_STRUCT_NAMES
+    // TODO why?
     *(int*)colormap->colormap_fname = 0;
+#endif
     if (rdColormap_LoadEntry(colormap_fname, colormap))
       return colormap;
   
@@ -62,8 +66,9 @@ int rdColormap_LoadEntry(char *colormap_fname, rdColormap *colormap)
         stdPlatform_Printf("failed to open colormap `%s`!\n", colormap_fname);
         return 0;
     }
-    _strncpy(colormap->colormap_fname, stdFileFromPath(colormap_fname), 0x1Fu);
-    colormap->colormap_fname[31] = 0;
+#ifdef SITH_DEBUG_STRUCT_NAMES
+    stdString_SafeStrCopy(colormap->colormap_fname, stdFileFromPath(colormap_fname), 32);
+#endif
     rdroid_pHS->fileRead(colormap_fptr, &header, 0x40);
     colormap->tint.x = header.tint[0];
     colormap->flags = header.flags;

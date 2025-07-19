@@ -338,6 +338,7 @@ int sithCommand_CmdCogList(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 
     if ( sithWorld_pCurrentWorld )
     {
+#ifdef SITH_DEBUG_STRUCT_NAMES
         _sprintf(std_genBuffer, "World cogs = %d.", sithWorld_pCurrentWorld->numCogsLoaded);
         sithConsole_Print(std_genBuffer);
         v3 = 0;
@@ -352,6 +353,7 @@ int sithCommand_CmdCogList(stdDebugConsoleCmd *pCmd, const char *pArgStr)
             sithConsole_Print(std_genBuffer);
             ++v3;
         }
+#endif
         result = 1;
     }
     else

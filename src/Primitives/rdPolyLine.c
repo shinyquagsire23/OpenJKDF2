@@ -41,8 +41,10 @@ int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *materi
 
     if ( polyline_fname )
     {
-        _strncpy(polyline->fname, polyline_fname, 0x1Fu);
-        polyline->fname[31] = 0;
+        // TODO: caching?
+#ifdef SITH_DEBUG_STRUCT_NAMES
+        stdString_SafeStrCopy(polyline->fname, polyline_fname, 32);
+#endif
     }
     polyline->length = length;
     polyline->baseRadius = base_rad;

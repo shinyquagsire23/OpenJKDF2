@@ -1,5 +1,6 @@
 #include "sithKeyFrame.h"
 
+#include "Win95/std.h"
 #include "World/sithWorld.h"
 #include "Engine/rdKeyframe.h"
 #include "Engine/sithPuppet.h"
@@ -110,7 +111,11 @@ rdKeyframe* sithKeyFrame_LoadEntry(const char *fpath)
         keyframe->id |= 0x8000;
     }
 
+#ifdef SITH_DEBUG_STRUCT_NAMES
     stdHashTable_SetKeyVal(sithPuppet_keyframesHashtable, keyframe->name, keyframe);
+#else
+    stdHashTable_SetKeyVal(sithPuppet_keyframesHashtable, stdFileFromPath(key_fpath), keyframe);
+#endif
     ++world->numKeyframesLoaded;
     return keyframe;
 }
@@ -133,7 +138,9 @@ void sithKeyFrame_Free(sithWorld *world)
 
     for (int idx = 0; idx < world->numKeyframesLoaded; idx++)
     {
+#ifdef SITH_DEBUG_STRUCT_NAMES
         stdHashTable_FreeKey(sithPuppet_keyframesHashtable, world->keyframes[idx].name);
+#endif
         rdKeyframe_FreeJoints(&world->keyframes[idx]);
     }
     

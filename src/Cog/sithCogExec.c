@@ -175,8 +175,10 @@ void sithCogExec_Exec(sithCog *cog_ctx)
             case COG_OPCODE_RET:
                 if ( cog_ctx->flags & SITH_COG_DEBUG )
                 {
+#ifdef SITH_DEBUG_STRUCT_NAMES
                     _sprintf(std_genBuffer, "Cog %s: Returned from depth %d.\n", cog_ctx->cogscript_fpath, cog_ctx->calldepth);
                     sithConsole_Print(std_genBuffer);
+#endif
                 }
                 sithCogExec_Ret(cog_ctx);
                 break;
@@ -244,8 +246,10 @@ void sithCogExec_ExecCog(sithCog *ctx, int32_t trigIdx)
         ctx->trigId = ctx->cogscript->triggers[trigIdx].trigId;
         if ( ctx->flags & SITH_COG_DEBUG )
         {
+#ifdef SITH_DEBUG_STRUCT_NAMES
             _sprintf(std_genBuffer, "Cog %s: execution started.\n", ctx->cogscript_fpath);
             sithConsole_Print(std_genBuffer);
+#endif
         }
         sithCogExec_Exec(ctx);
         if ( ctx->script_running == 4 )

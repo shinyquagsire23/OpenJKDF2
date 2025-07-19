@@ -4,7 +4,6 @@
 
 #include "stdPlatform.h"
 #include "General/stdLinklist.h"
-#include "General/crc32.h"
 #include <math.h>
 #include <stdlib.h>
 
@@ -201,8 +200,13 @@ int stdHashTable_SetKeyVal(stdHashTable *hashmap, const char *key, void *value)
     if (!hashmap || !key)
         return 0;
 
-    if (stdHashTable_GetKeyVal(hashmap, key))
+    if (stdHashTable_GetKeyVal(hashmap, key)) {
+#ifndef SITH_DEBUG_STRUCT_NAMES
+        stdHashTable_FreeKey(hashmap, key);
+#else
         return 0;
+#endif
+    }
 
     v9 = &hashmap->buckets[hashmap->keyHashToIndex(key, hashmap->numBuckets)];
     v10 = stdLinklist_GetTail(v9);
@@ -282,7 +286,7 @@ void* stdHashTable_GetKeyVal(stdHashTable *hashmap, const char *key)
     return 0;
 }
 
-int stdHashTable_FreeKey(stdHashTable *hashtable, char *key)
+int stdHashTable_FreeKey(stdHashTable *hashtable, const char *key)
 {
     int v2;
     stdLinklist *foundKey;
@@ -360,6 +364,65 @@ int stdHashTable_FreeKey(stdHashTable *hashtable, char *key)
     }
     return 1;
 }
+
+#ifdef STDHASHTABLE_CRC32_KEYS
+int stdHashTable_FreeKeyCrc32(stdHashTable *hashtable, uint32_t keyCrc32)
+{
+    int v2;
+    stdLinklist *foundKey;
+    stdLinklist *i;
+    stdLinklist *bucketTopKey;
+
+    if (!hashtable)
+        return 0;
+
+    foundKey = 0;
+    //v2 = hashtable->keyHashToIndex(key, hashtable->numBuckets);
+    v2 = keyCrc32 % hashtable->numBuckets;
+    for ( i = &hashtable->buckets[v2]; i; i = i->next )
+    {
+        if (!i->keyCrc32) {
+            break;
+        }
+        if (i->keyCrc32 == keyCrc32)
+        {
+            foundKey = i;
+            break;
+        }
+    }
+
+    if ( !foundKey )
+        return 0;
+
+    //stdLinklist_UnlinkChild(foundKey); // Added: Moved to prevent freeing issues
+    bucketTopKey = &hashtable->buckets[v2];
+    if ( bucketTopKey == foundKey )
+    {
+        stdLinklist* pNext = foundKey->next;
+        if ( pNext )
+        {
+            bucketTopKey->keyCrc32 = pNext->keyCrc32;
+            bucketTopKey->value = pNext->value;
+
+            stdLinklist_InsertReplace(pNext, bucketTopKey);
+            std_pHS->free(pNext);
+        }
+        else
+        {
+            bucketTopKey->prev = NULL;
+            bucketTopKey->next = NULL;
+            bucketTopKey->keyCrc32 = 0;
+            bucketTopKey->value = 0;
+        }
+    }
+    else
+    {
+        stdLinklist_UnlinkChild(foundKey); // Added: Moved to prevent freeing issues
+        std_pHS->free(foundKey);
+    }
+    return 1;
+}
+#endif
 
 void stdHashTable_PrintDiagnostics(stdHashTable *hashtable)
 {

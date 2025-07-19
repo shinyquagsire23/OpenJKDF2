@@ -883,6 +883,7 @@ void jkHudInv_LoadItemRes()
                 if ( sithInventory_aDescriptors[j].hudBitmap )
                     stdBitmap_Free(sithInventory_aDescriptors[j].hudBitmap);
                 sithInventory_aDescriptors[j].hudBitmap = NULL;
+                // TODO ehh
                 stdString_snprintf(a1, 32, "ui\\bm\\ic%.5s%d.bm", sithInventory_aDescriptors[j].fpath, v0);
                 v4 = stdBitmap_Load(a1, 0, 0);
                 sithInventory_aDescriptors[j].hudBitmap = v4;

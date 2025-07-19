@@ -76,11 +76,14 @@ stdFont* stdFont_Load(char *fpath, int a2, int a3)
         fontAlloc_ = 0;
     }
     fname = stdFileFromPath(fpath);
-    _strncpy(fontAlloc_->name, fname, 0x1Fu);
+
+    // TODO: maybe Jones/MoTS had hashtable changes here to avoid copies of fonts?
+#ifdef SITH_DEBUG_STRUCT_NAMES
+    stdString_SafeWStrCopy(fontAlloc_->name, fname, 32);
+#endif
     pEntries = fontAlloc_->charsetHead.pEntries;
     charMin = fontAlloc_->charsetHead.charFirst;
     charMax = fontAlloc_->charsetHead.charLast;
-    fontAlloc_->name[31] = 0;
     if ( std_pHS->fileRead(fd, pEntries, sizeof(stdFontEntry) * (charMax - charMin + 1)) != sizeof(stdFontEntry) * (charMax - charMin + 1) )
         goto LABEL_28;
     fpatha = 1;

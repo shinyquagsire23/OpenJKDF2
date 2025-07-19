@@ -568,7 +568,9 @@ typedef struct rdAnimEntry
 
 typedef struct rdJoint
 {
+#ifdef SITH_DEBUG_STRUCT_NAMES
     char mesh_name[32];
+#endif
     uint32_t nodeIdx;
     uint32_t numAnimEntries;
     rdAnimEntry* paAnimEntries;
@@ -576,7 +578,9 @@ typedef struct rdJoint
 
 typedef struct rdKeyframe
 {
+#ifdef SITH_DEBUG_STRUCT_NAMES
     char name[32];
+#endif
     uint32_t id;
     uint32_t flags;
     uint32_t numJoints;
@@ -1061,7 +1065,9 @@ typedef struct stdFontCharset
 
 typedef struct stdFont
 {
+#ifdef SITH_DEBUG_STRUCT_NAMES
   char name[32];
+#endif
   int32_t marginY;
   int32_t marginX;
   int16_t field_28;
@@ -1124,7 +1130,9 @@ typedef struct rdColor24
 
 typedef struct rdColormap
 {
+#ifdef SITH_DEBUG_STRUCT_NAMES
     char colormap_fname[32];
+#endif
     uint32_t flags;
     rdVector3 tint;
     rdColor24 colors[256];
@@ -1222,9 +1230,18 @@ typedef struct rdMaterialHeader
 typedef struct rdMaterial
 {
     uint32_t tex_type;
+#ifdef SITH_DEBUG_STRUCT_NAMES
     char mat_fpath[32];
+#endif
 #if defined(SDL2_RENDER) || defined(RDMATERIAL_LRU_LOAD_UNLOAD)
+#ifndef SITH_DEBUG_STRUCT_NAMES
+    union {
+#endif
     char mat_full_fpath[256];
+#ifndef SITH_DEBUG_STRUCT_NAMES
+    char mat_fpath[32];
+    };
+#endif
 #endif
     uint32_t id;
     rdTexformat tex_format;
@@ -1278,7 +1295,12 @@ typedef struct sithAnimclassMode
 
 typedef struct sithAnimclass
 {
+#ifdef SITH_DEBUG_STRUCT_NAMES
     char name[32];
+#endif
+#ifdef STDHASHTABLE_CRC32_KEYS
+    uint32_t namecrc;
+#endif
     sithAnimclassMode modes[6];
     int32_t bodypart_to_joint[10];
 } sithAnimclass;
@@ -1837,7 +1859,9 @@ typedef struct sithCog
     sithCogStackvar stack[SITHCOGVM_MAX_STACKSIZE];
 #endif
     uint32_t stackPos;
+#ifdef SITH_DEBUG_STRUCT_NAMES
     char cogscript_fpath[32];
+#endif
 #ifdef JKM_TYPES
     uint32_t unk1;
     int32_t numHeapVars;
@@ -2113,7 +2137,12 @@ typedef struct sithAIClass
   flex_t accuracy;
   int32_t numEntries;
   sithAIClassEntry entries[16];
+#ifdef SITH_DEBUG_STRUCT_NAMES
   char fpath[32];
+#endif
+#ifdef STDHASHTABLE_CRC32_KEYS
+    uint32_t fpathcrc;
+#endif
 } sithAIClass;
 
 #ifdef JKM_LIGHTING
@@ -2246,7 +2275,11 @@ typedef struct sithWorldParser
 typedef struct sithItemDescriptor
 {
     uint32_t flags;
+#ifdef SITH_DEBUG_STRUCT_NAMES
     char fpath[128];
+#else
+    char fpath[8];
+#endif
     flex_t ammoMin;
     flex_t ammoMax;
     sithCog* cog;
@@ -2288,7 +2321,9 @@ typedef struct sithMap
 
 typedef struct rdPolyLine 
 {
+#ifdef SITH_DEBUG_STRUCT_NAMES
     char fname[32];
+#endif
     flex_t length;
     flex_t baseRadius;
     flex_t tipRadius;
@@ -2936,7 +2971,12 @@ typedef struct sithThing
     rdVector3 field_268;
     sithAIClass* pAIClass;
     sithActor* actor;
+#ifdef SITH_DEBUG_STRUCT_NAMES
     char template_name[32];
+#endif
+#ifdef STDHASHTABLE_CRC32_KEYS
+    uint32_t templateNameCrc;
+#endif
     sithCog* class_cog;
     sithCog* capture_cog;
     jkPlayerInfo* playerInfo;

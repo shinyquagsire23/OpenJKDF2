@@ -378,6 +378,7 @@ int jkQuakeConsole_AutocompleteTemplates()
 
     int bPrintOnce = 0;
 
+#ifdef SITH_DEBUG_STRUCT_NAMES
     if (sithWorld_pStatic && sithWorld_pStatic->templates) 
     {
         for (int i = 0; i < sithWorld_pStatic->numTemplatesLoaded; i++)
@@ -406,6 +407,7 @@ int jkQuakeConsole_AutocompleteTemplates()
             }
         }
     }
+#endif
     return bPrintOnce;
 }
 

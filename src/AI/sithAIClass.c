@@ -2,6 +2,7 @@
 
 #include "General/stdHashTable.h"
 #include "General/stdMath.h"
+#include "General/stdString.h"
 #include "World/sithWorld.h"
 #include "World/jkPlayer.h"
 #include "AI/sithAI.h"
@@ -116,12 +117,16 @@ sithAIClass* sithAIClass_Load(char *fpath)
 
     _memset(aiclass, 0, sizeof(sithAIClass));
 
-    _strncpy(aiclass->fpath, fpath, 0x1Fu);
-    aiclass->fpath[31] = 0;
+#ifdef SITH_DEBUG_STRUCT_NAMES
+    stdString_SafeStrCopy(aiclass->fpath, fpath, 32);
+#endif
+#ifdef STDHASHTABLE_CRC32_KEYS
+    aiclass->fpathcrc = crc32(fpath, strlen(fpath));
+#endif
 
     if ( sithAIClass_LoadEntry(fullpath, aiclass) )
     {
-        stdHashTable_SetKeyVal(sithAIClass_hashmap, aiclass->fpath, aiclass);
+        stdHashTable_SetKeyVal(sithAIClass_hashmap, fpath, aiclass);
         aiclass->index = world->numAIClassesLoaded++;
         
         return aiclass;
@@ -243,7 +248,11 @@ void sithAIClass_Free(sithWorld *world)
     {
         for (uint32_t i = 0; i < world->numAIClassesLoaded; i++)
         {
+#ifdef STDHASHTABLE_CRC32_KEYS
+            stdHashTable_FreeKeyCrc32(sithAIClass_hashmap, world->aiclasses[i].fpathcrc);
+#else
             stdHashTable_FreeKey(sithAIClass_hashmap, world->aiclasses[i].fpath);
+#endif
         }
         pSithHS->free(world->aiclasses);
         world->aiclasses = 0;

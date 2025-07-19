@@ -23,8 +23,9 @@ keyframeUnloader_t rdKeyframe_RegisterUnloader(keyframeUnloader_t loader)
 void rdKeyframe_NewEntry(rdKeyframe *keyframe)
 {
     _memset(keyframe, 0, sizeof(rdKeyframe));
-    _strncpy(keyframe->name, "UNKNOWN", 0x1Fu);
-    keyframe->name[31] = 0;
+#ifdef SITH_DEBUG_STRUCT_NAMES
+    stdString_SafeStrCopy(keyframe->name, "UNKNOWN", 32);
+#endif
 }
 
 rdKeyframe* rdKeyframe_Load(char *fname)
@@ -70,12 +71,11 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
     unsigned int nodes_read;
     flex32_t ftmp;
 
-    _memset(keyframe, 0, sizeof(rdKeyframe));
-    _strncpy(keyframe->name, "UNKNOWN", 0x1Fu);
-    keyframe->name[31] = 0;
+    rdKeyframe_NewEntry(keyframe);
     key_fname_only = stdFileFromPath(key_fpath);
-    _strncpy(keyframe->name, key_fname_only, 0x1Fu);
-    keyframe->name[31] = 0;
+#ifdef SITH_DEBUG_STRUCT_NAMES
+    stdString_SafeStrCopy(keyframe->name, key_fname_only, 32);
+#endif
     if (!stdConffile_OpenRead(key_fpath)) {
         stdPrintf(pSithHS->errorPrint, ".\\Engine\\rdKeyframe.c", 0, "OpenJKDF2: Failed to open keyframe file `%s`\n", key_fpath);
         goto open_fail;
@@ -180,8 +180,9 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
             goto read_fail;
         joint = &keyframe->paJoints[node_idx];
         
-        _strncpy(joint->mesh_name, mesh_name, 0x1Fu);
-        joint->mesh_name[31] = 0;
+#ifdef SITH_DEBUG_STRUCT_NAMES
+        stdString_SafeStrCopy(joint->mesh_name, mesh_name, 32);
+#endif
         
         if (!stdConffile_ReadLine())
             goto read_fail;
@@ -300,7 +301,11 @@ int rdKeyframe_Write(char *out_fpath, rdKeyframe *keyframe, char *creation_metho
             continue;
 
         rdroid_pHS->filePrintf(fd, "NODE    %d\n", i);
-        rdroid_pHS->filePrintf(fd, "MESH NAME %s\n", joint_iter);
+#ifdef SITH_DEBUG_STRUCT_NAMES
+        rdroid_pHS->filePrintf(fd, "MESH NAME %s\n", joint_iter->mesh_name);
+#else
+        rdroid_pHS->filePrintf(fd, "MESH NAME %s\n", "UNKNOWN");
+#endif
         rdroid_pHS->filePrintf(fd, "ENTRIES %d\n", joint_iter->numAnimEntries);
         rdroid_pHS->filePrintf(fd, "\n");
         rdroid_pHS->filePrintf(

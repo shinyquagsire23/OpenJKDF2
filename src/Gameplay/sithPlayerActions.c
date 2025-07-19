@@ -65,8 +65,10 @@ void sithPlayerActions_Activate(sithThing *thing)
                 {
                     v7 = searchResult->receiver;
 #ifdef DEBUG_QOL_CHEATS
+#ifdef SITH_DEBUG_STRUCT_NAMES
                     if (v7 && thing == sithPlayer_pLocalPlayerThing)
                         jk_printf("OpenJKDF2: Debug thing %s\n", v7->template_name);
+#endif
 #endif
                     if ( v7->type != SITH_THING_ITEM && v7->type != SITH_THING_WEAPON && (v7->thingflags & SITH_TF_CAPTURED) != 0 )
                     {

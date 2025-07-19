@@ -303,6 +303,7 @@ LABEL_21:
             printf("Load %s tex %d/%d mip %d/%d\n", mat_fpath, tex_numa, material->num_textures, mipmap_num, texture->num_mipmaps);
             created_tex = stdDisplay_VBufferNew(&format, create_ddraw_surface, gpu_mem, 0);
             *texture_struct = created_tex;
+            material->bDataLoaded = bDoLoad;
             if ( !created_tex ) {
                 /*mat_file_ = mat_file__;
                 rdroid_pHS->fileClose(mat_file_);
@@ -374,7 +375,9 @@ LABEL_22:
       rdroid_pHS->fileRead(mat_file_, colors, 0x300);
     }
     v26 = stdFileFromPath(mat_fpath);
+#ifdef SITH_DEBUG_STRUCT_NAMES
     stdString_SafeStrCopy(material->mat_fpath, v26, sizeof(material->mat_fpath));
+#endif
     rdroid_pHS->fileClose(mat_file_);
     mat_file = 1;
 

@@ -250,7 +250,9 @@
 //
 // Misc optimizations/features
 //
+#define SITH_DEBUG_STRUCT_NAMES
 #if defined(TARGET_TWL)
+#undef SITH_DEBUG_STRUCT_NAMES
 #define STDHASHTABLE_CRC32_KEYS
 #define COG_DYNAMIC_STACKS
 #define COG_DYNAMIC_STACKS_INCREMENT (32)

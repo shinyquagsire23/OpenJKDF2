@@ -19,6 +19,7 @@
 #include "Engine/sithRender.h"
 #include "Engine/sithPhysics.h"
 #include "General/stdHashTable.h"
+#include "General/stdString.h"
 #include "Main/jkGame.h"
 #include "Cog/sithCogExec.h"
 #include "Cog/sithCog.h"
@@ -448,9 +449,8 @@ void sithAI_RegisterCommand(const char *cmdName, sithAICommandFunc_t func, int p
 
     sithAICommand* aiCmd = &sithAI_commandList[sithAI_numCommands];
 
-    _strncpy(aiCmd->name, cmdName, 0x1Fu);
-    aiCmd->name[31] = 0;
-    
+    stdString_SafeStrCopy(aiCmd->name, cmdName, 32);
+
     aiCmd->func = func;
     aiCmd->param1 = param1;
     aiCmd->param2 = param2;
@@ -478,6 +478,7 @@ int sithAI_PrintThings(stdDebugConsoleCmd* a, const char* b)
     sithActor *i; // esi
     sithAIClass *v3; // ecx
 
+#ifdef SITH_DEBUG_STRUCT_NAMES
     if ( sithAI_bOpened )
     {
         sithConsole_Print("Active AI things:\n");
@@ -509,6 +510,7 @@ int sithAI_PrintThings(stdDebugConsoleCmd* a, const char* b)
         sithConsole_Print("AI system not open.\n");
         return 0;
     }
+#endif
 }
 
 int sithAI_PrintThingStatus(stdDebugConsoleCmd* a1, const char *idxStr)
@@ -516,10 +518,11 @@ int sithAI_PrintThingStatus(stdDebugConsoleCmd* a1, const char *idxStr)
     uint32_t v2; // ebx
     sithThing *v3; // eax
     sithActor *v4; // edi
-    int result; // eax
+    int result = 1; // eax
     int v7; // [esp+3Ch] [ebp-8h]
     int actorIdx; // [esp+40h] [ebp-4h] BYREF
 
+#ifdef SITH_DEBUG_STRUCT_NAMES
     v2 = 0;
     if ( idxStr && sithAI_bOpened && _sscanf(idxStr, "%d", &actorIdx) == 1 && actorIdx <= sithAI_inittedActors )
     {
@@ -578,6 +581,7 @@ int sithAI_PrintThingStatus(stdDebugConsoleCmd* a1, const char *idxStr)
         result = 0;
     }
     return result;
+#endif // SITH_DEBUG_STRUCT_NAMES
 }
 
 int sithAI_LoadThingActorParams(stdConffileArg *arg, sithThing *thing, int param)

@@ -372,6 +372,7 @@ void jkHud_Draw()
     if (!jkHud_bOpened)
         return;
 
+#ifdef SITH_DEBUG_STRUCT_NAMES
     if ( Main_bDispStats )
     {
         playerThing = sithWorld_pCurrentWorld->playerThing;
@@ -411,6 +412,7 @@ void jkHud_Draw()
         }
         jkDev_sub_41FC40(0x66, std_genBuffer);
     }
+#endif
 
 #ifdef SDL2_RENDER
     jkHud_DrawGPU();

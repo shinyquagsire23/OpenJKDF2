@@ -1134,7 +1134,9 @@ int sithDSSThing_ProcessFullDesc(sithCogMsg *msg)
         }
         else if (!thing->trackParams.sizeFrames && thing->trackParams.loadedFrames < 0) {
             stdPlatform_Printf("OpenJKDF2: Serialized thing has underflowed trackParams.loadedFrames 0x%x, size 0x%x, recovering?\n", thing->trackParams.loadedFrames, thing->trackParams.sizeFrames);
+#ifdef SITH_DEBUG_STRUCT_NAMES
             stdPlatform_Printf("OpenJKDF2: Template ID %x, %s\n", v8, sithWorld_pCurrentWorld->templates[v8].template_name);
+#endif
             thing->trackParams.loadedFrames = thing->trackParams.sizeFrames;
         }
 

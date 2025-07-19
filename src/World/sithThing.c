@@ -1509,7 +1509,9 @@ int sithThing_Load(sithWorld *pWorld, int a2)
                 }
                 else
                 {
+#ifdef SITH_DEBUG_STRUCT_NAMES
                     stdString_SafeStrCopy(v21->template_name, stdConffile_entry.args[2].value, 0x20);
+#endif
                 }
             }
         }

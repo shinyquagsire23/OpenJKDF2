@@ -11,6 +11,7 @@
 #include "World/jkPlayer.h"
 #include "Dss/sithDSSThing.h"
 #include "Main/Main.h"
+#include "General/stdString.h"
 
 // MOTS added
 static int sithInventory_008d60f8;
@@ -21,8 +22,7 @@ void sithInventory_NewEntry(int binIdx, sithCog *cog, char *name, flex_t min, fl
 {
     sithItemDescriptor* desc = &sithInventory_aDescriptors[binIdx];
     
-    _strncpy(desc->fpath, name, 0x7F);
-    desc->fpath[127] = 0;
+    stdString_SafeStrCopy(desc->fpath, name, sizeof(desc->fpath));
 
     desc->cog = cog;
     desc->ammoMin = min;
