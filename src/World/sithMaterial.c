@@ -90,8 +90,14 @@ int sithMaterial_Load(sithWorld *world, int a2)
 
             // Added: memleak. TODO: static.jkl??
             if (sithMaterial_aMaterials) {
+#ifdef RDMATERIAL_LRU_LOAD_UNLOAD
+                for (uint32_t i = 0; i < sithMaterial_numMaterials; i++) {
+                    rdMaterial_FreeEntry(sithMaterial_aMaterials[i]);
+                }
+#endif
                 pSithHS->free(sithMaterial_aMaterials);
                 sithMaterial_aMaterials = NULL;
+                sithMaterial_numMaterials = 0;
             }
 
             sithMaterial_aMaterials = (rdMaterial **)pSithHS->alloc(sizeof(rdMaterial*) * a2);

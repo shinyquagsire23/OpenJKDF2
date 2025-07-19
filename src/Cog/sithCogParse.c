@@ -394,6 +394,11 @@ int sithCogParse_ReallocSymboltable(sithCogSymboltable *table)
     sithCogSymbol *buckets; // ecx
     int i; // esi
 
+    // Added: nullptr checks
+    if (!table) {
+        return 0;
+    }
+
     if ( table->hashtable )
     {
         stdHashTable_Free(table->hashtable);
@@ -403,6 +408,11 @@ int sithCogParse_ReallocSymboltable(sithCogSymboltable *table)
     if ( table->max_entries > amt )
     {
         reallocBuckets = (sithCogSymbol *)pSithHS->realloc(table->buckets, sizeof(sithCogSymbol) * amt);
+        // Added: nullptr checks
+        if (!reallocBuckets) {
+            table->max_entries = 0;
+            return 0;
+        }
         reallocAmt = table->entry_cnt;
         table->buckets = reallocBuckets;
         table->max_entries = reallocAmt;

@@ -26,6 +26,9 @@ int rdMaterial_LoadEntry(char *mat_fpath, rdMaterial *material, int create_ddraw
 void rdMaterial_Free(rdMaterial *material);
 void rdMaterial_FreeEntry(rdMaterial* material);
 int rdMaterial_EnsureData(rdMaterial* material);
+int rdMaterial_EnsureDataForced(rdMaterial* pMaterial);
+int rdMaterial_EnsureMetadata(rdMaterial* pMaterial);
+void rdMaterial_OptionalFree(rdMaterial* pMaterial);
 int rdMaterial_AddToTextureCache(rdMaterial *material, rdTexture *texture, int mipmap_level, int no_alpha, int cel_idx);
 void rdMaterial_ResetCacheInfo(rdMaterial *material);
 //static int (*rdMaterial_AddToTextureCache)(rdMaterial *material, rdTexture *a2, int mipmap_level, int no_alpha) = (void*)rdMaterial_AddToTextureCache_ADDR;

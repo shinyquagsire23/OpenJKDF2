@@ -400,6 +400,11 @@ int rdCache_SendFaceListToHardware()
 
         // Added
         rdMaterial_EnsureData(v11.material);
+#if defined(RDMATERIAL_LRU_LOAD_UNLOAD)
+        if (!v11.material->bDataLoaded) {
+            continue;
+        }
+#endif
 
         v14 = active_6c->wallCel;
         if ( v14 == -1 )
@@ -420,14 +425,14 @@ int rdCache_SendFaceListToHardware()
             v14 = v11.material->num_texinfo - 1;
         }
 
-        v15 = v11.material->texinfos[v14];
+        v15 = v11.material->texinfos ? v11.material->texinfos[v14] : NULL; // Added: v11.material->texinfos nullptr check
         v137 = v15;
         if ( v11.mipmap_related == 4 && (v15 && v15->header.texture_type & 8) == 0 ) // Added: v15 nullptr check
         {
             v11.mipmap_related = 3;
             mipmap_related = 3;
         }
-        if ( !v15 || (v15->header.texture_type & 8) == 0 || !v15->texture_ptr ) // Added: !v15->texture_ptr
+        if ( !v15 || (v15 && (v15->header.texture_type & 8) == 0) || (v15 && !v15->texture_ptr) ) // Added: v15 nullptr check, !v15->texture_ptr
         {
             tex2_arr_sel = 0;
         }

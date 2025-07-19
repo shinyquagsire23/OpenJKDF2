@@ -149,6 +149,16 @@ int rdMaterial_LoadEntry_Common(char *mat_fpath, rdMaterial *material, int creat
 
         return 0;
     }
+
+#if defined(RDMATERIAL_LRU_LOAD_UNLOAD)
+    // We have to short-circuit here so that we get the right fullpathx
+    if (!bDoLoad) {
+        stdString_SafeStrCopy(material->mat_full_fpath, mat_fpath, sizeof(material->mat_full_fpath));
+        rdroid_pHS->fileClose(mat_file_);
+        return 1;
+    }
+#endif
+
     num_texinfo = mat_header.num_texinfo;
     tex_type = mat_header.type;
     material->num_textures = mat_header.num_textures;
@@ -180,6 +190,14 @@ int rdMaterial_LoadEntry_Common(char *mat_fpath, rdMaterial *material, int creat
         }
         ++texture_idk;
     }
+#if defined(RDMATERIAL_LRU_LOAD_UNLOAD)
+    // Short circuit only after metadata
+    if (bDoLoad == 2) {
+        stdString_SafeStrCopy(material->mat_full_fpath, mat_fpath, sizeof(material->mat_full_fpath));
+        rdroid_pHS->fileClose(mat_file_);
+        return 1;
+    }
+#endif
     num_textures = material->num_textures;
     material->textures = 0;
     if ( num_textures )
@@ -195,6 +213,12 @@ int rdMaterial_LoadEntry_Common(char *mat_fpath, rdMaterial *material, int creat
       // Moved?
       memset(textures, 0, sizeof(rdTexture) * num_textures);
       material->textures = textures;
+    }
+    else {
+        // Some materials are solid colors
+#if defined(RDMATERIAL_LRU_LOAD_UNLOAD)
+        material->bDataLoaded = bDoLoad;
+#endif
     }
     tex_numa = 0;
     if ( material->num_textures )
@@ -219,6 +243,7 @@ int rdMaterial_LoadEntry_Common(char *mat_fpath, rdMaterial *material, int creat
         format.format.bpp = bpp;
         if ( texture->num_mipmaps )
           break;
+
 LABEL_21:
         mat_file_ = mat_file__;
         v21 = (unsigned int)(tex_numa++ + 1) < material->num_textures;
@@ -349,13 +374,12 @@ LABEL_22:
       rdroid_pHS->fileRead(mat_file_, colors, 0x300);
     }
     v26 = stdFileFromPath(mat_fpath);
-    _strncpy(material->mat_fpath, v26, 0x1Fu);
-    material->mat_fpath[31] = 0;
+    stdString_SafeStrCopy(material->mat_fpath, v26, sizeof(material->mat_fpath));
     rdroid_pHS->fileClose(mat_file_);
     mat_file = 1;
 
 #if defined(SDL2_RENDER) || defined(RDMATERIAL_LRU_LOAD_UNLOAD)
-    _strncpy(material->mat_full_fpath, mat_fpath, 0xFF);
+    stdString_SafeStrCopy(material->mat_full_fpath, mat_fpath, sizeof(material->mat_full_fpath));
 #endif
 #ifdef SDL2_RENDER
     for (int i = 0; i < 256; i++)
@@ -415,7 +439,7 @@ int rdMaterial_LoadEntry(char *mat_fpath, rdMaterial *material, int create_ddraw
     return rdMaterial_LoadEntry_Common(mat_fpath, material, create_ddraw_surface, gpu_mem, !openjkdf2_bIsExtraLowMemoryPlatform);
 }
 
-int rdMaterial_LoadEntry_Deferred(rdMaterial *material, int create_ddraw_surface, int gpu_mem)
+int rdMaterial_LoadEntry_Deferred(rdMaterial *material, int create_ddraw_surface, int gpu_mem, int partial)
 {
     // Added: No nullptr derefs
     if (!material) {
@@ -432,12 +456,12 @@ int rdMaterial_LoadEntry_Deferred(rdMaterial *material, int create_ddraw_surface
     rdMaterial_FreeEntry(material);
     //stdPlatform_Printf("rdMaterial_LoadEntry_Deferred %s\n", tmp);
     //_memset(material, 0, sizeof(rdMaterial));
-    res = rdMaterial_LoadEntry_Common(tmp, material, create_ddraw_surface, gpu_mem, 1);
-    if (!material->bDataLoaded) {
+    res = rdMaterial_LoadEntry_Common(tmp, material, create_ddraw_surface, gpu_mem, partial ? 2 : 1);
+    if (!material->bDataLoaded || (!res && partial)) {
         rdMaterial_FreeEntry(material);
         if (rdMaterial_PurgeMaterialCache()) {
-            res = rdMaterial_LoadEntry_Common(tmp, material, create_ddraw_surface, gpu_mem, 1);
-            if (!res) {
+            res = rdMaterial_LoadEntry_Common(tmp, material, create_ddraw_surface, gpu_mem, partial ? 2 : 1);
+            if (!res && !partial) {
                 rdMaterial_FreeEntry(material);
                 rdMaterial_LoadEntry_Common(tmp, material, create_ddraw_surface, gpu_mem, 0);
             }
@@ -449,7 +473,7 @@ int rdMaterial_LoadEntry_Deferred(rdMaterial *material, int create_ddraw_surface
     //}
 
 #ifdef TARGET_TWL
-    stdPlatform_PrintHeapStats();
+    //stdPlatform_PrintHeapStats();
 #endif
 #endif
     return res;
@@ -594,11 +618,54 @@ int rdMaterial_EnsureData(rdMaterial* pMaterial) {
     }
 #if defined(RDMATERIAL_LRU_LOAD_UNLOAD)
     // Only allow trying to load data once per frame
-    if (!pMaterial->bDataLoaded && pMaterial->frameNum != std3D_frameCount) {
-        rdMaterial_LoadEntry_Deferred(pMaterial, 1, 1);
+    if (!pMaterial->bDataLoaded && (pMaterial->frameNum != std3D_frameCount && std3D_frameCount != 1)) {
+        rdMaterial_LoadEntry_Deferred(pMaterial, 1, 1, 0);
     }
 #endif
     return 1;
+}
+
+int rdMaterial_EnsureDataForced(rdMaterial* pMaterial) {
+    if (!pMaterial) {
+        return 0;
+    }
+#if defined(RDMATERIAL_LRU_LOAD_UNLOAD)
+    // Only allow trying to load data once per frame
+    if (!pMaterial->bDataLoaded) {
+        if (!rdMaterial_LoadEntry_Deferred(pMaterial, 1, 1, 0)) {
+            rdMaterial_PurgeEntireMaterialCache();
+            rdMaterial_LoadEntry_Deferred(pMaterial, 1, 1, 0);
+        }
+    }
+#endif
+    return 1;
+}
+
+// Added
+int rdMaterial_EnsureMetadata(rdMaterial* pMaterial) {
+    if (!pMaterial) {
+        return 0;
+    }
+#if defined(RDMATERIAL_LRU_LOAD_UNLOAD)
+    // Only allow trying to load data once per frame
+    if (!pMaterial->bDataLoaded) {
+        int prev_std3D_frameCount = std3D_frameCount;
+        std3D_frameCount = 1;
+        rdMaterial_LoadEntry_Deferred(pMaterial, 1, 1, 1);
+        std3D_frameCount = prev_std3D_frameCount;
+    }
+#endif
+    return 1;
+}
+
+// Added
+void rdMaterial_OptionalFree(rdMaterial* pMaterial) {
+    if (!pMaterial) return;
+#ifdef TARGET_TWL
+    if (openjkdf2_bIsExtraLowMemoryPlatform) {
+        rdMaterial_FreeEntry(pMaterial);
+    }
+#endif
 }
 
 // rdMaterial_Write
@@ -832,7 +899,7 @@ void rdMaterial_AddMaterialToCacheList(rdMaterial *pMaterial) {
 
 int rdMaterial_PurgeMaterialCache()
 {
-    printf("Purge mat... %d\n", rdMaterial_numCachedMaterials);
+    //printf("Purge mat... %d\n", rdMaterial_numCachedMaterials);
 
     // TODO: maybe be gentler here and have like, a 60 frame buffer
 
@@ -853,7 +920,9 @@ int rdMaterial_PurgeMaterialCache()
     }
 
 #ifdef TARGET_TWL
-    stdPlatform_PrintHeapStats();
+    if (purgedAnything) {
+        stdPlatform_PrintHeapStats();
+    }
 #endif
 
     return purgedAnything;

@@ -811,6 +811,12 @@ void sithCogExec_PushVar(sithCog *ctx, sithCogStackvar *val)
 {
     sithCogStackvar *pushVar;
 
+#ifdef COG_DYNAMIC_STACKS
+    if (ctx->stackPos >= ctx->stackSize) {
+        sithCogExec_GrowStack(ctx, ctx->stackSize+COG_DYNAMIC_STACKS_INCREMENT);
+    }
+#endif
+
     if ( ctx->stackPos == SITHCOGVM_MAX_STACKSIZE )
     {
         memmove(ctx->stack, &ctx->stack[1], sizeof(ctx->stack) * (SITHCOGVM_MAX_STACKSIZE-1));
@@ -861,8 +867,14 @@ int32_t sithCogExec_PopProgramVal(sithCog *ctx)
 
 void sithCogExec_ResetStack(sithCog *ctx)
 {
-    if ( ctx->stackPos )
+    if (ctx->stackPos) {
         ctx->stackPos = 0;
+    }
+#ifdef COG_DYNAMIC_STACKS
+    pSithHS->free(ctx->stack);
+    ctx->stack = NULL;
+    ctx->stackSize = 0;
+#endif
 }
 
 void sithCogExec_Call(sithCog *ctx)
@@ -1007,7 +1019,15 @@ sithCogStackvar* sithCogExec_AssignStackVar(sithCogStackvar *out, sithCog *ctx, 
         out->dataAsPtrs[1] = in->dataAsPtrs[1]; // these are undefined in the original
         out->dataAsPtrs[2] = in->dataAsPtrs[2];
         return out;
-    }
-
-    
+    }    
 }
+
+#ifdef COG_DYNAMIC_STACKS
+void sithCogExec_GrowStack(sithCog* pCtx, uint32_t sz) {
+    if (!pCtx) return;
+    if (pCtx->stackSize >= sz) return;
+
+    pCtx->stack = (sithCogStackvar*)pSithHS->realloc(pCtx->stack, sz*sizeof(*pCtx->stack));
+    pCtx->stackSize = sz;
+}
+#endif

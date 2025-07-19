@@ -332,6 +332,7 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
                 v36 = _atoi(tmpTxt);
                 face->num = j;
                 face->material = (v36 == -1) ? 0 : model->materials[v36];
+                rdMaterial_EnsureMetadata(face->material); // Added: we don't need VBuffers yet
                 tmpTxt = _strtok(0, " \t");
                 if ( _sscanf(tmpTxt, "%x", &face->type) != 1 )
                     goto fail;
@@ -381,6 +382,7 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
                         _strtok(0, " \t,");
                     }
                 }
+                rdMaterial_OptionalFree(face->material); // Added
                 face++;
             }
 

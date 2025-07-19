@@ -79,6 +79,10 @@ void sithCogExec_BitOperation(sithCog *cog_ctx, int32_t op);
 void sithCogExec_MathOperation(sithCog *cog_ctx, int32_t op);
 sithCogStackvar* sithCogExec_AssignStackVar(sithCogStackvar *out, sithCog *ctx, sithCogStackvar *in);
 
+#ifdef COG_DYNAMIC_STACKS
+void sithCogExec_GrowStack(sithCog* pCtx, uint32_t sz);
+#endif
+
 //static void (__cdecl *sithCogExec_Ret)(sithCog *cog) = (void*)sithCogExec_Ret_ADDR;
 //static void (__cdecl *sithCogExec_Call)(sithCog *cog) = (void*)sithCogExec_Call_ADDR;
 

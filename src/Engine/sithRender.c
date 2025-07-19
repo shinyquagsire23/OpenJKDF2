@@ -1334,7 +1334,7 @@ void sithRender_RenderLevelGeometry()
                 v10 = v73;
             }
 
-            if ( v65->adjoin && surfaceMat && ((v65->surfaceInfo.face.type & 2) != 0 || (v10->header.texture_type & 8) != 0 && (v10->texture_ptr->alpha_en & 1) != 0) )
+            if ( v65->adjoin && surfaceMat && ((v65->surfaceInfo.face.type & 2) != 0 || (v10 && (v10->header.texture_type & 8)) && (v10 && (v10->texture_ptr->alpha_en & 1))) ) // Added: nullptr checks for v10
             {
                 if (sithRender_numSurfaces < SITH_MAX_VISIBLE_ALPHA_SURFACES)
                 {

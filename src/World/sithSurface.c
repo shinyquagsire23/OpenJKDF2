@@ -182,6 +182,7 @@ int sithSurface_Load(sithWorld *world)
             if ( v20 >= sithMaterial_numMaterials )
                 return 0;
             face->material = sithMaterial_aMaterials[v20];
+            rdMaterial_EnsureMetadata(face->material); // Added: we don't need VBuffers yet
         }
         else
         {
@@ -218,12 +219,13 @@ int sithSurface_Load(sithWorld *world)
 
             // Guess the sky color for fog
 #ifdef TARGET_TWL
-            if (face->material) {
+            rdMaterial_EnsureDataForced(face->material);
+            if (face->material && face->material->bDataLoaded) {
                 rdMaterial* mat = face->material;
-                rdMaterial_EnsureData(mat);
                 rdTexture* texture = &mat->textures[0];
                 stdVBuffer* lowestMipBuf = NULL;
                 for (int mip = 0; mip < texture->num_mipmaps; mip++) {
+                    if (!texture->texture_struct) continue;
                     stdVBuffer* buf = texture->texture_struct[mip];
                     if (buf && buf->surface_lock_alloc && !buf->format.format.is16bit) {
                         lowestMipBuf = buf;
@@ -257,11 +259,14 @@ int sithSurface_Load(sithWorld *world)
                     wallCel = face->material->celIdx;
                 v66 = face->material->texinfos[wallCel];
             }
+            else {
+                v66 = NULL; // Added
+            }
             if ( (world->adjoins[adjoinIdx].flags & 1) == 0
               || (face->material 
                   && face->geometryMode 
                   && (face->type & 2) == 0 
-                  && ((v66->header.texture_type & 8) == 0 || (v66->texture_ptr->alpha_en & 1) == 0)))
+                  && (v66 && ((v66->header.texture_type & 8) == 0 || (v66->texture_ptr->alpha_en & 1) == 0))))
             {
                 surfaceAdjoin->flags |= SITHSURF_ADJOIN_80;
             }
@@ -336,9 +341,9 @@ int sithSurface_Load(sithWorld *world)
 
         if (testAmt < v34 * 4) {
             surfaceInfo->intensities = (flex_t*)pSithHS->alloc(sizeof(flex_t) * ((v34 * 4) + 1)); // Added: extra
-            memset(surfaceInfo->intensities, 0, sizeof(flex_t) * ((v34 * 4) + 1)); // Added
             if ( !surfaceInfo->intensities )
                 return 0;
+            memset(surfaceInfo->intensities, 0, sizeof(flex_t) * ((v34 * 4) + 1)); // Added
             for (int32_t v45 = 0; v45 < v34; v45++)
             {
                 flex_t val = _atof(stdConffile_entry.args[v61+v45].value);
@@ -351,9 +356,9 @@ int sithSurface_Load(sithWorld *world)
         }
         else {
             surfaceInfo->intensities = (flex_t*)pSithHS->alloc(sizeof(flex_t) * ((v34 * 4) + 1));
-            memset(surfaceInfo->intensities, 0, sizeof(flex_t) * ((v34 * 4) + 1)); // Added
             if ( !surfaceInfo->intensities )
                 return 0;
+            memset(surfaceInfo->intensities, 0, sizeof(flex_t) * ((v34 * 4) + 1)); // Added
 
             surfaceIter->surfaceFlags |= SITH_SURFACE_1000000;
             for (int32_t v45 = 0; v45 < v34; v45++)
@@ -368,6 +373,8 @@ int sithSurface_Load(sithWorld *world)
 
         face->numVertices = v34;
         face->num = v67;
+
+        rdMaterial_OptionalFree(face->material);
     }
 
     for (int32_t v50 = 0; v50 < numSurfaces; v50++)
@@ -388,6 +395,11 @@ int sithSurface_Load(sithWorld *world)
     }
     
     world->numSurfaces = numSurfaces;
+#ifdef RDMATERIAL_LRU_LOAD_UNLOAD
+    for (uint32_t i = 0; i < sithMaterial_numMaterials; i++) {
+        rdMaterial_OptionalFree(sithMaterial_aMaterials[i]);
+    }
+#endif
     pSithHS->free(sithMaterial_aMaterials);
     sithMaterial_aMaterials = NULL; // Added
     sithMaterial_numMaterials = 0;

@@ -116,8 +116,10 @@ sithPuppet* sithPuppet_NewEntry(sithThing *thing)
 
     v1 = (sithPuppet *)pSithHS->alloc(sizeof(sithPuppet));
     thing->puppet = v1;
-    if ( !v1 )
+    if ( !v1 ) {
         thing->animclass = 0;
+        return NULL; // Added
+    }
     _memset(v1, 0, sizeof(sithPuppet));
     sector = thing->sector;
     if ( sector && (sector->flags & SITH_SECTOR_UNDERWATER) != 0 )

@@ -1830,7 +1830,12 @@ typedef struct sithCog
     sithCogCallstack callstack[4];
     uint32_t calldepth;
     sithCogSymboltable* pSymbolTable;
+#ifdef COG_DYNAMIC_STACKS
+    sithCogStackvar* stack;
+    uint32_t stackSize;
+#else
     sithCogStackvar stack[SITHCOGVM_MAX_STACKSIZE];
+#endif
     uint32_t stackPos;
     char cogscript_fpath[32];
 #ifdef JKM_TYPES

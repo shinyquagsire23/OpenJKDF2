@@ -128,6 +128,11 @@ loop_escape:
       _memset(hashtable->buckets, 0, sizeof(stdLinklist) * hashtable->numBuckets);
       hashtable->keyHashToIndex = stdHashTable_HashStringToIdx;
     }
+    else {
+        // Added: fail more gracefully and without memleaks
+        std_pHS->free(hashtable);
+        return NULL;
+    }
     return hashtable;
 }
 

@@ -468,25 +468,24 @@ LABEL_25:
                     sithCog_LoadEntry(v8, v6, idk->value);
                 goto LABEL_24;
             }
-            if ( _strlen(v13) )
-                break;
-            if ( _strlen(idk->value) )
+            else if ( _strlen(v13) ) {
+                sithCog_LoadEntry(v8, v6, v13);
+                v8 = v14;
+            }
+            else if ( _strlen(idk->value) )
             {
                 sithCog_LoadEntry(v8, v6, idk->value);
-                goto LABEL_20;
+                v8 = v14;
             }
-LABEL_21:
             v13 += 32;
             sithCog_ThingsSectorsRegSymbolIdk(cogs, v6, v8);
+
+
 LABEL_24:
             ++v6;
             if (++v10 >= cogs->cogscript->numIdk )
                 goto LABEL_25;
         }
-        sithCog_LoadEntry(v8, v6, v13);
-LABEL_20:
-        v8 = v14;
-        goto LABEL_21;
     }
 LABEL_26:
     result = 1;
@@ -1453,7 +1452,15 @@ void sithCog_Free(sithWorld *world)
             {
                 pSithHS->free(v9->heap);
                 v9->numHeapVars = 0;
+                v9->heap = NULL; // Added
             }
+#ifdef COG_DYNAMIC_STACKS
+            if (v9->stack) {
+                pSithHS->free(v9->stack);
+                v9->stack = NULL;
+                v9->stackSize = 0;
+            }
+#endif
         }
         pSithHS->free(world->cogs);
         world->cogs = 0;

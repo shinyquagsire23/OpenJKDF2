@@ -252,6 +252,8 @@
 //
 #if defined(TARGET_TWL)
 #define STDHASHTABLE_CRC32_KEYS
+#define COG_DYNAMIC_STACKS
+#define COG_DYNAMIC_STACKS_INCREMENT (32)
 #endif
 
 // Deferred loading and LRU unloading

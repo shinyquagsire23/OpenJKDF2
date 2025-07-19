@@ -176,7 +176,7 @@ static void* Linux_realloc(void* ptr, uint32_t len)
 
 #define ALLOC_ALIGN (0x10)
 
-#define MEM_CHECKING
+//#define MEM_CHECKING
 #define MEM_CHECKING_ADD (0x10)
 #define MEM_CHECKING_ZERO_VAL (0x00)
 #define MEM_CHECKING_VAL (0xAA)
@@ -253,6 +253,8 @@ static void* TWL_alloc(uint32_t len)
 #ifdef MEM_CHECKING
             memset(ret, MEM_CHECKING_ZERO_VAL, len);
             memset((uint8_t*)ret+len, MEM_CHECKING_VAL, lenAlign-len);
+#else
+            memset(ret, 0, len);
 #endif
             HDR_SET((tMemTrackingHeader*)ret, 0xF0, len);
             //printf("ret %p\n", ret);
@@ -269,6 +271,8 @@ static void* TWL_alloc(uint32_t len)
 #ifdef MEM_CHECKING
             memset(ret, MEM_CHECKING_ZERO_VAL, len);
             memset((uint8_t*)ret+len, MEM_CHECKING_VAL, lenAlign-len);
+#else
+            memset(ret, 0, len);
 #endif
             HDR_SET((tMemTrackingHeader*)ret, 0xDA, len);
             return (void*)(((intptr_t)ret) + sizeof(tMemTrackingHeader));
