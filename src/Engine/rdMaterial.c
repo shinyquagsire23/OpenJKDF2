@@ -463,7 +463,9 @@ int rdMaterial_LoadEntry_Deferred(rdMaterial *material, int create_ddraw_surface
             res = rdMaterial_LoadEntry_Common(tmp, material, create_ddraw_surface, gpu_mem, partial ? 2 : 1);
             if (!res && !partial) {
                 rdMaterial_FreeEntry(material);
+                int prevId = material->id;
                 rdMaterial_LoadEntry_Common(tmp, material, create_ddraw_surface, gpu_mem, 0);
+                material->id = prevId;
             }
         }
     }

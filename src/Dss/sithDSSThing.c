@@ -1152,8 +1152,12 @@ int sithDSSThing_ProcessFullDesc(sithCogMsg *msg)
 
         for (int i = 0; i < thing->trackParams.loadedFrames; i++)
         {
-            thing->trackParams.aFrames[i].pos = NETMSG_POPVEC3();
-            thing->trackParams.aFrames[i].rot = NETMSG_POPVEC3();
+            rdVector3 tmp1 = NETMSG_POPVEC3();
+            rdVector3 tmp2 = NETMSG_POPVEC3();
+            if (thing->trackParams.aFrames) {
+                thing->trackParams.aFrames[i].pos = tmp1;
+                thing->trackParams.aFrames[i].rot = tmp2;
+            }
         }
     }
     sithThing_sub_4CD100(thing);

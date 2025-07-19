@@ -1315,7 +1315,7 @@ void sithRender_RenderLevelGeometry()
             if (dist <= 0.0 )
                 continue;
 #ifdef TARGET_TWL
-            if (dist > 3.0) {
+            if (dist > 3.0 && !(v65->surfaceFlags & (SITH_SURFACE_HORIZON_SKY|SITH_SURFACE_CEILING_SKY))) {
                 continue;
             }
 #endif
