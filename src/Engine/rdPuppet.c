@@ -201,6 +201,10 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
             if (!v17) {
                 continue;
             }
+            // Added: lowmem nullptr checks
+            if (!v17->paJoints) {
+                continue;
+            }
             
             v18 = (v17->type & nodeIter->type) ? trackIter->highPri : trackIter->lowPri;
             if (!trackIter->status & 2) {
@@ -208,8 +212,8 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
             }
             
             v19 = nodeIter->idx;
-            v20 = &v17->paJoints[v19]; // overflow in orig? added (moved): v19 < v17->numJoints2
-            if (!(v19 < v17->numJoints2 && v20->numAnimEntries)) {
+            v20 = &v17->paJoints[v19]; // overflow in orig? added (moved): v19 < v17->numJoints2, added v20->paAnimEntries nullptr check
+            if (!(v19 < v17->numJoints2 && v20->numAnimEntries && v20->paAnimEntries)) {
                 continue;
             }
             

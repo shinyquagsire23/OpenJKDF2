@@ -981,6 +981,8 @@ flex_t stdMath_ClipPrecision(flex_t val)
 #ifndef EXPERIMENTAL_FIXED_POINT
     if (stdMath_Fabs(val) <= 0.00001)
         return 0.0;
+#else
+    return flexdirect(val.to_raw() & 0xFFFFFFF0);
 #endif
     return val;
 }

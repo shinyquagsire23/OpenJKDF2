@@ -28,11 +28,9 @@
 int sithSector_Load(sithWorld *world, int tmp)
 {
     unsigned int alloc_size; // ebx
-    sithSector *v5; // eax
     sithSector *v6; // eax
     unsigned int v7; // ecx
     sithSector *sectors; // esi
-    int32_t *sector_vertices; // eax
     int v13; // edi
     unsigned int v15; // eax
     void *v16; // ecx
@@ -55,12 +53,18 @@ int sithSector_Load(sithWorld *world, int tmp)
         return 0;
     if ( !stdConffile_ReadLine() || _sscanf(stdConffile_aLine, " world sectors %d", &sectors_amt) != 1 )
         return 0;
+
+#ifdef STDPLATFORM_HEAP_SUGGESTIONS
+    int prevSuggest = pSithHS->suggestHeap(HEAP_FAST);
+#endif
     alloc_size = sizeof(sithSector) * sectors_amt;
-    v5 = (sithSector *)pSithHS->alloc(sizeof(sithSector) * sectors_amt);
-    world->sectors = v5;
-    if ( v5 )
+    world->sectors = (sithSector *)pSithHS->alloc(sizeof(sithSector) * sectors_amt);
+#ifdef STDPLATFORM_HEAP_SUGGESTIONS
+    pSithHS->suggestHeap(prevSuggest);
+#endif
+    if ( world->sectors )
     {
-        _memset(v5, 0, alloc_size);
+        _memset(world->sectors, 0, alloc_size);
         v6 = world->sectors;
         v7 = 0;
         for ( world->numSectors = sectors_amt; v7 < sectors_amt; ++v7 )
@@ -170,9 +174,8 @@ int sithSector_Load(sithWorld *world, int tmp)
                 break;
             if ( _sscanf(stdConffile_aLine, " vertices %d", &num_vertices) != 1 )
                 break;
-            sector_vertices = (int32_t *)pSithHS->alloc(sizeof(int32_t) * num_vertices);
-            sectors->verticeIdxs = sector_vertices;
-            if ( !sector_vertices )
+            sectors->verticeIdxs = (int32_t *)pSithHS->alloc(sizeof(int32_t) * num_vertices);
+            if ( !sectors->verticeIdxs )
                 break;
 
             for (v13 = 0; v13 < num_vertices; v13++)

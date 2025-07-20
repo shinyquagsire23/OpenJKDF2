@@ -438,7 +438,10 @@ int rdMaterial_LoadEntry(char *mat_fpath, rdMaterial *material, int create_ddraw
     }
 
     // TODO: refcounting
+    // Added: juuuust in case
+    int prevId = material->id;
     _memset(material, 0, sizeof(rdMaterial));
+    material->id = prevId;
     return rdMaterial_LoadEntry_Common(mat_fpath, material, create_ddraw_surface, gpu_mem, !openjkdf2_bIsExtraLowMemoryPlatform);
 }
 
@@ -455,6 +458,11 @@ int rdMaterial_LoadEntry_Deferred(rdMaterial *material, int create_ddraw_surface
     if (material->bDataLoaded) {
         return 1;
     }
+
+#ifdef STDPLATFORM_HEAP_SUGGESTIONS
+    int prevSuggest = pSithHS->suggestHeap(HEAP_SLOW);
+#endif
+
     stdString_SafeStrCopy(tmp, material->mat_full_fpath, sizeof(tmp));
     rdMaterial_FreeEntry(material);
     //stdPlatform_Printf("rdMaterial_LoadEntry_Deferred %s\n", tmp);
@@ -472,6 +480,10 @@ int rdMaterial_LoadEntry_Deferred(rdMaterial *material, int create_ddraw_surface
             }
         }
     }
+
+#ifdef STDPLATFORM_HEAP_SUGGESTIONS
+    pSithHS->suggestHeap(prevSuggest);
+#endif
 
     //if (material->bDataLoaded) {
         rdMaterial_UpdateFrameCount(material);

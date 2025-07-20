@@ -128,14 +128,14 @@ MATH_FUNC void rdVector_ExtractAngle(const rdVector3 *v1, rdVector3 *out);
 // Added
 MATH_FUNC flex_t rdVector_Dist3(const rdVector3 *v1, const rdVector3 *v2);
 MATH_FUNC flex_t rdVector_DistSquared3(const rdVector3 *v1, const rdVector3 *v2);
-MATH_FUNC rdVector3* rdVector_MultAcc3(rdVector3 *v1, const rdVector3 *v2, flex_t scale);
+MATH_FUNC FAST_FUNC rdVector3* rdVector_MultAcc3(rdVector3 *v1, const rdVector3 *v2, flex_t scale);
 MATH_FUNC void rdVector_Zero3(rdVector3 *v);
 MATH_FUNC void rdVector_Zero2(rdVector2 *v);
 MATH_FUNC int rdVector_IsZero3(rdVector3* v);
 MATH_FUNC flex_t rdVector_NormalDot(const rdVector3* v1, const rdVector3* v2, const rdVector3* norm);
 MATH_FUNC void rdVector_AbsRound3(rdVector3* v);
 MATH_FUNC void rdVector_ClipPrecision3(rdVector3* v);
-MATH_FUNC void rdVector_NormalizeAngleAcute3(rdVector3* v);
+MATH_FUNC FAST_FUNC void rdVector_NormalizeAngleAcute3(rdVector3* v);
 MATH_FUNC void rdVector_ClampRange3(rdVector3* v, flex_t minVal, flex_t maxVal);
 MATH_FUNC void rdVector_ClampValue3(rdVector3* v, flex_t val);
 

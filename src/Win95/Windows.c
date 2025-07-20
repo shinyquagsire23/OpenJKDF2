@@ -22,6 +22,10 @@
 #include <SDL.h>
 #endif
 
+#ifdef TARGET_TWL
+#include <nds.h>
+#endif
+
 static int Windows_bInitted;
 static uint32_t Windows_DplayGuid[4] = {0x0BF0613C0, 0x11D0DE79, 0x0A000C999, 0x4BAD7624};
 static char Windows_cpu_info[0x4c] = { 0 };
@@ -331,6 +335,15 @@ void Windows_GameErrorMsgbox(const char *a1, ...)
     va_end(va);
     jk_printf("FATAL ERROR: %s\n", tmp);
     while(1);
+#endif
+#ifdef TARGET_TWL
+    while (1) {
+        scanKeys();
+        u16 keys_held = keysHeld();
+        if (!!(keys_held & KEY_A)) {
+            break;
+        }
+    }
 #endif
     jk_exit(1);
 }

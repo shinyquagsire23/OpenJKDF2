@@ -231,13 +231,18 @@ void* __attribute__((weak)) __memcpy_chk(void * dest, const void * src, size_t l
 #endif // WIN64_MINGW
 
 #ifdef TARGET_TWL
-mspace openjkdf2_mem_alt_mspace;
-mspace openjkdf2_mem_main_mspace;
+extern mspace openjkdf2_mem_alt_mspace;
+extern mspace openjkdf2_mem_main_mspace;
 
-intptr_t openjkdf2_mem_alt_mspace_start;
-intptr_t openjkdf2_mem_alt_mspace_end;
-intptr_t openjkdf2_mem_main_mspace_start;
-intptr_t openjkdf2_mem_main_mspace_end;
+extern intptr_t openjkdf2_mem_alt_mspace_start;
+extern intptr_t openjkdf2_mem_alt_mspace_end;
+extern intptr_t openjkdf2_mem_main_mspace_start;
+extern intptr_t openjkdf2_mem_main_mspace_end;
+extern "C"
+{
+    extern void debugRamEnableCache();
+    extern void nwramEnableCache();
+}
 #endif
 
 int main(int argc, char** argv)
@@ -266,8 +271,6 @@ int main(int argc, char** argv)
 #endif // ARCH_WASM
 
 #ifdef TARGET_TWL
-    extern int32_t openjkdf2_mem_alt_mspace_valid;
-
     REG_SQRTCNT = SQRT_64;
     REG_DIVCNT = DIV_64_32;
 
@@ -286,21 +289,61 @@ int main(int argc, char** argv)
         *(u32*)0x4004008 |= 0x8F;
         REG_EXMEMCNT &= ~(1<<15);
 
-        setCpuClock(1); 
+        setCpuClock(1);
+        debugRamEnableCache();
+        nwramEnableCache();
+    }
+    else {
+        sysSetCartOwner(BUS_OWNER_ARM9);
     }
 
-    if (peripheralSlot2Init(SLOT2_PERIPHERAL_EXTRAM)) {
+    // TODO: DS mode slot2 can't r/w u8s
+#if 0
+    if (!isDSiMode()) {
+        *((vu16*)0x09FC00B4) = 0x00A5;
+        *((vu16*)0x09FC0000) = 0x6;
+
+        peripheralSlot2DisableCache();
+
+        size_t alt_sz = 0x2000000 - 0x1000;
+        openjkdf2_mem_alt_mspace_start = (intptr_t)0x08000000;
+        openjkdf2_mem_alt_mspace_end = openjkdf2_mem_alt_mspace_start + alt_sz;
+
+        for (int i = 0; i < 10; i++) {
+            strcpy((char*)(openjkdf2_mem_alt_mspace_start + (i*0x1000)), "Testing if the RAM is sticking.\n");
+            printf("%.100s\n", (const char*)(openjkdf2_mem_alt_mspace_start + (i*0x1000)));
+        }
+
+        *((vu16*)0x08000000) = 0xDAAD;
+        *((vu8*)0x08000002) = 0xd5;
+        *((vu8*)0x08000003) = 0xd5;
+        *((vu32*)0x08000004) = 0xF00FDAD5;
+        printf("%08x %08x %08x %08x %02x %04x %08x\n", *((u32*)openjkdf2_mem_alt_mspace_start + 0), *((u32*)openjkdf2_mem_alt_mspace_start + 1), *((u32*)openjkdf2_mem_alt_mspace_start + 2), *((u32*)openjkdf2_mem_alt_mspace_start + 3));
+        printf("%02x %04x %08x\n", *((vu8*)0x08000002), *((vu16*)0x08000000), *((vu32*)0x08000004));
+        
+
+        openjkdf2_mem_alt_mspace = create_mspace_with_base((void*)openjkdf2_mem_alt_mspace_start, alt_sz, 0);
+
+        printf("Added extra 0x%zx bytes to heap from %s.\n", alt_sz, "EDGBA");
+
+        openjkdf2_bIsLowMemoryPlatform = 1;
+        openjkdf2_bIsExtraLowMemoryPlatform = 0;
+    } 
+    else 
+#endif
+
+    // TODO: DS mode slot2 can't r/w u8s
+    if (isDSiMode() && peripheralSlot2Init(SLOT2_PERIPHERAL_EXTRAM)) {
         peripheralSlot2Open(SLOT2_PERIPHERAL_EXTRAM);
         peripheralSlot2EnableCache(true);
 
         size_t alt_sz = peripheralSlot2RamSize() - 0x1000;
         openjkdf2_mem_alt_mspace_start = (intptr_t)peripheralSlot2RamStart();
-        openjkdf2_mem_alt_mspace_end = openjkdf2_mem_alt_mspace_start + alt_sz;
+        openjkdf2_mem_alt_mspace_end = openjkdf2_mem_alt_mspace_start + alt_sz;        
 
         openjkdf2_mem_alt_mspace = create_mspace_with_base((void*)openjkdf2_mem_alt_mspace_start, alt_sz, 0);
-        openjkdf2_mem_alt_mspace_valid = 1;
 
-        printf("Added extra 0x%zx bytes to heap.\n", alt_sz);
+        printf("Added extra 0x%zx bytes to heap from %s.\n", alt_sz, peripheralSlot2GetName());
 
         openjkdf2_bIsLowMemoryPlatform = 1;
         openjkdf2_bIsExtraLowMemoryPlatform = 0;
@@ -333,7 +376,7 @@ int main(int argc, char** argv)
 
     printf("heap free=0x%x\n  allocated=0x%x\n", (intptr_t)getHeapLimit() - (intptr_t)getHeapEnd(), (intptr_t)getHeapEnd() - (intptr_t)getHeapStart());
 
-    printf("heap start=0x%p\n  end=0x%p\n  limit=0x%p\n", (intptr_t)getHeapStart(), (intptr_t)getHeapEnd(), (intptr_t)getHeapLimit());
+    printf("heap start=%p\n  end=%p\n  limit=%p\n", (intptr_t)getHeapStart(), (intptr_t)getHeapEnd(), (intptr_t)getHeapLimit());
 
     printf("ext heap start=%p, size=%x\n", peripheralSlot2RamStart(), peripheralSlot2RamSize());
     //*(u32*)0x0D000000 = 0x12345678;
@@ -561,6 +604,14 @@ int main(int argc, char** argv)
 #ifdef PLATFORM_PHYSFS
     PHYSFS_deinit();
 #endif
+
+    while (1) {
+        scanKeys();
+        u16 keys_held = keysHeld();
+        if (!!(keys_held & KEY_A)) {
+            break;
+        }
+    }
 
     return 1;
 }

@@ -1045,13 +1045,15 @@ void sithPhysics_ThingPhysAttached(sithThing *pThing, flex_t deltaSeconds)
 
         if ( stdMath_ClipPrecision(v109) != 0.0 )
         {
+            // If deltaSeconds is < the canonical phys tickrate, we get these
+            // crazy oscillations
 #ifdef FIXED_TIMESTEP_PHYS
             // Fix physics being tied to framerate?
-            if (NEEDS_STEPPED_PHYS)
+            if (NEEDS_STEPPED_PHYS && (deltaSeconds < CANONICAL_PHYS_TICKRATE))
                 v109 *= (deltaSeconds / CANONICAL_PHYS_TICKRATE);
 #endif
 #ifdef EXPERIMENTAL_FIXED_POINT
-            if (!(NEEDS_STEPPED_PHYS))
+            if (!(NEEDS_STEPPED_PHYS) && (deltaSeconds < CANONICAL_PHYS_TICKRATE))
                 v109 *= (deltaSeconds / CANONICAL_PHYS_TICKRATE);
 #endif
             rdVector_MultAcc3(&pThing->physicsParams.vel, &attachedNormal, -v109);
@@ -1098,8 +1100,10 @@ void sithPhysics_ThingPhysAttached(sithThing *pThing, flex_t deltaSeconds)
         flex_t new_v131 = v131 * (deltaSeconds / CANONICAL_PHYS_TICKRATE);
         new_v131 = stdMath_ClampValue(new_v131, deltaSeconds * 0.5);
 
+        // If deltaSeconds is < the canonical phys tickrate, we get these
+        // crazy oscillations
 #ifdef FIXED_TIMESTEP_PHYS
-        if (NEEDS_STEPPED_PHYS)
+        if (NEEDS_STEPPED_PHYS && deltaSeconds < CANONICAL_PHYS_TICKRATE)
             v131 = new_v131;
         else
             v131 = orig_v131;
@@ -1107,7 +1111,8 @@ void sithPhysics_ThingPhysAttached(sithThing *pThing, flex_t deltaSeconds)
         v131 = orig_v131;
 #endif
 #ifdef EXPERIMENTAL_FIXED_POINT
-        v131 = new_v131;
+        if (deltaSeconds < CANONICAL_PHYS_TICKRATE)
+            v131 = new_v131;
 #endif
 
         // Added: Fix turret slowly drifting up?

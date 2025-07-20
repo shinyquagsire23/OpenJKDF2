@@ -44,7 +44,7 @@
 #define sithAI_CanDetectSightThing_ADDR (0x004EC140)
 
 extern int sithAI_bOpened;
-extern sithActor sithAI_actors[256];
+extern sithActor sithAI_actors[SITHAI_MAX_ACTORS];
 extern int sithAI_inittedActors;
 extern sithAIAlign sithAI_aAlignments[10];
 extern flex_t sithAI_FLOAT_005a79d8;

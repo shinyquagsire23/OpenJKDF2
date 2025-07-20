@@ -245,16 +245,6 @@ int sithMain_Tick()
         
     }
 #endif
-    
-#ifdef TARGET_TWL
-    // Fallback to stepped 30Hz physics if ms delta is very high
-    if (sithTime_deltaMs > 55) {
-        jkPlayer_bJankyPhysics = 0;
-    }
-    else {
-        jkPlayer_bJankyPhysics = 1;
-    }
-#endif
 
     sithMain_tickStartMs = stdPlatform_GetTimeMsec(); // Added: perf analyzing
 
@@ -262,6 +252,16 @@ int sithMain_Tick()
     {
         sithTime_Tick();
         sithComm_Sync();
+
+#ifdef TARGET_TWL
+        // Fallback to stepped 30Hz physics if ms delta is very high
+        if (sithTime_deltaMs > 100) {
+            jkPlayer_bJankyPhysics = 0;
+        }
+        else {
+            jkPlayer_bJankyPhysics = 1;
+        }
+#endif
 
 #ifdef FIXED_TIMESTEP_PHYS
         if (NEEDS_STEPPED_PHYS) {

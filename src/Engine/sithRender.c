@@ -30,6 +30,10 @@
 #include "Platform/std3D.h"
 #include "stdPlatform.h"
 
+#if defined(TARGET_TWL)
+#include <nds.h>
+#endif
+
 #ifdef QOL_IMPROVEMENTS
 #if 0
 static rdThing* lightDebugThing = NULL;
@@ -485,7 +489,12 @@ void sithRender_Draw()
 
 #ifdef TARGET_TWL
     int testAlphaEnd = stdPlatform_GetTimeMsec();
-    //printf("clp=%d lts=%d geo=%d thg=%d al=%d %d\n", testClipEnd - testClip, testLightsEnd - testLights, testLevelGeoEnd - testLevelGeo, testThingsEnd - testThings, testAlphaEnd - testAlpha, sithRender_numSectors);
+    char resetConsole[16];
+    int consoleX, consoleY;
+    consoleGetCursor(NULL, &consoleX, &consoleY);
+    snprintf(resetConsole, sizeof(resetConsole)-1, "\x1b[%d;%dH", consoleX, consoleY);
+    printf("\x1b[3;0H                               \rclp=%d lts=%d geo=%d thg=%d al=%d %d \n                        \n", testClipEnd - testClip, testLightsEnd - testLights, testLevelGeoEnd - testLevelGeo, testThingsEnd - testThings, testAlphaEnd - testAlpha, sithRender_numSectors);
+    stdPlatform_Printf(resetConsole);
 #endif
 }
 
@@ -1880,10 +1889,10 @@ LABEL_150:
     }
     
 
-#ifndef TARGET_TWL
+//#ifndef TARGET_TWL
     // TWL: 5-27ms
     rdCache_Flush();
-#endif
+//#endif
     rdCamera_pCurCamera->pClipFrustum = v77;
 }
 
@@ -2277,9 +2286,9 @@ void sithRender_RenderThings()
     }
 
     // DSi doesn't really have Z buffer options, so just batch everything
-#ifndef TARGET_TWL
+//#ifndef TARGET_TWL
     rdCache_Flush();
-#endif
+//#endif
 
     // MoTS added
     if (lastDrawn) 
@@ -2290,9 +2299,9 @@ void sithRender_RenderThings()
     }
 
     // DSi doesn't really have Z buffer options, so just batch everything
-#ifndef TARGET_TWL
+//#ifndef TARGET_TWL
     rdCache_Flush();
-#endif
+//#endif
 
     if (sithRender_008d1668) {
         rdSetCullFlags(1);
@@ -2537,9 +2546,9 @@ void sithRender_RenderAlphaSurfaces()
     }
 
     // DSi doesn't really have Z buffer options, so just batch everything
-#ifndef TARGET_TWL
+//#ifndef TARGET_TWL
     rdCache_Flush();
-#endif
+//#endif
 #ifdef SDL2_RENDER
     rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
 #endif

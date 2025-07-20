@@ -35,10 +35,10 @@
 #define stdMath_Sqrt_ADDR (0x00433670)
 
 MATH_FUNC flex_t stdMath_FlexPower(flex_t num, int32_t exp);
-MATH_FUNC flex_t stdMath_NormalizeAngle(flex_t angle);
-MATH_FUNC flex_t stdMath_NormalizeAngleAcute(flex_t angle);
-MATH_FUNC flex_t stdMath_NormalizeDeltaAngle(flex_t a1, flex_t a2);
-MATH_FUNC void stdMath_SinCos(flex_t angle, flex_t *pSinOut, flex_t *pCosOut);
+MATH_FUNC FAST_FUNC flex_t stdMath_NormalizeAngle(flex_t angle);
+MATH_FUNC FAST_FUNC flex_t stdMath_NormalizeAngleAcute(flex_t angle);
+MATH_FUNC FAST_FUNC flex_t stdMath_NormalizeDeltaAngle(flex_t a1, flex_t a2);
+MATH_FUNC FAST_FUNC void stdMath_SinCos(flex_t angle, flex_t *pSinOut, flex_t *pCosOut);
 MATH_FUNC flex_t stdMath_Tan(flex_t a1);
 MATH_FUNC flex_t stdMath_ArcSin1(flex_t val);
 MATH_FUNC flex_t stdMath_ArcSin2(flex_t val);

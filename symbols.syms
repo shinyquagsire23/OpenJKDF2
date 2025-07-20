@@ -714,7 +714,7 @@ sithWeapon_8BD008 0x008BD008 int[6]
 sithWeapon_8BD024 0x008BD024 int
 sithWeapon_senderIndex 0x008BD028 int
 
-jkPlayer_playerInfos 0x008C4CA0 sithPlayerInfo[32]
+jkPlayer_playerInfos 0x008C4CA0 sithPlayerInfo[JKPLAYER_NUM_INFOS]
 jkPlayer_playerShortName 0x08EC320 wchar_t[32]
 jkPlayer_numOtherThings 0x0085FF44 int
 jkPlayer_numThings 0x0085B560 int
@@ -724,7 +724,7 @@ playerThingIdx 0x83199C int
 jkPlayer_maxPlayers 0x8319A0 uint32_t
 sithPlayer_pLocalPlayerThing 0x8319A4 sithThing*
 sithPlayer_pLocalPlayer 0x8319A8 sithPlayerInfo*
-playerThings 0x85B580 jkPlayerInfo[32]
+playerThings 0x85B580 jkPlayerInfo[JKPLAYER_NUM_INFOS]
 jkSaber_rotateMat 0x85FA80 rdMatrix34
 jkPlayer_setRotateOverlayMap 0x00860764 int
 jkPlayer_setDrawStatus 0x00860768 int

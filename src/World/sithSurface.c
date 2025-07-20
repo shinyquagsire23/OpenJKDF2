@@ -89,8 +89,14 @@ int sithSurface_Load(sithWorld *world)
     }
     if ( numAdjoins )
     {
+#ifdef STDPLATFORM_HEAP_SUGGESTIONS
+        int prevSuggest = pSithHS->suggestHeap(HEAP_FAST);
+#endif
         allocSize = sizeof(sithAdjoin) * numAdjoins;
         adjoins = (sithAdjoin *)pSithHS->alloc(sizeof(sithAdjoin) * numAdjoins);
+#ifdef STDPLATFORM_HEAP_SUGGESTIONS
+        pSithHS->suggestHeap(prevSuggest);
+#endif
         world->adjoins = adjoins;
         if ( !adjoins ) {
             stdPrintf(
@@ -147,7 +153,13 @@ int sithSurface_Load(sithWorld *world)
         return 0;
     }
 
+#ifdef STDPLATFORM_HEAP_SUGGESTIONS
+    int prevSuggest = pSithHS->suggestHeap(HEAP_FAST);
+#endif
     world->surfaces = (sithSurface *)pSithHS->alloc(sizeof(sithSurface) * numSurfaces);
+#ifdef STDPLATFORM_HEAP_SUGGESTIONS
+    pSithHS->suggestHeap(prevSuggest);
+#endif
     if (!world->surfaces)
     {
         stdPrintf(

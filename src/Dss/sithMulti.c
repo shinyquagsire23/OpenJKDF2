@@ -880,7 +880,7 @@ int sithMulti_ProcessLeaveJoin(sithCogMsg *msg)
     v4 = NETMSG_POPS16();
 
     sithNet_MultiModeFlags = v2;
-    jkPlayer_maxPlayers = v4;
+    jkPlayer_maxPlayers = v4; // TODO cap this to JKPLAYER_NUM_INFOS?
     for (v3 = 0; v3 < jkPlayer_maxPlayers; v3++)
     {
         v6 = &jkPlayer_playerInfos[v3];

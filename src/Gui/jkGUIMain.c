@@ -51,7 +51,11 @@ static jkGuiMenu jkGuiMain_cutscenesMenu = {jkGuiMain_cutscenesElements, -1, 0xF
 
 static jkGuiElement jkGuiMain_elements[11] = {
     {ELEMENT_TEXTBUTTON, 10, 5, "GUI_SINGLEPLAYER", 3, {0, 160, 0x280, 0x3C}, 1, 0, 0, 0, 0, 0, {0}, 0},
+#ifndef TARGET_NO_MULTIPLAYER_MENUS
     {ELEMENT_TEXTBUTTON, 11, 5, "GUI_MULTIPLAYER", 3, {0, 220, 0x280, 0x3C}, 1, 0, 0, 0, 0, 0, {0}, 0},
+#else
+    {ELEMENT_TEXT, 11, 5, NULL, 3, {0, 220, 0x280, 0x3C}, 1, 0, 0, 0, 0, 0, {0}, 0},
+#endif
     {ELEMENT_TEXTBUTTON, 12, 5, "GUI_QUIT", 3, {0, 0x118, 0x280, 0x3C}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON, 14, 2, "GUI_CHOOSEPLAYER", 3, {20, 380, 150, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON, 15, 2, "GUI_VIEWCUTSCENES", 3, {250, 380, 150, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
@@ -110,7 +114,11 @@ void jkGuiMain_Show()
     jkGuiMain_elements[9].wstr = openjkdf2_waReleaseCommitShort;
 
     jkGui_SetModeMenu(jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]->palette);
-    if ( !jkGuiMain_bIdk || (jkGuiMain_bIdk = 0, jkGuiPlayer_ShowNewPlayer(1), !stdComm_dword_8321F8) || jkGuiMultiplayer_Show2() != 1 )
+    if ( !jkGuiMain_bIdk || (jkGuiMain_bIdk = 0, jkGuiPlayer_ShowNewPlayer(1), !stdComm_dword_8321F8)
+#ifndef TARGET_NO_MULTIPLAYER_MENUS 
+        || jkGuiMultiplayer_Show2() != 1 
+#endif
+        )
     {
         if (Main_bMotsCompat) {
             jkGuiMain_elements[4].bIsVisible = Main_bDevMode; // MOTS added
@@ -130,9 +138,11 @@ void jkGuiMain_Show()
                 case 10:
                     v1 = jkGuiSingleplayer_Show();
                     break;
+#ifndef TARGET_NO_MULTIPLAYER_MENUS
                 case 11:
                     v1 = jkGuiMultiplayer_Show();
                     break;
+#endif
                 case 12:
                     v4 = jkStrings_GetUniStringWithFallback("GUI_QUITCONFIRM_Q");
                     v2 = jkStrings_GetUniStringWithFallback("GUI_QUITCONFIRM");

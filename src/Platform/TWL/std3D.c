@@ -36,9 +36,9 @@ typedef struct TWLVERTEX
 } TWLVERTEX;
 
 size_t std3D_loadedTexturesAmt = 0;
-static rdTri GL_tmpTris[STD3D_MAX_TRIS] = {0};
+//static rdTri GL_tmpTris[STD3D_MAX_TRIS] = {0};
 static size_t GL_tmpTrisAmt = 0;
-static TWLVERTEX GL_tmpVertices[STD3D_MAX_VERTICES] = {0};
+//static TWLVERTEX GL_tmpVertices[STD3D_MAX_VERTICES] = {0};
 static size_t GL_tmpVerticesAmt = 0;
 static size_t rendered_tris = 0;
 
@@ -265,7 +265,7 @@ void std3D_Shutdown() {
 
     std3D_FreeResources();
 
-    //std3D_PurgeEntireTextureCache();
+    std3D_PurgeEntireTextureCache();
 }
 
 /*
@@ -850,12 +850,12 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
             res = glGenTextures(1, &image_texture);
         }
     }
-    if (!res) {
+    /*if (!res) {
         res = std3D_PurgeTextureCache(texture->textureSize);
         if (res) {
             res = glGenTextures(1, &image_texture);
         }
-    }
+    }*/
     if (!res) {
         stdPlatform_Printf("Out of texture IDs! %x\n", std3D_highestTexId);
         //std3D_bPurgeTexturesOnEnd = 1;

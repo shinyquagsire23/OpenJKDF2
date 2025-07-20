@@ -118,10 +118,10 @@
 #define MAX_DEFLECTION_BOUNCES (6)
 
 #if defined(TARGET_TWL)
-#define RDCACHE_MAX_TRIS (0x800) // theoretical max 0x800?
-#define RDCACHE_MAX_VERTICES (0x1800)
+#define RDCACHE_MAX_TRIS (0x400) // theoretical max 0x800?
+#define RDCACHE_MAX_VERTICES (0xC00) // theoretical max 0x1800?
 
-#define STD3D_MAX_TEXTURES (512)
+#define STD3D_MAX_TEXTURES (512) // theoretical max 2048
 #define STD3D_MAX_UI_TRIS (0x100)
 #define STD3D_MAX_UI_VERTICES (0x100)
 #else
@@ -132,6 +132,22 @@
 #define STD3D_MAX_UI_TRIS (0x8000)
 #define STD3D_MAX_UI_VERTICES (0x8000)
 #endif
+
+#if defined(QOL_IMPROVEMENTS) && !defined(TARGET_TWL)
+#define SITH_MAX_SYNC_THINGS (128)
+#else
+#define SITH_MAX_SYNC_THINGS (16)
+#endif
+
+#ifdef QOL_IMPROVEMENTS
+    #define SITH_NUM_EVENTS (6)
+#else // !QOL_IMPROVEMENTS
+    #ifdef JKM_TYPES
+        #define SITH_NUM_EVENTS (6)
+    #else // !JKM_TYPES
+        #define SITH_NUM_EVENTS (5)
+    #endif // JKM_TYPES
+#endif // QOL_IMPROVEMENTS
 
 #define SITHCONTROL_NUM_HANDLERS (9)
 
@@ -164,6 +180,12 @@
 // Backport Droidworks misc
 #ifdef QOL_IMPROVEMENTS
 #define DW_CAMERA
+#endif
+
+#ifdef TARGET_TWL
+#define JKPLAYER_NUM_INFOS (11)
+#else
+#define JKPLAYER_NUM_INFOS (32)
 #endif
 
 #ifdef JKM_DSS
@@ -253,7 +275,11 @@
 #define STDCONF_LINEBUFFER_LEN (2048)
 #endif
 
+#ifdef TARGET_TWL
+#define SITHAI_MAX_ACTORS (128)
+#else
 #define SITHAI_MAX_ACTORS (256)
+#endif
 
 #if defined(QOL_IMPROVEMENTS) && !defined(TARGET_TWL)
 #define SITH_MIXER_NUMPLAYINGSOUNDS (256)
@@ -273,6 +299,7 @@
 #define COG_DYNAMIC_IDK
 #define COG_DYNAMIC_TRIGGERS
 #define COG_DYNAMIC_STACKS_INCREMENT (32)
+#define STDPLATFORM_HEAP_SUGGESTIONS
 #endif
 
 // Deferred loading and LRU unloading
@@ -286,7 +313,7 @@
 #define JKDEV_NUM_CHEATS (32)
 #endif
 
-#define SITHCVAR_MAX_CVARS (512)
+#define SITHCVAR_MAX_CVARS (256)
 #define SITHCVAR_MAX_STRLEN (256)
 #define SITHCVAR_MAX_NAME_STRLEN (64)
 
@@ -360,8 +387,11 @@ typedef double flex_d_t_type;
 // TODO: Have a TARGET_ARMvIDK or something
 #ifdef TARGET_TWL
 #define MATH_FUNC __attribute__((target("arm")))
+#define FAST_FUNC __attribute__((section(".itcm.text"), long_call))
+#define FAST_DATA __attribute__((section(".itcm.data"), long_call))
 #else
 #define MATH_FUNC
+#define FAST_FUNC
 #endif
 
 #endif // _OPENJKDF2_ENGINE_CONFIG_H

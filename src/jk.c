@@ -31,6 +31,10 @@
 #include <ctype.h>
 #endif
 
+#ifdef TARGET_TWL
+#include <nds.h>
+#endif
+
 #include "General/stdString.h"
 #include "Platform/stdControl.h"
 
@@ -679,6 +683,15 @@ int _fputs(const char * a, FILE * b)
 
 void jk_exit(int a)
 {
+#ifdef TARGET_TWL
+    while (1) {
+        scanKeys();
+        u16 keys_held = keysHeld();
+        if (!!(keys_held & KEY_A)) {
+            break;
+        }
+    }
+#endif
     exit(a);
 }
 

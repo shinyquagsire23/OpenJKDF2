@@ -33,7 +33,7 @@ MATH_FUNC void rdCache_Reset();
 void rdCache_ClearFrameCounters();
 rdProcEntry *rdCache_GetProcEntry();
 void rdCache_Flush();
-MATH_FUNC int rdCache_SendFaceListToHardware();
+MATH_FUNC FAST_FUNC int rdCache_SendFaceListToHardware();
 void rdCache_ResetRenderList();
 MATH_FUNC void rdCache_DrawRenderList();
 int rdCache_TriCompare(const void* a_, const void* b_);

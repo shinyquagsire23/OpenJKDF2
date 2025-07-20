@@ -3,6 +3,7 @@
 #include "Devices/sithControl.h"
 #include "Platform/stdControl.h"
 #include "General/Darray.h"
+#include "General/stdString.h"
 #include "Gui/jkGUI.h"
 #include "Gui/jkGUIDialog.h"
 #include "Gui/jkGUIRend.h"
@@ -239,7 +240,7 @@ int jkGuiKeyboard_EnumBindings(int32_t inputFuncIdx, const char *pInputFuncStr, 
     if ( v17 && (jkGuiKeyboard_dword_555E10 != 105 || (flags & 1) == 0) )
     {
         if ( (a3 & 2) == 0
-          || ((_strncpy(v18, pInputFuncStr, 0x1Fu), v18[31] = 0, (flags & 1) == 0) ? ((flags & 4) == 0 ? (v16 = "_K") : (v16 = "_R"), strncat(v18, v16, 0x20u)) : strncat(v18, "_A", 0x20u),
+          || ((stdString_SafeStrCopy(v18, pInputFuncStr, 32), (flags & 1) == 0) ? ((flags & 4) == 0 ? (v16 = "_K") : (v16 = "_R"), strncat(v18, v16, 0x20u-1)) : strncat(v18, "_A", 0x20u-1), // Added: made strncat safe (won't null-terminate unless its <sizeof)
               (v8 = jkStrings_GetUniStringWithFallback(v18)) != 0) )
         {
             if ( dxKeyNum == -1 )

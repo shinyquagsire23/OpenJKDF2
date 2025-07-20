@@ -319,10 +319,7 @@ int rdCache_SendFaceListToHardware()
         v1 = 1;
         v129 = 1;
     }
-#ifdef TARGET_TWL
-    // TODO: this breaks transparent color-only surfaces, maybe just check tri flags?
-    rdSetVertexColorMode(1);
-#endif
+
     if ( v0 || v1 || (rdGetVertexColorMode() == 1)) // MOTS added
     {
         flags_idk |= 0x8000;

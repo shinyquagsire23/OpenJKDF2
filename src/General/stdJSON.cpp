@@ -127,9 +127,6 @@ static int stdJSON_WriteToFile(const char* pFpath, nlohmann::json& json_file)
         stdPlatform_Printf("ERROR: Failed to open `(NULL)`!\n");
         return 0;
     }
-#ifdef TARGET_TWL
-    return 1;
-#endif
 
     fs::path json_path = {pFpath};
     std::ofstream o(json_path);

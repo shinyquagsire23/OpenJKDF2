@@ -108,7 +108,7 @@ char Main_strEpisode[129];
 char Main_strMap[128+4];
 #endif
 
-#ifdef QOL_IMPROVEMENTS
+#if defined(QOL_IMPROVEMENTS) && !defined(TARGET_NO_MULTIPLAYER_MENUS)
 int Main_StartupDedicated(int bFullyDedicated)
 {
     char* pRemoveExt;
@@ -265,7 +265,7 @@ int Main_Startup(const char *cmdline)
     setlocale(LC_ALL, "C");
 #endif
 
-    stdInitServices(&hs);    
+    stdInitServices(&hs);
     jkGuiNetHost_maxRank = 4;
     jkGuiNetHost_maxPlayers = 4;
     Video_modeStruct.geoMode = 4;
@@ -373,8 +373,10 @@ int Main_Startup(const char *cmdline)
         rdStartup(&hs);
         jkGuiRend_Startup();
         jkGui_Startup();
+#if !defined(TARGET_NO_MULTIPLAYER_MENUS)
         jkGuiMultiplayer_Startup();
         jkGuiNetHost_Startup();
+#endif
         jkGuiSetup_Startup();
         jkGuiDisplay_Startup();
         jkGuiForce_Startup();
@@ -390,14 +392,18 @@ int Main_Startup(const char *cmdline)
         jkGuiControlOptions_Startup();
         jkGuiObjectives_Startup();
         jkGuiSingleTally_Startup();
+#if !defined(TARGET_NO_MULTIPLAYER_MENUS)
         jkGuiMultiTally_Startup();
         jkGuiBuildMulti_StartupEditCharacter();
+#endif
         jkGuiTitle_Startup();
         jkGuiGeneral_Startup();
         jkGuiGameplay_Startup();
         jkGuiDecision_Startup();
         jkGuiSingleplayer_Startup();
+#if !defined(TARGET_NO_MULTIPLAYER_MENUS)
         jkGuiBuildMulti_Startup();
+#endif
         jkGuiSaveLoad_Startup();
         jkGuiControlSaveLoad_Startup();
 #ifdef QOL_IMPROVEMENTS
@@ -428,7 +434,7 @@ int Main_Startup(const char *cmdline)
 
         if (jkRes_LoadCD(0))
         {
-#ifdef QOL_IMPROVEMENTS
+#if defined(QOL_IMPROVEMENTS) && !defined(TARGET_NO_MULTIPLAYER_MENUS)
             if (Main_bDedicatedServer || Main_bAutostart) {
                 if (Main_StartupDedicated(Main_bDedicatedServer))
                 {
@@ -462,7 +468,9 @@ void Main_Shutdown()
     jkSmack_Shutdown();
     jkGuiControlSaveLoad_Shutdown();
     jkGuiSaveLoad_Shutdown();
+#if !defined(TARGET_NO_MULTIPLAYER_MENUS)
     jkGuiBuildMulti_Shutdown();
+#endif
     jkGuiSingleplayer_Shutdown();
     jkGuiDecision_Shutdown();
     jkGuiGameplay_Shutdown();
@@ -478,8 +486,10 @@ void Main_Shutdown()
     jkGuiForce_Shutdown();
     jkGuiDisplay_Shutdown();
     jkGuiSetup_Shutdown();
+#if !defined(TARGET_NO_MULTIPLAYER_MENUS)
     jkGuiNetHost_Shutdown();
     jkGuiMultiplayer_Shutdown();
+#endif
     jkGuiMain_Shutdown();
     jkGuiPlayer_Shutdown();
     jkGuiSound_Shutdown();

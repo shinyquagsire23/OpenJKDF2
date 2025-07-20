@@ -344,7 +344,7 @@ int sithGamesave_SerializeAllThings(int mpFlags)
         }
     }
 
-    for (uint32_t i = 0; i < 256; i++) // TODO define this maximum
+    for (uint32_t i = 0; i < SITHAI_MAX_ACTORS; i++) // TODO define this maximum
     {
         if ( sithAI_actors[i].pAIClass ) {
             sithDSS_SendAIStatus(&sithAI_actors[i], 0, mpFlags);

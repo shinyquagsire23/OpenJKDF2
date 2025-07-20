@@ -66,10 +66,10 @@ extern "C" {
 #define rdMatrix_TransformPointLst34_ADDR (0x004423D0)
 #define rdMatrix_TransformPointLst44_ADDR (0x00442470)
 
-MATH_FUNC void rdMatrix_Build34(rdMatrix34 *out, const rdVector3 *rot, const rdVector3 *pos);
-MATH_FUNC void rdMatrix_BuildFromLook34(rdMatrix34 *out, const rdVector3 *lookAt);
-MATH_FUNC void rdMatrix_BuildCamera34(rdMatrix34 *out, const rdVector3 *rot, const rdVector3 *pos);
-MATH_FUNC void rdMatrix_InvertOrtho34(rdMatrix34 *out, const rdMatrix34 *in);
+MATH_FUNC FAST_FUNC void rdMatrix_Build34(rdMatrix34 *out, const rdVector3 *rot, const rdVector3 *pos);
+MATH_FUNC FAST_FUNC void rdMatrix_BuildFromLook34(rdMatrix34 *out, const rdVector3 *lookAt);
+MATH_FUNC FAST_FUNC void rdMatrix_BuildCamera34(rdMatrix34 *out, const rdVector3 *rot, const rdVector3 *pos);
+MATH_FUNC FAST_FUNC void rdMatrix_InvertOrtho34(rdMatrix34 *out, const rdMatrix34 *in);
 MATH_FUNC void rdMatrix_Build44(rdMatrix44 *out, const rdVector3 *rot, const rdVector3 *pos);
 MATH_FUNC void rdMatrix_BuildRotate34(rdMatrix34 *out, const rdVector3 *rot);
 MATH_FUNC void rdMatrix_BuildInverseRotate34(rdMatrix34 *out, const rdVector3 *rot);
@@ -89,11 +89,11 @@ MATH_FUNC void rdMatrix_Copy44(rdMatrix44 *dst, const rdMatrix44 *src);
 MATH_FUNC void rdMatrix_Copy34to44(rdMatrix44 *dst, const rdMatrix34 *src);
 MATH_FUNC void rdMatrix_Copy44to34(rdMatrix34 *dst, const rdMatrix44 *src);
 MATH_FUNC void rdMatrix_Transpose44(rdMatrix44 *out, const rdMatrix44 *src);
-MATH_FUNC void rdMatrix_Multiply34(rdMatrix34 *out, const rdMatrix34 *mat1, const rdMatrix34 *mat2);
+MATH_FUNC FAST_FUNC void rdMatrix_Multiply34(rdMatrix34 *out, const rdMatrix34 *mat1, const rdMatrix34 *mat2);
 MATH_FUNC void rdMatrix_Multiply44(rdMatrix44 *out, const rdMatrix44 *mat1, const rdMatrix44 *mat2);
-MATH_FUNC void rdMatrix_PreMultiply34(rdMatrix34 *mat1, rdMatrix34 *mat2);
+MATH_FUNC FAST_FUNC void rdMatrix_PreMultiply34(rdMatrix34 *mat1, rdMatrix34 *mat2);
 MATH_FUNC void rdMatrix_PreMultiply44(rdMatrix44 *mat1, rdMatrix44 *mat2);
-MATH_FUNC void rdMatrix_PostMultiply34(rdMatrix34 *mat1, rdMatrix34 *mat2);
+MATH_FUNC FAST_FUNC void rdMatrix_PostMultiply34(rdMatrix34 *mat1, rdMatrix34 *mat2);
 MATH_FUNC void rdMatrix_PostMultiply44(rdMatrix44 *mat1, rdMatrix44 *mat2);
 MATH_FUNC void rdMatrix_PreRotate34(rdMatrix34 *out, rdVector3 *rot);
 MATH_FUNC void rdMatrix_PreRotate44(rdMatrix44 *out, rdVector3 *rot);
@@ -111,13 +111,13 @@ MATH_FUNC void rdMatrix_SetRowVector34(rdMatrix34 *m, int row, rdVector3 *in);
 MATH_FUNC void rdMatrix_SetRowVector44(rdMatrix44 *m, int row, rdVector4 *in);
 MATH_FUNC void rdMatrix_GetRowVector34(rdMatrix34 *m, int row, rdVector3 *out);
 MATH_FUNC void rdMatrix_GetRowVector44(rdMatrix44 *m, int row, rdVector4 *out);
-MATH_FUNC void rdMatrix_TransformVector34(rdVector3 *out, const rdVector3 *v, const rdMatrix34 *m);
+MATH_FUNC FAST_FUNC void rdMatrix_TransformVector34(rdVector3 *out, const rdVector3 *v, const rdMatrix34 *m);
 MATH_FUNC void rdMatrix_TransformVector34Acc_0(rdVector3 *a1, const rdVector3 *a2, const rdMatrix34 *a3);
 MATH_FUNC void rdMatrix_TransformVector34Acc(rdVector3 *a1, const rdMatrix34 *a2);
 MATH_FUNC void rdMatrix_TransformVector44(rdMatrix44 *a1, const rdVector4 *a2, const rdMatrix44 *a3);
 MATH_FUNC void rdMatrix_TransformVector44Acc(rdVector4 *a1, const rdMatrix44 *a2);
-MATH_FUNC void rdMatrix_TransformPoint34(rdVector3 *vertex_out, const rdVector3 *vertex, const rdMatrix34 *camera);
-MATH_FUNC void rdMatrix_TransformPoint34Acc(rdVector3 *a1, const rdMatrix34 *a2);
+MATH_FUNC FAST_FUNC void rdMatrix_TransformPoint34(rdVector3 *vertex_out, const rdVector3 *vertex, const rdMatrix34 *camera);
+MATH_FUNC FAST_FUNC void rdMatrix_TransformPoint34Acc(rdVector3 *a1, const rdMatrix34 *a2);
 MATH_FUNC void rdMatrix_TransformPoint44(rdVector4 *a1, const rdVector4 *a2, const rdMatrix44 *a3);
 MATH_FUNC void rdMatrix_TransformPoint44Acc(rdVector4 *a1, const rdMatrix44 *a2);
 MATH_FUNC void rdMatrix_TransformPointLst34(const rdMatrix34 *m, const rdVector3 *in, rdVector3 *out, int num);

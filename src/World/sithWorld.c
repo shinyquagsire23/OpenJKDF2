@@ -670,22 +670,12 @@ int sithWorld_Initialize()
 
 int sithWorld_LoadGeoresource(sithWorld *pWorld, int a2)
 {
-    rdVector3 *vertices; // eax
-    rdVector3 *vertex; // esi
-    rdVector2 *vertices_uvs; // eax
-    rdVector2 *vertex_uvs; // esi
-    int v14; // eax
-    int v15; // edi
-    unsigned int num_vertices; // [esp+Ch] [ebp-A4h] BYREF
-    unsigned int num_vertices_uvs; // [esp+10h] [ebp-A0h] BYREF
-    unsigned int numColormaps; // [esp+14h] [ebp-9Ch] BYREF
-    int v_idx; // [esp+18h] [ebp-98h] BYREF
-    flex32_t v_x; // [esp+1Ch] [ebp-94h] BYREF
-    flex32_t v21; // [esp+20h] [ebp-90h] BYREF
-    flex32_t v_y; // [esp+24h] [ebp-8Ch] BYREF
-    flex32_t v23; // [esp+28h] [ebp-88h] BYREF
-    flex32_t v_z; // [esp+2Ch] [ebp-84h] BYREF
-    char colormap_fname[128]; // [esp+30h] [ebp-80h] BYREF
+    uint32_t numVertices;
+    uint32_t textureVertices;
+    uint32_t numColormaps; // [esp+14h] [ebp-9Ch] BYREF
+    int v_idx;
+    flex32_t v_x, v_y, v_z, v_u, v_v;
+    char colormap_fname[128];
 
     if ( a2 )
         return 0;
@@ -736,20 +726,18 @@ int sithWorld_LoadGeoresource(sithWorld *pWorld, int a2)
         return 0;
     }
 
-    if (_sscanf(stdConffile_aLine, " world vertices %d", &num_vertices) != 1 )
+    if (_sscanf(stdConffile_aLine, " world vertices %d", &numVertices) != 1 )
     {
         return 0;
     }
 
-    vertices = (rdVector3 *)pSithHS->alloc(sizeof(rdVector3) * num_vertices);
-    pWorld->vertices = vertices;
-    if (!vertices)
+    pWorld->vertices = (rdVector3 *)pSithHS->alloc(sizeof(rdVector3) * numVertices);
+    if (!pWorld->vertices)
     {
         return 0;
     }
 
-    vertex = vertices;
-    for (int i = 0; i < num_vertices; i++)
+    for (int i = 0; i < numVertices; i++)
     {
         if (!stdConffile_ReadLine())
         {
@@ -761,49 +749,41 @@ int sithWorld_LoadGeoresource(sithWorld *pWorld, int a2)
             return 0;
         }
 
-        vertex->x = v_x;
-        vertex->y = v_y;
-        vertex->z = v_z;
-        ++vertex;
+        pWorld->vertices[i].x = v_x;
+        pWorld->vertices[i].y = v_y;
+        pWorld->vertices[i].z = v_z;
     }
 
-    pWorld->numVertices = num_vertices;
+    pWorld->numVertices = numVertices;
     if (!stdConffile_ReadLine())
     {
         return 0;
     }
 
-    if (_sscanf(stdConffile_aLine, " world texture vertices %d", &num_vertices_uvs) != 1)
+    if (_sscanf(stdConffile_aLine, " world texture vertices %d", &textureVertices) != 1)
     {
         return 0;
     }
 
-    pWorld->vertexUVs = (rdVector2 *)pSithHS->alloc(sizeof(rdVector2) * num_vertices_uvs);
+    pWorld->vertexUVs = (rdVector2 *)pSithHS->alloc(sizeof(rdVector2) * textureVertices);
     if (!pWorld->vertexUVs)
     {
         return 0;
     }
 
-    vertex_uvs = pWorld->vertexUVs;
-    v14 = num_vertices_uvs;
-    v15 = 0;
-    if ( !num_vertices_uvs )
-    {
-LABEL_28:
-        pWorld->numVertexUVs = v14;
-        return sithSurface_Load(pWorld) != 0;
-    }
-    while ( stdConffile_ReadLine() && _sscanf(stdConffile_aLine, " %d: %f %f", &v_idx, &v21, &v23) == 3 )
-    {
-        vertex_uvs->x = v21;
-        vertex_uvs->y = v23;
-        v14 = num_vertices_uvs;
-        ++vertex_uvs;
-        if ( ++v15 >= num_vertices_uvs )
-            goto LABEL_28;
+    for (int i = 0; i < textureVertices; i++) {
+        if (!stdConffile_ReadLine()) {
+            return 0;
+        }
+        if (_sscanf(stdConffile_aLine, " %d: %f %f", &v_idx, &v_u, &v_v) != 3) {
+            return 0;
+        }
+
+        pWorld->vertexUVs[i].x = v_u;
+        pWorld->vertexUVs[i].y = v_v;
     }
 
-    return 0;
+    return sithSurface_Load(pWorld) != 0;
 }
 
 void sithWorld_sub_4D0A20(sithWorld *pWorld)

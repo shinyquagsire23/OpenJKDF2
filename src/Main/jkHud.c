@@ -241,6 +241,10 @@ int jkHud_ClearRects(int unk)
     int result; // eax
     rdRect a4; // [esp+Ch] [ebp-10h] BYREF
 
+    // Added: no crashing
+    if (!jkHud_bOpened)
+        return 1;
+
     v0 = Video_pCanvas->xStart;
     v1 = 0;
     if ( jkHud_rectViewScores.x < v0 )

@@ -62,6 +62,7 @@ set(TARGET_TWL FALSE)
 set(TARGET_HOOKS FALSE)
 set(TARGET_NO_BLOBS FALSE)
 set(TARGET_CAN_JKGM FALSE)
+set(TARGET_NO_MULTIPLAYER_MENUS FALSE)
 set(OPENJKDF2_USE_BLOBS FALSE CACHE BOOL "Use blobs")
 
 # Options for compiling
@@ -197,6 +198,17 @@ file(GLOB GAME_MAIN_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/main.c)
 file(GLOB TEST_SRCS ${PROJECT_SOURCE_DIR}/src/Tests/*.c)
 list(REMOVE_ITEM ENGINE_SOURCE_FILES ${TEST_SRCS})
 list(REMOVE_ITEM ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/main.c)
+
+# Remove multiplayer menus from compilation
+file(GLOB MULTIPLAYER_MENU_SRCS 
+    ${PROJECT_SOURCE_DIR}/src/Gui/jkGUIMultiplayer.c
+    ${PROJECT_SOURCE_DIR}/src/Gui/jkGUIMultTally.c
+    ${PROJECT_SOURCE_DIR}/src/Gui/jkGUINetHost.c
+    ${PROJECT_SOURCE_DIR}/src/Gui/jkGUIBuildMulti.c
+)
+if (TARGET_NO_MULTIPLAYER_MENUS)
+    list(REMOVE_ITEM ENGINE_SOURCE_FILES ${MULTIPLAYER_MENU_SRCS})
+endif()
 
 # Fcaseopen
 file(GLOB FCASEOPEN_SRCS ${PROJECT_SOURCE_DIR}/src/external/fcaseopen/*.c)

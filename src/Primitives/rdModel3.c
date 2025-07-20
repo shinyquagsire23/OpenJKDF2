@@ -218,6 +218,10 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
             }
             mesh->radius = radius; // FLEXTODO
             
+#ifdef STDPLATFORM_HEAP_SUGGESTIONS
+            pSithHS->suggestHeap(HEAP_FAST);
+#endif
+
             mesh->vertices = 0;
             mesh->vertices_i = 0;
             mesh->vertices_unk = 0;
@@ -286,6 +290,9 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
                 if ( !mesh->vertexNormals )
                     goto fail;
             }
+#ifdef STDPLATFORM_HEAP_SUGGESTIONS
+            pSithHS->suggestHeap(HEAP_ANY);
+#endif
             for (v29 = 0; v29 < mesh->numVertices; v29++ )
             {
                 
@@ -490,6 +497,9 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
     return 1;
 
 fail:
+#ifdef STDPLATFORM_HEAP_SUGGESTIONS
+    pSithHS->suggestHeap(HEAP_ANY);
+#endif
     stdConffile_Close();
     return 0;
 }

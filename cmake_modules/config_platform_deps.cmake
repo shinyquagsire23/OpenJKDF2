@@ -39,6 +39,10 @@ if(TARGET_NO_BLOBS)
     add_definitions(-DNO_JK_MMAP)
 endif()
 
+if (TARGET_NO_MULTIPLAYER_MENUS)
+    add_definitions(-DTARGET_NO_MULTIPLAYER_MENUS)
+endif()
+
 # Enables all force powers by default, useful for debugging.
 if(DEBUG_QOL_CHEATS)
     add_definitions(-DDEBUG_QOL_CHEATS)
@@ -211,7 +215,9 @@ if(TARGET_MACOS)
 endif()
 
 if(TARGET_TWL)
-    file(GLOB TARGET_TWL_SRCS ${PROJECT_SOURCE_DIR}/src/Platform/TWL/*.c)
+    file(GLOB TARGET_TWL_SRCS ${PROJECT_SOURCE_DIR}/src/Platform/TWL/*.c ${PROJECT_SOURCE_DIR}/src/Platform/TWL/mpu.s)
+    set_property(SOURCE ${PROJECT_SOURCE_DIR}/src/Platform/TWL/mpu.s PROPERTY LANGUAGE C)
+    set_property(SOURCE ${PROJECT_SOURCE_DIR}/src/Platform/TWL/mpu.s APPEND PROPERTY COMPILE_OPTIONS "-x" "assembler-with-cpp")
     list(APPEND ENGINE_SOURCE_FILES ${TARGET_TWL_SRCS})
 endif()
 

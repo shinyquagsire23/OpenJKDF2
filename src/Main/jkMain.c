@@ -637,12 +637,14 @@ LABEL_28:
         else {
             thing_six = 1;
             stdControl_ToggleCursor(0);
+#if !defined(TARGET_NO_MULTIPLAYER_MENUS)
             if ( jkGuiMultiplayer_ShowSynchronizing() == 1 )
             {
                 thing_six = 0;
                 stdControl_ToggleCursor(1);
                 goto LABEL_28;
             }
+#endif
             sithMain_Close();
             sithMulti_Shutdown();
             if ( jkGuiRend_thing_five )

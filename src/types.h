@@ -105,22 +105,6 @@ typedef uint32_t size_t;
 
 #include "Primitives/rdRect.h"
 
-#ifdef QOL_IMPROVEMENTS
-#define SITH_MAX_SYNC_THINGS (128)
-#else
-#define SITH_MAX_SYNC_THINGS (16)
-#endif
-
-#ifdef QOL_IMPROVEMENTS
-    #define SITH_NUM_EVENTS (6)
-#else // !QOL_IMPROVEMENTS
-    #ifdef JKM_TYPES
-        #define SITH_NUM_EVENTS (6)
-    #else // !JKM_TYPES
-        #define SITH_NUM_EVENTS (5)
-    #endif // JKM_TYPES
-#endif // QOL_IMPROVEMENTS
-
 
 #if defined(JK_NO_MMAP)
 //#define RDCACHE_MAX_TRIS (0x2000)
@@ -1975,6 +1959,9 @@ typedef struct HostServicesBasic
     int (*fileSize)(stdFile_t);
     int (*filePrintf)(stdFile_t, const char*, ...);
     const wchar_t* (*fileGetws)(stdFile_t, wchar_t *, size_t);
+#ifdef STDPLATFORM_HEAP_SUGGESTIONS
+    void (*suggestHeap)(int);
+#endif
 } HostServicesBasic;
 
 typedef struct HostServices
@@ -2002,6 +1989,9 @@ typedef struct HostServices
     int (*fileSize)(stdFile_t);
     int (*filePrintf)(stdFile_t, const char*, ...);
     const wchar_t* (*fileGetws)(stdFile_t, wchar_t *, size_t);
+#ifdef STDPLATFORM_HEAP_SUGGESTIONS
+    int (*suggestHeap)(int);
+#endif
     void* (*allocHandle)(size_t);
     void (*freeHandle)(void*);
     void* (*reallocHandle)(void*, size_t);

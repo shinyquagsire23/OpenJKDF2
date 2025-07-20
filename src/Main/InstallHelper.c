@@ -1130,12 +1130,15 @@ void InstallHelper_SetCwd()
         chdir("mots/");
     }
 #elif defined(TARGET_TWL)
+    char tmp[128];
+    extern char openjkdf2_aOrigCwd[512];
     if (!Main_bMotsCompat) {
-        chdir("sd:/jk1/");
+        snprintf(tmp, sizeof(tmp)-1, "%sjk1/", openjkdf2_aOrigCwd);
     }
     else {
-        chdir("sd:/mots/");
+        snprintf(tmp, sizeof(tmp)-1, "%smots/", openjkdf2_aOrigCwd);
     }
+    chdir(tmp);
 #else
     if (!Main_bMotsCompat) {
         chdir("/jk1/");

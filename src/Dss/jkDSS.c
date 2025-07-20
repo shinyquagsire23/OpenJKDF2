@@ -83,7 +83,9 @@ int jkDSS_Startup()
         sithComm_SetMsgFunc(DSS_SABERINFO2, jkDSS_ProcessSetSaberInfo);
     }
     sithComm_SetMsgFunc(DSS_SETTEAM, jkDSS_ProcessSetTeam);
+#if !defined(TARGET_NO_MULTIPLAYER_MENUS)
     sithComm_SetMsgFunc(DSS_JOINING, jkGuiMultiplayer_CogMsgHandleJoining);
+#endif
     sithGamesave_Setidk(jkDSS_playerconfig_idksync, jkDSS_player_thingsidkfunc, jkDSS_nullsub_2, jkDSS_Write, jkDSS_Load);
     sithMulti_SetHandleridk(jkDSS_idk4);
 
