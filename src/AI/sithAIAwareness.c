@@ -75,7 +75,7 @@ int sithAIAwareness_Tick(int32_t a, sithEventInfo* b)
     {
         // Added: prevent OOB access
         // TODO: define this maximum
-        if (v3 >= 256) break;
+        if (v3 >= SITHAI_MAX_ACTORS) break;
 
         sithActor* i = &sithAI_actors[v3];
 

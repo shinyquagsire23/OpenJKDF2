@@ -59,7 +59,7 @@ int sithCogParse_Load(char *cog_fpath, sithCogScript *cogscript, int unk)
     _memset(cogscript, 0, sizeof(sithCogScript));
 #ifdef STDHASHTABLE_CRC32_KEYS
     const char* fname = stdFileFromPath(cog_fpath);
-    cogscript->pathCrc = crc32(fname, strlen(fname));
+    cogscript->pathCrc = stdCrc32(fname, strlen(fname));
 #else
     stdString_SafeStrCopy(cogscript->cog_fpath, stdFileFromPath(cog_fpath), 32);
 #endif
@@ -425,6 +425,7 @@ int sithCogParse_ReallocSymboltable(sithCogSymboltable *table)
         table->max_entries = reallocAmt;
     }
     result = table->max_entries;
+#ifndef COG_CRC32_SYMBOL_NAMES
     i_ = 0;
     if ( result )
     {
@@ -432,11 +433,11 @@ int sithCogParse_ReallocSymboltable(sithCogSymboltable *table)
         i = 0;
         do
         {
-            if ( buckets[i].field_18 )
+            if ( buckets[i].pName )
             {
-                pSithHS->free(buckets[i].field_18);
+                pSithHS->free(buckets[i].pName);
                 buckets = table->buckets;
-                table->buckets[i].field_18 = 0;
+                table->buckets[i].pName = 0;
             }
             result = table->max_entries;
             ++i_;
@@ -444,6 +445,7 @@ int sithCogParse_ReallocSymboltable(sithCogSymboltable *table)
         }
         while ( i_ < result );
     }
+#endif
     return result;
 }
 
@@ -469,8 +471,10 @@ void sithCogParse_FreeSymboltable(sithCogSymboltable *table)
                 v3 = 0;
                 do
                 {
-                    if ( v1[v3].field_18 )
-                        pSithHS->free(v1[v3].field_18);
+#ifndef COG_CRC32_SYMBOL_NAMES
+                    if ( v1[v3].pName )
+                        pSithHS->free(v1[v3].pName);
+#endif
                     v1 = table->buckets;
                     if ( table->buckets[v3].val.type == 4 )
                     {
@@ -498,11 +502,18 @@ sithCogSymbol* sithCogParse_AddSymbol(sithCogSymboltable *table, const char *sym
         table->entry_cnt++;
         if ( symbolName )
         {
+#if !defined(COG_CRC32_SYMBOL_NAMES)
             char* key = (char *)pSithHS->alloc(_strlen(symbolName) + 1);
             _strcpy(key, symbolName);
-            symbol->field_18 = key;
+            symbol->pName = key;
             if ( table->hashtable )
                 stdHashTable_SetKeyVal(table->hashtable, key, symbol);
+#else
+            symbol->nameCrc = stdCrc32(symbolName, strlen(symbolName));
+            if ( table->hashtable )
+                stdHashTable_SetKeyVal(table->hashtable, symbolName, symbol);
+#endif
+            
         }
         symbol->field_14 = cog_yacc_loop_depth;
         cog_yacc_loop_depth++;

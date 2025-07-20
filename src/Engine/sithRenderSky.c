@@ -52,7 +52,7 @@ void sithRenderSky_TransformHorizontal(rdProcEntry *pProcEntry, sithSurfaceInfo 
     {
         pVertXYZ->z = rdCamera_pCurCamera->pClipFrustum->zFar; // zFar
 #ifdef TARGET_TWL
-        pVertXYZ->z = 2.0f; // TODO figure out actual zfar or do this hack somewhere else
+        //pVertXYZ->z = 2.0f; // TODO figure out actual zfar or do this hack somewhere else
 #endif
 
         tmp1 = (pVertXYZ->x - rdCamera_pCurCamera->canvas->half_screen_width) * sithSector_flt_8553C0;
@@ -109,7 +109,7 @@ void sithRenderSky_TransformVertical(rdProcEntry *pProcEntry, sithSurfaceInfo *p
         pProcEntry->vertices[i].z = stdMath_Clamp(pProcEntry->vertices[i].z, 0.0f, rdCamera_pCurCamera->pClipFrustum->zFar);
 #endif
 #ifdef TARGET_TWL
-        pProcEntry->vertices[i].z = 2.0f; // TODO figure out actual zfar or do this hack somewhere else
+        //pProcEntry->vertices[i].z = 2.0f; // TODO figure out actual zfar or do this hack somewhere else
 #endif
     }
 }

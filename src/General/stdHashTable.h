@@ -17,18 +17,25 @@
 #define stdHashTable_Dump_ADDR (0x00438040) // unused but interesting
 
 typedef struct stdLinklist stdLinklist;
+typedef struct stdSingleLinklist stdSingleLinklist;
+
+#ifdef STDHASHTABLE_SINGLE_LINKLIST
+typedef stdSingleLinklist tHashLink;
+#else
+typedef stdLinklist tHashLink;
+#endif
 
 typedef struct stdHashTable
 {
     int numBuckets;
-    stdLinklist* buckets;
+    tHashLink* buckets;
     uint32_t (*keyHashToIndex)(const char *data, uint32_t numBuckets);
 } stdHashTable;
 
 uint32_t stdHashTable_HashStringToIdx(const char *data, uint32_t numBuckets);
 stdHashTable* stdHashTable_New(int maxEntries);
-stdLinklist* stdHashTable_GetBucketTail(stdLinklist *pLL);
-void stdHashTable_FreeBuckets(stdLinklist *a1);
+tHashLink* stdHashTable_GetBucketTail(tHashLink *pLL);
+void stdHashTable_FreeBuckets(tHashLink *a1);
 void stdHashTable_Free(stdHashTable *table);
 #ifdef STDHASHTABLE_CRC32_KEYS
 int stdHashTable_FreeKeyCrc32(stdHashTable *hashtable, uint32_t keyCrc32);

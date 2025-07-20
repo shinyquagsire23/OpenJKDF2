@@ -367,7 +367,6 @@ LABEL_7:
     ++jkDev_log_55A4A4;
     jkDev_aEntries[v6].bDrawEntry = 2;
     jkDev_aEntries[v6].field_10C = 2;
-#ifdef QOL_IMPROVEMENTS
     char tmp[256];
     char tmp2[256+2];
     stdString_WcharToChar(tmp, str, 255);
@@ -375,6 +374,7 @@ LABEL_7:
     printf("\r                                            \r");
     stdString_snprintf(tmp2, sizeof(tmp2), "%s%c", tmp, _strlen(tmp) && tmp[_strlen(tmp)-1] == '\n' ? ' ' : '\n');
     printf("%s", tmp2);
+#ifdef QUAKE_CONSOLE
     jkQuakeConsole_PrintLine(tmp2);
 #endif
     return v5;

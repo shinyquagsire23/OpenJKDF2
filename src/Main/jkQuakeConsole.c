@@ -5,6 +5,7 @@
 #include "General/stdFont.h"
 #include "General/stdString.h"
 #include "General/stdLinklist.h"
+#include "General/stdSingleLinklist.h"
 #include "Win95/stdDisplay.h"
 #include "Devices/sithConsole.h"
 #include "Win95/WinIdk.h"
@@ -329,7 +330,7 @@ int jkQuakeConsole_AutocompleteCheats()
     int bPrintOnce = 0;
     for (int i = 0; i < jkDev_cheatHashtable->numBuckets; i++)
     {
-        stdLinklist* pIter = &jkDev_cheatHashtable->buckets[i];
+        tHashLink* pIter = &jkDev_cheatHashtable->buckets[i];
         while (pIter)
         {
             if (pIter->key) {
@@ -354,7 +355,7 @@ int jkQuakeConsole_AutocompleteConsoleCmds()
     int bPrintOnce = 0;
     for (int i = 0; i < sithConsole_pCmdHashtable->numBuckets; i++)
     {
-        stdLinklist* pIter = &sithConsole_pCmdHashtable->buckets[i];
+        tHashLink* pIter = &sithConsole_pCmdHashtable->buckets[i];
         while (pIter)
         {
             if (pIter->key) {

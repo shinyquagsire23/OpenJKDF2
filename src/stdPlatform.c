@@ -159,7 +159,11 @@ static int Linux_stdFtell(stdFile_t fhand)
 
 static void* Linux_alloc(uint32_t len)
 {
-    return malloc(len);
+    void* ret = malloc(len);
+    if (ret) {
+        memset(ret, 0, len);
+    }
+    return ret;
 }
 
 static void Linux_free(void* ptr)
@@ -600,15 +604,17 @@ int stdPlatform_Printf(const char *fmt, ...)
     int ret = vprintf(fmt, args);
     va_end (args);
 
+#ifdef QUAKE_CONSOLE
     va_start (args, fmt);
     vsnprintf(tmp, sizeof(tmp), fmt, args);
     jkQuakeConsole_PrintLine(tmp);
+    va_end(args);
+#endif
 
 #ifdef TARGET_ANDROID
     LOGI("%s", tmp);
 #endif
 
-    va_end (args);
 #ifdef SDL2_RENDER
     SDL_UnlockMutex(stdPlatform_mtxPrintf);
 #endif

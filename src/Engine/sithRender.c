@@ -386,10 +386,13 @@ void sithRender_Draw()
         sithRender_Clip(sithCamera_currentCamera->sector, rdCamera_pCurCamera->pClipFrustum, 0.0, 0);
     }
     else {
+        sithRender_Clip(sithCamera_currentCamera->sector, rdCamera_pCurCamera->pClipFrustum, 0.0, 0);
+
         // TODO: Basic view sphere clipping at least?
         for (int i = 0; i < sithWorld_pCurrentWorld->numSectors; i++)
         {
-            sithRender_Clip(&sithWorld_pCurrentWorld->sectors[i], rdCamera_pCurCamera->pClipFrustum, 0.0, 0);
+            if (&sithWorld_pCurrentWorld->sectors[i] != sithCamera_currentCamera->sector)
+                sithRender_Clip(&sithWorld_pCurrentWorld->sectors[i], rdCamera_pCurCamera->pClipFrustum, 0.0, 0);
         }
     }
 #ifdef TARGET_TWL
@@ -1311,6 +1314,9 @@ void sithRender_RenderLevelGeometry()
         rdSetProcFaceUserData(level_idk->id);
         v65 = level_idk->surfaces;
 
+#ifdef TARGET_TWL
+        BOOL noDistCulling = (level_idk != sithCamera_currentCamera->sector);
+#endif
         for (v75 = 0; v75 < level_idk->numSurfaces; v65->field_4 = sithRender_lastRenderTick, ++v65, v75++)
         {
             if ( !v65->surfaceInfo.face.geometryMode )
@@ -1324,7 +1330,7 @@ void sithRender_RenderLevelGeometry()
             if (dist <= 0.0 )
                 continue;
 #ifdef TARGET_TWL
-            if (dist > 3.0 && !(v65->surfaceFlags & (SITH_SURFACE_HORIZON_SKY|SITH_SURFACE_CEILING_SKY))) {
+            if (noDistCulling && dist > 3.0 && !(v65->surfaceFlags & (SITH_SURFACE_HORIZON_SKY|SITH_SURFACE_CEILING_SKY))) {
                 continue;
             }
 #endif
@@ -1677,7 +1683,7 @@ void sithRender_RenderLevelGeometry()
 #ifdef TARGET_TWL
                     skip_this_surface = 1;
                     surfaceFlags = v65->surfaceFlags;
-                    if (!(surfaceFlags & (SITH_SURFACE_HORIZON_SKY | SITH_SURFACE_CEILING_SKY)))
+                    if (!noDistCulling && !(surfaceFlags & (SITH_SURFACE_HORIZON_SKY | SITH_SURFACE_CEILING_SKY)))
                     {
                         for (int i = 0; i < meshinfo_out.numVertices; i++) {
                             //printf("%f\n", (float)v20->vertices[i].y);
@@ -1689,6 +1695,9 @@ void sithRender_RenderLevelGeometry()
                         if (skip_this_surface) {
                             goto LABEL_92;
                         }
+                    }
+                    else {
+                        skip_this_surface = 0;
                     }
 #endif
 

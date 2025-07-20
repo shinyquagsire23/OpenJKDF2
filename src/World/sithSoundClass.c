@@ -198,7 +198,7 @@ int sithSoundClass_Load(sithWorld *world, int a2)
                 {
                     current_soundclass = &sithWorld_pLoading->soundclasses[idx];
 #ifdef STDHASHTABLE_CRC32_KEYS
-                    current_soundclass->nameCrc = crc32(v6, strlen(v6));
+                    current_soundclass->nameCrc = stdCrc32(v6, strlen(v6));
 #endif
 #ifdef SITH_DEBUG_STRUCT_NAMES
                     stdString_SafeStrCopy(current_soundclass->snd_fname, v6, 32);
@@ -207,7 +207,11 @@ int sithSoundClass_Load(sithWorld *world, int a2)
                     {
                         v10 = sithSoundClass_hashtable;
                         ++sithWorld_pLoading->numSoundClassesLoaded;
+#ifdef SITH_DEBUG_STRUCT_NAMES
+                        stdHashTable_SetKeyVal(v10, current_soundclass->snd_fname, current_soundclass); // this is load-bearing
+#else
                         stdHashTable_SetKeyVal(v10, v6, current_soundclass); // current_soundclass->snd_fname -> v6
+#endif
                     }
                 }
             }
@@ -241,7 +245,7 @@ sithSoundClass* sithSoundClass_LoadFile(char *fpath)
         return 0;
     v4 = &v1->soundclasses[v3];
 #ifdef STDHASHTABLE_CRC32_KEYS
-    v4->nameCrc = crc32(fpath, strlen(fpath));
+    v4->nameCrc = stdCrc32(fpath, strlen(fpath));
 #endif
 #ifdef SITH_DEBUG_STRUCT_NAMES
     stdString_SafeStrCopy(v4->snd_fname, fpath, 32);
@@ -250,7 +254,11 @@ sithSoundClass* sithSoundClass_LoadFile(char *fpath)
         return 0;
     v5 = sithSoundClass_hashtable;
     ++v1->numSoundClassesLoaded;
+#ifdef SITH_DEBUG_STRUCT_NAMES
+    stdHashTable_SetKeyVal(v5, v4->snd_fname, v4); // this is a load-bearing ifdef
+#else
     stdHashTable_SetKeyVal(v5, fpath, v4); // Added: v4->snd_fname -> fpath
+#endif
     return v4;
 }
 

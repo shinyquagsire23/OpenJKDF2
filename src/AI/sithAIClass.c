@@ -121,12 +121,17 @@ sithAIClass* sithAIClass_Load(char *fpath)
     stdString_SafeStrCopy(aiclass->fpath, fpath, 32);
 #endif
 #ifdef STDHASHTABLE_CRC32_KEYS
-    aiclass->fpathcrc = crc32(fpath, strlen(fpath));
+    aiclass->fpathcrc = stdCrc32(fpath, strlen(fpath));
 #endif
 
     if ( sithAIClass_LoadEntry(fullpath, aiclass) )
     {
+#ifdef SITH_DEBUG_STRUCT_NAMES
+            // The copies of names are load-bearing, SetKeyVal stores a reference
+        stdHashTable_SetKeyVal(sithAIClass_hashmap, aiclass->fpath, aiclass);
+#else
         stdHashTable_SetKeyVal(sithAIClass_hashmap, fpath, aiclass);
+#endif
         aiclass->index = world->numAIClassesLoaded++;
         
         return aiclass;

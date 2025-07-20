@@ -76,9 +76,15 @@ int rdThing_SetModel3(rdThing *thing, rdModel3 *model)
     thing->type = RD_THINGTYPE_MODEL;
     thing->model3 = model;
     thing->geosetSelect = -1;
- 
+
+#ifdef STDPLATFORM_HEAP_SUGGESTIONS
+    int prevSuggest = pSithHS->suggestHeap(HEAP_FAST);
+#endif
     thing->hierarchyNodeMatrices = (rdMatrix34*)rdroid_pHS->alloc(sizeof(rdMatrix34) * model->numHierarchyNodes);
-    
+#ifdef STDPLATFORM_HEAP_SUGGESTIONS
+    pSithHS->suggestHeap(prevSuggest);
+#endif
+
     // moved
     if (!thing->hierarchyNodeMatrices)
         return 0;
@@ -180,9 +186,7 @@ void rdThing_AccumulateMatrices(rdThing *thing, rdHierarchyNode *node, rdMatrix3
     rdMatrix_PostMultiply34(&matrix, &thing->hierarchyNodeMatrices[node->idx]);
     if ( node->parent )
     {
-        negPivot.x = -node->parent->pivot.x;
-        negPivot.y = -node->parent->pivot.y;
-        negPivot.z = -node->parent->pivot.z;
+        rdVector_Neg3(&negPivot, &node->parent->pivot);
         rdMatrix_PostTranslate34(&matrix, &negPivot);
     }
     rdMatrix_Multiply34(&thing->hierarchyNodeMatrices[node->idx], acc, &matrix);

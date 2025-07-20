@@ -386,7 +386,9 @@ int Window_lastMouseY = 0;
 int Window_xPos = SDL_WINDOWPOS_CENTERED;
 int Window_yPos = SDL_WINDOWPOS_CENTERED;
 int last_jkGame_isDDraw = 0;
+#ifdef QUAKE_CONSOLE
 int last_jkQuakeConsole_bOpen = 0;
+#endif
 int Window_menu_mouseX = 0;
 int Window_menu_mouseY = 0;
 
@@ -659,13 +661,17 @@ void Window_UpdateHeadless()
 
         if (!jkGuiBuildMulti_bRendering) {
             std3D_StartScene();
+#ifdef QUAKE_CONSOLE
             jkQuakeConsole_Render();
+#endif
             std3D_DrawMenu();
             std3D_EndScene();
             //SDL_GL_SwapWindow(displayWindow);
         }
         else {
+#ifdef QUAKE_CONSOLE
             jkQuakeConsole_Render();
+#endif
             std3D_DrawMenu();
             //SDL_GL_SwapWindow(displayWindow);
             //menu_framelimit_amt_ms = 64;
@@ -1007,13 +1013,17 @@ void Window_SdlUpdate()
 
         if (!jkGuiBuildMulti_bRendering) {
             std3D_StartScene();
+#ifdef QUAKE_CONSOLE
             jkQuakeConsole_Render();
+#endif
             std3D_DrawMenu();
             std3D_EndScene();
             SDL_GL_SwapWindow(displayWindow);
         }
         else {
+#ifdef QUAKE_CONSOLE
             jkQuakeConsole_Render();
+#endif
             std3D_DrawMenu();
             SDL_GL_SwapWindow(displayWindow);
             //menu_framelimit_amt_ms = 64;
@@ -1049,6 +1059,8 @@ void Window_SdlUpdate()
             Window_lastYRel = 0;
         }
 
+#ifdef QUAKE_CONSOLE
+
         if (jkQuakeConsole_bOpen && jkQuakeConsole_bOpen != last_jkQuakeConsole_bOpen) {
             SDL_WarpMouseInWindow(displayWindow, Window_menu_mouseX, Window_menu_mouseY);
         }
@@ -1072,12 +1084,15 @@ void Window_SdlUpdate()
         {
             SDL_SetRelativeMouseMode(SDL_FALSE);
         }
+#endif
     }
 
     jkPlayer_enableVsync_last = jkPlayer_enableVsync;
 
     last_jkGame_isDDraw = jkGame_isDDraw;
+#ifdef QUAKE_CONSOLE
     last_jkQuakeConsole_bOpen = jkQuakeConsole_bOpen;
+#endif
 }
 
 void Window_SdlVblank()

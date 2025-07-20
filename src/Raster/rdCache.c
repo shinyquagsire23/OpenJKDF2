@@ -680,6 +680,7 @@ int rdCache_SendFaceListToHardware()
 #ifdef TARGET_TWL
                 rdCache_aHWVertices[rdCache_totalVerts].x = (active_6c->vertices[vtx_idx].x * res_fix_x) * v38; // Added: The original game rounded to ints here (with ceilf?)
                 rdCache_aHWVertices[rdCache_totalVerts].y = (active_6c->vertices[vtx_idx].y * res_fix_y) * v38; // Added: The original game rounded to ints here (with ceilf?)
+                v38 = stdMath_Clamp(v38, 0.0, SITHCAMERA_ZFAR);
 #endif
                 rdCache_aHWVertices[rdCache_totalVerts].z = v38;
 
@@ -827,7 +828,7 @@ int rdCache_SendFaceListToHardware()
                 uvs_in_pixels = v52->vertexUVs;
 
                 // DSi wants UVs in pixels
-#ifdef TARGET_TWL
+#if defined(TARGET_TWL) && defined(EXPERIMENTAL_FIXED_POINT)
                 rdCache_aHWVertices[rdCache_totalVerts].tu = uvs_in_pixels[vtx_idx].x >> mipmap_level;
                 rdCache_aHWVertices[rdCache_totalVerts].tv = uvs_in_pixels[vtx_idx].y >> mipmap_level;
 #else
@@ -986,6 +987,7 @@ LABEL_232:
 #ifdef TARGET_TWL
             rdCache_aHWVertices[rdCache_totalVerts].x = ((active_6c->vertices[tmpiter].x * res_fix_x) * v89);  // Added: The original game rounded to ints here (with ceilf?)
             rdCache_aHWVertices[rdCache_totalVerts].y = ((active_6c->vertices[tmpiter].y * res_fix_y) * v89);  // Added: The original game rounded to ints here (with ceilf?)
+            v89 = stdMath_Clamp(v89, 0.0, SITHCAMERA_ZFAR);
 #endif
             rdCache_aHWVertices[rdCache_totalVerts].z = v89;
 

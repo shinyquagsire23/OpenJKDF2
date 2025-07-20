@@ -266,6 +266,7 @@ void std3D_Shutdown() {
     std3D_FreeResources();
 
     std3D_PurgeEntireTextureCache();
+    rdMaterial_PurgeEntireMaterialCache();
 }
 
 /*
@@ -1514,7 +1515,7 @@ void std3D_PurgeEntireTextureCache()
     loaded_colormap = NULL;
     std3D_bHasInitted = 0;
 
-    rdMaterial_PurgeEntireMaterialCache();
+    //rdMaterial_PurgeEntireMaterialCache();
 }
 
 void std3D_UpdateSettings() {}

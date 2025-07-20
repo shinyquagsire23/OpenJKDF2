@@ -1592,7 +1592,12 @@ sithCogScript* sithCogScript_LoadEntry(const char *pFpath, int32_t unk)
         v4 = sithWorld_pLoading->numCogScriptsLoaded;
         if ( v4 < sithWorld_pLoading->numCogScripts && (v5 = &sithWorld_pLoading->cogScripts[v4], sithCogParse_Load(v6, v5, unk)) )
         {
-            stdHashTable_SetKeyVal(sithCog_pScriptHashtable, pFpath, v5); // Added: cog_fpath -> pFpath
+#ifdef SITH_DEBUG_STRUCT_NAMES
+            // The copies of names are load-bearing, SetKeyVal stores a reference
+            stdHashTable_SetKeyVal(sithCog_pScriptHashtable, v5->cog_fpath, v5);
+#else
+            stdHashTable_SetKeyVal(sithCog_pScriptHashtable, pFpath, v5);
+#endif
             ++sithWorld_pLoading->numCogScriptsLoaded;
             result = v5;
         }
@@ -1761,7 +1766,11 @@ int sithCogScript_DevCmdCogStatus(stdDebugConsoleCmd *cmd, const char *extra)
         {
             do
             {
-                v7 = v6->field_18;
+#ifndef COG_CRC32_SYMBOL_NAMES
+                v7 = v6->pName;
+#else
+                v7 = NULL;
+#endif
                 if ( !v7 )
                     v7 = "<null>";
                 _sprintf(std_genBuffer, "  Symbol %d: '%s' ", v6->symbol_id, v7);

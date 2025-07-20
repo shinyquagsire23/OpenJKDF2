@@ -219,6 +219,7 @@ if(TARGET_TWL)
     set_property(SOURCE ${PROJECT_SOURCE_DIR}/src/Platform/TWL/mpu.s PROPERTY LANGUAGE C)
     set_property(SOURCE ${PROJECT_SOURCE_DIR}/src/Platform/TWL/mpu.s APPEND PROPERTY COMPILE_OPTIONS "-x" "assembler-with-cpp")
     list(APPEND ENGINE_SOURCE_FILES ${TARGET_TWL_SRCS})
+    list(REMOVE_ITEM ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/Main/jkQuakeConsole.c)
 endif()
 
 if(TARGET_WASM)

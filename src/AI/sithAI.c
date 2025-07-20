@@ -79,6 +79,7 @@ int sithAI_Startup()
 
     sithAICmd_Startup();
 
+    // TODO: what is this inline?
     _memset(sithAI_actors, 0, sizeof(sithActor) * SITHAI_MAX_ACTORS);
 
     v1 = SITHAI_MAX_ACTORS-1;
@@ -111,6 +112,7 @@ int sithAI_Startup()
         --v1;
     }
     while ( (intptr_t)v3 >= (intptr_t)sithAI_actors );
+    // end inline
 
     sithAI_bInit = 1;
     return 1;
@@ -179,6 +181,7 @@ void sithAI_Close()
     if (sithAI_bOpened)
         return;
     
+    // TODO: what is this inline?
     v0 = sithAI_inittedActors;
     _memset(sithAI_actors, 0, sizeof(sithActor) * SITHAI_MAX_ACTORS);
 
@@ -213,6 +216,7 @@ void sithAI_Close()
         --v1;
     }
     while ( (intptr_t)v3 >= (intptr_t)sithAI_actors );
+    // end inline
     
     sithAI_bOpened = 0;
 }

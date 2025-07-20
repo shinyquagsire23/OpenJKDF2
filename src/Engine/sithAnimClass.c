@@ -43,14 +43,19 @@ int sithAnimClass_Load(sithWorld *world, int a2)
                 stdString_SafeStrCopy(animclass->name, name, 32);
 #endif
 #ifdef STDHASHTABLE_CRC32_KEYS
-                animclass->namecrc = crc32(name, strlen(name));
+                animclass->namecrc = stdCrc32(name, strlen(name));
 #endif
                 // Added: sprintf -> snprintf
                 stdString_snprintf(pup_path, 128, "%s%c%s", "misc\\pup", 92, stdConffile_entry.args[1].value);
                 if ( sithAnimClass_LoadPupEntry(animclass, pup_path) )
                 {
                     ++sithWorld_pLoading->numAnimClassesLoaded;
+#ifdef SITH_DEBUG_STRUCT_NAMES
+                    // The copies of names are load-bearing, SetKeyVal stores a reference
+                    stdHashTable_SetKeyVal(sithPuppet_hashtable, animclass->name, animclass);
+#else
                     stdHashTable_SetKeyVal(sithPuppet_hashtable, name, animclass);
+#endif
                 }
             }
         }
@@ -77,7 +82,7 @@ sithAnimclass* sithAnimClass_LoadEntry(char *a1)
               stdString_SafeStrCopy(v4->name, a1, 32),
 #endif
 #ifdef STDHASHTABLE_CRC32_KEYS
-              v4->namecrc = crc32(a1, strlen(a1)),
+              v4->namecrc = stdCrc32(a1, strlen(a1)),
 #endif
               _sprintf(v6, "%s%c%s", "misc\\pup", 92, a1),
               !sithAnimClass_LoadPupEntry(v4, v6)) )
@@ -88,7 +93,11 @@ sithAnimclass* sithAnimClass_LoadEntry(char *a1)
         {
             v5 = sithPuppet_hashtable;
             ++sithWorld_pLoading->numAnimClassesLoaded;
+#ifdef SITH_DEBUG_STRUCT_NAMES
+            stdHashTable_SetKeyVal(v5, v4->name, v4);
+#else
             stdHashTable_SetKeyVal(v5, a1, v4); // Added: v4->name to a1
+#endif
             result = v4;
         }
     }
@@ -184,7 +193,11 @@ LABEL_39:
                                 {
                                     keyframe->id |= 0x8000u;
                                 }
+#ifdef SITH_DEBUG_STRUCT_NAMES
+                                stdHashTable_SetKeyVal(sithPuppet_keyframesHashtable, keyframe->name, keyframe);
+#else
                                 stdHashTable_SetKeyVal(sithPuppet_keyframesHashtable, /*keyframe->name*/key_fname, keyframe);
+#endif
                                 v10 = keyframe;
                                 ++world->numKeyframesLoaded;
                                 goto LABEL_39;

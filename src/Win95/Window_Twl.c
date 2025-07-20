@@ -40,7 +40,9 @@ int Window_lastMouseY = 0;
 int Window_xPos = 0;
 int Window_yPos = 0;
 int last_jkGame_isDDraw = 0;
+#ifdef QUAKE_CONSOLE
 int last_jkQuakeConsole_bOpen = 0;
+#endif
 int Window_menu_mouseX = 0;
 int Window_menu_mouseY = 0;
 extern int Window_needsRecreate;
@@ -543,6 +545,7 @@ void Window_SdlUpdate()
             Window_lastYRel = 0;
         }
 
+#ifdef QUAKE_CONSOLE
         if (jkQuakeConsole_bOpen && jkQuakeConsole_bOpen != last_jkQuakeConsole_bOpen) {
             //SDL_WarpMouseInWindow(displayWindow, Window_menu_mouseX, Window_menu_mouseY);
         }
@@ -566,12 +569,15 @@ void Window_SdlUpdate()
         {
             //SDL_SetRelativeMouseMode(SDL_FALSE);
         }
+#endif
     }
 
     jkPlayer_enableVsync_last = jkPlayer_enableVsync;
 
     last_jkGame_isDDraw = jkGame_isDDraw;
+#ifdef QUAKE_CONSOLE
     last_jkQuakeConsole_bOpen = jkQuakeConsole_bOpen;
+#endif
 }
 
 void Window_SdlVblank()

@@ -463,7 +463,9 @@ void Main_Shutdown()
     stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
 
     std3D_Shutdown(); // Added
+#ifdef QUAKE_CONSOLE
     jkQuakeConsole_Shutdown();
+#endif
 
     jkSmack_Shutdown();
     jkGuiControlSaveLoad_Shutdown();

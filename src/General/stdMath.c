@@ -74,8 +74,51 @@ flex_t stdMath_NormalizeDeltaAngle(flex_t a1, flex_t a2)
     return result;
 }
 
+#ifdef EXPERIMENTAL_FIXED_POINT
+void stdMath_SinCosVeryApproximate(flex_t angle, flex_t *pSinOut, flex_t *pCosOut)
+{
+    flex_t normalized; // st7
+    int32_t quantized; // [esp+1Ch] [ebp-10h]
+    //_stdMath_SinCos(angle, pSinOut, pCosOut);
+    //return;
+
+    // Dance around the precision for fixed point
+    normalized = stdMath_NormalizeAngle(angle);
+    quantized = (int32_t)((normalized / 90.0) * 142.0);
+
+    int numSamples = quantized;
+    int sprevi = 1<<FIXED_POINT_DECIMAL_BITS; // Radius.
+    int sprev2i = 0; // 284 = 180deg
+    int lastCor = 1<<FIXED_POINT_DECIMAL_BITS;
+    int lastSir = 0;
+    int cor = 1<<FIXED_POINT_DECIMAL_BITS;
+    int sir = 0;
+    for (int i = 0; i <= numSamples; i++) {
+        lastCor = cor;
+        lastSir = sir;
+        cor = (sprevi - sprev2i);
+        sir = (sprev2i + sprevi);// * (3.14159/568.85); // optional, for rescale
+        
+        //printf( "%d: %d %d, %f %f\n", i, sir, cor, );
+        int si = (sprevi<<1)-(sprevi>>13)-sprev2i; // controls omega
+        sprev2i = sprevi;
+        sprevi = si;
+    }
+
+    flex_t s = flexdirect((sir+lastSir)>>1) * (flex_t)(3.14159/568.85);
+    flex_t c = flexdirect((cor+lastCor)>>1);
+    
+    *pSinOut = s;
+    *pCosOut = c;
+}
+#endif
+
 void stdMath_SinCos(flex_t angle, flex_t *pSinOut, flex_t *pCosOut)
 {
+#ifdef EXPERIMENTAL_FIXED_POINT
+    //return stdMath_SinCosVeryApproximate(angle, pSinOut, pCosOut);
+#endif
+
     flex_t normalized; // st7
     flex_t v4; // st7
     flex_t v5; // st7
@@ -577,7 +620,7 @@ flex_t stdMath_Sqrt(flex_t a)
     if (a < (flex_t)0.0)
         return (flex_t)0.0;
 
-#if defined(TARGET_TWL)
+#if defined(TARGET_TWL) && defined(EXPERIMENTAL_FIXED_POINT)
     //return f32toflex(sqrtf32_mine(flextof32(a)));
     //return flexdirect(sqrt_fx16_16_to_fx16_16(a.to_raw()));
     return sqrtfixed_mine(a);

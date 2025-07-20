@@ -5,6 +5,8 @@
 #include "jk.h"
 #include "types.h"
 
+#include "General/stdMath.h"
+
 #ifndef NO_JK_MMAP
 #include "Cog/sithCog.h"
 #include "Cog/sithCogExec.h"
@@ -166,7 +168,7 @@
 #include "Main/Main.h"
 #endif // NO_JK_MMAP
 
-extern char openjkdf2_aOrigCwd[1024];
+extern char openjkdf2_aOrigCwd[512];
 
 void do_hooks();
 
@@ -238,12 +240,16 @@ extern intptr_t openjkdf2_mem_alt_mspace_start;
 extern intptr_t openjkdf2_mem_alt_mspace_end;
 extern intptr_t openjkdf2_mem_main_mspace_start;
 extern intptr_t openjkdf2_mem_main_mspace_end;
+#ifdef __cplusplus
 extern "C"
 {
+#endif
     extern void debugRamEnableCache();
     extern void nwramEnableCache();
+#ifdef __cplusplus
 }
 #endif
+#endif // TARGET_TWL
 
 int main(int argc, char** argv)
 {
@@ -269,6 +275,31 @@ int main(int argc, char** argv)
         });
     );
 #endif // ARCH_WASM
+
+#if 0
+    int numSamples = 700;
+    int sprevi = 1<<16; // Radius.
+    int sprev2i = 0; // 284 = 180deg
+    for (int i = 0; i <= numSamples; i++) {
+        int cor = (sprevi - sprev2i);
+        int sir = (sprev2i + sprevi) * (3.14159/568.85); // optional, for rescale
+        printf( "%d: %d %d, %f %f\n", i, sir, cor, (flex32_t)flexdirect(sir), (flex32_t)flexdirect(cor));
+        int si = (sprevi<<1)-(sprevi>>13)-sprev2i; // controls omega
+        sprev2i = sprevi;
+        sprevi = si;
+    }
+
+
+    for (int i = 0; i < 360; i++) {
+        flex_t sinTest, cosTest;
+        stdMath_SinCosVeryApproximate(i, &sinTest, &cosTest);
+
+        flex_t sinTest2, cosTest2;
+        stdMath_SinCos(i, &sinTest2, &cosTest2);
+
+        printf("%d: %f %f %f %f\n", i, (flex32_t)sinTest, (flex32_t)cosTest, (flex32_t)sinTest2, (flex32_t)cosTest2);
+    }
+#endif
 
 #ifdef TARGET_TWL
     REG_SQRTCNT = SQRT_64;
@@ -409,6 +440,7 @@ int main(int argc, char** argv)
     }
 #endif
 
+#ifdef TARGET_TWL
     scanKeys();
     u16 keys_held = keysHeld();
 
@@ -422,6 +454,7 @@ int main(int argc, char** argv)
     char *cwd = getcwd(NULL, 0);
         printf("Current dir: %s\n\n", cwd);
         free(cwd);
+#endif
 
 #if 0
     FILE* test = fopen("sd:/test_write.txt", "wb");
@@ -605,6 +638,7 @@ int main(int argc, char** argv)
     PHYSFS_deinit();
 #endif
 
+#ifdef TARGET_TWL
     while (1) {
         scanKeys();
         u16 keys_held = keysHeld();
@@ -612,6 +646,7 @@ int main(int argc, char** argv)
             break;
         }
     }
+#endif
 
     return 1;
 }

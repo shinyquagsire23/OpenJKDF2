@@ -346,7 +346,7 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
     
     uint8_t* srcPixels = vbuf2 ? (uint8_t*)vbuf2->surface_lock_alloc : NULL;
     uint8_t* dstPixels = (uint8_t*)vbuf->surface_lock_alloc;
-    uint32_t srcStride = vbuf2 ? vbuf2->format.width_in_bytes : NULL;
+    uint32_t srcStride = vbuf2 ? vbuf2->format.width_in_bytes : 0;
     uint32_t dstStride = vbuf->format.width_in_bytes;
 
     if (!srcPixels && dstPixels) {

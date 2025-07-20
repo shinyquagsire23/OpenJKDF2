@@ -216,7 +216,7 @@
 #elif defined(TARGET_TWL)
 #define SITHCAMERA_ZNEAR_FIRSTPERSON (1.0 / 64.0)
 #define SITHCAMERA_ZNEAR (1.0 / 64.0)
-#define SITHCAMERA_ZFAR (64.0)
+#define SITHCAMERA_ZFAR (4.0)
 #else
 #define SITHCAMERA_ZNEAR_FIRSTPERSON (1.0 / 64.0)
 #define SITHCAMERA_ZNEAR (1.0 / 64.0)
@@ -294,16 +294,24 @@
 #define SITH_DEBUG_STRUCT_NAMES
 #if defined(TARGET_TWL)
 #undef SITH_DEBUG_STRUCT_NAMES
+
+// stdHashTable memory optimizations
 #define STDHASHTABLE_CRC32_KEYS
+#define STDHASHTABLE_LOG2_BUCKETS
+#define STDHASHTABLE_SINGLE_LINKLIST
+
+// COG memory optimizations
 #define COG_DYNAMIC_STACKS
 #define COG_DYNAMIC_IDK
 #define COG_DYNAMIC_TRIGGERS
 #define COG_DYNAMIC_STACKS_INCREMENT (32)
-#define STDPLATFORM_HEAP_SUGGESTIONS
-#endif
+#define COG_CRC32_SYMBOL_NAMES
 
-// Deferred loading and LRU unloading
-#if defined(QOL_IMPROVEMENTS)
+// Suggest which heaps to place things in 
+// (fast NWRAM, slow swap, etc)
+#define STDPLATFORM_HEAP_SUGGESTIONS
+
+// Deferred material loading and LRU unloading
 #define RDMATERIAL_LRU_LOAD_UNLOAD
 #endif
 
@@ -387,7 +395,11 @@ typedef double flex_d_t_type;
 // TODO: Have a TARGET_ARMvIDK or something
 #ifdef TARGET_TWL
 #define MATH_FUNC __attribute__((target("arm")))
+#ifdef EXPERIMENTAL_FIXED_POINT
 #define FAST_FUNC __attribute__((section(".itcm.text"), long_call))
+#else
+#define FAST_FUNC
+#endif
 #define FAST_DATA __attribute__((section(".itcm.data"), long_call))
 #else
 #define MATH_FUNC

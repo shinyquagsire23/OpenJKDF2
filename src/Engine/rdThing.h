@@ -36,6 +36,6 @@ int rdThing_SetSprite3(rdThing *thing, rdSprite *sprite);
 int rdThing_SetPolyline(rdThing *thing, rdPolyLine *polyline);
 int rdThing_SetParticleCloud(rdThing *thing, rdParticle *particle);
 int rdThing_Draw(rdThing *thing, rdMatrix34 *m);
-void rdThing_AccumulateMatrices(rdThing *thing, rdHierarchyNode *node, rdMatrix34 *acc);
+FAST_FUNC void rdThing_AccumulateMatrices(rdThing *thing, rdHierarchyNode *node, rdMatrix34 *acc);
 
 #endif // _RDTHING_H

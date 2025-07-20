@@ -168,7 +168,7 @@ int jkGui_Startup()
         }
     }
 #ifdef TARGET_TWL
-    stdPlatform_Printf("after fonts 0x%x 0x%x\n", (intptr_t)getHeapLimit() - (intptr_t)getHeapEnd(), (intptr_t)getHeapEnd() - (intptr_t)getHeapStart());
+    stdPlatform_PrintHeapStats();
 #endif
 
     for (int i = 0; i < 35; i++)
@@ -192,7 +192,7 @@ int jkGui_Startup()
     }
     // TODO: Eviction caching for stdBitmap, rdMaterial
 #ifdef TARGET_TWL
-    stdPlatform_Printf("after bms 0x%x 0x%x\n", (intptr_t)getHeapLimit() - (intptr_t)getHeapEnd(), (intptr_t)getHeapEnd() - (intptr_t)getHeapStart());
+    stdPlatform_PrintHeapStats();
 #endif
 
     Window_ShowCursorUnwindowed(Main_bWindowGUI == 0);

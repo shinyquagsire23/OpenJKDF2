@@ -214,12 +214,14 @@ int Windows_GdiHandler(HWND a1, UINT msg, WPARAM wParam, HWND a4, LRESULT *a5)
                 v5 = 1;
                 *a5 = 1;
             }
+#ifdef QUAKE_CONSOLE
             else if ( jkQuakeConsole_bOpen ) // Added: Quake console
             {
                 jkQuakeConsole_SendInput(wParam, 1);
                 v5 = 1;
                 *a5 = 1;
             }
+#endif
             break;
         default:
             break;

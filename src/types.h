@@ -1,11 +1,16 @@
 #ifndef TYPES_H
 #define TYPES_H
 
-#ifdef TARGET_TWL
+#if defined(TARGET_TWL) && defined(EXPERIMENTAL_FIXED_POINT)
 //#include <nds.h>
 #define flextov16(n) ((v16)((int32_t)n.to_raw() >> (FIXED_POINT_DECIMAL_BITS-12)))
 #define flextof32(n) ((int32_t)((int32_t)n.to_raw() >> (FIXED_POINT_DECIMAL_BITS-12)))
 #define f32toflex(n) (numeric::fixed<FIXED_POINT_WHOLE_BITS, FIXED_POINT_DECIMAL_BITS>::from_base(n<<(FIXED_POINT_DECIMAL_BITS-12)))
+#elif defined(TARGET_TWL) && !defined(EXPERIMENTAL_FIXED_POINT)
+#define flextov16(n) (floattov16(n))
+#define flextof32(n) (floattof32(n))
+#define f32toflex(n) (f32tofloat(n))
+
 #endif
 
 #ifdef EXPERIMENTAL_FIXED_POINT
@@ -2057,7 +2062,11 @@ typedef struct sithCogSymbol
   };
 #endif
   int32_t field_14;
-  char* field_18;
+#ifndef COG_CRC32_SYMBOL_NAMES
+  char* pName;
+#else
+  uint32_t nameCrc;
+#endif
 } sithCogSymbol;
 
 typedef struct sithCogSymboltable

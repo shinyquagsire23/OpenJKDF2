@@ -178,7 +178,7 @@ sithThing* sithTemplate_CreateEntry(sithWorld *world)
     stdString_SafeStrCopy(tmp.template_name, template_name, sizeof(tmp.template_name));
 #endif
 #ifdef STDHASHTABLE_CRC32_KEYS
-    tmp.templateNameCrc = crc32(template_name, strlen(template_name));
+    tmp.templateNameCrc = stdCrc32(template_name, strlen(template_name));
 #endif
 
     for (int i = 2; i < stdConffile_entry.numArgs; i++)
@@ -195,7 +195,12 @@ sithThing* sithTemplate_CreateEntry(sithWorld *world)
     result = &world->templates[world->numTemplatesLoaded++];
     tmp.thingIdx = result->thingIdx;
     _memcpy(result, &tmp, sizeof(sithThing));
+#ifdef SITH_DEBUG_STRUCT_NAMES
+    // The copies of names are load-bearing, SetKeyVal stores a reference
+    stdHashTable_SetKeyVal(sithTemplate_hashmap, result->template_name, result);
+#else
     stdHashTable_SetKeyVal(sithTemplate_hashmap, template_name, result);
+#endif
 
     return result;
 }

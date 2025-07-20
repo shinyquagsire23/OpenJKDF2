@@ -691,7 +691,9 @@ void stdControl_ReadControls()
 
     if (!stdControl_bControlsActive)
         return;
+#ifdef QUAKE_CONSOLE
     if (jkQuakeConsole_bOpen) return; // Hijack input to console
+#endif
 
     // HACK
     stdControl_bHasJoysticks = 1; // HACK
@@ -807,8 +809,8 @@ void stdControl_ReadControls()
     touchRead(&touchXY);
     if (touchXY.px != 0 || touchXY.py != 0) {
         if (lastTouchXY.px != 0 || lastTouchXY.py != 0) {
-            Window_lastXRel = touchXY.px - lastTouchXY.px;
-            Window_lastYRel = touchXY.py - lastTouchXY.py;
+            Window_lastXRel = (touchXY.px - lastTouchXY.px) * 2;
+            Window_lastYRel = (touchXY.py - lastTouchXY.py) * 2;
         }
     }
     lastTouchXY = touchXY;
@@ -821,7 +823,9 @@ void stdControl_ReadMouse()
 {
     if (!stdControl_bReadMouse)
         return;
+#ifdef QUAKE_CONSOLE
     if (jkQuakeConsole_bOpen) return; // Hijack input to console
+#endif
 
     stdControl_aAxisPos[AXIS_MOUSE_Z] = Window_mouseWheelY; // TODO
     stdControl_aAxisPos[AXIS_MOUSE_X] = Window_lastXRel; // TODO

@@ -23,6 +23,10 @@
 #include "external/fcaseopen/fcaseopen.h"
 #endif
 
+#ifdef TARGET_TWL
+#include <errno.h>
+#endif
+
 stdFileSearch* stdFileUtil_NewFind(const char *path, int a2, const char *extension)
 {
     stdFileSearch* search = (stdFileSearch *)std_pHS->alloc(sizeof(stdFileSearch));
@@ -307,7 +311,9 @@ int stdFileUtil_FindNext(stdFileSearch *a1, stdFileSearchResult *a2)
             tmp[strlen(tmp)-1] = 0;
         }
 
+#ifdef TARGET_TWL
         errno = 0;
+#endif
         a1->num_found = scandir(tmp, &a1->namelist, search_ext ? parse_ext : NULL, alphasort);
         
         if (!a1->namelist || a1->num_found <= 0) return 0;
