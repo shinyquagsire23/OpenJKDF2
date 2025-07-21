@@ -382,7 +382,7 @@ int std3D_StartScene()
             glFogColor(skyColor.r >> 3, skyColor.g >> 3, skyColor.b >> 3, 31);
             glClearColor(skyColor.r >> 3, skyColor.g >> 3, skyColor.b >> 3, 31);
             for (int i = 0; i < 32; i++) {
-                glFogDensity(i, stdMath_ClampInt((i-6)*6, 0, 127));
+                glFogDensity(i, stdMath_ClampInt((i-5)*5, 0, 127));
             }
             glFogDensity(31,127);
         }

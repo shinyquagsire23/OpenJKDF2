@@ -32,6 +32,10 @@ int rdCamera_NewEntry(rdCamera *camera, flex_t fov, BOOL bClipFar, flex_t zNear,
     if (!camera)
         return 0;
 
+#ifdef TARGET_TWL
+    bClipFar = 1;
+#endif
+
     // Added: Don't double-alloc
     if (!camera->pClipFrustum)
     {
