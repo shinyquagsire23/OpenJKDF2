@@ -296,7 +296,7 @@ void* stdSound_BufferSetData(stdSound_buffer_t* sound, int bufferBytes, int32_t*
     if (sound->data && !sound->bIsCopy)
         std_pHS->free(sound->data);
 
-    
+    sound->bufferBytes = 0;
     sound->data = std_pHS->alloc(bufferBytes);
     if (!sound->data) {
         return NULL;
@@ -315,16 +315,18 @@ int stdSound_BufferUnlock(stdSound_buffer_t* sound, void* buffer, int bufferRead
 
 int stdSound_BufferPlay(stdSound_buffer_t* buf, int loop)
 {
-    if (!buf) return 0;
+    if (!buf || !buf->data) return 0;
     buf->isLooping = loop;
     if (stdSound_IsPlaying(buf, NULL)) {
         return 1;
     }
+
+    // TODO: critical section?
     for (int i = 0; i < SITH_MIXER_NUMPLAYINGSOUNDS; i++) {
         if (!stdSound_aPlayingSounds[i]) {
-            stdSound_aPlayingSounds[i] = buf;
             buf->currentSample = 0;
             buf->isPlaying = 1;
+            stdSound_aPlayingSounds[i] = buf;
             return 1;
         }
     }
@@ -334,8 +336,10 @@ int stdSound_BufferPlay(stdSound_buffer_t* buf, int loop)
 void stdSound_BufferRelease(stdSound_buffer_t* sound)
 {   
     stdSound_BufferStop(sound);
-    if (sound->data && !sound->bIsCopy)
+    if (sound->data && !sound->bIsCopy) {
         std_pHS->free(sound->data);
+        sound->data = NULL;
+    }
 
     memset(sound, 0, sizeof(*sound));
     std_pHS->free(sound);
@@ -400,6 +404,7 @@ int stdSound_BufferStop(stdSound_buffer_t* buf)
     buf->currentSample = 0;
     buf->isLooping = 0;
 
+    // TODO: critical section?
     for (int i = 0; i < SITH_MIXER_NUMPLAYINGSOUNDS; i++) {
         if (stdSound_aPlayingSounds[i] == buf) {
             stdSound_aPlayingSounds[i] = NULL;

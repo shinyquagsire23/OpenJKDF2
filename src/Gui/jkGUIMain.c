@@ -57,7 +57,7 @@ static jkGuiElement jkGuiMain_elements[11] = {
     {ELEMENT_TEXTBUTTON, 10, 5, "GUI_SINGLEPLAYER", 3, {0, 220, 640, 60}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXT, 11, 5, NULL, 3, {0, 0, 0, 0}, 1, 0, 0, 0, 0, 0, {0}, 0},
 #endif
-    {ELEMENT_TEXTBUTTON, 12, 5, "GUI_QUIT", 3, {0, 0x118, 640, 60}, 1, 0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_TEXTBUTTON, 12, 5, "GUI_QUIT", 3, {0, 280, 640, 60}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON, 14, 2, "GUI_CHOOSEPLAYER", 3, {20, 380, 150, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON, 15, 2, "GUI_VIEWCUTSCENES", 3, {250, 380, 150, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON, 13, 2, "GUI_SETUP", 3, {470, 380, 150, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},

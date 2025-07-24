@@ -25,7 +25,7 @@
 static int jkGuiPlayer_bInitted = 0;
 
 static wchar_t jkGuiPlayer_awTmp_555D28[0x100] = {0};
-static char* jkGuiPlayer_GuiDifficulties[3] = {"GUI_EASY", "GUI_MED", "GUI_HARD"};
+static const char* jkGuiPlayer_GuiDifficulties[3] = {"GUI_EASY", "GUI_MED", "GUI_HARD"};
 
 static int32_t jkGuiPlayer_menuSelectIdk[2] = {0xFA, 0};
 static int32_t jkGuiPlayer_menuSelectIdk2[2] = {0xd, 0xe};
@@ -62,6 +62,16 @@ static jkGuiMenu jkGuiPlayer_menuNew = {jkGuiPlayer_menuNewElements, 0, 0xFFFF, 
 
 int jkGuiPlayer_Startup()
 {
+    jkGui_InitMenu(&jkGuiPlayer_menuSelect, jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]);
+    jkGui_InitMenu(&jkGuiPlayer_menuNew, jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]);
+
+#ifdef JKGUI_SMOL_SCREEN
+    for (int i = 1; i < 8; i++) {
+        jkGuiPlayer_menuNewElements[i].rect = jkGuiPlayer_menuNewElements[i].rectOrig;
+        jkGuiPlayer_menuNewElements[i].bIsSmolDirty = 1; 
+    }
+#endif
+
     // MOTS added: Move the UI stuff around for MoTS
     if (Main_bMotsCompat) {
         jkGuiPlayer_menuSelectElements[1].rect.y = 0xAF;
@@ -78,18 +88,9 @@ int jkGuiPlayer_Startup()
     }
 
 #ifdef JKGUI_SMOL_SCREEN
-    jkGuiPlayer_menuNewElements[1].bIsSmolDirty = 1;
-    jkGuiPlayer_menuNewElements[2].bIsSmolDirty = 1;
-    jkGuiPlayer_menuNewElements[3].bIsSmolDirty = 1;
-    jkGuiPlayer_menuNewElements[4].bIsSmolDirty = 1;
-    jkGuiPlayer_menuNewElements[5].bIsSmolDirty = 1;
-    jkGuiPlayer_menuNewElements[6].bIsSmolDirty = 1;
-    jkGuiPlayer_menuNewElements[7].bIsSmolDirty = 1;
     jkGui_SmolScreenFixup(&jkGuiPlayer_menuNew, 0);
 #endif
 
-    jkGui_InitMenu(&jkGuiPlayer_menuSelect, jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]);
-    jkGui_InitMenu(&jkGuiPlayer_menuNew, jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]);
     jkGuiPlayer_bInitted = 1;
     return 1;
 }

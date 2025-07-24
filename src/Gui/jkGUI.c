@@ -176,20 +176,6 @@ void jkGui_SmolScreenFixup(jkGuiMenu *menu, BOOL bForce) {
             continue;
         }
 
-        int bIgnore = 0;
-        if (iter->rect.width == 640) {
-            bIgnore = 1;
-        }
-        if (iter->rect.height == 480) {
-            bIgnore = 1;
-        }
-        if (iter->rect.y < 100) {
-            //bIgnore = 1;
-        }
-        if (iter->type == ELEMENT_TEXT && !iter->str) {
-            bIgnore = 1;
-        }
-
         iter->rect.x = ((int)(flex_t)iter->rect.x * (flex_t)0.4);
         iter->rect.y = ((int)(flex_t)iter->rect.y * (flex_t)0.4);
         iter->rect.width = ((int)(flex_t)iter->rect.width * (flex_t)0.4);
@@ -197,7 +183,7 @@ void jkGui_SmolScreenFixup(jkGuiMenu *menu, BOOL bForce) {
 
         if ((iter->type == ELEMENT_TEXTBUTTON || iter->type == ELEMENT_TEXT)) {
             iter->textType = 12;
-            if (iter->rect.height < 11) {
+            if (iter->rect.height && iter->rect.height < 11) {
                 iter->rect.height = 11;
             }
         }

@@ -233,6 +233,7 @@ file(GLOB ENGINE_SOURCE_FILES_REGLOB ${PROJECT_SOURCE_DIR}/src/*.c
                        ${PROJECT_SOURCE_DIR}/src/Platform/*/*.cpp
                        ${PROJECT_SOURCE_DIR}/src/Platform/*/*/*.cpp)
 list(REMOVE_ITEM ENGINE_SOURCE_FILES_REGLOB ${TEST_SRCS})
+list(APPEND ENGINE_SOURCE_FILES_REGLOB ${GLOBALS_C})
 if (EXPERIMENTAL_FIXED_POINT)
     set_source_files_properties(${ENGINE_SOURCE_FILES_REGLOB} PROPERTIES LANGUAGE CXX )
 endif()

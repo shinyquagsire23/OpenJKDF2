@@ -63,7 +63,7 @@ static jkGuiJoystickEntry jkGuiJoystick_aEntries[JKGUIJOYSTICK_NUM_ENTRIES] =
     { KEY_JOY1_B7,      "KEY_JOY1_B7",      0x206, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0 },
     { KEY_JOY1_B8,      "KEY_JOY1_B8",      0x207, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0 },
 
-#ifdef SDL2_RENDER
+#if defined(SDL2_RENDER) || defined(TARGET_TWL)
     { KEY_JOY1_B9,      "KEY_JOY1_B9",      0x208, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0 },
     { KEY_JOY1_B10,     "KEY_JOY1_B10",     0x209, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0 },
     { KEY_JOY1_B11,     "KEY_JOY1_B11",     0x20A, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0 },
@@ -104,7 +104,7 @@ static jkGuiJoystickEntry jkGuiJoystick_aEntries[JKGUIJOYSTICK_NUM_ENTRIES] =
     { KEY_JOY2_B7,      "KEY_JOY2_B7",      0xA06, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0 },
     { KEY_JOY2_B8,      "KEY_JOY2_B8",      0xA07, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0 },
 
-#ifdef SDL2_RENDER
+#if defined(SDL2_RENDER) || defined(TARGET_TWL)
     { KEY_JOY2_B9,      "KEY_JOY2_B9",      0xA08, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0 },
     { KEY_JOY2_B10,     "KEY_JOY2_B10",     0xA09, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0 },
     { KEY_JOY2_B11,     "KEY_JOY2_B11",     0xA0A, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0 },
@@ -174,7 +174,7 @@ static jkGuiElement jkGuiJoystick_aElements[33+3] = {
     { ELEMENT_CHECKBOX, 0, 0, "GUI_DISABLE_JOYSTICK", 0, { 320, 335, 300, 20 }, 1, 0, "GUI_DISABLE_JOYSTICK_HINT", NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
     { ELEMENT_TEXT, 0, 2, &jkGuiJoystick_awTmp, 3, { 50, 180, 320, 120 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
     { ELEMENT_TEXT, 0, 2, &jkGuiJoystick_awTmp, 3, { 50, 180, 540, 120 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
-#ifdef SDL2_RENDER
+#if defined(SDL2_RENDER) || defined(TARGET_TWL)
     { ELEMENT_TEXT, 0, 0, jkGuiJoystick_strings.aStrings[0], 3, { 20, 310, 190, 25 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
     { ELEMENT_TEXT, 0, 0, jkGuiJoystick_strings.aStrings[1], 3, { 20, 335, 190, 25 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
     { ELEMENT_TEXT, 0, 0, jkGuiJoystick_strings.aStrings[2], 3, { 20, 360, 190, 25 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
@@ -512,6 +512,13 @@ void jkGuiJoystick_sub_41B390()
     v1 = &jkGuiJoystick_aEntries[0];
     do
     {
+        // Added: in case the compiler doesn't init some of the array
+        if (!v1->displayStrKey) {
+            ++v1;
+            ++v7;
+            continue;
+        }
+
         v2 = v1->keybits & 0xFF; // Added: 4bit -> 8bit
         v8 = v1->keybits & 0x300; // Added: 4bit -> 8bit
         v3 = v1->keybits & 0x800; // Added: 4bit -> 8bit
@@ -572,22 +579,21 @@ int jkGuiJoystick_EnumFunc(int32_t inputFuncIdx, const char *pInputFuncStr, uint
     v11 = inputFuncIdx;
     if ( (flags & 2) != 0 )
     {
-        _strncpy(v17, pInputFuncStr, 0x1Fu);
-        v17[31] = 0;
+        stdString_SafeStrCopy(v17, pInputFuncStr, 32);
         flags2 |= 1; // Added: HACK
         if ( (flags2 & 1) != 0 )
         {
-            strncat(v17, "_A", 0x20u);
+            strncat(v17, "_A", 31); // Added: 32->31
             v8 = 1;
         }
         else if ( (flags2 & 4) != 0 )
         {
-            strncat(v17, "_R", 0x20u);
+            strncat(v17, "_R", 31); // Added: 32->31
             v11 = inputFuncIdx | 0x80000000;
         }
         else
         {
-            strncat(v17, "_K", 0x20u);
+            strncat(v17, "_K", 31); // Added: 32->31
         }
         v9 = jkStrings_GetUniStringWithFallback(v17);
         if ( !v9 )
@@ -877,7 +883,7 @@ void jkGuiJoystick_MenuTick(jkGuiMenu *pMenu)
             jkGuiJoystick_aElements[30].bIsVisible = 1;
             jkGuiJoystick_aElements[31].bIsVisible = 1;
 
-#ifdef SDL2_RENDER
+#if defined(SDL2_RENDER) || defined(TARGET_TWL)
             jkGuiJoystick_aElements[32].bIsVisible = 1;
             jkGuiJoystick_aElements[33].bIsVisible = 1;
             jkGuiJoystick_aElements[34].bIsVisible = 1;
@@ -928,7 +934,7 @@ void jkGuiJoystick_MenuTick(jkGuiMenu *pMenu)
             jkGuiJoystick_aElements[29].bIsVisible = 0;
             jkGuiJoystick_aElements[30].bIsVisible = 0;
             jkGuiJoystick_aElements[31].bIsVisible = 0;
-#ifdef SDL2_RENDER
+#if defined(SDL2_RENDER) || defined(TARGET_TWL)
             jkGuiJoystick_aElements[32].bIsVisible = 0;
             jkGuiJoystick_aElements[33].bIsVisible = 0;
             jkGuiJoystick_aElements[34].bIsVisible = 0;
@@ -1023,7 +1029,7 @@ void jkGuiJoystick_MenuTick(jkGuiMenu *pMenu)
         jkGuiRend_UpdateAndDrawClickable(&jkGuiJoystick_aElements[29], pMenu, 1);
         jkGuiRend_UpdateAndDrawClickable(&jkGuiJoystick_aElements[30], pMenu, 1);
         jkGuiRend_UpdateAndDrawClickable(&jkGuiJoystick_aElements[31], pMenu, 1);
-#ifdef SDL2_RENDER
+#if defined(SDL2_RENDER) || defined(TARGET_TWL)
         jkGuiRend_UpdateAndDrawClickable(&jkGuiJoystick_aElements[32], pMenu, 1);
         jkGuiRend_UpdateAndDrawClickable(&jkGuiJoystick_aElements[33], pMenu, 1);
         jkGuiRend_UpdateAndDrawClickable(&jkGuiJoystick_aElements[34], pMenu, 1);
@@ -1065,7 +1071,7 @@ int32_t jkGuiJoystick_Show()
     jkGuiJoystick_aElements[29].bIsVisible = 0;
     jkGuiJoystick_aElements[30].bIsVisible = 0;
     jkGuiJoystick_aElements[31].bIsVisible = 0;
-#ifdef SDL2_RENDER
+#if defined(SDL2_RENDER) || defined(TARGET_TWL)
     jkGuiJoystick_aElements[32].bIsVisible = 0;
     jkGuiJoystick_aElements[33].bIsVisible = 0;
     jkGuiJoystick_aElements[34].bIsVisible = 0;

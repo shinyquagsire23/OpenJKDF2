@@ -242,6 +242,11 @@ wchar_t* stdStrTable_GetStringWithFallback(stdStrTable* pTable, const char *key)
     stdStrMsg *v2; // eax
     wchar_t *result; // eax
 
+    // Added: nullptr fallback
+    if (!key) {
+        return L"(NULL)";
+    }
+
     if ( pTable->numMsgs && (v2 = (stdStrMsg *)stdHashTable_GetKeyVal(pTable->hashtable, key)) != 0 )
         result = v2->uniStr;
     else

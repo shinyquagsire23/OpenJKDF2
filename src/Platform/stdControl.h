@@ -69,6 +69,11 @@ void stdControl_ReadControls();
 void stdControl_ReadMouse();
 #endif
 
+// Added: pop system keyboard on DSi or Steam Deck
+void stdControl_ShowSystemKeyboard();
+void stdControl_HideSystemKeyboard();
+BOOL stdControl_IsSystemKeyboardShowing();
+
 extern const stdControlDikStrToNum stdControl_aDikNumToStr[JK_TOTAL_NUM_KEYS];
 extern const char *stdControl_aAxisNames[JK_NUM_AXES+1];
 

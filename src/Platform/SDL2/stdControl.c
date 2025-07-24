@@ -265,6 +265,7 @@ uint8_t stdControl_aDebounce[256];
 static uint32_t stdControl_aJoystickQuirks[JK_NUM_JOYSTICKS] = {0};
 static SDL_Joystick *pJoysticks[JK_NUM_JOYSTICKS] = {0};
 static int stdControl_aJoystickNumAxes[JK_NUM_JOYSTICKS] = {0};
+static int stdControl_bKeyboardBeingShown = 0;
 
 // Added: SDL2
 void stdControl_SetSDLKeydown(int keyNum, int bDown, uint32_t readTime)
@@ -846,4 +847,22 @@ void stdControl_ReadMouse()
     stdControl_SetKeydown(KEY_MOUSE_B3, !!(buttons & SDL_BUTTON_MMASK), stdControl_curReadTime);
     stdControl_SetKeydown(KEY_MOUSE_B4, !!(buttons & SDL_BUTTON_X1MASK), stdControl_curReadTime);
     stdControl_SetKeydown(KEY_MOUSE_B5, !!(buttons & SDL_BUTTON_X2MASK), stdControl_curReadTime);
+}
+
+void stdControl_ShowSystemKeyboard() {
+    if (stdControl_bKeyboardBeingShown) {
+        return;
+    }
+    stdControl_bKeyboardBeingShown = 1;
+}
+
+void stdControl_HideSystemKeyboard() {
+    if (!stdControl_bKeyboardBeingShown) {
+        return;
+    }
+    stdControl_bKeyboardBeingShown = 0;
+}
+
+BOOL stdControl_IsSystemKeyboardShowing() {
+    return stdControl_bKeyboardBeingShown;
 }

@@ -165,13 +165,15 @@ int Window_MessageLoop()
     //jkMain_GuiAdvance(); // TODO needed?
     jkGuiRend_UpdateController();
 
+    static touchPosition lastTouchXY = {0};
     touchPosition touchXY;
     touchRead(&touchXY);
-    if (touchXY.px != 0 || touchXY.py != 0 || Window_bFlipRequested) {
+    if (touchXY.px != 0 || touchXY.py != 0 || lastTouchXY.px != 0 || lastTouchXY.py != 0 || Window_bFlipRequested) {
         Window_msg_main_handler(g_hWnd, WM_PAINT, 0, 0);
         Window_SdlUpdate();
         Window_bFlipRequested = 0;
     }
+    lastTouchXY = touchXY;
     //if (stdPlatform_GetTimeMsec() - last_draw_ms > 1000) {
         //Window_msg_main_handler(g_hWnd, WM_PAINT, 0, 0);
         //last_draw_ms = stdPlatform_GetTimeMsec();
@@ -202,6 +204,57 @@ void Window_SdlUpdate()
         Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_ESCAPE, 0);
         Window_msg_main_handler(g_hWnd, WM_CHAR, VK_ESCAPE, 0);
         printf("escape\n");
+    }
+
+    if (stdControl_IsSystemKeyboardShowing()) {
+        consoleClear();
+    }
+
+    int16_t keyboardChar = keyboardUpdate();
+    if (keyboardChar) {
+        /*
+        DVK_FOLD      = -23, ///< Fold key (top left on the default keyboard)
+    DVK_TAB       =  9,  ///< Tab key
+    DVK_BACKSPACE =  8,  ///< Backspace
+    DVK_CAPS      = -15, ///< Caps key
+    DVK_SHIFT     = -14, ///< Shift key
+    DVK_SPACE     =  32, ///< Space key
+    DVK_MENU      = -5,  ///< Menu key
+    DVK_ENTER     =  10, ///< Enter key
+    DVK_CTRL      = -16, ///< Ctrl key
+    DVK_UP        = -17, ///< Up key
+    DVK_RIGHT     = -18, ///< Right key
+    DVK_DOWN      = -19, ///< Down key
+    DVK_LEFT      = -20, ///< Left key
+    DVK_ALT       = -26  ///< Alt key
+        */
+        if (keyboardChar == DVK_TAB) {
+            Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_TAB, 0);
+            Window_msg_main_handler(g_hWnd, WM_CHAR, VK_TAB, 0);
+        }
+        else if (keyboardChar == DVK_BACKSPACE) {
+            Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_BACK, 0);
+            Window_msg_main_handler(g_hWnd, WM_CHAR, VK_BACK, 0);
+        }
+        else if (keyboardChar == DVK_ENTER) {
+            Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_RETURN, 0);
+            Window_msg_main_handler(g_hWnd, WM_CHAR, VK_RETURN, 0);
+        }
+        else if (keyboardChar == DVK_LEFT) {
+            Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_LEFT, 0);
+        }
+        else if (keyboardChar == DVK_RIGHT) {
+            Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_RIGHT, 0);
+        }
+        else if (keyboardChar == DVK_UP) {
+            Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_UP, 0);
+        }
+        else if (keyboardChar == DVK_DOWN) {
+            Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_DOWN, 0);
+        }
+        else if (keyboardChar > 0) {
+            Window_msg_main_handler(g_hWnd, WM_CHAR, keyboardChar, 0);
+        }
     }
 
 #if 0

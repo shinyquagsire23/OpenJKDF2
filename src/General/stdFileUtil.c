@@ -2,6 +2,7 @@
 
 #include "stdPlatform.h"
 #include "General/stdFnames.h"
+#include "General/stdString.h"
 #include "jk.h"
 
 #ifdef PLATFORM_POSIX
@@ -206,7 +207,7 @@ int stdFileUtil_Deltree(const char* lpPathName)
     if (len > 512) {
         len = 512;
     }
-    _strncpy(tmp, lpPathName, sizeof(tmp));
+    stdString_SafeStrCopy(tmp, lpPathName, sizeof(tmp));
 
 #ifndef WIN64_STANDALONE
     for (int i = 0; i < len; i++)
@@ -220,7 +221,45 @@ int stdFileUtil_Deltree(const char* lpPathName)
 #ifndef TARGET_TWL
     nftw(tmp, rmFiles, 10, FTW_DEPTH|FTW_MOUNT|FTW_PHYS);
 #else
-    assert(0);
+    DIR *dir;
+    struct dirent *entry;
+    char filepath[256];
+    struct stat statbuf;
+    int result = 1;
+
+    dir = opendir(tmp);
+    if (!dir)
+        return 0;
+
+    while ((entry = readdir(dir)) != NULL && result == 1) {
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+            continue;
+
+        snprintf(filepath, sizeof(filepath), "%s/%s", tmp, entry->d_name);
+
+        if (stat(filepath, &statbuf) == -1) { // use lstat on non-DSi
+            result = 0;
+            break;
+        }
+
+        if (S_ISDIR(statbuf.st_mode)) {
+            result = stdFileUtil_Deltree(filepath);
+        } else {
+            if (unlink(filepath) != 0) {
+                result = 0;
+                break;
+            }
+        }
+    }
+
+    closedir(dir);
+
+    if (result) {
+        if (rmdir(tmp) != 0)
+            result = 0;
+    }
+
+    return result;
 #endif
 
     //rmdir(tmp);

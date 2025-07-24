@@ -2475,9 +2475,39 @@ void jkGuiRend_FocusElementDir(jkGuiMenu *pMenu, int32_t dir)
     }
 
     rdRect curFocus = focusedElement->rect;
+    // Move the current focus rect position to position of the corresponding edge
+    if (dir == FOCUS_LEFT || dir == FOCUS_RIGHT)
+    {
+        // A left edge or a right edge
+        curFocus.y += curFocus.height/2;
+    }
+    else if (dir == FOCUS_UP || dir == FOCUS_DOWN)
+    {
+        // A top edge or a bottom edge
+        curFocus.x += curFocus.width/2;
+    }
 
+    if (dir == FOCUS_DOWN) {
+        curFocus.y += curFocus.height-1;
+    }
+    else if (dir == FOCUS_RIGHT) {
+        curFocus.x += curFocus.width-1;
+    }
+
+    // We're iterating through every element to narrow down which element is the closest
+    // in the direction we're focusing. The "best candidate" is the element that is currently
+    // the closest, and gets replaced when a closer one is found.
     jkGuiElement* iter = pMenu->paElements;
     jkGuiElement* bestCandidate = focusedElement;
+
+    rdRect bcRect = bestCandidate->rect;
+    if (dir == FOCUS_RIGHT || dir == FOCUS_DOWN) {
+        bcRect = (rdRect){-10000,-10000,0,0};
+    }
+    else {
+        bcRect = (rdRect){10000,10000,0,0};
+    }
+
     while ( 1 )
     {
         if ( iter->type == ELEMENT_END ) {
@@ -2519,47 +2549,29 @@ void jkGuiRend_FocusElementDir(jkGuiMenu *pMenu, int32_t dir)
             continue;
         }
 
-        // HACK
-#ifdef JKGUI_SMOL_SCREEN
         rdRect rect = iter->rect;
-        rdRect bcRect = bestCandidate->rect;
-#else
-        rdRect rect = iter->rect;
-        rdRect bcRect = bestCandidate->rect;
 
+        // Move the iter rect position to the opposing edge
+        // (ie, FOCUS_RIGHT will jump from the right side of the 
+        //  current element to the left side of the next element)
         if (dir == FOCUS_LEFT || dir == FOCUS_RIGHT)
         {
+            // A left edge or a right edge
             rect.y += rect.height/2;
-            rect.y += rect.height/2;
         }
-        else if ()
+        else if (dir == FOCUS_UP || dir == FOCUS_DOWN)
         {
-            if (rect.x > curFocus.x && bDistCloseX && bDistCloseY) {
-                bestCandidate = iter;
-            }
+            // A top edge or a bottom edge
+            rect.x += rect.width/2;
         }
-        else if (dir == FOCUS_UP)
-        {
-            if (rect.y < curFocus.y && bDistCloseX && bDistCloseY) {
-                bestCandidate = iter;
-            }
+
+        if (dir == FOCUS_UP) {
+            rect.y += rect.height;
         }
-        else if (dir == FOCUS_DOWN)
-        {
-            if (rect.y > curFocus.y && bDistCloseX && bDistCloseY) {
-                bestCandidate = iter;
-            }
+        else if (dir == FOCUS_LEFT) {
+            rect.x += rect.width;
         }
-#endif
-        if (bestCandidate == focusedElement) {
-            if (dir == FOCUS_RIGHT || dir == FOCUS_DOWN) {
-                bcRect = (rdRect){-1000,-1000,0,0};
-            }
-            else {
-                bcRect = (rdRect){1000,1000,0,0};
-            }
-            
-        }
+
         //printf("%u %u\n", abs(rect.y - curFocus.y), abs(bcRect.y - curFocus.y));
         //int bDistCloseX = abs(rect.x - curFocus.x) < abs(bcRect.x - curFocus.x);
         //int bDistCloseY = abs(rect.y - curFocus.y) < abs(bcRect.y - curFocus.y);
@@ -2567,30 +2579,47 @@ void jkGuiRend_FocusElementDir(jkGuiMenu *pMenu, int32_t dir)
         int32_t distBc = sqrt((bcRect.x - curFocus.x)*(bcRect.x - curFocus.x) + (bcRect.y - curFocus.y)*(bcRect.y - curFocus.y));
         int32_t bDistCloseX = distCur < distBc;
         int32_t bDistCloseY = bDistCloseX;
+        BOOL containsPt = rdRect_ContainsPoint(&focusedElement->rect, rect.x, rect.y) || rdRect_ContainsPoint(&iter->rect, curFocus.x, curFocus.y); // In case elements overlap
+        BOOL containsX = rect.x >= focusedElement->rect.x && rect.x <= focusedElement->rect.x + focusedElement->rect.width;
+        // Most listboxes have action buttons under them, allow focusing to them with left/right
+        BOOL isListbox = focusedElement->type == ELEMENT_LISTBOX;
         if (dir == FOCUS_LEFT)
         {
-            if (rect.x < curFocus.x && bDistCloseX && bDistCloseY) {
+            if ((curFocus.x > rect.x || containsX || isListbox) && bDistCloseX && bDistCloseY) {
                 bestCandidate = iter;
             }
         }
         else if (dir == FOCUS_RIGHT)
         {
-            if (rect.x > curFocus.x && bDistCloseX && bDistCloseY) {
+            if ((curFocus.x < rect.x || containsX || isListbox) && bDistCloseX && bDistCloseY) {
                 bestCandidate = iter;
             }
         }
         else if (dir == FOCUS_UP)
         {
-            if (rect.y < curFocus.y && bDistCloseX && bDistCloseY) {
+            if ((curFocus.y > rect.y || containsPt) && bDistCloseX && bDistCloseY) {
                 bestCandidate = iter;
             }
         }
         else if (dir == FOCUS_DOWN)
         {
-            if (rect.y > curFocus.y && bDistCloseX && bDistCloseY) {
+            if ((curFocus.y < rect.y || containsPt) && bDistCloseX && bDistCloseY) {
                 bestCandidate = iter;
             }
         }
+
+        if (bestCandidate == iter) {
+            bcRect = rect;
+        }
+
+#if 0
+        if (bestCandidate == iter) {
+            printf("* %u->%u, cur=%u %u, nxt=%u %u, %u %u%c\n", (int)(focusedElement - pMenu->paElements), (int)(bestCandidate - pMenu->paElements), curFocus.x, curFocus.y, rect.x, rect.y, distCur, distBc, bDistCloseX?'!':'x');
+        }
+        else {
+            printf("%u->%u, cur=%u %u, nxt=%u %u, %u %u%c\n", (int)(focusedElement - pMenu->paElements), (int)(iter - pMenu->paElements), curFocus.x, curFocus.y, rect.x, rect.y, distCur, distBc, bDistCloseX?'!':'x');
+        }
+#endif
         
         iter++;
     }
@@ -2598,7 +2627,9 @@ void jkGuiRend_FocusElementDir(jkGuiMenu *pMenu, int32_t dir)
     //printf("%u->%u, %u %u, %u %u\n", (int)(focusedElement - pMenu->paElements), (int)(bestCandidate - pMenu->paElements), focusedElement->rect.x, focusedElement->rect.y, bestCandidate->rect.x, bestCandidate->rect.y);
 
     jkGuiElement* element = bestCandidate;
-    if (!element) return;
+    if (!element) {
+        return;
+    }
     if ((element->type == ELEMENT_LISTBOX || element->type == ELEMENT_TEXTBOX) && jkGuiRend_sub_5103E0(element))
     {
 //#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
@@ -2621,14 +2652,19 @@ LABEL_22:
         }
     }
     else {
+        // focusedElement is for textboxes and listboxes only
+        pMenu->focusedElement = NULL;
         //jkGuiRend_MouseMovedCallback(pMenu, bestCandidate->rect.x, bestCandidate->rect.y);
         jkGuiRend_ClickableMouseover(pMenu, bestCandidate);
     }
 }
 
+// Added: controller support
+// TODO: QOL ifdef?
 void jkGuiRend_UpdateController()
 {
     static int lastB1 = 0;
+    static int keyboardShowedLastUpdate = 0;
     stdControl_bControlsActive = 1; // HACK
     stdControl_ReadControls();
 
@@ -2676,8 +2712,10 @@ void jkGuiRend_UpdateController()
     }
 
     if (jkGuiRend_activeMenu->lastMouseOverClickable && jkGuiRend_activeMenu->lastMouseOverClickable->type == ELEMENT_TEXTBOX) {
-#ifdef TARGET_TWL
-        printf("Need a dispenser here\n");
-#endif
+        keyboardShowedLastUpdate = 1;
+        stdControl_ShowSystemKeyboard();
+    }
+    else if (keyboardShowedLastUpdate) {
+        stdControl_HideSystemKeyboard();
     }
 }

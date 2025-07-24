@@ -902,6 +902,11 @@ int stdFont_sub_435810(stdFont *a1, const wchar_t *a2, int a3)
     stdFontCharset *v8; // eax
     int v9; // ecx
 
+    // Added
+    if (!a1 || !a2) {
+        return 0;
+    }
+
     v3 = a2;
     v4 = 0;
     for ( i = *a2; i; --a3 )

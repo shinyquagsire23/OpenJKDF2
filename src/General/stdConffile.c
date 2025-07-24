@@ -17,8 +17,7 @@ int stdConffile_OpenWrite(char *a1)
     writeFile = std_pHS->fileOpen(a1, "wb");
     if (writeFile)
     {
-        _strncpy(stdConffile_aWriteFilename, a1, 127);
-        stdConffile_aWriteFilename[127] = 0;
+        stdString_SafeStrCopy(stdConffile_aWriteFilename, a1, 128);
         return 1;
     }
     else
@@ -56,8 +55,7 @@ int stdConffile_OpenMode(char *fpath, char* mode)
     }
 
     stdConffile_aLine = (char*)std_pHS->alloc(STDCONF_LINEBUFFER_LEN);
-    _strncpy(stdConffile_pFilename, fpath, 127);
-    stdConffile_pFilename[127] = 0;
+    stdString_SafeStrCopy(stdConffile_pFilename, fpath, 128);
     stdConffile_linenum = 0;
     stdConffile_bOpen = 1;
     return 1;
@@ -110,8 +108,7 @@ void stdConffile_CloseWrite()
     {
         std_pHS->fileClose(writeFile);
         writeFile = 0;
-        _strncpy(stdConffile_aWriteFilename, "NOT_OPEN", 0x7Fu);
-        stdConffile_aWriteFilename[127] = 0;
+        stdString_SafeStrCopy(stdConffile_aWriteFilename, "NOT_OPEN", 128);
     }
 }
 

@@ -266,6 +266,7 @@ uint8_t stdControl_aDebounce[JK_NUM_KEYS];
 static uint32_t stdControl_aJoystickQuirks[JK_NUM_JOYSTICKS] = {0};
 //static SDL_Joystick *pJoysticks[JK_NUM_JOYSTICKS] = {0};
 static int stdControl_aJoystickNumAxes[JK_NUM_JOYSTICKS] = {0};
+static int stdControl_bKeyboardBeingShown = 0;
 
 // Added: SDL2
 void stdControl_SetSDLKeydown(int keyNum, int bDown, uint32_t readTime)
@@ -700,6 +701,7 @@ void stdControl_ReadControls()
     stdControl_aJoystickNumAxes[0] = 1;
     stdControl_aJoystickMaxButtons[0] = 7;
     stdControl_aAxisEnabled[0] = 1;
+    stdControl_aAxisEnabled[1] = 1;
     stdControl_aJoystickExists[0] = 1;
     sithWeapon_controlOptions &= ~(1 << 5); // Enable joystick
 
@@ -868,4 +870,29 @@ void stdControl_ReadMouse()
     stdControl_SetKeydown(KEY_MOUSE_B4, !!(buttons & SDL_BUTTON_X1MASK), stdControl_curReadTime);
     stdControl_SetKeydown(KEY_MOUSE_B5, !!(buttons & SDL_BUTTON_X2MASK), stdControl_curReadTime);
 #endif
+}
+
+void stdControl_ShowSystemKeyboard() {
+    if (stdControl_bKeyboardBeingShown) {
+        return;
+    }
+    stdControl_bKeyboardBeingShown = 1;
+
+    // Initializes demo keyboard and loads graphics to VRAM
+    consoleClear();
+    keyboardDemoInit();
+    keyboardShow();
+}
+
+void stdControl_HideSystemKeyboard() {
+    if (!stdControl_bKeyboardBeingShown) {
+        return;
+    }
+    stdControl_bKeyboardBeingShown = 0;
+    keyboardHide();
+    keyboardExit(); // Unload VRAM graphics
+}
+
+BOOL stdControl_IsSystemKeyboardShowing() {
+    return stdControl_bKeyboardBeingShown;
 }

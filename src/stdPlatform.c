@@ -94,13 +94,18 @@ for (int i = 0; i < len; i++)
 #ifndef TARGET_TWL
     ret = (stdFile_t)fcaseopen(tmp, mode);
 #else
-    struct stat statstuff;
-    int exists = stat(tmp, &statstuff) >= 0;
-    if (exists) {
-        ret = (stdFile_t)fopen(tmp, mode);
+    if (mode[0] != 'w') {
+        struct stat statstuff;
+        int exists = stat(tmp, &statstuff) >= 0;
+        if (exists) {
+            ret = (stdFile_t)fopen(tmp, mode);
+        }
+        else {
+            return 0;
+        }
     }
     else {
-        return 0;
+        ret = (stdFile_t)fopen(tmp, mode);
     }
 #endif
     //printf("File open `%s`->`%s` mode `%s`, ret %x\n", fpath, tmp, mode, ret);
@@ -126,6 +131,9 @@ static int Linux_stdFileClose(stdFile_t fhand)
 
 static size_t Linux_stdFileRead(stdFile_t fhand, void* dst, size_t len)
 {
+#ifdef TARGET_TWL
+    if (!dst || !len) return 0;
+#endif
     size_t val =  fread(dst, 1, len, (FILE*)fhand);
 
     return val;
@@ -133,11 +141,17 @@ static size_t Linux_stdFileRead(stdFile_t fhand, void* dst, size_t len)
 
 static size_t Linux_stdFileWrite(stdFile_t fhand, void* dst, size_t len)
 {
+#ifdef TARGET_TWL
+    if (!dst || !len) return 0;
+#endif
     return fwrite(dst, 1, len, (FILE*)fhand);
 }
 
 static const char* Linux_stdFileGets(stdFile_t fhand, char* dst, size_t len)
 {
+#ifdef TARGET_TWL
+    if (!dst || !len) return 0;
+#endif
     return fgets(dst, len, (FILE*)fhand);
 }
 

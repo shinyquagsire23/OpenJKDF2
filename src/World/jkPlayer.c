@@ -513,10 +513,14 @@ void jkPlayer_WriteConf(wchar_t *name)
     sithCvar_SaveGlobals();
 #endif
 
-    if (!name[0]) return; // Added
+    if (!name || !name[0]) {
+        printf("jkPlayer_WriteConf NULL name?\n");
+        return; // Added
+    }
 
     stdString_WcharToChar(nameTmp, name, 31);
     nameTmp[31] = 0;
+    printf("??? %s\n", nameTmp);
     stdFnames_MakePath3(ext_fpath, 256, "player", nameTmp, "openjkdf2.json"); // Added
     stdFnames_MakePath3(ext_fpath_cvars, 256, "player", nameTmp, SITHCVAR_FNAME); // Added
     stdString_snprintf(fpath, 128, "player\\%s\\%s.plr", nameTmp, nameTmp);
