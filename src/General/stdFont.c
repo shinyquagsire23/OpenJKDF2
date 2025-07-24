@@ -126,11 +126,11 @@ LABEL_28:
     }
 LABEL_21:
     bitmap = stdBitmap_LoadFromFile(fd, a2, a3);
-    fontAlloc_->bitmap = bitmap;
+    fontAlloc_->pBitmap = bitmap;
     if ( bitmap )
     {
         _strncpy((char *)bitmap->fpath, "FONTSTRIP", 0x1Fu);
-        fontAlloc_->bitmap->fpath[31] = 0;
+        fontAlloc_->pBitmap->fpath[31] = 0;
         std_pHS->fileClose(fd);
         result = fontAlloc_;
     }
@@ -172,9 +172,9 @@ unsigned int stdFont_Draw1(stdVBuffer *vbuf, stdFont *font, unsigned int blit_x,
     v8 = blit_x;
     v9 = blit_x;
     v18 = 0;
-    a2a = *font->bitmap->mipSurfaces;
+    a2a = *font->pBitmap->mipSurfaces;
     a5a.y = 0;
-    a5a.height = a2a->format.height;
+    a5a.height = stdFont_GetHeight(font);
     if ( a5 >= (int)(vbuf->format.width - blit_x) )
         a5 = vbuf->format.width - blit_x;
     v10 = a6;
@@ -225,8 +225,8 @@ unsigned int stdFont_Draw1(stdVBuffer *vbuf, stdFont *font, unsigned int blit_x,
             if ( v15 )
             {
 LABEL_22:
-                a5a.x = v15->pEntries[v14 - v15->charFirst].field_0;
-                v16 = v15->pEntries[v14 - v15->charFirst].field_4;
+                a5a.x = v15->pEntries[v14 - v15->charFirst].glyphTexX;
+                v16 = v15->pEntries[v14 - v15->charFirst].glyphWidth;
                 a5a.width = v16;
             }
             else
@@ -278,10 +278,10 @@ void stdFont_Draw2(stdVBuffer *a1, stdFont *a2, unsigned int a3, int a4, rdRect 
 
     v8 = a6;
     v9 = a3;
-    v10 = *a2->bitmap->mipSurfaces;
+    v10 = *a2->pBitmap->mipSurfaces;
     rect.y = 0;
     a2a = v10;
-    rect.height = v10->format.height;
+    rect.height = stdFont_GetHeight(a2);
     if ( a6 )
     {
         do
@@ -339,8 +339,8 @@ void stdFont_Draw2(stdVBuffer *a1, stdFont *a2, unsigned int a3, int a4, rdRect 
                             {
 LABEL_20:
                                 v10 = a2a;
-                                rect.x = v15->pEntries[v14 - v15->charFirst].field_0;
-                                rect.width = v15->pEntries[v14 - v15->charFirst].field_4;
+                                rect.x = v15->pEntries[v14 - v15->charFirst].glyphTexX;
+                                rect.width = v15->pEntries[v14 - v15->charFirst].glyphWidth;
                             }
                             else
                             {
@@ -367,7 +367,7 @@ LABEL_19:
             if ( v11 )
             {
                 v9 = a3;
-                a4 += (*a2->bitmap->mipSurfaces)->format.height + a2->marginY;
+                a4 += stdFont_GetHeight(a2) + a2->marginY;
             }
             v8 = v11;
         }
@@ -379,7 +379,6 @@ void stdFont_Draw3(stdVBuffer *paintSurface, stdFont *font, int a3, rdRect *a4, 
 {
     char v7; // bl
     int v8; // esi
-    stdFont *v9; // edi
     rdRect *v10; // ebp
     stdVBuffer *v11; // eax
     const wchar_t *v12; // ecx
@@ -408,13 +407,12 @@ void stdFont_Draw3(stdVBuffer *paintSurface, stdFont *font, int a3, rdRect *a4, 
     v8 = 0;
     if ( a5 )
     {
-        v9 = font;
         v10 = a4;
-        v11 = *font->bitmap->mipSurfaces;
+        v11 = *font->pBitmap->mipSurfaces;
         v12 = a6;
         rect.y = 0;
         vbuf2 = v11;
-        rect.height = v11->format.height;
+        rect.height = stdFont_GetHeight(font);
         if ( (a5 & 2) == 0 )
             goto LABEL_9;
         v13 = a6;
@@ -422,13 +420,13 @@ void stdFont_Draw3(stdVBuffer *paintSurface, stdFont *font, int a3, rdRect *a4, 
         {
             do
             {
-                v13 = stdFont_sub_4352C0(v13, v9, v10->x, v10, &tmp);
+                v13 = stdFont_sub_4352C0(v13, font, v10->x, v10, &tmp);
                 ++v8;
             }
             while ( v13 );
             v12 = a6;
         }
-        v14 = v10->y + (v10->height - v8 * ((*v9->bitmap->mipSurfaces)->format.height + v9->marginY)) / 2;
+        v14 = v10->y + (v10->height - v8 * (stdFont_GetHeight(font) + font->marginY)) / 2;
         a3 = v14;
         if ( (v7 & 1) != 0 )
         {
@@ -438,7 +436,7 @@ LABEL_9:
                 while ( 1 )
                 {
                     int font_ = 0;
-                    v15 = stdFont_sub_4352C0(v12, v9, v10->x, v10, &font_);
+                    v15 = stdFont_sub_4352C0(v12, font, v10->x, v10, &font_);
                     v16 = a6;
                     v17 = v15;
                     v18 = 0;
@@ -451,19 +449,19 @@ LABEL_9:
                             if ( *v16 == 9 )
                             {
                                 v19 = 16;
-                                if ( 8 * v9->marginX >= 16 )
-                                    v19 = 8 * v9->marginX;
+                                if ( 8 * font->marginX >= 16 )
+                                    v19 = 8 * font->marginX;
                                 v18 = v19 * ((v19 + v18) / v19);
                             }
                             else if ( _iswspace(*v16) )
                             {
-                                v18 += v9->marginX;
+                                v18 += font->marginX;
                             }
                             else
                             {
                                 v20 = *v16;
-                                v21 = &v9->charsetHead;
-                                if ( v9 != (stdFont *)-48 )
+                                v21 = &font->charsetHead;
+                                if ( font != (stdFont *)-48 )
                                 {
                                     do
                                     {
@@ -475,11 +473,11 @@ LABEL_9:
                                     if ( v21 )
                                         goto LABEL_30;
                                 }
-                                v20 = v9->field_28;
+                                v20 = font->field_28;
                                 rect.x = 0;
                                 rect.width = 0;
-                                v21 = &v9->charsetHead;
-                                if ( v9 == (stdFont *)-48 )
+                                v21 = &font->charsetHead;
+                                if ( font == (stdFont *)-48 )
                                     goto LABEL_29;
                                 do
                                 {
@@ -492,8 +490,8 @@ LABEL_9:
                                 {
 LABEL_30:
                                     v10 = a4;
-                                    rect.x = v21->pEntries[v20 - v21->charFirst].field_0;
-                                    v22 = v21->pEntries[v20 - v21->charFirst].field_4;
+                                    rect.x = v21->pEntries[v20 - v21->charFirst].glyphTexX;
+                                    v22 = v21->pEntries[v20 - v21->charFirst].glyphWidth;
                                     rect.width = v22;
                                 }
                                 else
@@ -503,7 +501,7 @@ LABEL_29:
                                     rect.x = 0;
                                     rect.width = 0;
                                 }
-                                v18 += v22 + v9->marginY;
+                                v18 += v22 + font->marginY;
                             }
                             ++v16;
                             ++a5;
@@ -520,19 +518,19 @@ LABEL_29:
                             if ( *a6 == 9 )
                             {
                                 v25 = 16;
-                                if ( 8 * v9->marginX >= 16 )
-                                    v25 = 8 * v9->marginX;
+                                if ( 8 * font->marginX >= 16 )
+                                    v25 = 8 * font->marginX;
                                 v24 = v25 * ((int)(v25 + v24) / v25);
                             }
                             else if ( _iswspace(*a6) )
                             {
-                                v24 += v9->marginX;
+                                v24 += font->marginX;
                             }
                             else
                             {
-                                v26 = &v9->charsetHead;
+                                v26 = &font->charsetHead;
                                 v27 = *a6;
-                                if ( v9 != (stdFont *)-48 )
+                                if ( font != (stdFont *)-48 )
                                 {
                                     do
                                     {
@@ -544,11 +542,11 @@ LABEL_29:
                                     if ( v26 )
                                         goto LABEL_52;
                                 }
-                                v27 = v9->field_28;
+                                v27 = font->field_28;
                                 rect.x = 0;
                                 rect.width = 0;
-                                v26 = &v9->charsetHead;
-                                if ( v9 == (stdFont *)-48 )
+                                v26 = &font->charsetHead;
+                                if ( font == (stdFont *)-48 )
                                     goto LABEL_51;
                                 do
                                 {
@@ -561,8 +559,8 @@ LABEL_29:
                                 {
 LABEL_52:
                                     v10 = a4;
-                                    rect.x = v26->pEntries[v27 - v26->charFirst].field_0;
-                                    rect.width = v26->pEntries[v27 - v26->charFirst].field_4;
+                                    rect.x = v26->pEntries[v27 - v26->charFirst].glyphTexX;
+                                    rect.width = v26->pEntries[v27 - v26->charFirst].glyphWidth;
                                 }
                                 else
                                 {
@@ -575,7 +573,7 @@ LABEL_51:
                                 if (rect.height >= v28 )
                                     rect.height = v28;
                                 stdDisplay_VBufferCopy(paintSurface, vbuf2, v24, a3, &rect, a7);
-                                v24 += rect.width + v9->marginY;
+                                v24 += rect.width + font->marginY;
                             }
                             ++v23;
                             ++a6;
@@ -584,7 +582,7 @@ LABEL_51:
                         v17 = v30;
                     }
                     if ( v17 )
-                        a3 += (*v9->bitmap->mipSurfaces)->format.height + v9->marginY;
+                        a3 += stdFont_GetHeight(font) + font->marginY;
                     a6 = v17;
                     if ( !v17 )
                         break;
@@ -594,7 +592,7 @@ LABEL_51:
         }
         else
         {
-            stdFont_Draw2(paintSurface, v9, v10->x, v14, v10, v12, a7);
+            stdFont_Draw2(paintSurface, font, v10->x, v14, v10, v12, a7);
         }
     }
     else
@@ -658,7 +656,7 @@ int stdFont_Draw4(stdVBuffer *a1, stdFont *font, int xPos, int yPos, int a5, int
                 while ( v13 );
                 if ( v13 )
 LABEL_17:
-                    v14 = v13->pEntries[v12 - v13->charFirst].field_4;
+                    v14 = v13->pEntries[v12 - v13->charFirst].glyphWidth;
                 else
 LABEL_16:
                     v14 = 0;
@@ -675,7 +673,7 @@ LABEL_16:
         }
         if ( (a7 & 2) != 0 )
         {
-            v18 = (a6 - (*font->bitmap->mipSurfaces)->format.height) / 2;
+            v18 = (a6 - stdFont_GetHeight(font)) / 2;
             if ( v18 < 0 )
                 v18 = 0;
         }
@@ -781,7 +779,7 @@ const wchar_t* stdFont_sub_4352C0(const wchar_t *a1, stdFont *a2, int a3, rdRect
                                 while ( v13 );
                                 if ( v13 )
 LABEL_28:
-                                    v14 = v13->pEntries[v12 - v13->charFirst].field_4;
+                                    v14 = v13->pEntries[v12 - v13->charFirst].glyphWidth;
                                 else
 LABEL_27:
                                     v14 = 0;
@@ -849,7 +847,7 @@ LABEL_31:
                     while ( v19 );
                     if ( v19 )
 LABEL_50:
-                        v20 = v19->pEntries[v18 - v19->charFirst].field_4;
+                        v20 = v19->pEntries[v18 - v19->charFirst].glyphWidth;
                     else
 LABEL_49:
                         v20 = 0;
@@ -872,6 +870,7 @@ LABEL_49:
     return 0;
 }
 
+// TODO: I think I saw this inlined somewhere
 int stdFont_sub_4357C0(stdFont *a1, const wchar_t *a2, rdRect *a4)
 {
     const wchar_t *v3; // eax
@@ -891,7 +890,7 @@ int stdFont_sub_4357C0(stdFont *a1, const wchar_t *a2, rdRect *a4)
         }
         while ( v3 );
     }
-    return v4 * ((*a1->bitmap->mipSurfaces)->format.height + a1->marginY);
+    return v4 * (stdFont_GetHeight(a1) + a1->marginY);
 }
 
 int stdFont_sub_435810(stdFont *a1, const wchar_t *a2, int a3)
@@ -942,7 +941,7 @@ int stdFont_sub_435810(stdFont *a1, const wchar_t *a2, int a3)
             while ( v8 );
             if ( v8 )
 LABEL_16:
-                v9 = v8->pEntries[v7 - v8->charFirst].field_4;
+                v9 = v8->pEntries[v7 - v8->charFirst].glyphWidth;
             else
 LABEL_15:
                 v9 = 0;
@@ -1033,8 +1032,8 @@ void stdFont_Free(stdFont *font)
     if (!font)
         return;
 
-    if ( font->bitmap )
-        stdBitmap_Free(font->bitmap);
+    if ( font->pBitmap )
+        stdBitmap_Free(font->pBitmap);
     v1 = font->charsetHead.previous;
     std_pHS->free(font);
     if ( v1 )
@@ -1066,9 +1065,9 @@ uint32_t stdFont_DrawAscii(stdVBuffer *a1, stdFont *a2, unsigned int blit_x, int
     v8 = blit_x;
     v9 = blit_x;
     v19 = 0;
-    v10 = *a2->bitmap->mipSurfaces;
+    v10 = *a2->pBitmap->mipSurfaces;
     a5a.y = 0;
-    a5a.height = v10->format.height;
+    a5a.height = stdFont_GetHeight(a2);
     if ( x_max >= (int)(a1->format.width - blit_x) )
         x_max = a1->format.width - blit_x;
     v11 = *str;
@@ -1119,8 +1118,8 @@ uint32_t stdFont_DrawAscii(stdVBuffer *a1, stdFont *a2, unsigned int blit_x, int
             {
 LABEL_25:
                 v8 = blit_x;
-                a5a.x = v16->pEntries[v15 - v16->charFirst].field_0;
-                v17 = v16->pEntries[v15 - v16->charFirst].field_4;
+                a5a.x = v16->pEntries[v15 - v16->charFirst].glyphTexX;
+                v17 = v16->pEntries[v15 - v16->charFirst].glyphWidth;
                 a5a.width = v17;
             }
             else
@@ -1174,7 +1173,6 @@ uint32_t stdFont_DrawAsciiGPU(stdFont *a2, unsigned int blit_x, int blit_y, int 
 {
     unsigned int v8; // ebp
     unsigned int v9; // esi
-    stdVBuffer *v10; // eax
     char v11; // al
     int v12; // ecx
     int v14; // eax
@@ -1187,9 +1185,8 @@ uint32_t stdFont_DrawAsciiGPU(stdFont *a2, unsigned int blit_x, int blit_y, int 
     v8 = blit_x;
     v9 = blit_x;
     v19 = 0;
-    v10 = *a2->bitmap->mipSurfaces;
     a5a.y = 0;
-    a5a.height = v10->format.height;
+    a5a.height = stdFont_GetHeight(a2);
     //if ( x_max >= (int)(a1->format.width - blit_x) )
     //    x_max = a1->format.width - blit_x;
     v11 = *str;
@@ -1241,8 +1238,8 @@ uint32_t stdFont_DrawAsciiGPU(stdFont *a2, unsigned int blit_x, int blit_y, int 
             {
 LABEL_25:
                 v8 = blit_x;
-                a5a.x = v16->pEntries[v15 - v16->charFirst].field_0;
-                v17 = v16->pEntries[v15 - v16->charFirst].field_4;
+                a5a.x = v16->pEntries[v15 - v16->charFirst].glyphTexX;
+                v17 = v16->pEntries[v15 - v16->charFirst].glyphWidth;
                 a5a.width = v17;
             }
             else
@@ -1258,7 +1255,7 @@ LABEL_24:
                 if (a2->monospaceW && a5a.width < a2->monospaceW) {
                     shift = (a2->monospaceW - a5a.width)/2;
                 }
-                std3D_DrawUIBitmap(a2->bitmap, 0, v9+shift, blit_y, &a5a, scale, alpha_maybe);
+                std3D_DrawUIBitmap(a2->pBitmap, 0, v9+shift, blit_y, &a5a, scale, alpha_maybe);
                 //stdDisplay_VBufferCopy(a1, v10, v9, blit_y, &a5a, alpha_maybe);
                 v14 = a5a.width + a2->marginY;
                 goto LABEL_29;
@@ -1284,7 +1281,6 @@ uint32_t stdFont_DrawAsciiWidth(stdFont *a2, unsigned int blit_x, int blit_y, in
 {
     unsigned int v8; // ebp
     unsigned int v9; // esi
-    stdVBuffer *v10; // eax
     char v11; // al
     int v12; // ecx
     int v14; // eax
@@ -1297,9 +1293,8 @@ uint32_t stdFont_DrawAsciiWidth(stdFont *a2, unsigned int blit_x, int blit_y, in
     v8 = blit_x;
     v9 = blit_x;
     v19 = 0;
-    v10 = *a2->bitmap->mipSurfaces;
     a5a.y = 0;
-    a5a.height = v10->format.height;
+    a5a.height = stdFont_GetHeight(a2);
     //if ( x_max >= (int)(a1->format.width - blit_x) )
     //    x_max = a1->format.width - blit_x;
     v11 = *str;
@@ -1350,8 +1345,8 @@ uint32_t stdFont_DrawAsciiWidth(stdFont *a2, unsigned int blit_x, int blit_y, in
             {
 LABEL_25:
                 v8 = blit_x;
-                a5a.x = v16->pEntries[v15 - v16->charFirst].field_0;
-                v17 = v16->pEntries[v15 - v16->charFirst].field_4;
+                a5a.x = v16->pEntries[v15 - v16->charFirst].glyphTexX;
+                v17 = v16->pEntries[v15 - v16->charFirst].glyphWidth;
                 a5a.width = v17;
             }
             else
@@ -1363,7 +1358,7 @@ LABEL_24:
             }
             if ( (int)(v9 + INT_FLOAT_SCALED(v17, scale)) < (int)(v8 + x_max) )
             {
-                //std3D_DrawUIBitmap(a2->bitmap, 0, v9, blit_y, &a5a, scale, alpha_maybe);
+                //std3D_DrawUIBitmap(a2->pBitmap, 0, v9, blit_y, &a5a, scale, alpha_maybe);
                 //stdDisplay_VBufferCopy(a1, v10, v9, blit_y, &a5a, alpha_maybe);
                 v14 = a5a.width + a2->marginY;
                 goto LABEL_29;
@@ -1440,7 +1435,7 @@ int stdFont_Draw4GPU(stdFont *font, int xPos, int yPos, int a5, int a6, int a7, 
                 while ( v13 );
                 if ( v13 )
 LABEL_17:
-                    v14 = INT_FLOAT_SCALED(v13->pEntries[v12 - v13->charFirst].field_4, scale);
+                    v14 = INT_FLOAT_SCALED(v13->pEntries[v12 - v13->charFirst].glyphWidth, scale);
                 else
 LABEL_16:
                     v14 = 0;
@@ -1457,7 +1452,7 @@ LABEL_16:
         }
         if ( (a7 & 2) != 0 )
         {
-            v18 = (a6 - INT_FLOAT_SCALED((*font->bitmap->mipSurfaces)->format.height, scale)) / 2;
+            v18 = (a6 - INT_FLOAT_SCALED(stdFont_GetHeight(font), scale)) / 2; // Added: stdFont_GetHeight
             if ( v18 < 0 )
                 v18 = 0;
         }
@@ -1481,14 +1476,12 @@ unsigned int stdFont_Draw1GPU(stdFont *font, unsigned int blit_x, int blit_y, in
     stdFontCharset *v15; // eax
     int v18; // [esp+10h] [ebp-14h]
     rdRect a5a; // [esp+14h] [ebp-10h] BYREF
-    stdVBuffer *a2a; // [esp+2Ch] [ebp+8h]
 
     v8 = blit_x;
     v9 = blit_x;
     v18 = 0;
-    a2a = *font->bitmap->mipSurfaces;
     a5a.y = 0;
-    a5a.height = a2a->format.height;
+    a5a.height = stdFont_GetHeight(font);
     //if ( a5 >= (int)(vbuf->format.width - blit_x) )
     //    a5 = vbuf->format.width - blit_x;
     v10 = a6;
@@ -1539,8 +1532,8 @@ unsigned int stdFont_Draw1GPU(stdFont *font, unsigned int blit_x, int blit_y, in
             if ( v15 )
             {
 LABEL_22:
-                a5a.x = v15->pEntries[v14 - v15->charFirst].field_0;
-                a5a.width = v15->pEntries[v14 - v15->charFirst].field_4;
+                a5a.x = v15->pEntries[v14 - v15->charFirst].glyphTexX;
+                a5a.width = v15->pEntries[v14 - v15->charFirst].glyphWidth;
             }
             else
             {
@@ -1555,7 +1548,7 @@ LABEL_21:
                 if (font->monospaceW && a5a.width < font->monospaceW) {
                     shift = (font->monospaceW - a5a.width)/2;
                 }
-                std3D_DrawUIBitmap(font->bitmap, 0, v9+shift, blit_y, &a5a, scale, alpha_maybe);
+                std3D_DrawUIBitmap(font->pBitmap, 0, v9+shift, blit_y, &a5a, scale, alpha_maybe);
                 v13 = a5a.width + font->marginY;
                 goto LABEL_26;
             }
@@ -1591,16 +1584,14 @@ unsigned int stdFont_Draw1Width(stdFont *font, unsigned int blit_x, int blit_y, 
     stdFontCharset *v15; // eax
     int v18; // [esp+10h] [ebp-14h]
     rdRect a5a; // [esp+14h] [ebp-10h] BYREF
-    stdVBuffer *a2a; // [esp+2Ch] [ebp+8h]
 
     uint32_t largest_x = 0;
 
     v8 = blit_x;
     v9 = blit_x;
     v18 = 0;
-    a2a = *font->bitmap->mipSurfaces;
     a5a.y = 0;
-    a5a.height = a2a->format.height;
+    a5a.height = stdFont_GetHeight(font);
     //if ( a5 >= (int)(vbuf->format.width - blit_x) )
     //    a5 = vbuf->format.width - blit_x;
     v10 = a6;
@@ -1651,8 +1642,8 @@ unsigned int stdFont_Draw1Width(stdFont *font, unsigned int blit_x, int blit_y, 
             if ( v15 )
             {
 LABEL_22:
-                a5a.x = v15->pEntries[v14 - v15->charFirst].field_0;
-                a5a.width = v15->pEntries[v14 - v15->charFirst].field_4;
+                a5a.x = v15->pEntries[v14 - v15->charFirst].glyphTexX;
+                a5a.width = v15->pEntries[v14 - v15->charFirst].glyphWidth;
             }
             else
             {
@@ -1666,7 +1657,7 @@ LABEL_21:
                 if (next_spot > largest_x) {
                     largest_x = next_spot;
                 }
-                //std3D_DrawUIBitmap(font->bitmap, 0, v9, blit_y, &a5a, 1.0, alpha_maybe);
+                //std3D_DrawUIBitmap(font->pBitmap, 0, v9, blit_y, &a5a, 1.0, alpha_maybe);
                 v13 = a5a.width + font->marginY;
                 goto LABEL_26;
             }
@@ -1702,7 +1693,6 @@ unsigned int stdFont_DrawMultilineCenteredGPU(stdFont *font, unsigned int blit_x
     stdFontCharset *v15; // eax
     int v18; // [esp+10h] [ebp-14h]
     rdRect a5a; // [esp+14h] [ebp-10h] BYREF
-    stdVBuffer *a2a; // [esp+2Ch] [ebp+8h]
 
     uint32_t line_width = stdFont_Draw1Width(font, blit_x, blit_y, a5, a6, alpha_maybe, scale);
     if (line_width > a5-blit_x) {
@@ -1713,9 +1703,8 @@ unsigned int stdFont_DrawMultilineCenteredGPU(stdFont *font, unsigned int blit_x
 
     v9 = blit_x + ((a5 - line_width) / 2);
     v18 = 0;
-    a2a = *font->bitmap->mipSurfaces;
     a5a.y = 0;
-    a5a.height = a2a->format.height;
+    a5a.height = stdFont_GetHeight(font);
     //if ( a5 >= (int)(vbuf->format.width - blit_x) )
     //    a5 = vbuf->format.width - blit_x;
     v10 = a6;
@@ -1782,8 +1771,8 @@ unsigned int stdFont_DrawMultilineCenteredGPU(stdFont *font, unsigned int blit_x
             if ( v15 )
             {
 LABEL_22:
-                a5a.x = v15->pEntries[v14 - v15->charFirst].field_0;
-                a5a.width = v15->pEntries[v14 - v15->charFirst].field_4;
+                a5a.x = v15->pEntries[v14 - v15->charFirst].glyphTexX;
+                a5a.width = v15->pEntries[v14 - v15->charFirst].glyphWidth;
             }
             else
             {
@@ -1799,7 +1788,7 @@ LABEL_21:
                     largest_x = next_spot;
                 }
                 
-                std3D_DrawUIBitmap(font->bitmap, 0, v9, blit_y, &a5a, scale, alpha_maybe);
+                std3D_DrawUIBitmap(font->pBitmap, 0, v9, blit_y, &a5a, scale, alpha_maybe);
                 v13 = a5a.width + font->marginY;
                 goto LABEL_26;
             }
@@ -1831,7 +1820,6 @@ unsigned int stdFont_DrawMultilineCenteredHeight(stdFont *font, unsigned int bli
     stdFontCharset *v15; // eax
     int v18; // [esp+10h] [ebp-14h]
     rdRect a5a; // [esp+14h] [ebp-10h] BYREF
-    stdVBuffer *a2a; // [esp+2Ch] [ebp+8h]
 
     uint32_t line_width = stdFont_Draw1Width(font, blit_x, blit_y, a5, a6, alpha_maybe, scale);
     if (line_width > a5-blit_x) {
@@ -1842,9 +1830,8 @@ unsigned int stdFont_DrawMultilineCenteredHeight(stdFont *font, unsigned int bli
 
     v9 = blit_x + ((a5 - line_width) / 2);
     v18 = 0;
-    a2a = *font->bitmap->mipSurfaces;
     a5a.y = 0;
-    a5a.height = a2a->format.height;
+    a5a.height = stdFont_GetHeight(font);
     //if ( a5 >= (int)(vbuf->format.width - blit_x) )
     //    a5 = vbuf->format.width - blit_x;
     v10 = a6;
@@ -1911,8 +1898,8 @@ unsigned int stdFont_DrawMultilineCenteredHeight(stdFont *font, unsigned int bli
             if ( v15 )
             {
 LABEL_22:
-                a5a.x = v15->pEntries[v14 - v15->charFirst].field_0;
-                a5a.width = v15->pEntries[v14 - v15->charFirst].field_4;
+                a5a.x = v15->pEntries[v14 - v15->charFirst].glyphTexX;
+                a5a.width = v15->pEntries[v14 - v15->charFirst].glyphWidth;
             }
             else
             {
@@ -1928,7 +1915,7 @@ LABEL_21:
                     largest_x = next_spot;
                 }
                 
-                //std3D_DrawUIBitmap(font->bitmap, 0, v9, blit_y, &a5a, scale, alpha_maybe);
+                //std3D_DrawUIBitmap(font->pBitmap, 0, v9, blit_y, &a5a, scale, alpha_maybe);
                 v13 = a5a.width + font->marginY;
                 goto LABEL_26;
             }

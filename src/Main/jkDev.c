@@ -120,8 +120,6 @@ void jkDev_Shutdown()
 
 int jkDev_Open()
 {
-    stdVBuffer **v1; // edx
-    stdBitmap *v3; // edx
     stdVBufferTexFmt a1; // [esp+0h] [ebp-4Ch] BYREF
 
     if ( jkDev_bOpened )
@@ -131,9 +129,8 @@ int jkDev_Open()
     if ( Main_bNoHUD )
         return 1;
 
-    v1 = jkHud_pMsgFontSft->bitmap->mipSurfaces;
     jkDev_log_55A4A4 = 0;
-    jkDev_BMFontHeight = (*v1)->format.height;
+    jkDev_BMFontHeight = stdFont_GetHeight(jkHud_pMsgFontSft);
 
     _memcpy(&a1, &stdDisplay_pCurVideoMode->format, sizeof(a1));
     a1.height = 5 * jkDev_BMFontHeight;
@@ -142,8 +139,7 @@ int jkDev_Open()
 #endif
 
     jkDev_vbuf = stdDisplay_VBufferNew(&a1, 1, 0, 0);
-    v3 = jkHud_pMsgFontSft->bitmap;
-    jkDev_ColorKey = v3->colorkey;
+    jkDev_ColorKey = jkHud_pMsgFontSft->pBitmap->colorkey;
 
     if ( jkDev_vbuf )
     {

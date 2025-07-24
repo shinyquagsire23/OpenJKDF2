@@ -338,7 +338,14 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
                 tmpTxt = _strtok(0, " \t");
                 v36 = _atoi(tmpTxt);
                 face->num = j;
-                face->material = (v36 == -1) ? 0 : model->materials[v36];
+                // Added: model->numMaterials bounds
+                if (v36 > model->numMaterials) {
+                    v36 = model->numMaterials-1;
+                }
+                else if (v36 < 0 && v36 != -1) {
+                    v36 = 0;
+                }
+                face->material = (v36 == -1 || !model->numMaterials) ? 0 : model->materials[v36]; // Added: model->numMaterials check
                 rdMaterial_EnsureMetadata(face->material); // Added: we don't need VBuffers yet
                 tmpTxt = _strtok(0, " \t");
                 if ( _sscanf(tmpTxt, "%x", &face->type) != 1 )

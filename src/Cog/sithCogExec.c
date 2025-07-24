@@ -368,9 +368,9 @@ int32_t sithCogExec_PopVector3(sithCog *ctx, rdVector3* out)
     
     if ( tmp.type == COG_VARTYPE_VECTOR )
     {
-        out->x = tmp.dataAsFloat[0]; // FLEXTODO
-        out->y = tmp.dataAsFloat[1]; // FLEXTODO
-        out->z = tmp.dataAsFloat[2]; // FLEXTODO
+        out->x = (flex_t)tmp.dataAsFloat[0]; // FLEXTODO
+        out->y = (flex_t)tmp.dataAsFloat[1]; // FLEXTODO
+        out->z = (flex_t)tmp.dataAsFloat[2]; // FLEXTODO
         return 1;
     }
 

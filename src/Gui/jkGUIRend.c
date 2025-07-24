@@ -12,6 +12,7 @@
 #include "Win95/stdGdi.h"
 #include "Win95/stdSound.h"
 #include "General/stdString.h"
+#include "Gui/jkGUI.h"
 #include "stdPlatform.h"
 #include "jk.h"
 #include "types.h"
@@ -1288,6 +1289,7 @@ int jkGuiRend_ListBoxEventHandler(jkGuiElement *element, jkGuiMenu *menu, int32_
 
     if (eventType == JKGUI_EVENT_INIT)
     {
+        // TODO is this an inlined func?
         v19 = 2;
         v20 = &menu->fonts[element->textType];
         do
@@ -1295,8 +1297,8 @@ int jkGuiRend_ListBoxEventHandler(jkGuiElement *element, jkGuiMenu *menu, int32_
             if ( *v20 )
             {
                 v21 = element->texInfo.textHeight;
-                if ( v21 <= (*(*v20)->bitmap->mipSurfaces)->format.height )
-                    v21 = (*(*v20)->bitmap->mipSurfaces)->format.height;
+                if ( v21 <= stdFont_GetHeight(*v20) )
+                    v21 = stdFont_GetHeight(*v20);
                 element->texInfo.textHeight = v21;
             }
             ++v20;
@@ -2139,7 +2141,7 @@ int jkGuiRend_TextBoxEventHandler(jkGuiElement *element, jkGuiMenu *menu, int32_
         v26 = menu->fonts[element->textType];
         if ( v26 )
         {
-            v27 = (*v26->bitmap->mipSurfaces)->format.height + 3;
+            v27 = (*v26->pBitmap->mipSurfaces)->format.height + 3;
             if ( element->rect.height > v27 )
                 v27 = element->rect.height;
             element->rect.height = v27;
@@ -2312,6 +2314,10 @@ int jkGuiRend_PicButtonEventHandler(jkGuiElement *element, jkGuiMenu *menu, int3
     stdBitmap* bitmap = menu->ui_structs[element->selectedTextEntry];
     if ( bitmap )
     {
+#ifdef JKGUI_SMOL_SCREEN
+        element->rect = element->rectOrig;
+        element->bIsSmolDirty = 1;
+#endif
         if ( element->rect.x < 0 )
             element->rect.x = bitmap->xPos;
         if ( element->rect.y < 0 )
@@ -2320,6 +2326,9 @@ int jkGuiRend_PicButtonEventHandler(jkGuiElement *element, jkGuiMenu *menu, int3
             element->rect.width = bitmap->mipSurfaces[0]->format.width;
         if ( element->rect.height < 0 )
             element->rect.height = bitmap->mipSurfaces[0]->format.height;
+#ifdef JKGUI_SMOL_SCREEN
+        jkGui_SmolScreenFixup(menu, 0);
+#endif
     }
 
     return 1;
@@ -2373,8 +2382,8 @@ int jkGuiRend_TextButtonEventHandler(jkGuiElement *element, jkGuiMenu *menu, int
         if ( *v6 )
         {
             v7 = element->rect.height;
-            if ( v7 <= (*(*v6)->bitmap->mipSurfaces)->format.height )
-                v7 = (*(*v6)->bitmap->mipSurfaces)->format.height;
+            if ( v7 <= stdFont_GetHeight(*v6))
+                v7 = stdFont_GetHeight(*v6);
             element->rect.height = v7;
         }
         ++v6;
@@ -2510,8 +2519,38 @@ void jkGuiRend_FocusElementDir(jkGuiMenu *pMenu, int32_t dir)
             continue;
         }
 
+        // HACK
+#ifdef JKGUI_SMOL_SCREEN
         rdRect rect = iter->rect;
         rdRect bcRect = bestCandidate->rect;
+#else
+        rdRect rect = iter->rect;
+        rdRect bcRect = bestCandidate->rect;
+
+        if (dir == FOCUS_LEFT || dir == FOCUS_RIGHT)
+        {
+            rect.y += rect.height/2;
+            rect.y += rect.height/2;
+        }
+        else if ()
+        {
+            if (rect.x > curFocus.x && bDistCloseX && bDistCloseY) {
+                bestCandidate = iter;
+            }
+        }
+        else if (dir == FOCUS_UP)
+        {
+            if (rect.y < curFocus.y && bDistCloseX && bDistCloseY) {
+                bestCandidate = iter;
+            }
+        }
+        else if (dir == FOCUS_DOWN)
+        {
+            if (rect.y > curFocus.y && bDistCloseX && bDistCloseY) {
+                bestCandidate = iter;
+            }
+        }
+#endif
         if (bestCandidate == focusedElement) {
             if (dir == FOCUS_RIGHT || dir == FOCUS_DOWN) {
                 bcRect = (rdRect){-1000,-1000,0,0};
@@ -2582,12 +2621,14 @@ LABEL_22:
         }
     }
     else {
-        jkGuiRend_MouseMovedCallback(pMenu, bestCandidate->rect.x, bestCandidate->rect.y);
+        //jkGuiRend_MouseMovedCallback(pMenu, bestCandidate->rect.x, bestCandidate->rect.y);
+        jkGuiRend_ClickableMouseover(pMenu, bestCandidate);
     }
 }
 
 void jkGuiRend_UpdateController()
 {
+    static int lastB1 = 0;
     stdControl_bControlsActive = 1; // HACK
     stdControl_ReadControls();
 
@@ -2609,12 +2650,18 @@ void jkGuiRend_UpdateController()
         printf("down\n");
     }
     if (stdControl_ReadKey(KEY_JOY1_B1, &val) && val) {
+        lastB1 = val;
         //jkGuiRend_InvokeEvent(jkGuiRend_activeMenu->focusedElement, jkGuiRend_activeMenu, JKGUI_EVENT_KEYDOWN, VK_RETURN);
         jkGuiRend_WindowHandler(0, WM_KEYFIRST, VK_RETURN, 0, 0);
         //if (jkGuiRend_activeMenu->lastMouseOverClickable && jkGuiRend_activeMenu->lastMouseOverClickable->clickHandlerFunc )
         //    jkGuiRend_activeMenu->lastClicked = jkGuiRend_activeMenu->lastMouseOverClickable->clickHandlerFunc(jkGuiRend_activeMenu->lastMouseOverClickable, jkGuiRend_activeMenu, jkGuiRend_mouseX, jkGuiRend_mouseY, 1);
+        jkGuiRend_activeMenu->lastMouseDownClickable = jkGuiRend_activeMenu->lastMouseOverClickable;
         jkGuiRend_InvokeClicked(jkGuiRend_activeMenu->lastMouseOverClickable, jkGuiRend_activeMenu, jkGuiRend_mouseX, jkGuiRend_mouseY, 1);
         printf("a\n");
+    }
+    else if (lastB1 && !val) {
+        lastB1 = 0;
+        jkGuiRend_activeMenu->lastMouseDownClickable = 0;
     }
     if (stdControl_ReadKey(KEY_JOY1_B2, &val) && val) {
         jkGuiRend_WindowHandler(0, WM_KEYFIRST, VK_ESCAPE, 0, 0);
@@ -2626,5 +2673,11 @@ void jkGuiRend_UpdateController()
         if (jkGuiRend_activeMenu->pReturnKeyShortcutElement) {
             jkGuiRend_InvokeClicked(jkGuiRend_activeMenu->pReturnKeyShortcutElement, jkGuiRend_activeMenu, jkGuiRend_mouseX, jkGuiRend_mouseY, 1);
         }
+    }
+
+    if (jkGuiRend_activeMenu->lastMouseOverClickable && jkGuiRend_activeMenu->lastMouseOverClickable->type == ELEMENT_TEXTBOX) {
+#ifdef TARGET_TWL
+        printf("Need a dispenser here\n");
+#endif
     }
 }

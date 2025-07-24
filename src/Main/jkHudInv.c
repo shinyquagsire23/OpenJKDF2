@@ -905,7 +905,7 @@ void jkHudInv_LoadItemRes()
     jkHudInv_font = stdFont_Load(v18, 0, 0);
     if ( !jkHudInv_font )
         Windows_GameErrorMsgbox("ERR_CANNOT_LOAD_FILE %s", v18);
-    stdBitmap_ConvertColorFormat(&Video_format.format, jkHudInv_font->bitmap);
+    stdBitmap_ConvertColorFormat(&Video_format.format, jkHudInv_font->pBitmap);
     v6 = Video_format.width;
     _memset(&jkHudInv_info, 0, sizeof(jkHudInvInfo));
     v7 = Video_format.height;

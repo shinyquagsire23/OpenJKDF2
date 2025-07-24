@@ -544,7 +544,6 @@ int sithCamera_SetCurrentCamera(sithCamera *camera)
     rdCamera_SetCurrent(&camera->rdCam);
     if ( camera->cameraPerspective == 32 )
     {
-        
         rdMatrix_Copy34(&sithCamera_focusMat, &sithCamera_currentCamera->primaryFocus->lookOrientation);
         rot.x = 0.0;
         rot.y = -45.0;

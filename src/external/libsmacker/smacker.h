@@ -24,6 +24,7 @@
 
 /* includes - needed for FILE* here */
 #include <stdio.h>
+#include <stdint.h>
 
 /** forward-declaration for an struct */
 typedef struct smk_t* smk;
@@ -60,41 +61,44 @@ extern "C" {
 
 /* OPEN OPERATIONS */
 /** open an smk (from a file) */
-smk smk_open_file(const char* filename, unsigned char mode);
+smk smk_open_file(const char* filename, uint8_t mode);
 /** open an smk (from a file pointer) */
-smk smk_open_filepointer(FILE* file, unsigned char mode);
+smk smk_open_filepointer(FILE* file, uint8_t mode);
 /** read an smk (from a memory buffer) */
-smk smk_open_memory(const unsigned char* buffer, unsigned long size);
+smk smk_open_memory(const uint8_t* buffer, uint32_t size);
 
 /* CLOSE OPERATIONS */
 /** close out an smk file and clean up memory */
 void smk_close(smk object);
 
 /* GET FILE INFO OPERATIONS */
-char smk_info_all(const smk object, unsigned long* frame, unsigned long* frame_count, double* usf);
-char smk_info_video(const smk object, unsigned long* w, unsigned long* h, unsigned char* y_scale_mode);
-char smk_info_audio(const smk object, unsigned char* track_mask, unsigned char channels[7], unsigned char bitdepth[7], unsigned long audio_rate[7]);
+char smk_info_all(const smk object, uint32_t* frame, uint32_t* frame_count, double* usf);
+char smk_info_video(const smk object, uint32_t* w, uint32_t* h, uint8_t* y_scale_mode);
+char smk_info_audio(const smk object, uint8_t* track_mask, uint8_t channels[7], uint8_t bitdepth[7], uint32_t audio_rate[7]);
 
 /* ENABLE/DISABLE Switches */
-char smk_enable_all(smk object, unsigned char mask);
-char smk_enable_video(smk object, unsigned char enable);
-char smk_enable_audio(smk object, unsigned char track, unsigned char enable);
+char smk_enable_all(smk object, uint8_t mask);
+char smk_enable_video(smk object, uint8_t enable);
+char smk_enable_audio(smk object, uint8_t track, uint8_t enable);
 
 /** Retrieve palette */
-const unsigned char* smk_get_palette(const smk object);
+const uint8_t* smk_get_palette(const smk object);
 /** Retrieve video frame, as a buffer of size w*h */
-const unsigned char* smk_get_video(const smk object);
+const uint8_t* smk_get_video(const smk object);
 /** Retrieve decoded audio chunk, track N */
-const unsigned char* smk_get_audio(const smk object, unsigned char track);
+const uint8_t* smk_get_audio(const smk object, uint8_t track);
 /** Get size of currently pointed decoded audio chunk, track N */
-unsigned long smk_get_audio_size(const smk object, unsigned char track);
+uint32_t smk_get_audio_size(const smk object, uint8_t track);
 
 /** rewind to first frame and unpack */
 char smk_first(smk object);
 /** advance to next frame and unpack */
 char smk_next(smk object);
 /** seek to first keyframe before/at N in an smk */
-char smk_seek_keyframe(smk object, unsigned long frame);
+char smk_seek_keyframe(smk object, uint32_t frame);
+char smk_seek_keyframe_ahead(smk s, uint32_t f);
+/* check if the next frame is a keyframe */
+char smk_is_keyframe(smk s);
 
 #ifdef __cplusplus
 }

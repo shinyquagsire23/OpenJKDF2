@@ -3,6 +3,7 @@
 #include "Engine/rdroid.h"
 #include "General/stdConffile.h"
 #include "General/stdString.h"
+#include "General/crc32.h"
 #include "stdPlatform.h"
 #include "Win95/std.h"
 #include "jk.h"
@@ -26,6 +27,9 @@ void rdKeyframe_NewEntry(rdKeyframe *keyframe)
     _memset(keyframe, 0, sizeof(rdKeyframe));
 #ifdef SITH_DEBUG_STRUCT_NAMES
     stdString_SafeStrCopy(keyframe->name, "UNKNOWN", 32);
+#endif
+#ifdef STDHASHTABLE_CRC32_KEYS
+    keyframe->namecrc = stdCrc32("UNKNOWN", strlen("UNKNOWN"));
 #endif
 }
 
@@ -76,6 +80,9 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
     key_fname_only = stdFileFromPath(key_fpath);
 #ifdef SITH_DEBUG_STRUCT_NAMES
     stdString_SafeStrCopy(keyframe->name, key_fname_only, 32);
+#endif
+#ifdef STDHASHTABLE_CRC32_KEYS
+    keyframe->namecrc = stdCrc32(key_fname_only, strlen(key_fname_only));
 #endif
     if (!stdConffile_OpenRead(key_fpath)) {
         stdPrintf(pSithHS->errorPrint, ".\\Engine\\rdKeyframe.c", 0, "OpenJKDF2: Failed to open keyframe file `%s`\n", key_fpath);

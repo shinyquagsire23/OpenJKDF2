@@ -16,8 +16,17 @@ smush_ctx* smush_from_fpath(const char* fpath)
     memset(ctx, 0, sizeof(*ctx));
 
     ctx->framebuffer = malloc(640*480*sizeof(uint8_t));
+    if (!ctx->framebuffer) {
+        free(ctx);
+        return NULL;
+    }
     memset(ctx->framebuffer, 0, 640*480*sizeof(uint8_t));
     ctx->framebuffer_stor = malloc(640*480*sizeof(uint8_t));
+    if (!ctx->framebuffer_stor) {
+        free(ctx);
+        free(ctx->framebuffer);
+        return NULL;
+    }
     memset(ctx->framebuffer_stor, 0, 640*480*sizeof(uint8_t));
     ctx->c48_ctx = NULL;
 
@@ -262,8 +271,8 @@ void smush_proc_fobj(smush_ctx* ctx, uint32_t seek_pos, uint32_t total_size)
     ctx->codec_h = getle16(fobj.height);
 
     uint8_t* data = malloc(total_size);
-    memset(data, 0, total_size);
     if (!data) return;
+    memset(data, 0, total_size);
 
     fread(data, total_size - 0xE, 1, ctx->f);
 
@@ -378,7 +387,9 @@ void smush_proc_iact_payload(smush_ctx* ctx, const uint8_t* data, int64_t total_
 
             if (!ctx->audio_buffer_tmp) {
                 ctx->audio_buffer_tmp = (uint8_t*)malloc(ctx->audio_buffer_size);
-                memset(ctx->audio_buffer_tmp, 0, ctx->audio_buffer_size);
+                if (ctx->audio_buffer_tmp) {
+                    memset(ctx->audio_buffer_tmp, 0, ctx->audio_buffer_size);
+                }
                 ctx->audio_buffer_collected = 0;
             }
             uint8_t* disposable_buf = ctx->audio_buffer_tmp + ctx->audio_buffer_collected;
@@ -427,25 +438,39 @@ void smush_proc_iact_payload(smush_ctx* ctx, const uint8_t* data, int64_t total_
                 //printf("%02x %04x %x\n", val, out - ctx->audio_buffer, total_size);
                 if (val == 0x80) {
                     uint8_t val_tmp = *decode_in++;
-                    *out++ = *decode_in++;
-                    *out++ = val_tmp;
+                    if (ctx->audio_buffer_tmp) {
+                        *out++ = *decode_in++;
+                        *out++ = val_tmp;
+                    }
+                    else {
+                        decode_in++;
+                    }
                 }
                 else {
                     int16_t val16 = (int8_t)val << lownib;
-                    *out++ = (uint8_t)val16;
-                    *out++ = val16 >> 8;
+                    if (ctx->audio_buffer_tmp) {
+                        *out++ = (uint8_t)val16;
+                        *out++ = val16 >> 8;
+                    }
                 }
 
                 val = *decode_in++;
                 if (val == 0x80) {
                     uint8_t val_tmp = *decode_in++;
-                    *out++ = *decode_in++;
-                    *out++ = val_tmp;
+                    if (ctx->audio_buffer_tmp) {
+                        *out++ = *decode_in++;
+                        *out++ = val_tmp;
+                    }
+                    else {
+                        decode_in++;
+                    }
                 }
                 else {
                     int16_t val16 = (int8_t)val << hinib;
-                    *out++ = (uint8_t)val16;
-                    *out++ = val16 >> 8;
+                    if (ctx->audio_buffer_tmp) {
+                        *out++ = (uint8_t)val16;
+                        *out++ = val16 >> 8;
+                    }
                 }
 #endif
             }

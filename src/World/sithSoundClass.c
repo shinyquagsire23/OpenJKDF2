@@ -257,7 +257,7 @@ sithSoundClass* sithSoundClass_LoadFile(char *fpath)
 #ifdef SITH_DEBUG_STRUCT_NAMES
     stdHashTable_SetKeyVal(v5, v4->snd_fname, v4); // this is a load-bearing ifdef
 #else
-    stdHashTable_SetKeyVal(v5, fpath, v4); // Added: v4->snd_fname -> fpath
+    stdHashTable_SetKeyVal(v5, fpath, v4);
 #endif
     return v4;
 }

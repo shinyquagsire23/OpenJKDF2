@@ -351,6 +351,7 @@ typedef struct sithMapView sithMapView;
 typedef struct sithPlayerInfo sithPlayerInfo;
 typedef struct sithAnimclassEntry sithAnimclassEntry;
 typedef struct stdALBuffer stdALBuffer;
+typedef struct stdMaxmodBuffer stdMaxmodBuffer;
 typedef struct stdNullSoundBuffer stdNullSoundBuffer;
 typedef struct stdFontCharset stdFontCharset;
 typedef struct rdTri rdTri;
@@ -386,6 +387,11 @@ typedef stdALBuffer stdSound_3dBuffer_t;
 #ifdef STDSOUND_NULL
 typedef stdNullSoundBuffer stdSound_buffer_t;
 typedef stdNullSoundBuffer stdSound_3dBuffer_t;
+#endif 
+
+#ifdef STDSOUND_MAXMOD
+typedef stdMaxmodBuffer stdSound_buffer_t;
+typedef stdMaxmodBuffer stdSound_3dBuffer_t;
 #endif 
 
 #endif // STDSOUND_OPENAL
@@ -569,6 +575,9 @@ typedef struct rdKeyframe
 {
 #ifdef SITH_DEBUG_STRUCT_NAMES
     char name[32];
+#endif
+#ifdef STDHASHTABLE_CRC32_KEYS
+    uint32_t namecrc;
 #endif
     uint32_t id;
     uint32_t flags;
@@ -1039,8 +1048,8 @@ typedef struct stdVBufferTexFmt
 
 typedef struct stdFontEntry
 {
-  int32_t field_0;
-  int32_t field_4;
+  int32_t glyphTexX;
+  int32_t glyphWidth;
 } stdFontEntry;
 
 typedef struct stdFontCharset
@@ -1061,7 +1070,7 @@ typedef struct stdFont
   int32_t marginX;
   int16_t field_28;
   int16_t monospaceW;
-  stdBitmap *bitmap;
+  stdBitmap *pBitmap;
   stdFontCharset charsetHead;
 } stdFont;
 
@@ -1237,13 +1246,12 @@ typedef struct rdMaterial
     rdColor24 *palette_alloc;
     uint32_t num_texinfo;
     uint32_t celIdx;
-    rdTexinfo *texinfos[16];
+    rdTexinfo *texinfos[RDMATERIAL_MAX_TEXINFOS];
     uint32_t num_textures;
     rdTexture *textures;
 #ifdef RDMATERIAL_LRU_LOAD_UNLOAD
     BOOL bDataLoaded;
     int frameNum;
-    int refcnt;
     rdMaterial* pPrevCachedMaterial;
     rdMaterial* pNextCachedMaterial;
 #endif
@@ -3136,6 +3144,13 @@ typedef struct jkGuiElement
         const char* hintTextAlloced;
         const wchar_t* wHintTextAlloced;
     };
+#endif
+
+    // Added: Allow soft-resetting auto-smol repositioning
+#ifdef JKGUI_SMOL_SCREEN
+    rdRect rectOrig;
+    BOOL bIsSmolDirty;
+    BOOL bIsOrigStored;
 #endif
 } jkGuiElement;
 

@@ -27,7 +27,9 @@ uint32_t Linux_TimeMs()
 {
     // TWL has hardware timers we can use for accurate ms timing
 #if defined(TARGET_TWL)
-    return (uint32_t)(((TIMER1_DATA*(1<<16))+TIMER0_DATA)/32.7285);
+    //16756
+    //return (uint32_t)(((TIMER1_DATA*(1<<16))+TIMER0_DATA)/32.7285);
+    return (uint32_t)(((uint64_t)((TIMER1_DATA*(1<<16))+TIMER0_DATA)<<9)/16757);
 #else
 
     struct timespec _t;
@@ -45,7 +47,8 @@ uint32_t Linux_TimeMs()
 uint64_t Linux_TimeUs()
 {
 #if defined(TARGET_TWL)
-    return (uint64_t)(((TIMER1_DATA*(1<<16))+TIMER0_DATA)/32728.5);
+    //return (uint64_t)((flex64_t)((TIMER1_DATA*(1<<16))+TIMER0_DATA)/0.0327285);
+    return (uint64_t)(((uint64_t)((TIMER1_DATA*(1<<16))+TIMER0_DATA)<<19)/17159);
 #else
     struct timespec _t;
 
@@ -61,12 +64,6 @@ uint64_t Linux_TimeUs()
 
 static stdFile_t Linux_stdFileOpen(const char* fpath, const char* mode)
 {
-    // TODO figure out melonds failing
-#ifdef TARGET_TWL
-    if (!strcmp(mode, "w") || !strcmp(mode, "wb")) {
-        return 0;
-    }
-#endif
     char tmp[512];
     size_t len = strlen(fpath);
 
@@ -195,6 +192,7 @@ size_t trackingAllocsBReal = 0;
 size_t trackingAllocsBLimit = 0;
 size_t trackingAllocsC = 0;
 size_t trackingAllocsCReal = 0;
+size_t activeAllocs = 0;
 
 mspace openjkdf2_mem_main_mspace = NULL;
 mspace openjkdf2_mem_alt_mspace = NULL;
@@ -220,6 +218,7 @@ extern "C" {
 extern void *__real_malloc(size_t size);
 extern void __real_free(void *ptr);
 extern void* __real_realloc(void *ptr, size_t len);
+extern void *__real_calloc(size_t num, size_t size);
 
 #ifdef __cplusplus
 }
@@ -239,6 +238,7 @@ static void* TWL_mspace_alloc(mspace m, uint8_t marker, uint32_t len, uint32_t l
     if (ret) {
         *pTrackingAllocs += len;
         *pTrackingAllocsReal += lenAlign;
+        activeAllocs += 1;
         //printf("%p %x\n", ret, len + sizeof(tMemTrackingHeader));
 #ifdef MEM_CHECKING
         memset(ret, MEM_CHECKING_ZERO_VAL, len);
@@ -256,6 +256,7 @@ static void TWL_mspace_free(mspace m, tMemTrackingHeader* pHdr, uint32_t size, u
     void* ptr = (void*)(pHdr+1);
     *pTrackingAllocs -= size;
     *pTrackingAllocsReal -= sizeAlign;
+    activeAllocs -= 1;
     HDR_SET(pHdr, 0xDE, 0);
 #ifdef MEM_CHECKING
     memset(ptr, MEM_CHECKING_VAL_FREE, sizeAlign);
@@ -485,6 +486,10 @@ void* __wrap_realloc(void *ptr, uint32_t len) {
     return TWL_realloc(ptr, len);
 }
 
+void *__real_calloc(size_t num, size_t size) {
+    return TWL_alloc(num*size);
+}
+
 #ifdef __cplusplus
 }
 #endif
@@ -626,6 +631,6 @@ int stdPlatform_Printf(const char *fmt, ...)
 void stdPlatform_PrintHeapStats()
 {
     size_t waste = (trackingAllocsAReal - trackingAllocsA) + (trackingAllocsBReal - trackingAllocsB) + (trackingAllocsCReal - trackingAllocsC);
-    stdPlatform_Printf("heap ext=0x%zx mn=0x%zx\nnw=0x%zx wst=0x%zx\n", trackingAllocsA, trackingAllocsB, trackingAllocsC, waste);
+    stdPlatform_Printf("heap ext=0x%zx mn=0x%zx\nnw=0x%zx wst=0x%zx\nnum=%zd\n", trackingAllocsA, trackingAllocsB, trackingAllocsC, waste, activeAllocs);
 }
 #endif

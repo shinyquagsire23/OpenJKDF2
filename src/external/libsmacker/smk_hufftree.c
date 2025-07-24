@@ -26,8 +26,8 @@ struct smk_huff8_t
 		struct smk_huff8_t* b1;
 		struct
 		{
-			unsigned short value;
-			unsigned char escapecode;
+			uint16_t value;
+			uint8_t escapecode;
 		} leaf;
 	} u;
 };
@@ -39,7 +39,7 @@ struct smk_huff8_t
 struct smk_huff16_t
 {
 	struct smk_huff8_t* t;
-	unsigned short cache[3];
+	uint16_t cache[3];
 };
 
 /*********************** 8-BIT HUFF-TREE FUNCTIONS ***********************/
@@ -98,7 +98,7 @@ error:
 
 /* Look up an 8-bit value from a basic huff tree.
 	Return -1 on error. */
-short _smk_huff8_lookup(struct smk_bit_t* bs, const struct smk_huff8_t* t)
+int16_t _smk_huff8_lookup(struct smk_bit_t* bs, const struct smk_huff8_t* t)
 {
 	char bit;
 
@@ -200,12 +200,12 @@ error: ;
 	} \
 }
 /* Recursively builds a Big tree. */
-static struct smk_huff8_t* _smk_huff16_build_rec(struct smk_bit_t* bs, const unsigned short cache[3], const struct smk_huff8_t* low8, const struct smk_huff8_t* hi8)
+static struct smk_huff8_t* _smk_huff16_build_rec(struct smk_bit_t* bs, const uint16_t cache[3], const struct smk_huff8_t* low8, const struct smk_huff8_t* hi8)
 {
 	struct smk_huff8_t* ret = NULL;
 
 	char bit;
-	short lowval;
+	int16_t lowval;
 
 	/* sanity check - removed: these cannot be null, because they were checked at smk_huff16_build below */
 	/* smk_assert(bs);
@@ -273,10 +273,10 @@ struct smk_huff16_t* _smk_huff16_build(struct smk_bit_t* bs)
 	struct smk_huff8_t* low8 = NULL;
 	struct smk_huff8_t* hi8 = NULL;
 
-	short lowval;
+	int16_t lowval;
 
 	char bit;
-	unsigned char i;
+	uint8_t i;
 
 	/* sanity check */
 	smk_assert(bs);
@@ -331,9 +331,9 @@ error:
 	return NULL;
 }
 
-static int _smk_huff16_lookup_rec(struct smk_bit_t* bs, unsigned short cache[3], const struct smk_huff8_t* t)
+static int _smk_huff16_lookup_rec(struct smk_bit_t* bs, uint16_t cache[3], const struct smk_huff8_t* t)
 {
-	unsigned short val;
+	uint16_t val;
 	char bit;
 
 	/* sanity check */

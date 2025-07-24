@@ -93,6 +93,10 @@ rdProcEntry *rdCache_GetProcEntry()
     out_procEntry->paGreenIntensities = &rdCache_aGreenIntensities[rdCache_numUsedIntensities];
     out_procEntry->paBlueIntensities = &rdCache_aBlueIntensities[rdCache_numUsedIntensities];
 #endif
+
+    // Added: Try and prevent weird issues.
+    out_procEntry->material = NULL;
+
     return out_procEntry;
 }
 
@@ -413,7 +417,8 @@ int rdCache_SendFaceListToHardware()
                     v14 = v11.material->num_texinfo - 1;
             }
         }
-        else if ( v14 < 0 )
+        
+        if ( v14 < 0 ) // Added: don't do else if here
         {
             v14 = 0;
         }
@@ -421,8 +426,11 @@ int rdCache_SendFaceListToHardware()
         {
             v14 = v11.material->num_texinfo - 1;
         }
+        else if ( v14 >= RDMATERIAL_MAX_TEXINFOS ) { // Added
+            v14 = RDMATERIAL_MAX_TEXINFOS-1;
+        }
 
-        v15 = v11.material->texinfos ? v11.material->texinfos[v14] : NULL; // Added: v11.material->texinfos nullptr check
+        v15 = v11.material->texinfos[v14];
         v137 = v15;
         if ( v11.mipmap_related == 4 && (v15 && v15->header.texture_type & 8) == 0 ) // Added: v15 nullptr check
         {

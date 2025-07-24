@@ -140,6 +140,8 @@ void sithKeyFrame_Free(sithWorld *world)
     {
 #ifdef SITH_DEBUG_STRUCT_NAMES
         stdHashTable_FreeKey(sithPuppet_keyframesHashtable, world->keyframes[idx].name);
+#else
+        stdHashTable_FreeKeyCrc32(sithPuppet_keyframesHashtable, world->keyframes[idx].namecrc);
 #endif
         rdKeyframe_FreeJoints(&world->keyframes[idx]);
     }

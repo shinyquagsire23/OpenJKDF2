@@ -133,7 +133,7 @@ int jkHud_Open()
         *fontIter->pFont = v5;
         if ( !v5 )
             Windows_GameErrorMsgbox("ERR_CANNOT_LOAD_FILE %s", tmp);
-        stdBitmap_ConvertColorFormat(&Video_format.format, v5->bitmap);
+        stdBitmap_ConvertColorFormat(&Video_format.format, v5->pBitmap);
         ++fontIter;
     }
     jkHud_leftBlitX = 0;
@@ -734,7 +734,7 @@ void jkHud_Draw()
         {
             a4.width = 9;
             a4.x = jkHud_rectViewScores.x + 20;
-            a4.height = (*jkHud_pMsgFontSft->bitmap->mipSurfaces)->format.height - 2;
+            a4.height = stdFont_GetHeight(jkHud_pMsgFontSft) - 2;
             v49 = jkStrings_GetUniStringWithFallback("HUD_TEAMSCORESTITLE");
             stdFont_Draw4(
                 Video_pMenuBuffer,
@@ -814,7 +814,7 @@ LABEL_116:
                             stdFont_Draw1(Video_pMenuBuffer, jkHud_pMsgFontSft, jkHud_rectViewScores.x + 90, v53, jkHud_rectViewScores.width, a6, 1);
                             jk_snwprintf(a6, 0x80u, L"%4d", v54->score);
                             stdFont_Draw1(Video_pMenuBuffer, jkHud_pMsgFontSft, jkHud_rectViewScores.x + 150, v53, jkHud_rectViewScores.width, a6, 1);
-                            v53 += (*jkHud_pMsgFontSft->bitmap->mipSurfaces)->format.height + jkHud_pMsgFontSft->marginY;
+                            v53 += stdFont_GetHeight(jkHud_pMsgFontSft) + jkHud_pMsgFontSft->marginY;
                             break;
                     }
                 }
@@ -826,7 +826,7 @@ LABEL_116:
         {
             a4.x = jkHud_rectViewScores.x;
             a4.width = 9;
-            a4.height = (*jkHud_pMsgFontSft->bitmap->mipSurfaces)->format.height - 2;
+            a4.height = stdFont_GetHeight(jkHud_pMsgFontSft) - 2;
             v42 = jkStrings_GetUniStringWithFallback("HUD_PLAYERSCORES");
             stdFont_Draw4(
                 Video_pMenuBuffer,
@@ -866,7 +866,7 @@ LABEL_116:
                     jk_snwprintf(a6, 0x80u, L"%4d", v46->score);
                     stdFont_Draw1(Video_pMenuBuffer, jkHud_pMsgFontSft, jkHud_rectViewScores.x + 190, v44, jkHud_rectViewScores.width, a6, 1);
                     ++v46;
-                    v44 += (*jkHud_pMsgFontSft->bitmap->mipSurfaces)->format.height + jkHud_pMsgFontSft->marginY;
+                    v44 += stdFont_GetHeight(jkHud_pMsgFontSft) + jkHud_pMsgFontSft->marginY;
                     if ( ++v45 >= jkHud_numPlayers )
                         break;
                     v43 = jkHud_dword_553ED0;
@@ -1332,7 +1332,7 @@ void jkHud_DrawGPU()
         {
             a4.width = HUD_SCALED(9);
             a4.x = jkHud_rectViewScores.x + HUD_SCALED(20);
-            a4.height = HUD_SCALED((*jkHud_pMsgFontSft->bitmap->mipSurfaces)->format.height - 2);
+            a4.height = HUD_SCALED(stdFont_GetHeight(jkHud_pMsgFontSft) - 2);
             v49 = jkStrings_GetUniStringWithFallback("HUD_TEAMSCORESTITLE");
             stdFont_Draw4GPU(
                 jkHud_pMsgFontSft,
@@ -1413,7 +1413,7 @@ LABEL_116:
                             stdFont_Draw1GPU(jkHud_pMsgFontSft, jkHud_rectViewScores.x + HUD_SCALED(90), v53, jkHud_rectViewScores.width, a6, 1, jkPlayer_hudScale);
                             jk_snwprintf(a6, 0x80u, L"%4d", v54->score);
                             stdFont_Draw1GPU(jkHud_pMsgFontSft, jkHud_rectViewScores.x + HUD_SCALED(150), v53, jkHud_rectViewScores.width, a6, 1, jkPlayer_hudScale);
-                            v53 += HUD_SCALED((*jkHud_pMsgFontSft->bitmap->mipSurfaces)->format.height + jkHud_pMsgFontSft->marginY);
+                            v53 += HUD_SCALED(stdFont_GetHeight(jkHud_pMsgFontSft) + jkHud_pMsgFontSft->marginY);
                             break;
                     }
                 }
@@ -1425,7 +1425,7 @@ LABEL_116:
         {
             a4.x = jkHud_rectViewScores.x;
             a4.width = HUD_SCALED(9);
-            a4.height = HUD_SCALED((*jkHud_pMsgFontSft->bitmap->mipSurfaces)->format.height - 2);
+            a4.height = HUD_SCALED(stdFont_GetHeight(jkHud_pMsgFontSft) - 2);
             v42 = jkStrings_GetUniStringWithFallback("HUD_PLAYERSCORES");
             stdFont_Draw4GPU(
                 jkHud_pMsgFontSft,
@@ -1466,7 +1466,7 @@ LABEL_116:
                     jk_snwprintf(a6, 0x80u, L"%4d", v46->score);
                     stdFont_Draw1GPU(jkHud_pMsgFontSft, jkHud_rectViewScores.x + HUD_SCALED(190), v44, jkHud_rectViewScores.width, a6, 1, jkPlayer_hudScale);
                     ++v46;
-                    v44 += HUD_SCALED((*jkHud_pMsgFontSft->bitmap->mipSurfaces)->format.height + jkHud_pMsgFontSft->marginY);
+                    v44 += HUD_SCALED(stdFont_GetHeight(jkHud_pMsgFontSft) + jkHud_pMsgFontSft->marginY);
                     if ( ++v45 >= jkHud_numPlayers )
                         break;
                     v43 = jkHud_dword_553ED0;

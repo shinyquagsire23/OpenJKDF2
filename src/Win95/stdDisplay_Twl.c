@@ -197,7 +197,14 @@ int stdDisplay_ClearRect(stdVBuffer *buf, int fillColor, rdRect *rect)
 
 int stdDisplay_DDrawGdiSurfaceFlip()
 {
-    Window_SdlUpdate();
+    extern int Window_bFlipRequested;
+
+    if (!jkCutscene_isRendering && !sithWorld_pLoading && !jkGame_isDDraw) {
+        Window_bFlipRequested = 1;
+    }
+    else {
+        Window_SdlUpdate();
+    }
     return 1;
 }
 
@@ -351,9 +358,9 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
 
     if (!srcPixels && dstPixels) {
         int has_alpha = !(rect->width == 640) && (alpha_maybe & 1);
-        for (int i = 0; i < rect->width; i++)
+        for (int j = 0; j < rect->height; j++)
         {
-            for (int j = 0; j < rect->height; j++)
+            for (int i = 0; i < rect->width; i++)
             {
                 //if ((uint32_t)(i + srcRect.x) >= (uint32_t)vbuf2->format.width) continue;
                 //if ((uint32_t)(j + srcRect.y) >= (uint32_t)vbuf2->format.height) continue;
@@ -385,9 +392,9 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
 
         rdRect dstRect_inter = {0, 0, rect->width, rect->height};
 
-        for (int i = 0; i < rect->width; i++)
+        for (int j = 0; j < rect->height; j++)
         {
-            for (int j = 0; j < rect->height; j++)
+            for (int i = 0; i < rect->width; i++)
             {
                 if ((uint32_t)(i + srcRect.x) > (uint32_t)vbuf2->format.width) continue;
                 if ((uint32_t)(j + srcRect.y) > (uint32_t)vbuf2->format.height) continue;
@@ -414,9 +421,9 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
     int once = 0;
     int has_alpha = !(rect->width == 640) && (alpha_maybe & 1);
     
-    for (int i = 0; i < rect->width; i++)
+    for (int j = 0; j < rect->height; j++)
     {
-        for (int j = 0; j < rect->height; j++)
+        for (int i = 0; i < rect->width; i++)
         {
             if ((uint32_t)(i + srcRect.x) >= (uint32_t)vbuf2->format.width) continue;
             if ((uint32_t)(j + srcRect.y) >= (uint32_t)vbuf2->format.height) continue;
@@ -442,6 +449,7 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
 
 int stdDisplay_VBufferFill(stdVBuffer *vbuf, int fillColor, rdRect *rect)
 {
+    if (!vbuf) return 1;
 
     rdRect fallback = {0,0,vbuf->format.width, vbuf->format.height};
     if (!rect)
@@ -465,9 +473,9 @@ int stdDisplay_VBufferFill(stdVBuffer *vbuf, int fillColor, rdRect *rect)
         return 0;
     }
 
-    for (int i = 0; i < rect->width; i++)
+    for (int j = 0; j < rect->height; j++)
     {
-        for (int j = 0; j < rect->height; j++)
+        for (int i = 0; i < rect->width; i++)
         {
             uint32_t idx = (i + dstRect.x) + ((j + dstRect.y)*dstStride);
             if (idx > max_idx)
@@ -483,6 +491,7 @@ int stdDisplay_VBufferFill(stdVBuffer *vbuf, int fillColor, rdRect *rect)
 
 int stdDisplay_VBufferSetColorKey(stdVBuffer *vbuf, int color)
 {
+    if (!vbuf) return 1;
     //DDCOLORKEY v3; // [esp+0h] [ebp-8h] BYREF
 
     if ( vbuf->bSurfaceLocked )

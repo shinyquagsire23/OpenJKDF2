@@ -21,17 +21,14 @@
 #include "Main/jkGame.h"
 #include "Main/jkStrings.h"
 #include "Cog/jkCog.h"
+#include "General/stdMath.h"
 
 #ifdef TARGET_TWL
 #include <nds.h>
 #endif
 
 const char* jkGui_aBitmaps[35] = {
-#ifdef TARGET_TWL
     "bkMain.bm",
-#else
-    "bkMain.bm",
-#endif
     "bkSingle.bm",
     "bkMulti.bm",
     "bkSetup.bm",
@@ -68,9 +65,20 @@ const char* jkGui_aBitmaps[35] = {
     "arrowRight.bm"
 };
 
-const char* jkGui_aFonts[12] = {
+#ifdef JKGUI_SMOL_SCREEN
+#define JKGUI_NUM_FONTS (12+3)
+#else
+#define JKGUI_NUM_FONTS (12)
+#endif
+
+const char* jkGui_aFonts[JKGUI_NUM_FONTS] = {
+#ifdef JKGUI_SMOL_SCREEN
+    "msgfont.sft",
+    "msgfont.sft",
+#else
     "small0.sft",
     "small1.sft",
+#endif
     "med0.sft",
     "med1.sft",
     "med2.sft",
@@ -80,7 +88,12 @@ const char* jkGui_aFonts[12] = {
     "FLFont0.sft",
     "FLFont1.sft",
     "FLFont2.sft",
-    "FLTitle.sft"
+    "FLTitle.sft",
+#ifdef JKGUI_SMOL_SCREEN
+    "msgfont.sft",
+    "msgfont.sft",
+    "msgfont.sft",
+#endif
 };
 
 static int jkGui_bInitialized;
@@ -108,6 +121,20 @@ void jkGui_InitMenu(jkGuiMenu *menu, stdBitmap *bgBitmap)
         iter->wHintTextAlloced = NULL;
         iter->strAlloced = NULL;
 #endif
+#ifdef JKGUI_SMOL_SCREEN
+        if (!iter->bIsOrigStored) {
+            iter->rectOrig = iter->rect;
+            iter->bIsOrigStored = 1;
+        }
+        else {
+            iter->rect = iter->rectOrig;
+        }
+
+        if (iter->type == ELEMENT_TEXTBUTTON || iter->type == ELEMENT_TEXT || iter->type == ELEMENT_LISTBOX) {
+            iter->textType = 12;
+        }
+        iter->bIsSmolDirty = 1;
+#endif
 
         if ( iter->hintText )
         {
@@ -129,9 +156,70 @@ void jkGui_InitMenu(jkGuiMenu *menu, stdBitmap *bgBitmap)
                 }
             }
         }
+
         ++iter;
     }
+
+#ifdef JKGUI_SMOL_SCREEN
+    jkGui_SmolScreenFixup(menu, 1);
+#endif
 }
+
+#ifdef JKGUI_SMOL_SCREEN
+void jkGui_SmolScreenFixup(jkGuiMenu *menu, BOOL bForce) {
+    jkGuiElement* iter = menu->paElements;
+    
+    while ( iter->type != ELEMENT_END )
+    {
+        if (!iter->bIsSmolDirty && !bForce) {
+            iter++;
+            continue;
+        }
+
+        int bIgnore = 0;
+        if (iter->rect.width == 640) {
+            bIgnore = 1;
+        }
+        if (iter->rect.height == 480) {
+            bIgnore = 1;
+        }
+        if (iter->rect.y < 100) {
+            //bIgnore = 1;
+        }
+        if (iter->type == ELEMENT_TEXT && !iter->str) {
+            bIgnore = 1;
+        }
+
+        iter->rect.x = ((int)(flex_t)iter->rect.x * (flex_t)0.4);
+        iter->rect.y = ((int)(flex_t)iter->rect.y * (flex_t)0.4);
+        iter->rect.width = ((int)(flex_t)iter->rect.width * (flex_t)0.4);
+        iter->rect.height = ((int)(flex_t)iter->rect.height * (flex_t)0.4);
+
+        if ((iter->type == ELEMENT_TEXTBUTTON || iter->type == ELEMENT_TEXT)) {
+            iter->textType = 12;
+            if (iter->rect.height < 11) {
+                iter->rect.height = 11;
+            }
+        }
+        iter++;
+    }
+
+    iter = menu->paElements;
+    while ( iter->type != ELEMENT_END )
+    {
+        if (!iter->bIsSmolDirty && !bForce) {
+            iter->bIsSmolDirty = 0;
+            iter++;
+            continue;
+        }
+        else {
+            iter->bIsSmolDirty = 0;
+        }
+
+        iter++;
+    }
+}
+#endif
 
 int jkGui_MessageBeep()
 {
@@ -151,12 +239,12 @@ int jkGui_Startup()
     stdString_CharToWchar(jkPlayer_playerShortName, playerShortName, 31);
     jkPlayer_playerShortName[31] = 0;
 
-    for (int i = 0; i < 12; i++)
+    for (int i = 0; i < JKGUI_NUM_FONTS; i++)
     {
         // TODO: Eviction caching for stdBitmap, rdMaterial
-#ifdef TARGET_TWL
-        int replace_lut[] = {0,1,2,3,4,2,3,4,2,3,4,2};
-        if (openjkdf2_bIsLowMemoryPlatform && i >= 5) {
+#if defined(TARGET_TWL) || defined(JKGUI_SMOL_SCREEN)
+        int replace_lut[] = {0,1,0,1,1,2,3,4,0,1,1,2,0,1,1};
+        if (/*openjkdf2_bIsLowMemoryPlatform &&*/ i >= 5) {
             jkGui_stdFonts[i] = jkGui_stdFonts[replace_lut[i]];
             continue;
         }
@@ -175,14 +263,14 @@ int jkGui_Startup()
     {
         // TODO: Eviction caching for stdBitmap, rdMaterial
 #ifdef TARGET_TWL
-        if (i >= 1 && i <= 6) {
+        /*if (i >= 1 && i <= 6) {
             jkGui_stdBitmaps[i] = jkGui_stdBitmaps[0];
             continue;
         }
         if (i >= 7 && i <= 11) {
             jkGui_stdBitmaps[i] = jkGui_stdBitmaps[0];
             continue;
-        }
+        }*/
 #endif
         stdString_snprintf(tmp, 128, "ui\\bm\\%s", jkGui_aBitmaps[i]);
         jkGui_stdBitmaps[i] = stdBitmap_Load(tmp, 1, 0);
@@ -194,6 +282,54 @@ int jkGui_Startup()
 #ifdef TARGET_TWL
     stdPlatform_PrintHeapStats();
 #endif
+
+#ifdef JKGUI_SMOL_SCREEN
+    stdVBuffer* texA = jkGui_stdFonts[1]->pBitmap->mipSurfaces[0];
+    stdDisplay_VBufferLock(texA);
+    for (int i = 0; i < texA->format.width * texA->format.height; i++) {
+        if (!texA->surface_lock_alloc[i]) continue;
+
+        // menu: E5=black, E4=dark red E0=red E1=lighter red?
+        // menu: F3=gold, darker, FC=bright yellow, E6=brown
+        // font: 87=outline alt 3f=outline, 68=interior 69=interior alt
+
+        if (texA->surface_lock_alloc[i] == 0x3F) { // outline
+            texA->surface_lock_alloc[i] = 0xE5;
+        }
+        else if (texA->surface_lock_alloc[i] == 0x87) { // outline
+            texA->surface_lock_alloc[i] = 0xE6;
+        }
+        else if (texA->surface_lock_alloc[i] == 0x68) { // interior
+            texA->surface_lock_alloc[i] = 0xFC;
+        }
+        else if (texA->surface_lock_alloc[i] == 0x69) { // interior
+            texA->surface_lock_alloc[i] = 0xFB;
+        }
+        //texA->surface_lock_alloc[i] = 0xe6;
+    }
+    stdDisplay_VBufferUnlock(texA);
+
+    stdVBuffer* texB = jkGui_stdFonts[0]->pBitmap->mipSurfaces[0];
+    stdDisplay_VBufferLock(texB);
+    for (int i = 0; i < texB->format.width * texB->format.height; i++) {
+        if (!texB->surface_lock_alloc[i]) continue;
+
+        if (texB->surface_lock_alloc[i] == 0x3F) {
+            texB->surface_lock_alloc[i] = 0xE5;
+        }
+        else if (texB->surface_lock_alloc[i] == 0x87) {
+            texB->surface_lock_alloc[i] = 0xE4;
+        }
+        else if (texB->surface_lock_alloc[i] == 0x68) {
+            texB->surface_lock_alloc[i] = 0xE0;
+        }
+        else if (texB->surface_lock_alloc[i] == 0x69) {
+            texB->surface_lock_alloc[i] = 0xE0;
+        }
+    }
+    stdDisplay_VBufferUnlock(texB);
+//#endif
+#endif // JKGUI_SMOL_SCREEN
 
     Window_ShowCursorUnwindowed(Main_bWindowGUI == 0);
     jkGuiRend_SetPalette((uint8_t*)jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]->palette);
@@ -207,9 +343,9 @@ void jkGui_Shutdown()
 
     char playerShortName[32];
 
-    for (int i = 0; i < 12; i++)
+    for (int i = 0; i < JKGUI_NUM_FONTS; i++)
     {
-#ifdef TARGET_TWL
+#if defined(TARGET_TWL) || defined(JKGUI_SMOL_SCREEN)
         if (i >= 5) {
             continue;
         }
@@ -221,12 +357,12 @@ void jkGui_Shutdown()
     for (int i = 0; i < 35; i++)
     {
 #ifdef TARGET_TWL
-        if (i >= 1 && i <= 6) {
+        /*if (i >= 1 && i <= 6) {
             continue;
         }
         if (i >= 7 && i <= 11) {
             continue;
-        }
+        }*/
 #endif
         stdBitmap_Free(jkGui_stdBitmaps[i]);
         jkGui_stdBitmaps[i] = NULL;
@@ -345,7 +481,11 @@ void jkGui_sub_412E20(jkGuiMenu *menu, int a2, int a3, int a4)
         jkGuiElement* element = jkGuiRend_MenuGetClickableById(menu, i);
         if ( element )
         {
+#ifndef JKGUI_SMOL_SCREEN
             element->textType = 2;
+#else
+            element->textType = 12;
+#endif
             element->type = ELEMENT_TEXTBUTTON;
         }
     }
@@ -355,7 +495,11 @@ void jkGui_sub_412E20(jkGuiMenu *menu, int a2, int a3, int a4)
         jkGuiElement* element = jkGuiRend_MenuGetClickableById(menu, a4);
         if ( element )
         {
+#ifndef JKGUI_SMOL_SCREEN
             element->textType = 3;
+#else
+            element->textType = 13;
+#endif
             element->type = ELEMENT_TEXT;
         }
     }

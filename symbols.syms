@@ -927,7 +927,7 @@ jkGuiMap_unk4 0x00556618 sithMap
 jkGuiMap_vec3Idk 0x00556650 rdVector3
 jkGuiMap_pCamera 0x0055665C rdCamera*
 jkGuiMap_dword_556660 0x00556660 int
-jkGuiMap_dword_556664 0x00556664 int
+jkGuiMap_bOrbitActive 0x00556664 int
 jkGuiMap_dword_556668 0x00556668 int
 jkGuiMap_dword_55666C 0x0055666C int
 

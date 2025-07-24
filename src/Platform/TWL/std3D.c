@@ -56,8 +56,7 @@ int std3D_timeWastedWaitingAround = 0;
 
 u8* i8Bitmap = NULL;
 u8* i8Bitmap2 = NULL;
-u8* i8Bitmap_flip = NULL;
-u8* i8Bitmap2_flip = NULL;
+BOOL std3D_bMenuBitmapsFreed = 1;
 
 D3DVERTEX* tmpD3DVertices = NULL;
 rdTri* tmpTris = NULL;
@@ -258,10 +257,7 @@ void std3D_Shutdown() {
     pHS->free(i8Bitmap2);
     i8Bitmap2 = NULL;
 
-    pHS->free(i8Bitmap_flip);
-    i8Bitmap_flip = NULL;
-    pHS->free(i8Bitmap2_flip);
-    i8Bitmap2_flip = NULL;
+    std3D_bMenuBitmapsFreed = 1;
 
     std3D_FreeResources();
 
@@ -1099,8 +1095,8 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
     return 1;
 }
 
-int fb_shift_x = 192;
-int fb_shift_y = 128;
+int fb_shift_x = 0;//192;
+int fb_shift_y = 0;//128;
 
 MATH_FUNC void std3D_DrawMenu()
 {
@@ -1109,6 +1105,7 @@ MATH_FUNC void std3D_DrawMenu()
     // HACK: Force resources to free
     std3D_frameCount = 1;
 
+#if 0
     touchPosition touchXY;
     touchRead(&touchXY);
     if (touchXY.px != 0 || touchXY.py != 0) {
@@ -1128,9 +1125,11 @@ MATH_FUNC void std3D_DrawMenu()
             fb_shift_y = 0;
         }
     }
+#endif
 
-    if (!i8Bitmap || !i8Bitmap2 || !i8Bitmap_flip || !i8Bitmap2_flip) {
+    if (std3D_bMenuBitmapsFreed) {
         std3D_PurgeEntireTextureCache();
+        rdMaterial_PurgeEntireMaterialCache();
         std3D_LoadResources();
     }
     if (!i8Bitmap) {
@@ -1139,15 +1138,28 @@ MATH_FUNC void std3D_DrawMenu()
     if (!i8Bitmap2) {
         i8Bitmap2 = (u8*)pHS->alloc(256*128);
     }
-    if (!i8Bitmap_flip) {
-        i8Bitmap_flip = (u8*)pHS->alloc(256*64);
-    }
-    if (!i8Bitmap2_flip) {
-        i8Bitmap2_flip = (u8*)pHS->alloc(256*128);
+    if (i8Bitmap || i8Bitmap2) {
+        std3D_bMenuBitmapsFreed = 0;
     }
 
-    u8* whichBitmap = std3D_bTwlFlipTextures ? i8Bitmap : i8Bitmap_flip;
-    u8* whichBitmap2 = std3D_bTwlFlipTextures ? i8Bitmap2 : i8Bitmap2_flip;
+    u8* whichBitmap = i8Bitmap;
+    u8* whichBitmap2 = i8Bitmap2;
+    int whichTexture = std3D_bTwlFlipTextures ? 0 : 2;
+    int whichTexture2 = std3D_bTwlFlipTextures ? 1 : 3;
+    u8* tmpVramCheck = NULL;
+
+    if (tmpVramCheck = (u8*)glGetTexturePointer(whichTexture)) {
+        free(i8Bitmap);
+        i8Bitmap = NULL;
+
+        whichBitmap = tmpVramCheck;
+    }
+    if (tmpVramCheck = (u8*)glGetTexturePointer(whichTexture2)) {
+        free(i8Bitmap2);
+        i8Bitmap2 = NULL;
+
+        whichBitmap2 = tmpVramCheck;
+    }
 
     if (!whichBitmap || !whichBitmap2) {
         return;
@@ -1156,21 +1168,56 @@ MATH_FUNC void std3D_DrawMenu()
     if (Video_menuBuffer.surface_lock_alloc)
     {
         uint32_t pitch = Video_menuBuffer.format.width_in_bytes;
-        for (int x = 0; x < 256; x++)
-        {
-            for(int y = 0; y < 64; y++)
+        if (jkCutscene_isRendering) {
+            flex_t srcXf = 0;
+            flex_t srcYf = 0;
+            for (int y = 0; y < 64; y++)
             {
-                whichBitmap[(y*256)+x] = Video_menuBuffer.surface_lock_alloc[(pitch*(y+fb_shift_y))+(x+fb_shift_x)];
-                //Video_menuBuffer.surface_lock_alloc[(pitch*y)+x] = (y*128)+x;
+                srcXf = 0;
+                for (int x = 0; x < 256; x++)
+                {
+                    int srcX = (int)srcXf;
+                    int srcY = (int)srcYf;
+                    whichBitmap[(y*256)+x] = Video_menuBuffer.surface_lock_alloc[(pitch*srcY)+srcX];
+                    //Video_menuBuffer.surface_lock_alloc[(pitch*y)+x] = (y*128)+x;
+
+                    srcXf += (flex_t)2.5;
+                }
+                srcYf += (flex_t)2.5;
+            }
+
+            //srcY = 64*(flex_t)2.5;
+            for (int y = 0; y < 128; y++)
+            {
+                srcXf = 0;
+                for (int x = 0; x < 256; x++)
+                {
+                    int srcX = (int)srcXf;
+                    int srcY = (int)srcYf;
+                    whichBitmap2[(y*256)+x] = Video_menuBuffer.surface_lock_alloc[(pitch*srcY)+srcX];
+                    //Video_menuBuffer.surface_lock_alloc[(pitch*y)+x] = (y*128)+x;
+                    srcXf += (flex_t)2.5;
+                }
+                srcYf += (flex_t)2.5;
             }
         }
-
-        for (int x = 0; x < 256; x++)
-        {
-            for(int y = 0; y < 128; y++)
+        else {
+            for (int y = 0; y < 64; y++)
             {
-                whichBitmap2[(y*256)+x] = Video_menuBuffer.surface_lock_alloc[(pitch*((y+fb_shift_y)+64))+(x+fb_shift_x)];
-                //Video_menuBuffer.surface_lock_alloc[(pitch*y)+x] = (y*128)+x;
+                for (int x = 0; x < 256; x++)
+                {
+                    whichBitmap[(y*256)+x] = Video_menuBuffer.surface_lock_alloc[(pitch*(y+fb_shift_y))+(x+fb_shift_x)];
+                    //Video_menuBuffer.surface_lock_alloc[(pitch*y)+x] = (y*128)+x;
+                }
+            }
+
+            for (int y = 0; y < 128; y++)
+            {
+                for (int x = 0; x < 256; x++)
+                {
+                    whichBitmap2[(y*256)+x] = Video_menuBuffer.surface_lock_alloc[(pitch*((y+fb_shift_y)+64))+(x+fb_shift_x)];
+                    //Video_menuBuffer.surface_lock_alloc[(pitch*y)+x] = (y*128)+x;
+                }
             }
         }
     }
@@ -1179,6 +1226,7 @@ MATH_FUNC void std3D_DrawMenu()
     //DC_FlushRange((u8*)whichBitmap2, 256*128);
 
     std3D_ActuallyNeedToWaitForGeometryToFinish();
+    swiWaitForVBlank();
 
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
@@ -1196,10 +1244,10 @@ MATH_FUNC void std3D_DrawMenu()
 
     update_from_display_palette();
     
-    glBindTexture(0, textureIDS[std3D_bTwlFlipTextures ? 0 : 2]);
+    glBindTexture(0, textureIDS[whichTexture]);
     glTexImage2D(0, 0, GL_RGB256, TEXTURE_SIZE_256, TEXTURE_SIZE_64, 0, TEXGEN_TEXCOORD, (u8*)whichBitmap);
 
-    glBindTexture(0, textureIDS[std3D_bTwlFlipTextures ? 1 : 3]);
+    glBindTexture(0, textureIDS[whichTexture2]);
     glTexImage2D(0, 0, GL_RGB256, TEXTURE_SIZE_256, TEXTURE_SIZE_128, 0, TEXGEN_TEXCOORD, (u8*)whichBitmap2);
 
     std3D_bNeedsToPurgeMenuBuffers = 1;
@@ -1208,27 +1256,19 @@ MATH_FUNC void std3D_DrawMenu()
     glBindTexture(0, textureIDS[nTexture]);
     glColorTableEXT( 0, 0, 256, 0, 0, (u16*)i8Pal );
 
-    //draw the obj
     glColor3b(255,255,255);
-    //glScalef(0.4f,0.4f,0.4f);
-    //glScalef(1.0f/0.4f,1.0f/0.4f,1.0f/0.4f);
     int polyid = 1;
-    //for(int j = 0; j < 2; j++)
+    for(int i = 0; i < 2; i++)
     {
-        for(int i = 0; i < 2; i++)
-        {
-            //glAssignColorTable(0,paletteIDS[0]);
+        //glAssignColorTable(0,paletteIDS[0]);
 
-            glBindTexture(0, textureIDS[i+(std3D_bTwlFlipTextures?0:2)]);
-            //glBindTexture(0, textureIDS[4]);
-            glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK | POLY_MODULATION | POLY_ID(polyid) ) ;
-            glBegin(GL_QUAD);
-            drawQuad(i);
-            glEnd();
-            polyid++;
-        }
-
-        
+        glBindTexture(0, textureIDS[i+(std3D_bTwlFlipTextures?0:2)]);
+        //glBindTexture(0, textureIDS[4]);
+        glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK | POLY_MODULATION | POLY_ID(polyid) ) ;
+        glBegin(GL_QUAD);
+        drawQuad(i);
+        glEnd();
+        polyid++;
     }
 
     std3D_bTwlFlipTextures = !std3D_bTwlFlipTextures;
@@ -1344,6 +1384,7 @@ void std3D_PurgeBitmapRefs(stdBitmap *pBitmap)
 
 void std3D_PurgeSurfaceRefs(rdDDrawSurface *pTexture)
 {
+    if (!pTexture) { return; }
     //stdPlatform_Printf("std3D_PurgeSurfaceRefs\n");
     for (int i = 0; i < STD3D_MAX_TEXTURES; i++)
     {
@@ -1527,4 +1568,4 @@ void std3D_DrawUIBitmapRGBA(stdBitmap* pBmp, int mipIdx, flex_t dstX, flex_t dst
 void std3D_DrawUIBitmap(stdBitmap* pBmp, int mipIdx, flex_t dstX, flex_t dstY, rdRect* srcRect, flex_t scale, int bAlphaOverwrite) {}
 void std3D_DrawUIClearedRect(uint8_t palIdx, rdRect* dstRect) {}
 void std3D_DrawUIClearedRectRGBA(uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a, rdRect* dstRect) {}
-int std3D_IsReady() {}
+int std3D_IsReady() { return std3D_bHasInitted; }

@@ -14,22 +14,8 @@
 /* malloc and friends */
 #include "smk_malloc.h"
 
-/*
-	Bitstream structure
-	Pointer to raw block of data and a size limit.
-	Maintains internal pointers to byte_num and bit_number.
-*/
-struct smk_bit_t
-{
-	const unsigned char* buffer;
-	unsigned long size;
-
-	unsigned long byte_num;
-	char bit_num;
-};
-
 /* BITSTREAM Functions */
-struct smk_bit_t* smk_bs_init(const unsigned char* b, const unsigned long size)
+struct smk_bit_t* smk_bs_init(const uint8_t* b, const uint64_t size)
 {
 	struct smk_bit_t* ret = NULL;
 
@@ -44,8 +30,8 @@ struct smk_bit_t* smk_bs_init(const unsigned char* b, const unsigned long size)
 	ret->size = size;
 
 	/* point to initial byte: note, smk_malloc already sets these to 0 */
-	/* ret->byte_num = 0;
-	ret->bit_num = 0; */
+	ret->byte_num = 0;
+	ret->bit_num = 0;
 
 	/* return ret or NULL if error : ) */
 error:
@@ -56,8 +42,9 @@ error:
 	Returns -1 if error encountered */
 char _smk_bs_read_1(struct smk_bit_t* bs)
 {
-	unsigned char ret = -1;
+	uint8_t ret = -1;
 
+#ifndef SMK_FAST
 	/* sanity check */
 	smk_assert(bs);
 
@@ -67,6 +54,7 @@ char _smk_bs_read_1(struct smk_bit_t* bs)
 		fprintf(stderr, "libsmacker::_smk_bs_read_1(bs): ERROR: bitstream (length=%lu) exhausted.\n", bs->size);
 		goto error;
 	}
+#endif
 
 	/* get next bit and return */
 	ret = (((bs->buffer[bs->byte_num]) & (1 << bs->bit_num)) != 0);
@@ -75,11 +63,8 @@ char _smk_bs_read_1(struct smk_bit_t* bs)
 	bs->bit_num ++;
 
 	/* Out of bits in this byte: next! */
-	if (bs->bit_num > 7)
-	{
-		bs->byte_num ++;
-		bs->bit_num = 0;
-	}
+	bs->byte_num += (bs->bit_num>>3);
+	bs->bit_num &= 7;
 
 	/* return ret, or (default) -1 if error */
 error:
@@ -88,10 +73,11 @@ error:
 
 /* Reads a byte
 	Returns -1 if error. */
-short _smk_bs_read_8(struct smk_bit_t* bs)
+int16_t _smk_bs_read_8(struct smk_bit_t* bs)
 {
-	unsigned char ret = -1;
+	uint8_t ret = -1;
 
+#ifndef SMK_FAST
 	/* sanity check */
 	smk_assert(bs);
 
@@ -101,6 +87,7 @@ short _smk_bs_read_8(struct smk_bit_t* bs)
 		fprintf(stderr, "libsmacker::_smk_bs_read_8(bs): ERROR: bitstream (length=%lu) exhausted.\n", bs->size);
 		goto error;
 	}
+#endif
 
 	if (bs->bit_num)
 	{

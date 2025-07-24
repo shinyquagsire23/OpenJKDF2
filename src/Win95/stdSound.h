@@ -3,6 +3,10 @@
 
 #include "types.h"
 
+#ifdef STDSOUND_MAXMOD
+#include <maxmod9.h>
+#endif
+
 #define stdSound_Startup_ADDR (0x0436E80)
 #define stdSound_Shutdown_ADDR (0x04370E0)
 #define stdSound_SetMenuVolume_ADDR (0x0437150)
@@ -83,6 +87,29 @@ typedef struct stdNullSoundBuffer
     rdVector3 pos;
     rdVector3 vel;
 } stdNullSoundBuffer;
+
+#ifdef STDSOUND_MAXMOD
+typedef struct stdMaxmodBuffer
+{
+    void* data;
+    int format;
+    int bStereo;
+    int bitsPerSample;
+    uint32_t nSamplesPerSec;
+    int bufferBytes;
+    int bufferLen;
+    int refcnt;
+    flex_t vol;
+    int bIsCopy;
+    rdVector3 pos;
+    rdVector3 vel;
+    mm_stream stream;
+    uint32_t currentSample;
+    int sampleRepeats;
+    BOOL isPlaying;
+    BOOL isLooping;
+} stdMaxmodBuffer;
+#endif
 
 typedef struct stdWaveFormat
 {

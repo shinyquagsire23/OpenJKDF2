@@ -89,7 +89,7 @@ void jkQuakeConsole_Startup()
     int largestW = 0;
     for (int i = 0; i < num; i++)
     {
-        int w = jkQuakeConsole_pFont->charsetHead.pEntries[i].field_4;
+        int w = jkQuakeConsole_pFont->charsetHead.pEntries[i].glyphWidth;
         char theChar = i + jkQuakeConsole_pFont->charsetHead.charFirst;
         averageW += w;
         if (w > largestW && theChar != ' ' && theChar != '\t') {
@@ -101,7 +101,7 @@ void jkQuakeConsole_Startup()
     jkQuakeConsole_pFont->monospaceW = (averageW + averageW + largestW) / 3;
     for (int i = 0; i < num; i++)
     {
-        //jkQuakeConsole_pFont->charsetHead.pEntries[i].field_4 = largestW;
+        //jkQuakeConsole_pFont->charsetHead.pEntries[i].glyphWidth = largestW;
     }
 
     Window_AddMsgHandler(jkQuakeConsole_WmHandler);
@@ -176,7 +176,7 @@ void jkQuakeConsole_Render()
 
     flex_t screenW = Video_menuBuffer.format.width;
     flex_t screenH = Video_menuBuffer.format.height;
-    flex_t fontHeight = ((*jkQuakeConsole_pFont->bitmap->mipSurfaces)->format.height + jkQuakeConsole_pFont->marginY) * jkPlayer_hudScale;
+    flex_t fontHeight = ((*jkQuakeConsole_pFont->pBitmap->mipSurfaces)->format.height + jkQuakeConsole_pFont->marginY) * jkPlayer_hudScale;
     if (fontHeight <= 0.0) {
         fontHeight = 1.0;
     }

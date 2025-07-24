@@ -697,7 +697,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, flex_t a3, i
             int bAdjoinIsTransparent = (((!adjoinSurface->surfaceInfo.face.material ||
                         (adjoinSurface->surfaceInfo.face.geometryMode == 0)) ||
                        ((adjoinSurface->surfaceInfo.face.type & 2))) ||
-                      (v51 && (v51->header.texture_type & 8) && (v51->texture_ptr->alpha_en & 1))
+                      (v51 && (v51->header.texture_type & 8) && (v51->texture_ptr && v51->texture_ptr->alpha_en & 1)) // Added: v51->texture_ptr check
                       );
 
 #ifdef QOL_IMPROVEMENTS
@@ -722,7 +722,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, flex_t a3, i
             int bMirrorAdjoinIsTransparent = (((!adjoinMirrorSurface->surfaceInfo.face.material ||
                         (adjoinMirrorSurface->surfaceInfo.face.geometryMode == RD_GEOMODE_NOTRENDERED)) ||
                        ((adjoinMirrorSurface->surfaceInfo.face.type & 2))) ||
-                      (adjoinMirrorTexinfo && (adjoinMirrorTexinfo->header.texture_type & 8) && (adjoinMirrorTexinfo->texture_ptr->alpha_en & 1))
+                      (adjoinMirrorTexinfo && (adjoinMirrorTexinfo->header.texture_type & 8) && (adjoinMirrorTexinfo->texture_ptr && adjoinMirrorTexinfo->texture_ptr->alpha_en & 1))
                       );
 
             bAdjoinIsTransparent |= bMirrorAdjoinIsTransparent;
@@ -1137,7 +1137,7 @@ void sithRender_NoClip(sithSector *sector, rdClipFrustum *frustumArg, flex_t a3,
             int bAdjoinIsTransparent = (((!adjoinSurface->surfaceInfo.face.material ||
                         (adjoinSurface->surfaceInfo.face.geometryMode == 0)) ||
                        ((adjoinSurface->surfaceInfo.face.type & 2))) ||
-                      (v51 && (v51->header.texture_type & 8) && (v51->texture_ptr->alpha_en & 1))
+                      (v51 && (v51->header.texture_type & 8) && (v51->texture_ptr && v51->texture_ptr->alpha_en & 1)) // Added: v51->texture_ptr check
                       );
 
 #ifdef QOL_IMPROVEMENTS
@@ -1162,7 +1162,7 @@ void sithRender_NoClip(sithSector *sector, rdClipFrustum *frustumArg, flex_t a3,
             int bMirrorAdjoinIsTransparent = (((!adjoinMirrorSurface->surfaceInfo.face.material ||
                         (adjoinMirrorSurface->surfaceInfo.face.geometryMode == RD_GEOMODE_NOTRENDERED)) ||
                        ((adjoinMirrorSurface->surfaceInfo.face.type & 2))) ||
-                      (adjoinMirrorTexinfo && (adjoinMirrorTexinfo->header.texture_type & 8) && (adjoinMirrorTexinfo->texture_ptr->alpha_en & 1))
+                      (adjoinMirrorTexinfo && (adjoinMirrorTexinfo->header.texture_type & 8) && (adjoinMirrorTexinfo->texture_ptr && adjoinMirrorTexinfo->texture_ptr->alpha_en & 1))
                       );
 
             bAdjoinIsTransparent |= bMirrorAdjoinIsTransparent;
@@ -1349,7 +1349,7 @@ void sithRender_RenderLevelGeometry()
                 v10 = v73;
             }
 
-            if ( v65->adjoin && surfaceMat && ((v65->surfaceInfo.face.type & 2) != 0 || (v10 && (v10->header.texture_type & 8)) && (v10 && (v10->texture_ptr->alpha_en & 1))) ) // Added: nullptr checks for v10
+            if ( v65->adjoin && surfaceMat && ((v65->surfaceInfo.face.type & 2) != 0 || (v10 && (v10->header.texture_type & 8)) && (v10 && v10->texture_ptr && (v10->texture_ptr->alpha_en & 1))) ) // Added: nullptr checks for v10 and v10->texture_ptr
             {
                 if (sithRender_numSurfaces < SITH_MAX_VISIBLE_ALPHA_SURFACES)
                 {

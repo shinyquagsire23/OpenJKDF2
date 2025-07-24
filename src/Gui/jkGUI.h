@@ -22,6 +22,9 @@ typedef struct stdFont stdFont;
 typedef struct jkEpisodeLoad jkEpisodeLoad;
 
 void jkGui_InitMenu(jkGuiMenu *menu, stdBitmap *bgBitmap);
+#ifdef JKGUI_SMOL_SCREEN
+void jkGui_SmolScreenFixup(jkGuiMenu *menu, BOOL bForce);
+#endif
 int jkGui_MessageBeep();
 int jkGui_Startup();
 void jkGui_Shutdown();

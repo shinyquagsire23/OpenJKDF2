@@ -444,6 +444,7 @@ int main(int argc, char** argv)
     scanKeys();
     u16 keys_held = keysHeld();
 
+
     if (!!(keys_held & KEY_B)) {
         Main_bMotsCompat = 1;
     }

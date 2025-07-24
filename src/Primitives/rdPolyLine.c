@@ -86,7 +86,7 @@ int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *materi
         // Odd quirk: This requires the material be actually loaded
         // Added: nullptr fallbacks
         v22 = NULL;
-        if (polyline->edgeFace.material->texinfos && polyline->edgeFace.material->texinfos[0] && polyline->edgeFace.material->texinfos[0]->texture_ptr) {
+        if (polyline->edgeFace.material->texinfos[0] && polyline->edgeFace.material->texinfos[0]->texture_ptr) {
             v22 = polyline->edgeFace.material->texinfos[0]->texture_ptr->texture_struct[0];
         }
         extraUVTipMaybe[0].x = (flex_d_t)(v22 ? (unsigned int)v22->format.width : 1) - 0.01;// Added: nullptr check and fallback
@@ -133,7 +133,7 @@ int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *materi
         // Odd quirk: This requires the material be actually loaded
         // Added: nullptr fallbacks
         v22 = NULL;
-        if (polyline->tipFace.material->texinfos && polyline->tipFace.material->texinfos[0] && polyline->tipFace.material->texinfos[0]->texture_ptr) {
+        if (polyline->tipFace.material->texinfos[0] && polyline->tipFace.material->texinfos[0]->texture_ptr) {
             v22 = polyline->tipFace.material->texinfos[0]->texture_ptr->texture_struct[0];
         }
         extraUVFaceMaybe[0].x = (flex_d_t)(v22 ? (unsigned int)v22->format.width : 1.0) - 0.01; // Added: nullptr check and fallback

@@ -442,7 +442,7 @@ void sithMain_UpdateCamera()
             static flex_t sithMain_UpdateCamera_lastFov = 90.0;
             static void* sithMain_UpdateCamera_lastCamera = NULL;
 
-            if (aspect != sithMain_lastAspect || jkPlayer_fov != sithCamera_currentCamera->rdCam.fov || jkPlayer_fov != sithMain_UpdateCamera_lastFov || sithMain_UpdateCamera_lastCamera != sithCamera_currentCamera) {
+            //if (aspect != sithMain_lastAspect || jkPlayer_fov != sithCamera_currentCamera->rdCam.fov || jkPlayer_fov != sithMain_UpdateCamera_lastFov || sithMain_UpdateCamera_lastCamera != sithCamera_currentCamera) {
 #endif
                 if (!Main_bMotsCompat)
                 {
@@ -460,7 +460,7 @@ void sithMain_UpdateCamera()
                     rdCamera_SetOrthoScale(&sithCamera_currentCamera->rdCam, 250.0);
                 }
 #if defined(TARGET_TWL)
-            }
+            //}
 #endif
 
             sithMain_lastAspect = aspect;

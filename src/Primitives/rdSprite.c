@@ -43,7 +43,7 @@ int rdSprite_NewEntry(rdSprite *sprite, char *spritepath, int type, char *materi
     sprite->face.material = rdMaterial_Load(material, 0, 0);
     if ( sprite->face.material )
     {
-        rdMaterial_EnsureData(sprite->face.material); // Added: TWL
+        rdMaterial_EnsureDataForced(sprite->face.material); // Added: TWL
         sprite->face.numVertices = 4;
         sprite->face.vertexPosIdx = (int *)rdroid_pHS->alloc(sizeof(int) * sprite->face.numVertices);
         if ( sprite->face.vertexPosIdx )
@@ -73,7 +73,7 @@ int rdSprite_NewEntry(rdSprite *sprite, char *spritepath, int type, char *materi
                 // Odd quirk: This requires the material be actually loaded
                 // Added: nullptr fallbacks
                 stdVBuffer* v24 = NULL;
-                if (sprite->face.material->texinfos && sprite->face.material->texinfos[0] && sprite->face.material->texinfos[0]->texture_ptr) {
+                if (sprite->face.material->texinfos[0] && sprite->face.material->texinfos[0]->texture_ptr) {
                     v24 = sprite->face.material->texinfos[0]->texture_ptr->texture_struct[0];
                 }
                 int32_t width = v24 ? v24->format.width : 1; // Added: nullptr check and fallback

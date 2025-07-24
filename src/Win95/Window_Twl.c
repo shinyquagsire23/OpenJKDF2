@@ -13,7 +13,7 @@
 #include "Devices/sithConsole.h"
 #include "Platform/wuRegistry.h"
 #include "Main/jkQuakeConsole.h"
-#include "Gui/jkGuiRend.h"
+#include "Gui/jkGUIRend.h"
 
 #ifdef TARGET_TWL
 
@@ -46,6 +46,7 @@ int last_jkQuakeConsole_bOpen = 0;
 int Window_menu_mouseX = 0;
 int Window_menu_mouseY = 0;
 extern int Window_needsRecreate;
+int Window_bFlipRequested = 0;
 
 void test_display()
 {
@@ -166,8 +167,10 @@ int Window_MessageLoop()
 
     touchPosition touchXY;
     touchRead(&touchXY);
-    if (touchXY.px != 0 || touchXY.py != 0) {
+    if (touchXY.px != 0 || touchXY.py != 0 || Window_bFlipRequested) {
         Window_msg_main_handler(g_hWnd, WM_PAINT, 0, 0);
+        Window_SdlUpdate();
+        Window_bFlipRequested = 0;
     }
     //if (stdPlatform_GetTimeMsec() - last_draw_ms > 1000) {
         //Window_msg_main_handler(g_hWnd, WM_PAINT, 0, 0);
@@ -475,7 +478,8 @@ void Window_SdlUpdate()
     
     static int sampleTime_delay = 0;
     int sampleTime_roundtrip = stdPlatform_GetTimeMsec() - Window_lastSampleTime;
-    //printf("total %u heap 0x%x 0x%x\n", sampleTime_roundtrip, (intptr_t)getHeapLimit() - (intptr_t)getHeapEnd(), (intptr_t)getHeapEnd() - (intptr_t)getHeapStart());
+    //printf("total %u\n", sampleTime_roundtrip);
+    //stdPlatform_PrintHeapStats();
     Window_lastSampleTime = stdPlatform_GetTimeMsec(); // TODO
 
     static int jkPlayer_enableVsync_last = 0;

@@ -131,7 +131,7 @@ flex_d_t stdMci_GetTrackLength(int track)
 }
 
 #else // LINUX
-#ifdef STDSOUND_NULL
+#if defined(STDSOUND_NULL) || defined(STDSOUND_MAXMOD)
 
 int stdMci_trackFrom;
 int stdMci_trackTo;
@@ -209,7 +209,7 @@ flex_d_t stdMci_GetTrackLength(int track)
     return 0.0;
 }
 
-#else // !STDSOUND_NULL
+#elif defined(SDL2_RENDER) // !STDSOUND_NULL
 
 #include <SDL_mixer.h>
 

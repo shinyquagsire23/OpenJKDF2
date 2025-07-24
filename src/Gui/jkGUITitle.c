@@ -17,6 +17,7 @@
 #include "World/jkPlayer.h"
 #include "General/stdString.h"
 #include "General/stdFnames.h"
+#include "General/stdMath.h"
 #include "Platform/std3D.h"
 
 static wchar_t jkGuiTitle_tmpBuffer[512];
@@ -56,6 +57,44 @@ void jkGuiTitle_Startup()
     jkGui_InitMenu(&jkGuiTitle_menuLoad, jkGui_stdBitmaps[JKGUI_BM_BK_LOADING]);
 #ifdef QOL_IMPROVEMENTS
     jkGuiTitle_elementsLoad[4].bIsVisible = 0;
+#endif
+#ifdef JKGUI_SMOL_SCREEN
+    // Make sure the copyright text isn't garbled
+    jkGuiTitle_elementsLoadStatic[2].rect = jkGuiTitle_elementsLoadStatic[2].rectOrig;
+    jkGuiTitle_elementsLoadStatic[3].rect = jkGuiTitle_elementsLoadStatic[3].rectOrig;
+    jkGuiTitle_elementsLoadStatic[4].rect = jkGuiTitle_elementsLoadStatic[4].rectOrig;
+    jkGuiTitle_elementsLoadStatic[2].rect.y -= 40;
+    jkGuiTitle_elementsLoadStatic[2].rect.height += 40;
+    jkGuiTitle_elementsLoadStatic[2].bIsSmolDirty = 1;
+    jkGuiTitle_elementsLoadStatic[3].bIsSmolDirty = 1;
+    jkGuiTitle_elementsLoadStatic[4].bIsSmolDirty = 1;
+    jkGui_SmolScreenFixup(&jkGuiTitle_menuLoadStatic, 0);
+
+    // Increase the size of the map loading text area
+    jkGuiTitle_elementsLoad[0].rect = jkGuiTitle_elementsLoad[0].rectOrig;
+    jkGuiTitle_elementsLoad[1].rect = jkGuiTitle_elementsLoad[1].rectOrig;
+    jkGuiTitle_elementsLoad[2].rect = jkGuiTitle_elementsLoad[2].rectOrig;
+    jkGuiTitle_elementsLoad[3].rect = jkGuiTitle_elementsLoad[3].rectOrig;
+    
+    jkGuiTitle_elementsLoad[0].rect.x -= 150;
+    jkGuiTitle_elementsLoad[1].rect.x -= 150;
+    jkGuiTitle_elementsLoad[2].rect.x -= 150;
+    jkGuiTitle_elementsLoad[3].rect.x -= 150;
+
+    jkGuiTitle_elementsLoad[0].rect.width += 150;
+    jkGuiTitle_elementsLoad[1].rect.width += 150;
+    jkGuiTitle_elementsLoad[2].rect.width += 150;
+    jkGuiTitle_elementsLoad[3].rect.width += 150;
+
+    jkGuiTitle_elementsLoad[2].rect.y += 20;
+    jkGuiTitle_elementsLoad[3].rect.y += 20;
+    jkGuiTitle_elementsLoad[3].rect.height -= 20;
+    
+    jkGuiTitle_elementsLoad[0].bIsSmolDirty = 1;
+    jkGuiTitle_elementsLoad[1].bIsSmolDirty = 1;
+    jkGuiTitle_elementsLoad[2].bIsSmolDirty = 1;
+    jkGuiTitle_elementsLoad[3].bIsSmolDirty = 1;
+    jkGui_SmolScreenFixup(&jkGuiTitle_menuLoad, 0);
 #endif
 }
 
@@ -168,9 +207,12 @@ void jkGuiTitle_UnkDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf
         {
             if ( *v6 == '^' )
             {
+#ifndef JKGUI_SMOL_SCREEN
                 result = 2;
+#endif
                 ++v6;
             }
+
             v8 = element->rect.width;
             v9 = element->rect.y;
             a4a.x = element->rect.x;
@@ -183,7 +225,7 @@ void jkGuiTitle_UnkDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf
             a4a.y = v4;
             stdFont_Draw3(vbuf, v13[result], v4, &a4a, 1, v6, 1);
             v14 = stdFont_sub_4357C0(menu->fonts[v12], v6, &a4a) + v4;
-            result = (*menu->fonts[v12]->bitmap->mipSurfaces)->format.height;
+            result = stdFont_GetHeight(menu->fonts[v12]);
             v4 = ((uint32_t )(3 * result) >> 2) + v14;
             v5 = v16;
         }
@@ -191,43 +233,34 @@ void jkGuiTitle_UnkDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf
     }
 }
 
-void jkGuiTitle_LoadBarDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int a4)
+void jkGuiTitle_LoadBarDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vbuf, int bForceRedraw)
 {
-    int v6; // ebx
-    int v7; // eax
-    int v8; // edx
-    int v9; // ecx
-    int v10; // esi
-    rdRect a4a; // [esp+10h] [ebp-10h] BYREF
-    int a3a; // [esp+24h] [ebp+4h]
+    rdRect tmp;
 
-    if ( g_app_suspended )
-    {
-        v6 = element->selectedTextEntry;
-        if ( v6 < 0 )
-        {
-            v6 = 0;
-        }
-        else if ( v6 > 100 )
-        {
-            v6 = 100;
-        }
-        a3a = element->extraInt;
-        element->selectedTextEntry = v6;
-        if ( a4 )
-            jkGuiRend_CopyVBuffer(menu, &element->rect);
-        jkGuiRend_DrawRect(vbuf, &element->rect, menu->fillColor);
-        v7 = element->rect.x;
-        v8 = element->rect.width;
-        a4a.y = element->rect.y + 3;
-        v9 = v6 * (element->rect.width - 6);
-        a4a.x = v7 + 3;
-        a4a.width = v8;
-        v10 = element->rect.height - 6;
-        a4a.height = v10;
-        a4a.width = v9 / 100;
-        if ( v9 / 100 > 0 && v10 > 0 )
-            stdDisplay_VBufferFill(vbuf, a3a, &a4a);
+    if (!g_app_suspended) {
+        return;
+    }
+
+    element->selectedTextEntry = stdMath_ClampInt(element->selectedTextEntry, 0, 100);
+    if (bForceRedraw) {
+        jkGuiRend_CopyVBuffer(menu, &element->rect);
+    }
+#ifdef JKGUI_SMOL_SCREEN
+    tmp = element->rect;
+    tmp.x -= 1;
+    tmp.y -= 1;
+    tmp.width += 2;
+    tmp.height += 2;
+    stdDisplay_VBufferFill(vbuf, 0xE4, &tmp);
+#endif
+    jkGuiRend_DrawRect(vbuf, &element->rect, menu->fillColor);
+    tmp.x = element->rect.x + 3;
+    tmp.y = element->rect.y + 3;
+    tmp.width = element->rect.width;
+    tmp.height = element->rect.height - 6;
+    tmp.width = (element->selectedTextEntry * (element->rect.width - 6)) / 100;
+    if (tmp.width > 0 && tmp.height > 0) {
+        stdDisplay_VBufferFill(vbuf, element->extraInt, &tmp);
     }
 }
 
@@ -274,7 +307,7 @@ void jkGuiTitle_ShowLoadingStatic()
     int verMajor; // [esp-Ch] [ebp-2Ch]
     int verMinor; // [esp-8h] [ebp-28h]
     int verRevision; // [esp-4h] [ebp-24h]
-    char* verMotsStr;
+    const wchar_t* verMotsStr;
     //wchar_t v4[16]; // [esp+0h] [ebp-20h] BYREF
     // Added: removed undefined behavior, used to use the stack.....
 
@@ -284,9 +317,9 @@ void jkGuiTitle_ShowLoadingStatic()
     verRevision = jkGuiTitle_verRevision;
     verMinor = jkGuiTitle_verMinor;
     verMajor = jkGuiTitle_verMajor;
-    verMotsStr = ""; // TODO?
+    verMotsStr = L""; // TODO?
     guiVersionStr = jkStrings_GetUniStringWithFallback("GUI_VERSION");
-    jk_snwprintf(jkGuiTitle_versionBuffer, sizeof(jkGuiTitle_versionBuffer) / sizeof(wchar_t), guiVersionStr, verMajor, verMinor, verRevision, verMotsStr);
+    jk_snwprintf(jkGuiTitle_versionBuffer, (sizeof(jkGuiTitle_versionBuffer) / sizeof(wchar_t))-1, guiVersionStr, verMajor, verMinor, verRevision, verMotsStr);
     jkGuiTitle_elementsLoadStatic[4].wstr = jkGuiTitle_versionBuffer;
     jkGuiTitle_elementsLoadStatic[1].selectedTextEntry = 0;
     jkGuiRend_gui_sets_handler_framebufs(&jkGuiTitle_menuLoadStatic);

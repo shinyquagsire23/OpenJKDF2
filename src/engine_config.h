@@ -283,10 +283,13 @@
 
 #if defined(QOL_IMPROVEMENTS) && !defined(TARGET_TWL)
 #define SITH_MIXER_NUMPLAYINGSOUNDS (256)
+#elif defined(TARGET_TWL)
+#define SITH_MIXER_NUMPLAYINGSOUNDS (8)
 #else
 #define SITH_MIXER_NUMPLAYINGSOUNDS (32)
 #endif
 
+#define RDMATERIAL_MAX_TEXINFOS (16)
 
 //
 // Misc optimizations/features
@@ -313,7 +316,14 @@
 
 // Deferred material loading and LRU unloading
 #define RDMATERIAL_LRU_LOAD_UNLOAD
+
+// Halve the x/y positions/sizes for all jkGui elements
+#define JKGUI_SMOL_SCREEN
 #endif
+
+#define RDMATERIAL_LRU_LOAD_UNLOAD
+#define JKGUI_SMOL_SCREEN
+#define STDHASHTABLE_CRC32_KEYS
 
 #ifdef QOL_IMPROVEMENTS
 #define JKDEV_NUM_CHEATS (64)

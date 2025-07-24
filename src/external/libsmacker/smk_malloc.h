@@ -16,15 +16,19 @@
 #include <stdlib.h>
 /* fprintf */
 #include <stdio.h>
+#include <stdint.h>
 
 /* Error messages from calloc */
 #include <errno.h>
 #include <string.h>
 
+extern void stdPlatform_PrintHeapStats();
+
 /**
 	Verbose assert:
 		branches to an error block if pointer is null
 */
+#ifndef SMK_FAST
 #define smk_assert(p) \
 { \
 	if (!p) \
@@ -33,6 +37,9 @@
 		goto error; \
 	} \
 }
+#else
+#define smk_assert(p) (p)
+#endif
 
 /**
 	Safe free: attempts to prevent double-free by setting pointer to NULL.
@@ -70,7 +77,8 @@
 	{ \
 		fprintf(stderr, "libsmacker::smk_malloc(" #p ", %lu) - ERROR: calloc() returned NULL (file: %s, line: %lu)\n\tReason: [%d] %s\n", \
 			(unsigned long) (x), __FILE__, (unsigned long)__LINE__, errno, strerror(errno)); \
-		exit(EXIT_FAILURE); \
+		/*exit(EXIT_FAILURE);*/ \
+		while(1); \
 	} \
 }
 

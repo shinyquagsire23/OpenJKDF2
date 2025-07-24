@@ -4,6 +4,7 @@
 #include "World/sithWorld.h"
 #include "General/stdString.h"
 #include "General/stdHashTable.h"
+#include "Win95/std.h"
 #include "jk.h"
 
 int sithAnimClass_Load(sithWorld *world, int a2)
@@ -70,6 +71,9 @@ sithAnimclass* sithAnimClass_LoadEntry(char *a1)
     sithAnimclass *v4; // esi
     stdHashTable *v5; // [esp-Ch] [ebp-9Ch]
     char v6[128]; // [esp+10h] [ebp-80h] BYREF
+#ifdef STDHASHTABLE_CRC32_KEYS
+    char tmp[32];
+#endif
 
     result = (sithAnimclass *)stdHashTable_GetKeyVal(sithPuppet_hashtable, a1);
     if ( !result )
@@ -82,6 +86,7 @@ sithAnimclass* sithAnimClass_LoadEntry(char *a1)
               stdString_SafeStrCopy(v4->name, a1, 32),
 #endif
 #ifdef STDHASHTABLE_CRC32_KEYS
+              stdString_SafeStrCopy(tmp, a1, 32),
               v4->namecrc = stdCrc32(a1, strlen(a1)),
 #endif
               _sprintf(v6, "%s%c%s", "misc\\pup", 92, a1),
@@ -96,7 +101,7 @@ sithAnimclass* sithAnimClass_LoadEntry(char *a1)
 #ifdef SITH_DEBUG_STRUCT_NAMES
             stdHashTable_SetKeyVal(v5, v4->name, v4);
 #else
-            stdHashTable_SetKeyVal(v5, a1, v4); // Added: v4->name to a1
+            stdHashTable_SetKeyVal(v5, tmp, v4); // Added: tmp thing
 #endif
             result = v4;
         }
@@ -196,7 +201,7 @@ LABEL_39:
 #ifdef SITH_DEBUG_STRUCT_NAMES
                                 stdHashTable_SetKeyVal(sithPuppet_keyframesHashtable, keyframe->name, keyframe);
 #else
-                                stdHashTable_SetKeyVal(sithPuppet_keyframesHashtable, /*keyframe->name*/key_fname, keyframe);
+                                stdHashTable_SetKeyVal(sithPuppet_keyframesHashtable, /*keyframe->name*//*key_fname*/stdFileFromPath(keyframe_fpath), keyframe);
 #endif
                                 v10 = keyframe;
                                 ++world->numKeyframesLoaded;
@@ -230,10 +235,8 @@ void sithAnimClass_Free(sithWorld *world)
             {
 #ifdef SITH_DEBUG_STRUCT_NAMES
                 stdHashTable_FreeKey(sithPuppet_hashtable, world->animclasses[v2].name);
-#else
-#ifdef STDHASHTABLE_CRC32_KEYS
+#elif defined(STDHASHTABLE_CRC32_KEYS)
                 stdHashTable_FreeKeyCrc32(sithPuppet_hashtable, world->animclasses[v2].namecrc);
-#endif
 #endif
                 ++v1;
                 ++v2;

@@ -9,6 +9,15 @@
 
 int sithSound_Startup()
 {
+#ifdef TARGET_TWL
+    if (openjkdf2_bIsExtraLowMemoryPlatform)
+        sithSound_maxDataLoaded = 0x60000;
+    else
+        sithSound_maxDataLoaded = 0x200000;
+#elif defined(QOL_IMPROVEMENTS)
+    sithSound_maxDataLoaded = 0x4000000; // 64MiB
+#endif
+
     if ( stdSound_Startup() )
     {
         sithSound_hashtable = stdHashTable_New(256);
@@ -228,7 +237,7 @@ int sithSound_LoadFileData(sithSound *sound)
         return 0;
 
     if ( sound->bufferBytes + sithSound_curDataLoaded > sithSound_maxDataLoaded )
-        sithSound_StopAll(sound->bufferBytes + 0x19000);
+        sithSound_FreeUpMemory(sound->bufferBytes + 0x19000);
     stdSound_buffer_t* dsoundBuf = stdSound_BufferCreate(sound->bStereo, sound->sampleRateHz, sound->bitsPerSample, sound->bufferBytes);
     if ( dsoundBuf )
     {
@@ -281,8 +290,9 @@ LABEL_11:
 
 int sithSound_UnloadData(sithSound *sound)
 {
-    if (!(sound->isLoaded & 1))
+    if (!(sound->isLoaded & 1)) {
         return 0;
+    }
 
     stdSound_BufferRelease(sound->dsoundBuffer2);
     sound->isLoaded &= ~1u;
@@ -319,7 +329,7 @@ int sithSound_ReadDataFromFd(int fd, sithSound *sound)
     return 0;
 }
 
-int sithSound_StopAll(uint32_t idk)
+int sithSound_FreeUpMemory(uint32_t numBytesNeeded)
 {
     sithWorld *world; // edi
     int result; // eax
@@ -338,8 +348,15 @@ int sithSound_StopAll(uint32_t idk)
             world = sithWorld_pStatic;
             if (!world)
                 world = sithWorld_pCurrentWorld;
+            else if(!world) // Added: allow freeing sounds during loading
+                world = sithWorld_pLoading;
             else
                 v8 = 0;
+        }
+
+        // Added: Prevent nullptr deref
+        if (!world) {
+            return 0;
         }
 
         for (uint32_t v3 = sithSound_var4; v3 < world->numSoundsLoaded; v3++)
@@ -364,7 +381,7 @@ int sithSound_StopAll(uint32_t idk)
                         sithSound_curDataLoaded -= world->sounds[v3].bufferBytes;
                         result = v9;
                     }
-                    if ( result >= idk )
+                    if ( result >= numBytesNeeded )
                     {
                         sithSound_var5 = v8;
                         sithSound_var4 = v3 + 1;

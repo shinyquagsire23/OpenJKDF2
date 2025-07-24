@@ -31,7 +31,7 @@ static int32_t jkGuiPlayer_menuSelectIdk[2] = {0xFA, 0};
 static int32_t jkGuiPlayer_menuSelectIdk2[2] = {0xd, 0xe};
 
 static jkGuiElement jkGuiPlayer_menuSelectElements[8] = {
-    {ELEMENT_TEXT, 0, 0, 0, 3, {0, 0x19A, 0x280, 0x14}, 1, 0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_TEXT, 0, 0, 0, 3, {0, 410, 0x280, 0x14}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXT, 0, 5, "GUI_CHOOSEPLAYER", 3, {0, 0x82, 0x280, 0x28}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_LISTBOX, 1, 0, 0, 0, {0x82, 0xC8, 0x17C, 0xB4}, 1, 0, 0, 0, 0, jkGuiPlayer_menuSelectIdk2, {0}, 0},
     {ELEMENT_TEXTBUTTON, -1, 2, "GUI_CANCEL", 3, {0, 0x1AE, 0xA0, 0x28}, 1, 0, 0, 0, 0, 0, {0}, 0},
@@ -44,7 +44,7 @@ static jkGuiElement jkGuiPlayer_menuSelectElements[8] = {
 static jkGuiMenu jkGuiPlayer_menuSelect = {jkGuiPlayer_menuSelectElements, 0, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, (intptr_t)jkGuiPlayer_menuSelectIdk, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0,0};
 
 static jkGuiElement jkGuiPlayer_menuNewElements[12] = {
-    { ELEMENT_TEXT, 0, 0, 0, 3, {0, 0x19A, 280, 14}, 1, 0, 0, 0, 0, 0, {0}, 0},
+    { ELEMENT_TEXT, 0, 0, 0, 3, {0, 410, 280, 14}, 1, 0, 0, 0, 0, 0, {0}, 0},
     { ELEMENT_TEXT, 0, 5, "GUI_NEWPLAYER", 3, {0, 0x82, 0x280, 0x28}, 1, 0, 0, 0, 0, 0, {0}, 0},
     { ELEMENT_TEXT, 0, 0, "GUI_NAME", 2, {0xC8, 0xD2, 0xC8, 0x14}, 1, 0, 0, 0, 0, 0, {0}, 0},
     { ELEMENT_TEXTBOX, 0, 0, 0, 10, {0xC8, 0xF0, 0xC8, 0x14}, 1, 0, 0, 0, 0, 0, {0}, 0},
@@ -52,7 +52,7 @@ static jkGuiElement jkGuiPlayer_menuNewElements[12] = {
     { ELEMENT_CHECKBOX, 0, 0, "GUI_EASY", 0, {0xC8, 0x136, 0xC8, 0x14}, 1, 0, 0, 0, jkGuiPlayer_DifficultyDraw, 0, {0}, 0},
     { ELEMENT_CHECKBOX, 0, 0, "GUI_MED", 0, {0xC8, 0x154, 0xC8, 0x14}, 1, 0, 0, 0, jkGuiPlayer_DifficultyDraw, 0, {0}, 0},
     { ELEMENT_CHECKBOX, 0, 0, "GUI_HARD", 0, {0xC8, 0x172, 0xC8, 0x14}, 1, 0, 0, 0, jkGuiPlayer_DifficultyDraw, 0, {0}, 0},
-    { ELEMENT_TEXT, 0, 0, 0, 3, {0, 0x19A, 0x280, 0x14}, 1, 0, 0, 0, 0, 0, {0}, 0},
+    { ELEMENT_TEXT, 0, 0, 0, 3, {0, 410, 0x280, 0x14}, 1, 0, 0, 0, 0, 0, {0}, 0},
     { ELEMENT_TEXTBUTTON, -1, 2, "GUI_CANCEL", 3, {0x14, 0x1AE, 0xC8, 0x28}, 1, 0, 0, 0, 0, 0, {0}, 0},
     { ELEMENT_TEXTBUTTON, 1, 2, "GUI_OK", 3, {0x1A4, 0x1AE, 0xC8, 0x28}, 1, 0, 0, 0, 0, 0, {0}, 0},
     { ELEMENT_END, 0, 0, 0, 0, {0}, 0, 0, 0, 0, 0, 0, {0}, 0},
@@ -76,6 +76,17 @@ int jkGuiPlayer_Startup()
         jkGuiPlayer_menuNewElements[6].rect.y = 0x163;
         jkGuiPlayer_menuNewElements[7].rect.y = 0x17C;
     }
+
+#ifdef JKGUI_SMOL_SCREEN
+    jkGuiPlayer_menuNewElements[1].bIsSmolDirty = 1;
+    jkGuiPlayer_menuNewElements[2].bIsSmolDirty = 1;
+    jkGuiPlayer_menuNewElements[3].bIsSmolDirty = 1;
+    jkGuiPlayer_menuNewElements[4].bIsSmolDirty = 1;
+    jkGuiPlayer_menuNewElements[5].bIsSmolDirty = 1;
+    jkGuiPlayer_menuNewElements[6].bIsSmolDirty = 1;
+    jkGuiPlayer_menuNewElements[7].bIsSmolDirty = 1;
+    jkGui_SmolScreenFixup(&jkGuiPlayer_menuNew, 0);
+#endif
 
     jkGui_InitMenu(&jkGuiPlayer_menuSelect, jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]);
     jkGui_InitMenu(&jkGuiPlayer_menuNew, jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]);

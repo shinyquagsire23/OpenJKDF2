@@ -685,6 +685,9 @@ int32_t sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogReference *cogIdk, ch
                     v17->id = (v17 - sithWorld_pStatic->keyframes) | 0x8000;
                 }
             }
+            else {
+                v17->id = (v17 - sithWorld_pStatic->keyframes) | 0x8000;
+            }
 
             cogSymbol->val.data[0] = v17->id;
             return 1;

@@ -50,13 +50,14 @@ static jkGuiElement jkGuiMain_cutscenesElements[5] = {
 static jkGuiMenu jkGuiMain_cutscenesMenu = {jkGuiMain_cutscenesElements, -1, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 
 static jkGuiElement jkGuiMain_elements[11] = {
-    {ELEMENT_TEXTBUTTON, 10, 5, "GUI_SINGLEPLAYER", 3, {0, 160, 0x280, 0x3C}, 1, 0, 0, 0, 0, 0, {0}, 0},
 #ifndef TARGET_NO_MULTIPLAYER_MENUS
-    {ELEMENT_TEXTBUTTON, 11, 5, "GUI_MULTIPLAYER", 3, {0, 220, 0x280, 0x3C}, 1, 0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_TEXTBUTTON, 10, 5, "GUI_SINGLEPLAYER", 3, {0, 160, 640, 60}, 1, 0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_TEXTBUTTON, 11, 5, "GUI_MULTIPLAYER", 3, {0, 220, 640, 60}, 1, 0, 0, 0, 0, 0, {0}, 0},
 #else
-    {ELEMENT_TEXT, 11, 5, NULL, 3, {0, 220, 0x280, 0x3C}, 1, 0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_TEXTBUTTON, 10, 5, "GUI_SINGLEPLAYER", 3, {0, 220, 640, 60}, 1, 0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_TEXT, 11, 5, NULL, 3, {0, 0, 0, 0}, 1, 0, 0, 0, 0, 0, {0}, 0},
 #endif
-    {ELEMENT_TEXTBUTTON, 12, 5, "GUI_QUIT", 3, {0, 0x118, 0x280, 0x3C}, 1, 0, 0, 0, 0, 0, {0}, 0},
+    {ELEMENT_TEXTBUTTON, 12, 5, "GUI_QUIT", 3, {0, 0x118, 640, 60}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON, 14, 2, "GUI_CHOOSEPLAYER", 3, {20, 380, 150, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON, 15, 2, "GUI_VIEWCUTSCENES", 3, {250, 380, 150, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
     {ELEMENT_TEXTBUTTON, 13, 2, "GUI_SETUP", 3, {470, 380, 150, 40}, 1, 0, 0, 0, 0, 0, {0}, 0},
@@ -79,6 +80,13 @@ void jkGuiMain_Show()
     int v1; // esi
     wchar_t *v2; // eax
     wchar_t *v4; // [esp-4h] [ebp-Ch]
+
+#ifdef JKGUI_SMOL_SCREEN
+    for (int i = 0; i < 11; i++) {
+        jkGuiMain_elements[i].rect = jkGuiMain_elements[i].rectOrig;
+        jkGuiMain_elements[i].bIsSmolDirty = 1; 
+    }
+#endif
 
     if (!Main_bMotsCompat) {
         jkGuiMain_elements[0].rect.y = 160;
@@ -108,6 +116,21 @@ void jkGuiMain_Show()
         jkGuiMain_elements[6].rect.y = 420+5;
 #endif
     }
+
+#ifdef JKGUI_SMOL_SCREEN
+    for (int i = 0; i < 11; i++) {
+        jkGuiMain_elements[i].rect.y -= 60;
+    }
+    
+    jkGuiMain_elements[0].rect.y += 70; // Singleplayer
+    jkGuiMain_elements[7].rect.height += 15; // Expansions & Mods
+    jkGuiMain_elements[8].rect.height += 10; // Version
+    jkGuiMain_elements[9].rect.height += 10; // git hash
+    jkGuiMain_elements[8].rect.y += 20;
+    jkGuiMain_elements[9].rect.y += 40; // git hash
+    jkGuiMain_elements[9].rect.x -= 15;
+    jkGui_SmolScreenFixup(&jkGuiMain_menu, 0);
+#endif
 
     // Added: OpenJKDF2 version
     jkGuiMain_elements[8].wstr = openjkdf2_waReleaseVersion;

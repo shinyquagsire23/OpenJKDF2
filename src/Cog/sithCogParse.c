@@ -60,7 +60,8 @@ int sithCogParse_Load(char *cog_fpath, sithCogScript *cogscript, int unk)
 #ifdef STDHASHTABLE_CRC32_KEYS
     const char* fname = stdFileFromPath(cog_fpath);
     cogscript->pathCrc = stdCrc32(fname, strlen(fname));
-#else
+#endif
+#ifdef SITH_DEBUG_STRUCT_NAMES
     stdString_SafeStrCopy(cogscript->cog_fpath, stdFileFromPath(cog_fpath), 32);
 #endif
     _memset(cog_parser_node_stackpos, 0xFFu, sizeof(cog_parser_node_stackpos));

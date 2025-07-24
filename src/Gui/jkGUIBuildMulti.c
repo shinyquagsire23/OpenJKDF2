@@ -948,6 +948,13 @@ int jkGuiBuildMulti_Show()
     char tmp1[128]; // [esp+16Ch] [ebp-280h] BYREF
     wchar_t wtmp1[256]; // [esp+1ECh] [ebp-200h] BYREF
 
+#ifdef JKGUI_SMOL_SCREEN
+    jkGuiBuildMulti_menuEditCharacter_buttons[6].rect = jkGuiBuildMulti_menuEditCharacter_buttons[6].rectOrig;
+    jkGuiBuildMulti_menuEditCharacter_buttons[7].rect = jkGuiBuildMulti_menuEditCharacter_buttons[7].rectOrig;
+    jkGuiBuildMulti_menuEditCharacter_buttons[6].bIsSmolDirty = 1;
+    jkGuiBuildMulti_menuEditCharacter_buttons[7].bIsSmolDirty = 1;
+#endif
+
     // MoTS added: Need to move things around for Personality
     if (!Main_bMotsCompat) {
         jkGuiBuildMulti_menuEditCharacter_buttons[10].bIsVisible = 0;
@@ -963,6 +970,10 @@ int jkGuiBuildMulti_Show()
         jkGuiBuildMulti_menuEditCharacter_buttons[6].rect.y = 310;
         jkGuiBuildMulti_menuEditCharacter_buttons[7].rect.y = 330;
     }
+
+#ifdef JKGUI_SMOL_SCREEN
+    jkGui_SmolScreenFixup(&jkGuiBuildMulti_menuEditCharacter, 0);
+#endif
 
     wPlayerName[0] = 0;
     memset(&wPlayerName[1], 0, 0x3Cu);

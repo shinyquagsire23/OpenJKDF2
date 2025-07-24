@@ -51,7 +51,7 @@ void jkGuiObjectives_CustomRender(jkGuiElement *element, jkGuiMenu *menu, stdVBu
                 ++num_objectives;
                 drawRect.width = element->rect.width - 30;
                 drawRect.x = element->rect.x + 30;
-                drawRect.height = font_height + (*menu->fonts[element->textType]->bitmap->mipSurfaces)->format.height;
+                drawRect.height = font_height + stdFont_GetHeight(menu->fonts[element->textType]);
                 int font_idx = (uint8_t)((goal_flags & GOAL_SECRET) | 0x10) >> 1;
                 stdFont_Draw2(vbuf, menu->fonts[font_idx], drawRect.x, drawRect.y, &drawRect, pTextEnt->str, 1);
                 int font_height_2 = stdFont_sub_4357C0(menu->fonts[font_idx], pTextEnt->str, &drawRect);
@@ -62,7 +62,7 @@ void jkGuiObjectives_CustomRender(jkGuiElement *element, jkGuiMenu *menu, stdVBu
                     drawRect.y + ((unsigned int)(font_height_2 - (*jkGui_stdBitmaps[JKGUI_BM_OBJECTIVESCHECK]->mipSurfaces)->format.height) >> 1),
                     0,
                     1);
-                font_height = (*menu->fonts[element->textType]->bitmap->mipSurfaces)->format.height + font_height_2;
+                font_height = stdFont_GetHeight(menu->fonts[element->textType]) + font_height_2;
                 drawRect.y += font_height;
             }
         }
