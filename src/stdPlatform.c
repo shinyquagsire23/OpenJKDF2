@@ -355,8 +355,10 @@ static void* TWL_alloc(uint32_t len)
         }
     }
 
-    if (ret = TWL_mspace_alloc(openjkdf2_mem_nwram_mspace, 0xD5, len, lenAlign, &trackingAllocsC, &trackingAllocsCReal)) {
-        return ret;
+    if (heapSuggestion != HEAP_AUDIO) {
+        if (ret = TWL_mspace_alloc(openjkdf2_mem_nwram_mspace, 0xD5, len, lenAlign, &trackingAllocsC, &trackingAllocsCReal)) {
+            return ret;
+        }
     }
 
     //uint32_t freeEst = (intptr_t)getHeapLimit() - (intptr_t)getHeapEnd();

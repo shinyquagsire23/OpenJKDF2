@@ -1483,6 +1483,7 @@ enum HEAP_SUGGESTIONS {
     HEAP_ANY = 0,
     HEAP_FAST = 1,
     HEAP_SLOW = 2,
+    HEAP_AUDIO = 3,
 };
 #endif
 

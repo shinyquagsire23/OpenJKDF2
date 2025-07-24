@@ -218,6 +218,10 @@ int stdSound_Startup()
 
     //soundEnable();
 
+#ifdef STDPLATFORM_HEAP_SUGGESTIONS
+        int prevSuggest = pSithHS->suggestHeap(HEAP_AUDIO);
+#endif
+
     // We are not using a soundbank so we need to manually initialize
     // mm_ds_system.
     mm_ds_system mmSys =
@@ -242,6 +246,10 @@ int stdSound_Startup()
     mmStreamOpen(&stdSound_mmstream);
 
     memset(stdSound_aPlayingSounds, 0, sizeof(stdSound_aPlayingSounds));
+
+#ifdef STDPLATFORM_HEAP_SUGGESTIONS
+        pSithHS->suggestHeap(prevSuggest);
+#endif
 
     return 1;
 }
