@@ -121,7 +121,7 @@ mm_word streamingCallback(mm_word length,
 
     for (int i = 0; i < SITH_MIXER_NUMPLAYINGSOUNDS; i++) {
         stdSound_buffer_t* buf = stdSound_aPlayingSounds[i];
-        if (!buf || !buf->data) continue;
+        if (!buf || !buf->data || buf->vol <= 0.0) continue;
 
         s16 *dst = (s16*)dest;
         int neededRepeats = STDSOUND_SAMPLE_RATE / buf->nSamplesPerSec;
