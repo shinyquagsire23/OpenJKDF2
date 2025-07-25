@@ -71,10 +71,6 @@ ExternalProject_Add(
                         -DSDL2MIXER_OPUS_SHARED:BOOL=FALSE
                         -DSDL2MIXER_WAVPACK:BOOL=FALSE
                         -DCMAKE_POLICY_VERSION_MINIMUM=3.5
-                        -DCMAKE_FIND_PACKAGE_PREFER_CONFIG=FALSE
-                        -DCMAKE_IGNORE_PATH="/usr/local;/opt/local;/opt/homebrew/lib;/opt/homebrew/include;/opt/local/bin"
-                        -DCMAKE_IGNORE_SYSTEM_PATH="/usr/local;/opt/local;/opt/homebrew/lib;/opt/homebrew/include;/opt/local/bin"
-                        -DCMAKE_FIND_DEBUG_MODE=TRUE
                         
     CMAKE_CACHE_ARGS
                         -DSDL2_DIR:STRING=${SDL_ROOT}/../
