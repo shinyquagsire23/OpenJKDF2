@@ -859,7 +859,7 @@ error:
 	return -1;
 }
 
-__attribute__((target("arm"))) static char smk_render_video(struct smk_video_t* s, uint8_t* p, uint32_t size)
+static char smk_render_video(struct smk_video_t* s, uint8_t* p, uint32_t size)
 {
 	uint8_t* t = s->frame;
 	uint8_t s1,s2;

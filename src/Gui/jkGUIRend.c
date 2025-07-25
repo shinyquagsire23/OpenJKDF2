@@ -12,6 +12,7 @@
 #include "Win95/stdGdi.h"
 #include "Win95/stdSound.h"
 #include "General/stdString.h"
+#include "Primitives/rdRect.h"
 #include "Gui/jkGUI.h"
 #include "stdPlatform.h"
 #include "jk.h"

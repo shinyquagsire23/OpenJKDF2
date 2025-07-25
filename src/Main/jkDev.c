@@ -385,7 +385,7 @@ int jkDev_DebugLog(const char *lParam)
     stdString_CharToWchar(a1, lParam, 127);
     a1[127] = 0;
     int ret = jkDev_PrintUniString(a1);
-#ifdef WIN32
+#if defined(WIN32) && !defined(SDL2_RENDER)
     if ( jkDev_hDlg )
     {
         v1 = GetDlgItem(jkDev_hDlg, 1037);

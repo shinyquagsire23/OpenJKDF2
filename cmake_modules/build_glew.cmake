@@ -28,6 +28,7 @@ ExternalProject_Add(
                         -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
                         -Dglew-cmake_BUILD_SHARED:BOOL=FALSE
                         -DONLY_LIBS:BOOL=TRUE
+                        -DCMAKE_POLICY_VERSION_MINIMUM=3.5
     BUILD_BYPRODUCTS    ${GLEW_STATIC_LIBRARY_PATH} ${GLEW_SHARED_LIBRARY_PATH}
 )
 

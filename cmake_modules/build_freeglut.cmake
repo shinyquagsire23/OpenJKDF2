@@ -21,6 +21,7 @@ if (TARGET_COMPILE_FREEGLUT)
                             -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
                             -DFREEGLUT_BUILD_STATIC_LIBS:BOOL=FALSE
                             -DFREEGLUT_BUILD_DEMOS=OFF
+                            -DCMAKE_POLICY_VERSION_MINIMUM=3.5
         # We have to pass `LIBS` via `CMAKE_CACHE_ARGS` because CMake’s 3.26.3
         # ExternalProject_Add() has a bug that ruthlessly swallows `;` when used
         # with `CMAKE_ARGS`

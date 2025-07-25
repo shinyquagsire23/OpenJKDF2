@@ -17,6 +17,9 @@ set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 
+set(CMAKE_IGNORE_PATH "/opt/homebrew;/opt/homebrew/include;/opt/homebrew/lib;/usr/local")
+set(CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH FALSE)
+
 string(REGEX MATCH "^[0-9]+" CMAKE_SYSTEM_MAJOR_VERSION ${CMAKE_SYSTEM_VERSION})
 string(REGEX REPLACE "^[0-9]+\\.([0-9]+).*" "\\1" CMAKE_SYSTEM_MINOR_VERSION ${CMAKE_SYSTEM_VERSION})
 
@@ -31,8 +34,10 @@ string(JOIN " " CMAKE_C_FLAGS_INIT
 # and unfortunately, -nolibc does not get rid of MSVCRT.DLL completely
     -nodefaultlibs
 # __imp_ prefixed symbols are long time obsolete and not used in static libs anyway
-    -mnop-fun-dllimport)
+    -mnop-fun-dllimport
+    -ffunction-sections)
 set(CMAKE_CXX_FLAGS_INIT ${CMAKE_C_FLAGS_INIT})
+
 # Unfortunately, CMAKE_SIZEOF_VOID_P is not yet available for determining machine word size
 if(CMAKE_SYSTEM_PROCESSOR STREQUAL x86 OR
    CMAKE_SYSTEM_PROCESSOR STREQUAL arm)
@@ -48,6 +53,25 @@ else()
 set(MINGW_STACK_SIZE  0x10000,0x1000)
 set(MINGW_HEAP_SIZE 0x100000,0x10000)
 endif()
+
+# Original MinGW default libs
+# -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt
+# By design, MinGW should not link to advapi32 shell32 user32 by default anyway
+set(CMAKE_C_STANDARD_LIBRARIES
+# FIXME: static linking with MinGW is a challange because key static and dynamic libs are not symbol twins
+    "-Wl,-Bstatic,-lpthread,-lmingwex,-lmingw32,-lgcc,-Bdynamic,-lmsvcr120,-lkernel32"
+#    "-Wl,-Bstatic,-lmingwex,-lmingw32,-lgcc,-lgcc_eh,-lmoldname,-lpthread,-lmsvcrt,-lm,-Bdynamic,-lkernel32"
+#   "-lpthread -lmingw32 -lgcc -lmingwex -lmsvcr120 -lkernel32" # link to msvcr120 aka Microsoft Visual C++ 2013 Redistributable
+    CACHE INTERNAL CMAKE_C_STANDARD_LIBRARIES # there are nasty interdependencies between libpthread and libgcc/libgcc_eh
+)
+set(CMAKE_CXX_STANDARD_LIBRARIES
+# FIXME: static linking with MinGW is a challange because key static and dynamic libs are not symbol twins
+    "-Wl,-Bstatic,-lstdc++,-lpthread,-lmingwex,-lmingw32,-lgcc,-lgcc_eh,-Bdynamic,-lmsvcr120,-lkernel32"
+#    "-Wl,-Bstatic,-lstdc++,-lmingwex,-lmingw32,-lgcc,-lgcc_eh,-lmoldname,-lpthread,-lmsvcrt,-lm,-Bdynamic,-lkernel32"
+#   "-lstdc++ -lpthread -lmingw32 -lgcc -lgcc_eh -lpthread -lmingwex -lmsvcr120 -lkernel32" # link to msvcr120 aka Microsoft Visual C++ 2013 Redistributable
+    CACHE INTERNAL CMAKE_CXX_STANDARD_LIBRARIES # there are nasty interdependencies between libpthread and libgcc/libgcc_eh
+)
+
 set(CMAKE_EXE_LINKER_FLAGS_INIT
     "-Wl,--major-os-version,${CMAKE_SYSTEM_MAJOR_VERSION},--minor-os-version,${CMAKE_SYSTEM_MINOR_VERSION}\
      -Wl,--major-subsystem-version,${CMAKE_SYSTEM_MAJOR_VERSION},--minor-subsystem-version,${CMAKE_SYSTEM_MINOR_VERSION}\
@@ -58,21 +82,6 @@ set(CMAKE_EXE_LINKER_FLAGS_INIT
      -Xlinker --heap  -Xlinker ${MINGW_HEAP_SIZE}" # -Wl does not support commas , in options
 )
 set(CMAKE_SHARED_LINKER_FLAGS_INIT "-mwindows ${CMAKE_EXE_LINKER_FLAGS_INIT}")
-# Original MinGW default libs
-# -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt
-# By design, MinGW should not link to advapi32 shell32 user32 by default anyway
-set(CMAKE_C_STANDARD_LIBRARIES
-# FIXME: static linking with MinGW is a challange because key static and dynamic libs are not symbol twins
-    "-Wl,-Bstatic,-lpthread,-lmingwex,-lmingw32,-lgcc,-Bdynamic,-lmsvcr120,-lkernel32"
-#   "-lpthread -lmingw32 -lgcc -lmingwex -lmsvcr120 -lkernel32" # link to msvcr120 aka Microsoft Visual C++ 2013 Redistributable
-    CACHE INTERNAL CMAKE_C_STANDARD_LIBRARIES # there are nasty interdependencies between libpthread and libgcc/libgcc_eh
-)
-set(CMAKE_CXX_STANDARD_LIBRARIES
-# FIXME: static linking with MinGW is a challange because key static and dynamic libs are not symbol twins
-    "-Wl,-Bstatic,-lstdc++,-lpthread,-lmingwex,-lmingw32,-lgcc,-lgcc_eh,-Bdynamic,-lmsvcr120,-lkernel32"
-#   "-lstdc++ -lpthread -lmingw32 -lgcc -lgcc_eh -lpthread -lmingwex -lmsvcr120 -lkernel32" # link to msvcr120 aka Microsoft Visual C++ 2013 Redistributable
-    CACHE INTERNAL CMAKE_CXX_STANDARD_LIBRARIES # there are nasty interdependencies between libpthread and libgcc/libgcc_eh
-)
 
 set(WIN32 TRUE)
 set(MINGW TRUE)
