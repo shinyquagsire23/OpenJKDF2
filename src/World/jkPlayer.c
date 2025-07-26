@@ -62,6 +62,8 @@ int jkPlayer_setCrosshairOnLightsaber = 1;
 int jkPlayer_setCrosshairOnFist = 1;
 int jkPlayer_bDisableWeaponWaggle = 0;
 int jkPlayer_bHasLoadedSettingsOnce = 0;
+int jkPlayer_bEnableEmissiveTextures = 1;
+int jkPlayer_bEnableClassicLighting = 0;
 #endif
 
 #ifdef FIXED_TIMESTEP_PHYS
@@ -185,6 +187,12 @@ void jkPlayer_StartupVars()
 
     sithCvar_RegisterBool("r_hidpi",                     0,                         &Window_isHiDpi_tmp,                CVARFLAG_LOCAL|CVARFLAG_READONLY);
     sithCvar_RegisterBool("r_fullscreen",                0,                         &Window_isFullscreen_tmp,           CVARFLAG_LOCAL|CVARFLAG_READONLY);
+
+    // TODO: port to SDL
+#ifdef TARGET_TWL
+    sithCvar_RegisterBool("r_emissiveTextures",          0,                         &jkPlayer_bEnableEmissiveTextures,  CVARFLAG_LOCAL|CVARFLAG_READONLY);
+    sithCvar_RegisterBool("r_classicLighting",           0,                         &jkPlayer_bEnableClassicLighting,   CVARFLAG_LOCAL|CVARFLAG_READONLY);
+#endif
 
 #ifdef FIXED_TIMESTEP_PHYS
     sithCvar_RegisterBool("g_bJankyPhysics",             0,                         &jkPlayer_bJankyPhysics,            CVARFLAG_LOCAL);

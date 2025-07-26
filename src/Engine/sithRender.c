@@ -1378,6 +1378,7 @@ void sithRender_RenderLevelGeometry()
                 procEntry = rdCache_GetProcEntry();
                 if ( !procEntry )
                     continue;
+                procEntry->light_level_static = 1.0; // Added?
                 if ( (v65->surfaceFlags & (SITH_SURFACE_HORIZON_SKY|SITH_SURFACE_CEILING_SKY)) != 0 )
                 {
                     geoMode = sithRender_geoMode;
@@ -1584,6 +1585,7 @@ void sithRender_RenderLevelGeometry()
                     v20 = rdCache_GetProcEntry();
                     if ( !v20 )
                         goto LABEL_92;
+                    v20->light_level_static = 1.0; // Added?
                     v21 = v65->surfaceInfo.face.geometryMode;
                     if ( v21 >= sithRender_geoMode )
                         v21 = sithRender_geoMode;
@@ -2429,6 +2431,7 @@ void sithRender_RenderAlphaSurfaces()
         {
             continue;
         }
+        v9->light_level_static = 1.0; // Added?
         
         v9->geometryMode = sithRender_geoMode;
         if ( v0->surfaceInfo.face.geometryMode < v9->geometryMode )

@@ -654,7 +654,15 @@ int rdCache_SendFaceListToHardware()
                     while ( vert_lights_iter_cnt );
                 }
 
-                //active_6c->light_level_static = v26 * 255.0;
+#ifdef TARGET_TWL
+                // Added: populate this here too
+                if (!(rdGetVertexColorMode() != 1 || lighting_capability != 3) && lighting_capability != 0) {
+                    v24 = active_6c->extralight + active_6c->light_level_static;
+                    v25 = stdMath_Clamp(v24, 0.0, 1.0);
+                    v26 = stdMath_Clamp(v25, v148, 1.0);
+                    active_6c->light_level_static = v26 * 255.0;
+                }
+#endif
             }
 
             iterating_6c_vtxs = active_6c->vertices;
@@ -698,6 +706,11 @@ int rdCache_SendFaceListToHardware()
 #else
                 rdCache_aHWVertices[rdCache_totalVerts].nx = d3dvtx_zval / 32.0;
 #endif
+
+#ifdef TARGET_TWL
+                rdCache_aHWVertices[rdCache_totalVerts].lightLevel = 0xFF;
+#endif
+
                 rdCache_aHWVertices[rdCache_totalVerts].nz = 0.0;
                 if ( lighting_capability == 0 )
                 {
@@ -728,6 +741,9 @@ int rdCache_SendFaceListToHardware()
 #ifdef SDL2_RENDER
                         rdCache_aHWVertices[rdCache_totalVerts].lightLevel = light_level / 255.0;
 #endif
+#ifdef TARGET_TWL
+                        rdCache_aHWVertices[rdCache_totalVerts].lightLevel = (int)light_level;
+#endif
                         
 
                         vertex_b = (__int64)light_level;
@@ -757,6 +773,12 @@ int rdCache_SendFaceListToHardware()
                         light_level = luma;
 
                         rdCache_aHWVertices[rdCache_totalVerts].lightLevel = luma / 255.0;
+#endif
+#ifdef TARGET_TWL
+                        // TODO: could probably find something cheaper
+                        //flex_t luma = (0.2126 * intRed) + (0.7152 * intGreen) + (0.0722 * intBlue);
+                        //light_level = luma;
+                        rdCache_aHWVertices[rdCache_totalVerts].lightLevel = (int)active_6c->light_level_static;
 #endif
 
                         vertex_b = (int)intBlue;
@@ -961,10 +983,19 @@ solid_tri:
                 }
                 while ( v71 );
             }
+
+            // Added: always calculate light_level_static
+            /*v75 = active_6c->extralight + active_6c->light_level_static;
+            v76 = stdMath_Clamp(stdMath_Clamp(v75, 0.0, 1.0), v148, 1.0);
+            active_6c->light_level_static = v76 * 63.0;*/
             goto LABEL_232;
         }
         else
         {
+            // Added: always calculate light_level_static
+            /*v75 = active_6c->extralight + active_6c->light_level_static;
+            v76 = stdMath_Clamp(stdMath_Clamp(v75, 0.0, 1.0), v148, 1.0);
+            active_6c->light_level_static = v76 * 63.0;*/
             goto LABEL_232;
         }
 
@@ -1007,6 +1038,10 @@ LABEL_232:
 #endif
             rdCache_aHWVertices[rdCache_totalVerts].nz = 0.0;
 
+#ifdef TARGET_TWL
+            rdCache_aHWVertices[rdCache_totalVerts].lightLevel = 0xFF;
+#endif
+
             // Added: nullptr check and fallback
             if (!(rdColormap *)active_6c->colormap || !v137) {
                 v93 = 0xFF;
@@ -1046,6 +1081,9 @@ LABEL_232:
                         v92 = active_6c->light_level_static;
 #ifdef SDL2_RENDER
                     rdCache_aHWVertices[rdCache_totalVerts].lightLevel = v92 / 255.0;
+#endif
+#ifdef TARGET_TWL
+                    rdCache_aHWVertices[rdCache_totalVerts].lightLevel = (int)v92 << 2;
 #endif
                     v93 = *((uint8_t *)v91->lightlevel + 256 * ((__int64)v92 & 0x3F) + v137->header.field_4);
                     v94 = (uint8_t)v91->colors[v93].g;

@@ -43,6 +43,12 @@ MSGS 100          # <--- DON'T FORGET TO UPDATE THIS COUNT
    "GUIEXT_EN_TEXTURE_PRECACHE"           0 "Enable texture precaching"
    "GUIEXT_EN_TEXTURE_PRECACHE_HINT"      0 "Load all material textures ahead-of-time instead of just-in-time?"
 
+# TWL-only for now
+   "GUIEXT_EN_EMISSIVE_TEXTURES"          0 "Enable emissive textures"
+   "GUIEXT_EN_EMISSIVE_TEXTURES_HINT"     0 "Display textures which glow in the dark."
+   "GUIEXT_EN_CLASSIC_LIGHTING"           0 "Enable classic lighting"
+   "GUIEXT_EN_CLASSIC_LIGHTING_HINT"      0 "Use the original 256-color light tables."
+
 
 #******************************
 #  Sound

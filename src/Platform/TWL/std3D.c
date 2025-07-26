@@ -6,13 +6,15 @@
 #include "General/stdBitmap.h"
 #include "Win95/stdDisplay.h"
 #include "World/sithSurface.h"
+#include "World/jkPlayer.h"
 #include "stdPlatform.h"
 
 int std3D_bReinitHudElements = 0;
 
 int sillyTextureHack[256];
 int textureIDS[8];
-int paletteIDS[3];
+int paletteIDS[0x40];
+uint32_t paletteAddrs[0x40];
 flex_t fCamera = 1.0;
 int nTexture = 0;
 
@@ -53,6 +55,7 @@ uint8_t std3D_fogColorIdx = 0;
 int std3D_bTwlFlipTextures = 0;
 int std3D_bNeedsToPurgeMenuBuffers = 0;
 int std3D_timeWastedWaitingAround = 0;
+static void* loaded_colormap = NULL;
 
 u8* i8Bitmap = NULL;
 u8* i8Bitmap2 = NULL;
@@ -110,17 +113,6 @@ u32 uv[] =
     TEXTURE_PACK(0,0)
 };
 
-u32 normals[] =
-{
-    NORMAL_PACK(0,floattov10(-.97),0),
-    NORMAL_PACK(0,0,floattov10(.97)),
-    NORMAL_PACK(floattov10(.97),0,0),
-    NORMAL_PACK(0,0,floattov10(-.97)),
-    NORMAL_PACK(floattov10(-.97),0,0),
-    NORMAL_PACK(0,floattov10(.97),0)
-
-};
-
 //draw a cube face at the specified color
 void drawQuad(int poly)
 {   
@@ -129,9 +121,6 @@ void drawQuad(int poly)
     u32 f2 = CubeFaces[poly * 4 + 1] ;
     u32 f3 = CubeFaces[poly * 4 + 2] ;
     u32 f4 = CubeFaces[poly * 4 + 3] ;
-
-    //not using lighting; not using normals
-    //glNormal(normals[poly]);
 
     GFX_TEX_COORD = (uv[(poly*4)+0]);
     glVertex3v16(CubeVectors[f1*3], CubeVectors[f1*3 + 1], CubeVectors[f1*3 +  2] );
@@ -146,6 +135,49 @@ void drawQuad(int poly)
     glVertex3v16(CubeVectors[f4*3], CubeVectors[f4*3 + 1], CubeVectors[f4*3 + 2] );
 }
 
+static uint16_t *vramGetBank(uint16_t *addr)
+{
+    const uint16_t *vram_i_end = VRAM_I + ((16 * 1024) / sizeof(u16));
+
+    if (addr >= VRAM_A && addr < VRAM_B)
+        return VRAM_A;
+    else if (addr >= VRAM_B && addr < VRAM_C)
+        return VRAM_B;
+    else if (addr >= VRAM_C && addr < VRAM_D)
+        return VRAM_C;
+    else if (addr >= VRAM_D && addr < VRAM_E)
+        return VRAM_D;
+    else if (addr >= VRAM_E && addr < VRAM_F)
+        return VRAM_E;
+    else if (addr >= VRAM_F && addr < VRAM_G)
+        return VRAM_F;
+    else if (addr >= VRAM_G && addr < VRAM_H)
+        return VRAM_G;
+    else if (addr >= VRAM_H && addr < VRAM_I)
+        return VRAM_H;
+    else if (addr >= VRAM_I && addr < vram_i_end)
+        return VRAM_I;
+
+    sassert(0, "Address not in VRAM");
+    return NULL;
+}
+
+uint32_t vramToPalAddr(uint8_t* checkAddr) {
+    // Calculate the address, logical and actual, of where the palette will go
+    uint16_t *baseBank = vramGetBank((uint16_t *)checkAddr);
+    uint32_t addr = ((uint32_t)checkAddr - (uint32_t)baseBank);
+    uint8_t offset = 0;
+
+    if (baseBank == VRAM_F)
+        offset = (VRAM_F_CR >> 3) & 3;
+    else if (baseBank == VRAM_G)
+        offset = (VRAM_G_CR >> 3) & 3;
+    addr += ((offset & 0x1) * 0x4000) + ((offset & 0x2) * 0x8000);
+
+    addr >>= 4;
+    return addr;
+}
+
 static void update_from_display_palette()
 {
     for (int i = 0; i < 256; i++) {
@@ -156,27 +188,85 @@ static void update_from_display_palette()
     }
 }
 
-static void* loaded_colormap = NULL;
-
 static void update_from_world_palette()
 {
     if (sithWorld_pCurrentWorld && sithWorld_pCurrentWorld->colormaps && loaded_colormap != sithWorld_pCurrentWorld->colormaps)
     {
+        rdColormap* pWorldCmp = sithWorld_pCurrentWorld->colormaps;
 
-        for (int i = 0; i < 256; i++) {
-            u8 rval = sithWorld_pCurrentWorld->colormaps->colors[i].r;
-            u8 gval = sithWorld_pCurrentWorld->colormaps->colors[i].g;
-            u8 bval = sithWorld_pCurrentWorld->colormaps->colors[i].b;
-            i8PalWorld[i] = RGB15((rval>>3),(gval>>3),(bval>>3));
+        loaded_colormap = pWorldCmp;
+        
+        if (jkPlayer_bEnableClassicLighting) {
+            // Generate all of the different light level palettes
+            // (for emissive textures)
+            for (int l = 0; l < 0x40; l++) {
+                for (int i = 0; i < 256; i++) {
+                    u8 lightLevel = pWorldCmp->lightlevel[(l*0x100)+i];
+
+                    u8 rval = pWorldCmp->colors[lightLevel].r;
+                    u8 gval = pWorldCmp->colors[lightLevel].g;
+                    u8 bval = pWorldCmp->colors[lightLevel].b;
+                    i8PalWorld[i] = RGB15((rval>>3),(gval>>3),(bval>>3));
+                }
+                glBindTexture(0, paletteIDS[l]);
+                glColorTableEXT( 0, 0, 256, 0, 0, (u16*)i8PalWorld );
+                paletteAddrs[l] = vramToPalAddr((uint8_t*)glGetColorTablePointer(paletteIDS[l]));
+            }
         }
+        else if (jkPlayer_bEnableEmissiveTextures) {
+            // Enhanced emissive textures
+            u8 isEmissive[0x100];
 
-        loaded_colormap = sithWorld_pCurrentWorld->colormaps;
+            memset(isEmissive, 1, sizeof(isEmissive));
+            for (int i = 0; i < 256; i++) {
+                u8 lightLevelBase = pWorldCmp->lightlevel[i];
+                for (int l = 1; l < 0x40; l++) {
+                    u8 lightLevel = pWorldCmp->lightlevel[(l*0x100)+i];
+                    if (lightLevel != lightLevelBase) {
+                        isEmissive[i] = 0;
+                        break;
+                    }
+                }
+            }
 
-        glBindTexture(0, paletteIDS[0]);
-        glColorTableEXT( 0, 0, 256, 0, 0, (u16*)i8PalWorld );
+            // Generate all of the different light level palettes
+            // from scratch rather than sampling the palette
+            for (int l = 0; l < 0x40; l++) {
+                flex_t lightLevel = (flex_t)l / (flex_t)0x3F;
+                // TODO: we could do something cheeky and spread the color conversion
+                // error across the light levels
+                for (int i = 0; i < 256; i++) {
+                    flex_t lightLevelColor = lightLevel;
+                    if (isEmissive[i]) {
+                        lightLevelColor = 1.0;
+                    }
+                    u8 rval = (u8)((flex_t)pWorldCmp->colors[i].r * lightLevelColor);
+                    u8 gval = (u8)((flex_t)pWorldCmp->colors[i].g * lightLevelColor);
+                    u8 bval = (u8)((flex_t)pWorldCmp->colors[i].b * lightLevelColor);
+                    i8PalWorld[i] = RGB15((rval>>3),(gval>>3),(bval>>3));
+                }
+                glBindTexture(0, paletteIDS[l]);
+                glColorTableEXT( 0, 0, 256, 0, 0, (u16*)i8PalWorld );
+                paletteAddrs[l] = vramToPalAddr((uint8_t*)glGetColorTablePointer(paletteIDS[l]));
+            }
+        }
+        else {
+            // No emissive textures
+            for (int i = 0; i < 256; i++) {
+                u8 rval = pWorldCmp->colors[i].r;
+                u8 gval = pWorldCmp->colors[i].g;
+                u8 bval = pWorldCmp->colors[i].b;
+                i8PalWorld[i] = RGB15((rval>>3),(gval>>3),(bval>>3));
+            }
 
-        glBindTexture(0, textureIDS[4]);
-        glColorTableEXT( 0, 0, 256, 0, 0, (u16*)i8PalWorld );
+            for (int l = 0; l < 0x40; l++) {
+                glBindTexture(0, paletteIDS[l]);
+                glColorTableEXT( 0, 0, 256, 0, 0, (u16*)i8PalWorld );
+                paletteAddrs[l] = vramToPalAddr((uint8_t*)glGetColorTablePointer(paletteIDS[l]));
+            }
+        }
+        //glBindTexture(0, textureIDS[4]);
+        //glColorTableEXT( 0, 0, 256, 0, 0, (u16*)i8PalWorld );
     }
 
     
@@ -193,12 +283,12 @@ int std3D_LoadResources() {
     }
 
     glGenTextures(4, &textureIDS[0]);
-    glGenTextures(1, &paletteIDS[0]);
+    glGenTextures(0x40, &paletteIDS[0]);
 
     update_from_display_palette();
     
     //glBindTexture(0, paletteIDS[0]);
-    glColorTableEXT( 0, 0, 256, 0, 0, (u16*)i8Pal );
+    //glColorTableEXT( 0, 0, 256, 0, 0, (u16*)i8Pal );
 
     std3D_bHasInitted = 1;
     return 1;
@@ -480,7 +570,7 @@ void std3D_DrawRenderListReal()
 
     update_from_world_palette();
 
-    glBindTexture(0, textureIDS[4]);
+    glBindTexture(0, -1);
 
     glColor3b(255,255,255);
     //glBindTexture(0, textureIDS[4]);
@@ -490,9 +580,16 @@ void std3D_DrawRenderListReal()
     int last_alpha = -1;
     uint32_t last_flags = 0;
 
+    /*static int lightCycle = 0;
+    lightCycle++;
+    lightCycle = lightCycle % 0x40;
+    printf("\n\n\n\n%x %x\n", lightCycle, paletteAddrs[lightCycle]);*/
+
     //glPolyFmt(POLY_ALPHA(last_alpha) | POLY_CULL_BACK | POLY_MODULATION | POLY_ID(polyid++) ) ;
     //glBegin(GL_TRIANGLES);
 
+    u8 lastLightLevel = 0x3F;
+    GFX_PAL_FORMAT = paletteAddrs[0x3F];
     for (int j = 0; j < GL_tmpTrisAmt; j++)
     {
         
@@ -508,7 +605,7 @@ void std3D_DrawRenderListReal()
             glBindTexture(0, tex_id);
         }
         else {
-            glBindTexture(0, textureIDS[4]);
+            glBindTexture(0, -1);
         }
         //glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S | GL_TEXTURE_WRAP_T | TEXGEN_POSITION);
         //printf("tri %d %dx%d\n", tex_id, tex_w, tex_h);
@@ -528,10 +625,41 @@ void std3D_DrawRenderListReal()
         }
 #endif
         int avg_alpha = COMP_A(v3->color) >> 3;
+
+        //u8 lightLevel = stdMath_Min(stdMath_Min(COMP_R(v3->color), COMP_R(v2->color)), COMP_R(v1->color));//v3->lightLevel>>2;// <= 0x3F ? v3->lightLevel : 0x3F;
+        //u8 lightLevel = v3->lightLevel>>2;// <= 0x3F ? v3->lightLevel : 0x3F;
+        u8 lightLevel = stdMath_Max(v1->lightLevel, stdMath_Max(v2->lightLevel, v3->lightLevel))>>2; // Cheap, but messes up guns
+        if (flags & 0x8000 && tex_id == -1) { // 0x8000 = constant light?
+            lightLevel = 0x3F;
+        }
+        if (!(jkPlayer_bEnableClassicLighting || jkPlayer_bEnableEmissiveTextures)) {
+            lightLevel = 0x3F;
+        }
+        // Expensive, but works correctly in MoTS, still broken for semitransparency??
+        /*u8 redMax = stdMath_Max(stdMath_Max(COMP_R(v3->color), COMP_R(v2->color)), COMP_R(v1->color));
+        u8 blueMax = stdMath_Max(stdMath_Max(COMP_B(v3->color), COMP_B(v2->color)), COMP_B(v1->color));
+        u8 greenMax = stdMath_Max(stdMath_Max(COMP_G(v3->color), COMP_G(v2->color)), COMP_G(v1->color));
+        u8 lightLevel = stdMath_Max(redMax, stdMath_Max(blueMax, greenMax))>>2;*/
+        
+
+        //lightLevel = lightLevel > 0x3F ? 0x3F : lightLevel;
+        u8 lightLevelAdd = (0x3F - lightLevel) << 2;
+        //if (lastLightLevel != lightLevel) {
+            GFX_PAL_FORMAT = paletteAddrs[lightLevel];
+        //}
+        lastLightLevel = lightLevel;
+
+        
         if (avg_alpha != last_alpha || (flags & 0x20000) != (last_flags & 0x20000) || (flags & 0x10000) != (last_flags & 0x10000)) {
             //glEnd();
             glPolyFmt(POLY_ALPHA(avg_alpha) | ((flags & 0x10000) ? POLY_CULL_NONE : POLY_CULL_BACK) | POLY_MODULATION | POLY_ID(polyid++) | ((flags & 0x20000) ? 0 : POLY_FOG) ) ;
             glBegin(GL_TRIANGLES);
+
+            // TODO: search for polygons with the same flags?
+            if (polyid > 63) {
+                polyid = 0;
+                stdPlatform_Printf("WARN: Too many polygons\n");
+            }
         }
         last_alpha = avg_alpha;
         last_flags = flags;
@@ -544,7 +672,7 @@ void std3D_DrawRenderListReal()
             //glColor3b((int)(v3->tu*255.0), (int)(v3->tv*255.0), 255);
             //glColor3b((j&0xFF),(j&0xFF),(j&0xFF));
             //glVertex3v16(floattov16(0.0), floattov16(1.92), floattov16(0.6));
-            glColor3b(COMP_R(v3->color),COMP_G(v3->color),COMP_B(v3->color));
+            glColor3b(stdMath_Min(COMP_R(v3->color) + lightLevelAdd, 0xFF),stdMath_Min(COMP_G(v3->color) + lightLevelAdd, 0xFF),stdMath_Min(COMP_B(v3->color) + lightLevelAdd, 0xFF));
             //glColor3b(0xFF, 0x00, 0x00);
             glVertex3v16(flextov16(v3->x), flextov16(v3->y), flextov16(v3->z));
         }
@@ -556,7 +684,7 @@ void std3D_DrawRenderListReal()
             //glColor3b((int)(v2->tu*255.0), (int)(v2->tv*255.0), 255);
             //glColor3b((j&0xFF),(j&0xFF),(j&0xFF));
             //glVertex3v16(floattov16(2.56), floattov16(1.28), floattov16(0.6));
-            glColor3b(COMP_R(v2->color),COMP_G(v2->color),COMP_B(v2->color));
+            glColor3b(stdMath_Min(COMP_R(v2->color) + lightLevelAdd, 0xFF),stdMath_Min(COMP_G(v2->color) + lightLevelAdd, 0xFF),stdMath_Min(COMP_B(v2->color) + lightLevelAdd, 0xFF));
             //glColor3b(0, 0xff, 0x00);
              glVertex3v16(flextov16(v2->x), flextov16(v2->y), flextov16(v2->z));
 
@@ -568,7 +696,7 @@ void std3D_DrawRenderListReal()
             }
             //glColor3b((int)(v1->tu*255.0), (int)(v1->tv*255.0), 255);
             //glVertex3v16(floattov16(0.0), floattov16(1.28), floattov16(0.6));
-            glColor3b(COMP_R(v1->color),COMP_G(v1->color),COMP_B(v1->color));
+            glColor3b(stdMath_Min(COMP_R(v1->color) + lightLevelAdd, 0xFF),stdMath_Min(COMP_G(v1->color) + lightLevelAdd, 0xFF),stdMath_Min(COMP_B(v1->color) + lightLevelAdd, 0xFF));
             //glColor3b(0, 0x00, 0xff);
              glVertex3v16(flextov16(v1->x), flextov16(v1->y), flextov16(v1->z));
         }
@@ -867,7 +995,7 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
     //printf("%x\n", *(u32*)0x4004008);
 
     glBindTexture(GL_TEXTURE_2D, image_texture);
-    glAssignColorTable(GL_TEXTURE_2D, paletteIDS[0]);
+    //glAssignColorTable(GL_TEXTURE_2D, paletteIDS[0]);
     //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S);
@@ -1047,7 +1175,7 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
         glDeleteTextures(1, &image_texture);
 
         std3D_bPurgeTexturesOnEnd = 1;
-        glBindTexture(GL_TEXTURE_2D, textureIDS[4]);
+        glBindTexture(GL_TEXTURE_2D, -1);
         return 1; // Kinda hacky, don't alert rdCache
 
         // TODO: Free any unused textures instead of having a white texture for one frame
@@ -1090,7 +1218,7 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
     texture->emissive_data = NULL;
 #endif
 
-    glBindTexture(GL_TEXTURE_2D, textureIDS[4]);
+    glBindTexture(GL_TEXTURE_2D, -1);
     
     return 1;
 }
@@ -1275,7 +1403,7 @@ MATH_FUNC void std3D_DrawMenu()
 
 #if 0
     glColor3b(255,255,255);
-    glBindTexture(0, textureIDS[4]);
+    glBindTexture(0, -1);
     for (int j = 0; j < 1; j++)
     {
         //glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK | POLY_MODULATION | POLY_ID(j) ) ;
@@ -1535,7 +1663,7 @@ void std3D_PurgeEntireTextureCache()
     std3D_ActuallyNeedToWaitForGeometryToFinish();
 
     glDeleteTextures(4, &textureIDS[0]);
-    glDeleteTextures(1, &paletteIDS[0]);
+    glDeleteTextures(0x40, &paletteIDS[0]);
 
     stdPlatform_Printf("Purging texture cache... %x\n", std3D_loadedTexturesAmt);
     for (int i = 0; i < std3D_loadedTexturesAmt; i++)

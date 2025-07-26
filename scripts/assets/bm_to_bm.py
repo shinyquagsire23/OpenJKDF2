@@ -628,47 +628,64 @@ def convert_dw_pngs():
             close_lut[i] = cmp_dw.closest_color(cmp_new, i)
         mat_to_mat_2(m, cmp_dw, cmp_new, close_lut)
 
-def convert_mat_to_correct_palette(desired_image_fpath, original_bm_fpath, output_fpath):
+def convert_bm_to_correct_palette(desired_image_fpath, original_bm_fpath, output_fpath):
     desired_image = open(desired_image_fpath, "rb").read()
     original_bm = open(original_bm_fpath, "rb").read()
+
+    pal_flags = struct.unpack("<L", original_bm[0xC:0x10])[0]
+    num_mips = struct.unpack("<L", desired_image[0x10:0x14])[0]
 
     desired_image_palraw = desired_image[-0x300:]
     original_bm_palraw = original_bm[-0x300:]
     cmp_desired = CmpPal(colormap_lut["ui"])
     cmp_original = CmpPal(colormap_lut["ui"])
 
+    if (pal_flags & 2) == 0 and "/fl" in desired_image_fpath:
+        #desired_base = open(desired_image_fpath + "/../bkfieldlog.BM", "rb").read()
+        original_base = open("/Users/maxamillion/Library/Application Support/OpenJKDF2/openjkdf2/resource/ui/bm/originals/bkfieldlog.BM", "rb").read()
+        #desired_image_palraw = desired_base[-0x300:]
+        original_bm_palraw = original_base[-0x300:]
+
     cmp_desired.pal_raw = desired_image_palraw
     cmp_original.pal_raw = original_bm_palraw
 
-    print(cmp_desired.pal_raw)
+    #print(cmp_desired.pal_raw)
 
     closest_lut = []
     for i in range(0, 256):
         closest_lut += [cmp_desired.closest_color(cmp_original, i, check_emissive=False)]
     closest_lut[0] = 0
-    print(closest_lut)
+    #print(closest_lut)
 
-    width = 256
-    height = 192
-    out_image_data = []
-    desired_image_data = desired_image[0x88:]
-    #original_image_data = desired_image[0x88:]
-    for y in range(0, height):
-        for x in range(0, width):
-            val = desired_image_data[(y*width)+x]
-            #color = cmp_original.closest_color(cmp_desired, val)
-            color = closest_lut[val]
-            out_image_data += [color]
+    #print(width, height, num_mips)
 
-    out_image_data = bytes(out_image_data)
     f = open(output_fpath, "wb")
-    f.write(desired_image[:0x88])
-    f.write(out_image_data)
-    f.write(original_bm_palraw)
+    f.write(original_bm[0x0:0x20])
+    f.write(desired_image[0x20:0x80])
+
+    current_offs = 0x80
+    for i in range(0, num_mips):
+        width, height = struct.unpack("<LL", desired_image[current_offs:current_offs+8])
+        f.write(struct.pack("<LL", width, height))
+        current_offs += 8
+        out_image_data = []
+        desired_image_data = desired_image[current_offs:]
+        for y in range(0, height):
+            for x in range(0, width):
+                val = desired_image_data[(y*width)+x]
+                #color = cmp_original.closest_color(cmp_desired, val)
+                color = closest_lut[val]
+                out_image_data += [color]
+                current_offs += 1
+
+        out_image_data = bytes(out_image_data)
+        f.write(out_image_data)
+    if (pal_flags & 2) != 0:
+        f.write(original_bm_palraw)
     f.close()
 
-    cmp_desired.write_png("testA.png")
-    cmp_original.write_png("testB.png")
+    #cmp_desired.write_png("testA.png")
+    #cmp_original.write_png("testB.png")
 
 #for i in range(0, num_textures):
 #    print (textures[i])
@@ -678,7 +695,20 @@ def convert_mat_to_correct_palette(desired_image_fpath, original_bm_fpath, outpu
 
 # python3 scripts/assets/bm_to_bm.py "/Users/maxamillion/Library/Application Support/OpenJKDF2/openjkdf2/resource/ui/bm/new/bkmain.bm" "/Users/maxamillion/Library/Application Support/OpenJKDF2/openjkdf2/resource/ui/bm/originals/bkmain.bm" "/Users/maxamillion/Library/Application Support/OpenJKDF2/openjkdf2/resource/ui/bm/bkmain.bm"
 
+#export MYBMS="/Users/maxamillion/Library/Application Support/OpenJKDF2/openjkdf2/resource/ui/bm"
+#python3 scripts/assets/bm_to_bm.py "$MYBMS/new2/bksingle.bm" "$MYBMS/originals/bksingle.bm" "$MYBMS/bksingle.bm"
+#python3 scripts/assets/bm_to_bm.py "$MYBMS/new2/bkesc.bm" "$MYBMS/originals/bkesc.bm" "$MYBMS/bkesc.bm"
+#python3 scripts/assets/bm_to_bm.py "$MYBMS/new2/bkloading.bm" "$MYBMS/originals/bkloading.bm" "$MYBMS/bkloading.bm"
+#python3 scripts/assets/bm_to_bm.py "$MYBMS/new2/bkmain.bm" "$MYBMS/originals/bkmain.bm" "$MYBMS/bkmain.bm"
+#python3 scripts/assets/bm_to_bm.py "$MYBMS/new2/bksetup.bm" "$MYBMS/originals/bksetup.bm" "$MYBMS/bksetup.bm"
+#python3 scripts/assets/bm_to_bm.py "$MYBMS/new2/bksingle.bm" "$MYBMS/originals/bksingle.bm" "$MYBMS/bksingle.bm"
+#python3 scripts/assets/bm_to_bm.py "$MYBMS/new2/bktally.bm" "$MYBMS/originals/bktally.bm" "$MYBMS/bktally.bm"
+
+for path in glob.glob("/Users/maxamillion/Library/Application Support/OpenJKDF2/openjkdf2/resource/ui/bm/new2/*.BM"):
+    print(path, path.replace("/new2", "/originals"), path.replace("/new2", ""))
+    convert_bm_to_correct_palette(path, path.replace("/new2", "/originals"), path.replace("/new2", ""))
+
 if (len(sys.argv) < 3):
     print("Usage: mat_to_mat.py [valid_image_bad_palette.bm] [original_bm_with_good_palette.bm] [output.bm]")
-print("adf")
-convert_mat_to_correct_palette(sys.argv[1], sys.argv[2], sys.argv[3])
+
+convert_bm_to_correct_palette(sys.argv[1], sys.argv[2], sys.argv[3])

@@ -181,9 +181,9 @@ LABEL_26:
     }
 
 
-    colormap->lightlevel = colorsLights;
+    colormap->lightlevel = (uint8_t*)colorsLights;
     if ( (intptr_t)colorsLights & 0xFF )
-        colormap->lightlevel = (void*)((intptr_t)colorsLights - ((intptr_t)colorsLights & 0xFF) + 0x100);
+        colormap->lightlevel = (uint8_t*)((intptr_t)colorsLights - ((intptr_t)colorsLights & 0xFF) + 0x100);
 
     rdroid_pHS->fileRead(colormap_fptr, colormap->lightlevel, 0x4000);
 

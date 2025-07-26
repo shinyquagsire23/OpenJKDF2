@@ -66,6 +66,10 @@ int jkGuiPlayer_Startup()
     jkGui_InitMenu(&jkGuiPlayer_menuNew, jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]);
 
 #ifdef JKGUI_SMOL_SCREEN
+    for (int i = 1; i < 3; i++) {
+        jkGuiPlayer_menuSelectElements[i].rect = jkGuiPlayer_menuSelectElements[i].rectOrig;
+        jkGuiPlayer_menuSelectElements[i].bIsSmolDirty = 1; 
+    }
     for (int i = 1; i < 8; i++) {
         jkGuiPlayer_menuNewElements[i].rect = jkGuiPlayer_menuNewElements[i].rectOrig;
         jkGuiPlayer_menuNewElements[i].bIsSmolDirty = 1; 
@@ -88,6 +92,7 @@ int jkGuiPlayer_Startup()
     }
 
 #ifdef JKGUI_SMOL_SCREEN
+    jkGui_SmolScreenFixup(&jkGuiPlayer_menuSelect, 0);
     jkGui_SmolScreenFixup(&jkGuiPlayer_menuNew, 0);
 #endif
 

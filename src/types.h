@@ -871,6 +871,7 @@ typedef struct D3DVERTEX_twl
     flex_t dvTV;
   };
   #pragma pack(pop)
+  uint32_t lightLevel;
 } D3DVERTEX_twl;
 #pragma pack(pop)
 
@@ -1134,7 +1135,7 @@ typedef struct rdColormap
     uint32_t flags;
     rdVector3 tint;
     rdColor24 colors[256];
-    void* lightlevel;
+    uint8_t* lightlevel;
     void* lightlevelAlloc;
     void* transparency;
     void* transparencyAlloc;

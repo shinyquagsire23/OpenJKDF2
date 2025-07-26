@@ -163,6 +163,9 @@ extern int jkPlayer_bDisableWeaponWaggle;
 
 extern int jkPlayer_bHasLoadedSettingsOnce;
 
+extern int jkPlayer_bEnableEmissiveTextures;
+extern int jkPlayer_bEnableClassicLighting;
+
 #define FOV_MIN (40)
 #define FOV_MAX (170)
 
