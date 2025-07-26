@@ -2586,13 +2586,13 @@ void jkGuiRend_FocusElementDir(jkGuiMenu *pMenu, int32_t dir)
         BOOL isListbox = focusedElement->type == ELEMENT_LISTBOX;
         if (dir == FOCUS_LEFT)
         {
-            if ((curFocus.x > rect.x || containsX || isListbox) && bDistCloseX && bDistCloseY) {
+            if ((curFocus.x > rect.x || containsPt || isListbox) && bDistCloseX && bDistCloseY) {
                 bestCandidate = iter;
             }
         }
         else if (dir == FOCUS_RIGHT)
         {
-            if ((curFocus.x < rect.x || containsX || isListbox) && bDistCloseX && bDistCloseY) {
+            if ((curFocus.x < rect.x || containsPt || isListbox) && bDistCloseX && bDistCloseY) {
                 bestCandidate = iter;
             }
         }

@@ -176,6 +176,9 @@ void jkGui_SmolScreenFixup(jkGuiMenu *menu, BOOL bForce) {
             continue;
         }
 
+        int32_t dirtyWidth = iter->rect.width;
+        int32_t dirtyHeight = iter->rect.height;
+
         iter->rect.x = ((int)(flex_t)iter->rect.x * (flex_t)0.4);
         iter->rect.y = ((int)(flex_t)iter->rect.y * (flex_t)0.4);
         iter->rect.width = ((int)(flex_t)iter->rect.width * (flex_t)0.4);
@@ -185,6 +188,14 @@ void jkGui_SmolScreenFixup(jkGuiMenu *menu, BOOL bForce) {
             iter->textType = 12;
             if (iter->rect.height && iter->rect.height < 11) {
                 iter->rect.height = 11;
+            }
+        }
+        if (iter->type == ELEMENT_PICBUTTON) {
+            if (iter->rectOrig.width < 0) {
+                iter->rect.width = dirtyWidth;
+            }
+            if (iter->rectOrig.height < 0) {
+                iter->rect.height = dirtyHeight;
             }
         }
         iter++;
