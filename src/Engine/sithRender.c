@@ -278,8 +278,8 @@ void sithRender_Draw()
     //lightDebugNum = 0; // Added
 
 #ifdef TARGET_TWL
-    //sithRender_geoMode = RD_GEOMODE_TEXTURED;
-    //sithRender_lightMode = RD_LIGHTMODE_FULLYLIT;
+    //sithRender_geoMode = RD_GEOMODE_SOLIDCOLOR;
+    //sithRender_lightMode = RD_LIGHTMODE_DIFFUSE;
     //sithRender_texMode = RD_TEXTUREMODE_PERSPECTIVE;
     //rdroid_curVertexColorMode = 0;
 #endif
@@ -1477,6 +1477,9 @@ void sithRender_RenderLevelGeometry()
                 {
                     procEntry->ambientLight = stdMath_Clamp(level_idk->extraLight + sithRender_008d4098, 0.0, 1.0);
                 }
+
+                // These lighting optimizations are for the software renderer
+#ifdef TARGET_TWL
                 if ( procEntry->ambientLight >= 1.0 )
                 {
                     if ( v68 )
@@ -1545,6 +1548,7 @@ void sithRender_RenderLevelGeometry()
                         procEntry->light_level_static = v67;
                     }
                 }
+#endif
 
                 surfaceFlags = v65->surfaceFlags;
                 if ( (surfaceFlags & SITH_SURFACE_HORIZON_SKY) != 0 )
@@ -1720,6 +1724,8 @@ void sithRender_RenderLevelGeometry()
                         v20->ambientLight = stdMath_Clamp(level_idk->extraLight + sithRender_008d4098, 0.0, 1.0);
                     }
 
+                    // These lighting optimizations are for the software renderer
+#ifndef TARGET_TWL
                     if ( v20->ambientLight >= 1.0 )
                     {
                         if ( v68 )
@@ -1778,6 +1784,7 @@ void sithRender_RenderLevelGeometry()
                             }
                         }
                     }
+#endif
 
                     v20->wallCel = v65->surfaceInfo.face.wallCel;
                     v20->extralight = v65->surfaceInfo.face.extraLight;
@@ -2176,6 +2183,13 @@ void sithRender_RenderThings()
                         yval = sithCamera_currentCamera->invZoomScale * (thingIter->screenPos).y;
                     }
 
+#ifdef TARGET_TWL
+                    // Added: Force corpses to use the lowest geoset possible
+                    if (thingIter->type == SITH_THING_CORPSE) {
+                        yval = 100.0;
+                    }
+#endif
+
                     if ( thingIter->rdthing.type == RD_THINGTYPE_MODEL )
                     {
                         model3 = thingIter->rdthing.model3;
@@ -2226,27 +2240,36 @@ void sithRender_RenderThings()
                     }
                     
                     texMode = thingIter->rdthing.desiredTexMode;
+
+                    // These texture optimizations are for the sw renderer
+#ifndef TARGET_TWL
                     if ( yval >= (flex_d_t)curWorld->perspectiveDistance )
                     {
                         thingIter->rdthing.curTexMode = texMode > RD_TEXTUREMODE_AFFINE ? RD_TEXTUREMODE_AFFINE : texMode;
                     }
                     else
+#endif
                     {
                         texMode2 = RD_TEXTUREMODE_PERSPECTIVE;
                         if ( texMode <= RD_TEXTUREMODE_PERSPECTIVE)
                             texMode2 = thingIter->rdthing.desiredTexMode;
                         thingIter->rdthing.curTexMode = texMode2;
                     }
+
+                    // These texture optimizations are for the sw renderer
+#ifndef TARGET_TWL
                     if ( yval >= (flex_d_t)curWorld->perspectiveDistance )
                     {
                         thingIter->rdthing.curTexMode = texMode > RD_TEXTUREMODE_AFFINE ? RD_TEXTUREMODE_AFFINE : texMode;
                     }
                     else
+#endif
                     {
                         if ( texMode > RD_TEXTUREMODE_PERSPECTIVE)
                             texMode = RD_TEXTUREMODE_PERSPECTIVE;
                         thingIter->rdthing.curTexMode = texMode;
                     }
+
                     if ( (thingIter->thingflags & SITH_TF_LIGHT) != 0
                       && thingIter->light > 0.0
                       && a2 <= stdMath_Clamp(thingIter->light, 0.0, 1.0) )
@@ -2258,9 +2281,10 @@ void sithRender_RenderThings()
                     {
                         rdCamera_SetAmbientLight(rdCamera_pCurCamera, a2);
                     }
+
+                    lightMode = thingIter->rdthing.desiredLightMode;
                     if ( a2 >= 1.0 )
                     {
-                        lightMode = thingIter->rdthing.desiredLightMode;
                         if ( v16 )
                         {
                             lightMode = lightMode > RD_LIGHTMODE_FULLYLIT ? RD_LIGHTMODE_FULLYLIT : lightMode;
@@ -2273,13 +2297,11 @@ void sithRender_RenderThings()
                     }
                     else if ( (thingIter->thingflags & SITH_TF_IGNOREGOURAUDDISTANCE) == 0 && yval >= (flex_d_t)sithWorld_pCurrentWorld->gouradDistance )
                     {
-                        lightMode = thingIter->rdthing.desiredLightMode;
                         if ( lightMode > RD_LIGHTMODE_DIFFUSE)
                             lightMode = RD_LIGHTMODE_DIFFUSE;
                     }
                     else
                     {
-                        lightMode = thingIter->rdthing.desiredLightMode;
                         if ( lightMode > RD_LIGHTMODE_GOURAUD)
                             lightMode = RD_LIGHTMODE_GOURAUD;
                     }
@@ -2342,8 +2364,12 @@ int sithRender_RenderThing(sithThing *pThing)
 
 #ifdef TARGET_TWL
     int skip_this_thing = 0;
-    if (pThing->screenPos.y - (pThing->rdthing.type == RD_THINGTYPE_MODEL ? pThing->rdthing.model3->radius : (flex_t)0.0) > 2.0) {
+    flex_t realDepth = pThing->screenPos.y - (pThing->rdthing.type == RD_THINGTYPE_MODEL ? pThing->rdthing.model3->radius : (flex_t)0.0);
+    if (realDepth > 2.0) {
         skip_this_thing = 1;
+    }
+    if (realDepth > 1.5) {
+        // geomode
     }
     if (!skip_this_thing) {
 #endif
@@ -2471,6 +2497,8 @@ void sithRender_RenderAlphaSurfaces()
         
         v9->ambientLight = stdMath_Clamp(surfaceSector->extraLight + sithRender_008d4098, 0.0, 1.0);
 
+        // These light optimizations are for the sw renderer
+#ifndef TARGET_TWL
         if ( v9->ambientLight < 1.0 )
         {
             if ( v9->lightingMode == RD_LIGHTMODE_DIFFUSE)
@@ -2541,6 +2569,7 @@ void sithRender_RenderAlphaSurfaces()
                 v9->lightingMode = RD_LIGHTMODE_FULLYLIT;
             }
         }
+#endif
 
         v23 = 1;
         if ( v9->geometryMode >= RD_GEOMODE_TEXTURED)

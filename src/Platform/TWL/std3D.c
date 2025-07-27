@@ -57,6 +57,10 @@ int std3D_bNeedsToPurgeMenuBuffers = 0;
 int std3D_timeWastedWaitingAround = 0;
 static void* loaded_colormap = NULL;
 
+static uint8_t std3D_lastSkyColor = 0;
+static flex_t std3D_currentFogAmbientMult = 1.0;
+static flex_t std3D_targetFogAmbientMult = 1.0;
+
 u8* i8Bitmap = NULL;
 u8* i8Bitmap2 = NULL;
 BOOL std3D_bMenuBitmapsFreed = 1;
@@ -267,9 +271,51 @@ static void update_from_world_palette()
         }
         //glBindTexture(0, textureIDS[4]);
         //glColorTableEXT( 0, 0, 256, 0, 0, (u16*)i8PalWorld );
+
+        std3D_lastSkyColor = 0;
+    }   
+}
+
+static void std3D_UpdateFogColor() {
+    if (!rdCamera_pCurCamera)
+        return;
+    flex_t ambientLight = rdCamera_pCurCamera->ambientLight;
+    if (std3D_lastSkyColor == sithSurface_skyColorGuess && std3D_currentFogAmbientMult == ambientLight) {
+        return;
     }
 
-    
+    std3D_fogDepth = 5;
+        
+    // TODO: Make this dynamic based on the furthest Z?
+    glFogShift(11);
+    glFogOffset(std3D_fogDepth & 0x7FFF);
+    rdColor24 skyColor = sithWorld_pCurrentWorld->colormaps->colors[sithSurface_skyColorGuess];
+
+    if (std3D_currentFogAmbientMult < ambientLight) {
+        std3D_currentFogAmbientMult += 0.01;
+        if (std3D_currentFogAmbientMult > ambientLight) {
+            std3D_currentFogAmbientMult = ambientLight;
+        }
+    } 
+    else if (std3D_currentFogAmbientMult > ambientLight) {
+        std3D_currentFogAmbientMult -= 0.01;
+        if (std3D_currentFogAmbientMult < ambientLight) {
+            std3D_currentFogAmbientMult = ambientLight;
+        }
+    }
+
+    uint8_t colorR = (u8)((flex_t)skyColor.r * std3D_currentFogAmbientMult);
+    uint8_t colorG = (u8)((flex_t)skyColor.g * std3D_currentFogAmbientMult);
+    uint8_t colorB = (u8)((flex_t)skyColor.b * std3D_currentFogAmbientMult);
+
+    glFogColor(colorR >> 3, colorG >> 3, colorB >> 3, 31);
+    glClearColor(colorR >> 3, colorG >> 3, colorB >> 3, 31);
+    for (int i = 0; i < 32; i++) {
+        glFogDensity(i, stdMath_ClampInt((i-5)*5, 0, 127));
+    }
+    glFogDensity(31,127);
+
+    std3D_lastSkyColor = sithSurface_skyColorGuess;
 }
 
 int std3D_LoadResources() {
@@ -459,18 +505,7 @@ int std3D_StartScene()
             glMatrixMode(GL_MODELVIEW);
             wOverride(0);
 
-            std3D_fogDepth = 5;
-        
-            // TODO: Make this dynamic based on the furthest Z?
-            glFogShift(11);
-            glFogOffset(std3D_fogDepth & 0x7FFF);
-            rdColor24 skyColor = sithWorld_pCurrentWorld->colormaps->colors[sithSurface_skyColorGuess];
-            glFogColor(skyColor.r >> 3, skyColor.g >> 3, skyColor.b >> 3, 31);
-            glClearColor(skyColor.r >> 3, skyColor.g >> 3, skyColor.b >> 3, 31);
-            for (int i = 0; i < 32; i++) {
-                glFogDensity(i, stdMath_ClampInt((i-5)*5, 0, 127));
-            }
-            glFogDensity(31,127);
+            std3D_UpdateFogColor();
         }
     }
     else {
@@ -569,6 +604,7 @@ void std3D_DrawRenderListReal()
     std3D_ActuallyNeedToWaitForGeometryToFinish();
 
     update_from_world_palette();
+    std3D_UpdateFogColor();
 
     glBindTexture(0, -1);
 

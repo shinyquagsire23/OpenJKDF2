@@ -243,10 +243,11 @@ int sithSurface_Load(sithWorld *world)
                         lowestMipBuf = buf;
                     }
                 }
-                if (lowestMipBuf) {
+                if (lowestMipBuf && mat->texinfos && mat->texinfos[0]) {
                     uint32_t pxIdx = (lowestMipBuf->format.width * lowestMipBuf->format.height/2);
                                      //+ (lowestMipBuf->format.width / 2);
-                    sithSurface_skyColorGuess = lowestMipBuf->surface_lock_alloc[pxIdx];
+                    //sithSurface_skyColorGuess = lowestMipBuf->surface_lock_alloc[pxIdx];
+                    sithSurface_skyColorGuess = mat->texinfos[0]->header.solidColor;
                 }
             }
 #endif

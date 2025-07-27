@@ -1007,9 +1007,16 @@ void jkPlayer_renderSaberWeaponMesh(sithThing *thing)
         if ( sithPlayer_pLocalPlayer->iteminfo[SITHBIN_F_SEEING].state & ITEMSTATE_ACTIVATE )
         {
             rdGeoMode_t oldGeoMode = thing->rdthing.curGeoMode;
+#ifdef TARGET_TWL
+            // Added: Don't draw them twice wtf
+            if (thing->rdthing.curGeoMode != thing->rdthing.desiredGeoMode) {
+#endif
             thing->rdthing.curGeoMode = thing->rdthing.desiredGeoMode;
             rdVector_Copy3(&thing->lookOrientation.scale, &thing->position);
             rdThing_Draw(&thing->rdthing, &thing->lookOrientation);
+#ifdef TARGET_TWL
+            }
+#endif
 
             thing->lookOrientation.scale.x = 0.0;
             thing->lookOrientation.scale.y = 0.0;

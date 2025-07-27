@@ -336,7 +336,7 @@ int rdCache_SendFaceListToHardware()
     rend_6c_current_idx = 0;
     
     for (rend_6c_current_idx = 0; rend_6c_current_idx < rdCache_numProcFaces; rend_6c_current_idx++)
-    {        
+    {
         active_6c = &rdCache_aProcFaces[rend_6c_current_idx];
         mipmap_level = a3;
 
@@ -399,10 +399,23 @@ int rdCache_SendFaceListToHardware()
             continue;
         }
 
-        // Added
-        rdMaterial_EnsureData(v11.material);
+        // Added: EnsureData stuff
+        if (mipmap_related == 3) {
+            rdMaterial_EnsureMetadata(v11.material);
+        }
+        else {
+            rdMaterial_EnsureData(v11.material);
+#ifdef TARGET_TWL
+            // Added: fall back to colors with no data
+            if (!v11.material->bDataLoaded) {
+                v11.mipmap_related = 3;
+                mipmap_related = 3;
+            }
+#endif
+        }
+        
 #if defined(RDMATERIAL_LRU_LOAD_UNLOAD)
-        if (!v11.material->bDataLoaded) {
+        if (!(v11.material->bDataLoaded || (v11.material->bMetadataLoaded && mipmap_related == 3))) {
             continue;
         }
 #endif
@@ -437,7 +450,7 @@ int rdCache_SendFaceListToHardware()
             v11.mipmap_related = 3;
             mipmap_related = 3;
         }
-        if ( !v15 || (v15 && (v15->header.texture_type & 8) == 0) || (v15 && !v15->texture_ptr) ) // Added: v15 nullptr check, !v15->texture_ptr
+        if ((mipmap_related == 3) || !v15 || (v15 && (v15->header.texture_type & 8) == 0) || (v15 && !v15->texture_ptr) ) // Added: v15 nullptr check, !v15->texture_ptr, mipmap_related check
         {
             tex2_arr_sel = 0;
         }
@@ -546,7 +559,7 @@ int rdCache_SendFaceListToHardware()
 #endif
             }
 
-            if ( !rdMaterial_AddToTextureCache(v11.material, sith_tex_sel, mipmap_level, alpha_is_opaque, v14) )
+            if (!rdMaterial_AddToTextureCache(v11.material, sith_tex_sel, mipmap_level, alpha_is_opaque, v14) )
             {
                 rdCache_DrawRenderList();
                 rdCache_ResetRenderList();
@@ -1058,7 +1071,7 @@ LABEL_232:
             if ( lighting_capability == 0) // Added: v137 nullptr check
             {
                 v91 = (rdColormap *)active_6c->colormap;
-                v97 = v137->header.field_4;
+                v97 = v137->header.solidColor;
                 v94 = (uint8_t)v91->colors[v97].g;
                 v98 = (uint8_t)v91->colors[v97].b;
                 v96 = (uint8_t)v91->colors[v97].r;
@@ -1085,7 +1098,7 @@ LABEL_232:
 #ifdef TARGET_TWL
                     rdCache_aHWVertices[rdCache_totalVerts].lightLevel = (int)v92 << 2;
 #endif
-                    v93 = *((uint8_t *)v91->lightlevel + 256 * ((__int64)v92 & 0x3F) + v137->header.field_4);
+                    v93 = *((uint8_t *)v91->lightlevel + 256 * ((__int64)v92 & 0x3F) + v137->header.solidColor);
                     v94 = (uint8_t)v91->colors[v93].g;
                     v95 = (uint8_t)v91->colors[v93].b;
                     v96 = (uint8_t)v91->colors[v93].r;
@@ -1097,7 +1110,7 @@ LABEL_232:
                 else
                 {
                     v91 = (rdColormap *)active_6c->colormap;
-                    uint8_t baseLight = *((uint8_t *)v91->lightlevel + v137->header.field_4);
+                    uint8_t baseLight = *((uint8_t *)v91->lightlevel + v137->header.solidColor);
                     flex_d_t intRed = active_6c->paRedIntensities[vtx_idx] * 255.0 - 0.5;
                     flex_d_t intGreen = active_6c->paGreenIntensities[vtx_idx] * 255.0 - 0.5;
                     flex_d_t intBlue = active_6c->paBlueIntensities[vtx_idx] * 255.0 - 0.5;
@@ -1157,31 +1170,10 @@ skip_colormap_deref:
                 v94 = (__int64)((flex_d_t)green * rdroid_curColorEffects.fade);
                 blue = (__int64)((flex_d_t)blue * rdroid_curColorEffects.fade);
             }
-            if ( v96 < 0 )
-            {
-                v96 = (v96 & ~0xFF) | 0;
-            }
-            else if ( v96 > 255 )
-            {
-                v96 = (v96 & ~0xFF) | 0xff;
-            }
-            if ( v94 < 0 )
-            {
-                v94 = (v94 & ~0xFF) | 0;
-            }
-            else if ( v94 > 255 )
-            {
-                v94 = (v94 & ~0xFF) | 0xff;
-            }
+            v96 = stdMath_ClampInt(v96, 0, 0xFF);
+            v94 = stdMath_ClampInt(v94, 0, 0xFF);
             v103 = blue;
-            if ( blue < 0 )
-            {
-                v103 = 0;
-            }
-            else if ( blue > 255 )
-            {
-                v103 = -1;
-            }
+            v103 = stdMath_ClampInt(v103, 0, 0xFF);
             v104 = v103 | (((uint8_t)v94 | ((alpha_upshifta | (uint8_t)v96) << 8)) << 8);
             rdCache_aHWVertices[rdCache_totalVerts].color = v104;
             rdCache_aHWVertices[rdCache_totalVerts].tu = 0.0;

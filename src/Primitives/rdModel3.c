@@ -2,6 +2,7 @@
 
 #include "Engine/rdroid.h"
 #include "General/stdConffile.h"
+#include "General/stdString.h"
 #include "stdPlatform.h"
 #include "Primitives/rdVector.h"
 #include "Primitives/rdMatrix.h"
@@ -36,8 +37,7 @@ void rdModel3_ClearFrameCounters()
 int rdModel3_NewEntry(rdModel3 *model)
 {
     _memset(model, 0, sizeof(rdModel3));
-    _strncpy(model->filename, "UNKNOWN", 0x1Fu);
-    model->filename[31] = 0;
+    stdString_SafeStrCopy(model->filename, "UNKNOWN", 32);
     model->geosetSelect = 0;
     return 0;
 }
@@ -98,8 +98,7 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
     int geoset_num;
 
     rdModel3_NewEntry(model);
-    _strncpy(model->filename, stdFileFromPath(model_fpath), 0x1Fu);
-    model->filename[31] = 0;
+    stdString_SafeStrCopy(model->filename, stdFileFromPath(model_fpath), 32);
     if ( !stdConffile_OpenRead(model_fpath) )
         return 0;
 
@@ -199,8 +198,7 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
             if ( _sscanf(stdConffile_aLine, " name %s", std_genBuffer) != 1 )
                 goto fail;
 
-            _strncpy(mesh->name, std_genBuffer, 0x1Fu);
-            mesh->name[31] = 0;
+            stdString_SafeStrCopy(mesh->name, std_genBuffer, 32);
 
             if ( !stdConffile_ReadLine()
               || _sscanf(stdConffile_aLine, " radius %f", &radius) != 1
@@ -1248,8 +1246,19 @@ void rdModel3_DrawHNode(rdHierarchyNode *pNode)
             if (pParent) // Added: nullptr check
                 rdModel3_pCurGeoset->meshes[pNode->meshIdx].radius = rdModel3_pCurGeoset->meshes[pParent->meshIdx].radius;
         }
-        
+
+#ifdef TARGET_TWL
+        // Added: HACK: Force enemy weapons to not have textures
+        int geoMode = curGeometryMode;
+        if (!strcmp(pNode->name, "weapon")) {
+            curGeometryMode = RD_GEOMODE_SOLIDCOLOR;
+        }
+#endif
         rdModel3_DrawMesh(&rdModel3_pCurGeoset->meshes[pNode->meshIdx], &pCurThing->hierarchyNodeMatrices[pNode->idx]);
+
+#ifdef TARGET_TWL
+        curGeometryMode = geoMode;
+#endif
     }
 
     iter = pNode->child;

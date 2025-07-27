@@ -196,7 +196,10 @@ void sithThing_TickAll(flex_t deltaSeconds, int deltaMs)
         if (!pThingIter->type)
             continue;
 #ifdef TARGET_TWL
-        int bCanUpdateOffscreen = (((uint8_t)jkPlayer_currentTickIdx + (pThingIter->thingIdx & 0xFF)) & 0x7F) == 0;
+        int bCanUpdateOffscreen = (((uint8_t)jkPlayer_currentTickIdx + (pThingIter->thingIdx & 0xFF)) & 0x3F) == 0;
+        int bActorCanUpdateEveryOther = pThingIter->type == SITH_THING_ACTOR && (((uint8_t)jkPlayer_currentTickIdx + (pThingIter->thingIdx & 0xFF)) & 1) == 0;
+        int bActorCanUpdateNow = pThingIter->type == SITH_THING_ACTOR && pThingIter->screenPos.y < 0.5;
+        int bCanAlwaysUpdatePhysics = pThingIter->type == SITH_THING_PLAYER || pThingIter->type == SITH_THING_PARTICLE || pThingIter->type == SITH_THING_WEAPON || pThingIter->type == SITH_THING_DEBRIS || pThingIter->type == SITH_THING_COG;
 #endif
 
         if (!(pThingIter->thingflags & SITH_TF_WILLBEREMOVED))
@@ -224,6 +227,7 @@ void sithThing_TickAll(flex_t deltaSeconds, int deltaMs)
             {
                 case SITH_CT_AI:
                     // CPU optimization testing
+                    // TODO: Check if a thing has been given a target by a COG and allow it to move, eg easter egg lady in Baron's Hed
 #ifdef TARGET_TWL
                     if (pThingIter->type == SITH_THING_PLAYER || pThingIter->lastRenderedTickIdx >= jkPlayer_currentTickIdx-3 || bCanUpdateOffscreen)
 #endif
@@ -254,7 +258,7 @@ void sithThing_TickAll(flex_t deltaSeconds, int deltaMs)
             {
                 // CPU optimization testing
 #ifdef TARGET_TWL
-                if (pThingIter->type == SITH_THING_PLAYER || pThingIter->lastRenderedTickIdx >= jkPlayer_currentTickIdx-3 || bCanUpdateOffscreen)
+                if (bCanAlwaysUpdatePhysics || pThingIter->lastRenderedTickIdx >= jkPlayer_currentTickIdx-3 || bCanUpdateOffscreen)
 #endif
                 sithPhysics_ThingTick(pThingIter, deltaSeconds);
             }
@@ -265,15 +269,17 @@ void sithThing_TickAll(flex_t deltaSeconds, int deltaMs)
 
             // CPU optimization testing
 #ifdef TARGET_TWL
-            if (pThingIter->type == SITH_THING_PLAYER || pThingIter->lastRenderedTickIdx >= jkPlayer_currentTickIdx-3 || bCanUpdateOffscreen)
+            if (bCanAlwaysUpdatePhysics || pThingIter->lastRenderedTickIdx >= jkPlayer_currentTickIdx-3 || bCanUpdateOffscreen)
 #endif
             sithThing_TickPhysics(pThingIter, deltaSeconds);
 
             // CPU optimization testing
 #ifdef TARGET_TWL
-            if (pThingIter->type == SITH_THING_PLAYER || pThingIter->lastRenderedTickIdx >= jkPlayer_currentTickIdx-3 || bCanUpdateOffscreen)
-#endif
+            if ((pThingIter->type == SITH_THING_PLAYER) || bActorCanUpdateNow || bActorCanUpdateEveryOther || (pThingIter->type != SITH_THING_ACTOR && pThingIter->lastRenderedTickIdx >= jkPlayer_currentTickIdx-3) || bCanUpdateOffscreen)
+            sithPuppet_Tick(pThingIter, bActorCanUpdateEveryOther ? deltaSeconds * 2 : deltaSeconds);
+#else
             sithPuppet_Tick(pThingIter, deltaSeconds);
+#endif
             continue;
         }
 

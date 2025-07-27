@@ -176,6 +176,8 @@ int rdSetMipDistances(rdVector4 *dists)
 
 #ifdef QOL_IMPROVEMENTS
     static rdVector4 origLod;
+    static flex_t origGourad;
+    static flex_t origPerspective;
     static int once = 0;
     static sithWorld* onceWorld = NULL;
     if (onceWorld != sithWorld_pCurrentWorld) {
@@ -183,11 +185,13 @@ int rdSetMipDistances(rdVector4 *dists)
     }
     if (!once) {
         origLod = sithWorld_pCurrentWorld->lodDistance;
+        origGourad = sithWorld_pCurrentWorld->gouradDistance;
+        origPerspective = sithWorld_pCurrentWorld->perspectiveDistance;
         once = 1;
     }
     onceWorld = sithWorld_pCurrentWorld;
 #ifdef TARGET_TWL
-    flex_t scale_factor = 0.7;
+    flex_t scale_factor = 0.6;
 #else
     flex_t scale_factor = (Video_format.width / 640.0) * 2.0;
 #endif
@@ -201,6 +205,8 @@ int rdSetMipDistances(rdVector4 *dists)
         sithWorld_pCurrentWorld->lodDistance.y = origLod.y * scale_factor;
         sithWorld_pCurrentWorld->lodDistance.z = origLod.z * scale_factor;
         sithWorld_pCurrentWorld->lodDistance.w = origLod.w * scale_factor;
+        sithWorld_pCurrentWorld->gouradDistance = origGourad * scale_factor;
+        sithWorld_pCurrentWorld->perspectiveDistance = origPerspective * scale_factor;
     }
 #endif
 

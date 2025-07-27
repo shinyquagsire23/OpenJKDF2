@@ -209,6 +209,7 @@ int rdMaterial_LoadEntry_Common(char *mat_fpath, rdMaterial *material, int creat
         ++texture_idk;
     }
 #if defined(RDMATERIAL_LRU_LOAD_UNLOAD)
+    material->bMetadataLoaded = 1;
     // Short circuit only after metadata
     if (bDoLoad == 2) {
         stdString_SafeStrCopy(material->mat_full_fpath, mat_fpath, sizeof(material->mat_full_fpath));
@@ -381,6 +382,7 @@ LABEL_22:
       while ( v22 < material->num_texinfo );
       mat_file_ = mat_file__;
     }
+#ifndef TARGET_TWL
     if ( material->tex_type & 1 )
     {
       colors = (rdColor24 *)rdroid_pHS->alloc(0x300u);
@@ -394,6 +396,7 @@ LABEL_22:
       }
       rdroid_pHS->fileRead(mat_file_, colors, 0x300);
     }
+#endif
 
     // Added: Move this up to start
     /*v26 = stdFileFromPath(mat_fpath);
@@ -662,8 +665,14 @@ void rdMaterial_FreeEntry(rdMaterial* material)
 #if defined(RDMATERIAL_LRU_LOAD_UNLOAD)
     rdMaterial_RemoveMaterialFromCacheList(material);
     material->bDataLoaded = 0;
+    material->bMetadataLoaded = 0;
 #endif
 }
+
+#if defined(RDMATERIAL_LRU_LOAD_UNLOAD)
+static uint32_t rdMaterial_budgetFrameCount = 0;
+static uint32_t rdMaterial_budgetMs = 0;
+#endif
 
 // Added
 int rdMaterial_EnsureData(rdMaterial* pMaterial) {
@@ -671,10 +680,34 @@ int rdMaterial_EnsureData(rdMaterial* pMaterial) {
         return 0;
     }
 #if defined(RDMATERIAL_LRU_LOAD_UNLOAD)
+    if (pMaterial->bDataLoaded) {
+        return 1;
+    }
+
+    // Ensure that we don't stall for a ridiculous amount of time
+    // if we need to load textures
+    if (rdMaterial_budgetFrameCount != std3D_frameCount) {
+        rdMaterial_budgetMs = 0;
+        rdMaterial_budgetFrameCount = std3D_frameCount;
+    }
+    if (rdMaterial_budgetMs > 20) {
+        return 0;
+    }
+    if (rdMaterial_budgetMs > 5) {
+        uint32_t timeBefore = stdPlatform_GetTimeMsec();
+        int res = rdMaterial_EnsureMetadata(pMaterial);
+        uint32_t timeAfter = stdPlatform_GetTimeMsec();
+        rdMaterial_budgetMs += timeAfter - timeBefore;
+        return res;
+    }
+
+    uint32_t timeBefore = stdPlatform_GetTimeMsec();
     // Only allow trying to load data once per frame
     if (!pMaterial->bDataLoaded && (pMaterial->frameNum != std3D_frameCount && std3D_frameCount != 1)) {
         rdMaterial_LoadEntry_Deferred(pMaterial, 1, 1, 0);
     }
+    uint32_t timeAfter = stdPlatform_GetTimeMsec();
+    rdMaterial_budgetMs += timeAfter - timeBefore;
 #endif
     return 1;
 }
@@ -701,12 +734,15 @@ int rdMaterial_EnsureMetadata(rdMaterial* pMaterial) {
         return 0;
     }
 #if defined(RDMATERIAL_LRU_LOAD_UNLOAD)
+    if (pMaterial->bDataLoaded) {
+        return 1;
+    }
     // Only allow trying to load data once per frame
-    if (!pMaterial->bDataLoaded) {
-        int prev_std3D_frameCount = std3D_frameCount;
-        std3D_frameCount = 1;
+    if (!pMaterial->bMetadataLoaded) {
+        //int prev_std3D_frameCount = std3D_frameCount;
+        //std3D_frameCount = 1;
         rdMaterial_LoadEntry_Deferred(pMaterial, 1, 1, 1);
-        std3D_frameCount = prev_std3D_frameCount;
+        //std3D_frameCount = prev_std3D_frameCount;
     }
 #endif
     return 1;
@@ -890,6 +926,7 @@ void rdMaterial_EvictData(rdMaterial *pMaterial)
     }
 
     pMaterial->bDataLoaded = 0;
+    //pMaterial->bMetadataLoaded = 0;
 }
 
 // Derived from https://github.com/smlu/OpenJones3D/blob/main/Libs/std/Win95/std3D.c

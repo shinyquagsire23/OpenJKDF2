@@ -1202,7 +1202,7 @@ typedef struct rdTexinfoExtHeader
 typedef struct rdTexinfoHeader
 {
     uint32_t texture_type;
-    uint32_t field_4;
+    uint32_t solidColor;
     uint32_t field_8;
     uint32_t field_C;
     uint32_t field_10;
@@ -1251,7 +1251,8 @@ typedef struct rdMaterial
     uint32_t num_textures;
     rdTexture *textures;
 #ifdef RDMATERIAL_LRU_LOAD_UNLOAD
-    BOOL bDataLoaded;
+    uint16_t bDataLoaded;
+    uint16_t bMetadataLoaded; 
     int frameNum;
     rdMaterial* pPrevCachedMaterial;
     rdMaterial* pNextCachedMaterial;
