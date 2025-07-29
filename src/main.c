@@ -311,8 +311,13 @@ int main(int argc, char** argv)
     lcdMainOnTop();
 
     videoSetMode(MODE_0_3D);
-    consoleInit( NULL, 0, BgType_Text4bpp, BgSize_T_256x256, 23, 2, false, true );
-    consoleDemoInit();
+
+    videoSetModeSub(MODE_0_2D);
+    vramSetBankH(VRAM_H_SUB_BG);
+    vramSetBankI(VRAM_I_SUB_BG_0x06208000);
+    //setBrightness(2, 0);
+
+    consoleInit(NULL, 0, BgType_Text4bpp, BgSize_T_256x256, 23, 2, false, true);
 
     printf("Waddup\n");
 

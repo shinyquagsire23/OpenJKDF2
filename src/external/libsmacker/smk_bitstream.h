@@ -31,6 +31,7 @@ struct smk_bit_t
 /* BITSTREAM Functions */
 /** Initialize a bitstream */
 struct smk_bit_t* smk_bs_init(const uint8_t* b, uint64_t size);
+void smk_bs_reset(struct smk_bit_t* bs, const uint8_t* b, const uint64_t size);
 
 #ifndef SMK_FAST
 /** This macro checks return code from _smk_bs_read_1 and

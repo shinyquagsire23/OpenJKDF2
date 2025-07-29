@@ -994,11 +994,11 @@ skip_audio:
         smk_enable_video(jkCutscene_smk, smk_is_keyframe(jkCutscene_smk));
         jkCutscene_smacker_process_audio();
 #ifdef TARGET_TWL
-        pHS->suggestHeap(HEAP_FAST);
+        //pHS->suggestHeap(HEAP_FAST);
 #endif
         char smk_res = smk_next(jkCutscene_smk);
 #ifdef TARGET_TWL
-        pHS->suggestHeap(HEAP_ANY);
+        //pHS->suggestHeap(HEAP_ANY);
 #endif
         if (smk_res == SMK_DONE) {
             last_displayFrame = 0;
@@ -1064,11 +1064,11 @@ skip_audio:
     }*/
     //smk_enable_video(jkCutscene_smk, smk_is_keyframe(jkCutscene_smk));
 #ifdef TARGET_TWL
-    pHS->suggestHeap(HEAP_FAST);
+    //pHS->suggestHeap(HEAP_FAST);
 #endif
     char smk_res = smk_next(jkCutscene_smk);
 #ifdef TARGET_TWL
-    pHS->suggestHeap(HEAP_ANY);
+    //pHS->suggestHeap(HEAP_ANY);
 #endif
 	if (smk_res == SMK_DONE) {
         last_displayFrame = 0;

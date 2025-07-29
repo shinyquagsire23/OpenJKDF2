@@ -360,7 +360,7 @@ int std3D_Startup()
     // TODO
     vramSetBankA(VRAM_A_TEXTURE);
     vramSetBankB(VRAM_B_TEXTURE);
-    //vramSetBankC(VRAM_C_TEXTURE);
+    vramSetBankC(VRAM_C_TEXTURE);
     vramSetBankD(VRAM_D_TEXTURE);
     //vramSetBankE(VRAM_E_TEXTURE);
     vramSetBankE(VRAM_E_TEX_PALETTE);
@@ -1020,7 +1020,7 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
     if (!res) {
         stdPlatform_Printf("Out of texture IDs! %x\n", std3D_highestTexId);
         //std3D_bPurgeTexturesOnEnd = 1;
-        return 1;
+        return 0;
     }
     if (image_texture > std3D_highestTexId) {
         std3D_highestTexId = image_texture;
@@ -1210,9 +1210,9 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
         stdPlatform_Printf("Out of VRAM!\n");
         glDeleteTextures(1, &image_texture);
 
-        std3D_bPurgeTexturesOnEnd = 1;
+        //std3D_bPurgeTexturesOnEnd = 1;
         glBindTexture(GL_TEXTURE_2D, -1);
-        return 1; // Kinda hacky, don't alert rdCache
+        return 0;
 
         // TODO: Free any unused textures instead of having a white texture for one frame
         //return std3D_AddToTextureCache(vbuf, texture, is_alpha_tex, no_alpha);
@@ -1342,7 +1342,9 @@ MATH_FUNC void std3D_DrawMenu()
                 {
                     int srcX = (int)srcXf;
                     int srcY = (int)srcYf;
-                    whichBitmap[(y*256)+x] = Video_menuBuffer.surface_lock_alloc[(pitch*srcY)+srcX];
+                    //int skip = (pitch*srcY)+srcX;
+                    int skip = ((srcY % 4) * 4) + (srcX % 4) + ((srcX / 4)*16) + ((srcY / 4) * pitch * 4) + 640 + 640;
+                    whichBitmap[(y*256)+x] = Video_menuBuffer.surface_lock_alloc[skip];
                     //Video_menuBuffer.surface_lock_alloc[(pitch*y)+x] = (y*128)+x;
 
                     srcXf += (flex_t)2.5;
@@ -1358,7 +1360,9 @@ MATH_FUNC void std3D_DrawMenu()
                 {
                     int srcX = (int)srcXf;
                     int srcY = (int)srcYf;
-                    whichBitmap2[(y*256)+x] = Video_menuBuffer.surface_lock_alloc[(pitch*srcY)+srcX];
+                    //int skip = (pitch*srcY)+srcX;
+                    int skip = ((srcY % 4) * 4) + (srcX % 4) + ((srcX / 4)*16) + ((srcY / 4) * pitch * 4) + 640 + 640;
+                    whichBitmap2[(y*256)+x] = Video_menuBuffer.surface_lock_alloc[skip];
                     //Video_menuBuffer.surface_lock_alloc[(pitch*y)+x] = (y*128)+x;
                     srcXf += (flex_t)2.5;
                 }

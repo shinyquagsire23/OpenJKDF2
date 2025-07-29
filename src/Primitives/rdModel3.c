@@ -1636,3 +1636,21 @@ LABEL_44:
     rdCache_AddProcFace(0, vertexDst.numVertices, flags);
     return 1;
 }
+
+// Added: Data preloading
+void rdModel3_EnsureMaterialData(rdThing *pRdThing) {
+    rdModel3* pModel3 = NULL;
+
+    if (!pRdThing) {
+        return;
+    }
+    pModel3 = pRdThing->model3;
+    if (!pModel3 || !pModel3->materials) {
+        return;
+    }
+
+    for (int i = 0; i < pModel3->numMaterials; i++)
+    {
+        rdMaterial_EnsureData(pModel3->materials[i]);
+    }
+}

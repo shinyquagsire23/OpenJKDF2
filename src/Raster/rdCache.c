@@ -561,10 +561,22 @@ int rdCache_SendFaceListToHardware()
 
             if (!rdMaterial_AddToTextureCache(v11.material, sith_tex_sel, mipmap_level, alpha_is_opaque, v14) )
             {
+#if defined(RDMATERIAL_LRU_LOAD_UNLOAD)
+                // Just draw solids if we can
+                if (v11.material->bMetadataLoaded) {
+                    v11.mipmap_related = 3;
+                    mipmap_related = 3;
+                }
+                else {
+                    continue;
+                }
+#else
                 rdCache_DrawRenderList();
                 rdCache_ResetRenderList();
-                if ( !rdMaterial_AddToTextureCache(v11.material, sith_tex_sel, mipmap_level, alpha_is_opaque, v14) )
+                if ( !rdMaterial_AddToTextureCache(v11.material, sith_tex_sel, mipmap_level, alpha_is_opaque, v14) ) {
                     return 0;
+                }
+#endif
             }
 
             tex2_arr_sel = &sith_tex_sel->alphaMats[mipmap_level];

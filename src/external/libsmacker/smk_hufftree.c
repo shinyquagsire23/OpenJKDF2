@@ -331,7 +331,7 @@ error:
 	return NULL;
 }
 
-static int _smk_huff16_lookup_rec(struct smk_bit_t* bs, uint16_t cache[3], const struct smk_huff8_t* t)
+static uint16_t _smk_huff16_lookup_rec(struct smk_bit_t* bs, uint16_t cache[3], const struct smk_huff8_t* t)
 {
 	uint16_t val;
 	char bit;
@@ -383,7 +383,7 @@ error:
 }
 
 /* Convenience call-out for recursive bigtree lookup function */
-long _smk_huff16_lookup(struct smk_bit_t* bs, struct smk_huff16_t* big)
+uint16_t _smk_huff16_lookup(struct smk_bit_t* bs, struct smk_huff16_t* big)
 {
 	/* sanity check */
 	smk_assert(bs);

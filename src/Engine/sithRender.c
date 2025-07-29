@@ -2381,6 +2381,10 @@ int sithRender_RenderThing(sithThing *pThing)
     }
 #ifdef TARGET_TWL
     }
+    else {
+        // Preload model textures, if supported
+        rdModel3_EnsureMaterialData(&pThing->rdthing);
+    }
 #endif
 
     if (pThing->type == SITH_THING_EXPLOSION && (pThing->explosionParams.typeflags & SITHEXPLOSION_FLAG_FLASH_BLINDS_THINGS))

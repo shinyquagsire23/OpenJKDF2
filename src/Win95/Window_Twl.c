@@ -531,7 +531,7 @@ void Window_SdlUpdate()
     
     static int sampleTime_delay = 0;
     int sampleTime_roundtrip = stdPlatform_GetTimeMsec() - Window_lastSampleTime;
-    //printf("total %u\n", sampleTime_roundtrip);
+    printf("total %u\n", sampleTime_roundtrip);
     //stdPlatform_PrintHeapStats();
     Window_lastSampleTime = stdPlatform_GetTimeMsec(); // TODO
 

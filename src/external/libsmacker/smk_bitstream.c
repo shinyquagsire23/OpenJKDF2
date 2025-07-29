@@ -38,6 +38,21 @@ error:
 	return ret;
 }
 
+void smk_bs_reset(struct smk_bit_t* bs, const uint8_t* b, const uint64_t size)
+{
+	/* sanity check */
+	smk_assert(b);
+
+	/* set up the pointer to bitstream, and the size counter */
+	bs->buffer = b;
+	bs->size = size;
+
+	/* point to initial byte: note, smk_malloc already sets these to 0 */
+	bs->byte_num = 0;
+	bs->bit_num = 0;
+error:
+}
+
 /* Reads a bit
 	Returns -1 if error encountered */
 char _smk_bs_read_1(struct smk_bit_t* bs)

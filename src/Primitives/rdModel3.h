@@ -208,6 +208,9 @@ MATH_FUNC void rdModel3_DrawHNode(rdHierarchyNode *pNode);
 MATH_FUNC void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat);
 MATH_FUNC FAST_FUNC int rdModel3_DrawFace(rdFace *face, int lightFlags);
 
+// Added: Data preloading
+void rdModel3_EnsureMaterialData(rdThing *pRdThing);
+
 #ifdef __cplusplus
 }
 #endif
