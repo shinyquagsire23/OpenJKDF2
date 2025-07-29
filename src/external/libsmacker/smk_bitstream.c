@@ -51,6 +51,7 @@ void smk_bs_reset(struct smk_bit_t* bs, const uint8_t* b, const uint64_t size)
 	bs->byte_num = 0;
 	bs->bit_num = 0;
 error:
+	;
 }
 
 /* Reads a bit
