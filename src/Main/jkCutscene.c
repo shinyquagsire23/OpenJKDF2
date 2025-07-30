@@ -38,7 +38,7 @@ static smush_ctx* jkCutscene_pSmush;
 static smk jkCutscene_smk;
 static int jkCutscene_bSmkValid = 0;
 static flex64_t jkCutscene_smk_usf;
-static unsigned long jkCutscene_smk_w, jkCutscene_smk_h, jkCutscene_smk_frames;
+static uint32_t jkCutscene_smk_w, jkCutscene_smk_h, jkCutscene_smk_frames;
 static stdVBuffer* jkCutscene_frameBuf = NULL;
 //static void* jkCutscene_audioBuf = NULL;
 static stdSound_buffer_t* jkCutscene_audio = NULL;
@@ -331,7 +331,7 @@ int jkCutscene_sub_421310(char* fpath)
         jk_printf("Opened file %s as SMK\nWidth: %lu\nHeight: %lu\nFrames: %lu\nFPS: %f\n", tmp, jkCutscene_smk_w, jkCutscene_smk_h, jkCutscene_smk_frames, 1000000.0 / jkCutscene_smk_usf);
         
         unsigned char   a_t, a_c[7], a_d[7];
-        unsigned long   a_r[7];
+        uint32_t   a_r[7];
 
         smk_info_audio(jkCutscene_smk, &a_t, a_c, a_d, a_r);
         //printf("%x\n", a_t);
@@ -812,7 +812,7 @@ int jkCutscene_Handler(HWND a1, UINT a2, WPARAM a3, LPARAM a4, LRESULT *a5)
 #if defined(SDL2_RENDER) || defined(TARGET_TWL)
 void jkCutscene_smacker_process_audio()
 {
-    unsigned long frame = 0;
+    uint32_t frame = 0;
     smk_info_all(jkCutscene_smk, &frame, NULL, NULL);
 
     uint32_t* subtitle_idx = (uint32_t*)smk_get_audio(jkCutscene_smk, 1);

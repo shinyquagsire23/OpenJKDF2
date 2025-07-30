@@ -696,8 +696,13 @@ int rdCache_SendFaceListToHardware()
             for (int vtx_idx = 0; vtx_idx < active_6c->numVertices; vtx_idx++)
             {
 #ifndef TARGET_TWL
+#ifdef RENDER_ROUND_VERTICES
+                rdCache_aHWVertices[rdCache_totalVerts].x = stdMath_Ceil(iterating_6c_vtxs[vtx_idx].x);
+                rdCache_aHWVertices[rdCache_totalVerts].y = stdMath_Ceil(active_6c->vertices[vtx_idx].y);
+#else
                 rdCache_aHWVertices[rdCache_totalVerts].x = (iterating_6c_vtxs[vtx_idx].x); // Added: The original game rounded to ints here (with ceilf?)
                 rdCache_aHWVertices[rdCache_totalVerts].y = (active_6c->vertices[vtx_idx].y); // Added: The original game rounded to ints here (with ceilf?)
+#endif
 #endif
                 iterating_6c_vtxs_ = active_6c->vertices;
 
@@ -719,9 +724,14 @@ int rdCache_SendFaceListToHardware()
                 if ( rdCache_dword_865258 != 16 )
                     v38 = 1.0 - v38;
 #ifdef TARGET_TWL
-                rdCache_aHWVertices[rdCache_totalVerts].x = (active_6c->vertices[vtx_idx].x * res_fix_x) * v38; // Added: The original game rounded to ints here (with ceilf?)
-                rdCache_aHWVertices[rdCache_totalVerts].y = (active_6c->vertices[vtx_idx].y * res_fix_y) * v38; // Added: The original game rounded to ints here (with ceilf?)
-                v38 = stdMath_Clamp(v38, 0.0, SITHCAMERA_ZFAR);
+#ifdef RENDER_ROUND_VERTICES
+                rdCache_aHWVertices[rdCache_totalVerts].x = ((stdMath_Ceil(active_6c->vertices[vtx_idx].x) * res_fix_x) * v38); // Added: The original game rounded to ints here (with ceilf?)
+                rdCache_aHWVertices[rdCache_totalVerts].y = ((stdMath_Ceil(active_6c->vertices[vtx_idx].y) * res_fix_y) * v38); // Added: The original game rounded to ints here (with ceilf?)
+#else
+                rdCache_aHWVertices[rdCache_totalVerts].x = (((active_6c->vertices[vtx_idx].x) * res_fix_x) * v38); // Added: The original game rounded to ints here (with ceilf?)
+                rdCache_aHWVertices[rdCache_totalVerts].y = (((active_6c->vertices[vtx_idx].y) * res_fix_y) * v38); // Added: The original game rounded to ints here (with ceilf?)
+#endif
+                //v38 = stdMath_Clamp(v38, 0.0, SITHCAMERA_ZFAR);
 #endif
                 rdCache_aHWVertices[rdCache_totalVerts].z = v38;
 

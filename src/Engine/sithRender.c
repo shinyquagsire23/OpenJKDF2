@@ -852,18 +852,18 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, flex_t a3, i
                     }
 
                     // Causes random black lines?
-#if 0
-                    flex_t v49 = stdMath_Ceil(maxY);
-                    flex_t v48 = stdMath_Ceil(maxX);
-                    flex_t v47 = stdMath_Ceil(minY);
+#ifdef RENDER_ROUND_VERTICES
                     flex_t v46 = stdMath_Ceil(minX);
-#endif
-
+                    flex_t v47 = stdMath_Ceil(minY);
+                    flex_t v48 = stdMath_Ceil(maxX);
+                    flex_t v49 = stdMath_Ceil(maxY);
+#else
                     // Fixed
                     flex_t v46 = minX - 2.0;//stdMath_Ceil(minX);
                     flex_t v47 = minY - 2.0;//stdMath_Ceil(minY);
                     flex_t v48 = maxX + 1.5;
                     flex_t v49 = maxY + 1.5;
+#endif
                     
                     // Check that the new frustum will be smaller than the last, 
                     //  if it won't be then stop recursing on this surface--

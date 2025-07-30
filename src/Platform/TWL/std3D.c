@@ -705,11 +705,8 @@ void std3D_DrawRenderListReal()
                 GFX_TEX_COORD = TEXTURE_PACK(inttot16((int)(v3->tu)), inttot16((int)(v3->tv)));    
             }
             
-            //glColor3b((int)(v3->tu*255.0), (int)(v3->tv*255.0), 255);
-            //glColor3b((j&0xFF),(j&0xFF),(j&0xFF));
-            //glVertex3v16(floattov16(0.0), floattov16(1.92), floattov16(0.6));
             glColor3b(stdMath_Min(COMP_R(v3->color) + lightLevelAdd, 0xFF),stdMath_Min(COMP_G(v3->color) + lightLevelAdd, 0xFF),stdMath_Min(COMP_B(v3->color) + lightLevelAdd, 0xFF));
-            //glColor3b(0xFF, 0x00, 0x00);
+            //glColor3b(COMP_R(v3->color), COMP_G(v3->color), COMP_B(v3->color));
             glVertex3v16(flextov16(v3->x), flextov16(v3->y), flextov16(v3->z));
         }
         
@@ -717,12 +714,9 @@ void std3D_DrawRenderListReal()
             if (tex_id != -1) {
                 GFX_TEX_COORD = TEXTURE_PACK(inttot16((int)(v2->tu)), inttot16((int)(v2->tv)));
             }
-            //glColor3b((int)(v2->tu*255.0), (int)(v2->tv*255.0), 255);
-            //glColor3b((j&0xFF),(j&0xFF),(j&0xFF));
-            //glVertex3v16(floattov16(2.56), floattov16(1.28), floattov16(0.6));
             glColor3b(stdMath_Min(COMP_R(v2->color) + lightLevelAdd, 0xFF),stdMath_Min(COMP_G(v2->color) + lightLevelAdd, 0xFF),stdMath_Min(COMP_B(v2->color) + lightLevelAdd, 0xFF));
-            //glColor3b(0, 0xff, 0x00);
-             glVertex3v16(flextov16(v2->x), flextov16(v2->y), flextov16(v2->z));
+            //glColor3b(COMP_R(v2->color), COMP_G(v2->color), COMP_B(v2->color));
+            glVertex3v16(flextov16(v2->x), flextov16(v2->y), flextov16(v2->z));
 
         }
         
@@ -730,11 +724,9 @@ void std3D_DrawRenderListReal()
             if (tex_id != -1) {
                 GFX_TEX_COORD = TEXTURE_PACK(inttot16((int)(v1->tu)), inttot16((int)(v1->tv)));
             }
-            //glColor3b((int)(v1->tu*255.0), (int)(v1->tv*255.0), 255);
-            //glVertex3v16(floattov16(0.0), floattov16(1.28), floattov16(0.6));
             glColor3b(stdMath_Min(COMP_R(v1->color) + lightLevelAdd, 0xFF),stdMath_Min(COMP_G(v1->color) + lightLevelAdd, 0xFF),stdMath_Min(COMP_B(v1->color) + lightLevelAdd, 0xFF));
-            //glColor3b(0, 0x00, 0xff);
-             glVertex3v16(flextov16(v1->x), flextov16(v1->y), flextov16(v1->z));
+            //glColor3b(COMP_R(v1->color), COMP_G(v1->color), COMP_B(v1->color));
+            glVertex3v16(flextov16(v1->x), flextov16(v1->y), flextov16(v1->z));
         }
         
         

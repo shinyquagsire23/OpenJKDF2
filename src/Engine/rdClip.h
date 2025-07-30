@@ -35,7 +35,7 @@ MATH_FUNC int rdClip_Face3W(rdClipFrustum *frustum, rdVector3 *vertices, int num
 MATH_FUNC FAST_FUNC int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, flex_t *a4, int numVertices);
 MATH_FUNC FAST_FUNC int rdClip_Face3S(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices);
 MATH_FUNC int rdClip_Face3GS(rdClipFrustum *frustum, rdVector3 *vertices, flex_t *a3, int numVertices);
-MATH_FUNC int rdClip_Face3T(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, int numVertices);
+MATH_FUNC FAST_FUNC int rdClip_Face3T(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, int numVertices);
 
 MATH_FUNC int rdClip_Face3GSRGB(rdClipFrustum *frustum, rdVector3 *vertices, flex_t *pR, flex_t *pG, flex_t *pB, int numVertices);
 MATH_FUNC FAST_FUNC int rdClip_Face3GTRGB(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, flex_t *pR, flex_t *pG, flex_t *pB, int numVertices);

@@ -1360,10 +1360,10 @@ int rdClip_Face3W(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices)
                     ++v5;
                     v109 = (frustum->zFar - v107->y) / (v108->y - v107->y);
                     v105->y = frustum->zFar;
-                    ++v105;
+                    v105->z = (v108->z - v107->z) * v109 + v107->z;
+                    v105->x = (v108->x - v107->x) * v109 + v107->x;
                     rdClip_faceStatus |= 0x2;
-                    v105[-1].z = (v108->z - v107->z) * v109 + v107->z;
-                    v105[-1].x = (v108->x - v107->x) * v109 + v107->x;
+                    ++v105;
                 }
                 if ( v108->y <= (flex_d_t)frustum->zFar )
                 {
@@ -1447,11 +1447,9 @@ int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, 
     flex_d_t v69; // rtt
     rdVector3 *v71; // eax
     int v72; // ebx
-    intptr_t v73; // eax
     rdVector3 *v74; // eax
-    intptr_t v75; // esi
     rdVector2 *v76; // esi
-    intptr_t v77; // ecx
+    flex_t* v77; // ecx
     //bool v78; // cc
     rdVector3 *v79; // ebx
     rdVector2 *v80; // edi
@@ -1475,10 +1473,8 @@ int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, 
     flex_d_t v102; // st4
     flex_d_t v103; // rt2
     rdVector3 *v105; // edi
-    intptr_t v106; // ebp
     rdVector2 *v107; // ebp
     rdVector3 *v108; // eax
-    intptr_t v109; // edx
     rdVector3 *v110; // ecx
     flex_t *v111; // edx
     int v112; // edi
@@ -1505,10 +1501,9 @@ int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, 
     flex_d_t v137; // rtt
     rdVector3 *v139; // edi
     int v140; // esi
-    intptr_t v141; // ebp
     rdVector2 *v142; // ebp
-    intptr_t v143; // edx
     int v144; // eax
+    flex_t* v143;
     rdVector3 *v145; // ecx
     rdVector2 *v146; // esi
     rdVector3 *v147; // ebx
@@ -1527,9 +1522,8 @@ int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, 
     rdVector2 *v161; // ebp
     rdVector3 *v162; // esi
     rdVector3 *v163; // ecx
-    intptr_t v165; // ebp
     rdVector2 *v166; // ebp
-    intptr_t v167; // edx
+    flex_t* v167; // edx
     int v168; // eax
     rdVector3 *v169; // ecx
     rdVector2 *v170; // esi
@@ -1635,45 +1629,43 @@ int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, 
                         v16 = v16 / v202;
                     }
                     v19 = frustum->nearLeft * v16;
-                    v20 = numVerticesb;
-                    if (v20 < 0.0)
-                        v20 = -v20;
-                    v23 = v208;
-                    if (v23 < 0.0)
-                        v23 = -v23;
+                    v20 = stdMath_Fabs(numVerticesb);
+                    v23 = stdMath_Fabs(v208);
                     if ( v20 <= v23 )
                         v25 = (v19 - v8->x) / v208;
                     else
                         v25 = (v16 - v8->y) / numVerticesb;
-                    ++v11;
-                    ++v10;
+                    
                     v26 = (v6->x - v9->x) * v25;
                     v27 = v19;
                     v28 = *v190;
-                    v11[-1].x = v27;
+                    v11->x = v27;
                     v29 = v26 + v9->x;
-                    v11[-1].y = v16;
+                    v11->y = v16;
                     v30 = v28;
                     v31 = v7->z;
                     v32 = v30 - *v196;
-                    v10[-1].x = v29;
+                    v10->x = v29;
                     v33 = v31 - v8->z;
                     v34 = (v6->y - v9->y) * v25 + v9->y;
                     v35 = v32 * v25 + *v196;
-                    v11[-1].z = v33 * v25 + v8->z;
-                    v10[-1].y = v34;
+                    v11->z = v33 * v25 + v8->z;
+                    v10->y = v34;
                     *v212++ = v35;
                     ++v184;
+                    ++v11;
+                    ++v10;
                     rdClip_faceStatus |= 0x10;
                 }
                 if ( v13 <= v7->x )
                 {
-                    v37 = v11++;
-                    ++v10;
+                    v37 = v11;
                     *v37 = *v7;
-                    v10[-1].x = v6->x;
-                    v10[-1].y = v6->y;
+                    v10->x = v6->x;
+                    v10->y = v6->y;
                     ++v184;
+                    ++v10;
+                    ++v11;
                     *v212++ = *v190;
                 }
             }
@@ -1726,47 +1718,45 @@ int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, 
                     v50 = v50 / v203;
                 }
                 v53 = frustum->right * v50;
-                v54 = numVerticese;
-                if ( v54 < 0.0 )
-                    v54 = -v54;
-                v57 = v209;
-                if ( v57 < 0.0 )
-                    v57 = -v57;
+                v54 = stdMath_Fabs(numVerticese);
+                v57 = stdMath_Fabs(v209);
                 if ( v54 <= v57 )
                     v59 = (v53 - v40->x) / v209;
                 else
                     v59 = (v50 - v40->y) / numVerticese;
-                ++v44;
-                ++v43;
+                
                 v60 = (v39->x - v41->x) * v59;
                 v61 = v53;
                 v62 = *v191;
-                v44[-1].x = v61;
+                v44->x = v61;
                 v63 = v60 + v41->x;
-                v44[-1].y = v50;
+                v44->y = v50;
                 v64 = v62;
                 v65 = v42->z;
                 v66 = v64 - *v197;
-                v43[-1].x = v63;
+                v43->x = v63;
                 v67 = v65 - v40->z;
                 v68 = (v39->y - v41->y) * v59 + v41->y;
                 v69 = v66 * v59 + *v197;
-                v44[-1].z = v67 * v59 + v40->z;
-                v43[-1].y = v68;
+                v44->z = v67 * v59 + v40->z;
+                v43->y = v68;
                 *v213++ = v69;
                 ++v185;
+                ++v44;
+                ++v43;
                 rdClip_faceStatus |= 0x20;
             }
             if ( v46 >= v42->x )
             {
-                v71 = v44++;
-                ++v43;
+                v71 = v44;
                 v71->x = v42->x;
                 v71->y = v42->y;
                 v71->z = v42->z;
-                v43[-1].x = v39->x;
-                v43[-1].y = v39->y;
+                v43->x = v39->x;
+                v43->y = v39->y;
                 ++v185;
+                ++v43;
+                ++v44;
                 *v213++ = *v191;
             }
         }
@@ -1782,22 +1772,22 @@ int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, 
     if ( v185 < 3 )
         goto LABEL_127;
     v186 = 0;
-    v73 = (intptr_t)pDestVert ^ (intptr_t)pSourceVert;
+    
+    v74 = pDestVert;
     pDestVert = pSourceVert;
-    v74 = (rdVector3 *)((intptr_t)pSourceVert ^ v73);
     pSourceVert = v74;
-    v75 = (intptr_t)pDestTVert ^ (intptr_t)pSourceTVert;
+
+    v76 = pDestTVert;
     pDestTVert = pSourceTVert;
-    v76 = (rdVector2 *)((intptr_t)pSourceTVert ^ v75);
     pSourceTVert = v76;
-    v77 = (intptr_t)pDestIVert ^ (intptr_t)pSourceIVert;
+    v77 = pDestIVert;
     pDestIVert = pSourceIVert;
-    pSourceIVert = (flex_t *)((intptr_t)pSourceIVert ^ v77);
+    pSourceIVert = v77;
     numVerticesf = v72;
-    v198 = (flex_t *)(((intptr_t)pDestIVert ^ v77) + 4 * v72 - 4);
+    v198 = &pSourceIVert[v72 - 1];
     v79 = &v74[v72 - 1];
     v80 = &v76[numVerticesf - 1];
-    v192 = (flex_t *)((intptr_t)pDestIVert ^ v77);
+    v192 = pSourceIVert;
     if ( v72 > 0 )
     {
         v81 = pDestTVert;
@@ -1823,42 +1813,40 @@ int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, 
                         v89 = v88 / v205;
                     }
                     v92 = frustum->nearTop * v89;
-                    v93 = v210;
-                    if ( v93 < 0.0 )
-                        v93 = -v93;
-                    v96 = v214;
-                    if ( v96 < 0.0 )
-                        v96 = -v96;
+                    v93 = stdMath_Fabs(v210);
+                    v96 = stdMath_Fabs(v214);
                     if ( v93 <= v96 )
                         v98 = (v92 - v79->z) / v214;
                     else
                         v98 = (v89 - v79->y) / v210;
                     v99 = v82->x - v79->x;
-                    ++v83;
-                    ++v81;
+                    
                     v100 = *v192 - *v198;
                     ++v186;
-                    v81[-1].x = (v76->x - v80->x) * v98 + v80->x;
+                    v81->x = (v76->x - v80->x) * v98 + v80->x;
                     v101 = v99 * v98;
                     v102 = (v76->y - v80->y) * v98 + v80->y;
                     v103 = v100 * v98 + *v198;
-                    v83[-1].x = v101 + v79->x;
-                    v83[-1].y = v89;
-                    v83[-1].z = v92;
-                    v81[-1].y = v102;
+                    v83->x = v101 + v79->x;
+                    v83->y = v89;
+                    v83->z = v92;
+                    v81->y = v102;
                     *v218++ = v103;
+                    ++v83;
+                    ++v81;
                     rdClip_faceStatus |= 0x4;
                 }
                 if ( v82->z <= (flex_d_t)numVerticesg )
                 {
-                    v105 = v83++;
-                    ++v81;
+                    v105 = v83;
                     v105->x = v82->x;
                     v105->y = v82->y;
                     v105->z = v82->z;
-                    v81[-1].x = v76->x;
-                    v81[-1].y = v76->y;
+                    v81->x = v76->x;
+                    v81->y = v76->y;
                     ++v186;
+                    ++v81;
+                    ++v83;
                     *v218++ = *v192;
                 }
             }
@@ -1872,15 +1860,14 @@ int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, 
     result = v186;
     if ( v186 >= 3 )
     {
-        v106 = (intptr_t)pDestTVert ^ (intptr_t)pSourceTVert;
+        v107 = pDestTVert;
         pDestTVert = pSourceTVert;
-        v107 = (rdVector2 *)((intptr_t)pSourceTVert ^ v106);
         v108 = pSourceVert;
-        v109 = (intptr_t)pDestIVert ^ (intptr_t)pSourceIVert;
+        v111 = pDestIVert;
         v110 = pDestVert;
         pDestVert = pSourceVert;
         pDestIVert = pSourceIVert;
-        v111 = (flex_t *)((intptr_t)pSourceIVert ^ v109);
+        
         pSourceVert = v110;
         numVerticesh = v186;
         pSourceTVert = v107;
@@ -1917,40 +1904,39 @@ int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, 
                             v123 = v122 / v207;
                         }
                         v126 = frustum->bottom * v123;
-                        v127 = v215;
-                        if ( v127 < 0.0 )
-                            v127 = -v127;
-                        v130 = v211;
-                        if ( v130 < 0.0 )
-                            v130 = -v130;
+                        v127 = stdMath_Fabs(v215);
+                        v130 = stdMath_Fabs(v211);
                         if ( v127 <= v130 )
                             v132 = (v126 - v113->z) / v211;
                         else
                             v132 = (v123 - v113->y) / v215;
                         v133 = v117->x - v113->x;
-                        ++v118;
-                        ++v116;
+                        
                         v134 = *v193 - *v199;
                         ++v187;
-                        v116[-1].x = (v115->x - v114->x) * v132 + v114->x;
+                        v116->x = (v115->x - v114->x) * v132 + v114->x;
                         v135 = v133 * v132;
                         v136 = (v115->y - v114->y) * v132 + v114->y;
                         v137 = v134 * v132 + *v199;
-                        v118[-1].x = v135 + v113->x;
-                        v118[-1].y = v123;
-                        v118[-1].z = v126;
-                        v116[-1].y = v136;
+                        v118->x = v135 + v113->x;
+                        v118->y = v123;
+                        v118->z = v126;
+                        v116->y = v136;
                         *v219++ = v137;
+                        ++v118;
+                        ++v116;
                         rdClip_faceStatus |= 0x8;
                     }
                     if ( v117->z >= (flex_d_t)numVerticesi )
                     {
-                        v139 = v118++;
-                        ++v116;
+                        v139 = v118;
+                        
                         *v139 = *v117;
-                        v116[-1].x = v115->x;
-                        v116[-1].y = v115->y;
+                        v116->x = v115->x;
+                        v116->y = v115->y;
                         ++v187;
+                        ++v118;
+                        ++v116;
                         *v219++ = *v193;
                     }
                 }
@@ -1972,17 +1958,16 @@ int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, 
         v188 = 0;
         pDestVert = v110;
         pSourceVert = v108;
-        v141 = (intptr_t)pDestTVert ^ (intptr_t)v107;
-        pDestTVert = (rdVector2 *)(v141 ^ (intptr_t)pDestTVert);
-        v142 = (rdVector2 *)((intptr_t)pDestTVert ^ v141);
+        v142 = pDestTVert;
+        pDestTVert = pSourceTVert;
         pSourceTVert = v142;
-        v143 = (intptr_t)pDestIVert ^ (intptr_t)v111;
-        pDestIVert = (flex_t *)(v143 ^ (intptr_t)pDestIVert);
+        v143 = pDestIVert;
+        pDestIVert = pSourceIVert;
         v144 = v140;
-        pSourceIVert = (flex_t *)((intptr_t)pDestIVert ^ v143);
+        pSourceIVert = v143;
 
-        v200 = (flex_t *)(((intptr_t)pDestIVert ^ v143) + 4 * v140 - 4);
-        v194 = (flex_t *)((intptr_t)pDestIVert ^ v143);
+        v200 = &pSourceIVert[v140 - 1];
+        v194 = pSourceIVert;
         v145 = &pSourceVert[v140 - 1];
         v146 = &v142[v140 - 1];
         if ( v140 <= 0 )
@@ -2007,32 +1992,43 @@ int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, 
                       && v149->y != frustum->zNear
                       && (v145->y < (flex_d_t)frustum->zNear || v149->y < (flex_d_t)frustum->zNear) )
                     {
-                        ++v147;
-                        v150 = (frustum->zNear - v145->y) / (v149->y - v145->y);
-                        v147[-1].y = frustum->zNear;
-                        ++v148;
-                        ++v188;
+                        flex_t tmpdiv = (v149->y - v145->y);
+#ifdef EXPERIMENTAL_FIXED_POINT
+                        if (tmpdiv != 0.0) {
+                            v150 = (frustum->zNear - v145->y) / tmpdiv;
+                        }
+                        else {
+                            v150 = (frustum->zNear - v145->y);
+                        }
+#else
+                        v150 = (frustum->zNear - v145->y) / tmpdiv;
+#endif
+                        v147->y = frustum->zNear;
                         v151 = (v142->x - v146->x) * v150 + v146->x;
                         v152 = *v194 - *v200;
-                        v147[-1].z = (v149->z - v145->z) * v150 + v145->z;
+                        v147->z = (v149->z - v145->z) * v150 + v145->z;
                         v153 = v151;
                         v154 = v149->x - v145->x;
-                        v148[-1].x = v153;
+                        v148->x = v153;
                         v155 = v154 * v150;
                         v156 = (v142->y - v146->y) * v150 + v146->y;
                         v157 = v152 * v150 + *v200;
-                        v147[-1].x = v155 + v145->x;
-                        v148[-1].y = v156;
+                        v147->x = v155 + v145->x;
+                        v148->y = v156;
                         *numVerticesj++ = v157;
                         rdClip_faceStatus |= 1;
+                        ++v147;
+                        ++v148;
+                        ++v188;
                     }
                     if ( v149->y >= (flex_d_t)frustum->zNear )
                     {
-                        v159 = v147++;
-                        ++v148;
+                        v159 = v147;
                         *v159 = *v149;
-                        v148[-1].x = v142->x;
-                        v148[-1].y = v142->y;
+                        v148->x = v142->x;
+                        v148->y = v142->y;
+                        ++v147;
+                        ++v148;
                         ++v188;
                         *numVerticesj++ = *v194;
                     }
@@ -2056,21 +2052,21 @@ int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, 
         }
         if (frustum->bClipFar)
         {
-            v165 = (intptr_t)pDestTVert ^ (intptr_t)v161;
             pDestVert = v163;
-            pDestTVert = (rdVector2 *)(v165 ^ (intptr_t)pDestTVert);
-            v166 = (rdVector2 *)((intptr_t)pDestTVert ^ v165);
-            v167 = (intptr_t)pDestIVert ^ (intptr_t)v160;
+            v166 = pDestTVert;
+            pDestTVert = pSourceTVert;
+            
+            v167 = pDestIVert;
             pSourceVert = v162;
             pSourceTVert = v166;
-            pDestIVert = (flex_t *)(v167 ^ (intptr_t)pDestIVert);
+            pDestIVert = pSourceIVert;
             v168 = v72;
-            pSourceIVert = (flex_t *)((intptr_t)pDestIVert ^ v167);
+            pSourceIVert = v167;
             v189 = 0;
-            v201 = (flex_t *)(((intptr_t)pDestIVert ^ v167) + 4 * v72 - 4);
+            v201 = &pSourceIVert[v72 - 1];
             v169 = &v162[v72 - 1];
             v170 = &v166[v72 - 1];
-            v195 = (flex_t *)((intptr_t)pDestIVert ^ v167);
+            v195 = pSourceIVert;
             v171 = pDestVert;
             numVerticesk = pDestIVert;
             v172 = pDestTVert;
@@ -2084,33 +2080,37 @@ int rdClip_Face3GT(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, 
                       && v173->y != frustum->zFar
                       && (v169->y > (flex_d_t)frustum->zFar || v173->y > (flex_d_t)frustum->zFar) )
                     {
-                        ++v171;
+                        
                         v174 = (frustum->zFar - v169->y) / (v173->y - v169->y);
-                        v171[-1].y = frustum->zFar;
-                        ++v172;
-                        ++v189;
+                        v171->y = frustum->zFar;
+
                         v175 = (v166->x - v170->x) * v174 + v170->x;
                         v176 = *v195;
-                        v171[-1].z = (v173->z - v169->z) * v174 + v169->z;
+                        v171->z = (v173->z - v169->z) * v174 + v169->z;
                         v177 = v175;
                         v178 = v173->x - v169->x;
-                        v172[-1].x = v177;
+                        v172->x = v177;
                         v179 = (v176 - *v201) * v174;
                         v180 = (v166->y - v170->y) * v174 + v170->y;
                         v181 = v179 + *v201;
-                        v171[-1].x = v178 * v174 + v169->x;
-                        v172[-1].y = v180;
+                        v171->x = v178 * v174 + v169->x;
+                        v172->y = v180;
                         *numVerticesk++ = v181;
+                        ++v171;
+                        ++v172;
+                        ++v189;
                         rdClip_faceStatus |= 0x2;
                     }
                     if ( v173->y <= (flex_d_t)frustum->zFar )
                     {
-                        v183 = v171++;
-                        ++v172;
+                        v183 = v171;
+                        
                         *v183 = *v173;
-                        v172[-1].x = v166->x;
-                        v172[-1].y = v166->y;
+                        v172->x = v166->x;
+                        v172->y = v166->y;
                         ++v189;
+                        ++v171;
+                        ++v172;
                         *numVerticesk++ = *v195;
                     }
                 }
@@ -3276,11 +3276,6 @@ int rdClip_Face3T(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, i
     rdVector3 *v160; // edx
     flex_d_t v161; // st7
     int v162; // eax
-    flex_d_t v163; // st6
-    flex_d_t v164; // st5
-    flex_d_t v165; // st6
-    flex_d_t v166; // st5
-    flex_d_t v167; // st6
     rdVector3 *v168; // ecx
     int v169; // [esp+10h] [ebp-10h]
     int v170; // [esp+10h] [ebp-10h]
@@ -3613,7 +3608,8 @@ int rdClip_Face3T(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, i
     v136 = pDestTVert;
     pDestVert = pSourceVert;
     pSourceVert = v134;
-    
+
+// znear start
     v173 = 0;
     pDestTVert = pSourceTVert;
     v137 = v108;
@@ -3633,7 +3629,17 @@ int rdClip_Face3T(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, i
           && v160->y != frustum->zNear
           && (v138->y < (flex_d_t)frustum->zNear || v160->y < (flex_d_t)frustum->zNear) )
         {
-            v143 = (frustum->zNear - v138->y) / (v160->y - v138->y);
+            flex_t tmpdiv = (v160->y - v138->y);
+#ifdef EXPERIMENTAL_FIXED_POINT
+            if (tmpdiv != 0.0) {
+                v143 = (frustum->zNear - v138->y) / tmpdiv;
+            }
+            else {
+                v143 = (frustum->zNear - v138->y);
+            }
+#else
+            v143 = (frustum->zNear - v138->y) / tmpdiv;
+#endif
             v141->y = frustum->zNear;
             ++v173;
             rdClip_faceStatus |= 0x1;
@@ -3661,13 +3667,15 @@ int rdClip_Face3T(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, i
             ++v140;
         }
     }
-    v151 = pDestVert;
     v70 = v173;
     if ( v173 < 3 )
     {
         rdClip_faceStatus |= 0x40;
         return v173;
     }
+// znear end
+    v151 = pDestVert;
+
     if (frustum->bClipFar)
     {
         v154 = pDestTVert;
@@ -3693,18 +3701,26 @@ int rdClip_Face3T(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, i
               && v160->y != frustum->zFar
               && (v156->y > (flex_d_t)frustum->zFar || v160->y > (flex_d_t)frustum->zFar) )
             {
-                v161 = (frustum->zFar - v156->y) / (v160->y - v156->y);
+                flex_t tmpdiv = (v160->y - v156->y);
+#ifdef EXPERIMENTAL_FIXED_POINT
+                if (tmpdiv != 0.0) {
+                    v161 = (frustum->zFar - v156->y) / tmpdiv;
+                }
+                else {
+                    v161 = (frustum->zFar - v156->y);
+                }
+#else
+                v161 = (frustum->zFar - v156->y) / tmpdiv;
+#endif
+                
+                v159->x = (v160->x - v156->x) * v161 + v156->x;
                 v159->y = frustum->zFar;
-                rdClip_faceStatus |= 2;
-                v163 = (v154->x - v157->x) * v161 + v157->x;
                 v159->z = (v160->z - v156->z) * v161 + v156->z;
-                v164 = v163;
-                v165 = v160->x - v156->x;
-                v158->x = v164;
-                v166 = v165 * v161 + v156->x;
-                v167 = (v154->y - v157->y) * v161 + v157->y;
-                v159->x = v166;
-                v158->y = v167;
+
+                v158->x = (v154->x - v157->x) * v161 + v157->x;
+                v158->y = (v154->y - v157->y) * v161 + v157->y;
+
+                rdClip_faceStatus |= 2;
                 ++v174;
                 ++v158;
                 ++v159;

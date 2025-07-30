@@ -376,6 +376,7 @@ typedef double flex_d_t_type;
 #ifdef EXPERIMENTAL_FIXED_POINT
 #define FIXED_POINT_DECIMAL_BITS (16)
 #define FIXED_POINT_WHOLE_BITS   (32-FIXED_POINT_DECIMAL_BITS)
+#define RENDER_ROUND_VERTICES
 #endif
 
 #define FLEX(n) ((flex_t)n)
