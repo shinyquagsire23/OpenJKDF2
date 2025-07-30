@@ -25,7 +25,7 @@ int jkGame_Startup();
 int jkGame_ParseSection(sithWorld* a1, int a2);
 void jkGame_ForceRefresh();
 void jkGame_Shutdown();
-int jkGame_Update();
+MATH_FUNC int jkGame_Update();
 void jkGame_SetDefaultSettings();
 
 void jkGame_ScreensizeIncrease();

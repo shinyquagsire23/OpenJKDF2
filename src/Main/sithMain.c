@@ -436,7 +436,8 @@ void sithMain_UpdateCamera()
             // Set screen aspect ratio
             flex_t aspect = sithCamera_currentCamera->rdCam.canvas->half_screen_height / sithCamera_currentCamera->rdCam.canvas->half_screen_width;
 #if defined(TARGET_TWL)
-            aspect = 192.0/256.0;
+            //aspect = 192.0/256.0;
+            aspect = 1.0;
             sithCamera_currentCamera->rdCam.canvas->half_screen_width = 256.0;
             sithCamera_currentCamera->rdCam.canvas->half_screen_height = 192.0;
             static flex_t sithMain_UpdateCamera_lastFov = 90.0;

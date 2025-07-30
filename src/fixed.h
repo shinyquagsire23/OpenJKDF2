@@ -28,8 +28,9 @@
 #define FIXED_H_
 
 #ifdef TARGET_TWL
+#define MATH_FUNC __attribute__((target("arm")))
 #include <nds/arm9/math.h>
-static inline s32 div64_mine_(s64 num, s32 den)
+__attribute__((always_inline)) static inline s32 div64_mine_(s64 num, s32 den)
 {
     REG_DIV_NUMER = ((s64)num);
     REG_DIV_DENOM_L = den;
@@ -38,6 +39,8 @@ static inline s32 div64_mine_(s64 num, s32 den)
 
     return (REG_DIV_RESULT_L);
 }
+#else
+#define MATH_FUNC
 #endif
 
 #if __cplusplus >= 201402L
@@ -232,7 +235,7 @@ CONSTEXPR14 fixed<I, F> divide(fixed<I, F> numerator, fixed<I, F> denominator, f
 
 // this is the usual implementation of multiplication
 template <size_t I, size_t F>
-CONSTEXPR14 fixed<I, F> multiply(fixed<I, F> lhs, fixed<I, F> rhs, typename std::enable_if<type_from_size<I + F>::next_size::is_specialized>::type * = nullptr) {
+__attribute__((always_inline)) MATH_FUNC CONSTEXPR14 fixed<I, F> multiply(fixed<I, F> lhs, fixed<I, F> rhs, typename std::enable_if<type_from_size<I + F>::next_size::is_specialized>::type * = nullptr) {
 
 	using next_type = typename fixed<I, F>::next_type;
 	using base_type = typename fixed<I, F>::base_type;
@@ -249,7 +252,7 @@ CONSTEXPR14 fixed<I, F> multiply(fixed<I, F> lhs, fixed<I, F> rhs, typename std:
 // it is slightly slower, but is more robust since it doesn't
 // require and upgraded type
 template <size_t I, size_t F>
-CONSTEXPR14 fixed<I, F> multiply(fixed<I, F> lhs, fixed<I, F> rhs, typename std::enable_if<!type_from_size<I + F>::next_size::is_specialized>::type * = nullptr) {
+MATH_FUNC CONSTEXPR14 fixed<I, F> multiply(fixed<I, F> lhs, fixed<I, F> rhs, typename std::enable_if<!type_from_size<I + F>::next_size::is_specialized>::type * = nullptr) {
 
 	using base_type = typename fixed<I, F>::base_type;
 
@@ -411,21 +414,21 @@ public: // unary operators
 	}
 
 public: // basic math operators
-	CONSTEXPR14 fixed &operator+=(fixed n) {
+	__attribute__((always_inline)) CONSTEXPR14 fixed &operator+=(fixed n) {
 		data_ += n.data_;
 		return *this;
 	}
 
-	CONSTEXPR14 fixed &operator-=(fixed n) {
+	__attribute__((always_inline)) CONSTEXPR14 fixed &operator-=(fixed n) {
 		data_ -= n.data_;
 		return *this;
 	}
 
-	CONSTEXPR14 fixed &operator*=(fixed n) {
+	__attribute__((always_inline)) CONSTEXPR14 fixed &operator*=(fixed n) {
 		return assign(detail::multiply(*this, n));
 	}
 
-	CONSTEXPR14 fixed &operator/=(fixed n) {
+	__attribute__((always_inline)) CONSTEXPR14 fixed &operator/=(fixed n) {
 		fixed temp;
 		return assign(detail::divide(*this, n, temp));
 	}
@@ -602,7 +605,7 @@ CONSTEXPR14 typename std::conditional<I1 >= I2, fixed<I1, F>, fixed<I2, F>>::typ
 }
 
 template <size_t I1, size_t I2, size_t F>
-CONSTEXPR14 typename std::conditional<I1 >= I2, fixed<I1, F>, fixed<I2, F>>::type operator*(fixed<I1, F> lhs, fixed<I2, F> rhs) {
+__attribute__((always_inline)) CONSTEXPR14 typename std::conditional<I1 >= I2, fixed<I1, F>, fixed<I2, F>>::type operator*(fixed<I1, F> lhs, fixed<I2, F> rhs) {
 
 	using T = typename std::conditional<
 		I1 >= I2,
@@ -615,7 +618,7 @@ CONSTEXPR14 typename std::conditional<I1 >= I2, fixed<I1, F>, fixed<I2, F>>::typ
 }
 
 template <size_t I1, size_t I2, size_t F>
-CONSTEXPR14 typename std::conditional<I1 >= I2, fixed<I1, F>, fixed<I2, F>>::type operator/(fixed<I1, F> lhs, fixed<I2, F> rhs) {
+__attribute__((always_inline)) CONSTEXPR14 typename std::conditional<I1 >= I2, fixed<I1, F>, fixed<I2, F>>::type operator/(fixed<I1, F> lhs, fixed<I2, F> rhs) {
 
 	using T = typename std::conditional<
 		I1 >= I2,
@@ -647,13 +650,13 @@ CONSTEXPR14 fixed<I, F> operator-(fixed<I, F> lhs, fixed<I, F> rhs) {
 }
 
 template <size_t I, size_t F>
-CONSTEXPR14 fixed<I, F> operator*(fixed<I, F> lhs, fixed<I, F> rhs) {
+__attribute__((always_inline))  CONSTEXPR14 fixed<I, F> operator*(fixed<I, F> lhs, fixed<I, F> rhs) {
 	lhs *= rhs;
 	return lhs;
 }
 
 template <size_t I, size_t F>
-CONSTEXPR14 fixed<I, F> operator/(fixed<I, F> lhs, fixed<I, F> rhs) {
+__attribute__((always_inline))  CONSTEXPR14 fixed<I, F> operator/(fixed<I, F> lhs, fixed<I, F> rhs) {
 	lhs /= rhs;
 	return lhs;
 }
@@ -671,13 +674,13 @@ CONSTEXPR14 fixed<I, F> operator-(fixed<I, F> lhs, Number rhs) {
 }
 
 template <size_t I, size_t F, class Number, class = typename std::enable_if<std::is_arithmetic<Number>::value>::type>
-CONSTEXPR14 fixed<I, F> operator*(fixed<I, F> lhs, Number rhs) {
+__attribute__((always_inline)) CONSTEXPR14 fixed<I, F> operator*(fixed<I, F> lhs, Number rhs) {
 	lhs *= fixed<I, F>(rhs);
 	return lhs;
 }
 
 template <size_t I, size_t F, class Number, class = typename std::enable_if<std::is_arithmetic<Number>::value>::type>
-CONSTEXPR14 fixed<I, F> operator/(fixed<I, F> lhs, Number rhs) {
+__attribute__((always_inline)) CONSTEXPR14 fixed<I, F> operator/(fixed<I, F> lhs, Number rhs) {
 	lhs /= fixed<I, F>(rhs);
 	return lhs;
 }

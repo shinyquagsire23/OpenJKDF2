@@ -61,14 +61,14 @@
 int sithThing_Startup();
 int sithThing_Shutdown();
 void sithThing_SetHandler(sithThing_handler_t handler);
-void sithThing_TickAll(flex_t deltaSeconds, int deltaMs);
+MATH_FUNC void sithThing_TickAll(flex_t deltaSeconds, int deltaMs);
 void sithThing_Remove(sithThing* pThing);
 sithThing* sithThing_GetParent(sithThing* pThing);
 sithThing* sithThing_GetThingByIdx(int idx);
 void sithThing_idkjkl(void);
 void sithThing_sub_4CCE60();
 void sithThing_FreeEverything(sithThing* pThing);
-void sithThing_sub_4CD100(sithThing* pThing);
+MATH_FUNC void sithThing_sub_4CD100(sithThing* pThing);
 int sithThing_DoesRdThingInit(sithThing* pThing);
 sithThing* sithThing_InstantiateFromTemplate(sithThing *pThing, sithThing *pTemplateThing);
 int sithThing_ParseArgs(stdConffileArg *arg, sithThing* pThing);
