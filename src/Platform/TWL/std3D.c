@@ -68,6 +68,10 @@ BOOL std3D_bMenuBitmapsFreed = 1;
 D3DVERTEX* tmpD3DVertices = NULL;
 rdTri* tmpTris = NULL;
 
+extern int std3D_bEnableTwlVrr;
+extern int std3D_twlLastFinishedFrame;
+extern int std3D_twlFinishedFrame;
+
 //verticies for the cube
 v16 CubeVectors[] = {
     floattov16(0.0), floattov16(0.0), floattov16(0.5), 
@@ -342,6 +346,9 @@ int std3D_LoadResources() {
 
 int std3D_Startup()
 {
+    // TODO: Not on 3DS?
+    std3D_bEnableTwlVrr = 1;
+
     // initialize gl
     glInit();
 
@@ -567,6 +574,9 @@ int std3D_EndScene()
         std3D_bPurgeTexturesOnEnd = 0;
     }
 
+    // For VRR, let the IRQ handler know we finished rendering
+    std3D_twlFinishedFrame++;
+
     return 0;
 }
 void std3D_ResetRenderList() 
@@ -688,7 +698,7 @@ void std3D_DrawRenderListReal()
         
         if (avg_alpha != last_alpha || (flags & 0x20000) != (last_flags & 0x20000) || (flags & 0x10000) != (last_flags & 0x10000)) {
             //glEnd();
-            glPolyFmt(POLY_ALPHA(avg_alpha) | ((flags & 0x10000) ? POLY_CULL_NONE : POLY_CULL_BACK) | POLY_MODULATION | POLY_ID(polyid++) | ((flags & 0x20000) ? 0 : POLY_FOG) ) ;
+            glPolyFmt(POLY_ALPHA(avg_alpha) | ((flags & 0x10000) ? POLY_CULL_NONE : POLY_CULL_BACK) | POLY_MODULATION | POLY_RENDER_FAR_POLYS | POLY_ID(polyid++) | ((flags & 0x20000) ? 0 : POLY_FOG) ) ;
             glBegin(GL_TRIANGLES);
 
             // TODO: search for polygons with the same flags?

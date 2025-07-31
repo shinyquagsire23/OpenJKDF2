@@ -327,7 +327,6 @@ typedef struct rdPuppet rdPuppet;
 typedef struct rdSprite rdSprite;
 typedef struct rdSurface rdSurface;
 typedef struct rdThing rdThing;
-typedef struct rdVertexIdxInfo rdVertexIdxInfo;
 typedef struct sithCollisionSearchEntry sithCollisionSearchEntry;
 typedef struct sithPlayingSound sithPlayingSound;
 typedef struct sithSoundClass sithSoundClass;
@@ -1486,28 +1485,12 @@ typedef struct rdEdge
     rdEdge* next;
 } rdEdge;
 
-typedef struct rdVertexIdxInfo
-{
-    uint32_t numVertices;
-    int* vertexPosIdx;
-    int* vertexUVIdx;
-    rdVector3* vertices;
-    rdVector2* vertexUVs;
-    flex_t* paDynamicLight;
-    flex_t* intensities;
-#ifdef JKM_LIGHTING
-    flex_t* paRedIntensities;
-    flex_t* paGreenIntensities;
-    flex_t* paBlueIntensities;
-#endif
-} rdVertexIdxInfo;
-
 typedef struct rdMeshinfo
 {
     uint32_t numVertices;
     int* vertexPosIdx;
     int* vertexUVIdx;
-    rdVector3* verticesProjected;
+    rdVector3* vertices;
     rdVector2* vertexUVs;
     flex_t* paDynamicLight;
     flex_t* intensities;

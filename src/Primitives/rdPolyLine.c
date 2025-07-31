@@ -206,7 +206,7 @@ int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix)
     rdVector3 vertex_out;
     rdMatrix34 out;
     rdVector3 vertex;
-    rdVertexIdxInfo idxInfo;
+    rdMeshinfo idxInfo;
 
     polyline = thing->polyline;
     
@@ -307,7 +307,7 @@ int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix)
     return 1;
 }
 
-void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVertexIdxInfo *idxInfo)
+void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdMeshinfo *idxInfo)
 {
     rdProcEntry *procEntry;
     rdMeshinfo mesh_out;
@@ -317,7 +317,7 @@ void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVert
     if (!procEntry)
         return;
 
-    mesh_out.verticesProjected = rdPolyLine_FaceVerts;
+    mesh_out.vertices = rdPolyLine_FaceVerts;
     mesh_out.verticesOrig = procEntry->vertices;
     mesh_out.vertexUVs = procEntry->vertexUVs;
     mesh_out.paDynamicLight = procEntry->vertexIntensities;
@@ -381,7 +381,7 @@ void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVert
     if ( mesh_out.numVertices < 3 )
         return;
 
-    rdCamera_pCurCamera->fnProjectLst(mesh_out.verticesOrig, mesh_out.verticesProjected, mesh_out.numVertices);
+    rdCamera_pCurCamera->fnProjectLst(mesh_out.verticesOrig, mesh_out.vertices, mesh_out.numVertices);
 
     if ( rdroid_curRenderOptions & 2 )
         procEntry->ambientLight = rdCamera_pCurCamera->ambientLight;

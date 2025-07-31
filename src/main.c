@@ -211,11 +211,91 @@ void crash_handler_basic(int sig);
 #include <nds/arm9/dldi.h>
 #include "Platform/TWL/dlmalloc.h"
 
-volatile int frame = 0;
-//---------------------------------------------------------------------------------
-void Vblank() {
-//---------------------------------------------------------------------------------
-    frame++;
+// Keep all of this in DTCM to avoid stalls in the IRQ handler
+FAST_DATA volatile int std3D_bEnableTwlVrr = 0;
+FAST_DATA volatile int std3D_twlLastFinishedFrame = 0;
+FAST_DATA volatile int std3D_twlFinishedFrame = 0;
+FAST_DATA volatile int std3D_stalledHblanks = 0;
+
+/*
+// just 50Hz
+FAST_FUNC void hblank_handler() {
+    // Don't run during the VBL period
+    if (!std3D_bEnableTwlVrr || REG_VCOUNT < 202 || REG_VCOUNT > 202)
+        return;
+    if (std3D_twlFinishedFrame != std3D_twlLastFinishedFrame && false) {
+        std3D_twlLastFinishedFrame = std3D_twlFinishedFrame;
+
+        // If we finish early or are done holding, move to the next frame
+        //REG_VCOUNT = 260;
+        std3D_stalledHblanks = 30;
+    }
+    else {
+        // Hold VCOUNT until the frame is finished
+        
+        std3D_stalledHblanks++;
+        if (std3D_stalledHblanks < 62) {
+            REG_VCOUNT = 202;
+        }
+        else {
+            std3D_stalledHblanks = 0;
+            REG_VCOUNT = 203;
+        }
+    }
+}
+*/
+
+// VRR implementation for NDS:
+// ---
+// Since we can change the VCOUNT register, we can both advance
+// VCOUNT from 193 -> 214 (~65Hz), or we can delay VCOUNT down to about ~45Hz.
+//
+// Rather than setting discrete refresh rates, we adjust VCOUNT
+// slightly depending on when the frame gets finished, possibly multiple times
+// per frame. 
+//
+// If the frame is not finished for multiple vsyncs, the screen will
+// default to the lowest non-flickering refresh rate (~45Hz).
+//
+FAST_FUNC void hblank_handler() {
+    // GBATek says the safe period is from 202..212,
+    // but it seems to actually be 193..214 --
+    // unless the GPU is doing a lot of work, then it seems to bump to 202
+    const int hblankMin = 193;
+    const int hblankMax = 214;
+    int vcountCur = REG_VCOUNT;
+    if (!std3D_bEnableTwlVrr || vcountCur < hblankMin || vcountCur >= hblankMax)
+        return;
+
+    // If the GPU is busy, let vcount keep going until we can hijack it safely
+    // (if this is not checked, the screen will output corrupt triangles/frames
+    //  in high-tri areas)
+    if (GFX_STATUS & (1<<27)) {
+        ;
+    }
+    else if (std3D_twlFinishedFrame != std3D_twlLastFinishedFrame) {
+        std3D_twlLastFinishedFrame = std3D_twlFinishedFrame;
+
+        // If we finish early or are done holding, move to the next frame
+        // and skip ahead
+        REG_VCOUNT = hblankMax;
+    }
+    else {
+        // Hold VCOUNT until the frame is finished
+        
+        // 62 hblanks = 4ms = 50Hz, scanlines start to show
+        // 62*2 hblanks = 8ms = ~40Hz, flickers
+        // 93 hblanks = 6ms = ~45Hz?
+
+        std3D_stalledHblanks++;
+        if (std3D_stalledHblanks > 93+(hblankMax-hblankMin)/*(262*1)+58*/) {
+            REG_VCOUNT = hblankMax;//hblankMin+1;
+            std3D_stalledHblanks = 0;
+        }
+        else {
+            REG_VCOUNT = vcountCur;
+        }
+    }
 }
 #endif
 
@@ -304,6 +384,9 @@ int main(int argc, char** argv)
 #ifdef TARGET_TWL
     REG_SQRTCNT = SQRT_64;
     REG_DIVCNT = DIV_64_32;
+
+    irqSet(IRQ_HBLANK, hblank_handler);
+    irqEnable(IRQ_HBLANK);
 
     defaultExceptionHandler();
     consoleDebugInit(DebugDevice_NOCASH);

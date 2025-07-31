@@ -1322,10 +1322,10 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
         rdModel3_textureMode = curTextureMode;
 
     vertexSrc.paDynamicLight = pCurMesh->vertices_unk;
-    vertexSrc.verticesProjected = aView;
+    vertexSrc.vertices = aView;
     vertexSrc.vertexUVs = pCurMesh->vertexUVs;
     vertexSrc.intensities = 0;
-    vertexDst.verticesProjected = aFaceVerts;
+    vertexDst.vertices = aFaceVerts;
 
     if (rdModel3_lightingMode == RD_LIGHTMODE_FULLYLIT)
     {
@@ -1508,7 +1508,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
     // MOTS added: RGB
     if ((rdGetVertexColorMode() == 0) || (procEntry->lightingMode == RD_LIGHTMODE_DIFFUSE)) {
         if ( meshFrustrumCull )
-            rdPrimit3_ClipFace(rdCamera_pCurCamera->pClipFrustum, geometryMode, lightingMode, textureMode, (rdVertexIdxInfo *)&vertexSrc, &vertexDst, &face->clipIdk);
+            rdPrimit3_ClipFace(rdCamera_pCurCamera->pClipFrustum, geometryMode, lightingMode, textureMode, &vertexSrc, &vertexDst, &face->clipIdk);
         else
             rdPrimit3_NoClipFace(geometryMode, lightingMode, textureMode, &vertexSrc, &vertexDst, &face->clipIdk);
     }
@@ -1555,7 +1555,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
                       rdCamera_pCurCamera->attenuationMin);
         }
     }
-    rdCamera_pCurCamera->fnProjectLst(vertexDst.verticesOrig, vertexDst.verticesProjected, vertexDst.numVertices);
+    rdCamera_pCurCamera->fnProjectLst(vertexDst.verticesOrig, vertexDst.vertices, vertexDst.numVertices);
     if ( rdroid_curRenderOptions & 2 )
         procEntry->ambientLight = rdCamera_pCurCamera->ambientLight;
     else

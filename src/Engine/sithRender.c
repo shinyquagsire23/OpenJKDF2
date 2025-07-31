@@ -804,7 +804,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, flex_t a3, i
 
             sithRender_idxInfo.numVertices = adjoinSurface->surfaceInfo.face.numVertices;
             sithRender_idxInfo.vertexPosIdx = adjoinSurface->surfaceInfo.face.vertexPosIdx;
-            meshinfo_out.verticesProjected = sithRender_aVerticesTmp;
+            meshinfo_out.vertices = sithRender_aVerticesTmp;
             sithRender_idxInfo.vertexUVIdx = adjoinSurface->surfaceInfo.face.vertexUVIdx;
 
             rdPrimit3_ClipFace(frustumArg, RD_GEOMODE_WIREFRAME, RD_LIGHTMODE_NOTLIT, RD_TEXTUREMODE_AFFINE, &sithRender_idxInfo, &meshinfo_out, &adjoinSurface->surfaceInfo.face.clipIdk);
@@ -1408,7 +1408,7 @@ void sithRender_RenderLevelGeometry()
                 if ( texMode2 >= texMode )
                     texMode2 = texMode;
                 procEntry->textureMode = texMode2;
-                meshinfo_out.verticesProjected = sithRender_aVerticesTmp;
+                meshinfo_out.vertices = sithRender_aVerticesTmp;
                 meshinfo_out.paDynamicLight = procEntry->vertexIntensities;
                 sithRender_idxInfo.vertexPosIdx = v65->surfaceInfo.face.vertexPosIdx;
                 meshinfo_out.vertexUVs = procEntry->vertexUVs;
@@ -1426,6 +1426,13 @@ void sithRender_RenderLevelGeometry()
                                        &sithRender_idxInfo, 
                                        &meshinfo_out, 
                                        &v65->surfaceInfo.face.clipIdk);
+                    /*rdPrimit3_NoClipFace(/*level_idk->clipFrustum,* / 
+                                       procEntry->geometryMode, 
+                                       procEntry->lightingMode, 
+                                       texMode3, 
+                                       &sithRender_idxInfo, 
+                                       &meshinfo_out, 
+                                       &v65->surfaceInfo.face.clipIdk);*/
                 }
                 else 
                 {
@@ -1479,7 +1486,7 @@ void sithRender_RenderLevelGeometry()
                 }
 
                 // These lighting optimizations are for the software renderer
-#ifdef TARGET_TWL
+#ifndef TARGET_TWL
                 if ( procEntry->ambientLight >= 1.0 )
                 {
                     if ( v68 )
@@ -1619,7 +1626,7 @@ void sithRender_RenderLevelGeometry()
                         v79[1] = v65->surfaceInfo.face.vertexUVIdx[v71];
                         v79[2] = v65->surfaceInfo.face.vertexUVIdx[v18];
                     }
-                    meshinfo_out.verticesProjected = sithRender_aVerticesTmp;
+                    meshinfo_out.vertices = sithRender_aVerticesTmp;
                     sithRender_idxInfo.numVertices = 3;
                     meshinfo_out.vertexUVs = v20->vertexUVs;
                     sithRender_idxInfo.vertexPosIdx = v78;
@@ -1639,6 +1646,13 @@ void sithRender_RenderLevelGeometry()
                                            &sithRender_idxInfo, 
                                            &meshinfo_out, 
                                            &v65->surfaceInfo.face.clipIdk);
+                        /*rdPrimit3_NoClipFace(/*level_idk->clipFrustum,* / 
+                                       v20->geometryMode, 
+                                       v20->lightingMode, 
+                                       v20->textureMode, 
+                                       &sithRender_idxInfo, 
+                                       &meshinfo_out, 
+                                       &v65->surfaceInfo.face.clipIdk);*/
                     }
                     else {
                         
@@ -2485,7 +2499,7 @@ void sithRender_RenderAlphaSurfaces()
         sithRender_idxInfo.numVertices = v0->surfaceInfo.face.numVertices;
         sithRender_idxInfo.vertexPosIdx = v0->surfaceInfo.face.vertexPosIdx;
         sithRender_idxInfo.vertexUVIdx = v0->surfaceInfo.face.vertexUVIdx;
-        meshinfo_out.verticesProjected = sithRender_aVerticesTmp;
+        meshinfo_out.vertices = sithRender_aVerticesTmp;
 
         // Added: Just in case
         if (!sithRender_idxInfo.vertexUVIdx && v9->geometryMode > RD_GEOMODE_SOLIDCOLOR) {

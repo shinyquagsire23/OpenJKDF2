@@ -18,7 +18,7 @@ void rdPolyLine_Free(rdPolyLine *polyline);
 void rdPolyLine_FreeEntry(rdPolyLine *polyline);
 MATH_FUNC int rdPolyLine_Draw(rdThing *thing, rdMatrix34 *matrix);
 
-MATH_FUNC void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdVertexIdxInfo *idxInfo);
-//static void (*rdPolyLine_DrawFace)(rdThing *thing, rdFace *face, rdVector3 *unused, rdVertexIdxInfo *idxInfo) = (void*)rdPolyLine_DrawFace_ADDR;
+MATH_FUNC void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdMeshinfo *idxInfo);
+//static void (*rdPolyLine_DrawFace)(rdThing *thing, rdFace *face, rdVector3 *unused, rdMeshinfo *idxInfo) = (void*)rdPolyLine_DrawFace_ADDR;
 
 #endif // _RDPOLYLINE_H

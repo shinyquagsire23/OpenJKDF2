@@ -156,11 +156,11 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     mesh_in.numVertices = sprite->face.numVertices;
     mesh_in.vertexPosIdx = sprite->face.vertexPosIdx;
     mesh_in.vertexUVIdx = sprite->face.vertexUVIdx;
-    mesh_in.verticesProjected = rdSprite_inVerts;
+    mesh_in.vertices = rdSprite_inVerts;
     mesh_in.paDynamicLight = 0;
     mesh_in.vertexUVs = sprite->vertexUVs;
     mesh_in.intensities = 0;
-    mesh_out.verticesProjected = rdSprite_tmpVerts;
+    mesh_out.vertices = rdSprite_tmpVerts;
     mesh_out.verticesOrig = procEntry->vertices;
     mesh_out.vertexUVs = procEntry->vertexUVs;
     mesh_out.paDynamicLight = procEntry->vertexIntensities;
@@ -233,7 +233,7 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
             procEntry->geometryMode,
             procEntry->lightingMode,
             procEntry->textureMode,
-            (rdVertexIdxInfo *)&mesh_in,
+            &mesh_in,
             &mesh_out,
             &sprite->face.clipIdk);
     else
@@ -241,7 +241,7 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     if ( mesh_out.numVertices < 3u )
         return 0;
 
-    rdCamera_pCurCamera->fnProjectLst(mesh_out.verticesOrig, mesh_out.verticesProjected, mesh_out.numVertices);
+    rdCamera_pCurCamera->fnProjectLst(mesh_out.verticesOrig, mesh_out.vertices, mesh_out.numVertices);
 
     if ( rdroid_curRenderOptions & 2 )
         procEntry->ambientLight = rdCamera_pCurCamera->ambientLight;

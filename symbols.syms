@@ -66,7 +66,7 @@ sithRender_numSurfaces 0x0082F4B8 int32_t
 sithRender_geoThingsDrawn 0x00831980 int
 sithRender_nongeoThingsDrawn 0x00831984 int
 sithRender_f_82F4B0 0x0082F4B0 flex_t = 0.0
-sithRender_idxInfo 0x0082F648 rdVertexIdxInfo
+sithRender_idxInfo 0x0082F648 rdMeshinfo
 meshinfo_out 0x0082F490 rdMeshinfo
 sithRender_weaponRenderHandle 0x00831998 sithRender_weapRendFunc_t
 sithRender_aLights 0x0082F668 rdLight[32]
