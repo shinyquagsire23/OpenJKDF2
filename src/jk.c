@@ -683,7 +683,15 @@ int _fputs(const char * a, FILE * b)
 
 void jk_exit(int a)
 {
+    exit(a);
+}
+
 #ifdef TARGET_TWL
+#ifdef __cplusplus
+extern "C" {
+#endif
+extern void __real_exit(int res);
+void __wrap_exit(int res) {
     while (1) {
         scanKeys();
         u16 keys_held = keysHeld();
@@ -691,9 +699,12 @@ void jk_exit(int a)
             break;
         }
     }
-#endif
-    exit(a);
+    __real_exit(res);
 }
+#ifdef __cplusplus
+}
+#endif
+#endif
 
 int jk_printf(const char* fmt, ...)
 {

@@ -502,7 +502,7 @@ void* __wrap_realloc(void *ptr, uint32_t len) {
     return TWL_realloc(ptr, len);
 }
 
-void *__real_calloc(size_t num, size_t size) {
+void *__wrap_calloc(size_t num, size_t size) {
     return TWL_alloc(num*size);
 }
 

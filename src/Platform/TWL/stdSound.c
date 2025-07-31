@@ -217,9 +217,16 @@ int stdSound_Startup()
     printf("Using STDSOUND_MAXMOD as audio backend\n");
 
     //soundEnable();
+    
+    memset(stdSound_aPlayingSounds, 0, sizeof(stdSound_aPlayingSounds));
+
+    static int bInitted = 0;
+    if (bInitted) {
+        return 1;
+    }
 
 #ifdef STDPLATFORM_HEAP_SUGGESTIONS
-        int prevSuggest = pSithHS->suggestHeap(HEAP_AUDIO);
+    int prevSuggest = pSithHS->suggestHeap(HEAP_AUDIO);
 #endif
 
     // We are not using a soundbank so we need to manually initialize
@@ -245,11 +252,10 @@ int stdSound_Startup()
     };
     mmStreamOpen(&stdSound_mmstream);
 
-    memset(stdSound_aPlayingSounds, 0, sizeof(stdSound_aPlayingSounds));
-
 #ifdef STDPLATFORM_HEAP_SUGGESTIONS
-        pSithHS->suggestHeap(prevSuggest);
+    pSithHS->suggestHeap(prevSuggest);
 #endif
+    bInitted = 1;
 
     return 1;
 }

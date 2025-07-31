@@ -216,6 +216,7 @@ FAST_DATA volatile int std3D_bEnableTwlVrr = 0;
 FAST_DATA volatile int std3D_twlLastFinishedFrame = 0;
 FAST_DATA volatile int std3D_twlFinishedFrame = 0;
 FAST_DATA volatile int std3D_stalledHblanks = 0;
+FAST_DATA volatile int std3D_twlTargetHblanks = 93;
 
 /*
 // just 50Hz
@@ -261,7 +262,7 @@ FAST_FUNC void hblank_handler() {
     // GBATek says the safe period is from 202..212,
     // but it seems to actually be 193..214 --
     // unless the GPU is doing a lot of work, then it seems to bump to 202
-    const int hblankMin = 193;
+    const int hblankMin = 195;
     const int hblankMax = 214;
     int vcountCur = REG_VCOUNT;
     if (!std3D_bEnableTwlVrr || vcountCur < hblankMin || vcountCur >= hblankMax)
@@ -288,8 +289,8 @@ FAST_FUNC void hblank_handler() {
         // 93 hblanks = 6ms = ~45Hz?
 
         std3D_stalledHblanks++;
-        if (std3D_stalledHblanks > 93+(hblankMax-hblankMin)/*(262*1)+58*/) {
-            REG_VCOUNT = hblankMax;//hblankMin+1;
+        if (std3D_stalledHblanks > std3D_twlTargetHblanks+(hblankMax-hblankMin)) {
+            REG_VCOUNT = hblankMax;
             std3D_stalledHblanks = 0;
         }
         else {

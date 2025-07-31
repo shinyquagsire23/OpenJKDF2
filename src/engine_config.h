@@ -411,7 +411,7 @@ typedef double flex_d_t_type;
 #else
 #define FAST_FUNC
 #endif
-#define FAST_DATA __attribute__((section(".itcm.data"), long_call))
+#define FAST_DATA __attribute__((section(".itcm.data")))
 #else
 #define MATH_FUNC
 #define FAST_FUNC

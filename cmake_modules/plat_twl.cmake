@@ -38,10 +38,10 @@ macro(plat_initialize)
 
     set(TARGET_TWL TRUE)
 
-    add_link_options(-g -mthumb -mthumb-interwork -fno-exceptions -fshort-wchar -L${LIBNDS}/lib -L${BLOCKSDS}/libs/maxmod/lib -Wl,--gc-sections -ffunction-sections  --specs=${BLOCKSDS_SPECS} -Wl,--wrap,malloc -Wl,--wrap,free -Wl,--wrap,realloc -flto -Wno-odr)
+    add_link_options(-g -mthumb -mthumb-interwork -fno-exceptions -fshort-wchar -L${LIBNDS}/lib -L${BLOCKSDS}/libs/maxmod/lib -Wl,--gc-sections -ffunction-sections  --specs=${BLOCKSDS_SPECS} -Wl,--wrap,malloc -Wl,--wrap,free -Wl,--wrap,realloc -Wl,--wrap,exit -flto -Wno-odr)
     add_compile_options(-g -mthumb -mthumb-interwork -fno-exceptions -mcpu=arm946e-s+nofp -fomit-frame-pointer -ffast-math -Wl,--gc-sections -ffunction-sections --specs=${BLOCKSDS_SPECS})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
-    add_compile_options(-Oz -flto -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces -Wno-odr -fno-delete-null-pointer-checks -fno-semantic-interposition -fpredictive-commoning -Wl,--wrap,malloc -Wl,--wrap,free -Wl,--wrap,realloc -Wl,--wrap,calloc)
+    add_compile_options(-Oz -flto -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces -Wno-odr -fno-delete-null-pointer-checks -fno-semantic-interposition -fpredictive-commoning -Wl,--wrap,malloc -Wl,--wrap,free -Wl,--wrap,realloc -Wl,--wrap,calloc -Wl,--wrap,exit)
     include_directories(${LIBNDS}/include)
     include_directories(${BLOCKSDS}/libs/maxmod/include)
 endmacro()

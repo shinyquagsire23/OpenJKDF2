@@ -68,9 +68,12 @@ BOOL std3D_bMenuBitmapsFreed = 1;
 D3DVERTEX* tmpD3DVertices = NULL;
 rdTri* tmpTris = NULL;
 
+uint32_t std3D_lastPurgeMs = 0;
+
 extern int std3D_bEnableTwlVrr;
 extern int std3D_twlLastFinishedFrame;
 extern int std3D_twlFinishedFrame;
+extern int std3D_twlTargetHblanks;
 
 //verticies for the cube
 v16 CubeVectors[] = {
@@ -569,10 +572,50 @@ int std3D_EndScene()
 #endif
 
     if (std3D_bPurgeTexturesOnEnd) {
-        std3D_ActuallyNeedToWaitForGeometryToFinish();
-        std3D_PurgeEntireTextureCache();
-        std3D_bPurgeTexturesOnEnd = 0;
+        if (stdPlatform_GetTimeMsec() - std3D_lastPurgeMs > 1000) {
+            std3D_ActuallyNeedToWaitForGeometryToFinish();
+            std3D_PurgeEntireTextureCache();
+            std3D_bPurgeTexturesOnEnd = 0;
+            std3D_lastPurgeMs = stdPlatform_GetTimeMsec();
+        }
     }
+
+    if (!std3D_bEnableTwlVrr) {
+        return 0;
+    }
+
+    // Calculate the number of Hblanks for VRR.
+    // We assume the last frame is probably similar to the current frame.
+    const flex_t usPerHblank = (16.666666/262.0*1000.0);
+    const flex_t hblankPerUs = 1.0/usPerHblank;
+    const flex_t usBaselineFlex = usPerHblank*(262-(214-195)); // The hblanks that we *have* to do
+    const int64_t usBaseline = (int)usBaselineFlex;
+    static uint64_t lastUs = 0;
+    uint64_t curUs = Linux_TimeUs();
+    int64_t deltaUs = (curUs - lastUs);
+    int64_t deltaUsOrig = deltaUs;
+    int neededHblanks = 0;
+    flex_t deltaUsF;
+    if (deltaUs < 23000) {
+        std3D_twlTargetHblanks = 0;
+        deltaUsF = (flex_t)(int)deltaUs;
+    }
+    else {
+        while (deltaUs >= usBaseline) {
+            deltaUs -= usBaseline;
+        }
+        if (deltaUs < 0) {
+            deltaUs = 0;
+        }
+        deltaUsF = (flex_t)(int)deltaUs;
+        
+        lastUs = curUs;
+        neededHblanks = deltaUsF * hblankPerUs;
+
+        std3D_twlTargetHblanks = neededHblanks % 94;
+    }
+    
+    //printf("%d %d %d %f\n", std3D_twlTargetHblanks, neededHblanks, (int)(10000.0 / (flex_t)(deltaUsOrig/100)), (flex32_t)deltaUsF);
 
     // For VRR, let the IRQ handler know we finished rendering
     std3D_twlFinishedFrame++;
@@ -1212,7 +1255,7 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
         stdPlatform_Printf("Out of VRAM!\n");
         glDeleteTextures(1, &image_texture);
 
-        //std3D_bPurgeTexturesOnEnd = 1;
+        std3D_bPurgeTexturesOnEnd = 1;
         glBindTexture(GL_TEXTURE_2D, -1);
         return 0;
 
