@@ -319,6 +319,10 @@
 
 // Halve the x/y positions/sizes for all jkGui elements
 #define JKGUI_SMOL_SCREEN
+
+// Keep rdClip buffers in stack (DTCM)
+#define RDCLIP_WORK_BUFFERS_IN_STACK_MEM
+#define RDCLIP_COPY_VERTS_TO_STACK
 #endif
 
 //#define RDMATERIAL_LRU_LOAD_UNLOAD

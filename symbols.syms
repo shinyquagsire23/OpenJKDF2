@@ -158,15 +158,15 @@ sithEvent_bInit 0x855004 int
 sithEvent_bOpen 0x855008 int
 
 rdClip_faceStatus 0x0082EE5C int
-pSourceVert 0x0082EC50 rdVector3*
-workIVerts 0x0082EC58 flex_t[32]
-workVerts 0x0082ECD8 rdVector3[32]
-pDestVert 0x0082EB44 rdVector3*
-pDestIVert 0x0082EB48 flex_t*
-workTVerts 0x0082EB50 rdVector2[32]
-pSourceIVert 0x0082EB38 flex_t*
-pSourceTVert 0x0082EB3C rdVector2*
-pDestTVert 0x0082EB40 rdVector2*
+rdClip_pSourceVert 0x0082EC50 rdVector3*
+rdClip_workIVerts 0x0082EC58 flex_t[32]
+rdClip_workVerts 0x0082ECD8 rdVector3[32]
+rdClip_pDestVert 0x0082EB44 rdVector3*
+rdClip_pDestIVert 0x0082EB48 flex_t*
+rdClip_workTVerts 0x0082EB50 rdVector2[32]
+rdClip_pSourceIVert 0x0082EB38 flex_t*
+rdClip_pSourceTVert 0x0082EB3C rdVector2*
+rdClip_pDestTVert 0x0082EB40 rdVector2*
 
 sithSoundMixer_dword_835FCC 0x00835FCC int
 sithSoundMixer_bPlayingMci 0x00835FD0 int

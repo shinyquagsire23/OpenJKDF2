@@ -6,6 +6,20 @@
 
 #include <math.h>
 
+#ifndef RDCLIP_WORK_BUFFERS_IN_STACK_MEM
+#define INST_WORKBUFS
+#define INST_WORKBUFS_MOTS
+
+#define pSourceVert  rdClip_pSourceVert 
+#define workIVerts rdClip_workIVerts
+#define workVerts rdClip_workVerts
+#define pDestVert rdClip_pDestVert
+#define pDestIVert rdClip_pDestIVert
+#define workTVerts rdClip_workTVerts
+#define pSourceIVert rdClip_pSourceIVert
+#define pSourceTVert rdClip_pSourceTVert
+#define pDestTVert rdClip_pDestTVert
+
 #ifdef JKM_LIGHTING
 flex_t* pSourceRedIVert;
 flex_t* pSourceGreenIVert;
@@ -18,6 +32,54 @@ flex_t* pDestBlueIVert;
 flex_t workRedIVerts[32];
 flex_t workGreenIVerts[32];
 flex_t workBlueIVerts[32];
+#endif // JKM_LIGHTING
+
+#else // TARGET_TWL
+
+#ifdef JKM_LIGHTING
+#define INST_WORKBUFS_MOTS \
+    flex_t* pSourceRedIVert; \
+    flex_t* pSourceGreenIVert; \
+    flex_t* pSourceBlueIVert; \
+    flex_t* pDestRedIVert; \
+    flex_t* pDestGreenIVert; \
+    flex_t* pDestBlueIVert; \
+    flex_t workRedIVerts[32]; \
+    flex_t workGreenIVerts[32]; \
+    flex_t workBlueIVerts[32];
+#else
+#define INST_WORKBUFS_MOTS
+#endif
+
+#define INST_WORKBUFS \
+    rdVector3* pSourceVert; \
+    flex_t workIVerts[32]; \
+    rdVector3 workVerts[32]; \
+    rdVector3* pDestVert; \
+    flex_t* pDestIVert; \
+    rdVector2 workTVerts[32]; \
+    flex_t* pSourceIVert; \
+    rdVector2* pSourceTVert; \
+    rdVector2* pDestTVert;
+#endif
+
+// TODO: Non-GT versions...?
+#ifdef RDCLIP_COPY_VERTS_TO_STACK
+// TODO: alloca maybe?
+#define INST_ARG_COPIES \
+    rdClipFrustum _clipFrustum = *pClipFrustum; \
+    rdVector3 _vertices[32]; \
+    rdVector2 _tvertices[32]; \
+    flex_t _ivertices[32]; \
+    _memcpy(_vertices, pVertices, numVertices*sizeof(*pVertices)); \
+    _memcpy(_tvertices, pTVertices, numVertices*sizeof(*pTVertices)); \
+    _memcpy(_ivertices, pIVertices, numVertices*sizeof(*pIVertices)); \
+    pClipFrustum = &_clipFrustum; \
+    pVertices = _vertices; \
+    pTVertices = _tvertices; \
+    pIVertices = _ivertices;
+#else
+#define INST_ARG_COPIES
 #endif
 
 int rdClip_Line2(rdCanvas *canvas, signed int *pX1, signed int *pY1, signed int *pX2, signed int *pY2)
@@ -943,6 +1005,8 @@ int rdClip_SphereInFrustrum(rdClipFrustum *frust, rdVector3 *pos, flex_t rad)
 
 int rdClip_Face3W(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices)
 {
+    INST_WORKBUFS
+
     //return _rdClip_Face3W(frustum, vertices, numVertices);
     rdVector3 *v3; // edx
     int v5; // ebp
@@ -1387,58 +1451,42 @@ int rdClip_Face3W(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices)
 }
 
 // TVertices as in Texture Vertices, or UVs
-int rdClip_Face3GT(rdClipFrustum *pClipFrustum, rdVector3 *pVertices, rdVector2 *pTVertices, flex_t *paIntensities, int numVertices)
+int rdClip_Face3GT(rdClipFrustum *pClipFrustum, rdVector3 *pVertices, rdVector2 *pTVertices, flex_t *pIVertices, int numVertices)
 {
-    //return _rdClip_Face3GT(pClipFrustum, pVertices, pTVertices, paIntensities, numVertices);
+    INST_WORKBUFS
+    INST_ARG_COPIES
+
+    //return _rdClip_Face3GT(pClipFrustum, pVertices, pTVertices, pIVertices, numVertices);
     rdVector2 *pTVertIter; // esi
     rdVector3 *pVertIter; // edi
     rdVector3 *pLastVertIter; // ebx
     rdVector2 *pLastTVertIter; // edx
     rdVector2 *pWorkTVertIter; // ebp
     rdVector3 *pWorkVertIter; // ecx
-    //char v14; // c0
     flex_d_t v16; // st6
-    //char v17; // c3
     flex_d_t v19; // st5
     flex_d_t v20; // st4
-    //char v21; // c0
     flex_d_t v23; // st3
-    //char v24; // c0
     flex_d_t v25; // st4
     flex_d_t v33; // st3
-    //unsigned __int8 v47; // c0
-    //unsigned __int8 v48; // c3
     flex_d_t v50; // st6
-    //char v51; // c3
     flex_d_t v53; // st5
     flex_d_t v54; // st4
-    //char v55; // c0
     flex_d_t v57; // st3
-    //char v58; // c0
     flex_d_t v59; // st4
     rdVector3 *pLastDestVert; // eax
-    //bool v78; // cc
-    //unsigned __int8 v85; // c0
-    //unsigned __int8 v86; // c3
     flex_d_t v88; // st6
-    //char v90; // c3
     flex_d_t v92; // st6
     flex_d_t v93; // st5
-    //char v94; // c0
     flex_d_t v96; // st4
-    //char v97; // c0
     flex_d_t v98; // st5
     flex_d_t v99; // st4
     rdVector3 *pLastSourceVert; // eax
-    //char v120; // c0
     flex_d_t v122; // st6
     flex_d_t v123; // st7
-    //char v124; // c3
     flex_d_t v126; // st6
     flex_d_t v127; // st5
-    //char v128; // c0
     flex_d_t v130; // st4
-    //char v131; // c0
     flex_d_t v132; // st5
     flex_t* v143;
     flex_d_t v150; // st7
@@ -1472,7 +1520,7 @@ int rdClip_Face3GT(rdClipFrustum *pClipFrustum, rdVector3 *pVertices, rdVector2 
     pDestVert = workVerts;
     pSourceTVert = pTVertices;
     pDestTVert = workTVerts;
-    pSourceIVert = paIntensities;
+    pSourceIVert = pIVertices;
     pDestIVert = workIVerts;
 
     pWorkVertIter = workVerts;
@@ -1481,10 +1529,10 @@ int rdClip_Face3GT(rdClipFrustum *pClipFrustum, rdVector3 *pVertices, rdVector2 
 
     pVertIter = pVertices;
     pTVertIter = pTVertices;
-    pIVertIter = paIntensities;
+    pIVertIter = pIVertices;
     pLastVertIter = &pVertices[numVertices - 1];
     pLastTVertIter = &pTVertices[numVertices - 1];
-    pLastIVertIter = &paIntensities[numVertices - 1];
+    pLastIVertIter = &pIVertices[numVertices - 1];
 
     for (int i = 0; i < numVertices; pLastVertIter = pVertIter++, pLastTVertIter = pTVertIter++, pLastIVertIter = pIVertIter++, i++)
     {
@@ -1543,7 +1591,7 @@ int rdClip_Face3GT(rdClipFrustum *pClipFrustum, rdVector3 *pVertices, rdVector2 
     pSourceTVert = workTVerts;
     pDestTVert = pTVertices;
     pSourceIVert = workIVerts;
-    pDestIVert = paIntensities;
+    pDestIVert = pIVertices;
 
     pWorkVertIter = pDestVert;
     pWorkTVertIter = pDestTVert;
@@ -1927,7 +1975,7 @@ int rdClip_Face3GT(rdClipFrustum *pClipFrustum, rdVector3 *pVertices, rdVector2 
     {
         _memcpy(pVertices, pDestVert, sizeof(rdVector3) * numOnScreenVertices);
         _memcpy(pTVertices, pDestTVert, sizeof(rdVector2) * numOnScreenVertices);
-        _memcpy(paIntensities, pDestIVert, sizeof(flex_t) * numOnScreenVertices);
+        _memcpy(pIVertices, pDestIVert, sizeof(flex_t) * numOnScreenVertices);
     }
 
     return numOnScreenVertices;
@@ -1935,6 +1983,8 @@ int rdClip_Face3GT(rdClipFrustum *pClipFrustum, rdVector3 *pVertices, rdVector2 
 
 int rdClip_Face3S(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices)
 {
+    INST_WORKBUFS
+
     //return _rdClip_Face3S(frustum, vertices, numVertices);
     rdVector3 *v3; // edx
     int v5; // ebp
@@ -2351,6 +2401,8 @@ int rdClip_Face3S(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices)
 
 int rdClip_Face3GS(rdClipFrustum *frustum, rdVector3 *vertices, flex_t *a3, int numVertices)
 {
+    INST_WORKBUFS
+
     //return _rdClip_Face3GS(frustum, vertices, a3, numVertices);
     rdVector3 *v4; // edx
     flex_t *v5; // edi
@@ -2948,6 +3000,8 @@ int rdClip_Face3GS(rdClipFrustum *frustum, rdVector3 *vertices, flex_t *a3, int 
 
 int rdClip_Face3T(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, int numVertices)
 {
+    INST_WORKBUFS
+
     //return _rdClip_Face3T(frustum, vertices, uvs, numVertices);
 
     rdVector3 *v4; // edx
@@ -3553,6 +3607,9 @@ int rdClip_Face3T(rdClipFrustum *frustum, rdVector3 *vertices, rdVector2 *uvs, i
 
 int rdClip_Face3GSRGB(rdClipFrustum *frustum,rdVector3 *vertices,flex_t *pR,flex_t *pG,flex_t *pB,int numVertices)
 {
+    INST_WORKBUFS
+    INST_WORKBUFS_MOTS
+
     flex_t fVar1;
     flex_t fVar2;
     flex_t fVar3;
@@ -4267,6 +4324,9 @@ int rdClip_Face3GSRGB(rdClipFrustum *frustum,rdVector3 *vertices,flex_t *pR,flex
 
 int rdClip_Face3GTRGB(rdClipFrustum *pFrustum,rdVector3 *paVertices,rdVector2 *paUvs,flex_t *pR,flex_t *pG,flex_t *pB, int numVertices)
 {
+    INST_WORKBUFS
+    INST_WORKBUFS_MOTS
+
     flex_t fVar1;
     flex_t fVar2;
     flex_t fVar3;
