@@ -133,7 +133,7 @@ set(CMAKE_PREFIX_PATH ${PORTLIBS} CACHE PATH "Find libraries in the portlibs dir
 set(PLAT_SWITCH TRUE)
 set(NINTENDO_SWITCH TRUE)
 set(SWITCH TRUE)
-
+add_compile_options(-Wno-implicit-function-declaration)
 # Additional include paths for Switch portlibs
 if(EXISTS "${PORTLIBS}/include")
     message(STATUS "Found portlibs include directory")

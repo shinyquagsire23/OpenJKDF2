@@ -4,6 +4,10 @@ macro(plat_initialize)
     set(BIN_NAME "openjkdf2.elf")
     set(NRO_NAME "openjkdf2.nro")
 
+    # Ensure we're targeting AArch64
+    set(CMAKE_SYSTEM_NAME "Generic")
+    set(CMAKE_SYSTEM_PROCESSOR "aarch64")
+    
     # Application metadata
     set(APP_TITLE "OpenJKDF2")
     set(APP_AUTHOR "OpenJKDF2 Team")
@@ -40,14 +44,14 @@ macro(plat_initialize)
     set(TARGET_SWITCH TRUE)
 
     # Compiler and linker flags  
-    set(SWITCH_COMMON_FLAGS "-g -Wall -O2 -ffunction-sections")
-    set(SWITCH_COMMON_FLAGS "${SWITCH_COMMON_FLAGS} -march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE")
-    
-    add_compile_options(${SWITCH_COMMON_FLAGS})
+    set(ARCH_FLAGS "-march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE")
+    add_compile_options(-g -Wall -O2 -ffunction-sections)
+    add_compile_options(${ARCH_FLAGS})
     add_compile_options(-D__SWITCH__ -I${LIBNX}/include -I${PORTLIBS}/include)
     
     # C++ specific flags
-
+    add_compile_options(-Wno-implicit-function-declaration)
+    
     # Linker flags
     add_link_options(-specs=${LIBNX}/switch.specs -g ${ARCH_FLAGS} -Wl,-Map,${CMAKE_CURRENT_BINARY_DIR}/openjkdf2.map)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti -fno-exceptions -fno-strict-aliasing")
@@ -62,7 +66,7 @@ endmacro()
 
 macro(plat_specific_deps)
     # Switch-specific dependencies - SDL2 via portlibs
-    set(SDL2_COMMON_LIBS "SDL2main SDL2 SDL2_mixer")
+    set(SDL2_COMMON_LIBS "-lSDL2main -lSDL2 -lSDL2_mixer")
 endmacro()
 
 macro(plat_link_and_package)
@@ -76,22 +80,22 @@ macro(plat_link_and_package)
     
     # Link portlibs libraries
     if(TARGET_USE_SDL2)
-        target_link_libraries(${BIN_NAME} PRIVATE SDL2main SDL2 SDL2_mixer)
+        target_link_libraries(${BIN_NAME} PRIVATE -lSDL2main -lSDL2 -lSDL2_mixer)
     endif()
     
     if(TARGET_USE_OPENAL)
-        target_link_libraries(${BIN_NAME} PRIVATE openal)
+        target_link_libraries(${BIN_NAME} PRIVATE -lopenal)
     endif()
     
     if(TARGET_USE_PHYSFS)
-        target_link_libraries(${BIN_NAME} PRIVATE physfs)
+        target_link_libraries(${BIN_NAME} PRIVATE -lphysfs)
     endif()
     
     # PNG support for textures
-    target_link_libraries(${BIN_NAME} PRIVATE png z)
+    target_link_libraries(${BIN_NAME} PRIVATE -lpng -lz)
     
     # OpenGL ES via mesa
-    target_link_libraries(${BIN_NAME} PRIVATE EGL GLESv2)
+    target_link_libraries(${BIN_NAME} PRIVATE -lEGL -lGLESv2)
     
     target_link_libraries(sith_engine PRIVATE nlohmann_json::nlohmann_json)
 
@@ -102,8 +106,8 @@ macro(plat_link_and_package)
     endif()
 
     add_custom_target(${NRO_NAME} ALL
-        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${BIN_NAME}
-        COMMAND ${ELF2NRO} ${CMAKE_CURRENT_BINARY_DIR}/${BIN_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${NRO_NAME} --nacp=${CMAKE_CURRENT_BINARY_DIR}/openjkdf2.nacp
+        DEPENDS ${BIN_NAME}
+        COMMAND ${ELF2NRO} $<TARGET_FILE:${BIN_NAME}> ${CMAKE_CURRENT_BINARY_DIR}/${NRO_NAME} --nacp=${CMAKE_CURRENT_BINARY_DIR}/openjkdf2.nacp
         COMMENT "Converting ELF to NRO"
     )
 
