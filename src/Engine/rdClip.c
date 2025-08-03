@@ -66,18 +66,24 @@ flex_t workBlueIVerts[32];
 // TODO: Non-GT versions...?
 #ifdef RDCLIP_COPY_VERTS_TO_STACK
 // TODO: alloca maybe?
+/*
+rdVector3* _vertices = (rdVector3*)alloca(numVertices*sizeof(rdVector3)); \
+    rdVector2* _tvertices = (rdVector2*)alloca(numVertices*sizeof(rdVector2)); \
+    flex_t* _ivertices = (flex_t*)alloca(numVertices*sizeof(flex_t)); \
+*/
+
 #define INST_ARG_COPIES \
     rdClipFrustum _clipFrustum = *pClipFrustum; \
     rdVector3 _vertices[32]; \
     rdVector2 _tvertices[32]; \
     flex_t _ivertices[32]; \
-    _memcpy(_vertices, pVertices, numVertices*sizeof(*pVertices)); \
-    _memcpy(_tvertices, pTVertices, numVertices*sizeof(*pTVertices)); \
-    _memcpy(_ivertices, pIVertices, numVertices*sizeof(*pIVertices)); \
+    _memcpy(_vertices, pSourceVert, numVertices*sizeof(rdVector3)); \
+    _memcpy(_tvertices, pSourceTVert, numVertices*sizeof(rdVector2)); \
+    _memcpy(_ivertices, pSourceIVert, numVertices*sizeof(flex_t)); \
     pClipFrustum = &_clipFrustum; \
-    pVertices = _vertices; \
-    pTVertices = _tvertices; \
-    pIVertices = _ivertices;
+    pSourceVert = _vertices; \
+    pSourceTVert = _tvertices; \
+    pSourceIVert = _ivertices;
 #else
 #define INST_ARG_COPIES
 #endif
@@ -1454,7 +1460,6 @@ int rdClip_Face3W(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices)
 int rdClip_Face3GT(rdClipFrustum *pClipFrustum, rdVector3 *pVertices, rdVector2 *pTVertices, flex_t *pIVertices, int numVertices)
 {
     INST_WORKBUFS
-    INST_ARG_COPIES
 
     //return _rdClip_Face3GT(pClipFrustum, pVertices, pTVertices, pIVertices, numVertices);
     rdVector2 *pTVertIter; // esi
@@ -1523,17 +1528,91 @@ int rdClip_Face3GT(rdClipFrustum *pClipFrustum, rdVector3 *pVertices, rdVector2 
     pSourceIVert = pIVertices;
     pDestIVert = workIVerts;
 
+    INST_ARG_COPIES
+
     pWorkVertIter = workVerts;
     pWorkTVertIter = workTVerts;
     pWorkIVertIter = workIVerts;
 
-    pVertIter = pVertices;
-    pTVertIter = pTVertices;
-    pIVertIter = pIVertices;
-    pLastVertIter = &pVertices[numVertices - 1];
-    pLastTVertIter = &pTVertices[numVertices - 1];
-    pLastIVertIter = &pIVertices[numVertices - 1];
+    pVertIter = pSourceVert;
+    pTVertIter = pSourceTVert;
+    pIVertIter = pSourceIVert;
+    pLastVertIter = &pSourceVert[numVertices - 1];
+    pLastTVertIter = &pSourceTVert[numVertices - 1];
+    pLastIVertIter = &pSourceIVert[numVertices - 1];
 
+#ifdef RDCLIP_CLIP_ZFAR_FIRST
+    if (pClipFrustum->bClipFar)
+    {
+        for (int i = 0; i < numVertices; pLastVertIter = pVertIter++, pLastIVertIter = pIVertIter++, pLastTVertIter = pTVertIter++, i++)
+        {
+            if (!(pLastVertIter->y <= (flex_d_t)pClipFrustum->zFar || pVertIter->y <= (flex_d_t)pClipFrustum->zFar)) {
+                continue;
+            }
+
+            if ( pLastVertIter->y != pClipFrustum->zFar
+              && pVertIter->y != pClipFrustum->zFar
+              && (pLastVertIter->y > (flex_d_t)pClipFrustum->zFar || pVertIter->y > (flex_d_t)pClipFrustum->zFar) )
+            {
+                
+                v174 = (pClipFrustum->zFar - pLastVertIter->y) / (pVertIter->y - pLastVertIter->y);
+                pWorkVertIter->x = (pVertIter->x - pLastVertIter->x) * v174 + pLastVertIter->x;
+                pWorkVertIter->y = pClipFrustum->zFar;
+                pWorkVertIter->z = (pVertIter->z - pLastVertIter->z) * v174 + pLastVertIter->z;
+
+                pWorkTVertIter->x = (pTVertIter->x - pLastTVertIter->x) * v174 + pLastTVertIter->x;
+                pWorkTVertIter->y = (pTVertIter->y - pLastTVertIter->y) * v174 + pLastTVertIter->y;
+                
+                *pWorkIVertIter++ = ((*pIVertIter - *pLastIVertIter) * v174) + *pLastIVertIter;
+                ++pWorkVertIter;
+                ++pWorkTVertIter;
+                ++numOnScreenVertices;
+                rdClip_faceStatus |= CLIPSTAT_FAR;
+            }
+            if ( pVertIter->y <= (flex_d_t)pClipFrustum->zFar )
+            {
+                *pWorkVertIter = *pVertIter;
+                pWorkTVertIter->x = pTVertIter->x;
+                pWorkTVertIter->y = pTVertIter->y;
+                ++pWorkVertIter;
+                ++pWorkTVertIter;
+                ++numOnScreenVertices;
+                *pWorkIVertIter++ = *pIVertIter;
+            }
+        }
+        if ( numOnScreenVertices < 3 ) {
+            return numOnScreenVertices;
+        }
+
+        numVertices = numOnScreenVertices;
+        pLastSourceVert = pSourceVert;
+        pLastDestVert = pDestVert;
+        pLastSourceTVert = pSourceTVert;
+        pLastDestTVert = pDestTVert;
+        pLastSourceIVert = pSourceIVert;
+        pLastDestIVert = pDestIVert;
+
+        pSourceVert = pLastDestVert;
+        pDestVert = pLastSourceVert;
+        pSourceTVert = pLastDestTVert;
+        pDestTVert = pLastSourceTVert;
+        pSourceIVert = pLastDestIVert;
+        pDestIVert = pLastSourceIVert;
+
+        pWorkVertIter = pLastSourceVert;
+        pWorkTVertIter = pLastSourceTVert;
+        pWorkIVertIter = pLastSourceIVert;
+
+        pVertIter = pLastDestVert;
+        pTVertIter = pLastDestTVert;
+        pIVertIter = pLastDestIVert;
+        pLastIVertIter = &pSourceIVert[numVertices - 1];
+        pLastVertIter = &pLastDestVert[numVertices - 1];
+        pLastTVertIter = &pTVertIter[numVertices - 1];
+
+        numOnScreenVertices = 0;
+    }
+#endif
     for (int i = 0; i < numVertices; pLastVertIter = pVertIter++, pLastTVertIter = pTVertIter++, pLastIVertIter = pIVertIter++, i++)
     {
         flex_t nearLeftPlaneA = pClipFrustum->nearLeft * pLastVertIter->y;
@@ -1584,25 +1663,32 @@ int rdClip_Face3GT(rdClipFrustum *pClipFrustum, rdVector3 *pVertices, rdVector2 
     }
     if ( numOnScreenVertices < 3 )
         return numOnScreenVertices;
-    
-    numVertices = numOnScreenVertices;
-    pSourceVert = workVerts;
-    pDestVert = pVertices;
-    pSourceTVert = workTVerts;
-    pDestTVert = pTVertices;
-    pSourceIVert = workIVerts;
-    pDestIVert = pIVertices;
 
-    pWorkVertIter = pDestVert;
-    pWorkTVertIter = pDestTVert;
-    pWorkIVertIter = pDestIVert;
-    
-    pVertIter = workVerts;
-    pTVertIter = workTVerts;
-    pIVertIter = workIVerts;
-    pLastVertIter = &workVerts[numVertices - 1];
-    pLastTVertIter = &workTVerts[numVertices - 1];
-    pLastIVertIter = &workIVerts[numVertices - 1];
+    numVertices = numOnScreenVertices;
+    pLastSourceVert = pSourceVert;
+    pLastDestVert = pDestVert;
+    pLastSourceTVert = pSourceTVert;
+    pLastDestTVert = pDestTVert;
+    pLastSourceIVert = pSourceIVert;
+    pLastDestIVert = pDestIVert;
+
+    pSourceVert = pLastDestVert;
+    pDestVert = pLastSourceVert;
+    pSourceTVert = pLastDestTVert;
+    pDestTVert = pLastSourceTVert;
+    pSourceIVert = pLastDestIVert;
+    pDestIVert = pLastSourceIVert;
+
+    pWorkVertIter = pLastSourceVert;
+    pWorkTVertIter = pLastSourceTVert;
+    pWorkIVertIter = pLastSourceIVert;
+
+    pVertIter = pLastDestVert;
+    pTVertIter = pLastDestTVert;
+    pIVertIter = pLastDestIVert;
+    pLastIVertIter = &pSourceIVert[numVertices - 1];
+    pLastVertIter = &pLastDestVert[numVertices - 1];
+    pLastTVertIter = &pTVertIter[numVertices - 1];
 
     numOnScreenVertices = 0;
     for (int i = 0; i < numVertices; pLastVertIter = pVertIter++, pLastIVertIter = pIVertIter++, pLastTVertIter = pTVertIter++, i++)
@@ -1823,7 +1909,7 @@ int rdClip_Face3GT(rdClipFrustum *pClipFrustum, rdVector3 *pVertices, rdVector2 
 
     if ( numOnScreenVertices < 3 )
         return numOnScreenVertices;
-    
+
     numVertices = numOnScreenVertices;
     pLastSourceVert = pSourceVert;
     pLastDestVert = pDestVert;
@@ -1901,6 +1987,7 @@ int rdClip_Face3GT(rdClipFrustum *pClipFrustum, rdVector3 *pVertices, rdVector2 
         return numOnScreenVertices;
     }
 
+#ifndef RDCLIP_CLIP_ZFAR_FIRST
     if (pClipFrustum->bClipFar)
     {
         numVertices = numOnScreenVertices;
@@ -1970,6 +2057,7 @@ int rdClip_Face3GT(rdClipFrustum *pClipFrustum, rdVector3 *pVertices, rdVector2 
             return numOnScreenVertices;
         }
     }
+#endif
 
     if ( pDestVert != pVertices )
     {

@@ -1007,7 +1007,8 @@ void sithRender_NoClip(sithSector *sector, rdClipFrustum *frustumArg, flex_t a3,
         frustum = &sithRender_clipFrustums[sithRender_numClipFrustums++];
         _memcpy(frustum, frustumArg, sizeof(rdClipFrustum));
         thing = sector->thingsList;
-        sector->clipFrustum = frustum;
+        //sector->clipFrustum = frustum;
+        sector->clipFrustum = rdCamera_pCurCamera->pClipFrustum;
         lightIdx = sithRender_numLights;
 
         // Added: safety
@@ -1254,6 +1255,7 @@ void sithRender_RenderLevelGeometry()
 #ifdef TARGET_TWL
     int skip_this_surface = 1;
     rdroid_curAcceleration = 1;
+    sithRender_flag &= ~0x8; // Drops render time by 2/3 by rendering by n-gons instead of tris
 #endif
 
     if ( rdroid_curAcceleration )
@@ -1323,7 +1325,7 @@ void sithRender_RenderLevelGeometry()
                 continue;
             vertices_alloc = sithWorld_pCurrentWorld->vertices;
 
-            // TODO macro/vector func?
+            // TODO macro/vector func? Backface culling
             flex_t dist = (sithCamera_currentCamera->vec3_1.z - vertices_alloc[*v65->surfaceInfo.face.vertexPosIdx].z) * v65->surfaceInfo.face.normal.z
                + (sithCamera_currentCamera->vec3_1.y - vertices_alloc[*v65->surfaceInfo.face.vertexPosIdx].y) * v65->surfaceInfo.face.normal.y
                + (sithCamera_currentCamera->vec3_1.x - vertices_alloc[*v65->surfaceInfo.face.vertexPosIdx].x) * v65->surfaceInfo.face.normal.x;
@@ -1372,8 +1374,34 @@ void sithRender_RenderLevelGeometry()
                 v65->field_4 = sithRender_lastRenderTick;
             }
 
-            // Render sky vertices specifically?
-            if ( (sithRender_flag & 8) == 0 || v65->surfaceInfo.face.numVertices <= 3 || (v65->surfaceFlags & (SITH_SURFACE_CEILING_SKY|SITH_SURFACE_HORIZON_SKY)) != 0 || !v65->surfaceInfo.face.lightingMode )
+            // TODO: sphere culling?
+#if 0
+            if (!v65->surfaceInfo.face.radius) {
+                rdVector3* vBase = &sithRender_idxInfo.vertices[*v65->surfaceInfo.face.vertexPosIdx];
+                rdVector3 addedVerts = {0};
+                for (int idx = 0; idx < v65->surfaceInfo.face.numVertices; idx++) {
+                    int fullIdx = v65->surfaceInfo.face.vertexPosIdx[idx];
+                    rdVector3* pIter = &sithRender_idxInfo.vertices[fullIdx];
+                    rdVector_Add3Acc(&addedVerts, pIter);
+                }
+                rdVector_Scale3Acc(&addedVerts, 1.0 / (flex_t)v65->surfaceInfo.face.numVertices);
+
+                //v65->surfaceInfo.face.radius = stdMath_Max(rdVector_Dist3(&addedVerts, vBase), v65->surfaceInfo.face.radius);
+                for (int idx = 0; idx < v65->surfaceInfo.face.numVertices; idx++) {
+                    int fullIdx = v65->surfaceInfo.face.vertexPosIdx[idx];
+                    rdVector3* pIter = &sithRender_idxInfo.vertices[fullIdx];
+                    v65->surfaceInfo.face.radius = stdMath_Max(rdVector_Dist3(&addedVerts, pIter), v65->surfaceInfo.face.radius);
+                }
+            }
+            if (!rdClip_SphereInFrustrum(/*level_idk->clipFrustum*/rdCamera_pCurCamera->pClipFrustum, &sithRender_idxInfo.vertices[*v65->surfaceInfo.face.vertexPosIdx], v65->surfaceInfo.face.radius * 4.0)) {
+                //goto LABEL_92;
+                continue;
+            }
+#endif
+
+            // Render with N-Gons instead of triangle strips if flag 0x8 is unset, or if it's sky vertices
+            BOOL bIsSkySurface = (v65->surfaceFlags & (SITH_SURFACE_CEILING_SKY|SITH_SURFACE_HORIZON_SKY));
+            if ( (sithRender_flag & 8) == 0 || v65->surfaceInfo.face.numVertices <= 3 || bIsSkySurface || !v65->surfaceInfo.face.lightingMode )
             {
                 procEntry = rdCache_GetProcEntry();
                 if ( !procEntry )
@@ -1415,10 +1443,17 @@ void sithRender_RenderLevelGeometry()
                 sithRender_idxInfo.numVertices = v65->surfaceInfo.face.numVertices;
                 texMode3 = texMode2;
                 sithRender_idxInfo.vertexUVIdx = v65->surfaceInfo.face.vertexUVIdx;
-                
+
                 // MOTS added
                 if (rdGetVertexColorMode() == 0) {
                     sithRender_idxInfo.intensities = v65->surfaceInfo.intensities;
+
+                    // HACK: We adjust the sky Z later
+#ifdef TARGET_TWL
+                    if (bIsSkySurface) {
+                        level_idk->clipFrustum->bClipFar = 0;
+                    }
+#endif
                     rdPrimit3_ClipFace(level_idk->clipFrustum, 
                                        procEntry->geometryMode, 
                                        procEntry->lightingMode, 
@@ -1426,6 +1461,9 @@ void sithRender_RenderLevelGeometry()
                                        &sithRender_idxInfo, 
                                        &meshinfo_out, 
                                        &v65->surfaceInfo.face.clipIdk);
+#ifdef TARGET_TWL
+                    level_idk->clipFrustum->bClipFar = 1;
+#endif
                     /*rdPrimit3_NoClipFace(/*level_idk->clipFrustum,* / 
                                        procEntry->geometryMode, 
                                        procEntry->lightingMode, 

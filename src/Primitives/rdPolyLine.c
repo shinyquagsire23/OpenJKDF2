@@ -388,6 +388,8 @@ void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdMesh
     else
         procEntry->ambientLight = 0.0;
 
+    // Software renderer optimizations, skip
+#ifndef TARGET_TWL
     if ( procEntry->lightingMode )
     {
         if ( procEntry->ambientLight < 1.0 )
@@ -450,6 +452,12 @@ void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdMesh
             procEntry->light_level_static = 1.0;
         }
     }
+#else
+    if ( procEntry->lightingMode == 3 )
+    {
+        procEntry->light_level_static = *procEntry->vertexIntensities;
+    }
+#endif
     
     int procFaceFlags = 1;
     if ( procEntry->geometryMode >= 4 )
@@ -462,5 +470,9 @@ void rdPolyLine_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdMesh
     procEntry->type = face->type;
     procEntry->extralight = face->extraLight;
     procEntry->material = face->material;
+
+    // Added: Polylines should always be drawn
+    rdMaterial_EnsureDataForced(procEntry->material);
+
     rdCache_AddProcFace(0, mesh_out.numVertices, procFaceFlags);
 }

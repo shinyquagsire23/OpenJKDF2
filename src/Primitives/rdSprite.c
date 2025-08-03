@@ -248,6 +248,8 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     else
         procEntry->ambientLight = 0.0;
 
+    // Software renderer optimizations
+#ifndef TARGET_TWL
     if ( procEntry->lightingMode )
     {
         if ( procEntry->ambientLight < 1.0 )
@@ -304,6 +306,12 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
             procEntry->lightingMode = rdColormap_pCurMap == rdColormap_pIdentityMap ? 0 : 2;
         }
     }
+#else
+    if ( procEntry->lightingMode == 3 )
+    {
+        procEntry->light_level_static = *procEntry->vertexIntensities;
+    }
+#endif
 
     int procFlags = 1;
     if ( procEntry->geometryMode >= 4 )
@@ -316,6 +324,9 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     procEntry->type = sprite->face.type;
     procEntry->extralight = sprite->face.extraLight;
     procEntry->material = sprite->face.material;
+
+    // Added: Sprites should always be drawn
+    rdMaterial_EnsureDataForced(procEntry->material);
 
     rdCache_AddProcFace(0, mesh_out.numVertices, procFlags);
     return 1;

@@ -1516,6 +1516,10 @@ typedef struct rdFace
     uint32_t wallCel;
     rdVector2 clipIdk;
     flex_t extraLight;
+    // TODO: sphere culling?
+#if 0
+    flex_t radius;
+#endif
     rdVector3 normal;
 } rdFace;
 

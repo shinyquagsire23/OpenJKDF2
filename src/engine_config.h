@@ -322,7 +322,8 @@
 
 // Keep rdClip buffers in stack (DTCM)
 #define RDCLIP_WORK_BUFFERS_IN_STACK_MEM
-#define RDCLIP_COPY_VERTS_TO_STACK
+//#define RDCLIP_COPY_VERTS_TO_STACK
+#define RDCLIP_CLIP_ZFAR_FIRST
 #endif
 
 //#define RDMATERIAL_LRU_LOAD_UNLOAD
@@ -416,6 +417,21 @@ typedef double flex_d_t_type;
 #define FAST_FUNC
 #endif
 #define FAST_DATA __attribute__((section(".itcm.data")))
+
+#include <stdint.h>
+#include <stddef.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+/*extern FAST_FUNC void* memcpy(void* dst, const void* src, size_t len);
+extern FAST_FUNC void* _memcpy(void* dst, const void* src, size_t len);
+extern FAST_FUNC void* __aeabi_memcpy(void* dst, const void* src, size_t len);
+extern FAST_FUNC void* __aeabi_memcpy4(void* dst, const void* src, size_t len);
+extern FAST_FUNC void* __aeabi_memcpy8(void* dst, const void* src, size_t len);*/
+#ifdef __cplusplus
+}
+#endif
 #else
 #define MATH_FUNC
 #define FAST_FUNC

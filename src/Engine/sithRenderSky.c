@@ -52,8 +52,8 @@ void sithRenderSky_TransformHorizontal(rdProcEntry *pProcEntry, sithSurfaceInfo 
     {
         pVertXYZ->z = rdCamera_pCurCamera->pClipFrustum->zFar; // zFar
 #ifdef TARGET_TWL
-        //pVertXYZ->z = 2.0f; // TODO figure out actual zfar or do this hack somewhere else
-        pVertXYZ->z = rdCamera_pCurCamera->pClipFrustum->zFar - 0.5;
+        //pVertXYZ->z = 1.0f; // TODO figure out actual zfar or do this hack somewhere else
+        pVertXYZ->z = rdCamera_pCurCamera->pClipFrustum->zFar - 1.0;
 #endif
 
         tmp1 = (pVertXYZ->x - rdCamera_pCurCamera->canvas->half_screen_width) * sithSector_flt_8553C0;
@@ -84,30 +84,50 @@ void sithRenderSky_TransformVertical(rdProcEntry *pProcEntry, sithSurfaceInfo *p
     pProcEntry->textureMode = sithRender_texMode > RD_TEXTUREMODE_AFFINE ? RD_TEXTUREMODE_AFFINE : sithRender_texMode;
 #endif
 
+    // Jones3D does this, idk
+#ifdef QOL_IMPROVEMENTS
+    //float invMatWidth = 1.0f / (float)pSurfaceInfo->face.material->texinfos[0]->texture_ptr->texture_struct[0]->format.width;
+    //float invMatHeight = 1.0f / (float)pSurfaceInfo->face.material->texinfos[0]->texture_ptr->texture_struct[0]->format.height;
+#endif
+
+    flex_t maxTmp = 0.0;
     for (uint32_t i = 0; i < num_vertices; i++)
     {
         rdMatrix_TransformPoint34(&a2a, &pUntransformedVerts[i], &rdCamera_camMatrix);
         rdVector_Sub3Acc(&a2a, &sithCamera_currentCamera->vec3_1);
+
+        // This seems to bug out when a2a.z < 0.0 (not sure how that's even happening)
         rdVector_Normalize3(&a1a, &a2a);
-        
+
+        const flex_t hitTestMaxZ = 1000.0;
         flex_t tmp = 0.0;
-        if (!sithIntersect_SphereHit(&sithCamera_currentCamera->vec3_1, &a1a, 1000.0, 0.0, &sithSector_surfaceNormal, &sithSector_zMaxVec, &tmp, 0)) {
-            tmp = 1000.0;
+        if (!sithIntersect_SphereHit(&sithCamera_currentCamera->vec3_1, &a1a, hitTestMaxZ, 0.0, &sithSector_surfaceNormal, &sithSector_zMaxVec, &tmp, 0)) {
+            tmp = hitTestMaxZ;
         }
         rdVector_Scale3Acc(&a1a, tmp);
         pVertUV = &pProcEntry->vertexUVs[i];
         rdVector_Add3Acc(&a1a, &sithCamera_currentCamera->vec3_1);
         rdVector_Scale2(pVertUV, (rdVector2*)&a1a, 16.0);
+
+#ifdef QOL_IMPROVEMENTS
+        //pVertUV->x *= invMatWidth;
+        //pVertUV->y *= invMatHeight;
+#endif
+
         rdVector_Add2Acc(pVertUV, &sithWorld_pCurrentWorld->ceilingSkyOffs);
         rdVector_Add2Acc(pVertUV, &pSurfaceInfo->face.clipIdk);
         rdMatrix_TransformPoint34(&vertex_out, &a1a, &sithCamera_currentCamera->rdCam.view_matrix);
+
+#ifdef TARGET_TWL
+        vertex_out.y *= 0.05;
+#endif
 
         pProcEntry->vertices[i].z = vertex_out.y;
 
         // TODO: There's a bug where facing a vertical wall of sky starts dividing strangely
 #ifdef QOL_IMPROVEMENTS
         // Added: Clip Z to zfar
-        pProcEntry->vertices[i].z = stdMath_Clamp(pProcEntry->vertices[i].z, 0.0f, rdCamera_pCurCamera->pClipFrustum->zFar - 0.5);
+        pProcEntry->vertices[i].z = stdMath_Clamp(pProcEntry->vertices[i].z, 0.0f, rdCamera_pCurCamera->pClipFrustum->zFar - 1.0);
 #endif
 #ifdef TARGET_TWL
         //pProcEntry->vertices[i].z = 2.0f; // TODO figure out actual zfar or do this hack somewhere else

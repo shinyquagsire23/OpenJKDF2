@@ -409,6 +409,10 @@ int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
                 v5->lightingMode = v35;
                 v29 = particle->vertexCel;
                 v5->material = particle->material;
+
+                // Added: Particles should always be drawn
+                rdMaterial_EnsureDataForced(v5->material);
+
                 v5->ambientLight = matrix_4_3a;
                 v30 = v29[v32];
                 v5->geometryMode = 3;

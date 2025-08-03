@@ -1563,6 +1563,9 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
 
     int isIdentityMap = (rdColormap_pCurMap == rdColormap_pIdentityMap);
     procEntry->wallCel = face->wallCel;
+
+    // These are software renderer optimizations, skip
+#ifndef TARGET_TWL
     if ( procEntry->ambientLight < 1.0 )
     {
         if ( procEntry->lightingMode == RD_LIGHTMODE_DIFFUSE )
@@ -1575,22 +1578,19 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
             {
                 procEntry->lightingMode = RD_LIGHTMODE_NOTLIT;
             }
-            goto LABEL_44;
         }
-        if ( (rdGetVertexColorMode() != 0) || procEntry->lightingMode != RD_LIGHTMODE_GOURAUD )
-            goto LABEL_44;
+        else if (!((rdGetVertexColorMode() != 0) || procEntry->lightingMode != RD_LIGHTMODE_GOURAUD)) {
+            for (int i = 1; i < vertexDst.numVertices; i++ )
+            {
+                    flex_t level = procEntry->vertexIntensities[i] - procEntry->vertexIntensities[0];
+                    if ( level < 0.0 )
+                        level = -level;
 
-        for (int i = 1; i < vertexDst.numVertices; i++ )
-        {
-                flex_t level = procEntry->vertexIntensities[i] - procEntry->vertexIntensities[0];
-                if ( level < 0.0 )
-                    level = -level;
-
-                if ( level > 0.015625 )
-                    goto LABEL_44;
-        }
-        
-        if ( procEntry->vertexIntensities[0] != 1.0 )
+                    if ( level > 0.015625 )
+                        break;
+            }
+        }        
+        else if ( procEntry->vertexIntensities[0] != 1.0 )
         {
             if ( procEntry->vertexIntensities[0] == 0.0 )
             {
@@ -1602,27 +1602,31 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
                 procEntry->lightingMode = RD_LIGHTMODE_DIFFUSE;
                 procEntry->light_level_static = procEntry->vertexIntensities[0];
             }
-            goto LABEL_44;
         }
-        if ( isIdentityMap )
+        else if ( isIdentityMap )
         {
             procEntry->lightingMode = RD_LIGHTMODE_FULLYLIT;
-            goto LABEL_44;
         }
-
-        procEntry->lightingMode = RD_LIGHTMODE_DIFFUSE;
-        procEntry->light_level_static = 1.0;
-        goto LABEL_44;
+        else {
+            procEntry->lightingMode = RD_LIGHTMODE_DIFFUSE;
+            procEntry->light_level_static = 1.0;
+        }
     }
-    if ( !isIdentityMap )
+    else if ( !isIdentityMap )
     {
         procEntry->lightingMode = RD_LIGHTMODE_DIFFUSE;
         procEntry->light_level_static = 1.0;
-        goto LABEL_44;
     }
-    procEntry->lightingMode = RD_LIGHTMODE_FULLYLIT;
+    else {
+        procEntry->lightingMode = RD_LIGHTMODE_FULLYLIT;
+    }
+#else
+    if ( procEntry->lightingMode == 3 )
+    {
+        procEntry->light_level_static = *procEntry->vertexIntensities;
+    }
+#endif
 
-LABEL_44:
     flags = 1;
     if ( procEntry->geometryMode >= 4 )
         flags = 3;
