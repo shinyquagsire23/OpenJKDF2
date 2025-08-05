@@ -90,6 +90,8 @@ for (int i = 0; i < len; i++)
 }
 #endif
 
+    //printf("open: %s %s\n", fpath, mode);
+
     stdFile_t ret;
 #ifndef TARGET_TWL
     ret = (stdFile_t)fcaseopen(tmp, mode);

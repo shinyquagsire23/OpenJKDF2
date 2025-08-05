@@ -1285,7 +1285,7 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
 
     rdMatrix_TransformPoint34(&vertex_out, &mat->scale, &rdCamera_pCurCamera->view_matrix);
     if ( thingFrustrumCull )
-        meshFrustrumCull = rdroid_curCullFlags & 1 ? rdClip_SphereInFrustrum(rdCamera_pCurCamera->pClipFrustum, &vertex_out, pCurMesh->radius) : 1;
+        meshFrustrumCull = (rdroid_curCullFlags & 1) ? rdClip_SphereInFrustrum(rdCamera_pCurCamera->pClipFrustum, &vertex_out, pCurMesh->radius) : 1;
     else
         meshFrustrumCull = 0;
 

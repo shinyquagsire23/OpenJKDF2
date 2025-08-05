@@ -29,6 +29,7 @@
 
 #ifdef TARGET_TWL
 #define MATH_FUNC __attribute__((target("arm")))
+#define FAST_FUNC __attribute__((section(".itcm.text"), long_call))
 #include <nds/arm9/math.h>
 __attribute__((always_inline)) static inline s32 div64_mine_(s64 num, s32 den)
 {
@@ -41,6 +42,7 @@ __attribute__((always_inline)) static inline s32 div64_mine_(s64 num, s32 den)
 }
 #else
 #define MATH_FUNC
+#define FAST_FUNC
 #endif
 
 #if __cplusplus >= 201402L
@@ -143,7 +145,7 @@ struct divide_by_zero : std::exception {
 };
 
 template <size_t I, size_t F>
-CONSTEXPR14 fixed<I, F> divide(fixed<I, F> numerator, fixed<I, F> denominator, fixed<I, F> &remainder, typename std::enable_if<type_from_size<I + F>::next_size::is_specialized>::type * = nullptr) {
+FAST_FUNC CONSTEXPR14 fixed<I, F> divide(fixed<I, F> numerator, fixed<I, F> denominator, fixed<I, F> &remainder, typename std::enable_if<type_from_size<I + F>::next_size::is_specialized>::type * = nullptr) {
 #ifdef TARGET_TWL
 	return fixed<I, F>::from_base(div64_mine_((s64)numerator.to_raw() << F, denominator.to_raw()));
 #else
@@ -164,7 +166,7 @@ CONSTEXPR14 fixed<I, F> divide(fixed<I, F> numerator, fixed<I, F> denominator, f
 }
 
 template <size_t I, size_t F>
-CONSTEXPR14 fixed<I, F> divide(fixed<I, F> numerator, fixed<I, F> denominator, fixed<I, F> &remainder, typename std::enable_if<!type_from_size<I + F>::next_size::is_specialized>::type * = nullptr) {
+FAST_FUNC CONSTEXPR14 fixed<I, F> divide(fixed<I, F> numerator, fixed<I, F> denominator, fixed<I, F> &remainder, typename std::enable_if<!type_from_size<I + F>::next_size::is_specialized>::type * = nullptr) {
 #ifdef TARGET_TWL
 	return fixed<I, F>::from_base(div64_mine_((s64)numerator.to_raw() << F, denominator.to_raw()));
 #else
@@ -235,14 +237,16 @@ CONSTEXPR14 fixed<I, F> divide(fixed<I, F> numerator, fixed<I, F> denominator, f
 
 // this is the usual implementation of multiplication
 template <size_t I, size_t F>
-__attribute__((always_inline)) MATH_FUNC CONSTEXPR14 fixed<I, F> multiply(fixed<I, F> lhs, fixed<I, F> rhs, typename std::enable_if<type_from_size<I + F>::next_size::is_specialized>::type * = nullptr) {
+__attribute__((always_inline)) MATH_FUNC CONSTEXPR14 fixed<I, F> multiply(const fixed<I, F>& lhs, const fixed<I, F>& rhs, typename std::enable_if<type_from_size<I + F>::next_size::is_specialized>::type * = nullptr) {
 
 	using next_type = typename fixed<I, F>::next_type;
 	using base_type = typename fixed<I, F>::base_type;
 
 	constexpr size_t fractional_bits = fixed<I, F>::fractional_bits;
 
-	next_type t(static_cast<next_type>(lhs.to_raw()) * static_cast<next_type>(rhs.to_raw()));
+	const next_type lhsNxt = static_cast<next_type>(lhs.to_raw());
+	const next_type rhsNxt = static_cast<next_type>(rhs.to_raw());
+	next_type t(lhsNxt * rhsNxt);
 	t >>= fractional_bits;
 
 	return fixed<I, F>::from_base(next_to_base<base_type>(t));
@@ -323,6 +327,10 @@ public: // conversion
 	template <size_t I2, size_t F2>
 	CONSTEXPR14 explicit fixed(fixed<I2, F2> other) {
 		static_assert(I2 <= I && F2 <= F, "Scaling conversion can only upgrade types");
+		if (I2 == I && F2 == F) {
+			data_ = other.data_;
+			return;
+		}
 		using T = fixed<I2, F2>;
 
 		const base_type fractional = (other.data_ & T::fractional_mask);
@@ -457,13 +465,13 @@ public: // binary math operators, effects underlying bit pattern since these
 	}
 
 	template <class Integer, class = typename std::enable_if<std::is_integral<Integer>::value>::type>
-	CONSTEXPR14 fixed &operator>>=(Integer n) {
+	__attribute__((always_inline)) CONSTEXPR14 fixed &operator>>=(Integer n) {
 		data_ >>= n;
 		return *this;
 	}
 
 	template <class Integer, class = typename std::enable_if<std::is_integral<Integer>::value>::type>
-	CONSTEXPR14 fixed &operator<<=(Integer n) {
+	__attribute__((always_inline)) CONSTEXPR14 fixed &operator<<=(Integer n) {
 		data_ <<= n;
 		return *this;
 	}
@@ -579,7 +587,7 @@ public:
 
 // if we have the same fractional portion, but differing integer portions, we trivially upgrade the smaller type
 template <size_t I1, size_t I2, size_t F>
-CONSTEXPR14 typename std::conditional<I1 >= I2, fixed<I1, F>, fixed<I2, F>>::type operator+(fixed<I1, F> lhs, fixed<I2, F> rhs) {
+__attribute__((always_inline)) CONSTEXPR14 typename std::conditional<I1 >= I2, fixed<I1, F>, fixed<I2, F>>::type operator+(fixed<I1, F> lhs, fixed<I2, F> rhs) {
 
 	using T = typename std::conditional<
 		I1 >= I2,
@@ -592,7 +600,7 @@ CONSTEXPR14 typename std::conditional<I1 >= I2, fixed<I1, F>, fixed<I2, F>>::typ
 }
 
 template <size_t I1, size_t I2, size_t F>
-CONSTEXPR14 typename std::conditional<I1 >= I2, fixed<I1, F>, fixed<I2, F>>::type operator-(fixed<I1, F> lhs, fixed<I2, F> rhs) {
+__attribute__((always_inline)) CONSTEXPR14 typename std::conditional<I1 >= I2, fixed<I1, F>, fixed<I2, F>>::type operator-(fixed<I1, F> lhs, fixed<I2, F> rhs) {
 
 	using T = typename std::conditional<
 		I1 >= I2,
@@ -631,7 +639,7 @@ __attribute__((always_inline)) CONSTEXPR14 typename std::conditional<I1 >= I2, f
 }
 
 template <size_t I, size_t F>
-std::ostream &operator<<(std::ostream &os, fixed<I, F> f) {
+__attribute__((always_inline)) std::ostream &operator<<(std::ostream &os, fixed<I, F> f) {
 	os << f.to_double();
 	return os;
 }
@@ -644,19 +652,62 @@ CONSTEXPR14 fixed<I, F> operator+(fixed<I, F> lhs, fixed<I, F> rhs) {
 }
 
 template <size_t I, size_t F>
-CONSTEXPR14 fixed<I, F> operator-(fixed<I, F> lhs, fixed<I, F> rhs) {
+__attribute__((always_inline)) CONSTEXPR14 fixed<I, F> operator-(fixed<I, F> lhs, fixed<I, F> rhs) {
 	lhs -= rhs;
 	return lhs;
 }
 
 template <size_t I, size_t F>
 __attribute__((always_inline))  CONSTEXPR14 fixed<I, F> operator*(fixed<I, F> lhs, fixed<I, F> rhs) {
+	// Special case 0, -1, 1 so that const expressions are collapsed without a shitton of bitshifts
+	if (__builtin_constant_p(rhs)) {
+		if (rhs == 0) {
+	        return fixed<I, F>(0);
+	    } 
+	    else if (rhs == 1) {
+	        return lhs;
+	    }
+	    else if (rhs == -1) {
+	        return -lhs;
+	    }
+	}
+	else if (__builtin_constant_p(lhs)) {
+		if (lhs == 0) {
+	        return fixed<I, F>(0);
+	    } 
+	    else if (lhs == 1) {
+	        return rhs;
+	    }
+	    else if (lhs == -1) {
+	        return -rhs;
+	    }
+	}
 	lhs *= rhs;
 	return lhs;
 }
 
 template <size_t I, size_t F>
 __attribute__((always_inline))  CONSTEXPR14 fixed<I, F> operator/(fixed<I, F> lhs, fixed<I, F> rhs) {
+	// Special case 0, -1, 1 so that const expressions are collapsed without a shitton of bitshifts
+	if (__builtin_constant_p(rhs)) {
+		if (rhs == 1) {
+	        return lhs;
+	    }
+	    else if (rhs == -1) {
+	        return -lhs;
+	    }
+	}
+	else if (__builtin_constant_p(lhs)) {
+		if (lhs == 0) {
+	        return fixed<I, F>(0);
+	    } 
+	    else if (lhs == 1) {
+	        return rhs;
+	    }
+	    else if (lhs == -1) {
+	        return -rhs;
+	    }
+	}
 	lhs /= rhs;
 	return lhs;
 }
@@ -668,46 +719,89 @@ CONSTEXPR14 fixed<I, F> operator+(fixed<I, F> lhs, Number rhs) {
 }
 
 template <size_t I, size_t F, class Number, class = typename std::enable_if<std::is_arithmetic<Number>::value>::type>
-CONSTEXPR14 fixed<I, F> operator-(fixed<I, F> lhs, Number rhs) {
+__attribute__((always_inline)) CONSTEXPR14 fixed<I, F> operator-(fixed<I, F> lhs, Number rhs) {
 	lhs -= fixed<I, F>(rhs);
 	return lhs;
 }
 
 template <size_t I, size_t F, class Number, class = typename std::enable_if<std::is_arithmetic<Number>::value>::type>
 __attribute__((always_inline)) CONSTEXPR14 fixed<I, F> operator*(fixed<I, F> lhs, Number rhs) {
+	// Special case 0, -1, 1 so that const expressions are collapsed without a shitton of bitshifts
+	if (__builtin_constant_p(rhs)) {
+		if (rhs == 0) {
+	        return fixed<I, F>(0);
+	    } 
+	    else if (rhs == 1) {
+	        return lhs;
+	    }
+	    else if (rhs == -1) {
+	        return -lhs;
+	    }
+	}
 	lhs *= fixed<I, F>(rhs);
 	return lhs;
 }
 
 template <size_t I, size_t F, class Number, class = typename std::enable_if<std::is_arithmetic<Number>::value>::type>
 __attribute__((always_inline)) CONSTEXPR14 fixed<I, F> operator/(fixed<I, F> lhs, Number rhs) {
+	// Special case 0, -1, 1 so that const expressions are collapsed without a shitton of bitshifts
+	if (__builtin_constant_p(rhs)) {
+		if (rhs == 0) {
+	        return fixed<I, F>(0);
+	    } 
+	    else if (rhs == 1) {
+	        return lhs;
+	    }
+	    else if (rhs == -1) {
+	        return -lhs;
+	    }
+	}
 	lhs /= fixed<I, F>(rhs);
 	return lhs;
 }
 
 template <size_t I, size_t F, class Number, class = typename std::enable_if<std::is_arithmetic<Number>::value>::type>
-CONSTEXPR14 fixed<I, F> operator+(Number lhs, fixed<I, F> rhs) {
+__attribute__((always_inline)) CONSTEXPR14 fixed<I, F> operator+(Number lhs, fixed<I, F> rhs) {
 	fixed<I, F> tmp(lhs);
 	tmp += rhs;
 	return tmp;
 }
 
 template <size_t I, size_t F, class Number, class = typename std::enable_if<std::is_arithmetic<Number>::value>::type>
-CONSTEXPR14 fixed<I, F> operator-(Number lhs, fixed<I, F> rhs) {
+__attribute__((always_inline)) CONSTEXPR14 fixed<I, F> operator-(Number lhs, fixed<I, F> rhs) {
 	fixed<I, F> tmp(lhs);
 	tmp -= rhs;
 	return tmp;
 }
 
 template <size_t I, size_t F, class Number, class = typename std::enable_if<std::is_arithmetic<Number>::value>::type>
-CONSTEXPR14 fixed<I, F> operator*(Number lhs, fixed<I, F> rhs) {
+__attribute__((always_inline)) CONSTEXPR14 fixed<I, F> operator*(Number lhs, fixed<I, F> rhs) {
+	// Special case 0, -1, 1 so that const expressions are collapsed without a shitton of bitshifts
+	if (__builtin_constant_p(lhs)) {
+		if (lhs == 0) {
+	        return fixed<I, F>(0);
+	    } 
+	    else if (lhs == 1) {
+	        return rhs;
+	    }
+	    else if (lhs == -1) {
+	        return -rhs;
+	    }
+	}
 	fixed<I, F> tmp(lhs);
 	tmp *= rhs;
 	return tmp;
 }
 
+
 template <size_t I, size_t F, class Number, class = typename std::enable_if<std::is_arithmetic<Number>::value>::type>
-CONSTEXPR14 fixed<I, F> operator/(Number lhs, fixed<I, F> rhs) {
+__attribute__((always_inline)) CONSTEXPR14 fixed<I, F> operator/(Number lhs, fixed<I, F> rhs) {
+	// Special case 0, -1, 1 so that const expressions are collapsed without a shitton of bitshifts
+	if (__builtin_constant_p(lhs)) {
+		if (lhs == 0) {
+	        return fixed<I, F>(0);
+	    }
+	}
 	fixed<I, F> tmp(lhs);
 	tmp /= rhs;
 	return tmp;
@@ -715,13 +809,13 @@ CONSTEXPR14 fixed<I, F> operator/(Number lhs, fixed<I, F> rhs) {
 
 // shift operators
 template <size_t I, size_t F, class Integer, class = typename std::enable_if<std::is_integral<Integer>::value>::type>
-CONSTEXPR14 fixed<I, F> operator<<(fixed<I, F> lhs, Integer rhs) {
+__attribute__((always_inline)) CONSTEXPR14 fixed<I, F> operator<<(fixed<I, F> lhs, Integer rhs) {
 	lhs <<= rhs;
 	return lhs;
 }
 
 template <size_t I, size_t F, class Integer, class = typename std::enable_if<std::is_integral<Integer>::value>::type>
-CONSTEXPR14 fixed<I, F> operator>>(fixed<I, F> lhs, Integer rhs) {
+__attribute__((always_inline)) CONSTEXPR14 fixed<I, F> operator>>(fixed<I, F> lhs, Integer rhs) {
 	lhs >>= rhs;
 	return lhs;
 }

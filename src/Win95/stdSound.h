@@ -166,7 +166,7 @@ void stdSound_BufferSetFrequency(stdSound_buffer_t* a1, int a2);
 stdSound_buffer_t* stdSound_BufferDuplicate(stdSound_buffer_t* sound);
 void stdSound_IA3D_idk(flex_t a);
 int stdSound_BufferStop(stdSound_buffer_t* a1);
-void stdSound_BufferSetVolume(stdSound_buffer_t* a1, flex_t a2);
+MATH_FUNC void stdSound_BufferSetVolume(stdSound_buffer_t* a1, flex_t a2);
 int stdSound_3DSetMode(stdSound_3dBuffer_t* a1, int a2);
 stdSound_3dBuffer_t* stdSound_BufferQueryInterface(stdSound_buffer_t* a1);
 void stdSound_CommitDeferredSettings();

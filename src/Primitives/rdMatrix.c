@@ -14,7 +14,7 @@ const rdMatrix44 rdroid_identMatrix44 = {{1.0, 0.0, 0.0, 0.0},
                                          {0.0, 0.0, 1.0, 0.0}, 
                                          {0.0, 0.0, 0.0, 1.0}};
 
-void rdMatrix_Build34(rdMatrix34 *out, const rdVector3 *rot, const rdVector3 *pos)
+void rdMatrix_Build34(rdMatrix34* NO_ALIAS out, const rdVector3* NO_ALIAS rot, const rdVector3* NO_ALIAS pos)
 {
     flex_t x_rad_sin, x_rad_cos;
     flex_t y_rad_sin, y_rad_cos;
@@ -37,7 +37,7 @@ void rdMatrix_Build34(rdMatrix34 *out, const rdVector3 *rot, const rdVector3 *po
     out->scale.z = pos->z;
 }
 
-void rdMatrix_BuildFromLook34(rdMatrix34 *out, const rdVector3 *lookAt)
+void rdMatrix_BuildFromLook34(rdMatrix34* NO_ALIAS out, const rdVector3* NO_ALIAS lookAt)
 {
     rdVector_Copy3(&out->lvec, lookAt);
 
@@ -207,7 +207,7 @@ void rdMatrix_BuildScale44(rdMatrix44 *out, const rdVector3 *scale)
     out->vD.w = 1.0;
 }
 
-void rdMatrix_BuildFromVectorAngle34(rdMatrix34 *out, const rdVector3 *v, flex_t angle)
+void rdMatrix_BuildFromVectorAngle34(rdMatrix34* NO_ALIAS out, const rdVector3* NO_ALIAS v, flex_t angle)
 {
     flex_t v12;
     flex_t v44;
@@ -265,7 +265,7 @@ void rdMatrix_BuildFromVectorAngle34(rdMatrix34 *out, const rdVector3 *v, flex_t
 }
 
 // MOTS altered
-void rdMatrix_LookAt(rdMatrix34 *out, const rdVector3 *v1, const rdVector3 *v2, flex_t angle)
+void rdMatrix_LookAt(rdMatrix34 *out, const rdVector3* NO_ALIAS v1, const rdVector3* NO_ALIAS v2, flex_t angle)
 {
     flex_t v7;
     flex_t v11;
@@ -316,7 +316,7 @@ void rdMatrix_LookAt(rdMatrix34 *out, const rdVector3 *v1, const rdVector3 *v2, 
     out->scale.z = v1->z;
 }
 
-void rdMatrix_ExtractAngles34(const rdMatrix34 *in, rdVector3 *out)
+void rdMatrix_ExtractAngles34(const rdMatrix34* NO_ALIAS in, rdVector3 *out)
 {
     flex_t v7; // ST08_4
     flex_t v9; // ST24_4
@@ -484,7 +484,7 @@ void rdMatrix_Transpose44(rdMatrix44 *out, const rdMatrix44 *src)
     _memcpy(out, &tmp, sizeof(rdMatrix44));
 }
 
-void rdMatrix_Multiply34(rdMatrix34 *out, const rdMatrix34 *mat1, const rdMatrix34 *mat2)
+void rdMatrix_Multiply34(rdMatrix34* NO_ALIAS out, const rdMatrix34* NO_ALIAS mat1, const rdMatrix34* NO_ALIAS mat2)
 {
     out->rvec.x = (mat1->uvec.x * mat2->rvec.z)
                   + (mat2->rvec.y * mat1->lvec.x)
@@ -547,35 +547,35 @@ void rdMatrix_Multiply44(rdMatrix44 *out, const rdMatrix44 *mat1, const rdMatrix
     out->vD.w = mat2->vD.w * mat1->vD.w + mat2->vD.y * mat1->vB.w + mat2->vD.x * mat1->vA.w + mat2->vD.z * mat1->vC.w;
 }
 
-void rdMatrix_PreMultiply34(rdMatrix34 *mat1, rdMatrix34 *mat2)
+void rdMatrix_PreMultiply34(rdMatrix34 *mat1, const rdMatrix34 *mat2)
 {
     rdMatrix34 tmp;
     _memcpy(&tmp, mat1, sizeof(tmp));
     rdMatrix_Multiply34(mat1, &tmp, mat2);
 }
 
-void rdMatrix_PreMultiply44(rdMatrix44 *mat1, rdMatrix44 *mat2)
+void rdMatrix_PreMultiply44(rdMatrix44 *mat1, const rdMatrix44 *mat2)
 {
     rdMatrix44 tmp;
     _memcpy(&tmp, mat1, sizeof(tmp));
     rdMatrix_Multiply44(mat1, &tmp, mat2);
 }
 
-void rdMatrix_PostMultiply34(rdMatrix34 *mat1, rdMatrix34 *mat2)
+void rdMatrix_PostMultiply34(rdMatrix34 *mat1, const rdMatrix34 *mat2)
 {
     rdMatrix34 tmp;
     _memcpy(&tmp, mat1, sizeof(tmp));
     rdMatrix_Multiply34(mat1, mat2, &tmp);
 }
 
-void rdMatrix_PostMultiply44(rdMatrix44 *mat1, rdMatrix44 *mat2)
+void rdMatrix_PostMultiply44(rdMatrix44 *mat1, const rdMatrix44 *mat2)
 {
     rdMatrix44 tmp;
     _memcpy(&tmp, mat1, sizeof(tmp));
     rdMatrix_Multiply44(mat1, mat2, &tmp);
 }
 
-void rdMatrix_PreRotate34(rdMatrix34 *out, rdVector3 *rot)
+void rdMatrix_PreRotate34(rdMatrix34 *out, const rdVector3 *rot)
 {
     rdMatrix34 tmp;
 
@@ -583,7 +583,7 @@ void rdMatrix_PreRotate34(rdMatrix34 *out, rdVector3 *rot)
     rdMatrix_PreMultiply34(out, &tmp);
 }
 
-void rdMatrix_PreRotate44(rdMatrix44 *out, rdVector3 *rot)
+void rdMatrix_PreRotate44(rdMatrix44 *out, const rdVector3 *rot)
 {
     rdMatrix44 a;
 
@@ -591,7 +591,7 @@ void rdMatrix_PreRotate44(rdMatrix44 *out, rdVector3 *rot)
     rdMatrix_PreMultiply44(out, &a);
 }
 
-void rdMatrix_PostRotate34(rdMatrix34 *out, rdVector3 *rot)
+void rdMatrix_PostRotate34(rdMatrix34 *out, const rdVector3 *rot)
 {
     rdMatrix34 a;
 
@@ -599,7 +599,7 @@ void rdMatrix_PostRotate34(rdMatrix34 *out, rdVector3 *rot)
     rdMatrix_PostMultiply34(out, &a);
 }
 
-void rdMatrix_PostRotate44(rdMatrix44 *out, rdVector3 *rot)
+void rdMatrix_PostRotate44(rdMatrix44 *out, const rdVector3 *rot)
 {
     rdMatrix44 a;
 
@@ -607,7 +607,7 @@ void rdMatrix_PostRotate44(rdMatrix44 *out, rdVector3 *rot)
     rdMatrix_PostMultiply44(out, &a);
 }
 
-void rdMatrix_PreTranslate34(rdMatrix34 *out, rdVector3 *trans)
+void rdMatrix_PreTranslate34(rdMatrix34 *out, const rdVector3 *trans)
 {
     rdMatrix34 mat2;
 
@@ -618,7 +618,7 @@ void rdMatrix_PreTranslate34(rdMatrix34 *out, rdVector3 *trans)
     rdMatrix_PreMultiply34(out, &mat2);
 }
 
-void rdMatrix_PreTranslate44(rdMatrix44 *out, rdVector3 *tV)
+void rdMatrix_PreTranslate44(rdMatrix44 *out, const rdVector3 *tV)
 {
     rdMatrix44 mTmp;
 
@@ -630,7 +630,7 @@ void rdMatrix_PreTranslate44(rdMatrix44 *out, rdVector3 *tV)
     rdMatrix_PreMultiply44(out, &mTmp);
 }
 
-void rdMatrix_PostTranslate34(rdMatrix34 *out, rdVector3 *trans)
+void rdMatrix_PostTranslate34(rdMatrix34 *out, const rdVector3 *trans)
 {
     rdMatrix34 mat2;
 
@@ -641,7 +641,7 @@ void rdMatrix_PostTranslate34(rdMatrix34 *out, rdVector3 *trans)
     rdMatrix_PostMultiply34(out, &mat2);
 }
 
-void rdMatrix_PostTranslate44(rdMatrix44 *out, rdVector3 *tV)
+void rdMatrix_PostTranslate44(rdMatrix44 *out, const rdVector3 *tV)
 {
     rdMatrix44 mTmp;
 
@@ -653,7 +653,7 @@ void rdMatrix_PostTranslate44(rdMatrix44 *out, rdVector3 *tV)
     rdMatrix_PostMultiply44(out, &mTmp);
 }
 
-void rdMatrix_PreScale34(rdMatrix34 *out, rdVector3 *scale)
+void rdMatrix_PreScale34(rdMatrix34 *out, const rdVector3 *scale)
 {
     rdMatrix34 tmp;
 
@@ -672,7 +672,7 @@ void rdMatrix_PreScale34(rdMatrix34 *out, rdVector3 *scale)
     rdMatrix_PreMultiply34(out, &tmp);
 }
 
-void rdMatrix_PreScale44(rdMatrix44 *out, rdVector4 *scale)
+void rdMatrix_PreScale44(rdMatrix44 *out, const rdVector4 *scale)
 {
     rdMatrix44 tmp;
 
@@ -692,7 +692,7 @@ void rdMatrix_PreScale44(rdMatrix44 *out, rdVector4 *scale)
     rdMatrix_PreMultiply44(out, &tmp);
 }
 
-void rdMatrix_PostScale34(rdMatrix34 *out, rdVector3 *scale)
+void rdMatrix_PostScale34(rdMatrix34 *out, const rdVector3 *scale)
 {
     rdMatrix34 tmp;
 
@@ -711,7 +711,7 @@ void rdMatrix_PostScale34(rdMatrix34 *out, rdVector3 *scale)
     rdMatrix_PostMultiply34(out, &tmp);
 }
 
-void rdMatrix_PostScale44(rdMatrix44 *out, rdVector4 *scale)
+void rdMatrix_PostScale44(rdMatrix44 *out, const rdVector4 *scale)
 {
     rdMatrix44 tmp;
 
@@ -731,12 +731,12 @@ void rdMatrix_PostScale44(rdMatrix44 *out, rdVector4 *scale)
     rdMatrix_PostMultiply44(out, &tmp);
 }
 
-void rdMatrix_SetRowVector34(rdMatrix34 *m, int row, rdVector3 *in)
+void rdMatrix_SetRowVector34(rdMatrix34 *m, int row, const rdVector3 *in)
 {
     *(&m->rvec + row) = *in;
 }
 
-void rdMatrix_SetRowVector44(rdMatrix44 *m, int row, rdVector4 *in)
+void rdMatrix_SetRowVector44(rdMatrix44 *m, int row, const rdVector4 *in)
 {
     *(&m->vA + row) = *in;
 }
@@ -783,7 +783,7 @@ void rdMatrix_TransformVector34(rdVector3 *out, const rdVector3 *v, const rdMatr
     out->z = v8 * v9 + v6 * v11 + m->rvec.z * v->x;
 }
 
-void rdMatrix_TransformVector34Acc_0(rdVector3 *a1, const rdVector3 *a2, const rdMatrix34 *a3)
+void rdMatrix_TransformVector34Acc_0(rdVector3* NO_ALIAS a1, const rdVector3* NO_ALIAS a2, const rdMatrix34 *a3)
 {
     flex_d_t v3; // st5
     flex_d_t v4; // st4
@@ -809,7 +809,7 @@ void rdMatrix_TransformVector34Acc_0(rdVector3 *a1, const rdVector3 *a2, const r
     a1->z = v8 * v9 + v6 * v11 + a3->uvec.x * a2->x;
 }
 
-void rdMatrix_TransformVector34Acc(rdVector3 *pAcc, const rdMatrix34 *pIn)
+void rdMatrix_TransformVector34Acc(rdVector3* NO_ALIAS pAcc, const rdMatrix34 *pIn)
 {
     rdVector3 tmp;
 
@@ -846,14 +846,14 @@ void rdMatrix_TransformVector44Acc(rdVector4 *a1, const rdMatrix44 *a2)
     a1->w = v6 + v5;
 }
 
-void rdMatrix_TransformPoint34(rdVector3 *vOut, const rdVector3 *vIn, const rdMatrix34 *camera)
+void rdMatrix_TransformPoint34(rdVector3* NO_ALIAS vOut, const rdVector3* NO_ALIAS vIn, const rdMatrix34 *camera)
 {
     vOut->x = camera->lvec.x * vIn->y + camera->uvec.x * vIn->z + camera->rvec.x * vIn->x + camera->scale.x;
     vOut->y = (camera->lvec.y * vIn->y + camera->uvec.y * vIn->z + camera->rvec.y * vIn->x) + camera->scale.y;
     vOut->z = camera->uvec.z * vIn->z + camera->lvec.z * vIn->y + camera->rvec.z * vIn->x + camera->scale.z;
 }
 
-void rdMatrix_TransformPoint34Acc(rdVector3 *a1, const rdMatrix34 *a2)
+void rdMatrix_TransformPoint34Acc(rdVector3* NO_ALIAS a1, const rdMatrix34 *a2)
 {
     rdVector3 tmp;
     _memcpy(&tmp, a1, sizeof(tmp));

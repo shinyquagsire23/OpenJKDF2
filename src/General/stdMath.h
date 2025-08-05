@@ -79,7 +79,7 @@ MATH_FUNC flex_t stdMath_Sqrt(flex_t a);
 MATH_FUNC flex_t stdMath_ClipPrecision(flex_t val);
 MATH_FUNC flex_t stdMath_Clamp(flex_t val, flex_t valMin, flex_t valMax);
 MATH_FUNC flex_t stdMath_ClampValue(flex_t val, flex_t valAbsMax);
-static inline flex_t stdMath_Fabs(flex_t val)
+__attribute__((always_inline)) static inline flex_t stdMath_Fabs(flex_t val)
 {
     //return fabs(val);
     return (val < 0.0) ? -val : val;

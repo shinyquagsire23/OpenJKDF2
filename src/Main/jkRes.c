@@ -482,6 +482,8 @@ stdFile_t jkRes_FileOpen(const char *fpath, const char *mode)
     if ( resIdx >= 0x20 )
         return (stdFile_t)0;
     v6 = 0;
+
+    // Try in the EXE root (not in resource/), ex "3do\key\kysabrf2.key"
     fhand = pLowLevelHS->fileOpen(fpath, mode);
     if ( fhand )
     {
@@ -497,8 +499,10 @@ stdFile_t jkRes_FileOpen(const char *fpath, const char *mode)
         for (v19 = 0; v19 < 5; v19++)
         {
             v11 = jkRes_gCtx.aGobDirectories[v19].name;
-            if (!v11) continue;
+            if (!v11 || !v11[0]) continue; // Added: Don't check in the root directory on Linux
 
+            // Try in episode/[episode name], resource/, etc
+            // ex: "episode\JK1\3do\key\kysabrf2.key", "resource/3do\key\kysabrf2.key"
             stdString_snprintf(jkRes_idkGobPath, 0x80u, "%s%c%s", v11, LEC_PATH_SEPARATOR_CHR, fpath);
             v12 = pLowLevelHS->fileOpen(jkRes_idkGobPath, mode);
             if ( v12 )
@@ -510,6 +514,8 @@ stdFile_t jkRes_FileOpen(const char *fpath, const char *mode)
                 jkRes_aFiles[resIdx].bOpened = 1;
                 v6 = 1;
             }
+
+            // Try in the GOB itself
             if ( !v6 )
             {
                 for (v18 = 0; v18 < jkRes_gCtx.aGobDirectories[v19].numGobs; v18++)

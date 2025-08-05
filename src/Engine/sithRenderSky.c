@@ -27,13 +27,13 @@ void sithRenderSky_Close()
 
 void sithRenderSky_Update()
 {
-    sithSector_flt_8553C0 = sithSector_horizontalDist / rdCamera_pCurCamera->fov_y;
+    sithSector_flt_8553C0 = sithSector_horizontalDist / rdCamera_pCurCamera->fovDx;
     stdMath_SinCos(sithCamera_currentCamera->viewPYR.z, &sithSector_flt_8553F4, &sithSector_flt_8553C8);
     sithSector_flt_8553B8 = -(sithCamera_currentCamera->viewPYR.y * sithSector_horizontalPixelsPerRev_idk);
     sithSector_flt_8553C4 = -(sithCamera_currentCamera->viewPYR.x * sithSector_horizontalPixelsPerRev_idk);
 }
 
-// As seen in: Return Home to Sloan
+// As seen in: Return Home to Sulon
 void sithRenderSky_TransformHorizontal(rdProcEntry *pProcEntry, sithSurfaceInfo *pSurfaceInfo, uint32_t num_vertices)
 {
     rdVector2 *pVertUV;
@@ -50,14 +50,25 @@ void sithRenderSky_TransformHorizontal(rdProcEntry *pProcEntry, sithSurfaceInfo 
 
     while ( num_vertices )
     {
-        pVertXYZ->z = rdCamera_pCurCamera->pClipFrustum->zFar; // zFar
 #ifdef TARGET_TWL
-        //pVertXYZ->z = 1.0f; // TODO figure out actual zfar or do this hack somewhere else
-        pVertXYZ->z = rdCamera_pCurCamera->pClipFrustum->zFar - 1.0;
-#endif
+        rdVector3 proj;
+        rdCamera_pCurCamera->fnProjectLstClip(&proj, pVertXYZ, 1);
+        tmp1 = (proj.x - rdCamera_pCurCamera->canvas->half_screen_width) * sithSector_flt_8553C0;
+        tmp2 = (proj.y - rdCamera_pCurCamera->canvas->half_screen_height) * sithSector_flt_8553C0;
 
+        flex_t prev_z = pVertXYZ->y;
+        pVertXYZ->y = rdCamera_pCurCamera->pClipFrustum->zFar - 0.1;
+
+        pVertXYZ->x /= prev_z;
+        pVertXYZ->x *= pVertXYZ->y;
+        pVertXYZ->z /= prev_z;
+        pVertXYZ->z *= pVertXYZ->y;
+#else
+        pVertXYZ->z = rdCamera_pCurCamera->pClipFrustum->zFar; // zFar
         tmp1 = (pVertXYZ->x - rdCamera_pCurCamera->canvas->half_screen_width) * sithSector_flt_8553C0;
         tmp2 = (pVertXYZ->y - rdCamera_pCurCamera->canvas->half_screen_height) * sithSector_flt_8553C0;
+#endif
+
         pVertUV->x = tmp1 * sithSector_flt_8553C8 - tmp2 * sithSector_flt_8553F4 + sithSector_flt_8553B8;
         pVertUV->y = tmp2 * sithSector_flt_8553C8 + tmp1 * sithSector_flt_8553F4 + sithSector_flt_8553C4;
         rdVector_Add2Acc(pVertUV, &sithWorld_pCurrentWorld->horizontalSkyOffs);
@@ -90,7 +101,11 @@ void sithRenderSky_TransformVertical(rdProcEntry *pProcEntry, sithSurfaceInfo *p
     //float invMatHeight = 1.0f / (float)pSurfaceInfo->face.material->texinfos[0]->texture_ptr->texture_struct[0]->format.height;
 #endif
 
-    flex_t maxTmp = 0.0;
+    // TODO: Clamp vertices to horizon? Would be easier to just have a skybox tbh
+#ifdef QOL_IMPROVEMENTS
+    //BOOL bHitTestFailed = false;
+#endif
+
     for (uint32_t i = 0; i < num_vertices; i++)
     {
         rdMatrix_TransformPoint34(&a2a, &pUntransformedVerts[i], &rdCamera_camMatrix);
@@ -103,6 +118,10 @@ void sithRenderSky_TransformVertical(rdProcEntry *pProcEntry, sithSurfaceInfo *p
         flex_t tmp = 0.0;
         if (!sithIntersect_SphereHit(&sithCamera_currentCamera->vec3_1, &a1a, hitTestMaxZ, 0.0, &sithSector_surfaceNormal, &sithSector_zMaxVec, &tmp, 0)) {
             tmp = hitTestMaxZ;
+#ifdef QOL_IMPROVEMENTS
+            /*bHitTestFailed = true;
+            break;*/
+#endif
         }
         rdVector_Scale3Acc(&a1a, tmp);
         pVertUV = &pProcEntry->vertexUVs[i];
@@ -119,18 +138,23 @@ void sithRenderSky_TransformVertical(rdProcEntry *pProcEntry, sithSurfaceInfo *p
         rdMatrix_TransformPoint34(&vertex_out, &a1a, &sithCamera_currentCamera->rdCam.view_matrix);
 
 #ifdef TARGET_TWL
+        flex_t prev_z = pProcEntry->vertices[i].y;
         vertex_out.y *= 0.05;
-#endif
-
+        pProcEntry->vertices[i].y = vertex_out.y;
+        pProcEntry->vertices[i].y = stdMath_Clamp(pProcEntry->vertices[i].y, 0.0f, rdCamera_pCurCamera->pClipFrustum->zFar - 0.1);
+        pProcEntry->vertices[i].x /= prev_z;
+        pProcEntry->vertices[i].x *= pProcEntry->vertices[i].y;
+        pProcEntry->vertices[i].z /= prev_z;
+        pProcEntry->vertices[i].z *= pProcEntry->vertices[i].y;
+#else
         pProcEntry->vertices[i].z = vertex_out.y;
-
+#endif
         // TODO: There's a bug where facing a vertical wall of sky starts dividing strangely
-#ifdef QOL_IMPROVEMENTS
-        // Added: Clip Z to zfar
-        pProcEntry->vertices[i].z = stdMath_Clamp(pProcEntry->vertices[i].z, 0.0f, rdCamera_pCurCamera->pClipFrustum->zFar - 1.0);
-#endif
-#ifdef TARGET_TWL
-        //pProcEntry->vertices[i].z = 2.0f; // TODO figure out actual zfar or do this hack somewhere else
-#endif
     }
+
+#ifdef QOL_IMPROVEMENTS
+    /*if (bHitTestFailed) {
+        pProcEntry->geometryMode = RD_GEOMODE_SOLIDCOLOR;
+    }*/
+#endif
 }

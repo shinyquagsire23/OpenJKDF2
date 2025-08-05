@@ -4,10 +4,12 @@
 #if defined(TARGET_TWL) && defined(EXPERIMENTAL_FIXED_POINT)
 //#include <nds.h>
 #define flextov16(n) ((v16)((int32_t)n.to_raw() >> (FIXED_POINT_DECIMAL_BITS-12)))
+#define flextot16(n) ((v16)((int32_t)n.to_raw() >> (FIXED_POINT_DECIMAL_BITS-4)))
 #define flextof32(n) ((int32_t)((int32_t)n.to_raw() >> (FIXED_POINT_DECIMAL_BITS-12)))
 #define f32toflex(n) (numeric::fixed<FIXED_POINT_WHOLE_BITS, FIXED_POINT_DECIMAL_BITS>::from_base(n<<(FIXED_POINT_DECIMAL_BITS-12)))
 #elif defined(TARGET_TWL) && !defined(EXPERIMENTAL_FIXED_POINT)
 #define flextov16(n) (floattov16(n))
+#define flextot16(n) (floattot16(n))
 #define flextof32(n) (floattof32(n))
 #define f32toflex(n) (f32tofloat(n))
 
@@ -516,12 +518,15 @@ typedef struct rdCamera
     rdCanvas* canvas;
     rdMatrix34 view_matrix;
     flex_t fov;
-    flex_t fov_y;
+    flex_t fovDx;
     flex_t screenAspectRatio;
     flex_t orthoScale;
     rdClipFrustum *pClipFrustum;
-    void (*fnProject)(rdVector3 *, rdVector3 *);
-    void (*fnProjectLst)(rdVector3 *, rdVector3 *, unsigned int);
+    void (*fnProject)(rdVector3 *, const rdVector3 *);
+    void (*fnProjectLst)(rdVector3 *, const rdVector3 *, unsigned int);
+#ifdef TARGET_TWL
+    void (*fnProjectLstClip)(rdVector3 *, const rdVector3 *, unsigned int);
+#endif
     flex_t ambientLight;
     int32_t numLights;
     rdLight* lights[RDCAMERA_MAX_LIGHTS];

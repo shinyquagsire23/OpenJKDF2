@@ -199,7 +199,7 @@ static void update_from_display_palette()
     }
 }
 
-static void update_from_world_palette()
+MATH_FUNC static void update_from_world_palette()
 {
     if (sithWorld_pCurrentWorld && sithWorld_pCurrentWorld->colormaps && loaded_colormap != sithWorld_pCurrentWorld->colormaps)
     {
@@ -283,7 +283,7 @@ static void update_from_world_palette()
     }   
 }
 
-static void std3D_UpdateFogColor() {
+MATH_FUNC static void std3D_UpdateFogColor() {
     if (!rdCamera_pCurCamera)
         return;
     flex_t ambientLight = rdCamera_pCurCamera->ambientLight;
@@ -294,7 +294,7 @@ static void std3D_UpdateFogColor() {
     std3D_fogDepth = 5;
         
     // TODO: Make this dynamic based on the furthest Z?
-    glFogShift(11);
+    glFogShift(12);
     glFogOffset(std3D_fogDepth & 0x7FFF);
     rdColor24 skyColor = sithWorld_pCurrentWorld->colormaps->colors[sithSurface_skyColorGuess];
 
@@ -426,23 +426,26 @@ c14 = a11*b14 + a12*b24 + a13*b34 + a14*b44
 */
 
 void std3DTwl_LoadProjection() {
-    MATRIX_LOAD4x4 = floattof32(2.0f);
+    if (!rdCamera_pCurCamera) {
+        return;
+    }
+    MATRIX_LOAD4x4 = floattof32(1.0f * (rdCamera_pCurCamera->fovDx >> 8));
     MATRIX_LOAD4x4 = 0;
     MATRIX_LOAD4x4 = 0;
     MATRIX_LOAD4x4 = floattof32(0.0f);
 
     MATRIX_LOAD4x4 = 0;
-    MATRIX_LOAD4x4 = -floattof32(2.0f);
+    MATRIX_LOAD4x4 = floattof32(1.0f * (rdCamera_pCurCamera->fovDx >> 8) / rdCamera_pCurCamera->screenAspectRatio);
     MATRIX_LOAD4x4 = 0;
     MATRIX_LOAD4x4 = floattof32(0.0f);
 
     MATRIX_LOAD4x4 = 0;
     MATRIX_LOAD4x4 = 0;
     MATRIX_LOAD4x4 = floattof32(0.0F);
-    MATRIX_LOAD4x4 = floattof32(1.0F);
+    MATRIX_LOAD4x4 = floattof32(0.5F);
 
-    MATRIX_LOAD4x4 = -floattof32(1.0f);//0;
-    MATRIX_LOAD4x4 = floattof32(1.0f);; //0;
+    MATRIX_LOAD4x4 = floattof32(0.0f);//0;
+    MATRIX_LOAD4x4 = floattof32(0.0f); //0;
     MATRIX_LOAD4x4 = floattof32(0.0F);//-divf32(zFar + zNear, zFar - zNear);//0;
     MATRIX_LOAD4x4 = floattof32(0.0f);
 }
@@ -509,14 +512,19 @@ int std3D_StartScene()
             std3D_PurgeEntireTextureCache();
             std3D_bNeedsToPurgeMenuBuffers = 0;
 
-            glMatrixMode(GL_PROJECTION);
-            std3DTwl_LoadProjection();
+            
 
-            glMatrixMode(GL_MODELVIEW);
-            wOverride(0);
 
             std3D_UpdateFogColor();
         }
+
+        glMatrixMode(GL_PROJECTION);
+        //glFrustum(-0.5, 0.5, -0.5, 0.5, 0.1, 40.0);
+        std3DTwl_LoadProjection();
+
+        glMatrixMode(GL_MODELVIEW);
+        wOverride(0);
+        //gluPerspective(/*rdCamera_pCurCamera->fov*/90.0, 256.0 / 192.0, 0.1, 40);
     }
     else {
         //glFogOffset(0x6000);
@@ -528,7 +536,8 @@ int std3D_StartScene()
 
     return 0;
 }
-int std3D_EndScene()
+
+MATH_FUNC int std3D_EndScene()
 {
     //glMatrixMode(GL_MODELVIEW);
     //glPopMatrix(1);
@@ -755,7 +764,7 @@ void std3D_DrawRenderListReal()
 
         {
             if (tex_id != -1) {
-                GFX_TEX_COORD = TEXTURE_PACK(inttot16((int)(v3->tu)), inttot16((int)(v3->tv)));    
+                GFX_TEX_COORD = TEXTURE_PACK(flextot16(v3->tu), flextot16(v3->tv));    
             }
             
             glColor3b(stdMath_Min(COMP_R(v3->color) + lightLevelAdd, 0xFF),stdMath_Min(COMP_G(v3->color) + lightLevelAdd, 0xFF),stdMath_Min(COMP_B(v3->color) + lightLevelAdd, 0xFF));
@@ -765,7 +774,7 @@ void std3D_DrawRenderListReal()
         
         {
             if (tex_id != -1) {
-                GFX_TEX_COORD = TEXTURE_PACK(inttot16((int)(v2->tu)), inttot16((int)(v2->tv)));
+                GFX_TEX_COORD = TEXTURE_PACK(flextot16(v2->tu), flextot16(v2->tv));
             }
             glColor3b(stdMath_Min(COMP_R(v2->color) + lightLevelAdd, 0xFF),stdMath_Min(COMP_G(v2->color) + lightLevelAdd, 0xFF),stdMath_Min(COMP_B(v2->color) + lightLevelAdd, 0xFF));
             //glColor3b(COMP_R(v2->color), COMP_G(v2->color), COMP_B(v2->color));
@@ -775,7 +784,7 @@ void std3D_DrawRenderListReal()
         
         {
             if (tex_id != -1) {
-                GFX_TEX_COORD = TEXTURE_PACK(inttot16((int)(v1->tu)), inttot16((int)(v1->tv)));
+                GFX_TEX_COORD = TEXTURE_PACK(flextot16(v1->tu), flextot16(v1->tv));
             }
             glColor3b(stdMath_Min(COMP_R(v1->color) + lightLevelAdd, 0xFF),stdMath_Min(COMP_G(v1->color) + lightLevelAdd, 0xFF),stdMath_Min(COMP_B(v1->color) + lightLevelAdd, 0xFF));
             //glColor3b(COMP_R(v1->color), COMP_G(v1->color), COMP_B(v1->color));

@@ -10,7 +10,7 @@
 #define rdMath_ClampVector_ADDR (0x0046D570)
 #define rdMath_PointsCollinear_ADDR (0x0046D600)
 
-MATH_FUNC flex_t rdMath_DistancePointToPlane(const rdVector3 *light, const rdVector3 *normal, const rdVector3 *vertex);
+MATH_FUNC FAST_FUNC flex_t rdMath_DistancePointToPlane(const rdVector3 *light, const rdVector3 *normal, const rdVector3 *vertex);
 MATH_FUNC void rdMath_CalcSurfaceNormal(rdVector3 *out, rdVector3 *edge1, rdVector3 *edge2, rdVector3 *edge3);
 MATH_FUNC flex_t rdMath_DeltaAngleNormalizedAbs(rdVector3 *a1, rdVector3 *a2);
 MATH_FUNC flex_t rdMath_DeltaAngleNormalized(rdVector3 *a1, rdVector3 *a2, rdVector3 *a3);

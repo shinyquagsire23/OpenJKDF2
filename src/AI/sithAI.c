@@ -1325,7 +1325,7 @@ void sithAI_SetRandomThingLook(rdMatrix34 *a1, sithThing *a2, rdVector3 *a3, fle
     }
 }
 
-void sithAI_RandomFireVector(rdVector3 *out, flex_t magnitude)
+MATH_FUNC void sithAI_RandomFireVector(rdVector3 *out, flex_t magnitude)
 {
     out->x = ((flex_d_t)_frand() - 0.5) * magnitude + out->x;
     out->y = ((flex_d_t)_frand() - 0.5) * magnitude + out->y;
@@ -1544,7 +1544,7 @@ void sithAI_GetThingsInView(sithSector *a1, rdMatrix34 *a2, flex_t a3)
                   && (!v9
                    || !v7->surface->surfaceInfo.face.geometryMode
                    || (v7->surface->surfaceInfo.face.type & 2)
-                   || (v8 && (v8->texture_ptr->alpha_en & 1) != 0)) // Added: searchSurface nullptr check
+                   || (v8 && v8->texture_ptr && (v8->texture_ptr->alpha_en & 1) != 0)) // Added: searchSurface nullptr check, v8->texture_ptr nullptr check
                   && rdVector_Dot3(&a2->lvec, &v7->surface->surfaceInfo.face.normal) < 0.0 )
                 {
                     a3a = v7->mirror->dist + v7->dist + a3;

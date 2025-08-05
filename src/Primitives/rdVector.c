@@ -657,7 +657,7 @@ void rdVector_Zero2(rdVector2 *v)
     rdVector_Copy2(v, &rdroid_zeroVector2);
 }
 
-int rdVector_IsZero3(rdVector3* v)
+int rdVector_IsZero3(const rdVector3* v)
 {
     return (v->x == 0.0 && v->y == 0.0 && v->z == 0.0);
 }

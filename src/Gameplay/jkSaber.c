@@ -46,7 +46,7 @@ void jkSaber_InitializeSaberInfo(sithThing *thing, char *material_side_fname, ch
 #endif
 
     rdPolyLine_FreeEntry(&saberinfo->polyline); // Added: fix memleak
-    rdPolyLine_NewEntry(&saberinfo->polyline, "Saber", material_side_fname, material_tip_fname, length, base_rad, tip_rad, 4, 0, 0, 0.0);
+    rdPolyLine_NewEntry(&saberinfo->polyline, "Saber", material_side_fname, material_tip_fname, length, base_rad, tip_rad, RD_LIGHTMODE_4_UNK, 0, 0, 0.0);
     rdThing_NewEntry(&saberinfo->polylineThing, thing);
     rdThing_SetPolyline(&saberinfo->polylineThing, &saberinfo->polyline);
     saberinfo->wall_sparks = wall_sparks;

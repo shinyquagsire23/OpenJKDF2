@@ -367,6 +367,8 @@ int Main_Startup(const char *cmdline)
     Windows_Startup();
     jkStrings_Startup();
     sithCvar_Startup(); // Added
+    //stdPlatform_PrintHeapStats();
+    //while(1);
 
     if (Windows_InitWindow())
     {

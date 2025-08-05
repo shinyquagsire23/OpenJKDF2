@@ -28,6 +28,7 @@
 #include "World/sithWorld.h"
 #include "World/sithExplosion.h"
 #include "Platform/std3D.h"
+#include "Primitives/rdMath.h"
 #include "stdPlatform.h"
 
 #if defined(TARGET_TWL)
@@ -391,6 +392,9 @@ void sithRender_Draw()
         // TODO: Basic view sphere clipping at least?
         for (int i = 0; i < sithWorld_pCurrentWorld->numSectors; i++)
         {
+            if (!rdClip_SphereInFrustrum(rdCamera_pCurCamera->pClipFrustum, &sithWorld_pCurrentWorld->sectors[i].center, sithWorld_pCurrentWorld->sectors[i].radius)) {
+                continue;
+            }
             if (&sithWorld_pCurrentWorld->sectors[i] != sithCamera_currentCamera->sector)
                 sithRender_Clip(&sithWorld_pCurrentWorld->sectors[i], rdCamera_pCurCamera->pClipFrustum, 0.0, 0);
         }
@@ -675,16 +679,14 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, flex_t a3, i
         }
 
         v20 = &sithWorld_pCurrentWorld->vertices[*adjoinSurface->surfaceInfo.face.vertexPosIdx];
-        flex_t dist = (sithCamera_currentCamera->vec3_1.y - v20->y) * adjoinSurface->surfaceInfo.face.normal.y
-                   + (sithCamera_currentCamera->vec3_1.z - v20->z) * adjoinSurface->surfaceInfo.face.normal.z
-                   + (sithCamera_currentCamera->vec3_1.x - v20->x) * adjoinSurface->surfaceInfo.face.normal.x;
+        flex_t dist = rdMath_DistancePointToPlane(&sithCamera_currentCamera->vec3_1, &adjoinSurface->surfaceInfo.face.normal, v20);
         flex_t adjoinDistAdd = adjoinIter->dist + adjoinIter->mirror->dist + a3;
 
         // Avoid rendering adjoins if they're far enough away
 #ifdef TARGET_TWL
         // adjoinDistAdd compare GREATLY reduces recursion issues 
         // TODO: Test against TODOA and verify if this is QOL-worthy
-        if (/*(adjoinDistAdd > 4.0) ||*/ (dist > 3.0)) {
+        if (/*(adjoinDistAdd > 4.0) ||*/ (dist > 4.0)) {
             // Doesn't help, causes visual issues
             //adjoinIter->sector->clipVisited = sithRender_lastRenderTick;
 
@@ -812,7 +814,11 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, flex_t a3, i
             if ((((unsigned int)meshinfo_out.numVertices >= 3u) || (rdClip_faceStatus & CLIPSTAT_NONE_VISIBLE)) 
                 && ((rdClip_faceStatus & (CLIPSTAT_NEAR|CLIPSTAT_NONE_VISIBLE)) || ((adjoinIter->flags & 1) && bAdjoinIsTransparent))) 
             {
+#ifdef TARGET_TWL
+                rdCamera_pCurCamera->fnProjectLstClip(sithRender_aVerticesTmp_projected, sithRender_aVerticesTmp, meshinfo_out.numVertices);
+#else
                 rdCamera_pCurCamera->fnProjectLst(sithRender_aVerticesTmp_projected, sithRender_aVerticesTmp, meshinfo_out.numVertices);
+#endif
                 
                 v31 = frustumArg;
 
@@ -912,7 +918,7 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, flex_t a3, i
                 
                 // wtf is with this float?
                 if (!(sithRender_flag & 4) || adjoinDistAdd < sithRender_f_82F4B0 ) {
-                    if (depth > 3) {
+                    if (depth > 2) {
                         adjoinIter->mirror->timesClipped = sithRender_lastRenderTick;
                         adjoinIter->timesClipped = sithRender_lastRenderTick;
                         sithRender_NoClip(adjoinIter->sector, v31, adjoinDistAdd, depth+1);    
@@ -922,7 +928,6 @@ void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, flex_t a3, i
                         adjoinIter->timesClipped = SITH_MAX_SURFACE_CLIP_ITERS;
                         sithRender_Clip(adjoinIter->sector, v31, adjoinDistAdd, depth+1);
                     }
-                    
                 }
 #else
                 // wtf is with this float?
@@ -1114,16 +1119,14 @@ void sithRender_NoClip(sithSector *sector, rdClipFrustum *frustumArg, flex_t a3,
         }
 
         v20 = &sithWorld_pCurrentWorld->vertices[*adjoinSurface->surfaceInfo.face.vertexPosIdx];
-        flex_t dist = (sithCamera_currentCamera->vec3_1.y - v20->y) * adjoinSurface->surfaceInfo.face.normal.y
-                   + (sithCamera_currentCamera->vec3_1.z - v20->z) * adjoinSurface->surfaceInfo.face.normal.z
-                   + (sithCamera_currentCamera->vec3_1.x - v20->x) * adjoinSurface->surfaceInfo.face.normal.x;
+        flex_t dist = rdMath_DistancePointToPlane(&sithCamera_currentCamera->vec3_1, &adjoinSurface->surfaceInfo.face.normal, v20);
         flex_t adjoinDistAdd = adjoinIter->dist + adjoinIter->mirror->dist + a3;
 
         // Avoid rendering adjoins if they're far enough away
 #ifdef TARGET_TWL
         // adjoinDistAdd compare GREATLY reduces recursion issues 
         // TODO: Test against TODOA and verify if this is QOL-worthy
-        if (/*(adjoinDistAdd > 3.5) ||*/ (dist > 3.0)) {
+        if (/*(adjoinDistAdd > 3.5) ||*/ (dist > 4.0)) {
             // Doesn't help, causes visual issues
             //adjoinIter->sector->clipVisited = sithRender_lastRenderTick;
             adjoinIter->timesClipped = sithRender_lastRenderTick;
@@ -1325,14 +1328,11 @@ void sithRender_RenderLevelGeometry()
                 continue;
             vertices_alloc = sithWorld_pCurrentWorld->vertices;
 
-            // TODO macro/vector func? Backface culling
-            flex_t dist = (sithCamera_currentCamera->vec3_1.z - vertices_alloc[*v65->surfaceInfo.face.vertexPosIdx].z) * v65->surfaceInfo.face.normal.z
-               + (sithCamera_currentCamera->vec3_1.y - vertices_alloc[*v65->surfaceInfo.face.vertexPosIdx].y) * v65->surfaceInfo.face.normal.y
-               + (sithCamera_currentCamera->vec3_1.x - vertices_alloc[*v65->surfaceInfo.face.vertexPosIdx].x) * v65->surfaceInfo.face.normal.x;
+            flex_t dist = rdMath_DistancePointToPlane(&sithCamera_currentCamera->vec3_1, &v65->surfaceInfo.face.normal, &vertices_alloc[*v65->surfaceInfo.face.vertexPosIdx]);
             if (dist <= 0.0 )
                 continue;
 #ifdef TARGET_TWL
-            if (noDistCulling && dist > 3.0 && !(v65->surfaceFlags & (SITH_SURFACE_HORIZON_SKY|SITH_SURFACE_CEILING_SKY))) {
+            if (noDistCulling && dist > 4.0 && !(v65->surfaceFlags & (SITH_SURFACE_HORIZON_SKY|SITH_SURFACE_CEILING_SKY))) {
                 continue;
             }
 #endif
@@ -1745,7 +1745,7 @@ void sithRender_RenderLevelGeometry()
                     {
                         for (int i = 0; i < meshinfo_out.numVertices; i++) {
                             //printf("%f\n", (float)v20->vertices[i].y);
-                            if (sithRender_aVerticesTmp[i].y < 2.2) {
+                            if (sithRender_aVerticesTmp[i].y < 3.2) {
                                 skip_this_surface = 0;
                                 break;
                             }
@@ -2417,7 +2417,7 @@ int sithRender_RenderThing(sithThing *pThing)
 #ifdef TARGET_TWL
     int skip_this_thing = 0;
     flex_t realDepth = pThing->screenPos.y - (pThing->rdthing.type == RD_THINGTYPE_MODEL ? pThing->rdthing.model3->radius : (flex_t)0.0);
-    if (realDepth > 2.0) {
+    if (realDepth > 3.0) {
         skip_this_thing = 1;
     }
     if (realDepth > 1.5) {

@@ -409,7 +409,7 @@ int main(int argc, char** argv)
         *(u32*)0x4004008 |= 0x8F; // Use revised DSi circuits
         //REG_EXMEMCNT &= ~(1<<15); // ARM9 gets memory priority (don't use, causes audio chirping)
 
-        setCpuClock(1);
+        //setCpuClock(1);
         debugRamEnableCache();
         nwramEnableCache();
     }

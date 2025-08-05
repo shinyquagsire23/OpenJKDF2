@@ -106,7 +106,7 @@ size_t getMMFormatBytesPerSample(mm_stream_formats format) {
     return multiplier;
 }
 
-mm_word streamingCallback(mm_word length,
+MATH_FUNC mm_word streamingCallback(mm_word length,
                           mm_addr dest,
                           mm_stream_formats format)
 {
@@ -217,7 +217,7 @@ int stdSound_Startup()
     printf("Using STDSOUND_MAXMOD as audio backend\n");
 
     //soundEnable();
-    
+
     memset(stdSound_aPlayingSounds, 0, sizeof(stdSound_aPlayingSounds));
 
     static int bInitted = 0;

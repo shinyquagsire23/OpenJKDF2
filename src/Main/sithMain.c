@@ -421,9 +421,10 @@ int sithMain_Tick()
 void sithMain_UpdateCamera()
 {
 #if defined(TARGET_TWL)
-    jkPlayer_fov = 90.0;
+    jkPlayer_fov = 90; // 90deg vertical, 106deg horizontal stock
     jkPlayer_bJankyPhysics = 1;
     jkPlayer_fovIsVertical = 0;
+    jkPlayer_enableOrigAspect = 0;
 #endif
 
     if ( (g_submodeFlags & 8) == 0 )
@@ -437,9 +438,16 @@ void sithMain_UpdateCamera()
             flex_t aspect = sithCamera_currentCamera->rdCam.canvas->half_screen_height / sithCamera_currentCamera->rdCam.canvas->half_screen_width;
 #if defined(TARGET_TWL)
             //aspect = 192.0/256.0;
-            aspect = 1.0;
-            sithCamera_currentCamera->rdCam.canvas->half_screen_width = 256.0;
-            sithCamera_currentCamera->rdCam.canvas->half_screen_height = 192.0;
+            //const flex_t canvasWidth = 256.0;
+            //const flex_t canvasHeight = 192.0;
+            //aspect = 1.0;
+            aspect = 192.0/256.0;
+            const flex_t canvasWidth = 256.0;
+            const flex_t canvasHeight = 192.0;
+            sithCamera_currentCamera->rdCam.canvas->half_screen_width = canvasWidth/2;
+            sithCamera_currentCamera->rdCam.canvas->half_screen_height = canvasHeight/2;
+            sithCamera_currentCamera->rdCam.canvas->widthMinusOne = canvasWidth - 1.0;
+            sithCamera_currentCamera->rdCam.canvas->heightMinusOne = canvasHeight - 1.0;
             static flex_t sithMain_UpdateCamera_lastFov = 90.0;
             static void* sithMain_UpdateCamera_lastCamera = NULL;
 

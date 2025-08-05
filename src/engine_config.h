@@ -216,7 +216,7 @@
 #elif defined(TARGET_TWL)
 #define SITHCAMERA_ZNEAR_FIRSTPERSON (1.0 / 64.0)
 #define SITHCAMERA_ZNEAR (1.0 / 64.0)
-#define SITHCAMERA_ZFAR (4.0)
+#define SITHCAMERA_ZFAR (8.0)
 #else
 #define SITHCAMERA_ZNEAR_FIRSTPERSON (1.0 / 64.0)
 #define SITHCAMERA_ZNEAR (1.0 / 64.0)
@@ -381,7 +381,7 @@ typedef double flex_d_t_type;
 #ifdef EXPERIMENTAL_FIXED_POINT
 #define FIXED_POINT_DECIMAL_BITS (16)
 #define FIXED_POINT_WHOLE_BITS   (32-FIXED_POINT_DECIMAL_BITS)
-#define RENDER_ROUND_VERTICES
+//#define RENDER_ROUND_VERTICES
 #endif
 
 #define FLEX(n) ((flex_t)n)
@@ -417,6 +417,7 @@ typedef double flex_d_t_type;
 #define FAST_FUNC
 #endif
 #define FAST_DATA __attribute__((section(".itcm.data")))
+#define NO_ALIAS __restrict__
 
 #include <stdint.h>
 #include <stddef.h>
@@ -435,6 +436,7 @@ extern FAST_FUNC void* __aeabi_memcpy8(void* dst, const void* src, size_t len);*
 #else
 #define MATH_FUNC
 #define FAST_FUNC
+#define NO_ALIAS
 #endif
 
 #endif // _OPENJKDF2_ENGINE_CONFIG_H

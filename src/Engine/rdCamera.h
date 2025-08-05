@@ -49,14 +49,14 @@ MATH_FUNC int rdCamera_SetAspectRatio(rdCamera *camera, flex_t ratio);
 MATH_FUNC int rdCamera_BuildFOV(rdCamera *camera);
 MATH_FUNC int rdCamera_BuildClipFrustum(rdCamera *camera, rdClipFrustum *outClip, signed int height, signed int width, signed int height2, signed int width2);
 MATH_FUNC void rdCamera_Update(rdMatrix34 *orthoProj);
-MATH_FUNC void rdCamera_OrthoProject(rdVector3* out, rdVector3* v);
-MATH_FUNC void rdCamera_OrthoProjectLst(rdVector3 *vertices_out, rdVector3 *vertices_in, unsigned int num_vertices);
-MATH_FUNC void rdCamera_OrthoProjectSquare(rdVector3 *out, rdVector3 *v);
-MATH_FUNC void rdCamera_OrthoProjectSquareLst(rdVector3 *vertices_out, rdVector3 *vertices_in, unsigned int num_vertices);
-MATH_FUNC FAST_FUNC void rdCamera_PerspProject(rdVector3 *out, rdVector3 *v);
-MATH_FUNC FAST_FUNC void rdCamera_PerspProjectLst(rdVector3 *vertices_out, rdVector3 *vertices_in, unsigned int num_vertices);
-MATH_FUNC void rdCamera_PerspProjectSquare(rdVector3 *out, rdVector3 *v);
-MATH_FUNC void rdCamera_PerspProjectSquareLst(rdVector3 *vertices_out, rdVector3 *vertices_in, unsigned int num_vertices);
+MATH_FUNC void rdCamera_OrthoProject(rdVector3* out, const rdVector3* v);
+MATH_FUNC void rdCamera_OrthoProjectLst(rdVector3 *vertices_out, const rdVector3 *vertices_in, unsigned int num_vertices);
+MATH_FUNC void rdCamera_OrthoProjectSquare(rdVector3 *out, const rdVector3 *v);
+MATH_FUNC void rdCamera_OrthoProjectSquareLst(rdVector3 *vertices_out, const rdVector3 *vertices_in, unsigned int num_vertices);
+MATH_FUNC FAST_FUNC void rdCamera_PerspProject(rdVector3 *out, const rdVector3 *v);
+MATH_FUNC FAST_FUNC void rdCamera_PerspProjectLst(rdVector3 *vertices_out, const rdVector3 *vertices_in, unsigned int num_vertices);
+MATH_FUNC void rdCamera_PerspProjectSquare(rdVector3 *out, const rdVector3 *v);
+MATH_FUNC void rdCamera_PerspProjectSquareLst(rdVector3 *vertices_out, const rdVector3 *vertices_in, unsigned int num_vertices);
 void rdCamera_SetAmbientLight(rdCamera *camera, flex_t amt);
 MATH_FUNC void rdCamera_SetAttenuation(rdCamera *camera, flex_t minVal, flex_t maxVal);
 MATH_FUNC int rdCamera_AddLight(rdCamera *camera, rdLight *light, rdVector3 *lightPos);
@@ -64,6 +64,11 @@ int rdCamera_ClearLights(rdCamera *camera);
 void rdCamera_AdvanceFrame();
 flex_t rdCamera_GetMipmapScalar(); // MOTS added
 void rdCamera_SetMipmapScalar(flex_t val); // MOTS added
+
+#ifdef TARGET_TWL
+MATH_FUNC FAST_FUNC void rdCamera_PerspProjectClip(rdVector3 *vertices_out, const rdVector3 *vertices_in); // Added
+MATH_FUNC FAST_FUNC void rdCamera_PerspProjectLstClip(rdVector3 *vertices_out, const rdVector3 *vertices_in, unsigned int num_vertices); // Added
+#endif
 
 #ifdef __cplusplus
 }
