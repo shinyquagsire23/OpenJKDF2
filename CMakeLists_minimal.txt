@@ -1,0 +1,29 @@
+cmake_minimum_required(VERSION 3.13)
+
+# Set toolchain before project()
+set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/toolchain_switch_minimal.cmake")
+
+project(minimal_switch_test C)
+
+# Check for devkitPro
+if(NOT DEFINED ENV{DEVKITPRO})
+    message(FATAL_ERROR "Please set DEVKITPRO in your environment")
+endif()
+
+# Create a simple executable with only essential dependencies
+add_executable(minimal_test src/main_minimal.c)
+
+# Link only the essential nx library
+target_link_libraries(minimal_test nx)
+
+# Set output names
+set_target_properties(minimal_test PROPERTIES
+    OUTPUT_NAME "minimal_test"
+)
+
+# Custom command to create .nro file
+add_custom_command(TARGET minimal_test POST_BUILD
+    COMMAND ${DEVKITPRO}/tools/bin/elf2nro minimal_test.elf minimal_test.nro
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    COMMENT "Creating NRO file"
+)

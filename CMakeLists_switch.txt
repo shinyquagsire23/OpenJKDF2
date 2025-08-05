@@ -148,7 +148,10 @@ set(NINTENDO_SWITCH TRUE)
 set(SWITCH TRUE)
     include(cmake_modules/plat_switch.cmake)
 endif()
-
+set(PLAT_SWITCH TRUE)
+set(NINTENDO_SWITCH TRUE)
+set(SWITCH TRUE)
+    include(cmake_modules/plat_switch.cmake)
 # Establishes compile options, binary/library names, defines, etc
 plat_initialize()
 
@@ -190,16 +193,16 @@ if(TARGET_USE_OPENAL AND NOT OPENAL_COMPILING_FROM_SRC)
     include_directories(${OPENAL_INCLUDE_DIR})
 endif()
 
-# All of the base sources
 file(GLOB ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/*.c
                        ${PROJECT_SOURCE_DIR}/src/*/*.c
                        ${PROJECT_SOURCE_DIR}/src/General/*.cpp
                        ${PROJECT_SOURCE_DIR}/src/Platform/Common/*.c
                        ${PROJECT_SOURCE_DIR}/src/Platform/Common/*.cpp)
 
+list(REMOVE_ITEM ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/main_switch_simple.c)
 # Game main
-file(GLOB GAME_MAIN_SOURCE_FILES  
-                      ${PROJECT_SOURCE_DIR}/src/main_switch_simple.c)
+file(GLOB GAME_MAIN_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/main_switch_simple.c)
+
 # Remove test sources from glob
 file(GLOB TEST_SRCS ${PROJECT_SOURCE_DIR}/src/Tests/*.c)
 list(REMOVE_ITEM ENGINE_SOURCE_FILES ${TEST_SRCS})
@@ -218,6 +221,7 @@ if (TARGET_NO_MULTIPLAYER_MENUS)
     list(REMOVE_ITEM ENGINE_SOURCE_FILES ${MULTIPLAYER_MENU_SRCS})
 endif()
 
+
 # Fcaseopen
 file(GLOB FCASEOPEN_SRCS ${PROJECT_SOURCE_DIR}/src/external/fcaseopen/*.c)
 list(APPEND ENGINE_SOURCE_FILES ${FCASEOPEN_SRCS})
@@ -232,7 +236,7 @@ include(cmake_modules/precompile_globals.cmake)
 
 #set( CMAKE_VERBOSE_MAKEFILE on )
 
-# Force CXX compilation for all files
+# Force CXX compilation for all CMakeFiles
 file(GLOB ENGINE_SOURCE_FILES_REGLOB ${PROJECT_SOURCE_DIR}/src/*.c
                        ${PROJECT_SOURCE_DIR}/src/*/*.c
                        ${PROJECT_SOURCE_DIR}/src/General/*.cpp
@@ -240,6 +244,7 @@ file(GLOB ENGINE_SOURCE_FILES_REGLOB ${PROJECT_SOURCE_DIR}/src/*.c
                        ${PROJECT_SOURCE_DIR}/src/Platform/*/*/*.c
                        ${PROJECT_SOURCE_DIR}/src/Platform/*/*.cpp
                        ${PROJECT_SOURCE_DIR}/src/Platform/*/*/*.cpp)
+
 list(REMOVE_ITEM ENGINE_SOURCE_FILES_REGLOB ${TEST_SRCS})
 list(APPEND ENGINE_SOURCE_FILES_REGLOB ${GLOBALS_C})
 if (EXPERIMENTAL_FIXED_POINT)

@@ -1,0 +1,119 @@
+cmake_minimum_required(VERSION 3.13)
+
+# Set toolchain before project()
+set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/toolchain_switch.cmake")
+    message(STATUS "Targeting Nintendo Switch")
+set(DEVKITA64 "${DEVKITPRO}/devkitA64")
+set(LIBNX "${DEVKITPRO}/libnx")
+set(PORTLIBS "${DEVKITPRO}/portlibs/switch")
+    set(BIN_NAME "switch_sdl_test")
+    set(NRO_NAME "openjkdf2.nro")
+
+    # Ensure we're targeting AArch64
+    set(CMAKE_SYSTEM_NAME "Generic")
+    set(CMAKE_SYSTEM_PROCESSOR "aarch64")
+    
+    # Application metadata
+    set(APP_TITLE "OpenJKDF2")
+    set(APP_AUTHOR "OpenJKDF2 Team")
+    set(APP_VERSION "1.0.0")
+
+    # Platform defines
+    add_definitions(-DPLAT_MISSING_WIN32)
+    add_definitions(-DTARGET_SWITCH)
+    add_definitions(-D_XOPEN_SOURCE=500)
+    add_definitions(-D_DEFAULT_SOURCE)
+    add_definitions(-D__SWITCH__)
+    add_definitions(-DARM64)
+    add_definitions(-DSMK_FAST)
+project(switch_sdl_test C)
+
+# Check for devkitPro
+if(NOT DEFINED ENV{DEVKITPRO})
+    message(FATAL_ERROR "Please set DEVKITPRO in your environment")
+endif()
+
+# Find SDL2 using pkg-config first, then fallback
+find_package(PkgConfig REQUIRED)
+pkg_search_module(SDL2 sdl2)
+
+# If pkg-config fails, manually set SDL2 paths
+if(NOT SDL2_FOUND)
+    message(STATUS "pkg-config SDL2 not found, using manual configuration")
+    set(PORTLIBS "$ENV{DEVKITPRO}/portlibs/switch")
+    set(SDL2_INCLUDE_DIRS "${PORTLIBS}/include/SDL2")
+    set(SDL2_LIBRARIES "-L${PORTLIBS}/lib -lSDL2")
+    set(SDL2_CFLAGS_OTHER "")
+endif()
+    set(SDL2_COMMON_LIBS SDL2main)
+# Create the executable
+add_executable(switch_sdl_test src/main_switch_simple.c)
+
+    include_directories(${LIBNX}/include)
+    include_directories(${PORTLIBS}/include)
+    
+    # Library paths
+    link_directories(${LIBNX}/lib)
+    link_directories(${PORTLIBS}/lib)
+
+     target_link_libraries(${BIN_NAME} PRIVATE 
+        -lnx
+        -lm 
+        -lstdc++ 
+        -lc
+    )
+
+    # Link portlibs libraries
+    if(TARGET_USE_SDL2)
+        target_link_libraries(${BIN_NAME} PRIVATE -lSDL2main -lSDL2 -lSDL2_mixer)
+            target_link_libraries(${BIN_NAME} PRIVATE 
+            -lopusfile 
+            -lopus 
+            -logg 
+            -lvorbisfile 
+            -lvorbis 
+            -lFLAC
+            -lmpg123
+            -lmodplug
+        )
+    endif()
+    
+    if(TARGET_USE_OPENAL)
+        target_link_libraries(${BIN_NAME} PRIVATE -lopenal)
+    endif()
+    
+    if(TARGET_USE_PHYSFS)
+        target_link_libraries(${BIN_NAME} PRIVATE -lphysfs)
+    endif()
+    
+    # PNG support for textures
+    target_link_libraries(${BIN_NAME} PRIVATE -lpng -lz)
+    
+    # OpenGL ES via mesa
+        target_link_libraries(${BIN_NAME} PRIVATE -lEGL -lGLESv2 -lglapi -lglad -ldrm_nouveau)
+
+    
+# Link libraries in the correct order
+target_link_libraries(switch_sdl_test 
+    PRIVATE
+    ${SDL2_COMMON_LIBS}
+)
+
+
+# Add include directories
+target_include_directories(switch_sdl_test PRIVATE ${SDL2_INCLUDE_DIRS})
+
+# Add compiler flags
+target_compile_options(switch_sdl_test PRIVATE ${SDL2_CFLAGS_OTHER})
+
+# Set output names
+set_target_properties(switch_sdl_test PROPERTIES
+    OUTPUT_NAME "switch_sdl_test"
+)
+
+# Custom command to create .nro file
+add_custom_command(TARGET switch_sdl_test POST_BUILD
+    COMMAND ${DEVKITPRO}/tools/bin/elf2nro switch_sdl_test.elf switch_sdl_test.nro
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    COMMENT "Creating NRO file"
+)

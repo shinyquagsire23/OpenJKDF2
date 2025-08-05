@@ -1,0 +1,43 @@
+cmake_minimum_required(VERSION 3.13)
+
+# Include devkitpro toolchain
+if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+    if(DEFINED ENV{DEVKITPRO})
+        set(CMAKE_TOOLCHAIN_FILE "$ENV{DEVKITPRO}/cmake/Switch.cmake" CACHE PATH "")
+        include("$ENV{DEVKITPRO}/cmake/Switch.cmake")
+    endif()
+endif()
+
+# Project name
+project(openjkdf2_switch_simple)
+
+# Include directories
+include_directories($ENV{DEVKITPRO}/libnx/include)
+include_directories($ENV{DEVKITPRO}/portlibs/switch/include)
+
+# Find required libraries
+find_package(PkgConfig REQUIRED)
+pkg_search_module(SDL2 REQUIRED sdl2)
+
+# Add executable
+add_executable(${PROJECT_NAME} src/main_switch_simple.c)
+
+# Link libraries
+target_link_libraries(${PROJECT_NAME} 
+    ${SDL2_LIBRARIES}
+    nx
+)
+
+# Compiler flags
+target_compile_options(${PROJECT_NAME} PRIVATE ${SDL2_CFLAGS_OTHER})
+
+# Create NRO file for Switch
+nx_generate_nacp(${PROJECT_NAME}.nacp
+    NAME "OpenJKDF2 Simple Test"
+    AUTHOR "OpenJKDF2 Team"
+    VERSION "1.0.0"
+)
+
+nx_create_nro(${PROJECT_NAME}
+    NACP ${PROJECT_NAME}.nacp
+)
