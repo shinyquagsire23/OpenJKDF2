@@ -18,8 +18,12 @@
 #include "Main/InstallHelper.h"
 #include "Main/jkQuakeConsole.h" // Added
 
-#ifdef SDL2_RENDER
+#if defined(SDL2_RENDER) 
+#if !defined(TARGET_SWITCH)
 #include <SDL.h>
+#else 
+#include <SDL2/SDL.h>
+#endif 
 #endif
 
 #ifdef TARGET_TWL
@@ -329,7 +333,7 @@ void Windows_GameErrorMsgbox(const char *a1, ...)
     jk_printf("FATAL ERROR: %s\n", tmp);
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", tmp, NULL);
 
-#if !defined(ARCH_WASM) && !defined(TARGET_ANDROID)
+#if !defined(ARCH_WASM) && !defined(TARGET_ANDROID) && !defined(TARGET_SWITCH)
     InstallHelper_CheckRequiredAssets(1);
 #endif
 #else

@@ -2922,10 +2922,18 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
     {
         texture->is_16bit = 1;
 #if 1
+#ifdef TARGET_SWITCH
+        // Switch uses OpenGL ES which doesn't support _REV variants
+        if (!is_alpha_tex)
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width, height, 0,  GL_RGB, GL_UNSIGNED_SHORT_5_6_5, image_8bpp);
+        else
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0,  GL_RGBA, GL_UNSIGNED_SHORT_5_5_5_1, image_8bpp);
+#else
         if (!is_alpha_tex)
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width, height, 0,  GL_RGB, GL_UNSIGNED_SHORT_5_6_5_REV, image_8bpp);
         else
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0,  GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, image_8bpp);
+#endif
 #endif
 
 #ifdef __NOTDEF_FORMAT_CONVERSION

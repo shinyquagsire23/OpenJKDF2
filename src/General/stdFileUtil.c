@@ -218,7 +218,7 @@ int stdFileUtil_Deltree(const char* lpPathName)
     }
 #endif
 
-#ifndef TARGET_TWL
+#if !defined(TARGET_TWL) && !defined(TARGET_SWITCH)
     nftw(tmp, rmFiles, 10, FTW_DEPTH|FTW_MOUNT|FTW_PHYS);
 #else
     DIR *dir;

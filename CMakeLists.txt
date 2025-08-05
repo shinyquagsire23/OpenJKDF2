@@ -32,10 +32,11 @@ set(PLAT_HOOKS FALSE CACHE BOOL "Hook DLL target")
 set(PLAT_MSVC FALSE CACHE BOOL "Windows 64-bit MSVC")
 set(PLAT_ANDROID_ARM64 FALSE CACHE BOOL "Android AArch64")
 set(PLAT_TWL FALSE CACHE BOOL "Nintendo DSi")
+set(PLAT_SWITCH FALSE CACHE BOOL "Nintendo Switch")
 set(PLAT_AUTO FALSE CACHE BOOL "Target the host OS")
 
 # Set PLAT_AUTO if a platform isn't specifically selected
-if(NOT PLAT_LINUX_32 AND NOT PLAT_LINUX_64 AND NOT PLAT_MACOS AND NOT PLAT_MACOS_X86_64 AND NOT PLAT_MINGW_X86_64 AND NOT PLAT_WASM AND NOT PLAT_HOOKS AND NOT PLAT_TWL)
+if(NOT PLAT_LINUX_32 AND NOT PLAT_LINUX_64 AND NOT PLAT_MACOS AND NOT PLAT_MACOS_X86_64 AND NOT PLAT_MINGW_X86_64 AND NOT PLAT_WASM AND NOT PLAT_HOOKS AND NOT PLAT_TWL AND NOT PLAT_SWITCH)
     set(PLAT_AUTO TRUE)
 endif()
 
@@ -139,8 +140,13 @@ elseif(PLAT_MSVC)
     include(cmake_modules/plat_msvc.cmake)
 elseif(PLAT_TWL)
     include(cmake_modules/plat_twl.cmake)
+elseif(PLAT_SWITCH)
+    include(cmake_modules/plat_switch.cmake)
 else()
-    message(FATAL_ERROR "Unknown platform! Cannot continue.")
+set(PLAT_SWITCH TRUE)
+set(NINTENDO_SWITCH TRUE)
+set(SWITCH TRUE)
+    include(cmake_modules/plat_switch.cmake)
 endif()
 
 # Establishes compile options, binary/library names, defines, etc
@@ -241,7 +247,7 @@ endif()
 add_library(sith_engine OBJECT ${ENGINE_SOURCE_FILES})
 plat_specific_deps()
 
-if(TARGET_ANDROID)
+if(TARGET_ANDROID )
     add_library(${BIN_NAME} SHARED ${GAME_MAIN_SOURCE_FILES})
     target_link_libraries(${BIN_NAME} PRIVATE ${SDL2_COMMON_LIBS} sith_engine)
 elseif(TARGET_HOOKS)
@@ -265,6 +271,18 @@ else()
         endif()
     endif()
 endif()
+
+if(TARGET_USE_SDL2)
+        target_link_libraries(${BIN_NAME} PRIVATE -lSDL2main -lSDL2 -lSDL2_mixer)
+    endif()
+    
+    if(TARGET_USE_OPENAL)
+        target_link_libraries(${BIN_NAME} PRIVATE -lopenal)
+    endif()
+    
+    if(TARGET_USE_PHYSFS)
+        target_link_libraries(${BIN_NAME} PRIVATE -lphysfs)
+    endif()
 
 # TODO byacc and flex
 # maxamillion@Maxs-MacBook-Pro Cog % ../../flex/flex -i cog.l

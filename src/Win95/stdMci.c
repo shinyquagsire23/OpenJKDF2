@@ -211,8 +211,11 @@ flex_d_t stdMci_GetTrackLength(int track)
 
 #elif defined(SDL2_RENDER) // !STDSOUND_NULL
 
+#if defined(TARGET_SWITCH)
+#include <SDL2/SDL_mixer.h>
+#else
 #include <SDL_mixer.h>
-
+#endif
 int stdMci_trackFrom;
 int stdMci_trackTo;
 int stdMci_trackCurrent;

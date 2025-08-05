@@ -1,7 +1,9 @@
 macro(plat_initialize)
     message(STATUS "Targeting Nintendo Switch")
-
-    set(BIN_NAME "openjkdf2.elf")
+set(DEVKITA64 "${DEVKITPRO}/devkitA64")
+set(LIBNX "${DEVKITPRO}/libnx")
+set(PORTLIBS "${DEVKITPRO}/portlibs/switch")
+    set(BIN_NAME "openjkdf2")
     set(NRO_NAME "openjkdf2.nro")
 
     # Ensure we're targeting AArch64
@@ -40,20 +42,32 @@ macro(plat_initialize)
 
     set(TARGET_BUILD_TESTS FALSE)
     set(SDL2_COMMON_LIBS "")
+    set(TARGET_SWITCH_EXECUTABLE TRUE)  # Force executable instead of shared library
 
     set(TARGET_SWITCH TRUE)
+    set(TARGET_COMPILE_FREEGLUT FALSE)  # Switch doesn't need freeglut
+
+    # Mock OpenGL targets to prevent CMake from searching
+    set(OPENGL_FOUND TRUE)
+    set(OpenGL_FOUND TRUE)
+    set(OPENGL_GL_FOUND TRUE)
+    set(OpenGL_OpenGL_FOUND TRUE)
+    set(OpenGL_EGL_FOUND TRUE)
+    set(OPENGL_opengl_LIBRARY "")
+    set(OPENGL_glx_LIBRARY "")
+    
 
     # Compiler and linker flags  
-    set(ARCH_FLAGS "-march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE")
     add_compile_options(-g -Wall -O2 -ffunction-sections)
-    add_compile_options(${ARCH_FLAGS})
+   add_compile_options(${ARCH_FLAGS})
     add_compile_options(-D__SWITCH__ -I${LIBNX}/include -I${PORTLIBS}/include)
     
-    # C++ specific flags
-    add_compile_options(-Wno-implicit-function-declaration)
     
+    # C specific flags
+    add_compile_options($<$<COMPILE_LANGUAGE:C>:-Wno-implicit-function-declaration>)
+       set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--verbose")
     # Linker flags
-    add_link_options(-specs=${LIBNX}/switch.specs -g ${ARCH_FLAGS} -Wl,-Map,${CMAKE_CURRENT_BINARY_DIR}/openjkdf2.map)
+    #add_link_options(-specs=${LIBNX}/switch.specs -march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE -g ${ARCH_FLAGS} -Wl,-Map,${CMAKE_CURRENT_BINARY_DIR}/openjkdf2.map)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti -fno-exceptions -fno-strict-aliasing")
     # Include paths
     include_directories(${LIBNX}/include)
@@ -62,6 +76,9 @@ macro(plat_initialize)
     # Library paths
     link_directories(${LIBNX}/lib)
     link_directories(${PORTLIBS}/lib)
+    
+    # Add Switch-specific OpenGL module path
+    list(APPEND CMAKE_MODULE_PATH "${PORTLIBS}/lib/cmake/OpenGL")
 endmacro()
 
 macro(plat_specific_deps)
@@ -77,10 +94,20 @@ macro(plat_link_and_package)
         -lstdc++ 
         -lc
     )
-    
+
     # Link portlibs libraries
     if(TARGET_USE_SDL2)
         target_link_libraries(${BIN_NAME} PRIVATE -lSDL2main -lSDL2 -lSDL2_mixer)
+            target_link_libraries(${BIN_NAME} PRIVATE 
+            -lopusfile 
+            -lopus 
+            -logg 
+            -lvorbisfile 
+            -lvorbis 
+            -lFLAC
+            -lmpg123
+            -lmodplug
+        )
     endif()
     
     if(TARGET_USE_OPENAL)
@@ -95,36 +122,32 @@ macro(plat_link_and_package)
     target_link_libraries(${BIN_NAME} PRIVATE -lpng -lz)
     
     # OpenGL ES via mesa
-    target_link_libraries(${BIN_NAME} PRIVATE -lEGL -lGLESv2)
+        target_link_libraries(${BIN_NAME} PRIVATE -lEGL -lGLESv2 -lglapi -lglad -ldrm_nouveau)
+
     
     target_link_libraries(sith_engine PRIVATE nlohmann_json::nlohmann_json)
 
-    # Create .nro file using elf2nro
+    # Find tools for manual conversion (optional)
     find_program(ELF2NRO elf2nro ${DEVKITPRO}/tools/bin)
-    if(NOT ELF2NRO)
-        message(FATAL_ERROR "elf2nro not found. Please install switch-tools package.")
-    endif()
-
-    add_custom_target(${NRO_NAME} ALL
-        DEPENDS ${BIN_NAME}
-        COMMAND ${ELF2NRO} $<TARGET_FILE:${BIN_NAME}> ${CMAKE_CURRENT_BINARY_DIR}/${NRO_NAME} --nacp=${CMAKE_CURRENT_BINARY_DIR}/openjkdf2.nacp
-        COMMENT "Converting ELF to NRO"
-    )
-
-    # Create NACP (Nintendo Application Control Property) file
     find_program(NACPTOOL nacptool ${DEVKITPRO}/tools/bin)
-    if(NOT NACPTOOL)
-        message(FATAL_ERROR "nacptool not found. Please install switch-tools package.")
+    
+    # Show exact file locations
+    message(STATUS "ELF file will be located at: ${CMAKE_CURRENT_BINARY_DIR}/${BIN_NAME}")
+    
+    if(ELF2NRO AND NACPTOOL)
+        message(STATUS "elf2nro found at: ${ELF2NRO}")
+        message(STATUS "nacptool found at: ${NACPTOOL}")
+        message(STATUS "To manually create NRO file, run from build directory:")
+        message(STATUS "  ${NACPTOOL} --create \"${APP_TITLE}\" \"${APP_AUTHOR}\" \"${APP_VERSION}\" openjkdf2.nacp")
+        message(STATUS "  ${ELF2NRO} ${BIN_NAME} ${NRO_NAME} --nacp=openjkdf2.nacp")
+    else()
+        if(NOT ELF2NRO)
+            message(WARNING "elf2nro not found. Install switch-tools package to convert ELF to NRO.")
+        endif()
+        if(NOT NACPTOOL)
+            message(WARNING "nacptool not found. Install switch-tools package to create NACP file.")
+        endif()
     endif()
-
-    add_custom_command(
-        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/openjkdf2.nacp
-        COMMAND ${NACPTOOL} --create "${APP_TITLE}" "${APP_AUTHOR}" "${APP_VERSION}" ${CMAKE_CURRENT_BINARY_DIR}/openjkdf2.nacp
-        COMMENT "Creating NACP file"
-    )
-
-    add_custom_target(nacp ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/openjkdf2.nacp)
-    add_dependencies(${NRO_NAME} nacp)
 endmacro()
 
 macro(plat_extra_deps)

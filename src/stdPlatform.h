@@ -26,7 +26,7 @@ extern "C" {
 void stdPlatform_InitServices(HostServices *handlers);
 int stdPlatform_Startup();
 
-#ifndef __cplusplus
+#if !defined(__cplusplus) && !defined(TARGET_SWITCH)
 static void (*stdPlatform_Assert)(const char* a1, const char *a2, int a3) = (void*)stdPlatform_Assert_ADDR;
 
 static void* (*stdPlatform_AllocHandle)(size_t) = (void*)stdPlatform_AllocHandle_ADDR;
@@ -36,7 +36,7 @@ static uint32_t (*stdPlatform_LockHandle)(uint32_t) = (void*)stdPlatform_LockHan
 static void (*stdPlatform_UnlockHandle)(uint32_t) = (void*)stdPlatform_UnlockHandle_ADDR;
 #endif
 
-#ifndef PLATFORM_POSIX
+#if !defined(PLATFORM_POSIX) && !defined(TARGET_SWITCH)
 static int (*stdPrintf)(int (*a1)(const char *, ...), const char *a2, int line, const char *fmt, ...) = (void*)0x426D80;
 static int (*stdPlatform_Printf)(const char *fmt, ...) = (void*)stdPlatform_Printf_ADDR;
 static int (__cdecl *stdPlatform_GetTimeMsec)(void) = (void*)stdPlatform_GetTimeMsec_ADDR;

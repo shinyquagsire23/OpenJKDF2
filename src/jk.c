@@ -1,5 +1,5 @@
 #include "jk.h"
-
+#define assert(...) ((void)0)
 #include "types.h"
 
 #if defined(LINUX) || defined(TARGET_TWL)

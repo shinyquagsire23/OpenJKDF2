@@ -31,7 +31,11 @@
 #if !defined(WIN64_MINGW) && !defined(_WIN32)
 #include <sys/ioctl.h>
 #include <sys/select.h>
+#ifdef TARGET_SWITCH
+#include <machine/termios.h>
+#else 
 #include <termios.h>
+#endif 
 #else
 #include <conio.h>
 #endif
@@ -577,12 +581,12 @@ int my_kbhit() {
 
     if (! initialized) {
         // Use termios to turn off line buffering
-        struct termios term;
-        tcgetattr(STDIN, &term);
-        term.c_lflag &= ~ICANON;
-        term.c_lflag &= ~ECHO;
-        tcsetattr(STDIN, TCSANOW, &term);
-        setbuf(stdin, NULL);
+        // struct termios term;
+        //tcgetattr(STDIN, &term);
+        //term.c_lflag &= ~ICANON;
+        //term.c_lflag &= ~ECHO;
+        //tcsetattr(STDIN, TCSANOW, &term);
+        //setbuf(stdin, NULL);
         initialized = 1;
     }
 
@@ -1301,7 +1305,7 @@ int Window_Main_Linux(int argc, char** argv)
 
     
     Window_RecreateSDL2Window();
-#if !defined(TARGET_ANDROID) && !defined(ARCH_WASM)
+#if !defined(TARGET_ANDROID) && !defined(TARGET_SWITCH)  && !defined(TARGET_SWITCH) && !defined(ARCH_WASM)
     glewInit();
 #endif
     

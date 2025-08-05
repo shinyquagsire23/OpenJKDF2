@@ -23,7 +23,7 @@
 #include "external/fcaseopen/fcaseopen.h"
 #endif
 
-#if defined(SDL2_RENDER) && !defined(ARCH_WASM)
+#if defined(SDL2_RENDER) && !defined(ARCH_WASM) && !defined(TARGET_SWITCH)
 
 int InstallHelper_copy(const char* in_path, const char* out_path);
 int InstallHelper_CopyFile(const char* pFolder, const char* pName);

@@ -12,7 +12,7 @@
 #include <unistd.h>
 #endif
 
-#if defined(SDL2_RENDER) && !defined(ARCH_WASM) && !defined(TARGET_ANDROID)
+#if defined(SDL2_RENDER) && !defined(ARCH_WASM) && !defined(TARGET_ANDROID) && !defined(TARGET_SWITCH)
 
 const char* aRequiredAssets[] = {
     "episode/JK1.gob",

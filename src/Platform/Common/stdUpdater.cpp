@@ -79,7 +79,7 @@ int stdUpdater_CheckForUpdates()
 {
     stdUpdater_Reset();
 
-#if defined(PLATFORM_LINUX) || defined(ARCH_WASM) || defined(TARGET_TWL)
+#if defined(PLATFORM_LINUX) || defined(ARCH_WASM) || defined(TARGET_TWL) || defined(TARGET_SWITCH)
     return 0;
 #else
     if (stdUpdater_bDisableUpdates) {

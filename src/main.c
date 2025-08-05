@@ -176,6 +176,28 @@ void do_hooks();
 #include <emscripten.h>
 #endif // ARCH_WASM
 
+#ifdef TARGET_SWITCH
+#include <switch.h>
+#include "SDL2/SDL.h"
+void draw_rects(SDL_Renderer *renderer, int x, int y)
+{
+    // R
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    SDL_Rect r = {x, y, 64, 64};
+    SDL_RenderFillRect(renderer, &r);
+
+    // G
+    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+    SDL_Rect g = {x + 64, y, 64, 64};
+    SDL_RenderFillRect(renderer, &g);
+
+    // B
+    SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+    SDL_Rect b = {x + 128, y, 64, 64};
+    SDL_RenderFillRect(renderer, &b);
+}
+#endif
+
 #ifdef WIN64_STANDALONE
 #include "exchndl.h"
 
@@ -334,6 +356,8 @@ extern "C"
 
 int main(int argc, char** argv)
 {
+    printf("=== NRO boot start ===\n");
+    
 #ifdef ARCH_WASM
     EM_ASM(
         FS.mkdir('/jk1/player');
@@ -589,13 +613,13 @@ int main(int argc, char** argv)
     }
 #endif // WIN64_STANDALONE
 
-#if !defined(ARCH_WASM) && !defined(TARGET_ANDROID) && !defined(TARGET_TWL)
+#if !defined(ARCH_WASM) && !defined(TARGET_ANDROID) && !defined(TARGET_SWITCH)  && !defined(TARGET_TWL)
     openjkdf2_pExecutablePath = argv[0];
 #endif // !ARCH_WASM
 
 #ifdef LINUX
 
-#if !defined(ARCH_WASM) && !defined(TARGET_ANDROID)
+#if !defined(ARCH_WASM) && !defined(TARGET_ANDROID) && !defined(TARGET_SWITCH) && !defined(TARGET_TWL)
     signal(SIGSEGV, crash_handler_basic);
     //signal(SIGINT, int_handler);
 #endif // !ARCH_WASM
@@ -646,11 +670,28 @@ int main(int argc, char** argv)
 #endif // !ARCH_64BIT
 #endif // LINUX
 
-#ifdef PLATFORM_PHYSFS
+#ifdef PLATFORM_PHYSFS 
     PHYSFS_init(argv[0]);
     PHYSFS_permitSymbolicLinks(0);
 #endif
+#ifdef TARGET_SWITCH
+    romfsInit();
+    chdir("romfs:/");
+#endif
 
+#ifdef TARGET_SWITCH
+ consoleInit(NULL);
+    printf("Hello from Ryujinx\n");
+    printf("Press + to exit\n");
+    consoleUpdate(NULL);
+
+    while (appletMainLoop()) {
+        consoleUpdate(NULL);
+    }
+
+    consoleExit(NULL);
+    return 0; 
+#else
     getcwd(openjkdf2_aOrigCwd, sizeof(openjkdf2_aOrigCwd));
 
     openjkdf2_bOrigWasDF2 = 1;
@@ -735,6 +776,7 @@ int main(int argc, char** argv)
             break;
         }
     }
+#endif
 #endif
 
     return 1;
