@@ -367,14 +367,12 @@ int Main_Startup(const char *cmdline)
     Windows_Startup();
     jkStrings_Startup();
     sithCvar_Startup(); // Added
-    //stdPlatform_PrintHeapStats();
-    //while(1);
 
     if (Windows_InitWindow())
     {
         rdStartup(&hs);
-        jkGuiRend_Startup();
-        jkGui_Startup();
+        jkGuiRend_Startup(); // B15E8
+        jkGui_Startup(); // 15C6D1
 #if !defined(TARGET_NO_MULTIPLAYER_MENUS)
         jkGuiMultiplayer_Startup();
         jkGuiNetHost_Startup();

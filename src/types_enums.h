@@ -465,6 +465,12 @@ enum RdClipFaceStatus {
     CLIPSTAT_80 = 0x80
 };
 
+enum RdSphereClipStatus {
+    SPHERE_FULLY_INSIDE = 0,
+    SPHERE_CLIPPING_EDGE = 1,
+    SPHERE_FULLY_OUTSIDE = 2,
+};
+
 enum RD_THINGTYPE
 {
     RD_THINGTYPE_0   = 0,

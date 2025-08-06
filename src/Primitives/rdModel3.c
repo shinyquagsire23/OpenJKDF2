@@ -1160,14 +1160,21 @@ int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
     pCurThing = thing;
     pCurModel3 = thing->model3;
     rdMatrix_TransformPoint34(&vertex_out, &matrix_4_3->scale, &rdCamera_pCurCamera->view_matrix);
-    if ( rdroid_curCullFlags & 2 )
-        frustumCull = rdClip_SphereInFrustrum(rdCamera_pCurCamera->pClipFrustum, &vertex_out, pCurModel3->radius);
-    else
+    if (rdroid_curCullFlags & 2) {
+        frustumCull = rdClip_SphereInFrustum(rdCamera_pCurCamera->pClipFrustum, &vertex_out, pCurModel3->radius);
+    }
+    else {
         frustumCull = thing->clippingIdk;
-    thingFrustrumCull = frustumCull;
-    if ( frustumCull == 2 )
+    }
+    thingFrustumCull = frustumCull;
+    if (frustumCull == SPHERE_FULLY_OUTSIDE)
         return 0;
-    thingFrustrumCull = 1;
+
+    // LEC HACK: Amputated joints can't do frustum culling?
+#ifndef TARGET_TWL
+    thingFrustumCull = SPHERE_CLIPPING_EDGE;
+#endif
+
     if ( thing->geosetSelect == -1 )
     {
         geosetNum = pCurModel3->geosetSelect;
@@ -1284,13 +1291,16 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
         return;
 
     rdMatrix_TransformPoint34(&vertex_out, &mat->scale, &rdCamera_pCurCamera->view_matrix);
-    if ( thingFrustrumCull )
-        meshFrustrumCull = (rdroid_curCullFlags & 1) ? rdClip_SphereInFrustrum(rdCamera_pCurCamera->pClipFrustum, &vertex_out, pCurMesh->radius) : 1;
-    else
-        meshFrustrumCull = 0;
+    if (thingFrustumCull != SPHERE_FULLY_INSIDE) {
+        meshFrustumCull = (rdroid_curCullFlags & 1) ? rdClip_SphereInFrustum(rdCamera_pCurCamera->pClipFrustum, &vertex_out, pCurMesh->radius) : SPHERE_CLIPPING_EDGE;
+    }
+    else {
+        meshFrustumCull = 0;
+    }
 
-    if ( meshFrustrumCull == 2 )
+    if (meshFrustumCull == SPHERE_FULLY_OUTSIDE) {
         return;
+    }
 
     rdMatrix_Multiply34(&out, &rdCamera_pCurCamera->view_matrix, mat);
     rdMatrix_TransformPointLst34(&out, pCurMesh->vertices, aView, pCurMesh->numVertices);
@@ -1311,8 +1321,8 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
 
 // This function = 1ms or so
 #ifdef TARGET_TWL
-    //thingFrustrumCull = 0;
-    //meshFrustrumCull = 0;
+    //thingFrustumCull = 0;
+    //meshFrustumCull = 0;
     // TODO: Check if it's really that expensive
     rdModel3_lightingMode = RD_LIGHTMODE_DIFFUSE;
 #endif
@@ -1507,7 +1517,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
 
     // MOTS added: RGB
     if ((rdGetVertexColorMode() == 0) || (procEntry->lightingMode == RD_LIGHTMODE_DIFFUSE)) {
-        if ( meshFrustrumCull )
+        if (meshFrustumCull != SPHERE_FULLY_INSIDE)
             rdPrimit3_ClipFace(rdCamera_pCurCamera->pClipFrustum, geometryMode, lightingMode, textureMode, &vertexSrc, &vertexDst, &face->clipIdk);
         else
             rdPrimit3_NoClipFace(geometryMode, lightingMode, textureMode, &vertexSrc, &vertexDst, &face->clipIdk);
@@ -1520,7 +1530,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
         vertexDst.paGreenIntensities = procEntry->paGreenIntensities;
         vertexDst.paBlueIntensities = procEntry->paBlueIntensities;
         //printf("%p %p %p, %p %p %p\n", vertexSrc.paRedIntensities, vertexSrc.paGreenIntensities, vertexSrc.paBlueIntensities, vertexDst.paRedIntensities, vertexDst.paGreenIntensities, vertexDst.paBlueIntensities);
-        if ( meshFrustrumCull )
+        if (meshFrustumCull != SPHERE_FULLY_INSIDE)
             rdPrimit3_ClipFaceRGB(rdCamera_pCurCamera->pClipFrustum, geometryMode, lightingMode, textureMode, &vertexSrc, &vertexDst, &face->clipIdk);
         else
             rdPrimit3_NoClipFaceRGB(geometryMode, lightingMode, textureMode, &vertexSrc, &vertexDst, &face->clipIdk);

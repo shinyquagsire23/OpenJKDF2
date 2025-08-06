@@ -931,101 +931,111 @@ int rdClip_Line3(rdClipFrustum *clipFrustum, rdVector3 *point1, rdVector3 *point
     return 1;
 }
 
-int rdClip_SphereInFrustrum(const rdClipFrustum* NO_ALIAS frust, const rdVector3* NO_ALIAS pos, flex_t rad)
+int rdClip_SphereInFrustum(const rdClipFrustum* NO_ALIAS frust, const rdVector3* NO_ALIAS pos, flex_t rad)
 {
-    int v5; // edi
-    int v9; // esi
-    flex_d_t v10; // st7
-    flex_d_t v11; // st7
-    flex_d_t v12; // st7
-    flex_d_t v13; // st7
-    flex_t v14; // [esp+0h] [ebp-Ch]
-    flex_t v15; // [esp+4h] [ebp-8h]
-    flex_t v16; // [esp+8h] [ebp-4h]
-    flex_t v17; // [esp+8h] [ebp-4h]
-    flex_t frusta; // [esp+10h] [ebp+4h]
-    flex_t posa; // [esp+14h] [ebp+8h]
-    flex_t posb; // [esp+14h] [ebp+8h]
-    flex_t posc; // [esp+14h] [ebp+8h]
-    flex_t rada; // [esp+18h] [ebp+Ch]
-    flex_t radb; // [esp+18h] [ebp+Ch]
+    flex_t topPlaneMin, topPlaneMax;
+    flex_t bottomPlaneMin, bottomPlaneMax;
+    flex_t leftPlaneMin, leftPlaneMax;
+    flex_t rightPlaneMin, rightPlaneMax;
 
-    v14 = rad + pos->y;
-    v5 = 1;
-    frusta = pos->y - rad;
-    if (v14 < (flex_d_t)frust->zNear)
-        return 2;
-    if ( frusta < (flex_d_t)frust->zNear )
-        v5 = 0;
+    BOOL bFullyInFrustum = 1;
+    flex_t depthPlusRad = rad + pos->y;
+    flex_t depthMinusRad = pos->y - rad;
+
+    if (depthPlusRad < frust->zNear) {
+        return SPHERE_FULLY_OUTSIDE;
+    }
+    if (depthMinusRad < frust->zNear) {
+        bFullyInFrustum = 0;
+    }
+
     if (frust->bClipFar)
     {
-        if ( frusta > (flex_d_t)frust->zFar )
-            return 2;
-        if ( v14 > (flex_d_t)frust->zFar )
-            v5 = 0;
+        if (depthMinusRad > frust->zFar) {
+            return SPHERE_FULLY_OUTSIDE;
+        }
+        if (depthPlusRad > frust->zFar) {
+            bFullyInFrustum = 0;
+        }
     }
 
-    v15 = rad + pos->z;
-    v16 = pos->z - rad;
-    if ( rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective)
+    flex_t heightPlusRad = pos->z + rad;
+    flex_t heightMinusRad = pos->z - rad;
+    if (rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective)
     {
-        v10 = frust->farTop * frusta;
-        posa = frust->farTop * v14;
+        topPlaneMin = frust->farTop * depthMinusRad;
+        topPlaneMax = frust->farTop * depthPlusRad;
     }
     else
     {
-        v10 = frust->orthoTop;
-        posa = frust->orthoTop;
+        topPlaneMin = frust->orthoTop;
+        topPlaneMax = frust->orthoTop;
     }
-    if ( v16 > v10 && v16 > (flex_d_t)posa )
-        return 2;
-    if ( v15 > v10 || v15 > (flex_d_t)posa )
-        v5 = 0;
-    if ( rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective)
+
+    if (heightMinusRad > topPlaneMin && heightMinusRad > topPlaneMax) {
+        return SPHERE_FULLY_OUTSIDE;
+    }
+    if (heightPlusRad > topPlaneMin || heightPlusRad > topPlaneMax) {
+        bFullyInFrustum = 0;
+    }
+
+    if (rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective)
     {
-        v11 = frust->bottom * frusta;
-        posb = frust->bottom * v14;
+        bottomPlaneMin = frust->bottom * depthMinusRad;
+        bottomPlaneMax = frust->bottom * depthPlusRad;
     }
     else
     {
-        v11 = frust->orthoBottom;
-        posb = frust->orthoBottom;
+        bottomPlaneMin = frust->orthoBottom;
+        bottomPlaneMax = frust->orthoBottom;
     }
-    if ( v15 < v11 && v15 < (flex_d_t)posb )
-        return 2;
-    if ( v16 < v11 || v16 < (flex_d_t)posb )
-        v5 = 0;
-    v17 = pos->x + rad;
-    posc = pos->x - rad;
+
+    if (heightPlusRad < bottomPlaneMin && heightPlusRad < bottomPlaneMax) {
+        return SPHERE_FULLY_OUTSIDE;
+    }
+    if (heightMinusRad < bottomPlaneMin || heightMinusRad < bottomPlaneMax) {
+        bFullyInFrustum = 0;
+    }
+
+    flex_t widthPlusRad = pos->x + rad;
+    flex_t widthMinusRad = pos->x - rad;
     if ( rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective)
     {
-        v12 = frust->farLeft * frusta;
-        rada = frust->farLeft * v14;
+        leftPlaneMin = frust->farLeft * depthMinusRad;
+        leftPlaneMax = frust->farLeft * depthPlusRad;
     }
     else
     {
-        v12 = frust->orthoLeft;
-        rada = frust->orthoLeft;
+        leftPlaneMin = frust->orthoLeft;
+        leftPlaneMax = frust->orthoLeft;
     }
-    if ( v17 < v12 && v17 < (flex_d_t)rada )
-        return 2;
-    if ( posc < v12 || posc < (flex_d_t)rada )
-        v5 = 0;
+    
+    if (widthPlusRad < leftPlaneMin && widthPlusRad < leftPlaneMax) {
+        return SPHERE_FULLY_OUTSIDE;
+    }
+    if (widthMinusRad < leftPlaneMin || widthMinusRad < leftPlaneMax) {
+        bFullyInFrustum = 0;
+    }
+
     if ( rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective)
     {
-        v13 = frust->right * frusta;
-        radb = frust->right * v14;
+        rightPlaneMin = frust->right * depthMinusRad;
+        rightPlaneMax = frust->right * depthPlusRad;
     }
     else
     {
-        v13 = frust->orthoRight;
-        radb = frust->orthoRight;
+        rightPlaneMin = frust->orthoRight;
+        rightPlaneMax = frust->orthoRight;
     }
-    if ( posc > v13 && posc > (flex_d_t)radb )
-        return 2;
-    if ( v17 > v13 || v17 > (flex_d_t)radb )
-        v5 = 0;
-    return v5 == 0;
+
+    if (widthMinusRad > rightPlaneMin && widthMinusRad > rightPlaneMax) {
+        return SPHERE_FULLY_OUTSIDE;
+    }
+    if (widthPlusRad > rightPlaneMin || widthPlusRad > rightPlaneMax) {
+        bFullyInFrustum = 0;
+    }
+
+    return (bFullyInFrustum == 0) ? SPHERE_CLIPPING_EDGE : SPHERE_FULLY_INSIDE;
 }
 
 int rdClip_Face3W(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3* NO_ALIAS pVertices, int numVertices)

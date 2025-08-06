@@ -142,7 +142,7 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     rdSprite *sprite = thing->sprite3;
     rdMatrix_TransformPoint34(&vertex_out, &mat->scale, &rdCamera_pCurCamera->view_matrix);
     if ( rdroid_curCullFlags & 2 )
-        clipResult = rdClip_SphereInFrustrum(rdCamera_pCurCamera->pClipFrustum, &vertex_out, sprite->radius);
+        clipResult = rdClip_SphereInFrustum(rdCamera_pCurCamera->pClipFrustum, &vertex_out, sprite->radius);
     else
         clipResult = thing->clippingIdk;
 

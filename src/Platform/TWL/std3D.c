@@ -291,21 +291,22 @@ MATH_FUNC static void std3D_UpdateFogColor() {
         return;
     }
 
-    std3D_fogDepth = 5;
+    // This is seemingly also in units of glFogShift (12 = 1.0?)
+    std3D_fogDepth = 15;
         
     // TODO: Make this dynamic based on the furthest Z?
-    glFogShift(12);
+    glFogShift(11);
     glFogOffset(std3D_fogDepth & 0x7FFF);
     rdColor24 skyColor = sithWorld_pCurrentWorld->colormaps->colors[sithSurface_skyColorGuess];
 
     if (std3D_currentFogAmbientMult < ambientLight) {
-        std3D_currentFogAmbientMult += 0.01;
+        std3D_currentFogAmbientMult += 0.001;
         if (std3D_currentFogAmbientMult > ambientLight) {
             std3D_currentFogAmbientMult = ambientLight;
         }
     } 
     else if (std3D_currentFogAmbientMult > ambientLight) {
-        std3D_currentFogAmbientMult -= 0.01;
+        std3D_currentFogAmbientMult -= 0.001;
         if (std3D_currentFogAmbientMult < ambientLight) {
             std3D_currentFogAmbientMult = ambientLight;
         }
@@ -316,10 +317,12 @@ MATH_FUNC static void std3D_UpdateFogColor() {
     uint8_t colorB = (u8)((flex_t)skyColor.b * std3D_currentFogAmbientMult);
 
     glFogColor(colorR >> 3, colorG >> 3, colorB >> 3, 31);
+    //glFogColor(31, 0, 0, 31);
     glClearColor(colorR >> 3, colorG >> 3, colorB >> 3, 31);
     for (int i = 0; i < 32; i++) {
-        glFogDensity(i, stdMath_ClampInt((i-5)*5, 0, 127));
+        glFogDensity(i, stdMath_ClampInt(i*4, 0, 127));
     }
+    glFogDensity(0,0);
     glFogDensity(31,127);
 
     std3D_lastSkyColor = sithSurface_skyColorGuess;
@@ -429,20 +432,21 @@ void std3DTwl_LoadProjection() {
     if (!rdCamera_pCurCamera) {
         return;
     }
-    MATRIX_LOAD4x4 = floattof32(1.0f * (rdCamera_pCurCamera->fovDx >> 8));
+    const float zMult = 1.0f;
+    MATRIX_LOAD4x4 = floattof32((zMult*2.0f) * (rdCamera_pCurCamera->fovDx >> 8));
     MATRIX_LOAD4x4 = 0;
     MATRIX_LOAD4x4 = 0;
     MATRIX_LOAD4x4 = floattof32(0.0f);
 
     MATRIX_LOAD4x4 = 0;
-    MATRIX_LOAD4x4 = floattof32(1.0f * (rdCamera_pCurCamera->fovDx >> 8) / rdCamera_pCurCamera->screenAspectRatio);
+    MATRIX_LOAD4x4 = floattof32((zMult*2.0f) * (rdCamera_pCurCamera->fovDx >> 8) / rdCamera_pCurCamera->screenAspectRatio);
     MATRIX_LOAD4x4 = 0;
     MATRIX_LOAD4x4 = floattof32(0.0f);
 
     MATRIX_LOAD4x4 = 0;
     MATRIX_LOAD4x4 = 0;
     MATRIX_LOAD4x4 = floattof32(0.0F);
-    MATRIX_LOAD4x4 = floattof32(0.5F);
+    MATRIX_LOAD4x4 = floattof32(zMult);
 
     MATRIX_LOAD4x4 = floattof32(0.0f);//0;
     MATRIX_LOAD4x4 = floattof32(0.0f); //0;
@@ -530,7 +534,7 @@ int std3D_StartScene()
         //glFogOffset(0x6000);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
-        std3D_fogDepth = 0x6000;
+        std3D_fogDepth = 0x3000;
     }
     
 
@@ -597,7 +601,7 @@ MATH_FUNC int std3D_EndScene()
     // We assume the last frame is probably similar to the current frame.
     const flex_t usPerHblank = (16.666666/262.0*1000.0);
     const flex_t hblankPerUs = 1.0/usPerHblank;
-    const flex_t usBaselineFlex = usPerHblank*(262-(214-195)); // The hblanks that we *have* to do
+    const flex_t usBaselineFlex = usPerHblank*(262-(214-202)); // The hblanks that we *have* to do
     const int64_t usBaseline = (int)usBaselineFlex;
     static uint64_t lastUs = 0;
     uint64_t curUs = Linux_TimeUs();

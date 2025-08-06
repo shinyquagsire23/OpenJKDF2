@@ -336,10 +336,10 @@ int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
     particle = thing->particlecloud;
     rdMatrix_TransformPoint34(&vertex_out, &matrix_4_3->scale, &rdCamera_pCurCamera->view_matrix);
     if ( rdroid_curCullFlags & 2 )
-        v3 = rdClip_SphereInFrustrum(rdCamera_pCurCamera->pClipFrustum, &vertex_out, particle->cloudRadius);
+        v3 = rdClip_SphereInFrustum(rdCamera_pCurCamera->pClipFrustum, &vertex_out, particle->cloudRadius);
     else
         v3 = thing->clippingIdk;
-    if ( v3 != 2 )
+    if ( v3 != SPHERE_FULLY_OUTSIDE )
     {
         rdMatrix_Multiply34(&out, &rdCamera_pCurCamera->view_matrix, matrix_4_3);
         if ( rdroid_curRenderOptions & 2 )

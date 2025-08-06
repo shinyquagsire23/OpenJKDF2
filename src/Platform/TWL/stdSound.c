@@ -262,8 +262,8 @@ int stdSound_Startup()
 
 void stdSound_Shutdown()
 {
-    mmStreamClose();
-    soundDisable();
+    //mmStreamClose();
+    //soundDisable();
 }
 
 void stdSound_SetMenuVolume(flex_t a1)

@@ -119,7 +119,9 @@ void sithAIAwareness_sub_4F2C30(sithSectorEntry *pSectorEntry, sithSector *pSect
     {
         pSectorAlloc->field_4[pSectorEntry->field_14] = a5;
         pSectorAlloc->field_10[pSectorEntry->field_14] = *pPos1;
+#ifndef OPTIMIZE_AWAY_UNUSED_FIELDS
         pSectorAlloc->field_34[pSectorEntry->field_14] = *pPos2;
+#endif
         pSectorAlloc->field_58[pSectorEntry->field_14] = pThing;
         if (a6 > 0.0)
         {
@@ -127,7 +129,11 @@ void sithAIAwareness_sub_4F2C30(sithSectorEntry *pSectorEntry, sithSector *pSect
             {
                 flex_t a6a = (i->mirror ? a6 - i->mirror->dist : a6);
 
-                sithAIAwareness_sub_4F2C30(pSectorEntry, i->sector, pPos1, &i->field_1C, a6, a6a, pThing);
+                rdVector3 adjoinUnk;
+#ifndef OPTIMIZE_AWAY_UNUSED_FIELDS
+                adjoinUnk = i->field_1C; // Maybe this was the adjoin center...?
+#endif
+                sithAIAwareness_sub_4F2C30(pSectorEntry, i->sector, pPos1, &adjoinUnk, a6, a6a, pThing);
             }
         }
     }

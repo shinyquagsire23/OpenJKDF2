@@ -262,7 +262,7 @@ FAST_FUNC void hblank_handler() {
     // GBATek says the safe period is from 202..212,
     // but it seems to actually be 193..214 --
     // unless the GPU is doing a lot of work, then it seems to bump to 202
-    const int hblankMin = 195;
+    const int hblankMin = 202;
     const int hblankMax = 214;
     int vcountCur = REG_VCOUNT;
     if (!std3D_bEnableTwlVrr || vcountCur < hblankMin || vcountCur >= hblankMax)
@@ -1513,7 +1513,7 @@ void do_hooks()
     hook_function(rdClip_Line3Ortho_ADDR, rdClip_Line3Ortho);
     hook_function(rdClip_Line3_ADDR, rdClip_Line3);
     
-    hook_function(rdClip_SphereInFrustrum_ADDR, rdClip_SphereInFrustrum);
+    hook_function(rdClip_SphereInFrustum_ADDR, rdClip_SphereInFrustum);
     
     //hook_function(rdClip_Face3W_ADDR, rdClip_Face3W);
     //hook_function(rdClip_Face3GT_ADDR, rdClip_Face3GT);

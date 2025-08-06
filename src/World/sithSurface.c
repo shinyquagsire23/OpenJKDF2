@@ -387,6 +387,25 @@ int sithSurface_Load(sithWorld *world)
         face->numVertices = v34;
         face->num = v67;
 
+#ifdef SITHRENDER_SPHERE_TEST_SURFACES
+        rdVector3 surfaceCenterPt = {0};
+        for (int idx = 0; idx < surfaceIter->surfaceInfo.face.numVertices; idx++) {
+            int fullIdx = surfaceIter->surfaceInfo.face.vertexPosIdx[idx];
+            rdVector3* pIter = &sithWorld_pLoading->vertices[fullIdx];
+            rdVector_Add3Acc(&surfaceCenterPt, pIter);
+            rdVector_Scale3Acc(&surfaceCenterPt, 0.5);
+        }
+        
+        flex_t radius = 0.0;
+        for (int idx = 0; idx < surfaceIter->surfaceInfo.face.numVertices; idx++) {
+            int fullIdx = surfaceIter->surfaceInfo.face.vertexPosIdx[idx];
+            rdVector3* pIter = &sithWorld_pLoading->vertices[fullIdx];
+            radius = stdMath_Max(rdVector_Dist3(&surfaceCenterPt, pIter), radius);
+        }
+        surfaceIter->radius = radius;
+        surfaceIter->center = surfaceCenterPt;
+#endif
+
         rdMaterial_OptionalFree(face->material);
     }
 

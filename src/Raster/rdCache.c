@@ -711,6 +711,8 @@ int rdCache_SendFaceListToHardware()
                 iterating_6c_vtxs = iterating_6c_vtxs_;
                 d3dvtx_zval = iterating_6c_vtxs_[vtx_idx].z;
                 v38 = (flex_t)d3dvtx_zval;
+                if ( rdCache_dword_865258 != 16 )
+                    v38 = SITHCAMERA_ZFAR - v38;
 #else
                 v36 = iterating_6c_vtxs_[vtx_idx].z;
                 iterating_6c_vtxs = iterating_6c_vtxs_;
@@ -719,9 +721,10 @@ int rdCache_SendFaceListToHardware()
                 else
                     d3dvtx_zval = 1.0 / iterating_6c_vtxs_[vtx_idx].z;
                 v38 = d3dvtx_zval * invZFar;
-#endif
                 if ( rdCache_dword_865258 != 16 )
                     v38 = 1.0 - v38;
+#endif
+
 #ifdef TARGET_TWL
                 rdCache_aHWVertices[rdCache_totalVerts].x = ((active_6c->vertices[vtx_idx].x)); // Added: The original game rounded to ints here (with ceilf?)
                 rdCache_aHWVertices[rdCache_totalVerts].y = ((active_6c->vertices[vtx_idx].z)); // Added: The original game rounded to ints here (with ceilf?)
@@ -732,7 +735,7 @@ int rdCache_SendFaceListToHardware()
 
                 // Don't waste time with this on DSi
 #ifdef TARGET_TWL
-                rdCache_aHWVertices[rdCache_totalVerts].nx = 0.0;
+                //rdCache_aHWVertices[rdCache_totalVerts].nx = 0.0;
 #else
                 rdCache_aHWVertices[rdCache_totalVerts].nx = d3dvtx_zval / 32.0;
 #endif
@@ -741,7 +744,9 @@ int rdCache_SendFaceListToHardware()
                 rdCache_aHWVertices[rdCache_totalVerts].lightLevel = 0xFF;
 #endif
 
+#ifndef TARGET_TWL
                 rdCache_aHWVertices[rdCache_totalVerts].nz = 0.0;
+#endif
                 if ( lighting_capability == 0 )
                 {
                     vertex_b = 255;
@@ -914,9 +919,10 @@ int rdCache_SendFaceListToHardware()
                 rdCache_aHWVertices[rdCache_aHWLines[tri_idx].v1].color = active_6c->extraData;
                 rdCache_aHWVertices[rdCache_aHWLines[tri_idx].v2].color = active_6c->extraData;
 
+#ifndef TARGET_TWL
                 rdCache_aHWVertices[rdCache_aHWLines[tri_idx].v1].nz = 0.0;
                 rdCache_aHWVertices[rdCache_aHWLines[tri_idx].v2].nz = 0.0;
-                
+#endif
                 rdCache_totalLines++;
             }
             else 
@@ -1049,15 +1055,17 @@ LABEL_232:
 #ifdef TARGET_TWL
             v88 = active_6c->vertices[tmpiter].z;
             v89 = v88;
+            if ( rdCache_dword_865258 != 16 )
+                v89 = SITHCAMERA_ZFAR - v89;
 #else
             if ( v87 == 0.0 )
                 v88 = 0.0;
             else
                 v88 = 1.0 / active_6c->vertices[tmpiter].z;
             v89 = v88 * invZFar;
-#endif
             if ( rdCache_dword_865258 != 16 )
                 v89 = 1.0 - v89;
+#endif
 #ifdef TARGET_TWL
             rdCache_aHWVertices[rdCache_totalVerts].x = ((active_6c->vertices[tmpiter].x));  // Added: The original game rounded to ints here (with ceilf?)
             rdCache_aHWVertices[rdCache_totalVerts].y = ((active_6c->vertices[tmpiter].z));  // Added: The original game rounded to ints here (with ceilf?)
@@ -1068,11 +1076,12 @@ LABEL_232:
 
             // Don't waste time with this on DSi
 #ifdef TARGET_TWL
-            rdCache_aHWVertices[rdCache_totalVerts].nx = 0.0;
+            //rdCache_aHWVertices[rdCache_totalVerts].nx = 0.0;
+            //rdCache_aHWVertices[rdCache_totalVerts].nz = 0.0;
 #else
             rdCache_aHWVertices[rdCache_totalVerts].nx = v88 / 32.0;
-#endif
             rdCache_aHWVertices[rdCache_totalVerts].nz = 0.0;
+#endif
 
 #ifdef TARGET_TWL
             rdCache_aHWVertices[rdCache_totalVerts].lightLevel = 0xFF;

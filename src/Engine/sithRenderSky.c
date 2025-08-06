@@ -139,7 +139,7 @@ void sithRenderSky_TransformVertical(rdProcEntry *pProcEntry, sithSurfaceInfo *p
 
 #ifdef TARGET_TWL
         flex_t prev_z = pProcEntry->vertices[i].y;
-        vertex_out.y *= 0.05;
+        vertex_out.y *= 0.15;
         pProcEntry->vertices[i].y = vertex_out.y;
         pProcEntry->vertices[i].y = stdMath_Clamp(pProcEntry->vertices[i].y, 0.0f, rdCamera_pCurCamera->pClipFrustum->zFar - 0.1);
         pProcEntry->vertices[i].x /= prev_z;

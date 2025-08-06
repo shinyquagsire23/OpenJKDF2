@@ -842,23 +842,9 @@ typedef struct D3DVERTEX_twl
   #pragma pack(push, 4)
   union
   {
-    flex_t nx;
-    flex_t dvNX;
-  };
-  #pragma pack(pop)
-  #pragma pack(push, 4)
-  union
-  {
     flex_t ny;
     flex_t dvNY;
     uint32_t color;
-  };
-  #pragma pack(pop)
-  #pragma pack(push, 4)
-  union
-  {
-    flex_t nz;
-    flex_t dvNZ;
   };
   #pragma pack(pop)
   #pragma pack(push, 4)
@@ -1317,15 +1303,8 @@ typedef struct sithAdjoin
     sithAdjoin *next;
     uint32_t field_14;
     flex_t dist;
+#ifndef OPTIMIZE_AWAY_UNUSED_FIELDS
     rdVector3 field_1C;
-#ifdef TARGET_TWL
-    int timesClipped;
-    flex_t minX;
-    flex_t maxX;
-    flex_t minY;
-    flex_t maxY;
-    flex_t minZ;
-    flex_t maxZ;
 #endif
 } sithAdjoin;
 
@@ -1521,10 +1500,6 @@ typedef struct rdFace
     uint32_t wallCel;
     rdVector2 clipIdk;
     flex_t extraLight;
-    // TODO: sphere culling?
-#if 0
-    flex_t radius;
-#endif
     rdVector3 normal;
 } rdFace;
 
@@ -1563,6 +1538,11 @@ typedef struct sithSurface
     sithAdjoin* adjoin;
     uint32_t surfaceFlags;
     sithSurfaceInfo surfaceInfo;
+    // TODO: sphere culling?
+#ifdef SITHRENDER_SPHERE_TEST_SURFACES
+    flex_t radius;
+    rdVector3 center;
+#endif
 } sithSurface;
 
 typedef int (*rdMaterialUnloader_t)(rdMaterial*);
@@ -2598,7 +2578,9 @@ typedef struct sithSectorAlloc
     int32_t field_0;
     flex_t field_4[3];
     rdVector3 field_10[3];
+#ifndef OPTIMIZE_AWAY_UNUSED_FIELDS
     rdVector3 field_34[3];
+#endif
     sithThing* field_58[3];
 } sithSectorAlloc;
 

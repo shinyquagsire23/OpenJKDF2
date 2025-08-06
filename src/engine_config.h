@@ -118,8 +118,8 @@
 #define MAX_DEFLECTION_BOUNCES (6)
 
 #if defined(TARGET_TWL)
-#define RDCACHE_MAX_TRIS (0x400) // theoretical max 0x800?
-#define RDCACHE_MAX_VERTICES (0xC00) // theoretical max 0x1800?
+#define RDCACHE_MAX_TRIS (0x200) // theoretical max 0x800?
+#define RDCACHE_MAX_VERTICES (0x600) // theoretical max 0x1800?
 
 #define STD3D_MAX_TEXTURES (512) // theoretical max 2048
 #define STD3D_MAX_UI_TRIS (0x100)
@@ -216,7 +216,7 @@
 #elif defined(TARGET_TWL)
 #define SITHCAMERA_ZNEAR_FIRSTPERSON (1.0 / 64.0)
 #define SITHCAMERA_ZNEAR (1.0 / 64.0)
-#define SITHCAMERA_ZFAR (8.0)
+#define SITHCAMERA_ZFAR (6.0)
 #else
 #define SITHCAMERA_ZNEAR_FIRSTPERSON (1.0 / 64.0)
 #define SITHCAMERA_ZNEAR (1.0 / 64.0)
@@ -324,7 +324,9 @@
 #define RDCLIP_WORK_BUFFERS_IN_STACK_MEM
 //#define RDCLIP_COPY_VERTS_TO_STACK
 #define RDCLIP_CLIP_ZFAR_FIRST
+#define SITHRENDER_SPHERE_TEST_SURFACES
 #endif
+#define SITHRENDER_SPHERE_TEST_SURFACES
 
 //#define RDMATERIAL_LRU_LOAD_UNLOAD
 //#define JKGUI_SMOL_SCREEN
@@ -382,6 +384,7 @@ typedef double flex_d_t_type;
 #define FIXED_POINT_DECIMAL_BITS (16)
 #define FIXED_POINT_WHOLE_BITS   (32-FIXED_POINT_DECIMAL_BITS)
 //#define RENDER_ROUND_VERTICES
+#define OPTIMIZE_AWAY_UNUSED_FIELDS
 #endif
 
 #define FLEX(n) ((flex_t)n)

@@ -12,11 +12,11 @@ curGeometryMode 0x0073A590 int
 apGeoLights 0x0073A598 rdLight*[64]
 rdModel3_aLocalLightPos 0x0073A698 rdVector3[64]
 rdModel3_aLocalLightDir 0x0 rdVector3[64]
-meshFrustrumCull 0x0073A998 int
+meshFrustumCull 0x0073A998 int
 curTextureMode 0x0073A99C int
 aView 0x0073A9A0 rdVector3[512]
 pCurMesh 0x0073C1A0 rdMesh*
-thingFrustrumCull 0x0073C1A4 int
+thingFrustumCull 0x0073C1A4 int
 vertexSrc 0x0073C1A8 rdMeshinfo
 pCurModel3 0x0073C1C8 rdModel3*
 rdModel3_textureMode 0x0073C1CC int
