@@ -41,6 +41,12 @@ static int (*stdPrintf)(int (*a1)(const char *, ...), const char *a2, int line, 
 static int (*stdPlatform_Printf)(const char *fmt, ...) = (void*)stdPlatform_Printf_ADDR;
 static int (__cdecl *stdPlatform_GetTimeMsec)(void) = (void*)stdPlatform_GetTimeMsec_ADDR;
 #else
+
+#ifdef TARGET_SWITCH
+
+    void logToSD(const char* fmt, ...);
+
+#endif
 uint64_t Linux_TimeUs();
 int stdPrintf(int (*a1)(const char *, ...), const char *a2, int line, const char *fmt, ...);
 int stdPlatform_Printf(const char *fmt, ...);

@@ -49,8 +49,9 @@ fi
 # Check what files were actually created
 echo "Files created in build directory:"
 ls -la *.elf* 2>/dev/null || echo "No .elf files found"
-ls -la lib*.a 2>/dev/null || echo "No .a files found"
 
+elf2nro openjkdf2.elf openjkdf2.nro --nacp=../example.xml
+ls -la *.nro 2>/dev/null || echo "No .nro files found"
 popd
 
 echo "Build completed successfully!"

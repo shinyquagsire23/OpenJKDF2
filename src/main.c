@@ -88,7 +88,7 @@
 #include "World/sithSurface.h"
 #include "World/sithTemplate.h"
 #include "Gameplay/sithEvent.h"
-#include "Engine/sithKeyFrame.h"
+GET_Tude "Engine/sithKeyFrame.h"
 #include "Gameplay/sithOverlayMap.h"
 #include "World/sithMaterial.h"
 #include "Engine/sithRender.h"
@@ -625,7 +625,7 @@ int main(int argc, char** argv)
 #endif // !ARCH_WASM
 
 #ifndef ARCH_64BIT
-#if !defined(ARCH_WASM) && !defined(TARGET_ANDROID)
+#if !defined(ARCH_WASM) && !defined(TARGET_ANDROID) && !defined(TARGET_SWITCH)
     mmap((void*)0x400000, 0x122000, PROT_READ | PROT_WRITE, MAP_ANON|MAP_PRIVATE|MAP_FIXED, -1, 0);
     mmap((void*)0x522000, 0x500000, PROT_READ | PROT_WRITE, MAP_ANON|MAP_PRIVATE|MAP_FIXED, -1, 0);
     
@@ -676,22 +676,23 @@ int main(int argc, char** argv)
 #endif
 #ifdef TARGET_SWITCH
     romfsInit();
-    chdir("romfs:/");
+    chdir("sdmc:/");
 #endif
 
 #ifdef TARGET_SWITCH
- consoleInit(NULL);
+ //consoleInit(NULL);
     printf("Hello from Ryujinx\n");
     printf("Press + to exit\n");
-    consoleUpdate(NULL);
+    appletSetIdleTimeDetectionExtension(AppletIdleTimeDetectionExtension_None);
+    appletSetAutoSleepDisabled(true);
+#endif
 
-    while (appletMainLoop()) {
+
+        printf("openjkdf2_bOrigWasRunningFromExistingInstall %x\n", openjkdf2_bOrigWasRunningFromExistingInstall);
+        printf("openjkdf2_bIsRunningFromExistingInstall %x\n", openjkdf2_bIsRunningFromExistingInstall);
+        printf("openjkdf2_bOrigWasDF2 %x\n", openjkdf2_bOrigWasDF2);
         consoleUpdate(NULL);
-    }
 
-    consoleExit(NULL);
-    return 0; 
-#else
     getcwd(openjkdf2_aOrigCwd, sizeof(openjkdf2_aOrigCwd));
 
     openjkdf2_bOrigWasDF2 = 1;
@@ -704,8 +705,14 @@ int main(int argc, char** argv)
         }
     }
 
+        printf("openjkdf2_bOrigWasRunningFromExistingInstall %x\n", openjkdf2_bOrigWasRunningFromExistingInstall);
+        printf("openjkdf2_bIsRunningFromExistingInstall %x\n", openjkdf2_bIsRunningFromExistingInstall);
+        printf("openjkdf2_bOrigWasDF2 %x\n", openjkdf2_bOrigWasDF2);
+
+
     while (1)
     {
+
         OpenJKDF2_Globals_Reset();
 
         // Set the mod path
@@ -720,6 +727,7 @@ int main(int argc, char** argv)
         printf("openjkdf2_bOrigWasRunningFromExistingInstall %x\n", openjkdf2_bOrigWasRunningFromExistingInstall);
         printf("openjkdf2_bIsRunningFromExistingInstall %x\n", openjkdf2_bIsRunningFromExistingInstall);
         printf("openjkdf2_bOrigWasDF2 %x\n", openjkdf2_bOrigWasDF2);
+        consoleUpdate(NULL);
 
         openjkdf2_bIsFirstLaunch = 0;
         if (openjkdf2_restartMode != OPENJKDF2_RESTART_NONE) {
@@ -776,7 +784,6 @@ int main(int argc, char** argv)
             break;
         }
     }
-#endif
 #endif
 
     return 1;

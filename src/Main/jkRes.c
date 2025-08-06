@@ -35,6 +35,13 @@ int jkRes_Startup(HostServices *a1)
     }
     jkRes_LoadNew(&jkRes_gCtx.aGobDirectories[3], "resource", 1);
     _memset(jkRes_aFiles, 0, sizeof(jkRes_aFiles));
+    stdPlatform_Printf("OpenJKDF2: %s - jkRes_bInit = 1\n", __func__);
+    // Log out whats all now initted 
+    stdPlatform_Printf("OpenJKDF2: %s - jkRes_gCtx.aGobDirectories[0].name = %s\n", __func__, jkRes_gCtx.aGobDirectories[0].name);
+    stdPlatform_Printf("OpenJKDF2: %s - jkRes_gCtx.aGobDirectories[0].name = %s\n", __func__, jkRes_gCtx.aGobDirectories[1].name);
+    stdPlatform_Printf("OpenJKDF2: %s - jkRes_gCtx.aGobDirectories[0].name = %s\n", __func__, jkRes_gCtx.aGobDirectories[2].name);
+    stdPlatform_Printf("OpenJKDF2: %s - jkRes_gCtx.aGobDirectories[0].name = %s\n", __func__, jkRes_gCtx.aGobDirectories[3].name);
+
     jkRes_bInit = 1;
     return 1;
 }
@@ -239,6 +246,11 @@ int jkRes_ReadKey()
 
 int jkRes_LoadNew(jkResGobDirectory *resGob, char *name, int a3)
 {
+
+   char  path[255] = {0};
+    getcwd(path, 255);
+    chdir("sdmc:/jk/");
+    stdPlatform_Printf("Openjkdf2 loadNew:  Current working directory: %s\n", path);
     stdFileSearch *v15; // ebp
     stdFileSearchResult v18; // [esp+8h] [ebp-10Ch] BYREF
 
@@ -270,14 +282,18 @@ int jkRes_LoadNew(jkResGobDirectory *resGob, char *name, int a3)
     }
 
     v15 = stdFileUtil_NewFind(name, 3, JKRES_GOB_EXT);
+    stdPlatform_Printf("OpenJKDF2: %s - Searching for gobs in %s\n", __func__, name);
     while (stdFileUtil_FindNext(v15, &v18))
     {
+        stdPlatform_Printf("OpenJKDF2: %s - Found gob: %s\n", __func__, v18.fpath);
         if ( resGob->numGobs >= STDGOB_MAX_GOBS )
             break;
         if ( v18.fpath[0] != '.' )
         {
             stdString_snprintf(jkRes_idkGobPath, 0x80u, "%s%c%s", name, LEC_PATH_SEPARATOR_CHR, v18.fpath);
             resGob->gobs[resGob->numGobs] = stdGob_Load(jkRes_idkGobPath, 16, 0);
+
+            stdPlatform_Printf("OpenJKDF2: %s - Loading gob: %s\n", __func__, jkRes_idkGobPath);
 
             if ( resGob->gobs[resGob->numGobs] )
                 resGob->numGobs++;
@@ -563,6 +579,9 @@ int jkRes_FileClose(stdFile_t fd)
 size_t jkRes_FileRead(stdFile_t fd, void* out, size_t len)
 {
     jkResFile *resFile = &jkRes_aFiles[fd - 1];
+    stdPlatform_Printf("Openjkdf2: %s fd: %d len: %zu\n", __func__, fd, len);
+    stdPlatform_Printf("Openjkdf2: %s - use low level: %d\n", __func__, resFile->useLowLevel);
+
 
     if ( resFile->useLowLevel )
         return pLowLevelHS->fileRead(resFile->fsHandle, out, len);

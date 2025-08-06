@@ -23,7 +23,10 @@
 
 #include "external/fcaseopen/fcaseopen.h"
 #endif
-
+#ifdef TARGET_SWITCH
+#include <stdio.h>
+#include <stdlib.h>
+#endif
 #ifdef TARGET_TWL
 #include <errno.h>
 #endif
@@ -59,7 +62,8 @@ stdFileSearch* stdFileUtil_NewFind(const char *path, int a2, const char *extensi
 #endif
 
     stdPlatform_Printf("OpenJKDF2: %s %s\n", __func__, search->path);
-    
+    stdPlatform_Printf("OpenJKDF2 amount: %s %s\n", __func__, search->num_found);
+
     return search;
 }
 
@@ -299,11 +303,30 @@ static int parse_ext(const struct dirent *dir)
     return 0;
 }
 
+void printFileSearch(stdFileSearch *search){
+    if (!search) {
+        stdPlatform_Printf("OpenJKDF2: %s - search is NULL\n", __func__);
+        return;
+    }
+    stdPlatform_Printf("OpenJKDF2: %s - path: %s, num_found: %d, isNotFirst: %d\n", __func__, search->path, search->num_found, search->isNotFirst);
+    // Print all entries in the namelist
+    if (search->namelist) {
+        for (int i = 0; i < search->num_found; i++) {
+            stdPlatform_Printf("OpenJKDF2: %s - namelist[%d]: %s\n", __func__, i, search->namelist[i]->d_name);
+        }
+    } else {
+        stdPlatform_Printf("OpenJKDF2: %s - namelist is NULL\n", __func__);
+    }
+}
 int stdFileUtil_FindNext(stdFileSearch *a1, stdFileSearchResult *a2)
 {
+    char  path[255] = {0};
+    getcwd(path, 255);
+    stdPlatform_Printf("Openjkdf2: Current working directory: %s\n", path);
     struct dirent *iter;
     char tmp[128];
 
+    printFileSearch(a1);
     if ( !a1 )
         return 0;
 
@@ -316,7 +339,7 @@ int stdFileUtil_FindNext(stdFileSearch *a1, stdFileSearchResult *a2)
     }
     else
     {
-#ifdef TARGET_TWL
+#if defined(TARGET_TWL) || defined(TARGET_SWITCH) 
         getcwd(tmp, 128-1);
         //strncpy(tmp, pcwd, 128-1);
         strncat(tmp, "/", 128-1);
@@ -357,11 +380,19 @@ int stdFileUtil_FindNext(stdFileSearch *a1, stdFileSearchResult *a2)
         
         if (!a1->namelist || a1->num_found <= 0) return 0;
         
-        iter = a1->namelist[2];
+        iter = a1->namelist[0];
         a1->isNotFirst = 2;
     }
+    printFileSearch(a1);
 
-    if (a1->num_found <= 2 || !iter)
+        stdPlatform_Printf("Openjkdf2: All Found entries:: %d\n", a1->num_found);
+        stdPlatform_Printf("Openjkdf2: Current entry: %s\n", iter ? iter->d_name : "NULL");
+    if (!iter)
+    {
+        stdPlatform_Printf("Openjkdf2: No more entries found\n");
+    }
+
+    if (a1->num_found < 2 || !iter)
         return 0;
 
     strncpy(a2->fpath, iter->d_name, sizeof(a2->fpath));

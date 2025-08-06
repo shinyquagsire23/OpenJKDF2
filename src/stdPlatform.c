@@ -21,6 +21,23 @@
 #endif
 
 #include "SDL2_helper.h"
+#ifdef TARGET_SWITCH
+#include <switch.h>
+#include <stdarg.h>
+#include <stdio.h>
+    void logToSD(const char* fmt, ...) {
+        FILE* f = fopen("sdmc:/openjkdf2_log.txt", "a");
+        if (!f) return;
+
+
+        va_list args;
+        va_start(args, fmt);
+        vfprintf(f, fmt, args);
+        fprintf(f, "\n");
+        va_end(args);
+        fclose(f);
+    }
+#endif
 
 #ifdef PLATFORM_POSIX
 uint32_t Linux_TimeMs()
@@ -67,6 +84,7 @@ static stdFile_t Linux_stdFileOpen(const char* fpath, const char* mode)
     char tmp[512];
     size_t len = strlen(fpath);
 
+    stdPlatform_Printf("Openjkdf2: Linux_stdFileOpen: %s %s\n", fpath, mode);
     if (len > 512) {
         len = 512;
     }
@@ -637,7 +655,18 @@ int stdPlatform_Printf(const char *fmt, ...)
 #ifdef TARGET_ANDROID
     LOGI("%s", tmp);
 #endif
+#ifdef TARGET_SWITCH
+    FILE* f = fopen("sdmc:/openjkdf2_log.txt", "a");
+    if (!f) return ret;
 
+
+    va_start(args, fmt);
+    vfprintf(f, fmt, args);
+    fprintf(f, "\n");
+    va_end(args);
+    fclose(f);
+    return ret;
+#endif
 #ifdef SDL2_RENDER
     SDL_UnlockMutex(stdPlatform_mtxPrintf);
 #endif

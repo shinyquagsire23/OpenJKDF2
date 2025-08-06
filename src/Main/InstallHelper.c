@@ -12,7 +12,7 @@
 #include <unistd.h>
 #endif
 
-#if defined(SDL2_RENDER) && !defined(ARCH_WASM) && !defined(TARGET_ANDROID) && !defined(TARGET_SWITCH)
+#if defined(SDL2_RENDER) && !defined(ARCH_WASM) && !defined(TARGET_ANDROID) && defined(TARGET_SWITCH)
 
 const char* aRequiredAssets[] = {
     "episode/JK1.gob",
@@ -421,8 +421,9 @@ int InstallHelper_UseLocalData()
     return InstallHelper_GetLocalDataDir(NULL, 0, 1);
 }
 
-int InstallHelper_AttemptInstallFromExisting(nfdu8char_t* path)
+int InstallHelper_AttemptInstallFromExisting(char* path)
 {
+    return 1; //added
     const char* aOptionalAssets[] = {
         "JK.EXE",
         "JKM.EXE",
@@ -701,6 +702,7 @@ int InstallHelper_AttemptInstallFromExisting(nfdu8char_t* path)
     return 1;
 }
 
+#ifndef TARGET_SWITCH
 int InstallHelper_AttemptInstallFromDisk(nfdu8char_t* path)
 {
     bool isTwoPartCD = false;
@@ -919,6 +921,7 @@ final_check:
     return 1;
 }
 
+#endif
 int InstallHelper_AttemptInstall()
 {
     // TODO: Polyglot
@@ -946,58 +949,8 @@ int InstallHelper_AttemptInstall()
     InstallHelper_GetLocalDataDir(tmpCwd, sizeof(tmpCwd), 0);
     snprintf(tmpMsg, sizeof(tmpMsg), "OpenJKDF2 could not find required game assets.\nWould you like to install assets now?\n\nAssets will be installed to:\n%s", tmpCwd);
 
-    const SDL_MessageBoxData messageboxdata = {
-        SDL_MESSAGEBOX_INFORMATION, /* .flags */
-        NULL, /* .window */
-        "OpenJKDF2 Install Helper", /* .title */
-        tmpMsg, /* .message */
-        SDL_arraysize(buttons), /* .numbuttons */
-        buttons, /* .buttons */
-        &colorScheme /* .colorScheme */
-    };
 
-    int buttonid;
-    if (SDL_ShowMessageBox(&messageboxdata, &buttonid) < 0) {
-        SDL_Log("error displaying message box");
-        return 0;
-    }
-
-    if (buttonid == -1 || buttonid == 1) return 0;
-
-    if (Main_bMotsCompat)
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "OpenJKDF2 Install Helper", "Please select your existing JKMOTS installation, or an install disk mount.", NULL);
-    else
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "OpenJKDF2 Install Helper", "Please select your existing JKDF2 installation, or an install disk mount.", NULL);
-    
-    if (NFD_Init() != NFD_OKAY) {
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed to initialize file chooser", NULL);
-        return 0;
-    }
-
-    nfdu8char_t* path;
-    nfdresult_t selRet = NFD_PickFolderU8(&path, NULL);
-    if (selRet != NFD_OKAY || !path) {
-        //SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed during file chooser", NULL);
-        return 0;
-    }
-    //SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "OpenJKDF2 Install Helper", path, NULL);
-
-    // Check if this is a disk
-    char checkDisk[4096];
-
-    strncpy(checkDisk, path, sizeof(checkDisk)-1);
-    strncat(checkDisk, "/AUTORUN.INF", sizeof(checkDisk)-1);
-    if (util_FileExists(checkDisk)) {
-        return InstallHelper_AttemptInstallFromDisk(path);
-    }
-
-    // Disk 2 has no autorun
-    strncpy(checkDisk, path, sizeof(checkDisk)-1);
-    strncat(checkDisk, "/GAMEDATA/RESOURCE/JK_.CD", sizeof(checkDisk)-1);
-    if (util_FileExists(checkDisk)) {
-        return InstallHelper_AttemptInstallFromDisk(path);
-    }
-
+    char *path = "sdmc:/jk/";
     return InstallHelper_AttemptInstallFromExisting(path);
 }
 
@@ -1139,6 +1092,10 @@ void InstallHelper_SetCwd()
         snprintf(tmp, sizeof(tmp)-1, "%smots/", openjkdf2_aOrigCwd);
     }
     chdir(tmp);
+#elif defined(TARGET_SWITCH)
+    stdPlatform_Printf("Running from: %s\n", "gamefiles");
+    chdir("sdmc:/jk/");
+
 #else
     if (!Main_bMotsCompat) {
         chdir("/jk1/");
@@ -1147,9 +1104,8 @@ void InstallHelper_SetCwd()
         chdir("/mots/");
     }
 #endif
-    char tmpCwd[256];
-    getcwd(tmpCwd, sizeof(tmpCwd));
 
-    stdPlatform_Printf("Running from: %s\n", tmpCwd);
+
+    stdPlatform_Printf("Running from my dir : %s\n", "test");
 }
 #endif // defined(SDL2_RENDER) && !defined(ARCH_WASM) && !defined(TARGET_ANDROID)

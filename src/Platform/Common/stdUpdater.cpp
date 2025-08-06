@@ -30,9 +30,11 @@
 
 extern "C" {
 
+    #ifndef TARGET_SWITCH
 std::string stdUpdater_strBrowserDownloadUrl;
 std::string stdUpdater_strUpdateVersion;
 std::string stdUpdater_strDlFname;
+#endif
 bool stdUpdater_bDownloading;
 bool stdUpdater_bFoundUpdate;
 bool stdUpdater_bCompletedUpdate;
@@ -46,7 +48,7 @@ char* stdUpdater_pUpdateFilename = (char*)"";
 
 void stdUpdater_StartupCvars()
 {
-#ifdef TARGET_TWL
+#if defined(TARGET_TWL) || defined(TARGET_SWITCH)
     return;
 #endif
     sithCvar_RegisterBool("net_disableUpdates", 0, &stdUpdater_bDisableUpdates, CVARFLAG_GLOBAL);
@@ -64,15 +66,16 @@ void stdUpdater_StartupCvars()
 
 void stdUpdater_Reset()
 {
-#ifdef TARGET_TWL
+#if defined(TWL) || defined(SWITCH) || defined(TARGET_SWITCH)
     return;
-#endif
+#else
     stdUpdater_strBrowserDownloadUrl = "";
     stdUpdater_strUpdateVersion = "";
     stdUpdater_strDlFname = "";
     stdUpdater_bFoundUpdate = false;
     stdUpdater_bCompletedUpdate = false;
     stdUpdater_bDownloading = false;
+    #endif
 }
 
 int stdUpdater_CheckForUpdates()
@@ -167,9 +170,9 @@ int stdUpdater_CheckForUpdates()
 
 void stdUpdater_GetUpdateText(wchar_t* pOut, size_t outSz)
 {
-#ifdef TARGET_TWL
+#if defined(TARGET_TWL) || defined(TARGET_SWITCH)
     return;
-#endif
+#else
     // TODO: i8n
     if (stdUpdater_bCompletedUpdate) {
 #if defined(WIN64_STANDALONE)
@@ -185,13 +188,14 @@ void stdUpdater_GetUpdateText(wchar_t* pOut, size_t outSz)
     }
     
     jk_snwprintf(pOut, outSz/sizeof(wchar_t), jkStrings_GetUniStringWithFallback("GUIEXT_UPDATE_IS_AVAIL"), openjkdf2_aReleaseVersion, stdUpdater_strUpdateVersion.c_str());
+    #endif
 }
 
 void stdUpdater_Win64UpdateThread()
 {
-#ifdef TARGET_TWL
+#if defined(TARGET_TWL) || defined(TARGET_SWITCH)
     return;
-#endif
+#else
     char buffer[1024];
     char **rc;
     int file_count;
@@ -206,7 +210,7 @@ void stdUpdater_Win64UpdateThread()
     stdPlatform_Printf("stdUpdater: %s %s\n", tmp_zippath, stdUpdater_strBrowserDownloadUrl.c_str());
     stdUpdater_bDownloading = true;
     stdHttp_DownloadToPath(stdUpdater_strBrowserDownloadUrl.c_str(), tmp_zippath);
-
+#endif
 #if defined(PLATFORM_PHYSFS)
     PHYSFS_mount(tmp_zippath, "update", 1);
 
@@ -310,7 +314,7 @@ int stdUpdater_UpdateThread(void* unused)
 
 void stdUpdater_DoUpdate()
 {
-#if defined(PLATFORM_LINUX) || defined(TARGET_TWL)
+#if defined(PLATFORM_LINUX) || defined(TARGET_TWL) || defined(TARGET_SWITCH)
     stdUpdater_bFoundUpdate = false;
     stdUpdater_bDownloading = false;
     stdUpdater_bCompletedUpdate = false;
@@ -321,7 +325,7 @@ void stdUpdater_DoUpdate()
         return;
     }
 
-#ifdef SDL2_RENDER
+#ifdef SDL2_RENDER 
     SDL_Thread* stdUpdater_thread = SDL_CreateThread(stdUpdater_UpdateThread, "stdComm_EnumThread", (void *)NULL);
 #else
     stdUpdater_UpdateThread(NULL);

@@ -403,8 +403,9 @@ GLuint std3D_loadProgram(const char* fpath_base)
     glGetProgramiv(out, GL_LINK_STATUS, &link_ok);
     if (!link_ok) 
     {
+        stdPlatform_Printf("std3D: Could not link program %s!\n", fpath_base);
         print_log(out);
-        return 0;
+        return 1;
     }
     
     return out;

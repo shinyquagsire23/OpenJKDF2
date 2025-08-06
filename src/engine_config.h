@@ -366,9 +366,10 @@ extern int Window_isHiDpi;
 #ifdef WIN64_STANDALONE
 #define WINDOW_DEFAULT_WIDTH  (640*2)
 #define WINDOW_DEFAULT_HEIGHT (480*2)
-#else // WIN64_STANDALONE
-#define WINDOW_DEFAULT_WIDTH  (640)
-#define WINDOW_DEFAULT_HEIGHT (480)
+#else
+
+#define WINDOW_DEFAULT_WIDTH  (1920)
+#define WINDOW_DEFAULT_HEIGHT (1080)
 #endif // WIN64_STANDALONE
 
 // The type to use for flex_t:

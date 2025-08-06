@@ -2,7 +2,7 @@
 #define assert(...) ((void)0)
 #include "types.h"
 
-#if defined(LINUX) || defined(TARGET_TWL)
+#if defined(LINUX) || defined(TARGET_TWL) || defined(TARGET_SWITCH)
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
@@ -11,6 +11,9 @@
 //#include <wchar.h>
 #endif
 
+#if defined(TARGET_SWITCH)
+#include <switch.h>
+#endif
 #ifdef MACOS
 #include <wchar.h>
 #endif
@@ -347,7 +350,7 @@ void* _memset(void* ptr, int val, size_t num)
     return ptr;
 }
 
-#if !defined(MACOS) && !defined(WIN64_STANDALONE) && !defined(LINUX) && !defined(TARGET_TWL)
+#if !defined(MACOS) && !defined(WIN64_STANDALONE) && !defined(LINUX) && !defined(TARGET_TWL) && !defined(TARGET_SWITCH)
 void* memset(void* ptr, int val, size_t num)
 {
     int i;

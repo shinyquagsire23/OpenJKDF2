@@ -63,7 +63,8 @@ GLuint load_shader_file(const char* filepath, GLenum type)
     }
     
     stdPlatform_Printf("std3D: Parse shader `%s`\n", filepath);
-    
+    // print content
+	stdPlatform_Printf("%s\n", shader_contents);
     GLuint ret = create_shader(shader_contents, type);
     free(shader_contents);
     
@@ -115,7 +116,11 @@ GLuint create_shader(const char* shader, GLenum type) {
     extensions = "\n";
     defines = "#define CAN_BILINEAR_FILTER\n";
 #endif
-
+#if defined(TARGET_SWITCH)
+    version = "#version 300 es\n";
+    extensions = "\n";
+    defines = "#define CAN_BILINEAR_FILTER\n";
+#endif
 	// GLES2 precision specifiers
 	const char* precision;
 	precision =

@@ -139,7 +139,7 @@ endif()
 
 # OpenAL specific paths
 if(EXISTS "${PORTLIBS}/include/AL")
-    include_directories("${PORTLIBS}/include")
+    include_directories("${PORTLIBS}/include/AL")
 endif()
 
     set(CMAKE_C_COMPILER "${DEVKITA64}/bin/aarch64-none-elf-gcc")

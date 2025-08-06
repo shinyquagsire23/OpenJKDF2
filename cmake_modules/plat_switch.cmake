@@ -24,20 +24,20 @@ set(PORTLIBS "${DEVKITPRO}/portlibs/switch")
     add_definitions(-DARM64)
     add_definitions(-DSMK_FAST)
 
-    # Feature configuration for Switch
-    set(TARGET_USE_PHYSFS TRUE)
-    set(TARGET_USE_GAMENETWORKINGSOCKETS FALSE)  # Networking likely disabled for now
-    set(TARGET_USE_LIBSMACKER TRUE)
-    set(TARGET_USE_LIBSMUSHER TRUE)
+    # Feature configuration for Switch - start minimal
+    set(TARGET_USE_PHYSFS FALSE)  # Disable file system for now
+    set(TARGET_USE_GAMENETWORKINGSOCKETS FALSE)  # Networking disabled
+    set(TARGET_USE_LIBSMACKER TRUE)  # Disable video for now
+    set(TARGET_USE_LIBSMUSHER TRUE)  # Disable audio compression for now
     set(TARGET_USE_SDL2 TRUE)
     set(TARGET_USE_OPENGL TRUE)  # Switch supports OpenGL ES
-    set(TARGET_USE_OPENAL TRUE)  # Should work via portlibs
+    set(TARGET_USE_OPENAL FALSE)  # Disable audio for now
     set(TARGET_POSIX TRUE)
     set(TARGET_NO_BLOBS TRUE)
-    set(TARGET_CAN_JKGM FALSE)  # Game mode disabled for now
+    set(TARGET_CAN_JKGM FALSE)  # Game mode disabled
     set(OPENJKDF2_NO_ASAN TRUE)
-    set(TARGET_USE_CURL FALSE)  # Curl might not be available
-    set(TARGET_FIND_OPENAL FALSE)  # We'll link it manually
+    set(TARGET_USE_CURL FALSE)  # Curl disabled
+    set(TARGET_FIND_OPENAL FALSE)
     set(TARGET_NO_MULTIPLAYER_MENUS TRUE)  # Disable multiplayer UI
 
     set(TARGET_BUILD_TESTS FALSE)
@@ -57,18 +57,27 @@ set(PORTLIBS "${DEVKITPRO}/portlibs/switch")
     set(OPENGL_glx_LIBRARY "")
     
 
-    # Compiler and linker flags  
+    # Compiler and linker flags for static linking
     add_compile_options(-g -Wall -O2 -ffunction-sections)
-   add_compile_options(${ARCH_FLAGS})
+    add_compile_options(${ARCH_FLAGS})
     add_compile_options(-D__SWITCH__ -I${LIBNX}/include -I${PORTLIBS}/include)
-    
     
     # C specific flags
     add_compile_options($<$<COMPILE_LANGUAGE:C>:-Wno-implicit-function-declaration>)
-       set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--verbose")
+    
+    # Force static linking and use Switch specs
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}  -static-libgcc -static-libstdc++")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE  -pie -fPIE -Wl,-Ttext-segment=0x8000000" )
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-Map,${CMAKE_CURRENT_BINARY_DIR}/openjkdf2.map")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -pie -fPIE -Wl,-Ttext-segment=0x8000000")
     # Linker flags
     #add_link_options(-specs=${LIBNX}/switch.specs -march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE -g ${ARCH_FLAGS} -Wl,-Map,${CMAKE_CURRENT_BINARY_DIR}/openjkdf2.map)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti -fno-exceptions -fno-strict-aliasing")
+    
+    # Force static library preference
+    set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+    set(BUILD_SHARED_LIBS OFF)
+    
     # Include paths
     include_directories(${LIBNX}/include)
     include_directories(${PORTLIBS}/include)
@@ -82,48 +91,72 @@ set(PORTLIBS "${DEVKITPRO}/portlibs/switch")
 endmacro()
 
 macro(plat_specific_deps)
-    # Switch-specific dependencies - SDL2 via portlibs
-    set(SDL2_COMMON_LIBS "-lSDL2main -lSDL2 -lSDL2_mixer")
+    # Switch-specific dependencies - handled via static linking in plat_link_and_package
+    set(SDL2_COMMON_LIBS "")
 endmacro()
 
 macro(plat_link_and_package)
-    # Link Switch libraries
-    target_link_libraries(${BIN_NAME} PRIVATE 
-        -lnx
-        -lm 
-        -lstdc++ 
-        -lc
-    )
-
-    # Link portlibs libraries
+    # Link Switch libraries in proper order for static linking
+    # Core system libraries first
+    target_link_libraries(${BIN_NAME} PRIVATE -lnx)
+    
+    # Link portlibs libraries statically
     if(TARGET_USE_SDL2)
-        target_link_libraries(${BIN_NAME} PRIVATE -lSDL2main -lSDL2 -lSDL2_mixer)
-            target_link_libraries(${BIN_NAME} PRIVATE 
-            -lopusfile 
-            -lopus 
-            -logg 
-            -lvorbisfile 
-            -lvorbis 
-            -lFLAC
-            -lmpg123
-            -lmodplug
+        target_link_libraries(${BIN_NAME} PRIVATE 
+            ${PORTLIBS}/lib/libSDL2main.a
+            ${PORTLIBS}/lib/libSDL2.a
+        )
+        # Audio codec libraries (if SDL2_mixer is used)
+        target_link_libraries(${BIN_NAME} PRIVATE 
+            ${PORTLIBS}/lib/libopusfile.a
+            ${PORTLIBS}/lib/libopus.a
+            ${PORTLIBS}/lib/libogg.a
+            ${PORTLIBS}/lib/libvorbisfile.a
+            ${PORTLIBS}/lib/libvorbis.a
+            ${PORTLIBS}/lib/libFLAC.a
+            ${PORTLIBS}/lib/libmpg123.a
+            ${PORTLIBS}/lib/libmodplug.a
+            ${PORTLIBS}/lib/libdrm_nouveau.a
         )
     endif()
     
     if(TARGET_USE_OPENAL)
-        target_link_libraries(${BIN_NAME} PRIVATE -lopenal)
+        target_link_libraries(${BIN_NAME} PRIVATE ${PORTLIBS}/lib/libopenal.a)
     endif()
     
     if(TARGET_USE_PHYSFS)
-        target_link_libraries(${BIN_NAME} PRIVATE -lphysfs)
+        target_link_libraries(${BIN_NAME} PRIVATE ${PORTLIBS}/lib/libphysfs.a)
     endif()
     
-    # PNG support for textures
-    target_link_libraries(${BIN_NAME} PRIVATE -lpng -lz)
+    # PNG support for textures - static libraries
+    target_link_libraries(${BIN_NAME} PRIVATE 
+        ${PORTLIBS}/lib/libpng.a 
+        ${PORTLIBS}/lib/libz.a
+    )
     
-    # OpenGL ES via mesa
-        target_link_libraries(${BIN_NAME} PRIVATE -lEGL -lGLESv2 -lglapi -lglad -ldrm_nouveau)
+    # OpenGL ES via mesa - static libraries
+    target_link_libraries(${BIN_NAME} PRIVATE 
+        ${PORTLIBS}/lib/libEGL.a
+        ${PORTLIBS}/lib/libGLESv2.a
+        ${PORTLIBS}/lib/libglapi.a
+        ${PORTLIBS}/lib/libglad.a
+               ${PORTLIBS}/lib/libSDL2main.a
+            ${PORTLIBS}/lib/libSDL2.a
+    )
+    
+    target_link_libraries(${BIN_NAME} PRIVATE 
+        ${PORTLIBS}/lib/libEGL.a
+        ${PORTLIBS}/lib/libGLESv2.a
+        ${PORTLIBS}/lib/libglapi.a
+        ${PORTLIBS}/lib/libglad.a
+    )
 
+    # Standard libraries last
+    target_link_libraries(${BIN_NAME} PRIVATE 
+        -lm 
+        -lstdc++ 
+        -lc
+    )
     
     target_link_libraries(sith_engine PRIVATE nlohmann_json::nlohmann_json)
 
