@@ -263,6 +263,7 @@ uint8_t stdControl_aDebounce[256];
 
 #define SDL2_MIN_BINARY_THRESH (-0x5000)
 #define SDL2_MAX_BINARY_THRESH (0x5000)
+static int stdControl_aJoystickNumAxes[JK_NUM_JOYSTICKS] = {0};
 
 #define QUIRK_NINTENDO_TRIGGER_AXIS_TO_BUTTON (1)
 const char *stdControl_aAxisNames[JK_NUM_AXES+1] =
@@ -749,56 +750,84 @@ int stdControl_ReadAxisRaw(int axisNum)
     return result;
 }
 
-// Switch-specific controller reading function
-void stdControl_SwitchReadControls()
+// Main entry point for reading controls
+void stdControl_ReadControls()
 {
-    
+    flex_d_t khz;
+
+    if (!stdControl_bControlsActive)
+        return;
+
+    // Initialize Switch controller if needed
     if (!switch_initialized) {
         stdControl_SwitchInit();
     }
     
+    // Set up joystick flags like TWL does
+    stdControl_bHasJoysticks = 1;
+    stdControl_aJoystickNumAxes[0] = 4;  // We have 4 axes (left stick X/Y, right stick X/Y)
+    stdControl_aJoystickMaxButtons[0] = 16;
+    stdControl_aAxisEnabled[0] = 1;
+    stdControl_aJoystickExists[0] = 1;
+    sithWeapon_controlOptions &= ~(1 << 5); // Enable joystick
+    
+    // Clear input arrays at start of frame (like TWL does)
+    _memset(stdControl_aInput1, 0, sizeof(int) * JK_NUM_KEYS);
+    stdControl_bControlsIdle = 1;
+    _memset(stdControl_aInput2, 0, sizeof(int) * JK_NUM_KEYS);
+    stdControl_curReadTime = stdPlatform_GetTimeMsec();
+    stdControl_msDelta = stdControl_curReadTime - stdControl_msLast;
+    if (stdControl_msDelta != 0)
+        khz = 1.0 / (flex_d_t)(__int64)(stdControl_msDelta);
+    else
+        khz = 1.0;
+    _memset(stdControl_aAxisPos, 0, sizeof(int) * JK_NUM_AXES);
+    stdControl_updateKHz = khz;
+    stdControl_updateHz = khz * 1000.0;
+    
     // Scan the gamepad - should be done once per frame
     padUpdate(&switch_pad);
     
-    // Get button states
-    u64 kDown = padGetButtonsDown(&switch_pad);
-    u64 kUp = padGetButtonsUp(&switch_pad);
+    // Get button states - use padGetButtons (held) not padGetButtonsDown (newly pressed)
+    u64 kHeld = padGetButtons(&switch_pad);
     
-    // Map Switch buttons to game keys
+    // Map Switch buttons to game keys using held state (like TWL uses keysHeld)
     // Face buttons (A, B, X, Y)
-    stdControl_SetKeydown(KEY_JOY1_B1, (kDown & HidNpadButton_A) != 0, stdControl_curReadTime);
-    stdControl_SetKeydown(KEY_JOY1_B2, (kDown & HidNpadButton_B) != 0, stdControl_curReadTime);
-    stdControl_SetKeydown(KEY_JOY1_B3, (kDown & HidNpadButton_X) != 0, stdControl_curReadTime);
-    stdControl_SetKeydown(KEY_JOY1_B4, (kDown & HidNpadButton_Y) != 0, stdControl_curReadTime);
+    stdControl_SetKeydown(KEY_JOY1_B1, (kHeld & HidNpadButton_A) != 0, stdControl_curReadTime);
+    stdControl_SetKeydown(KEY_JOY1_B2, (kHeld & HidNpadButton_B) != 0, stdControl_curReadTime);
+    stdControl_SetKeydown(KEY_JOY1_B3, (kHeld & HidNpadButton_X) != 0, stdControl_curReadTime);
+    stdControl_SetKeydown(KEY_JOY1_B4, (kHeld & HidNpadButton_Y) != 0, stdControl_curReadTime);
     
-
     // Shoulder buttons
-    stdControl_SetKeydown(KEY_JOY1_B5, (kDown & HidNpadButton_L) != 0, stdControl_curReadTime);
-    stdControl_SetKeydown(KEY_JOY1_B6, (kDown & HidNpadButton_R) != 0, stdControl_curReadTime);
-    stdControl_SetKeydown(KEY_JOY1_B7, (kDown & HidNpadButton_ZL) != 0, stdControl_curReadTime);
-    stdControl_SetKeydown(KEY_JOY1_B8, (kDown & HidNpadButton_ZR) != 0, stdControl_curReadTime);
+    stdControl_SetKeydown(KEY_JOY1_B5, (kHeld & HidNpadButton_L) != 0, stdControl_curReadTime);
+    stdControl_SetKeydown(KEY_JOY1_B6, (kHeld & HidNpadButton_R) != 0, stdControl_curReadTime);
+    stdControl_SetKeydown(KEY_JOY1_B7, (kHeld & HidNpadButton_ZL) != 0, stdControl_curReadTime);
+    stdControl_SetKeydown(KEY_JOY1_B8, (kHeld & HidNpadButton_ZR) != 0, stdControl_curReadTime);
     
     // Start/Select
-    stdControl_SetKeydown(KEY_JOY1_B9, (kDown & HidNpadButton_Plus) != 0, stdControl_curReadTime);
+    stdControl_SetKeydown(KEY_JOY1_B9, (kHeld & HidNpadButton_Plus) != 0, stdControl_curReadTime);
+    
+    // Handle minus button for escape (only on button down, not held)
+    u64 kDown = padGetButtonsDown(&switch_pad);
     if(kDown & HidNpadButton_Minus) {
         jkGuiRend_WindowHandler(0, WM_KEYFIRST, VK_ESCAPE, 0, 0);
         jkGuiRend_WindowHandler(0, WM_CHAR, VK_ESCAPE, 0, 0);
-          if ( jkCutscene_isRendering )
-                {
-                     jkCutscene_sub_421410();
-                }
+        if ( jkCutscene_isRendering )
+        {
+             jkCutscene_sub_421410();
+        }
     }
-    stdControl_SetKeydown(KEY_JOY1_B10, (kDown & HidNpadButton_Minus) != 0, stdControl_curReadTime);
+    stdControl_SetKeydown(KEY_JOY1_B10, (kHeld & HidNpadButton_Minus) != 0, stdControl_curReadTime);
     
     // Stick clicks
-    stdControl_SetKeydown(KEY_JOY1_B11, (kDown & HidNpadButton_StickL) != 0, stdControl_curReadTime);
-    stdControl_SetKeydown(KEY_JOY1_B12, (kDown & HidNpadButton_StickR) != 0, stdControl_curReadTime);
+    stdControl_SetKeydown(KEY_JOY1_B11, (kHeld & HidNpadButton_StickL) != 0, stdControl_curReadTime);
+    stdControl_SetKeydown(KEY_JOY1_B12, (kHeld & HidNpadButton_StickR) != 0, stdControl_curReadTime);
     
     // D-Pad
-    stdControl_SetKeydown(KEY_JOY1_HLEFT, (kDown & HidNpadButton_Left) != 0, stdControl_curReadTime);
-    stdControl_SetKeydown(KEY_JOY1_HUP, (kDown & HidNpadButton_Up) != 0, stdControl_curReadTime);
-    stdControl_SetKeydown(KEY_JOY1_HRIGHT, (kDown & HidNpadButton_Right) != 0, stdControl_curReadTime);
-    stdControl_SetKeydown(KEY_JOY1_HDOWN, (kDown & HidNpadButton_Down) != 0, stdControl_curReadTime);
+    stdControl_SetKeydown(KEY_JOY1_HLEFT, (kHeld & HidNpadButton_Left) != 0, stdControl_curReadTime);
+    stdControl_SetKeydown(KEY_JOY1_HUP, (kHeld & HidNpadButton_Up) != 0, stdControl_curReadTime);
+    stdControl_SetKeydown(KEY_JOY1_HRIGHT, (kHeld & HidNpadButton_Right) != 0, stdControl_curReadTime);
+    stdControl_SetKeydown(KEY_JOY1_HDOWN, (kHeld & HidNpadButton_Down) != 0, stdControl_curReadTime);
     
     // Read analog sticks
     HidAnalogStickState leftStick = padGetStickPos(&switch_pad, 0);  // Left stick
@@ -809,7 +838,11 @@ void stdControl_SwitchReadControls()
     stdControl_aAxisPos[AXIS_JOY1_Y] = -leftStick.y;  // Invert Y axis
     stdControl_aAxisPos[AXIS_JOY1_Z] = rightStick.x;  // Right stick X
     stdControl_aAxisPos[AXIS_JOY1_R] = -rightStick.y; // Right stick Y (inverted)
+    
+    // Update timing like TWL does
+    stdControl_msLast = stdControl_curReadTime;
 }
+
 static int _cursorState = 0;
 // Added: SDL2
 void stdControl_SetSDLKeydown(int keyNum, int bDown, uint32_t readTime)
@@ -837,13 +870,6 @@ int stdControl_ShowCursor(int a)
         _cursorState--;
     }
     return _cursorState;
-}
-// Main entry point for reading controls
-void stdControl_ReadControls()
-{
-#ifdef TARGET_SWITCH
-    stdControl_SwitchReadControls();
-#endif
 }
 
 flex_t stdControl_ReadKeyAsAxis(int keyNum)
