@@ -101,7 +101,7 @@ int jkGuiSingleplayer_Show()
     int v15; // ebx
     int v16; // edi
     jkEpisode *v17; // esi
-    const char *v18; // eax
+    const char *file_name; // eax
     Darray darray; // [esp+10h] [ebp-1C8h]
     Darray array2; // [esp+28h] [ebp-1B0h]
     Darray array; // [esp+40h] [ebp-198h]
@@ -125,6 +125,7 @@ int jkGuiSingleplayer_Show()
             switch ( clicked )
             {
                 case JKGUI_NEWGAME:
+                stdPlatform_Printf("OpenJKDF2: %s - New Game\n", __func__);
                     v24[0] = 0;
                     jkGui_sub_412E20(&jkGuiSingleplayer_menu2, JKGUI_NEWGAME, JKGUI_DEBUGPLAY, JKGUI_NEWGAME);
                     jkGuiRend_DarrayNewStr(&darray, jkEpisode_var2 + 1, 0);
@@ -132,6 +133,7 @@ int jkGuiSingleplayer_Show()
                     jkEpisode_LoadVerify();
                     jkGuiRend_DarrayFreeEntry(&darray);
                     v16 = 0;
+                    stdPlatform_Printf("OpenJKDF2: %s - Current selected item count: %d\n", __func__, jkEpisode_var2);
                     if ( jkEpisode_var2 > 0 )
                     {
                         v17 = jkEpisode_aEpisodes;
@@ -162,8 +164,8 @@ int jkGuiSingleplayer_Show()
                     }
                     if ( clicked == 1 )
                     {
-                        v18 = (const char *)jkGuiRend_GetId(&darray, jkGuiSingleplayer_buttons2[6].selectedTextEntry);
-                        _strncpy(v24, v18, 0x7Fu);
+                        file_name = (const char *)jkGuiRend_GetId(&darray, jkGuiSingleplayer_buttons2[6].selectedTextEntry);
+                        _strncpy(v24, file_name, 0x7Fu);
                         v24[127] = 0;
                     }
                     jkGuiRend_DarrayFree(&darray);

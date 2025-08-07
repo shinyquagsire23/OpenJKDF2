@@ -58,7 +58,7 @@ set(PORTLIBS "${DEVKITPRO}/portlibs/switch")
     
 
     # Compiler and linker flags for static linking
-    add_compile_options(-g -Wall -O2 -ffunction-sections)
+    add_compile_options(-g -Wall -ffunction-sections)
     add_compile_options(${ARCH_FLAGS})
     add_compile_options(-D__SWITCH__ -I${LIBNX}/include -I${PORTLIBS}/include)
     

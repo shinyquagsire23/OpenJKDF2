@@ -84,7 +84,7 @@ static stdFile_t Linux_stdFileOpen(const char* fpath, const char* mode)
     char tmp[512];
     size_t len = strlen(fpath);
 
-    stdPlatform_Printf("Openjkdf2: Linux_stdFileOpen: %s %s\n", fpath, mode);
+  //  stdPlatform_Printf("Openjkdf2: Linux_stdFileOpen: %s %s\n", fpath, mode);
     if (len > 512) {
         len = 512;
     }
@@ -622,6 +622,18 @@ int stdPrintf(int (*a1)(const char *, ...), const char *a2, int line, const char
     printf("(%p %s:%d) ", a1, a2, line);
     int ret = vprintf(fmt, args);
     va_end (args);
+    #ifdef TARGET_SWITCH
+        FILE* f = fopen("sdmc:/openjkdf2_log.txt", "a");
+    if (!f) return ret;
+
+        fprintf(f, "(%p %s:%d) ", a1, a2, line);
+
+    va_start(args, fmt);
+    vfprintf(f, fmt, args);
+    fprintf(f, "\n");
+    va_end(args);
+    fclose(f);
+    #endif
     return ret;
 }
 

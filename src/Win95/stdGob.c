@@ -30,6 +30,7 @@ void stdGob_Shutdown()
 stdGob* stdGob_Load(char *fpath, int a2, int a3)
 {
     stdGob* gob = (stdGob*)std_pHS->alloc(sizeof(stdGob));
+    stdPlatform_Printf("OpenJKDF2: %s - Loading gob from fpath: %s\n", __func__, fpath);
     if (gob)
     {
         _memset(gob, 0, sizeof(stdGob)); // TODO why was this needed
@@ -91,6 +92,8 @@ int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
         stdPlatform_Printf("OpenJKDF2: Opened `%s`.\n", gob->fpath); // Added
     }
     gob->openedFile = (stdGobFile *)std_pHS->alloc(sizeof(stdGobFile) * gob->numFilesOpen);
+            jk_printf("Loading GOB file `%s`with %d entries\n", fname, gob->numFiles);
+
     if ( !gob->openedFile )
       return 0;
     _memset(gob->openedFile, 0, sizeof(stdGobFile) * gob->numFilesOpen);
@@ -105,6 +108,7 @@ int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
       stdPrintf(std_pHS->errorPrint, ".\\Win95\\stdGob.c", 277, "Error: Bad version %d for gob file\n", header.version, 0, 0, 0);
       return 0;
     }
+
     pGobHS->fseek(gob->fhand, header.entryTable_offs, 0);
     pGobHS->fileRead(gob->fhand, &gob->numFiles, sizeof(uint32_t));
     gob->entries = (stdGobEntry *)std_pHS->alloc(sizeof(stdGobEntry) * gob->numFiles);
@@ -118,15 +122,18 @@ int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
 #ifdef TARGET_TWL
     gob->entriesHashtable = stdHashTable_New(gob->numFiles);
 #else
-    gob->entriesHashtable = stdHashTable_New(1024);
+    gob->entriesHashtable = stdHashTable_New(2048);
 #endif
+    jk_printf("Loaded GOB file `%s`with %d entries\n", fname, gob->numFiles);
+
     for (int v4 = 0; v4 < gob->numFiles; v4++)
     {
         pGobHS->fileRead(gob->fhand, &gob->entries[v4], sizeof(stdGobEntry));
         stdHashTable_SetKeyVal(gob->entriesHashtable, gob->entries[v4].fname, &gob->entries[v4]);
+
+   // jk_printf("Printing entry `%s`...\n", gob->entries[v4].fname);
     }
 
-    jk_printf("Loaded GOB file `%s`...\n", fname);
     
     return 1;
 }
@@ -179,6 +186,7 @@ stdGobFile* stdGob_FileOpen(stdGob *gob, const char *filepath)
     stdGobFile *result = NULL;
     int v5;
 
+    stdPlatform_Printf("OpenJKDF2: %s - Opening file: %s in gob: %s\n", __func__, filepath, gob->fpath);
     // Embedded resources
 #if defined(QOL_IMPROVEMENTS)
     size_t sz = 0;
@@ -222,8 +230,12 @@ stdGobFile* stdGob_FileOpen(stdGob *gob, const char *filepath)
     }
 #endif
     entry = (stdGobEntry*)stdHashTable_GetKeyVal(gob->entriesHashtable, stdGob_fpath);
-    if (!entry)
+        stdPlatform_Printf("OpenJKDF2: %s - Opening cleaned up: %s in gob: %s\n", __func__, filepath, gob->fpath);
+
+    if (!entry) {
+        stdPlatform_Printf("OpenJKDF2: %s - Failed to find entry for: %s in gob: %s\n", __func__, filepath, gob->fpath);
         return 0;
+    }
 
     result = gob->openedFile;
     v5 = 0;
@@ -245,6 +257,7 @@ stdGobFile* stdGob_FileOpen(stdGob *gob, const char *filepath)
     result->parent = gob;
     result->entry = entry;
     result->seekOffs = 0;
+    stdPlatform_Printf("OpenJKDF2: %s - opening item count is %d in gob: %s\n", __func__, gob->numFilesOpen, gob->fpath);
     return result;
 }
 

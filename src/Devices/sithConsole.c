@@ -95,6 +95,7 @@ void sithConsole_Close()
 
 void sithConsole_Print(const char *str)
 {
+    stdPlatform_Printf("Openjkdf2: %s\n", str);
     if ( DebugGui_fnPrint )
     {
         // TODO TODO regression

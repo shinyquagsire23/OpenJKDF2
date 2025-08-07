@@ -1543,7 +1543,10 @@ int Window_DefaultHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam, voi
 
 int Window_MessageLoop()
 {
+        jkGuiRend_UpdateController();
+
     jkMain_GuiAdvance();
+            jkGuiRend_UpdateController();
     Window_msg_main_handler(g_hWnd, WM_PAINT, 0, 0);
     
     //Window_SdlUpdate();

@@ -62,7 +62,7 @@ stdFileSearch* stdFileUtil_NewFind(const char *path, int a2, const char *extensi
 #endif
 
     stdPlatform_Printf("OpenJKDF2: %s %s\n", __func__, search->path);
-    stdPlatform_Printf("OpenJKDF2 amount: %s %s\n", __func__, search->num_found);
+   // stdPlatform_Printf("OpenJKDF2 amount: %s %s\n", __func__, search->num_found);
 
     return search;
 }
@@ -321,12 +321,13 @@ void printFileSearch(stdFileSearch *search){
 int stdFileUtil_FindNext(stdFileSearch *a1, stdFileSearchResult *a2)
 {
     char  path[255] = {0};
+    chdir("sdmc:/openjkdf2/");
     getcwd(path, 255);
-    stdPlatform_Printf("Openjkdf2: Current working directory: %s\n", path);
+    // stdPlatform_Printf("Openjkdf2: Current working directory: %s\n", path);
     struct dirent *iter;
     char tmp[128];
 
-    printFileSearch(a1);
+    //printFileSearch(a1);
     if ( !a1 )
         return 0;
 
@@ -339,7 +340,7 @@ int stdFileUtil_FindNext(stdFileSearch *a1, stdFileSearchResult *a2)
     }
     else
     {
-#if defined(TARGET_TWL) || defined(TARGET_SWITCH) 
+#if defined(TARGET_TWL)
         getcwd(tmp, 128-1);
         //strncpy(tmp, pcwd, 128-1);
         strncat(tmp, "/", 128-1);
@@ -377,6 +378,7 @@ int stdFileUtil_FindNext(stdFileSearch *a1, stdFileSearchResult *a2)
         errno = 0;
 #endif
         a1->num_found = scandir(tmp, &a1->namelist, search_ext ? parse_ext : NULL, alphasort);
+        stdPlatform_Printf("Openjkdf2: scandir found %d entries in %s\n", a1->num_found, tmp);
         
         if (!a1->namelist || a1->num_found <= 0) return 0;
         
@@ -385,11 +387,11 @@ int stdFileUtil_FindNext(stdFileSearch *a1, stdFileSearchResult *a2)
     }
     printFileSearch(a1);
 
-        stdPlatform_Printf("Openjkdf2: All Found entries:: %d\n", a1->num_found);
-        stdPlatform_Printf("Openjkdf2: Current entry: %s\n", iter ? iter->d_name : "NULL");
+        //stdPlatform_Printf("Openjkdf2: All Found entries:: %d\n", a1->num_found);
+      //  stdPlatform_Printf("Openjkdf2: Current entry: %s\n", iter ? iter->d_name : "NULL");
     if (!iter)
     {
-        stdPlatform_Printf("Openjkdf2: No more entries found\n");
+       stdPlatform_Printf("Openjkdf2: No more entries found\n");
     }
 
     if (a1->num_found < 2 || !iter)

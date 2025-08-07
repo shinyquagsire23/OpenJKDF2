@@ -104,6 +104,7 @@ int rdMaterial_LoadEntry_Common(char *mat_fpath, rdMaterial *material, int creat
     int textures_idk[RDMATERIAL_MAX_TEXINFOS]; // [esp+F8h] [ebp-40h]
     stdVBuffer *created_tex; // eax
 
+    stdPlatform_Printf("OpenJKDF2: %s mat_fpath: %s create_ddraw_surface: %d gpu_mem: %d bDoLoad: %d\n", __func__, mat_fpath, create_ddraw_surface, gpu_mem, bDoLoad);
     // Added: No nullptr derefs
     if (!material) {
         return 0;
@@ -137,7 +138,7 @@ int rdMaterial_LoadEntry_Common(char *mat_fpath, rdMaterial *material, int creat
     mat_file_ = mat_file;
     mat_file__ = mat_file;
     if (!mat_file) {
-        //jk_printf("OpenJKDF2: Material `%s` could not be opened!\n", mat_fpath); // Added
+        stdPlatform_Printf("OpenJKDF2: Material `%s` could not be opened!\n", mat_fpath); // Added
         return 0;
     }
 

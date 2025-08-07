@@ -248,7 +248,7 @@ int jkCutscene_sub_421310(char* fpath)
     // STUB
     if (!fpath) return 1;
 
-#if defined(ARCH_WASM)
+#if defined(ARCH_WASM) || defined(TARGET_SWITCH)
     printf("vid skip %s\n", fpath);
     return 1;
 #endif
@@ -274,7 +274,7 @@ int jkCutscene_sub_421310(char* fpath)
     }
     _strncpy(tmp, fpath, sizeof(tmp));
 
-#ifdef LINUX
+#if defined(TARGET_SWITCH) || defined(LINUX)
     for (int i = 0; i < len; i++)
     {
         if (tmp[i] == '\\') {
@@ -292,7 +292,7 @@ int jkCutscene_sub_421310(char* fpath)
     sithSoundMixer_StopSong();
     stdMci_Stop();
 
-#ifdef LINUX
+#if defined(LINUX) || defined(TARGET_SWITCH)
     char *r = (char*)malloc(strlen(tmp) + 16);
     if (casepath(tmp, r))
     {
@@ -757,6 +757,15 @@ int jkCutscene_Handler(HWND a1, UINT a2, WPARAM a3, LPARAM a4, LRESULT *a5)
         case WM_SETCURSOR:
             jk_SetCursor(0);
             return 1;
+        case WM_KEYDOWN:
+            if ( a3 == VK_ESCAPE )
+            {
+                if ( jkCutscene_isRendering )
+                {
+                    return jkCutscene_sub_421410();
+                }
+                return 1;
+            }
         case WM_CHAR:
             if ( a3 == VK_ESCAPE )
             {

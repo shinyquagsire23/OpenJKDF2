@@ -26,7 +26,9 @@
 
 char* stdEmbeddedRes_LoadOnlyInternal(const char* filepath, size_t* pOutSz)
 {
-#ifdef TARGET_TWL
+    stdPlatform_Printf("OpenJKDF2: %s - Loading embedded resource: %s\n", __func__, filepath);
+    int exists = 0;
+#ifdef TARGET_TWL 
     struct stat statstuff;
     int exists = 0;
 #endif
@@ -34,13 +36,22 @@ char* stdEmbeddedRes_LoadOnlyInternal(const char* filepath, size_t* pOutSz)
     char* base_path = NULL;
     char* file_contents = NULL;
     char tmp_filepath[256];
+ 
     strncpy(tmp_filepath, "resource/", 256);
     strncat(tmp_filepath, filepath, 256);
-
+    #if defined(TARGET_SWITCH) || defined(LINUX)
+    for (int i = 0; i < strlen(tmp_filepath); i++)
+    {
+        if (tmp_filepath[i] == '\\') {
+            tmp_filepath[i] = '/';
+        }
+    }
+#endif   
+    stdPlatform_Printf("OpenJKDF2: %s - Loading embedded resource fullpath: %s\n", __func__, tmp_filepath);
     if (pOutSz) {
         *pOutSz = 0;
     }
-    
+
 #ifdef WIN32
 for (int i = 0; i < strlen(tmp_filepath); i++)
 {
@@ -65,11 +76,7 @@ for (int i = 0; i < strlen(tmp_filepath); i++)
     SDL_free(base_path);
 #endif
 #if defined(TARGET_SWITCH) && defined(SDL2_RENDER)
-    base_path = SDL_GetBasePath();
-    strncpy(tmp_filepath, base_path, 256);
-    strncat(tmp_filepath, "Resources/", 256);
-    strncat(tmp_filepath, filepath, 256);
-    SDL_free(base_path);
+
 #endif
 
     f = fopen(tmp_filepath, "r");

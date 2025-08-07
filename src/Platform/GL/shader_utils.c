@@ -64,7 +64,6 @@ GLuint load_shader_file(const char* filepath, GLenum type)
     
     stdPlatform_Printf("std3D: Parse shader `%s`\n", filepath);
     // print content
-	stdPlatform_Printf("%s\n", shader_contents);
     GLuint ret = create_shader(shader_contents, type);
     free(shader_contents);
     

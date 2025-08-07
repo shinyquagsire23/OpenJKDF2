@@ -712,6 +712,18 @@ void __wrap_exit(int res) {
 int jk_printf(const char* fmt, ...)
 {
     va_list args;
+
+    #ifdef TARGET_SWITCH
+       FILE* f = fopen("sdmc:/openjkdf2_log.txt", "a");
+    if (!f) return 0;
+
+
+    va_start(args, fmt);
+    vfprintf(f, fmt, args);
+    fprintf(f, "\n");
+    va_end(args);
+    fclose(f);
+    #endif
     va_start (args, fmt);
     int ret = vprintf(fmt, args);
     va_end (args);

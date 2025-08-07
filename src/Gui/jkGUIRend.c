@@ -2684,7 +2684,7 @@ void jkGuiRend_UpdateController()
     }
     if (stdControl_ReadKey(KEY_JOY1_HDOWN, &val) && val) {
         jkGuiRend_FocusElementDir(jkGuiRend_activeMenu, FOCUS_DOWN);
-        printf("down\n");
+        stdPlatform_Printf("down\n");
     }
     if (stdControl_ReadKey(KEY_JOY1_B1, &val) && val) {
         lastB1 = val;
@@ -2702,6 +2702,7 @@ void jkGuiRend_UpdateController()
     }
     if (stdControl_ReadKey(KEY_JOY1_B2, &val) && val) {
         jkGuiRend_WindowHandler(0, WM_KEYFIRST, VK_ESCAPE, 0, 0);
+        stdPlatform_Printf("b\n");
         printf("b\n");
     }
     if (stdControl_ReadKey(KEY_JOY1_B3, &val) && val) {
@@ -2716,6 +2717,13 @@ void jkGuiRend_UpdateController()
         keyboardShowedLastUpdate = 1;
         stdControl_ShowSystemKeyboard();
     }
+    // Start Over to Escape sending
+    if(stdControl_ReadKey(KEY_JOY1_B10, &val) && val) {
+                jkGuiRend_WindowHandler(0, WM_KEYFIRST, VK_ESCAPE, 0, 0);
+
+        stdPlatform_Printf("PLUS PRESSED \n");
+    }
+
     else if (keyboardShowedLastUpdate) {
         stdControl_HideSystemKeyboard();
     }

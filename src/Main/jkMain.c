@@ -914,6 +914,7 @@ int jkMain_sub_403470(char *a1)
 
 int jkMain_LoadFile(char *a1)
 {
+    stdPlatform_Printf("jkMain_LoadFile(%s)\n", a1);
     if (jkRes_LoadCD(1))
     {
         sithInventory_549FA0 = 1;

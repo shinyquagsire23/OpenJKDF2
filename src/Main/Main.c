@@ -83,7 +83,7 @@
 #endif
 #include <sys/types.h>
 #include <stdbool.h>
-#if defined(LINUX) || defined(MACOS)
+#if defined(LINUX) || defined(MACOS) || defined(TARGET_SWITCH)
 #include <pwd.h>
 #endif
 #include "nfd.h"
@@ -271,7 +271,7 @@ int Main_Startup(const char *cmdline)
     Video_modeStruct.geoMode = 4;
     pHS = &hs;
     jkPlayer_setFullSubtitles = 1; // Added: Set subtitles as default for opening cutscene
-    jkPlayer_setDisableCutscenes = 0;
+    jkPlayer_setDisableCutscenes = 1;
     jkPlayer_setRotateOverlayMap = 1;
     jkPlayer_setDrawStatus = 1;
     jkPlayer_setCrosshair = 0;

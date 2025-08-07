@@ -138,7 +138,7 @@ rdMaterial* sithMaterial_LoadEntry(const char *a1, int create_ddraw_surface, int
     rdMaterial *result; // eax
     unsigned int v6; // eax
     char *v7; // edi
-    rdMaterial *v8; // ebx
+    rdMaterial *currentMaterial; // ebx
     int v9; // eax
     char v10; // cl
     int v11; // eax
@@ -156,14 +156,14 @@ rdMaterial* sithMaterial_LoadEntry(const char *a1, int create_ddraw_surface, int
         if ( v6 >= v4->numMaterials )
             return 0;
         v7 = "mat;3do\\mat";
-        v8 = &v4->materials[v6];
+        currentMaterial = &v4->materials[v6];
         do
         {
             v7 = stdString_CopyBetweenDelimiter(v7, mat_fpath, 128, ";");
             if ( mat_fpath[0] )
             {
                 stdString_snprintf(mat_fpath2, 128, "%s%c%s", mat_fpath, 92, a1); // Added: WASM doesn't like the dst being the same as src, also sprintf -> snprintf
-                if ( rdMaterial_LoadEntry(mat_fpath2, v8, create_ddraw_surface, gpu_mem) )
+                if ( rdMaterial_LoadEntry(mat_fpath2, currentMaterial, create_ddraw_surface, gpu_mem) )
                 {
                     v9 = 1;
                     goto LABEL_10;
@@ -175,22 +175,23 @@ rdMaterial* sithMaterial_LoadEntry(const char *a1, int create_ddraw_surface, int
 LABEL_10:
         if ( v9 )
         {
-            stdHashTable_SetKeyVal(sithMaterial_hashmap, v8->mat_fpath, v8);
+            stdHashTable_SetKeyVal(sithMaterial_hashmap, currentMaterial->mat_fpath, currentMaterial);
             v10 = v4->level_type_maybe;
             v11 = v4->numMaterialsLoaded;
-            v8->id = v11;
+            currentMaterial->id = v11;
             if ( (v10 & 1) != 0 )
             {
                 v12 = v11 | 0x8000;
-                v8->id = v12;
+                currentMaterial->id = v12;
             }
             v4->numMaterialsLoaded = v11 + 1;
-            return v8;
+            return currentMaterial;
         }
         if ( !_strcmp(a1, "dflt.mat") )
             return 0;
         a1 = "dflt.mat";
     }
+    return currentMaterial;
 }
 
 rdMaterial* sithMaterial_GetByIdx(int idx)
