@@ -31,7 +31,7 @@ set(PORTLIBS "${DEVKITPRO}/portlibs/switch")
     set(TARGET_USE_LIBSMUSHER TRUE)  # Disable audio compression for now
     set(TARGET_USE_SDL2 TRUE)
     set(TARGET_USE_OPENGL TRUE)  # Switch supports OpenGL ES
-    set(TARGET_USE_OPENAL FALSE)  # Disable audio for now
+    set(TARGET_USE_OPENAL TRUE)  # Disable audio for now
     set(TARGET_POSIX TRUE)
     set(TARGET_NO_BLOBS TRUE)
     set(TARGET_CAN_JKGM FALSE)  # Game mode disabled
