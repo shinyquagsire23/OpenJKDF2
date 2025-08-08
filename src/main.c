@@ -88,7 +88,7 @@
 #include "World/sithSurface.h"
 #include "World/sithTemplate.h"
 #include "Gameplay/sithEvent.h"
-GET_Tude "Engine/sithKeyFrame.h"
+#include "Engine/sithKeyFrame.h"
 #include "Gameplay/sithOverlayMap.h"
 #include "World/sithMaterial.h"
 #include "Engine/sithRender.h"
@@ -175,28 +175,6 @@ void do_hooks();
 #ifdef ARCH_WASM
 #include <emscripten.h>
 #endif // ARCH_WASM
-
-#ifdef TARGET_SWITCH
-#include <switch.h>
-#include "SDL2/SDL.h"
-void draw_rects(SDL_Renderer *renderer, int x, int y)
-{
-    // R
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-    SDL_Rect r = {x, y, 64, 64};
-    SDL_RenderFillRect(renderer, &r);
-
-    // G
-    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-    SDL_Rect g = {x + 64, y, 64, 64};
-    SDL_RenderFillRect(renderer, &g);
-
-    // B
-    SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
-    SDL_Rect b = {x + 128, y, 64, 64};
-    SDL_RenderFillRect(renderer, &b);
-}
-#endif
 
 #ifdef WIN64_STANDALONE
 #include "exchndl.h"
@@ -356,7 +334,6 @@ extern "C"
 
 int main(int argc, char** argv)
 {
-    printf("=== NRO boot start ===\n");
     
 #ifdef ARCH_WASM
     EM_ASM(
@@ -677,9 +654,6 @@ int main(int argc, char** argv)
 #ifdef TARGET_SWITCH
     romfsInit();
     chdir("sdmc:/");
-#endif
-
-#ifdef TARGET_SWITCH
     appletSetIdleTimeDetectionExtension(AppletIdleTimeDetectionExtension_None);
     appletSetAutoSleepDisabled(true);
 #endif
@@ -711,7 +685,9 @@ int main(int argc, char** argv)
         memset(openjkdf2_aRestartPath, 0, sizeof(openjkdf2_aRestartPath));
         Window_Main_Linux(argc, argv);
 
-
+        printf("openjkdf2_bOrigWasRunningFromExistingInstall %x\n", openjkdf2_bOrigWasRunningFromExistingInstall);
+        printf("openjkdf2_bIsRunningFromExistingInstall %x\n", openjkdf2_bIsRunningFromExistingInstall);
+        printf("openjkdf2_bOrigWasDF2 %x\n", openjkdf2_bOrigWasDF2);
         openjkdf2_bIsFirstLaunch = 0;
         if (openjkdf2_restartMode != OPENJKDF2_RESTART_NONE) {
             // Purge any cmdline args that will get in the way.
