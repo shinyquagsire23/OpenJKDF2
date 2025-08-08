@@ -497,7 +497,7 @@ int jkCutscene_Show(char* fpath)
         jkGui_SetModeMenu(smush_get_palette(jkCutscene_pSmush));
     }
 
-    jkCutscene_55AA54 = 0;
+    jkCutscene_isPaused = 0;
     jkCutscene_audioFlip = 0;
     last_displayFrame = 0;
     last_audioUs = 0;
@@ -602,7 +602,7 @@ int jkCutscene_smack_related_loops()
     smack_finished = 0;
     if ( !jkCutscene_isRendering )
         return 1;
-    if ( !jkCutscene_55AA54 && g_app_suspended )
+    if ( !jkCutscene_isPaused && g_app_suspended )
     {
 #if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
         if (!openjkdf2_bIsKVM)
@@ -714,7 +714,7 @@ int jkCutscene_PauseShow(int unk)
     wchar_t *v0; // eax
     int result; // eax
 
-    if ( jkCutscene_55AA54 )
+    if ( jkCutscene_isPaused )
     {
         v0 = jkStrings_GetUniStringWithFallback("GUI_PAUSED");
         stdFont_Draw4(&Video_otherBuf, jkCutscene_subtitlefont, 0, 10, 640, 40, 3, v0, 0);
@@ -777,14 +777,14 @@ int jkCutscene_Handler(HWND a1, UINT event, WPARAM a3, LPARAM a4, LRESULT *a5)
             }
             else if ( a3 == VK_SPACE )
             {
-                jkCutscene_55AA54 = !jkCutscene_55AA54;
+                jkCutscene_isPaused = !jkCutscene_isPaused;
 #if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
                 if (!openjkdf2_bIsKVM)
-                    smack_off(jkCutscene_55AA54);
+                    smack_off(jkCutscene_isPaused);
 #endif
 
 #if defined(SDL2_RENDER) || defined(TARGET_TWL)
-                if (jkCutscene_55AA54)
+                if (jkCutscene_isPaused)
                 {
                     if (jkCutscene_audioFull)
                         stdSound_BufferStop(jkCutscene_audioFull);
