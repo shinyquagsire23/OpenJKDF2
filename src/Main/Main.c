@@ -271,7 +271,7 @@ int Main_Startup(const char *cmdline)
     Video_modeStruct.geoMode = 4;
     pHS = &hs;
     jkPlayer_setFullSubtitles = 1; // Added: Set subtitles as default for opening cutscene
-    jkPlayer_setDisableCutscenes = 1;
+    jkPlayer_setDisableCutscenes = 0;
     jkPlayer_setRotateOverlayMap = 1;
     jkPlayer_setDrawStatus = 1;
     jkPlayer_setCrosshair = 0;
@@ -509,7 +509,7 @@ void Main_Shutdown()
     jkControl_Shutdown(); // Added
     jkHudInv_Shutdown();
     if ( jkCutscene_isRendering )
-        jkCutscene_sub_421410();
+        jkCutscene_stop();
     Video_Shutdown();
     jkGame_Shutdown();
     jkDev_Shutdown();

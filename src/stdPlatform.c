@@ -23,20 +23,6 @@
 #include "SDL2_helper.h"
 #ifdef TARGET_SWITCH
 #include <switch.h>
-#include <stdarg.h>
-#include <stdio.h>
-    void logToSD(const char* fmt, ...) {
-        FILE* f = fopen("sdmc:/openjkdf2_log.txt", "a");
-        if (!f) return;
-
-
-        va_list args;
-        va_start(args, fmt);
-        vfprintf(f, fmt, args);
-        fprintf(f, "\n");
-        va_end(args);
-        fclose(f);
-    }
 #endif
 
 #ifdef PLATFORM_POSIX

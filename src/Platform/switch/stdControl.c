@@ -811,10 +811,13 @@ void stdControl_ReadControls()
     u64 kDown = padGetButtonsDown(&switch_pad);
     if(kDown & HidNpadButton_Minus) {
         jkGuiRend_WindowHandler(0, WM_KEYFIRST, VK_ESCAPE, 0, 0);
+         Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_ESCAPE, 0);
+         Window_msg_main_handler(g_hWnd, WM_CHAR, VK_ESCAPE, 0);
+
         jkGuiRend_WindowHandler(0, WM_CHAR, VK_ESCAPE, 0, 0);
         if ( jkCutscene_isRendering )
         {
-             jkCutscene_sub_421410();
+             jkCutscene_stop();
         }
     }
     stdControl_SetKeydown(KEY_JOY1_B10, (kHeld & HidNpadButton_Minus) != 0, stdControl_curReadTime);

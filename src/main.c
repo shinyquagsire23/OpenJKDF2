@@ -205,6 +205,9 @@ void crash_handler_basic(int sig);
 #include "SDL2_helper.h"
 #endif // LINUX
 
+#ifdef TARGET_SWITCH
+#include <switch.h>
+#endif // SWITCH
 #ifdef TARGET_TWL
 #include <nds.h>
 #include <fat.h>

@@ -243,12 +243,12 @@ void jkCutscene_Shutdown()
     jkCutscene_bInitted = 0;
 }
 
-int jkCutscene_sub_421310(char* fpath)
+int jkCutscene_Show(char* fpath)
 {
     // STUB
     if (!fpath) return 1;
 
-#if defined(ARCH_WASM) || defined(TARGET_SWITCH)
+#if defined(ARCH_WASM)
     printf("vid skip %s\n", fpath);
     return 1;
 #endif
@@ -523,7 +523,7 @@ int jkCutscene_sub_421310(char* fpath)
     return 1;
 }
 
-int jkCutscene_sub_421410()
+int jkCutscene_stop()
 {
     stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
     
@@ -742,11 +742,11 @@ int jkCutscene_PauseShow(int unk)
     return result;
 }
 
-int jkCutscene_Handler(HWND a1, UINT a2, WPARAM a3, LPARAM a4, LRESULT *a5)
+int jkCutscene_Handler(HWND a1, UINT event, WPARAM a3, LPARAM a4, LRESULT *a5)
 {
     wchar_t *v5; // eax
 
-    switch ( a2 )
+    switch ( event )
     {
         case WM_CLOSE:
 #if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
@@ -762,7 +762,7 @@ int jkCutscene_Handler(HWND a1, UINT a2, WPARAM a3, LPARAM a4, LRESULT *a5)
             {
                 if ( jkCutscene_isRendering )
                 {
-                    return jkCutscene_sub_421410();
+                    return jkCutscene_stop();
                 }
                 return 1;
             }
@@ -771,7 +771,7 @@ int jkCutscene_Handler(HWND a1, UINT a2, WPARAM a3, LPARAM a4, LRESULT *a5)
             {
                 if ( jkCutscene_isRendering )
                 {
-                    return jkCutscene_sub_421410();
+                    return jkCutscene_stop();
                 }
                 return 1;
             }

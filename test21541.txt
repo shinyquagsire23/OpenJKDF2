@@ -1,0 +1,2438 @@
+~/Code/projects/etc/OpenJKDF2/build_switch ~/Code/projects/etc/OpenJKDF2
+Building OpenJKDF2 for Nintendo Switch...
+Using devkitPro at: /opt/devkitpro
+-- Targeting Nintendo Switch
+-- Using the multi-header code from /home/anno/Code/projects/etc/OpenJKDF2/3rdparty/json/include/
+-- Could NOT find GLUT (missing: GLUT_glut_LIBRARY GLUT_INCLUDE_DIR) 
+-- Going to build “FreeGLUT 3.4.0” from Git module
+-- Going to build “GLEW 2.2.0” from Git module
+-- Going to build “zlib 1.2.13” from Git module
+-- Going to build “PhysFS 3.2.0” from Git module
+-- Going to build “libpng 1.6.39” from Git module
+-- Going to build “SDL 2.26.5” from Git module
+-- Going to build “SDL_mixer 2.6.3” from Git module
+-- Going to build “libopenal 1.23.1” from Git module
+-- ELF file will be located at: /home/anno/Code/projects/etc/OpenJKDF2/build_switch/openjkdf2
+-- elf2nro found at: /opt/devkitpro/tools/bin/elf2nro
+-- nacptool found at: /opt/devkitpro/tools/bin/nacptool
+-- To manually create NRO file, run from build directory:
+--   /opt/devkitpro/tools/bin/nacptool --create "OpenJKDF2" "OpenJKDF2 Team" "1.0.0" openjkdf2.nacp
+--   /opt/devkitpro/tools/bin/elf2nro openjkdf2 openjkdf2.nro --nacp=openjkdf2.nacp
+-- Configuring done (0.1s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/anno/Code/projects/etc/OpenJKDF2/build_switch
+[ 98%] Built target sith_engine
+[100%] Building C object CMakeFiles/openjkdf2.dir/src/main_switch_simple.o
+[100%] Linking CXX executable openjkdf2.elf
+GNU ld (GNU Binutils) 2.43.1
+  Supported emulations:
+   aarch64elf
+   aarch64elf32
+   aarch64elf32b
+   aarch64elfb
+   armelf
+   armelfb
+using external linker script: /opt/devkitpro/libnx/switch.ld
+==================================================
+OUTPUT_ARCH(aarch64)
+ENTRY(_start)
+
+PHDRS
+{
+	code   PT_LOAD FLAGS(5) /* Read | Execute */;
+	rodata PT_LOAD FLAGS(4) /* Read */;
+	data   PT_LOAD FLAGS(6) /* Read | Write */;
+	dyn    PT_DYNAMIC;
+}
+
+SECTIONS
+{
+	PROVIDE_HIDDEN( __start__ = 0x0 );
+
+	/* =========== CODE section =========== */
+	. = __start__;
+	PROVIDE_HIDDEN( __code_start = . );
+
+	.text :
+	{
+		KEEP (*(.crt0))
+		*(.text.unlikely .text.*_unlikely .text.unlikely.*)
+		*(.text.exit .text.exit.*)
+		*(.text.startup .text.startup.*)
+		*(.text.hot .text.hot.*)
+		*(.text .stub .text.* .gnu.linkonce.t.*)
+		. = ALIGN(8);
+	} :code
+
+	.init :
+	{
+		KEEP( *(.init) )
+		. = ALIGN(8);
+	} :code
+
+	.plt :
+	{
+		*(.plt)
+		*(.iplt)
+		. = ALIGN(8);
+	} :code
+
+	.fini :
+	{
+		KEEP( *(.fini) )
+		. = ALIGN(8);
+	} :code
+
+	/* =========== RODATA section =========== */
+	. = ALIGN(0x1000);
+	PROVIDE_HIDDEN( __rodata_start = . );
+
+	.nx-module-name : { KEEP (*(.nx-module-name)) } :rodata
+
+	.rela.dyn : { *(.rela.*) } :rodata
+	.relr.dyn : { *(.relr.*) } :rodata
+
+	.hash     : { *(.hash) } :rodata
+	.gnu.hash : { *(.gnu.hash) } :rodata
+
+	.dynsym   : { *(.dynsym) } :rodata
+	.dynstr   : { *(.dynstr) } :rodata
+
+	.rodata :
+	{
+		*(.rodata .rodata.* .gnu.linkonce.r.*)
+		. = ALIGN(8);
+	} :rodata
+
+	.tls.align :
+	{
+		QUAD( MAX( ALIGNOF(.tdata), ALIGNOF(.tbss) ) )
+	} :rodata
+
+	PROVIDE_HIDDEN( __tls_align = ADDR(.tls.align) );
+
+	.gcc_except_table  : { *(.gcc_except_table .gcc_except_table.*) } :rodata
+	.eh_frame_hdr      : { *(.eh_frame_hdr) *(.eh_frame_entry .eh_frame_entry.*) } :rodata
+	.eh_frame          : { KEEP (*(.eh_frame)) *(.eh_frame.*) } :rodata
+	.gnu_extab         : { *(.gnu_extab*) } : rodata
+	.exception_ranges  : { *(.exception_ranges .exception_ranges*) } :rodata
+
+	PROVIDE_HIDDEN( __eh_frame_hdr_start = ADDR(.eh_frame_hdr)                         );
+	PROVIDE_HIDDEN( __eh_frame_hdr_end   = ADDR(.eh_frame_hdr) + SIZEOF(.eh_frame_hdr) );
+
+	.gnu.version       : { *(.gnu.version) } :rodata
+	.gnu.version_d     : { *(.gnu.version_d) } :rodata
+	.gnu.version_r     : { *(.gnu.version_r) } :rodata
+
+	.note.gnu.build-id : { *(.note.gnu.build-id) } :rodata
+
+	/* =========== RELRO section =========== */
+	. = ALIGN(0x1000);
+	PROVIDE_HIDDEN( __relro_start = . );
+
+	.preinit_array :
+	{
+		PROVIDE_HIDDEN( __preinit_array_start = . );
+		KEEP (*(.preinit_array))
+		PROVIDE_HIDDEN( __preinit_array_end = . );
+	} :data
+
+	.init_array :
+	{
+		PROVIDE_HIDDEN( __init_array_start = . );
+		KEEP( *(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*)) )
+		KEEP( *(.init_array .ctors) )
+		PROVIDE_HIDDEN( __init_array_end = . );
+	} :data
+
+	.fini_array :
+	{
+		PROVIDE_HIDDEN( __fini_array_start = . );
+		KEEP( *(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*)) )
+		KEEP( *(.fini_array .dtors) )
+		PROVIDE_HIDDEN( __fini_array_end = . );
+	} :data
+
+	.data.rel.ro :
+	{
+		*(.data.rel.ro.local* .gnu.linkonce.d.rel.ro.local.*)
+		*(.data.rel.ro .data.rel.ro.* .gnu.linkonce.d.rel.ro.*)
+		. = ALIGN(8);
+	} :data
+
+	.dynamic : { *(.dynamic) } :data :dyn
+
+	.got     : { *(.got) *(.igot) } :data
+	.got.plt : { *(.got.plt)  *(.igot.plt) } :data
+
+	PROVIDE_HIDDEN( __got_start__ = ADDR(.got)                        );
+	PROVIDE_HIDDEN( __got_end__   = ADDR(.got.plt) + SIZEOF(.got.plt) );
+
+	/* =========== DATA section =========== */
+	. = ALIGN(0x1000);
+	PROVIDE_HIDDEN( __data_start = . );
+
+	.data :
+	{
+		*(.data .data.* .gnu.linkonce.d.*)
+		SORT(CONSTRUCTORS)
+		. = ALIGN(8);
+	} :data
+
+	.tdata :
+	{
+		*(.tdata .tdata.* .gnu.linkonce.td.*)
+		. = ALIGN(8);
+	} :data
+
+	PROVIDE_HIDDEN( __tdata_lma     = ADDR(.tdata)                  );
+	PROVIDE_HIDDEN( __tdata_lma_end = ADDR(.tdata) + SIZEOF(.tdata) );
+
+	.tbss :
+	{
+		*(.tbss .tbss.* .gnu.linkonce.tb.*)
+		*(.tcommon)
+		. = ALIGN(8);
+	} :data
+
+	.bss :
+	{
+		*(.dynbss)
+		*(.bss .bss.* .gnu.linkonce.b.*)
+		*(COMMON)
+		. = ALIGN(8);
+	} :data
+
+	/* Reserve space for the TLS segment of the main thread */
+	.main.tls ALIGN(MAX(ALIGNOF(.tdata),ALIGNOF(.tbss))) :
+	{
+		. += SIZEOF(.tdata);
+		. = ALIGN(ALIGNOF(.tbss));
+		. += SIZEOF(.tbss);
+	} :data
+
+	PROVIDE_HIDDEN( __tls_start   = ADDR(.main.tls)                     );
+	PROVIDE_HIDDEN( __tls_end     = ADDR(.main.tls) + SIZEOF(.main.tls) );
+
+	PROVIDE_HIDDEN( __bss_start__ = ADDR(.bss) );
+	PROVIDE_HIDDEN( __bss_end__   = __tls_end  );
+
+	PROVIDE_HIDDEN( __end__ = . );
+
+	/* =========== Argument buffer =========== */
+	. = ALIGN(0x1000);
+	PROVIDE_HIDDEN( __argdata__ = . );
+
+	/* ==================
+	   ==== Metadata ====
+	   ================== */
+
+	/* Discard sections that difficult post-processing */
+	/DISCARD/ : { *(.group .comment .note) }
+
+	/* Stabs debugging sections. */
+	.stab          0 : { *(.stab) }
+	.stabstr       0 : { *(.stabstr) }
+	.stab.excl     0 : { *(.stab.excl) }
+	.stab.exclstr  0 : { *(.stab.exclstr) }
+	.stab.index    0 : { *(.stab.index) }
+	.stab.indexstr 0 : { *(.stab.indexstr) }
+
+	/* DWARF debug sections.
+	   Symbols in the DWARF debugging sections are relative to the beginning
+	   of the section so we begin them at 0. */
+
+	/* DWARF 1 */
+	.debug          0 : { *(.debug) }
+	.line           0 : { *(.line) }
+
+	/* GNU DWARF 1 extensions */
+	.debug_srcinfo  0 : { *(.debug_srcinfo) }
+	.debug_sfnames  0 : { *(.debug_sfnames) }
+
+	/* DWARF 1.1 and DWARF 2 */
+	.debug_aranges  0 : { *(.debug_aranges) }
+	.debug_pubnames 0 : { *(.debug_pubnames) }
+
+	/* DWARF 2 */
+	.debug_info     0 : { *(.debug_info) }
+	.debug_abbrev   0 : { *(.debug_abbrev) }
+	.debug_line     0 : { *(.debug_line) }
+	.debug_frame    0 : { *(.debug_frame) }
+	.debug_str      0 : { *(.debug_str) }
+	.debug_loc      0 : { *(.debug_loc) }
+	.debug_macinfo  0 : { *(.debug_macinfo) }
+}
+
+==================================================
+/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/bin/ld: mode aarch64elf
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/crti.o succeeded
+/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/crti.o
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/crtbegin.o succeeded
+/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/crtbegin.o
+attempt to open CMakeFiles/openjkdf2.dir/src/main_switch_simple.o succeeded
+CMakeFiles/openjkdf2.dir/src/main_switch_simple.o
+attempt to open CMakeFiles/sith_engine.dir/src/AI/sithAI.o succeeded
+CMakeFiles/sith_engine.dir/src/AI/sithAI.o
+attempt to open CMakeFiles/sith_engine.dir/src/AI/sithAIAwareness.o succeeded
+CMakeFiles/sith_engine.dir/src/AI/sithAIAwareness.o
+attempt to open CMakeFiles/sith_engine.dir/src/AI/sithAIClass.o succeeded
+CMakeFiles/sith_engine.dir/src/AI/sithAIClass.o
+attempt to open CMakeFiles/sith_engine.dir/src/AI/sithAICmd.o succeeded
+CMakeFiles/sith_engine.dir/src/AI/sithAICmd.o
+attempt to open CMakeFiles/sith_engine.dir/src/Cog/jkCog.o succeeded
+CMakeFiles/sith_engine.dir/src/Cog/jkCog.o
+attempt to open CMakeFiles/sith_engine.dir/src/Cog/lex.yy.o succeeded
+CMakeFiles/sith_engine.dir/src/Cog/lex.yy.o
+attempt to open CMakeFiles/sith_engine.dir/src/Cog/sithCog.o succeeded
+CMakeFiles/sith_engine.dir/src/Cog/sithCog.o
+attempt to open CMakeFiles/sith_engine.dir/src/Cog/sithCogExec.o succeeded
+CMakeFiles/sith_engine.dir/src/Cog/sithCogExec.o
+attempt to open CMakeFiles/sith_engine.dir/src/Cog/sithCogFunction.o succeeded
+CMakeFiles/sith_engine.dir/src/Cog/sithCogFunction.o
+attempt to open CMakeFiles/sith_engine.dir/src/Cog/sithCogFunctionAI.o succeeded
+CMakeFiles/sith_engine.dir/src/Cog/sithCogFunctionAI.o
+attempt to open CMakeFiles/sith_engine.dir/src/Cog/sithCogFunctionPlayer.o succeeded
+CMakeFiles/sith_engine.dir/src/Cog/sithCogFunctionPlayer.o
+attempt to open CMakeFiles/sith_engine.dir/src/Cog/sithCogFunctionSector.o succeeded
+CMakeFiles/sith_engine.dir/src/Cog/sithCogFunctionSector.o
+attempt to open CMakeFiles/sith_engine.dir/src/Cog/sithCogFunctionSound.o succeeded
+CMakeFiles/sith_engine.dir/src/Cog/sithCogFunctionSound.o
+attempt to open CMakeFiles/sith_engine.dir/src/Cog/sithCogFunctionSurface.o succeeded
+CMakeFiles/sith_engine.dir/src/Cog/sithCogFunctionSurface.o
+attempt to open CMakeFiles/sith_engine.dir/src/Cog/sithCogFunctionThing.o succeeded
+CMakeFiles/sith_engine.dir/src/Cog/sithCogFunctionThing.o
+attempt to open CMakeFiles/sith_engine.dir/src/Cog/sithCogParse.o succeeded
+CMakeFiles/sith_engine.dir/src/Cog/sithCogParse.o
+attempt to open CMakeFiles/sith_engine.dir/src/Cog/y.tab.o succeeded
+CMakeFiles/sith_engine.dir/src/Cog/y.tab.o
+attempt to open CMakeFiles/sith_engine.dir/src/Devices/sithComm.o succeeded
+CMakeFiles/sith_engine.dir/src/Devices/sithComm.o
+attempt to open CMakeFiles/sith_engine.dir/src/Devices/sithConsole.o succeeded
+CMakeFiles/sith_engine.dir/src/Devices/sithConsole.o
+attempt to open CMakeFiles/sith_engine.dir/src/Devices/sithControl.o succeeded
+CMakeFiles/sith_engine.dir/src/Devices/sithControl.o
+attempt to open CMakeFiles/sith_engine.dir/src/Devices/sithSound.o succeeded
+CMakeFiles/sith_engine.dir/src/Devices/sithSound.o
+attempt to open CMakeFiles/sith_engine.dir/src/Devices/sithSoundMixer.o succeeded
+CMakeFiles/sith_engine.dir/src/Devices/sithSoundMixer.o
+attempt to open CMakeFiles/sith_engine.dir/src/Dss/jkDSS.o succeeded
+CMakeFiles/sith_engine.dir/src/Dss/jkDSS.o
+attempt to open CMakeFiles/sith_engine.dir/src/Dss/sithDSS.o succeeded
+CMakeFiles/sith_engine.dir/src/Dss/sithDSS.o
+attempt to open CMakeFiles/sith_engine.dir/src/Dss/sithDSSCog.o succeeded
+CMakeFiles/sith_engine.dir/src/Dss/sithDSSCog.o
+attempt to open CMakeFiles/sith_engine.dir/src/Dss/sithDSSThing.o succeeded
+CMakeFiles/sith_engine.dir/src/Dss/sithDSSThing.o
+attempt to open CMakeFiles/sith_engine.dir/src/Dss/sithGamesave.o succeeded
+CMakeFiles/sith_engine.dir/src/Dss/sithGamesave.o
+attempt to open CMakeFiles/sith_engine.dir/src/Dss/sithMulti.o succeeded
+CMakeFiles/sith_engine.dir/src/Dss/sithMulti.o
+attempt to open CMakeFiles/sith_engine.dir/src/Engine/rdActive.o succeeded
+CMakeFiles/sith_engine.dir/src/Engine/rdActive.o
+attempt to open CMakeFiles/sith_engine.dir/src/Engine/rdCamera.o succeeded
+CMakeFiles/sith_engine.dir/src/Engine/rdCamera.o
+attempt to open CMakeFiles/sith_engine.dir/src/Engine/rdCanvas.o succeeded
+CMakeFiles/sith_engine.dir/src/Engine/rdCanvas.o
+attempt to open CMakeFiles/sith_engine.dir/src/Engine/rdClip.o succeeded
+CMakeFiles/sith_engine.dir/src/Engine/rdClip.o
+attempt to open CMakeFiles/sith_engine.dir/src/Engine/rdColormap.o succeeded
+CMakeFiles/sith_engine.dir/src/Engine/rdColormap.o
+attempt to open CMakeFiles/sith_engine.dir/src/Engine/rdKeyframe.o succeeded
+CMakeFiles/sith_engine.dir/src/Engine/rdKeyframe.o
+attempt to open CMakeFiles/sith_engine.dir/src/Engine/rdLight.o succeeded
+CMakeFiles/sith_engine.dir/src/Engine/rdLight.o
+attempt to open CMakeFiles/sith_engine.dir/src/Engine/rdMaterial.o succeeded
+CMakeFiles/sith_engine.dir/src/Engine/rdMaterial.o
+attempt to open CMakeFiles/sith_engine.dir/src/Engine/rdPuppet.o succeeded
+CMakeFiles/sith_engine.dir/src/Engine/rdPuppet.o
+attempt to open CMakeFiles/sith_engine.dir/src/Engine/rdThing.o succeeded
+CMakeFiles/sith_engine.dir/src/Engine/rdThing.o
+attempt to open CMakeFiles/sith_engine.dir/src/Engine/rdroid.o succeeded
+CMakeFiles/sith_engine.dir/src/Engine/rdroid.o
+attempt to open CMakeFiles/sith_engine.dir/src/Engine/sithAnimClass.o succeeded
+CMakeFiles/sith_engine.dir/src/Engine/sithAnimClass.o
+attempt to open CMakeFiles/sith_engine.dir/src/Engine/sithCamera.o succeeded
+CMakeFiles/sith_engine.dir/src/Engine/sithCamera.o
+attempt to open CMakeFiles/sith_engine.dir/src/Engine/sithCollision.o succeeded
+CMakeFiles/sith_engine.dir/src/Engine/sithCollision.o
+attempt to open CMakeFiles/sith_engine.dir/src/Engine/sithIntersect.o succeeded
+CMakeFiles/sith_engine.dir/src/Engine/sithIntersect.o
+attempt to open CMakeFiles/sith_engine.dir/src/Engine/sithKeyFrame.o succeeded
+CMakeFiles/sith_engine.dir/src/Engine/sithKeyFrame.o
+attempt to open CMakeFiles/sith_engine.dir/src/Engine/sithParticle.o succeeded
+CMakeFiles/sith_engine.dir/src/Engine/sithParticle.o
+attempt to open CMakeFiles/sith_engine.dir/src/Engine/sithPhysics.o succeeded
+CMakeFiles/sith_engine.dir/src/Engine/sithPhysics.o
+attempt to open CMakeFiles/sith_engine.dir/src/Engine/sithPuppet.o succeeded
+CMakeFiles/sith_engine.dir/src/Engine/sithPuppet.o
+attempt to open CMakeFiles/sith_engine.dir/src/Engine/sithRender.o succeeded
+CMakeFiles/sith_engine.dir/src/Engine/sithRender.o
+attempt to open CMakeFiles/sith_engine.dir/src/Engine/sithRenderSky.o succeeded
+CMakeFiles/sith_engine.dir/src/Engine/sithRenderSky.o
+attempt to open CMakeFiles/sith_engine.dir/src/Gameplay/jkSaber.o succeeded
+CMakeFiles/sith_engine.dir/src/Gameplay/jkSaber.o
+attempt to open CMakeFiles/sith_engine.dir/src/Gameplay/sithEvent.o succeeded
+CMakeFiles/sith_engine.dir/src/Gameplay/sithEvent.o
+attempt to open CMakeFiles/sith_engine.dir/src/Gameplay/sithInventory.o succeeded
+CMakeFiles/sith_engine.dir/src/Gameplay/sithInventory.o
+attempt to open CMakeFiles/sith_engine.dir/src/Gameplay/sithOverlayMap.o succeeded
+CMakeFiles/sith_engine.dir/src/Gameplay/sithOverlayMap.o
+attempt to open CMakeFiles/sith_engine.dir/src/Gameplay/sithPlayer.o succeeded
+CMakeFiles/sith_engine.dir/src/Gameplay/sithPlayer.o
+attempt to open CMakeFiles/sith_engine.dir/src/Gameplay/sithPlayerActions.o succeeded
+CMakeFiles/sith_engine.dir/src/Gameplay/sithPlayerActions.o
+attempt to open CMakeFiles/sith_engine.dir/src/Gameplay/sithTime.o succeeded
+CMakeFiles/sith_engine.dir/src/Gameplay/sithTime.o
+attempt to open CMakeFiles/sith_engine.dir/src/General/Darray.o succeeded
+CMakeFiles/sith_engine.dir/src/General/Darray.o
+attempt to open CMakeFiles/sith_engine.dir/src/General/crc32.o succeeded
+CMakeFiles/sith_engine.dir/src/General/crc32.o
+attempt to open CMakeFiles/sith_engine.dir/src/General/md5.o succeeded
+CMakeFiles/sith_engine.dir/src/General/md5.o
+attempt to open CMakeFiles/sith_engine.dir/src/General/sithStrTable.o succeeded
+CMakeFiles/sith_engine.dir/src/General/sithStrTable.o
+attempt to open CMakeFiles/sith_engine.dir/src/General/stdBitmap.o succeeded
+CMakeFiles/sith_engine.dir/src/General/stdBitmap.o
+attempt to open CMakeFiles/sith_engine.dir/src/General/stdBitmapRle.o succeeded
+CMakeFiles/sith_engine.dir/src/General/stdBitmapRle.o
+attempt to open CMakeFiles/sith_engine.dir/src/General/stdColor.o succeeded
+CMakeFiles/sith_engine.dir/src/General/stdColor.o
+attempt to open CMakeFiles/sith_engine.dir/src/General/stdConffile.o succeeded
+CMakeFiles/sith_engine.dir/src/General/stdConffile.o
+attempt to open CMakeFiles/sith_engine.dir/src/General/stdFileUtil.o succeeded
+CMakeFiles/sith_engine.dir/src/General/stdFileUtil.o
+attempt to open CMakeFiles/sith_engine.dir/src/General/stdFnames.o succeeded
+CMakeFiles/sith_engine.dir/src/General/stdFnames.o
+attempt to open CMakeFiles/sith_engine.dir/src/General/stdFont.o succeeded
+CMakeFiles/sith_engine.dir/src/General/stdFont.o
+attempt to open CMakeFiles/sith_engine.dir/src/General/stdHashTable.o succeeded
+CMakeFiles/sith_engine.dir/src/General/stdHashTable.o
+attempt to open CMakeFiles/sith_engine.dir/src/General/stdJSON.o succeeded
+CMakeFiles/sith_engine.dir/src/General/stdJSON.o
+attempt to open CMakeFiles/sith_engine.dir/src/General/stdLinklist.o succeeded
+CMakeFiles/sith_engine.dir/src/General/stdLinklist.o
+attempt to open CMakeFiles/sith_engine.dir/src/General/stdMath.o succeeded
+CMakeFiles/sith_engine.dir/src/General/stdMath.o
+attempt to open CMakeFiles/sith_engine.dir/src/General/stdMemory.o succeeded
+CMakeFiles/sith_engine.dir/src/General/stdMemory.o
+attempt to open CMakeFiles/sith_engine.dir/src/General/stdPalEffects.o succeeded
+CMakeFiles/sith_engine.dir/src/General/stdPalEffects.o
+attempt to open CMakeFiles/sith_engine.dir/src/General/stdPcx.o succeeded
+CMakeFiles/sith_engine.dir/src/General/stdPcx.o
+attempt to open CMakeFiles/sith_engine.dir/src/General/stdSingleLinklist.o succeeded
+CMakeFiles/sith_engine.dir/src/General/stdSingleLinklist.o
+attempt to open CMakeFiles/sith_engine.dir/src/General/stdStrTable.o succeeded
+CMakeFiles/sith_engine.dir/src/General/stdStrTable.o
+attempt to open CMakeFiles/sith_engine.dir/src/General/stdString.o succeeded
+CMakeFiles/sith_engine.dir/src/General/stdString.o
+attempt to open CMakeFiles/sith_engine.dir/src/General/util.o succeeded
+CMakeFiles/sith_engine.dir/src/General/util.o
+attempt to open CMakeFiles/sith_engine.dir/src/Gui/jkGUI.o succeeded
+CMakeFiles/sith_engine.dir/src/Gui/jkGUI.o
+attempt to open CMakeFiles/sith_engine.dir/src/Gui/jkGUIControlOptions.o succeeded
+CMakeFiles/sith_engine.dir/src/Gui/jkGUIControlOptions.o
+attempt to open CMakeFiles/sith_engine.dir/src/Gui/jkGUIControlSaveLoad.o succeeded
+CMakeFiles/sith_engine.dir/src/Gui/jkGUIControlSaveLoad.o
+attempt to open CMakeFiles/sith_engine.dir/src/Gui/jkGUIDecision.o succeeded
+CMakeFiles/sith_engine.dir/src/Gui/jkGUIDecision.o
+attempt to open CMakeFiles/sith_engine.dir/src/Gui/jkGUIDialog.o succeeded
+CMakeFiles/sith_engine.dir/src/Gui/jkGUIDialog.o
+attempt to open CMakeFiles/sith_engine.dir/src/Gui/jkGUIEsc.o succeeded
+CMakeFiles/sith_engine.dir/src/Gui/jkGUIEsc.o
+attempt to open CMakeFiles/sith_engine.dir/src/Gui/jkGUIForce.o succeeded
+CMakeFiles/sith_engine.dir/src/Gui/jkGUIForce.o
+attempt to open CMakeFiles/sith_engine.dir/src/Gui/jkGUIGameplay.o succeeded
+CMakeFiles/sith_engine.dir/src/Gui/jkGUIGameplay.o
+attempt to open CMakeFiles/sith_engine.dir/src/Gui/jkGUIGeneral.o succeeded
+CMakeFiles/sith_engine.dir/src/Gui/jkGUIGeneral.o
+attempt to open CMakeFiles/sith_engine.dir/src/Gui/jkGUIJoystick.o succeeded
+CMakeFiles/sith_engine.dir/src/Gui/jkGUIJoystick.o
+attempt to open CMakeFiles/sith_engine.dir/src/Gui/jkGUIKeyboard.o succeeded
+CMakeFiles/sith_engine.dir/src/Gui/jkGUIKeyboard.o
+attempt to open CMakeFiles/sith_engine.dir/src/Gui/jkGUIMain.o succeeded
+CMakeFiles/sith_engine.dir/src/Gui/jkGUIMain.o
+attempt to open CMakeFiles/sith_engine.dir/src/Gui/jkGUIMap.o succeeded
+CMakeFiles/sith_engine.dir/src/Gui/jkGUIMap.o
+attempt to open CMakeFiles/sith_engine.dir/src/Gui/jkGUIMods.o succeeded
+CMakeFiles/sith_engine.dir/src/Gui/jkGUIMods.o
+attempt to open CMakeFiles/sith_engine.dir/src/Gui/jkGUIMouse.o succeeded
+CMakeFiles/sith_engine.dir/src/Gui/jkGUIMouse.o
+attempt to open CMakeFiles/sith_engine.dir/src/Gui/jkGUIMultiTally.o succeeded
+CMakeFiles/sith_engine.dir/src/Gui/jkGUIMultiTally.o
+attempt to open CMakeFiles/sith_engine.dir/src/Gui/jkGUIObjectives.o succeeded
+CMakeFiles/sith_engine.dir/src/Gui/jkGUIObjectives.o
+attempt to open CMakeFiles/sith_engine.dir/src/Gui/jkGUIPlayer.o succeeded
+CMakeFiles/sith_engine.dir/src/Gui/jkGUIPlayer.o
+attempt to open CMakeFiles/sith_engine.dir/src/Gui/jkGUIRend.o succeeded
+CMakeFiles/sith_engine.dir/src/Gui/jkGUIRend.o
+attempt to open CMakeFiles/sith_engine.dir/src/Gui/jkGUISaveLoad.o succeeded
+CMakeFiles/sith_engine.dir/src/Gui/jkGUISaveLoad.o
+attempt to open CMakeFiles/sith_engine.dir/src/Gui/jkGUISetup.o succeeded
+CMakeFiles/sith_engine.dir/src/Gui/jkGUISetup.o
+attempt to open CMakeFiles/sith_engine.dir/src/Gui/jkGUISingleTally.o succeeded
+CMakeFiles/sith_engine.dir/src/Gui/jkGUISingleTally.o
+attempt to open CMakeFiles/sith_engine.dir/src/Gui/jkGUISingleplayer.o succeeded
+CMakeFiles/sith_engine.dir/src/Gui/jkGUISingleplayer.o
+attempt to open CMakeFiles/sith_engine.dir/src/Gui/jkGUISound.o succeeded
+CMakeFiles/sith_engine.dir/src/Gui/jkGUISound.o
+attempt to open CMakeFiles/sith_engine.dir/src/Gui/jkGUITitle.o succeeded
+CMakeFiles/sith_engine.dir/src/Gui/jkGUITitle.o
+attempt to open CMakeFiles/sith_engine.dir/src/Main/InstallHelper.o succeeded
+CMakeFiles/sith_engine.dir/src/Main/InstallHelper.o
+attempt to open CMakeFiles/sith_engine.dir/src/Main/Main.o succeeded
+CMakeFiles/sith_engine.dir/src/Main/Main.o
+attempt to open CMakeFiles/sith_engine.dir/src/Main/jkAI.o succeeded
+CMakeFiles/sith_engine.dir/src/Main/jkAI.o
+attempt to open CMakeFiles/sith_engine.dir/src/Main/jkControl.o succeeded
+CMakeFiles/sith_engine.dir/src/Main/jkControl.o
+attempt to open CMakeFiles/sith_engine.dir/src/Main/jkCredits.o succeeded
+CMakeFiles/sith_engine.dir/src/Main/jkCredits.o
+attempt to open CMakeFiles/sith_engine.dir/src/Main/jkCutscene.o succeeded
+CMakeFiles/sith_engine.dir/src/Main/jkCutscene.o
+attempt to open CMakeFiles/sith_engine.dir/src/Main/jkDev.o succeeded
+CMakeFiles/sith_engine.dir/src/Main/jkDev.o
+attempt to open CMakeFiles/sith_engine.dir/src/Main/jkEpisode.o succeeded
+CMakeFiles/sith_engine.dir/src/Main/jkEpisode.o
+attempt to open CMakeFiles/sith_engine.dir/src/Main/jkGame.o succeeded
+CMakeFiles/sith_engine.dir/src/Main/jkGame.o
+attempt to open CMakeFiles/sith_engine.dir/src/Main/jkGob.o succeeded
+CMakeFiles/sith_engine.dir/src/Main/jkGob.o
+attempt to open CMakeFiles/sith_engine.dir/src/Main/jkHud.o succeeded
+CMakeFiles/sith_engine.dir/src/Main/jkHud.o
+attempt to open CMakeFiles/sith_engine.dir/src/Main/jkHudCameraView.o succeeded
+CMakeFiles/sith_engine.dir/src/Main/jkHudCameraView.o
+attempt to open CMakeFiles/sith_engine.dir/src/Main/jkHudInv.o succeeded
+CMakeFiles/sith_engine.dir/src/Main/jkHudInv.o
+attempt to open CMakeFiles/sith_engine.dir/src/Main/jkHudScope.o succeeded
+CMakeFiles/sith_engine.dir/src/Main/jkHudScope.o
+attempt to open CMakeFiles/sith_engine.dir/src/Main/jkMain.o succeeded
+CMakeFiles/sith_engine.dir/src/Main/jkMain.o
+attempt to open CMakeFiles/sith_engine.dir/src/Main/jkQuakeConsole.o succeeded
+CMakeFiles/sith_engine.dir/src/Main/jkQuakeConsole.o
+attempt to open CMakeFiles/sith_engine.dir/src/Main/jkRes.o succeeded
+CMakeFiles/sith_engine.dir/src/Main/jkRes.o
+attempt to open CMakeFiles/sith_engine.dir/src/Main/jkSmack.o succeeded
+CMakeFiles/sith_engine.dir/src/Main/jkSmack.o
+attempt to open CMakeFiles/sith_engine.dir/src/Main/jkStrings.o succeeded
+CMakeFiles/sith_engine.dir/src/Main/jkStrings.o
+attempt to open CMakeFiles/sith_engine.dir/src/Main/sithCommand.o succeeded
+CMakeFiles/sith_engine.dir/src/Main/sithCommand.o
+attempt to open CMakeFiles/sith_engine.dir/src/Main/sithCvar.o succeeded
+CMakeFiles/sith_engine.dir/src/Main/sithCvar.o
+attempt to open CMakeFiles/sith_engine.dir/src/Main/sithMain.o succeeded
+CMakeFiles/sith_engine.dir/src/Main/sithMain.o
+attempt to open CMakeFiles/sith_engine.dir/src/Platform/Common/stdControl.o succeeded
+CMakeFiles/sith_engine.dir/src/Platform/Common/stdControl.o
+attempt to open CMakeFiles/sith_engine.dir/src/Platform/Common/stdEmbeddedRes.o succeeded
+CMakeFiles/sith_engine.dir/src/Platform/Common/stdEmbeddedRes.o
+attempt to open CMakeFiles/sith_engine.dir/src/Platform/Common/stdHttp.o succeeded
+CMakeFiles/sith_engine.dir/src/Platform/Common/stdHttp.o
+attempt to open CMakeFiles/sith_engine.dir/src/Platform/Common/stdUpdater.o succeeded
+CMakeFiles/sith_engine.dir/src/Platform/Common/stdUpdater.o
+attempt to open CMakeFiles/sith_engine.dir/src/Primitives/rdDebug.o succeeded
+CMakeFiles/sith_engine.dir/src/Primitives/rdDebug.o
+attempt to open CMakeFiles/sith_engine.dir/src/Primitives/rdMath.o succeeded
+CMakeFiles/sith_engine.dir/src/Primitives/rdMath.o
+attempt to open CMakeFiles/sith_engine.dir/src/Primitives/rdMatrix.o succeeded
+CMakeFiles/sith_engine.dir/src/Primitives/rdMatrix.o
+attempt to open CMakeFiles/sith_engine.dir/src/Primitives/rdModel3.o succeeded
+CMakeFiles/sith_engine.dir/src/Primitives/rdModel3.o
+attempt to open CMakeFiles/sith_engine.dir/src/Primitives/rdParticle.o succeeded
+CMakeFiles/sith_engine.dir/src/Primitives/rdParticle.o
+attempt to open CMakeFiles/sith_engine.dir/src/Primitives/rdPolyLine.o succeeded
+CMakeFiles/sith_engine.dir/src/Primitives/rdPolyLine.o
+attempt to open CMakeFiles/sith_engine.dir/src/Primitives/rdPrimit2.o succeeded
+CMakeFiles/sith_engine.dir/src/Primitives/rdPrimit2.o
+attempt to open CMakeFiles/sith_engine.dir/src/Primitives/rdPrimit3.o succeeded
+CMakeFiles/sith_engine.dir/src/Primitives/rdPrimit3.o
+attempt to open CMakeFiles/sith_engine.dir/src/Primitives/rdSprite.o succeeded
+CMakeFiles/sith_engine.dir/src/Primitives/rdSprite.o
+attempt to open CMakeFiles/sith_engine.dir/src/Primitives/rdVector.o succeeded
+CMakeFiles/sith_engine.dir/src/Primitives/rdVector.o
+attempt to open CMakeFiles/sith_engine.dir/src/Raster/rdCache.o succeeded
+CMakeFiles/sith_engine.dir/src/Raster/rdCache.o
+attempt to open CMakeFiles/sith_engine.dir/src/Raster/rdFace.o succeeded
+CMakeFiles/sith_engine.dir/src/Raster/rdFace.o
+attempt to open CMakeFiles/sith_engine.dir/src/Raster/rdRaster.o succeeded
+CMakeFiles/sith_engine.dir/src/Raster/rdRaster.o
+attempt to open CMakeFiles/sith_engine.dir/src/Win95/DirectX.o succeeded
+CMakeFiles/sith_engine.dir/src/Win95/DirectX.o
+attempt to open CMakeFiles/sith_engine.dir/src/Win95/Video.o succeeded
+CMakeFiles/sith_engine.dir/src/Win95/Video.o
+attempt to open CMakeFiles/sith_engine.dir/src/Win95/WinIdk.o succeeded
+CMakeFiles/sith_engine.dir/src/Win95/WinIdk.o
+attempt to open CMakeFiles/sith_engine.dir/src/Win95/Window.o succeeded
+CMakeFiles/sith_engine.dir/src/Win95/Window.o
+attempt to open CMakeFiles/sith_engine.dir/src/Win95/Window_Twl.o succeeded
+CMakeFiles/sith_engine.dir/src/Win95/Window_Twl.o
+attempt to open CMakeFiles/sith_engine.dir/src/Win95/Windows.o succeeded
+CMakeFiles/sith_engine.dir/src/Win95/Windows.o
+attempt to open CMakeFiles/sith_engine.dir/src/Win95/std.o succeeded
+CMakeFiles/sith_engine.dir/src/Win95/std.o
+attempt to open CMakeFiles/sith_engine.dir/src/Win95/stdComm.o succeeded
+CMakeFiles/sith_engine.dir/src/Win95/stdComm.o
+attempt to open CMakeFiles/sith_engine.dir/src/Win95/stdConsole.o succeeded
+CMakeFiles/sith_engine.dir/src/Win95/stdConsole.o
+attempt to open CMakeFiles/sith_engine.dir/src/Win95/stdDisplay.o succeeded
+CMakeFiles/sith_engine.dir/src/Win95/stdDisplay.o
+attempt to open CMakeFiles/sith_engine.dir/src/Win95/stdDisplay_Twl.o succeeded
+CMakeFiles/sith_engine.dir/src/Win95/stdDisplay_Twl.o
+attempt to open CMakeFiles/sith_engine.dir/src/Win95/stdGdi.o succeeded
+CMakeFiles/sith_engine.dir/src/Win95/stdGdi.o
+attempt to open CMakeFiles/sith_engine.dir/src/Win95/stdGob.o succeeded
+CMakeFiles/sith_engine.dir/src/Win95/stdGob.o
+attempt to open CMakeFiles/sith_engine.dir/src/Win95/stdMci.o succeeded
+CMakeFiles/sith_engine.dir/src/Win95/stdMci.o
+attempt to open CMakeFiles/sith_engine.dir/src/Win95/stdSound.o succeeded
+CMakeFiles/sith_engine.dir/src/Win95/stdSound.o
+attempt to open CMakeFiles/sith_engine.dir/src/World/jkPlayer.o succeeded
+CMakeFiles/sith_engine.dir/src/World/jkPlayer.o
+attempt to open CMakeFiles/sith_engine.dir/src/World/sithActor.o succeeded
+CMakeFiles/sith_engine.dir/src/World/sithActor.o
+attempt to open CMakeFiles/sith_engine.dir/src/World/sithArchLighting.o succeeded
+CMakeFiles/sith_engine.dir/src/World/sithArchLighting.o
+attempt to open CMakeFiles/sith_engine.dir/src/World/sithExplosion.o succeeded
+CMakeFiles/sith_engine.dir/src/World/sithExplosion.o
+attempt to open CMakeFiles/sith_engine.dir/src/World/sithItem.o succeeded
+CMakeFiles/sith_engine.dir/src/World/sithItem.o
+attempt to open CMakeFiles/sith_engine.dir/src/World/sithMap.o succeeded
+CMakeFiles/sith_engine.dir/src/World/sithMap.o
+attempt to open CMakeFiles/sith_engine.dir/src/World/sithMaterial.o succeeded
+CMakeFiles/sith_engine.dir/src/World/sithMaterial.o
+attempt to open CMakeFiles/sith_engine.dir/src/World/sithModel.o succeeded
+CMakeFiles/sith_engine.dir/src/World/sithModel.o
+attempt to open CMakeFiles/sith_engine.dir/src/World/sithSector.o succeeded
+CMakeFiles/sith_engine.dir/src/World/sithSector.o
+attempt to open CMakeFiles/sith_engine.dir/src/World/sithSoundClass.o succeeded
+CMakeFiles/sith_engine.dir/src/World/sithSoundClass.o
+attempt to open CMakeFiles/sith_engine.dir/src/World/sithSprite.o succeeded
+CMakeFiles/sith_engine.dir/src/World/sithSprite.o
+attempt to open CMakeFiles/sith_engine.dir/src/World/sithSurface.o succeeded
+CMakeFiles/sith_engine.dir/src/World/sithSurface.o
+attempt to open CMakeFiles/sith_engine.dir/src/World/sithTemplate.o succeeded
+CMakeFiles/sith_engine.dir/src/World/sithTemplate.o
+attempt to open CMakeFiles/sith_engine.dir/src/World/sithThing.o succeeded
+CMakeFiles/sith_engine.dir/src/World/sithThing.o
+attempt to open CMakeFiles/sith_engine.dir/src/World/sithTrackThing.o succeeded
+CMakeFiles/sith_engine.dir/src/World/sithTrackThing.o
+attempt to open CMakeFiles/sith_engine.dir/src/World/sithWeapon.o succeeded
+CMakeFiles/sith_engine.dir/src/World/sithWeapon.o
+attempt to open CMakeFiles/sith_engine.dir/src/World/sithWorld.o succeeded
+CMakeFiles/sith_engine.dir/src/World/sithWorld.o
+attempt to open CMakeFiles/sith_engine.dir/src/hook.o succeeded
+CMakeFiles/sith_engine.dir/src/hook.o
+attempt to open CMakeFiles/sith_engine.dir/src/jk.o succeeded
+CMakeFiles/sith_engine.dir/src/jk.o
+attempt to open CMakeFiles/sith_engine.dir/src/main_globals.o succeeded
+CMakeFiles/sith_engine.dir/src/main_globals.o
+attempt to open CMakeFiles/sith_engine.dir/src/stdPlatform.o succeeded
+CMakeFiles/sith_engine.dir/src/stdPlatform.o
+attempt to open CMakeFiles/sith_engine.dir/src/unusedWontImpl.o succeeded
+CMakeFiles/sith_engine.dir/src/unusedWontImpl.o
+attempt to open CMakeFiles/sith_engine.dir/src/version.o succeeded
+CMakeFiles/sith_engine.dir/src/version.o
+attempt to open CMakeFiles/sith_engine.dir/src/wprintf.o succeeded
+CMakeFiles/sith_engine.dir/src/wprintf.o
+attempt to open CMakeFiles/sith_engine.dir/src/external/fcaseopen/fcaseopen.o succeeded
+CMakeFiles/sith_engine.dir/src/external/fcaseopen/fcaseopen.o
+attempt to open CMakeFiles/sith_engine.dir/src/Platform/Networking/None/stdComm_none.o succeeded
+CMakeFiles/sith_engine.dir/src/Platform/Networking/None/stdComm_none.o
+attempt to open CMakeFiles/sith_engine.dir/src/external/libsmacker/smacker.o succeeded
+CMakeFiles/sith_engine.dir/src/external/libsmacker/smacker.o
+attempt to open CMakeFiles/sith_engine.dir/src/external/libsmacker/smk_bitstream.o succeeded
+CMakeFiles/sith_engine.dir/src/external/libsmacker/smk_bitstream.o
+attempt to open CMakeFiles/sith_engine.dir/src/external/libsmacker/smk_hufftree.o succeeded
+CMakeFiles/sith_engine.dir/src/external/libsmacker/smk_hufftree.o
+attempt to open CMakeFiles/sith_engine.dir/src/external/libsmusher/src/smush.o succeeded
+CMakeFiles/sith_engine.dir/src/external/libsmusher/src/smush.o
+attempt to open CMakeFiles/sith_engine.dir/src/external/libsmusher/src/codec48.o succeeded
+CMakeFiles/sith_engine.dir/src/external/libsmusher/src/codec48.o
+attempt to open CMakeFiles/sith_engine.dir/src/Platform/SDL2/jkGUIDisplay.o succeeded
+CMakeFiles/sith_engine.dir/src/Platform/SDL2/jkGUIDisplay.o
+attempt to open CMakeFiles/sith_engine.dir/src/Platform/SDL2/stdControl.o succeeded
+CMakeFiles/sith_engine.dir/src/Platform/SDL2/stdControl.o
+attempt to open CMakeFiles/sith_engine.dir/src/Platform/GL/shader_utils.o succeeded
+CMakeFiles/sith_engine.dir/src/Platform/GL/shader_utils.o
+attempt to open CMakeFiles/sith_engine.dir/src/Platform/GL/std3D.o succeeded
+CMakeFiles/sith_engine.dir/src/Platform/GL/std3D.o
+attempt to open CMakeFiles/sith_engine.dir/src/Platform/GL/jkgm.o succeeded
+CMakeFiles/sith_engine.dir/src/Platform/GL/jkgm.o
+attempt to open CMakeFiles/sith_engine.dir/src/Platform/Posix/wuRegistry.o succeeded
+CMakeFiles/sith_engine.dir/src/Platform/Posix/wuRegistry.o
+attempt to open CMakeFiles/sith_engine.dir/generated/globals.o succeeded
+CMakeFiles/sith_engine.dir/generated/globals.o
+attempt to open /opt/devkitpro/libnx/lib/libSDL2main.so failed
+attempt to open /opt/devkitpro/libnx/lib/libSDL2main.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libSDL2main.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libSDL2main.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libSDL2main.a
+attempt to open /opt/devkitpro/libnx/lib/libSDL2.so failed
+attempt to open /opt/devkitpro/libnx/lib/libSDL2.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libSDL2.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libSDL2.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libSDL2.a
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_assert.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_error.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_hints.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_log.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_spinlock.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_audio.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_audiocvt.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_audiotypecvt.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_mixer.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_cpuinfo.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_events.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_gesture.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_keyboard.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_mouse.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_quit.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_touch.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_windowevents.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_rwops.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_haptic.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_gamecontroller.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_joystick.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)controller_type.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_url.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_render.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_yuv_sw.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_render_gles2.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_shaders_gles2.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_render_sw.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_rotate.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_triangle.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_sensor.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_crc16.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_getenv.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_malloc.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_stdlib.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_string.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_thread.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_timer.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_fillrect.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_pixels.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_rect.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_stretch.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_surface.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_video.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_yuv.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)yuv_rgb.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_systhread.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_syssem.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_sysmutex.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_systls.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_switchvideo.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_switchaudio.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_sysjoystick.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_systimer.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_virtualjoystick.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_sysurl.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_syshaptic.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_dummysensor.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_sysfilesystem.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_dataqueue.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_guid.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_list.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_utils.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_atomic.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_displayevents.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_blendfillrect.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_blendline.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_blendpoint.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_drawline.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_drawpoint.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_qsort.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_RLEaccel.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_blit.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_blit_0.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_blit_1.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_blit_A.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_blit_N.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_blit_auto.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_blit_copy.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_blit_slow.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_egl.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_switchkeyboard.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_switchmouse.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_switchopengles.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_switchswkb.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_switchtouch.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_sysloadso.o
+attempt to open /opt/devkitpro/libnx/lib/libSDL2_mixer.so failed
+attempt to open /opt/devkitpro/libnx/lib/libSDL2_mixer.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libSDL2_mixer.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libSDL2_mixer.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libSDL2_mixer.a
+(/opt/devkitpro/portlibs/switch/lib/libSDL2_mixer.a)mixer.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2_mixer.a)music.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2_mixer.a)music_modplug.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2_mixer.a)music_mpg123.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2_mixer.a)music_ogg.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2_mixer.a)music_opus.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2_mixer.a)music_timidity.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2_mixer.a)music_wav.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2_mixer.a)playmidi.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2_mixer.a)tables.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2_mixer.a)timidity.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2_mixer.a)effects_internal.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2_mixer.a)load_aiff.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2_mixer.a)load_voc.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2_mixer.a)common.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2_mixer.a)instrum.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2_mixer.a)mix.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2_mixer.a)output.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2_mixer.a)readmidi.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2_mixer.a)resample.o
+(/opt/devkitpro/portlibs/switch/lib/libSDL2_mixer.a)effect_position.o
+attempt to open /opt/devkitpro/libnx/lib/libSDL2main.so failed
+attempt to open /opt/devkitpro/libnx/lib/libSDL2main.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libSDL2main.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libSDL2main.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libSDL2main.a
+attempt to open /opt/devkitpro/libnx/lib/libSDL2.so failed
+attempt to open /opt/devkitpro/libnx/lib/libSDL2.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libSDL2.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libSDL2.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libSDL2.a
+(/opt/devkitpro/portlibs/switch/lib/libSDL2.a)SDL_wave.o
+attempt to open /opt/devkitpro/libnx/lib/libSDL2_mixer.so failed
+attempt to open /opt/devkitpro/libnx/lib/libSDL2_mixer.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libSDL2_mixer.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libSDL2_mixer.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libSDL2_mixer.a
+attempt to open /opt/devkitpro/libnx/lib/libopenal.so failed
+attempt to open /opt/devkitpro/libnx/lib/libopenal.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libopenal.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libopenal.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libopenal.a
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)buffer.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)error.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)listener.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)source.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)alc.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)alu.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)alconfig.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)bformatdec.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)buffer_storage.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)effectslot.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)reverb.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)helpers.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)hrtf.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)panning.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)voice.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)loopback.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)null.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)sdl2.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)wave.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)ambdec.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)bs2b.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)bsinc_tables.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)cpu_caps.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)devformat.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)except.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)biquad.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)nfc.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)splitter.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)fmt_traits.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)fpu_ctrl.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)mastering.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)uhjfilter.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)mixer_c.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)mixer_neon.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)alcomplex.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)almalloc.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)alstring.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)polyphase_resampler.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)ringbuffer.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)strutils.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)threads.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)auxeffectslot.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)effect.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)autowah.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)chorus.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)compressor.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)convolution.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)dedicated.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)distortion.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)echo.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)equalizer.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)fshifter.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)modulator.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)null.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)pshifter.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)reverb.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)vmorpher.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)event.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)extension.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)filter.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)state.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)autowah.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)chorus.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)compressor.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)convolution.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)dedicated.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)distortion.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)echo.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)equalizer.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)fshifter.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)modulator.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)null.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)pshifter.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)vmorpher.o
+(/opt/devkitpro/portlibs/switch/lib/libopenal.a)base.o
+attempt to open /opt/devkitpro/libnx/lib/libphysfs.so failed
+attempt to open /opt/devkitpro/libnx/lib/libphysfs.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libphysfs.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libphysfs.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libphysfs.a
+(/opt/devkitpro/portlibs/switch/lib/libphysfs.a)physfs.o
+(/opt/devkitpro/portlibs/switch/lib/libphysfs.a)physfs_unicode.o
+(/opt/devkitpro/portlibs/switch/lib/libphysfs.a)physfs_platform_posix.o
+(/opt/devkitpro/portlibs/switch/lib/libphysfs.a)physfs_platform_switch.o
+(/opt/devkitpro/portlibs/switch/lib/libphysfs.a)physfs_archiver_dir.o
+(/opt/devkitpro/portlibs/switch/lib/libphysfs.a)physfs_archiver_grp.o
+(/opt/devkitpro/portlibs/switch/lib/libphysfs.a)physfs_archiver_hog.o
+(/opt/devkitpro/portlibs/switch/lib/libphysfs.a)physfs_archiver_7z.o
+(/opt/devkitpro/portlibs/switch/lib/libphysfs.a)physfs_archiver_mvl.o
+(/opt/devkitpro/portlibs/switch/lib/libphysfs.a)physfs_archiver_qpak.o
+(/opt/devkitpro/portlibs/switch/lib/libphysfs.a)physfs_archiver_wad.o
+(/opt/devkitpro/portlibs/switch/lib/libphysfs.a)physfs_archiver_zip.o
+(/opt/devkitpro/portlibs/switch/lib/libphysfs.a)physfs_archiver_slb.o
+(/opt/devkitpro/portlibs/switch/lib/libphysfs.a)physfs_archiver_iso9660.o
+(/opt/devkitpro/portlibs/switch/lib/libphysfs.a)physfs_archiver_vdf.o
+(/opt/devkitpro/portlibs/switch/lib/libphysfs.a)physfs_byteorder.o
+(/opt/devkitpro/portlibs/switch/lib/libphysfs.a)physfs_archiver_unpacked.o
+attempt to open /opt/devkitpro/libnx/lib/libnx.so failed
+attempt to open /opt/devkitpro/libnx/lib/libnx.a succeeded
+/opt/devkitpro/libnx/lib/libnx.a
+(/opt/devkitpro/libnx/lib/libnx.a)applet.o
+(/opt/devkitpro/libnx/lib/libnx.a)audren.o
+(/opt/devkitpro/libnx/lib/libnx.a)hid.o
+(/opt/devkitpro/libnx/lib/libnx.a)psm.o
+(/opt/devkitpro/libnx/lib/libnx.a)sm.o
+(/opt/devkitpro/libnx/lib/libnx.a)default_window.o
+(/opt/devkitpro/libnx/lib/libnx.a)native_window.o
+(/opt/devkitpro/libnx/lib/libnx.a)driver.o
+(/opt/devkitpro/libnx/lib/libnx.a)mempool.o
+(/opt/devkitpro/libnx/lib/libnx.a)sink.o
+(/opt/devkitpro/libnx/lib/libnx.a)voice.o
+(/opt/devkitpro/libnx/lib/libnx.a)hid_la.o
+(/opt/devkitpro/libnx/lib/libnx.a)libapplet.o
+(/opt/devkitpro/libnx/lib/libnx.a)swkbd.o
+(/opt/devkitpro/libnx/lib/libnx.a)alloc.o
+(/opt/devkitpro/libnx/lib/libnx.a)diag.o
+(/opt/devkitpro/libnx/lib/libnx.a)env.o
+(/opt/devkitpro/libnx/lib/libnx.a)hosversion.o
+(/opt/devkitpro/libnx/lib/libnx.a)newlib.o
+(/opt/devkitpro/libnx/lib/libnx.a)pad.o
+(/opt/devkitpro/libnx/lib/libnx.a)socket.o
+(/opt/devkitpro/libnx/lib/libnx.a)utf16_to_utf8.o
+(/opt/devkitpro/libnx/lib/libnx.a)utf8_to_utf16.o
+(/opt/devkitpro/libnx/lib/libnx.a)cache.o
+(/opt/devkitpro/libnx/lib/libnx.a)svc.o
+(/opt/devkitpro/libnx/lib/libnx.a)readtp.o
+(/opt/devkitpro/libnx/lib/libnx.a)switch_crt0.o
+(/opt/devkitpro/libnx/lib/libnx.a)condvar.o
+(/opt/devkitpro/libnx/lib/libnx.a)event.o
+(/opt/devkitpro/libnx/lib/libnx.a)mutex.o
+(/opt/devkitpro/libnx/lib/libnx.a)shmem.o
+(/opt/devkitpro/libnx/lib/libnx.a)thread.o
+(/opt/devkitpro/libnx/lib/libnx.a)tmem.o
+(/opt/devkitpro/libnx/lib/libnx.a)virtmem.o
+(/opt/devkitpro/libnx/lib/libnx.a)wait.o
+(/opt/devkitpro/libnx/lib/libnx.a)apm.o
+(/opt/devkitpro/libnx/lib/libnx.a)bsd.o
+(/opt/devkitpro/libnx/lib/libnx.a)nifm.o
+(/opt/devkitpro/libnx/lib/libnx.a)ssl.o
+(/opt/devkitpro/libnx/lib/libnx.a)time.o
+(/opt/devkitpro/libnx/lib/libnx.a)vi.o
+(/opt/devkitpro/libnx/lib/libnx.a)fence.o
+(/opt/devkitpro/libnx/lib/libnx.a)nvhost-ctrl.o
+(/opt/devkitpro/libnx/lib/libnx.a)binder.o
+(/opt/devkitpro/libnx/lib/libnx.a)buffer_producer.o
+(/opt/devkitpro/libnx/lib/libnx.a)parcel.o
+(/opt/devkitpro/libnx/lib/libnx.a)argv.o
+(/opt/devkitpro/libnx/lib/libnx.a)dynamic.o
+(/opt/devkitpro/libnx/lib/libnx.a)init.o
+(/opt/devkitpro/libnx/lib/libnx.a)nxlink.o
+(/opt/devkitpro/libnx/lib/libnx.a)convert_errno.o
+(/opt/devkitpro/libnx/lib/libnx.a)fs_dev.o
+(/opt/devkitpro/libnx/lib/libnx.a)path_buf.o
+(/opt/devkitpro/libnx/lib/libnx.a)decode_utf16.o
+(/opt/devkitpro/libnx/lib/libnx.a)decode_utf8.o
+(/opt/devkitpro/libnx/lib/libnx.a)encode_utf16.o
+(/opt/devkitpro/libnx/lib/libnx.a)encode_utf8.o
+(/opt/devkitpro/libnx/lib/libnx.a)exception.o
+(/opt/devkitpro/libnx/lib/libnx.a)random.o
+(/opt/devkitpro/libnx/lib/libnx.a)sessionmgr.o
+(/opt/devkitpro/libnx/lib/libnx.a)fs.o
+(/opt/devkitpro/libnx/lib/libnx.a)nv.o
+(/opt/devkitpro/libnx/lib/libnx.a)set.o
+attempt to open /opt/devkitpro/libnx/lib/libstdc++.so failed
+attempt to open /opt/devkitpro/libnx/lib/libstdc++.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libstdc++.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libstdc++.a failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libstdc++.so failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libstdc++.a failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.so failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a succeeded
+/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)bad_alloc.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)class_type_info.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)del_ops.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)del_opv.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)del_opvs.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)eh_alloc.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)eh_aux_runtime.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)eh_call.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)eh_catch.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)eh_exception.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)eh_globals.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)eh_personality.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)eh_terminate.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)eh_throw.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)eh_unex_handler.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)guard.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)new_op.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)new_opv.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)si_class_type_info.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)tinfo.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)vmi_class_type_info.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)istream-string.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)locale.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)stdexcept.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)tree.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)basic_file.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)chrono.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)lt1-codecvt.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)cow-shim_facets.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)cow-stdexcept.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)cow-string-inst.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)cow-wstring-inst.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)ctype.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)ctype_configure_char.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)ctype_members.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)cxx11-shim_facets.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)cxx11-stdexcept.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)cxx11-wlocale-inst.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)fstream-inst.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)functexcept.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)functional.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)ios-inst.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)ios.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)iostream-inst.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)istream-inst.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)locale-inst.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)locale_init.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)mutex.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)ostream-inst.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)random.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)shared_ptr.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)sso_string.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)sstream-inst.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)streambuf-inst.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)string-inst.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)system_error.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)thread.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)wlocale-inst.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)wstring-inst.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)fs_ops.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)fs_path.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)bad_array_new.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)bad_cast.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)bad_typeid.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)del_op.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)dyncast.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)eh_term_handler.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)fundamental_type_info.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)hash_bytes.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)new_handler.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)new_opvnt.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)pointer_type_info.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)c++locale.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)codecvt.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)codecvt_members.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)collate_members.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)collate_members_cow.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)ios_locale.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)istream.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)locale_facets.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)messages_members.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)messages_members_cow.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)misc-inst.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)monetary_members.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)monetary_members_cow.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)numeric_members.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)numeric_members_cow.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)streambuf.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)time_members.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)cow-locale_init.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)cxx11-ios_failure.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)cxx11-locale-inst.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)ios_errcat.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)fs_dir.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)compatibility.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)pbase_type_info.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)pmem_type_info.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)ios_failure.o
+attempt to open /opt/devkitpro/libnx/lib/libSDL2main.so failed
+attempt to open /opt/devkitpro/libnx/lib/libSDL2main.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libSDL2main.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libSDL2main.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libSDL2main.a
+attempt to open /opt/devkitpro/libnx/lib/libSDL2.so failed
+attempt to open /opt/devkitpro/libnx/lib/libSDL2.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libSDL2.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libSDL2.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libSDL2.a
+attempt to open /opt/devkitpro/libnx/lib/libSDL2_mixer.so failed
+attempt to open /opt/devkitpro/libnx/lib/libSDL2_mixer.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libSDL2_mixer.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libSDL2_mixer.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libSDL2_mixer.a
+attempt to open /opt/devkitpro/libnx/lib/libopusfile.so failed
+attempt to open /opt/devkitpro/libnx/lib/libopusfile.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libopusfile.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libopusfile.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libopusfile.a
+(/opt/devkitpro/portlibs/switch/lib/libopusfile.a)opusfile.o
+(/opt/devkitpro/portlibs/switch/lib/libopusfile.a)stream.o
+(/opt/devkitpro/portlibs/switch/lib/libopusfile.a)info.o
+(/opt/devkitpro/portlibs/switch/lib/libopusfile.a)internal.o
+attempt to open /opt/devkitpro/libnx/lib/libopus.so failed
+attempt to open /opt/devkitpro/libnx/lib/libopus.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libopus.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libopus.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libopus.a
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)opus.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)opus_decoder.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)opus_multistream_decoder.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)celt.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)celt_decoder.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)entcode.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)entdec.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)mdct.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)modes.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)pitch.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)celt_lpc.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)quant_bands.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)rate.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)vq.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)celt_neon_intr.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)pitch_neon_intr.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)dec_API.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)tables_other.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)stereo_MS_to_LR.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)resampler.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)resampler_private_down_FIR.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)resampler_private_IIR_FIR.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)resampler_private_up2_HQ.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)resampler_rom.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)stereo_decode_pred.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)opus_multistream.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)bands.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)cwrs.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)entenc.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)kiss_fft.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)laplace.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)mathops.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)init_decoder.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)decode_frame.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)decode_parameters.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)decode_indices.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)decode_pulses.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)decoder_set_fs.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)gain_quant.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)NLSF_decode.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)PLC.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)shell_coder.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)tables_gain.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)tables_LTP.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)tables_NLSF_CB_NB_MB.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)tables_NLSF_CB_WB.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)tables_pitch_lag.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)tables_pulses_per_block.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)NLSF_unpack.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)bwexpander.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)decode_pitch.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)lin2log.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)log2lin.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)LPC_analysis_filter.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)NLSF2A.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)NLSF_stabilize.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)pitch_est_tables.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)resampler_private_AR2.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)sort.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)sum_sqr_shift.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)LPC_fit.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)LPC_inv_pred_gain_neon_intr.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)CNG.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)code_signs.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)decode_core.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)bwexpander_32.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)LPC_inv_pred_gain.o
+(/opt/devkitpro/portlibs/switch/lib/libopus.a)table_LSF_cos.o
+attempt to open /opt/devkitpro/libnx/lib/libogg.so failed
+attempt to open /opt/devkitpro/libnx/lib/libogg.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libogg.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libogg.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libogg.a
+(/opt/devkitpro/portlibs/switch/lib/libogg.a)framing.o
+attempt to open /opt/devkitpro/libnx/lib/libvorbisfile.so failed
+attempt to open /opt/devkitpro/libnx/lib/libvorbisfile.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libvorbisfile.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libvorbisfile.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libvorbisfile.a
+(/opt/devkitpro/portlibs/switch/lib/libvorbisfile.a)vorbisfile.o
+attempt to open /opt/devkitpro/libnx/lib/libvorbis.so failed
+attempt to open /opt/devkitpro/libnx/lib/libvorbis.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libvorbis.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libvorbis.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libvorbis.a
+(/opt/devkitpro/portlibs/switch/lib/libvorbis.a)block.o
+(/opt/devkitpro/portlibs/switch/lib/libvorbis.a)envelope.o
+(/opt/devkitpro/portlibs/switch/lib/libvorbis.a)window.o
+(/opt/devkitpro/portlibs/switch/lib/libvorbis.a)lpc.o
+(/opt/devkitpro/portlibs/switch/lib/libvorbis.a)synthesis.o
+(/opt/devkitpro/portlibs/switch/lib/libvorbis.a)psy.o
+(/opt/devkitpro/portlibs/switch/lib/libvorbis.a)info.o
+(/opt/devkitpro/portlibs/switch/lib/libvorbis.a)registry.o
+(/opt/devkitpro/portlibs/switch/lib/libvorbis.a)codebook.o
+(/opt/devkitpro/portlibs/switch/lib/libvorbis.a)sharedbook.o
+(/opt/devkitpro/portlibs/switch/lib/libvorbis.a)bitrate.o
+(/opt/devkitpro/portlibs/switch/lib/libvorbis.a)mdct.o
+(/opt/devkitpro/portlibs/switch/lib/libvorbis.a)smallft.o
+(/opt/devkitpro/portlibs/switch/lib/libvorbis.a)floor1.o
+(/opt/devkitpro/portlibs/switch/lib/libvorbis.a)floor0.o
+(/opt/devkitpro/portlibs/switch/lib/libvorbis.a)res0.o
+(/opt/devkitpro/portlibs/switch/lib/libvorbis.a)mapping0.o
+(/opt/devkitpro/portlibs/switch/lib/libvorbis.a)lsp.o
+attempt to open /opt/devkitpro/libnx/lib/libFLAC.so failed
+attempt to open /opt/devkitpro/libnx/lib/libFLAC.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libFLAC.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libFLAC.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libFLAC.a
+attempt to open /opt/devkitpro/libnx/lib/libmpg123.so failed
+attempt to open /opt/devkitpro/libnx/lib/libmpg123.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libmpg123.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libmpg123.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libmpg123.a
+(/opt/devkitpro/portlibs/switch/lib/libmpg123.a)libmpg123_la-format.o
+(/opt/devkitpro/portlibs/switch/lib/libmpg123.a)libmpg123_la-libmpg123.o
+(/opt/devkitpro/portlibs/switch/lib/libmpg123.a)libmpg123_la-index.o
+(/opt/devkitpro/portlibs/switch/lib/libmpg123.a)libmpg123_la-icy.o
+(/opt/devkitpro/portlibs/switch/lib/libmpg123.a)libmpg123_la-icy2utf8.o
+(/opt/devkitpro/portlibs/switch/lib/libmpg123.a)libmpg123_la-ntom.o
+(/opt/devkitpro/portlibs/switch/lib/libmpg123.a)libmpg123_la-stringbuf.o
+(/opt/devkitpro/portlibs/switch/lib/libmpg123.a)compat_str.o
+(/opt/devkitpro/portlibs/switch/lib/libmpg123.a)libmpg123_la-parse.o
+(/opt/devkitpro/portlibs/switch/lib/libmpg123.a)libmpg123_la-frame.o
+(/opt/devkitpro/portlibs/switch/lib/libmpg123.a)libmpg123_la-id3.o
+(/opt/devkitpro/portlibs/switch/lib/libmpg123.a)libmpg123_la-optimize.o
+(/opt/devkitpro/portlibs/switch/lib/libmpg123.a)libmpg123_la-readers.o
+(/opt/devkitpro/portlibs/switch/lib/libmpg123.a)libmpg123_la-tabinit.o
+(/opt/devkitpro/portlibs/switch/lib/libmpg123.a)libmpg123_la-layer1.o
+(/opt/devkitpro/portlibs/switch/lib/libmpg123.a)libmpg123_la-layer2.o
+(/opt/devkitpro/portlibs/switch/lib/libmpg123.a)libmpg123_la-layer3.o
+(/opt/devkitpro/portlibs/switch/lib/libmpg123.a)libmpg123_la-synth_8bit.o
+(/opt/devkitpro/portlibs/switch/lib/libmpg123.a)libmpg123_la-synth.o
+(/opt/devkitpro/portlibs/switch/lib/libmpg123.a)libmpg123_la-synth_s32.o
+(/opt/devkitpro/portlibs/switch/lib/libmpg123.a)libmpg123_la-synth_real.o
+(/opt/devkitpro/portlibs/switch/lib/libmpg123.a)compat.o
+(/opt/devkitpro/portlibs/switch/lib/libmpg123.a)libmpg123_la-dct64.o
+(/opt/devkitpro/portlibs/switch/lib/libmpg123.a)libmpg123_la-equalizer.o
+attempt to open /opt/devkitpro/libnx/lib/libmodplug.so failed
+attempt to open /opt/devkitpro/libnx/lib/libmodplug.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libmodplug.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libmodplug.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libmodplug.a
+(/opt/devkitpro/portlibs/switch/lib/libmodplug.a)modplug.o
+(/opt/devkitpro/portlibs/switch/lib/libmodplug.a)sndmix.o
+(/opt/devkitpro/portlibs/switch/lib/libmodplug.a)sndfile.o
+(/opt/devkitpro/portlibs/switch/lib/libmodplug.a)snd_fx.o
+(/opt/devkitpro/portlibs/switch/lib/libmodplug.a)snd_flt.o
+(/opt/devkitpro/portlibs/switch/lib/libmodplug.a)snd_dsp.o
+(/opt/devkitpro/portlibs/switch/lib/libmodplug.a)fastmix.o
+(/opt/devkitpro/portlibs/switch/lib/libmodplug.a)mmcmp.o
+(/opt/devkitpro/portlibs/switch/lib/libmodplug.a)load_xm.o
+(/opt/devkitpro/portlibs/switch/lib/libmodplug.a)load_wav.o
+(/opt/devkitpro/portlibs/switch/lib/libmodplug.a)load_umx.o
+(/opt/devkitpro/portlibs/switch/lib/libmodplug.a)load_ult.o
+(/opt/devkitpro/portlibs/switch/lib/libmodplug.a)load_stm.o
+(/opt/devkitpro/portlibs/switch/lib/libmodplug.a)load_s3m.o
+(/opt/devkitpro/portlibs/switch/lib/libmodplug.a)load_ptm.o
+(/opt/devkitpro/portlibs/switch/lib/libmodplug.a)load_okt.o
+(/opt/devkitpro/portlibs/switch/lib/libmodplug.a)load_mtm.o
+(/opt/devkitpro/portlibs/switch/lib/libmodplug.a)load_mod.o
+(/opt/devkitpro/portlibs/switch/lib/libmodplug.a)load_med.o
+(/opt/devkitpro/portlibs/switch/lib/libmodplug.a)load_mdl.o
+(/opt/devkitpro/portlibs/switch/lib/libmodplug.a)load_it.o
+(/opt/devkitpro/portlibs/switch/lib/libmodplug.a)load_far.o
+(/opt/devkitpro/portlibs/switch/lib/libmodplug.a)load_dsm.o
+(/opt/devkitpro/portlibs/switch/lib/libmodplug.a)load_dmf.o
+(/opt/devkitpro/portlibs/switch/lib/libmodplug.a)load_dbm.o
+(/opt/devkitpro/portlibs/switch/lib/libmodplug.a)load_ams.o
+(/opt/devkitpro/portlibs/switch/lib/libmodplug.a)load_amf.o
+(/opt/devkitpro/portlibs/switch/lib/libmodplug.a)load_669.o
+(/opt/devkitpro/portlibs/switch/lib/libmodplug.a)load_mt2.o
+(/opt/devkitpro/portlibs/switch/lib/libmodplug.a)load_psm.o
+(/opt/devkitpro/portlibs/switch/lib/libmodplug.a)load_abc.o
+(/opt/devkitpro/portlibs/switch/lib/libmodplug.a)load_mid.o
+(/opt/devkitpro/portlibs/switch/lib/libmodplug.a)load_pat.o
+attempt to open /opt/devkitpro/libnx/lib/libopenal.so failed
+attempt to open /opt/devkitpro/libnx/lib/libopenal.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libopenal.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libopenal.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libopenal.a
+attempt to open /opt/devkitpro/libnx/lib/libphysfs.so failed
+attempt to open /opt/devkitpro/libnx/lib/libphysfs.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libphysfs.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libphysfs.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libphysfs.a
+attempt to open /opt/devkitpro/libnx/lib/libpng.so failed
+attempt to open /opt/devkitpro/libnx/lib/libpng.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libpng.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libpng.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libpng.a
+attempt to open /opt/devkitpro/libnx/lib/libz.so failed
+attempt to open /opt/devkitpro/libnx/lib/libz.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libz.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libz.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libz.a
+attempt to open /opt/devkitpro/libnx/lib/libEGL.so failed
+attempt to open /opt/devkitpro/libnx/lib/libEGL.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libEGL.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libEGL.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libEGL.a
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_eglapi.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_eglconfig.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_eglcontext.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_eglcurrent.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_egldevice.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_egldisplay.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_egldriver.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_eglglobals.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_egllog.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_eglsurface.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_eglsync.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)drivers_switch_egl_switch.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_manager.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_sampler_view.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)util_u_surface.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nouveau_switch_winsys.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nvc0_nvc0_screen.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nvc0_nvc0_surface.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nvc0_nvc0_tex.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nvc0_nvc0_transfer.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nvc0_nve4_compute.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)debug.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)hash_table.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)ralloc.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)u_debug.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)u_format.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)meson-generated_.._u_format_table.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_eglarray.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_context.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_cpuinfo.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_debug.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_debug_output.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_depth.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_dlist.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_draw_validate.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_errors.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_eval.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_extensions.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_extensions_table.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_fbobject.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_feedback.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_fog.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_formats.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_framebuffer.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_getstring.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_glformats.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_hash.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_hint.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_image.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_light.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_lines.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_matrix.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_multisample.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_pack.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_pbo.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_performance_monitor.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_performance_query.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_pipelineobj.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_pixel.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_pixelstore.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_pixeltransfer.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_points.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_polygon.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_queryobj.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_rastpos.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_readpix.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_remap.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_renderbuffer.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_scissor.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_shaderapi.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_shaderimage.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_shaderobj.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_shader_query.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_shared.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_spirv_extensions.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_state.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_stencil.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_syncobj.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_texcompress.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_texcompress_bptc.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_texcompress_etc.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_texcompress_fxt1.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_texcompress_rgtc.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_texcompress_s3tc.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_teximage.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_texobj.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_texstate.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_texstorage.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_texstore.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_texturebindless.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_textureview.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_transformfeedback.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_uniform_query.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_uniforms.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_varray.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_version.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_viewport.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)math_m_matrix.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)vbo_vbo_context.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)vbo_vbo_exec_api.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)vbo_vbo_exec.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)vbo_vbo_exec_draw.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)vbo_vbo_exec_eval.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)vbo_vbo_noop.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)vbo_vbo_save_api.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)vbo_vbo_save.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)vbo_vbo_save_draw.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)vbo_vbo_save_loopback.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)meson-generated_.._format_unpack.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)meson-generated_.._.._mapi_glapi_gen_api_exec.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)meson-generated_.._.._mapi_glapi_gen_enums.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)meson-generated_.._format_fallback.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_cb_bitmap.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_cb_drawpixels.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_cb_fbo.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_cb_flush.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_cb_texture.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_context.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_debug.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_draw.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_extensions.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_format.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_gen_mipmap.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_pbo.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_program.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_scissor.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_shader_cache.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_texture.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_tgsi_lower_depth_clamp.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_tgsi_lower_yuv.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)builtin_functions.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)generate_ir.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)glsl_parser_extras.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)glsl_symbol_table.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)ir_builder.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)ir_clone.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)ir_constant_expression.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)ir.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)ir_equals.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)ir_function.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)ir_hierarchical_visitor.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)ir_hv_accept.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)ir_print_visitor.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)ir_validate.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)linker.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)linker_util.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)link_atomics.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)link_functions.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)link_interface_blocks.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)link_uniforms.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)link_uniform_initializers.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)link_uniform_blocks.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)link_varyings.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)loop_analysis.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)loop_unroll.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)lower_builtins.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)lower_const_arrays_to_uniforms.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)lower_cs_derived.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)lower_discard_flow.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)lower_distance.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)lower_instructions.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)lower_jumps.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)lower_packed_varyings.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)lower_named_interface_blocks.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)lower_precision.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)lower_subroutine.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)lower_tess_level.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)lower_vec_index_to_swizzle.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)lower_vector_derefs.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)lower_vector_insert.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)lower_vertex_id.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)lower_shared_reference.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)lower_ubo_reference.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)lower_xfb_varying.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)opt_algebraic.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)opt_array_splitting.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)opt_conditional_discard.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)opt_constant_folding.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)opt_constant_propagation.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)opt_constant_variable.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)opt_copy_propagation_elements.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)opt_dead_builtin_variables.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)opt_dead_builtin_varyings.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)opt_dead_code.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)opt_dead_code_local.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)opt_dead_functions.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)opt_flatten_nested_if_blocks.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)opt_flip_matrices.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)opt_function_inlining.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)opt_if_simplification.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)opt_minmax.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)opt_rebalance_tree.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)opt_redundant_jumps.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)opt_structure_splitting.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)opt_swizzle.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)opt_tree_grafting.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)opt_vectorize.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)propagate_invariance.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)string_to_uint_map.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)meson-generated_.._glsl_parser.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)meson-generated_.._glsl_lexer.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)pp.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)meson-generated_.._glcpp-lex.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)meson-generated_.._glcpp-parse.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)glsl_types.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)shader_enums.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)cso_cache_cso_context.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)cso_cache_cso_hash.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)tgsi_tgsi_build.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)tgsi_tgsi_dump.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)tgsi_tgsi_emulate.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)tgsi_tgsi_from_mesa.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)tgsi_tgsi_info.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)tgsi_tgsi_iterate.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)tgsi_tgsi_parse.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)tgsi_tgsi_scan.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)tgsi_tgsi_strings.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)tgsi_tgsi_transform.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)tgsi_tgsi_ureg.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)tgsi_tgsi_util.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)util_u_bitmask.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)util_u_framebuffer.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)util_u_gen_mipmap.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)util_u_helpers.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)util_u_prim.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)util_u_sampler.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)util_u_screen.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)util_u_simple_shaders.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)util_u_tile.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)util_u_upload_mgr.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)util_u_vbuf.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nouveau_buffer.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nouveau_fence.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nouveau_heap.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nouveau_mm.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nouveau_screen.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nouveau_vp3_video.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nv50_nv50_surface.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nv50_nv50_tex.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nv50_nv50_transfer.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nvc0_nvc0_compute.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nvc0_nvc0_context.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nvc0_nvc0_formats.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nvc0_nvc0_miptree.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nvc0_nvc0_program.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nvc0_nvc0_query.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nvc0_nvc0_query_hw.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nvc0_nvc0_query_hw_metric.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nvc0_nvc0_query_hw_sm.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nvc0_nvc0_query_sw.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nvc0_nvc0_resource.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nvc0_nvc0_shader_state.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nvc0_nvc0_state.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nvc0_nvc0_state_validate.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nvc0_nvc0_vbo.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nvc0_nvc0_vbo_translate.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nvc0_nvc0_video.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nvc0_nvc0_video_ppp.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nvc0_nvc0_video_vp.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)blob.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)half_float.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)mesa-sha1.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)os_time.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)os_file.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)os_misc.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)sha1_sha1.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)rgtc.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)set.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)softfloat.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)string_buffer.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)strtod.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)u_cpu_detect.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)meson-generated_.._format_srgb.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)u_format_bptc.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)u_format_etc.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)u_format_latc.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)u_format_other.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)u_format_rgtc.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)u_format_s3tc.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)u_format_yuv.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)u_format_zs.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)program_ir_to_mesa.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)program_prog_optimize.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)program_prog_parameter.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)program_prog_print.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)program_program.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)program_programopt.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)program_prog_statevars.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)program_symbol_table.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_accum.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_api_arrayelt.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_api_loopback.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_arbprogram.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_arrayobj.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_atifragshader.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_attrib.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_barrier.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_bbox.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_blend.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_blit.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_bufferobj.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_buffers.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_clear.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_clip.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_colortab.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_compute.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_condrender.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_conservativeraster.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_convolve.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_copyimage.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_draw.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_drawpix.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_drawtex.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_enable.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_externalobjects.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_ff_fragment_shader.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_ffvertex_prog.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_formatquery.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_format_utils.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_get.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_genmipmap.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_glspirv.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_histogram.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_mipmap.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_objectlabel.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_objectpurge.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_program_binary.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_program_resource.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_querymatrix.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_robustness.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_samplerobj.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_texcompress_astc.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_texcompress_cpal.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_texenv.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_texgen.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_texgetimage.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_texparam.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_vdpau.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_vtxfmt.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)main_es1_conversion.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)math_m_eval.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)vbo_vbo_minmax_index.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)meson-generated_.._format_pack.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_atifs_to_tgsi.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_atom.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_atom_clip.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_atom_constbuf.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_atom_depth.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_atom_framebuffer.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_atom_image.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_atom_msaa.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_atom_pixeltransfer.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_atom_rasterizer.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_atom_sampler.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_atom_scissor.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_atom_shader.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_atom_stipple.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_atom_storagebuf.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_atom_tess.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_atom_texture.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_atom_viewport.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_cb_bitmap_shader.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_cb_blit.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_cb_bufferobjects.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_cb_clear.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_cb_compute.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_cb_condrender.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_cb_copyimage.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_cb_drawpixels_shader.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_cb_drawtex.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_cb_eglimage.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_cb_memoryobjects.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_cb_msaa.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_cb_perfmon.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_cb_perfquery.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_cb_program.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_cb_queryobj.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_cb_readpixels.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_cb_strings.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_cb_semaphoreobjects.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_cb_syncobj.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_cb_texturebarrier.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_cb_viewport.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_cb_xformfb.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_glsl_to_ir.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_glsl_to_tgsi.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_glsl_to_tgsi_array_merge.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_glsl_to_tgsi_private.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_glsl_to_tgsi_temprename.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_mesa_to_tgsi.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)ast_array_index.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)ast_expr.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)ast_function.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)ast_to_hir.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)ast_type.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)builtin_types.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)builtin_variables.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)hir_field_selection.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)ir_array_refcount.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)ir_basic_block.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)ir_function_can_inline.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)ir_function_detect_recursion.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)ir_rvalue_visitor.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)ir_set_program_inouts.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)ir_variable_refcount.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)link_uniform_block_active_visitor.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)lower_blend_equation_advanced.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)lower_buffer_access.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)lower_discard.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)lower_if_to_cond_assign.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)lower_int64.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)lower_mat_op_to_vec.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)lower_offset_array.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)lower_packing_builtins.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)lower_variable_index_to_cond_assign.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)lower_vec_index_to_cond_assign.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)lower_vector.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)lower_output_reads.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)serialize.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)cso_cache_cso_cache.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)tgsi_tgsi_text.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)translate_translate.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)translate_translate_cache.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)translate_translate_generic.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)util_u_draw_quad.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)util_u_transfer.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)vl_vl_stubs.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nv50_nv50_context.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nv50_nv50_formats.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nv50_nv50_miptree.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nv50_nv50_program.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nv50_nv50_query.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nv50_nv50_query_hw.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nv50_nv50_query_hw_metric.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nv50_nv50_query_hw_sm.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nv50_nv50_resource.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nv50_nv50_screen.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nv50_nv50_state.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nv50_nv50_state_validate.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nv50_nv50_vbo.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nv50_nv84_video.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nv50_nv84_video_vp.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nv50_nv98_video.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nv50_nv98_video_ppp.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nv50_nv98_video_vp.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)codegen_nv50_ir.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)codegen_nv50_ir_bb.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)codegen_nv50_ir_from_tgsi.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)codegen_nv50_ir_graph.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)codegen_nv50_ir_peephole.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)codegen_nv50_ir_print.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)codegen_nv50_ir_ra.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)codegen_nv50_ir_ssa.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)codegen_nv50_ir_target.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)codegen_nv50_ir_util.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)codegen_nv50_ir_target_gm107.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)codegen_nv50_ir_target_nvc0.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nvc0_nvc0_video_bsp.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)crc32.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)program_arbprogparse.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)program_prog_cache.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)program_prog_instruction.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)program_prog_opt_constant_fold.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)meson-generated_.._program_program_parse.tab.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_atom_array.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_atom_atomicbuf.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)state_tracker_st_atom_blend.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)ir_expression_flattening.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)tgsi_tgsi_sanity.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nouveau_video.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nouveau_vp3_video_bsp.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nouveau_vp3_video_vp.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nv50_nv50_compute.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nv50_nv50_push.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nv50_nv50_shader_state.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nv50_nv84_video_bsp.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)nv50_nv98_video_bsp.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)codegen_nv50_ir_build_util.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)codegen_nv50_ir_from_common.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)codegen_nv50_ir_emit_gm107.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)codegen_nv50_ir_lowering_gm107.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)codegen_nv50_ir_lowering_nvc0.cpp.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)program_prog_parameter_layout.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)program_program_parse_extra.c.o
+(/opt/devkitpro/portlibs/switch/lib/libEGL.a)meson-generated_.._program_lex.yy.c.o
+attempt to open /opt/devkitpro/libnx/lib/libGLESv2.so failed
+attempt to open /opt/devkitpro/libnx/lib/libGLESv2.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libGLESv2.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libGLESv2.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libGLESv2.a
+(/opt/devkitpro/portlibs/switch/lib/libGLESv2.a).._entry.c.o
+attempt to open /opt/devkitpro/libnx/lib/libglapi.so failed
+attempt to open /opt/devkitpro/libnx/lib/libglapi.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libglapi.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libglapi.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libglapi.a
+(/opt/devkitpro/portlibs/switch/lib/libglapi.a).._mapi_glapi.c.o
+(/opt/devkitpro/portlibs/switch/lib/libglapi.a).._stub.c.o
+(/opt/devkitpro/portlibs/switch/lib/libglapi.a).._table.c.o
+(/opt/devkitpro/portlibs/switch/lib/libglapi.a).._u_current.c.o
+(/opt/devkitpro/portlibs/switch/lib/libglapi.a).._entry.c.o
+attempt to open /opt/devkitpro/libnx/lib/libglad.so failed
+attempt to open /opt/devkitpro/libnx/lib/libglad.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libglad.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libglad.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libglad.a
+attempt to open /opt/devkitpro/libnx/lib/libdrm_nouveau.so failed
+attempt to open /opt/devkitpro/libnx/lib/libdrm_nouveau.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libdrm_nouveau.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libdrm_nouveau.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libdrm_nouveau.a
+(/opt/devkitpro/portlibs/switch/lib/libdrm_nouveau.a)bufctx.o
+(/opt/devkitpro/portlibs/switch/lib/libdrm_nouveau.a)nouveau.o
+(/opt/devkitpro/portlibs/switch/lib/libdrm_nouveau.a)pushbuf.o
+(/opt/devkitpro/portlibs/switch/lib/libdrm_nouveau.a)bomap.o
+attempt to open /opt/devkitpro/libnx/lib/libSDL2main.so failed
+attempt to open /opt/devkitpro/libnx/lib/libSDL2main.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libSDL2main.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libSDL2main.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libSDL2main.a
+attempt to open /opt/devkitpro/libnx/lib/libSDL2.so failed
+attempt to open /opt/devkitpro/libnx/lib/libSDL2.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libSDL2.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libSDL2.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libSDL2.a
+attempt to open /opt/devkitpro/libnx/lib/libSDL2_mixer.so failed
+attempt to open /opt/devkitpro/libnx/lib/libSDL2_mixer.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libSDL2_mixer.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libSDL2_mixer.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libSDL2_mixer.a
+attempt to open /opt/devkitpro/libnx/lib/libnx.so failed
+attempt to open /opt/devkitpro/libnx/lib/libnx.a succeeded
+/opt/devkitpro/libnx/lib/libnx.a
+(/opt/devkitpro/libnx/lib/libnx.a)fatal.o
+(/opt/devkitpro/libnx/lib/libnx.a)address_space.o
+(/opt/devkitpro/libnx/lib/libnx.a)gpu.o
+(/opt/devkitpro/libnx/lib/libnx.a)gpu_channel.o
+(/opt/devkitpro/libnx/lib/libnx.a)map.o
+(/opt/devkitpro/libnx/lib/libnx.a)nvchannel.o
+(/opt/devkitpro/libnx/lib/libnx.a)nvhost-as-gpu.o
+(/opt/devkitpro/libnx/lib/libnx.a)nvhost-ctrl-gpu.o
+(/opt/devkitpro/libnx/lib/libnx.a)nvmap.o
+(/opt/devkitpro/libnx/lib/libnx.a)channel.o
+attempt to open /opt/devkitpro/libnx/lib/libm.so failed
+attempt to open /opt/devkitpro/libnx/lib/libm.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libm.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libm.a failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libm.so failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libm.a failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.so failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a succeeded
+/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-sf_atan.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-wf_fmod.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-sinf.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-sf_lround.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-log.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-s_sin.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-w_atan2.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-sf_lrint.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-sf_fabs.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-math_err.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-s_modf.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-sf_log2.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-e_rem_pio2.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-wf_acos.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-pow.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-w_fmod.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-ef_fmod.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-k_rem_pio2.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-sincosf_data.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-sf_ldexp.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-w_acos.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-s_scalbn.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-sf_scalbn.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-sf_exp.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-exp_data.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-ef_acos.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-wf_sqrt.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-w_sqrt.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-s_ldexp.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-s_lround.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-w_log10.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-sf_pow.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-k_sin.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-wf_atan2.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-sf_tan.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-s_cos.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-pow_log_data.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-math_errf.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-s_frexp.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-ef_sqrt.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-log2.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-sf_nan.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-e_log10.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-sf_cbrt.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-w_sinh.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-sf_exp2.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-cosf.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-log_data.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-wf_sinh.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-e_sqrt.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-e_atan2.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-s_tan.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-sf_pow_log2_data.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-cabs.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-s_floor.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-w_asin.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-exp.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-wf_asin.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-ef_asin.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-sf_finite.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-sf_log2_data.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-sf_log.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-s_fpclassify.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-e_fmod.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-s_finite.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-s_atan.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-wf_log10.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-ef_atan2.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-sf_exp2_data.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-k_cos.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-ef_sinh.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-e_asin.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-s_fabs.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-e_acos.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-ef_rem_pio2.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-kf_tan.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-w_hypot.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-s_nan.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-sf_log_data.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-kf_rem_pio2.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-k_tan.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-log2_data.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-e_sinh.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-cimag.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-sf_floor.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-creal.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-ef_log10.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-sf_expm1.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-e_hypot.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a)libm_a-s_expm1.o
+attempt to open /opt/devkitpro/libnx/lib/libstdc++.so failed
+attempt to open /opt/devkitpro/libnx/lib/libstdc++.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libstdc++.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libstdc++.a failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libstdc++.so failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libstdc++.a failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.so failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a succeeded
+/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)list.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a)hashtable_c++0x.o
+attempt to open /opt/devkitpro/libnx/lib/libc.so failed
+attempt to open /opt/devkitpro/libnx/lib/libc.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libc.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libc.a failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libc.so failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libc.a failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.so failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a succeeded
+/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-rand.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-getenv.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-strndup.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-wmemmove.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-fputs.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-atol.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-wcslcat.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-signal.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-strspn.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-isalpha.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-strftime.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-strerror.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-impure.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-fwrite.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-strrchr.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-wcsncasecmp.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-itoa.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-fgets.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-abs.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-fvwrite.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-setenv.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-u_strerr.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-strtoll.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-strcasestr.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-locale.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-wcsxfrm.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-atof.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-strtod.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-random.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-sysfstat.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-sprintf.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-strcspn.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-getc.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-utoa.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-wcsftime.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-putchar.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-strcat.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-wcscmp.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-gdtoa-gethex.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-strxfrm.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-rename.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-freopen.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-strtoul.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-strlen.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-mbtowc_r.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-timelocal.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-syswrite.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-fseeko.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-ferror.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-strncat.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-sysgettod.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-bsearch.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-tzset.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-strchr.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-wmemcpy.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-fread.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-calloc.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-vsnprintf.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-memchr.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-wctype.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-stdio.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-vasprintf.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-aligned_alloc.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-labs.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-qsort.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-abort.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-refill.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-threads.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-fclose.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-sysread.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-gettzinfo.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-strncmp.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-localeconv.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-swprintf.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-vfprintf.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-wmemcmp.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-callocr.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-fprintf.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-strcmp.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-makebuf.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-wcsncmp.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-realloc.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-mktime.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-strlcpy.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-strdup.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-wcsstr.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-strnlen.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-malign.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-findfp.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-tzlock.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-_Exit.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-rewind.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-mallocr.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-putc.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-strcasecmp.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-dtoa.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-wcrtomb.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-sysisatty.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-memcpy.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-strndup_r.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-freer.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-towupper.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-strtok.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-svfprintf.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-remove.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-atoi.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-vprintf.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-strtol.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-clearerr.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-wcslcpy.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-sysclose.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-strpbrk.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-isspace.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-feof.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-setvbuf.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-wcscasecmp.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-strcoll.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-tzset_r.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-errno.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-malloc.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-printf.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-xpg_strerror_r.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-wctob.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-wcscpy.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-syslseek.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-sniprintf.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-sscanf.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-strsep.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-fopen.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-ctype_.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-time.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-strlcat.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-isblank.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-btowc.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-asprintf.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-puts.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-fdopen.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-sysopen.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-gmtime.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-mbstowcs.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-getenv_r.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-strstr.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-wmemchr.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-fputc.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-vsscanf.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-reallocr.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-islower.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-strncasecmp.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-strdup_r.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-fwalk.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-mlock.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-ftello.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-fileno.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-tzcalc_limits.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-rget.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-ftell.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-setenv_r.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-sysstat.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-exit.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-svfwprintf.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-strtok_r.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-svfscanf.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-fseek.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-atexit.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-sysunlink.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-strcpy.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-wctomb_r.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-memcpy_chk.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-wcslen.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-isupper.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-lcltime.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-snprintf.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-strncpy.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-toupper.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-strtoull.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-tzvars.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-stpcpy.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-perror.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-wmemset.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-wcsrtombs.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-wcscoll.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-syslink.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-svfiprintf.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-memcmp.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-gdtoa-hexnan.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-towlower.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-isalnum.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-flags.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-mbrtowc.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-init.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-iswctype.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-wsetup.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-fflush.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-wcstoul.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-iswalnum.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-envlock.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-assert.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-iswspace_l.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-mprec.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-ssprint_r.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-iswblank.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-iswlower.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-gmtime_r.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-fiprintf.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-malignr.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-div.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-wbuf.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-wcsnrtombs.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-svfiscanf.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-iswalpha.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-towctrans.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-sswprint_r.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-fini.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-sprint_r.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-siscanf.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-environ.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-month_lengths.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-iswspace.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-iswdigit.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-sccl.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-mbstowcs_r.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-iswalpha_l.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-chk_fail.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-mbsnrtowcs.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-iswprint.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-iswcntrl.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-categories.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-iswxdigit.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-mbrlen.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-__atexit.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-stpncpy.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-ssputs_r.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-lcltime_r.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-iswupper.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-iswgraph.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-iswlower_l.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-iswblank_l.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-iswalnum_l.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-iswpunct.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-ungetc.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-vfiprintf.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-towctrans_l.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-iswprint_l.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-iswcntrl_l.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-iswupper_l.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-iswgraph_l.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-__call_atexit.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a)libc_a-iswpunct_l.o
+attempt to open /opt/devkitpro/libnx/lib/libopusfile.so failed
+attempt to open /opt/devkitpro/libnx/lib/libopusfile.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libopusfile.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libopusfile.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libopusfile.a
+attempt to open /opt/devkitpro/libnx/lib/libopus.so failed
+attempt to open /opt/devkitpro/libnx/lib/libopus.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libopus.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libopus.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libopus.a
+attempt to open /opt/devkitpro/libnx/lib/libogg.so failed
+attempt to open /opt/devkitpro/libnx/lib/libogg.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libogg.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libogg.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libogg.a
+(/opt/devkitpro/portlibs/switch/lib/libogg.a)bitwise.o
+attempt to open /opt/devkitpro/libnx/lib/libvorbisfile.so failed
+attempt to open /opt/devkitpro/libnx/lib/libvorbisfile.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libvorbisfile.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libvorbisfile.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libvorbisfile.a
+attempt to open /opt/devkitpro/libnx/lib/libvorbis.so failed
+attempt to open /opt/devkitpro/libnx/lib/libvorbis.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libvorbis.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libvorbis.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libvorbis.a
+attempt to open /opt/devkitpro/libnx/lib/libFLAC.so failed
+attempt to open /opt/devkitpro/libnx/lib/libFLAC.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libFLAC.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libFLAC.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libFLAC.a
+attempt to open /opt/devkitpro/libnx/lib/libmpg123.so failed
+attempt to open /opt/devkitpro/libnx/lib/libmpg123.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libmpg123.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libmpg123.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libmpg123.a
+attempt to open /opt/devkitpro/libnx/lib/libmodplug.so failed
+attempt to open /opt/devkitpro/libnx/lib/libmodplug.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libmodplug.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libmodplug.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libmodplug.a
+attempt to open /opt/devkitpro/libnx/lib/libpng.so failed
+attempt to open /opt/devkitpro/libnx/lib/libpng.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libpng.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libpng.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libpng.a
+attempt to open /opt/devkitpro/libnx/lib/libz.so failed
+attempt to open /opt/devkitpro/libnx/lib/libz.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libz.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libz.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libz.a
+attempt to open /opt/devkitpro/libnx/lib/libEGL.so failed
+attempt to open /opt/devkitpro/libnx/lib/libEGL.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libEGL.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libEGL.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libEGL.a
+attempt to open /opt/devkitpro/libnx/lib/libGLESv2.so failed
+attempt to open /opt/devkitpro/libnx/lib/libGLESv2.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libGLESv2.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libGLESv2.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libGLESv2.a
+attempt to open /opt/devkitpro/libnx/lib/libglapi.so failed
+attempt to open /opt/devkitpro/libnx/lib/libglapi.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libglapi.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libglapi.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libglapi.a
+attempt to open /opt/devkitpro/libnx/lib/libglad.so failed
+attempt to open /opt/devkitpro/libnx/lib/libglad.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libglad.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libglad.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libglad.a
+attempt to open /opt/devkitpro/libnx/lib/libdrm_nouveau.so failed
+attempt to open /opt/devkitpro/libnx/lib/libdrm_nouveau.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libdrm_nouveau.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libdrm_nouveau.a succeeded
+/opt/devkitpro/portlibs/switch/lib/libdrm_nouveau.a
+attempt to open /opt/devkitpro/libnx/lib/libnx.so failed
+attempt to open /opt/devkitpro/libnx/lib/libnx.a succeeded
+/opt/devkitpro/libnx/lib/libnx.a
+attempt to open /opt/devkitpro/libnx/lib/libm.so failed
+attempt to open /opt/devkitpro/libnx/lib/libm.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libm.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libm.a failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libm.so failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libm.a failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.so failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a succeeded
+/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a
+attempt to open /opt/devkitpro/libnx/lib/libstdc++.so failed
+attempt to open /opt/devkitpro/libnx/lib/libstdc++.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libstdc++.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libstdc++.a failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libstdc++.so failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libstdc++.a failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.so failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a succeeded
+/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libstdc++.a
+attempt to open /opt/devkitpro/libnx/lib/libm.so failed
+attempt to open /opt/devkitpro/libnx/lib/libm.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libm.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libm.a failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libm.so failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libm.a failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.so failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a succeeded
+/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libm.a
+attempt to open /opt/devkitpro/libnx/lib/libc.so failed
+attempt to open /opt/devkitpro/libnx/lib/libc.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libc.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libc.a failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libc.so failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libc.a failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.so failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a succeeded
+/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a
+attempt to open /opt/devkitpro/libnx/lib/libgcc.so failed
+attempt to open /opt/devkitpro/libnx/lib/libgcc.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libgcc.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libgcc.a failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libgcc.so failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libgcc.a succeeded
+/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libgcc.a
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libgcc.a)_muldc3.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libgcc.a)eqtf2.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libgcc.a)multf3.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libgcc.a)floatunsitf.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libgcc.a)extenddftf2.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libgcc.a)trunctfsf2.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libgcc.a)trunctfdf2.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libgcc.a)unwind-dw2.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libgcc.a)unwind-dw2-fde.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libgcc.a)__arm_za_disable.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libgcc.a)sfp-exceptions.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libgcc.a)__aarch64_have_sme.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libgcc.a)__arm_tpidr2_save.o
+attempt to open /opt/devkitpro/libnx/lib/libg.so failed
+attempt to open /opt/devkitpro/libnx/lib/libg.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libg.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libg.a failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libg.so failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libg.a failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libg.so failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libg.a succeeded
+/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libg.a
+attempt to open /opt/devkitpro/libnx/lib/libc.so failed
+attempt to open /opt/devkitpro/libnx/lib/libc.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libc.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libc.a failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libc.so failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libc.a failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.so failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a succeeded
+/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a
+attempt to open /opt/devkitpro/libnx/lib/libsysbase.so failed
+attempt to open /opt/devkitpro/libnx/lib/libsysbase.a failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libsysbase.so failed
+attempt to open /opt/devkitpro/portlibs/switch/lib/libsysbase.a failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libsysbase.so failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libsysbase.a failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.so failed
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a succeeded
+/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-_exit.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-chdir.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-chmod.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-clocks.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-concatenate.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-dirent.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-fchmod.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-fstat.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-fsync.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-getpid.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-getreent.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-gettod.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-handle_manager.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-iosupport.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-isatty.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-kill.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-link.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-lseek.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-lstat.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-malloc_vars.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-mkdir.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-pthread.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-nanosleep.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-open.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-pathconf.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-read.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-readlink.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-rename.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-rmdir.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-sbrk.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-scandir.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-stat.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-statvfs.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-symlink.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-syscall_support.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-truncate.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-unlink.o
+(/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a)libsysbase_libsysbase_a-write.o
+/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/libgcc.a
+/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libg.a
+/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libc.a
+/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/../../../../aarch64-none-elf/lib/pic/libsysbase.a
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/crtend.o succeeded
+/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/crtend.o
+attempt to open /opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/crtn.o succeeded
+/opt/devkitpro/devkitA64/bin/../lib/gcc/aarch64-none-elf/14.2.0/pic/crtn.o
+[100%] Built target openjkdf2
+Files created in build directory:
+-rwxr-xr-x 1 anno anno 38752304  5. Aug 20:19 openjkdf2.elf
+No .a files found
+~/Code/projects/etc/OpenJKDF2
+Build completed successfully!
+Check build_switch/ directory for output files
+
+To install on your Switch:
+1. Copy openjkdf2.nro to /switch/ on your SD card
+2. Copy your JKDF2 game files to /switch/openjkdf2/ on your SD card
+3. Launch via Homebrew Launcher

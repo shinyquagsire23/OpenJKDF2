@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.5)
 
 if(PLAT_MACOS_X86_64)
     set(CMAKE_OSX_ARCHITECTURES "x86_64")

@@ -1,0 +1,41 @@
+~/Code/projects/etc/OpenJKDF2/build_switch ~/Code/projects/etc/OpenJKDF2
+Building OpenJKDF2 for Nintendo Switch...
+Using devkitPro at: /opt/devkitpro
+-- Targeting Nintendo Switch
+-- Using the multi-header code from /home/anno/Code/projects/etc/OpenJKDF2/3rdparty/json/include/
+-- Could NOT find GLUT (missing: GLUT_glut_LIBRARY GLUT_INCLUDE_DIR) 
+-- Going to build “FreeGLUT 3.4.0” from Git module
+-- Going to build “GLEW 2.2.0” from Git module
+-- Going to build “zlib 1.2.13” from Git module
+-- Going to build “PhysFS 3.2.0” from Git module
+-- Going to build “libpng 1.6.39” from Git module
+-- Going to build “SDL 2.26.5” from Git module
+-- Going to build “SDL_mixer 2.6.3” from Git module
+-- Going to build “libopenal 1.23.1” from Git module
+-- ELF file will be located at: /home/anno/Code/projects/etc/OpenJKDF2/build_switch/openjkdf2.elf
+-- elf2nro found at: /opt/devkitpro/tools/bin/elf2nro
+-- nacptool found at: /opt/devkitpro/tools/bin/nacptool
+-- To manually create NRO file, run from build directory:
+--   /opt/devkitpro/tools/bin/nacptool --create "OpenJKDF2" "OpenJKDF2 Team" "1.0.0" openjkdf2.nacp
+--   /opt/devkitpro/tools/bin/elf2nro openjkdf2.elf openjkdf2.nro --nacp=openjkdf2.nacp
+-- Configuring done (0.1s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/anno/Code/projects/etc/OpenJKDF2/build_switch
+[  0%] Building C object CMakeFiles/sith_engine.dir/src/Devices/sithSoundMixer.o
+[  0%] Building C object CMakeFiles/sith_engine.dir/src/Devices/sithConsole.o
+[  1%] Building C object CMakeFiles/sith_engine.dir/src/Devices/sithSound.o
+[  2%] Building C object CMakeFiles/sith_engine.dir/src/Gui/jkGUIMain.o
+[  3%] Building C object CMakeFiles/sith_engine.dir/src/Main/InstallHelper.o
+[  3%] Building C object CMakeFiles/sith_engine.dir/src/Gui/jkGUITitle.o
+[  3%] Building C object CMakeFiles/sith_engine.dir/src/Main/Main.o
+[  3%] Building C object CMakeFiles/sith_engine.dir/src/Gui/jkGUIRend.o
+[  3%] Building C object CMakeFiles/sith_engine.dir/src/Gui/jkGUISound.o
+[  3%] Building C object CMakeFiles/sith_engine.dir/src/Gui/jkGUIMods.o
+[  3%] Building C object CMakeFiles/sith_engine.dir/src/Main/jkCutscene.o
+[  3%] Building C object CMakeFiles/sith_engine.dir/src/Main/jkControl.o
+[  3%] Building C object CMakeFiles/sith_engine.dir/src/Main/jkDev.o
+[  5%] Building C object CMakeFiles/sith_engine.dir/src/Main/jkCredits.o
+[  6%] Building C object CMakeFiles/sith_engine.dir/src/Main/jkAI.o
+[  7%] Building C object CMakeFiles/sith_engine.dir/src/Main/jkEpisode.o
+[  0%] Building C object CMakeFiles/sith_engine.dir/src/Devices/sithConsole.o
+Build failed!
