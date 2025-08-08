@@ -2666,7 +2666,8 @@ void jkGuiRend_UpdateController()
 {
     static int lastB1 = 0;
     static int keyboardShowedLastUpdate = 0;
-    stdControl_bControlsActive = 1; // HACK
+    stdControl_bControlsActive = 1; // HACK 
+    // Yes thats a hack that breaks my game - built in another hack to circumvent that hack
     stdControl_ReadControls();
 
     int val = 0;

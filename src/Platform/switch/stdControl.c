@@ -5,6 +5,7 @@
 #include "stdPlatform.h"
 #include "General/stdMath.h"
 
+#include "SDL2/SDL_keycode.h"
 #include "jk.h"
 #include "Main/jkCutscene.h"
 // Switch-specific includes
@@ -500,9 +501,7 @@ const stdControlDikStrToNum stdControl_aDikNumToStr[JK_TOTAL_NUM_KEYS] =
 // Control system startup
 int stdControl_Startup()
 {
-#ifdef TARGET_NINTENDO_SWITCH
     stdControl_SwitchInit();
-#endif
     return 1;
 }
 
@@ -755,6 +754,14 @@ void stdControl_ReadControls()
 {
     flex_d_t khz;
 
+        u64 kDown = padGetButtonsDown(&switch_pad);
+    if(kDown & HidNpadButton_Minus) {
+        //jkGuiRend_WindowHandler(0, WM_KEYFIRST, VK_ESCAPE, 0, 0);
+          //      jkGuiRend_WindowHandler(0, WM_CHAR, VK_ESCAPE, 0, 0);
+         Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_ESCAPE, 0);
+         Window_msg_main_handler(g_hWnd, WM_CHAR, VK_ESCAPE, 0);
+
+    }
     if (!stdControl_bControlsActive)
         return;
 
@@ -808,18 +815,8 @@ void stdControl_ReadControls()
     stdControl_SetKeydown(KEY_JOY1_B9, (kHeld & HidNpadButton_Plus) != 0, stdControl_curReadTime);
     
     // Handle minus button for escape (only on button down, not held)
-    u64 kDown = padGetButtonsDown(&switch_pad);
-    if(kDown & HidNpadButton_Minus) {
-        jkGuiRend_WindowHandler(0, WM_KEYFIRST, VK_ESCAPE, 0, 0);
-         Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_ESCAPE, 0);
-         Window_msg_main_handler(g_hWnd, WM_CHAR, VK_ESCAPE, 0);
 
-        jkGuiRend_WindowHandler(0, WM_CHAR, VK_ESCAPE, 0, 0);
-        if ( jkCutscene_isRendering )
-        {
-             jkCutscene_stop();
-        }
-    }
+ 
     stdControl_SetKeydown(KEY_JOY1_B10, (kHeld & HidNpadButton_Minus) != 0, stdControl_curReadTime);
     
     // Stick clicks

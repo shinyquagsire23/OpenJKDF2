@@ -527,13 +527,13 @@ int jkCutscene_stop()
 {
     stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
     
-#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
+#if !defined(SDL2_RENDER) && !defined(TARGET_TWL) && !defined(TARGET_SWITCH)
     if ( !jkCutscene_isRendering )
         return 0;
 #endif
     Window_RemoveMsgHandler(jkCutscene_Handler);
 
-#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
+#if !defined(SDL2_RENDER) && !defined(TARGET_TWL) && !defined(TARGET_SWITCH)
     if (!openjkdf2_bIsKVM)
         smack_sub_426940();
 #endif

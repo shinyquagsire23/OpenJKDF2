@@ -26,14 +26,11 @@
 #include <switch.h>
 #include "SDL2/SDL.h"
 
-#define SCREEN_W 1280
-#define SCREEN_H 720
 #endif
 #include <stdarg.h>
 
 
 #ifdef SDL2_RENDER
-
 #include <fcntl.h> 
 #include <stdio.h>
 #ifndef _WIN32
@@ -1337,6 +1334,11 @@ void Window_RecreateSDL2Window()
 
 void Window_Main_Loop()
 {
+    // this is needed for reacting to controller in cutscene
+    if(jkCutscene_isRendering){
+        jkGuiRend_UpdateController();
+    }
+    //stdControl_ReadControls();
     jkMain_GuiAdvance(); // TODO needed?
     Window_msg_main_handler(g_hWnd, WM_PAINT, 0, 0);
     
