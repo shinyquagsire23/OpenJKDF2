@@ -680,18 +680,10 @@ int main(int argc, char** argv)
 #endif
 
 #ifdef TARGET_SWITCH
- //consoleInit(NULL);
-    printf("Hello from Ryujinx\n");
-    printf("Press + to exit\n");
     appletSetIdleTimeDetectionExtension(AppletIdleTimeDetectionExtension_None);
     appletSetAutoSleepDisabled(true);
 #endif
 
-
-        printf("openjkdf2_bOrigWasRunningFromExistingInstall %x\n", openjkdf2_bOrigWasRunningFromExistingInstall);
-        printf("openjkdf2_bIsRunningFromExistingInstall %x\n", openjkdf2_bIsRunningFromExistingInstall);
-        printf("openjkdf2_bOrigWasDF2 %x\n", openjkdf2_bOrigWasDF2);
-        consoleUpdate(NULL);
 
     getcwd(openjkdf2_aOrigCwd, sizeof(openjkdf2_aOrigCwd));
 
@@ -704,11 +696,6 @@ int main(int argc, char** argv)
             openjkdf2_bOrigWasDF2 = 0; // Running some kind of mod.
         }
     }
-
-        printf("openjkdf2_bOrigWasRunningFromExistingInstall %x\n", openjkdf2_bOrigWasRunningFromExistingInstall);
-        printf("openjkdf2_bIsRunningFromExistingInstall %x\n", openjkdf2_bIsRunningFromExistingInstall);
-        printf("openjkdf2_bOrigWasDF2 %x\n", openjkdf2_bOrigWasDF2);
-
 
     while (1)
     {
@@ -724,10 +711,6 @@ int main(int argc, char** argv)
         memset(openjkdf2_aRestartPath, 0, sizeof(openjkdf2_aRestartPath));
         Window_Main_Linux(argc, argv);
 
-        printf("openjkdf2_bOrigWasRunningFromExistingInstall %x\n", openjkdf2_bOrigWasRunningFromExistingInstall);
-        printf("openjkdf2_bIsRunningFromExistingInstall %x\n", openjkdf2_bIsRunningFromExistingInstall);
-        printf("openjkdf2_bOrigWasDF2 %x\n", openjkdf2_bOrigWasDF2);
-        consoleUpdate(NULL);
 
         openjkdf2_bIsFirstLaunch = 0;
         if (openjkdf2_restartMode != OPENJKDF2_RESTART_NONE) {
