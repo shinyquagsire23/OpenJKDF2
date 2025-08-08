@@ -433,7 +433,7 @@ void Window_HandleMouseMove(SDL_MouseMotionEvent *event)
 
         Window_mouseX = (int)(((fX - menu_x) / (flex_t)menu_w) * 640.0);
         Window_mouseY = (int)((fY / (flex_t)Window_screenYSize) * 480.0);
-        //logToSD("%d %d\n", Window_mouseX, Window_mouseY);
+        //stdPlatform_Printf("%d %d\n", Window_mouseX, Window_mouseY);
     }
     else
     {
@@ -475,16 +475,16 @@ void Window_HandleWindowEvent(SDL_Event* event)
                 }
             }
 #endif
-            //logToSD("Window %d shown", event->window.windowID);
+            //stdPlatform_Printf("Window %d shown", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_HIDDEN:
-            //logToSD("Window %d hidden", event->window.windowID);
+            //stdPlatform_Printf("Window %d hidden", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_EXPOSED:
-            //logToSD("Window %d exposed", event->window.windowID);
+            //stdPlatform_Printf("Window %d exposed", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_MOVED:
-            /*logToSD("Window %d moved to %d,%d",
+            /*stdPlatform_Printf("Window %d moved to %d,%d",
                     event->window.windowID, event->window.data1,
                     event->window.data2);*/
             Window_xPos = event->window.data1;
@@ -502,37 +502,37 @@ void Window_HandleWindowEvent(SDL_Event* event)
 
             if (Window_xSize < 640) Window_xSize = 640;
             if (Window_ySize < 480) Window_ySize = 480;
-            //logToSD("%u %u\n", Window_xSize, Window_ySize);
+            //stdPlatform_Printf("%u %u\n", Window_xSize, Window_ySize);
             break;
         case SDL_WINDOWEVENT_MINIMIZED:
-            //logToSD("Window %d minimized", event->window.windowID);
+            //stdPlatform_Printf("Window %d minimized", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_MAXIMIZED:
-            //logToSD("Window %d maximized", event->window.windowID);
+            //stdPlatform_Printf("Window %d maximized", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_RESTORED:
-            //logToSD("Window %d restored", event->window.windowID);
+            //stdPlatform_Printf("Window %d restored", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_ENTER:
-            //logToSD("Mouse entered window %d\n", event->window.windowID);
+            //stdPlatform_Printf("Mouse entered window %d\n", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_LEAVE:
-            //logToSD("Mouse left window %d\n", event->window.windowID);
+            //stdPlatform_Printf("Mouse left window %d\n", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_FOCUS_GAINED:
-            //logToSD("Window %d gained keyboard focus", event->window.windowID);
+            //stdPlatform_Printf("Window %d gained keyboard focus", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_FOCUS_LOST:
-            //logToSD("Window %d lost keyboard focus", event->window.windowID);
+            //stdPlatform_Printf("Window %d lost keyboard focus", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_CLOSE:
-            //logToSD("Window %d closed", event->window.windowID);
+            //stdPlatform_Printf("Window %d closed", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_TAKE_FOCUS:
-            //logToSD("Window %d is offered a focus", event->window.windowID);
+            //stdPlatform_Printf("Window %d is offered a focus", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_HIT_TEST:
-            //logToSD("Window %d has a special hit test", event->window.windowID);
+            //stdPlatform_Printf("Window %d has a special hit test", event->window.windowID);
             break;
     }
 }
@@ -632,14 +632,14 @@ void Window_UpdateHeadless()
         for (int i = 0; i < bytes_read; i++)
         {
             if (buffer[i] == '\n' || buffer[i] == '\r') {
-                logToSD("\r> %s\n", Window_headlessBuffer);
+                stdPlatform_Printf("\r> %s\n", Window_headlessBuffer);
                 sithConsole_TryCommand(Window_headlessBuffer);
                 memset(Window_headlessBuffer, 0, sizeof(Window_headlessBuffer));
                 continue;
             }
             else if (buffer[i] == 0x7F && strlen(Window_headlessBuffer)) {
                 Window_headlessBuffer[strlen(Window_headlessBuffer)-1] = 0;
-                logToSD("\r> %s ", Window_headlessBuffer);
+                stdPlatform_Printf("\r> %s ", Window_headlessBuffer);
                 continue;
             }
             else if (buffer[i] < ' ' || buffer[i] > '~')
@@ -652,8 +652,8 @@ void Window_UpdateHeadless()
         }
     }
     
-    logToSD("\r> %s", Window_headlessBuffer);
-    //logToSD("> %x %x %s\n", buffer[0], my_kbhit(), Window_headlessBuffer);
+    stdPlatform_Printf("\r> %s", Window_headlessBuffer);
+    //stdPlatform_Printf("> %x %x %s\n", buffer[0], my_kbhit(), Window_headlessBuffer);
     fflush(stdout);
 
     if (Window_resized)
@@ -669,7 +669,7 @@ void Window_UpdateHeadless()
     }
     
     int sampleTime_roundtrip = SDL_GetTicks() - Window_lastSampleTime;
-    //logToSD("%u\n", sampleTime_roundtrip);
+    //stdPlatform_Printf("%u\n", sampleTime_roundtrip);
     Window_lastSampleTime = SDL_GetTicks();
 
     static int sampleTime_delay = 0;
@@ -982,7 +982,7 @@ void Window_SdlUpdate()
                 if (jkQuakeConsole_bOpen) break; // Hijack all input to console
                 break;
             case SDL_QUIT:
-                logToSD("Quit!\n");
+                stdPlatform_Printf("Quit!\n");
 
                 // Added
                 if (jkPlayer_bHasLoadedSettingsOnce) {
@@ -1010,7 +1010,7 @@ void Window_SdlUpdate()
     
     static int sampleTime_delay = 0;
     int sampleTime_roundtrip = SDL_GetTicks() - Window_lastSampleTime;
-    //logToSD("%u\n", sampleTime_roundtrip);
+    //stdPlatform_Printf("%u\n", sampleTime_roundtrip);
     Window_lastSampleTime = SDL_GetTicks();
 
     static int jkPlayer_enableVsync_last = 0;
@@ -1125,7 +1125,7 @@ void Window_SdlVblank()
 #endif
     SDL_GL_SwapWindow(displayWindow);
     //uint32_t after = stdPlatform_GetTimeMsec();
-    //logToSD("%u %u\n", after-before, before-roundtrip);
+    //stdPlatform_Printf("%u %u\n", after-before, before-roundtrip);
 
     //roundtrip = before;
 
@@ -1155,12 +1155,12 @@ void Window_RecreateSDL2Window()
     SDL_Window *window;
 
     int done = 0, x = 0, w = 1920, h = 1080;
-    logToSD("creating window \n");
+    stdPlatform_Printf("creating window \n");
     consoleUpdate(NULL);
     // mandatory at least on switch, else gfx is not properly closed
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0) {
 
-        logToSD("creating window failed on init: %s", SDL_GetError());
+        stdPlatform_Printf("creating window failed on init: %s", SDL_GetError());
         consoleUpdate(NULL);
         return;
     }
@@ -1170,13 +1170,13 @@ void Window_RecreateSDL2Window()
     // available switch SDL2 video modes :
     // 1920 x 1080 @ 32 bpp (SDL_PIXELFORMAT_RGBA8888)
     // 1280 x 720 @ 32 bpp (SDL_PIXELFORMAT_RGBA8888)
-    logToSD("We are here, window at %s\n\n", displayWindow);
+    stdPlatform_Printf("We are here, window at %s\n\n", displayWindow);
     svcSleepThread(10000000000); // 1 sec delay
     window = SDL_CreateWindow("sdl2_gles2", 0, 0, 1920, 1080, 0);
     displayWindow = window;
-    logToSD("We are here, window at %s", displayWindow);
+    stdPlatform_Printf("We are here, window at %s", displayWindow);
     if (!window) {
-        logToSD("creating window failed: %s", SDL_GetError());
+        stdPlatform_Printf("creating window failed: %s", SDL_GetError());
         consoleUpdate(NULL);
         SDL_Quit();
         return;
@@ -1196,11 +1196,11 @@ void Window_RecreateSDL2Window()
 
     //consoleInit(NULL);
     if (Main_bHeadless) return;
-    logToSD("In Window .... %x\n");
+    stdPlatform_Printf("In Window .... %x\n");
 
     //consoleUpdate(NULL);
 
-    logToSD("Recreating SDL2 Window!\n");
+    stdPlatform_Printf("Recreating SDL2 Window!\n");
     Window_needsRecreate = 0;
 
     if (displayWindow) {
@@ -1238,22 +1238,22 @@ void Window_RecreateSDL2Window()
     flags=0;
 #endif
 
-    logToSD("test");
-    logToSD("creating window");
+    stdPlatform_Printf("test");
+    stdPlatform_Printf("creating window");
     consoleUpdate(NULL);
 #ifdef ARCH_WASM
     displayWindow = SDL_CreateWindow(Window_isHiDpi ? "OpenJKDF2 HiDPI" : "OpenJKDF2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, canvas_get_width(), canvas_get_height(), flags);
 #elif defined(TARGET_ANDROID)
     displayWindow = SDL_CreateWindow(Window_isHiDpi ? "OpenJKDF2 HiDPI" : "OpenJKDF2", 0, 0, Window_screenXSize, Window_screenYSize, flags);
 #elif defined(TARGET_SWITCH)
-    logToSD("created window waiting \n\n");
+    stdPlatform_Printf("created window waiting \n\n");
     consoleUpdate(NULL);
-    logToSD("We are here, window at %s", displayWindow);
+    stdPlatform_Printf("We are here, window at %s", displayWindow);
 
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0) {
-        logToSD("SDL_Init failed: %s\n", SDL_GetError());
+        stdPlatform_Printf("SDL_Init failed: %s\n", SDL_GetError());
     }
-    logToSD("Init was good %s", displayWindow);
+    stdPlatform_Printf("Init was good %s", displayWindow);
 
 
     displayWindow = SDL_CreateWindow(
@@ -1263,18 +1263,18 @@ void Window_RecreateSDL2Window()
         0 // or 0
     );
 
-    logToSD("Tried to create Window %s", displayWindow);
+    stdPlatform_Printf("Tried to create Window %s", displayWindow);
     if (!displayWindow) {
-        logToSD("SDL_CreateWindow failed: %s\n", SDL_GetError());
+        stdPlatform_Printf("SDL_CreateWindow failed: %s\n", SDL_GetError());
     }
 
 
     if (!displayWindow) {
-        logToSD("created window failed");
-        logToSD("SDL ERROR: %s", SDL_GetError());
+        stdPlatform_Printf("created window failed");
+        stdPlatform_Printf("SDL ERROR: %s", SDL_GetError());
         consoleUpdate(NULL);
     }
-    logToSD("We have a window ladies %s", displayWindow);
+    stdPlatform_Printf("We have a window ladies %s", displayWindow);
 
 
 
@@ -1283,7 +1283,7 @@ void Window_RecreateSDL2Window()
 #endif
     if (!displayWindow) {
         char errtmp[256];
-        logToSD(errtmp, 256, "!! Failed to create SDL2 window !!\n%s", SDL_GetError());
+        stdPlatform_Printf(errtmp, 256, "!! Failed to create SDL2 window !!\n%s", SDL_GetError());
     //    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", errtmp, NULL);
         exit (-1);
     }
@@ -1300,7 +1300,7 @@ void Window_RecreateSDL2Window()
         SDL_SetWindowFullscreen(displayWindow, 0);
     }
 #endif
-    logToSD("SDL ERROR: %s", SDL_GetError());
+    stdPlatform_Printf("SDL ERROR: %s", SDL_GetError());
 
     glWindowContext = SDL_GL_CreateContext(displayWindow);
     
@@ -1318,9 +1318,9 @@ void Window_RecreateSDL2Window()
     if (glWindowContext == NULL)
     {
         char errtmp[256];
-        logToSD("SDL ERROR: %s", SDL_GetError());
+        stdPlatform_Printf("SDL ERROR: %s", SDL_GetError());
         consoleUpdate(NULL);
-        logToSD(errtmp, 256, "!! Failed to initialize SDL OpenGL context !!\n%s", SDL_GetError());
+        stdPlatform_Printf(errtmp, 256, "!! Failed to initialize SDL OpenGL context !!\n%s", SDL_GetError());
        // SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", errtmp, NULL);
         exit(-1);
     }
@@ -1353,11 +1353,11 @@ int Window_Main_Linux(int argc, char** argv)
     //SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_NOPARACHUTE);
     // mandatory at least on switch, else gfx is not properly closed
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0) {
-        logToSD("Init error .... %x\n");
+        stdPlatform_Printf("Init error .... %x\n");
         consoleUpdate(NULL);
     }
-    logToSD("Screen size: %d x %d\n", Window_screenXSize, Window_screenYSize);
-    logToSD("Init was good .... %x\n");
+    stdPlatform_Printf("Screen size: %d x %d\n", Window_screenXSize, Window_screenYSize);
+    stdPlatform_Printf("Init was good .... %x\n");
     consoleUpdate(NULL);
     
     Window_RecreateSDL2Window();
