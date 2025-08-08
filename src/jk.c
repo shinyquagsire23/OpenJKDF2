@@ -713,7 +713,7 @@ int jk_printf(const char* fmt, ...)
 {
     va_list args;
 
-    #ifdef TARGET_SWITCH
+    #if defined(TARGET_SWITCH) && defined(DEBUG)
        FILE* f = fopen("sdmc:/openjkdf2_log.txt", "a");
     if (!f) return 0;
 

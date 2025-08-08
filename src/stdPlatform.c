@@ -622,7 +622,7 @@ int stdPrintf(int (*a1)(const char *, ...), const char *a2, int line, const char
     printf("(%p %s:%d) ", a1, a2, line);
     int ret = vprintf(fmt, args);
     va_end (args);
-    #ifdef TARGET_SWITCH
+    #ifdef TARGET_SWITCH && defined(DEBUG)
         FILE* f = fopen("sdmc:/openjkdf2_log.txt", "a");
     if (!f) return ret;
 
@@ -667,7 +667,7 @@ int stdPlatform_Printf(const char *fmt, ...)
 #ifdef TARGET_ANDROID
     LOGI("%s", tmp);
 #endif
-#ifdef TARGET_SWITCH
+#if defined(TARGET_SWITCH) && defined(DEBUG)
     FILE* f = fopen("sdmc:/openjkdf2_log.txt", "a");
     if (!f) return ret;
 
