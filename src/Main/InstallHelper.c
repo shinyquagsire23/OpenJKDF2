@@ -421,9 +421,8 @@ int InstallHelper_UseLocalData()
     return InstallHelper_GetLocalDataDir(NULL, 0, 1);
 }
 
-int InstallHelper_AttemptInstallFromExisting(char* path)
+int InstallHelper_AttemptInstallFromExisting(nfdu8char_t* path)
 {
-    return 1; //added
     const char* aOptionalAssets[] = {
         "JK.EXE",
         "JKM.EXE",
@@ -697,8 +696,9 @@ int InstallHelper_AttemptInstallFromExisting(char* path)
         fclose(f);
     }
 
+    #ifndef TARGET_SWITCH
     NFD_Quit();
-
+#endif
     return 1;
 }
 

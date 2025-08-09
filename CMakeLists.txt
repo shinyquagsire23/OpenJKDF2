@@ -249,9 +249,9 @@ endif()
 
 add_library(sith_engine OBJECT ${ENGINE_SOURCE_FILES})
 plat_specific_deps()
-#list(REMOVE_ITEM ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/main.c)
 
-if(TARGET_ANDROID )
+#list(REMOVE_ITEM ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/main.c)
+if(TARGET_ANDROID)
     add_library(${BIN_NAME} SHARED ${GAME_MAIN_SOURCE_FILES})
     target_link_libraries(${BIN_NAME} PRIVATE ${SDL2_COMMON_LIBS} sith_engine)
 elseif(TARGET_HOOKS)
@@ -264,9 +264,12 @@ elseif(TARGET_HOOKS)
     target_link_libraries(${BIN_NAME} PRIVATE ${SDL2_COMMON_LIBS} sith_engine)
     target_link_libraries(${BIN_NAME}_kvm PRIVATE  ${SDL2_COMMON_LIBS} sith_engine)
 elseif(TARGET_SWITCH)
+ 
+
+
     add_library(objlib OBJECT ${GAME_MAIN_SOURCE_FILES})
-    add_executable(${BIN_NAME} $<TARGET_OBJECTS:objlib>
-     $<TARGET_OBJECTS:sith_engine>)
+    add_executable(${BIN_NAME}  $<TARGET_OBJECTS:sith_engine> $<TARGET_OBJECTS:objlib>
+    )
     
     message(STATUS "Applying PIE flags to ${BIN_NAME}")
     target_link_libraries(${BIN_NAME} PRIVATE ${SDL2_COMMON_LIBS} sith_engine)
