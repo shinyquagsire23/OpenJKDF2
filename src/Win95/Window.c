@@ -1146,40 +1146,6 @@ EM_JS(int, canvas_get_height, (), {
 
 void Window_RecreateSDL2Window()
 {
-#if 0
-    SDL_Event event;
-    SDL_Window *window;
-
-    int done = 0, x = 0, w = 1920, h = 1080;
-    stdPlatform_Printf("creating window \n");
-    consoleUpdate(NULL);
-    // mandatory at least on switch, else gfx is not properly closed
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0) {
-
-        stdPlatform_Printf("creating window failed on init: %s", SDL_GetError());
-        consoleUpdate(NULL);
-        return;
-    }
-
-    // create an SDL window (OpenGL ES2 always enabled)
-    // when SDL_FULLSCREEN flag is not set, viewport is automatically handled by SDL (use SDL_SetWindowSize to "change resolution")
-    // available switch SDL2 video modes :
-    // 1920 x 1080 @ 32 bpp (SDL_PIXELFORMAT_RGBA8888)
-    // 1280 x 720 @ 32 bpp (SDL_PIXELFORMAT_RGBA8888)
-    stdPlatform_Printf("We are here, window at %s\n\n", displayWindow);
-    svcSleepThread(10000000000); // 1 sec delay
-    window = SDL_CreateWindow("sdl2_gles2", 0, 0, 1920, 1080, 0);
-    displayWindow = window;
-    stdPlatform_Printf("We are here, window at %s", displayWindow);
-    if (!window) {
-        stdPlatform_Printf("creating window failed: %s", SDL_GetError());
-        consoleUpdate(NULL);
-        SDL_Quit();
-        return;
-    }
-
-    return;
-#endif
 
 
 #ifdef ARCH_WASM
@@ -1205,22 +1171,43 @@ void Window_RecreateSDL2Window()
         SDL_DestroyWindow(displayWindow);
     }
 
+    #if defined(TARGET_SWITCH)
     int flags = 0;
 
+    #else
+        int flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
+    #endif
     if (displayWindow) {
         flags = SDL_GetWindowFlags(displayWindow);
         //std3D_FreeResources();
         //SDL_GL_DeleteContext(glWindowContext);
         //SDL_DestroyWindow(displayWindow);
 
+        #if !defined(TARGET_SWITCH)
+            flags |= SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
+        #endif
     }
 
 #ifdef WIN64_STANDALONE
     SDL_SetHint(SDL_HINT_WINDOWS_DPI_AWARENESS, "permonitorv2");
 #endif
 
+#if !defined(TARGET_SWITCH)
+ if (Window_isHiDpi)
+        flags |= SDL_WINDOW_ALLOW_HIGHDPI;
+    else
+        flags &= ~SDL_WINDOW_ALLOW_HIGHDPI;
 
 
+    if (Window_isFullscreen) {
+
+        //flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+
+    }
+    else {
+        //flags &= ~SDL_WINDOW_FULLSCREEN_DESKTOP;
+    }
+#endif
 
 
 #if defined(ARCH_WASM)
@@ -1277,7 +1264,7 @@ void Window_RecreateSDL2Window()
     if (!displayWindow) {
         char errtmp[256];
         stdPlatform_Printf(errtmp, 256, "!! Failed to create SDL2 window !!\n%s", SDL_GetError());
-    //    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", errtmp, NULL);
+      //SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", errtmp, NULL);
         exit (-1);
     }
     //SDL_SetRenderDrawBlendMode(displayRenderer, SDL_BLENDMODE_BLEND);
@@ -1302,7 +1289,7 @@ void Window_RecreateSDL2Window()
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
         SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
-        //SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
         glWindowContext = SDL_GL_CreateContext(displayWindow);
     }
     
