@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.5)
 
 if(PLAT_MACOS_X86_64)
     set(CMAKE_OSX_ARCHITECTURES "x86_64")
@@ -32,10 +32,11 @@ set(PLAT_HOOKS FALSE CACHE BOOL "Hook DLL target")
 set(PLAT_MSVC FALSE CACHE BOOL "Windows 64-bit MSVC")
 set(PLAT_ANDROID_ARM64 FALSE CACHE BOOL "Android AArch64")
 set(PLAT_TWL FALSE CACHE BOOL "Nintendo DSi")
+set(PLAT_SWITCH FALSE CACHE BOOL "Nintendo Switch")
 set(PLAT_AUTO FALSE CACHE BOOL "Target the host OS")
-
+    set(DEBUG TRUE)
 # Set PLAT_AUTO if a platform isn't specifically selected
-if(NOT PLAT_LINUX_32 AND NOT PLAT_LINUX_64 AND NOT PLAT_MACOS AND NOT PLAT_MACOS_X86_64 AND NOT PLAT_MINGW_X86_64 AND NOT PLAT_WASM AND NOT PLAT_HOOKS AND NOT PLAT_TWL)
+if(NOT PLAT_LINUX_32 AND NOT PLAT_LINUX_64 AND NOT PLAT_MACOS AND NOT PLAT_MACOS_X86_64 AND NOT PLAT_MINGW_X86_64 AND NOT PLAT_WASM AND NOT PLAT_HOOKS AND NOT PLAT_TWL AND NOT PLAT_SWITCH)
     set(PLAT_AUTO TRUE)
 endif()
 
@@ -92,19 +93,19 @@ endif()
 
 # General defs
 add_compile_definitions(
-    OPENJKDF2_PROJECT_NAME=${PROJECT_NAME}
-    OPENJKDF2_PROJECT_VERSION=${PROJECT_VERSION}
-    OPENJKDF2_MAJOR_VERSION=${PROJECT_VERSION_MAJOR}
-    OPENJKDF2_MINOR_VERSION=${PROJECT_VERSION_MINOR}
-    OPENJKDF2_PATCH_VERSION=${PROJECT_VERSION_PATCH}
-    OPENJKDF2_TWEAK_VERSION=${PROJECT_VERSION_TWEAK}
-    OPENJKDF2_RELEASE_VERSION_STRING=\"v${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}\"
-    OPENJKDF2_RELEASE_VERSION_STRING_W=L\"v${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}\"
-    OPENJKDF2_RELEASE_COMMIT=\"${OPENJKDF2_RELEASE_COMMIT}\"
-    OPENJKDF2_RELEASE_COMMIT_SHORT=\"${OPENJKDF2_RELEASE_COMMIT_SHORT}\"
-    OPENJKDF2_RELEASE_COMMIT_W=L\"${OPENJKDF2_RELEASE_COMMIT}\"
-    OPENJKDF2_RELEASE_COMMIT_SHORT_W=L\"${OPENJKDF2_RELEASE_COMMIT_SHORT}\"
-    QOL_IMPROVEMENTS
+        OPENJKDF2_PROJECT_NAME=${PROJECT_NAME}
+        OPENJKDF2_PROJECT_VERSION=${PROJECT_VERSION}
+        OPENJKDF2_MAJOR_VERSION=${PROJECT_VERSION_MAJOR}
+        OPENJKDF2_MINOR_VERSION=${PROJECT_VERSION_MINOR}
+        OPENJKDF2_PATCH_VERSION=${PROJECT_VERSION_PATCH}
+        OPENJKDF2_TWEAK_VERSION=${PROJECT_VERSION_TWEAK}
+        OPENJKDF2_RELEASE_VERSION_STRING=\"v${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}\"
+        OPENJKDF2_RELEASE_VERSION_STRING_W=L\"v${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}\"
+        OPENJKDF2_RELEASE_COMMIT=\"${OPENJKDF2_RELEASE_COMMIT}\"
+        OPENJKDF2_RELEASE_COMMIT_SHORT=\"${OPENJKDF2_RELEASE_COMMIT_SHORT}\"
+        OPENJKDF2_RELEASE_COMMIT_W=L\"${OPENJKDF2_RELEASE_COMMIT}\"
+        OPENJKDF2_RELEASE_COMMIT_SHORT_W=L\"${OPENJKDF2_RELEASE_COMMIT_SHORT}\"
+        QOL_IMPROVEMENTS
 )
 
 set(CMAKE_C_STANDARD 11)
@@ -139,15 +140,20 @@ elseif(PLAT_MSVC)
     include(cmake_modules/plat_msvc.cmake)
 elseif(PLAT_TWL)
     include(cmake_modules/plat_twl.cmake)
+elseif(PLAT_SWITCH)
+        set(PLAT_SWITCH TRUE)
+    set(NINTENDO_SWITCH TRUE)
+    set(SWITCH TRUE)
+    include(cmake_modules/plat_switch.cmake)
 else()
-    message(FATAL_ERROR "Unknown platform! Cannot continue.")
-endif()
 
+    include(cmake_modules/plat_switch.cmake)
+endif()
 # Establishes compile options, binary/library names, defines, etc
 plat_initialize()
 
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release)
+    set(CMAKE_BUILD_TYPE Release)
 endif()
 
 # CMake module paths
@@ -170,10 +176,10 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/json)
 
 # All of the includes
 include_directories(
-    ${PROJECT_SOURCE_DIR}/src
-    ${PROJECT_SOURCE_DIR}/src/external/libsmacker
-    ${PROJECT_SOURCE_DIR}/src/external/libsmusher/src
-    ${PROJECT_SOURCE_DIR}/src/external/nativefiledialog-extended
+        ${PROJECT_SOURCE_DIR}/src
+        ${PROJECT_SOURCE_DIR}/src/external/libsmacker
+        ${PROJECT_SOURCE_DIR}/src/external/libsmusher/src
+        ${PROJECT_SOURCE_DIR}/src/external/nativefiledialog-extended
 )
 
 if(TARGET_USE_SDL2)
@@ -184,15 +190,15 @@ if(TARGET_USE_OPENAL AND NOT OPENAL_COMPILING_FROM_SRC)
     include_directories(${OPENAL_INCLUDE_DIR})
 endif()
 
-# All of the base sources
 file(GLOB ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/*.c
-                       ${PROJECT_SOURCE_DIR}/src/*/*.c
-                       ${PROJECT_SOURCE_DIR}/src/General/*.cpp
-                       ${PROJECT_SOURCE_DIR}/src/Platform/Common/*.c
-                       ${PROJECT_SOURCE_DIR}/src/Platform/Common/*.cpp)
+        ${PROJECT_SOURCE_DIR}/src/*/*.c
+        ${PROJECT_SOURCE_DIR}/src/General/*.cpp
+        ${PROJECT_SOURCE_DIR}/src/Platform/Common/*.c
+        ${PROJECT_SOURCE_DIR}/src/Platform/Common/*.cpp)
 
 # Game main
 file(GLOB GAME_MAIN_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/main.c)
+
 
 # Remove test sources from glob
 file(GLOB TEST_SRCS ${PROJECT_SOURCE_DIR}/src/Tests/*.c)
@@ -200,19 +206,21 @@ list(REMOVE_ITEM ENGINE_SOURCE_FILES ${TEST_SRCS})
 list(REMOVE_ITEM ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/main.c)
 
 # Remove multiplayer menus from compilation
-file(GLOB MULTIPLAYER_MENU_SRCS 
-    ${PROJECT_SOURCE_DIR}/src/Gui/jkGUIMultiplayer.c
-    ${PROJECT_SOURCE_DIR}/src/Gui/jkGUIMultTally.c
-    ${PROJECT_SOURCE_DIR}/src/Gui/jkGUINetHost.c
-    ${PROJECT_SOURCE_DIR}/src/Gui/jkGUIBuildMulti.c
+file(GLOB MULTIPLAYER_MENU_SRCS
+        ${PROJECT_SOURCE_DIR}/src/Gui/jkGUIMultiplayer.c
+        ${PROJECT_SOURCE_DIR}/src/Gui/jkGUIMultTally.c
+        ${PROJECT_SOURCE_DIR}/src/Gui/jkGUINetHost.c
+        ${PROJECT_SOURCE_DIR}/src/Gui/jkGUIBuildMulti.c
 )
 if (TARGET_NO_MULTIPLAYER_MENUS)
     list(REMOVE_ITEM ENGINE_SOURCE_FILES ${MULTIPLAYER_MENU_SRCS})
 endif()
 
+
 # Fcaseopen
 file(GLOB FCASEOPEN_SRCS ${PROJECT_SOURCE_DIR}/src/external/fcaseopen/*.c)
 list(APPEND ENGINE_SOURCE_FILES ${FCASEOPEN_SRCS})
+list(APPEND ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/Main/InstallHelper.c)
 include_directories(${PROJECT_SOURCE_DIR}/src/external/fcaseopen)
 
 # The rest of the conditional/TARGET_* dependencies
@@ -224,14 +232,15 @@ include(cmake_modules/precompile_globals.cmake)
 
 #set( CMAKE_VERBOSE_MAKEFILE on )
 
-# Force CXX compilation for all files
+# Force CXX compilation for all CMakeFiles
 file(GLOB ENGINE_SOURCE_FILES_REGLOB ${PROJECT_SOURCE_DIR}/src/*.c
-                       ${PROJECT_SOURCE_DIR}/src/*/*.c
-                       ${PROJECT_SOURCE_DIR}/src/General/*.cpp
-                       ${PROJECT_SOURCE_DIR}/src/Platform/*/*.c
-                       ${PROJECT_SOURCE_DIR}/src/Platform/*/*/*.c
-                       ${PROJECT_SOURCE_DIR}/src/Platform/*/*.cpp
-                       ${PROJECT_SOURCE_DIR}/src/Platform/*/*/*.cpp)
+        ${PROJECT_SOURCE_DIR}/src/*/*.c
+        ${PROJECT_SOURCE_DIR}/src/General/*.cpp
+        ${PROJECT_SOURCE_DIR}/src/Platform/*/*.c
+        ${PROJECT_SOURCE_DIR}/src/Platform/*/*/*.c
+        ${PROJECT_SOURCE_DIR}/src/Platform/*/*.cpp
+        ${PROJECT_SOURCE_DIR}/src/Platform/*/*/*.cpp)
+
 list(REMOVE_ITEM ENGINE_SOURCE_FILES_REGLOB ${TEST_SRCS})
 list(APPEND ENGINE_SOURCE_FILES_REGLOB ${GLOBALS_C})
 if (EXPERIMENTAL_FIXED_POINT)
@@ -241,6 +250,7 @@ endif()
 add_library(sith_engine OBJECT ${ENGINE_SOURCE_FILES})
 plat_specific_deps()
 
+#list(REMOVE_ITEM ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/main.c)
 if(TARGET_ANDROID)
     add_library(${BIN_NAME} SHARED ${GAME_MAIN_SOURCE_FILES})
     target_link_libraries(${BIN_NAME} PRIVATE ${SDL2_COMMON_LIBS} sith_engine)
@@ -253,6 +263,32 @@ elseif(TARGET_HOOKS)
 
     target_link_libraries(${BIN_NAME} PRIVATE ${SDL2_COMMON_LIBS} sith_engine)
     target_link_libraries(${BIN_NAME}_kvm PRIVATE  ${SDL2_COMMON_LIBS} sith_engine)
+elseif(TARGET_SWITCH)
+ 
+
+
+
+    add_library(objlib OBJECT ${GAME_MAIN_SOURCE_FILES})
+    add_executable(${BIN_NAME}  $<TARGET_OBJECTS:sith_engine> $<TARGET_OBJECTS:objlib>
+    )
+    
+    message(STATUS "Applying PIE flags to ${BIN_NAME}")
+    target_link_libraries(${BIN_NAME} PRIVATE ${SDL2_COMMON_LIBS} sith_engine)
+
+    target_compile_options(${BIN_NAME} PRIVATE -fPIE)
+    target_link_options(${BIN_NAME} PRIVATE -pie -Wl,-Ttext-segment=0x8000000)
+    target_link_options(${BIN_NAME} PRIVATE -pie -Wl,-Ttext-segment=0x8000000)
+    if(TARGET_USE_SDL2)
+    target_link_libraries(${BIN_NAME} PRIVATE -lSDL2main -lSDL2 -lSDL2_mixer)
+endif()
+
+if(TARGET_USE_OPENAL)
+    target_link_libraries(${BIN_NAME} PRIVATE -lopenal)
+endif()
+
+if(TARGET_USE_PHYSFS)
+    target_link_libraries(${BIN_NAME} PRIVATE -lphysfs)
+endif()
 else()
     add_executable(${BIN_NAME} ${GAME_MAIN_SOURCE_FILES})
     target_link_libraries(${BIN_NAME} PRIVATE ${SDL2_COMMON_LIBS} sith_engine)
@@ -266,6 +302,7 @@ else()
     endif()
 endif()
 
+
 # TODO byacc and flex
 # maxamillion@Maxs-MacBook-Pro Cog % ../../flex/flex -i cog.l
 # maxamillion@Maxs-MacBook-Pro Cog % ../../byacc/yacc -d cog.y
@@ -276,7 +313,7 @@ plat_extra_deps()
 if(NOT OPENJKDF2_NO_ASAN)
     #add_compile_options(-fsanitize=address -fsanitize=float-divide-by-zero)
     #add_link_options(-fsanitize=address -fsanitize=float-divide-by-zero)
-    
+
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address -fsanitize=float-divide-by-zero")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fsanitize=float-divide-by-zero")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address -fsanitize=float-divide-by-zero")

@@ -37,7 +37,7 @@
 
 #ifdef STDSOUND_OPENAL
 //#include <AL/al.h>
-#ifdef ARCH_WASM
+#if defined(ARCH_WASM) || defined(TARGET_SWITCH)
 #include <AL/al.h>
 #include <AL/alc.h>
 #else

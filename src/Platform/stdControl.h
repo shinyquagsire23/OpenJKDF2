@@ -32,6 +32,11 @@ void stdControl_FreeSdlJoysticks();
 void stdControl_InitSdlJoysticks();
 #endif
 
+#ifdef TARGET_SWITCH
+void stdControl_SwitchInit();
+void stdControl_SwitchReadControls();
+#endif
+
 void stdControl_Reset();
 int stdControl_EnableAxis(unsigned int idx);
 MATH_FUNC flex_t stdControl_ReadAxis(int axisNum);

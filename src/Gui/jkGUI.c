@@ -236,6 +236,7 @@ int jkGui_Startup()
     stdString_CharToWchar(jkPlayer_playerShortName, playerShortName, 31);
     jkPlayer_playerShortName[31] = 0;
 
+    stdPlatform_Printf("OpenJKDF2: %s playername is: %s\n", __func__, jkPlayer_playerShortName);
     for (int i = 0; i < JKGUI_NUM_FONTS; i++)
     {
         // TODO: Eviction caching for stdBitmap, rdMaterial
@@ -249,6 +250,8 @@ int jkGui_Startup()
         stdString_snprintf(tmp, 128, "ui\\sft\\%s", jkGui_aFonts[i]);
         jkGui_stdFonts[i] = stdFont_Load(tmp, 1, 0);
         if (jkGui_stdFonts[i] == NULL) {
+
+            stdPlatform_Printf("OpenJKDF2: %s Cannot load file %s from location %s\n", __func__, jkGui_aFonts[i], tmp);
             Windows_GameErrorMsgbox("ERR_CANNOT_LOAD_FILE %s", tmp);
         }
     }

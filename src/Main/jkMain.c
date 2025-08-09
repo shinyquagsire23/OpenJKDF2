@@ -210,12 +210,12 @@ int jkMain_SwitchTo5(char *pJklFname)
 // MOTS altered
 void jkMain_GuiAdvance()
 {
-    unsigned int v1; // esi
+    unsigned int timestamp; // esi
     int v3; // esi
-    int v4; // esi
-    void (__cdecl *v5)(int, int); // ecx
-    void (__cdecl *v7)(int, int); // ecx
-    void (__cdecl *v8)(int); // ecx
+    int previousGuiState; // esi
+    void (__cdecl *guiLeaveFunction)(int, int); // ecx
+    void (__cdecl *nextGuiDisplayFunction)(int, int); // ecx
+    void (__cdecl *currentGuiStateTickFunction)(int); // ecx
 
     if ( !g_app_suspended )
     {
@@ -225,11 +225,11 @@ void jkMain_GuiAdvance()
         {
             if ( sithNet_isMulti && !thing_six)
             {
-                v1 = stdPlatform_GetTimeMsec();
+                timestamp = stdPlatform_GetTimeMsec();
                 
-                if (v1 > jkMain_lastTickMs + TICKRATE_MS)
+                if (timestamp > jkMain_lastTickMs + TICKRATE_MS)
                 {
-                    jkMain_lastTickMs = v1;
+                    jkMain_lastTickMs = timestamp;
                     if (!sithMain_Tick()) return;
                 }
                 
@@ -256,11 +256,11 @@ void jkMain_GuiAdvance()
                     jkMain_EndLevel(1);
                 }
                 jkPlayer_nullsub_1(&playerThings[playerThingIdx]);
-                jkGame_dword_552B5C += stdPlatform_GetTimeMsec() - v1;
+                jkGame_dword_552B5C += stdPlatform_GetTimeMsec() - timestamp;
                 v3 = stdPlatform_GetTimeMsec();
                 if ( g_app_suspended && jkSmack_currentGuiState != 6 ) {
 #if defined(SDL2_RENDER) || defined(TARGET_TWL)
-                    if (jkMain_lastTickMs == v1)
+                    if (jkMain_lastTickMs == timestamp)
 #endif
                     jkGame_Update();
                 }
@@ -295,28 +295,28 @@ void jkMain_GuiAdvance()
     if ( jkSmack_stopTick && !jkGuiRend_thing_five )
     {
         jkGuiRend_thing_four = 0;
-        v4 = jkSmack_currentGuiState;
-        v5 = jkMain_aGuiStateFuncs[jkSmack_currentGuiState].leaveFunc;
-        if ( v5 )
-            v5(jkSmack_currentGuiState, jkSmack_nextGuiState);
+        previousGuiState = jkSmack_currentGuiState;
+        guiLeaveFunction = jkMain_aGuiStateFuncs[jkSmack_currentGuiState].leaveFunc;
+        if ( guiLeaveFunction )
+            guiLeaveFunction(jkSmack_currentGuiState, jkSmack_nextGuiState);
         //jk_printf("leave %u\n", jkSmack_currentGuiState);
 
         jkSmack_stopTick = 0;
         jkSmack_currentGuiState = jkSmack_nextGuiState;
-        v7 = jkMain_aGuiStateFuncs[jkSmack_nextGuiState].showFunc;
-        if ( !v7 )
+        nextGuiDisplayFunction = jkMain_aGuiStateFuncs[jkSmack_nextGuiState].showFunc;
+        if ( !nextGuiDisplayFunction )
             goto LABEL_35;
         //jk_printf("show %u\n", jkSmack_currentGuiState);
-        v7(jkSmack_nextGuiState, v4);
+        nextGuiDisplayFunction(jkSmack_nextGuiState, previousGuiState);
         //jk_printf("showed %u\n", jkSmack_currentGuiState);
     }
 LABEL_35:
     if ( !jkSmack_stopTick )
     {
         //jk_printf("tick %u %x\n", jkSmack_currentGuiState, jkMain_aGuiStateFuncs[jkSmack_currentGuiState].tickFunc);
-        v8 = jkMain_aGuiStateFuncs[jkSmack_currentGuiState].tickFunc;
-        if ( v8 )
-            v8(jkSmack_currentGuiState);
+        currentGuiStateTickFunction = jkMain_aGuiStateFuncs[jkSmack_currentGuiState].tickFunc;
+        if ( currentGuiStateTickFunction )
+            currentGuiStateTickFunction(jkSmack_currentGuiState);
     }
 }
 
@@ -914,6 +914,7 @@ int jkMain_sub_403470(char *a1)
 
 int jkMain_LoadFile(char *a1)
 {
+    stdPlatform_Printf("jkMain_LoadFile(%s)\n", a1);
     if (jkRes_LoadCD(1))
     {
         sithInventory_549FA0 = 1;
@@ -1331,7 +1332,7 @@ void jkMain_VideoShow(int a1, int a2)
     //if (Main_bMotsCompat && !sithNet_isMulti )
     //    sithTime_Pause();
 
-    result = jkCutscene_sub_421310(jkMain_aLevelJklFname);
+    result = jkCutscene_Show(jkMain_aLevelJklFname);
     if ( !result )
     {
         Windows_ErrorMsgboxWide("ERR_CANNOT_LOAD_FILE %s", jkMain_aLevelJklFname);
@@ -1426,7 +1427,7 @@ void jkMain_VideoLeave(int a1, int a2)
     //if (Main_bMotsCompat && !sithNet_isMulti )
     //    sithTime_Resume();
 
-    jkCutscene_sub_421410();
+    jkCutscene_stop();
     if ( a1 == JK_GAMEMODE_VIDEO3 || a1 == JK_GAMEMODE_VIDEO4 )
         jkMain_StartNextLevelInEpisode(0, 1);
 }

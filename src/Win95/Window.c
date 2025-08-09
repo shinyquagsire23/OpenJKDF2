@@ -1,5 +1,8 @@
 #include "Window.h"
 
+#include <SDL2/SDL_error.h>
+#include <SDL2/SDL_log.h>
+
 #include "Win95/stdGdi.h"
 #include "Platform/std3D.h"
 #include "Main/Main.h"
@@ -13,15 +16,21 @@
 #include "Devices/sithConsole.h"
 #include "Platform/wuRegistry.h"
 #include "Main/jkQuakeConsole.h"
-
+#include "Gui/jkGUIRend.h"
 #include "jk.h"
 
 #ifdef ARCH_WASM
 #include <emscripten.h>
 #endif
+#ifdef TARGET_SWITCH
+#include <switch.h>
+#include "SDL2/SDL.h"
+
+#endif
+#include <stdarg.h>
+
 
 #ifdef SDL2_RENDER
-
 #include <fcntl.h> 
 #include <stdio.h>
 #ifndef _WIN32
@@ -31,7 +40,11 @@
 #if !defined(WIN64_MINGW) && !defined(_WIN32)
 #include <sys/ioctl.h>
 #include <sys/select.h>
+#ifdef TARGET_SWITCH
+#include <machine/termios.h>
+#else 
 #include <termios.h>
+#endif 
 #else
 #include <conio.h>
 #endif
@@ -79,6 +92,7 @@ void Window_SetHiDpi(int val)
 
 void Window_SetFullscreen(int val)
 {
+    return;
     if (Window_isFullscreen != val)
     {
         // Reset window when exiting fullscreen
@@ -367,6 +381,8 @@ int Window_DefaultHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam, voi
 #ifdef SDL2_RENDER
 
 SDL_Window* displayWindow = NULL;
+SDL_Renderer *renderer = NULL;
+
 SDL_Event event;
 SDL_GLContext glWindowContext;
 
@@ -414,7 +430,7 @@ void Window_HandleMouseMove(SDL_MouseMotionEvent *event)
 
         Window_mouseX = (int)(((fX - menu_x) / (flex_t)menu_w) * 640.0);
         Window_mouseY = (int)((fY / (flex_t)Window_screenYSize) * 480.0);
-        //printf("%d %d\n", Window_mouseX, Window_mouseY);
+        //stdPlatform_Printf("%d %d\n", Window_mouseX, Window_mouseY);
     }
     else
     {
@@ -456,16 +472,16 @@ void Window_HandleWindowEvent(SDL_Event* event)
                 }
             }
 #endif
-            //printf("Window %d shown", event->window.windowID);
+            //stdPlatform_Printf("Window %d shown", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_HIDDEN:
-            //printf("Window %d hidden", event->window.windowID);
+            //stdPlatform_Printf("Window %d hidden", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_EXPOSED:
-            //printf("Window %d exposed", event->window.windowID);
+            //stdPlatform_Printf("Window %d exposed", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_MOVED:
-            /*printf("Window %d moved to %d,%d",
+            /*stdPlatform_Printf("Window %d moved to %d,%d",
                     event->window.windowID, event->window.data1,
                     event->window.data2);*/
             Window_xPos = event->window.data1;
@@ -483,37 +499,37 @@ void Window_HandleWindowEvent(SDL_Event* event)
 
             if (Window_xSize < 640) Window_xSize = 640;
             if (Window_ySize < 480) Window_ySize = 480;
-            //printf("%u %u\n", Window_xSize, Window_ySize);
+            //stdPlatform_Printf("%u %u\n", Window_xSize, Window_ySize);
             break;
         case SDL_WINDOWEVENT_MINIMIZED:
-            //printf("Window %d minimized", event->window.windowID);
+            //stdPlatform_Printf("Window %d minimized", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_MAXIMIZED:
-            //printf("Window %d maximized", event->window.windowID);
+            //stdPlatform_Printf("Window %d maximized", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_RESTORED:
-            //printf("Window %d restored", event->window.windowID);
+            //stdPlatform_Printf("Window %d restored", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_ENTER:
-            //printf("Mouse entered window %d\n", event->window.windowID);
+            //stdPlatform_Printf("Mouse entered window %d\n", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_LEAVE:
-            //printf("Mouse left window %d\n", event->window.windowID);
+            //stdPlatform_Printf("Mouse left window %d\n", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_FOCUS_GAINED:
-            //printf("Window %d gained keyboard focus", event->window.windowID);
+            //stdPlatform_Printf("Window %d gained keyboard focus", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_FOCUS_LOST:
-            //printf("Window %d lost keyboard focus", event->window.windowID);
+            //stdPlatform_Printf("Window %d lost keyboard focus", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_CLOSE:
-            //printf("Window %d closed", event->window.windowID);
+            //stdPlatform_Printf("Window %d closed", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_TAKE_FOCUS:
-            //printf("Window %d is offered a focus", event->window.windowID);
+            //stdPlatform_Printf("Window %d is offered a focus", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_HIT_TEST:
-            //printf("Window %d has a special hit test", event->window.windowID);
+            //stdPlatform_Printf("Window %d has a special hit test", event->window.windowID);
             break;
     }
 }
@@ -577,12 +593,12 @@ int my_kbhit() {
 
     if (! initialized) {
         // Use termios to turn off line buffering
-        struct termios term;
-        tcgetattr(STDIN, &term);
-        term.c_lflag &= ~ICANON;
-        term.c_lflag &= ~ECHO;
-        tcsetattr(STDIN, TCSANOW, &term);
-        setbuf(stdin, NULL);
+        // struct termios term;
+        //tcgetattr(STDIN, &term);
+        //term.c_lflag &= ~ICANON;
+        //term.c_lflag &= ~ECHO;
+        //tcsetattr(STDIN, TCSANOW, &term);
+        //setbuf(stdin, NULL);
         initialized = 1;
     }
 
@@ -613,14 +629,14 @@ void Window_UpdateHeadless()
         for (int i = 0; i < bytes_read; i++)
         {
             if (buffer[i] == '\n' || buffer[i] == '\r') {
-                printf("\r> %s\n", Window_headlessBuffer);
+                stdPlatform_Printf("\r> %s\n", Window_headlessBuffer);
                 sithConsole_TryCommand(Window_headlessBuffer);
                 memset(Window_headlessBuffer, 0, sizeof(Window_headlessBuffer));
                 continue;
             }
             else if (buffer[i] == 0x7F && strlen(Window_headlessBuffer)) {
                 Window_headlessBuffer[strlen(Window_headlessBuffer)-1] = 0;
-                printf("\r> %s ", Window_headlessBuffer);
+                stdPlatform_Printf("\r> %s ", Window_headlessBuffer);
                 continue;
             }
             else if (buffer[i] < ' ' || buffer[i] > '~')
@@ -633,8 +649,8 @@ void Window_UpdateHeadless()
         }
     }
     
-    printf("\r> %s", Window_headlessBuffer);
-    //printf("> %x %x %s\n", buffer[0], my_kbhit(), Window_headlessBuffer);
+    stdPlatform_Printf("\r> %s", Window_headlessBuffer);
+    //stdPlatform_Printf("> %x %x %s\n", buffer[0], my_kbhit(), Window_headlessBuffer);
     fflush(stdout);
 
     if (Window_resized)
@@ -650,7 +666,7 @@ void Window_UpdateHeadless()
     }
     
     int sampleTime_roundtrip = SDL_GetTicks() - Window_lastSampleTime;
-    //printf("%u\n", sampleTime_roundtrip);
+    //stdPlatform_Printf("%u\n", sampleTime_roundtrip);
     Window_lastSampleTime = SDL_GetTicks();
 
     static int sampleTime_delay = 0;
@@ -991,7 +1007,7 @@ void Window_SdlUpdate()
     
     static int sampleTime_delay = 0;
     int sampleTime_roundtrip = SDL_GetTicks() - Window_lastSampleTime;
-    //printf("%u\n", sampleTime_roundtrip);
+    //stdPlatform_Printf("%u\n", sampleTime_roundtrip);
     Window_lastSampleTime = SDL_GetTicks();
 
     static int jkPlayer_enableVsync_last = 0;
@@ -1033,7 +1049,7 @@ void Window_SdlUpdate()
             std3D_PurgeEntireTextureCache();
             Window_RecreateSDL2Window();
         }
-        
+
         // Keep menu FPS at 60FPS, to avoid cranking the GPU unnecessarily.
         if (sampleTime_roundtrip < menu_framelimit_amt_ms) {
             sampleTime_delay++;
@@ -1106,7 +1122,7 @@ void Window_SdlVblank()
 #endif
     SDL_GL_SwapWindow(displayWindow);
     //uint32_t after = stdPlatform_GetTimeMsec();
-    //printf("%u %u\n", after-before, before-roundtrip);
+    //stdPlatform_Printf("%u %u\n", after-before, before-roundtrip);
 
     //roundtrip = before;
 
@@ -1130,6 +1146,8 @@ EM_JS(int, canvas_get_height, (), {
 
 void Window_RecreateSDL2Window()
 {
+
+
 #ifdef ARCH_WASM
     static int onlyOnce = 0;
     if (onlyOnce) {
@@ -1138,9 +1156,13 @@ void Window_RecreateSDL2Window()
     onlyOnce = 1;
 #endif
 
+    //consoleInit(NULL);
     if (Main_bHeadless) return;
+    stdPlatform_Printf("In Window .... %x\n");
 
-    stdPlatform_Printf("Recreating SDL2 Window!\n");
+    //consoleUpdate(NULL);
+
+    stdPlatform_Printf("Recreating SDL2 WinRecreating SDLdow!\n");
     Window_needsRecreate = 0;
 
     if (displayWindow) {
@@ -1149,32 +1171,44 @@ void Window_RecreateSDL2Window()
         SDL_DestroyWindow(displayWindow);
     }
 
-    int flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
+    #if defined(TARGET_SWITCH)
+    int flags = 0;
 
+    #else
+        int flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
+    #endif
     if (displayWindow) {
         flags = SDL_GetWindowFlags(displayWindow);
         //std3D_FreeResources();
         //SDL_GL_DeleteContext(glWindowContext);
         //SDL_DestroyWindow(displayWindow);
 
-        flags |= SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
+        #if !defined(TARGET_SWITCH)
+            flags |= SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
+        #endif
     }
 
 #ifdef WIN64_STANDALONE
     SDL_SetHint(SDL_HINT_WINDOWS_DPI_AWARENESS, "permonitorv2");
 #endif
 
-    if (Window_isHiDpi)
+#if !defined(TARGET_SWITCH)
+ if (Window_isHiDpi)
         flags |= SDL_WINDOW_ALLOW_HIGHDPI;
     else
         flags &= ~SDL_WINDOW_ALLOW_HIGHDPI;
 
+
     if (Window_isFullscreen) {
+
         //flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+
     }
     else {
         //flags &= ~SDL_WINDOW_FULLSCREEN_DESKTOP;
     }
+#endif
+
 
 #if defined(ARCH_WASM)
     //flags &= ~SDL_WINDOW_RESIZABLE;
@@ -1183,18 +1217,54 @@ void Window_RecreateSDL2Window()
 #ifdef TARGET_ANDROID
     flags = SDL_WINDOW_SHOWN;
 #endif
+#ifdef TARGET_SWITCH
+    flags=0;
+    stdPlatform_Printf("test");
+    stdPlatform_Printf("creating window");
+    consoleUpdate(NULL);
+#endif
+
 
 #ifdef ARCH_WASM
     displayWindow = SDL_CreateWindow(Window_isHiDpi ? "OpenJKDF2 HiDPI" : "OpenJKDF2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, canvas_get_width(), canvas_get_height(), flags);
 #elif defined(TARGET_ANDROID)
     displayWindow = SDL_CreateWindow(Window_isHiDpi ? "OpenJKDF2 HiDPI" : "OpenJKDF2", 0, 0, Window_screenXSize, Window_screenYSize, flags);
+#elif defined(TARGET_SWITCH)
+    stdPlatform_Printf("created window waiting \n\n");
+    consoleUpdate(NULL);
+    stdPlatform_Printf("We are here, window at %s", displayWindow);
+
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0) {
+        stdPlatform_Printf("SDL_Init failed: %s\n", SDL_GetError());
+    }
+    stdPlatform_Printf("Init was good %s", displayWindow);
+
+
+    displayWindow = SDL_CreateWindow(
+        "sdl2_gles2",
+        0, 0,
+        1920, 1080,
+        0 // or 0
+    );
+
+    stdPlatform_Printf("Tried to create Window %s", displayWindow);
+    if (!displayWindow) {
+        stdPlatform_Printf("SDL_CreateWindow failed: %s\n", SDL_GetError());
+    }
+
+    stdPlatform_Printf("We have a window ladies %s", displayWindow);
+
+
+
 #else
+
     displayWindow = SDL_CreateWindow(Window_isHiDpi ? "OpenJKDF2 HiDPI" : "OpenJKDF2", Window_xPos, Window_yPos, Window_screenXSize, Window_screenYSize, flags);
 #endif
+
     if (!displayWindow) {
         char errtmp[256];
-        snprintf(errtmp, 256, "!! Failed to create SDL2 window !!\n%s", SDL_GetError());
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", errtmp, NULL);
+        stdPlatform_Printf(errtmp, 256, "!! Failed to create SDL2 window !!\n%s", SDL_GetError());
+      //SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", errtmp, NULL);
         exit (-1);
     }
     //SDL_SetRenderDrawBlendMode(displayRenderer, SDL_BLENDMODE_BLEND);
@@ -1202,13 +1272,13 @@ void Window_RecreateSDL2Window()
 #if defined(MACOS) && defined(__aarch64__)
     //SDL_FixWindowMacOS(displayWindow);
 #endif
-
     if (Window_isFullscreen) {
         SDL_SetWindowFullscreen(displayWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
     }
     else {
         SDL_SetWindowFullscreen(displayWindow, 0);
     }
+    stdPlatform_Printf("SDL ERROR: %s", SDL_GetError());
 
     glWindowContext = SDL_GL_CreateContext(displayWindow);
     
@@ -1226,15 +1296,14 @@ void Window_RecreateSDL2Window()
     if (glWindowContext == NULL)
     {
         char errtmp[256];
-        snprintf(errtmp, 256, "!! Failed to initialize SDL OpenGL context !!\n%s", SDL_GetError());
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", errtmp, NULL);
+        stdPlatform_Printf("SDL ERROR: %s", SDL_GetError());
+        stdPlatform_Printf(errtmp, 256, "!! Failed to initialize SDL OpenGL context !!\n%s", SDL_GetError());
+       // SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", errtmp, NULL);
         exit(-1);
     }
 
     SDL_GL_MakeCurrent(displayWindow, glWindowContext);
     SDL_GL_SetSwapInterval(jkPlayer_enableVsync); // Disable vsync
-    SDL_StartTextInput();
-
     SDL_GL_GetDrawableSize(displayWindow, &Window_xSize, &Window_ySize);
     SDL_GetWindowSize(displayWindow, &Window_screenXSize, &Window_screenYSize);
 
@@ -1243,6 +1312,11 @@ void Window_RecreateSDL2Window()
 
 void Window_Main_Loop()
 {
+    // this is needed for reacting to controller in cutscene
+    if(jkCutscene_isRendering){
+        jkGuiRend_UpdateController();
+    }
+    //stdControl_ReadControls();
     jkMain_GuiAdvance(); // TODO needed?
     Window_msg_main_handler(g_hWnd, WM_PAINT, 0, 0);
     
@@ -1253,58 +1327,16 @@ int Window_Main_Linux(int argc, char** argv)
 {
     char cmdLine[1024];
     int result;
+    int done = 0, x = 0, w = 1920, h = 1080;
 
+    stdPlatform_Printf("Window Main Linux called: %d x %d\n", Window_screenXSize, Window_screenYSize);
     // Init SDL
-    SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "1");
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_NOPARACHUTE);
-
-#if defined(MACOS)
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
-#else
-
-#if defined(WIN64_STANDALONE)
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
-
-    // apitrace
-#if 0
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
-    SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
-#endif
-#elif defined(TARGET_ANDROID)
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-    SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
-#elif defined(ARCH_WASM)
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-    SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
-#else
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
-#endif
-
-#endif
-
     
     Window_RecreateSDL2Window();
-#if !defined(TARGET_ANDROID) && !defined(ARCH_WASM)
+#if !defined(TARGET_ANDROID) && !defined(TARGET_SWITCH)  && !defined(TARGET_SWITCH) && !defined(ARCH_WASM)
     glewInit();
 #endif
-    
+
     //SDL_RenderClear(displayRenderer);
     //SDL_RenderPresent(displayRenderer);
     
@@ -1328,8 +1360,8 @@ int Window_Main_Linux(int argc, char** argv)
 
     int fullscreen = wuRegistry_GetBool("Window_isFullscreen", 0);
     int hidpi = wuRegistry_GetBool("Window_isHiDpi", 0);
-    Window_SetFullscreen(fullscreen);
-    Window_SetHiDpi(hidpi);
+    //Window_SetFullscreen(fullscreen);
+    //Window_SetHiDpi(hidpi);
     Window_RecreateSDL2Window();
 
     if (!result) return result;
@@ -1338,8 +1370,10 @@ int Window_Main_Linux(int argc, char** argv)
     {
         if (displayWindow) {
             std3D_FreeResources();
-            SDL_GL_DeleteContext(glWindowContext);
+            SDL_DestroyRenderer(renderer); // only if you use it
+            SDL_GL_DeleteContext(glWindowContext); // only if used
             SDL_DestroyWindow(displayWindow);
+            displayWindow = NULL;
         }
     }
 
@@ -1481,7 +1515,10 @@ int Window_DefaultHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam, voi
 
 int Window_MessageLoop()
 {
+        jkGuiRend_UpdateController();
+
     jkMain_GuiAdvance();
+            jkGuiRend_UpdateController();
     Window_msg_main_handler(g_hWnd, WM_PAINT, 0, 0);
     
     //Window_SdlUpdate();

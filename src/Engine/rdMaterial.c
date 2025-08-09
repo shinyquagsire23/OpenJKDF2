@@ -137,7 +137,7 @@ int rdMaterial_LoadEntry_Common(char *mat_fpath, rdMaterial *material, int creat
     mat_file_ = mat_file;
     mat_file__ = mat_file;
     if (!mat_file) {
-        //jk_printf("OpenJKDF2: Material `%s` could not be opened!\n", mat_fpath); // Added
+        stdPlatform_Printf("OpenJKDF2: Material `%s` could not be opened!\n", mat_fpath); // Added
         return 0;
     }
 

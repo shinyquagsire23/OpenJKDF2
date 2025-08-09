@@ -369,7 +369,8 @@ extern int Window_isHiDpi;
 #ifdef WIN64_STANDALONE
 #define WINDOW_DEFAULT_WIDTH  (640*2)
 #define WINDOW_DEFAULT_HEIGHT (480*2)
-#else // WIN64_STANDALONE
+#else
+
 #define WINDOW_DEFAULT_WIDTH  (640)
 #define WINDOW_DEFAULT_HEIGHT (480)
 #endif // WIN64_STANDALONE

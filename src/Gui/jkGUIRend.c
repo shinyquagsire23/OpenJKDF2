@@ -2666,7 +2666,8 @@ void jkGuiRend_UpdateController()
 {
     static int lastB1 = 0;
     static int keyboardShowedLastUpdate = 0;
-    stdControl_bControlsActive = 1; // HACK
+    stdControl_bControlsActive = 1; // HACK 
+    // Yes thats a hack that breaks my game - built in another hack to circumvent that hack
     stdControl_ReadControls();
 
     int val = 0;
@@ -2684,7 +2685,7 @@ void jkGuiRend_UpdateController()
     }
     if (stdControl_ReadKey(KEY_JOY1_HDOWN, &val) && val) {
         jkGuiRend_FocusElementDir(jkGuiRend_activeMenu, FOCUS_DOWN);
-        printf("down\n");
+        stdPlatform_Printf("down\n");
     }
     if (stdControl_ReadKey(KEY_JOY1_B1, &val) && val) {
         lastB1 = val;
@@ -2702,6 +2703,7 @@ void jkGuiRend_UpdateController()
     }
     if (stdControl_ReadKey(KEY_JOY1_B2, &val) && val) {
         jkGuiRend_WindowHandler(0, WM_KEYFIRST, VK_ESCAPE, 0, 0);
+        stdPlatform_Printf("b\n");
         printf("b\n");
     }
     if (stdControl_ReadKey(KEY_JOY1_B3, &val) && val) {
@@ -2716,6 +2718,13 @@ void jkGuiRend_UpdateController()
         keyboardShowedLastUpdate = 1;
         stdControl_ShowSystemKeyboard();
     }
+    // Start Over to Escape sending
+    if(stdControl_ReadKey(KEY_JOY1_B10, &val) && val) {
+                jkGuiRend_WindowHandler(0, WM_KEYFIRST, VK_ESCAPE, 0, 0);
+
+        stdPlatform_Printf("PLUS PRESSED \n");
+    }
+
     else if (keyboardShowedLastUpdate) {
         stdControl_HideSystemKeyboard();
     }

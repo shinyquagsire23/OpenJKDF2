@@ -60,7 +60,14 @@ extern "C" {
 #define GL_BGR 0x80E0
 #endif
 
+#elif defined(TARGET_SWITCH)
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_opengles2.h>
+#include <GLES3/gl3.h>
+#include <GLES3/gl3ext.h>
 #else
+
+
 #include <GL/glew.h>
 #include <SDL.h>
 #include <GL/gl.h>

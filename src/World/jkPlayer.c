@@ -715,7 +715,7 @@ int jkPlayer_ReadConf(wchar_t *name)
         sithControl_ReadConf();
 
         // HACK
-#ifdef TARGET_TWL
+#if defined(TARGET_TWL) || defined(TARGET_SWITCH)
         sithControl_InputInit();
 #endif
         if ( stdConffile_ReadArgs() )

@@ -40,6 +40,7 @@ void jkEpisode_Shutdown()
 
 int jkEpisode_LoadVerify()
 {
+    strcpy(jkRes_curDir, "sdmc:/jk");
     stdFileSearch *v0; // ebp
     unsigned int v2; // esi
     jkEpisode *v3; // edi
@@ -65,6 +66,9 @@ int jkEpisode_LoadVerify()
     stdFileSearchResult v30; // [esp+54h] [ebp-18Ch] BYREF
     char v31[64]; // [esp+160h] [ebp-80h] BYREF
     char v32[64]; // [esp+1A0h] [ebp-40h] BYREF
+
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
+    stdPlatform_Printf("OpenJKDF2: %s - LoadingStuff : %s \n ", __func__, jkEpisode_var5);
 
     if ( Windows_installType < 1 )
         jkRes_LoadCD(0);
@@ -133,10 +137,14 @@ LABEL_20:
             }
         }
     }
+    strcpy(jkRes_curDir, "sdmc:/jk");
     stdFileUtil_DisposeFind(v5);
+    stdPlatform_Printf("OpenJKDF2: %s - Found %d episodes\n", __func__, jkEpisode_var2);
+    stdPlatform_Printf("OpenJKDF2: %s - Current Dir: %s\n", __func__, jkRes_curDir[0] ? jkRes_curDir : "NULL");
     if ( jkRes_curDir[0] )
     {
-        _sprintf(jkEpisode_var5, "%s\\gamedata\\episode", jkRes_curDir);
+        _sprintf(jkEpisode_var5, "%s\\episode\\", jkRes_curDir);
+            stdPlatform_Printf("OpenJKDF2: %s - Looking for %s episodes\n", __func__, jkEpisode_var5);
         v10 = stdFileUtil_NewFind(jkEpisode_var5, 3, JKRES_GOB_EXT);
         while ( stdFileUtil_FindNext(v10, &v30) )
         {
@@ -171,6 +179,8 @@ LABEL_30:
     }
     jkRes_HookHS();
     result = jkEpisode_var2;
+
+    stdPlatform_Printf("OpenJKDF2: %s - Result: %s\n", __func__, result);
     v28 = 0;
     if ( jkEpisode_var2 )
     {

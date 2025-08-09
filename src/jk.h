@@ -15,11 +15,14 @@
 #include <ctype.h>
 #endif
 
-#if defined(MACOS) || defined(LINUX) || defined(TARGET_TWL)
+#if defined(MACOS) || defined(LINUX) || defined(TARGET_TWL) || defined(TARGET_SWITCH)
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#endif
+#if defined(TARGET_SWITCH)
+
 #endif
 
 #ifndef __cplusplus

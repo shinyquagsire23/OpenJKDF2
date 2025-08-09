@@ -113,3 +113,10 @@ packaging/android-project/.gradle/*
 packaging/android-project/app/build/*
 packaging/android-project/app/src/main/jniLibs/*
 packaging/win32/openjkdf2-64.exe.manifest
+build_switch/*
+build/*
+build_linux64/*
+build_switch_simple/*
+gamefiles/*
+.vscode
+.idea

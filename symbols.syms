@@ -653,7 +653,7 @@ jkCutscene_bInitted 0x0055AA58 int
 jkCutscene_isRendering 0x0055AA48 int
 jkCutscene_dword_55B750 0x0055B750 int
 jkCutscene_dword_55AA50 0x0055AA50 int
-jkCutscene_55AA54 0x0055AA54 int
+jkCutscene_isPaused 0x0055AA54 int
 
 jkMain_aLevelJklFname 0x005528D0 char[128]
 thing_nine 0x0052552C int = 1

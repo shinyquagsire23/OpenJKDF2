@@ -1,8 +1,8 @@
 #include "jk.h"
-
+#define assert(...) ((void)0)
 #include "types.h"
 
-#if defined(LINUX) || defined(TARGET_TWL)
+#if defined(LINUX) || defined(TARGET_TWL) || defined(TARGET_SWITCH)
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
@@ -11,6 +11,9 @@
 //#include <wchar.h>
 #endif
 
+#if defined(TARGET_SWITCH)
+#include <switch.h>
+#endif
 #ifdef MACOS
 #include <wchar.h>
 #endif
@@ -347,7 +350,7 @@ void* _memset(void* ptr, int val, size_t num)
     return ptr;
 }
 
-#if !defined(MACOS) && !defined(WIN64_STANDALONE) && !defined(LINUX) && !defined(TARGET_TWL)
+#if !defined(MACOS) && !defined(WIN64_STANDALONE) && !defined(LINUX) && !defined(TARGET_TWL) && !defined(TARGET_SWITCH)
 void* memset(void* ptr, int val, size_t num)
 {
     int i;
@@ -709,6 +712,18 @@ void __wrap_exit(int res) {
 int jk_printf(const char* fmt, ...)
 {
     va_list args;
+
+    #if defined(TARGET_SWITCH) && defined(DEBUG)
+       FILE* f = fopen("sdmc:/openjkdf2_log.txt", "a");
+    if (!f) return 0;
+
+
+    va_start(args, fmt);
+    vfprintf(f, fmt, args);
+    fprintf(f, "\n");
+    va_end(args);
+    fclose(f);
+    #endif
     va_start (args, fmt);
     int ret = vprintf(fmt, args);
     va_end (args);

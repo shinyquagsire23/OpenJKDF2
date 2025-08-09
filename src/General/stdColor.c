@@ -74,10 +74,11 @@ int stdColor_ColorConvertOneRow(uint8_t *outPixels, rdTexformat *formatTo, uint8
                     v11 = *(uint32_t*)inPixels;
                     break;
                 default:
-                    std_pHS->assert(
-                        "Unsupported pixel depth.  Only 8, 16, 24, & 32 bits per pixel supported at the moment.",
-                        ".\\General\\stdColor.c",
-                        525);
+                
+                 //   std_pHS->assert(
+                   //     "Unsupported pixel depth.  Only 8, 16, 24, & 32 bits per pixel supported at the moment.",
+                     //   ".\\General\\stdColor.c",
+                       // 525);
                     break;
             }
             v13 = v22 & (v11 >> formatFrom->r_shift);

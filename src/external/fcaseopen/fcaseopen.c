@@ -7,7 +7,11 @@
 #include <dirent.h>
 #include <errno.h>
 #include <unistd.h>
+#ifdef TARGET_SWITCH
+#include <switch.h>
 
+#include <alloca.h>
+#endif
 #if 0
 static int is_directory(const char *path) {
    struct stat statbuf;

@@ -243,7 +243,7 @@ void jkCutscene_Shutdown()
     jkCutscene_bInitted = 0;
 }
 
-int jkCutscene_sub_421310(char* fpath)
+int jkCutscene_Show(char* fpath)
 {
     // STUB
     if (!fpath) return 1;
@@ -251,6 +251,10 @@ int jkCutscene_sub_421310(char* fpath)
 #if defined(ARCH_WASM)
     printf("vid skip %s\n", fpath);
     return 1;
+#endif
+
+#if defined(TARGET_SWITCH)
+return 1;
 #endif
 
 #if defined(TARGET_TWL)
@@ -274,7 +278,7 @@ int jkCutscene_sub_421310(char* fpath)
     }
     _strncpy(tmp, fpath, sizeof(tmp));
 
-#ifdef LINUX
+#if defined(TARGET_SWITCH) || defined(LINUX)
     for (int i = 0; i < len; i++)
     {
         if (tmp[i] == '\\') {
@@ -292,7 +296,7 @@ int jkCutscene_sub_421310(char* fpath)
     sithSoundMixer_StopSong();
     stdMci_Stop();
 
-#ifdef LINUX
+#if defined(LINUX) || defined(TARGET_SWITCH)
     char *r = (char*)malloc(strlen(tmp) + 16);
     if (casepath(tmp, r))
     {
@@ -497,7 +501,7 @@ int jkCutscene_sub_421310(char* fpath)
         jkGui_SetModeMenu(smush_get_palette(jkCutscene_pSmush));
     }
 
-    jkCutscene_55AA54 = 0;
+    jkCutscene_isPaused = 0;
     jkCutscene_audioFlip = 0;
     last_displayFrame = 0;
     last_audioUs = 0;
@@ -523,17 +527,17 @@ int jkCutscene_sub_421310(char* fpath)
     return 1;
 }
 
-int jkCutscene_sub_421410()
+int jkCutscene_stop()
 {
     stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
     
-#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
+#if !defined(SDL2_RENDER) && !defined(TARGET_TWL) && !defined(TARGET_SWITCH)
     if ( !jkCutscene_isRendering )
         return 0;
 #endif
     Window_RemoveMsgHandler(jkCutscene_Handler);
 
-#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
+#if !defined(SDL2_RENDER) && !defined(TARGET_TWL) && !defined(TARGET_SWITCH)
     if (!openjkdf2_bIsKVM)
         smack_sub_426940();
 #endif
@@ -602,7 +606,7 @@ int jkCutscene_smack_related_loops()
     smack_finished = 0;
     if ( !jkCutscene_isRendering )
         return 1;
-    if ( !jkCutscene_55AA54 && g_app_suspended )
+    if ( !jkCutscene_isPaused && g_app_suspended )
     {
 #if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
         if (!openjkdf2_bIsKVM)
@@ -714,7 +718,7 @@ int jkCutscene_PauseShow(int unk)
     wchar_t *v0; // eax
     int result; // eax
 
-    if ( jkCutscene_55AA54 )
+    if ( jkCutscene_isPaused )
     {
         v0 = jkStrings_GetUniStringWithFallback("GUI_PAUSED");
         stdFont_Draw4(&Video_otherBuf, jkCutscene_subtitlefont, 0, 10, 640, 40, 3, v0, 0);
@@ -742,11 +746,11 @@ int jkCutscene_PauseShow(int unk)
     return result;
 }
 
-int jkCutscene_Handler(HWND a1, UINT a2, WPARAM a3, LPARAM a4, LRESULT *a5)
+int jkCutscene_Handler(HWND a1, UINT event, WPARAM a3, LPARAM a4, LRESULT *a5)
 {
     wchar_t *v5; // eax
 
-    switch ( a2 )
+    switch ( event )
     {
         case WM_CLOSE:
 #if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
@@ -757,25 +761,34 @@ int jkCutscene_Handler(HWND a1, UINT a2, WPARAM a3, LPARAM a4, LRESULT *a5)
         case WM_SETCURSOR:
             jk_SetCursor(0);
             return 1;
+        case WM_KEYDOWN:
+            if ( a3 == VK_ESCAPE )
+            {
+                if ( jkCutscene_isRendering )
+                {
+                    return jkCutscene_stop();
+                }
+                return 1;
+            }
         case WM_CHAR:
             if ( a3 == VK_ESCAPE )
             {
                 if ( jkCutscene_isRendering )
                 {
-                    return jkCutscene_sub_421410();
+                    return jkCutscene_stop();
                 }
                 return 1;
             }
             else if ( a3 == VK_SPACE )
             {
-                jkCutscene_55AA54 = !jkCutscene_55AA54;
+                jkCutscene_isPaused = !jkCutscene_isPaused;
 #if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
                 if (!openjkdf2_bIsKVM)
-                    smack_off(jkCutscene_55AA54);
+                    smack_off(jkCutscene_isPaused);
 #endif
 
 #if defined(SDL2_RENDER) || defined(TARGET_TWL)
-                if (jkCutscene_55AA54)
+                if (jkCutscene_isPaused)
                 {
                     if (jkCutscene_audioFull)
                         stdSound_BufferStop(jkCutscene_audioFull);

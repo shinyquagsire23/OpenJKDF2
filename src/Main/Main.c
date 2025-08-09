@@ -83,7 +83,7 @@
 #endif
 #include <sys/types.h>
 #include <stdbool.h>
-#if defined(LINUX) || defined(MACOS)
+#if defined(LINUX) || defined(MACOS) || defined(TARGET_SWITCH)
 #include <pwd.h>
 #endif
 #include "nfd.h"
@@ -509,7 +509,7 @@ void Main_Shutdown()
     jkControl_Shutdown(); // Added
     jkHudInv_Shutdown();
     if ( jkCutscene_isRendering )
-        jkCutscene_sub_421410();
+        jkCutscene_stop();
     Video_Shutdown();
     jkGame_Shutdown();
     jkDev_Shutdown();

@@ -158,6 +158,12 @@ endif()
 # SDL2 Platform/
 if(TARGET_USE_SDL2)
     file(GLOB TARGET_SDL2_SRCS ${PROJECT_SOURCE_DIR}/src/Platform/SDL2/*.c)
+    
+    # Remove conflicting platform implementations for Switch
+    if(TARGET_SWITCH)
+        list(REMOVE_ITEM TARGET_SDL2_SRCS ${PROJECT_SOURCE_DIR}/src/Platform/SDL2/stdControl.c)
+    endif()
+    
     list(APPEND ENGINE_SOURCE_FILES ${TARGET_SDL2_SRCS})
     add_compile_definitions(SDL2_RENDER)
 endif()
@@ -223,7 +229,18 @@ if(TARGET_TWL)
     list(APPEND ENGINE_SOURCE_FILES ${TARGET_TWL_SRCS})
     list(REMOVE_ITEM ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/Main/jkQuakeConsole.c)
 endif()
+if(TARGET_SWITCH)
+    file(GLOB TARGET_SWITCH_SRCS ${PROJECT_SOURCE_DIR}/src/Platform/switch/*.c)
+    message(STATUS "Adding Switch platform sources: ${TARGET_SWITCH_SRCS}")
+    
+    list(APPEND ENGINE_SOURCE_FILES ${TARGET_SWITCH_SRCS})
+    list(APPEND ENGINE_SOURCE_FILES_REGLOB ${TARGET_SWITCH_SRCS})
 
+    # Remove conflicting Common platform implementation
+    list(REMOVE_ITEM ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/Platform/Common/stdControl.c)
+    list(REMOVE_ITEM ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/Platform/SDL2/stdControl.c)
+    add_definitions(-DSWITCH)
+endif()
 if(TARGET_WASM)
     add_definitions(-DLINUX)
 endif()

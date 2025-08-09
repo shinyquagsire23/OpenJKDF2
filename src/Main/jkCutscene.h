@@ -14,8 +14,8 @@
 
 void jkCutscene_Startup(char *fpath);
 void jkCutscene_Shutdown();
-int jkCutscene_sub_421310(char* a1);
-int jkCutscene_sub_421410();
+int jkCutscene_Show(char* a1);
+int jkCutscene_stop();
 int jkCutscene_smack_related_loops();
 int jkCutscene_PauseShow(int unk);
 int jkCutscene_Handler(HWND a1, UINT a2, WPARAM a3, LPARAM a4, LRESULT *a5);

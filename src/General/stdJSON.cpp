@@ -80,6 +80,7 @@ static nlohmann::json stdJSON_OpenAndReadFile(const char* pFpath)
 {
     fs::path json_path = {pFpath};
     nlohmann::json json_file(nlohmann::json::value_t::object);
+    stdPlatform_Printf("Opening json file at %s", json_path.string().c_str());
     if (!fs::exists(json_path)) {
         return json_file;
     }

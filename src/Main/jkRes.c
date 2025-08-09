@@ -35,6 +35,13 @@ int jkRes_Startup(HostServices *a1)
     }
     jkRes_LoadNew(&jkRes_gCtx.aGobDirectories[3], "resource", 1);
     _memset(jkRes_aFiles, 0, sizeof(jkRes_aFiles));
+    stdPlatform_Printf("OpenJKDF2: %s - jkRes_bInit = 1\n", __func__);
+    // Log out whats all now initted 
+    stdPlatform_Printf("OpenJKDF2: %s - jkRes_gCtx.aGobDirectories[0].name = %s\n", __func__, jkRes_gCtx.aGobDirectories[0].name);
+    stdPlatform_Printf("OpenJKDF2: %s - jkRes_gCtx.aGobDirectories[0].name = %s\n", __func__, jkRes_gCtx.aGobDirectories[1].name);
+    stdPlatform_Printf("OpenJKDF2: %s - jkRes_gCtx.aGobDirectories[0].name = %s\n", __func__, jkRes_gCtx.aGobDirectories[2].name);
+    stdPlatform_Printf("OpenJKDF2: %s - jkRes_gCtx.aGobDirectories[0].name = %s\n", __func__, jkRes_gCtx.aGobDirectories[3].name);
+
     jkRes_bInit = 1;
     return 1;
 }
@@ -103,11 +110,11 @@ void jkRes_LoadGob(char *a1)
     stdString_snprintf(jkRes_gCtx.aGobDirectories[1].name, 0x80u, "episode\\%s", jkRes_episodeGobName);
     
     jkRes_NewGob(&jkRes_gCtx.aGobDirectories[1], "episode", v30);
-
+    strcpy(jkRes_curDir, "sdmc:/jk");
     if ( jkRes_curDir[0] && Windows_installType < 1 )
     {
-        stdString_snprintf(std_genBuffer, 0x80u, "%s\\gamedata\\episode", jkRes_curDir);
-        stdString_snprintf(jkRes_gCtx.aGobDirectories[2].name, 0x80u, "%s\\gamedata\\episode\\%s", jkRes_curDir, jkRes_episodeGobName);
+        stdString_snprintf(std_genBuffer, 0x80u, "%s\\episode", jkRes_curDir);
+        stdString_snprintf(jkRes_gCtx.aGobDirectories[2].name, 0x80u, "%s\\episode\\%s", jkRes_curDir, jkRes_episodeGobName);
         
         jkRes_NewGob(&jkRes_gCtx.aGobDirectories[2], std_genBuffer, v30);
     }
@@ -195,6 +202,7 @@ int jkRes_FileExists(const char *fpath, char *a2, int len)
 int jkRes_ReadKeyFromFile(const char* fpath)
 {
     int keyval;
+    stdPlatform_Printf("OpenJKDF2: %s - Reading key from file: %s\n", __func__, fpath);
 
     stdFile_t fd = pHS->fileOpen(fpath, "rb");
     if (!fd)
@@ -209,12 +217,16 @@ int jkRes_ReadKeyFromFile(const char* fpath)
 // Added
 int jkRes_ReadKeyRaw()
 {
+        stdPlatform_Printf("OpenJKDF2: %s - Reading key raw: %s\n", __func__);
+
     return jkRes_ReadKeyFromFile("jk_.cd");
 }
 
 // Added
 int jkRes_ReadKeyRawEarly()
 {
+            stdPlatform_Printf("OpenJKDF2: %s - Reading key raw early: %s\n", __func__);
+
     return jkRes_ReadKeyFromFile("resource/jk_.cd");
 }
 
@@ -239,6 +251,14 @@ int jkRes_ReadKey()
 
 int jkRes_LoadNew(jkResGobDirectory *resGob, char *name, int a3)
 {
+
+
+    #ifdef TARGET_SWITCH
+   char  path[255] = {0};
+    getcwd(path, 255);
+    chdir("sdmc:/jk/");
+        stdPlatform_Printf("Openjkdf2 loadNew:  Current working directory: %s\n", path);
+    #endif
     stdFileSearch *v15; // ebp
     stdFileSearchResult v18; // [esp+8h] [ebp-10Ch] BYREF
 
@@ -270,14 +290,18 @@ int jkRes_LoadNew(jkResGobDirectory *resGob, char *name, int a3)
     }
 
     v15 = stdFileUtil_NewFind(name, 3, JKRES_GOB_EXT);
+    stdPlatform_Printf("OpenJKDF2: %s - Searching for gobs in %s\n", __func__, name);
     while (stdFileUtil_FindNext(v15, &v18))
     {
+        stdPlatform_Printf("OpenJKDF2: %s - Found gob: %s\n", __func__, v18.fpath);
         if ( resGob->numGobs >= STDGOB_MAX_GOBS )
             break;
         if ( v18.fpath[0] != '.' )
         {
             stdString_snprintf(jkRes_idkGobPath, 0x80u, "%s%c%s", name, LEC_PATH_SEPARATOR_CHR, v18.fpath);
             resGob->gobs[resGob->numGobs] = stdGob_Load(jkRes_idkGobPath, 16, 0);
+
+            stdPlatform_Printf("OpenJKDF2: %s - Loading gob: %s\n", __func__, jkRes_idkGobPath);
 
             if ( resGob->gobs[resGob->numGobs] )
                 resGob->numGobs++;
@@ -314,6 +338,7 @@ int jkRes_NewGob(jkResGobDirectory *gobFullpath, char *gobFolder, char *gobFname
 
 int jkRes_LoadCD(int cdNumberNeeded)
 {
+        stdPlatform_Printf("OpenJKDF2 - read cd: %s\n", __func__); // Added
     int v1; // eax
     unsigned int v3; // edi
     stdGob **v4; // esi
@@ -344,8 +369,12 @@ int jkRes_LoadCD(int cdNumberNeeded)
     while ( 1 )
     {
         v1 = pHS->fileOpen("jk_.cd", "rb");
+        stdPlatform_Printf("OpenJKDF2: %s - Opening jk_.cd\n", __func__);
+
         if ( v1 )
         {
+
+        stdPlatform_Printf("OpenJKDF2: %s - Opening jk_.cd good \n", __func__);
             pHS->fileRead(v1, &keyval, 4);
             if ( keyval == JKRES_MAGIC_0 ) {
                 v23 = 1;
@@ -362,7 +391,7 @@ int jkRes_LoadCD(int cdNumberNeeded)
             pHS->fileClose(v1);
         }
 
-#ifdef TARGET_TWL
+#if defined(TARGET_TWL) || defined(TARGET_SWITCH)
         v23 = 1;
 #endif
         
@@ -459,20 +488,21 @@ LABEL_39:
 
 stdFile_t jkRes_FileOpen(const char *fpath, const char *mode)
 {
+
     unsigned int resIdx; // edi
-    int v6; // esi
+    int success; // esi
     stdFile_t fhand; // eax
     unsigned int v8; // esi
-    const char *v11; // eax
-    stdFile_t v12; // eax
+    const char *gobDirectoryName; // eax
+    stdFile_t fileHandle; // eax
     unsigned int v13; // esi
     stdGobFile *v14; // eax
     unsigned int v15; // esi
     bool v16; // cf
-    stdGob **v17; // [esp+10h] [ebp-Ch]
-    unsigned int v18; // [esp+14h] [ebp-8h]
-    int v19; // [esp+18h] [ebp-4h]
-
+    stdGob **gobFile; // [esp+10h] [ebp-Ch]
+    unsigned int gobIdx; // [esp+14h] [ebp-8h]
+    int gobDirectoryIdx; // [esp+18h] [ebp-4h]
+    stdPlatform_Printf("Openjkdf2: %s - Opening file: %s with mode: %s\n", __func__, fpath, mode);
     resIdx = 0;
     for (resIdx = 0; resIdx < 32; resIdx++)
     {
@@ -481,49 +511,51 @@ stdFile_t jkRes_FileOpen(const char *fpath, const char *mode)
     }
     if ( resIdx >= 0x20 )
         return (stdFile_t)0;
-    v6 = 0;
+    success = 0;
 
     // Try in the EXE root (not in resource/), ex "3do\key\kysabrf2.key"
     fhand = pLowLevelHS->fileOpen(fpath, mode);
     if ( fhand )
     {
+        stdPlatform_Printf("Openjkdf2: %s - Opened file successfully in EXE root: %s\n", __func__, fpath);
         v8 = resIdx;
         jkRes_aFiles[v8].useLowLevel = 1;
         jkRes_aFiles[v8].fsHandle = fhand;
         stdString_SafeStrCopy(jkRes_aFiles[resIdx].fpath, fpath, 128);
         jkRes_aFiles[resIdx].bOpened = 1;
-        v6 = 1;
+        success = 1;
     }
     else
     {
-        for (v19 = 0; v19 < 5; v19++)
+        for (gobDirectoryIdx = 0; gobDirectoryIdx < 5; gobDirectoryIdx++)
         {
-            v11 = jkRes_gCtx.aGobDirectories[v19].name;
-            if (!v11 || !v11[0]) continue; // Added: Don't check in the root directory on Linux
+            gobDirectoryName = jkRes_gCtx.aGobDirectories[gobDirectoryIdx].name;
+            if (!gobDirectoryName || !gobDirectoryName[0]) continue;
 
             // Try in episode/[episode name], resource/, etc
             // ex: "episode\JK1\3do\key\kysabrf2.key", "resource/3do\key\kysabrf2.key"
-            stdString_snprintf(jkRes_idkGobPath, 0x80u, "%s%c%s", v11, LEC_PATH_SEPARATOR_CHR, fpath);
-            v12 = pLowLevelHS->fileOpen(jkRes_idkGobPath, mode);
-            if ( v12 )
+     stdString_snprintf(jkRes_idkGobPath, 0x80u, "%s%c%s", gobDirectoryName, LEC_PATH_SEPARATOR_CHR, fpath);
+            fileHandle = pLowLevelHS->fileOpen(jkRes_idkGobPath, mode);
+            if ( fileHandle )
             {
                 v13 = resIdx;
                 jkRes_aFiles[v13].useLowLevel = 1;
-                jkRes_aFiles[v13].fsHandle = v12;
+                jkRes_aFiles[v13].fsHandle = fileHandle;
                 stdString_SafeStrCopy(jkRes_aFiles[resIdx].fpath, jkRes_idkGobPath, 128);
                 jkRes_aFiles[resIdx].bOpened = 1;
-                v6 = 1;
+                success = 1;
             }
 
             // Try in the GOB itself
-            if ( !v6 )
+            if ( !success )
             {
-                for (v18 = 0; v18 < jkRes_gCtx.aGobDirectories[v19].numGobs; v18++)
+                for (gobIdx = 0; gobIdx < jkRes_gCtx.aGobDirectories[gobDirectoryIdx].numGobs; gobIdx++)
                 {
-                    v17 = &jkRes_gCtx.aGobDirectories[v19].gobs[v18];
-                    if ( v6 )
+                    gobFile = &jkRes_gCtx.aGobDirectories[gobDirectoryIdx].gobs[gobIdx];
+                    stdPlatform_Printf("Openjkdf2: %s - Trying to open gob: %s\n", __func__, (*gobFile)->fpath);
+                    if ( success )
                         break;
-                    v14 = stdGob_FileOpen(*v17, fpath);
+                    v14 = stdGob_FileOpen(*gobFile, fpath);
                     if ( v14 )
                     {
                         v15 = resIdx;
@@ -531,19 +563,24 @@ stdFile_t jkRes_FileOpen(const char *fpath, const char *mode)
                         jkRes_aFiles[v15].gobHandle = v14;
                         stdString_SafeStrCopy(jkRes_aFiles[resIdx].fpath, fpath, 128);
                         jkRes_aFiles[resIdx].bOpened = 1;
-                        v6 = 1;
+                        success = 1;
                     }
                 }
             }
         }
     }
-    if ( !v6 ) {
+
+    if ( !success ) {
         // MOTS added: fail log
         //if (Main_failLogFp) {
         //    fputs(Main_failLogFp, "%s", fpath);
         //}
+            stdPlatform_Printf("Openjkdf2: %s - FAILED OPENING FILE: %s\n", __func__, fpath);
         return (stdFile_t)0;
     }
+    // Print out if opening was successful based on v6
+    //stdPlatform_Printf("Openjkdf2: %s - Opened file successfully in gob %s: %s\n", __func__, (*gobFile)->fpath ,  jkRes_aFiles[resIdx].fpath);
+    //stdPlatform_Printf("Openjkdf2: %s - Opened file successfully: %s\n", __func__, jkRes_aFiles[resIdx].fpath);
     return (stdFile_t)(resIdx + 1);
 }
 
@@ -563,6 +600,9 @@ int jkRes_FileClose(stdFile_t fd)
 size_t jkRes_FileRead(stdFile_t fd, void* out, size_t len)
 {
     jkResFile *resFile = &jkRes_aFiles[fd - 1];
+    //stdPlatform_Printf("Openjkdf2: %s fd: %d len: %zu\n", __func__, fd, len);
+    //stdPlatform_Printf("Openjkdf2: %s - use low level: %d\n", __func__, resFile->useLowLevel);
+
 
     if ( resFile->useLowLevel )
         return pLowLevelHS->fileRead(resFile->fsHandle, out, len);

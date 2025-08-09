@@ -131,7 +131,7 @@ void sithWorld_UpdateLoadPercent(flex_t percent)
 int sithWorld_Load(sithWorld *pWorld, char *map_jkl_fname)
 {
     int result; // eax
-    int v3; // esi
+    int parser_idx; // esi
     sithWorldParser *parser; // edi
     int startMsecs; // edi
     __int64 v6; // [esp+1Ch] [ebp-120h]
@@ -166,27 +166,27 @@ int sithWorld_Load(sithWorld *pWorld, char *map_jkl_fname)
         {
             if ( _sscanf(stdConffile_aLine, " section: %s", section) == 1 )
             {
-                v3 = 0;
+                parser_idx = 0;
                 if ( sithWorld_numParsers <= 0 )
                 {
 LABEL_11:
-                    v3 = -1;
+                    parser_idx = -1;
                 }
                 else
                 {
                     parser = sithWorld_aSectionParsers;
                     while ( __strcmpi(parser->section_name, section) )
                     {
-                        ++v3;
+                        ++parser_idx;
                         ++parser;
-                        if ( v3 >= sithWorld_numParsers )
+                        if ( parser_idx >= sithWorld_numParsers )
                             goto LABEL_11;
                     }
                 }
-                if ( v3 != -1 )
+                if ( parser_idx != -1 )
                 {
                     startMsecs = stdPlatform_GetTimeMsec();
-                    if ( !sithWorld_aSectionParsers[v3].funcptr(pWorld, 0) ) {
+                    if ( !sithWorld_aSectionParsers[parser_idx].funcptr(pWorld, 0) ) {
                         // Added
                         _sprintf(tmp, "%f seconds to parse section %s -- FAILED!\n", (flex32_t)v6 * 0.001, section);
                         sithConsole_Print(tmp);

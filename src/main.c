@@ -205,6 +205,9 @@ void crash_handler_basic(int sig);
 #include "SDL2_helper.h"
 #endif // LINUX
 
+#ifdef TARGET_SWITCH
+#include <switch.h>
+#endif // SWITCH
 #ifdef TARGET_TWL
 #include <nds.h>
 #include <fat.h>
@@ -334,6 +337,7 @@ extern "C"
 
 int main(int argc, char** argv)
 {
+    
 #ifdef ARCH_WASM
     EM_ASM(
         FS.mkdir('/jk1/player');
@@ -589,19 +593,19 @@ int main(int argc, char** argv)
     }
 #endif // WIN64_STANDALONE
 
-#if !defined(ARCH_WASM) && !defined(TARGET_ANDROID) && !defined(TARGET_TWL)
+#if !defined(ARCH_WASM) && !defined(TARGET_ANDROID) && !defined(TARGET_SWITCH)  && !defined(TARGET_TWL)
     openjkdf2_pExecutablePath = argv[0];
 #endif // !ARCH_WASM
 
 #ifdef LINUX
 
-#if !defined(ARCH_WASM) && !defined(TARGET_ANDROID)
+#if !defined(ARCH_WASM) && !defined(TARGET_ANDROID) && !defined(TARGET_SWITCH) && !defined(TARGET_TWL)
     signal(SIGSEGV, crash_handler_basic);
     //signal(SIGINT, int_handler);
 #endif // !ARCH_WASM
 
 #ifndef ARCH_64BIT
-#if !defined(ARCH_WASM) && !defined(TARGET_ANDROID)
+#if !defined(ARCH_WASM) && !defined(TARGET_ANDROID) && !defined(TARGET_SWITCH)
     mmap((void*)0x400000, 0x122000, PROT_READ | PROT_WRITE, MAP_ANON|MAP_PRIVATE|MAP_FIXED, -1, 0);
     mmap((void*)0x522000, 0x500000, PROT_READ | PROT_WRITE, MAP_ANON|MAP_PRIVATE|MAP_FIXED, -1, 0);
     
@@ -646,9 +650,13 @@ int main(int argc, char** argv)
 #endif // !ARCH_64BIT
 #endif // LINUX
 
-#ifdef PLATFORM_PHYSFS
+#ifdef PLATFORM_PHYSFS 
     PHYSFS_init(argv[0]);
     PHYSFS_permitSymbolicLinks(0);
+#endif
+#ifdef TARGET_SWITCH
+    stdPlatform_Printf("openjkdf2_bIsFirstLaunch %x\n", openjkdf2_bIsFirstLaunch);
+    chdir("sdmc:/jk/");
 #endif
 
     getcwd(openjkdf2_aOrigCwd, sizeof(openjkdf2_aOrigCwd));
@@ -665,6 +673,7 @@ int main(int argc, char** argv)
 
     while (1)
     {
+
         OpenJKDF2_Globals_Reset();
 
         // Set the mod path
@@ -676,10 +685,9 @@ int main(int argc, char** argv)
         memset(openjkdf2_aRestartPath, 0, sizeof(openjkdf2_aRestartPath));
         Window_Main_Linux(argc, argv);
 
-        printf("openjkdf2_bOrigWasRunningFromExistingInstall %x\n", openjkdf2_bOrigWasRunningFromExistingInstall);
-        printf("openjkdf2_bIsRunningFromExistingInstall %x\n", openjkdf2_bIsRunningFromExistingInstall);
-        printf("openjkdf2_bOrigWasDF2 %x\n", openjkdf2_bOrigWasDF2);
-
+        stdPlatform_Printf("openjkdf2_bOrigWasRunningFromExistingInstall %x\n", openjkdf2_bOrigWasRunningFromExistingInstall);
+        stdPlatform_Printf("openjkdf2_bIsRunningFromExistingInstall %x\n", openjkdf2_bIsRunningFromExistingInstall);
+        stdPlatform_Printf("openjkdf2_bOrigWasDF2 %x\n", openjkdf2_bOrigWasDF2);
         openjkdf2_bIsFirstLaunch = 0;
         if (openjkdf2_restartMode != OPENJKDF2_RESTART_NONE) {
             // Purge any cmdline args that will get in the way.
