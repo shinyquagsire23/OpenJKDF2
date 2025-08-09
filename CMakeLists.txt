@@ -220,6 +220,7 @@ endif()
 # Fcaseopen
 file(GLOB FCASEOPEN_SRCS ${PROJECT_SOURCE_DIR}/src/external/fcaseopen/*.c)
 list(APPEND ENGINE_SOURCE_FILES ${FCASEOPEN_SRCS})
+list(APPEND ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/Main/InstallHelper.c)
 include_directories(${PROJECT_SOURCE_DIR}/src/external/fcaseopen)
 
 # The rest of the conditional/TARGET_* dependencies
@@ -249,7 +250,6 @@ endif()
 add_library(sith_engine OBJECT ${ENGINE_SOURCE_FILES})
 plat_specific_deps()
 #list(REMOVE_ITEM ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/main.c)
-list(REMOVE_ITEM ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/main_switch_simple.c)
 
 if(TARGET_ANDROID )
     add_library(${BIN_NAME} SHARED ${GAME_MAIN_SOURCE_FILES})
@@ -265,8 +265,11 @@ elseif(TARGET_HOOKS)
     target_link_libraries(${BIN_NAME}_kvm PRIVATE  ${SDL2_COMMON_LIBS} sith_engine)
 elseif(TARGET_SWITCH)
     add_library(objlib OBJECT ${GAME_MAIN_SOURCE_FILES})
-    add_executable(${BIN_NAME} $<TARGET_OBJECTS:objlib>)
+    add_executable(${BIN_NAME} $<TARGET_OBJECTS:objlib>
+     $<TARGET_OBJECTS:sith_engine>)
+    
     message(STATUS "Applying PIE flags to ${BIN_NAME}")
+    target_link_libraries(${BIN_NAME} PRIVATE ${SDL2_COMMON_LIBS} sith_engine)
 
     target_compile_options(${BIN_NAME} PRIVATE -fPIE)
     target_link_options(${BIN_NAME} PRIVATE -pie -Wl,-Ttext-segment=0x8000000)
