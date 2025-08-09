@@ -202,6 +202,7 @@ int jkRes_FileExists(const char *fpath, char *a2, int len)
 int jkRes_ReadKeyFromFile(const char* fpath)
 {
     int keyval;
+    stdPlatform_Printf("OpenJKDF2: %s - Reading key from file: %s\n", __func__, fpath);
 
     stdFile_t fd = pHS->fileOpen(fpath, "rb");
     if (!fd)
@@ -216,12 +217,16 @@ int jkRes_ReadKeyFromFile(const char* fpath)
 // Added
 int jkRes_ReadKeyRaw()
 {
+        stdPlatform_Printf("OpenJKDF2: %s - Reading key raw: %s\n", __func__);
+
     return jkRes_ReadKeyFromFile("jk_.cd");
 }
 
 // Added
 int jkRes_ReadKeyRawEarly()
 {
+            stdPlatform_Printf("OpenJKDF2: %s - Reading key raw early: %s\n", __func__);
+
     return jkRes_ReadKeyFromFile("resource/jk_.cd");
 }
 
@@ -247,10 +252,13 @@ int jkRes_ReadKey()
 int jkRes_LoadNew(jkResGobDirectory *resGob, char *name, int a3)
 {
 
+
+    #ifdef TARGET_SWITCH
    char  path[255] = {0};
     getcwd(path, 255);
     chdir("sdmc:/jk/");
-    stdPlatform_Printf("Openjkdf2 loadNew:  Current working directory: %s\n", path);
+        stdPlatform_Printf("Openjkdf2 loadNew:  Current working directory: %s\n", path);
+    #endif
     stdFileSearch *v15; // ebp
     stdFileSearchResult v18; // [esp+8h] [ebp-10Ch] BYREF
 
@@ -330,6 +338,7 @@ int jkRes_NewGob(jkResGobDirectory *gobFullpath, char *gobFolder, char *gobFname
 
 int jkRes_LoadCD(int cdNumberNeeded)
 {
+        stdPlatform_Printf("OpenJKDF2 - read cd: %s\n", __func__); // Added
     int v1; // eax
     unsigned int v3; // edi
     stdGob **v4; // esi
@@ -382,7 +391,7 @@ int jkRes_LoadCD(int cdNumberNeeded)
             pHS->fileClose(v1);
         }
 
-#ifdef TARGET_TWL
+#if defined(TARGET_TWL) || defined(TARGET_SWITCH)
         v23 = 1;
 #endif
         
@@ -508,6 +517,7 @@ stdFile_t jkRes_FileOpen(const char *fpath, const char *mode)
     fhand = pLowLevelHS->fileOpen(fpath, mode);
     if ( fhand )
     {
+        stdPlatform_Printf("Openjkdf2: %s - Opened file successfully in EXE root: %s\n", __func__, fpath);
         v8 = resIdx;
         jkRes_aFiles[v8].useLowLevel = 1;
         jkRes_aFiles[v8].fsHandle = fhand;
@@ -569,8 +579,8 @@ stdFile_t jkRes_FileOpen(const char *fpath, const char *mode)
         return (stdFile_t)0;
     }
     // Print out if opening was successful based on v6
-    stdPlatform_Printf("Openjkdf2: %s - Opened file successfully in gob %s: %s\n", __func__, (*gobFile)->fpath ,  jkRes_aFiles[resIdx].fpath);
-    stdPlatform_Printf("Openjkdf2: %s - Opened file successfully: %s\n", __func__, jkRes_aFiles[resIdx].fpath);
+    //stdPlatform_Printf("Openjkdf2: %s - Opened file successfully in gob %s: %s\n", __func__, (*gobFile)->fpath ,  jkRes_aFiles[resIdx].fpath);
+    //stdPlatform_Printf("Openjkdf2: %s - Opened file successfully: %s\n", __func__, jkRes_aFiles[resIdx].fpath);
     return (stdFile_t)(resIdx + 1);
 }
 

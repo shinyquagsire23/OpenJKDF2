@@ -24,7 +24,7 @@
 
 static int jkGuiPlayer_bInitted = 0;
 
-static wchar_t jkGuiPlayer_awTmp_555D28[0x100] = {0};
+static wchar_t wCharPlayerName[0x100] = {0};
 static const char* jkGuiPlayer_GuiDifficulties[3] = {"GUI_EASY", "GUI_MED", "GUI_HARD"};
 
 static int32_t jkGuiPlayer_menuSelectIdk[2] = {0xFA, 0};
@@ -105,7 +105,7 @@ void jkGuiPlayer_Shutdown()
     jkGuiPlayer_bInitted = 0;
 
     // Added: clean reset
-    memset(jkGuiPlayer_awTmp_555D28, 0, sizeof(jkGuiPlayer_awTmp_555D28));
+    memset(wCharPlayerName, 0, sizeof(wCharPlayerName));
 }
 
 int jkGuiPlayer_sub_410640(Darray *array, jkGuiElement *element)
@@ -114,7 +114,7 @@ int jkGuiPlayer_sub_410640(Darray *array, jkGuiElement *element)
     stdFileSearch *v3; // eax
     stdFileSearch *v4; // ebp
     int v5; // eax
-    wchar_t *v6; // eax
+    wchar_t *guiDifficulty; // eax
     int v8; // [esp+10h] [ebp-3B4h] BYREF
     int v9; // [esp+14h] [ebp-3B0h] BYREF
     char a1a[32]; // [esp+18h] [ebp-3ACh] BYREF
@@ -137,6 +137,7 @@ int jkGuiPlayer_sub_410640(Darray *array, jkGuiElement *element)
                 stdString_snprintf(jkl_fname, 128, "player%c%s%c%s.plr", LEC_PATH_SEPARATOR_CHR, searchRes.fpath, LEC_PATH_SEPARATOR_CHR, searchRes.fpath);
                 if ( searchRes.is_subdirectory && searchRes.fpath[0] != '.' && util_FileExists(jkl_fname) )
                 {
+                    stdPlatform_Printf("OpenJKDF2: %s - Found player file: %s\n", __func__, jkl_fname);
                     _memset(tmp, 0, sizeof(tmp));
                     stdString_CharToWchar(tmp, searchRes.fpath, 255);
                     tmp[255] = 0;
@@ -169,9 +170,9 @@ int jkGuiPlayer_sub_410640(Darray *array, jkGuiElement *element)
                     {
                         v5 = 1;
                     }
-                    v6 = jkStrings_GetUniStringWithFallback(jkGuiPlayer_GuiDifficulties[v5]);
-                    if (v6) // Added: avoid nullptr deref
-                        __wcscat(tmp, v6);
+                    guiDifficulty = jkStrings_GetUniStringWithFallback(jkGuiPlayer_GuiDifficulties[v5]);
+                    if (guiDifficulty) // Added: avoid nullptr deref
+                        __wcscat(tmp, guiDifficulty);
                     jkGuiRend_DarrayReallocStr(array, tmp, 0);
                     if ( !__strcmpi(searchRes.fpath, a1a) )
                         element->selectedTextEntry = v2;
@@ -194,9 +195,9 @@ void jkGuiPlayer_ShowNewPlayer(int a1)
     jkGuiStringEntry *v3; // eax
     const wchar_t *v4; // esi
     wchar_t *v5; // eax
-    int v6; // esi
-    int v7; // edi
-    const wchar_t *v8; // eax
+    int hasError; // esi
+    int ok_result; // edi
+    const wchar_t *errorMessage; // eax
     wchar_t *v9; // eax
     wchar_t *v10; // eax
     jkGuiStringEntry *v11; // eax
@@ -207,7 +208,7 @@ void jkGuiPlayer_ShowNewPlayer(int a1)
     Darray a1a; // [esp+1Ch] [ebp-658h] BYREF
     char v17[32]; // [esp+34h] [ebp-640h] BYREF
     char v18[32]; // [esp+54h] [ebp-620h] BYREF
-    char v19[128]; // [esp+74h] [ebp-600h] BYREF
+    char playerName[128]; // [esp+74h] [ebp-600h] BYREF
     char v20[128]; // [esp+F4h] [ebp-580h] BYREF
     char v21[128]; // [esp+174h] [ebp-500h] BYREF
     char PathName[128]; // [esp+1F4h] [ebp-480h] BYREF
@@ -276,8 +277,8 @@ void jkGuiPlayer_ShowNewPlayer(int a1)
                 continue;
             case 2:
                 jkGuiPlayer_menuNewElements[9].bIsVisible = v15 == 0;
-                jkGuiPlayer_menuNewElements[3].wstr = jkGuiPlayer_awTmp_555D28;
-                _memset(jkGuiPlayer_awTmp_555D28, 0, 16 * sizeof(wchar_t));
+                jkGuiPlayer_menuNewElements[3].wstr = wCharPlayerName;
+                _memset(wCharPlayerName, 0, 16 * sizeof(wchar_t));
                 jkGuiPlayer_menuNewElements[3].selectedTextEntry = 16;
                 jkGuiPlayer_menuNewElements[8].unistr = 0;
                 jkGuiPlayer_menuNewElements[5].selectedTextEntry = 0;
@@ -303,50 +304,50 @@ void jkGuiPlayer_ShowNewPlayer(int a1)
         }
         do
         {
-            v6 = 0;
+            hasError = 0;
             jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiPlayer_menuNew, &jkGuiPlayer_menuNewElements[10]);
             if ( !v15 )
                 jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiPlayer_menuNew, &jkGuiPlayer_menuNewElements[9]);
-            v7 = jkGuiRend_DisplayAndReturnClicked(&jkGuiPlayer_menuNew);
-            if ( v7 == 1 )
+            ok_result = jkGuiRend_DisplayAndReturnClicked(&jkGuiPlayer_menuNew);
+            if ( ok_result == 1 )
             {
-                if ( jkGuiPlayer_awTmp_555D28[0] )
+                if ( wCharPlayerName[0] )
                 {
-                    if ( jkPlayer_VerifyWcharName(jkGuiPlayer_awTmp_555D28) )
+                    if ( jkPlayer_VerifyWcharName(wCharPlayerName) )
                     {
-                        stdString_WcharToChar(v19, jkGuiPlayer_awTmp_555D28, 127);
-                        v19[127] = 0;
-                        stdFnames_MakePath(v21, 128, "player", v19);
-                        stdString_snprintf(v21, 128, "player%c%s%c%s.plr", LEC_PATH_SEPARATOR_CHR, v19, LEC_PATH_SEPARATOR_CHR, v19);
+                        stdString_WcharToChar(playerName, wCharPlayerName, 127);
+                        playerName[127] = 0;
+                        stdFnames_MakePath(v21, 128, "player", playerName);
+                        stdString_snprintf(v21, 128, "player%c%s%c%s.plr", LEC_PATH_SEPARATOR_CHR, playerName, LEC_PATH_SEPARATOR_CHR, playerName);
                         if ( !util_FileExists(v21) )
                             continue;
-                        v6 = 1;
-                        v8 = jkStrings_GetUniStringWithFallback("ERR_PLAYER_ALREADY_EXISTS");
+                        hasError = 1;
+                        errorMessage = jkStrings_GetUniStringWithFallback("ERR_PLAYER_ALREADY_EXISTS");
                     }
                     else
                     {
-                        v6 = 1;
-                        v8 = jkStrings_GetUniStringWithFallback("ERR_BAD_PLAYER_NAME");
+                        hasError = 1;
+                        errorMessage = jkStrings_GetUniStringWithFallback("ERR_BAD_PLAYER_NAME");
                     }
                 }
                 else
                 {
-                    v6 = 1;
-                    v8 = jkStrings_GetUniStringWithFallback("ERR_NO_PLAYER_NAME");
+                    hasError = 1;
+                    errorMessage = jkStrings_GetUniStringWithFallback("ERR_NO_PLAYER_NAME");
                 }
-                jkGuiPlayer_menuNewElements[8].wstr = v8;
+                jkGuiPlayer_menuNewElements[8].wstr = errorMessage;
             }
         }
-        while ( v6 );
-        if ( v7 == 1 )
+        while ( hasError );
+        if ( ok_result == 1 )
         {
             if ( jkGuiPlayer_menuNewElements[5].selectedTextEntry )
                 jkPlayer_setDiff = 0;
             else
                 jkPlayer_setDiff = 2 - (jkGuiPlayer_menuNewElements[6].selectedTextEntry != 0);
-            jkPlayer_CreateConf(jkGuiPlayer_awTmp_555D28);
+            jkPlayer_CreateConf(wCharPlayerName);
         }
-        if ( v7 < 0 )
+        if ( ok_result < 0 )
             v14 = 1;
     }
     while ( v14 );

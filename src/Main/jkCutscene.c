@@ -253,6 +253,10 @@ int jkCutscene_Show(char* fpath)
     return 1;
 #endif
 
+#if defined(TARGET_SWITCH)
+return 1;
+#endif
+
 #if defined(TARGET_TWL)
     // TODO: Find a way to make sure enough memory is free during cutscenes
     // (move them back to before the level load?)

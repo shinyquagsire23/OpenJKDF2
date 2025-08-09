@@ -27,7 +27,6 @@
 char* stdEmbeddedRes_LoadOnlyInternal(const char* filepath, size_t* pOutSz)
 {
     stdPlatform_Printf("OpenJKDF2: %s - Loading embedded resource: %s\n", __func__, filepath);
-    int exists = 0;
 #ifdef TARGET_TWL 
     struct stat statstuff;
     int exists = 0;

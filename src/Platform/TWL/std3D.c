@@ -354,7 +354,6 @@ int std3D_Startup()
 {
     // TODO: Not on 3DS?
     std3D_bEnableTwlVrr = 1;
-
     // initialize gl
     glInit();
 

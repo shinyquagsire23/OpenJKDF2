@@ -267,6 +267,7 @@ elseif(TARGET_SWITCH)
  
 
 
+
     add_library(objlib OBJECT ${GAME_MAIN_SOURCE_FILES})
     add_executable(${BIN_NAME}  $<TARGET_OBJECTS:sith_engine> $<TARGET_OBJECTS:objlib>
     )
@@ -277,6 +278,17 @@ elseif(TARGET_SWITCH)
     target_compile_options(${BIN_NAME} PRIVATE -fPIE)
     target_link_options(${BIN_NAME} PRIVATE -pie -Wl,-Ttext-segment=0x8000000)
     target_link_options(${BIN_NAME} PRIVATE -pie -Wl,-Ttext-segment=0x8000000)
+    if(TARGET_USE_SDL2)
+    target_link_libraries(${BIN_NAME} PRIVATE -lSDL2main -lSDL2 -lSDL2_mixer)
+endif()
+
+if(TARGET_USE_OPENAL)
+    target_link_libraries(${BIN_NAME} PRIVATE -lopenal)
+endif()
+
+if(TARGET_USE_PHYSFS)
+    target_link_libraries(${BIN_NAME} PRIVATE -lphysfs)
+endif()
 else()
     add_executable(${BIN_NAME} ${GAME_MAIN_SOURCE_FILES})
     target_link_libraries(${BIN_NAME} PRIVATE ${SDL2_COMMON_LIBS} sith_engine)
@@ -290,17 +302,6 @@ else()
     endif()
 endif()
 
-if(TARGET_USE_SDL2)
-    target_link_libraries(${BIN_NAME} PRIVATE -lSDL2main -lSDL2 -lSDL2_mixer)
-endif()
-
-if(TARGET_USE_OPENAL)
-    target_link_libraries(${BIN_NAME} PRIVATE -lopenal)
-endif()
-
-if(TARGET_USE_PHYSFS)
-    target_link_libraries(${BIN_NAME} PRIVATE -lphysfs)
-endif()
 
 # TODO byacc and flex
 # maxamillion@Maxs-MacBook-Pro Cog % ../../flex/flex -i cog.l
@@ -315,8 +316,7 @@ if(NOT OPENJKDF2_NO_ASAN)
 
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address -fsanitize=float-divide-by-zero")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fsanitize=float-divide-by-zero")
-    message(STATUS "test1234")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address -fsanitize=float-divide-by-zero -pie -fPIE -Wl,-Ttext-segment=0x8000000" )
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address -fsanitize=float-divide-by-zero")
     set(SANITIZE_ADDRESS TRUE)
     #target_link_libraries(${BIN_NAME} PRIVATE "-static-libsan")
 

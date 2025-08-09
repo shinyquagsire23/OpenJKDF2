@@ -16,7 +16,7 @@
 #include "Devices/sithConsole.h"
 #include "Platform/wuRegistry.h"
 #include "Main/jkQuakeConsole.h"
-
+#include "Gui/jkGUIRend.h"
 #include "jk.h"
 
 #ifdef ARCH_WASM
@@ -1146,7 +1146,6 @@ EM_JS(int, canvas_get_height, (), {
 
 void Window_RecreateSDL2Window()
 {
-    appletMainLoop();
 #if 0
     SDL_Event event;
     SDL_Window *window;
@@ -1197,7 +1196,7 @@ void Window_RecreateSDL2Window()
 
     //consoleUpdate(NULL);
 
-    stdPlatform_Printf("Recreating SDL2 Window!\n");
+    stdPlatform_Printf("Recreating SDL2 WinRecreating SDLdow!\n");
     Window_needsRecreate = 0;
 
     if (displayWindow) {
@@ -1233,11 +1232,12 @@ void Window_RecreateSDL2Window()
 #endif
 #ifdef TARGET_SWITCH
     flags=0;
-#endif
-
     stdPlatform_Printf("test");
     stdPlatform_Printf("creating window");
     consoleUpdate(NULL);
+#endif
+
+
 #ifdef ARCH_WASM
     displayWindow = SDL_CreateWindow(Window_isHiDpi ? "OpenJKDF2 HiDPI" : "OpenJKDF2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, canvas_get_width(), canvas_get_height(), flags);
 #elif defined(TARGET_ANDROID)
@@ -1265,19 +1265,15 @@ void Window_RecreateSDL2Window()
         stdPlatform_Printf("SDL_CreateWindow failed: %s\n", SDL_GetError());
     }
 
-
-    if (!displayWindow) {
-        stdPlatform_Printf("created window failed");
-        stdPlatform_Printf("SDL ERROR: %s", SDL_GetError());
-        consoleUpdate(NULL);
-    }
     stdPlatform_Printf("We have a window ladies %s", displayWindow);
 
 
 
 #else
+
     displayWindow = SDL_CreateWindow(Window_isHiDpi ? "OpenJKDF2 HiDPI" : "OpenJKDF2", Window_xPos, Window_yPos, Window_screenXSize, Window_screenYSize, flags);
 #endif
+
     if (!displayWindow) {
         char errtmp[256];
         stdPlatform_Printf(errtmp, 256, "!! Failed to create SDL2 window !!\n%s", SDL_GetError());
@@ -1289,14 +1285,12 @@ void Window_RecreateSDL2Window()
 #if defined(MACOS) && defined(__aarch64__)
     //SDL_FixWindowMacOS(displayWindow);
 #endif
-#if !defined(TARGET_SWITCH)
     if (Window_isFullscreen) {
         SDL_SetWindowFullscreen(displayWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
     }
     else {
         SDL_SetWindowFullscreen(displayWindow, 0);
     }
-#endif
     stdPlatform_Printf("SDL ERROR: %s", SDL_GetError());
 
     glWindowContext = SDL_GL_CreateContext(displayWindow);
@@ -1305,7 +1299,7 @@ void Window_RecreateSDL2Window()
     if (glWindowContext == NULL)
     {
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
         SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
         //SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
@@ -1316,7 +1310,6 @@ void Window_RecreateSDL2Window()
     {
         char errtmp[256];
         stdPlatform_Printf("SDL ERROR: %s", SDL_GetError());
-        consoleUpdate(NULL);
         stdPlatform_Printf(errtmp, 256, "!! Failed to initialize SDL OpenGL context !!\n%s", SDL_GetError());
        // SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", errtmp, NULL);
         exit(-1);
@@ -1324,8 +1317,6 @@ void Window_RecreateSDL2Window()
 
     SDL_GL_MakeCurrent(displayWindow, glWindowContext);
     SDL_GL_SetSwapInterval(jkPlayer_enableVsync); // Disable vsync
-    SDL_StartTextInput();
-
     SDL_GL_GetDrawableSize(displayWindow, &Window_xSize, &Window_ySize);
     SDL_GetWindowSize(displayWindow, &Window_screenXSize, &Window_screenYSize);
 
@@ -1350,17 +1341,9 @@ int Window_Main_Linux(int argc, char** argv)
     char cmdLine[1024];
     int result;
     int done = 0, x = 0, w = 1920, h = 1080;
+
+    stdPlatform_Printf("Window Main Linux called: %d x %d\n", Window_screenXSize, Window_screenYSize);
     // Init SDL
-    //SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "1");
-    //SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_NOPARACHUTE);
-    // mandatory at least on switch, else gfx is not properly closed
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0) {
-        stdPlatform_Printf("Init error .... %x\n");
-        consoleUpdate(NULL);
-    }
-    stdPlatform_Printf("Screen size: %d x %d\n", Window_screenXSize, Window_screenYSize);
-    stdPlatform_Printf("Init was good .... %x\n");
-    consoleUpdate(NULL);
     
     Window_RecreateSDL2Window();
 #if !defined(TARGET_ANDROID) && !defined(TARGET_SWITCH)  && !defined(TARGET_SWITCH) && !defined(ARCH_WASM)

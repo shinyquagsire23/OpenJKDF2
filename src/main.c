@@ -655,12 +655,9 @@ int main(int argc, char** argv)
     PHYSFS_permitSymbolicLinks(0);
 #endif
 #ifdef TARGET_SWITCH
-    romfsInit();
-    chdir("sdmc:/");
-    appletSetIdleTimeDetectionExtension(AppletIdleTimeDetectionExtension_None);
-    appletSetAutoSleepDisabled(true);
+    stdPlatform_Printf("openjkdf2_bIsFirstLaunch %x\n", openjkdf2_bIsFirstLaunch);
+    chdir("sdmc:/jk/");
 #endif
-
 
     getcwd(openjkdf2_aOrigCwd, sizeof(openjkdf2_aOrigCwd));
 
@@ -688,9 +685,9 @@ int main(int argc, char** argv)
         memset(openjkdf2_aRestartPath, 0, sizeof(openjkdf2_aRestartPath));
         Window_Main_Linux(argc, argv);
 
-        printf("openjkdf2_bOrigWasRunningFromExistingInstall %x\n", openjkdf2_bOrigWasRunningFromExistingInstall);
-        printf("openjkdf2_bIsRunningFromExistingInstall %x\n", openjkdf2_bIsRunningFromExistingInstall);
-        printf("openjkdf2_bOrigWasDF2 %x\n", openjkdf2_bOrigWasDF2);
+        stdPlatform_Printf("openjkdf2_bOrigWasRunningFromExistingInstall %x\n", openjkdf2_bOrigWasRunningFromExistingInstall);
+        stdPlatform_Printf("openjkdf2_bIsRunningFromExistingInstall %x\n", openjkdf2_bIsRunningFromExistingInstall);
+        stdPlatform_Printf("openjkdf2_bOrigWasDF2 %x\n", openjkdf2_bOrigWasDF2);
         openjkdf2_bIsFirstLaunch = 0;
         if (openjkdf2_restartMode != OPENJKDF2_RESTART_NONE) {
             // Purge any cmdline args that will get in the way.
