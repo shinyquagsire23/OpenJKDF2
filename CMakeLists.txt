@@ -34,7 +34,7 @@ set(PLAT_ANDROID_ARM64 FALSE CACHE BOOL "Android AArch64")
 set(PLAT_TWL FALSE CACHE BOOL "Nintendo DSi")
 set(PLAT_SWITCH FALSE CACHE BOOL "Nintendo Switch")
 set(PLAT_AUTO FALSE CACHE BOOL "Target the host OS")
-
+    set(DEBUG TRUE)
 # Set PLAT_AUTO if a platform isn't specifically selected
 if(NOT PLAT_LINUX_32 AND NOT PLAT_LINUX_64 AND NOT PLAT_MACOS AND NOT PLAT_MACOS_X86_64 AND NOT PLAT_MINGW_X86_64 AND NOT PLAT_WASM AND NOT PLAT_HOOKS AND NOT PLAT_TWL AND NOT PLAT_SWITCH)
     set(PLAT_AUTO TRUE)
@@ -141,17 +141,14 @@ elseif(PLAT_MSVC)
 elseif(PLAT_TWL)
     include(cmake_modules/plat_twl.cmake)
 elseif(PLAT_SWITCH)
-    include(cmake_modules/plat_switch.cmake)
-else()
-    set(PLAT_SWITCH TRUE)
+        set(PLAT_SWITCH TRUE)
     set(NINTENDO_SWITCH TRUE)
     set(SWITCH TRUE)
     include(cmake_modules/plat_switch.cmake)
+else()
+
+    include(cmake_modules/plat_switch.cmake)
 endif()
-set(PLAT_SWITCH TRUE)
-set(NINTENDO_SWITCH TRUE)
-set(SWITCH TRUE)
-include(cmake_modules/plat_switch.cmake)
 # Establishes compile options, binary/library names, defines, etc
 plat_initialize()
 
@@ -199,19 +196,14 @@ file(GLOB ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/*.c
         ${PROJECT_SOURCE_DIR}/src/Platform/Common/*.c
         ${PROJECT_SOURCE_DIR}/src/Platform/Common/*.cpp)
 
-list(REMOVE_ITEM ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/main_switch_simple.c)
 # Game main
 file(GLOB GAME_MAIN_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/main.c)
 
-#file(GLOB GAME_MAIN_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/main_switch_simple.c)
-list(REMOVE_ITEM ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/main_switch_simple.c)
 
 # Remove test sources from glob
 file(GLOB TEST_SRCS ${PROJECT_SOURCE_DIR}/src/Tests/*.c)
 list(REMOVE_ITEM ENGINE_SOURCE_FILES ${TEST_SRCS})
 list(REMOVE_ITEM ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/main.c)
-#list(REMOVE_ITEM ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/main_switch_simple.c)
-#list(REMOVE_ITEM ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/main_minimal.c)
 
 # Remove multiplayer menus from compilation
 file(GLOB MULTIPLAYER_MENU_SRCS
@@ -271,7 +263,7 @@ elseif(TARGET_HOOKS)
 
     target_link_libraries(${BIN_NAME} PRIVATE ${SDL2_COMMON_LIBS} sith_engine)
     target_link_libraries(${BIN_NAME}_kvm PRIVATE  ${SDL2_COMMON_LIBS} sith_engine)
-else()
+elseif(TARGET_SWITCH)
     add_library(objlib OBJECT ${GAME_MAIN_SOURCE_FILES})
     add_executable(${BIN_NAME} $<TARGET_OBJECTS:objlib>)
     message(STATUS "Applying PIE flags to ${BIN_NAME}")
@@ -279,7 +271,8 @@ else()
     target_compile_options(${BIN_NAME} PRIVATE -fPIE)
     target_link_options(${BIN_NAME} PRIVATE -pie -Wl,-Ttext-segment=0x8000000)
     target_link_options(${BIN_NAME} PRIVATE -pie -Wl,-Ttext-segment=0x8000000)
-    #add_executable(${BIN_NAME} ${GAME_MAIN_SOURCE_FILES})
+else()
+    add_executable(${BIN_NAME} ${GAME_MAIN_SOURCE_FILES})
     target_link_libraries(${BIN_NAME} PRIVATE ${SDL2_COMMON_LIBS} sith_engine)
 
     if(TARGET_BUILD_TESTS AND TARGET_MACOS)

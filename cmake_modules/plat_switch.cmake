@@ -21,6 +21,7 @@ set(PORTLIBS "${DEVKITPRO}/portlibs/switch")
     add_definitions(-D_XOPEN_SOURCE=500)
     add_definitions(-D_DEFAULT_SOURCE)
     add_definitions(-D__SWITCH__)
+    add_definitions(-DDEBUG)
     add_definitions(-DARM64)
     add_definitions(-DSMK_FAST)
 
@@ -55,7 +56,7 @@ set(PORTLIBS "${DEVKITPRO}/portlibs/switch")
     set(OpenGL_EGL_FOUND TRUE)
     set(OPENGL_opengl_LIBRARY "")
     set(OPENGL_glx_LIBRARY "")
-    
+    set(DEBUG TRUE)
 
     # Compiler and linker flags for static linking
     add_compile_options(-g -Wall -ffunction-sections)
