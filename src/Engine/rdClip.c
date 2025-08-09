@@ -206,7 +206,7 @@ int rdClip_CalcOutcode2(rdCanvas *canvas, int x, int y)
     return result;
 }
 
-int rdClip_Point3(rdClipFrustum *clipFrustum, rdVector3 *point)
+int rdClip_Point3(const rdClipFrustum* NO_ALIAS clipFrustum, rdVector3 *point)
 {
     if ( point->y < (flex_d_t)clipFrustum->zNear )
         return 0;
@@ -229,7 +229,7 @@ int rdClip_Point3(rdClipFrustum *clipFrustum, rdVector3 *point)
     return v7 <= point->z;
 }
 
-int rdClip_Line3Project(rdClipFrustum *clipFrustum, rdVector3 *point1, rdVector3 *point2, int *out1, int *out2)
+int rdClip_Line3Project(const rdClipFrustum* NO_ALIAS clipFrustum, rdVector3 *point1, rdVector3 *point2, int *out1, int *out2)
 {
     flex_d_t v10; // st7
     flex_d_t v12; // st6
@@ -675,7 +675,7 @@ int rdClip_Line3Project(rdClipFrustum *clipFrustum, rdVector3 *point1, rdVector3
     return 1;
 }
 
-int rdClip_Line3Ortho(rdClipFrustum *clipFrustum, rdVector3 *point1, rdVector3 *point2, int *out1, int *out2)
+int rdClip_Line3Ortho(const rdClipFrustum* NO_ALIAS clipFrustum, rdVector3 *point1, rdVector3 *point2, int *out1, int *out2)
 {
     flex_d_t v8; // st7
     flex_d_t v10; // st6
@@ -898,7 +898,7 @@ int rdClip_Line3Ortho(rdClipFrustum *clipFrustum, rdVector3 *point1, rdVector3 *
     return 1;
 }
 
-int rdClip_Line3(rdClipFrustum *clipFrustum, rdVector3 *point1, rdVector3 *point2, rdVector3 *pointOut1, rdVector3 *pointOut2, int *out1, int *out2)
+int rdClip_Line3(const rdClipFrustum* NO_ALIAS clipFrustum, rdVector3 *point1, rdVector3 *point2, rdVector3 *pointOut1, rdVector3 *pointOut2, int *out1, int *out2)
 {
     signed int ret;
     rdVector3 vertex_out;
@@ -1488,7 +1488,7 @@ int rdClip_Face3W(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3* NO_ALIA
 int rdClip_Face3GT(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3* NO_ALIAS pVertices, rdVector2* NO_ALIAS pTVertices, flex_t* NO_ALIAS pIVertices, int numVertices)
 {
 #ifdef EXPERIMENTAL_FIXED_POINT
-    const int premultiplyA = 16;
+    const int premultiplyA = 2;
     const int premultiplyASquared = premultiplyA*premultiplyA;
 #else
     const flex_t premultiplyA = 1.0;
@@ -2096,7 +2096,7 @@ int rdClip_Face3GT(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3* NO_ALI
     return numOnScreenVertices;
 }
 
-int rdClip_Face3S(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices)
+int rdClip_Face3S(const rdClipFrustum* NO_ALIAS frustum, rdVector3 *vertices, int numVertices)
 {
     INST_WORKBUFS
 
@@ -2514,7 +2514,7 @@ int rdClip_Face3S(rdClipFrustum *frustum, rdVector3 *vertices, int numVertices)
     return v5;
 }
 
-int rdClip_Face3GS(rdClipFrustum *frustum, rdVector3 *vertices, flex_t *a3, int numVertices)
+int rdClip_Face3GS(const rdClipFrustum* NO_ALIAS frustum, rdVector3 *vertices, flex_t *a3, int numVertices)
 {
     INST_WORKBUFS
 
@@ -3188,11 +3188,15 @@ int rdClip_Face3T(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3* NO_ALIA
     pLastTVertIter = &pSourceTVert[numVertices - 1];
 
 #ifdef EXPERIMENTAL_FIXED_POINT
-    const int premultiplyA = 16;
+    const int premultiplyA = 2;
     const int premultiplyASquared = premultiplyA*premultiplyA;
+    const int premultiplyB = 16;
+    const int premultiplyBSquared = premultiplyB*premultiplyB;
 #else
     const flex_t premultiplyA = 1.0;
     const flex_t premultiplyASquared = 1.0;
+    const flex_t premultiplyB = 1.0;
+    const flex_t premultiplyBSquared = 1.0;
 #endif
 
 #ifdef RDCLIP_CLIP_ZFAR_FIRST
@@ -3486,27 +3490,27 @@ int rdClip_Face3T(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3* NO_ALIA
             v215 = pVertIter->y - pLastVertIter->y;
             v211 = pVertIter->z - pLastVertIter->z;
 
-            v122 = (((pVertIter->y * premultiplyA) * (pLastVertIter->z * premultiplyA)) - ((pVertIter->z * premultiplyA) * (pLastVertIter->y * premultiplyA)));
-            v207 = ((pClipFrustum->bottom * premultiplyA) * (v215 * premultiplyA) - (v211 * premultiplyASquared));
+            v122 = (((pVertIter->y * premultiplyB) * (pLastVertIter->z * premultiplyB)) - ((pVertIter->z * premultiplyB) * (pLastVertIter->y * premultiplyB)));
+            v207 = ((pClipFrustum->bottom * premultiplyB) * (v215 * premultiplyB) - (v211 * premultiplyBSquared));
             if (v207 != 0.0)
             {
                 v123 = v122 / v207;
             }
             else {
-                v123 = v122 / premultiplyASquared;
+                v123 = v122 / premultiplyBSquared;
             }
-            v126 = (pClipFrustum->bottom * premultiplyA) * (v123 * premultiplyA);
+            v126 = (pClipFrustum->bottom * premultiplyB) * (v123 * premultiplyB);
             v127 = stdMath_Fabs(v215);
             v130 = stdMath_Fabs(v211);
             if ( v127 <= v130 ) {
-                v132 = ((v126 - (pLastVertIter->z * premultiplyASquared))) / (v211 * premultiplyASquared);
+                v132 = ((v126 - (pLastVertIter->z * premultiplyBSquared))) / (v211 * premultiplyBSquared);
             }
             else {
-                v132 = ((v123 - pLastVertIter->y) * premultiplyASquared) / (v215 * premultiplyASquared);
+                v132 = ((v123 - pLastVertIter->y) * premultiplyBSquared) / (v215 * premultiplyBSquared);
             }
             pWorkVertIter->x = ((pVertIter->x - pLastVertIter->x) * v132) + pLastVertIter->x;
             pWorkVertIter->y = v123;
-            pWorkVertIter->z = v126 / premultiplyASquared;
+            pWorkVertIter->z = v126 / premultiplyBSquared;
             
             pWorkTVertIter->x = (pTVertIter->x - pLastTVertIter->x) * v132 + pLastTVertIter->x;
             pWorkTVertIter->y = (pTVertIter->y - pLastTVertIter->y) * v132 + pLastTVertIter->y;
@@ -3563,7 +3567,7 @@ int rdClip_Face3T(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3* NO_ALIA
             flex_t tmpdiv = (pVertIter->y - pLastVertIter->y);
 #ifdef EXPERIMENTAL_FIXED_POINT
             if (tmpdiv != 0.0) {
-                v150 = ((pClipFrustum->zNear - pLastVertIter->y) * premultiplyASquared) / (tmpdiv * premultiplyASquared);
+                v150 = ((pClipFrustum->zNear - pLastVertIter->y) * premultiplyBSquared) / (tmpdiv * premultiplyBSquared);
             }
             else {
                 v150 = (pClipFrustum->zNear - pLastVertIter->y);
@@ -3674,7 +3678,7 @@ int rdClip_Face3T(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3* NO_ALIA
 }
 // MOTS TODO
 
-int rdClip_Face3GSRGB(rdClipFrustum *frustum,rdVector3 *vertices,flex_t *pR,flex_t *pG,flex_t *pB,int numVertices)
+int rdClip_Face3GSRGB(const rdClipFrustum* NO_ALIAS frustum,rdVector3 *vertices,flex_t *pR,flex_t *pG,flex_t *pB,int numVertices)
 {
     INST_WORKBUFS
     INST_WORKBUFS_MOTS

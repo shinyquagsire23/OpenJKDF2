@@ -12,7 +12,7 @@ void rdPrimit3_ClearFrameCounters()
 {
 }
 
-void rdPrimit3_ClipFace(rdClipFrustum *clipFrustum, rdGeoMode_t geoMode, signed int lightMode, int texMode, rdMeshinfo *idxInfo, rdMeshinfo *mesh_out, rdVector2 *idkIn)
+void rdPrimit3_ClipFace(const rdClipFrustum* NO_ALIAS clipFrustum, rdGeoMode_t geoMode, signed int lightMode, int texMode, rdMeshinfo *idxInfo, rdMeshinfo *mesh_out, rdVector2 *idkIn)
 {
 #ifdef TARGET_TWL
     //rdPrimit3_NoClipFace(geoMode, lightMode, texMode, (rdMeshinfo*)idxInfo, mesh_out, idkIn);
@@ -1483,7 +1483,7 @@ LAB_0044cb44:
 
 
 void rdPrimit3_ClipFaceRGBLevel
-               (rdClipFrustum *clipFrustum,rdGeoMode_t geoMode,int lightMode,int texMode,
+               (const rdClipFrustum* NO_ALIAS clipFrustum,rdGeoMode_t geoMode,int lightMode,int texMode,
                rdMeshinfo *idxInfo,rdMeshinfo *mesh_out,rdVector2 *idkIn)
 {
     rdVector3 *prVar1;

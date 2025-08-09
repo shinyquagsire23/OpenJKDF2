@@ -118,8 +118,8 @@
 #define MAX_DEFLECTION_BOUNCES (6)
 
 #if defined(TARGET_TWL)
-#define RDCACHE_MAX_TRIS (0x200) // theoretical max 0x800?
-#define RDCACHE_MAX_VERTICES (0x600) // theoretical max 0x1800?
+#define RDCACHE_MAX_TRIS (0x100) // theoretical max 0x800?
+#define RDCACHE_MAX_VERTICES (0x300) // theoretical max 0x1800?
 
 #define STD3D_MAX_TEXTURES (512) // theoretical max 2048
 #define STD3D_MAX_UI_TRIS (0x100)
@@ -325,7 +325,10 @@
 //#define RDCLIP_COPY_VERTS_TO_STACK
 #define RDCLIP_CLIP_ZFAR_FIRST
 #define SITHRENDER_SPHERE_TEST_SURFACES
+#define RDCACHE_RENDER_NGONS
 #endif
+
+#define RDCACHE_RENDER_LINES
 
 //#define RDMATERIAL_LRU_LOAD_UNLOAD
 //#define JKGUI_SMOL_SCREEN

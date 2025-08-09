@@ -36,7 +36,11 @@ MATH_FUNC void rdCache_Flush();
 MATH_FUNC FAST_FUNC int rdCache_SendFaceListToHardware();
 void rdCache_ResetRenderList();
 MATH_FUNC void rdCache_DrawRenderList();
+#ifndef RDCACHE_RENDER_NGONS
 int rdCache_TriCompare(const void* a_, const void* b_);
+#else
+int rdCache_NGonCompare(const void* a_, const void* b_);
+#endif
 
 int rdCache_ProcFaceCompare(rdProcEntry *a, rdProcEntry *b);
 MATH_FUNC int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags);

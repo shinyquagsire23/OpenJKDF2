@@ -233,9 +233,7 @@ int rdCamera_BuildFOV(rdCamera *camera)
         
         case rdCameraProjectType_Perspective:
         {
-#ifdef TARGET_TWL
-            flex_t overdraw = 0.0;
-#elif defined(QOL_IMPROVEMENTS)
+#if defined(QOL_IMPROVEMENTS)
             flex_t overdraw = 1.0; // Added: HACK for 1px off on the bottom of the screen
 #else
             flex_t overdraw = 0.0;
@@ -248,7 +246,8 @@ int rdCamera_BuildFOV(rdCamera *camera)
             flex_t project_width_half_2 = project_width_half;
             flex_t project_height_half_2 = project_height_half;
             
-            camera->fovDx = project_width_half / stdMath_Tan(camera->fov * 0.5);
+            flex_t tangent = stdMath_Tan(camera->fov * 0.5);
+            camera->fovDx = project_width_half / tangent;
 
             flex_t fovDx = camera->fovDx;
             flex_t fovDy = camera->fovDx;
@@ -261,12 +260,24 @@ int rdCamera_BuildFOV(rdCamera *camera)
                 fovDx = 0.000001;
             }
 
+            // This area is very susceptible to fixed-point error 
+#ifdef EXPERIMENTAL_FIXED_POINT
+            clipFrustum->bClipFar = 1;
+            flex_t aspect = project_height_half_2/project_width_half;
+            clipFrustum->farTop = tangent * aspect; // far top
+            clipFrustum->farLeft = -tangent; // far left
+            clipFrustum->bottom = -clipFrustum->farTop;
+            clipFrustum->right = tangent; // right
+            clipFrustum->nearTop = ((project_height_half - -1.0) / project_width_half) * tangent; // near top
+            clipFrustum->nearLeft = (-(project_width_half - -1.0) / project_width_half) * tangent; // near left
+#else
             clipFrustum->farTop = project_height_half / fovDy; // far top
             clipFrustum->farLeft = -project_width_half / fovDx; // far left
             clipFrustum->bottom = -project_height_half_2 / fovDy; // bottom
             clipFrustum->right = project_width_half_2 / fovDx; // right
             clipFrustum->nearTop = (project_height_half - -1.0) / fovDy; // near top
             clipFrustum->nearLeft = -(project_width_half - -1.0) / fovDx; // near left
+#endif
             return 1;
         }
     }
@@ -283,9 +294,7 @@ int rdCamera_BuildClipFrustum(rdCamera *camera, rdClipFrustum *outClip, signed i
     if ( !canvas )
         return 0;
 
-#ifdef TARGET_TWL
-    flex_t overdraw = 0.0;
-#elif defined(QOL_IMPROVEMENTS)
+#if defined(QOL_IMPROVEMENTS)
     flex_t overdraw = 1.0; // Added: HACK for 1px off on the bottom of the screen
 #else
     flex_t overdraw = 0.0;
@@ -311,18 +320,22 @@ int rdCamera_BuildClipFrustum(rdCamera *camera, rdClipFrustum *outClip, signed i
         fovDx = 0.000001;
     }
 
+#if 0 //def EXPERIMENTAL_FIXED_POINT
+    flex_t tangent = stdMath_Tan(camera->fov * 0.5);
+    flex_t aspect = project_height_half_2/project_width_half;
+    clipFrustum->farTop = tangent * aspect; // far top
+    clipFrustum->farLeft = -tangent; // far left
+    clipFrustum->bottom = -clipFrustum->farTop;
+    clipFrustum->right = tangent; // right
+    clipFrustum->nearTop = ((project_height_half - -1.0) / project_width_half) * tangent; // near top
+    clipFrustum->nearLeft = (-(project_width_half - -1.0) / project_width_half) * tangent; // near left
+#else
     outClip->farTop = project_width_half / fovDy;
     outClip->farLeft = -project_height_half / fovDx;
     outClip->bottom = -project_width_half_2 / fovDy;
     outClip->right = project_height_half_2 / fovDx;
     outClip->nearTop = (project_width_half - -1.0) / fovDy;
     outClip->nearLeft = -(project_height_half - -1.0) / fovDx;
-
-#ifdef QOL_IMPROVEMENTS
-    outClip->minX = minX;
-    outClip->minY = minY;
-    outClip->maxX = maxX;
-    outClip->maxY = maxY;
 #endif
 
     return 1;

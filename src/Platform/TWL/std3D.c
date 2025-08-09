@@ -38,8 +38,6 @@ typedef struct TWLVERTEX
 } TWLVERTEX;
 
 size_t std3D_loadedTexturesAmt = 0;
-//static rdTri GL_tmpTris[STD3D_MAX_TRIS] = {0};
-static size_t GL_tmpTrisAmt = 0;
 //static TWLVERTEX GL_tmpVertices[STD3D_MAX_VERTICES] = {0};
 static size_t GL_tmpVerticesAmt = 0;
 static size_t rendered_tris = 0;
@@ -66,7 +64,14 @@ u8* i8Bitmap2 = NULL;
 BOOL std3D_bMenuBitmapsFreed = 1;
 
 D3DVERTEX* tmpD3DVertices = NULL;
+#ifndef RDCACHE_RENDER_NGONS
+//static rdTri GL_tmpTris[STD3D_MAX_TRIS] = {0};
+static size_t GL_tmpTrisAmt = 0;
 rdTri* tmpTris = NULL;
+#else
+rdNGon* tmpNGons = NULL;
+static size_t GL_tmpNGonsAmt = 0;
+#endif
 
 uint32_t std3D_lastPurgeMs = 0;
 
@@ -74,6 +79,8 @@ extern int std3D_bEnableTwlVrr;
 extern int std3D_twlLastFinishedFrame;
 extern int std3D_twlFinishedFrame;
 extern int std3D_twlTargetHblanks;
+
+uint32_t std3DTwl_aPolyFormats[64];
 
 //verticies for the cube
 v16 CubeVectors[] = {
@@ -561,6 +568,7 @@ MATH_FUNC int std3D_EndScene()
     //int before_ms = stdPlatform_GetTimeMsec();
     glFlush(GL_WBUFFERING | GL_TRANS_MANUALSORT); // This doesn't force the CPU to wait for blank, but bit 27 in GFX_STATUS will clear after vblank
     std3D_finishingFrameIdx = std3D_frameCount;
+    memset(std3DTwl_aPolyFormats, 0, sizeof(std3DTwl_aPolyFormats));
     //swiWaitForVBlank();
     //std3D_timeWastedWaitingAround = stdPlatform_GetTimeMsec() - before_ms;
 
@@ -637,10 +645,16 @@ MATH_FUNC int std3D_EndScene()
 }
 void std3D_ResetRenderList() 
 {
+#ifndef RDCACHE_RENDER_NGONS
     rendered_tris += GL_tmpTrisAmt;
+    GL_tmpTrisAmt = 0;
+#else
+    rendered_tris += GL_tmpNGonsAmt;
+    GL_tmpNGonsAmt = 0;
+#endif
+    
 
     GL_tmpVerticesAmt = 0;
-    GL_tmpTrisAmt = 0;
     //GL_tmpLinesAmt = 0;
 }
 int std3D_RenderListVerticesFinish()
@@ -658,6 +672,7 @@ void std3D_DrawRenderList()
     std3D_ResetRenderList();
 }
 
+#ifndef RDCACHE_RENDER_NGONS
 void std3D_DrawRenderListReal()
 {
     //printf("DrawRenderList %u %u\n", GL_tmpTrisAmt, GL_tmpVerticesAmt);
@@ -803,6 +818,335 @@ void std3D_DrawRenderListReal()
 
     //std3D_ResetRenderList();
 }
+#else
+void std3D_DrawRenderListReal()
+{
+    //printf("DrawRenderList %u %u\n", GL_tmpTrisAmt, GL_tmpVerticesAmt);
+    if (!GL_tmpNGonsAmt) return;
+
+    D3DVERTEX* vertexes = tmpD3DVertices;
+    rdNGon* ngons = tmpNGons;
+
+    std3D_ActuallyNeedToWaitForGeometryToFinish();
+
+    update_from_world_palette();
+    std3D_UpdateFogColor();
+
+    glBindTexture(0, -1);
+
+    glColor3b(255,255,255);
+    
+    int polyid = 0;
+    int last_alpha = -1;
+    uint32_t last_flags = 0;
+
+    u8 lastLightLevel = 0xFF;
+    GFX_PAL_FORMAT = paletteAddrs[0x3F];
+    static int last_tex_id = -1;
+    last_tex_id = -1;
+    glBindTexture(0, -1);
+    for (int j = 0; j < GL_tmpNGonsAmt; j++)
+    {
+        rdDDrawSurface* tex = ngons[j].texture;
+
+        int tex_id = -1;
+        int tex_w = tex->width;
+        int tex_h = tex->height;
+        uint32_t flags = ngons[j].flags;
+        if (tex) {
+            tex_id = tex->texture_id;
+        }
+        if (last_tex_id != tex_id) {
+            glBindTexture(0, tex_id);
+            last_tex_id = tex_id;
+        }
+
+        // N-Gons -> triangles
+#if 0
+        D3DVERTEX* v1 = &vertexes[ngons[j].vertIdxStart + ngons[j].numVertices - 1];
+        D3DVERTEX* v2 = &vertexes[ngons[j].vertIdxStart + 1];
+        D3DVERTEX* v3 = &vertexes[ngons[j].vertIdxStart + 0];
+
+        for (int k = 0; k < ngons[j].numVertices - 2; k++) {
+            int avg_alpha = COMP_A(v3->color) >> 3;
+
+            //u8 lightLevel = stdMath_Min(stdMath_Min(COMP_R(v3->color), COMP_R(v2->color)), COMP_R(v1->color));//v3->lightLevel>>2;// <= 0x3F ? v3->lightLevel : 0x3F;
+            //u8 lightLevel = v3->lightLevel>>2;// <= 0x3F ? v3->lightLevel : 0x3F;
+            u8 lightLevel = stdMath_Max(v1->lightLevel, stdMath_Max(v2->lightLevel, v3->lightLevel))>>2; // Cheap, but messes up guns
+            if (flags & 0x8000 && tex_id == -1) { // 0x8000 = constant light?
+                lightLevel = 0x3F;
+            }
+            if (!(jkPlayer_bEnableClassicLighting || jkPlayer_bEnableEmissiveTextures)) {
+                lightLevel = 0x3F;
+            }
+            // Expensive, but works correctly in MoTS, still broken for semitransparency??
+            /*u8 redMax = stdMath_Max(stdMath_Max(COMP_R(v3->color), COMP_R(v2->color)), COMP_R(v1->color));
+            u8 blueMax = stdMath_Max(stdMath_Max(COMP_B(v3->color), COMP_B(v2->color)), COMP_B(v1->color));
+            u8 greenMax = stdMath_Max(stdMath_Max(COMP_G(v3->color), COMP_G(v2->color)), COMP_G(v1->color));
+            u8 lightLevel = stdMath_Max(redMax, stdMath_Max(blueMax, greenMax))>>2;*/
+            
+
+            //lightLevel = lightLevel > 0x3F ? 0x3F : lightLevel;
+            u8 lightLevelAdd = (0x3F - lightLevel) << 2;
+            //if (lastLightLevel != lightLevel) {
+                GFX_PAL_FORMAT = paletteAddrs[lightLevel];
+            //}
+            lastLightLevel = lightLevel;
+
+            
+            if (avg_alpha != last_alpha || (flags & 0x20000) != (last_flags & 0x20000) || (flags & 0x10000) != (last_flags & 0x10000)) {
+                //glEnd();
+                glPolyFmt(POLY_ALPHA(avg_alpha) | ((flags & 0x10000) ? POLY_CULL_NONE : POLY_CULL_BACK) | POLY_MODULATION | POLY_RENDER_FAR_POLYS | POLY_ID(polyid++) | ((flags & 0x20000) ? 0 : POLY_FOG) ) ;
+                glBegin(GL_TRIANGLES); // GL_TRIANGLE_STRIP
+
+                // TODO: search for polygons with the same flags?
+                if (polyid > 63) {
+                    polyid = 0;
+                    stdPlatform_Printf("WARN: Too many polygons\n");
+                }
+            }
+            last_alpha = avg_alpha;
+            last_flags = flags;
+
+            {
+                if (tex_id != -1) {
+                    GFX_TEX_COORD = TEXTURE_PACK(flextot16(v3->tu), flextot16(v3->tv));    
+                }
+                
+                glColor3b(stdMath_Min(COMP_R(v3->color) + lightLevelAdd, 0xFF),stdMath_Min(COMP_G(v3->color) + lightLevelAdd, 0xFF),stdMath_Min(COMP_B(v3->color) + lightLevelAdd, 0xFF));
+                //glColor3b(COMP_R(v3->color), COMP_G(v3->color), COMP_B(v3->color));
+                glVertex3v16(flextov16(v3->x), flextov16(v3->y), flextov16(v3->z));
+            }
+            
+            {
+                if (tex_id != -1) {
+                    GFX_TEX_COORD = TEXTURE_PACK(flextot16(v2->tu), flextot16(v2->tv));
+                }
+                glColor3b(stdMath_Min(COMP_R(v2->color) + lightLevelAdd, 0xFF),stdMath_Min(COMP_G(v2->color) + lightLevelAdd, 0xFF),stdMath_Min(COMP_B(v2->color) + lightLevelAdd, 0xFF));
+                //glColor3b(COMP_R(v2->color), COMP_G(v2->color), COMP_B(v2->color));
+                glVertex3v16(flextov16(v2->x), flextov16(v2->y), flextov16(v2->z));
+
+            }
+            
+            {
+                if (tex_id != -1) {
+                    GFX_TEX_COORD = TEXTURE_PACK(flextot16(v1->tu), flextot16(v1->tv));
+                }
+                glColor3b(stdMath_Min(COMP_R(v1->color) + lightLevelAdd, 0xFF),stdMath_Min(COMP_G(v1->color) + lightLevelAdd, 0xFF),stdMath_Min(COMP_B(v1->color) + lightLevelAdd, 0xFF));
+                //glColor3b(COMP_R(v1->color), COMP_G(v1->color), COMP_B(v1->color));
+                glVertex3v16(flextov16(v1->x), flextov16(v1->y), flextov16(v1->z));
+            }
+
+            /*int nextIdx = k + 2;
+            if (k == ngons[j].numVertices - 3) {
+                nextIdx = 0;
+            }
+
+            v3 = v2;
+            v2 = v1;
+            v1 = &vertexes[ngons[j].vertIdxStart + nextIdx];*/
+
+            
+            if (k & 1)
+            {
+                v3 = v1--;
+            }
+            else
+            {
+                v3 = v2;
+                v2++;
+            }
+        }
+#endif
+
+        // N-Gons -> triangle strips
+#if 1
+        D3DVERTEX* vert = &vertexes[ngons[j].vertIdxStart];
+        //D3DVERTEX* vert = &vertexes[ngons[j].vertIdxStart];
+        int avg_alpha = COMP_A(vert->color) >> 3;
+        if (avg_alpha != last_alpha || (flags & 0x20000) != (last_flags & 0x20000) || (flags & 0x10000) != (last_flags & 0x10000)) {
+            //glEnd();
+
+            // Show wireframe
+            //avg_alpha = 0;
+            uint32_t desiredFmt = POLY_ALPHA(avg_alpha) | ((flags & 0x10000) ? POLY_CULL_NONE : POLY_CULL_NONE) | POLY_MODULATION | POLY_RENDER_FAR_POLYS | ((flags & 0x20000) ? 0 : POLY_FOG);
+
+            int polyFmtIdx = 0;
+
+            for (polyFmtIdx = 0; polyFmtIdx < 64; polyFmtIdx++) {
+                uint32_t val = std3DTwl_aPolyFormats[polyFmtIdx];
+                if (!val) {
+                    std3DTwl_aPolyFormats[polyFmtIdx] = desiredFmt;
+                    break;
+                }
+                if (val == desiredFmt) break;
+            }
+
+            if (polyFmtIdx > 63) {
+                stdPlatform_Printf("WARN: Too many polygons\n");
+            }
+            else {
+                glPolyFmt(desiredFmt | POLY_ID(polyFmtIdx)) ;
+            }
+        }
+        last_alpha = avg_alpha;
+        last_flags = flags;
+        GFX_PAL_FORMAT = paletteAddrs[0x3F];
+
+        int idx1 = 0;
+        int idx2 = ngons[j].numVertices - 1;
+        int vertIdxStart = ngons[j].vertIdxStart;
+        u8 lightLevelOrig = 0;
+        u8 lightLevel = 0;
+        if (flags & 0x8000 && tex_id == -1) { // 0x8000 = constant light?
+            lightLevelOrig = 0x3F;
+        }
+        if (!(jkPlayer_bEnableClassicLighting || jkPlayer_bEnableEmissiveTextures)) {
+            lightLevelOrig = 0x3F;
+        }
+        lightLevel = lightLevelOrig;
+
+        // Same light level for entire face?
+#if 0
+        for (int k = 0; k < ngons[j].numVertices; k++) {
+            lightLevel = stdMath_Max(lightLevel, vertexes[ngons[j].vertIdxStart+k].lightLevel>>2);
+        }
+        GFX_PAL_FORMAT = paletteAddrs[lightLevel]; // This apparently can't be issued per-triangle in a strip?
+        lastLightLevel = lightLevel;
+#endif
+
+        u8 lastVertLightLevel = lightLevelOrig;
+        u8 lastLastVertLightLevel = lightLevelOrig;
+        u8 vertLightLevel = lightLevelOrig;
+        u8 nextVertLightLevel = lightLevelOrig;
+        int numVerticesInTri = 0;
+
+#if 1
+        // We have to precompute this so that lightLevelAdd is correct
+        nextVertLightLevel = vertexes[vertIdxStart + 0].lightLevel>>2;
+        lastLastVertLightLevel = vertexes[vertIdxStart + 1].lightLevel>>2;
+        lastVertLightLevel = vertexes[vertIdxStart + idx2].lightLevel>>2;
+        lightLevel = stdMath_Max(stdMath_Max(lastVertLightLevel, lastLastVertLightLevel), nextVertLightLevel);
+        GFX_PAL_FORMAT = paletteAddrs[lightLevel]; // This apparently can't be issued per-triangle in a strip?
+        lastLightLevel = lightLevel;
+#endif
+        for (int k = 0; k < ngons[j].numVertices; k++) {
+            
+            if (!k || (k & 1)) {
+                vert = &vertexes[vertIdxStart + idx1++];
+            }
+            else {
+                vert = &vertexes[vertIdxStart + idx2--];
+            }
+
+            // Different light levels per tri, apparently GFX_PAL_FORMAT isn't allowed to be per-triangle (allegedly),
+            // and we need to change the vertex colors if lightLevelAdd changes anyway
+#if 1
+            BOOL resetStrip = 0;
+            
+            vertLightLevel = vert->lightLevel>>2;//nextVertLightLevel;
+            if ((k+1) & 1) {
+                nextVertLightLevel = vertexes[vertIdxStart + idx1].lightLevel>>2;
+            }
+            else {
+                nextVertLightLevel = vertexes[vertIdxStart + idx2].lightLevel>>2;
+            }
+            lightLevel = stdMath_Max(stdMath_Max(lastVertLightLevel, lastLastVertLightLevel), vertLightLevel);
+
+            // Roll back 2 vertices and cut the strip if we have to swap light levels
+            if (k > 2 && numVerticesInTri >= 2 && lastLightLevel != lightLevel) {
+                GFX_PAL_FORMAT = paletteAddrs[lightLevel];
+                lastLightLevel = lightLevel;
+
+                glBegin(GL_TRIANGLE_STRIP);
+
+                // When redoing k-2, it needs the current
+                // vertex's light level and the previous vertex's light level
+                // for lightLevelAdd
+                u8 tmp = lastVertLightLevel;
+                u8 tmp2 = lastLastVertLightLevel;
+
+                lastVertLightLevel = vertLightLevel;
+                lastLastVertLightLevel = tmp;
+                nextVertLightLevel = tmp2;
+
+                idx1--;
+                idx2++;
+                if (k & 1) {
+                    idx1--;
+                }
+                else {
+                    idx2++;
+                }
+                k -= 3;
+
+                numVerticesInTri = 0;
+                continue;
+            }
+
+            
+#endif
+
+            // This allegedly doesn't work
+            // Actually it definitely doesn't work because I need the vertex colors
+            // different for each triangle when lightLevel changes
+#if 0
+            if (k >= 2) {
+                lightLevel = stdMath_Max(stdMath_Max(lastVertLightLevel, lastLastVertLightLevel), vert->lightLevel>>2);
+                GFX_PAL_FORMAT = paletteAddrs[lightLevel];
+
+                lastLastVertLightLevel = lastVertLightLevel;
+                lastVertLightLevel = lightLevel;
+            }
+#endif
+
+            u8 lightLevelAdd = (0x3F - lightLevel) << 2;
+
+            if (!k) {
+                glBegin(GL_TRIANGLE_STRIP);
+            }
+
+            {
+                if (tex_id != -1) {
+                    GFX_TEX_COORD = TEXTURE_PACK(flextot16(vert->tu), flextot16(vert->tv));    
+                }
+                
+                glColor3b(stdMath_Min(COMP_R(vert->color) + lightLevelAdd, 0xFF),stdMath_Min(COMP_G(vert->color) + lightLevelAdd, 0xFF),stdMath_Min(COMP_B(vert->color) + lightLevelAdd, 0xFF));
+                //glColor3b(COMP_R(v3->color), COMP_G(v3->color), COMP_B(v3->color));
+                glVertex3v16(flextov16(vert->x), flextov16(vert->y), flextov16(vert->z));
+            }
+            numVerticesInTri++;
+
+#if 0
+            if (resetStrip) {
+                //glEnd();
+                glBegin(GL_TRIANGLE_STRIP);
+
+                // We have to look one vertex into the future
+                // to get the maximum light level of the next triangle
+                u8 tmp = lastVertLightLevel;
+                lastVertLightLevel = nextVertLightLevel;
+                lastLastVertLightLevel = vertLightLevel;
+                nextVertLightLevel = tmp;
+
+                idx1--;
+                idx2++;
+                k -= 2;
+
+                numVerticesInTri = 0;
+                continue;
+            }
+#endif
+
+            lastLastVertLightLevel = lastVertLightLevel;
+            lastVertLightLevel = vertLightLevel;
+        }
+        //glEnd();
+#endif
+    }
+}
+#endif
+
 int std3D_SetCurrentPalette(rdColor24 *a1, int a2)
 {
     return 0;
@@ -823,7 +1167,8 @@ void std3D_UnloadAllTextures()
     std3D_loadedTexturesAmt = 0;
 }
 
-void std3D_AddRenderListTris(rdTri *tris, unsigned int num_tris) 
+#ifndef RDCACHE_RENDER_NGONS
+void std3D_AddRenderListTris(rdTri *tris, unsigned int count) 
 {
     // HACK: Avoid copies
 #if 0
@@ -836,12 +1181,34 @@ void std3D_AddRenderListTris(rdTri *tris, unsigned int num_tris)
     memcpy(&GL_tmpTris[GL_tmpTrisAmt], tris, sizeof(rdTri) * num_tris);
 #endif
     tmpTris = tris;
-    GL_tmpTrisAmt = num_tris;
+    GL_tmpTrisAmt = count;
 
     std3D_DrawRenderListReal();
 
     rendered_tris += GL_tmpTrisAmt;
 }
+#else
+void std3D_AddRenderListNGons(rdNGon *ngons, unsigned int count) 
+{
+    // HACK: Avoid copies
+#if 0
+    //printf("Add %u tris\n", num_tris);
+    if (GL_tmpTrisAmt + num_tris > STD3D_MAX_TRIS)
+    {
+        return;
+    }
+    
+    memcpy(&GL_tmpTris[GL_tmpTrisAmt], tris, sizeof(rdTri) * num_tris);
+#endif
+
+    tmpNGons = ngons;
+    GL_tmpNGonsAmt = count;
+
+    std3D_DrawRenderListReal();
+
+    rendered_tris += GL_tmpNGonsAmt;
+}
+#endif
 void std3D_AddRenderListLines(rdLine* lines, uint32_t num_lines) {}
 
 //#define flextov16(n) (floattov16((float)n))

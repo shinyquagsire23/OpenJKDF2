@@ -1155,13 +1155,24 @@ int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
     rdHierarchyNode *rootNode;
     int meshIdx;
     rdHierarchyNode *node;
-    rdVector3 vertex_out;
-
+    
     pCurThing = thing;
     pCurModel3 = thing->model3;
-    rdMatrix_TransformPoint34(&vertex_out, &matrix_4_3->scale, &rdCamera_pCurCamera->view_matrix);
+    
     if (rdroid_curCullFlags & 2) {
-        frustumCull = rdClip_SphereInFrustum(rdCamera_pCurCamera->pClipFrustum, &vertex_out, pCurModel3->radius);
+        rdVector3 vertex_out;
+        rdClipFrustum* pThingFrustum = rdCamera_pCurCamera->pClipFrustum;
+
+        // Moved this in here, it's not used elsewhere
+        rdMatrix_TransformPoint34(&vertex_out, &matrix_4_3->scale, &rdCamera_pCurCamera->view_matrix);
+        frustumCull = rdClip_SphereInFrustum(pThingFrustum, &vertex_out, pCurModel3->radius);
+#ifdef SITHRENDER_SPHERE_TEST_SURFACES
+        extern rdClipFrustum sithRender_absoluteMaxFrustum;
+
+        if (frustumCull == SPHERE_CLIPPING_EDGE) {
+            frustumCull = rdClip_SphereInFrustum(&sithRender_absoluteMaxFrustum, &vertex_out, pCurModel3->radius);
+        }
+#endif
     }
     else {
         frustumCull = thing->clippingIdk;
@@ -1282,20 +1293,30 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
 {
     rdLight **pGeoLight;
     rdVector3 vertex;
-    rdVector3 vertex_out;
     rdMatrix34 matInv;
     rdMatrix34 out;
 
     pCurMesh = meshIn;
     if ( !meshIn->geometryMode )
         return;
-
-    rdMatrix_TransformPoint34(&vertex_out, &mat->scale, &rdCamera_pCurCamera->view_matrix);
+    
     if (thingFrustumCull != SPHERE_FULLY_INSIDE) {
-        meshFrustumCull = (rdroid_curCullFlags & 1) ? rdClip_SphereInFrustum(rdCamera_pCurCamera->pClipFrustum, &vertex_out, pCurMesh->radius) : SPHERE_CLIPPING_EDGE;
+        rdVector3 vertex_out;
+        rdClipFrustum* pMeshFrustum = rdCamera_pCurCamera->pClipFrustum;
+
+        // Moved this in here, it's not used elsewhere
+        rdMatrix_TransformPoint34(&vertex_out, &mat->scale, &rdCamera_pCurCamera->view_matrix);
+        meshFrustumCull = (rdroid_curCullFlags & 1) ? rdClip_SphereInFrustum(pMeshFrustum, &vertex_out, pCurMesh->radius) : SPHERE_CLIPPING_EDGE;
+#ifdef SITHRENDER_SPHERE_TEST_SURFACES
+        extern rdClipFrustum sithRender_absoluteMaxFrustum;
+
+        if (meshFrustumCull == SPHERE_CLIPPING_EDGE) {
+            meshFrustumCull = rdClip_SphereInFrustum(&sithRender_absoluteMaxFrustum, &vertex_out, pCurMesh->radius);
+        }
+#endif
     }
     else {
-        meshFrustumCull = 0;
+        meshFrustumCull = SPHERE_FULLY_INSIDE;
     }
 
     if (meshFrustumCull == SPHERE_FULLY_OUTSIDE) {

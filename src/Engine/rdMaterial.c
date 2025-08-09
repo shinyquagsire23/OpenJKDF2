@@ -399,10 +399,10 @@ LABEL_22:
 #endif
 
     // Added: Move this up to start
-    /*v26 = stdFileFromPath(mat_fpath);
+    v26 = stdFileFromPath(mat_fpath);
 #ifdef SITH_DEBUG_STRUCT_NAMES
     stdString_SafeStrCopy(material->mat_fpath, v26, sizeof(material->mat_fpath));
-#endif*/
+#endif
     rdroid_pHS->fileClose(mat_file_);
     mat_file = 1;
 

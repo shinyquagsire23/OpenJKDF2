@@ -8,6 +8,7 @@
 #include "Gameplay/sithEvent.h"
 #include "General/stdString.h"
 #include "General/stdStrTable.h"
+#include "Win95/std.h"
 #include "Main/jkDev.h"
 #include "Main/jkEpisode.h"
 #include "Main/jkRes.h"
@@ -404,8 +405,14 @@ void jkDSS_SendSetSaberInfo(sithThing *thing)
     const char* dummy = "ky.snd";
     NETMSG_PUSHSTR(dummy, 0x20);
 #endif
+
+#ifdef SITH_DEBUG_STRUCT_NAMES
     NETMSG_PUSHSTR(thing->playerInfo->polyline.edgeFace.material->mat_fpath, 0x20);
     NETMSG_PUSHSTR(thing->playerInfo->polyline.tipFace.material->mat_fpath, 0x20);
+#else
+    NETMSG_PUSHSTR(stdFileFromPath(thing->playerInfo->polyline.edgeFace.material->mat_fpath), 0x20);
+    NETMSG_PUSHSTR(stdFileFromPath(thing->playerInfo->polyline.tipFace.material->mat_fpath), 0x20);
+#endif
 
     NETMSG_END(DSS_SABERINFO2);
     

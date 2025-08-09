@@ -421,7 +421,7 @@ int sithMain_Tick()
 void sithMain_UpdateCamera()
 {
 #if defined(TARGET_TWL)
-    jkPlayer_fov = 90; // 90deg vertical, 106deg horizontal stock
+    jkPlayer_fov = 98; // 90deg vertical, 106deg horizontal stock
     jkPlayer_bJankyPhysics = 1;
     jkPlayer_fovIsVertical = 0;
     jkPlayer_enableOrigAspect = 0;

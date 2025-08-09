@@ -19,7 +19,7 @@
 
 
 void rdPrimit3_ClearFrameCounters(void);
-MATH_FUNC FAST_FUNC void rdPrimit3_ClipFace(rdClipFrustum *clipFrustum, rdGeoMode_t geoMode, signed int lightMode, int texMode, rdMeshinfo *idxInfo, rdMeshinfo *mesh_out, rdVector2 *idkIn);
+MATH_FUNC FAST_FUNC void rdPrimit3_ClipFace(const rdClipFrustum* NO_ALIAS clipFrustum, rdGeoMode_t geoMode, signed int lightMode, int texMode, rdMeshinfo *idxInfo, rdMeshinfo *mesh_out, rdVector2 *idkIn);
 //void rdPrimit3_NoClipFace(int geometryMode, signed int lightingMode, int textureMode, rdMeshinfo *_vertexSrc, rdMeshinfo *_vertexDst, rdVector2 *clipIdk);
 MATH_FUNC void rdPrimit3_NoClipFace(rdGeoMode_t geoMode, signed int lightMode, int texMode, rdMeshinfo *_vertexSrc, rdMeshinfo *_vertexDst, rdVector2 *idkIn);
 MATH_FUNC int rdPrimit3_GetScreenCoord(rdVector3 *vec, rdScreenPoint *screenpt);
@@ -34,7 +34,7 @@ rdPrimit3_ClipFaceRGB
           rdMeshinfo *idxInfo,rdMeshinfo *mesh_out,rdVector2 *idkIn);
 
 MATH_FUNC FAST_FUNC void rdPrimit3_ClipFaceRGBLevel
-               (rdClipFrustum *clipFrustum,rdGeoMode_t geoMode,int lightMode,int texMode,
+               (const rdClipFrustum* NO_ALIAS clipFrustum,rdGeoMode_t geoMode,int lightMode,int texMode,
                rdMeshinfo *idxInfo,rdMeshinfo *mesh_out,rdVector2 *idkIn);
 
 //static void (__cdecl *_rdPrimit3_ClipFace)(rdClipFrustum *a1, signed int a2, signed int a3, int textureMode, rdMeshinfo *idxInfo, rdMeshinfo *mesh_out, rdVector2 *a7) = (void*)rdPrimit3_ClipFace_ADDR;

@@ -9,16 +9,24 @@
 
 #include <math.h>
 
-#ifdef QOL_IMPROVEMENTS
+#ifdef RDCACHE_RENDER_LINES
 static int rdCache_totalLines = 0;
 static rdLine rdCache_aHWLines[1024];
-int rdroid_curVertexColorMode = 0; // MOTS added
 #endif
 
 #ifdef JKM_LIGHTING
+int rdroid_curVertexColorMode = 0; // MOTS added
 static flex_t rdCache_aRedIntensities[RDCACHE_MAX_VERTICES];
 static flex_t rdCache_aGreenIntensities[RDCACHE_MAX_VERTICES];
 static flex_t rdCache_aBlueIntensities[RDCACHE_MAX_VERTICES];
+#endif
+
+#ifdef RDCACHE_RENDER_NGONS
+rdNGon rdCache_aHWSolidNGons[RDCACHE_MAX_TRIS];
+rdNGon rdCache_aHWNormalNGons[RDCACHE_MAX_TRIS];
+
+static int rdCache_totalNormalNGons = 0;
+static int rdCache_totalSolidNGons = 0;
 #endif
 
 int rdCache_Startup()
@@ -79,14 +87,16 @@ rdProcEntry *rdCache_GetProcEntry()
         idx = rdCache_numProcFaces;
     }
 
-    if ( (unsigned int)(RDCACHE_MAX_VERTICES - rdCache_numUsedVertices) < 0x20 )
+    if ( (unsigned int)(RDCACHE_MAX_VERTICES - rdCache_numUsedVertices) < 0x20 
+        || (unsigned int)(RDCACHE_MAX_VERTICES - rdCache_numUsedTexVertices) < 0x20
+        || (unsigned int)(RDCACHE_MAX_VERTICES - rdCache_numUsedIntensities) < 0x20) {
+#ifdef QOL_IMPROVEMENTS
+        rdCache_Flush();
+        idx = rdCache_numProcFaces;
+#else
         return 0;
-
-    if ( (unsigned int)(RDCACHE_MAX_VERTICES - rdCache_numUsedTexVertices) < 0x20 )
-        return 0;
-
-    if ( (unsigned int)(RDCACHE_MAX_VERTICES - rdCache_numUsedIntensities) < 0x20 )
-        return 0;
+#endif
+    }
 
     out_procEntry = &rdCache_aProcFaces[idx];
     out_procEntry->vertices = &rdCache_aVertices[rdCache_numUsedVertices];
@@ -168,8 +178,6 @@ void rdCache_Flush()
     rdCache_Reset();
 }
 
-#if 1
-
 int rdCache_SendFaceListToHardware()
 {
     int v0; // ecx
@@ -213,11 +221,7 @@ int rdCache_SendFaceListToHardware()
     int final_vertex_color; // eax
     rdVector2 *uvs_in_pixels; // eax
     flex_d_t tex_v; // st7
-    int v61; // ecx
-    int lighting_maybe_2; // edx
-    unsigned int v63; // edi
     int tri; // eax
-    int lighting_maybe; // ebx
     size_t tri_idx; // eax
     flex_t *v70; // ecx
     int v71; // edx
@@ -908,7 +912,7 @@ int rdCache_SendFaceListToHardware()
                 
                 ++rdCache_totalVerts;
             }
-#ifdef QOL_IMPROVEMENTS
+#ifdef RDCACHE_RENDER_LINES
             if ( active_6c->numVertices <= 2 )
             {
                 tri_idx = rdCache_totalLines;
@@ -927,6 +931,26 @@ int rdCache_SendFaceListToHardware()
             }
             else 
 #endif
+
+
+#ifdef RDCACHE_RENDER_NGONS
+            if ( active_6c->numVertices >= 3 )
+            {
+                tri_idx = rdCache_totalNormalNGons;
+                rdCache_aHWNormalNGons[tri_idx].vertIdxStart = tri_vert_idx;
+                rdCache_aHWNormalNGons[tri_idx].numVertices = active_6c->numVertices;
+                rdCache_aHWNormalNGons[tri_idx].flags = flags_idk_;
+                rdCache_aHWNormalNGons[tri_idx].texture = tex2_arr_sel;
+                rdCache_totalNormalNGons++;
+            }
+#else
+#ifdef TARGET_TWL
+            if (rdCache_totalNormalTris + (active_6c->numVertices-2) >= RDCACHE_MAX_TRIS)
+            {
+                rdCache_DrawRenderList();
+                rdCache_ResetRenderList();
+            }
+#endif
             if ( active_6c->numVertices <= 3 )
             {
                 tri_idx = rdCache_totalNormalTris;
@@ -939,30 +963,29 @@ int rdCache_SendFaceListToHardware()
             }
             else
             {
-                v61 = active_6c->numVertices - 2;
-                v63 = active_6c->numVertices - 1;
-                lighting_maybe_2 = 0;
-                lighting_capability = 1;
-                for (int pushed_tris = 0; pushed_tris <= v61; pushed_tris++)
+                int v1 = active_6c->numVertices - 1;
+                int v2 = 1;
+                int v3 = 0;
+                for (int pushed_tris = 0; pushed_tris < active_6c->numVertices - 2; pushed_tris++)
                 {
-                    lighting_maybe = lighting_capability;
-                    rdCache_aHWNormalTris[rdCache_totalNormalTris+pushed_tris].v3 = tri_vert_idx + lighting_maybe_2;
-                    rdCache_aHWNormalTris[rdCache_totalNormalTris+pushed_tris].v2 = tri_vert_idx + lighting_maybe;
-                    rdCache_aHWNormalTris[rdCache_totalNormalTris+pushed_tris].v1 = tri_vert_idx + v63;
+                    rdCache_aHWNormalTris[rdCache_totalNormalTris+pushed_tris].v3 = tri_vert_idx + v3;
+                    rdCache_aHWNormalTris[rdCache_totalNormalTris+pushed_tris].v2 = tri_vert_idx + v2;
+                    rdCache_aHWNormalTris[rdCache_totalNormalTris+pushed_tris].v1 = tri_vert_idx + v1;
                     rdCache_aHWNormalTris[rdCache_totalNormalTris+pushed_tris].flags = flags_idk_;
                     rdCache_aHWNormalTris[rdCache_totalNormalTris+pushed_tris].texture = tex2_arr_sel;
                     if ( (pushed_tris & 1) != 0 )
                     {
-                        lighting_maybe_2 = v63--;
+                        v3 = v1--;
                     }
                     else
                     {
-                        lighting_maybe_2 = lighting_maybe;
-                        lighting_capability = lighting_maybe + 1;
+                        v3 = v2;
+                        v2 = v2 + 1;
                     }
                 }
-                rdCache_totalNormalTris += v61;
+                rdCache_totalNormalTris += active_6c->numVertices - 2;
             }
+#endif
             continue;
         }
 
@@ -1214,7 +1237,7 @@ skip_colormap_deref:
             tmpiter++;
         }
         v108 = active_6c->numVertices;
-#ifdef QOL_IMPROVEMENTS
+#ifdef RDCACHE_RENDER_LINES
         if ( v108 <= 2 )
         {
             v117 = rdCache_totalLines;
@@ -1228,6 +1251,25 @@ skip_colormap_deref:
             rdCache_totalLines++;
         }
         else 
+#endif
+
+#ifdef RDCACHE_RENDER_NGONS
+        if ( active_6c->numVertices >= 3 )
+        {
+            v117 = rdCache_totalSolidTris;
+            rdCache_aHWSolidNGons[v117].vertIdxStart = tri_vert_idx;
+            rdCache_aHWSolidNGons[v117].numVertices = active_6c->numVertices;
+            rdCache_aHWSolidNGons[v117].flags = flags_idk_;
+            rdCache_aHWSolidNGons[v117].texture = 0;
+            rdCache_totalSolidNGons++;
+        }
+#else
+#ifdef QOL_IMPROVEMENTS
+        if (rdCache_totalSolidTris + (active_6c->numVertices-2) >= RDCACHE_MAX_TRIS)
+        {
+            rdCache_DrawRenderList();
+            rdCache_ResetRenderList();
+        }
 #endif
         if ( v108 <= 3 )
         {
@@ -1265,6 +1307,7 @@ skip_colormap_deref:
             }
             rdCache_totalSolidTris += v109;
         }
+#endif
     }
 
     rdCache_DrawRenderList();
@@ -1272,16 +1315,20 @@ skip_colormap_deref:
     return 1;
 }
 
-
-#endif
-
 void rdCache_ResetRenderList()
 {
     std3D_ResetRenderList();
+
+#ifndef RDCACHE_RENDER_NGONS
     rdCache_totalNormalTris = 0;
     rdCache_totalSolidTris = 0;
+#else
+    rdCache_totalNormalNGons = 0;
+    rdCache_totalSolidNGons = 0;
+#endif
+
     rdCache_totalVerts = 0;
-#ifdef QOL_IMPROVEMENTS
+#ifdef RDCACHE_RENDER_LINES
     rdCache_totalLines = 0;
 #endif
 }
@@ -1297,24 +1344,44 @@ void rdCache_DrawRenderList()
         }
         std3D_RenderListVerticesFinish();
 #ifndef TARGET_TWL
+#ifndef RDCACHE_RENDER_NGONS
         if ( rdroid_curZBufferMethod == RD_ZBUFFER_READ_WRITE )
             _qsort(rdCache_aHWNormalTris, rdCache_totalNormalTris, sizeof(rdTri), rdCache_TriCompare);
+#else
+        if ( rdroid_curZBufferMethod == RD_ZBUFFER_READ_WRITE )
+            _qsort(rdCache_aHWNormalNGons, rdCache_totalNormalNGons, sizeof(rdNGon), rdCache_NGonCompare);
 #endif
+#else
+#ifndef RDCACHE_RENDER_NGONS
+        //_qsort(rdCache_aHWNormalTris, rdCache_totalNormalTris, sizeof(rdTri), rdCache_TriCompare);
+#else
+        //_qsort(rdCache_aHWNormalNGons, rdCache_totalNormalNGons, sizeof(rdNGon), rdCache_NGonCompare);
+#endif
+   
+#endif
+
+#ifndef RDCACHE_RENDER_NGONS
         if ( rdCache_totalSolidTris )
             std3D_AddRenderListTris(rdCache_aHWSolidTris, rdCache_totalSolidTris);
         if ( rdCache_totalNormalTris )
             std3D_AddRenderListTris(rdCache_aHWNormalTris, rdCache_totalNormalTris);
-#ifdef QOL_IMPROVEMENTS
-#ifdef SDL2_RENDER
+#else // RDCACHE_RENDER_NGONS
+        if ( rdCache_totalSolidNGons )
+            std3D_AddRenderListNGons(rdCache_aHWSolidNGons, rdCache_totalSolidNGons);
+        if ( rdCache_totalNormalNGons )
+            std3D_AddRenderListNGons(rdCache_aHWNormalNGons, rdCache_totalNormalNGons);
+#endif
+
+#ifdef RDCACHE_RENDER_LINES
         if ( rdCache_totalLines )
             std3D_AddRenderListLines(rdCache_aHWLines, rdCache_totalLines);
-#endif
 #endif
 
         std3D_DrawRenderList();
     }
 }
 
+#ifndef RDCACHE_RENDER_NGONS
 int rdCache_TriCompare(const void* a_, const void* b_)
 {
     const rdTri* a = (const rdTri*)a_;
@@ -1331,6 +1398,24 @@ int rdCache_TriCompare(const void* a_, const void* b_)
     else
         return tex_a->is_16bit != 0 ? 1 : -1;
 }
+#else
+int rdCache_NGonCompare(const void* a_, const void* b_)
+{
+    const rdNGon* a = (const rdNGon*)a_;
+    const rdNGon* b = (const rdNGon*)b_;
+
+    rdDDrawSurface *tex_b;
+    rdDDrawSurface *tex_a;
+
+    tex_b = b->texture;
+    tex_a = a->texture;
+
+    if ( tex_a->is_16bit == tex_b->is_16bit )
+        return tex_a - tex_b;
+    else
+        return tex_a->is_16bit != 0 ? 1 : -1;
+}
+#endif
 
 int rdCache_ProcFaceCompare(rdProcEntry *a, rdProcEntry *b)
 {

@@ -393,8 +393,9 @@ int sithSurface_Load(sithWorld *world)
             int fullIdx = surfaceIter->surfaceInfo.face.vertexPosIdx[idx];
             rdVector3* pIter = &sithWorld_pLoading->vertices[fullIdx];
             rdVector_Add3Acc(&surfaceCenterPt, pIter);
-            rdVector_Scale3Acc(&surfaceCenterPt, 0.5);
+            //rdVector_Scale3Acc(&surfaceCenterPt, 0.5);
         }
+        rdVector_Scale3Acc(&surfaceCenterPt, 1.0 / surfaceIter->surfaceInfo.face.numVertices);
         
         flex_t radius = 0.0;
         for (int idx = 0; idx < surfaceIter->surfaceInfo.face.numVertices; idx++) {

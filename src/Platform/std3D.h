@@ -91,7 +91,11 @@ int std3D_SetCurrentPalette(rdColor24 *a1, int a2);
 void std3D_GetValidDimension(unsigned int inW, unsigned int inH, unsigned int *outW, unsigned int *outH);
 int std3D_DrawOverlay();
 void std3D_UnloadAllTextures();
+#ifndef RDCACHE_RENDER_NGONS
 MATH_FUNC void std3D_AddRenderListTris(rdTri *tris, unsigned int num_tris);
+#else
+MATH_FUNC void std3D_AddRenderListNGons(rdNGon *tris, unsigned int num_ngons);
+#endif
 MATH_FUNC void std3D_AddRenderListLines(rdLine* lines, uint32_t num_lines);
 MATH_FUNC int std3D_AddRenderListVertices(D3DVERTEX *vertex_array, int count);
 void std3D_UpdateFrameCount(rdDDrawSurface *pTexture);

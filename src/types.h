@@ -355,7 +355,12 @@ typedef struct stdALBuffer stdALBuffer;
 typedef struct stdMaxmodBuffer stdMaxmodBuffer;
 typedef struct stdNullSoundBuffer stdNullSoundBuffer;
 typedef struct stdFontCharset stdFontCharset;
+#ifndef RDCACHE_RENDER_NGONS
 typedef struct rdTri rdTri;
+#else
+typedef struct rdNGon rdNGon;
+typedef int rdTri; // for symbols.syms
+#endif
 typedef struct rdLine rdLine;
 typedef struct rdGeoset rdGeoset;
 typedef struct rdMeshinfo rdMeshinfo;
@@ -611,10 +616,10 @@ typedef struct rdClipFrustum
   flex_t nearTop;
   flex_t nearLeft;
 #ifdef QOL_IMPROVEMENTS
-  flex_t minX;
-  flex_t minY;
-  flex_t maxX;
-  flex_t maxY;
+  //flex_t minX;
+  //flex_t minY;
+  //flex_t maxX;
+  //flex_t maxY;
 #endif
 } rdClipFrustum;
 
@@ -662,6 +667,7 @@ typedef struct v11_struct
   rdMaterial *material;
 } v11_struct;
 
+#ifndef RDCACHE_RENDER_NGONS
 typedef struct rdTri
 {
   int32_t v1;
@@ -670,6 +676,7 @@ typedef struct rdTri
   int32_t flags;
   rdDDrawSurface *texture; // DirectDrawSurface*
 } rdTri;
+#endif
 
 typedef struct rdUITri
 {
@@ -686,6 +693,16 @@ typedef struct rdLine
     int32_t v2;
     int32_t flags;
 } rdLine;
+
+#ifdef RDCACHE_RENDER_NGONS
+typedef struct rdNGon
+{
+  int32_t vertIdxStart;
+  int32_t numVertices;
+  int32_t flags;
+  rdDDrawSurface *texture; // DirectDrawSurface*
+} rdNGon;
+#endif
 
 typedef float D3DVALUE;
 
