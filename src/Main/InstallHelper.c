@@ -950,8 +950,11 @@ int InstallHelper_AttemptInstall()
     snprintf(tmpMsg, sizeof(tmpMsg), "OpenJKDF2 could not find required game assets.\nWould you like to install assets now?\n\nAssets will be installed to:\n%s", tmpCwd);
 
 
-    char *path = "sdmc:/jk/";
-    return InstallHelper_AttemptInstallFromExisting(path);
+    #ifdef TARGET_SWITCH
+    //snprintf(tmpCwd, sizeof(tmpCwd), "sdmc:/jk/");
+return InstallHelper_AttemptInstallFromExisting("sdmc:/jk/");
+    #endif
+    return InstallHelper_AttemptInstallFromExisting(tmpCwd);
 }
 
 void InstallHelper_CheckRequiredAssets(int doInstall)

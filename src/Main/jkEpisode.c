@@ -47,7 +47,7 @@ int jkEpisode_LoadVerify()
     stdFileSearch *v5; // ebp
     unsigned int v7; // esi
     jkEpisode *v8; // edi
-    stdFileSearch *v10; // ebp
+    stdFileSearch *gobSearch; // ebp
     unsigned int v12; // esi
     jkEpisode *v13; // edi
     int result; // eax
@@ -139,14 +139,15 @@ LABEL_20:
     }
     strcpy(jkRes_curDir, "sdmc:/jk");
     stdFileUtil_DisposeFind(v5);
-    stdPlatform_Printf("OpenJKDF2: %s - Found %d episodes\n", __func__, jkEpisode_var2);
-    stdPlatform_Printf("OpenJKDF2: %s - Current Dir: %s\n", __func__, jkRes_curDir[0] ? jkRes_curDir : "NULL");
+    // HERE it still works
     if ( jkRes_curDir[0] )
     {
-        _sprintf(jkEpisode_var5, "%s\\episode\\", jkRes_curDir);
-            stdPlatform_Printf("OpenJKDF2: %s - Looking for %s episodes\n", __func__, jkEpisode_var5);
-        v10 = stdFileUtil_NewFind(jkEpisode_var5, 3, JKRES_GOB_EXT);
-        while ( stdFileUtil_FindNext(v10, &v30) )
+
+        //_sprintf(jkEpisode_var5, "%s\\episode\\", jkRes_curDir);
+           // stdPlatform_Printf("OpenJKDF2: %s - Looking for %s \n", __func__, jkEpisode_var5);
+        gobSearch = stdFileUtil_NewFind(jkEpisode_var5, 3, JKRES_GOB_EXT);
+
+        while ( stdFileUtil_FindNext(gobSearch, &v30) )
         {
             if ( v30.fpath[0] != '.' )
             {
@@ -175,12 +176,12 @@ LABEL_30:
                 }
             }
         }
-        stdFileUtil_DisposeFind(v10);
+
+        stdFileUtil_DisposeFind(gobSearch);
     }
     jkRes_HookHS();
     result = jkEpisode_var2;
 
-    stdPlatform_Printf("OpenJKDF2: %s - Result: %s\n", __func__, result);
     v28 = 0;
     if ( jkEpisode_var2 )
     {

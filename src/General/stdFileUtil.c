@@ -37,12 +37,14 @@ stdFileSearch* stdFileUtil_NewFind(const char *path, int a2, const char *extensi
     if ( !search ) {
         return search;
     }
+
     _memset(search, 0, sizeof(stdFileSearch));
 
     if ( a2 < 0 )
         return search;
     if ( a2 <= 2 )
     {
+
         stdFnames_MakePath(search->path, 128, path, "*.*");
         return search;
     }
@@ -50,10 +52,12 @@ stdFileSearch* stdFileUtil_NewFind(const char *path, int a2, const char *extensi
         return search;
     if ( *extension == '.' )
         extension = extension + 1;
+
     _sprintf(std_genBuffer, "*.%s", extension);
     stdFnames_MakePath(search->path, 128, path, std_genBuffer);
     
-#ifdef FS_POSIX
+#if defined(TARGET_SWITCH) || defined(FS_POSIX)
+
     for (int i = 0; i < strlen(search->path); i++)
     {
         if (search->path[i] == '\\')
@@ -104,6 +108,7 @@ int stdFileUtil_FindNext(stdFileSearch *a1, stdFileSearchResult *a2)
 
 void stdFileUtil_DisposeFind(stdFileSearch *search)
 {
+
     if ( search )
     {
         if ( search->isNotFirst )
@@ -290,6 +295,7 @@ static int parse_ext(const struct dirent *dir)
         }
         else 
         {
+
             if(__strnicmp(ext, search_ext, 3) == 0)
                 return 1;
         }
@@ -321,90 +327,94 @@ void printFileSearch(stdFileSearch *search){
 int stdFileUtil_FindNext(stdFileSearch *a1, stdFileSearchResult *a2)
 {
     char  path[255] = {0};
-    chdir("sdmc:/openjkdf2/");
-    getcwd(path, 255);
-    // stdPlatform_Printf("Openjkdf2: Current working directory: %s\n", path);
-    struct dirent *iter;
+    struct dirent *iter = NULL;
     char tmp[128];
 
-    //printFileSearch(a1);
-    if ( !a1 )
-        return 0;
+    if (!a1) return 0;
 
-    if (a1->isNotFirst++)
-    {
-        if (a1->isNotFirst >= a1->num_found)
+    /* Subsequent calls: iterate existing namelist */
+    if (a1->namelist) {
+        if (a1->isNotFirst >= a1->num_found) {
             iter = NULL;
-        else
-            iter = a1->namelist[a1->isNotFirst];
+        } else {
+            iter = a1->namelist[a1->isNotFirst++];
+        }
     }
+    /* First call: build path, scan, return first real entry */
     else
     {
 #if defined(TARGET_TWL)
-        getcwd(tmp, 128-1);
-        //strncpy(tmp, pcwd, 128-1);
-        strncat(tmp, "/", 128-1);
-        strncat(tmp, a1->path, 128-1);
+        getcwd(tmp, sizeof(tmp)-1);
+        strncat(tmp, "/", sizeof(tmp)-1 - strlen(tmp));
+        strncat(tmp, a1->path, sizeof(tmp)-1 - strlen(tmp));
 #else
-        strncpy(tmp, a1->path, 128);
+        strncpy(tmp, a1->path, sizeof(tmp)-1);
+        tmp[sizeof(tmp)-1] = '\0';
 #endif
 
-        // Clear out extension
-        // TODO: ehhhh
-        if (!strcmp(strrchr(tmp,'*'), "*")) {
-            *strrchr(tmp,'.') = 0;
-            *strrchr(tmp,'*') = 0;
-            search_ext = strrchr(a1->path,'.');
-            search_ext = NULL;
-        }
-        else
+        /* Clear out extension/wildcard safely (kept same behavior, just guarded) */
         {
-            *strrchr(tmp,'.') = 0;
-            *strrchr(tmp,'*') = 0;
-            search_ext = strrchr(a1->path,'.');
-        }
-        
-        for (int i = 0; i < strlen(tmp); i++)
-        {
-            if (tmp[i] == '\\') {
-                tmp[i] = '/';
+            char *p;
+            /* Your original code tried to handle "*.*" vs "*.ext".
+               Keep semantics but avoid NULL deref. */
+            char *last_star = strrchr(tmp, '*');
+            if (last_star && strcmp(last_star, "*") == 0) {
+                p = strrchr(tmp, '.'); if (p) *p = 0;
+                p = strrchr(tmp, '*'); if (p) *p = 0;
+                search_ext = NULL;  /* keep: wildcard → no extension filter */
+            } else {
+                p = strrchr(tmp, '.'); if (p) *p = 0;
+                p = strrchr(tmp, '*'); if (p) *p = 0;
+                search_ext = strrchr(a1->path, '.'); /* e.g. ".gob" or ".*" */
             }
         }
-        if (tmp[strlen(tmp)-1] = '/') {
-            tmp[strlen(tmp)-1] = 0;
+
+        /* Normalize slashes and strip trailing slash */
+        {
+            size_t n = strlen(tmp);
+            for (size_t i = 0; i < n; i++) {
+                if (tmp[i] == '\\') tmp[i] = '/';
+            }
+            if (n > 0 && tmp[n-1] == '/') tmp[n-1] = '\0';
         }
 
 #ifdef TARGET_TWL
         errno = 0;
 #endif
+
         a1->num_found = scandir(tmp, &a1->namelist, search_ext ? parse_ext : NULL, alphasort);
-        stdPlatform_Printf("Openjkdf2: scandir found %d entries in %s\n", a1->num_found, tmp);
-        
+
         if (!a1->namelist || a1->num_found <= 0) return 0;
-        
-        iter = a1->namelist[0];
-        a1->isNotFirst = 2;
-    }
-    printFileSearch(a1);
 
-        //stdPlatform_Printf("Openjkdf2: All Found entries:: %d\n", a1->num_found);
-      //  stdPlatform_Printf("Openjkdf2: Current entry: %s\n", iter ? iter->d_name : "NULL");
-    if (!iter)
-    {
-       stdPlatform_Printf("Openjkdf2: No more entries found\n");
+        /* Find first non-dot entry (don’t assume . and .. are present) */
+        int start = 0;
+        while (start < a1->num_found) {
+            const char *name = a1->namelist[start]->d_name;
+            if (!(name[0]=='.' && (name[1]=='\0' || (name[1]=='.' && name[2]=='\0'))))
+                break;
+            start++;
+        }
+        if (start >= a1->num_found) return 0;
+
+        iter = a1->namelist[start];
+        a1->isNotFirst = start + 1;  /* next call returns the next entry */
+
+        printFileSearch(a1); /* optional: will now show cursor = next index */
     }
 
-    if (a1->num_found < 2 || !iter)
+    if (!iter || a1->num_found <= 0) {
         return 0;
+    }
 
-    strncpy(a2->fpath, iter->d_name, sizeof(a2->fpath));
+    /* Safe copy + NUL */
+    strncpy(a2->fpath, iter->d_name, sizeof(a2->fpath)-1);
+    a2->fpath[sizeof(a2->fpath)-1] = '\0';
 
     a2->time_write = 0;
-    a2->is_subdirectory = iter->d_type == DT_DIR ? 0x10 : 0;
+    a2->is_subdirectory = (iter->d_type == DT_DIR) ? 0x10 : 0;
 
     return 1;
 }
-
 void stdFileUtil_DisposeFind(stdFileSearch *search)
 {
     if ( search )

@@ -217,20 +217,20 @@ char* stdFnames_Concat(char *a1, char *a2, int a3)
 char* stdFnames_MakePath(char *a1, int a2, const char *a3, const char *a4)
 {
     int v4; // ecx
-    unsigned int v5; // kr04_4
+    unsigned int lengthWithEndSlash; // kr04_4
 
     _strncpy(a1, a3, a2 - 1);
     a1[a2 - 1] = 0;
-    v5 = _strlen(a1) + 1;
-    v4 = v5 - 1;
-    if ( a1[v5 - 2] != LEC_PATH_SEPARATOR_CHR && v4 < a2 - 1 && *a1 )
+    lengthWithEndSlash = _strlen(a1) + 1;
+    v4 = lengthWithEndSlash - 1;
+    if ( lengthWithEndSlash >= 2 && a1[lengthWithEndSlash - 2] != LEC_PATH_SEPARATOR_CHR && v4 < a2 - 1 && *a1 )
     {
       a1[v4] = LEC_PATH_SEPARATOR_CHR;
-      v4 = v5;
-      a1[v5] = 0;
+      v4 = lengthWithEndSlash;
+      a1[lengthWithEndSlash] = 0;
     }
 
-#ifdef FS_POSIX
+#if defined(TARGET_SWITCH) || defined(FS_POSIX)
     char *r = (char*)malloc(strlen(a1) + 16);
     if (casepath(a1, r))
     {

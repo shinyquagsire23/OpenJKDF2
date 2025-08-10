@@ -4,6 +4,7 @@
 
 int util_FileExists(const char *fpath)
 {
+    if (!fpath || !*fpath) return 0;
     intptr_t f = std_pHS->fileOpen(fpath, "r");
     if ( f )
     {

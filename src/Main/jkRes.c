@@ -110,7 +110,6 @@ void jkRes_LoadGob(char *a1)
     stdString_snprintf(jkRes_gCtx.aGobDirectories[1].name, 0x80u, "episode\\%s", jkRes_episodeGobName);
     
     jkRes_NewGob(&jkRes_gCtx.aGobDirectories[1], "episode", v30);
-    strcpy(jkRes_curDir, "sdmc:/jk");
     if ( jkRes_curDir[0] && Windows_installType < 1 )
     {
         stdString_snprintf(std_genBuffer, 0x80u, "%s\\episode", jkRes_curDir);
@@ -202,7 +201,6 @@ int jkRes_FileExists(const char *fpath, char *a2, int len)
 int jkRes_ReadKeyFromFile(const char* fpath)
 {
     int keyval;
-    stdPlatform_Printf("OpenJKDF2: %s - Reading key from file: %s\n", __func__, fpath);
 
     stdFile_t fd = pHS->fileOpen(fpath, "rb");
     if (!fd)
@@ -217,7 +215,6 @@ int jkRes_ReadKeyFromFile(const char* fpath)
 // Added
 int jkRes_ReadKeyRaw()
 {
-        stdPlatform_Printf("OpenJKDF2: %s - Reading key raw: %s\n", __func__);
 
     return jkRes_ReadKeyFromFile("jk_.cd");
 }
@@ -225,8 +222,6 @@ int jkRes_ReadKeyRaw()
 // Added
 int jkRes_ReadKeyRawEarly()
 {
-            stdPlatform_Printf("OpenJKDF2: %s - Reading key raw early: %s\n", __func__);
-
     return jkRes_ReadKeyFromFile("resource/jk_.cd");
 }
 
