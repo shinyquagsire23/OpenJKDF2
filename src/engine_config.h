@@ -423,6 +423,9 @@ typedef double flex_d_t_type;
 #endif
 #define FAST_DATA __attribute__((section(".itcm.data")))
 #define NO_ALIAS __restrict__
+#define LIKELY(cond)   __builtin_expect(!!(cond), 1)
+#define UNLIKELY(cond) __builtin_expect(!!(cond), 0)
+
 
 #include <stdint.h>
 #include <stddef.h>
@@ -442,6 +445,8 @@ extern FAST_FUNC void* __aeabi_memcpy8(void* dst, const void* src, size_t len);*
 #define MATH_FUNC
 #define FAST_FUNC
 #define NO_ALIAS
+#define LIKELY(cond) (cond)
+#define UNLIKELY(cond) (cond)
 #endif
 
 #endif // _OPENJKDF2_ENGINE_CONFIG_H

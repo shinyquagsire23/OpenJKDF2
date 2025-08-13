@@ -42,6 +42,7 @@ void sithRender_SetPalette(const void *palette);
 MATH_FUNC void sithRender_Draw();
 MATH_FUNC void sithRender_Clip(sithSector *sector, rdClipFrustum *frustumArg, flex_t a3, int depth); // Added: depth safety
 MATH_FUNC void sithRender_NoClip(sithSector *sector, rdClipFrustum *frustumArg, flex_t a3, int depth);
+MATH_FUNC void sithRender_KindaClipAssignFrustum(sithSector *sector, rdClipFrustum *frustumArg, int depth, int parentSector);
 MATH_FUNC void sithRender_KindaClip(sithSector *sector, rdClipFrustum *frustumArg, flex_t prevAdjoinDistAdd, int depth);
 MATH_FUNC void sithRender_RenderLevelGeometry();
 MATH_FUNC void sithRender_UpdateAllLights();
