@@ -992,12 +992,14 @@ typedef struct jkgm_cache_entry_t jkgm_cache_entry_t;
 
 typedef struct rdDDrawSurface
 {
+#ifndef OPTIMIZE_AWAY_UNUSED_FIELDS
     void* lpVtbl; // IDirectDrawSurfaceVtbl *lpVtbl
     uint32_t direct3d_tex;
     uint8_t surface_desc[0x6c];
-    uint32_t texture_id;
-    uint32_t texture_loaded;
-    uint32_t is_16bit;
+#endif
+    int texture_id;
+    int texture_loaded;
+    int is_16bit;
     uint32_t width;
     uint32_t height;
 
@@ -1110,8 +1112,10 @@ typedef struct SDL_Surface SDL_Surface;
 typedef struct stdVBuffer
 {
     uint32_t bSurfaceLocked;
+#ifndef OPTIMIZE_AWAY_UNUSED_FIELDS
     uint32_t lock_cnt;
     uint32_t gap8;
+#endif
     stdVBufferTexFmt format;
     void* palette;
     char* surface_lock_alloc;
@@ -1124,7 +1128,9 @@ typedef struct stdVBuffer
 #endif
     };
     void* ddraw_palette; // LPDIRECTDRAWPALETTE
+#ifndef OPTIMIZE_AWAY_UNUSED_FIELDS
     uint8_t desc[0x6c];
+#endif
 } stdVBuffer;
 
 typedef struct rdColor24
@@ -1336,7 +1342,9 @@ typedef struct sithCamera
     sithThing* secondaryFocus;
     sithSector* sector;
     rdVector3 collisionOffset;
+#ifndef OPTIMIZE_AWAY_UNUSED_FIELDS
     rdVector3 unused1;
+#endif
     rdMatrix34 viewMat;
     rdVector3 vec3_1;
     rdVector3 viewPYR;
@@ -1555,7 +1563,6 @@ typedef struct sithSurface
     sithAdjoin* adjoin;
     uint32_t surfaceFlags;
     sithSurfaceInfo surfaceInfo;
-    // TODO: sphere culling?
 #ifdef SITHRENDER_SPHERE_TEST_SURFACES
     flex_t radius;
     rdVector3 center;
@@ -2119,7 +2126,11 @@ typedef struct sithCogScript
 
 typedef struct sithAICommand
 {
+#ifndef SITHAI_CRC32_INSTINCTS
     char name[32];
+#else
+    uint32_t namecrc;
+#endif
     sithAICommandFunc_t func;
     int32_t param1;
     int32_t param2;
@@ -2504,7 +2515,9 @@ typedef struct jkPlayerMpcInfo
   wchar_t name[32];
   char model[32];
   char soundClass[32];
+#ifndef OPTIMIZE_AWAY_UNUSED_FIELDS
   uint8_t gap80[32];
+#endif
 #ifdef JKM_PARAMS
   int32_t unk1;
 #endif
@@ -2656,9 +2669,11 @@ typedef struct sithActor
     int32_t mood0;
     int32_t mood1;
     int32_t mood2;
+#ifndef OPTIMIZE_AWAY_UNUSED_FIELDS
     int32_t field_27C;
     int32_t field_280;
     int32_t field_284;
+#endif
     int32_t field_288;
     int32_t field_28C;
     rdVector3 *paFrames;

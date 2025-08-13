@@ -942,26 +942,26 @@ int rdClip_SphereInFrustum(const rdClipFrustum* NO_ALIAS frust, const rdVector3*
     flex_t depthPlusRad = rad + pos->y;
     flex_t depthMinusRad = pos->y - rad;
 
-    if (depthPlusRad < frust->zNear) {
+    if (LIKELY(depthPlusRad < frust->zNear)) {
         return SPHERE_FULLY_OUTSIDE;
     }
-    if (depthMinusRad < frust->zNear) {
+    if (UNLIKELY(depthMinusRad < frust->zNear)) {
         bFullyInFrustum = 0;
     }
 
-    if (frust->bClipFar)
+    if (LIKELY(frust->bClipFar))
     {
-        if (depthMinusRad > frust->zFar) {
+        if (LIKELY(depthMinusRad > frust->zFar)) {
             return SPHERE_FULLY_OUTSIDE;
         }
-        if (depthPlusRad > frust->zFar) {
+        if (UNLIKELY(depthPlusRad > frust->zFar)) {
             bFullyInFrustum = 0;
         }
     }
 
     flex_t heightPlusRad = pos->z + rad;
     flex_t heightMinusRad = pos->z - rad;
-    if (rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective)
+    if (LIKELY(rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective))
     {
         topPlaneMin = frust->farTop * depthMinusRad;
         topPlaneMax = frust->farTop * depthPlusRad;
@@ -972,14 +972,14 @@ int rdClip_SphereInFrustum(const rdClipFrustum* NO_ALIAS frust, const rdVector3*
         topPlaneMax = frust->orthoTop;
     }
 
-    if (heightMinusRad > topPlaneMin && heightMinusRad > topPlaneMax) {
+    if (LIKELY(heightMinusRad > topPlaneMin && heightMinusRad > topPlaneMax)) {
         return SPHERE_FULLY_OUTSIDE;
     }
-    if (heightPlusRad > topPlaneMin || heightPlusRad > topPlaneMax) {
+    if (UNLIKELY(heightPlusRad > topPlaneMin || heightPlusRad > topPlaneMax)) {
         bFullyInFrustum = 0;
     }
 
-    if (rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective)
+    if (LIKELY(rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective))
     {
         bottomPlaneMin = frust->bottom * depthMinusRad;
         bottomPlaneMax = frust->bottom * depthPlusRad;
@@ -990,16 +990,16 @@ int rdClip_SphereInFrustum(const rdClipFrustum* NO_ALIAS frust, const rdVector3*
         bottomPlaneMax = frust->orthoBottom;
     }
 
-    if (heightPlusRad < bottomPlaneMin && heightPlusRad < bottomPlaneMax) {
+    if (LIKELY(heightPlusRad < bottomPlaneMin && heightPlusRad < bottomPlaneMax)) {
         return SPHERE_FULLY_OUTSIDE;
     }
-    if (heightMinusRad < bottomPlaneMin || heightMinusRad < bottomPlaneMax) {
+    if (UNLIKELY(heightMinusRad < bottomPlaneMin || heightMinusRad < bottomPlaneMax)) {
         bFullyInFrustum = 0;
     }
 
     flex_t widthPlusRad = pos->x + rad;
     flex_t widthMinusRad = pos->x - rad;
-    if ( rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective)
+    if (LIKELY(rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective))
     {
         leftPlaneMin = frust->farLeft * depthMinusRad;
         leftPlaneMax = frust->farLeft * depthPlusRad;
@@ -1010,14 +1010,14 @@ int rdClip_SphereInFrustum(const rdClipFrustum* NO_ALIAS frust, const rdVector3*
         leftPlaneMax = frust->orthoLeft;
     }
     
-    if (widthPlusRad < leftPlaneMin && widthPlusRad < leftPlaneMax) {
+    if (LIKELY(widthPlusRad < leftPlaneMin && widthPlusRad < leftPlaneMax)) {
         return SPHERE_FULLY_OUTSIDE;
     }
-    if (widthMinusRad < leftPlaneMin || widthMinusRad < leftPlaneMax) {
+    if (UNLIKELY(widthMinusRad < leftPlaneMin || widthMinusRad < leftPlaneMax)) {
         bFullyInFrustum = 0;
     }
 
-    if ( rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective)
+    if (LIKELY(rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective))
     {
         rightPlaneMin = frust->right * depthMinusRad;
         rightPlaneMax = frust->right * depthPlusRad;
@@ -1028,10 +1028,10 @@ int rdClip_SphereInFrustum(const rdClipFrustum* NO_ALIAS frust, const rdVector3*
         rightPlaneMax = frust->orthoRight;
     }
 
-    if (widthMinusRad > rightPlaneMin && widthMinusRad > rightPlaneMax) {
+    if (LIKELY(widthMinusRad > rightPlaneMin && widthMinusRad > rightPlaneMax)) {
         return SPHERE_FULLY_OUTSIDE;
     }
-    if (widthPlusRad > rightPlaneMin || widthPlusRad > rightPlaneMax) {
+    if (UNLIKELY(widthPlusRad > rightPlaneMin || widthPlusRad > rightPlaneMax)) {
         bFullyInFrustum = 0;
     }
 
@@ -1536,6 +1536,9 @@ int rdClip_Face3GT(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3* NO_ALI
     flex_t* NO_ALIAS pLastSourceIVert;
     flex_t* NO_ALIAS pLastDestIVert;
 
+    // The LIKELY vs UNLIKELY here honestly depends a lot on whether sithRender is doing sphere culling,
+    // but we assume in general that most vertices being clipped will be clipped partially, but not entirely
+
     rdClip_faceStatus = 0;
     numOnScreenVertices = 0;
 
@@ -1560,17 +1563,17 @@ int rdClip_Face3GT(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3* NO_ALI
     pLastIVertIter = &pSourceIVert[numVertices - 1];
 
 #ifdef RDCLIP_CLIP_ZFAR_FIRST
-    if (pClipFrustum->bClipFar)
+    if (LIKELY(pClipFrustum->bClipFar))
     {
         for (int i = 0; i < numVertices; pLastVertIter = pVertIter++, pLastIVertIter = pIVertIter++, pLastTVertIter = pTVertIter++, i++)
         {
-            if (!(pLastVertIter->y <= (flex_d_t)pClipFrustum->zFar || pVertIter->y <= (flex_d_t)pClipFrustum->zFar)) {
+            if (UNLIKELY(!(pLastVertIter->y <= (flex_d_t)pClipFrustum->zFar || pVertIter->y <= (flex_d_t)pClipFrustum->zFar))) {
                 continue;
             }
 
-            if ( pLastVertIter->y != pClipFrustum->zFar
+            if (LIKELY(pLastVertIter->y != pClipFrustum->zFar
               && pVertIter->y != pClipFrustum->zFar
-              && (pLastVertIter->y > (flex_d_t)pClipFrustum->zFar || pVertIter->y > (flex_d_t)pClipFrustum->zFar) )
+              && (pLastVertIter->y > (flex_d_t)pClipFrustum->zFar || pVertIter->y > (flex_d_t)pClipFrustum->zFar)))
             {
                 
                 v174 = (pClipFrustum->zFar - pLastVertIter->y) / (pVertIter->y - pLastVertIter->y);
@@ -1587,7 +1590,7 @@ int rdClip_Face3GT(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3* NO_ALI
                 ++numOnScreenVertices;
                 rdClip_faceStatus |= CLIPSTAT_FAR;
             }
-            if ( pVertIter->y <= (flex_d_t)pClipFrustum->zFar )
+            if (LIKELY(pVertIter->y <= (flex_d_t)pClipFrustum->zFar))
             {
                 *pWorkVertIter = *pVertIter;
                 pWorkTVertIter->x = pTVertIter->x;
@@ -1598,7 +1601,7 @@ int rdClip_Face3GT(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3* NO_ALI
                 *pWorkIVertIter++ = *pIVertIter;
             }
         }
-        if ( numOnScreenVertices < 3 ) {
+        if (UNLIKELY(numOnScreenVertices < 3)) {
             return numOnScreenVertices;
         }
 
@@ -1635,11 +1638,11 @@ int rdClip_Face3GT(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3* NO_ALI
     {
         flex_t nearLeftPlaneA = pClipFrustum->nearLeft * pLastVertIter->y;
         flex_t nearLeftPlaneB = pClipFrustum->nearLeft * pVertIter->y;
-        if (!(nearLeftPlaneA <= pLastVertIter->x || nearLeftPlaneB <= pVertIter->x)) {
+        if (UNLIKELY(!(nearLeftPlaneA <= pLastVertIter->x || nearLeftPlaneB <= pVertIter->x))) {
             continue;
         }
 
-        if ( pLastVertIter->x != nearLeftPlaneA && nearLeftPlaneB != pVertIter->x && (pLastVertIter->x < nearLeftPlaneA || nearLeftPlaneB > pVertIter->x) )
+        if (LIKELY(pLastVertIter->x != nearLeftPlaneA && nearLeftPlaneB != pVertIter->x && (pLastVertIter->x < nearLeftPlaneA || nearLeftPlaneB > pVertIter->x)))
         {
             flex_t dy = (pVertIter->y - pLastVertIter->y);
             flex_t dx = (pVertIter->x - pLastVertIter->x);
@@ -1669,7 +1672,7 @@ int rdClip_Face3GT(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3* NO_ALI
             ++pWorkVertIter;
             rdClip_faceStatus |= CLIPSTAT_LEFT;
         }
-        if ( nearLeftPlaneB <= pVertIter->x )
+        if (LIKELY(nearLeftPlaneB <= pVertIter->x))
         {
             *pWorkVertIter = *pVertIter;
             pWorkTVertIter->x = pTVertIter->x;
@@ -1680,7 +1683,7 @@ int rdClip_Face3GT(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3* NO_ALI
             ++pWorkVertIter;
         }
     }
-    if ( numOnScreenVertices < 3 )
+    if (UNLIKELY(numOnScreenVertices < 3))
         return numOnScreenVertices;
 
     numVertices = numOnScreenVertices;
@@ -1714,11 +1717,11 @@ int rdClip_Face3GT(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3* NO_ALI
     {
         flex_t rightPlaneA = pClipFrustum->right * pLastVertIter->y;
         flex_t rightPlaneB = pClipFrustum->right * pVertIter->y;
-        if (!(rightPlaneA >= pLastVertIter->x || rightPlaneB >= pVertIter->x)) {
+        if (UNLIKELY(!(rightPlaneA >= pLastVertIter->x || rightPlaneB >= pVertIter->x))) {
             continue;
         }
 
-        if ( pLastVertIter->x != rightPlaneA && rightPlaneB != pVertIter->x && (pLastVertIter->x > (flex_d_t)rightPlaneA || rightPlaneB < pVertIter->x) )
+        if (LIKELY(pLastVertIter->x != rightPlaneA && rightPlaneB != pVertIter->x && (pLastVertIter->x > (flex_d_t)rightPlaneA || rightPlaneB < pVertIter->x)))
         {
             flex_t dy = (pVertIter->y - pLastVertIter->y);
             flex_t dx = (pVertIter->x - pLastVertIter->x);
@@ -1749,7 +1752,7 @@ int rdClip_Face3GT(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3* NO_ALI
             ++pWorkVertIter;
             rdClip_faceStatus |= CLIPSTAT_RIGHT;
         }
-        if ( rightPlaneB >= pVertIter->x )
+        if (LIKELY(rightPlaneB >= pVertIter->x))
         {
             pWorkVertIter->x = pVertIter->x;
             pWorkVertIter->y = pVertIter->y;
@@ -1763,7 +1766,7 @@ int rdClip_Face3GT(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3* NO_ALI
         }
     }
     
-    if ( numOnScreenVertices < 3 ) {
+    if (UNLIKELY(numOnScreenVertices < 3)) {
         return numOnScreenVertices;
     }
     
@@ -1798,11 +1801,11 @@ int rdClip_Face3GT(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3* NO_ALI
     {
         flex_t topPlaneA = pClipFrustum->nearTop * pLastVertIter->y;
         flex_t topPlaneB = pClipFrustum->nearTop * pVertIter->y;
-        if (!(pLastVertIter->z <= topPlaneA || pVertIter->z <= (flex_d_t)topPlaneB)) {
+        if (UNLIKELY(!(pLastVertIter->z <= topPlaneA || pVertIter->z <= (flex_d_t)topPlaneB))) {
             continue;
         }
 
-        if ( pLastVertIter->z != topPlaneA && pVertIter->z != topPlaneB && (pLastVertIter->z > (flex_d_t)topPlaneA || pVertIter->z > (flex_d_t)topPlaneB) )
+        if (LIKELY(pLastVertIter->z != topPlaneA && pVertIter->z != topPlaneB && (pLastVertIter->z > (flex_d_t)topPlaneA || pVertIter->z > (flex_d_t)topPlaneB)))
         {
             flex_t dy = pVertIter->y - pLastVertIter->y;
             flex_t dz = pVertIter->z - pLastVertIter->z;
@@ -1833,7 +1836,7 @@ int rdClip_Face3GT(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3* NO_ALI
             ++pWorkVertIter;
             rdClip_faceStatus |= CLIPSTAT_TOP;
         }
-        if ( pVertIter->z <= (flex_d_t)topPlaneB )
+        if (LIKELY(pVertIter->z <= (flex_d_t)topPlaneB))
         {
             pWorkVertIter->x = pVertIter->x;
             pWorkVertIter->y = pVertIter->y;
@@ -1846,7 +1849,7 @@ int rdClip_Face3GT(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3* NO_ALI
             ++pWorkVertIter;
         }
     }
-    if ( numOnScreenVertices < 3 ) {
+    if (UNLIKELY(numOnScreenVertices < 3)) {
         return numOnScreenVertices;
     }
 
@@ -1881,11 +1884,11 @@ int rdClip_Face3GT(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3* NO_ALI
     {
         flex_t bottomPlaneA = pClipFrustum->bottom * pLastVertIter->y;
         flex_t bottomPlaneB = pClipFrustum->bottom * pVertIter->y;
-        if (!(pLastVertIter->z >= bottomPlaneA || pVertIter->z >= (flex_d_t)bottomPlaneB)) {
+        if (UNLIKELY(!(pLastVertIter->z >= bottomPlaneA || pVertIter->z >= (flex_d_t)bottomPlaneB))) {
             continue;
         }
 
-        if ( pLastVertIter->z != bottomPlaneA && pVertIter->z != bottomPlaneB && (pLastVertIter->z < (flex_d_t)bottomPlaneA || pVertIter->z < (flex_d_t)bottomPlaneB) )
+        if (LIKELY(pLastVertIter->z != bottomPlaneA && pVertIter->z != bottomPlaneB && (pLastVertIter->z < (flex_d_t)bottomPlaneA || pVertIter->z < (flex_d_t)bottomPlaneB)))
         {
             flex_t dy = pVertIter->y - pLastVertIter->y;
             flex_t dz = pVertIter->z - pLastVertIter->z;
@@ -1922,7 +1925,7 @@ int rdClip_Face3GT(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3* NO_ALI
             ++pWorkTVertIter;
             rdClip_faceStatus |= CLIPSTAT_BOTTOM;
         }
-        if ( pVertIter->z >= (flex_d_t)bottomPlaneB )
+        if (LIKELY(pVertIter->z >= (flex_d_t)bottomPlaneB))
         {
             *pWorkVertIter = *pVertIter;
             pWorkTVertIter->x = pTVertIter->x;
@@ -1934,7 +1937,7 @@ int rdClip_Face3GT(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3* NO_ALI
         }
     }
 
-    if ( numOnScreenVertices < 3 )
+    if (UNLIKELY(numOnScreenVertices < 3))
         return numOnScreenVertices;
 
     numVertices = numOnScreenVertices;
@@ -1966,13 +1969,13 @@ int rdClip_Face3GT(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3* NO_ALI
     numOnScreenVertices = 0;
     for (int i = 0; i < numVertices; pLastVertIter = pVertIter++, pLastIVertIter = pIVertIter++, pLastTVertIter = pTVertIter++, i++)
     {
-        if (!(pLastVertIter->y >= (flex_d_t)pClipFrustum->zNear || pVertIter->y >= (flex_d_t)pClipFrustum->zNear)) {
+        if (UNLIKELY(!(pLastVertIter->y >= (flex_d_t)pClipFrustum->zNear || pVertIter->y >= (flex_d_t)pClipFrustum->zNear))) {
             continue;
         }
 
-        if ( pLastVertIter->y != pClipFrustum->zNear
+        if (LIKELY(pLastVertIter->y != pClipFrustum->zNear
           && pVertIter->y != pClipFrustum->zNear
-          && (pLastVertIter->y < (flex_d_t)pClipFrustum->zNear || pVertIter->y < (flex_d_t)pClipFrustum->zNear) )
+          && (pLastVertIter->y < (flex_d_t)pClipFrustum->zNear || pVertIter->y < (flex_d_t)pClipFrustum->zNear)))
         {
             flex_t dy = (pVertIter->y - pLastVertIter->y) * premultiplyASquared;
 #ifdef EXPERIMENTAL_FIXED_POINT
@@ -1996,7 +1999,7 @@ int rdClip_Face3GT(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3* NO_ALI
             ++pWorkTVertIter;
             ++numOnScreenVertices;
         }
-        if ( pVertIter->y >= (flex_d_t)pClipFrustum->zNear )
+        if (LIKELY(pVertIter->y >= (flex_d_t)pClipFrustum->zNear))
         {
             *pWorkVertIter = *pVertIter;
             pWorkTVertIter->x = pTVertIter->x;
@@ -2008,14 +2011,14 @@ int rdClip_Face3GT(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3* NO_ALI
         }
     }
 
-    if ( numOnScreenVertices < 3 )
+    if (UNLIKELY(numOnScreenVertices < 3))
     {
         rdClip_faceStatus |= CLIPSTAT_NONE_VISIBLE; // Bug? Or did I mislabel this status
         return numOnScreenVertices;
     }
 
 #ifndef RDCLIP_CLIP_ZFAR_FIRST
-    if (pClipFrustum->bClipFar)
+    if (UNLIKELY(pClipFrustum->bClipFar))
     {
         numVertices = numOnScreenVertices;
         pLastSourceVert = pSourceVert;
@@ -2046,13 +2049,13 @@ int rdClip_Face3GT(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3* NO_ALI
         numOnScreenVertices = 0;
         for (int i = 0; i < numVertices; pLastVertIter = pVertIter++, pLastIVertIter = pIVertIter++, pLastTVertIter = pTVertIter++, i++)
         {
-            if (!(pLastVertIter->y <= (flex_d_t)pClipFrustum->zFar || pVertIter->y <= (flex_d_t)pClipFrustum->zFar)) {
+            if (UNLIKELY(!(pLastVertIter->y <= (flex_d_t)pClipFrustum->zFar || pVertIter->y <= (flex_d_t)pClipFrustum->zFar))) {
                 continue;
             }
 
-            if ( pLastVertIter->y != pClipFrustum->zFar
+            if (LIKELY(pLastVertIter->y != pClipFrustum->zFar
               && pVertIter->y != pClipFrustum->zFar
-              && (pLastVertIter->y > (flex_d_t)pClipFrustum->zFar || pVertIter->y > (flex_d_t)pClipFrustum->zFar) )
+              && (pLastVertIter->y > (flex_d_t)pClipFrustum->zFar || pVertIter->y > (flex_d_t)pClipFrustum->zFar)))
             {
                 
                 v174 = (pClipFrustum->zFar - pLastVertIter->y) / (pVertIter->y - pLastVertIter->y);
@@ -2069,7 +2072,7 @@ int rdClip_Face3GT(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3* NO_ALI
                 ++numOnScreenVertices;
                 rdClip_faceStatus |= CLIPSTAT_FAR;
             }
-            if ( pVertIter->y <= (flex_d_t)pClipFrustum->zFar )
+            if (LIKELY(pVertIter->y <= (flex_d_t)pClipFrustum->zFar))
             {
                 *pWorkVertIter = *pVertIter;
                 pWorkTVertIter->x = pTVertIter->x;
@@ -2080,13 +2083,13 @@ int rdClip_Face3GT(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3* NO_ALI
                 *pWorkIVertIter++ = *pIVertIter;
             }
         }
-        if ( numOnScreenVertices < 3 ) {
+        if (UNLIKELY(numOnScreenVertices < 3)) {
             return numOnScreenVertices;
         }
     }
 #endif
 
-    if ( pDestVert != pVertices )
+    if (UNLIKELY(pDestVert != pVertices))
     {
         _memcpy(pVertices, pDestVert, sizeof(rdVector3) * numOnScreenVertices);
         _memcpy(pTVertices, pDestTVert, sizeof(rdVector2) * numOnScreenVertices);

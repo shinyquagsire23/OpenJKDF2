@@ -1429,7 +1429,7 @@ void sithRender_KindaClip(sithSector *sector, rdClipFrustum *frustumArg, flex_t 
             bAdjoinIsTransparent |= (dist < 0.01);
 #endif
 
-            if ((adjoinIter->flags & 1) && bAdjoinIsTransparent) 
+            if (LIKELY((adjoinIter->flags & 1) && bAdjoinIsTransparent))
             {
 #ifdef SITHRENDER_SPHERE_TEST_SURFACES
                 BOOL bKeepFullFrustum = 0;
@@ -1441,7 +1441,7 @@ void sithRender_KindaClip(sithSector *sector, rdClipFrustum *frustumArg, flex_t 
                 int clipResult = rdClip_SphereInFrustum(pSphereFrustum, &centerTrans, radius);
 
                 // Try to guess if the sphere is actually encapsulating the camera
-                if ((dist - radius) < 0.0 || (dist + radius) >= rdCamera_pCurCamera->pClipFrustum->zFar || (radius * 2.0) >= 2.5 || dist < 0.01) {
+                if (UNLIKELY((dist - radius) < 0.0 || (dist + radius) >= rdCamera_pCurCamera->pClipFrustum->zFar || (radius * 2.0) >= 2.5 || dist < 0.01)) {
                     clipResult = SPHERE_CLIPPING_EDGE;
                     bKeepFullFrustum = 1;
                 }
@@ -1451,7 +1451,7 @@ void sithRender_KindaClip(sithSector *sector, rdClipFrustum *frustumArg, flex_t 
                     clipResult = SPHERE_CLIPPING_EDGE;
                 }
 
-                if (clipResult == SPHERE_FULLY_OUTSIDE) {
+                if (LIKELY(clipResult == SPHERE_FULLY_OUTSIDE)) {
 
 #if 0
                     // Double-check if the sphere is encapsulating the frustum
@@ -1494,12 +1494,12 @@ void sithRender_KindaClip(sithSector *sector, rdClipFrustum *frustumArg, flex_t 
                     outClip = *rdCamera_pCurCamera->pClipFrustum;//*frustumArg;
                 }
 
-                if ( adjoinSurface->field_4 != sithRender_lastRenderTick )
+                if (LIKELY(adjoinSurface->field_4 != sithRender_lastRenderTick))
                 {
                     for (int i = 0; i < adjoinSurface->surfaceInfo.face.numVertices; i++)
                     {
                         v25 = adjoinSurface->surfaceInfo.face.vertexPosIdx[i];
-                        if ( sithWorld_pCurrentWorld->alloc_unk98[v25] != sithRender_lastRenderTick )
+                        if (LIKELY(sithWorld_pCurrentWorld->alloc_unk98[v25] != sithRender_lastRenderTick))
                         {
                             rdMatrix_TransformPoint34(&sithWorld_pCurrentWorld->verticesTransformed[v25], &sithWorld_pCurrentWorld->vertices[v25], &rdCamera_pCurCamera->view_matrix);
                             sithWorld_pCurrentWorld->alloc_unk98[v25] = sithRender_lastRenderTick;
@@ -1521,7 +1521,7 @@ void sithRender_KindaClip(sithSector *sector, rdClipFrustum *frustumArg, flex_t 
                 flex_t topLimit = outClip.farTop;
 
                 // If we've visited before, grow the frustum
-                if (adjoinIter->sector->renderTick == sithRender_lastRenderTick)
+                if (UNLIKELY(adjoinIter->sector->renderTick == sithRender_lastRenderTick))
                 {
                     leftLimit = stdMath_Min(adjoinIter->sector->clipFrustum->farLeft, leftLimit);
                     rightLimit = stdMath_Max(adjoinIter->sector->clipFrustum->right, rightLimit);
@@ -1550,13 +1550,13 @@ void sithRender_KindaClip(sithSector *sector, rdClipFrustum *frustumArg, flex_t 
                     maxY = stdMath_Max(maxY, projY);
                 }
 
-                if (minX == maxX || minY == maxY) {
+                if (UNLIKELY(minX == maxX || minY == maxY)) {
                     *v31 = *rdCamera_pCurCamera->pClipFrustum;
 #if 0
                     printf("aaaaaa2 %d in %d, depth %d, %f %f %f %f\n", adjoinIter->sector->id, sector->id, depth, minX, maxX, minY, maxY);
 #endif
 
-                    if (adjoinIter->sector->renderTick == sithRender_lastRenderTick && !bKeepFullFrustum)
+                    if (UNLIKELY(adjoinIter->sector->renderTick == sithRender_lastRenderTick && !bKeepFullFrustum))
                     {
                         int lastClipVisited = adjoinIter->sector->clipVisited;
                         adjoinIter->sector->clipVisited = 0;
@@ -1579,7 +1579,7 @@ void sithRender_KindaClip(sithSector *sector, rdClipFrustum *frustumArg, flex_t 
 #endif
 
                 // Assign the grown frustum and don't iterate deeper
-                if (adjoinIter->sector->renderTick == sithRender_lastRenderTick)
+                if (UNLIKELY(adjoinIter->sector->renderTick == sithRender_lastRenderTick))
                 {
                     rdClipFrustum* pFrustumPrior = adjoinIter->sector->clipFrustum;
                     v31->farTop   = stdMath_Max(v31->farTop, pFrustumPrior->farTop);
@@ -1722,7 +1722,7 @@ void sithRender_RenderLevelGeometry()
     sithRender_flag &= ~0x8; // Drops render time by 2/3 by rendering by n-gons instead of tris
 #endif
 
-    if ( rdroid_curAcceleration )
+    if (LIKELY(rdroid_curAcceleration))
     {
         rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
         if (sithRender_flag & 0x80) {
@@ -1764,7 +1764,7 @@ void sithRender_RenderLevelGeometry()
         level_idk->geoRenderTick = sithRender_lastRenderTick;
         //level_idk->clipFrustum = rdCamera_pCurCamera->pClipFrustum;
 #endif
-        if ( sithRender_lightingIRMode )
+        if (UNLIKELY(sithRender_lightingIRMode))
         {
             a2 = sithRender_f_83198C;
             rdCamera_SetAmbientLight(rdCamera_pCurCamera, sithRender_f_83198C);
@@ -1787,13 +1787,13 @@ void sithRender_RenderLevelGeometry()
         for (v75 = 0; v75 < level_idk->numSurfaces; v65->field_4 = sithRender_lastRenderTick, ++v65, v75++)
         {
             rdClipFrustum* pSurfaceFrustum = pSectorFrustum;
-            if ( !v65->surfaceInfo.face.geometryMode )
+            if (UNLIKELY(!v65->surfaceInfo.face.geometryMode))
                 continue;
             vertices_alloc = sithWorld_pCurrentWorld->vertices;
 
             BOOL bIsSkySurface = (v65->surfaceFlags & (SITH_SURFACE_CEILING_SKY|SITH_SURFACE_HORIZON_SKY));
             flex_t dist = rdMath_DistancePointToPlane(&sithCamera_currentCamera->vec3_1, &v65->surfaceInfo.face.normal, &vertices_alloc[*v65->surfaceInfo.face.vertexPosIdx]);
-            if (dist <= 0.0)
+            if (UNLIKELY(dist <= 0.0))
                 continue;
 #ifdef TARGET_TWL
             if (noDistCulling && dist > SITHCAMERA_ZFAR && !bIsSkySurface) {
@@ -1802,7 +1802,7 @@ void sithRender_RenderLevelGeometry()
 #endif
 
             rdMaterial* surfaceMat = v65->surfaceInfo.face.material;
-            if ( surfaceMat )
+            if (LIKELY(surfaceMat))
             {
                 if ( v65->surfaceInfo.face.wallCel == -1 )
                     v10 = surfaceMat->texinfos[surfaceMat->celIdx];
@@ -1832,7 +1832,7 @@ void sithRender_RenderLevelGeometry()
 
 #ifdef SITHRENDER_SPHERE_TEST_SURFACES
             int clipResult = SPHERE_CLIPPING_EDGE; 
-            if (/*noDistCulling &&*/ !bIsSkySurface)
+            if (LIKELY(/*noDistCulling &&*/ !bIsSkySurface))
             {
                 rdVector3 centerTrans = v65->center;
                 rdClipFrustum* pSphereFrustum = pSurfaceFrustum;
@@ -1844,7 +1844,7 @@ void sithRender_RenderLevelGeometry()
                 /*if (sithRender_lastRenderTick & 1) {
                     clipResult = SPHERE_CLIPPING_EDGE;
                 }*/
-                if (v65->radius * 2.0 > rdCamera_pCurCamera->pClipFrustum->zFar) {
+                if (UNLIKELY(v65->radius * 2.0 > rdCamera_pCurCamera->pClipFrustum->zFar)) {
                     clipResult = SPHERE_CLIPPING_EDGE;
                     //pSurfaceFrustum = rdCamera_pCurCamera->pClipFrustum;
                 }
@@ -1855,7 +1855,7 @@ void sithRender_RenderLevelGeometry()
                     clipResult = rdClip_SphereInFrustum(&sithRender_absoluteMaxFrustum, &centerTrans, v65->radius);
                 }
 
-                if (clipResult == SPHERE_FULLY_OUTSIDE) {
+                if (LIKELY(clipResult == SPHERE_FULLY_OUTSIDE)) {
                     continue;
                 }
 
@@ -1868,12 +1868,12 @@ void sithRender_RenderLevelGeometry()
             }
 #endif
 
-            if ( v65->field_4 != sithRender_lastRenderTick )
+            if (LIKELY(v65->field_4 != sithRender_lastRenderTick))
             {
                 for (int j = 0; j < v65->surfaceInfo.face.numVertices; j++)
                 {
                     int idx = v65->surfaceInfo.face.vertexPosIdx[j];
-                    if ( sithWorld_pCurrentWorld->alloc_unk98[idx] != sithRender_lastRenderTick )
+                    if (LIKELY(sithWorld_pCurrentWorld->alloc_unk98[idx] != sithRender_lastRenderTick))
                     {
                         rdMatrix_TransformPoint34(&sithWorld_pCurrentWorld->verticesTransformed[idx], &sithWorld_pCurrentWorld->vertices[idx], &rdCamera_pCurCamera->view_matrix);
                         sithWorld_pCurrentWorld->alloc_unk98[idx] = sithRender_lastRenderTick;
@@ -1883,13 +1883,13 @@ void sithRender_RenderLevelGeometry()
             }
 
             // Render with N-Gons instead of triangle strips if flag 0x8 is unset, or if it's sky vertices
-            if ( (sithRender_flag & 8) == 0 || v65->surfaceInfo.face.numVertices <= 3 || bIsSkySurface || !v65->surfaceInfo.face.lightingMode )
+            if (LIKELY((sithRender_flag & 8) == 0 || v65->surfaceInfo.face.numVertices <= 3 || bIsSkySurface || !v65->surfaceInfo.face.lightingMode))
             {
                 procEntry = rdCache_GetProcEntry();
                 if ( !procEntry )
                     continue;
                 procEntry->light_level_static = 1.0; // Added?
-                if ( (v65->surfaceFlags & (SITH_SURFACE_HORIZON_SKY|SITH_SURFACE_CEILING_SKY)) != 0 )
+                if (UNLIKELY(bIsSkySurface))
                 {
                     geoMode = sithRender_geoMode;
                     if ( sithRender_geoMode > RD_GEOMODE_SOLIDCOLOR)
@@ -1898,24 +1898,24 @@ void sithRender_RenderLevelGeometry()
                 else
                 {
                     geoMode = v65->surfaceInfo.face.geometryMode;
-                    if ( geoMode >= sithRender_geoMode )
+                    if (UNLIKELY(geoMode >= sithRender_geoMode))
                         geoMode = sithRender_geoMode;
                 }
                 procEntry->geometryMode = geoMode;
                 lightMode = v65->surfaceInfo.face.lightingMode;
-                if ( sithRender_lightingIRMode )
+                if (UNLIKELY(sithRender_lightingIRMode))
                 {
                     if ( lightMode >= RD_LIGHTMODE_DIFFUSE)
                         lightMode = RD_LIGHTMODE_DIFFUSE;
                 }
-                else if ( lightMode >= sithRender_lightMode )
+                else if (UNLIKELY(lightMode >= sithRender_lightMode))
                 {
                     lightMode = sithRender_lightMode;
                 }
                 texMode = sithRender_texMode;
                 procEntry->lightingMode = lightMode;
                 texMode2 = v65->surfaceInfo.face.textureMode;
-                if ( texMode2 >= texMode )
+                if (UNLIKELY(texMode2 >= texMode))
                     texMode2 = texMode;
                 procEntry->textureMode = texMode2;
                 meshinfo_out.vertices = sithRender_aVerticesTmp;
@@ -1937,7 +1937,7 @@ void sithRender_RenderLevelGeometry()
                     }
 #endif
 #ifdef SITHRENDER_SPHERE_TEST_SURFACES
-                    if (clipResult != SPHERE_FULLY_INSIDE) {
+                    if (UNLIKELY(clipResult != SPHERE_FULLY_INSIDE)) {
 #endif
                     rdPrimit3_ClipFace(pSurfaceFrustum, 
                                        procEntry->geometryMode, 
@@ -1986,9 +1986,7 @@ void sithRender_RenderLevelGeometry()
                     meshinfo_out.paBlueIntensities = procEntry->paBlueIntensities;
 
 #ifdef TARGET_TWL
-                    if (bIsSkySurface) {
-                        pSurfaceFrustum->bClipFar = 0;
-                    }
+                    pSurfaceFrustum->bClipFar = !bIsSkySurface;
 #endif
 #ifdef SITHRENDER_SPHERE_TEST_SURFACES
                     if (clipResult != SPHERE_FULLY_INSIDE) {
@@ -2029,13 +2027,13 @@ void sithRender_RenderLevelGeometry()
                 }
                 
                 num_vertices = meshinfo_out.numVertices;
-                if ( meshinfo_out.numVertices < 3u )
+                if (UNLIKELY(meshinfo_out.numVertices < 3u))
                 {
                     continue;
                 }
                 rdCamera_pCurCamera->fnProjectLst(procEntry->vertices, sithRender_aVerticesTmp, meshinfo_out.numVertices);
 
-                if ( sithRender_lightingIRMode )
+                if (UNLIKELY(sithRender_lightingIRMode))
                 {
                     v49 = sithRender_f_83198C;
                     procEntry->light_level_static = 0.0;
@@ -2119,11 +2117,11 @@ void sithRender_RenderLevelGeometry()
 #endif
 
                 surfaceFlags = v65->surfaceFlags;
-                if ( (surfaceFlags & SITH_SURFACE_HORIZON_SKY) != 0 )
+                if (UNLIKELY(surfaceFlags & SITH_SURFACE_HORIZON_SKY))
                 {
                     sithRenderSky_TransformHorizontal(procEntry, &v65->surfaceInfo, num_vertices);
                 }
-                else if ( (surfaceFlags & SITH_SURFACE_CEILING_SKY) != 0 )
+                else if (UNLIKELY(surfaceFlags & SITH_SURFACE_CEILING_SKY))
                 {
                     sithRenderSky_TransformVertical(procEntry, &v65->surfaceInfo, sithRender_aVerticesTmp, num_vertices);
                 }
@@ -2426,12 +2424,12 @@ LABEL_150:
 #ifdef SITHRENDER_SPHERE_TEST_SURFACES
             extern rdClipFrustum sithRender_absoluteMaxFrustum;
 
-            if (v63 == SPHERE_CLIPPING_EDGE) {
+            if (UNLIKELY(v63 == SPHERE_CLIPPING_EDGE)) {
                 v63 = rdClip_SphereInFrustum(&sithRender_absoluteMaxFrustum, &i->screenPos, i->rdthing.model3->radius);
             }
     #endif
             i->rdthing.clippingIdk = v63;
-            if ( v63 == SPHERE_FULLY_OUTSIDE ) {
+            if (LIKELY(v63 == SPHERE_FULLY_OUTSIDE)) {
                 continue;
             }
 

@@ -164,7 +164,9 @@ int Main_StartupDedicated(int bFullyDedicated)
     stdString_SafeWStrCopy(jkGuiMultiplayer_mpcInfo.name, L"", 32);
     stdString_SafeStrCopy(jkGuiMultiplayer_mpcInfo.model, "ky.3do", 32);
     stdString_SafeStrCopy(jkGuiMultiplayer_mpcInfo.soundClass, "ky.snd", 32);
+#ifndef OPTIMIZE_OUT_UNUSED_FIELDS
     //stdString_SafeStrCopy(jkGuiMultiplayer_mpcInfo.gap80, "", 32);
+#endif
     stdString_SafeStrCopy(jkGuiMultiplayer_mpcInfo.sideMat, "sabergreen1.mat", 32);
     stdString_SafeStrCopy(jkGuiMultiplayer_mpcInfo.tipMat, "sabergreen0.mat", 32);
     jkGuiMultiplayer_mpcInfo.jediRank = 0;

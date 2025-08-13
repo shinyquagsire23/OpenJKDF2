@@ -1,6 +1,7 @@
 #include "sithAI.h"
 
 #include "General/stdMath.h"
+#include "General/crc32.h"
 #include "World/sithThing.h"
 #include "Engine/sithCollision.h"
 #include "World/sithActor.h"
@@ -453,7 +454,11 @@ void sithAI_RegisterCommand(const char *cmdName, sithAICommandFunc_t func, int p
 
     sithAICommand* aiCmd = &sithAI_commandList[sithAI_numCommands];
 
+#ifndef SITHAI_CRC32_INSTINCTS
     stdString_SafeStrCopy(aiCmd->name, cmdName, 32);
+#else
+    aiCmd->namecrc = stdCrc32(cmdName, strlen(cmdName));
+#endif
 
     aiCmd->func = func;
     aiCmd->param1 = param1;
@@ -467,9 +472,17 @@ sithAICommand* sithAI_FindCommand(const char *cmdName)
     if ( !sithAI_numCommands )
         return NULL;
 
+#ifdef SITHAI_CRC32_INSTINCTS
+    uint32_t cmdNameCrc = stdCrc32(cmdName, strlen(cmdName));
+#endif
+
     for (uint32_t i = 0; i < sithAI_numCommands; i++)
     {
+#ifndef SITHAI_CRC32_INSTINCTS
         if (!_strcmp(cmdName, sithAI_commandList[i].name))
+#else
+        if (sithAI_commandList[i].namecrc == cmdNameCrc)
+#endif
             return &sithAI_commandList[i];
     }
 

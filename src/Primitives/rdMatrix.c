@@ -279,9 +279,7 @@ void rdMatrix_LookAt(rdMatrix34 *out, const rdVector3* NO_ALIAS v1, const rdVect
     out->lvec.z = v2->z - v1->z;
     rdVector_Normalize3Acc(&out->lvec);
     rdMatrix_BuildFromVectorAngle34(&tmp, &out->lvec, angle);
-    v7 = (out->lvec.y * 0.0) + (out->lvec.x * 0.0) + (out->lvec.z * 1.0);
-    if ( v7 < 0.0 )
-        v7 = -v7;
+    v7 = stdMath_Fabs((out->lvec.y * 0.0) + (out->lvec.x * 0.0) + (out->lvec.z * 1.0));
     if ( v7 <= 0.999 )
     {
         v24 = tmp.rvec.x * 0.0 + tmp.lvec.x * 0.0 + tmp.uvec.x * 1.0;

@@ -310,6 +310,9 @@
 #define COG_DYNAMIC_STACKS_INCREMENT (32)
 #define COG_CRC32_SYMBOL_NAMES
 
+// Other memory optimizations
+#define SITHAI_CRC32_INSTINCTS
+
 // Suggest which heaps to place things in 
 // (fast NWRAM, slow swap, etc)
 #define STDPLATFORM_HEAP_SUGGESTIONS

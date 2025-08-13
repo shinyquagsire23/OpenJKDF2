@@ -32,15 +32,7 @@ flex_t rdMath_DeltaAngleNormalizedAbs(rdVector3 *a1, rdVector3 *a2)
 
 flex_t rdMath_DeltaAngleNormalized(rdVector3 *a1, rdVector3 *a2, rdVector3 *a3)
 {
-    flex_t v4 = rdVector_Dot3(a1, a2);
-    if ( v4 < -1.0 ) // TODO clamp macro
-    {
-        v4 = -1.0;
-    }
-    else if ( v4 > 1.0 )
-    {
-        v4 = 1.0;
-    }
+    flex_t v4 = stdMath_Clamp(rdVector_Dot3(a1, a2), -1.0, 1.0);
 
     if ( v4 == 1.0 )
         return 0.0;
