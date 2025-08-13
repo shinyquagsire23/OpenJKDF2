@@ -359,8 +359,10 @@ int std3D_LoadResources() {
 
 int std3D_Startup()
 {
-    // TODO: Not on 3DS?
-    std3D_bEnableTwlVrr = 1;
+    // No VRR on 3DS, it causes issues
+    if (openjkdf2_bIsExtraLowMemoryPlatform) {
+        std3D_bEnableTwlVrr = 1;
+    }
 
     // initialize gl
     glInit();
@@ -998,10 +1000,8 @@ void std3D_DrawRenderListReal()
         int vertIdxStart = ngons[j].vertIdxStart;
         u8 lightLevelOrig = 0;
         u8 lightLevel = 0;
-        if (flags & 0x8000 && tex_id == -1) { // 0x8000 = constant light?
-            lightLevelOrig = 0x3F;
-        }
-        if (!(jkPlayer_bEnableClassicLighting || jkPlayer_bEnableEmissiveTextures)) {
+        BOOL bConstantLight = (flags & 0x8000 && tex_id == -1) || !(jkPlayer_bEnableClassicLighting || jkPlayer_bEnableEmissiveTextures);
+        if (bConstantLight) {
             lightLevelOrig = 0x3F;
         }
         lightLevel = lightLevelOrig;
@@ -1045,7 +1045,11 @@ void std3D_DrawRenderListReal()
             BOOL resetStrip = 0;
             
             vertLightLevel = vert->lightLevel>>2;//nextVertLightLevel;
-            if ((k+1) & 1) {
+            if (bConstantLight) { // 0x8000 = constant light?
+                nextVertLightLevel = 0x3F;
+                vertLightLevel = 0x3F;
+            }
+            else if ((k+1) & 1) {
                 nextVertLightLevel = vertexes[vertIdxStart + idx1].lightLevel>>2;
             }
             else {

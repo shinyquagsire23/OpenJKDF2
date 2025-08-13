@@ -1024,18 +1024,32 @@ int rdMaterial_PurgeMaterialCache()
     // TODO: maybe be gentler here and have like, a 60 frame buffer
 
     int purgedAnything = 0;
+    int purgeLimit = 240;
     rdMaterial* pNextCachedMaterial = NULL;
-    for ( rdMaterial* pCacheMaterial = rdMaterial_pFirstMatCache; pCacheMaterial; pCacheMaterial = pNextCachedMaterial )
-    {
-        pNextCachedMaterial = pCacheMaterial->pNextCachedMaterial;
-
-        // On DSi, we can't purge the current frame nor the previous, because the previous is being rastered constantly by the hardware
-        if (!(pCacheMaterial->frameNum == std3D_frameCount || pCacheMaterial->frameNum == std3D_frameCount-1))
+    while (!purgedAnything) {
+        for ( rdMaterial* pCacheMaterial = rdMaterial_pFirstMatCache; pCacheMaterial; pCacheMaterial = pNextCachedMaterial )
         {
-            purgedAnything = 1;
-            
-            rdMaterial_ResetCacheInfo(pCacheMaterial);
-            //std3D_PurgeSurfaceRefs(pCacheMaterial);
+            pNextCachedMaterial = pCacheMaterial->pNextCachedMaterial;
+
+            if (pCacheMaterial->frameNum == std3D_frameCount || pCacheMaterial->frameNum == std3D_frameCount-1) {
+                break;
+            }
+
+            // On DSi, we can't purge the current frame nor the previous, because the previous is being rastered constantly by the hardware
+            if (pCacheMaterial->frameNum-std3D_frameCount > purgeLimit)
+            {
+                purgedAnything = 1;
+                
+                rdMaterial_ResetCacheInfo(pCacheMaterial);
+                //std3D_PurgeSurfaceRefs(pCacheMaterial);
+            }
+            else {
+                break;
+            }
+        }
+        purgeLimit -= 20;
+        if (purgeLimit <= 0) {
+            break;
         }
     }
 
