@@ -609,7 +609,7 @@ int stdPrintf(int (*a1)(const char *, ...), const char *a2, int line, const char
     printf("(%p %s:%d) ", a1, a2, line);
     int ret = vprintf(fmt, args);
     va_end (args);
-    #if defined(TARGET_SWITCH) //&& defined(DEBUG)
+    #if defined(TARGET_SWITCH) && defined(DEBUG)
         FILE* f = fopen("sdmc:/openjkdf2_log.txt", "a");
     if (!f) return ret;
 
