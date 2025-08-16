@@ -197,8 +197,17 @@ int jkRes_ReadKeyFromFile(const char* fpath)
     int keyval;
 
     stdFile_t fd = pHS->fileOpen(fpath, "rb");
-    if (!fd)
-        return 0;
+    if (!fd) {
+        // Added: pLowLevelHS for DSi
+        fd = pLowLevelHS->fileOpen(fpath, "rb");
+        if (!fd) {
+            return 0;
+        }
+        keyval = 0;
+        pLowLevelHS->fileRead(fd, &keyval, 4);
+        pLowLevelHS->fileClose(fd);
+        return keyval;
+    }
 
     keyval = 0;
     pHS->fileRead(fd, &keyval, 4);
