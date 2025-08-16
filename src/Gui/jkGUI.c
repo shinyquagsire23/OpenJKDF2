@@ -302,6 +302,9 @@ int jkGui_Startup()
         else if (texA->surface_lock_alloc[i] == 0x69) { // interior
             texA->surface_lock_alloc[i] = 0xFB;
         }
+        else {
+            texA->surface_lock_alloc[i] = 0xE5;
+        }
         //texA->surface_lock_alloc[i] = 0xe6;
     }
     stdDisplay_VBufferUnlock(texA);
@@ -315,13 +318,16 @@ int jkGui_Startup()
             texB->surface_lock_alloc[i] = 0xE5;
         }
         else if (texB->surface_lock_alloc[i] == 0x87) {
-            texB->surface_lock_alloc[i] = 0xE4;
+            texB->surface_lock_alloc[i] = 0xE5;
         }
         else if (texB->surface_lock_alloc[i] == 0x68) {
             texB->surface_lock_alloc[i] = 0xE0;
         }
         else if (texB->surface_lock_alloc[i] == 0x69) {
             texB->surface_lock_alloc[i] = 0xE0;
+        }
+        else {
+            texB->surface_lock_alloc[i] = 0xE5;
         }
     }
     stdDisplay_VBufferUnlock(texB);

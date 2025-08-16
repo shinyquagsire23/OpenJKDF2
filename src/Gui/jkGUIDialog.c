@@ -51,8 +51,14 @@ stdVBuffer *jkGuiDialog_sub_416900()
     v1 = v0;
     if ( v0 )
     {
+        int copyX = jkGui_stdBitmaps[JKGUI_BM_BK_DIALOG]->xPos;
+        int copyY = jkGui_stdBitmaps[JKGUI_BM_BK_DIALOG]->yPos;
+#ifdef JKGUI_SMOL_SCREEN
+        copyX = (int)((flex_t)copyX * 0.4);
+        copyY = (int)((flex_t)copyY * 0.4);
+#endif
         stdDisplay_VBufferCopy(v0, &Video_menuBuffer, 0, 0, 0, 0);
-        stdDisplay_VBufferCopy(v1, *jkGui_stdBitmaps[JKGUI_BM_BK_DIALOG]->mipSurfaces, jkGui_stdBitmaps[JKGUI_BM_BK_DIALOG]->xPos, jkGui_stdBitmaps[JKGUI_BM_BK_DIALOG]->yPos, 0, 0);
+        stdDisplay_VBufferCopy(v1, *jkGui_stdBitmaps[JKGUI_BM_BK_DIALOG]->mipSurfaces, copyX, copyY, 0, 0);
     }
     return v1;
 }

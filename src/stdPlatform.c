@@ -149,31 +149,6 @@ static size_t Linux_stdFileWrite(stdFile_t fhand, void* dst, size_t len)
     return fwrite(dst, 1, len, (FILE*)fhand);
 }
 
-/*
-// GCC hates this?
-char tmp[64];
-    const char* retval = dst;
-    if (!dst || !len) return 0;
-    while(1) {
-        size_t res = fread(tmp, 1, sizeof(tmp), (FILE*)fhand);
-        if (!res) break;
-        for (size_t i = 0; i < res; i++) {
-            char val = tmp[i];
-            if (val == '\r') continue;
-            *dst++ = val;
-            len--;
-            if (val == '\n' || len == 1) {
-                *dst++ = 0;
-                return retval;
-            }
-            if (!val) {
-                return retval;
-            }
-        }
-    }
-    return retval;
-*/
-
 static const char* Linux_stdFileGets(stdFile_t fhand, char* dst, size_t len)
 {
     // Drops static.jkl animclass parsing from 21.87s to 13.578s due to slow locks on getc

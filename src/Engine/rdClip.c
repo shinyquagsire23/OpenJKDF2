@@ -908,7 +908,7 @@ int rdClip_Line3(const rdClipFrustum* NO_ALIAS clipFrustum, rdVector3 *point1, r
 
     rdMatrix_TransformPoint34(&vertex_out, point1, &rdCamera_pCurCamera->view_matrix);
     rdMatrix_TransformPoint34(&vertex_out2, point2, &rdCamera_pCurCamera->view_matrix);
-    if ( rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective)
+    if (rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective)
         ret = rdClip_Line3Project(clipFrustum, &vertex_out, &vertex_out2, out1, out2);
     else
         ret = rdClip_Line3Ortho(clipFrustum, &vertex_out, &vertex_out2, out1, out2);
