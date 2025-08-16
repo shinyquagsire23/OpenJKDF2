@@ -100,8 +100,11 @@ for m in mat_list:
 #mat_list = mat_list_real
 '''
 
-basepath = "/Users/maxamillion/workspace/OpenJKDF2/DF2_res/Res2/"
+basepath_jk = "/Users/maxamillion/workspace/OpenJKDF2/DF2_res/Res2/"
+basepath_jkm = "/Users/maxamillion/workspace/OpenJKDF2/MOTS_res/Jkmres/"
 basepath_dw = "/Users/maxamillion/workspace/OpenJKDF2/DW_res/dwCD/"
+
+basepath = basepath_jk
 
 colormap_lut = {}
 colormap_lut["00"] = basepath + "misc/cmp/uicolormap.cmp"
@@ -188,21 +191,30 @@ class CmpPal:
                 return False
         return True
 
-    def closest_color(self, other_cmp, n, check_emissive=True):
-        needs_emissive = self.is_emissive(n)
-        rgb = self.get_color(n)
+    def closest_color_from_rgb(self, rgb, check_emissive=False, needs_emissive=False):
         r, g, b = rgb
         color_diffs = []
         for i in range(1, 256):
-            if check_emissive and needs_emissive and not other_cmp.is_emissive(i):
+            
+            if check_emissive and needs_emissive and not self.is_emissive(i):
                 continue
-            color = other_cmp.get_color(i)
+            if check_emissive and not needs_emissive and self.is_emissive(i):
+                continue
+            
+            color = self.get_color(i)
             cr, cg, cb = color
             color_diff = math.sqrt((r - cr)**2 + (g - cg)**2 + (b - cb)**2)
             color_diffs.append((color_diff, i))
         return min(color_diffs)[1]
 
-    def find_matching_color(self, other_cmp, n):
+    def closest_color_in_other_cmp(self, other_cmp, n, check_emissive=True):
+        if (n == 0):
+            return 0
+        needs_emissive = self.is_emissive(n)
+        rgb = self.get_color(n)
+        return other_cmp.closest_color_from_rgb(rgb, check_emissive, needs_emissive)
+
+    def find_matching_color_in_other_cmp(self, other_cmp, n):
         if n == 0:
             return 0
 
@@ -339,14 +351,14 @@ def mat_to_mat(f_path, cmp_from=None, cmp_to=None):
     def get_pal_color_to(n):
         return cmp_to.get_color(n)
 
-    def closest_color(n):
-        return cmp_from.closest_color(cmp_to, n)
+    def closest_color_in_other_cmp(n):
+        return cmp_from.closest_color_in_other_cmp(cmp_to, n)
 
     match_lut = [-1] * 256
     for i in range(0, 256):
-        match_lut[i] = cmp_from.find_matching_color(cmp_to, i)
+        match_lut[i] = cmp_from.find_matching_color_in_other_cmp(cmp_to, i)
 
-    def find_matching_color(n):
+    def find_matching_color_in_other_cmp(n):
         global not_found_list
 
         if n not in not_found_list:
@@ -356,7 +368,7 @@ def mat_to_mat(f_path, cmp_from=None, cmp_to=None):
         return match_lut[n]
 
     #for i in range(0, 256):
-    #    find_matching_color(i)
+    #    find_matching_color_in_other_cmp(i)
 
     '''
     width = 16
@@ -368,9 +380,9 @@ def mat_to_mat(f_path, cmp_from=None, cmp_to=None):
         for x in range(width):
             val = idx#data[(y*width) + x]
             color = (0xFF, 0x0, 0xFF)
-            if find_matching_color(val) != -1:
+            if find_matching_color_in_other_cmp(val) != -1:
                 color = get_pal_color_from(val)
-            color = get_pal_color_to(closest_color(idx))
+            color = get_pal_color_to(closest_color_in_other_cmp(idx))
 
             row = row + color
             idx += 1
@@ -414,7 +426,7 @@ def mat_to_mat(f_path, cmp_from=None, cmp_to=None):
                 for x in range(width):
                     val = data[(y*width) + x]
                     row = row + get_pal_color_from(val)
-                    find_matching_color(val)
+                    find_matching_color_in_other_cmp(val)
                 img.append(row)
 
             #with open(out_dir + f_path.replace(".mat", "") + "_" + str(i) + ".png", 'wb') as f_out:
@@ -433,14 +445,14 @@ def mat_to_mat_2(f_path, cmp_from=None, cmp_to=None, close_lut=None):
     def get_pal_color_to(n):
         return cmp_to.get_color(n)
 
-    def closest_color(n):
-        return cmp_from.closest_color(cmp_to, n)
+    def closest_color_in_other_cmp(n):
+        return cmp_from.closest_color_in_other_cmp(cmp_to, n)
 
     match_lut = [-1] * 256
     for i in range(0, 256):
-        match_lut[i] = cmp_from.find_matching_color(cmp_to, i)
+        match_lut[i] = cmp_from.find_matching_color_in_other_cmp(cmp_to, i)
 
-    def find_matching_color(n):
+    def find_matching_color_in_other_cmp(n):
         global not_found_list
 
         if n not in not_found_list:
@@ -450,7 +462,7 @@ def mat_to_mat_2(f_path, cmp_from=None, cmp_to=None, close_lut=None):
         return match_lut[n]
 
     #for i in range(0, 256):
-    #    find_matching_color(i)
+    #    find_matching_color_in_other_cmp(i)
 
     '''
     width = 16
@@ -462,9 +474,9 @@ def mat_to_mat_2(f_path, cmp_from=None, cmp_to=None, close_lut=None):
         for x in range(width):
             val = idx#data[(y*width) + x]
             color = (0xFF, 0x0, 0xFF)
-            if find_matching_color(val) != -1:
+            if find_matching_color_in_other_cmp(val) != -1:
                 color = get_pal_color_from(val)
-            color = get_pal_color_to(closest_color(idx))
+            color = get_pal_color_to(closest_color_in_other_cmp(idx))
 
             row = row + color
             idx += 1
@@ -522,7 +534,7 @@ def mat_to_mat_2(f_path, cmp_from=None, cmp_to=None, close_lut=None):
                     data_conv[(y*width) + x] = val_conv
                     color = get_pal_color_to(val_conv)
                     row = row + color
-                    #find_matching_color(val)
+                    #find_matching_color_in_other_cmp(val)
                 img.append(row)
 
             f_out.write(bytes(data_conv))
@@ -573,11 +585,11 @@ def convert_dw_pngs():
         for x in range(width):
             val = idx#data[(y*width) + x]
             color = (0xFF, 0x0, 0xFF)
-            jk_matchidx = cmp_dw.find_matching_color(cmp_new, val)
+            jk_matchidx = cmp_dw.find_matching_color_in_other_cmp(cmp_new, val)
             if jk_matchidx != -1 and jk_matchidx < jk_custom_start:
                 color = cmp_dw.get_color(val)
             else:
-                color = cmp_new.get_color(cmp_dw.closest_color(cmp_new, idx))
+                color = cmp_new.get_color(cmp_dw.closest_color_in_other_cmp(cmp_new, idx))
 
             if color not in duplicates:
                 duplicates += [color]
@@ -609,7 +621,7 @@ def convert_dw_pngs():
         new_lightlevels = [0] * 0x40
         for j in range(0, 0x40):
             idx = lightlevels[j]
-            new_lightlevels[j] = cmp_dw.closest_color(cmp_new, idx)
+            new_lightlevels[j] = cmp_dw.closest_color_in_other_cmp(cmp_new, idx)
 
         cmp_new.set_lightlevels(idx_new, new_lightlevels)
 
@@ -625,8 +637,46 @@ def convert_dw_pngs():
     for m in mat_list:
         close_lut = [-1] * 256
         for i in range(0, 256):
-            close_lut[i] = cmp_dw.closest_color(cmp_new, i)
+            close_lut[i] = cmp_dw.closest_color_in_other_cmp(cmp_new, i)
         mat_to_mat_2(m, cmp_dw, cmp_new, close_lut)
+
+def get_cmp_from_bm(fpath):
+    f = open(fpath, "rb")
+    if not f:
+        return CmpPal(colormap_lut["ui"])
+    bm_bytes = f.read()
+    f.close()
+
+    pal_flags = struct.unpack("<L", bm_bytes[0xC:0x10])[0]
+
+    palraw = bm_bytes[-0x300:]
+    cmp_out = CmpPal(colormap_lut["ui"])
+
+    fname = os.path.basename(fpath)
+    fpath_dir = os.path.dirname(fpath)
+
+    # HACK
+    if (pal_flags & 2) == 0 and fname.startswith("fl"):
+        new_path = os.path.join(fpath_dir, "bkfieldlog.BM")
+        with open(new_path, "rb") as f2:
+            bm_base_bytes = f2.read()
+            cmp_out.pal_raw = bm_base_bytes[-0x300:]
+    elif (pal_flags & 2) == 0 and fname.startswith("fo") and ((not fname.startswith("force")) or fname.startswith("forcemeter")):
+        new_path = os.path.join(fpath_dir, "bkforce.BM")
+        with open(new_path, "rb") as f2:
+            bm_base_bytes = f2.read()
+            cmp_out.pal_raw = bm_base_bytes[-0x300:]
+    elif (pal_flags & 2) == 0 and fname.startswith("objectives"):
+        new_path = os.path.join(fpath_dir, "bkfieldlog.BM")
+        with open(new_path, "rb") as f2:
+            bm_base_bytes = f2.read()
+            cmp_out.pal_raw = bm_base_bytes[-0x300:]
+    elif (pal_flags & 2) == 0:
+        print(f"BM {fpath} has no palette, falling back to UI palette.")
+    else:
+        cmp_out.pal_raw = palraw
+
+    return cmp_out
 
 def convert_bm_to_correct_palette(desired_image_fpath, original_bm_fpath, output_fpath):
     desired_image = open(desired_image_fpath, "rb").read()
@@ -635,25 +685,14 @@ def convert_bm_to_correct_palette(desired_image_fpath, original_bm_fpath, output
     pal_flags = struct.unpack("<L", original_bm[0xC:0x10])[0]
     num_mips = struct.unpack("<L", desired_image[0x10:0x14])[0]
 
-    desired_image_palraw = desired_image[-0x300:]
-    original_bm_palraw = original_bm[-0x300:]
-    cmp_desired = CmpPal(colormap_lut["ui"])
-    cmp_original = CmpPal(colormap_lut["ui"])
-
-    if (pal_flags & 2) == 0 and "/fl" in desired_image_fpath:
-        #desired_base = open(desired_image_fpath + "/../bkfieldlog.BM", "rb").read()
-        original_base = open("/Users/maxamillion/Library/Application Support/OpenJKDF2/openjkdf2/resource/ui/bm/originals/bkfieldlog.BM", "rb").read()
-        #desired_image_palraw = desired_base[-0x300:]
-        original_bm_palraw = original_base[-0x300:]
-
-    cmp_desired.pal_raw = desired_image_palraw
-    cmp_original.pal_raw = original_bm_palraw
+    cmp_desired = get_cmp_from_bm(desired_image_fpath)
+    cmp_original = get_cmp_from_bm(original_bm_fpath)
 
     #print(cmp_desired.pal_raw)
 
     closest_lut = []
     for i in range(0, 256):
-        closest_lut += [cmp_desired.closest_color(cmp_original, i, check_emissive=False)]
+        closest_lut += [cmp_desired.closest_color_in_other_cmp(cmp_original, i, check_emissive=False)]
     closest_lut[0] = 0
     #print(closest_lut)
 
@@ -673,7 +712,7 @@ def convert_bm_to_correct_palette(desired_image_fpath, original_bm_fpath, output
         for y in range(0, height):
             for x in range(0, width):
                 val = desired_image_data[(y*width)+x]
-                #color = cmp_original.closest_color(cmp_desired, val)
+                #color = cmp_original.closest_color_in_other_cmp(cmp_desired, val)
                 color = closest_lut[val]
                 out_image_data += [color]
                 current_offs += 1
@@ -681,11 +720,114 @@ def convert_bm_to_correct_palette(desired_image_fpath, original_bm_fpath, output
         out_image_data = bytes(out_image_data)
         f.write(out_image_data)
     if (pal_flags & 2) != 0:
-        f.write(original_bm_palraw)
+        f.write(cmp_original.pal_raw[:0x300])
     f.close()
 
     #cmp_desired.write_png("testA.png")
     #cmp_original.write_png("testB.png")
+
+def downscale_bm(desired_image_fpath, output_fpath):
+    desired_image = open(desired_image_fpath, "rb").read()
+
+    pal_flags = struct.unpack("<L", desired_image[0xC:0x10])[0]
+    num_mips = struct.unpack("<L", desired_image[0x10:0x14])[0]
+
+    f = open(output_fpath, "wb")
+    f.write(desired_image[0x0:0x20])
+    f.write(desired_image[0x20:0x80])
+
+    cmp_desired = get_cmp_from_bm(desired_image_fpath)
+
+    bm_to_png(desired_image_fpath, output_fpath)
+
+    closest_lut = {}
+
+    print(f"Writing {output_fpath}...")
+    current_offs = 0x80
+    for i in range(0, num_mips):
+        out_image_data = []
+
+        png_fpath = output_fpath.replace(".bm", "") + "_" + str(i) + ".png"
+        os.system(f"magick \"{png_fpath}\" -resize 40% \"{png_fpath}\"") # -resize for linear interpolation, -scale for nearest
+
+        width, height, pixels, metadata = png.Reader(filename=png_fpath).asDirect()
+        pixel_rows = [list(row) for row in pixels]
+        has_alpha = metadata['alpha']
+        stride = 3 if not has_alpha else 4
+        print(f"{png_fpath} {width} {height}", len(pixel_rows))
+
+        f.write(struct.pack("<LL", width, height))
+
+        for y in range(0, height):
+            for x in range(0, width):
+                pixel_offs = (x*stride)
+                val_rgba = pixel_rows[y][pixel_offs:pixel_offs+stride]
+                if len(val_rgba) < stride:
+                    print(val_rgba)
+                    val_rgba = [0,0,0,0]
+
+                if len(val_rgba) > 3 and val_rgba[3] == 0:
+                    out_image_data += [0]
+                    current_offs += 1
+                    continue
+
+                if has_alpha:
+                    a = float(val_rgba[3]) / 255.0
+                    val_rgb = (int(float(val_rgba[0]) * a), int(float(val_rgba[1]) * a), int(float(val_rgba[2]) * a))
+                else:
+                    val_rgb = (val_rgba[0], val_rgba[1], val_rgba[2])
+
+                if val_rgb not in closest_lut:
+                    val = cmp_desired.closest_color_from_rgb(val_rgb)
+                    closest_lut[val_rgb] = val
+                else:
+                    val = closest_lut[val_rgb]
+                #print(val_rgb, val, cmp_desired.get_color(val))
+
+                
+                out_image_data += [val]
+                current_offs += 1
+        out_image_data = bytes(out_image_data)
+        f.write(out_image_data)
+    if (pal_flags & 2) != 0:
+        f.write(cmp_desired.pal_raw[:0x300])
+    f.close()
+
+
+def bm_to_png(desired_image_fpath, output_fpath):
+    desired_image = open(desired_image_fpath, "rb").read()
+
+    pal_flags = struct.unpack("<L", desired_image[0xC:0x10])[0]
+    num_mips = struct.unpack("<L", desired_image[0x10:0x14])[0]
+
+    cmp_desired = get_cmp_from_bm(desired_image_fpath)
+
+    current_offs = 0x80
+    for i in range(0, num_mips):
+        width, height = struct.unpack("<LL", desired_image[current_offs:current_offs+8])
+
+        current_offs += 8
+        out_image_data = []
+        desired_image_data = desired_image[current_offs:current_offs+(width*height)]
+        #current_offs += width*height
+        #width = 16
+        #height = 16
+        idx = 0
+        img = []
+        for y in range(height):
+            row = ()
+            for x in range(width):
+                val = desired_image_data[idx]
+                color = cmp_desired.get_color(val)
+                color = (color[0], color[1], color[2], 0 if val == 0 else 0xFF)
+                row = row + color
+                current_offs += 1
+                idx += 1
+            img.append(row)
+
+        with open(output_fpath.replace(".bm", "") + "_" + str(i) + ".png", 'wb') as f_out:
+            w = png.Writer(width, height, greyscale=False, alpha=True)
+            w.write(f_out, img)
 
 #for i in range(0, num_textures):
 #    print (textures[i])
@@ -704,9 +846,21 @@ def convert_bm_to_correct_palette(desired_image_fpath, original_bm_fpath, output
 #python3 scripts/assets/bm_to_bm.py "$MYBMS/new2/bksingle.bm" "$MYBMS/originals/bksingle.bm" "$MYBMS/bksingle.bm"
 #python3 scripts/assets/bm_to_bm.py "$MYBMS/new2/bktally.bm" "$MYBMS/originals/bktally.bm" "$MYBMS/bktally.bm"
 
-for path in glob.glob("/Users/maxamillion/Library/Application Support/OpenJKDF2/openjkdf2/resource/ui/bm/new2/*.BM"):
-    print(path, path.replace("/new2", "/originals"), path.replace("/new2", ""))
-    convert_bm_to_correct_palette(path, path.replace("/new2", "/originals"), path.replace("/new2", ""))
+'''
+for path in glob.glob("/Users/maxamillion/Library/Application Support/OpenJKDF2/openjkdf2/resource/ui/bm/new3/*.BM"):
+    print(path, path.replace("/new3", "/originals"), path.replace("/new3", ""))
+    convert_bm_to_correct_palette(path, path.replace("/new3", "/originals"), path.replace("/new3", ""))
+'''
+
+'''
+jk_todo = "/Users/maxamillion/Library/Application Support/OpenJKDF2/openjkdf2/resource/ui/bm/todo/*.bm"
+jkm_todo = "/Users/maxamillion/Library/Application Support/OpenJKDF2/openjkmots/resource/ui/bm/todo/*.bm"
+for path in glob.glob(jkm_todo):
+    print(path, path.replace("/todo", "/originals"), path.replace("/todo", ""))
+    outpath = path.replace("/todo", "")
+    downscale_bm(path, outpath)
+    bm_to_png(outpath, outpath)
+'''
 
 if (len(sys.argv) < 3):
     print("Usage: mat_to_mat.py [valid_image_bad_palette.bm] [original_bm_with_good_palette.bm] [output.bm]")
