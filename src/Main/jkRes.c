@@ -297,7 +297,7 @@ int jkRes_NewGob(jkResGobDirectory *gobFullpath, char *gobFolder, char *gobFname
     
     gobFullpath->numGobs = 0;
     stdString_snprintf(jkRes_idkGobPath, 0x80u, "%s%c%s", gobFolder, LEC_PATH_SEPARATOR_CHR, gobFname);
-    if ( util_FileExists(jkRes_idkGobPath) )
+    if ( util_FileExistsLowLevel(jkRes_idkGobPath) ) // Added: util_FileExists -> util_FileExistsLowLevel
     {
         if ( gobFullpath->numGobs < STDGOB_MAX_GOBS )
         {
@@ -483,7 +483,9 @@ stdFile_t jkRes_FileOpen(const char *fpath, const char *mode)
         return (stdFile_t)0;
     v6 = 0;
 
+#ifndef TARGET_TWL
     // Try in the EXE root (not in resource/), ex "3do\key\kysabrf2.key"
+    // This was also used for `player/...` and `controls/...`
     fhand = pLowLevelHS->fileOpen(fpath, mode);
     if ( fhand )
     {
@@ -495,6 +497,7 @@ stdFile_t jkRes_FileOpen(const char *fpath, const char *mode)
         v6 = 1;
     }
     else
+#endif
     {
         for (v19 = 0; v19 < 5; v19++)
         {

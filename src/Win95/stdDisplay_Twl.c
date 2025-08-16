@@ -262,6 +262,7 @@ stdVBuffer* stdDisplay_VBufferNew(stdVBufferTexFmt *fmt, int create_ddraw_surfac
         return NULL;
     }
     
+#ifndef RDMATERIAL_MINIMIZE_STRUCTS
     //if (fmt->format.g_bits == 6) // RGB565
     {
         fmt->format.r_bits = 0;
@@ -283,6 +284,7 @@ stdVBuffer* stdDisplay_VBufferNew(stdVBufferTexFmt *fmt, int create_ddraw_surfac
         bbitmask = 0;
         abitmask = 0;
     }
+#endif
 
 #if 0
     SDL_Surface* surface = SDL_CreateRGBSurface(0, fmt->width, fmt->height, fmt->format.bpp, rbitmask, gbitmask, bbitmask, abitmask);

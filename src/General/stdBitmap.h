@@ -9,7 +9,7 @@ typedef struct stdBitmap
     char fpath[32];
     int field_20;
     int palFmt;
-    rdTexformat format;
+    rdTexFormat format;
     void *palette;
     int numMips;
     int field_68;
@@ -35,7 +35,7 @@ typedef struct bitmapHeader
     uint32_t xPos;
     uint32_t yPos;
     uint32_t colorkey;
-    rdTexformat format;
+    rdTexFormat format;
     uint32_t field_58;
     uint32_t field_5C;
     uint32_t field_60;
@@ -68,10 +68,10 @@ stdBitmap* stdBitmap_Load2(char *fpath, int bCreateDDrawSurface, int gpuMem); //
 stdBitmap* stdBitmap_LoadFromFile(intptr_t fd, int bCreateDDrawSurface, int gpuMem);
 int stdBitmap_LoadEntry(char *fpath, stdBitmap *out, int bCreateDDrawSurface, int gpuMem);
 int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSurface, int gpuMem);
-void stdBitmap_ConvertColorFormat(rdTexformat *formatTo, stdBitmap *bitmap);
+void stdBitmap_ConvertColorFormat(rdTexFormat *formatTo, stdBitmap *bitmap);
 void stdBitmap_Free(stdBitmap *bitmap);
 
-//static rdTexformat* (*stdBitmap_ConvertColorFormat)(rdTexformat *formatTo, stdBitmap *bitmap) = (void*)stdBitmap_ConvertColorFormat_ADDR;
+//static rdTexFormat* (*stdBitmap_ConvertColorFormat)(rdTexFormat *formatTo, stdBitmap *bitmap) = (void*)stdBitmap_ConvertColorFormat_ADDR;
 
 //static stdBitmap* (*stdBitmap_Load)(char *fpath, int create_ddraw_surface, int a3) = (void*)stdBitmap_Load_ADDR;
 //static void (*stdBitmap_Free)(stdBitmap *bitmap) = (void*)stdBitmap_Free_ADDR;

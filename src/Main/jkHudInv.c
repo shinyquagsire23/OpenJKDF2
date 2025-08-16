@@ -838,7 +838,7 @@ void jkHudInv_LoadItemRes()
 #endif
     jkHudInv_rend_isshowing_maybe = 0;
     jkHudInv_dword_553F94 = 0;
-    if ( _memcmp(&Video_format.format, &jkHudInv_itemTexfmt, sizeof(rdTexformat)) || std3D_bReinitHudElements) // Added: std3D_bReinitHudElements
+    if ( _memcmp(&Video_format.format, &jkHudInv_itemTexfmt, sizeof(rdTexFormat)) || std3D_bReinitHudElements) // Added: std3D_bReinitHudElements
     {
         std3D_bReinitHudElements = 0;
         _memcpy(&jkHudInv_itemTexfmt, &Video_format.format, sizeof(jkHudInv_itemTexfmt));
@@ -858,13 +858,17 @@ void jkHudInv_LoadItemRes()
         else
             v1 = stdBitmap_Load("ui\\bm\\icBrack16.bm", 0, 0);
         jkHudInv_aBitmaps[0] = v1;
+#ifndef RDMATERIAL_MINIMIZE_STRUCTS
         stdBitmap_ConvertColorFormat(&Video_format.format, v1);
+#endif
         if ( v0 == 8 )
             v2 = stdBitmap_Load("ui\\bm\\forceBrack8.bm", 0, 0);
         else
             v2 = stdBitmap_Load("ui\\bm\\forceBrack16.bm", 0, 0);
         jkHudInv_aBitmaps[1] = v2;
+#ifndef RDMATERIAL_MINIMIZE_STRUCTS
         stdBitmap_ConvertColorFormat(&Video_format.format, v2);
+#endif
         if ( jkHudInv_aBitmaps[2] )
         {
             stdBitmap_Free(jkHudInv_aBitmaps[2]);
@@ -875,7 +879,9 @@ void jkHudInv_LoadItemRes()
         else
             stdString_snprintf(std_genBuffer, 1024, "ui\\bm\\%s", "IcDefau16.bm");
         jkHudInv_aBitmaps[2] = stdBitmap_Load(std_genBuffer, 0, 0);
+#ifndef RDMATERIAL_MINIMIZE_STRUCTS
         stdBitmap_ConvertColorFormat(&Video_format.format, jkHudInv_aBitmaps[2]);
+#endif
         for (int j = 0; j < SITHBIN_NUMBINS; j++)
         {
             if ( (sithInventory_aDescriptors[j].flags & (ITEMINFO_POWER|ITEMINFO_ITEM)) != 0 )
@@ -887,7 +893,9 @@ void jkHudInv_LoadItemRes()
                 stdString_snprintf(a1, 32, "ui\\bm\\ic%.5s%d.bm", sithInventory_aDescriptors[j].fpath, v0);
                 v4 = stdBitmap_Load(a1, 0, 0);
                 sithInventory_aDescriptors[j].hudBitmap = v4;
+#ifndef RDMATERIAL_MINIMIZE_STRUCTS
                 stdBitmap_ConvertColorFormat(&Video_format.format, v4);
+#endif
             }
         }
     }
@@ -905,7 +913,9 @@ void jkHudInv_LoadItemRes()
     jkHudInv_font = stdFont_Load(v18, 0, 0);
     if ( !jkHudInv_font )
         Windows_GameErrorMsgbox("ERR_CANNOT_LOAD_FILE %s", v18);
+#ifndef RDMATERIAL_MINIMIZE_STRUCTS
     stdBitmap_ConvertColorFormat(&Video_format.format, jkHudInv_font->pBitmap);
+#endif
     v6 = Video_format.width;
     _memset(&jkHudInv_info, 0, sizeof(jkHudInvInfo));
     v7 = Video_format.height;
@@ -966,7 +976,7 @@ int jkHudInv_Startup()
 {
     stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
     
-    _memset(&jkHudInv_itemTexfmt, 0, sizeof(rdTexformat)); // sizeof(jkHudInv_itemTexfmt)
+    _memset(&jkHudInv_itemTexfmt, 0, sizeof(rdTexFormat)); // sizeof(jkHudInv_itemTexfmt)
     return 1;
 }
 

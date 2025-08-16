@@ -329,6 +329,8 @@ typedef struct rdPuppet rdPuppet;
 typedef struct rdSprite rdSprite;
 typedef struct rdSurface rdSurface;
 typedef struct rdThing rdThing;
+typedef struct rdTexFormat rdTexFormat;
+typedef struct rdTexFormatMin rdTexFormatMin;
 typedef struct sithCollisionSearchEntry sithCollisionSearchEntry;
 typedef struct sithPlayingSound sithPlayingSound;
 typedef struct sithSoundClass sithSoundClass;
@@ -1027,7 +1029,7 @@ typedef struct rdDDrawSurface
 #endif
 } rdDDrawSurface;
 
-typedef struct rdTexformat
+typedef struct rdTexFormat
 {
     uint32_t is16bit;
     uint32_t bpp;
@@ -1043,7 +1045,15 @@ typedef struct rdTexformat
     uint32_t unk_40;
     uint32_t unk_44;
     uint32_t unk_48;
-} rdTexformat;
+} rdTexFormat;
+
+#ifdef RDMATERIAL_MINIMIZE_STRUCTS
+typedef struct rdTexFormatMin
+{
+    BOOL is16bit;
+    BOOL bpp;
+} rdTexFormatMin;
+#endif // RDMATERIAL_MINIMIZE_STRUCTS
 
 typedef struct stdVBufferTexFmt
 {
@@ -1052,7 +1062,11 @@ typedef struct stdVBufferTexFmt
     uint32_t texture_size_in_bytes;
     uint32_t width_in_bytes;
     uint32_t width_in_pixels;
-    rdTexformat format;
+#ifdef RDMATERIAL_MINIMIZE_STRUCTS
+    rdTexFormatMin format;
+#else
+    rdTexFormat format;
+#endif
 } stdVBufferTexFmt;
 
 
@@ -1236,7 +1250,7 @@ typedef struct rdMaterialHeader
     uint32_t type;
     uint32_t num_texinfo;
     uint32_t num_textures;
-    rdTexformat tex_format;
+    rdTexFormat texFormat;
 } rdMaterialHeader;
 
 typedef struct rdMaterial
@@ -1256,7 +1270,11 @@ typedef struct rdMaterial
 #endif
 #endif
     uint32_t id;
-    rdTexformat tex_format;
+#ifdef RDMATERIAL_MINIMIZE_STRUCTS
+    rdTexFormatMin texFormat;
+#else
+    rdTexFormat texFormat;
+#endif
     rdColor24 *palette_alloc;
     uint32_t num_texinfo;
     uint32_t celIdx;
@@ -2482,9 +2500,9 @@ typedef struct jkPlayerInfo
     jkSaberCollide saberCollideInfo;
     uint32_t lastSparkSpawnMs;
 #ifdef JKM_SABER
-    uint32_t jkmUnk1;
-    rdMatrix34 jkmSaberUnk1;
-    rdMatrix34 jkmSaberUnk2;
+    uint32_t bHasLastJointMat;
+    rdMatrix34 lastSaberJointMat;
+    rdMatrix34 lastSecondarySaberJointMat;
 #endif // JKM_SABER
     sithThing* wall_sparks;
     sithThing* blood_sparks;

@@ -2,22 +2,33 @@
 
 #include "jk.h"
 
-int stdColor_Indexed8ToRGB16(uint8_t idx, rdColor24 *pal, rdTexformat *fmt)
+#ifdef RDMATERIAL_MINIMIZE_STRUCTS
+
+// Forced to RGB555
+#define STDCOLOR_RGB15(r, g, b)      ((r) | ((g) << 5) | ((b) << 10))
+int stdColor_Indexed8ToRGB16(uint8_t idx, rdColor24 *pal, rdTexFormatMin *fmt)
+{
+    rdColor24* pColor = (rdColor24 *)((char *)pal + 2 * idx + idx);
+    return STDCOLOR_RGB15(pColor->r >> 3, pColor->g >> 3, pColor->b >> 3);
+}
+#else
+int stdColor_Indexed8ToRGB16(uint8_t idx, rdColor24 *pal, rdTexFormat *fmt)
 {
     rdColor24 *v3; // esi
 
     v3 = (rdColor24 *)((char *)pal + 2 * idx + idx);
     return ((uint8_t)((uint8_t)v3->g >> (fmt->g_bitdiff & 0xFF)) << fmt->g_shift) | ((uint8_t)((uint8_t)v3->r >> (fmt->r_bitdiff & 0xFF)) << fmt->r_shift) | ((uint8_t)v3->b >> (fmt->b_bitdiff & 0xFF) << fmt->b_shift);
 }
+#endif
 
-uint32_t stdColor_ColorConvertOnePixel(rdTexformat *formatTo, int color, rdTexformat *formatFrom)
+uint32_t stdColor_ColorConvertOnePixel(rdTexFormat *formatTo, int color, rdTexFormat *formatFrom)
 {
     uint32_t tmp;
     stdColor_ColorConvertOneRow((uint8_t*)&tmp, formatTo, (uint8_t*)&color, formatFrom, 1);
     return tmp;
 }
 
-int stdColor_ColorConvertOneRow(uint8_t *outPixels, rdTexformat *formatTo, uint8_t *inPixels, rdTexformat *formatFrom, int numPixels)
+int stdColor_ColorConvertOneRow(uint8_t *outPixels, rdTexFormat *formatTo, uint8_t *inPixels, rdTexFormat *formatFrom, int numPixels)
 {
     int v6; // eax
     int v8; // edx

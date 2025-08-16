@@ -85,7 +85,6 @@ int rdMaterial_LoadEntry_Common(char *mat_fpath, rdMaterial *material, int creat
     rdTexture *textures; // eax
     rdTexture *texture; // esi
     unsigned int mipmap_num; // ebx
-    int bpp; // eax
     stdVBuffer **texture_struct; // edi
     int v21; // cf
     unsigned int v22; // edi
@@ -179,7 +178,12 @@ int rdMaterial_LoadEntry_Common(char *mat_fpath, rdMaterial *material, int creat
     material->num_texinfo = num_texinfo;
     material->celIdx = 0;
     tex_num = 0;
-    _memcpy(&material->tex_format, &mat_header.tex_format, sizeof(material->tex_format));
+#ifdef RDMATERIAL_MINIMIZE_STRUCTS
+    material->texFormat.is16bit = mat_header.texFormat.is16bit;
+    material->texFormat.bpp = mat_header.texFormat.bpp;
+#else
+    _memcpy(&material->texFormat, &mat_header.texFormat, sizeof(material->texFormat));
+#endif
     texture_idk = textures_idk;
     memset(material->texinfos, 0, sizeof(material->texinfos)); // Added: just in case?
     for (tex_num = 0; tex_num < material->num_texinfo; tex_num++)
@@ -257,9 +261,8 @@ int rdMaterial_LoadEntry_Common(char *mat_fpath, rdMaterial *material, int creat
         texture->color_transparent = tex_header_1.unk_10;
         format.width = tex_header_1.width;
         format.height = tex_header_1.height;
-        bpp = material->tex_format.bpp;
-        format.format.is16bit = material->tex_format.is16bit;
-        format.format.bpp = bpp;
+        format.format.is16bit = material->texFormat.is16bit;
+        format.format.bpp = material->texFormat.bpp;
         if ( texture->num_mipmaps )
           break;
 

@@ -219,16 +219,16 @@ LABEL_17:
     return 1;
 }
 
-void stdBitmap_ConvertColorFormat(rdTexformat *formatTo, stdBitmap *bitmap)
+void stdBitmap_ConvertColorFormat(rdTexFormat *formatTo, stdBitmap *bitmap)
 {
-    rdTexformat *formatFrom_; // eax
+    rdTexFormat *formatFrom_; // eax
     int v4; // esi
     stdVBuffer *v5; // eax
-    rdTexformat *formatFrom; // [esp+18h] [ebp+8h]
+    rdTexFormat *formatFrom; // [esp+18h] [ebp+8h]
 
     formatFrom_ = &bitmap->format;
     formatFrom = &bitmap->format;
-    if ( _memcmp(formatTo, formatFrom, sizeof(rdTexformat)) && (formatFrom_->is16bit || formatTo->is16bit) )
+    if ( _memcmp(formatTo, formatFrom, sizeof(rdTexFormat)) && (formatFrom_->is16bit || formatTo->is16bit) )
     {
         v4 = 0;
         if ( bitmap->numMips > 0 )
@@ -254,7 +254,7 @@ void stdBitmap_ConvertColorFormat(rdTexformat *formatTo, stdBitmap *bitmap)
             bitmap->colorkey = stdColor_ColorConvertOnePixel(formatTo, bitmap->colorkey, formatFrom_);
             formatFrom_ = formatFrom;
         }
-        _memcpy(formatFrom_, formatTo, sizeof(rdTexformat));
+        _memcpy(formatFrom_, formatTo, sizeof(rdTexFormat));
     }
 }
 

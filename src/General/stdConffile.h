@@ -21,8 +21,16 @@
 
 
 int stdConffile_OpenRead(char *jkl_fname);
+int stdConffile_OpenReadBytes(char *fpath); // Added: Helper
 int stdConffile_OpenWrite(char *a1);
-int stdConffile_OpenMode(char *fpath, char* mode);
+int stdConffile_OpenMode(char *fpath, const char* mode);
+int stdConffile_OpenModeBypass(char *fpath, const char* mode);
+
+// Added: Bypass GOBs
+int stdConffile_OpenReadBypass(char *jkl_fname);
+int stdConffile_OpenReadBytesBypass(char *fpath);
+int stdConffile_OpenWriteBypass(char *a1);
+
 void stdConffile_Close();
 void stdConffile_CloseWrite();
 int stdConffile_WriteLine(const char *line);

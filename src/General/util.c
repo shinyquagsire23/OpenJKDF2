@@ -10,6 +10,22 @@ int util_FileExists(const char *fpath)
         std_pHS->fileClose(f);
         return 1;
     }
+
+#ifdef TARGET_TWL
+    return util_FileExistsLowLevel(fpath);
+#else
+    return 0;
+#endif
+}
+
+int util_FileExistsLowLevel(const char *fpath)
+{
+    intptr_t f = pLowLevelHS->fileOpen(fpath, "r");
+    if ( f )
+    {
+        pLowLevelHS->fileClose(f);
+        return 1;
+    }
     return 0;
 }
 

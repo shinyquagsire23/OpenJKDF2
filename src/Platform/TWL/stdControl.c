@@ -719,16 +719,16 @@ void stdControl_ReadControls()
 
     u16 keysPressed = keysDown();
 
-    _memset(stdControl_aInput1, 0, sizeof(int) * JK_NUM_KEYS);
+    //_memset(stdControl_aInput1, 0, sizeof(int) * JK_NUM_KEYS);
     stdControl_bControlsIdle = 1;
-    _memset(stdControl_aInput2, 0, sizeof(int) * JK_NUM_KEYS);
+    //_memset(stdControl_aInput2, 0, sizeof(int) * JK_NUM_KEYS);
     stdControl_curReadTime = stdPlatform_GetTimeMsec();
     stdControl_msDelta = stdControl_curReadTime - stdControl_msLast;
     if (stdControl_msDelta != 0)
         khz = 1.0 / (flex_d_t)(__int64)(stdControl_msDelta);
     else
         khz = 1.0;
-    _memset(stdControl_aAxisPos, 0, sizeof(int) * JK_NUM_AXES);
+    //_memset(stdControl_aAxisPos, 0, sizeof(int) * JK_NUM_AXES);
     stdControl_updateKHz = khz;
     stdControl_updateHz = khz * 1000.0;
 

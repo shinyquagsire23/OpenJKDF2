@@ -386,11 +386,12 @@ flex_t stdControl_ReadKeyAsAxis(int keyNum)
         if ( stdControl_aKeyInfo[keyNum] )
         {
             v1 = stdControl_msDelta;
-            goto LABEL_6;
         }
-        return 0.0;
+        else {
+            return 0.0;
+        }
     }
-LABEL_6:
+
     if ( v1 >= stdControl_msDelta )
         v1 = stdControl_msDelta;
     result = (flex_d_t)v1 * stdControl_updateKHz;
@@ -476,9 +477,6 @@ void stdControl_SetMouseSensitivity(flex_t xSensitivity, flex_t ySensitivity)
 
 void stdControl_SetKeydown(int keyNum, int bDown, uint32_t readTime)
 {
-    uint32_t v3; // ecx
-    int v4; // ecx
-
     // Added: bounds check
     if (keyNum >= JK_NUM_KEYS || keyNum < 0)
         return;
@@ -491,22 +489,26 @@ void stdControl_SetKeydown(int keyNum, int bDown, uint32_t readTime)
         stdControl_bControlsIdle = 0;
     }
 
+#ifdef TARGET_TWL
+    // TODO: I think the intent is to allow polling for inputs on a separate thread?
+    stdControl_aInput2[keyNum] = 0;
+    stdControl_aInput1[keyNum] = 0;
+#endif
+
     if ( !bDown || stdControl_aKeyInfo[keyNum] )
     {
         if ( !bDown && stdControl_aKeyInfo[keyNum] )
         {
-            v4 = stdControl_aInput1[keyNum];
             stdControl_aKeyInfo[keyNum] = 0;
-            if ( !v4 )
+            if ( !stdControl_aInput1[keyNum] )
                 stdControl_aInput1[keyNum] = stdControl_msDelta;
             stdControl_aInput1[keyNum] += readTime - stdControl_curReadTime;
         }
     }
     else
     {
-        v3 = stdControl_curReadTime - readTime;
         stdControl_aKeyInfo[keyNum] = 1;
-        stdControl_aInput1[keyNum] = v3;
+        stdControl_aInput1[keyNum] = stdControl_curReadTime - readTime;
         ++stdControl_aInput2[keyNum];
     }
 }

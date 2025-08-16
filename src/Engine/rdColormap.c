@@ -6,7 +6,7 @@
 #include "Win95/std.h"
 #include "stdPlatform.h"
 
-static rdTexformat rdColormap_colorInfo = {1, 0x10, 5, 6, 5, 0x0B, 5, 0, 3, 2, 3, 0, 0, 0};
+static rdTexFormat rdColormap_colorInfo = {1, 0x10, 5, 6, 5, 0x0B, 5, 0, 3, 2, 3, 0, 0, 0};
 
 int rdColormap_SetCurrent(rdColormap *colormap)
 {
@@ -319,7 +319,7 @@ int rdColormap_Write(char *outpath, rdColormap *colormap)
     return 1;
 }
 
-int rdColormap_BuildRGB16(uint16_t *paColors16, rdColor24 *paColors24, uint8_t a4, uint8_t a5, uint8_t a6, rdTexformat *format)
+int rdColormap_BuildRGB16(uint16_t *paColors16, rdColor24 *paColors24, uint8_t a4, uint8_t a5, uint8_t a6, rdTexFormat *format)
 {
     return 1;
 }

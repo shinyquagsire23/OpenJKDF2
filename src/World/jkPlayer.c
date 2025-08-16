@@ -528,11 +528,10 @@ void jkPlayer_WriteConf(wchar_t *name)
 
     stdString_WcharToChar(nameTmp, name, 31);
     nameTmp[31] = 0;
-    printf("??? %s\n", nameTmp);
     stdFnames_MakePath3(ext_fpath, 256, "player", nameTmp, "openjkdf2.json"); // Added
     stdFnames_MakePath3(ext_fpath_cvars, 256, "player", nameTmp, SITHCVAR_FNAME); // Added
     stdString_snprintf(fpath, 128, "player\\%s\\%s.plr", nameTmp, nameTmp);
-    if ( stdConffile_OpenWrite(fpath) )
+    if ( stdConffile_OpenWriteBypass(fpath) )
     {
         stdConffile_Printf("version %d\n", 1);
         stdConffile_Printf("diff %d\n", jkPlayer_setDiff);
@@ -695,7 +694,7 @@ int jkPlayer_ReadConf(wchar_t *name)
     stdFnames_MakePath3(ext_fpath, 256, "player", v6, "openjkdf2.json");
     stdFnames_MakePath3(ext_fpath_cvars, 256, "player", v6, SITHCVAR_FNAME); // Added
     stdString_snprintf(fpath, 256, "player\\%s\\%s.plr", v6, v6); // Added: sprintf -> snprintf
-    if (!stdConffile_OpenRead(fpath))
+    if (!stdConffile_OpenReadBypass(fpath))
         return 0;
 
     if ( stdConffile_ReadLine() && _sscanf(stdConffile_aLine, "version %d", &version) == 1 && version == 1 && stdConffile_ReadLine() )
@@ -1296,7 +1295,7 @@ int jkPlayer_MPCParse(jkPlayerMpcInfo *info, sithPlayerInfo* unk, wchar_t *fname
     info->name[31] = 0;
     _sprintf(jkl_fname, "player\\%s\\%s.mpc", a1a, v11);
 
-    if (!stdConffile_OpenRead(jkl_fname))
+    if (!stdConffile_OpenReadBypass(jkl_fname))
         return 0;
 
     if ( stdConffile_ReadLine()
@@ -1364,7 +1363,7 @@ int jkPlayer_MPCWrite(sithPlayerInfo* unk, wchar_t *mpcName, wchar_t *playerName
     mpcNameChar[31] = 0;
     stdString_snprintf(fpath, 128, "player\\%s\\%s.mpc", mpcNameChar, playerNameChar);
 
-    if (!stdConffile_OpenWrite(fpath))
+    if (!stdConffile_OpenWriteBypass(fpath))
         return 0;
 
     stdConffile_Printf("version %d\n", 1);
@@ -1596,7 +1595,7 @@ LABEL_8:
         stdString_WcharToChar(v13, jkPlayer_playerShortName, 31);
         v13[31] = 0;
         stdString_snprintf(v14, 128, "player\\%s\\%s.plr", v13, v13);
-        if ( stdConffile_OpenWrite(v14) )
+        if ( stdConffile_OpenWriteBypass(v14) )
         {
             stdConffile_Printf("version %d\n", 1);
             stdConffile_Printf("diff %d\n", jkPlayer_setDiff);

@@ -245,7 +245,7 @@ int jkGuiControlSaveLoad_Write(int bIdk)
         headerTmp.version = 1;
         _wcsncpy(headerTmp.wstr, (const wchar_t *)jkGuiControlSaveLoad_aElements[2].wstr, 0x3Fu);
         headerTmp.wstr[63] = 0;
-        if ( stdConffile_OpenWrite(fpath) )
+        if ( stdConffile_OpenWriteBypass(fpath) )
         {
             stdConffile_Write((const char*)&headerTmp, sizeof(jkGuiControlInfoHeader));
             sithControl_WriteConf();
@@ -258,7 +258,7 @@ int jkGuiControlSaveLoad_Write(int bIdk)
         if ( !v5 )
             goto LABEL_43;
         _sprintf(fpath, "controls\\%s", v5->fpath);
-        if ( stdConffile_OpenMode(fpath, "rb") )
+        if ( stdConffile_OpenReadBytesBypass(fpath) )
         {
             stdConffile_Read(&headerTmp, sizeof(jkGuiControlInfoHeader));
             if ( headerTmp.version == 1 )

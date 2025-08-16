@@ -1091,7 +1091,7 @@ int jkGuiBuildMulti_Show2(Darray *pDarray, jkGuiElement *pElement, int minIdk, i
             if (v8 >= &jkGuiBuildMulti_aMpcInfo[32]) break;
 
             stdString_snprintf(fpath, 128, "%s\\%s", path, v16.fpath);
-            if ( util_FileExists(fpath) )
+            if ( util_FileExistsLowLevel(fpath) ) // Added: util_FileExists -> util_FileExistsLowLevel
             {
                 _strncpy(a2a, v16.fpath, 0x1Fu);
                 a2a[31] = 0;
@@ -1263,7 +1263,7 @@ int jkGuiBuildMulti_ShowNewCharacter(int rank, int bGameFormatIsJK, int bHasNoVa
                 stdString_WcharToChar(v17, jkGuiBuildMulti_aWchar_5594C8, 127);
                 v17[127] = 0;
                 stdString_snprintf(v18, 128, "player\\%s\\%s.mpc", v16, v17);
-                if ( !util_FileExists(v18) )
+                if ( !util_FileExistsLowLevel(v18) ) // Added: util_FileExists -> util_FileExistsLowLevel
                     goto LABEL_16;
                 v7 = 1;
                 v9 = jkStrings_GetUniStringWithFallback("ERR_PLAYER_ALREADY_EXISTS");

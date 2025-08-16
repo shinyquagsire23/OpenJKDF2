@@ -1152,8 +1152,7 @@ int jkMain_cd_swap_reverify(jkEpisodeEntry *ent)
                 break;
             }
         }
-        _strncpy(jkMain_aLevelJklFname, ent->fileName, 0x7Fu);
-        jkMain_aLevelJklFname[127] = 0;
+        stdString_SafeStrCopy(jkMain_aLevelJklFname, ent->fileName, 128);
         jkSmack_gameMode = sithNet_isMulti != 0 ? 2 : 0;
         if ( jkGuiRend_thing_five )
             jkGuiRend_thing_four = 1;

@@ -68,7 +68,7 @@ int sithGamesave_Load(char *saveFname, int debugNextCheckpoint, int a3)
         LEC_PATH_SEPARATOR_CHR, playerName, LEC_PATH_SEPARATOR_CHR, saveFname
     );
 
-    if (stdConffile_OpenMode(fpath, "rb"))
+    if (stdConffile_OpenReadBytesBypass(fpath))
     {
         stdConffile_Close();
         sithGamesave_dword_835914 = a3;
@@ -99,7 +99,7 @@ int sithGamesave_LoadEntry(char *fpath)
 
     int bIsOutdatedSave = 0;
 
-    if ( !stdConffile_OpenMode(fpath, "rb") )
+    if ( !stdConffile_OpenReadBytesBypass(fpath) )
         goto load_fail;
     stdConffile_Read(&header, sizeof(sithGamesave_Header));
 
@@ -433,7 +433,7 @@ int sithGamesave_Write(char *saveFname, int a2, int a3, wchar_t *saveName)
         LEC_PATH_SEPARATOR_CHR, tmp_playerName, LEC_PATH_SEPARATOR_CHR,
         saveFname
     );
-    if ( a2 || !stdConffile_OpenRead(PathName) )
+    if ( a2 || !stdConffile_OpenReadBypass(PathName) )
     {
         _memset(&sithGamesave_headerTmp, 0, sizeof(sithGamesave_headerTmp));
         sithGamesave_headerTmp.version = COMPAT_SAVE_VERSION;
@@ -494,7 +494,7 @@ int sithGamesave_Flush()
         sithGamesave_currentState = SITH_GS_NONE;
         return 1;
     }
-    if ( (sithPlayer_pLocalPlayerThing->thingflags & SITH_TF_DEAD) == 0 && stdConffile_OpenWrite(sithGamesave_fpath) )
+    if ( (sithPlayer_pLocalPlayerThing->thingflags & SITH_TF_DEAD) == 0 && stdConffile_OpenWriteBypass(sithGamesave_fpath) )
     {
         int multiplayerFlagsSave = sithComm_multiplayerFlags;
         sithComm_multiplayerFlags = 4;

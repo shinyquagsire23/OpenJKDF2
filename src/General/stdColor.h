@@ -16,12 +16,16 @@
 #define stdColor_ColorConvertOnePixel_ADDR (0x00434040)
 #define stdColor_Indexed8ToRGB16_ADDR (0x00434070)
 
-int stdColor_Indexed8ToRGB16(uint8_t idx, rdColor24 *pal, rdTexformat *fmt);
-uint32_t stdColor_ColorConvertOnePixel(rdTexformat *formatTo, int color, rdTexformat *formatFrom);
-int stdColor_ColorConvertOneRow(uint8_t *outPixels, rdTexformat *formatTo, uint8_t *inPixels, rdTexformat *formatFrom, int numPixels);
+#ifdef RDMATERIAL_MINIMIZE_STRUCTS
+int stdColor_Indexed8ToRGB16(uint8_t idx, rdColor24 *pal, rdTexFormatMin *fmt);
+#else
+int stdColor_Indexed8ToRGB16(uint8_t idx, rdColor24 *pal, rdTexFormat *fmt);
+#endif
+uint32_t stdColor_ColorConvertOnePixel(rdTexFormat *formatTo, int color, rdTexFormat *formatFrom);
+int stdColor_ColorConvertOneRow(uint8_t *outPixels, rdTexFormat *formatTo, uint8_t *inPixels, rdTexFormat *formatFrom, int numPixels);
 int stdColor_GammaCorrect(uint8_t *a1, uint8_t *a2, int a3, flex_d_t a4);
 
 //static int (*stdColor_GammaCorrect)(uint8_t *a1, uint8_t *a2, int a3, flex_d_t a4) = (void*)stdColor_GammaCorrect_ADDR;
-//static int (*stdColor_ColorConvertOneRow)(uint8_t *outPixels, rdTexformat *formatTo, uint8_t *inPixels, rdTexformat *formatFrom, int numPixels) = (void*)stdColor_ColorConvertOneRow_ADDR;
+//static int (*stdColor_ColorConvertOneRow)(uint8_t *outPixels, rdTexFormat *formatTo, uint8_t *inPixels, rdTexFormat *formatFrom, int numPixels) = (void*)stdColor_ColorConvertOneRow_ADDR;
 
 #endif // _STDCOLOR_H

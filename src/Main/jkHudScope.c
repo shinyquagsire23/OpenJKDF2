@@ -116,7 +116,9 @@ int jkHudScope_Open(void)
             Windows_GameErrorMsgbox("ERR_CANNOT_LOAD_FILE %s",local_80);
         }
         else {
+#ifndef RDMATERIAL_MINIMIZE_STRUCTS
             stdBitmap_ConvertColorFormat(&Video_format.format,*pBmIter->pBitmap);
+#endif
         }
 
         pBmIter++;

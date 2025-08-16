@@ -11,6 +11,7 @@
 #define util_Weirdchecksum_ADDR (0x0042F810)
 
 int util_FileExists(const char *fpath);
+int util_FileExistsLowLevel(const char *fpath);
 uint32_t util_Weirdchecksum(uint8_t *data, int len, uint32_t last_hash);
 
 #endif // _UTIL_H

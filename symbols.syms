@@ -147,7 +147,7 @@ sithMulti_dword_832664 0x00832664 int
 
 rdColormap_pCurMap 0x0073A3C8 rdColormap*
 rdColormap_pIdentityMap 0x0073A3CC rdColormap*
-//rdColormap_colorInfo 0x00548260 rdTexformat
+//rdColormap_colorInfo 0x00548260 rdTexFormat
 
 sithEvent_aEvents 0x00852F98 sithEvent[256]
 sithEvent_list 0x00855000 sithEvent*
@@ -583,7 +583,7 @@ jkHud_dword_553EDC 0x00553EDC int
 jkHud_dword_553EE0 0x00553EE0 int
 
 jkHudInv_info 0x00553EE8 jkHudInvInfo
-jkHudInv_itemTexfmt 0x00553F28 rdTexformat
+jkHudInv_itemTexfmt 0x00553F28 rdTexFormat
 jkHudInv_flags 0x00553F60 int
 jkHudInv_dword_553F64 0x00553F64 int
 jkHudInv_scroll 0x00553F68 jkHudInvScroll

@@ -319,6 +319,7 @@
 
 // Deferred material loading and LRU unloading
 #define RDMATERIAL_LRU_LOAD_UNLOAD
+#define RDMATERIAL_MINIMIZE_STRUCTS
 
 // Halve the x/y positions/sizes for all jkGui elements
 #define JKGUI_SMOL_SCREEN

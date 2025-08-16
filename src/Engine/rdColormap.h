@@ -30,11 +30,11 @@ void rdColormap_Free(rdColormap *colormap);
 void rdColormap_FreeEntry(rdColormap *colormap);
 int rdColormap_Write(char *outpath, rdColormap *colormap);
 
-int rdColormap_BuildRGB16(uint16_t *paColors16, rdColor24 *paColors24, uint8_t a4, uint8_t a5, uint8_t a6, rdTexformat *format);
+int rdColormap_BuildRGB16(uint16_t *paColors16, rdColor24 *paColors24, uint8_t a4, uint8_t a5, uint8_t a6, rdTexFormat *format);
 int rdColormap_BuildGrayRamp(rdColormap* pColormap);
 
 //static int (*rdColormap_BuildGrayRamp)(rdColormap *colormap) = (void*)rdColormap_BuildGrayRamp_ADDR;
-//static int (*rdColormap_BuildRGB16)(uint16_t *a2, rdColor24 *a3, uint8_t a4, uint8_t a5, uint8_t a6, rdTexformat *format) = (void*)rdColormap_BuildRGB16_ADDR;
+//static int (*rdColormap_BuildRGB16)(uint16_t *a2, rdColor24 *a3, uint8_t a4, uint8_t a5, uint8_t a6, rdTexFormat *format) = (void*)rdColormap_BuildRGB16_ADDR;
 //static int (__cdecl *rdColormap_LoadEntry)(char *colormap_fname, rdColormap *colormap) = (void*)rdColormap_LoadEntry_ADDR;
 
 #ifdef __cplusplus

@@ -149,12 +149,60 @@ static size_t Linux_stdFileWrite(stdFile_t fhand, void* dst, size_t len)
     return fwrite(dst, 1, len, (FILE*)fhand);
 }
 
+/*
+// GCC hates this?
+char tmp[64];
+    const char* retval = dst;
+    if (!dst || !len) return 0;
+    while(1) {
+        size_t res = fread(tmp, 1, sizeof(tmp), (FILE*)fhand);
+        if (!res) break;
+        for (size_t i = 0; i < res; i++) {
+            char val = tmp[i];
+            if (val == '\r') continue;
+            *dst++ = val;
+            len--;
+            if (val == '\n' || len == 1) {
+                *dst++ = 0;
+                return retval;
+            }
+            if (!val) {
+                return retval;
+            }
+        }
+    }
+    return retval;
+*/
+
 static const char* Linux_stdFileGets(stdFile_t fhand, char* dst, size_t len)
 {
+    // Drops static.jkl animclass parsing from 21.87s to 13.578s due to slow locks on getc
 #ifdef TARGET_TWL
+    char tmp[128];
+    const char* retval = dst;
     if (!dst || !len) return 0;
-#endif
+    while(1) {
+        size_t res = fread(tmp, 1, sizeof(tmp), (FILE*)fhand);
+        if (!res) break;
+        for (size_t i = 0; i < res; i++) {
+            char val = tmp[i];
+            //if (val == '\r') continue;
+            *dst++ = val;
+            len--;
+            if (val == '\n' || len == 1) {
+                fseek((FILE*)fhand, (i+1)-res, SEEK_CUR);
+                *dst++ = 0;
+                return retval;
+            }
+            if (!val) {
+                fseek((FILE*)fhand, (i+1)-res, SEEK_CUR);
+                return retval;
+            }
+        }
+    }
+#else
     return fgets(dst, len, (FILE*)fhand);
+#endif
 }
 
 static int Linux_stdFseek(stdFile_t fhand, int a, int b)
@@ -506,6 +554,25 @@ void* __wrap_realloc(void *ptr, uint32_t len) {
 
 void *__wrap_calloc(size_t num, size_t size) {
     return TWL_alloc(num*size);
+}
+
+extern int32_t __real___muldi3(int32_t a, int32_t b);
+MATH_FUNC int32_t __wrap___muldi3_(int32_t a, int32_t b) {
+    int32_t result;
+    int32_t lo, hi;
+
+    __asm__ (
+        "smull %0, %1, %2, %3"
+        : "=&r"(lo), "=&r"(hi)        // output: lo = %0, hi = %1
+        : "r"(a), "r"(b)              // input: a = %2, b = %3
+    );
+
+    result = (uint32_t)lo;
+    return result;
+}
+
+int32_t __wrap___muldi3(int32_t a, int32_t b) {
+    return __wrap___muldi3_(a,b);
 }
 
 #ifdef __cplusplus

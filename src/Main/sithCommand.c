@@ -466,7 +466,8 @@ int sithCommand_CmdMemDump(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     int v3; // edi
     stdMemoryAlloc *i; // esi
 
-    result = pSithHS->fileOpen("memdump.txt", "w+");
+    // Added: pSithHS -> pLowLevelHS
+    result = pLowLevelHS->fileOpen("memdump.txt", "w+");
     v3 = result;
     if ( result )
     {

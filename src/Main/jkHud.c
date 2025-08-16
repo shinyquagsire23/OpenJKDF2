@@ -104,7 +104,9 @@ int jkHud_Open()
         *bitmapIter->pBitmap = v3;
         if ( !v3 )
             Windows_GameErrorMsgbox("ERR_CANNOT_LOAD_FILE %s", tmp);
+#ifndef RDMATERIAL_MINIMIZE_STRUCTS
         stdBitmap_ConvertColorFormat(&Video_format.format, v3);
+#endif
         ++bitmapIter;
     }
 
@@ -133,7 +135,9 @@ int jkHud_Open()
         *fontIter->pFont = v5;
         if ( !v5 )
             Windows_GameErrorMsgbox("ERR_CANNOT_LOAD_FILE %s", tmp);
+#ifndef RDMATERIAL_MINIMIZE_STRUCTS
         stdBitmap_ConvertColorFormat(&Video_format.format, v5->pBitmap);
+#endif
         ++fontIter;
     }
     jkHud_leftBlitX = 0;

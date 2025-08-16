@@ -135,7 +135,7 @@ int jkGuiPlayer_sub_410640(Darray *array, jkGuiElement *element)
             do
             {
                 stdString_snprintf(jkl_fname, 128, "player%c%s%c%s.plr", LEC_PATH_SEPARATOR_CHR, searchRes.fpath, LEC_PATH_SEPARATOR_CHR, searchRes.fpath);
-                if ( searchRes.is_subdirectory && searchRes.fpath[0] != '.' && util_FileExists(jkl_fname) )
+                if ( searchRes.is_subdirectory && searchRes.fpath[0] != '.' && util_FileExistsLowLevel(jkl_fname) ) // Added: util_FileExists -> util_FileExistsLowLevel
                 {
                     _memset(tmp, 0, sizeof(tmp));
                     stdString_CharToWchar(tmp, searchRes.fpath, 255);
@@ -143,7 +143,7 @@ int jkGuiPlayer_sub_410640(Darray *array, jkGuiElement *element)
                     wchar_t tab[2] = {'\t', 0};
                     __wcscat(tmp, tab);
                     
-                    if ( stdConffile_OpenRead(jkl_fname) )
+                    if ( stdConffile_OpenReadBypass(jkl_fname) )
                     {
                         if ( stdConffile_ReadLine() && _sscanf(stdConffile_aLine, "version %d", &v8) == 1 && v8 == 1 && stdConffile_ReadLine() )
                         {
@@ -318,7 +318,7 @@ void jkGuiPlayer_ShowNewPlayer(int a1)
                         v19[127] = 0;
                         stdFnames_MakePath(v21, 128, "player", v19);
                         stdString_snprintf(v21, 128, "player%c%s%c%s.plr", LEC_PATH_SEPARATOR_CHR, v19, LEC_PATH_SEPARATOR_CHR, v19);
-                        if ( !util_FileExists(v21) )
+                        if ( !util_FileExistsLowLevel(v21) ) // Added: util_FileExists -> util_FileExistsLowLevel
                             continue;
                         v6 = 1;
                         v8 = jkStrings_GetUniStringWithFallback("ERR_PLAYER_ALREADY_EXISTS");
