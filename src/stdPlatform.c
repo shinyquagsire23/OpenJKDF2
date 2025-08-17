@@ -532,11 +532,12 @@ void *__wrap_calloc(size_t num, size_t size) {
 }
 
 extern int32_t __real___muldi3(int32_t a, int32_t b);
-MATH_FUNC int32_t __wrap___muldi3_(int32_t a, int32_t b) {
+__attribute__((never_inline)) MATH_FUNC int32_t __wrap___muldi3_(int32_t a, int32_t b) {
     int32_t result;
     int32_t lo, hi;
 
     __asm__ (
+        ".arm\n"
         "smull %0, %1, %2, %3"
         : "=&r"(lo), "=&r"(hi)        // output: lo = %0, hi = %1
         : "r"(a), "r"(b)              // input: a = %2, b = %3

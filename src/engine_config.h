@@ -118,8 +118,8 @@
 #define MAX_DEFLECTION_BOUNCES (6)
 
 #if defined(TARGET_TWL)
-#define RDCACHE_MAX_TRIS (0x100) // theoretical max 0x800?
-#define RDCACHE_MAX_VERTICES (0x300) // theoretical max 0x1800?
+#define RDCACHE_MAX_TRIS (0x80) // theoretical max 0x800?
+#define RDCACHE_MAX_VERTICES (0x180) // theoretical max 0x1800?
 
 #define STD3D_MAX_TEXTURES (512) // theoretical max 2048
 #define STD3D_MAX_UI_TRIS (0x100)

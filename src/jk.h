@@ -230,7 +230,7 @@ static int (*__strnicmp)(const char *, const char *, size_t) = (void*)0x00520DA0
 static int (*_sscanf)(const char*, const char*, ...) = (void*)0x512CB0;
 static void* (*_memcpy)(void*, const void*, size_t) = (void*)0x514D00;
 char* _strcpy(char *dst, const char *src);
-int _memcmp(const void* str1, const void* str2, size_t count);
+int _memcmp(const void* str1, const void* str2, size_t count) __attribute__ ((pure));
 void* _memset(void* ptr, int val, size_t num);
 void* _memset32(void* ptr, uint32_t val, size_t num);
 
@@ -276,8 +276,20 @@ static wchar_t* (*_wcsncpy)(wchar_t *, const wchar_t *, size_t) = (wchar_t* (*)(
 void jk_fatal();
 #else // WIN32_BLOBS
 char* _strcpy(char *dst, const char *src);
-int _memcmp(const void* str1, const void* str2, size_t count);
+int _memcmp(const void* str1, const void* str2, size_t count) __attribute__ ((pure));
+#if !defined(TARGET_TWL)
 void* _memset(void* ptr, int val, size_t num);
+#define _memset_inline _memset
+#else
+#define _memset memset
+static inline void __attribute((always_inline)) _memset_inline(void* ptr, int val, size_t num) {
+    uint8_t* iter = (uint8_t*)ptr;
+    for (size_t i = 0; i < num; i++)
+    {
+        *iter++ = val;
+    }
+}
+#endif
 void* _memset32(void* ptr, uint32_t val, size_t num);
 int _sscanf(const char * s, const char * format, ...);
 int _sprintf(char * s, const char * format, ...);
@@ -351,8 +363,6 @@ void jk_ValidateRect(HWND hWnd, const RECT *lpRect);
 #if !defined(ARCH_WASM)
 int __isspace(int a);
 #endif
-void* _memset(void* ptr, int val, size_t num);
-void* _memset32(void* ptr, uint32_t val, size_t num);
 wchar_t* __wcscat(wchar_t *, const wchar_t *);
 wchar_t* __wcschr(const wchar_t *, wchar_t);
 wchar_t* __wcsncpy(wchar_t *, const wchar_t *, size_t);

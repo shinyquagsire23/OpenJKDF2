@@ -6,15 +6,15 @@ std_pHS 0x866C80 struct HostServices*
 rdModel3_pCurGeoset 0x0073A3D8 rdGeoset*
 localCamera 0x0073A3E0 rdVector3
 
-aFaceVerts 0x0073A3F0 rdVector3[32]
+aFaceVerts 0x0073A3F0 rdVector3[32] NO_REINIT
 vertexDst 0x0073A570 rdMeshinfo
 curGeometryMode 0x0073A590 int
 apGeoLights 0x0073A598 rdLight*[64]
-rdModel3_aLocalLightPos 0x0073A698 rdVector3[64]
-rdModel3_aLocalLightDir 0x0 rdVector3[64]
+rdModel3_aLocalLightPos 0x0073A698 rdVector3[64] NO_REINIT
+rdModel3_aLocalLightDir 0x0 rdVector3[64] NO_REINIT
 meshFrustumCull 0x0073A998 int
 curTextureMode 0x0073A99C int
-aView 0x0073A9A0 rdVector3[512]
+aView 0x0073A9A0 rdVector3[512] NO_REINIT
 pCurMesh 0x0073C1A0 rdMesh*
 thingFrustumCull 0x0073C1A4 int
 vertexSrc 0x0073C1A8 rdMeshinfo
@@ -73,8 +73,8 @@ sithRender_aLights 0x0082F668 rdLight[32]
 sithRender_aSectors 0x0082F110 sithSector*[SITH_MAX_VISIBLE_SECTORS]
 sithRender_clipFrustums 0x0082FEF0 rdClipFrustum[SITH_MAX_VISIBLE_SECTORS]
 sithRender_aSectors2 0x0082FC68 sithSector*[SITH_MAX_VISIBLE_SECTORS_2+2]
-sithRender_aVerticesTmp 0x0082F310 rdVector3[32]
-sithRender_aVerticesTmp_projected 0x0082F4C0 rdVector3[32]
+sithRender_aVerticesTmp 0x0082F310 rdVector3[32] NO_REINIT
+sithRender_aVerticesTmp_projected 0x0082F4C0 rdVector3[32] NO_REINIT
 sithRender_aSurfaces 0x008318F8 sithSurface*[SITH_MAX_VISIBLE_ALPHA_SURFACES]
 sithRender_lastRenderTick 0x008EE678 int
 aSithSurfaces 0x00847E98 sithSurface*[SITH_MAX_VISIBLE_ALPHA_SURFACES]
@@ -115,15 +115,15 @@ sithMaterial_hashmap 0x00852F84 stdHashTable*
 sithMaterial_aMaterials 0x0088AFD0 rdMaterial**
 sithMaterial_numMaterials 0x00852F80 int
 
-rdCache_aHWSolidTris 0x005703A0 rdTri[RDCACHE_MAX_TRIS]
+rdCache_aHWSolidTris 0x005703A0 rdTri[RDCACHE_MAX_TRIS] NO_REINIT
 rdCache_totalNormalTris 0x005753A0 int
-rdCache_aIntensities 0x005753A8 flex_t[RDCACHE_MAX_VERTICES]
-rdCache_aVertices 0x005953A8 rdVector3[RDCACHE_MAX_VERTICES]
+rdCache_aIntensities 0x005753A8 flex_t[RDCACHE_MAX_VERTICES] NO_REINIT
+rdCache_aVertices 0x005953A8 rdVector3[RDCACHE_MAX_VERTICES] NO_REINIT
 rdCache_totalVerts 0x005F53A8 int
-rdCache_aTexVertices 0x005F53B0 rdVector2[RDCACHE_MAX_VERTICES]
-rdCache_aHWNormalTris 0x006353B0 rdTri[RDCACHE_MAX_TRIS]
+rdCache_aTexVertices 0x005F53B0 rdVector2[RDCACHE_MAX_VERTICES] NO_REINIT
+rdCache_aHWNormalTris 0x006353B0 rdTri[RDCACHE_MAX_TRIS] NO_REINIT
 rdCache_totalSolidTris 0x0063A3B0 int
-rdCache_aHWVertices 0x0063A3B8 D3DVERTEX[RDCACHE_MAX_VERTICES]
+rdCache_aHWVertices 0x0063A3B8 D3DVERTEX[RDCACHE_MAX_VERTICES] NO_REINIT
 rdCache_drawnFaces 0x0073A3B8 int
 rdCache_numUsedVertices 0x0073A3BC int
 rdCache_numUsedTexVertices 0x0073A3C0 int
@@ -131,7 +131,7 @@ rdCache_numUsedIntensities 0x0073A3C4 int
 rdCache_ulcExtent 0x0086EE70 rdVector2i
 rdCache_lrcExtent 0x0086EE78 rdVector2i
 rdCache_numProcFaces 0x0086EE80 int
-rdCache_aProcFaces 0x0086EEA0 rdProcEntry[RDCACHE_MAX_TRIS]
+rdCache_aProcFaces 0x0086EEA0 rdProcEntry[RDCACHE_MAX_TRIS] NO_REINIT
 rdCache_dword_865258 0x00865258 int
 
 sithMulti_name 0x008C4BE0 wchar_t[32]
@@ -159,11 +159,11 @@ sithEvent_bOpen 0x855008 int
 
 rdClip_faceStatus 0x0082EE5C int
 rdClip_pSourceVert 0x0082EC50 rdVector3*
-rdClip_workIVerts 0x0082EC58 flex_t[32]
-rdClip_workVerts 0x0082ECD8 rdVector3[32]
+rdClip_workIVerts 0x0082EC58 flex_t[32] NO_REINIT
+rdClip_workVerts 0x0082ECD8 rdVector3[32] NO_REINIT
 rdClip_pDestVert 0x0082EB44 rdVector3*
 rdClip_pDestIVert 0x0082EB48 flex_t*
-rdClip_workTVerts 0x0082EB50 rdVector2[32]
+rdClip_workTVerts 0x0082EB50 rdVector2[32] NO_REINIT
 rdClip_pSourceIVert 0x0082EB38 flex_t*
 rdClip_pSourceTVert 0x0082EB3C rdVector2*
 rdClip_pDestTVert 0x0082EB40 rdVector2*
@@ -269,16 +269,16 @@ sithTemplate_count 0x8BBC68 int
 sithTemplate_oldHashtable 0x8BBC6C stdHashTable*
 
 // rdActive
-activeEdgeTail 0x0082D688 rdEdge
-activeEdgeHead 0x0073E618 rdEdge
-apNewActiveEdges 0x0073D610 rdEdge*[1024]
-apRemoveActiveEdges 0x00754680 rdEdge*[1024]
+activeEdgeTail 0x0082D688 rdEdge NO_REINIT
+activeEdgeHead 0x0073E618 rdEdge NO_REINIT
+apNewActiveEdges 0x0073D610 rdEdge*[1024] NO_REINIT
+apRemoveActiveEdges 0x00754680 rdEdge*[1024] NO_REINIT
 yMinEdge 0x0073E610 int
 yMaxEdge 0x0073E670 int
 numActiveSpans 0x0073E674 int
 numActiveFaces 0x0082D684 int
 numActiveEdges 0x0082D680 int
-aActiveEdges 0x00755680 rdEdge[1024] // TODO verify
+aActiveEdges 0x00755680 rdEdge[1024] NO_REINIT // TODO verify
 rdActive_drawnFaces 0x0082D6E0 int
 
 sithMain_bEndLevel 0x0082F0A8 int

@@ -1841,7 +1841,7 @@ typedef struct sithCogStackvar
         char* dataAsName;
         cogSymbolFunc_t dataAsFunc;
     };
-    int8_t type;
+    int16_t type;
 } sithCogStackvar;
 #else
 typedef struct sithCogStackvar

@@ -24,6 +24,14 @@ typedef struct embeddedResource_t
     size_t data_len;
 } embeddedResource_t;
 
+#ifdef TARGET_TWL
+#define MAYBE_UNUSED __attribute__((unused))
+#else
+#define MAYBE_UNUSED
+#endif
+
+#define NO_REINIT // HACK
+
 // Addrs
 [[[cog
     import cog
@@ -86,7 +94,7 @@ typedef struct embeddedResource_t
             c_type = s[0]
             c_type_post = "[" + s[1] 
         
-        cog.outl("extern %s %s%s;" % (c_type, name, c_type_post))
+        cog.outl("extern %s %s%s MAYBE_UNUSED;" % (c_type, name, c_type_post))
 
 ]]]
 [[[end]]]

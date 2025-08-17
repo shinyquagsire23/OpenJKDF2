@@ -14,6 +14,14 @@
 
 #include "jk.h"
 
+#ifdef TARGET_TWL
+#define MAYBE_UNUSED __attribute__((unused))
+#else
+#define MAYBE_UNUSED
+#endif
+
+#define NO_REINIT // HACK
+
 #ifdef NO_JK_MMAP
 // Vars
 [[[cog
@@ -76,7 +84,7 @@
             c_type = s[0]
             c_type_post = "[" + s[1] 
         
-        cog.outl("%s %s%s = %s;" % (c_type, name, c_type_post, c_val))
+        cog.outl("%s %s%s MAYBE_UNUSED = %s;" % (c_type, name, c_type_post, c_val))
 
 ]]]
 [[[end]]]
@@ -118,8 +126,12 @@ void OpenJKDF2_Globals_Reset()
         if c_type == "func":
             continue
         
+        c_type_is_int_like = False
+        if c_type == "int" or c_type == "int32_t" or c_type == "uint32_t" or c_type == "uint16_t" or c_type == "int16_t":
+            c_type_is_int_like = True
+
         if c_val == "":
-            if c_type == "int":
+            if c_type_is_int_like:
                 c_val = "0"
             elif c_type == "float":
                 c_val = "0.0f"
@@ -145,10 +157,12 @@ void OpenJKDF2_Globals_Reset()
             c_type = s[0]
             c_type_post = "[" + s[1] 
         
-        if c_val == "NULL" or c_val == "0" or c_val == "0.0f":
+        if "NO_REINIT" in c_type or "NO_REINIT" in c_type_post:
+            cog.outl("// NO_REINIT for %s" % (name))
+        elif c_val == "NULL" or c_val == "0" or c_val == "0.0f" or c_type_is_int_like:
             cog.outl("%s = %s;" % (name, c_val))
-        if c_val == "{0}":
-            cog.outl("_memset(&%s, 0, sizeof(%s));" % (name, name))
+        elif c_val == "{0}":
+            cog.outl("_memset_inline(&%s, 0, sizeof(%s));" % (name, name))
         else:
             cog.outl("%s __%s_origValue%s = %s;" % (c_type, name, c_type_post, c_val))
             cog.outl("_memcpy(&%s, &__%s_origValue, sizeof(%s));" % (name, name, name))

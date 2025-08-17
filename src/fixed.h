@@ -145,7 +145,7 @@ struct divide_by_zero : std::exception {
 };
 
 template <size_t I, size_t F>
-FAST_FUNC CONSTEXPR14 fixed<I, F> divide(fixed<I, F> numerator, fixed<I, F> denominator, fixed<I, F> &remainder, typename std::enable_if<type_from_size<I + F>::next_size::is_specialized>::type * = nullptr) {
+CONSTEXPR14 fixed<I, F> divide(fixed<I, F> numerator, fixed<I, F> denominator, fixed<I, F> &remainder, typename std::enable_if<type_from_size<I + F>::next_size::is_specialized>::type * = nullptr) {
 #ifdef TARGET_TWL
 	return fixed<I, F>::from_base(div64_mine_((s64)numerator.to_raw() << F, denominator.to_raw()));
 #else
@@ -166,7 +166,7 @@ FAST_FUNC CONSTEXPR14 fixed<I, F> divide(fixed<I, F> numerator, fixed<I, F> deno
 }
 
 template <size_t I, size_t F>
-FAST_FUNC CONSTEXPR14 fixed<I, F> divide(fixed<I, F> numerator, fixed<I, F> denominator, fixed<I, F> &remainder, typename std::enable_if<!type_from_size<I + F>::next_size::is_specialized>::type * = nullptr) {
+CONSTEXPR14 fixed<I, F> divide(fixed<I, F> numerator, fixed<I, F> denominator, fixed<I, F> &remainder, typename std::enable_if<!type_from_size<I + F>::next_size::is_specialized>::type * = nullptr) {
 #ifdef TARGET_TWL
 	return fixed<I, F>::from_base(div64_mine_((s64)numerator.to_raw() << F, denominator.to_raw()));
 #else

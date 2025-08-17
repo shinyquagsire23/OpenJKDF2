@@ -337,15 +337,17 @@ char* _strcat(char* str, const char* concat)
     return str;
 }
 
+#if !defined(TARGET_TWL)
 void* _memset(void* ptr, int val, size_t num)
 {
-    int i;
+    size_t i;
     for (i = 0; i < num; i++)
     {
         *(uint8_t*)((char*)ptr+i) = val;
     }
     return ptr;
 }
+#endif
 
 #if !defined(MACOS) && !defined(WIN64_STANDALONE) && !defined(LINUX) && !defined(TARGET_TWL)
 void* memset(void* ptr, int val, size_t num)
