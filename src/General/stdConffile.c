@@ -6,6 +6,8 @@
 
 // Added: Split off local file access from GOB access
 static struct HostServices* stdConffile_pHS = 0;
+static BOOL openFileIsBypass[20];
+static BOOL bOpenFileIsBypassed = 0;
 
 int stdConffile_OpenRead(char *fpath)
 {
@@ -45,6 +47,8 @@ int stdConffile_OpenModeCommon(char *fpath, const char* mode, BOOL bBypassGobs)
     {
         _strcpy(&aFilenameStack[128 * stackLevel], stdConffile_pFilename);
         
+        // Added: Split off local file access from GOB access
+        openFileIsBypass[stackLevel] = stdConffile_pHS == pLowLevelHS ? 1 : 0;
         openFileStack[stackLevel] = openFile;
         linenumStack[stackLevel] = stdConffile_linenum;
         apBufferStack[stackLevel] = stdConffile_aLine;
@@ -55,20 +59,20 @@ int stdConffile_OpenModeCommon(char *fpath, const char* mode, BOOL bBypassGobs)
         stackLevel++;
     }
 
+    // Added: Setting stdConffile_pHS
+    if (bBypassGobs) {
+        stdConffile_pHS = pLowLevelHS;
+    }
+    else {
+        stdConffile_pHS = std_pHS;
+    }
+
     if (!_memcmp(fpath, "none", 5u))
     {
         openFile = 0;
     }
     else
     {
-        // Added: Setting stdConffile_pHS
-        if (bBypassGobs) {
-            stdConffile_pHS = pLowLevelHS;
-        }
-        else {
-            stdConffile_pHS = std_pHS;
-        }
-
         openFile = stdConffile_pHS->fileOpen(fpath, mode); // Added: std_pHS -> stdConffile_pHS
         if (!openFile)
             goto fail_open;
@@ -93,7 +97,8 @@ fail_open:
     openFile = openFileStack[stackLevel];
     stdConffile_linenum = linenumStack[stackLevel];
     stdConffile_aLine = apBufferStack[stackLevel];
-    
+    stdConffile_pHS = openFileIsBypass[stackLevel] ? pLowLevelHS : std_pHS; // Added: Split off local file access from GOB access
+
     _memcpy(&stdConffile_entry, (const void *)(aEntryStack + ((STDCONF_LINEBUFFER_LEN+4) * stackLevel)), sizeof(stdConffileEntry));
     return 0;
 }
@@ -130,7 +135,7 @@ void stdConffile_Close()
     if (!stdConffile_bOpen)
         return;
 
-    if (openFile){
+    if (openFile) {
         stdConffile_pHS->fileClose(openFile); // Added: std_pHS -> stdConffile_pHS
     }
 
@@ -147,6 +152,7 @@ void stdConffile_Close()
     openFile = openFileStack[stackLevel];
     stdConffile_linenum = linenumStack[stackLevel];
     stdConffile_aLine = apBufferStack[stackLevel];
+    stdConffile_pHS = openFileIsBypass[stackLevel] ? pLowLevelHS : std_pHS; // Added: Split off local file access from GOB access
     _memcpy(&stdConffile_entry, (const void *)(aEntryStack + ((STDCONF_LINEBUFFER_LEN+4) * stackLevel)), sizeof(stdConffileEntry));
 }
 

@@ -858,7 +858,7 @@ aFilenameStack 0x0055D620 char[2560]
 apBufferStack 0x0055E020 char*[20]
 linenumStack 0x0055E070 int[20]
 aEntryStack 0x0055E0C0 char[0x14*(STDCONF_LINEBUFFER_LEN+4)]
-openFileStack 0x00563110 int[20]
+openFileStack 0x00563110 stdFile_t[20]
 printfBuffer 0x00563160 char[STDCONF_LINEBUFFER_LEN]
 stdConffile_linenum 0x00563560 int
 stdConffile_bOpen 0x00563564 int
