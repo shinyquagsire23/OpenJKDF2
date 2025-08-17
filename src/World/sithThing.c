@@ -510,6 +510,11 @@ void sithThing_sub_4CCE60()
     int32_t v6; // eax
     int32_t v8; // ecx
 
+    // Added: Prevent crashes
+    if (!sithWorld_pCurrentWorld) {
+        return;
+    }
+
     sithNet_thingsIdx = 0;
     sithWorld_pCurrentWorld->numThings = -1;
     v2 = sithNet_things + 1;
@@ -550,7 +555,7 @@ void sithThing_FreeEverythingNet(sithThing* pThing)
     sithThing_FreeEverything(pThing); // Inlined
 
     v2 = pThing->thingIdx;
-    if ( v2 == sithWorld_pCurrentWorld->numThings )
+    if (sithWorld_pCurrentWorld && v2 == sithWorld_pCurrentWorld->numThings ) // Added: sithWorld_pCurrentWorld nullptr check
     {
         v3 = v2 - 1;
         if ( v2 - 1 >= 0 )

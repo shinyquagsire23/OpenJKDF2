@@ -648,6 +648,10 @@ int32_t sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogReference *cogIdk, ch
     rdModel3 *v15; // eax
     rdKeyframe *v17; // eax
     sithAIClass *v19; // eax
+#ifdef COG_COMPRESS_VAR_SIZE
+    flex32_t tmpx, tmpy, tmpz;
+    cog_flex_t* pVec;
+#endif
 
     switch ( cogIdk->type )
     {
@@ -713,6 +717,7 @@ int32_t sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogReference *cogIdk, ch
             return 1;
         case COG_TYPE_VECTOR:
             cogSymbol->val.type = COG_VARTYPE_VECTOR;
+#ifndef COG_COMPRESS_VAR_SIZE
             if (_sscanf(val, "(%f/%f/%f)", &cogSymbol->val.dataAsFloat[0], &cogSymbol->val.dataAsFloat[1], &cogSymbol->val.dataAsFloat[2]) == 3 )
             {
                 return 1;
@@ -724,6 +729,30 @@ int32_t sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogReference *cogIdk, ch
                 cogSymbol->val.dataAsFloat[2] = 0.0;
                 return 0;
             }
+#else
+            pVec = (cog_flex_t*)pSithHS->alloc(sizeof(cog_flex_t)*3);
+            if (pVec) {
+                cogSymbol->val.dataAsPtrs[0] = (intptr_t)pVec;
+                if (_sscanf(val, "(%f/%f/%f)", &tmpx, &tmpy, &tmpz) == 3 )
+                {
+                    pVec[0] = tmpx;
+                    pVec[1] = tmpy;
+                    pVec[2] = tmpz;
+                    return 1;
+                }
+                else
+                {
+                    pVec[0] = 0.0f;
+                    pVec[1] = 0.0f;
+                    pVec[2] = 0.0f;
+                    return 0;
+                }
+            }
+            else {
+                cogSymbol->val.dataAsPtrs[0] = 0;
+                return 0;
+            }
+#endif
             break;
 
         case COG_TYPE_MODEL:

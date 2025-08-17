@@ -1830,6 +1830,20 @@ typedef struct sithCogCallstack
     uint32_t trigId;
 } sithCogCallstack;
 
+#ifdef COG_COMPRESS_VAR_SIZE
+typedef struct sithCogStackvar
+{
+    union
+    {
+        cog_int_t data[1];
+        cog_flex_t dataAsFloat[1];
+        intptr_t dataAsPtrs[1];
+        char* dataAsName;
+        cogSymbolFunc_t dataAsFunc;
+    };
+    int8_t type;
+} sithCogStackvar;
+#else
 typedef struct sithCogStackvar
 {
     uint32_t type;
@@ -1842,6 +1856,7 @@ typedef struct sithCogStackvar
         cogSymbolFunc_t dataAsFunc;
     };
 } sithCogStackvar;
+#endif
 
 typedef struct sithCog
 {

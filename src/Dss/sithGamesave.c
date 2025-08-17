@@ -30,6 +30,7 @@
 #include "Main/jkStrings.h"
 #include "Main/jkMain.h"
 #include "Main/jkEpisode.h"
+#include "General/stdString.h"
 #include "stdPlatform.h"
 #include "jk.h"
 
@@ -284,12 +285,10 @@ skip_free_things:
 
     stdConffile_Close();
     _memcpy(&sithGamesave_headerTmp, &header, sizeof(sithGamesave_headerTmp));
-    _strncpy(sithGamesave_autosave_fname, stdFnames_FindMedName(fpath), 0x7Fu);
-    sithGamesave_autosave_fname[127] = 0;
+    stdString_SafeStrCopy(sithGamesave_autosave_fname, stdFnames_FindMedName(fpath), 128);
     if ( sithGamesave_dword_835914 )
     {
-        _strncpy(sithGamesave_saveName, stdFnames_FindMedName(fpath), 0x7Fu);
-        sithGamesave_saveName[127] = 0;
+        stdString_SafeStrCopy(sithGamesave_saveName, stdFnames_FindMedName(fpath), 128);
         _wcsncpy(sithGamesave_wsaveName, sithGamesave_headerTmp.saveName, 0xFFu);
         sithGamesave_wsaveName[255] = 0;
     }

@@ -153,9 +153,23 @@ int sithDSSCog_SendSyncCog(sithCog *cog, int sendto_id, int mpFlags)
             }
             else if ( sym->val.type == COG_VARTYPE_VECTOR )
             {
+#ifndef COG_COMPRESS_VAR_SIZE
                 NETMSG_PUSHF32(sym->val.dataAsFloat[0]);
                 NETMSG_PUSHF32(sym->val.dataAsFloat[1]);
                 NETMSG_PUSHF32(sym->val.dataAsFloat[2]);
+#else
+                if (sym->val.dataAsPtrs[0]){
+                    cog_flex_t* ptr = (cog_flex_t*)sym->val.dataAsPtrs[0];
+                    NETMSG_PUSHF32(ptr[0]);
+                    NETMSG_PUSHF32(ptr[1]);
+                    NETMSG_PUSHF32(ptr[2]);
+                }
+                else {
+                    NETMSG_PUSHF32(0.0f);
+                    NETMSG_PUSHF32(0.0f);
+                    NETMSG_PUSHF32(0.0f);
+                }
+#endif
             }
             else if (Main_bMotsCompat && sym->val.type == COG_VARTYPE_STR)
             {
@@ -225,9 +239,23 @@ int sithDSSCog_ProcessSyncCog(sithCogMsg *msg)
             }
             else if ( sym->val.type == COG_VARTYPE_VECTOR )
             {
+#ifndef COG_COMPRESS_VAR_SIZE
                 sym->val.dataAsFloat[0] = NETMSG_POPF32();
                 sym->val.dataAsFloat[1] = NETMSG_POPF32();
                 sym->val.dataAsFloat[2] = NETMSG_POPF32();
+#else
+                if (sym->val.dataAsPtrs[0]){
+                    cog_flex_t* ptr = (cog_flex_t*)sym->val.dataAsPtrs[0];
+                    ptr[0] = NETMSG_POPF32();
+                    ptr[1] = NETMSG_POPF32();
+                    ptr[2] = NETMSG_POPF32();
+                }
+                else {
+                    NETMSG_POPF32();
+                    NETMSG_POPF32();
+                    NETMSG_POPF32();
+                }
+#endif
             }
             else if (Main_bMotsCompat && sym->val.type == COG_VARTYPE_STR)
             {
