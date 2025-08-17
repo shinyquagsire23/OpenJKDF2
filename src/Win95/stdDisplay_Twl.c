@@ -218,6 +218,8 @@ int stdDisplay_SetMasterPalette(uint8_t* pal)
 {
     rdColor24* pal24 = (rdColor24*)pal;
     
+    if (!stdDisplay_masterPalette || !pal) return 0;
+
     memcpy(stdDisplay_masterPalette, pal24, sizeof(stdDisplay_masterPalette));
 #if 0    
     SDL_Color* tmp = malloc(sizeof(SDL_Color) * 256);

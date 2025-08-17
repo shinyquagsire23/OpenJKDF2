@@ -340,6 +340,7 @@ static void* TWL_mspace_realloc(mspace m, uint8_t marker, tMemTrackingHeader* pH
 
 static void* TWL_alloc(uint32_t len)
 {
+    static BOOL bDontTryAgain = 0;
     if (!len) {
         return NULL;
     }
@@ -403,6 +404,21 @@ static void* TWL_alloc(uint32_t len)
     //uint32_t freeEst = (intptr_t)getHeapLimit() - (intptr_t)getHeapEnd();
 
     printf("already out? %zx %zx %zx\n", trackingAllocsA, trackingAllocsB, trackingAllocsC);
+
+    // Emergency freeing measures
+    if (!bDontTryAgain) {
+        extern int sithSound_FreeUpMemory(uint32_t);
+        extern int rdMaterial_PurgeEntireMaterialCache();
+        if (!sithSound_FreeUpMemory(len)) {
+            if (!rdMaterial_PurgeMaterialCache()) {
+                rdMaterial_PurgeEntireMaterialCache();
+            }
+        }
+        
+        bDontTryAgain = 1;
+        ret = TWL_alloc(len);
+        bDontTryAgain = 0;
+    }
 
     if (!ret) {
         printf("Failed to allocate %x bytes...\n", len);
