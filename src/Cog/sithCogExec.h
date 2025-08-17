@@ -83,6 +83,8 @@ sithCogStackvar* sithCogExec_AssignStackVar(sithCogStackvar *out, sithCog *ctx, 
 void sithCogExec_GrowStack(sithCog* pCtx, uint32_t sz);
 #endif
 
+void sithCogExec_Push3Floats(sithCog *ctx, const cog_flex_t* val);
+
 //static void (__cdecl *sithCogExec_Ret)(sithCog *cog) = (void*)sithCogExec_Ret_ADDR;
 //static void (__cdecl *sithCogExec_Call)(sithCog *cog) = (void*)sithCogExec_Call_ADDR;
 
