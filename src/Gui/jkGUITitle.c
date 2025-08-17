@@ -311,6 +311,9 @@ void jkGuiTitle_ShowLoadingStatic()
     //wchar_t v4[16]; // [esp+0h] [ebp-20h] BYREF
     // Added: removed undefined behavior, used to use the stack.....
 
+    // Added
+    stdBitmap_EnsureData(jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]);
+
     jkGui_SetModeMenu(jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]->palette);
     jkGuiTitle_whichLoading = 1;
     sithWorld_SetLoadPercentCallback(jkGuiTitle_WorldLoadCallback);
@@ -335,6 +338,9 @@ void jkGuiTitle_ShowLoading(char *a1, wchar_t *a2)
 #ifdef QOL_IMPROVEMENTS
     jkGuiTitle_elementsLoad[4].bIsVisible = 0;
 #endif
+
+    // Added
+    stdBitmap_EnsureData(jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]);
 
     jkGui_SetModeMenu(jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]->palette);
     jkGuiTitle_whichLoading = 2;

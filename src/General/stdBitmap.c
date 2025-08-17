@@ -2,12 +2,14 @@
 
 #include "stdPlatform.h"
 #include "General/stdColor.h"
+#include "General/stdString.h"
 #include "Win95/stdDisplay.h"
 #include "Win95/std.h"
 #include "Platform/std3D.h"
 #include "jk.h"
 
-stdBitmap* stdBitmap_Load(char *fpath, int bCreateDDrawSurface, int gpuMem)
+// Added: Partial loading
+stdBitmap* stdBitmap_LoadCommon(char *fpath, int bCreateDDrawSurface, int gpuMem, int bPartial)
 {
     stdBitmap *outAlloc; // esi
     stdBitmap *result; // eax
@@ -22,21 +24,8 @@ stdBitmap* stdBitmap_Load(char *fpath, int bCreateDDrawSurface, int gpuMem)
         return NULL;
     }
 
-
-    fp = std_pHS->fileOpen(fpath, "rb");
-    if ( fp )
-    {
-        v7 = stdFileFromPath(fpath);
-        _strncpy((char *)outAlloc->fpath, v7, 0x1Fu);
-        outAlloc->fpath[31] = 0;
-        v6 = stdBitmap_LoadEntryFromFile(fp, outAlloc, bCreateDDrawSurface, gpuMem);
-        std_pHS->fileClose(fp);
-    }
-    else
-    {
-        stdPrintf(std_pHS->errorPrint, ".\\General\\stdBitmap.c", 147, "Error: Invalid load filename '%s'.\n", fpath);
-        v6 = 0;
-    }
+    v6 = stdBitmap_LoadEntry(fpath, outAlloc, bCreateDDrawSurface, gpuMem, bPartial);
+    
     if ( v6 )
     {
         result = outAlloc;
@@ -48,6 +37,37 @@ stdBitmap* stdBitmap_Load(char *fpath, int bCreateDDrawSurface, int gpuMem)
     }
     
     return result;
+}
+
+// Added: Partial loading
+stdBitmap* stdBitmap_Load(char *fpath, int bCreateDDrawSurface, int gpuMem)
+{
+    return stdBitmap_LoadCommon(fpath, bCreateDDrawSurface, gpuMem, 0);
+}
+
+// Added: Partial loading
+stdBitmap* stdBitmap_LoadPartial(char *fpath, int bCreateDDrawSurface, int gpuMem)
+{
+#ifdef STDBITMAP_PARTIAL_LOAD
+    return stdBitmap_LoadCommon(fpath, bCreateDDrawSurface, gpuMem, 1);
+#else
+    return stdBitmap_LoadCommon(fpath, bCreateDDrawSurface, gpuMem, 0);
+#endif
+}
+
+int stdBitmap_EnsureData(stdBitmap *pBitmap) {
+#ifdef STDBITMAP_PARTIAL_LOAD
+    char tmp[128];
+    if (!pBitmap) return 0;
+
+    if (pBitmap->bLoaded) {
+        return 1;
+    }
+    stdString_SafeStrCopy(tmp, pBitmap->fpath_full, 128);
+    stdBitmap_FreeEntry(pBitmap);
+    stdPlatform_Printf("stdBitmap: Ensuring data for: `%s`\n", tmp);
+    return stdBitmap_LoadEntry(tmp, pBitmap, 1, 0, 0); // TODO
+#endif
 }
 
 // MOTS added
@@ -65,7 +85,7 @@ stdBitmap* stdBitmap_LoadFromFile(stdFile_t fd, int bCreateDDrawSurface, int gpu
         return NULL;
     }
 
-    if (stdBitmap_LoadEntryFromFile(fd, outAlloc, bCreateDDrawSurface, gpuMem))
+    if (stdBitmap_LoadEntryFromFile(fd, outAlloc, bCreateDDrawSurface, gpuMem, 0))
     {
         return outAlloc;
     }
@@ -76,19 +96,22 @@ stdBitmap* stdBitmap_LoadFromFile(stdFile_t fd, int bCreateDDrawSurface, int gpu
     }
 }
 
-int stdBitmap_LoadEntry(char *fpath, stdBitmap *out, int bCreateDDrawSurface, int gpuMem)
+int stdBitmap_LoadEntry(char *fpath, stdBitmap *out, int bCreateDDrawSurface, int gpuMem, int bPartial)
 {
     stdFile_t fd; // esi
-    const char *v6; // eax
     signed int v7; // edi
+
+#ifdef STDBITMAP_PARTIAL_LOAD
+    stdString_SafeStrCopy(out->fpath_full, fpath, 128);
+#endif
 
     fd = std_pHS->fileOpen(fpath, "rb");
     if ( fd )
     {
-        v6 = stdFileFromPath(fpath);
-        _strncpy((char *)out->fpath, v6, 0x1Fu);
-        out->fpath[31] = 0;
-        v7 = stdBitmap_LoadEntryFromFile(fd, out, bCreateDDrawSurface, gpuMem);
+#ifndef OPTIMIZE_AWAY_UNUSED_FIELDS
+        stdString_SafeStrCopy(out->fpath, stdFileFromPath(fpath), 32);
+#endif
+        v7 = stdBitmap_LoadEntryFromFile(fd, out, bCreateDDrawSurface, gpuMem, bPartial);
         std_pHS->fileClose(fd);
         return v7;
     }
@@ -99,7 +122,7 @@ int stdBitmap_LoadEntry(char *fpath, stdBitmap *out, int bCreateDDrawSurface, in
     }
 }
 
-int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSurface, int gpuMem)
+int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSurface, int gpuMem, int bPartial)
 {
     int palFmt; // ebp
     int numMips_; // edx
@@ -118,6 +141,14 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
     bitmapHeader bmp_header; // [esp+20h] [ebp-CCh] BYREF
     stdVBufferTexFmt vbufTexFmt; // [esp+A0h] [ebp-4Ch] BYREF
 
+#ifndef STDBITMAP_PARTIAL_LOAD
+    bPartial = 0;
+#endif
+
+    // Added: This used to wipe out fpath
+    // Added: Moved this up
+    _memset(&out->field_20, 0, sizeof(stdBitmap)-offsetof(stdBitmap, field_20));
+
     std_pHS->fileRead(fp, &bmp_header, sizeof(bitmapHeader));
     if ( _memcmp((const char *)&bmp_header, "BM  ", 4u) )
     {
@@ -132,8 +163,8 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
     palFmt = bmp_header.palFmt;
     v18 = bmp_header.field_8;
     numMips_ = bmp_header.numMips;
-    _memset(out, 0, sizeof(stdBitmap));
-    vbufAllocSize = 4 * numMips_;
+
+    vbufAllocSize = sizeof(stdVBuffer*) * numMips_;
     numMips = numMips_;
     vbufAlloc = (stdVBuffer **)std_pHS->alloc(sizeof(stdVBuffer*) * numMips_);
     out->mipSurfaces = vbufAlloc;
@@ -149,7 +180,10 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
     else
     {
         stdPrintf(std_pHS->messagePrint, ".\\General\\stdBitmap.c", 843, "Ran out of memory trying allocate bitmap.\n", 0, 0, 0, 0);
+        // Added: Don't crash
+        return 0;
     }
+
     out->colorkey = bmp_header.colorkey;
     out->xPos = bmp_header.xPos;
     out->yPos = bmp_header.yPos;
@@ -162,9 +196,16 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
 
         _memcpy(&vbufTexFmt.format, &out->format, sizeof(vbufTexFmt.format));
 
+        if (bPartial) {
+            out->mipSurfaces[mipCount] = NULL;
+            std_pHS->fseek(fp, vbufTexFmt.width*vbufTexFmt.height*((unsigned int)vbufTexFmt.format.bpp >> 3), SEEK_CUR);
+            continue;
+        }
+
         surface = stdDisplay_VBufferNew(&vbufTexFmt, bCreateDDrawSurface, gpuMem, 0);
-        if ( !surface )
+        if ( !surface ) {
             goto LABEL_17;
+        }
 
         out->mipSurfaces[mipCount] = surface;
         stdDisplay_VBufferLock(surface);
@@ -189,7 +230,7 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
 #endif
     }
 
-    if ( (out->palFmt & 2) != 0 )
+    if ( (out->palFmt & 2) != 0  && !bPartial)
     {
         palette_map = std_pHS->alloc(0x300);
         out->palette = palette_map;
@@ -213,6 +254,12 @@ LABEL_17:
     for (int i = 0; i < out->numMips; i++)
     {
         std3D_AddBitmapToTextureCache(out, i, !(out->palFmt & 1), 0);
+    }
+#endif
+
+#ifdef STDBITMAP_PARTIAL_LOAD
+    if (!bPartial) {
+        out->bLoaded = 1;
     }
 #endif
 
@@ -258,7 +305,7 @@ void stdBitmap_ConvertColorFormat(rdTexFormat *formatTo, stdBitmap *bitmap)
     }
 }
 
-void stdBitmap_Free(stdBitmap *pBitmap)
+void stdBitmap_FreeEntry(stdBitmap *pBitmap)
 {
     unsigned int i; // esi
     
@@ -279,14 +326,40 @@ void stdBitmap_Free(stdBitmap *pBitmap)
     {
         for ( i = 0; i < pBitmap->numMips; ++i )
         {
-            if ( pBitmap->mipSurfaces[i] )
+            if ( pBitmap->mipSurfaces[i] ) {
                 stdDisplay_VBufferFree(pBitmap->mipSurfaces[i]);
+            }
+            pBitmap->mipSurfaces[i] = NULL; // Added
         }
         std_pHS->free(pBitmap->mipSurfaces);
     }
-    if ( pBitmap->palette )
+    pBitmap->mipSurfaces = NULL; // Added
+    if (pBitmap->palette) {
         std_pHS->free(pBitmap->palette);
+    }
+    pBitmap->palette = NULL; // Added
+
+#ifdef STDBITMAP_PARTIAL_LOAD
+    pBitmap->bLoaded = 0;
+#endif
     //stdPrintf(std_pHS->debugPrint, ".\\General\\stdBitmap.c", 359, "Bitmap elements successfully freed.\n", 0, 0, 0, 0);
+}
+
+void stdBitmap_Free(stdBitmap *pBitmap)
+{
+    stdBitmap_FreeEntry(pBitmap);
     std_pHS->free(pBitmap);
     //stdPrintf(std_pHS->debugPrint, ".\\General\\stdBitmap.c", 322, "Bitmap successfully freed.\n", 0, 0, 0, 0);
+}
+
+// Added
+int stdBitmap_UnloadData(stdBitmap* pBitmap) {
+#ifdef STDBITMAP_PARTIAL_LOAD
+    if (!pBitmap || !pBitmap->bLoaded) return 0;
+
+    stdPlatform_Printf("stdBitmap: Unloading data for `%s`\n", pBitmap->fpath_full);
+    stdBitmap_FreeEntry(pBitmap);
+    pBitmap->bLoaded = 0;
+#endif
+    return 1;
 }

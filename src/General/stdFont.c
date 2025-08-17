@@ -2,6 +2,7 @@
 
 #include "stdPlatform.h"
 #include "General/stdBitmap.h"
+#include "General/stdString.h"
 #include "Win95/stdDisplay.h"
 #include "Win95/std.h"
 #include "Platform/std3D.h"
@@ -129,8 +130,9 @@ LABEL_21:
     fontAlloc_->pBitmap = bitmap;
     if ( bitmap )
     {
-        _strncpy((char *)bitmap->fpath, "FONTSTRIP", 0x1Fu);
-        fontAlloc_->pBitmap->fpath[31] = 0;
+#ifndef OPTIMIZE_AWAY_UNUSED_FIELDS
+        stdString_SafeStrCopy((char *)bitmap->fpath, "FONTSTRIP", 32);
+#endif
         std_pHS->fileClose(fd);
         result = fontAlloc_;
     }

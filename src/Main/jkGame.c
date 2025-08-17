@@ -353,6 +353,9 @@ int jkGame_Update()
     snprintf(resetConsole, sizeof(resetConsole)-1, "\x1b[%d;%dH", consoleX, consoleY);
     stdPlatform_Printf("\x1b[0;0H                               \rdlt all=%d mn=%d %d wrld=%d\n                               \r pov=%d hud=%d drw=%d wst=%d %d \n                               \n", total_delta-std3D_timeWastedWaitingAround, sithMain_tickEndMs-sithMain_tickStartMs, jkGame_Delta_ClearScreen_AdvanceFrame, jkGame_Delta_AdvanceFrame_UpdateCamera, jkGame_Delta_UpdateCamera_DrawPov, jkGame_Delta_DrawPov_HudDrawn, jkGame_Delta_HudDrawn_End - std3D_timeWastedWaitingAround, std3D_timeWastedWaitingAround, sithRender_numSectors);
     stdPlatform_Printf(resetConsole);
+    stdPlatform_Printf("\x1b[6;0H                               \r");
+    stdPlatform_PrintHeapStats();
+    stdPlatform_Printf(resetConsole);
     //world=28 drw=15 emu
     //world=48 drw=33 dsi, 33 down to 25 with jank phys?
 #endif

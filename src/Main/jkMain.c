@@ -322,8 +322,13 @@ LABEL_35:
 
 void jkMain_EscapeMenuShow(int a1, int a2)
 {
-    if ( !sithNet_isMulti )
+    if ( !sithNet_isMulti ){
         sithTime_Pause();
+    }
+
+    // Added
+    stdBitmap_EnsureData(jkGui_stdBitmaps[JKGUI_BM_BK_ESC]);
+    
     jkGui_SetModeMenu(jkGui_stdBitmaps[JKGUI_BM_BK_ESC]->palette);
     jkGuiEsc_Show();
 }

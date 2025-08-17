@@ -102,8 +102,15 @@ void jkGui_InitMenu(jkGuiMenu *menu, stdBitmap *bgBitmap)
 {
     if ( bgBitmap )
     {
+        // Added
+        stdBitmap_EnsureData(bgBitmap);
+
+#ifndef STDBITMAP_PARTIAL_LOAD
         menu->palette = (uint8_t*)bgBitmap->palette;
         menu->texture = bgBitmap->mipSurfaces[0];
+#else
+        menu->pBgBitmap = bgBitmap;
+#endif
     }
     
     jkGuiElement* iter = menu->paElements;
@@ -223,6 +230,26 @@ int jkGui_MessageBeep()
     return jk_MessageBeep(0x30u);
 }
 
+void jkGui_LoadBmIdx(int idx) {
+    char tmp[128];
+    // TODO: Eviction caching for stdBitmap, rdMaterial
+#ifdef TARGET_TWL
+    /*if (i >= 1 && i <= 6) {
+        jkGui_stdBitmaps[i] = jkGui_stdBitmaps[0];
+        continue;
+    }
+    if (i >= 7 && i <= 11) {
+        jkGui_stdBitmaps[i] = jkGui_stdBitmaps[0];
+        continue;
+    }*/
+#endif
+    stdString_snprintf(tmp, 128, "ui\\bm\\%s", jkGui_aBitmaps[idx]);
+    jkGui_stdBitmaps[idx] = stdBitmap_LoadPartial(tmp, 1, 0);
+    if (jkGui_stdBitmaps[idx] == NULL) {
+        Windows_GameErrorMsgbox("ERR_CANNOT_LOAD_FILE %s", tmp);
+    }
+}
+
 int jkGui_Startup()
 {
     char playerShortName[32];
@@ -258,22 +285,8 @@ int jkGui_Startup()
 
     for (int i = 0; i < 35; i++)
     {
-        // TODO: Eviction caching for stdBitmap, rdMaterial
-#ifdef TARGET_TWL
-        /*if (i >= 1 && i <= 6) {
-            jkGui_stdBitmaps[i] = jkGui_stdBitmaps[0];
-            continue;
-        }
-        if (i >= 7 && i <= 11) {
-            jkGui_stdBitmaps[i] = jkGui_stdBitmaps[0];
-            continue;
-        }*/
-#endif
-        stdString_snprintf(tmp, 128, "ui\\bm\\%s", jkGui_aBitmaps[i]);
-        jkGui_stdBitmaps[i] = stdBitmap_Load(tmp, 1, 0);
-        if (jkGui_stdBitmaps[i] == NULL) {
-            Windows_GameErrorMsgbox("ERR_CANNOT_LOAD_FILE %s", tmp);
-        }
+        // Added: Allow unloading BMs
+        jkGui_LoadBmIdx(i);
     }
     // TODO: Eviction caching for stdBitmap, rdMaterial
 #ifdef TARGET_TWL
@@ -335,6 +348,7 @@ int jkGui_Startup()
 #endif // JKGUI_SMOL_SCREEN
 
     Window_ShowCursorUnwindowed(Main_bWindowGUI == 0);
+    stdBitmap_EnsureData(jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]); // Added
     jkGuiRend_SetPalette((uint8_t*)jkGui_stdBitmaps[JKGUI_BM_BK_MAIN]->palette);
     jkGui_bInitialized = 1;
     return 1;

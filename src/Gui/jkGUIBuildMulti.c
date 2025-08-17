@@ -414,6 +414,9 @@ int jkGuiBuildMulti_ShowEditCharacter(BOOL bIdk)
     char v34[32]; // [esp+ECh] [ebp-A0h] BYREF
     char FileName[128]; // [esp+10Ch] [ebp-80h] BYREF
 
+    // Added
+    stdBitmap_EnsureData(jkGui_stdBitmaps[JKGUI_BM_BK_BUILD_MULTI]);
+
     memset(v28, 0, sizeof(v28));
     jkGui_SetModeMenu(jkGui_stdBitmaps[JKGUI_BM_BK_BUILD_MULTI]->palette);
     v1 = jkPlayer_GetJediRank();
@@ -622,6 +625,9 @@ LABEL_32:
 
     jkGuiBuildMulti_bRendering = 0; // Added
 
+    // Added
+    stdBitmap_UnloadData(jkGui_stdBitmaps[JKGUI_BM_BK_BUILD_MULTI]);
+
     return v18;
 }
 
@@ -700,7 +706,20 @@ void jkGuiBuildMulti_ModelDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVB
     if ( jkGuiBuildMulti_lastModelDrawMs )
     {
         if ( stdPlatform_GetTimeMsec() - (uint32_t)jkGuiBuildMulti_lastModelDrawMs <= BUILDMULTI_SWITCH_DELAY_MS ) {
+#ifdef STDBITMAP_PARTIAL_LOAD
+            if (pMenu->pBgBitmap) {
+                stdBitmap_EnsureData(pMenu->pBgBitmap);
+            }
+
+            if (pMenu->pBgBitmap && pMenu->pBgBitmap->mipSurfaces[0]) {
+                stdDisplay_VBufferCopy(pVbuf, pMenu->pBgBitmap->mipSurfaces[0], 315u, 115, &jkGuiBuildMulti_rect_5353C8, 0);
+            }
+            else if (pMenu->pTextureOverride) {
+                stdDisplay_VBufferCopy(pVbuf, pMenu->pTextureOverride, 315u, 115, &jkGuiBuildMulti_rect_5353C8, 0);
+            }
+#else
             stdDisplay_VBufferCopy(pVbuf, pMenu->texture, 315u, 115, &jkGuiBuildMulti_rect_5353C8, 0);
+#endif
             return;
         }
         jkGuiBuildMulti_ThingCleanup(); // inlined

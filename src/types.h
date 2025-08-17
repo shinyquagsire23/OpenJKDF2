@@ -3198,8 +3198,13 @@ typedef struct jkGuiMenu
   int32_t textBoxCursorColor;
   int32_t fillColor;
   int32_t checkboxBitmapIdx;
+#ifndef STDBITMAP_PARTIAL_LOAD
   stdVBuffer *texture;
   uint8_t* palette;
+#else
+  stdBitmap* pBgBitmap;
+  stdVBuffer* pTextureOverride;
+#endif
   stdBitmap **ui_structs;
   stdFont** fonts;
   intptr_t paddings;

@@ -589,6 +589,7 @@ int jkCutscene_sub_421410()
     extraUs = 0;
 
     jkCutscene_isRendering = 0;
+    jkGui_SetModeGame(); // Added?
     jk_ShowCursor(1);
     return 1;
 }

@@ -64,8 +64,22 @@ void jkGuiRend_CopyVBuffer(jkGuiMenu *menu, rdRect *rect)
 {
     if ( g_app_suspended && !jkGuiRend_bIsSurfaceValid )
     {
-        if ( menu->texture )
+#ifdef STDBITMAP_PARTIAL_LOAD
+        if (menu->pBgBitmap) {
+            stdBitmap_EnsureData(menu->pBgBitmap);
+
+            if (menu->pBgBitmap->mipSurfaces[0]) {
+                stdDisplay_VBufferCopy(jkGuiRend_menuBuffer, menu->pBgBitmap->mipSurfaces[0], rect->x, rect->y, rect, 0);
+            }
+        }
+        else if (menu->pTextureOverride) {
+            stdDisplay_VBufferCopy(jkGuiRend_menuBuffer, menu->pTextureOverride, rect->x, rect->y, rect, 0);   
+        }
+#else
+        if (menu->texture) {
             stdDisplay_VBufferCopy(jkGuiRend_menuBuffer, menu->texture, rect->x, rect->y, rect, 0);
+        }
+#endif
     }
 }
 
@@ -246,8 +260,22 @@ void jkGuiRend_Paint(jkGuiMenu *menu)
     stdDisplay_SetMasterPalette(jkGuiRend_palette);
 
 #ifndef TARGET_TWL
-    if ( menu->texture )
+#ifdef STDBITMAP_PARTIAL_LOAD
+    if (menu->pBgBitmap) {
+        stdBitmap_EnsureData(menu->pBgBitmap);
+
+        if (menu->pBgBitmap->mipSurfaces[0]) {
+            stdDisplay_VBufferCopy(jkGuiRend_menuBuffer, menu->pBgBitmap->mipSurfaces[0], 0, 0, 0, 0);
+        }
+    }
+    else if (menu->pTextureOverride) {
+        stdDisplay_VBufferCopy(jkGuiRend_menuBuffer, menu->pTextureOverride, 0, 0, 0, 0);
+    }
+#else
+    if (menu->texture) {
         stdDisplay_VBufferCopy(jkGuiRend_menuBuffer, menu->texture, 0, 0, 0, 0);
+    }
+#endif
 #endif
 
     jkGuiElement* clickable = &menu->paElements[0];
@@ -321,6 +349,13 @@ int32_t jkGuiRend_DisplayAndReturnClicked(jkGuiMenu *menu)
     jkGuiRend_sub_50FDB0();
     --jkGuiRend_thing_five;
     jkGuiRend_activeMenu = lastActiveMenu;
+
+#ifdef STDBITMAP_PARTIAL_LOAD
+    for (int i = 0; i < 35; i++) {
+        stdBitmap_UnloadData(jkGui_stdBitmaps[i]);
+    }
+#endif
+
     return menu->lastClicked;
 }
 
@@ -333,8 +368,18 @@ void jkGuiRend_sub_50FAD0(jkGuiMenu *menu)
     menu->lastMouseOverClickable = 0;
     menu->lastClicked = 0;
 
-    if ( menu->palette )
+#ifdef STDBITMAP_PARTIAL_LOAD
+    if (menu->pBgBitmap) {
+        stdBitmap_EnsureData(menu->pBgBitmap);
+    }
+    if (menu->pBgBitmap && menu->pBgBitmap->palette) {
+       jkGuiRend_SetPalette((uint8_t*)menu->pBgBitmap->palette);
+    }
+#else
+    if (menu->palette) {
        jkGuiRend_SetPalette(menu->palette);
+    }
+#endif
 
     paletteChecksum = 0;
 
@@ -407,8 +452,22 @@ void jkGuiRend_gui_sets_handler_framebufs(jkGuiMenu *menu)
     ++jkGuiRend_HandlerIsSet;
     
 #ifdef TARGET_TWL
-    if ( menu->texture )
+#ifdef STDBITMAP_PARTIAL_LOAD
+    if (menu->pBgBitmap) {
+        stdBitmap_EnsureData(menu->pBgBitmap);
+
+        if (menu->pBgBitmap->mipSurfaces[0]) {
+            stdDisplay_VBufferCopy(jkGuiRend_menuBuffer, menu->pBgBitmap->mipSurfaces[0], 0, 0, 0, 0);
+        }
+    }
+    else if (menu->pTextureOverride) {
+        stdDisplay_VBufferCopy(jkGuiRend_menuBuffer, menu->pTextureOverride, 0, 0, 0, 0);
+    }
+#else
+    if (menu->texture) {
         stdDisplay_VBufferCopy(jkGuiRend_menuBuffer, menu->texture, 0, 0, 0, 0);
+    }
+#endif
 #endif
     
     jkGuiRend_Paint(menu);
@@ -506,6 +565,12 @@ void jkGuiRend_Close()
     jkGuiRend_menuBuffer = 0;
     jkGuiRend_texture_dword_8561E8 = 0;
     jkGuiRend_bOpen = 0;
+
+#ifdef STDBITMAP_PARTIAL_LOAD
+    for (int i = 0; i < 35; i++) {
+        stdBitmap_UnloadData(jkGui_stdBitmaps[i]);
+    }
+#endif
 }
 
 jkGuiElement* jkGuiRend_MenuGetClickableById(jkGuiMenu *menu, int32_t id)
@@ -1431,6 +1496,11 @@ void jkGuiRend_ListBoxDraw(jkGuiElement *element_, jkGuiMenu *menu, stdVBuffer *
     bitmapIndices = element_->uiBitmaps;
     topArrowBitmap = menu->ui_structs[bitmapIndices[0]];
     bottomArrowBitmap = menu->ui_structs[bitmapIndices[1]];
+
+    // Added
+    stdBitmap_EnsureData(topArrowBitmap);
+    stdBitmap_EnsureData(bottomArrowBitmap);
+
     if ( redraw )
         jkGuiRend_CopyVBuffer(menu, &element_->texInfo.rect);
     if ( menu->focusedElement == element_ )
@@ -1521,9 +1591,14 @@ void jkGuiRend_CheckBoxDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *
     rdRect drawRect; // [esp+10h] [ebp-10h]
     int32_t a4a; // [esp+30h] [ebp+10h]
 
-    if ( redraw )
+    if (redraw) {
         jkGuiRend_CopyVBuffer(menu, &element->rect);
+    }
     checkboxBitmap = menu->ui_structs[menu->checkboxBitmapIdx];
+
+    // Added
+    stdBitmap_EnsureData(checkboxBitmap);
+
     v6 = checkboxBitmap->mipSurfaces[(element->selectedTextEntry != 0) ? 1 : 0];
     v7 = (uint32_t)(element->rect.height - v6->format.height) / 2;
     if ( v7 < 0 )
@@ -1848,14 +1923,24 @@ int jkGuiRend_SliderEventHandler(jkGuiElement *element, jkGuiMenu *menu, int32_t
                 bitmapIdices = (int32_t *)element->uiBitmaps;
                 backgroundIdx = *bitmapIdices;
                 backgroundBitmap = menu->ui_structs[backgroundIdx];
+
                 if ( backgroundBitmap )
                 {
+                    // Added
+                    stdBitmap_EnsureData(backgroundBitmap);
+
                     v12 = (*backgroundBitmap->mipSurfaces)->format.width;
                     v11 = (v9 - v12) / 2;
                 }
                 sliderThumbBitmap = menu->ui_structs[bitmapIdices[1]];
+
+
+
                 if ( sliderThumbBitmap )
                 {
+                    // Added
+                    stdBitmap_EnsureData(sliderThumbBitmap);
+
                     v18 = (*sliderThumbBitmap->mipSurfaces)->format.width;
                     v12 -= v18;
                     if ( v33 != (uint8_t*)-44 )
@@ -2003,8 +2088,17 @@ void jkGuiRend_SliderDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vb
     sliderThumbIdx = bitmapIndices[1];
     sliderThumbBitmap = menu->ui_structs[sliderThumbIdx];
     sliderBackgroundBitmap = menu->ui_structs[*bitmapIndices];
+
+    // Added
+    stdBitmap_EnsureData(sliderThumbBitmap);
+    stdBitmap_EnsureData(sliderBackgroundBitmap);
+
     v44 = sliderThumbBitmap;
     elementa = menu->ui_structs[*bitmapIndices];
+
+    // Added
+    stdBitmap_EnsureData(elementa);
+
     if (!sliderThumbBitmap || !sliderBackgroundBitmap) return;
     
     if ( element == menu->lastMouseOverClickable )
@@ -2063,6 +2157,10 @@ void jkGuiRend_SliderDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vb
     bitmapIndices2 = element->uiBitmaps;
     elementb = element->selectedTextEntry;
     sliderBackgroundBitmap2 = menu->ui_structs[*bitmapIndices2];
+
+    // Added
+    stdBitmap_EnsureData(sliderBackgroundBitmap2);
+
     v32 = 0;
     v33 = element->rect.width;
     if ( sliderBackgroundBitmap2 )
@@ -2071,6 +2169,10 @@ void jkGuiRend_SliderDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *vb
         v32 = (element->rect.width - v33) / 2;
     }
     sliderThumbBitmap2 = menu->ui_structs[bitmapIndices2[1]];
+    
+    // Added
+    stdBitmap_EnsureData(sliderThumbBitmap2);
+
     if ( sliderThumbBitmap2 )
     {
         v33 -= (*sliderThumbBitmap2->mipSurfaces)->format.width;
@@ -2315,6 +2417,9 @@ int jkGuiRend_PicButtonEventHandler(jkGuiElement *element, jkGuiMenu *menu, int3
     stdBitmap* bitmap = menu->ui_structs[element->selectedTextEntry];
     if ( bitmap )
     {
+        // Added
+        stdBitmap_EnsureData(bitmap);
+
 #ifdef JKGUI_SMOL_SCREEN
         element->rect = element->rectOrig;
         element->bIsSmolDirty = 1;
@@ -2353,6 +2458,9 @@ void jkGuiRend_PicButtonDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer 
     stdBitmap* bitmap = menu->ui_structs[element->selectedTextEntry];
     if ( bitmap )
     {
+        // Added
+        stdBitmap_EnsureData(bitmap);
+
         rect.x = 0;
         rect.y = 0;
 

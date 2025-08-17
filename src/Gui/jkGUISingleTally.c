@@ -37,6 +37,9 @@ int jkGuiSingleTally_Show()
     int ret; // eax
     wchar_t v14[32]; // [esp+8h] [ebp-40h] BYREF
 
+    // Added
+    stdBitmap_EnsureData(jkGui_stdBitmaps[JKGUI_BM_BK_TALLY]);
+
     jkGui_SetModeMenu(jkGui_stdBitmaps[JKGUI_BM_BK_TALLY]->palette);
     jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiSingleTally_menu, &jkGuiSingleTally_buttons[6]);
     jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiSingleTally_menu, &jkGuiSingleTally_buttons[5]);

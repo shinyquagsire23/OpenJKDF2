@@ -525,6 +525,8 @@ void Window_SdlUpdate()
             stdDisplay_SetMode(0, 0, 0);
             //jkMain_FixRes();
         }
+
+        jkGui_SetModeGame();
         
         Window_resized = 0;
     }

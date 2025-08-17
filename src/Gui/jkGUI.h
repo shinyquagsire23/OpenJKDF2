@@ -35,4 +35,6 @@ void jkGui_copies_string(char* out);
 char *jkGui_sub_412EC0();
 wchar_t* jkGui_sub_412ED0();
 
+void jkGui_LoadBmIdx(int idx); // Added
+
 #endif // _JKGUI_H
