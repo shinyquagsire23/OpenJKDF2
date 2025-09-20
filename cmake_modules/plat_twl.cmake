@@ -38,10 +38,10 @@ macro(plat_initialize)
 
     set(TARGET_TWL TRUE)
 
-    add_link_options(-g -mthumb -mthumb-interwork -fno-exceptions -fshort-wchar -L${LIBNDS}/lib -L${BLOCKSDS}/libs/maxmod/lib -Wl,--gc-sections -ffunction-sections -fdata-sections  --specs=${BLOCKSDS_SPECS} -Wl,--wrap,malloc -Wl,--wrap,free -Wl,--wrap,realloc -Wl,--wrap,exit -Wno-odr -flto)
+    add_link_options(-g -mthumb -mthumb-interwork -fno-exceptions -fshort-wchar -L${LIBNDS}/lib -L${BLOCKSDS}/libs/maxmod/lib -Wl,--gc-sections -ffunction-sections -fdata-sections  --specs=${BLOCKSDS_SPECS} -Wl,--wrap,malloc -Wl,--wrap,free -Wl,--wrap,realloc -Wl,--wrap,exit -Wl,--wrap,__muldi3 -Wl,--wrap,__aeabi_lmul -Wno-odr -flto)
     add_compile_options(-g -mthumb -mthumb-interwork -fno-exceptions -mcpu=arm946e-s+nofp -fomit-frame-pointer -ffast-math -Wl,--gc-sections -ffunction-sections -fdata-sections --specs=${BLOCKSDS_SPECS})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti -fno-common")
-    add_compile_options(-Oz -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces -Wno-odr -fno-delete-null-pointer-checks -fno-semantic-interposition -fpredictive-commoning -Wl,--wrap,malloc -Wl,--wrap,free -Wl,--wrap,realloc -Wl,--wrap,calloc -Wl,--wrap,exit -Wl,--wrap,__muldi3 -fno-common  -flto)
+    add_compile_options(-Oz -Wuninitialized -fshort-wchar -Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces -Wno-odr -fno-delete-null-pointer-checks -fno-semantic-interposition -fpredictive-commoning -Wl,--wrap,malloc -Wl,--wrap,free -Wl,--wrap,realloc -Wl,--wrap,calloc -Wl,--wrap,exit -Wl,--wrap,__muldi3  -Wl,--wrap,__aeabi_lmul -fno-common  -flto)
     include_directories(${LIBNDS}/include)
     include_directories(${BLOCKSDS}/libs/maxmod/include)
 endmacro()

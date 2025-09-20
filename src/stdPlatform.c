@@ -547,24 +547,56 @@ void *__wrap_calloc(size_t num, size_t size) {
     return TWL_alloc(num*size);
 }
 
-extern int32_t __real___muldi3(int32_t a, int32_t b);
-__attribute__((never_inline)) MATH_FUNC int32_t __wrap___muldi3_(int32_t a, int32_t b) {
-    int32_t result;
-    int32_t lo, hi;
+extern int64_t __real___muldi3(int32_t a, int32_t b);
 
+__attribute__((naked)) int64_t __wrap___muldi3(int32_t a, int32_t b) {
     __asm__ (
+        ".align 4\n"
+        ".thumb\n"
+        "bx pc\n"
+        "nop\n"
         ".arm\n"
-        "smull %0, %1, %2, %3"
-        : "=&r"(lo), "=&r"(hi)        // output: lo = %0, hi = %1
-        : "r"(a), "r"(b)              // input: a = %2, b = %3
-    );
 
-    result = (uint32_t)lo;
-    return result;
+        "mul r3, r0, r3\n"
+        "mla r3, r2, r1, r3\n"
+        "umull   r0, r1, r2, r0\n"
+        "add r1, r3\n"
+    
+        "bx lr\n"
+    );
 }
 
-int32_t __wrap___muldi3(int32_t a, int32_t b) {
-    return __wrap___muldi3_(a,b);
+__attribute__((naked)) int64_t __wrap___aeabi_lmul(int64_t a, int64_t b) {
+    __asm__ (
+        ".align 4\n"
+        ".thumb\n"
+        "mul r3, r0, r3\n"
+        "bx pc\n"
+        ".arm\n"
+
+        
+        "mla r3, r2, r1, r3\n"
+        "umull   r0, r1, r2, r0\n"
+        "add r1, r3\n"
+    
+        "bx lr\n"
+    );
+}
+
+__attribute__((naked)) int64_t __smull_helper(int32_t a, int32_t b) {
+    __asm__ (
+        ".align 4\n"
+        ".thumb\n"
+        "mov r3, r0\n"
+        "mov r2, r1\n"
+        "bx pc\n"
+        "nop\n"
+        ".arm\n"
+
+        "smull   r0, r1, r2, r3\n"
+    
+        "bx lr\n"
+    );
 }
 
 #ifdef __cplusplus
