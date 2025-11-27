@@ -29,6 +29,8 @@ cp $OPENJKDF2_BUILD_DIR/SDL_mixer/libSDL2_mixer.so app/src/main/jniLibs/arm64-v8
 ./gradlew assembleDebug
 ./gradlew installDebug
 cd ../..
+
+cp $OPENJKDF2_BUILD_DIR/../packaging/android-project/app/build/outputs/apk/debug/app-debug.apk OpenJKDF2-arm64-v8a.apk
 #adb push wasm_out/jk1 /storage/self/primary/Android/data/org.openjkdf2.app/files/
 #adb push wasm_out/mots /storage/self/primary/Android/data/org.openjkdf2.app/files/
 adb shell am start -n org.openjkdf2.app/.GameActivity

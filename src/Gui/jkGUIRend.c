@@ -3,6 +3,7 @@
 #include "General/Darray.h"
 #include "General/stdBitmap.h"
 #include "General/stdFont.h"
+#include "General/stdMath.h"
 #include "Engine/rdMaterial.h" // TODO move stdVBuffer
 #include "Devices/sithSound.h"
 #include "Primitives/rdVector.h"
@@ -2777,23 +2778,44 @@ void jkGuiRend_UpdateController()
     stdControl_bControlsActive = 1; // HACK
     stdControl_ReadControls();
 
+    static flex_t lastJoyXRight = 0.0;
+    static flex_t lastJoyYDown = 0.0;
+    static flex_t lastJoyXLeft = 0.0;
+    static flex_t lastJoyYUp = 0.0;
+    flex_t joyXRight = stdMath_Max(stdControl_ReadAxis(AXIS_JOY1_X), stdControl_ReadAxis(AXIS_JOY1_Z));
+    flex_t joyYDown = stdMath_Max(stdControl_ReadAxis(AXIS_JOY1_Y), stdControl_ReadAxis(AXIS_JOY1_R));
+    flex_t joyXLeft = stdMath_Min(stdControl_ReadAxis(AXIS_JOY1_X), stdControl_ReadAxis(AXIS_JOY1_Z));
+    flex_t joyYUp = stdMath_Min(stdControl_ReadAxis(AXIS_JOY1_Y), stdControl_ReadAxis(AXIS_JOY1_R));
+
+    //stdPlatform_Printf("%f %f, %d\n", joyX, joyY, (joyY < -0.5 && lastJoyY >= -0.5));
+
     int val = 0;
-    if (stdControl_ReadKey(KEY_JOY1_HLEFT, &val) && val) {
+    if ((stdControl_ReadKey(KEY_JOY1_HLEFT, &val) && val) 
+        || (joyXLeft < -0.5 && lastJoyXLeft >= -0.5)) {
         jkGuiRend_FocusElementDir(jkGuiRend_activeMenu, FOCUS_LEFT);
-        printf("left\n");
+        stdPlatform_Printf("left\n");
     }
-    if (stdControl_ReadKey(KEY_JOY1_HRIGHT, &val) && val) {
+    else if ((stdControl_ReadKey(KEY_JOY1_HRIGHT, &val) && val)
+            || (joyXRight > 0.5 && lastJoyXRight <= 0.5)) {
         jkGuiRend_FocusElementDir(jkGuiRend_activeMenu, FOCUS_RIGHT);
-        printf("right\n");
+        stdPlatform_Printf("right\n");
     }
-    if (stdControl_ReadKey(KEY_JOY1_HUP, &val) && val) {
+    if ((stdControl_ReadKey(KEY_JOY1_HUP, &val) && val)
+        || (joyYUp < -0.5 && lastJoyYUp >= -0.5)) {
         jkGuiRend_FocusElementDir(jkGuiRend_activeMenu, FOCUS_UP);
-        printf("up\n");
+        stdPlatform_Printf("up\n");
     }
-    if (stdControl_ReadKey(KEY_JOY1_HDOWN, &val) && val) {
+    else if ((stdControl_ReadKey(KEY_JOY1_HDOWN, &val) && val)
+        || (joyYDown > 0.5 && lastJoyYDown <= 0.5)) {
         jkGuiRend_FocusElementDir(jkGuiRend_activeMenu, FOCUS_DOWN);
-        printf("down\n");
+        stdPlatform_Printf("down\n");
     }
+
+    lastJoyXRight = joyXRight;
+    lastJoyYDown = joyYDown;
+    lastJoyXLeft = joyXLeft;
+    lastJoyYUp = joyYUp;
+
     if (stdControl_ReadKey(KEY_JOY1_B1, &val) && val) {
         lastB1 = val;
         //jkGuiRend_InvokeEvent(jkGuiRend_activeMenu->focusedElement, jkGuiRend_activeMenu, JKGUI_EVENT_KEYDOWN, VK_RETURN);

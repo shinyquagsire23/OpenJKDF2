@@ -756,7 +756,8 @@ void stdControl_ReadControls()
 
             uint32_t quirks = stdControl_aJoystickQuirks[i];
 
-            //stdControl_aAxisEnabled[i] = 0;
+            // HACK
+            stdControl_aAxisEnabled[i] = 1;
 
             
             for (int j = 0; j < JK_JOYSTICK_AXIS_STRIDE; j++)
@@ -769,6 +770,8 @@ void stdControl_ReadControls()
                 int val = SDL_JoystickGetAxis(pJoysticks[i], j+axisShift);
                 //stdPlatform_Printf("stick %d: %d %s\n", j, val, SDL_GetError());
                 stdControl_aAxisPos[(JK_JOYSTICK_AXIS_STRIDE * i) + j] = val;
+
+                stdControl_aJoysticks[j].flags |= 2; // HACK
 
                 SDL_ClearError();
             }
