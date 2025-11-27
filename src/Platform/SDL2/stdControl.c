@@ -744,7 +744,8 @@ void stdControl_ReadControls()
         // stdControl_SetKeydown(keyNum, keyVal, timestamp)
     }
 
-    if ( stdControl_bHasJoysticks )
+    // HACK: ehh
+    //if ( stdControl_bHasJoysticks )
     {
         for (int i = 0; i < JK_NUM_JOYSTICKS; i++)
         {
