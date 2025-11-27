@@ -928,6 +928,7 @@ void stdControl_ShowSystemKeyboard() {
     if (stdControl_bKeyboardBeingShown) {
         return;
     }
+    SDL_StartTextInput();
     stdControl_bKeyboardBeingShown = 1;
 }
 
@@ -935,6 +936,7 @@ void stdControl_HideSystemKeyboard() {
     if (!stdControl_bKeyboardBeingShown) {
         return;
     }
+    SDL_StopTextInput();
     stdControl_bKeyboardBeingShown = 0;
 }
 
