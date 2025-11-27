@@ -4,7 +4,7 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE := main
 
-SDL_PATH := $(OPENJKDF2_SDL2_PATH)
+SDL_PATH := ../SDL
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SDL_PATH)/include
 
@@ -13,6 +13,6 @@ LOCAL_SRC_FILES := YourSourceHere.c
 
 LOCAL_SHARED_LIBRARIES := SDL2
 
-LOCAL_LDLIBS := -lGLESv1_CM -lGLESv2 -lOpenSLES -llog -landroid $(OPENJKDF2_SDL2_LIBRARY)
+LOCAL_LDLIBS := -lGLESv1_CM -lGLESv2 -lOpenSLES -llog -landroid
 
 include $(BUILD_SHARED_LIBRARY)

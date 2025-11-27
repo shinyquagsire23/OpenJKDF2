@@ -243,7 +243,9 @@ void stdControl_Reset()
     stdControlJoystickEntry *v0; // eax
 
     stdControl_bReadMouse = 0;
+#ifndef SDL2_RENDER
     stdControl_bHasJoysticks = 0;
+#endif
 
     for (int i = 0; i < JK_NUM_JOYSTICKS; i++) {
         stdControl_aAxisEnabled[i] = 0;

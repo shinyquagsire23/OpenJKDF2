@@ -262,11 +262,14 @@ uint8_t stdControl_aDebounce[JK_NUM_KEYS];
 #define SDL2_MAX_BINARY_THRESH (0x5000)
 
 #define QUIRK_NINTENDO_TRIGGER_AXIS_TO_BUTTON (1)
+#define QUIRK_ODIN_CONTROLLLER (2)
 
 static uint32_t stdControl_aJoystickQuirks[JK_NUM_JOYSTICKS] = {0};
 //static SDL_Joystick *pJoysticks[JK_NUM_JOYSTICKS] = {0};
 static int stdControl_aJoystickNumAxes[JK_NUM_JOYSTICKS] = {0};
 static int stdControl_bKeyboardBeingShown = 0;
+int stdControl_bControllerEscapeKey = 0;
+int stdControl_bControllerEscapeKey_last = 0;
 
 // Added: SDL2
 void stdControl_SetSDLKeydown(int keyNum, int bDown, uint32_t readTime)

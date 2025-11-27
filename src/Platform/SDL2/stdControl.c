@@ -261,11 +261,14 @@ uint8_t stdControl_aDebounce[256];
 #define SDL2_MAX_BINARY_THRESH (0x5000)
 
 #define QUIRK_NINTENDO_TRIGGER_AXIS_TO_BUTTON (1)
+#define QUIRK_ODIN_CONTROLLLER (2)
 
 static uint32_t stdControl_aJoystickQuirks[JK_NUM_JOYSTICKS] = {0};
 static SDL_Joystick *pJoysticks[JK_NUM_JOYSTICKS] = {0};
 static int stdControl_aJoystickNumAxes[JK_NUM_JOYSTICKS] = {0};
 static int stdControl_bKeyboardBeingShown = 0;
+int stdControl_bControllerEscapeKey = 0;
+int stdControl_bControllerEscapeKey_last = 0;
 
 // Added: SDL2
 void stdControl_SetSDLKeydown(int keyNum, int bDown, uint32_t readTime)
@@ -285,6 +288,7 @@ void stdControl_SetSDLKeydown(int keyNum, int bDown, uint32_t readTime)
 
 void stdControl_FreeSdlJoysticks()
 {
+    stdPlatform_Printf("Free SDL joysticks...\n");
     for (int i = 0; i < JK_NUM_JOYSTICKS; i++) {
         if (pJoysticks[i])
             SDL_JoystickClose(pJoysticks[i]);
@@ -335,7 +339,14 @@ void stdControl_InitSdlJoysticks()
         //    quirks |= QUIRK_NINTENDO_TRIGGER_AXIS_TO_BUTTON;
         //}
 
-        if (quirks & QUIRK_NINTENDO_TRIGGER_AXIS_TO_BUTTON) {
+        if (!strcmp(SDL_JoystickNameForIndex(i), "Odin Controller")) {
+            quirks |= QUIRK_ODIN_CONTROLLLER;
+        }
+        else if (!strcmp(SDL_JoystickNameForIndex(i), "Android Accelerometer")) {
+            continue;
+        }
+
+        if (quirks & (QUIRK_NINTENDO_TRIGGER_AXIS_TO_BUTTON | QUIRK_ODIN_CONTROLLLER)) {
             numAxes -= 2;
         }
 
@@ -394,6 +405,7 @@ int stdControl_Startup()
     }
 #endif
 
+    stdPlatform_Printf("Free SDL joysticks...\n");
     for (int i = 0; i < JK_NUM_JOYSTICKS; i++) {
         stdControl_aJoystickExists[i] = 0;
         stdControl_aJoystickMaxButtons[i] = 0;
@@ -715,6 +727,7 @@ void stdControl_ReadControls()
         stdControl_aDebounce[SDLK_RETURN] = 1;
     }
     stdControl_bDisableKeyboard_last = stdControl_bDisableKeyboard;
+    stdControl_bControllerEscapeKey_last = stdControl_bControllerEscapeKey;
 
     if ( !stdControl_bDisableKeyboard )
     {
@@ -730,11 +743,12 @@ void stdControl_ReadControls()
         }
         // stdControl_SetKeydown(keyNum, keyVal, timestamp)
     }
+
     if ( stdControl_bHasJoysticks )
     {
         for (int i = 0; i < JK_NUM_JOYSTICKS; i++)
         {
-            if ( !(stdControl_aAxisEnabled[i] && stdControl_aJoystickExists[i]) )
+            if ( !(/*stdControl_aAxisEnabled[i] &&*/ stdControl_aJoystickExists[i]) )
                 continue;
 
             if (!pJoysticks[i]) continue;
@@ -746,19 +760,42 @@ void stdControl_ReadControls()
             
             for (int j = 0; j < JK_JOYSTICK_AXIS_STRIDE; j++)
             {
-                int val = SDL_JoystickGetAxis(pJoysticks[i],j);
-                //printf("%u: %d\n", j, val);
+                int axisShift = 0;
+                if (quirks & QUIRK_ODIN_CONTROLLLER) {
+                    //axisShift += 2;
+                }
+
+                int val = SDL_JoystickGetAxis(pJoysticks[i], j+axisShift);
+                //stdPlatform_Printf("stick %d: %d %s\n", j, val, SDL_GetError());
                 stdControl_aAxisPos[(JK_JOYSTICK_AXIS_STRIDE * i) + j] = val;
+
+                SDL_ClearError();
             }
 
             int numAxes = stdControl_aJoystickNumAxes[i];
             int numButtons = stdControl_aJoystickMaxButtons[i];
             int numRealButtons = numButtons - (numAxes * 2);
             int numAxisButtons = numAxes * 2;
+            int numHats = SDL_JoystickNumHats(pJoysticks[i]);
+
+            uint8_t hatState = 0;
+            if (numHats) {
+                hatState = SDL_JoystickGetHat(pJoysticks[i], 0);
+            }
+            if (quirks & QUIRK_ODIN_CONTROLLLER) {
+                hatState = 0;
+            }
             
             for (int j = 0; j < JK_NUM_JOY_BUTTONS + JK_NUM_EXT_JOY_BUTTONS; ++j )
             {
-                int val = SDL_JoystickGetButton(pJoysticks[i], j);
+                if (j > numButtons) {
+                    break;
+                }
+
+                int val = 0;
+                if (j < numRealButtons) {
+                    val = SDL_JoystickGetButton(pJoysticks[i], j);
+                }
 
                 if (quirks & QUIRK_NINTENDO_TRIGGER_AXIS_TO_BUTTON) {
                     if (j == 15) { // Capture
@@ -769,9 +806,14 @@ void stdControl_ReadControls()
                     }
                 }
 
+                int axisShift = 0;
+                if (quirks & QUIRK_ODIN_CONTROLLLER) {
+                    //axisShift += 2;
+                }
+
                 if (j >= numRealButtons && j < numButtons) {
                     int axisButtonNum = (j - numRealButtons);
-                    int axisNum = axisButtonNum / 2;
+                    int axisNum = (axisButtonNum / 2) + axisShift;
                     if (axisButtonNum & 1) {
                         val = !!(SDL_JoystickGetAxis(pJoysticks[i], axisNum) < SDL2_MIN_BINARY_THRESH);
                     }
@@ -788,10 +830,43 @@ void stdControl_ReadControls()
                 if (val) {
                     //stdControl_bControlsIdle = 0;
                 }
-                stdControl_SetKeydown(idx, val /* button val */, stdControl_curReadTime);
-            }
 
-            uint8_t hatState = SDL_JoystickGetHat(pJoysticks[i], 0);
+                // HACK: Ayn Thor ??? why is the hat wrong
+                if (quirks & QUIRK_ODIN_CONTROLLLER) {
+                    if (idx == KEY_JOY1_B12) {
+                        hatState |= val ? SDL_HAT_UP : 0;
+                        continue;
+                    }
+                    else if (idx == KEY_JOY1_B13) {
+                        hatState |= val ? SDL_HAT_DOWN : 0;
+                        continue;
+                    }
+                    else if (idx == KEY_JOY1_B14) {
+                        hatState |= val ? SDL_HAT_LEFT : 0;
+                        continue;
+                    }
+                    else if (idx == KEY_JOY1_B15) {
+                        hatState |= val ? SDL_HAT_RIGHT : 0;
+                        continue;
+                    }
+                    else if (idx == KEY_JOY1_B5) { // back button
+                        continue;
+                    }
+                    else if (idx == KEY_JOY1_B7) { // back button
+                        continue;
+                    }
+                }
+
+                stdControl_SetKeydown(idx, val /* button val */, stdControl_curReadTime);
+
+                // HACK: Escape key for controllers
+                /*if (idx == KEY_JOY1_B7) {
+                    stdControl_bControllerEscapeKey = val;
+                    stdPlatform_Printf("asdfasdf\n");
+                }
+                stdPlatform_Printf("idx %d %d\n", idx, val);*/
+            }
+            
             stdControl_SetKeydown((JK_JOYSTICK_BUTTON_STRIDE*i) + KEY_JOY1_HLEFT, !!(hatState & SDL_HAT_LEFT) /* button val */, stdControl_curReadTime);
             stdControl_SetKeydown((JK_JOYSTICK_BUTTON_STRIDE*i) + KEY_JOY1_HUP, !!(hatState & SDL_HAT_UP) /* button val */, stdControl_curReadTime);
             stdControl_SetKeydown((JK_JOYSTICK_BUTTON_STRIDE*i) + KEY_JOY1_HRIGHT, !!(hatState & SDL_HAT_RIGHT) /* button val */, stdControl_curReadTime);

@@ -6,6 +6,7 @@
 #include "Main/jkMain.h"
 #include "Main/jkGame.h"
 #include "Gui/jkGUI.h"
+#include "Gui/jkGUIRend.h"
 #include "Win95/stdDisplay.h"
 #include "World/jkPlayer.h"
 #include "Platform/stdControl.h"
@@ -723,11 +724,16 @@ void Window_SdlUpdate()
     SDL_Event event;
     SDL_MouseButtonEvent* mevent;
 
+    // HACK: Escape key for controllers
+    extern int stdControl_bControllerEscapeKey;
+    extern int stdControl_bControllerEscapeKey_last;
+
     while (SDL_PollEvent(&event))
     {
         switch (event.type)
         {
             case SDL_JOYDEVICEADDED: {
+                stdControl_bHasJoysticks = 1;
                 stdControl_InitSdlJoysticks();
                 break;
             }
@@ -964,6 +970,23 @@ void Window_SdlUpdate()
 
                 if (jkQuakeConsole_bOpen) break; // Hijack all input to console
                 break;
+
+            // HACK: Escape key for controllers
+            case SDL_JOYBUTTONDOWN:
+            case SDL_JOYBUTTONUP:
+                //stdPlatform_Printf("button %d, %d\n", event.jbutton.button, event.jbutton.state);
+                if (event.jbutton.button == 6 || event.jbutton.button == 4) {
+                    stdControl_bControllerEscapeKey = (event.jbutton.state == SDL_PRESSED);
+                }
+                else if (event.jbutton.button == 2) {
+                    
+                }
+                break;
+            case SDL_JOYAXISMOTION:
+                if (event.jaxis.which == 0) {
+                    //stdPlatform_Printf("axis %d, %d\n", event.jaxis.axis, event.jaxis.value);
+                }
+                break;
             case SDL_QUIT:
                 stdPlatform_Printf("Quit!\n");
 
@@ -978,6 +1001,13 @@ void Window_SdlUpdate()
                 break;
         }
     }
+
+    // HACK: Escape key for controllers
+    if (stdControl_bControllerEscapeKey && !stdControl_bControllerEscapeKey_last) {
+        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_ESCAPE, event.key.repeat & 0xFFFF);
+        Window_msg_main_handler(g_hWnd, WM_CHAR, VK_ESCAPE, event.key.repeat & 0xFFFF);
+    }
+    stdControl_bControllerEscapeKey_last = stdControl_bControllerEscapeKey;
     
     if (Window_resized)
     {
@@ -1258,6 +1288,19 @@ int Window_Main_Linux(int argc, char** argv)
 
     // Init SDL
     SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "1");
+    SDL_SetHint(SDL_HINT_APP_NAME, "OpenJKDF2");
+
+#if defined(TARGET_ANDROID)
+    //SDL_SetHint(SDL_HINT_JOYSTICK_DEBUG, "1");
+    SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI, "1");
+    SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_JOY_CONS, "1");
+    SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_PS4, "1");
+    SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_XBOX, "1");
+    //SDL_SetHint(SDL_HINT_AUTO_UPDATE_JOYSTICKS, "1");
+    SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
+    SDL_SetHint(SDL_HINT_ANDROID_TRAP_BACK_BUTTON, "1");
+#endif
+
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_NOPARACHUTE);
 
 #if defined(MACOS)
@@ -1483,6 +1526,9 @@ int Window_DefaultHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam, voi
 
 int Window_MessageLoop()
 {
+    // Added: controller menuing
+    jkGuiRend_UpdateController();
+
     jkMain_GuiAdvance();
     Window_msg_main_handler(g_hWnd, WM_PAINT, 0, 0);
     
