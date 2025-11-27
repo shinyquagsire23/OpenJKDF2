@@ -198,11 +198,7 @@ void jkHud_Close()
 {
     if ( jkHud_bChatOpen )
     {
-        jkHud_chatStrPos = 0;
-        jkHud_bChatOpen = 0;
-        jkDev_sub_41FC90(103);
-        stdControl_Flush();
-        stdControl_bDisableKeyboard = 0;
+        jkHud_idk_time(); // Inlined
     }
     if ( !Main_bNoHUD )
     {
@@ -1598,6 +1594,9 @@ int jkHud_Chat()
     wchar_t *v3; // [esp-8h] [ebp-108h]
     wchar_t tmp[256]; // [esp+0h] [ebp-100h] BYREF
 
+    // Added: Android/similar
+    stdControl_ShowSystemKeyboard();
+
     jkHud_bChatOpen = 1;
     jkHud_chatStr[0] = 0;
     jkHud_chatStrPos = 0;
@@ -1646,11 +1645,7 @@ void jkHud_SendChat(char a1)
                 sithConsole_TryCommand(jkHud_chatStr);
             }
         }
-        jkHud_chatStrPos = 0;
-        jkHud_bChatOpen = 0;
-        jkDev_sub_41FC90(103);
-        stdControl_Flush();
-        stdControl_bDisableKeyboard = 0;
+        jkHud_idk_time(); // Inlined
     }
     else
     {
@@ -1765,6 +1760,9 @@ void jkHud_idk_time()
     jkDev_sub_41FC90(103);
     stdControl_Flush();
     stdControl_bDisableKeyboard = 0;
+
+    // Added: Android/similar
+    stdControl_HideSystemKeyboard();
 }
 
 int jkHud_chat2()

@@ -2524,6 +2524,10 @@ void jkGuiRend_TextButtonDraw(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer
 void jkGuiRend_FocusElementDir(jkGuiMenu *pMenu, int32_t dir)
 {
     int32_t idx = 0;
+    if (!pMenu) {
+        return;
+    }
+
     jkGuiElement* focusedElement = pMenu->focusedElement;
     if (focusedElement && !focusedElement->bIsVisible) {
         focusedElement = NULL;
@@ -2773,6 +2777,9 @@ LABEL_22:
 // TODO: QOL ifdef?
 void jkGuiRend_UpdateController()
 {
+    if (!jkGuiRend_activeMenu) {
+        return;
+    }
     static int lastB1 = 0;
     static int keyboardShowedLastUpdate = 0;
     stdControl_bControlsActive = 1; // HACK
@@ -2822,8 +2829,10 @@ void jkGuiRend_UpdateController()
         jkGuiRend_WindowHandler(0, WM_KEYFIRST, VK_RETURN, 0, 0);
         //if (jkGuiRend_activeMenu->lastMouseOverClickable && jkGuiRend_activeMenu->lastMouseOverClickable->clickHandlerFunc )
         //    jkGuiRend_activeMenu->lastClicked = jkGuiRend_activeMenu->lastMouseOverClickable->clickHandlerFunc(jkGuiRend_activeMenu->lastMouseOverClickable, jkGuiRend_activeMenu, jkGuiRend_mouseX, jkGuiRend_mouseY, 1);
-        jkGuiRend_activeMenu->lastMouseDownClickable = jkGuiRend_activeMenu->lastMouseOverClickable;
-        jkGuiRend_InvokeClicked(jkGuiRend_activeMenu->lastMouseOverClickable, jkGuiRend_activeMenu, jkGuiRend_mouseX, jkGuiRend_mouseY, 1);
+        if (jkGuiRend_activeMenu) {
+            jkGuiRend_activeMenu->lastMouseDownClickable = jkGuiRend_activeMenu->lastMouseOverClickable;
+            jkGuiRend_InvokeClicked(jkGuiRend_activeMenu->lastMouseOverClickable, jkGuiRend_activeMenu, jkGuiRend_mouseX, jkGuiRend_mouseY, 1);
+        }
         printf("a\n");
     }
     else if (lastB1 && !val) {
@@ -2837,12 +2846,12 @@ void jkGuiRend_UpdateController()
     if (stdControl_ReadKey(KEY_JOY1_B3, &val) && val) {
         //jkGuiRend_WindowHandler(0, WM_KEYFIRST, VK_TAB, 0, 0);
         printf("x\n");
-        if (jkGuiRend_activeMenu->pReturnKeyShortcutElement) {
+        if (jkGuiRend_activeMenu && jkGuiRend_activeMenu->pReturnKeyShortcutElement) {
             jkGuiRend_InvokeClicked(jkGuiRend_activeMenu->pReturnKeyShortcutElement, jkGuiRend_activeMenu, jkGuiRend_mouseX, jkGuiRend_mouseY, 1);
         }
     }
 
-    if (jkGuiRend_activeMenu->lastMouseOverClickable && jkGuiRend_activeMenu->lastMouseOverClickable->type == ELEMENT_TEXTBOX) {
+    if (jkGuiRend_activeMenu && jkGuiRend_activeMenu->lastMouseOverClickable && jkGuiRend_activeMenu->lastMouseOverClickable->type == ELEMENT_TEXTBOX) {
         keyboardShowedLastUpdate = 1;
         stdControl_ShowSystemKeyboard();
     }

@@ -705,7 +705,11 @@ int jkQuakeConsole_WmHandler(HWND a1, UINT msg, WPARAM wParam, HWND a4, LRESULT 
             {
                 jkQuakeConsole_bOpen = !jkQuakeConsole_bOpen;
                 if (jkQuakeConsole_bOpen) {
+                    stdControl_ShowSystemKeyboard();
                     jkQuakeConsole_ResetShade();
+                }
+                else {
+                    stdControl_HideSystemKeyboard();
                 }
                 stdControl_ToggleCursor(!jkQuakeConsole_bOpen);
                 *a5 = 1;
@@ -714,7 +718,7 @@ int jkQuakeConsole_WmHandler(HWND a1, UINT msg, WPARAM wParam, HWND a4, LRESULT 
             else if (wParam == VK_UP || wParam == VK_DOWN || wParam == VK_LEFT || wParam == VK_RIGHT || wParam == VK_DELETE) { // 
                 jkQuakeConsole_SendInput(wParam, 0);
             }
-            else if (!jkHud_bChatOpen && !jkQuakeConsole_bOpen) {
+            else if (!jkHud_bChatOpen && !jkQuakeConsole_bOpen && !stdControl_IsSystemKeyboardShowing()) {
                 sithCommand_HandleBinds(wParam);
             }
 
