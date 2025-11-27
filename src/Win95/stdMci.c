@@ -4,6 +4,10 @@
 #include "stdPlatform.h"
 #include "jk.h"
 
+#ifdef TARGET_ANDROID
+#include "Main/InstallHelper.h"
+#endif
+
 #ifdef FS_POSIX
 #include "external/fcaseopen/fcaseopen.h"
 #endif
@@ -226,10 +230,12 @@ int stdMci_Startup()
 
     stdMci_bInitted = 1;
     
-    if (Mix_OpenAudio(48000, AUDIO_S16SYS, 2, 1024) < 0)
-	    return 1;
+    if (Mix_OpenAudio(48000, AUDIO_S16SYS, 2, 1024) < 0) {
+        stdPlatform_Printf("stdMci: Failed Mix_OpenAudio? %s\n", Mix_GetError());
+        return 1;
+    }
 
-	Mix_AllocateChannels(2);
+    Mix_AllocateChannels(2);
 
     // Added
     stdMci_bIsGOG = 1;
@@ -263,7 +269,18 @@ int stdMci_TryPlay(const char* fpath) {
     free(r);
 #endif
 
-    stdMci_music = Mix_LoadMUS(tmp); 
+#ifdef TARGET_ANDROID
+    char tmp2[512];
+    getcwd(tmp2, sizeof(tmp2));
+    //if (tmp[0] != '.') {
+        strcat(tmp2, "/");
+    //}
+    strcat(tmp2, tmp);
+    stdMci_music = Mix_LoadMUS(tmp2); 
+#else
+    stdMci_music = Mix_LoadMUS(tmp);
+#endif
+    
     if (!stdMci_music) {
         //printf("INFO: Failed to play music `%s', trying alternate location...\n", tmp);
         stdPlatform_Printf("stdMci: Error in Mix_LoadMUS, %s\n", Mix_GetError());

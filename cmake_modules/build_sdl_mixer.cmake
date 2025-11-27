@@ -37,6 +37,8 @@ if(PLAT_MSVC)
                         "${SDL_MIXER_ROOT}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}opusfile${CMAKE_STATIC_LIBRARY_SUFFIX}"
                         "${SDL_MIXER_ROOT}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}opus${CMAKE_STATIC_LIBRARY_SUFFIX}"
     )
+elseif(TARGET_ANDROID)
+    set(SDL_MIXER_DEPS  SDL::SDL) # ????
 else()
     set(SDL_MIXER_DEPS  SDL::SDL
                         "${SDL_MIXER_ROOT}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}vorbisfile${CMAKE_STATIC_LIBRARY_SUFFIX}"

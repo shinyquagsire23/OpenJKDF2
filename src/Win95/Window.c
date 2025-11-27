@@ -1301,6 +1301,8 @@ int Window_Main_Linux(int argc, char** argv)
     //SDL_SetHint(SDL_HINT_AUTO_UPDATE_JOYSTICKS, "1");
     SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
     SDL_SetHint(SDL_HINT_ANDROID_TRAP_BACK_BUTTON, "1");
+    SDL_SetHint("SDL_MIXER_DEBUG_MUSIC_INTERFACES", "1");
+    SDL_SetHint(SDL_HINT_AUDIODRIVER, "aaudio"); // This is fine for music tbh
 #endif
 
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_NOPARACHUTE);
