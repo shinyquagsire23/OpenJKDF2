@@ -738,7 +738,7 @@ int jkQuakeConsole_WmHandler(HWND a1, UINT msg, WPARAM wParam, HWND a4, LRESULT 
                 *a5 = 1;
                 return 1;
             }
-            else if (!jkHud_bChatOpen && !jkQuakeConsole_bOpen) {
+            else if (!jkHud_bChatOpen && !jkQuakeConsole_bOpen && !stdControl_IsSystemKeyboardShowing()) {
                 sithCommand_HandleBinds(wParam);
             }
             break;

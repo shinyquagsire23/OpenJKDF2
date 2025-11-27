@@ -234,7 +234,7 @@ int stdString_wstrncat(wchar_t *a1, int a2, int a3, wchar_t *a4)
     }
     if ( v6 >= a2 - a3 - 1 )
         v6 = a2 - a3 - 1;
-    _memcpy(v7, a4, 2 * v6);
+    _memcpy(v7, a4, sizeof(wchar_t) * v6);
     result = a2;
     v4[a2 - 1] = 0;
     return result;
