@@ -1265,7 +1265,9 @@ void Window_RecreateSDL2Window()
 
     SDL_GL_MakeCurrent(displayWindow, glWindowContext);
     SDL_GL_SetSwapInterval(jkPlayer_enableVsync); // Disable vsync
+#ifndef TARGET_ANDROID
     SDL_StartTextInput();
+#endif
 
     SDL_GL_GetDrawableSize(displayWindow, &Window_xSize, &Window_ySize);
     SDL_GetWindowSize(displayWindow, &Window_screenXSize, &Window_screenYSize);
