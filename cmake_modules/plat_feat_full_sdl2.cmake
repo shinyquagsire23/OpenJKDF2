@@ -19,5 +19,5 @@ if(OPENJKDF2_USE_BLOBS)
 endif()
 
 macro(plat_sdl2_deps)
-    set(SDL2_COMMON_LIBS SDL2main SDL::SDL ${SDL_MIXER_DEPS} SDL::Mixer)
+    set(SDL2_COMMON_LIBS SDL2main SDL::SDL ${SDL_MIXER_DEPS} SDL::Mixer OpenAL::OpenAL)
 endmacro()

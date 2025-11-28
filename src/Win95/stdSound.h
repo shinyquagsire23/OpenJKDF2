@@ -58,6 +58,8 @@ typedef struct stdALBuffer
     int refcnt;
     flex_t vol;
     int bIsCopy;
+    int bHasPos;
+    int bHasVel;
     ALfloat pos[3];
     ALfloat vel[3];
 } stdALBuffer;

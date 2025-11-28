@@ -415,7 +415,7 @@ stdSound_buffer_t* sithSound_InitFromPath(char *path)
     if (!path)
         return NULL;
 
-    _sprintf(tmp, "sound%c%s", LEC_PATH_SEPARATOR, path);
+    _sprintf(tmp, "sound%c%s", LEC_PATH_SEPARATOR_CHR, path);
     fd = pSithHS->fileOpen(tmp, "rb");
     if ( fd )
     {

@@ -2,8 +2,8 @@
 
 export PATH="${HOMEBREW_PREFIX}/opt/llvm/bin:$PATH"
 export MACOSX_DEPLOYMENT_TARGET=10.15
-export CC=/opt/homebrew/opt/llvm/bin/clang
-export CXX=/opt/homebrew/opt/llvm/bin/clang++
+export CC=/opt/homebrew/opt/llvm@19/bin/clang
+export CXX=/opt/homebrew/opt/llvm@19/bin/clang++
 
 cd /Users/maxamillion/workspace/OpenJKDF2/
 

@@ -291,9 +291,15 @@ int stdSound_BufferUnlock(stdSound_buffer_t* sound, void* buffer, int bufferRead
         alGenSources((ALuint)1, &sound->source);
 
         alSourcef(sound->source, AL_PITCH, 1.0);
-        alSourcefv(sound->source, AL_POSITION, sound->pos);
-        alSourcefv(sound->source, AL_VELOCITY, sound->vel);
-        alSourcei(sound->source, AL_SOURCE_RELATIVE, AL_TRUE); // No 3D until we're given a position
+        if (sound->bHasPos) {
+            alSourcefv(sound->source, AL_POSITION, sound->pos);
+        }
+        if (sound->bHasVel) {
+            alSourcefv(sound->source, AL_VELOCITY, sound->vel);
+        }
+        if (!sound->bHasPos) {
+            alSourcei(sound->source, AL_SOURCE_RELATIVE, AL_TRUE); // No 3D until we're given a position
+        }
         
         //printf("%u %u\n", buf->source, buf->buffer);
     }
@@ -313,11 +319,19 @@ int stdSound_BufferPlay(stdSound_buffer_t* buf, int loop)
         alGenSources((ALuint)1, &buf->source);
 
 	    alSourcef(buf->source, AL_PITCH, 1.0);
-        alSourcefv(buf->source, AL_POSITION, buf->pos);
-        alSourcefv(buf->source, AL_VELOCITY, buf->vel);
-        alSourcei(buf->source, AL_SOURCE_RELATIVE, AL_TRUE); // No 3D until we're given a position
+        if (buf->bHasPos) {
+            alSourcefv(buf->source, AL_POSITION, buf->pos);
+        }
+        if (buf->bHasVel) {
+            alSourcefv(buf->source, AL_VELOCITY, buf->vel);
+        }
+        if (!buf->bHasPos) {
+            alSourcei(buf->source, AL_SOURCE_RELATIVE, AL_TRUE); // No 3D until we're given a position
+        }
 	    
 	    //printf("%u %u\n", buf->source, buf->buffer);
+
+        stdSound_BufferSetVolume(buf, buf->vol);
 	}
 
     alSourcei(buf->source, AL_BUFFER, buf->buffer);
@@ -377,6 +391,9 @@ int stdSound_BufferReset(stdSound_buffer_t* sound)
 	//alSourcef(sound->source, AL_GAIN, 1.0);
 	//alSource3f(sound->source, AL_POSITION, 0, 0, 0);
 	//alSource3f(sound->source, AL_VELOCITY, 0, 0, 0);
+
+    sound->bHasPos = 0;
+    sound->bHasVel = 0;
 	
 	if (sound->source)
 	{
@@ -524,6 +541,7 @@ void stdSound_SetPosition(stdSound_buffer_t* pSoundBuf, rdVector3 *pos)
 
     alSourcei(pSoundBuf->source, AL_SOURCE_RELATIVE, AL_FALSE);
     alSourcefv(pSoundBuf->source, AL_POSITION, pSoundBuf->pos);
+    pSoundBuf->bHasPos = 1;
 }
 
 void stdSound_SetVelocity(stdSound_buffer_t* pSoundBuf, rdVector3 *vel)
@@ -539,6 +557,7 @@ void stdSound_SetVelocity(stdSound_buffer_t* pSoundBuf, rdVector3 *vel)
 
     alSourcei(pSoundBuf->source, AL_SOURCE_RELATIVE, AL_FALSE);
     alSourcefv(pSoundBuf->source, AL_VELOCITY, pSoundBuf->vel); // FLEXTODO
+    pSoundBuf->bHasVel = 1;
 }
 
 int stdSound_IsPlaying(stdSound_buffer_t* pSoundBuf, rdVector3 *pos)

@@ -4,6 +4,8 @@ export PATH="${HOMEBREW_PREFIX}/opt/llvm/bin:$PATH"
 export MACOSX_DEPLOYMENT_TARGET=10.15
 export OPENJKDF2_RELEASE_COMMIT=$(git log -1 --format="%H")
 export OPENJKDF2_RELEASE_COMMIT_SHORT=$(git rev-parse --short=8 HEAD)
+export CC=/opt/homebrew/opt/llvm@19/bin/clang
+export CXX=/opt/homebrew/opt/llvm@19/bin/clang++
 
 rm -rf OpenJKDF2.app
 rm -rf OpenJKDF2_x86_64.app

@@ -642,6 +642,9 @@ void jkGuiRend_PlayWav(char *fpath)
 
         stdSound_BufferPlay(newHandle, 0);
     }
+    else {
+        stdPlatform_Printf("Failed to open path: `%s`!\n", fpath);
+    }
 }
 
 void jkGuiRend_SetCursorVisible(int32_t visible)
