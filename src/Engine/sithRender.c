@@ -1784,7 +1784,9 @@ void sithRender_RenderLevelGeometry()
         BOOL noDistCulling = (level_idk != sithCamera_currentCamera->sector);
 #endif
         rdClipFrustum* pSectorFrustum = level_idk->clipFrustum;
-        for (v75 = 0; v75 < level_idk->numSurfaces; v65->field_4 = sithRender_lastRenderTick, ++v65, v75++)
+
+        // Added: Removed the field_4 set?
+        for (v75 = 0; v75 < level_idk->numSurfaces; /*v65->field_4 = sithRender_lastRenderTick,*/ ++v65, v75++)
         {
             rdClipFrustum* pSurfaceFrustum = pSectorFrustum;
             if (UNLIKELY(!v65->surfaceInfo.face.geometryMode))
@@ -3115,15 +3117,15 @@ void sithRender_RenderAlphaSurfaces()
         }
         rdColormap_SetCurrent(v1->colormap);
 
-        if ( v0->field_4 != sithRender_lastRenderTick )
+        if (LIKELY(v0->field_4 != sithRender_lastRenderTick))
         {
-            for (v4 = 0; v4 < v0->surfaceInfo.face.numVertices; v4++)
+            for (int j = 0; j < v0->surfaceInfo.face.numVertices; j++)
             {
-                v7 = v0->surfaceInfo.face.vertexPosIdx[v4];
-                if ( sithWorld_pCurrentWorld->alloc_unk98[v7] != sithRender_lastRenderTick )
+                int idx = v0->surfaceInfo.face.vertexPosIdx[j];
+                if (LIKELY(sithWorld_pCurrentWorld->alloc_unk98[idx] != sithRender_lastRenderTick))
                 {
-                    rdMatrix_TransformPoint34(&sithWorld_pCurrentWorld->verticesTransformed[v7], &sithWorld_pCurrentWorld->vertices[v7], &rdCamera_pCurCamera->view_matrix);
-                    sithWorld_pCurrentWorld->alloc_unk98[v7] = sithRender_lastRenderTick;
+                    rdMatrix_TransformPoint34(&sithWorld_pCurrentWorld->verticesTransformed[idx], &sithWorld_pCurrentWorld->vertices[idx], &rdCamera_pCurCamera->view_matrix);
+                    sithWorld_pCurrentWorld->alloc_unk98[idx] = sithRender_lastRenderTick;
                 }
             }
             v0->field_4 = sithRender_lastRenderTick;

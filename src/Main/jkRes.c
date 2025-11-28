@@ -7,6 +7,7 @@
 #include "General/stdFnames.h"
 #include "stdPlatform.h"
 #include "Win95/Windows.h"
+#include "Win95/std.h"
 #include "Main/sithMain.h"
 #include "General/util.h"
 #include "Gui/jkGUIDialog.h"
@@ -196,8 +197,14 @@ int jkRes_ReadKeyFromFile(const char* fpath)
 {
     int keyval;
 
-    stdFile_t fd = pHS->fileOpen(fpath, "rb");
-    if (!fd) {
+    // HACK
+    if (!pLowLevelHS || !pLowLevelHS->fileOpen) {
+        pLowLevelHS = (HostServices *)&lowLevelHS;
+        stdInitServices(&lowLevelHS);
+    }
+
+    stdFile_t fd = (stdFile_t)0;
+    if (!pHS || !(fd = pHS->fileOpen(fpath, "rb"), fd)) {
         // Added: pLowLevelHS for DSi
         fd = pLowLevelHS->fileOpen(fpath, "rb");
         if (!fd) {
