@@ -1466,6 +1466,12 @@ int jkGuiRend_ListBoxEventHandler(jkGuiElement *element, jkGuiMenu *menu, int32_
                 jkGuiRend_UpdateAndDrawClickable(element_, menu, 1);
                 jkGuiRend_PlayWav(menu->soundHover);
                 break;
+            
+            // Added: Click-focus on currently selected element
+            case VK_SHIFT:
+                a1a = -1234;
+                break;
+
             default:
                 break;
         }
@@ -2753,6 +2759,7 @@ void jkGuiRend_FocusElementDir(jkGuiMenu *pMenu, int32_t dir)
         pMenu->focusedElement = element;
         pMenu->lastMouseOverClickable = element;
 //#endif
+
         if ( focusedElement )
         {
             if ( focusedElement != element )
@@ -2766,6 +2773,10 @@ void jkGuiRend_FocusElementDir(jkGuiMenu *pMenu, int32_t dir)
 LABEL_22:
             if ( focusedElement != element )
                 jkGuiRend_UpdateAndDrawClickable(element, pMenu, 1);
+        }
+
+        if (element->type == ELEMENT_LISTBOX) {
+            jkGuiRend_InvokeEvent(element, pMenu, JKGUI_EVENT_KEYDOWN, VK_SHIFT); // Just need to trigger the handler w/o any keys
         }
     }
     else {
