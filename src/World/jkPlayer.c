@@ -44,7 +44,7 @@ int jkPlayer_enableOrigAspect = 0;
 int jkPlayer_enableBloom = 0;
 int jkPlayer_enableSSAO = 0;
 int jkPlayer_fpslimit = 0;
-int jkPlayer_enableVsync = 0;
+int jkPlayer_enableVsync = 1;
 flex_t jkPlayer_ssaaMultiple = 1.0;
 flex_t jkPlayer_gamma = 1.0;
 int jkPlayer_bEnableJkgm = 1;
@@ -168,7 +168,7 @@ void jkPlayer_StartupVars()
     sithCvar_RegisterBool("r_enableBloom",              0,                          &jkPlayer_enableBloom,              CVARFLAG_LOCAL);
     sithCvar_RegisterBool("r_enableSSAO",               0,                          &jkPlayer_enableSSAO,               CVARFLAG_LOCAL);
     sithCvar_RegisterInt("r_fpslimit",                  0,                          &jkPlayer_fpslimit,                 CVARFLAG_LOCAL);
-    sithCvar_RegisterBool("r_enableVsync",              0,                          &jkPlayer_enableVsync,              CVARFLAG_LOCAL);
+    sithCvar_RegisterBool("r_enableVsync",              1,                          &jkPlayer_enableVsync,              CVARFLAG_LOCAL);
     sithCvar_RegisterFlex("r_ssaaMultiple",             1.0,                        &jkPlayer_ssaaMultiple,             CVARFLAG_LOCAL);
     sithCvar_RegisterFlex("r_gamma",                    1.0,                        &jkPlayer_gamma,                    CVARFLAG_LOCAL);
     sithCvar_RegisterBool("r_bEnableJkgm",              1,                          &jkPlayer_bEnableJkgm,              CVARFLAG_LOCAL|CVARFLAG_READONLY);
@@ -212,7 +212,7 @@ void jkPlayer_ResetVars()
     jkPlayer_enableBloom = 0;
     jkPlayer_enableSSAO = 0;
     jkPlayer_fpslimit = 0;
-    jkPlayer_enableVsync = 0;
+    jkPlayer_enableVsync = 1;
     jkPlayer_ssaaMultiple = 1.0;
     jkPlayer_gamma = 1.0;
     jkPlayer_bEnableJkgm = 1;
