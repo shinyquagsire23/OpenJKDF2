@@ -832,7 +832,12 @@ void sithThing_ExitWater(sithThing* pThing, int a2)
     if ( pThing->animclass )
         sithPuppet_sub_4E4760(pThing, 0);
 
+#ifdef QOL_IMPROVEMENTS
+    // Prevent splash sound spam if they're not actually making significant movement
+    if ( pThing->soundclass && stdMath_Fabs(pThing->physicsParams.vel.z) > 0.02 )  
+#else
     if ( pThing->soundclass )
+#endif
     {
         if ( pThing->moveType == SITH_MT_PHYSICS && rdVector_Len3(&pThing->physicsParams.vel) < 1.0 )
             sithSoundClass_PlayModeRandom(pThing, SITH_SC_EXITWATERSLOW);

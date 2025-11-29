@@ -3052,6 +3052,10 @@ typedef struct sithThing
 #ifdef JKM_LIGHTING
     int32_t archlightIdx;
 #endif
+
+#ifdef QOL_IMPROVEMENTS
+    uint32_t lastAnnoyingSoundSpamMs;
+#endif
 } sithThing;
 
 typedef int (__cdecl *sithThing_handler_t)(sithThing*);

@@ -466,6 +466,23 @@ sithPlayingSound* sithSoundClass_PlayModeRandom(sithThing *thing, uint32_t a2)
 
     if (!thing->soundclass) return NULL;
 
+#ifdef QOL_IMPROVEMENTS
+    if (a2 == SITH_SC_ENTERWATER 
+        || a2 == SITH_SC_ENTERWATERSLOW
+        || a2 == SITH_SC_EXITWATER 
+        || a2 == SITH_SC_EXITWATERSLOW
+        || a2 == SITH_SC_LANDMETAL
+        || a2 == SITH_SC_LANDWATER
+        || a2 == SITH_SC_LANDPUDDLE
+        || a2 == SITH_SC_LANDEARTH) 
+    {
+        if (sithTime_curMs - thing->lastAnnoyingSoundSpamMs < 300) {
+            return NULL;
+        }
+        thing->lastAnnoyingSoundSpamMs = sithTime_curMs;
+    }
+#endif
+
     if ( a2 < SITH_SC_MAX )
     {
         v3 = thing->soundclass->entries[a2];
