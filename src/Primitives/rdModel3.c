@@ -1178,8 +1178,9 @@ int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
         frustumCull = thing->clippingIdk;
     }
     thingFrustumCull = frustumCull;
-    if (frustumCull == SPHERE_FULLY_OUTSIDE)
+    if (frustumCull == SPHERE_FULLY_OUTSIDE) {
         return 0;
+    }
 
     // LEC HACK: Amputated joints can't do frustum culling?
 #ifndef TARGET_TWL
@@ -1205,7 +1206,7 @@ int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
     if ( curGeometryMode >= rdroid_curGeometryMode )
         curGeometryMode = rdroid_curGeometryMode;
 
-    if ( rdroid_curRenderOptions & 2 && rdCamera_pCurCamera->ambientLight >= 1.0 )
+    if ((rdroid_curRenderOptions & 2) && rdCamera_pCurCamera->ambientLight >= 1.0 )
     {
         curLightingMode = RD_LIGHTMODE_FULLYLIT;
     }

@@ -2757,8 +2757,9 @@ void sithRender_RenderThings()
 #ifdef TARGET_TWL
                         // Preload model textures, if supported
                         rdModel3_EnsureMaterialData(&thingIter->rdthing);
-#endif
                         continue;
+#endif
+                        v1->clipFrustum = rdCamera_pCurCamera->pClipFrustum;
                     }
 #endif
                     clipRadius = 0.0f;
