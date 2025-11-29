@@ -14,6 +14,8 @@
 #include "Gui/jkGUITitle.h"
 #include "World/jkPlayer.h"
 #include "World/sithWorld.h"
+#include "Devices/sithControl.h"
+#include "Platform/stdControl.h"
 #include "Cog/jkCog.h"
 #include "stdPlatform.h"
 
@@ -440,6 +442,11 @@ LABEL_46:
     jkGuiRend_DarrayFree(&jkGuiSaveLoad_DarrayEntries);
     result = v3;
     jkGuiSaveLoad_numEntries = 0;
+
+    // Added: Make sure onscreen keyboard is down
+    stdControl_HideSystemKeyboard();
+    sithControl_ReadControls();
+
     return result;
 }
 

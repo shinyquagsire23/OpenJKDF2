@@ -1785,26 +1785,15 @@ void sithControl_MapDefaults()
     sithControl_MapFunc(INPUT_FUNC_GAMMA, DIK_F11, 0);
     sithControl_MapFunc(INPUT_FUNC_SCREENSHOT, DIK_F12, 0);
     sithControl_MapFunc(INPUT_FUNC_TALLY, DIK_GRAVE, 0);
-}
-
-void sithControl_InputInit()
-{
-    stdControlKeyInfoEntry *v6; // eax
-    stdControlKeyInfoEntry *v7; // eax
-    stdControlKeyInfoEntry *v8; // eax
-
-    _memset(sithControl_aInputFuncToKeyinfo, 0, sizeof(stdControlKeyInfo) * 74);
-#ifndef TARGET_TWL
-    stdControl_Reset();
-#endif
-    sithWeapon_controlOptions = 36;
-    sithControl_MapDefaults();
-    sithControl_MapAxisFunc(INPUT_FUNC_FORWARD, AXIS_JOY1_Y, 4u);
-    sithControl_MapAxisFunc(INPUT_FUNC_TURN, AXIS_JOY1_X, 4u);
 
 #ifndef TARGET_TWL
     sithControl_MapAxisFunc(INPUT_FUNC_FORWARD, AXIS_JOY1_Y, 4u);
-    sithControl_MapAxisFunc(INPUT_FUNC_SLIDE, AXIS_JOY1_X, 4u);
+    if (Main_bMotsCompat) {
+        sithControl_MapAxisFunc(INPUT_FUNC_SLIDE, AXIS_JOY1_X, 4u);
+    }
+    else {
+        sithControl_MapAxisFunc(INPUT_FUNC_SLIDE, AXIS_JOY1_X, 0u);
+    }
     sithControl_MapAxisFunc(INPUT_FUNC_PITCH, AXIS_JOY1_R, 4u);
     sithControl_MapAxisFunc(INPUT_FUNC_TURN, AXIS_JOY1_Z, 4u);
 
@@ -1812,6 +1801,9 @@ void sithControl_InputInit()
     sithControl_DefaultHelper(INPUT_FUNC_DUCK, KEY_JOY1_B2, 2); // b
     sithControl_DefaultHelper(INPUT_FUNC_ACTIVATE, KEY_JOY1_B3, 2); // x
     sithControl_MapFunc(INPUT_FUNC_JUMP, KEY_JOY1_B4, 0); // y
+
+    sithControl_DefaultHelper(INPUT_FUNC_USEINV, KEY_JOY1_B8, 2); // lstick click
+    sithControl_DefaultHelper(INPUT_FUNC_USESKILL, KEY_JOY1_B9, 2); // rstick click
 
     sithControl_MapFunc(INPUT_FUNC_NEXTINV, KEY_JOY1_HUP, 0);
     sithControl_MapFunc(INPUT_FUNC_PREVINV, KEY_JOY1_HDOWN, 0);
@@ -1824,6 +1816,29 @@ void sithControl_InputInit()
     sithControl_DefaultHelper(INPUT_FUNC_FIRE2, KEY_JOY1_B16, 2); // ltrig
     sithControl_DefaultHelper(INPUT_FUNC_FIRE1, KEY_JOY1_B17, 2); // rtrig
 #endif
+}
+
+void sithControl_InputInit()
+{
+    stdControlKeyInfoEntry *v6; // eax
+    stdControlKeyInfoEntry *v7; // eax
+    stdControlKeyInfoEntry *v8; // eax
+
+    _memset(sithControl_aInputFuncToKeyinfo, 0, sizeof(stdControlKeyInfo) * 74);
+#ifndef TARGET_TWL
+    stdControl_Reset();
+#endif
+
+    // Enable joystick by default
+#ifdef QOL_IMPROVEMENTS
+    sithWeapon_controlOptions = 0x4;
+#else
+    sithWeapon_controlOptions = 0x24;
+#endif
+
+    sithControl_MapDefaults();
+    sithControl_MapAxisFunc(INPUT_FUNC_FORWARD, AXIS_JOY1_Y, 4u);
+    sithControl_MapAxisFunc(INPUT_FUNC_TURN, AXIS_JOY1_X, 4u);
 
     v6 = sithControl_MapAxisFunc(INPUT_FUNC_TURN, AXIS_MOUSE_X, 0xCu);
     if ( v6 )
