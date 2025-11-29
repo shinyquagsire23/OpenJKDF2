@@ -2429,14 +2429,19 @@ LABEL_150:
             if (UNLIKELY(v63 == SPHERE_CLIPPING_EDGE)) {
                 v63 = rdClip_SphereInFrustum(&sithRender_absoluteMaxFrustum, &i->screenPos, i->rdthing.model3->radius);
             }
-    #endif
+#endif
             i->rdthing.clippingIdk = v63;
             if (LIKELY(v63 == SPHERE_FULLY_OUTSIDE)) {
                 continue;
             }
 
+            // REMOVED: This was bugged idk
+            //if ( a2 >= 1.0 )
+            //    i->rdthing.desiredLightMode = RD_LIGHTMODE_FULLYLIT;
             if ( a2 >= 1.0 )
-                i->rdthing.desiredLightMode = RD_LIGHTMODE_FULLYLIT;
+                i->rdthing.curLightMode = RD_LIGHTMODE_FULLYLIT;
+            else
+                i->rdthing.curLightMode = i->rdthing.desiredLightMode;
 
             // MOTS added
 #ifdef JKM_LIGHTING
