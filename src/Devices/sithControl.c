@@ -860,6 +860,10 @@ void sithControl_AddInputHandler(sithControl_handler_t a1)
     }
 }
 
+#ifdef QOL_IMPROVEMENTS
+int sithControl_buttonPressDebounce = 0;
+#endif
+
 // MOTS altered
 int sithControl_HandlePlayer(sithThing *player, flex_t deltaSecs)
 {
@@ -880,6 +884,7 @@ int sithControl_HandlePlayer(sithThing *player, flex_t deltaSecs)
     rdVector3 a3a; // [esp+Ch] [ebp-3Ch] BYREF
     rdMatrix34 a; // [esp+18h] [ebp-30h] BYREF
     int input_read;
+    int tmp;
 
     //g_debugmodeFlags |= 0x100;
 
@@ -931,6 +936,21 @@ int sithControl_HandlePlayer(sithThing *player, flex_t deltaSecs)
                     sithConsole_AlertSound();
                     sithControl_death_msgtimer = 0;
 LABEL_39:
+#ifdef QOL_IMPROVEMENTS
+                    // HACK: Prevent exploding yourself on reloading
+                    tmp = sithControl_ReadFunctionMap(INPUT_FUNC_ACTIVATE, &input_read);
+                    if (!sithControl_buttonPressDebounce && (input_read != 0 || (sithControl_ReadFunctionMap(INPUT_FUNC_FIRE1, &input_read), input_read != 0) ))
+                    {
+                        sithControl_buttonPressDebounce = 1;
+                    }
+                    else if (sithControl_buttonPressDebounce && tmp == 0 && !sithControl_ReadFunctionMap(INPUT_FUNC_FIRE1, &input_read) )
+                    {
+                        sithControl_buttonPressDebounce = 0;
+                        sithPlayer_debug_loadauto(player);
+                        return 0;
+                    }
+                    return 0;
+#else
                     sithControl_ReadFunctionMap(INPUT_FUNC_ACTIVATE, &input_read);
                     if ( input_read != 0 || (sithControl_ReadFunctionMap(INPUT_FUNC_FIRE1, &input_read), input_read != 0) )
                     {
@@ -938,11 +958,15 @@ LABEL_39:
                         return 0;
                     }
                     return 0;
+#endif
                 }
             }
         }
         else
         {
+#ifdef QOL_IMPROVEMENTS
+            sithControl_buttonPressDebounce = 0;
+#endif
             if (!Main_bMotsCompat) {
                 sithControl_008d7f44 = 1.0;
                 sithControl_PlayerLook(player, deltaSecs);
@@ -977,6 +1001,9 @@ LABEL_39:
     }
 
 debug_controls:
+#ifdef QOL_IMPROVEMENTS
+        sithControl_buttonPressDebounce = 0;
+#endif
     if ( player->moveType == SITH_MT_PHYSICS )
         sithPhysics_ThingStop(player);
 

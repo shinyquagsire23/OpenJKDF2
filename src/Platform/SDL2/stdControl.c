@@ -571,6 +571,11 @@ void stdControl_Flush()
 
     stdControl_curReadTime = stdPlatform_GetTimeMsec();
 
+    _memset(stdControl_aInput1, 0, sizeof(int) * JK_NUM_KEYS);
+    _memset(stdControl_aInput2, 0, sizeof(int) * JK_NUM_KEYS);
+    _memset(stdControl_aKeyInfo, 0, sizeof(int) * JK_NUM_KEYS);
+    stdControl_ReadControls();
+
 #if 0
     if ( stdControl_keyboardIDirectInputDevice )
     {

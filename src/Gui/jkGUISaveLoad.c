@@ -41,7 +41,7 @@ static jkGuiElement jkGuiSaveLoad_aElements[15] = {
     {ELEMENT_END, 0, 0, 0, 0, {0}, 0, 0, 0, 0, 0, 0, {0}, 0},
 };
 
-static jkGuiMenu jkGuiSaveLoad_menu = {jkGuiSaveLoad_aElements, -1, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
+jkGuiMenu jkGuiSaveLoad_menu = {jkGuiSaveLoad_aElements, -1, 0xFFFF, 0xFFFF, 0xF, 0, 0, jkGui_stdBitmaps, jkGui_stdFonts, 0, 0, "thermloop01.wav", "thrmlpu2.wav", 0, 0, 0, 0, 0, 0};
 
 int jkGuiSaveLoad_ListClick(jkGuiElement *element, jkGuiMenu *menu, int32_t mouseX, int32_t mouseY, BOOL redraw)
 {
@@ -445,7 +445,6 @@ LABEL_46:
 
     // Added: Make sure onscreen keyboard is down
     stdControl_HideSystemKeyboard();
-    sithControl_ReadControls();
 
     return result;
 }
