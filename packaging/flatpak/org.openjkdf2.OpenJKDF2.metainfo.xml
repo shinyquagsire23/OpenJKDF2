@@ -68,6 +68,7 @@
   </content_rating>
   <releases>
     <!--NEXT_RELEASE_HERE-->
+    <release version="0.9.7" date="2025-12-02" />
     <release version="0.9.6" date="2024-12-07" />
     <release version="0.9.5" date="2024-11-29" />
     <release version="0.9.4" date="2024-11-28" />
