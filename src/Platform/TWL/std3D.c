@@ -294,7 +294,14 @@ MATH_FUNC static void std3D_UpdateFogColor() {
     if (!rdCamera_pCurCamera)
         return;
     flex_t ambientLight = rdCamera_pCurCamera->ambientLight;
-    if (std3D_lastSkyColor == sithSurface_skyColorGuess && std3D_currentFogAmbientMult == ambientLight) {
+
+    int bHasFilter = rdroid_curColorEffects.filter.x || rdroid_curColorEffects.filter.y || rdroid_curColorEffects.filter.z;
+    int bForceRefresh = 0;
+    if (bHasFilter || stdPalEffects_state.field_8) {
+        bForceRefresh = 1;
+    }
+
+    if ((std3D_lastSkyColor == sithSurface_skyColorGuess && std3D_currentFogAmbientMult == ambientLight) && !bForceRefresh) {
         return;
     }
 
@@ -319,9 +326,39 @@ MATH_FUNC static void std3D_UpdateFogColor() {
         }
     }
 
-    uint8_t colorR = (u8)((flex_t)skyColor.r * std3D_currentFogAmbientMult);
-    uint8_t colorG = (u8)((flex_t)skyColor.g * std3D_currentFogAmbientMult);
-    uint8_t colorB = (u8)((flex_t)skyColor.b * std3D_currentFogAmbientMult);
+    uint8_t colorR;
+    uint8_t colorG;
+    uint8_t colorB;
+
+    if (stdPalEffects_state.field_8) {
+        rdVector3 tint = rdroid_curColorEffects.tint;
+        const rdVector3 bias = (rdVector3){1.0, 1.0, 1.0};
+        rdVector_Add3Acc(&tint, &bias);
+        rdVector_Normalize3Acc(&tint);
+        rdVector_Scale3Acc(&tint, 1.732); // sqrt(3)
+
+        // TODO tint
+        colorR = (u8)((flex_t)skyColor.r * std3D_currentFogAmbientMult * tint.x);
+        colorG = (u8)((flex_t)skyColor.g * std3D_currentFogAmbientMult * tint.y);
+        colorB = (u8)((flex_t)skyColor.b * std3D_currentFogAmbientMult * tint.z);
+    }
+    else {
+        colorR = (u8)((flex_t)skyColor.r * std3D_currentFogAmbientMult);
+        colorG = (u8)((flex_t)skyColor.g * std3D_currentFogAmbientMult);
+        colorB = (u8)((flex_t)skyColor.b * std3D_currentFogAmbientMult);
+    }
+
+    if (bHasFilter) {
+        if (!rdroid_curColorEffects.filter.x) {
+            colorR = colorR >> 2;
+        }
+        if (!rdroid_curColorEffects.filter.y) {
+            colorG = colorG >> 2;
+        }
+        if (!rdroid_curColorEffects.filter.z) {
+            colorB = colorB >> 2;
+        }
+    }
 
     glFogColor(colorR >> 3, colorG >> 3, colorB >> 3, 31);
     //glFogColor(31, 0, 0, 31);

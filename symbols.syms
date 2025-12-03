@@ -199,8 +199,8 @@ sithSound_hashtable 0x0084DF38 stdHashTable*
 sithSound_var4 0x0084DF40 int
 sithSound_var5 0x0084DF44 int
 
-sithControl_inputFuncToControlType 0x00833A20 int[74]
-sithControl_aInputFuncToKeyinfo 0x00833B48 stdControlKeyInfo[74]
+sithControl_inputFuncToControlType 0x00833A20 int[INPUT_FUNC_MAX]
+sithControl_aInputFuncToKeyinfo 0x00833B48 stdControlKeyInfo[INPUT_FUNC_MAX]
 sithControl_msIdle 0x00835830 uint32_t
 sithControl_bInitted 0x00835834 int
 sithControl_bOpened 0x00835838 int

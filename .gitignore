@@ -113,3 +113,9 @@ packaging/android-project/.gradle/*
 packaging/android-project/app/build/*
 packaging/android-project/app/src/main/jniLibs/*
 packaging/win32/openjkdf2-64.exe.manifest
+android-OpenJKDF2-arm64-v8a.apk
+OpenJKDF2-arm64-v8a.apk
+nintendo-dsi-shareware-demo.zip
+nintendo-dsi-debug.zip
+nintendo-dsi-shareware-demo/*
+build_openjkdf2_venv/*

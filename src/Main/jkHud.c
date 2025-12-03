@@ -1791,11 +1791,11 @@ int jkHud_chat2()
 #ifdef QOL_IMPROVEMENTS
 BOOL jkHud_shouldCrosshairBeShownForWeapon(sithThing *player) {
   int currentWeapon = sithInventory_GetCurWeapon(player);
-  if(currentWeapon == SITHBIN_FISTS || MOTS_ONLY_COND(currentWeapon == SITHBIN_MOTS_FISTS)) {
+  if (currentWeapon == SITHBIN_FISTS || MOTS_ONLY_FLAG(currentWeapon == SITHBIN_MOTS_FISTS)) {
     return jkPlayer_setCrosshairOnFist;
   }
 
-  if(currentWeapon == SITHBIN_LIGHTSABER || MOTS_ONLY_COND(currentWeapon == SITHBIN_MOTS_LIGHTSABER)){
+  if (currentWeapon == SITHBIN_LIGHTSABER || MOTS_ONLY_FLAG(currentWeapon == SITHBIN_MOTS_LIGHTSABER)){
     return jkPlayer_setCrosshairOnLightsaber;
   }
 

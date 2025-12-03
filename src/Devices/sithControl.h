@@ -24,9 +24,9 @@
 #define sithControl_ReadControls_ADDR (0x004D70A0)
 #define sithControl_FinishRead_ADDR (0x004D70B0)
 #define sithControl_InputInit_ADDR (0x004D70C0)
-#define sithControl_sub_4D7350_ADDR (0x004D7350)
+#define sithControl_KeyboardInputInitDefaults_ADDR (0x004D7350)
 #define sithControl_JoyInputInit_ADDR (0x004D73E0)
-#define sithControl_sub_4D7670_ADDR (0x004D7670)
+#define sithControl_MouseInputInitDefaults_ADDR (0x004D7670)
 #define sithControl_WriteConf_ADDR (0x004D78E0)
 #define sithControl_ReadConf_ADDR (0x004D79A0)
 #define sithControl_sub_4D7C30_ADDR (0x004D7C30)
@@ -70,12 +70,19 @@ int sithControl_ReadFunctionMap(int func, int* out);
 
 void sithControl_sub_4D6930(int a);
 stdControlKeyInfo* sithControl_EnumBindings(sithControlEnumFunc_t pfEnumFunction, int a2, int a3, int a4, Darray *a5);
-void sithControl_sub_4D7670();
-void sithControl_sub_4D7350();
+void sithControl_MouseInputInitDefaults();
+void sithControl_KeyboardInputInitDefaults();
 void sithControl_JoyInputInit();
 
+void sithControl_MapDefaultsJoystick();
+
+#ifdef QOL_IMPROVEMENTS
+void sithControl_SetLastSelected(int which);
+int sithControl_GetLastSelected();
+#endif // QOL_IMPROVEMENTS
+
 //static stdControlKeyInfo* (*sithControl_EnumBindings)(sithControlEnumFunc_t func, int a2, int a3, int a4, int a5) = (void*)sithControl_EnumBindings_ADDR;
-//static void (*sithControl_sub_4D7670)() = (void*)sithControl_sub_4D7670_ADDR;
+//static void (*sithControl_MouseInputInitDefaults)() = (void*)sithControl_MouseInputInitDefaults_ADDR;
 //static int (*sithControl_HandlePlayer)(sithThing *a1, flex_t a2) = (void*)sithControl_HandlePlayer_ADDR;
 
 //static int (*sithControl_IsOpen)() = (void*)sithControl_IsOpen_ADDR;

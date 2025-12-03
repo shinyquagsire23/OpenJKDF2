@@ -34,8 +34,8 @@ char* stdEmbeddedRes_LoadOnlyInternal(const char* filepath, size_t* pOutSz)
     char* base_path = NULL;
     char* file_contents = NULL;
     char tmp_filepath[256];
-    strncpy(tmp_filepath, "resource/", 256);
-    strncat(tmp_filepath, filepath, 256);
+    strncpy(tmp_filepath, "resource/", 256-1);
+    strncat(tmp_filepath, filepath, 256-1);
 
     if (pOutSz) {
         *pOutSz = 0;
@@ -59,9 +59,9 @@ for (int i = 0; i < strlen(tmp_filepath); i++)
     
 #if defined(MACOS) && defined(SDL2_RENDER)
     base_path = SDL_GetBasePath();
-    strncpy(tmp_filepath, base_path, 256);
-    strncat(tmp_filepath, "Contents/Resources/", 256);
-    strncat(tmp_filepath, filepath, 256);
+    strncpy(tmp_filepath, base_path, 256-1);
+    strncat(tmp_filepath, "Contents/Resources/", 256-1);
+    strncat(tmp_filepath, filepath, 256-1);
     SDL_free(base_path);
 #endif
 
@@ -98,7 +98,7 @@ for (int i = 0; i < strlen(tmp_filepath); i++)
     }
 
 skip_fopen:
-    strncpy(tmp_filepath, filepath, 256);
+    strncpy(tmp_filepath, filepath, 256-1);
     
     for (int i = 0; i < strlen(tmp_filepath); i++)
     {
@@ -141,8 +141,8 @@ char* stdEmbeddedRes_Load(const char* filepath, size_t* pOutSz)
     char* base_path = NULL;
     char* file_contents = NULL;
     char tmp_filepath[256];
-    strncpy(tmp_filepath, "resource/", 256);
-    strncat(tmp_filepath, filepath, 256);
+    strncpy(tmp_filepath, "resource/", 256-1);
+    strncat(tmp_filepath, filepath, 256-1);
 
     if (pOutSz) {
         *pOutSz = 0;
@@ -210,9 +210,9 @@ retry_file:
     {
 #if defined(MACOS) && defined(SDL2_RENDER)
         base_path = SDL_GetBasePath();
-        strncpy(tmp_filepath, base_path, 256);
-        strncat(tmp_filepath, "Contents/Resources/", 256);
-        strncat(tmp_filepath, filepath, 256);
+        strncpy(tmp_filepath, base_path, 256-1);
+        strncat(tmp_filepath, "Contents/Resources/", 256-1);
+        strncat(tmp_filepath, filepath, 256-1);
         SDL_free(base_path);
 
         f = fopen(tmp_filepath, "r");
@@ -221,7 +221,7 @@ retry_file:
 #endif
 
 skip_fopen:
-        strncpy(tmp_filepath, filepath, 256);
+        strncpy(tmp_filepath, filepath, 256-1);
         
         for (int i = 0; i < strlen(tmp_filepath); i++)
         {

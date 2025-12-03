@@ -640,7 +640,7 @@ int jkGuiMouse_RestoreDefaultsClicked(jkGuiElement *pClickedElement, jkGuiMenu *
     v7 = jkStrings_GetUniStringWithFallback("GUI_RESTORE_DEFAULTS_Q");
     v5 = jkStrings_GetUniStringWithFallback("GUI_RESTORE_DEFAULTS");
     if ( jkGuiDialog_YesNoDialog(v5, v7) )
-        sithControl_sub_4D7670();
+        sithControl_MouseInputInitDefaults();
     jkGuiMouse_sub_417210();
     jkGuiMouse_dword_53032C = -1;
     jkGuiMouse_dword_530328 = -1;

@@ -347,13 +347,57 @@ int jkGame_Update()
     extern int std3D_timeWastedWaitingAround;
     extern int32_t sithRender_numSectors;
 
+    int healthNum = 0;
+    int shieldsNum = 0;
+    int forceNum = 0;
+    int ammoNum = 0;
+    int currentItemBin = 0;
+    int currentForceBin = 0;
+    int bHasSuperShields = 0;
+    int bHasSuperWeapon = 0;
+    int bHasForceSurge = 0;
+    int bHasFieldLight = 0;
+
+    if (sithWorld_pCurrentWorld) {
+        sithThing* pPlayer = sithWorld_pCurrentWorld->playerThing;
+        if ( pPlayer->type == SITH_THING_PLAYER ) {
+            healthNum = pPlayer->actorParams.health;
+            shieldsNum = (int32_t)sithInventory_GetBinAmount(pPlayer, SITHBIN_SHIELDS);
+            forceNum = (int32_t)sithInventory_GetBinAmount(pPlayer, SITHBIN_FORCEMANA);
+            ammoNum = jkHud_GetWeaponAmmo(pPlayer);
+
+            bHasSuperShields = playerThings[playerThingIdx].bHasSuperShields;
+            bHasSuperWeapon = playerThings[playerThingIdx].bHasSuperWeapon;
+            bHasForceSurge = playerThings[playerThingIdx].bHasForceSurge;
+            bHasFieldLight = sithInventory_GetActivate(pPlayer, SITHBIN_FIELDLIGHT);
+        }
+    }
+
     char resetConsole[16];
     int consoleX, consoleY;
     consoleGetCursor(NULL, &consoleX, &consoleY);
-    snprintf(resetConsole, sizeof(resetConsole)-1, "\x1b[%d;%dH", consoleX, consoleY);
-    stdPlatform_Printf("\x1b[0;0H                               \rdlt all=%d mn=%d %d wrld=%d\n                               \r pov=%d hud=%d drw=%d wst=%d %d \n                               \n", total_delta-std3D_timeWastedWaitingAround, sithMain_tickEndMs-sithMain_tickStartMs, jkGame_Delta_ClearScreen_AdvanceFrame, jkGame_Delta_AdvanceFrame_UpdateCamera, jkGame_Delta_UpdateCamera_DrawPov, jkGame_Delta_DrawPov_HudDrawn, jkGame_Delta_HudDrawn_End - std3D_timeWastedWaitingAround, std3D_timeWastedWaitingAround, sithRender_numSectors);
+    snprintf(resetConsole, sizeof(resetConsole)-1, "\x1b[%d;%dH\x1b[97m", consoleY, consoleX);
+    stdPlatform_Printf("\x1b[0;0H                                \r\x1b[0;0H\x1b[%d;1m%cHLTH %03d \x1b[%d;1m%cSHLD %03d \x1b[39;0m%c\n                               \n", (bHasSuperShields ? 33 : 31), (bHasSuperShields ? '*' : ' '), healthNum, (bHasSuperShields ? 33 : 32), (bHasSuperShields ? '*' : ' '), shieldsNum, (bHasFieldLight ? '*' : ' '));
     stdPlatform_Printf(resetConsole);
-    stdPlatform_Printf("\x1b[6;0H                               \r");
+    if (ammoNum < 0) {
+        stdPlatform_Printf("\x1b[1;0H                                \r\x1b[1;0H\x1b[%d;1m%cAMMO --- \x1b[%d;1m%cMANA %03d   \n                               \n\x1b[39;0m", (bHasSuperWeapon ? 33 : 39), (bHasSuperWeapon ? '*' : ' '), (bHasForceSurge ? 33 : 39), (bHasForceSurge ? '*' : ' '), forceNum);
+    }
+    else {
+        stdPlatform_Printf("\x1b[1;0H                                \r\x1b[1;0H\x1b[33;%dm%cAMMO %03d \x1b[%d;1m%cMANA %03d   \n                               \n\x1b[39;0m", (bHasSuperWeapon ? 1 : 0), (bHasSuperWeapon ? '*' : ' '), ammoNum, (bHasForceSurge ? 33 : 36), (bHasForceSurge ? '*' : ' '), forceNum);
+    }
+    stdPlatform_Printf("\x1b[6;0H                                \r");
+    stdPlatform_Printf("\x1b[5;0H                                \r");
+    stdPlatform_Printf("\x1b[4;0H                                \r");
+    stdPlatform_Printf("\x1b[3;0H                                \r");
+    stdPlatform_Printf("\x1b[2;0H                                \r\x1b[2;0H");
+    
+    jkDev_UpdateEntries();
+    jkDev_PrintfLog();
+    stdPlatform_Printf("\x1b[7;0H                                \r");
+    stdPlatform_Printf(resetConsole);
+    stdPlatform_Printf("\x1b[10;0H                               \rdlt all=%d mn=%d %d wrld=%d\n                               \r pov=%d hud=%d drw=%d wst=%d %d \n                               \n                               \n", total_delta-std3D_timeWastedWaitingAround, sithMain_tickEndMs-sithMain_tickStartMs, jkGame_Delta_ClearScreen_AdvanceFrame, jkGame_Delta_AdvanceFrame_UpdateCamera, jkGame_Delta_UpdateCamera_DrawPov, jkGame_Delta_DrawPov_HudDrawn, jkGame_Delta_HudDrawn_End - std3D_timeWastedWaitingAround, std3D_timeWastedWaitingAround, sithRender_numSectors);
+    stdPlatform_Printf(resetConsole);
+    stdPlatform_Printf("\x1b[13;0H                               \r");
     stdPlatform_PrintHeapStats();
     stdPlatform_Printf(resetConsole);
     //world=28 drw=15 emu

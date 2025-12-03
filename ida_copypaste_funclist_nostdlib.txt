@@ -2076,9 +2076,9 @@ sithControl_ReadFunctionMap	.text	004D7010	00000082	00000014	00000008	R	.	.	.	.	
 sithControl_ReadControls	.text	004D70A0	00000005	00000000	00000000	R	.	.	.	.	.	.	.
 sithControl_FinishRead	.text	004D70B0	00000005	00000000	00000000	R	.	.	.	.	.	.	.
 sithControl_InputInit	.text	004D70C0	00000287	0000000C	00000000	R	.	.	.	.	.	T	.
-sithControl_sub_4D7350	.text	004D7350	0000008A	00000014	00000000	R	.	.	.	.	.	.	.
+sithControl_KeyboardInputInitDefaults	.text	004D7350	0000008A	00000014	00000000	R	.	.	.	.	.	.	.
 sithControl_JoyInputInit	.text	004D73E0	00000290	00000014	00000000	R	.	.	.	.	.	.	.
-sithControl_sub_4D7670	.text	004D7670	0000026B	00000014	00000000	R	.	.	.	.	.	T	.
+sithControl_MouseInputInitDefaults	.text	004D7670	0000026B	00000014	00000000	R	.	.	.	.	.	T	.
 sithControl_WriteConf	.text	004D78E0	000000B2	00000018	00000000	R	.	.	.	.	.	.	.
 sithControl_ReadConf	.text	004D79A0	0000028A	00000020	00000000	R	.	.	.	.	.	.	.
 sithControl_sub_4D7C30	.text	004D7C30	00000016	00000004	00000000	R	.	.	.	.	.	.	.

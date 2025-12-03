@@ -901,7 +901,8 @@ int32_t jkGuiRend_InvokeClicked(jkGuiElement *clickable, jkGuiMenu *menu, int32_
 {
     jkGuiClickHandlerFunc_t handler;
 
-    if ( !clickable->bIsVisible || clickable->enableHover )
+    // Added: !clickable
+    if (!clickable || !clickable->bIsVisible || clickable->enableHover )
         return 0;
 
     handler = clickable->clickHandlerFunc;
@@ -2844,41 +2845,51 @@ void jkGuiRend_UpdateController()
     valB1 = stdControl_ReadKey(KEY_JOY1_B1, &val);
 
     extern jkGuiMenu jkGuiSaveLoad_menu;
+    extern jkGuiMenu jkGuiDialog_OkCancel_menu;
 
     if (!lastB1 && valB1) {
         jkGuiRend_B1Menu = jkGuiRend_activeMenu;
+        jkGuiMenu* pB1Menu = jkGuiRend_activeMenu;
+        lastB1 = valB1; // Ugh, recursion junk
 
-        // HACK: Prevent player from killing themselves on load
-        if (jkGuiRend_activeMenu != &jkGuiSaveLoad_menu) {
+        // HACK: Prevent player from killing themselves on load or save
+        if (jkGuiRend_activeMenu != &jkGuiSaveLoad_menu && !(jkGuiRend_activeMenu == &jkGuiDialog_OkCancel_menu && jkGuiRend_lastActiveMenu == &jkGuiSaveLoad_menu)) {
+            jkGuiElement* prevFocusedElement = jkGuiRend_activeMenu->focusedElement;
             jkGuiRend_WindowHandler(0, WM_KEYFIRST, VK_RETURN, 0, 0);
-            if (jkGuiRend_activeMenu) {
+            if (prevFocusedElement == jkGuiRend_activeMenu->focusedElement && pB1Menu == jkGuiRend_activeMenu) {
                 jkGuiRend_activeMenu->lastMouseDownClickable = jkGuiRend_activeMenu->lastMouseOverClickable;
                 jkGuiRend_InvokeClicked(jkGuiRend_activeMenu->lastMouseOverClickable, jkGuiRend_activeMenu, jkGuiRend_mouseX, jkGuiRend_mouseY, 1);
             }
-            printf("a\n");
+            stdPlatform_Printf("a1\n");
         }
     }
     else if (lastB1 && !valB1) {
-        if (jkGuiRend_activeMenu == &jkGuiSaveLoad_menu && jkGuiRend_B1Menu == jkGuiRend_activeMenu) {
+        jkGuiMenu* pB1Menu = jkGuiRend_activeMenu;
+        lastB1 = valB1; // Ugh, recursion junk
+
+        if ((jkGuiRend_activeMenu == &jkGuiSaveLoad_menu || (jkGuiRend_activeMenu == &jkGuiDialog_OkCancel_menu && jkGuiRend_lastActiveMenu == &jkGuiSaveLoad_menu)) && jkGuiRend_B1Menu == jkGuiRend_activeMenu) {
+            jkGuiElement* prevFocusedElement = jkGuiRend_activeMenu->focusedElement;
             jkGuiRend_WindowHandler(0, WM_KEYFIRST, VK_RETURN, 0, 0);
-            if (jkGuiRend_activeMenu) {
+            if (prevFocusedElement == jkGuiRend_activeMenu->focusedElement && pB1Menu == jkGuiRend_activeMenu) {
                 jkGuiRend_activeMenu->lastMouseDownClickable = jkGuiRend_activeMenu->lastMouseOverClickable;
                 jkGuiRend_InvokeClicked(jkGuiRend_activeMenu->lastMouseOverClickable, jkGuiRend_activeMenu, jkGuiRend_mouseX, jkGuiRend_mouseY, 1);
             }
-            printf("a\n");
+            stdPlatform_Printf("a2\n");
         }
 
-        jkGuiRend_activeMenu->lastMouseDownClickable = 0;
+        if (jkGuiRend_activeMenu) {
+            jkGuiRend_activeMenu->lastMouseDownClickable = 0;
+        }
     }
     lastB1 = valB1;
 
     if (stdControl_ReadKey(KEY_JOY1_B2, &val) && val) {
         jkGuiRend_WindowHandler(0, WM_KEYFIRST, VK_ESCAPE, 0, 0);
-        printf("b\n");
+        stdPlatform_Printf("b\n");
     }
     if (stdControl_ReadKey(KEY_JOY1_B3, &val) && val) {
         //jkGuiRend_WindowHandler(0, WM_KEYFIRST, VK_TAB, 0, 0);
-        printf("x\n");
+        stdPlatform_Printf("x\n");
         if (jkGuiRend_activeMenu && jkGuiRend_activeMenu->pReturnKeyShortcutElement) {
             jkGuiRend_InvokeClicked(jkGuiRend_activeMenu->pReturnKeyShortcutElement, jkGuiRend_activeMenu, jkGuiRend_mouseX, jkGuiRend_mouseY, 1);
         }
@@ -2892,5 +2903,7 @@ void jkGuiRend_UpdateController()
         stdControl_HideSystemKeyboard();
     }
 
-    jkGuiRend_lastActiveMenu = jkGuiRend_activeMenu;
+    if (jkGuiRend_activeMenu != jkGuiRend_lastActiveMenu) {
+        jkGuiRend_lastActiveMenu = jkGuiRend_activeMenu;
+    }
 }

@@ -36,7 +36,7 @@ static int sithControl_008d7f54 = 0;
 static int sithControl_008d7f58 = 0;
 static int sithControl_008d7f5c = 0;
 
-static const char *sithControl_aFunctionStrs[74] =
+static const char *sithControl_aFunctionStrs[INPUT_FUNC_MAX+1] =
 {
     "FORWARD",
     "TURN",
@@ -111,8 +111,16 @@ static const char *sithControl_aFunctionStrs[74] =
     "ACTIVATE28",
     "ACTIVATE29",
     "ACTIVATE30",
-    "ACTIVATE31"
+    "ACTIVATE31",
+#ifdef QOL_IMPROVEMENTS
+    "USELASTSELECTED", // Common button for both items and force power usage for controllers
+#endif // QOL_IMPROVEMENTS
+    "INPUT_FUNC_MAX"
 };
+
+#ifdef QOL_IMPROVEMENTS
+int sithControl_lastSelected = LAST_SELECTED_ITEM;
+#endif // QOL_IMPROVEMENTS
 
 int sithControl_Startup()
 {
@@ -122,11 +130,16 @@ int sithControl_Startup()
     if ( stdControl_Startup() )
     {
         sithControl_InitFuncToControlType();
-        _memset(sithControl_aInputFuncToKeyinfo, 0, sizeof(stdControlKeyInfo) * 74);
+        _memset(sithControl_aInputFuncToKeyinfo, 0, sizeof(stdControlKeyInfo) * INPUT_FUNC_MAX);
         stdControl_Reset();
         sithControl_bInitted = 1;
         return 1;
     }
+
+#ifdef QOL_IMPROVEMENTS
+    sithControl_lastSelected = LAST_SELECTED_ITEM;
+#endif // QOL_IMPROVEMENTS
+
     return 0;
 }
 
@@ -153,7 +166,8 @@ int sithControl_Shutdown()
 
     memset(sithControl_aHandlers, 0, sizeof(sithControl_handler_t) * SITHCONTROL_NUM_HANDLERS);
     sithControl_numHandlers = 0;
-#endif
+    sithControl_lastSelected = LAST_SELECTED_ITEM;
+#endif // QOL_IMPROVEMENTS
 
     sithControl_bInitted = 0;
     return 1;
@@ -229,6 +243,9 @@ void sithControl_InitFuncToControlType()
     sithControl_inputFuncToControlType[INPUT_FUNC_TALLY] = 4 | 1;
     if ( (g_debugmodeFlags & DEBUGFLAG_IN_EDITOR) != 0 )
         sithControl_inputFuncToControlType[INPUT_FUNC_DEBUG] = 4 | 1;
+#ifdef QOL_IMPROVEMENTS
+    sithControl_inputFuncToControlType[INPUT_FUNC_USELASTSELECTED] = 4 | 1;
+#endif
 }
 
 // MOTS altered
@@ -297,7 +314,7 @@ stdControlKeyInfoEntry* sithControl_MapFunc(int funcIdx, int keyNum, int flags)
     int a3a; // [esp+1Ch] [ebp+Ch]
 
     v3 = flags;
-    v3 = flags & ~9 | 2;
+    v3 = flags & ~(8|1) | 2;
     a3a = v3;
     //printf("1] Map %x\n", keyNum);
     if ( (sithControl_inputFuncToControlType[funcIdx] & 1) != 0 && sithControl_aInputFuncToKeyinfo[funcIdx].numEntries != 8 )
@@ -316,7 +333,7 @@ LABEL_9:
                 goto LABEL_14;
         }
         v7 = v5->aEntries;
-        while ( (v7->flags & 2) == 0 || v7->dxKeyNum != keyNum )
+        while ( (v7->flags & INPUT_MAPPING_FLAG_DXKEY) == 0 || v7->dxKeyNum != keyNum )
         {
             ++v6;
             ++v7;
@@ -379,7 +396,7 @@ stdControlKeyInfoEntry* sithControl_MapAxisFunc(int funcIdx, int dxKeyNum, uint3
         return 0;
     if ( sithControl_aInputFuncToKeyinfo[funcIdx].numEntries == 8 )
         return 0;
-    if ( (v4 & 2) != 0 )
+    if ( (v4 & INPUT_MAPPING_FLAG_DXKEY) != 0 )
     {
         v7 = 0;
         v8 = sithControl_aInputFuncToKeyinfo;
@@ -531,7 +548,7 @@ int sithControl_ReadConf()
     unsigned int dxKeyNum_; // [esp+18h] [ebp-8h]
     int v21; // [esp+1Ch] [ebp-4h]
 
-    _memset(sithControl_aInputFuncToKeyinfo, 0, sizeof(stdControlKeyInfo) * 74);
+    _memset(sithControl_aInputFuncToKeyinfo, 0, sizeof(stdControlKeyInfo) * INPUT_FUNC_MAX);
     stdControl_Reset();
     if ( !stdConffile_ReadArgs()
       || !stdConffile_entry.numArgs
@@ -561,7 +578,7 @@ int sithControl_ReadConf()
                 if ( stdConffile_entry.numArgs > 4u )
                     v18 = _atof(stdConffile_entry.args[4].value);
                 v3 = v19;
-                if ( (v19 & 2) != 0 )
+                if ( (v19 & INPUT_MAPPING_FLAG_DXKEY) != 0 )
                 {
                     if ( dxKeyNum <= JK_NUM_KEYS )
                     {
@@ -586,7 +603,7 @@ LABEL_24:
                                         goto LABEL_30;
                                 }
                                 v8 = v6->aEntries;
-                                while ( (v8->flags & 2) == 0 || v8->dxKeyNum != dxKeyNum )
+                                while ( (v8->flags & INPUT_MAPPING_FLAG_DXKEY) == 0 || v8->dxKeyNum != dxKeyNum )
                                 {
                                     ++v7;
                                     ++v8;
@@ -726,7 +743,7 @@ flex_t sithControl_GetAxis2(int axisNum)
                 {
                     v4 = stdControl_ReadAxis(entryIter->dxKeyNum);
 LABEL_11:
-                    if ( (entryIter->flags & 8) != 0 )
+                    if ( (entryIter->flags & INPUT_MAPPING_FLAG_RAW_AXIS) != 0 )
                         v4 = v4 * sithTime_TickHz;
                     if ( v4 != 0.0 )
                     {
@@ -781,9 +798,9 @@ flex_t sithControl_ReadAxisStuff(int funcIdx)
         do
         {
             v3 = v2->flags;
-            if ( (v3 & 8) == 0 )
+            if ( (v3 & INPUT_MAPPING_FLAG_RAW_AXIS) == 0 )
             {
-                if ( (v3 & 1) != 0 )
+                if ( (v3 & INPUT_MAPPING_FLAG_AXIS) != 0 )
                 {
                     if ( (sithWeapon_controlOptions & 0x20) == 0 || v2->dxKeyNum >= AXIS_MOUSE_X )
                     {
@@ -797,7 +814,7 @@ flex_t sithControl_ReadAxisStuff(int funcIdx)
 LABEL_12:
                     if ( v4 != 0.0 )
                     {
-                        if ( (v3 & 4) != 0 )
+                        if ( (v3 & INPUT_MAPPING_FLAG_AXIS_REVERSED) != 0 )
                             v4 = -v4;
                         if ( v2->binaryAxisVal != 0.0 )
                             v4 = v4 * v2->binaryAxisVal;
@@ -1812,37 +1829,6 @@ void sithControl_MapDefaults()
     sithControl_MapFunc(INPUT_FUNC_GAMMA, DIK_F11, 0);
     sithControl_MapFunc(INPUT_FUNC_SCREENSHOT, DIK_F12, 0);
     sithControl_MapFunc(INPUT_FUNC_TALLY, DIK_GRAVE, 0);
-
-#ifndef TARGET_TWL
-    sithControl_MapAxisFunc(INPUT_FUNC_FORWARD, AXIS_JOY1_Y, 4u);
-    if (Main_bMotsCompat) {
-        sithControl_MapAxisFunc(INPUT_FUNC_SLIDE, AXIS_JOY1_X, 4u);
-    }
-    else {
-        sithControl_MapAxisFunc(INPUT_FUNC_SLIDE, AXIS_JOY1_X, 0u);
-    }
-    sithControl_MapAxisFunc(INPUT_FUNC_PITCH, AXIS_JOY1_R, 4u);
-    sithControl_MapAxisFunc(INPUT_FUNC_TURN, AXIS_JOY1_Z, 4u);
-
-    sithControl_DefaultHelper(INPUT_FUNC_FIRE1, KEY_JOY1_B1, 2); // a
-    sithControl_DefaultHelper(INPUT_FUNC_DUCK, KEY_JOY1_B2, 2); // b
-    sithControl_DefaultHelper(INPUT_FUNC_ACTIVATE, KEY_JOY1_B3, 2); // x
-    sithControl_MapFunc(INPUT_FUNC_JUMP, KEY_JOY1_B4, 0); // y
-
-    sithControl_DefaultHelper(INPUT_FUNC_USEINV, KEY_JOY1_B8, 2); // lstick click
-    sithControl_DefaultHelper(INPUT_FUNC_USESKILL, KEY_JOY1_B9, 2); // rstick click
-
-    sithControl_MapFunc(INPUT_FUNC_NEXTINV, KEY_JOY1_HUP, 0);
-    sithControl_MapFunc(INPUT_FUNC_PREVINV, KEY_JOY1_HDOWN, 0);
-    sithControl_MapFunc(INPUT_FUNC_PREVSKILL, KEY_JOY1_HLEFT, 0);
-    sithControl_MapFunc(INPUT_FUNC_NEXTSKILL, KEY_JOY1_HRIGHT, 0);
-
-    sithControl_MapFunc(INPUT_FUNC_PREVWEAPON, KEY_JOY1_B10, 0); // lbump
-    sithControl_MapFunc(INPUT_FUNC_NEXTWEAPON, KEY_JOY1_B11, 0); // rbump
-
-    sithControl_DefaultHelper(INPUT_FUNC_FIRE2, KEY_JOY1_B16, 2); // ltrig
-    sithControl_DefaultHelper(INPUT_FUNC_FIRE1, KEY_JOY1_B17, 2); // rtrig
-#endif
 }
 
 void sithControl_InputInit()
@@ -1851,7 +1837,7 @@ void sithControl_InputInit()
     stdControlKeyInfoEntry *v7; // eax
     stdControlKeyInfoEntry *v8; // eax
 
-    _memset(sithControl_aInputFuncToKeyinfo, 0, sizeof(stdControlKeyInfo) * 74);
+    _memset(sithControl_aInputFuncToKeyinfo, 0, sizeof(stdControlKeyInfo) * INPUT_FUNC_MAX);
 #ifndef TARGET_TWL
     stdControl_Reset();
 #endif
@@ -1885,20 +1871,13 @@ void sithControl_InputInit()
     sithControl_DefaultHelper(INPUT_FUNC_JUMP, KEY_MOUSE_B2, 2);
     sithControl_DefaultHelper(INPUT_FUNC_FIRE2, KEY_MOUSE_B3, 2);
 
-#ifdef TARGET_TWL
-    sithControl_MapFunc(INPUT_FUNC_FORWARD, KEY_JOY1_HUP, 0);
-    sithControl_MapFunc(INPUT_FUNC_FORWARD, KEY_JOY1_HDOWN, 4);
-    sithControl_MapFunc(INPUT_FUNC_TURN, KEY_JOY1_HLEFT, 0);
-    sithControl_MapFunc(INPUT_FUNC_TURN, KEY_JOY1_HRIGHT, 4);
-    sithControl_DefaultHelper(INPUT_FUNC_FIRE1, KEY_JOY1_B1, 2);
-    sithControl_DefaultHelper(INPUT_FUNC_DUCK, KEY_JOY1_B2, 0);
-    sithControl_DefaultHelper(INPUT_FUNC_ACTIVATE, KEY_JOY1_B3, 2);
-    sithControl_MapFunc(INPUT_FUNC_JUMP, KEY_JOY1_B4, 0);
-    sithControl_MapFunc(INPUT_FUNC_NEXTINV, KEY_JOY1_B5, 0); // L
-    sithControl_MapFunc(INPUT_FUNC_NEXTWEAPON, KEY_JOY1_B6, 0); // R
-    sithControl_MapFunc(INPUT_FUNC_USEINV, KEY_JOY1_B7, 0);
-    sithWeapon_controlOptions |= 2;
+#ifdef QOL_IMPROVEMENTS
+    sithControl_MapDefaultsJoystick();
 #endif
+
+#ifdef TARGET_TWL
+    sithWeapon_controlOptions |= 2;
+#endif // TARGET_TWL
 }
 
 void sithControl_sub_4D6930(int funcIdx)
@@ -1929,14 +1908,14 @@ stdControlKeyInfo* sithControl_EnumBindings(sithControlEnumFunc_t pfEnumFunction
     v6 = 1;
     v7 = 0;
     v20 = sithControl_aInputFuncToKeyinfo;
-    for (int j = 0; j < 74; j++)
+    for (int j = 0; j < INPUT_FUNC_MAX; j++)
     {
         int typeflags = sithControl_inputFuncToControlType[v7];
 
         v18 = 0;
         v19 = 0;
         v17 = 0;
-        v21 = typeflags & 2;
+        v21 = typeflags & INPUT_MAPPING_FLAG_DXKEY;
         v16 = 0;
         v8 = &result->aEntries[0];
 
@@ -1944,7 +1923,7 @@ stdControlKeyInfo* sithControl_EnumBindings(sithControlEnumFunc_t pfEnumFunction
         {
             v9 = v8->flags;
             v10 = v8->dxKeyNum;
-            v11 = v8->flags & 2;
+            v11 = v8->flags & INPUT_MAPPING_FLAG_DXKEY;
             if ( (!v11 || v10 >= JK_EXTENDED_KEY_START || a2)
               && (((v9 & 1) == 0 || v10 < AXIS_MOUSE_X) 
               && (!v11 || !KEY_IS_MOUSE(v10)) || a4)
@@ -1952,7 +1931,7 @@ stdControlKeyInfo* sithControl_EnumBindings(sithControlEnumFunc_t pfEnumFunction
               && (!v11 || v10 < JK_EXTENDED_KEY_START || KEY_IS_MOUSE(v10)) || a3) )
             {
                 v6 = pfEnumFunction(v7, sithControl_aFunctionStrs[v7], typeflags, v16, v10, v9, v8, a5);
-                if ( v18 || (v12 = i, (i->dxKeyNum & 2) != 0) && (i->dxKeyNum & 4) == 0 )
+                if ( v18 || (v12 = i, (i->flags & INPUT_MAPPING_FLAG_DXKEY) != 0) && (i->flags & 4) == 0 )
                 {
                     v12 = i;
                     v18 = 1;
@@ -1961,8 +1940,8 @@ stdControlKeyInfo* sithControl_EnumBindings(sithControlEnumFunc_t pfEnumFunction
                 {
                     v18 = 0;
                 }
-                v19 = v19 || (v12->dxKeyNum & 2) != 0 && (v12->dxKeyNum & 4) != 0;
-                if ( v17 || (v17 = 0, (v12->dxKeyNum & 1) != 0) )
+                v19 = v19 || (v12->flags & INPUT_MAPPING_FLAG_DXKEY) != 0 && (v12->flags & 4) != 0;
+                if ( v17 || (v17 = 0, (v12->flags & INPUT_MAPPING_FLAG_AXIS) != 0) )
                     v17 = 1;
             }
             ++v16;
@@ -1989,7 +1968,7 @@ stdControlKeyInfo* sithControl_EnumBindings(sithControlEnumFunc_t pfEnumFunction
     return result;
 }
 
-void sithControl_sub_4D7670()
+void sithControl_MouseInputInitDefaults()
 {
     stdControlKeyInfo *v0; // edx
     uint32_t v1; // ecx
@@ -2071,7 +2050,7 @@ void sithControl_sub_4D7670()
 LABEL_17:
         ;
     }
-    while ( v3 || ++v0 < &sithControl_aInputFuncToKeyinfo[74] );
+    while ( v3 || ++v0 < &sithControl_aInputFuncToKeyinfo[INPUT_FUNC_MAX] );
 
     v10 = sithControl_MapAxisFunc(INPUT_FUNC_TURN, AXIS_MOUSE_X, 0xCu);
     if ( v10 )
@@ -2087,7 +2066,7 @@ LABEL_17:
     sithControl_DefaultHelper(INPUT_FUNC_FIRE2, KEY_MOUSE_B3, 2);
 }
 
-void sithControl_sub_4D7350()
+void sithControl_KeyboardInputInitDefaults()
 {
     stdControlKeyInfo *v0; // edx
     uint32_t v1; // eax
@@ -2114,7 +2093,7 @@ void sithControl_sub_4D7350()
             v9 = v0->aEntries;
             while ( !v3 )
             {
-                if ( (v4->flags & 1) == 0 && v4->dxKeyNum < JK_EXTENDED_KEY_START )
+                if ( (v4->flags & INPUT_MAPPING_FLAG_AXIS) == 0 && v4->dxKeyNum < JK_EXTENDED_KEY_START )
                 {
                     v5 = v1 - 1;
                     v6 = v2;
@@ -2146,7 +2125,7 @@ void sithControl_sub_4D7350()
 LABEL_13:
         ;
     }
-    while ( v3 || ++v0 < &sithControl_aInputFuncToKeyinfo[74] );
+    while ( v3 || ++v0 < &sithControl_aInputFuncToKeyinfo[INPUT_FUNC_MAX] );
     sithControl_MapDefaults();
 }
 
@@ -2191,7 +2170,8 @@ void sithControl_JoyInputInit()
             while ( !v3 )
             {
                 v5 = v4->dxKeyNum;
-                if ( (v4->flags & 1) == 0 && KEY_IS_JOY_BUTTON(v5) || (v4->flags & 1) != 0 && v5 >= 0 && v5 <= 11 )
+                if ( (v4->flags & INPUT_MAPPING_FLAG_AXIS) == 0 && KEY_IS_JOY_BUTTON(v5) 
+                    || (v4->flags & INPUT_MAPPING_FLAG_AXIS) != 0 && v5 >= AXIS_JOY1_X && v5 <= AXIS_JOY2_V )
                 {
                     v6 = v1 - 1;
                     v7 = v2;
@@ -2223,71 +2203,13 @@ void sithControl_JoyInputInit()
 LABEL_17:
         ;
     }
-    while ( v3 || ++v0 < &sithControl_aInputFuncToKeyinfo[74] );
-    sithControl_MapAxisFunc(INPUT_FUNC_FORWARD, AXIS_JOY1_Y, 4u);
-    sithControl_MapAxisFunc(INPUT_FUNC_TURN, AXIS_JOY1_X, 4u);
-    if ( (sithControl_inputFuncToControlType[10] & 1) != 0 && sithControl_aInputFuncToKeyinfo[10].numEntries != 8 )
-    {
-        sithControl_MapFuncToDxKey(INPUT_FUNC_SLIDE, KEY_JOY1_B1);
-        v10 = sithControl_aInputFuncToKeyinfo[10].numEntries + 1;
-        v11 = &sithControl_aInputFuncToKeyinfo[10].aEntries[sithControl_aInputFuncToKeyinfo[10].numEntries];
-        v11->flags = 2;
-        v11->dxKeyNum = KEY_JOY1_B1;
-        sithControl_aInputFuncToKeyinfo[10].numEntries = v10;
-    }
-    if ( (sithControl_inputFuncToControlType[11] & 1) != 0 && sithControl_aInputFuncToKeyinfo[11].numEntries != 8 )
-    {
-        sithControl_MapFuncToDxKey(INPUT_FUNC_SLIDE, KEY_JOY1_B2);
-        v12 = sithControl_aInputFuncToKeyinfo[11].numEntries + 1;
-        v13 = &sithControl_aInputFuncToKeyinfo[11].aEntries[sithControl_aInputFuncToKeyinfo[11].numEntries];
-        v13->flags = 2;
-        v13->dxKeyNum = KEY_JOY1_B2;
-        sithControl_aInputFuncToKeyinfo[11].numEntries = v12;
-    }
-    if ( (sithControl_inputFuncToControlType[12] & 1) != 0 && sithControl_aInputFuncToKeyinfo[12].numEntries != 8 )
-    {
-        sithControl_MapFuncToDxKey(INPUT_FUNC_SLIDE, KEY_JOY1_B3);
-        v14 = sithControl_aInputFuncToKeyinfo[12].numEntries + 1;
-        v15 = &sithControl_aInputFuncToKeyinfo[12].aEntries[sithControl_aInputFuncToKeyinfo[12].numEntries];
-        v15->flags = 2;
-        v15->dxKeyNum = KEY_JOY1_B3;
-        sithControl_aInputFuncToKeyinfo[12].numEntries = v14;
-    }
-    if ( (sithControl_inputFuncToControlType[4] & 1) != 0 && sithControl_aInputFuncToKeyinfo[4].numEntries != 8 )
-    {
-        sithControl_MapFuncToDxKey(INPUT_FUNC_SLIDE, KEY_JOY1_B4);
-        v16 = sithControl_aInputFuncToKeyinfo[4].numEntries + 1;
-        v17 = &sithControl_aInputFuncToKeyinfo[4].aEntries[sithControl_aInputFuncToKeyinfo[4].numEntries];
-        v17->flags = 2;
-        v17->dxKeyNum = KEY_JOY1_B4;
-        sithControl_aInputFuncToKeyinfo[4].numEntries = v16;
-    }
-    if ( (sithControl_inputFuncToControlType[8] & 1) != 0 )
-    {
-        if ( sithControl_aInputFuncToKeyinfo[8].numEntries != 8 )
-        {
-            sithControl_MapFuncToDxKey(INPUT_FUNC_SLIDE, KEY_JOY1_HUP);
-            v18 = sithControl_aInputFuncToKeyinfo[8].numEntries + 1;
-            v19 = &sithControl_aInputFuncToKeyinfo[8].aEntries[sithControl_aInputFuncToKeyinfo[8].numEntries];
-            v19->flags = 6;
-            v19->dxKeyNum = KEY_JOY1_HUP;
-            sithControl_aInputFuncToKeyinfo[8].numEntries = v18;
-        }
-        if ( (sithControl_inputFuncToControlType[8] & 1) != 0 && sithControl_aInputFuncToKeyinfo[8].numEntries != 8 )
-        {
-            sithControl_MapFuncToDxKey(INPUT_FUNC_SLIDE, KEY_JOY1_HDOWN);
-            v20 = sithControl_aInputFuncToKeyinfo[8].numEntries + 1;
-            v21 = &sithControl_aInputFuncToKeyinfo[8].aEntries[sithControl_aInputFuncToKeyinfo[8].numEntries];
-            v21->flags = 2;
-            v21->dxKeyNum = KEY_JOY1_HDOWN;
-            sithControl_aInputFuncToKeyinfo[8].numEntries = v20;
-        }
-    }
-    sithControl_MapFunc(INPUT_FUNC_SLIDE, KEY_JOY1_HLEFT, 4);
-    sithControl_MapFunc(INPUT_FUNC_SLIDE, KEY_JOY1_HRIGHT, 0);
-    sithControl_MapFunc(INPUT_FUNC_NEXTINV, KEY_JOY1_B5, 0);
-    sithControl_MapFunc(INPUT_FUNC_USEINV, KEY_JOY1_B7, 0);
+    while ( v3 || ++v0 < &sithControl_aInputFuncToKeyinfo[INPUT_FUNC_MAX] );
 
+    sithControl_MapDefaultsJoystick();
+}
+
+// Added
+void sithControl_MapDefaultsJoystick() {
 #if !defined(TARGET_TWL) && defined(QOL_IMPROVEMENTS)
     sithControl_MapAxisFunc(INPUT_FUNC_FORWARD, AXIS_JOY1_Y, 4u);
     if (Main_bMotsCompat) {
@@ -2299,7 +2221,7 @@ LABEL_17:
     sithControl_MapAxisFunc(INPUT_FUNC_PITCH, AXIS_JOY1_R, 4u);
     sithControl_MapAxisFunc(INPUT_FUNC_TURN, AXIS_JOY1_Z, 4u);
 
-    sithControl_DefaultHelper(INPUT_FUNC_FIRE1, KEY_JOY1_B1, 2); // a
+    sithControl_DefaultHelper(INPUT_FUNC_USELASTSELECTED, KEY_JOY1_B1, 2); // a
     sithControl_DefaultHelper(INPUT_FUNC_DUCK, KEY_JOY1_B2, 2); // b
     sithControl_DefaultHelper(INPUT_FUNC_ACTIVATE, KEY_JOY1_B3, 2); // x
     sithControl_MapFunc(INPUT_FUNC_JUMP, KEY_JOY1_B4, 0); // y
@@ -2317,5 +2239,42 @@ LABEL_17:
 
     sithControl_DefaultHelper(INPUT_FUNC_FIRE2, KEY_JOY1_B16, 2); // ltrig
     sithControl_DefaultHelper(INPUT_FUNC_FIRE1, KEY_JOY1_B17, 2); // rtrig
+#elif defined(TARGET_TWL)
+    sithControl_MapFunc(INPUT_FUNC_FORWARD, KEY_JOY1_HUP, 0);
+    sithControl_MapFunc(INPUT_FUNC_NEXTSKILL, KEY_JOY1_HDOWN, 0);
+    sithControl_MapFunc(INPUT_FUNC_TURN, KEY_JOY1_HLEFT, 0);
+    sithControl_MapFunc(INPUT_FUNC_TURN, KEY_JOY1_HRIGHT, 4);
+    sithControl_DefaultHelper(INPUT_FUNC_FIRE1, KEY_JOY1_B1, 2); // a
+    sithControl_DefaultHelper(INPUT_FUNC_DUCK, KEY_JOY1_B2, 0); // b
+    sithControl_DefaultHelper(INPUT_FUNC_ACTIVATE, KEY_JOY1_B3, 2); // x
+    sithControl_MapFunc(INPUT_FUNC_JUMP, KEY_JOY1_B4, 0); // y
+    sithControl_MapFunc(INPUT_FUNC_NEXTINV, KEY_JOY1_B10, 0); // L
+    sithControl_MapFunc(INPUT_FUNC_NEXTWEAPON, KEY_JOY1_B11, 0); // R
+    sithControl_MapFunc(INPUT_FUNC_USELASTSELECTED, KEY_JOY1_B7, 0);
+#else
+    sithControl_MapAxisFunc(INPUT_FUNC_FORWARD, AXIS_JOY1_Y, 4u);
+    sithControl_MapAxisFunc(INPUT_FUNC_TURN, AXIS_JOY1_X, 4u);
+
+    sithControl_DefaultHelper(INPUT_FUNC_FIRE1, KEY_JOY1_B1, 2);
+    sithControl_DefaultHelper(INPUT_FUNC_FIRE2, KEY_JOY1_B2, 2);
+    sithControl_DefaultHelper(INPUT_FUNC_ACTIVATE, KEY_JOY1_B3, 2);
+    sithControl_DefaultHelper(INPUT_FUNC_JUMP, KEY_JOY1_B4, 2);
+    sithControl_MapFunc(INPUT_FUNC_PITCH, KEY_JOY1_HUP, 4);
+    sithControl_MapFunc(INPUT_FUNC_PITCH, KEY_JOY1_HDOWN, 0);
+    sithControl_MapFunc(INPUT_FUNC_SLIDE, KEY_JOY1_HLEFT, 4);
+    sithControl_MapFunc(INPUT_FUNC_SLIDE, KEY_JOY1_HRIGHT, 0);
+    sithControl_MapFunc(INPUT_FUNC_NEXTINV, KEY_JOY1_B5, 0);
+    sithControl_MapFunc(INPUT_FUNC_USEINV, KEY_JOY1_B7, 0);
 #endif
 }
+
+// Common button for both items and force power usage for controllers
+#ifdef QOL_IMPROVEMENTS
+void sithControl_SetLastSelected(int which) {
+    sithControl_lastSelected = which;
+}
+
+int sithControl_GetLastSelected() {
+    return sithControl_lastSelected;
+}
+#endif // QOL_IMPROVEMENTS

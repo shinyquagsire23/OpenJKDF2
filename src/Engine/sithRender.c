@@ -609,8 +609,8 @@ void sithRender_Draw()
     char resetConsole[16];
     int consoleX, consoleY;
     consoleGetCursor(NULL, &consoleX, &consoleY);
-    snprintf(resetConsole, sizeof(resetConsole)-1, "\x1b[%d;%dH", consoleX, consoleY);
-    printf("\x1b[3;0H                               \rclp=%d lts=%d geo=%d thg=%d al=%d %d \n                        \n", testClipEnd - testClip, testLightsEnd - testLights, testLevelGeoEnd - testLevelGeo, testThingsEnd - testThings, testAlphaEnd - testAlpha, sithRender_numSectors);
+    snprintf(resetConsole, sizeof(resetConsole)-1, "\x1b[%d;%dH", consoleY, consoleX);
+    printf("\x1b[8;0H                               \rclp=%d lts=%d geo=%d thg=%d al=%d %d \n                        \n", testClipEnd - testClip, testLightsEnd - testLights, testLevelGeoEnd - testLevelGeo, testThingsEnd - testThings, testAlphaEnd - testAlpha, sithRender_numSectors);
     stdPlatform_Printf(resetConsole);
 #endif
 }

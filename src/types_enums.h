@@ -279,7 +279,7 @@ typedef enum
 #define JK_EXT_MOUSE_END        (KEY_MOUSE_B5 + JK_NUM_EXT_MOUSE_BUTTONS)
 
 #define KEY_IS_MOUSE(x) ((x >= KEY_MOUSE_B1 && x <= KEY_MOUSE_B4) || (x >= KEY_MOUSE_B5 && x < JK_EXT_MOUSE_END))
-#define KEY_IS_JOY_BUTTON(x) ((x >= KEY_JOY1_B1 && x < KEY_MOUSE_STARTIDX) || (x >= (KEY_JOY1_B9 - 1) && x < KEY_JOY2_EXT_ENDIDX))
+#define KEY_IS_JOY_BUTTON(x) ((x >= KEY_JOY1_B1 && x < KEY_MOUSE_STARTIDX) || (x >= KEY_JOY1_B9 && x < KEY_JOY2_EXT_ENDIDX))
 #define KEY_IS_BUTTON(x) (KEY_IS_JOY_BUTTON(x) || x < JK_EXTENDED_KEY_START)
 
 // QOL added:
@@ -354,6 +354,11 @@ typedef enum
 #define AXIS_MOUSE_X         ((JK_JOYSTICK_AXIS_STRIDE * 2) + 0) // c 12
 #define AXIS_MOUSE_Y         ((JK_JOYSTICK_AXIS_STRIDE * 2) + 1) // d 13
 #define AXIS_MOUSE_Z         ((JK_JOYSTICK_AXIS_STRIDE * 2) + 2) // e 14
+
+#define INPUT_MAPPING_FLAG_AXIS             (1)
+#define INPUT_MAPPING_FLAG_DXKEY            (2)
+#define INPUT_MAPPING_FLAG_AXIS_REVERSED    (4)
+#define INPUT_MAPPING_FLAG_RAW_AXIS         (8)
 
 // g_debugmodeFlags defines
 #define DEBUGFLAG_NO_AIEVENTS          (0x1)
@@ -736,7 +741,20 @@ enum INPUT_FUNC
     INPUT_FUNC_ACTIVATE29 = 71,
     INPUT_FUNC_ACTIVATE30 = 72,
     INPUT_FUNC_ACTIVATE31 = 73,
+
+#ifdef QOL_IMPROVEMENTS
+    INPUT_FUNC_USELASTSELECTED = 74,
+    INPUT_FUNC_MAX = 75,
+#else
     INPUT_FUNC_MAX = 74,
+#endif
+
+};
+
+enum SithLastSelected_e {
+    LAST_SELECTED_SKILL = 0,
+    LAST_SELECTED_ITEM = 1,
+    LAST_SELECTED_MAX = 2,
 };
 
 enum SITHSOUNDFLAG

@@ -505,7 +505,7 @@ int jkGuiKeyboard_RestoreDefaultsClicked(jkGuiElement *pElement, jkGuiMenu *pMen
     v3 = jkStrings_GetUniStringWithFallback("GUI_RESTORE_DEFAULTS");
     if ( jkGuiDialog_YesNoDialog(v3, v4) )
     {
-        sithControl_sub_4D7350();
+        sithControl_KeyboardInputInitDefaults();
         jkHudInv_InputInit();
     }
     jkGuiKeyboard_sub_411F40(&jkGuiKeyboard_aElements[12], &jkGuiKeyboard_darrEntries);

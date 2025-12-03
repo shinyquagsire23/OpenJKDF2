@@ -768,8 +768,8 @@ void stdControl_ReadControls()
         stdControl_SetKeydown(KEY_JOY1_B2, !!(keys_held & KEY_B) /* button val */, stdControl_curReadTime);
         stdControl_SetKeydown(KEY_JOY1_B3, !!(keys_held & KEY_X) /* button val */, stdControl_curReadTime);
         stdControl_SetKeydown(KEY_JOY1_B4, !!(keys_held & KEY_Y) /* button val */, stdControl_curReadTime);
-        stdControl_SetKeydown(KEY_JOY1_B5, !!(keys_held & KEY_L) /* button val */, stdControl_curReadTime);
-        stdControl_SetKeydown(KEY_JOY1_B6, !!(keys_held & KEY_R) /* button val */, stdControl_curReadTime);
+        stdControl_SetKeydown(KEY_JOY1_B10, !!(keys_held & KEY_L) /* button val */, stdControl_curReadTime);
+        stdControl_SetKeydown(KEY_JOY1_B11, !!(keys_held & KEY_R) /* button val */, stdControl_curReadTime);
         stdControl_SetKeydown(KEY_JOY1_B7, !!(keys_held & KEY_SELECT) /* button val */, stdControl_curReadTime);
         //stdControl_SetKeydown(KEY_JOY1_B8, !!(keys_held & KEY_START) /* button val */, stdControl_curReadTime);
 
@@ -803,9 +803,11 @@ void stdControl_ReadControls()
             int sampleTime_roundtrip = stdPlatform_GetTimeMsec() - sampleTime_last;
             //stdPlatform_Printf("total %u heap 0x%x 0x%x\n", sampleTime_roundtrip, (intptr_t)getHeapLimit() - (intptr_t)getHeapEnd(), (intptr_t)getHeapEnd() - (intptr_t)getHeapStart());
         }
-        if (keysPressed & KEY_SELECT) {
+//#ifdef DEBUG_QOL_CHEATS
+        if ((keysPressed & (KEY_X)) && (keys_held & KEY_SELECT)) {
             jkDev_CmdNoclip(NULL, NULL);
         }
+//#endif
         sampleTime_last = stdPlatform_GetTimeMsec();
     }
 

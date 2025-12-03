@@ -328,6 +328,32 @@ void jkDev_BlitLogToScreenGPU()
     jkDev_dword_55A9D0 = (jkDev_dword_55A9D0 + 1) % 2;
 }
 
+// For DSi
+void jkDev_PrintfLog()
+{
+    int v1; // ebx
+    int v2; // ebp
+    jkDevLogEnt* v3; // edi
+    char tmp[256];
+    
+    v2 = 0;
+    v3 = &jkDev_aEntries[0];
+    for (int i = 0; i < 5; i++)
+    {
+        if ( v2 < jkDev_log_55A4A4 /*&& v3->bDrawEntry*/ )
+        {
+            stdString_WcharToChar(tmp, v3->text, 255);
+            tmp[255] = 0;
+            stdPlatform_Printf("%s\n", tmp);
+        }
+        //if ( v3->bDrawEntry > 0 )
+        //    --v3->bDrawEntry;
+        ++v3;
+        ++v2;
+    }
+    jkDev_dword_55A9D0 = (jkDev_dword_55A9D0 + 1) % 2;
+}
+
 // MOTS altered? inlined?
 int jkDev_PrintUniString(const wchar_t *str)
 {

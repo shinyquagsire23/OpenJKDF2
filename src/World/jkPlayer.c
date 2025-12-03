@@ -33,6 +33,13 @@
 #include "Platform/std3D.h"
 #include "Main/sithCvar.h"
 
+// DSi has *plenty* of time to read the text.
+#ifdef TARGET_TWL
+#define FAST_MISSION_TEXT_DEFAULT (1)
+#else
+#define FAST_MISSION_TEXT_DEFAULT (0)
+#endif
+
 // DO NOT FORGET TO ADD TO jkPlayer_ResetVars()
 #ifdef QOL_IMPROVEMENTS
 int Window_isHiDpi_tmp = 0;
@@ -50,7 +57,7 @@ flex_t jkPlayer_gamma = 1.0;
 int jkPlayer_bEnableJkgm = 1;
 int jkPlayer_bEnableTexturePrecache = 1;
 int jkPlayer_bKeepCorpses = 0;
-int jkPlayer_bFastMissionText = 0;
+int jkPlayer_bFastMissionText = FAST_MISSION_TEXT_DEFAULT;
 int jkPlayer_bUseOldPlayerPhysics = 0;
 flex_t jkPlayer_hudScale = 2.0;
 flex_t jkPlayer_crosshairLineWidth = 1.0;
@@ -174,7 +181,7 @@ void jkPlayer_StartupVars()
     sithCvar_RegisterBool("r_bEnableJkgm",              1,                          &jkPlayer_bEnableJkgm,              CVARFLAG_LOCAL|CVARFLAG_READONLY);
     sithCvar_RegisterBool("r_bEnableTexturePrecache",   1,                          &jkPlayer_bEnableTexturePrecache,   CVARFLAG_LOCAL|CVARFLAG_READONLY);
     sithCvar_RegisterBool("g_bKeepCorpses",             0,                          &jkPlayer_bKeepCorpses,             CVARFLAG_LOCAL);
-    sithCvar_RegisterBool("menu_bFastMissionText",      0,                          &jkPlayer_bFastMissionText,         CVARFLAG_LOCAL);
+    sithCvar_RegisterBool("menu_bFastMissionText",      FAST_MISSION_TEXT_DEFAULT,  &jkPlayer_bFastMissionText,         CVARFLAG_LOCAL);
     sithCvar_RegisterBool("g_bUseOldPlayerPhysics",     0,                          &jkPlayer_bUseOldPlayerPhysics,     CVARFLAG_LOCAL);
     sithCvar_RegisterFlex("hud_scale",                  2.0,                        &jkPlayer_hudScale,                 CVARFLAG_LOCAL|CVARFLAG_RESETHUD);
     sithCvar_RegisterFlex("hud_crosshairLineWidth",     1.0,                        &jkPlayer_crosshairLineWidth,       CVARFLAG_LOCAL|CVARFLAG_RESETHUD);

@@ -12,6 +12,7 @@
 #include "Dss/sithDSSThing.h"
 #include "Main/Main.h"
 #include "General/stdString.h"
+#include "Main/jkDev.h"
 
 // MOTS added
 static int sithInventory_008d60f8;
@@ -249,6 +250,11 @@ void sithInventory_SelectItem(sithThing *thing, int binIdx)
     }
 
     thing->actorParams.playerinfo->curItem = binIdx;
+
+    // For some reason items don't print out like force powers, ugh
+#ifdef TARGET_TWL
+    jkDev_DebugLog(sithInventory_aDescriptors[binIdx].fpath);
+#endif
 }
 
 void sithInventory_SelectItemPrior(sithThing *thing)
@@ -1106,7 +1112,11 @@ int sithInventory_HandleInvSkillKeys(sithThing *player, flex_t deltaSecs)
     }
     else
     {
-        if ( sithControl_ReadFunctionMap(INPUT_FUNC_USEINV, &keyRead) )
+        if ( sithControl_ReadFunctionMap(INPUT_FUNC_USEINV, &keyRead) 
+#ifdef QOL_IMPROVEMENTS
+            || sithControl_ReadFunctionMap(INPUT_FUNC_USELASTSELECTED, &keyRead) && sithControl_GetLastSelected() == LAST_SELECTED_ITEM
+#endif // QOL_IMPROVEMENTS
+            )
         {
             if ( !sithInventory_bUnk )
             {
@@ -1153,7 +1163,11 @@ int sithInventory_HandleInvSkillKeys(sithThing *player, flex_t deltaSecs)
             }
         }
 
-        if ( sithControl_ReadFunctionMap(INPUT_FUNC_USESKILL, &keyRead) )
+        if ( sithControl_ReadFunctionMap(INPUT_FUNC_USESKILL, &keyRead) 
+#ifdef QOL_IMPROVEMENTS
+            || sithControl_ReadFunctionMap(INPUT_FUNC_USELASTSELECTED, &keyRead) && sithControl_GetLastSelected() == LAST_SELECTED_SKILL
+#endif // QOL_IMPROVEMENTS
+            )
         {
             if ( !sithInventory_bUnkPower )
             {
@@ -1305,9 +1319,15 @@ skip_cog:
             ++v40;
         }
         while ( (intptr_t)v20 < (intptr_t)&sithInventory_powerKeybinds[20].idk );
+
         sithControl_ReadFunctionMap(INPUT_FUNC_NEXTINV, &keyRead);
         while (keyRead--)
         {
+#ifdef QOL_IMPROVEMENTS
+            // Common button for both items and force power usage for controllers
+            sithControl_SetLastSelected(LAST_SELECTED_ITEM);
+#endif // QOL_IMPROVEMENTS
+
             if (sithThing_MotsTick(10,1,1.0))
             {
                 v34 = sithInventory_GetNumBinsWithFlag(v1, v1->actorParams.playerinfo->curItem, 2);
@@ -1317,10 +1337,15 @@ skip_cog:
                 sithInventory_8339EC = 0;
             }
         }
-        sithControl_ReadFunctionMap(INPUT_FUNC_PREVINV, &keyRead);
 
+        sithControl_ReadFunctionMap(INPUT_FUNC_PREVINV, &keyRead);
         while (keyRead--)
         {
+#ifdef QOL_IMPROVEMENTS
+            // Common button for both items and force power usage for controllers
+            sithControl_SetLastSelected(LAST_SELECTED_ITEM);
+#endif // QOL_IMPROVEMENTS
+
             v35 = v1->actorParams.playerinfo->curItem;
             v36 = v35 - 1;
             if ( v35 - 1 < 0 )
@@ -1358,10 +1383,14 @@ LABEL_108:
             sithInventory_8339EC = 0;
             sithInventory_bRendIsHidden = 1;
         }
-        sithControl_ReadFunctionMap(INPUT_FUNC_NEXTSKILL, &keyRead);
 
+        sithControl_ReadFunctionMap(INPUT_FUNC_NEXTSKILL, &keyRead);
         while (keyRead--)
         {
+#ifdef QOL_IMPROVEMENTS
+            // Common button for both items and force power usage for controllers
+            sithControl_SetLastSelected(LAST_SELECTED_SKILL);
+#endif // QOL_IMPROVEMENTS
             if (sithThing_MotsTick(11, 1, 1.0)) {
                 sithInventory_SelectPowerPrior(v1);
                 sithInventory_8339F4 = 1;
@@ -1369,10 +1398,14 @@ LABEL_108:
                 sithInventory_8339EC = 0;
             }
         }
-        sithControl_ReadFunctionMap(INPUT_FUNC_PREVSKILL, &keyRead);
 
+        sithControl_ReadFunctionMap(INPUT_FUNC_PREVSKILL, &keyRead);
         while (keyRead--)
         {
+#ifdef QOL_IMPROVEMENTS
+            // Common button for both items and force power usage for controllers
+            sithControl_SetLastSelected(LAST_SELECTED_SKILL);
+#endif // QOL_IMPROVEMENTS
             if (sithThing_MotsTick(11, 1, -1.0)) {
                 sithInventory_SelectPowerFollowing(v1);
                 sithInventory_8339F4 = 1;

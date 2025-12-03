@@ -95,6 +95,62 @@ MSGS 100          # <--- DON'T FORGET TO UPDATE THIS COUNT
 #******************************
 #  Controls
 #******************************
+   "KEY_JOY1_B9"                                0 "Joy 1 Button 9"
+   "KEY_JOY1_B10"                               0 "Joy 1 Button 10"
+   "KEY_JOY1_B11"                               0 "Joy 1 Button 11"
+   "KEY_JOY1_B12"                               0 "Joy 1 Button 12"
+   "KEY_JOY1_B13"                               0 "Joy 1 Button 13"
+   "KEY_JOY1_B14"                               0 "Joy 1 Button 14"
+   "KEY_JOY1_B15"                               0 "Joy 1 Button 15"
+   "KEY_JOY1_B16"                               0 "Joy 1 Button 16"
+   "KEY_JOY1_B17"                               0 "Joy 1 Button 17"
+   "KEY_JOY1_B18"                               0 "Joy 1 Button 18"
+   "KEY_JOY1_B19"                               0 "Joy 1 Button 19"
+   "KEY_JOY1_B20"                               0 "Joy 1 Button 20"
+   "KEY_JOY1_B21"                               0 "Joy 1 Button 21"
+   "KEY_JOY1_B22"                               0 "Joy 1 Button 22"
+   "KEY_JOY1_B23"                               0 "Joy 1 Button 23"
+   "KEY_JOY1_B24"                               0 "Joy 1 Button 24"
+   "KEY_JOY1_B25"                               0 "Joy 1 Button 25"
+   "KEY_JOY1_B26"                               0 "Joy 1 Button 26"
+   "KEY_JOY1_B27"                               0 "Joy 1 Button 27"
+
+   "KEY_JOY2_B9"                                0 "Joy 2 Button 9"
+   "KEY_JOY2_B10"                               0 "Joy 2 Button 10"
+   "KEY_JOY2_B11"                               0 "Joy 2 Button 11"
+   "KEY_JOY2_B12"                               0 "Joy 2 Button 12"
+   "KEY_JOY2_B13"                               0 "Joy 2 Button 13"
+   "KEY_JOY2_B14"                               0 "Joy 2 Button 14"
+   "KEY_JOY2_B15"                               0 "Joy 2 Button 15"
+   "KEY_JOY2_B16"                               0 "Joy 2 Button 16"
+   "KEY_JOY2_B17"                               0 "Joy 2 Button 17"
+   "KEY_JOY2_B18"                               0 "Joy 2 Button 18"
+   "KEY_JOY2_B19"                               0 "Joy 2 Button 19"
+   "KEY_JOY2_B20"                               0 "Joy 2 Button 20"
+   "KEY_JOY2_B21"                               0 "Joy 2 Button 21"
+   "KEY_JOY2_B22"                               0 "Joy 2 Button 22"
+   "KEY_JOY2_B23"                               0 "Joy 2 Button 23"
+   "KEY_JOY2_B24"                               0 "Joy 2 Button 24"
+   "KEY_JOY2_B25"                               0 "Joy 2 Button 25"
+   "KEY_JOY2_B26"                               0 "Joy 2 Button 26"
+   "KEY_JOY2_B27"                               0 "Joy 2 Button 27"
+
    "KEY_MOUSE_B5"                               0 "Mouse Button 5"
+   "KEY_MOUSE_B6"                               0 "Mouse Button 6"
+   "KEY_MOUSE_B7"                               0 "Mouse Button 7"
+   "KEY_MOUSE_B8"                               0 "Mouse Button 8"
+
+#******************************
+#  Control Setup strings
+#******************************/
+
+   ### Names for the control functions (actions).
+   ### They match the names returned in sithControl_EnumBindings() and
+   ### CONTROL_FUNCTION_NAMES in sithControl.h
+   "GAMERESTORE"     0 "Game Restore"
+   "GAMERECORD"      0 "Game Record"
+   "DEBUG"           0 "Debug"
+   "USELASTSELECTED" 0 "Use Selected Skill/Item"
+
 
 END
