@@ -539,6 +539,15 @@ int jkGuiForce_Show(int bCanSpendStars, int isMulti, int a4, wchar_t* a5, int *p
     jkGuiForce_pElements[EIDX_RESET].bIsVisible = bCanSpendStars;
     jkGuiForce_pElements[EIDX_QUIT].bIsVisible = bEnableIdk != 0;
 
+#ifdef QOL_IMPROVEMENTS
+    if (!bEnableIdk && !bCanSpendStars) {
+        jkGuiRend_MenuSetReturnKeyShortcutElement(jkGuiForce_pMenu, &jkGuiForce_pElements[EIDX_OK_BUTTON]);
+        jkGuiRend_MenuSetEscapeKeyShortcutElement(jkGuiForce_pMenu, &jkGuiForce_pElements[EIDX_OK_BUTTON]);
+        jkGuiForce_pMenu->focusedElement = &jkGuiForce_pElements[EIDX_OK_BUTTON];
+        jkGuiForce_pMenu->lastMouseOverClickable = &jkGuiForce_pElements[EIDX_OK_BUTTON];
+    }
+#endif // QOL_IMPROVEMENTS
+
     flex_t darklight_float = jkPlayer_CalcAlignment(jkGuiForce_isMulti);
     if (Main_bMotsCompat) {
         if (!isMulti || jkPlayer_personality == 1) {

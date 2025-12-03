@@ -2898,6 +2898,7 @@ void jkGuiRend_UpdateController()
     if (jkGuiRend_activeMenu && jkGuiRend_activeMenu->lastMouseOverClickable && jkGuiRend_activeMenu->lastMouseOverClickable->type == ELEMENT_TEXTBOX) {
         keyboardShowedLastUpdate = 1;
         stdControl_ShowSystemKeyboard();
+        jkGuiRend_WindowHandler(0, WM_KEYFIRST, VK_END, 0, 0);
     }
     else if (keyboardShowedLastUpdate) {
         stdControl_HideSystemKeyboard();

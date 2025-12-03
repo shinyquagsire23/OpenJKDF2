@@ -730,6 +730,18 @@ void Window_SdlUpdate()
 
     while (SDL_PollEvent(&event))
     {
+        int bIsOdin = 0;
+        int bIsGamepad = 0;
+
+        if (event.type == SDL_JOYBUTTONDOWN || event.type == SDL_JOYBUTTONUP) {
+            const char* name = SDL_JoystickNameForIndex(event.jbutton.which);
+            bIsOdin = name && strcmp(name, "Odin Controller") == 0;
+            bIsGamepad = SDL_IsGameController(event.jbutton.which);
+        }
+        if (event.type == SDL_CONTROLLERBUTTONDOWN || event.type == SDL_CONTROLLERBUTTONUP) {
+            bIsGamepad = 1;
+        }
+
         switch (event.type)
         {
             case SDL_JOYDEVICEADDED: {
@@ -752,6 +764,7 @@ void Window_SdlUpdate()
                 Window_HandleWindowEvent(&event);
                 break;
             case SDL_KEYDOWN:
+                stdPlatform_Printf("scancode %d\n", event.key.keysym.scancode);
                 //handleKey(&event.key.keysym, WM_KEYDOWN, 0x1);
                 if (event.key.keysym.sym == SDLK_ESCAPE)
                 {
@@ -830,6 +843,10 @@ void Window_SdlUpdate()
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_OEM_3, event.key.repeat & 0xFFFF);
                 }
+                else if (event.key.keysym.scancode == SDL_SCANCODE_AC_BACK) {
+                    Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_ESCAPE, 0);
+                    Window_msg_main_handler(g_hWnd, WM_CHAR, VK_ESCAPE, event.key.repeat & 0xFFFF);
+                }
 
                 //if (!event.key.repeat)
                 //    stdControl_SetSDLKeydown(event.key.keysym.scancode, 1, event.key.timestamp);
@@ -903,6 +920,9 @@ void Window_SdlUpdate()
                 {
                     Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_OEM_3, 0);
                 }
+                else if (event.key.keysym.scancode == SDL_SCANCODE_AC_BACK) {
+                    Window_msg_main_handler(g_hWnd, WM_KEYUP, VK_ESCAPE, 0);
+                }
                 //handleKey(&event.key.keysym, WM_KEYUP, 0xc0000001);
 
                 if (jkQuakeConsole_bOpen) break; // Hijack all input to console
@@ -974,19 +994,66 @@ void Window_SdlUpdate()
             // HACK: Escape key for controllers
             case SDL_JOYBUTTONDOWN:
             case SDL_JOYBUTTONUP:
-                //stdPlatform_Printf("button %d, %d\n", event.jbutton.button, event.jbutton.state);
-                if (event.jbutton.button == 6 || event.jbutton.button == 4) {
+                if (!bIsGamepad) {
+                    stdPlatform_Printf("button %d, %d\n", event.jbutton.button, event.jbutton.state);
+                }
+                if (bIsOdin && !bIsGamepad && (event.jbutton.button == 6 || event.jbutton.button == 4)) {
                     stdControl_bControllerEscapeKey = (event.jbutton.state == SDL_PRESSED);
                 }
-                else if (event.jbutton.button == 2) {
-                    
+                else if (!bIsGamepad && jkCutscene_isRendering && event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == 3) { // y
+                    Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_SPACE, event.key.repeat & 0xFFFF);
+                    Window_msg_main_handler(g_hWnd, WM_CHAR, VK_SPACE, event.key.repeat & 0xFFFF);
+                }
+                else if (!bIsGamepad && jkCutscene_isRendering  && event.type == SDL_JOYBUTTONDOWN&& event.jbutton.button == 2) { // x
+                    Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_SPACE, event.key.repeat & 0xFFFF);
+                    Window_msg_main_handler(g_hWnd, WM_CHAR, VK_SPACE, event.key.repeat & 0xFFFF);
+                }
+                else if (!bIsGamepad && jkCutscene_isRendering && event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == 1) { // b
+                    Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_ESCAPE, event.key.repeat & 0xFFFF);
+                    Window_msg_main_handler(g_hWnd, WM_CHAR, VK_ESCAPE, event.key.repeat & 0xFFFF);
+                }
+                else if (!bIsGamepad && jkCutscene_isRendering && event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == 0) { // a
+                    Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_ESCAPE, event.key.repeat & 0xFFFF);
+                    Window_msg_main_handler(g_hWnd, WM_CHAR, VK_ESCAPE, event.key.repeat & 0xFFFF);
                 }
                 break;
+
             case SDL_JOYAXISMOTION:
                 if (event.jaxis.which == 0) {
                     //stdPlatform_Printf("axis %d, %d\n", event.jaxis.axis, event.jaxis.value);
                 }
                 break;
+
+            case SDL_CONTROLLERBUTTONDOWN:
+            case SDL_CONTROLLERBUTTONUP:
+                if (bIsGamepad) {
+                    stdPlatform_Printf("gpad button %d, %d\n", event.cbutton.button, event.cbutton.state);
+                    if (event.cbutton.button == SDL_CONTROLLER_BUTTON_START || event.cbutton.button == SDL_CONTROLLER_BUTTON_BACK) {
+                        stdControl_bControllerEscapeKey = (event.cbutton.state == SDL_PRESSED);
+                    }
+                    else if (jkCutscene_isRendering && event.type == SDL_CONTROLLERBUTTONDOWN && event.cbutton.button == SDL_CONTROLLER_BUTTON_Y) { // y
+                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_SPACE, event.key.repeat & 0xFFFF);
+                        Window_msg_main_handler(g_hWnd, WM_CHAR, VK_SPACE, event.key.repeat & 0xFFFF);
+                    }
+                    else if (jkCutscene_isRendering  && event.type == SDL_CONTROLLERBUTTONDOWN && event.cbutton.button == SDL_CONTROLLER_BUTTON_X) { // x
+                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_SPACE, event.key.repeat & 0xFFFF);
+                        Window_msg_main_handler(g_hWnd, WM_CHAR, VK_SPACE, event.key.repeat & 0xFFFF);
+                    }
+                    else if (jkCutscene_isRendering && event.type == SDL_CONTROLLERBUTTONDOWN && event.cbutton.button == SDL_CONTROLLER_BUTTON_B) { // b
+                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_ESCAPE, event.key.repeat & 0xFFFF);
+                        Window_msg_main_handler(g_hWnd, WM_CHAR, VK_ESCAPE, event.key.repeat & 0xFFFF);
+                    }
+                    else if (jkCutscene_isRendering && event.type == SDL_CONTROLLERBUTTONDOWN && event.cbutton.button == SDL_CONTROLLER_BUTTON_A) { // a
+                        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_ESCAPE, event.key.repeat & 0xFFFF);
+                        Window_msg_main_handler(g_hWnd, WM_CHAR, VK_ESCAPE, event.key.repeat & 0xFFFF);
+                    }
+                }
+                break;
+            case SDL_CONTROLLERAXISMOTION:
+                //stdPlatform_Printf("Controller %d Axis %d moved to %d\n", 
+                //       event.caxis.which, event.caxis.axis, event.caxis.value);
+                break;
+
             case SDL_QUIT:
                 stdPlatform_Printf("Quit!\n");
 
@@ -1305,7 +1372,7 @@ int Window_Main_Linux(int argc, char** argv)
     SDL_SetHint(SDL_HINT_AUDIODRIVER, "aaudio"); // This is fine for music tbh
 #endif
 
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_NOPARACHUTE);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_NOPARACHUTE | SDL_INIT_GAMECONTROLLER);
 
 #if defined(MACOS)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);

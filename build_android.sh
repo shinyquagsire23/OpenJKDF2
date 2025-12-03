@@ -16,7 +16,7 @@ OPENJKDF2_BUILD_DIR=$(pwd)
 # Prevent macOS headers from getting linked in
 export -n SDKROOT MACOSX_DEPLOYMENT_TARGET CPLUS_INCLUDE_PATH C_INCLUDE_PATH
 
-cmake .. --toolchain $(pwd)/../cmake_modules/toolchain_android_aarch64.cmake
+(cmake .. --toolchain $(pwd)/../cmake_modules/toolchain_android_aarch64.cmake || cmake .. --toolchain $(pwd)/../cmake_modules/toolchain_android_aarch64.cmake)
 if [ $? -ne 0 ]; then
     exit -1
 fi

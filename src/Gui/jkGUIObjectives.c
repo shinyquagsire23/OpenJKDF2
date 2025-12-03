@@ -55,13 +55,17 @@ void jkGuiObjectives_CustomRender(jkGuiElement *element, jkGuiMenu *menu, stdVBu
                 int font_idx = (uint8_t)((goal_flags & GOAL_SECRET) | 0x10) >> 1;
                 stdFont_Draw2(vbuf, menu->fonts[font_idx], drawRect.x, drawRect.y, &drawRect, pTextEnt->str, 1);
                 int font_height_2 = stdFont_sub_4357C0(menu->fonts[font_idx], pTextEnt->str, &drawRect);
-                stdDisplay_VBufferCopy(
-                    vbuf,
-                    jkGui_stdBitmaps[JKGUI_BM_OBJECTIVESCHECK]->mipSurfaces[(uint8_t)(goal_flags & GOAL_COMPLETE) >> 1],
-                    element->rect.x,
-                    drawRect.y + ((unsigned int)(font_height_2 - (*jkGui_stdBitmaps[JKGUI_BM_OBJECTIVESCHECK]->mipSurfaces)->format.height) >> 1),
-                    0,
-                    1);
+
+                // Added: nullptr checks
+                if (jkGui_stdBitmaps[JKGUI_BM_OBJECTIVESCHECK] && jkGui_stdBitmaps[JKGUI_BM_OBJECTIVESCHECK]->mipSurfaces && *jkGui_stdBitmaps[JKGUI_BM_OBJECTIVESCHECK]->mipSurfaces) {
+                    stdDisplay_VBufferCopy(
+                        vbuf,
+                        jkGui_stdBitmaps[JKGUI_BM_OBJECTIVESCHECK]->mipSurfaces[(uint8_t)(goal_flags & GOAL_COMPLETE) >> 1],
+                        element->rect.x,
+                        drawRect.y + ((unsigned int)(font_height_2 - (*jkGui_stdBitmaps[JKGUI_BM_OBJECTIVESCHECK]->mipSurfaces)->format.height) >> 1),
+                        0,
+                        1);
+                }
                 font_height = stdFont_GetHeight(menu->fonts[element->textType]) + font_height_2;
                 drawRect.y += font_height;
             }
@@ -87,6 +91,13 @@ int jkGuiObjectives_Show()
     wchar_t *v9; // [esp-4h] [ebp-90h]
     wchar_t v10[32]; // [esp+Ch] [ebp-80h] BYREF
     char key[64]; // [esp+4Ch] [ebp-40h] BYREF
+
+#ifdef QOL_IMPROVEMENTS
+    jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiObjectives_menu, &jkGuiObjectives_elements[4]);
+    jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiObjectives_menu, &jkGuiObjectives_elements[4]);
+    jkGuiObjectives_menu.focusedElement = &jkGuiObjectives_elements[4];
+    jkGuiObjectives_menu.lastMouseOverClickable = &jkGuiObjectives_elements[4];
+#endif // QOL_IMPROVEMENTS
 
     _memset(jkGuiObjectives_aTexts, 0, sizeof(jkGuiObjectives_aTexts));
     v0 = (__int64)sithInventory_GetBinAmount(sithPlayer_pLocalPlayerThing, 99);

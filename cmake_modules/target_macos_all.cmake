@@ -40,6 +40,10 @@ macro(postcompile_macos)
         COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/zlib/*/*/libz.1.dylib ${BUNDLE}/Contents/MacOS
         COMMAND install_name_tool -change libz.1.dylib @executable_path/libz.1.dylib ${BUNDLE}/Contents/MacOS/${BIN_NAME}
 
+        # openal
+        COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/openal/*/libopenal.1.dylib ${BUNDLE}/Contents/MacOS
+        COMMAND install_name_tool -change libopenal.1.dylib @executable_path/libopenal.1.dylib ${BUNDLE}/Contents/MacOS/${BIN_NAME}
+
         COMMAND install_name_tool -change ${OPENSSL_CRYPTO_LIBRARY} @executable_path/libcrypto.dylib ${BUNDLE}/Contents/MacOS/libGameNetworkingSockets.dylib
         COMMAND install_name_tool -change ${OPENSSL_CRYPTO_LIBRARY} @executable_path/libcrypto.dylib ${BUNDLE}/Contents/MacOS/${BIN_NAME}
         COMMAND install_name_tool -change ${HOMEBREW_PREFIX}/opt/openssl@3/lib/libcrypto.3.dylib @executable_path/libcrypto.dylib ${BUNDLE}/Contents/MacOS/libGameNetworkingSockets.dylib

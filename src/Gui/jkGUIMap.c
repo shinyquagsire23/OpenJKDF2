@@ -281,10 +281,22 @@ int jkGuiMap_Show()
     v3.height = (int)(320*0.4);
 #endif
 
+#ifdef QOL_IMPROVEMENTS
+    jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiMap_menu, &jkGuiMap_aElements[14]);
+    jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiMap_menu, &jkGuiMap_aElements[14]);
+    jkGuiMap_menu.focusedElement = &jkGuiMap_aElements[2];
+    jkGuiMap_menu.lastMouseOverClickable = &jkGuiMap_aElements[2];
+#endif // QOL_IMPROVEMENTS
+
     jkGuiMap_pVbuffer = stdDisplay_VBufferNew(&v3, 0, 0, 0);
     stdDisplay_VBufferFill(jkGuiMap_pVbuffer, 0, 0);
     if ( rdOpen(0) )
     {
+        // HACK: Use the clipping calc instead of no-op for DSi
+#ifdef TARGET_TWL
+        extern int rdCamera_bForceRealProj;
+        rdCamera_bForceRealProj = 1;
+#endif
         jkGuiMap_pCanvas = rdCanvas_New(1, jkGuiMap_pVbuffer, 0, 0, 0, v3.width-1, v3.height-1, 6);
         jkGuiMap_pCamera = rdCamera_New(90.0, 1.0, 0.2, 10.0, 1.0);
         rdCamera_SetCanvas(jkGuiMap_pCamera, jkGuiMap_pCanvas);
@@ -306,6 +318,9 @@ int jkGuiMap_Show()
         rdMatrix_BuildTranslate34(&jkGuiMap_matTmp, &a2);
         rdVector_Zero3(&jkGuiMap_vec3Idk2);
         rdVector_Zero3(&jkGuiMap_vec3Idk);
+#ifdef TARGET_TWL
+        rdCamera_SetProjectType(jkGuiMap_pCamera, rdCameraProjectType_Perspective);
+#endif
         rdCamera_SetCurrent(jkGuiMap_pCamera);
         rdCamera_Update(&jkGuiMap_viewMat);
         jkGuiMap_bOrbitActive = 0;
@@ -318,5 +333,12 @@ int jkGuiMap_Show()
     stdDisplay_VBufferFree(jkGuiMap_pVbuffer);
     result = v0;
     jkGuiMap_dword_556660 = 0;
+
+    // HACK: Use the clipping calc instead of no-op for DSi
+#ifdef TARGET_TWL
+    extern int rdCamera_bForceRealProj;
+    rdCamera_bForceRealProj = 0;
+#endif
+
     return result;
 }

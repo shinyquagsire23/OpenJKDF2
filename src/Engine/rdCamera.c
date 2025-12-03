@@ -12,6 +12,10 @@
 static rdVector3 rdCamera_camRotation;
 static flex_t rdCamera_mipmapScalar = 1.0; // MOTS added
 
+#ifdef TARGET_TWL
+int rdCamera_bForceRealProj = 0;
+#endif
+
 rdCamera* rdCamera_New(flex_t fov, flex_t x, flex_t y, flex_t z, flex_t aspectRatio)
 {
     rdCamera* out = (rdCamera *)rdroid_pHS->alloc(sizeof(rdCamera));
@@ -163,7 +167,11 @@ int rdCamera_SetProjectType(rdCamera *camera, int type)
                 camera->fnProject = rdCamera_PerspProjectSquare;
                 camera->fnProjectLst = rdCamera_PerspProjectSquareLst;
 #ifdef TARGET_TWL
-                camera->fnProjectLstClip = rdCamera_PerspProjectSquareLst;
+                camera->fnProjectLstClip = rdCamera_PerspProjectLstClip;
+                if (rdCamera_bForceRealProj) {
+                    camera->fnProject = rdCamera_PerspProjectClip;
+                    camera->fnProjectLst = rdCamera_PerspProjectLstClip;
+                }
 #endif
             }
             else
@@ -172,6 +180,10 @@ int rdCamera_SetProjectType(rdCamera *camera, int type)
                 camera->fnProjectLst = rdCamera_PerspProjectLst;
 #ifdef TARGET_TWL
                 camera->fnProjectLstClip = rdCamera_PerspProjectLstClip;
+                if (rdCamera_bForceRealProj) {
+                    camera->fnProject = rdCamera_PerspProjectClip;
+                    camera->fnProjectLst = rdCamera_PerspProjectLstClip;
+                }
 #endif
             }
             break;
