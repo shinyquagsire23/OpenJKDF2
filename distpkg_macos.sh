@@ -32,7 +32,7 @@ export PKG_CONFIG_PATH_OLD=$PKG_CONFIG_PATH
 cmake .. -DPLAT_MACOS_X86_64=true --toolchain $(pwd)/../cmake_modules/toolchain_macos_x86_64.cmake -DCMAKE_OSX_ARCHITECTURES="x86_64" &&
 cmake .. -DPLAT_MACOS_X86_64=true --toolchain $(pwd)/../cmake_modules/toolchain_macos_x86_64.cmake -DCMAKE_OSX_ARCHITECTURES="x86_64" &&
 (make -j $(nproc) PROTOBUF || make -j1 PROTOBUF) && 
-( make -j1 openjkdf2-64 || make -j1 openjkdf2-64)
+( make -j $(nproc) openjkdf2-64 || make -j1 openjkdf2-64)
 if [ $? -ne 0 ]; then
     exit -1
 fi

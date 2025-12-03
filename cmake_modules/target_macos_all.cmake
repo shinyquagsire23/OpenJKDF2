@@ -43,6 +43,7 @@ macro(postcompile_macos)
         # openal
         COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/openal/*/libopenal.1.dylib ${BUNDLE}/Contents/MacOS
         COMMAND install_name_tool -change libopenal.1.dylib @executable_path/libopenal.1.dylib ${BUNDLE}/Contents/MacOS/${BIN_NAME}
+        COMMAND install_name_tool -change @rpath/libopenal.1.dylib @executable_path/libopenal.1.dylib ${BUNDLE}/Contents/MacOS/${BIN_NAME}
 
         COMMAND install_name_tool -change ${OPENSSL_CRYPTO_LIBRARY} @executable_path/libcrypto.dylib ${BUNDLE}/Contents/MacOS/libGameNetworkingSockets.dylib
         COMMAND install_name_tool -change ${OPENSSL_CRYPTO_LIBRARY} @executable_path/libcrypto.dylib ${BUNDLE}/Contents/MacOS/${BIN_NAME}

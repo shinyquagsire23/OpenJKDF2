@@ -995,7 +995,7 @@ void Window_SdlUpdate()
             case SDL_JOYBUTTONDOWN:
             case SDL_JOYBUTTONUP:
                 if (!bIsGamepad) {
-                    stdPlatform_Printf("button %d, %d\n", event.jbutton.button, event.jbutton.state);
+                    //stdPlatform_Printf("button %d, %d\n", event.jbutton.button, event.jbutton.state);
                 }
                 if (bIsOdin && !bIsGamepad && (event.jbutton.button == 6 || event.jbutton.button == 4)) {
                     stdControl_bControllerEscapeKey = (event.jbutton.state == SDL_PRESSED);
@@ -1027,7 +1027,7 @@ void Window_SdlUpdate()
             case SDL_CONTROLLERBUTTONDOWN:
             case SDL_CONTROLLERBUTTONUP:
                 if (bIsGamepad) {
-                    stdPlatform_Printf("gpad button %d, %d\n", event.cbutton.button, event.cbutton.state);
+                    //stdPlatform_Printf("gpad button %d, %d\n", event.cbutton.button, event.cbutton.state);
                     if (event.cbutton.button == SDL_CONTROLLER_BUTTON_START || event.cbutton.button == SDL_CONTROLLER_BUTTON_BACK) {
                         stdControl_bControllerEscapeKey = (event.cbutton.state == SDL_PRESSED);
                     }
