@@ -339,6 +339,11 @@ int stdSound_BufferPlay(stdSound_buffer_t* buf, int loop)
     return 0;
 }
 
+int stdSound_BufferQueueAfterAnother(stdSound_buffer_t* bufPrev, stdSound_buffer_t* bufNext)
+{
+    return stdSound_BufferPlay(bufNext); // TODO
+}
+
 void stdSound_BufferRelease(stdSound_buffer_t* sound)
 {   
     stdSound_BufferStop(sound);

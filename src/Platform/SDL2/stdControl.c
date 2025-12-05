@@ -1040,19 +1040,32 @@ void stdControl_ReadMouse()
 }
 
 void stdControl_ShowSystemKeyboard() {
+    extern SDL_Window* displayWindow;
     if (stdControl_bKeyboardBeingShown) {
         return;
     }
     SDL_StartTextInput();
+    if (Window_bShouldPopSteamKeyboard) {
+        SDL_OpenURL("steam://open/keyboard?XPosition=0&YPosition=0&Width=0&Height=0&Mode=1");
+
+        Window_bNeedsKeyboardFixed = 1;
+    }
     stdControl_bKeyboardBeingShown = 1;
 }
 
 void stdControl_HideSystemKeyboard() {
+    extern SDL_Window* displayWindow;
     if (!stdControl_bKeyboardBeingShown) {
         return;
     }
+    if (Window_bShouldPopSteamKeyboard) {
+        SDL_OpenURL("steam://close/keyboard");
+    }
     SDL_StopTextInput();
+    SDL_RaiseWindow(displayWindow);
+    SDL_SetWindowInputFocus(displayWindow);
     stdControl_bKeyboardBeingShown = 0;
+    Window_bNeedsKeyboardFixed = 0;
 }
 
 BOOL stdControl_IsSystemKeyboardShowing() {

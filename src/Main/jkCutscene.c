@@ -45,6 +45,12 @@ static stdSound_buffer_t* jkCutscene_audio = NULL;
 static stdSound_buffer_t* jkCutscene_audio2 = NULL;
 static stdSound_buffer_t* jkCutscene_audio3 = NULL;
 static stdSound_buffer_t* jkCutscene_audioFull = NULL;
+
+static stdSound_buffer_t* jkCutscene_lastAudio = NULL;
+static stdSound_buffer_t* jkCutscene_currentAudio = NULL;
+static uint8_t* jkCutscene_currentAudioBuf = NULL;
+static int32_t jkCutscene_currentAudioBufSize = 0;
+static int32_t jkCutscene_currentAudioWritten = 0;
 static int jkCutscene_audioFlip = 0;
 
 // TODO actually fill this in with an alternative Smack decoder
@@ -166,6 +172,10 @@ void jkCutscene_CleanReset()
     jkCutscene_smk_frames = 0;
     jkCutscene_frameBuf = NULL;
     //jkCutscene_audioBuf = NULL;
+    jkCutscene_lastAudio = NULL;
+    jkCutscene_currentAudio = NULL;
+    jkCutscene_currentAudioBuf = NULL;
+    jkCutscene_currentAudioWritten = 0;
     jkCutscene_audio = NULL;
     jkCutscene_audio2 = NULL;
     jkCutscene_audio3 = NULL;
@@ -335,7 +345,7 @@ int jkCutscene_sub_421310(char* fpath)
 
         if (!jkCutscene_smk)
         {
-            jk_printf("Failed to load file `%s`!\n", tmp);
+            stdPlatform_Printf("Failed to load file `%s`!\n", tmp);
 #ifdef TARGET_TWL
             stdPlatform_PrintHeapStats();
             //while(1);
@@ -346,7 +356,7 @@ int jkCutscene_sub_421310(char* fpath)
         jkCutscene_bSmkValid = 1;
         smk_info_all(jkCutscene_smk, NULL, &jkCutscene_smk_frames, &jkCutscene_smk_usf);
         smk_info_video(jkCutscene_smk, &jkCutscene_smk_w, &jkCutscene_smk_h, NULL);
-        jk_printf("Opened file %s as SMK\nWidth: %lu\nHeight: %lu\nFrames: %lu\nFPS: %f\n", tmp, jkCutscene_smk_w, jkCutscene_smk_h, jkCutscene_smk_frames, 1000000.0 / jkCutscene_smk_usf);
+        stdPlatform_Printf("Opened file %s as SMK\nWidth: %lu\nHeight: %lu\nFrames: %lu\nFPS: %f\n", tmp, jkCutscene_smk_w, jkCutscene_smk_h, jkCutscene_smk_frames, 1000000.0 / jkCutscene_smk_usf);
         
         unsigned char   a_t, a_c[7], a_d[7];
         uint32_t   a_r[7];
@@ -479,7 +489,7 @@ int jkCutscene_sub_421310(char* fpath)
         jkCutscene_smk_h = smush_video_height(jkCutscene_pSmush);
         jkCutscene_smk_usf = 1000000.0 / (flex64_t)smush_video_fps(jkCutscene_pSmush);
 
-        jk_printf("Opened file %s as Smush\nWidth: %lu\nHeight: %lu\nFrames: %lu\nFPS: %f\n", tmp, jkCutscene_smk_w, jkCutscene_smk_h, jkCutscene_smk_frames, 1000000.0 / jkCutscene_smk_usf);
+        stdPlatform_Printf("Opened file %s as Smush\nWidth: %lu\nHeight: %lu\nFrames: %lu\nFPS: %f\n", tmp, jkCutscene_smk_w, jkCutscene_smk_h, jkCutscene_smk_frames, 1000000.0 / jkCutscene_smk_usf);
 
         stdVBufferTexFmt texFmt;
         texFmt.width = jkCutscene_smk_w;
@@ -605,6 +615,12 @@ int jkCutscene_sub_421410()
         stdDisplay_VBufferFree(jkCutscene_frameBuf);
         jkCutscene_frameBuf = NULL;
     }
+
+    jkCutscene_lastAudio = NULL;
+    jkCutscene_currentAudio = NULL;
+    jkCutscene_currentAudioBuf = NULL;
+    jkCutscene_currentAudioWritten = 0;
+    jkCutscene_currentAudioBufSize = 0;
 #endif
 
     last_displayFrame = 0;
@@ -801,6 +817,9 @@ int jkCutscene_Handler(HWND a1, UINT a2, WPARAM a3, LPARAM a4, LRESULT *a5)
 #if defined(SDL2_RENDER) || defined(TARGET_TWL)
                 if (jkCutscene_55AA54)
                 {
+                    if (jkCutscene_audio)
+                        stdSound_BufferStop(jkCutscene_audio);
+#if 0
                     if (jkCutscene_audioFull)
                         stdSound_BufferStop(jkCutscene_audioFull);
                     if (jkCutscene_audio)
@@ -809,11 +828,15 @@ int jkCutscene_Handler(HWND a1, UINT a2, WPARAM a3, LPARAM a4, LRESULT *a5)
                         stdSound_BufferStop(jkCutscene_audio2);
                     if (jkCutscene_audio3)
                         stdSound_BufferStop(jkCutscene_audio3);
+#endif
                     last_displayFrame -= Linux_TimeUs();
                     last_audioUs -= Linux_TimeUs();
                 }
                 else
                 {
+                    if (jkCutscene_audio)
+                        stdSound_BufferPlay(jkCutscene_audio, 0);
+#if 0
                     if (jkCutscene_audioFull)
                         stdSound_BufferPlay(jkCutscene_audioFull, 0);
                     if (jkCutscene_audio)
@@ -822,6 +845,7 @@ int jkCutscene_Handler(HWND a1, UINT a2, WPARAM a3, LPARAM a4, LRESULT *a5)
                         stdSound_BufferPlay(jkCutscene_audio2, 0);
                     if (jkCutscene_audio3)
                         stdSound_BufferPlay(jkCutscene_audio3, 0);
+#endif
                     last_displayFrame += Linux_TimeUs();
                     last_audioUs += Linux_TimeUs();
                 }
@@ -855,6 +879,103 @@ void jkCutscene_smacker_process_audio()
     }
 }
 
+void jkCutscene_smacker_smusher_audio_queue() {
+    if (jkCutscene_audio_queue_read_idx != jkCutscene_audio_queue_write_idx || jkCutscene_audio_len || jkCutscene_currentAudioWritten < jkCutscene_currentAudioBufSize) {
+        
+        // If we ran through the queued samples, fetch new samples
+        if (jkCutscene_audio_len <= 0) {
+            if (jkCutscene_audio_buf) {
+                free((void*)jkCutscene_audio_buf);
+                jkCutscene_audio_buf = NULL;
+            }
+            jkCutscene_audio_buf = jkCutscene_audio_queue[jkCutscene_audio_queue_read_idx];
+            jkCutscene_audio_len = jkCutscene_audio_queue_lens[jkCutscene_audio_queue_read_idx];
+            jkCutscene_audio_pos = jkCutscene_audio_buf;
+
+            if (jkCutscene_audio_buf) {
+                jkCutscene_audio_queue[jkCutscene_audio_queue_read_idx] = NULL;
+                jkCutscene_audio_queue_lens[jkCutscene_audio_queue_read_idx++] = 0;
+                jkCutscene_audio_queue_read_idx = jkCutscene_audio_queue_read_idx % AUDIO_QUEUE_DEPTH;
+
+                //stdPlatform_Printf("Next samples!\n");
+            }
+            else {
+                return;
+            }
+        }
+
+        if (!jkCutscene_audio_pos || !jkCutscene_audio_len) {
+            return;
+        }
+
+        if (!jkCutscene_currentAudio) {
+            //stdPlatform_Printf("Flip!\n");
+            jkCutscene_audioFlip++;
+            jkCutscene_audioFlip %= 3;
+            if (jkCutscene_audioFlip == 0) {
+                jkCutscene_currentAudio = jkCutscene_audio;
+            }
+            if (jkCutscene_audioFlip == 1) {
+                jkCutscene_currentAudio = jkCutscene_audio2;
+            }
+            else if (jkCutscene_audioFlip == 2) {
+                jkCutscene_currentAudio = jkCutscene_audio3;
+            }
+
+            if (!jkCutscene_lastAudio) {
+                jkCutscene_lastAudio = jkCutscene_currentAudio;
+            }
+            jkCutscene_currentAudioWritten = 0;
+
+            //stdSound_BufferReset(jkCutscene_currentAudio);
+            jkCutscene_currentAudioBuf = (uint8_t*)stdSound_BufferSetData(jkCutscene_currentAudio, AUDIO_BUFS_DEPTH, &jkCutscene_currentAudioBufSize);
+            memset(jkCutscene_currentAudioBuf, 0, jkCutscene_currentAudioBufSize);
+        }
+
+        
+
+        int32_t len = 0;
+        uint8_t* stream = jkCutscene_currentAudioBuf;
+        uint8_t* stream_iter = stream + jkCutscene_currentAudioWritten;
+        uint32_t stream_left = jkCutscene_currentAudioBufSize - jkCutscene_currentAudioWritten;
+        
+        int32_t written_len = 0;
+        while (written_len < stream_left) {
+            int32_t to_write = (stream_left > jkCutscene_audio_len ? jkCutscene_audio_len : stream_left);
+            if (to_write > 0 && jkCutscene_audio_pos) {
+                memcpy(stream_iter, jkCutscene_audio_pos, to_write);
+                stream_iter += to_write;
+                stream_left -= to_write;
+            }
+
+            //stdPlatform_Printf("write %x %x %p %x\n", to_write, stream_left, jkCutscene_audio_pos, jkCutscene_audio_len);
+
+            written_len += to_write;
+            jkCutscene_audio_pos += to_write;
+            jkCutscene_audio_len -= to_write;
+            jkCutscene_currentAudioWritten += to_write;
+            //printf("%x %x %x %x\n", to_write, written_len, jkCutscene_audio_len, stream_left);
+
+            // Just in case?
+            if (to_write <= 0) break;
+        }
+        //stdPlatform_Printf("Wrote %x, %x of %x\n", written_len, jkCutscene_currentAudioWritten, jkCutscene_currentAudioBufSize);
+
+        if (jkCutscene_currentAudioWritten >= jkCutscene_currentAudioBufSize) {
+            //stdPlatform_Printf("Play!\n");
+            stdSound_BufferUnlock(jkCutscene_currentAudio, stream, len);
+            stdSound_BufferQueueAfterAnother(jkCutscene_audio, jkCutscene_currentAudio);
+
+            last_audioUs = Linux_TimeUs();
+
+            jkCutscene_lastAudio = jkCutscene_currentAudio;
+            jkCutscene_currentAudio = NULL;
+            jkCutscene_currentAudioWritten = 0;
+            jkCutscene_currentAudioBufSize = 0;
+        }
+    }
+}
+
 int jkCutscene_smacker_process()
 {
     if ( !jkCutscene_isRendering )
@@ -876,6 +997,7 @@ int jkCutscene_smacker_process()
 
     //stdPlatform_Printf("next? %p %f %f %f %f\n", jkCutscene_audio_queue_read_idx, cur_audioUs - last_audioUs, slop, jkCutscene_audio_us, jkCutscene_audio_us_slop);
 
+#if 0
     if (jkCutscene_audio_us == 0.0 || cur_audioUs - last_audioUs >= jkCutscene_audio_us - jkCutscene_audio_us_slop) {
 
         flex64_t stutter_compensate = 0.0;
@@ -929,6 +1051,14 @@ int jkCutscene_smacker_process()
 
         if (!jkCutscene_audio_pos || !jkCutscene_audio_len) {
             goto skip_audio;
+        }
+
+        stdSound_buffer_t* lastBuf = jkCutscene_audio;
+        if (jkCutscene_audioFlip == 1) {
+            lastBuf = jkCutscene_audio2;
+        }
+        else if (jkCutscene_audioFlip == 2) {
+             lastBuf = jkCutscene_audio3;
         }
 
         jkCutscene_audioFlip++;
@@ -994,7 +1124,7 @@ int jkCutscene_smacker_process()
         }
         //printf("Wrote %x\n", written_len);
         stdSound_BufferUnlock(buf, stream, len);
-        stdSound_BufferPlay(buf, 0);
+        stdSound_BufferQueueAfterAnother(lastBuf, buf);
 
         jkCutscene_audio_us = ((flex64_t)(written_len / 4) / 22050.0) * 1000000.0;
         jkCutscene_audio_us += stutter_compensate; // If we were late...
@@ -1002,6 +1132,11 @@ int jkCutscene_smacker_process()
 
         last_audioUs = Linux_TimeUs();
     }
+#endif
+
+#if 1
+    jkCutscene_smacker_smusher_audio_queue();
+#endif
 
 skip_audio:
     if (delta <= usPerFrame) return 0;
@@ -1014,6 +1149,7 @@ skip_audio:
 
     // If the CPU is lagging, try and catch up by skipping video frames
     while (extraUs > usPerFrame) {
+        //stdPlatform_Printf("Lagging behind?\n");
         /*if (smk_is_keyframe(jkCutscene_smk)) {
             printf("Keyframe\n");
         }*/
@@ -1127,6 +1263,7 @@ int jkCutscene_smusher_process()
     flex64_t slop = jkCutscene_audio_us - (cur_audioUs - last_audioUs);
     //printf("%f %f %f\n", slop, jkCutscene_audio_us_slop, (flex64_t)Linux_TimeUs());
 
+#if 0
     if (cur_audioUs - last_audioUs >= jkCutscene_audio_us - jkCutscene_audio_us_slop) {
 
         flex64_t stutter_compensate = 0.0;
@@ -1253,6 +1390,11 @@ int jkCutscene_smusher_process()
 
         last_audioUs = Linux_TimeUs();
     }
+#endif
+
+#if 1
+    jkCutscene_smacker_smusher_audio_queue();
+#endif
 
 skip_audio:
     if (delta <= usPerFrame) return 0;

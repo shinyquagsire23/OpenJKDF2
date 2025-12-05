@@ -2800,6 +2800,7 @@ void jkGuiRend_UpdateController()
     }
     static int lastB1 = 0;
     static int keyboardShowedLastUpdate = 0;
+    static jkGuiElement* currentKeyboardFocusedElement = NULL;
     stdControl_bControlsActive = 1; // HACK
     stdControl_ReadControls();
 
@@ -2895,13 +2896,25 @@ void jkGuiRend_UpdateController()
         }
     }
 
-    if (jkGuiRend_activeMenu && jkGuiRend_activeMenu->lastMouseOverClickable && jkGuiRend_activeMenu->lastMouseOverClickable->type == ELEMENT_TEXTBOX) {
-        keyboardShowedLastUpdate = 1;
+    if (!stdControl_IsSystemKeyboardShowing() || jkGuiRend_activeMenu->focusedElement != currentKeyboardFocusedElement) {
+        stdControl_HideSystemKeyboard();
+        keyboardShowedLastUpdate = 0;
+        currentKeyboardFocusedElement = NULL;
+    }
+
+    if (jkGuiRend_activeMenu && jkGuiRend_activeMenu->focusedElement && jkGuiRend_activeMenu->focusedElement->type == ELEMENT_TEXTBOX) {
         stdControl_ShowSystemKeyboard();
-        jkGuiRend_WindowHandler(0, WM_KEYFIRST, VK_END, 0, 0);
+        if (!keyboardShowedLastUpdate) {
+            jkGuiRend_WindowHandler(0, WM_KEYFIRST, VK_END, 0, 0);
+        }
+
+        keyboardShowedLastUpdate = 1;
+        currentKeyboardFocusedElement = jkGuiRend_activeMenu->focusedElement;
     }
     else if (keyboardShowedLastUpdate) {
         stdControl_HideSystemKeyboard();
+        keyboardShowedLastUpdate = 0;
+        currentKeyboardFocusedElement = NULL;
     }
 
     if (jkGuiRend_activeMenu != jkGuiRend_lastActiveMenu) {

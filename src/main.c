@@ -560,11 +560,18 @@ int main(int argc, char** argv)
 
 #endif
 #ifdef WIN64_STANDALONE
+    int skipConsoleWindow = 0;
+    if ((SDL_GetHintBoolean("SteamClientLaunch", 0) || SDL_GetHintBoolean("SteamOS", 0) || SDL_GetHintBoolean("SteamDeck", 0)) && SDL_GetHintBoolean("SteamGamepadUI", 0)) {
+        skipConsoleWindow = 1;
+    }
+
     FILE* fp;
-    AllocConsole();
-    freopen_s(&fp, "CONIN$", "r", stdin);
-    freopen_s(&fp, "CONOUT$", "w", stdout);
-    freopen_s(&fp, "CONOUT$", "w", stdout);
+    if (!skipConsoleWindow) {
+        AllocConsole();
+        freopen_s(&fp, "CONIN$", "r", stdin);
+        freopen_s(&fp, "CONOUT$", "w", stdout);
+        freopen_s(&fp, "CONOUT$", "w", stdout);
+    }
 
     int can_has_crashdumps = 1;
 

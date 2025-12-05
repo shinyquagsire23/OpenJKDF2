@@ -303,13 +303,15 @@ int stdSound_BufferUnlock(stdSound_buffer_t* sound, void* buffer, int bufferRead
         
         //printf("%u %u\n", buf->source, buf->buffer);
     }
-    alSourcei(sound->source, AL_BUFFER, sound->buffer);
+    //alSourcei(sound->source, AL_BUFFER, sound->buffer);
 
     return 1;
 }
 
 int stdSound_BufferPlay(stdSound_buffer_t* buf, int loop)
 {
+    ALint source_type;
+
     if (Main_bHeadless) return 1;
 
     //alSourceStop(buf->source);
@@ -334,11 +336,56 @@ int stdSound_BufferPlay(stdSound_buffer_t* buf, int loop)
         stdSound_BufferSetVolume(buf, buf->vol);
 	}
 
-    alSourcei(buf->source, AL_BUFFER, buf->buffer);
-    alSourcei(buf->source, AL_LOOPING, loop ? AL_TRUE : AL_FALSE);
-    alSourcef(buf->source, AL_GAIN, buf->vol);
-
+    alGetSourcei(buf->source, AL_SOURCE_TYPE, &source_type);
+    if (source_type != AL_STREAMING) {
+        alSourcei(buf->source, AL_BUFFER, buf->buffer);
+        alSourcei(buf->source, AL_LOOPING, loop ? AL_TRUE : AL_FALSE);
+        alSourcef(buf->source, AL_GAIN, buf->vol);
+    }
+    
 	alSourcePlay(buf->source);
+    return 1;
+}
+
+// Added
+int stdSound_BufferQueueAfterAnother(stdSound_buffer_t* bufPrev, stdSound_buffer_t* bufNext)
+{
+    ALint source_state = 0;
+    ALint processed = 0;
+    if (Main_bHeadless) return 1;
+
+    if (!bufPrev->source)
+    {
+        alGenSources((ALuint)1, &bufPrev->source);
+
+        alSourcef(bufPrev->source, AL_PITCH, 1.0);
+        if (bufPrev->bHasPos) {
+            alSourcefv(bufPrev->source, AL_POSITION, bufPrev->pos);
+        }
+        if (bufPrev->bHasVel) {
+            alSourcefv(bufPrev->source, AL_VELOCITY, bufPrev->vel);
+        }
+        if (!bufPrev->bHasPos) {
+            alSourcei(bufPrev->source, AL_SOURCE_RELATIVE, AL_TRUE); // No 3D until we're given a position
+        }
+        
+        stdSound_BufferSetVolume(bufPrev, bufPrev->vol);
+    }
+
+    alSourcei(bufPrev->source, AL_LOOPING, AL_FALSE);
+    alSourceQueueBuffers(bufPrev->source, 1, &bufNext->buffer);
+
+    alGetSourcei(bufPrev->source, AL_SOURCE_STATE, &source_state);
+    if (source_state != AL_PLAYING) {
+        alSourcePlay(bufPrev->source);
+    }
+    
+    alGetSourcei(bufPrev->source, AL_BUFFERS_PROCESSED, &processed);
+    while (processed) {
+        ALuint unused;
+        alSourceUnqueueBuffers(bufPrev->source, 1, &unused);
+        processed--;
+    }
     return 1;
 }
 
@@ -655,6 +702,11 @@ int stdSound_BufferUnlock(stdSound_buffer_t* sound, void* buffer, int bufferRead
 }
 
 int stdSound_BufferPlay(stdSound_buffer_t* buf, int loop)
+{
+    return 1;
+}
+
+int stdSound_BufferQueueAfterAnother(stdSound_buffer_t* bufPrev, stdSound_buffer_t* bufNext)
 {
     return 1;
 }

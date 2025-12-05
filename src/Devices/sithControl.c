@@ -2211,15 +2211,31 @@ LABEL_17:
 // Added
 void sithControl_MapDefaultsJoystick() {
 #if !defined(TARGET_TWL) && defined(QOL_IMPROVEMENTS)
-    sithControl_MapAxisFunc(INPUT_FUNC_FORWARD, AXIS_JOY1_Y, 4u);
+    stdControlKeyInfoEntry* mapped;
+
+    mapped = sithControl_MapAxisFunc(INPUT_FUNC_FORWARD, AXIS_JOY1_Y, 4u);
+    if (mapped) {
+        mapped->binaryAxisVal = 1.0;
+    }
+
     if (Main_bMotsCompat) {
-        sithControl_MapAxisFunc(INPUT_FUNC_SLIDE, AXIS_JOY1_X, 4u);
+        mapped = sithControl_MapAxisFunc(INPUT_FUNC_SLIDE, AXIS_JOY1_X, 4u);
     }
     else {
-        sithControl_MapAxisFunc(INPUT_FUNC_SLIDE, AXIS_JOY1_X, 0u);
+        mapped = sithControl_MapAxisFunc(INPUT_FUNC_SLIDE, AXIS_JOY1_X, 0u);
     }
-    sithControl_MapAxisFunc(INPUT_FUNC_PITCH, AXIS_JOY1_R, 4u);
-    sithControl_MapAxisFunc(INPUT_FUNC_TURN, AXIS_JOY1_Z, 4u);
+    if (mapped) {
+        mapped->binaryAxisVal = 1.0;
+    }
+
+    mapped = sithControl_MapAxisFunc(INPUT_FUNC_PITCH, AXIS_JOY1_R, 4u);
+    if (mapped) {
+        mapped->binaryAxisVal = 1.0;
+    }
+    mapped = sithControl_MapAxisFunc(INPUT_FUNC_TURN, AXIS_JOY1_Z, 4u);
+    if (mapped) {
+        mapped->binaryAxisVal = 1.0;
+    }
 
     sithControl_DefaultHelper(INPUT_FUNC_USELASTSELECTED, KEY_JOY1_B1, 2); // a
     sithControl_DefaultHelper(INPUT_FUNC_DUCK, KEY_JOY1_B2, 2); // b
