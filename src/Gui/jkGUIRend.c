@@ -2801,6 +2801,8 @@ void jkGuiRend_UpdateController()
     static int lastB1 = 0;
     static int keyboardShowedLastUpdate = 0;
     static jkGuiElement* currentKeyboardFocusedElement = NULL;
+    static int prev_stdControl_bControlsActive = 0;
+    prev_stdControl_bControlsActive = stdControl_bControlsActive;
     stdControl_bControlsActive = 1; // HACK
     stdControl_ReadControls();
 
@@ -2920,4 +2922,6 @@ void jkGuiRend_UpdateController()
     if (jkGuiRend_activeMenu != jkGuiRend_lastActiveMenu) {
         jkGuiRend_lastActiveMenu = jkGuiRend_activeMenu;
     }
+
+    stdControl_bControlsActive = prev_stdControl_bControlsActive;
 }
