@@ -11,11 +11,11 @@
 #include "external/fcaseopen/fcaseopen.h"
 #endif
 
-/*#ifdef SDL2_RENDER
+#ifdef SDL2_RENDER
 #include "SDL2_helper.h"
-
-#define stdEmbeddedRes_errmsg(_msg) SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", _msg, NULL)
-#else*/
+#endif
+//#define stdEmbeddedRes_errmsg(_msg) SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", _msg, NULL)
+//#else
 #define stdEmbeddedRes_errmsg(_msg) stdPlatform_Printf("stdEmbeddedRes: %s\n", _msg)
 //#endif
 

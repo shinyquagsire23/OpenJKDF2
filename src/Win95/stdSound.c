@@ -342,6 +342,9 @@ int stdSound_BufferPlay(stdSound_buffer_t* buf, int loop)
         alSourcei(buf->source, AL_LOOPING, loop ? AL_TRUE : AL_FALSE);
         alSourcef(buf->source, AL_GAIN, buf->vol);
     }
+    else {
+        alSourcei(buf->source, AL_BUFFER, 0);
+    }
     
 	alSourcePlay(buf->source);
     return 1;
@@ -352,6 +355,7 @@ int stdSound_BufferQueueAfterAnother(stdSound_buffer_t* bufPrev, stdSound_buffer
 {
     ALint source_state = 0;
     ALint processed = 0;
+    ALint source_type = AL_UNDETERMINED;
     if (Main_bHeadless) return 1;
 
     if (!bufPrev->source)
@@ -372,6 +376,24 @@ int stdSound_BufferQueueAfterAnother(stdSound_buffer_t* bufPrev, stdSound_buffer
         stdSound_BufferSetVolume(bufPrev, bufPrev->vol);
     }
 
+    alGetSourcei(bufPrev->source, AL_SOURCE_TYPE, &source_type);
+    if (source_type == AL_STATIC)
+    {
+        printf("OPENAL SOUND IS STATIC SOMEHOW\n");
+        stdSound_BufferReset(bufPrev);
+    }
+
+    alGetSourcei(bufPrev->source, AL_BUFFERS_PROCESSED, &processed);
+    //printf("processed %d\n", processed);
+    while (processed) {
+        ALuint unused;
+        alSourceUnqueueBuffers(bufPrev->source, 1, &unused);
+        processed--;
+    }
+    alGetSourcei(bufPrev->source, AL_BUFFERS_QUEUED, &processed);
+    //printf("queued %d\n", processed);
+
+    alSourcei(bufPrev->source, AL_BUFFER, 0);
     alSourcei(bufPrev->source, AL_LOOPING, AL_FALSE);
     alSourceQueueBuffers(bufPrev->source, 1, &bufNext->buffer);
 
@@ -380,12 +402,6 @@ int stdSound_BufferQueueAfterAnother(stdSound_buffer_t* bufPrev, stdSound_buffer
         alSourcePlay(bufPrev->source);
     }
     
-    alGetSourcei(bufPrev->source, AL_BUFFERS_PROCESSED, &processed);
-    while (processed) {
-        ALuint unused;
-        alSourceUnqueueBuffers(bufPrev->source, 1, &unused);
-        processed--;
-    }
     return 1;
 }
 

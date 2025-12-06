@@ -526,11 +526,11 @@ void Window_HandleWindowEvent(SDL_Event* event)
             stdPlatform_Printf("Mouse left window %d\n", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_FOCUS_GAINED:
-            stdPlatform_Printf("Window %d gained keyboard focus", event->window.windowID);
+            stdPlatform_Printf("Window %d gained keyboard focus\n", event->window.windowID);
             Window_bNeedsKeyboardFixed = 0;
             break;
         case SDL_WINDOWEVENT_FOCUS_LOST:
-            stdPlatform_Printf("Window %d lost keyboard focus", event->window.windowID);
+            stdPlatform_Printf("Window %d lost keyboard focus\n", event->window.windowID);
             if (stdControl_IsSystemKeyboardShowing() && Window_bNeedsKeyboardFixed) {
                 stdPlatform_Printf("Fixing keyboard...\n");
                 
