@@ -440,6 +440,7 @@ void Window_HandleMouseMove(SDL_MouseMotionEvent *event)
 }
 
 int jkCutscene_wasPaused = 0;
+int jkGame_wasDDraw = 0;
 int Window_bNeedsKeyboardFixed = 0;
 void Window_HandleWindowEvent(SDL_Event* event)
 {
@@ -496,10 +497,16 @@ void Window_HandleWindowEvent(SDL_Event* event)
 #ifdef TARGET_ANDROID
             stdPlatform_Printf("SDL_WINDOWEVENT_MINIMIZED");
             jkCutscene_wasPaused = jkCutscene_55AA54 && jkCutscene_isRendering && std3D_IsReady();
+            jkGame_wasDDraw = jkGame_isDDraw;
             if (std3D_IsReady() && jkCutscene_isRendering && !jkCutscene_wasPaused) {
                 stdPlatform_Printf("Pause cutscene...\n");
                 Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_SPACE, 0);
                 Window_msg_main_handler(g_hWnd, WM_CHAR, VK_SPACE, 0);
+            }
+            else if (std3D_IsReady() && jkGame_isDDraw) {
+                stdPlatform_Printf("Pause game...\n");
+                Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_ESCAPE, 0);
+                Window_msg_main_handler(g_hWnd, WM_CHAR, VK_ESCAPE, 0);
             }
 #endif
             break;
@@ -516,6 +523,11 @@ void Window_HandleWindowEvent(SDL_Event* event)
                 stdPlatform_Printf("Play cutscene...\n");
                 Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_SPACE, 0);
                 Window_msg_main_handler(g_hWnd, WM_CHAR, VK_SPACE, 0);
+            }
+            else if (std3D_IsReady() && !jkGame_isDDraw && jkGame_wasDDraw) {
+                stdPlatform_Printf("Resume game...\n");
+                Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_ESCAPE, 0);
+                Window_msg_main_handler(g_hWnd, WM_CHAR, VK_ESCAPE, 0);
             }
 #endif
             break;
