@@ -43,6 +43,8 @@ void Window_SetHiDpi(int val);
 void Window_SetFullscreen(int val);
 
 
+extern int Window_screenXSize;
+extern int Window_screenYsSize;
 extern int Window_lastXRel;
 extern int Window_lastYRel;
 extern int Window_lastSampleMs;

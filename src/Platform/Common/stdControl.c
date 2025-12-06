@@ -343,11 +343,18 @@ flex_t stdControl_ReadAxis(int axisNum)
         }
     }
     result = stdMath_ClipPrecision(stdControl_aJoysticks[v2].fRangeConversion * (flex_d_t)v9);
+#ifdef QOL_IMPROVEMENTS
+    if ( result != 0.0 ) {
+        sithControl_msIdle = 0;
+        stdControl_bControlsIdle = 0;
+    }
+#else
     if ( stdControl_bControlsIdle )
     {
         if ( result != 0.0 )
             stdControl_bControlsIdle = 0;
     }
+#endif
 
     // Added: Scale to FPS
     //result = (result * (sithTime_TickHz / 50.0));
@@ -369,8 +376,14 @@ int stdControl_ReadAxisRaw(int axisNum)
     result = stdControl_aAxisPos[axisNum] - stdControl_aJoysticks[axisNum].dwXoffs;
     if ( !result )
         return 0;
+#ifdef QOL_IMPROVEMENTS
+    sithControl_msIdle = 0;
+    stdControl_bControlsIdle = 0;
+
+#else
     if ( stdControl_bControlsIdle )
         stdControl_bControlsIdle = 0;
+#endif
 
     return result;
 }
@@ -396,12 +409,23 @@ flex_t stdControl_ReadKeyAsAxis(int keyNum)
 
     if ( v1 >= stdControl_msDelta )
         v1 = stdControl_msDelta;
+#ifdef QOL_IMPROVEMENTS
+    result = 1.5;
+#else
     result = (flex_d_t)v1 * stdControl_updateKHz;
+#endif
+#ifdef QOL_IMPROVEMENTS
+    if ( result != 0.0 ) {
+        sithControl_msIdle = 0;
+        stdControl_bControlsIdle = 0;
+    }
+#else
     if ( stdControl_bControlsIdle )
     {
         if ( result != 0.0 )
             stdControl_bControlsIdle = 0;
     }
+#endif
     return result;
 }
 

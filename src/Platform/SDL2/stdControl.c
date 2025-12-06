@@ -998,6 +998,20 @@ void stdControl_ReadMouse()
         return;
     if (jkQuakeConsole_bOpen) return; // Hijack input to console
 
+    stdControl_aJoysticks[AXIS_MOUSE_X].dwYoffs = 0;
+    stdControl_aJoysticks[AXIS_MOUSE_X].uMaxVal = (__int64)(250.0 * (640.0 / Window_screenXSize));
+    stdControl_aJoysticks[AXIS_MOUSE_X].uMinVal = -stdControl_aJoysticks[AXIS_MOUSE_X].uMaxVal;
+    stdControl_aJoysticks[AXIS_MOUSE_X].flags |= 1u;
+    stdControl_aJoysticks[AXIS_MOUSE_X].dwXoffs = (2 * stdControl_aJoysticks[AXIS_MOUSE_X].uMaxVal + 1) / 2 - stdControl_aJoysticks[AXIS_MOUSE_X].uMaxVal;
+    stdControl_aJoysticks[AXIS_MOUSE_X].fRangeConversion = 1.0 / (flex_d_t)(stdControl_aJoysticks[AXIS_MOUSE_X].uMaxVal - stdControl_aJoysticks[AXIS_MOUSE_X].dwXoffs);
+
+    stdControl_aJoysticks[AXIS_MOUSE_Y].dwYoffs = 0;
+    stdControl_aJoysticks[AXIS_MOUSE_Y].uMaxVal = (__int64)(200.0 * (480.0 / Window_screenXSize));
+    stdControl_aJoysticks[AXIS_MOUSE_Y].uMinVal = -stdControl_aJoysticks[AXIS_MOUSE_Y].uMaxVal;
+    stdControl_aJoysticks[AXIS_MOUSE_Y].flags |= 1u;
+    stdControl_aJoysticks[AXIS_MOUSE_Y].dwXoffs = (2 * stdControl_aJoysticks[AXIS_MOUSE_Y].uMaxVal + 1) / 2 - stdControl_aJoysticks[AXIS_MOUSE_Y].uMaxVal;
+    stdControl_aJoysticks[AXIS_MOUSE_Y].fRangeConversion = 1.0 / (flex_d_t)(stdControl_aJoysticks[AXIS_MOUSE_Y].uMaxVal - stdControl_aJoysticks[AXIS_MOUSE_Y].dwXoffs);
+
     stdControl_aAxisPos[AXIS_MOUSE_Z] = Window_mouseWheelY; // TODO
     stdControl_aAxisPos[AXIS_MOUSE_X] = Window_lastXRel; // TODO
     stdControl_aAxisPos[AXIS_MOUSE_Y] = Window_lastYRel; // TODO

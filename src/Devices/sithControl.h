@@ -17,9 +17,9 @@
 #define sithControl_input_map_idk_ADDR (0x004D6BC0)
 #define sithControl_AddInputHandler_ADDR (0x004D6C50)
 #define sithControl_Tick_ADDR (0x004D6C70)
-#define sithControl_GetAxis2_ADDR (0x004D6D70)
-#define sithControl_ReadAxisStuff_ADDR (0x004D6EB0)
-#define sithControl_GetAxis_ADDR (0x004D6F80)
+#define sithControl_GetAxisTimeCorrected_ADDR (0x004D6D70)
+#define sithControl_GetAxisNonRaw_ADDR (0x004D6EB0)
+#define sithControl_GetAxisNonTimeCorrected_ADDR (0x004D6F80)
 #define sithControl_ReadFunctionMap_ADDR (0x004D7010)
 #define sithControl_ReadControls_ADDR (0x004D70A0)
 #define sithControl_FinishRead_ADDR (0x004D70B0)
@@ -63,13 +63,14 @@ void sithControl_ReadControls();
 void sithControl_FinishRead();
 void sithControl_MapDefaults();
 void sithControl_InputInit();
-MATH_FUNC flex_t sithControl_GetAxis2(int axisNum);
-MATH_FUNC flex_t sithControl_ReadAxisStuff(int funcIdx);
+MATH_FUNC flex_t sithControl_GetAxisTimeCorrected(int axisNum);
+MATH_FUNC flex_t sithControl_GetAxisNonRaw(int funcIdx);
 MATH_FUNC flex_t sithControl_GetAxis(int funcIdx);
 int sithControl_ReadFunctionMap(int func, int* out);
 
 void sithControl_sub_4D6930(int a);
 stdControlKeyInfo* sithControl_EnumBindings(sithControlEnumFunc_t pfEnumFunction, int a2, int a3, int a4, Darray *a5);
+void sithControl_MapDefaultsMouse(); // Added
 void sithControl_MouseInputInitDefaults();
 void sithControl_KeyboardInputInitDefaults();
 void sithControl_JoyInputInit();
