@@ -773,6 +773,8 @@ void jkGuiBuildMulti_SaberDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVB
     rdRect rect; // [esp+4h] [ebp-10h] BYREF
 
     pSabBm = jkGuiBuildMulti_apSaberBitmaps[jkGuiBuildMulti_saberIdx];
+    if (pSabBm->palette)
+        (*pSabBm->mipSurfaces)->palette = pSabBm->palette;
     rect.x = 0;
     rect.y = 0;
     bmWidth = (*pSabBm->mipSurfaces)->format.width;
