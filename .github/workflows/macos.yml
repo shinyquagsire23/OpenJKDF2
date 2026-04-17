@@ -12,7 +12,7 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: recursive
       name: Checkout
@@ -27,3 +27,10 @@ jobs:
           brew install openssl@3 protobuf
     - name: cmake
       run: export HOMEBREW_PREFIX="/usr/local" && ./.github/build_macos.sh
+    - name: Upload Artifact
+      if: github.event_name == 'push'
+      uses: actions/upload-artifact@v4
+      with:
+        name: openjkdf2-macos
+        path: build_darwin64/OpenJKDF2.app
+        if-no-files-found: warn

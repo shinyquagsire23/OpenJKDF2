@@ -5,7 +5,7 @@ on:
     branches:
       - master
   pull_request:
-    branches: 
+    branches:
       - master
 
 jobs:
@@ -14,11 +14,11 @@ jobs:
     runs-on: ubuntu-22.04
 
     env:
-      OPENJKDF2_BUILD_DIR: /tmp/OpenJKDF2/Linux/x86_64/Debug
+      OPENJKDF2_BUILD_DIR: /tmp/OpenJKDF2/Linux/x86_64/Release
       CC: clang
       CXX: clang++
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
         name: Checkout
@@ -30,6 +30,15 @@ jobs:
                                   protobuf-compiler &&
           sudo pip3 install cogapp
       - name: Generate CMake Build System
-        run: cmake -DCMAKE_BUILD_TYPE=Debug -B "$OPENJKDF2_BUILD_DIR"
+        run: cmake -DCMAKE_BUILD_TYPE=Release -B "$OPENJKDF2_BUILD_DIR"
       - name: Make
-        run: make -C "$OPENJKDF2_BUILD_DIR"
+        run: make -C "$OPENJKDF2_BUILD_DIR" -j $(nproc)
+      - name: Upload Artifact
+        if: github.event_name == 'push'
+        uses: actions/upload-artifact@v4
+        with:
+          name: openjkdf2-linux-x86_64
+          path: |
+            ${{ env.OPENJKDF2_BUILD_DIR }}/openjkdf2
+            ${{ env.OPENJKDF2_BUILD_DIR }}/libGameNetworkingSockets.so
+          if-no-files-found: warn
