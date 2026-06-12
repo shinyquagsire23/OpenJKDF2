@@ -910,7 +910,7 @@ int jkDSS_Processx33(sithCogMsg *msg)
     int16_t arg2 = NETMSG_POPS16();
     int arg3 = NETMSG_POPS32();
 
-    if ( arg0 > sithWorld_pCurrentWorld->numThingsLoaded )
+    if ( arg0 >= sithWorld_pCurrentWorld->numThingsLoaded ) // Added: off-by-one fix
         return 0;
     sithThing* pThing = &sithWorld_pCurrentWorld->things[arg0];
 
