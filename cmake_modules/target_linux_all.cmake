@@ -35,8 +35,18 @@ macro(plat_extra_deps)
     if(TARGET_USE_GAMENETWORKINGSOCKETS)
         add_custom_command(
             TARGET ${BIN_NAME}
-            POST_BUILD 
+            POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/GameNetworkingSockets/bin/libGameNetworkingSockets.so ${PROJECT_BINARY_DIR}
+        )
+    endif()
+
+    # Strip release binaries
+    if(CMAKE_BUILD_TYPE STREQUAL Release OR CMAKE_BUILD_TYPE STREQUAL MinSizeRel)
+        add_custom_command(
+            TARGET ${BIN_NAME}
+            POST_BUILD
+            COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${BIN_NAME}>
+            COMMENT "Stripping ${BIN_NAME}"
         )
     endif()
 endmacro()

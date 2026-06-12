@@ -12,9 +12,15 @@ macro(plat_initialize)
 
     set(TARGET_LINUX TRUE)
 
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c11 -fshort-wchar -Werror=implicit-function-declaration -Wno-unused-variable -Wno-parentheses -Wno-incompatible-pointer-types")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fshort-wchar -Werror=implicit-function-declaration -Wno-unused-variable -Wno-parentheses ")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -fshort-wchar -Werror=implicit-function-declaration -Wno-unused-variable -Wno-parentheses  -Wno-incompatible-pointer-types")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fshort-wchar -Werror=implicit-function-declaration -Wno-unused-variable -Wno-parentheses ")
     add_link_options(-fshort-wchar)
+
+    if(CMAKE_BUILD_TYPE STREQUAL Debug)
+        add_compile_options(-g -O0)
+    else()
+        add_compile_options(-O2)
+    endif()
 endmacro()
 
 macro(plat_specific_deps)
