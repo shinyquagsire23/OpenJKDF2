@@ -12,6 +12,29 @@
 
 #define INT_FLOAT_SCALED(x, s) ((int)((flex_t)(x) * (flex_t)(s))) // FLEXTODO
 
+// Un-inlined: Find the charset containing a character, falling back to the font's default character.
+// Returns the charset, or NULL if not found. *pChar may be changed to the default character on fallback.
+static stdFontCharset* stdFont_FindCharset(stdFont *font, uint16_t *pChar)
+{
+    stdFontCharset *charset = &font->charsetHead;
+    while ( charset )
+    {
+        if ( *pChar >= charset->charFirst && *pChar <= charset->charLast )
+            return charset;
+        charset = charset->previous;
+    }
+    // Fallback to default character
+    *pChar = font->field_28;
+    charset = &font->charsetHead;
+    while ( charset )
+    {
+        if ( *pChar >= charset->charFirst && *pChar <= charset->charLast )
+            return charset;
+        charset = charset->previous;
+    }
+    return NULL;
+}
+
 stdFont* stdFont_Load(char *fpath, int a2, int a3)
 {
     stdFont *result; // eax
@@ -1216,40 +1239,12 @@ int stdFont_sub_4355F0(stdFont *font, const wchar_t *text)
         }
         else
         {
-            // Look up glyph in charsets
-            stdFontCharset *charset = &font->charsetHead;
+            uint16_t lookupChar = *text;
+            stdFontCharset *charset = stdFont_FindCharset(font, &lookupChar);
             if ( charset )
-            {
-                while ( !(*text >= charset->charFirst && *text <= charset->charLast) )
-                {
-                    charset = charset->previous;
-                    if ( !charset )
-                        break;
-                }
-            }
-            if ( !charset )
-            {
-                // Try default character
-                uint16_t defChar = font->field_28;
-                charset = &font->charsetHead;
-                if ( charset )
-                {
-                    while ( !(defChar >= charset->charFirst && defChar <= charset->charLast) )
-                    {
-                        charset = charset->previous;
-                        if ( !charset )
-                            break;
-                    }
-                }
-                if ( charset )
-                    glyphWidth = charset->pEntries[defChar - charset->charFirst].glyphWidth;
-                else
-                    glyphWidth = 0;
-            }
+                glyphWidth = charset->pEntries[lookupChar - charset->charFirst].glyphWidth;
             else
-            {
-                glyphWidth = charset->pEntries[*text - charset->charFirst].glyphWidth;
-            }
+                glyphWidth = 0;
             glyphWidth += font->marginY;
         }
         totalWidth += glyphWidth;
@@ -1309,36 +1304,12 @@ int stdFont_sub_4356B0(const wchar_t *text, stdFont *font, int *pMaxWidth)
             }
             else
             {
-                stdFontCharset *charset = &font->charsetHead;
+                uint16_t lookupChar = ch;
+                stdFontCharset *charset = stdFont_FindCharset(font, &lookupChar);
                 if ( charset )
-                {
-                    while ( !(ch >= charset->charFirst && ch <= charset->charLast) )
-                    {
-                        charset = charset->previous;
-                        if ( !charset ) break;
-                    }
-                }
-                if ( !charset )
-                {
-                    uint16_t defChar = font->field_28;
-                    charset = &font->charsetHead;
-                    if ( charset )
-                    {
-                        while ( !(defChar >= charset->charFirst && defChar <= charset->charLast) )
-                        {
-                            charset = charset->previous;
-                            if ( !charset ) break;
-                        }
-                    }
-                    if ( charset )
-                        glyphWidth = charset->pEntries[defChar - charset->charFirst].glyphWidth;
-                    else
-                        glyphWidth = 0;
-                }
+                    glyphWidth = charset->pEntries[lookupChar - charset->charFirst].glyphWidth;
                 else
-                {
-                    glyphWidth = charset->pEntries[ch - charset->charFirst].glyphWidth;
-                }
+                    glyphWidth = 0;
                 glyphWidth += font->marginY;
             }
             lineWidth += glyphWidth;
@@ -1365,37 +1336,11 @@ void stdFont_sub_435190(stdVBuffer *vbuf, stdFont *font, int destX, int destY, u
     if ( iswspace(ch) )
         return;
 
-    // Look up glyph in charsets
-    stdFontCharset *charset = &font->charsetHead;
-    if ( charset )
-    {
-        while ( !(ch >= charset->charFirst && ch <= charset->charLast) )
-        {
-            charset = charset->previous;
-            if ( !charset ) break;
-        }
-    }
-    if ( !charset )
-    {
-        uint16_t defChar = font->field_28;
-        charset = &font->charsetHead;
-        if ( charset )
-        {
-            while ( !(defChar >= charset->charFirst && defChar <= charset->charLast) )
-            {
-                charset = charset->previous;
-                if ( !charset ) break;
-            }
-        }
-        if ( !charset ) return;
-        glyphTexX = charset->pEntries[defChar - charset->charFirst].glyphTexX;
-        glyphWidth = charset->pEntries[defChar - charset->charFirst].glyphWidth;
-    }
-    else
-    {
-        glyphTexX = charset->pEntries[ch - charset->charFirst].glyphTexX;
-        glyphWidth = charset->pEntries[ch - charset->charFirst].glyphWidth;
-    }
+    uint16_t lookupChar = ch;
+    stdFontCharset *charset = stdFont_FindCharset(font, &lookupChar);
+    if ( !charset ) return;
+    glyphTexX = charset->pEntries[lookupChar - charset->charFirst].glyphTexX;
+    glyphWidth = charset->pEntries[lookupChar - charset->charFirst].glyphWidth;
 
     srcRect.x = glyphTexX;
     srcRect.y = 0;

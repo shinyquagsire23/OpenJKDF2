@@ -4,16 +4,13 @@
 
 int stdPalEffects_Open(stdPalEffectSetPaletteFunc_t a1)
 {
-    stdPalEffects_setPalette = a1;
+    stdPalEffects_SetPaletteFunc(a1);
     _memset(stdPalEffects_aEffects, 0, sizeof(stdPalEffects_aEffects));
     _memset(&stdPalEffects_state, 0, sizeof(stdPalEffects_state));
     _memset(&stdPalEffects_state.effect, 0, sizeof(stdPalEffects_state.effect));
     stdPalEffects_numEffectRequests = 0;
     stdPalEffects_state.effect.fade = 1.0;
-    stdPalEffects_state.field_4 = 1;
-    stdPalEffects_state.field_8 = 1;
-    stdPalEffects_state.field_C = 1;
-    stdPalEffects_state.field_10 = 1;
+    stdPalEffects_SetStateBools(1, 1, 1, 1);
     return 1;
 }
 

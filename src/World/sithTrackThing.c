@@ -25,27 +25,14 @@ void sithTrackThing_MoveToFrame(sithThing *thing, int goalFrame, flex_t a3)
 void sithTrackThing_Arrivedidk(sithThing *thing)
 {
     sithThingFrame *v4; // edx
-    flex_d_t v8; // st7
-    flex_d_t v9; // st6
     sithThingFrame *v12; // eax
-    flex_d_t v15; // st7
-    flex_d_t v16; // st6
     flex_t thinga; // [esp+10h] [ebp+4h]
 
     int goalFrame = thing->goalframe;
     if ( thing->curframe == goalFrame )
     {
         v4 = thing->trackParams.aFrames;
-        rdVector_Sub3(&thing->trackParams.vel, &v4[thing->curframe].pos, &thing->position);
-        v8 = rdVector_Normalize3Acc(&thing->trackParams.vel);
-        if ( v8 != 0.0 )
-        {
-            v9 = v8 / thing->trackParams.lerpSpeed;
-            thing->field_250 = 0;
-            thing->trackParams.flags |= 1;
-            thing->trackParams.field_1C = v9;
-        }
-        thinga = thing->trackParams.field_1C;
+        thinga = sithTrackThing_CalcMoveDirection(thing, &v4[thing->curframe].pos);
         if ( thing->trackParams.field_1C == 0.0 )
         {
             thing->trackParams.flags &= ~0x17;
@@ -74,16 +61,7 @@ void sithTrackThing_Arrivedidk(sithThing *thing)
 
         v12 = thing->trackParams.aFrames;
         thing->field_258 = goalFrame;
-        rdVector_Sub3(&thing->trackParams.vel, &v12[goalFrame].pos, &thing->position);
-        v15 = rdVector_Normalize3Acc(&thing->trackParams.vel);
-        if ( v15 != 0.0 )
-        {
-            v16 = v15 / thing->trackParams.lerpSpeed;
-            thing->field_250 = 0;
-            thing->trackParams.flags |= 1;
-            thing->trackParams.field_1C = v16;
-        }
-        thinga = thing->trackParams.field_1C;
+        thinga = sithTrackThing_CalcMoveDirection(thing, &v12[goalFrame].pos);
     }
     if ( thinga < 1.0 )
         thinga = 1.0;
@@ -452,7 +430,6 @@ void sithTrackThing_Rotate(sithThing *trackThing, rdVector3 *rot)
 void sithTrackThing_SkipToFrame(sithThing *trackThing, uint32_t goalframeNum, flex_t a3)
 {
     sithThingFrame *goalFrame; // eax
-    flex_t v5; // st7
 
     if ( goalframeNum < trackThing->trackParams.loadedFrames )
     {
@@ -464,15 +441,7 @@ void sithTrackThing_SkipToFrame(sithThing *trackThing, uint32_t goalframeNum, fl
 
         goalFrame = &trackThing->trackParams.aFrames[trackThing->goalframe];
 
-        rdVector_Sub3(&trackThing->trackParams.vel, &goalFrame->pos, &trackThing->position);
-        
-        v5 = rdVector_Normalize3Acc(&trackThing->trackParams.vel);
-        if ( v5 != 0.0 )
-        {
-            trackThing->field_250 = 0;
-            trackThing->trackParams.flags |= 1;
-            trackThing->trackParams.field_1C = v5 / trackThing->trackParams.lerpSpeed;
-        }
+        sithTrackThing_CalcMoveDirection(trackThing, &goalFrame->pos);
     }
 }
 

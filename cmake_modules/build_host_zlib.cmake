@@ -36,6 +36,7 @@ ExternalProject_Add(
                         ${ZLIB_HOST_TOOLCHAIN_ARG}
                         -DCMAKE_INSTALL_LIBDIR=lib
                         -DCMAKE_BUILD_TYPE:STRING=Release
+                        -DCMAKE_POLICY_VERSION_MINIMUM=3.5
     BUILD_BYPRODUCTS    ${ZLIB_HOST_STATIC_LIBRARY_PATH} ${ZLIB_HOST_DYNAMIC_LIBRARY_PATH} ${ZLIB_HOST_IMPORT_LIBRARY_PATH}
 )
 

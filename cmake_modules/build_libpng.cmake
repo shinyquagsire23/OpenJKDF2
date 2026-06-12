@@ -33,6 +33,7 @@ ExternalProject_Add(
                         -DPNG_STATIC:BOOL=TRUE
                         -DPNG_EXECUTABLES:BOOL=FALSE
                         -DPNG_TESTS:BOOL=FALSE
+                        -DCMAKE_POLICY_VERSION_MINIMUM=3.5
                         -DZLIB_ROOT:PATH=${ZLIB_ROOT}
     DEPENDS             ${LIBPNG_DEPENDS}
     BUILD_BYPRODUCTS    ${PNG_STATIC_LIBRARY_PATH} #${PNG_IMPORT_LIBRARY_PATH}

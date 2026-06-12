@@ -8,6 +8,15 @@
 #include "stdPlatform.h"
 #include "jk.h"
 
+// Un-inlined: Clear track node flags with bounds check (added in Grim Fandango).
+static void rdPuppet_ClearTrackNodes(rdPuppet *puppet, int trackNum)
+{
+    if (puppet->rdthing->model3->numHierarchyNodes < 0x40)
+        _memset(puppet->tracks[trackNum].nodes, 0, sizeof(uint32_t) * puppet->rdthing->model3->numHierarchyNodes);
+    else
+        _memset(puppet->tracks[trackNum].nodes, 0, sizeof(puppet->tracks[trackNum].nodes));
+}
+
 rdPuppet* rdPuppet_New(rdThing *thing)
 {
     rdPuppet* puppet = (rdPuppet *)rdroid_pHS->alloc(sizeof(rdPuppet));
@@ -481,11 +490,7 @@ int rdPuppet_AddTrack(rdPuppet *puppet, rdKeyframe *keyframe, int lowPri, int hi
     newTrack->status |= 1;
     newTrack->playSpeed = 0.0;
     
-    // Added: Added in Grim Fandango, bounds checking
-    if (puppet->rdthing->model3->numHierarchyNodes < 0x40)
-        _memset(puppet->tracks[newTrackIdx].nodes, 0, sizeof(uint32_t) * puppet->rdthing->model3->numHierarchyNodes);
-    else
-        _memset(puppet->tracks[newTrackIdx].nodes, 0, sizeof(puppet->tracks[newTrackIdx].nodes));
+    rdPuppet_ClearTrackNodes(puppet, newTrackIdx);
     result = newTrackIdx;
     newTrack->field_120 = 0.0;
     newTrack->field_124 = 0.0;
@@ -563,11 +568,7 @@ void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, flex_t a3)
             size_t v11 = sizeof(uint32_t) * puppet->rdthing->model3->numHierarchyNodes;
             puppet->tracks[trackNum].field_120 -= (flex_d_t)puppet->tracks[trackNum].keyframe->numFrames * v21;
             
-            // Added: Added in Grim Fandango, bounds checks
-            if (puppet->rdthing->model3->numHierarchyNodes < 0x40)
-                _memset(puppet->tracks[trackNum].nodes, 0, sizeof(uint32_t) * puppet->rdthing->model3->numHierarchyNodes);
-            else
-                _memset(puppet->tracks[trackNum].nodes, 0, sizeof(puppet->tracks[trackNum].nodes));
+            rdPuppet_ClearTrackNodes(puppet, trackNum);
         }
         
     }
@@ -664,11 +665,7 @@ void rdPuppet_unk(rdPuppet *puppet, int trackNum)
 
     v2 = &puppet->tracks[trackNum];
 
-    // Added: Added in Grim Fandango, bounds checks
-    if (puppet->rdthing->model3->numHierarchyNodes < 0x40)
-        _memset(v2->nodes, 0, sizeof(uint32_t) * puppet->rdthing->model3->numHierarchyNodes);
-    else
-        _memset(v2->nodes, 0, sizeof(puppet->tracks[trackNum].nodes));
+    rdPuppet_ClearTrackNodes(puppet, trackNum);
 
     v2->field_120 = 0.0;
     v2->field_124 = 0.0;

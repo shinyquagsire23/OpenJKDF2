@@ -343,3 +343,8 @@ other          0.000%            0 / 107
 total          4.162%          105 / 2798
 
 ```
+
+## See Also
+
+- [OpenJones3D](https://github.com/smlu/OpenJones3D) — Sister project decompiling Indiana Jones and the Infernal Machine, which is based on the same engine and internal libraries
+- [OpenJK](https://github.com/JACoders/OpenJK) — Community-maintained open-source engine for Jedi Outcast (SP) and Jedi Academy (SP & MP), the sequels to Dark Forces II.

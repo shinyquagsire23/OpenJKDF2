@@ -1933,30 +1933,30 @@ void do_hooks()
     hook_function(sithDSSThing_ProcessPos_ADDR, sithDSSThing_ProcessPos);
 
 #if 0
-    hook_function(sithDSSThing_SendSyncThingFull_ADDR, sithDSSThing_SendSyncThingFull);
-    hook_function(sithDSSThing_SendPlaySoundPos_ADDR, sithDSSThing_SendPlaySoundPos);
-    hook_function(sithDSSThing_ProcessSyncThingFull_ADDR, sithDSSThing_ProcessSyncThingFull);
-    hook_function(sithDSSThing_ProcessPlaySoundPos_ADDR, sithDSSThing_ProcessPlaySoundPos);
+    //hook_function(sithDSSThing_SendSyncThingFull_ADDR, sithDSSThing_SendSyncThingFull); // TODO: not yet decompiled
+    //hook_function(sithDSSThing_SendPlaySoundPos_ADDR, sithDSSThing_SendPlaySoundPos); // TODO: not yet decompiled
+    //hook_function(sithDSSThing_ProcessSyncThingFull_ADDR, sithDSSThing_ProcessSyncThingFull); // TODO: not yet decompiled
+    //hook_function(sithDSSThing_ProcessPlaySoundPos_ADDR, sithDSSThing_ProcessPlaySoundPos); // TODO: not yet decompiled
     hook_function(sithDSSThing_SendSyncThingAttachment_ADDR, sithDSSThing_SendSyncThingAttachment);
 #endif
 
 #if 0
     hook_function(sithDSS_SendSyncPuppet_ADDR, sithDSS_SendSyncPuppet);
-    hook_function(sithDSS_SendSyncAI_ADDR, sithDSS_SendSyncAI);
-    hook_function(sithDSS_SendSyncSurface_ADDR, sithDSS_SendSyncSurface);
-    hook_function(sithDSS_SendSyncSector_ADDR, sithDSS_SendSyncSector);
-    hook_function(sithDSS_SendSyncItemDesc_ADDR, sithDSS_SendSyncItemDesc);
-    hook_function(sithDSS_SendStopAnim_ADDR, sithDSS_SendStopAnim);
+    //hook_function(sithDSS_SendSyncAI_ADDR, sithDSS_SendSyncAI); // TODO: not yet decompiled
+    //hook_function(sithDSS_SendSyncSurface_ADDR, sithDSS_SendSyncSurface); // TODO: not yet decompiled
+    //hook_function(sithDSS_SendSyncSector_ADDR, sithDSS_SendSyncSector); // TODO: not yet decompiled
+    //hook_function(sithDSS_SendSyncItemDesc_ADDR, sithDSS_SendSyncItemDesc); // TODO: not yet decompiled
+    //hook_function(sithDSS_SendStopAnim_ADDR, sithDSS_SendStopAnim); // TODO: not yet decompiled
     hook_function(sithDSS_SendSyncTimers_ADDR, sithDSS_SendSyncTimers);
     hook_function(sithDSS_SendSyncPalEffects_ADDR, sithDSS_SendSyncPalEffects);
     hook_function(sithDSS_SendSyncCameras_ADDR, sithDSS_SendSyncCameras);
     hook_function(sithDSS_SendMisc_ADDR, sithDSS_SendMisc);
     hook_function(sithDSS_ProcessSyncPuppet_ADDR, sithDSS_ProcessSyncPuppet);
-    hook_function(sithDSS_ProcessSyncAI_ADDR, sithDSS_ProcessSyncAI);
-    hook_function(sithDSS_ProcessSyncSurface_ADDR, sithDSS_ProcessSyncSurface);
-    hook_function(sithDSS_ProcessSyncSector_ADDR, sithDSS_ProcessSyncSector);
-    hook_function(sithDSS_ProcessSyncItemDesc_ADDR, sithDSS_ProcessSyncItemDesc);
-    hook_function(sithDSS_ProcessStopAnim_ADDR, sithDSS_ProcessStopAnim);
+    //hook_function(sithDSS_ProcessSyncAI_ADDR, sithDSS_ProcessSyncAI); // TODO: not yet decompiled
+    //hook_function(sithDSS_ProcessSyncSurface_ADDR, sithDSS_ProcessSyncSurface); // TODO: not yet decompiled
+    //hook_function(sithDSS_ProcessSyncSector_ADDR, sithDSS_ProcessSyncSector); // TODO: not yet decompiled
+    //hook_function(sithDSS_ProcessSyncItemDesc_ADDR, sithDSS_ProcessSyncItemDesc); // TODO: not yet decompiled
+    //hook_function(sithDSS_ProcessStopAnim_ADDR, sithDSS_ProcessStopAnim); // TODO: not yet decompiled
     hook_function(sithDSS_ProcessSyncTimers_ADDR, sithDSS_ProcessSyncTimers);
     hook_function(sithDSS_ProcessSyncPalEffects_ADDR, sithDSS_ProcessSyncPalEffects);
     hook_function(sithDSS_ProcessSyncCameras_ADDR, sithDSS_ProcessSyncCameras);
@@ -2005,8 +2005,8 @@ void do_hooks()
     // sithIntersect
 #if 0
     hook_function(sithIntersect_IsSphereInSector_ADDR, sithIntersect_IsSphereInSector);
-    hook_function(sithIntersect_sub_5080D0_ADDR, sithIntersect_sub_5080D0);
-    hook_function(sithIntersect_sub_508540_ADDR, sithIntersect_sub_508540);
+    //hook_function(sithIntersect_sub_5080D0_ADDR, sithIntersect_sub_5080D0); // TODO: not yet decompiled
+    //hook_function(sithIntersect_sub_508540_ADDR, sithIntersect_sub_508540); // TODO: not yet decompiled
     hook_function(sithIntersect_sub_508D20_ADDR, sithIntersect_sub_508D20);
     hook_function(sithIntersect_SphereHit_ADDR, sithIntersect_SphereHit);
     hook_function(sithIntersect_sub_508750_ADDR, sithIntersect_sub_508750);
@@ -2448,7 +2448,7 @@ void do_hooks()
     hook_function(sithSound_LoadFileData_ADDR, sithSound_LoadFileData);
     hook_function(sithSound_UnloadData_ADDR, sithSound_UnloadData);
     hook_function(sithSound_LoadData_ADDR, sithSound_LoadData);
-    hook_function(sithSound_StopAll_ADDR, sithSound_StopAll);
+    //hook_function(sithSound_StopAll_ADDR, sithSound_StopAll); // TODO: not yet decompiled
     hook_function(sithSound_InitFromPath_ADDR, sithSound_InitFromPath);
     
     // sithSoundClass
@@ -2598,8 +2598,8 @@ void do_hooks()
     hook_function(jkGuiRend_InvokeClicked_ADDR, jkGuiRend_InvokeClicked);
     hook_function(jkGuiRend_PlayClickSound_ADDR, jkGuiRend_PlayClickSound);
     hook_function(jkGuiRend_RenderFocused_ADDR, jkGuiRend_RenderFocused);
-    hook_function(jkGuiRend_RenderIdk2_ADDR, jkGuiRend_RenderIdk2);
-    hook_function(jkGuiRend_RenderAll_ADDR, jkGuiRend_RenderAll);
+    //hook_function(jkGuiRend_RenderIdk2_ADDR, jkGuiRend_RenderIdk2); // TODO: renamed to jkGuiRend_RenderIdk2_alt, needs _ADDR
+    //hook_function(jkGuiRend_RenderAll_ADDR, jkGuiRend_RenderAll); // TODO: not yet decompiled
     hook_function(jkGuiRend_ClickableMouseover_ADDR, jkGuiRend_ClickableMouseover);
     hook_function(jkGuiRend_MouseMovedCallback_ADDR, jkGuiRend_MouseMovedCallback);
     hook_function(jkGuiRend_SetVisibleAndDraw_ADDR, jkGuiRend_SetVisibleAndDraw);
@@ -2841,8 +2841,8 @@ void do_hooks()
     //hook_function(Window_DefaultHandler_ADDR, Window_DefaultHandler);
     hook_function(Window_MessageLoop_ADDR, Window_MessageLoop);
     hook_function(Window_msg_main_handler_ADDR, Window_msg_main_handler);
-    hook_function(sithControl_GetAxis_ADDR, sithControl_GetAxis);
-    hook_function(sithControl_ReadAxisStuff_ADDR, sithControl_ReadAxisStuff);
+    //hook_function(sithControl_GetAxis_ADDR, sithControl_GetAxis); // TODO: not yet decompiled
+    //hook_function(sithControl_ReadAxisStuff_ADDR, sithControl_ReadAxisStuff); // TODO: not yet decompiled
     hook_function(sithControl_ReadFunctionMap_ADDR, sithControl_ReadFunctionMap);
 
     hook_function(stdControl_Open_ADDR, stdControl_Open);
@@ -2853,7 +2853,7 @@ void do_hooks()
     hook_function(stdControl_ReadControls_ADDR, stdControl_ReadControls);
     hook_function(stdControl_FinishRead_ADDR, stdControl_FinishRead);
     hook_function(stdControl_ReadAxis_ADDR, stdControl_ReadAxis);
-    hook_function(sithControl_GetAxis2_ADDR, sithControl_GetAxis2);
+    //hook_function(sithControl_GetAxis2_ADDR, sithControl_GetAxis2); // TODO: not yet decompiled
     
     hook_function(stdDisplay_Startup_ADDR, stdDisplay_Startup);
     hook_function(stdDisplay_VBufferFill_ADDR, stdDisplay_VBufferFill);

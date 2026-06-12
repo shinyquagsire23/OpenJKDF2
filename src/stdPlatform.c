@@ -180,6 +180,26 @@ static const char* Linux_stdFileGets(stdFile_t fhand, char* dst, size_t len)
 #endif
 }
 
+static const wchar_t* Linux_stdFileGetws(stdFile_t fhand, wchar_t* dst, size_t len)
+{
+    // Can't use fgetws because -fshort-wchar makes wchar_t 2 bytes
+    // but libc fgetws expects native wchar_t (4 bytes on POSIX).
+    // Read UTF-16LE characters one at a time instead.
+    if (!len) return NULL;
+    size_t i = 0;
+    while (i < len - 1) {
+        wchar_t ch = 0;
+        if (fread(&ch, sizeof(wchar_t), 1, (FILE*)fhand) != 1) {
+            if (i == 0) return NULL;
+            break;
+        }
+        dst[i++] = ch;
+        if (ch == L'\n') break;
+    }
+    dst[i] = L'\0';
+    return dst;
+}
+
 static int Linux_stdFseek(stdFile_t fhand, int a, int b)
 {
     //printf("fseek? %x %x\n", a, b);
@@ -714,6 +734,7 @@ void stdPlatform_InitServices(HostServices *handlers)
     handlers->fileRead = Linux_stdFileRead;
     handlers->fileGets = Linux_stdFileGets;
     handlers->fileWrite = Linux_stdFileWrite;
+    handlers->fileGetws = Linux_stdFileGetws;
     handlers->fseek = Linux_stdFseek;
     handlers->ftell = Linux_stdFtell;
     handlers->getTimerTick = Linux_TimeMs;

@@ -1214,7 +1214,7 @@ void jkCogExt_GetThingAttachThing(sithCog* ctx)
         if (pThing->attach_flags == SITH_ATTACH_THINGSURFACE) {
             sithThing* pAttached = pThing->attachedThing;
             if (pAttached) {
-                retval = pAttached->thing_id;
+                retval = pAttached->thingIdx;
             }
         }
     }

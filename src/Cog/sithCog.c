@@ -790,20 +790,7 @@ int32_t sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogReference *cogIdk, ch
 
 int32_t sithCog_ThingsSectorsRegSymbolIdk(sithCog *cog, sithCogReference *idk, sithCogSymbol *symbol)
 {
-    cog_int_t v3; // eax
-    int32_t v5; // ebx
-    int32_t v6; // edi
-    sithSurface *v7; // esi
-    int32_t v8; // eax
-    int32_t v10; // eax
-    int32_t v11; // ebx
-    int32_t v12; // edi
-    sithSector *v13; // esi
-    int32_t v17; // ebx
-    int32_t v18; // edi
-    sithThing *v19; // esi
-
-    v3 = symbol->val.data[0];
+    cog_int_t v3 = symbol->val.data[0];
     if ( v3 < 0 )
         return 0;
     switch ( idk->type )
@@ -811,60 +798,15 @@ int32_t sithCog_ThingsSectorsRegSymbolIdk(sithCog *cog, sithCogReference *idk, s
         case 3:
             if ( v3 >= sithWorld_pCurrentWorld->numThingsLoaded )
                 return 0;
-            v17 = idk->mask;
-            v18 = idk->linkid;
-            v19 = &sithWorld_pCurrentWorld->things[v3];
-            //printf("OpenJKDF2: Linking thing %x to cog `%s`? %x %x %x\n", v3, cog->cogscript_fpath, sithThing_GetIdxFromThing(v19), v19->type, idk->linkid);
-            if ( sithThing_GetIdxFromThing(v19) && v19->type && v18 >= 0 )
-            {
-                //printf("OpenJKDF2: Linked thing `%s` to cog `%s`\n", v19->template_name, cog->cogscript_fpath);
-                v19->thingflags |= SITH_TF_CAPTURED;
-                sithCog_aThingLinks[sithCog_numThingLinks].thing = v19;
-                sithCog_aThingLinks[sithCog_numThingLinks].cog = cog;
-                sithCog_aThingLinks[sithCog_numThingLinks].linkid = v18;
-                sithCog_aThingLinks[sithCog_numThingLinks].mask = v17;
-                sithCog_aThingLinks[sithCog_numThingLinks].signature = v19->signature;
-                sithCog_numThingLinks++;
-            }
-            break;
+            return sithCog_ThingFromSymbolidk(cog, &sithWorld_pCurrentWorld->things[v3], idk->linkid, idk->mask);
         case 5:
             if ( v3 >= sithWorld_pCurrentWorld->numSectors )
                 return 0;
-            v11 = idk->mask;
-            v12 = idk->linkid;
-            v13 = &sithWorld_pCurrentWorld->sectors[v3];
-            if ( sithSector_GetIdxFromPtr(v13) && v12 >= 0 )
-            {
-                v13->flags |= SITH_SECTOR_COGLINKED;
-                sithCog_aSectorLinks[sithCog_numSectorLinks].sector = v13;
-                sithCog_aSectorLinks[sithCog_numSectorLinks].cog = cog;
-                sithCog_aSectorLinks[sithCog_numSectorLinks].linkid = v12;
-                sithCog_aSectorLinks[sithCog_numSectorLinks].mask = v11;
-                sithCog_numSectorLinks++;
-                return 1;
-            }
-            break;
+            return sithCog_Sectoridk(cog, &sithWorld_pCurrentWorld->sectors[v3], idk->linkid, idk->mask);
         case 6:
             if ( v3 >= sithWorld_pCurrentWorld->numSurfaces )
                 return 0;
-            v5 = idk->mask;
-            v6 = idk->linkid;
-            v7 = &sithWorld_pCurrentWorld->surfaces[v3];
-            if ( sithSurface_GetIdxFromPtr(v7) )
-            {
-                if ( v6 >= 0 )
-                {
-                    v7->surfaceFlags |= SITH_SURFACE_COG_LINKED;
-                    v10 = sithCog_numSurfaceLinks;
-                    sithCog_aSurfaceLinks[v10].surface = v7;
-                    sithCog_aSurfaceLinks[v10].cog = cog;
-                    sithCog_aSurfaceLinks[v10].linkid = v6;
-                    sithCog_aSurfaceLinks[v10].mask = v5;
-                    sithCog_numSurfaceLinks++;
-                    return 1;
-                }
-            }
-            break;
+            return sithCog_Thingidk(cog, &sithWorld_pCurrentWorld->surfaces[v3], idk->linkid, idk->mask);
     }
     return 1;
 }
@@ -1908,16 +1850,16 @@ int sithCog_InitCogs(sithWorld *world, int num)
 int sithCog_ThingFromSymbolidk(sithCog *cog, sithThing *thing, int linkId, int mask)
 {
     int thingIdx = sithThing_GetIdxFromThing(thing);
-    if ( !thingIdx || !thing->thing_id )
+    if ( !thingIdx || !thing->type )
         return 0;
     if ( linkId >= 0 )
     {
-        thing->thingflags |= 0x400;
+        thing->thingflags |= SITH_TF_CAPTURED;
         sithCog_aThingLinks[sithCog_numThingLinks].thing = thing;
         sithCog_aThingLinks[sithCog_numThingLinks].cog = cog;
         sithCog_aThingLinks[sithCog_numThingLinks].linkid = linkId;
         sithCog_aThingLinks[sithCog_numThingLinks].mask = mask;
-        sithCog_aThingLinks[sithCog_numThingLinks].signature = thing->thing_id;
+        sithCog_aThingLinks[sithCog_numThingLinks].signature = thing->signature;
         sithCog_numThingLinks++;
     }
     return 1;
@@ -1930,7 +1872,7 @@ int sithCog_Thingidk(sithCog *cog, sithSurface *surface, int linkId, int mask)
         return 0;
     if ( linkId >= 0 )
     {
-        surface->surfaceFlags |= 2;
+        surface->surfaceFlags |= SITH_SURFACE_COG_LINKED;
         sithCog_aSurfaceLinks[sithCog_numSurfaceLinks].surface = surface;
         sithCog_aSurfaceLinks[sithCog_numSurfaceLinks].cog = cog;
         sithCog_aSurfaceLinks[sithCog_numSurfaceLinks].linkid = linkId;
@@ -1947,7 +1889,7 @@ int sithCog_Sectoridk(sithCog *cog, sithSector *sector, int linkId, int mask)
         return 0;
     if ( linkId >= 0 )
     {
-        sector->flags |= 4;
+        sector->flags |= SITH_SECTOR_COGLINKED;
         sithCog_aSectorLinks[sithCog_numSectorLinks].sector = sector;
         sithCog_aSectorLinks[sithCog_numSectorLinks].cog = cog;
         sithCog_aSectorLinks[sithCog_numSectorLinks].linkid = linkId;

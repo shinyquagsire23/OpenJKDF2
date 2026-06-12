@@ -126,6 +126,7 @@ ExternalProject_Add(
                            -Dprotobuf_BUILD_EXAMPLES:BOOL=FALSE
                            -Dprotobuf_BUILD_PROTOC_BINARIES:BOOL=${PROTOBUF_BUILD_PROTOC_BINARIES}
                            -Dprotobuf_DISABLE_RTTI:BOOL=TRUE
+                           -DCMAKE_POLICY_VERSION_MINIMUM=3.5
                            -DZLIB_ROOT:PATH=${ZLIB_ROOT}
     DEPENDS                ${PROTOBUF_DEPENDS} # add platform specific zlib depency
     BUILD_BYPRODUCTS       ${libprotobuf_STATIC_LIBRARY_PATH} ${libprotobuf_SHARED_LIBRARY_PATH}

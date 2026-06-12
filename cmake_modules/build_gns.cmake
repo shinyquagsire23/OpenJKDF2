@@ -46,6 +46,7 @@ ExternalProject_Add(
                            -DProtobuf_USE_STATIC_LIBS:BOOL=TRUE
                            -DProtobuf_ROOT:PATH=${Protobuf_ROOT}
                            ${GAMENETWORKINGSOCKETS_PROTOC_EXECUTABLE}
+                           -DCMAKE_POLICY_VERSION_MINIMUM=3.5
                            ${GAMENETWORKINGSOCKETS_EXTRA_ARGS}
     DEPENDS                PROTOBUF ${GAMENETWORKINGSOCKETS_DEPENDS}
     PATCH_COMMAND          git restore CMakeLists.txt src/CMakeLists.txt &&

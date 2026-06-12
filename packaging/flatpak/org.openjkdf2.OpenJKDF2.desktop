@@ -1,6 +1,7 @@
 [Desktop Entry]
 Name=OpenJKDF2
-Comment=Open Jedi Knight: Dark Forces II
+Comment=Open “Jedi Knight™: Dark Forces II”
+Keywords=STAR;WARS;LucasArts;Lucasfilm;mysteries;sith;mots;
 Exec=openjkdf2
 Type=Application
 Icon=org.openjkdf2.OpenJKDF2
