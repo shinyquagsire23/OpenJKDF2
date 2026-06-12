@@ -986,10 +986,18 @@ int sithDSSThing_ProcessFullDesc(sithCogMsg *msg)
     if ( sithWorld_pCurrentWorld->things[thingIdx].type )
         sithThing_FreeEverythingNet(&sithWorld_pCurrentWorld->things[thingIdx]);
 
-    if ( sithWorld_pCurrentWorld->numThings > thingIdx )
-        thingIdx = sithWorld_pCurrentWorld->numThings;
-
-    sithWorld_pCurrentWorld->numThings = thingIdx;
+    // Only bump the high-water mark; do NOT clobber the destination slot.
+    // The original game (JK.EXE @ 0x004F46F0) keeps these as two separate locals:
+    // the packet's thingIdx is always the slot the thing is written to, while a
+    // throwaway temporary is used to raise numThings = max(numThings, thingIdx).
+    // An earlier decompile merged the two into `thingIdx`, so whenever
+    // numThings > thingIdx the received thing was written to things[numThings]
+    // instead of things[thingIdx]. A projectile spawned while a player is joining
+    // inflates numThings, which misroutes the FullDesc of every static thing still
+    // streaming through the join sync, corrupting the thing_id<->slot mapping and
+    // causing remote things to teleport.
+    if ( sithWorld_pCurrentWorld->numThings < thingIdx )
+        sithWorld_pCurrentWorld->numThings = thingIdx;
 
     type = NETMSG_POPS16();
     if ( !type )
