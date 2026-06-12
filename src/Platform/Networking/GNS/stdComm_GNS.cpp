@@ -314,6 +314,11 @@ public:
 
         id = 1;
         availableIds = 0x1;
+        // Drop any disconnect events left over from a previous session. Otherwise a
+        // stale id (e.g. a client that dis/reconnected last game) gets replayed during
+        // the next host's join handshake, which aborts the new client's sync (matching
+        // sithMulti_sendto_id) and removes them -> they time out and never appear.
+        std::queue<int>().swap(m_DisconnectedPeers);
     }
 
     void Shutdown()
@@ -337,6 +342,7 @@ public:
         m_hPollGroup = k_HSteamNetPollGroup_Invalid;
 
         availableIds = 0x1;
+        std::queue<int>().swap(m_DisconnectedPeers);
     }
 
     void RunStep()
