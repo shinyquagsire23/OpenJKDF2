@@ -45,7 +45,9 @@
       <caption>A screenshot of the game running in OpenJKDF2</caption>
     </screenshot>
   </screenshots>
-  <developer_name>Max Thomas</developer_name>
+  <developer id="org.openjkdf2">
+    <name>Max Thomas</name>
+  </developer>
   <url type="homepage">https://github.com/shinyquagsire23/OpenJKDF2</url>
   <url type="bugtracker">https://github.com/shinyquagsire23/OpenJKDF2/issues</url>
   <url type="contact">https://github.com/shinyquagsire23/OpenJKDF2/issues</url>
@@ -61,11 +63,7 @@
     <control>pointing</control>
     <control>keyboard</control>
   </recommends>
-  <content_rating type="oars-1.1">
-    <content_attribute id="violence-fantasy">moderate</content_attribute>
-    <content_attribute id="violence-bloodshed">mild</content_attribute>
-    <content_attribute id="social-chat">intense</content_attribute>
-  </content_rating>
+  <content_rating type="oars-1.1"/>
   <releases>
     <!--NEXT_RELEASE_HERE-->
       <description>
