@@ -896,9 +896,11 @@ LABEL_81:
             return 0.0;
         if (!(flags & RAYCAST_40))
         {
+            // A floor-sticking thing only re-finds/attaches to the floor when it's
+            // descending slowly, i.e. vel.z in [-2.0, 0.2].
             if ( (v5->attach_flags) != 0 && !(v5->attach_flags & SITH_ATTACH_NO_MOVE)
               || (v5->physicsParams.physflags & SITH_PF_FLOORSTICK) != 0
-              && (v5->physicsParams.vel.z < -2.0 || v5->physicsParams.vel.z <= 0.2) )
+              && (v5->physicsParams.vel.z >= -2.0 && v5->physicsParams.vel.z <= 0.2) )
             {
                 sithPhysics_FindFloor(v5, 0);
             }
