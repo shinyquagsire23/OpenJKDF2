@@ -1375,12 +1375,20 @@ int sithAI_FireWeapon(sithActor *actor, flex_t minDistToFire, flex_t maxDistToFi
     v9 = actor->thing;
     v21 = 1.0;
     v20 = 0;
-    if ( (g_debugmodeFlags & DEBUGFLAG_NO_AI) != 0
-      || (v9->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED))
-      || (v9->sector->flags & SITH_SECTOR_UNDERWATER) && (v9->actorParams.typeflags & SITH_AF_CANTSHOOTUNDERWATER) != 0 )
+    if (g_debugmodeFlags & DEBUGFLAG_NO_AI) {
+        return 0;
+    }
+    if (v9->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) {
+        return 0;
+    }
+    // Bail when underwater and unable to shoot underwater
+    if (v9->sector // Added: thing->sector null check
+        && (v9->sector->flags & SITH_SECTOR_UNDERWATER)
+        && (v9->actorParams.typeflags & SITH_AF_CANTSHOOTUNDERWATER))
     {
         return 0;
     }
+
     if ( bAltFire )
     {
         if ( bAltFire == 1 )
@@ -1771,11 +1779,11 @@ int sithAI_FUN_0053a520(sithActor *pActor,flex_t param_2,flex_t param_3,flex_t p
     if (thing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) {
         return 0;
     }
-    if (thing->sector && thing->sector->flags & SITH_SECTOR_UNDERWATER) // Added: thing->sector
+    // Bail when underwater and unable to shoot underwater
+    if (thing->sector // Added: thing->sector null check
+        && (thing->sector->flags & SITH_SECTOR_UNDERWATER)
+        && (thing->actorParams.typeflags & SITH_AF_CANTSHOOTUNDERWATER))
     {
-        return 0;
-    }
-    if (thing->actorParams.typeflags & SITH_AF_CANTSHOOTUNDERWATER) {
         return 0;
     }
 
@@ -1859,11 +1867,11 @@ int sithAI_Leap(sithActor *pActor,flex_t minDist,flex_t maxDist,flex_t minDot,in
     if (thing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) {
         return 0;
     }
-    if (thing->sector && thing->sector->flags & SITH_SECTOR_UNDERWATER) // Added: thing->sector
+    // Bail when underwater and unable to shoot underwater
+    if (thing->sector // Added: thing->sector null check
+        && (thing->sector->flags & SITH_SECTOR_UNDERWATER)
+        && (thing->actorParams.typeflags & SITH_AF_CANTSHOOTUNDERWATER))
     {
-        return 0;
-    }
-    if (thing->actorParams.typeflags & SITH_AF_CANTSHOOTUNDERWATER) {
         return 0;
     }
 
