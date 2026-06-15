@@ -39,7 +39,8 @@ void sithPhysics_FindFloor(sithThing *pThing, int a3)
     if (!pThing->sector)
         return;
 
-    if (pThing->sector->flags & SITH_SECTOR_UNDERWATER && pThing->type == SITH_THING_PLAYER)
+    // There are no floors underwater, unless you're the player
+    if ((pThing->sector->flags & SITH_SECTOR_UNDERWATER) && pThing->type == SITH_THING_PLAYER)
     {
         sithCollision_SearchRadiusForThings(pThing->sector, pThing, &pThing->position, &rdroid_zVector3, 0.05, 0.0, RAYCAST_1);
         v5 = sithCollision_NextSearchResult();
@@ -62,7 +63,7 @@ LABEL_8:
             pThing->physicsParams.physflags &= ~SITH_PF_WATERSURFACE;
         }
     }
-    else
+    else if (!(pThing->sector->flags & SITH_SECTOR_UNDERWATER))
     {
         if ( (pThing->physicsParams.physflags & SITH_PF_WALLSTICK) == 0 )
         {
