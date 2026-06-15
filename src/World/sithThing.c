@@ -1116,7 +1116,6 @@ sithThing* sithThing_SpawnTemplate(sithThing *pTemplateThing, sithThing *spawnTh
 void sithThing_AttachToSurface(sithThing* pThing, sithSurface *surface, int a3)
 {
     int v4; // ebp
-    int v5; // eax
     int *v6; // eax
     sithWorld *v7; // edx
     rdVector3 *v8; // ecx
@@ -1136,10 +1135,9 @@ void sithThing_AttachToSurface(sithThing* pThing, sithSurface *surface, int a3)
     }
 
     v4 = 1;
-    v5 = pThing->attach_flags;
-    if ( v5 )
+    if ( pThing->attach_flags )
     {
-        if ( (v5 & 1) != 0 && pThing->attachedSurface == surface )
+        if ( (pThing->attach_flags & 1) != 0 && pThing->attachedSurface == surface )
             return;
         v4 = 0;
         sithThing_DetachThing(pThing);

@@ -190,6 +190,7 @@ int sithPuppet_PlayMode(sithThing *thing, signed int anim, rdPuppetTrackCallback
     if ( anim >= SITHPUPPET_NUMANIMS )
         return -1;
     v6 = thing->puppet;
+
     v7 = &v4->modes[v6->majorMode].keyframe[anim];
     keyframe = v7->keyframe;
     if ( !v7->keyframe )
@@ -239,6 +240,7 @@ int sithPuppet_StartKey(rdPuppet *puppet, rdKeyframe *keyframe, int a3, int a4, 
     {
         trackNum = a5;
     }
+
 LABEL_8:
     if ( v6 )
     {
@@ -285,6 +287,7 @@ void sithPuppet_ResetTrack(sithThing *puppet)
     v2->otherTrack = -1;
     v2->field_18 = -1;
     v2->currentTrack = -1;
+
 }
 
 // MOTS altered?
@@ -452,7 +455,7 @@ flex_t sithPuppet_sub_4E4380(sithThing *thing)
                 }
             }
         }
-        if ( thing->moveType == SITH_ANIM_STAND && thing->attach_flags && (thing->physicsParams.physflags & (SITH_PF_200000|SITH_PF_CROUCHING)) )
+        if ( thing->moveType == SITH_MT_PHYSICS && thing->attach_flags && (thing->physicsParams.physflags & (SITH_PF_200000|SITH_PF_CROUCHING)) )
         {
             if ( v3 == SITH_ANIM_STAND && thinga < 0.0 )
                 anim = SITH_ANIM_CROUCHBACK;
@@ -531,6 +534,7 @@ flex_t sithPuppet_sub_4E4380(sithThing *thing)
 LABEL_51:
     v18 = thing->puppet;
     v18->currentAnimation = anim;
+
     v19 = &v11->modes[v18->majorMode].keyframe[anim];
     if ( v19 != v18->playingAnim )
     {

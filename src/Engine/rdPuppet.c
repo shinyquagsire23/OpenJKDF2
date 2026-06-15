@@ -244,7 +244,8 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
             }
             
             v18 = (v17->type & nodeIter->type) ? trackIter->highPri : trackIter->lowPri;
-            if (!trackIter->status & 2) {
+            // Only blend tracks that are actively playing (status bit 0x2)
+            if (!(trackIter->status & 2)) {
                 continue;
             }
             
@@ -432,11 +433,7 @@ int rdPuppet_UpdateTracks(rdPuppet *puppet, flex_t deltaSeconds)
                 }
                 else
                 {
-                    if ( track->callback )
-                        track->callback(puppet->rdthing->parentSithThing, v2, 0);
-                    track->status = 0;
-                    track->keyframe = 0;
-                    track->callback = 0;
+                    rdPuppet_ResetTrack(puppet, v2);
                 }
             }
         }
@@ -450,7 +447,6 @@ int rdPuppet_AddTrack(rdPuppet *puppet, rdKeyframe *keyframe, int lowPri, int hi
     rdPuppetTrack *v4; // ecx
     int newTrackIdx; // esi
     rdPuppetTrack *v6; // eax
-    int result; // eax
     rdPuppetTrack *newTrack; // edx
 
     v4 = puppet->tracks;
@@ -471,15 +467,10 @@ int rdPuppet_AddTrack(rdPuppet *puppet, rdKeyframe *keyframe, int lowPri, int hi
                 return -1;
         }
 
-        if ( puppet->tracks[newTrackIdx].callback )
-            puppet->tracks[newTrackIdx].callback(puppet->rdthing->parentSithThing, newTrackIdx, 0);
-
-        puppet->tracks[newTrackIdx].status = 0;
-        puppet->tracks[newTrackIdx].keyframe = 0;
-        puppet->tracks[newTrackIdx].callback = 0;
-
         if ( newTrackIdx >= 4 )
             return -1;
+
+        rdPuppet_ResetTrack(puppet, newTrackIdx);
     }
     
     newTrack = &puppet->tracks[newTrackIdx];
@@ -489,13 +480,10 @@ int rdPuppet_AddTrack(rdPuppet *puppet, rdKeyframe *keyframe, int lowPri, int hi
     newTrack->lowPri = lowPri;
     newTrack->status |= 1;
     newTrack->playSpeed = 0.0;
+
+    rdPuppet_unk(puppet, newTrackIdx);
     
-    rdPuppet_ClearTrackNodes(puppet, newTrackIdx);
-    result = newTrackIdx;
-    newTrack->field_120 = 0.0;
-    newTrack->field_124 = 0.0;
-    newTrack->status = 3;
-    return result;
+    return newTrackIdx;
 }
 
 void rdPuppet_SetCallback(rdPuppet *a1, int trackNum, rdPuppetTrackCallback_t callback)
@@ -518,7 +506,7 @@ int rdPuppet_FadeInTrack(rdPuppet *puppet, int trackNum, flex_t speed)
     }
 }
 
-void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, flex_t a3)
+void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, flex_t deltaSecondsKinda)
 {
     //_rdPuppet_AdvanceTrack(puppet, trackNum, a3);
     //return;
@@ -536,9 +524,9 @@ void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, flex_t a3)
     v20 = 0;
     v4 = puppet->tracks[trackNum].keyframe;
     v5 = &puppet->tracks[trackNum];
-    if ( !v4 || a3 == 0.0 )
+    if ( !v4 || deltaSecondsKinda == 0.0 )
         return;
-    v22 = a3 + puppet->tracks[trackNum].field_124;
+    v22 = deltaSecondsKinda + puppet->tracks[trackNum].field_124;
     v6 = (flex_d_t)v4->numFrames;
     puppet->tracks[trackNum].field_120 = v22;
 
@@ -611,11 +599,7 @@ void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, flex_t a3)
 
     if ( v20 )
     {
-        if ( puppet->tracks[trackNum].callback )
-            puppet->tracks[trackNum].callback(puppet->rdthing->parentSithThing, trackNum, 0);
-        v5->status = 0;
-        puppet->tracks[trackNum].keyframe = 0;
-        puppet->tracks[trackNum].callback = 0;
+        rdPuppet_ResetTrack(puppet, trackNum);
     }
     else
     {
@@ -680,13 +664,8 @@ int rdPuppet_RemoveTrack(rdPuppet *puppet, rdThing *rdthing)
     {
         puppet->tracks[i].field_120 = 0.0;
         puppet->tracks[i].field_124 = 0.0;
-        if ( puppet->tracks[i].callback )
-        {
-            puppet->tracks[i].callback(puppet->rdthing->parentSithThing, i, 0);
-        }
-        puppet->tracks[i].status = 0;
-        puppet->tracks[i].keyframe = 0;
-        puppet->tracks[i].callback = 0;
+
+        rdPuppet_ResetTrack(puppet, i);
     }
 
     return 1;
