@@ -20,6 +20,7 @@
 #include "jk.h"
 
 #define JKSABER_EXTENDTIME (0.3000000)
+#define JKSABER_LENGTHCHANGE (0.6000000)
 
 void jkSaber_Startup()
 {
@@ -151,11 +152,11 @@ void jkSaber_UpdateLength(sithThing *thing)
         thing->jkFlags &= ~JKFLAG_SABERRETRACT;
 
         playerInfo->polyline.length = newLength;
-        thing->actorParams.timeLeftLengthChange = deltaLen * (1.0 - JKSABER_EXTENDTIME);
+        thing->actorParams.timeLeftLengthChange = deltaLen * JKSABER_LENGTHCHANGE;
         if (newLength >= playerInfo->length) // ? verify, IDA crapped out on this comparison
         {
             playerInfo->polyline.length = playerInfo->length;
-            thing->actorParams.timeLeftLengthChange = (1.0 - JKSABER_EXTENDTIME);
+            thing->actorParams.timeLeftLengthChange = JKSABER_LENGTHCHANGE;
             thing->jkFlags &= ~(JKFLAG_SABERRETRACT | JKFLAG_SABEREXTEND);
         }
     }
@@ -167,7 +168,7 @@ void jkSaber_UpdateLength(sithThing *thing)
         thing->jkFlags &= ~JKFLAG_SABEREXTEND;
 
         playerInfo->polyline.length = newLength;
-        thing->actorParams.timeLeftLengthChange = deltaLen * (1.0 - JKSABER_EXTENDTIME);
+        thing->actorParams.timeLeftLengthChange = deltaLen * JKSABER_LENGTHCHANGE;
         if ( newLength <= 0.0 ) // ? verify, IDA crapped out on this comparison
         {
             playerInfo->polyline.length = 0.0;
@@ -178,7 +179,7 @@ void jkSaber_UpdateLength(sithThing *thing)
     else if (thing->jkFlags & JKFLAG_SABERFORCEON) // Used for starting a level with the saber on, ie DF2 lv4
     {
         playerInfo->polyline.length = playerInfo->length;
-        thing->actorParams.timeLeftLengthChange = (1.0 - JKSABER_EXTENDTIME);
+        thing->actorParams.timeLeftLengthChange = JKSABER_LENGTHCHANGE;
         thing->jkFlags &= ~(JKFLAG_SABERRETRACT | JKFLAG_SABEREXTEND);
         thing->jkFlags |= JKFLAG_SABERON;
 

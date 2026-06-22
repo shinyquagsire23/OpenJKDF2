@@ -273,7 +273,8 @@ void sithWeapon_sub_4D3920(sithThing *weapon)
                         break;
                     rdVector_Copy3(&a3, &weapon->position);
                     rdVector_MultAcc3(&a3, &lookOrient, elementSize_);
-                    if (rdVector_Len3(&a3) <= 0.0) // TODO verify this
+                    rdVector_Sub3(&a1a, &a3, &weaponPos);
+                    if (rdVector_Len3(&a1a) <= weapon->weaponParams.trailCylRadius)
                     {
                         rot.x = _frand()
                               * (weapon->weaponParams.trainRandAngle + weapon->weaponParams.trainRandAngle)
@@ -369,7 +370,8 @@ LABEL_25:
             a3.x = v32 * lookOrient.x + weapon->position.x;
             a3.y = v32 * lookOrient.y + weapon->position.y;
             a3.z = v32 * lookOrient.z + weapon->position.z;
-            if (rdVector_Len3(&a3) <= 0.0) // TODO verify this
+            rdVector_Sub3(&a1a, &a3, &weaponPos);
+            if (rdVector_Len3(&a1a) <= weapon->weaponParams.trailCylRadius)
             {
                 rot.x = _frand() * (weapon->weaponParams.trainRandAngle + weapon->weaponParams.trainRandAngle)
                       - weapon->weaponParams.trainRandAngle;
@@ -659,9 +661,9 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
 
     int bFlagsHadWfImpactSoundFxEarlier = physicsThing->weaponParams.typeflags & SITH_WF_IMPACT_SOUND_FX;
     if ( physicsThing->weaponParams.typeflags & SITH_WF_IMPACT_SOUND_FX && collidedThing->thingflags & SITH_TF_4
-      || collidedThing->controlType == SITH_CT_PARTICLE && physicsThing->weaponParams.typeflags & SITH_WF_RICOCHET_OFF_SURFACE && physicsThing->weaponParams.numDeflectionBounces < 2 )
+      || collidedThing->type == SITH_THING_COG && physicsThing->weaponParams.typeflags & SITH_WF_RICOCHET_OFF_SURFACE && physicsThing->weaponParams.numDeflectionBounces < 2 )
     {
-        if ( ++physicsThing->weaponParams.numDeflectionBounces < MAX_DEFLECTION_BOUNCES )
+        if ( physicsThing->weaponParams.numDeflectionBounces++ < MAX_DEFLECTION_BOUNCES )
         {
             rdVector3 v31 = physicsThing->physicsParams.vel;
             result = sithCollision_DebrisDebrisCollide(physicsThing, collidedThing, a4, 0);

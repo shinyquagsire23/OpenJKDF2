@@ -638,10 +638,10 @@ void sithPhysics_ThingPhysPlayer(sithThing *player, flex_t deltaSeconds)
     // sync better between clients.
     flex_t rolloverCombine = deltaSeconds + player->physicsParams.physicsRolloverFrames;
 
-    flex_t framesToApply = rolloverCombine * OLDSTEP_TARGET_FPS; // get number of 50FPS steps passed
-    player->physicsParams.physicsRolloverFrames = rolloverCombine - (flex_d_t)(unsigned int)(int)framesToApply * OLDSTEP_DELTA_50FPS;
+    int framesToApply = (int)stdMath_Floor(rolloverCombine * OLDSTEP_TARGET_FPS + 0.5); // number of 50FPS steps passed
+    player->physicsParams.physicsRolloverFrames = rolloverCombine - (flex_d_t)(unsigned int)framesToApply * OLDSTEP_DELTA_50FPS;
 
-    for (int i = (int)framesToApply; i > 0; i--)
+    for (int i = framesToApply; i > 0; i--)
     {
         rdVector_Zero3(&a1a);
         if ( player->physicsParams.airDrag != 0.0 )
@@ -950,6 +950,10 @@ void sithPhysics_ThingPhysAttached(sithThing *pThing, flex_t deltaSeconds)
         if ( (pThing->physicsParams.physflags & SITH_PF_CROUCHING) != 0 )
             v44 = deltaSeconds * 0.8;
         rdVector_Scale3(&vel_change, &pThing->physicsParams.acceleration, v44);
+        
+        flex_t velChangeMag = rdVector_Len3(&vel_change);
+        if ( pThing->physicsParams.maxVel < velChangeMag )
+            rdVector_Scale3Acc(&vel_change, pThing->physicsParams.maxVel / velChangeMag);
         rdVector_ClipPrecision3(&vel_change);
         if ( !rdVector_IsZero3(&vel_change) )
             rdMatrix_TransformVector34Acc(&vel_change, &pThing->lookOrientation);

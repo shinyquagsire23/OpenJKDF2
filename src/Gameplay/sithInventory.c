@@ -107,7 +107,7 @@ int sithInventory_GetNumBinsWithFlag(sithThing *thing, int binNum, int flags)
         if ( binNum <= 0 )
             return -1;
 
-        for (int i = 0; i < SITHBIN_NUMBINS; i++)
+        for (int i = 0; i < binNum; i++)
         {
             sithItemDescriptor* desc =  &sithInventory_aDescriptors[i];
 
@@ -196,7 +196,7 @@ int sithInventory_GetNumBinsWithFlagRev(sithThing *thing, int binNumEnd, int fla
         if ( binNumEnd >= 199 )
             return -1;
 
-        for (int i = 199; i > binNumEnd - 1; --i)
+        for (int i = 199; i > binNumEnd; --i)
         {
             sithItemDescriptor* desc = &sithInventory_aDescriptors[i];
             if (!(!(flags & desc->flags) || thing->actorParams.playerinfo == (sithPlayerInfo *)-136 || !(desc->flags & ITEMINFO_VALID) || !(thing->actorParams.playerinfo->iteminfo[i].state & ITEMSTATE_AVAILABLE)))
@@ -1419,7 +1419,7 @@ LABEL_108:
 
 void sithInventory_SendFire(sithThing *player)
 {
-    for (int i = 0; i < SITHBIN_NUMBINS; i++) // TODO I think the actual game has an off by one here
+    for (int i = 0; i < SITHBIN_NUMBINS; i++)
     {
         sithItemInfo* iteminfo = &player->actorParams.playerinfo->iteminfo[i];
         sithItemDescriptor* desc = &sithInventory_aDescriptors[i];

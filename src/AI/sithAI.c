@@ -369,11 +369,12 @@ void sithAI_TickActor(sithActor *actor)
     int a3 = actor->flags;
 
     while (1) {
+        int bRestartScan = 0;
         for ( a1a = 0; a1a < actor->numAIClassEntries; ++a1a )
         {
             if ( (actor->instincts[a1a].field_0 & 1) == 0 )
             {
-                if ((actor->flags & actor->pAIClass->entries[a1a].param1) 
+                if ((actor->flags & actor->pAIClass->entries[a1a].param1)
                     && !(actor->flags & actor->pAIClass->entries[a1a].param2))
                 {
                     if ( actor->instincts[a1a].nextUpdate <= sithTime_curMs )
@@ -383,7 +384,9 @@ void sithAI_TickActor(sithActor *actor)
                         {
                             sithAI_SetActorFireTarget(actor, SITHAI_MODE_UNK100, a3);
                             a3 = actor->flags;
-                            continue;
+                            
+                            bRestartScan = 1;
+                            break;
                         }
                     }
                     if ( actor->instincts[a1a].nextUpdate < nextMs ) {
@@ -392,7 +395,8 @@ void sithAI_TickActor(sithActor *actor)
                 }
             }
         }
-        break;
+        if (!bRestartScan)
+            break;
     }
     
     actor->nextUpdate = nextMs;
@@ -1700,7 +1704,8 @@ void sithAI_GetThingsInCone(sithSector *a1, rdMatrix34 *a2, flex_t a3)
             rdVector_Normalize3(&v16, &a2->lvec);
             v17 = rdVector_Dot3(&a1a, &v13);
             a2a = rdVector_Dot3(&v1, &v13);
-            if ( v17 > (flex_d_t)sithAI_flt_84DE58
+            if ( dist > (flex_d_t)sithAI_flt_84DE70
+              || v17 > (flex_d_t)sithAI_flt_84DE58
               || v17 < -sithAI_flt_84DE58
               || a2a > (flex_d_t)sithAI_flt_84DE64
               || a2a < -sithAI_flt_84DE64

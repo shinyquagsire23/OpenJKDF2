@@ -423,7 +423,11 @@ flex_t sithPuppet_sub_4E4380(sithThing *thing)
         }
     }
 
-    if ( thing->sector && (thing->sector->flags & SITH_SECTOR_UNDERWATER) != 0 )
+    // MOTS also routes actors with the SITH_AF_40000000 typeflag through the submerged
+    // animation set (majorMode = field_0 + 3) even when not underwater. Without this, such MOTS
+    // actors play the wrong animation set. Gated on MoTS so JK behavior is unchanged.
+    if ( (thing->sector && (thing->sector->flags & SITH_SECTOR_UNDERWATER) != 0)
+      || (Main_bMotsCompat && (thing->actorParams.typeflags & SITH_AF_40000000) != 0) )
     {
         v11 = thing->animclass;
         if ( v11 )

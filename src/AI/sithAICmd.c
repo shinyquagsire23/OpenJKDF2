@@ -484,6 +484,8 @@ int sithAICmd_LobFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorInst
         }
         return 0;
     }
+    if ( !v7 )
+        return 0;
     if ( (v7->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
     {
         if ( aiclass->argsAsFloat[5] > _frand() )
@@ -1515,7 +1517,7 @@ int sithAICmd_HitAndRun(sithActor *actor, sithAIClassEntry *aiclass, sithActorIn
         instinct->param0 = 0.0;
         actor->flags |= SITHAI_MODE_FLEEING;
         actor->pFleeThing = actor->pDistractor;
-        instinct->nextUpdate = sithTime_curMs + (int)aiclass->argsAsFloat[1];
+        instinct->nextUpdate = sithTime_curMs + (int)stdMath_Floor(aiclass->argsAsFloat[1] + 0.5);
         return 1;
     }
     return result;

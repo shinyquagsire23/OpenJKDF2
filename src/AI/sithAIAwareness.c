@@ -82,8 +82,10 @@ int sithAIAwareness_Tick(int32_t a, sithEventInfo* b)
         sithAIAwareness_sub_4F2C30(v2, v2->sector, &v2->pos, &v2->pos, v2->field_18, v2->field_18, v2->thing);
     }
     
-    // Added: fixed off-by-one in loop comparison
-    for (size_t v3 = 0; v3 < sithAI_inittedActors; ++v3 )
+    // sithAI_inittedActors is an inclusive max index (-1 when empty), so the loop must be `<=`
+    // to reach the highest-indexed actor (matches the binary and sithAI_TickAll). A signed
+    // counter keeps the empty (-1) case iterating zero times.
+    for (int v3 = 0; v3 <= sithAI_inittedActors; ++v3 )
     {
         // Added: prevent OOB access
         // TODO: define this maximum

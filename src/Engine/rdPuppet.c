@@ -552,7 +552,7 @@ void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, flex_t deltaSecondsKi
         }
         else
         {
-            v21 = stdMath_Floor(v22 / v6);
+            v21 = stdMath_Floor(v22 / v6 + 0.5);
             size_t v11 = sizeof(uint32_t) * puppet->rdthing->model3->numHierarchyNodes;
             puppet->tracks[trackNum].field_120 -= (flex_d_t)puppet->tracks[trackNum].keyframe->numFrames * v21;
             
