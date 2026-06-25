@@ -770,7 +770,7 @@ LABEL_50:
             if (!Main_bMotsCompat) return;
 
             if ((thing->controlType == SITH_CT_AI) && (v12 = thing->actor, v12 != (sithActor *)0x0)) {
-                sithAI_FUN_0053a520(v12,0.0,0.0,0.0,v12->field_26C,v12->field_264,v12->field_268);
+                sithAI_Charge(v12,0.0,0.0,0.0,v12->field_26C,v12->field_264,v12->field_268);
             }
             return;
         default:

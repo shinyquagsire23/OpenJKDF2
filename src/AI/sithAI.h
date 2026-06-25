@@ -89,10 +89,10 @@ MATH_FUNC int sithAI_CanDetectSightThing(sithActor* actor, sithThing* targetThin
 void sithAI_SetDistractor(sithThing *pDistractor);
 void sithAI_AddAlignmentPriority(flex_t param_1);
 int sithAI_FirstThingInCone(sithSector *sector, rdMatrix34 *out, flex_t autoaimFov, flex_t autoaimMaxDist, int a5, sithThing **thingList, int a7, flex_t a8);
-MATH_FUNC int sithAI_FUN_0053a520(sithActor *pActor,flex_t param_2,flex_t param_3,flex_t param_4,int param_5,
+MATH_FUNC int sithAI_Charge(sithActor *pActor,flex_t param_2,flex_t param_3,flex_t param_4,int param_5,
                        flex_t param_6,uint32_t param_7);
 MATH_FUNC int sithAI_Leap(sithActor *pActor,flex_t minDist,flex_t maxDist,flex_t minDot,int param_5,
-                       flex_t param_6,uint32_t param_7);
+                       flex_t leapSpeed,uint32_t param_7);
 MATH_FUNC sithThing* sithAI_FUN_00539a60(sithActor *pThing);
 
 //static int (*sithAI_Startup)() = (void*)sithAI_Startup_ADDR;

@@ -1763,15 +1763,15 @@ int sithAI_FirstThingInCone(sithSector *sector, rdMatrix34 *out, flex_t autoaimF
 }
 
 // MOTS added
-int sithAI_FUN_0053a520(sithActor *pActor,flex_t param_2,flex_t param_3,flex_t param_4,int param_5,
+int sithAI_Charge(sithActor *pActor,flex_t param_2,flex_t param_3,flex_t param_4,int param_5,
                        flex_t param_6,uint32_t param_7)
 {
     sithThing *thing;
-    sithThing *psVar1;
-    sithThing *psVar2;
+    sithThing *pDistractorThing;
+    sithThing *pActorThing;
     flex_t fVar3;
     flex_t fVar4;
-    flex_t fVar5;
+    flex_t xDist;
     int bVar6;
     int anim;
 
@@ -1798,20 +1798,22 @@ int sithAI_FUN_0053a520(sithActor *pActor,flex_t param_2,flex_t param_3,flex_t p
     sithAI_sub_4EAD60(pActor);
     if ((param_7 & 8) != 0) {
 LAB_0053a691:
-        psVar1 = pActor->pDistractor;
-        psVar2 = pActor->thing;
-        fVar5 = (psVar1->position).x - (psVar2->position).x;
-        fVar3 = (psVar1->position).y - (psVar2->position).y;
-        fVar4 = (psVar1->position).z - (psVar2->position).z;
+        pDistractorThing = pActor->pDistractor;
+        pActorThing = pActor->thing;
+        
+        xDist = (pDistractorThing->position).x - (pActorThing->position).x;
+        fVar3 = (pDistractorThing->position).y - (pActorThing->position).y;
+        fVar4 = (pDistractorThing->position).z - (pActorThing->position).z;
+
         pActor->field_28C = sithTime_curMs + 2000;
         pActor->moveSpeed = 1313.0;
         pActor->flags &= ~(SITHAI_MODE_TURNING | SITHAI_MODE_MOVING);
-        pActor->attackError.x = fVar5;
-        thing->physicsParams.vel.x = param_6 * fVar5;
+        pActor->attackError.x = xDist;
+        thing->physicsParams.vel.x = param_6 * xDist;
         thing->physicsParams.vel.y = param_6 * fVar3;
         pActor->attackError.y = fVar3;
         pActor->attackError.z = fVar4;
-        pActor->attackDistance = stdMath_Sqrt(fVar4 * fVar4 + fVar3 * fVar3 + fVar5 * fVar5);
+        pActor->attackDistance = stdMath_Sqrt(fVar4 * fVar4 + fVar3 * fVar3 + xDist * xDist);
         thing->physicsParams.vel.z = param_6 * fVar4;
         return 1;
     }
@@ -1847,16 +1849,15 @@ LAB_0053a691:
 
 // MOTS added
 int sithAI_Leap(sithActor *pActor,flex_t minDist,flex_t maxDist,flex_t minDot,int param_5,
-                       flex_t param_6,uint32_t param_7)
+                       flex_t leapSpeed,uint32_t param_7)
 {
     flex_t fVar1;
     sithThing *thing;
-    sithThing *psVar2;
-    sithThing *psVar3;
+    sithThing *pDistractorThing;
+    sithThing *pActorThing;
     int bVar4;
-    uint32_t uVar5;
     int anim;
-    flex_d_t fVar6;
+    flex_d_t xDist;
     flex_d_t fVar7;
     flex_d_t fVar8;
     flex_d_t fVar9;
@@ -1884,30 +1885,31 @@ int sithAI_Leap(sithActor *pActor,flex_t minDist,flex_t maxDist,flex_t minDot,in
         anim = SITH_ANIM_JUMP;
     }
     sithAI_sub_4EAD60(pActor);
-    uVar5 = sithTime_curMs;
     if ((param_7 & 8) != 0) 
     {
 LAB_0053a3b9:
-        psVar2 = pActor->pDistractor;
-        psVar3 = pActor->thing;
-        fVar6 = (flex_d_t)(psVar2->position).x - (flex_d_t)(psVar3->position).x;
-        fVar7 = (flex_d_t)(psVar2->position).y - (flex_d_t)(psVar3->position).y;
-        fVar8 = (flex_d_t)(psVar2->position).z - (flex_d_t)(psVar3->position).z;
-        fVar9 = stdMath_Sqrt(fVar8 * (flex_d_t)(flex_t)fVar8 + fVar7 * fVar7 + fVar6 * (flex_d_t)(flex_t)fVar6); // FLEXTODO
-        fVar10 = fVar9 / (flex_d_t)param_6 - (flex_d_t) - 0.2;
+        pDistractorThing = pActor->pDistractor;
+        pActorThing = pActor->thing;
+        
+        xDist = (flex_d_t)(pDistractorThing->position).x - (flex_d_t)(pActorThing->position).x;
+        fVar7 = (flex_d_t)(pDistractorThing->position).y - (flex_d_t)(pActorThing->position).y;
+        fVar8 = (flex_d_t)(pDistractorThing->position).z - (flex_d_t)(pActorThing->position).z;
+        
+        fVar9 = stdMath_Sqrt(fVar8 * (flex_d_t)(flex_t)fVar8 + fVar7 * fVar7 + xDist * (flex_d_t)(flex_t)xDist); // FLEXTODO
+        fVar10 = fVar9 / (flex_d_t)leapSpeed - (flex_d_t) - 0.2;
         fVar1 = sithWorld_pCurrentWorld->worldGravity;
-        (pActor->attackError).x = (flex_t)fVar6; // FLEXTODO
+        (pActor->attackError).x = (flex_t)xDist; // FLEXTODO
         (pActor->attackError).y = (flex_t)fVar7; // FLEXTODO
         (pActor->attackError).z = (flex_t)fVar8; // FLEXTODO
         pActor->attackDistance = (flex_t)fVar9; // FLEXTODO
         lVar11 = (int64_t)(fVar10 * 1000.0);
-        pActor->field_28C = (int)lVar11 + uVar5;
+        pActor->field_28C = (int)lVar11 + sithTime_curMs;
         pActor->flags &= ~(SITHAI_MODE_TURNING | SITHAI_MODE_MOVING);
         sithThing_DetachThing(thing);
-        thing->physicsParams.vel.x = param_6 * (flex_t)fVar6; // FLEXTODO
-        thing->physicsParams.vel.y = param_6 * (flex_t)fVar7; // FLEXTODO
+        thing->physicsParams.vel.x = leapSpeed * (flex_t)xDist; // FLEXTODO
+        thing->physicsParams.vel.y = leapSpeed * (flex_t)fVar7; // FLEXTODO
         thing->physicsParams.vel.z =
-            (flex_t)(fVar10 * 0.5 * fVar1 + (flex_t)(param_6 * (flex_t)fVar8)); // FLEXTODO
+            (flex_t)(fVar10 * 0.5 * fVar1 + (flex_t)(leapSpeed * (flex_t)fVar8)); // FLEXTODO
         sithSoundClass_PlayModeRandom(thing, SITH_SC_JUMP);
         return 1;
     }
@@ -1935,7 +1937,7 @@ LAB_0053a3b9:
                 {
                     pActor->field_28C = sithTime_curMs + 300;
                     pActor->field_268 = param_7 | 8;
-                    pActor->field_264 = param_6;
+                    pActor->field_264 = leapSpeed;
                     pActor->field_26C = param_5;
                     sithPuppet_PlayMode(thing, anim, NULL);
                     return 1;

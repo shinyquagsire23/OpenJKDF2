@@ -1807,7 +1807,7 @@ int sithAICmd_Charge(sithActor *pActor, sithAIClassEntry *pAiclass, sithActorIns
     if (pActor->pDistractor == (sithThing *)0x0) {
         return 0;
     }
-    iVar2 = sithAI_FUN_0053a520(pActor, pAiclass->argsAsFloat[3], pAiclass->argsAsFloat[2], pAiclass->argsAsFloat[1], 1, pAiclass->argsAsFloat[5], 0);
+    iVar2 = sithAI_Charge(pActor, pAiclass->argsAsFloat[3], pAiclass->argsAsFloat[2], pAiclass->argsAsFloat[1], 1, pAiclass->argsAsFloat[5], 0);
     if (iVar2 != 0) {
         pActor->flags = pActor->flags | SITHAI_MODE_TARGET_VISIBLE;
         lVar3 = (int64_t)(((_frand() * 0.4 - 0.2) -
