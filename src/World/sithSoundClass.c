@@ -107,6 +107,20 @@ static const char* sithSoundClass_aKeys[SITH_SC_MAX] = {
     "reserved8",
 };
 
+#define IS_ANNOYING_SOUND(sc_id) ( \
+           sc_id == SITH_SC_ENTERWATER \
+        || sc_id == SITH_SC_ENTERWATERSLOW \
+        || sc_id == SITH_SC_EXITWATER \
+        || sc_id == SITH_SC_EXITWATERSLOW \
+        || sc_id == SITH_SC_LANDHARD \
+        || sc_id == SITH_SC_LANDHURT \
+        || sc_id == SITH_SC_LANDMETAL \
+        || sc_id == SITH_SC_LANDWATER \
+        || sc_id == SITH_SC_LANDPUDDLE \
+        || sc_id == SITH_SC_LANDEARTH \
+        || sc_id == SITH_SC_MOVING \
+        )
+
 int sithSoundClass_Startup()
 {
     sithSoundClass_hashtable = stdHashTable_New(64);
@@ -349,6 +363,16 @@ void sithSoundClass_ThingPlaySoundclass4(sithThing *thing, unsigned int soundcla
     soundclass = thing->soundclass;
     if ( soundclass && soundclass_id < SITH_SC_MAX )
     {
+#ifdef QOL_IMPROVEMENTS
+        if (IS_ANNOYING_SOUND(soundclass_id))
+        {
+            if (sithTime_curMs - thing->lastAnnoyingSoundSpamMs < 300) {
+                return;
+            }
+            thing->lastAnnoyingSoundSpamMs = sithTime_curMs;
+        }
+#endif
+
         v3 = soundclass->entries[soundclass_id];
         if ( v3 )
             sithSoundClass_PlayMode(thing, v3, 1.0);
@@ -366,6 +390,17 @@ sithPlayingSound* sithSoundClass_ThingPlaySoundclass5(sithThing *thing, int sc_i
 
     if ( (unsigned int)sc_id < SITH_SC_MAX )
     {
+        // Try to prevent sound spam at the source
+#ifdef QOL_IMPROVEMENTS
+        if (IS_ANNOYING_SOUND(sc_id))
+        {
+            if (sithTime_curMs - thing->lastAnnoyingSoundSpamMs < 300) {
+                return NULL;
+            }
+            thing->lastAnnoyingSoundSpamMs = sithTime_curMs;
+        }
+#endif
+
         v4 = thing->soundclass->entries[sc_id];
         if ( v4 )
         {
@@ -398,6 +433,17 @@ void sithSoundClass_PlayThingSoundclass(sithThing *thing, int sc_id, flex_t a3)
 
     if ( thing->soundclass && (unsigned int)sc_id < SITH_SC_MAX )
     {
+        // Try to prevent sound spam at the source
+#ifdef QOL_IMPROVEMENTS
+        if (IS_ANNOYING_SOUND(sc_id)) 
+        {
+            if (sithTime_curMs - thing->lastAnnoyingSoundSpamMs < 300) {
+                return;
+            }
+            thing->lastAnnoyingSoundSpamMs = sithTime_curMs;
+        }
+#endif
+
         entry = thing->soundclass->entries[sc_id];
         if ( entry )
             sithSoundClass_PlayMode(thing, entry, a3);
@@ -466,25 +512,19 @@ sithPlayingSound* sithSoundClass_PlayModeRandom(sithThing *thing, uint32_t a2)
 
     if (!thing->soundclass) return NULL;
 
-#ifdef QOL_IMPROVEMENTS
-    if (a2 == SITH_SC_ENTERWATER 
-        || a2 == SITH_SC_ENTERWATERSLOW
-        || a2 == SITH_SC_EXITWATER 
-        || a2 == SITH_SC_EXITWATERSLOW
-        || a2 == SITH_SC_LANDMETAL
-        || a2 == SITH_SC_LANDWATER
-        || a2 == SITH_SC_LANDPUDDLE
-        || a2 == SITH_SC_LANDEARTH) 
-    {
-        if (sithTime_curMs - thing->lastAnnoyingSoundSpamMs < 300) {
-            return NULL;
-        }
-        thing->lastAnnoyingSoundSpamMs = sithTime_curMs;
-    }
-#endif
-
     if ( a2 < SITH_SC_MAX )
     {
+        // Try to prevent sound spam at the source
+#ifdef QOL_IMPROVEMENTS
+        if (IS_ANNOYING_SOUND(a2)) 
+        {
+            if (sithTime_curMs - thing->lastAnnoyingSoundSpamMs < 300) {
+                return NULL;
+            }
+            thing->lastAnnoyingSoundSpamMs = sithTime_curMs;
+        }
+#endif
+
         v3 = thing->soundclass->entries[a2];
         if ( v3 )
         {
