@@ -156,6 +156,7 @@ extern int jkPlayer_bEnableTexturePrecache;
 extern int jkPlayer_bKeepCorpses;
 extern int jkPlayer_bFastMissionText;
 extern int jkPlayer_bUseOldPlayerPhysics;
+extern int jkPlayer_bLedgeSqueeze;
 
 extern int jkPlayer_setCrosshairOnLightsaber;
 extern int jkPlayer_setCrosshairOnFist;

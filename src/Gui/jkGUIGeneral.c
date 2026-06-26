@@ -82,7 +82,8 @@ static jkGuiElement jkGuiGeneral_aElementsAdvanced[22] = {
     { ELEMENT_CHECKBOX,    0,            0, "GUIEXT_INCONSISTENT_PHYS",          0, {20, 190, 300, 40},  1, 0, "GUIEXT_INCONSISTENT_PHYS_HINT",          0, 0, 0, {0}, 0},
     { ELEMENT_CHECKBOX,    0,            0, "GUIEXT_CORPSE_DESPAWN",          0, {20, 150, 300, 40},  1, 0, "GUIEXT_CORPSE_DESPAWN_HINT",          0, 0, 0, {0}, 0},
     { ELEMENT_CHECKBOX,    0,            0, "GUIEXT_50HZ_MIDAIR_PHYS",          0, {20, 230, 300, 40},  1, 0, "GUIEXT_50HZ_MIDAIR_PHYS_HINT",          0, 0, 0, {0}, 0},
-    
+    { ELEMENT_CHECKBOX,    0,            0, "GUIEXT_LEDGE_SQUEEZE",          0, {20, 270, 300, 40},  1, 0, "GUIEXT_LEDGE_SQUEEZE_HINT",          0, 0, 0, {0}, 0},
+
     { ELEMENT_END,         0,            0, NULL,                   0, {0},                 0, 0, NULL,                        0, 0, 0, {0}, 0},
 };
 
@@ -127,6 +128,7 @@ int jkGuiGeneral_ShowAdvanced()
     jkGuiGeneral_aElementsAdvanced[9].selectedTextEntry = jkPlayer_bJankyPhysics;
     jkGuiGeneral_aElementsAdvanced[10].selectedTextEntry = jkPlayer_bKeepCorpses;
     jkGuiGeneral_aElementsAdvanced[11].selectedTextEntry = jkPlayer_bUseOldPlayerPhysics;
+    jkGuiGeneral_aElementsAdvanced[12].selectedTextEntry = jkPlayer_bLedgeSqueeze;
     
     jkGuiRend_MenuSetReturnKeyShortcutElement(&jkGuiGeneral_menuAdvanced, &jkGuiGeneral_aElementsAdvanced[7]);
     jkGuiRend_MenuSetEscapeKeyShortcutElement(&jkGuiGeneral_menuAdvanced, &jkGuiGeneral_aElementsAdvanced[8]);
@@ -141,6 +143,7 @@ int jkGuiGeneral_ShowAdvanced()
             jkPlayer_bJankyPhysics = jkGuiGeneral_aElementsAdvanced[9].selectedTextEntry;
             jkPlayer_bKeepCorpses = jkGuiGeneral_aElementsAdvanced[10].selectedTextEntry;
             jkPlayer_bUseOldPlayerPhysics = jkGuiGeneral_aElementsAdvanced[11].selectedTextEntry;
+            jkPlayer_bLedgeSqueeze = jkGuiGeneral_aElementsAdvanced[12].selectedTextEntry;
 
             jkPlayer_WriteConf(jkPlayer_playerShortName);
         }

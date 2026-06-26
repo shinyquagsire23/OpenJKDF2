@@ -1,4 +1,4 @@
-MSGS 100          # <--- DON'T FORGET TO UPDATE THIS COUNT
+MSGS 102          # <--- DON'T FORGET TO UPDATE THIS COUNT
 
 #  "<key>"     <unused number>   "<string>"
 
@@ -91,6 +91,9 @@ MSGS 100          # <--- DON'T FORGET TO UPDATE THIS COUNT
 
    "GUIEXT_50HZ_MIDAIR_PHYS"                    0 "Restore 50Hz midair player physics"
    "GUIEXT_50HZ_MIDAIR_PHYS_HINT"               0 "Step player physics and POV at 50Hz while midair?"
+
+   "GUIEXT_LEDGE_SQUEEZE"                       0 "Ease climbing onto ledges"
+   "GUIEXT_LEDGE_SQUEEZE_HINT"                  0 "Shrink the player collider while midair so it catches less on gap corners?"
 
 #******************************
 #  Controls

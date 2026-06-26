@@ -42,6 +42,11 @@
 #define NUM_THING_PARAMS (74) // JK is 72
 #define NUM_THING_TYPES (13)
 
+// QOL experiment: factor the local player's collision sphere is shrunk to while moving
+// horizontally in the air, so its top corner clears tight gap/overhang lips instead of being
+// shoved backward. 1.0 = vanilla (disabled); lower = squeezes through tighter openings.
+#define SITHTHING_SQUEEZE_RADIUS_FACTOR (0.7)
+
 int sithThing_bInitted;
 int sithThing_bInitted2 = 1;
 
@@ -327,7 +332,25 @@ void sithThing_TickPhysics(sithThing *pThing, flex_t deltaSecs)
     else
     {
         arg4a = rdVector_Normalize3(&v1, &pThing->field_268);
+#ifdef QOL_IMPROVEMENTS
+        // QOL experiment: shrink the local player's collision radius for this horizontal
+        // ground sweep so the sphere's top corner clears tight gap/overhang lips (vanilla shoves
+        // the player back). FindFloor inside UpdateThingCollision re-grounds. SP + local player
+        // only so MP stays bit-identical.
+        flex_t qolSavedMoveSize = pThing->moveSize;
+        int qolSqueeze = jkPlayer_bLedgeSqueeze
+                      && !sithNet_isMulti
+                      && pThing == sithPlayer_pLocalPlayerThing
+                      && !pThing->attach_flags
+                      && stdMath_Fabs(v1.z) < 1.0;
+        if (qolSqueeze)
+            pThing->moveSize *= SITHTHING_SQUEEZE_RADIUS_FACTOR;
+#endif
         pThing->waggle = sithCollision_UpdateThingCollision(pThing, &v1, arg4a, v2);
+#ifdef QOL_IMPROVEMENTS
+        if (qolSqueeze)
+            pThing->moveSize = qolSavedMoveSize;
+#endif
     }
 }
 
