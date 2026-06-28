@@ -240,7 +240,7 @@ char* stdFnames_MakePath(char *a1, int a2, const char *a3, const char *a4)
         else {
             strcpy(a1, r);
         }
-        strcat(a1, "/"); // Added?
+        _strncat(a1, "/", a2-1); // Added?
     }
     free(r);
 #endif

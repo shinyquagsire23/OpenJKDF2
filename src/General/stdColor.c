@@ -289,9 +289,9 @@ int stdColor_GammaCorrect(uint8_t *pOut, uint8_t *pIn, int numColors, flex_d_t g
 {
     for (int i = 0; i < numColors; i++)
     {
-        pOut[0] = (uint8_t)(__int64)(pow((flex_d_t)pIn[0] / 255.0, gamma) * 255.0);
-        pOut[1] = (uint8_t)(__int64)(pow((flex_d_t)pIn[1] / 255.0, gamma) * 255.0);
-        pOut[2] = (uint8_t)(__int64)(pow((flex_d_t)pIn[2] / 255.0, gamma) * 255.0);
+        pOut[0] = (uint8_t)(__int64)(powf((flex_d_t)pIn[0] / 255.0, gamma) * 255.0);
+        pOut[1] = (uint8_t)(__int64)(powf((flex_d_t)pIn[1] / 255.0, gamma) * 255.0);
+        pOut[2] = (uint8_t)(__int64)(powf((flex_d_t)pIn[2] / 255.0, gamma) * 255.0);
         pOut += 3;
         pIn += 3;
     }

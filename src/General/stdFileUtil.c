@@ -47,7 +47,7 @@ stdFileSearch* stdFileUtil_NewFind(const char *path, int a2, const char *extensi
         return search;
     if ( *extension == '.' )
         extension = extension + 1;
-    _sprintf(std_genBuffer, "*.%s", extension);
+    stdString_snprintf(std_genBuffer, 1024, "*.%s", extension);
     stdFnames_MakePath(search->path, 128, path, std_genBuffer);
     
 #ifdef FS_POSIX
@@ -57,6 +57,8 @@ stdFileSearch* stdFileUtil_NewFind(const char *path, int a2, const char *extensi
             search->path[i] = '/';
     }
 #endif
+
+
 
     stdPlatform_Printf("OpenJKDF2: %s %s\n", __func__, search->path);
     

@@ -2,6 +2,8 @@
 #make flex/flex
 #make byacc/yacc
 
+source /opt/wonderful/bin/wf-env
+
 # arm-none-eabi-addr2line -e build_nintendo_dsi/openjkdf2.elf 0x02047c48
 
 export OPENJKDF2_RELEASE_COMMIT=$(git log -1 --format="%H")

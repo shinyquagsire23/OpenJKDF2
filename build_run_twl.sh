@@ -1,6 +1,6 @@
 #!/bin/bash
 
-./build_twl_podman.sh
+./build_twl.sh
 
 if [ $? -ne 0 ]; then
     exit -1
