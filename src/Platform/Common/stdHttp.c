@@ -41,23 +41,27 @@ static void* stdHttp_export()
 
 static size_t stdHttp_write_to_buffer(void *contents, size_t size, size_t nmemb, void *userp)
 {
-    int32_t actual_recv = size*nmemb;
-    int32_t to_write = actual_recv;
+    if (nmemb != 0 && size > SIZE_MAX / nmemb) return 0;
+    size_t actual_recv = size * nmemb;
+    size_t to_write = actual_recv;
 
     if (!stdHttp_pDlBuffer) {
-        stdHttp_pDlBuffer = (char*)malloc(to_write*2);
-        memset(stdHttp_pDlBuffer, 0, to_write*2);
-        stdHttp_dlBufferMax = to_write*2;
+        if (to_write > SIZE_MAX / 2) return 0;
+        stdHttp_dlBufferMax = to_write + to_write;
+        stdHttp_pDlBuffer = (char*)calloc(1, stdHttp_dlBufferMax);
+        if (!stdHttp_pDlBuffer) return 0;
     }
 
-    if (stdHttp_dlBufferWritten+to_write >= stdHttp_dlBufferMax) {
-        void* tmp = malloc(stdHttp_dlBufferMax*2);
-        memset(tmp, 0, stdHttp_dlBufferMax*2);
+    if ((size_t)stdHttp_dlBufferWritten+to_write >= stdHttp_dlBufferMax) {
+        if (stdHttp_dlBufferMax > SIZE_MAX / 2) return 0;
+        size_t new_max = stdHttp_dlBufferMax + stdHttp_dlBufferMax;
+        void* tmp = calloc(1, new_max);
+        if (!tmp) return 0;
         memcpy(tmp, stdHttp_pDlBuffer, stdHttp_dlBufferWritten);
         free(stdHttp_pDlBuffer);
 
         stdHttp_pDlBuffer = (char*)tmp;
-        stdHttp_dlBufferMax = stdHttp_dlBufferMax*2;
+        stdHttp_dlBufferMax = new_max;
     }
 
     void* out_ptr = stdHttp_pDlBuffer + stdHttp_dlBufferWritten;
@@ -103,11 +107,17 @@ void* stdHttp_Fetch(const char* pUrl)
     blob.flags = CURL_BLOB_COPY;
 #endif
 
+    if (strncmp(pUrl, "https://", 8) != 0) {
+        curl_easy_cleanup(curl);
+        return NULL;
+    }
+
     curl_easy_setopt(curl, CURLOPT_URL, pUrl);
     curl_easy_setopt(curl, CURLOPT_USERAGENT, "OpenJKDF2-stdHttp");
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, stdHttp_write_to_buffer);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, stdHttp_pDlBuffer);
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
+    curl_easy_setopt(curl, CURLOPT_REDIR_PROTOCOLS, CURLPROTO_HTTPS);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 1);
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 0);
@@ -153,11 +163,18 @@ int stdHttp_DownloadToPath(const char* pUrl, const char* pFpath)
         return 0;
     }
 
+    if (strncmp(pUrl, "https://", 8) != 0) {
+        fclose(pFile);
+        curl_easy_cleanup(curl);
+        return 0;
+    }
+
     curl_easy_setopt(curl, CURLOPT_URL, pUrl);
     curl_easy_setopt(curl, CURLOPT_USERAGENT, "OpenJKDF2-stdHttp");
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, stdHttp_write_to_file);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, pFile);
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
+    curl_easy_setopt(curl, CURLOPT_REDIR_PROTOCOLS, CURLPROTO_HTTPS);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 1);
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 0);
