@@ -63,7 +63,7 @@ set(GLEW_USE_STATIC_LIBS TRUE)
 if(NOT CMAKE_CROSSCOMPILING)
     find_package(GLEW 2.2.0)
 endif()
-if((NOT GLEW_FOUND OR CMAKE_CROSSCOMPILING) AND NOT PLAT_WASM)
+if((NOT GLEW_FOUND OR CMAKE_CROSSCOMPILING) AND NOT PLAT_WASM AND NOT TARGET_USE_OPENGL11)
     message(STATUS "Going to build “GLEW 2.2.0” from Git module")
     include(build_glew)
 endif()
@@ -168,6 +168,17 @@ if(TARGET_USE_OPENGL)
 
     file(GLOB TARGET_GL_CPP_SRCS ${PROJECT_SOURCE_DIR}/src/Platform/GL/*.cpp)
     list(APPEND ENGINE_SOURCE_FILES ${TARGET_GL_CPP_SRCS})
+endif()
+
+if(TARGET_USE_OPENGL11)
+    file(GLOB TARGET_GL11_SRCS ${PROJECT_SOURCE_DIR}/src/Platform/GL11/*.c)
+    list(APPEND ENGINE_SOURCE_FILES ${TARGET_GL11_SRCS})
+    add_compile_definitions(RENDER_GL11)
+
+    # NOTE: jkQuakeConsole.c stays compiled here (unlike TWL). The shared SDL2 Window.c
+    # references its symbols inside SDL2_RENDER blocks, and the GL11 backend stubs out
+    # the UI text functions it uses (std3D_DrawUIBitmapRGBA/std3D_DrawUIClearedRectRGBA),
+    # so the console links fine and simply renders nothing.
 endif()
 
 if((TARGET_USE_OPENAL AND NOT PLAT_WASM) OR TARGET_MACOS)

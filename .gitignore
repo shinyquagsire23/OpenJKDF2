@@ -104,6 +104,9 @@ build_linux_x86_64_flatpak/*
 build_android_aarch64/*
 build_android_arm32/*
 build_nintendo_dsi/*
+build_win32/*
+build_winxp32/*
+nintendo-dsi-debug/*
 flatpak_openjkdf2/*
 .flatpak-builder/*
 OpenJKDF2.flatpak
@@ -122,3 +125,4 @@ build_openjkdf2_venv/*
 .beads/
 graphify-out/
 AGENTS.md
+.blocksds

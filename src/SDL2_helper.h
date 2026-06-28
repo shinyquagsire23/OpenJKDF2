@@ -4,7 +4,11 @@
 #ifdef SDL2_RENDER
 //#ifndef ARCH_WASM
 
-#ifdef MACOS
+#ifdef RENDER_GL11
+// Legacy fixed-function GL 1.1 backend: no GLEW, just SDL's GL 1.1 header.
+#include <SDL.h>
+#include <SDL_opengl.h>
+#elif defined(MACOS)
 #define GL_SILENCE_DEPRECATION
 #include <SDL.h>
 #include <GL/glew.h>

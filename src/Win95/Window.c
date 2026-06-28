@@ -1448,7 +1448,15 @@ int Window_Main_Linux(int argc, char** argv)
         Window_isHiDpi = 1;
     }
 
-#if defined(MACOS)
+#if defined(RENDER_GL11)
+    // Legacy fixed-function GL 1.1 backend: request a compatibility context.
+    // Requesting 1.1 makes desktop drivers return their highest legacy
+    // (compatibility) context, which is what old XP-era hardware exposes.
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 1);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
+    SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
+#elif defined(MACOS)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -1488,7 +1496,7 @@ int Window_Main_Linux(int argc, char** argv)
 #endif
 
     Window_RecreateSDL2Window();
-#if !defined(TARGET_ANDROID) && !defined(ARCH_WASM)
+#if !defined(TARGET_ANDROID) && !defined(ARCH_WASM) && !defined(RENDER_GL11)
     glewInit();
 #endif
     
