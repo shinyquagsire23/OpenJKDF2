@@ -32,6 +32,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "SDL2_helper.h"
+
 #include <SDL_opengl.h>
 #include <SDL_video.h>
 
@@ -91,6 +93,16 @@ static rdColor24 std3D_currentPalette[256];
 
 // ----------------------------------------------------------------------------
 
+// Software-paletted menu state: the engine renders the GUI/cutscene layers into
+// the 8-bit Video_menuBuffer; we expand it to an RGB GL texture each frame and
+// draw it as a fullscreen quad in the GL context (see std3D_DrawMenu).
+static GLuint   std3D_menuTexId = 0;
+static uint8_t* std3D_pMenuRGB = NULL;
+static int      std3D_menuTexW = 0;
+static int      std3D_menuTexH = 0;
+static int      std3D_menuWinW = 0;  // drawable size captured for the subrect helper
+static int      std3D_menuWinH = 0;
+
 int std3D_Startup()
 {
     if (Main_bHeadless) return 1;
@@ -120,6 +132,20 @@ int std3D_Startup()
 void std3D_Shutdown()
 {
     std3D_UnloadAllTextures();
+
+    if (std3D_menuTexId)
+    {
+        glDeleteTextures(1, &std3D_menuTexId);
+        std3D_menuTexId = 0;
+    }
+    if (std3D_pMenuRGB)
+    {
+        free(std3D_pMenuRGB);
+        std3D_pMenuRGB = NULL;
+    }
+    std3D_menuTexW = 0;
+    std3D_menuTexH = 0;
+
     std3D_bHasInitted = 0;
 }
 
@@ -523,7 +549,297 @@ void std3D_UpdateFrameCount(rdDDrawSurface* pTexture)
 // --- Contract stubs ----------------------------------------------------------
 // UI/HUD, FBO and overlay paths are intentionally not implemented (see header).
 
-void std3D_DrawMenu() {}
+
+/*
+if (Video_menuBuffer.surface_lock_alloc)
+    {
+        uint32_t pitch = Video_menuBuffer.format.width_in_bytes;
+        if (jkCutscene_isRendering) {
+            flex_t srcXf = 0;
+            flex_t srcYf = 0;
+            for (int y = 0; y < 64; y++)
+            {
+                srcXf = 0;
+                for (int x = 0; x < 256; x++)
+                {
+                    int srcX = (int)srcXf;
+                    int srcY = (int)srcYf;
+                    //int skip = (pitch*srcY)+srcX;
+                    int skip = ((srcY % 4) * 4) + (srcX % 4) + ((srcX / 4)*16) + ((srcY / 4) * pitch * 4) + 640 + 640;
+                    whichBitmap[(y*256)+x] = Video_menuBuffer.surface_lock_alloc[skip];
+                    //Video_menuBuffer.surface_lock_alloc[(pitch*y)+x] = (y*128)+x;
+
+                    srcXf += (flex_t)2.5;
+                }
+                srcYf += (flex_t)2.5;
+            }
+
+            //srcY = 64*(flex_t)2.5;
+            for (int y = 0; y < 128; y++)
+            {
+                srcXf = 0;
+                for (int x = 0; x < 256; x++)
+                {
+                    int srcX = (int)srcXf;
+                    int srcY = (int)srcYf;
+                    //int skip = (pitch*srcY)+srcX;
+                    int skip = ((srcY % 4) * 4) + (srcX % 4) + ((srcX / 4)*16) + ((srcY / 4) * pitch * 4) + 640 + 640;
+                    whichBitmap2[(y*256)+x] = Video_menuBuffer.surface_lock_alloc[skip];
+                    //Video_menuBuffer.surface_lock_alloc[(pitch*y)+x] = (y*128)+x;
+                    srcXf += (flex_t)2.5;
+                }
+                srcYf += (flex_t)2.5;
+            }
+        }
+        else {
+            for (int y = 0; y < 64; y++)
+            {
+                for (int x = 0; x < 256; x++)
+                {
+                    whichBitmap[(y*256)+x] = Video_menuBuffer.surface_lock_alloc[(pitch*(y+fb_shift_y))+(x+fb_shift_x)];
+                    //Video_menuBuffer.surface_lock_alloc[(pitch*y)+x] = (y*128)+x;
+                }
+            }
+
+            for (int y = 0; y < 128; y++)
+            {
+                for (int x = 0; x < 256; x++)
+                {
+                    whichBitmap2[(y*256)+x] = Video_menuBuffer.surface_lock_alloc[(pitch*((y+fb_shift_y)+64))+(x+fb_shift_x)];
+                    //Video_menuBuffer.surface_lock_alloc[(pitch*y)+x] = (y*128)+x;
+                }
+            }
+        }
+    }
+*/
+
+// Emits one textured quad of the menu texture, mirroring the modern backend's
+// std3D_DrawMenuSubrect: (x,y,w,h) is the source rect in menu-buffer texels,
+// (dstX,dstY) is the top-left destination in screen pixels, and `scale` multiplies
+// the destination size. scale==0 is the "proportional" mode used for full-buffer
+// fills (source maps 1:1 to the drawable). (cr,cg,cb) modulates the texels --
+// white for normal draws, black for the subtitle drop-shadow outline.
+static void std3D_DrawMenuSubrect(float x, float y, float w, float h,
+                                  float dstX, float dstY, float scale,
+                                  uint8_t cr, uint8_t cg, uint8_t cb)
+{
+    float tex_w = (float)std3D_menuTexW;
+    float tex_h = (float)std3D_menuTexH;
+    if (tex_w < 1.0f) tex_w = 1.0f;
+    if (tex_h < 1.0f) tex_h = 1.0f;
+
+    float w_dst = w, h_dst = h;
+    if (scale == 0.0f)
+    {
+        w_dst = (w / tex_w) * (float)std3D_menuWinW;
+        h_dst = (h / tex_h) * (float)std3D_menuWinH;
+        dstX  = (dstX / tex_w) * (float)std3D_menuWinW;
+        dstY  = (dstY / tex_h) * (float)std3D_menuWinH;
+        scale = 1.0f;
+    }
+
+    float u1 = x / tex_w, u2 = (x + w) / tex_w;
+    float v1 = y / tex_h, v2 = (y + h) / tex_h;
+    float x0 = dstX, y0 = dstY;
+    float x1 = dstX + scale * w_dst, y1 = dstY + scale * h_dst;
+
+    glColor4ub(cr, cg, cb, 255);
+    glBegin(GL_TRIANGLES);
+        glTexCoord2f(u1, v1); glVertex2f(x0, y0);
+        glTexCoord2f(u1, v2); glVertex2f(x0, y1);
+        glTexCoord2f(u2, v2); glVertex2f(x1, y1);
+
+        glTexCoord2f(u1, v1); glVertex2f(x0, y0);
+        glTexCoord2f(u2, v2); glVertex2f(x1, y1);
+        glTexCoord2f(u2, v1); glVertex2f(x1, y0);
+    glEnd();
+}
+
+// Software-paletted menu presentation.
+//
+// The GUI/menu and 2D cutscene layers are software-rendered by the engine into
+// the 8-bit paletted Video_menuBuffer. GL 1.1 has no shader to do the palette
+// lookup the modern backend uses, so we expand the indices to RGBA8888 on the CPU
+// through stdDisplay_masterPalette (matching the modern renderer's displaypal),
+// upload to a GL texture, and draw it in the existing GL context. Geometry/layout
+// (menu pillarbox, cutscene letterbox + subtitles, in-game HUD compositing) mirror
+// std3D_DrawMenu in src/Platform/GL/std3D.c.
+void std3D_DrawMenu()
+{
+    if (Main_bHeadless) return;
+
+    // Read the SDL surface pixels directly (like the modern backend): the engine
+    // leaves the menu buffer unlocked when it's not actively drawing, which nulls
+    // surface_lock_alloc -- but sdlSurface->pixels is always valid for a software
+    // surface.
+    if (!Video_menuBuffer.sdlSurface) return;
+
+    const int srcW = Video_menuBuffer.format.width;
+    const int srcH = Video_menuBuffer.format.height;
+    const uint8_t* pSrc = (const uint8_t*)Video_menuBuffer.sdlSurface->pixels;
+    if (srcW <= 0 || srcH <= 0 || !pSrc) return;
+
+    const uint32_t srcPitch = Video_menuBuffer.sdlSurface->pitch;
+
+    // (Re)allocate the CPU scratch buffer and GL texture when dimensions change.
+    // RGBA: palette index 0 is the color-key (transparent) entry -> alpha 0, so
+    // the 3D scene shows through where the HUD/menu buffer is empty (this pass is
+    // also the in-game 2D/HUD compositing step, called every frame from
+    // jkGame_Render -- it must NOT clear or opaquely overpaint the 3D scene).
+    if (std3D_menuTexW != srcW || std3D_menuTexH != srcH || !std3D_menuTexId)
+    {
+        if (std3D_pMenuRGB) free(std3D_pMenuRGB);
+        std3D_pMenuRGB = (uint8_t*)malloc((size_t)srcW * srcH * 4);
+        std3D_menuTexW = srcW;
+        std3D_menuTexH = srcH;
+
+        if (!std3D_menuTexId)
+            glGenTextures(1, &std3D_menuTexId);
+        glBindTexture(GL_TEXTURE_2D, std3D_menuTexId);
+        // Nearest keeps the color-key edges crisp (no alpha fringing at the
+        // transparent border, matching the modern shader's per-texel discard).
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, srcW, srcH, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    }
+    if (!std3D_pMenuRGB) return;
+
+    // Expand the 8-bit indices through the display palette into RGBA8888;
+    // index 0 -> fully transparent (matches menu_f.glsl's `if (index == 0) discard`).
+    for (int y = 0; y < srcH; ++y)
+    {
+        const uint8_t* pRow = pSrc + (size_t)y * srcPitch;
+        uint8_t* pDst = std3D_pMenuRGB + (size_t)y * srcW * 4;
+        for (int x = 0; x < srcW; ++x)
+        {
+            uint8_t idx = pRow[x];
+            if (idx == 0)
+            {
+                *pDst++ = 0; *pDst++ = 0; *pDst++ = 0; *pDst++ = 0;
+            }
+            else
+            {
+                const rdColor24* pCol = &stdDisplay_masterPalette[idx];
+                *pDst++ = pCol->r;
+                *pDst++ = pCol->g;
+                *pDst++ = pCol->b;
+                *pDst++ = 255;
+            }
+        }
+    }
+
+    glBindTexture(GL_TEXTURE_2D, std3D_menuTexId);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, srcW, srcH, GL_RGBA, GL_UNSIGNED_BYTE, std3D_pMenuRGB);
+
+    // Query the real drawable size (HiDPI-safe) rather than Window_xSize, which
+    // may not be updated until the first resize event.
+    int dw = Window_xSize, dh = Window_ySize;
+    SDL_Window* pWin = SDL_GL_GetCurrentWindow();
+    if (pWin) SDL_GL_GetDrawableSize(pWin, &dw, &dh);
+    std3D_menuWinW = dw;
+    std3D_menuWinH = dh;
+    glViewport(0, 0, dw, dh);
+
+    // Screen-space projection: (0,0) top-left -> (dw,dh) bottom-right, so the
+    // ported subrect destinations are in screen pixels just like the modern path.
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(0.0, (double)dw, (double)dh, 0.0, -1.0, 1.0);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    glDisable(GL_DEPTH_TEST);
+    glDepthMask(GL_FALSE);
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_BLEND);
+    glEnable(GL_ALPHA_TEST);
+    glAlphaFunc(GL_GREATER, 0.5f); // discard transparent (index-0) texels
+    glEnable(GL_TEXTURE_2D);
+
+    extern int jkGuiBuildMulti_bRendering;
+
+    if (jkCutscene_isRendering)
+    {
+        // Letterboxed cutscene: video band (centered, width-fit), optional
+        // subtitles with a black drop-shadow outline, and the pause text band.
+        // Source bands live in the top-left 640-wide column of the menu buffer.
+        float fake_windowW = (float)dw;
+        float fake_windowH = (float)dh;
+
+        int video_height = Main_bMotsCompat ? 350 : 300;
+        int subs_y = Main_bMotsCompat ? 400 : 350;
+        int subs_h = Main_bMotsCompat ? 80  : 130;
+
+        // For ultrawide screens, limit the video width to 16:9.
+        if (dw > dh && ((float)dw / (float)dh) > (Main_bMotsCompat ? (16.0f / 9.0f) : (21.0f / 9.0f)))
+            fake_windowW = fake_windowH * (16.0f / 9.0f);
+
+        float upscale  = fake_windowW / 640.0f;
+        float upscale2 = (fake_windowH - (50.0f + video_height * upscale)) / (float)subs_h;
+        float upscale3 = 1.0f;
+
+        if (upscale2 < 1.0f)
+        {
+            upscale2 = 1.0f;
+            if (fake_windowH > 480.0f)
+                upscale2 = 2.0f;
+        }
+        if (upscale2 > upscale)
+            upscale2 = upscale;
+
+        float shift_y = ((float)dh - fake_windowH) / 2.0f;
+        float shift_x = ((float)dw - fake_windowW) / 2.0f;
+
+        float sub_width = 640.0f * upscale2;
+        float sub_x = (fake_windowW - sub_width) / 2.0f;
+
+        float pause_width = 640.0f * upscale3;
+        float pause_x = (fake_windowW - pause_width) / 2.0f;
+
+        // Main video view
+        std3D_DrawMenuSubrect(0, 50, 640, video_height, shift_x, shift_y + 50, upscale, 255, 255, 255);
+
+        // Subtitles (drop-shadow outline drawn black, then the text in white)
+        if (jkCutscene_dword_55B750)
+        {
+            float sub_dstX = shift_x + sub_x;
+            float sub_dstY = shift_y + fake_windowH - (subs_h * upscale2);
+            std3D_DrawMenuSubrect(0, subs_y, 640, subs_h, sub_dstX - 2, sub_dstY,     upscale2, 0, 0, 0);
+            std3D_DrawMenuSubrect(0, subs_y, 640, subs_h, sub_dstX + 2, sub_dstY,     upscale2, 0, 0, 0);
+            std3D_DrawMenuSubrect(0, subs_y, 640, subs_h, sub_dstX,     sub_dstY - 2, upscale2, 0, 0, 0);
+            std3D_DrawMenuSubrect(0, subs_y, 640, subs_h, sub_dstX,     sub_dstY + 2, upscale2, 0, 0, 0);
+            std3D_DrawMenuSubrect(0, subs_y, 640, subs_h, sub_dstX,     sub_dstY,     upscale2, 255, 255, 255);
+        }
+
+        // Pause text
+        std3D_DrawMenuSubrect(0, 10, 640, 40, shift_x + pause_x, shift_y, upscale3, 255, 255, 255);
+    }
+    else if (!jkGame_isDDraw || jkGuiBuildMulti_bRendering)
+    {
+        // Full-screen GUI menus render at a fixed 640x480 in the top-left of the
+        // menu buffer; sample that sub-rect and pillarbox to a 4:3 aspect.
+        float menu_h = (float)dh;
+        float menu_w = menu_h * (640.0f / 480.0f);
+        float menu_x = ((float)dw - menu_w) / 2.0f;
+        std3D_DrawMenuSubrect(0, 0, 640, 480, menu_x, 0, menu_w / 640.0f, 255, 255, 255);
+    }
+    else
+    {
+        // In-game HUD overlay: the buffer is full-resolution; stretch it 1:1 over
+        // the already-rendered 3D scene (index-0 texels are discarded above).
+        std3D_DrawMenuSubrect(0, 0, (float)srcW, (float)srcH, 0, 0, 0.0f, 255, 255, 255);
+    }
+
+    // Restore the baseline state set up in std3D_Startup for the 3D path.
+    glDisable(GL_ALPHA_TEST);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_BLEND);
+    glDepthMask(GL_TRUE);
+}
 void std3D_DrawSceneFbo() {}
 void std3D_FreeResources() {}
 int  std3D_DrawOverlay() { return 1; }

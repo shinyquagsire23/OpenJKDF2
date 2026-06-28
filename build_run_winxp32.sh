@@ -1,15 +1,20 @@
 #!/bin/bash
 # 32-bit Windows XP build using the legacy OpenGL 1.1 fixed-function renderer.
 
-export OPENJKDF2_RELEASE_COMMIT="$(git log -1 --format="%H")" \
-       OPENJKDF2_RELEASE_COMMIT_SHORT="$(git rev-parse --short=8 HEAD)" &&
-# Prevent macOS headers from getting linked in
-export -n SDKROOT MACOSX_DEPLOYMENT_TARGET CPLUS_INCLUDE_PATH C_INCLUDE_PATH &&
+CX_ROOT="/Applications/CrossOver.app/Contents/SharedSupport/CrossOver"
+CX_BOTTLE="General"
+WINEPREFIX="/Users/maxamillion/Library/Application Support/CrossOver/Bottles/General"
+WINEDLLPATH="/Applications/CrossOver.app/Contents/SharedSupport/CrossOver/lib32on64/wine"
 
-#rm -rf build_win32
-mkdir -p build_win32 && pushd build_win32 &&
+WINELOADER="/Applications/CrossOver.app/Contents/SharedSupport/CrossOver/bin/wineloader32on64"
+WINESERVER="/Applications/CrossOver.app/Contents/SharedSupport/CrossOver/bin/wineserver"
 
-TARGET_BUILD_TESTS=1 cmake .. --toolchain $(pwd)/../cmake_modules/toolchain_mingw_x86_32.cmake &&
-make -j $(nproc) openjkdf2-32 &&
-popd &&
-./scripts/helper_CopyMinGWDLLs_x86_32.sh
+WINEDEBUG=all
+
+./build_winxp32.sh &&
+cp build_win32/openjkdf2-32.exe DF2/openjkdf2-32.exe &&
+cp build_win32/*.dll DF2/ &&
+
+pushd DF2 &&
+PATH="/Applications/CrossOver.app/Contents/SharedSupport/CrossOver/bin:/usr/bin:/bin:/usr/sbin:/sbin" DYLD_LIBRARY_PATH="/Applications/CrossOver.app/Contents/SharedSupport/CrossOver/lib64:/Applications/CrossOver.app/Contents/SharedSupport/CrossOver/lib32on64" /Applications/CrossOver.app/Contents/SharedSupport/CrossOver/bin/wine --bottle "General" /Users/maxamillion/workspace/OpenJKDF2/DF2/openjkdf2-32.exe -windowgui ;
+popd
