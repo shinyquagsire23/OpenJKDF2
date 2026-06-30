@@ -79,18 +79,9 @@ int std3D_bReinitHudElements = 0;
 static int std3D_bHasInitted = 0;
 
 // --- Render list accumulators -----------------------------------------------
-// rdCache flushes accumulation at STD3D_MAX_VERTICES (0x400), but it submits a
-// single dense procEntry as one batch that can exceed that (up to its own array
-// capacity, RDCACHE_MAX_VERTICES). The modern backend reads an undersized VBO on
-// overflow (benign, collapsed geometry); our immediate-mode path would instead
-// read *stale* entries straight out of these static arrays, smearing last frame's
-// geometry across the screen (a location-dependent "rotated" flicker). Size the
-// buffers to the full batch capacity so a big batch is never partially dropped.
-#define GL11_RL_MAX_VERTICES (RDCACHE_MAX_VERTICES)
-#define GL11_RL_MAX_TRIS     (RDCACHE_MAX_VERTICES)
-static D3DVERTEX GL_tmpVertices[GL11_RL_MAX_VERTICES] = {0};
+static D3DVERTEX GL_tmpVertices[STD3D_MAX_VERTICES] = {0};
 static size_t    GL_tmpVerticesAmt = 0;
-static rdTri     GL_tmpTris[GL11_RL_MAX_TRIS] = {0};
+static rdTri     GL_tmpTris[STD3D_MAX_TRIS] = {0};
 static size_t    GL_tmpTrisAmt = 0;
 
 // --- Texture cache ----------------------------------------------------------
@@ -244,7 +235,7 @@ int std3D_RenderListVerticesFinish()
 int std3D_AddRenderListVertices(D3DVERTEX* vertices, int count)
 {
     if (Main_bHeadless) return 1;
-    if (GL_tmpVerticesAmt + count >= GL11_RL_MAX_VERTICES)
+    if (GL_tmpVerticesAmt + count >= STD3D_MAX_VERTICES)
         return 0;
 
     memcpy(&GL_tmpVertices[GL_tmpVerticesAmt], vertices, sizeof(D3DVERTEX) * count);
@@ -255,7 +246,7 @@ int std3D_AddRenderListVertices(D3DVERTEX* vertices, int count)
 void std3D_AddRenderListTris(rdTri* tris, unsigned int num_tris)
 {
     if (Main_bHeadless) return;
-    if (GL_tmpTrisAmt + num_tris > GL11_RL_MAX_TRIS)
+    if (GL_tmpTrisAmt + num_tris > STD3D_MAX_TRIS)
         return;
 
     memcpy(&GL_tmpTris[GL_tmpTrisAmt], tris, sizeof(rdTri) * num_tris);
