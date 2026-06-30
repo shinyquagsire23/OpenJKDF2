@@ -768,7 +768,16 @@ char* _strrchr(char * a, char b)
 
 char* _strtok(char * a, const char * b)
 {
-    return strtok(a,b);
+    // Use strtok_r with our own private save pointer instead of strtok(). strtok()
+    // keeps a single global state pointer, and some C libraries call strtok()
+    // internally from unrelated functions -- notably KallistiOS normalizes paths
+    // with strtok() inside fopen()/open() (fs_normalize_path, realpath). The engine
+    // routinely tokenizes a buffer and opens files mid-tokenization (e.g. parsing a
+    // .3do/.jkl line while loading a referenced material), so sharing the global
+    // strtok state with libc corrupts the in-progress parse. A private save pointer
+    // makes our tokenization immune to any library strtok() use.
+    static char* _strtok_saveptr = NULL;
+    return strtok_r(a, b, &_strtok_saveptr);
 }
 
 char* _strncat(char* a, const char* b, size_t c)

@@ -36,7 +36,7 @@ extern "C" {
 #define rdCamera_ClearLights_ADDR (0x00443CF0)
 #define rdCamera_AdvanceFrame_ADDR (0x00443D10)
 
-rdCamera* rdCamera_New(flex_t fov, flex_t x, flex_t y, flex_t z, flex_t aspectRatio);
+rdCamera* rdCamera_New(flex_t fov, BOOL bClipFar, flex_t zNear, flex_t zFar, flex_t aspectRatio);
 int rdCamera_NewEntry(rdCamera *camera, flex_t fov, BOOL bClipFar, flex_t zNear, flex_t zFar, flex_t aspectRatio);
 void rdCamera_Free(rdCamera *camera);
 void rdCamera_FreeEntry(rdCamera *camera);

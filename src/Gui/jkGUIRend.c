@@ -2819,26 +2819,35 @@ void jkGuiRend_UpdateController()
 
     int val = 0;
     int valB1 = 0;
-    if ((stdControl_ReadKey(KEY_JOY1_HLEFT, &val) && val) 
+    // Edge-detect the d-pad (hat) keys the same way the analog stick is edge-detected
+    // below. stdControl_ReadKey returns the *held* state, so without tracking the
+    // previous frame a held d-pad direction fires every frame -- which zips listboxes
+    // straight to the start/end. Track per-direction previous state and act only on
+    // the press transition.
+    static int lastHLeft = 0, lastHRight = 0, lastHUp = 0, lastHDown = 0;
+    int hLeft  = (stdControl_ReadKey(KEY_JOY1_HLEFT,  &val) && val);
+    int hRight = (stdControl_ReadKey(KEY_JOY1_HRIGHT, &val) && val);
+    int hUp    = (stdControl_ReadKey(KEY_JOY1_HUP,    &val) && val);
+    int hDown  = (stdControl_ReadKey(KEY_JOY1_HDOWN,  &val) && val);
+
+    if ((hLeft && !lastHLeft)
         || (joyXLeft < -0.5 && lastJoyXLeft >= -0.5)) {
         jkGuiRend_FocusElementDir(jkGuiRend_activeMenu, FOCUS_LEFT);
-        stdPlatform_Printf("left\n");
     }
-    else if ((stdControl_ReadKey(KEY_JOY1_HRIGHT, &val) && val)
+    else if ((hRight && !lastHRight)
             || (joyXRight > 0.5 && lastJoyXRight <= 0.5)) {
         jkGuiRend_FocusElementDir(jkGuiRend_activeMenu, FOCUS_RIGHT);
-        stdPlatform_Printf("right\n");
     }
-    if ((stdControl_ReadKey(KEY_JOY1_HUP, &val) && val)
+    if ((hUp && !lastHUp)
         || (joyYUp < -0.5 && lastJoyYUp >= -0.5)) {
         jkGuiRend_FocusElementDir(jkGuiRend_activeMenu, FOCUS_UP);
-        stdPlatform_Printf("up\n");
     }
-    else if ((stdControl_ReadKey(KEY_JOY1_HDOWN, &val) && val)
+    else if ((hDown && !lastHDown)
         || (joyYDown > 0.5 && lastJoyYDown <= 0.5)) {
         jkGuiRend_FocusElementDir(jkGuiRend_activeMenu, FOCUS_DOWN);
-        stdPlatform_Printf("down\n");
     }
+
+    lastHLeft = hLeft; lastHRight = hRight; lastHUp = hUp; lastHDown = hDown;
 
     lastJoyXRight = joyXRight;
     lastJoyYDown = joyYDown;

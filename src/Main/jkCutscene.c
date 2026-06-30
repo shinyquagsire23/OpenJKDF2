@@ -273,7 +273,7 @@ int jkCutscene_sub_421310(char* fpath)
     }
     _strncpy(tmp, fpath, sizeof(tmp));
 
-#ifdef LINUX
+#if defined(LINUX) || defined(TARGET_DREAMCAST)
     for (int i = 0; i < len; i++)
     {
         if (tmp[i] == '\\') {

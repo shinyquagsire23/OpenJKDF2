@@ -1517,7 +1517,7 @@ int sithAICmd_HitAndRun(sithActor *actor, sithAIClassEntry *aiclass, sithActorIn
         instinct->param0 = 0.0;
         actor->flags |= SITHAI_MODE_FLEEING;
         actor->pFleeThing = actor->pDistractor;
-        instinct->nextUpdate = sithTime_curMs + (int)stdMath_Floor(aiclass->argsAsFloat[1] + 0.5);
+        instinct->nextUpdate = sithTime_curMs + (int32_t)stdMath_Floor(aiclass->argsAsFloat[1] + 0.5);
         return 1;
     }
     return result;

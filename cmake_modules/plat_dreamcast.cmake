@@ -21,6 +21,7 @@ macro(plat_initialize)
     add_definitions(-DTARGET_RETRO_HOMEBREW)
     add_definitions(-D_XOPEN_SOURCE=500)
     add_definitions(-D_DEFAULT_SOURCE)
+    add_definitions(-DSMK_FAST)
 
     # These mirror the DSi/TWL feature set: no SDL2, no desktop GL, no sockets,
     # software video codecs on, POSIX filesystem (KOS newlib), no blobs.
@@ -50,7 +51,13 @@ macro(plat_initialize)
     # kos-cc (the compiler wrapper) already injects the SH4/KOS flags, includes
     # and the kernel/libc link line, so we only add project-level options here.
     add_compile_options(-Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces)
-    add_compile_options(-ffast-math -fomit-frame-pointer -ffunction-sections -fdata-sections -fshort-wchar)
+    add_compile_options(-fomit-frame-pointer -ffunction-sections -fdata-sections -fshort-wchar)
+    # NOTE: -ffast-math removed (and unsafe-math/contraction explicitly disabled).
+    # KOS injects -mfsrra/-mfsca, which GCC only emits under -funsafe-math-optimizations
+    # (part of -ffast-math). Those approximate reciprocals/normals break the FP-heavy
+    # collision math (floor raycasts / move-and-slide), causing things to fall through
+    # the world. Disabling them trades a little speed for correct physics.
+    add_compile_options(-fno-fast-math -fno-unsafe-math-optimizations -ffp-contract=off)
     add_compile_options(-O2)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti -fno-exceptions")
     add_link_options(-ffunction-sections -fdata-sections -Wl,--gc-sections)

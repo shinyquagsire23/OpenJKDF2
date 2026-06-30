@@ -93,7 +93,7 @@ for (int i = 0; i < len; i++)
     //printf("open: %s %s\n", fpath, mode);
 
     stdFile_t ret;
-#ifndef TARGET_TWL
+#ifndef TARGET_RETRO_HOMEBREW
     ret = (stdFile_t)fcaseopen(tmp, mode);
 #else
     if (mode[0] != 'w') {
@@ -152,7 +152,7 @@ static size_t Linux_stdFileWrite(stdFile_t fhand, void* dst, size_t len)
 static const char* Linux_stdFileGets(stdFile_t fhand, char* dst, size_t len)
 {
     // Drops static.jkl animclass parsing from 21.87s to 13.578s due to slow locks on getc
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
     char tmp[128];
     const char* retval = dst;
     if (!dst || !len) return 0;

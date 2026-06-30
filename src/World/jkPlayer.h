@@ -178,8 +178,11 @@ extern int jkPlayer_bEnableClassicLighting;
 extern int jkPlayer_bJankyPhysics;
 #endif
 
-
+#ifndef SDL2_RENDER
+#define HUD_SCALED(x) (x) // FLEXTODO
+#else
 #define HUD_SCALED(x) ((int)((flex_t)(x) * jkPlayer_hudScale)) // FLEXTODO
+#endif
 
 //static void (*jkPlayer_InitThings)() = (void*)jkPlayer_InitThings_ADDR;
 //static int (*jkPlayer_ReadConf)(wchar_t *a1) = (void*)jkPlayer_ReadConf_ADDR;

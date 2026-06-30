@@ -268,6 +268,7 @@ const uint8_t stdControl_aSdlToDik[256] =
     0,//DIK_RGUI,
 };
 
+static uint32_t stdControl_aJoystickQuirks[JK_NUM_JOYSTICKS] = {0};
 uint8_t stdControl_aDebounce[JK_NUM_KEYS];
 int stdControl_bControllerEscapeKey = 0;
 int stdControl_bControllerEscapeKey_last = 0;
@@ -281,6 +282,24 @@ void stdControl_SetSDLKeydown(int keyNum, int bDown, uint32_t readTime)
     if (!stdControl_aSdlToDik[keyNum])
         return;
     stdControl_SetKeydown(stdControl_aSdlToDik[keyNum], bDown, readTime);
+}
+
+void stdControl_FreeSdlJoysticks()
+{
+    for (int i = 0; i < JK_NUM_JOYSTICKS; i++) {
+        //if (pJoysticks[i])
+        //    SDL_JoystickClose(pJoysticks[i]);
+        //pJoysticks[i] = NULL;
+    }
+
+    for (int i = 0; i < JK_NUM_JOYSTICKS; i++) {
+        stdControl_aJoystickExists[i] = 0;
+        stdControl_aJoystickMaxButtons[i] = 0;
+        stdControl_aJoystickEnabled[i] = 0;
+
+        stdControl_aJoystickQuirks[i] = 0;
+        stdControl_aJoystickNumAxes[i] = 0;
+    }
 }
 
 int stdControl_Startup()
@@ -308,10 +327,51 @@ int stdControl_Startup()
     return 1;
 }
 
-void stdControl_Shutdown() {}
-int  stdControl_Open()  { return 1; }
-int  stdControl_Close() { return 1; }
-void stdControl_Flush() {}
+void stdControl_Shutdown() {
+    stdControl_FreeSdlJoysticks();
+    stdControl_bStartup = 0;
+}
+
+int stdControl_Open()
+{
+    stdControl_bOpen = 1;
+
+#if 0
+    if ( stdControl_mouseDirectInputDevice && stdControl_bReadMouse )
+    {
+        stdControl_mouseDirectInputDevice->lpVtbl->Acquire(stdControl_mouseDirectInputDevice);
+        ShowCursor(0);
+    }
+    if ( stdControl_keyboardIDirectInputDevice )
+        stdControl_keyboardIDirectInputDevice->lpVtbl->Acquire(stdControl_keyboardIDirectInputDevice);
+#endif
+    stdControl_bControlsActive = 1;
+    return 1;
+}
+
+int stdControl_Close()
+{
+    if ( !stdControl_bOpen )
+        return 0;
+
+#if 0
+    if ( stdControl_mouseDirectInputDevice )
+    {
+        stdControl_mouseDirectInputDevice->lpVtbl->Unacquire(stdControl_mouseDirectInputDevice);
+        ShowCursor(1);
+    }
+    if ( stdControl_keyboardIDirectInputDevice )
+        stdControl_keyboardIDirectInputDevice->lpVtbl->Unacquire(stdControl_keyboardIDirectInputDevice);
+#endif
+
+    stdControl_bControlsActive = 0;
+    stdControl_bOpen = 0;
+    return 1;
+}
+
+void stdControl_Flush() {
+    stdControl_curReadTime = stdPlatform_GetTimeMsec();
+}
 
 void stdControl_ToggleCursor(int a)
 {
@@ -372,10 +432,11 @@ void stdControl_ToggleMouse()
         stdControl_ShowCursor(0);
     }
 }
-void stdControl_FreeSdlJoysticks() {}
 void stdControl_InitSdlJoysticks() {}
 void stdControl_ShowSystemKeyboard() {}
 void stdControl_HideSystemKeyboard() {}
+
+extern void Window_DreamcastPollGui();
 
 void stdControl_ReadControls()
 {
@@ -399,12 +460,12 @@ void stdControl_ReadControls()
     stdControl_bControlsIdle = 1;
     stdControl_curReadTime = stdPlatform_GetTimeMsec();
     stdControl_msDelta = stdControl_curReadTime - stdControl_msLast;
-    khz = (stdControl_msDelta != 0) ? (1.0 / (flex_d_t)(stdControl_msDelta)) : 1.0;
+    khz = (stdControl_msDelta != 0) ? (1.0 / (flex_d_t)(stdControl_msDelta)) : (flex_d_t)1.0;
     stdControl_updateKHz = khz;
     stdControl_updateHz = khz * 1000.0;
 
     // Keyboard: feed every held key through the HID-scancode -> DIK table.
-    if (!stdControl_bDisableKeyboard) {
+    /*if (!stdControl_bDisableKeyboard) {
         maple_device_t* kbd_dev = maple_enum_type(0, MAPLE_FUNC_KEYBOARD);
         if (kbd_dev) {
             kbd_state_t* kbd = kbd_get_state(kbd_dev);
@@ -415,6 +476,21 @@ void stdControl_ReadControls()
                 }
             }
         }
+    }*/
+
+    if ( !stdControl_bDisableKeyboard )
+    {
+        const uint8_t *state = (const uint8_t*)stdControl_aInput1;
+        for (int i = 0; i < 256; i++)
+        {
+            int s = !!state[i];
+            if (s && stdControl_aDebounce[i]) {
+                continue;
+            }
+            stdControl_SetKeydown(i, s, stdControl_curReadTime);
+            stdControl_aDebounce[i] = 0;
+        }
+        // stdControl_SetKeydown(keyNum, keyVal, timestamp)
     }
 
     // Controller -> joystick 0.

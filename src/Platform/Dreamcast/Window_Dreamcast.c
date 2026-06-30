@@ -163,13 +163,13 @@ int last_draw_ms = 0;
 int Window_MessageLoop()
 {
     jkGuiRend_UpdateController();
+    Window_SdlUpdate();
 
     // TODO: poll the Dreamcast controller/keyboard via KOS maple here.
 
     // Repaint + present when a flip was requested (set by the stdDisplay flip path).
     if (Window_bFlipRequested) {
         Window_msg_main_handler(g_hWnd, WM_PAINT, 0, 0);
-        Window_SdlUpdate();
         Window_bFlipRequested = 0;
     }
     return 0;
@@ -179,7 +179,7 @@ int Window_MessageLoop()
 // and the mouse cursor) as Window messages. In-game controls are read separately
 // in stdControl_ReadControls/ReadMouse; the mouse cursor here is gated to menus so
 // the look delta isn't consumed twice.
-static void Window_DreamcastPollGui()
+void Window_DreamcastPollGui()
 {
     // --- Keyboard ---
     maple_device_t* kbd_dev = maple_enum_type(0, MAPLE_FUNC_KEYBOARD);
@@ -221,20 +221,21 @@ static void Window_DreamcastPollGui()
         if (st) {
             static uint32_t prevButtons = 0;
             uint32_t pressed = st->buttons & ~prevButtons;
-            if (pressed & CONT_DPAD_LEFT)  Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_LEFT, 0);
-            if (pressed & CONT_DPAD_RIGHT) Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_RIGHT, 0);
-            if (pressed & CONT_DPAD_UP)    Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_UP, 0);
-            if (pressed & CONT_DPAD_DOWN)  Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_DOWN, 0);
+            // Update edge state BEFORE dispatching (these handlers can re-enter this
+            // poll via a nested GUI message loop -- see the mouse note below).
+            prevButtons = st->buttons;
+            // NOTE: the d-pad is intentionally NOT posted here. jkGuiRend's own
+            // joystick poll reads the d-pad via stdControl (KEY_JOY1_H*) and now
+            // edge-detects it; posting WM_KEYFIRST here too would double every move.
             if (pressed & CONT_A) {
-                Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_RETURN, 0);
-                Window_msg_main_handler(g_hWnd, WM_CHAR, VK_RETURN, 0);
+                //Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_RETURN, 0);
+                //Window_msg_main_handler(g_hWnd, WM_CHAR, VK_RETURN, 0);
             }
-            if (pressed & (CONT_B | CONT_START)) {
+            if ((pressed & CONT_START) /*|| (!jkGame_isDDraw && (pressed & CONT_B))*/) {
                 stdPlatform_Printf("Escape!\n");
                 Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_ESCAPE, 0);
                 Window_msg_main_handler(g_hWnd, WM_CHAR, VK_ESCAPE, 0);
             }
-            prevButtons = st->buttons;
         }
     }
 
@@ -250,9 +251,19 @@ static void Window_DreamcastPollGui()
                 if (Window_mouseY < 0) Window_mouseY = 0;
                 if (Window_mouseX >= Window_xSize) Window_mouseX = Window_xSize - 1;
                 if (Window_mouseY >= Window_ySize) Window_mouseY = Window_ySize - 1;
+                //stdPlatform_Printf("%d %d, %d %d %d %d\n", m->dx, m->dy, Window_mouseX, Window_mouseY, Window_xSize, Window_ySize);
 
                 static uint32_t prevMouseBtns = 0;
                 uint32_t mpos = (Window_mouseX & 0xFFFF) | ((Window_mouseY << 16) & 0xFFFF0000);
+
+                // Post a move event when the cursor actually moves so jkGuiRend
+                // repaints the cursor and flips (its WM_MOUSEMOVE handler does both).
+                // Without this the GUI cursor only updates on clicks.
+                if (m->dx || m->dy) {
+                    Window_msg_main_handler(g_hWnd, WM_MOUSEMOVE, 0, mpos);
+                    Window_bFlipRequested = 1;
+                }
+
                 int left  = !!(m->buttons & MOUSE_LEFTBUTTON);
                 int right = !!(m->buttons & MOUSE_RIGHTBUTTON);
                 int prevLeft  = !!(prevMouseBtns & MOUSE_LEFTBUTTON);
@@ -261,12 +272,17 @@ static void Window_DreamcastPollGui()
                 Window_bMouseLeft  = left;
                 Window_bMouseRight = right ? 2 : 0;
 
+                // Update the edge state BEFORE dispatching. WM_LBUTTONDOWN runs
+                // synchronously and, when the click opens a submenu, re-enters this
+                // poll through a nested GUI message loop. If prevMouseBtns weren't
+                // updated first, the nested poll would see the button as still a fresh
+                // press and fire the click again -> infinite recursion (stack overrun).
+                prevMouseBtns = m->buttons;
+
                 if (left  && !prevLeft)  Window_msg_main_handler(g_hWnd, WM_LBUTTONDOWN, 1, mpos);
                 if (!left && prevLeft)   Window_msg_main_handler(g_hWnd, WM_LBUTTONUP,   0, mpos);
                 if (right && !prevRight) Window_msg_main_handler(g_hWnd, WM_RBUTTONDOWN, 2, mpos);
                 if (!right && prevRight) Window_msg_main_handler(g_hWnd, WM_RBUTTONUP,   0, mpos);
-
-                prevMouseBtns = m->buttons;
             }
         }
     }

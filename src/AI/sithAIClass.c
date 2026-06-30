@@ -228,7 +228,7 @@ int sithAIClass_LoadEntry(char *fpath, sithAIClass *aiclass)
                             {
                                 flex_t v15 = _atof(stdConffile_entry.args[1+v11].value);
                                 entry->argsAsFloat[v11] = v15;
-                                entry->argsAsInt[v11] = (int)v15;
+                                entry->argsAsInt[v11] = (int32_t)v15;
                             }
                         }
                         ++aiclass->numEntries;

@@ -701,13 +701,13 @@ void jkMain_GameplayTick(int a2)
     if (thing_six) {
         return;
     }
-    
+
     if (!thing_eight) {
         return;
     }
 
     v1 = stdPlatform_GetTimeMsec();
-    
+
     if (v1 > jkMain_lastTickMs + TICKRATE_MS)
     {
         jkMain_lastTickMs = v1;
@@ -1552,6 +1552,11 @@ void jkMain_FixRes()
         newW = 640;
     if (newH < 480)
         newH = 480;
+
+#ifdef TARGET_DREAMCAST
+    newW = 640;
+    newH = 480;
+#endif
 
     Video_modeStruct.viewSizeIdx = 0;
     Video_modeStruct.aViewSizes[Video_modeStruct.viewSizeIdx].xMin = 0;

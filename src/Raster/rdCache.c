@@ -40,7 +40,7 @@ void rdCache_AdvanceFrame()
     rdroid_curAcceleration = 1;
 #endif
 
-#if defined(TARGET_TWL)
+#if defined(TARGET_RETRO_HOMEBREW)
     rdCache_dword_865258 = 16;
 #endif
 
@@ -408,7 +408,7 @@ int rdCache_SendFaceListToHardware()
         }
         else {
             rdMaterial_EnsureData(v11.material);
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
             // Added: fall back to colors with no data
             if (!v11.material->bDataLoaded) {
                 v11.mipmap_related = 3;
@@ -502,7 +502,7 @@ int rdCache_SendFaceListToHardware()
             }
 
             // Look for the closest mipmap that's been loaded
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
             int mipmap_level_orig = mipmap_level;
             stdVBuffer* mipmap = sith_tex_sel->texture_struct[mipmap_level];
 

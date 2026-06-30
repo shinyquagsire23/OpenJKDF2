@@ -392,8 +392,13 @@ extern int Window_isHiDpi;
 // - float for original game behavior
 // - double to verify flex_t vs flex32_t vs cog_flex_t is working
 // - TODO: fixed point support?
+#ifdef TARGET_DREAMCAST
+typedef double flex_t_type; // TODO: Why?
+typedef double flex_d_t_type;
+#else
 typedef float flex_t_type; // _Float16
 typedef double flex_d_t_type;
+#endif
 
 // Fixed point experiment
 #ifdef EXPERIMENTAL_FIXED_POINT

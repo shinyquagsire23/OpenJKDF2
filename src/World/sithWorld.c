@@ -243,13 +243,9 @@ sithWorld* sithWorld_New()
 {
     sithWorld *result; // eax
 
-    stdPlatform_Printf("OpenJKDF2: %s\n", __func__); // Added
-
     result = (sithWorld *)pSithHS->alloc(sizeof(sithWorld));
     if ( result )
         _memset(result, 0, sizeof(sithWorld));
-
-    stdPlatform_Printf("OpenJKDF2: %s end\n", __func__); // Added
 
     return result;
 }

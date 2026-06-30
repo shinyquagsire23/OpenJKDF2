@@ -168,6 +168,9 @@ int jkGame_Update()
     if ( Video_modeStruct.Video_8606C0 || Video_modeStruct.geoMode <= 2 )
 #endif
 #if !defined(TARGET_TWL)
+        // DC (like SDL2) composites the whole menu buffer as an overlay, so it must
+        // be cleared to the color key each frame or the HUD overlay shows stale
+        // content over the 3D scene. TWL skips this (it reads only HUD sub-regions).
         stdDisplay_VBufferFill(Video_pMenuBuffer, Video_fillColor, 0); // Significant delay on TWL
 #endif
     jkDev_DrawLog();

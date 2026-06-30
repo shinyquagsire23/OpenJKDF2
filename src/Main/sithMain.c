@@ -317,8 +317,6 @@ int sithMain_Tick()
             uint32_t wholeFramesToApply = (uint32_t)(float)round((float)framesToApply);
             sithTime_physicsRolloverFrames = rolloverCombine - (((flex_d_t)wholeFramesToApply) * DELTA_PHYSTICK_FPS);
 
-            //printf("%f %f\n", framesToApply, rolloverCombine);
-
             // TODO figure this out
             sithControl_ReadControls();
             if ( g_sithMode != 2 )
@@ -420,7 +418,7 @@ int sithMain_Tick()
 
 void sithMain_UpdateCamera()
 {
-#if defined(TARGET_TWL)
+#if defined(TARGET_RETRO_HOMEBREW)
     jkPlayer_fov = 98; // 90deg vertical, 106deg horizontal stock
     jkPlayer_bJankyPhysics = 1;
     jkPlayer_fovIsVertical = 0;
@@ -517,7 +515,6 @@ void sithMain_AutoSave()
 #ifdef LINUX_TMP
     //g_debugmodeFlags |= 1;
 #endif
-
     sithTime_Startup();
     sithInventory_Reset(sithPlayer_pLocalPlayerThing);
 
@@ -549,7 +546,7 @@ void sithMain_AutoSave()
     {
         stdString_snprintf(v5, 128, "%s%s", "_JKAUTO_", sithWorld_pCurrentWorld->map_jkl_fname);
         stdFnames_ChangeExt(v5, "jks");
-        sithGamesave_Write(v5, 1, 0, 0);
+        int dbg_wr = sithGamesave_Write(v5, 1, 0, 0);
         sithTime_Startup();
     }
 }

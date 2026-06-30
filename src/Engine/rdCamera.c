@@ -16,7 +16,7 @@ static flex_t rdCamera_mipmapScalar = 1.0; // MOTS added
 int rdCamera_bForceRealProj = 0;
 #endif
 
-rdCamera* rdCamera_New(flex_t fov, flex_t x, flex_t y, flex_t z, flex_t aspectRatio)
+rdCamera* rdCamera_New(flex_t fov, BOOL bClipFar, flex_t zNear, flex_t zFar, flex_t aspectRatio)
 {
     rdCamera* out = (rdCamera *)rdroid_pHS->alloc(sizeof(rdCamera));
     if ( !out ) {
@@ -26,7 +26,7 @@ rdCamera* rdCamera_New(flex_t fov, flex_t x, flex_t y, flex_t z, flex_t aspectRa
     // Added: zero out alloc
     memset(out, 0, sizeof(*out));
 
-    rdCamera_NewEntry(out, fov, x, y, z, aspectRatio);    
+    rdCamera_NewEntry(out, fov, bClipFar, zNear, zFar, aspectRatio);    
     
     return out;
 }

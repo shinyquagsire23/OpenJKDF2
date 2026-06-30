@@ -203,6 +203,9 @@ stdGobFile* stdGob_FileOpen(stdGob *gob, const char *filepath)
         result->parent = gob;
         result->entry = entry;
         result->seekOffs = 0;
+        // Added: Opening another file in this GOB makes the shared handle's position
+        // ambiguous: invalidate the seek-skip cache so the next read re-seeks.
+        gob->lastReadFile = 0;
         return result;
     }
 #endif
@@ -245,6 +248,9 @@ stdGobFile* stdGob_FileOpen(stdGob *gob, const char *filepath)
     result->parent = gob;
     result->entry = entry;
     result->seekOffs = 0;
+    // Added: Opening another file in this GOB makes the shared handle's position
+    // ambiguous: invalidate the seek-skip cache so the next read re-seeks.
+    gob->lastReadFile = 0;
     return result;
 }
 

@@ -50,7 +50,7 @@ extern "C" {
 #define NETMSG_START_2 intptr_t craftingPacket = (intptr_t)&stdComm_cogMsgTmp.pktData[0];
 
 // TODO: Just rewrite all of this with memcpys
-#ifdef TARGET_TWL // Prevent aligned stores/loads
+#ifdef TARGET_RETRO_HOMEBREW // Prevent unaligned stores/loads
 #define FIX_ALIGN(t) ((craftingPacket & (sizeof(t)-1)) ? /*stdPlatform_Printf("Bump %p\n", craftingPacket),*/ craftingPacket += (sizeof(t) - (craftingPacket & (sizeof(t)-1))), 1 : 1)
 #else
 #define FIX_ALIGN(t) (1)
@@ -88,7 +88,7 @@ int32_t _readingOutS32; flex32_t _readingOutFloat; rdVector2 _readingOutV2; \
 rdVector3 _readingOutV3; rdVector3i _readingOutV3i; rdMatrix34 _readingOutM34;
 
 // TODO: Just rewrite all of this with memcpys
-#ifdef TARGET_TWL // Prevent unaligned stores and loads
+#ifdef TARGET_RETRO_HOMEBREW // Prevent unaligned stores and loads
 #define CHECK_ALIGN(t) ((((intptr_t)_readingPacket) & (sizeof(t)-1)) ? _readingPacket += (sizeof(t) - (((intptr_t)_readingPacket) & (sizeof(t)-1))), 1 : 1)
 #else
 #define CHECK_ALIGN(t) (1)

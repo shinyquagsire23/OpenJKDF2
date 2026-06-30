@@ -108,6 +108,10 @@ LABEL_8:
                     if ( (i->hitType & SITHCOLLISION_WORLD) != 0 )
                     {
                         //printf("Attach to new surface? %x\n", i->surface->field_0);
+                        if (pThing == sithPlayer_pLocalPlayerThing) {
+                            static int dbg_g = 0;
+                            if (dbg_g < 8) { dbg_g++; stdPlatform_Printf("[floor] GROUNDED dist=%.3f v8=%.3f\n", (double)i->distance, (double)v8); }
+                        }
                         sithThing_AttachToSurface(pThing, i->surface, a3);
                         sithCollision_SearchClose();
                         return;
@@ -146,6 +150,10 @@ LABEL_8:
                 range = pThing->moveSize;
                 sithCollision_SearchRadiusForThings(pThing->sector, 0, &pThing->position, &direction, v8, range, searchFlags | RAYCAST_2000 | RAYCAST_800 | RAYCAST_2);
             }
+        }
+        if (pThing == sithPlayer_pLocalPlayerThing) {
+            static int dbg_d = 0;
+            if (dbg_d < 8) { dbg_d++; stdPlatform_Printf("[floor] NO FLOOR (detach) v8=%.3f attach=0x%x sector=%p\n", (double)v8, (unsigned)pThing->attach_flags, (void*)pThing->sector); }
         }
         if ( pThing->attach_flags )
             sithThing_DetachThing(pThing);
@@ -638,10 +646,10 @@ void sithPhysics_ThingPhysPlayer(sithThing *player, flex_t deltaSeconds)
     // sync better between clients.
     flex_t rolloverCombine = deltaSeconds + player->physicsParams.physicsRolloverFrames;
 
-    int framesToApply = (int)stdMath_Floor(rolloverCombine * OLDSTEP_TARGET_FPS + 0.5); // number of 50FPS steps passed
+    int32_t framesToApply = (int32_t)stdMath_Floor(rolloverCombine * OLDSTEP_TARGET_FPS + 0.5); // number of 50FPS steps passed
     player->physicsParams.physicsRolloverFrames = rolloverCombine - (flex_d_t)(unsigned int)framesToApply * OLDSTEP_DELTA_50FPS;
 
-    for (int i = framesToApply; i > 0; i--)
+    for (int32_t i = framesToApply; i > 0; i--)
     {
         rdVector_Zero3(&a1a);
         if ( player->physicsParams.airDrag != 0.0 )

@@ -557,7 +557,7 @@ public: // conversion to basic types
         return (bool)!!to_int32();
     }
 
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
     operator int() const {
         return to_int();
     }
