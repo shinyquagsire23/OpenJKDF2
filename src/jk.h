@@ -15,7 +15,7 @@
 #include <ctype.h>
 #endif
 
-#if defined(MACOS) || defined(LINUX) || defined(TARGET_TWL)
+#if defined(MACOS) || defined(LINUX) || defined(TARGET_TWL) || defined(TARGET_DREAMCAST)
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -277,10 +277,14 @@ void jk_fatal();
 #else // WIN32_BLOBS
 char* _strcpy(char *dst, const char *src);
 int _memcmp(const void* str1, const void* str2, size_t count) PURE_FUNC;
-#if !defined(TARGET_TWL)
+#if !defined(TARGET_TWL) && !defined(TARGET_DREAMCAST)
 void* _memset(void* ptr, int val, size_t num);
 #define _memset_inline _memset
 #else
+// Bare-metal newlib targets (TWL, Dreamcast): use the C library's optimized
+// memset. Defining our own byte-loop memset is dangerous here -- at -O2 GCC's
+// loop-distribute-patterns rewrites the loop into a memset() call, which then
+// recurses infinitely (KOS even calls memset to clear BSS before main()).
 #define _memset memset
 static inline void __attribute((always_inline)) _memset_inline(void* ptr, int val, size_t num) {
     uint8_t* iter = (uint8_t*)ptr;

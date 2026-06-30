@@ -335,6 +335,13 @@ extern "C"
 #endif
 #endif // TARGET_TWL
 
+#ifdef TARGET_DREAMCAST
+#include <kos.h>
+// KOS reads these at startup (must be at file scope). INIT_DEFAULT brings up IRQs,
+// threads and the standard subsystems; INIT_CONTROLLER enables maple input.
+KOS_INIT_FLAGS(INIT_DEFAULT | INIT_CONTROLLER);
+#endif // TARGET_DREAMCAST
+
 int main(int argc, char** argv)
 {
 #ifdef ARCH_WASM
@@ -562,6 +569,24 @@ int main(int argc, char** argv)
 
 
 #endif
+#ifdef TARGET_DREAMCAST
+    printf("OpenJKDF2 starting on Sega Dreamcast (KallistiOS)\n");
+
+    // KOS auto-mounts the standard VFS points (/cd GD-ROM, /pc dc-load host,
+    // /ram, /sd, /vmu). Game data is expected on the disc; fall back to the
+    // dc-load host directory for development.
+    if (chdir("/cd") != 0) {
+        chdir("/pc");
+    }
+
+    {
+        char *cwd = getcwd(NULL, 0);
+        if (cwd) {
+            printf("Current dir: %s\n", cwd);
+            free(cwd);
+        }
+    }
+#endif // TARGET_DREAMCAST
 #ifdef WIN64_STANDALONE
     int skipConsoleWindow = 0;
     if ((SDL_GetHintBoolean("SteamClientLaunch", 0) || SDL_GetHintBoolean("SteamOS", 0) || SDL_GetHintBoolean("SteamDeck", 0)) && SDL_GetHintBoolean("SteamGamepadUI", 0)) {

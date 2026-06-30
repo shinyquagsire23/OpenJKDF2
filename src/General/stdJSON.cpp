@@ -8,6 +8,20 @@
 #ifndef _WIN32
 #include <unistd.h>
 #endif
+
+// Whyyyyyyy are you like this KallistiOS toolchain
+#ifdef TARGET_DREAMCAST
+#include <cstdio>
+#include <cstdlib>
+
+namespace std {
+    using ::snprintf;
+    using ::strtoll;
+    using ::strtoull;
+    using ::strtold;
+}
+#endif
+
 #include <nlohmann/json.hpp>
 #include <filesystem>
 #include <unordered_map>

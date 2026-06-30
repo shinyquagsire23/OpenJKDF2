@@ -135,7 +135,7 @@ flex_d_t stdMci_GetTrackLength(int track)
 }
 
 #else // LINUX
-#if defined(STDSOUND_NULL) || defined(STDSOUND_MAXMOD)
+#if defined(STDSOUND_NULL) || defined(STDSOUND_MAXMOD) || defined(STDSOUND_DREAMCAST)
 
 int stdMci_trackFrom;
 int stdMci_trackTo;

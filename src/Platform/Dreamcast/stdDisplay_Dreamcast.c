@@ -1,14 +1,11 @@
-#ifdef TARGET_TWL
-#include "stdDisplay.h"
+#ifdef TARGET_DREAMCAST
+#include "Win95/stdDisplay.h"
 
 #include "stdPlatform.h"
 #include "jk.h"
 #include "Win95/Video.h"
 #include "Win95/Window.h"
 #include "General/stdColor.h"
-
-#include <assert.h>
-#include <nds.h>
 
 uint32_t Video_menuTexId = 0;
 uint32_t Video_overlayTexId = 0;

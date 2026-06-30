@@ -8,7 +8,7 @@
 #define NEEDS_STEPPED_PHYS (!jkPlayer_bJankyPhysics || sithNet_isMulti)
 
 // Settings for stepped physics
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
 #define TARGET_PHYSTICK_FPS (20.0)
 #define DELTA_PHYSTICK_FPS (1.0/TARGET_PHYSTICK_FPS)
 #else
@@ -39,7 +39,7 @@
 #define CANONICAL_PHYS_TICKRATE (1.0 / 25.0)
 
 // Use microsecond timing to calculate sithTime_deltaSecs/etc
-#if defined(PLATFORM_POSIX) && !defined(TARGET_TWL)
+#if defined(PLATFORM_POSIX) && !defined(TARGET_RETRO_HOMEBREW)
 #define MICROSECOND_TIME
 #endif
 
@@ -77,7 +77,7 @@
 #define SITH_MAX_VISIBLE_SECTORS_2 (0xA0)
 #define SITH_MAX_VISIBLE_ALPHA_SURFACES (32)
 #define SITH_MAX_SURFACE_CLIP_ITERS (25) // not real
-#elif defined(TARGET_TWL)
+#elif defined(TARGET_RETRO_HOMEBREW)
 #define SITH_MAX_THINGS (641)
 #define SITH_MAX_VISIBLE_SECTORS (256)
 #define SITH_MAX_VISIBLE_SECTORS_2 (256+32)
@@ -92,13 +92,13 @@
 #endif // QOL_IMPROVEMENTS
 
 // COG resource limits
-#if defined(QOL_IMPROVEMENTS) && !defined(TARGET_TWL)
+#if defined(QOL_IMPROVEMENTS) && !defined(TARGET_RETRO_HOMEBREW)
 #define SITHCOGVM_MAX_STACKSIZE (0x10000)
 #define SITHCOG_SYMBOL_LIMIT (2048) // JK was 512, MoTS/DW are 1024
 #define SITHCOG_LINKED_SYMBOL_LIMIT (2048)
 #define SITHCOG_MAX_LINKS (2048)
 #define SITHCOG_NODE_STACKDEPTH (0x800) // JK was 0x200, MoTS is 0x400
-#elif defined(TARGET_TWL)
+#elif defined(TARGET_RETRO_HOMEBREW)
 
 #define SITHCOGVM_MAX_STACKSIZE (64)
 #define SITHCOG_SYMBOL_LIMIT (1024) // JK was 512, MoTS/DW are 1024
@@ -117,7 +117,7 @@
 // Weapon-related limits
 #define MAX_DEFLECTION_BOUNCES (6)
 
-#if defined(TARGET_TWL)
+#if defined(TARGET_RETRO_HOMEBREW)
 #define RDCACHE_MAX_TRIS (0x80) // theoretical max 0x800?
 #define RDCACHE_MAX_VERTICES (0x180) // theoretical max 0x1800?
 
@@ -133,7 +133,7 @@
 #define STD3D_MAX_UI_VERTICES (0x8000)
 #endif
 
-#if defined(QOL_IMPROVEMENTS) && !defined(TARGET_TWL)
+#if defined(QOL_IMPROVEMENTS) && !defined(TARGET_RETRO_HOMEBREW)
 #define SITH_MAX_SYNC_THINGS (128)
 #else
 #define SITH_MAX_SYNC_THINGS (16)
@@ -182,7 +182,7 @@
 #define DW_CAMERA
 #endif
 
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
 #define JKPLAYER_NUM_INFOS (11)
 #else
 #define JKPLAYER_NUM_INFOS (32)
@@ -213,7 +213,7 @@
 #define SITHCAMERA_ZNEAR_FIRSTPERSON (1.0 / 128.0)
 #define SITHCAMERA_ZNEAR (1.0 / 64.0)
 #define SITHCAMERA_ZFAR (128.0)
-#elif defined(TARGET_TWL)
+#elif defined(TARGET_RETRO_HOMEBREW)
 #define SITHCAMERA_ZNEAR_FIRSTPERSON (1.0 / 64.0)
 #define SITHCAMERA_ZNEAR (1.0 / 64.0)
 #define SITHCAMERA_ZFAR (6.0)
@@ -225,13 +225,13 @@
 
 #define SITHPARTICLE_MAX_PARTICLES (64)
 
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
 #define RDCAMERA_MAX_LIGHTS (8)
 #else
 #define RDCAMERA_MAX_LIGHTS (64)
 #endif
 
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
 #define STDGOB_MAX_GOBS (8)
 #else
 #define STDGOB_MAX_GOBS (64)
@@ -275,15 +275,15 @@
 #define STDCONF_LINEBUFFER_LEN (2048)
 #endif
 
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
 #define SITHAI_MAX_ACTORS (128)
 #else
 #define SITHAI_MAX_ACTORS (256)
 #endif
 
-#if defined(QOL_IMPROVEMENTS) && !defined(TARGET_TWL)
+#if defined(QOL_IMPROVEMENTS) && !defined(TARGET_RETRO_HOMEBREW)
 #define SITH_MIXER_NUMPLAYINGSOUNDS (256)
-#elif defined(TARGET_TWL)
+#elif defined(TARGET_RETRO_HOMEBREW)
 #define SITH_MIXER_NUMPLAYINGSOUNDS (32)
 #else
 #define SITH_MIXER_NUMPLAYINGSOUNDS (32)
@@ -295,7 +295,8 @@
 // Misc optimizations/features
 //
 #define SITH_DEBUG_STRUCT_NAMES
-#if defined(TARGET_TWL)
+
+#if defined(TARGET_RETRO_HOMEBREW)
 #undef SITH_DEBUG_STRUCT_NAMES
 
 // stdHashTable memory optimizations
@@ -330,9 +331,14 @@
 //#define RDCLIP_COPY_VERTS_TO_STACK
 #define RDCLIP_CLIP_ZFAR_FIRST
 #define SITHRENDER_SPHERE_TEST_SURFACES
+
+// DSi can render in n-gons instead of tris
+#ifdef TARGET_TWL
 #define RDCACHE_RENDER_NGONS
+#endif // TARGET_TWL
+
 #define STDBITMAP_PARTIAL_LOAD
-#endif
+#endif // defined(TARGET_RETRO_HOMEBREW)
 
 #define RDCACHE_RENDER_LINES
 

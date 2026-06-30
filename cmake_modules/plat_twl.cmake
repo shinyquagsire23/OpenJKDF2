@@ -11,6 +11,7 @@ macro(plat_initialize)
 
     add_definitions(-DPLAT_MISSING_WIN32)
     add_definitions(-DTARGET_TWL)
+    add_definitions(-DTARGET_RETRO_HOMEBREW)
     add_definitions(-D_XOPEN_SOURCE=500)
     add_definitions(-D_DEFAULT_SOURCE)
     add_definitions(-DARM9)

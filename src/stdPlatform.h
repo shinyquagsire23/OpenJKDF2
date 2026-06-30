@@ -67,6 +67,10 @@ extern size_t trackingAllocsBLimit;
 void stdPlatform_PrintHeapStats();
 #endif
 
+#ifdef TARGET_DREAMCAST
+void stdPlatform_PrintHeapStats();
+#endif
+
 #ifdef __cplusplus
 }
 #endif

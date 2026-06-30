@@ -813,4 +813,11 @@ void stdPlatform_PrintHeapStats()
     size_t waste = (trackingAllocsAReal - trackingAllocsA) + (trackingAllocsBReal - trackingAllocsB) + (trackingAllocsCReal - trackingAllocsC);
     stdPlatform_Printf("heap ext=0x%zx mn=0x%zx\nnw=0x%zx wst=0x%zx\nnum=%zd\n", trackingAllocsA, trackingAllocsB, trackingAllocsC, waste, activeAllocs);
 }
-#endif
+#endif // TARGET_TWL
+
+#ifdef TARGET_DREAMCAST
+void stdPlatform_PrintHeapStats()
+{
+    // TODO
+}
+#endif // TARGET_DREAMCAST

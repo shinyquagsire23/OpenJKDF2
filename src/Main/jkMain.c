@@ -51,7 +51,7 @@
 #include "Dss/jkDSS.h"
 #include "stdPlatform.h"
 
-#if defined(TARGET_TWL)
+#if defined(TARGET_RETRO_HOMEBREW)
 #define TICKRATE_MS (0) // no cap
 #elif defined(QOL_IMPROVEMENTS)
 #define TICKRATE_MS (jkPlayer_fpslimit ? 1000 / jkPlayer_fpslimit : 0) // no cap
@@ -111,7 +111,7 @@ void jkMain_Shutdown()
 }
 
 // TODO merge SDL2 in
-#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
+#if !defined(SDL2_RENDER) && !defined(TARGET_RETRO_HOMEBREW)
 int jkMain_SetVideoMode()
 {
     signed int result; // eax
@@ -259,7 +259,7 @@ void jkMain_GuiAdvance()
                 jkGame_dword_552B5C += stdPlatform_GetTimeMsec() - v1;
                 v3 = stdPlatform_GetTimeMsec();
                 if ( g_app_suspended && jkSmack_currentGuiState != 6 ) {
-#if defined(SDL2_RENDER) || defined(TARGET_TWL)
+#if defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW)
                     if (jkMain_lastTickMs == v1)
 #endif
                     jkGame_Update();
@@ -1527,7 +1527,7 @@ void jkMain_StartupCutscene(char *pCutsceneStr)
     }
 }
 
-#if defined(SDL2_RENDER) || defined(TARGET_TWL)
+#if defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW)
 void jkMain_FixRes()
 {
     if (!jkGame_isDDraw)

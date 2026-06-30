@@ -18,6 +18,7 @@
 #include "Dss/sithMulti.h"
 #include "AI/sithAIClass.h"
 
+#include <string.h>
 #include <stdint.h>
 #include <math.h>
 

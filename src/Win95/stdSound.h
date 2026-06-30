@@ -113,6 +113,28 @@ typedef struct stdMaxmodBuffer
 } stdMaxmodBuffer;
 #endif
 
+#ifdef STDSOUND_DREAMCAST
+typedef struct stdSoundDreamcastBuffer {
+    void* data;
+    int format;
+    int bStereo;
+    int bitsPerSample;
+    uint32_t nSamplesPerSec;
+    int bufferBytes;
+    int bufferLen;
+    int refcnt;
+    flex_t vol;
+    int bIsCopy;
+    rdVector3 pos;
+    rdVector3 vel;
+    //mm_stream stream;
+    uint32_t currentSample;
+    int sampleRepeats;
+    BOOL isPlaying;
+    BOOL isLooping;
+} stdSoundDreamcastBuffer;
+#endif
+
 typedef struct stdWaveFormat
 {
   int16_t wFormatTag;

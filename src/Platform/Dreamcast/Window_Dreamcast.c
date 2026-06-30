@@ -1,4 +1,4 @@
-#include "Window.h"
+#include "Win95/Window.h"
 
 #include "Win95/stdGdi.h"
 #include "Platform/std3D.h"
@@ -15,9 +15,12 @@
 #include "Main/jkQuakeConsole.h"
 #include "Gui/jkGUIRend.h"
 
-#ifdef TARGET_TWL
+#ifdef TARGET_DREAMCAST
 
-#include <nds.h>
+#include <dc/maple.h>
+#include <dc/maple/controller.h>
+#include <dc/maple/keyboard.h>
+#include <dc/maple/mouse.h>
 
 extern int jkGuiBuildMulti_bRendering;
 
@@ -159,27 +162,113 @@ int Window_ShowCursorUnwindowed(int a1)
 int last_draw_ms = 0;
 int Window_MessageLoop()
 {
-#ifdef TARGET_TWL
-    //printf("heap 0x%x 0x%x 0x%x\n", (intptr_t)getHeapLimit() - (intptr_t)getHeapEnd(), (intptr_t)getHeapEnd() - (intptr_t)getHeapStart(), (intptr_t)getHeapLimit());
-#endif
-    //jkMain_GuiAdvance(); // TODO needed?
     jkGuiRend_UpdateController();
 
-    static touchPosition lastTouchXY = {0};
-    touchPosition touchXY;
-    touchRead(&touchXY);
-    if (touchXY.px != 0 || touchXY.py != 0 || lastTouchXY.px != 0 || lastTouchXY.py != 0 || Window_bFlipRequested) {
+    // TODO: poll the Dreamcast controller/keyboard via KOS maple here.
+
+    // Repaint + present when a flip was requested (set by the stdDisplay flip path).
+    if (Window_bFlipRequested) {
         Window_msg_main_handler(g_hWnd, WM_PAINT, 0, 0);
         Window_SdlUpdate();
         Window_bFlipRequested = 0;
     }
-    lastTouchXY = touchXY;
-    //if (stdPlatform_GetTimeMsec() - last_draw_ms > 1000) {
-        //Window_msg_main_handler(g_hWnd, WM_PAINT, 0, 0);
-        //last_draw_ms = stdPlatform_GetTimeMsec();
-    //}
-    //Window_msg_main_handler(g_hWnd, WM_PAINT, 0, 0);
     return 0;
+}
+
+// Posts menu/GUI input (keyboard navigation + typed text, controller navigation,
+// and the mouse cursor) as Window messages. In-game controls are read separately
+// in stdControl_ReadControls/ReadMouse; the mouse cursor here is gated to menus so
+// the look delta isn't consumed twice.
+static void Window_DreamcastPollGui()
+{
+    // --- Keyboard ---
+    maple_device_t* kbd_dev = maple_enum_type(0, MAPLE_FUNC_KEYBOARD);
+    if (kbd_dev) {
+        kbd_state_t* kbd = kbd_get_state(kbd_dev);
+        if (kbd) {
+            // HID scancode -> Windows VK for navigation/control keys. `chr` => also
+            // emit WM_CHAR (the GUI expects both for Enter/Tab/Backspace).
+            static const struct { int sc; int vk; int chr; } specials[] = {
+                { 0x29, VK_ESCAPE, 1 }, { 0x28, VK_RETURN, 1 }, { 0x2A, VK_BACK, 1 },
+                { 0x2B, VK_TAB,    1 }, { 0x4F, VK_RIGHT,  0 }, { 0x50, VK_LEFT, 0 },
+                { 0x51, VK_DOWN,   0 }, { 0x52, VK_UP,     0 }, { 0x4B, VK_PRIOR, 0 },
+                { 0x4E, VK_NEXT,   0 }, { 0x4C, VK_DELETE, 0 }, { 0x4A, VK_HOME, 0 },
+                { 0x4D, VK_END,    0 },
+            };
+            for (int i = 0; i < (int)(sizeof(specials) / sizeof(specials[0])); i++) {
+                int sc = specials[i].sc;
+                if (sc >= KBD_MAX_KEYS) continue;
+                int v = kbd->key_states[sc].value;
+                if ((v & KEY_STATE_IS_DOWN) && !(v & KEY_STATE_WAS_DOWN)) {
+                    Window_msg_main_handler(g_hWnd, WM_KEYFIRST, specials[i].vk, 0);
+                    if (specials[i].chr)
+                        Window_msg_main_handler(g_hWnd, WM_CHAR, specials[i].vk, 0);
+                }
+            }
+            // Typed printable characters (translated for shift/caps).
+            int k;
+            while ((k = kbd_queue_pop(kbd_dev, 1)) != KBD_QUEUE_END) {
+                if (k >= 32 && k < 127)
+                    Window_msg_main_handler(g_hWnd, WM_CHAR, k, 0);
+            }
+        }
+    }
+
+    // --- Controller: drive menu navigation ---
+    maple_device_t* cont_dev = maple_enum_type(0, MAPLE_FUNC_CONTROLLER);
+    if (cont_dev) {
+        cont_state_t* st = (cont_state_t*)maple_dev_status(cont_dev);
+        if (st) {
+            static uint32_t prevButtons = 0;
+            uint32_t pressed = st->buttons & ~prevButtons;
+            if (pressed & CONT_DPAD_LEFT)  Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_LEFT, 0);
+            if (pressed & CONT_DPAD_RIGHT) Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_RIGHT, 0);
+            if (pressed & CONT_DPAD_UP)    Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_UP, 0);
+            if (pressed & CONT_DPAD_DOWN)  Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_DOWN, 0);
+            if (pressed & CONT_A) {
+                Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_RETURN, 0);
+                Window_msg_main_handler(g_hWnd, WM_CHAR, VK_RETURN, 0);
+            }
+            if (pressed & (CONT_B | CONT_START)) {
+                Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_ESCAPE, 0);
+                Window_msg_main_handler(g_hWnd, WM_CHAR, VK_ESCAPE, 0);
+            }
+            prevButtons = st->buttons;
+        }
+    }
+
+    // --- Mouse cursor + buttons (menus only; in-game look is read in stdControl) ---
+    if (!jkGame_isDDraw) {
+        maple_device_t* mdev = maple_enum_type(0, MAPLE_FUNC_MOUSE);
+        if (mdev) {
+            mouse_state_t* m = (mouse_state_t*)maple_dev_status(mdev);
+            if (m) {
+                Window_mouseX += m->dx;
+                Window_mouseY += m->dy;
+                if (Window_mouseX < 0) Window_mouseX = 0;
+                if (Window_mouseY < 0) Window_mouseY = 0;
+                if (Window_mouseX >= Window_xSize) Window_mouseX = Window_xSize - 1;
+                if (Window_mouseY >= Window_ySize) Window_mouseY = Window_ySize - 1;
+
+                static uint32_t prevMouseBtns = 0;
+                uint32_t mpos = (Window_mouseX & 0xFFFF) | ((Window_mouseY << 16) & 0xFFFF0000);
+                int left  = !!(m->buttons & MOUSE_LEFTBUTTON);
+                int right = !!(m->buttons & MOUSE_RIGHTBUTTON);
+                int prevLeft  = !!(prevMouseBtns & MOUSE_LEFTBUTTON);
+                int prevRight = !!(prevMouseBtns & MOUSE_RIGHTBUTTON);
+
+                Window_bMouseLeft  = left;
+                Window_bMouseRight = right ? 2 : 0;
+
+                if (left  && !prevLeft)  Window_msg_main_handler(g_hWnd, WM_LBUTTONDOWN, 1, mpos);
+                if (!left && prevLeft)   Window_msg_main_handler(g_hWnd, WM_LBUTTONUP,   0, mpos);
+                if (right && !prevRight) Window_msg_main_handler(g_hWnd, WM_RBUTTONDOWN, 2, mpos);
+                if (!right && prevRight) Window_msg_main_handler(g_hWnd, WM_RBUTTONUP,   0, mpos);
+
+                prevMouseBtns = m->buttons;
+            }
+        }
+    }
 }
 
 void Window_SdlUpdate()
@@ -189,73 +278,7 @@ void Window_SdlUpdate()
         return;
     }
 
-    uint16_t left, right;
-    uint32_t pos, msgl, msgr;
-    int hasLeft, hasRight;
-
-    //printf("Heap: 0x%x/0x%x %p\n",  getHeapEnd() - getHeapStart(), getHeapLimit() - getHeapStart(), getHeapStart());
-
-    if (!jkGame_isDDraw)
-    {
-        scanKeys();
-    }
-    u16 keysPressed = keysDown();
-    if (keysPressed & KEY_START) {
-        Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_ESCAPE, 0);
-        Window_msg_main_handler(g_hWnd, WM_CHAR, VK_ESCAPE, 0);
-        printf("escape\n");
-    }
-
-    if (stdControl_IsSystemKeyboardShowing()) {
-        consoleClear();
-    }
-
-    int16_t keyboardChar = keyboardUpdate();
-    if (keyboardChar) {
-        /*
-        DVK_FOLD      = -23, ///< Fold key (top left on the default keyboard)
-    DVK_TAB       =  9,  ///< Tab key
-    DVK_BACKSPACE =  8,  ///< Backspace
-    DVK_CAPS      = -15, ///< Caps key
-    DVK_SHIFT     = -14, ///< Shift key
-    DVK_SPACE     =  32, ///< Space key
-    DVK_MENU      = -5,  ///< Menu key
-    DVK_ENTER     =  10, ///< Enter key
-    DVK_CTRL      = -16, ///< Ctrl key
-    DVK_UP        = -17, ///< Up key
-    DVK_RIGHT     = -18, ///< Right key
-    DVK_DOWN      = -19, ///< Down key
-    DVK_LEFT      = -20, ///< Left key
-    DVK_ALT       = -26  ///< Alt key
-        */
-        if (keyboardChar == DVK_TAB) {
-            Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_TAB, 0);
-            Window_msg_main_handler(g_hWnd, WM_CHAR, VK_TAB, 0);
-        }
-        else if (keyboardChar == DVK_BACKSPACE) {
-            Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_BACK, 0);
-            Window_msg_main_handler(g_hWnd, WM_CHAR, VK_BACK, 0);
-        }
-        else if (keyboardChar == DVK_ENTER) {
-            Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_RETURN, 0);
-            Window_msg_main_handler(g_hWnd, WM_CHAR, VK_RETURN, 0);
-        }
-        else if (keyboardChar == DVK_LEFT) {
-            Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_LEFT, 0);
-        }
-        else if (keyboardChar == DVK_RIGHT) {
-            Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_RIGHT, 0);
-        }
-        else if (keyboardChar == DVK_UP) {
-            Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_UP, 0);
-        }
-        else if (keyboardChar == DVK_DOWN) {
-            Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_DOWN, 0);
-        }
-        else if (keyboardChar > 0) {
-            Window_msg_main_handler(g_hWnd, WM_CHAR, keyboardChar, 0);
-        }
-    }
+    Window_DreamcastPollGui();
 
 #if 0
     SDL_Event event;

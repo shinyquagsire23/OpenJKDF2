@@ -12,14 +12,14 @@
 #ifdef RDCACHE_RENDER_LINES
 static int rdCache_totalLines = 0;
 static rdLine rdCache_aHWLines[1024];
-#endif
+#endif // RDCACHE_RENDER_LINES
 
 #ifdef JKM_LIGHTING
 int rdroid_curVertexColorMode = 0; // MOTS added
 static flex_t rdCache_aRedIntensities[RDCACHE_MAX_VERTICES];
 static flex_t rdCache_aGreenIntensities[RDCACHE_MAX_VERTICES];
 static flex_t rdCache_aBlueIntensities[RDCACHE_MAX_VERTICES];
-#endif
+#endif // JKM_LIGHTING
 
 #ifdef RDCACHE_RENDER_NGONS
 rdNGon rdCache_aHWSolidNGons[RDCACHE_MAX_TRIS];
@@ -27,7 +27,7 @@ rdNGon rdCache_aHWNormalNGons[RDCACHE_MAX_TRIS];
 
 static int rdCache_totalNormalNGons = 0;
 static int rdCache_totalSolidNGons = 0;
-#endif
+#endif // RDCACHE_RENDER_NGONS
 
 int rdCache_Startup()
 {
@@ -44,7 +44,7 @@ void rdCache_AdvanceFrame()
     rdCache_dword_865258 = 16;
 #endif
 
-#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
+#if !defined(SDL2_RENDER) && !defined(TARGET_RETRO_HOMEBREW)
     if ( rdroid_curAcceleration > 0 )
 #endif
         std3D_StartScene();
@@ -52,7 +52,7 @@ void rdCache_AdvanceFrame()
 
 void rdCache_FinishFrame()
 {
-#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
+#if !defined(SDL2_RENDER) && !defined(TARGET_RETRO_HOMEBREW)
     if ( rdroid_curAcceleration > 0 )
 #endif
         std3D_EndScene();
@@ -130,7 +130,7 @@ void rdCache_Flush()
         _qsort(rdCache_aProcFaces, rdCache_numProcFaces, sizeof(rdProcEntry), (int (__cdecl *)(const void *, const void *))rdCache_ProcFaceCompare);
 #endif
     }
-#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
+#if !defined(SDL2_RENDER) && !defined(TARGET_RETRO_HOMEBREW)
     if ( rdroid_curAcceleration <= 0 )
     {
         if ( rdroid_curOcclusionMethod )
@@ -355,7 +355,7 @@ int rdCache_SendFaceListToHardware()
             flags_idk_ |= 0x10000;
         }
 
-#if defined(SDL2_RENDER) || defined(TARGET_TWL)
+#if defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW)
         d3d_maxVertices = STD3D_MAX_VERTICES;
 #endif
         if ( active_6c->numVertices + rdCache_totalVerts >= d3d_maxVertices )
@@ -1508,7 +1508,7 @@ int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags)
     procFace->y_max = (int32_t)stdMath_Ceil(y_max);
     procFace->z_min = z_min;
     procFace->z_max = z_max;
-#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
+#if !defined(SDL2_RENDER) && !defined(TARGET_RETRO_HOMEBREW)
     if ( procFace->x_min >= (unsigned int)procFace->x_max )
         return 0;
     if ( procFace->y_min >= (unsigned int)procFace->y_max )

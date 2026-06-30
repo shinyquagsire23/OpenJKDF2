@@ -3,6 +3,20 @@
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
+
+// Whyyyyyyy are you like this KallistiOS toolchain
+#ifdef TARGET_DREAMCAST
+#include <cstdio>
+#include <cstdlib>
+
+namespace std {
+    using ::snprintf;
+    using ::strtoll;
+    using ::strtoull;
+    using ::strtold;
+}
+#endif
+
 #include <nlohmann/json.hpp>
 
 #include "Platform/Common/stdHttp.h"
@@ -46,7 +60,7 @@ char* stdUpdater_pUpdateFilename = (char*)"";
 
 void stdUpdater_StartupCvars()
 {
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
     return;
 #endif
     sithCvar_RegisterBool("net_disableUpdates", 0, &stdUpdater_bDisableUpdates, CVARFLAG_GLOBAL);
@@ -64,7 +78,7 @@ void stdUpdater_StartupCvars()
 
 void stdUpdater_Reset()
 {
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
     return;
 #endif
     stdUpdater_strBrowserDownloadUrl = "";
@@ -79,7 +93,7 @@ int stdUpdater_CheckForUpdates()
 {
     stdUpdater_Reset();
 
-#if defined(PLATFORM_LINUX) || defined(ARCH_WASM) || defined(TARGET_TWL)
+#if defined(PLATFORM_LINUX) || defined(ARCH_WASM) || defined(TARGET_RETRO_HOMEBREW)
     return 0;
 #else
     if (stdUpdater_bDisableUpdates) {
@@ -162,12 +176,12 @@ int stdUpdater_CheckForUpdates()
         stdPlatform_Printf("stdUpdater: Failed to parse JSON?\n");
         return 0;
     }
-#endif // defined(PLATFORM_LINUX) || defined(ARCH_WASM) || defined(TARGET_TWL)
+#endif // defined(PLATFORM_LINUX) || defined(ARCH_WASM) || defined(TARGET_RETRO_HOMEBREW)
 }
 
 void stdUpdater_GetUpdateText(wchar_t* pOut, size_t outSz)
 {
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
     return;
 #endif
     // TODO: i8n
@@ -189,7 +203,7 @@ void stdUpdater_GetUpdateText(wchar_t* pOut, size_t outSz)
 
 void stdUpdater_Win64UpdateThread()
 {
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
     return;
 #endif
     char buffer[1024];
@@ -310,7 +324,7 @@ int stdUpdater_UpdateThread(void* unused)
 
 void stdUpdater_DoUpdate()
 {
-#if defined(PLATFORM_LINUX) || defined(TARGET_TWL)
+#if defined(PLATFORM_LINUX) || defined(TARGET_RETRO_HOMEBREW)
     stdUpdater_bFoundUpdate = false;
     stdUpdater_bDownloading = false;
     stdUpdater_bCompletedUpdate = false;

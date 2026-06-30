@@ -16,7 +16,7 @@
 #endif
 #include <sys/stat.h>
 #ifndef _WIN32
-#ifndef TARGET_TWL
+#ifndef TARGET_RETRO_HOMEBREW
 #include <ftw.h>
 #endif
 #endif
@@ -24,7 +24,7 @@
 #include "external/fcaseopen/fcaseopen.h"
 #endif
 
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
 #include <errno.h>
 #endif
 
@@ -276,7 +276,7 @@ int stdFileUtil_Deltree(const char* lpPathName)
     }
 #endif
 
-#ifndef TARGET_TWL
+#ifndef TARGET_RETRO_HOMEBREW
     nftw(tmp, rmFiles, 10, FTW_DEPTH|FTW_MOUNT|FTW_PHYS);
 #else
     DIR *dir;
@@ -374,7 +374,7 @@ int stdFileUtil_FindNext(stdFileSearch *a1, stdFileSearchResult *a2)
     }
     else
     {
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
         getcwd(tmp, 128-1);
         //strncpy(tmp, pcwd, 128-1);
         strncat(tmp, "/", 128-1);
@@ -408,7 +408,7 @@ int stdFileUtil_FindNext(stdFileSearch *a1, stdFileSearchResult *a2)
             tmp[strlen(tmp)-1] = 0;
         }
 
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
         errno = 0;
 #endif
         a1->num_found = scandir(tmp, &a1->namelist, search_ext ? parse_ext : NULL, alphasort);

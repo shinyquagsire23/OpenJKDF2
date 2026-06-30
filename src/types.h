@@ -375,6 +375,7 @@ typedef struct sithPlayerInfo sithPlayerInfo;
 typedef struct sithAnimclassEntry sithAnimclassEntry;
 typedef struct stdALBuffer stdALBuffer;
 typedef struct stdMaxmodBuffer stdMaxmodBuffer;
+typedef struct stdSoundDreamcastBuffer stdSoundDreamcastBuffer;
 typedef struct stdNullSoundBuffer stdNullSoundBuffer;
 typedef struct stdFontCharset stdFontCharset;
 #ifndef RDCACHE_RENDER_NGONS
@@ -421,6 +422,11 @@ typedef stdNullSoundBuffer stdSound_3dBuffer_t;
 typedef stdMaxmodBuffer stdSound_buffer_t;
 typedef stdMaxmodBuffer stdSound_3dBuffer_t;
 #endif 
+
+#ifdef STDSOUND_DREAMCAST
+typedef stdSoundDreamcastBuffer stdSound_buffer_t;
+typedef stdSoundDreamcastBuffer stdSound_3dBuffer_t;
+#endif
 
 #endif // STDSOUND_OPENAL
 

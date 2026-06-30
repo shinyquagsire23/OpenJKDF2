@@ -1,6 +1,8 @@
 #include "jkCog.h"
 
 #include <math.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "General/stdStrTable.h"
 #include "Main/jkHud.h"
@@ -1329,7 +1331,7 @@ void jkCogExt_Randomint(sithCog* ctx)
     int b = sithCogExec_PopInt(ctx);
     int a = sithCogExec_PopInt(ctx);
     
-    sithCogExec_PushInt(ctx, a + (rand() % (b-a+1)));
+    sithCogExec_PushInt(ctx, a + (_rand() % (b-a+1)));
 }
 
 void jkCogExt_Sine(sithCog* ctx)

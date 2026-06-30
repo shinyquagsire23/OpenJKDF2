@@ -2,7 +2,7 @@
 
 #include "types.h"
 
-#if defined(LINUX) || defined(TARGET_TWL)
+#if defined(LINUX) || defined(TARGET_RETRO_HOMEBREW)
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
@@ -337,7 +337,7 @@ char* _strcat(char* str, const char* concat)
     return str;
 }
 
-#if !defined(TARGET_TWL)
+#if !defined(TARGET_RETRO_HOMEBREW)
 void* _memset(void* ptr, int val, size_t num)
 {
     size_t i;
@@ -349,7 +349,7 @@ void* _memset(void* ptr, int val, size_t num)
 }
 #endif
 
-#if !defined(MACOS) && !defined(WIN64_STANDALONE) && !defined(LINUX) && !defined(TARGET_TWL)
+#if !defined(MACOS) && !defined(WIN64_STANDALONE) && !defined(LINUX) && !defined(TARGET_RETRO_HOMEBREW)
 void* memset(void* ptr, int val, size_t num)
 {
     int i;
