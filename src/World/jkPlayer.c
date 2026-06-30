@@ -34,7 +34,7 @@
 #include "Main/sithCvar.h"
 
 // DSi has *plenty* of time to read the text.
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
 #define FAST_MISSION_TEXT_DEFAULT (1)
 #else
 #define FAST_MISSION_TEXT_DEFAULT (0)
@@ -725,7 +725,7 @@ int jkPlayer_ReadConf(wchar_t *name)
         sithControl_ReadConf();
 
         // HACK
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
         sithControl_InputInit();
 #endif
         if ( stdConffile_ReadArgs() )
@@ -889,7 +889,7 @@ void jkPlayer_DrawPov()
         jkSaber_rotateVec.z = angleSin * jkPlayer_waggleVec.z * velNorm;
         rdMatrix_BuildRotate34(&jkSaber_rotateMat, &jkSaber_rotateVec);
 
-#if defined(SDL2_RENDER) || defined(TARGET_TWL)
+#if defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW)
         // Force weapon to draw in front of scene
         std3D_ClearZBuffer();
         rdSetZBufferMethod(RD_ZBUFFER_READ_WRITE);
@@ -931,7 +931,7 @@ void jkPlayer_DrawPov()
         rdMatrix_PreMultiply34(&viewMat, &jkSaber_rotateMat);
 
         // Moved: see below.
-#if !(defined(SDL2_RENDER) || defined(TARGET_TWL))
+#if !(defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW))
         // Render saber if applicable
         if (playerThings[playerThingIdx].actorThing->jkFlags & JKFLAG_SABERON)
         {
@@ -952,7 +952,7 @@ void jkPlayer_DrawPov()
 
         // Added: we want the polyline to render in draw order so the spheres don't clip, 
         // but we want the POV model to be aware of the depths still.
-#if defined(SDL2_RENDER) || defined(TARGET_TWL)
+#if defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW)
         if (playerThings[playerThingIdx].actorThing->jkFlags & JKFLAG_SABERON)
         {
             rdSetZBufferMethod(RD_ZBUFFER_READ_NOWRITE);

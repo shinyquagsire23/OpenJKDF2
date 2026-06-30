@@ -284,8 +284,8 @@ void jkGuiTitle_WorldLoadCallback(flex_t percentage)
             jkGuiTitle_elementsLoad[1].selectedTextEntry = (__int64)percentage;
             jkGuiRend_UpdateAndDrawClickable(&jkGuiTitle_elementsLoad[1], &jkGuiTitle_menuLoad, 1);
         }
-#if defined(SDL2_RENDER) || defined(TARGET_TWL)
-#if defined(PLATFORM_POSIX) && !defined(TARGET_TWL)
+#if defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW)
+#if defined(PLATFORM_POSIX) && !defined(TARGET_RETRO_HOMEBREW)
     static uint64_t lastRefresh = 0;
     // Only update loading bar at 30fps, so that we don't waste time
     // during vsync.
@@ -373,8 +373,8 @@ void jkGuiTitle_LoadingFinalize()
             if (shouldSkip) break;
             int selected = jkGuiRend_DisplayAndReturnClicked(&jkGuiTitle_menuLoad);
 
-#if defined(SDL2_RENDER) || defined(TARGET_TWL)
-#if defined(PLATFORM_POSIX) && !defined(TARGET_TWL)
+#if defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW)
+#if defined(PLATFORM_POSIX) && !defined(TARGET_RETRO_HOMEBREW)
             static uint64_t lastRefresh = 0;
             // Only update loading bar at 30fps, so that we don't waste time
             // during vsync.

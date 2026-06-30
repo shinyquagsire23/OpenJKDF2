@@ -63,7 +63,7 @@ static jkGuiJoystickEntry jkGuiJoystick_aEntries[JKGUIJOYSTICK_NUM_ENTRIES] =
     { KEY_JOY1_B7,      "KEY_JOY1_B7",      0x206, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0 },
     { KEY_JOY1_B8,      "KEY_JOY1_B8",      0x207, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0 },
 
-#if defined(SDL2_RENDER) || defined(TARGET_TWL)
+#if defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW)
     { KEY_JOY1_B9,      "KEY_JOY1_B9",      0x208, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0 },
     { KEY_JOY1_B10,     "KEY_JOY1_B10",     0x209, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0 },
     { KEY_JOY1_B11,     "KEY_JOY1_B11",     0x20A, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0 },
@@ -104,7 +104,7 @@ static jkGuiJoystickEntry jkGuiJoystick_aEntries[JKGUIJOYSTICK_NUM_ENTRIES] =
     { KEY_JOY2_B7,      "KEY_JOY2_B7",      0xA06, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0 },
     { KEY_JOY2_B8,      "KEY_JOY2_B8",      0xA07, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0 },
 
-#if defined(SDL2_RENDER) || defined(TARGET_TWL)
+#if defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW)
     { KEY_JOY2_B9,      "KEY_JOY2_B9",      0xA08, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0 },
     { KEY_JOY2_B10,     "KEY_JOY2_B10",     0xA09, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0 },
     { KEY_JOY2_B11,     "KEY_JOY2_B11",     0xA0A, INPUT_FUNC_FORWARD, 0u, NULL, 0,  0 },
@@ -197,7 +197,7 @@ static jkGuiElement jkGuiJoystick_aElements[33+3] = {
     { ELEMENT_TEXT, 0, 2, &jkGuiJoystick_awTmp, 3, { 50, 180, 540, 120 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
 
     // 29
-#if defined(SDL2_RENDER) || defined(TARGET_TWL)
+#if defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW)
     { ELEMENT_TEXT, 0, 0, jkGuiJoystick_strings.aStrings[0], 3, { 20, 310, 190, 25 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
     { ELEMENT_TEXT, 0, 0, jkGuiJoystick_strings.aStrings[1], 3, { 20, 335, 190, 25 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
     { ELEMENT_TEXT, 0, 0, jkGuiJoystick_strings.aStrings[2], 3, { 20, 360, 190, 25 }, 1, 0, NULL, NULL, NULL, NULL, { 0, 0, 0, 0, 0, { 0, 0, 0, 0 } }, 0 },
@@ -914,7 +914,7 @@ void jkGuiJoystick_MenuTick(jkGuiMenu *pMenu)
             jkGuiJoystick_aElements[30].bIsVisible = 1;
             jkGuiJoystick_aElements[31].bIsVisible = 1;
 
-#if defined(SDL2_RENDER) || defined(TARGET_TWL)
+#if defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW)
             jkGuiJoystick_aElements[32].bIsVisible = 1;
             jkGuiJoystick_aElements[33].bIsVisible = 1;
             jkGuiJoystick_aElements[34].bIsVisible = 1;
@@ -965,7 +965,7 @@ void jkGuiJoystick_MenuTick(jkGuiMenu *pMenu)
             jkGuiJoystick_aElements[29].bIsVisible = 0;
             jkGuiJoystick_aElements[30].bIsVisible = 0;
             jkGuiJoystick_aElements[31].bIsVisible = 0;
-#if defined(SDL2_RENDER) || defined(TARGET_TWL)
+#if defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW)
             jkGuiJoystick_aElements[32].bIsVisible = 0;
             jkGuiJoystick_aElements[33].bIsVisible = 0;
             jkGuiJoystick_aElements[34].bIsVisible = 0;
@@ -1059,7 +1059,7 @@ void jkGuiJoystick_MenuTick(jkGuiMenu *pMenu)
         jkGuiRend_UpdateAndDrawClickable(&jkGuiJoystick_aElements[29], pMenu, 1);
         jkGuiRend_UpdateAndDrawClickable(&jkGuiJoystick_aElements[30], pMenu, 1);
         jkGuiRend_UpdateAndDrawClickable(&jkGuiJoystick_aElements[31], pMenu, 1);
-#if defined(SDL2_RENDER) || defined(TARGET_TWL)
+#if defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW)
         jkGuiRend_UpdateAndDrawClickable(&jkGuiJoystick_aElements[32], pMenu, 1);
         jkGuiRend_UpdateAndDrawClickable(&jkGuiJoystick_aElements[33], pMenu, 1);
         jkGuiRend_UpdateAndDrawClickable(&jkGuiJoystick_aElements[34], pMenu, 1);
@@ -1100,7 +1100,7 @@ int32_t jkGuiJoystick_Show()
     jkGuiJoystick_aElements[29].bIsVisible = 0;
     jkGuiJoystick_aElements[30].bIsVisible = 0;
     jkGuiJoystick_aElements[31].bIsVisible = 0;
-#if defined(SDL2_RENDER) || defined(TARGET_TWL)
+#if defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW)
     jkGuiJoystick_aElements[32].bIsVisible = 0;
     jkGuiJoystick_aElements[33].bIsVisible = 0;
     jkGuiJoystick_aElements[34].bIsVisible = 0;

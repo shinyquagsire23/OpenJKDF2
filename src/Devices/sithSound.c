@@ -30,7 +30,7 @@ static int sithSound_FindInSearchPaths(const char *filename, char *outPath, int 
 
 int sithSound_Startup()
 {
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
     if (openjkdf2_bIsExtraLowMemoryPlatform)
         sithSound_maxDataLoaded = 0x60000;
     else

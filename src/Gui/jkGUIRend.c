@@ -260,7 +260,7 @@ void jkGuiRend_Paint(jkGuiMenu *menu)
     stdControl_ShowCursor(0);
     stdDisplay_SetMasterPalette(jkGuiRend_palette);
 
-#ifndef TARGET_TWL
+#ifndef TARGET_RETRO_HOMEBREW
 #ifdef STDBITMAP_PARTIAL_LOAD
     if (menu->pBgBitmap) {
         stdBitmap_EnsureData(menu->pBgBitmap);
@@ -287,7 +287,7 @@ void jkGuiRend_Paint(jkGuiMenu *menu)
         clickable = &menu->paElements[++clickableIdx];
     }
 
-#if defined(SDL2_RENDER) || defined(TARGET_TWL)
+#if defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW)
     menu->focusedElement = lastFocused;
     menu->lastMouseDownClickable = lastDown;
 #endif
@@ -334,7 +334,7 @@ int32_t jkGuiRend_DisplayAndReturnClicked(jkGuiMenu *menu)
         { 
             // Added: this makes the menu that appears when pressing ESC in jkGUISingleTally flicker,
             //        I think due to how we handle window message emulation.
-#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
+#if !defined(SDL2_RENDER) && !defined(TARGET_RETRO_HOMEBREW)
             menu->lastClicked = -1;
 #endif
         }
@@ -452,7 +452,7 @@ void jkGuiRend_gui_sets_handler_framebufs(jkGuiMenu *menu)
     }
     ++jkGuiRend_HandlerIsSet;
     
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
 #ifdef STDBITMAP_PARTIAL_LOAD
     if (menu->pBgBitmap) {
         stdBitmap_EnsureData(menu->pBgBitmap);
@@ -470,7 +470,7 @@ void jkGuiRend_gui_sets_handler_framebufs(jkGuiMenu *menu)
     }
 #endif
 #endif
-    
+
     jkGuiRend_Paint(menu);
 }
 
@@ -974,7 +974,7 @@ LABEL_12:
     jkGuiElement* element = &menu->paElements[idxOther];
     if ( element && jkGuiRend_sub_5103E0(element) )
     {
-//#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
+//#if !defined(SDL2_RENDER) && !defined(TARGET_RETRO_HOMEBREW)
         menu->focusedElement = element;
 //#endif
         if ( focusedElement )
@@ -1027,7 +1027,7 @@ void jkGuiRend_RenderIdk2_alt(jkGuiMenu *menu)
     jkGuiElement* element = &menu->paElements[idxOther];
     if ( element && jkGuiRend_sub_5103E0(element) )
     {
-#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
+#if !defined(SDL2_RENDER) && !defined(TARGET_RETRO_HOMEBREW)
         menu->focusedElement = element;
 #endif
         if ( focusedElement )
@@ -1763,7 +1763,7 @@ LABEL_47:
             break;
 
         case WM_CHAR:
-#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
+#if !defined(SDL2_RENDER) && !defined(TARGET_RETRO_HOMEBREW)
             if ( (jkGuiRend_lastKeyScancode != 0xFF0000) & (uint8_t)lParam )
 #endif
                 jkGuiRend_InvokeEvent(jkGuiRend_activeMenu->focusedElement, jkGuiRend_activeMenu, JKGUI_EVENT_CHAR, wParam);
@@ -2756,7 +2756,7 @@ void jkGuiRend_FocusElementDir(jkGuiMenu *pMenu, int32_t dir)
     }
     if ((element->type == ELEMENT_LISTBOX || element->type == ELEMENT_TEXTBOX) && jkGuiRend_sub_5103E0(element))
     {
-//#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
+//#if !defined(SDL2_RENDER) && !defined(TARGET_RETRO_HOMEBREW)
         pMenu->focusedElement = element;
         pMenu->lastMouseOverClickable = element;
 //#endif

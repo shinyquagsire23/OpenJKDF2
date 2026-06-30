@@ -515,7 +515,7 @@ void stdControl_SetKeydown(int keyNum, int bDown, uint32_t readTime)
         stdControl_bControlsIdle = 0;
     }
 
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
     // TODO: I think the intent is to allow polling for inputs on a separate thread?
     // This is a perf optimization to avoid memsetting
     stdControl_aInput2[keyNum] = 0;

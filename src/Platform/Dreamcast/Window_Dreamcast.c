@@ -230,6 +230,7 @@ static void Window_DreamcastPollGui()
                 Window_msg_main_handler(g_hWnd, WM_CHAR, VK_RETURN, 0);
             }
             if (pressed & (CONT_B | CONT_START)) {
+                stdPlatform_Printf("Escape!\n");
                 Window_msg_main_handler(g_hWnd, WM_KEYFIRST, VK_ESCAPE, 0);
                 Window_msg_main_handler(g_hWnd, WM_CHAR, VK_ESCAPE, 0);
             }

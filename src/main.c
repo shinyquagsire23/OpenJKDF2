@@ -586,6 +586,9 @@ int main(int argc, char** argv)
             free(cwd);
         }
     }
+
+    openjkdf2_bIsLowMemoryPlatform = 1;
+    openjkdf2_bIsExtraLowMemoryPlatform = 0;
 #endif // TARGET_DREAMCAST
 #ifdef WIN64_STANDALONE
     int skipConsoleWindow = 0;

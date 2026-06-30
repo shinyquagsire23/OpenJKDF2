@@ -1685,7 +1685,7 @@ void sithControl_FreeCam(sithThing *player)
                     mult *= 5.0;
                 }
                 else if (sithControl_ReadFunctionMap(INPUT_FUNC_JUMP, &tmp)) {
-#ifndef TARGET_TWL
+#ifndef TARGET_RETRO_HOMEBREW
                     mult *= 5.0;
 #endif
                 }
@@ -1699,7 +1699,7 @@ void sithControl_FreeCam(sithThing *player)
                 rdMatrix_BuildRotate34(&a, &v1->actorParams.eyePYR);
                 rdVector_Zero3(&addVec);
                 rdVector_MultAcc3(&addVec, &rdroid_yVector3, sithControl_GetAxisNonRaw(INPUT_FUNC_FORWARD) * mult);
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
                 if (sithControl_ReadFunctionMap(INPUT_FUNC_JUMP, &tmp)) {
                     rdVector_MultAcc3(&addVec, &rdroid_zVector3, 1.0);
                 }
@@ -1864,7 +1864,7 @@ void sithControl_InputInit()
     stdControlKeyInfoEntry *v8; // eax
 
     _memset(sithControl_aInputFuncToKeyinfo, 0, sizeof(stdControlKeyInfo) * INPUT_FUNC_MAX);
-#ifndef TARGET_TWL
+#ifndef TARGET_RETRO_HOMEBREW
     stdControl_Reset();
 #endif
 
@@ -1885,9 +1885,9 @@ void sithControl_InputInit()
     sithControl_MapDefaultsJoystick();
 #endif
 
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
     sithWeapon_controlOptions |= 2;
-#endif // TARGET_TWL
+#endif // TARGET_RETRO_HOMEBREW
 }
 
 void sithControl_sub_4D6930(int funcIdx)
@@ -2239,7 +2239,7 @@ LABEL_17:
 
 // Added
 void sithControl_MapDefaultsJoystick() {
-#if !defined(TARGET_TWL) && defined(QOL_IMPROVEMENTS)
+#if !defined(TARGET_RETRO_HOMEBREW) && defined(QOL_IMPROVEMENTS)
     stdControlKeyInfoEntry* mapped;
 
     mapped = sithControl_MapAxisFunc(INPUT_FUNC_FORWARD, AXIS_JOY1_Y, 4u);
@@ -2284,7 +2284,7 @@ void sithControl_MapDefaultsJoystick() {
 
     sithControl_DefaultHelper(INPUT_FUNC_FIRE2, KEY_JOY1_B16, 2); // ltrig
     sithControl_DefaultHelper(INPUT_FUNC_FIRE1, KEY_JOY1_B17, 2); // rtrig
-#elif defined(TARGET_TWL)
+#elif defined(TARGET_RETRO_HOMEBREW) // TODO split out analog vs no analog controls
     sithControl_MapFunc(INPUT_FUNC_FORWARD, KEY_JOY1_HUP, 0);
     sithControl_MapFunc(INPUT_FUNC_NEXTSKILL, KEY_JOY1_HDOWN, 0);
     sithControl_MapFunc(INPUT_FUNC_TURN, KEY_JOY1_HLEFT, 0);

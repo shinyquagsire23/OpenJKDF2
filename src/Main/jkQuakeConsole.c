@@ -762,7 +762,7 @@ int jkQuakeConsole_WmHandler(HWND a1, UINT msg, WPARAM wParam, HWND a4, LRESULT 
 
 void jkQuakeConsole_PrintLine(const char* pLine)
 {
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
     return;
 #endif
     if (!pLine) return;

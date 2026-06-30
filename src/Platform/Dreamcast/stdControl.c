@@ -312,9 +312,66 @@ void stdControl_Shutdown() {}
 int  stdControl_Open()  { return 1; }
 int  stdControl_Close() { return 1; }
 void stdControl_Flush() {}
-void stdControl_ToggleCursor(int a) {}
-int  stdControl_ShowCursor(int a) { return 1; }
-void stdControl_ToggleMouse() {}
+
+void stdControl_ToggleCursor(int a)
+{
+    if ( stdControl_bOpen )
+    {
+        if ( a )
+        {
+            if ( stdControl_mouseDirectInputDevice && stdControl_bReadMouse )
+            {
+                //stdControl_mouseDirectInputDevice->lpVtbl->Acquire(stdControl_mouseDirectInputDevice);
+                stdControl_ShowCursor(0);
+            }
+            //if ( stdControl_keyboardIDirectInputDevice )
+            //    stdControl_keyboardIDirectInputDevice->lpVtbl->Acquire(stdControl_keyboardIDirectInputDevice);
+            stdControl_bControlsActive = 1;
+        }
+        else
+        {
+            if ( stdControl_mouseDirectInputDevice )
+            {
+                //stdControl_mouseDirectInputDevice->lpVtbl->Unacquire(stdControl_mouseDirectInputDevice);
+                stdControl_ShowCursor(1);
+            }
+            //if ( stdControl_keyboardIDirectInputDevice )
+            //    stdControl_keyboardIDirectInputDevice->lpVtbl->Unacquire(stdControl_keyboardIDirectInputDevice);
+            stdControl_bControlsActive = 0;
+        }
+    }
+
+    //SDL_SetRelativeMouseMode(!!a);
+}
+
+static int _cursorState = 0;
+
+int stdControl_ShowCursor(int a)
+{
+    if (a)
+    {
+        _cursorState++;
+    }
+    else
+    {
+        _cursorState--;
+    }
+    return _cursorState;
+}
+
+void stdControl_ToggleMouse()
+{
+    if ( stdControl_bReadMouse )
+    {
+        stdControl_bReadMouse = 0;
+        stdControl_ShowCursor(1);
+    }
+    else
+    {
+        stdControl_bReadMouse = 1;
+        stdControl_ShowCursor(0);
+    }
+}
 void stdControl_FreeSdlJoysticks() {}
 void stdControl_InitSdlJoysticks() {}
 void stdControl_ShowSystemKeyboard() {}

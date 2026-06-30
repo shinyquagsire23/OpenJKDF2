@@ -21,12 +21,15 @@
 
 #ifdef TARGET_TWL
 #include <nds.h>
+#endif
+
+#ifdef TARGET_RETRO_HOMEBREW
 #include <sys/stat.h>
 #endif
 
 char* stdEmbeddedRes_LoadOnlyInternal(const char* filepath, size_t* pOutSz)
 {
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
     struct stat statstuff;
     int exists = 0;
 #endif
@@ -50,7 +53,7 @@ for (int i = 0; i < strlen(tmp_filepath); i++)
 }
 #endif
 
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
     exists = stat(tmp_filepath, &statstuff) >= 0;
     if (!exists) {
         goto skip_fopen;
@@ -133,7 +136,7 @@ skip_fopen:
 
 char* stdEmbeddedRes_Load(const char* filepath, size_t* pOutSz)
 {
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
     struct stat statstuff;
     int exists = 0;
 #endif
@@ -167,7 +170,7 @@ for (int i = 0; i < strlen(tmp_filepath); i++)
 #endif
 
 
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
     exists = stat(tmp_filepath, &statstuff) >= 0;
     if (!exists) {
         goto skip_fopen;

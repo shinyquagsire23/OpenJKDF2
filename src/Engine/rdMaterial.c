@@ -286,7 +286,7 @@ LABEL_21:
 #endif
 #endif
 
-#if defined(TARGET_TWL)
+#if defined(TARGET_RETRO_HOMEBREW)
         texture->alphaMats[mipmap_num].width = format.width;
         texture->alphaMats[mipmap_num].height = format.height;
         texture->opaqueMats[mipmap_num].width = format.width;
@@ -300,7 +300,7 @@ LABEL_21:
         }
 #endif
 
-#if !defined(TARGET_TWL)
+#if !defined(TARGET_RETRO_HOMEBREW)
         printf("Load %s tex %d/%d mip %d/%d\n", mat_fpath, tex_numa, material->num_textures, mipmap_num, texture->num_mipmaps);
         created_tex = stdDisplay_VBufferNew(&format, create_ddraw_surface, gpu_mem, 0);
         *texture_struct = created_tex;
@@ -385,7 +385,7 @@ LABEL_22:
       while ( v22 < material->num_texinfo );
       mat_file_ = mat_file__;
     }
-#ifndef TARGET_TWL
+#ifndef TARGET_RETRO_HOMEBREW
     if ( material->tex_type & 1 )
     {
       colors = (rdColor24 *)rdroid_pHS->alloc(0x300u);
@@ -529,7 +529,7 @@ int rdMaterial_LoadEntry_Deferred(rdMaterial *material, int create_ddraw_surface
         rdMaterial_UpdateFrameCount(material);
     //}
 
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
     //stdPlatform_PrintHeapStats();
 #endif
 #endif
@@ -584,7 +584,7 @@ void rdMaterial_FreeEntry(rdMaterial* material)
                 {
                     rdDDrawSurface* surface = &pTex->alphaMats[j];
 
-#if defined(SDL2_RENDER) || defined(TARGET_TWL)
+#if defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW)
                     if (surface->texture_loaded) {
                         stdPlatform_Printf("OpenJKDF2: rdMaterial_FreeEntry %s %x\n", material->mat_fpath, surface->texture_id);
                         std3D_PurgeSurfaceRefs(&pTex->alphaMats[j]);
@@ -626,7 +626,7 @@ void rdMaterial_FreeEntry(rdMaterial* material)
         {
             rdDDrawSurface* surface = &pTex->alphaMats[j];
 
-#if defined(SDL2_RENDER) || defined(TARGET_TWL)
+#if defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW)
             if (surface->texture_loaded) {
                 stdPlatform_Printf("OpenJKDF2: rdMaterial_FreeEntry %s %x\n", material->mat_fpath, surface->texture_id);
                 std3D_PurgeSurfaceRefs(&pTex->alphaMats[j]);
@@ -754,7 +754,7 @@ int rdMaterial_EnsureMetadata(rdMaterial* pMaterial) {
 // Added
 void rdMaterial_OptionalFree(rdMaterial* pMaterial) {
     if (!pMaterial) return;
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
     //if (openjkdf2_bIsExtraLowMemoryPlatform) {
         rdMaterial_FreeEntry(pMaterial);
     //}
@@ -847,7 +847,7 @@ void rdMaterial_ResetCacheInfo(rdMaterial *pMaterial)
         rdTexture* texIter = &pMaterial->textures[i];
         for (int j = 0; j < texIter->num_mipmaps; j++)
         {
-#if defined(SDL2_RENDER) || defined(TARGET_TWL)
+#if defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW)
             std3D_PurgeSurfaceRefs(&texIter->alphaMats[j]);
             std3D_PurgeSurfaceRefs(&texIter->opaqueMats[j]);
 #endif
@@ -1056,7 +1056,7 @@ int rdMaterial_PurgeMaterialCache()
         }
     }
 
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
     if (purgedAnything) {
         stdPlatform_PrintHeapStats();
     }

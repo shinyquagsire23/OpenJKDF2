@@ -252,7 +252,7 @@ void sithInventory_SelectItem(sithThing *thing, int binIdx)
     thing->actorParams.playerinfo->curItem = binIdx;
 
     // For some reason items don't print out like force powers, ugh
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
     jkDev_DebugLog(sithInventory_aDescriptors[binIdx].fpath);
 #endif
 }

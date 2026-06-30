@@ -279,7 +279,7 @@ int jkGui_Startup()
             Windows_GameErrorMsgbox("ERR_CANNOT_LOAD_FILE %s", tmp);
         }
     }
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
     stdPlatform_PrintHeapStats();
 #endif
 
@@ -289,7 +289,7 @@ int jkGui_Startup()
         jkGui_LoadBmIdx(i);
     }
     // TODO: Eviction caching for stdBitmap, rdMaterial
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
     stdPlatform_PrintHeapStats();
 #endif
 

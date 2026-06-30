@@ -253,7 +253,7 @@ int sithMain_Tick()
         sithTime_Tick();
         sithComm_Sync();
 
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
         // Fallback to stepped 30Hz physics if ms delta is very high
         if (sithTime_deltaMs > 100) {
             jkPlayer_bJankyPhysics = 0;

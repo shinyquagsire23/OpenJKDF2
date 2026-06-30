@@ -70,23 +70,23 @@ void jkGuiMap_DrawMapScreen(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *
     {
         rdCamera_SetCurrent(jkGuiMap_pCamera);
         stdControl_ShowCursor(1);
-#if defined(SDL2_RENDER) || defined(TARGET_TWL)
+#if defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW)
         stdDisplay_VBufferLock(jkGuiMap_pVbuffer);
 #endif
         stdDisplay_VBufferFill(jkGuiMap_pVbuffer, 0, 0);
         rdAdvanceFrame();
         sithMap_DrawCircle(jkGuiMap_pCamera, &jkGuiMap_matTmp);
-#if !defined(SDL2_RENDER) && !defined(TARGET_TWL)
+#if !defined(SDL2_RENDER) && !defined(TARGET_RETRO_HOMEBREW)
         rdFinishFrame();
 #endif
         stdDisplay_VBufferCopy(vbuf, jkGuiMap_pVbuffer, JKGUIMAP_BUFFER_X, JKGUIMAP_BUFFER_Y, 0, 0);
 
-#if defined(SDL2_RENDER) || defined(TARGET_TWL)
+#if defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW)
         stdDisplay_VBufferUnlock(jkGuiMap_pVbuffer);
 #endif
 
         stdControl_ShowCursor(0);
-#if defined(SDL2_RENDER) && !defined(TARGET_TWL)
+#if defined(SDL2_RENDER) && !defined(TARGET_RETRO_HOMEBREW)
         // rdFinishFrame calls stdDisplay_ddraw_waitforvblank which causes flickering on SDL2
         rdCache_Flush();
         rdCache_FinishFrame();

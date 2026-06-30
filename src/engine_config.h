@@ -324,7 +324,9 @@
 #define RDMATERIAL_MINIMIZE_STRUCTS
 
 // Halve the x/y positions/sizes for all jkGui elements
+#ifdef TARGET_TWL
 #define JKGUI_SMOL_SCREEN
+#endif // TARGET_TWL
 
 // Keep rdClip buffers in stack (DTCM)
 #define RDCLIP_WORK_BUFFERS_IN_STACK_MEM

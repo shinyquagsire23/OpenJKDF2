@@ -115,7 +115,7 @@ int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
     _memset(gob->entries, 0, sizeof(stdGobEntry) * gob->numFiles);
 
     // We're not adding anything so like, keep it small?
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
     gob->entriesHashtable = stdHashTable_New(gob->numFiles);
 #else
     gob->entriesHashtable = stdHashTable_New(1024);

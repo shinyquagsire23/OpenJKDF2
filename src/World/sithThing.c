@@ -200,7 +200,7 @@ void sithThing_TickAll(flex_t deltaSeconds, int deltaMs)
         pThingIter = &sithWorld_pCurrentWorld->things[i];
         if (!pThingIter->type)
             continue;
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
         int bCanUpdateOffscreen = (((uint8_t)jkPlayer_currentTickIdx + (pThingIter->thingIdx & 0xFF)) & 0x3F) == 0;
         int bActorCanUpdateEveryOther = pThingIter->type == SITH_THING_ACTOR && (((uint8_t)jkPlayer_currentTickIdx + (pThingIter->thingIdx & 0xFF)) & 1) == 0;
         int bActorCanUpdateNow = pThingIter->type == SITH_THING_ACTOR && pThingIter->screenPos.y < 0.5;
@@ -233,7 +233,7 @@ void sithThing_TickAll(flex_t deltaSeconds, int deltaMs)
                 case SITH_CT_AI:
                     // CPU optimization testing
                     // TODO: Check if a thing has been given a target by a COG and allow it to move, eg easter egg lady in Baron's Hed
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
                     if (pThingIter->type == SITH_THING_PLAYER || pThingIter->lastRenderedTickIdx >= jkPlayer_currentTickIdx-3 || bCanUpdateOffscreen)
 #endif
                     sithAI_Tick(pThingIter, deltaSeconds);
@@ -262,7 +262,7 @@ void sithThing_TickAll(flex_t deltaSeconds, int deltaMs)
             if ( pThingIter->moveType == SITH_MT_PHYSICS )
             {
                 // CPU optimization testing
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
                 if (bCanAlwaysUpdatePhysics || pThingIter->lastRenderedTickIdx >= jkPlayer_currentTickIdx-3 || bCanUpdateOffscreen)
 #endif
                 sithPhysics_ThingTick(pThingIter, deltaSeconds);
@@ -273,13 +273,13 @@ void sithThing_TickAll(flex_t deltaSeconds, int deltaMs)
             }
 
             // CPU optimization testing
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
             if (bCanAlwaysUpdatePhysics || pThingIter->lastRenderedTickIdx >= jkPlayer_currentTickIdx-3 || bCanUpdateOffscreen)
 #endif
             sithThing_TickPhysics(pThingIter, deltaSeconds);
 
             // CPU optimization testing
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
             if ((pThingIter->type == SITH_THING_PLAYER) || bActorCanUpdateNow || bActorCanUpdateEveryOther || (pThingIter->type != SITH_THING_ACTOR && pThingIter->lastRenderedTickIdx >= jkPlayer_currentTickIdx-3) || bCanUpdateOffscreen)
             sithPuppet_Tick(pThingIter, bActorCanUpdateEveryOther ? deltaSeconds * 2 : deltaSeconds);
 #else

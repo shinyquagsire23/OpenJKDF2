@@ -141,7 +141,10 @@ int sithWorld_Load(sithWorld *pWorld, char *map_jkl_fname)
 
     if ( !pWorld )
         return 0;
-#if defined(SDL2_RENDER) || defined(TARGET_TWL)
+
+    stdPlatform_Printf("OpenJKDF2: %s -> %s\n", __func__, map_jkl_fname); // Added
+
+#if defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW)
     std3D_PurgeEntireTextureCache();
 #endif
 
@@ -190,7 +193,7 @@ LABEL_11:
                         // Added
                         _sprintf(tmp, "%f seconds to parse section %s -- FAILED!\n", (flex32_t)v6 * 0.001, section);
                         sithConsole_Print(tmp);
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
                         stdPlatform_PrintHeapStats();
 #endif
                         goto LABEL_19;
@@ -198,7 +201,7 @@ LABEL_11:
                     v6 = (unsigned int)(stdPlatform_GetTimeMsec() - startMsecs);
                     _sprintf(tmp, "%f seconds to parse section %s.\n", (flex32_t)v6 * 0.001, section);
                     sithConsole_Print(tmp);
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
                     stdPlatform_PrintHeapStats();
 #endif
                 }
@@ -240,9 +243,14 @@ sithWorld* sithWorld_New()
 {
     sithWorld *result; // eax
 
+    stdPlatform_Printf("OpenJKDF2: %s\n", __func__); // Added
+
     result = (sithWorld *)pSithHS->alloc(sizeof(sithWorld));
     if ( result )
         _memset(result, 0, sizeof(sithWorld));
+
+    stdPlatform_Printf("OpenJKDF2: %s end\n", __func__); // Added
+
     return result;
 }
 

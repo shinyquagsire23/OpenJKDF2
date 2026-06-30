@@ -11,7 +11,7 @@ int util_FileExists(const char *fpath)
         return 1;
     }
 
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
     return util_FileExistsLowLevel(fpath);
 #else
     return 0;
