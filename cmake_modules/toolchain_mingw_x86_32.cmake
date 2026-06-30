@@ -23,7 +23,14 @@ set(CMAKE_IGNORE_PATH "/opt/homebrew;/opt/homebrew/include;/opt/homebrew/lib;/us
 string(REGEX MATCH "^[0-9]+" CMAKE_SYSTEM_MAJOR_VERSION ${CMAKE_SYSTEM_VERSION})
 string(REGEX REPLACE "^[0-9]+\\.([0-9]+).*" "\\1" CMAKE_SYSTEM_MINOR_VERSION ${CMAKE_SYSTEM_VERSION})
 
-add_compile_options(-fstack-check=no -fno-stack-limit -mno-sse -mno-sse2 -mfpmath=387)
+# x87 FPU (no SSE) for pre-SSE2 hardware compatibility. -fexcess-precision=standard
+# makes float expressions round to their declared type per the C standard (instead of
+# GNU-mode's "fast" behavior that keeps 80-bit excess precision in x87 registers).
+# Without it, the camera/view matrix math rounds inconsistently frame-to-frame and an
+# intermittent ~90-degree view rotation appears during movement. This is the targeted
+# fix for the excess-precision bug; unlike -ffloat-store it doesn't force every float
+# variable to memory, so the performance cost is far smaller.
+add_compile_options(-fstack-check=no -fno-stack-limit -mno-sse -mno-sse2 -mfpmath=387 -fexcess-precision=standard)
 add_link_options(
     -Wl,-t
 #   -flto=auto -ffat-lto-objects -flto-compression-level=9 -flto-partition=one

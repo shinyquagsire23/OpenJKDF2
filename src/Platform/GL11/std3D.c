@@ -79,9 +79,18 @@ int std3D_bReinitHudElements = 0;
 static int std3D_bHasInitted = 0;
 
 // --- Render list accumulators -----------------------------------------------
-static D3DVERTEX GL_tmpVertices[STD3D_MAX_VERTICES] = {0};
+// rdCache flushes accumulation at STD3D_MAX_VERTICES (0x400), but it submits a
+// single dense procEntry as one batch that can exceed that (up to its own array
+// capacity, RDCACHE_MAX_VERTICES). The modern backend reads an undersized VBO on
+// overflow (benign, collapsed geometry); our immediate-mode path would instead
+// read *stale* entries straight out of these static arrays, smearing last frame's
+// geometry across the screen (a location-dependent "rotated" flicker). Size the
+// buffers to the full batch capacity so a big batch is never partially dropped.
+#define GL11_RL_MAX_VERTICES (RDCACHE_MAX_VERTICES)
+#define GL11_RL_MAX_TRIS     (RDCACHE_MAX_VERTICES)
+static D3DVERTEX GL_tmpVertices[GL11_RL_MAX_VERTICES] = {0};
 static size_t    GL_tmpVerticesAmt = 0;
-static rdTri     GL_tmpTris[STD3D_MAX_TRIS] = {0};
+static rdTri     GL_tmpTris[GL11_RL_MAX_TRIS] = {0};
 static size_t    GL_tmpTrisAmt = 0;
 
 // --- Texture cache ----------------------------------------------------------
@@ -235,7 +244,7 @@ int std3D_RenderListVerticesFinish()
 int std3D_AddRenderListVertices(D3DVERTEX* vertices, int count)
 {
     if (Main_bHeadless) return 1;
-    if (GL_tmpVerticesAmt + count >= STD3D_MAX_VERTICES)
+    if (GL_tmpVerticesAmt + count >= GL11_RL_MAX_VERTICES)
         return 0;
 
     memcpy(&GL_tmpVertices[GL_tmpVerticesAmt], vertices, sizeof(D3DVERTEX) * count);
@@ -246,7 +255,7 @@ int std3D_AddRenderListVertices(D3DVERTEX* vertices, int count)
 void std3D_AddRenderListTris(rdTri* tris, unsigned int num_tris)
 {
     if (Main_bHeadless) return;
-    if (GL_tmpTrisAmt + num_tris > STD3D_MAX_TRIS)
+    if (GL_tmpTrisAmt + num_tris > GL11_RL_MAX_TRIS)
         return;
 
     memcpy(&GL_tmpTris[GL_tmpTrisAmt], tris, sizeof(rdTri) * num_tris);
@@ -269,8 +278,13 @@ static void std3D_EmitVertex(const D3DVERTEX* v, const float* m, int textured)
     float pz = m[10] * z + m[14];
 
     float denom = 1.0f - z;
+    // Avoid a divide-by-zero, but preserve the sign: a small *negative* denom means
+    // the vertex is past the camera plane (w should stay negative so GL clips it).
+    // Clamping it to +1e-6 would flip w positive and fling the vertex far in front,
+    // smearing a huge triangle across the screen for a frame as geometry crosses
+    // the camera plane (the modern shader has no guard and clips correctly).
     if (denom < 1e-6f && denom > -1e-6f)
-        denom = 1e-6f;
+        denom = (denom < 0.0f) ? -1e-6f : 1e-6f;
     float w = 1.0f / denom;
 
     glColor4ub(COMP_R(v->color), COMP_G(v->color), COMP_B(v->color), COMP_A(v->color));
@@ -329,6 +343,13 @@ void std3D_DrawRenderList()
 
     for (size_t j = 0; j < GL_tmpTrisAmt; j++)
     {
+        // Safety net: never index past the vertices actually submitted this batch
+        // (reading the stale tail of the static array shows last frame's geometry).
+        if ((size_t)tris[j].v1 >= GL_tmpVerticesAmt ||
+            (size_t)tris[j].v2 >= GL_tmpVerticesAmt ||
+            (size_t)tris[j].v3 >= GL_tmpVerticesAmt)
+            continue;
+
         rdDDrawSurface* tex   = tris[j].texture;
         uint32_t        flags = tris[j].flags;
 
