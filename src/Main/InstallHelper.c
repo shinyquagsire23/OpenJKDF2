@@ -12,6 +12,10 @@
 #include <unistd.h>
 #endif
 
+#ifdef TARGET_DREAMCAST
+#include <dirent.h>
+#endif
+
 #if defined(SDL2_RENDER) && !defined(ARCH_WASM) && !defined(TARGET_ANDROID)
 
 const char* aRequiredAssets[] = {
@@ -1129,6 +1133,36 @@ void InstallHelper_SetCwd()
     else {
         chdir("mots/");
     }
+#elif defined(TARGET_DREAMCAST)
+    char tmp[128];
+    extern char openjkdf2_aOrigCwd[512];
+    if (!Main_bMotsCompat) {
+        snprintf(tmp, sizeof(tmp)-1, "%s/jk1/", openjkdf2_aOrigCwd);
+    }
+    else {
+        snprintf(tmp, sizeof(tmp)-1, "%s/mots/", openjkdf2_aOrigCwd);
+    }
+    chdir(tmp);
+
+    DIR *dir;
+    struct dirent *entry;
+
+    // Open the current directory (".")
+    dir = opendir(".");
+    if (dir == NULL) {
+        perror("Unable to read directory");
+        //return 1;
+    }
+    else {
+        // Read and print each entry in the directory
+        while ((entry = readdir(dir)) != NULL) {
+            printf("%s\n", entry->d_name);
+        }
+
+        // Close the directory stream
+        closedir(dir);
+    }
+
 #elif defined(TARGET_TWL)
     char tmp[128];
     extern char openjkdf2_aOrigCwd[512];

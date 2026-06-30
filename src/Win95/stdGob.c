@@ -82,13 +82,13 @@ int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
 #endif
 
     gob->viewMapped = 0;
-    gob->fhand = pGobHS->fileOpen(gob->fpath, "r+b");
+    gob->fhand = pGobHS->fileOpen(gob->fpath, "rb"); // Added: r+b -> rb, we don't actually need to write GOBs
     if ( !gob->fhand ) {
-        stdPlatform_Printf("OpenJKDF2: Failed to open `%s`.\n", gob->fpath); // Added
+        stdPlatform_Printf("OpenJKDF2: stdGob failed to open `%s`.\n", gob->fpath); // Added
         return 0;
     }
     else {
-        stdPlatform_Printf("OpenJKDF2: Opened `%s`.\n", gob->fpath); // Added
+        stdPlatform_Printf("OpenJKDF2: stdGob opened `%s`.\n", gob->fpath); // Added
     }
     gob->openedFile = (stdGobFile *)std_pHS->alloc(sizeof(stdGobFile) * gob->numFilesOpen);
     if ( !gob->openedFile )
@@ -126,7 +126,7 @@ int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
         stdHashTable_SetKeyVal(gob->entriesHashtable, gob->entries[v4].fname, &gob->entries[v4]);
     }
 
-    jk_printf("Loaded GOB file `%s`...\n", fname);
+    stdPlatform_Printf("OpenJKDF2: stdGob loaded GOB file `%s`...\n", fname);
     
     return 1;
 }

@@ -71,8 +71,22 @@ macro(plat_link_and_package)
 
     # Final packaging: build the bootable .cdi from the linked ELF.
     if(MKDCDISC)
+        # Assets dropped into packaging/dreamcast/disc are placed at the root of the
+        # disc data track (so they appear under /cd at runtime, where the Dreamcast
+        # main() chdir's). Only pass -D if the directory has real content, since an
+        # empty/placeholder-only directory upsets mkdcdisc.
+        set(DC_DISC_DIR ${PROJECT_SOURCE_DIR}/packaging/dreamcast/disc)
+        file(GLOB_RECURSE DC_DISC_ASSETS LIST_DIRECTORIES false
+             ${DC_DISC_DIR}/* )
+        list(FILTER DC_DISC_ASSETS EXCLUDE REGEX "/\\.dummy$|/\\.DS_Store$|/\\.gitignore$")
+
+        set(DC_DISC_ARGS "")
+        if(DC_DISC_ASSETS)
+            set(DC_DISC_ARGS -D ${DC_DISC_DIR})
+        endif()
+
         add_custom_target(${CDI_NAME} ALL
-            DEPENDS ${BIN_NAME}
+            DEPENDS ${BIN_NAME} ${DC_DISC_ASSETS}
             BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/${CDI_NAME}
             # --no-padding keeps the .cdi small (~MBs, not ~700MB). Emulators
             # (Flycast/redream) load non-padded images fine; drop -N if you need a
@@ -81,6 +95,7 @@ macro(plat_link_and_package)
                     -e $<TARGET_FILE:${BIN_NAME}>
                     -o ${CMAKE_CURRENT_BINARY_DIR}/${CDI_NAME}
                     -n "OpenJKDF2"
+                    ${DC_DISC_ARGS}
                     --no-padding
                     -v 1
             COMMENT "Creating Dreamcast disc image ${CDI_NAME}"
