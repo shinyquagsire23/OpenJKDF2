@@ -511,7 +511,12 @@ int rdMaterial_LoadEntry_Deferred(rdMaterial *material, int create_ddraw_surface
     //stdPlatform_Printf("rdMaterial_LoadEntry_Deferred %s\n", tmp);
     //_memset(material, 0, sizeof(rdMaterial));
     res = rdMaterial_LoadEntry_Common(tmp, material, create_ddraw_surface, gpu_mem, partial ? 2 : 1);
-    if (!material->bDataLoaded || (!res && partial)) {
+    // A partial (metadata-only) load never sets bDataLoaded, so keying the
+    // free/retry on !bDataLoaded wrongly discarded a *successful* metadata load --
+    // leaving texinfos (and thus solidColor) NULL, so color-only tris rendered
+    // white. Judge each mode by its own success flag: metadata for partial, data
+    // for a full load.
+    if ((partial && !material->bMetadataLoaded) || (!partial && !material->bDataLoaded)) {
         rdMaterial_FreeEntry(material);
         if (rdMaterial_PurgeMaterialCache()) {
             res = rdMaterial_LoadEntry_Common(tmp, material, create_ddraw_surface, gpu_mem, partial ? 2 : 1);

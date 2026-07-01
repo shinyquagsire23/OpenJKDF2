@@ -413,11 +413,20 @@ int rdCache_SendFaceListToHardware()
             if (!v11.material->bDataLoaded) {
                 v11.mipmap_related = 3;
                 mipmap_related = 3;
+                // EnsureData frees the material's metadata while the vbuf data is
+                // still streaming, which leaves the solid-color path with no texinfo
+                // (v137 == NULL) so it renders white. Reload just the metadata
+                // (synchronous, header-only) so the fallback draws the material's
+                // real solidColor instead.
+                rdMaterial_EnsureMetadata(v11.material);
             }
 #endif
         }
-        
+
 #if defined(RDMATERIAL_LRU_LOAD_UNLOAD)
+        // Skip only tris we have nothing to draw: no vbuf data AND no metadata to
+        // derive a solid color from. Streaming tris now carry loaded metadata (see
+        // above), so they fall through and render their solidColor.
         if (!(v11.material->bDataLoaded || (v11.material->bMetadataLoaded && mipmap_related == 3))) {
             continue;
         }
@@ -605,7 +614,7 @@ int rdCache_SendFaceListToHardware()
             actual_height = (flex_t)(out_height << mipmap_level); // FLEXTODO
         }
 
-#ifdef TARGET_TWL
+#ifdef TARGET_RETRO_HOMEBREW
         // We need to know if a triangle is sky texture (affine texture)
         if (active_6c->textureMode == RD_TEXTUREMODE_AFFINE) {
             flags_idk_ |= 0x20000;
