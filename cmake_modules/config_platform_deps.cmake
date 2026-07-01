@@ -242,6 +242,8 @@ endif()
 if(TARGET_DREAMCAST)
     file(GLOB TARGET_DREAMCAST_SRCS ${PROJECT_SOURCE_DIR}/src/Platform/Dreamcast/*.c)
     list(APPEND ENGINE_SOURCE_FILES ${TARGET_DREAMCAST_SRCS})
+    # Shared dlmalloc (ONLY_MSPACES) backs the tracked engine heap in stdPlatform.c.
+    list(APPEND ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/Platform/TWL/dlmalloc.c)
     # No hardware-accelerated dev console (it relies on the SDL2/GL UI text path).
     list(REMOVE_ITEM ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/Main/jkQuakeConsole.c)
 endif()

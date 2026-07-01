@@ -24,6 +24,7 @@
 #include <kos.h>
 #include <dc/pvr.h>
 #include <dc/video.h>
+#include <dc/biosfont.h>
 #include <dc/flashrom.h>
 
 #include <stdlib.h>
@@ -60,9 +61,19 @@ static size_t    GL_tmpTrisAmt = 0;
 // PVR lists must be submitted in order (OP -> PT -> TR), but DrawRenderList runs
 // many times per frame straight into the already-open OP list. So translucent
 // tris (flags & 0x600) are pre-converted and stashed here, then flushed in the TR
-// pass at EndScene. Sized for a frame's worth of translucent geometry (a minority
-// of the scene: glass, water, sprites, effects).
-#define STD3D_MAX_DEFER_TRIS 4096
+// pass at EndScene.
+//
+// This stays small because the engine already renders alpha *surfaces* in their own
+// pass (sithRender_RenderAlphaSurfaces); only the transparent *things* (sprites,
+// blaster impacts, effects) interleaved into RenderThings actually need buffering.
+// Overflow silently drops tris -- bump this if heavy particle scenes flicker.
+// #2 test: set to 1 to bypass the whole TR/defer path -- translucent tris go
+// straight to the OP list as opaque. If maps stop hanging with this, the culprit is
+// the TR list / autosort / deferral machinery; if they still hang, it's the base
+// opaque pipeline. (Visual: translucent surfaces render opaque.)
+#define STD3D_DISABLE_TR 0
+
+#define STD3D_MAX_DEFER_TRIS 512
 typedef struct dcDeferTri {
     pvr_vertex_t    v[3];
     rdDDrawSurface* tex;
@@ -70,6 +81,70 @@ typedef struct dcDeferTri {
 } dcDeferTri;
 static dcDeferTri std3D_deferTR[STD3D_MAX_DEFER_TRIS];
 static size_t     std3D_numDeferTR = 0;
+
+// --- Border-color loop tracer ------------------------------------------------
+// Paints the TV overscan border a color at each phase of the frame, so a hardware
+// hang (no serial console) shows *where* the loop froze by what color it's stuck on.
+// Enable at compile time with -DSTD3D_BORDER_TRACE, or sneakily at runtime by
+// plugging a controller into port 4 (checked once in std3D_Startup).
+#ifdef STD3D_BORDER_TRACE
+static int std3D_bBorderTrace = 1;
+#else
+static int std3D_bBorderTrace = 0;
+#endif
+void std3D_BorderTrace(uint8_t r, uint8_t g, uint8_t b)
+{
+    if (std3D_bBorderTrace) vid_border_color(r, g, b);
+}
+
+// One blink "unit" as a busy-loop count (~1/3 s at 200 MHz -- filmable; exact timing
+// doesn't matter, only the color sequence does). Interrupts are off in the handler so
+// timers aren't available.
+#define EXC_UNIT 10000000u
+static void std3D_ExcSpin(uint32_t loops) { for (volatile uint32_t i = 0; i < loops; i++) { } }
+
+// Blink a 32-bit value on the TV border, MSB first, as 8 hex nibbles. Each nibble is a
+// GREEN start marker, then its 4 bits MSB-first as RED=1 / BLUE=0 (both lit, so there's
+// no "black == 0" ambiguity), each bit followed by a short black gap. To decode: after
+// the intro color, read 8 groups; each group is GREEN then 4 colored pulses => 1 hex
+// digit; concatenate the 8 digits.
+static void std3D_BlinkWord(uint32_t val)
+{
+    for (int nib = 7; nib >= 0; nib--) {
+        uint32_t n = (val >> (nib * 4)) & 0xF;
+        vid_border_color(0, 255, 0); std3D_ExcSpin(EXC_UNIT);       // GREEN: nibble start
+        vid_border_color(0, 0, 0);   std3D_ExcSpin(EXC_UNIT / 2);
+        for (int bit = 3; bit >= 0; bit--) {
+            if (n & (1u << bit)) vid_border_color(255, 0, 0);       // RED  = 1
+            else                 vid_border_color(0, 0, 255);       // BLUE = 0
+            std3D_ExcSpin(EXC_UNIT);
+            vid_border_color(0, 0, 0); std3D_ExcSpin(EXC_UNIT / 2); // gap between bits
+        }
+    }
+}
+
+// Catch SH4 CPU faults and blink the fault registers out on the border (the framebuffer
+// is unreachable from an exception context; the border register always works). Maps
+// back to source with sh-elf-addr2line -e openjkdf2.elf <PC>. Never returns -- the game
+// is wedged anyway. Registered in std3D_Startup only when the tracer is enabled.
+static void std3D_ExcHandler(irq_t code, irq_context_t* ctx, void* data)
+{
+    (void)data; (void)code;
+    uint32_t tea = *(volatile uint32_t*)0xFF00000C; // SH4 TEA: faulting data address
+
+    // Blink the fault registers out on the border in binary (the framebuffer is
+    // unreachable from an exception; the border register always works). Film it and
+    // decode per std3D_BlinkWord's scheme. Loops forever over PC, then PR, then the
+    // faulting address, each introduced by a long identifying color.
+    for (;;) {
+        vid_border_color(255, 255, 255); std3D_ExcSpin(EXC_UNIT * 5); // WHITE = PC next
+        std3D_BlinkWord(ctx->pc);
+        vid_border_color(255, 255, 0);   std3D_ExcSpin(EXC_UNIT * 5); // YELLOW = PR next
+        std3D_BlinkWord(ctx->pr);
+        vid_border_color(255, 0, 255);   std3D_ExcSpin(EXC_UNIT * 5); // MAGENTA = addr next
+        std3D_BlinkWord(tea);
+    }
+}
 
 // --- Texture cache -----------------------------------------------------------
 typedef struct dcTexEntry {
@@ -80,6 +155,12 @@ typedef struct dcTexEntry {
 } dcTexEntry;
 static dcTexEntry std3D_aTex[STD3D_MAX_TEXTURES] = {0};
 static size_t     std3D_numTex = 0;
+
+// Texture-cache LRU (ported from the TWL/original path). Cached textures are kept
+// in a doubly-linked list on the surface (pFirst/pLastTexCache + the surface's
+// pNext/pPrevCachedTexture links); frameNum records last use. Lets
+// std3D_PurgeTextureCache evict the oldest textures to satisfy an allocation
+// instead of nuking the whole cache. (These globals live in generated/globals.h.)
 
 static rdColor24 std3D_currentPalette[256];
 
@@ -128,11 +209,19 @@ int std3D_Startup()
         // alpha-blended (translucent) world geometry; OP_MOD/TR_MOD stay off.
         pvr_init_params_t params = {
             { PVR_BINSIZE_32, PVR_BINSIZE_0, PVR_BINSIZE_32, PVR_BINSIZE_0, PVR_BINSIZE_32 },
-            512 * 1024, // vertex buffer size
+            512 * 1024, // vertex buffer size (known-VRAM-safe)
             0,          // dma
             0,          // fsaa
-            0,          // autosort NOT disabled (let the PVR sort translucents later)
-            3           // extra OPBs for heavy geometry
+            // #1 test: autosort DISABLED. Autosort is the OPB-hungriest PVR mode;
+            // the engine already depth-sorts (rdCache_ProcFaceCompare) so TR should
+            // still look right. Set back to 0 to re-enable if it doesn't help.
+            1,          // autosort_disabled
+            // Extra object-pointer-buffer blocks the TA grabs when a screen tile
+            // overflows its bin. 3 is far too small for full 3D maps: on hardware the
+            // TA stalls waiting for OPB space and hangs the next pvr_wait_ready
+            // (Flycast treats the OPB as unlimited). 16 is still VRAM-cheap next to
+            // the vertex buffer -- dial down if pvr_mem complains at startup.
+            16          // extra OPBs for heavy geometry
         };
         pvr_init(&params);
         pvr_set_bg_color(0.0f, 0.0f, 0.0f);
@@ -158,6 +247,24 @@ int std3D_Startup()
 #endif
 
         std3D_bPvrReady = 1;
+    }
+
+#ifndef STD3D_BORDER_TRACE
+    // Sneaky enable: a controller plugged into port 4 (0-indexed port 3) turns on
+    // the border loop tracer for this run, no rebuild needed.
+    if (maple_enum_dev(3, 0) != NULL) std3D_bBorderTrace = 1;
+#endif
+
+    // When the tracer is on, also catch CPU faults and flash the border (see
+    // std3D_ExcHandler). Registered once.
+    if (std3D_bBorderTrace) {
+        static int excHooked = 0;
+        if (!excHooked) {
+            excHooked = 1;
+            arch_irq_set_handler(EXC_DATA_ADDRESS_READ,  std3D_ExcHandler, NULL);
+            arch_irq_set_handler(EXC_DATA_ADDRESS_WRITE, std3D_ExcHandler, NULL);
+            arch_irq_set_handler(EXC_ILLEGAL_INSTR,      std3D_ExcHandler, NULL);
+        }
     }
 
     std3D_bHasInitted = 1;
@@ -200,7 +307,14 @@ int std3D_StartScene()
     // EndScene), close it out so we never deadlock on pvr_wait_ready.
     if (std3D_bInScene) std3D_EndScene();
 
+    // TEMP HW DIAGNOSTIC (border/overscan color = where the loop is stuck; visible
+    // with no console). RED just before pvr_wait_ready, GREEN once it returns. If the
+    // screen freezes with a RED border, pvr_wait_ready is blocking on a render-done
+    // IRQ that never fired; BLUE (set in EndScene) means we're stuck in the game sim,
+    // not the PVR at all.
+    std3D_BorderTrace(255, 0, 0);  // RED: about to wait for the previous render
     pvr_wait_ready();
+    std3D_BorderTrace(0, 255, 0);  // GREEN: wait returned, registering this scene
     pvr_scene_begin();
     pvr_list_begin(PVR_LIST_OP_POLY);
     std3D_bInScene = 1;
@@ -313,6 +427,7 @@ int std3D_EndScene()
 
     pvr_scene_finish();
     std3D_bInScene = 0;
+    std3D_BorderTrace(0, 0, 255);  // BLUE: scene submitted; loop now back in the game
     return 0;
 }
 
@@ -429,7 +544,7 @@ void std3D_DrawRenderList()
 
         // Translucent (flags & 0x600): defer to the TR pass, keeping the vertex
         // alpha so the PVR blends it. Everything else goes straight to the OP list.
-        if (tris[j].flags & 0x600)
+        if (!STD3D_DISABLE_TR && (tris[j].flags & 0x600))
         {
             if (std3D_numDeferTR < STD3D_MAX_DEFER_TRIS)
             {
@@ -525,6 +640,18 @@ static void std3D_UpdateWorldPaletteBanks()
     }
 }
 
+// Allocate VRAM for a texture; if the heap is full, evict LRU cache entries to make
+// room and retry once (the original OOM strategy).
+static pvr_ptr_t std3D_pvrAllocOrPurge(size_t bytes)
+{
+    pvr_ptr_t p = pvr_mem_malloc(bytes);
+    if (!p) {
+        std3D_PurgeTextureCache(bytes);
+        p = pvr_mem_malloc(bytes);
+    }
+    return p;
+}
+
 int std3D_AddToTextureCache(stdVBuffer* vbuf, rdDDrawSurface* texture, int is_alpha_tex, int no_alpha)
 {
     if (Main_bHeadless) return 1;
@@ -540,6 +667,7 @@ int std3D_AddToTextureCache(stdVBuffer* vbuf, rdDDrawSurface* texture, int is_al
 
     int fmt;
     pvr_ptr_t ptr;
+    uint32_t  texBytes = 0; // VRAM bytes (tracked for the LRU purge accounting)
     uint8_t*  src8  = (uint8_t*)vbuf->surface_lock_alloc;
     uint16_t* src16 = (uint16_t*)vbuf->surface_lock_alloc;
 
@@ -558,7 +686,8 @@ int std3D_AddToTextureCache(stdVBuffer* vbuf, rdDDrawSurface* texture, int is_al
         for (uint32_t y = 0; y < height; y++)
             memcpy(staging8 + (size_t)y * width, src8 + (size_t)y * rowpx, width);
 
-        ptr = pvr_mem_malloc(width * height);
+        texBytes = width * height;
+        ptr = std3D_pvrAllocOrPurge(texBytes);
         if (!ptr) { free(staging8); return 1; }
         // pvr_txr_load_ex twiddles during upload (required for paletted textures).
         pvr_txr_load_ex(staging8, ptr, width, height, PVR_TXRLOAD_8BPP);
@@ -610,13 +739,23 @@ int std3D_AddToTextureCache(stdVBuffer* vbuf, rdDDrawSurface* texture, int is_al
         }
         fmt = (is_alpha_tex ? PVR_TXRFMT_ARGB1555 : PVR_TXRFMT_RGB565) | PVR_TXRFMT_NONTWIDDLED;
 
-        ptr = pvr_mem_malloc(width * height * 2);
+        texBytes = width * height * 2;
+        ptr = std3D_pvrAllocOrPurge(texBytes);
         if (!ptr) { free(staging); return 1; }
         pvr_txr_load(staging, ptr, width * height * 2);
         free(staging);
     }
 
-    size_t idx = std3D_numTex++;
+    // Reuse a slot freed by std3D_PurgeSurfaceRefs before growing the high-water
+    // mark, so streaming maps don't march the cache to STD3D_MAX_TEXTURES.
+    size_t idx = std3D_numTex;
+    for (size_t i = 0; i < std3D_numTex; i++) {
+        if (!std3D_aTex[i].surf && !std3D_aTex[i].ptr) { idx = i; break; }
+    }
+    if (idx == std3D_numTex) {
+        if (std3D_numTex >= STD3D_MAX_TEXTURES) { pvr_mem_free(ptr); return 1; }
+        std3D_numTex++;
+    }
     std3D_aTex[idx].surf = texture;
     std3D_aTex[idx].ptr  = ptr;
     std3D_aTex[idx].w    = width;
@@ -626,6 +765,9 @@ int std3D_AddToTextureCache(stdVBuffer* vbuf, rdDDrawSurface* texture, int is_al
     texture->texture_id     = (int)idx;
     texture->texture_loaded = 1;
     texture->is_16bit       = vbuf->format.format.is16bit ? 1 : 0;
+    texture->textureSize    = texBytes;         // for LRU purge accounting
+    std3D_AddTextureToCacheList(texture);       // newest -> MRU end of the list
+    texture->frameNum       = std3D_frameCount;
     return 1;
 }
 
@@ -634,22 +776,146 @@ void std3D_UnloadAllTextures()
     for (size_t i = 0; i < std3D_numTex; i++)
     {
         if (std3D_aTex[i].ptr) pvr_mem_free(std3D_aTex[i].ptr);
-        if (std3D_aTex[i].surf) std3D_aTex[i].surf->texture_loaded = 0;
+        if (std3D_aTex[i].surf) {
+            std3D_aTex[i].surf->texture_loaded = 0;
+            std3D_aTex[i].surf->pNextCachedTexture = NULL;
+            std3D_aTex[i].surf->pPrevCachedTexture = NULL;
+        }
         std3D_aTex[i].ptr = NULL;
         std3D_aTex[i].surf = NULL;
     }
     std3D_numTex = 0;
+    std3D_pFirstTexCache = NULL;
+    std3D_pLastTexCache  = NULL;
+    std3D_numCachedTextures = 0;
 }
 
-void std3D_PurgeEntireTextureCache()       { std3D_UnloadAllTextures(); }
-int  std3D_PurgeTextureCache(size_t size)  { std3D_UnloadAllTextures(); return 1; }
-void std3D_RemoveTextureFromCacheList(rdDDrawSurface* pCacheTexture) {}
-void std3D_AddTextureToCacheList(rdDDrawSurface* pTexture)  {}
-void std3D_UpdateFrameCount(rdDDrawSurface* pTexture)       {}
-void std3D_PurgeUIEntry(int i, int idx)                    {}
-void std3D_PurgeTextureEntry(int i)                        {}
-void std3D_PurgeBitmapRefs(stdBitmap* pBitmap)             {}
-void std3D_PurgeSurfaceRefs(rdDDrawSurface* texture)       {}
+void std3D_PurgeEntireTextureCache() { std3D_UnloadAllTextures(); }
+
+// --- LRU cache list (from OpenJones3D / the original std3D) -------------------
+void std3D_RemoveTextureFromCacheList(rdDDrawSurface* pCacheTexture)
+{
+    if (!pCacheTexture) return;
+
+    if (pCacheTexture == std3D_pFirstTexCache)
+    {
+        std3D_pFirstTexCache = pCacheTexture->pNextCachedTexture;
+        if (std3D_pFirstTexCache)
+        {
+            std3D_pFirstTexCache->pPrevCachedTexture = NULL;
+            if (!std3D_pFirstTexCache->pNextCachedTexture)
+                std3D_pLastTexCache = std3D_pFirstTexCache;
+        }
+        else
+            std3D_pLastTexCache = NULL;
+    }
+    else if (pCacheTexture == std3D_pLastTexCache)
+    {
+        std3D_pLastTexCache = pCacheTexture->pPrevCachedTexture;
+        if (pCacheTexture->pPrevCachedTexture)
+            pCacheTexture->pPrevCachedTexture->pNextCachedTexture = NULL;
+        else
+            std3D_pLastTexCache = std3D_pFirstTexCache;
+    }
+    else
+    {
+        if (pCacheTexture->pPrevCachedTexture)
+            pCacheTexture->pPrevCachedTexture->pNextCachedTexture = pCacheTexture->pNextCachedTexture;
+        if (pCacheTexture->pNextCachedTexture)
+            pCacheTexture->pNextCachedTexture->pPrevCachedTexture = pCacheTexture->pPrevCachedTexture;
+    }
+
+    pCacheTexture->pNextCachedTexture = NULL;
+    pCacheTexture->pPrevCachedTexture = NULL;
+    pCacheTexture->frameNum = 0;
+    --std3D_numCachedTextures;
+}
+
+void std3D_AddTextureToCacheList(rdDDrawSurface* pTexture)
+{
+    if (!pTexture) return;
+
+    if (std3D_pFirstTexCache)
+    {
+        std3D_pLastTexCache->pNextCachedTexture = pTexture;
+        pTexture->pPrevCachedTexture            = std3D_pLastTexCache;
+        pTexture->pNextCachedTexture            = NULL;
+        std3D_pLastTexCache                     = pTexture;
+    }
+    else
+    {
+        std3D_pLastTexCache          = pTexture;
+        std3D_pFirstTexCache         = pTexture;
+        pTexture->pPrevCachedTexture = NULL;
+        pTexture->pNextCachedTexture = NULL;
+    }
+    ++std3D_numCachedTextures;
+}
+
+// Bump a texture to most-recently-used and stamp the current frame (called when a
+// texture is bound for rendering).
+void std3D_UpdateFrameCount(rdDDrawSurface* pTexture)
+{
+    if (!pTexture) return;
+    std3D_RemoveTextureFromCacheList(pTexture);
+    std3D_AddTextureToCacheList(pTexture);
+    pTexture->frameNum = std3D_frameCount;
+}
+
+// Free the VRAM texture backing a surface, release its cache slot, and unlink it
+// from the LRU list. Called by rdMaterial's unload path (rdMaterial.c) -- without
+// this the PVR texture heap leaks as maps stream materials and eventually corrupts.
+void std3D_PurgeSurfaceRefs(rdDDrawSurface* texture)
+{
+    if (!texture) return;
+    for (size_t i = 0; i < std3D_numTex; i++) {
+        if (std3D_aTex[i].surf != texture) continue;
+        if (std3D_aTex[i].ptr) pvr_mem_free(std3D_aTex[i].ptr);
+        std3D_aTex[i].ptr  = NULL;
+        std3D_aTex[i].surf = NULL; // slot reusable by std3D_AddToTextureCache
+    }
+    std3D_RemoveTextureFromCacheList(texture);
+    texture->texture_loaded = 0;
+}
+
+void std3D_PurgeTextureEntry(int i)
+{
+    if (i < 0 || (size_t)i >= std3D_numTex) return;
+    if (std3D_aTex[i].surf) std3D_PurgeSurfaceRefs(std3D_aTex[i].surf);
+}
+
+// Evict cached textures to free at least `size` bytes of VRAM. Mirrors the original
+// std3D_PurgeTextureCache: first try to reuse an exact-size victim, otherwise evict
+// oldest-first. Never touch the current or previous frame's textures -- the PVR is
+// still rasterizing the previous scene from them.
+int std3D_PurgeTextureCache(size_t size)
+{
+    size_t purgedBytes = 0;
+
+    for (rdDDrawSurface* pTex = std3D_pFirstTexCache;
+         pTex && !(pTex->frameNum == std3D_frameCount || pTex->frameNum == std3D_frameCount - 1);
+         pTex = pTex->pNextCachedTexture)
+    {
+        if (pTex->textureSize == size) {
+            std3D_PurgeSurfaceRefs(pTex);
+            return 1;
+        }
+    }
+
+    rdDDrawSurface* pNext = NULL;
+    for (rdDDrawSurface* pTex = std3D_pFirstTexCache; pTex && purgedBytes < size; pTex = pNext)
+    {
+        pNext = pTex->pNextCachedTexture;
+        if (pTex->frameNum == std3D_frameCount || pTex->frameNum == std3D_frameCount - 1)
+            continue;
+        purgedBytes += pTex->textureSize;
+        std3D_PurgeSurfaceRefs(pTex);
+    }
+    return purgedBytes != 0;
+}
+
+void std3D_PurgeUIEntry(int i, int idx)      {}
+void std3D_PurgeBitmapRefs(stdBitmap* pBitmap) {}
 
 // --- Z buffer / viewport / device --------------------------------------------
 int  std3D_ClearZBuffer()                 { return 1; }

@@ -127,11 +127,17 @@ typedef struct stdSoundDreamcastBuffer {
     int bIsCopy;
     rdVector3 pos;
     rdVector3 vel;
-    //mm_stream stream;
     uint32_t currentSample;
     int sampleRepeats;
     BOOL isPlaying;
     BOOL isLooping;
+    // KOS AICA backend state (see src/Platform/Dreamcast/stdSound.c)
+    uint32_t sfxHandle;    // sfxhnd_t; 0 == SFXHND_INVALID (not uploaded to SPU RAM)
+    int      channel;      // AICA channel from the last play; -1 == none
+    int      panVal;       // 0=left, 128=center, 255=right
+    int      freqHz;       // playback frequency override; 0 == use nSamplesPerSec
+    uint32_t playStartMs;  // for the time-based IsPlaying estimate
+    uint32_t playDurMs;    // computed one-shot duration (ms)
 } stdSoundDreamcastBuffer;
 #endif
 

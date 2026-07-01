@@ -737,7 +737,16 @@ void sithSurface_Tick(flex_t deltaSecs)
                             {
                                 v19 = 2;
                             }
-                            v20 = (surface->wallCel - v19) % (v17 - v19) + v19;
+                            // Fixed: guard modulo-by-zero. When num_texinfo (v17) equals
+                            // v19 the divisor (v17 - v19) is 0; the SH4 libgcc division
+                            // helper then indexes its reciprocal table out of bounds and
+                            // reads a wild address, faulting on real hardware (Flycast and
+                            // x86 tolerate the stray read). A degenerate cel range just
+                            // resolves to the base frame v19.
+                            if ( v17 > (uint32_t)v19 )
+                                v20 = (surface->wallCel - v19) % (v17 - v19) + v19;
+                            else
+                                v20 = v19;
                             surface->wallCel = v20;
                             rdMaterial* v21 = surface->material;
                             if ( v20 > v21->num_texinfo - 1 )

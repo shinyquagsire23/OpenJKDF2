@@ -1411,8 +1411,17 @@ void Window_RecreateSDL2Window()
 void Window_Main_Loop()
 {
     jkMain_GuiAdvance(); // TODO needed?
+#ifdef TARGET_DREAMCAST
+    // Loop-phase tracer (see std3D border tracer). BLUE (set in std3D_EndScene) still
+    // showing here => hang inside the tick after the render; CYAN => hang in the
+    // present; WHITE => hang at the top of the next tick's sim (before its render).
+    std3D_BorderTrace(0, 255, 255);   // CYAN: tick returned, about to present
+#endif
     Window_msg_main_handler(g_hWnd, WM_PAINT, 0, 0);
-    
+#ifdef TARGET_DREAMCAST
+    std3D_BorderTrace(255, 255, 255); // WHITE: presented, looping to next tick
+#endif
+
     //Window_SdlUpdate();
 }
 

@@ -57,10 +57,10 @@ macro(plat_initialize)
     # (part of -ffast-math). Those approximate reciprocals/normals break the FP-heavy
     # collision math (floor raycasts / move-and-slide), causing things to fall through
     # the world. Disabling them trades a little speed for correct physics.
-    add_compile_options(-fno-fast-math -fno-unsafe-math-optimizations -ffp-contract=off)
+    add_compile_options(-fno-fast-math -fno-unsafe-math-optimizations -ffp-contract=off -Wl,--wrap,malloc -Wl,--wrap,free -Wl,--wrap,realloc -Wl,--wrap,calloc)
     add_compile_options(-O2)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti -fno-exceptions")
-    add_link_options(-ffunction-sections -fdata-sections -Wl,--gc-sections)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti -fno-exceptions -Wl,--wrap,malloc -Wl,--wrap,free -Wl,--wrap,realloc -Wl,--wrap,calloc")
+    add_link_options(-ffunction-sections -fdata-sections -Wl,--gc-sections -Wl,--wrap,malloc -Wl,--wrap,free -Wl,--wrap,realloc -Wl,--wrap,calloc)
 endmacro()
 
 macro(plat_specific_deps)

@@ -499,7 +499,7 @@ stdFile_t jkRes_FileOpen(const char *fpath, const char *mode)
         return (stdFile_t)0;
     v6 = 0;
 
-#ifndef TARGET_RETRO_HOMEBREW
+#ifndef TARGET_TWL
     // Try in the EXE root (not in resource/), ex "3do\key\kysabrf2.key"
     // This was also used for `player/...` and `controls/...`
     fhand = pLowLevelHS->fileOpen(fpath, mode);

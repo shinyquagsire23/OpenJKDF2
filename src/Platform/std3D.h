@@ -82,6 +82,12 @@ static int (*std3D_CreateExecuteBuffer)() = (void*)std3D_CreateExecuteBuffer_ADD
 #else
 int std3D_Startup();
 void std3D_Shutdown();
+#ifdef TARGET_DREAMCAST
+// Diagnostic: paint the TV overscan border to trace where the frame loop is (hangs
+// with no console). No-op unless the tracer is enabled (compile -DSTD3D_BORDER_TRACE
+// or plug a controller into port 4). See src/Platform/Dreamcast/std3D.c.
+void std3D_BorderTrace(uint8_t r, uint8_t g, uint8_t b);
+#endif
 int std3D_StartScene();
 int std3D_EndScene();
 void std3D_ResetRenderList();

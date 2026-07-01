@@ -324,7 +324,7 @@ LABEL_21:
 #ifdef TARGET_TWL
         if ((format.width <= 16 || mipmap_num >= texture->num_mipmaps-1)) {
 #else
-        if (1) { // Dreamcast has Big Boy amounts of VRAM
+        if ((format.width <= 16 || mipmap_num >= texture->num_mipmaps-1)) { // Dreamcast has Big Boy amounts of VRAM
 #endif
             printf("Load %s tex %d/%d mip %d/%d\n", mat_fpath, tex_numa, material->num_textures, mipmap_num, texture->num_mipmaps);
             created_tex = stdDisplay_VBufferNew(&format, create_ddraw_surface, gpu_mem, 0);

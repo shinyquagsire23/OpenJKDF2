@@ -10,6 +10,11 @@
 #include "Platform/TWL/dlmalloc.h"
 #endif
 
+#ifdef TARGET_DREAMCAST
+#include <malloc.h>                  // KOS/newlib memalign for the overflow fallback
+#include "Platform/TWL/dlmalloc.h"   // shared dlmalloc (ONLY_MSPACES) for the engine heap
+#endif
+
 #ifdef PLATFORM_POSIX
 #include <stdlib.h>
 #include <stdio.h>
@@ -625,6 +630,239 @@ __attribute__((naked)) int64_t __smull_helper(int32_t a, int32_t b) {
 
 #endif
 
+#ifdef TARGET_DREAMCAST
+// ---------------------------------------------------------------------------
+// Dreamcast tracked allocator (ported from the DSi/TWL path, kept as its own
+// block for now).
+//
+// The engine churns many small allocations while streaming materials in and out;
+// routing them through a dlmalloc mspace gives block coalescing (to fight heap
+// fragmentation on the DC's 16 MiB) plus a small tracking header for debugging:
+// per-alloc size + pool marker, double-free detection, and optional guard bytes.
+//
+// System RAM only for now -- one mspace carved out of the newlib heap, with a
+// plain-malloc fallback for overflow. A VRAM-backed overflow mspace can be added
+// later as another marker/branch (see DC_MARK_*).
+//
+// Deliberately wired only as the engine HostServices alloc/free/realloc, NOT via
+// linker --wrap: KOS is preemptively multithreaded and this mspace is not lock-
+// guarded, so KOS/newlib's own allocations stay on their heap.
+// ---------------------------------------------------------------------------
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+extern void *__real_malloc(size_t size);
+extern void __real_free(void *ptr);
+extern void* __real_realloc(void *ptr, size_t len);
+extern void *__real_calloc(size_t num, size_t size);
+
+#ifdef __cplusplus
+}
+#endif
+
+#define DC_ALLOC_ALIGN 8   // keep user pointers 8-byte aligned (doubles/pointers)
+
+//#define DC_MEM_CHECKING          // guard bytes after each alloc to catch OOB writes
+#define DC_MEM_CHECKING_VAL      0xAA
+#define DC_MEM_CHECKING_VAL_FREE 0x55
+
+// Tracking-header high byte: which pool the block lives in (and freed sentinel).
+#define DC_MARK_MSPACE 0xDC   // engine mspace (system RAM)
+#define DC_MARK_SYS    0x5A   // plain-malloc overflow fallback
+#define DC_MARK_FREED  0xDE   // sentinel written on free (double-free detection)
+
+// Reserve left on the newlib heap for KOS (threads, drivers, file buffers) and the
+// overflow fallback after we carve out the engine mspace.
+#define DC_MSPACE_RESERVE (3 * 1024 * 1024)
+
+typedef struct DcMemHeader {
+    uint32_t mark_size;   // [31:24] pool marker, [23:0] user byte size
+    uint32_t _pad;        // keeps the following user pointer 8-byte aligned
+} DcMemHeader;
+#define DC_HDR_MARK(p)     (((p)->mark_size >> 24) & 0xFF)
+#define DC_HDR_SIZE(p)     ((p)->mark_size & 0xFFFFFF)
+#define DC_HDR_SET(p,m,s)  ((p)->mark_size = (((m) & 0xFF) << 24) | ((s) & 0xFFFFFF))
+
+static mspace dc_mspace = NULL;
+static size_t dc_mspace_size = 0;
+
+// Live-allocation stats (exported for debugging).
+size_t dc_trackingAllocs     = 0;  // user bytes live in the mspace
+size_t dc_trackingAllocsReal = 0;  // aligned bytes live in the mspace
+size_t dc_trackingSys        = 0;  // user bytes live in the fallback heap
+size_t dc_activeAllocs       = 0;
+
+static inline uint32_t DC_BlockSize(uint32_t len)
+{
+    uint32_t total = (len + (uint32_t)sizeof(DcMemHeader) + (DC_ALLOC_ALIGN - 1)) & ~(DC_ALLOC_ALIGN - 1);
+#ifdef DC_MEM_CHECKING
+    total += DC_ALLOC_ALIGN; // guard region
+#endif
+    return total;
+}
+
+static void DC_mspace_init(void)
+{
+    // Probe the largest contiguous block newlib can give, then carve out all but
+    // the reserve for the engine mspace. (malloc here is KOS/newlib's -- this path
+    // is not --wrapped.)
+    size_t probe = 12 * 1024 * 1024;
+    void* p = NULL;
+    while (probe > DC_MSPACE_RESERVE && !(p = __real_malloc(probe)))
+        probe -= 0x40000;
+    if (p) __real_free(p);
+
+    size_t want = (probe > DC_MSPACE_RESERVE) ? (probe - DC_MSPACE_RESERVE) : 0;
+    void* base = want ? __real_malloc(want) : NULL;
+    if (base) {
+        dc_mspace = create_mspace_with_base(base, want, 0);
+        dc_mspace_size = want;
+    }
+    stdPlatform_Printf("[DC heap] engine mspace: %u KiB (reserve %u KiB)\n",
+                       (unsigned)(dc_mspace_size / 1024), (unsigned)(DC_MSPACE_RESERVE / 1024));
+}
+
+static void* DC_alloc(uint32_t len)
+{
+    static int bDontTryAgain = 0;
+    if (!len) return NULL;
+    if (!dc_mspace) DC_mspace_init();
+
+    uint32_t total = DC_BlockSize(len);
+
+    uint8_t mark = DC_MARK_MSPACE;
+    void* raw = dc_mspace ? mspace_malloc(dc_mspace, total) : NULL;
+    if (!raw) {
+        // mspace exhausted (or not yet up) -> overflow onto the newlib heap.
+        //raw = memalign(DC_ALLOC_ALIGN, total);
+        raw = __real_malloc(total);
+        mark = DC_MARK_SYS;
+    }
+
+    if (!raw) {
+        // Emergency freeing measures -- the main reason this override exists.
+        // Both pools are exhausted, so reclaim from the sound and material LRU
+        // caches (which the plain KOS malloc has no way to reach) and retry once.
+        if (!bDontTryAgain) {
+            extern int sithSound_FreeUpMemory(uint32_t);
+            extern int rdMaterial_PurgeMaterialCache(void);
+            extern int rdMaterial_PurgeEntireMaterialCache(void);
+            if (!sithSound_FreeUpMemory(len)) {
+                if (!rdMaterial_PurgeMaterialCache()) {
+                    rdMaterial_PurgeEntireMaterialCache();
+                }
+            }
+            bDontTryAgain = 1;
+            void* ret = DC_alloc(len);
+            bDontTryAgain = 0;
+            return ret;
+        }
+        stdPlatform_Printf("[DC heap] failed to allocate %u bytes (mspace %u/%u KiB)\n",
+                           (unsigned)len, (unsigned)(dc_trackingAllocsReal / 1024),
+                           (unsigned)(dc_mspace_size / 1024));
+        return NULL;
+    }
+
+    if (mark == DC_MARK_MSPACE) {
+        dc_trackingAllocs     += len;
+        dc_trackingAllocsReal += total;
+    } else {
+        dc_trackingSys += len;
+    }
+    dc_activeAllocs++;
+
+    DcMemHeader* hdr = (DcMemHeader*)raw;
+    DC_HDR_SET(hdr, mark, len);
+    void* user = (void*)((uintptr_t)raw + sizeof(DcMemHeader));
+    memset(user, 0, len); // engine relies on zeroed allocations
+#ifdef DC_MEM_CHECKING
+    memset((uint8_t*)user + len, DC_MEM_CHECKING_VAL,
+           total - (uint32_t)sizeof(DcMemHeader) - len);
+#endif
+    return user;
+}
+
+static void DC_free(void* ptr)
+{
+    if (!ptr) return;
+    DcMemHeader* hdr = (DcMemHeader*)((uintptr_t)ptr - sizeof(DcMemHeader));
+    uint8_t  mark = DC_HDR_MARK(hdr);
+    uint32_t len  = DC_HDR_SIZE(hdr);
+    uint32_t total = DC_BlockSize(len);
+
+#ifdef DC_MEM_CHECKING
+    for (uint32_t i = len; i < total - (uint32_t)sizeof(DcMemHeader); i++) {
+        if (*((uint8_t*)ptr + i) != DC_MEM_CHECKING_VAL) {
+            stdPlatform_Printf("[DC heap] OOB write past %p (size %u)\n", ptr, (unsigned)len);
+            break;
+        }
+    }
+    memset(ptr, DC_MEM_CHECKING_VAL_FREE, total - (uint32_t)sizeof(DcMemHeader));
+#endif
+
+    if (mark == DC_MARK_FREED) {
+        stdPlatform_Printf("[DC heap] double free %p\n", ptr);
+        return;
+    }
+
+    DC_HDR_SET(hdr, DC_MARK_FREED, 0);
+    dc_activeAllocs--;
+
+    if (mark == DC_MARK_MSPACE) {
+        dc_trackingAllocs     -= len;
+        dc_trackingAllocsReal -= total;
+        mspace_free(dc_mspace, hdr);
+    } else if (mark == DC_MARK_SYS) {
+        dc_trackingSys -= len;
+        __real_free(hdr);
+    } else {
+        stdPlatform_Printf("[DC heap] free of unknown block %p (marker %02x)\n", ptr, mark);
+        //__real_free(ptr);
+        //return;
+    }
+}
+
+static void* DC_realloc(void* ptr, uint32_t len)
+{
+    if (!ptr) return DC_alloc(len);
+    if (!len) { DC_free(ptr); return NULL; }
+
+    DcMemHeader* hdr = (DcMemHeader*)((uintptr_t)ptr - sizeof(DcMemHeader));
+    uint32_t oldLen = DC_HDR_SIZE(hdr);
+    if (oldLen == len) return ptr;
+
+    // Simple move-realloc: alloc + copy + free. Keeps the header/pool bookkeeping
+    // correct even when a block migrates between the mspace and the fallback.
+    void* nw = DC_alloc(len);
+    if (!nw) return NULL;
+    memcpy(nw, ptr, oldLen < len ? oldLen : len);
+    DC_free(ptr);
+    return nw;
+}
+
+void *__wrap_malloc(uint32_t size) {
+    //return DC_alloc(size);
+    return __real_malloc(size);
+}
+
+void __wrap_free(void *ptr) {
+    //DC_free(ptr);
+    __real_free(ptr);
+}
+
+void* __wrap_realloc(void *ptr, uint32_t len) {
+    //return DC_realloc(ptr, len);
+    return __real_realloc(ptr, len);
+}
+
+void *__wrap_calloc(size_t num, size_t size) {
+    //return DC_alloc(num*size);
+    return __real_calloc(num, size);
+}
+#endif // TARGET_DREAMCAST
+
 static int Linux_stdFeof(stdFile_t fhand)
 {
     return feof((FILE*)fhand);
@@ -750,6 +988,12 @@ void stdPlatform_InitServices(HostServices *handlers)
     handlers->free = TWL_free;
     handlers->realloc = TWL_realloc;
     handlers->suggestHeap = TWL_suggestHeap;
+#endif
+
+#if 0//def TARGET_DREAMCAST
+    handlers->alloc = DC_alloc;
+    handlers->free = DC_free;
+    handlers->realloc = DC_realloc;
 #endif
 }
 
