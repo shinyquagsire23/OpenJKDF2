@@ -273,11 +273,13 @@ void stdSound_BufferRelease(stdSound_buffer_t* sound)
 {
     if (!sound) return;
     if (sound->channel >= 0) { snd_sfx_stop(sound->channel); sound->channel = -1; }
-    // Only the owner of the PCM owns its SPU handle; duplicates share `data`.
-    if (!sound->bIsCopy) {
-        if (sound->sfxHandle) snd_sfx_unload(sound->sfxHandle);
-        if (sound->data) std_pHS->free(sound->data);
-    }
+    // Each buffer -- original OR duplicate -- uploads its OWN SPU copy (Duplicate sets
+    // sfxHandle=0, so it re-uploads lazily on first play), so its handle must ALWAYS be
+    // unloaded. Gating this on !bIsCopy leaked the AICA sound RAM on every played sound
+    // until sfx went permanently silent. Only the shared main-RAM PCM (`data`) is
+    // owner-only.
+    if (sound->sfxHandle) snd_sfx_unload(sound->sfxHandle);
+    if (!sound->bIsCopy && sound->data) std_pHS->free(sound->data);
 
     memset(sound, 0, sizeof(*sound));
     std_pHS->free(sound);
