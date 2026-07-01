@@ -874,9 +874,9 @@ void std3D_ResetUIRenderList()
 }
 int  std3D_IsReady() { return std3D_bHasInitted; }
 
-int std3D_HasAlpha() { return 0; }
-int std3D_HasModulateAlpha() { return 0; }
-int std3D_HasAlphaFlatStippled() { return 0; }
+int std3D_HasAlpha() { return 1; }
+int std3D_HasModulateAlpha() { return 1; }
+int std3D_HasAlphaFlatStippled() { return 1; }
 
 // Convert a stdBitmap mip (8-bit paletted or 16-bit) to an RGBA8 GL texture and
 // cache the id in the bitmap. Index 0 / the color key becomes transparent so the
