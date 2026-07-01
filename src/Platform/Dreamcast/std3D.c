@@ -56,6 +56,21 @@ static size_t    GL_tmpVerticesAmt = 0;
 static rdTri     GL_tmpTris[STD3D_MAX_TRIS] = {0};
 static size_t    GL_tmpTrisAmt = 0;
 
+// --- Deferred translucent triangles ------------------------------------------
+// PVR lists must be submitted in order (OP -> PT -> TR), but DrawRenderList runs
+// many times per frame straight into the already-open OP list. So translucent
+// tris (flags & 0x600) are pre-converted and stashed here, then flushed in the TR
+// pass at EndScene. Sized for a frame's worth of translucent geometry (a minority
+// of the scene: glass, water, sprites, effects).
+#define STD3D_MAX_DEFER_TRIS 4096
+typedef struct dcDeferTri {
+    pvr_vertex_t    v[3];
+    rdDDrawSurface* tex;
+    int             textured;
+} dcDeferTri;
+static dcDeferTri std3D_deferTR[STD3D_MAX_DEFER_TRIS];
+static size_t     std3D_numDeferTR = 0;
+
 // --- Texture cache -----------------------------------------------------------
 typedef struct dcTexEntry {
     rdDDrawSurface* surf;
@@ -70,11 +85,30 @@ static rdColor24 std3D_currentPalette[256];
 
 // --- Menu/HUD overlay texture ------------------------------------------------
 // PVR textures must be power-of-two; the 640x480 menu buffer lives in the
-// top-left of a 1024x512 ARGB1555 texture (index 0 -> transparent for the HUD).
+// top-left of a 1024x512 texture (index 0 -> transparent for the HUD).
+//
+// Two implementations, selected by STD3D_MENU_PALETTED:
+//   0 (default): expand the 8-bit menu buffer to a non-twiddled ARGB1555 texture
+//                on the CPU each frame and upload it (pvr_txr_load, no twiddle).
+//   1: upload the raw 8-bit indices as a *paletted* PAL8BPP texture and let the
+//      PVR do the lookup through a hardware palette bank (bank 0 = current
+//      palette). Half the VRAM/upload, but paletted textures must be twiddled and
+//      pvr_txr_load_ex's per-frame twiddle of the full 1024x512 has shown up as
+//      lag -- kept here for the game-texture (static, twiddle-once) work.
+#define STD3D_MENU_PALETTED 0
 #define MENU_TEX_W 1024
 #define MENU_TEX_H 512
+#define MENU_PAL_BANK 0
+#define MENU_PAL_BASE (MENU_PAL_BANK * 256)
 static pvr_ptr_t std3D_menuTex = NULL;
+#if STD3D_MENU_PALETTED
+static uint8_t*  std3D_pMenuStaging = NULL; // 1024x512 8-bit index staging in main RAM
+#else
 static uint16_t* std3D_pMenuStaging = NULL; // 1024x512 ARGB1555 staging in main RAM
+#endif
+
+static void std3D_UpdateWorldPaletteBanks(void); // defined in the texture cache section
+static void std3D_EmitDeferredTR(void);          // defined in the render list section
 
 // ----------------------------------------------------------------------------
 
@@ -90,8 +124,10 @@ int std3D_Startup()
     {
         // Opaque + punch-through lists (translucent comes later). The PVR picks the
         // video mode from the detected cable/region (50Hz PAL, else 60Hz / VGA).
+        // opb sizes: [OP_POLY, OP_MOD, TR_POLY, TR_MOD, PT_POLY]. TR enabled for
+        // alpha-blended (translucent) world geometry; OP_MOD/TR_MOD stay off.
         pvr_init_params_t params = {
-            { PVR_BINSIZE_32, PVR_BINSIZE_0, PVR_BINSIZE_0, PVR_BINSIZE_0, PVR_BINSIZE_32 },
+            { PVR_BINSIZE_32, PVR_BINSIZE_0, PVR_BINSIZE_32, PVR_BINSIZE_0, PVR_BINSIZE_32 },
             512 * 1024, // vertex buffer size
             0,          // dma
             0,          // fsaa
@@ -101,11 +137,25 @@ int std3D_Startup()
         pvr_init(&params);
         pvr_set_bg_color(0.0f, 0.0f, 0.0f);
 
+        // 16-bit ARGB1555 palette entries, globally, for all paletted textures
+        // (world 8bpp textures and the optional paletted menu). 1-bit alpha matches
+        // the engine's index-0 colorkey transparency.
+        pvr_set_pal_format(PVR_PAL_ARGB1555);
+
+#if STD3D_MENU_PALETTED
+        // Menu overlay texture + its main-RAM staging buffer (kept for the session).
+        // 8bpp paletted: half the VRAM and upload bandwidth of the old ARGB1555 path.
+        std3D_menuTex = pvr_mem_malloc(MENU_TEX_W * MENU_TEX_H * 1);
+        std3D_pMenuStaging = (uint8_t*)memalign(32, MENU_TEX_W * MENU_TEX_H * 1);
+        if (std3D_pMenuStaging)
+            memset(std3D_pMenuStaging, 0, MENU_TEX_W * MENU_TEX_H * 1);
+#else
         // Menu overlay texture + its main-RAM staging buffer (kept for the session).
         std3D_menuTex = pvr_mem_malloc(MENU_TEX_W * MENU_TEX_H * 2);
         std3D_pMenuStaging = (uint16_t*)memalign(32, MENU_TEX_W * MENU_TEX_H * 2);
         if (std3D_pMenuStaging)
             memset(std3D_pMenuStaging, 0, MENU_TEX_W * MENU_TEX_H * 2);
+#endif
 
         std3D_bPvrReady = 1;
     }
@@ -140,6 +190,12 @@ int std3D_StartScene()
     if (!std3D_bHasInitted) std3D_Startup();
     if (!std3D_bPvrReady) return 0;
 
+    // Refresh the world palette banks if the level colormap changed (cheap: gated
+    // on a pointer compare). Must run before scene_finish reads the palette.
+    std3D_UpdateWorldPaletteBanks();
+
+    std3D_numDeferTR = 0; // fresh translucent buffer for the frame
+
     // If a previous scene was never finished (an early-out somewhere skipped
     // EndScene), close it out so we never deadlock on pvr_wait_ready.
     if (std3D_bInScene) std3D_EndScene();
@@ -161,13 +217,20 @@ static void std3D_SubmitMenuOverlay()
     pvr_poly_cxt_t cxt;
     pvr_poly_hdr_t hdr;
     pvr_poly_cxt_txr(&cxt, PVR_LIST_PT_POLY,
+#if STD3D_MENU_PALETTED
+                     PVR_TXRFMT_PAL8BPP | PVR_TXRFMT_8BPP_PAL(MENU_PAL_BANK),
+#else
                      PVR_TXRFMT_ARGB1555 | PVR_TXRFMT_NONTWIDDLED,
+#endif
                      MENU_TEX_W, MENU_TEX_H, std3D_menuTex, PVR_FILTER_NEAREST);
     cxt.gen.culling = PVR_CULLING_NONE;
     // The HUD/menu overlay is always on top of the 3D scene. Without this it depth-
     // tests against the world (which writes nearer 1/w values) and gets occluded.
+    // Depth WRITE is on so the overlay stamps its huge z into the depth buffer; the
+    // translucent (TR) pass renders after PT, and this makes those tris fail the
+    // GREATER test against the HUD and stay behind it.
     cxt.depth.comparison = PVR_DEPTHCMP_ALWAYS;
-    cxt.depth.write = 0;
+    cxt.depth.write = 1;
     pvr_poly_compile(&hdr, &cxt);
     pvr_prim(&hdr, sizeof(hdr));
 
@@ -201,7 +264,7 @@ static void std3D_SubmitCursorSquare()
     const float x = (float)Window_mouseX;
     const float y = (float)Window_mouseY;
     const float s = 4.0f;
-    const float z = 10.0f; // in front of the menu overlay (z=1)
+    const float z = 1.0e6f; // in front of the menu overlay (z=1)
 
     pvr_poly_cxt_t cxt;
     pvr_poly_hdr_t hdr;
@@ -224,10 +287,6 @@ static void std3D_SubmitCursorSquare()
     v.x = x + s; v.y = y + s; v.z = z; pvr_prim(&v, sizeof(v));
 }
 
-int std3D_dbgTrisSeen   = 0;
-int std3D_dbgTrisSubmit = 0;
-int std3D_dbgEarlyOut   = 0;
-
 int std3D_EndScene()
 {
     if (Main_bHeadless || !std3D_bInScene) return 0;
@@ -244,18 +303,16 @@ int std3D_EndScene()
         std3D_bMenuPending = 0;
     }
 
+    // Translucent world geometry deferred during the frame, flushed last (the PVR
+    // renders TR after OP/PT). Autosort orders them back-to-front for us.
+    if (std3D_numDeferTR) {
+        pvr_list_begin(PVR_LIST_TR_POLY);
+        std3D_EmitDeferredTR();
+        pvr_list_finish();
+    }
+
     pvr_scene_finish();
     std3D_bInScene = 0;
-
-    // TEMP DIAGNOSTIC: seen vs submitted vs dropped (scene inactive), once per ~2s.
-    {
-        static int s_frame = 0;
-        if ((s_frame++ % 120) == 0)
-            stdPlatform_Printf("[DC std3D] f=%d seen=%d submit=%d earlyOut=%d numTex=%d ddraw=%d\n",
-                               s_frame, std3D_dbgTrisSeen, std3D_dbgTrisSubmit,
-                               std3D_dbgEarlyOut, (int)std3D_numTex, jkGame_isDDraw);
-    }
-    std3D_dbgTrisSeen = std3D_dbgTrisSubmit = std3D_dbgEarlyOut = 0;
     return 0;
 }
 
@@ -287,12 +344,12 @@ void std3D_AddRenderListTris(rdTri* tris, unsigned int num_tris)
 
 void std3D_AddRenderListLines(rdLine* lines, uint32_t num_lines) {}
 
-static inline void std3D_EmitVertex(const D3DVERTEX* vtx, int textured, uint32_t cmd)
+static inline void std3D_ConvertVertex(pvr_vertex_t* v, const D3DVERTEX* vtx,
+                                       int textured, uint32_t cmd, int keepAlpha)
 {
-    pvr_vertex_t v;
-    v.flags = cmd;
-    v.x = vtx->x;
-    v.y = vtx->y;
+    v->flags = cmd;
+    v->x = vtx->x;
+    v->y = vtx->y;
 
     // The PVR's vertex z is 1/w: it is interpolated linearly in screen space for
     // both depth (GEQUAL, nearer = larger) and perspective-correct texturing.
@@ -300,29 +357,61 @@ static inline void std3D_EmitVertex(const D3DVERTEX* vtx, int textured, uint32_t
     // (rdCache.c:744). Using the depth-buffer value 1/(1-z) instead is ~w (the
     // reciprocal), which only approximates perspective and skews the texture on
     // triangles that span a large depth range — most visible at the screen edges.
-    v.z = vtx->nx * 32.0f;
+    v->z = vtx->nx * 32.0f;
 
-    if (textured) { v.u = vtx->tu; v.v = vtx->tv; }
-    else          { v.u = 0.0f;    v.v = 0.0f;    }
+    if (textured) { v->u = vtx->tu; v->v = vtx->tv; }
+    else          { v->u = 0.0f;    v->v = 0.0f;    }
 
-    // Vertex color carries baked lighting (ARGB); force opaque for the OP list.
-    v.argb  = 0xFF000000u | (vtx->color & 0x00FFFFFFu);
-    v.oargb = 0;
+    // Vertex color carries baked lighting (0xAARRGGBB). The OP list forces opaque;
+    // the TR list keeps the engine's alpha so MODULATEALPHA blends by it.
+    v->argb  = keepAlpha ? vtx->color : (0xFF000000u | (vtx->color & 0x00FFFFFFu));
+    v->oargb = 0;
+}
+
+static inline void std3D_EmitVertex(const D3DVERTEX* vtx, int textured, uint32_t cmd)
+{
+    pvr_vertex_t v;
+    std3D_ConvertVertex(&v, vtx, textured, cmd, 0);
     pvr_prim(&v, sizeof(v));
 }
 
-extern int std3D_dbgTrisSeen;     // tris handed to DrawRenderList this frame
-extern int std3D_dbgTrisSubmit;   // tris actually submitted to the PVR
-extern int std3D_dbgEarlyOut;     // DrawRenderList calls dropped (scene inactive)
+// Flush the deferred translucent triangles into the (already-open) TR list.
+static void std3D_EmitDeferredTR(void)
+{
+    rdDDrawSurface* lastTex = (rdDDrawSurface*)~0;
+    for (size_t i = 0; i < std3D_numDeferTR; i++)
+    {
+        dcDeferTri* d = &std3D_deferTR[i];
+        if (d->tex != lastTex)
+        {
+            pvr_poly_cxt_t cxt;
+            pvr_poly_hdr_t hdr;
+            if (d->textured && d->tex && d->tex->texture_loaded
+                && (size_t)d->tex->texture_id < std3D_numTex)
+            {
+                dcTexEntry* e = &std3D_aTex[d->tex->texture_id];
+                pvr_poly_cxt_txr(&cxt, PVR_LIST_TR_POLY, e->fmt, e->w, e->h,
+                                 e->ptr, PVR_FILTER_NEAREST);
+            }
+            else
+            {
+                pvr_poly_cxt_col(&cxt, PVR_LIST_TR_POLY);
+            }
+            cxt.gen.culling = PVR_CULLING_NONE;
+            cxt.depth.write = 0; // translucent geometry must not occlude
+            pvr_poly_compile(&hdr, &cxt);
+            pvr_prim(&hdr, sizeof(hdr));
+            lastTex = d->tex;
+        }
+        pvr_prim(&d->v[0], sizeof(pvr_vertex_t));
+        pvr_prim(&d->v[1], sizeof(pvr_vertex_t));
+        pvr_prim(&d->v[2], sizeof(pvr_vertex_t));
+    }
+}
 
 void std3D_DrawRenderList()
 {
-    // Diagnostic: record what the engine handed us *before* any early-out.
-    std3D_dbgTrisSeen += (int)GL_tmpTrisAmt;
-
     if (Main_bHeadless || !std3D_bInScene || !std3D_bOpListOpen || !GL_tmpTrisAmt) {
-        if (GL_tmpTrisAmt && (!std3D_bInScene || !std3D_bOpListOpen))
-            std3D_dbgEarlyOut += (int)GL_tmpTrisAmt;
         std3D_ResetRenderList();
         return;
     }
@@ -330,21 +419,36 @@ void std3D_DrawRenderList()
     rdTri*     tris  = GL_tmpTris;
     D3DVERTEX* verts = GL_tmpVertices;
 
-    std3D_dbgTrisSubmit += (int)GL_tmpTrisAmt;
-
     rdDDrawSurface* lastTex = (rdDDrawSurface*)~0;
     int textured = 0;
 
     for (size_t j = 0; j < GL_tmpTrisAmt; j++)
     {
         rdDDrawSurface* tex = tris[j].texture;
+        int isTex = tex && tex->texture_loaded && (size_t)tex->texture_id < std3D_numTex;
+
+        // Translucent (flags & 0x600): defer to the TR pass, keeping the vertex
+        // alpha so the PVR blends it. Everything else goes straight to the OP list.
+        if (tris[j].flags & 0x600)
+        {
+            if (std3D_numDeferTR < STD3D_MAX_DEFER_TRIS)
+            {
+                dcDeferTri* d = &std3D_deferTR[std3D_numDeferTR++];
+                d->tex = isTex ? tex : NULL;
+                d->textured = isTex;
+                std3D_ConvertVertex(&d->v[0], &verts[tris[j].v1], isTex, PVR_CMD_VERTEX,     1);
+                std3D_ConvertVertex(&d->v[1], &verts[tris[j].v2], isTex, PVR_CMD_VERTEX,     1);
+                std3D_ConvertVertex(&d->v[2], &verts[tris[j].v3], isTex, PVR_CMD_VERTEX_EOL, 1);
+            }
+            continue;
+        }
 
         // Re-emit the poly header whenever the bound texture changes.
         if (tex != lastTex)
         {
             pvr_poly_cxt_t cxt;
             pvr_poly_hdr_t hdr;
-            if (tex && tex->texture_loaded && (size_t)tex->texture_id < std3D_numTex)
+            if (isTex)
             {
                 dcTexEntry* e = &std3D_aTex[tex->texture_id];
                 pvr_poly_cxt_txr(&cxt, PVR_LIST_OP_POLY, e->fmt, e->w, e->h,
@@ -388,6 +492,39 @@ int std3D_GetValidDimensions(int a1, int a2, int a3, int a4) { return 1; }
 static inline uint8_t std3D_Expand5(uint8_t v5) { return (uint8_t)((v5 * 527 + 23) >> 6); }
 static inline uint8_t std3D_Expand6(uint8_t v6) { return (uint8_t)((v6 * 259 + 33) >> 6); }
 
+// --- World texture palette banks ---------------------------------------------
+// 8-bit world/model textures are indices into the level colormap. We upload that
+// colormap once into hardware palette banks (ARGB1555) and reference them from
+// PAL8BPP textures, so those textures upload at 1 byte/pixel instead of being
+// expanded to 16-bit -- the swizzle/twiddle is paid once at load, not per frame.
+// The two banks differ only in index 0: colorkey (transparent) for alpha textures
+// and opaque for the rest, mirroring the engine's index-0 colorkey. Lighting comes
+// from the modulated vertex color, so a single (unlit) colormap suffices; banks 2-3
+// are left for the emissive/full-bright variants later.
+#define WORLD_PAL_BANK_CK      0   // index 0 transparent (is_alpha_tex colorkey)
+#define WORLD_PAL_BANK_OPAQUE  1   // index 0 opaque
+static void* std3D_loadedColormap = NULL;
+
+static inline int std3D_IsPow2(uint32_t n) { return n && !(n & (n - 1)); }
+
+// Populate the world palette banks from the current level colormap. Gated on the
+// colormap pointer changing (level load), like the TWL update_from_world_palette.
+static void std3D_UpdateWorldPaletteBanks()
+{
+    if (!sithWorld_pCurrentWorld || !sithWorld_pCurrentWorld->colormaps) return;
+    rdColormap* pCmp = sithWorld_pCurrentWorld->colormaps;
+    if ((void*)pCmp == std3D_loadedColormap) return; // unchanged since last upload
+    std3D_loadedColormap = (void*)pCmp;
+
+    for (int i = 0; i < 256; i++)
+    {
+        rdColor24* c = &pCmp->colors[i];
+        uint16_t rgb = ((c->r >> 3) << 10) | ((c->g >> 3) << 5) | (c->b >> 3);
+        pvr_set_pal_entry(WORLD_PAL_BANK_CK     * 256 + i, (i == 0) ? 0x0000u : (0x8000u | rgb));
+        pvr_set_pal_entry(WORLD_PAL_BANK_OPAQUE * 256 + i, 0x8000u | rgb);
+    }
+}
+
 int std3D_AddToTextureCache(stdVBuffer* vbuf, rdDDrawSurface* texture, int is_alpha_tex, int no_alpha)
 {
     if (Main_bHeadless) return 1;
@@ -399,56 +536,85 @@ int std3D_AddToTextureCache(stdVBuffer* vbuf, rdDDrawSurface* texture, int is_al
     uint32_t height = vbuf->format.height;
     if (!width || !height) return 1;
 
-    uint16_t* staging = (uint16_t*)memalign(32, width * height * 2);
-    if (!staging) return 1;
+    std3D_UpdateWorldPaletteBanks();
 
     int fmt;
+    pvr_ptr_t ptr;
     uint8_t*  src8  = (uint8_t*)vbuf->surface_lock_alloc;
     uint16_t* src16 = (uint16_t*)vbuf->surface_lock_alloc;
 
-    if (vbuf->format.format.is16bit)
+    // Fast path: 8-bit textures that index the world colormap upload as raw PAL8BPP
+    // (1 byte/pixel, half the bandwidth). Paletted textures must be twiddled, which
+    // requires power-of-two dims; anything else falls through to 16-bit expansion.
+    int usePaletted = !vbuf->format.format.is16bit
+                   && std3D_IsPow2(width) && std3D_IsPow2(height)
+                   && sithWorld_pCurrentWorld && sithWorld_pCurrentWorld->colormaps;
+
+    if (usePaletted)
     {
-        // Engine 565 / ARGB1555 share the PVR bit layout: straight copy.
-        uint32_t rowpx = vbuf->format.width_in_bytes / 2;
+        uint8_t* staging8 = (uint8_t*)memalign(32, width * height);
+        if (!staging8) return 1;
+        uint32_t rowpx = vbuf->format.width_in_bytes;
         for (uint32_t y = 0; y < height; y++)
-            for (uint32_t x = 0; x < width; x++)
-                staging[y * width + x] = src16[y * rowpx + x];
-        fmt = (is_alpha_tex ? PVR_TXRFMT_ARGB1555 : PVR_TXRFMT_RGB565) | PVR_TXRFMT_NONTWIDDLED;
+            memcpy(staging8 + (size_t)y * width, src8 + (size_t)y * rowpx, width);
+
+        ptr = pvr_mem_malloc(width * height);
+        if (!ptr) { free(staging8); return 1; }
+        // pvr_txr_load_ex twiddles during upload (required for paletted textures).
+        pvr_txr_load_ex(staging8, ptr, width, height, PVR_TXRLOAD_8BPP);
+        free(staging8);
+
+        int bank = is_alpha_tex ? WORLD_PAL_BANK_CK : WORLD_PAL_BANK_OPAQUE;
+        fmt = PVR_TXRFMT_PAL8BPP | PVR_TXRFMT_8BPP_PAL(bank);
     }
     else
     {
-        // 8-bit paletted -> expand through the texture palette (or world colormap).
-        uint8_t* pal = (uint8_t*)vbuf->palette;
-        uint32_t rowpx = vbuf->format.width_in_bytes;
-        for (uint32_t y = 0; y < height; y++)
-        {
-            for (uint32_t x = 0; x < width; x++)
-            {
-                uint8_t idx = src8[y * rowpx + x];
-                uint8_t r, g, b;
-                if (pal) { r = pal[idx*3+0]; g = pal[idx*3+1]; b = pal[idx*3+2]; }
-                else if (sithWorld_pCurrentWorld && sithWorld_pCurrentWorld->colormaps)
-                { rdColor24* c = &sithWorld_pCurrentWorld->colormaps->colors[idx]; r=c->r; g=c->g; b=c->b; }
-                else { rdColor24* c = &std3D_currentPalette[idx]; r=c->r; g=c->g; b=c->b; }
+        uint16_t* staging = (uint16_t*)memalign(32, width * height * 2);
+        if (!staging) return 1;
 
-                if (is_alpha_tex)
+        if (vbuf->format.format.is16bit)
+        {
+            // Engine 565 / ARGB1555 share the PVR bit layout: straight copy.
+            uint32_t rowpx = vbuf->format.width_in_bytes / 2;
+            for (uint32_t y = 0; y < height; y++)
+                for (uint32_t x = 0; x < width; x++)
+                    staging[y * width + x] = src16[y * rowpx + x];
+        }
+        else
+        {
+            // 8-bit (non-POT or no colormap) -> expand through the texture palette.
+            uint8_t* pal = (uint8_t*)vbuf->palette;
+            uint32_t rowpx = vbuf->format.width_in_bytes;
+            for (uint32_t y = 0; y < height; y++)
+            {
+                for (uint32_t x = 0; x < width; x++)
                 {
-                    uint16_t a = (idx == 0 && !no_alpha) ? 0x0000 : 0x8000;
-                    staging[y*width+x] = a | ((r>>3)<<10) | ((g>>3)<<5) | (b>>3);
-                }
-                else
-                {
-                    staging[y*width+x] = ((r>>3)<<11) | ((g>>2)<<5) | (b>>3);
+                    uint8_t idx = src8[y * rowpx + x];
+                    uint8_t r, g, b;
+                    if (pal) { r = pal[idx*3+0]; g = pal[idx*3+1]; b = pal[idx*3+2]; }
+                    else if (sithWorld_pCurrentWorld && sithWorld_pCurrentWorld->colormaps)
+                    { rdColor24* c = &sithWorld_pCurrentWorld->colormaps->colors[idx]; r=c->r; g=c->g; b=c->b; }
+                    else { rdColor24* c = &std3D_currentPalette[idx]; r=c->r; g=c->g; b=c->b; }
+
+                    if (is_alpha_tex)
+                    {
+                        uint16_t a = (idx == 0 && !no_alpha) ? 0x0000 : 0x8000;
+                        staging[y*width+x] = a | ((r>>3)<<10) | ((g>>3)<<5) | (b>>3);
+                    }
+                    else
+                    {
+                        staging[y*width+x] = ((r>>3)<<11) | ((g>>2)<<5) | (b>>3);
+                    }
                 }
             }
         }
         fmt = (is_alpha_tex ? PVR_TXRFMT_ARGB1555 : PVR_TXRFMT_RGB565) | PVR_TXRFMT_NONTWIDDLED;
-    }
 
-    pvr_ptr_t ptr = pvr_mem_malloc(width * height * 2);
-    if (!ptr) { free(staging); return 1; }
-    pvr_txr_load(staging, ptr, width * height * 2);
-    free(staging);
+        ptr = pvr_mem_malloc(width * height * 2);
+        if (!ptr) { free(staging); return 1; }
+        pvr_txr_load(staging, ptr, width * height * 2);
+        free(staging);
+    }
 
     size_t idx = std3D_numTex++;
     std3D_aTex[idx].surf = texture;
@@ -497,9 +663,17 @@ void std3D_DrawSceneFbo()                 {}
 void std3D_Screenshot(const char* pFpath) {}
 
 // --- Capabilities ------------------------------------------------------------
-int std3D_HasAlpha()             { return 0; }
-int std3D_HasModulateAlpha()     { return 0; }
-int std3D_HasAlphaFlatStippled() { return 0; }
+// Report colorkey/alpha-texture support so rdCache selects the alpha material
+// variant and tags those tris with flag 0x400 (rdCache.c:538/558 -- "blaster
+// shots, etc"). is_alpha_tex already loads them into the colorkey palette bank
+// (index 0 transparent); the 0x400 flag routes them to the TR pass, where
+// MODULATEALPHA + the transparent index-0 gives a proper cutout.
+int std3D_HasAlpha()             { return 1; }
+// Report modulated-alpha support so rdCache keeps translucent materials' vertex
+// alpha (~90/255) instead of forcing them opaque (rdCache.c:391). Those tris get
+// flag 0x600 and are routed to the PVR TR list with alpha blending.
+int std3D_HasModulateAlpha()     { return 1; }
+int std3D_HasAlphaFlatStippled() { return 1; }
 
 // --- Menu / HUD overlay ------------------------------------------------------
 // Expand the 8-bit Video_menuBuffer into the ARGB1555 overlay texture (index 0
@@ -516,16 +690,53 @@ void std3D_DrawMenu()
     const uint32_t pitch = Video_menuBuffer.format.width_in_bytes;
     if (srcW <= 0 || srcH <= 0) return;
 
+    int w = (srcW < 640) ? srcW : 640;
+    int h = (srcH < 480) ? srcH : 480;
+    const uint8_t* src = (const uint8_t*)Video_menuBuffer.surface_lock_alloc;
+
+#if STD3D_MENU_PALETTED
+    // Push the current palette into hardware bank 0 (ARGB1555). Index 0 stays
+    // transparent (alpha bit clear) so the punch-through overlay shows the world
+    // through the HUD's empty areas; everything else is opaque.
+    //
+    // The 256 register writes are only needed when the palette actually changes
+    // (menu<->world transitions, palette effects), so gate them on a memcmp of the
+    // master palette -- same trick as the GL3 renderer's displaypal_data cache.
+    static rdColor24 menuPalCache[256];
+    static int menuPalCacheValid = 0;
+    if (!menuPalCacheValid || memcmp(menuPalCache, stdDisplay_masterPalette, 0x300))
+    {
+        memcpy(menuPalCache, stdDisplay_masterPalette, 0x300);
+        menuPalCacheValid = 1;
+        pvr_set_pal_entry(MENU_PAL_BASE + 0, 0x0000);
+        for (int i = 1; i < 256; i++)
+        {
+            const rdColor24* c = &stdDisplay_masterPalette[i];
+            pvr_set_pal_entry(MENU_PAL_BASE + i,
+                              0x8000u | ((c->r >> 3) << 10) | ((c->g >> 3) << 5) | (c->b >> 3));
+        }
+    }
+
+    // Copy the raw 8-bit indices straight into the staging buffer -- no per-pixel
+    // palette expansion; the PVR does the lookup. (The unused padding columns/rows
+    // are never sampled by the overlay quad, so they don't need clearing.)
+    for (int y = 0; y < h; y++)
+    {
+        const uint8_t* srow = src + (size_t)y * pitch;
+        uint8_t* drow = std3D_pMenuStaging + (size_t)y * MENU_TEX_W;
+        memcpy(drow, srow, w);
+    }
+
+    // pvr_txr_load_ex twiddles (required for paletted textures) during upload.
+    pvr_txr_load_ex(std3D_pMenuStaging, std3D_menuTex, MENU_TEX_W, MENU_TEX_H, PVR_TXRLOAD_8BPP);
+#else
+    // Expand the 8-bit menu buffer to ARGB1555 on the CPU and upload it untwiddled.
     static uint16_t pal1555[256];
     for (int i = 0; i < 256; i++)
     {
         const rdColor24* c = &stdDisplay_masterPalette[i];
         pal1555[i] = (uint16_t)(0x8000 | ((c->r >> 3) << 10) | ((c->g >> 3) << 5) | (c->b >> 3));
     }
-
-    int w = (srcW < 640) ? srcW : 640;
-    int h = (srcH < 480) ? srcH : 480;
-    const uint8_t* src = (const uint8_t*)Video_menuBuffer.surface_lock_alloc;
 
     for (int y = 0; y < h; y++)
     {
@@ -539,6 +750,7 @@ void std3D_DrawMenu()
     }
 
     pvr_txr_load(std3D_pMenuStaging, std3D_menuTex, MENU_TEX_W * MENU_TEX_H * 2);
+#endif
     std3D_bMenuPending = 1;
 }
 
