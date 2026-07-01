@@ -12,6 +12,12 @@
 #include "external/fcaseopen/fcaseopen.h"
 #endif
 
+#ifdef STDSOUND_DREAMCAST
+#include <dc/cdrom.h>
+#include <dc/syscalls.h>   // CD_STATUS_*
+#include <dc/spu.h>        // spu_cdda_volume
+#endif
+
 // Added
 int stdMci_bIsGOG = 1;
 
@@ -135,7 +141,116 @@ flex_d_t stdMci_GetTrackLength(int track)
 }
 
 #else // LINUX
-#if defined(STDSOUND_NULL) || defined(STDSOUND_MAXMOD) || defined(STDSOUND_DREAMCAST)
+#if defined(STDSOUND_DREAMCAST)
+
+// Dreamcast: stream the soundtrack as hardware CD Digital Audio (CDDA). The music
+// tracks are authored onto the disc as Red Book audio tracks (see the mkdcdisc --cdda
+// packaging), and the GD-ROM plays them directly into the AICA mix -- effectively free
+// CPU-wise, unlike decoding Ogg/Vorbis in software. The engine's track numbers line up
+// with the disc's audio track numbers (data is track 1, music starts at track 2).
+
+int stdMci_dcFrom = 0;
+int stdMci_dcTo = 0;
+int stdMci_dcPlaying = 0;
+int stdMci_dcVol = 15;   // AICA CDDA mix level, 0..15 (start at full)
+
+// Map a GOG DF2 soundtrack track number to the physical CDDA track on our disc.
+//
+// GOG encodes the source CD in the tens digit: disk 1 is tracks 12-18, disk 2 is 22-32
+// (18 songs total, with a gap). mkdcdisc authors the Oggs as audio tracks *before* the
+// data track, in numeric filename order, so Track12.ogg..Track32.ogg become CD tracks
+// 1..18 contiguously. This collapses the GOG numbering (and its gap) onto 1..18:
+//   disk 1: 12..18 -> CD 1..7      (cd = gog - 11)
+//   disk 2: 22..32 -> CD 8..18     (cd = gog - 14)
+// Returns 0 for track numbers we don't ship (caller then plays nothing).
+static int stdMci_dcCddaTrack(int gog)
+{
+    if (gog >= 12 && gog <= 18) return gog - 11;
+    if (gog >= 22 && gog <= 32) return gog - 14;
+    return 0;
+}
+
+int stdMci_Startup()
+{
+    stdMci_bInitted = 1;
+    stdMci_bIsGOG = 1; // real track IDs, no CD-offset guessing needed on our disc
+    // The GD-ROM is brought up by KOS (INIT_CDROM, part of INIT_DEFAULT); nothing else.
+    return 1;
+}
+
+void stdMci_Shutdown()
+{
+    stdMci_Stop();
+    stdMci_bInitted = 0;
+    stdMci_dcFrom = stdMci_dcTo = 0;
+    stdMci_bIsGOG = 1;
+}
+
+int stdMci_Play(uint8_t trackFrom, uint8_t trackTo)
+{
+    stdMci_dcFrom = trackFrom;
+    stdMci_dcTo   = trackTo;
+
+    int cdFrom = stdMci_dcCddaTrack(trackFrom);
+    int cdTo   = stdMci_dcCddaTrack(trackTo);
+    if (cdFrom == 0) {           // track we don't ship -> nothing to play
+        stdMci_dcPlaying = 0;
+        return 0;
+    }
+    if (cdTo == 0 || cdTo < cdFrom) cdTo = cdFrom;
+
+    // Play the range once (loops=0); sithSoundMixer polls CheckStatus and re-issues
+    // Play to loop the range, matching the other backends. CDDA_TRACKS = play by track.
+    if (cdrom_cdda_play(cdFrom, cdTo, 0, CDDA_TRACKS) == ERR_OK) {
+        // Re-assert the mix level -- snd/spu init can reset the CDDA registers, and the
+        // engine may Play before its first SetVolume.
+        spu_cdda_volume(stdMci_dcVol, stdMci_dcVol);
+        stdMci_dcPlaying = 1;
+        return 1;
+    }
+    stdMci_dcPlaying = 0;
+    return 0;
+}
+
+void stdMci_SetVolume(flex_t vol)
+{
+    // Engine passes 0.0..1.0; the AICA CDDA mix level is 0..15 (spu_cdda_volume writes
+    // the CDDA volume registers directly, so it persists across track changes).
+    int v = (int)(vol * 15.0 + 0.5);
+    if (v < 0) v = 0;
+    if (v > 15) v = 15;
+    stdMci_dcVol = v;
+    spu_cdda_volume(v, v);
+}
+
+void stdMci_Stop()
+{
+    if (stdMci_dcPlaying) {
+        cdrom_cdda_pause();
+        stdMci_dcPlaying = 0;
+    }
+}
+
+int stdMci_CheckStatus()
+{
+    if (!stdMci_dcPlaying)
+        return 0;
+
+    int status = 0, disc_type = 0;
+    if (cdrom_get_status(&status, &disc_type) == ERR_OK && status == CD_STATUS_PLAYING)
+        return 1;
+
+    // Finished (or drive left the playing state) -> report idle so the mixer loops.
+    stdMci_dcPlaying = 0;
+    return 0;
+}
+
+flex_d_t stdMci_GetTrackLength(int track)
+{
+    return 0.0;
+}
+
+#elif defined(STDSOUND_NULL) || defined(STDSOUND_MAXMOD)
 
 int stdMci_trackFrom;
 int stdMci_trackTo;
