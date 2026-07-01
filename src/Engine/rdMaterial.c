@@ -301,7 +301,7 @@ LABEL_21:
 #endif
 
 #if !defined(TARGET_RETRO_HOMEBREW)
-        printf("Load %s tex %d/%d mip %d/%d\n", mat_fpath, tex_numa, material->num_textures, mipmap_num, texture->num_mipmaps);
+        //printf("Load %s tex %d/%d mip %d/%d\n", mat_fpath, tex_numa, material->num_textures, mipmap_num, texture->num_mipmaps);
         created_tex = stdDisplay_VBufferNew(&format, create_ddraw_surface, gpu_mem, 0);
         *texture_struct = created_tex;
         if ( !created_tex )
