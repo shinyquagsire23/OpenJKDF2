@@ -393,8 +393,14 @@ extern int Window_isHiDpi;
 // - double to verify flex_t vs flex32_t vs cog_flex_t is working
 // - TODO: fixed point support?
 #ifdef TARGET_DREAMCAST
-typedef double flex_t_type; // TODO: Why?
-typedef double flex_d_t_type;
+// All single precision, no double anywhere. TEST: on -m4-single the SH4 sits in single
+// mode and flips FPSCR PR (+ float<->double converts) for every double op. flex_t=float
+// with the collision code's many flex_d_t (double) locals means constant single/double
+// mixing -- suspected cause of the DC-only floor-collision bug (the two configs that
+// work, DC all-double and arm64 all-float, are the two with NO mixing). Making flex_d_t
+// float too removes the mixing (and matches the working arm64 all-float run).
+typedef float flex_t_type;
+typedef float flex_d_t_type;
 #else
 typedef float flex_t_type; // _Float16
 typedef double flex_d_t_type;

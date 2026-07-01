@@ -39,7 +39,7 @@ static int stdSound_dcReady = 0;
 // into a ring buffer that a single snd_stream channel consumes at real time. A
 // tiny KOS thread polls the stream; when it drains and stays idle we stop it so
 // snd_sfx gets its channels back until the next cutscene.
-#define DC_STREAM_RING (256 * 1024)
+#define DC_STREAM_RING (64 * 1024)
 static uint8_t  stdSound_dcRing[DC_STREAM_RING];
 static volatile uint32_t stdSound_dcRingW = 0;  // absolute write count (producer: engine)
 static volatile uint32_t stdSound_dcRingR = 0;  // absolute read count (consumer: stream cb)

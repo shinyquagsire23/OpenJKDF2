@@ -51,11 +51,17 @@ static int std3D_bInScene   = 0;
 static int std3D_bOpListOpen = 0;
 static int std3D_bMenuPending = 0;
 
-// --- Render list accumulators (mirrors GL11) ---------------------------------
-static D3DVERTEX GL_tmpVertices[STD3D_MAX_VERTICES] = {0};
-static size_t    GL_tmpVerticesAmt = 0;
-static rdTri     GL_tmpTris[STD3D_MAX_TRIS] = {0};
-static size_t    GL_tmpTrisAmt = 0;
+// --- Render list (points straight at rdCache's buffers; DSi-style zero-copy) ---
+// Instead of memcpy'ing into big static arrays, we keep pointers into rdCache's own
+// vertex/tri arrays and draw each tri batch eagerly as it's added (rdCache hands us
+// solid tris then normal tris, both indexing the one vertex array). This drops ~two
+// large buffers and the per-flush copies, and removes the old STD3D_MAX_VERTICES
+// (128) truncation vs rdCache's 384.
+static D3DVERTEX* GL_tmpVertices = NULL;
+static size_t     GL_tmpVerticesAmt = 0;
+static rdTri*     GL_tmpTris = NULL;
+static size_t     GL_tmpTrisAmt = 0;
+static void std3D_DrawRenderListReal(void); // eager per-batch emitter
 
 // --- Deferred translucent triangles ------------------------------------------
 // PVR lists must be submitted in order (OP -> PT -> TR), but DrawRenderList runs
@@ -225,6 +231,14 @@ int std3D_Startup()
         };
         pvr_init(&params);
         pvr_set_bg_color(0.0f, 0.0f, 0.0f);
+
+        // Reserve the system-RAM overflow arena out of VRAM now, while VRAM is fresh
+        // (before the menu texture / world textures fragment it) so the 4 MiB block is
+        // contiguous. See the DC allocator in stdPlatform.c.
+#ifdef TARGET_DREAMCAST
+        extern void DC_InitVramOverflow(void);
+        DC_InitVramOverflow();
+#endif
 
         // 16-bit ARGB1555 palette entries, globally, for all paletted textures
         // (world 8bpp textures and the optional paletted menu). 1-bit alpha matches
@@ -443,18 +457,21 @@ int std3D_RenderListVerticesFinish() { return 0; }
 int std3D_AddRenderListVertices(D3DVERTEX* vertices, int count)
 {
     if (Main_bHeadless) return 1;
-    if (GL_tmpVerticesAmt + count >= STD3D_MAX_VERTICES) return 0;
-    memcpy(&GL_tmpVertices[GL_tmpVerticesAmt], vertices, sizeof(D3DVERTEX) * count);
-    GL_tmpVerticesAmt += count;
+    // Point at rdCache's buffer -- no copy, no size cap (always succeeds).
+    GL_tmpVertices    = vertices;
+    GL_tmpVerticesAmt = (size_t)count;
     return 1;
 }
 
 void std3D_AddRenderListTris(rdTri* tris, unsigned int num_tris)
 {
     if (Main_bHeadless) return;
-    if (GL_tmpTrisAmt + num_tris > STD3D_MAX_TRIS) return;
-    memcpy(&GL_tmpTris[GL_tmpTrisAmt], tris, sizeof(rdTri) * num_tris);
-    GL_tmpTrisAmt += num_tris;
+    // rdCache calls us once for the solid batch then once for the normal batch, both
+    // indexing GL_tmpVertices. Point at this batch and draw it now (eager, single copy)
+    // rather than accumulating -- so no per-flush tri buffer is needed either.
+    GL_tmpTris    = tris;
+    GL_tmpTrisAmt = num_tris;
+    std3D_DrawRenderListReal();
 }
 
 void std3D_AddRenderListLines(rdLine* lines, uint32_t num_lines) {}
@@ -524,12 +541,13 @@ static void std3D_EmitDeferredTR(void)
     }
 }
 
-void std3D_DrawRenderList()
+// Eager per-batch emitter: draws GL_tmpTrisAmt tris (this batch) against the shared
+// GL_tmpVertices pointer. Called from std3D_AddRenderListTris, not by rdCache directly.
+static void std3D_DrawRenderListReal(void)
 {
-    if (Main_bHeadless || !std3D_bInScene || !std3D_bOpListOpen || !GL_tmpTrisAmt) {
-        std3D_ResetRenderList();
+    if (Main_bHeadless || !std3D_bInScene || !std3D_bOpListOpen
+        || !GL_tmpTrisAmt || !GL_tmpVertices)
         return;
-    }
 
     rdTri*     tris  = GL_tmpTris;
     D3DVERTEX* verts = GL_tmpVertices;
@@ -585,7 +603,12 @@ void std3D_DrawRenderList()
         std3D_EmitVertex(&verts[tris[j].v2], textured, PVR_CMD_VERTEX);
         std3D_EmitVertex(&verts[tris[j].v3], textured, PVR_CMD_VERTEX_EOL);
     }
+}
 
+// Public entry from rdCache. The tri batches were already drawn eagerly in
+// std3D_AddRenderListTris, so this just clears the per-flush render-list pointers.
+void std3D_DrawRenderList()
+{
     std3D_ResetRenderList();
 }
 

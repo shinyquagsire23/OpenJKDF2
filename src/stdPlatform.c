@@ -640,14 +640,18 @@ __attribute__((naked)) int64_t __smull_helper(int32_t a, int32_t b) {
 // fragmentation on the DC's 16 MiB) plus a small tracking header for debugging:
 // per-alloc size + pool marker, double-free detection, and optional guard bytes.
 //
-// System RAM only for now -- one mspace carved out of the newlib heap, with a
-// plain-malloc fallback for overflow. A VRAM-backed overflow mspace can be added
-// later as another marker/branch (see DC_MARK_*).
+// Allocation order: SYSTEM RAM FIRST (fast, cached newlib heap), then spill into a
+// 4 MiB overflow arena carved out of PVR VRAM (slower, uncached CPU access -- so only
+// cold data lands there). If BOTH are exhausted the emergency free-up runs (sound +
+// material LRU caches) and we retry once. The VRAM arena is a dlmalloc mspace (block
+// coalescing); sysram uses plain newlib malloc.
 //
 // Deliberately wired only as the engine HostServices alloc/free/realloc, NOT via
-// linker --wrap: KOS is preemptively multithreaded and this mspace is not lock-
+// linker --wrap: KOS is preemptively multithreaded and the mspace is not lock-
 // guarded, so KOS/newlib's own allocations stay on their heap.
 // ---------------------------------------------------------------------------
+
+#include <dc/pvr.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -669,13 +673,14 @@ extern void *__real_calloc(size_t num, size_t size);
 #define DC_MEM_CHECKING_VAL_FREE 0x55
 
 // Tracking-header high byte: which pool the block lives in (and freed sentinel).
-#define DC_MARK_MSPACE 0xDC   // engine mspace (system RAM)
-#define DC_MARK_SYS    0x5A   // plain-malloc overflow fallback
+#define DC_MARK_MSPACE 0xDC   // VRAM overflow mspace (fallback)
+#define DC_MARK_SYS    0x5A   // system RAM (newlib) -- the primary pool
 #define DC_MARK_FREED  0xDE   // sentinel written on free (double-free detection)
 
-// Reserve left on the newlib heap for KOS (threads, drivers, file buffers) and the
-// overflow fallback after we carve out the engine mspace.
-#define DC_MSPACE_RESERVE (3 * 1024 * 1024)
+// Size of the VRAM block reserved as the overflow arena. VRAM is 8 MiB total and the
+// PVR also needs it for framebuffers/vertex buffer/OPB/textures, so this trades texture
+// headroom for system-RAM headroom -- dial down if textures thrash (LRU eviction).
+#define DC_VRAM_OVERFLOW_SIZE (1 * 512 * 1024)
 
 typedef struct DcMemHeader {
     uint32_t mark_size;   // [31:24] pool marker, [23:0] user byte size
@@ -685,13 +690,13 @@ typedef struct DcMemHeader {
 #define DC_HDR_SIZE(p)     ((p)->mark_size & 0xFFFFFF)
 #define DC_HDR_SET(p,m,s)  ((p)->mark_size = (((m) & 0xFF) << 24) | ((s) & 0xFFFFFF))
 
-static mspace dc_mspace = NULL;
-static size_t dc_mspace_size = 0;
+static mspace dc_vram_mspace = NULL;
+static size_t dc_vram_mspace_size = 0;
 
 // Live-allocation stats (exported for debugging).
-size_t dc_trackingAllocs     = 0;  // user bytes live in the mspace
-size_t dc_trackingAllocsReal = 0;  // aligned bytes live in the mspace
-size_t dc_trackingSys        = 0;  // user bytes live in the fallback heap
+size_t dc_trackingAllocs     = 0;  // user bytes live in the VRAM overflow mspace
+size_t dc_trackingAllocsReal = 0;  // aligned bytes live in the VRAM overflow mspace
+size_t dc_trackingSys        = 0;  // user bytes live in system RAM (the primary pool)
 size_t dc_activeAllocs       = 0;
 
 static inline uint32_t DC_BlockSize(uint32_t len)
@@ -703,42 +708,37 @@ static inline uint32_t DC_BlockSize(uint32_t len)
     return total;
 }
 
-static void DC_mspace_init(void)
+// Reserve the VRAM overflow arena. Must be called AFTER pvr_init (VRAM is up) and
+// EARLY -- before the texture cache fragments VRAM -- so the 4 MiB block is contiguous.
+// Called from std3D_Startup. Safe to call more than once (no-op after the first).
+void DC_InitVramOverflow(void)
 {
-    // Probe the largest contiguous block newlib can give, then carve out all but
-    // the reserve for the engine mspace. (malloc here is KOS/newlib's -- this path
-    // is not --wrapped.)
-    size_t probe = 12 * 1024 * 1024;
-    void* p = NULL;
-    while (probe > DC_MSPACE_RESERVE && !(p = __real_malloc(probe)))
-        probe -= 0x40000;
-    if (p) __real_free(p);
-
-    size_t want = (probe > DC_MSPACE_RESERVE) ? (probe - DC_MSPACE_RESERVE) : 0;
-    void* base = want ? __real_malloc(want) : NULL;
+    if (dc_vram_mspace) return;
+    // pvr_mem_malloc hands back a 32-byte-aligned pointer in the 64-bit texture area
+    // (0xa5......), which the SH4 can address as normal (uncached) memory.
+    void* base = pvr_mem_malloc(DC_VRAM_OVERFLOW_SIZE);
     if (base) {
-        dc_mspace = create_mspace_with_base(base, want, 0);
-        dc_mspace_size = want;
+        dc_vram_mspace = create_mspace_with_base(base, DC_VRAM_OVERFLOW_SIZE, 0);
+        dc_vram_mspace_size = DC_VRAM_OVERFLOW_SIZE;
     }
-    stdPlatform_Printf("[DC heap] engine mspace: %u KiB (reserve %u KiB)\n",
-                       (unsigned)(dc_mspace_size / 1024), (unsigned)(DC_MSPACE_RESERVE / 1024));
+    stdPlatform_Printf("[DC heap] VRAM overflow arena: %u KiB @ %p\n",
+                       (unsigned)(dc_vram_mspace_size / 1024), base);
 }
 
 static void* DC_alloc(uint32_t len)
 {
     static int bDontTryAgain = 0;
     if (!len) return NULL;
-    if (!dc_mspace) DC_mspace_init();
 
     uint32_t total = DC_BlockSize(len);
 
-    uint8_t mark = DC_MARK_MSPACE;
-    void* raw = dc_mspace ? mspace_malloc(dc_mspace, total) : NULL;
-    if (!raw) {
-        // mspace exhausted (or not yet up) -> overflow onto the newlib heap.
-        //raw = memalign(DC_ALLOC_ALIGN, total);
-        raw = __real_malloc(total);
-        mark = DC_MARK_SYS;
+    // System RAM first (fast, cached).
+    uint8_t mark = DC_MARK_SYS;
+    void* raw = __real_malloc(total);
+    if (!raw && dc_vram_mspace) {
+        // Sysram exhausted -> spill into the VRAM overflow arena (slower, uncached).
+        raw = mspace_malloc(dc_vram_mspace, total);
+        mark = DC_MARK_MSPACE;
     }
 
     if (!raw) {
@@ -759,9 +759,9 @@ static void* DC_alloc(uint32_t len)
             bDontTryAgain = 0;
             return ret;
         }
-        stdPlatform_Printf("[DC heap] failed to allocate %u bytes (mspace %u/%u KiB)\n",
-                           (unsigned)len, (unsigned)(dc_trackingAllocsReal / 1024),
-                           (unsigned)(dc_mspace_size / 1024));
+        stdPlatform_Printf("[DC heap] failed to allocate %u bytes (sys %u KiB live, VRAM %u/%u KiB)\n",
+                           (unsigned)len, (unsigned)(dc_trackingSys / 1024),
+                           (unsigned)(dc_trackingAllocsReal / 1024), (unsigned)(dc_vram_mspace_size / 1024));
         return NULL;
     }
 
@@ -813,7 +813,7 @@ static void DC_free(void* ptr)
     if (mark == DC_MARK_MSPACE) {
         dc_trackingAllocs     -= len;
         dc_trackingAllocsReal -= total;
-        mspace_free(dc_mspace, hdr);
+        mspace_free(dc_vram_mspace, hdr);
     } else if (mark == DC_MARK_SYS) {
         dc_trackingSys -= len;
         __real_free(hdr);
@@ -990,7 +990,7 @@ void stdPlatform_InitServices(HostServices *handlers)
     handlers->suggestHeap = TWL_suggestHeap;
 #endif
 
-#if 0//def TARGET_DREAMCAST
+#ifdef TARGET_DREAMCAST
     handlers->alloc = DC_alloc;
     handlers->free = DC_free;
     handlers->realloc = DC_realloc;
