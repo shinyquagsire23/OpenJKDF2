@@ -64,7 +64,7 @@ rdMaterial* rdMaterial_Load(char *material_fname, int create_ddraw_surface, int 
     if (pMaterialsLoader)
         return (rdMaterial*)pMaterialsLoader(material_fname, create_ddraw_surface, gpu_memory);
 
-    material = (rdMaterial*)rdroid_pHS->alloc(sizeof(rdMaterial));
+    material = (rdMaterial*)RDROID_ALLOC(sizeof(rdMaterial));
     if (material && rdMaterial_LoadEntry(material_fname, material, create_ddraw_surface, gpu_memory))
         return material;
 
@@ -188,7 +188,7 @@ int rdMaterial_LoadEntry_Common(char *mat_fpath, rdMaterial *material, int creat
     memset(material->texinfos, 0, sizeof(material->texinfos)); // Added: just in case?
     for (tex_num = 0; tex_num < material->num_texinfo; tex_num++)
     {
-        texinfo_alloc = (rdTexinfo *)rdroid_pHS->alloc(sizeof(rdTexinfo));
+        texinfo_alloc = (rdTexinfo *)RDROID_ALLOC(sizeof(rdTexinfo));
         material->texinfos[tex_num] = texinfo_alloc;
         if ( !texinfo_alloc )
         {
@@ -225,7 +225,7 @@ int rdMaterial_LoadEntry_Common(char *mat_fpath, rdMaterial *material, int creat
     material->textures = 0;
     if ( num_textures )
     {
-      textures = (rdTexture *)rdroid_pHS->alloc(sizeof(rdTexture) * num_textures);
+      textures = (rdTexture *)RDROID_ALLOC(sizeof(rdTexture) * num_textures);
       if ( !textures )
       {
         stdPlatform_Printf("OpenJKDF2: Material `%s` textures array could not be allocated!\n", mat_fpath); // Added
@@ -347,11 +347,11 @@ LABEL_21:
             // vbuffer may be word-addressable-only (DC VRAM / NDS slot-2).
             {
                 uint32_t mipLen = (*texture_struct)->format.texture_size_in_bytes;
-                void* pMipTmp = std_pHS->alloc(mipLen);
+                void* pMipTmp = STD_ALLOC(mipLen);
                 if (pMipTmp) {
                     rdroid_pHS->fileRead(mat_file__, pMipTmp, mipLen);
                     stdPlatform_Memcpy32((*texture_struct)->surface_lock_alloc, pMipTmp, mipLen);
-                    std_pHS->free(pMipTmp);
+                    STD_FREE(pMipTmp);
                 } else {
                     rdroid_pHS->fileRead(mat_file__, (void *)(*texture_struct)->surface_lock_alloc, mipLen);
                 }
@@ -403,7 +403,7 @@ LABEL_22:
 #ifndef TARGET_RETRO_HOMEBREW
     if ( material->tex_type & 1 )
     {
-      colors = (rdColor24 *)rdroid_pHS->alloc(0x300u);
+      colors = (rdColor24 *)RDROID_ALLOC(0x300u);
       material->palette_alloc = colors;
       if ( !colors )
       {
@@ -576,7 +576,7 @@ void rdMaterial_Free(rdMaterial *material)
 
     rdMaterial_FreeEntry(material);
 
-    rdroid_pHS->free(material);
+    RDROID_FREE(material);
 }
 
 void rdMaterial_FreeEntry(rdMaterial* material)
@@ -629,7 +629,7 @@ void rdMaterial_FreeEntry(rdMaterial* material)
             
             texinfo->texture_ptr = NULL; // Added
 
-            rdroid_pHS->free(texinfo);
+            RDROID_FREE(texinfo);
         }
 
         // Added:
@@ -671,7 +671,7 @@ void rdMaterial_FreeEntry(rdMaterial* material)
     }
 
     if (material->textures) {
-        rdroid_pHS->free(material->textures);
+        RDROID_FREE(material->textures);
 
         // Added
         material->textures = NULL;
@@ -679,7 +679,7 @@ void rdMaterial_FreeEntry(rdMaterial* material)
 
     // Added: nullptr check, removed type check
     if (/*(material->tex_type & 1) &&*/ material->palette_alloc) {
-        rdroid_pHS->free(material->palette_alloc);
+        RDROID_FREE(material->palette_alloc);
 
         // Added
         material->palette_alloc = NULL;
@@ -926,14 +926,14 @@ void rdMaterial_EvictData(rdMaterial *pMaterial)
     // Make sure there's no dangling references to any textures
     //
     if (pMaterial->textures) {
-        rdroid_pHS->free(pMaterial->textures);
+        RDROID_FREE(pMaterial->textures);
 
         // Added
         pMaterial->textures = NULL;
     }
 
     if (/*(material->tex_type & 1) &&*/ pMaterial->palette_alloc) {
-        rdroid_pHS->free(pMaterial->palette_alloc);
+        RDROID_FREE(pMaterial->palette_alloc);
 
         // Added
         pMaterial->palette_alloc = NULL;

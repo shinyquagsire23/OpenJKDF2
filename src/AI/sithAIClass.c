@@ -29,7 +29,7 @@ int sithAIClass_New(sithWorld *world, int a2)
 {
     intptr_t result; // eax
 
-    result = (intptr_t)pSithHS->alloc(sizeof(sithAIClass) * a2);
+    result = (intptr_t)SITH_ALLOC(sizeof(sithAIClass) * a2);
     world->aiclasses = (sithAIClass *)result;
     if (result)
     {
@@ -62,7 +62,7 @@ int sithAIClass_ParseSection(sithWorld *world, int a2)
     if (!numAIClasses) {
         return 1;
     }
-    aiclasses = (sithAIClass *)pSithHS->alloc(sizeof(sithAIClass) * numAIClasses);
+    aiclasses = (sithAIClass *)SITH_ALLOC(sizeof(sithAIClass) * numAIClasses);
     world->aiclasses = aiclasses;
     if (!aiclasses)
     {
@@ -259,7 +259,7 @@ void sithAIClass_Free(sithWorld *world)
             stdHashTable_FreeKey(sithAIClass_hashmap, world->aiclasses[i].fpath);
 #endif
         }
-        pSithHS->free(world->aiclasses);
+        SITH_FREE(world->aiclasses);
         world->aiclasses = 0;
     }
     world->numAIClasses = 0;

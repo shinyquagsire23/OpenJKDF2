@@ -148,6 +148,9 @@ typedef struct rdMesh
     flex_t field_64;
     int field_68;
     int field_6C;
+#ifdef RDMODEL3_POOLED_FACE_INDICES
+    int* paFaceIdxPool; // Added: pooled face vertex/UV indices
+#endif
 } rdMesh;
 #else
 
@@ -179,7 +182,9 @@ typedef struct rdMesh
     flex_t field_64;
     int field_68;
     int field_6C;
-    
+#ifdef RDMODEL3_POOLED_FACE_INDICES
+    int* paFaceIdxPool; // Added: pooled face vertex/UV indices
+#endif
 } rdMesh;
 #endif
 

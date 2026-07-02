@@ -1,5 +1,7 @@
 #include "sithArchLighting.h"
 
+#include "stdPlatform.h" // Added: *_ALLOC/*_FREE macros
+
 #include "jk.h"
 #include "globals.h"
 #include "General/stdConffile.h"
@@ -15,15 +17,15 @@ void sithArchLighting_Free(sithWorld* pWorld)
             sithArchLight* psVar3 = &pWorld->aArchlights[i];
             for (int j = 0; j < psVar3->numMeshes; j++) 
             {
-                pSithHS->free(psVar3->aMeshes[j].aMono);
-                pSithHS->free(psVar3->aMeshes[j].aRed);
-                pSithHS->free(psVar3->aMeshes[j].aGreen);
-                pSithHS->free(psVar3->aMeshes[j].aBlue);
-                //pSithHS->free(psVar3->aMeshes[j]); // MOTS bug
+                SITH_FREE(psVar3->aMeshes[j].aMono);
+                SITH_FREE(psVar3->aMeshes[j].aRed);
+                SITH_FREE(psVar3->aMeshes[j].aGreen);
+                SITH_FREE(psVar3->aMeshes[j].aBlue);
+                //SITH_FREE(psVar3->aMeshes[j]); // MOTS bug
             }
-            pSithHS->free(psVar3->aMeshes); // Added: free correctly
+            SITH_FREE(psVar3->aMeshes); // Added: free correctly
         }
-        pSithHS->free(pWorld->aArchlights);
+        SITH_FREE(pWorld->aArchlights);
         pWorld->aArchlights = NULL;
         pWorld->numArchLights = 0;
     }
@@ -64,7 +66,7 @@ int sithArchLighting_ParseSection(sithWorld *pWorld, int unk)
     if (uVar8 == 0) {
         uVar8 = sizeof(sithArchLight); // Added: 1 -> sizeof(sithArchLight)
     }
-    psVar3 = (sithArchLight *)pSithHS->alloc(uVar8);
+    psVar3 = (sithArchLight *)SITH_ALLOC(uVar8);
     pWorld->aArchlights = psVar3;
     if (!psVar3) return 0;
 
@@ -79,7 +81,7 @@ int sithArchLighting_ParseSection(sithWorld *pWorld, int unk)
             if (!strncmp(stdConffile_entry.args[0].value, "nummeshes:", strlen("nummeshes:"))) {
                 iStack12 = _atoi(stdConffile_entry.args[1].value);
                 psVar3->numMeshes = iStack12;
-                psVar4 = (sithArchLightMesh *)pSithHS->alloc(iStack12 * sizeof(sithArchLightMesh));
+                psVar4 = (sithArchLightMesh *)SITH_ALLOC(iStack12 * sizeof(sithArchLightMesh));
                 psVar3->aMeshes = psVar4;
                 if (iStack12 != 0) {
                     iVar9 = 0;
@@ -93,13 +95,13 @@ int sithArchLighting_ParseSection(sithWorld *pWorld, int unk)
                             uVar5 = _atoi(stdConffile_entry.args[1].value);
                             ppvVar11->numVertices = uVar5;
                             uVar8 = uVar5 * sizeof(flex_t);
-                            pfVar6 = (flex_t *)pSithHS->alloc(uVar8);
+                            pfVar6 = (flex_t *)SITH_ALLOC(uVar8);
                             ppvVar11->aMono = pfVar6;
-                            pfVar6 = (flex_t *)pSithHS->alloc(uVar8);
+                            pfVar6 = (flex_t *)SITH_ALLOC(uVar8);
                             ppvVar11->aRed = pfVar6;
-                            pfVar6 = (flex_t *)pSithHS->alloc(uVar8);
+                            pfVar6 = (flex_t *)SITH_ALLOC(uVar8);
                             ppvVar11->aGreen = pfVar6;
-                            pfVar6 = (flex_t *)pSithHS->alloc(uVar8);
+                            pfVar6 = (flex_t *)SITH_ALLOC(uVar8);
                             uVar8 = 0;
                             ppvVar11->aBlue = pfVar6;
                             if (uVar5 != 0) {

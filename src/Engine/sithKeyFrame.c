@@ -122,7 +122,7 @@ rdKeyframe* sithKeyFrame_LoadEntry(const char *fpath)
 
 int sithKeyFrame_New(sithWorld *world, int numKeyframes)
 {
-    world->keyframes = (rdKeyframe *)pSithHS->alloc(sizeof(rdKeyframe) * numKeyframes);
+    world->keyframes = (rdKeyframe *)SITH_ALLOC(sizeof(rdKeyframe) * numKeyframes);
     if ( !world->keyframes )
         return 0;
     world->numKeyframes = numKeyframes;
@@ -146,7 +146,7 @@ void sithKeyFrame_Free(sithWorld *world)
         rdKeyframe_FreeJoints(&world->keyframes[idx]);
     }
     
-    pSithHS->free(world->keyframes);
+    SITH_FREE(world->keyframes);
     world->keyframes = 0;
     world->numKeyframesLoaded = 0;
     world->numKeyframes = 0;

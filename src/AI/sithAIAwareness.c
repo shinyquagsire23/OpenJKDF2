@@ -1,5 +1,7 @@
 #include "sithAIAwareness.h"
 
+#include "stdPlatform.h" // Added: *_ALLOC/*_FREE macros
+
 #include "AI/sithAI.h"
 #include "Gameplay/sithEvent.h"
 #include "World/sithWorld.h"
@@ -10,7 +12,7 @@
 
 int sithAIAwareness_Startup()
 {
-    sithAIAwareness_aSectors = (sithSectorAlloc *)pSithHS->alloc(sizeof(sithSectorAlloc) * sithWorld_pCurrentWorld->numSectors);
+    sithAIAwareness_aSectors = (sithSectorAlloc *)SITH_ALLOC(sizeof(sithSectorAlloc) * sithWorld_pCurrentWorld->numSectors);
     if (sithAIAwareness_aSectors)
     {
         sithAIAwareness_numEntries = 0;
@@ -26,7 +28,7 @@ int sithAIAwareness_Startup()
 
 void sithAIAwareness_Shutdown()
 {
-    pSithHS->free(sithAIAwareness_aSectors);
+    SITH_FREE(sithAIAwareness_aSectors);
     sithAIAwareness_aSectors = 0;
     sithEvent_RegisterFunc(3, NULL, 0, SITHEVENT_TASKDISABLED);
     sithAIAwareness_bInitted = 0;

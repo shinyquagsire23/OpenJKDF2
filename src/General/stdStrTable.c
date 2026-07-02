@@ -71,7 +71,7 @@ int stdStrTable_Load(stdStrTable *strtable, char *fpath)
         return 0;
     }
     strtable->numMsgs = numMsgs;
-    strtable->msgs = (stdStrMsg*)std_pHS->alloc(sizeof(stdStrMsg) * numMsgs);
+    strtable->msgs = (stdStrMsg*)STD_ALLOC(sizeof(stdStrMsg) * numMsgs);
     if ( !strtable->msgs )
         std_pHS->assert("Out of memory--cannot load string table", ".\\General\\stdStrTable.c", 120);
     _memset(strtable->msgs, 0, sizeof(stdStrMsg) * numMsgs);
@@ -115,7 +115,7 @@ int stdStrTable_Load(stdStrTable *strtable, char *fpath)
             v17 = stdString_GetQuotedStringContents(a1a, v34, 256);
             if ( v17 )
             {
-                v18 = (char *)std_pHS->alloc(_strlen(v34) + 1);
+                v18 = (char *)STD_ALLOC(_strlen(v34) + 1);
                 _strcpy(v18, v34);
                 v19 = value;
                 value->key = v18;
@@ -210,11 +210,11 @@ void stdStrTable_Free(stdStrTable* pTable)
             for (int i = 0; i < pTable->numMsgs; i++)
             {
                 if ( pTable->msgs[i].uniStr )
-                    std_pHS->free((void*)pTable->msgs[i].uniStr);
+                    STD_FREE((void*)pTable->msgs[i].uniStr);
                 if ( pTable->msgs[i].key )
-                    std_pHS->free((void*)pTable->msgs[i].key);
+                    STD_FREE((void*)pTable->msgs[i].key);
             }
-            std_pHS->free(pTable->msgs);
+            STD_FREE(pTable->msgs);
         }
 
         // Added: Moved

@@ -164,8 +164,8 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
     //out->format.width = 0;
     //out->format.width_in_bytes = 0;
     if (!Video_menuBuffer.surface_lock_alloc)
-        Video_menuBuffer.surface_lock_alloc = (char*)std_pHS->alloc(Video_menuBuffer.format.texture_size_in_bytes);
-    //Video_otherBuf.surface_lock_alloc = std_pHS->alloc(Video_otherBuf.format.texture_size_in_bytes);
+        Video_menuBuffer.surface_lock_alloc = (char*)STD_ALLOC(Video_menuBuffer.format.texture_size_in_bytes);
+    //Video_otherBuf.surface_lock_alloc = STD_ALLOC(Video_otherBuf.format.texture_size_in_bytes);
 
 #if 0
     glGenTextures(1, &Video_menuTexId);
@@ -238,7 +238,7 @@ int stdDisplay_SetMasterPalette(uint8_t* pal)
 
 stdVBuffer* stdDisplay_VBufferNew(stdVBufferTexFmt *fmt, int create_ddraw_surface, int gpu_mem, const void* palette)
 {
-    stdVBuffer* out = (stdVBuffer*)std_pHS->alloc(sizeof(stdVBuffer));
+    stdVBuffer* out = (stdVBuffer*)STD_ALLOC(sizeof(stdVBuffer));
     if (!out) {
         return NULL;
     }
@@ -261,10 +261,10 @@ stdVBuffer* stdDisplay_VBufferNew(stdVBufferTexFmt *fmt, int create_ddraw_surfac
     // vbuffer pixel data is only accessed word-safe on this port, so allow
     // placement in word-addressable-only memory (e.g. future slot-2 RAM heap).
     int prevSuggest = std_pHS->suggestHeap(HEAP_WORD_ADDRESSABLE);
-    out->surface_lock_alloc = (char*)std_pHS->alloc(out->format.texture_size_in_bytes);
+    out->surface_lock_alloc = (char*)STD_ALLOC(out->format.texture_size_in_bytes);
     std_pHS->suggestHeap(prevSuggest);
     if (!out->surface_lock_alloc) {
-        std_pHS->free(out);
+        STD_FREE(out);
         return NULL;
     }
     
@@ -333,7 +333,7 @@ void stdDisplay_VBufferUnlock(stdVBuffer *buf)
 
     /*if (buf->format.width == 640 && buf->format.height == 480) {
         if (buf->surface_lock_alloc)
-            std_pHS->free(buf->surface_lock_alloc);
+            STD_FREE(buf->surface_lock_alloc);
         
         buf->surface_lock_alloc = NULL;
     }*/
@@ -396,7 +396,7 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
     if (dstPixels == srcPixels)
     {
         size_t buf_len = srcStride * dstRect.width * dstRect.height;
-        uint8_t* dstPixels = (uint8_t*)std_pHS->alloc(buf_len);
+        uint8_t* dstPixels = (uint8_t*)STD_ALLOC(buf_len);
         int has_alpha = 0;//!(rect->width == 640);
 
         rdRect dstRect_inter = {0, 0, rect->width, rect->height};
@@ -471,7 +471,7 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
 
     if (self_copy)
     {
-        std_pHS->free(srcPixels);
+        STD_FREE(srcPixels);
     }
 
     //SDL_BlitSurface(vbuf2->sdlSurface, &srcRect, vbuf->sdlSurface, &dstRect); //TODO error check
@@ -557,9 +557,9 @@ void stdDisplay_VBufferFree(stdVBuffer *vbuf)
     stdDisplay_VBufferUnlock(vbuf);
     //SDL_FreeSurface(vbuf->sdlSurface);
     if (vbuf->surface_lock_alloc)
-        std_pHS->free(vbuf->surface_lock_alloc);
+        STD_FREE(vbuf->surface_lock_alloc);
     vbuf->surface_lock_alloc = NULL;
-    std_pHS->free(vbuf);
+    STD_FREE(vbuf);
 }
 
 void stdDisplay_ddraw_surface_flip2()

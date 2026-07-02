@@ -48,7 +48,7 @@ rdModel3* rdModel3_New(char *path)
 
     if ( pModel3Loader )
         return (rdModel3 *)pModel3Loader(path, 0);
-    model = (rdModel3 *)rdroid_pHS->alloc(sizeof(rdModel3));
+    model = (rdModel3 *)RDROID_ALLOC(sizeof(rdModel3));
     if ( model )
     {
         if ( rdModel3_Load(path, model) )
@@ -138,7 +138,7 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
 
     if ( model->numMaterials)
     {
-        model->materials = (rdMaterial **)rdroid_pHS->alloc(sizeof(rdMaterial*) * model->numMaterials);
+        model->materials = (rdMaterial **)RDROID_ALLOC(sizeof(rdMaterial*) * model->numMaterials);
         if (!model->materials) {
             rdModel3_HelpDebug("OpenJKDF2: %s: Failed to allocate materials\n", __func__); // Added
             return 0;
@@ -221,7 +221,7 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
             goto fail;
         }
 
-        model->geosets[v78].meshes = (rdMesh *)rdroid_pHS->alloc(sizeof(rdMesh) * model->geosets[v78].numMeshes);
+        model->geosets[v78].meshes = (rdMesh *)RDROID_ALLOC(sizeof(rdMesh) * model->geosets[v78].numMeshes);
         if ( !model->geosets[v78].meshes )
             goto fail;
         
@@ -270,17 +270,17 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
             mesh->vertices_unk = 0;
             if ( mesh->numVertices)
             {
-                mesh->vertices = (rdVector3 *)rdroid_pHS->alloc(sizeof(rdVector3) * mesh->numVertices);
+                mesh->vertices = (rdVector3 *)RDROID_ALLOC(sizeof(rdVector3) * mesh->numVertices);
                 if ( !mesh->vertices ){
                     rdModel3_HelpDebug("OpenJKDF2: %s: Failed to allocate vertices\n", __func__); // Added
                     goto fail;
                 }
-                mesh->vertices_i = (flex_t *)rdroid_pHS->alloc(sizeof(flex_t) * mesh->numVertices);
+                mesh->vertices_i = (flex_t *)RDROID_ALLOC(sizeof(flex_t) * mesh->numVertices);
                 if ( !mesh->vertices_i ) {
                     rdModel3_HelpDebug("OpenJKDF2: %s: Failed to allocate vertex lights\n", __func__); // Added
                     goto fail;
                 }
-                mesh->vertices_unk  = (flex_t *)rdroid_pHS->alloc(sizeof(flex_t) * mesh->numVertices);
+                mesh->vertices_unk  = (flex_t *)RDROID_ALLOC(sizeof(flex_t) * mesh->numVertices);
                 if ( !mesh->vertices_unk  ) {
                     rdModel3_HelpDebug("OpenJKDF2: %s: Failed to allocate vertex unk\n", __func__); // Added
                     goto fail;
@@ -319,7 +319,7 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
             mesh->vertexUVs = 0;
             if ( mesh->numUVs )
             {
-                mesh->vertexUVs = (rdVector2 *)rdroid_pHS->alloc(sizeof(rdVector2) * mesh->numUVs);
+                mesh->vertexUVs = (rdVector2 *)RDROID_ALLOC(sizeof(rdVector2) * mesh->numUVs);
                 if ( !mesh->vertexUVs ) {
                     rdModel3_HelpDebug("OpenJKDF2: %s: Failed to allocate vertex UVs\n", __func__); // Added
                     goto fail;
@@ -342,7 +342,7 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
             mesh->vertexNormals = 0;
             if ( mesh->numVertices)
             {
-                mesh->vertexNormals = (rdVector3 *)rdroid_pHS->alloc(sizeof(rdVector3) * mesh->numVertices);
+                mesh->vertexNormals = (rdVector3 *)RDROID_ALLOC(sizeof(rdVector3) * mesh->numVertices);
                 if ( !mesh->vertexNormals ) {
                     rdModel3_HelpDebug("OpenJKDF2: %s: Failed to allocate vertex normals\n", __func__); // Added
                     goto fail;
@@ -378,9 +378,13 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
                 goto fail;
             }
             mesh->faces = 0;
+#ifdef RDMODEL3_POOLED_FACE_INDICES
+            int poolUsed = 0, poolCap = 0;   // Added: this mesh's face index pool
+            int* pIdxPool = NULL;
+#endif
             if ( mesh->numFaces)
             {
-                mesh->faces = (rdFace *)rdroid_pHS->alloc(sizeof(rdFace) * mesh->numFaces);
+                mesh->faces = (rdFace *)RDROID_ALLOC(sizeof(rdFace) * mesh->numFaces);
                 if ( !mesh->faces ) {
                     rdModel3_HelpDebug("OpenJKDF2: %s: Failed to allocate faces\n", __func__); // Added
                     goto fail;
@@ -429,25 +433,62 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
                     goto fail;
                 if ( face->numVertices > 24 )
                     goto fail;
-                face->vertexPosIdx = (int*)rdroid_pHS->alloc(sizeof(int) * face->numVertices);
+                int bHasUV = (face->material && (face->material->tex_type & 2)) ? 1 : 0; // Added: hoisted
+                int* pPosIdx;
+                int* pUVIdx = NULL;
+#ifdef RDMODEL3_POOLED_FACE_INDICES
+                // Added: grab index storage from the mesh pool; the face fields hold
+                // offset+1 until the fixup after this loop (the pool moves on growth).
+                {
+                    int need = face->numVertices * (bHasUV ? 2 : 1);
+                    if (poolUsed + need > poolCap) {
+                        int newCap = poolCap ? poolCap * 2 : 256;
+                        while (newCap < poolUsed + need)
+                            newCap *= 2;
+                        int* pNewPool = (int*)RDROID_REALLOC(pIdxPool, sizeof(int) * newCap);
+                        if (!pNewPool) {
+                            rdModel3_HelpDebug("OpenJKDF2: %s: Failed to grow face index pool\n", __func__); // Added
+                            goto fail;
+                        }
+                        pIdxPool = pNewPool;
+                        poolCap = newCap;
+                        mesh->paFaceIdxPool = pIdxPool; // keep current for the fail path
+                    }
+                    pPosIdx = pIdxPool + poolUsed;
+                    face->vertexPosIdx = (int*)(intptr_t)(poolUsed + 1);
+                    poolUsed += face->numVertices;
+                    if (bHasUV) {
+                        pUVIdx = pIdxPool + poolUsed;
+                        face->vertexUVIdx = (int*)(intptr_t)(poolUsed + 1);
+                        poolUsed += face->numVertices;
+                    }
+                }
+#else
+                face->vertexPosIdx = (int*)RDROID_ALLOC(sizeof(int) * face->numVertices);
                 if ( !face->vertexPosIdx ) {
                     rdModel3_HelpDebug("OpenJKDF2: %s: Failed to allocate vertexPosIdx\n", __func__); // Added
                     goto fail;
                 }
-                if ( face->material && face->material->tex_type & 2 )
+                pPosIdx = face->vertexPosIdx;
+                if ( bHasUV )
                 {
-                    face->vertexUVIdx = (int*)rdroid_pHS->alloc(sizeof(int) * face->numVertices);
+                    face->vertexUVIdx = (int*)RDROID_ALLOC(sizeof(int) * face->numVertices);
                     if ( !face->vertexUVIdx ) {
                         rdModel3_HelpDebug("OpenJKDF2: %s: Failed to allocate mesh vertex UVs\n", __func__); // Added
                         goto fail;
                     }
+                    pUVIdx = face->vertexUVIdx;
+                }
+#endif
+                if ( bHasUV )
+                {
                     for (v49 = 0; v49 < face->numVertices; v49++)
                     {
                         tmpTxt = _strtok(0, " \t,");
-                        face->vertexPosIdx[v49] = _atoi(tmpTxt);
+                        pPosIdx[v49] = _atoi(tmpTxt);
                         
                         tmpTxt = _strtok(0, " \t,");
-                        face->vertexUVIdx[v49] = _atoi(tmpTxt);
+                        pUVIdx[v49] = _atoi(tmpTxt);
                     }
                 }
                 else
@@ -456,13 +497,29 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
                     for (v52 = 0; v52 < face->numVertices; v52++)
                     {
                         tmpTxt = _strtok(0, " \t,");
-                        face->vertexPosIdx[v52] = _atoi(tmpTxt);
+                        pPosIdx[v52] = _atoi(tmpTxt);
                         _strtok(0, " \t,");
                     }
                 }
                 rdMaterial_OptionalFree(face->material); // Added
                 face++;
             }
+#ifdef RDMODEL3_POOLED_FACE_INDICES
+            // Added: trim the pool to what was used and resolve offsets to pointers.
+            if (pIdxPool && poolUsed && poolUsed < poolCap) {
+                int* pTrim = (int*)RDROID_REALLOC(pIdxPool, sizeof(int) * poolUsed);
+                if (pTrim)
+                    pIdxPool = pTrim;
+            }
+            mesh->paFaceIdxPool = pIdxPool;
+            for (int j2 = 0; j2 < mesh->numFaces; j2++)
+            {
+                rdFace* pFixFace = &mesh->faces[j2];
+                pFixFace->vertexPosIdx = pIdxPool + ((intptr_t)pFixFace->vertexPosIdx - 1);
+                if (pFixFace->vertexUVIdx)
+                    pFixFace->vertexUVIdx = pIdxPool + ((intptr_t)pFixFace->vertexUVIdx - 1);
+            }
+#endif
 
             if ( !stdConffile_ReadLine() )
                 goto fail;
@@ -498,7 +555,7 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
     if ( _sscanf(stdConffile_aLine, " hierarchy nodes %d", &model->numHierarchyNodes) != 1 )
         goto fail;
 
-    model->hierarchyNodes = (rdHierarchyNode *)rdroid_pHS->alloc(sizeof(rdHierarchyNode) * model->numHierarchyNodes);
+    model->hierarchyNodes = (rdHierarchyNode *)RDROID_ALLOC(sizeof(rdHierarchyNode) * model->numHierarchyNodes);
     if (!model->hierarchyNodes) {
         rdModel3_HelpDebug("OpenJKDF2: %s: Failed to allocate hierarchyNodes\n", __func__); // Added
         goto fail;
@@ -818,7 +875,7 @@ void rdModel3_Free(rdModel3 *model)
         else
         {
             rdModel3_FreeEntry(model);
-            rdroid_pHS->free(model);
+            RDROID_FREE(model);
         }
     }
 }
@@ -836,33 +893,43 @@ void rdModel3_FreeEntry(rdModel3 *model)
             rdMesh* mesh = &geoset->meshes[meshNum];
             
             if (mesh->vertices)
-                rdroid_pHS->free(mesh->vertices);
+                RDROID_FREE(mesh->vertices);
             
             if (mesh->vertexUVs)
-                rdroid_pHS->free(mesh->vertexUVs);
+                RDROID_FREE(mesh->vertexUVs);
             
             if ( mesh->faces )
             {
-                for (int faceIdx = 0; faceIdx < mesh->numFaces; faceIdx++)
+#ifdef RDMODEL3_POOLED_FACE_INDICES
+                // Added: pooled index storage frees as one block (per-face pointers
+                // alias into it; a partially-parsed mesh may hold offsets instead)
+                if (mesh->paFaceIdxPool) {
+                    RDROID_FREE(mesh->paFaceIdxPool);
+                    mesh->paFaceIdxPool = NULL;
+                } else
+#endif
                 {
-                    rdFace_FreeEntry(&mesh->faces[faceIdx]);
+                    for (int faceIdx = 0; faceIdx < mesh->numFaces; faceIdx++)
+                    {
+                        rdFace_FreeEntry(&mesh->faces[faceIdx]);
+                    }
                 }
-                rdroid_pHS->free(mesh->faces);
+                RDROID_FREE(mesh->faces);
             }
             if (mesh->vertices_i)
-                rdroid_pHS->free(mesh->vertices_i);
+                RDROID_FREE(mesh->vertices_i);
             if (mesh->vertices_unk)
-                rdroid_pHS->free(mesh->vertices_unk);
+                RDROID_FREE(mesh->vertices_unk);
             if (mesh->vertexNormals)
-                rdroid_pHS->free(mesh->vertexNormals);
+                RDROID_FREE(mesh->vertexNormals);
         }
         if ( geoset->meshes )
-            rdroid_pHS->free(geoset->meshes);
+            RDROID_FREE(geoset->meshes);
         ++geoset;
     }
 
     if ( model->hierarchyNodes )
-        rdroid_pHS->free(model->hierarchyNodes);
+        RDROID_FREE(model->hierarchyNodes);
 
     if ( model->numMaterials )
     {
@@ -872,7 +939,7 @@ void rdModel3_FreeEntry(rdModel3 *model)
         }
     }
     if (model->materials )
-        rdroid_pHS->free(model->materials);
+        RDROID_FREE(model->materials);
 }
 
 void rdModel3_FreeEntryGeometryOnly(rdModel3 *model)
@@ -888,36 +955,46 @@ void rdModel3_FreeEntryGeometryOnly(rdModel3 *model)
             rdMesh* mesh = &geoset->meshes[meshNum];
             
             if (mesh->vertices)
-                rdroid_pHS->free(mesh->vertices);
+                RDROID_FREE(mesh->vertices);
             
             if (mesh->vertexUVs)
-                rdroid_pHS->free(mesh->vertexUVs);
+                RDROID_FREE(mesh->vertexUVs);
             
             if ( mesh->faces )
             {
-                for (int faceIdx = 0; faceIdx < mesh->numFaces; faceIdx++)
+#ifdef RDMODEL3_POOLED_FACE_INDICES
+                // Added: pooled index storage frees as one block (per-face pointers
+                // alias into it; a partially-parsed mesh may hold offsets instead)
+                if (mesh->paFaceIdxPool) {
+                    RDROID_FREE(mesh->paFaceIdxPool);
+                    mesh->paFaceIdxPool = NULL;
+                } else
+#endif
                 {
-                    rdFace_FreeEntry(&mesh->faces[faceIdx]);
+                    for (int faceIdx = 0; faceIdx < mesh->numFaces; faceIdx++)
+                    {
+                        rdFace_FreeEntry(&mesh->faces[faceIdx]);
+                    }
                 }
-                rdroid_pHS->free(mesh->faces);
+                RDROID_FREE(mesh->faces);
             }
             if (mesh->vertices_i)
-                rdroid_pHS->free(mesh->vertices_i);
+                RDROID_FREE(mesh->vertices_i);
             if (mesh->vertices_unk)
-                rdroid_pHS->free(mesh->vertices_unk);
+                RDROID_FREE(mesh->vertices_unk);
             if (mesh->vertexNormals)
-                rdroid_pHS->free(mesh->vertexNormals);
+                RDROID_FREE(mesh->vertexNormals);
         }
         if ( geoset->meshes )
-            rdroid_pHS->free(geoset->meshes);
+            RDROID_FREE(geoset->meshes);
         ++geoset;
     }
 
     if ( model->hierarchyNodes )
-        rdroid_pHS->free(model->hierarchyNodes);
+        RDROID_FREE(model->hierarchyNodes);
 
     if (model->materials )
-        rdroid_pHS->free(model->materials);
+        RDROID_FREE(model->materials);
 }
 
 #if 0

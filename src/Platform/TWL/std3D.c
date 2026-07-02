@@ -447,9 +447,9 @@ int std3D_Startup()
 void std3D_Shutdown() {
     stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
 
-    pHS->free(i8Bitmap);
+    JK_FREE(i8Bitmap);
     i8Bitmap = NULL;
-    pHS->free(i8Bitmap2);
+    JK_FREE(i8Bitmap2);
     i8Bitmap2 = NULL;
 
     std3D_bMenuBitmapsFreed = 1;
@@ -1516,7 +1516,7 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
         int real_width = width < 8 ? 8 : width;
         int real_height = height < 8 ? 8 : height;
         int sz = std3D_EstimateTWLSize(width_e, height_e, GL_RGB256);
-        image_8bpp = (uint8_t*)pHS->alloc(sz);
+        image_8bpp = (uint8_t*)JK_ALLOC(sz);
         memset(image_8bpp, 0, sz);
         image_upsized = 1;
 
@@ -1669,7 +1669,7 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
     }
 
     if (image_upsized) {
-        pHS->free(image_8bpp);
+        JK_FREE(image_8bpp);
     }
 
     if (!res) {
@@ -1763,10 +1763,10 @@ MATH_FUNC void std3D_DrawMenu()
         std3D_LoadResources();
     }
     if (!i8Bitmap) {
-        i8Bitmap = (u8*)pHS->alloc(256*64);
+        i8Bitmap = (u8*)JK_ALLOC(256*64);
     }
     if (!i8Bitmap2) {
-        i8Bitmap2 = (u8*)pHS->alloc(256*128);
+        i8Bitmap2 = (u8*)JK_ALLOC(256*128);
     }
     if (i8Bitmap || i8Bitmap2) {
         std3D_bMenuBitmapsFreed = 0;

@@ -33,7 +33,7 @@ void sithCogParse_Reset()
 {
     if ( cogparser_nodes_alloc )
     {
-        pSithHS->free(cogparser_nodes_alloc);
+        SITH_FREE(cogparser_nodes_alloc);
         cogparser_num_nodes = 0;
         cogparser_current_nodeidx = 0;
     }
@@ -157,6 +157,12 @@ int sithCogParse_Load(char *cog_fpath, sithCogScript *cogscript, int unk)
             v8 = cogscript->triggers[v6].field_8;
             cogscript->triggers[v6].trigPc = cog_parser_node_stackpos[v8];
         }
+#ifdef COG_SEAL_SYMBOLTABLES
+        // Added: seal the table (free parse-time hashtable, trim buckets); see
+        // engine_config.h. Guarded: an empty table would realloc to 0 bytes.
+        if ( cogscript->pSymbolTable && cogscript->pSymbolTable->entry_cnt )
+            sithCogParse_ReallocSymboltable(cogscript->pSymbolTable);
+#endif
         stdConffile_Close();
         return 1;
     }
@@ -254,7 +260,7 @@ LABEL_16:
                 v6 = v3->parent_loop_depth;
                 if ( v6 )
                     cog_parser_node_stackpos[v6] = cogvm_stackpos;
-                script_program = (int32_t *)pSithHS->alloc(sizeof(int32_t) * cogvm_stackpos + sizeof(int32_t));
+                script_program = (int32_t *)SITH_ALLOC(sizeof(int32_t) * cogvm_stackpos + sizeof(int32_t));
                 script->script_program = script_program;
                 if ( !script_program )
                     goto LABEL_19;
@@ -337,11 +343,11 @@ sithCogSymboltable* sithCogParse_CopySymboltable(sithCogSymboltable *table)
     sithCogSymboltable *result; // eax
 
     entry_cnt = table->entry_cnt;
-    newTable = (sithCogSymboltable *)pSithHS->alloc(sizeof(sithCogSymboltable));
+    newTable = (sithCogSymboltable *)SITH_ALLOC(sizeof(sithCogSymboltable));
     if ( !newTable )
         return 0;
     _memset(newTable, 0, sizeof(sithCogSymboltable));
-    buckets = (sithCogSymbol *)pSithHS->alloc(sizeof(sithCogSymbol) * entry_cnt);
+    buckets = (sithCogSymbol *)SITH_ALLOC(sizeof(sithCogSymbol) * entry_cnt);
     newTable->buckets = buckets;
     if ( !buckets )
         return 0;
@@ -360,10 +366,10 @@ sithCogSymboltable* sithCogParse_NewSymboltable(int amt)
     sithCogSymbol *buckets; // edi
     sithCogSymboltable *result; // eax
 
-    newTable = (sithCogSymboltable *)pSithHS->alloc(sizeof(sithCogSymboltable));
+    newTable = (sithCogSymboltable *)SITH_ALLOC(sizeof(sithCogSymboltable));
     if ( newTable
       && (_memset(newTable, 0, sizeof(sithCogSymboltable)),
-          newTable->buckets = (sithCogSymbol *)pSithHS->alloc(sizeof(sithCogSymbol) * amt),
+          newTable->buckets = (sithCogSymbol *)SITH_ALLOC(sizeof(sithCogSymbol) * amt),
           newHashtable = stdHashTable_New(2 * amt),
           buckets = newTable->buckets,
           newTable->hashtable = newHashtable,
@@ -382,10 +388,10 @@ sithCogSymboltable* sithCogParse_NewSymboltable(int amt)
         if ( newTable )
         {
             if ( newTable->buckets )
-                pSithHS->free(newTable->buckets);
+                SITH_FREE(newTable->buckets);
             if ( newTable->hashtable )
                 stdHashTable_Free(newTable->hashtable);
-            pSithHS->free(newTable);
+            SITH_FREE(newTable);
         }
         result = 0;
     }
@@ -415,7 +421,7 @@ int sithCogParse_ReallocSymboltable(sithCogSymboltable *table)
     amt = table->entry_cnt;
     if ( table->max_entries > amt )
     {
-        reallocBuckets = (sithCogSymbol *)pSithHS->realloc(table->buckets, sizeof(sithCogSymbol) * amt);
+        reallocBuckets = (sithCogSymbol *)SITH_REALLOC(table->buckets, sizeof(sithCogSymbol) * amt);
         // Added: nullptr checks
         if (!reallocBuckets) {
             table->max_entries = 0;
@@ -436,7 +442,7 @@ int sithCogParse_ReallocSymboltable(sithCogSymboltable *table)
         {
             if ( buckets[i].pName )
             {
-                pSithHS->free(buckets[i].pName);
+                SITH_FREE(buckets[i].pName);
                 buckets = table->buckets;
                 table->buckets[i].pName = 0;
             }
@@ -474,7 +480,7 @@ void sithCogParse_FreeSymboltable(sithCogSymboltable *table)
                 {
 #ifndef COG_CRC32_SYMBOL_NAMES
                     if (v1[v3].pName) {
-                        pSithHS->free(v1[v3].pName);
+                        SITH_FREE(v1[v3].pName);
                     }
 #endif
 
@@ -482,7 +488,7 @@ void sithCogParse_FreeSymboltable(sithCogSymboltable *table)
                     if (v1[v3].val.type == COG_VARTYPE_VECTOR)
                     {
                         if (v1[v3].val.dataAsPtrs[0]) {
-                            pSithHS->free((void*)v1[v3].val.dataAsPtrs[0]);
+                            SITH_FREE((void*)v1[v3].val.dataAsPtrs[0]);
                         }
                         v1[v3].val.dataAsPtrs[0] = 0;
                     }
@@ -490,7 +496,7 @@ void sithCogParse_FreeSymboltable(sithCogSymboltable *table)
                     v1 = table->buckets;
                     if (table->buckets[v3].val.type == COG_VARTYPE_STR)
                     {
-                        pSithHS->free(v1[v3].val.dataAsName);
+                        SITH_FREE(v1[v3].val.dataAsName);
                         v1 = table->buckets;
                         table->buckets[v3].val.dataAsName = 0;
                     }
@@ -500,10 +506,10 @@ void sithCogParse_FreeSymboltable(sithCogSymboltable *table)
                 while ( v2 < table->max_entries );
             }
         }
-        pSithHS->free(table->buckets);
+        SITH_FREE(table->buckets);
         table->buckets = 0;
     }
-    pSithHS->free(table);
+    SITH_FREE(table);
 }
 
 sithCogSymbol* sithCogParse_AddSymbol(sithCogSymboltable *table, const char *symbolName)
@@ -515,7 +521,7 @@ sithCogSymbol* sithCogParse_AddSymbol(sithCogSymboltable *table, const char *sym
         if ( symbolName )
         {
 #if !defined(COG_CRC32_SYMBOL_NAMES)
-            char* key = (char *)pSithHS->alloc(_strlen(symbolName) + 1);
+            char* key = (char *)SITH_ALLOC(_strlen(symbolName) + 1);
             _strcpy(key, symbolName);
             symbol->pName = key;
             if ( table->hashtable )
@@ -693,7 +699,7 @@ void sithCogParse_LexAddSymbol(const char *symName)
     if ( symbol )
     {
         symbol->val.type = COG_VARTYPE_STR;
-        symbol->val.dataAsName = (char *)pSithHS->alloc(_strlen(symName) - 1);
+        symbol->val.dataAsName = (char *)SITH_ALLOC(_strlen(symName) - 1);
         _strncpy(symbol->val.dataAsName, symName + 1, _strlen(symName) - 2);
         symbol->val.dataAsName[_strlen(symName) - 2] = 0;
         yylval.as_int = symbol->symbol_id;
@@ -821,7 +827,7 @@ int sithCogParse_ParseSymbol(sithCogScript *cogScript, int a2, int unk)
     symbol->val.dataAsName = 0;
 
 #ifdef COG_DYNAMIC_IDK
-    cogScript->aIdk = (sithCogReference*)pSithHS->realloc(cogScript->aIdk, sizeof(sithCogReference) * (cogScript->numIdk+1));
+    cogScript->aIdk = (sithCogReference*)SITH_REALLOC(cogScript->aIdk, sizeof(sithCogReference) * (cogScript->numIdk+1));
 #endif
     
     cogIdk = &cogScript->aIdk[cogScript->numIdk];
@@ -840,8 +846,8 @@ int sithCogParse_ParseSymbol(sithCogScript *cogScript, int a2, int unk)
         else if ( unk && !_strcmp(arg->key, "desc"))
         {
             if ( cogIdk->desc )
-                pSithHS->free(cogIdk->desc);
-            cogIdk->desc = (char *)pSithHS->alloc(_strlen(arg->value) + 1);
+                SITH_FREE(cogIdk->desc);
+            cogIdk->desc = (char *)SITH_ALLOC(_strlen(arg->value) + 1);
             _strcpy(cogIdk->desc, arg->value);
         }
         else if ( !_strcmp(arg->key, "mask") )
@@ -900,12 +906,12 @@ int sithCogParse_ParseFlex(sithCogScript *cogScript, int a2)
 
         if ( a2 && !_strcmp(arg->key, "desc"))
         {
-            v20 = _strcpy((char *)pSithHS->alloc(_strlen(arg->value) + 1), arg->value);
+            v20 = _strcpy((char *)SITH_ALLOC(_strlen(arg->value) + 1), arg->value);
         }
     }
     
 #ifdef COG_DYNAMIC_IDK
-    cogScript->aIdk = (sithCogReference*)pSithHS->realloc(cogScript->aIdk, sizeof(sithCogReference) * (cogScript->numIdk+1));
+    cogScript->aIdk = (sithCogReference*)SITH_REALLOC(cogScript->aIdk, sizeof(sithCogReference) * (cogScript->numIdk+1));
 #endif
 
     sithCogReference* cogIdk = &cogScript->aIdk[cogScript->numIdk];
@@ -951,12 +957,12 @@ int sithCogParse_ParseInt(sithCogScript *cogScript, int a2)
 
         if ( a2 && !_strcmp(arg->key, "desc"))
         {
-            v20 = _strcpy((char *)pSithHS->alloc(_strlen(arg->value) + 1), arg->value);
+            v20 = _strcpy((char *)SITH_ALLOC(_strlen(arg->value) + 1), arg->value);
         }
     }
     
 #ifdef COG_DYNAMIC_IDK
-    cogScript->aIdk = (sithCogReference*)pSithHS->realloc(cogScript->aIdk, sizeof(sithCogReference) * (cogScript->numIdk+1));
+    cogScript->aIdk = (sithCogReference*)SITH_REALLOC(cogScript->aIdk, sizeof(sithCogReference) * (cogScript->numIdk+1));
 #endif
 
     sithCogReference* cogIdk = &cogScript->aIdk[cogScript->numIdk];
@@ -1002,12 +1008,12 @@ int sithCogParse_ParseVector(sithCogScript *cogScript, int a2)
 
         if ( a2 && !_strcmp(arg->key, "desc"))
         {
-            v20 = _strcpy((char *)pSithHS->alloc(_strlen(arg->value) + 1), arg->value);
+            v20 = _strcpy((char *)SITH_ALLOC(_strlen(arg->value) + 1), arg->value);
         }
     }
 
 #ifdef COG_DYNAMIC_IDK
-    cogScript->aIdk = (sithCogReference*)pSithHS->realloc(cogScript->aIdk, sizeof(sithCogReference) * (cogScript->numIdk+1));
+    cogScript->aIdk = (sithCogReference*)SITH_REALLOC(cogScript->aIdk, sizeof(sithCogReference) * (cogScript->numIdk+1));
 #endif
     
     sithCogReference* cogIdk = &cogScript->aIdk[cogScript->numIdk];
@@ -1035,7 +1041,7 @@ int sithCogParse_ParseMessage(sithCogScript *cogScript)
     //printf("Add message? %x %x %s\n", symbolGet->val.data[0], symbol->field_14, stdConffile_entry.args[1].value);
     
 #ifdef COG_DYNAMIC_TRIGGERS
-    cogScript->triggers = (sithCogTrigger*)pSithHS->realloc(cogScript->triggers, sizeof(sithCogTrigger) * (cogScript->num_triggers+1));
+    cogScript->triggers = (sithCogTrigger*)SITH_REALLOC(cogScript->triggers, sizeof(sithCogTrigger) * (cogScript->num_triggers+1));
 #endif
 
     symbol->val.dataAsName = symbolGet->val.dataAsName;

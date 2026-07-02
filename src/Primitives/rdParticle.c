@@ -22,7 +22,7 @@ rdParticle* rdParticle_New(int numVertices, flex_t size, rdMaterial *material, i
 {
     rdParticle *particle;
 
-    particle = (rdParticle*)rdroid_pHS->alloc(sizeof(rdParticle));
+    particle = (rdParticle*)RDROID_ALLOC(sizeof(rdParticle));
     if (particle)
         rdParticle_NewEntry(particle, numVertices, size, material, lightingMode, allocateVertices);
 
@@ -41,8 +41,8 @@ int rdParticle_NewEntry(rdParticle *particle, int numVertices, flex_t size, rdMa
 
     if (allocateVertices)
     {
-        particle->vertices = (rdVector3 *)rdroid_pHS->alloc(sizeof(rdVector3) * numVertices);
-        particle->vertexCel = (int *)rdroid_pHS->alloc(sizeof(int) * particle->numVertices);
+        particle->vertices = (rdVector3 *)RDROID_ALLOC(sizeof(rdVector3) * numVertices);
+        particle->vertexCel = (int *)RDROID_ALLOC(sizeof(int) * particle->numVertices);
         if (particle->vertices && particle->vertexCel)
         {
             _memset(particle->vertices, 0, sizeof(rdVector3) * particle->numVertices);
@@ -66,7 +66,7 @@ rdParticle* rdParticle_Clone(rdParticle *particle)
 {
     rdParticle *clonedPart; // eax
 
-    clonedPart = (rdParticle*)rdroid_pHS->alloc(sizeof(rdParticle));
+    clonedPart = (rdParticle*)RDROID_ALLOC(sizeof(rdParticle));
     if (clonedPart)
     {
         rdParticle_NewEntry(clonedPart, particle->numVertices, particle->diameter, particle->material, particle->lightingMode, 1);
@@ -84,7 +84,7 @@ void rdParticle_Free(rdParticle *particle)
 
     rdParticle_FreeEntry(particle);
     
-    rdroid_pHS->free(particle);
+    RDROID_FREE(particle);
 }
 
 void rdParticle_FreeEntry(rdParticle *particle)
@@ -93,8 +93,8 @@ void rdParticle_FreeEntry(rdParticle *particle)
     {
         if (!particle->vertices)
             return;
-        rdroid_pHS->free(particle->vertices);
-        rdroid_pHS->free(particle->vertexCel);
+        RDROID_FREE(particle->vertices);
+        RDROID_FREE(particle->vertexCel);
     }
     particle->vertices = NULL;
     particle->vertexCel = NULL;
@@ -107,7 +107,7 @@ rdParticle* rdParticle_Load(char *path)
     if (rdParticle_loader)
         return (rdParticle*)rdParticle_loader(path);
 
-    particle = (rdParticle*)rdroid_pHS->alloc(sizeof(rdParticle));
+    particle = (rdParticle*)RDROID_ALLOC(sizeof(rdParticle));
     if (!particle)
         return NULL;
 
@@ -208,9 +208,9 @@ int rdParticle_LoadEntry(char *fpath, rdParticle *pParticle)
       && numVertices <= 0x100 )
     {
         pParticle->numVertices = numVertices;
-        v13 = (rdVector3 *)rdroid_pHS->alloc(sizeof(rdVector3) * numVertices);
+        v13 = (rdVector3 *)RDROID_ALLOC(sizeof(rdVector3) * numVertices);
         pParticle->vertices = v13;
-        pParticle->vertexCel = (int*)rdroid_pHS->alloc(sizeof(int) * numVertices);
+        pParticle->vertexCel = (int*)RDROID_ALLOC(sizeof(int) * numVertices);
         v16 = pParticle->vertices;
         if ( v16 && pParticle->vertexCel)
         {

@@ -1,5 +1,7 @@
 #include "rdLight.h"
 
+#include "stdPlatform.h" // Added: *_ALLOC/*_FREE macros
+
 #include "jk.h"
 
 #include "Primitives/rdMath.h"
@@ -10,7 +12,7 @@ rdLight *rdLight_New()
 {
     rdLight *light;
 
-    light = (rdLight*)rdroid_pHS->alloc(sizeof(rdLight));
+    light = (rdLight*)RDROID_ALLOC(sizeof(rdLight));
     if (!light)
     return 0;
 
@@ -43,7 +45,7 @@ int rdLight_NewEntry(rdLight *light)
 void rdLight_Free(rdLight *light)
 {
     if (light)
-        rdroid_pHS->free(light);
+        RDROID_FREE(light);
 }
 
 void rdLight_FreeEntry(rdLight *light)

@@ -76,7 +76,7 @@ stdHashTable* stdHashTable_New(int maxEntries)
     int actualNumBuckets = 1999;
     signed int v7;
 
-    hashtable = (stdHashTable *)std_pHS->alloc(sizeof(stdHashTable));
+    hashtable = (stdHashTable *)STD_ALLOC(sizeof(stdHashTable));
     if (!hashtable)
         return NULL;
 
@@ -135,7 +135,7 @@ loop_escape:
     }
 
     hashtable->numBuckets = actualNumBuckets;
-    hashtable->buckets = (tHashLink *)std_pHS->alloc(sizeof(tHashLink) * actualNumBuckets);
+    hashtable->buckets = (tHashLink *)STD_ALLOC(sizeof(tHashLink) * actualNumBuckets);
     if ( hashtable->buckets )
     {
       _memset(hashtable->buckets, 0, sizeof(tHashLink) * hashtable->numBuckets);
@@ -143,7 +143,7 @@ loop_escape:
     }
     else {
         // Added: fail more gracefully and without memleaks
-        std_pHS->free(hashtable);
+        STD_FREE(hashtable);
         return NULL;
     }
     return hashtable;
@@ -173,7 +173,7 @@ void stdHashTable_FreeBuckets(tHashLink *a1)
         iter->next = NULL; // added
 
         //printf("Free from %p: %p\n", a1, iter);
-        std_pHS->free(iter);
+        STD_FREE(iter);
         
         iter = next_iter;
     }
@@ -202,10 +202,10 @@ void stdHashTable_Free(stdHashTable *table)
         }
         while ( bucketIdx < table->numBuckets );
     }
-    std_pHS->free(table->buckets);
+    STD_FREE(table->buckets);
     table->buckets = NULL; // added
     
-    std_pHS->free(table);
+    STD_FREE(table);
 }
 
 int stdHashTable_SetKeyVal(stdHashTable *hashmap, const char *key, void *value)
@@ -231,7 +231,7 @@ int stdHashTable_SetKeyVal(stdHashTable *hashmap, const char *key, void *value)
 
     if ( v10->key )
     {
-        new_child = (tHashLink *)std_pHS->alloc(sizeof(tHashLink));
+        new_child = (tHashLink *)STD_ALLOC(sizeof(tHashLink));
         if (!new_child)
             return 0;
         //printf("Alloc to %p: %p %s\n", v9, new_child, key);
@@ -373,7 +373,7 @@ int stdHashTable_FreeKey(stdHashTable *hashtable, const char *key)
 #else
             stdLinklist_InsertReplace(pNext, bucketTopKey);
 #endif
-            std_pHS->free(pNext);
+            STD_FREE(pNext);
         }
         else
         {
@@ -396,7 +396,7 @@ int stdHashTable_FreeKey(stdHashTable *hashtable, const char *key)
 #else
         stdLinklist_UnlinkChild(foundKey); // Added: Moved to prevent freeing issues
 #endif
-        std_pHS->free(foundKey);
+        STD_FREE(foundKey);
     }
     return 1;
 }
@@ -447,7 +447,7 @@ int stdHashTable_FreeKeyCrc32(stdHashTable *hashtable, uint32_t keyCrc32)
 #else
             stdLinklist_InsertReplace(pNext, bucketTopKey);
 #endif
-            std_pHS->free(pNext);
+            STD_FREE(pNext);
         }
         else
         {
@@ -466,7 +466,7 @@ int stdHashTable_FreeKeyCrc32(stdHashTable *hashtable, uint32_t keyCrc32)
 #else
         stdLinklist_UnlinkChild(foundKey); // Added: Moved to prevent freeing issues
 #endif
-        std_pHS->free(foundKey);
+        STD_FREE(foundKey);
     }
     return 1;
 }

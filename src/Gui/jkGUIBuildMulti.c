@@ -289,7 +289,7 @@ rdModel3* jkGuiBuildMulti_ModelLoader(const char *pCharFpath, int unused)
     char fpath[128]; // [esp+4h] [ebp-80h] BYREF
 
     __snprintf(fpath, 128, "%s%c%s", "3do", '\\', pCharFpath); // ADDED: sprintf -> snprintf
-    pModel = (rdModel3 *)pHS->alloc(sizeof(rdModel3));
+    pModel = (rdModel3 *)JK_ALLOC(sizeof(rdModel3));
     memset(pModel, 0, sizeof(rdModel3));
     return rdModel3_Load(fpath, pModel) != 0 ? pModel : NULL;
 }
@@ -299,7 +299,7 @@ rdMaterial* jkGuiBuildMulti_MatLoader(const char *pMatFname, int a, int b)
     rdMaterial *pMaterial; // esi
     char mat_fpath[128]; // [esp+8h] [ebp-80h] BYREF
 
-    pMaterial = (rdMaterial *)pHS->alloc(sizeof(rdMaterial));
+    pMaterial = (rdMaterial *)JK_ALLOC(sizeof(rdMaterial));
     memset(pMaterial, 0, sizeof(rdMaterial));
     _sprintf(mat_fpath, "3do%cmat%c%s", '\\', '\\', pMatFname);
     if ( !rdMaterial_LoadEntry(mat_fpath, pMaterial, 0, 0) )
@@ -316,7 +316,7 @@ rdKeyframe* jkGuiBuildMulti_KeyframeLoader(const char *pKeyframeFname)
     rdKeyframe *pKeyframe; // esi
     char key_fpath[128]; // [esp+4h] [ebp-80h] BYREF
 
-    pKeyframe = (rdKeyframe *)pHS->alloc(sizeof(rdKeyframe));
+    pKeyframe = (rdKeyframe *)JK_ALLOC(sizeof(rdKeyframe));
     memset(pKeyframe, 0, sizeof(rdKeyframe));
     _sprintf(key_fpath, "3do%ckey%c%s", '\\', '\\', pKeyframeFname);
     rdKeyframe_LoadEntry(key_fpath, pKeyframe);
@@ -450,9 +450,9 @@ int jkGuiBuildMulti_ShowEditCharacter(BOOL bIdk)
         stdConffile_ReadLine();
         if ( _sscanf(stdConffile_aLine, "numsabers: %d", &jkGuiBuildMulti_numSabers) == 1 )
         {
-            jkGame_aSabers = (jkSaberInfo *)pHS->alloc(sizeof(jkSaberInfo) * jkGuiBuildMulti_numSabers);
+            jkGame_aSabers = (jkSaberInfo *)JK_ALLOC(sizeof(jkSaberInfo) * jkGuiBuildMulti_numSabers);
             memset(jkGame_aSabers, 0, sizeof(jkSaberInfo) * jkGuiBuildMulti_numSabers);
-            for ( jkGuiBuildMulti_apSaberBitmaps = (stdBitmap **)pHS->alloc(sizeof(stdBitmap*) * jkGuiBuildMulti_numSabers);
+            for ( jkGuiBuildMulti_apSaberBitmaps = (stdBitmap **)JK_ALLOC(sizeof(stdBitmap*) * jkGuiBuildMulti_numSabers);
                   stdConffile_ReadLine();
                   jkGuiBuildMulti_apSaberBitmaps[idx] = v7 )
             {
@@ -510,7 +510,7 @@ LABEL_16:
         stdConffile_ReadLine();
         if ( _sscanf(stdConffile_aLine, "nummodels: %d", &jkGuiBuildMulti_numModels) == 1 )
         {
-            jkGuiBuildMulti_aModels = (jkMultiModelInfo *)pHS->alloc(jkGuiBuildMulti_numModels * sizeof(jkMultiModelInfo));
+            jkGuiBuildMulti_aModels = (jkMultiModelInfo *)JK_ALLOC(jkGuiBuildMulti_numModels * sizeof(jkMultiModelInfo));
             memset(jkGuiBuildMulti_aModels, 0, jkGuiBuildMulti_numModels * sizeof(jkMultiModelInfo));
             while ( stdConffile_ReadLine() )
             {
@@ -606,16 +606,16 @@ LABEL_32:
 
     jkGuiBuildMulti_bSabersLoaded = 0;
     if ( jkGuiBuildMulti_aModels )
-        pHS->free(jkGuiBuildMulti_aModels);
+        JK_FREE(jkGuiBuildMulti_aModels);
     jkGuiBuildMulti_bEditShowing = 0;
     if ( jkGame_aSabers )
-        pHS->free(jkGame_aSabers);
+        JK_FREE(jkGame_aSabers);
     for ( i = 0; i < jkGuiBuildMulti_numSabers; ++i ) {
         stdBitmap_Free(jkGuiBuildMulti_apSaberBitmaps[i]);
         jkGuiBuildMulti_apSaberBitmaps[i] = NULL; // Added
     }
     if ( jkGuiBuildMulti_apSaberBitmaps ) {
-        pHS->free(jkGuiBuildMulti_apSaberBitmaps);
+        JK_FREE(jkGuiBuildMulti_apSaberBitmaps);
         jkGuiBuildMulti_apSaberBitmaps = NULL; // Added
     }
     jkGui_SetModeGame();

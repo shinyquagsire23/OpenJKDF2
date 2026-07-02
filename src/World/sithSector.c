@@ -1,5 +1,7 @@
 #include "sithSector.h"
 
+#include "stdPlatform.h" // Added: *_ALLOC/*_FREE macros
+
 #include "General/stdMath.h"
 #include "Primitives/rdMath.h"
 #include "Raster/rdFace.h"
@@ -58,7 +60,7 @@ int sithSector_Load(sithWorld *world, int tmp)
     int prevSuggest = pSithHS->suggestHeap(HEAP_FAST);
 #endif
     alloc_size = sizeof(sithSector) * sectors_amt;
-    world->sectors = (sithSector *)pSithHS->alloc(sizeof(sithSector) * sectors_amt);
+    world->sectors = (sithSector *)SITH_ALLOC(sizeof(sithSector) * sectors_amt);
 #ifdef STDPLATFORM_HEAP_SUGGESTIONS
     pSithHS->suggestHeap(prevSuggest);
 #endif
@@ -174,7 +176,7 @@ int sithSector_Load(sithWorld *world, int tmp)
                 break;
             if ( _sscanf(stdConffile_aLine, " vertices %d", &num_vertices) != 1 )
                 break;
-            sectors->verticeIdxs = (int32_t *)pSithHS->alloc(sizeof(int32_t) * num_vertices);
+            sectors->verticeIdxs = (int32_t *)SITH_ALLOC(sizeof(int32_t) * num_vertices);
             if ( !sectors->verticeIdxs )
                 break;
 
@@ -242,7 +244,7 @@ int sithSector_GetThingsCount(sithSector *sector)
 
 int sithSector_New(sithWorld *world, int num)
 {
-    sithSector *sectors = (sithSector *)pSithHS->alloc(num * sizeof(sithSector));
+    sithSector *sectors = (sithSector *)SITH_ALLOC(num * sizeof(sithSector));
     world->sectors = sectors;
     if ( !sectors )
         return 0;
@@ -271,9 +273,9 @@ void sithSector_Free(sithWorld *world)
     for (uint32_t i = 0; i < world->numSectors; i++)
     {
         if ( world->sectors[i].verticeIdxs )
-            pSithHS->free(world->sectors[i].verticeIdxs);
+            SITH_FREE(world->sectors[i].verticeIdxs);
     }
-    pSithHS->free(world->sectors);
+    SITH_FREE(world->sectors);
     world->sectors = 0;
     world->numSectors = 0;
 }

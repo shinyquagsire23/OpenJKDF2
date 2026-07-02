@@ -54,7 +54,7 @@ stdMemoryAlloc* stdMemory_BlockAlloc(unsigned int allocSize, char *filePath, int
     stdMemoryAlloc *v4; // edx
     stdMemoryAlloc *v5; // ecx
 
-    result = (stdMemoryAlloc *)std_pHS->alloc(allocSize + 0x24);
+    result = (stdMemoryAlloc *)STD_ALLOC(allocSize + 0x24);
     v4 = result;
     if ( result )
     {
@@ -100,7 +100,7 @@ void stdMemory_BlockFree(stdMemoryAlloc *alloc)
     v1->next->prev = v2;
     stdMemory_info.allocCur = v3 - v1->size;
     stdMemory_info.nextNum = v4 - 1;
-    std_pHS->free(v1);
+    STD_FREE(v1);
 }
 
 stdMemoryAlloc* stdMemory_BlockRealloc(stdMemoryAlloc *alloc, int allocSize, char *filePath, int lineNum)
@@ -120,7 +120,7 @@ stdMemoryAlloc* stdMemory_BlockRealloc(stdMemoryAlloc *alloc, int allocSize, cha
     if ( allocSize )
     {
         v9 = alloc[-1].size;
-        result = (stdMemoryAlloc *)std_pHS->realloc(&alloc[-1], allocSize + 0x24);
+        result = (stdMemoryAlloc *)STD_REALLOC(&alloc[-1], allocSize + 0x24);
         if ( result )
         {
             result->filePath = filePath;
@@ -154,7 +154,7 @@ stdMemoryAlloc* stdMemory_BlockRealloc(stdMemoryAlloc *alloc, int allocSize, cha
         v5->next->prev = v6;
         stdMemory_info.allocCur = v7 - v5->size;
         stdMemory_info.nextNum = v8 - 1;
-        std_pHS->free(v5);
+        STD_FREE(v5);
         result = 0;
     }
     return result;

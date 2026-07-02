@@ -131,12 +131,12 @@ int sithGamesave_LoadEntry(char *fpath)
     if ( jkEpisode_Load(&jkGui_episodeLoad) )
     {
         if (jkEpisode_mLoad.paEntries) {
-            pHS->free(jkEpisode_mLoad.paEntries);
+            JK_FREE(jkEpisode_mLoad.paEntries);
             jkEpisode_mLoad.paEntries = NULL;
         }
         jkEpisode_mLoad = jkGui_episodeLoad;
         size_t aEnts_size = (jkEpisode_mLoad.numSeq + 1) * sizeof(jkEpisodeEntry);
-        jkEpisode_mLoad.paEntries = (jkEpisodeEntry *)pHS->alloc(aEnts_size);
+        jkEpisode_mLoad.paEntries = (jkEpisodeEntry *)JK_ALLOC(aEnts_size);
         memcpy(jkEpisode_mLoad.paEntries, jkGui_episodeLoad.paEntries, aEnts_size);
 
         jkEpisode_mLoad.currentEpisodeEntryIdx = backup_episodeIdx;

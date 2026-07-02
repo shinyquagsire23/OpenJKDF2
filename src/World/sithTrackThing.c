@@ -323,7 +323,7 @@ int sithTrackThing_LoadPathParams(stdConffileArg *arg, sithThing *thing, int par
             }
 
             size_t alloc_sz = sizeof(sithThingFrame) * numFrames;
-            thing->trackParams.aFrames = (sithThingFrame*)pSithHS->alloc(alloc_sz);
+            thing->trackParams.aFrames = (sithThingFrame*)SITH_ALLOC(alloc_sz);
             if ( thing->trackParams.aFrames )
             {
                 _memset(thing->trackParams.aFrames, 0, alloc_sz);
@@ -357,7 +357,7 @@ void sithTrackThing_idkpathmove(sithThing *thing, sithThing *thing2, rdVector3 *
     sithThingFrame *v9; // esi
     rdVector3 a1a; // [esp+10h] [ebp-Ch] BYREF
 
-    thing->trackParams.aFrames = (sithThingFrame *)pSithHS->alloc(sizeof(sithThingFrame) * thing2->trackParams.sizeFrames);
+    thing->trackParams.aFrames = (sithThingFrame *)SITH_ALLOC(sizeof(sithThingFrame) * thing2->trackParams.sizeFrames);
     _memcpy(thing->trackParams.aFrames, thing2->trackParams.aFrames, sizeof(sithThingFrame) * thing2->trackParams.sizeFrames);
     thing->trackParams.sizeFrames = thing2->trackParams.sizeFrames;
     thing->trackParams.loadedFrames = thing2->trackParams.loadedFrames;

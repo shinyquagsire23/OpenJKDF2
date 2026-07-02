@@ -27,6 +27,11 @@
 [[[cog
     import cog
 
+    # Added: globals shadowed by lazily-allocated heap buffers on some platforms
+    # (see engine_config.h). Their definition and reset-memset are wrapped in
+    # #ifndef <define> so --gc-sections can strip the unused .bss array.
+    heap_shadowed = { "sithComm_MsgTmpBuf": "SITHCOMM_HEAP_MSGBUF" }
+
     addrs = []
 
     f = open(symbols_fpath, "r")
@@ -84,7 +89,12 @@
             c_type = s[0]
             c_type_post = "[" + s[1] 
         
-        cog.outl("%s %s%s MAYBE_UNUSED = %s;" % (c_type, name, c_type_post, c_val))
+        if name in heap_shadowed:
+            cog.outl("#ifndef %s // Added: heap-shadowed on some platforms" % heap_shadowed[name])
+            cog.outl("%s %s%s MAYBE_UNUSED = %s;" % (c_type, name, c_type_post, c_val))
+            cog.outl("#endif")
+        else:
+            cog.outl("%s %s%s MAYBE_UNUSED = %s;" % (c_type, name, c_type_post, c_val))
 
 ]]]
 [[[end]]]
@@ -95,6 +105,8 @@ void OpenJKDF2_Globals_Reset()
 // Vars
 [[[cog
     import cog
+
+    heap_shadowed = { "sithComm_MsgTmpBuf": "SITHCOMM_HEAP_MSGBUF" } # Added: keep in sync with above
 
     addrs = []
 
@@ -157,7 +169,13 @@ void OpenJKDF2_Globals_Reset()
             c_type = s[0]
             c_type_post = "[" + s[1] 
         
-        if "NO_REINIT" in c_type or "NO_REINIT" in c_type_post:
+        if name in heap_shadowed:
+            # Added: heap-shadowed globals have no .bss array to reset (the module
+            # owning the shadow resets/frees it itself)
+            cog.outl("#ifndef %s" % heap_shadowed[name])
+            cog.outl("_memset_inline(&%s, 0, sizeof(%s));" % (name, name))
+            cog.outl("#endif")
+        elif "NO_REINIT" in c_type or "NO_REINIT" in c_type_post:
             cog.outl("// NO_REINIT for %s" % (name))
         elif c_val == "NULL" or c_val == "0" or c_val == "0.0f" or c_type_is_int_like:
             cog.outl("%s = %s;" % (name, c_val))

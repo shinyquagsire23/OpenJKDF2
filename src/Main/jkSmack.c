@@ -29,7 +29,7 @@ void jkSmack_Shutdown()
     jkSmack_bInit = 0;
     if ( jkEpisode_mLoad.paEntries )
     {
-        pHS->free(jkEpisode_mLoad.paEntries);
+        JK_FREE(jkEpisode_mLoad.paEntries);
         jkEpisode_mLoad.paEntries = 0;
 
         // Added: prevent UAF

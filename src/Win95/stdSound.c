@@ -159,7 +159,7 @@ void stdSound_SetMenuVolume(flex_t a1)
 
 stdSound_buffer_t* stdSound_BufferCreate(int bStereo, uint32_t nSamplesPerSec, uint16_t bitsPerSample, int bufferLen)
 {
-    stdSound_buffer_t* out = (stdSound_buffer_t*)std_pHS->alloc(sizeof(stdSound_buffer_t));
+    stdSound_buffer_t* out = (stdSound_buffer_t*)STD_ALLOC(sizeof(stdSound_buffer_t));
     if (!out)
         return NULL;
     
@@ -230,9 +230,9 @@ void* stdSound_BufferSetData(stdSound_buffer_t* sound, int bufferBytes, int32_t*
         *bufferMaxSize = bufferBytes;
     
     if (sound->data && !sound->bIsCopy)
-        std_pHS->free(sound->data);
+        STD_FREE(sound->data);
 
-    sound->data = std_pHS->alloc(bufferBytes);
+    sound->data = STD_ALLOC(bufferBytes);
     sound->bufferBytes = bufferBytes;
     
     _memset(sound->data, 0, sound->bufferBytes);
@@ -250,7 +250,7 @@ int stdSound_BufferUnlock(stdSound_buffer_t* sound, void* buffer, int bufferRead
     
     if (sound->format == AL_FORMAT_STEREO24 || sound->format == AL_FORMAT_MONO24)
     {
-        void* tmp = std_pHS->alloc(sound->bufferBytes);
+        void* tmp = STD_ALLOC(sound->bufferBytes);
         memcpy(tmp, sound->data, sound->bufferBytes);
         memset(sound->data, 0, sound->bufferBytes);
 
@@ -440,10 +440,10 @@ end:
 	sound->buffer = 0;
 	
 	if (sound->data && !sound->bIsCopy)
-	    std_pHS->free(sound->data);
+	    STD_FREE(sound->data);
 
     memset(sound, 0, sizeof(*sound));
-	std_pHS->free(sound);
+	STD_FREE(sound);
 }
 
 int stdSound_BufferReset(stdSound_buffer_t* sound)
@@ -491,7 +491,7 @@ void stdSound_BufferSetFrequency(stdSound_buffer_t* sound, int freq)
 stdSound_buffer_t* stdSound_BufferDuplicate(stdSound_buffer_t* sound)
 {
 #if 1
-    stdSound_buffer_t* out = (stdSound_buffer_t*)std_pHS->alloc(sizeof(stdSound_buffer_t));
+    stdSound_buffer_t* out = (stdSound_buffer_t*)STD_ALLOC(sizeof(stdSound_buffer_t));
     if (!out)
         return NULL;
     
@@ -673,7 +673,7 @@ void stdSound_SetMenuVolume(flex_t a1)
 
 stdSound_buffer_t* stdSound_BufferCreate(int bStereo, uint32_t nSamplesPerSec, uint16_t bitsPerSample, int bufferLen)
 {
-    stdSound_buffer_t* out = (stdSound_buffer_t*)std_pHS->alloc(sizeof(stdSound_buffer_t));
+    stdSound_buffer_t* out = (stdSound_buffer_t*)STD_ALLOC(sizeof(stdSound_buffer_t));
     if (!out)
         return NULL;
     
@@ -701,10 +701,10 @@ void* stdSound_BufferSetData(stdSound_buffer_t* sound, int bufferBytes, int32_t*
         *bufferMaxSize = bufferBytes;
     
     if (sound->data && !sound->bIsCopy)
-        std_pHS->free(sound->data);
+        STD_FREE(sound->data);
 
     
-    sound->data = std_pHS->alloc(bufferBytes);
+    sound->data = STD_ALLOC(bufferBytes);
     sound->bufferBytes = bufferBytes;
     
     _memset(sound->data, 0, sound->bufferBytes);
@@ -730,10 +730,10 @@ int stdSound_BufferQueueAfterAnother(stdSound_buffer_t* bufPrev, stdSound_buffer
 void stdSound_BufferRelease(stdSound_buffer_t* sound)
 {	
 	if (sound->data && !sound->bIsCopy)
-	    std_pHS->free(sound->data);
+	    STD_FREE(sound->data);
 
     memset(sound, 0, sizeof(*sound));
-    std_pHS->free(sound);
+    STD_FREE(sound);
 }
 
 int stdSound_BufferReset(stdSound_buffer_t* sound)
@@ -753,7 +753,7 @@ void stdSound_BufferSetFrequency(stdSound_buffer_t* sound, int freq)
 
 stdSound_buffer_t* stdSound_BufferDuplicate(stdSound_buffer_t* sound)
 {
-    stdSound_buffer_t* out = (stdSound_buffer_t*)std_pHS->alloc(sizeof(stdSound_buffer_t));
+    stdSound_buffer_t* out = (stdSound_buffer_t*)STD_ALLOC(sizeof(stdSound_buffer_t));
     if (!out)
         return NULL;
     

@@ -288,7 +288,7 @@ int jkEpisode_Load(jkEpisodeLoad *a1)
 
     // Added: memleak
     if (a1->paEntries) {
-        pHS->free(a1->paEntries);
+        JK_FREE(a1->paEntries);
     }
 
     a1->paEntries = 0;
@@ -376,7 +376,7 @@ LABEL_47:
     }
     aEnts_size = (numSeq + 1) * sizeof(jkEpisodeEntry);
 
-    aEnts = (jkEpisodeEntry *)pHS->alloc(aEnts_size);
+    aEnts = (jkEpisodeEntry *)JK_ALLOC(aEnts_size);
     a1->paEntries = aEnts;
     if ( !aEnts )
         Windows_GameErrorMsgbox("ERR_OUT_OF_MEMORY");

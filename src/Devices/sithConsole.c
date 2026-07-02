@@ -14,7 +14,7 @@ int sithConsole_Startup(int maxCmds)
     stdHashTable *v1; // eax
     signed int result; // eax
 
-    sithConsole_aCmds = (stdDebugConsoleCmd *)pSithHS->alloc(sizeof(stdDebugConsoleCmd) * maxCmds);
+    sithConsole_aCmds = (stdDebugConsoleCmd *)SITH_ALLOC(sizeof(stdDebugConsoleCmd) * maxCmds);
     v1 = stdHashTable_New(2 * maxCmds);
     sithConsole_pCmdHashtable = v1;
     if ( sithConsole_aCmds )
@@ -35,7 +35,7 @@ int sithConsole_Startup(int maxCmds)
         }
         if ( sithConsole_aCmds )
         {
-            pSithHS->free(sithConsole_aCmds);
+            SITH_FREE(sithConsole_aCmds);
             v1 = sithConsole_pCmdHashtable;
             sithConsole_aCmds = 0;
         }
@@ -53,7 +53,7 @@ void sithConsole_Shutdown()
 {
     if ( sithConsole_aCmds )
     {
-        pSithHS->free((void *)sithConsole_aCmds);
+        SITH_FREE((void *)sithConsole_aCmds);
         sithConsole_aCmds = 0;
     }
     if ( sithConsole_pCmdHashtable )

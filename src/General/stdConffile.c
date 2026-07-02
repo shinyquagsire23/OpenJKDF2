@@ -78,7 +78,7 @@ int stdConffile_OpenModeCommon(char *fpath, const char* mode, BOOL bBypassGobs)
             goto fail_open;
     }
 
-    stdConffile_aLine = (char*)std_pHS->alloc(STDCONF_LINEBUFFER_LEN);
+    stdConffile_aLine = (char*)STD_ALLOC(STDCONF_LINEBUFFER_LEN);
     stdString_SafeStrCopy(stdConffile_pFilename, fpath, 128);
     stdConffile_linenum = 0;
     stdConffile_bOpen = 1;
@@ -140,7 +140,7 @@ void stdConffile_Close()
     }
 
     openFile = 0;
-    std_pHS->free(stdConffile_aLine);
+    STD_FREE(stdConffile_aLine);
     
     if (!stackLevel)
     {

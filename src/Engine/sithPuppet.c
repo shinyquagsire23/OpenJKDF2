@@ -114,7 +114,7 @@ sithPuppet* sithPuppet_NewEntry(sithThing *thing)
     sithSector *sector; // eax
     sithPuppet *result; // eax
 
-    v1 = (sithPuppet *)pSithHS->alloc(sizeof(sithPuppet));
+    v1 = (sithPuppet *)SITH_ALLOC(sizeof(sithPuppet));
     thing->puppet = v1;
     if ( !v1 ) {
         thing->animclass = 0;
@@ -145,7 +145,7 @@ void sithPuppet_FreeEntry(sithThing *puppet)
 {
     if ( puppet->puppet )
     {
-        pSithHS->free(puppet->puppet);
+        SITH_FREE(puppet->puppet);
         puppet->puppet = 0;
     }
 }

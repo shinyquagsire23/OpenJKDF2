@@ -86,6 +86,25 @@ void sithComm_Shutdown()
     sithComm_version = 6;
 }
 
+#ifdef SITHCOMM_HEAP_MSGBUF
+// Added: shadow the generated 66KB .bss retry buffer with a lazily-allocated
+// heap buffer (multiplayer-only; see engine_config.h). The generated array
+// becomes unreferenced and --gc-sections strips it.
+static sithCogMsg* sithComm_pMsgTmpBufHeap = NULL;
+#define sithComm_MsgTmpBuf sithComm_pMsgTmpBufHeap
+static int sithComm_EnsureMsgTmpBuf(void)
+{
+    if (!sithComm_pMsgTmpBufHeap)
+    {
+        // On DC an OOM here purges the material cache and retries internally.
+        sithComm_pMsgTmpBufHeap = (sithCogMsg*)SITH_ALLOC(32 * sizeof(sithCogMsg));
+        if (sithComm_pMsgTmpBufHeap)
+            _memset(sithComm_pMsgTmpBufHeap, 0, 32 * sizeof(sithCogMsg));
+    }
+    return sithComm_pMsgTmpBufHeap != NULL;
+}
+#endif
+
 void sithComm_SetMsgFunc(int msgid, cogMsg_Handler func)
 {
     sithComm_msgFuncs[msgid] = func;
@@ -136,7 +155,12 @@ int sithComm_SendMsgToPlayer(sithCogMsg *msg, int a2, int mpFlags, int a4)
             }
             if ( !msg->netMsg.field_14 )
                 goto LABEL_35;
-            
+#ifdef SITHCOMM_HEAP_MSGBUF
+            // Added: first reliable send allocates the retry buffer; if that
+            // somehow fails, degrade to an untracked (unreliable) send.
+            if ( !sithComm_EnsureMsgTmpBuf() )
+                goto LABEL_35;
+#endif
             for (idx = 0; idx < 32; idx++)
             {
                 v14 = &sithComm_MsgTmpBuf[idx];
@@ -307,6 +331,10 @@ int sithComm_InvokeMsgByIdx(sithCogMsg *a1)
 
 void sithComm_SyncWithPlayers()
 {
+#ifdef SITHCOMM_HEAP_MSGBUF
+    if ( !sithComm_MsgTmpBuf ) // Added: nothing buffered yet
+        return;
+#endif
     if ( sithComm_idk2 )
     {
         
@@ -343,7 +371,16 @@ void sithComm_SyncWithPlayers()
 
 void sithComm_ClearMsgTmpBuf()
 {
+#ifdef SITHCOMM_HEAP_MSGBUF
+    // Added: called at MP session teardown -- give the 66KB back to the heap.
+    if ( sithComm_MsgTmpBuf )
+    {
+        SITH_FREE(sithComm_MsgTmpBuf);
+        sithComm_MsgTmpBuf = NULL;
+    }
+#else
     _memset(sithComm_MsgTmpBuf, 0, sizeof(sithComm_MsgTmpBuf));
+#endif
     sithComm_idk2 = 0;
 }
 
@@ -359,7 +396,10 @@ int sithComm_cogMsg_Reset(sithCogMsg *msg)
     v1 = NETMSG_POPS16();
     playerIdx = sithPlayer_ThingIdxToPlayerIdx(msg->netMsg.thingIdx);
     foundIdx = 0;
-    
+#ifdef SITHCOMM_HEAP_MSGBUF
+    if ( !sithComm_MsgTmpBuf ) // Added: no tracked messages to ack
+        return 1;
+#endif
     for (foundIdx = 0; foundIdx < 32; foundIdx++)
     {
         if (sithComm_MsgTmpBuf[foundIdx].netMsg.msgId == v1 )

@@ -939,10 +939,10 @@ void sithCogFunction_HeapNew(sithCog *ctx)
         oldHeap = ctx->heap;
         if ( oldHeap )
         {
-            pSithHS->free(oldHeap);
+            SITH_FREE(oldHeap);
             ctx->numHeapVars = 0;
         }
-        newHeap = (sithCogStackvar *)pSithHS->alloc(sizeof(sithCogStackvar) * numHeapVars);
+        newHeap = (sithCogStackvar *)SITH_ALLOC(sizeof(sithCogStackvar) * numHeapVars);
         ctx->heap = newHeap;
         _memset(newHeap, 0, (sizeof(sithCogStackvar) * numHeapVars));
         ctx->numHeapVars = numHeapVars;
@@ -984,7 +984,7 @@ void sithCogFunction_HeapFree(sithCog *ctx)
 {
     if ( ctx->heap )
     {
-        pSithHS->free(ctx->heap);
+        SITH_FREE(ctx->heap);
         ctx->numHeapVars = 0;
     }
 }

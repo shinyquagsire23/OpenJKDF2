@@ -251,8 +251,8 @@ void jkGuiMods_Show()
     v7 = 0;
     for ( i = (jkGuiModsElement_t *)jkGuiRend_GetId(&darray, 0); i; i = (jkGuiModsElement_t *)jkGuiRend_GetId(&darray, v7) )
     {
-        pHS->free((void*)i->paPath);
-        pHS->free(i);
+        JK_FREE((void*)i->paPath);
+        JK_FREE(i);
         ++v7;
     }
     jkGuiRend_DarrayFree(&darray);
@@ -262,20 +262,20 @@ void jkGuiMods_AddEntry(Darray *pListDisplayed, int type, const char* paVal, con
 {
     size_t alloc_sz = (_strlen(paDisplayed) + 1) * sizeof(wchar_t);
 
-    wchar_t* out = (wchar_t *)pHS->alloc(alloc_sz);
+    wchar_t* out = (wchar_t *)JK_ALLOC(alloc_sz);
     memset(out, 0, alloc_sz);
 
-    jkGuiModsElement_t* pListElement = (jkGuiModsElement_t*)pHS->alloc(sizeof(jkGuiModsElement_t));
+    jkGuiModsElement_t* pListElement = (jkGuiModsElement_t*)JK_ALLOC(sizeof(jkGuiModsElement_t));
     memset(pListElement, 0, sizeof(jkGuiModsElement_t));
     
-    char* paValNew = (char*)pHS->alloc(_strlen(paVal) + 1);
+    char* paValNew = (char*)JK_ALLOC(_strlen(paVal) + 1);
     stdString_SafeStrCopy(paValNew, paVal, _strlen(paVal)+1);
     pListElement->type = type;
     pListElement->paPath = paValNew;
 
     stdString_CharToWchar(out, paDisplayed, _strlen(paDisplayed));
     jkGuiRend_DarrayReallocStr(pListDisplayed, out, (intptr_t)pListElement);
-    pHS->free(out);
+    JK_FREE(out);
 }
 
 void jkGuiMods_PopulateEntries(Darray *pListDisplayed, jkGuiElement *element)

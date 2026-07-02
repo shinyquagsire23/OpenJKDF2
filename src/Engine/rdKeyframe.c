@@ -40,7 +40,7 @@ rdKeyframe* rdKeyframe_Load(char *fname)
     if (pKeyframeLoader)
         return (rdKeyframe*)pKeyframeLoader(fname);
 
-    keyframe = (rdKeyframe*)rdroid_pHS->alloc(sizeof(rdKeyframe));
+    keyframe = (rdKeyframe*)RDROID_ALLOC(sizeof(rdKeyframe));
     if (!keyframe)
         return NULL;
 
@@ -126,7 +126,7 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
     if (_sscanf(stdConffile_aLine, " joints %d", &keyframe->numJoints) != 1)
       goto read_fail;
 
-    paJoints = (rdJoint *)rdroid_pHS->alloc(sizeof(rdJoint) * (keyframe->numJoints+1)); // Added: try and contain rdPuppet crashes...
+    paJoints = (rdJoint *)RDROID_ALLOC(sizeof(rdJoint) * (keyframe->numJoints+1)); // Added: try and contain rdPuppet crashes...
     keyframe->paJoints = paJoints;
     if (!paJoints)
       goto read_fail;
@@ -206,7 +206,7 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
         // memory (DC VRAM arena). Biggest per-level chunk of animation data.
         int prevSuggest = rdroid_pHS->suggestHeap(HEAP_WORD_ADDRESSABLE);
 #endif
-        joint->paAnimEntries = (rdAnimEntry*)rdroid_pHS->alloc(sizeof(rdAnimEntry) * anim_entry_cnt + 2); // Added: prevent some oob accesses in rdPuppet
+        joint->paAnimEntries = (rdAnimEntry*)RDROID_ALLOC(sizeof(rdAnimEntry) * anim_entry_cnt + 2); // Added: prevent some oob accesses in rdPuppet
 #ifdef TARGET_RETRO_HOMEBREW
         rdroid_pHS->suggestHeap(prevSuggest);
 #endif
@@ -379,7 +379,7 @@ void rdKeyframe_FreeEntry(rdKeyframe *keyframe)
     // This was inlined
     rdKeyframe_FreeJoints(keyframe);
     
-    rdroid_pHS->free(keyframe);
+    RDROID_FREE(keyframe);
 }
 
 void rdKeyframe_FreeJoints(rdKeyframe *keyframe)
@@ -395,11 +395,11 @@ void rdKeyframe_FreeJoints(rdKeyframe *keyframe)
     {
         if (joint_iter->paAnimEntries)
         {
-            rdroid_pHS->free(joint_iter->paAnimEntries);
+            RDROID_FREE(joint_iter->paAnimEntries);
             joint_iter->paAnimEntries = NULL;
         }
         joint_iter++;
     }
-    rdroid_pHS->free(keyframe->paJoints);
+    RDROID_FREE(keyframe->paJoints);
     keyframe->paJoints = NULL;
 }

@@ -284,7 +284,7 @@ LABEL_17:
     v7 = 0;
     for ( i = (void *)jkGuiRend_GetId(&darray, 0); i; i = (void *)jkGuiRend_GetId(&darray, v7) )
     {
-        pHS->free(i);
+        JK_FREE(i);
         ++v7;
     }
     jkGui_SetModeGame();
@@ -319,7 +319,7 @@ void jkGuiMain_PopulateCutscenes(Darray *list, jkGuiElement *element)
     v2 = jkPlayer_cutscenePath;
     for (v6 = 0; v6 < jkPlayer_setNumCutscenes; v6++)
     {
-        v3 = _strcpy((char *)pHS->alloc(_strlen(v2) + 1), v2);
+        v3 = _strcpy((char *)JK_ALLOC(_strlen(v2) + 1), v2);
         stdFnames_CopyShortName(key, 64, v3); // TODO aaaaaaa ??? disassembly was wrong?
         jkGuiTitle_sub_4189A0(key);
         v5 = jkStrings_GetUniString(key);
@@ -339,7 +339,7 @@ void jkGuiMain_FreeCutscenes(Darray *a1)
     v1 = 0;
     for ( i = (void *)jkGuiRend_GetId(a1, 0); i; i = (void *)jkGuiRend_GetId(a1, v1) )
     {
-        pHS->free(i);
+        JK_FREE(i);
         ++v1;
     }
 }

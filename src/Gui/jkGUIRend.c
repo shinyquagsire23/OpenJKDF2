@@ -519,7 +519,7 @@ void jkGuiRend_Shutdown()
             stdSound_BufferRelease(jkGuiRend_DsoundHandles[i]);
             
         if ( jkGuiRend_LoadedSounds[i] )
-            std_pHS->free(jkGuiRend_LoadedSounds[i]);
+            STD_FREE(jkGuiRend_LoadedSounds[i]);
     }
     
     memset(jkGuiRend_LoadedSounds, 0, sizeof(jkGuiRend_LoadedSounds));
@@ -624,7 +624,7 @@ void jkGuiRend_PlayWav(char *fpath)
         }
             
         if ( jkGuiRend_LoadedSounds[3] ) {
-            std_pHS->free(jkGuiRend_LoadedSounds[3]);
+            STD_FREE(jkGuiRend_LoadedSounds[3]);
             jkGuiRend_LoadedSounds[3] = NULL;
         }
 
@@ -635,7 +635,7 @@ void jkGuiRend_PlayWav(char *fpath)
         }
 
         jkGuiRend_DsoundHandles[0] = newHandle;
-        char* soundPath = (char *)std_pHS->alloc(_strlen(fpath) + 1);
+        char* soundPath = (char *)STD_ALLOC(_strlen(fpath) + 1);
         _strcpy(soundPath, fpath);
         jkGuiRend_LoadedSounds[0] = soundPath;
 
@@ -734,7 +734,7 @@ int32_t jkGuiRend_DarrayReallocStr(Darray *array, wchar_t *wStr, intptr_t id)
     {
         if ( wStr )
         {
-            v7 = (wchar_t *)std_pHS->alloc(sizeof(wchar_t) * (_wcslen(wStr) + 1));
+            v7 = (wchar_t *)STD_ALLOC(sizeof(wchar_t) * (_wcslen(wStr) + 1));
             wStr = _wcscpy(v7, wStr);
         }
     }
@@ -796,7 +796,7 @@ void jkGuiRend_DarrayFreeEntry(Darray *array)
         {
             str = jkGuiRend_GetString(array, i);
             if (str)
-                std_pHS->free(str);
+                STD_FREE(str);
         }
     }
     Darray_ClearAll(array);

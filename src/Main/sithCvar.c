@@ -52,10 +52,10 @@ void sithCvar_Shutdown()
         tSithCvar* pCvar = &sithCvar_aCvars[i];
 
         if(pCvar->type == CVARTYPE_STR && pCvar->pStrVal) {
-            pHS->free((void*)pCvar->pStrVal);
+            JK_FREE((void*)pCvar->pStrVal);
         }
         if (pCvar->pNameLower) {
-            pHS->free((void*)pCvar->pNameLower);
+            JK_FREE((void*)pCvar->pNameLower);
         }
     }
 
@@ -232,7 +232,7 @@ int sithCvar_Register(const char* pName, int32_t type, intptr_t defaultVal, void
 {
     if (sithCvar_numRegistered >= SITHCVAR_MAX_CVARS) return 0;
 
-    char* tmp = (char*)pHS->alloc(SITHCVAR_MAX_NAME_STRLEN);
+    char* tmp = (char*)JK_ALLOC(SITHCVAR_MAX_NAME_STRLEN);
     if (!tmp) return 0;
 
     tSithCvar* pCvar = &sithCvar_aCvars[sithCvar_numRegistered++];
@@ -254,7 +254,7 @@ int sithCvar_Register(const char* pName, int32_t type, intptr_t defaultVal, void
             break;
         case CVARTYPE_STR:
         {
-            char* pVal = (char*)pHS->alloc(SITHCVAR_MAX_STRLEN);
+            char* pVal = (char*)JK_ALLOC(SITHCVAR_MAX_STRLEN);
             stdString_SafeStrCopy(pVal, (const char*)defaultVal, SITHCVAR_MAX_STRLEN);
             pCvar->pStrVal = pVal;
             break;

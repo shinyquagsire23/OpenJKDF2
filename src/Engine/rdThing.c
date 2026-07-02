@@ -1,5 +1,7 @@
 #include "rdThing.h"
 
+#include "stdPlatform.h" // Added: *_ALLOC/*_FREE macros
+
 #include "Engine/rdroid.h"
 #include "Engine/rdPuppet.h"
 #include "Primitives/rdMatrix.h"
@@ -8,7 +10,7 @@ rdThing* rdThing_New(sithThing *parent)
 {
     rdThing *thing;
 
-    thing = (rdThing*)rdroid_pHS->alloc(sizeof(rdThing));
+    thing = (rdThing*)RDROID_ALLOC(sizeof(rdThing));
     if ( !thing )
         return 0;
     rdThing_NewEntry(thing, parent);
@@ -40,7 +42,7 @@ void rdThing_Free(rdThing *thing)
     if ( thing )
     {
         rdThing_FreeEntry(thing);
-        rdroid_pHS->free(thing);
+        RDROID_FREE(thing);
     }
 }
 
@@ -50,17 +52,17 @@ void rdThing_FreeEntry(rdThing *thing)
     {
         if ( thing->hierarchyNodeMatrices )
         {
-            rdroid_pHS->free(thing->hierarchyNodeMatrices);
+            RDROID_FREE(thing->hierarchyNodeMatrices);
             thing->hierarchyNodeMatrices = 0;
         }
         if ( thing->hierarchyNodes2 )
         {
-            rdroid_pHS->free((void *)thing->hierarchyNodes2); // Possible OOB write in this
+            RDROID_FREE((void *)thing->hierarchyNodes2); // Possible OOB write in this
             thing->hierarchyNodes2 = 0;
         }
         if ( thing->amputatedJoints )
         {
-            rdroid_pHS->free(thing->amputatedJoints);
+            RDROID_FREE(thing->amputatedJoints);
             thing->amputatedJoints = 0;
         }
     }
@@ -80,7 +82,7 @@ int rdThing_SetModel3(rdThing *thing, rdModel3 *model)
 #ifdef STDPLATFORM_HEAP_SUGGESTIONS
     int prevSuggest = pSithHS->suggestHeap(HEAP_FAST);
 #endif
-    thing->hierarchyNodeMatrices = (rdMatrix34*)rdroid_pHS->alloc(sizeof(rdMatrix34) * model->numHierarchyNodes);
+    thing->hierarchyNodeMatrices = (rdMatrix34*)RDROID_ALLOC(sizeof(rdMatrix34) * model->numHierarchyNodes);
 #ifdef STDPLATFORM_HEAP_SUGGESTIONS
     pSithHS->suggestHeap(prevSuggest);
 #endif
@@ -89,7 +91,7 @@ int rdThing_SetModel3(rdThing *thing, rdModel3 *model)
     if (!thing->hierarchyNodeMatrices)
         return 0;
 
-    thing->hierarchyNodes2 = (rdVector3*)rdroid_pHS->alloc(sizeof(rdVector3) * model->numHierarchyNodes);
+    thing->hierarchyNodes2 = (rdVector3*)RDROID_ALLOC(sizeof(rdVector3) * model->numHierarchyNodes);
     // memset used to be here??
 
     // thing->hierarchyNodeMatrices check used to be here??
@@ -99,7 +101,7 @@ int rdThing_SetModel3(rdThing *thing, rdModel3 *model)
     
     _memset(thing->hierarchyNodes2, 0, sizeof(rdVector3) * model->numHierarchyNodes);
 
-    thing->amputatedJoints = (int *)rdroid_pHS->alloc(sizeof(int) * model->numHierarchyNodes);
+    thing->amputatedJoints = (int *)RDROID_ALLOC(sizeof(int) * model->numHierarchyNodes);
     if (!thing->amputatedJoints)
         return 0;
 

@@ -1,5 +1,7 @@
 #include "sithTemplate.h"
 
+#include "stdPlatform.h" // Added: *_ALLOC/*_FREE macros
+
 #include "World/sithThing.h"
 #include "World/sithWorld.h"
 #include "General/stdString.h"
@@ -25,7 +27,7 @@ void sithTemplate_Shutdown()
 
 int sithTemplate_New(sithWorld *world, unsigned int numTemplates)
 {
-    world->templates = (sithThing*)pSithHS->alloc(sizeof(sithThing) * numTemplates);
+    world->templates = (sithThing*)SITH_ALLOC(sizeof(sithThing) * numTemplates);
     if (!world->templates)
         return 0;
 
@@ -115,7 +117,7 @@ void sithTemplate_FreeWorld(sithWorld *world)
 
     if ( world->templates )
     {
-        pSithHS->free(world->templates);
+        SITH_FREE(world->templates);
         world->templates = 0;
         world->numTemplates = 0;
         world->numTemplatesLoaded = 0;

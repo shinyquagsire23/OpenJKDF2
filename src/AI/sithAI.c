@@ -70,12 +70,12 @@ int sithAI_Startup()
 
     sithAI_FLOAT_005a79d8 = 1.0; // MoTS added
 
-    sithAI_commandList = (sithAICommand *)pSithHS->alloc(sizeof(sithAICommand) * 32);
+    sithAI_commandList = (sithAICommand *)SITH_ALLOC(sizeof(sithAICommand) * 32);
     if ( sithAI_commandList )
     {
         sithAI_commandsHashmap = stdHashTable_New(64);
         if ( !sithAI_commandsHashmap )
-            pSithHS->free(sithAI_commandList);
+            SITH_FREE(sithAI_commandList);
     }
 
     sithAICmd_Startup();
@@ -123,7 +123,7 @@ void sithAI_Shutdown()
 {
     if ( sithAI_bInit )
     {
-        pSithHS->free(sithAI_commandList);
+        SITH_FREE(sithAI_commandList);
         stdHashTable_Free(sithAI_commandsHashmap);
         sithAI_bInit = 0;
     }
@@ -286,7 +286,7 @@ void sithAI_FreeEntry(sithThing *thing)
     // Added: fix memleak
     if (sithAI_actors[v2].paFrames)
     {
-        pSithHS->free(sithAI_actors[v2].paFrames);
+        SITH_FREE(sithAI_actors[v2].paFrames);
         sithAI_actors[v2].paFrames = NULL;
     }
 
@@ -638,7 +638,7 @@ int sithAI_LoadThingActorParams(stdConffileArg *arg, sithThing *thing, int param
     v5 = _atoi(arg->value);
     if ( !v5 )
         return 0;
-    result = (intptr_t)pSithHS->alloc(sizeof(rdVector3) * v5);
+    result = (intptr_t)SITH_ALLOC(sizeof(rdVector3) * v5);
     v3->paFrames = (rdVector3 *)result;
     if ( result )
     {
@@ -664,7 +664,7 @@ void sithAI_idkframesalloc(sithThing *a2, sithThing *a3, rdVector3 *a4)
 
     v3 = a3;
     v4 = a2->actor;
-    v4->paFrames = (rdVector3 *)pSithHS->alloc(sizeof(rdVector3) * a3->trackParams.sizeFrames);
+    v4->paFrames = (rdVector3 *)SITH_ALLOC(sizeof(rdVector3) * a3->trackParams.sizeFrames);
     v4->sizeFrames = a3->trackParams.sizeFrames;
     v5 = a3->trackParams.loadedFrames;
     v6 = 0;

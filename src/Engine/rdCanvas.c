@@ -1,5 +1,7 @@
 #include "rdCanvas.h"
 
+#include "stdPlatform.h" // Added: *_ALLOC/*_FREE macros
+
 #include "Engine/rdroid.h"
 
 rdCanvas* rdCanvas_New(int bIdk, stdVBuffer *vbuf1, stdVBuffer *vbuf2, int x, int y, int w, int h, int a8)
@@ -7,7 +9,7 @@ rdCanvas* rdCanvas_New(int bIdk, stdVBuffer *vbuf1, stdVBuffer *vbuf2, int x, in
     rdCanvas *result; // eax
     rdCanvas *v9; // esi
 
-    result = (rdCanvas *)rdroid_pHS->alloc(sizeof(rdCanvas));
+    result = (rdCanvas *)RDROID_ALLOC(sizeof(rdCanvas));
     v9 = result;
     if ( result )
     {
@@ -48,7 +50,7 @@ int rdCanvas_NewEntry(rdCanvas *canvas, int bIdk, stdVBuffer *vbuf, stdVBuffer *
 void rdCanvas_Free(rdCanvas *canvas)
 {
     if ( canvas )
-        rdroid_pHS->free(canvas);
+        RDROID_FREE(canvas);
 }
 
 void rdCanvas_FreeEntry(rdCanvas *canvas)

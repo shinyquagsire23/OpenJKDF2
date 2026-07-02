@@ -786,7 +786,7 @@ int jkHudInv_InitItems()
     jkHudInv_numItems = v1;
     if ( v1 > 0 )
     {
-        jkHudInv_aItems = (int*)pHS->alloc(sizeof(int) * v1);
+        jkHudInv_aItems = (int*)JK_ALLOC(sizeof(int) * v1);
         if (!jkHudInv_aItems)
         {
             jkHudInv_numItems = 0;
@@ -987,7 +987,7 @@ int jkHudInv_Shutdown()
     jkHudInv_Close(); // Added: memleak
 
     if ( jkHudInv_aItems )
-        pHS->free(jkHudInv_aItems);
+        JK_FREE(jkHudInv_aItems);
 
     if ( jkHudInv_aBitmaps[0] )
     {

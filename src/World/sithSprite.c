@@ -90,7 +90,7 @@ void sithSprite_FreeEntry(sithWorld *world)
         stdHashTable_FreeKey(sithSprite_hashmap, world->sprites[idx].path);
         rdSprite_FreeEntry(&world->sprites[idx]);
     }
-    pSithHS->free(world->sprites);
+    SITH_FREE(world->sprites);
     world->sprites = 0;
     world->numSpritesLoaded = 0;
     world->numSprites = 0;
@@ -173,7 +173,7 @@ int sithSprite_New(sithWorld *world, int num)
 {
     rdSprite *sprites; // edi
 
-    sprites = (rdSprite *)pSithHS->alloc(sizeof(rdSprite) * num);
+    sprites = (rdSprite *)SITH_ALLOC(sizeof(rdSprite) * num);
     world->sprites = sprites;
     if ( !sprites )
         return 0;

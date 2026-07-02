@@ -86,7 +86,7 @@ void jkGuiSingleplayer_Shutdown()
     // Added: memleak
     if ( jkGui_episodeLoad.paEntries )
     {
-        pHS->free(jkGui_episodeLoad.paEntries);
+        JK_FREE(jkGui_episodeLoad.paEntries);
         jkGui_episodeLoad.paEntries = 0;
     }
 }
@@ -228,7 +228,7 @@ int jkGuiSingleplayer_Show()
                                 v13 = (void *)v11->id;
                                 if ( v13 )
                                 {
-                                    pHS->free(v13);
+                                    JK_FREE(v13);
                                     v11->id = 0;
                                 }
                             }
@@ -239,12 +239,12 @@ int jkGuiSingleplayer_Show()
 #ifdef QOL_IMPROVEMENTS
                                 // Added: progress end of level normally from debug menu, instead of exiting to main menu
                                 if (jkEpisode_mLoad.paEntries) {
-                                    pHS->free(jkEpisode_mLoad.paEntries);
+                                    JK_FREE(jkEpisode_mLoad.paEntries);
                                     jkEpisode_mLoad.paEntries = NULL;
                                 }
                                 jkEpisode_mLoad = jkGui_episodeLoad;
                                 size_t aEnts_size = (jkEpisode_mLoad.numSeq + 1) * sizeof(jkEpisodeEntry);
-                                jkEpisode_mLoad.paEntries = (jkEpisodeEntry *)pHS->alloc(aEnts_size);
+                                jkEpisode_mLoad.paEntries = (jkEpisodeEntry *)JK_ALLOC(aEnts_size);
                                 memcpy(jkEpisode_mLoad.paEntries, jkGui_episodeLoad.paEntries, aEnts_size);
                                 
                                 jkEpisode_mLoad.currentEpisodeEntryIdx = 0;
@@ -361,7 +361,7 @@ void jkGuiSingleplayer_sub_41AA30(Darray *array, jkGuiElement *element, int a3, 
         v11 = (void *)v9->id;
         if ( v11 )
         {
-            pHS->free(v11);
+            JK_FREE(v11);
             v10->id = 0;
         }
     }
@@ -376,7 +376,7 @@ void jkGuiSingleplayer_sub_41AA30(Darray *array, jkGuiElement *element, int a3, 
         {
             // Added: extended the path alloc to include the real index
             uint32_t alloc_sz = _strlen(a2.fpath) + 1 + sizeof(int);
-            v14 = (char *)pHS->alloc(alloc_sz);
+            v14 = (char *)JK_ALLOC(alloc_sz);
             _strncpy(v14+sizeof(int), a2.fpath, alloc_sz-sizeof(int)-1);
             v14[alloc_sz-1] = 0;
             v16 = jkGuiTitle_quicksave_related_func1(&strtable, v14+sizeof(int));
@@ -400,7 +400,7 @@ void jkGuiSingleplayer_sub_41AA30(Darray *array, jkGuiElement *element, int a3, 
             {
                 // Added: extended the path alloc to include the real index
                 uint32_t alloc_sz = _strlen(v17->fileName) + 1 + sizeof(int);
-                v18 = (char *)pHS->alloc(alloc_sz);
+                v18 = (char *)JK_ALLOC(alloc_sz);
                 _strncpy(v18+sizeof(int), v17->fileName, alloc_sz-sizeof(int)-1); // Added: strcpy -> strncpy, +sizeof(int)
                 v18[alloc_sz-1] = 0;
                 v20 = jkGuiTitle_quicksave_related_func1(&strtable, v18+sizeof(int)); // Added: +sizeof(int)
@@ -438,7 +438,7 @@ void jkGuiSingleplayer_sub_41AC70(Darray *array, jkGuiElement *element, int idx)
         v6 = (void *)strEnt->id;
         if ( v6 )
         {
-            pHS->free(v6);
+            JK_FREE(v6);
             v5->id = 0;
         }
     }
@@ -464,7 +464,7 @@ int jkGuiSingleplayer_sub_41AD00(Darray *array)
         v5 = (void *)v3->id;
         if ( v5 )
         {
-            pHS->free(v5);
+            JK_FREE(v5);
             v4->id = 0;
         }
         result = array->total;

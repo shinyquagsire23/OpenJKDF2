@@ -22,7 +22,7 @@ stdBitmap* stdPcx_Load(char *fpath, int create_ddraw_surface, int gpu_mem)
     if ( !fhand )
         return 0;
 
-    bitmap = (stdBitmap *)std_pHS->alloc(sizeof(stdBitmap));
+    bitmap = (stdBitmap *)STD_ALLOC(sizeof(stdBitmap));
     if ( !bitmap )
         goto fail; // TODO will this nullptr deref?
 
@@ -38,7 +38,7 @@ stdBitmap* stdPcx_Load(char *fpath, int create_ddraw_surface, int gpu_mem)
     bitmap->format.is16bit = 0;
     bitmap->format.bpp = pcxHeader.bitDepth;
 
-    bitmap->mipSurfaces = (stdVBuffer **)std_pHS->alloc(sizeof(stdVBuffer *) * 1);
+    bitmap->mipSurfaces = (stdVBuffer **)STD_ALLOC(sizeof(stdVBuffer *) * 1);
     if ( !bitmap->mipSurfaces )
         goto fail;
     _memset(&format, 0, sizeof(format));
@@ -81,7 +81,7 @@ stdBitmap* stdPcx_Load(char *fpath, int create_ddraw_surface, int gpu_mem)
         }
     }
     stdDisplay_VBufferUnlock(*bitmap->mipSurfaces);
-    paletteAlloc = std_pHS->alloc(0x300u);
+    paletteAlloc = STD_ALLOC(0x300u);
     bitmap->palette = paletteAlloc;
     if ( paletteAlloc )
     {

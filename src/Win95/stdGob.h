@@ -42,8 +42,19 @@ typedef struct stdGobEntry
 {
     uint32_t fileOffset;
     int32_t fileSize;
-    char fname[128];
+#ifndef STDGOB_COMPACT_ENTRIES
+    char fname[128]; // in-memory copy of the on-disk name (see STDGOB_COMPACT_ENTRIES)
+#endif
 } stdGobEntry;
+
+// The on-disk directory entry layout (always 136 bytes), used as a staging
+// buffer when STDGOB_COMPACT_ENTRIES strips names from the resident entries.
+typedef struct stdGobDiskEntry
+{
+    uint32_t fileOffset;
+    int32_t fileSize;
+    char fname[128];
+} stdGobDiskEntry;
 
 typedef struct stdGobFile
 {

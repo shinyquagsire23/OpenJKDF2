@@ -1921,7 +1921,11 @@ typedef struct sithCog
     int32_t numHeapVars;
     sithCogStackvar* heap;
 #endif
+#ifdef COG_HEAP_INIT_ARGS
+    char* aInitArgs; // Added: heap'd jkl init strings, freed after linking (was field_4BC[32*128])
+#else
     char field_4BC[32*128];
+#endif
 #ifndef JKM_TYPES
     sithCogStackvar* heap;
     int32_t numHeapVars;
@@ -2281,6 +2285,9 @@ typedef struct sithWorld
     rdVector2* vertexUVs;
     int32_t numSurfaces;
     sithSurface* surfaces;
+#ifdef SITHSURFACE_POOLED_ARRAYS
+    int* paSurfaceIdxPool; // Added: pooled surface index/intensity arrays
+#endif
     int32_t numAdjoinsLoaded;
     int32_t numAdjoins;
     sithAdjoin* adjoins;

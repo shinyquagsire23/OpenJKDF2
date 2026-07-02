@@ -29,7 +29,7 @@ void stdGob_Shutdown()
 
 stdGob* stdGob_Load(char *fpath, int a2, int a3)
 {
-    stdGob* gob = (stdGob*)std_pHS->alloc(sizeof(stdGob));
+    stdGob* gob = (stdGob*)STD_ALLOC(sizeof(stdGob));
     if (gob)
     {
         _memset(gob, 0, sizeof(stdGob)); // TODO why was this needed
@@ -90,7 +90,7 @@ int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
     else {
         stdPlatform_Printf("OpenJKDF2: stdGob opened `%s`.\n", gob->fpath); // Added
     }
-    gob->openedFile = (stdGobFile *)std_pHS->alloc(sizeof(stdGobFile) * gob->numFilesOpen);
+    gob->openedFile = (stdGobFile *)STD_ALLOC(sizeof(stdGobFile) * gob->numFilesOpen);
     if ( !gob->openedFile )
       return 0;
     _memset(gob->openedFile, 0, sizeof(stdGobFile) * gob->numFilesOpen);
@@ -107,7 +107,7 @@ int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
     }
     pGobHS->fseek(gob->fhand, header.entryTable_offs, 0);
     pGobHS->fileRead(gob->fhand, &gob->numFiles, sizeof(uint32_t));
-    gob->entries = (stdGobEntry *)std_pHS->alloc(sizeof(stdGobEntry) * gob->numFiles);
+    gob->entries = (stdGobEntry *)STD_ALLOC(sizeof(stdGobEntry) * gob->numFiles);
     if ( !gob->entries )
       return 0;
     
@@ -122,8 +122,18 @@ int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
 #endif
     for (int v4 = 0; v4 < gob->numFiles; v4++)
     {
+#ifdef STDGOB_COMPACT_ENTRIES
+        // Added: stage the fixed 136-byte disk entry; only offset/size stay
+        // resident (the CRC-keyed hashtable doesn't retain the name pointer).
+        stdGobDiskEntry diskEntry;
+        pGobHS->fileRead(gob->fhand, &diskEntry, sizeof(stdGobDiskEntry));
+        gob->entries[v4].fileOffset = diskEntry.fileOffset;
+        gob->entries[v4].fileSize = diskEntry.fileSize;
+        stdHashTable_SetKeyVal(gob->entriesHashtable, diskEntry.fname, &gob->entries[v4]);
+#else
         pGobHS->fileRead(gob->fhand, &gob->entries[v4], sizeof(stdGobEntry));
         stdHashTable_SetKeyVal(gob->entriesHashtable, gob->entries[v4].fname, &gob->entries[v4]);
+#endif
     }
 
     stdPlatform_Printf("OpenJKDF2: stdGob loaded GOB file `%s`...\n", fname);
@@ -137,7 +147,7 @@ void stdGob_Free(stdGob *gob)
         return;
 
     stdGob_FreeEntry(gob);
-    std_pHS->free(gob);
+    STD_FREE(gob);
 }
 
 void stdGob_FreeEntry(stdGob *gob)
@@ -157,12 +167,12 @@ void stdGob_FreeEntry(stdGob *gob)
         }
         // Added: Fix memleak
         if (gob->openedFile) {
-            std_pHS->free(gob->openedFile);
+            STD_FREE(gob->openedFile);
             gob->openedFile = NULL;
         }
         if ( gob->entries )
         {
-            std_pHS->free(gob->entries);
+            STD_FREE(gob->entries);
             gob->entries = 0;
         }
         if ( gob->entriesHashtable )

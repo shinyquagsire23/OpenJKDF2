@@ -312,6 +312,52 @@
 #define COG_CRC32_SYMBOL_NAMES
 #define COG_COMPRESS_VAR_SIZE
 
+// Seal each script's symbol table after parsing: drop the parse-time hashtable
+// and shrink the bucket array (allocated at SITHCOG_LINKED_SYMBOL_LIMIT
+// entries) down to what the script actually uses. This restores the retail
+// engine's post-parse ReallocSymboltable step, which the reimplementation
+// registers but never calls. Runtime lookups are by index (GetSymbol) and
+// per-instance copies are already exact-sized, so nothing needs the headroom;
+// AddSymbol on a sealed table fails cleanly rather than growing.
+// Kept RETRO-only until well-tested there; PC keeps the untrimmed behavior.
+#define COG_SEAL_SYMBOLTABLES
+
+// Heap-allocate each cog's jkl-provided symbol init strings (numIdk * 32 bytes,
+// zeroed) instead of the fixed 4KB inline array (field_4BC, 128 * 32 chars).
+// They are filled while parsing the jkl cogs section, consumed exactly once by
+// the level-load linking pass in sithCog_Open, then freed there. ~4KB saved per
+// placed cog. Kept RETRO-only until well-tested.
+#define COG_HEAP_INIT_ARGS
+
+// Pool all of a mesh's per-face vertex/UV index arrays into a single
+// allocation (rdModel3): the 3DO loader otherwise makes two tiny (12-16 byte)
+// allocations per face -- 20k+ heap blocks per level, each with allocator
+// header overhead. Faces briefly hold pool offsets during parsing (the pool
+// can move while growing) and are resolved to pointers once the mesh is done.
+// Kept RETRO-only until well-tested.
+#define RDMODEL3_POOLED_FACE_INDICES
+
+// Same pooling for world surfaces (sithSurface): vertexPosIdx, optional
+// vertexUVIdx and the intensity arrays are otherwise 3 tiny allocations per
+// surface (12k+ heap blocks per level). One world-owned pool, offsets during
+// parse, pointer fixup after, freed as one block in sithSurface_Free.
+// Kept RETRO-only until well-tested.
+#define SITHSURFACE_POOLED_ARRAYS
+
+// Drop the 128-byte inline filename from in-memory GOB directory entries: the
+// disk format keeps it, but a staging read feeds the name straight into the
+// CRC-keyed lookup hashtable (which retains no key pointer) and nothing else
+// reads it afterward. 136 -> 8 bytes per entry, ~0.5 MB across the loaded
+// GOBs. Requires STDHASHTABLE_CRC32_KEYS. Kept RETRO-only until well-tested.
+#define STDGOB_COMPACT_ENTRIES
+
+// The 32-slot reliable-resend buffer (sithComm_MsgTmpBuf, ~66KB of .bss) is
+// multiplayer-only: shadow the generated array with a heap buffer allocated on
+// first reliable send and freed by sithComm_ClearMsgTmpBuf (MP session
+// teardown). Single-player never allocates it; --gc-sections strips the
+// unreferenced generated array. Kept RETRO-only until well-tested.
+#define SITHCOMM_HEAP_MSGBUF
+
 // Other memory optimizations
 #define SITHAI_CRC32_INSTINCTS
 

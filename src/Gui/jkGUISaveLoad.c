@@ -173,7 +173,7 @@ int jkGuiSaveLoad_DeleteOnClick(jkGuiElement *element, jkGuiMenu *menu, int32_t 
                 {
                     entry = (jkGuiSaveLoad_Entry *)jkGuiRend_GetId(&jkGuiSaveLoad_DarrayEntries, i);
                     if ( entry )
-                        pHS->free(entry);
+                        JK_FREE(entry);
                 }
                 jkGuiRend_DarrayFree(&jkGuiSaveLoad_DarrayEntries);
                 jkGuiSaveLoad_numEntries = 0;
@@ -228,7 +228,7 @@ void jkGuiSaveLoad_PopulateList()
                         if ( v3 )
                         {
                             *v3 = 0;
-                            v6 = (jkGuiSaveLoad_Entry *)pHS->alloc(sizeof(jkGuiSaveLoad_Entry));
+                            v6 = (jkGuiSaveLoad_Entry *)JK_ALLOC(sizeof(jkGuiSaveLoad_Entry));
                             _memcpy(v6, &saveHeader, sizeof(sithGamesave_Header));
                             stdString_SafeStrCopy(v6->fpath, a2.fpath, 128);
                             _strtolower(v6->fpath);
@@ -363,7 +363,7 @@ int jkGuiSaveLoad_Show(int bIsSave)
 LABEL_24:
         if ( !v7 )
         {
-            v13 = (char *)pHS->alloc(jkGuiSaveLoad_numEntries + 1);
+            v13 = (char *)JK_ALLOC(jkGuiSaveLoad_numEntries + 1);
             v14 = jkGuiSaveLoad_numEntries;
             v15 = v13;
             v16 = jkGuiSaveLoad_numEntries + 1;
@@ -400,7 +400,7 @@ LABEL_24:
                     break;
             }
             _sprintf(v30, JKSAVE_FORMATSTR, i);
-            pHS->free(v15);
+            JK_FREE(v15);
 LABEL_44:
             v28 = jkGuiSaveLoad_aElements[2].wstr;
             v22 = jkGuiTitle_quicksave_related_func1(&jkCog_strings, sithWorld_pCurrentWorld->map_jkl_fname);
@@ -437,7 +437,7 @@ LABEL_46:
     {
         v24 = (jkGuiSaveLoad_Entry *)jkGuiRend_GetId(&jkGuiSaveLoad_DarrayEntries, j);
         if ( v24 )
-            pHS->free(v24);
+            JK_FREE(v24);
     }
     jkGuiRend_DarrayFree(&jkGuiSaveLoad_DarrayEntries);
     result = v3;

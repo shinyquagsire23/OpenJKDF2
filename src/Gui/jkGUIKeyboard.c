@@ -1,5 +1,7 @@
 #include "jkGUIKeyboard.h"
 
+#include "stdPlatform.h" // Added: *_ALLOC/*_FREE macros
+
 #include "Devices/sithControl.h"
 #include "Platform/stdControl.h"
 #include "General/Darray.h"
@@ -90,7 +92,7 @@ int jkGuiKeyboard_sub_411E40(Darray *pDarr)
     {
         v3 = jkGuiRend_GetStringEntry(pDarr, i);
         if ( v3->pKeyboardEntry )
-            pHS->free(v3->pKeyboardEntry);
+            JK_FREE(v3->pKeyboardEntry);
         result = pDarr->total;
         ++i;
     }
@@ -197,9 +199,9 @@ void jkGuiKeyboard_sub_411F40(jkGuiElement *pElement, Darray *pDarr)
                         v19 = L" ";
                         v15 = _wcslen(L" ");
                     }
-                    v16 = (wchar_t *)pHS->alloc(sizeof(wchar_t) * (v15 + 1));
+                    v16 = (wchar_t *)JK_ALLOC(sizeof(wchar_t) * (v15 + 1));
                     v17 = _wcscpy(v16, v19);
-                    pHS->free(v13->str);
+                    JK_FREE(v13->str);
                     v13->str = v17;
                 }
             }
@@ -281,7 +283,7 @@ LABEL_25:
             }
             jk_snwprintf(wStr, 0xFFu, L"%ls%ls\t%ls", v17, v8, v9);
 
-            v14 = (jkGuiKeyboardEntry *)pHS->alloc(sizeof(jkGuiKeyboardEntry));
+            v14 = (jkGuiKeyboardEntry *)JK_ALLOC(sizeof(jkGuiKeyboardEntry));
             if ( v14 )
             {
                 v14->inputFuncIdx = inputFuncIdx;

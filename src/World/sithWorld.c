@@ -106,9 +106,9 @@ int sithWorld_Startup()
 void sithWorld_Shutdown()
 {
     if ( sithWorld_pCurrentWorld )
-        pSithHS->free(sithWorld_pCurrentWorld);
+        SITH_FREE(sithWorld_pCurrentWorld);
     if ( sithWorld_pStatic ) {
-        //pSithHS->free(sithWorld_pStatic); // Added: Actually free everything
+        //SITH_FREE(sithWorld_pStatic); // Added: Actually free everything
         sithWorld_FreeEntry(sithWorld_pStatic); // Added: Actually free everything
     }
     sithWorld_pCurrentWorld = 0;
@@ -224,6 +224,10 @@ LABEL_19:
         std3D_UpdateSettings();
 #endif
         sithWorld_bLoaded = 1;
+#ifdef STDPLATFORM_ALLOC_TRACKING
+        // Added: dump the per-file allocation catalog once the world is in.
+        stdPlatform_PrintAllocStats();
+#endif
         return 1;
     }
     goto cleanup;
@@ -243,7 +247,7 @@ sithWorld* sithWorld_New()
 {
     sithWorld *result; // eax
 
-    result = (sithWorld *)pSithHS->alloc(sizeof(sithWorld));
+    result = (sithWorld *)SITH_ALLOC(sizeof(sithWorld));
     if ( result )
         _memset(result, 0, sizeof(sithWorld));
 
@@ -274,24 +278,24 @@ int sithWorld_NewEntry(sithWorld *pWorld)
         v3 = pWorld->numVertices;
         if ( v3 )
         {
-            v4 = (rdVector3 *)pSithHS->alloc(sizeof(rdVector3) * v3);
+            v4 = (rdVector3 *)SITH_ALLOC(sizeof(rdVector3) * v3);
             pWorld->verticesTransformed = v4;
             if ( !v4 )
                 return 0;
 
-            v5 = (flex_t *)pSithHS->alloc(sizeof(flex_t) * pWorld->numVertices);
+            v5 = (flex_t *)SITH_ALLOC(sizeof(flex_t) * pWorld->numVertices);
             pWorld->verticesDynamicLight = v5;
             if ( !v5 )
                 return 0;
             _memset(v5, 0, sizeof(flex_t) * pWorld->numVertices);
 
-            v6 = (int32_t *)pSithHS->alloc(sizeof(int32_t) * pWorld->numVertices);
+            v6 = (int32_t *)SITH_ALLOC(sizeof(int32_t) * pWorld->numVertices);
             pWorld->alloc_unk98 = v6;
             if ( !v6 )
                 return 0;
             _memset(v6, 0, sizeof(int) * pWorld->numVertices);
 
-            v7 = (int32_t *)pSithHS->alloc(sizeof(int32_t) * pWorld->numVertices);
+            v7 = (int32_t *)SITH_ALLOC(sizeof(int32_t) * pWorld->numVertices);
             pWorld->alloc_unk9c = v7;
             if ( !v7 )
                 return 0;
@@ -356,7 +360,7 @@ void sithWorld_FreeEntry(sithWorld *pWorld)
             }
             while ( v1 < pWorld->numColormaps );
         }
-        pSithHS->free(pWorld->colormaps);
+        SITH_FREE(pWorld->colormaps);
         pWorld->colormaps = 0;
         pWorld->numColormaps = 0;
     }
@@ -376,34 +380,34 @@ void sithWorld_FreeEntry(sithWorld *pWorld)
         sithTemplate_FreeWorld(pWorld);
     if ( pWorld->vertices )
     {
-        pSithHS->free(pWorld->vertices);
+        SITH_FREE(pWorld->vertices);
         pWorld->vertices = 0;
     }
     if ( pWorld->verticesTransformed )
     {
-        pSithHS->free(pWorld->verticesTransformed);
+        SITH_FREE(pWorld->verticesTransformed);
         pWorld->verticesTransformed = 0;
     }
     if ( pWorld->verticesDynamicLight )
     {
-        pSithHS->free(pWorld->verticesDynamicLight);
+        SITH_FREE(pWorld->verticesDynamicLight);
         pWorld->verticesDynamicLight = 0;
     }
     if ( pWorld->alloc_unk9c )
     {
-        pSithHS->free(pWorld->alloc_unk9c);
+        SITH_FREE(pWorld->alloc_unk9c);
         pWorld->alloc_unk9c = 0;
     }
     if ( pWorld->vertexUVs )
     {
-        pSithHS->free(pWorld->vertexUVs);
+        SITH_FREE(pWorld->vertexUVs);
         pWorld->vertexUVs = 0;
     }
     if ( pWorld->surfaces )
         sithSurface_Free(pWorld);
     if ( pWorld->alloc_unk98 )
     {
-        pSithHS->free(pWorld->alloc_unk98);
+        SITH_FREE(pWorld->alloc_unk98);
         pWorld->alloc_unk98 = 0;
     }
     if ( pWorld->materials )
@@ -443,7 +447,7 @@ void sithWorld_FreeEntry(sithWorld *pWorld)
     sithWorld_pCurrentWorld = 0;
 
     // Added (Droidworks): JK and MoTS memleaked the world alloc
-    pSithHS->free(pWorld);
+    SITH_FREE(pWorld);
 }
 
 int sithHeader_Load(sithWorld *pWorld, int junk)
@@ -698,7 +702,7 @@ int sithWorld_LoadGeoresource(sithWorld *pWorld, int a2)
     }
 
     pWorld->numColormaps = numColormaps;
-    pWorld->colormaps = (rdColormap *)pSithHS->alloc(sizeof(rdColormap) * numColormaps);
+    pWorld->colormaps = (rdColormap *)SITH_ALLOC(sizeof(rdColormap) * numColormaps);
     memset(pWorld->colormaps, 0, sizeof(rdColormap) * numColormaps); // Added: prevent freeing issues on load failures
     
     if (!pWorld->colormaps)
@@ -735,7 +739,7 @@ int sithWorld_LoadGeoresource(sithWorld *pWorld, int a2)
         return 0;
     }
 
-    pWorld->vertices = (rdVector3 *)pSithHS->alloc(sizeof(rdVector3) * numVertices);
+    pWorld->vertices = (rdVector3 *)SITH_ALLOC(sizeof(rdVector3) * numVertices);
     if (!pWorld->vertices)
     {
         return 0;
@@ -769,7 +773,7 @@ int sithWorld_LoadGeoresource(sithWorld *pWorld, int a2)
         return 0;
     }
 
-    pWorld->vertexUVs = (rdVector2 *)pSithHS->alloc(sizeof(rdVector2) * textureVertices);
+    pWorld->vertexUVs = (rdVector2 *)SITH_ALLOC(sizeof(rdVector2) * textureVertices);
     if (!pWorld->vertexUVs)
     {
         return 0;

@@ -10,12 +10,12 @@ stdBitmap* stdBmp_Load(const char *fpath, int create_ddraw_surface, int gpu_mem)
 {
     stdBitmap *bitmap;
 
-    bitmap = (stdBitmap *)std_pHS->alloc(sizeof(stdBitmap));
+    bitmap = (stdBitmap *)STD_ALLOC(sizeof(stdBitmap));
     if ( !bitmap )
         return NULL;
     if ( !stdBmp_LoadEntryFromFile(fpath, bitmap, create_ddraw_surface, gpu_mem) )
     {
-        std_pHS->free(bitmap);
+        STD_FREE(bitmap);
         return NULL;
     }
     return bitmap;
@@ -57,7 +57,7 @@ int stdBmp_LoadEntryFromFile(const char *fpath, stdBitmap *bitmap, int create_dd
     if ( infoHeader.bpp < 8 )
     {
         int paletteSize = (1 << infoHeader.bpp) * 4;
-        paletteData = std_pHS->alloc(paletteSize + sizeof(stdVBufferTexFmt));
+        paletteData = STD_ALLOC(paletteSize + sizeof(stdVBufferTexFmt));
         int palRead = std_pHS->fileRead(fhand, paletteData, paletteSize);
         if ( palRead != paletteSize )
         {
@@ -114,7 +114,7 @@ int stdBmp_LoadEntryFromFile(const char *fpath, stdBitmap *bitmap, int create_dd
     }
 
     // Allocate mip surface pointers
-    bitmap->mipSurfaces = (stdVBuffer **)std_pHS->alloc(bitmap->numMips * sizeof(stdVBuffer *));
+    bitmap->mipSurfaces = (stdVBuffer **)STD_ALLOC(bitmap->numMips * sizeof(stdVBuffer *));
     if ( !bitmap->mipSurfaces )
     {
         std_pHS->assert("Unable to allocate memory.", ".\\General\\stdBmp.c", 0x153);
@@ -147,7 +147,7 @@ int stdBmp_LoadEntryFromFile(const char *fpath, stdBitmap *bitmap, int create_dd
 #ifdef TARGET_RETRO_HOMEBREW
     // Added: bounce rows through a temp buffer; fileRead byte-writes internally
     // and the vbuffer may be word-addressable-only (DC VRAM / NDS slot-2).
-    uint8_t* pRowTmp = (uint8_t*)std_pHS->alloc(stride);
+    uint8_t* pRowTmp = (uint8_t*)STD_ALLOC(stride);
 #endif
     for (int row = 0; row < height; row++)
     {
@@ -198,7 +198,7 @@ int stdBmp_LoadEntryFromFile(const char *fpath, stdBitmap *bitmap, int create_dd
     }
 #ifdef TARGET_RETRO_HOMEBREW
     if (pRowTmp)
-        std_pHS->free(pRowTmp);
+        STD_FREE(pRowTmp);
 #endif
 
     stdDisplay_VBufferUnlock(vbuf);

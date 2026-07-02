@@ -1,5 +1,7 @@
 #include "sithDSS.h"
 
+#include "stdPlatform.h" // Added: *_ALLOC/*_FREE macros
+
 #include "AI/sithAI.h"
 #include "AI/sithAIClass.h"
 #include "Cog/sithCog.h"
@@ -419,7 +421,7 @@ int sithDSS_ProcessAIStatus(sithCogMsg *msg)
     
     if ( actor->loadedFrames)
     {
-        actor->paFrames = (rdVector3 *)pSithHS->alloc(sizeof(rdVector3) * actor->loadedFrames);
+        actor->paFrames = (rdVector3 *)SITH_ALLOC(sizeof(rdVector3) * actor->loadedFrames);
         actor->sizeFrames = actor->loadedFrames;
         if ( actor->paFrames )
         {

@@ -1,5 +1,7 @@
 #include "rdCamera.h"
 
+#include "stdPlatform.h" // Added: *_ALLOC/*_FREE macros
+
 #include "Engine/rdLight.h"
 #include "jk.h"
 #include "Engine/rdroid.h"
@@ -18,7 +20,7 @@ int rdCamera_bForceRealProj = 0;
 
 rdCamera* rdCamera_New(flex_t fov, BOOL bClipFar, flex_t zNear, flex_t zFar, flex_t aspectRatio)
 {
-    rdCamera* out = (rdCamera *)rdroid_pHS->alloc(sizeof(rdCamera));
+    rdCamera* out = (rdCamera *)RDROID_ALLOC(sizeof(rdCamera));
     if ( !out ) {
         return 0;
     }
@@ -43,7 +45,7 @@ int rdCamera_NewEntry(rdCamera *camera, flex_t fov, BOOL bClipFar, flex_t zNear,
     // Added: Don't double-alloc
     if (!camera->pClipFrustum)
     {
-        camera->pClipFrustum = (rdClipFrustum *)rdroid_pHS->alloc(sizeof(rdClipFrustum));
+        camera->pClipFrustum = (rdClipFrustum *)RDROID_ALLOC(sizeof(rdClipFrustum));
     }
 
     if ( camera->pClipFrustum )
@@ -73,14 +75,14 @@ void rdCamera_Free(rdCamera *camera)
     if (camera)
     {
         rdCamera_FreeEntry(camera);
-        rdroid_pHS->free(camera);
+        RDROID_FREE(camera);
     }
 }
 
 void rdCamera_FreeEntry(rdCamera *camera)
 {
     if ( camera->pClipFrustum ) {
-        rdroid_pHS->free(camera->pClipFrustum);
+        RDROID_FREE(camera->pClipFrustum);
         camera->pClipFrustum = NULL; // Added: no UAF
     }
 }

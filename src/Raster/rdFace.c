@@ -7,7 +7,7 @@ rdFace *rdFace_New()
 {
     rdFace *out;
 
-    out = (rdFace*)rdroid_pHS->alloc(sizeof(rdFace));
+    out = (rdFace*)RDROID_ALLOC(sizeof(rdFace));
     if (!out)
         return 0;
 
@@ -43,7 +43,7 @@ void rdFace_Free(rdFace *face)
 void rdFace_FreeEntry(rdFace *face)
 {
     if ( face->vertexPosIdx )
-        rdroid_pHS->free(face->vertexPosIdx);
+        RDROID_FREE(face->vertexPosIdx);
     if ( face->vertexUVIdx )
-        rdroid_pHS->free(face->vertexUVIdx);
+        RDROID_FREE(face->vertexUVIdx);
 }

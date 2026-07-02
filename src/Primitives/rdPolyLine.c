@@ -1,5 +1,7 @@
 #include "rdPolyLine.h"
 
+#include "stdPlatform.h" // Added: *_ALLOC/*_FREE macros
+
 #include "Engine/rdroid.h"
 #include "Engine/rdCamera.h"
 #include "General/stdMath.h"
@@ -17,7 +19,7 @@ rdPolyLine* rdPolyLine_New(char *polyline_fname, char *material_fname, char *mat
 {
     rdPolyLine* polyline;
 
-    polyline = (rdPolyLine *)rdroid_pHS->alloc(sizeof(rdPolyLine));
+    polyline = (rdPolyLine *)RDROID_ALLOC(sizeof(rdPolyLine));
     if (polyline)
     {
         memset(polyline, 0, sizeof(*polyline)); // Added: clear struct
@@ -64,7 +66,7 @@ int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *materi
         return 0;
     rdMaterial_EnsureDataForced(polyline->edgeFace.material); // Added: TWL
     polyline->edgeFace.numVertices = 4;
-    vertexPosIdx = (int *)rdroid_pHS->alloc(sizeof(int) * polyline->edgeFace.numVertices);
+    vertexPosIdx = (int *)RDROID_ALLOC(sizeof(int) * polyline->edgeFace.numVertices);
     polyline->edgeFace.vertexPosIdx = vertexPosIdx;
     if ( !vertexPosIdx )
         return 0;
@@ -73,13 +75,13 @@ int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *materi
         *vertexPosIdx = i++;
     if ( polyline->edgeFace.geometryMode >= RD_GEOMODE_TEXTURED)
     {
-        vertexUVIdx = (int *)rdroid_pHS->alloc(4 * numVertices);
+        vertexUVIdx = (int *)RDROID_ALLOC(4 * numVertices);
         polyline->edgeFace.vertexUVIdx = vertexUVIdx;
         if ( !vertexUVIdx )
             return 0;
         for (int j = 0; j < polyline->edgeFace.numVertices; ++vertexUVIdx )
             *vertexUVIdx = j++;
-        extraUVTipMaybe = (rdVector2 *)rdroid_pHS->alloc(sizeof(rdVector2) * polyline->edgeFace.numVertices);
+        extraUVTipMaybe = (rdVector2 *)RDROID_ALLOC(sizeof(rdVector2) * polyline->edgeFace.numVertices);
         polyline->extraUVTipMaybe = extraUVTipMaybe;
         if ( !extraUVTipMaybe )
             return 0;
@@ -112,7 +114,7 @@ int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *materi
         return 0;
     rdMaterial_EnsureDataForced(polyline->tipFace.material); // Added: TWL
     polyline->tipFace.numVertices = 4;
-    vertexPosIdx = (int *)rdroid_pHS->alloc(sizeof(int) * polyline->tipFace.numVertices);
+    vertexPosIdx = (int *)RDROID_ALLOC(sizeof(int) * polyline->tipFace.numVertices);
     polyline->tipFace.vertexPosIdx = vertexPosIdx;
     if ( !vertexPosIdx )
         return 0;
@@ -120,13 +122,13 @@ int rdPolyLine_NewEntry(rdPolyLine *polyline, char *polyline_fname, char *materi
         *vertexPosIdx = k++;
     if ( polyline->tipFace.geometryMode >= RD_GEOMODE_TEXTURED)
     {
-        vertexUVIdx = (int *)rdroid_pHS->alloc(sizeof(int) * polyline->tipFace.numVertices);
+        vertexUVIdx = (int *)RDROID_ALLOC(sizeof(int) * polyline->tipFace.numVertices);
         polyline->tipFace.vertexUVIdx = vertexUVIdx;
         if ( !vertexUVIdx )
             return 0;
         for (int l = 0; l < polyline->tipFace.numVertices; ++vertexUVIdx )
             *vertexUVIdx = l++;
-        extraUVFaceMaybe = (rdVector2 *)rdroid_pHS->alloc(sizeof(rdVector2) * polyline->tipFace.numVertices);
+        extraUVFaceMaybe = (rdVector2 *)RDROID_ALLOC(sizeof(rdVector2) * polyline->tipFace.numVertices);
         polyline->extraUVFaceMaybe = extraUVFaceMaybe;
         if ( !extraUVFaceMaybe )
             return 0;
@@ -154,7 +156,7 @@ void rdPolyLine_Free(rdPolyLine *polyline)
     if ( polyline )
     {
         rdPolyLine_FreeEntry(polyline);
-        rdroid_pHS->free(polyline);
+        RDROID_FREE(polyline);
     }
 }
 
@@ -162,32 +164,32 @@ void rdPolyLine_FreeEntry(rdPolyLine *polyline)
 {
     if ( polyline->extraUVFaceMaybe )
     {
-        rdroid_pHS->free(polyline->extraUVFaceMaybe);
+        RDROID_FREE(polyline->extraUVFaceMaybe);
         polyline->extraUVFaceMaybe = 0;
     }
     if ( polyline->extraUVTipMaybe )
     {
-        rdroid_pHS->free(polyline->extraUVTipMaybe);
+        RDROID_FREE(polyline->extraUVTipMaybe);
         polyline->extraUVTipMaybe = 0;
     }
     if ( polyline->tipFace.vertexPosIdx )
     {
-        rdroid_pHS->free(polyline->tipFace.vertexPosIdx);
+        RDROID_FREE(polyline->tipFace.vertexPosIdx);
         polyline->tipFace.vertexPosIdx = 0;
     }
     if ( polyline->tipFace.vertexUVIdx )
     {
-        rdroid_pHS->free(polyline->tipFace.vertexUVIdx);
+        RDROID_FREE(polyline->tipFace.vertexUVIdx);
         polyline->tipFace.vertexUVIdx = 0;
     }
     if ( polyline->edgeFace.vertexPosIdx )
     {
-        rdroid_pHS->free(polyline->edgeFace.vertexPosIdx);
+        RDROID_FREE(polyline->edgeFace.vertexPosIdx);
         polyline->edgeFace.vertexPosIdx = 0;
     }
     if ( polyline->edgeFace.vertexUVIdx )
     {
-        rdroid_pHS->free(polyline->edgeFace.vertexUVIdx);
+        RDROID_FREE(polyline->edgeFace.vertexUVIdx);
         polyline->edgeFace.vertexUVIdx = 0;
     }
 }

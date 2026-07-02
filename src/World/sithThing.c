@@ -496,7 +496,7 @@ void sithThing_Free(sithWorld *pWorld)
 
     sithThing_freestuff(pWorld);
 
-    pSithHS->free(pWorld->things);
+    SITH_FREE(pWorld->things);
     pWorld->things = 0;
     pWorld->numThingsLoaded = 0;
     pWorld->numThings = -1;
@@ -613,7 +613,7 @@ void sithThing_FreeEverything(sithThing* pThing)
     if ( pThing->sector )
         sithThing_LeaveSector(pThing);
     if ( pThing->moveType == SITH_MT_PATH && pThing->trackParams.aFrames )
-        pSithHS->free(pThing->trackParams.aFrames);
+        SITH_FREE(pThing->trackParams.aFrames);
     if ( pThing->controlType == SITH_CT_AI )
         sithAI_FreeEntry(pThing);
     if ( pThing->type == SITH_THING_PARTICLE )
@@ -1034,7 +1034,7 @@ sithThing* sithThing_InstantiateFromTemplate(sithThing *pThing, sithThing *pTemp
         {
             // Added: made this more explicit
             pThing->trackParams.sizeFrames = pTemplateThing->trackParams.sizeFrames;
-            pThing->trackParams.aFrames = (sithThingFrame *)pSithHS->alloc(sizeof(sithThingFrame) * pThing->trackParams.sizeFrames);
+            pThing->trackParams.aFrames = (sithThingFrame *)SITH_ALLOC(sizeof(sithThingFrame) * pThing->trackParams.sizeFrames);
             if (pThing->trackParams.aFrames) // Added: nullptr check
                 _memcpy(pThing->trackParams.aFrames, pTemplateThing->trackParams.aFrames, sizeof(sithThingFrame) * pThing->trackParams.sizeFrames);
         }
@@ -1479,7 +1479,7 @@ int sithThing_Load(sithWorld *pWorld, int a2)
                 sithNet_things[1 + sithNet_thingsIdx++] = v5;
             }
         }
-        pSithHS->free(pWorld->things);
+        SITH_FREE(pWorld->things);
         pWorld->things = 0;
         pWorld->numThingsLoaded = 0;
         pWorld->numThings = -1;
@@ -1490,7 +1490,7 @@ int sithThing_Load(sithWorld *pWorld, int a2)
     if ( _strcmp(stdConffile_entry.args[1].value, "things") )
         return 0;
     v10 = _atoi(stdConffile_entry.args[2].value);
-    paThings = (sithThing *)pSithHS->alloc(sizeof(sithThing) * v10);
+    paThings = (sithThing *)SITH_ALLOC(sizeof(sithThing) * v10);
 
     sithWorld_pCurrentWorld->things = paThings;
     if ( !paThings )

@@ -29,6 +29,8 @@
 #include <dc/sound/sfxmgr.h>
 #include <dc/sound/stream.h>
 #include <kos/thread.h>
+#include <kos/mutex.h>  // Added: cutscene ring lifecycle lock
+#include <malloc.h>    // Added: memalign for the lazy stream scratch
 
 static int stdSound_dcReady = 0;
 
@@ -62,8 +64,8 @@ static void stdSound_dcSampleUnref(stdSound_buffer_t* buf)
     if (!smp) return;
     if (--smp->refs > 0) return;
     if (smp->sfxHandle) snd_sfx_unload(smp->sfxHandle);
-    if (smp->data) std_pHS->free(smp->data);
-    std_pHS->free(smp);
+    if (smp->data) STD_FREE(smp->data);
+    STD_FREE(smp);
 }
 
 // --- Gapless streaming (cutscene audio) --------------------------------------
@@ -74,10 +76,15 @@ static void stdSound_dcSampleUnref(stdSound_buffer_t* buf)
 // tiny KOS thread polls the stream; when it drains and stays idle we stop it so
 // snd_sfx gets its channels back until the next cutscene.
 #define DC_STREAM_RING (64 * 1024)
-static uint8_t  stdSound_dcRing[DC_STREAM_RING];
+// Added: the ring and its stream scratch (128KB combined) are heap-allocated on
+// the first cutscene audio chunk and freed when the stream drains and self-stops
+// (cutscenes and gameplay are mutually exclusive, so the memory is returned for
+// the level that follows). stdSound_dcRingMtx guards queue-vs-free.
+static mutex_t  stdSound_dcRingMtx = MUTEX_INITIALIZER;
+static uint8_t* stdSound_dcRing = NULL;
 static volatile uint32_t stdSound_dcRingW = 0;  // absolute write count (producer: engine)
 static volatile uint32_t stdSound_dcRingR = 0;  // absolute read count (consumer: stream cb)
-static uint8_t  stdSound_dcScratch[SND_STREAM_BUFFER_MAX] __attribute__((aligned(32)));
+static uint8_t* stdSound_dcScratch = NULL;      // SND_STREAM_BUFFER_MAX, 32-byte aligned
 static snd_stream_hnd_t stdSound_dcStream = SND_STREAM_INVALID;
 static int      stdSound_dcStreamOn = 0;
 static int      stdSound_dcStreamRate = 22050;
@@ -91,6 +98,7 @@ static volatile int stdSound_dcStreamThdRun = 0;
 static void* stdSound_dcStreamCb(snd_stream_hnd_t hnd, int req, int* recv)
 {
     (void)hnd;
+    if (!stdSound_dcRing || !stdSound_dcScratch) { *recv = 0; return NULL; } // Added: lazy buffers
     uint32_t avail = stdSound_dcRingW - stdSound_dcRingR;
     uint32_t give  = (avail < (uint32_t)req) ? avail : (uint32_t)req;
     uint32_t r     = stdSound_dcRingR % DC_STREAM_RING;
@@ -110,13 +118,24 @@ static void* stdSound_dcStreamThread(void* arg)
     (void)arg;
     while (stdSound_dcStreamThdRun) {
         if (stdSound_dcStreamOn && stdSound_dcStream != SND_STREAM_INVALID) {
+            mutex_lock(&stdSound_dcRingMtx); // Added: the callback reads the ring inside poll
             snd_stream_poll(stdSound_dcStream);
             // Self-stop once fully drained and idle, so snd_sfx reclaims channels.
             if (stdSound_dcRingR == stdSound_dcRingW &&
                 (stdPlatform_GetTimeMsec() - stdSound_dcStreamLastMs) > 750) {
                 snd_stream_stop(stdSound_dcStream);
                 stdSound_dcStreamOn = 0;
+                // Added: cutscene over -- return the ring + scratch to the heap.
+                if (stdSound_dcRing) {
+                    std_pHS->free(stdSound_dcRing);
+                    stdSound_dcRing = NULL;
+                }
+                if (stdSound_dcScratch) {
+                    free(stdSound_dcScratch);
+                    stdSound_dcScratch = NULL;
+                }
             }
+            mutex_unlock(&stdSound_dcRingMtx);
         }
         stdSound_dcLongPollAll();
         thd_sleep(10);
@@ -130,10 +149,21 @@ static void stdSound_dcStreamQueue(stdSound_buffer_t* buf)
     int rate   = buf->nSamplesPerSec ? (int)buf->nSamplesPerSec : 22050;
     int stereo = buf->bStereo ? 1 : 0;
 
+    mutex_lock(&stdSound_dcRingMtx); // Added: vs. the pump's drain-free
+    // Added: first cutscene chunk allocates the ring + scratch (see above);
+    // memalign because snd_stream fills the scratch via 32-byte SQ bursts.
+    if (!stdSound_dcRing) {
+        stdSound_dcRing = (uint8_t*)std_pHS->alloc(DC_STREAM_RING);
+        if (!stdSound_dcRing) { mutex_unlock(&stdSound_dcRingMtx); return; }
+    }
+    if (!stdSound_dcScratch) {
+        stdSound_dcScratch = (uint8_t*)memalign(32, SND_STREAM_BUFFER_MAX);
+        if (!stdSound_dcScratch) { mutex_unlock(&stdSound_dcRingMtx); return; }
+    }
     if (stdSound_dcStream == SND_STREAM_INVALID) {
         snd_stream_init();
         stdSound_dcStream = snd_stream_alloc(stdSound_dcStreamCb, SND_STREAM_BUFFER_MAX);
-        if (stdSound_dcStream == SND_STREAM_INVALID) return;
+        if (stdSound_dcStream == SND_STREAM_INVALID) { mutex_unlock(&stdSound_dcRingMtx); return; } // Added
     }
     if (!stdSound_dcStreamThd) {
         stdSound_dcStreamThdRun = 1;
@@ -155,7 +185,10 @@ static void stdSound_dcStreamQueue(stdSound_buffer_t* buf)
 
     uint32_t len   = (uint32_t)buf->bufferBytes;
     uint32_t space = DC_STREAM_RING - (stdSound_dcRingW - stdSound_dcRingR);
-    if (len == 0 || len > space) return; // ring full -> drop (better than corrupting)
+    if (len == 0 || len > space) { // ring full -> drop (better than corrupting)
+        mutex_unlock(&stdSound_dcRingMtx);
+        return;
+    }
 
     uint32_t w     = stdSound_dcRingW % DC_STREAM_RING;
     uint32_t first = (len < DC_STREAM_RING - w) ? len : (DC_STREAM_RING - w);
@@ -164,6 +197,7 @@ static void stdSound_dcStreamQueue(stdSound_buffer_t* buf)
     __asm__ __volatile__("" ::: "memory"); // publish data before advancing the write index
     stdSound_dcRingW += len;
     stdSound_dcStreamLastMs = stdPlatform_GetTimeMsec();
+    mutex_unlock(&stdSound_dcRingMtx);
 }
 
 // --- Long-sound streaming (sfx over the 65534-sample snd_sfx cap) -------------
@@ -314,7 +348,7 @@ void stdSound_SetMenuVolume(flex_t a1)
 
 stdSound_buffer_t* stdSound_BufferCreate(int bStereo, uint32_t nSamplesPerSec, uint16_t bitsPerSample, int bufferLen)
 {
-    stdSound_buffer_t* out = (stdSound_buffer_t*)std_pHS->alloc(sizeof(stdSound_buffer_t));
+    stdSound_buffer_t* out = (stdSound_buffer_t*)STD_ALLOC(sizeof(stdSound_buffer_t));
     if (!out)
         return NULL;
 
@@ -346,7 +380,7 @@ void* stdSound_BufferSetData(stdSound_buffer_t* sound, int bufferBytes, int32_t*
     // keep the old one alive through their own references.
     stdSound_dcSampleUnref(sound);
 
-    dcSample* smp = (dcSample*)std_pHS->alloc(sizeof(dcSample));
+    dcSample* smp = (dcSample*)STD_ALLOC(sizeof(dcSample));
     if (!smp)
         return NULL;
     _memset(smp, 0, sizeof(*smp));
@@ -363,7 +397,7 @@ void* stdSound_BufferSetData(stdSound_buffer_t* sound, int bufferBytes, int32_t*
         uint32_t bps   = (bits / 8) * chans;
         int bLong = bps && (uint32_t)bufferBytes / bps > 65534;
         int prevSuggest = bLong ? std_pHS->suggestHeap(HEAP_WORD_ADDRESSABLE) : 0;
-        smp->data = std_pHS->alloc(bufferBytes);
+        smp->data = STD_ALLOC(bufferBytes);
         if (bLong) {
             std_pHS->suggestHeap(prevSuggest);
             stdPlatform_Printf("stdSound: long sample %u KB -> %08x\n",
@@ -371,7 +405,7 @@ void* stdSound_BufferSetData(stdSound_buffer_t* sound, int bufferBytes, int32_t*
         }
     }
     if (!smp->data) {
-        std_pHS->free(smp);
+        STD_FREE(smp);
         return NULL;
     }
     smp->refs = 1;
@@ -415,7 +449,7 @@ static int stdSound_dcEnsureLoaded(stdSound_buffer_t* buf)
     if (!smp->sfxHandle) return 0;
 
     // SPU copy is authoritative now: reclaim the sysram PCM.
-    std_pHS->free(smp->data);
+    STD_FREE(smp->data);
     smp->data = NULL;
     buf->data = NULL;
     return 1;
@@ -494,7 +528,7 @@ void stdSound_BufferRelease(stdSound_buffer_t* sound)
     stdSound_dcSampleUnref(sound);
 
     memset(sound, 0, sizeof(*sound));
-    std_pHS->free(sound);
+    STD_FREE(sound);
 }
 
 int stdSound_BufferReset(stdSound_buffer_t* sound)
@@ -528,7 +562,7 @@ void stdSound_BufferSetFrequency(stdSound_buffer_t* sound, int freq)
 
 stdSound_buffer_t* stdSound_BufferDuplicate(stdSound_buffer_t* sound)
 {
-    stdSound_buffer_t* out = (stdSound_buffer_t*)std_pHS->alloc(sizeof(stdSound_buffer_t));
+    stdSound_buffer_t* out = (stdSound_buffer_t*)STD_ALLOC(sizeof(stdSound_buffer_t));
     if (!out)
         return NULL;
 

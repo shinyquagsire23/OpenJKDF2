@@ -146,7 +146,7 @@ wchar_t* jkGuiTitle_quicksave_related_func1(stdStrTable *strTable, char *jkl_fna
     for (int i = 0; i < 20; i++)
     {
         if (texts->str) {
-            std_pHS->free(texts->str);
+            STD_FREE(texts->str);
             texts->str = NULL;
         }
     }

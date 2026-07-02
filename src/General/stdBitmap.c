@@ -17,7 +17,7 @@ stdBitmap* stdBitmap_LoadCommon(char *fpath, int bCreateDDrawSurface, int gpuMem
     signed int v6; // ebx
     const char *v7; // eax
 
-    outAlloc = (stdBitmap *)std_pHS->alloc(sizeof(stdBitmap));
+    outAlloc = (stdBitmap *)STD_ALLOC(sizeof(stdBitmap));
     if (!outAlloc)
     {
         stdPrintf(std_pHS->errorPrint, ".\\General\\stdBitmap.c", 68, "Error: Unable to allocate memory for bitmap '%s'\n", fpath);
@@ -32,7 +32,7 @@ stdBitmap* stdBitmap_LoadCommon(char *fpath, int bCreateDDrawSurface, int gpuMem
     }
     else
     {
-        std_pHS->free(outAlloc);
+        STD_FREE(outAlloc);
         result = 0;
     }
     
@@ -78,7 +78,7 @@ stdBitmap* stdBitmap_Load2(char *fpath, int bCreateDDrawSurface, int gpuMem)
 
 stdBitmap* stdBitmap_LoadFromFile(stdFile_t fd, int bCreateDDrawSurface, int gpuMem)
 {
-    stdBitmap* outAlloc = (stdBitmap*)std_pHS->alloc(sizeof(stdBitmap));
+    stdBitmap* outAlloc = (stdBitmap*)STD_ALLOC(sizeof(stdBitmap));
     if (!outAlloc)
     {
         stdPrintf(std_pHS->errorPrint, ".\\General\\stdBitmap.c", 103, "Error: Unable to allocate memory for bitmap.\n", 0, 0, 0, 0);
@@ -166,7 +166,7 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
 
     vbufAllocSize = sizeof(stdVBuffer*) * numMips_;
     numMips = numMips_;
-    vbufAlloc = (stdVBuffer **)std_pHS->alloc(sizeof(stdVBuffer*) * numMips_);
+    vbufAlloc = (stdVBuffer **)STD_ALLOC(sizeof(stdVBuffer*) * numMips_);
     out->mipSurfaces = vbufAlloc;
     if ( vbufAlloc )
     {
@@ -215,7 +215,7 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
 #ifdef TARGET_RETRO_HOMEBREW
         // Added: bounce rows through a temp buffer; fileRead byte-writes internally
         // and the vbuffer may be word-addressable-only (DC VRAM / NDS slot-2).
-        char* pRowTmp = (char*)std_pHS->alloc(v15);
+        char* pRowTmp = (char*)STD_ALLOC(v15);
         for ( i = 0; i < vbufTexFmt.height; ++i )
         {
             if (pRowTmp) {
@@ -227,7 +227,7 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
             lockAlloc += surface->format.width_in_bytes;
         }
         if (pRowTmp) {
-            std_pHS->free(pRowTmp);
+            STD_FREE(pRowTmp);
         }
 #else
         for ( i = 0; i < vbufTexFmt.height; ++i )
@@ -243,7 +243,7 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
         // TODO: Eviction caching for stdBitmap, rdMaterial
 #ifdef TARGET_TWL
         if (openjkdf2_bIsExtraLowMemoryPlatform && vbufTexFmt.width == 640 && vbufTexFmt.height == 480){
-            std_pHS->free(surface->surface_lock_alloc);
+            STD_FREE(surface->surface_lock_alloc);
             surface->surface_lock_alloc = NULL;
         }
 #endif
@@ -251,7 +251,7 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
 
     if ( (out->palFmt & 2) != 0  && !bPartial)
     {
-        palette_map = std_pHS->alloc(0x300);
+        palette_map = STD_ALLOC(0x300);
         out->palette = palette_map;
         if ( !palette_map )
         {
@@ -263,9 +263,9 @@ LABEL_17:
     }
 
 #ifdef SDL2_RENDER
-    out->aTextureIds = (uint32_t*)std_pHS->alloc(out->numMips * sizeof(uint32_t));
-    out->abLoadedToGPU = (int*)std_pHS->alloc(out->numMips * sizeof(int));
-    out->paDataDepthConverted = (void**)std_pHS->alloc(out->numMips * sizeof(void*));
+    out->aTextureIds = (uint32_t*)STD_ALLOC(out->numMips * sizeof(uint32_t));
+    out->abLoadedToGPU = (int*)STD_ALLOC(out->numMips * sizeof(int));
+    out->paDataDepthConverted = (void**)STD_ALLOC(out->numMips * sizeof(void*));
 
     memset(out->aTextureIds, 0, (out->numMips * sizeof(uint32_t)));
     memset(out->abLoadedToGPU, 0, (out->numMips * sizeof(int)));
@@ -333,11 +333,11 @@ void stdBitmap_FreeEntry(stdBitmap *pBitmap)
 
 #ifdef SDL2_RENDER
     std3D_PurgeBitmapRefs(pBitmap);
-    std_pHS->free(pBitmap->aTextureIds);
+    STD_FREE(pBitmap->aTextureIds);
     pBitmap->aTextureIds = NULL;
-    std_pHS->free(pBitmap->abLoadedToGPU);
+    STD_FREE(pBitmap->abLoadedToGPU);
     pBitmap->abLoadedToGPU = NULL;
-    std_pHS->free(pBitmap->paDataDepthConverted);
+    STD_FREE(pBitmap->paDataDepthConverted);
     pBitmap->paDataDepthConverted = NULL;
 #endif
 
@@ -350,11 +350,11 @@ void stdBitmap_FreeEntry(stdBitmap *pBitmap)
             }
             pBitmap->mipSurfaces[i] = NULL; // Added
         }
-        std_pHS->free(pBitmap->mipSurfaces);
+        STD_FREE(pBitmap->mipSurfaces);
     }
     pBitmap->mipSurfaces = NULL; // Added
     if (pBitmap->palette) {
-        std_pHS->free(pBitmap->palette);
+        STD_FREE(pBitmap->palette);
     }
     pBitmap->palette = NULL; // Added
 
@@ -367,7 +367,7 @@ void stdBitmap_FreeEntry(stdBitmap *pBitmap)
 void stdBitmap_Free(stdBitmap *pBitmap)
 {
     stdBitmap_FreeEntry(pBitmap);
-    std_pHS->free(pBitmap);
+    STD_FREE(pBitmap);
     //stdPrintf(std_pHS->debugPrint, ".\\General\\stdBitmap.c", 322, "Bitmap successfully freed.\n", 0, 0, 0, 0);
 }
 
@@ -478,7 +478,7 @@ void stdBitmap_MemUsage(stdBitmap *pBitmap, int mipIdx, stdVBuffer *vbuf)
 
 stdBitmap* stdBitmap_New(uint32_t numMips, int palFmt, int field_20, int field_68, rdTexFormat *pFormat)
 {
-    stdBitmap *bitmap = (stdBitmap *)std_pHS->alloc(sizeof(stdBitmap));
+    stdBitmap *bitmap = (stdBitmap *)STD_ALLOC(sizeof(stdBitmap));
     if ( !bitmap )
     {
         stdPrintf(std_pHS->statusPrint, ".\\General\\stdBitmap.c", 0x316,
@@ -487,13 +487,13 @@ stdBitmap* stdBitmap_New(uint32_t numMips, int palFmt, int field_20, int field_6
     }
     _memset(bitmap, 0, sizeof(stdBitmap));
 
-    stdVBuffer **surfaces = (stdVBuffer **)std_pHS->alloc(numMips * sizeof(stdVBuffer *));
+    stdVBuffer **surfaces = (stdVBuffer **)STD_ALLOC(numMips * sizeof(stdVBuffer *));
     bitmap->mipSurfaces = surfaces;
     if ( !surfaces )
     {
         stdPrintf(std_pHS->statusPrint, ".\\General\\stdBitmap.c", 0x34B,
                   "Ran out of memory trying allocating bitmap.");
-        std_pHS->free(bitmap);
+        STD_FREE(bitmap);
         return NULL;
     }
     _memset(surfaces, 0, numMips * sizeof(stdVBuffer *));
@@ -510,7 +510,7 @@ int stdBitmap_NewEntry(stdBitmap *bitmap, uint32_t numMips, int palFmt, int fiel
 {
     _memset(bitmap, 0, sizeof(stdBitmap));
 
-    stdVBuffer **surfaces = (stdVBuffer **)std_pHS->alloc(numMips * sizeof(stdVBuffer *));
+    stdVBuffer **surfaces = (stdVBuffer **)STD_ALLOC(numMips * sizeof(stdVBuffer *));
     bitmap->mipSurfaces = surfaces;
     if ( !surfaces )
     {

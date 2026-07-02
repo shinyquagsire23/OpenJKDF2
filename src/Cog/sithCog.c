@@ -436,6 +436,13 @@ int32_t sithCog_Open()
                 if ( _strlen(v3->value) )
                     sithCog_LoadEntry(&v2->pSymbolTable->buckets[v3->hash], v3, v3->value);
             }
+#ifdef COG_HEAP_INIT_ARGS
+            // Added: static-world cogs never consume jkl init strings; drop them
+            if (v2->aInitArgs) {
+                SITH_FREE(v2->aInitArgs);
+                v2->aInitArgs = NULL;
+            }
+#endif
             sithCog_SendMessage(v2++, SITH_MESSAGE_LOADING, 0, 0, 0, 0, 0);
             world = world_;
         }
@@ -452,12 +459,23 @@ int32_t sithCog_Open()
             if ( cogs->cogscript->numIdk )
                 break;
 LABEL_25:
+#ifdef COG_HEAP_INIT_ARGS
+            // Added: the init strings were only needed for the linking above
+            if (cogs->aInitArgs) {
+                SITH_FREE(cogs->aInitArgs);
+                cogs->aInitArgs = NULL;
+            }
+#endif
             sithCog_SendMessage(cogs++, SITH_MESSAGE_LOADING, 0, 0, 0, 0, 0);
             if (++v12 >= world_->numCogsLoaded )
                 goto LABEL_26;
         }
 
+#ifdef COG_HEAP_INIT_ARGS
+        v13 = cogs->aInitArgs; // may be NULL (no jkl args / arg-less cog)
+#else
         v13 = cogs->field_4BC;
+#endif
         while ( 1 )
         {
             idk = &cogs->cogscript->aIdk[v10];
@@ -469,7 +487,7 @@ LABEL_25:
                     sithCog_LoadEntry(v8, v6, idk->value);
                 goto LABEL_24;
             }
-            else if ( _strlen(v13) ) {
+            else if ( v13 && _strlen(v13) ) { // Added: v13 NULL guard for COG_HEAP_INIT_ARGS
                 sithCog_LoadEntry(v8, v6, v13);
                 v8 = v14;
             }
@@ -478,7 +496,8 @@ LABEL_25:
                 sithCog_LoadEntry(v8, v6, idk->value);
                 v8 = v14;
             }
-            v13 += 32;
+            if (v13) // Added: NULL guard for COG_HEAP_INIT_ARGS
+                v13 += 32;
             sithCog_ThingsSectorsRegSymbolIdk(cogs, v6, v8);
 
 
@@ -537,7 +556,7 @@ int sithCog_Load(sithWorld *world, int a2)
     num_cogs = _atoi(stdConffile_entry.args[2].value);
     if ( !num_cogs )
         return 1;
-    cogs = (sithCog *)pSithHS->alloc(sizeof(sithCog) * num_cogs);
+    cogs = (sithCog *)SITH_ALLOC(sizeof(sithCog) * num_cogs);
     world->cogs = cogs;
     if ( cogs )
     {
@@ -558,12 +577,23 @@ int sithCog_Load(sithWorld *world, int a2)
             {
                 v18 = v9->cogscript;
                 v23 = 0;
+#ifdef COG_HEAP_INIT_ARGS
+                // Added: exact-size init-arg strings, freed after linking in sithCog_Open
+                v9->aInitArgs = NULL;
+                if (v9->cogscript->numIdk) {
+                    v9->aInitArgs = (char*)SITH_ALLOC(32 * v9->cogscript->numIdk);
+                    if (v9->aInitArgs)
+                        _memset(v9->aInitArgs, 0, 32 * v9->cogscript->numIdk);
+                }
+                v21 = v9->aInitArgs;
+#else
                 v21 = &v9->field_4BC[0];
+#endif
                 v22 = 2;
                 for (v23 = 0; v23 < v9->cogscript->numIdk; v23++)
                 {
                     //printf("%s\n", stdConffile_entry.args[v22].value);
-                    if ( (v18->aIdk[v23].flags & 1) == 0 && stdConffile_entry.numArgs > v22 )
+                    if ( v21 && (v18->aIdk[v23].flags & 1) == 0 && stdConffile_entry.numArgs > v22 )
                     {
                         stdString_SafeStrCopy(v21, stdConffile_entry.args[v22].value, 32);
                         v21 += 32;
@@ -730,7 +760,7 @@ int32_t sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogReference *cogIdk, ch
                 return 0;
             }
 #else
-            pVec = (cog_flex_t*)pSithHS->alloc(sizeof(cog_flex_t)*3);
+            pVec = (cog_flex_t*)SITH_ALLOC(sizeof(cog_flex_t)*3);
             if (pVec) {
                 cogSymbol->val.dataAsPtrs[0] = (intptr_t)pVec;
                 if (_sscanf(val, "(%f/%f/%f)", &tmpx, &tmpy, &tmpz) == 3 )
@@ -1428,23 +1458,23 @@ void sithCog_Free(sithWorld *world)
             {
                 if (v4->aIdk[v5].desc)
                 {
-                    pSithHS->free(v4->aIdk[v5].desc);
+                    SITH_FREE(v4->aIdk[v5].desc);
                     v4->aIdk[v5].desc = NULL;
                 }
             }
 #ifdef COG_DYNAMIC_IDK
             if (v4->aIdk)
-                pSithHS->free(v4->aIdk);
+                SITH_FREE(v4->aIdk);
             v4->aIdk = NULL;
 #endif
 #ifdef COG_DYNAMIC_TRIGGERS
             if (v4->triggers)
-                pSithHS->free(v4->triggers);
+                SITH_FREE(v4->triggers);
             v4->triggers = NULL;
 #endif
             if ( v4->script_program )
             {
-                pSithHS->free(v4->script_program);
+                SITH_FREE(v4->script_program);
                 v4->script_program = 0;
             }
 #ifdef STDHASHTABLE_CRC32_KEYS
@@ -1453,7 +1483,7 @@ void sithCog_Free(sithWorld *world)
             stdHashTable_FreeKey(sithCog_pScriptHashtable, v4->cog_fpath);
 #endif
         }
-        pSithHS->free(world->cogScripts);
+        SITH_FREE(world->cogScripts);
         world->cogScripts = 0;
         world->numCogScripts = 0;
         world->numCogScriptsLoaded = 0;
@@ -1464,21 +1494,28 @@ void sithCog_Free(sithWorld *world)
         {
             v9 = &world->cogs[i];
             sithCogParse_FreeSymboltable(v9->pSymbolTable);
+#ifdef COG_HEAP_INIT_ARGS
+            if ( v9->aInitArgs ) // Added: failed-load path can leave these live
+            {
+                SITH_FREE(v9->aInitArgs);
+                v9->aInitArgs = NULL;
+            }
+#endif
             if ( v9->heap )
             {
-                pSithHS->free(v9->heap);
+                SITH_FREE(v9->heap);
                 v9->numHeapVars = 0;
                 v9->heap = NULL; // Added
             }
 #ifdef COG_DYNAMIC_STACKS
             if (v9->stack) {
-                pSithHS->free(v9->stack);
+                SITH_FREE(v9->stack);
                 v9->stack = NULL;
                 v9->stackSize = 0;
             }
 #endif
         }
-        pSithHS->free(world->cogs);
+        SITH_FREE(world->cogs);
         world->cogs = 0;
         world->numCogs = 0;
         world->numCogsLoaded = 0;
@@ -1522,7 +1559,7 @@ int sithCogScript_Load(sithWorld *lvl, int a2)
     numCogScripts = _atoi(stdConffile_entry.args[2].value);
     if ( !numCogScripts )
         return 1;
-    cogScripts = (sithCogScript *)pSithHS->alloc(sizeof(sithCogScript) * numCogScripts);
+    cogScripts = (sithCogScript *)SITH_ALLOC(sizeof(sithCogScript) * numCogScripts);
     lvl->cogScripts = cogScripts;
     if ( cogScripts )
     {
@@ -1794,13 +1831,13 @@ void sithCog_FreeEntry(sithCog *cog)
     {
         if ( cog->cogscript->aIdk[i].desc )
         {
-            pSithHS->free(cog->cogscript->aIdk[i].desc);
+            SITH_FREE(cog->cogscript->aIdk[i].desc);
             cog->cogscript->aIdk[i].desc = NULL;
         }
     }
     if ( cog->heap )
     {
-        pSithHS->free(cog->heap);
+        SITH_FREE(cog->heap);
         cog->heap = NULL;
     }
 }
@@ -1810,14 +1847,14 @@ void sithCog_Free2(sithCogScript *cogscript)
     sithCogParse_FreeSymboltable(cogscript->pSymbolTable);
     if ( cogscript->script_program )
     {
-        pSithHS->free(cogscript->script_program);
+        SITH_FREE(cogscript->script_program);
         cogscript->script_program = NULL;
     }
 }
 
 int sithCog_InitScripts(sithWorld *world, int num)
 {
-    sithCogScript *scripts = (sithCogScript *)pSithHS->alloc(num * sizeof(sithCogScript));
+    sithCogScript *scripts = (sithCogScript *)SITH_ALLOC(num * sizeof(sithCogScript));
     world->cogScripts = scripts;
     if ( !scripts )
     {
@@ -1833,7 +1870,7 @@ int sithCog_InitScripts(sithWorld *world, int num)
 
 int sithCog_InitCogs(sithWorld *world, int num)
 {
-    sithCog *cogs = (sithCog *)pSithHS->alloc(num * sizeof(sithCog));
+    sithCog *cogs = (sithCog *)SITH_ALLOC(num * sizeof(sithCog));
     world->cogs = cogs;
     if ( !cogs )
     {

@@ -1130,6 +1130,154 @@ void stdPlatform_PrintHeapStats()
 #endif // TARGET_DREAMCAST
 
 
+// Added: per-file allocation cataloguing. The original game clearly had debug
+// allocation hooks in its host-services design; this reconstructs the idea.
+// Enabled by STDPLATFORM_ALLOC_TRACKING (the *_ALLOC/*_FREE macros in
+// stdPlatform.h); stats keyed on __FILE__ string identity (each TU passes its
+// own literal, so pointer compare hits first; strcmp is the cross-TU fallback).
+// Sizes at free/realloc come from stdPlatform_AllocSize below, which reads the
+// platform allocator's own header -- no extra per-allocation overhead that
+// would distort the memory pressure being measured.
+
+// Read back the user-byte size of an allocation from the underlying allocator.
+// Returns 0 if unknown (untracked/foreign pointer) -- callers treat 0 as "skip".
+uint32_t stdPlatform_AllocSize(void* p)
+{
+    if (!p) return 0;
+#if defined(TARGET_DREAMCAST)
+    DcMemHeader* hdr = (DcMemHeader*)p - 1;
+    uint8_t mark = DC_HDR_MARK(hdr);
+    if (mark != DC_MARK_MSPACE && mark != DC_MARK_SYS)
+        return 0;
+    return DC_HDR_SIZE(hdr);
+#elif defined(TARGET_TWL)
+    tMemTrackingHeader* hdr = (tMemTrackingHeader*)p - 1;
+    if (HDR_MEMTYPE_RD(hdr) == 0xDE)
+        return 0;
+    return HDR_SIZE_RD(hdr);
+#elif defined(__APPLE__)
+    extern size_t malloc_size(const void*);
+    return (uint32_t)malloc_size(p);
+#elif defined(__GLIBC__)
+    extern size_t malloc_usable_size(void*);
+    return (uint32_t)malloc_usable_size(p);
+#elif defined(_MSC_VER)
+    return (uint32_t)_msize(p);
+#else
+    return 0;
+#endif
+}
+
+#define STDALLOCTRACK_MAX_FILES 128
+typedef struct stdAllocTrackEnt
+{
+    const char* pFile;
+    int32_t liveBytes;
+    int32_t liveCount;
+    int32_t peakBytes;
+    uint32_t totalAllocs;
+} stdAllocTrackEnt;
+static stdAllocTrackEnt stdPlatform_aAllocTrack[STDALLOCTRACK_MAX_FILES];
+static int stdPlatform_numAllocTrack = 0;
+static int32_t stdPlatform_allocTrackUntracked = 0; // freed-without-size etc.
+
+static stdAllocTrackEnt* stdPlatform_AllocTrackEnt(const char* pFile)
+{
+    for (int i = 0; i < stdPlatform_numAllocTrack; i++) {
+        if (stdPlatform_aAllocTrack[i].pFile == pFile)
+            return &stdPlatform_aAllocTrack[i];
+    }
+    for (int i = 0; i < stdPlatform_numAllocTrack; i++) {
+        if (!_strcmp(stdPlatform_aAllocTrack[i].pFile, pFile))
+            return &stdPlatform_aAllocTrack[i];
+    }
+    if (stdPlatform_numAllocTrack >= STDALLOCTRACK_MAX_FILES)
+        return NULL;
+    stdAllocTrackEnt* ent = &stdPlatform_aAllocTrack[stdPlatform_numAllocTrack++];
+    ent->pFile = pFile;
+    return ent;
+}
+
+void* stdPlatform_TrackedAlloc(void* (*allocFn)(uint32_t), uint32_t len, const char* pFile)
+{
+    void* p = allocFn(len);
+    if (p) {
+        stdAllocTrackEnt* ent = stdPlatform_AllocTrackEnt(pFile);
+        if (ent) {
+            ent->liveBytes += (int32_t)len;
+            ent->liveCount++;
+            ent->totalAllocs++;
+            if (ent->liveBytes > ent->peakBytes)
+                ent->peakBytes = ent->liveBytes;
+        }
+    }
+    return p;
+}
+
+void stdPlatform_TrackedFree(void (*freeFn)(void*), void* p, const char* pFile)
+{
+    if (p) {
+        uint32_t sz = stdPlatform_AllocSize(p);
+        stdAllocTrackEnt* ent = stdPlatform_AllocTrackEnt(pFile);
+        if (ent && sz) {
+            ent->liveBytes -= (int32_t)sz;
+            ent->liveCount--;
+        }
+        else if (!sz) {
+            stdPlatform_allocTrackUntracked++;
+        }
+    }
+    freeFn(p);
+}
+
+void* stdPlatform_TrackedRealloc(void* (*reallocFn)(void*, uint32_t), void* p, uint32_t len, const char* pFile)
+{
+    uint32_t oldSz = p ? stdPlatform_AllocSize(p) : 0;
+    void* pNew = reallocFn(p, len);
+    if (pNew) {
+        stdAllocTrackEnt* ent = stdPlatform_AllocTrackEnt(pFile);
+        if (ent) {
+            ent->liveBytes += (int32_t)len - (int32_t)oldSz;
+            if (!p) ent->liveCount++;
+            ent->totalAllocs++;
+            if (ent->liveBytes > ent->peakBytes)
+                ent->peakBytes = ent->liveBytes;
+        }
+    }
+    return pNew;
+}
+
+// Dump the catalog, largest live footprint first.
+void stdPlatform_PrintAllocStats(void)
+{
+    int aOrder[STDALLOCTRACK_MAX_FILES];
+    int32_t totalLive = 0, totalPeak = 0;
+    for (int i = 0; i < stdPlatform_numAllocTrack; i++)
+        aOrder[i] = i;
+    for (int i = 1; i < stdPlatform_numAllocTrack; i++) {
+        int v = aOrder[i], j = i - 1;
+        while (j >= 0 && stdPlatform_aAllocTrack[aOrder[j]].liveBytes < stdPlatform_aAllocTrack[v].liveBytes) {
+            aOrder[j + 1] = aOrder[j];
+            j--;
+        }
+        aOrder[j + 1] = v;
+    }
+    stdPlatform_Printf("=== alloc catalog (live KB / peak KB / count / total allocs) ===\n");
+    for (int i = 0; i < stdPlatform_numAllocTrack; i++) {
+        stdAllocTrackEnt* ent = &stdPlatform_aAllocTrack[aOrder[i]];
+        const char* pName = ent->pFile;
+        for (const char* c = pName; *c; c++)
+            if (*c == '/' || *c == '\\') pName = c + 1;
+        stdPlatform_Printf("%7.1f %7.1f %5d %6u  %s\n",
+            ent->liveBytes / 1024.0, ent->peakBytes / 1024.0,
+            ent->liveCount, ent->totalAllocs, pName);
+        totalLive += ent->liveBytes;
+        totalPeak += ent->peakBytes;
+    }
+    stdPlatform_Printf("=== total live %d KB (sum of peaks %d KB, %d untracked frees) ===\n",
+        (int)(totalLive / 1024), (int)(totalPeak / 1024), stdPlatform_allocTrackUntracked);
+}
+
 // Added: does this pointer live in memory that drops byte-granular stores?
 // Callers use it to decide between a direct fileRead and a word-safe bounce.
 int stdPlatform_IsWordAddressableOnly(const void* p)

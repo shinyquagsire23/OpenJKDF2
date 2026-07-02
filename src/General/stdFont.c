@@ -85,7 +85,7 @@ stdFont* stdFont_Load(char *fpath, int a2, int a3)
     marginX = header.marginX;
     totalAlloc = sizeof(stdFontEntry) * (extHeader.characterLast - extHeader.characterFirst) + sizeof(stdFont);
     marginY = header.marginY;
-    fontAlloc = (stdFont *)std_pHS->alloc(totalAlloc);
+    fontAlloc = (stdFont *)STD_ALLOC(totalAlloc);
     if ( fontAlloc )
     {
         _memset(fontAlloc, 0, totalAlloc);
@@ -123,7 +123,7 @@ stdFont* stdFont_Load(char *fpath, int a2, int a3)
             for ( i = fontAlloc_->charsetHead.previous; i; i = i->previous )
                 lastCharset = i;
             v16 = sizeof(stdFontEntry) * (extHeader.characterLast - extHeader.characterFirst + 1) + (sizeof(stdFontCharset*) + sizeof(uint16_t)*2 + sizeof(stdFontEntry*));
-            charset = (stdFontCharset *)std_pHS->alloc(v16*2);
+            charset = (stdFontCharset *)STD_ALLOC(v16*2);
             if ( charset )
             {
                 lastCharset->previous = charset;
@@ -163,13 +163,13 @@ LABEL_21:
     else
     {
         v20 = fontAlloc_->charsetHead.previous;
-        std_pHS->free(fontAlloc_);
+        STD_FREE(fontAlloc_);
         if ( v20 )
         {
             do
             {
                 v21 = v20->previous;
-                std_pHS->free(v20);
+                STD_FREE(v20);
                 v20 = v21;
             }
             while ( v21 );
@@ -1066,13 +1066,13 @@ void stdFont_Free(stdFont *font)
     if ( font->pBitmap )
         stdBitmap_Free(font->pBitmap);
     v1 = font->charsetHead.previous;
-    std_pHS->free(font);
+    STD_FREE(font);
     if ( v1 )
     {
         do
         {
             v2 = v1->previous;
-            std_pHS->free(v1);
+            STD_FREE(v1);
             v1 = v2;
         }
         while ( v2 );
@@ -1203,7 +1203,7 @@ int stdFont_sub_4355B0(stdFont *font, uint16_t a2)
 stdFont* stdFont_New(int marginY, int marginX, int16_t field_28, uint16_t charFirst, uint16_t charLast)
 {
     uint32_t allocSize = ((uint32_t)(charLast - charFirst)) * sizeof(stdFontEntry) + sizeof(stdFont);
-    stdFont *font = (stdFont *)std_pHS->alloc(allocSize);
+    stdFont *font = (stdFont *)STD_ALLOC(allocSize);
     if ( !font )
         return NULL;
     _memset(font, 0, allocSize);
@@ -1266,7 +1266,7 @@ stdFontCharset* stdFont_sub_4358D0(stdFont *font, uint16_t charFirst, uint16_t c
     }
 
     uint32_t allocSize = ((uint32_t)(charLast - charFirst) + 1) * sizeof(stdFontEntry) + sizeof(stdFontCharset);
-    stdFontCharset *newCharset = (stdFontCharset *)std_pHS->alloc(allocSize);
+    stdFontCharset *newCharset = (stdFontCharset *)STD_ALLOC(allocSize);
     if ( !newCharset )
         return NULL;
     _memset(newCharset, 0, allocSize);

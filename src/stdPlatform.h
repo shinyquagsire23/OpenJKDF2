@@ -74,6 +74,44 @@ void stdPlatform_PrintHeapStats();
 // Added
 void stdPlatform_Memzero32(void* dst, uint32_t len);
 int stdPlatform_IsWordAddressableOnly(const void* p);
+
+// Added: per-file allocation cataloguing (see stdPlatform.c).
+// Define STDPLATFORM_ALLOC_TRACKING to route the *_ALLOC/*_FREE macros below
+// through a tracker keyed on __FILE__; without it they compile straight to the
+// host-services calls (zero overhead). Free/realloc read the allocation size
+// back from the platform allocator's own header, so tracked and untracked
+// pointers can be mixed safely.
+void* stdPlatform_TrackedAlloc(void* (*allocFn)(uint32_t), uint32_t len, const char* pFile);
+void  stdPlatform_TrackedFree(void (*freeFn)(void*), void* p, const char* pFile);
+void* stdPlatform_TrackedRealloc(void* (*reallocFn)(void*, uint32_t), void* p, uint32_t len, const char* pFile);
+void  stdPlatform_PrintAllocStats(void);
+uint32_t stdPlatform_AllocSize(void* p);
+
+#ifdef STDPLATFORM_ALLOC_TRACKING
+#define STD_ALLOC(len)       stdPlatform_TrackedAlloc(std_pHS->alloc, (len), __FILE__)
+#define STD_FREE(p)          stdPlatform_TrackedFree(std_pHS->free, (p), __FILE__)
+#define STD_REALLOC(p, len)  stdPlatform_TrackedRealloc(std_pHS->realloc, (p), (len), __FILE__)
+#define SITH_ALLOC(len)      stdPlatform_TrackedAlloc(pSithHS->alloc, (len), __FILE__)
+#define SITH_FREE(p)         stdPlatform_TrackedFree(pSithHS->free, (p), __FILE__)
+#define SITH_REALLOC(p, len) stdPlatform_TrackedRealloc(pSithHS->realloc, (p), (len), __FILE__)
+#define RDROID_ALLOC(len)    stdPlatform_TrackedAlloc(rdroid_pHS->alloc, (len), __FILE__)
+#define RDROID_FREE(p)       stdPlatform_TrackedFree(rdroid_pHS->free, (p), __FILE__)
+#define RDROID_REALLOC(p, len) stdPlatform_TrackedRealloc(rdroid_pHS->realloc, (p), (len), __FILE__)
+#define JK_ALLOC(len)        stdPlatform_TrackedAlloc(pHS->alloc, (len), __FILE__)
+#define JK_FREE(p)           stdPlatform_TrackedFree(pHS->free, (p), __FILE__)
+#else
+#define STD_ALLOC(len)       std_pHS->alloc(len)
+#define STD_FREE(p)          std_pHS->free(p)
+#define STD_REALLOC(p, len)  std_pHS->realloc((p), (len))
+#define SITH_ALLOC(len)      pSithHS->alloc(len)
+#define SITH_FREE(p)         pSithHS->free(p)
+#define SITH_REALLOC(p, len) pSithHS->realloc((p), (len))
+#define RDROID_ALLOC(len)    rdroid_pHS->alloc(len)
+#define RDROID_FREE(p)       rdroid_pHS->free(p)
+#define RDROID_REALLOC(p, len) rdroid_pHS->realloc((p), (len))
+#define JK_ALLOC(len)        pHS->alloc(len)
+#define JK_FREE(p)           pHS->free(p)
+#endif
 void stdPlatform_Memcpy32(void* dst, const void* src, uint32_t len);
 void stdPlatform_Memset32(void* dst, uint8_t val, uint32_t len);
 

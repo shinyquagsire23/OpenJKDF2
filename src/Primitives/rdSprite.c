@@ -1,5 +1,7 @@
 #include "rdSprite.h"
 
+#include "stdPlatform.h" // Added: *_ALLOC/*_FREE macros
+
 #include "General/stdMath.h"
 #include "General/stdString.h"
 #include "Engine/rdroid.h"
@@ -16,7 +18,7 @@ rdSprite* rdSprite_New(int type, char *fpath, char *materialFpath, flex_t width,
 {
     rdSprite *sprite;
 
-    sprite = (rdSprite *)rdroid_pHS->alloc(sizeof(rdSprite));
+    sprite = (rdSprite *)RDROID_ALLOC(sizeof(rdSprite));
     if ( sprite )
     {
         rdSprite_NewEntry(sprite, fpath, type, materialFpath, width, height, geometryMode, lightMode, textureMode, extraLight, offset);
@@ -45,7 +47,7 @@ int rdSprite_NewEntry(rdSprite *sprite, char *spritepath, int type, char *materi
     {
         rdMaterial_EnsureDataForced(sprite->face.material); // Added: TWL
         sprite->face.numVertices = 4;
-        sprite->face.vertexPosIdx = (int *)rdroid_pHS->alloc(sizeof(int) * sprite->face.numVertices);
+        sprite->face.vertexPosIdx = (int *)RDROID_ALLOC(sizeof(int) * sprite->face.numVertices);
         if ( sprite->face.vertexPosIdx )
         {
             if ( sprite->face.geometryMode <= RD_GEOMODE_SOLIDCOLOR)
@@ -57,7 +59,7 @@ int rdSprite_NewEntry(rdSprite *sprite, char *spritepath, int type, char *materi
             }
             else
             {
-                sprite->face.vertexUVIdx = (int *)rdroid_pHS->alloc(sizeof(int) * sprite->face.numVertices);
+                sprite->face.vertexUVIdx = (int *)RDROID_ALLOC(sizeof(int) * sprite->face.numVertices);
                 if ( !sprite->face.vertexUVIdx )
                     return 0;
 
@@ -66,7 +68,7 @@ int rdSprite_NewEntry(rdSprite *sprite, char *spritepath, int type, char *materi
                    sprite->face.vertexPosIdx[i] = i;
                    sprite->face.vertexUVIdx[i] = i;
                 }
-                sprite->vertexUVs = (rdVector2 *)rdroid_pHS->alloc(sizeof(rdVector2) * sprite->face.numVertices);
+                sprite->vertexUVs = (rdVector2 *)RDROID_ALLOC(sizeof(rdVector2) * sprite->face.numVertices);
                 if ( !sprite->vertexUVs )
                     return 0;
                 
@@ -105,7 +107,7 @@ void rdSprite_Free(rdSprite *sprite)
     if (sprite)
     {
         rdSprite_FreeEntry(sprite);
-        rdroid_pHS->free(sprite);
+        RDROID_FREE(sprite);
     }
 }
 
@@ -113,17 +115,17 @@ void rdSprite_FreeEntry(rdSprite *sprite)
 {
     if (sprite->vertexUVs)
     {
-        rdroid_pHS->free(sprite->vertexUVs);
+        RDROID_FREE(sprite->vertexUVs);
         sprite->vertexUVs = 0;
     }
     if (sprite->face.vertexPosIdx)
     {
-        rdroid_pHS->free(sprite->face.vertexPosIdx);
+        RDROID_FREE(sprite->face.vertexPosIdx);
         sprite->face.vertexPosIdx = 0;
     }
     if (sprite->face.vertexUVIdx)
     {
-        rdroid_pHS->free(sprite->face.vertexUVIdx);
+        RDROID_FREE(sprite->face.vertexUVIdx);
         sprite->face.vertexUVIdx = 0;
     }
 }

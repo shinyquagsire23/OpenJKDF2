@@ -184,7 +184,7 @@ int sithSoundClass_Load(sithWorld *world, int a2)
     if ( sithNet_isMulti ) {
         num_soundclasses += 32;
     }
-    soundclasses = (sithSoundClass *)pSithHS->alloc(sizeof(sithSoundClass) * num_soundclasses);
+    soundclasses = (sithSoundClass *)SITH_ALLOC(sizeof(sithSoundClass) * num_soundclasses);
     world->soundclasses = soundclasses;
     if ( soundclasses )
     {
@@ -311,7 +311,7 @@ int sithSoundClass_LoadEntry(sithSoundClass *soundClass, char *fpath)
                 continue;
         }
 
-        newEntry = (sithSoundClassEntry *)pSithHS->alloc(sizeof(sithSoundClassEntry));
+        newEntry = (sithSoundClassEntry *)SITH_ALLOC(sizeof(sithSoundClassEntry));
         if ( newEntry )
         {
             _memset(newEntry, 0, sizeof(sithSoundClassEntry));
@@ -491,7 +491,7 @@ void sithSoundClass_Free2(sithWorld *world)
                 {
                     v6 = v5->nextSound;
                     v5->nextSound = NULL; // Added
-                    pSithHS->free(v5);
+                    SITH_FREE(v5);
                     v5 = v6;
                 }
                 while ( v6 );
@@ -499,7 +499,7 @@ void sithSoundClass_Free2(sithWorld *world)
             ++v3;
         }
     }
-    pSithHS->free(world->soundclasses);
+    SITH_FREE(world->soundclasses);
     world->soundclasses = 0;
     world->numSoundClasses = 0;
     world->numSoundClassesLoaded = 0;

@@ -99,7 +99,7 @@ void jkMain_Shutdown()
     // Added: memleak
     if ( jkEpisode_mLoad.paEntries )
     {
-        pHS->free(jkEpisode_mLoad.paEntries);
+        JK_FREE(jkEpisode_mLoad.paEntries);
         jkEpisode_mLoad.paEntries = 0;
     }
 
@@ -880,7 +880,7 @@ void jkMain_UnkTick(int a1)
     jkRes_LoadGob(jkMain_strIdk);
     if ( jkEpisode_mLoad.paEntries )
     {
-        pHS->free(jkEpisode_mLoad.paEntries);
+        JK_FREE(jkEpisode_mLoad.paEntries);
         jkEpisode_mLoad.paEntries = 0;
 
         // Added: prevent UAF
@@ -925,7 +925,7 @@ int jkMain_LoadFile(char *a1)
         jkRes_LoadGob(a1);
         if ( jkEpisode_mLoad.paEntries )
         {
-            pHS->free(jkEpisode_mLoad.paEntries);
+            JK_FREE(jkEpisode_mLoad.paEntries);
             jkEpisode_mLoad.paEntries = 0;
 
             // Added: prevent UAF
@@ -956,7 +956,7 @@ int jkMain_loadFile2(char *pGobPath, char *pEpisodeName)
     jkRes_LoadGob(pGobPath);
     if ( jkEpisode_mLoad.paEntries )
     {
-        pHS->free(jkEpisode_mLoad.paEntries);
+        JK_FREE(jkEpisode_mLoad.paEntries);
         jkEpisode_mLoad.paEntries = 0;
 
         // Added: prevent UAF
@@ -994,7 +994,7 @@ int jkMain_LoadLevelSingleplayer(char *pGobPath, char *pEpisodeName)
     jkRes_LoadGob(pGobPath);
     if ( jkEpisode_mLoad.paEntries )
     {
-        pHS->free(jkEpisode_mLoad.paEntries);
+        JK_FREE(jkEpisode_mLoad.paEntries);
         jkEpisode_mLoad.paEntries = 0;
 
         // Added: prevent UAF

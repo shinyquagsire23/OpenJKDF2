@@ -1,5 +1,7 @@
 #include "sithCommand.h"
 
+#include "stdPlatform.h" // Added: *_ALLOC/*_FREE macros
+
 #include "General/sithStrTable.h"
 #include "General/stdString.h"
 #include "Devices/sithConsole.h"
@@ -731,7 +733,7 @@ int sithCommand_CmdMatList(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     }
 
     // Allocate array: [matIdx, numFaces, totalBytes, bytesPerFace] per material
-    int (*matInfo)[4] = (int(*)[4])pSithHS->alloc(pWorld->numMaterials * sizeof(int[4]));
+    int (*matInfo)[4] = (int(*)[4])SITH_ALLOC(pWorld->numMaterials * sizeof(int[4]));
 
     // Initialize
     for (int i = 0; i < pWorld->numMaterials; i++)
@@ -781,7 +783,7 @@ int sithCommand_CmdMatList(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         }
     }
 
-    pSithHS->free(matInfo);
+    SITH_FREE(matInfo);
     return 1;
 }
 

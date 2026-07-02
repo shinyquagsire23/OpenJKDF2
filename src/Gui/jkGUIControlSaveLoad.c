@@ -129,7 +129,7 @@ void jkGuiControlSaveLoad_FindFile()
             {
                 if ( pHS->fileRead(v1, &v5, sizeof(jkGuiControlInfoHeader)) == sizeof(jkGuiControlInfoHeader) && v5.version == 1 )
                 {
-                    v2 = (jkGuiControlInfo *)pHS->alloc(sizeof(jkGuiControlInfo));
+                    v2 = (jkGuiControlInfo *)JK_ALLOC(sizeof(jkGuiControlInfo));
                     _memcpy(v2, &v5, sizeof(jkGuiControlInfoHeader));
                     stdString_SafeStrCopy(v2->fpath, a2.fpath, 0x80);
                     _strtolower(v2->fpath);
@@ -204,7 +204,7 @@ int jkGuiControlSaveLoad_Write(int bIdk)
     {
         if ( v3 == 1 || !v5 )
         {
-            v6 = (char *)pHS->alloc(jkGuiControlSaveLoad_dword_559C84 + 1);
+            v6 = (char *)JK_ALLOC(jkGuiControlSaveLoad_dword_559C84 + 1);
             v7 = jkGuiControlSaveLoad_dword_559C84;
             v8 = v6;
             memset(v6, 0, jkGuiControlSaveLoad_dword_559C84 + 1);
@@ -234,7 +234,7 @@ int jkGuiControlSaveLoad_Write(int bIdk)
                     break;
             }
             _sprintf(tmp1, "set%04d.ctl", i);
-            pHS->free(v8);
+            JK_FREE(v8);
             _sprintf(fpath, "controls\\%s", tmp1);
         }
         else

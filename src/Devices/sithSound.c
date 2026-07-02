@@ -108,7 +108,7 @@ void sithSound_Free(sithWorld *world)
             sithSound_UnloadData(&world->sounds[i]);
             stdHashTable_FreeKey(sithSound_hashtable, world->sounds[i].sound_fname);
         }
-        pSithHS->free(world->sounds);
+        SITH_FREE(world->sounds);
         world->numSoundsLoaded = 0;
         world->numSounds = 0;
         world->sounds = 0;
@@ -123,7 +123,7 @@ int sithSound_New(sithWorld *world, int num)
         num++;
     }
 
-    sithSound* sounds  = (sithSound *)pSithHS->alloc(sizeof(sithSound) * num);
+    sithSound* sounds  = (sithSound *)SITH_ALLOC(sizeof(sithSound) * num);
     world->sounds = sounds;
     if ( sounds )
     {

@@ -44,7 +44,7 @@ rdParticle* sithParticle_LoadEntry(const char *a1)
     v1 = sithWorld_pLoading;
     if ( !sithWorld_pLoading->particles )
     {
-        v2 = (rdParticle *)pSithHS->alloc(SITHPARTICLE_MAX_PARTICLES * sizeof(rdParticle));
+        v2 = (rdParticle *)SITH_ALLOC(SITHPARTICLE_MAX_PARTICLES * sizeof(rdParticle));
         v1->particles = v2;
         if ( v2 )
         {
@@ -80,7 +80,7 @@ int sithParticle_New(sithWorld *world, int numParticles)
 {
     rdParticle *newParticle; // edi
 
-    newParticle = (rdParticle *)pSithHS->alloc(sizeof(rdParticle) * numParticles);
+    newParticle = (rdParticle *)SITH_ALLOC(sizeof(rdParticle) * numParticles);
     world->particles = newParticle;
     if ( !newParticle )
         return 0;
@@ -364,7 +364,7 @@ void sithParticle_Free(sithWorld *world)
         rdParticle_FreeEntry(&world->particles[i]);
     }
     
-    pSithHS->free(world->particles);
+    SITH_FREE(world->particles);
     world->particles = 0;
     world->numParticles = 0;
     world->numParticlesLoaded = 0;

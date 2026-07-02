@@ -31,7 +31,7 @@ rdColormap* rdColormap_Load(char *colormap_fname)
 {
     rdColormap *colormap;
 
-    colormap = (rdColormap*)rdroid_pHS->alloc(sizeof(rdColormap));
+    colormap = (rdColormap*)RDROID_ALLOC(sizeof(rdColormap));
  
     if (!colormap)
     {
@@ -85,7 +85,7 @@ int rdColormap_LoadEntry(char *colormap_fname, rdColormap *colormap)
     /*
     if ( (colormap->flags & 4) == 0 )
     {
-        colorsLights = rdroid_pHS->alloc(0x4100);
+        colorsLights = RDROID_ALLOC(0x4100);
         colormap->lightlevelAlloc = colorsLights;
         if (!colorsLights)
         {
@@ -100,7 +100,7 @@ int rdColormap_LoadEntry(char *colormap_fname, rdColormap *colormap)
         rdroid_pHS->fileRead(colormap_fptr, colormap->lightlevel, 0x4000);
         if ( (colormap->flags & 1) != 0 )
         {
-            transparencyAlloc = rdroid_pHS->alloc(0x10100);
+            transparencyAlloc = RDROID_ALLOC(0x10100);
             colormap->transparencyAlloc = transparencyAlloc;
             if ( !transparencyAlloc )
             {
@@ -116,7 +116,7 @@ int rdColormap_LoadEntry(char *colormap_fname, rdColormap *colormap)
         colormap->dword34C = 0;
         goto LABEL_26;
     }
-    rgb16Alloc = (uint16_t *)rdroid_pHS->alloc(0x8000);
+    rgb16Alloc = (uint16_t *)RDROID_ALLOC(0x8000);
     colormap->rgb16Alloc = rgb16Alloc;
     if ( !rgb16Alloc )
     {
@@ -126,7 +126,7 @@ int rdColormap_LoadEntry(char *colormap_fname, rdColormap *colormap)
     rdColormap_BuildRGB16(rgb16Alloc, colormap->colors, 0, 0, 0, &rdColormap_colorInfo);
     if ( (colormap->flags & 1) != 0 )
     {
-        v10 = rdroid_pHS->alloc(0x10100);
+        v10 = RDROID_ALLOC(0x10100);
         colormap->transparencyAlloc = v10;
         if (!v10)
         {
@@ -138,7 +138,7 @@ int rdColormap_LoadEntry(char *colormap_fname, rdColormap *colormap)
         if ( ((intptr_t)v10) & 0xFF )
             colormap->transparency = (void*)((intptr_t)v10 - (((intptr_t)v10) & 0xFF) + 256);
         rdroid_pHS->fileRead(colormap_fptr, colormap->transparency, 0x10000);
-        v11 = rdroid_pHS->alloc(0x10000);
+        v11 = RDROID_ALLOC(0x10000);
         colormap->dword34C = v11;
         if ( v11 )
         {
@@ -162,7 +162,7 @@ LABEL_26:
         colormap->rgb16Alloc = NULL;
     }
     else {
-        rgb16Alloc = (uint16_t *)rdroid_pHS->alloc(0x8000);
+        rgb16Alloc = (uint16_t *)RDROID_ALLOC(0x8000);
         colormap->rgb16Alloc = rgb16Alloc;
         if ( !rgb16Alloc )
         {
@@ -172,7 +172,7 @@ LABEL_26:
         rdColormap_BuildRGB16(rgb16Alloc, colormap->colors, 0, 0, 0, &rdColormap_colorInfo);
     }
 
-    colorsLights = rdroid_pHS->alloc(0x4100);
+    colorsLights = RDROID_ALLOC(0x4100);
     colormap->lightlevelAlloc = colorsLights;
     if (!colorsLights)
     {
@@ -189,7 +189,7 @@ LABEL_26:
 
     if (colormap->flags & 1) 
     {
-        v10 = (char*)rdroid_pHS->alloc(0x10100);
+        v10 = (char*)RDROID_ALLOC(0x10100);
         colormap->transparencyAlloc = v10;
         if (!v10)
         {
@@ -235,31 +235,31 @@ safe_fallback:
 void rdColormap_Free(rdColormap *colormap)
 {
     rdColormap_FreeEntry(colormap);
-    rdroid_pHS->free(colormap);
+    RDROID_FREE(colormap);
 }
 
 void rdColormap_FreeEntry(rdColormap *colormap)
 {
     if (colormap->lightlevelAlloc)
     {
-        rdroid_pHS->free(colormap->lightlevelAlloc);
+        RDROID_FREE(colormap->lightlevelAlloc);
         colormap->lightlevelAlloc = 0;
     }
     if (colormap->rgb16Alloc)
     {
-        rdroid_pHS->free(colormap->rgb16Alloc);
+        RDROID_FREE(colormap->rgb16Alloc);
         colormap->rgb16Alloc = 0;
     }
     if (colormap->flags & 1)
     {
         if (colormap->transparencyAlloc)
         {
-            rdroid_pHS->free(colormap->transparencyAlloc);
+            RDROID_FREE(colormap->transparencyAlloc);
             colormap->transparencyAlloc = 0;
         }
         if (colormap->dword34C)
         {
-            rdroid_pHS->free(colormap->dword34C);
+            RDROID_FREE(colormap->dword34C);
             colormap->dword34C = 0;
         }
     }

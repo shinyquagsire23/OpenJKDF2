@@ -39,7 +39,7 @@ int sithModel_Load(sithWorld *world, int a2)
     if ( !world->numModels )
         return 1;
 
-    world->models = (rdModel3 *)pSithHS->alloc(sizeof(rdModel3) * world->numModels);
+    world->models = (rdModel3 *)SITH_ALLOC(sizeof(rdModel3) * world->numModels);
     if ( !world->models )
     {
         stdPrintf(pSithHS->errorPrint, ".\\World\\sithModel.c", 164, "Memory error while reading models, line %d.\n", stdConffile_linenum, 0, 0, 0);
@@ -74,7 +74,7 @@ void sithModel_Free(sithWorld *world)
         stdHashTable_FreeKey(sithModel_hashtable, world->models[i].filename);
         rdModel3_FreeEntryGeometryOnly(&world->models[i]);
     }
-    pSithHS->free(world->models);
+    SITH_FREE(world->models);
     world->models = 0;
     world->numModelsLoaded = 0;
     world->numModels = 0;
@@ -169,7 +169,7 @@ uint32_t sithModel_GetMemorySize(rdModel3 *model)
 
 int sithModel_New(sithWorld *world, int num)
 {
-    world->models = (rdModel3 *)pSithHS->alloc(sizeof(rdModel3) * num);
+    world->models = (rdModel3 *)SITH_ALLOC(sizeof(rdModel3) * num);
     if ( !world->models )
         return 0;
 

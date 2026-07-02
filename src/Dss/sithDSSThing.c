@@ -1155,9 +1155,9 @@ int sithDSSThing_ProcessFullDesc(sithCogMsg *msg)
 
             // Prevent memleaks
             if (thing->trackParams.aFrames) {
-                pSithHS->free(thing->trackParams.aFrames);
+                SITH_FREE(thing->trackParams.aFrames);
             }
-            thing->trackParams.aFrames = (sithThingFrame*)pSithHS->alloc(sizeof(sithThingFrame) * thing->trackParams.sizeFrames);
+            thing->trackParams.aFrames = (sithThingFrame*)SITH_ALLOC(sizeof(sithThingFrame) * thing->trackParams.sizeFrames);
         }
 
         for (int i = 0; i < thing->trackParams.loadedFrames; i++)

@@ -30,7 +30,7 @@
 
 stdFileSearch* stdFileUtil_NewFind(const char *path, int a2, const char *extension)
 {
-    stdFileSearch* search = (stdFileSearch *)std_pHS->alloc(sizeof(stdFileSearch));
+    stdFileSearch* search = (stdFileSearch *)STD_ALLOC(sizeof(stdFileSearch));
     if ( !search ) {
         return search;
     }
@@ -106,7 +106,7 @@ void stdFileUtil_DisposeFind(stdFileSearch *search)
     {
         if ( search->isNotFirst )
             __findclose(search->field_88);
-        std_pHS->free(search);
+        STD_FREE(search);
     }
 }
 
@@ -178,7 +178,7 @@ int TryCreateDirectory(LPCSTR lpPathName)
     {
         size_t i;
 
-        (p=strncpy((char *)std_pHS->alloc(1+i), lpPathName, i=p-lpPathName))[i] = '\0';
+        (p=strncpy((char *)STD_ALLOC(1+i), lpPathName, i=p-lpPathName))[i] = '\0';
         b = TryCreateDirectory(p);
         free(p);
         b = b ? CreateDirectoryA(lpPathName, 0) : 0;
@@ -440,7 +440,7 @@ void stdFileUtil_DisposeFind(stdFileSearch *search)
         }
         free(search->namelist);
 
-        std_pHS->free(search);
+        STD_FREE(search);
     }
 }
 

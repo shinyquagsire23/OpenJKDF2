@@ -6,6 +6,13 @@ if(DEFINED ENV{DC_AUTOBOOT_MAP})
     add_compile_definitions(DC_AUTOBOOT_MAP="$ENV{DC_AUTOBOOT_MAP}")
     message(STATUS "DC autoboot map: $ENV{DC_AUTOBOOT_MAP}")
 endif()
+
+# Optional: per-file allocation cataloguing (stdPlatform_PrintAllocStats), e.g.
+#   ALLOC_TRACKING=1 ./build_dreamcast.sh
+if(DEFINED ENV{ALLOC_TRACKING})
+    add_compile_definitions(STDPLATFORM_ALLOC_TRACKING)
+    message(STATUS "Allocation tracking enabled")
+endif()
     message( STATUS "Targeting Sega Dreamcast" )
 
     set(BIN_NAME "openjkdf2")
@@ -65,7 +72,7 @@ endif()
     # collision math (floor raycasts / move-and-slide), causing things to fall through
     # the world. Disabling them trades a little speed for correct physics.
     add_compile_options(-fno-fast-math -fno-unsafe-math-optimizations -ffp-contract=off -Wl,--wrap,malloc -Wl,--wrap,free -Wl,--wrap,realloc -Wl,--wrap,calloc)
-    add_compile_options(-O2)
+    add_compile_options(-Os)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti -fno-exceptions -Wl,--wrap,malloc -Wl,--wrap,free -Wl,--wrap,realloc -Wl,--wrap,calloc -ffp-contract=off")
     add_link_options(-ffunction-sections -fdata-sections -Wl,--gc-sections -Wl,--wrap,malloc -Wl,--wrap,free -Wl,--wrap,realloc -Wl,--wrap,calloc)
 endmacro()

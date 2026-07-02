@@ -19,7 +19,7 @@ static void rdPuppet_ClearTrackNodes(rdPuppet *puppet, int trackNum)
 
 rdPuppet* rdPuppet_New(rdThing *thing)
 {
-    rdPuppet* puppet = (rdPuppet *)rdroid_pHS->alloc(sizeof(rdPuppet));
+    rdPuppet* puppet = (rdPuppet *)RDROID_ALLOC(sizeof(rdPuppet));
 
     if (!puppet )
         return NULL;
@@ -59,7 +59,7 @@ void rdPuppet_Free(rdPuppet *puppet)
         puppet->tracks[i].callback = NULL;
     }
     
-    rdroid_pHS->free(puppet);
+    RDROID_FREE(puppet);
 }
 
 void rdPuppet_FreeEntry()

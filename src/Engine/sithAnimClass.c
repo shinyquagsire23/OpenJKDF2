@@ -1,5 +1,7 @@
 #include "sithAnimClass.h"
 
+#include "stdPlatform.h" // Added: *_ALLOC/*_FREE macros
+
 #include "Engine/sithPuppet.h"
 #include "World/sithWorld.h"
 #include "General/stdString.h"
@@ -22,7 +24,7 @@ int sithAnimClass_Load(sithWorld *world, int a2)
     num_animclasses = _atoi(stdConffile_entry.args[2].value);
     if ( !num_animclasses )
         return 1;
-    animclasses = (sithAnimclass *)pSithHS->alloc(sizeof(sithAnimclass) * num_animclasses);
+    animclasses = (sithAnimclass *)SITH_ALLOC(sizeof(sithAnimclass) * num_animclasses);
     world->animclasses = animclasses;
     if ( !animclasses )
         return 0;
@@ -223,7 +225,7 @@ int sithAnimClass_New(sithWorld *world, int num)
 {
     sithAnimclass *animclasses;
 
-    animclasses = (sithAnimclass *)pSithHS->alloc(sizeof(sithAnimclass) * num);
+    animclasses = (sithAnimclass *)SITH_ALLOC(sizeof(sithAnimclass) * num);
     world->animclasses = animclasses;
     if ( !animclasses )
         return 0;
@@ -258,7 +260,7 @@ void sithAnimClass_Free(sithWorld *world)
             while ( v1 < world->numAnimClassesLoaded );
         }
 
-        pSithHS->free(world->animclasses);
+        SITH_FREE(world->animclasses);
         world->animclasses = 0;
         world->numAnimClassesLoaded = 0;
         world->numAnimClasses = 0;

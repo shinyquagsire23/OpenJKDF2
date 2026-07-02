@@ -12,7 +12,7 @@ char* stdString_FastCopy(const char *str)
     char *v5; // edi
     const char *v6; // esi
 
-    result = (char *)std_pHS->alloc(_strlen(str) + 1);
+    result = (char *)STD_ALLOC(_strlen(str) + 1);
     v2 = result;
     if ( result )
     {
@@ -34,7 +34,7 @@ wchar_t* stdString_FastWCopy(const wchar_t *str)
 {
     if (!str) return NULL;
 
-    wchar_t* result = (wchar_t*)std_pHS->alloc((_wcslen(str) + 1)* sizeof(wchar_t));
+    wchar_t* result = (wchar_t*)STD_ALLOC((_wcslen(str) + 1)* sizeof(wchar_t));
     stdString_SafeWStrCopy(result, str, _wcslen(str)+1);
     return result;
 }
@@ -248,7 +248,7 @@ wchar_t* stdString_CstrCopy(const char *a1)
     signed int v4; // ecx
     uint8_t v5; // dl
 
-    v1 = (wchar_t *)std_pHS->alloc(sizeof(wchar_t) * (_strlen(a1) + 1));
+    v1 = (wchar_t *)STD_ALLOC(sizeof(wchar_t) * (_strlen(a1) + 1));
     v2 = 0;
     v3 = v1;
     v4 = _strlen(a1);
@@ -276,7 +276,7 @@ char* stdString_WcharCopy(wchar_t *a1)
     char *i; // edx
 
     v1 = _wcslen(a1);
-    v2 = (char *)std_pHS->alloc(v1 + 1);
+    v2 = (char *)STD_ALLOC(v1 + 1);
     v3 = _wcslen(a1);
     v4 = 0;
     v5 = a1;

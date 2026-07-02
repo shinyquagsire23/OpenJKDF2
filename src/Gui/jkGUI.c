@@ -118,10 +118,10 @@ void jkGui_InitMenu(jkGuiMenu *menu, stdBitmap *bgBitmap)
     {
 #ifdef QOL_IMPROVEMENTS
         if (iter->wHintTextAlloced) {
-            std_pHS->free((void*)iter->wHintTextAlloced);
+            STD_FREE((void*)iter->wHintTextAlloced);
         }
         if (iter->strAlloced) {
-            std_pHS->free((void*)iter->strAlloced);
+            STD_FREE((void*)iter->strAlloced);
         }
         iter->hintText = iter->origHintText;
         iter->str = iter->origStr;

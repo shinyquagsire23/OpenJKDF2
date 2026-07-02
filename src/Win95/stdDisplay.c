@@ -217,7 +217,7 @@ int stdDisplay_SetMasterPalette(uint8_t* pal)
 
 stdVBuffer* stdDisplay_VBufferNew(stdVBufferTexFmt *fmt, int create_ddraw_surface, int gpu_mem, const void* palette)
 {
-    stdVBuffer* out = (stdVBuffer*)std_pHS->alloc(sizeof(stdVBuffer));
+    stdVBuffer* out = (stdVBuffer*)STD_ALLOC(sizeof(stdVBuffer));
     
     _memset(out, 0, sizeof(*out));
     
@@ -226,7 +226,7 @@ stdVBuffer* stdDisplay_VBufferNew(stdVBufferTexFmt *fmt, int create_ddraw_surfac
     // force 0 reads
     //out->format.width = 0;
     //out->format.width_in_bytes = 0;
-    //out->surface_lock_alloc = std_pHS->alloc(texture_size_in_bytes);
+    //out->surface_lock_alloc = STD_ALLOC(texture_size_in_bytes);
     
     //if (fmt->format.g_bits == 6) // RGB565
     {
@@ -475,7 +475,7 @@ void stdDisplay_VBufferFree(stdVBuffer *vbuf)
     }
     stdDisplay_VBufferUnlock(vbuf);
     SDL_FreeSurface(vbuf->sdlSurface);
-    std_pHS->free(vbuf);
+    STD_FREE(vbuf);
 }
 
 void stdDisplay_ddraw_surface_flip2()

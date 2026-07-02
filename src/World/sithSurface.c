@@ -93,7 +93,7 @@ int sithSurface_Load(sithWorld *world)
         int prevSuggest = pSithHS->suggestHeap(HEAP_FAST);
 #endif
         allocSize = sizeof(sithAdjoin) * numAdjoins;
-        adjoins = (sithAdjoin *)pSithHS->alloc(sizeof(sithAdjoin) * numAdjoins);
+        adjoins = (sithAdjoin *)SITH_ALLOC(sizeof(sithAdjoin) * numAdjoins);
 #ifdef STDPLATFORM_HEAP_SUGGESTIONS
         pSithHS->suggestHeap(prevSuggest);
 #endif
@@ -156,7 +156,7 @@ int sithSurface_Load(sithWorld *world)
 #ifdef STDPLATFORM_HEAP_SUGGESTIONS
     int prevSuggest = pSithHS->suggestHeap(HEAP_FAST);
 #endif
-    world->surfaces = (sithSurface *)pSithHS->alloc(sizeof(sithSurface) * numSurfaces);
+    world->surfaces = (sithSurface *)SITH_ALLOC(sizeof(sithSurface) * numSurfaces);
 #ifdef STDPLATFORM_HEAP_SUGGESTIONS
     pSithHS->suggestHeap(prevSuggest);
 #endif
@@ -180,6 +180,12 @@ int sithSurface_Load(sithWorld *world)
     }
     surfaces = world->surfaces;
 
+#ifdef SITHSURFACE_POOLED_ARRAYS
+    // Added: one pool for every surface's index/intensity arrays (3 tiny allocs
+    // per surface otherwise). Fields hold offset+1 until the fixup after the loop.
+    int poolUsed = 0, poolCap = 0;
+    int* pIdxPool = NULL;
+#endif
     for (int32_t v67 = 0; v67 < numSurfaces; v67++)
     {
         sithSurface* surfaceIter = &surfaces[v67];
@@ -295,37 +301,79 @@ int sithSurface_Load(sithWorld *world)
         if ( v34 > 0x18 )
             return 0;
 
-        face->vertexPosIdx = (int*)pSithHS->alloc(sizeof(int) * v34);
+        int bSurfHasUV = (face->material && (face->material->tex_type & 2)) ? 1 : 0; // Added: hoisted
+        int* pPosIdx;
+        int* pUVIdx = NULL;
+        flex_t* pIntens = NULL;
+#ifdef SITHSURFACE_POOLED_ARRAYS
+        {
+            // Added: grab pos/uv/intensity storage from the world pool (fields hold
+            // offset+1 until the post-loop fixup; the pool moves while growing).
+            int needIntens = (v34 * 4) + 1; // JKM_LIGHTING layout; >= v34 either way
+            int need = v34 * (bSurfHasUV ? 2 : 1) + needIntens;
+            if (poolUsed + need > poolCap) {
+                int newCap = poolCap ? poolCap * 2 : 4096;
+                while (newCap < poolUsed + need)
+                    newCap *= 2;
+                int* pNewPool = (int*)SITH_REALLOC(pIdxPool, sizeof(int) * newCap);
+                if (!pNewPool)
+                    return 0;
+                pIdxPool = pNewPool;
+                poolCap = newCap;
+                world->paSurfaceIdxPool = pIdxPool; // keep current for the fail path
+            }
+            pPosIdx = pIdxPool + poolUsed;
+            face->vertexPosIdx = (int*)(intptr_t)(poolUsed + 1);
+            poolUsed += v34;
+            if (bSurfHasUV) {
+                pUVIdx = pIdxPool + poolUsed;
+                face->vertexUVIdx = (int*)(intptr_t)(poolUsed + 1);
+                poolUsed += v34;
+            }
+            pIntens = (flex_t*)(pIdxPool + poolUsed);
+            surfaceInfo->intensities = (flex_t*)(intptr_t)(poolUsed + 1);
+            poolUsed += needIntens;
+            _memset(pIntens, 0, sizeof(flex_t) * needIntens);
+        }
+#else
+        face->vertexPosIdx = (int*)SITH_ALLOC(sizeof(int) * v34);
         if ( !face->vertexPosIdx )
             return 0;
+        pPosIdx = face->vertexPosIdx;
 
 #ifndef JKM_LIGHTING
-        surfaceInfo->intensities = (flex_t*)pSithHS->alloc(sizeof(flex_t) * v34);
+        surfaceInfo->intensities = (flex_t*)SITH_ALLOC(sizeof(flex_t) * v34);
         if ( !surfaceInfo->intensities )
             return 0;
+        pIntens = surfaceInfo->intensities;
 #endif
+#endif // SITHSURFACE_POOLED_ARRAYS
 
-        if (face->material && (face->material->tex_type & 2))
+        if (bSurfHasUV)
         {
-            face->vertexUVIdx = (int*)pSithHS->alloc(sizeof(int) * v34);
+#ifndef SITHSURFACE_POOLED_ARRAYS
+            face->vertexUVIdx = (int*)SITH_ALLOC(sizeof(int) * v34);
             if ( !face->vertexUVIdx )
                 return 0;
-
+            pUVIdx = face->vertexUVIdx;
+#endif
             v61 = 10;
             for (v40 = 0; v40 < v34; v40++)
             {
-                face->vertexPosIdx[v40] = _atoi(stdConffile_entry.args[v61].value);
-                face->vertexUVIdx[v40] = _atoi(stdConffile_entry.args[v61+1].value);
+                pPosIdx[v40] = _atoi(stdConffile_entry.args[v61].value);
+                pUVIdx[v40] = _atoi(stdConffile_entry.args[v61+1].value);
                 v61 += 2;
             }
         }
         else
         {
+#ifndef SITHSURFACE_POOLED_ARRAYS
             face->vertexUVIdx = 0;
+#endif
             v61 = 10;
             for (v43 = 0; v43 < v34; v43++)
             {
-                face->vertexPosIdx[v43] = _atoi(stdConffile_entry.args[v61].value);
+                pPosIdx[v43] = _atoi(stdConffile_entry.args[v61].value);
                 v61 += 2;
             }
         }
@@ -333,7 +381,7 @@ int sithSurface_Load(sithWorld *world)
 #ifndef JKM_LIGHTING
         for (int32_t v45 = 0; v45 < v34; v45++)
         {
-            surfaceInfo->intensities[v45] = _atof(stdConffile_entry.args[v61+v45].value);
+            pIntens[v45] = _atof(stdConffile_entry.args[v61+v45].value);
         }
 #else
         int32_t testAmt = 0;
@@ -352,34 +400,33 @@ int sithSurface_Load(sithWorld *world)
         }*/
         testAmt = stdConffile_entry.numArgs - v61;
 
+#ifndef SITHSURFACE_POOLED_ARRAYS
+        // Added: pooled mode grabs+zeroes this storage up front (pIntens)
+        surfaceInfo->intensities = (flex_t*)SITH_ALLOC(sizeof(flex_t) * ((v34 * 4) + 1)); // Added: extra
+        if ( !surfaceInfo->intensities )
+            return 0;
+        memset(surfaceInfo->intensities, 0, sizeof(flex_t) * ((v34 * 4) + 1)); // Added
+        pIntens = surfaceInfo->intensities;
+#endif
         if (testAmt < v34 * 4) {
-            surfaceInfo->intensities = (flex_t*)pSithHS->alloc(sizeof(flex_t) * ((v34 * 4) + 1)); // Added: extra
-            if ( !surfaceInfo->intensities )
-                return 0;
-            memset(surfaceInfo->intensities, 0, sizeof(flex_t) * ((v34 * 4) + 1)); // Added
             for (int32_t v45 = 0; v45 < v34; v45++)
             {
                 flex_t val = _atof(stdConffile_entry.args[v61+v45].value);
-                surfaceInfo->intensities[(v34*0)+v45] = val; // Added
-                surfaceInfo->intensities[(v34*1)+v45] = val; // Added
-                surfaceInfo->intensities[(v34*2)+v45] = val; // Added 
-                surfaceInfo->intensities[(v34*3)+v45] = val; // Added
+                pIntens[(v34*0)+v45] = val; // Added
+                pIntens[(v34*1)+v45] = val; // Added
+                pIntens[(v34*2)+v45] = val; // Added 
+                pIntens[(v34*3)+v45] = val; // Added
             }
             surfaceIter->surfaceFlags &= ~SITH_SURFACE_1000000;
         }
         else {
-            surfaceInfo->intensities = (flex_t*)pSithHS->alloc(sizeof(flex_t) * ((v34 * 4) + 1));
-            if ( !surfaceInfo->intensities )
-                return 0;
-            memset(surfaceInfo->intensities, 0, sizeof(flex_t) * ((v34 * 4) + 1)); // Added
-
             surfaceIter->surfaceFlags |= SITH_SURFACE_1000000;
             for (int32_t v45 = 0; v45 < v34; v45++)
             {
-                surfaceInfo->intensities[(v34*0)+v45] = _atof(stdConffile_entry.args[v61+(v45*4)+0].value);
-                surfaceInfo->intensities[(v34*1)+v45] = _atof(stdConffile_entry.args[v61+(v45*4)+1].value);
-                surfaceInfo->intensities[(v34*2)+v45] = _atof(stdConffile_entry.args[v61+(v45*4)+2].value);
-                surfaceInfo->intensities[(v34*3)+v45] = _atof(stdConffile_entry.args[v61+(v45*4)+3].value);
+                pIntens[(v34*0)+v45] = _atof(stdConffile_entry.args[v61+(v45*4)+0].value);
+                pIntens[(v34*1)+v45] = _atof(stdConffile_entry.args[v61+(v45*4)+1].value);
+                pIntens[(v34*2)+v45] = _atof(stdConffile_entry.args[v61+(v45*4)+2].value);
+                pIntens[(v34*3)+v45] = _atof(stdConffile_entry.args[v61+(v45*4)+3].value);
             }
         }
 #endif
@@ -390,7 +437,7 @@ int sithSurface_Load(sithWorld *world)
 #ifdef SITHRENDER_SPHERE_TEST_SURFACES
         rdVector3 surfaceCenterPt = {0};
         for (int idx = 0; idx < surfaceIter->surfaceInfo.face.numVertices; idx++) {
-            int fullIdx = surfaceIter->surfaceInfo.face.vertexPosIdx[idx];
+            int fullIdx = pPosIdx[idx]; // Added: pool-safe (field may hold an offset here)
             rdVector3* pIter = &sithWorld_pLoading->vertices[fullIdx];
             rdVector_Add3Acc(&surfaceCenterPt, pIter);
             //rdVector_Scale3Acc(&surfaceCenterPt, 0.5);
@@ -399,7 +446,7 @@ int sithSurface_Load(sithWorld *world)
         
         flex_t radius = 0.0;
         for (int idx = 0; idx < surfaceIter->surfaceInfo.face.numVertices; idx++) {
-            int fullIdx = surfaceIter->surfaceInfo.face.vertexPosIdx[idx];
+            int fullIdx = pPosIdx[idx]; // Added: pool-safe
             rdVector3* pIter = &sithWorld_pLoading->vertices[fullIdx];
             radius = stdMath_Max(rdVector_Dist3(&surfaceCenterPt, pIter), radius);
         }
@@ -409,6 +456,24 @@ int sithSurface_Load(sithWorld *world)
 
         rdMaterial_OptionalFree(face->material);
     }
+
+#ifdef SITHSURFACE_POOLED_ARRAYS
+    // Added: trim the pool and resolve the offset-encoded fields to pointers.
+    if (pIdxPool && poolUsed && poolUsed < poolCap) {
+        int* pTrim = (int*)SITH_REALLOC(pIdxPool, sizeof(int) * poolUsed);
+        if (pTrim)
+            pIdxPool = pTrim;
+    }
+    world->paSurfaceIdxPool = pIdxPool;
+    for (int32_t vFix = 0; vFix < numSurfaces; vFix++)
+    {
+        rdFace* pFixFace = &surfaces[vFix].surfaceInfo.face;
+        pFixFace->vertexPosIdx = pIdxPool + ((intptr_t)pFixFace->vertexPosIdx - 1);
+        if (pFixFace->vertexUVIdx)
+            pFixFace->vertexUVIdx = pIdxPool + ((intptr_t)pFixFace->vertexUVIdx - 1);
+        surfaces[vFix].surfaceInfo.intensities = (flex_t*)(pIdxPool + ((intptr_t)surfaces[vFix].surfaceInfo.intensities - 1));
+    }
+#endif
 
     for (int32_t v50 = 0; v50 < numSurfaces; v50++)
     {
@@ -433,7 +498,7 @@ int sithSurface_Load(sithWorld *world)
         rdMaterial_OptionalFree(sithMaterial_aMaterials[i]);
     }
 #endif
-    pSithHS->free(sithMaterial_aMaterials);
+    SITH_FREE(sithMaterial_aMaterials);
     sithMaterial_aMaterials = NULL; // Added
     sithMaterial_numMaterials = 0;
     return 1;
@@ -586,7 +651,7 @@ rdSurface* sithSurface_SurfaceAnim(sithSurface *parent, flex_t a2, uint16_t flag
 
 int sithSurface_New(sithWorld *world, int num)
 {
-    sithSurface *surfaces = (sithSurface *)pSithHS->alloc(num * sizeof(sithSurface));
+    sithSurface *surfaces = (sithSurface *)SITH_ALLOC(num * sizeof(sithSurface));
     world->surfaces = surfaces;
     if ( !surfaces )
         return 0;
@@ -607,7 +672,7 @@ int sithSurface_AllocateAdjoins(sithWorld *world, int num)
         world->adjoins = NULL;
         return 1;
     }
-    sithAdjoin *adjoins = (sithAdjoin *)pSithHS->alloc(num * sizeof(sithAdjoin));
+    sithAdjoin *adjoins = (sithAdjoin *)SITH_ALLOC(num * sizeof(sithAdjoin));
     world->adjoins = adjoins;
     if ( !adjoins )
         return 0;
@@ -619,27 +684,46 @@ int sithSurface_AllocateAdjoins(sithWorld *world, int num)
 
 void sithSurface_Free(sithWorld *world)
 {
+#ifdef SITHSURFACE_POOLED_ARRAYS
+    // Added: pooled surface arrays free as one block (per-surface pointers alias
+    // into it; a partially-parsed world may still hold offsets instead).
+    if (world->paSurfaceIdxPool)
+    {
+        SITH_FREE(world->paSurfaceIdxPool);
+        world->paSurfaceIdxPool = NULL;
+        for (int32_t i = 0; i < world->numSurfaces; i++)
+        {
+            sithSurface* surface = &world->surfaces[i];
+            surface->surfaceInfo.face.numVertices = 0;
+            surface->surfaceInfo.face.vertexPosIdx = NULL;
+            surface->surfaceInfo.face.vertexUVIdx = NULL;
+            surface->surfaceInfo.intensities = NULL;
+            surface->surfaceInfo.lastTouchedMs = 0;
+        }
+    }
+    else
+#endif
     for (int32_t i = 0; i < world->numSurfaces; i++)
     {
         sithSurface* surface = &world->surfaces[i];
 
         surface->surfaceInfo.face.numVertices = 0;
         if ( surface->surfaceInfo.face.vertexPosIdx )
-            pSithHS->free(surface->surfaceInfo.face.vertexPosIdx);
+            SITH_FREE(surface->surfaceInfo.face.vertexPosIdx);
         if ( surface->surfaceInfo.face.vertexUVIdx )
-            pSithHS->free(surface->surfaceInfo.face.vertexUVIdx);
+            SITH_FREE(surface->surfaceInfo.face.vertexUVIdx);
         if ( surface->surfaceInfo.intensities )
-            pSithHS->free(surface->surfaceInfo.intensities);
+            SITH_FREE(surface->surfaceInfo.intensities);
         surface->surfaceInfo.lastTouchedMs = 0;
     }
 
-    pSithHS->free(world->surfaces);
+    SITH_FREE(world->surfaces);
     world->surfaces = 0;
     world->numSurfaces = 0;
     sithSurface_numSurfaces_0 = 0;
     if ( world->adjoins )
     {
-        pSithHS->free(world->adjoins);
+        SITH_FREE(world->adjoins);
         world->adjoins = 0;
         world->numAdjoins = 0;
         world->numAdjoinsLoaded = 0;

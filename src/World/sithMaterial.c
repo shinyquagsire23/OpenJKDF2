@@ -1,5 +1,7 @@
 #include "sithMaterial.h"
 
+#include "stdPlatform.h" // Added: *_ALLOC/*_FREE macros
+
 #include "General/stdHashTable.h"
 #include "General/stdString.h"
 #include "General/stdFnames.h"
@@ -25,7 +27,7 @@ void sithMaterial_Shutdown()
 
     // Added
     if (sithMaterial_aMaterials) {
-        pSithHS->free(sithMaterial_aMaterials);
+        SITH_FREE(sithMaterial_aMaterials);
         sithMaterial_aMaterials = NULL;
     }
 }
@@ -52,11 +54,11 @@ void sithMaterial_Free(sithWorld *world)
         }
         while ( v1 < world->numMaterialsLoaded );
     }
-    pSithHS->free(world->materials);
+    SITH_FREE(world->materials);
     v3 = world->materials2;
     world->materials = 0;
     world->numMaterialsLoaded = 0;
-    pSithHS->free(v3);
+    SITH_FREE(v3);
     world->materials2 = 0;
 }
 
@@ -95,12 +97,12 @@ int sithMaterial_Load(sithWorld *world, int a2)
                     rdMaterial_FreeEntry(sithMaterial_aMaterials[i]);
                 }
 #endif
-                pSithHS->free(sithMaterial_aMaterials);
+                SITH_FREE(sithMaterial_aMaterials);
                 sithMaterial_aMaterials = NULL;
                 sithMaterial_numMaterials = 0;
             }
 
-            sithMaterial_aMaterials = (rdMaterial **)pSithHS->alloc(sizeof(rdMaterial*) * a2);
+            sithMaterial_aMaterials = (rdMaterial **)SITH_ALLOC(sizeof(rdMaterial*) * a2);
             if ( stdConffile_ReadArgs() )
             {
                 while ( _strcmp(stdConffile_entry.args[0].value, "end") )
@@ -236,7 +238,7 @@ rdVector2* sithMaterial_New(sithWorld *world, int num)
     // Added: needed for JKE?
     num *= 2;
 
-    v2 = (rdMaterial *)pSithHS->alloc(sizeof(rdMaterial) * num);
+    v2 = (rdMaterial *)SITH_ALLOC(sizeof(rdMaterial) * num);
     world->materials = v2;
     if ( !v2 )
         return 0;
@@ -247,11 +249,11 @@ rdVector2* sithMaterial_New(sithWorld *world, int num)
         sithMaterial_hashmap = stdHashTable_New(1024);
         if ( !sithMaterial_hashmap )
         {
-            pSithHS->free(world->materials);
+            SITH_FREE(world->materials);
             return 0;
         }
     }
-    result = (rdVector2 *)pSithHS->alloc(sizeof(rdVector2) * num);
+    result = (rdVector2 *)SITH_ALLOC(sizeof(rdVector2) * num);
     world->materials2 = result;
     if ( !result )
         return 0;

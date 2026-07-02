@@ -78,7 +78,7 @@ static void std3D_DrawRenderListReal(void); // eager per-batch emitter
 // opaque pipeline. (Visual: translucent surfaces render opaque.)
 #define STD3D_DISABLE_TR 0
 
-#define STD3D_MAX_DEFER_TRIS 512
+#define STD3D_MAX_DEFER_TRIS 256 // Added: was 512; 32KB of .bss, overflow drops tris gracefully
 typedef struct dcDeferTri {
     pvr_vertex_t    v[3];
     rdDDrawSurface* tex;

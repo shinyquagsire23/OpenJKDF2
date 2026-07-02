@@ -1,5 +1,7 @@
 #include "jkCredits.h"
 
+#include "stdPlatform.h" // Added: *_ALLOC/*_FREE macros
+
 #include "General/stdStrTable.h"
 #include "General/stdFont.h"
 #include "Win95/stdDisplay.h"
@@ -180,7 +182,7 @@ LABEL_19:
     v26.height = 64;
     jkCredits_pVbuffer2 = stdDisplay_VBufferNew(&v26, 1, 1, jkCredits_aPalette);
     stdDisplay_ClearRect(jkCredits_pVbuffer2, 0, 0);
-    v16 = (char *)pHS->alloc(0x2000);
+    v16 = (char *)JK_ALLOC(0x2000);
     memset(v16, 0, 0x2000u);
     jkCredits_aIdk = v16;
     v17 = 0;
@@ -464,10 +466,10 @@ int jkCredits_Skip()
         stdDisplay_VBufferFree(jkCredits_pVbuffer);
     jkCredits_pVbuffer = 0;
     if ( jkCredits_pVbuffer2 )
-        pHS->free(jkCredits_pVbuffer2);
+        JK_FREE(jkCredits_pVbuffer2);
     jkCredits_pVbuffer2 = 0;
     if ( jkCredits_aIdk )
-        pHS->free(jkCredits_aIdk);
+        JK_FREE(jkCredits_aIdk);
     jkCredits_aIdk = 0;
 
     // Added
