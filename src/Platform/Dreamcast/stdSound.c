@@ -5,8 +5,8 @@
 // KOS's snd_sfx layer mix them on the AICA (so no software mixer is needed).
 //
 // Scope / known limits (first pass):
-//  - snd_sfx caps a single effect at 65534 samples; longer sounds (some voice
-//    lines) won't upload and are silently skipped -- streaming (snd_stream) TBD.
+//  - snd_sfx caps a single effect at 65534 samples; longer sounds (the cantina
+//    music loop, long voice lines) are routed to memory-fed snd_stream slots.
 //  - Volume/pan/frequency are applied at play time. Continuously-updated 3D
 //    sources won't retrack mid-playback yet (needs per-channel AICA control).
 //  - IsPlaying is a time estimate (KOS doesn't expose a per-channel status here),
@@ -31,6 +31,40 @@
 #include <kos/thread.h>
 
 static int stdSound_dcReady = 0;
+
+// --- Refcounted samples --------------------------------------------------------
+// The engine is written against DirectSound, where DuplicateSoundBuffer shares
+// the sample memory between buffers and lifetime is implicit COM refcounting.
+// dcSample carries that: the PCM and its (single, shared) SPU upload live here;
+// every buffer -- original or duplicate -- holds a reference. The last release
+// unloads the SPU copy and frees the PCM. Duplicates play the SAME SPU sample on
+// their own AICA channel (no per-duplicate upload).
+typedef struct dcSample {
+    int      refs;         // buffers referencing this sample
+    void*    data;         // sysram PCM; freed after SPU upload unless bLong
+    int      bufferBytes;
+    uint32_t sfxHandle;    // shared SPU upload; 0 until first play
+    uint16_t bits, chans;
+    uint32_t rate;
+    int      bLong;        // over the 65534-sample snd_sfx cap -> streamed from data
+} dcSample;
+
+static dcSample* stdSound_dcSampleOf(stdSound_buffer_t* buf)
+{
+    return (dcSample*)buf->pSample;
+}
+
+static void stdSound_dcSampleUnref(stdSound_buffer_t* buf)
+{
+    dcSample* smp = stdSound_dcSampleOf(buf);
+    buf->pSample = NULL;
+    buf->data = NULL;
+    if (!smp) return;
+    if (--smp->refs > 0) return;
+    if (smp->sfxHandle) snd_sfx_unload(smp->sfxHandle);
+    if (smp->data) std_pHS->free(smp->data);
+    std_pHS->free(smp);
+}
 
 // --- Gapless streaming (cutscene audio) --------------------------------------
 // Cutscenes decode ahead of real time and chain fixed PCM chunks via
@@ -69,6 +103,8 @@ static void* stdSound_dcStreamCb(snd_stream_hnd_t hnd, int req, int* recv)
     return stdSound_dcScratch;
 }
 
+static void stdSound_dcLongPollAll(void); // long-sound streaming, defined below
+
 static void* stdSound_dcStreamThread(void* arg)
 {
     (void)arg;
@@ -82,6 +118,7 @@ static void* stdSound_dcStreamThread(void* arg)
                 stdSound_dcStreamOn = 0;
             }
         }
+        stdSound_dcLongPollAll();
         thd_sleep(10);
     }
     return NULL;
@@ -127,6 +164,125 @@ static void stdSound_dcStreamQueue(stdSound_buffer_t* buf)
     __asm__ __volatile__("" ::: "memory"); // publish data before advancing the write index
     stdSound_dcRingW += len;
     stdSound_dcStreamLastMs = stdPlatform_GetTimeMsec();
+}
+
+// --- Long-sound streaming (sfx over the 65534-sample snd_sfx cap) -------------
+// The AICA's per-channel loop registers hold 16-bit sample positions, so snd_sfx
+// can't play anything longer than 65534 samples (the level 1 cantina music loop,
+// long voice lines, ...). Those buffers get routed to a snd_stream slot instead,
+// fed straight from the buffer's in-memory PCM: the callback walks buf->data and
+// wraps for loops, so playback is seamless and touches no disk. Slots are polled
+// by the same thread as the cutscene ring.
+#define DC_NUM_LONG    2               // stream handles left: 4 - music - cutscene
+#define DC_LONG_BUFSZ  (16 << 10)      // per-channel ring in SPU RAM (~0.37s @22kHz)
+typedef struct dcLongSlot {
+    snd_stream_hnd_t   hnd;
+    stdSound_buffer_t* buf;            // whose PCM we stream (data/bufferBytes)
+    uint32_t           pos;            // byte position in buf->data
+    int                loop;
+    volatile int       on;
+    volatile uint32_t  doneMs;         // one-shot fully fed at this tick (0 = playing)
+} dcLongSlot;
+static dcLongSlot stdSound_dcLong[DC_NUM_LONG];
+// One shared scratch: all long-slot callbacks run on the single poll thread.
+static uint8_t stdSound_dcLongScratch[DC_LONG_BUFSZ * 2] __attribute__((aligned(32)));
+
+static void* stdSound_dcLongCb(snd_stream_hnd_t hnd, int req, int* recv)
+{
+    dcLongSlot* s = (dcLongSlot*)snd_stream_get_userdata(hnd);
+    if (!s || !s->on || !s->buf || !s->buf->data) { *recv = 0; return NULL; }
+    if (req > (int)sizeof(stdSound_dcLongScratch)) req = (int)sizeof(stdSound_dcLongScratch);
+
+    uint8_t* src = (uint8_t*)s->buf->data;
+    uint32_t total = (uint32_t)s->buf->bufferBytes;
+    int got = 0;
+    while (got < req) {
+        if (s->pos >= total) {
+            if (s->loop) s->pos = 0;
+            else { if (!s->doneMs) s->doneMs = stdPlatform_GetTimeMsec() | 1; break; }
+        }
+        uint32_t chunk = total - s->pos;
+        if (chunk > (uint32_t)(req - got)) chunk = (uint32_t)(req - got);
+        memcpy(stdSound_dcLongScratch + got, src + s->pos, chunk);
+        s->pos += chunk;
+        got += chunk;
+    }
+    if (got < req) memset(stdSound_dcLongScratch + got, 0, req - got); // one-shot tail
+    *recv = req;
+    return stdSound_dcLongScratch;
+}
+
+static dcLongSlot* stdSound_dcLongFind(stdSound_buffer_t* buf)
+{
+    for (int i = 0; i < DC_NUM_LONG; i++)
+        if (stdSound_dcLong[i].on && stdSound_dcLong[i].buf == buf)
+            return &stdSound_dcLong[i];
+    return NULL;
+}
+
+static void stdSound_dcLongStop(stdSound_buffer_t* buf)
+{
+    dcLongSlot* s = stdSound_dcLongFind(buf);
+    if (!s) return;
+    s->on = 0;
+    snd_stream_stop(s->hnd);
+    s->buf = NULL;
+}
+
+// Poll every active long slot; retire finished one-shots so the slot frees up.
+static void stdSound_dcLongPollAll(void)
+{
+    for (int i = 0; i < DC_NUM_LONG; i++) {
+        dcLongSlot* s = &stdSound_dcLong[i];
+        if (!s->on) continue;
+        snd_stream_poll(s->hnd);
+        // One-shot fully fed: give the SPU ring ~1s to drain, then free the slot.
+        if (s->doneMs && (stdPlatform_GetTimeMsec() - s->doneMs) > 1000) {
+            s->on = 0;
+            snd_stream_stop(s->hnd);
+            s->buf = NULL;
+        }
+    }
+}
+
+static int stdSound_dcLongPlay(stdSound_buffer_t* buf, int loop)
+{
+    // Reuse the buffer's own slot if it's already streaming (restart).
+    dcLongSlot* s = stdSound_dcLongFind(buf);
+    if (!s) {
+        for (int i = 0; i < DC_NUM_LONG; i++) {
+            if (!stdSound_dcLong[i].on) { s = &stdSound_dcLong[i]; break; }
+        }
+    }
+    if (!s) return 0; // all slots busy -> silently skip (as before)
+
+    if (s->hnd == SND_STREAM_INVALID || s->hnd == 0) {
+        snd_stream_init();
+        s->hnd = snd_stream_alloc(stdSound_dcLongCb, DC_LONG_BUFSZ);
+        if (s->hnd == SND_STREAM_INVALID) return 0;
+    }
+    if (!stdSound_dcStreamThd) {
+        stdSound_dcStreamThdRun = 1;
+        stdSound_dcStreamThd = thd_create(0, stdSound_dcStreamThread, NULL);
+    }
+
+    if (s->on) snd_stream_stop(s->hnd);
+    s->buf   = buf;
+    s->pos   = 0;
+    s->loop  = loop;
+    s->doneMs = 0;
+    snd_stream_set_userdata(s->hnd, s);
+
+    uint32_t rate = buf->freqHz ? (uint32_t)buf->freqHz
+                                : (buf->nSamplesPerSec ? buf->nSamplesPerSec : 22050);
+    snd_stream_start(s->hnd, rate, buf->bStereo ? 1 : 0);
+    {
+        int v = (int)(buf->vol * 255.0);
+        snd_stream_volume(s->hnd, stdMath_ClampInt(v, 0, 255));
+        snd_stream_pan(s->hnd, buf->panVal, buf->panVal);
+    }
+    s->on = 1;
+    return 1;
 }
 
 int stdSound_Startup()
@@ -184,20 +340,47 @@ void* stdSound_BufferSetData(stdSound_buffer_t* sound, int bufferBytes, int32_t*
     if (bufferMaxSize)
         *bufferMaxSize = bufferBytes;
 
-    if (sound->data && !sound->bIsCopy)
-        std_pHS->free(sound->data);
+    stdSound_dcLongStop(sound); // must not stream from a freed/refilled buffer
 
-    // The PCM must survive in SPU RAM independently of this buffer; re-uploading
-    // means the old handle is stale.
-    if (sound->sfxHandle) { snd_sfx_unload(sound->sfxHandle); sound->sfxHandle = 0; }
+    // DirectSound semantics: refilling this buffer makes a NEW sample; duplicates
+    // keep the old one alive through their own references.
+    stdSound_dcSampleUnref(sound);
 
-    sound->data = std_pHS->alloc(bufferBytes);
-    if (!sound->data)
+    dcSample* smp = (dcSample*)std_pHS->alloc(sizeof(dcSample));
+    if (!smp)
         return NULL;
+    _memset(smp, 0, sizeof(*smp));
+
+    // Long sounds (over the 65534-sample snd_sfx cap) stay resident and are
+    // streamed from this buffer, only ever filled word-safely -- so let them
+    // land in the VRAM overflow arena and keep megabytes of PCM (cantina loop,
+    // long voice lines) out of system RAM. They're cold: read back 16KB per
+    // ~0.4s by the stream slot. Short sounds stay in sysram (freed after SPU
+    // upload anyway).
+    {
+        uint16_t bits  = sound->bitsPerSample ? (uint16_t)sound->bitsPerSample : 16;
+        uint16_t chans = sound->bStereo ? 2 : 1;
+        uint32_t bps   = (bits / 8) * chans;
+        int bLong = bps && (uint32_t)bufferBytes / bps > 65534;
+        int prevSuggest = bLong ? std_pHS->suggestHeap(HEAP_WORD_ADDRESSABLE) : 0;
+        smp->data = std_pHS->alloc(bufferBytes);
+        if (bLong) {
+            std_pHS->suggestHeap(prevSuggest);
+            stdPlatform_Printf("stdSound: long sample %u KB -> %08x\n",
+                               (unsigned)(bufferBytes / 1024), (unsigned)(uintptr_t)smp->data);
+        }
+    }
+    if (!smp->data) {
+        std_pHS->free(smp);
+        return NULL;
+    }
+    smp->refs = 1;
+    smp->bufferBytes = bufferBytes;
+    // (no memset: DC_alloc already zeroes allocations word-safely)
+
+    sound->pSample = smp;
+    sound->data = smp->data;        // engine writes PCM through this pointer
     sound->bufferBytes = bufferBytes;
-
-    _memset(sound->data, 0, sound->bufferBytes);
-
     return sound->data;
 }
 
@@ -206,29 +389,61 @@ int stdSound_BufferUnlock(stdSound_buffer_t* sound, void* buffer, int bufferRead
     return 1;
 }
 
-// Upload this buffer's PCM into SPU RAM (once). Returns 1 if a handle is ready.
+// Upload this buffer's sample into SPU RAM (once, shared with duplicates).
+// Returns 1 if the shared handle is ready. On success for short sounds the sysram
+// PCM is freed -- the SPU copy is the sample from then on (a refill goes through
+// BufferSetData, which makes a new sample).
 static int stdSound_dcEnsureLoaded(stdSound_buffer_t* buf)
 {
-    if (buf->sfxHandle) return 1;
-    if (!stdSound_dcReady || !buf->data || buf->bufferBytes <= 0) return 0;
+    dcSample* smp = stdSound_dcSampleOf(buf);
+    if (!smp) return 0;
+    if (smp->sfxHandle) return 1;
+    if (!stdSound_dcReady || !smp->data || smp->bufferBytes <= 0) return 0;
 
-    uint16_t bits  = buf->bitsPerSample ? (uint16_t)buf->bitsPerSample : 16;
-    uint16_t chans = buf->bStereo ? 2 : 1;
-    uint32_t rate  = buf->nSamplesPerSec ? buf->nSamplesPerSec : 22050;
+    smp->bits  = buf->bitsPerSample ? (uint16_t)buf->bitsPerSample : 16;
+    smp->chans = buf->bStereo ? 2 : 1;
+    smp->rate  = buf->nSamplesPerSec ? buf->nSamplesPerSec : 22050;
 
-    // snd_sfx caps at 65534 samples; skip anything longer (would corrupt/fail).
-    uint32_t bytesPerSample = (bits / 8) * chans;
-    if (bytesPerSample && (uint32_t)buf->bufferBytes / bytesPerSample > 65534)
+    // snd_sfx caps at 65534 samples; longer sounds stream from sysram instead.
+    uint32_t bytesPerSample = (smp->bits / 8) * smp->chans;
+    if (bytesPerSample && (uint32_t)smp->bufferBytes / bytesPerSample > 65534) {
+        smp->bLong = 1;
         return 0;
+    }
 
-    buf->sfxHandle = snd_sfx_load_raw_buf((char*)buf->data, buf->bufferBytes, rate, bits, chans);
-    return buf->sfxHandle != 0;
+    smp->sfxHandle = snd_sfx_load_raw_buf((char*)smp->data, smp->bufferBytes, smp->rate, smp->bits, smp->chans);
+    if (!smp->sfxHandle) return 0;
+
+    // SPU copy is authoritative now: reclaim the sysram PCM.
+    std_pHS->free(smp->data);
+    smp->data = NULL;
+    buf->data = NULL;
+    return 1;
 }
 
 int stdSound_BufferPlay(stdSound_buffer_t* buf, int loop)
 {
     if (!buf) return 0;
-    if (!stdSound_dcEnsureLoaded(buf)) return 1; // couldn't upload -> silently no-op
+
+    dcSample* smp = stdSound_dcSampleOf(buf);
+    if (!stdSound_dcEnsureLoaded(buf)) {
+        // Over the snd_sfx 65534-sample cap (cantina loop, long voice lines): play
+        // through a memory-fed snd_stream slot instead of skipping it.
+        if (smp && smp->bLong && smp->data) {
+            if (stdSound_dcLongPlay(buf, loop)) {
+                uint16_t bits_  = smp->bits ? smp->bits : 16;
+                uint16_t chans_ = smp->chans ? smp->chans : 1;
+                uint32_t bps    = (bits_ / 8) * chans_;
+                uint32_t rate_  = buf->freqHz ? (uint32_t)buf->freqHz
+                                              : (smp->rate ? smp->rate : 22050);
+                buf->isPlaying   = 1;
+                buf->isLooping   = loop;
+                buf->playStartMs = stdPlatform_GetTimeMsec();
+                buf->playDurMs   = (rate_ && bps) ? (uint32_t)(((uint64_t)((uint32_t)smp->bufferBytes / bps) * 1000) / rate_) : 0;
+            }
+        }
+        return 1; // no SPU handle -> silently no-op (as before)
+    }
 
     uint16_t chans = buf->bStereo ? 2 : 1;
     uint16_t bits  = buf->bitsPerSample ? (uint16_t)buf->bitsPerSample : 16;
@@ -241,7 +456,7 @@ int stdSound_BufferPlay(stdSound_buffer_t* buf, int loop)
     sfx_play_data_t d;
     _memset(&d, 0, sizeof(d));
     d.chn  = -1;             // auto-allocate a free channel
-    d.idx  = buf->sfxHandle;
+    d.idx  = smp->sfxHandle; // shared upload (duplicates play the same SPU sample)
     d.vol  = vol;
     d.pan  = buf->panVal;
     d.loop = loop;
@@ -272,14 +487,11 @@ int stdSound_BufferQueueAfterAnother(stdSound_buffer_t* bufPrev, stdSound_buffer
 void stdSound_BufferRelease(stdSound_buffer_t* sound)
 {
     if (!sound) return;
+    stdSound_dcLongStop(sound); // must stop before data is freed
     if (sound->channel >= 0) { snd_sfx_stop(sound->channel); sound->channel = -1; }
-    // Each buffer -- original OR duplicate -- uploads its OWN SPU copy (Duplicate sets
-    // sfxHandle=0, so it re-uploads lazily on first play), so its handle must ALWAYS be
-    // unloaded. Gating this on !bIsCopy leaked the AICA sound RAM on every played sound
-    // until sfx went permanently silent. Only the shared main-RAM PCM (`data`) is
-    // owner-only.
-    if (sound->sfxHandle) snd_sfx_unload(sound->sfxHandle);
-    if (!sound->bIsCopy && sound->data) std_pHS->free(sound->data);
+    // The sample (PCM + the single shared SPU upload) is refcounted: the last
+    // buffer out -- original or duplicate, in any order -- tears it down.
+    stdSound_dcSampleUnref(sound);
 
     memset(sound, 0, sizeof(*sound));
     std_pHS->free(sound);
@@ -290,6 +502,7 @@ int stdSound_BufferReset(stdSound_buffer_t* sound)
     if (!sound) return 0;
     // Stop playback and rewind so the buffer can be refilled and replayed. The SPU
     // handle is kept (the PCM is re-uploaded by BufferSetData when the data changes).
+    stdSound_dcLongStop(sound);
     if (sound->channel >= 0) { snd_sfx_stop(sound->channel); sound->channel = -1; }
     sound->isPlaying = 0;
     sound->isLooping = 0;
@@ -303,6 +516,9 @@ void stdSound_BufferSetPan(stdSound_buffer_t* a1, flex_t a2)
     // DirectSound-style pan is roughly -10000 (left) .. +10000 (right).
     int pan = 128 + (int)((a2 / 10000.0) * 127.0);
     a1->panVal = stdMath_ClampInt(pan, 0, 255);
+    // Long-sound slots play live off a stream: retrack the pan immediately.
+    dcLongSlot* s = stdSound_dcLongFind(a1);
+    if (s) snd_stream_pan(s->hnd, a1->panVal, a1->panVal);
 }
 
 void stdSound_BufferSetFrequency(stdSound_buffer_t* sound, int freq)
@@ -331,8 +547,14 @@ stdSound_buffer_t* stdSound_BufferDuplicate(stdSound_buffer_t* sound)
     out->channel = -1;
     out->panVal = sound->panVal;
     out->freqHz = sound->freqHz;
-    // A duplicate uploads its own SPU copy lazily on first play.
+    // DirectSound semantics: the duplicate SHARES the sample (memory + the one
+    // SPU upload); it just plays on its own channel.
+    out->pSample = sound->pSample;
     out->sfxHandle = 0;
+    {
+        dcSample* smp = stdSound_dcSampleOf(out);
+        if (smp) smp->refs++;
+    }
     return out;
 }
 
@@ -343,6 +565,7 @@ void stdSound_IA3D_idk(flex_t a)
 int stdSound_BufferStop(stdSound_buffer_t* buf)
 {
     if (!buf) return 1;
+    stdSound_dcLongStop(buf); // no-op unless this buffer holds a long-sound slot
     if (buf->channel >= 0) { snd_sfx_stop(buf->channel); buf->channel = -1; }
     buf->isPlaying = 0;
     return 1;
@@ -352,6 +575,12 @@ void stdSound_BufferSetVolume(stdSound_buffer_t* sound, flex_t vol)
 {
     if (!sound) return;
     sound->vol = vol * stdSound_fMenuVolume;
+    // Long-sound slots play live off a stream: retrack the volume immediately.
+    dcLongSlot* s = stdSound_dcLongFind(sound);
+    if (s) {
+        int v = (int)(sound->vol * 255.0);
+        snd_stream_volume(s->hnd, stdMath_ClampInt(v, 0, 255));
+    }
 }
 
 int stdSound_3DSetMode(stdSound_buffer_t* a1, int a2)

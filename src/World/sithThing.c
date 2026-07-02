@@ -201,7 +201,15 @@ void sithThing_TickAll(flex_t deltaSeconds, int deltaMs)
         if (!pThingIter->type)
             continue;
 #ifdef TARGET_RETRO_HOMEBREW
-        int bCanUpdateOffscreen = (((uint8_t)jkPlayer_currentTickIdx + (pThingIter->thingIdx & 0xFF)) & 0x3F) == 0;
+        // Added: the current camera's focus must always tick at full rate. In-engine
+        // cutscene rigs (boss-intro fly-bys: PlayKey/RotatePivot on an invisible
+        // camera thing) never render, so the rendered-recently gates below would
+        // throttle their animation to the 1/64 offscreen rate and freeze the shot.
+        int bIsCameraFocus = sithCamera_currentCamera
+            && (sithCamera_currentCamera->primaryFocus == pThingIter
+             || sithCamera_currentCamera->secondaryFocus == pThingIter);
+        int bCanUpdateOffscreen = bIsCameraFocus ||
+            (((uint8_t)jkPlayer_currentTickIdx + (pThingIter->thingIdx & 0xFF)) & 0x3F) == 0;
         int bActorCanUpdateEveryOther = pThingIter->type == SITH_THING_ACTOR && (((uint8_t)jkPlayer_currentTickIdx + (pThingIter->thingIdx & 0xFF)) & 1) == 0;
         int bActorCanUpdateNow = pThingIter->type == SITH_THING_ACTOR && pThingIter->screenPos.y < 0.5;
         int bCanAlwaysUpdatePhysics = pThingIter->type == SITH_THING_PLAYER || pThingIter->type == SITH_THING_PARTICLE || pThingIter->type == SITH_THING_WEAPON || pThingIter->type == SITH_THING_DEBRIS || pThingIter->type == SITH_THING_COG;

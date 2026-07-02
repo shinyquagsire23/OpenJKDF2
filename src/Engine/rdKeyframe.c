@@ -200,7 +200,16 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
 
         joint->nodeIdx = node_idx;
         joint->numAnimEntries = anim_entry_cnt;
+#ifdef TARGET_RETRO_HOMEBREW
+        // Added: anim entries are written word-safely (parse-time float/u32 stores
+        // only) and read-only afterward, so they can live in word-addressable-only
+        // memory (DC VRAM arena). Biggest per-level chunk of animation data.
+        int prevSuggest = rdroid_pHS->suggestHeap(HEAP_WORD_ADDRESSABLE);
+#endif
         joint->paAnimEntries = (rdAnimEntry*)rdroid_pHS->alloc(sizeof(rdAnimEntry) * anim_entry_cnt + 2); // Added: prevent some oob accesses in rdPuppet
+#ifdef TARGET_RETRO_HOMEBREW
+        rdroid_pHS->suggestHeap(prevSuggest);
+#endif
         if (!joint->paAnimEntries)
           goto read_fail;
 

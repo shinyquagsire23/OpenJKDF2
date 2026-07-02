@@ -5,6 +5,7 @@
 #include "General/stdString.h"
 #include "General/stdFnames.h"
 #include "World/sithWorld.h"
+#include "stdPlatform.h" // Added: word-safe read bounce for VRAM-resident PCM
 #include "jk.h"
 
 // Un-inlined: searches semicolon-delimited directory list for a sound file.
@@ -225,6 +226,34 @@ sithSound* sithSound_GetFromIdx(int idx)
     return &world->sounds[idx];
 }
 
+
+#ifdef TARGET_RETRO_HOMEBREW
+// Added: fileRead byte-writes into the destination, but long-sound PCM may live
+// in word-addressable-only memory (DC VRAM arena). Bounce those through a chunk
+// buffer with word-safe copies; everything else reads direct.
+static int sithSound_ReadIntoBuffer(int fd, void* pDst, int len)
+{
+    if (!stdPlatform_IsWordAddressableOnly(pDst))
+        return pSithHS->fileRead(fd, pDst, len);
+
+    static char aBounce[16384]; // sound loads are main-thread only
+    char* pOut = (char*)pDst;
+    int total = 0;
+    while (total < len) {
+        int chunk = len - total;
+        if (chunk > (int)sizeof(aBounce)) chunk = (int)sizeof(aBounce);
+        int got = pSithHS->fileRead(fd, aBounce, chunk);
+        if (got <= 0) break;
+        stdPlatform_Memcpy32(pOut + total, aBounce, got);
+        total += got;
+        if (got < chunk) break;
+    }
+    return total;
+}
+#else
+#define sithSound_ReadIntoBuffer(fd, pDst, len) pSithHS->fileRead((fd), (pDst), (len))
+#endif
+
 int sithSound_LoadFileData(sithSound *sound)
 {
     void *buf; // ebp
@@ -250,7 +279,7 @@ int sithSound_LoadFileData(sithSound *sound)
             buf = stdSound_BufferSetData(sound->dsoundBuffer2, sound->bufferBytes, &bufferMaxSize);
             if ( buf )
             {
-                int numRead = pSithHS->fileRead(fd, buf, bufferMaxSize);
+                int numRead = sithSound_ReadIntoBuffer(fd, buf, bufferMaxSize); // Added: word-safe for VRAM-resident PCM
                 if ( stdSound_BufferUnlock(sound->dsoundBuffer2, buf, numRead) )
                 {
                     sound->isLoaded |= 1u;
@@ -263,7 +292,12 @@ int sithSound_LoadFileData(sithSound *sound)
     if ( fd )
         pSithHS->fileClose(fd);
     if ( sound->dsoundBuffer2 )
+    {
         stdSound_BufferRelease(sound->dsoundBuffer2);
+        // Added: the counterpart of the += above -- a failed load must not leak
+        // accounting, or curDataLoaded inflates until no sound can ever load again.
+        sithSound_curDataLoaded -= sound->bufferBytes;
+    }
     sound->dsoundBuffer2 = 0;
     return 0;
 }
@@ -303,7 +337,7 @@ int sithSound_ReadDataFromFd(int fd, sithSound *sound)
     data = stdSound_BufferSetData(sound->dsoundBuffer2, sound->bufferBytes, &bufferBytes);
     if ( data )
     {
-        int amt = pSithHS->fileRead(fd, data, bufferBytes);
+        int amt = sithSound_ReadIntoBuffer(fd, data, bufferBytes); // Added: word-safe for VRAM-resident PCM
         return stdSound_BufferUnlock(sound->dsoundBuffer2, data, amt);
     }
     return 0;

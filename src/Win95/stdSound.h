@@ -132,6 +132,10 @@ typedef struct stdSoundDreamcastBuffer {
     BOOL isPlaying;
     BOOL isLooping;
     // KOS AICA backend state (see src/Platform/Dreamcast/stdSound.c)
+    void*    pSample;      // dcSample*: refcounted PCM + shared SPU upload.
+                           // Duplicates share it (DirectSound semantics: duplicated
+                           // buffers share the sample memory; engine refcounts
+                           // implicitly via BufferDuplicate/BufferRelease).
     uint32_t sfxHandle;    // sfxhnd_t; 0 == SFXHND_INVALID (not uploaded to SPU RAM)
     int      channel;      // AICA channel from the last play; -1 == none
     int      panVal;       // 0=left, 128=center, 255=right

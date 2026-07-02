@@ -701,6 +701,8 @@ typedef struct DcMemHeader {
 #define DC_HDR_SET(p,m,s)  ((p)->mark_size = (((m) & 0xFF) << 24) | ((s) & 0xFFFFFF))
 
 static mspace dc_vram_mspace = NULL;
+static uintptr_t dc_vram_arena_base = 0;   // Added: arena bounds, see stdPlatform_IsWordAddressableOnly
+static uintptr_t dc_vram_arena_end  = 0;
 static size_t dc_vram_mspace_size = 0;
 static int dc_heapSuggestion = HEAP_ANY;
 
@@ -729,6 +731,14 @@ static inline uint32_t DC_BlockSize(uint32_t len)
 // Reserve the VRAM overflow arena. Must be called AFTER pvr_init (VRAM is up) and
 // EARLY -- before the texture cache fragments VRAM -- so the 4 MiB block is contiguous.
 // Called from std3D_Startup. Safe to call more than once (no-op after the first).
+// Added: expose the arena bounds to stdPlatform_IsWordAddressableOnly (which
+// lives outside this TARGET_DREAMCAST section).
+void DC_GetVramArenaBounds(uintptr_t* pBase, uintptr_t* pEnd)
+{
+    *pBase = dc_vram_arena_base;
+    *pEnd  = dc_vram_arena_end;
+}
+
 void DC_InitVramOverflow(void)
 {
     if (dc_vram_mspace) return;
@@ -760,6 +770,8 @@ void DC_InitVramOverflow(void)
                                (p16[0] == 0x11AA && p16[1] == 0xBB44) ? "OK" : "BROKEN");
             dc_vram_mspace = create_mspace_with_base(base, want, 0);
             dc_vram_mspace_size = want;
+            dc_vram_arena_base = (uintptr_t)base;      // Added: for stdPlatform_IsWordAddressableOnly
+            dc_vram_arena_end  = (uintptr_t)base + want;
         }
     }
     stdPlatform_Printf("[DC heap] VRAM word-addressable arena: %u KiB (of %u KiB free; %u KiB reserved for textures)\n",
@@ -1117,6 +1129,21 @@ void stdPlatform_PrintHeapStats()
 }
 #endif // TARGET_DREAMCAST
 
+
+// Added: does this pointer live in memory that drops byte-granular stores?
+// Callers use it to decide between a direct fileRead and a word-safe bounce.
+int stdPlatform_IsWordAddressableOnly(const void* p)
+{
+#ifdef TARGET_DREAMCAST
+    extern void DC_GetVramArenaBounds(uintptr_t* pBase, uintptr_t* pEnd);
+    uintptr_t base, end;
+    DC_GetVramArenaBounds(&base, &end);
+    return base && (uintptr_t)p >= base && (uintptr_t)p < end;
+#else
+    (void)p;
+    return 0;
+#endif
+}
 
 // Added:
 // memcpy/memset that never issue byte stores, for word-addressable-only

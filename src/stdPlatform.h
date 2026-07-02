@@ -73,6 +73,7 @@ void stdPlatform_PrintHeapStats();
 
 // Added
 void stdPlatform_Memzero32(void* dst, uint32_t len);
+int stdPlatform_IsWordAddressableOnly(const void* p);
 void stdPlatform_Memcpy32(void* dst, const void* src, uint32_t len);
 void stdPlatform_Memset32(void* dst, uint8_t val, uint32_t len);
 

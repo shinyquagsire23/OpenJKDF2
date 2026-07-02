@@ -1,4 +1,11 @@
 macro(plat_initialize)
+
+# Optional: boot straight into a map (debug/testing), e.g.
+#   DC_AUTOBOOT_MAP=01narshadda.jkl ./build_dreamcast.sh
+if(DEFINED ENV{DC_AUTOBOOT_MAP})
+    add_compile_definitions(DC_AUTOBOOT_MAP="$ENV{DC_AUTOBOOT_MAP}")
+    message(STATUS "DC autoboot map: $ENV{DC_AUTOBOOT_MAP}")
+endif()
     message( STATUS "Targeting Sega Dreamcast" )
 
     set(BIN_NAME "openjkdf2")
