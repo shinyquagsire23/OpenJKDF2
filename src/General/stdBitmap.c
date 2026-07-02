@@ -152,7 +152,7 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
     std_pHS->fileRead(fp, &bmp_header, sizeof(bitmapHeader));
     if ( _memcmp((const char *)&bmp_header, "BM  ", 4u) )
     {
-        stdPrintf(std_pHS->errorPrint, ".\\General\\stdBitmap.c", 213, "Error: Bad signature in header of bitmap file.\n", 0, 0, 0, 0);
+        stdPrintf(std_pHS->errorPrint, ".\\General\\stdBitmap.c", 213, "Error: Bad signature in header of bitmap file (%x).\n", *(uint32_t*)&bmp_header);
         return 0;
     }
     if ( bmp_header.field_4 != 70 )
@@ -209,14 +209,33 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
 
         out->mipSurfaces[mipCount] = surface;
         stdDisplay_VBufferLock(surface);
-        lockAlloc = surface->surface_lock_alloc;
+        lockAlloc = (char*)surface->surface_lock_alloc;
         
         v15 = surface->format.width * ((unsigned int)surface->format.format.bpp >> 3);
+#ifdef TARGET_RETRO_HOMEBREW
+        // Added: bounce rows through a temp buffer; fileRead byte-writes internally
+        // and the vbuffer may be word-addressable-only (DC VRAM / NDS slot-2).
+        char* pRowTmp = (char*)std_pHS->alloc(v15);
+        for ( i = 0; i < vbufTexFmt.height; ++i )
+        {
+            if (pRowTmp) {
+                std_pHS->fileRead(fp, pRowTmp, v15);
+                stdPlatform_Memcpy32(lockAlloc, pRowTmp, v15);
+            } else {
+                std_pHS->fileRead(fp, lockAlloc, v15);
+            }
+            lockAlloc += surface->format.width_in_bytes;
+        }
+        if (pRowTmp) {
+            std_pHS->free(pRowTmp);
+        }
+#else
         for ( i = 0; i < vbufTexFmt.height; ++i )
         {
             std_pHS->fileRead(fp, lockAlloc, v15);
             lockAlloc += surface->format.width_in_bytes;
         }
+#endif
         stdDisplay_VBufferUnlock(surface);
         if ( (out->palFmt & 1) != 0 ) {
             stdDisplay_VBufferSetColorKey(surface, out->colorkey);

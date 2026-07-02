@@ -404,9 +404,9 @@ int jkCredits_Tick()
             v8 = (uint8_t*)Video_menuBuffer.surface_lock_alloc;
             pAIdk = jkCredits_aIdk;
             v25.x = -Video_menuBuffer.format.width_in_bytes;
-            v23 = Video_menuBuffer.surface_lock_alloc;
+            v23 = (char*)Video_menuBuffer.surface_lock_alloc; // Added: explicit cast (field is void* now)
             v24 = 32;
-            v10 = (uint8_t*)&Video_menuBuffer.surface_lock_alloc[479 * Video_menuBuffer.format.width_in_bytes];
+            v10 = (uint8_t*)Video_menuBuffer.surface_lock_alloc + 479 * Video_menuBuffer.format.width_in_bytes;
             v22 = (char*)v10;
             do
             {

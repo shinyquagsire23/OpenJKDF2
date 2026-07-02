@@ -68,15 +68,16 @@ stdBitmap* stdPcx_Load(char *fpath, int create_ddraw_surface, int gpu_mem)
             uint32_t v15 = (v11 & 0x3F) - 1;
             if (v11 & 0x3F)
             {
-                uint32_t v17 = (v13 | (v13 << 8) | (v13 << 16) | (v13 << 24));
-                _memset32(lockAlloc, v17, v16 >> 2);
-                _memset(&lockAlloc[v16 & ~3], v17, v16 & 3);
+                // Added: word-safe fill, also handles the unaligned run start
+                stdPlatform_Memset32(lockAlloc, v13, v16);
                 lockAlloc += v16;
             }
         }
         else
         {
-            *lockAlloc++ = v11;
+            // Added: word-safe store (vbuffers may be word-addressable-only)
+            stdPlatform_WriteByte16(lockAlloc, v11);
+            lockAlloc++;
         }
     }
     stdDisplay_VBufferUnlock(*bitmap->mipSurfaces);

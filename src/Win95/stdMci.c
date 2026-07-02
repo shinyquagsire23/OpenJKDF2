@@ -16,6 +16,7 @@
 #include <dc/cdrom.h>
 #include <dc/syscalls.h>   // CD_STATUS_*
 #include <dc/spu.h>        // spu_cdda_volume
+#include <kos/thread.h>    // thd_sleep
 #endif
 
 // Added
@@ -142,12 +143,15 @@ flex_d_t stdMci_GetTrackLength(int track)
 
 #else // LINUX
 #if defined(STDSOUND_DREAMCAST)
+#ifdef STDMCI_DC_CDDA
 
-// Dreamcast: stream the soundtrack as hardware CD Digital Audio (CDDA). The music
-// tracks are authored onto the disc as Red Book audio tracks (see the mkdcdisc --cdda
-// packaging), and the GD-ROM plays them directly into the AICA mix -- effectively free
-// CPU-wise, unlike decoding Ogg/Vorbis in software. The engine's track numbers line up
-// with the disc's audio track numbers (data is track 1, music starts at track 2).
+// Dreamcast (retired CDDA path, kept for reference behind STDMCI_DC_CDDA):
+// stream the soundtrack as hardware CD Digital Audio. This turned out to be
+// unusable in practice -- the GD drive can't serve data-sector reads while
+// playing audio (any read stops playback, and reads racing a PLAY command
+// return garbage that permanently poisons KOS's iso9660 sector cache), and this
+// engine streams materials/sounds from disc constantly. See the ADPCM streaming
+// implementation below instead.
 
 int stdMci_dcFrom = 0;
 int stdMci_dcTo = 0;
@@ -201,15 +205,50 @@ int stdMci_Play(uint8_t trackFrom, uint8_t trackTo)
 
     // Play the range once (loops=0); sithSoundMixer polls CheckStatus and re-issues
     // Play to loop the range, matching the other backends. CDDA_TRACKS = play by track.
-    if (cdrom_cdda_play(cdFrom, cdTo, 0, CDDA_TRACKS) == ERR_OK) {
-        // Re-assert the mix level -- snd/spu init can reset the CDDA registers, and the
-        // engine may Play before its first SetVolume.
-        spu_cdda_volume(stdMci_dcVol, stdMci_dcVol);
-        stdMci_dcPlaying = 1;
-        return 1;
+    int playRc = cdrom_cdda_play(cdFrom, cdTo, 0, CDDA_TRACKS);
+
+    // Issuing a PLAY command (even one that FAILS) can leave the drive delivering
+    // mispositioned (audio) bytes -- or outright errors -- for data reads. KOS's
+    // iso9660 layer DMAs every read into its persistent sector cache, so ONE bad
+    // read during this window poisons that sector's cache block for the rest of
+    // the session (this broke all GOB reads when music started mid-level-load).
+    // Absorb the window with cache-bypassing scratch reads of the data session's
+    // PVD until it verifies ("CD001"); if it never verifies, stop the music rather
+    // than let the engine read garbage.
+    int bReadsVerified = 0;
+    {
+        static uint8_t scratch[2048] __attribute__((aligned(32)));
+        cd_toc_t toc;
+        // false = low-density TOC: burned CD-Rs have no high-density area.
+        if (cdrom_read_toc(&toc, false) == ERR_OK) {
+            uint32_t fad = cdrom_locate_data_track(&toc);
+            if (fad) {
+                for (int tries = 0; tries < 100; tries++) {
+                    if (cdrom_read_sectors_ex(scratch, fad + 16, 1, false) == ERR_OK &&
+                        scratch[1] == 'C' && scratch[2] == 'D' &&
+                        scratch[3] == '0' && scratch[4] == '0' && scratch[5] == '1') {
+                        bReadsVerified = 1; // data reads position correctly again
+                        break;
+                    }
+                    thd_sleep(10);
+                }
+            }
+        }
     }
-    stdMci_dcPlaying = 0;
-    return 0;
+
+    if (playRc != ERR_OK || !bReadsVerified) {
+        // No playback, or reads still wedged: make sure the drive isn't left in the
+        // play state so the game survives without music.
+        cdrom_cdda_pause();
+        stdMci_dcPlaying = 0;
+        return 0;
+    }
+
+    // Re-assert the mix level -- snd/spu init can reset the CDDA registers, and the
+    // engine may Play before its first SetVolume.
+    spu_cdda_volume(stdMci_dcVol, stdMci_dcVol);
+    stdMci_dcPlaying = 1;
+    return 1;
 }
 
 void stdMci_SetVolume(flex_t vol)
@@ -249,6 +288,218 @@ flex_d_t stdMci_GetTrackLength(int track)
 {
     return 0.0;
 }
+
+#else // !STDMCI_DC_CDDA: AICA ADPCM streaming from the data track
+
+// Dreamcast: stream the soundtrack as AICA ADPCM files from the data track.
+// The packaging converts each GOG Ogg (Track12.ogg, ...) to headerless 4-bit
+// Yamaha AICA ADPCM at 44.1kHz stereo, nibble-interleaved for snd_stream
+// (music/trackNN.adp on the disc; see plat_dreamcast.cmake + KOS wav2adpcm).
+// The AICA decodes ADPCM in hardware, so this costs ~no SH4 time -- and unlike
+// CDDA, the music data flows through normal file reads that interleave cleanly
+// with the engine's constant material/sound streaming.
+//
+// A small pump thread keeps the stream fed even while the main thread is busy
+// inside a level load (KOS's fs layer serializes concurrent disc access).
+
+#include <dc/sound/stream.h>
+#include <kos/thread.h>
+#include <kos/mutex.h>
+
+#define STDMCI_ADPCM_FREQ   44100
+#define STDMCI_ADPCM_STEREO 1
+#define STDMCI_CHUNK        (32 << 10)   // callback staging; >= any smp_req
+
+static snd_stream_hnd_t stdMci_shnd = SND_STREAM_INVALID;
+static FILE*   stdMci_fp = NULL;
+static int     stdMci_trackCur = 0;   // GOG track number currently playing
+static int     stdMci_trackEnd = 0;   // last GOG track of the requested range
+static volatile int stdMci_bStreaming = 0;
+static volatile int stdMci_bEnded = 0;
+static int     stdMci_vol255 = 255;
+static volatile int stdMci_bPumpRun = 0;
+static kthread_t*   stdMci_pPumpThd = NULL;
+static mutex_t stdMci_mtx = MUTEX_INITIALIZER;
+static uint8_t stdMci_chunkBuf[STDMCI_CHUNK] __attribute__((aligned(32)));
+
+// Open the .adp for a track number (NULL = not shipped / missing). Files are
+// GOG-named (track12..18 = disc 1, track22..32 = disc 2). In-level requests
+// already arrive GOG-numbered; jkCredits passes ORIGINAL CD track numbers
+// (2..9), so mirror the SDL2 backend's fallback: +10/+20 by the episode's disc.
+// Absolute paths: the game chdir's into the game-data subdir (/cd/jk1), but the
+// soundtrack lives at the disc root (see plat_dreamcast.cmake).
+static FILE* stdMci_dcOpenTrack(int track)
+{
+    char path[64];
+    FILE* fp;
+
+    snprintf(path, sizeof(path), "/cd/music/track%d.adp", track);
+    if ((fp = fopen(path, "rb")))
+        return fp;
+
+    if (track <= 12) {
+        int cdNum = 1;
+        if (jkMain_pEpisodeEnt)       cdNum = jkMain_pEpisodeEnt->cdNum;
+        else if (jkMain_pEpisodeEnt2) cdNum = jkMain_pEpisodeEnt2->cdNum;
+        snprintf(path, sizeof(path), "/cd/music/track%d.adp",
+                 track + (cdNum == 2 ? 20 : 10));
+        if ((fp = fopen(path, "rb")))
+            return fp;
+    }
+    return NULL;
+}
+
+// snd_stream data callback (called from the pump thread via snd_stream_poll).
+// For 4-bit stereo nibble-interleaved ADPCM, one byte = one L+R sample pair,
+// so bytes == samples requested. Advances across the track range on EOF.
+static void* stdMci_dcStreamCb(snd_stream_hnd_t hnd, int smp_req, int* smp_recv)
+{
+    (void)hnd;
+    int want = smp_req;                    // bytes (stereo 4-bit: 1 byte/sample pair)
+    if (want > (int)sizeof(stdMci_chunkBuf)) want = (int)sizeof(stdMci_chunkBuf);
+    // ADPCM transfers want whole 32-byte blocks; trailing partials are padded.
+    int got = 0;
+    while (got < want && stdMci_fp) {
+        int r = (int)fread(stdMci_chunkBuf + got, 1, want - got, stdMci_fp);
+        if (r > 0) { got += r; continue; }
+        // EOF: advance to the next track in the range, else finish.
+        fclose(stdMci_fp);
+        stdMci_fp = NULL;
+        if (stdMci_trackCur < stdMci_trackEnd) {
+            stdMci_trackCur++;
+            stdMci_fp = stdMci_dcOpenTrack(stdMci_trackCur);
+        }
+    }
+    if (got <= 0) {
+        stdMci_bEnded = 1;
+        *smp_recv = 0;
+        return NULL;   // stream starves out; CheckStatus reports idle -> mixer loops
+    }
+    // Zero-pad up to a 32-byte boundary so a short final read can't loop garbage.
+    while ((got & 31) && got < (int)sizeof(stdMci_chunkBuf)) stdMci_chunkBuf[got++] = 0;
+    *smp_recv = got;
+    return stdMci_chunkBuf;
+}
+
+// Pump thread: keeps the AICA ring buffer fed. ~1.4s of audio fits in the ring
+// (32KB/chan at 22KB/s/chan), so a 50ms cadence has lots of slack.
+static void* stdMci_dcPumpThread(void* arg)
+{
+    (void)arg;
+    while (stdMci_bPumpRun) {
+        mutex_lock(&stdMci_mtx);
+        if (stdMci_bStreaming && !stdMci_bEnded && stdMci_shnd != SND_STREAM_INVALID)
+            snd_stream_poll(stdMci_shnd);
+        mutex_unlock(&stdMci_mtx);
+        thd_sleep(50);
+    }
+    return NULL;
+}
+
+int stdMci_Startup()
+{
+    // snd_stream_init implicitly snd_init()s; run it at startup, before any SPU
+    // sfx are loaded, so it can't clobber them later.
+    if (snd_stream_init() < 0) {
+        stdPlatform_Printf("stdMci: snd_stream_init failed, no music\n");
+        stdMci_bInitted = 0;
+        return 0;
+    }
+    stdMci_shnd = snd_stream_alloc(stdMci_dcStreamCb, SND_STREAM_BUFFER_MAX_ADPCM);
+    if (stdMci_shnd == SND_STREAM_INVALID) {
+        stdPlatform_Printf("stdMci: snd_stream_alloc failed, no music\n");
+        stdMci_bInitted = 0;
+        return 0;
+    }
+    stdMci_bPumpRun = 1;
+    stdMci_pPumpThd = thd_create(0, stdMci_dcPumpThread, NULL);
+    stdMci_bInitted = 1;
+    stdMci_bIsGOG = 1; // engine passes real GOG track IDs; files are named by them
+    return 1;
+}
+
+void stdMci_Shutdown()
+{
+    stdMci_Stop();
+    if (stdMci_pPumpThd) {
+        stdMci_bPumpRun = 0;
+        thd_join(stdMci_pPumpThd, NULL);
+        stdMci_pPumpThd = NULL;
+    }
+    if (stdMci_shnd != SND_STREAM_INVALID) {
+        snd_stream_destroy(stdMci_shnd);
+        stdMci_shnd = SND_STREAM_INVALID;
+    }
+    stdMci_bInitted = 0;
+}
+
+int stdMci_Play(uint8_t trackFrom, uint8_t trackTo)
+{
+    if (stdMci_shnd == SND_STREAM_INVALID) return 0;
+
+    mutex_lock(&stdMci_mtx);
+
+    // Stop anything already going.
+    if (stdMci_bStreaming) {
+        snd_stream_stop(stdMci_shnd);
+        stdMci_bStreaming = 0;
+    }
+    if (stdMci_fp) { fclose(stdMci_fp); stdMci_fp = NULL; }
+
+    stdMci_trackCur = trackFrom;
+    stdMci_trackEnd = (trackTo >= trackFrom) ? trackTo : trackFrom;
+    stdMci_fp = stdMci_dcOpenTrack(stdMci_trackCur);
+    if (!stdMci_fp) {
+        // Track not shipped (GOG numbering has gaps) -> play nothing.
+        mutex_unlock(&stdMci_mtx);
+        return 0;
+    }
+
+    stdMci_bEnded = 0;
+    snd_stream_start_adpcm(stdMci_shnd, STDMCI_ADPCM_FREQ, STDMCI_ADPCM_STEREO);
+    snd_stream_volume(stdMci_shnd, stdMci_vol255);
+    stdMci_bStreaming = 1;
+
+    mutex_unlock(&stdMci_mtx);
+    return 1;
+}
+
+void stdMci_SetVolume(flex_t vol)
+{
+    int v = (int)(vol * 255.0 + 0.5);
+    if (v < 0) v = 0;
+    if (v > 255) v = 255;
+    stdMci_vol255 = v;
+    mutex_lock(&stdMci_mtx);
+    if (stdMci_bStreaming && stdMci_shnd != SND_STREAM_INVALID)
+        snd_stream_volume(stdMci_shnd, v);
+    mutex_unlock(&stdMci_mtx);
+}
+
+void stdMci_Stop()
+{
+    mutex_lock(&stdMci_mtx);
+    if (stdMci_bStreaming && stdMci_shnd != SND_STREAM_INVALID)
+        snd_stream_stop(stdMci_shnd);
+    stdMci_bStreaming = 0;
+    stdMci_bEnded = 0;
+    if (stdMci_fp) { fclose(stdMci_fp); stdMci_fp = NULL; }
+    mutex_unlock(&stdMci_mtx);
+}
+
+int stdMci_CheckStatus()
+{
+    // Playing as long as the stream is up and hasn't drained past the last track;
+    // reporting idle makes sithSoundMixer re-issue Play (that's how looping works).
+    return stdMci_bStreaming && !stdMci_bEnded;
+}
+
+flex_d_t stdMci_GetTrackLength(int track)
+{
+    return 0.0;
+}
+
+#endif // STDMCI_DC_CDDA
 
 #elif defined(STDSOUND_NULL) || defined(STDSOUND_MAXMOD)
 

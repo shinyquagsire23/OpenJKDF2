@@ -337,6 +337,7 @@ extern "C"
 
 #ifdef TARGET_DREAMCAST
 #include <kos.h>
+#include "Platform/Dreamcast/dcFault.h"
 // KOS reads these at startup (must be at file scope). INIT_DEFAULT brings up IRQs,
 // threads and the standard subsystems; INIT_CONTROLLER enables maple input.
 KOS_INIT_FLAGS(INIT_DEFAULT | INIT_CONTROLLER);
@@ -344,6 +345,24 @@ KOS_INIT_FLAGS(INIT_DEFAULT | INIT_CONTROLLER);
 
 int main(int argc, char** argv)
 {
+#ifdef TARGET_DREAMCAST
+    // Added: on-screen CPU fault reporter (KOS default only prints to serial)
+    dcFault_Install();
+
+    // Added: bring the PVR + VRAM overflow arena up before any engine allocations,
+    // so GUI font/bitmap vbuffers loaded pre-first-frame can land in VRAM.
+    extern void std3D_EarlyInit(void);
+    std3D_EarlyInit();
+
+#ifdef DC_AUTOBOOT_MAP
+    // Added: boot straight into a map (debug/testing; define DC_AUTOBOOT_MAP to
+    // a jkl name, e.g. -DDC_AUTOBOOT_MAP=\"01narshadda.jkl\").
+    static char* dcAutobootArgv[] = { "openjkdf2", "-autostart", "-sp",
+                                      "-episode", "JK1", "-map", DC_AUTOBOOT_MAP };
+    argc = 7;
+    argv = dcAutobootArgv;
+#endif
+#endif
 #ifdef ARCH_WASM
     EM_ASM(
         FS.mkdir('/jk1/player');

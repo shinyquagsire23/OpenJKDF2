@@ -343,10 +343,19 @@ LABEL_21:
             if ( texture->alpha_en & 1 )
               stdDisplay_VBufferSetColorKey(created_tex, texture->color_transparent);
             stdDisplay_VBufferLock(*texture_struct);
-            rdroid_pHS->fileRead(
-              mat_file__,
-              (void *)(*texture_struct)->surface_lock_alloc,
-              (*texture_struct)->format.texture_size_in_bytes);
+            // Added: bounce through a temp; fileRead byte-writes internally and the
+            // vbuffer may be word-addressable-only (DC VRAM / NDS slot-2).
+            {
+                uint32_t mipLen = (*texture_struct)->format.texture_size_in_bytes;
+                void* pMipTmp = std_pHS->alloc(mipLen);
+                if (pMipTmp) {
+                    rdroid_pHS->fileRead(mat_file__, pMipTmp, mipLen);
+                    stdPlatform_Memcpy32((*texture_struct)->surface_lock_alloc, pMipTmp, mipLen);
+                    std_pHS->free(pMipTmp);
+                } else {
+                    rdroid_pHS->fileRead(mat_file__, (void *)(*texture_struct)->surface_lock_alloc, mipLen);
+                }
+            }
             stdDisplay_VBufferUnlock(*texture_struct);
 #if defined(RDMATERIAL_LRU_LOAD_UNLOAD)
             material->bDataLoaded = bDoLoad;
@@ -1080,16 +1089,15 @@ int rdMaterial_PurgeEntireMaterialCache()
 {
     int res = 0;
 
-    // HACK but whatever lol
-    int prev_std3D_frameCount = std3D_frameCount;
-    std3D_frameCount = 0;
-    res = rdMaterial_PurgeMaterialCache();
-    std3D_frameCount = prev_std3D_frameCount;
-
-    rdMaterial_numCachedMaterials = 0;
-    rdMaterial_pLastMatCache          = NULL;
-    rdMaterial_pFirstMatCache         = NULL;
-        
+    rdMaterial* pNextCachedMaterial = NULL;
+    for (rdMaterial* pCacheMaterial = rdMaterial_pFirstMatCache; pCacheMaterial; pCacheMaterial = pNextCachedMaterial)
+    {
+        pNextCachedMaterial = pCacheMaterial->pNextCachedMaterial;
+        if (pCacheMaterial->frameNum == std3D_frameCount || pCacheMaterial->frameNum == std3D_frameCount - 1)
+            continue;
+        rdMaterial_ResetCacheInfo(pCacheMaterial); // evicts + unlinks from the cache list
+        res = 1;
+    }
 
     return res;
 }

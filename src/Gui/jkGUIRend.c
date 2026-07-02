@@ -150,12 +150,13 @@ void jkGuiRend_DrawRect(stdVBuffer *vbuf, rdRect *rect, int16_t color)
         if ( rect->x < rect->x + rect->width )
         {
             v21 = v36 - v14;
-            v22 = &vbuf->surface_lock_alloc[rect->x + v14];
+            v22 = (char*)vbuf->surface_lock_alloc + rect->x + v14;
             v23 = rect->width;
             do
             {
-                v22[v21] = color;
-                *v22++ = color;
+                // Added: word-safe stores (vbuffers may be word-addressable-only)
+                stdPlatform_WriteByte16(v22 + v21, (uint8_t)color);
+                stdPlatform_WriteByte16(v22++, (uint8_t)color);
                 --v23;
             }
             while ( v23 );
@@ -167,8 +168,9 @@ void jkGuiRend_DrawRect(stdVBuffer *vbuf, rdRect *rect, int16_t color)
             goto LABEL_22;
         if ( rect->x < rect->x + rect->width )
         {
-            int16_t* v18 = (int16_t *)&vbuf->surface_lock_alloc[2 * (rect->x + v14)];
-            int16_t* v19 = (int16_t *)&vbuf->surface_lock_alloc[2 * (rect->x + v36)];
+            // Added: explicit byte-pointer math (field is void* now)
+            int16_t* v18 = (int16_t *)((char*)vbuf->surface_lock_alloc + 2 * (rect->x + v14));
+            int16_t* v19 = (int16_t *)((char*)vbuf->surface_lock_alloc + 2 * (rect->x + v36));
             v20 = rect->width;
             do
             {
@@ -188,13 +190,14 @@ LABEL_22:
         if ( rect->y < v12 )
         {
             v32 = rect->x - v24;
-            v33 = &vbuf->surface_lock_alloc[rect->y * vbuf->format.width_in_pixels + v24];
+            v33 = (char*)vbuf->surface_lock_alloc + rect->y * vbuf->format.width_in_pixels + v24;
             v34 = v12 - rect->y;
             do
             {
                 v35 = vbuf->format.width_in_pixels;
-                v33[v32] = color;
-                *v33 = color;
+                // Added: word-safe stores (vbuffers may be word-addressable-only)
+                stdPlatform_WriteByte16(v33 + v32, (uint8_t)color);
+                stdPlatform_WriteByte16(v33, (uint8_t)color);
                 v33 += v35;
                 --v34;
             }

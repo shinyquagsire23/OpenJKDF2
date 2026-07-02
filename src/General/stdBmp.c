@@ -144,9 +144,24 @@ int stdBmp_LoadEntryFromFile(const char *fpath, stdBitmap *bitmap, int create_dd
     int stride = vbuf->format.width_in_bytes;
 
     // Read rows
+#ifdef TARGET_RETRO_HOMEBREW
+    // Added: bounce rows through a temp buffer; fileRead byte-writes internally
+    // and the vbuffer may be word-addressable-only (DC VRAM / NDS slot-2).
+    uint8_t* pRowTmp = (uint8_t*)std_pHS->alloc(stride);
+#endif
     for (int row = 0; row < height; row++)
     {
+#ifdef TARGET_RETRO_HOMEBREW
+        int bytesRead;
+        if (pRowTmp) {
+            bytesRead = std_pHS->fileRead(fhand, pRowTmp, vbuf->format.width_in_bytes);
+            stdPlatform_Memcpy32(pixels, pRowTmp, vbuf->format.width_in_bytes);
+        } else {
+            bytesRead = std_pHS->fileRead(fhand, pixels, vbuf->format.width_in_bytes);
+        }
+#else
         int bytesRead = std_pHS->fileRead(fhand, pixels, vbuf->format.width_in_bytes);
+#endif
         if ( bytesRead != (int)vbuf->format.width_in_bytes )
         {
             std_pHS->assert("Unable to read all the data from file.", ".\\General\\stdBmp.c", 0x17E);
@@ -164,6 +179,14 @@ int stdBmp_LoadEntryFromFile(const char *fpath, stdBitmap *bitmap, int create_dd
         for (int i = 0; i < halfHeight; i++)
         {
             uint8_t *botRow = (uint8_t *)vbuf->surface_lock_alloc + (height - 1 - i) * stride;
+#ifdef TARGET_RETRO_HOMEBREW
+            // Added: word-safe row swap (byte reads OK, writes via temp + Memcpy32)
+            if (pRowTmp) {
+                _memcpy(pRowTmp, topRow, stride);
+                stdPlatform_Memcpy32(topRow, botRow, stride);
+                stdPlatform_Memcpy32(botRow, pRowTmp, stride);
+            } else
+#endif
             for (int j = 0; j < stride; j++)
             {
                 uint8_t tmp = topRow[j];
@@ -173,6 +196,10 @@ int stdBmp_LoadEntryFromFile(const char *fpath, stdBitmap *bitmap, int create_dd
             topRow += stride;
         }
     }
+#ifdef TARGET_RETRO_HOMEBREW
+    if (pRowTmp)
+        std_pHS->free(pRowTmp);
+#endif
 
     stdDisplay_VBufferUnlock(vbuf);
     std_pHS->fileClose(fhand);

@@ -99,6 +99,7 @@ int Window_Main_Linux(int argc, char** argv)
         strcat(cmdLine, argv[i]);
         strcat(cmdLine, " ");
     }
+    stdPlatform_Printf("cmdline: %s\n", cmdLine);
     
     result = Main_Startup(cmdLine);
 

@@ -1810,7 +1810,7 @@ MATH_FUNC void std3D_DrawMenu()
                     int srcY = (int)srcYf;
                     //int skip = (pitch*srcY)+srcX;
                     int skip = ((srcY % 4) * 4) + (srcX % 4) + ((srcX / 4)*16) + ((srcY / 4) * pitch * 4) + 640 + 640;
-                    whichBitmap[(y*256)+x] = Video_menuBuffer.surface_lock_alloc[skip];
+                    whichBitmap[(y*256)+x] = ((uint8_t*)Video_menuBuffer.surface_lock_alloc)[skip];
                     //Video_menuBuffer.surface_lock_alloc[(pitch*y)+x] = (y*128)+x;
 
                     srcXf += (flex_t)2.5;
@@ -1828,7 +1828,7 @@ MATH_FUNC void std3D_DrawMenu()
                     int srcY = (int)srcYf;
                     //int skip = (pitch*srcY)+srcX;
                     int skip = ((srcY % 4) * 4) + (srcX % 4) + ((srcX / 4)*16) + ((srcY / 4) * pitch * 4) + 640 + 640;
-                    whichBitmap2[(y*256)+x] = Video_menuBuffer.surface_lock_alloc[skip];
+                    whichBitmap2[(y*256)+x] = ((uint8_t*)Video_menuBuffer.surface_lock_alloc)[skip];
                     //Video_menuBuffer.surface_lock_alloc[(pitch*y)+x] = (y*128)+x;
                     srcXf += (flex_t)2.5;
                 }
@@ -1840,7 +1840,7 @@ MATH_FUNC void std3D_DrawMenu()
             {
                 for (int x = 0; x < 256; x++)
                 {
-                    whichBitmap[(y*256)+x] = Video_menuBuffer.surface_lock_alloc[(pitch*(y+fb_shift_y))+(x+fb_shift_x)];
+                    whichBitmap[(y*256)+x] = ((uint8_t*)Video_menuBuffer.surface_lock_alloc)[(pitch*(y+fb_shift_y))+(x+fb_shift_x)];
                     //Video_menuBuffer.surface_lock_alloc[(pitch*y)+x] = (y*128)+x;
                 }
             }
@@ -1849,7 +1849,7 @@ MATH_FUNC void std3D_DrawMenu()
             {
                 for (int x = 0; x < 256; x++)
                 {
-                    whichBitmap2[(y*256)+x] = Video_menuBuffer.surface_lock_alloc[(pitch*((y+fb_shift_y)+64))+(x+fb_shift_x)];
+                    whichBitmap2[(y*256)+x] = ((uint8_t*)Video_menuBuffer.surface_lock_alloc)[(pitch*((y+fb_shift_y)+64))+(x+fb_shift_x)];
                     //Video_menuBuffer.surface_lock_alloc[(pitch*y)+x] = (y*128)+x;
                 }
             }

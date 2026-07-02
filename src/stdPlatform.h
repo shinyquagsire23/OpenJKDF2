@@ -71,6 +71,24 @@ void stdPlatform_PrintHeapStats();
 void stdPlatform_PrintHeapStats();
 #endif
 
+// Added
+void stdPlatform_Memzero32(void* dst, uint32_t len);
+void stdPlatform_Memcpy32(void* dst, const void* src, uint32_t len);
+void stdPlatform_Memset32(void* dst, uint8_t val, uint32_t len);
+
+// Added: single byte store via 16-bit read-modify-write, for word-addressable
+// destinations (Dreamcast VRAM / NDS slot-2 RAM drop byte-granular stores).
+// Little-endian (SH4/ARM9).
+static inline void stdPlatform_WriteByte16(void* p, uint8_t val)
+{
+    uint16_t* pWord = (uint16_t*)((uintptr_t)p & ~(uintptr_t)1);
+    if ((uintptr_t)p & 1)
+        *pWord = (*pWord & 0x00FF) | ((uint16_t)val << 8);
+    else
+        *pWord = (*pWord & 0xFF00) | val;
+}
+
+
 #ifdef __cplusplus
 }
 #endif

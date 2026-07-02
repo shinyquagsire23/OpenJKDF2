@@ -296,52 +296,57 @@ int jkGui_Startup()
 #ifdef JKGUI_SMOL_SCREEN
     stdVBuffer* texA = jkGui_stdFonts[1]->pBitmap->mipSurfaces[0];
     stdDisplay_VBufferLock(texA);
+    uint8_t* pTexAPixels = (uint8_t*)texA->surface_lock_alloc; // Added: byte reads OK, writes word-safe
     for (int i = 0; i < texA->format.width * texA->format.height; i++) {
-        if (!texA->surface_lock_alloc[i]) continue;
+        if (!pTexAPixels[i]) continue;
 
         // menu: E5=black, E4=dark red E0=red E1=lighter red?
         // menu: F3=gold, darker, FC=bright yellow, E6=brown
         // font: 87=outline alt 3f=outline, 68=interior 69=interior alt
 
-        if (texA->surface_lock_alloc[i] == 0x3F) { // outline
-            texA->surface_lock_alloc[i] = 0xE5;
+        uint8_t vOut;
+        if (pTexAPixels[i] == 0x3F) { // outline
+            vOut = 0xE5;
         }
-        else if (texA->surface_lock_alloc[i] == 0x87) { // outline
-            texA->surface_lock_alloc[i] = 0xE6;
+        else if (pTexAPixels[i] == 0x87) { // outline
+            vOut = 0xE6;
         }
-        else if (texA->surface_lock_alloc[i] == 0x68) { // interior
-            texA->surface_lock_alloc[i] = 0xFC;
+        else if (pTexAPixels[i] == 0x68) { // interior
+            vOut = 0xFC;
         }
-        else if (texA->surface_lock_alloc[i] == 0x69) { // interior
-            texA->surface_lock_alloc[i] = 0xFB;
+        else if (pTexAPixels[i] == 0x69) { // interior
+            vOut = 0xFB;
         }
         else {
-            texA->surface_lock_alloc[i] = 0xE5;
+            vOut = 0xE5;
         }
-        //texA->surface_lock_alloc[i] = 0xe6;
+        stdPlatform_WriteByte16(&pTexAPixels[i], vOut);
     }
     stdDisplay_VBufferUnlock(texA);
 
     stdVBuffer* texB = jkGui_stdFonts[0]->pBitmap->mipSurfaces[0];
     stdDisplay_VBufferLock(texB);
+    uint8_t* pTexBPixels = (uint8_t*)texB->surface_lock_alloc; // Added: byte reads OK, writes word-safe
     for (int i = 0; i < texB->format.width * texB->format.height; i++) {
-        if (!texB->surface_lock_alloc[i]) continue;
+        if (!pTexBPixels[i]) continue;
 
-        if (texB->surface_lock_alloc[i] == 0x3F) {
-            texB->surface_lock_alloc[i] = 0xE5;
+        uint8_t vOut;
+        if (pTexBPixels[i] == 0x3F) {
+            vOut = 0xE5;
         }
-        else if (texB->surface_lock_alloc[i] == 0x87) {
-            texB->surface_lock_alloc[i] = 0xE5;
+        else if (pTexBPixels[i] == 0x87) {
+            vOut = 0xE5;
         }
-        else if (texB->surface_lock_alloc[i] == 0x68) {
-            texB->surface_lock_alloc[i] = 0xE0;
+        else if (pTexBPixels[i] == 0x68) {
+            vOut = 0xE0;
         }
-        else if (texB->surface_lock_alloc[i] == 0x69) {
-            texB->surface_lock_alloc[i] = 0xE0;
+        else if (pTexBPixels[i] == 0x69) {
+            vOut = 0xE0;
         }
         else {
-            texB->surface_lock_alloc[i] = 0xE5;
+            vOut = 0xE5;
         }
+        stdPlatform_WriteByte16(&pTexBPixels[i], vOut);
     }
     stdDisplay_VBufferUnlock(texB);
 //#endif

@@ -108,7 +108,7 @@ char Main_strEpisode[129];
 char Main_strMap[128+4];
 #endif
 
-#if defined(QOL_IMPROVEMENTS) && !defined(TARGET_NO_MULTIPLAYER_MENUS)
+#if defined(QOL_IMPROVEMENTS)
 int Main_StartupDedicated(int bFullyDedicated)
 {
     char* pRemoveExt;
@@ -137,6 +137,7 @@ int Main_StartupDedicated(int bFullyDedicated)
         *pRemoveExt = 0;
     }
     strcat(Main_strMap, ".jkl");
+    stdPlatform_Printf("Autostarting level: `%s`\n", Main_strMap);
 
     if (bFullyDedicated) {
         strcpy(aTmpPlayerShortName, "ServerDed");
@@ -157,8 +158,10 @@ int Main_StartupDedicated(int bFullyDedicated)
         jkGuiNetHost_bIsDedicated = 1;
     }
 
+//#if !defined(TARGET_NO_MULTIPLAYER_MENUS)
     jkGuiNetHost_SaveSettings();
     jkGuiNetHost_LoadSettings();
+//#endif // !defined(TARGET_NO_MULTIPLAYER_MENUS)
 
     // Fake player
     stdString_SafeWStrCopy(jkGuiMultiplayer_mpcInfo.name, L"", 32);
@@ -193,8 +196,13 @@ int Main_StartupDedicated(int bFullyDedicated)
 
     wuRegistry_GetWString("gameName", v34.serverName, 32, L"OpenJKDF2 Dedicated Server");
     wuRegistry_GetWString("serverPassword", v34.wPassword, 32, L"");
+#ifndef TARGET_DREAMCAST // TODO writable config
     wuRegistry_GetString("serverEpisodeGob", v34.episodeGobName, 32, Main_strEpisode);
     wuRegistry_GetString("serverMapJkl", v34.mapJklFname, 32, Main_strMap);
+#else
+    stdString_SafeStrCopy(v34.episodeGobName, Main_strEpisode, 32);
+    stdString_SafeStrCopy(v34.mapJklFname, Main_strMap, 32);
+#endif
 
     if (_wcslen(v34.wPassword)) {
         jkGuiNetHost_sessionFlags |= SESSIONFLAG_PASSWORD;
@@ -247,6 +255,7 @@ int Main_StartupDedicated(int bFullyDedicated)
         }
     }
     else {
+        stdPlatform_Printf("Loading SP: episode `%s`, map `%s`", v34.episodeGobName, v34.mapJklFname);
         if (jkMain_LoadLevelSingleplayer(v34.episodeGobName, v34.mapJklFname))
         {
             return 1;
@@ -436,7 +445,7 @@ int Main_Startup(const char *cmdline)
 
         if (jkRes_LoadCD(0))
         {
-#if defined(QOL_IMPROVEMENTS) && !defined(TARGET_NO_MULTIPLAYER_MENUS)
+#if defined(QOL_IMPROVEMENTS)
             if (Main_bDedicatedServer || Main_bAutostart) {
                 if (Main_StartupDedicated(Main_bDedicatedServer))
                 {

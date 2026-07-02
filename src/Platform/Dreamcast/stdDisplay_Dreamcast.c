@@ -255,7 +255,11 @@ stdVBuffer* stdDisplay_VBufferNew(stdVBufferTexFmt *fmt, int create_ddraw_surfac
 
     //out->format.width = 0;
     //out->format.width_in_bytes = 0;
+    // vbuffer pixel data is only accessed word-safe on this port, so allow
+    // placement in word-addressable-only memory (the VRAM overflow arena).
+    int prevSuggest = std_pHS->suggestHeap(HEAP_WORD_ADDRESSABLE);
     out->surface_lock_alloc = (char*)std_pHS->alloc(out->format.texture_size_in_bytes);
+    std_pHS->suggestHeap(prevSuggest);
     if (!out->surface_lock_alloc) {
         std_pHS->free(out);
         return NULL;
@@ -365,14 +369,15 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
             {
                 //if ((uint32_t)(i + srcRect.x) >= (uint32_t)vbuf2->format.width) continue;
                 //if ((uint32_t)(j + srcRect.y) >= (uint32_t)vbuf2->format.height) continue;
-                
+
                 uint8_t pixel = 0;//srcPixels[(i + srcRect.x) + ((j + srcRect.y)*srcStride)];
 
                 if (!pixel && has_alpha) continue;
                 if ((uint32_t)(i + dstRect.x) >= (uint32_t)vbuf->format.width) continue;
                 if ((uint32_t)(j + dstRect.y) >= (uint32_t)vbuf->format.height) continue;
 
-                dstPixels[(i + dstRect.x) + ((j + dstRect.y)*dstStride)] = pixel;
+                // word-safe store (vbuffers may be word-addressable-only)
+                stdPlatform_WriteByte16(&dstPixels[(i + dstRect.x) + ((j + dstRect.y)*dstStride)], pixel);
             }
         }
         return 1;
@@ -421,21 +426,43 @@ int stdDisplay_VBufferCopy(stdVBuffer *vbuf, stdVBuffer *vbuf2, unsigned int bli
     
     int once = 0;
     int has_alpha = !(rect->width == 640) && (alpha_maybe & 1);
-    
+
+    if (!has_alpha) {
+        // no transparency skip -> contiguous rows, word-safe row copies
+        for (int j = 0; j < rect->height; j++)
+        {
+            if ((uint32_t)(j + srcRect.y) >= (uint32_t)vbuf2->format.height) continue;
+            if ((uint32_t)(j + dstRect.y) >= (uint32_t)vbuf->format.height) continue;
+
+            int iStart = 0;
+            if (iStart + srcRect.x < 0) iStart = -srcRect.x;
+            if (iStart + dstRect.x < 0) iStart = -dstRect.x;
+            int iEnd = rect->width;
+            if (iEnd + srcRect.x > vbuf2->format.width) iEnd = vbuf2->format.width - srcRect.x;
+            if (iEnd + dstRect.x > vbuf->format.width)  iEnd = vbuf->format.width - dstRect.x;
+            if (iEnd <= iStart) continue;
+
+            stdPlatform_Memcpy32(&dstPixels[(iStart + dstRect.x) + ((j + dstRect.y)*dstStride)],
+                                 &srcPixels[(iStart + srcRect.x) + ((j + srcRect.y)*srcStride)],
+                                 iEnd - iStart);
+        }
+    }
+    else
     for (int j = 0; j < rect->height; j++)
     {
         for (int i = 0; i < rect->width; i++)
         {
             if ((uint32_t)(i + srcRect.x) >= (uint32_t)vbuf2->format.width) continue;
             if ((uint32_t)(j + srcRect.y) >= (uint32_t)vbuf2->format.height) continue;
-            
+
             uint8_t pixel = srcPixels[(i + srcRect.x) + ((j + srcRect.y)*srcStride)];
 
             if (!pixel && has_alpha) continue;
             if ((uint32_t)(i + dstRect.x) >= (uint32_t)vbuf->format.width) continue;
             if ((uint32_t)(j + dstRect.y) >= (uint32_t)vbuf->format.height) continue;
 
-            dstPixels[(i + dstRect.x) + ((j + dstRect.y)*dstStride)] = pixel;
+            // word-safe store (vbuffers may be word-addressable-only)
+            stdPlatform_WriteByte16(&dstPixels[(i + dstRect.x) + ((j + dstRect.y)*dstStride)], pixel);
         }
     }
 
@@ -476,16 +503,21 @@ int stdDisplay_VBufferFill(stdVBuffer *vbuf, int fillColor, rdRect *rect)
 
     for (int j = 0; j < rect->height; j++)
     {
-        for (int i = 0; i < rect->width; i++)
+        // row-wise word-safe fill (vbuffers may be word-addressable-only)
+        for (int i = 0; i < rect->width; )
         {
             uint32_t idx = (i + dstRect.x) + ((j + dstRect.y)*dstStride);
-            if (idx > max_idx)
+            if (idx > max_idx) {
+                i++;
                 continue;
-            
-            dstPixels[idx] = fillColor;
+            }
+            uint32_t span = rect->width - i;
+            if (idx + span - 1 > max_idx) span = max_idx - idx + 1;
+            stdPlatform_Memset32(&dstPixels[idx], (uint8_t)fillColor, span);
+            i += span;
         }
     }
-    
+
     //SDL_FillRect(vbuf, &dstRect, fillColor); //TODO error check
     return 1;
 }

@@ -14,6 +14,5 @@ char openjkdf2_aRestartPath[256];
 char* openjkdf2_pExecutablePath = "";
 
 #ifdef TARGET_NO_MULTIPLAYER_MENUS
-int jkGuiNetHost_bIsDedicated = 0;
 int jkGuiBuildMulti_bRendering = 0;
 #endif

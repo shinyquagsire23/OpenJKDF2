@@ -935,7 +935,8 @@ int jkCutscene_smacker_process()
     stdDisplay_VBufferUnlock(jkCutscene_frameBuf);*/
     
     stdDisplay_VBufferLock(Video_pMenuBuffer);
-    _memcpy(Video_pMenuBuffer->surface_lock_alloc + (640*50), smk_get_video(jkCutscene_smk), jkCutscene_smk_w*jkCutscene_smk_h);
+    // Added: word-safe copy (vbuffers may be word-addressable-only)
+    stdPlatform_Memcpy32((uint8_t*)Video_pMenuBuffer->surface_lock_alloc + (640*50), smk_get_video(jkCutscene_smk), jkCutscene_smk_w*jkCutscene_smk_h);
     //stdDisplay_VBufferCopy(Video_pMenuBuffer, jkCutscene_frameBuf, 0, 50, NULL, 0);
     //stdDisplay_VBufferFill(Video_pMenuBuffer, 0, &jkCutscene_rect1);
     stdDisplay_VBufferCopy(Video_pMenuBuffer, &Video_otherBuf, jkCutscene_rect1.x, jkCutscene_rect1.y, &jkCutscene_rect1, 0);
@@ -1014,7 +1015,12 @@ int jkCutscene_smusher_process()
     _memcpy(stdDisplay_masterPalette, smush_get_palette(jkCutscene_pSmush), 0x300);
     
     stdDisplay_VBufferLock(jkCutscene_frameBuf);
+#ifdef TARGET_RETRO_HOMEBREW
+    // Added: word-safe copy (vbuffers may be word-addressable-only)
+    stdPlatform_Memcpy32(jkCutscene_frameBuf->surface_lock_alloc, smush_get_video(jkCutscene_pSmush), jkCutscene_smk_w*jkCutscene_smk_h);
+#else
     _memcpy(jkCutscene_frameBuf->surface_lock_alloc, smush_get_video(jkCutscene_pSmush), jkCutscene_smk_w*jkCutscene_smk_h);
+#endif
     stdDisplay_VBufferUnlock(jkCutscene_frameBuf);
     
     stdDisplay_VBufferLock(Video_pMenuBuffer);

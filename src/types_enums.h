@@ -1504,10 +1504,25 @@ enum AUTOPICKUP
 
 #ifdef STDPLATFORM_HEAP_SUGGESTIONS
 enum HEAP_SUGGESTIONS {
+    // Defaults to the main system RAM, via malloc
     HEAP_ANY = 0,
+
+    // TCM, WRAM, anything that's particularly fast and good for
+    // quick accesses for math operations
     HEAP_FAST = 1,
+
+    // Memory that doesn't have to be accessed quickly, and
+    // might be paged in/out
     HEAP_SLOW = 2,
+
+    // Audio heap, depending on the platform this may require
+    // specific areas of RAM for DMA, or might need faster RAM
     HEAP_AUDIO = 3,
+
+    // Buffer is only ever accessed with 16/32-bit aligned loads/stores--
+    // no byte or misaligned access, incl. memcpy/memset tails. 
+    // (Dreamcast PVR VRAM, NDS slot-2 expansion RAM)
+    HEAP_WORD_ADDRESSABLE = 4,
 };
 #endif
 

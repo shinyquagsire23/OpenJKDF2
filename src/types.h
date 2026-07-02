@@ -1158,7 +1158,7 @@ typedef struct stdVBuffer
 #endif
     stdVBufferTexFmt format;
     void* palette;
-    char* surface_lock_alloc;
+    void* surface_lock_alloc;
     uint32_t transparent_color;
     union
     {

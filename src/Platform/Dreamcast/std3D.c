@@ -24,7 +24,6 @@
 #include <kos.h>
 #include <dc/pvr.h>
 #include <dc/video.h>
-#include <dc/biosfont.h>
 #include <dc/flashrom.h>
 
 #include <stdlib.h>
@@ -103,55 +102,6 @@ void std3D_BorderTrace(uint8_t r, uint8_t g, uint8_t b)
     if (std3D_bBorderTrace) vid_border_color(r, g, b);
 }
 
-// One blink "unit" as a busy-loop count (~1/3 s at 200 MHz -- filmable; exact timing
-// doesn't matter, only the color sequence does). Interrupts are off in the handler so
-// timers aren't available.
-#define EXC_UNIT 10000000u
-static void std3D_ExcSpin(uint32_t loops) { for (volatile uint32_t i = 0; i < loops; i++) { } }
-
-// Blink a 32-bit value on the TV border, MSB first, as 8 hex nibbles. Each nibble is a
-// GREEN start marker, then its 4 bits MSB-first as RED=1 / BLUE=0 (both lit, so there's
-// no "black == 0" ambiguity), each bit followed by a short black gap. To decode: after
-// the intro color, read 8 groups; each group is GREEN then 4 colored pulses => 1 hex
-// digit; concatenate the 8 digits.
-static void std3D_BlinkWord(uint32_t val)
-{
-    for (int nib = 7; nib >= 0; nib--) {
-        uint32_t n = (val >> (nib * 4)) & 0xF;
-        vid_border_color(0, 255, 0); std3D_ExcSpin(EXC_UNIT);       // GREEN: nibble start
-        vid_border_color(0, 0, 0);   std3D_ExcSpin(EXC_UNIT / 2);
-        for (int bit = 3; bit >= 0; bit--) {
-            if (n & (1u << bit)) vid_border_color(255, 0, 0);       // RED  = 1
-            else                 vid_border_color(0, 0, 255);       // BLUE = 0
-            std3D_ExcSpin(EXC_UNIT);
-            vid_border_color(0, 0, 0); std3D_ExcSpin(EXC_UNIT / 2); // gap between bits
-        }
-    }
-}
-
-// Catch SH4 CPU faults and blink the fault registers out on the border (the framebuffer
-// is unreachable from an exception context; the border register always works). Maps
-// back to source with sh-elf-addr2line -e openjkdf2.elf <PC>. Never returns -- the game
-// is wedged anyway. Registered in std3D_Startup only when the tracer is enabled.
-static void std3D_ExcHandler(irq_t code, irq_context_t* ctx, void* data)
-{
-    (void)data; (void)code;
-    uint32_t tea = *(volatile uint32_t*)0xFF00000C; // SH4 TEA: faulting data address
-
-    // Blink the fault registers out on the border in binary (the framebuffer is
-    // unreachable from an exception; the border register always works). Film it and
-    // decode per std3D_BlinkWord's scheme. Loops forever over PC, then PR, then the
-    // faulting address, each introduced by a long identifying color.
-    for (;;) {
-        vid_border_color(255, 255, 255); std3D_ExcSpin(EXC_UNIT * 5); // WHITE = PC next
-        std3D_BlinkWord(ctx->pc);
-        vid_border_color(255, 255, 0);   std3D_ExcSpin(EXC_UNIT * 5); // YELLOW = PR next
-        std3D_BlinkWord(ctx->pr);
-        vid_border_color(255, 0, 255);   std3D_ExcSpin(EXC_UNIT * 5); // MAGENTA = addr next
-        std3D_BlinkWord(tea);
-    }
-}
-
 // --- Texture cache -----------------------------------------------------------
 typedef struct dcTexEntry {
     rdDDrawSurface* surf;
@@ -199,10 +149,14 @@ static void std3D_EmitDeferredTR(void);          // defined in the render list s
 
 // ----------------------------------------------------------------------------
 
-int std3D_Startup()
+// Added: bring the PVR (and with it the VRAM overflow arena) up at boot, before
+// any GUI assets allocate -- the engine only calls std3D_Startup at the first
+// drawn frame, which is AFTER jkGui loads its fonts/bitmaps. On the autoload
+// path that meant every vbuffer went to system RAM (the arena didn't exist yet)
+// and heavy maps ran out of memory. Idempotent; called from main() and from
+// std3D_Startup.
+void std3D_EarlyInit(void)
 {
-    if (Main_bHeadless) { std3D_bHasInitted = 1; return 1; }
-
     // pvr_init must run exactly once for the whole session -- it sets up the TA,
     // VRAM and display. The engine calls std3D_Startup/Shutdown around GUI/menu
     // transitions (Video_SwitchToGDI etc.), so we keep the PVR alive and only flip
@@ -221,13 +175,15 @@ int std3D_Startup()
             // #1 test: autosort DISABLED. Autosort is the OPB-hungriest PVR mode;
             // the engine already depth-sorts (rdCache_ProcFaceCompare) so TR should
             // still look right. Set back to 0 to re-enable if it doesn't help.
-            1,          // autosort_disabled
-            // Extra object-pointer-buffer blocks the TA grabs when a screen tile
-            // overflows its bin. 3 is far too small for full 3D maps: on hardware the
-            // TA stalls waiting for OPB space and hangs the next pvr_wait_ready
-            // (Flycast treats the OPB as unlimited). 16 is still VRAM-cheap next to
-            // the vertex buffer -- dial down if pvr_mem complains at startup.
-            16          // extra OPBs for heavy geometry
+            1,          // autosort_disabled (engine depth-sorts via ProcFaceCompare)
+            // Extra object-pointer-buffer blocks the TA grabs when a tile overflows its
+            // bin. This is allocated PER render buffer and multiplied (1 + count), so
+            // it's expensive in VRAM: with BINSIZE_32 x 3 lists x 300 tiles (~112 KiB)
+            // and two buffers, count=16 burned ~3.8 MiB. It was bumped to 16 chasing a
+            // "TA stall" hang that turned out to be the flex_t single/double mixing bug,
+            // NOT OPB exhaustion -- so 3 (the original) is plenty and frees ~2.9 MiB of
+            // VRAM for textures and the system-overflow arena.
+            3           // extra OPBs
         };
         pvr_init(&params);
         pvr_set_bg_color(0.0f, 0.0f, 0.0f);
@@ -262,24 +218,19 @@ int std3D_Startup()
 
         std3D_bPvrReady = 1;
     }
+}
+
+int std3D_Startup()
+{
+    if (Main_bHeadless) { std3D_bHasInitted = 1; return 1; }
+
+    std3D_EarlyInit();
 
 #ifndef STD3D_BORDER_TRACE
     // Sneaky enable: a controller plugged into port 4 (0-indexed port 3) turns on
     // the border loop tracer for this run, no rebuild needed.
     if (maple_enum_dev(3, 0) != NULL) std3D_bBorderTrace = 1;
 #endif
-
-    // When the tracer is on, also catch CPU faults and flash the border (see
-    // std3D_ExcHandler). Registered once.
-    if (std3D_bBorderTrace) {
-        static int excHooked = 0;
-        if (!excHooked) {
-            excHooked = 1;
-            arch_irq_set_handler(EXC_DATA_ADDRESS_READ,  std3D_ExcHandler, NULL);
-            arch_irq_set_handler(EXC_DATA_ADDRESS_WRITE, std3D_ExcHandler, NULL);
-            arch_irq_set_handler(EXC_ILLEGAL_INSTR,      std3D_ExcHandler, NULL);
-        }
-    }
 
     std3D_bHasInitted = 1;
     return 1;

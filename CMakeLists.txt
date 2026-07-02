@@ -213,7 +213,7 @@ list(REMOVE_ITEM ENGINE_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/main.c)
 file(GLOB MULTIPLAYER_MENU_SRCS 
     ${PROJECT_SOURCE_DIR}/src/Gui/jkGUIMultiplayer.c
     ${PROJECT_SOURCE_DIR}/src/Gui/jkGUIMultTally.c
-    ${PROJECT_SOURCE_DIR}/src/Gui/jkGUINetHost.c
+#   ${PROJECT_SOURCE_DIR}/src/Gui/jkGUINetHost.c
     ${PROJECT_SOURCE_DIR}/src/Gui/jkGUIBuildMulti.c
 )
 if (TARGET_NO_MULTIPLAYER_MENUS)

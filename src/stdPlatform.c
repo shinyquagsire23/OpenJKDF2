@@ -116,7 +116,6 @@ for (int i = 0; i < len; i++)
     }
 #endif
     //printf("File open `%s`->`%s` mode `%s`, ret %x\n", fpath, tmp, mode, ret);
-    
     return ret;
 }
 
@@ -669,18 +668,29 @@ extern void *__real_calloc(size_t num, size_t size);
 #define DC_ALLOC_ALIGN 8   // keep user pointers 8-byte aligned (doubles/pointers)
 
 //#define DC_MEM_CHECKING          // guard bytes after each alloc to catch OOB writes
+                                    // (caught a real double-free in the OOM-unwind path once; word-safe fills)
 #define DC_MEM_CHECKING_VAL      0xAA
 #define DC_MEM_CHECKING_VAL_FREE 0x55
 
 // Tracking-header high byte: which pool the block lives in (and freed sentinel).
-#define DC_MARK_MSPACE 0xDC   // VRAM overflow mspace (fallback)
+#define DC_MARK_MSPACE 0xDC   // VRAM word-addressable arena (opt-in, see DC_alloc)
 #define DC_MARK_SYS    0x5A   // system RAM (newlib) -- the primary pool
 #define DC_MARK_FREED  0xDE   // sentinel written on free (double-free detection)
 
-// Size of the VRAM block reserved as the overflow arena. VRAM is 8 MiB total and the
-// PVR also needs it for framebuffers/vertex buffer/OPB/textures, so this trades texture
-// headroom for system-RAM headroom -- dial down if textures thrash (LRU eviction).
-#define DC_VRAM_OVERFLOW_SIZE (1 * 512 * 1024)
+// VRAM word-addressable arena sizing. VRAM is 8 MiB total; the PVR keeps framebuffers,
+// the vertex buffer and the OPB, and the rest is the texture pool. We carve the arena
+// out of that pool, but adaptively: take the smaller of the target below and whatever
+// pvr_mem has free beyond a reserve kept for the menu texture (allocated just after
+// this) and streamed world textures. This never over-grabs (which used to fail
+// pvr_mem_malloc outright, leaving no arena) and self-tunes to the current PVR config.
+//
+// PVR texture RAM drops byte-granular CPU stores (the controller works in 16-bit
+// lanes; a byte write mangles its lane -- see the probe in DC_InitVramOverflow), so
+// the arena only serves allocations explicitly flagged HEAP_WORD_ADDRESSABLE by the
+// caller via suggestHeap. It is NOT a transparent spill pool for general data.
+#define DC_VRAM_OVERFLOW_SIZE   (4 * 1024 * 1024)  // desired max, capped to what's free
+#define DC_VRAM_TEXTURE_RESERVE (5 * 512 * 1024)   // ~2.5 MiB left for menuTex + textures
+#define DC_VRAM_OVERFLOW_MIN    (256 * 1024)       // don't bother creating a tiny arena
 
 typedef struct DcMemHeader {
     uint32_t mark_size;   // [31:24] pool marker, [23:0] user byte size
@@ -692,6 +702,14 @@ typedef struct DcMemHeader {
 
 static mspace dc_vram_mspace = NULL;
 static size_t dc_vram_mspace_size = 0;
+static int dc_heapSuggestion = HEAP_ANY;
+
+static int DC_suggestHeap(int which)
+{
+    int prev = dc_heapSuggestion;
+    dc_heapSuggestion = which;
+    return prev;
+}
 
 // Live-allocation stats (exported for debugging).
 size_t dc_trackingAllocs     = 0;  // user bytes live in the VRAM overflow mspace
@@ -714,15 +732,39 @@ static inline uint32_t DC_BlockSize(uint32_t len)
 void DC_InitVramOverflow(void)
 {
     if (dc_vram_mspace) return;
-    // pvr_mem_malloc hands back a 32-byte-aligned pointer in the 64-bit texture area
-    // (0xa5......), which the SH4 can address as normal (uncached) memory.
-    void* base = pvr_mem_malloc(DC_VRAM_OVERFLOW_SIZE);
-    if (base) {
-        dc_vram_mspace = create_mspace_with_base(base, DC_VRAM_OVERFLOW_SIZE, 0);
-        dc_vram_mspace_size = DC_VRAM_OVERFLOW_SIZE;
+
+    // Grab the smaller of the target and (free VRAM - texture reserve), so we never fail
+    // the alloc by over-asking and always leave headroom for textures.
+    size_t avail  = pvr_mem_available();
+    size_t budget = (avail > DC_VRAM_TEXTURE_RESERVE) ? (avail - DC_VRAM_TEXTURE_RESERVE) : 0;
+    size_t want   = DC_VRAM_OVERFLOW_SIZE;
+    if (want > budget) want = budget;
+    want &= ~(size_t)31;   // keep the 32-byte alignment pvr_mem hands out
+
+    if (want >= DC_VRAM_OVERFLOW_MIN) {
+        // pvr_mem_malloc returns a 32-byte-aligned pointer in the 64-bit texture window
+        // (0xa4......, P2 uncached). NOTE: PVR texture RAM does not honor byte-granular
+        // CPU stores (the memory controller works in 16-bit lanes) -- see the byte-store
+        // probe below. That makes a general-purpose heap here unsafe for any data that
+        // gets memcpy'd/byte-written, which is most engine data.
+        void* base = pvr_mem_malloc(want);
+        if (base) {
+            // Byte-store probe: on real hardware byte writes to VRAM mangle the
+            // containing 16-bit lane (Flycast emulates VRAM as plain RAM and passes).
+            volatile uint8_t* p8 = (volatile uint8_t*)base;
+            volatile uint16_t* p16 = (volatile uint16_t*)base;
+            p16[0] = 0x1122; p16[1] = 0x3344;
+            p8[0] = 0xAA; p8[3] = 0xBB;      // expect 0x11AA / 0xBB44 if bytes work
+            stdPlatform_Printf("[DC heap] VRAM byte-store probe: %04x %04x (want 11aa bb44) -> %s\n",
+                               p16[0], p16[1],
+                               (p16[0] == 0x11AA && p16[1] == 0xBB44) ? "OK" : "BROKEN");
+            dc_vram_mspace = create_mspace_with_base(base, want, 0);
+            dc_vram_mspace_size = want;
+        }
     }
-    stdPlatform_Printf("[DC heap] VRAM overflow arena: %u KiB @ %p\n",
-                       (unsigned)(dc_vram_mspace_size / 1024), base);
+    stdPlatform_Printf("[DC heap] VRAM word-addressable arena: %u KiB (of %u KiB free; %u KiB reserved for textures)\n",
+                       (unsigned)(dc_vram_mspace_size / 1024), (unsigned)(avail / 1024),
+                       (unsigned)(DC_VRAM_TEXTURE_RESERVE / 1024));
 }
 
 static void* DC_alloc(uint32_t len)
@@ -732,19 +774,25 @@ static void* DC_alloc(uint32_t len)
 
     uint32_t total = DC_BlockSize(len);
 
-    // System RAM first (fast, cached).
-    uint8_t mark = DC_MARK_SYS;
-    void* raw = __real_malloc(total);
-    if (!raw && dc_vram_mspace) {
-        // Sysram exhausted -> spill into the VRAM overflow arena (slower, uncached).
+    // The VRAM arena is word-addressable only, so it's gated behind an explicit
+    // HEAP_WORD_ADDRESSABLE suggestion from the caller: those allocations prefer
+    // VRAM (relieving sysram) and fall back to sysram; everything else is
+    // sysram-only (fast, cached, byte-addressable).
+    uint8_t mark = DC_MARK_MSPACE;
+    void* raw = NULL;
+    if (dc_heapSuggestion == HEAP_WORD_ADDRESSABLE && dc_vram_mspace) {
         raw = mspace_malloc(dc_vram_mspace, total);
-        mark = DC_MARK_MSPACE;
+    }
+    if (!raw) {
+        raw = __real_malloc(total);
+        mark = DC_MARK_SYS;
     }
 
     if (!raw) {
         // Emergency freeing measures -- the main reason this override exists.
-        // Both pools are exhausted, so reclaim from the sound and material LRU
-        // caches (which the plain KOS malloc has no way to reach) and retry once.
+        // Every pool this allocation may use is exhausted, so reclaim from the sound
+        // and material LRU caches (which the plain KOS malloc has no way to reach)
+        // and retry once.
         if (!bDontTryAgain) {
             extern int sithSound_FreeUpMemory(uint32_t);
             extern int rdMaterial_PurgeMaterialCache(void);
@@ -776,10 +824,10 @@ static void* DC_alloc(uint32_t len)
     DcMemHeader* hdr = (DcMemHeader*)raw;
     DC_HDR_SET(hdr, mark, len);
     void* user = (void*)((uintptr_t)raw + sizeof(DcMemHeader));
-    memset(user, 0, len); // engine relies on zeroed allocations
+    stdPlatform_Memzero32(user, len); // engine relies on zeroed allocations; word ops for VRAM safety
 #ifdef DC_MEM_CHECKING
-    memset((uint8_t*)user + len, DC_MEM_CHECKING_VAL,
-           total - (uint32_t)sizeof(DcMemHeader) - len);
+    stdPlatform_Memset32((uint8_t*)user + len, DC_MEM_CHECKING_VAL,   // word-safe for VRAM blocks
+                         total - (uint32_t)sizeof(DcMemHeader) - len);
 #endif
     return user;
 }
@@ -795,11 +843,12 @@ static void DC_free(void* ptr)
 #ifdef DC_MEM_CHECKING
     for (uint32_t i = len; i < total - (uint32_t)sizeof(DcMemHeader); i++) {
         if (*((uint8_t*)ptr + i) != DC_MEM_CHECKING_VAL) {
-            stdPlatform_Printf("[DC heap] OOB write past %p (size %u)\n", ptr, (unsigned)len);
+            stdPlatform_Printf("[DC heap] OOB write past %p (size %u): %02x at +%u\n",
+                               ptr, (unsigned)len, *((uint8_t*)ptr + i), (unsigned)i);
             break;
         }
     }
-    memset(ptr, DC_MEM_CHECKING_VAL_FREE, total - (uint32_t)sizeof(DcMemHeader));
+    stdPlatform_Memset32(ptr, DC_MEM_CHECKING_VAL_FREE, total - (uint32_t)sizeof(DcMemHeader)); // word-safe
 #endif
 
     if (mark == DC_MARK_FREED) {
@@ -834,10 +883,11 @@ static void* DC_realloc(void* ptr, uint32_t len)
     if (oldLen == len) return ptr;
 
     // Simple move-realloc: alloc + copy + free. Keeps the header/pool bookkeeping
-    // correct even when a block migrates between the mspace and the fallback.
+    // correct even when a block migrates between pools. Word copy: either side
+    // may be in the VRAM arena, where byte-store tails would mangle a 16-bit lane.
     void* nw = DC_alloc(len);
     if (!nw) return NULL;
-    memcpy(nw, ptr, oldLen < len ? oldLen : len);
+    stdPlatform_Memcpy32(nw, ptr, oldLen < len ? oldLen : len);
     DC_free(ptr);
     return nw;
 }
@@ -994,6 +1044,7 @@ void stdPlatform_InitServices(HostServices *handlers)
     handlers->alloc = DC_alloc;
     handlers->free = DC_free;
     handlers->realloc = DC_realloc;
+    handlers->suggestHeap = DC_suggestHeap;
 #endif
 }
 
@@ -1065,3 +1116,82 @@ void stdPlatform_PrintHeapStats()
     // TODO
 }
 #endif // TARGET_DREAMCAST
+
+
+// Added:
+// memcpy/memset that never issue byte stores, for word-addressable-only
+// destinations (Dreamcast VRAM, NDS slot-2 RAM -- their buses drop byte enables
+// on writes; byte reads are fine). Exact length, any src/dst alignment: unaligned
+// edges use 16-bit read-modify-write, bulk uses 32-bit stores (little-endian).
+void stdPlatform_Memzero32(void* dst, uint32_t len)
+{
+    uint8_t* pDst = (uint8_t*)dst;
+    if (len && ((uintptr_t)pDst & 1)) {
+        stdPlatform_WriteByte16(pDst, 0);
+        pDst++; len--;
+    }
+    if (len >= 2 && ((uintptr_t)pDst & 2)) {
+        *(uint16_t*)pDst = 0;
+        pDst += 2; len -= 2;
+    }
+    for (; len >= 4; len -= 4, pDst += 4)
+        *(uint32_t*)pDst = 0;
+    if (len >= 2) {
+        *(uint16_t*)pDst = 0;
+        pDst += 2; len -= 2;
+    }
+    if (len)
+        stdPlatform_WriteByte16(pDst, 0);
+}
+
+void stdPlatform_Memset32(void* dst, uint8_t val, uint32_t len)
+{
+    uint8_t* pDst = (uint8_t*)dst;
+    uint32_t pattern = val * 0x01010101u;
+    if (len && ((uintptr_t)pDst & 1)) {
+        stdPlatform_WriteByte16(pDst, val);
+        pDst++; len--;
+    }
+    if (len >= 2 && ((uintptr_t)pDst & 2)) {
+        *(uint16_t*)pDst = (uint16_t)pattern;
+        pDst += 2; len -= 2;
+    }
+    for (; len >= 4; len -= 4, pDst += 4)
+        *(uint32_t*)pDst = pattern;
+    if (len >= 2) {
+        *(uint16_t*)pDst = (uint16_t)pattern;
+        pDst += 2; len -= 2;
+    }
+    if (len)
+        stdPlatform_WriteByte16(pDst, val);
+}
+
+void stdPlatform_Memcpy32(void* dst, const void* src, uint32_t len)
+{
+    uint8_t* pDst = (uint8_t*)dst;
+    const uint8_t* pSrc = (const uint8_t*)src;
+    if (len && ((uintptr_t)pDst & 1)) {
+        stdPlatform_WriteByte16(pDst, *pSrc);
+        pDst++; pSrc++; len--;
+    }
+    if (len >= 2 && ((uintptr_t)pDst & 2)) {
+        *(uint16_t*)pDst = (uint16_t)pSrc[0] | ((uint16_t)pSrc[1] << 8);
+        pDst += 2; pSrc += 2; len -= 2;
+    }
+    if (!((uintptr_t)pSrc & 3)) {
+        // Fast path: src co-aligned, straight 32-bit copies
+        for (; len >= 4; len -= 4, pDst += 4, pSrc += 4)
+            *(uint32_t*)pDst = *(const uint32_t*)pSrc;
+    } else {
+        // Src misaligned: assemble words from byte reads (always safe)
+        for (; len >= 4; len -= 4, pDst += 4, pSrc += 4)
+            *(uint32_t*)pDst = (uint32_t)pSrc[0] | ((uint32_t)pSrc[1] << 8) |
+                               ((uint32_t)pSrc[2] << 16) | ((uint32_t)pSrc[3] << 24);
+    }
+    if (len >= 2) {
+        *(uint16_t*)pDst = (uint16_t)pSrc[0] | ((uint16_t)pSrc[1] << 8);
+        pDst += 2; pSrc += 2; len -= 2;
+    }
+    if (len)
+        stdPlatform_WriteByte16(pDst, *pSrc);
+}

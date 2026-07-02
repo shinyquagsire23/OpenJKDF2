@@ -92,48 +92,58 @@ macro(plat_link_and_package)
             set(DC_DISC_ARGS -D ${DC_DISC_DIR})
         endif()
 
-        # --- CDDA soundtrack --------------------------------------------------
-        # Drop the DF2 soundtrack Oggs into packaging/dreamcast/music/ (named so they
-        # sort in track order, e.g. Track2.ogg .. Track12.ogg). Each is transcoded to
-        # 44.1kHz/16-bit stereo WAV and authored as a Red Book CDDA audio track, which
-        # the GD-ROM plays in hardware (see the Dreamcast stdMci). The data track is 1,
-        # so the first Ogg becomes CD track 2 -- matching the engine's track numbers.
-        # Needs ffmpeg on the host; missing ffmpeg or no Oggs => disc builds without
-        # music (not an error). Oggs are user-supplied game assets and not committed.
+        # --- ADPCM soundtrack -------------------------------------------------
+        # The soundtrack streams as AICA ADPCM files from the data track (see the
+        # Dreamcast stdMci). CDDA turned out to be unusable: the GD drive can't
+        # serve data reads while playing audio, and the engine streams from disc
+        # constantly. Drop the GOG-named DF2 soundtrack Oggs (Track12.ogg..Track32.ogg)
+        # into packaging/dreamcast/music/; each is transcoded to 44.1kHz/16-bit
+        # stereo, then to headerless nibble-interleaved AICA ADPCM (KOS wav2adpcm)
+        # as music/trackNN.adp on the disc (~2.6MB/min; hardware-decoded). Needs
+        # ffmpeg on the host; missing tools or no Oggs => disc builds without music
+        # (not an error). Oggs are user-supplied game assets and not committed.
         set(DC_MUSIC_DIR ${PROJECT_SOURCE_DIR}/packaging/dreamcast/music)
-        set(DC_CDDA_ARGS "")
-        set(DC_CDDA_WAVS "")
+        set(DC_ADPCM_FILES "")
         find_program(FFMPEG_BIN ffmpeg)
+        find_program(WAV2ADPCM_BIN wav2adpcm
+                     HINTS $ENV{KOS_BASE}/utils/wav2adpcm /opt/toolchains/dc/kos/utils/wav2adpcm)
         # CONFIGURE_DEPENDS: re-glob (and thus pick up newly added Oggs) on a plain
         # `make`, without needing a manual cmake re-run.
         file(GLOB DC_MUSIC_OGGS CONFIGURE_DEPENDS
              ${DC_MUSIC_DIR}/*.ogg ${DC_MUSIC_DIR}/*.OGG)
-        list(SORT DC_MUSIC_OGGS COMPARE NATURAL)   # so Track2 precedes Track10
-        if(DC_MUSIC_OGGS AND FFMPEG_BIN)
-            set(DC_CDDA_DIR ${CMAKE_CURRENT_BINARY_DIR}/cdda)
-            file(MAKE_DIRECTORY ${DC_CDDA_DIR})
-            set(_cdda_track 2)
+        list(SORT DC_MUSIC_OGGS COMPARE NATURAL)
+        if(DC_MUSIC_OGGS AND FFMPEG_BIN AND WAV2ADPCM_BIN)
+            set(DC_ADPCM_TMP ${CMAKE_CURRENT_BINARY_DIR}/adpcm)
+            set(DC_ADPCM_OUT ${DC_DISC_DIR}/music)   # lands on the disc under /cd/music
+            file(MAKE_DIRECTORY ${DC_ADPCM_TMP})
+            file(MAKE_DIRECTORY ${DC_ADPCM_OUT})
             foreach(ogg ${DC_MUSIC_OGGS})
                 get_filename_component(_base ${ogg} NAME_WE)
-                set(_wav ${DC_CDDA_DIR}/${_base}.wav)
+                string(REGEX MATCH "[0-9]+" _tracknum ${_base})   # Track12 -> 12 (GOG number)
+                if(NOT _tracknum)
+                    message(WARNING "ADPCM: can't find a track number in ${_base}, skipping")
+                    continue()
+                endif()
+                set(_wav ${DC_ADPCM_TMP}/${_base}.wav)
+                set(_adp ${DC_ADPCM_OUT}/track${_tracknum}.adp)
                 add_custom_command(
-                    OUTPUT ${_wav}
+                    OUTPUT ${_adp}
                     COMMAND ${FFMPEG_BIN} -y -loglevel error -i ${ogg}
                             -ar 44100 -ac 2 -c:a pcm_s16le ${_wav}
+                    COMMAND ${WAV2ADPCM_BIN} -n -i -t ${_wav} ${_adp}
+                    COMMAND ${CMAKE_COMMAND} -E remove ${_wav}
                     DEPENDS ${ogg}
-                    COMMENT "CDDA: ${_base}.ogg -> audio track ${_cdda_track}"
+                    COMMENT "ADPCM: ${_base}.ogg -> music/track${_tracknum}.adp"
                     VERBATIM)
-                list(APPEND DC_CDDA_WAVS ${_wav})
-                list(APPEND DC_CDDA_ARGS --cdda ${_wav})
-                math(EXPR _cdda_track "${_cdda_track}+1")
+                list(APPEND DC_ADPCM_FILES ${_adp})
             endforeach()
-        elseif(DC_MUSIC_OGGS AND NOT FFMPEG_BIN)
-            message(WARNING "packaging/dreamcast/music has Oggs but ffmpeg was not found; "
-                            "the disc will be built without a CDDA soundtrack.")
+        elseif(DC_MUSIC_OGGS)
+            message(WARNING "packaging/dreamcast/music has Oggs but ffmpeg and/or KOS "
+                            "wav2adpcm were not found; the disc will be built without music.")
         endif()
 
         add_custom_target(${CDI_NAME} ALL
-            DEPENDS ${BIN_NAME} ${DC_DISC_ASSETS} ${DC_CDDA_WAVS}
+            DEPENDS ${BIN_NAME} ${DC_DISC_ASSETS} ${DC_ADPCM_FILES}
             BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/${CDI_NAME}
             # --no-padding keeps the .cdi small (~MBs, not ~700MB). Emulators
             # (Flycast/redream) load non-padded images fine; drop -N if you need a
@@ -143,7 +153,6 @@ macro(plat_link_and_package)
                     -o ${CMAKE_CURRENT_BINARY_DIR}/${CDI_NAME}
                     -n "OpenJKDF2"
                     ${DC_DISC_ARGS}
-                    ${DC_CDDA_ARGS}
                     --no-padding
                     -v 1
             COMMENT "Creating Dreamcast disc image ${CDI_NAME}"
