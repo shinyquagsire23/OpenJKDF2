@@ -76,6 +76,12 @@ static void stdSound_dcSampleUnref(stdSound_buffer_t* buf)
 // tiny KOS thread polls the stream; when it drains and stays idle we stop it so
 // snd_sfx gets its channels back until the next cutscene.
 #define DC_STREAM_RING (64 * 1024)
+// Added: the SPU-side AICA loop for the cutscene stream. Deliberately small
+// (~0.37s of stereo @22kHz) -- snd_stream_start prefills the WHOLE loop, so an
+// oversized loop (the stock SND_STREAM_BUFFER_MAX is 64KB/channel = ~1.5s) lays
+// down ~1s of silence ahead of the first real sample and permanently shifts the
+// audio track behind the video. See stdSound_dcStreamQueue's deferred start.
+#define DC_STREAM_SPU_BUF (16 * 1024)
 // Added: the ring and its stream scratch (128KB combined) are heap-allocated on
 // the first cutscene audio chunk and freed when the stream drains and self-stops
 // (cutscenes and gameplay are mutually exclusive, so the memory is returned for
@@ -84,7 +90,7 @@ static mutex_t  stdSound_dcRingMtx = MUTEX_INITIALIZER;
 static uint8_t* stdSound_dcRing = NULL;
 static volatile uint32_t stdSound_dcRingW = 0;  // absolute write count (producer: engine)
 static volatile uint32_t stdSound_dcRingR = 0;  // absolute read count (consumer: stream cb)
-static uint8_t* stdSound_dcScratch = NULL;      // SND_STREAM_BUFFER_MAX, 32-byte aligned
+static uint8_t* stdSound_dcScratch = NULL;      // DC_STREAM_SPU_BUF, 32-byte aligned
 static snd_stream_hnd_t stdSound_dcStream = SND_STREAM_INVALID;
 static int      stdSound_dcStreamOn = 0;
 static int      stdSound_dcStreamRate = 22050;
@@ -151,38 +157,33 @@ static void stdSound_dcStreamQueue(stdSound_buffer_t* buf)
 
     mutex_lock(&stdSound_dcRingMtx); // Added: vs. the pump's drain-free
     // Added: first cutscene chunk allocates the ring + scratch (see above);
-    // memalign because snd_stream fills the scratch via 32-byte SQ bursts.
+    // memalign because snd_stream fills the scratch via 32-byte SQ bursts. A
+    // fresh ring is a fresh stream, so rewind the cursors when we (re)allocate it.
     if (!stdSound_dcRing) {
         stdSound_dcRing = (uint8_t*)std_pHS->alloc(DC_STREAM_RING);
         if (!stdSound_dcRing) { mutex_unlock(&stdSound_dcRingMtx); return; }
+        stdSound_dcRingR = stdSound_dcRingW = 0;
     }
     if (!stdSound_dcScratch) {
-        stdSound_dcScratch = (uint8_t*)memalign(32, SND_STREAM_BUFFER_MAX);
+        stdSound_dcScratch = (uint8_t*)memalign(32, DC_STREAM_SPU_BUF);
         if (!stdSound_dcScratch) { mutex_unlock(&stdSound_dcRingMtx); return; }
     }
     if (stdSound_dcStream == SND_STREAM_INVALID) {
         snd_stream_init();
-        stdSound_dcStream = snd_stream_alloc(stdSound_dcStreamCb, SND_STREAM_BUFFER_MAX);
+        // Small SPU loop on purpose (see DC_STREAM_SPU_BUF) -- an oversized loop
+        // desyncs the cutscene audio by ~1s.
+        stdSound_dcStream = snd_stream_alloc(stdSound_dcStreamCb, DC_STREAM_SPU_BUF);
         if (stdSound_dcStream == SND_STREAM_INVALID) { mutex_unlock(&stdSound_dcRingMtx); return; } // Added
     }
     if (!stdSound_dcStreamThd) {
         stdSound_dcStreamThdRun = 1;
         stdSound_dcStreamThd = thd_create(0, stdSound_dcStreamThread, NULL);
     }
-    if (!stdSound_dcStreamOn) {
-        stdSound_dcRingR = stdSound_dcRingW = 0; // fresh stream
-        stdSound_dcStreamRate = rate;
-        stdSound_dcStreamStereo = stereo;
-        snd_stream_start(stdSound_dcStream, rate, stereo);
-        stdSound_dcStreamOn = 1;
-    }
-    // Carry the cutscene's per-buffer volume (cutsceneVolume * menuVolume) onto the
-    // stream (0..255).
-    {
-        int v = (int)(buf->vol * 255.0);
-        snd_stream_volume(stdSound_dcStream, v < 0 ? 0 : (v > 255 ? 255 : v));
-    }
+    stdSound_dcStreamRate = rate;
+    stdSound_dcStreamStereo = stereo;
 
+    // Copy this chunk into the ring FIRST, so the deferred start below prefills the
+    // SPU loop from real audio rather than silence.
     uint32_t len   = (uint32_t)buf->bufferBytes;
     uint32_t space = DC_STREAM_RING - (stdSound_dcRingW - stdSound_dcRingR);
     if (len == 0 || len > space) { // ring full -> drop (better than corrupting)
@@ -197,6 +198,27 @@ static void stdSound_dcStreamQueue(stdSound_buffer_t* buf)
     __asm__ __volatile__("" ::: "memory"); // publish data before advancing the write index
     stdSound_dcRingW += len;
     stdSound_dcStreamLastMs = stdPlatform_GetTimeMsec();
+
+    // Added: deferred start. snd_stream_start prefills the entire SPU loop
+    // (buffer_size * channels bytes) from our callback in one shot; if the ring
+    // is short it pads the shortfall with silence and that silence sits *ahead*
+    // of the first real sample forever, which is the ~1s cutscene audio lag. So
+    // hold off starting until the ring actually holds a full prefill's worth of
+    // real audio (one 32KB chunk covers it), then start clean with zero silence.
+    if (!stdSound_dcStreamOn) {
+        uint32_t prefill  = (uint32_t)DC_STREAM_SPU_BUF * (stereo ? 2u : 1u);
+        uint32_t buffered = stdSound_dcRingW - stdSound_dcRingR;
+        if (buffered >= prefill) {
+            snd_stream_start(stdSound_dcStream, rate, stereo);
+            stdSound_dcStreamOn = 1;
+        }
+    }
+    // Carry the cutscene's per-buffer volume (cutsceneVolume * menuVolume) onto the
+    // stream (0..255) once it's actually playing.
+    if (stdSound_dcStreamOn) {
+        int v = (int)(buf->vol * 255.0);
+        snd_stream_volume(stdSound_dcStream, v < 0 ? 0 : (v > 255 ? 255 : v));
+    }
     mutex_unlock(&stdSound_dcRingMtx);
 }
 
