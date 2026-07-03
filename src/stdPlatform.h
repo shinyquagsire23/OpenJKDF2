@@ -75,6 +75,17 @@ void stdPlatform_PrintHeapStats();
 void stdPlatform_Memzero32(void* dst, uint32_t len);
 int stdPlatform_IsWordAddressableOnly(const void* p);
 
+// Added: TWL-only extram placement hint around an allocation (no-op elsewhere).
+// Use for data that is word-safe but too hot for DC's uncached VRAM window.
+#ifdef TARGET_TWL
+#define TWL_EXTRAM_SUGGEST(hs)  int _twlPrevSuggest = (hs)->suggestHeap(HEAP_WORD_ADDRESSABLE)
+#define TWL_EXTRAM_RESTORE(hs)  (hs)->suggestHeap(_twlPrevSuggest)
+#else
+#define TWL_EXTRAM_SUGGEST(hs)  do {} while (0)
+#define TWL_EXTRAM_RESTORE(hs)  do {} while (0)
+#endif
+
+
 // Added: per-file allocation cataloguing (see stdPlatform.c).
 // Define STDPLATFORM_ALLOC_TRACKING to route the *_ALLOC/*_FREE macros below
 // through a tracker keyed on __FILE__; without it they compile straight to the

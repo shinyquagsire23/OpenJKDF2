@@ -184,13 +184,15 @@ int sithSoundClass_Load(sithWorld *world, int a2)
     if ( sithNet_isMulti ) {
         num_soundclasses += 32;
     }
+    { TWL_EXTRAM_SUGGEST(pSithHS); // Added: word-width fields, parsed once
     soundclasses = (sithSoundClass *)SITH_ALLOC(sizeof(sithSoundClass) * num_soundclasses);
+    TWL_EXTRAM_RESTORE(pSithHS); }
     world->soundclasses = soundclasses;
     if ( soundclasses )
     {
         world->numSoundClasses = num_soundclasses;
         world->numSoundClassesLoaded = 0;
-        _memset(soundclasses, 0, sizeof(sithSoundClass) * num_soundclasses);
+        stdPlatform_Memzero32(soundclasses, sizeof(sithSoundClass) * num_soundclasses); // Added: word-safe
     }
     else
     {
@@ -311,10 +313,12 @@ int sithSoundClass_LoadEntry(sithSoundClass *soundClass, char *fpath)
                 continue;
         }
 
+        { TWL_EXTRAM_SUGGEST(pSithHS); // Added: word-width fields, parsed once
         newEntry = (sithSoundClassEntry *)SITH_ALLOC(sizeof(sithSoundClassEntry));
+        TWL_EXTRAM_RESTORE(pSithHS); }
         if ( newEntry )
         {
-            _memset(newEntry, 0, sizeof(sithSoundClassEntry));
+            stdPlatform_Memzero32(newEntry, sizeof(sithSoundClassEntry)); // Added: word-safe
             newEntry->sound = v5;
             newEntry->playflags = 64;
             newEntry->minRadius = 0.5;

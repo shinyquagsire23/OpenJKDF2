@@ -260,7 +260,18 @@ LABEL_16:
                 v6 = v3->parent_loop_depth;
                 if ( v6 )
                     cog_parser_node_stackpos[v6] = cogvm_stackpos;
+#ifdef TARGET_RETRO_HOMEBREW
+                // Added: bytecode is written as pure 32-bit stores by codegen and
+                // read per-opcode at execution -- word-safe and cool enough for
+                // word-addressable-only memory.
+                {
+                    int prevSuggest = pSithHS->suggestHeap(HEAP_WORD_ADDRESSABLE);
+                    script_program = (int32_t *)SITH_ALLOC(sizeof(int32_t) * cogvm_stackpos + sizeof(int32_t));
+                    pSithHS->suggestHeap(prevSuggest);
+                }
+#else
                 script_program = (int32_t *)SITH_ALLOC(sizeof(int32_t) * cogvm_stackpos + sizeof(int32_t));
+#endif
                 script->script_program = script_program;
                 if ( !script_program )
                     goto LABEL_19;
@@ -299,7 +310,7 @@ LABEL_16:
                         case COG_OPCODE_PUSHVECTOR:
                             v17 = &script_prog_next[stack_pos];
                             next_stackpos = stack_pos + 3;
-                            _memcpy(v17, &cur_instr->vector, sizeof(cog_flex_t)*3);
+                            stdPlatform_Memcpy32(v17, &cur_instr->vector, sizeof(cog_flex_t)*3); // Added: word-safe (program may be word-addressable-only)
                             goto LABEL_32;
                         case COG_OPCODE_GOFALSE:
                         case COG_OPCODE_GOTRUE:
@@ -347,11 +358,17 @@ sithCogSymboltable* sithCogParse_CopySymboltable(sithCogSymboltable *table)
     if ( !newTable )
         return 0;
     _memset(newTable, 0, sizeof(sithCogSymboltable));
+#ifdef TARGET_RETRO_HOMEBREW
+    int prevSuggest = pSithHS->suggestHeap(HEAP_WORD_ADDRESSABLE); // Added: see NewSymboltable
+#endif
     buckets = (sithCogSymbol *)SITH_ALLOC(sizeof(sithCogSymbol) * entry_cnt);
+#ifdef TARGET_RETRO_HOMEBREW
+    pSithHS->suggestHeap(prevSuggest);
+#endif
     newTable->buckets = buckets;
     if ( !buckets )
         return 0;
-    _memcpy(buckets, table->buckets, sizeof(sithCogSymbol) * entry_cnt);
+    stdPlatform_Memcpy32(buckets, table->buckets, sizeof(sithCogSymbol) * entry_cnt); // Added: word-safe both sides
     result = newTable;
     newTable->max_entries = entry_cnt;
     newTable->entry_cnt = entry_cnt;
@@ -367,6 +384,11 @@ sithCogSymboltable* sithCogParse_NewSymboltable(int amt)
     sithCogSymboltable *result; // eax
 
     newTable = (sithCogSymboltable *)SITH_ALLOC(sizeof(sithCogSymboltable));
+#ifdef TARGET_RETRO_HOMEBREW
+    // Added: symbol buckets are word-safe (32-bit fields; 16-bit stackvar type
+    // writes are fine on word-addressable memory) -- suggest the arena.
+    int prevSuggest = pSithHS->suggestHeap(HEAP_WORD_ADDRESSABLE);
+#endif
     if ( newTable
       && (_memset(newTable, 0, sizeof(sithCogSymboltable)),
           newTable->buckets = (sithCogSymbol *)SITH_ALLOC(sizeof(sithCogSymbol) * amt),
@@ -376,7 +398,10 @@ sithCogSymboltable* sithCogParse_NewSymboltable(int amt)
           newTable->buckets)
       && newHashtable )
     {
-        _memset(buckets, 0, sizeof(sithCogSymbol) * amt);
+#ifdef TARGET_RETRO_HOMEBREW
+        pSithHS->suggestHeap(prevSuggest);
+#endif
+        stdPlatform_Memzero32(buckets, sizeof(sithCogSymbol) * amt); // Added: word-safe
         newTable->max_entries = amt;
         newTable->entry_cnt = 0;
         newTable->unk_14 = 0;
@@ -384,6 +409,9 @@ sithCogSymboltable* sithCogParse_NewSymboltable(int amt)
     }
     else
     {
+#ifdef TARGET_RETRO_HOMEBREW
+        pSithHS->suggestHeap(prevSuggest); // Added
+#endif
         stdPrintf(pSithHS->errorPrint, ".\\Cog\\sithCogParse.c", 421, "Failed to create memory for symbol table.\n", 0, 0, 0, 0);
         if ( newTable )
         {
@@ -421,7 +449,13 @@ int sithCogParse_ReallocSymboltable(sithCogSymboltable *table)
     amt = table->entry_cnt;
     if ( table->max_entries > amt )
     {
+#ifdef TARGET_RETRO_HOMEBREW
+        int prevSuggest = pSithHS->suggestHeap(HEAP_WORD_ADDRESSABLE); // Added: keep the trim in the arena
+#endif
         reallocBuckets = (sithCogSymbol *)SITH_REALLOC(table->buckets, sizeof(sithCogSymbol) * amt);
+#ifdef TARGET_RETRO_HOMEBREW
+        pSithHS->suggestHeap(prevSuggest);
+#endif
         // Added: nullptr checks
         if (!reallocBuckets) {
             table->max_entries = 0;
@@ -552,7 +586,10 @@ void sithCogParse_SetSymbolVal(sithCogSymbol *a1, sithCogStackvar *a2)
     // TODO ehhhhhh
     //*(sithCogStackvar *)&a1->val = *a2;
     a1->val.type = a2->type;
-    _memcpy(a1->val.dataAsPtrs, a2->dataAsPtrs, sizeof(a1->val.dataAsPtrs));
+    // Added: word stores -- symbol tables may live in word-addressable-only
+    // memory, and a tiny _memcpy compiles to a byte loop (dropped by the bus).
+    for (size_t i = 0; i < sizeof(a1->val.dataAsPtrs)/sizeof(a1->val.dataAsPtrs[0]); i++)
+        a1->val.dataAsPtrs[i] = a2->dataAsPtrs[i];
 }
 
 sithCogSymbol* sithCogParse_GetSymbolVal(sithCogSymboltable *pSymbolTable, char *a2)

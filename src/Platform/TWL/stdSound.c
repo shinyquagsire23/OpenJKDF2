@@ -309,7 +309,7 @@ void* stdSound_BufferSetData(stdSound_buffer_t* sound, int bufferBytes, int32_t*
     }
     sound->bufferBytes = bufferBytes;
     
-    _memset(sound->data, 0, sound->bufferBytes);
+    stdPlatform_Memzero32(sound->data, sound->bufferBytes); // Added: word-safe (source PCM may be in extram)
 
     return sound->data;
 }

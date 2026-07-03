@@ -3,6 +3,7 @@
 #include "jk.h"
 #include <math.h>
 #include "General/stdMath.h"
+#include "stdPlatform.h" // Added: word-safe matrix copies (dest may be an extram-resident thing)
 
 const rdMatrix34 rdroid_identMatrix34 = {{1.0, 0.0, 0.0}, 
                                          {0.0, 1.0, 0.0}, 
@@ -152,13 +153,13 @@ void rdMatrix_BuildRotate44(rdMatrix44 *out, const rdVector3 *rot)
 
 void rdMatrix_BuildTranslate34(rdMatrix34 *out, const rdVector3 *tV)
 {
-    _memcpy(out, &rdroid_identMatrix34, sizeof(rdMatrix34));
+    stdPlatform_Memcpy32(out, &rdroid_identMatrix34, sizeof(rdMatrix34));
     rdVector_Copy3(&out->scale, tV);
 }
 
 void rdMatrix_BuildTranslate44(rdMatrix44 *out, const rdVector3 *tV)
 {
-    _memcpy(out, &rdroid_identMatrix44, sizeof(rdMatrix44));
+    stdPlatform_Memcpy32(out, &rdroid_identMatrix44, sizeof(rdMatrix44));
     out->vD.x = tV->x;
     out->vD.y = tV->y;
     out->vD.z = tV->z;
@@ -405,22 +406,24 @@ void rdMatrix_Normalize34(rdMatrix34 *m)
 
 void rdMatrix_Identity34(rdMatrix34 *out)
 {
-    _memcpy(out, &rdroid_identMatrix34, sizeof(*out));
+    stdPlatform_Memcpy32(out, &rdroid_identMatrix34, sizeof(*out));
 }
 
 void rdMatrix_Identity44(rdMatrix44 *out)
 {
-    _memcpy(out, &rdroid_identMatrix44, sizeof(*out));
+    stdPlatform_Memcpy32(out, &rdroid_identMatrix44, sizeof(*out));
 }
 
+// Added: word-safe copy -- destinations are frequently fields of things that
+// may live in word-addressable-only memory (NDS extram)
 void rdMatrix_Copy34(rdMatrix34 *dst, const rdMatrix34 *src)
 {
-    _memcpy(dst, src, sizeof(rdMatrix34));
+    stdPlatform_Memcpy32(dst, src, sizeof(rdMatrix34));
 }
 
 void rdMatrix_Copy44(rdMatrix44 *dst, const rdMatrix44 *src)
 {
-    _memcpy(dst, src, sizeof(rdMatrix44));
+    stdPlatform_Memcpy32(dst, src, sizeof(rdMatrix44));
 }
 
 void rdMatrix_Copy34to44(rdMatrix44 *dst, const rdMatrix34 *src)
@@ -479,7 +482,7 @@ void rdMatrix_Transpose44(rdMatrix44 *out, const rdMatrix44 *src)
     tmp.vD.y = src->vB.w;
     tmp.vD.z = src->vC.w;
     tmp.vD.w = src->vD.w;
-    _memcpy(out, &tmp, sizeof(rdMatrix44));
+    stdPlatform_Memcpy32(out, &tmp, sizeof(rdMatrix44));
 }
 
 void rdMatrix_Multiply34(rdMatrix34* NO_ALIAS out, const rdMatrix34* NO_ALIAS mat1, const rdMatrix34* NO_ALIAS mat2)
@@ -548,28 +551,28 @@ void rdMatrix_Multiply44(rdMatrix44 *out, const rdMatrix44 *mat1, const rdMatrix
 void rdMatrix_PreMultiply34(rdMatrix34 *mat1, const rdMatrix34 *mat2)
 {
     rdMatrix34 tmp;
-    _memcpy(&tmp, mat1, sizeof(tmp));
+    stdPlatform_Memcpy32(&tmp, mat1, sizeof(tmp));
     rdMatrix_Multiply34(mat1, &tmp, mat2);
 }
 
 void rdMatrix_PreMultiply44(rdMatrix44 *mat1, const rdMatrix44 *mat2)
 {
     rdMatrix44 tmp;
-    _memcpy(&tmp, mat1, sizeof(tmp));
+    stdPlatform_Memcpy32(&tmp, mat1, sizeof(tmp));
     rdMatrix_Multiply44(mat1, &tmp, mat2);
 }
 
 void rdMatrix_PostMultiply34(rdMatrix34 *mat1, const rdMatrix34 *mat2)
 {
     rdMatrix34 tmp;
-    _memcpy(&tmp, mat1, sizeof(tmp));
+    stdPlatform_Memcpy32(&tmp, mat1, sizeof(tmp));
     rdMatrix_Multiply34(mat1, mat2, &tmp);
 }
 
 void rdMatrix_PostMultiply44(rdMatrix44 *mat1, const rdMatrix44 *mat2)
 {
     rdMatrix44 tmp;
-    _memcpy(&tmp, mat1, sizeof(tmp));
+    stdPlatform_Memcpy32(&tmp, mat1, sizeof(tmp));
     rdMatrix_Multiply44(mat1, mat2, &tmp);
 }
 
@@ -609,7 +612,7 @@ void rdMatrix_PreTranslate34(rdMatrix34 *out, const rdVector3 *trans)
 {
     rdMatrix34 mat2;
 
-    _memcpy(&mat2, &rdroid_identMatrix34, sizeof(mat2));
+    stdPlatform_Memcpy32(&mat2, &rdroid_identMatrix34, sizeof(mat2));
     mat2.scale.x = trans->x;
     mat2.scale.y = trans->y;
     mat2.scale.z = trans->z;
@@ -620,7 +623,7 @@ void rdMatrix_PreTranslate44(rdMatrix44 *out, const rdVector3 *tV)
 {
     rdMatrix44 mTmp;
 
-    _memcpy(&mTmp, &rdroid_identMatrix44, sizeof(mTmp));
+    stdPlatform_Memcpy32(&mTmp, &rdroid_identMatrix44, sizeof(mTmp));
     mTmp.vD.w = 1.0;
     mTmp.vD.x = tV->x;
     mTmp.vD.y = tV->y;
@@ -632,7 +635,7 @@ void rdMatrix_PostTranslate34(rdMatrix34 *out, const rdVector3 *trans)
 {
     rdMatrix34 mat2;
 
-    _memcpy(&mat2, &rdroid_identMatrix34, sizeof(mat2));
+    stdPlatform_Memcpy32(&mat2, &rdroid_identMatrix34, sizeof(mat2));
     mat2.scale.x = trans->x;
     mat2.scale.y = trans->y;
     mat2.scale.z = trans->z;
@@ -643,7 +646,7 @@ void rdMatrix_PostTranslate44(rdMatrix44 *out, const rdVector3 *tV)
 {
     rdMatrix44 mTmp;
 
-    _memcpy(&mTmp, &rdroid_identMatrix44, sizeof(mTmp));
+    stdPlatform_Memcpy32(&mTmp, &rdroid_identMatrix44, sizeof(mTmp));
     mTmp.vD.w = 1.0;
     mTmp.vD.x = tV->x;
     mTmp.vD.y = tV->y;
@@ -854,7 +857,7 @@ void rdMatrix_TransformPoint34(rdVector3* NO_ALIAS vOut, const rdVector3* NO_ALI
 void rdMatrix_TransformPoint34Acc(rdVector3* NO_ALIAS a1, const rdMatrix34 *a2)
 {
     rdVector3 tmp;
-    _memcpy(&tmp, a1, sizeof(tmp));
+    stdPlatform_Memcpy32(&tmp, a1, sizeof(tmp));
     
     rdMatrix_TransformPoint34(a1, &tmp, a2);
 }
@@ -870,7 +873,7 @@ void rdMatrix_TransformPoint44(rdVector4 *a1, const rdVector4 *a2, const rdMatri
 void rdMatrix_TransformPoint44Acc(rdVector4 *a1, const rdMatrix44 *a2)
 {
     rdVector4 tmp;
-    _memcpy(&tmp, a1, sizeof(tmp));
+    stdPlatform_Memcpy32(&tmp, a1, sizeof(tmp));
     
     rdMatrix_TransformPoint44(a1, &tmp, a2);
 }

@@ -24,7 +24,7 @@ keyframeUnloader_t rdKeyframe_RegisterUnloader(keyframeUnloader_t loader)
 
 void rdKeyframe_NewEntry(rdKeyframe *keyframe)
 {
-    _memset(keyframe, 0, sizeof(rdKeyframe));
+    stdPlatform_Memzero32(keyframe, sizeof(rdKeyframe)); // Added: word-safe (array may be in extram)
 #ifdef SITH_DEBUG_STRUCT_NAMES
     stdString_SafeStrCopy(keyframe->name, "UNKNOWN", 32);
 #endif
@@ -126,12 +126,14 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
     if (_sscanf(stdConffile_aLine, " joints %d", &keyframe->numJoints) != 1)
       goto read_fail;
 
+    { TWL_EXTRAM_SUGGEST(rdroid_pHS); // Added: joints are word-width on RETRO
     paJoints = (rdJoint *)RDROID_ALLOC(sizeof(rdJoint) * (keyframe->numJoints+1)); // Added: try and contain rdPuppet crashes...
+    TWL_EXTRAM_RESTORE(rdroid_pHS); }
     keyframe->paJoints = paJoints;
     if (!paJoints)
       goto read_fail;
 
-    _memset(paJoints, 0, sizeof(rdJoint) * (keyframe->numJoints+1));
+    stdPlatform_Memzero32(paJoints, sizeof(rdJoint) * (keyframe->numJoints+1)); // Added: word-safe
     keyframe->numJoints2 = keyframe->numJoints;
 
     if (!stdConffile_ReadLine() || _sscanf(stdConffile_aLine, " section: %s", std_genBuffer) != 1)

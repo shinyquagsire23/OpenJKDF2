@@ -60,13 +60,15 @@ int sithSector_Load(sithWorld *world, int tmp)
     int prevSuggest = pSithHS->suggestHeap(HEAP_FAST);
 #endif
     alloc_size = sizeof(sithSector) * sectors_amt;
+    { TWL_EXTRAM_SUGGEST(pSithHS); // Added: word-width fields/writes (audited)
     world->sectors = (sithSector *)SITH_ALLOC(sizeof(sithSector) * sectors_amt);
+    TWL_EXTRAM_RESTORE(pSithHS); }
 #ifdef STDPLATFORM_HEAP_SUGGESTIONS
     pSithHS->suggestHeap(prevSuggest);
 #endif
     if ( world->sectors )
     {
-        _memset(world->sectors, 0, alloc_size);
+        stdPlatform_Memzero32(world->sectors, alloc_size); // Added: word-safe
         v6 = world->sectors;
         v7 = 0;
         for ( world->numSectors = sectors_amt; v7 < sectors_amt; ++v7 )
@@ -176,7 +178,9 @@ int sithSector_Load(sithWorld *world, int tmp)
                 break;
             if ( _sscanf(stdConffile_aLine, " vertices %d", &num_vertices) != 1 )
                 break;
+            { TWL_EXTRAM_SUGGEST(pSithHS); // Added: word-width fields/writes (audited)
             sectors->verticeIdxs = (int32_t *)SITH_ALLOC(sizeof(int32_t) * num_vertices);
+            TWL_EXTRAM_RESTORE(pSithHS); }
             if ( !sectors->verticeIdxs )
                 break;
 
@@ -244,11 +248,14 @@ int sithSector_GetThingsCount(sithSector *sector)
 
 int sithSector_New(sithWorld *world, int num)
 {
-    sithSector *sectors = (sithSector *)SITH_ALLOC(num * sizeof(sithSector));
+    sithSector *sectors;
+    { TWL_EXTRAM_SUGGEST(pSithHS); // Added: word-width fields/writes (audited)
+    sectors = (sithSector *)SITH_ALLOC(num * sizeof(sithSector));
+    TWL_EXTRAM_RESTORE(pSithHS); }
     world->sectors = sectors;
     if ( !sectors )
         return 0;
-    _memset(sectors, 0, num * sizeof(sithSector));
+    stdPlatform_Memzero32(sectors, num * sizeof(sithSector)); // Added: word-safe
     world->numSectors = num;
     return 1;
 }

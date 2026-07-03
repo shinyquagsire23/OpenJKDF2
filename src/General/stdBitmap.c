@@ -242,7 +242,8 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
         }
         // TODO: Eviction caching for stdBitmap, rdMaterial
 #ifdef TARGET_TWL
-        if (openjkdf2_bIsExtraLowMemoryPlatform && vbufTexFmt.width == 640 && vbufTexFmt.height == 480){
+        if (openjkdf2_bIsExtraLowMemoryPlatform && 
+            ((vbufTexFmt.width == 640 && vbufTexFmt.height == 480) /*|| (vbufTexFmt.width == 256 && vbufTexFmt.height == 192)*/)){
             STD_FREE(surface->surface_lock_alloc);
             surface->surface_lock_alloc = NULL;
         }
@@ -259,7 +260,19 @@ LABEL_17:
             stdPrintf(std_pHS->errorPrint, ".\\General\\stdBitmap.c", 297, "Error: Out of memory trying to load bitmap.\n", 0, 0, 0, 0);
             return 0;
         }
-        std_pHS->fileRead(fp, palette_map, 0x300);
+        // Added: checked read -- a short read here left a garbage palette
+        // (the fleeting jkHud wrong-color bug). Resume short reads.
+        {
+            int gotPal = 0;
+            while (gotPal < 0x300) {
+                int r = (int)std_pHS->fileRead(fp, (char*)palette_map + gotPal, 0x300 - gotPal);
+                if (r <= 0) {
+                    stdPlatform_Printf("OpenJKDF2: bitmap palette short read %d/768!\n", gotPal);
+                    break;
+                }
+                gotPal += r;
+            }
+        }
     }
 
 #ifdef SDL2_RENDER

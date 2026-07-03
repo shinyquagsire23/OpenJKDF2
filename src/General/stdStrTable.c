@@ -71,10 +71,12 @@ int stdStrTable_Load(stdStrTable *strtable, char *fpath)
         return 0;
     }
     strtable->numMsgs = numMsgs;
+    { TWL_EXTRAM_SUGGEST(std_pHS); // Added: msg table is word-safe (ptrs/ints)
     strtable->msgs = (stdStrMsg*)STD_ALLOC(sizeof(stdStrMsg) * numMsgs);
+    TWL_EXTRAM_RESTORE(std_pHS); }
     if ( !strtable->msgs )
         std_pHS->assert("Out of memory--cannot load string table", ".\\General\\stdStrTable.c", 120);
-    _memset(strtable->msgs, 0, sizeof(stdStrMsg) * numMsgs);
+    stdPlatform_Memzero32(strtable->msgs, sizeof(stdStrMsg) * numMsgs); // Added: word-safe
     strtable->hashtable = stdHashTable_New(numMsgs + (numMsgs/2));
     if ( !strtable->hashtable )
         std_pHS->assert("Out of memory--cannot load string table", ".\\General\\stdStrTable.c", 126);
@@ -115,8 +117,10 @@ int stdStrTable_Load(stdStrTable *strtable, char *fpath)
             v17 = stdString_GetQuotedStringContents(a1a, v34, 256);
             if ( v17 )
             {
+                { TWL_EXTRAM_SUGGEST(std_pHS); // Added: keys are read-only after insert
                 v18 = (char *)STD_ALLOC(_strlen(v34) + 1);
-                _strcpy(v18, v34);
+                TWL_EXTRAM_RESTORE(std_pHS); }
+                stdPlatform_Memcpy32(v18, v34, _strlen(v34) + 1); // Added: word-safe
                 v19 = value;
                 value->key = v18;
                 v20 = stdString_CopyBetweenDelimiter(v17, v34, 256, " \t");

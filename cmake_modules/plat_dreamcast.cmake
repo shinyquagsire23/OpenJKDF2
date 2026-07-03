@@ -9,6 +9,15 @@ endif()
 
 # Optional: per-file allocation cataloguing (stdPlatform_PrintAllocStats), e.g.
 #   ALLOC_TRACKING=1 ./build_dreamcast.sh
+if(DEFINED ENV{DC_AUTOEXIT_MS})
+    add_compile_definitions(DC_AUTOEXIT_MS=$ENV{DC_AUTOEXIT_MS})
+    message(STATUS "DC auto-exit after $ENV{DC_AUTOEXIT_MS} ms of gameplay")
+endif()
+if(DEFINED ENV{DC_AUTOEXIT_NEXTMAP})
+    add_compile_definitions(DC_AUTOEXIT_NEXTMAP="$ENV{DC_AUTOEXIT_NEXTMAP}")
+    message(STATUS "DC auto-exit loads map: $ENV{DC_AUTOEXIT_NEXTMAP}")
+endif()
+
 if(DEFINED ENV{ALLOC_TRACKING})
     add_compile_definitions(STDPLATFORM_ALLOC_TRACKING)
     message(STATUS "Allocation tracking enabled")

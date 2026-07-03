@@ -344,7 +344,9 @@ void jkDev_PrintfLog()
         {
             stdString_WcharToChar(tmp, v3->text, 255);
             tmp[255] = 0;
-            stdPlatform_Printf("%s\n", tmp);
+            // Added: raw printf -- this redraw re-emits the last few entries every
+            // pass, which floods the emulator debug mirror on TWL.
+            printf("%s\n", tmp);
         }
         //if ( v3->bDrawEntry > 0 )
         //    --v3->bDrawEntry;

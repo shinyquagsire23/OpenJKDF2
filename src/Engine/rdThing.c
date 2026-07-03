@@ -91,7 +91,9 @@ int rdThing_SetModel3(rdThing *thing, rdModel3 *model)
     if (!thing->hierarchyNodeMatrices)
         return 0;
 
+    { TWL_EXTRAM_SUGGEST(rdroid_pHS); // Added: word writes only
     thing->hierarchyNodes2 = (rdVector3*)RDROID_ALLOC(sizeof(rdVector3) * model->numHierarchyNodes);
+    TWL_EXTRAM_RESTORE(rdroid_pHS); }
     // memset used to be here??
 
     // thing->hierarchyNodeMatrices check used to be here??
@@ -99,13 +101,15 @@ int rdThing_SetModel3(rdThing *thing, rdModel3 *model)
     if (!thing->hierarchyNodes2)
         return 0;
     
-    _memset(thing->hierarchyNodes2, 0, sizeof(rdVector3) * model->numHierarchyNodes);
+    stdPlatform_Memzero32(thing->hierarchyNodes2, sizeof(rdVector3) * model->numHierarchyNodes); // Added: word-safe
 
+    { TWL_EXTRAM_SUGGEST(rdroid_pHS); // Added
     thing->amputatedJoints = (int *)RDROID_ALLOC(sizeof(int) * model->numHierarchyNodes);
+    TWL_EXTRAM_RESTORE(rdroid_pHS); }
     if (!thing->amputatedJoints)
         return 0;
 
-    _memset(thing->amputatedJoints, 0, sizeof(int) * model->numHierarchyNodes);
+    stdPlatform_Memzero32(thing->amputatedJoints, sizeof(int) * model->numHierarchyNodes); // Added: word-safe
 
     rdHierarchyNode* iter = model->hierarchyNodes;
     for (int i = 0; i < model->numHierarchyNodes; i++)

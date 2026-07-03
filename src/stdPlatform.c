@@ -266,6 +266,8 @@ intptr_t openjkdf2_mem_alt_mspace_end;
 intptr_t openjkdf2_mem_main_mspace_start;
 intptr_t openjkdf2_mem_main_mspace_end;
 
+int openjkdf2_mem_alt_mspace_wordonly = 0;
+
 typedef struct MemTrackingHeader {
     uint32_t memtype_size;
 } tMemTrackingHeader;
@@ -303,11 +305,14 @@ static void* TWL_mspace_alloc(mspace m, uint8_t marker, uint32_t len, uint32_t l
         *pTrackingAllocsReal += lenAlign;
         activeAllocs += 1;
         //printf("%p %x\n", ret, len + sizeof(tMemTrackingHeader));
+        // Added: word-safe fills. BlocksDS memset (__ndsabi_memset1) byte-fills,
+        // and the slot-2 bus DROPS byte writes -- every extram allocation was
+        // handed out unzeroed, corrupting everything that assumes cleared memory.
 #ifdef MEM_CHECKING
-        memset(ret, MEM_CHECKING_ZERO_VAL, len);
-        memset((uint8_t*)ret+len, MEM_CHECKING_VAL, lenAlign-len);
+        stdPlatform_Memset32(ret, MEM_CHECKING_ZERO_VAL, len);
+        stdPlatform_Memset32((uint8_t*)ret+len, MEM_CHECKING_VAL, lenAlign-len);
 #else
-        memset(ret, 0, len);
+        stdPlatform_Memzero32(ret, len);
 #endif
         HDR_SET((tMemTrackingHeader*)ret, marker, len);
         return (void*)(((intptr_t)ret) + sizeof(tMemTrackingHeader));
@@ -322,7 +327,7 @@ static void TWL_mspace_free(mspace m, tMemTrackingHeader* pHdr, uint32_t size, u
     activeAllocs -= 1;
     HDR_SET(pHdr, 0xDE, 0);
 #ifdef MEM_CHECKING
-    memset(ptr, MEM_CHECKING_VAL_FREE, sizeAlign);
+    stdPlatform_Memset32(ptr, MEM_CHECKING_VAL_FREE, sizeAlign); // Added: word-safe
 #endif
     mspace_free(m, (void*)pHdr);
 }
@@ -341,7 +346,7 @@ static void* TWL_mspace_realloc(mspace m, uint8_t marker, tMemTrackingHeader* pH
         *pTrackingAllocsReal += lenAlign;
 #ifdef MEM_CHECKING
         if (lenAlign > sizeAlign && len > oldSize) {
-            memset((uint8_t*)ret + sizeAlign, MEM_CHECKING_VAL, lenAlign - sizeAlign);
+            stdPlatform_Memset32((uint8_t*)ret + sizeAlign, MEM_CHECKING_VAL, lenAlign - sizeAlign); // Added: word-safe
         }
 #endif
         HDR_SET(pHdr, marker, len);
@@ -409,8 +414,15 @@ static void* TWL_alloc(uint32_t len)
         }
     }
 
-    if(ret = TWL_mspace_alloc(openjkdf2_mem_alt_mspace, 0xF0, len, lenAlign, &trackingAllocsA, &trackingAllocsAReal)) {
-        return ret;
+    if (heapSuggestion == HEAP_WORD_ADDRESSABLE && openjkdf2_mem_alt_mspace_wordonly) {
+        if(ret = TWL_mspace_alloc(openjkdf2_mem_alt_mspace, 0xF0, len, lenAlign, &trackingAllocsA, &trackingAllocsAReal)) {
+            return ret;
+        }
+    }
+    else if (!openjkdf2_mem_alt_mspace_wordonly) {
+        if(ret = TWL_mspace_alloc(openjkdf2_mem_alt_mspace, 0xF0, len, lenAlign, &trackingAllocsA, &trackingAllocsAReal)) {
+            return ret;
+        }
     }
 
     if (trackingAllocsBReal + lenAlign < trackingAllocsBLimit) {
@@ -1107,6 +1119,28 @@ int stdPlatform_Printf(const char *fmt, ...)
     LOGI("%s", tmp);
 #endif
 
+#ifdef TARGET_TWL
+    // Added: mirror prints to the no$gba-style debug string port that melonDS
+    // implements (0x04FFFA18 = "string out + linefeed"; libnds nocashMessage
+    // uses the mov r12,r12 protocol melonDS doesn't). Unmapped I/O on real
+    // hardware, so the write is a harmless no-op there.
+    {
+        // Static: the stack lives in DTCM, which the emulator's bus-level string
+        // read can't see; this buffer lands in main RAM.
+        static char aNocashBuf[256];
+        va_start(args, fmt);
+        vsnprintf(aNocashBuf, sizeof(aNocashBuf), fmt, args);
+        va_end(args);
+        size_t tlen = strlen(aNocashBuf);
+        if (tlen && aNocashBuf[tlen-1] == '\n')
+            aNocashBuf[tlen-1] = 0; // the port appends the newline
+        // Skip the bottom-screen console's ANSI cursor/color sequences -- they
+        // are screen-positioning spam in a line-oriented emulator log.
+        if (aNocashBuf[0] && aNocashBuf[0] != '\x1b')
+            *(volatile uint32_t*)0x04FFFA18 = (uint32_t)aNocashBuf;
+    }
+#endif
+
 #ifdef SDL2_RENDER
     SDL_UnlockMutex(stdPlatform_mtxPrintf);
 #endif
@@ -1118,7 +1152,9 @@ int stdPlatform_Printf(const char *fmt, ...)
 void stdPlatform_PrintHeapStats()
 {
     size_t waste = (trackingAllocsAReal - trackingAllocsA) + (trackingAllocsBReal - trackingAllocsB) + (trackingAllocsCReal - trackingAllocsC);
-    stdPlatform_Printf("heap ext=0x%zx mn=0x%zx\nnw=0x%zx wst=0x%zx\nnum=%zd\n", trackingAllocsA, trackingAllocsB, trackingAllocsC, waste, activeAllocs);
+    // Added: raw printf -- this runs per frame for the on-screen HUD; keep it
+    // off the emulator debug channel (stdPlatform_Printf mirrors to nocash).
+    printf("heap ext=0x%zx mn=0x%zx\nnw=0x%zx wst=0x%zx\nnum=%zd\n", trackingAllocsA, trackingAllocsB, trackingAllocsC, waste, activeAllocs);
 }
 #endif // TARGET_TWL
 
@@ -1287,6 +1323,11 @@ int stdPlatform_IsWordAddressableOnly(const void* p)
     uintptr_t base, end;
     DC_GetVramArenaBounds(&base, &end);
     return base && (uintptr_t)p >= base && (uintptr_t)p < end;
+#elif defined(TARGET_TWL)
+    // Added: the slot-2 extram alt-mspace (16/32-bit stores only)
+    return openjkdf2_mem_alt_mspace_wordonly
+        && (intptr_t)p >= openjkdf2_mem_alt_mspace_start
+        && (intptr_t)p < openjkdf2_mem_alt_mspace_end;
 #else
     (void)p;
     return 0;

@@ -556,11 +556,13 @@ int sithCog_Load(sithWorld *world, int a2)
     num_cogs = _atoi(stdConffile_entry.args[2].value);
     if ( !num_cogs )
         return 1;
+    { TWL_EXTRAM_SUGGEST(pSithHS); // Added: word-width fields (fpath is debug-only)
     cogs = (sithCog *)SITH_ALLOC(sizeof(sithCog) * num_cogs);
+    TWL_EXTRAM_RESTORE(pSithHS); }
     world->cogs = cogs;
     if ( cogs )
     {
-        _memset(cogs, 0, sizeof(sithCog) * num_cogs);
+        stdPlatform_Memzero32(cogs, sizeof(sithCog) * num_cogs); // Added: word-safe
         world->numCogs = num_cogs;
         world->numCogsLoaded = 0;
         while ( stdConffile_ReadArgs() )
@@ -1870,7 +1872,10 @@ int sithCog_InitScripts(sithWorld *world, int num)
 
 int sithCog_InitCogs(sithWorld *world, int num)
 {
-    sithCog *cogs = (sithCog *)SITH_ALLOC(num * sizeof(sithCog));
+    sithCog *cogs;
+    { TWL_EXTRAM_SUGGEST(pSithHS); // Added
+    cogs = (sithCog *)SITH_ALLOC(num * sizeof(sithCog));
+    TWL_EXTRAM_RESTORE(pSithHS); }
     world->cogs = cogs;
     if ( !cogs )
     {
@@ -1878,7 +1883,7 @@ int sithCog_InitCogs(sithWorld *world, int num)
                   "Memory alloc failure initializing cogs.");
         return 0;
     }
-    _memset(cogs, 0, num * sizeof(sithCog));
+    stdPlatform_Memzero32(cogs, num * sizeof(sithCog)); // Added: word-safe
     world->numCogs = num;
     world->numCogsLoaded = 0;
     return 1;

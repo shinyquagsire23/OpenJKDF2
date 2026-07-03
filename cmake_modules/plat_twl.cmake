@@ -1,4 +1,15 @@
 macro(plat_initialize)
+
+if(DEFINED ENV{ALLOC_TRACKING})
+    add_compile_definitions(STDPLATFORM_ALLOC_TRACKING)
+    message(STATUS "TWL alloc tracking enabled")
+endif()
+
+if(DEFINED ENV{TWL_AUTOBOOT_MAP})
+    add_compile_definitions(TWL_AUTOBOOT_MAP="$ENV{TWL_AUTOBOOT_MAP}")
+    message(STATUS "TWL autoboot map: $ENV{TWL_AUTOBOOT_MAP}")
+endif()
+
     message( STATUS "Targeting Nintendo DSi" )
 
     set(BIN_NAME "openjkdf2.elf")

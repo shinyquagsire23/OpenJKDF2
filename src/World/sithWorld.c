@@ -278,24 +278,32 @@ int sithWorld_NewEntry(sithWorld *pWorld)
         v3 = pWorld->numVertices;
         if ( v3 )
         {
+            { TWL_EXTRAM_SUGGEST(pSithHS); // Added: per-frame arrays; word writes only
             v4 = (rdVector3 *)SITH_ALLOC(sizeof(rdVector3) * v3);
+            TWL_EXTRAM_RESTORE(pSithHS); }
             pWorld->verticesTransformed = v4;
             if ( !v4 )
                 return 0;
 
+            { TWL_EXTRAM_SUGGEST(pSithHS); // Added
             v5 = (flex_t *)SITH_ALLOC(sizeof(flex_t) * pWorld->numVertices);
+            TWL_EXTRAM_RESTORE(pSithHS); }
             pWorld->verticesDynamicLight = v5;
             if ( !v5 )
                 return 0;
-            _memset(v5, 0, sizeof(flex_t) * pWorld->numVertices);
+            stdPlatform_Memzero32(v5, sizeof(flex_t) * pWorld->numVertices); // Added: word-safe
 
+            { TWL_EXTRAM_SUGGEST(pSithHS); // Added
             v6 = (int32_t *)SITH_ALLOC(sizeof(int32_t) * pWorld->numVertices);
+            TWL_EXTRAM_RESTORE(pSithHS); }
             pWorld->alloc_unk98 = v6;
             if ( !v6 )
                 return 0;
-            _memset(v6, 0, sizeof(int) * pWorld->numVertices);
+            stdPlatform_Memzero32(v6, sizeof(int) * pWorld->numVertices); // Added: word-safe
 
+            { TWL_EXTRAM_SUGGEST(pSithHS); // Added
             v7 = (int32_t *)SITH_ALLOC(sizeof(int32_t) * pWorld->numVertices);
+            TWL_EXTRAM_RESTORE(pSithHS); }
             pWorld->alloc_unk9c = v7;
             if ( !v7 )
                 return 0;
@@ -739,7 +747,16 @@ int sithWorld_LoadGeoresource(sithWorld *pWorld, int a2)
         return 0;
     }
 
+#ifdef TARGET_TWL
+    // Added: static world vertices are parsed once (word stores) then read-only;
+    // extram-safe on TWL. Per-frame arrays (transformed/dynamic light) stay in
+    // sysram -- they are written every frame.
+    int prevSuggest = pSithHS->suggestHeap(HEAP_WORD_ADDRESSABLE);
+#endif
     pWorld->vertices = (rdVector3 *)SITH_ALLOC(sizeof(rdVector3) * numVertices);
+#ifdef TARGET_TWL
+    pSithHS->suggestHeap(prevSuggest);
+#endif
     if (!pWorld->vertices)
     {
         return 0;
@@ -773,7 +790,13 @@ int sithWorld_LoadGeoresource(sithWorld *pWorld, int a2)
         return 0;
     }
 
+#ifdef TARGET_TWL
+    int prevSuggestUV = pSithHS->suggestHeap(HEAP_WORD_ADDRESSABLE); // Added: see vertices
+#endif
     pWorld->vertexUVs = (rdVector2 *)SITH_ALLOC(sizeof(rdVector2) * textureVertices);
+#ifdef TARGET_TWL
+    pSithHS->suggestHeap(prevSuggestUV);
+#endif
     if (!pWorld->vertexUVs)
     {
         return 0;

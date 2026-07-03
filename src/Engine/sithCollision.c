@@ -1246,7 +1246,7 @@ void sithCollision_sub_4E77A0(sithThing *thing, rdMatrix34 *a2)
         rdMatrix_Normalize34(a2);
     }
     rdVector_Zero3(&a2->scale);
-    _memcpy(&thing->lookOrientation, a2, sizeof(thing->lookOrientation));
+    stdPlatform_Memcpy32(&thing->lookOrientation, a2, sizeof(thing->lookOrientation)); // Added: word-safe (things may be in extram)
 }
 
 int sithCollision_DebrisPlayerCollide(sithThing *thing, sithThing *thing2, sithCollisionSearchEntry *searchEnt, int isSolid)

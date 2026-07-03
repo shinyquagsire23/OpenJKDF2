@@ -300,6 +300,13 @@
 #undef SITH_DEBUG_STRUCT_NAMES
 
 // stdHashTable memory optimizations
+#ifdef TARGET_TWL
+// Link nodes come from slab pools (freelist reuse) instead of thousands of
+// tiny heap allocations; slabs are extram-suggested. Risk-free on TWL where
+// extram is cacheable; not enabled on DC (small uncached arena -- lookup
+// pointer-chasing there would cost more than the RAM is worth).
+#define STDHASHTABLE_NODE_POOL
+#endif
 #define STDHASHTABLE_CRC32_KEYS
 #define STDHASHTABLE_LOG2_BUCKETS
 #define STDHASHTABLE_SINGLE_LINKLIST

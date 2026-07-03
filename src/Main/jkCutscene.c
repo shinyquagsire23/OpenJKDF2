@@ -261,6 +261,15 @@ int jkCutscene_sub_421310(char* fpath)
     }
 #endif
 
+#if defined(TARGET_TWL)
+    // TODO: Find a way to make sure enough memory is free during cutscenes
+    // (move them back to before the level load?)
+    if (openjkdf2_bIsLowMemoryPlatform /*&& Main_bMotsCompat*/) {
+        printf("vid skip %s\n", fpath);
+        return 1;
+    }
+#endif
+
     if (jkPlayer_setDisableCutscenes) {
         return 1;
     }

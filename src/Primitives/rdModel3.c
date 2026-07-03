@@ -1,5 +1,17 @@
 #include "rdModel3.h"
 
+// Added: on TWL, the big cold model payload arrays (vertices/UVs/normals/faces/
+// index pools -- word-safe writes only, parsed once) go to the slot-2 extram
+// heap. Not enabled on DC: these are read in per-frame transform loops and DC
+// VRAM CPU reads are uncached.
+#ifdef TARGET_TWL
+#define RDMODEL3_EXTRAM_SUGGEST() int _prevSuggest = rdroid_pHS->suggestHeap(HEAP_WORD_ADDRESSABLE)
+#define RDMODEL3_EXTRAM_RESTORE() rdroid_pHS->suggestHeap(_prevSuggest)
+#else
+#define RDMODEL3_EXTRAM_SUGGEST() do {} while (0)
+#define RDMODEL3_EXTRAM_RESTORE() do {} while (0)
+#endif
+
 #include "Engine/rdroid.h"
 #include "General/stdConffile.h"
 #include "General/stdString.h"
@@ -36,7 +48,7 @@ void rdModel3_ClearFrameCounters()
 
 int rdModel3_NewEntry(rdModel3 *model)
 {
-    _memset(model, 0, sizeof(rdModel3));
+    stdPlatform_Memzero32(model, sizeof(rdModel3)); // Added: word-safe (models array may be in extram)
     stdString_SafeStrCopy(model->filename, "UNKNOWN", 32);
     model->geosetSelect = 0;
     return 0;
@@ -270,22 +282,28 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
             mesh->vertices_unk = 0;
             if ( mesh->numVertices)
             {
+                { RDMODEL3_EXTRAM_SUGGEST();
                 mesh->vertices = (rdVector3 *)RDROID_ALLOC(sizeof(rdVector3) * mesh->numVertices);
+                RDMODEL3_EXTRAM_RESTORE(); }
                 if ( !mesh->vertices ){
                     rdModel3_HelpDebug("OpenJKDF2: %s: Failed to allocate vertices\n", __func__); // Added
                     goto fail;
                 }
+                { RDMODEL3_EXTRAM_SUGGEST();
                 mesh->vertices_i = (flex_t *)RDROID_ALLOC(sizeof(flex_t) * mesh->numVertices);
+                RDMODEL3_EXTRAM_RESTORE(); }
                 if ( !mesh->vertices_i ) {
                     rdModel3_HelpDebug("OpenJKDF2: %s: Failed to allocate vertex lights\n", __func__); // Added
                     goto fail;
                 }
+                { RDMODEL3_EXTRAM_SUGGEST();
                 mesh->vertices_unk  = (flex_t *)RDROID_ALLOC(sizeof(flex_t) * mesh->numVertices);
+                RDMODEL3_EXTRAM_RESTORE(); }
                 if ( !mesh->vertices_unk  ) {
                     rdModel3_HelpDebug("OpenJKDF2: %s: Failed to allocate vertex unk\n", __func__); // Added
                     goto fail;
                 }
-                _memset(mesh->vertices_unk, 0, mesh->numVertices); // bug?
+                stdPlatform_Memzero32(mesh->vertices_unk, mesh->numVertices); // bug? // Added: word-safe
             }
             for (vertex_num = 0; vertex_num < mesh->numVertices; vertex_num++)
             {
@@ -319,7 +337,9 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
             mesh->vertexUVs = 0;
             if ( mesh->numUVs )
             {
+                { RDMODEL3_EXTRAM_SUGGEST();
                 mesh->vertexUVs = (rdVector2 *)RDROID_ALLOC(sizeof(rdVector2) * mesh->numUVs);
+                RDMODEL3_EXTRAM_RESTORE(); }
                 if ( !mesh->vertexUVs ) {
                     rdModel3_HelpDebug("OpenJKDF2: %s: Failed to allocate vertex UVs\n", __func__); // Added
                     goto fail;
@@ -342,7 +362,9 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
             mesh->vertexNormals = 0;
             if ( mesh->numVertices)
             {
+                { RDMODEL3_EXTRAM_SUGGEST();
                 mesh->vertexNormals = (rdVector3 *)RDROID_ALLOC(sizeof(rdVector3) * mesh->numVertices);
+                RDMODEL3_EXTRAM_RESTORE(); }
                 if ( !mesh->vertexNormals ) {
                     rdModel3_HelpDebug("OpenJKDF2: %s: Failed to allocate vertex normals\n", __func__); // Added
                     goto fail;
@@ -384,7 +406,9 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
 #endif
             if ( mesh->numFaces)
             {
+                { RDMODEL3_EXTRAM_SUGGEST();
                 mesh->faces = (rdFace *)RDROID_ALLOC(sizeof(rdFace) * mesh->numFaces);
+                RDMODEL3_EXTRAM_RESTORE(); }
                 if ( !mesh->faces ) {
                     rdModel3_HelpDebug("OpenJKDF2: %s: Failed to allocate faces\n", __func__); // Added
                     goto fail;
@@ -511,6 +535,20 @@ int rdModel3_Load(char *model_fpath, rdModel3 *model)
                 if (pTrim)
                     pIdxPool = pTrim;
             }
+#ifdef TARGET_TWL
+            // Added: relocate the finished pool into extram (TWL realloc cannot
+            // migrate heaps, so growth happened in sysram; one word-safe move).
+            if (pIdxPool && poolUsed) {
+                RDMODEL3_EXTRAM_SUGGEST();
+                int* pMoved = (int*)RDROID_ALLOC(sizeof(int) * poolUsed);
+                RDMODEL3_EXTRAM_RESTORE();
+                if (pMoved) {
+                    stdPlatform_Memcpy32(pMoved, pIdxPool, sizeof(int) * poolUsed);
+                    RDROID_FREE(pIdxPool);
+                    pIdxPool = pMoved;
+                }
+            }
+#endif
             mesh->paFaceIdxPool = pIdxPool;
             for (int j2 = 0; j2 < mesh->numFaces; j2++)
             {

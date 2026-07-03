@@ -17,6 +17,16 @@
 #include <nds.h>
 #endif
 
+// Added: SafeStrCopy variant for destinations that may live in word-addressable-
+// only memory (the world materials array on TWL): stage on the stack, then a
+// word-safe copy of the terminated string.
+static void rdMaterial_WordSafeStrCopy(char* pDst, const char* pSrc, int len)
+{
+    char tmp[128];
+    stdString_SafeStrCopy(tmp, pSrc, len > 128 ? 128 : len);
+    stdPlatform_Memcpy32(pDst, tmp, _strlen(tmp) + 1);
+}
+
 
 #if defined(RDMATERIAL_LRU_LOAD_UNLOAD)
 
@@ -121,7 +131,7 @@ int rdMaterial_LoadEntry_Common(char *mat_fpath, rdMaterial *material, int creat
 #if defined(RDMATERIAL_LRU_LOAD_UNLOAD)
     //if (!bDoLoad) {
 #endif
-        _memset(material, 0, sizeof(rdMaterial));
+        stdPlatform_Memzero32(material, sizeof(rdMaterial)); // Added: word-safe
 #if defined(RDMATERIAL_LRU_LOAD_UNLOAD)
     //}
 #endif
@@ -154,9 +164,9 @@ int rdMaterial_LoadEntry_Common(char *mat_fpath, rdMaterial *material, int creat
     if (!bDoLoad) {
         // We need this to ensure sithMaterial loader doesn't break
 #ifdef SITH_DEBUG_STRUCT_NAMES
-        stdString_SafeStrCopy(material->mat_fpath, stdFileFromPath(mat_fpath), sizeof(material->mat_fpath));
+        rdMaterial_WordSafeStrCopy(material->mat_fpath, stdFileFromPath(mat_fpath), sizeof(material->mat_fpath)); // Added: word-safe
 #endif
-        stdString_SafeStrCopy(material->mat_full_fpath, mat_fpath, sizeof(material->mat_full_fpath));
+        rdMaterial_WordSafeStrCopy(material->mat_full_fpath, mat_fpath, sizeof(material->mat_full_fpath)); // Added: word-safe
         rdroid_pHS->fileClose(mat_file_);
         return 1;
     }
@@ -185,10 +195,12 @@ int rdMaterial_LoadEntry_Common(char *mat_fpath, rdMaterial *material, int creat
     _memcpy(&material->texFormat, &mat_header.texFormat, sizeof(material->texFormat));
 #endif
     texture_idk = textures_idk;
-    memset(material->texinfos, 0, sizeof(material->texinfos)); // Added: just in case?
+    stdPlatform_Memzero32(material->texinfos, sizeof(material->texinfos)); // Added: just in case? (word-safe)
     for (tex_num = 0; tex_num < material->num_texinfo; tex_num++)
     {
+        { TWL_EXTRAM_SUGGEST(rdroid_pHS); // Added: texinfo fields are all word-width
         texinfo_alloc = (rdTexinfo *)RDROID_ALLOC(sizeof(rdTexinfo));
+        TWL_EXTRAM_RESTORE(rdroid_pHS); }
         material->texinfos[tex_num] = texinfo_alloc;
         if ( !texinfo_alloc )
         {
@@ -216,7 +228,7 @@ int rdMaterial_LoadEntry_Common(char *mat_fpath, rdMaterial *material, int creat
     material->bMetadataLoaded = 1;
     // Short circuit only after metadata
     if (bDoLoad == 2) {
-        stdString_SafeStrCopy(material->mat_full_fpath, mat_fpath, sizeof(material->mat_full_fpath));
+        rdMaterial_WordSafeStrCopy(material->mat_full_fpath, mat_fpath, sizeof(material->mat_full_fpath)); // Added: word-safe
         rdroid_pHS->fileClose(mat_file_);
         return 1;
     }
@@ -225,7 +237,9 @@ int rdMaterial_LoadEntry_Common(char *mat_fpath, rdMaterial *material, int creat
     material->textures = 0;
     if ( num_textures )
     {
+      { TWL_EXTRAM_SUGGEST(rdroid_pHS); // Added: rdTexture fields are all word-width
       textures = (rdTexture *)RDROID_ALLOC(sizeof(rdTexture) * num_textures);
+      TWL_EXTRAM_RESTORE(rdroid_pHS); }
       if ( !textures )
       {
         stdPlatform_Printf("OpenJKDF2: Material `%s` textures array could not be allocated!\n", mat_fpath); // Added
@@ -412,20 +426,32 @@ LABEL_22:
 
         return 0;
       }
-      rdroid_pHS->fileRead(mat_file_, colors, 0x300);
+      // Added: checked read -- a short read here left a garbage palette
+      // (intermittent wrong/pink material colors). Resume short reads.
+      {
+        int gotPal = 0;
+        while (gotPal < 0x300) {
+          int r = rdroid_pHS->fileRead(mat_file_, (char*)colors + gotPal, 0x300 - gotPal);
+          if (r <= 0) {
+            stdPlatform_Printf("OpenJKDF2: Material `%s` palette short read %d/768!\n", mat_fpath, gotPal);
+            break;
+          }
+          gotPal += r;
+        }
+      }
     }
 #endif
 
     // Added: Move this up to start
     v26 = stdFileFromPath(mat_fpath);
 #ifdef SITH_DEBUG_STRUCT_NAMES
-    stdString_SafeStrCopy(material->mat_fpath, v26, sizeof(material->mat_fpath));
+    rdMaterial_WordSafeStrCopy(material->mat_fpath, v26, sizeof(material->mat_fpath)); // Added: word-safe
 #endif
     rdroid_pHS->fileClose(mat_file_);
     mat_file = 1;
 
 #if defined(SDL2_RENDER) || defined(RDMATERIAL_LRU_LOAD_UNLOAD)
-    stdString_SafeStrCopy(material->mat_full_fpath, mat_fpath, sizeof(material->mat_full_fpath));
+    rdMaterial_WordSafeStrCopy(material->mat_full_fpath, mat_fpath, sizeof(material->mat_full_fpath)); // Added: word-safe
 #endif
 #ifdef SDL2_RENDER
     for (int i = 0; i < 128; i++)

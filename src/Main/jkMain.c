@@ -706,6 +706,28 @@ void jkMain_GameplayTick(int a2)
         return;
     }
 
+#ifdef DC_AUTOEXIT_MS
+    // Added: quit to menu after N ms of gameplay (headless soak/teardown tests;
+    // pairs with DC_AUTOBOOT_MAP, e.g. -DDC_AUTOEXIT_MS=90000).
+    {
+        static uint32_t dcAutoExitStartMs = 0;
+        uint32_t nowMs = stdPlatform_GetTimeMsec();
+        if (!dcAutoExitStartMs)
+            dcAutoExitStartMs = nowMs;
+        if (nowMs - dcAutoExitStartMs > (DC_AUTOEXIT_MS)) {
+            dcAutoExitStartMs = nowMs;
+#ifdef DC_AUTOEXIT_NEXTMAP
+            stdPlatform_Printf("DC_AUTOEXIT: transitioning to " DC_AUTOEXIT_NEXTMAP "\n");
+            jkMain_LoadLevelSingleplayer("JK1", DC_AUTOEXIT_NEXTMAP);
+#else
+            stdPlatform_Printf("DC_AUTOEXIT: leaving gameplay\n");
+            jkMain_MenuReturn();
+#endif
+            return;
+        }
+    }
+#endif
+
     v1 = stdPlatform_GetTimeMsec();
 
     if (v1 > jkMain_lastTickMs + TICKRATE_MS)

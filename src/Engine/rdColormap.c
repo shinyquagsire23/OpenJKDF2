@@ -50,6 +50,26 @@ rdColormap* rdColormap_Load(char *colormap_fname)
 }
 
 // MOTS altered
+
+// Added: colormap reads were unchecked; a short read (GD-ROM hiccups do this)
+// silently left garbage in the palette -> intermittent pink levels. Resume
+// short reads; only a hard failure aborts the load.
+static int rdColormap_ReadAll(stdFile_t fp, void* pDst, int len)
+{
+    int got = 0;
+    while (got < len)
+    {
+        int r = rdroid_pHS->fileRead(fp, (char*)pDst + got, len - got);
+        if (r <= 0)
+        {
+            stdPlatform_Printf("OpenJKDF2: rdColormap short read %d/%d!\n", got, len);
+            return 0;
+        }
+        got += r;
+    }
+    return 1;
+}
+
 int rdColormap_LoadEntry(char *colormap_fname, rdColormap *colormap)
 {
     intptr_t colormap_fptr; // edi
@@ -69,7 +89,7 @@ int rdColormap_LoadEntry(char *colormap_fname, rdColormap *colormap)
 #ifdef SITH_DEBUG_STRUCT_NAMES
     stdString_SafeStrCopy(colormap->colormap_fname, stdFileFromPath(colormap_fname), 32);
 #endif
-    rdroid_pHS->fileRead(colormap_fptr, &header, 0x40);
+    if (!rdColormap_ReadAll(colormap_fptr, &header, 0x40)) goto safe_fallback; // Added: checked read
     colormap->tint.x = header.tint[0];
     colormap->flags = header.flags;
     colormap->tint.y = header.tint[1];
@@ -79,7 +99,7 @@ int rdColormap_LoadEntry(char *colormap_fname, rdColormap *colormap)
         jk_printf("CMP magic in `%s` is invalid!\n", colormap_fname);
         goto safe_fallback;
     }
-    rdroid_pHS->fileRead(colormap_fptr, colormap->colors, 0x300);
+    if (!rdColormap_ReadAll(colormap_fptr, colormap->colors, 0x300)) goto safe_fallback; // Added: checked read
 
     // JKDF2
     /*
@@ -97,7 +117,7 @@ int rdColormap_LoadEntry(char *colormap_fname, rdColormap *colormap)
         if ( (intptr_t)colorsLights & 0xFF )
             colormap->lightlevel = (void*)((intptr_t)colorsLights - ((intptr_t)colorsLights & 0xFF) + 0x100);
 
-        rdroid_pHS->fileRead(colormap_fptr, colormap->lightlevel, 0x4000);
+        if (!rdColormap_ReadAll(colormap_fptr, colormap->lightlevel, 0x4000)) goto safe_fallback; // Added: checked read
         if ( (colormap->flags & 1) != 0 )
         {
             transparencyAlloc = RDROID_ALLOC(0x10100);
@@ -110,7 +130,7 @@ int rdColormap_LoadEntry(char *colormap_fname, rdColormap *colormap)
             colormap->transparency = transparencyAlloc;
             if ( (intptr_t)transparencyAlloc & 0xFF )
                 colormap->transparency = (void*)((intptr_t)transparencyAlloc - (((intptr_t)transparencyAlloc) & 0xFF) + 256);
-            rdroid_pHS->fileRead(colormap_fptr, colormap->transparency, 0x10000);
+            if (!rdColormap_ReadAll(colormap_fptr, colormap->transparency, 0x10000)) goto safe_fallback; // Added: checked read
         }
         colormap->rgb16Alloc = 0;
         colormap->dword34C = 0;
@@ -137,14 +157,14 @@ int rdColormap_LoadEntry(char *colormap_fname, rdColormap *colormap)
         colormap->transparency = v10;
         if ( ((intptr_t)v10) & 0xFF )
             colormap->transparency = (void*)((intptr_t)v10 - (((intptr_t)v10) & 0xFF) + 256);
-        rdroid_pHS->fileRead(colormap_fptr, colormap->transparency, 0x10000);
+        if (!rdColormap_ReadAll(colormap_fptr, colormap->transparency, 0x10000)) goto safe_fallback; // Added: checked read
         v11 = RDROID_ALLOC(0x10000);
         colormap->dword34C = v11;
         if ( v11 )
         {
             if ( rdColormap_colorInfo.g_bits == 5 )
                 rdroid_pHS->fseek(colormap_fptr, 0x10000, 1);
-            rdroid_pHS->fileRead(colormap_fptr, colormap->dword34C, 0x10000);
+            if (!rdColormap_ReadAll(colormap_fptr, colormap->dword34C, 0x10000)) goto safe_fallback; // Added: checked read
             goto LABEL_15;
         }
     }
@@ -185,7 +205,7 @@ LABEL_26:
     if ( (intptr_t)colorsLights & 0xFF )
         colormap->lightlevel = (uint8_t*)((intptr_t)colorsLights - ((intptr_t)colorsLights & 0xFF) + 0x100);
 
-    rdroid_pHS->fileRead(colormap_fptr, colormap->lightlevel, 0x4000);
+    if (!rdColormap_ReadAll(colormap_fptr, colormap->lightlevel, 0x4000)) goto safe_fallback; // Added: checked read
 
     if (colormap->flags & 1) 
     {
@@ -200,7 +220,7 @@ LABEL_26:
         colormap->transparency = v10;
         if ( ((intptr_t)v10) & 0xFF )
             colormap->transparency = (void*)((intptr_t)v10 - (((intptr_t)v10) & 0xFF) + 256);
-        rdroid_pHS->fileRead(colormap_fptr, colormap->transparency, 0x10000);
+        if (!rdColormap_ReadAll(colormap_fptr, colormap->transparency, 0x10000)) goto safe_fallback; // Added: checked read
 
         if ((colormap->flags & 4) == 0) {
             colormap->dword34C = NULL;
@@ -212,10 +232,10 @@ LABEL_26:
 
             if (rdColormap_colorInfo.g_bits == 5) {
                 rdroid_pHS->fseek(colormap_fptr,0x10000,1);
-                rdroid_pHS->fileRead(colormap_fptr,colormap->dword34C,0x10000);
+                if (!rdColormap_ReadAll(colormap_fptr, colormap->dword34C, 0x10000)) goto safe_fallback; // Added: checked read
             }
             else {
-                rdroid_pHS->fileRead(colormap_fptr,v11,0x10000);
+                if (!rdColormap_ReadAll(colormap_fptr, v11, 0x10000)) goto safe_fallback; // Added: checked read
                 rdroid_pHS->fseek(colormap_fptr,0x10000,1);
             }
         }

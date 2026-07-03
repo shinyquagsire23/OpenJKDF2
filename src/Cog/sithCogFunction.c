@@ -942,9 +942,15 @@ void sithCogFunction_HeapNew(sithCog *ctx)
             SITH_FREE(oldHeap);
             ctx->numHeapVars = 0;
         }
+        { TWL_EXTRAM_SUGGEST(pSithHS); // Added: heap vars are word-safe stackvars
         newHeap = (sithCogStackvar *)SITH_ALLOC(sizeof(sithCogStackvar) * numHeapVars);
+        TWL_EXTRAM_RESTORE(pSithHS); }
         ctx->heap = newHeap;
-        _memset(newHeap, 0, (sizeof(sithCogStackvar) * numHeapVars));
+        if (!newHeap) { // Added: don't memset NULL on OOM
+            ctx->numHeapVars = 0;
+            return;
+        }
+        stdPlatform_Memzero32(newHeap, (sizeof(sithCogStackvar) * numHeapVars)); // Added: word-safe
         ctx->numHeapVars = numHeapVars;
     }
 }

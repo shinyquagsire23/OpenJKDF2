@@ -122,7 +122,9 @@ rdKeyframe* sithKeyFrame_LoadEntry(const char *fpath)
 
 int sithKeyFrame_New(sithWorld *world, int numKeyframes)
 {
+    { TWL_EXTRAM_SUGGEST(pSithHS); // Added: rdKeyframe fields are word-width on RETRO
     world->keyframes = (rdKeyframe *)SITH_ALLOC(sizeof(rdKeyframe) * numKeyframes);
+    TWL_EXTRAM_RESTORE(pSithHS); }
     if ( !world->keyframes )
         return 0;
     world->numKeyframes = numKeyframes;

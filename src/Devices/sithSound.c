@@ -276,7 +276,12 @@ int sithSound_LoadFileData(sithSound *sound)
         if ( fd )
         {
             pSithHS->fseek(fd, sound->seekOffset, 0);
+            // Added: on TWL the ARM9 mixes from source PCM, so it can live in
+            // extram (the fill below goes through the word-safe read bounce);
+            // only the ARM7-visible mix output buffer needs HEAP_AUDIO.
+            { TWL_EXTRAM_SUGGEST(pSithHS);
             buf = stdSound_BufferSetData(sound->dsoundBuffer2, sound->bufferBytes, &bufferMaxSize);
+            TWL_EXTRAM_RESTORE(pSithHS); }
             if ( buf )
             {
                 int numRead = sithSound_ReadIntoBuffer(fd, buf, bufferMaxSize); // Added: word-safe for VRAM-resident PCM
@@ -334,7 +339,9 @@ int sithSound_ReadDataFromFd(int fd, sithSound *sound)
     void *data;
 
     int32_t bufferBytes;
+    { TWL_EXTRAM_SUGGEST(pSithHS); // Added: see sithSound_LoadFileData
     data = stdSound_BufferSetData(sound->dsoundBuffer2, sound->bufferBytes, &bufferBytes);
+    TWL_EXTRAM_RESTORE(pSithHS); }
     if ( data )
     {
         int amt = sithSound_ReadIntoBuffer(fd, data, bufferBytes); // Added: word-safe for VRAM-resident PCM

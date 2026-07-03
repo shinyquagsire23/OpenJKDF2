@@ -24,13 +24,22 @@ int sithAnimClass_Load(sithWorld *world, int a2)
     num_animclasses = _atoi(stdConffile_entry.args[2].value);
     if ( !num_animclasses )
         return 1;
+#ifdef TARGET_RETRO_HOMEBREW
+    // Added: animclass data is all 32-bit fields, written only at parse time and
+    // read when animations start -- cold and word-safe, so it can live in
+    // word-addressable-only memory (DC VRAM arena / NDS slot-2 RAM).
+    int prevSuggest = pSithHS->suggestHeap(HEAP_WORD_ADDRESSABLE);
+#endif
     animclasses = (sithAnimclass *)SITH_ALLOC(sizeof(sithAnimclass) * num_animclasses);
+#ifdef TARGET_RETRO_HOMEBREW
+    pSithHS->suggestHeap(prevSuggest);
+#endif
     world->animclasses = animclasses;
     if ( !animclasses )
         return 0;
     world->numAnimClasses = num_animclasses;
     world->numAnimClassesLoaded = 0;
-    _memset(animclasses, 0, sizeof(sithAnimclass) * num_animclasses);
+    stdPlatform_Memzero32(animclasses, sizeof(sithAnimclass) * num_animclasses); // Added: word-safe
     while ( stdConffile_ReadArgs() )
     {
         if ( !_strcmp(stdConffile_entry.args[0].value, "end") )
@@ -40,7 +49,7 @@ int sithAnimClass_Load(sithWorld *world, int a2)
             if ( sithWorld_pLoading->numAnimClassesLoaded != sithWorld_pLoading->numAnimClasses )
             {
                 animclass = &sithWorld_pLoading->animclasses[sithWorld_pLoading->numAnimClassesLoaded];
-                _memset(animclass, 0, sizeof(sithAnimclass));
+                stdPlatform_Memzero32(animclass, sizeof(sithAnimclass)); // Added: word-safe
                 const char* name = stdConffile_entry.args[1].value;
 #ifdef SITH_DEBUG_STRUCT_NAMES
                 stdString_SafeStrCopy(animclass->name, name, 32);
@@ -83,7 +92,7 @@ sithAnimclass* sithAnimClass_LoadEntry(char *a1)
         v3 = sithWorld_pLoading->numAnimClassesLoaded;
         if ( v3 == sithWorld_pLoading->numAnimClasses
           || (v4 = &sithWorld_pLoading->animclasses[v3],
-              _memset(v4, 0, sizeof(sithAnimclass)),
+              stdPlatform_Memzero32(v4, sizeof(sithAnimclass)), // Added: word-safe
 #ifdef SITH_DEBUG_STRUCT_NAMES
               stdString_SafeStrCopy(v4->name, a1, 32),
 #endif
@@ -131,7 +140,7 @@ int sithAnimClass_LoadPupEntry(sithAnimclass *animclass, char *fpath)
     if (!stdConffile_OpenRead(fpath))
         return 0;
 
-    _memset(animclass->bodypart_to_joint, 0xFFu, sizeof(animclass->bodypart_to_joint));
+    stdPlatform_Memset32(animclass->bodypart_to_joint, 0xFFu, sizeof(animclass->bodypart_to_joint)); // Added: word-safe
     while ( stdConffile_ReadArgs() )
     {
         if ( !stdConffile_entry.numArgs )
@@ -140,7 +149,7 @@ int sithAnimClass_LoadPupEntry(sithAnimclass *animclass, char *fpath)
         {
             mode = _atoi(stdConffile_entry.args[0].value);
             if ( stdConffile_entry.numArgs > 1u && !_strcmp(stdConffile_entry.args[1].key, "basedon") )
-                _memcpy(&animclass->modes[mode], &animclass->modes[_atoi(stdConffile_entry.args[1].value)], sizeof(animclass->modes[mode]));
+                stdPlatform_Memcpy32(&animclass->modes[mode], &animclass->modes[_atoi(stdConffile_entry.args[1].value)], sizeof(animclass->modes[mode])); // Added: word-safe
         }
         else if ( !_strcmp(stdConffile_entry.args[0].value, "joints") )
         {
@@ -225,13 +234,19 @@ int sithAnimClass_New(sithWorld *world, int num)
 {
     sithAnimclass *animclasses;
 
+#ifdef TARGET_RETRO_HOMEBREW
+    int prevSuggest = pSithHS->suggestHeap(HEAP_WORD_ADDRESSABLE); // Added: see sithAnimClass_Load
+#endif
     animclasses = (sithAnimclass *)SITH_ALLOC(sizeof(sithAnimclass) * num);
+#ifdef TARGET_RETRO_HOMEBREW
+    pSithHS->suggestHeap(prevSuggest);
+#endif
     world->animclasses = animclasses;
     if ( !animclasses )
         return 0;
     world->numAnimClasses = num;
     world->numAnimClassesLoaded = 0;
-    _memset(animclasses, 0, sizeof(sithAnimclass) * num);
+    stdPlatform_Memzero32(animclasses, sizeof(sithAnimclass) * num); // Added: word-safe
     return 1;
 }
 

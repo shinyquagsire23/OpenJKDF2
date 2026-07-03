@@ -356,10 +356,13 @@ void jkGuiTitle_ShowLoading(char *a1, wchar_t *a2)
     jkGuiRend_gui_sets_handler_framebufs(&jkGuiTitle_menuLoad);
 }
 
+int jkGuiTitle_bSkipLoadingWait = 0; // Added: autoboot skips the mission-text wait
+
 void jkGuiTitle_LoadingFinalize()
 {
 #ifdef QOL_IMPROVEMENTS
-    int shouldSkip = jkPlayer_bFastMissionText || sithNet_isMulti || !sithWorld_pCurrentWorld;
+    int shouldSkip = jkPlayer_bFastMissionText || sithNet_isMulti || !sithWorld_pCurrentWorld
+                  || jkGuiTitle_bSkipLoadingWait; // Added
     if ( jkGuiTitle_whichLoading != 1)
     {
         int selected = -1;

@@ -44,7 +44,11 @@
 #define sithAI_CanDetectSightThing_ADDR (0x004EC140)
 
 extern int sithAI_bOpened;
+#ifdef TARGET_TWL
+extern sithActor* sithAI_actors; // Added: heap'd (extram); see sithAI.c
+#else
 extern sithActor sithAI_actors[SITHAI_MAX_ACTORS];
+#endif
 extern int sithAI_inittedActors;
 extern sithAIAlign sithAI_aAlignments[10];
 extern flex_t sithAI_FLOAT_005a79d8;

@@ -29,11 +29,13 @@ int sithAIClass_New(sithWorld *world, int a2)
 {
     intptr_t result; // eax
 
+    { TWL_EXTRAM_SUGGEST(pSithHS); // Added: parsed once, word-width fields (fpath is debug-only)
     result = (intptr_t)SITH_ALLOC(sizeof(sithAIClass) * a2);
+    TWL_EXTRAM_RESTORE(pSithHS); }
     world->aiclasses = (sithAIClass *)result;
     if (result)
     {
-        _memset((void *)result, 0, sizeof(sithAIClass) * a2);
+        stdPlatform_Memzero32((void *)result, sizeof(sithAIClass) * a2); // Added: word-safe
         world->numAIClasses = a2;
         world->numAIClassesLoaded = 0;
         result = 1;
@@ -62,7 +64,9 @@ int sithAIClass_ParseSection(sithWorld *world, int a2)
     if (!numAIClasses) {
         return 1;
     }
+    { TWL_EXTRAM_SUGGEST(pSithHS); // Added: parsed once, word-width fields (fpath is debug-only)
     aiclasses = (sithAIClass *)SITH_ALLOC(sizeof(sithAIClass) * numAIClasses);
+    TWL_EXTRAM_RESTORE(pSithHS); }
     world->aiclasses = aiclasses;
     if (!aiclasses)
     {
@@ -72,7 +76,7 @@ int sithAIClass_ParseSection(sithWorld *world, int a2)
         return 0;
     }
     
-    _memset(aiclasses, 0, sizeof(sithAIClass) * numAIClasses);
+    stdPlatform_Memzero32(aiclasses, sizeof(sithAIClass) * numAIClasses); // Added: word-safe
     world->numAIClassesLoaded = 0;
     world->numAIClasses = numAIClasses;
     if ( stdConffile_ReadArgs() )
@@ -115,7 +119,7 @@ sithAIClass* sithAIClass_Load(char *fpath)
 
     aiclass = &world->aiclasses[numLoaded];
 
-    _memset(aiclass, 0, sizeof(sithAIClass));
+    stdPlatform_Memzero32(aiclass, sizeof(sithAIClass)); // Added: word-safe
 
 #ifdef SITH_DEBUG_STRUCT_NAMES
     stdString_SafeStrCopy(aiclass->fpath, fpath, 32);

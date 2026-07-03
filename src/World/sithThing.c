@@ -663,8 +663,10 @@ int sithThing_DoesRdThingInit(sithThing* pThing)
     int32_t idx = pThing->thingIdx;
     int32_t sig = pThing->signature;
 
-    _memset(pThing, 0, sizeof(sithThing));
-    _memcpy(&pThing->lookOrientation, &rdroid_identMatrix34, sizeof(pThing->lookOrientation));
+    // Added: word-safe -- this also initializes template entries, which may live
+    // in word-addressable-only memory (DC VRAM arena / NDS slot-2 RAM)
+    stdPlatform_Memzero32(pThing, sizeof(sithThing));
+    stdPlatform_Memcpy32(&pThing->lookOrientation, &rdroid_identMatrix34, sizeof(pThing->lookOrientation));
 
     int out = rdThing_NewEntry(&pThing->rdthing, pThing);
     pThing->thingIdx = idx;
@@ -1019,7 +1021,7 @@ sithThing* sithThing_InstantiateFromTemplate(sithThing *pThing, sithThing *pTemp
     v12 = pThing->rdthing.parentSithThing;
     if ( pTemplateThing )
     {
-        _memcpy(pThing, pTemplateThing, sizeof(sithThing));
+        stdPlatform_Memcpy32(pThing, pTemplateThing, sizeof(sithThing)); // Added: word-safe (things/templates may be word-addressable-only)
         if ( pThing->rdthing.type == RD_THINGTYPE_MODEL )
         {
             rdThing_SetModel3(&pThing->rdthing, pThing->rdthing.model3);
@@ -1061,7 +1063,7 @@ sithThing* sithThing_Create(sithThing *pTemplateThing, const rdVector3 *position
 
     sithThing_InstantiateFromTemplate(pThingRet, pTemplateThing);
     pThingRet->position = *position;
-    _memcpy(&pThingRet->lookOrientation, lookOrientation, sizeof(pThingRet->lookOrientation));
+    stdPlatform_Memcpy32(&pThingRet->lookOrientation, lookOrientation, sizeof(pThingRet->lookOrientation)); // Added: word-safe (things may be in extram)
     rdVector_Zero3(&pThingRet->lookOrientation.scale);
     rdMatrix_PreMultiply34(&pThingRet->lookOrientation, &pTemplateThing->lookOrientation);
     sithThing_EnterSector(pThingRet, sector, 1, 0);
@@ -1363,7 +1365,7 @@ int sithThing_DetachThing(sithThing* pThing)
         }
         result = 0;
 
-        _memset(v2, 0, sizeof(uint32_t) + sizeof(rdVector3) + sizeof(sithSurfaceInfo*) + sizeof(flex_t) + sizeof(rdVector3) + sizeof(void*)); // TODO
+        stdPlatform_Memzero32(v2, sizeof(uint32_t) + sizeof(rdVector3) + sizeof(sithSurfaceInfo*) + sizeof(flex_t) + sizeof(rdVector3) + sizeof(void*)); // TODO // Added: word-safe
         return result;
     }
     v3 = pThing->attachedThing;
@@ -1396,7 +1398,7 @@ LABEL_8:
             result = 0;
             pThing->parentThing = 0;
             pThing->childThing = 0;
-            _memset(v2, 0, sizeof(uint32_t) + sizeof(rdVector3) + sizeof(sithSurfaceInfo*) + sizeof(flex_t) + sizeof(rdVector3) + sizeof(void*));// TODO
+            stdPlatform_Memzero32(v2, sizeof(uint32_t) + sizeof(rdVector3) + sizeof(sithSurfaceInfo*) + sizeof(flex_t) + sizeof(rdVector3) + sizeof(void*));// TODO // Added: word-safe
             return result;
         }
     }
@@ -1409,7 +1411,7 @@ LABEL_8:
     result = 0;
     pThing->parentThing = 0;
     pThing->childThing = 0;
-    _memset(v2, 0, sizeof(uint32_t) + sizeof(rdVector3) + sizeof(sithSurfaceInfo*) + sizeof(flex_t) + sizeof(rdVector3) + sizeof(void*));// TODO
+    stdPlatform_Memzero32(v2, sizeof(uint32_t) + sizeof(rdVector3) + sizeof(sithSurfaceInfo*) + sizeof(flex_t) + sizeof(rdVector3) + sizeof(void*));// TODO // Added: word-safe
     return result;
 }
 
@@ -1490,7 +1492,9 @@ int sithThing_Load(sithWorld *pWorld, int a2)
     if ( _strcmp(stdConffile_entry.args[1].value, "things") )
         return 0;
     v10 = _atoi(stdConffile_entry.args[2].value);
+    { TWL_EXTRAM_SUGGEST(pSithHS); // Added: word-safe struct (audited); slow-but-loads on NDS
     paThings = (sithThing *)SITH_ALLOC(sizeof(sithThing) * v10);
+    TWL_EXTRAM_RESTORE(pSithHS); }
 
     sithWorld_pCurrentWorld->things = paThings;
     if ( !paThings )

@@ -87,7 +87,7 @@ void sithCogExec_Exec(sithCog *cog_ctx)
 
             case COG_OPCODE_PUSHVECTOR:
 #ifndef COG_COMPRESS_VAR_SIZE
-                _memcpy(val.data, &cogscript->script_program[cog_ctx->execPos], sizeof(cog_flex_t) * 3);
+                stdPlatform_Memcpy32(val.data, &cogscript->script_program[cog_ctx->execPos], sizeof(cog_flex_t) * 3); // Added: word ops (bytecode may be in extram)
                 val.type = COG_VARTYPE_VECTOR;
                 sithCogExec_PushVar(cog_ctx, &val);
 #else
@@ -372,7 +372,7 @@ int32_t sithCogExec_PopValue(sithCog *ctx, sithCogStackvar *stackVar)
             if (d0) {
                 cog_flex_t* ptr = (cog_flex_t*)SITH_ALLOC(sizeof(cog_flex_t)*3);
                 if (ptr) {
-                    _memcpy(ptr, (void*)d0, sizeof(cog_flex_t)*3);
+                    stdPlatform_Memcpy32(ptr, (void*)d0, sizeof(cog_flex_t)*3); // Added: word ops (symbol data may be in extram)
                 }
                 d0 = (intptr_t)ptr;
             }
@@ -1063,12 +1063,16 @@ void sithCogExec_PushVar(sithCog *ctx, sithCogStackvar *val)
 #ifdef COG_DYNAMIC_STACKS
     if (ctx->stackPos >= ctx->stackSize) {
         sithCogExec_GrowStack(ctx, ctx->stackSize+COG_DYNAMIC_STACKS_INCREMENT);
+        if (ctx->stackPos >= ctx->stackSize)
+            return; // Added: grow failed -- drop the push rather than overflow
     }
 #endif
 
     if ( ctx->stackPos == SITHCOGVM_MAX_STACKSIZE )
     {
-        memmove(ctx->stack, &ctx->stack[1], sizeof(ctx->stack) * (SITHCOGVM_MAX_STACKSIZE-1));
+        // Added: word-safe shift (stack may be word-addressable-only); dst < src,
+        // so a forward copy preserves the memmove semantics.
+        stdPlatform_Memcpy32(ctx->stack, &ctx->stack[1], sizeof(ctx->stack) * (SITHCOGVM_MAX_STACKSIZE-1));
         --ctx->stackPos;
     }
     
@@ -1321,7 +1325,28 @@ void sithCogExec_GrowStack(sithCog* pCtx, uint32_t sz) {
     if (!pCtx) return;
     if (pCtx->stackSize >= sz) return;
 
-    pCtx->stack = (sithCogStackvar*)SITH_REALLOC(pCtx->stack, sz*sizeof(*pCtx->stack));
+#ifdef TARGET_TWL
+    // Added: stacks live in extram on TWL. TWL realloc can't migrate heaps (and
+    // dlmalloc's in-mspace move is a byte copy), so grow by alloc+wordcopy+free.
+    sithCogStackvar* pNew;
+    { TWL_EXTRAM_SUGGEST(pSithHS);
+    pNew = (sithCogStackvar*)SITH_ALLOC(sz * sizeof(*pCtx->stack));
+    TWL_EXTRAM_RESTORE(pSithHS); }
+    if (!pNew)
+        return; // Added: keep the old stack; the push site drops the value instead
+    if (pCtx->stack) {
+        stdPlatform_Memcpy32(pNew, pCtx->stack, pCtx->stackSize * sizeof(*pCtx->stack));
+        SITH_FREE(pCtx->stack);
+    }
+    pCtx->stack = pNew;
+#else
+    // Added: a failed grow used to overwrite the stack pointer with NULL,
+    // leaking the stack and silently killing the cog. Keep the old stack.
+    sithCogStackvar* pNew = (sithCogStackvar*)SITH_REALLOC(pCtx->stack, sz*sizeof(*pCtx->stack));
+    if (!pNew)
+        return;
+    pCtx->stack = pNew;
+#endif
     pCtx->stackSize = sz;
 }
 #endif

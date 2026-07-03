@@ -238,7 +238,9 @@ rdVector2* sithMaterial_New(sithWorld *world, int num)
     // Added: needed for JKE?
     num *= 2;
 
+    { TWL_EXTRAM_SUGGEST(pSithHS); // Added: all writers into this array are word-safe (see rdMaterial.c)
     v2 = (rdMaterial *)SITH_ALLOC(sizeof(rdMaterial) * num);
+    TWL_EXTRAM_RESTORE(pSithHS); }
     world->materials = v2;
     if ( !v2 )
         return 0;

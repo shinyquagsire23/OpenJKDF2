@@ -764,7 +764,15 @@ void std3D_UnloadAllTextures()
     std3D_numCachedTextures = 0;
 }
 
-void std3D_PurgeEntireTextureCache() { std3D_UnloadAllTextures(); }
+void std3D_PurgeEntireTextureCache()
+{
+    std3D_UnloadAllTextures();
+    // Added: force a palette-bank re-upload on the next texture cache. The bank
+    // cache keys on the colormap POINTER, and a reloaded level often gets the
+    // same allocation address -- which kept stale (possibly garbage) banks and
+    // made the pink-palette bug sticky across same-map reloads.
+    std3D_loadedColormap = NULL;
+}
 
 // --- LRU cache list (from OpenJones3D / the original std3D) -------------------
 void std3D_RemoveTextureFromCacheList(rdDDrawSurface* pCacheTexture)

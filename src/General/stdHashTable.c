@@ -8,6 +8,49 @@
 #include <math.h>
 #include <stdlib.h>
 
+#ifdef STDHASHTABLE_NODE_POOL
+// Added: slab-pooled link nodes (see engine_config.h). Nodes are recycled via a
+// freelist threaded through ->next; slabs are never returned (population is
+// steady-state across level loads). All node writes are word-width.
+#define STDHASHTABLE_POOL_CHUNK_NODES 340 // ~4KB slabs
+typedef struct stdHashPoolChunk { struct stdHashPoolChunk* pNext; } stdHashPoolChunk;
+static stdHashPoolChunk* stdHashTable_pPoolChunks = NULL;
+static tHashLink* stdHashTable_pFreeNodes = NULL;
+
+static tHashLink* stdHashTable_NodeAlloc(void)
+{
+    if (!stdHashTable_pFreeNodes)
+    {
+        stdHashPoolChunk* pChunk;
+        { TWL_EXTRAM_SUGGEST(std_pHS);
+        pChunk = (stdHashPoolChunk*)STD_ALLOC(sizeof(stdHashPoolChunk) + sizeof(tHashLink) * STDHASHTABLE_POOL_CHUNK_NODES);
+        TWL_EXTRAM_RESTORE(std_pHS); }
+        if (!pChunk)
+            return NULL;
+        pChunk->pNext = stdHashTable_pPoolChunks;
+        stdHashTable_pPoolChunks = pChunk;
+        tHashLink* aNodes = (tHashLink*)(pChunk + 1);
+        for (int i = 0; i < STDHASHTABLE_POOL_CHUNK_NODES; i++)
+        {
+            aNodes[i].next = stdHashTable_pFreeNodes;
+            stdHashTable_pFreeNodes = &aNodes[i];
+        }
+    }
+    tHashLink* pNode = stdHashTable_pFreeNodes;
+    stdHashTable_pFreeNodes = pNode->next;
+    return pNode;
+}
+
+static void stdHashTable_NodeFree(tHashLink* pNode)
+{
+    pNode->next = stdHashTable_pFreeNodes;
+    stdHashTable_pFreeNodes = pNode;
+}
+#define STDHASHTABLE_NODE_FREE(p) stdHashTable_NodeFree(p)
+#else
+#define STDHASHTABLE_NODE_FREE(p) STD_FREE(p)
+#endif
+
 #define hashmapBucketSizes_MAX (32)
 
 int hashmapBucketSizes[hashmapBucketSizes_MAX] = 
@@ -135,10 +178,12 @@ loop_escape:
     }
 
     hashtable->numBuckets = actualNumBuckets;
+    { TWL_EXTRAM_SUGGEST(std_pHS); // Added: CRC-keyed links are word-safe
     hashtable->buckets = (tHashLink *)STD_ALLOC(sizeof(tHashLink) * actualNumBuckets);
+    TWL_EXTRAM_RESTORE(std_pHS); }
     if ( hashtable->buckets )
     {
-      _memset(hashtable->buckets, 0, sizeof(tHashLink) * hashtable->numBuckets);
+      stdPlatform_Memzero32(hashtable->buckets, sizeof(tHashLink) * hashtable->numBuckets); // Added: word-safe
       hashtable->keyHashToIndex = stdHashTable_HashStringToIdx;
     }
     else {
@@ -173,7 +218,7 @@ void stdHashTable_FreeBuckets(tHashLink *a1)
         iter->next = NULL; // added
 
         //printf("Free from %p: %p\n", a1, iter);
-        STD_FREE(iter);
+        STDHASHTABLE_NODE_FREE(iter); // Added
         
         iter = next_iter;
     }
@@ -231,12 +276,20 @@ int stdHashTable_SetKeyVal(stdHashTable *hashmap, const char *key, void *value)
 
     if ( v10->key )
     {
-        new_child = (tHashLink *)STD_ALLOC(sizeof(tHashLink));
+#ifdef STDHASHTABLE_NODE_POOL
+        new_child = stdHashTable_NodeAlloc(); // Added: slab pool
+#else
+        tHashLink *new_child_alloc; // Added: see below
+        { TWL_EXTRAM_SUGGEST(std_pHS);
+        new_child_alloc = (tHashLink *)STD_ALLOC(sizeof(tHashLink));
+        TWL_EXTRAM_RESTORE(std_pHS); }
+        new_child = new_child_alloc;
+#endif
         if (!new_child)
             return 0;
         //printf("Alloc to %p: %p %s\n", v9, new_child, key);
 
-        _memset(new_child, 0, sizeof(*new_child));
+        stdPlatform_Memzero32(new_child, sizeof(*new_child)); // Added: word-safe
 #ifdef STDHASHTABLE_CRC32_KEYS
         new_child->keyCrc32 = stdCrc32(key, strlen(key));
 #else
@@ -251,7 +304,7 @@ int stdHashTable_SetKeyVal(stdHashTable *hashmap, const char *key, void *value)
     }
     else
     {
-        _memset(v9, 0, sizeof(*v9));
+        stdPlatform_Memzero32(v9, sizeof(*v9)); // Added: word-safe
 #ifdef STDHASHTABLE_CRC32_KEYS
         v9->keyCrc32 = stdCrc32(key, strlen(key));
 #else
@@ -373,7 +426,7 @@ int stdHashTable_FreeKey(stdHashTable *hashtable, const char *key)
 #else
             stdLinklist_InsertReplace(pNext, bucketTopKey);
 #endif
-            STD_FREE(pNext);
+            STDHASHTABLE_NODE_FREE(pNext); // Added
         }
         else
         {
@@ -396,7 +449,7 @@ int stdHashTable_FreeKey(stdHashTable *hashtable, const char *key)
 #else
         stdLinklist_UnlinkChild(foundKey); // Added: Moved to prevent freeing issues
 #endif
-        STD_FREE(foundKey);
+        STDHASHTABLE_NODE_FREE(foundKey); // Added
     }
     return 1;
 }
@@ -447,7 +500,7 @@ int stdHashTable_FreeKeyCrc32(stdHashTable *hashtable, uint32_t keyCrc32)
 #else
             stdLinklist_InsertReplace(pNext, bucketTopKey);
 #endif
-            STD_FREE(pNext);
+            STDHASHTABLE_NODE_FREE(pNext); // Added
         }
         else
         {
@@ -466,7 +519,7 @@ int stdHashTable_FreeKeyCrc32(stdHashTable *hashtable, uint32_t keyCrc32)
 #else
         stdLinklist_UnlinkChild(foundKey); // Added: Moved to prevent freeing issues
 #endif
-        STD_FREE(foundKey);
+        STDHASHTABLE_NODE_FREE(foundKey); // Added
     }
     return 1;
 }

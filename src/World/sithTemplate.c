@@ -27,11 +27,20 @@ void sithTemplate_Shutdown()
 
 int sithTemplate_New(sithWorld *world, unsigned int numTemplates)
 {
+#ifdef TARGET_RETRO_HOMEBREW
+    // Added: templates are parsed into a stack local and copied in word-safely,
+    // then only ever read (spawn copies FROM them; byte reads are fine) -- cold
+    // and word-safe, so they can live in word-addressable-only memory.
+    int prevSuggest = pSithHS->suggestHeap(HEAP_WORD_ADDRESSABLE);
+#endif
     world->templates = (sithThing*)SITH_ALLOC(sizeof(sithThing) * numTemplates);
+#ifdef TARGET_RETRO_HOMEBREW
+    pSithHS->suggestHeap(prevSuggest);
+#endif
     if (!world->templates)
         return 0;
 
-    _memset(world->templates, 0, sizeof(sithThing) * numTemplates);
+    stdPlatform_Memzero32(world->templates, sizeof(sithThing) * numTemplates); // Added: word-safe
     for (int i = 0; i < numTemplates; i++)
     {
         sithThing_DoesRdThingInit(&world->templates[i]);
@@ -196,7 +205,7 @@ sithThing* sithTemplate_CreateEntry(sithWorld *world)
 
     result = &world->templates[world->numTemplatesLoaded++];
     tmp.thingIdx = result->thingIdx;
-    _memcpy(result, &tmp, sizeof(sithThing));
+    stdPlatform_Memcpy32(result, &tmp, sizeof(sithThing)); // Added: word-safe (array may be word-addressable-only)
 #ifdef SITH_DEBUG_STRUCT_NAMES
     // The copies of names are load-bearing, SetKeyVal stores a reference
     stdHashTable_SetKeyVal(sithTemplate_hashmap, result->template_name, result);

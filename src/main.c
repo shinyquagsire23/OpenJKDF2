@@ -324,6 +324,8 @@ extern intptr_t openjkdf2_mem_alt_mspace_start;
 extern intptr_t openjkdf2_mem_alt_mspace_end;
 extern intptr_t openjkdf2_mem_main_mspace_start;
 extern intptr_t openjkdf2_mem_main_mspace_end;
+
+extern int openjkdf2_mem_alt_mspace_wordonly;
 #ifdef __cplusplus
 extern "C"
 {
@@ -361,7 +363,21 @@ int main(int argc, char** argv)
                                       "-episode", "JK1", "-map", DC_AUTOBOOT_MAP };
     argc = 7;
     argv = dcAutobootArgv;
+    {
+        extern int jkGuiTitle_bSkipLoadingWait; // Added: don't wait for input at the load screen
+        jkGuiTitle_bSkipLoadingWait = 1;
+    }
 #endif
+#endif
+
+#if defined(TARGET_TWL) && defined(TWL_AUTOBOOT_MAP)
+    // Added: NDS/DSi twin of DC_AUTOBOOT_MAP (TWL_AUTOBOOT_MAP env at build time)
+    static char* twlAutobootArgv[] = { "openjkdf2", "-autostart", "-sp",
+                                       "-episode", "JK1", "-map", TWL_AUTOBOOT_MAP };
+    argc = 7;
+    argv = twlAutobootArgv;
+    extern int jkGuiTitle_bSkipLoadingWait; // Added: don't wait for input at the load screen
+    jkGuiTitle_bSkipLoadingWait = 1;
 #endif
 #ifdef ARCH_WASM
     EM_ASM(
@@ -482,7 +498,7 @@ int main(int argc, char** argv)
 #endif
 
     // TODO: DS mode slot2 can't r/w u8s
-    if (isDSiMode() && peripheralSlot2Init(SLOT2_PERIPHERAL_EXTRAM)) {
+    if (peripheralSlot2Init(SLOT2_PERIPHERAL_EXTRAM)) {
         peripheralSlot2Open(SLOT2_PERIPHERAL_EXTRAM);
         peripheralSlot2EnableCache(true);
 
@@ -491,14 +507,15 @@ int main(int argc, char** argv)
         openjkdf2_mem_alt_mspace_end = openjkdf2_mem_alt_mspace_start + alt_sz;        
 
         openjkdf2_mem_alt_mspace = create_mspace_with_base((void*)openjkdf2_mem_alt_mspace_start, alt_sz, 0);
+        openjkdf2_mem_alt_mspace_wordonly = !isDSiMode();
 
-        printf("Added extra 0x%zx bytes to heap from %s.\n", alt_sz, peripheralSlot2GetName());
+        stdPlatform_Printf("Added extra 0x%zx bytes to heap from %s.\n", alt_sz, peripheralSlot2GetName()); // Added: mirror to emu log
 
         openjkdf2_bIsLowMemoryPlatform = 1;
         openjkdf2_bIsExtraLowMemoryPlatform = 0;
     }
     else {
-        printf("No extra RAM available to use.\n");
+        stdPlatform_Printf("No extra RAM available to use.\n"); // Added: mirror to emu log
 
         openjkdf2_bIsLowMemoryPlatform = 1;
         openjkdf2_bIsExtraLowMemoryPlatform = 1;

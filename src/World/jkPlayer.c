@@ -227,7 +227,7 @@ void jkPlayer_ResetVars()
     jkPlayer_bEnableJkgm = 1;
     jkPlayer_bEnableTexturePrecache = 1;
     jkPlayer_bKeepCorpses = 0;
-    jkPlayer_bFastMissionText = 0;
+    jkPlayer_bFastMissionText = FAST_MISSION_TEXT_DEFAULT;
     jkPlayer_bUseOldPlayerPhysics = 0;
     jkPlayer_bLedgeSqueeze = 0;
     jkPlayer_hudScale = 2.0;
@@ -770,7 +770,10 @@ int jkPlayer_ReadConf(wchar_t *name)
         jkPlayer_bEnableJkgm = stdJSON_GetBool(ext_fpath, "bEnableJkgm", jkPlayer_bEnableJkgm);
         jkPlayer_bEnableTexturePrecache = stdJSON_GetBool(ext_fpath, "bEnableTexturePrecache", jkPlayer_bEnableTexturePrecache);
         jkPlayer_bKeepCorpses = stdJSON_GetBool(ext_fpath, "bKeepCorpses", jkPlayer_bKeepCorpses);
+#ifndef TARGET_RETRO_HOMEBREW
+        // Added: RETRO always uses the fast default (no input wait at load screens)
         jkPlayer_bFastMissionText = stdJSON_GetBool(ext_fpath, "bFastMissionText", jkPlayer_bFastMissionText);
+#endif
         jkPlayer_hudScale = stdJSON_GetFloat(ext_fpath, "hudScale", jkPlayer_hudScale);
         jkPlayer_crosshairLineWidth = stdJSON_GetFloat(ext_fpath, "crosshairLineWidth", jkPlayer_crosshairLineWidth);
         jkPlayer_crosshairScale = stdJSON_GetFloat(ext_fpath, "crosshairScale", jkPlayer_crosshairScale);

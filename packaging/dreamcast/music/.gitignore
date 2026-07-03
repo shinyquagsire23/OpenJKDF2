@@ -1,0 +1,5 @@
+# Soundtrack assets are user-supplied game content -- don't commit them.
+*.ogg
+*.OGG
+*.wav
+*.WAV

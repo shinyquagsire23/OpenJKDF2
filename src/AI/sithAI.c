@@ -48,7 +48,13 @@ int sithAI_dword_84DE74 = 0;
 
 // These are located in a different part of .data?
 sithAIAlign sithAI_aAlignments[10] = {0}; // MoTS Added
+#ifdef TARGET_TWL
+// Added: 84KB of .bss -> extram. Allocated once at sithAI_Startup; sithActor is
+// all word-width fields (audited) and every clear below is word-safe.
+sithActor* sithAI_actors = NULL;
+#else
 sithActor sithAI_actors[SITHAI_MAX_ACTORS] = {0};
+#endif
 int sithAI_inittedActors = 0;
 
 // This is also in a different part
@@ -65,6 +71,17 @@ int sithAI_Startup()
     int v4; // eax
     sithActor *v5; // ecx
 
+#ifdef TARGET_TWL
+    // Added: allocate the actor pool in extram (was 84KB of .bss)
+    if ( !sithAI_actors )
+    {
+        TWL_EXTRAM_SUGGEST(pSithHS);
+        sithAI_actors = (sithActor*)SITH_ALLOC(sizeof(sithActor) * SITHAI_MAX_ACTORS);
+        TWL_EXTRAM_RESTORE(pSithHS);
+        if ( !sithAI_actors )
+            return 0;
+    }
+#endif
     if ( sithAI_bInit )
         return 0;
 
@@ -81,7 +98,7 @@ int sithAI_Startup()
     sithAICmd_Startup();
 
     // TODO: what is this inline?
-    _memset(sithAI_actors, 0, sizeof(sithActor) * SITHAI_MAX_ACTORS);
+    stdPlatform_Memzero32(sithAI_actors, sizeof(sithActor) * SITHAI_MAX_ACTORS); // Added: word-safe
 
     v1 = SITHAI_MAX_ACTORS-1;
     v2 = sithAI_actorInitted;
@@ -90,7 +107,7 @@ int sithAI_Startup()
 
     do
     {
-        _memset(v3, 0, sizeof(sithActor));
+        stdPlatform_Memzero32(v3, sizeof(sithActor)); // Added: word-safe
         if ( v1 == sithAI_inittedActors )
         {
             v4 = v1 - 1;
@@ -147,7 +164,7 @@ void sithAI_Shutdown()
 
     // These are located in a different part of .data?
     _memset(sithAI_aAlignments, 0, sizeof(sithAI_aAlignments));
-    _memset(sithAI_actors, 0, sizeof(sithAI_actors));
+    stdPlatform_Memzero32(sithAI_actors, sizeof(sithActor) * SITHAI_MAX_ACTORS); // Added: word-safe (and pointer-safe sizeof)
     sithAI_inittedActors = 0;
 
     // This is also in a different part
@@ -184,7 +201,7 @@ void sithAI_Close()
     
     // TODO: what is this inline?
     v0 = sithAI_inittedActors;
-    _memset(sithAI_actors, 0, sizeof(sithActor) * SITHAI_MAX_ACTORS);
+    stdPlatform_Memzero32(sithAI_actors, sizeof(sithActor) * SITHAI_MAX_ACTORS); // Added: word-safe
 
     v1 = SITHAI_MAX_ACTORS-1;
     v2 = sithAI_actorInitted;
@@ -193,7 +210,7 @@ void sithAI_Close()
 
     do
     {
-        _memset(v3, 0, sizeof(sithActor));
+        stdPlatform_Memzero32(v3, sizeof(sithActor)); // Added: word-safe
         if ( v1 == v0 )
         {
             v4 = v1 - 1;
@@ -290,7 +307,7 @@ void sithAI_FreeEntry(sithThing *thing)
         sithAI_actors[v2].paFrames = NULL;
     }
 
-    _memset(&sithAI_actors[v2], 0, sizeof(sithActor));
+    stdPlatform_Memzero32(&sithAI_actors[v2], sizeof(sithActor)); // Added: word-safe
     if (v2 == sithAI_inittedActors)
     {
         v3 = v2 - 1;

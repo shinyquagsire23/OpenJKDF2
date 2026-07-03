@@ -87,7 +87,7 @@ rdModel3* sithModel_LoadEntry(const char *model_3do_fname, int unk)
 
     model = (rdModel3 *)stdHashTable_GetKeyVal(sithModel_hashtable, model_3do_fname);
     if ( model ) {
-        stdPlatform_Printf("OpenJKDF2: %s: Load %s from static jkl.\n", __func__, model_3do_fname); // Added
+        //stdPlatform_Printf("OpenJKDF2: %s: Load %s from static jkl.\n", __func__, model_3do_fname); // Added
         return model;
     }
 
@@ -101,7 +101,7 @@ rdModel3* sithModel_LoadEntry(const char *model_3do_fname, int unk)
     if ( !rdModel3_Load(model_fpath, model) )
     {
         if ( !unk ) {
-            stdPlatform_Printf("OpenJKDF2: %s: rdModel3_Load failed, loading dflt.3do!\n", __func__); // Added
+            stdPlatform_Printf("OpenJKDF2: %s: rdModel3_Load failed for `%s`, loading dflt.3do!\n", __func__, model_3do_fname); // Added
             return sithModel_LoadEntry("dflt.3do", 1);
         }
         return 0;

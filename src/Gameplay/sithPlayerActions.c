@@ -1,4 +1,5 @@
 #include "sithPlayerActions.h"
+#include "stdPlatform.h" // Added
 
 #include "World/sithThing.h"
 #include "World/sithSector.h"
@@ -163,7 +164,7 @@ void sithPlayerActions_WarpToCheckpoint(sithThing *thing, int idx)
     {
         if ( (jkPlayer_playerInfos[idx].flags & 2) != 0 )
         {
-            _memcpy(&thing->lookOrientation, &jkPlayer_playerInfos[idx].spawnPosOrient, sizeof(thing->lookOrientation));
+            stdPlatform_Memcpy32(&thing->lookOrientation, &jkPlayer_playerInfos[idx].spawnPosOrient, sizeof(thing->lookOrientation)); // Added: word-safe (things may be in extram)
             thing->position = thing->lookOrientation.scale;
             rdVector_Zero3(&thing->lookOrientation.scale);
             sithThing_MoveToSector(thing, jkPlayer_playerInfos[idx].pSpawnSector, 0);

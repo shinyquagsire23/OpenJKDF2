@@ -12,19 +12,14 @@ char* stdString_FastCopy(const char *str)
     char *v5; // edi
     const char *v6; // esi
 
+    { TWL_EXTRAM_SUGGEST(std_pHS); // Added: strings are read-only after creation
     result = (char *)STD_ALLOC(_strlen(str) + 1);
+    TWL_EXTRAM_RESTORE(std_pHS); }
     v2 = result;
     if ( result )
     {
-        v3 = _strlen(str) + 1;
-        v4 = v3;
-        v3 >>= 2;
-        _memcpy(v2, str, 4 * v3);
-        v6 = &str[4 * v3];
-        v5 = &v2[4 * v3];
-        v3 = (v3 & 0xFFFFFF00) | v4 & 0xFF;
-        result = v2;
-        _memcpy(v5, v6, v3 & 3);
+        // Added: word-safe copy (destination may be word-addressable-only)
+        stdPlatform_Memcpy32(v2, str, _strlen(str) + 1);
     }
     return result;
 }
@@ -34,7 +29,10 @@ wchar_t* stdString_FastWCopy(const wchar_t *str)
 {
     if (!str) return NULL;
 
-    wchar_t* result = (wchar_t*)STD_ALLOC((_wcslen(str) + 1)* sizeof(wchar_t));
+    wchar_t* result;
+    { TWL_EXTRAM_SUGGEST(std_pHS); // Added: wchar stores are 16-bit -> word-safe
+    result = (wchar_t*)STD_ALLOC((_wcslen(str) + 1)* sizeof(wchar_t));
+    TWL_EXTRAM_RESTORE(std_pHS); }
     stdString_SafeWStrCopy(result, str, _wcslen(str)+1);
     return result;
 }
@@ -248,7 +246,9 @@ wchar_t* stdString_CstrCopy(const char *a1)
     signed int v4; // ecx
     uint8_t v5; // dl
 
+    { TWL_EXTRAM_SUGGEST(std_pHS); // Added: fill loop below stores 16-bit wchars
     v1 = (wchar_t *)STD_ALLOC(sizeof(wchar_t) * (_strlen(a1) + 1));
+    TWL_EXTRAM_RESTORE(std_pHS); }
     v2 = 0;
     v3 = v1;
     v4 = _strlen(a1);
@@ -276,7 +276,9 @@ char* stdString_WcharCopy(wchar_t *a1)
     char *i; // edx
 
     v1 = _wcslen(a1);
+    { TWL_EXTRAM_SUGGEST(std_pHS); // Added: filled via 16-bit RMW below
     v2 = (char *)STD_ALLOC(v1 + 1);
+    TWL_EXTRAM_RESTORE(std_pHS); }
     v3 = _wcslen(a1);
     v4 = 0;
     v5 = a1;
@@ -284,13 +286,13 @@ char* stdString_WcharCopy(wchar_t *a1)
     {
         if ( !*v5 )
             break;
-        *i = *v5 <= 0xFFu ? *(char *)v5 : '?';
+        stdPlatform_WriteByte16(i, *v5 <= 0xFFu ? (uint8_t)*v5 : '?'); // Added: word-safe byte store
         ++v5;
         ++i;
     }
     if ( v4 < v3 )
-        *i = 0;
-    v2[_wcslen(a1)] = 0;
+        stdPlatform_WriteByte16(i, 0); // Added: word-safe
+    stdPlatform_WriteByte16(&v2[_wcslen(a1)], 0); // Added: word-safe
     return v2;
 }
 

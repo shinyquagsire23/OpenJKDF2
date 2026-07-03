@@ -89,7 +89,11 @@ int sithSurface_Load(sithWorld *world)
     }
     if ( numAdjoins )
     {
-#ifdef STDPLATFORM_HEAP_SUGGESTIONS
+#ifdef TARGET_TWL
+        // Added: was HEAP_FAST -- adjoins are ~100KB on big maps and never fit
+        // NWRAM; all fields/writes are word-width (audited), so extram instead.
+        int prevSuggest = pSithHS->suggestHeap(HEAP_WORD_ADDRESSABLE);
+#elif defined(STDPLATFORM_HEAP_SUGGESTIONS)
         int prevSuggest = pSithHS->suggestHeap(HEAP_FAST);
 #endif
         allocSize = sizeof(sithAdjoin) * numAdjoins;
@@ -107,7 +111,7 @@ int sithSurface_Load(sithWorld *world)
                 numAdjoins);
             return 0;
         }
-        _memset(adjoins, 0, allocSize);
+        stdPlatform_Memzero32(adjoins, allocSize); // Added: word-safe
         world->numAdjoins = numAdjoins;
         world->numAdjoinsLoaded = 0;
     }
@@ -285,7 +289,9 @@ int sithSurface_Load(sithWorld *world)
               || (face->material 
                   && face->geometryMode 
                   && (face->type & 2) == 0 
-                  && (v66 && ((v66->header.texture_type & 8) == 0 || (v66->texture_ptr->alpha_en & 1) == 0))))
+                  && (v66 && ((v66->header.texture_type & 8) == 0 
+                      || (v66->texture_ptr && v66->texture_ptr->alpha_en & 1) == 0)))
+                     ) // Added: v66->texture_ptr check, TODO: Should this have an EnsureWhatever?
             {
                 surfaceAdjoin->flags |= SITHSURF_ADJOIN_80;
             }
@@ -464,6 +470,22 @@ int sithSurface_Load(sithWorld *world)
         if (pTrim)
             pIdxPool = pTrim;
     }
+#ifdef TARGET_TWL
+    // Added: relocate the finished pool into extram (TWL realloc cannot migrate
+    // heaps, so growth happened in sysram; one word-safe move, then the fixup
+    // below resolves offsets against the final address). Not on DC: these
+    // arrays are read per visible surface per frame and DC VRAM is uncached.
+    if (pIdxPool && poolUsed) {
+        int prevSuggest = pSithHS->suggestHeap(HEAP_WORD_ADDRESSABLE);
+        int* pMoved = (int*)SITH_ALLOC(sizeof(int) * poolUsed);
+        pSithHS->suggestHeap(prevSuggest);
+        if (pMoved) {
+            stdPlatform_Memcpy32(pMoved, pIdxPool, sizeof(int) * poolUsed);
+            SITH_FREE(pIdxPool);
+            pIdxPool = pMoved;
+        }
+    }
+#endif
     world->paSurfaceIdxPool = pIdxPool;
     for (int32_t vFix = 0; vFix < numSurfaces; vFix++)
     {
@@ -672,11 +694,14 @@ int sithSurface_AllocateAdjoins(sithWorld *world, int num)
         world->adjoins = NULL;
         return 1;
     }
-    sithAdjoin *adjoins = (sithAdjoin *)SITH_ALLOC(num * sizeof(sithAdjoin));
+    sithAdjoin *adjoins;
+    { TWL_EXTRAM_SUGGEST(pSithHS); // Added
+    adjoins = (sithAdjoin *)SITH_ALLOC(num * sizeof(sithAdjoin));
+    TWL_EXTRAM_RESTORE(pSithHS); }
     world->adjoins = adjoins;
     if ( !adjoins )
         return 0;
-    _memset(adjoins, 0, num * sizeof(sithAdjoin));
+    stdPlatform_Memzero32(adjoins, num * sizeof(sithAdjoin)); // Added: word-safe
     world->numAdjoins = num;
     world->numAdjoinsLoaded = 0;
     return 1;
