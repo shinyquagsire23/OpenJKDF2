@@ -21,7 +21,7 @@ f.seek(entrytable_offs)
 
 num_files, = struct.unpack("<L", f.read(4))
 
-for i in range(0, num_files-1):
+for i in range(0, num_files): # Added: was num_files-1, which silently dropped the last entry
     f.seek(entrytable_offs + 4 + (i * (128+8)))
     print (hex(entrytable_offs + 4 + (i * (128+8))))
 
