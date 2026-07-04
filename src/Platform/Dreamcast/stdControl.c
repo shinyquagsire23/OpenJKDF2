@@ -465,7 +465,7 @@ void stdControl_ReadControls()
     stdControl_updateHz = khz * 1000.0;
 
     // Keyboard: feed every held key through the HID-scancode -> DIK table.
-    /*if (!stdControl_bDisableKeyboard) {
+    if (!stdControl_bDisableKeyboard) {
         maple_device_t* kbd_dev = maple_enum_type(0, MAPLE_FUNC_KEYBOARD);
         if (kbd_dev) {
             kbd_state_t* kbd = kbd_get_state(kbd_dev);
@@ -476,9 +476,9 @@ void stdControl_ReadControls()
                 }
             }
         }
-    }*/
+    }
 
-    if ( !stdControl_bDisableKeyboard )
+    /*if ( !stdControl_bDisableKeyboard )
     {
         const uint8_t *state = (const uint8_t*)stdControl_aInput1;
         for (int i = 0; i < 256; i++)
@@ -491,7 +491,7 @@ void stdControl_ReadControls()
             stdControl_aDebounce[i] = 0;
         }
         // stdControl_SetKeydown(keyNum, keyVal, timestamp)
-    }
+    }*/
 
     // Controller -> joystick 0.
     maple_device_t* cont_dev = maple_enum_type(0, MAPLE_FUNC_CONTROLLER);

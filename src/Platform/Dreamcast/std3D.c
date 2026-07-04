@@ -335,14 +335,39 @@ static void std3D_SubmitMenuOverlay()
     v.x = 640.0f; v.y = 480.0f; v.z = z; v.u = u1;   v.v = v1;   pvr_prim(&v, sizeof(v));
 }
 
-// TEMP DEBUG: draw a small filled square at the platform mouse position so we can
-// see where Window_mouseX/Y actually is relative to the on-screen cursor.
-static void std3D_SubmitCursorSquare()
+// Added: draw a Windows 95 style arrow cursor at the platform mouse position.
+// The hotspot (arrow tip) sits at (Window_mouseX, Window_mouseY). It's rendered as
+// untextured black-outline/white-fill pixel runs, so no texture upload is needed.
+static void std3D_SubmitCursor()
 {
     extern int Window_mouseX, Window_mouseY;
-    const float x = (float)Window_mouseX;
-    const float y = (float)Window_mouseY;
-    const float s = 4.0f;
+
+    // Classic left-pointing arrow: 'B' = black outline, 'W' = white fill,
+    // ' ' = transparent. Tip is the top-left cell.
+    static const char* const rows[] = {
+        "B",
+        "BB",
+        "BWB",
+        "BWWB",
+        "BWWWB",
+        "BWWWWB",
+        "BWWWWWB",
+        "BWWWWWWB",
+        "BWWWWWWWB",
+        "BWWWWWWWWB",
+        "BWWWWWBBBB",
+        "BWWBWWB",
+        "BWB BWWB",
+        "BB  BWWB",
+        "B    BWWB",
+        "     BWWB",
+        "     BB",
+    };
+    const int nRows = (int)(sizeof(rows) / sizeof(rows[0]));
+
+    const float s = 1.0f;   // 1:1 pixels (authentic Win95 size, integer-aligned)
+    const float ox = (float)Window_mouseX;
+    const float oy = (float)Window_mouseY;
     const float z = 1.0e6f; // in front of the menu overlay (z=1)
 
     pvr_poly_cxt_t cxt;
@@ -356,14 +381,33 @@ static void std3D_SubmitCursorSquare()
 
     pvr_vertex_t v;
     v.oargb = 0;
-    v.argb  = 0xFFFF0000; // opaque red
     v.u = 0.0f; v.v = 0.0f;
-    v.flags = PVR_CMD_VERTEX;
-    v.x = x;     v.y = y;     v.z = z; pvr_prim(&v, sizeof(v));
-    v.x = x + s; v.y = y;     v.z = z; pvr_prim(&v, sizeof(v));
-    v.x = x;     v.y = y + s; v.z = z; pvr_prim(&v, sizeof(v));
-    v.flags = PVR_CMD_VERTEX_EOL;
-    v.x = x + s; v.y = y + s; v.z = z; pvr_prim(&v, sizeof(v));
+
+    // One header, then a run-length quad per horizontal span of same-colored cells.
+    for (int r = 0; r < nRows; r++) {
+        const char* row = rows[r];
+        for (int c = 0; row[c]; ) {
+            char ch = row[c];
+            if (ch == ' ') { c++; continue; }
+            int run = 1;
+            while (row[c + run] == ch) run++;
+
+            v.argb = (ch == 'B') ? 0xFF000000u : 0xFFFFFFFFu;
+            const float x0 = ox + (float)c * s;
+            const float y0 = oy + (float)r * s;
+            const float x1 = x0 + (float)run * s;
+            const float y1 = y0 + s;
+
+            v.flags = PVR_CMD_VERTEX;
+            v.x = x0; v.y = y0; v.z = z; pvr_prim(&v, sizeof(v));
+            v.x = x1; v.y = y0; v.z = z; pvr_prim(&v, sizeof(v));
+            v.x = x0; v.y = y1; v.z = z; pvr_prim(&v, sizeof(v));
+            v.flags = PVR_CMD_VERTEX_EOL;
+            v.x = x1; v.y = y1; v.z = z; pvr_prim(&v, sizeof(v));
+
+            c += run;
+        }
+    }
 }
 
 int std3D_EndScene()
@@ -376,7 +420,7 @@ int std3D_EndScene()
         pvr_list_begin(PVR_LIST_PT_POLY);
         std3D_SubmitMenuOverlay();
         if (!jkGame_isDDraw) {
-            std3D_SubmitCursorSquare(); // mouse position marker
+            std3D_SubmitCursor(); // Windows 95 style arrow
         }
         pvr_list_finish();
         std3D_bMenuPending = 0;

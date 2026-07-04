@@ -62,6 +62,19 @@ const char* sithGamesave_AutosaveMapName(void)
 }
 
 #ifdef TARGET_DREAMCAST
+// Added: with no SD, the level-start autosave (the death/restart buffer) is kept
+// as a single FULL save file in volatile KOS /ram. That flat ramdisk holds one
+// file fine (no subdirs), and living outside the writable tree means it's never
+// packed into the VMU snapshot and never triggers a slow VMU write on level load.
+// Returns 1 (and fills pOut with the /ram path) when saveFname is that autosave.
+static int sithGamesave_DcRamAutosavePath(const char* saveFname, char* pOut, int outSz)
+{
+    if (dcStorage_HasFilesystem() || !saveFname || _strncmp(saveFname, "_JKAUTO_", 8) != 0)
+        return 0;
+    stdString_snprintf(pOut, outSz, "/ram/%s", saveFname);
+    return 1;
+}
+
 // Added: alongside a full autosave on SD, also drop a slim inventory-only copy on
 // the VMU (named _JKAUTO_dcauto.jks) so the card always carries a resume point.
 // No-op with no SD (the primary autosave is already the slim VMU save) or no VMU.
@@ -116,6 +129,10 @@ int sithGamesave_Load(char *saveFname, int debugNextCheckpoint, int a3)
 
     stdString_WcharToChar(playerName, jkPlayer_playerShortName, 31);
     playerName[31] = 0;
+#ifdef TARGET_DREAMCAST
+    // The death/restart autosave lives in flat /ram with no SD (see helper above).
+    if (!sithGamesave_DcRamAutosavePath(saveFname, fpath, 128))
+#endif
     stdString_snprintf(
         fpath, 128, "player%c%s%c%s",
         LEC_PATH_SEPARATOR_CHR, playerName, LEC_PATH_SEPARATOR_CHR, saveFname
@@ -158,7 +175,9 @@ int sithGamesave_LoadEntry(char *fpath)
     // filename (_JKAUTO_dcauto.jks) rather than platform state, since a full SD
     // save and the slim VMU copy coexist. It's the intended format, so suppress
     // the "outdated" warning further down.
-    if (fpath && _strstr(fpath, "dcauto")) {
+    // The flat /ram death/restart autosave shares the "dcauto" name but is a FULL
+    // save, so exclude it here -- only the slim VMU copy loads inventory-only.
+    if (fpath && _strstr(fpath, "dcauto") && _strncmp(fpath, "/ram/", 5) != 0) {
         bIsBinOnly = 1;
         bIsOutdatedSave = 1;
     }
@@ -522,6 +541,12 @@ int sithGamesave_Write(char *saveFname, int a2, int a3, wchar_t *saveName)
         LEC_PATH_SEPARATOR_CHR, tmp_playerName, LEC_PATH_SEPARATOR_CHR,
         saveFname
     );
+#ifdef TARGET_DREAMCAST
+    // Redirect the death/restart autosave to a flat /ram file: full, volatile, and
+    // off the VMU (see sithGamesave_DcRamAutosavePath). No-op for other saves; the
+    // resulting path drives the full-serialize / no-VMU-flush choices in _Flush().
+    sithGamesave_DcRamAutosavePath(saveFname, PathName, 128);
+#endif
     if ( a2 || !stdConffile_OpenReadBypass(PathName) )
     {
         _memset(&sithGamesave_headerTmp, 0, sizeof(sithGamesave_headerTmp));
@@ -602,12 +627,15 @@ int sithGamesave_Flush()
         stdConffile_Write((const char*)&g_mapModeFlags, sizeof(int32_t));
         
 #ifdef TARGET_DREAMCAST
+        // The flat /ram autosave (redirected in _Write) is identified by its path.
+        int bRamAutosave = (_strncmp(sithGamesave_fpath, "/ram/", 5) == 0);
         // Added: a slim save serializes only the inventory bins, not the full
         // per-thing state -- the restart-with-inventory load consumes just
         // DSS_INVENTORY, and the tiny VMU can't hold the rest. Slim when there's
         // no SD (the only store) or when explicitly forced (the extra VMU copy
-        // written alongside a full SD save).
-        if (dcStorage_HasFilesystem() && !sithGamesave_bForceSlim)
+        // written alongside a full SD save). The /ram death/restart autosave is
+        // always full -- the flat ramdisk holds it and restart needs it.
+        if ((dcStorage_HasFilesystem() || bRamAutosave) && !sithGamesave_bForceSlim)
             sithGamesave_SerializeAllThings(4);
         else
             sithGamesave_SerializeInventoryOnly(4);
@@ -631,9 +659,10 @@ int sithGamesave_Flush()
 #ifdef TARGET_DREAMCAST
         // Added: flush to the VMU only for slim saves (the card carries just the
         // slim copy) -- and not when re-materialising a save the card already
-        // holds. Full SD writes don't touch the VMU.
+        // holds. Full SD writes don't touch the VMU, and neither does the flat
+        // /ram death/restart autosave (it lives outside the writable tree).
         {
-            int bWroteSlim = (!dcStorage_HasFilesystem() || sithGamesave_bForceSlim);
+            int bWroteSlim = (!dcStorage_HasFilesystem() || sithGamesave_bForceSlim) && !bRamAutosave;
             if (bWroteSlim && !sithGamesave_bSuppressVmuFlush)
                 dcStorage_Flush();
         }
