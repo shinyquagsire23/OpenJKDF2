@@ -162,7 +162,11 @@ int stdDisplay_SetMode(unsigned int modeIdx, const void *palette, int paged)
     //out->format.width_in_bytes = 0;
     if (!Video_menuBuffer.surface_lock_alloc)
         Video_menuBuffer.surface_lock_alloc = (char*)STD_ALLOC(Video_menuBuffer.format.texture_size_in_bytes);
-    //Video_otherBuf.surface_lock_alloc = STD_ALLOC(Video_otherBuf.format.texture_size_in_bytes);
+    // Added: the overlay buffer needs a surface too -- cutscene subtitles are
+    // drawn here and composited into the menu buffer. Without it stdFont_Draw3
+    // writes to a NULL surface and the subtitles silently never appear.
+    if (!Video_otherBuf.surface_lock_alloc)
+        Video_otherBuf.surface_lock_alloc = (char*)STD_ALLOC(Video_otherBuf.format.texture_size_in_bytes);
 
 #if 0
     glGenTextures(1, &Video_menuTexId);

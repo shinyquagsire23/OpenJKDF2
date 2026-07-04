@@ -1,5 +1,9 @@
 #include "jkPlayer.h"
 
+#ifdef TARGET_DREAMCAST
+#include "Platform/Dreamcast/dcStorage.h" // Added: persist profile writes to VMU
+#endif
+
 #include <math.h>
 #include "General/stdString.h"
 #include "General/stdFnames.h"
@@ -260,7 +264,7 @@ int jkPlayer_LoadAutosave()
     char tmp[128];
 
     jkPlayer_bLoadingSomething = 1;
-    stdString_snprintf(tmp, 128, "%s%s", "_JKAUTO_", sithWorld_pCurrentWorld->map_jkl_fname);
+    stdString_snprintf(tmp, 128, "%s%s", "_JKAUTO_", sithGamesave_AutosaveMapName()); // Added: single-slot on DC
     stdFnames_ChangeExt(tmp, "jks");
     return sithGamesave_Load(tmp, 0, 0);
 }
@@ -599,6 +603,9 @@ void jkPlayer_WriteConf(wchar_t *name)
 #endif
 
         stdConffile_CloseWrite();
+#ifdef TARGET_DREAMCAST
+        dcStorage_Flush(); // Added: persist the profile/config to VMU (no-op on SD)
+#endif
     }
 }
 

@@ -115,7 +115,13 @@ void jkGame_ScreensizeDecrease()
 
 void jkGame_SetDefaultSettings()
 {
+#ifdef TARGET_DREAMCAST
+    // Added: subtitles default on (cutscene voice audio can be unreliable, and
+    // the opening cutscene expects them). Overridden by a saved player config.
+    jkPlayer_setFullSubtitles = 1;
+#else
     jkPlayer_setFullSubtitles = 0;
+#endif
     jkPlayer_setDisableCutscenes = 0;
     jkPlayer_setRotateOverlayMap = 1;
     jkPlayer_setDrawStatus = 1;

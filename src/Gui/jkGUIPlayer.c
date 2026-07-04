@@ -278,6 +278,11 @@ void jkGuiPlayer_ShowNewPlayer(int a1)
                 jkGuiPlayer_menuNewElements[9].bIsVisible = v15 == 0;
                 jkGuiPlayer_menuNewElements[3].wstr = jkGuiPlayer_awTmp_555D28;
                 _memset(jkGuiPlayer_awTmp_555D28, 0, 16 * sizeof(wchar_t));
+#ifdef TARGET_DREAMCAST
+                // Added: pre-fill a default name so a profile can be created
+                // without the on-screen keyboard (deferred for now).
+                __wcsncpy(jkGuiPlayer_awTmp_555D28, L"Player", 6);
+#endif
                 jkGuiPlayer_menuNewElements[3].selectedTextEntry = 16;
                 jkGuiPlayer_menuNewElements[8].unistr = 0;
                 jkGuiPlayer_menuNewElements[5].selectedTextEntry = 0;

@@ -75,6 +75,13 @@ endif()
     # and the kernel/libc link line, so we only add project-level options here.
     add_compile_options(-Wall -Wno-unused-variable -Wno-parentheses -Wno-missing-braces)
     add_compile_options(-fomit-frame-pointer -ffunction-sections -fdata-sections -fshort-wchar)
+
+    # kos-ports zlib (VMU snapshot compression in dcVmu). The port builds libz.a
+    # into $KOS_PORTS/lib (linked via -lz) but leaves zlib.h in its own inst dir
+    # rather than the shared include dir, so add that path explicitly.
+    if(DEFINED ENV{KOS_PORTS})
+        include_directories($ENV{KOS_PORTS}/zlib/inst/include)
+    endif()
     # NOTE: -ffast-math removed (and unsafe-math/contraction explicitly disabled).
     # KOS injects -mfsrra/-mfsca, which GCC only emits under -funsafe-math-optimizations
     # (part of -ffast-math). Those approximate reciprocals/normals break the FP-heavy
@@ -95,6 +102,10 @@ macro(plat_link_and_package)
     # lib and the header-only JSON dependency. (GLdc -lGL will be added when the
     # GL 1.1 renderer is wired up.)
     target_link_libraries(${BIN_NAME} PRIVATE -lm)
+    # libkosfat: FAT filesystem for the SD-card writable store (dcStorage). The SD
+    # block driver (dc/sd.h) is part of the base KOS lib. -lkosutils provides the
+    # VMU package helpers, and -lz (kos-ports zlib) compresses the VMU snapshot.
+    target_link_libraries(${BIN_NAME} PRIVATE -lkosfat -lkosutils -lz)
     target_link_libraries(sith_engine PRIVATE nlohmann_json::nlohmann_json)
 
     target_link_options(${BIN_NAME} PRIVATE -Wl,-Map,openjkdf2.map)

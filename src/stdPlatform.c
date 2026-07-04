@@ -12,7 +12,10 @@
 
 #ifdef TARGET_DREAMCAST
 #include <malloc.h>                  // KOS/newlib memalign for the overflow fallback
+#include <unistd.h>                  // sbrk (current heap break, for free-RAM stats)
+#include <arch/arch.h>              // _arch_mem_top (top of system RAM)
 #include "Platform/TWL/dlmalloc.h"   // shared dlmalloc (ONLY_MSPACES) for the engine heap
+#include "Platform/Dreamcast/dcStorage.h" // Added: writable-storage path redirection
 #endif
 
 #ifdef PLATFORM_POSIX
@@ -70,6 +73,14 @@ uint64_t Linux_TimeUs()
 static stdFile_t Linux_stdFileOpen(const char* fpath, const char* mode)
 {
     char tmp[512];
+#ifdef TARGET_DREAMCAST
+    // Added: read-only assets live on the GD-ROM; the CWD is writable storage.
+    // Route relative asset paths back to the asset root (writable data is left
+    // relative to the CWD). See dcStorage.
+    char dcAsset[512];
+    if (dcStorage_ResolveAssetPath(fpath, dcAsset, sizeof(dcAsset)))
+        fpath = dcAsset;
+#endif
     size_t len = strlen(fpath);
 
     if (len > 512) {
@@ -1159,9 +1170,26 @@ void stdPlatform_PrintHeapStats()
 #endif // TARGET_TWL
 
 #ifdef TARGET_DREAMCAST
+// Added: current memory pressure. sysUsed/sysFree cover the primary system-RAM
+// pool (sysFree is the untouched sbrk headroom); vram covers the word-addressable
+// VRAM overflow arena. All values in KiB except the live allocation count.
+void DC_GetMemStats(uint32_t* pSysUsedK, uint32_t* pSysFreeK,
+                    uint32_t* pVramUsedK, uint32_t* pVramTotalK, uint32_t* pAllocs)
+{
+    if (pSysUsedK)   *pSysUsedK   = (uint32_t)(dc_trackingSys / 1024);
+    // Untouched RAM above the current heap break (newlib grows via sbrk).
+    if (pSysFreeK)   *pSysFreeK   = (uint32_t)(((uintptr_t)_arch_mem_top - (uintptr_t)sbrk(0)) / 1024);
+    if (pVramUsedK)  *pVramUsedK  = (uint32_t)(dc_trackingAllocsReal / 1024);
+    if (pVramTotalK) *pVramTotalK = (uint32_t)(dc_vram_mspace_size / 1024);
+    if (pAllocs)     *pAllocs     = (uint32_t)dc_activeAllocs;
+}
+
 void stdPlatform_PrintHeapStats()
 {
-    // TODO
+    uint32_t sysUsed, sysFree, vramUsed, vramTotal, allocs;
+    DC_GetMemStats(&sysUsed, &sysFree, &vramUsed, &vramTotal, &allocs);
+    stdPlatform_Printf("[DC heap] sys %uK used, %uK free | vram %u/%uK | %u allocs\n",
+                       sysUsed, sysFree, vramUsed, vramTotal, allocs);
 }
 #endif // TARGET_DREAMCAST
 

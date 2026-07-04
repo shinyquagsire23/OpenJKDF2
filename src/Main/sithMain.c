@@ -544,9 +544,14 @@ void sithMain_AutoSave()
     }
     else
     {
-        stdString_snprintf(v5, 128, "%s%s", "_JKAUTO_", sithWorld_pCurrentWorld->map_jkl_fname);
+        stdString_snprintf(v5, 128, "%s%s", "_JKAUTO_", sithGamesave_AutosaveMapName()); // Added: single-slot on DC
         stdFnames_ChangeExt(v5, "jks");
         int dbg_wr = sithGamesave_Write(v5, 1, 0, 0);
+#ifdef TARGET_DREAMCAST
+        // Added: on SD the write above is the full autosave; also drop a slim copy
+        // on the VMU so the card always carries a resume point.
+        sithGamesave_DcFlushSlimToVmu();
+#endif
         sithTime_Startup();
     }
 }

@@ -7,6 +7,9 @@
 #include "General/stdFileUtil.h"
 #include "Main/jkRes.h"
 #include "stdPlatform.h"
+#ifdef TARGET_DREAMCAST
+#include "Platform/Dreamcast/dcStorage.h" // Added: writable CWD + read-only assets
+#endif
 
 #ifdef TARGET_TWL
 #include <unistd.h>
@@ -1134,34 +1137,15 @@ void InstallHelper_SetCwd()
         chdir("mots/");
     }
 #elif defined(TARGET_DREAMCAST)
+    // Added: assets stay read-only on the GD-ROM (/cd/jk1 or /cd/mots); the CWD
+    // becomes writable storage (SD card, else RAM disk) so player/, saves, and
+    // config JSON can be written. dcStorage routes relative asset reads back to
+    // the asset root. See src/Platform/Dreamcast/dcStorage.c.
     char tmp[128];
     extern char openjkdf2_aOrigCwd[512];
-    if (!Main_bMotsCompat) {
-        snprintf(tmp, sizeof(tmp)-1, "%s/jk1/", openjkdf2_aOrigCwd);
-    }
-    else {
-        snprintf(tmp, sizeof(tmp)-1, "%s/mots/", openjkdf2_aOrigCwd);
-    }
-    chdir(tmp);
-
-    DIR *dir;
-    struct dirent *entry;
-
-    // Open the current directory (".")
-    dir = opendir(".");
-    if (dir == NULL) {
-        perror("Unable to read directory");
-        //return 1;
-    }
-    else {
-        // Read and print each entry in the directory
-        while ((entry = readdir(dir)) != NULL) {
-            printf("%s\n", entry->d_name);
-        }
-
-        // Close the directory stream
-        closedir(dir);
-    }
+    snprintf(tmp, sizeof(tmp) - 1, "%s/%s", openjkdf2_aOrigCwd, Main_bMotsCompat ? "mots" : "jk1");
+    tmp[sizeof(tmp) - 1] = 0;
+    dcStorage_UseWritableCwd(tmp);
 
 #elif defined(TARGET_TWL)
     char tmp[128];

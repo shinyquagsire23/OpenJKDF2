@@ -207,6 +207,33 @@ void jkGuiSaveLoad_PopulateList()
 
     jkGuiRend_DarrayNewStr(&jkGuiSaveLoad_DarrayEntries, 50, 1);
     jkGuiSaveLoad_numEntries = 0;
+
+#ifdef TARGET_DREAMCAST
+    // Added: surface the slim VMU/resume save (_JKAUTO_dcauto.jks) as an explicit
+    // "VMU Save" entry in the LOAD list -- the normal list skips _JKAUTO_
+    // autosaves, and this slim save mirrors what's on the memory card (see dcVmu /
+    // the dual-write). Load-only: you don't save over the VMU slot.
+    if (!jkGuiSaveLoad_bIsSaveMenu)
+    {
+        static const wchar_t vmuName[] = L"VMU Save";
+        sithGamesave_GetProfilePath(path, 128, "_JKAUTO_dcauto.jks");
+        stdFile_t vf = pLowLevelHS->fileOpen(path, "rb");
+        if (vf) {
+            sithGamesave_Header vmuHeader;
+            if (pLowLevelHS->fileRead(vf, &vmuHeader, sizeof(sithGamesave_Header)) == sizeof(sithGamesave_Header)
+                && (vmuHeader.version == 6 || vmuHeader.version == 0x7D6)) {
+                jkGuiSaveLoad_Entry* ve = (jkGuiSaveLoad_Entry*)JK_ALLOC(sizeof(jkGuiSaveLoad_Entry));
+                _memcpy(ve, &vmuHeader, sizeof(sithGamesave_Header));
+                stdString_SafeStrCopy(ve->fpath, "_JKAUTO_dcauto.jks", 128);
+                _strtolower(ve->fpath);
+                jkGuiRend_DarrayReallocStr(&jkGuiSaveLoad_DarrayEntries, (wchar_t*)vmuName, (intptr_t)ve);
+                ++jkGuiSaveLoad_numEntries;
+            }
+            pLowLevelHS->fileClose(vf);
+        }
+    }
+#endif
+
     sithGamesave_GetProfilePath(path, 128, jkGuiSaveLoad_byte_559C50);
     v0 = stdFileUtil_NewFind(path, 3, "jks");
     v1 = v0;

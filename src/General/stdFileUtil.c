@@ -3,6 +3,9 @@
 #include "stdPlatform.h"
 #include "General/stdFnames.h"
 #include "General/stdString.h"
+#ifdef TARGET_DREAMCAST
+#include "Platform/Dreamcast/dcStorage.h" // Added: asset-dir listing routes to /cd
+#endif
 #include "jk.h"
 
 #ifdef PLATFORM_POSIX
@@ -374,7 +377,18 @@ int stdFileUtil_FindNext(stdFileSearch *a1, stdFileSearchResult *a2)
     }
     else
     {
-#ifdef TARGET_RETRO_HOMEBREW
+#ifdef TARGET_DREAMCAST
+        // Added: asset directories (resource/, episode/, ...) live on the GD-ROM;
+        // route their listing to the asset root. Writable dirs (player/) fall
+        // through to the getcwd() path below, i.e. the writable CWD.
+        if (dcStorage_ResolveAssetPath(a1->path, tmp, 128)) {
+        }
+        else {
+            getcwd(tmp, 128-1);
+            strncat(tmp, "/", 128-1);
+            strncat(tmp, a1->path, 128-1);
+        }
+#elif defined(TARGET_RETRO_HOMEBREW)
         getcwd(tmp, 128-1);
         //strncpy(tmp, pcwd, 128-1);
         strncat(tmp, "/", 128-1);

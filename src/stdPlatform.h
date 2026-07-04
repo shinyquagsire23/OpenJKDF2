@@ -69,6 +69,9 @@ void stdPlatform_PrintHeapStats();
 
 #ifdef TARGET_DREAMCAST
 void stdPlatform_PrintHeapStats();
+// Added: current memory pressure for the on-screen debug overlay (see dcDebug).
+void DC_GetMemStats(uint32_t* pSysUsedK, uint32_t* pSysFreeK,
+                    uint32_t* pVramUsedK, uint32_t* pVramTotalK, uint32_t* pAllocs);
 #endif
 
 // Added

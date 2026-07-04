@@ -272,7 +272,7 @@ void sithPlayer_debug_loadauto(sithThing *player)
     }
     else if ( !sithGamesave_Load(sithGamesave_autosave_fname, 0, 0) )
     {
-        stdString_snprintf(v1, 128, "%s%s", "_JKAUTO_", sithWorld_pCurrentWorld->map_jkl_fname);
+        stdString_snprintf(v1, 128, "%s%s", "_JKAUTO_", sithGamesave_AutosaveMapName()); // Added: single-slot on DC
         stdFnames_ChangeExt(v1, "jks");
         sithGamesave_Load(v1, 0, 0);
     }

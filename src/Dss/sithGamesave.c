@@ -1,5 +1,9 @@
 #include "sithGamesave.h"
 
+#ifdef TARGET_DREAMCAST
+#include "Platform/Dreamcast/dcStorage.h" // Added: single-autosave slot on VMU/RAM
+#endif
+
 #include "AI/sithAI.h"
 #include "World/sithWorld.h"
 #include "World/jkPlayer.h"
@@ -33,6 +37,54 @@
 #include "General/stdString.h"
 #include "stdPlatform.h"
 #include "jk.h"
+
+#ifdef TARGET_DREAMCAST
+// Added: set while a load re-runs sithMain_AutoSave() so its re-save doesn't push
+// a redundant write to the VMU -- the card already holds what we just loaded.
+static int sithGamesave_bSuppressVmuFlush = 0;
+// Added: forces a slim (inventory-only) save even when an SD card is present, so
+// the extra copy destined for the VMU stays tiny.
+int sithGamesave_bForceSlim = 0;
+#endif
+
+// Added: the autosave slot is normally named per-map (_JKAUTO_<map>.jks). On a
+// Dreamcast without an SD card the writable store (VMU/RAM) can't hold one per
+// level, so every autosave collapses onto a single fixed name -- the real map is
+// still recovered from the save's header on load. Elsewhere (and on SD) this is
+// just the current map name, preserving the per-map autosaves.
+const char* sithGamesave_AutosaveMapName(void)
+{
+#ifdef TARGET_DREAMCAST
+    if (!dcStorage_HasFilesystem())
+        return "dcauto.jkl";
+#endif
+    return sithWorld_pCurrentWorld->map_jkl_fname;
+}
+
+#ifdef TARGET_DREAMCAST
+// Added: alongside a full autosave on SD, also drop a slim inventory-only copy on
+// the VMU (named _JKAUTO_dcauto.jks) so the card always carries a resume point.
+// No-op with no SD (the primary autosave is already the slim VMU save) or no VMU.
+void sithGamesave_DcFlushSlimToVmu(void)
+{
+    if (!dcStorage_HasFilesystem() || !dcStorage_VmuPresent())
+        return;
+    char name[128];
+    char savedFname[128];
+    // Preserve the primary autosave name -- death should still reload the full SD
+    // save, not this slim VMU copy.
+    _strncpy(savedFname, sithGamesave_autosave_fname, sizeof(savedFname) - 1);
+    savedFname[sizeof(savedFname) - 1] = 0;
+
+    stdString_snprintf(name, sizeof(name), "_JKAUTO_dcauto.jks");
+    sithGamesave_bForceSlim = 1;
+    sithGamesave_Write(name, 1, 0, 0);
+    sithGamesave_bForceSlim = 0;
+
+    _strncpy(sithGamesave_autosave_fname, savedFname, 0x7Fu);
+    sithGamesave_autosave_fname[127] = 0;
+}
+#endif
 
 void sithGamesave_Setidk(sithSaveHandler_t a1, sithSaveHandler_t a2, sithSaveHandler_t a3, sithSaveHandler_t a4, sithSaveHandler_t a5)
 {
@@ -99,6 +151,18 @@ int sithGamesave_LoadEntry(char *fpath)
 #endif
 
     int bIsOutdatedSave = 0;
+    int bIsBinOnly = 0; // Added
+#ifdef TARGET_DREAMCAST
+    // Added: slim saves omit per-thing state, so they load like an outdated save
+    // -- restore inventory and restart the level. Detected by the fixed slim
+    // filename (_JKAUTO_dcauto.jks) rather than platform state, since a full SD
+    // save and the slim VMU copy coexist. It's the intended format, so suppress
+    // the "outdated" warning further down.
+    if (fpath && _strstr(fpath, "dcauto")) {
+        bIsBinOnly = 1;
+        bIsOutdatedSave = 1;
+    }
+#endif
 
     if ( !stdConffile_OpenReadBytesBypass(fpath) )
         goto load_fail;
@@ -271,9 +335,20 @@ skip_free_things:
         jkPlayer_Startup();
         jkPlayer_InitForceBins();
         jkPlayer_InitSaber();
+#ifdef TARGET_DREAMCAST
+        // Added: this AutoSave just re-materialises what we loaded; let it rebuild
+        // the RAM-disk save but skip the (slow, flash-wearing) VMU write.
+        sithGamesave_bSuppressVmuFlush = 1;
         sithMain_AutoSave();
+        sithGamesave_bSuppressVmuFlush = 0;
+#else
+        sithMain_AutoSave();
+#endif
 
-        jkGuiDialog_ErrorDialog(jkStrings_GetUniStringWithFallback("ERROR"), L"This save is outdated and cannot be loaded fully. The level will be restarted with your existing inventory and progress.");
+        // Added: bin-only is the intended VMU save format, not a version error --
+        // don't scare the player with the "outdated save" dialog.
+        if (!bIsBinOnly)
+            jkGuiDialog_ErrorDialog(jkStrings_GetUniStringWithFallback("ERROR"), L"This save is outdated and cannot be loaded fully. The level will be restarted with your existing inventory and progress.");
 
         goto skip_dss;
     }
@@ -305,6 +380,21 @@ load_fail:
 }
 
 // MOTS altered
+// Added: minimal serializer for Dreamcast VMU (bin-only) saves. Emits just the
+// DSS_INVENTORY messages -- the only thing the restart-with-inventory load path
+// consumes -- so the save stays a few KB and fits the memory card.
+int sithGamesave_SerializeInventoryOnly(int mpFlags)
+{
+    if ( (sithComm_multiplayerFlags & mpFlags) == 0 )
+        return 0;
+    for (int v19 = 0; v19 < SITHBIN_NUMBINS; v19++)
+    {
+        if ( (sithInventory_aDescriptors[v19].flags & ITEMINFO_VALID) != 0 )
+            sithDSS_SendInventory(sithPlayer_pLocalPlayerThing, v19, 0, mpFlags);
+    }
+    return 1;
+}
+
 int sithGamesave_SerializeAllThings(int mpFlags)
 {
     uint32_t v15; // ebx
@@ -511,7 +601,19 @@ int sithGamesave_Flush()
         stdConffile_Write((const char*)&jkPlayer_setDiff, sizeof(int32_t));
         stdConffile_Write((const char*)&g_mapModeFlags, sizeof(int32_t));
         
+#ifdef TARGET_DREAMCAST
+        // Added: a slim save serializes only the inventory bins, not the full
+        // per-thing state -- the restart-with-inventory load consumes just
+        // DSS_INVENTORY, and the tiny VMU can't hold the rest. Slim when there's
+        // no SD (the only store) or when explicitly forced (the extra VMU copy
+        // written alongside a full SD save).
+        if (dcStorage_HasFilesystem() && !sithGamesave_bForceSlim)
+            sithGamesave_SerializeAllThings(4);
+        else
+            sithGamesave_SerializeInventoryOnly(4);
+#else
         sithGamesave_SerializeAllThings(4);
+#endif
         if ( sithGamesave_func1 )
             sithGamesave_func1();
         stdConffile_CloseWrite();
@@ -526,6 +628,16 @@ int sithGamesave_Flush()
             sithConsole_PrintUniStr(sithStrTable_GetUniStringWithFallback("GAME_SAVED"));
         }
         sithComm_multiplayerFlags = multiplayerFlagsSave;
+#ifdef TARGET_DREAMCAST
+        // Added: flush to the VMU only for slim saves (the card carries just the
+        // slim copy) -- and not when re-materialising a save the card already
+        // holds. Full SD writes don't touch the VMU.
+        {
+            int bWroteSlim = (!dcStorage_HasFilesystem() || sithGamesave_bForceSlim);
+            if (bWroteSlim && !sithGamesave_bSuppressVmuFlush)
+                dcStorage_Flush();
+        }
+#endif
     }
     sithGamesave_currentState = SITH_GS_NONE;
     return 0;

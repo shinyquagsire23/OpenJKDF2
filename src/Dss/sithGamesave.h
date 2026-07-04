@@ -18,6 +18,11 @@ int sithGamesave_Load(char *saveFname, int a2, int a3);
 int sithGamesave_LoadEntry(char *fpath);
 int sithGamesave_Write(char *saveFname, int a2, int a3, wchar_t *saveName);
 int sithGamesave_Flush();
+const char* sithGamesave_AutosaveMapName(void); // Added: single autosave slot on DC VMU/RAM
+#ifdef TARGET_DREAMCAST
+extern int sithGamesave_bForceSlim;             // Added: force a slim (inventory-only) save
+void sithGamesave_DcFlushSlimToVmu(void);       // Added: write the slim VMU copy alongside SD
+#endif
 
 //static int (*sithGamesave_Load)(char *a1, int a2, int a3) = (void*)sithGamesave_Load_ADDR;
 //static int (*sithGamesave_LoadEntry)(char *fpath) = (void*)sithGamesave_LoadEntry_ADDR;

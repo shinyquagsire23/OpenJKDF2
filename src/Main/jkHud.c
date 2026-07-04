@@ -1,5 +1,9 @@
 #include "jkHud.h"
 
+#ifdef TARGET_DREAMCAST
+#include "Platform/Dreamcast/dcDebug.h" // Added: 4th-port debug overlay (FPS + mem)
+#endif
+
 #include "Gameplay/sithInventory.h"
 #include "Win95/Video.h"
 #include "Win95/Windows.h"
@@ -885,16 +889,31 @@ LABEL_116:
         stdDisplay_VBufferCopy(Video_pMenuBuffer, *jkHud_pStatusRightBm->mipSurfaces, jkHud_rightBlitX, jkHud_rightBlitY, 0, 1);
     }
 
-#ifdef DEBUG_QOL_CHEATS
-    int fps = (int)sithTime_TickHz;
-    if (fps > 999)
-        fps = 999;
-    if (fps < 0)
-        fps = 0;
-    memset(tmp, 0, 32);
-    stdString_snprintf(tmp, 32, "%03d", fps);
-    stdFont_DrawAscii(Video_pMenuBuffer, jkHud_pMsgFontSft, jkHud_leftBlitX, jkHud_leftBlitY, 999, tmp, 0);
+    // Debug overlay: FPS (+ memory pressure on Dreamcast). On DC it's toggled by
+    // a controller in the 4th maple port; elsewhere by the DEBUG_QOL_CHEATS build.
+#if defined(TARGET_DREAMCAST)
+    if (dcDebug_PadInPort4())
+#elif defined(DEBUG_QOL_CHEATS)
+    if (1)
+#else
+    if (0)
 #endif
+    {
+        int fps = (int)sithTime_TickHz;
+        if (fps > 999) fps = 999;
+        if (fps < 0) fps = 0;
+        memset(tmp, 0, 32);
+        stdString_snprintf(tmp, 32, "%03d", fps);
+        stdFont_DrawAscii(Video_pMenuBuffer, jkHud_pMsgFontSft, jkHud_leftBlitX, jkHud_leftBlitY, 999, tmp, 0);
+#ifdef TARGET_DREAMCAST
+        char dbgLine[48];
+        int dbgY = 30;
+        for (int dbgI = 0; dcDebug_GetOverlayLine(dbgI, dbgLine, sizeof(dbgLine)); dbgI++) {
+            stdFont_DrawAscii(Video_pMenuBuffer, jkHud_pMsgFontSft, jkHud_leftBlitX + 10, dbgY, 999, dbgLine, 0);
+            dbgY += 14;
+        }
+#endif
+    }
 
 #ifdef SDL2_RENDER
     stdDisplay_VBufferUnlock(Video_pCanvasOverlayMap->vbuffer);
@@ -1480,16 +1499,30 @@ LABEL_116:
         jkHud_idk16 = 0;
     }
 
-#ifdef DEBUG_QOL_CHEATS
-    int fps = (int)sithTime_TickHz;
-    if (fps > 999)
-        fps = 999;
-    if (fps < 0)
-        fps = 0;
-    memset(tmp, 0, 32);
-    stdString_snprintf(tmp, 32, "%03d", fps);
-    stdFont_DrawAsciiGPU(jkHud_pMsgFontSft, jkHud_leftBlitX, jkHud_leftBlitY, 999, tmp, 1, jkPlayer_hudScale);
+    // Debug overlay (GPU HUD path): FPS (+ memory pressure on Dreamcast).
+#if defined(TARGET_DREAMCAST)
+    if (dcDebug_PadInPort4())
+#elif defined(DEBUG_QOL_CHEATS)
+    if (1)
+#else
+    if (0)
 #endif
+    {
+        int fps = (int)sithTime_TickHz;
+        if (fps > 999) fps = 999;
+        if (fps < 0) fps = 0;
+        memset(tmp, 0, 32);
+        stdString_snprintf(tmp, 32, "%03d", fps);
+        stdFont_DrawAsciiGPU(jkHud_pMsgFontSft, jkHud_leftBlitX, jkHud_leftBlitY, 999, tmp, 1, jkPlayer_hudScale);
+#ifdef TARGET_DREAMCAST
+        char dbgLine[48];
+        int dbgY = jkHud_leftBlitY + 14;
+        for (int dbgI = 0; dcDebug_GetOverlayLine(dbgI, dbgLine, sizeof(dbgLine)); dbgI++) {
+            stdFont_DrawAsciiGPU(jkHud_pMsgFontSft, jkHud_leftBlitX, dbgY, 999, dbgLine, 1, jkPlayer_hudScale);
+            dbgY += 14;
+        }
+#endif
+    }
 
 #ifdef SDL2_RENDER
     stdDisplay_VBufferUnlock(Video_pCanvasOverlayMap->vbuffer);

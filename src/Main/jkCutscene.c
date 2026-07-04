@@ -18,6 +18,9 @@
 #include "General/stdString.h"
 #include "stdPlatform.h"
 #include "Platform/std3D.h"
+#ifdef TARGET_DREAMCAST
+#include "Platform/Dreamcast/dcStorage.h" // Added: route cutscene videos to /cd
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -307,6 +310,19 @@ int jkCutscene_sub_421310(char* fpath)
         strcpy(tmp, r);
     }
     free((void*)r);
+#endif
+
+#ifdef TARGET_DREAMCAST
+    // Added: smush_from_fpath and smk_open_file both fopen() tmp directly, which
+    // skips the engine's asset routing and fcaseopen. Rewrite tmp to the
+    // case-corrected absolute asset path so cutscenes load from the GD-ROM.
+    {
+        char dcTmp[512];
+        if (dcStorage_ResolveAssetPathCased(tmp, dcTmp, sizeof(dcTmp))) {
+            _strncpy(tmp, dcTmp, sizeof(tmp));
+            tmp[sizeof(tmp) - 1] = 0;
+        }
+    }
 #endif
 
 #ifdef TARGET_RETRO_HOMEBREW

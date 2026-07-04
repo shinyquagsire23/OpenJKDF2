@@ -1533,7 +1533,7 @@ void sithCogFunction_AutoSaveGame(sithCog *ctx)
 {
     char tmp[128];
 
-    stdString_snprintf(tmp, 128, "%s%s", "_JKAUTO_", sithWorld_pCurrentWorld->map_jkl_fname);
+    stdString_snprintf(tmp, 128, "%s%s", "_JKAUTO_", sithGamesave_AutosaveMapName()); // Added: single-slot on DC
     stdFnames_ChangeExt(tmp, "jks");
     sithGamesave_Write(tmp, 1, 0, 0);
 }
