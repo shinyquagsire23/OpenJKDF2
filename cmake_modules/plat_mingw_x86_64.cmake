@@ -72,26 +72,38 @@ macro(plat_link_and_package)
     target_link_libraries(sith_engine PRIVATE GLUT::GLUT)
     target_link_libraries(sith_engine PRIVATE GLEW::glew_s)
     target_link_libraries(${BIN_NAME} PRIVATE GLEW::glew_s)
-    target_link_libraries(sith_engine PRIVATE mingw32 ${SDL2_COMMON_LIBS} version imm32 setupapi gdi32 winmm imm32 ole32 oleaut32 shell32 ssp winmm user32 crypt32 advapi32) # SDL2’s peculiarity that you have to link mingw32 before SDL2main
+    # Note: libssp is statically linked in the toolchain's standard libraries, so
+    # it is intentionally not listed here -- adding -lssp re-adds libssp-0.dll.
+    target_link_libraries(sith_engine PRIVATE mingw32 ${SDL2_COMMON_LIBS} version imm32 setupapi gdi32 winmm imm32 ole32 oleaut32 shell32 winmm user32 crypt32 advapi32) # SDL2’s peculiarity that you have to link mingw32 before SDL2main
     
     if(TARGET_CAN_JKGM)
         target_link_libraries(sith_engine PRIVATE PNG::PNG ZLIB::ZLIB)
     endif()
 
     if (TARGET_USE_OPENAL)
-        target_link_libraries(sith_engine PRIVATE ${SDL_MIXER_DEPS} SDL::Mixer)
+        # SDL::Mixer must precede its Vorbis/Ogg deps: with fully static libs the
+        # linker only pulls objects that resolve an already-seen undefined symbol,
+        # so the mixer archive (which references ov_*) has to come before
+        # vorbisfile/vorbis/ogg in SDL_MIXER_DEPS.
+        target_link_libraries(sith_engine PRIVATE SDL::Mixer ${SDL_MIXER_DEPS})
         target_link_libraries(sith_engine PRIVATE OpenAL::OpenAL)
     endif()
     target_link_libraries(sith_engine PRIVATE nlohmann_json::nlohmann_json)
     if(TARGET_USE_GAMENETWORKINGSOCKETS)
+        # Loaded at runtime via LoadLibrary("libGameNetworkingSockets.dll") in
+        # stdComm_GNS.cpp -- shipped as a DLL, not statically linked.
         target_link_libraries(sith_engine PRIVATE GameNetworkingSockets::GameNetworkingSockets)
     endif()
     if(TARGET_USE_PHYSFS)
         target_link_libraries(sith_engine PRIVATE PhysFS::PhysFS_s)
         target_link_libraries(${BIN_NAME} PRIVATE PhysFS::PhysFS_s)
     endif()
-    target_link_libraries(sith_engine PRIVATE opengl32 ws2_32 uuid ole32)
+    # Windows system import libs, listed last so they satisfy undefined symbols
+    # pulled in by any of the static archives above (link order matters for the
+    # import-stub archives too, e.g. SDL's SHGetSpecialFolderPathW in shell32).
+    target_link_libraries(sith_engine PRIVATE opengl32 ws2_32 uuid ole32 shell32 shlwapi advapi32 user32 gdi32 winmm imm32 version setupapi oleaut32 crypt32)
 
+    # OpenAL ships as a DLL so it can be swapped for another OpenAL implementation.
     if (TARGET_USE_OPENAL)
         add_custom_command(
             TARGET ${BIN_NAME}
@@ -100,19 +112,11 @@ macro(plat_link_and_package)
         )
     endif()
 
-    add_custom_command(
-        TARGET ${BIN_NAME}
-        POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/exchndl.dll ${PROJECT_BINARY_DIR}
-        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/symsrv.dll ${PROJECT_BINARY_DIR}
-        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/mgwhelp.dll ${PROJECT_BINARY_DIR}
-        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/3rdparty/drmingw-0.9.3-win64/bin/symsrv.yes ${PROJECT_BINARY_DIR}
-    )
-
+    # GameNetworkingSockets ships as a DLL (loaded on demand via LoadLibrary).
     if(TARGET_USE_GAMENETWORKINGSOCKETS)
         add_custom_command(
             TARGET ${BIN_NAME}
-            POST_BUILD 
+            POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/GameNetworkingSockets/bin/libGameNetworkingSockets.dll ${PROJECT_BINARY_DIR}
         )
     endif()

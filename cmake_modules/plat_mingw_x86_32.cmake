@@ -64,22 +64,30 @@ macro(plat_link_and_package)
 
     # NOTE: no GLEW / GLUT here -- OpenGL 1.1 entry points come straight from opengl32,
     # and extension procs (EXT_paletted_texture) are resolved via SDL_GL_GetProcAddress.
-    target_link_libraries(sith_engine PRIVATE mingw32 ${SDL2_COMMON_LIBS} version imm32 setupapi gdi32 winmm imm32 ole32 oleaut32 shell32 ssp winmm user32 crypt32 advapi32) # SDL2's peculiarity that you have to link mingw32 before SDL2main
+    # libssp is statically linked in the toolchain's standard libraries, so it is
+    # intentionally not listed here (linking -lssp re-adds libssp-0.dll).
+    target_link_libraries(sith_engine PRIVATE mingw32 ${SDL2_COMMON_LIBS} version imm32 setupapi gdi32 winmm imm32 ole32 oleaut32 shell32 winmm user32 crypt32 advapi32) # SDL2's peculiarity that you have to link mingw32 before SDL2main
 
     if (TARGET_USE_OPENAL)
-        target_link_libraries(sith_engine PRIVATE ${SDL_MIXER_DEPS} SDL::Mixer)
+        # SDL::Mixer before its Vorbis/Ogg deps so the static link resolves ov_*.
+        target_link_libraries(sith_engine PRIVATE SDL::Mixer ${SDL_MIXER_DEPS})
         target_link_libraries(sith_engine PRIVATE OpenAL::OpenAL)
     endif()
     target_link_libraries(sith_engine PRIVATE nlohmann_json::nlohmann_json)
     if(TARGET_USE_GAMENETWORKINGSOCKETS)
+        # Loaded at runtime via LoadLibrary("libGameNetworkingSockets.dll") in
+        # stdComm_GNS.cpp -- shipped as a DLL, not statically linked.
         target_link_libraries(sith_engine PRIVATE GameNetworkingSockets::GameNetworkingSockets)
     endif()
     if(TARGET_USE_PHYSFS)
         target_link_libraries(sith_engine PRIVATE PhysFS::PhysFS_s)
         target_link_libraries(${BIN_NAME} PRIVATE PhysFS::PhysFS_s)
     endif()
-    target_link_libraries(sith_engine PRIVATE opengl32 ws2_32 uuid ole32)
+    # Windows system import libs last, so they satisfy symbols pulled in by any of
+    # the static archives above (link order matters for import-stub archives too).
+    target_link_libraries(sith_engine PRIVATE opengl32 ws2_32 uuid ole32 shell32 shlwapi advapi32 user32 gdi32 winmm imm32 version setupapi oleaut32 crypt32)
 
+    # OpenAL ships as a DLL so it can be swapped for another OpenAL implementation.
     if (TARGET_USE_OPENAL)
         add_custom_command(
             TARGET ${BIN_NAME}
@@ -88,6 +96,7 @@ macro(plat_link_and_package)
         )
     endif()
 
+    # GameNetworkingSockets ships as a DLL (loaded on demand via LoadLibrary).
     if(TARGET_USE_GAMENETWORKINGSOCKETS)
         add_custom_command(
             TARGET ${BIN_NAME}

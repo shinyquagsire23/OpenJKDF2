@@ -37,8 +37,11 @@ add_link_options(
 )
 
 string(JOIN " " CMAKE_C_FLAGS_INIT
-# We do not want to link to the deprecated MSVCRT.DLL (Microsoft Visual C++ 6.0) C runtime library
-# and unfortunately, -nolibc does not get rid of MSVCRT.DLL completely
+# Target the system msvcrt.dll (present on every Windows since 2000/XP) rather than
+# a redistributable CRT (msvcr120.dll) so the .exe needs no shipped DLLs. msvcrt's
+# printf is C89-only, so route stdio through MinGW's own C99 implementation in the
+# static libmingwex to keep %lld/%f/positional args correct without a newer CRT DLL.
+    -D__USE_MINGW_ANSI_STDIO=1
     -nodefaultlibs
 # __imp_ prefixed symbols are long time obsolete and not used in static libs anyway
     -mnop-fun-dllimport
@@ -65,17 +68,14 @@ endif()
 # -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt
 # By design, MinGW should not link to advapi32 shell32 user32 by default anyway
 set(CMAKE_C_STANDARD_LIBRARIES
-# FIXME: static linking with MinGW is a challange because key static and dynamic libs are not symbol twins
-    "-Wl,-Bstatic,-lpthread,-lmingwex,-lmingw32,-lgcc,-Bdynamic,-lmsvcr120,-lkernel32"
-#    "-Wl,-Bstatic,-lmingwex,-lmingw32,-lgcc,-lgcc_eh,-lmoldname,-lpthread,-lmsvcrt,-lm,-Bdynamic,-lkernel32"
-#   "-lpthread -lmingw32 -lgcc -lmingwex -lmsvcr120 -lkernel32" # link to msvcr120 aka Microsoft Visual C++ 2013 Redistributable
+# Everything but the system CRT (msvcrt) and kernel32 comes from static libs so the
+# .exe imports only guaranteed Windows system DLLs. libssp is static here so
+# stack-protected objects don't drag in libssp-0.dll.
+    "-Wl,-Bstatic,-lssp,-lpthread,-lmingwex,-lmingw32,-lgcc,-Bdynamic,-lmsvcrt,-lkernel32"
     CACHE INTERNAL CMAKE_C_STANDARD_LIBRARIES # there are nasty interdependencies between libpthread and libgcc/libgcc_eh
 )
 set(CMAKE_CXX_STANDARD_LIBRARIES
-# FIXME: static linking with MinGW is a challange because key static and dynamic libs are not symbol twins
-    "-Wl,-Bstatic,-lstdc++,-lpthread,-lmingwex,-lmingw32,-lgcc,-lgcc_eh,-Bdynamic,-lmsvcr120,-lkernel32"
-#    "-Wl,-Bstatic,-lstdc++,-lmingwex,-lmingw32,-lgcc,-lgcc_eh,-lmoldname,-lpthread,-lmsvcrt,-lm,-Bdynamic,-lkernel32"
-#   "-lstdc++ -lpthread -lmingw32 -lgcc -lgcc_eh -lpthread -lmingwex -lmsvcr120 -lkernel32" # link to msvcr120 aka Microsoft Visual C++ 2013 Redistributable
+    "-Wl,-Bstatic,-lstdc++,-lssp,-lpthread,-lmingwex,-lmingw32,-lgcc,-lgcc_eh,-Bdynamic,-lmsvcrt,-lkernel32"
     CACHE INTERNAL CMAKE_CXX_STANDARD_LIBRARIES # there are nasty interdependencies between libpthread and libgcc/libgcc_eh
 )
 
