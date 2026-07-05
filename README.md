@@ -20,6 +20,8 @@ OpenJKDF2 supports the following configurations:
 | 64-bit Linux/SDL2 | OpenGL 3.3 | 64-bit Linux compilation with SDL2 and OpenAL. |
 | ARM64 Android | OpenGL ES 3 | ARMv8 Android compilation with SDL2 and OpenAL Soft. |
 | Nintendo DSi | Custom | Nintendo DSi port with hardware rendering, software audio. Extremely RAM-limited, supports emissive palettes. |
+| Dreamcast | Custom | KallistiOS+Dreamcast port with basic 3D rendering (no emissive palettes), HW accelerated audio including soundtrack and cutscenes. Extremely RAM-limited. |
+| 32-bit Windows/SDL2 | OpenGL 1.1 | Windows compilation with SDL2 and OpenAL Soft. DirectX dependencies are replaced with SDL2 and OpenAL. Targeting Windows XP ~ Windows 7 |
 | Emscripten/WebAssembly | WebGL 2/OpenGL ES 3 | WebAssembly with SDL2 and OpenAL. Runs in a web browser. Since WASM only supports 32-bit pointers, this will likely be less buggy than 64-bit, but less performant. |
 
 The following implementations are in-progress or planned:

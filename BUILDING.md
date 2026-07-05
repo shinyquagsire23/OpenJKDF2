@@ -227,3 +227,23 @@ Run the CMake GUI and select the `OpenJKDF2/` directory for your sources. Create
 
 You'll probably want to set `openjkdf2-64` as the default project, from there it should work and debug as expected.
 </details>
+
+<details>
+  <summary>Nintendo DSi</summary>
+
+See [here](https://blocksds.skylyrac.net/docs/setup/) for setting up BlocksDS environment, then
+
+`./build_twl.sh`
+</details>
+
+
+<details>
+  <summary>Dreamcast</summary>
+
+See [here](https://dreamcast.wiki/Getting_Started_with_Dreamcast_development) for setting up KallistiOS environment, then
+
+`brew install ` TODO I need to catalogue everything
+
+`./build_dreamcast.sh`
+</details>
+
