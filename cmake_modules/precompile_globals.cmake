@@ -46,11 +46,14 @@ add_custom_command(
     DEPENDS ${SYMBOLS_FILE} ${GLOBALS_H_COG} ${PYTHON_EXE} ${COGAPP_DEPENDS} ${EMBEDDED_RESOURCES}
 )
 
-add_custom_command(
-    PRE_BUILD
-    OUTPUT ${BIN_NAME}
-    DEPENDS ${GLOBALS_C} ${GLOBALS_H}
-)
+# Gather the cog generation into one target. Many sith_engine translation units
+# include generated/globals.h transitively (via rdMaterial.h etc.), but CMake has
+# no way to know that on a clean build, so a high -j build would compile them while
+# cog is still writing globals.h and read a truncated header ("unterminated
+# #ifndef"). add_dependencies(sith_engine generate_globals) (in CMakeLists.txt)
+# makes every sith_engine object wait for this target to finish first.
+set_source_files_properties(${GLOBALS_H} ${GLOBALS_C} PROPERTIES GENERATED TRUE)
+add_custom_target(generate_globals DEPENDS ${GLOBALS_H} ${GLOBALS_C})
 
 # HACK
 list(REMOVE_ITEM ENGINE_SOURCE_FILES ${GLOBALS_C})

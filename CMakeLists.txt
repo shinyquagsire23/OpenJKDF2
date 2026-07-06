@@ -249,6 +249,10 @@ if (EXPERIMENTAL_FIXED_POINT)
 endif()
 
 add_library(sith_engine OBJECT ${ENGINE_SOURCE_FILES})
+# Generate cog headers (generated/globals.h) fully before compiling any engine
+# source -- many include it transitively, and a parallel build otherwise races the
+# generation and reads a half-written header. See precompile_globals.cmake.
+add_dependencies(sith_engine generate_globals)
 plat_specific_deps()
 
 if(TARGET_ANDROID)

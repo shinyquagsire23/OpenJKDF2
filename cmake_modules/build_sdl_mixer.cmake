@@ -55,7 +55,16 @@ endif()
 if(PLAT_MSVC)
     set(SDL_MIXER_PATCH_COMMAND git submodule update --init)
 else()
-    set(SDL_MIXER_PATCH_COMMAND cd ${CMAKE_SOURCE_DIR}/lib/SDL_mixer/external/ogg && git apply ${PROJECT_SOURCE_DIR}/lib/ogg_fix.patch && cd ${CMAKE_SOURCE_DIR}/lib/SDL_mixer && chmod +x ${CMAKE_SOURCE_DIR}/lib/SDL_mixer/external/download.sh && ${CMAKE_SOURCE_DIR}/lib/SDL_mixer/external/download.sh || true)
+    # Run through `bash -c` so the &&/|| operators are honoured -- ExternalProject
+    # executes PATCH_COMMAND without a shell, so an unwrapped `cd ... && ...` would
+    # try to exec `cd` with the rest as literal args. Every step is best-effort: on
+    # a flatpak build the build sandbox has no network (download.sh can't fetch) and
+    # incremental re-runs would re-apply the patch -- neither should fail the build,
+    # since the ogg/vorbis submodules are already checked out by the source fetch.
+    # No ';' in the command: CMake would treat semicolons as list-element separators
+    # and hand them to bash as separate args. Use subshells + &&/|| instead, with a
+    # trailing `|| true` so the whole step always succeeds.
+    set(SDL_MIXER_PATCH_COMMAND bash -c "cd '${CMAKE_SOURCE_DIR}/lib/SDL_mixer/external/ogg' && ( git apply '${PROJECT_SOURCE_DIR}/lib/ogg_fix.patch' || true ) && cd '${CMAKE_SOURCE_DIR}/lib/SDL_mixer' && chmod +x external/download.sh && ( ./external/download.sh || true ) || true")
 endif()
 
 ExternalProject_Add(
