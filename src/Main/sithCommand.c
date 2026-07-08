@@ -46,41 +46,41 @@ int sithCommand_CmdQuit(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 // MOTS altered
 void sithCommand_Startup()
 {
-    sithConsole_RegisterCommand(sithCommand_CmdPlayers, "players", 0);
-    sithConsole_RegisterCommand(sithCommand_CmdCoords, "coords", 0);
-    sithConsole_RegisterCommand(sithCommand_CheatSetDebugFlags, "trackshots", 3);
-    sithConsole_RegisterCommand(sithCommand_CmdPing, "ping", 0);
-    sithConsole_RegisterCommand(sithCommand_CmdKick, "kick", 0);
-    sithConsole_RegisterCommand(sithCommand_CmdKick, "boot", 0); // MOTS added
-    sithConsole_RegisterCommand(sithCommand_CmdTick, "tick", 0);
-    sithConsole_RegisterCommand(sithCommand_CmdSession, "session", 0);
+    sithConsole_RegisterCommand(sithCommand_Players, "players", 0);
+    sithConsole_RegisterCommand(sithCommand_Coords, "coords", 0);
+    sithConsole_RegisterCommand(sithCommand_DebugMode, "trackshots", 3);
+    sithConsole_RegisterCommand(sithCommand_PingPlayer, "ping", 0);
+    sithConsole_RegisterCommand(sithCommand_Kick, "kick", 0);
+    sithConsole_RegisterCommand(sithCommand_Kick, "boot", 0); // MOTS added
+    sithConsole_RegisterCommand(sithCommand_Tick, "tick", 0);
+    sithConsole_RegisterCommand(sithCommand_Session, "session", 0);
 
     if ( (g_debugmodeFlags & DEBUGFLAG_IN_EDITOR) != 0 )
     {
         sithConsole_RegisterCommand(sithConsole_Help, "help", 0);
-        sithConsole_RegisterCommand(sithCommand_CheatSetDebugFlags, "disableai", 0);
-        sithConsole_RegisterCommand(sithCommand_CheatSetDebugFlags, "notarget", 6);
-        sithConsole_RegisterCommand(sithCommand_CheatSetDebugFlags, "outline", 1);
-        sithConsole_RegisterCommand(sithCommand_CheatSetDebugFlags, "disablepuppet", 2);
-        sithConsole_RegisterCommand(sithCommand_CmdCogTrace, "cogtrace", 0);
-        sithConsole_RegisterCommand(sithCommand_CmdCogList, "coglist", 0);
+        sithConsole_RegisterCommand(sithCommand_DebugMode, "disableai", 0);
+        sithConsole_RegisterCommand(sithCommand_DebugMode, "notarget", 6);
+        sithConsole_RegisterCommand(sithCommand_DebugMode, "outline", 1);
+        sithConsole_RegisterCommand(sithCommand_DebugMode, "disablepuppet", 2);
+        sithConsole_RegisterCommand(sithCommand_CogTrace, "cogtrace", 0);
+        sithConsole_RegisterCommand(sithCommand_CogList, "coglist", 0);
         sithConsole_RegisterCommand(sithCogScript_DevCmdCogStatus, "cogstatus", 0);
-        sithConsole_RegisterCommand(sithCommand_CheatSetDebugFlags, "noaishots", 4);
+        sithConsole_RegisterCommand(sithCommand_DebugMode, "noaishots", 4);
         sithConsole_RegisterCommand(sithAI_PrintThingStatus, "aistatus", 0);
         sithConsole_RegisterCommand(sithAI_PrintThings, "ailist", 0);
-        sithConsole_RegisterCommand(sithCommand_CmdFly, "fly", 0);
-        sithConsole_RegisterCommand(sithCommand_CmdMem, "mem", 0);
-        sithConsole_RegisterCommand(sithCommand_CmdDynamicMem, "dynamicmem", 0);
-        sithConsole_RegisterCommand(sithCommand_CmdMemDump, "memdump", 0);
-        sithConsole_RegisterCommand(sithCommand_CheatSetDebugFlags, "invul", 5);
-        sithConsole_RegisterCommand(sithCommand_CmdCogPause, "cogpause", 0);
+        sithConsole_RegisterCommand(sithCommand_Fly, "fly", 0);
+        sithConsole_RegisterCommand(sithCommand_Memory, "mem", 0);
+        sithConsole_RegisterCommand(sithCommand_DynamicMemory, "dynamicmem", 0);
+        sithConsole_RegisterCommand(sithCommand_MemoryDump, "memdump", 0);
+        sithConsole_RegisterCommand(sithCommand_DebugMode, "invul", 5);
+        sithConsole_RegisterCommand(sithCommand_CogPause, "cogpause", 0);
 #ifndef LINUX_TMP
-        sithConsole_RegisterCommand(sithCommand_CmdMatList, "matlist", 0);
+        sithConsole_RegisterCommand(sithCommand_MatList, "matlist", 0);
 #endif
-        sithConsole_RegisterCommand(sithCommand_CmdWarp, "warp", 0);
-        sithConsole_RegisterCommand(sithCommand_CmdActivate, "activate", 0);
-        sithConsole_RegisterCommand(sithCommand_CheatSetDebugFlags, "slowmo", 7);
-        sithConsole_RegisterCommand(sithCommand_CmdJump, "jump", 0);
+        sithConsole_RegisterCommand(sithCommand_Warp, "warp", 0);
+        sithConsole_RegisterCommand(sithCommand_Activate, "activate", 0);
+        sithConsole_RegisterCommand(sithCommand_DebugMode, "slowmo", 7);
+        sithConsole_RegisterCommand(sithCommand_Jump, "jump", 0);
     }
 
 #ifdef QOL_IMPROVEMENTS
@@ -95,7 +95,7 @@ void sithCommand_Startup()
 #endif
 }
 
-int sithCommand_CheatSetDebugFlags(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_DebugMode(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     int *v2; // esi
     int v3; // edi
@@ -178,7 +178,7 @@ LABEL_24:
     return result;
 }
 
-int sithCommand_CmdTick(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_Tick(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     signed int result; // eax
     unsigned int newTickrate; // eax
@@ -208,7 +208,7 @@ int sithCommand_CmdTick(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return result;
 }
 
-int sithCommand_CmdSession(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_Session(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     uint32_t v3; // edi
     sithDplayPlayer* v4; // esi
@@ -236,7 +236,7 @@ int sithCommand_CmdSession(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return 1;
 }
 
-int sithCommand_CmdCogTrace(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_CogTrace(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     signed int result; // eax
     unsigned int v3; // eax
@@ -282,7 +282,7 @@ int sithCommand_CmdCogTrace(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return result;
 }
 
-int sithCommand_CmdCogPause(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_CogPause(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     signed int result; // eax
     unsigned int v3; // eax
@@ -329,7 +329,7 @@ int sithCommand_CmdCogPause(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return result;
 }
 
-int sithCommand_CmdCogList(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_CogList(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     signed int result; // eax
     unsigned int v3; // ebp
@@ -363,7 +363,7 @@ int sithCommand_CmdCogList(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return result;
 }
 
-int sithCommand_CmdFly(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_Fly(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     sithThing *v0; // ecx
     wchar_t *v3; // eax
@@ -401,7 +401,7 @@ int sithCommand_CmdFly(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return 0;
 }
 
-int sithCommand_CmdMem(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_Memory(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     int worldAllocatedAmt[17];
     int worldQuantityAmt[17];
@@ -447,7 +447,7 @@ int sithCommand_CmdMem(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return 1;
 }
 
-int sithCommand_CmdDynamicMem(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_DynamicMemory(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     _sprintf(
         std_genBuffer,
@@ -459,7 +459,7 @@ int sithCommand_CmdDynamicMem(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return 1;
 }
 
-int sithCommand_CmdMemDump(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_MemoryDump(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     int result; // eax
     int v3; // edi
@@ -487,7 +487,7 @@ int sithCommand_CmdMemDump(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 
 // MatList
 
-int sithCommand_CmdCoords(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_Coords(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     sithThing *player; // esi
     signed int result; // eax
@@ -524,7 +524,7 @@ int sithCommand_CmdCoords(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return result;
 }
 
-int sithCommand_CmdWarp(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_Warp(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     sithThing *v3; // ebp
     int result; // eax
@@ -585,7 +585,7 @@ int sithCommand_CmdWarp(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return result;
 }
 
-int sithCommand_CmdActivate(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_Activate(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     sithThing *v2; // esi
     int tmp;
@@ -618,7 +618,7 @@ int sithCommand_CmdActivate(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return 0;
 }
 
-int sithCommand_CmdJump(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_Jump(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     int result;
     int idx;
@@ -635,7 +635,7 @@ int sithCommand_CmdJump(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return result;
 }
 
-int sithCommand_CmdPlayers(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_Players(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     uint32_t v2; // edi
     sithPlayerInfo* v3; // esi
@@ -665,7 +665,7 @@ int sithCommand_CmdPlayers(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return 1;
 }
 
-int sithCommand_CmdPing(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_PingPlayer(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     int v2; // esi
     wchar_t v4[32]; // [esp+4h] [ebp-40h] BYREF
@@ -688,7 +688,7 @@ int sithCommand_CmdPing(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return 1;
 }
 
-int sithCommand_CmdKick(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_Kick(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     uint32_t v2; // edi
     sithPlayerInfo *v3; // esi
@@ -718,12 +718,12 @@ int sithCommand_CmdKick(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     return 1;
 }
 
-int sithCommand_matlist_sort(const void *a, const void *b)
+int sithCommand_CompareMatInfos(const void *a, const void *b)
 {
     return ((const int*)b)[2] - ((const int*)a)[2];
 }
 
-int sithCommand_CmdMatList(stdDebugConsoleCmd *pCmd, const char *pArgStr)
+int sithCommand_MatList(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     sithWorld *pWorld = sithWorld_pCurrentWorld;
     if ( !pWorld )
@@ -770,7 +770,7 @@ int sithCommand_CmdMatList(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     }
 
     // Sort by total bytes descending
-    _qsort(matInfo, pWorld->numMaterials, sizeof(int[4]), sithCommand_matlist_sort);
+    _qsort(matInfo, pWorld->numMaterials, sizeof(int[4]), sithCommand_CompareMatInfos);
 
     for (int i = 0; i < pWorld->numMaterials; i++)
     {

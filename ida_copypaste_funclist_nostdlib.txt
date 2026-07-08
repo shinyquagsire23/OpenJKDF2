@@ -2434,25 +2434,25 @@ sithActor_DestroyActor	.text	004ED760	00000043	00000004	00000004	R	.	.	.	.	.	T	.
 sithActor_DestroyCorpse	.text	004ED7B0	00000027	00000000	00000004	R	.	.	.	.	.	T	.
 sithActor_ParseArg	.text	004ED7E0	000003AC	00000004	0000000C	R	.	.	.	.	.	T	.
 sithCommand_Startup	.text	004EDC10	00000253			R	.	.	.	.	.	T	.
-sithCommand_CmdTick	.text	004EDE70	00000091	00000000	00000008	R	.	.	.	.	.	T	.
-sithCommand_CmdSession	.text	004EDF10	000000A7	00000000	00000008	R	.	.	.	.	.	T	.
-sithCommand_CheatSetDebugFlags	.text	004EDFC0	0000018A	00000150	0000000C	R	.	.	.	.	.	T	.
-sithCommand_CmdCogTrace	.text	004EE170	000000B3	00000004	00000008	R	.	.	.	.	.	T	.
-sithCommand_CmdCogPause	.text	004EE230	000000B3	00000004	00000008	R	.	.	.	.	.	T	.
-sithCommand_CmdCogList	.text	004EE2F0	00000125	00000000	00000008	R	.	.	.	.	.	T	.
-sithCommand_CmdFly	.text	004EE420	0000007D			R	.	.	.	.	.	T	.
-sithCommand_CmdMem	.text	004EE4A0	0000026D	0000008C	00000008	R	.	.	.	.	.	T	.
-sithCommand_CmdDynamicMem	.text	004EE710	00000039	00000000	00000008	R	.	.	.	.	.	T	.
-sithCommand_CmdMemDump	.text	004EE750	00000098	00000004	00000008	R	.	.	.	.	.	T	.
-sithCommand_CmdMatList	.text	004EE7F0	0000016E	0000000C	00000008	R	.	.	.	.	.	T	.
-sithCommand_CmdCoords	.text	004EE960	000000D6	00000044	00000008	R	.	.	.	.	.	T	.
-sithCommand_CmdWarp	.text	004EEA40	00000141	00000058	00000008	R	.	.	.	.	.	T	.
-sithCommand_CmdActivate	.text	004EEB90	0000009A	00000004	00000008	R	.	.	.	.	.	T	.
-sithCommand_CmdJump	.text	004EEC30	00000036	00000000	00000008	R	.	.	.	.	.	T	.
-sithCommand_CmdPlayers	.text	004EEC70	0000009F	00000028	00000008	R	.	.	.	.	.	T	.
-sithCommand_CmdPing	.text	004EED10	00000093	00000044	00000008	R	.	.	.	.	.	T	.
-sithCommand_CmdKick	.text	004EEDB0	000000BF	0000004C	00000008	R	.	.	.	.	.	T	.
-sithCommand_matlist_sort	.text	004EEE70	00000011	00000000	00000008	R	.	.	.	.	.	T	.
+sithCommand_Tick	.text	004EDE70	00000091	00000000	00000008	R	.	.	.	.	.	T	.
+sithCommand_Session	.text	004EDF10	000000A7	00000000	00000008	R	.	.	.	.	.	T	.
+sithCommand_DebugMode	.text	004EDFC0	0000018A	00000150	0000000C	R	.	.	.	.	.	T	.
+sithCommand_CogTrace	.text	004EE170	000000B3	00000004	00000008	R	.	.	.	.	.	T	.
+sithCommand_CogPause	.text	004EE230	000000B3	00000004	00000008	R	.	.	.	.	.	T	.
+sithCommand_CogList	.text	004EE2F0	00000125	00000000	00000008	R	.	.	.	.	.	T	.
+sithCommand_Fly	.text	004EE420	0000007D			R	.	.	.	.	.	T	.
+sithCommand_Memory	.text	004EE4A0	0000026D	0000008C	00000008	R	.	.	.	.	.	T	.
+sithCommand_DynamicMemory	.text	004EE710	00000039	00000000	00000008	R	.	.	.	.	.	T	.
+sithCommand_MemoryDump	.text	004EE750	00000098	00000004	00000008	R	.	.	.	.	.	T	.
+sithCommand_MatList	.text	004EE7F0	0000016E	0000000C	00000008	R	.	.	.	.	.	T	.
+sithCommand_Coords	.text	004EE960	000000D6	00000044	00000008	R	.	.	.	.	.	T	.
+sithCommand_Warp	.text	004EEA40	00000141	00000058	00000008	R	.	.	.	.	.	T	.
+sithCommand_Activate	.text	004EEB90	0000009A	00000004	00000008	R	.	.	.	.	.	T	.
+sithCommand_Jump	.text	004EEC30	00000036	00000000	00000008	R	.	.	.	.	.	T	.
+sithCommand_Players	.text	004EEC70	0000009F	00000028	00000008	R	.	.	.	.	.	T	.
+sithCommand_PingPlayer	.text	004EED10	00000093	00000044	00000008	R	.	.	.	.	.	T	.
+sithCommand_Kick	.text	004EEDB0	000000BF	0000004C	00000008	R	.	.	.	.	.	T	.
+sithCommand_CompareMatInfos	.text	004EEE70	00000011	00000000	00000008	R	.	.	.	.	.	T	.
 sithSound_Startup	.text	004EEE90	0000002C			R	.	.	.	.	.	T	.
 sithSound_Shutdown	.text	004EEEC0	0000003D			R	.	.	.	.	.	.	.
 sithSound_ReadSoundsListText	.text	004EEF00	000001B6	00000010	00000008	R	.	.	.	.	.	T	.

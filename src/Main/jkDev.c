@@ -617,21 +617,21 @@ int jkDev_Custom_CmdJumpNextCheckpoint(stdDebugConsoleCmd* pCmd, const char* pAr
 int jkDev_CmdDebugFlags(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( !sithNet_isMulti )
-        sithCommand_CheatSetDebugFlags(pCmd, pArgStr);
+        sithCommand_DebugMode(pCmd, pArgStr);
     return 1;
 }
 
 int jkDev_CmdFly(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( !sithNet_isMulti )
-        sithCommand_CmdFly(pCmd, pArgStr);
+        sithCommand_Fly(pCmd, pArgStr);
     return 1;
 }
 
 int jkDev_CmdDebugFlags2(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( !sithNet_isMulti )
-        sithCommand_CheatSetDebugFlags(pCmd, pArgStr);
+        sithCommand_DebugMode(pCmd, pArgStr);
     return 1;
 }
 
@@ -646,7 +646,7 @@ int jkDev_CmdWarp(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         if ( pArgStr )
         {
             if ( _sscanf(pArgStr, "%f %f %f", &v5, &v4, &v6) == 3 )
-                sithCommand_CmdWarp(pCmd, pArgStr);
+                sithCommand_Warp(pCmd, pArgStr);
         }
     }
     return 1;
@@ -655,21 +655,21 @@ int jkDev_CmdWarp(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 int jkDev_CmdActivate(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( !sithNet_isMulti )
-        sithCommand_CmdActivate(pCmd, pArgStr);
+        sithCommand_Activate(pCmd, pArgStr);
     return 1;
 }
 
 int jkDev_CmdDebugFlags3(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( !sithNet_isMulti )
-        sithCommand_CheatSetDebugFlags(pCmd, pArgStr);
+        sithCommand_DebugMode(pCmd, pArgStr);
     return 1;
 }
 
 int jkDev_CmdJump(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if ( !sithNet_isMulti )
-        sithCommand_CmdJump(pCmd, pArgStr);
+        sithCommand_Jump(pCmd, pArgStr);
     return 1;
 }
 

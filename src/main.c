@@ -2874,25 +2874,25 @@ void do_hooks()
 
     // sithCommand
     hook_function(sithCommand_Startup_ADDR, sithCommand_Startup);
-    hook_function(sithCommand_CmdTick_ADDR, sithCommand_CmdTick);
-    hook_function(sithCommand_CmdSession_ADDR, sithCommand_CmdSession);
-    hook_function(sithCommand_CheatSetDebugFlags_ADDR, sithCommand_CheatSetDebugFlags);
-    hook_function(sithCommand_CmdCogTrace_ADDR, sithCommand_CmdCogTrace);
-    hook_function(sithCommand_CmdCogPause_ADDR, sithCommand_CmdCogPause);
-    hook_function(sithCommand_CmdCogList_ADDR, sithCommand_CmdCogList);
-    hook_function(sithCommand_CmdFly_ADDR, sithCommand_CmdFly);
-    hook_function(sithCommand_CmdMem_ADDR, sithCommand_CmdMem);
-    hook_function(sithCommand_CmdDynamicMem_ADDR, sithCommand_CmdDynamicMem);
-    hook_function(sithCommand_CmdMemDump_ADDR, sithCommand_CmdMemDump);
-    hook_function(sithCommand_CmdMatList_ADDR, sithCommand_CmdMatList);
-    hook_function(sithCommand_CmdCoords_ADDR, sithCommand_CmdCoords);
-    hook_function(sithCommand_CmdWarp_ADDR, sithCommand_CmdWarp);
-    hook_function(sithCommand_CmdActivate_ADDR, sithCommand_CmdActivate);
-    hook_function(sithCommand_CmdJump_ADDR, sithCommand_CmdJump);
-    hook_function(sithCommand_CmdPlayers_ADDR, sithCommand_CmdPlayers);
-    hook_function(sithCommand_CmdPing_ADDR, sithCommand_CmdPing);
-    hook_function(sithCommand_CmdKick_ADDR, sithCommand_CmdKick);
-    hook_function(sithCommand_matlist_sort_ADDR, sithCommand_matlist_sort);
+    hook_function(sithCommand_Tick_ADDR, sithCommand_Tick);
+    hook_function(sithCommand_Session_ADDR, sithCommand_Session);
+    hook_function(sithCommand_DebugMode_ADDR, sithCommand_DebugMode);
+    hook_function(sithCommand_CogTrace_ADDR, sithCommand_CogTrace);
+    hook_function(sithCommand_CogPause_ADDR, sithCommand_CogPause);
+    hook_function(sithCommand_CogList_ADDR, sithCommand_CogList);
+    hook_function(sithCommand_Fly_ADDR, sithCommand_Fly);
+    hook_function(sithCommand_Memory_ADDR, sithCommand_Memory);
+    hook_function(sithCommand_DynamicMemory_ADDR, sithCommand_DynamicMemory);
+    hook_function(sithCommand_MemoryDump_ADDR, sithCommand_MemoryDump);
+    hook_function(sithCommand_MatList_ADDR, sithCommand_MatList);
+    hook_function(sithCommand_Coords_ADDR, sithCommand_Coords);
+    hook_function(sithCommand_Warp_ADDR, sithCommand_Warp);
+    hook_function(sithCommand_Activate_ADDR, sithCommand_Activate);
+    hook_function(sithCommand_Jump_ADDR, sithCommand_Jump);
+    hook_function(sithCommand_Players_ADDR, sithCommand_Players);
+    hook_function(sithCommand_PingPlayer_ADDR, sithCommand_PingPlayer);
+    hook_function(sithCommand_Kick_ADDR, sithCommand_Kick);
+    hook_function(sithCommand_CompareMatInfos_ADDR, sithCommand_CompareMatInfos);
 
     //hook_function(Darray_sub_520CB0_ADDR, Darray_sub_520CB0);
     // test saber time
