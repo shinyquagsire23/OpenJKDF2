@@ -416,3 +416,46 @@ string literal to its exact pre-rename content from git; 1:1 by order). `apply_t
 is now string-safe (skips `"…"`/`'…'` and `#` lines). **Always runtime-verify** renames:
 `build_darwin64/openjkdf2-64 -dedicatedServer -episode JK1 -map 01narshadda.jkl` parses
 the world headless — watch for `FAILED`/`Parse problem`. Compile-green ≠ correct.
+
+## Validation methodology (how to verify a rename batch is safe)
+
+Two complementary gates. **Compile-green is NOT sufficient** — string-literal
+corruption and other semantic slips build cleanly.
+
+### 1. Byte-compare oracle (gold standard for pure-NAME renames)
+A correct struct/member/enum-CONSTANT **name** rename is invisible to the compiler
+(identifiers don't survive to machine code), so the emitted binary is **byte-identical**
+before and after. String literals *do* survive into `.rodata`, so any accidental
+in-string rewrite (JKL keywords, section names, asset paths, stringized asserts)
+shows up immediately as a diff. Proven: base `0db6a8d5` (pre-member-rename) vs HEAD
+(4 member batches + string fix) NDS builds are byte-identical.
+
+Workflow (NDS/TWL build; ~5 min/build, libs cached on incremental):
+```sh
+# neutralize the embedded git hash so builds are deterministic (temp, DO NOT commit)
+cat > cmake_modules/version.cmake <<'V'
+set(OPENJKDF2_PROJECT_VERSION 0.9.9.0)
+set(OPENJKDF2_RELEASE_COMMIT "0000000000000000000000000000000000000000")
+set(OPENJKDF2_RELEASE_COMMIT_SHORT "00000000")
+V
+./build_twl.sh && cp build_nintendo_dsi/openjkdf2.nds /tmp/after.nds   # current (post-rename)
+git checkout <base-commit> -- src && ./build_twl.sh && cp build_nintendo_dsi/openjkdf2.nds /tmp/before.nds
+cmp -s /tmp/before.nds /tmp/after.nds && echo "IDENTICAL ✓ (rename is semantically null)"
+git checkout HEAD -- src && git checkout HEAD -- cmake_modules/version.cmake   # restore
+```
+**Caveats:** function renames change `__func__`/stringized asserts (not byte-clean —
+this is a *post*-function-naming tool). **Enum-type field RETYPING is NOT byte-clean**
+(`int`→`enum` changes sign-extension/promotion/comparisons in codegen) — use gate 2 there.
+
+### 2. Runtime dedicated-server load (catches semantic changes the oracle can't gate)
+Loads/parses the world headless (no display), so it exercises the JKL parsers:
+```sh
+build_darwin64/openjkdf2-64 -dedicatedServer -episode JK1 -map 01narshadda.jkl
+```
+Watch for `... section X -- FAILED!` / `Parse problem`. A healthy load parses ~28
+sections across static.jkl + the level with 0 failures. Use for the retype batch and
+any change that legitimately alters codegen.
+
+**Per-batch gate:** pure-name batches → byte-compare identical before commit; retype/
+codegen batches → runtime dedicated-server parse clean before commit. Always build all
+three platforms (macOS + TWL + Dreamcast) regardless.
