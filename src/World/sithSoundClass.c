@@ -288,17 +288,21 @@ int sithSoundClass_LoadEntry(sithSoundClass *pClass, char *pPath)
     int v10; // edx
     sithSoundClassEntry *i; // eax
 
+    SITH_ASSERTREL(pClass && pPath); // Added: from OpenJones3D
+
     if (!stdConffile_Open(pPath))
         return 0;
 
     while ( stdConffile_ReadArgs() )
     {
         if ( stdConffile_g_entry.numArgs < 2u ) {
+            SITHLOG_ERROR("Short line in file %s, line %d.\n", pPath, stdConffile_linenum); // Added: from OpenJones3D
             continue;
         }
 
         soundIdx = (uint32_t)((intptr_t)stdHashtbl_Find(sithSoundClass_pHashTable, (const char*)(intptr_t)stdConffile_g_entry.aArgs[0].value) & 0xFFFFFFFF);
         if (soundIdx < 0 || soundIdx >= SITH_SC_MAX) {
+            SITHLOG_ERROR("Mode %s not recognized in file %s.\n", stdConffile_g_entry.aArgs[0].value, pPath); // Added: from OpenJones3D
             continue;
         }
 
@@ -364,6 +368,8 @@ void sithSoundClass_PlayModeFirst(SithThing *pThing, unsigned int mode)
     sithSoundClass *pSoundClass; // eax
     sithSoundClassEntry *v3; // eax
 
+    SITH_ASSERTREL(pThing); // Added: from OpenJones3D
+
     pSoundClass = pThing->pSoundClass;
     if ( pSoundClass && mode < SITH_SC_MAX )
     {
@@ -389,6 +395,8 @@ sithPlayingSound* sithSoundClass_PlayMode(SithThing *pThing, int mode, flex_t se
     unsigned int v5; // edi
     uint32_t v6; // eax
     int v7; // eax
+
+    SITH_ASSERTREL(pThing); // Added: from OpenJones3D
 
     if (!pThing->pSoundClass) return NULL;
 
@@ -435,6 +443,8 @@ void sithSoundClass_PlayModeFirstEx(SithThing *pThing, int mode, flex_t volume)
 {
     sithSoundClassEntry *entry; // eax
 
+    SITH_ASSERTREL(pThing); // Added: from OpenJones3D
+
     if ( pThing->pSoundClass && (unsigned int)mode < SITH_SC_MAX )
     {
         // Try to prevent sound spam at the source
@@ -473,6 +483,8 @@ void sithSoundClass_FreeWorldSoundClasses(SithWorld *pWorld)
     sithSoundClassEntry *v5; // eax
     sithSoundClassEntry *v6; // esi
     int v8; // [esp+8h] [ebp-4h]
+
+    SITH_ASSERTREL(pWorld); // Added: from OpenJones3D
 
     if (!pWorld->sizeSoundClasses)
         return;
@@ -605,6 +617,7 @@ void sithSoundClass_StopSound(SithThing *thing, sithSound *sound)
 
 int sithSoundClass_SetThingClass(SithThing *pThing, sithSoundClass *pSoundClass)
 {
+    SITH_ASSERTREL(pThing && pSoundClass); // Added: from OpenJones3D
     if ( pThing->pSoundClass == pSoundClass )
         return 0;
     pThing->pSoundClass = pSoundClass;

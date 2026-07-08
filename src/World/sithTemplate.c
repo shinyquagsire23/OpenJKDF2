@@ -33,6 +33,7 @@ int sithTemplate_AllocWorldTemplates(SithWorld *pWorld, unsigned int size)
     // and word-safe, so they can live in word-addressable-only memory.
     int prevSuggest = pSithHS->suggestHeap(HEAP_WORD_ADDRESSABLE);
 #endif
+    SITH_ASSERTREL(pWorld != NULL); // Added: from OpenJones3D
     pWorld->aThingTemplates = (SithThing*)SITH_ALLOC(sizeof(SithThing) * size);
 #ifdef TARGET_RETRO_HOMEBREW
     pSithHS->suggestHeap(prevSuggest);
@@ -114,6 +115,8 @@ void sithTemplate_OldFree()
 
 void sithTemplate_FreeWorldTemplates(SithWorld *pWorld)
 {
+    SITH_ASSERTREL(pWorld != NULL); // Added: from OpenJones3D
+
     for (int i = 0; i < pWorld->numThingTemplates; i++)
     {
         rdThing_FreeEntry(&pWorld->aThingTemplates[i].renderData);
@@ -137,6 +140,7 @@ SithThing* sithTemplate_GetTemplate(const char *pName)
 {
     SithThing *result;
 
+    SITH_ASSERTREL(pName); // Added: from OpenJones3D
     if ( !_memcmp(pName, "none", 5u) )
         return 0;
     result = (SithThing *)stdHashtbl_Find(sithTemplate_pHashtable, pName);

@@ -82,6 +82,8 @@ int sithSprite_ReadStaticSpritesListText(SithWorld *pWorld, int bSkip)
 
 void sithSprite_FreeWorldSprites(SithWorld *pWorld)
 {
+    SITH_ASSERTREL(pWorld != NULL); // Added: from OpenJones3D
+
     if (!pWorld->sizeSprites)
         return;
 
