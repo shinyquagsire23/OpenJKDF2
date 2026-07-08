@@ -459,3 +459,18 @@ any change that legitimately alters codegen.
 **Per-batch gate:** pure-name batches → byte-compare identical before commit; retype/
 codegen batches → runtime dedicated-server parse clean before commit. Always build all
 three platforms (macOS + TWL + Dreamcast) regardless.
+
+### Enum work outcome (3c)
+- **Enum CONSTANTS ✅** (3b, 115 renames) and **enum TYPEDEFS ✅** (21 bare enums →
+  `typedef enum eName{}Name`, byte-identical NDS) are done.
+- **Enum FIELD retyping (`uint32_t` field → enum type): NOT VIABLE, abandoned.** Two
+  hard blockers, both confirmed by a SithThing pilot: (1) **TWL builds as C++**, where
+  `unsigned int → enum` assignment is a hard error (`-fpermissive`) and DF2 assigns
+  computed uints to flag fields pervasively; (2) **ARM EABI defaults to `-fshort-enums`**
+  (DSi), shrinking a small-valued enum field to 1–2 bytes and breaking the
+  JK.EXE-matched struct layout. Fields stay `uint32_t`/`int32_t`; the typedefs remain
+  available for casts/returns/locals. macOS built + ran fine, but TWL failed to compile
+  → reverted. Do NOT retry field retyping.
+
+**Phase 3 is effectively complete**: 3a type names, 3b enum constants, 3c member names
+(247) + enum typedefs (21). Remaining project work is Phase 4 (style match).
