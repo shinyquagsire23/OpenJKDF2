@@ -745,7 +745,7 @@ void sithSurface_FreeWorldSurfaces(sithWorld *world)
     SITH_FREE(world->surfaces);
     world->surfaces = 0;
     world->numSurfaces = 0;
-    sithSurface_numSurfaces_0 = 0;
+    sithSurface_numUnsyncedSurfaces = 0;
     if ( world->adjoins )
     {
         SITH_FREE(world->adjoins);
@@ -1566,9 +1566,9 @@ void sithSurface_SyncSurface(sithSurface *pSurface)
 {
     pSurface->surfaceFlags |= SITH_SURFACE_CHANGED;
 
-    if ( sithSurface_numSurfaces_0 < 0x20 )
+    if ( sithSurface_numUnsyncedSurfaces < 0x20 )
     {
-        aSithSurfaces[sithSurface_numSurfaces_0++] = pSurface;
+        aSithSurfaces[sithSurface_numUnsyncedSurfaces++] = pSurface;
     }
 }
 
@@ -1576,10 +1576,10 @@ void sithSurface_SyncSurfaces()
 {
     if (!sithMessage_g_outputstream) return;
 
-    for (uint32_t v0 = 0; v0 < sithSurface_numSurfaces_0; v0++)
+    for (uint32_t v0 = 0; v0 < sithSurface_numUnsyncedSurfaces; v0++)
     {
         sithDSS_SurfaceStatus(aSithSurfaces[v0], -1, 255);
     }
 
-    sithSurface_numSurfaces_0 = 0;
+    sithSurface_numUnsyncedSurfaces = 0;
 }

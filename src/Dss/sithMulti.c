@@ -219,7 +219,7 @@ int sithMulti_Startup()
 
     sithNet_checksum = sithWorld_CalcWorldChecksum(sithWorld_g_pCurrentWorld, 0/*jkGuiMultiplayer_checksumSeed*/); // Added: TODO fix the checksum seed
     sithNet_syncIdx = 0;
-    sithSurface_numSurfaces_0 = 0;
+    sithSurface_numUnsyncedSurfaces = 0;
     sithSector_numModifiedSectors = 0;
     sithNet_bNeedsFullThingSyncForLeaveJoin = 0;
     sithComm_ClearMsgTmpBuf();
