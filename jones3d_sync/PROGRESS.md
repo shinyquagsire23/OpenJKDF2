@@ -125,7 +125,7 @@ Symbols with **no** OpenJones3D counterpart (JK-only features, platform backends
 ## Progress
 
 **91 shared engine modules** identified (52 sith · 20 rdroid · 18 std · 1 w32util).
-Functions-only pass completed: **52 / 91**.
+Functions-only pass completed: **72 / 91**.
 
 Current phase: **functions only** (per project decision, globals → struct
 members/names/typedefs come in later passes). `_Startup` functions are **kept**
@@ -210,26 +210,26 @@ as-is (DF2 soft-reset convention), not renamed to J3D's `_Reset`/`_ResetGlobals`
 
 | ☐ | DF2 module | J3D module | DF2 src | J3D src | Notes |
 |---|-----------|-----------|---------|---------|-------|
-| ☐ | `rdCache` | `rdCache` | Raster/rdCache.c | Libs/rdroid/Raster/rdCache.c |  |
-| ☐ | `rdCamera` | `rdCamera` | Engine/rdCamera.c | Libs/rdroid/Engine/rdCamera.c |  |
-| ☐ | `rdCanvas` | `rdCanvas` | Engine/rdCanvas.c | Libs/rdroid/Engine/rdCanvas.c |  |
-| ☐ | `rdClip` | `rdClip` | Engine/rdClip.c | Libs/rdroid/Engine/rdClip.c |  |
-| ☐ | `rdFace` | `rdFace` | Raster/rdFace.c | Libs/rdroid/Raster/rdFace.c |  |
-| ☐ | `rdKeyframe` | `rdKeyframe` | Engine/rdKeyframe.c | Libs/rdroid/Engine/rdKeyframe.c |  |
-| ☐ | `rdLight` | `rdLight` | Engine/rdLight.c | Libs/rdroid/Engine/rdLight.c |  |
-| ☐ | `rdMaterial` | `rdMaterial` | Engine/rdMaterial.c | Libs/rdroid/Engine/rdMaterial.c |  |
-| ☐ | `rdMath` | `rdMath` | Primitives/rdMath.c | Libs/rdroid/Math/rdMath.c |  |
-| ☐ | `rdMatrix` | `rdMatrix` | Primitives/rdMatrix.c | Libs/rdroid/Math/rdMatrix.c |  |
-| ☐ | `rdModel3` | `rdModel3` | Primitives/rdModel3.c | Libs/rdroid/Primitives/rdModel3.c |  |
-| ☐ | `rdParticle` | `rdParticle` | Primitives/rdParticle.c | Libs/rdroid/Primitives/rdParticle.c |  |
-| ☐ | `rdPolyLine` | `rdPolyline` | Primitives/rdPolyLine.c | Libs/rdroid/Primitives/rdPolyline.c | case differs |
-| ☐ | `rdPrimit2` | `rdPrimit2` | Primitives/rdPrimit2.c | Libs/rdroid/Primitives/rdPrimit2.c |  |
-| ☐ | `rdPrimit3` | `rdPrimit3` | Primitives/rdPrimit3.c | Libs/rdroid/Primitives/rdPrimit3.c |  |
-| ☐ | `rdPuppet` | `rdPuppet` | Engine/rdPuppet.c | Libs/rdroid/Engine/rdPuppet.c |  |
-| ☐ | `rdSprite` | `rdSprite` | Primitives/rdSprite.c | Libs/rdroid/Primitives/rdSprite.c |  |
-| ☐ | `rdThing` | `rdThing` | Engine/rdThing.c | Libs/rdroid/Engine/rdThing.c |  |
-| ☐ | `rdVector` | `rdVector` | Primitives/rdVector.c | Libs/rdroid/Math/rdVector.c |  |
-| ☐ | `rdroid` | `rdroid` | Engine/rdroid.c | Libs/rdroid/Main/rdroid.c |  |
+| ☑fn | `rdCache` | `rdCache` | already matched — no renames | Libs/rdroid/Raster/rdCache.c |  |
+| ☑fn | `rdCamera` | `rdCamera` | Engine/rdCamera.c | Libs/rdroid/Engine/rdCamera.c |  |
+| ☑fn | `rdCanvas` | `rdCanvas` | already matched — no renames | Libs/rdroid/Engine/rdCanvas.c |  |
+| ☑fn | `rdClip` | `rdClip` | Engine/rdClip.c | Libs/rdroid/Engine/rdClip.c |  |
+| ☑fn | `rdFace` | `rdFace` | already matched — no renames | Libs/rdroid/Raster/rdFace.c |  |
+| ☑fn | `rdKeyframe` | `rdKeyframe` | Engine/rdKeyframe.c | Libs/rdroid/Engine/rdKeyframe.c |  |
+| ☑fn | `rdLight` | `rdLight` | already matched — no renames | Libs/rdroid/Engine/rdLight.c |  |
+| ☑fn | `rdMaterial` | `rdMaterial` | already matched — no renames | Libs/rdroid/Engine/rdMaterial.c |  |
+| ☑fn | `rdMath` | `rdMath` | Primitives/rdMath.c | Libs/rdroid/Math/rdMath.c |  |
+| ☑fn | `rdMatrix` | `rdMatrix` | Primitives/rdMatrix.c | Libs/rdroid/Math/rdMatrix.c |  |
+| ☑fn | `rdModel3` | `rdModel3` | Primitives/rdModel3.c | Libs/rdroid/Primitives/rdModel3.c |  |
+| ☑fn | `rdParticle` | `rdParticle` | Primitives/rdParticle.c | Libs/rdroid/Primitives/rdParticle.c |  |
+| ☑fn | `rdPolyLine` | `rdPolyline` | Primitives/rdPolyLine.c | Libs/rdroid/Primitives/rdPolyline.c | case differs |
+| ☑fn | `rdPrimit2` | `rdPrimit2` | Primitives/rdPrimit2.c | Libs/rdroid/Primitives/rdPrimit2.c |  |
+| ☑fn | `rdPrimit3` | `rdPrimit3` | Primitives/rdPrimit3.c | Libs/rdroid/Primitives/rdPrimit3.c |  |
+| ☑fn | `rdPuppet` | `rdPuppet` | Engine/rdPuppet.c | Libs/rdroid/Engine/rdPuppet.c |  |
+| ☑fn | `rdSprite` | `rdSprite` | already matched — no renames | Libs/rdroid/Primitives/rdSprite.c |  |
+| ☑fn | `rdThing` | `rdThing` | already matched — no renames | Libs/rdroid/Engine/rdThing.c |  |
+| ☑fn | `rdVector` | `rdVector` | Primitives/rdVector.c | Libs/rdroid/Math/rdVector.c |  |
+| ☑fn | `rdroid` | `rdroid` | Engine/rdroid.c | Libs/rdroid/Main/rdroid.c |  |
 
 ### std  (18 modules)
 
