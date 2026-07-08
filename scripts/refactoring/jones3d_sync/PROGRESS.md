@@ -507,7 +507,30 @@ Done (byte-identical NDS each batch): sithTime; **batch1** sithCamera/Collision/
 Model/SoundClass/Material; **batch2** sithSurface/Sprite/KeyFrame/Template/Weapon/Item;
 **batch3** sithPhysics/Actor/Explosion/Particle/Control/Puppet; **batch4** rdCamera/
 Material/Model3/Light/Keyframe (rdColormap has no J3D counterpart); **batch5** sithWorld/
-Render/Map/CogExec/CogParse (sithNav absent in both). = **30 modules, ~340 functions.**
-Tool: scratchpad `apply_argnames.py` + per-module subagent maps. Remaining ~61 modules
-(sithThing, sithCog + CogFunction*/CogUtil/CogVm, sithAI family [note sithAICmd ↔ J3D
-sithAIInstinct/sithAIMove/sithAIUtil split], std* utilities, jk* game layer, etc.).
+Render/Map/CogExec/CogParse (sithNav absent in both); **batch6** sithCog +
+stdConffile/String/Fnames; **batch7** sithAI/AIClass/AIAwareness/AICmd + sithCogFunction/
+Thing (sithAICmd ↔ J3D sithAIInstinct/Move/Util split). = **40 modules.**
+Tool: scratchpad `apply_argnames.py` + per-module subagent maps. Remaining ~51 modules
+(sithThing, remaining sithCogFunction* verb modules [Player/AI/Sector/Sound/Surface],
+std* utilities, jk* game layer, etc.).
+
+**Batch-7 caveats (new):**
+- **`#var`-stringizing macros break byte-identity — BENIGN (like `__func__`).** A param
+  fed to `OPENJKDF2_WARN_NULL_AND_RETURN`/`_PRINT` (jk.h, uses `#var`) or a stringized
+  assert embeds the param NAME as a `.rodata` string. Renaming changes that string's
+  length → the whole NDS shifts → `cmp -l` shows ~99k "diffs" at identical file size.
+  It is NOT a codegen/behavior change. Validate that the only real string-set delta is
+  the macro's own param names:
+  `diff <(strings /tmp/head.nds|sort -u) <(strings NEW|sort -u) | grep -iE 'WARN:|assert|NULL in|%s!'`
+  (everything else that `diff` prints is `strings`-tool noise from shifted regions), then
+  runtime `-sp` dedicated-server load. Keep the rename (canonical debug output is good).
+  Hit by sithAIAwareness_ProcessEvent (pSectorEntry/pPos1/pPos2 → pEvent/startPos/endPos).
+- **cog verb `ctx`→`pCog` collisions.** 5 fns already have a local `pCog`
+  (`sithCog* pCog = ...PopCog(ctx)`), so renaming the `ctx` param to `pCog` self-references
+  or shadows — a **C++ error on TWL, only a warning on C/macOS** (build TWL!). Exclude
+  them: sithCogFunction_{SetActionCog,Get/Set/ClearCogFlags}, sithCogFunctionThing_ReleaseThing.
+  Verb fns are a mechanical uniform `ctx→pCog` (+`a1→pCog` where the sole sithCog* param is
+  a1) — generate from the .c defs rather than trusting a per-agent list.
+- **version.cmake neutralization must keep `set(OPENJKDF2_PROJECT_VERSION 0.9.9.0)`**
+  (CMakeLists parses it → MAJOR/MINOR/PATCH; dropping it breaks version.c). Replace only
+  the two git `execute_process` blocks with hardcoded COMMIT/COMMIT_SHORT.
