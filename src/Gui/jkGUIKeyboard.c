@@ -318,7 +318,7 @@ int jkGuiKeyboard_AddControlClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, in
     jkGuiKeyboard_funcIdx = v4->inputFuncIdx;
     if ( jkGuiKeyboard_dword_555DE0 )
     {
-        stdControl_ToggleCursor(1);
+        stdControl_SetActivation(1);
         stdControl_bControlsActive = 0;
     }
     else
@@ -372,7 +372,7 @@ void jkGuiKeyboard_sub_4123C0(jkGuiMenu *pMenu)
             if ( v4 == 1 )
                 goto LABEL_27;
             jkGuiKeyboard_bOnceIdk = 0;
-            stdControl_ToggleCursor(0);
+            stdControl_SetActivation(0);
             if ( jkGuiKeyboard_darrEntries.total - 1 <= 0 )
                 goto LABEL_23;
             while ( 1 )
@@ -417,14 +417,14 @@ LABEL_27:
                 stdControl_FinishRead();
                 stdControl_bControlsActive = jkGuiKeyboard_dword_555DE0 == 0;
                 if ( jkGuiKeyboard_dword_555DE0 )
-                    stdControl_ToggleCursor(0);
+                    stdControl_SetActivation(0);
                 else
                     stdControl_Close();
                 jkGuiKeyboard_bOnceIdk = 0;
                 return;
             }
             jkGuiRend_Paint(&jkGuiKeyboard_menu);
-            stdControl_ToggleCursor(1);
+            stdControl_SetActivation(1);
             if ( jkGuiKeyboard_dword_555DE0 )
                 stdControl_bControlsActive = 0;
             v4 = v11;
@@ -474,7 +474,7 @@ int jkGuiKeyboard_CancelClicked(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_
         return pElement->hoverId;
     jkGuiKeyboard_bOnceIdk = 0;
     if ( jkGuiKeyboard_dword_555DE0 )
-        stdControl_ToggleCursor(0);
+        stdControl_SetActivation(0);
     else
         stdControl_Close();
     return 0;

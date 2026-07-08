@@ -931,7 +931,7 @@ void jkGuiJoystick_MenuTick(jkGuiMenu *pMenu)
             jkGuiJoystick_awTmp[255] = 0;
             if ( jkGuiJoystick_dword_557078 )
             {
-                stdControl_ToggleCursor(1);
+                stdControl_SetActivation(1);
                 stdControl_bControlsActive = 0;
             }
             else
@@ -983,7 +983,7 @@ void jkGuiJoystick_MenuTick(jkGuiMenu *pMenu)
             }
             while ( v5 < &jkGuiJoystick_aEntries[JKGUIJOYSTICK_NUM_ENTRIES] );
             if ( jkGuiJoystick_dword_557078 )
-                stdControl_ToggleCursor(0);
+                stdControl_SetActivation(0);
             else
                 stdControl_Close();
             v1 = jkGuiJoystick_bIsCapturingInputs;

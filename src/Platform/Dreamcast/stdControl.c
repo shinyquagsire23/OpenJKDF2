@@ -281,7 +281,7 @@ void stdControl_SetSDLKeydown(int keyNum, int bDown, uint32_t readTime)
         return;
     if (!stdControl_aSdlToDik[keyNum])
         return;
-    stdControl_SetKeydown(stdControl_aSdlToDik[keyNum], bDown, readTime);
+    stdControl_UpdateKeyState(stdControl_aSdlToDik[keyNum], bDown, readTime);
 }
 
 void stdControl_FreeSdlJoysticks()
@@ -318,9 +318,9 @@ int stdControl_Startup()
     }
 
     // Mouse axes (matches the SDL2/TWL ranges).
-    stdControl_InitAxis(AXIS_MOUSE_X, -250, 250, 0.0);
-    stdControl_InitAxis(AXIS_MOUSE_Y, -200, 200, 0.0);
-    stdControl_InitAxis(AXIS_MOUSE_Z, -20, 20, 0.0);
+    stdControl_RegisterAxis(AXIS_MOUSE_X, -250, 250, 0.0);
+    stdControl_RegisterAxis(AXIS_MOUSE_Y, -200, 200, 0.0);
+    stdControl_RegisterAxis(AXIS_MOUSE_Z, -20, 20, 0.0);
 
     stdControl_Reset();
     stdControl_bStartup = 1;
@@ -373,7 +373,7 @@ void stdControl_Flush() {
     stdControl_curReadTime = stdPlatform_GetTimeMsec();
 }
 
-void stdControl_ToggleCursor(int a)
+void stdControl_SetActivation(int a)
 {
     if ( stdControl_bOpen )
     {
@@ -382,7 +382,7 @@ void stdControl_ToggleCursor(int a)
             if ( stdControl_mouseDirectInputDevice && stdControl_bReadMouse )
             {
                 //stdControl_mouseDirectInputDevice->lpVtbl->Acquire(stdControl_mouseDirectInputDevice);
-                stdControl_ShowCursor(0);
+                stdControl_ShowMouseCursor(0);
             }
             //if ( stdControl_keyboardIDirectInputDevice )
             //    stdControl_keyboardIDirectInputDevice->lpVtbl->Acquire(stdControl_keyboardIDirectInputDevice);
@@ -393,7 +393,7 @@ void stdControl_ToggleCursor(int a)
             if ( stdControl_mouseDirectInputDevice )
             {
                 //stdControl_mouseDirectInputDevice->lpVtbl->Unacquire(stdControl_mouseDirectInputDevice);
-                stdControl_ShowCursor(1);
+                stdControl_ShowMouseCursor(1);
             }
             //if ( stdControl_keyboardIDirectInputDevice )
             //    stdControl_keyboardIDirectInputDevice->lpVtbl->Unacquire(stdControl_keyboardIDirectInputDevice);
@@ -406,7 +406,7 @@ void stdControl_ToggleCursor(int a)
 
 static int _cursorState = 0;
 
-int stdControl_ShowCursor(int a)
+int stdControl_ShowMouseCursor(int a)
 {
     if (a)
     {
@@ -424,12 +424,12 @@ void stdControl_ToggleMouse()
     if ( stdControl_bReadMouse )
     {
         stdControl_bReadMouse = 0;
-        stdControl_ShowCursor(1);
+        stdControl_ShowMouseCursor(1);
     }
     else
     {
         stdControl_bReadMouse = 1;
-        stdControl_ShowCursor(0);
+        stdControl_ShowMouseCursor(0);
     }
 }
 void stdControl_InitSdlJoysticks() {}
@@ -454,8 +454,8 @@ void stdControl_ReadControls()
     stdControl_aJoystickExists[0] = 1;
     sithWeapon_controlOptions &= ~(1 << 5); // Enable joystick
 
-    stdControl_InitAxis(AXIS_JOY1_X, -0x7FFF, 0x7FFF, 0.2);
-    stdControl_InitAxis(AXIS_JOY1_Y, -0x7FFF, 0x7FFF, 0.2);
+    stdControl_RegisterAxis(AXIS_JOY1_X, -0x7FFF, 0x7FFF, 0.2);
+    stdControl_RegisterAxis(AXIS_JOY1_Y, -0x7FFF, 0x7FFF, 0.2);
 
     stdControl_bControlsIdle = 1;
     stdControl_curReadTime = stdPlatform_GetTimeMsec();
@@ -487,10 +487,10 @@ void stdControl_ReadControls()
             if (s && stdControl_aDebounce[i]) {
                 continue;
             }
-            stdControl_SetKeydown(i, s, stdControl_curReadTime);
+            stdControl_UpdateKeyState(i, s, stdControl_curReadTime);
             stdControl_aDebounce[i] = 0;
         }
-        // stdControl_SetKeydown(keyNum, keyVal, timestamp)
+        // stdControl_UpdateKeyState(keyNum, keyVal, timestamp)
     }*/
 
     // Controller -> joystick 0.
@@ -499,17 +499,17 @@ void stdControl_ReadControls()
         cont_state_t* st = (cont_state_t*)maple_dev_status(cont_dev);
         if (st) {
             uint32_t b = st->buttons;
-            stdControl_SetKeydown(KEY_JOY1_B1, !!(b & CONT_A),     stdControl_curReadTime);
-            stdControl_SetKeydown(KEY_JOY1_B2, !!(b & CONT_B),     stdControl_curReadTime);
-            stdControl_SetKeydown(KEY_JOY1_B3, !!(b & CONT_X),     stdControl_curReadTime);
-            stdControl_SetKeydown(KEY_JOY1_B4, !!(b & CONT_Y),     stdControl_curReadTime);
-            stdControl_SetKeydown(KEY_JOY1_B10, st->ltrig > 64,    stdControl_curReadTime);
-            stdControl_SetKeydown(KEY_JOY1_B11, st->rtrig > 64,    stdControl_curReadTime);
+            stdControl_UpdateKeyState(KEY_JOY1_B1, !!(b & CONT_A),     stdControl_curReadTime);
+            stdControl_UpdateKeyState(KEY_JOY1_B2, !!(b & CONT_B),     stdControl_curReadTime);
+            stdControl_UpdateKeyState(KEY_JOY1_B3, !!(b & CONT_X),     stdControl_curReadTime);
+            stdControl_UpdateKeyState(KEY_JOY1_B4, !!(b & CONT_Y),     stdControl_curReadTime);
+            stdControl_UpdateKeyState(KEY_JOY1_B10, st->ltrig > 64,    stdControl_curReadTime);
+            stdControl_UpdateKeyState(KEY_JOY1_B11, st->rtrig > 64,    stdControl_curReadTime);
 
-            stdControl_SetKeydown(KEY_JOY1_HLEFT,  !!(b & CONT_DPAD_LEFT),  stdControl_curReadTime);
-            stdControl_SetKeydown(KEY_JOY1_HUP,    !!(b & CONT_DPAD_UP),    stdControl_curReadTime);
-            stdControl_SetKeydown(KEY_JOY1_HRIGHT, !!(b & CONT_DPAD_RIGHT), stdControl_curReadTime);
-            stdControl_SetKeydown(KEY_JOY1_HDOWN,  !!(b & CONT_DPAD_DOWN),  stdControl_curReadTime);
+            stdControl_UpdateKeyState(KEY_JOY1_HLEFT,  !!(b & CONT_DPAD_LEFT),  stdControl_curReadTime);
+            stdControl_UpdateKeyState(KEY_JOY1_HUP,    !!(b & CONT_DPAD_UP),    stdControl_curReadTime);
+            stdControl_UpdateKeyState(KEY_JOY1_HRIGHT, !!(b & CONT_DPAD_RIGHT), stdControl_curReadTime);
+            stdControl_UpdateKeyState(KEY_JOY1_HDOWN,  !!(b & CONT_DPAD_DOWN),  stdControl_curReadTime);
 
             // Analog stick (-128..127) -> joystick axis range.
             stdControl_aAxisPos[AXIS_JOY1_X] = (st->joyx * 0x7FFF) / 128;
@@ -554,8 +554,8 @@ void stdControl_ReadMouse()
     Window_mouseWheelX = 0;
     Window_mouseWheelY = 0;
 
-    stdControl_SetKeydown(KEY_MOUSE_B1, bLeft  || Window_bMouseLeft,  stdControl_curReadTime);
-    stdControl_SetKeydown(KEY_MOUSE_B2, bRight || Window_bMouseRight, stdControl_curReadTime);
+    stdControl_UpdateKeyState(KEY_MOUSE_B1, bLeft  || Window_bMouseLeft,  stdControl_curReadTime);
+    stdControl_UpdateKeyState(KEY_MOUSE_B2, bRight || Window_bMouseRight, stdControl_curReadTime);
 }
 
 BOOL stdControl_IsSystemKeyboardShowing() {

@@ -711,7 +711,7 @@ int jkQuakeConsole_WmHandler(HWND a1, UINT msg, WPARAM wParam, HWND a4, LRESULT 
                 else {
                     stdControl_HideSystemKeyboard();
                 }
-                stdControl_ToggleCursor(!jkQuakeConsole_bOpen);
+                stdControl_SetActivation(!jkQuakeConsole_bOpen);
                 *a5 = 1;
                 return 1;
             }

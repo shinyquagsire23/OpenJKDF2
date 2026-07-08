@@ -157,7 +157,7 @@ int Window_DefaultHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam, voi
 
 int Window_ShowCursorUnwindowed(int a1)
 {
-    return stdControl_ShowCursor(a1);
+    return stdControl_ShowMouseCursor(a1);
 }
 
 int last_draw_ms = 0;
@@ -533,8 +533,8 @@ void Window_SdlUpdate()
                 if (hasRight)
                     Window_msg_main_handler(g_hWnd, msgr, left | right, pos);
 
-                //stdControl_SetKeydown(KEY_MOUSE_B1, Window_bMouseLeft, mevent->timestamp);
-                //stdControl_SetKeydown(KEY_MOUSE_B2, Window_bMouseRight, mevent->timestamp);
+                //stdControl_UpdateKeyState(KEY_MOUSE_B1, Window_bMouseLeft, mevent->timestamp);
+                //stdControl_UpdateKeyState(KEY_MOUSE_B2, Window_bMouseRight, mevent->timestamp);
 
                 break;
             case SDL_MOUSEWHEEL:

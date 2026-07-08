@@ -108,7 +108,7 @@ void Windows_InitGdi(int windowed)
     Windows_bWindowed = windowed;
 #ifndef SDL2_RENDER
     if ( windowed )
-        stdControl_ShowCursor(0);
+        stdControl_ShowMouseCursor(0);
     else
         Window_ShowCursorUnwindowed(0);
 
@@ -128,7 +128,7 @@ void Windows_ShutdownGdi()
         Window_RemoveMsgHandler(Windows_GdiHandler);
 #ifndef SDL2_RENDER
         if ( Windows_bWindowed )
-            stdControl_ShowCursor(1);
+            stdControl_ShowMouseCursor(1);
 #endif
         Windows_bUnk = 0;
     }
@@ -226,21 +226,21 @@ int Windows_GdiHandler(HWND a1, UINT msg, WPARAM wParam, HWND a4, LRESULT *a5)
         default:
             break;
     }
-    v6 = stdControl_ShowCursor(0);
+    v6 = stdControl_ShowMouseCursor(0);
 
     int v7 = v6 < -1;
     if ( v6 > -1 )
     {
         do
         {
-            v8 = stdControl_ShowCursor(0);
+            v8 = stdControl_ShowMouseCursor(0);
             v7 = v8 < -1;
         }
         while ( v8 > -1 );
     }
     if ( v7 )
     {
-        while ( stdControl_ShowCursor(1) < -1 )
+        while ( stdControl_ShowMouseCursor(1) < -1 )
             ;
     }
     return v5;

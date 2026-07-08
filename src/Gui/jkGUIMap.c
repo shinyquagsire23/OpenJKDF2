@@ -69,7 +69,7 @@ void jkGuiMap_DrawMapScreen(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *
     if ( g_app_suspended )
     {
         rdCamera_SetCurrent(jkGuiMap_pCamera);
-        stdControl_ShowCursor(1);
+        stdControl_ShowMouseCursor(1);
 #if defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW)
         stdDisplay_VBufferLock(jkGuiMap_pVbuffer);
 #endif
@@ -85,7 +85,7 @@ void jkGuiMap_DrawMapScreen(jkGuiElement *element, jkGuiMenu *menu, stdVBuffer *
         stdDisplay_VBufferUnlock(jkGuiMap_pVbuffer);
 #endif
 
-        stdControl_ShowCursor(0);
+        stdControl_ShowMouseCursor(0);
 #if defined(SDL2_RENDER) && !defined(TARGET_RETRO_HOMEBREW)
         // rdFinishFrame calls stdDisplay_ddraw_waitforvblank which causes flickering on SDL2
         rdCache_Flush();

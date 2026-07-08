@@ -730,7 +730,7 @@ void jkGuiBuildMulti_ModelDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVB
 
     if ( g_app_suspended )
     {
-        stdControl_ShowCursor(1);
+        stdControl_ShowMouseCursor(1);
         stdDisplay_VBufferFill(jkGuiBuildMulti_pVBuf1, 0, 0);
         stdDisplay_VBufferLock(jkGuiBuildMulti_pVBuf1);
         rdAdvanceFrame();
@@ -761,7 +761,7 @@ void jkGuiBuildMulti_ModelDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, stdVB
         rot.y = a2a * 20.0;
         rdMatrix_PostRotate34(&jkGuiBuildMulti_matrix, &rot);
         stdDisplay_VBufferCopy(pVbuf, jkGuiBuildMulti_pVBuf1, 0x13Bu, 115, 0, 0);
-        stdControl_ShowCursor(0);
+        stdControl_ShowMouseCursor(0);
     }
 }
 

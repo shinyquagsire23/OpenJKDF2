@@ -2912,8 +2912,8 @@ void do_hooks()
     hook_function(stdControl_Open_ADDR, stdControl_Open);
     hook_function(stdControl_Close_ADDR, stdControl_Close);
     hook_function(stdControl_Flush_ADDR, stdControl_Flush);
-    hook_function(stdControl_ToggleCursor_ADDR, stdControl_ToggleCursor);
-    hook_function(stdControl_ShowCursor_ADDR, stdControl_ShowCursor);
+    hook_function(stdControl_SetActivation_ADDR, stdControl_SetActivation);
+    hook_function(stdControl_ShowMouseCursor_ADDR, stdControl_ShowMouseCursor);
     hook_function(stdControl_ReadControls_ADDR, stdControl_ReadControls);
     hook_function(stdControl_FinishRead_ADDR, stdControl_FinishRead);
     hook_function(stdControl_ReadAxis_ADDR, stdControl_ReadAxis);

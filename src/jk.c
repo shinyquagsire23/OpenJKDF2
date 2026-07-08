@@ -1099,7 +1099,7 @@ void jk_SetActiveWindow(HWND hWnd)
 void jk_ShowCursor(int a)
 {
     //assert(0);
-    stdControl_ShowCursor(a);
+    stdControl_ShowMouseCursor(a);
 }
 
 void jk_ValidateRect(HWND hWnd, const RECT *lpRect)

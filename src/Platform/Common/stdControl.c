@@ -501,7 +501,7 @@ void stdControl_SetMouseSensitivity(flex_t xSensitivity, flex_t ySensitivity)
 
 // more
 
-void stdControl_SetKeydown(int keyNum, int bDown, uint32_t readTime)
+void stdControl_UpdateKeyState(int keyNum, int bDown, uint32_t readTime)
 {
     // Added: bounds check
     if (keyNum >= JK_NUM_KEYS || keyNum < 0)
@@ -542,7 +542,7 @@ void stdControl_SetKeydown(int keyNum, int bDown, uint32_t readTime)
 
 // readmouse
 
-void stdControl_InitAxis(int index, int stickMin, int stickMax, flex_t multiplier)
+void stdControl_RegisterAxis(int index, int stickMin, int stickMax, flex_t multiplier)
 {
     int v4; // eax
     int v5; // esi

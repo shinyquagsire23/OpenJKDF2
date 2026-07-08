@@ -782,12 +782,12 @@ stdControl_ReadKey	.text	0042EBA0	00000065	00000004	00000008	R	.	.	.	.	.	T	.
 stdControl_FinishRead	.text	0042EC10	00000001			R	.	.	.	.	.	.	.
 stdControl_MessageHandler	.text	0042EC20	00000026	00000000	0000000C	R	.	.	.	.	.	.	.
 stdControl_SetMouseSensitivity	.text	0042EC50	000000EA	00000008	00000008	R	.	.	.	.	.	T	.
-stdControl_ToggleCursor	.text	0042ED40	00000078	00000000	00000004	R	.	.	.	.	.	T	.
-stdControl_ShowCursor	.text	0042EDC0	0000000C	00000000	00000004	R	.	.	.	.	.	T	.
+stdControl_SetActivation	.text	0042ED40	00000078	00000000	00000004	R	.	.	.	.	.	T	.
+stdControl_ShowMouseCursor	.text	0042EDC0	0000000C	00000000	00000004	R	.	.	.	.	.	T	.
 stdControl_ToggleMouse	.text	0042EDD0	00000050	00000000	00000000	R	.	.	.	.	.	T	.
-stdControl_SetKeydown	.text	0042EE20	00000094	00000000	0000000C	R	.	.	.	.	.	T	.
+stdControl_UpdateKeyState	.text	0042EE20	00000094	00000000	0000000C	R	.	.	.	.	.	T	.
 stdControl_ReadMouse	.text	0042EEC0	000001CA	00000238	00000000	R	.	.	.	.	.	T	.
-stdControl_InitAxis	.text	0042F090	0000008F	00000008	00000010	R	.	.	.	.	.	T	.
+stdControl_RegisterAxis	.text	0042F090	0000008F	00000008	00000010	R	.	.	.	.	.	T	.
 stdString_FastCopy	.text	0042F120	0000004A	00000008	00000004	R	.	.	.	.	.	T	.
 stdString_snprintf	.text	0042F170	00000029	00000008	0000000D	R	.	.	.	.	.	T	.
 stdString_CopyBetweenDelimiter	.text	0042F1A0	0000006E	00000010	00000010	R	.	.	.	.	.	T	.

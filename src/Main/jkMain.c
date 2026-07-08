@@ -220,7 +220,7 @@ void jkMain_GuiAdvance()
     if ( !g_app_suspended )
     {
         if ( thing_nine )
-            stdControl_ToggleCursor(0);
+            stdControl_SetActivation(0);
         if ( thing_eight )
         {
             if ( sithNet_isMulti && !thing_six)
@@ -283,7 +283,7 @@ void jkMain_GuiAdvance()
                 jkCutscene_PauseShow(0);
                 break;
             case JK_GAMEMODE_GAMEPLAY:
-                stdControl_ToggleCursor(1);
+                stdControl_SetActivation(1);
                 jkGame_ddraw_idk_palettes();
                 break;
             default:
@@ -406,7 +406,7 @@ void jkMain_EscapeMenuLeave(int a2, int a3)
     {
         if ( a3 == JK_GAMEMODE_ESCAPE )
         {
-            stdControl_ToggleCursor(0);
+            stdControl_SetActivation(0);
             sithSoundMixer_StopAll();
         }
         if ( jkGame_isDDraw )
@@ -457,7 +457,7 @@ void jkMain_EscapeMenuLeave(int a2, int a3)
 // MOTS altered
 void jkMain_EndLevelScreenShow(int a1, int a2)
 {
-    stdControl_ToggleCursor(0); // Added
+    stdControl_SetActivation(0); // Added
 
     if (!Main_bMotsCompat) {
         if ( jkEpisode_mLoad.type != JK_EPISODE_SINGLEPLAYER && jkSmack_gameMode == 2
@@ -641,12 +641,12 @@ LABEL_28:
         }
         else {
             thing_six = 1;
-            stdControl_ToggleCursor(0);
+            stdControl_SetActivation(0);
 #if !defined(TARGET_NO_MULTIPLAYER_MENUS)
             if ( jkGuiMultiplayer_ShowSynchronizing() == 1 )
             {
                 thing_six = 0;
-                stdControl_ToggleCursor(1);
+                stdControl_SetActivation(1);
                 goto LABEL_28;
             }
 #endif
@@ -678,7 +678,7 @@ LABEL_28:
 
     if ( jkMain_SetVideoMode() )
     {
-        stdControl_ToggleCursor(1);
+        stdControl_SetActivation(1);
         stdControl_Flush();
         jkGame_Update();
         thing_eight = 1;
@@ -781,7 +781,7 @@ void jkMain_GameplayLeave(int a2, int a3)
 
     if ( a3 == JK_GAMEMODE_ESCAPE )
     {
-        stdControl_ToggleCursor(0);
+        stdControl_SetActivation(0);
         sithSoundMixer_StopAll();
     }
     if ( jkGame_isDDraw )
@@ -850,8 +850,8 @@ void jkMain_TitleLeave(int a1, int a2)
 
 void jkMain_MainShow(int a1, int a2)
 {
-    stdControl_ShowCursor(1);
-    stdControl_ToggleCursor(0); // Added
+    stdControl_ShowMouseCursor(1);
+    stdControl_SetActivation(0); // Added
     jkGuiMain_Show();
 }
 

@@ -260,7 +260,7 @@ void jkGuiRend_Paint(jkGuiMenu *menu)
     if (!g_app_suspended || jkGuiRend_bIsSurfaceValid)
         return;
     
-    stdControl_ShowCursor(0);
+    stdControl_ShowMouseCursor(0);
     stdDisplay_SetMasterPalette(jkGuiRend_palette);
 
 #ifndef TARGET_RETRO_HOMEBREW
@@ -662,27 +662,27 @@ void jkGuiRend_UpdateCursor()
 
     if ( jkGuiRend_CursorVisible )
     {
-        ret = stdControl_ShowCursor(1);
+        ret = stdControl_ShowMouseCursor(1);
         while ( ret > 0 )
         {
-            ret = stdControl_ShowCursor(0);
+            ret = stdControl_ShowMouseCursor(0);
         }
         if ( ret < 0 )
         {
-            while ( stdControl_ShowCursor(1) < 0 )
+            while ( stdControl_ShowMouseCursor(1) < 0 )
                 ;
         }
     }
     else
     {
-        ret = stdControl_ShowCursor(0);
+        ret = stdControl_ShowMouseCursor(0);
         while ( ret > -1 )
         {
-            ret = stdControl_ShowCursor(0);
+            ret = stdControl_ShowMouseCursor(0);
         }
         if ( ret > -1 )
         {
-            while ( stdControl_ShowCursor(1) < -1 )
+            while ( stdControl_ShowMouseCursor(1) < -1 )
                 ;
         }
     }
@@ -848,7 +848,7 @@ void jkGuiRend_UpdateAndDrawClickable(jkGuiElement *clickable, jkGuiMenu *menu, 
     }
     else
     {
-        stdControl_ShowCursor(0);
+        stdControl_ShowMouseCursor(0);
         mousePos.x = 1;
     }
 
@@ -886,7 +886,7 @@ void jkGuiRend_UpdateAndDrawClickable(jkGuiElement *clickable, jkGuiMenu *menu, 
         menu->lastMouseDownClickable = 0;
 LABEL_47:
     if ( mousePos.x )
-        stdControl_ShowCursor(1);
+        stdControl_ShowMouseCursor(1);
 
 }
 
