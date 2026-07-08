@@ -1363,7 +1363,7 @@ void do_hooks()
     hook_function(stdFileUtil_FindQuick_ADDR, stdFileUtil_FindQuick);
     hook_function(stdFileUtil_CountMatches_ADDR, stdFileUtil_CountMatches);
     hook_function(stdFileUtil_MkDir_ADDR, stdFileUtil_MkDir);
-    hook_function(stdFileUtil_DirExists_ADDR, stdFileUtil_DirExists);
+    hook_function(stdFileUtil_FileExists_ADDR, stdFileUtil_FileExists);
     hook_function(stdFileUtil_RmDir_ADDR, stdFileUtil_RmDir);
     hook_function(stdFileUtil_DelFile_ADDR, stdFileUtil_DelFile);
     

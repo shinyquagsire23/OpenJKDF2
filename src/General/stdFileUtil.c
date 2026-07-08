@@ -152,7 +152,7 @@ int stdFileUtil_CountMatches(const char *path, int type, const char *extension)
     return count;
 }
 
-int stdFileUtil_DirExists(const char *path)
+int stdFileUtil_FileExists(const char *path)
 {
     struct _WIN32_FIND_DATAA findData;
     HANDLE h = FindFirstFileA(path, (LPWIN32_FIND_DATAA)&findData);
@@ -500,7 +500,7 @@ int stdFileUtil_CountMatches(const char *path, int type, const char *extension)
     return count;
 }
 
-int stdFileUtil_DirExists(const char *path)
+int stdFileUtil_FileExists(const char *path)
 {
     struct stat st;
     return stat(path, &st) == 0 && S_ISDIR(st.st_mode);

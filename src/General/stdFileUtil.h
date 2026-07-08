@@ -14,7 +14,7 @@ extern "C" {
 #define stdFileUtil_FindQuick_ADDR (0x00431910)
 #define stdFileUtil_CountMatches_ADDR (0x00431A70)
 #define stdFileUtil_MkDir_ADDR (0x00431BC0)
-#define stdFileUtil_DirExists_ADDR (0x00431BD0)
+#define stdFileUtil_FileExists_ADDR (0x00431BD0)
 #define stdFileUtil_RmDir_ADDR (0x00431C00)
 #define stdFileUtil_DelFile_ADDR (0x00431C10)
 #define stdFileUtil_Deltree_ADDR (0x00431C20)
@@ -46,7 +46,7 @@ void stdFileUtil_DisposeFind(stdFileSearch *search);
 void stdFileUtil_FindReset(stdFileSearch *search);
 int stdFileUtil_FindQuick(const char *path, int type, const char *extension, stdFileSearchResult *result);
 int stdFileUtil_CountMatches(const char *path, int type, const char *extension);
-int stdFileUtil_DirExists(const char *path);
+int stdFileUtil_FileExists(const char *path);
 void stdFileUtil_RmDir(const char *path);
 
 int stdFileUtil_DelFile(char* lpFileName);
