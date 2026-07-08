@@ -581,7 +581,7 @@ void sithThing_FreeEverythingNet(sithThing* pThing)
     int32_t v5; // eax
 
     if ( sithNet_isMulti && sithNet_isServer && (pThing->thing_id & 0xFFFF0000) == 0 )
-        sithMulti_FreeThing(pThing->thing_id);
+        sithMulti_RemoveStaticThing(pThing->thing_id);
 
     sithThing_FreeEverything(pThing); // Inlined
 
@@ -1466,7 +1466,7 @@ int sithThing_Load(sithWorld *pWorld, int a2)
             if ( v4->type )
             {
                 if ( sithNet_isMulti && sithNet_isServer && (v4->thing_id & 0xFFFF0000) == 0 )
-                    sithMulti_FreeThing(v4->thing_id);
+                    sithMulti_RemoveStaticThing(v4->thing_id);
                 sithThing_FreeEverything(v4);
                 v5 = v4->thingIdx;
                 if ( v5 == sithWorld_pCurrentWorld->numThings )

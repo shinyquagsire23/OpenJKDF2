@@ -140,11 +140,11 @@ int stdComm_Recv(sithCogMsg *msg)
         {
             if (ret == 2)
             {
-                sithMulti_sub_4CA470(playerId);
+                sithMulti_ProcessPlayerLost(playerId);
             }
             else if (ret == DPSYS_DELETEPLAYER && sithNet_isServer )
             {
-                sithMulti_SendLeaveJoin(playerId, 1);
+                sithMulti_SyncPlayers(playerId, 1);
                 return 0;
             }
         }

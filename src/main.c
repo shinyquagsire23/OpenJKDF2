@@ -1090,9 +1090,9 @@ void do_hooks()
     hook_function(sithMulti_map_init_related_ADDR, sithMulti_map_init_related);
     hook_function(sithMulti_sub_4CA3B0_ADDR, sithMulti_ResetNetState);
     hook_function(sithMulti_sub_4CA410_ADDR, sithMulti_CleanupThings);
-    hook_function(sithMulti_sendmsgidk4_ADDR, sithMulti_sendmsgidk4);
-    hook_function(sithMulti_ProcessJoin_unused_ADDR, sithMulti_ProcessJoin_unused);
-    hook_function(sithMulti_Send36_ADDR, sithMulti_Send36);
+    hook_function(sithMulti_RemovePlayer_ADDR, sithMulti_RemovePlayer);
+    hook_function(sithMulti_ProcessPlayerJoin_ADDR, sithMulti_ProcessPlayerJoin);
+    hook_function(sithMulti_FinishJoining_ADDR, sithMulti_FinishJoining);
 
     // sithCog
     hook_function(sithCog_FreeEntry_ADDR, sithCog_FreeEntry);

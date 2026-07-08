@@ -128,7 +128,7 @@ int jkDSS_idk4()
                 sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 255, 1);
                 sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 255, 1);
                 sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 255, 1);
-                sithMulti_EndLevel(sithTime_curMs + MULTI_NEXTLEVEL_DELAY_MS, 1);
+                sithMulti_QuitGame(sithTime_curMs + MULTI_NEXTLEVEL_DELAY_MS, 1);
             }
         }
         jkDSS_SendSetSaberInfo2(sithPlayer_pLocalPlayerThing);
@@ -1089,7 +1089,7 @@ void jkDSS_SendEndLevel()
     sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 255, 1);
     sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 255, 1);
     sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 255, 1);
-    sithMulti_EndLevel(sithTime_curMs + 10000, 1);
+    sithMulti_QuitGame(sithTime_curMs + 10000, 1);
 }
 
 int jkDSS_ProcessEndLevel(sithCogMsg *msg)
@@ -1101,7 +1101,7 @@ int jkDSS_ProcessEndLevel(sithCogMsg *msg)
     int arg0 = NETMSG_POPS32();
 
     jkEpisode_EndLevel(&jkEpisode_mLoad, arg0);
-    sithMulti_EndLevel(sithTime_curMs + 10000, 1);
+    sithMulti_QuitGame(sithTime_curMs + 10000, 1);
     return 1;
 }
 

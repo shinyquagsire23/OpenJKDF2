@@ -12,39 +12,39 @@ extern "C" {
 
 #define sithMulti_Startup_ADDR (0x004C9AE0)
 #define sithMulti_Shutdown_ADDR (0x004C9CB0)
-#define sithMulti_ServerLeft_ADDR (0x004C9D00)
+#define sithMulti_CheckPlayers_ADDR (0x004C9D00)
 #define sithMulti_CreatePlayer_ADDR (0x004C9FC0)
 #define sithMulti_InitTick_ADDR (0x004CA140)
 #define sithMulti_LobbyMessage_ADDR (0x004CA1B0)
 #define sithMulti_map_init_related_ADDR (0x004CA310)
 #define sithMulti_sub_4CA3B0_ADDR (0x004CA3B0)
 #define sithMulti_sub_4CA410_ADDR (0x004CA410)
-#define sithMulti_sub_4CA470_ADDR (0x004CA470)
-#define sithMulti_sendmsgidk4_ADDR (0x004CA610)
+#define sithMulti_ProcessPlayerLost_ADDR (0x004CA470)
+#define sithMulti_RemovePlayer_ADDR (0x004CA610)
 #define sithMulti_SendWelcome_ADDR (0x004CA710)
-#define sithMulti_ProcessJoinLeave_ADDR (0x004CA780)
-#define sithMulti_ProcessJoin_unused_ADDR (0x004CA910)
-#define sithMulti_SendLeaveJoin_ADDR (0x004CA9C0)
-#define sithMulti_ProcessLeaveJoin_ADDR (0x004CAAF0)
+#define sithMulti_ProcessWelcome_ADDR (0x004CA780)
+#define sithMulti_ProcessPlayerJoin_ADDR (0x004CA910)
+#define sithMulti_SyncPlayers_ADDR (0x004CA9C0)
+#define sithMulti_ProcessSyncPlayers_ADDR (0x004CAAF0)
 #define sithMulti_SendJoinRequest_ADDR (0x004CADB0)
 #define sithMulti_ProcessJoinRequest_ADDR (0x004CAE50)
-#define sithMulti_Send36_ADDR (0x004CB200)
+#define sithMulti_FinishJoining_ADDR (0x004CB200)
 #define sithMulti_SendChat_ADDR (0x004CB250)
 #define sithMulti_ProcessChat_ADDR (0x004CB2E0)
-#define sithMulti_SendPing_ADDR (0x004CB390)
+#define sithMulti_Ping_ADDR (0x004CB390)
 #define sithMulti_ProcessPing_ADDR (0x004CB3E0)
-#define sithMulti_ProcessPingResponse_ADDR (0x004CB410)
-#define sithMulti_SendQuit_ADDR (0x004CB4A0)
+#define sithMulti_ProcessPong_ADDR (0x004CB410)
+#define sithMulti_QuitPlayer_ADDR (0x004CB4A0)
 #define sithMulti_ProcessQuit_ADDR (0x004CB4F0)
-#define sithMulti_HandleTimeLimit_ADDR (0x004CB690)
+#define sithMulti_Update_ADDR (0x004CB690)
 #define sithMulti_SyncScores_ADDR (0x004CBC00)
-#define sithMulti_IterPlayersnothingidk_ADDR (0x004CBC10)
+#define sithMulti_GetPlayerIndexByID_ADDR (0x004CBC10)
 #define sithMulti_SetHandleridk_ADDR (0x004CBC40)
-#define sithMulti_HandleDeath_ADDR (0x004CBC50)
+#define sithMulti_ProcessKilledPlayer_ADDR (0x004CBC50)
 #define sithMulti_ProcessScore_ADDR (0x004CBDE0)
-#define sithMulti_EndLevel_ADDR (0x004CBF90)
+#define sithMulti_QuitGame_ADDR (0x004CBF90)
 #define sithMulti_GetSpawnIdx_ADDR (0x004CBFC0)
-#define sithMulti_FreeThing_ADDR (0x004CC110)
+#define sithMulti_RemoveStaticThing_ADDR (0x004CC110)
 
 #define NETMSG_START intptr_t craftingPacket = (intptr_t)&sithComm_netMsgTmp.pktData[0];
 #define NETMSG_START_2 intptr_t craftingPacket = (intptr_t)&stdComm_cogMsgTmp.pktData[0];
@@ -117,7 +117,7 @@ int sithMulti_ProcessChat(sithCogMsg *msg);
 
 HRESULT sithMulti_CreatePlayer(const wchar_t *a1, const wchar_t *a2, const char *a3, const char *a4, int a5, int a6, int multiModeFlags, int rate, int a9);
 int sithMulti_Startup();
-void sithMulti_FreeThing(int a1);
+void sithMulti_RemoveStaticThing(int a1);
 void sithMulti_Shutdown();
 int sithMulti_SendJoinRequest(int sendto_id);
 MATH_FUNC int sithMulti_GetSpawnIdx(sithThing *pPlayerThing);
@@ -125,40 +125,40 @@ void sithMulti_SyncScores();
 int sithMulti_map_init_related();
 int sithMulti_ResetNetState();
 void sithMulti_CleanupThings(sithWorld *pWorld);
-void sithMulti_sendmsgidk4(int playerIdx);
-void sithMulti_ProcessJoin_unused(int playerIdx);
-void sithMulti_Send36(int param1, int param2, int sendtoId);
-void sithMulti_HandleDeath(sithPlayerInfo *pPlayerInfo, sithThing *pKilledThing, sithThing *pKilledByThing);
-void sithMulti_EndLevel(uint32_t a1, int a2);
+void sithMulti_RemovePlayer(int playerIdx);
+void sithMulti_ProcessPlayerJoin(int playerIdx);
+void sithMulti_FinishJoining(int param1, int param2, int sendtoId);
+void sithMulti_ProcessKilledPlayer(sithPlayerInfo *pPlayerInfo, sithThing *pKilledThing, sithThing *pKilledByThing);
+void sithMulti_QuitGame(uint32_t a1, int a2);
 void sithMulti_SendWelcome(int a1, int playerIdx, int sendtoId);
-void sithMulti_SendQuit(int idx);
+void sithMulti_QuitPlayer(int idx);
 int sithMulti_LobbyMessage();
-int sithMulti_ProcessJoinLeave(sithCogMsg *msg);
+int sithMulti_ProcessWelcome(sithCogMsg *msg);
 int sithMulti_ProcessPing(sithCogMsg *msg);
-int sithMulti_ProcessPingResponse(sithCogMsg *msg);
+int sithMulti_ProcessPong(sithCogMsg *msg);
 int sithMulti_ProcessQuit(sithCogMsg *msg);
-int sithMulti_ServerLeft(int32_t a, sithEventInfo* b);
-void sithMulti_SendLeaveJoin(int sendtoId, int bSync);
-int sithMulti_ProcessLeaveJoin(sithCogMsg *msg);
-void sithMulti_sub_4CA470(int a1);
+int sithMulti_CheckPlayers(int32_t a, sithEventInfo* b);
+void sithMulti_SyncPlayers(int sendtoId, int bSync);
+int sithMulti_ProcessSyncPlayers(sithCogMsg *msg);
+void sithMulti_ProcessPlayerLost(int a1);
 void sithMulti_InitTick(uint32_t tickrate);
 int sithMulti_ProcessJoinRequest(sithCogMsg *msg);
-void sithMulti_HandleTimeLimit(int deltaMs);
-uint32_t sithMulti_IterPlayersnothingidk(int net_id);
-int sithMulti_SendPing(int sendtoId);
+void sithMulti_Update(int deltaMs);
+uint32_t sithMulti_GetPlayerIndexByID(int net_id);
+int sithMulti_Ping(int sendtoId);
 
 //static void (*sithMulti_Startup)() = (void*)sithMulti_Startup_ADDR;
-//static void (*sithMulti_FreeThing)(int a1) = (void*)sithMulti_FreeThing_ADDR;
-//static int (*sithMulti_SendQuit)(int a1) = (void*)sithMulti_SendQuit_ADDR;
+//static void (*sithMulti_RemoveStaticThing)(int a1) = (void*)sithMulti_RemoveStaticThing_ADDR;
+//static int (*sithMulti_QuitPlayer)(int a1) = (void*)sithMulti_QuitPlayer_ADDR;
 //static void (*sithMulti_SyncScores)(void) = (void*)sithMulti_SyncScores_ADDR;
 //static void (*sithMulti_Shutdown)() = (void*)sithMulti_Shutdown_ADDR;
 //static int (*sithMulti_LobbyMessage)() = (void*)sithMulti_LobbyMessage_ADDR;
-//static void (*sithMulti_HandleTimeLimit)(int) = (void*)sithMulti_HandleTimeLimit_ADDR;
+//static void (*sithMulti_Update)(int) = (void*)sithMulti_Update_ADDR;
 //static int (*sithMulti_SendWelcome)(int,int,int) = (void*)sithMulti_SendWelcome_ADDR;
-//static void (*sithMulti_HandleDeath)(sithPlayerInfo *a1, sithThing *killed, sithThing *killed_by) = (void*)sithMulti_HandleDeath_ADDR;
+//static void (*sithMulti_ProcessKilledPlayer)(sithPlayerInfo *a1, sithThing *killed, sithThing *killed_by) = (void*)sithMulti_ProcessKilledPlayer_ADDR;
 //static int (*sithMulti_CreatePlayer)(wchar_t *a1, wchar_t *a2, char *a3, char *a4, int a5, int a6, int a7, int a8, int a9) = (void*)sithMulti_CreatePlayer_ADDR;
 //static uint32_t (*sithMulti_InitTick)(uint32_t) = (void*)sithMulti_InitTick_ADDR;
-//static int (*sithMulti_ServerLeft)() = (void*)sithMulti_ServerLeft_ADDR;
+//static int (*sithMulti_CheckPlayers)() = (void*)sithMulti_CheckPlayers_ADDR;
 //static int (*sithMulti_SendJoinRequest)(int a1) = (void*)sithMulti_SendJoinRequest_ADDR;
 
 #ifdef __cplusplus

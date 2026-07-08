@@ -24,7 +24,7 @@ int sithComm_Startup()
     sithComm_msgFuncs[DSS_THINGPOS] = sithDSSThing_ProcessPos;
     sithComm_msgFuncs[DSS_FIREPROJECTILE] = sithDSSThing_ProcessFire;
     sithComm_msgFuncs[DSS_JOINREQUEST] = sithMulti_ProcessJoinRequest;
-    sithComm_msgFuncs[DSS_WELCOME] = sithMulti_ProcessJoinLeave;
+    sithComm_msgFuncs[DSS_WELCOME] = sithMulti_ProcessWelcome;
     sithComm_msgFuncs[DSS_DEATH] = sithDSSThing_ProcessDeath;
     sithComm_msgFuncs[DSS_DAMAGE] = sithDSSThing_ProcessDamage;
     sithComm_msgFuncs[DSS_SENDTRIGGER] = sithDSSCog_ProcessMessage;
@@ -40,7 +40,7 @@ int sithComm_Startup()
     sithComm_msgFuncs[DSS_SECTORSTATUS] = sithDSS_ProcessSectorStatus;
     sithComm_msgFuncs[DSS_PATHMOVE] = sithDSSThing_ProcessPathMove;
     sithComm_msgFuncs[DSS_SYNCPUPPET] = sithDSS_ProcessPuppetStatus;
-    sithComm_msgFuncs[DSS_LEAVEJOIN] = sithMulti_ProcessLeaveJoin;
+    sithComm_msgFuncs[DSS_LEAVEJOIN] = sithMulti_ProcessSyncPlayers;
     sithComm_msgFuncs[DSS_SYNCTHINGATTACHMENT] = sithDSSThing_ProcessAttachment;
     sithComm_msgFuncs[DSS_SYNCEVENTS] = sithDSS_ProcessSyncTaskEvents;
     sithComm_msgFuncs[DSS_SYNCCAMERAS] = sithDSS_ProcessSyncCameras;
@@ -58,7 +58,7 @@ int sithComm_Startup()
     sithComm_msgFuncs[DSS_PLAYKEYMODE] = sithDSSThing_ProcessPlayKeyMode;
     sithComm_msgFuncs[DSS_SETTHINGMODEL] = sithDSSThing_ProcessSetModel;
     sithComm_msgFuncs[DSS_PING] = sithMulti_ProcessPing;
-    sithComm_msgFuncs[DSS_PINGREPLY] = sithMulti_ProcessPingResponse;
+    sithComm_msgFuncs[DSS_PINGREPLY] = sithMulti_ProcessPong;
     sithComm_msgFuncs[DSS_ENUMPLAYERS] = stdComm_cogMsg_HandleEnumPlayers;
     sithComm_msgFuncs[DSS_RESET] = sithComm_cogMsg_Reset;
     sithComm_msgFuncs[DSS_QUIT] = sithMulti_ProcessQuit;
@@ -301,7 +301,7 @@ LABEL_22:
                 goto LABEL_14;
             }
             if ( sithNet_isServer )
-                sithMulti_SendQuit(sithComm_netMsgTmp.netMsg.thingIdx);
+                sithMulti_QuitPlayer(sithComm_netMsgTmp.netMsg.thingIdx);
         }
 LABEL_25:
         if ( sithComm_needsSync )

@@ -374,7 +374,7 @@ void sithPlayer_HandleSentDeathPkt(sithThing *thing)
         sithPhysics_ResetThingMovement(thing);
         sithWeapon_SyncPuppet(thing);
         if ( sithNet_isMulti )
-            sithMulti_HandleDeath(v1, thing, thing);
+            sithMulti_ProcessKilledPlayer(v1, thing, thing);
         if ( thing == sithPlayer_pLocalPlayerThing )
         {
             sithPlayer_debug_loadauto(thing);
@@ -395,7 +395,7 @@ void sithPlayer_sub_4C9150(sithThing *player, sithThing *killedBy)
     sithWeapon_SyncPuppet(player);
     sithInventory_SendKilledMessageToAll(player, killedBy);
     if ( sithNet_isMulti )
-        sithMulti_HandleDeath(v5, player, killedBy);
+        sithMulti_ProcessKilledPlayer(v5, player, killedBy);
     if ( player == sithPlayer_pLocalPlayerThing )
         sithControl_death_msgtimer = sithTime_curMs + 3000;
 }

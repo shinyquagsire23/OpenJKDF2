@@ -190,7 +190,7 @@ int sithCommand_CmdTick(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         if ( newTickrate >= 100 && newTickrate <= 300)
         {
             sithNet_tickrate = newTickrate;
-            sithEvent_RegisterTask(2, sithMulti_ServerLeft, newTickrate, 1);
+            sithEvent_RegisterTask(2, sithMulti_CheckPlayers, newTickrate, 1);
             result = 1;
         }
         else
@@ -225,7 +225,7 @@ int sithCommand_CmdSession(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         v4 = &DirectPlay_aPlayers[0];
         do
         {
-            v5 = sithMulti_IterPlayersnothingidk(v4->field_80);
+            v5 = sithMulti_GetPlayerIndexByID(v4->field_80);
             _sprintf(std_genBuffer, "Player %x (%S) is in the session", v4->field_80, jkPlayer_playerInfos[v5].player_name);
             sithConsole_PrintString(std_genBuffer);
             ++v3;
@@ -684,7 +684,7 @@ int sithCommand_CmdPing(stdDebugConsoleCmd *pCmd, const char *pArgStr)
             sithConsole_PrintString(std_genBuffer);
         }
     }
-    sithMulti_SendPing(jkPlayer_playerInfos[v2].net_id);
+    sithMulti_Ping(jkPlayer_playerInfos[v2].net_id);
     return 1;
 }
 
@@ -708,7 +708,7 @@ int sithCommand_CmdKick(stdDebugConsoleCmd *pCmd, const char *pArgStr)
             {
                 _sprintf(std_genBuffer, "Kicked %S", v3->player_name);
                 sithConsole_PrintString(std_genBuffer);
-                sithMulti_SendQuit(v3->net_id);
+                sithMulti_QuitPlayer(v3->net_id);
             }
             ++v2;
             ++v3;

@@ -407,7 +407,7 @@ int sithMain_Tick()
         //sithAI_PrintThings();
         
         sithConsole_Flush();
-        sithMulti_HandleTimeLimit(sithTime_deltaMs);
+        sithMulti_Update(sithTime_deltaMs);
         sithGamesave_Process();
 
         sithMain_tickEndMs = stdPlatform_GetTimeMsec();
