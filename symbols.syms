@@ -760,7 +760,7 @@ sithCollision_collideHurtIdk 0x008B4BF0 rdVector3
 
 sithSector_surfaceNormal 0x0054C6E8 rdVector3 = {0.0, 0.0, -1.0}
 sithAIAwareness_aEntries 0x00855028 sithSectorEntry[32]
-sithAIAwareness_aSectors 0x008553A8 sithSectorAlloc*
+sithAIAwareness_g_aSectors 0x008553A8 sithSectorAlloc*
 sithAIAwareness_numEntries 0x008553AC int
 sithAIAwareness_bInitted 0x008553B0 int
 sithAIAwareness_timerTicks 0x008553B4 int

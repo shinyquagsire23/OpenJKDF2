@@ -837,7 +837,7 @@ int sithAICmd_Listen(sithActor *actor, sithAIClassEntry *aiclass, sithActorInsti
     if ( (actor->flags & SITHAI_MODE_SEARCHING) == 0 )
         return 0;
     v6 = actor->thing;
-    v8 = &sithAIAwareness_aSectors[actor->thing->sector->id];
+    v8 = &sithAIAwareness_g_aSectors[actor->thing->sector->id];
     v25 = v8;
     if ( flags == SITHAI_MODE_MOVING )
     {
@@ -1293,7 +1293,7 @@ int sithAICmd_Dodge(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstin
     {
         if ( (actor->flags & SITHAI_MODE_ACTIVE) != 0 && flags == SITHAI_MODE_ATTACKING && aiclass->argsAsFloat[0] != 0.0 )
         {
-            v16 = &sithAIAwareness_aSectors[actor->thing->sector->id];
+            v16 = &sithAIAwareness_g_aSectors[actor->thing->sector->id];
             if (v16->field_4[2])
             {
                 if ( v16->field_58[2] )
@@ -1415,7 +1415,7 @@ int sithAICmd_SenseDanger(sithActor *actor, sithAIClassEntry *aiclass, sithActor
     rdVector3 a5; // [esp+Ch] [ebp-Ch] BYREF
     flex_t tmp;
 
-    v7 = &sithAIAwareness_aSectors[actor->thing->sector->id];
+    v7 = &sithAIAwareness_g_aSectors[actor->thing->sector->id];
     if ( (actor->flags & SITHAI_MODE_FLEEING) != 0 || (actor->flags & SITHAI_MODE_SEARCHING) == 0 )
         return 0;
     if ( !flags )

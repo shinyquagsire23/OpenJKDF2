@@ -12,8 +12,8 @@
 
 int sithAIAwareness_Startup()
 {
-    sithAIAwareness_aSectors = (sithSectorAlloc *)SITH_ALLOC(sizeof(sithSectorAlloc) * sithWorld_g_pCurrentWorld->numSectors);
-    if (sithAIAwareness_aSectors)
+    sithAIAwareness_g_aSectors = (sithSectorAlloc *)SITH_ALLOC(sizeof(sithSectorAlloc) * sithWorld_g_pCurrentWorld->numSectors);
+    if (sithAIAwareness_g_aSectors)
     {
         sithAIAwareness_numEntries = 0;
         if ( sithEvent_RegisterTask(3, sithAIAwareness_Update, 1000, SITHEVENT_TASKPERIODIC) )
@@ -28,8 +28,8 @@ int sithAIAwareness_Startup()
 
 void sithAIAwareness_Close()
 {
-    SITH_FREE(sithAIAwareness_aSectors);
-    sithAIAwareness_aSectors = 0;
+    SITH_FREE(sithAIAwareness_g_aSectors);
+    sithAIAwareness_g_aSectors = 0;
     sithEvent_RegisterTask(3, NULL, 0, SITHEVENT_TASKDISABLED);
     sithAIAwareness_bInitted = 0;
 }
@@ -104,7 +104,7 @@ int sithAIAwareness_Update(int32_t a, sithEventInfo* b)
                     sithSector* v6 = i->thing->sector;
                     if ( v6 )
                     {
-                        if ( sithAIAwareness_aSectors[v6->id].field_0 == sithAIAwareness_timerTicks )
+                        if ( sithAIAwareness_g_aSectors[v6->id].field_0 == sithAIAwareness_timerTicks )
                             sithAI_EmitEvent(i, SITHAI_MODE_ATTACKING, 0);
                     }
                 }
@@ -122,9 +122,9 @@ void sithAIAwareness_ProcessEvent(sithSectorEntry *pSectorEntry, sithSector *pSe
     OPENJKDF2_WARN_NULL_AND_RETURN(pSector);
     OPENJKDF2_WARN_NULL_AND_RETURN(pPos1);
     OPENJKDF2_WARN_NULL_AND_RETURN(pPos2);
-    OPENJKDF2_WARN_NULL_AND_RETURN(sithAIAwareness_aSectors);
+    OPENJKDF2_WARN_NULL_AND_RETURN(sithAIAwareness_g_aSectors);
 
-    sithSectorAlloc* pSectorAlloc = &sithAIAwareness_aSectors[pSector->id];
+    sithSectorAlloc* pSectorAlloc = &sithAIAwareness_g_aSectors[pSector->id];
     if (pSectorAlloc->field_0 != sithAIAwareness_timerTicks)
     {
         _memset(pSectorAlloc, 0, sizeof(sithSectorAlloc));
