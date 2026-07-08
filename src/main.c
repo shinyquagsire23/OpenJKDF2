@@ -1676,10 +1676,10 @@ void do_hooks()
     hook_function(rdClip_Line3Ortho_ADDR, rdClip_Line3Ortho);
     hook_function(rdClip_Line3_ADDR, rdClip_Line3);
     
-    hook_function(rdClip_SphereInFrustum_ADDR, rdClip_SphereInFrustum);
+    hook_function(rdClip_SphereInFrustrum_ADDR, rdClip_SphereInFrustrum);
     
     //hook_function(rdClip_Face3W_ADDR, rdClip_Face3W);
-    //hook_function(rdClip_Face3GT_ADDR, rdClip_Face3GT);
+    //hook_function(rdClip_Face3T_ADDR, rdClip_Face3T);
     //hook_function(rdClip_Face3S_ADDR, rdClip_Face3S);
     //hook_function(rdClip_Face3GS_ADDR, rdClip_Face3GS);
     

@@ -449,8 +449,8 @@ void sithRender_Draw()
 
             rdVector3 centerTrans = pSectorIter->center;
             rdMatrix_TransformPoint34Acc(&centerTrans, &rdCamera_pCurCamera->view_matrix);
-            int clipTestA = rdClip_SphereInFrustum(rdCamera_pCurCamera->pClipFrustum, &centerTrans, 0.0);
-            int clipTestB = rdClip_SphereInFrustum(rdCamera_pCurCamera->pClipFrustum, &centerTrans, pSectorIter->radius);
+            int clipTestA = rdClip_SphereInFrustrum(rdCamera_pCurCamera->pClipFrustum, &centerTrans, 0.0);
+            int clipTestB = rdClip_SphereInFrustrum(rdCamera_pCurCamera->pClipFrustum, &centerTrans, pSectorIter->radius);
             if (clipTestA == SPHERE_FULLY_INSIDE) {
 
             }
@@ -498,7 +498,7 @@ void sithRender_Draw()
 
             rdVector3 centerTrans = pSectorIter->center;
             rdMatrix_TransformPoint34Acc(&centerTrans, &rdCamera_pCurCamera->view_matrix);
-            if (rdClip_SphereInFrustum(rdCamera_pCurCamera->pClipFrustum, &centerTrans, pSectorIter->radius * 3.5) == SPHERE_FULLY_OUTSIDE) {
+            if (rdClip_SphereInFrustrum(rdCamera_pCurCamera->pClipFrustum, &centerTrans, pSectorIter->radius * 3.5) == SPHERE_FULLY_OUTSIDE) {
                 flex_t dist = rdVector_Dist3(&sithCamera_currentCamera->vec3_1, &pSectorIter->center);
                 if (dist + (pSectorIter->radius * 3.5) < 0.0) {
                     continue;
@@ -1438,7 +1438,7 @@ void sithRender_KindaClip(sithSector *sector, rdClipFrustum *frustumArg, flex_t 
                 rdClipFrustum* pSphereFrustum = frustumArg;//rdCamera_pCurCamera->pClipFrustum;//frustumArg;
                 rdMatrix_TransformPoint34Acc(&centerTrans, &rdCamera_pCurCamera->view_matrix);
 
-                int clipResult = rdClip_SphereInFrustum(pSphereFrustum, &centerTrans, radius);
+                int clipResult = rdClip_SphereInFrustrum(pSphereFrustum, &centerTrans, radius);
 
                 // Try to guess if the sphere is actually encapsulating the camera
                 if (UNLIKELY((dist - radius) < 0.0 || (dist + radius) >= rdCamera_pCurCamera->pClipFrustum->zFar || (radius * 2.0) >= 2.5 || dist < 0.01)) {
@@ -1455,7 +1455,7 @@ void sithRender_KindaClip(sithSector *sector, rdClipFrustum *frustumArg, flex_t 
 
 #if 0
                     // Double-check if the sphere is encapsulating the frustum
-                    clipResult = rdClip_SphereInFrustum(pSphereFrustum, &centerTrans, 0.0);
+                    clipResult = rdClip_SphereInFrustrum(pSphereFrustum, &centerTrans, 0.0);
                     if (clipResult == SPHERE_FULLY_OUTSIDE) {
 #if 0
                         for (int i = 0; i < depth+1; i++) {
@@ -1841,7 +1841,7 @@ void sithRender_RenderSectors()
 
                 rdMatrix_TransformPoint34Acc(&centerTrans, &rdCamera_pCurCamera->view_matrix);
 
-                clipResult = rdClip_SphereInFrustum(pSphereFrustum, &centerTrans, v65->radius);
+                clipResult = rdClip_SphereInFrustrum(pSphereFrustum, &centerTrans, v65->radius);
 
                 /*if (sithRender_lastRenderTick & 1) {
                     clipResult = SPHERE_CLIPPING_EDGE;
@@ -1854,7 +1854,7 @@ void sithRender_RenderSectors()
 
                     // Run a second check to see if we can have hardware clip for us
                     // (mostly pertinent on fixed-pt 3D hardware like DSi)
-                    clipResult = rdClip_SphereInFrustum(&sithRender_absoluteMaxFrustum, &centerTrans, v65->radius);
+                    clipResult = rdClip_SphereInFrustrum(&sithRender_absoluteMaxFrustum, &centerTrans, v65->radius);
                 }
 
                 if (LIKELY(clipResult == SPHERE_FULLY_OUTSIDE)) {
@@ -2422,12 +2422,12 @@ LABEL_150:
             }
 
             rdMatrix_TransformPoint34(&i->screenPos, &i->position, &rdCamera_pCurCamera->view_matrix);
-            v63 = rdClip_SphereInFrustum(level_idk->clipFrustum, &i->screenPos, i->rdthing.model3->radius);
+            v63 = rdClip_SphereInFrustrum(level_idk->clipFrustum, &i->screenPos, i->rdthing.model3->radius);
 #ifdef SITHRENDER_SPHERE_TEST_SURFACES
             extern rdClipFrustum sithRender_absoluteMaxFrustum;
 
             if (UNLIKELY(v63 == SPHERE_CLIPPING_EDGE)) {
-                v63 = rdClip_SphereInFrustum(&sithRender_absoluteMaxFrustum, &i->screenPos, i->rdthing.model3->radius);
+                v63 = rdClip_SphereInFrustrum(&sithRender_absoluteMaxFrustum, &i->screenPos, i->rdthing.model3->radius);
             }
 #endif
             i->rdthing.clippingIdk = v63;
@@ -2768,28 +2768,28 @@ void sithRender_RenderThings()
                         case RD_THINGTYPE_MODEL:
                             radius = thingIter->rdthing.model3->radius;
                             clipRadius = radius;
-                            clippingVal = rdClip_SphereInFrustum(v1->clipFrustum, &thingIter->screenPos, clipRadius);
+                            clippingVal = rdClip_SphereInFrustrum(v1->clipFrustum, &thingIter->screenPos, clipRadius);
                             break;
 
                         case RD_THINGTYPE_SPRITE3:
                             clipRadius = thingIter->rdthing.sprite3->radius;
                             ++sithRender_82F4B4;
-                            clippingVal = rdClip_SphereInFrustum(v1->clipFrustum, &thingIter->screenPos, clipRadius);
+                            clippingVal = rdClip_SphereInFrustrum(v1->clipFrustum, &thingIter->screenPos, clipRadius);
                             break;
 
                         case RD_THINGTYPE_PARTICLECLOUD:
                             clipRadius = thingIter->rdthing.particlecloud->cloudRadius;
-                            clippingVal = rdClip_SphereInFrustum(v1->clipFrustum, &thingIter->screenPos, clipRadius);
+                            clippingVal = rdClip_SphereInFrustrum(v1->clipFrustum, &thingIter->screenPos, clipRadius);
                             break;
 
                         case RD_THINGTYPE_POLYLINE:
                             radius = thingIter->rdthing.polyline->length;
                             clipRadius = radius;
-                            clippingVal = rdClip_SphereInFrustum(v1->clipFrustum, &thingIter->screenPos, clipRadius);
+                            clippingVal = rdClip_SphereInFrustrum(v1->clipFrustum, &thingIter->screenPos, clipRadius);
                             break;
 
                         default:
-                            clippingVal = rdClip_SphereInFrustum(v1->clipFrustum, &thingIter->screenPos, clipRadius);
+                            clippingVal = rdClip_SphereInFrustrum(v1->clipFrustum, &thingIter->screenPos, clipRadius);
                             break;
                     }
                     //printf("%f %f %f %d\n", (flex32_t)thingIter->screenPos.x, (flex32_t)thingIter->screenPos.y, (flex32_t)thingIter->screenPos.z, clippingVal);
@@ -3086,7 +3086,7 @@ void sithRender_RenderAlphaAdjoins()
 
             rdMatrix_TransformPoint34Acc(&centerTrans, &rdCamera_pCurCamera->view_matrix);
 
-            clipResult = rdClip_SphereInFrustum(pSphereFrustum, &centerTrans, v0->radius);
+            clipResult = rdClip_SphereInFrustrum(pSphereFrustum, &centerTrans, v0->radius);
 
             /*if (sithRender_lastRenderTick & 1) {
                 clipResult = SPHERE_CLIPPING_EDGE;
@@ -3099,7 +3099,7 @@ void sithRender_RenderAlphaAdjoins()
 
                 // Run a second check to see if we can have hardware clip for us
                 // (mostly pertinent on fixed-pt 3D hardware like DSi)
-                clipResult = rdClip_SphereInFrustum(&sithRender_absoluteMaxFrustum, &centerTrans, v0->radius);
+                clipResult = rdClip_SphereInFrustrum(&sithRender_absoluteMaxFrustum, &centerTrans, v0->radius);
             }
 
             if (clipResult == SPHERE_FULLY_OUTSIDE) {

@@ -931,7 +931,7 @@ int rdClip_Line3(const rdClipFrustum* NO_ALIAS clipFrustum, rdVector3 *point1, r
     return 1;
 }
 
-int rdClip_SphereInFrustum(const rdClipFrustum* NO_ALIAS frust, const rdVector3* NO_ALIAS pos, flex_t rad)
+int rdClip_SphereInFrustrum(const rdClipFrustum* NO_ALIAS frust, const rdVector3* NO_ALIAS pos, flex_t rad)
 {
     flex_t topPlaneMin, topPlaneMax;
     flex_t bottomPlaneMin, bottomPlaneMax;
@@ -1485,7 +1485,7 @@ int rdClip_Face3W(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3* NO_ALIA
 }
 
 // TVertices as in Texture Vertices, or UVs
-int rdClip_Face3GT(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3* NO_ALIAS pVertices, rdVector2* NO_ALIAS pTVertices, flex_t* NO_ALIAS pIVertices, int numVertices)
+int rdClip_Face3T(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3* NO_ALIAS pVertices, rdVector2* NO_ALIAS pTVertices, flex_t* NO_ALIAS pIVertices, int numVertices)
 {
 #ifdef EXPERIMENTAL_FIXED_POINT
     const int premultiplyA = 2;
@@ -3117,7 +3117,7 @@ int rdClip_Face3GS(const rdClipFrustum* NO_ALIAS frustum, rdVector3 *vertices, f
 }
 
 // TVertices as in Texture Vertices, or UVs
-int rdClip_Face3T(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3* NO_ALIAS pVertices, rdVector2* NO_ALIAS pTVertices, int numVertices)
+int rdClip_Face3GT(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3* NO_ALIAS pVertices, rdVector2* NO_ALIAS pTVertices, int numVertices)
 {
     INST_WORKBUFS
 

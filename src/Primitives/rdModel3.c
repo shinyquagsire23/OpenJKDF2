@@ -1348,12 +1348,12 @@ int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
 
         // Moved this in here, it's not used elsewhere
         rdMatrix_TransformPoint34(&vertex_out, &matrix_4_3->scale, &rdCamera_pCurCamera->view_matrix);
-        frustumCull = rdClip_SphereInFrustum(pThingFrustum, &vertex_out, pCurModel3->radius);
+        frustumCull = rdClip_SphereInFrustrum(pThingFrustum, &vertex_out, pCurModel3->radius);
 #ifdef SITHRENDER_SPHERE_TEST_SURFACES
         extern rdClipFrustum sithRender_absoluteMaxFrustum;
 
         if (frustumCull == SPHERE_CLIPPING_EDGE) {
-            frustumCull = rdClip_SphereInFrustum(&sithRender_absoluteMaxFrustum, &vertex_out, pCurModel3->radius);
+            frustumCull = rdClip_SphereInFrustrum(&sithRender_absoluteMaxFrustum, &vertex_out, pCurModel3->radius);
         }
 #endif
     }
@@ -1490,12 +1490,12 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
 
         // Moved this in here, it's not used elsewhere
         rdMatrix_TransformPoint34(&vertex_out, &mat->scale, &rdCamera_pCurCamera->view_matrix);
-        meshFrustumCull = (rdroid_curCullFlags & 1) ? rdClip_SphereInFrustum(pMeshFrustum, &vertex_out, pCurMesh->radius) : SPHERE_CLIPPING_EDGE;
+        meshFrustumCull = (rdroid_curCullFlags & 1) ? rdClip_SphereInFrustrum(pMeshFrustum, &vertex_out, pCurMesh->radius) : SPHERE_CLIPPING_EDGE;
 #ifdef SITHRENDER_SPHERE_TEST_SURFACES
         extern rdClipFrustum sithRender_absoluteMaxFrustum;
 
         if (meshFrustumCull == SPHERE_CLIPPING_EDGE) {
-            meshFrustumCull = rdClip_SphereInFrustum(&sithRender_absoluteMaxFrustum, &vertex_out, pCurMesh->radius);
+            meshFrustumCull = rdClip_SphereInFrustrum(&sithRender_absoluteMaxFrustum, &vertex_out, pCurMesh->radius);
         }
 #endif
     }

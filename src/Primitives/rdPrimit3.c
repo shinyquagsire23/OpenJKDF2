@@ -373,7 +373,7 @@ LABEL_25:
                     v85 = v71->vertexUVs;
                     v83 = v71->vertices;
                     if (rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective)
-                        v71->numVertices = rdClip_Face3T(clipFrustum, v83, v85, v72);
+                        v71->numVertices = rdClip_Face3GT(clipFrustum, v83, v85, v72);
                     else
                         v71->numVertices = rdClip_Face3TOrtho(clipFrustum, v83, v85, v72);
                 }
@@ -462,7 +462,7 @@ LABEL_25:
                         v55 = idxInfof;
                     }
                     if (rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective)
-                        v53->numVertices = rdClip_Face3GT(clipFrustum, v53->vertices, v53->vertexUVs, v53->paDynamicLight, v55);
+                        v53->numVertices = rdClip_Face3T(clipFrustum, v53->vertices, v53->vertexUVs, v53->paDynamicLight, v55);
                     else
                         v53->numVertices = rdClip_Face3GTOrtho(clipFrustum, v53->vertices, v53->vertexUVs, v53->paDynamicLight, v55);
                 }
@@ -1366,7 +1366,7 @@ rdPrimit3_ClipFaceRGB
                 }
 #endif
                 if (rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective) {
-                    uVar15 = rdClip_Face3T(clipFrustum,mesh_out->vertices,
+                    uVar15 = rdClip_Face3GT(clipFrustum,mesh_out->vertices,
                                            mesh_out->vertexUVs,idxInfo->numVertices);
                     mesh_out->numVertices = uVar15;
                     return;
@@ -1661,7 +1661,7 @@ void rdPrimit3_ClipFaceRGBLevel
                     } while (local_8 != 0);
                 }
                 if (rdCamera_pCurCamera->projectType == rdCameraProjectType_Perspective) {
-                    uVar16 = rdClip_Face3T(clipFrustum,mesh_out->vertices,
+                    uVar16 = rdClip_Face3GT(clipFrustum,mesh_out->vertices,
                                            mesh_out->vertexUVs,idxInfo->numVertices);
                     mesh_out->numVertices = uVar16;
                     return;
