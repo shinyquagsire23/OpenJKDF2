@@ -157,13 +157,13 @@ sithEvent_numFreeEventBuffers 0x00854FFC int
 sithEvent_bInit 0x855004 int
 sithEvent_bOpen 0x855008 int
 
-rdClip_faceStatus 0x0082EE5C int
+rdClip_g_faceStatus 0x0082EE5C int
 rdClip_pSourceVert 0x0082EC50 rdVector3*
 rdClip_workIVerts 0x0082EC58 flex_t[32] NO_REINIT
-rdClip_workVerts 0x0082ECD8 rdVector3[32] NO_REINIT
+rdClip_aWorkVerts 0x0082ECD8 rdVector3[32] NO_REINIT
 rdClip_pDestVert 0x0082EB44 rdVector3*
 rdClip_pDestIVert 0x0082EB48 flex_t*
-rdClip_workTVerts 0x0082EB50 rdVector2[32] NO_REINIT
+rdClip_aWorkTVerts 0x0082EB50 rdVector2[32] NO_REINIT
 rdClip_pSourceIVert 0x0082EB38 flex_t*
 rdClip_pSourceTVert 0x0082EB3C rdVector2*
 rdClip_pDestTVert 0x0082EB40 rdVector2*

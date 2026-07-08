@@ -863,8 +863,8 @@ void sithRender_BuildVisibleSectorList(sithSector *sector, rdClipFrustum *frustu
 
             rdPrimit3_ClipFace(frustumArg, RD_GEOMODE_WIREFRAME, RD_LIGHTMODE_NOTLIT, RD_TEXTUREMODE_AFFINE, &sithRender_faceView, &meshinfo_out, &adjoinSurface->surfaceInfo.face.clipIdk);
 
-            if ((((unsigned int)meshinfo_out.numVertices >= 3u) || (rdClip_faceStatus & CLIPSTAT_NONE_VISIBLE)) 
-                && ((rdClip_faceStatus & (CLIPSTAT_NEAR|CLIPSTAT_NONE_VISIBLE)) || ((adjoinIter->flags & 1) && bAdjoinIsTransparent))) 
+            if ((((unsigned int)meshinfo_out.numVertices >= 3u) || (rdClip_g_faceStatus & CLIPSTAT_NONE_VISIBLE)) 
+                && ((rdClip_g_faceStatus & (CLIPSTAT_NEAR|CLIPSTAT_NONE_VISIBLE)) || ((adjoinIter->flags & 1) && bAdjoinIsTransparent))) 
             {
 #ifdef TARGET_TWL
                 rdCamera_pCurCamera->fnProjectLstClip(sithRender_aTransformedClipVertices, sithRender_aClipVertices, meshinfo_out.numVertices);
@@ -875,7 +875,7 @@ void sithRender_BuildVisibleSectorList(sithSector *sector, rdClipFrustum *frustu
                 v31 = frustumArg;
 
                 // no frustum culling if forced
-                if (rdClip_faceStatus & (CLIPSTAT_NEAR|CLIPSTAT_NONE_VISIBLE))
+                if (rdClip_g_faceStatus & (CLIPSTAT_NEAR|CLIPSTAT_NONE_VISIBLE))
                 {
                     v31 = frustumArg;
                 }
