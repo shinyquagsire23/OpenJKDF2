@@ -213,7 +213,7 @@ int sithAIClass_LoadEntry(char *fpath, sithAIClass *aiclass)
                 entry = &aiclass->entries[nextIdx];
                 if ( nextIdx < 0x10 )
                 {
-                    instinct = sithAI_FindCommand(stdConffile_entry.args[0].value);
+                    instinct = sithAI_FindInstinct(stdConffile_entry.args[0].value);
                     if ( instinct )
                     {
                         entry->func = instinct->func;

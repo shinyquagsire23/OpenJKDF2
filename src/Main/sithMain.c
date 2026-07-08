@@ -349,7 +349,7 @@ int sithMain_Tick()
                     sithMessage_ProcessMessages();
 
                 if ( (g_debugmodeFlags & DEBUGFLAG_NO_AIEVENTS) == 0  && (!sithNet_isMulti || sithNet_isMulti && sithNet_isServer))
-                    sithAI_TickAll();
+                    sithAI_Process();
 
                 sithSurface_Tick(sithTime_deltaSeconds);
                 // TODO
@@ -384,7 +384,7 @@ int sithMain_Tick()
                 sithMessage_ProcessMessages();
 
             if ( (g_debugmodeFlags & DEBUGFLAG_NO_AIEVENTS) == 0 && (!sithNet_isMulti || sithNet_isMulti && sithNet_isServer))
-                sithAI_TickAll();
+                sithAI_Process();
         
             sithSurface_Tick(sithTime_deltaSeconds);
             if ( g_sithMode != 2 )
@@ -404,7 +404,7 @@ int sithMain_Tick()
             sithCogScript_TickAll();
         }
 
-        //sithAI_PrintThings();
+        //sithAI_AIList();
         
         sithConsole_Flush();
         sithMulti_Update(sithTime_deltaMs);

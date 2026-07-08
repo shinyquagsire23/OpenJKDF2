@@ -11,17 +11,17 @@
 #define sithAI_Shutdown_ADDR (0x004E9B90)
 #define sithAI_Open_ADDR (0x004E9BD0)
 #define sithAI_Close_ADDR (0x004E9C00)
-#define sithAI_NewEntry_ADDR (0x004E9CB0)
-#define sithAI_FreeEntry_ADDR (0x004E9D80)
-#define sithAI_TickAll_ADDR (0x004E9E20)
-#define sithAI_TickActor_ADDR (0x004E9E90)
-#define sithAI_SetActorFireTarget_ADDR (0x004E9F80)
-#define sithAI_RegisterCommand_ADDR (0x004EA0A0)
-#define sithAI_FindCommand_ADDR (0x004EA110)
-#define sithAI_PrintThings_ADDR (0x004EA190)
-#define sithAI_PrintThingStatus_ADDR (0x004EA230)
-#define sithAI_LoadThingActorParams_ADDR (0x004EA3F0)
-#define sithAI_idkframesalloc_ADDR (0x004EA520)
+#define sithAI_Create_ADDR (0x004E9CB0)
+#define sithAI_Free_ADDR (0x004E9D80)
+#define sithAI_Process_ADDR (0x004E9E20)
+#define sithAI_InstinctUpdate_ADDR (0x004E9E90)
+#define sithAI_EmitEvent_ADDR (0x004E9F80)
+#define sithAI_RegisterInstinct_ADDR (0x004EA0A0)
+#define sithAI_FindInstinct_ADDR (0x004EA110)
+#define sithAI_AIList_ADDR (0x004EA190)
+#define sithAI_AIStatus_ADDR (0x004EA230)
+#define sithAI_ParseArg_ADDR (0x004EA3F0)
+#define sithAI_CreateAIFramesFomMarker_ADDR (0x004EA520)
 #define sithAI_Tick_ADDR (0x004EA5E0)
 #define sithAI_sub_4EA630_ADDR (0x004EA630)
 #define sithAI_idk_msgarrived_target_ADDR (0x004EA890)
@@ -58,17 +58,17 @@ int sithAI_Startup();
 void sithAI_Shutdown();
 int sithAI_Open();
 void sithAI_Close();
-void sithAI_NewEntry(sithThing *thing);
-void sithAI_FreeEntry(sithThing *thing);
-void sithAI_TickAll();
-void sithAI_TickActor(sithActor *actor);
-void sithAI_SetActorFireTarget(sithActor *actor, int a2, intptr_t a3);
-void sithAI_RegisterCommand(const char *cmdName, sithAICommandFunc_t func, int param1, int param2, int param3);
-sithAICommand* sithAI_FindCommand(const char *cmdName);
-int sithAI_PrintThings(stdDebugConsoleCmd* a, const char* b);
-int sithAI_PrintThingStatus(stdDebugConsoleCmd* a1, const char *idxStr);
-int sithAI_LoadThingActorParams(stdConffileArg *arg, sithThing *thing, int param);
-void sithAI_idkframesalloc(sithThing *a2, sithThing *a3, rdVector3 *a4);
+void sithAI_Create(sithThing *thing);
+void sithAI_Free(sithThing *thing);
+void sithAI_Process();
+void sithAI_InstinctUpdate(sithActor *actor);
+void sithAI_EmitEvent(sithActor *actor, int a2, intptr_t a3);
+void sithAI_RegisterInstinct(const char *cmdName, sithAICommandFunc_t func, int param1, int param2, int param3);
+sithAICommand* sithAI_FindInstinct(const char *cmdName);
+int sithAI_AIList(stdDebugConsoleCmd* a, const char* b);
+int sithAI_AIStatus(stdDebugConsoleCmd* a1, const char *idxStr);
+int sithAI_ParseArg(stdConffileArg *arg, sithThing *thing, int param);
+void sithAI_CreateAIFramesFomMarker(sithThing *a2, sithThing *a3, rdVector3 *a4);
 void sithAI_Tick(sithThing *thing, flex_t deltaSeconds);
 MATH_FUNC void sithAI_sub_4EA630(sithActor *actor, flex_t deltaSeconds);
 MATH_FUNC void sithAI_idk_msgarrived_target(sithActor *actor, flex_t deltaSeconds);
@@ -100,12 +100,12 @@ MATH_FUNC int sithAI_Leap(sithActor *pActor,flex_t minDist,flex_t maxDist,flex_t
 MATH_FUNC sithThing* sithAI_FUN_00539a60(sithActor *pThing);
 
 //static int (*sithAI_Startup)() = (void*)sithAI_Startup_ADDR;
-//static int (*sithAI_LoadThingActorParams)(stdConffileArg *arg, sithThing *thing, int param) = (void*)sithAI_LoadThingActorParams_ADDR;
-//static void (*sithAI_FreeEntry)(sithThing *thing) = (void*)sithAI_FreeEntry_ADDR;
+//static int (*sithAI_ParseArg)(stdConffileArg *arg, sithThing *thing, int param) = (void*)sithAI_ParseArg_ADDR;
+//static void (*sithAI_Free)(sithThing *thing) = (void*)sithAI_Free_ADDR;
 //static void (*sithAI_Tick)(sithThing *thing, flex_t deltaSeconds) = (void*)sithAI_Tick_ADDR;
-//static void (*sithAI_TickActor)(sithActor *actor) = (void*)sithAI_TickActor_ADDR;
-//static void (*sithAI_TickAll)() = (void*)sithAI_TickAll_ADDR;
-//static void (*sithAI_SetActorFireTarget)(sithActor *a1, int a2, int a3) = (void*)sithAI_SetActorFireTarget_ADDR;
+//static void (*sithAI_InstinctUpdate)(sithActor *actor) = (void*)sithAI_InstinctUpdate_ADDR;
+//static void (*sithAI_Process)() = (void*)sithAI_Process_ADDR;
+//static void (*sithAI_EmitEvent)(sithActor *a1, int a2, int a3) = (void*)sithAI_EmitEvent_ADDR;
 //static int (*sithAI_FirstThingInView)(sithSector *a1, rdMatrix34 *a2, flex_t a3, flex_t a4, int a5, sithThing **a6, int a7, flex_t a8) = (void*)sithAI_FirstThingInView_ADDR;
 
 //static int (*sithAI_FireWeapon)(sithActor *a1, flex_t a2, flex_t a3, flex_t a4, flex_t a5, int a6, int a7) = (void*)sithAI_FireWeapon_ADDR;

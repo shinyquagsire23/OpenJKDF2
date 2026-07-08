@@ -66,8 +66,8 @@ void sithCommand_Startup()
         sithConsole_RegisterCommand(sithCommand_CogList, "coglist", 0);
         sithConsole_RegisterCommand(sithCogScript_DevCmdCogStatus, "cogstatus", 0);
         sithConsole_RegisterCommand(sithCommand_DebugMode, "noaishots", 4);
-        sithConsole_RegisterCommand(sithAI_PrintThingStatus, "aistatus", 0);
-        sithConsole_RegisterCommand(sithAI_PrintThings, "ailist", 0);
+        sithConsole_RegisterCommand(sithAI_AIStatus, "aistatus", 0);
+        sithConsole_RegisterCommand(sithAI_AIList, "ailist", 0);
         sithConsole_RegisterCommand(sithCommand_Fly, "fly", 0);
         sithConsole_RegisterCommand(sithCommand_Memory, "mem", 0);
         sithConsole_RegisterCommand(sithCommand_DynamicMemory, "dynamicmem", 0);

@@ -20,10 +20,10 @@
 
 void jkAI_Startup()
 {
-    sithAI_RegisterCommand("saberfighting", (sithAICommandFunc_t)jkAI_SaberFighting, 2, 0, 0);
-    sithAI_RegisterCommand("forcepowers", (sithAICommandFunc_t)jkAI_ForcePowers, 2, 0, 0);
-    sithAI_RegisterCommand("sabermove", (sithAICommandFunc_t)jkAI_SaberMove, 2, 0, 0);
-    sithAI_RegisterCommand("specialattack", (sithAICommandFunc_t)jkAI_SpecialAttack, 2, 0, 4);
+    sithAI_RegisterInstinct("saberfighting", (sithAICommandFunc_t)jkAI_SaberFighting, 2, 0, 0);
+    sithAI_RegisterInstinct("forcepowers", (sithAICommandFunc_t)jkAI_ForcePowers, 2, 0, 0);
+    sithAI_RegisterInstinct("sabermove", (sithAICommandFunc_t)jkAI_SaberMove, 2, 0, 0);
+    sithAI_RegisterInstinct("specialattack", (sithAICommandFunc_t)jkAI_SpecialAttack, 2, 0, 4);
 }
 
 // MoTS altered

@@ -2383,17 +2383,17 @@ sithAI_Startup	.text	004E9AA0	000000E9			R	.	.	.	.	.	.	.
 sithAI_Shutdown	.text	004E9B90	00000035			R	.	.	.	.	.	.	.
 sithAI_Open	.text	004E9BD0	00000023			R	.	.	.	.	.	.	.
 sithAI_Close	.text	004E9C00	000000A2			R	.	.	.	.	.	.	.
-sithAI_NewEntry	.text	004E9CB0	000000C6	0000000C	00000004	R	.	.	.	.	.	T	.
-sithAI_FreeEntry	.text	004E9D80	0000009C	00000004	00000004	R	.	.	.	.	.	T	.
-sithAI_TickAll	.text	004E9E20	0000006E	00000008	00000000	R	.	.	.	.	.	T	.
-sithAI_TickActor	.text	004E9E90	000000EB	00000018	00000004	R	.	.	.	.	.	T	.
-sithAI_SetActorFireTarget	.text	004E9F80	0000011B	00000010	0000000C	R	.	.	.	.	.	T	.
-sithAI_RegisterCommand	.text	004EA0A0	00000066	00000000	00000014	R	.	.	.	.	.	T	.
-sithAI_FindCommand	.text	004EA110	00000079	00000010	00000004	R	.	.	.	.	.	T	.
-sithAI_PrintThings	.text	004EA190	00000095	00000000	00000000	R	.	.	.	.	.	.	.
-sithAI_PrintThingStatus	.text	004EA230	000001B1	00000048	00000008	R	.	.	.	.	B	T	.
-sithAI_LoadThingActorParams	.text	004EA3F0	00000127	0000001C	0000000C	R	.	.	.	.	.	T	.
-sithAI_idkframesalloc	.text	004EA520	000000C0	0000001C	0000000C	R	.	.	.	.	.	T	.
+sithAI_Create	.text	004E9CB0	000000C6	0000000C	00000004	R	.	.	.	.	.	T	.
+sithAI_Free	.text	004E9D80	0000009C	00000004	00000004	R	.	.	.	.	.	T	.
+sithAI_Process	.text	004E9E20	0000006E	00000008	00000000	R	.	.	.	.	.	T	.
+sithAI_InstinctUpdate	.text	004E9E90	000000EB	00000018	00000004	R	.	.	.	.	.	T	.
+sithAI_EmitEvent	.text	004E9F80	0000011B	00000010	0000000C	R	.	.	.	.	.	T	.
+sithAI_RegisterInstinct	.text	004EA0A0	00000066	00000000	00000014	R	.	.	.	.	.	T	.
+sithAI_FindInstinct	.text	004EA110	00000079	00000010	00000004	R	.	.	.	.	.	T	.
+sithAI_AIList	.text	004EA190	00000095	00000000	00000000	R	.	.	.	.	.	.	.
+sithAI_AIStatus	.text	004EA230	000001B1	00000048	00000008	R	.	.	.	.	B	T	.
+sithAI_ParseArg	.text	004EA3F0	00000127	0000001C	0000000C	R	.	.	.	.	.	T	.
+sithAI_CreateAIFramesFomMarker	.text	004EA520	000000C0	0000001C	0000000C	R	.	.	.	.	.	T	.
 sithAI_Tick	.text	004EA5E0	0000004C	00000008	00000008	R	.	.	.	.	.	T	.
 sithAI_sub_4EA630	.text	004EA630	0000025B	0000000C	00000008	R	.	.	.	.	.	T	.
 sithAI_idk_msgarrived_target	.text	004EA890	000002E4	00000030	00000018	R	.	.	.	.	.	T	.

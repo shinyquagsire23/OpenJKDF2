@@ -594,7 +594,7 @@ sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileT
             {
                 v20 = v19->receiver;
                 if ( v20->controlType == SITH_CT_AI )
-                    sithAI_SetActorFireTarget(v20->actor, SITHAI_MODE_SLEEPING, (intptr_t)v9); // aaaaaaaaa undefined
+                    sithAI_EmitEvent(v20->actor, SITHAI_MODE_SLEEPING, (intptr_t)v9); // aaaaaaaaa undefined
             }
         }
         goto LABEL_31;

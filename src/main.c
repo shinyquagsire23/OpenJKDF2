@@ -2553,14 +2553,14 @@ void do_hooks()
     // sithAI
     hook_function(sithAI_Startup_ADDR, sithAI_Startup);
     hook_function(sithAI_Shutdown_ADDR, sithAI_Shutdown);
-    hook_function(sithAI_NewEntry_ADDR, sithAI_NewEntry);
-    hook_function(sithAI_FreeEntry_ADDR, sithAI_FreeEntry);
-    hook_function(sithAI_RegisterCommand_ADDR, sithAI_RegisterCommand);
-    hook_function(sithAI_FindCommand_ADDR, sithAI_FindCommand);
-    hook_function(sithAI_PrintThings_ADDR, sithAI_PrintThings);
-    hook_function(sithAI_PrintThingStatus_ADDR, sithAI_PrintThingStatus);
-    hook_function(sithAI_LoadThingActorParams_ADDR, sithAI_LoadThingActorParams);
-    hook_function(sithAI_idkframesalloc_ADDR, sithAI_idkframesalloc);
+    hook_function(sithAI_Create_ADDR, sithAI_Create);
+    hook_function(sithAI_Free_ADDR, sithAI_Free);
+    hook_function(sithAI_RegisterInstinct_ADDR, sithAI_RegisterInstinct);
+    hook_function(sithAI_FindInstinct_ADDR, sithAI_FindInstinct);
+    hook_function(sithAI_AIList_ADDR, sithAI_AIList);
+    hook_function(sithAI_AIStatus_ADDR, sithAI_AIStatus);
+    hook_function(sithAI_ParseArg_ADDR, sithAI_ParseArg);
+    hook_function(sithAI_CreateAIFramesFomMarker_ADDR, sithAI_CreateAIFramesFomMarker);
     hook_function(sithAI_Tick_ADDR, sithAI_Tick);
     hook_function(sithAI_SetLookFrame_ADDR, sithAI_SetLookFrame);
     hook_function(sithAI_SetMoveThing_ADDR, sithAI_SetMoveThing);

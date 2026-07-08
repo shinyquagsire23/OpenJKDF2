@@ -112,7 +112,7 @@ flex_t sithActor_DamageActor(sithThing *sender, sithThing *receiver, flex_t amou
     if ( receiver )
     {
         if ( receiver != sender && sender->controlType == SITH_CT_AI )
-            sithAI_SetActorFireTarget(sender->actor, SITHAI_MODE_MOVING, (intptr_t)receiver);
+            sithAI_EmitEvent(sender->actor, SITHAI_MODE_MOVING, (intptr_t)receiver);
         v7 = sithThing_GetParent(receiver);
         receiver_ = v7;
 
@@ -305,7 +305,7 @@ int sithActor_SurfaceCollisionHandler(sithThing *thing, sithSurface *surface, si
 {
     int ret = sithCollision_HandleThingHitSurface(thing, surface, searchEnt);
     if (ret && thing->controlType == SITH_CT_AI) {
-        sithAI_SetActorFireTarget(thing->actor, SITHAI_MODE_ACTIVE, 0);
+        sithAI_EmitEvent(thing->actor, SITHAI_MODE_ACTIVE, 0);
     }
     return ret;
 }
@@ -388,11 +388,11 @@ int sithActor_ActorCollisionHandler(sithThing *thing, sithThing *thing2, sithCol
     {
         if (thing->controlType == SITH_CT_AI && thing->actor)
         {
-            sithAI_SetActorFireTarget(thing->actor, SITHAI_MODE_SEARCHING, (intptr_t)thing2);
+            sithAI_EmitEvent(thing->actor, SITHAI_MODE_SEARCHING, (intptr_t)thing2);
         }
         if (thing2->controlType == SITH_CT_AI && thing2->actor)
         {
-            sithAI_SetActorFireTarget(thing2->actor, SITHAI_MODE_SEARCHING, (intptr_t)thing);
+            sithAI_EmitEvent(thing2->actor, SITHAI_MODE_SEARCHING, (intptr_t)thing);
         }
     }
     return ret;

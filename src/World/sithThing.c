@@ -615,7 +615,7 @@ void sithThing_FreeEverything(sithThing* pThing)
     if ( pThing->moveType == SITH_MT_PATH && pThing->trackParams.aFrames )
         SITH_FREE(pThing->trackParams.aFrames);
     if ( pThing->controlType == SITH_CT_AI )
-        sithAI_FreeEntry(pThing);
+        sithAI_Free(pThing);
     if ( pThing->type == SITH_THING_PARTICLE )
         sithParticle_Free(pThing);
     if ( pThing->animclass )
@@ -644,7 +644,7 @@ void sithThing_sub_4CD100(sithThing* pThing)
     if ( pThing->rdthing.puppet )
         sithPuppet_New(pThing);
     if ( pThing->controlType == SITH_CT_AI )
-        sithAI_NewEntry(pThing);
+        sithAI_Create(pThing);
     if ( pThing->soundclass )
         sithSoundClass_PlayModeRandom(pThing, SITH_SC_CREATE);
 
@@ -1623,7 +1623,7 @@ LABEL_10:
 LABEL_18:
     if ( v2 )
         return 1;
-    return pThing->controlType == SITH_CT_AI && sithAI_LoadThingActorParams(arg, pThing, paramIdx);
+    return pThing->controlType == SITH_CT_AI && sithAI_ParseArg(arg, pThing, paramIdx);
 }
 
 // MOTS altered

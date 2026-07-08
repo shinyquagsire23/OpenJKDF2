@@ -239,7 +239,7 @@ void sithAI_Close()
     sithAI_bOpened = 0;
 }
 
-void sithAI_NewEntry(sithThing *thing)
+void sithAI_Create(sithThing *thing)
 {
     sithAIClass *sith_ai; // edx
     int v2; // eax
@@ -287,7 +287,7 @@ void sithAI_NewEntry(sithThing *thing)
     }
 }
 
-void sithAI_FreeEntry(sithThing *thing)
+void sithAI_Free(sithThing *thing)
 {
     sithActor *v1; // eax
     int v2; // edx
@@ -329,7 +329,7 @@ void sithAI_FreeEntry(sithThing *thing)
     sithAI_actorInitted[sithAI_maxActors++] = v2;
 }
 
-void sithAI_TickAll()
+void sithAI_Process()
 {
     int v0; // edi
     sithActor *actor; // esi
@@ -348,7 +348,7 @@ void sithAI_TickAll()
                     sithCog_SendMessageFromThingEx(actor->thing,NULL,SITH_MESSAGE_AIEVENT,65536.0,0.0,0.0,0.0);
                 }
                 if (actor->nextUpdate <= sithTime_curMs) {
-                    sithAI_TickActor(actor);
+                    sithAI_InstinctUpdate(actor);
 
                     if (sithNet_isMulti && sithNet_MultiModeFlags & MULTIMODEFLAG_COOP) {
                         sithThing_SetSyncFlags(actor->thing, THING_SYNC_ALL); // Added
@@ -363,7 +363,7 @@ void sithAI_TickAll()
                   && (actor->flags & (SITHAI_MODE_DISABLED|SITHAI_MODE_SLEEPING)) == 0
                   && actor->nextUpdate <= sithTime_curMs )
             {
-                sithAI_TickActor(actor);
+                sithAI_InstinctUpdate(actor);
 
                 if (sithNet_isMulti && sithNet_MultiModeFlags & MULTIMODEFLAG_COOP) {
                     sithThing_SetSyncFlags(actor->thing, THING_SYNC_ALL); // Added
@@ -376,7 +376,7 @@ void sithAI_TickAll()
     }
 }
 
-void sithAI_TickActor(sithActor *actor)
+void sithAI_InstinctUpdate(sithActor *actor)
 {
     int v3; // ebx
     int *v4; // edi
@@ -399,7 +399,7 @@ void sithAI_TickActor(sithActor *actor)
                         actor->instincts[a1a].nextUpdate = sithTime_curMs + 1000;
                         if ( actor->pAIClass->entries[a1a].func(actor, &actor->pAIClass->entries[a1a], &actor->instincts[a1a], 0, 0) && a3 != actor->flags )
                         {
-                            sithAI_SetActorFireTarget(actor, SITHAI_MODE_UNK100, a3);
+                            sithAI_EmitEvent(actor, SITHAI_MODE_UNK100, a3);
                             a3 = actor->flags;
                             
                             bRestartScan = 1;
@@ -420,7 +420,7 @@ void sithAI_TickActor(sithActor *actor)
 }
 
 // MoTS altered
-void sithAI_SetActorFireTarget(sithActor *actor, int a2, intptr_t actorFlags)
+void sithAI_EmitEvent(sithActor *actor, int a2, intptr_t actorFlags)
 {
     int v6; // eax
     uint32_t v7; // ebx
@@ -468,7 +468,7 @@ void sithAI_SetActorFireTarget(sithActor *actor, int a2, intptr_t actorFlags)
     }
 }
 
-void sithAI_RegisterCommand(const char *cmdName, sithAICommandFunc_t func, int param1, int param2, int param3)
+void sithAI_RegisterInstinct(const char *cmdName, sithAICommandFunc_t func, int param1, int param2, int param3)
 {
     if ( sithAI_numCommands >= 0x20 )
         return;
@@ -488,7 +488,7 @@ void sithAI_RegisterCommand(const char *cmdName, sithAICommandFunc_t func, int p
     sithAI_numCommands++;
 }
 
-sithAICommand* sithAI_FindCommand(const char *cmdName)
+sithAICommand* sithAI_FindInstinct(const char *cmdName)
 {
     if ( !sithAI_numCommands )
         return NULL;
@@ -510,7 +510,7 @@ sithAICommand* sithAI_FindCommand(const char *cmdName)
     return NULL;
 }
 
-int sithAI_PrintThings(stdDebugConsoleCmd* a, const char* b)
+int sithAI_AIList(stdDebugConsoleCmd* a, const char* b)
 {
     int v1; // edi
     sithActor *i; // esi
@@ -551,7 +551,7 @@ int sithAI_PrintThings(stdDebugConsoleCmd* a, const char* b)
 #endif
 }
 
-int sithAI_PrintThingStatus(stdDebugConsoleCmd* a1, const char *idxStr)
+int sithAI_AIStatus(stdDebugConsoleCmd* a1, const char *idxStr)
 {
     uint32_t v2; // ebx
     sithThing *v3; // eax
@@ -622,7 +622,7 @@ int sithAI_PrintThingStatus(stdDebugConsoleCmd* a1, const char *idxStr)
 #endif // SITH_DEBUG_STRUCT_NAMES
 }
 
-int sithAI_LoadThingActorParams(stdConffileArg *arg, sithThing *thing, int param)
+int sithAI_ParseArg(stdConffileArg *arg, sithThing *thing, int param)
 {
     sithActor *v3; // esi
     intptr_t result; // eax
@@ -668,7 +668,7 @@ int sithAI_LoadThingActorParams(stdConffileArg *arg, sithThing *thing, int param
 }
 
 // Unused
-void sithAI_idkframesalloc(sithThing *a2, sithThing *a3, rdVector3 *a4)
+void sithAI_CreateAIFramesFomMarker(sithThing *a2, sithThing *a3, rdVector3 *a4)
 {
     sithThing *v3; // esi
     sithActor *v4; // edi
@@ -843,7 +843,7 @@ LABEL_22:
                     actor->flags &= ~SITHAI_MODE_MOVING;
                     sithSoundClass_StopMode(v3, SITH_SC_MOVING);
                     sithCog_SendMessageFromThing(v3, 0, SITH_MESSAGE_ARRIVED);
-                    sithAI_SetActorFireTarget(actor, SITHAI_MODE_FLEEING, 0);
+                    sithAI_EmitEvent(actor, SITHAI_MODE_FLEEING, 0);
                 }
                 return;
             }
@@ -854,7 +854,7 @@ LABEL_22:
                 if ( !sithAI_CanWalk(actor, &a4, 0) )
                 {
                     rdVector_Zero3(&v3->physicsParams.vel);
-                    sithAI_SetActorFireTarget(actor, SITHAI_MODE_TARGET_VISIBLE, 0);
+                    sithAI_EmitEvent(actor, SITHAI_MODE_TARGET_VISIBLE, 0);
                     return;
                 }
                 goto LABEL_22;

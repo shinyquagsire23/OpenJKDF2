@@ -85,7 +85,7 @@ int sithAIAwareness_Update(int32_t a, sithEventInfo* b)
     }
     
     // sithAI_inittedActors is an inclusive max index (-1 when empty), so the loop must be `<=`
-    // to reach the highest-indexed actor (matches the binary and sithAI_TickAll). A signed
+    // to reach the highest-indexed actor (matches the binary and sithAI_Process). A signed
     // counter keeps the empty (-1) case iterating zero times.
     for (int v3 = 0; v3 <= sithAI_inittedActors; ++v3 )
     {
@@ -105,7 +105,7 @@ int sithAIAwareness_Update(int32_t a, sithEventInfo* b)
                     if ( v6 )
                     {
                         if ( sithAIAwareness_aSectors[v6->id].field_0 == sithAIAwareness_timerTicks )
-                            sithAI_SetActorFireTarget(i, SITHAI_MODE_ATTACKING, 0);
+                            sithAI_EmitEvent(i, SITHAI_MODE_ATTACKING, 0);
                     }
                 }
             }
