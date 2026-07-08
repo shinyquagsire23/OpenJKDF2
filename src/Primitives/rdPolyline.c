@@ -151,50 +151,50 @@ int rdPolyline_NewEntry(rdPolyline *polyline, char *polyline_fname, char *materi
     return 1;
 }
 
-void rdPolyline_Free(rdPolyline *polyline)
+void rdPolyline_Free(rdPolyline *pPolyline)
 {
-    if ( polyline )
+    if ( pPolyline )
     {
-        rdPolyline_FreeEntry(polyline);
-        RDROID_FREE(polyline);
+        rdPolyline_FreeEntry(pPolyline);
+        RDROID_FREE(pPolyline);
     }
 }
 
-void rdPolyline_FreeEntry(rdPolyline *polyline)
+void rdPolyline_FreeEntry(rdPolyline *pPolyline)
 {
-    if ( polyline->extraUVFaceMaybe )
+    if ( pPolyline->extraUVFaceMaybe )
     {
-        RDROID_FREE(polyline->extraUVFaceMaybe);
-        polyline->extraUVFaceMaybe = 0;
+        RDROID_FREE(pPolyline->extraUVFaceMaybe);
+        pPolyline->extraUVFaceMaybe = 0;
     }
-    if ( polyline->extraUVTipMaybe )
+    if ( pPolyline->extraUVTipMaybe )
     {
-        RDROID_FREE(polyline->extraUVTipMaybe);
-        polyline->extraUVTipMaybe = 0;
+        RDROID_FREE(pPolyline->extraUVTipMaybe);
+        pPolyline->extraUVTipMaybe = 0;
     }
-    if ( polyline->tipFace.vertexPosIdx )
+    if ( pPolyline->tipFace.vertexPosIdx )
     {
-        RDROID_FREE(polyline->tipFace.vertexPosIdx);
-        polyline->tipFace.vertexPosIdx = 0;
+        RDROID_FREE(pPolyline->tipFace.vertexPosIdx);
+        pPolyline->tipFace.vertexPosIdx = 0;
     }
-    if ( polyline->tipFace.vertexUVIdx )
+    if ( pPolyline->tipFace.vertexUVIdx )
     {
-        RDROID_FREE(polyline->tipFace.vertexUVIdx);
-        polyline->tipFace.vertexUVIdx = 0;
+        RDROID_FREE(pPolyline->tipFace.vertexUVIdx);
+        pPolyline->tipFace.vertexUVIdx = 0;
     }
-    if ( polyline->face.vertexPosIdx )
+    if ( pPolyline->face.vertexPosIdx )
     {
-        RDROID_FREE(polyline->face.vertexPosIdx);
-        polyline->face.vertexPosIdx = 0;
+        RDROID_FREE(pPolyline->face.vertexPosIdx);
+        pPolyline->face.vertexPosIdx = 0;
     }
-    if ( polyline->face.vertexUVIdx )
+    if ( pPolyline->face.vertexUVIdx )
     {
-        RDROID_FREE(polyline->face.vertexUVIdx);
-        polyline->face.vertexUVIdx = 0;
+        RDROID_FREE(pPolyline->face.vertexUVIdx);
+        pPolyline->face.vertexUVIdx = 0;
     }
 }
 
-int rdPolyline_Draw(rdThing *thing, rdMatrix34 *matrix)
+int rdPolyline_Draw(rdThing *pLine, rdMatrix34 *pOrient)
 {
     rdPolyline *polyline;
     flex_t length;
@@ -210,7 +210,7 @@ int rdPolyline_Draw(rdThing *thing, rdMatrix34 *matrix)
     rdVector3 vertex;
     rdMeshinfo idxInfo;
 
-    polyline = thing->polyline;
+    polyline = pLine->polyline;
     
     // This is slightly different than IDA?
     idxInfo.numVertices = 4;
@@ -218,7 +218,7 @@ int rdPolyline_Draw(rdThing *thing, rdMatrix34 *matrix)
     idxInfo.paDynamicLight = 0;
     idxInfo.intensities = 0;
 
-    rdMatrix_Multiply34(&out, &rdCamera_g_pCurCamera->orient, matrix);
+    rdMatrix_Multiply34(&out, &rdCamera_g_pCurCamera->orient, pOrient);
     vertex.x = 0.0;
     vertex.y = polyline->length;
     vertex.z = 0.0;
@@ -245,7 +245,7 @@ int rdPolyline_Draw(rdThing *thing, rdMatrix34 *matrix)
         polylineVerts[3].y = vertex_out.y - epislon;
         polylineVerts[3].z = tip_top;
         idxInfo.aTexVerticies = polyline->extraUVFaceMaybe;
-        rdPolyline_DrawFace(thing, &polyline->tipFace, polylineVerts, &idxInfo);
+        rdPolyline_DrawFace(pLine, &polyline->tipFace, polylineVerts, &idxInfo);
     }
 
     // Base
@@ -263,7 +263,7 @@ int rdPolyline_Draw(rdThing *thing, rdMatrix34 *matrix)
         polylineVerts[3].y = out.scale.y - epislon;
         polylineVerts[3].z = out.scale.z + polyline->baseRadius;
         idxInfo.aTexVerticies = polyline->extraUVFaceMaybe;
-        rdPolyline_DrawFace(thing, &polyline->tipFace, polylineVerts, &idxInfo);
+        rdPolyline_DrawFace(pLine, &polyline->tipFace, polylineVerts, &idxInfo);
     }
     
 
@@ -304,12 +304,12 @@ int rdPolyline_Draw(rdThing *thing, rdMatrix34 *matrix)
         polylineVerts[3].y = out.scale.y;
         polylineVerts[3].z = (polyline->baseRadius * angSin) + (flex_t)0.0 + out.scale.z;
         idxInfo.aTexVerticies = polyline->extraUVTipMaybe;
-        rdPolyline_DrawFace(thing, &polyline->face, polylineVerts, &idxInfo);
+        rdPolyline_DrawFace(pLine, &polyline->face, polylineVerts, &idxInfo);
     }
     return 1;
 }
 
-void rdPolyline_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdMeshinfo *idxInfo)
+void rdPolyline_DrawFace(rdThing *pLine, rdFace *pFace, rdVector3 *aVertices, rdMeshinfo *aUVs)
 {
     rdProcEntry *procEntry;
     rdMeshinfo mesh_out;
@@ -324,23 +324,23 @@ void rdPolyline_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdMesh
     mesh_out.aTexVerticies = procEntry->aTexVerticies;
     mesh_out.paDynamicLight = procEntry->vertexIntensities;
     
-    idxInfo->numVertices = face->numVertices;
-    idxInfo->vertexPosIdx = face->vertexPosIdx;
-    idxInfo->vertexUVIdx = face->vertexUVIdx;
+    aUVs->numVertices = pFace->numVertices;
+    aUVs->vertexPosIdx = pFace->vertexPosIdx;
+    aUVs->vertexUVIdx = pFace->vertexUVIdx;
     
     rdGeoMode_t curGeometryMode_ = rdroid_g_curGeometryMode;
     rdLightMode_t curLightingMode_ = rdroid_g_curLightingMode;
     rdTexMode_t curTextureMode_ = rdroid_curTextureMode;
 
-    if ( curGeometryMode_ >= face->geometryMode )
-        curGeometryMode_ = face->geometryMode;
-    if ( curGeometryMode_ >= thing->curGeoMode )
+    if ( curGeometryMode_ >= pFace->geometryMode )
+        curGeometryMode_ = pFace->geometryMode;
+    if ( curGeometryMode_ >= pLine->curGeoMode )
     {
-        procEntry->geometryMode = thing->curGeoMode;
+        procEntry->geometryMode = pLine->curGeoMode;
     }    
-    else if ( rdroid_g_curGeometryMode >= face->geometryMode )
+    else if ( rdroid_g_curGeometryMode >= pFace->geometryMode )
     {
-        procEntry->geometryMode = face->geometryMode;
+        procEntry->geometryMode = pFace->geometryMode;
     }
     else
     {
@@ -354,32 +354,32 @@ void rdPolyline_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdMesh
     }
     else
     {
-        if ( curLightingMode_ >= face->lightingMode )
-            curLightingMode_ = face->lightingMode;
-        if ( curLightingMode_ >= thing->curLightMode )
+        if ( curLightingMode_ >= pFace->lightingMode )
+            curLightingMode_ = pFace->lightingMode;
+        if ( curLightingMode_ >= pLine->curLightMode )
         {
-            face->lightingMode = thing->curLightMode;
+            pFace->lightingMode = pLine->curLightMode;
         }
-        else if ( rdroid_g_curLightingMode < face->lightingMode )
+        else if ( rdroid_g_curLightingMode < pFace->lightingMode )
         {
-            face->lightingMode = rdroid_g_curLightingMode;
+            pFace->lightingMode = rdroid_g_curLightingMode;
         }
-        procEntry->lightingMode = face->lightingMode;
+        procEntry->lightingMode = pFace->lightingMode;
     }
 
-    if ( curTextureMode_ >= face->textureMode )
-        curTextureMode_ = face->textureMode;
+    if ( curTextureMode_ >= pFace->textureMode )
+        curTextureMode_ = pFace->textureMode;
     
-    procEntry->textureMode = thing->curTexMode;
+    procEntry->textureMode = pLine->curTexMode;
     if ( curTextureMode_ < procEntry->textureMode )
     {
-        if ( curTextureMode_ >= face->textureMode )
-            procEntry->textureMode = face->textureMode;
+        if ( curTextureMode_ >= pFace->textureMode )
+            procEntry->textureMode = pFace->textureMode;
         else
             procEntry->textureMode = rdroid_curTextureMode;
     }
 
-    rdPrimit3_ClipFace(rdCamera_g_pCurCamera->pClipFrustum, procEntry->geometryMode, procEntry->lightingMode, procEntry->textureMode, idxInfo, &mesh_out, &face->texVertOffset);
+    rdPrimit3_ClipFace(rdCamera_g_pCurCamera->pClipFrustum, procEntry->geometryMode, procEntry->lightingMode, procEntry->textureMode, aUVs, &mesh_out, &pFace->texVertOffset);
     if ( mesh_out.numVertices < 3 )
         return;
 
@@ -468,10 +468,10 @@ void rdPolyline_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdMesh
         procFaceFlags |= 4u;
 
     procEntry->light_flags = 0;
-    procEntry->wallCel = thing->wallCel;
-    procEntry->type = face->type;
-    procEntry->extralight = face->extraLight;
-    procEntry->material = face->material;
+    procEntry->wallCel = pLine->wallCel;
+    procEntry->type = pFace->type;
+    procEntry->extralight = pFace->extraLight;
+    procEntry->material = pFace->material;
 
     // Added: Polylines should always be drawn
     rdMaterial_EnsureDataForced(procEntry->material);

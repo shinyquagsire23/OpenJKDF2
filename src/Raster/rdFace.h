@@ -28,9 +28,9 @@ enum RdFaceFlag // Polygon face flags i.e face type -> 3DO & SithSurface
 };
 
 rdFace *rdFace_New();
-int rdFace_NewEntry(rdFace* out);
-void rdFace_Free(rdFace *face);
-void rdFace_FreeEntry(rdFace *face);
+int rdFace_NewEntry(rdFace* pFace);
+void rdFace_Free(rdFace *pFace);
+void rdFace_FreeEntry(rdFace *pFace);
 
 #ifdef __cplusplus
 }

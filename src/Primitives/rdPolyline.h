@@ -14,11 +14,11 @@
 
 rdPolyline* rdPolyline_New(char *polyline_fname, char *material_fname, char *material_fname2, flex_t length, flex_t base_rad, flex_t tip_rad, int lightmode, int texmode, int sortingmethod, flex_t extraLight);
 int rdPolyline_NewEntry(rdPolyline *polyline, char *polyline_fname, char *material_side_fname, char *material_tip_fname, flex_t length, flex_t base_rad, flex_t tip_rad, rdGeoMode_t edgeGeometryMode, rdLightMode_t edgeLightingMode, rdTexMode_t edgeTextureMode, flex_t extraLight);
-void rdPolyline_Free(rdPolyline *polyline);
-void rdPolyline_FreeEntry(rdPolyline *polyline);
-MATH_FUNC int rdPolyline_Draw(rdThing *thing, rdMatrix34 *matrix);
+void rdPolyline_Free(rdPolyline *pPolyline);
+void rdPolyline_FreeEntry(rdPolyline *pPolyline);
+MATH_FUNC int rdPolyline_Draw(rdThing *pLine, rdMatrix34 *pOrient);
 
-MATH_FUNC void rdPolyline_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdMeshinfo *idxInfo);
+MATH_FUNC void rdPolyline_DrawFace(rdThing *pLine, rdFace *pFace, rdVector3 *aVertices, rdMeshinfo *aUVs);
 //static void (*rdPolyline_DrawFace)(rdThing *thing, rdFace *face, rdVector3 *unused, rdMeshinfo *idxInfo) = (void*)rdPolyline_DrawFace_ADDR;
 
 #endif // _RDPOLYLINE_H

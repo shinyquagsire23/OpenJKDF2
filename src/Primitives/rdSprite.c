@@ -102,35 +102,35 @@ int rdSprite_NewEntry(rdSprite *sprite, char *spritepath, int type, char *materi
     return 0;
 }
 
-void rdSprite_Free(rdSprite *sprite)
+void rdSprite_Free(rdSprite *pSprite)
 {
-    if (sprite)
+    if (pSprite)
     {
-        rdSprite_FreeEntry(sprite);
-        RDROID_FREE(sprite);
+        rdSprite_FreeEntry(pSprite);
+        RDROID_FREE(pSprite);
     }
 }
 
-void rdSprite_FreeEntry(rdSprite *sprite)
+void rdSprite_FreeEntry(rdSprite *pSprite)
 {
-    if (sprite->aTexVerticies)
+    if (pSprite->aTexVerticies)
     {
-        RDROID_FREE(sprite->aTexVerticies);
-        sprite->aTexVerticies = 0;
+        RDROID_FREE(pSprite->aTexVerticies);
+        pSprite->aTexVerticies = 0;
     }
-    if (sprite->face.vertexPosIdx)
+    if (pSprite->face.vertexPosIdx)
     {
-        RDROID_FREE(sprite->face.vertexPosIdx);
-        sprite->face.vertexPosIdx = 0;
+        RDROID_FREE(pSprite->face.vertexPosIdx);
+        pSprite->face.vertexPosIdx = 0;
     }
-    if (sprite->face.vertexUVIdx)
+    if (pSprite->face.vertexUVIdx)
     {
-        RDROID_FREE(sprite->face.vertexUVIdx);
-        sprite->face.vertexUVIdx = 0;
+        RDROID_FREE(pSprite->face.vertexUVIdx);
+        pSprite->face.vertexUVIdx = 0;
     }
 }
 
-int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
+int rdSprite_Draw(rdThing *prdThing, rdMatrix34 *orient)
 {
     rdProcEntry *procEntry;
     rdVector2 *aTexVerticies;
@@ -141,12 +141,12 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     rdMeshinfo mesh_out;
     rdMeshinfo mesh_in;
 
-    rdSprite *sprite = thing->sprite3;
-    rdMatrix_TransformPoint34(&vertex_out, &mat->scale, &rdCamera_g_pCurCamera->orient);
+    rdSprite *sprite = prdThing->sprite3;
+    rdMatrix_TransformPoint34(&vertex_out, &orient->scale, &rdCamera_g_pCurCamera->orient);
     if ( rdroid_curCullFlags & 2 )
         clipResult = rdClip_SphereInFrustrum(rdCamera_g_pCurCamera->pClipFrustum, &vertex_out, sprite->radius);
     else
-        clipResult = thing->clippingIdk;
+        clipResult = prdThing->clippingIdk;
 
     if ( clipResult == 2 )
         return 0;
@@ -184,9 +184,9 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     rdTexMode_t curTextureMode_ = rdroid_curTextureMode;
     if ( curGeometryMode_ >= sprite->face.geometryMode )
         curGeometryMode_ = sprite->face.geometryMode;
-    if ( curGeometryMode_ >= thing->curGeoMode )
+    if ( curGeometryMode_ >= prdThing->curGeoMode )
     {
-        procEntry->geometryMode = thing->curGeoMode;
+        procEntry->geometryMode = prdThing->curGeoMode;
     }    
     else if ( rdroid_g_curGeometryMode >= sprite->face.geometryMode )
     {
@@ -206,9 +206,9 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     {
         if ( curLightingMode_ >= sprite->face.lightingMode )
             curLightingMode_ = sprite->face.lightingMode;
-        if ( curLightingMode_ >= thing->curLightMode )
+        if ( curLightingMode_ >= prdThing->curLightMode )
         {
-            sprite->face.lightingMode = thing->curLightMode;
+            sprite->face.lightingMode = prdThing->curLightMode;
         }
         else if ( rdroid_g_curLightingMode < sprite->face.lightingMode )
         {
@@ -220,7 +220,7 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     if ( curTextureMode_ >= sprite->face.textureMode )
         curTextureMode_ = sprite->face.textureMode;
     
-    procEntry->textureMode = thing->curTexMode;
+    procEntry->textureMode = prdThing->curTexMode;
     if ( curTextureMode_ < procEntry->textureMode )
     {
         if ( curTextureMode_ >= sprite->face.textureMode )
@@ -322,7 +322,7 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
         procFlags |= 4u;
 
     procEntry->light_flags = 0;
-    procEntry->wallCel = thing->wallCel;
+    procEntry->wallCel = prdThing->wallCel;
     procEntry->type = sprite->face.type;
     procEntry->extralight = sprite->face.extraLight;
     procEntry->material = sprite->face.material;

@@ -15,35 +15,35 @@ rdFace *rdFace_New()
     return out;
 }
 
-int rdFace_NewEntry(rdFace* out)
+int rdFace_NewEntry(rdFace* pFace)
 {
-    out->num = 0;
-    out->type = 0;
-    out->numVertices = 0;
-    out->vertexPosIdx = 0;
-    out->vertexUVIdx = 0;
-    out->material = 0;
-    out->wallCel = -1;
-    out->normal.x = 0.0;
-    out->normal.y = 0.0;
-    out->normal.z = 0.0;
-    out->texVertOffset.x = 0.0;
-    out->texVertOffset.y = 0.0;
-    out->extraLight = 0.0;
+    pFace->num = 0;
+    pFace->type = 0;
+    pFace->numVertices = 0;
+    pFace->vertexPosIdx = 0;
+    pFace->vertexUVIdx = 0;
+    pFace->material = 0;
+    pFace->wallCel = -1;
+    pFace->normal.x = 0.0;
+    pFace->normal.y = 0.0;
+    pFace->normal.z = 0.0;
+    pFace->texVertOffset.x = 0.0;
+    pFace->texVertOffset.y = 0.0;
+    pFace->extraLight = 0.0;
     return 1;
 }
 
-void rdFace_Free(rdFace *face)
+void rdFace_Free(rdFace *pFace)
 {
-    if (!face)
+    if (!pFace)
         return;
-    rdFace_FreeEntry(face);
+    rdFace_FreeEntry(pFace);
 }
 
-void rdFace_FreeEntry(rdFace *face)
+void rdFace_FreeEntry(rdFace *pFace)
 {
-    if ( face->vertexPosIdx )
-        RDROID_FREE(face->vertexPosIdx);
-    if ( face->vertexUVIdx )
-        RDROID_FREE(face->vertexUVIdx);
+    if ( pFace->vertexPosIdx )
+        RDROID_FREE(pFace->vertexPosIdx);
+    if ( pFace->vertexUVIdx )
+        RDROID_FREE(pFace->vertexUVIdx);
 }

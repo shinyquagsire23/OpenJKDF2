@@ -899,7 +899,7 @@ int rdPrimit3_GetScreenCoord(rdVector3 *vec, rdScreenPoint *screenpt)
     return 1;
 }
 
-void rdPrimit3_DrawClippedCircle(rdVector3 *pVecPos, flex_t xOffs, flex_t radius, int color16, int mask)
+void rdPrimit3_DrawClippedCircle(rdVector3 *pPos, flex_t xOffs, flex_t radius, int color16, int mask)
 {
     flex_t v5; // [esp+0h] [ebp-40h]
     rdVector3 vertex_out; // [esp+10h] [ebp-30h] BYREF
@@ -909,7 +909,7 @@ void rdPrimit3_DrawClippedCircle(rdVector3 *pVecPos, flex_t xOffs, flex_t radius
 
     // TODO is this GetScreenCoord but inlined?
 
-    rdMatrix_TransformPoint34(&vertex_out, pVecPos, &rdCamera_g_pCurCamera->orient);
+    rdMatrix_TransformPoint34(&vertex_out, pPos, &rdCamera_g_pCurCamera->orient);
     v7.y = vertex_out.y;
     v7.z = vertex_out.z;
     v7.x = vertex_out.x + xOffs;

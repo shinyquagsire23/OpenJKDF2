@@ -23,7 +23,7 @@ MATH_FUNC FAST_FUNC void rdPrimit3_ClipFace(const rdClipFrustum* NO_ALIAS pClipF
 //void rdPrimit3_NoClipFace(int geometryMode, signed int lightingMode, int textureMode, rdMeshinfo *_vertexSrc, rdMeshinfo *_vertexDst, rdVector2 *texVertOffset);
 MATH_FUNC void rdPrimit3_NoClipFace(rdGeoMode_t geoMode, signed int lightMode, int texMode, rdMeshinfo *_vertexSrc, rdMeshinfo *_vertexDst, rdVector2 *idkIn);
 MATH_FUNC int rdPrimit3_GetScreenCoord(rdVector3 *vec, rdScreenPoint *screenpt);
-MATH_FUNC void rdPrimit3_DrawClippedCircle(rdVector3 *pVecPos, flex_t xOffs, flex_t radius, int color16, int mask);
+MATH_FUNC void rdPrimit3_DrawClippedCircle(rdVector3 *pPos, flex_t xOffs, flex_t radius, int color16, int mask);
 
 MATH_FUNC void rdPrimit3_NoClipFaceRGB
                (rdGeoMode_t geoMode,int lightMode,int texMode,rdMeshinfo *_vertexSrc,

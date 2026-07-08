@@ -2,37 +2,37 @@
 
 #include "General/stdMath.h"
 
-void rdMath_CalcSurfaceNormal(rdVector3 *out, rdVector3 *edge1, rdVector3 *edge2, rdVector3 *edge3)
+void rdMath_CalcSurfaceNormal(rdVector3 *pDestNormal, rdVector3 *pVert1, rdVector3 *pVert2, rdVector3 *pVert3)
 {
     rdVector3 a;
     rdVector3 b;
 
-    rdVector_Sub3(&b, edge2, edge1);
-    rdVector_Sub3(&a, edge3, edge1);
+    rdVector_Sub3(&b, pVert2, pVert1);
+    rdVector_Sub3(&a, pVert3, pVert1);
     rdVector_Normalize3Acc(&b);
     rdVector_Normalize3Acc(&a);
-    rdVector_Cross3(out, &b, &a);
-    rdVector_Normalize3Acc(out);
+    rdVector_Cross3(pDestNormal, &b, &a);
+    rdVector_Normalize3Acc(pDestNormal);
 
-    rdMath_ClipVector3Acc(out, 0.000001);
+    rdMath_ClipVector3Acc(pDestNormal, 0.000001);
 }
 
-flex_t rdMath_DistancePointToPlane(const rdVector3 *light, const rdVector3 *normal, const rdVector3 *vertex)
+flex_t rdMath_DistancePointToPlane(const rdVector3 *pPoint, const rdVector3 *pPlaneNormal, const rdVector3 *pPointOnPlane)
 {
-  return (light->y - vertex->y) * normal->y + (light->z - vertex->z) * normal->z + (light->x - vertex->x) * normal->x;
+  return (pPoint->y - pPointOnPlane->y) * pPlaneNormal->y + (pPoint->z - pPointOnPlane->z) * pPlaneNormal->z + (pPoint->x - pPointOnPlane->x) * pPlaneNormal->x;
 }
 
-flex_t rdMath_DeltaAngleNormalizedAbs(rdVector3 *a1, rdVector3 *a2)
+flex_t rdMath_DeltaAngleNormalizedAbs(rdVector3 *pVectorX, rdVector3 *pVectorY)
 {
-    flex_t v2 = rdVector_Dot3(a1, a2);
+    flex_t v2 = rdVector_Dot3(pVectorX, pVectorY);
     if ( v2 == 1.0 )
         return 0.0;
     return 90.0 - stdMath_ArcSin1(v2);
 }
 
-flex_t rdMath_DeltaAngleNormalized(rdVector3 *a1, rdVector3 *a2, rdVector3 *a3)
+flex_t rdMath_DeltaAngleNormalized(rdVector3 *pVectorX, rdVector3 *pVectorY, rdVector3 *pVectorZ)
 {
-    flex_t v4 = stdMath_Clamp(rdVector_Dot3(a1, a2), -1.0, 1.0);
+    flex_t v4 = stdMath_Clamp(rdVector_Dot3(pVectorX, pVectorY), -1.0, 1.0);
 
     if ( v4 == 1.0 )
         return 0.0;
@@ -42,38 +42,38 @@ flex_t rdMath_DeltaAngleNormalized(rdVector3 *a1, rdVector3 *a2, rdVector3 *a3)
     flex_t v7 = 90.0 - stdMath_ArcSin1(v4);
     
     rdVector3 tmp;
-    rdVector_Cross3(&tmp, a1, a2);
-    if ( rdVector_Dot3(&tmp, a3) <= 0.0 )
+    rdVector_Cross3(&tmp, pVectorX, pVectorY);
+    if ( rdVector_Dot3(&tmp, pVectorZ) <= 0.0 )
         return -v7;
     else
         return v7;
 }
 
-void rdMath_ClipVector3Acc(rdVector3* out, flex_t minVal)
+void rdMath_ClipVector3Acc(rdVector3* vect, flex_t minVal)
 {
-    if ( (out->x < 0.0 ? -out->x : out->x) >= minVal )
-        out->x = out->x;
+    if ( (vect->x < 0.0 ? -vect->x : vect->x) >= minVal )
+        vect->x = vect->x;
     else
-        out->x = 0.0;
+        vect->x = 0.0;
         
-    if ( (out->y < 0.0 ? -out->y : out->y) >= minVal )
-        out->y = out->y;
+    if ( (vect->y < 0.0 ? -vect->y : vect->y) >= minVal )
+        vect->y = vect->y;
     else
-        out->y = 0.0;
+        vect->y = 0.0;
         
-    if ( (out->z < 0.0 ? -out->z : out->z) >= minVal )
-        out->z = out->z;
+    if ( (vect->z < 0.0 ? -vect->z : vect->z) >= minVal )
+        vect->z = vect->z;
     else
-        out->z = 0.0;
+        vect->z = 0.0;
 }
 
-int rdMath_PointsCollinear(rdVector3 *a1, rdVector3 *a2, rdVector3 *a3)
+int rdMath_PointsCollinear(rdVector3 *p1, rdVector3 *p2, rdVector3 *p3)
 {
     rdVector3 a;
     rdVector3 b;
 
-    rdVector_Sub3(&b, a2, a1);
-    rdVector_Sub3(&a, a3, a1);
+    rdVector_Sub3(&b, p2, p1);
+    rdVector_Sub3(&a, p3, p1);
     rdVector_Normalize3Acc(&b);
     rdVector_Normalize3Acc(&a);
 
@@ -84,11 +84,11 @@ int rdMath_PointsCollinear(rdVector3 *a1, rdVector3 *a2, rdVector3 *a3)
 }
 
 // added
-void rdMath_ClampVector3Acc(rdVector3* out, flex_t minVal, flex_t maxVal)
+void rdMath_ClampVector3Acc(rdVector3* vect, flex_t minVal, flex_t maxVal)
 {
-    out->x = rdMath_clampf(out->x, minVal, maxVal);
-    out->y = rdMath_clampf(out->y, minVal, maxVal);
-    out->z = rdMath_clampf(out->z, minVal, maxVal);
+    vect->x = rdMath_clampf(vect->x, minVal, maxVal);
+    vect->y = rdMath_clampf(vect->y, minVal, maxVal);
+    vect->z = rdMath_clampf(vect->z, minVal, maxVal);
 }
 
 flex_t rdMath_clampf(flex_t d, flex_t min, flex_t max)

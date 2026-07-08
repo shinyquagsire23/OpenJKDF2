@@ -10,11 +10,11 @@
 #define rdPrimit2_DrawRectangle_ADDR (0x00446E60)
 #define rdPrimit2_DrawTriangle_ADDR (0x00446EE0)
 
-MATH_FUNC int rdPrimit2_DrawLine(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, uint16_t color16, int mask);
-MATH_FUNC int rdPrimit2_DrawClippedLine(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, uint16_t color16, int mask);
-MATH_FUNC void rdPrimit2_DrawClippedCircle(rdCanvas *pCanvas, int x1, int y1, flex_t a4, flex_t radius, uint16_t color16, int mask);
-MATH_FUNC void rdPrimit2_DrawRectangle(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, int16_t color, int mask);
-MATH_FUNC void rdPrimit2_DrawTriangle(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, int x3, int y3, int16_t color, int mask);
+MATH_FUNC int rdPrimit2_DrawLine(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, uint16_t color, int pattern);
+MATH_FUNC int rdPrimit2_DrawClippedLine(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, uint16_t color, int pattern);
+MATH_FUNC void rdPrimit2_DrawClippedCircle(rdCanvas *pCanvas, int x, int y, flex_t radius, flex_t step, uint16_t color, int pattern);
+MATH_FUNC void rdPrimit2_DrawRectangle(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, int16_t color, int pattern);
+MATH_FUNC void rdPrimit2_DrawTriangle(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, int x3, int y3, int16_t color, int pattern);
 
 //static int (*rdPrimit2_DrawClippedLine)(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, uint16_t color16, int mask) = (void*)rdPrimit2_DrawClippedLine_ADDR;
 //static void (*rdPrimit2_DrawClippedCircle)(rdCanvas *pCanvas, int x1, int y1, flex_t a4, flex_t radius, uint16_t color16, int mask) = (void*)rdPrimit2_DrawClippedCircle_ADDR;

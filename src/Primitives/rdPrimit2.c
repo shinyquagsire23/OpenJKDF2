@@ -5,7 +5,7 @@
 #include "Engine/rdClip.h"
 #include "stdPlatform.h" // Added: word-safe pVBuffer stores
 
-int rdPrimit2_DrawLine(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, uint16_t color16, int mask)
+int rdPrimit2_DrawLine(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, uint16_t color, int pattern)
 {
     tVBuffer *v7; // ebx
     int v8; // ebp
@@ -40,8 +40,8 @@ int rdPrimit2_DrawLine(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, uint16
             v17 = y1 - y2;
         if ( (y2 - y1 <= 0 ? -1 : 1) > 0 )
             v20 = x1 - x2;
-        if ( mask < 0 ) // Added: word-safe store (vbuffers may be word-addressable-only)
-            stdPlatform_WriteByte16((uint8_t*)v7->surface_lock_alloc + y1 * v7->format.rowSize + x1, (uint8_t)color16);// crashes here
+        if ( pattern < 0 ) // Added: word-safe store (vbuffers may be word-addressable-only)
+            stdPlatform_WriteByte16((uint8_t*)v7->surface_lock_alloc + y1 * v7->format.rowSize + x1, (uint8_t)color);// crashes here
         v10 = 0;
         while ( v8 != x2 || v9 != y2 )
         {
@@ -59,8 +59,8 @@ int rdPrimit2_DrawLine(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, uint16
                 v10 = v11;
                 v8 += v22;
             }
-            if ( (v19 & mask) != 0 ) // Added: word-safe store
-                stdPlatform_WriteByte16((uint8_t*)pCanvas->pVBuffer->surface_lock_alloc + v9 * pCanvas->pVBuffer->format.rowSize + v8, (uint8_t)color16);
+            if ( (v19 & pattern) != 0 ) // Added: word-safe store
+                stdPlatform_WriteByte16((uint8_t*)pCanvas->pVBuffer->surface_lock_alloc + v9 * pCanvas->pVBuffer->format.rowSize + v8, (uint8_t)color);
         }
     }
     else
@@ -75,8 +75,8 @@ int rdPrimit2_DrawLine(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, uint16
             v18 = y1 - y2;
         if ( (y2 - y1 <= 0 ? -1 : 1) > 0 )
             v21 = x1 - x2;
-        if ( mask < 0 ) // Added: explicit byte-pointer math (field is void* now)
-            *(uint16_t *)((uint8_t*)v7->surface_lock_alloc + 2 * x1 + 2 * y1 * v7->format.rowWidth) = color16;
+        if ( pattern < 0 ) // Added: explicit byte-pointer math (field is void* now)
+            *(uint16_t *)((uint8_t*)v7->surface_lock_alloc + 2 * x1 + 2 * y1 * v7->format.rowWidth) = color;
         v14 = 0;
         while ( v12 != x2 || v13 != y2 )
         {
@@ -94,22 +94,22 @@ int rdPrimit2_DrawLine(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, uint16
                 v14 = v15;
                 v12 += v23;
             }
-            if ( (v19 & mask) != 0 ) // Added: explicit byte-pointer math (field is void* now)
-                *(uint16_t*)((uint8_t*)pCanvas->pVBuffer->surface_lock_alloc + 2 * v12 + 2 * v13 * pCanvas->pVBuffer->format.rowWidth) = color16;
+            if ( (v19 & pattern) != 0 ) // Added: explicit byte-pointer math (field is void* now)
+                *(uint16_t*)((uint8_t*)pCanvas->pVBuffer->surface_lock_alloc + 2 * v12 + 2 * v13 * pCanvas->pVBuffer->format.rowWidth) = color;
         }
     }
     return 1;
 }
 
-int rdPrimit2_DrawClippedLine(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, uint16_t color16, int mask)
+int rdPrimit2_DrawClippedLine(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, uint16_t color, int pattern)
 {
     if ( !rdClip_Line2(pCanvas, &x1, &y1, &x2, &y2) )
         return 0;
-    return rdPrimit2_DrawLine(pCanvas, x1, y1, x2, y2, color16, mask);
+    return rdPrimit2_DrawLine(pCanvas, x1, y1, x2, y2, color, pattern);
 }
 
 
-void rdPrimit2_DrawClippedCircle(rdCanvas *pCanvas, int x1, int y1, flex_t a4, flex_t radius, uint16_t color16, int mask)
+void rdPrimit2_DrawClippedCircle(rdCanvas *pCanvas, int x, int y, flex_t radius, flex_t step, uint16_t color, int pattern)
 {
     __int64 v7; // rax
     int v8; // edi
@@ -122,46 +122,46 @@ void rdPrimit2_DrawClippedCircle(rdCanvas *pCanvas, int x1, int y1, flex_t a4, f
     flex_t a4a; // [esp+4h] [ebp-8h] BYREF
     flex_t a3a; // [esp+8h] [ebp-4h] BYREF
 
-    v7 = (__int64)(a4 - -0.5);
-    v8 = x1;
-    if ( (int)v7 + x1 >= pCanvas->xStart && x1 - (int)v7 <= pCanvas->widthMinusOne && (int)v7 + y1 >= pCanvas->yStart && y1 - (int)v7 <= pCanvas->heightMinusOne )
+    v7 = (__int64)(radius - -0.5);
+    v8 = x;
+    if ( (int)v7 + x >= pCanvas->xStart && x - (int)v7 <= pCanvas->widthMinusOne && (int)v7 + y >= pCanvas->yStart && y - (int)v7 <= pCanvas->heightMinusOne )
     {
         stdMath_SinCos(0.0, &a3a, &a4a);
-        v9 = x1 + (__int64)(a4a * a4 - -0.5);
-        a2a = radius;
-        v10 = y1 + (__int64)(a3a * a4 - -0.5);
-        if ( radius <= 360.0 )
+        v9 = x + (__int64)(a4a * radius - -0.5);
+        a2a = step;
+        v10 = y + (__int64)(a3a * radius - -0.5);
+        if ( step <= 360.0 )
         {
             while ( 1 )
             {
                 stdMath_SinCos(a2a, &a3a, &a4a);
-                v11 = v8 + (__int64)(a4a * a4 - -0.5);
-                v12 = y1 + (__int64)(a3a * a4 - -0.5);
-                rdPrimit2_DrawClippedLine(pCanvas, v9, v10, v11, v12, color16, mask);
-                v13 = a2a + radius;
+                v11 = v8 + (__int64)(a4a * radius - -0.5);
+                v12 = y + (__int64)(a3a * radius - -0.5);
+                rdPrimit2_DrawClippedLine(pCanvas, v9, v10, v11, v12, color, pattern);
+                v13 = a2a + step;
                 v9 = v11;
                 v10 = v12;
                 a2a = v13;
                 if ( v13 > 360.0 )
                     break;
-                v8 = x1;
+                v8 = x;
             }
         }
     }
 }
 
 
-void rdPrimit2_DrawRectangle(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, int16_t color, int mask)
+void rdPrimit2_DrawRectangle(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, int16_t color, int pattern)
 {
-    rdPrimit2_DrawClippedLine(pCanvas, x1, y1, x2, y1, color, mask);
-    rdPrimit2_DrawClippedLine(pCanvas, x2, y1, x2, y2, color, mask);
-    rdPrimit2_DrawClippedLine(pCanvas, x1, y1, x1, y2, color, mask);
-    rdPrimit2_DrawClippedLine(pCanvas, x1, y2, x2, y2, color, mask);
+    rdPrimit2_DrawClippedLine(pCanvas, x1, y1, x2, y1, color, pattern);
+    rdPrimit2_DrawClippedLine(pCanvas, x2, y1, x2, y2, color, pattern);
+    rdPrimit2_DrawClippedLine(pCanvas, x1, y1, x1, y2, color, pattern);
+    rdPrimit2_DrawClippedLine(pCanvas, x1, y2, x2, y2, color, pattern);
 }
 
-void rdPrimit2_DrawTriangle(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, int x3, int y3, int16_t color, int mask)
+void rdPrimit2_DrawTriangle(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, int x3, int y3, int16_t color, int pattern)
 {
-    rdPrimit2_DrawClippedLine(pCanvas, x1, y1, x2, y2, color, mask);
-    rdPrimit2_DrawClippedLine(pCanvas, x2, y2, x3, y3, color, mask);
-    rdPrimit2_DrawClippedLine(pCanvas, x3, y3, x1, y1, color, mask);
+    rdPrimit2_DrawClippedLine(pCanvas, x1, y1, x2, y2, color, pattern);
+    rdPrimit2_DrawClippedLine(pCanvas, x2, y2, x3, y3, color, pattern);
+    rdPrimit2_DrawClippedLine(pCanvas, x3, y3, x1, y1, color, pattern);
 }
