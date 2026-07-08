@@ -1494,13 +1494,13 @@ void do_hooks()
     hook_function(stdConsole_SetCursorPos_ADDR, stdConsole_SetCursorPos);
     hook_function(stdConsole_GetCursorPos_ADDR, stdConsole_GetCursorPos);
     hook_function(stdConsole_ToggleCursor_ADDR, stdConsole_ToggleCursor);
-    hook_function(stdConsole_GetTextAttribute_ADDR, stdConsole_GetTextAttribute);
-    hook_function(stdConsole_SetTextAttribute_ADDR, stdConsole_SetTextAttribute);
+    hook_function(stdConsole_SetAttributes_ADDR, stdConsole_SetAttributes);
+    hook_function(stdConsole_SetConsoleTextAttribute_ADDR, stdConsole_SetConsoleTextAttribute);
     hook_function(stdConsole_Flush_ADDR, stdConsole_Flush);
-    hook_function(stdConsole_Clear_ADDR, stdConsole_Clear);
+    hook_function(stdConsole_InitOutputConsole_ADDR, stdConsole_InitOutputConsole);
     hook_function(stdConsole_Reset_ADDR, stdConsole_Reset);
     hook_function(stdConsole_Putc_ADDR, stdConsole_Putc);
-    hook_function(stdConsole_Puts_ADDR, stdConsole_Puts);
+    hook_function(stdConsole_WriteConsole_ADDR, stdConsole_WriteConsole);
     hook_function(stdConsole_ClearBuf_ADDR, stdConsole_ClearBuf);
     hook_function(stdConsole_ClearBuf2_ADDR, stdConsole_ClearBuf2);
     hook_function(stdConsole_WriteBorderMaybe_ADDR, stdConsole_WriteBorderMaybe);

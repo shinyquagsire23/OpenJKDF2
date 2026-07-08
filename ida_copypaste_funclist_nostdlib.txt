@@ -663,13 +663,13 @@ stdConsole_Free	.text	004279C0	0000001C	00000004	00000004	R	.	.	.	.	.	T	.
 stdConsole_SetCursorPos	.text	004279E0	00000026	00000000	00000006	R	.	.	.	.	.	.	.
 stdConsole_GetCursorPos	.text	00427A10	0000002E	00000018	00000004	R	.	.	.	.	.	T	.
 stdConsole_ToggleCursor	.text	00427A40	0000005C	00000000	00000004	R	.	.	.	.	.	T	.
-stdConsole_GetTextAttribute	.text	00427AA0	00000011	00000000	00000002	R	.	.	.	.	.	.	.
-stdConsole_SetTextAttribute	.text	00427AC0	00000018	00000000	00000002	R	.	.	.	.	.	T	.
+stdConsole_SetAttributes	.text	00427AA0	00000011	00000000	00000002	R	.	.	.	.	.	.	.
+stdConsole_SetConsoleTextAttribute	.text	00427AC0	00000018	00000000	00000002	R	.	.	.	.	.	T	.
 stdConsole_Flush	.text	00427AE0	0000000D	00000000	00000000	R	.	.	.	.	.	T	.
-stdConsole_Clear	.text	00427AF0	00000067	00000010	00000000	R	.	.	.	.	.	T	.
+stdConsole_InitOutputConsole	.text	00427AF0	00000067	00000010	00000000	R	.	.	.	.	.	T	.
 stdConsole_Reset	.text	00427B60	00000050	00000008	00000002	R	.	.	.	.	.	T	.
 stdConsole_Putc	.text	00427BB0	0000003B	00000000	00000008	R	.	.	.	.	.	.	.
-stdConsole_Puts	.text	00427BF0	00000049	00000004	00000008	R	.	.	.	.	.	T	.
+stdConsole_WriteConsole	.text	00427BF0	00000049	00000004	00000008	R	.	.	.	.	.	T	.
 stdConsole_ClearBuf	.text	00427C40	00000033	00000008	00000004	R	.	.	.	.	.	T	.
 stdConsole_ClearBuf2	.text	00427C80	0000002E	00000008	00000008	R	.	.	.	.	.	T	.
 stdConsole_WriteBorderMaybe	.text	00427CB0	000006AB	00000132	00000004	R	.	.	.	.	.	T	.

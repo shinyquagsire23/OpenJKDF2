@@ -11,13 +11,13 @@
 #define stdConsole_SetCursorPos_ADDR (0x004279E0)
 #define stdConsole_GetCursorPos_ADDR (0x00427A10)
 #define stdConsole_ToggleCursor_ADDR (0x00427A40)
-#define stdConsole_GetTextAttribute_ADDR (0x00427AA0)
-#define stdConsole_SetTextAttribute_ADDR (0x00427AC0)
+#define stdConsole_SetAttributes_ADDR (0x00427AA0)
+#define stdConsole_SetConsoleTextAttribute_ADDR (0x00427AC0)
 #define stdConsole_Flush_ADDR (0x00427AE0)
-#define stdConsole_Clear_ADDR (0x00427AF0)
+#define stdConsole_InitOutputConsole_ADDR (0x00427AF0)
 #define stdConsole_Reset_ADDR (0x00427B60)
 #define stdConsole_Putc_ADDR (0x00427BB0)
-#define stdConsole_Puts_ADDR (0x00427BF0)
+#define stdConsole_WriteConsole_ADDR (0x00427BF0)
 #define stdConsole_ClearBuf_ADDR (0x00427C40)
 #define stdConsole_ClearBuf2_ADDR (0x00427C80)
 #define stdConsole_WriteBorderMaybe_ADDR (0x00427CB0)
@@ -34,13 +34,13 @@ void stdConsole_Free(stdConsole *a1);
 BOOL stdConsole_SetCursorPos(COORD dwCursorPosition, SHORT a2);
 void stdConsole_GetCursorPos(COORD *a1);
 void stdConsole_ToggleCursor(int a1);
-int stdConsole_GetTextAttribute(WORD a1);
-void stdConsole_SetTextAttribute(__int16 wAttributes);
+int stdConsole_SetAttributes(WORD a1);
+void stdConsole_SetConsoleTextAttribute(__int16 wAttributes);
 void stdConsole_Flush();
-void stdConsole_Clear();
+void stdConsole_InitOutputConsole();
 void stdConsole_Reset(SHORT a1);
 void stdConsole_Putc(char Buffer, __int16 wAttributes);
-void stdConsole_Puts(char *lpBuffer, WORD wAttributes);
+void stdConsole_WriteConsole(char *lpBuffer, WORD wAttributes);
 int stdConsole_ClearBuf(stdConsole *a1);
 void stdConsole_ClearBuf2(stdConsole *a1, int a2);
 void stdConsole_WriteBorderMaybe(stdConsole *console);

@@ -106,7 +106,7 @@ int stdConsolePrintf(const char *fmt, ...)
     __vsnprintf(std_genBuffer, 0x400u, fmt, va);
     va_end(va);
 #ifndef PLATFORM_POSIX
-    stdConsole_Puts(std_genBuffer, 7u);
+    stdConsole_WriteConsole(std_genBuffer, 7u);
 #else
     jk_printf("%s", std_genBuffer);
 #endif

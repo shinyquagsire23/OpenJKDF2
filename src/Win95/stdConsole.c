@@ -148,13 +148,13 @@ void stdConsole_ToggleCursor(int a1)
     }
 }
 
-int stdConsole_GetTextAttribute(WORD a1)
+int stdConsole_SetAttributes(WORD a1)
 {
     stdConsole_wAttributes = a1;
     return 1;
 }
 
-void stdConsole_SetTextAttribute(__int16 wAttributes)
+void stdConsole_SetConsoleTextAttribute(__int16 wAttributes)
 {
     stdConsole_foregroundAttr = wAttributes;
     jk_SetConsoleTextAttribute(stdConsole_hConsoleOutput, wAttributes);
@@ -165,7 +165,7 @@ void stdConsole_Flush()
     jk_FlushConsoleInputBuffer(stdConsole_hConsoleInput);
 }
 
-void stdConsole_Clear()
+void stdConsole_InitOutputConsole()
 {
     DWORD NumberOfCharsWritten;
     COORD nopCoord = {0};
@@ -199,7 +199,7 @@ void stdConsole_Putc(char Buffer, __int16 wAttributes)
     jk_WriteConsoleA(stdConsole_hConsoleOutput, &Buffer, 1u, (LPDWORD)&wAttributes, 0);
 }
 
-void stdConsole_Puts(char *lpBuffer, WORD wAttributes)
+void stdConsole_WriteConsole(char *lpBuffer, WORD wAttributes)
 {
     if ( stdConsole_foregroundAttr != wAttributes )
     {
