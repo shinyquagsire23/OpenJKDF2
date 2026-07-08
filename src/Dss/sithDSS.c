@@ -632,7 +632,7 @@ void sithDSS_SyncTaskEvents(sithEvent *timer, int sendto_id, int mpFlags)
 {
     NETMSG_START;
 
-    NETMSG_PUSHU32(timer->endMs - sithTime_curMs);
+    NETMSG_PUSHU32(timer->endMs - sithTime_g_msecGameTime);
     NETMSG_PUSHU32(timer->timerInfo.cogIdx);
     NETMSG_PUSHU32(timer->timerInfo.timerIdx);
     NETMSG_PUSHF32(timer->timerInfo.field_10);

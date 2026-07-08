@@ -649,17 +649,17 @@ void jkHud_Draw()
     if ( jkHud_bHasTarget && jkHud_pTargetThing && rdPrimit3_GetScreenCoord(&jkHud_pTargetThing->position, &tmpScreenPt) )
     {
         flex_t valSin, valCos;
-        a2 = sithTime_curSeconds * 200.0;
+        a2 = sithTime_g_secGameTime * 200.0;
         if ( Video_format.format.is16bit )
         {
             stdMath_SinCos(a2, &valSin, &valCos);
             v58 = valSin * 20.0;
             rdPrimit2_DrawClippedCircle(pOverlayCanvas, tmpScreenPt.x, tmpScreenPt.y, v58, 20.0, jkHud_targetRed16, -1);
-            a2c = (sithTime_curSeconds - 0.1) * 200.0;
+            a2c = (sithTime_g_secGameTime - 0.1) * 200.0;
             stdMath_SinCos(a2c, &valSin, &valCos);
             v59 = valSin * 20.0;
             rdPrimit2_DrawClippedCircle(pOverlayCanvas, tmpScreenPt.x, tmpScreenPt.y, v59, 20.0, jkHud_targetGreen16, -1);
-            a2d = (sithTime_curSeconds - 0.2) * 200.0;
+            a2d = (sithTime_g_secGameTime - 0.2) * 200.0;
             stdMath_SinCos(a2d, &valSin, &valCos);
             v26 = jkHud_targetBlue16;
         }
@@ -668,11 +668,11 @@ void jkHud_Draw()
             stdMath_SinCos(a2, &valSin, &valCos);
             v56 = valSin * 20.0;
             rdPrimit2_DrawClippedCircle(pOverlayCanvas, tmpScreenPt.x, tmpScreenPt.y, v56, 20.0, jkHud_targetRed, -1);
-            a2a = (sithTime_curSeconds - 0.1) * 200.0;
+            a2a = (sithTime_g_secGameTime - 0.1) * 200.0;
             stdMath_SinCos(a2a, &valSin, &valCos);
             v57 = valSin * 20.0;
             rdPrimit2_DrawClippedCircle(pOverlayCanvas, tmpScreenPt.x, tmpScreenPt.y, v57, 20.0, jkHud_targetBlue, -1);
-            a2b = (sithTime_curSeconds - 0.2) * 200.0;
+            a2b = (sithTime_g_secGameTime - 0.2) * 200.0;
             stdMath_SinCos(a2b, &valSin, &valCos);
             v26 = jkHud_targetGreen;
         }
@@ -899,7 +899,7 @@ LABEL_116:
     if (0)
 #endif
     {
-        int fps = (int)sithTime_TickHz;
+        int fps = (int)sithTime_g_fps;
         if (fps > 999) fps = 999;
         if (fps < 0) fps = 0;
         memset(tmp, 0, 32);
@@ -1254,17 +1254,17 @@ void jkHud_DrawGPU()
     if ( jkHud_bHasTarget && jkHud_pTargetThing && rdPrimit3_GetScreenCoord(&jkHud_pTargetThing->position, &tmpScreenPt) )
     {
         flex_t valSin, valCos;
-        a2 = sithTime_curSeconds * 200.0;
+        a2 = sithTime_g_secGameTime * 200.0;
         if ( Video_format.format.is16bit )
         {
             stdMath_SinCos(a2, &valSin, &valCos);
             v58 = valSin * 20.0;
             rdPrimit2_DrawClippedCircle(pOverlayCanvas, tmpScreenPt.x, tmpScreenPt.y, v58, 20.0, jkHud_targetRed16, -1);
-            a2c = (sithTime_curSeconds - 0.1) * 200.0;
+            a2c = (sithTime_g_secGameTime - 0.1) * 200.0;
             stdMath_SinCos(a2c, &valSin, &valCos);
             v59 = valSin * 20.0;
             rdPrimit2_DrawClippedCircle(pOverlayCanvas, tmpScreenPt.x, tmpScreenPt.y, v59, 20.0, jkHud_targetGreen16, -1);
-            a2d = (sithTime_curSeconds - 0.2) * 200.0;
+            a2d = (sithTime_g_secGameTime - 0.2) * 200.0;
             stdMath_SinCos(a2d, &valSin, &valCos);
             v26 = jkHud_targetBlue16;
         }
@@ -1273,11 +1273,11 @@ void jkHud_DrawGPU()
             stdMath_SinCos(a2, &valSin, &valCos);
             v56 = valSin * 20.0;
             rdPrimit2_DrawClippedCircle(pOverlayCanvas, tmpScreenPt.x, tmpScreenPt.y, v56, 20.0, jkHud_targetRed, -1);
-            a2a = (sithTime_curSeconds - 0.1) * 200.0;
+            a2a = (sithTime_g_secGameTime - 0.1) * 200.0;
             stdMath_SinCos(a2a, &valSin, &valCos);
             v57 = valSin * 20.0;
             rdPrimit2_DrawClippedCircle(pOverlayCanvas, tmpScreenPt.x, tmpScreenPt.y, v57, 20.0, jkHud_targetBlue, -1);
-            a2b = (sithTime_curSeconds - 0.2) * 200.0;
+            a2b = (sithTime_g_secGameTime - 0.2) * 200.0;
             stdMath_SinCos(a2b, &valSin, &valCos);
             v26 = jkHud_targetGreen;
         }
@@ -1508,7 +1508,7 @@ LABEL_116:
     if (0)
 #endif
     {
-        int fps = (int)sithTime_TickHz;
+        int fps = (int)sithTime_g_fps;
         if (fps > 999) fps = 999;
         if (fps < 0) fps = 0;
         memset(tmp, 0, 32);

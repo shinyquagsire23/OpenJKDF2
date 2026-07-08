@@ -803,7 +803,7 @@ LABEL_78:
                 v16 = v36;
                 if ( v65 != 0.0 && v5->moveType == SITH_MT_PHYSICS) // Added: physics check
                 {
-                    rdVector_Scale3(&v5->field_268, &v5->physicsParams.vel, v65 * sithTime_deltaSeconds);
+                    rdVector_Scale3(&v5->field_268, &v5->physicsParams.vel, v65 * sithTime_g_frameTimeFlex);
                     v65 = 0.0;
                 }
                 if ( v36 )
@@ -922,9 +922,9 @@ int sithCollision_HandleThingHitSurface(sithThing *thing, sithSurface *surface, 
     if ( !sithCollision_CollideHurt(thing, &a3->hitNorm, a3->distance, surface->surfaceFlags & SITH_SURFACE_80) )
         return 0;
 
-    if ( (surface->surfaceFlags & SITH_SURFACE_COG_LINKED) != 0 && (v3->thingflags & SITH_TF_INVULN) == 0 && surface->surfaceInfo.lastTouchedMs + 500 <= sithTime_curMsAbsolute )
+    if ( (surface->surfaceFlags & SITH_SURFACE_COG_LINKED) != 0 && (v3->thingflags & SITH_TF_INVULN) == 0 && surface->surfaceInfo.lastTouchedMs + 500 <= sithTime_g_clockTime )
     {
-        surface->surfaceInfo.lastTouchedMs = sithTime_curMsAbsolute;
+        surface->surfaceInfo.lastTouchedMs = sithTime_g_clockTime;
         sithCog_SurfaceSendMessage(surface, v3, SITH_MESSAGE_TOUCHED);
     }
     if ( a1a > 0.15000001 )

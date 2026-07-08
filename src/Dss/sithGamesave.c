@@ -616,7 +616,7 @@ int sithGamesave_Process()
         if ( sithGamesave_funcWrite )
             sithGamesave_funcWrite();
         stdConffile_Write((const char*)sithWorld_pCurrentWorld->map_jkl_fname, 32);
-        stdConffile_Write((const char*)&sithTime_curMs, sizeof(uint32_t));
+        stdConffile_Write((const char*)&sithTime_g_msecGameTime, sizeof(uint32_t));
         
         // Added: split this apart, g_sithMode is a struct...
         stdConffile_Write((const char*)&g_sithMode, sizeof(int32_t));

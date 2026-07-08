@@ -397,7 +397,7 @@ void sithPlayer_PlayerKilledAction(sithThing *player, sithThing *killedBy)
     if ( sithNet_isMulti )
         sithMulti_ProcessKilledPlayer(v5, player, killedBy);
     if ( player == sithPlayer_pLocalPlayerThing )
-        sithControl_death_msgtimer = sithTime_curMs + 3000;
+        sithControl_death_msgtimer = sithTime_g_msecGameTime + 3000;
 }
 
 int sithPlayer_GetThingPlayerNumByIndex(int a1)

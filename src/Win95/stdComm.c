@@ -133,7 +133,7 @@ int stdComm_Recv(sithCogMsg *msg)
         {
             pMsg->netMsg.thingIdx = playerId;
             pMsg->netMsg.msg_size = msgBytes - 4;
-            pMsg->netMsg.timeMs = sithTime_curMs;
+            pMsg->netMsg.timeMs = sithTime_g_msecGameTime;
             return 1;
         }
         if ( (g_submodeFlags & 8) == 0 )

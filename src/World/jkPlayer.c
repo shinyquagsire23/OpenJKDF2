@@ -860,7 +860,7 @@ void jkPlayer_DrawPov()
 
     if ( playerThings[playerThingIdx].povModel.puppet )
     {
-        rdPuppet_UpdateTracks(playerThings[playerThingIdx].povModel.puppet, sithTime_deltaSeconds);
+        rdPuppet_UpdateTracks(playerThings[playerThingIdx].povModel.puppet, sithTime_g_frameTimeFlex);
     }
 
     if ( !(sithCamera_currentCamera->cameraPerspective & 0xFC) && sithCamera_currentCamera->primaryFocus == sithWorld_pCurrentWorld->cameraFocus )
@@ -872,7 +872,7 @@ void jkPlayer_DrawPov()
         flex_t waggleAmt = (stdMath_Fabs(player->waggle) > 0.02 ? 0.02 : stdMath_Fabs(player->waggle)) * jkPlayer_waggleMag;
 #else
         // scale animation to be in line w/ 25fps (presumed 'mastering' FPS of whoever was coding the waggle)
-        flex_t waggleAmt = (stdMath_Fabs(player->waggle) > 0.02 * (sithTime_deltaSeconds / (1.0/25)) ? 0.02 * (sithTime_deltaSeconds / (1.0/25)) : stdMath_Fabs(player->waggle)) * jkPlayer_waggleMag;
+        flex_t waggleAmt = (stdMath_Fabs(player->waggle) > 0.02 * (sithTime_g_frameTimeFlex / (1.0/25)) ? 0.02 * (sithTime_g_frameTimeFlex / (1.0/25)) : stdMath_Fabs(player->waggle)) * jkPlayer_waggleMag;
 
         if (jkPlayer_bDisableWeaponWaggle) {
             waggleAmt = 0.0;
@@ -1081,7 +1081,7 @@ void jkPlayer_renderSaberTwinkle(sithThing *player)
     rdMatrix34 matTmp;
 
     jkPlayerInfo* playerInfo = player->playerInfo;
-    if ( sithTime_curMs > playerInfo->nextTwinkleRandMs )
+    if ( sithTime_g_msecGameTime > playerInfo->nextTwinkleRandMs )
     {
         playerInfo->bRenderTwinkleParticle = 1;
         
@@ -1095,7 +1095,7 @@ void jkPlayer_renderSaberTwinkle(sithThing *player)
     }
     if ( playerInfo->bRenderTwinkleParticle )
     {
-        if ( sithTime_curMs > playerInfo->nextTwinkleSpawnMs )
+        if ( sithTime_g_msecGameTime > playerInfo->nextTwinkleSpawnMs )
         {
             rdThing* rdthing = &playerInfo->actorThing->rdthing;
             playerInfo->nextTwinkleSpawnMs += 40;

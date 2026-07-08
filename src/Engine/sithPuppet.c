@@ -200,7 +200,7 @@ int sithPuppet_PlayMode(sithThing *thing, signed int anim, rdPuppetTrackCallback
     highPri = v7->highPri;
     if ( anim != SITH_ANIM_FIDGET && anim != SITH_ANIM_FIDGET2 )
     {
-        v6->animStartedMs = sithTime_curMs;
+        v6->animStartedMs = sithTime_g_msecGameTime;
         v10 = v6->currentTrack;
         if ( v10 >= 0 )
         {
@@ -582,7 +582,7 @@ void sithPuppet_sub_4E4A20(sithThing *thing, sithAnimclassEntry *animClass)
         v4 = &sithPup->playingAnim->keyframe;
         if ( !v4 || *v4 != animClass->keyframe )
         {
-            sithPup->animStartedMs = sithTime_curMs;
+            sithPup->animStartedMs = sithTime_g_msecGameTime;
             v5 = sithPup->currentTrack;
             if ( v5 >= 0 )
             {
@@ -815,7 +815,7 @@ void sithPuppet_PlayFidgetMode(sithThing *pThing)
     int v10; // eax
 
     puppet = pThing->puppet;
-    if ( puppet->currentTrack < 0 && puppet->currentAnimation == 1 && (flex_d_t)(unsigned int)puppet->animStartedMs - -30000.0 < (flex_d_t)sithTime_curMs )
+    if ( puppet->currentTrack < 0 && puppet->currentAnimation == 1 && (flex_d_t)(unsigned int)puppet->animStartedMs - -30000.0 < (flex_d_t)sithTime_g_msecGameTime )
     {
         v2 = _frand();
         if ( v2 >= 0.3 )
@@ -856,7 +856,7 @@ void sithPuppet_PlayFidgetMode(sithThing *pThing)
                 v5 = -1;
             }
             v6 = pThing->puppet;
-            v7 = sithTime_curMs;
+            v7 = sithTime_g_msecGameTime;
             v6->currentTrack = v5;
             v6->animStartedMs = v7;
         }
@@ -870,7 +870,7 @@ void sithPuppet_resetidk(sithThing *pThing)
     rdPuppet *v3; // ecx
 
     puppet = pThing->puppet;
-    puppet->animStartedMs = sithTime_curMs;
+    puppet->animStartedMs = sithTime_g_msecGameTime;
     v2 = puppet->currentTrack;
     if ( v2 >= 0 )
     {

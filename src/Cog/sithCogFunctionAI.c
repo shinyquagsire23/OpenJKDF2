@@ -375,7 +375,7 @@ void sithCogFunctionAI_AISetFireTarget(sithCog *ctx)
             v3 = v2->actor;
             if ( v3 )
             {
-                v4 = sithTime_curMs;
+                v4 = sithTime_g_msecGameTime;
                 v3->pDistractor = v1;
                 v3->field_204 = v4;
                 v5 = v3->flags;

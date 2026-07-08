@@ -357,7 +357,7 @@ flex_t stdControl_ReadAxis(int axisNum)
 #endif
 
     // Added: Scale to FPS
-    //result = (result * (sithTime_TickHz / 50.0));
+    //result = (result * (sithTime_g_fps / 50.0));
     return result;
 }
 

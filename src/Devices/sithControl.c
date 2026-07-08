@@ -763,7 +763,7 @@ LABEL_11:
 #ifdef QOL_IMPROVEMENTS
                         v4 = v4 * 25.0;
 #else
-                        v4 = v4 * sithTime_TickHz;
+                        v4 = v4 * sithTime_g_fps;
 #endif
                     }
                     if ( v4 != 0.0 )
@@ -956,7 +956,7 @@ int sithControl_HandlePlayer(sithThing *player, flex_t deltaSecs)
             {
                 if ( !sithControl_death_msgtimer )
                     goto LABEL_39;
-                if ( sithControl_death_msgtimer <= sithTime_curMs )
+                if ( sithControl_death_msgtimer <= sithTime_g_msecGameTime )
                 {
                     if ( sithNet_isMulti )
                     {
@@ -1133,7 +1133,7 @@ debug_controls:
             rdVector_Normalize3Acc(&sithControl_vec3_54A570);
         }
 #ifdef QOL_IMPROVEMENTS
-        v7 = -sithControl_GetKeyAsAxisNormalized(INPUT_FUNC_FORWARD) * (deltaSecs * 0.1);// * (sithTime_TickHz / 50.0);
+        v7 = -sithControl_GetKeyAsAxisNormalized(INPUT_FUNC_FORWARD) * (deltaSecs * 0.1);// * (sithTime_g_fps / 50.0);
 #else
         v7 = -sithControl_GetKeyAsAxisNormalized(INPUT_FUNC_FORWARD) * (deltaSecs * 0.1);
 #endif
@@ -1224,8 +1224,8 @@ void sithControl_PlayerLook(sithThing *player, flex_t deltaSecs)
                 v3 = 1;
 #ifdef QOL_IMPROVEMENTS
                 // Scale appropriately to high framerates
-                a2.x += v6 * sithControl_008d7f44 * 90.0 * deltaSecs;// * (sithTime_TickHz / 50.0);
-                local_10 += v6 * sithControl_008d7f44 * 90.0 * deltaSecs;// * (sithTime_TickHz / 50.0);
+                a2.x += v6 * sithControl_008d7f44 * 90.0 * deltaSecs;// * (sithTime_g_fps / 50.0);
+                local_10 += v6 * sithControl_008d7f44 * 90.0 * deltaSecs;// * (sithTime_g_fps / 50.0);
 #else
                 a2.x += v6 * sithControl_008d7f44 * 90.0 * deltaSecs;
                 local_10 += v6 * sithControl_008d7f44 * 90.0 * deltaSecs;
@@ -1251,7 +1251,7 @@ LABEL_20:
                 {
 #ifdef QOL_IMPROVEMENTS
                     // Scale appropriately to high framerates
-                    v8 = deltaSecs * 180.0 * (sithTime_TickHz / 50.0);
+                    v8 = deltaSecs * 180.0 * (sithTime_g_fps / 50.0);
 #else
                     v8 = deltaSecs * 180.0;
 #endif
@@ -1336,9 +1336,9 @@ void sithControl_PlayerMovementMots(sithThing *player)
         fVar4 = sithControl_GetAxis(INPUT_FUNC_TURN);
 #ifdef QOL_IMPROVEMENTS
         // Scale appropriately to high framerates
-        fVar4 = fVar4 * sithTime_TickHz;
+        fVar4 = fVar4 * sithTime_g_fps;
 #else
-        fVar4 = fVar4 * sithTime_TickHz;
+        fVar4 = fVar4 * sithTime_g_fps;
 #endif
         if (1.0 <= move_multiplier) {
             local_8 = 1.0;
@@ -1349,7 +1349,7 @@ void sithControl_PlayerMovementMots(sithThing *player)
         fVar3 = sithControl_GetKeyAsAxis(INPUT_FUNC_TURN);
 #ifdef QOL_IMPROVEMENTS
         // Scale appropriately to high framerates
-        //fVar3 *= (sithTime_TickHz / 25.0) * 2.0;
+        //fVar3 *= (sithTime_g_fps / 25.0) * 2.0;
 #endif
 
         fVar4 += fVar3 * thing->actorParams.maxRotThrust * local_8;
@@ -1549,9 +1549,9 @@ void sithControl_PlayerMovement(sithThing *player)
             // These base values only come from raw axis fetches
 #ifdef QOL_IMPROVEMENTS
             // Scale appropriately to high and low framerates
-            player->physicsParams.angVel.y = sithControl_GetAxis(INPUT_FUNC_TURN) * sithTime_TickHz;
+            player->physicsParams.angVel.y = sithControl_GetAxis(INPUT_FUNC_TURN) * sithTime_g_fps;
 #else
-            player->physicsParams.angVel.y = sithControl_GetAxis(INPUT_FUNC_TURN) * sithTime_TickHz;
+            player->physicsParams.angVel.y = sithControl_GetAxis(INPUT_FUNC_TURN) * sithTime_g_fps;
 #endif
             if ( move_multiplier <= 1.0 )
                 move_multiplier_ = move_multiplier;
@@ -1561,7 +1561,7 @@ void sithControl_PlayerMovement(sithThing *player)
             // These axis values only come from non-raw axis fetches
 #ifdef QOL_IMPROVEMENTS
             // Scale appropriately to high framerates
-            player->physicsParams.angVel.y += sithControl_GetKeyAsAxis(INPUT_FUNC_TURN) * player->actorParams.maxRotThrust * move_multiplier_;// * (sithTime_TickHz / 25.0) * 2.0;
+            player->physicsParams.angVel.y += sithControl_GetKeyAsAxis(INPUT_FUNC_TURN) * player->actorParams.maxRotThrust * move_multiplier_;// * (sithTime_g_fps / 25.0) * 2.0;
 #else
             player->physicsParams.angVel.y += sithControl_GetKeyAsAxis(INPUT_FUNC_TURN) * player->actorParams.maxRotThrust * move_multiplier_;
 #endif
@@ -1666,10 +1666,10 @@ void sithControl_FreeCam(sithThing *player)
             
 #ifdef QOL_IMPROVEMENTS
             // Scale appropriately to high framerates
-            v1->physicsParams.angVel.y = sithControl_GetAxis(INPUT_FUNC_TURN) * sithTime_TickHz;
-            v1->physicsParams.angVel.y +=  sithControl_GetKeyAsAxis(INPUT_FUNC_TURN) * v1->actorParams.maxRotThrust;// * (sithTime_TickHz / 25.0) * 2.0;
+            v1->physicsParams.angVel.y = sithControl_GetAxis(INPUT_FUNC_TURN) * sithTime_g_fps;
+            v1->physicsParams.angVel.y +=  sithControl_GetKeyAsAxis(INPUT_FUNC_TURN) * v1->actorParams.maxRotThrust;// * (sithTime_g_fps / 25.0) * 2.0;
 #else
-            v1->physicsParams.angVel.y = sithControl_GetAxis(INPUT_FUNC_TURN) * sithTime_TickHz;
+            v1->physicsParams.angVel.y = sithControl_GetAxis(INPUT_FUNC_TURN) * sithTime_g_fps;
             v1->physicsParams.angVel.y += sithControl_GetKeyAsAxis(INPUT_FUNC_TURN) * v1->actorParams.maxRotThrust;
 #endif
         }

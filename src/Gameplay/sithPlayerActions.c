@@ -29,9 +29,9 @@ void sithPlayerActions_Activate(sithThing *thing)
     rdVector3 thingPos; // [esp+1Ch] [ebp-3Ch] BYREF
     rdMatrix34 out; // [esp+28h] [ebp-30h] BYREF
 
-    if ( !sithNet_isMulti || lastDoorOpenTime + 250 <= sithTime_curMsAbsolute )
+    if ( !sithNet_isMulti || lastDoorOpenTime + 250 <= sithTime_g_clockTime )
     {
-        lastDoorOpenTime = sithTime_curMsAbsolute;
+        lastDoorOpenTime = sithTime_g_clockTime;
         _memcpy(&out, &thing->lookOrientation, sizeof(out));
         rdVector_Copy3(&thingPos, &thing->position);
         if ( thing->type == SITH_THING_ACTOR || thing->type == SITH_THING_PLAYER )

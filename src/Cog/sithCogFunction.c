@@ -109,7 +109,7 @@ void sithCogFunction_Sleep(sithCog *ctx)
 #endif
     }
     ctx_->script_running = 2;
-    ctx_->wakeTimeMs = sithTime_curMs + (int)(fSecs * 1000.0);
+    ctx_->wakeTimeMs = sithTime_g_msecGameTime + (int)(fSecs * 1000.0);
 }
 
 void sithCogFunction_Print(sithCog *ctx)
@@ -338,7 +338,7 @@ void sithCogFunction_SetPulse(sithCog *ctx)
         }
         ctx->flags |= SITH_COG_PULSE_SET;
         ctx->pulsePeriodMs = (int)(popFlex * 1000.0);
-        ctx->nextPulseMs = (int)(popFlex * 1000.0) + sithTime_curMs;
+        ctx->nextPulseMs = (int)(popFlex * 1000.0) + sithTime_g_msecGameTime;
     }
 }
 
@@ -366,7 +366,7 @@ void sithCogFunction_SetTimer(sithCog *ctx)
 #endif
         }
         ctx->flags |= SITH_COG_TIMER_SET;
-        ctx->field_20 = sithTime_curMs + (int)(popFlex * 1000.0);
+        ctx->field_20 = sithTime_g_msecGameTime + (int)(popFlex * 1000.0);
     }
 }
 
@@ -571,12 +571,12 @@ void sithCogFunction_GetSithMode(sithCog* ctx)
 
 void sithCogFunction_GetGameTime(sithCog *ctx)
 {
-    sithCogExec_PushInt(ctx, sithTime_curMs);
+    sithCogExec_PushInt(ctx, sithTime_g_msecGameTime);
 }
 
 void sithCogFunction_GetFlexGameTime(sithCog *ctx)
 {
-    sithCogExec_PushFlex(ctx, sithTime_curSeconds);
+    sithCogExec_PushFlex(ctx, sithTime_g_secGameTime);
 }
 
 void sithCogFunction_GetDifficulty(sithCog *ctx)
@@ -646,7 +646,7 @@ void sithCogFunction_BitClear(sithCog *ctx)
 
 void sithCogFunction_GetLevelTime(sithCog *ctx)
 {
-    sithCogExec_PushFlex(ctx, sithTime_curMs * 0.001);
+    sithCogExec_PushFlex(ctx, sithTime_g_msecGameTime * 0.001);
 }
 
 void sithCogFunction_GetThingCount(sithCog *ctx)

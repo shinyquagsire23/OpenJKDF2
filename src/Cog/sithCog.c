@@ -1526,12 +1526,12 @@ void sithCog_FreeWorldCogs(sithWorld *world)
 
 void sithCog_UpdateThingTimer(sithThing *thing)
 {
-    if ( (thing->thingflags & SITH_TF_PULSE) != 0 && thing->pulse_end_ms <= sithTime_curMs )
+    if ( (thing->thingflags & SITH_TF_PULSE) != 0 && thing->pulse_end_ms <= sithTime_g_msecGameTime )
     {
-        thing->pulse_end_ms = sithTime_curMs + thing->pulse_ms;
+        thing->pulse_end_ms = sithTime_g_msecGameTime + thing->pulse_ms;
         sithCog_ThingSendMessageEx(thing, 0, SITH_MESSAGE_PULSE, 0.0, 0.0, 0.0, 0.0);
     }
-    if ( (thing->thingflags & SITH_TF_TIMER) != 0 && thing->timer <= sithTime_curMs )
+    if ( (thing->thingflags & SITH_TF_TIMER) != 0 && thing->timer <= sithTime_g_msecGameTime )
     {
         thing->thingflags &= ~SITH_TF_TIMER;
         sithCog_ThingSendMessageEx(thing, 0, SITH_MESSAGE_TIMER, 0.0, 0.0, 0.0, 0.0);
@@ -1684,14 +1684,14 @@ void sithCog_ProcessCog(sithCog *cog)
 {
     if (!(cog->flags & SITH_COG_DISABLED))
     {
-        //printf("%x %x %x %s\n", cog->flags, sithTime_curMs, cog->nextPulseMs, cog->cogscript_fpath);
-        if ( (cog->flags & SITH_COG_PULSE_SET) && sithTime_curMs >= cog->nextPulseMs )
+        //printf("%x %x %x %s\n", cog->flags, sithTime_g_msecGameTime, cog->nextPulseMs, cog->cogscript_fpath);
+        if ( (cog->flags & SITH_COG_PULSE_SET) && sithTime_g_msecGameTime >= cog->nextPulseMs )
         {
-            cog->nextPulseMs = sithTime_curMs + cog->pulsePeriodMs;
+            cog->nextPulseMs = sithTime_g_msecGameTime + cog->pulsePeriodMs;
             sithCog_SendMessage(cog, SITH_MESSAGE_PULSE, 0, 0, 0, 0, 0);
         }
 
-        if ( (cog->flags & SITH_COG_TIMER_SET) && sithTime_curMs >= cog->field_20 )
+        if ( (cog->flags & SITH_COG_TIMER_SET) && sithTime_g_msecGameTime >= cog->field_20 )
         {
             cog->flags &= ~SITH_COG_TIMER_SET;
             cog->field_20 = 0;
@@ -1699,7 +1699,7 @@ void sithCog_ProcessCog(sithCog *cog)
         }
         if ( cog->script_running == 2 )
         {
-            if ( cog->wakeTimeMs >= sithTime_curMs )
+            if ( cog->wakeTimeMs >= sithTime_g_msecGameTime )
                 return;
             if ((cog->flags & SITH_COG_DEBUG))
             {

@@ -347,7 +347,7 @@ void sithAI_Process()
                 if (actor->thing && actor->pInterest && (actor->pInterest->type == SITH_THING_FREE || actor->pInterest->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED))) {
                     sithCog_ThingSendMessageEx(actor->thing,NULL,SITH_MESSAGE_AIEVENT,65536.0,0.0,0.0,0.0);
                 }
-                if (actor->nextUpdate <= sithTime_curMs) {
+                if (actor->nextUpdate <= sithTime_g_msecGameTime) {
                     sithAI_InstinctUpdate(actor);
 
                     if (sithNet_isMulti && sithNet_MultiModeFlags & MULTIMODEFLAG_COOP) {
@@ -361,7 +361,7 @@ void sithAI_Process()
                   && (actor->thing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0
                   && actor->thing->actorParams.health > 0.0
                   && (actor->flags & (SITHAI_MODE_DISABLED|SITHAI_MODE_SLEEPING)) == 0
-                  && actor->nextUpdate <= sithTime_curMs )
+                  && actor->nextUpdate <= sithTime_g_msecGameTime )
             {
                 sithAI_InstinctUpdate(actor);
 
@@ -382,7 +382,7 @@ void sithAI_InstinctUpdate(sithActor *actor)
     int *v4; // edi
     int a1a; // [esp+1Ch] [ebp+4h]
 
-    uint32_t nextMs = sithTime_curMs + 5000;
+    uint32_t nextMs = sithTime_g_msecGameTime + 5000;
     int a3 = actor->flags;
 
     while (1) {
@@ -394,9 +394,9 @@ void sithAI_InstinctUpdate(sithActor *actor)
                 if ((actor->flags & actor->pAIClass->entries[a1a].param1)
                     && !(actor->flags & actor->pAIClass->entries[a1a].param2))
                 {
-                    if ( actor->instincts[a1a].nextUpdate <= sithTime_curMs )
+                    if ( actor->instincts[a1a].nextUpdate <= sithTime_g_msecGameTime )
                     {
-                        actor->instincts[a1a].nextUpdate = sithTime_curMs + 1000;
+                        actor->instincts[a1a].nextUpdate = sithTime_g_msecGameTime + 1000;
                         if ( actor->pAIClass->entries[a1a].func(actor, &actor->pAIClass->entries[a1a], &actor->instincts[a1a], 0, 0) && a3 != actor->flags )
                         {
                             sithAI_EmitEvent(actor, SITHAI_MODE_UNK100, a3);
@@ -903,7 +903,7 @@ void sithAI_SetLookFrame(sithActor *actor, rdVector3 *lookPos)
 
 void sithAI_SetMoveThing(sithActor *actor, rdVector3 *movePos, flex_t moveSpeed)
 {
-    if ( sithTime_curMs >= actor->field_28C || (actor->flags & SITHAI_MODE_MOVING) == 0 )
+    if ( sithTime_g_msecGameTime >= actor->field_28C || (actor->flags & SITHAI_MODE_MOVING) == 0 )
     {
         actor->moveSpeed = moveSpeed;
         rdVector_Copy3(&actor->movePos, movePos);
@@ -920,7 +920,7 @@ void sithAI_Jump(sithActor *actor, rdVector3 *pos, flex_t vel)
     if ( sithPuppet_PlayMode(actor->thing, SITH_ANIM_JUMP, 0) < 0 )
         sithPlayerActions_JumpWithVel(actor->thing, vel);
 
-    actor->field_28C = sithTime_curMs + 2000;
+    actor->field_28C = sithTime_g_msecGameTime + 2000;
     actor->flags |= SITHAI_MODE_MOVING;
 }
 
@@ -961,7 +961,7 @@ void sithAI_sub_4EAD60(sithActor *actor)
             if ( !v9 || sithAI_CanDetectSightThing(actor, actor->pDistractor, actor->attackDistance) )
             {
                 actor->field_1F8 = actor->pDistractor->position;
-                actor->field_204 = sithTime_curMs;
+                actor->field_204 = sithTime_g_msecGameTime;
             }
             else
             {
@@ -984,7 +984,7 @@ void sithAI_sub_4EAD60(sithActor *actor)
         if ( !v6 )
         {
             rdVector_Copy3(&actor->field_1F8, &actor->field_1D4);
-            actor->field_204 = sithTime_curMs;
+            actor->field_204 = sithTime_g_msecGameTime;
         }
     }
 }
@@ -1010,7 +1010,7 @@ void sithAI_sub_4EAF40(sithActor *actor)
                 if ( !v1 || sithAI_CanDetectSightThing(actor, actor->pMoveThing, actor->currentDistanceFromTarget) )
                 {
                     actor->field_23C = actor->pMoveThing->position;
-                    actor->field_248 = sithTime_curMs;
+                    actor->field_248 = sithTime_g_msecGameTime;
                 }
                 else
                 {
@@ -1033,7 +1033,7 @@ void sithAI_sub_4EAF40(sithActor *actor)
             if ( !v4 )
             {
                 rdVector_Copy3(&actor->field_23C, &actor->movepos);
-                actor->field_248 = sithTime_curMs;
+                actor->field_248 = sithTime_g_msecGameTime;
             }
         }
     }
@@ -1432,7 +1432,7 @@ int sithAI_FireWeapon(sithActor *actor, flex_t minDistToFire, flex_t maxDistToFi
         v20 = 0;
         goto LABEL_12;
     }
-    if ( actor->field_288 > sithTime_curMs || actor->field_1F4 )
+    if ( actor->field_288 > sithTime_g_msecGameTime || actor->field_1F4 )
         return 0;
     if ( actor->attackDistance < (flex_d_t)minDistToFire || actor->attackDistance > (flex_d_t)maxDistToFire )
         return 0;
@@ -1822,7 +1822,7 @@ LAB_0053a691:
         fVar3 = (pDistractorThing->position).y - (pActorThing->position).y;
         fVar4 = (pDistractorThing->position).z - (pActorThing->position).z;
 
-        pActor->field_28C = sithTime_curMs + 2000;
+        pActor->field_28C = sithTime_g_msecGameTime + 2000;
         pActor->moveSpeed = 1313.0;
         pActor->flags &= ~(SITHAI_MODE_TURNING | SITHAI_MODE_MOVING);
         pActor->attackError.x = xDist;
@@ -1834,7 +1834,7 @@ LAB_0053a691:
         thing->physicsParams.vel.z = param_6 * fVar4;
         return 1;
     }
-    if (((uint32_t)pActor->field_288 <= sithTime_curMs) &&
+    if (((uint32_t)pActor->field_288 <= sithTime_g_msecGameTime) &&
             (pActor->field_1F4 == 0)) {
         if ((pActor->attackDistance < param_2) || (pActor->attackDistance > param_3)) {
             bVar6 = 0;
@@ -1920,7 +1920,7 @@ LAB_0053a3b9:
         (pActor->attackError).z = (flex_t)fVar8; // FLEXTODO
         pActor->attackDistance = (flex_t)fVar9; // FLEXTODO
         lVar11 = (int64_t)(fVar10 * 1000.0);
-        pActor->field_28C = (int)lVar11 + sithTime_curMs;
+        pActor->field_28C = (int)lVar11 + sithTime_g_msecGameTime;
         pActor->flags &= ~(SITHAI_MODE_TURNING | SITHAI_MODE_MOVING);
         sithThing_DetachThing(thing);
         thing->physicsParams.vel.x = leapSpeed * (flex_t)xDist; // FLEXTODO
@@ -1932,7 +1932,7 @@ LAB_0053a3b9:
     }
 
     
-    if (((uint32_t)pActor->field_288 <= sithTime_curMs) &&
+    if (((uint32_t)pActor->field_288 <= sithTime_g_msecGameTime) &&
             (pActor->field_1F4 == 0)) 
     {
         if (pActor->attackDistance < minDist || pActor->attackDistance > maxDist) {
@@ -1952,7 +1952,7 @@ LAB_0053a3b9:
             if (fVar1 <= 1.0 - minDot) {
                 if (thing->actorParams.typeflags & SITH_AF_DELAYFIRE) 
                 {
-                    pActor->field_28C = sithTime_curMs + 300;
+                    pActor->field_28C = sithTime_g_msecGameTime + 300;
                     pActor->field_268 = param_7 | 8;
                     pActor->field_264 = leapSpeed;
                     pActor->field_26C = param_5;

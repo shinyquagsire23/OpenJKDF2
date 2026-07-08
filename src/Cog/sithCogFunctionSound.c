@@ -569,7 +569,7 @@ void sithCogFunctionSound_PlaySoundThingAndWait(sithCog *ctx)
     }
     if ( playingSound ) {
         ctx->script_running = 2;
-        ctx->wakeTimeMs = sithTime_curMs + pSound->sound_len;
+        ctx->wakeTimeMs = sithTime_g_msecGameTime + pSound->sound_len;
 
         sithCogExec_PushInt(ctx, playingSound->refid);
     }

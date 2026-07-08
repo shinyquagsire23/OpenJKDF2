@@ -720,7 +720,7 @@ int sithWeapon_ThingCollisionHandler(sithThing *physicsThing, sithThing *collide
     if (collidedThing->weaponParams.typeflags & SITH_WF_INSTANT_IMPACT
       && bFlagsHadWfImpactSoundFxEarlier
       && !(collidedThing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED))
-      && (collidedThing != sithPlayer_pLocalPlayerThing || sithTime_curSeconds >= (flex_d_t)sithWeapon_fireWait)
+      && (collidedThing != sithPlayer_pLocalPlayerThing || sithTime_g_secGameTime >= (flex_d_t)sithWeapon_fireWait)
       && sithActor_thing_anim_blocked(physicsThing, collidedThing, a4) )
     {
         return 1;
@@ -965,7 +965,7 @@ int sithWeapon_SelectWeapon(sithThing *player, int binIdx, int a3)
 
 void sithWeapon_SetMountWait(sithThing *a1, flex32_t mountWait)
 {
-    sithWeapon_mountWait = mountWait + sithTime_curSeconds;
+    sithWeapon_mountWait = mountWait + sithTime_g_secGameTime;
 }
 
 void sithWeapon_SetFireWait(sithThing *weapon, flex32_t firewait)
@@ -978,7 +978,7 @@ void sithWeapon_SetFireWait(sithThing *weapon, flex32_t firewait)
     else
     {
         sithWeapon_fireRate = firewait;
-        sithWeapon_fireWait = firewait + sithTime_curSeconds;
+        sithWeapon_fireWait = firewait + sithTime_g_secGameTime;
     }
 }
 
@@ -991,12 +991,12 @@ void sithWeapon_UpdateActorWeaponState(sithThing *player)
     sithItemDescriptor *v7; // eax
     int v9; // [esp-18h] [ebp-1Ch]
 
-    //printf("%x %x %f %f %f\n", sithWeapon_8BD024, sithWeapon_8BD05C, sithWeapon_mountWait, sithWeapon_fireWait, sithTime_curSeconds);
+    //printf("%x %x %f %f %f\n", sithWeapon_8BD024, sithWeapon_8BD05C, sithWeapon_mountWait, sithWeapon_fireWait, sithTime_g_secGameTime);
 
-    if ( sithWeapon_8BD024 == -1 || sithTime_curSeconds < (flex_d_t)sithWeapon_mountWait )
+    if ( sithWeapon_8BD024 == -1 || sithTime_g_secGameTime < (flex_d_t)sithWeapon_mountWait )
     {
         // aaaaaaaaaaa ????? wtf is going on here
-        if ( sithWeapon_8BD05C == 1 && sithTime_curSeconds >= (flex_d_t)sithWeapon_mountWait )
+        if ( sithWeapon_8BD05C == 1 && sithTime_g_secGameTime >= (flex_d_t)sithWeapon_mountWait )
         {
             v3 = sithInventory_GetCurrentWeapon(player);
             v4 = sithInventory_GetType(v3);
@@ -1007,14 +1007,14 @@ void sithWeapon_UpdateActorWeaponState(sithThing *player)
             }
             sithWeapon_8BD05C = 0;
         }
-        else if ( sithWeapon_CurWeaponMode != -1 && sithWeapon_fireRate > 0.0 && sithTime_curSeconds >= (flex_d_t)sithWeapon_fireWait )
+        else if ( sithWeapon_CurWeaponMode != -1 && sithWeapon_fireRate > 0.0 && sithTime_g_secGameTime >= (flex_d_t)sithWeapon_fireWait )
         {
             v6 = sithInventory_GetCurrentWeapon(player);
             v7 = sithInventory_GetType(v6);
             if ( v7 && (v7->flags & ITEMINFO_WEAPON) && v7->cog ) // Added: nullptr check
             {
                 v9 = player->thingIdx;
-                sithWeapon_fireWait = sithWeapon_fireRate + sithTime_curSeconds;
+                sithWeapon_fireWait = sithWeapon_fireRate + sithTime_g_secGameTime;
                 sithCog_SendMessageEx(v7->cog, SITH_MESSAGE_FIRE, SENDERTYPE_SYSTEM, sithWeapon_CurWeaponMode, SENDERTYPE_THING, v9, 0, 0.0, 0.0, 0.0, 0.0);
             }
         }
@@ -1036,16 +1036,16 @@ void sithWeapon_ActivateWeapon(sithThing *weapon, sithCog *cogCtx, flex_t fireRa
 {
     sithWeapon_fireRate = fireRate;
     sithWeapon_CurWeaponMode = mode;
-    sithWeapon_8BD0A0[mode] = sithTime_curSeconds;
+    sithWeapon_8BD0A0[mode] = sithTime_g_secGameTime;
 
     if (sithWeapon_fireRate <= 0.0)
         sithWeapon_fireWait = -1.0;
 
-    if ( sithWeapon_fireWait != -1.0 && sithTime_curSeconds >= (flex_d_t)sithWeapon_fireWait )
+    if ( sithWeapon_fireWait != -1.0 && sithTime_g_secGameTime >= (flex_d_t)sithWeapon_fireWait )
     {
         if ( mode != -1 )
             sithCog_SendMessageEx(cogCtx, SITH_MESSAGE_FIRE, 1, mode, 3, weapon->thingIdx, 0, 0.0, 0.0, 0.0, 0.0);
-        sithWeapon_fireWait = sithWeapon_fireRate + sithTime_curSeconds;
+        sithWeapon_fireWait = sithWeapon_fireRate + sithTime_g_secGameTime;
     }
 }
 
@@ -1062,11 +1062,11 @@ flex_t sithWeapon_DeactivateWeapon(sithThing *weapon, sithCog *cogCtx, int mode)
     if (sithWeapon_8BD0A0[mode] == -1.0 )
         result = 0.0;
     else
-        result = sithTime_curSeconds - sithWeapon_8BD0A0[mode];
+        result = sithTime_g_secGameTime - sithWeapon_8BD0A0[mode];
 
     sithWeapon_8BD0A0[mode] = -1.0;
     if ( sithWeapon_fireRate > 0.0 )
-        sithWeapon_mountWait = sithWeapon_fireRate + sithTime_curSeconds;
+        sithWeapon_mountWait = sithWeapon_fireRate + sithTime_g_secGameTime;
     sithWeapon_LastFireTimeSecs = -1.0;
     sithWeapon_fireRate = 0.0;
     for (int i = 0; i < 2; i++)
@@ -1138,7 +1138,7 @@ int sithWeapon_ProcessWeaponControls(sithThing *player, flex_t a2)
 
     if ( (player->weaponParams.typeflags & SITH_WF_TRIGGER_AIEVENT) == 0 )
     {
-        if ( sithTime_curSeconds < sithWeapon_mountWait )
+        if ( sithTime_g_secGameTime < sithWeapon_mountWait )
             return 0;
 
         inputFunc = INPUT_FUNC_SELECT1;
@@ -1393,8 +1393,8 @@ sithThing* sithWeapon_FireProjectile(sithThing *pSender, sithThing *pProjectileT
     {
         catchupFactor = 1.0;
         if ( sithWeapon_LastFireTimeSecs != -1.0 && sithWeapon_fireRate > 0.0 )
-            catchupFactor = (sithTime_curSeconds - sithWeapon_LastFireTimeSecs) / sithWeapon_fireRate - 1.0;
-        sithWeapon_LastFireTimeSecs = sithTime_curSeconds;
+            catchupFactor = (sithTime_g_secGameTime - sithWeapon_LastFireTimeSecs) / sithWeapon_fireRate - 1.0;
+        sithWeapon_LastFireTimeSecs = sithTime_g_secGameTime;
         if ( catchupFactor > 1.0 )
         {
             do

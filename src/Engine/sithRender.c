@@ -374,9 +374,9 @@ void sithRender_Draw()
         fov = jkPlayer_fov;
         aspect = sithMain_lastAspect;
 #endif
-        stdMath_SinCos(sithTime_curSeconds * 70.0, &a3, &a4);
+        stdMath_SinCos(sithTime_g_secGameTime * 70.0, &a3, &a4);
         rdCamera_SetFOV(&sithCamera_currentCamera->rdCam, a3 + fov);
-        stdMath_SinCos(sithTime_curSeconds * 100.0, &a3, &a4);
+        stdMath_SinCos(sithTime_g_secGameTime * 100.0, &a3, &a4);
         rdCamera_SetAspectRatio(&sithCamera_currentCamera->rdCam, a3 * 0.016666668 + aspect);
         sithRender_needsAspectReset = 1;
     }
@@ -536,7 +536,7 @@ void sithRender_Draw()
         else {
             local_8 = 0xffffffff;
         }
-        flex_t fVar3 = sithRender_008d4098 - (flex_t)local_8 * sithRender_008d409c * sithTime_deltaSeconds;
+        flex_t fVar3 = sithRender_008d4098 - (flex_t)local_8 * sithRender_008d409c * sithTime_g_frameTimeFlex;
         if (0.0 <= sithRender_008d4098) {
             if (sithRender_008d4098 < 0.0) {
                 iVar6 = 0;

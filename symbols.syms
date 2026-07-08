@@ -39,14 +39,14 @@ sithPuppet_animNamesToIdxHashtable 0x00847E90 stdHashTable*
 pKeyframeLoader 0x73D608 keyframeLoader_t
 pKeyframeUnloader 0x73D60C keyframeUnloader_t
 
-sithTime_deltaMs 0x00836C08 int32_t
-sithTime_deltaSeconds 0x00836C0C flex_t
-sithTime_TickHz 0x00836C10 flex_t 
-sithTime_curMs 0x00836C14 uint32_t
-sithTime_curSeconds 0x00836C18 flex32_t
-sithTime_curMsAbsolute 0x00836C1C uint32_t
-sithTime_pauseTimeMs 0x00836C20 int32_t
-sithTime_bRunning 0x00836C24 int
+sithTime_g_frameTime 0x00836C08 int32_t
+sithTime_g_frameTimeFlex 0x00836C0C flex_t
+sithTime_g_fps 0x00836C10 flex_t 
+sithTime_g_msecGameTime 0x00836C14 uint32_t
+sithTime_g_secGameTime 0x00836C18 flex32_t
+sithTime_g_clockTime 0x00836C1C uint32_t
+sithTime_msecPauseStartTime 0x00836C20 int32_t
+sithTime_g_bPaused 0x00836C24 int
 
 sithRender_texMode 0x008EC360 int
 sithRender_flag 0x008EC364 int

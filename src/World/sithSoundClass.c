@@ -370,10 +370,10 @@ void sithSoundClass_PlayModeFirst(sithThing *thing, unsigned int soundclass_id)
 #ifdef QOL_IMPROVEMENTS
         if (IS_ANNOYING_SOUND(soundclass_id))
         {
-            if (sithTime_curMs - thing->lastAnnoyingSoundSpamMs < 300) {
+            if (sithTime_g_msecGameTime - thing->lastAnnoyingSoundSpamMs < 300) {
                 return;
             }
-            thing->lastAnnoyingSoundSpamMs = sithTime_curMs;
+            thing->lastAnnoyingSoundSpamMs = sithTime_g_msecGameTime;
         }
 #endif
 
@@ -398,10 +398,10 @@ sithPlayingSound* sithSoundClass_PlayMode(sithThing *thing, int sc_id, flex_t a3
 #ifdef QOL_IMPROVEMENTS
         if (IS_ANNOYING_SOUND(sc_id))
         {
-            if (sithTime_curMs - thing->lastAnnoyingSoundSpamMs < 300) {
+            if (sithTime_g_msecGameTime - thing->lastAnnoyingSoundSpamMs < 300) {
                 return NULL;
             }
-            thing->lastAnnoyingSoundSpamMs = sithTime_curMs;
+            thing->lastAnnoyingSoundSpamMs = sithTime_g_msecGameTime;
         }
 #endif
 
@@ -441,10 +441,10 @@ void sithSoundClass_PlayModeFirstEx(sithThing *thing, int sc_id, flex_t a3)
 #ifdef QOL_IMPROVEMENTS
         if (IS_ANNOYING_SOUND(sc_id)) 
         {
-            if (sithTime_curMs - thing->lastAnnoyingSoundSpamMs < 300) {
+            if (sithTime_g_msecGameTime - thing->lastAnnoyingSoundSpamMs < 300) {
                 return;
             }
-            thing->lastAnnoyingSoundSpamMs = sithTime_curMs;
+            thing->lastAnnoyingSoundSpamMs = sithTime_g_msecGameTime;
         }
 #endif
 
@@ -522,10 +522,10 @@ sithPlayingSound* sithSoundClass_PlayModeRandom(sithThing *thing, uint32_t a2)
 #ifdef QOL_IMPROVEMENTS
         if (IS_ANNOYING_SOUND(a2)) 
         {
-            if (sithTime_curMs - thing->lastAnnoyingSoundSpamMs < 300) {
+            if (sithTime_g_msecGameTime - thing->lastAnnoyingSoundSpamMs < 300) {
                 return NULL;
             }
-            thing->lastAnnoyingSoundSpamMs = sithTime_curMs;
+            thing->lastAnnoyingSoundSpamMs = sithTime_g_msecGameTime;
         }
 #endif
 

@@ -129,7 +129,7 @@ int sithComm_SendMsgToPlayer(sithCogMsg *msg, int a2, int mpFlags, int a4)
     multiplayerFlags = sithComm_multiplayerFlags & mpFlags;
     if (!multiplayerFlags)
         return 1;
-    curMs = sithTime_curMs;
+    curMs = sithTime_g_msecGameTime;
     msg->netMsg.thingIdx = playerThingIdx;
     msg->netMsg.timeMs = curMs;
     if ( (multiplayerFlags & 1) != 0 )
@@ -178,7 +178,7 @@ int sithComm_SendMsgToPlayer(sithCogMsg *msg, int a2, int mpFlags, int a4)
             {
                 v17 = &sithComm_MsgTmpBuf[idx_];
                 v17->netMsg.field_18++;
-                v17->netMsg.timeMs2 = sithTime_curMs;
+                v17->netMsg.timeMs2 = sithTime_g_msecGameTime;
                 for (unsigned int v15 = 0; v15 < jkPlayer_maxPlayers; v15++)
                 {
                     v19 = sithComm_MsgTmpBuf[idx_].netMsg.field_14;
@@ -253,7 +253,7 @@ int sithMessage_ProcessMessages()
             v2 = sithComm_netMsgTmp.netMsg.cogMsgId;
             if ( v1 >= 0 )
             {
-                jkPlayer_playerInfos[v1].lastUpdateMs = sithTime_curMs;
+                jkPlayer_playerInfos[v1].lastUpdateMs = sithTime_g_msecGameTime;
 LABEL_14:
                 if ( sithComm_netMsgTmp.netMsg.msgId )
                 {
@@ -343,10 +343,10 @@ void sithComm_SyncWithPlayers()
             if (!sithComm_MsgTmpBuf[i].netMsg.msgId)
                 continue;
 
-            if ( sithComm_MsgTmpBuf[i].netMsg.timeMs2 + 1700 <= sithTime_curMs )
+            if ( sithComm_MsgTmpBuf[i].netMsg.timeMs2 + 1700 <= sithTime_g_msecGameTime )
             {
                 sithComm_MsgTmpBuf[i].netMsg.field_18++;
-                sithComm_MsgTmpBuf[i].netMsg.timeMs2 = sithTime_curMs;
+                sithComm_MsgTmpBuf[i].netMsg.timeMs2 = sithTime_g_msecGameTime;
 
                 for (int v9 = 0; v9 < jkPlayer_maxPlayers; v9++)
                 {

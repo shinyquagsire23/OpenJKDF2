@@ -431,13 +431,13 @@ int sithInventory_ActivateBin(sithThing *player, sithCog *cog, flex_t delay, int
 
     info = &player->actorParams.playerinfo->iteminfo[binNum];
     info->activationDelaySecs = delay;
-    info->activatedTimeSecs = sithTime_curSeconds;
+    info->activatedTimeSecs = sithTime_g_secGameTime;
     if ( delay <= 0.0 )
         info->binWait = -1.0;
-    if (info->binWait != -1.0 && sithTime_curSeconds >= (flex_d_t)info->binWait )
+    if (info->binWait != -1.0 && sithTime_g_secGameTime >= (flex_d_t)info->binWait )
     {
         sithCog_SendMessageEx(cog, SITH_MESSAGE_FIRE, SENDERTYPE_SYSTEM, binNum, SENDERTYPE_THING, player->thingIdx, 0, 0.0, 0.0, 0.0, 0.0);
-        info->binWait = sithTime_curSeconds + info->activationDelaySecs;
+        info->binWait = sithTime_g_secGameTime + info->activationDelaySecs;
     }
     return 1;
 }
@@ -454,7 +454,7 @@ flex_t sithInventory_DeactivateBin(sithThing *player, sithCog *unused, int binNu
     if ( info->activatedTimeSecs == -1.0 )
         result = 0.0;
     else
-        result = sithTime_curSeconds - info->activatedTimeSecs;
+        result = sithTime_g_secGameTime - info->activatedTimeSecs;
 
     info->activationDelaySecs = -1.0;
     info->binWait = -1.0;
@@ -464,7 +464,7 @@ flex_t sithInventory_DeactivateBin(sithThing *player, sithCog *unused, int binNu
 
 int sithInventory_BinSendActivate(sithThing *player, int binIdx)
 {
-    if ( sithTime_curSeconds < player->actorParams.playerinfo->iteminfo[binIdx].binWait )
+    if ( sithTime_g_secGameTime < player->actorParams.playerinfo->iteminfo[binIdx].binWait )
         return 0;
 
     if ( binIdx < 0 )
@@ -1127,7 +1127,7 @@ int sithInventory_HandleInvSkillKeys(sithThing *player, flex_t deltaSecs)
                     v10 = v1->actorParams.playerinfo;
                     v11 = player->actorParams.playerinfo->curItem;
                     sithInventory_bUnk = 1;
-                    if ( sithTime_curSeconds >= (flex_d_t)v10->iteminfo[v11].binWait && v11 >= SENDERTYPE_0 )
+                    if ( sithTime_g_secGameTime >= (flex_d_t)v10->iteminfo[v11].binWait && v11 >= SENDERTYPE_0 )
                     {
                         if ( sithInventory_IsInventoryAvailable(v1, v11) )
                         {
@@ -1178,7 +1178,7 @@ int sithInventory_HandleInvSkillKeys(sithThing *player, flex_t deltaSecs)
                     v15 = v1->actorParams.playerinfo;
                     v16 = player->actorParams.playerinfo->curPower;
                     sithInventory_bUnkPower = 1;
-                    if ( sithTime_curSeconds >= (flex_d_t)v15->iteminfo[v16].binWait && v16 >= SENDERTYPE_0 )
+                    if ( sithTime_g_secGameTime >= (flex_d_t)v15->iteminfo[v16].binWait && v16 >= SENDERTYPE_0 )
                     {
                         if ( sithInventory_IsInventoryAvailable(v1, v16) )
                         {
@@ -1285,7 +1285,7 @@ int sithInventory_HandleInvSkillKeys(sithThing *player, flex_t deltaSecs)
                             if (!sithThing_MotsTick(12, 1, (flex_t)v23)) goto skip_cog; // FLEXTODO
                         }
 
-                        if ( sithTime_curSeconds >= (flex_d_t)v1->actorParams.playerinfo->iteminfo[v23].binWait && v23 >= 0 )
+                        if ( sithTime_g_secGameTime >= (flex_d_t)v1->actorParams.playerinfo->iteminfo[v23].binWait && v23 >= 0 )
                         {
                             if ( sithInventory_IsInventoryAvailable(v1, v23) )
                             {
@@ -1425,12 +1425,12 @@ void sithInventory_SendFire(sithThing *player)
         sithItemDescriptor* desc = &sithInventory_aDescriptors[i];
         
         if ( iteminfo->activationDelaySecs > 0.0 
-             && sithTime_curSeconds >= iteminfo->binWait 
+             && sithTime_g_secGameTime >= iteminfo->binWait 
              && desc->flags & ITEMINFO_POWER )
         {
             if ( desc->cog )
             {
-                iteminfo->binWait = sithTime_curSeconds + iteminfo->activationDelaySecs;
+                iteminfo->binWait = sithTime_g_secGameTime + iteminfo->activationDelaySecs;
                 sithCog_SendMessageEx(desc->cog, SITH_MESSAGE_FIRE, SENDERTYPE_SYSTEM, i, SENDERTYPE_THING, player->thingIdx, 0, 0.0, 0.0, 0.0, 0.0);
             }
         }
@@ -1554,6 +1554,6 @@ void sithInventory_SetBinWait(sithThing *player, int binIdx, flex_t wait)
     if ( player->actorParams.playerinfo != (sithPlayerInfo *)-136 )
     {
         if ( sithInventory_aDescriptors[binIdx].flags & ITEMINFO_VALID )
-            player->actorParams.playerinfo->iteminfo[binIdx].binWait = wait + sithTime_curSeconds;
+            player->actorParams.playerinfo->iteminfo[binIdx].binWait = wait + sithTime_g_secGameTime;
     }
 }

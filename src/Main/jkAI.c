@@ -82,8 +82,8 @@ int jkAI_SaberFighting(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
                 sithPuppet_SetArmedMode(v7, SITH_ANIM_WALK);
                 actor->thing->jkFlags |= JKFLAG_SABEREXTEND;
             }
-            v11 = sithTime_curMs;
-            instinct->nextUpdate = sithTime_curMs + 500;
+            v11 = sithTime_g_msecGameTime;
+            instinct->nextUpdate = sithTime_g_msecGameTime + 500;
             if ( actor->field_288 <= v11 )
             {
                 sithAI_sub_4EAD60(actor);
@@ -168,8 +168,8 @@ LABEL_27:
                 sithSoundClass_PlayModeFirst(v21, v17_lo + SITH_SC_FIRE1);
                 sithPuppet_PlayMode(actor->thing, v20, 0);
                 jkSaber_Enable(actor->thing, a2a, a3a, 0.0);
-                v23 = v19 + sithTime_curMs;
-                instinct->nextUpdate = v19 + sithTime_curMs;
+                v23 = v19 + sithTime_g_msecGameTime;
+                instinct->nextUpdate = v19 + sithTime_g_msecGameTime;
                 actor->field_288 = v23;
             }
         }
@@ -204,7 +204,7 @@ int jkAI_SpecialAttack(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
         {
             if ( instinct->param0 == 0.0 )
             {
-                v10 = sithTime_curMs;
+                v10 = sithTime_g_msecGameTime;
             }
             else
             {
@@ -212,8 +212,8 @@ int jkAI_SpecialAttack(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
                 if ( v9 )
                     sithPuppet_StopKey(v9, (__int64)instinct->param0, 0.5);
                 jkSaber_Disable(actor->thing);
-                v10 = sithTime_curMs;
-                v11 = sithTime_curMs + aiclass->argsAsInt[8];
+                v10 = sithTime_g_msecGameTime;
+                v11 = sithTime_g_msecGameTime + aiclass->argsAsInt[8];
                 instinct->param0 = 0.0;
                 instinct->nextUpdate = v11;
             }
@@ -238,7 +238,7 @@ int jkAI_SpecialAttack(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
                             instinct->param0 = (flex_t)aiclassa;
                             jkSaber_Enable(v15, aiclass->argsAsFloat[7], 0.3, 0.0);
                             sithAI_SetMoveThing(actor, &actor->field_1D4, 4.0);
-                            v16 = aiclass->argsAsInt[4] + sithTime_curMs;
+                            v16 = aiclass->argsAsInt[4] + sithTime_g_msecGameTime;
                             instinct->nextUpdate = v16;
                             actor->field_288 = v16;
                         }
@@ -256,7 +256,7 @@ int jkAI_SpecialAttack(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
     if ( v5 )
         sithPuppet_StopKey(v5, (__int64)instinct->param0, 0.5);
     jkSaber_Disable(actor->thing);
-    v6 = sithTime_curMs + aiclass->argsAsInt[8];
+    v6 = sithTime_g_msecGameTime + aiclass->argsAsInt[8];
     instinct->param0 = 0.0;
     instinct->nextUpdate = v6;
     return 0;
@@ -290,7 +290,7 @@ int jkAI_ForcePowers(sithActor *actor, sithAIClassEntry *aiclass, sithActorInsti
 
     v6 = 0;
     v14 = 0;
-    instinct->nextUpdate = sithTime_curMs + aiclass->argsAsInt[0];
+    instinct->nextUpdate = sithTime_g_msecGameTime + aiclass->argsAsInt[0];
     sithAI_sub_4EAD60(actor);
     if ( !actor->pDistractor || actor->field_1F4 )
         return 0;
@@ -321,7 +321,7 @@ LABEL_25:
         v13 = (flex_t)v14;
         v12 = (flex_t)(unsigned int)actor->pDistractor->thingIdx;
         sithCog_ThingSendMessageEx(actor->thing, 0, SITH_MESSAGE_USER0, v12, v13, 0.0, 0.0);
-        instinct->nextUpdate = sithTime_curMs + aiclass->argsAsInt[v6 + 9];
+        instinct->nextUpdate = sithTime_g_msecGameTime + aiclass->argsAsInt[v6 + 9];
     }
     return 0;
 }

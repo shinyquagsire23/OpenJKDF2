@@ -146,7 +146,7 @@ void jkSaber_UpdateLength(sithThing *thing)
 
     if ( thing->jkFlags & JKFLAG_SABEREXTEND)
     {
-        flex_t newLength = playerInfo->polyline.length + (sithTime_deltaSeconds * JKSABER_EXTENDTIME);
+        flex_t newLength = playerInfo->polyline.length + (sithTime_g_frameTimeFlex * JKSABER_EXTENDTIME);
         flex_t deltaLen = newLength / playerInfo->length;
 
         thing->jkFlags &= ~JKFLAG_SABERRETRACT;
@@ -162,7 +162,7 @@ void jkSaber_UpdateLength(sithThing *thing)
     }
     else if ( thing->jkFlags & JKFLAG_SABERRETRACT )
     {
-        flex_t newLength = playerInfo->polyline.length - (sithTime_deltaSeconds * JKSABER_EXTENDTIME);
+        flex_t newLength = playerInfo->polyline.length - (sithTime_g_frameTimeFlex * JKSABER_EXTENDTIME);
         flex_t deltaLen = newLength / playerInfo->length;
 
         thing->jkFlags &= ~JKFLAG_SABEREXTEND;
@@ -394,13 +394,13 @@ void jkSaber_UpdateCollision(sithThing *player, int joint, int bSecondary)
 #endif
     rdVector_Copy3(&jointPos, &jointMat.scale);
     rdVector_Copy3(&a2a, &jointMat.lvec);
-    if (sithTime_deltaSeconds > saberMinDelta && playerInfo->bHasLastJointMat) 
+    if (sithTime_g_frameTimeFlex > saberMinDelta && playerInfo->bHasLastJointMat) 
     {
         pWhichLastJointMat = &playerInfo->lastSaberJointMat;
         if (bSecondary != 0) {
             pWhichLastJointMat = &playerInfo->lastSecondarySaberJointMat;
         }
-        flex_t fVar1 = sithTime_TickHz * saberMinDelta;
+        flex_t fVar1 = sithTime_g_fps * saberMinDelta;
         rdMatrix_Copy34(&lastJointMat, pWhichLastJointMat);
 
         rdVector_Sub3(&lerpPosDelta, &jointMat.scale, &lastJointMat.scale);
@@ -434,7 +434,7 @@ void jkSaber_SpawnSparks(jkPlayerInfo *pPlayerInfo, rdVector3 *pPos, sithSector 
     sithThing *pTemplate; // eax
     sithThing *pSpawned; // eax
 
-    if ( sithTime_curMs < pPlayerInfo->lastSparkSpawnMs + 200 )
+    if ( sithTime_g_msecGameTime < pPlayerInfo->lastSparkSpawnMs + 200 )
         return;
 
     if ( sparkType == SPARKTYPE_BLOOD )
@@ -455,7 +455,7 @@ void jkSaber_SpawnSparks(jkPlayerInfo *pPlayerInfo, rdVector3 *pPos, sithSector 
         if ( pSpawned )
         {
             pSpawned->prev_thing = pPlayerInfo->actorThing;
-            pPlayerInfo->lastSparkSpawnMs = sithTime_curMs;
+            pPlayerInfo->lastSparkSpawnMs = sithTime_g_msecGameTime;
             pSpawned->child_signature = pPlayerInfo->actorThing->signature;
         }
     }

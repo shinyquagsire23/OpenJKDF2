@@ -255,7 +255,7 @@ int sithUpdate()
 
 #ifdef TARGET_RETRO_HOMEBREW
         // Fallback to stepped 30Hz physics if ms delta is very high
-        if (sithTime_deltaMs > 100) {
+        if (sithTime_g_frameTime > 100) {
             jkPlayer_bJankyPhysics = 0;
         }
         else {
@@ -266,7 +266,7 @@ int sithUpdate()
 #ifdef FIXED_TIMESTEP_PHYS
         if (NEEDS_STEPPED_PHYS) {
             // Run all physics at a fixed timestep
-            flex_d_t rolloverCombine = sithTime_deltaSeconds + sithTime_physicsRolloverFrames;
+            flex_d_t rolloverCombine = sithTime_g_frameTimeFlex + sithTime_physicsRolloverFrames;
 
             flex_d_t framesToApply = rolloverCombine * TARGET_PHYSTICK_FPS; // get number of 50FPS steps passed
             uint32_t wholeFramesToApply = (uint32_t)(float)round((float)framesToApply);
@@ -274,25 +274,25 @@ int sithUpdate()
 
             //printf("%f %f\n", framesToApply, rolloverCombine);
 
-            flex_t tmp = sithTime_deltaSeconds;
-            uint32_t tmp2 = sithTime_deltaMs;
-            sithTime_deltaSeconds = DELTA_PHYSTICK_FPS;
-            sithTime_deltaMs = (int)(DELTA_PHYSTICK_FPS * 1000.0);
+            flex_t tmp = sithTime_g_frameTimeFlex;
+            uint32_t tmp2 = sithTime_g_frameTime;
+            sithTime_g_frameTimeFlex = DELTA_PHYSTICK_FPS;
+            sithTime_g_frameTime = (int)(DELTA_PHYSTICK_FPS * 1000.0);
 
             for (int i = (int)framesToApply; i > 0; i--)
             {
-                sithSurface_Tick(sithTime_deltaSeconds);
-                sithThing_Update(sithTime_deltaSeconds, sithTime_deltaMs);
+                sithSurface_Tick(sithTime_g_frameTimeFlex);
+                sithThing_Update(sithTime_g_frameTimeFlex, sithTime_g_frameTime);
             }
 
-            sithTime_deltaSeconds = tmp;
-            sithTime_deltaMs = tmp2;
+            sithTime_g_frameTimeFlex = tmp;
+            sithTime_g_frameTime = tmp2;
         }
         else
 #endif
         {
-            sithSurface_Tick(sithTime_deltaSeconds);
-            sithThing_Update(sithTime_deltaSeconds, sithTime_deltaMs);
+            sithSurface_Tick(sithTime_g_frameTimeFlex);
+            sithThing_Update(sithTime_g_frameTimeFlex, sithTime_g_frameTime);
         }
         sithConsole_Flush();
         return 1;
@@ -311,7 +311,7 @@ int sithUpdate()
 #ifdef FIXED_TIMESTEP_PHYS
         if (NEEDS_STEPPED_PHYS) {
             // Run all physics at a fixed timestep
-            flex_d_t rolloverCombine = sithTime_deltaSeconds + sithTime_physicsRolloverFrames;
+            flex_d_t rolloverCombine = sithTime_g_frameTimeFlex + sithTime_physicsRolloverFrames;
 
             flex_d_t framesToApply = rolloverCombine * TARGET_PHYSTICK_FPS; // get number of 50FPS steps passed
             uint32_t wholeFramesToApply = (uint32_t)(float)round((float)framesToApply);
@@ -321,28 +321,28 @@ int sithUpdate()
             sithControl_ReadControls();
             if ( g_sithMode != 2 )
             {
-                sithControl_Update(sithTime_deltaSeconds, sithTime_deltaMs);
+                sithControl_Update(sithTime_g_frameTimeFlex, sithTime_g_frameTime);
             }
             sithControl_FinishRead();
 
-            flex_t tmp = sithTime_deltaSeconds;
-            uint32_t tmp2 = sithTime_deltaMs;
-            flex_t tmp3 = sithTime_TickHz;
+            flex_t tmp = sithTime_g_frameTimeFlex;
+            uint32_t tmp2 = sithTime_g_frameTime;
+            flex_t tmp3 = sithTime_g_fps;
             flex_t tmp4 = stdControl_updateKHz;
             flex_t tmp5 = stdControl_updateHz;
-            uint32_t tmp6 = sithTime_curMs;
-            sithTime_curMs -= sithTime_deltaMs;
-            sithTime_deltaSeconds = DELTA_PHYSTICK_FPS;
-            sithTime_deltaMs = (int)(DELTA_PHYSTICK_FPS * 1000.0);
-            sithTime_TickHz = 1.0 / sithTime_deltaSeconds;
+            uint32_t tmp6 = sithTime_g_msecGameTime;
+            sithTime_g_msecGameTime -= sithTime_g_frameTime;
+            sithTime_g_frameTimeFlex = DELTA_PHYSTICK_FPS;
+            sithTime_g_frameTime = (int)(DELTA_PHYSTICK_FPS * 1000.0);
+            sithTime_g_fps = 1.0 / sithTime_g_frameTimeFlex;
             //stdControl_updateKHz = 1.0 / (DELTA_PHYSTICK_FPS * 1000.0);
-            //stdControl_updateHz = sithTime_TickHz;        
+            //stdControl_updateHz = sithTime_g_fps;        
 
             //printf("%f %u %f %f\n",framesToApply, wholeFramesToApply, rolloverCombine, sithTime_physicsRolloverFrames);
 
             for (int i = 0; i < wholeFramesToApply; i++)
             {
-                sithSoundMixer_Update(sithTime_deltaSeconds);
+                sithSoundMixer_Update(sithTime_g_frameTimeFlex);
                 sithEvent_Process();
 
                 if ( sithComm_bSyncMultiplayer )
@@ -351,33 +351,33 @@ int sithUpdate()
                 if ( (g_debugmodeFlags & DEBUGFLAG_NO_AIEVENTS) == 0  && (!sithNet_isMulti || sithNet_isMulti && sithNet_isServer))
                     sithAI_Process();
 
-                sithSurface_Tick(sithTime_deltaSeconds);
+                sithSurface_Tick(sithTime_g_frameTimeFlex);
                 // TODO
                 //if (g_sithMode != 2 )
                 //{
-                //    sithControl_Update(sithTime_deltaSeconds, sithTime_deltaMs);
+                //    sithControl_Update(sithTime_g_frameTimeFlex, sithTime_g_frameTime);
                 //}
-                sithThing_Update(sithTime_deltaSeconds, sithTime_deltaMs);
+                sithThing_Update(sithTime_g_frameTimeFlex, sithTime_g_frameTime);
                 sithThing_MotsTick(0x1F, 0, 0);
 
                 sithCog_ProcessCogs();
 
-                // COG scripts will sleep for periods of time based on sithTime_curMs,
+                // COG scripts will sleep for periods of time based on sithTime_g_msecGameTime,
                 // so we have to emulate the current time as well
-                sithTime_curMs += sithTime_deltaMs;
+                sithTime_g_msecGameTime += sithTime_g_frameTime;
             }
 
-            sithTime_deltaSeconds = tmp;
-            sithTime_deltaMs = tmp2;
-            sithTime_TickHz = tmp3;
-            sithTime_curMs = tmp6;
+            sithTime_g_frameTimeFlex = tmp;
+            sithTime_g_frameTime = tmp2;
+            sithTime_g_fps = tmp3;
+            sithTime_g_msecGameTime = tmp6;
             //stdControl_updateKHz = tmp4;
             //stdControl_updateHz = tmp5;
         }
         else
 #endif
         {
-            sithSoundMixer_Update(sithTime_deltaSeconds);
+            sithSoundMixer_Update(sithTime_g_frameTimeFlex);
             sithEvent_Process();
 
             if ( sithComm_bSyncMultiplayer )
@@ -386,19 +386,19 @@ int sithUpdate()
             if ( (g_debugmodeFlags & DEBUGFLAG_NO_AIEVENTS) == 0 && (!sithNet_isMulti || sithNet_isMulti && sithNet_isServer))
                 sithAI_Process();
         
-            sithSurface_Tick(sithTime_deltaSeconds);
+            sithSurface_Tick(sithTime_g_frameTimeFlex);
             if ( g_sithMode != 2 )
             {
 #ifdef FIXED_TIMESTEP_PHYS
                 sithControl_ReadControls();
 #endif
-                sithControl_Update(sithTime_deltaSeconds, sithTime_deltaMs);
+                sithControl_Update(sithTime_g_frameTimeFlex, sithTime_g_frameTime);
 #ifdef FIXED_TIMESTEP_PHYS
                 sithControl_FinishRead();
 #endif
             }
 
-            sithThing_Update(sithTime_deltaSeconds, sithTime_deltaMs);
+            sithThing_Update(sithTime_g_frameTimeFlex, sithTime_g_frameTime);
             sithThing_MotsTick(0x1F, 0, 0);
 
             sithCog_ProcessCogs();
@@ -407,7 +407,7 @@ int sithUpdate()
         //sithAI_AIList();
         
         sithConsole_Flush();
-        sithMulti_Update(sithTime_deltaMs);
+        sithMulti_Update(sithTime_g_frameTime);
         sithGamesave_Process();
 
         sithMain_tickEndMs = stdPlatform_GetTimeMsec();

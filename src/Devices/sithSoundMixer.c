@@ -76,7 +76,7 @@ int sithSoundMixer_PlaySong(unsigned int trackFrom, unsigned int trackTo, unsign
             return 0;
         }
         if ( a4 )
-            sithSoundMixer_flt_835FD8 = sithTime_curSeconds - -5.0;
+            sithSoundMixer_flt_835FD8 = sithTime_g_secGameTime - -5.0;
     }
     return 1;
 }
@@ -107,7 +107,7 @@ void sithSoundMixer_UpdateMusicVolume(flex_t musicVolume)
         sithSoundMixer_bIsMuted = 0;
         if (sithSoundMixer_bPlayingMci && sithSoundMixer_dword_835FCC)
         {
-            sithSoundMixer_flt_835FD8 = sithTime_curSeconds - -5.0;
+            sithSoundMixer_flt_835FD8 = sithTime_g_secGameTime - -5.0;
             if ( !stdMci_CheckStatus() && !stdMci_Play(sithSoundMixer_trackFrom, sithSoundMixer_trackTo) )
             {
                 sithSoundMixer_bPlayingMci = 0;
@@ -137,9 +137,9 @@ void sithSoundMixer_ResumeMusic(int bNotInPauseMenu)
       && (bNotInPauseMenu || sithControl_msIdle >= 2000)
 #endif
       && sithSoundMixer_dword_835FCC
-      && (bNotInPauseMenu || sithSoundMixer_flt_835FD8 <= (flex_d_t)sithTime_curSeconds) )
+      && (bNotInPauseMenu || sithSoundMixer_flt_835FD8 <= (flex_d_t)sithTime_g_secGameTime) )
     {
-        sithSoundMixer_flt_835FD8 = sithTime_curSeconds - -5.0;
+        sithSoundMixer_flt_835FD8 = sithTime_g_secGameTime - -5.0;
         if ( !stdMci_CheckStatus() && !stdMci_Play(sithSoundMixer_trackFrom, sithSoundMixer_trackTo) )
         {
             sithSoundMixer_bPlayingMci = 0;
@@ -459,9 +459,9 @@ sithPlayingSound* sithSoundMixer_PlaySoundThing(sithSound *sound, sithThing *pTh
     {
         if ( (pThing->type == SITH_THING_ACTOR || pThing->type == SITH_THING_PLAYER) && (flags & SITHSOUNDFLAG_VOICE) != 0 && (flags & SITHSOUNDFLAG_HIGHEST_PRIO|SITHSOUNDFLAG_HIGHPRIO) == 0 )
         {
-            if ( pThing->actorParams.field_1BC > sithTime_curMs )
+            if ( pThing->actorParams.field_1BC > sithTime_g_msecGameTime )
                 return 0;
-            pThing->actorParams.field_1BC = sithTime_curMs + sound->sound_len;
+            pThing->actorParams.field_1BC = sithTime_g_msecGameTime + sound->sound_len;
         }
         if ( pThing == sithPlayer_pLocalPlayerThing || pThing->moveType == SITH_MT_PATH || pThing->type == SITH_THING_PLAYER) // Added: third comparison, co-op
         {

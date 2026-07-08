@@ -646,7 +646,7 @@ rdSurface* sithSurface_SurfaceAnim(sithSurface *parent, flex_t a2, uint16_t flag
     rd_surf->field_34 = v8;
     if (v8)
     {
-        v13 = v8 + sithTime_curMs;
+        v13 = v8 + sithTime_g_msecGameTime;
         result = rd_surf;
         rd_surf->field_30 = v13;
     }
@@ -823,15 +823,15 @@ void sithSurface_Tick(flex_t deltaSecs)
                     sithSurface_ScrollSky(surface, SITH_SURFACE_CEILINGSKY, deltaSecs, v2);
                 }
             }
-            else if ( (flags & SITH_SURFACE_200000) != 0 && (v13 = surface->field_30, v13 <= sithTime_curMs) )
+            else if ( (flags & SITH_SURFACE_200000) != 0 && (v13 = surface->field_30, v13 <= sithTime_g_msecGameTime) )
             {
                 v14 = surface->field_34;
                 v15 = 0;
-                v16 = sithTime_curMs - v13;
+                v16 = sithTime_g_msecGameTime - v13;
                 if ( v14 && surface->material )
                 {
                     surface->wallCel += v16 / v14 + 1;
-                    surface->field_30 = surface->field_34 + sithTime_curMs - v16 % surface->field_34;
+                    surface->field_30 = surface->field_34 + sithTime_g_msecGameTime - v16 % surface->field_34;
                     v17 = surface->material->num_texinfo;
                     if ( surface->wallCel >= v17 )
                     {
@@ -1294,7 +1294,7 @@ rdSurface* sithSurface_MaterialAnim(rdMaterial *material, flex_t a2, int a3)
     v4->field_34 = v7;
     if (v7)
     {
-        v12 = v7 + sithTime_curMs;
+        v12 = v7 + sithTime_g_msecGameTime;
         result = v4;
         v4->field_30 = v12;
     }
@@ -1440,7 +1440,7 @@ rdSurface* sithSurface_sub_4F00A0(sithThing *thing, flex_t a2, uint32_t a3)
     v3->signature = v6;
     v3->material = v7->face.material;
     v8 = (uint32_t)(1000.0 / a2);
-    uint32_t v8_hi = sithTime_curMs;
+    uint32_t v8_hi = sithTime_g_msecGameTime;
     v3->field_34 = v8;
     v8_hi += v8;
     result = v3;

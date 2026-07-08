@@ -215,8 +215,8 @@ void sithCamera_Update(sithCamera *cam)
     rdMatrix34 out; // [esp+5Ch] [ebp-30h] BYREF
 
     sithThing* focusThing = cam->primaryFocus;
-    flex_t v77 = sithCamera_povShakeF2 * sithTime_deltaSeconds;
-    flex_t v78 = sithCamera_povShakeF1 * sithTime_deltaSeconds;
+    flex_t v77 = sithCamera_povShakeF2 * sithTime_g_frameTimeFlex;
+    flex_t v78 = sithCamera_povShakeF1 * sithTime_g_frameTimeFlex;
     switch ( cam->cameraPerspective )
     {
         case 1:
@@ -318,7 +318,7 @@ void sithCamera_Update(sithCamera *cam)
             rdMatrix_LookAt(&cam->viewMat, &a1, &v2, 0.0);
             cam->sector = sithCamera_SearchSectorInRadius(0, focusThing->sector, &focusThing->position, &cam->viewMat.scale, 0.02, RAYCAST_2000 | RAYCAST_200);
             rot.x = 0.0;
-            rot.y = sithTime_deltaSeconds * 8.0;
+            rot.y = sithTime_g_frameTimeFlex * 8.0;
             rot.z = 0.0;
             rdMatrix_PostRotate34(&sithCamera_focusMat, &rot);
             rdMatrix_Normalize34(&sithCamera_focusMat);
@@ -737,7 +737,7 @@ void sithCamera_UpdateZoom(sithCamera *pCamera)
     }
     fVar2 = currentScale - pCamera->zoomScale;
 
-    flex_t newScale = ((flex_t)zoomDirection * pCamera->zoomSpeed * sithTime_deltaSeconds + currentScale);
+    flex_t newScale = ((flex_t)zoomDirection * pCamera->zoomSpeed * sithTime_g_frameTimeFlex + currentScale);
     if (fVar2 >= 0.0) {
         if (fVar2 < 0.0) {
             iVar4 = 0;
@@ -822,7 +822,7 @@ void sithCamera_UpdateZoom(sithCamera *pCamera)
     }
     fVar2 = currentFov - pCamera->zoomFov;
 
-    flex_t newFov = ((flex_t)zoomDirection * pCamera->zoomSpeed * sithTime_deltaSeconds + currentFov);
+    flex_t newFov = ((flex_t)zoomDirection * pCamera->zoomSpeed * sithTime_g_frameTimeFlex + currentFov);
     if (fVar2 >= 0.0) {
         if (fVar2 < 0.0) {
             iVar4 = 0;

@@ -64,7 +64,7 @@ int sithEvent_CreateEvent(int taskId, sithEventInfo *timerInfo, uint32_t when)
     if ( !timer )
         return 0;
 
-    timer->endMs = sithTime_curMs + when;
+    timer->endMs = sithTime_g_msecGameTime + when;
     timer->taskNum = taskId;
     timer->timerInfo = *timerInfo;
 
@@ -104,7 +104,7 @@ void sithEvent_FreeEvent(sithEvent *pEvent)
 int sithEvent_RegisterTask(int idx, sithEventHandler_t handler, int rate, int startMode)
 {
     sithEvent_aTasks[idx].pfProcess = handler;
-    sithEvent_aTasks[idx].creationMs = sithTime_curMs;
+    sithEvent_aTasks[idx].creationMs = sithTime_g_msecGameTime;
     sithEvent_aTasks[idx].field_10 = 0;
     sithEvent_aTasks[idx].rate = rate;
     sithEvent_aTasks[idx].startMode = startMode;
@@ -120,11 +120,11 @@ void sithEvent_Process()
         sithEventTask* timerFunc = &sithEvent_aTasks[idx];
         if ( timerFunc->startMode == SITHEVENT_TASKPERIODIC )
         {
-            uint32_t delta = (sithTime_curMs - timerFunc->creationMs);
+            uint32_t delta = (sithTime_g_msecGameTime - timerFunc->creationMs);
             if ( delta > timerFunc->rate )
             {
                 if ( timerFunc->pfProcess(delta, 0) )
-                    timerFunc->creationMs = sithTime_curMs;
+                    timerFunc->creationMs = sithTime_g_msecGameTime;
             }
         }
     }
@@ -132,7 +132,7 @@ void sithEvent_Process()
     i = sithEvent_list;
     while (i)
     {
-        if ( i->endMs >= sithTime_curMs )
+        if ( i->endMs >= sithTime_g_msecGameTime )
             break;
 
         sithEvent_list = i->nextTimer;
