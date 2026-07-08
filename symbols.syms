@@ -32,9 +32,9 @@ rdModel3_numGeoLights 0x0073C2F0 uint32_t
 rdModel3_numMeshLights 0x0073C2F4 int
 rdModel3_fRadius 0x0073C2F8 flex_t
 
-sithPuppet_hashtable 0x00847E88 stdHashTable*
-sithPuppet_keyframesHashtable 0x00847E8C stdHashTable*
-sithPuppet_animNamesToIdxHashtable 0x00847E90 stdHashTable*
+sithPuppet_pClassHashtable 0x00847E88 stdHashTable*
+sithPuppet_pKeyHashtable 0x00847E8C stdHashTable*
+sithPuppet_pHashtblSubmodes 0x00847E90 stdHashTable*
 
 pKeyframeLoader 0x73D608 keyframeLoader_t
 pKeyframeUnloader 0x73D60C keyframeUnloader_t

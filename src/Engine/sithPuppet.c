@@ -70,15 +70,15 @@ static const char* sithPuppet_animNames[43+2] = {
 
 int sithPuppet_Startup()
 {
-    sithPuppet_hashtable = stdHashtbl_New(64);
-    sithPuppet_keyframesHashtable = stdHashtbl_New(256);
+    sithPuppet_pClassHashtable = stdHashtbl_New(64);
+    sithPuppet_pKeyHashtable = stdHashtbl_New(256);
 
-    if ( sithPuppet_hashtable && sithPuppet_keyframesHashtable )
+    if ( sithPuppet_pClassHashtable && sithPuppet_pKeyHashtable )
     {
-        sithPuppet_animNamesToIdxHashtable = stdHashtbl_New(SITHPUPPET_NUMANIMS * 2);
+        sithPuppet_pHashtblSubmodes = stdHashtbl_New(SITHPUPPET_NUMANIMS * 2);
         for (int i = 1; i < SITHPUPPET_NUMANIMS; i++)
         {
-            stdHashtbl_Add(sithPuppet_animNamesToIdxHashtable, sithPuppet_animNames[i], (void *)(intptr_t)i);
+            stdHashtbl_Add(sithPuppet_pHashtblSubmodes, sithPuppet_animNames[i], (void *)(intptr_t)i);
         }
         return 1;
     }
@@ -91,20 +91,20 @@ int sithPuppet_Startup()
 
 void sithPuppet_Shutdown()
 {
-    if ( sithPuppet_hashtable )
+    if ( sithPuppet_pClassHashtable )
     {
-        stdHashtbl_Free(sithPuppet_hashtable);
-        sithPuppet_hashtable = 0;
+        stdHashtbl_Free(sithPuppet_pClassHashtable);
+        sithPuppet_pClassHashtable = 0;
     }
-    if ( sithPuppet_keyframesHashtable )
+    if ( sithPuppet_pKeyHashtable )
     {
-        stdHashtbl_Free(sithPuppet_keyframesHashtable);
-        sithPuppet_keyframesHashtable = 0;
+        stdHashtbl_Free(sithPuppet_pKeyHashtable);
+        sithPuppet_pKeyHashtable = 0;
     }
-    if ( sithPuppet_animNamesToIdxHashtable )
+    if ( sithPuppet_pHashtblSubmodes )
     {
-        stdHashtbl_Free(sithPuppet_animNamesToIdxHashtable);
-        sithPuppet_animNamesToIdxHashtable = 0;
+        stdHashtbl_Free(sithPuppet_pHashtblSubmodes);
+        sithPuppet_pHashtblSubmodes = 0;
     }
 }
 
