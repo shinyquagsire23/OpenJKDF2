@@ -10,8 +10,8 @@
 
 int sithSprite_Startup()
 {
-    sithSprite_hashmap = stdHashtbl_New(128);
-    if (sithSprite_hashmap)
+    sithSprite_pHashtable = stdHashtbl_New(128);
+    if (sithSprite_pHashtable)
         return 1;
     stdPrintf(pSithHS->errorPrint, ".\\World\\sithSprite.c", 63, "Failed to allocate memory for sprites.\n", 0, 0, 0, 0);
     return 0;
@@ -19,10 +19,10 @@ int sithSprite_Startup()
 
 void sithSprite_Shutdown()
 {
-    if ( sithSprite_hashmap )
+    if ( sithSprite_pHashtable )
     {
-        stdHashtbl_Free(sithSprite_hashmap);
-        sithSprite_hashmap = 0;
+        stdHashtbl_Free(sithSprite_pHashtable);
+        sithSprite_pHashtable = 0;
     }
 }
 
@@ -87,7 +87,7 @@ void sithSprite_FreeWorldSprites(sithWorld *world)
 
     for (int idx = 0; idx < world->numSpritesLoaded; idx++)
     {
-        stdHashtbl_Remove(sithSprite_hashmap, world->sprites[idx].path);
+        stdHashtbl_Remove(sithSprite_pHashtable, world->sprites[idx].path);
         rdSprite_FreeEntry(&world->sprites[idx]);
     }
     SITH_FREE(world->sprites);
@@ -104,7 +104,7 @@ rdSprite* sithSprite_Load(char *fpath)
     char spriteFpath[128];
 
     world = sithWorld_g_pLastLoadedWorld;
-    result = (rdSprite *)stdHashtbl_Find(sithSprite_hashmap, fpath);
+    result = (rdSprite *)stdHashtbl_Find(sithSprite_pHashtable, fpath);
     if ( !result )
     {
         uint32_t idx = world->numSpritesLoaded;
@@ -136,7 +136,7 @@ rdSprite* sithSprite_Load(char *fpath)
                         
                         if ( rdSprite_NewEntry(sprite, fpath, type_id, mat, width, height, geometryMode, lightMode, textureMode, extralight, &off) )
                         {
-                            stdHashtbl_Add(sithSprite_hashmap, sprite->path, sprite);
+                            stdHashtbl_Add(sithSprite_pHashtable, sprite->path, sprite);
                             ++world->numSpritesLoaded;
                             return sprite;
                         }
