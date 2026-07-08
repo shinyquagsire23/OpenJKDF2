@@ -483,14 +483,14 @@ jkCog_bInitted 0x00553FB0 int
 jkCog_strings 0x0553FA0 stdStrTable
 
 sithCog_bOpened 0x00836C2C int
-sithCog_pScriptHashtable 0x00836C3C stdHashTable*
+sithCog_g_pHashtable 0x00836C3C stdHashTable*
 sithCog_aSectorLinks 0x008B5440 sithCogSectorLink[SITHCOG_MAX_LINKS]
 sithCog_numSectorLinks 0x00836C38 int
 sithCog_aThingLinks 0x008B7460 sithCogThingLink[SITHCOG_MAX_LINKS]
 sithCog_numThingLinks 0x00836C30 int
 sithCog_numSurfaceLinks 0x00836C34 int
 sithCog_aSurfaceLinks 0x008B9C60 sithCogSurfaceLink[SITHCOG_MAX_LINKS]
-sithCog_masterCog 0x008B542C sithCog*
+sithCog_g_pMasterCog 0x008B542C sithCog*
 
 jkDev_aEntryPositions 0x00559EF0 rdVector2i[10]
 jkDev_aEntries 0x00559F40 jkDevLogEnt[5]
@@ -833,7 +833,7 @@ jkGuiMultiplayer_multiEntry 0x00556050 jkMultiEntry
 jkGuiMultiplayer_dword_5564F0 0x005564F0 int
 
 g_hInstance 0x00855DEC HINSTANCE
-sithCog_pSymbolTable 0x008B5428 sithCogSymboltable*
+sithCog_g_pSymbolTable 0x008B5428 sithCogSymboltable*
 pSithHS 0x82F0A4 struct HostServices*
 g_hWnd 0x855DE0 HWND
 g_nShowCmd 0x855DE8 uint32_t

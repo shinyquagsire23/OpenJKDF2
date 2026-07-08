@@ -602,12 +602,12 @@ sithCogSymbol* sithCogParse_GetSymbol(sithCogSymboltable *pSymbolTable, char *a2
     if (result = (sithCogSymbol*)stdHashtbl_Find(pSymbolTable->hashtable, a2))
         return result;
 
-    if (pSymbolTable == sithCog_pSymbolTable) {
+    if (pSymbolTable == sithCog_g_pSymbolTable) {
         //jk_printf("OpenJKDF2: Missing symbol `%s` in `%s`!\n", a2, sithCogParse_lastParsedFile);
         return NULL;
     }
 
-    return sithCogParse_GetSymbol(sithCog_pSymbolTable, a2);
+    return sithCogParse_GetSymbol(sithCog_g_pSymbolTable, a2);
 }
 
 sithCogSymbol* sithCogParse_GetSymbolByID(sithCogSymboltable *table, unsigned int idx)
@@ -616,7 +616,7 @@ sithCogSymbol* sithCogParse_GetSymbolByID(sithCogSymboltable *table, unsigned in
 
     if ( idx >= 0x100 )
     {
-        table = sithCog_pSymbolTable;
+        table = sithCog_g_pSymbolTable;
         idx -= 256;
     }
 
@@ -1069,7 +1069,7 @@ int sithCogParse_ParseMessage(sithCogScript *cogScript)
     if ( cogScript->num_triggers == 32 )
         return 0;
 
-    sithCogSymbol* symbolGet = sithCogParse_GetSymbol(sithCog_pSymbolTable, stdConffile_entry.args[1].value);
+    sithCogSymbol* symbolGet = sithCogParse_GetSymbol(sithCog_g_pSymbolTable, stdConffile_entry.args[1].value);
     if (!symbolGet) return 0;
 
     sithCogSymbol* symbol = sithCogParse_AddSymbol(cogScript->pSymbolTable, stdConffile_entry.args[1].key);

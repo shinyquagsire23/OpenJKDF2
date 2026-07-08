@@ -1002,15 +1002,15 @@ void sithCogFunction_GetSelfCog(sithCog *ctx)
 
 void sithCogFunction_GetMasterCog(sithCog *ctx)
 {
-    if ( sithCog_masterCog )
-        sithCogExec_PushInt(ctx, sithCog_masterCog->selfCog);
+    if ( sithCog_g_pMasterCog )
+        sithCogExec_PushInt(ctx, sithCog_g_pMasterCog->selfCog);
     else
         sithCogExec_PushInt(ctx, -1);
 }
 
 void sithCogFunction_SetMasterCog(sithCog *ctx)
 {
-    sithCog_masterCog = sithCogExec_PopCog(ctx);
+    sithCog_g_pMasterCog = sithCogExec_PopCog(ctx);
 }
 
 // MOTS added

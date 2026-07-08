@@ -854,7 +854,7 @@ void sithDSS_SyncGameState(int sendto_id, int mpFlags)
 {
     NETMSG_START;
 
-    NETMSG_PUSHS32(sithCog_masterCog ? sithCog_masterCog->selfCog : -1);
+    NETMSG_PUSHS32(sithCog_g_pMasterCog ? sithCog_g_pMasterCog->selfCog : -1);
     if (Main_bMotsCompat) {
         NETMSG_PUSHS32(sithCog_pActionCog ? sithCog_pActionCog->selfCog : -1);
         NETMSG_PUSHS32(sithCog_actionCogIdk);
@@ -922,7 +922,7 @@ int sithDSS_ProcessSyncGameState(sithCogMsg *msg)
 {
     NETMSG_IN_START(msg);
 
-    sithCog_masterCog = sithCog_GetCogByIndex(NETMSG_POPS32());
+    sithCog_g_pMasterCog = sithCog_GetCogByIndex(NETMSG_POPS32());
     if (Main_bMotsCompat) {
         sithCog_pActionCog = sithCog_GetCogByIndex(NETMSG_POPS32());
         sithCog_actionCogIdk = NETMSG_POPS32();

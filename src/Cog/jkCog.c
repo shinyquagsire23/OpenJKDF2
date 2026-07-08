@@ -1095,91 +1095,91 @@ void jkCog_RegisterVerbsExt();
 void jkCog_RegisterVerbs()
 {
     if (Main_bMotsCompat) {
-        sithCog_AddIntSymbol(sithCog_pSymbolTable, 45, "enterbubble");
-        sithCog_AddIntSymbol(sithCog_pSymbolTable, 46, "exitbubble");
+        sithCog_AddIntSymbol(sithCog_g_pSymbolTable, 45, "enterbubble");
+        sithCog_AddIntSymbol(sithCog_g_pSymbolTable, 46, "exitbubble");
     }
-    sithCog_RegisterFunction(sithCog_pSymbolTable, sithCogFunctionPlayer_GetLocalPlayerThing, "jkgetlocalplayer");
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_SetFlags, "jksetflags");
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_GetFlags, "jkgetflags");
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_ClearFlags, "jkclearflags");
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_EndLevel, "jkendlevel");
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_PrintUniString, "jkprintunistring");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, sithCogFunctionPlayer_GetLocalPlayerThing, "jkgetlocalplayer");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_SetFlags, "jksetflags");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_GetFlags, "jkgetflags");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_ClearFlags, "jkclearflags");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_EndLevel, "jkendlevel");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_PrintUniString, "jkprintunistring");
     if (Main_bMotsCompat) {
-        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_PrintUniVoice, "jkprintunivoice");
+        sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_PrintUniVoice, "jkprintunivoice");
     }
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_SetPovModel, "jksetpovmodel");
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_PlayPovKey, "jkplaypovkey");
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_StopPovKey, "jkstoppovkey");
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_SetWeaponMesh, "jksetweaponmesh");
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_EnableSaber, "jkenablesaber");
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_DisableSaber, "jkdisablesaber");
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_SetSaberInfo, "jksetsaberinfo");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_SetPovModel, "jksetpovmodel");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_PlayPovKey, "jkplaypovkey");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_StopPovKey, "jkstoppovkey");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_SetWeaponMesh, "jksetweaponmesh");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_EnableSaber, "jkenablesaber");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_DisableSaber, "jkdisablesaber");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_SetSaberInfo, "jksetsaberinfo");
     if (Main_bMotsCompat) {
-        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_GetSaberSideMat, "jkgetsabersidemat");
+        sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_GetSaberSideMat, "jkgetsabersidemat");
     }
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_SetPersuasionInfo, "jksetpersuasioninfo");
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_SetForceSpeed, "jksetforcespeed");
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_SetInvis, "jksetinvis");
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_SetInvulnerable, "jksetinvulnerable");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_SetPersuasionInfo, "jksetpersuasioninfo");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_SetForceSpeed, "jksetforcespeed");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_SetInvis, "jksetinvis");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_SetInvulnerable, "jksetinvulnerable");
     if (Main_bMotsCompat) {
-        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_SyncForcePowers, "jksyncforcepowers");
+        sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_SyncForcePowers, "jksyncforcepowers");
     }
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_SetWaggle, "jksetwaggle");
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_SetSuperFlags, "jksetsuperflags");
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_ClearSuperFlags, "jkclearsuperflags");
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_GetSuperFlags, "jkgetsuperflags");
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_SetTarget, "jksettarget");
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_EndTarget, "jkendtarget");
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_SetTargetColors, "jksettargetcolors");
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_StringClear, "jkstringclear");
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_StringConcatSpace, "jkstringconcatspace");
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_StringConcatUnistring, "jkstringconcatunistring");
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_StringConcatAsciiString, "jkstringconcatasciistring");
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_StringConcatPlayerName, "jkstringconcatplayername");
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_StringConcatInt, "jkstringconcatint");
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_StringConcatFormattedInt, "jkstringconcatformattedint");
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_StringConcatFlex, "jkstringconcatflex");
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_StringConcatFormattedFlex, "jkstringconcatformattedflex");
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_StringConcatVector, "jkstringconcatvector");
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_StringOutput, "jkstringoutput");
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_GetSaberCam, "jkgetsabercam");
-    sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_GetChoice, "jkgetchoice");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_SetWaggle, "jksetwaggle");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_SetSuperFlags, "jksetsuperflags");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_ClearSuperFlags, "jkclearsuperflags");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_GetSuperFlags, "jkgetsuperflags");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_SetTarget, "jksettarget");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_EndTarget, "jkendtarget");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_SetTargetColors, "jksettargetcolors");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_StringClear, "jkstringclear");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_StringConcatSpace, "jkstringconcatspace");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_StringConcatUnistring, "jkstringconcatunistring");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_StringConcatAsciiString, "jkstringconcatasciistring");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_StringConcatPlayerName, "jkstringconcatplayername");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_StringConcatInt, "jkstringconcatint");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_StringConcatFormattedInt, "jkstringconcatformattedint");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_StringConcatFlex, "jkstringconcatflex");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_StringConcatFormattedFlex, "jkstringconcatformattedflex");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_StringConcatVector, "jkstringconcatvector");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_StringOutput, "jkstringoutput");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_GetSaberCam, "jkgetsabercam");
+    sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_GetChoice, "jkgetchoice");
 
     if (Main_bMotsCompat) {
-        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_BeginCutscene,"jkbegincutscene");
-        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_EndCutscene,"jkendcutscene");
-        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_StartupCutscene,"jkstartupcutscene");
-        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_GetMultiParam,"jkgetmultiparam");
-        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_InsideLeia,"insideleia");
-        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_CreateBubble,"jkcreatebubble");
-        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_DestroyBubble,"jkdestroybubble");
-        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_GetBubbleDistance,"jkgetbubbledistance");
-        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_ThingInBubble,"jkthinginbubble");
-        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_GetFirstBubble,"jkgetfirstbubble");
-        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_GetNextBubble,"jkgetnextbubble");
-        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_GetBubbleType,"jkgetbubbletype");
-        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_GetBubbleRadius,"jkgetbubbleradius");
-        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_SetBubbleType,"jksetbubbletype");
-        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_SetBubbleRadius,"jksetbubbleradius");
-        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_Screenshot,"jkscreenshot");
-        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_GetOpenFrames,"jkgetopenframes");
+        sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_BeginCutscene,"jkbegincutscene");
+        sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_EndCutscene,"jkendcutscene");
+        sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_StartupCutscene,"jkstartupcutscene");
+        sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_GetMultiParam,"jkgetmultiparam");
+        sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_InsideLeia,"insideleia");
+        sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_CreateBubble,"jkcreatebubble");
+        sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_DestroyBubble,"jkdestroybubble");
+        sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_GetBubbleDistance,"jkgetbubbledistance");
+        sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_ThingInBubble,"jkthinginbubble");
+        sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_GetFirstBubble,"jkgetfirstbubble");
+        sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_GetNextBubble,"jkgetnextbubble");
+        sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_GetBubbleType,"jkgetbubbletype");
+        sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_GetBubbleRadius,"jkgetbubbleradius");
+        sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_SetBubbleType,"jksetbubbletype");
+        sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_SetBubbleRadius,"jksetbubbleradius");
+        sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_Screenshot,"jkscreenshot");
+        sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_GetOpenFrames,"jkgetopenframes");
     }
     
 #ifdef QOL_IMPROVEMENTS
     if (Main_bDwCompat) {
         // Added for droidwork tests
-        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_dwGetActivateBin, "dwGetActivateBin");
-        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_stub1Args, "dwsetreftopic");
-        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_addBeam, "addbeam");
-        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_addLaser, "addlaser");
-        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_removeLaser, "removelaser");
-        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_getLaserId, "getlaserid");
-        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_stub0Args, "dwFlashInventory");
-        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_dwPlayCammySpeech, "dwplaycammyspeech");
-        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_stub0Args, "dwfreezeplayer");
-        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_stub0Args, "dwunfreezeplayer");
-        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_stub2Args, "dwplaycharacterspeech");
-        sithCog_RegisterFunction(sithCog_pSymbolTable, jkCog_stub0Args, "dwcleardialog");
+        sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_dwGetActivateBin, "dwGetActivateBin");
+        sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_stub1Args, "dwsetreftopic");
+        sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_addBeam, "addbeam");
+        sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_addLaser, "addlaser");
+        sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_removeLaser, "removelaser");
+        sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_getLaserId, "getlaserid");
+        sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_stub0Args, "dwFlashInventory");
+        sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_dwPlayCammySpeech, "dwplaycammyspeech");
+        sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_stub0Args, "dwfreezeplayer");
+        sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_stub0Args, "dwunfreezeplayer");
+        sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_stub2Args, "dwplaycharacterspeech");
+        sithCog_RegisterFunction(sithCog_g_pSymbolTable, jkCog_stub0Args, "dwcleardialog");
     }
 #endif
 }
