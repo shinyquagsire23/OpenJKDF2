@@ -10,6 +10,9 @@
 
 void sithCogFunctionAI_AISetMoveSpeed(sithCog *pCog)
 {
+    // Added: assert ported from OpenJones3D
+    SITH_ASSERTREL(pCog);
+
     cog_flex_t moveSpeed = stdMath_Clamp(sithCogExec_PopFlex(pCog), 0.0, 2.0);
     SithThing* pThing = sithCogExec_PopThing(pCog);
     if (pThing && pThing->controlType == SITH_CT_AI && pThing->actor)
@@ -23,6 +26,9 @@ void sithCogFunctionAI_AISetMovePos(sithCog *pCog)
     SithThing *v1; // eax
     SithAIControlBlock *v2; // eax
     rdVector3 v3; // [esp+4h] [ebp-Ch] BYREF
+
+    // Added: assert ported from OpenJones3D
+    SITH_ASSERTREL(pCog);
 
     // TODO: Bug? If the vector is invalid, other aArgs will never get popped.
     if (sithCogExec_PopVector(pCog, &v3))
@@ -46,6 +52,9 @@ void sithCogFunctionAI_AIJump(sithCog *pCog)
     SithAIControlBlock *v4; // eax
     rdVector3 v5; // [esp+8h] [ebp-Ch] BYREF
 
+    // Added: assert ported from OpenJones3D
+    SITH_ASSERTREL(pCog);
+
     cog_flex_t a1 = sithCogExec_PopFlex(pCog);
     v2 = sithCogExec_PopVector(pCog, &v5);
     v3 = sithCogExec_PopThing(pCog);
@@ -67,6 +76,9 @@ void sithCogFunctionAI_AISetMoveFrame(sithCog *pCog)
     SithThing *v2; // eax
     SithAIControlBlock *v3; // eax
     rdVector3 *v4; // ecx
+
+    // Added: assert ported from OpenJones3D
+    SITH_ASSERTREL(pCog);
 
     v1 = sithCogExec_PopInt(pCog);
     v2 = sithCogExec_PopThing(pCog);
@@ -98,6 +110,9 @@ void sithCogFunctionAI_AISetMoveThing(sithCog *pCog)
     SithThing *v2; // eax
     SithAIControlBlock *v3; // eax
 
+    // Added: assert ported from OpenJones3D
+    SITH_ASSERTREL(pCog);
+
     v1 = sithCogExec_PopThing(pCog);
     v2 = sithCogExec_PopThing(pCog);
     
@@ -120,6 +135,9 @@ void sithCogFunctionAI_AISetLookPos(sithCog *pCog)
     SithThing *v1; // eax
     SithAIControlBlock *v2; // eax
     rdVector3 v3; // [esp+4h] [ebp-Ch] BYREF
+
+    // Added: assert ported from OpenJones3D
+    SITH_ASSERTREL(pCog);
 
     // TODO: Bug? If the vector is invalid, other aArgs will never get popped.
     if ( sithCogExec_PopVector(pCog, &v3) )
@@ -147,6 +165,9 @@ void sithCogFunctionAI_AISetLookFrame(sithCog *pCog)
     SithThing *v2; // eax
     SithAIControlBlock *v3; // eax
     rdVector3 *v4; // ecx
+
+    // Added: assert ported from OpenJones3D
+    SITH_ASSERTREL(pCog);
 
     v1 = sithCogExec_PopInt(pCog);
     v2 = sithCogExec_PopThing(pCog);
@@ -177,6 +198,9 @@ void sithCogFunctionAI_AIGetMovePos(sithCog *pCog)
     SithThing *v1; // eax
     SithAIControlBlock *v2; // eax
 
+    // Added: assert ported from OpenJones3D
+    SITH_ASSERTREL(pCog);
+
     v1 = sithCogExec_PopThing(pCog);
     if ( v1 && v1->controlType == SITH_CT_AI )
     {
@@ -192,6 +216,9 @@ void sithCogFunctionAI_AISetMode(sithCog *pCog)
     SithThing *v2; // eax
     SithAIControlBlock *v3; // ecx
     int v4; // edx
+
+    // Added: assert ported from OpenJones3D
+    SITH_ASSERTREL(pCog);
 
     v1 = sithCogExec_PopInt(pCog);
     v2 = sithCogExec_PopThing(pCog);
@@ -220,6 +247,9 @@ void sithCogFunctionAI_AIGetMode(sithCog *pCog)
     SithThing *v1; // eax
     SithAIControlBlock *v2; // eax
 
+    // Added: assert ported from OpenJones3D
+    SITH_ASSERTREL(pCog);
+
     v1 = sithCogExec_PopThing(pCog);
     if ( v1 && v1->controlType == SITH_CT_AI && (v2 = v1->actor) != 0 )
         sithCogExec_PushInt(pCog, v2->flags);
@@ -234,6 +264,9 @@ void sithCogFunctionAI_AIClearMode(sithCog *pCog)
     SithAIControlBlock *v3; // ecx
     int v4; // edx
     int mode_inv; // esi
+
+    // Added: assert ported from OpenJones3D
+    SITH_ASSERTREL(pCog);
 
     mode = sithCogExec_PopInt(pCog);
     thing = sithCogExec_PopThing(pCog);

@@ -53,6 +53,8 @@ void sithCogExec_Execute(sithCog *pCog)
     
     //jk_printf("cog trace %s %x\n", cog_ctx->pScript->aName, cog_ctx->execPos);
 
+    SITH_ASSERTREL(pCog != NULL); // Added: ported J3D assert
+    SITH_ASSERTREL(pCog->execPos < pCog->pScript->codeSize); // Added: ported J3D assert
     pCog->script_running = 1;
     while ( 2 )
     {
@@ -288,6 +290,7 @@ void sithCogExec_ExecuteMessage(sithCog *pCog, int32_t handlerNum)
 {
     int32_t trigPc;
 
+    SITH_ASSERTREL(pCog != NULL); // Added: ported J3D assert
     trigPc = pCog->pScript->aHandlers[handlerNum].trigPc;
     if ( trigPc >= 0 )
     {
@@ -329,6 +332,8 @@ int32_t sithCogExec_PopSymbol(sithCog *pCog, SithCogSymbolValue *pVal)
 #endif
 
 
+    SITH_ASSERTREL(pCog != NULL); // Added: ported J3D assert
+    SITH_ASSERTREL(pVal != NULL); // Added: ported J3D assert
     if ( pCog->stackPos < 1 )
         return 0;
 
@@ -401,6 +406,7 @@ int32_t sithCogExec_PopSymbol(sithCog *pCog, SithCogSymbolValue *pVal)
 cog_flex_t sithCogExec_PopFlex(sithCog *pCog)
 {
     SithCogSymbolValue tmp;
+    SITH_ASSERTREL(pCog != NULL); // Added: ported J3D assert
     if (!sithCogExec_PopSymbol(pCog, &tmp))
         return 0.0;
         
@@ -425,6 +431,7 @@ cog_flex_t sithCogExec_PopFlex(sithCog *pCog)
 int32_t sithCogExec_PopInt(sithCog *pCog)
 {
     SithCogSymbolValue tmp;
+    SITH_ASSERTREL(pCog != NULL); // Added: ported J3D assert
     if (!sithCogExec_PopSymbol(pCog, &tmp))
         return -1;
     
@@ -450,6 +457,7 @@ int32_t sithCogExec_PopInt(sithCog *pCog)
 int32_t sithCogExec_PopArray(sithCog *pCog)
 {
     SithCogSymbolValue tmp;
+    SITH_ASSERTREL(pCog); // Added: ported J3D assert
     if (!sithCogExec_PopSymbol(pCog, &tmp))
         return 0;
     
@@ -471,6 +479,8 @@ int32_t sithCogExec_PopVector(sithCog *pCog, rdVector3* vec)
 {
     SithCogSymbolValue tmp;
 
+    SITH_ASSERTREL(pCog != NULL); // Added: ported J3D assert
+    SITH_ASSERTREL(vec != NULL); // Added: ported J3D assert
     if (!sithCogExec_PopSymbol(pCog, &tmp))
     {
         _memset(vec, 0, sizeof(*vec));
@@ -505,6 +515,7 @@ sithCog* sithCogExec_PopCog(sithCog *pCog)
     int32_t idx;
     SithWorld* world = sithWorld_g_pCurrentWorld;
 
+    SITH_ASSERTREL(pCog); // Added: ported J3D assert
     if (!sithCogExec_PopSymbol(pCog, &tmp))
     {
         return NULL;
@@ -555,6 +566,7 @@ SithThing* sithCogExec_PopThing(sithCog *pCog)
     int32_t idx;
     SithWorld* world = sithWorld_g_pCurrentWorld;
 
+    SITH_ASSERTREL(pCog); // Added: ported J3D assert
     if (!sithCogExec_PopSymbol(pCog, &tmp))
     {
         tmp.type = SITHCOG_VALUE_INT;
@@ -605,6 +617,7 @@ SithThing* sithCogExec_PopTemplate(sithCog *pCog)
     SithCogSymbolValue tmp;
     int32_t idx;
 
+    SITH_ASSERTREL(pCog); // Added: ported J3D assert
     if (!sithCogExec_PopSymbol(pCog, &tmp))
     {
         tmp.type = SITHCOG_VALUE_INT;
@@ -648,6 +661,7 @@ sithSound* sithCogExec_PopSound(sithCog *pCog)
     int32_t idx;
     SithWorld* world = sithWorld_g_pCurrentWorld;
 
+    SITH_ASSERTREL(pCog); // Added: ported J3D assert
     if (!sithCogExec_PopSymbol(pCog, &tmp))
     {
         tmp.type = SITHCOG_VALUE_INT;
@@ -707,6 +721,7 @@ SithSector* sithCogExec_PopSector(sithCog *pCog)
     int32_t idx;
     SithWorld* world = sithWorld_g_pCurrentWorld;
 
+    SITH_ASSERTREL(pCog); // Added: ported J3D assert
     if (!sithCogExec_PopSymbol(pCog, &tmp))
     {
         tmp.type = SITHCOG_VALUE_INT;
@@ -755,6 +770,7 @@ SithSurface* sithCogExec_PopSurface(sithCog *pCog)
     int32_t idx;
     SithWorld* world = sithWorld_g_pCurrentWorld;
 
+    SITH_ASSERTREL(pCog); // Added: ported J3D assert
     if (!sithCogExec_PopSymbol(pCog, &tmp))
     {
         tmp.type = SITHCOG_VALUE_INT;
@@ -804,6 +820,7 @@ rdMaterial* sithCogExec_PopMaterial(sithCog *pCog)
     int32_t idx;
     SithWorld* world = sithWorld_g_pCurrentWorld;
 
+    SITH_ASSERTREL(pCog); // Added: ported J3D assert
     if (!sithCogExec_PopSymbol(pCog, &tmp))
     {
         tmp.type = SITHCOG_VALUE_INT;
@@ -858,6 +875,7 @@ rdModel3* sithCogExec_PopModel3(sithCog *pCog)
     int32_t idx;
     SithWorld* world = sithWorld_g_pCurrentWorld;
 
+    SITH_ASSERTREL(pCog); // Added: ported J3D assert
     if (!sithCogExec_PopSymbol(pCog, &tmp))
     {
         tmp.type = SITHCOG_VALUE_INT;
@@ -912,6 +930,7 @@ rdKeyframe* sithCogExec_PopKeyframe(sithCog *pCog)
     int32_t idx;
     SithWorld* world = sithWorld_g_pCurrentWorld;
 
+    SITH_ASSERTREL(pCog); // Added: ported J3D assert
     if (!sithCogExec_PopSymbol(pCog, &tmp))
     {
         tmp.type = SITHCOG_VALUE_INT;
@@ -964,6 +983,7 @@ SithAIClass* sithCogExec_PopAIClass(sithCog *pCog)
     int32_t idx;
     SithWorld* world = sithWorld_g_pCurrentWorld;
 
+    SITH_ASSERTREL(pCog); // Added: ported J3D assert
     if (!sithCogExec_PopSymbol(pCog, &tmp))
     {
         tmp.type = SITHCOG_VALUE_INT;
@@ -1042,6 +1062,7 @@ char* sithCogExec_PopString(sithCog *pCog)
     SithCogSymbol *v5; // eax
     char *result; // eax
 
+    SITH_ASSERTREL(pCog != NULL); // Added: ported J3D assert
     v1 = pCog->stackPos;
     if ( v1 < 1
       || (v2 = v1 - 1, pCog->stackPos = v2, pCog->stack[v2].type != SITHCOG_VALUE_SYMBOLID)
@@ -1060,6 +1081,8 @@ void sithCogExec_PushStack(sithCog *pCog, SithCogSymbolValue *pValue)
 {
     SithCogSymbolValue *pushVar;
 
+    SITH_ASSERTREL(pCog != NULL); // Added: ported J3D assert
+    SITH_ASSERTREL(pValue != NULL); // Added: ported J3D assert
 #ifdef COG_DYNAMIC_STACKS
     if (pCog->stackPos >= pCog->stackSize) {
         sithCogExec_GrowStack(pCog, pCog->stackSize+COG_DYNAMIC_STACKS_INCREMENT);
@@ -1151,6 +1174,8 @@ void sithCogExec_Push3Floats(sithCog *ctx, const cog_flex_t* val)
 
 int32_t sithCogExec_GetOpCode(sithCog *pCog)
 {
+    SITH_ASSERTREL(pCog != NULL); // Added: ported J3D assert
+    SITH_ASSERTREL(pCog->pScript != NULL); // Added: ported J3D assert
     if ( pCog->execPos >= pCog->pScript->codeSize - 1 )
         return COG_OPCODE_RET;
 
@@ -1159,6 +1184,7 @@ int32_t sithCogExec_GetOpCode(sithCog *pCog)
 
 void sithCogExec_ResetStack(sithCog *pCog)
 {
+    SITH_ASSERTREL(pCog != NULL); // Added: ported J3D assert
     if (pCog->stackPos) {
         pCog->stackPos = 0;
     }
@@ -1171,6 +1197,7 @@ void sithCogExec_ResetStack(sithCog *pCog)
 
 void sithCogExec_PushCallstack(sithCog *pCog)
 {
+    SITH_ASSERTREL(pCog); // Added: ported J3D assert
     if ( pCog->callDepth != 4 )
     {
         sithCogExec_009d39b0 = 0;
@@ -1190,6 +1217,7 @@ void sithCogExec_PushCallstack(sithCog *pCog)
 
 void sithCogExec_PopCallstack(sithCog *pCog)
 {
+    SITH_ASSERTREL(pCog); // Added: ported J3D assert
     if ( pCog->callDepth )
     {
         pCog->script_running = pCog->callstack[--pCog->callDepth].script_running;
@@ -1207,6 +1235,8 @@ int32_t sithCogExec_PopStack(sithCog *pCog, SithCogSymbolValue *pValue)
 {
     SithCogSymbolValue *pop; // eax
 
+    SITH_ASSERTREL(pCog != NULL); // Added: ported J3D assert
+    SITH_ASSERTREL(pValue != NULL); // Added: ported J3D assert
     if ( pCog->stackPos < 1 )
         return 0;
 
@@ -1296,6 +1326,7 @@ void sithCogExec_FloatOps(sithCog *pCog, int32_t opcode)
 
 SithCogSymbolValue* sithCogExec_GetSymbolValue(SithCogSymbolValue *pDest, sithCog *pCog, SithCogSymbolValue *pValue)
 {
+    SITH_ASSERTREL(pCog && pValue); // Added: ported J3D assert
     if ( pValue->type == SITHCOG_VALUE_SYMBOLID )
         pValue = &sithCogParse_GetSymbolByID(pCog->pSymbolTable, pValue->dataAsPtrs[0])->val;
     if ( pValue->type != SITHCOG_VALUE_POINTER)
@@ -1310,6 +1341,7 @@ SithCogSymbolValue* sithCogExec_GetSymbolValue(SithCogSymbolValue *pDest, sithCo
     }
     else
     {
+        SITH_ASSERTREL(pValue->dataAsPtrs[0] != 0); // Added: ported J3D assert (non-null before deref)
         pDest->type = SITHCOG_VALUE_INT;
         pDest->dataAsPtrs[0] = *(int32_t*)pValue->dataAsPtrs[0]; // Why is this dereferenced...?
 #ifndef COG_COMPRESS_VAR_SIZE

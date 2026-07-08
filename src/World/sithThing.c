@@ -192,6 +192,9 @@ void sithThing_Update(flex_t secDeltaTime, int msecDeltaTime)
 {
     SithThing* pThingIter; // esi
 
+    // Added: assert ported from OpenJones3D
+    SITH_ASSERTREL(sithWorld_g_pCurrentWorld != NULL);
+
     if ( sithWorld_g_pCurrentWorld->numThings < 0 )
         return;
 
@@ -444,6 +447,9 @@ SithThing* sithThing_GetGuidThing(int guid)
 
 void sithThing_DestroyThing(SithThing* pThing)
 {
+    // Added: assert ported from OpenJones3D
+    SITH_ASSERTREL(pThing != NULL);
+
     pThing->flags |= SITH_TF_DESTROYED;
     if ( (pThing->flags & SITH_TF_CAPTURED) != 0 && (pThing->flags & SITH_TF_INVULN) == 0 )
         sithCog_ThingSendMessage(pThing, 0, SITH_MESSAGE_REMOVED);
@@ -452,6 +458,9 @@ void sithThing_DestroyThing(SithThing* pThing)
 flex_t sithThing_DamageThing(SithThing *pThing, SithThing *pDamageThing, flex_t damage, int hitType)
 {
     flex_t param1; // [esp+0h] [ebp-20h]
+
+    // Added: assert ported from OpenJones3D
+    SITH_ASSERTREL(pThing);
 
     // Added: noclip
     if (pThing == sithPlayer_g_pLocalPlayerThing && (g_debugmodeFlags & DEBUGFLAG_NOCLIP)) {
@@ -608,6 +617,9 @@ void sithThing_RemoveThing(SithThing* pThing)
 
 void sithThing_FreeThing(SithThing* pThing)
 {
+    // Added: assert ported from OpenJones3D
+    SITH_ASSERTREL(pThing->type != SITH_THING_FREE);
+
     if ( pThing->attach_flags )
         sithThing_DetachThing(pThing);
     if ( pThing->sector )
@@ -629,6 +641,9 @@ void sithThing_FreeThing(SithThing* pThing)
 
 void sithThing_Initialize(SithThing* pThing)
 {
+    // Added: assert ported from OpenJones3D
+    SITH_ASSERTREL(pThing);
+
     switch ( pThing->type )
     {
         case SITH_THING_ITEM:
@@ -682,6 +697,9 @@ int sithThing_Reset(SithThing* pThing)
 void sithThing_SetSector(SithThing* pThing, SithSector *pSector, int bNotify)
 {
     SithSector *v3; // eax
+
+    // Added: assert ported from OpenJones3D
+    SITH_ASSERTREL(sithThing_ValidateThingPointer(pThing));
 
     v3 = pThing->sector;
     if ( v3 )
@@ -955,6 +973,8 @@ SithThing* sithThing_Create(uint32_t type)
             }
         }
         if (iVar4 < 0) {
+            // Added: log ported from OpenJones3D
+            SITHLOG_ERROR("Call to sithThing_Create could not be satisfied - no free objects.\n");
             return NULL;
         }
     }
@@ -990,6 +1010,9 @@ int sithThing_SetThingModel(SithThing* pThing, rdModel3 *pModel)
     rdThing *v2; // edi
     rdPuppet *v4; // ebx
 
+    // Added: assert ported from OpenJones3D
+    SITH_ASSERTREL(pThing && pModel);
+
     v2 = &pThing->renderData;
     if ( pThing->renderData.type == RD_THING_MODEL3 && pThing->renderData.model3 == pModel )
         return 0;
@@ -1014,6 +1037,9 @@ SithThing* sithThing_SetThingBasedOn(SithThing *pThing, SithThing *pTemplate)
     int v11; // [esp+14h] [ebp-8h]
     SithThing *v12; // [esp+18h] [ebp-4h]
     int thinga; // [esp+20h] [ebp+4h]
+
+    // Added: assert ported from OpenJones3D
+    SITH_ASSERTREL(pThing != pTemplate);
 
     thinga = pThing->idx;
     v11 = pThing->guid;
@@ -1056,6 +1082,9 @@ SithThing* sithThing_SetThingBasedOn(SithThing *pThing, SithThing *pTemplate)
 
 SithThing* sithThing_CreateThingAtPos(SithThing *pTemplate, const rdVector3 *pos, const rdMatrix34 *orient, SithSector *pSector, SithThing *pParent)
 {
+    // Added: assert ported from OpenJones3D
+    SITH_ASSERTREL(pTemplate != NULL);
+
     SithThing* pThingRet = sithThing_Create(pTemplate->type); // was inlined
 
     if (!pThingRet)
@@ -1249,6 +1278,12 @@ void sithThing_AttachThingToThingFace(SithThing *pThing, SithThing *pAttachThing
     rdVector3 out; // [esp+20h] [ebp-Ch] BYREF
     flex_t a1a; // [esp+30h] [ebp+4h]
 
+    // Added: asserts ported from OpenJones3D
+    SITH_ASSERTREL(sithThing_ValidateThingPointer(pThing));
+    SITH_ASSERTREL(sithThing_ValidateThingPointer(pAttachThing));
+    SITH_ASSERTREL(pFace && aVertices);
+    SITH_ASSERTREL(pThing->moveType == SITH_MT_PHYSICS);
+
     v18 = 1;
     if ( pThing->attach_flags )
     {
@@ -1315,6 +1350,10 @@ void sithThing_AttachThingToThing(SithThing *pThing, SithThing *pAttachThing)
     int v2; // eax
     SithThing *v3; // eax
     rdVector3 a2; // [esp+8h] [ebp-Ch] BYREF
+
+    // Added: asserts ported from OpenJones3D
+    SITH_ASSERTREL(sithThing_ValidateThingPointer(pThing));
+    SITH_ASSERTREL(sithThing_ValidateThingPointer(pAttachThing));
 
     v2 = pThing->attach_flags;
     if ( v2 )
@@ -1419,6 +1458,9 @@ void sithThing_DetachAttachedThings(SithThing* pThing)
 {
     SithThing *v1; // eax
     SithThing *v2; // esi
+
+    // Added: assert ported from OpenJones3D
+    SITH_ASSERTREL(pThing);
 
     v1 = pThing->pAttachedThing;
     if ( v1 )
@@ -1576,6 +1618,9 @@ int sithThing_ParseArg(StdConffileArg *arg, SithThing* pThing)
     int32_t paramIdx; // edi
     int32_t v7; // eax
     int32_t v8; // eax
+
+    // Added: assert ported from OpenJones3D
+    SITH_ASSERTREL(arg != NULL && pThing != NULL);
 
     v2 = 0;
     param = (int)(intptr_t)stdHashtbl_Find(sithThing_pParseHashtbl, arg->key);

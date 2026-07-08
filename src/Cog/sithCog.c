@@ -550,6 +550,8 @@ int sithCog_ReadCogsListText(SithWorld *pWorld, int bSkip)
 
     if ( bSkip )
         return 0;
+    SITH_ASSERTREL(pWorld != NULL); // Added: from OpenJones3D
+    SITH_ASSERTREL(pWorld->aCogs == NULL); // Added: from OpenJones3D
     stdConffile_ReadArgs();
     if ( _strcmp(stdConffile_g_entry.aArgs[0].value, "world") || _strcmp(stdConffile_g_entry.aArgs[1].value, "cogs") )
         return 0;
@@ -624,6 +626,8 @@ sithCog* sithCog_Load(const char *pName)
     uint32_t v9; // eax
     char aName[128]; // [esp+10h] [ebp-80h] BYREF
 
+    SITH_ASSERTREL(pName != NULL); // Added: from OpenJones3D
+
     idx = sithWorld_g_pLastLoadedWorld->numCogs;
     if ( idx >= sithWorld_g_pLastLoadedWorld->sizeCogs )
         return 0;
@@ -684,6 +688,8 @@ int32_t sithCog_ParseSymbolRef(SithCogSymbol *pSymbol, SithCogSymbolRef *pRef, c
     flex32_t tmpx, tmpy, tmpz;
     cog_flex_t* pVec;
 #endif
+
+    SITH_ASSERTREL(pSymbol && pRef && pString); // Added: from OpenJones3D
 
     switch ( pRef->type )
     {
@@ -822,6 +828,7 @@ int32_t sithCog_ParseSymbolRef(SithCogSymbol *pSymbol, SithCogSymbolRef *pRef, c
 
 int32_t sithCog_LinkCog(sithCog *pCog, SithCogSymbolRef *pRef, SithCogSymbol *pSymbol)
 {
+    SITH_ASSERTREL(pCog && pRef && pSymbol); // Added: from OpenJones3D
     cog_int_t v3 = pSymbol->val.data[0];
     if ( v3 < 0 )
         return 0;
@@ -863,6 +870,8 @@ cog_flex_t sithCog_ThingSendMessageEx(SithThing *pThing, SithThing *pSrcThing, S
     cog_flex_t v17; // st7
     cog_flex_t v19; // [esp+10h] [ebp-8h]
     int32_t receivera; // [esp+20h] [ebp+8h]
+
+    SITH_ASSERTREL(pThing); // Added: from OpenJones3D
 
     v19 = 0.0;
     if ( messageType == SITH_MESSAGE_DAMAGED )
@@ -1003,6 +1012,8 @@ cog_flex_t sithCog_SurfaceSendMessageEx(SithSurface *pSurf, SithThing *pSrcThing
     int32_t v15; // [esp+14h] [ebp-8h]
     int32_t sourceType; // [esp+24h] [ebp+8h]
 
+    SITH_ASSERTREL(pSurf); // Added: from OpenJones3D
+
     v14 = 0.0;
     if ( pSrcThing )
     {
@@ -1077,6 +1088,8 @@ cog_flex_t sithCog_SectorSendMessageEx(SithSector *pSector, SithThing *pThing, S
     cog_flex_t v13; // [esp+10h] [ebp-Ch]
     int32_t v14; // [esp+14h] [ebp-8h]
     int32_t sourceTypea; // [esp+24h] [ebp+8h]
+
+    SITH_ASSERTREL(pSector); // Added: from OpenJones3D
 
     v13 = 0.0;
     if ( pThing )
@@ -1170,6 +1183,8 @@ void sithCog_SendMessage(sithCog *pCog, int32_t messageType, int32_t senderType,
         return;
 
     v7 = pCog->pScript;
+    SITH_ASSERTREL(v7 != NULL); // Added: from OpenJones3D
+    SITH_ASSERTREL(messageType > 0); // Added: from OpenJones3D
     if (pCog->flags & SITH_COG_DEBUG)
     {
 #ifdef SITH_DEBUG_STRUCT_NAMES
@@ -1296,6 +1311,8 @@ cog_flex_t sithCog_SendMessageEx(sithCog *pCog, int32_t messageType, int32_t sen
     if ( !pCog )
         return -9999.9873046875;
     v12 = pCog->pScript;
+    SITH_ASSERTREL(v12 != NULL); // Added: from OpenJones3D
+    SITH_ASSERTREL(messageType > 0); // Added: from OpenJones3D
     if ( (pCog->flags & SITH_COG_DEBUG) != 0 )
     {
 #ifdef SITH_DEBUG_STRUCT_NAMES
@@ -1598,6 +1615,8 @@ SithCogScript* sithCog_LoadScript(const char *pName, int32_t unk)
     SithCogScript *v5; // edi
     char v6[128]; // [esp+8h] [ebp-80h] BYREF
 
+    SITH_ASSERTREL(pName != NULL); // Added: from OpenJones3D
+
     _sprintf(v6, "%s%c%s", "cog", '\\', pName);
     result = (SithCogScript *)stdHashtbl_Find(sithCog_g_pHashtable, pName);
     if ( !result )
@@ -1666,6 +1685,8 @@ void sithCog_ProcessCogs()
     if (g_sithMode == 2)
         return;
 
+    SITH_ASSERTREL(sithWorld_g_pCurrentWorld != NULL); // Added: from OpenJones3D
+
     for (uint32_t i = 0; i < sithWorld_g_pCurrentWorld->numCogs; i++)
     {
         sithCog_ProcessCog(&sithWorld_g_pCurrentWorld->aCogs[i]);
@@ -1733,6 +1754,8 @@ int sithCog_TimerEventTask(int32_t msecTime, SithEventParams *pParams)
     SithWorld *v2; // ecx
     int32_t v3; // eax
     sithCog *v4; // eax
+
+    SITH_ASSERTREL(pParams); // Added: from OpenJones3D
 
     v2 = sithWorld_g_pCurrentWorld;
     v3 = pParams->idx;
@@ -1846,6 +1869,7 @@ void sithCog_FreeEntry(sithCog *pCog)
 
 void sithCog_FreeScriptEntry(SithCogScript *pScript)
 {
+    SITH_ASSERTREL(pScript != NULL); // Added: from OpenJones3D
     sithCogParse_FreeSymbolTable(pScript->pSymbolTable);
     if ( pScript->pCode )
     {
@@ -1856,6 +1880,7 @@ void sithCog_FreeScriptEntry(SithCogScript *pScript)
 
 int sithCog_AllocWorldCogScripts(SithWorld *pWorld, int numCogScripts)
 {
+    SITH_ASSERTREL(pWorld != NULL); // Added: from OpenJones3D
     SithCogScript *scripts = (SithCogScript *)SITH_ALLOC(numCogScripts * sizeof(SithCogScript));
     pWorld->aCogScripts = scripts;
     if ( !scripts )
@@ -1873,6 +1898,7 @@ int sithCog_AllocWorldCogScripts(SithWorld *pWorld, int numCogScripts)
 int sithCog_AllocWorldCogs(SithWorld *pWorld, int sizeCogs)
 {
     sithCog *aCogs;
+    SITH_ASSERTREL(pWorld != NULL); // Added: from OpenJones3D
     { TWL_EXTRAM_SUGGEST(pSithHS); // Added
     aCogs = (sithCog *)SITH_ALLOC(sizeCogs * sizeof(sithCog));
     TWL_EXTRAM_RESTORE(pSithHS); }
@@ -1891,6 +1917,7 @@ int sithCog_AllocWorldCogs(SithWorld *pWorld, int sizeCogs)
 
 int sithCog_LinkCogToThing(sithCog *pCog, SithThing *pThing, int linkId, int mask)
 {
+    SITH_ASSERTREL(pCog && pThing); // Added: from OpenJones3D
     int idx = sithThing_ValidateThingPointer(pThing);
     if ( !idx || !pThing->type )
         return 0;
@@ -1909,6 +1936,7 @@ int sithCog_LinkCogToThing(sithCog *pCog, SithThing *pThing, int linkId, int mas
 
 int sithCog_LinkCogToSurface(sithCog *pCog, SithSurface *pSurface, int linkId, int mask)
 {
+    SITH_ASSERTREL(pCog && pSurface); // Added: from OpenJones3D
     int surfIdx = sithSurface_ValidateSurfacePointer(pSurface);
     if ( !surfIdx )
         return 0;
@@ -1926,6 +1954,7 @@ int sithCog_LinkCogToSurface(sithCog *pCog, SithSurface *pSurface, int linkId, i
 
 int sithCog_LinkCogToSector(sithCog *pCog, SithSector *pSector, int linkId, int mask)
 {
+    SITH_ASSERTREL(pCog && pSector); // Added: from OpenJones3D
     int sectorIdx = sithSector_GetIdxFromPtr(pSector);
     if ( !sectorIdx )
         return 0;
