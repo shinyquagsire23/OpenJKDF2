@@ -263,10 +263,10 @@ sithOverlayMap_bOpened 0x008358C8 int
 sithSoundClass_hashtable 0x00847F1C stdHashTable*
 sithSoundClass_nameToKeyHashtable 0x00847F20 stdHashTable*
 
-sithTemplate_alloc 0x8BBC60 void*
-sithTemplate_hashmap 0x008BBC64 stdHashTable*
-sithTemplate_count 0x8BBC68 int
-sithTemplate_oldHashtable 0x8BBC6C stdHashTable*
+sithTemplate_pMasterFile 0x8BBC60 void*
+sithTemplate_pHashtable 0x008BBC64 stdHashTable*
+sithTemplate_masterFileCount 0x8BBC68 int
+sithTemplate_pMasterHashtable 0x8BBC6C stdHashTable*
 
 // rdActive
 activeEdgeTail 0x0082D688 rdEdge NO_REINIT

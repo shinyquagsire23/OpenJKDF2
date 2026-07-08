@@ -12,16 +12,16 @@
 
 int sithTemplate_Startup()
 {
-    sithTemplate_hashmap = stdHashtbl_New(512);
-    return sithTemplate_hashmap != 0;
+    sithTemplate_pHashtable = stdHashtbl_New(512);
+    return sithTemplate_pHashtable != 0;
 }
 
 void sithTemplate_Shutdown()
 {
-    if ( sithTemplate_hashmap )
+    if ( sithTemplate_pHashtable )
     {
-        stdHashtbl_Free(sithTemplate_hashmap);
-        sithTemplate_hashmap = 0;
+        stdHashtbl_Free(sithTemplate_pHashtable);
+        sithTemplate_pHashtable = 0;
     }
 }
 
@@ -118,9 +118,9 @@ void sithTemplate_FreeWorldTemplates(sithWorld *world)
     {
         rdThing_FreeEntry(&world->templates[i].rdthing);
 #ifdef STDHASHTABLE_CRC32_KEYS
-        stdHashtbl_FreeKeyCrc32(sithTemplate_hashmap, world->templates[i].templateNameCrc);
+        stdHashtbl_FreeKeyCrc32(sithTemplate_pHashtable, world->templates[i].templateNameCrc);
 #else
-        stdHashtbl_Remove(sithTemplate_hashmap, world->templates[i].template_name);
+        stdHashtbl_Remove(sithTemplate_pHashtable, world->templates[i].template_name);
 #endif
     }
 
@@ -139,17 +139,17 @@ sithThing* sithTemplate_GetTemplate(const char *name)
 
     if ( !_memcmp(name, "none", 5u) )
         return 0;
-    result = (sithThing *)stdHashtbl_Find(sithTemplate_hashmap, name);
+    result = (sithThing *)stdHashtbl_Find(sithTemplate_pHashtable, name);
     if ( result )
         return result;
 
-    if ( !sithTemplate_count )
+    if ( !sithTemplate_masterFileCount )
         return 0;
 
     // TODO interesting, but this hashtable is never initialized
 #if 0
     char v6[0x400];
-    const char** v3 = (const char **)stdHashtbl_Find(sithTemplate_oldHashtable, name);
+    const char** v3 = (const char **)stdHashtbl_Find(sithTemplate_pMasterHashtable, name);
     if ( !v3 )
         return 0;
     if ( v3[3] )
@@ -173,7 +173,7 @@ sithThing* sithTemplate_Parse(sithWorld *world)
     sithThing tmp;
     const char* template_name;
 
-    result = (sithThing *)stdHashtbl_Find(sithTemplate_hashmap, (const char*)stdConffile_entry.args[0].value);
+    result = (sithThing *)stdHashtbl_Find(sithTemplate_pHashtable, (const char*)stdConffile_entry.args[0].value);
     if ( result )
         return result;
 
@@ -181,7 +181,7 @@ sithThing* sithTemplate_Parse(sithWorld *world)
     memset(&tmp, 0, sizeof(tmp));
 
     sithThing_Reset(&tmp);
-    result = (sithThing *)stdHashtbl_Find(sithTemplate_hashmap, (const char*)stdConffile_entry.args[1].value);
+    result = (sithThing *)stdHashtbl_Find(sithTemplate_pHashtable, (const char*)stdConffile_entry.args[1].value);
     sithThing_SetThingBasedOn(&tmp, result);
 
     template_name = stdConffile_entry.args[0].value;
@@ -208,9 +208,9 @@ sithThing* sithTemplate_Parse(sithWorld *world)
     stdPlatform_Memcpy32(result, &tmp, sizeof(sithThing)); // Added: word-safe (array may be word-addressable-only)
 #ifdef SITH_DEBUG_STRUCT_NAMES
     // The copies of names are load-bearing, SetKeyVal stores a reference
-    stdHashtbl_Add(sithTemplate_hashmap, result->template_name, result);
+    stdHashtbl_Add(sithTemplate_pHashtable, result->template_name, result);
 #else
-    stdHashtbl_Add(sithTemplate_hashmap, template_name, result);
+    stdHashtbl_Add(sithTemplate_pHashtable, template_name, result);
 #endif
 
     return result;
