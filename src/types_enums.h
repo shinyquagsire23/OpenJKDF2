@@ -48,7 +48,7 @@ enum RD_ZBUFFERMETHOD
 };
 
 typedef uint32_t sithCogFlags_t;
-enum SithCogFlag
+typedef enum eSithCogFlag
 {
     SITH_COG_DEBUG = 0x1,
     SITH_COG_DISABLED = 0x2,
@@ -60,7 +60,7 @@ enum SithCogFlag
     SITH_COG_SERVER = 0x80,
     SITH_COG_GLOBAL = 0x100,
     SITHCOG_NOSYNC = 0x200,
-};
+} SithCogFlag;
 
 enum OpenJKDF2RestartMode
 {
@@ -73,7 +73,7 @@ enum OpenJKDF2RestartMode
 #define SITH_MESSAGE_MAX (Main_bMotsCompat ? 47 : 41)
 
 typedef int SITH_MESSAGE;
-enum SITH_MESSAGE_E
+typedef enum eSithCogMsgType
 {
     SITH_MESSAGE_0 = 0,
     SITH_MESSAGE_ACTIVATE = 1,
@@ -126,10 +126,10 @@ enum SITH_MESSAGE_E
     // MOTS ext
     SITH_MESSAGE_ENTERBUBBLE = 45,
     SITH_MESSAGE_EXITBUBBLE = 46,
-};
+} SithCogMsgType;
 
 typedef uint32_t sithWeaponFlags_t;
-enum SITH_WF_E
+typedef enum eSithWeaponFlag
 {
     SITH_WF_NOSHOOTERDAMAGE = 0x1,
     SITH_WF_2 = 0x2,
@@ -155,7 +155,7 @@ enum SITH_WF_E
     SITH_WF_EMITAITARGETEDEVENT = 0x200000,
     SITH_WF_ACTORKILLDESTROY = 0x400000,
     SITH_WF_MOPHIABOMB = 0x800000, // Jones specific
-};
+} SithWeaponFlag;
 
 typedef int32_t sithGamesaveState_t;
 enum SITH_GS_E
@@ -397,13 +397,13 @@ enum SITHCOLLISION
     SITHCOLLISION_ADJOINTOUCH = 0x40,
 };
 
-enum SithCollideType
+typedef enum eSithCollideType
 {
     SITH_COLLIDE_NONE = 0x0,
     SITH_COLLIDE_SPHERE = 0x1,
     SITH_COLLIDE_SPHERE_TREE = 0x2,
     SITH_COLLIDE_FACE = 0x3,
-};
+} SithCollideType;
 
 enum SithRaycastType
 {
@@ -425,7 +425,7 @@ enum SithRaycastType
     RAYCAST_8000 = 0x8000,
 };
 
-enum SithParticleFlag
+typedef enum eSithParticleFlag
 {
     SITHPARTICLE_FLAG_OUTWARD_EXPANDING = 0x1,
     SITHPARTICLE_FLAG_ANIMATE_CEL = 0x2,
@@ -434,7 +434,7 @@ enum SithParticleFlag
     SITHPARTICLE_FLAG_EMIT_LIGHT = 0x10,
     SITHPARTICLE_FLAG_RANDOM_CEL_CHANGE = 0x20,
     SITHPARTICLE_FLAG_TIMEOUT_RATE = 0x40,
-};
+} SithParticleFlag;
 
 enum RdAnimFlag
 {
@@ -796,7 +796,7 @@ enum SENDERTYPE
     SENDERTYPE_COG   = 9
 };
 
-enum COG_TYPE
+typedef enum eSithCogSymbolRefType
 {
     COG_TYPE_VERB    = 0,
     COG_TYPE_1       = 1,
@@ -809,9 +809,9 @@ enum COG_TYPE
     SITHCOG_SYM_REF_VECTOR = 11,
     SITHCOG_SYM_REF_MODEL = 12,
     SITHCOG_SYM_REF_AICLASS = 13,
-};
+} SithCogSymbolRefType;
 
-enum COG_VARTYPE
+typedef enum eSithCogValueType
 {
     SITHCOG_VALUE_POINTER  = 0,
     SITHCOG_VALUE_SYMBOLID  = 1,
@@ -819,7 +819,7 @@ enum COG_VARTYPE
     SITHCOG_VALUE_INT  = 3,
     SITHCOG_VALUE_STRING  = 4,
     SITHCOG_VALUE_VECTOR  = 5
-};
+} SithCogValueType;
 
 enum COG_OPCODE
 {
@@ -857,7 +857,7 @@ enum COG_OPCODE
     COG_OPCODE_CALL  = 31
 };
 
-enum SITHAI_MODE_E
+typedef enum eSithAIMode
 {
     SITHAI_MODE_MOVING = 0x01,
     SITHAI_MODE_ATTACKING = 0x02,
@@ -877,9 +877,9 @@ enum SITHAI_MODE_E
     SITHAI_MODE_WALLCRAWLING = 0x200000, // Jones probably
     SITHAI_MODE_NOCHASING = 0x2000000, // Jones
     SITHAI_MODE_ARMOREDSKIN = 0x8000000, // Jones
-};
+} SithAIMode;
 
-enum SITHAI_EVENT_E
+typedef enum eSithAIEventType
 {
     SITHAI_EVENT_HIT_SECTOR = 0x1,
     SITHAI_EVENT_SOUND = 0x2,
@@ -901,7 +901,7 @@ enum SITHAI_EVENT_E
     SITHAI_EVENTPOSTFIRE = 0x20000,
     SITHAI_EVENT_40000 = 0x40000,
     SITHAI_EVENT_GOAL_UNREACHABLE = 0x80000
-};
+} SithAIEventType;
 
 enum jkGUIButtonID_t
 {
@@ -1091,7 +1091,7 @@ enum GOAL_FLAGS
     GOAL_SECRET = 4, // Unused, makes text show as yellow
 };
 
-enum ITEMINFO_FLAGS
+typedef enum eSithInventoryTypeFlag
 {
     SITHINVENTORY_TYPE_REGISTERED   = 1,
     ITEMINFO_ITEM    = 2,
@@ -1102,15 +1102,15 @@ enum ITEMINFO_FLAGS
     SITHINVENTORY_TYPE_NOT_CARRIED_BETWEEN_LEVELS = 0x40,
     SITHINVENTORY_TYPE_BACKPACKITEM = 0x80,
     ITEMINFO_HOTKEYABLE = 0x100
-};
+} SithInventoryTypeFlag;
 
-enum ITEMSTATE
+typedef enum eSithInventoryItemStatus
 {
     SITHINVENTORY_ITEM_CHANGED  = 1,
     SITHINVENTORY_ITEM_ACTIVATED  = 2,
     SITHINVENTORY_ITEM_AVAILABLE  = 4,
     SITHINVENTORY_ITEM_FOUND = 8
-};
+} SithInventoryItemStatus;
 
 
 typedef enum ATTACHFLAGS
@@ -1182,7 +1182,7 @@ typedef enum eSithPhysicsFlags
     SITH_PF_8000000 = 0x8000000,
 } SithPhysicsFlags;
 
-enum THINGPARAM
+typedef enum eSithThingArg
 {
     THINGPARAM_0     = 0,
     SITHTHING_ARG_TYPE,
@@ -1263,7 +1263,7 @@ enum THINGPARAM
     THINGPARAM_CHANCE,
     THINGPARAM_ORIENT,
     THINGPARAM_FLESHHIT
-};
+} SithThingArg;
 
 typedef enum eSithThingType
 {
@@ -1308,7 +1308,7 @@ typedef enum eSithControlType
     SITH_CT_12 = 12,
 } SithControlType;
 
-enum SITH_DAMAGE
+typedef enum eSithDamageType
 {
     SITH_DAMAGE_IMPACT   = 0x01,
     SITH_DAMAGE_ENERGY   = 0x02,
@@ -1317,7 +1317,7 @@ enum SITH_DAMAGE
     SITH_DAMAGE_SABER    = 0x10,
     SITH_DAMAGE_DROWN    = 0x20,
     SITH_DAMAGE_FALL    = 0x40,
-};
+} SithDamageType;
 
 typedef enum eSithThingFlag
 {
@@ -1430,7 +1430,7 @@ typedef enum eSithActorFlag
 #define SITH_AF_COMBO_FREEZE (Main_bMotsCompat ? (SITH_AF_IMMOBILE|SITH_AF_FREEZE_MOVEMENT) : (SITH_AF_IMMOBILE))
 #define SITH_AF_COMBO_BLIND (SITH_AF_BLIND | MOTS_ONLY_FLAG(SITH_AF_FLYERMOVE))
 
-enum THING_SYNC_FLAGS
+typedef enum eSithThingSyncFlags
 {
     SITHTHING_SYNC_POS = 1,
     SITHTHING_SYNC_STATE = 2,
@@ -1442,7 +1442,7 @@ enum THING_SYNC_FLAGS
 
     // Helper
     THING_SYNC_ALL = 0xFF,
-};
+} SithThingSyncFlags;
 
 
 enum JKGUI_BM {
@@ -1483,7 +1483,7 @@ enum JKGUI_BM {
     JKGUI_BM_ARROW_RIGHT = 34, 
 };
 
-enum SITH_MAPMODE
+typedef enum eSithMapModeFlags
 {
     MAPMODE_01 = 0x01,
     SITHMAPMODE_SHOWALLSECTORS = 0x02,
@@ -1493,7 +1493,7 @@ enum SITH_MAPMODE
     SITHMAPMODE_SHOWWEAPONS = 0x20,
     SITHMAPMODE_SHOWALLTHINGS = 0x40,
     MAPMODE_80 = 0x80,
-};
+} SithMapModeFlags;
 
 enum AUTOPICKUP
 {
