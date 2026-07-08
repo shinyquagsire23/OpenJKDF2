@@ -1865,7 +1865,7 @@ void do_hooks()
     hook_function(rdCamera_SetOrthoScale_ADDR, rdCamera_SetOrthoScale);
     hook_function(rdCamera_SetAspectRatio_ADDR, rdCamera_SetAspectRatio);
     hook_function(rdCamera_BuildFOV_ADDR, rdCamera_BuildFOV);
-    hook_function(rdCamera_BuildClipFrustum_ADDR, rdCamera_BuildClipFrustum);
+    hook_function(rdCamera_SetFrustrum_ADDR, rdCamera_SetFrustrum);
     hook_function(rdCamera_Update_ADDR, rdCamera_Update);
     hook_function(rdCamera_PerspProject_ADDR, rdCamera_PerspProject);
     hook_function(rdCamera_PerspProjectLst_ADDR, rdCamera_PerspProjectLst);

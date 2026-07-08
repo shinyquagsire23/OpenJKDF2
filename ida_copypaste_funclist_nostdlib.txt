@@ -1190,7 +1190,7 @@ rdCamera_SetProjectType	.text	00443520	00000078	00000000	00000008	R	.	.	.	.	.	T	
 rdCamera_SetOrthoScale	.text	004435A0	0000001A	00000000	00000008	R	.	.	.	.	.	T	.
 rdCamera_SetAspectRatio	.text	004435C0	000000AF	00000000	00000008	R	.	.	.	.	.	T	.
 rdCamera_BuildFOV	.text	00443670	000001BD	00000018	00000004	R	.	.	.	.	.	T	.
-rdCamera_BuildClipFrustum	.text	00443830	000000CC	00000000	00000018	R	.	.	.	.	.	T	.
+rdCamera_SetFrustrum	.text	00443830	000000CC	00000000	00000018	R	.	.	.	.	.	T	.
 rdCamera_Update	.text	00443900	00000039	00000008	00000004	R	.	.	.	.	.	T	.
 rdCamera_OrthoProject	.text	00443940	0000003E	00000000	00000008	R	.	.	.	.	.	T	.
 rdCamera_OrthoProjectLst	.text	00443980	0000007C	00000010	0000000C	R	.	.	.	.	.	T	.

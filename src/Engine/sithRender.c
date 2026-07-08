@@ -923,7 +923,7 @@ void sithRender_BuildVisibleSectorList(sithSector *sector, rdClipFrustum *frustu
                     flex_t v49 = maxY + 1.5;
 #endif
 
-                    rdCamera_BuildClipFrustum(rdCamera_pCurCamera, &outClip, (int)(v46 - -0.5), (int)(v47 - -0.5), (int)v48, (int32_t)v49);
+                    rdCamera_SetFrustrum(rdCamera_pCurCamera, &outClip, (int)(v46 - -0.5), (int)(v47 - -0.5), (int)v48, (int32_t)v49);
                     v31 = &outClip;
 
                     // TODO: Test against TODOA and verify if this is QOL-worthy

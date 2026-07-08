@@ -20,7 +20,7 @@ extern "C" {
 #define rdCamera_SetOrthoScale_ADDR (0x004435A0)
 #define rdCamera_SetAspectRatio_ADDR (0x004435C0)
 #define rdCamera_BuildFOV_ADDR (0x00443670)
-#define rdCamera_BuildClipFrustum_ADDR (0x00443830)
+#define rdCamera_SetFrustrum_ADDR (0x00443830)
 #define rdCamera_Update_ADDR (0x00443900)
 #define rdCamera_OrthoProject_ADDR (0x00443940)
 #define rdCamera_OrthoProjectLst_ADDR (0x00443980)
@@ -47,7 +47,7 @@ int rdCamera_SetProjectType(rdCamera *camera, int type);
 MATH_FUNC int rdCamera_SetOrthoScale(rdCamera *camera, flex_t scale);
 MATH_FUNC int rdCamera_SetAspectRatio(rdCamera *camera, flex_t ratio);
 MATH_FUNC int rdCamera_BuildFOV(rdCamera *camera);
-MATH_FUNC int rdCamera_BuildClipFrustum(rdCamera *camera, rdClipFrustum *outClip, signed int height, signed int width, signed int height2, signed int width2);
+MATH_FUNC int rdCamera_SetFrustrum(rdCamera *camera, rdClipFrustum *outClip, signed int height, signed int width, signed int height2, signed int width2);
 MATH_FUNC void rdCamera_Update(rdMatrix34 *orthoProj);
 MATH_FUNC void rdCamera_OrthoProject(rdVector3* out, const rdVector3* v);
 MATH_FUNC void rdCamera_OrthoProjectLst(rdVector3 *vertices_out, const rdVector3 *vertices_in, unsigned int num_vertices);

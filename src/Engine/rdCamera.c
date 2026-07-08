@@ -299,7 +299,7 @@ int rdCamera_BuildFOV(rdCamera *camera)
     return 1;
 }
 
-int rdCamera_BuildClipFrustum(rdCamera *camera, rdClipFrustum *outClip, signed int minX, signed int minY, signed int maxX, signed int maxY)
+int rdCamera_SetFrustrum(rdCamera *camera, rdClipFrustum *outClip, signed int minX, signed int minY, signed int maxX, signed int maxY)
 {   
     //jk_printf("%u %u %u %u\n", height, width, height2, width2);
 
