@@ -281,7 +281,7 @@ void sithCogFunction_LoadTemplate(sithCog *ctx)
     sithThing *v2; // eax
 
     v1 = sithCogExec_PopString(ctx);
-    if ( v1 && (v2 = sithTemplate_GetEntryByName(v1)) != 0 )
+    if ( v1 && (v2 = sithTemplate_GetTemplate(v1)) != 0 )
         sithCogExec_PushInt(ctx, v2->thingIdx);
     else
         sithCogExec_PushInt(ctx, -1);

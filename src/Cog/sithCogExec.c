@@ -639,7 +639,7 @@ sithThing* sithCogExec_PopTemplate(sithCog *ctx)
     if (idx == -1)
         return NULL;
 
-    return sithTemplate_GetEntryByIdx(idx);
+    return sithTemplate_GetTemplateByIndex(idx);
 }
 
 sithSound* sithCogExec_PopSound(sithCog *ctx)

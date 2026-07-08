@@ -1513,7 +1513,7 @@ int sithThing_Load(sithWorld *pWorld, int a2)
         if ( !_strcmp(stdConffile_entry.args[0].value, "end") )
             break;
         v21 = &sithWorld_pCurrentWorld->things[_atoi(stdConffile_entry.args[0].value)];
-        v22 = sithTemplate_GetEntryByName(stdConffile_entry.args[1].value);
+        v22 = sithTemplate_GetTemplate(stdConffile_entry.args[1].value);
         if ( stdConffile_entry.numArgs >= 0xAu )
         {
             pos.x = _atof(stdConffile_entry.args[3].value);
@@ -1852,7 +1852,7 @@ LABEL_56:
             }
             break;
         case THINGPARAM_CREATETHING:
-            pThing->pTemplate = sithTemplate_GetEntryByName(arg->value);
+            pThing->pTemplate = sithTemplate_GetTemplate(arg->value);
             result = 1;
             break;
         case THINGPARAM_ORIENT:

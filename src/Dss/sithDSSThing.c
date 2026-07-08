@@ -644,7 +644,7 @@ int sithDSSThing_ProcessFireProjectile(sithCogMsg *msg)
     {
         int16_t scaleFlags = NETMSG_POPS16();
         int16_t templateIdx = NETMSG_POPS16();
-        sithThing* pTemplate = sithTemplate_GetEntryByIdx(templateIdx);
+        sithThing* pTemplate = sithTemplate_GetTemplateByIndex(templateIdx);
         sithSound* pSound = sithSound_GetFromIdx(NETMSG_POPS16());
         int anim = NETMSG_POPS16();
         rdVector3 aimError = NETMSG_POPVEC3();
@@ -682,7 +682,7 @@ int sithDSSThing_ProcessMOTSNew2(sithCogMsg *msg)
     if ( pThing )
     {
         int16_t scaleFlags = NETMSG_POPS16();
-        sithThing* pTemplate = sithTemplate_GetEntryByIdx(NETMSG_POPS16());
+        sithThing* pTemplate = sithTemplate_GetTemplateByIndex(NETMSG_POPS16());
         sithSound* pSound = sithSound_GetFromIdx(NETMSG_POPS16());
         int anim = NETMSG_POPS16();
         rdVector3 aimError = NETMSG_POPVEC3();
@@ -1448,7 +1448,7 @@ int sithDSSThing_ProcessCreateThing(sithCogMsg *msg)
     NETMSG_IN_START(msg);
 
     sithThing* pCreated = NULL;
-    sithThing* pThing = sithTemplate_GetEntryByIdx(NETMSG_POPS16());
+    sithThing* pThing = sithTemplate_GetTemplateByIndex(NETMSG_POPS16());
     if ( pThing )
     {
         int pThing2Id = NETMSG_POPS32();
@@ -1569,7 +1569,7 @@ int sithDSSThing_ProcessMOTSNew1(sithCogMsg *msg)
 
     NETMSG_IN_START(msg);
 
-    psVar1 = sithTemplate_GetEntryByIdx(NETMSG_POPS16());
+    psVar1 = sithTemplate_GetTemplateByIndex(NETMSG_POPS16());
     if (psVar1 == NULL) 
     {
         return 0;

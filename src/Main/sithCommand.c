@@ -812,7 +812,7 @@ int sithCommand_CmdThingNpc(stdDebugConsoleCmd *pCmd, const char *pArgStr)
             return 1;
         }
         
-        sithThing* pTemplate = sithTemplate_GetEntryByName(pArgIter);
+        sithThing* pTemplate = sithTemplate_GetTemplate(pArgIter);
         if (!pTemplate) {
             sithConsole_PrintString("No template by that name.");
         }

@@ -190,7 +190,7 @@ int sithExplosion_ParseArg(stdConffileArg *arg, sithThing *thing, int param)
                 if ( (unsigned int)++v15 >= 4 )
                     return 1;
             }
-            thing->explosionParams.debrisTemplates[v15] = sithTemplate_GetEntryByName(arg->value);
+            thing->explosionParams.debrisTemplates[v15] = sithTemplate_GetTemplate(arg->value);
             return 1;
 
         default:

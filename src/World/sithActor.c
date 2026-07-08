@@ -543,13 +543,13 @@ int sithActor_ParseArg(stdConffileArg *arg, sithThing *thing, unsigned int param
             thing->actorParams.jumpSpeed = v12;
             return result;
         case THINGPARAM_WEAPON:
-            thing->actorParams.templateWeapon = sithTemplate_GetEntryByName(arg->value);
+            thing->actorParams.templateWeapon = sithTemplate_GetTemplate(arg->value);
             return 1;
         case THINGPARAM_WEAPON2:
-            thing->actorParams.templateWeapon2 = sithTemplate_GetEntryByName(arg->value);
+            thing->actorParams.templateWeapon2 = sithTemplate_GetTemplate(arg->value);
             return 1;
         case THINGPARAM_EXPLODE:
-            thing->actorParams.templateExplode = sithTemplate_GetEntryByName(arg->value);
+            thing->actorParams.templateExplode = sithTemplate_GetTemplate(arg->value);
             return 1;
         case THINGPARAM_MAXHEALTH:
             v9 = _atof(arg->value);

@@ -25,7 +25,7 @@ void sithTemplate_Shutdown()
     }
 }
 
-int sithTemplate_New(sithWorld *world, unsigned int numTemplates)
+int sithTemplate_AllocWorldTemplates(sithWorld *world, unsigned int numTemplates)
 {
 #ifdef TARGET_RETRO_HOMEBREW
     // Added: templates are parsed into a stack local and copied in word-safely,
@@ -59,7 +59,7 @@ int sithTemplate_New(sithWorld *world, unsigned int numTemplates)
     return 1;
 }
 
-sithThing* sithTemplate_GetEntryByIdx(int idx)
+sithThing* sithTemplate_GetTemplateByIndex(int idx)
 {
     sithWorld* world = sithWorld_pCurrentWorld;
     if ( idx & 0x8000 )
@@ -76,7 +76,7 @@ sithThing* sithTemplate_GetEntryByIdx(int idx)
     return NULL;
 }
 
-int sithTemplate_Load(sithWorld *world, int a2)
+int sithTemplate_ReadThingTemplatesListText(sithWorld *world, int a2)
 {
     unsigned int numTemplates;
 
@@ -91,13 +91,13 @@ int sithTemplate_Load(sithWorld *world, int a2)
     if ( !numTemplates )
         return 1;
     
-    sithTemplate_New(world, numTemplates);
+    sithTemplate_AllocWorldTemplates(world, numTemplates);
     
     while ( stdConffile_ReadArgs() )
     {
         if ( !_memcmp(stdConffile_entry.args[0].value, "end", 4u) )
             break;
-        sithTemplate_CreateEntry(world);
+        sithTemplate_Parse(world);
     }
     return 1;
 }
@@ -112,7 +112,7 @@ void sithTemplate_OldFree()
     // TODO unused but interesting
 }
 
-void sithTemplate_FreeWorld(sithWorld *world)
+void sithTemplate_FreeWorldTemplates(sithWorld *world)
 {
     for (int i = 0; i < world->numTemplatesLoaded; i++)
     {
@@ -133,7 +133,7 @@ void sithTemplate_FreeWorld(sithWorld *world)
     }
 }
 
-sithThing* sithTemplate_GetEntryByName(const char *name)
+sithThing* sithTemplate_GetTemplate(const char *name)
 {
     sithThing *result;
 
@@ -153,21 +153,21 @@ sithThing* sithTemplate_GetEntryByName(const char *name)
     if ( !v3 )
         return 0;
     if ( v3[3] )
-        sithTemplate_GetEntryByName(v3[3]);
+        sithTemplate_GetTemplate(v3[3]);
     stdConffile_OpenRead("none");
 
     _strncpy(v6, v3[2], 0x3FFu);
     v6[0x3FF] = 0;
 
     stdConffile_ReadArgsFromStr(&v6);
-    result = sithTemplate_CreateEntry(sithWorld_pLoading);
+    result = sithTemplate_Parse(sithWorld_pLoading);
     stdConffile_Close();
     return result;
 #endif
     return 0;
 }
 
-sithThing* sithTemplate_CreateEntry(sithWorld *world)
+sithThing* sithTemplate_Parse(sithWorld *world)
 {
     sithThing *result;
     sithThing tmp;

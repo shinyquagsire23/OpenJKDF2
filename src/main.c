@@ -2210,14 +2210,14 @@ void do_hooks()
     // sithTemplate
     hook_function(sithTemplate_Startup_ADDR, sithTemplate_Startup);
     hook_function(sithTemplate_Shutdown_ADDR, sithTemplate_Shutdown);
-    hook_function(sithTemplate_New_ADDR, sithTemplate_New);
-    hook_function(sithTemplate_GetEntryByIdx_ADDR, sithTemplate_GetEntryByIdx);
-    hook_function(sithTemplate_Load_ADDR, sithTemplate_Load);
+    hook_function(sithTemplate_AllocWorldTemplates_ADDR, sithTemplate_AllocWorldTemplates);
+    hook_function(sithTemplate_GetTemplateByIndex_ADDR, sithTemplate_GetTemplateByIndex);
+    hook_function(sithTemplate_ReadThingTemplatesListText_ADDR, sithTemplate_ReadThingTemplatesListText);
     hook_function(sithTemplate_OldNew_ADDR, sithTemplate_OldNew);
     hook_function(sithTemplate_OldFree_ADDR, sithTemplate_OldFree);
-    hook_function(sithTemplate_FreeWorld_ADDR, sithTemplate_FreeWorld);
-    hook_function(sithTemplate_GetEntryByName_ADDR, sithTemplate_GetEntryByName);
-    hook_function(sithTemplate_CreateEntry_ADDR, sithTemplate_CreateEntry);
+    hook_function(sithTemplate_FreeWorldTemplates_ADDR, sithTemplate_FreeWorldTemplates);
+    hook_function(sithTemplate_GetTemplate_ADDR, sithTemplate_GetTemplate);
+    hook_function(sithTemplate_Parse_ADDR, sithTemplate_Parse);
     
     // sithTrackThing
     hook_function(sithTrackThing_SkipToFrame_ADDR, sithTrackThing_SkipToFrame);

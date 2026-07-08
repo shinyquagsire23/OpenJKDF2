@@ -370,9 +370,9 @@ void jkPlayer_InitSaber()
         playerInfoJk->jkmUnk6 = 0;
 #endif
 
-        sithThing* saberSparks = sithTemplate_GetEntryByName("+ssparks_saber");
-        sithThing* bloodSparks = sithTemplate_GetEntryByName("+ssparks_blood");
-        sithThing* wallSparks = sithTemplate_GetEntryByName("+ssparks_wall");
+        sithThing* saberSparks = sithTemplate_GetTemplate("+ssparks_saber");
+        sithThing* bloodSparks = sithTemplate_GetTemplate("+ssparks_blood");
+        sithThing* wallSparks = sithTemplate_GetTemplate("+ssparks_wall");
         
         jkSaber_InitializeSaberInfo(playerThings[i].actorThing, "sabergreen1.mat", "sabergreen0.mat", 0.0032, 0.0018, 0.12, wallSparks, bloodSparks, saberSparks);
     }
@@ -438,9 +438,9 @@ void jkPlayer_InitThings()
 
             // MOTS added: weird hack?
             if (Main_bMotsCompat && !playerInfoIter->polylineThing.polyline) {
-                sithThing* saberSparks = sithTemplate_GetEntryByName("+ssparks_saber");
-                sithThing* bloodSparks = sithTemplate_GetEntryByName("+ssparks_blood");
-                sithThing* wallSparks = sithTemplate_GetEntryByName("+ssparks_wall");
+                sithThing* saberSparks = sithTemplate_GetTemplate("+ssparks_saber");
+                sithThing* bloodSparks = sithTemplate_GetTemplate("+ssparks_blood");
+                sithThing* wallSparks = sithTemplate_GetTemplate("+ssparks_wall");
 
                 jkSaber_InitializeSaberInfo(thingIter, "saberred1.mat", "saberred0.mat", 0.0032, 0.0018, 0.12, wallSparks, bloodSparks, saberSparks);
             }
@@ -988,9 +988,9 @@ void jkPlayer_renderSaberWeaponMesh(sithThing *thing)
 
             jkPlayer_FUN_00404fe0(thing);
 
-            sithThing* saberSparks = sithTemplate_GetEntryByName("+ssparks_saber");
-            sithThing* bloodSparks = sithTemplate_GetEntryByName("+ssparks_blood");
-            sithThing* wallSparks = sithTemplate_GetEntryByName("+ssparks_wall");
+            sithThing* saberSparks = sithTemplate_GetTemplate("+ssparks_saber");
+            sithThing* bloodSparks = sithTemplate_GetTemplate("+ssparks_blood");
+            sithThing* wallSparks = sithTemplate_GetTemplate("+ssparks_wall");
             jkSaber_InitializeSaberInfo(thing, "saberred1.mat", "saberred0.mat", 0.0032, 0.0018, 0.12, wallSparks, bloodSparks, saberSparks);
         }
         return;
@@ -1112,7 +1112,7 @@ void jkPlayer_renderSaberTwinkle(sithThing *player)
                 rdModel3_GetMeshMatrix(rdthing, &playerInfo->actorThing->lookOrientation, meshIdx, &matTmp);
                 rdMatrix_TransformPoint34(&vTmp, &model->geosets[0].meshes[meshIdx].vertices[vtxIdx], &matTmp);
 
-                sithThing_Create(sithTemplate_GetEntryByName("+twinkle"), &vTmp, &matTmp, player->sector, 0);
+                sithThing_Create(sithTemplate_GetTemplate("+twinkle"), &vTmp, &matTmp, player->sector, 0);
 
                 playerInfo->numTwinkles--;
                 if ( !playerInfo->numTwinkles )

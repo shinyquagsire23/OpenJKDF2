@@ -376,9 +376,9 @@ int jkDSS_ProcessSetSaberInfoMots(sithCogMsg *msg)
     sithSoundClass* v6 = sithSoundClass_LoadFile(v14);
     if ( v6 )
         sithSoundClass_SetThingSoundClass(v2, v6);
-    sithThing* v10 = sithTemplate_GetEntryByName("+ssparks_saber");
-    sithThing* v9 = sithTemplate_GetEntryByName("+ssparks_blood");
-    sithThing* v7 = sithTemplate_GetEntryByName("+ssparks_wall");
+    sithThing* v10 = sithTemplate_GetTemplate("+ssparks_saber");
+    sithThing* v9 = sithTemplate_GetTemplate("+ssparks_blood");
+    sithThing* v7 = sithTemplate_GetTemplate("+ssparks_wall");
     jkSaber_InitializeSaberInfo(v2, material_side_fname, material_tip_fname, 0.0031999999, 0.0018, 0.12, v7, v9, v10);
 
     if ( sithNet_isServer && msg->netMsg.cogMsgId == DSS_SABERINFO1)
@@ -466,9 +466,9 @@ int jkDSS_ProcessSetSaberInfo(sithCogMsg *msg)
     sithSoundClass* v6 = sithSoundClass_LoadFile(v14);
     if ( v6 )
         sithSoundClass_SetThingSoundClass(v2, v6);
-    sithThing* v10 = sithTemplate_GetEntryByName("+ssparks_saber");
-    sithThing* v9 = sithTemplate_GetEntryByName("+ssparks_blood");
-    sithThing* v7 = sithTemplate_GetEntryByName("+ssparks_wall");
+    sithThing* v10 = sithTemplate_GetTemplate("+ssparks_saber");
+    sithThing* v9 = sithTemplate_GetTemplate("+ssparks_blood");
+    sithThing* v7 = sithTemplate_GetTemplate("+ssparks_wall");
     jkSaber_InitializeSaberInfo(v2, material_side_fname, material_tip_fname, 0.0031999999, 0.0018, 0.12, v7, v9, v10);
 
     if ( sithNet_isServer )
@@ -693,9 +693,9 @@ int jkDSS_ProcessSetSaberInfo2(sithCogMsg *msg)
         jkSaber_InitializeSaberInfo(thing, material_side_fname, material_tip_fname, baseRadius, tipRadius, playerInfo->length, 0, 0, 0);
         thing->playerInfo->polylineThing.polyline->length = NETMSG_POPF32();
     }
-    playerInfo->wall_sparks = sithTemplate_GetEntryByIdx(NETMSG_POPS32());
-    playerInfo->blood_sparks = sithTemplate_GetEntryByIdx(NETMSG_POPS32());
-    playerInfo->saber_sparks = sithTemplate_GetEntryByIdx(NETMSG_POPS32());
+    playerInfo->wall_sparks = sithTemplate_GetTemplateByIndex(NETMSG_POPS32());
+    playerInfo->blood_sparks = sithTemplate_GetTemplateByIndex(NETMSG_POPS32());
+    playerInfo->saber_sparks = sithTemplate_GetTemplateByIndex(NETMSG_POPS32());
     playerInfo->bHasSuperWeapon = NETMSG_POPU32();
     playerInfo->bHasSuperShields = NETMSG_POPU32();
     playerInfo->bHasForceSurge = NETMSG_POPU32();

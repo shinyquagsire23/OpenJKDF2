@@ -694,7 +694,7 @@ int32_t sithCog_LoadEntry(sithCogSymbol *cogSymbol, sithCogReference *cogIdk, ch
 
         case COG_TYPE_TEMPLATE:
             cogSymbol->val.type = COG_VARTYPE_INT;
-            v14 = sithTemplate_GetEntryByName(val);
+            v14 = sithTemplate_GetTemplate(val);
             if ( !v14 )
             {
                 cogSymbol->val.data[0] = -1;

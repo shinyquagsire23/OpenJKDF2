@@ -433,7 +433,7 @@ int sithWeapon_LoadParams(stdConffileArg *arg, sithThing *thing, int param)
             }
             return 1;
         case THINGPARAM_EXPLODE:
-            thing->weaponParams.explodeTemplate = sithTemplate_GetEntryByName(arg->value);
+            thing->weaponParams.explodeTemplate = sithTemplate_GetTemplate(arg->value);
             return 1;
 
         case THINGPARAM_FORCE:
@@ -453,7 +453,7 @@ int sithWeapon_LoadParams(stdConffileArg *arg, sithThing *thing, int param)
             return 1;
 
         case THINGPARAM_TRAILTHING:
-            thing->weaponParams.trailThing = sithTemplate_GetEntryByName(arg->value);
+            thing->weaponParams.trailThing = sithTemplate_GetTemplate(arg->value);
             return 1;
 
         case THINGPARAM_TRAILCYLRADIUS:
@@ -465,7 +465,7 @@ int sithWeapon_LoadParams(stdConffileArg *arg, sithThing *thing, int param)
             return 1;
 
         case THINGPARAM_FLESHHIT:
-            thing->weaponParams.fleshHitTemplate = sithTemplate_GetEntryByName(arg->value);
+            thing->weaponParams.fleshHitTemplate = sithTemplate_GetTemplate(arg->value);
             return 1;
 
         default:

@@ -892,7 +892,7 @@ sithThing* sithInventory_CreateBackpack(sithThing *player)
     if ( !sithNet_isMulti )
         return 0;
 
-    templateThing = sithTemplate_GetEntryByName("+backpack");
+    templateThing = sithTemplate_GetTemplate("+backpack");
     if ( !templateThing )
         return 0;
 
