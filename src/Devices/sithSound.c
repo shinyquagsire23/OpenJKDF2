@@ -1,7 +1,7 @@
 #include "sithSound.h"
 
 #include "Win95/stdSound.h"
-#include "General/stdHashTable.h"
+#include "General/stdHashtbl.h"
 #include "General/stdString.h"
 #include "General/stdFnames.h"
 #include "World/sithWorld.h"
@@ -42,7 +42,7 @@ int sithSound_Startup()
 
     if ( stdSound_Startup() )
     {
-        sithSound_hashtable = stdHashTable_New(256);
+        sithSound_hashtable = stdHashtbl_New(256);
         if ( sithSound_hashtable )
         {
             sithSound_bInit = 1;
@@ -60,7 +60,7 @@ int sithSound_Shutdown()
     stdSound_Shutdown();
     if ( sithSound_hashtable )
     {
-        stdHashTable_Free(sithSound_hashtable);
+        stdHashtbl_Free(sithSound_hashtable);
         sithSound_hashtable = 0;
     }
 
@@ -106,7 +106,7 @@ void sithSound_FreeWorldSounds(sithWorld *world)
         for (int i = 0; i < world->numSoundsLoaded; i++)
         {
             sithSound_UnloadData(&world->sounds[i]);
-            stdHashTable_FreeKey(sithSound_hashtable, world->sounds[i].sound_fname);
+            stdHashtbl_Remove(sithSound_hashtable, world->sounds[i].sound_fname);
         }
         SITH_FREE(world->sounds);
         world->numSoundsLoaded = 0;
@@ -159,7 +159,7 @@ sithSound* sithSound_Load(char *sound_fname, int a2)
         return 0;
 
     //printf("sithSound_Load %s\n", sound_fname);
-    sound = (sithSound *)stdHashTable_GetKeyVal(sithSound_hashtable, sound_fname);
+    sound = (sithSound *)stdHashtbl_Find(sithSound_hashtable, sound_fname);
     if ( sound )
     {
         if ( a2 && (sound->isLoaded & 1) == 0 )
@@ -197,7 +197,7 @@ sithSound* sithSound_Load(char *sound_fname, int a2)
                 sound->sound_len = sound->sound_len >> 1;
             sound->isLoaded = 0;
             sound->infoLoaded = 1;
-            stdHashTable_SetKeyVal(sithSound_hashtable, sound->sound_fname, sound);
+            stdHashtbl_Add(sithSound_hashtable, sound->sound_fname, sound);
             v12 = pSithHS;
             ++sithWorld_pLoading->numSoundsLoaded;
             v12->fileClose(sound_file);

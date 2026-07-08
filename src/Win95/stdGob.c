@@ -5,7 +5,7 @@
 #include "jk.h"
 #include "stdPlatform.h"
 
-#include "General/stdHashTable.h"
+#include "General/stdHashtbl.h"
 #include "General/stdString.h"
 #include "Platform/Common/stdEmbeddedRes.h"
 
@@ -116,9 +116,9 @@ int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
 
     // We're not adding anything so like, keep it small?
 #ifdef TARGET_RETRO_HOMEBREW
-    gob->entriesHashtable = stdHashTable_New(gob->numFiles);
+    gob->entriesHashtable = stdHashtbl_New(gob->numFiles);
 #else
-    gob->entriesHashtable = stdHashTable_New(1024);
+    gob->entriesHashtable = stdHashtbl_New(1024);
 #endif
     for (int v4 = 0; v4 < gob->numFiles; v4++)
     {
@@ -129,10 +129,10 @@ int stdGob_LoadEntry(stdGob *gob, char *fname, int a3, int a4)
         pGobHS->fileRead(gob->fhand, &diskEntry, sizeof(stdGobDiskEntry));
         gob->entries[v4].fileOffset = diskEntry.fileOffset;
         gob->entries[v4].fileSize = diskEntry.fileSize;
-        stdHashTable_SetKeyVal(gob->entriesHashtable, diskEntry.fname, &gob->entries[v4]);
+        stdHashtbl_Add(gob->entriesHashtable, diskEntry.fname, &gob->entries[v4]);
 #else
         pGobHS->fileRead(gob->fhand, &gob->entries[v4], sizeof(stdGobEntry));
-        stdHashTable_SetKeyVal(gob->entriesHashtable, gob->entries[v4].fname, &gob->entries[v4]);
+        stdHashtbl_Add(gob->entriesHashtable, gob->entries[v4].fname, &gob->entries[v4]);
 #endif
     }
 
@@ -177,7 +177,7 @@ void stdGob_FreeEntry(stdGob *gob)
         }
         if ( gob->entriesHashtable )
         {
-            stdHashTable_Free(gob->entriesHashtable);
+            stdHashtbl_Free(gob->entriesHashtable);
             gob->entriesHashtable = 0;
         }
     }
@@ -234,7 +234,7 @@ stdGobFile* stdGob_FileOpen(stdGob *gob, const char *filepath)
             stdGob_fpath[i] = '\\';
     }
 #endif
-    entry = (stdGobEntry*)stdHashTable_GetKeyVal(gob->entriesHashtable, stdGob_fpath);
+    entry = (stdGobEntry*)stdHashtbl_Find(gob->entriesHashtable, stdGob_fpath);
     if (!entry)
         return 0;
 

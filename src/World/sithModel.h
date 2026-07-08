@@ -1,7 +1,7 @@
 #ifndef _SITHMODEL_H
 #define _SITHMODEL_H
 
-#include "General/stdHashTable.h"
+#include "General/stdHashtbl.h"
 
 #define sithModel_Startup_ADDR (0x004E9660)
 #define sithModel_Shutdown_ADDR (0x004E9680)

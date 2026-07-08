@@ -1,4 +1,4 @@
-#include "stdHashTable.h"
+#include "stdHashtbl.h"
 
 #include "jk.h"
 
@@ -14,12 +14,12 @@
 // steady-state across level loads). All node writes are word-width.
 #define STDHASHTABLE_POOL_CHUNK_NODES 340 // ~4KB slabs
 typedef struct stdHashPoolChunk { struct stdHashPoolChunk* pNext; } stdHashPoolChunk;
-static stdHashPoolChunk* stdHashTable_pPoolChunks = NULL;
-static tHashLink* stdHashTable_pFreeNodes = NULL;
+static stdHashPoolChunk* stdHashtbl_pPoolChunks = NULL;
+static tHashLink* stdHashtbl_pFreeNodes = NULL;
 
-static tHashLink* stdHashTable_NodeAlloc(void)
+static tHashLink* stdHashtbl_NodeAlloc(void)
 {
-    if (!stdHashTable_pFreeNodes)
+    if (!stdHashtbl_pFreeNodes)
     {
         stdHashPoolChunk* pChunk;
         { TWL_EXTRAM_SUGGEST(std_pHS);
@@ -27,26 +27,26 @@ static tHashLink* stdHashTable_NodeAlloc(void)
         TWL_EXTRAM_RESTORE(std_pHS); }
         if (!pChunk)
             return NULL;
-        pChunk->pNext = stdHashTable_pPoolChunks;
-        stdHashTable_pPoolChunks = pChunk;
+        pChunk->pNext = stdHashtbl_pPoolChunks;
+        stdHashtbl_pPoolChunks = pChunk;
         tHashLink* aNodes = (tHashLink*)(pChunk + 1);
         for (int i = 0; i < STDHASHTABLE_POOL_CHUNK_NODES; i++)
         {
-            aNodes[i].next = stdHashTable_pFreeNodes;
-            stdHashTable_pFreeNodes = &aNodes[i];
+            aNodes[i].next = stdHashtbl_pFreeNodes;
+            stdHashtbl_pFreeNodes = &aNodes[i];
         }
     }
-    tHashLink* pNode = stdHashTable_pFreeNodes;
-    stdHashTable_pFreeNodes = pNode->next;
+    tHashLink* pNode = stdHashtbl_pFreeNodes;
+    stdHashtbl_pFreeNodes = pNode->next;
     return pNode;
 }
 
-static void stdHashTable_NodeFree(tHashLink* pNode)
+static void stdHashtbl_NodeFree(tHashLink* pNode)
 {
-    pNode->next = stdHashTable_pFreeNodes;
-    stdHashTable_pFreeNodes = pNode;
+    pNode->next = stdHashtbl_pFreeNodes;
+    stdHashtbl_pFreeNodes = pNode;
 }
-#define STDHASHTABLE_NODE_FREE(p) stdHashTable_NodeFree(p)
+#define STDHASHTABLE_NODE_FREE(p) stdHashtbl_NodeFree(p)
 #else
 #define STDHASHTABLE_NODE_FREE(p) STD_FREE(p)
 #endif
@@ -89,7 +89,7 @@ int hashmapBucketSizes[hashmapBucketSizes_MAX] =
     1999
 };
 
-uint32_t stdHashTable_HashStringToIdx(const char *data, uint32_t numBuckets)
+uint32_t stdHashtbl_HashStringToIdx(const char *data, uint32_t numBuckets)
 {
     uint32_t hash;
     uint8_t i;
@@ -110,7 +110,7 @@ uint32_t stdHashTable_HashStringToIdx(const char *data, uint32_t numBuckets)
     return hash % numBuckets;
 }
 
-stdHashTable* stdHashTable_New(int maxEntries)
+stdHashTable* stdHashtbl_New(int maxEntries)
 {
     stdHashTable *hashtable;
     int sizeIterIdx;
@@ -126,7 +126,7 @@ stdHashTable* stdHashTable_New(int maxEntries)
     // Added: memset
     _memset(hashtable, 0, sizeof(*hashtable));
 
-    // Basically every usage of stdHashTable_New assumes maxEntries is
+    // Basically every usage of stdHashtbl_New assumes maxEntries is
     // exactly what it says, the maximum anticipated number of entries.
     //
     // But this constructor seems to interpret that as maxBuckets, which
@@ -184,7 +184,7 @@ loop_escape:
     if ( hashtable->buckets )
     {
       stdPlatform_Memzero32(hashtable->buckets, sizeof(tHashLink) * hashtable->numBuckets); // Added: word-safe
-      hashtable->keyHashToIndex = stdHashTable_HashStringToIdx;
+      hashtable->keyHashToIndex = stdHashtbl_HashStringToIdx;
     }
     else {
         // Added: fail more gracefully and without memleaks
@@ -194,7 +194,7 @@ loop_escape:
     return hashtable;
 }
 
-tHashLink* stdHashTable_GetBucketTail(tHashLink *pLL)
+tHashLink* stdHashtbl_GetTailNode(tHashLink *pLL)
 {
 #ifdef STDHASHTABLE_SINGLE_LINKLIST
     return stdSingleLinklist_GetTail(pLL);
@@ -203,7 +203,7 @@ tHashLink* stdHashTable_GetBucketTail(tHashLink *pLL)
 #endif
 }
 
-void stdHashTable_FreeBuckets(tHashLink *a1)
+void stdHashtbl_FreeListNodes(tHashLink *a1)
 {
     tHashLink *iter;
     
@@ -224,7 +224,7 @@ void stdHashTable_FreeBuckets(tHashLink *a1)
     }
 }
 
-void stdHashTable_Free(stdHashTable *table)
+void stdHashtbl_Free(stdHashTable *table)
 {
     int bucketIdx;
     int bucketIdx2;
@@ -240,7 +240,7 @@ void stdHashTable_Free(stdHashTable *table)
         bucketIdx2 = 0;
         do
         {
-            stdHashTable_FreeBuckets(&table->buckets[bucketIdx2]);
+            stdHashtbl_FreeListNodes(&table->buckets[bucketIdx2]);
             table->buckets[bucketIdx2].next = NULL; // added
             ++bucketIdx;
             ++bucketIdx2;
@@ -253,7 +253,7 @@ void stdHashTable_Free(stdHashTable *table)
     STD_FREE(table);
 }
 
-int stdHashTable_SetKeyVal(stdHashTable *hashmap, const char *key, void *value)
+int stdHashtbl_Add(stdHashTable *hashmap, const char *key, void *value)
 {
     tHashLink *new_child; // eax
     tHashLink *v9; // ecx
@@ -263,21 +263,21 @@ int stdHashTable_SetKeyVal(stdHashTable *hashmap, const char *key, void *value)
     if (!hashmap || !key)
         return 0;
 
-    if (stdHashTable_GetKeyVal(hashmap, key)) {
+    if (stdHashtbl_Find(hashmap, key)) {
 #ifndef SITH_DEBUG_STRUCT_NAMES
-        stdHashTable_FreeKey(hashmap, key);
+        stdHashtbl_Remove(hashmap, key);
 #else
         return 0;
 #endif
     }
 
     v9 = &hashmap->buckets[hashmap->keyHashToIndex(key, hashmap->numBuckets)];
-    v10 = stdHashTable_GetBucketTail(v9);
+    v10 = stdHashtbl_GetTailNode(v9);
 
     if ( v10->key )
     {
 #ifdef STDHASHTABLE_NODE_POOL
-        new_child = stdHashTable_NodeAlloc(); // Added: slab pool
+        new_child = stdHashtbl_NodeAlloc(); // Added: slab pool
 #else
         tHashLink *new_child_alloc; // Added: see below
         { TWL_EXTRAM_SUGGEST(std_pHS);
@@ -317,7 +317,7 @@ int stdHashTable_SetKeyVal(stdHashTable *hashmap, const char *key, void *value)
     return 1;
 }
 
-void* stdHashTable_GetKeyVal(stdHashTable *hashmap, const char *key)
+void* stdHashtbl_Find(stdHashTable *hashmap, const char *key)
 {
     tHashLink *i;
     tHashLink *foundKey;
@@ -363,7 +363,7 @@ void* stdHashTable_GetKeyVal(stdHashTable *hashmap, const char *key)
     return 0;
 }
 
-int stdHashTable_FreeKey(stdHashTable *hashtable, const char *key)
+int stdHashtbl_Remove(stdHashTable *hashtable, const char *key)
 {
     int v2;
     tHashLink *foundKey;
@@ -455,7 +455,7 @@ int stdHashTable_FreeKey(stdHashTable *hashtable, const char *key)
 }
 
 #ifdef STDHASHTABLE_CRC32_KEYS
-int stdHashTable_FreeKeyCrc32(stdHashTable *hashtable, uint32_t keyCrc32)
+int stdHashtbl_FreeKeyCrc32(stdHashTable *hashtable, uint32_t keyCrc32)
 {
     int v2;
     tHashLink *foundKey;
@@ -525,7 +525,7 @@ int stdHashTable_FreeKeyCrc32(stdHashTable *hashtable, uint32_t keyCrc32)
 }
 #endif
 
-void stdHashTable_PrintDiagnostics(stdHashTable *hashtable)
+void stdHashtbl_PrintTableDiagnostics(stdHashTable *hashtable)
 {
     int maxLookups; // edi
     int bucketIdx2; // ebp
@@ -569,7 +569,7 @@ void stdHashTable_PrintDiagnostics(stdHashTable *hashtable)
     std_pHS->debugPrint("---------------------\n");
 }
 
-void stdHashTable_Dump(stdHashTable *hashtable)
+void stdHashtbl_DumpTable(stdHashTable *hashtable)
 {
     int index;
     tHashLink *key_iter;

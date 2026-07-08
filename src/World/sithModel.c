@@ -11,7 +11,7 @@ static stdHashTable* sithModel_hashtable;
 
 int sithModel_Startup()
 {
-    sithModel_hashtable = stdHashTable_New(256);
+    sithModel_hashtable = stdHashtbl_New(256);
     return sithModel_hashtable != 0;
 }
 
@@ -19,7 +19,7 @@ void sithModel_Shutdown()
 {
     if ( sithModel_hashtable )
     {
-        stdHashTable_Free(sithModel_hashtable);
+        stdHashtbl_Free(sithModel_hashtable);
         sithModel_hashtable = 0;
     }
 }
@@ -71,7 +71,7 @@ void sithModel_FreeWorldModels(sithWorld *world)
 
     for (int i = 0; i < world->numModelsLoaded; i++)
     {
-        stdHashTable_FreeKey(sithModel_hashtable, world->models[i].filename);
+        stdHashtbl_Remove(sithModel_hashtable, world->models[i].filename);
         rdModel3_FreeEntryGeometryOnly(&world->models[i]);
     }
     SITH_FREE(world->models);
@@ -85,7 +85,7 @@ rdModel3* sithModel_Load(const char *model_3do_fname, int unk)
     rdModel3 *model;
     char model_fpath[128];
 
-    model = (rdModel3 *)stdHashTable_GetKeyVal(sithModel_hashtable, model_3do_fname);
+    model = (rdModel3 *)stdHashtbl_Find(sithModel_hashtable, model_3do_fname);
     if ( model ) {
         //stdPlatform_Printf("OpenJKDF2: %s: Load %s from static jkl.\n", __func__, model_3do_fname); // Added
         return model;
@@ -111,7 +111,7 @@ rdModel3* sithModel_Load(const char *model_3do_fname, int unk)
     if (sithWorld_pLoading->level_type_maybe & 1)
         model->id |= 0x8000;
     
-    stdHashTable_SetKeyVal(sithModel_hashtable, model->filename, model);
+    stdHashtbl_Add(sithModel_hashtable, model->filename, model);
     sithWorld_pLoading->numModelsLoaded += 1;
 
     return model;

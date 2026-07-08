@@ -1,6 +1,6 @@
 #include "jkDev.h"
 
-#include "General/stdHashTable.h"
+#include "General/stdHashtbl.h"
 #include "General/stdBitmap.h"
 #include "General/stdFont.h"
 #include "General/stdString.h"
@@ -49,7 +49,7 @@ void jkDev_Startup()
     sithConsole_Open(16);
     sithConsole_RegisterPrintFunctions(jkDev_DebugLog, jkDev_PrintUniString);
 
-    jkDev_cheatHashtable = stdHashTable_New(JKDEV_NUM_CHEATS*2);
+    jkDev_cheatHashtable = stdHashtbl_New(JKDEV_NUM_CHEATS*2);
     _memset(jkDev_aCheatCmds, 0, sizeof(stdDebugConsoleCmd) * JKDEV_NUM_CHEATS);
 
     sithConsole_RegisterCommand(jkDev_CmdVersion, "version", 0);
@@ -110,7 +110,7 @@ void jkDev_Shutdown()
 
     if ( jkDev_cheatHashtable )
     {
-        stdHashTable_Free(jkDev_cheatHashtable);
+        stdHashtbl_Free(jkDev_cheatHashtable);
         jkDev_cheatHashtable = 0;
     }
     sithConsole_Close();
@@ -508,7 +508,7 @@ int jkDev_RegisterCmd(DebugConsoleCmd_t pfCheatFunc, const char *pCryptCheatStr,
     jkDev_aCheatCmds[jkDev_numCheats].cmdStr[31] = 0;
     jkDev_aCheatCmds[jkDev_numCheats].cmdFunc = pfCheatFunc;
     jkDev_aCheatCmds[jkDev_numCheats].extra = extra;
-    stdHashTable_SetKeyVal(jkDev_cheatHashtable, pCryptCheatStr, &jkDev_aCheatCmds[jkDev_numCheats]);
+    stdHashtbl_Add(jkDev_cheatHashtable, pCryptCheatStr, &jkDev_aCheatCmds[jkDev_numCheats]);
 
     ++jkDev_numCheats;
     return 1;
@@ -531,7 +531,7 @@ int jkDev_TryCommand(const char *cmd)
     _strncpy(key, v1, 128);
     key[127] = 0;
     jkDev_Decrypt(key);
-    pFoundCmd = (stdDebugConsoleCmd *)stdHashTable_GetKeyVal(jkDev_cheatHashtable, key);
+    pFoundCmd = (stdDebugConsoleCmd *)stdHashtbl_Find(jkDev_cheatHashtable, key);
     if ( !pFoundCmd )
         return 0;
     v5 = _strtok(0, "\n\r");

@@ -5,7 +5,7 @@
 #include "Engine/sithPuppet.h"
 #include "World/sithWorld.h"
 #include "General/stdString.h"
-#include "General/stdHashTable.h"
+#include "General/stdHashtbl.h"
 #include "Win95/std.h"
 #include "jk.h"
 
@@ -44,7 +44,7 @@ int sithAnimClass_Load(sithWorld *world, int a2)
     {
         if ( !_strcmp(stdConffile_entry.args[0].value, "end") )
             break;
-        if ( !stdHashTable_GetKeyVal(sithPuppet_hashtable, stdConffile_entry.args[1].value) )
+        if ( !stdHashtbl_Find(sithPuppet_hashtable, stdConffile_entry.args[1].value) )
         {
             if ( sithWorld_pLoading->numAnimClassesLoaded != sithWorld_pLoading->numAnimClasses )
             {
@@ -64,9 +64,9 @@ int sithAnimClass_Load(sithWorld *world, int a2)
                     ++sithWorld_pLoading->numAnimClassesLoaded;
 #ifdef SITH_DEBUG_STRUCT_NAMES
                     // The copies of names are load-bearing, SetKeyVal stores a reference
-                    stdHashTable_SetKeyVal(sithPuppet_hashtable, animclass->name, animclass);
+                    stdHashtbl_Add(sithPuppet_hashtable, animclass->name, animclass);
 #else
-                    stdHashTable_SetKeyVal(sithPuppet_hashtable, name, animclass);
+                    stdHashtbl_Add(sithPuppet_hashtable, name, animclass);
 #endif
                 }
             }
@@ -86,7 +86,7 @@ sithAnimclass* sithAnimClass_LoadEntry(char *a1)
     char tmp[32];
 #endif
 
-    result = (sithAnimclass *)stdHashTable_GetKeyVal(sithPuppet_hashtable, a1);
+    result = (sithAnimclass *)stdHashtbl_Find(sithPuppet_hashtable, a1);
     if ( !result )
     {
         v3 = sithWorld_pLoading->numAnimClassesLoaded;
@@ -110,9 +110,9 @@ sithAnimclass* sithAnimClass_LoadEntry(char *a1)
             v5 = sithPuppet_hashtable;
             ++sithWorld_pLoading->numAnimClassesLoaded;
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            stdHashTable_SetKeyVal(v5, v4->name, v4);
+            stdHashtbl_Add(v5, v4->name, v4);
 #else
-            stdHashTable_SetKeyVal(v5, tmp, v4); // Added: tmp thing
+            stdHashtbl_Add(v5, tmp, v4); // Added: tmp thing
 #endif
             result = v4;
         }
@@ -165,7 +165,7 @@ int sithAnimClass_LoadPupEntry(sithAnimclass *animclass, char *fpath)
         }
         else if ( stdConffile_entry.numArgs > 1u )
         {
-            animNameIdx = (intptr_t)stdHashTable_GetKeyVal(sithPuppet_animNamesToIdxHashtable, stdConffile_entry.args[0].value);
+            animNameIdx = (intptr_t)stdHashtbl_Find(sithPuppet_animNamesToIdxHashtable, stdConffile_entry.args[0].value);
             if ( animNameIdx )
             {
                 if ( stdConffile_entry.numArgs <= 2u )
@@ -187,7 +187,7 @@ int sithAnimClass_LoadPupEntry(sithAnimclass *animclass, char *fpath)
                     if ( sithWorld_pLoading->keyframes )
                     {
                         _sprintf(keyframe_fpath, "%s%c%s", "3do\\key", 92, stdConffile_entry.args[1].value);
-                        v10 = (rdKeyframe *)stdHashTable_GetKeyVal(sithPuppet_keyframesHashtable, key_fname);
+                        v10 = (rdKeyframe *)stdHashtbl_Find(sithPuppet_keyframesHashtable, key_fname);
                         if ( v10 )
                         {
 LABEL_39:
@@ -210,9 +210,9 @@ LABEL_39:
                                     keyframe->id |= 0x8000u;
                                 }
 #ifdef SITH_DEBUG_STRUCT_NAMES
-                                stdHashTable_SetKeyVal(sithPuppet_keyframesHashtable, keyframe->name, keyframe);
+                                stdHashtbl_Add(sithPuppet_keyframesHashtable, keyframe->name, keyframe);
 #else
-                                stdHashTable_SetKeyVal(sithPuppet_keyframesHashtable, /*keyframe->name*//*key_fname*/stdFileFromPath(keyframe_fpath), keyframe);
+                                stdHashtbl_Add(sithPuppet_keyframesHashtable, /*keyframe->name*//*key_fname*/stdFileFromPath(keyframe_fpath), keyframe);
 #endif
                                 v10 = keyframe;
                                 ++world->numKeyframesLoaded;
@@ -265,9 +265,9 @@ void sithAnimClass_Free(sithWorld *world)
             do
             {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-                stdHashTable_FreeKey(sithPuppet_hashtable, world->animclasses[v2].name);
+                stdHashtbl_Remove(sithPuppet_hashtable, world->animclasses[v2].name);
 #elif defined(STDHASHTABLE_CRC32_KEYS)
-                stdHashTable_FreeKeyCrc32(sithPuppet_hashtable, world->animclasses[v2].namecrc);
+                stdHashtbl_FreeKeyCrc32(sithPuppet_hashtable, world->animclasses[v2].namecrc);
 #endif
                 ++v1;
                 ++v2;

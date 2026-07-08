@@ -1,7 +1,7 @@
 #include "sithSurface.h"
 
 #include "stdPlatform.h"
-#include "General/stdHashTable.h"
+#include "General/stdHashtbl.h"
 #include "General/stdMath.h"
 #include "World/sithWorld.h"
 #include "World/jkPlayer.h"

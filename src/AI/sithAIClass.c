@@ -1,6 +1,6 @@
 #include "sithAIClass.h"
 
-#include "General/stdHashTable.h"
+#include "General/stdHashtbl.h"
 #include "General/stdMath.h"
 #include "General/stdString.h"
 #include "World/sithWorld.h"
@@ -11,7 +11,7 @@
 
 int sithAIClass_Startup()
 {
-    sithAIClass_hashmap = stdHashTable_New(64);
+    sithAIClass_hashmap = stdHashtbl_New(64);
     return sithAIClass_hashmap != 0;
 }
 
@@ -19,7 +19,7 @@ void sithAIClass_Shutdown()
 {
     if (sithAIClass_hashmap)
     {
-        stdHashTable_Free(sithAIClass_hashmap);
+        stdHashtbl_Free(sithAIClass_hashmap);
         sithAIClass_hashmap = 0;
     }
 }
@@ -107,7 +107,7 @@ sithAIClass* sithAIClass_Load(char *fpath)
     if ( !sithWorld_pLoading->aiclasses )
         return 0;
 
-    result = (sithAIClass *)stdHashTable_GetKeyVal(sithAIClass_hashmap, fpath);
+    result = (sithAIClass *)stdHashtbl_Find(sithAIClass_hashmap, fpath);
     if ( result )
         return result;
 
@@ -132,9 +132,9 @@ sithAIClass* sithAIClass_Load(char *fpath)
     {
 #ifdef SITH_DEBUG_STRUCT_NAMES
             // The copies of names are load-bearing, SetKeyVal stores a reference
-        stdHashTable_SetKeyVal(sithAIClass_hashmap, aiclass->fpath, aiclass);
+        stdHashtbl_Add(sithAIClass_hashmap, aiclass->fpath, aiclass);
 #else
-        stdHashTable_SetKeyVal(sithAIClass_hashmap, fpath, aiclass);
+        stdHashtbl_Add(sithAIClass_hashmap, fpath, aiclass);
 #endif
         aiclass->index = world->numAIClassesLoaded++;
         
@@ -258,9 +258,9 @@ void sithAIClass_FreeWorldAIClasses(sithWorld *world)
         for (uint32_t i = 0; i < world->numAIClassesLoaded; i++)
         {
 #ifdef STDHASHTABLE_CRC32_KEYS
-            stdHashTable_FreeKeyCrc32(sithAIClass_hashmap, world->aiclasses[i].fpathcrc);
+            stdHashtbl_FreeKeyCrc32(sithAIClass_hashmap, world->aiclasses[i].fpathcrc);
 #else
-            stdHashTable_FreeKey(sithAIClass_hashmap, world->aiclasses[i].fpath);
+            stdHashtbl_Remove(sithAIClass_hashmap, world->aiclasses[i].fpath);
 #endif
         }
         SITH_FREE(world->aiclasses);

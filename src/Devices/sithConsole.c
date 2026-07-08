@@ -3,7 +3,7 @@
 #include "Main/sithCommand.h"
 #include "Win95/stdSound.h"
 #include "Devices/sithSound.h"
-#include "General/stdHashTable.h"
+#include "General/stdHashtbl.h"
 #include "General/stdString.h"
 #include "Main/sithCvar.h"
 #include "stdPlatform.h"
@@ -15,7 +15,7 @@ int sithConsole_Startup(int maxCmds)
     signed int result; // eax
 
     sithConsole_aCmds = (stdDebugConsoleCmd *)SITH_ALLOC(sizeof(stdDebugConsoleCmd) * maxCmds);
-    v1 = stdHashTable_New(2 * maxCmds);
+    v1 = stdHashtbl_New(2 * maxCmds);
     sithConsole_pCmdHashtable = v1;
     if ( sithConsole_aCmds )
     {
@@ -42,7 +42,7 @@ int sithConsole_Startup(int maxCmds)
     }
     if ( v1 )
     {
-        stdHashTable_Free(v1);
+        stdHashtbl_Free(v1);
         sithConsole_pCmdHashtable = 0;
     }
 
@@ -58,7 +58,7 @@ void sithConsole_Shutdown()
     }
     if ( sithConsole_pCmdHashtable )
     {
-        stdHashTable_Free(sithConsole_pCmdHashtable);
+        stdHashtbl_Free(sithConsole_pCmdHashtable);
         sithConsole_pCmdHashtable = 0;
     }
     if ( sithConsole_alertSound )
@@ -178,7 +178,7 @@ int sithConsole_ExeCommand(const char *cmd)
             return 1;
         }
 
-        v2 = (stdDebugConsoleCmd *)stdHashTable_GetKeyVal(sithConsole_pCmdHashtable, v1);
+        v2 = (stdDebugConsoleCmd *)stdHashtbl_Find(sithConsole_pCmdHashtable, v1);
         if ( v2 )
         {
             v3 = _strtok(0, "\n\r");
@@ -233,7 +233,7 @@ int sithConsole_RegisterCommand(DebugConsoleCmd_t fn, const char *cmd, int extra
     v4 = &sithConsole_aCmds[sithConsole_numRegisteredCmds];
     v4->cmdFunc = fn;
     v4->extra = extra;
-    stdHashTable_SetKeyVal(sithConsole_pCmdHashtable, v4->cmdStr, v4);
+    stdHashtbl_Add(sithConsole_pCmdHashtable, v4->cmdStr, v4);
     ++sithConsole_numRegisteredCmds;
     return 1;
 }

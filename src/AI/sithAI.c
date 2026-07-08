@@ -19,7 +19,7 @@
 #include "Engine/sithAnimClass.h"
 #include "Engine/sithRender.h"
 #include "Engine/sithPhysics.h"
-#include "General/stdHashTable.h"
+#include "General/stdHashtbl.h"
 #include "General/stdString.h"
 #include "Main/jkGame.h"
 #include "Cog/sithCogExec.h"
@@ -90,7 +90,7 @@ int sithAI_Startup()
     sithAI_commandList = (sithAICommand *)SITH_ALLOC(sizeof(sithAICommand) * 32);
     if ( sithAI_commandList )
     {
-        sithAI_commandsHashmap = stdHashTable_New(64);
+        sithAI_commandsHashmap = stdHashtbl_New(64);
         if ( !sithAI_commandsHashmap )
             SITH_FREE(sithAI_commandList);
     }
@@ -141,7 +141,7 @@ void sithAI_Shutdown()
     if ( sithAI_bInit )
     {
         SITH_FREE(sithAI_commandList);
-        stdHashTable_Free(sithAI_commandsHashmap);
+        stdHashtbl_Free(sithAI_commandsHashmap);
         sithAI_bInit = 0;
     }
 

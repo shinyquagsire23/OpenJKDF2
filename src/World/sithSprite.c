@@ -2,7 +2,7 @@
 
 #include "Primitives/rdSprite.h"
 #include "World/sithWorld.h"
-#include "General/stdHashTable.h"
+#include "General/stdHashtbl.h"
 #include "General/stdConffile.h"
 #include "General/stdString.h"
 #include "stdPlatform.h"
@@ -10,7 +10,7 @@
 
 int sithSprite_Startup()
 {
-    sithSprite_hashmap = stdHashTable_New(128);
+    sithSprite_hashmap = stdHashtbl_New(128);
     if (sithSprite_hashmap)
         return 1;
     stdPrintf(pSithHS->errorPrint, ".\\World\\sithSprite.c", 63, "Failed to allocate memory for sprites.\n", 0, 0, 0, 0);
@@ -21,7 +21,7 @@ void sithSprite_Shutdown()
 {
     if ( sithSprite_hashmap )
     {
-        stdHashTable_Free(sithSprite_hashmap);
+        stdHashtbl_Free(sithSprite_hashmap);
         sithSprite_hashmap = 0;
     }
 }
@@ -87,7 +87,7 @@ void sithSprite_FreeWorldSprites(sithWorld *world)
 
     for (int idx = 0; idx < world->numSpritesLoaded; idx++)
     {
-        stdHashTable_FreeKey(sithSprite_hashmap, world->sprites[idx].path);
+        stdHashtbl_Remove(sithSprite_hashmap, world->sprites[idx].path);
         rdSprite_FreeEntry(&world->sprites[idx]);
     }
     SITH_FREE(world->sprites);
@@ -104,7 +104,7 @@ rdSprite* sithSprite_Load(char *fpath)
     char spriteFpath[128];
 
     world = sithWorld_pLoading;
-    result = (rdSprite *)stdHashTable_GetKeyVal(sithSprite_hashmap, fpath);
+    result = (rdSprite *)stdHashtbl_Find(sithSprite_hashmap, fpath);
     if ( !result )
     {
         uint32_t idx = world->numSpritesLoaded;
@@ -136,7 +136,7 @@ rdSprite* sithSprite_Load(char *fpath)
                         
                         if ( rdSprite_NewEntry(sprite, fpath, type_id, mat, width, height, geometryMode, lightMode, textureMode, extralight, &off) )
                         {
-                            stdHashTable_SetKeyVal(sithSprite_hashmap, sprite->path, sprite);
+                            stdHashtbl_Add(sithSprite_hashmap, sprite->path, sprite);
                             ++world->numSpritesLoaded;
                             return sprite;
                         }

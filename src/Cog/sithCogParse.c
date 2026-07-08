@@ -4,7 +4,7 @@
 
 #include "Cog/y.tab.h"
 #include "Cog/sithCogYACC.h"
-#include "General/stdHashTable.h"
+#include "General/stdHashtbl.h"
 #include "stdPlatform.h"
 #include "Win95/std.h"
 #include "General/stdConffile.h"
@@ -392,7 +392,7 @@ sithCogSymboltable* sithCogParse_AllocSymbolTable(int amt)
     if ( newTable
       && (_memset(newTable, 0, sizeof(sithCogSymboltable)),
           newTable->buckets = (sithCogSymbol *)SITH_ALLOC(sizeof(sithCogSymbol) * amt),
-          newHashtable = stdHashTable_New(2 * amt),
+          newHashtable = stdHashtbl_New(2 * amt),
           buckets = newTable->buckets,
           newTable->hashtable = newHashtable,
           newTable->buckets)
@@ -418,7 +418,7 @@ sithCogSymboltable* sithCogParse_AllocSymbolTable(int amt)
             if ( newTable->buckets )
                 SITH_FREE(newTable->buckets);
             if ( newTable->hashtable )
-                stdHashTable_Free(newTable->hashtable);
+                stdHashtbl_Free(newTable->hashtable);
             SITH_FREE(newTable);
         }
         result = 0;
@@ -443,7 +443,7 @@ int sithCogParse_ReallocSymbolTable(sithCogSymboltable *table)
 
     if ( table->hashtable )
     {
-        stdHashTable_Free(table->hashtable);
+        stdHashtbl_Free(table->hashtable);
         table->hashtable = 0;
     }
     amt = table->entry_cnt;
@@ -498,7 +498,7 @@ void sithCogParse_FreeSymbolTable(sithCogSymboltable *table)
 
     if ( table->hashtable )
     {
-        stdHashTable_Free(table->hashtable);
+        stdHashtbl_Free(table->hashtable);
         table->hashtable = 0;
     }
     v1 = table->buckets;
@@ -559,11 +559,11 @@ sithCogSymbol* sithCogParse_AddSymbol(sithCogSymboltable *table, const char *sym
             _strcpy(key, symbolName);
             symbol->pName = key;
             if ( table->hashtable )
-                stdHashTable_SetKeyVal(table->hashtable, key, symbol);
+                stdHashtbl_Add(table->hashtable, key, symbol);
 #else
             symbol->nameCrc = stdCrc32(symbolName, strlen(symbolName));
             if ( table->hashtable )
-                stdHashTable_SetKeyVal(table->hashtable, symbolName, symbol);
+                stdHashtbl_Add(table->hashtable, symbolName, symbol);
 #endif
             
         }
@@ -599,7 +599,7 @@ sithCogSymbol* sithCogParse_GetSymbol(sithCogSymboltable *pSymbolTable, char *a2
     if (!pSymbolTable->hashtable)
         return NULL;
     
-    if (result = (sithCogSymbol*)stdHashTable_GetKeyVal(pSymbolTable->hashtable, a2))
+    if (result = (sithCogSymbol*)stdHashtbl_Find(pSymbolTable->hashtable, a2))
         return result;
 
     if (pSymbolTable == sithCog_pSymbolTable) {

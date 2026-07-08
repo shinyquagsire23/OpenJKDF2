@@ -33,7 +33,7 @@
 #include "General/stdFont.h"
 #include "General/stdFnames.h"
 #include "General/stdFileUtil.h"
-#include "General/stdHashTable.h"
+#include "General/stdHashtbl.h"
 #include "General/stdLinklist.h"
 #include "General/stdString.h"
 #include "General/stdStrTable.h"
@@ -1393,16 +1393,16 @@ void do_hooks()
     hook_function(stdMci_GetTrackLength_ADDR, stdMci_GetTrackLength);
     
     // stdHashTable
-    hook_function(stdHashTable_HashStringToIdx_ADDR, stdHashTable_HashStringToIdx);
-    hook_function(stdHashTable_New_ADDR, stdHashTable_New);
-    hook_function(stdHashTable_GetBucketTail_ADDR, stdHashTable_GetBucketTail);
-    hook_function(stdHashTable_FreeBuckets_ADDR, stdHashTable_FreeBuckets);
-    hook_function(stdHashTable_Free_ADDR, stdHashTable_Free);
-    hook_function(stdHashTable_SetKeyVal_ADDR, stdHashTable_SetKeyVal);
-    hook_function(stdHashTable_GetKeyVal_ADDR, stdHashTable_GetKeyVal);
-    hook_function(stdHashTable_FreeKey_ADDR, stdHashTable_FreeKey);
-    hook_function(stdHashTable_PrintDiagnostics_ADDR, stdHashTable_PrintDiagnostics);
-    hook_function(stdHashTable_Dump_ADDR, stdHashTable_Dump);
+    hook_function(stdHashtbl_HashStringToIdx_ADDR, stdHashtbl_HashStringToIdx);
+    hook_function(stdHashtbl_New_ADDR, stdHashtbl_New);
+    hook_function(stdHashtbl_GetTailNode_ADDR, stdHashtbl_GetTailNode);
+    hook_function(stdHashtbl_FreeListNodes_ADDR, stdHashtbl_FreeListNodes);
+    hook_function(stdHashtbl_Free_ADDR, stdHashtbl_Free);
+    hook_function(stdHashtbl_Add_ADDR, stdHashtbl_Add);
+    hook_function(stdHashtbl_Find_ADDR, stdHashtbl_Find);
+    hook_function(stdHashtbl_Remove_ADDR, stdHashtbl_Remove);
+    hook_function(stdHashtbl_PrintTableDiagnostics_ADDR, stdHashtbl_PrintTableDiagnostics);
+    hook_function(stdHashtbl_DumpTable_ADDR, stdHashtbl_DumpTable);
 
     // stdLinkList
     hook_function(stdLinklist_InsertAfter_ADDR, stdLinklist_InsertAfter);

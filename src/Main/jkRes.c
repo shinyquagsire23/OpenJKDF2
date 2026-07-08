@@ -13,7 +13,7 @@
 #include "Gui/jkGUIDialog.h"
 #include "Main/jkStrings.h"
 #include "General/stdString.h"
-#include "General/stdHashTable.h"
+#include "General/stdHashtbl.h"
 
 static int jkRes_bInit;
 

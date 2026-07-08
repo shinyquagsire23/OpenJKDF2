@@ -2,7 +2,7 @@
 
 #include "stdPlatform.h" // Added: *_ALLOC/*_FREE macros
 
-#include "General/stdHashTable.h"
+#include "General/stdHashtbl.h"
 #include "General/stdString.h"
 #include "General/stdFnames.h"
 #include "World/sithWorld.h"
@@ -13,7 +13,7 @@
 
 int sithMaterial_Startup()
 {
-    sithMaterial_hashmap = stdHashTable_New(1024);
+    sithMaterial_hashmap = stdHashtbl_New(1024);
     return sithMaterial_hashmap != 0;
 }
 
@@ -21,7 +21,7 @@ void sithMaterial_Shutdown()
 {
     if ( sithMaterial_hashmap )
     {
-        stdHashTable_Free(sithMaterial_hashmap);
+        stdHashtbl_Free(sithMaterial_hashmap);
         sithMaterial_hashmap = 0;
     }
 
@@ -47,7 +47,7 @@ void sithMaterial_FreeWorldMaterials(sithWorld *world)
         v2 = 0;
         do
         {
-            stdHashTable_FreeKey(sithMaterial_hashmap, world->materials[v2].mat_fpath);
+            stdHashtbl_Remove(sithMaterial_hashmap, world->materials[v2].mat_fpath);
             rdMaterial_FreeEntry(&world->materials[v2]);
             ++v1;
             ++v2;
@@ -151,7 +151,7 @@ rdMaterial* sithMaterial_Load(const char *a1, int create_ddraw_surface, int gpu_
     while ( 1 )
     {
         v4 = sithWorld_pLoading;
-        result = (rdMaterial *)stdHashTable_GetKeyVal(sithMaterial_hashmap, a1);
+        result = (rdMaterial *)stdHashtbl_Find(sithMaterial_hashmap, a1);
         if ( result )
             return result;
         v6 = v4->numMaterialsLoaded;
@@ -177,7 +177,7 @@ rdMaterial* sithMaterial_Load(const char *a1, int create_ddraw_surface, int gpu_
 LABEL_10:
         if ( v9 )
         {
-            stdHashTable_SetKeyVal(sithMaterial_hashmap, v8->mat_fpath, v8);
+            stdHashtbl_Add(sithMaterial_hashmap, v8->mat_fpath, v8);
             v10 = v4->level_type_maybe;
             v11 = v4->numMaterialsLoaded;
             v8->id = v11;
@@ -248,7 +248,7 @@ rdVector2* sithMaterial_AllocWorldMaterials(sithWorld *world, int num)
     world->numMaterials = num;
     if ( !sithMaterial_hashmap )
     {
-        sithMaterial_hashmap = stdHashTable_New(1024);
+        sithMaterial_hashmap = stdHashtbl_New(1024);
         if ( !sithMaterial_hashmap )
         {
             SITH_FREE(world->materials);

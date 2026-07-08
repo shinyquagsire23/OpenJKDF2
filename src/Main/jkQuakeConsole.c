@@ -1,6 +1,6 @@
 #include "jkQuakeConsole.h"
 
-#include "General/stdHashTable.h"
+#include "General/stdHashtbl.h"
 #include "General/stdBitmap.h"
 #include "General/stdFont.h"
 #include "General/stdString.h"

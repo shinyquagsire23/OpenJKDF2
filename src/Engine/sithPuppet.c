@@ -1,7 +1,7 @@
 #include "sithPuppet.h"
 
 #include "General/stdMath.h"
-#include "General/stdHashTable.h"
+#include "General/stdHashtbl.h"
 #include "Engine/sithAnimClass.h"
 #include "Gameplay/sithTime.h"
 #include "World/sithSector.h"
@@ -70,15 +70,15 @@ static const char* sithPuppet_animNames[43+2] = {
 
 int sithPuppet_Startup()
 {
-    sithPuppet_hashtable = stdHashTable_New(64);
-    sithPuppet_keyframesHashtable = stdHashTable_New(256);
+    sithPuppet_hashtable = stdHashtbl_New(64);
+    sithPuppet_keyframesHashtable = stdHashtbl_New(256);
 
     if ( sithPuppet_hashtable && sithPuppet_keyframesHashtable )
     {
-        sithPuppet_animNamesToIdxHashtable = stdHashTable_New(SITHPUPPET_NUMANIMS * 2);
+        sithPuppet_animNamesToIdxHashtable = stdHashtbl_New(SITHPUPPET_NUMANIMS * 2);
         for (int i = 1; i < SITHPUPPET_NUMANIMS; i++)
         {
-            stdHashTable_SetKeyVal(sithPuppet_animNamesToIdxHashtable, sithPuppet_animNames[i], (void *)(intptr_t)i);
+            stdHashtbl_Add(sithPuppet_animNamesToIdxHashtable, sithPuppet_animNames[i], (void *)(intptr_t)i);
         }
         return 1;
     }
@@ -93,17 +93,17 @@ void sithPuppet_Shutdown()
 {
     if ( sithPuppet_hashtable )
     {
-        stdHashTable_Free(sithPuppet_hashtable);
+        stdHashtbl_Free(sithPuppet_hashtable);
         sithPuppet_hashtable = 0;
     }
     if ( sithPuppet_keyframesHashtable )
     {
-        stdHashTable_Free(sithPuppet_keyframesHashtable);
+        stdHashtbl_Free(sithPuppet_keyframesHashtable);
         sithPuppet_keyframesHashtable = 0;
     }
     if ( sithPuppet_animNamesToIdxHashtable )
     {
-        stdHashTable_Free(sithPuppet_animNamesToIdxHashtable);
+        stdHashtbl_Free(sithPuppet_animNamesToIdxHashtable);
         sithPuppet_animNamesToIdxHashtable = 0;
     }
 }

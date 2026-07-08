@@ -77,7 +77,7 @@ int stdStrTable_Load(stdStrTable *strtable, char *fpath)
     if ( !strtable->msgs )
         std_pHS->assert("Out of memory--cannot load string table", ".\\General\\stdStrTable.c", 120);
     stdPlatform_Memzero32(strtable->msgs, sizeof(stdStrMsg) * numMsgs); // Added: word-safe
-    strtable->hashtable = stdHashTable_New(numMsgs + (numMsgs/2));
+    strtable->hashtable = stdHashtbl_New(numMsgs + (numMsgs/2));
     if ( !strtable->hashtable )
         std_pHS->assert("Out of memory--cannot load string table", ".\\General\\stdStrTable.c", 126);
     v11 = 1;
@@ -129,7 +129,7 @@ int stdStrTable_Load(stdStrTable *strtable, char *fpath)
                     v19->field_8 = _atoi(v34);
                     stdString_GetQuotedStringContents(v20, v34, 256);
                     v19->uniStr = stdString_CstrCopy(v34);
-                    if ( !stdHashTable_SetKeyVal(strtable->hashtable, v19->key, v19) )
+                    if ( !stdHashtbl_Add(strtable->hashtable, v19->key, v19) )
                         stdPrintf(
                             std_pHS->errorPrint,
                             ".\\General\\stdStrTable.c",
@@ -208,7 +208,7 @@ void stdStrTable_Free(stdStrTable* pTable)
         // Added: Moved
         //pTable->numMsgs = 0;
         //pTable->msgs = 0;
-        stdHashTable_Free(pTable->hashtable);
+        stdHashtbl_Free(pTable->hashtable);
         if ( pTable->msgs )
         {
             for (int i = 0; i < pTable->numMsgs; i++)
@@ -236,7 +236,7 @@ wchar_t* stdStrTable_GetValue(stdStrTable* pTable, const char *key)
     stdStrMsg *v2; // eax
     wchar_t *result; // eax
 
-    if ( pTable->numMsgs && (v2 = (stdStrMsg *)stdHashTable_GetKeyVal(pTable->hashtable, key)) != 0 )
+    if ( pTable->numMsgs && (v2 = (stdStrMsg *)stdHashtbl_Find(pTable->hashtable, key)) != 0 )
         result = v2->uniStr;
     else
         result = 0;
@@ -303,7 +303,7 @@ wchar_t* stdStrTable_GetValueOrKey(stdStrTable* pTable, const char *key)
         return L"(NULL)";
     }
 
-    if ( pTable->numMsgs && (v2 = (stdStrMsg *)stdHashTable_GetKeyVal(pTable->hashtable, key)) != 0 )
+    if ( pTable->numMsgs && (v2 = (stdStrMsg *)stdHashtbl_Find(pTable->hashtable, key)) != 0 )
         result = v2->uniStr;
     else
         result = 0;

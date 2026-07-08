@@ -2,7 +2,7 @@
 
 #include "World/sithWorld.h"
 #include "Primitives/rdParticle.h"
-#include "General/stdHashTable.h"
+#include "General/stdHashtbl.h"
 #include "General/stdConffile.h"
 #include "World/sithMaterial.h"
 #include "Primitives/rdVector.h"
@@ -14,7 +14,7 @@ static stdHashTable *sithParticle_alloc;
 
 int sithParticle_Startup()
 {
-    sithParticle_alloc = stdHashTable_New(128);
+    sithParticle_alloc = stdHashtbl_New(128);
 
     if ( sithParticle_alloc )
         return 1;
@@ -27,7 +27,7 @@ void sithParticle_Shutdown()
 {
     if ( sithParticle_alloc )
     {
-        stdHashTable_Free(sithParticle_alloc);
+        stdHashtbl_Free(sithParticle_alloc);
         sithParticle_alloc = 0;
     }
 }
@@ -53,7 +53,7 @@ rdParticle* sithParticle_Load(const char *a1)
             _memset(v2, 0, SITHPARTICLE_MAX_PARTICLES * sizeof(rdParticle));
         }
     }
-    result = (rdParticle *)stdHashTable_GetKeyVal(sithParticle_alloc, a1);
+    result = (rdParticle *)stdHashtbl_Find(sithParticle_alloc, a1);
     if ( !result )
     {
         v4 = v1->numParticlesLoaded;
@@ -63,7 +63,7 @@ rdParticle* sithParticle_Load(const char *a1)
             _sprintf(v6, "%s%c%s", "misc\\par", '\\', a1);
             if ( rdParticle_LoadEntry(v6, v5) )
             {
-                stdHashTable_SetKeyVal(sithParticle_alloc, v5->name, v5);
+                stdHashtbl_Add(sithParticle_alloc, v5->name, v5);
                 ++v1->numParticlesLoaded;
                 result = v5;
             }
@@ -360,7 +360,7 @@ void sithParticle_FreeWorldParticles(sithWorld *world)
 
     for (int i = 0; i < world->numParticlesLoaded; i++)
     {
-        stdHashTable_FreeKey(sithParticle_alloc, world->particles[i].name);
+        stdHashtbl_Remove(sithParticle_alloc, world->particles[i].name);
         rdParticle_FreeEntry(&world->particles[i]);
     }
     

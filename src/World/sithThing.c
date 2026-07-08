@@ -1,6 +1,6 @@
 #include "sithThing.h"
 
-#include "General/stdHashTable.h"
+#include "General/stdHashtbl.h"
 #include "General/util.h"
 #include "General/stdString.h"
 #include "World/jkPlayer.h"
@@ -154,14 +154,14 @@ int sithThing_Startup()
 
     if ( !sithThing_bInitted )
     {
-        sithThing_paramKeyToParamValMap = stdHashTable_New((NUM_THING_PARAMS+1) * 2);
+        sithThing_paramKeyToParamValMap = stdHashtbl_New((NUM_THING_PARAMS+1) * 2);
         if ( sithThing_paramKeyToParamValMap )
         {
             v1 = 1;
             v2 = (const char **)sithThing_aParams;
             while ( 1 )
             {
-                stdHashTable_SetKeyVal(sithThing_paramKeyToParamValMap, *v2++, (void *)(intptr_t)v1++);
+                stdHashtbl_Add(sithThing_paramKeyToParamValMap, *v2++, (void *)(intptr_t)v1++);
                 if ( (intptr_t)v2 >= (intptr_t)&sithThing_aParams[NUM_THING_PARAMS] )
                     break;
             }
@@ -176,7 +176,7 @@ int sithThing_Shutdown()
 {
     if ( !sithThing_bInitted )
         return 0;
-    stdHashTable_Free(sithThing_paramKeyToParamValMap);
+    stdHashtbl_Free(sithThing_paramKeyToParamValMap);
     sithThing_bInitted = 0;
     return 1;
 }
@@ -1578,7 +1578,7 @@ int sithThing_ParseArg(stdConffileArg *arg, sithThing* pThing)
     int32_t v8; // eax
 
     v2 = 0;
-    param = (int)(intptr_t)stdHashTable_GetKeyVal(sithThing_paramKeyToParamValMap, arg->key);
+    param = (int)(intptr_t)stdHashtbl_Find(sithThing_paramKeyToParamValMap, arg->key);
     paramIdx = param;
     if ( !param )
         return 0;

@@ -26,7 +26,7 @@ int sithCvar_Startup()
     if (sithCvar_bInitted) return 1;
 
     sithCvar_numRegistered = 0;
-    sithCvar_pHashTable = stdHashTable_New(SITHCVAR_MAX_CVARS * 2);
+    sithCvar_pHashTable = stdHashtbl_New(SITHCVAR_MAX_CVARS * 2);
     memset(sithCvar_aCvars, 0, sizeof(sithCvar_aCvars));
 
     sithCvar_bInitted = 1;
@@ -62,7 +62,7 @@ void sithCvar_Shutdown()
     memset(sithCvar_aCvars, 0, sizeof(sithCvar_aCvars));
     if ( sithCvar_pHashTable )
     {
-        stdHashTable_Free(sithCvar_pHashTable);
+        stdHashtbl_Free(sithCvar_pHashTable);
         sithCvar_pHashTable = 0;
     }
     sithCvar_numRegistered = 0;
@@ -224,7 +224,7 @@ tSithCvar* sithCvar_Find(const char* pName)
     stdString_SafeStrCopy(tmp, pName, SITHCVAR_MAX_NAME_STRLEN);
     _strtolower(tmp);
 
-    tSithCvar* pCvar = (tSithCvar*)stdHashTable_GetKeyVal(sithCvar_pHashTable, tmp);
+    tSithCvar* pCvar = (tSithCvar*)stdHashtbl_Find(sithCvar_pHashTable, tmp);
     return pCvar;
 }
 
@@ -268,7 +268,7 @@ int sithCvar_Register(const char* pName, int32_t type, intptr_t defaultVal, void
     memset((void*)pCvar->pNameLower, 0, SITHCVAR_MAX_NAME_STRLEN);
     stdString_SafeStrCopy((char*)pCvar->pNameLower, pName, SITHCVAR_MAX_NAME_STRLEN);
     _strtolower((char*)pCvar->pNameLower);
-    stdHashTable_SetKeyVal(sithCvar_pHashTable, pCvar->pNameLower, pCvar);
+    stdHashtbl_Add(sithCvar_pHashTable, pCvar->pNameLower, pCvar);
 
     sithCvar_UpdateLinkInternal(pCvar);
 

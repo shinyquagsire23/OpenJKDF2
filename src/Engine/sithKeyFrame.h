@@ -1,7 +1,7 @@
 #ifndef _SITHKEYFRAME_H
 #define _SITHKEYFRAME_H
 
-#include "General/stdHashTable.h"
+#include "General/stdHashtbl.h"
 #include "World/sithWorld.h"
 
 #define sithKeyFrame_Load_ADDR (0x004E55B0)

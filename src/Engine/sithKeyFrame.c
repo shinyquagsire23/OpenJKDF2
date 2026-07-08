@@ -90,7 +90,7 @@ rdKeyframe* sithKeyFrame_LoadEntry(const char *fpath)
         return NULL;
 
     _sprintf(key_fpath, "%s%c%s", "3do\\key", 92, fpath);
-    keyframe = (rdKeyframe *)stdHashTable_GetKeyVal(sithPuppet_keyframesHashtable, fpath);
+    keyframe = (rdKeyframe *)stdHashtbl_Find(sithPuppet_keyframesHashtable, fpath);
 
     // Keyframe already loaded
     if (keyframe)
@@ -112,9 +112,9 @@ rdKeyframe* sithKeyFrame_LoadEntry(const char *fpath)
     }
 
 #ifdef SITH_DEBUG_STRUCT_NAMES
-    stdHashTable_SetKeyVal(sithPuppet_keyframesHashtable, keyframe->name, keyframe);
+    stdHashtbl_Add(sithPuppet_keyframesHashtable, keyframe->name, keyframe);
 #else
-    stdHashTable_SetKeyVal(sithPuppet_keyframesHashtable, stdFileFromPath(key_fpath), keyframe);
+    stdHashtbl_Add(sithPuppet_keyframesHashtable, stdFileFromPath(key_fpath), keyframe);
 #endif
     ++world->numKeyframesLoaded;
     return keyframe;
@@ -141,9 +141,9 @@ void sithKeyFrame_Free(sithWorld *world)
     for (int idx = 0; idx < world->numKeyframesLoaded; idx++)
     {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-        stdHashTable_FreeKey(sithPuppet_keyframesHashtable, world->keyframes[idx].name);
+        stdHashtbl_Remove(sithPuppet_keyframesHashtable, world->keyframes[idx].name);
 #else
-        stdHashTable_FreeKeyCrc32(sithPuppet_keyframesHashtable, world->keyframes[idx].namecrc);
+        stdHashtbl_FreeKeyCrc32(sithPuppet_keyframesHashtable, world->keyframes[idx].namecrc);
 #endif
         rdKeyframe_FreeEntry(&world->keyframes[idx]);
     }

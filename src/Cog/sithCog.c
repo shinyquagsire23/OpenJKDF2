@@ -22,7 +22,7 @@
 #include "Gameplay/sithTime.h"
 #include "World/sithSurface.h"
 #include "AI/sithAIClass.h"
-#include "General/stdHashTable.h"
+#include "General/stdHashtbl.h"
 #include "General/stdString.h"
 #include "World/sithSector.h"
 #include "World/sithThing.h"
@@ -48,7 +48,7 @@ int32_t sithCog_Startup()
         return 0;
     }
   
-    sithCog_pScriptHashtable = stdHashTable_New(256);
+    sithCog_pScriptHashtable = stdHashtbl_New(256);
     if (!sithCog_pScriptHashtable)
     {
         stdPrintf(pSithHS->errorPrint, ".\\Cog\\sithCog.c", 124, "Could not allocate COG hashtable.");
@@ -392,7 +392,7 @@ void sithCog_Shutdown()
     sithCogParse_FreeSymbolTable(sithCog_pSymbolTable);
     if ( sithCog_pScriptHashtable )
     {
-        stdHashTable_Free(sithCog_pScriptHashtable);
+        stdHashtbl_Free(sithCog_pScriptHashtable);
         sithCog_pScriptHashtable = 0;
     }
     sithCogParse_FreeParseTree();
@@ -635,7 +635,7 @@ sithCog* sithCog_Load(const char *fpath)
         cog->selfCog |= 0x8000;
     }
     _sprintf(cog_fpath, "%s%c%s", "cog", '\\', fpath);
-    v7 = (sithCogScript *)stdHashTable_GetKeyVal(sithCog_pScriptHashtable, fpath);
+    v7 = (sithCogScript *)stdHashtbl_Find(sithCog_pScriptHashtable, fpath);
     if ( v7 )
     {
         v8 = v7;
@@ -645,7 +645,7 @@ sithCog* sithCog_Load(const char *fpath)
         v9 = sithWorld_pLoading->numCogScriptsLoaded;
         if ( v9 < sithWorld_pLoading->numCogScripts && (v8 = &sithWorld_pLoading->cogScripts[v9], sithCogParse_Load(cog_fpath, v8, 0)) )
         {
-            stdHashTable_SetKeyVal(sithCog_pScriptHashtable, cog_fpath, v8); // Added: v8 -> no v8 for cog_fpath
+            stdHashtbl_Add(sithCog_pScriptHashtable, cog_fpath, v8); // Added: v8 -> no v8 for cog_fpath
             ++sithWorld_pLoading->numCogScriptsLoaded;
         }
         else
@@ -1480,9 +1480,9 @@ void sithCog_FreeWorldCogs(sithWorld *world)
                 v4->script_program = 0;
             }
 #ifdef STDHASHTABLE_CRC32_KEYS
-            stdHashTable_FreeKeyCrc32(sithCog_pScriptHashtable, v4->pathCrc);
+            stdHashtbl_FreeKeyCrc32(sithCog_pScriptHashtable, v4->pathCrc);
 #else
-            stdHashTable_FreeKey(sithCog_pScriptHashtable, v4->cog_fpath);
+            stdHashtbl_Remove(sithCog_pScriptHashtable, v4->cog_fpath);
 #endif
         }
         SITH_FREE(world->cogScripts);
@@ -1599,7 +1599,7 @@ sithCogScript* sithCog_LoadScript(const char *pFpath, int32_t unk)
     char v6[128]; // [esp+8h] [ebp-80h] BYREF
 
     _sprintf(v6, "%s%c%s", "cog", '\\', pFpath);
-    result = (sithCogScript *)stdHashTable_GetKeyVal(sithCog_pScriptHashtable, pFpath);
+    result = (sithCogScript *)stdHashtbl_Find(sithCog_pScriptHashtable, pFpath);
     if ( !result )
     {
         v4 = sithWorld_pLoading->numCogScriptsLoaded;
@@ -1607,9 +1607,9 @@ sithCogScript* sithCog_LoadScript(const char *pFpath, int32_t unk)
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
             // The copies of names are load-bearing, SetKeyVal stores a reference
-            stdHashTable_SetKeyVal(sithCog_pScriptHashtable, v5->cog_fpath, v5);
+            stdHashtbl_Add(sithCog_pScriptHashtable, v5->cog_fpath, v5);
 #else
-            stdHashTable_SetKeyVal(sithCog_pScriptHashtable, pFpath, v5);
+            stdHashtbl_Add(sithCog_pScriptHashtable, pFpath, v5);
 #endif
             ++sithWorld_pLoading->numCogScriptsLoaded;
             result = v5;

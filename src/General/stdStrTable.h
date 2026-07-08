@@ -2,7 +2,7 @@
 #define _STDSTRTABLE_H
 
 #include <stddef.h>
-#include "General/stdHashTable.h"
+#include "General/stdHashtbl.h"
 
 #define stdStrTable_Load_ADDR (0x004359B0)
 #define stdStrTable_Free_ADDR (0x00435F30)
