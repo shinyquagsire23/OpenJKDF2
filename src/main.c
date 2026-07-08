@@ -1569,10 +1569,10 @@ void do_hooks()
     hook_function(stdMemory_Startup_ADDR, stdMemory_Startup);
     hook_function(stdMemory_Shutdown_ADDR, stdMemory_Shutdown);
     hook_function(stdMemory_Open_ADDR, stdMemory_Open);
-    hook_function(stdMemory_Dump_ADDR, stdMemory_Dump);
-    hook_function(stdMemory_BlockAlloc_ADDR, stdMemory_BlockAlloc);
-    hook_function(stdMemory_BlockFree_ADDR, stdMemory_BlockFree);
-    hook_function(stdMemory_BlockRealloc_ADDR, stdMemory_BlockRealloc);
+    hook_function(stdMemory_Close_ADDR, stdMemory_Close);
+    hook_function(stdMemory_Malloc_ADDR, stdMemory_Malloc);
+    hook_function(stdMemory_Free_ADDR, stdMemory_Free);
+    hook_function(stdMemory_Realloc_ADDR, stdMemory_Realloc);
     
     // rdroid
     hook_function(rdStartup_ADDR, rdStartup);

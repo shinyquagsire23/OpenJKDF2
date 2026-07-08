@@ -1016,10 +1016,10 @@ stdLbm_Compress	.text	0043A030	00000175	00000008	00000001	R	.	.	.	.	.	.	.
 stdMemory_Startup	.text	0043A1C0	0000001B	00000004	00000000	R	.	.	.	.	.	T	.
 stdMemory_Shutdown	.text	0043A1E0	0000000B	00000000	00000000	R	.	.	.	.	.	.	.
 stdMemory_Open	.text	0043A1F0	00000017	00000000	00000000	R	.	.	.	.	.	.	.
-stdMemory_Dump	.text	0043A210	00000071	00000000	00000000	R	.	.	.	.	.	T	.
-stdMemory_BlockAlloc	.text	0043A290	000000AD	00000004	0000000C	R	.	.	.	.	.	T	.
-stdMemory_BlockFree	.text	0043A340	00000060	00000008	00000004	R	.	.	.	.	.	T	.
-stdMemory_BlockRealloc	.text	0043A3A0	000000FF	00000008	00000010	R	.	.	.	.	.	T	.
+stdMemory_Close	.text	0043A210	00000071	00000000	00000000	R	.	.	.	.	.	T	.
+stdMemory_Malloc	.text	0043A290	000000AD	00000004	0000000C	R	.	.	.	.	.	T	.
+stdMemory_Free	.text	0043A340	00000060	00000008	00000004	R	.	.	.	.	.	T	.
+stdMemory_Realloc	.text	0043A3A0	000000FF	00000008	00000010	R	.	.	.	.	.	T	.
 daAlloc	.text	0043A4A0	000001D6	00000010	00000004	R	.	.	.	.	.	T	.
 daFree	.text	0043A680	000000D2	00000008	00000004	R	.	.	.	.	.	T	.
 daRealloc	.text	0043A760	0000008E	00000010	00000008	R	.	.	.	.	.	.	.

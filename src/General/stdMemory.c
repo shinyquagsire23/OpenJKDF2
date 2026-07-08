@@ -22,7 +22,7 @@ int stdMemory_Open()
     return 1;
 }
 
-void stdMemory_Dump()
+void stdMemory_Close()
 {
     stdMemoryAlloc *iter; // eax
     stdMemoryAlloc *iterNext; // esi
@@ -48,7 +48,7 @@ void stdMemory_Dump()
     stdMemory_bOpened = 0;
 }
 
-stdMemoryAlloc* stdMemory_BlockAlloc(unsigned int allocSize, char *filePath, int lineNum)
+stdMemoryAlloc* stdMemory_Malloc(unsigned int allocSize, char *filePath, int lineNum)
 {
     stdMemoryAlloc *result; // eax
     stdMemoryAlloc *v4; // edx
@@ -83,7 +83,7 @@ stdMemoryAlloc* stdMemory_BlockAlloc(unsigned int allocSize, char *filePath, int
     return result;
 }
 
-void stdMemory_BlockFree(stdMemoryAlloc *alloc)
+void stdMemory_Free(stdMemoryAlloc *alloc)
 {
     stdMemoryAlloc *v1; // edx
     stdMemoryAlloc *v2; // eax
@@ -103,7 +103,7 @@ void stdMemory_BlockFree(stdMemoryAlloc *alloc)
     STD_FREE(v1);
 }
 
-stdMemoryAlloc* stdMemory_BlockRealloc(stdMemoryAlloc *alloc, int allocSize, char *filePath, int lineNum)
+stdMemoryAlloc* stdMemory_Realloc(stdMemoryAlloc *alloc, int allocSize, char *filePath, int lineNum)
 {
     stdMemoryAlloc *result; // eax
     stdMemoryAlloc *v5; // edx
@@ -116,7 +116,7 @@ stdMemoryAlloc* stdMemory_BlockRealloc(stdMemoryAlloc *alloc, int allocSize, cha
     unsigned int v12; // edx
 
     if ( !alloc )
-        return stdMemory_BlockAlloc(allocSize, filePath, lineNum);
+        return stdMemory_Malloc(allocSize, filePath, lineNum);
     if ( allocSize )
     {
         v9 = alloc[-1].size;
