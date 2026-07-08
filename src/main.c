@@ -2496,10 +2496,10 @@ void do_hooks()
     // sithSave
     hook_function(sithGamesave_Setidk_ADDR, sithGamesave_Setidk);
     hook_function(sithGamesave_GetProfilePath_ADDR, sithGamesave_GetProfilePath);
-    hook_function(sithGamesave_Load_ADDR, sithGamesave_Load);
-    hook_function(sithGamesave_LoadEntry_ADDR, sithGamesave_LoadEntry);
-    hook_function(sithGamesave_Write_ADDR, sithGamesave_Write);
-    hook_function(sithGamesave_Flush_ADDR, sithGamesave_Flush);
+    hook_function(sithGamesave_Restore_ADDR, sithGamesave_Restore);
+    hook_function(sithGamesave_RestoreFile_ADDR, sithGamesave_RestoreFile);
+    hook_function(sithGamesave_Save_ADDR, sithGamesave_Save);
+    hook_function(sithGamesave_Process_ADDR, sithGamesave_Process);
 
     // sithSound
     hook_function(sithSound_Startup_ADDR, sithSound_Startup);

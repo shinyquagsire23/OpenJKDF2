@@ -266,13 +266,13 @@ int jkPlayer_LoadAutosave()
     jkPlayer_bLoadingSomething = 1;
     stdString_snprintf(tmp, 128, "%s%s", "_JKAUTO_", sithGamesave_AutosaveMapName()); // Added: single-slot on DC
     stdFnames_ChangeExt(tmp, "jks");
-    return sithGamesave_Load(tmp, 0, 0);
+    return sithGamesave_Restore(tmp, 0, 0);
 }
 
 int jkPlayer_LoadSave(char *path)
 {
     jkPlayer_bLoadingSomething = 1;
-    return sithGamesave_Load(path, 0, 1);
+    return sithGamesave_Restore(path, 0, 1);
 }
 
 void jkPlayer_Startup()

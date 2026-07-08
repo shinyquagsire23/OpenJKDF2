@@ -432,8 +432,8 @@ LABEL_44:
             v28 = jkGuiSaveLoad_aElements[2].wstr;
             v22 = jkGuiTitle_quicksave_related_func1(&jkCog_strings, sithWorld_pCurrentWorld->map_jkl_fname);
             jk_snwprintf(v31, 0x100u, L"%s~%s", v22, v28);
-            sithGamesave_Write(v30, 1, 1, v31);
-            sithGamesave_Flush();
+            sithGamesave_Save(v30, 1, 1, v31);
+            sithGamesave_Process();
             goto LABEL_45;
         }
         v27 = jkStrings_GetUniStringWithFallback("GUI_SLCONFIRM_OVERWRITE");

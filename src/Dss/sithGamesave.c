@@ -91,7 +91,7 @@ void sithGamesave_DcFlushSlimToVmu(void)
 
     stdString_snprintf(name, sizeof(name), "_JKAUTO_dcauto.jks");
     sithGamesave_bForceSlim = 1;
-    sithGamesave_Write(name, 1, 0, 0);
+    sithGamesave_Save(name, 1, 0, 0);
     sithGamesave_bForceSlim = 0;
 
     _strncpy(sithGamesave_autosave_fname, savedFname, 0x7Fu);
@@ -122,7 +122,7 @@ int sithGamesave_GetProfilePath(char *out, int outSize, char *a3)
 
 // write
 
-int sithGamesave_Load(char *saveFname, int debugNextCheckpoint, int a3)
+int sithGamesave_Restore(char *saveFname, int debugNextCheckpoint, int a3)
 {
     char playerName[32]; // [esp+0h] [ebp-A0h] BYREF
     char fpath[128]; // [esp+20h] [ebp-80h] BYREF
@@ -151,14 +151,14 @@ int sithGamesave_Load(char *saveFname, int debugNextCheckpoint, int a3)
         }
         else
         {
-            return sithGamesave_LoadEntry(fpath);
+            return sithGamesave_RestoreFile(fpath);
         }
     }
     return 0;
 }
 
 // MOTS altered
-int sithGamesave_LoadEntry(char *fpath)
+int sithGamesave_RestoreFile(char *fpath)
 {
     uint32_t curMs; // [esp+Ch] [ebp-650h] BYREF
     char SrcStr[32]; // [esp+10h] [ebp-64Ch] BYREF
@@ -414,7 +414,7 @@ int sithGamesave_SerializeInventoryOnly(int mpFlags)
     return 1;
 }
 
-int sithGamesave_SerializeAllThings(int mpFlags)
+int sithGamesave_SaveCurrentWorld(int mpFlags)
 {
     uint32_t v15; // ebx
     int v16; // ebp
@@ -501,7 +501,7 @@ int sithGamesave_SerializeAllThings(int mpFlags)
     return 1;
 }
 
-int sithGamesave_Write(char *saveFname, int a2, int a3, wchar_t *saveName)
+int sithGamesave_Save(char *saveFname, int a2, int a3, wchar_t *saveName)
 {
     wchar_t *v5; // esi
     flex32_t *v7; // eax
@@ -579,11 +579,11 @@ int sithGamesave_Write(char *saveFname, int a2, int a3, wchar_t *saveName)
     }
 }
 
-int sithGamesave_Flush()
+int sithGamesave_Process()
 {
     if ( sithGamesave_currentState == SITH_GS_LOAD )
     {
-        if ( sithGamesave_LoadEntry(sithGamesave_fpath) )
+        if ( sithGamesave_RestoreFile(sithGamesave_fpath) )
         {
             sithGamesave_currentState = SITH_GS_NONE;
             return 1;
@@ -597,7 +597,7 @@ int sithGamesave_Flush()
     {
         if ( sithGamesave_currentState != SITH_GS_LOAD_DEBUG_NEXTCHECKPOINT)
             return sithGamesave_currentState - SITH_GS_LOAD_DEBUG_NEXTCHECKPOINT;
-        if ( sithGamesave_LoadEntry(sithGamesave_fpath) )
+        if ( sithGamesave_RestoreFile(sithGamesave_fpath) )
         {
             sithPlayer_debug_ToNextCheckpoint(sithPlayer_pLocalPlayerThing);
             sithGamesave_currentState = SITH_GS_NONE;
@@ -636,11 +636,11 @@ int sithGamesave_Flush()
         // written alongside a full SD save). The /ram death/restart autosave is
         // always full -- the flat ramdisk holds it and restart needs it.
         if ((dcStorage_HasFilesystem() || bRamAutosave) && !sithGamesave_bForceSlim)
-            sithGamesave_SerializeAllThings(4);
+            sithGamesave_SaveCurrentWorld(4);
         else
             sithGamesave_SerializeInventoryOnly(4);
 #else
-        sithGamesave_SerializeAllThings(4);
+        sithGamesave_SaveCurrentWorld(4);
 #endif
         if ( sithGamesave_func1 )
             sithGamesave_func1();

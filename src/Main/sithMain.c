@@ -408,7 +408,7 @@ int sithMain_Tick()
         
         sithConsole_Flush();
         sithMulti_HandleTimeLimit(sithTime_deltaMs);
-        sithGamesave_Flush();
+        sithGamesave_Process();
 
         sithMain_tickEndMs = stdPlatform_GetTimeMsec();
 
@@ -546,7 +546,7 @@ void sithMain_AutoSave()
     {
         stdString_snprintf(v5, 128, "%s%s", "_JKAUTO_", sithGamesave_AutosaveMapName()); // Added: single-slot on DC
         stdFnames_ChangeExt(v5, "jks");
-        int dbg_wr = sithGamesave_Write(v5, 1, 0, 0);
+        int dbg_wr = sithGamesave_Save(v5, 1, 0, 0);
 #ifdef TARGET_DREAMCAST
         // Added: on SD the write above is the full autosave; also drop a slim copy
         // on the VMU so the card always carries a resume point.

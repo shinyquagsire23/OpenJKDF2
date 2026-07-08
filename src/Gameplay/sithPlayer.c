@@ -270,11 +270,11 @@ void sithPlayer_debug_loadauto(sithThing *player)
     {
         sithPlayer_debug_ToNextCheckpoint(player);
     }
-    else if ( !sithGamesave_Load(sithGamesave_autosave_fname, 0, 0) )
+    else if ( !sithGamesave_Restore(sithGamesave_autosave_fname, 0, 0) )
     {
         stdString_snprintf(v1, 128, "%s%s", "_JKAUTO_", sithGamesave_AutosaveMapName()); // Added: single-slot on DC
         stdFnames_ChangeExt(v1, "jks");
-        sithGamesave_Load(v1, 0, 0);
+        sithGamesave_Restore(v1, 0, 0);
     }
     sithSoundMixer_ResumeMusic(1);
     player->type = SITH_THING_PLAYER;

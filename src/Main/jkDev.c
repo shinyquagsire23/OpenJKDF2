@@ -611,7 +611,7 @@ int jkDev_Custom_CmdJumpNextCheckpoint(stdDebugConsoleCmd* pCmd, const char* pAr
     jkPlayer_bLoadingSomething = 1;
     stdString_snprintf(tmp, 128, "%s%s", "_JKAUTO_", sithGamesave_AutosaveMapName()); // Added: single-slot on DC
     stdFnames_ChangeExt(tmp, "jks");
-    return sithGamesave_Load(tmp, 1, 0);
+    return sithGamesave_Restore(tmp, 1, 0);
 }
 
 int jkDev_CmdDebugFlags(stdDebugConsoleCmd *pCmd, const char *pArgStr)

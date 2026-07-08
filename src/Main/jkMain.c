@@ -564,7 +564,7 @@ void jkMain_GameplayShow(int a1, int a2)
 #ifdef JKM_DSS
             jkPlayer_SetAmmoMaximums(0);
 #endif
-            v3 = sithGamesave_Load(jkMain_aLevelJklFname, 0, 1);
+            v3 = sithGamesave_Restore(jkMain_aLevelJklFname, 0, 1);
         }
         else if ( jkSmack_gameMode == 2 )
         {

@@ -1535,7 +1535,7 @@ void sithCogFunction_AutoSaveGame(sithCog *ctx)
 
     stdString_snprintf(tmp, 128, "%s%s", "_JKAUTO_", sithGamesave_AutosaveMapName()); // Added: single-slot on DC
     stdFnames_ChangeExt(tmp, "jks");
-    sithGamesave_Write(tmp, 1, 0, 0);
+    sithGamesave_Save(tmp, 1, 0, 0);
 }
 
 void sithCogFunction_SetCameraFocii(sithCog *ctx)
