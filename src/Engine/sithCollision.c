@@ -846,7 +846,7 @@ LABEL_78:
     if (!(g_debugmodeFlags & DEBUGFLAG_NOCLIP) || pThing != sithPlayer_pLocalPlayerThing)
     {
         if ( v5->moveType == SITH_MT_PHYSICS )
-            sithPhysics_ThingStop(v5);
+            sithPhysics_ResetThingMovement(v5);
     }
 LABEL_81:
     
@@ -1018,9 +1018,9 @@ int sithCollision_ThingCollisionHandler(sithThing *thing1, sithThing *thing2, si
                 / (v5->physicsParams.mass + v4->physicsParams.mass);
 
         rdVector_Scale3(&forceVec, &a2, v6 * senderb);
-        sithPhysics_ThingApplyForce(v4, &forceVec);
+        sithPhysics_ApplyForce(v4, &forceVec);
         rdVector_Neg3Acc(&forceVec);
-        sithPhysics_ThingApplyForce(v5, &forceVec);
+        sithPhysics_ApplyForce(v5, &forceVec);
         return sithCollision_CollideHurt(v4, &a2, a3->distance, 0);
     }
     sender = 0.0f;

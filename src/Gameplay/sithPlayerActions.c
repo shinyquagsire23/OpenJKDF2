@@ -171,7 +171,7 @@ void sithPlayerActions_WarpToCheckpoint(sithThing *thing, int idx)
         }
         if ( thing->moveType == SITH_MT_PHYSICS )
         {
-            sithPhysics_ThingStop(thing);
+            sithPhysics_ResetThingMovement(thing);
             thing->physicsParams.physflags &= ~SITH_PF_100;
             sithPhysics_FindFloor(thing, 1);
         }

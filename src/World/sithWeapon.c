@@ -149,7 +149,7 @@ void sithWeapon_sub_4D35E0(sithThing *weapon)
                 if ( damageReceiver->moveType == SITH_MT_PHYSICS && MOTS_ONLY_FLAG(damageReceiver->type != SITH_THING_COG))
                 {
                     rdVector_Scale3(&tmp2, &weaponPos_, weapon->weaponParams.force);
-                    sithPhysics_ThingApplyForce(damageReceiver, &tmp2);
+                    sithPhysics_ApplyForce(damageReceiver, &tmp2);
                 }
             }
         }
@@ -336,7 +336,7 @@ void sithWeapon_sub_4D3920(sithThing *weapon)
                     tmp2.x = weapon->weaponParams.force * lookOrient.x;
                     tmp2.y = weapon->weaponParams.force * lookOrient.y;
                     tmp2.z = weapon->weaponParams.force * lookOrient.z;
-                    sithPhysics_ThingApplyForce(receiveThing, &tmp2);
+                    sithPhysics_ApplyForce(receiveThing, &tmp2);
                 }
             }
         }
@@ -573,7 +573,7 @@ sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileT
         }
         if ( a9 > 0.02 )
         {
-            sithPhysics_ThingTick(v9, a9);
+            sithPhysics_UpdateThing(v9, a9);
             v17 = rdVector_Normalize3(&a5a, &v9->physicsParams.velocityMaybe);
             if ( v17 > 0.0 )
             {
@@ -706,12 +706,12 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
         if (!(physicsThing->weaponParams.typeflags & SITH_WF_ATTACH_TO_WALL)) {
             return sithCollision_ThingCollisionHandler(physicsThing, collidedThing, a4, a5);
         }
-        sithPhysics_ThingStop(physicsThing);
+        sithPhysics_ResetThingMovement(physicsThing);
         sithSoundClass_StopMode(physicsThing, SITH_PF_USEGRAVITY);
         sithSoundClass_PlayModeFirst(physicsThing, SITH_SC_HITHARD);
         physicsThing->moveSize = 0.0;
         sithThing_AttachThing(physicsThing, collidedThing);
-        sithPhysics_ThingSetLook(physicsThing, &a4->hitNorm, 0.0);
+        sithPhysics_SetThingLook(physicsThing, &a4->hitNorm, 0.0);
         
         physicsThing->attach_flags |= SITH_ATTACH_NO_MOVE;
         physicsThing->physicsParams.physflags |= SITH_PF_USEGRAVITY;
@@ -748,7 +748,7 @@ int sithWeapon_Collide(sithThing *physicsThing, sithThing *collidedThing, sithCo
         }
         if (!(physicsThing->weaponParams.typeflags & SITH_WF_ATTACH_TO_THING))
             return 1;
-        sithPhysics_ThingStop(physicsThing);
+        sithPhysics_ResetThingMovement(physicsThing);
         sithThing_AttachThing(physicsThing, collidedThing);
 
         physicsThing->attach_flags |= SITH_ATTACH_NO_MOVE;
@@ -828,11 +828,11 @@ int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithCollisionSea
         else
         {
             sithCollision_HandleThingHitSurface(thing, surface, a3);
-            sithPhysics_ThingStop(thing);
+            sithPhysics_ResetThingMovement(thing);
             sithSoundClass_StopMode(thing, SITH_SC_CREATE);
             thing->moveSize = 0.0;
             sithThing_AttachToSurface(thing, surface, 0);
-            sithPhysics_ThingSetLook(thing, &surface->surfaceInfo.face.normal, 0.0);
+            sithPhysics_SetThingLook(thing, &surface->surfaceInfo.face.normal, 0.0);
             thing->physicsParams.physflags |= SITH_PF_NOTHRUST;
             result = 1;
         }

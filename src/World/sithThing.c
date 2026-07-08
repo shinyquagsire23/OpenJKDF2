@@ -273,7 +273,7 @@ void sithThing_TickAll(flex_t deltaSeconds, int deltaMs)
 #ifdef TARGET_RETRO_HOMEBREW
                 if (bCanAlwaysUpdatePhysics || pThingIter->lastRenderedTickIdx >= jkPlayer_currentTickIdx-3 || bCanUpdateOffscreen)
 #endif
-                sithPhysics_ThingTick(pThingIter, deltaSeconds);
+                sithPhysics_UpdateThing(pThingIter, deltaSeconds);
             }
             else if ( pThingIter->moveType == SITH_MT_PATH )
             {
@@ -1611,7 +1611,7 @@ LABEL_10:
         return 1;
     if ( pThing->moveType == SITH_MT_PHYSICS )
     {
-        v8 = sithPhysics_LoadThingParams(arg, pThing, paramIdx);
+        v8 = sithPhysics_ParseArg(arg, pThing, paramIdx);
     }
     else
     {

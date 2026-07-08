@@ -1972,8 +1972,8 @@ void do_hooks()
     hook_function(sithAIAwareness_Close_ADDR, sithAIAwareness_Close);
     hook_function(sithAIAwareness_sub_4F2B10_ADDR, sithAIAwareness_ProcessEvents);
     hook_function(sithPhysics_ApplyDrag_ADDR, sithPhysics_ApplyDrag);
-    hook_function(sithPhysics_ThingPhysGeneral_ADDR, sithPhysics_ThingPhysGeneral);
-    hook_function(sithPhysics_ThingPhysPlayer_ADDR, sithPhysics_ThingPhysPlayer);
+    hook_function(sithPhysics_UpdateThingPhysics_ADDR, sithPhysics_UpdateThingPhysics);
+    hook_function(sithPhysics_UpdatePlayerPhysics_ADDR, sithPhysics_UpdatePlayerPhysics);
     hook_function(sithRenderSky_Update_ADDR, sithRenderSky_Update);
     hook_function(sithSector_New_ADDR, sithSector_New);
     hook_function(sithSector_NewEntry_ADDR, sithSector_NewEntry);
@@ -1983,13 +1983,13 @@ void do_hooks()
     hook_function(sithPlayer_sub_4C93F0_ADDR, sithPlayer_GetBinItemActive);
     hook_function(sithPlayer_idk2_ADDR, sithPlayer_GetBinItemAvailable);
     hook_function(sithRenderSky_HorizonFaceToPlane_ADDR, sithRenderSky_HorizonFaceToPlane);
-    hook_function(sithPhysics_ThingSetLook_ADDR, sithPhysics_ThingSetLook);
-    hook_function(sithPhysics_ThingApplyForce_ADDR, sithPhysics_ThingApplyForce);
+    hook_function(sithPhysics_SetThingLook_ADDR, sithPhysics_SetThingLook);
+    hook_function(sithPhysics_ApplyForce_ADDR, sithPhysics_ApplyForce);
     hook_function(sithRenderSky_CeilingFaceToPlane_ADDR, sithRenderSky_CeilingFaceToPlane);
     hook_function(sithAIAwareness_CreateTransmittingEvent_ADDR, sithAIAwareness_CreateTransmittingEvent);
     hook_function(sithAIAwareness_Update_ADDR, sithAIAwareness_Update);
     hook_function(sithAIAwareness_ProcessEvent_ADDR, sithAIAwareness_ProcessEvent);
-    hook_function(sithPhysics_ThingGetInsertOffsetZ_ADDR, sithPhysics_ThingGetInsertOffsetZ);
+    hook_function(sithPhysics_GetThingHeight_ADDR, sithPhysics_GetThingHeight);
     hook_function(sithSector_GetPtrFromIdx_ADDR, sithSector_GetPtrFromIdx);
 
     // sithDSSThing
@@ -2186,7 +2186,7 @@ void do_hooks()
 
     // sithPhysics
     hook_function(sithPhysics_FindFloor_ADDR, sithPhysics_FindFloor);
-    hook_function(sithPhysics_ThingTick_ADDR, sithPhysics_ThingTick);
+    hook_function(sithPhysics_UpdateThing_ADDR, sithPhysics_UpdateThing);
     
     // sithSurface
     hook_function(sithSurface_New_ADDR, sithSurface_New);

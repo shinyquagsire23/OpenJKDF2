@@ -216,7 +216,7 @@ void sithCogFunction_StopThing(sithCog *ctx) // unused
     {
         if ( v1->moveType == SITH_MT_PHYSICS )
         {
-            sithPhysics_ThingStop(v1);
+            sithPhysics_ResetThingMovement(v1);
         }
         else if ( v1->moveType == SITH_MT_PATH )
         {

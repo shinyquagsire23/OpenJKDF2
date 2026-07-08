@@ -154,7 +154,7 @@ LABEL_8:
 
 // Inlined func
 
-void sithPhysics_ThingTick(sithThing *pThing, flex_t deltaSecs)
+void sithPhysics_UpdateThing(sithThing *pThing, flex_t deltaSecs)
 {
     if (!pThing->sector)
         return;
@@ -170,11 +170,11 @@ void sithPhysics_ThingTick(sithThing *pThing, flex_t deltaSecs)
 
     if (pThing->attach_flags & (SITH_ATTACH_THINGSURFACE | SITH_ATTACH_WORLDSURFACE))
     {
-        sithPhysics_ThingPhysAttached(pThing, deltaSecs);
+        sithPhysics_UpdateAttachedThingPhysics(pThing, deltaSecs);
     }
     else if (pThing->sector->flags & SITH_SECTOR_UNDERWATER)
     {
-        sithPhysics_ThingPhysUnderwater(pThing, deltaSecs);
+        sithPhysics_UpdateUnderwaterThingPhysics(pThing, deltaSecs);
     }
 #ifdef QOL_IMPROVEMENTS
     else if ( pThing->type == SITH_THING_PLAYER && (jkPlayer_bUseOldPlayerPhysics || sithNet_isMulti))
@@ -182,29 +182,29 @@ void sithPhysics_ThingTick(sithThing *pThing, flex_t deltaSecs)
 #ifdef FIXED_TIMESTEP_PHYS
         if ((NEEDS_STEPPED_PHYS) && !jkPlayer_bUseOldPlayerPhysics) {
             // time stepping is handled elsewhere
-            sithPhysics_ThingPhysGeneral(pThing, deltaSecs);
+            sithPhysics_UpdateThingPhysics(pThing, deltaSecs);
         }
         else
         {
-            sithPhysics_ThingPhysPlayer(pThing, deltaSecs);
+            sithPhysics_UpdatePlayerPhysics(pThing, deltaSecs);
         }
 #else
-        sithPhysics_ThingPhysPlayer(pThing, deltaSecs);
+        sithPhysics_UpdatePlayerPhysics(pThing, deltaSecs);
 #endif
     }
 #else
     else if ( pThing->type == SITH_THING_PLAYER )
     {
-        sithPhysics_ThingPhysPlayer(pThing, deltaSecs);
+        sithPhysics_UpdatePlayerPhysics(pThing, deltaSecs);
     }
 #endif
     else
     {
-        sithPhysics_ThingPhysGeneral(pThing, deltaSecs);
+        sithPhysics_UpdateThingPhysics(pThing, deltaSecs);
     }
 }
 
-void sithPhysics_ThingApplyForce(sithThing *pThing, rdVector3 *forceVec)
+void sithPhysics_ApplyForce(sithThing *pThing, rdVector3 *forceVec)
 {
     // Added: noclip
     if (pThing == sithPlayer_pLocalPlayerThing && (g_debugmodeFlags & DEBUGFLAG_NOCLIP)) {
@@ -223,7 +223,7 @@ void sithPhysics_ThingApplyForce(sithThing *pThing, rdVector3 *forceVec)
     }
 }
 
-void sithPhysics_ThingSetLook(sithThing *pThing, const rdVector3 *look, flex_t a3)
+void sithPhysics_SetThingLook(sithThing *pThing, const rdVector3 *look, flex_t a3)
 {
     flex_d_t v4; // st7
     flex_d_t v20; // st7
@@ -289,7 +289,7 @@ void sithPhysics_ApplyDrag(rdVector3 *vec, flex_t drag, flex_t mag, flex_t delta
     }
 }
 
-int sithPhysics_LoadThingParams(stdConffileArg *arg, sithThing *pThing, int param)
+int sithPhysics_ParseArg(stdConffileArg *arg, sithThing *pThing, int param)
 {
     flex32_t tmp;
     int tmpInt;
@@ -379,7 +379,7 @@ int sithPhysics_LoadThingParams(stdConffileArg *arg, sithThing *pThing, int para
     }
 }
 
-void sithPhysics_ThingStop(sithThing *pThing)
+void sithPhysics_ResetThingMovement(sithThing *pThing)
 {
     rdVector_Zero3(&pThing->physicsParams.vel);
     rdVector_Zero3(&pThing->physicsParams.angVel);
@@ -389,7 +389,7 @@ void sithPhysics_ThingStop(sithThing *pThing)
     rdVector_Zero3(&pThing->field_268);
 }
 
-flex_t sithPhysics_ThingGetInsertOffsetZ(sithThing *pThing)
+flex_t sithPhysics_GetThingHeight(sithThing *pThing)
 {
     flex_d_t result; // st7
     flex_t v2; // [esp+4h] [ebp+4h]
@@ -407,7 +407,7 @@ flex_t sithPhysics_ThingGetInsertOffsetZ(sithThing *pThing)
 }
 
 // MOTS altered
-void sithPhysics_ThingPhysGeneral(sithThing *pThing, flex_t deltaSeconds)
+void sithPhysics_UpdateThingPhysics(sithThing *pThing, flex_t deltaSeconds)
 {
     rdVector3 a1a;
     rdVector3 a3;
@@ -546,7 +546,7 @@ void sithPhysics_ThingPhysGeneral(sithThing *pThing, flex_t deltaSeconds)
 }
 
 // MOTS altered
-void sithPhysics_ThingPhysPlayer(sithThing *player, flex_t deltaSeconds)
+void sithPhysics_UpdatePlayerPhysics(sithThing *player, flex_t deltaSeconds)
 {
     rdMatrix34 a;
     rdVector3 a3;
@@ -680,7 +680,7 @@ void sithPhysics_ThingPhysPlayer(sithThing *player, flex_t deltaSeconds)
 }
 
 // MOTS altered
-void sithPhysics_ThingPhysUnderwater(sithThing *pThing, flex_t deltaSeconds)
+void sithPhysics_UpdateUnderwaterThingPhysics(sithThing *pThing, flex_t deltaSeconds)
 {
     flex_d_t v35; // st6
     flex_d_t v51; // st7
@@ -759,7 +759,7 @@ void sithPhysics_ThingPhysUnderwater(sithThing *pThing, flex_t deltaSeconds)
 }
 
 // MOTS altered
-void sithPhysics_ThingPhysAttached(sithThing *pThing, flex_t deltaSeconds)
+void sithPhysics_UpdateAttachedThingPhysics(sithThing *pThing, flex_t deltaSeconds)
 {   
     flex_t a2a; // [esp+0h] [ebp-94h]
     flex_t v144; // [esp+4h] [ebp-90h]
@@ -820,11 +820,11 @@ void sithPhysics_ThingPhysAttached(sithThing *pThing, flex_t deltaSeconds)
     {
         if ( (pThing->physicsParams.physflags & SITH_PF_SURFACEALIGN) != 0 )
         {
-            sithPhysics_ThingSetLook(pThing, &attachedNormal, pThing->physicsParams.orientSpeed * deltaSeconds);
+            sithPhysics_SetThingLook(pThing, &attachedNormal, pThing->physicsParams.orientSpeed * deltaSeconds);
         }
         else if ( (pThing->physicsParams.physflags & SITH_PF_800) != 0 )
         {
-            sithPhysics_ThingSetLook(pThing, &rdroid_zVector3, pThing->physicsParams.orientSpeed * deltaSeconds);
+            sithPhysics_SetThingLook(pThing, &rdroid_zVector3, pThing->physicsParams.orientSpeed * deltaSeconds);
         }
         else
         {

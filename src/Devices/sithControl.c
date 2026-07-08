@@ -1043,7 +1043,7 @@ debug_controls:
         sithControl_buttonPressDebounce = 0;
 #endif
     if ( player->moveType == SITH_MT_PHYSICS )
-        sithPhysics_ThingStop(player);
+        sithPhysics_ResetThingMovement(player);
 
     // Added
     if (sithControl_followingPlayer > 0) {
@@ -1273,7 +1273,7 @@ LABEL_20:
         else if ( sithControl_GetKey(INPUT_FUNC_CENTER, 0) )
         {
             if (sithThing_MotsTick(9, 0, 1.0))
-                sithPhysics_ThingSetLook(player, &rdroid_zVector3, deltaSecs);
+                sithPhysics_SetThingLook(player, &rdroid_zVector3, deltaSecs);
         }
     }
 }

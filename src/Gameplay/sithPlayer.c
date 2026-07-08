@@ -371,7 +371,7 @@ void sithPlayer_HandleSentDeathPkt(sithThing *thing)
         thing->physicsParams.physflags &= ~(SITH_PF_CROUCHING|SITH_PF_800|SITH_PF_100);
         thing->physicsParams.physflags |= (SITH_PF_SURFACEALIGN|SITH_PF_USEGRAVITY);
         thing->actorParams.typeflags &= ~SITH_AF_BLEEDS;
-        sithPhysics_ThingStop(thing);
+        sithPhysics_ResetThingMovement(thing);
         sithWeapon_SyncPuppet(thing);
         if ( sithNet_isMulti )
             sithMulti_HandleDeath(v1, thing, thing);
@@ -391,7 +391,7 @@ void sithPlayer_sub_4C9150(sithThing *player, sithThing *killedBy)
     player->physicsParams.physflags |= SITH_PF_SURFACEALIGN|SITH_PF_USEGRAVITY;
     player->thingflags |= SITH_TF_DEAD;
     player->actorParams.typeflags &= ~SITH_AF_BLEEDS;
-    sithPhysics_ThingStop(player);
+    sithPhysics_ResetThingMovement(player);
     sithWeapon_SyncPuppet(player);
     sithInventory_SendKilledMessageToAll(player, killedBy);
     if ( sithNet_isMulti )
@@ -524,7 +524,7 @@ void sithPlayer_debug_ToNextCheckpoint(sithThing *player)
                 &jkPlayer_playerInfos[v9].spawnPosOrient);
             sithThing_EnterSector(player, jkPlayer_playerInfos[v9].pSpawnSector, 1, 0);
             sithCamera_Update(sithCamera_currentCamera);
-            sithPhysics_ThingStop(player);
+            sithPhysics_ResetThingMovement(player);
             sithWeapon_SyncPuppet(player);
             sithCog_SendSimpleMessageToAll(SITH_MESSAGE_NEWPLAYER, SENDERTYPE_THING, player->thingIdx, SENDERTYPE_THING, player->thingIdx);
             if ( sithComm_multiplayerFlags )

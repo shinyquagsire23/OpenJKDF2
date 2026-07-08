@@ -557,7 +557,7 @@ void sithCogFunctionThing_StopThing(sithCog *ctx)
     }
     else if (pThing->moveType == SITH_MT_PHYSICS)
     {
-        sithPhysics_ThingStop(pThing);
+        sithPhysics_ResetThingMovement(pThing);
     }
 }
 
@@ -883,7 +883,7 @@ void sithCogFunctionThing_ApplyForce(sithCog *ctx)
     sithThing* pThing = sithCogExec_PopThing(ctx);
     if ( pThing && pThing->moveType == SITH_MT_PHYSICS)
     {
-        sithPhysics_ThingApplyForce(pThing, &poppedVec);
+        sithPhysics_ApplyForce(pThing, &poppedVec);
         if (COG_SHOULD_SYNC(ctx))
         {
             sithThing_SetSyncFlags(pThing, THING_SYNC_POS);

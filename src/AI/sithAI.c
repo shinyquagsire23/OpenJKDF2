@@ -1188,7 +1188,7 @@ int sithAI_CanWalk(sithActor *actor, rdVector3 *targetPosition, int *out)
     v6 = (sithSector *)result;
     if ( !result )
         return result;
-    searchDist = sithPhysics_ThingGetInsertOffsetZ(actorThing) + actor->pAIClass->maxStep;
+    searchDist = sithPhysics_GetThingHeight(actorThing) + actor->pAIClass->maxStep;
     sithCollision_SearchForCollisions(v6, actorThing, targetPosition, &moveNorm, searchDist, searchRadius, RAYCAST_2000 | RAYCAST_2);
     colSearchEntry = sithCollision_PopStack();
     if ( !colSearchEntry )
@@ -1260,7 +1260,7 @@ int sithAI_CanWalk_ExplicitSector(sithActor *actor, rdVector3 *targetPosition, s
     rdVector_Neg3(&moveNorm, &rdroid_zVector3);
     retval = 0;
     searchRadius = actorThing->moveSize * 0.25;
-    searchDist = sithPhysics_ThingGetInsertOffsetZ(actorThing) + actor->pAIClass->maxStep;
+    searchDist = sithPhysics_GetThingHeight(actorThing) + actor->pAIClass->maxStep;
     sithCollision_SearchForCollisions(targetSector, actorThing, targetPosition, &moveNorm, searchDist, searchRadius, RAYCAST_2000 | RAYCAST_2);
     colSearchEntry = sithCollision_PopStack();
     if ( colSearchEntry )

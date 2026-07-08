@@ -100,7 +100,7 @@ void sithExplosion_MakeBlast(sithThing *explosion)
                     if ( force != 0.0 && v4->moveType == SITH_MT_PHYSICS && (v4->physicsParams.physflags & SITH_PF_FEELBLASTFORCE) != 0 )
                     {
                         rdVector_Scale3(&a2, &i->hitNorm, -(a1a * force));
-                        sithPhysics_ThingApplyForce(v4, &a2);
+                        sithPhysics_ApplyForce(v4, &a2);
                     }
                     if ( damage != 0.0 )
                     {
