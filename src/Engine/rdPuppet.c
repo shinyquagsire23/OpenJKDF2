@@ -17,7 +17,7 @@ static void rdPuppet_ClearTrackNodes(rdPuppet *puppet, int trackNum)
         _memset(puppet->aTracks[trackNum].aCurKfNodeEntryNums, 0, sizeof(puppet->aTracks[trackNum].aCurKfNodeEntryNums));
 }
 
-rdPuppet* rdPuppet_New(rdThing *thing)
+rdPuppet* rdPuppet_New(rdThing *pParent)
 {
     rdPuppet* puppet = (rdPuppet *)RDROID_ALLOC(sizeof(rdPuppet));
 
@@ -28,7 +28,7 @@ rdPuppet* rdPuppet_New(rdThing *thing)
     _memset(puppet, 0, sizeof(rdPuppet));
 
     puppet->bPaused = 0;
-    puppet->renderData = thing;
+    puppet->renderData = pParent;
 
     for (int i = 0; i < RDPUPPET_MAX_TRACKS; i++)
     {
@@ -42,56 +42,56 @@ rdPuppet* rdPuppet_New(rdThing *thing)
         puppet->aTracks[i].keyframe = NULL;
         puppet->aTracks[i].callback = NULL;
     }
-    thing->puppet = puppet;
+    pParent->puppet = puppet;
     return puppet;
 }
 
-void rdPuppet_Free(rdPuppet *puppet)
+void rdPuppet_Free(rdPuppet *pPuppet)
 {
     // Moved: no nullptr deref
-    if (!puppet) return;
+    if (!pPuppet) return;
 
     // Added: prevent UAFs
     for (int i = 0; i < RDPUPPET_MAX_TRACKS; i++)
     {
-        puppet->aTracks[i].field_4 = 0;
-        puppet->aTracks[i].keyframe = NULL;
-        puppet->aTracks[i].callback = NULL;
+        pPuppet->aTracks[i].field_4 = 0;
+        pPuppet->aTracks[i].keyframe = NULL;
+        pPuppet->aTracks[i].callback = NULL;
     }
     
-    RDROID_FREE(puppet);
+    RDROID_FREE(pPuppet);
 }
 
 void rdPuppet_FreeEntry()
 {
 }
 
-void rdPuppet_SetPause(rdPuppet *puppet, int bPaused)
+void rdPuppet_SetPause(rdPuppet *pPuppet, int bPaused)
 {
-    puppet->bPaused = bPaused;
+    pPuppet->bPaused = bPaused;
 }
 
-void rdPuppet_SetTrackNoise(rdPuppet *puppet, int trackNum, flex_t noise)
+void rdPuppet_SetTrackNoise(rdPuppet *pPuppet, int track, flex_t noise)
 {
     if ( noise != 0.0f )
     {
-        puppet->aTracks[trackNum].status |= 0x1000;
+        pPuppet->aTracks[track].status |= 0x1000;
     }
     else
     {
-        puppet->aTracks[trackNum].status &= ~0x1000;
+        pPuppet->aTracks[track].status &= ~0x1000;
     }
-    puppet->aTracks[trackNum].field_120 = noise;
+    pPuppet->aTracks[track].field_120 = noise;
 }
 
-void rdPuppet_SetTrackPriority(rdPuppet *puppet, int trackNum, int lowPri, int highPri)
+void rdPuppet_SetTrackPriority(rdPuppet *pPuppet, int track, int lowPri, int heighPri)
 {
-    puppet->aTracks[trackNum].lowPri = lowPri;
-    puppet->aTracks[trackNum].highPri = highPri;
+    pPuppet->aTracks[track].lowPri = lowPri;
+    pPuppet->aTracks[track].highPri = heighPri;
 }
 
 // MOTS altered
-void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
+void rdPuppet_BuildJointMatrices(rdThing *prdThing, rdMatrix34 *pPlacement)
 {
     rdPuppet *puppet; // eax
     rdPuppetTrack *v4; // ebx
@@ -137,21 +137,21 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
     rdVector3 v91; // [esp+78h] [ebp-Ch]
     rdVector3 tmp1;
 
-    model = thing->model3;
-    puppet = thing->puppet;
-    if ( thing->field_18 )
+    model = prdThing->model3;
+    puppet = prdThing->puppet;
+    if ( prdThing->field_18 )
     {
         return;
     }
 
     // Added: Fix a crash?
-    if (!thing->paJointMatrices) return;
+    if (!prdThing->paJointMatrices) return;
 
     if ( !puppet || puppet->bPaused )
     {
         for (int i = 0; i < model->numHNodes; i++)
         {
-            rdMatrix_Copy34(&thing->paJointMatrices[i], &model->aHierarchyNodes[i].posRotMatrix);
+            rdMatrix_Copy34(&prdThing->paJointMatrices[i], &model->aHierarchyNodes[i].posRotMatrix);
         }
         goto accumulate_finalize;
     }
@@ -361,29 +361,29 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
         rdVector_Add3Acc(&a4, &nodeIter->pos);
         rdVector_Add3Acc(&a3, &nodeIter->rot);
 
-        rdMatrix_Build34(&thing->paJointMatrices[v80], &a3, &a4);
-        v61 = &thing->hierarchyNodes2[v80];
+        rdMatrix_Build34(&prdThing->paJointMatrices[v80], &a3, &a4);
+        v61 = &prdThing->hierarchyNodes2[v80];
         if ( !rdVector_IsZero3(v61) )
-            rdMatrix_PreRotate34(&thing->paJointMatrices[v80], &thing->hierarchyNodes2[v80]);
+            rdMatrix_PreRotate34(&prdThing->paJointMatrices[v80], &prdThing->hierarchyNodes2[v80]);
     }
 
 accumulate_finalize:
-    rdThing_AccumulateMatrices(thing, model->aHierarchyNodes, matrix);
-    thing->rdFrameNum = rdroid_frameTrue;
+    rdThing_AccumulateMatrices(prdThing, model->aHierarchyNodes, pPlacement);
+    prdThing->rdFrameNum = rdroid_frameTrue;
 }
 
-int rdPuppet_RemoveTrack(rdPuppet *puppet, int trackNum)
+int rdPuppet_RemoveTrack(rdPuppet *pPuppet, int track)
 {
-    if ( puppet->aTracks[trackNum].callback )
-        puppet->aTracks[trackNum].callback(puppet->renderData->pThing, trackNum, 0);
-    puppet->aTracks[trackNum].status = 0;
-    puppet->aTracks[trackNum].keyframe = 0;
-    puppet->aTracks[trackNum].callback = 0;
+    if ( pPuppet->aTracks[track].callback )
+        pPuppet->aTracks[track].callback(pPuppet->renderData->pThing, track, 0);
+    pPuppet->aTracks[track].status = 0;
+    pPuppet->aTracks[track].keyframe = 0;
+    pPuppet->aTracks[track].callback = 0;
     return 1;
 }
 
 // MOTS altered
-int rdPuppet_UpdateTracks(rdPuppet *puppet, flex_t deltaSeconds)
+int rdPuppet_UpdateTracks(rdPuppet *pPuppet, flex_t secDeltaTime)
 {
     //return _rdPuppet_UpdateTracks(puppet, deltaSeconds);
     
@@ -391,12 +391,12 @@ int rdPuppet_UpdateTracks(rdPuppet *puppet, flex_t deltaSeconds)
     int v13; // [esp+14h] [ebp-4h]
 
     v13 = 0;
-    if (puppet->bPaused)
+    if (pPuppet->bPaused)
         return 0;
 
     for (uint32_t v2 = 0; v2 < RDPUPPET_MAX_TRACKS; v2++)
     {
-        rdPuppetTrack* track = &puppet->aTracks[v2];
+        rdPuppetTrack* track = &pPuppet->aTracks[v2];
         if (!track->status)
             continue;
 
@@ -405,12 +405,12 @@ int rdPuppet_UpdateTracks(rdPuppet *puppet, flex_t deltaSeconds)
 
         if ( (track->status & 0x10) == 0 )
         {
-            rdPuppet_AdvanceTrack(puppet, v2, track->speed * deltaSeconds);
+            rdPuppet_AdvanceTrack(pPuppet, v2, track->speed * secDeltaTime);
         }
 
         if (track->status & 4)
         {
-            track->playSpeed += track->fadeSpeed * deltaSeconds;
+            track->playSpeed += track->fadeSpeed * secDeltaTime;
             if ( track->playSpeed >= 1.0 ) // verified
             {
                 track->playSpeed = 1.0;
@@ -419,7 +419,7 @@ int rdPuppet_UpdateTracks(rdPuppet *puppet, flex_t deltaSeconds)
         }
         else if (track->status & 8)
         {
-            track->playSpeed -= track->fadeSpeed * deltaSeconds;
+            track->playSpeed -= track->fadeSpeed * secDeltaTime;
             
             //if (puppet->renderData->pThing == sithPlayer_g_pLocalPlayerThing)
             //    stdPlatform_Printf("%u %f %f %f %f %u\n", v2, track->playSpeed, track->fadeSpeed, deltaSeconds, track->field_124, track->keyframe->numFrames);
@@ -433,7 +433,7 @@ int rdPuppet_UpdateTracks(rdPuppet *puppet, flex_t deltaSeconds)
                 }
                 else
                 {
-                    rdPuppet_RemoveTrack(puppet, v2);
+                    rdPuppet_RemoveTrack(pPuppet, v2);
                 }
             }
         }
@@ -442,17 +442,17 @@ int rdPuppet_UpdateTracks(rdPuppet *puppet, flex_t deltaSeconds)
     return v13;
 }
 
-int rdPuppet_AddTrack(rdPuppet *puppet, rdKeyframe *keyframe, int lowPri, int highPri)
+int rdPuppet_AddTrack(rdPuppet *pPuppet, rdKeyframe *pKFTrack, int lowPriority, int highPriority)
 {
     rdPuppetTrack *v4; // ecx
     int newTrackIdx; // esi
     rdPuppetTrack *v6; // eax
     rdPuppetTrack *newTrack; // edx
 
-    v4 = puppet->aTracks;
+    v4 = pPuppet->aTracks;
     for (newTrackIdx = 0; newTrackIdx < RDPUPPET_MAX_TRACKS; newTrackIdx++)
     {
-        if ( !puppet->aTracks[newTrackIdx].status )
+        if ( !pPuppet->aTracks[newTrackIdx].status )
             break;
     }
 
@@ -470,43 +470,43 @@ int rdPuppet_AddTrack(rdPuppet *puppet, rdKeyframe *keyframe, int lowPri, int hi
         if ( newTrackIdx >= 4 )
             return -1;
 
-        rdPuppet_RemoveTrack(puppet, newTrackIdx);
+        rdPuppet_RemoveTrack(pPuppet, newTrackIdx);
     }
     
-    newTrack = &puppet->aTracks[newTrackIdx];
-    newTrack->speed = keyframe->fps;
-    newTrack->keyframe = keyframe;
-    newTrack->highPri = highPri;
-    newTrack->lowPri = lowPri;
+    newTrack = &pPuppet->aTracks[newTrackIdx];
+    newTrack->speed = pKFTrack->fps;
+    newTrack->keyframe = pKFTrack;
+    newTrack->highPri = highPriority;
+    newTrack->lowPri = lowPriority;
     newTrack->status |= 1;
     newTrack->playSpeed = 0.0;
 
-    rdPuppet_ResetTrack(puppet, newTrackIdx);
+    rdPuppet_ResetTrack(pPuppet, newTrackIdx);
     
     return newTrackIdx;
 }
 
-void rdPuppet_SetCallback(rdPuppet *a1, int trackNum, rdPuppetTrackCallback_t callback)
+void rdPuppet_SetCallback(rdPuppet *pPuppet, int track, rdPuppetTrackCallback_t pfCallback)
 {
-    a1->aTracks[trackNum].callback = callback;
+    pPuppet->aTracks[track].callback = pfCallback;
 }
 
-int rdPuppet_FadeInTrack(rdPuppet *puppet, int trackNum, flex_t speed)
+int rdPuppet_FadeInTrack(rdPuppet *pPuppet, int track, flex_t speed)
 {
-    puppet->aTracks[trackNum].status = puppet->aTracks[trackNum].status & ~8u | 6;
+    pPuppet->aTracks[track].status = pPuppet->aTracks[track].status & ~8u | 6;
     if ( speed <= 0.0 )
     {
-        puppet->aTracks[trackNum].fadeSpeed = 1.0;
+        pPuppet->aTracks[track].fadeSpeed = 1.0;
         return 1;
     }
     else
     {
-        puppet->aTracks[trackNum].fadeSpeed = 1.0 / speed;
+        pPuppet->aTracks[track].fadeSpeed = 1.0 / speed;
         return 1;
     }
 }
 
-void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, flex_t deltaSecondsKinda)
+void rdPuppet_AdvanceTrack(rdPuppet *pPuppet, int track, flex_t frames)
 {
     //_rdPuppet_AdvanceTrack(puppet, trackNum, a3);
     //return;
@@ -522,30 +522,30 @@ void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, flex_t deltaSecondsKi
 
     v21 = 0.0;
     v20 = 0;
-    v4 = puppet->aTracks[trackNum].keyframe;
-    v5 = &puppet->aTracks[trackNum];
-    if ( !v4 || deltaSecondsKinda == 0.0 )
+    v4 = pPuppet->aTracks[track].keyframe;
+    v5 = &pPuppet->aTracks[track];
+    if ( !v4 || frames == 0.0 )
         return;
-    v22 = deltaSecondsKinda + puppet->aTracks[trackNum].field_124;
+    v22 = frames + pPuppet->aTracks[track].field_124;
     v6 = (flex_d_t)v4->numFrames;
-    puppet->aTracks[trackNum].field_120 = v22;
+    pPuppet->aTracks[track].field_120 = v22;
 
     if ( v22 >= v6 )
     {
         if (v5->status & 0x20)
         {
-            puppet->aTracks[trackNum].field_120 = v6;
+            pPuppet->aTracks[track].field_120 = v6;
             v20 = 1;
         }
         else if (v5->status & 0x40)
         {
-            puppet->aTracks[trackNum].field_120 = v6;
+            pPuppet->aTracks[track].field_120 = v6;
             v5->status |= 0x10;
         }
         else if ( v5->status & 0x80 )
         {
-            puppet->aTracks[trackNum].fadeSpeed = 4.0;
-            puppet->aTracks[trackNum].field_120 = v6;
+            pPuppet->aTracks[track].fadeSpeed = 4.0;
+            pPuppet->aTracks[track].field_120 = v6;
             v5->status &= ~0x4;
             v5->status |= 0x8;
             v5->status |= 0x10;
@@ -553,14 +553,14 @@ void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, flex_t deltaSecondsKi
         else
         {
             v21 = stdMath_Floor(v22 / v6 + 0.5);
-            size_t v11 = sizeof(uint32_t) * puppet->renderData->model3->numHNodes;
-            puppet->aTracks[trackNum].field_120 -= (flex_d_t)puppet->aTracks[trackNum].keyframe->numFrames * v21;
+            size_t v11 = sizeof(uint32_t) * pPuppet->renderData->model3->numHNodes;
+            pPuppet->aTracks[track].field_120 -= (flex_d_t)pPuppet->aTracks[track].keyframe->numFrames * v21;
             
-            rdPuppet_ClearTrackNodes(puppet, trackNum);
+            rdPuppet_ClearTrackNodes(pPuppet, track);
         }
         
     }
-    if ( puppet->aTracks[trackNum].callback )
+    if ( pPuppet->aTracks[track].callback )
     {
         if ( v4->numMarkers )
         {
@@ -568,11 +568,11 @@ void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, flex_t deltaSecondsKi
             {
                 for (uint32_t v13 = 0; v13 < v4->numMarkers; v13++)
                 {
-                    if ( v4->markers.marker_float[v13] > (flex_d_t)puppet->aTracks[trackNum].field_120 )
+                    if ( v4->markers.marker_float[v13] > (flex_d_t)pPuppet->aTracks[track].field_120 )
                         break;
-                    if ( v4->markers.marker_float[v13] > (flex_d_t)puppet->aTracks[trackNum].field_124 || puppet->aTracks[trackNum].field_124 == 0.0 )
+                    if ( v4->markers.marker_float[v13] > (flex_d_t)pPuppet->aTracks[track].field_124 || pPuppet->aTracks[track].field_124 == 0.0 )
                     {
-                        puppet->aTracks[trackNum].callback(puppet->renderData->pThing, trackNum, v4->markers.marker_int[v13]);
+                        pPuppet->aTracks[track].callback(pPuppet->renderData->pThing, track, v4->markers.marker_int[v13]);
                     }
                 }
             }
@@ -580,10 +580,10 @@ void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, flex_t deltaSecondsKi
             {
                 for (uint32_t v17 = 0; v17 < v4->numMarkers; v17++)
                 {
-                    if ( v4->markers.marker_float[v17] > (flex_d_t)puppet->aTracks[trackNum].field_124
-                      || v4->markers.marker_float[v17] <= (flex_d_t)puppet->aTracks[trackNum].field_120 )
+                    if ( v4->markers.marker_float[v17] > (flex_d_t)pPuppet->aTracks[track].field_124
+                      || v4->markers.marker_float[v17] <= (flex_d_t)pPuppet->aTracks[track].field_120 )
                     {
-                        puppet->aTracks[trackNum].callback(puppet->renderData->pThing, trackNum, v4->markers.marker_int[v17]);
+                        pPuppet->aTracks[track].callback(pPuppet->renderData->pThing, track, v4->markers.marker_int[v17]);
                     }
                 }
             }
@@ -591,7 +591,7 @@ void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, flex_t deltaSecondsKi
             {
                 for (uint32_t v15 = 0; v15 < v4->numMarkers; v15++)
                 {
-                    puppet->aTracks[trackNum].callback(puppet->renderData->pThing, trackNum, v4->markers.marker_int[v15]);
+                    pPuppet->aTracks[track].callback(pPuppet->renderData->pThing, track, v4->markers.marker_int[v15]);
                 }
             }
         }
@@ -599,73 +599,73 @@ void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, flex_t deltaSecondsKi
 
     if ( v20 )
     {
-        rdPuppet_RemoveTrack(puppet, trackNum);
+        rdPuppet_RemoveTrack(pPuppet, track);
     }
     else
     {
-        puppet->aTracks[trackNum].field_124 = puppet->aTracks[trackNum].field_120;
+        pPuppet->aTracks[track].field_124 = pPuppet->aTracks[track].field_120;
     }
 }
 
-int rdPuppet_FadeOutTrack(rdPuppet *puppet, int trackNum, flex_t speed)
+int rdPuppet_FadeOutTrack(rdPuppet *pPuppet, int track, flex_t speed)
 {
-    puppet->aTracks[trackNum].status = puppet->aTracks[trackNum].status & ~4u | 8;
+    pPuppet->aTracks[track].status = pPuppet->aTracks[track].status & ~4u | 8;
     if ( speed <= 0.0 )
     {
-        puppet->aTracks[trackNum].fadeSpeed = 1.0;
+        pPuppet->aTracks[track].fadeSpeed = 1.0;
         return 1;
     }
     else
     {
-        puppet->aTracks[trackNum].fadeSpeed = 1.0 / speed;
+        pPuppet->aTracks[track].fadeSpeed = 1.0 / speed;
         return 1;
     }
 }
 
-void rdPuppet_SetTrackSpeed(rdPuppet *puppet, int trackNum, flex_t speed)
+void rdPuppet_SetTrackSpeed(rdPuppet *pPuppet, int track, flex_t fps)
 {
-    puppet->aTracks[trackNum].speed = speed;
+    pPuppet->aTracks[track].speed = fps;
 }
 
-int rdPuppet_SetStatus(rdPuppet *puppet, int trackNum, int status)
+int rdPuppet_SetStatus(rdPuppet *pPuppet, int track, int status)
 {
-    puppet->aTracks[trackNum].status |= status;
+    pPuppet->aTracks[track].status |= status;
     return 1;
 }
 
-int rdPuppet_PlayTrack(rdPuppet *puppet, int trackNum)
+int rdPuppet_PlayTrack(rdPuppet *pPuppet, int track)
 {
     rdPuppetTrack *v2; // eax
 
-    v2 = &puppet->aTracks[trackNum];
+    v2 = &pPuppet->aTracks[track];
     v2->status = v2->status & ~0x10u | 2;
     v2->playSpeed = 1.0;
     return 1;
 }
 
-void rdPuppet_ResetTrack(rdPuppet *puppet, int trackNum)
+void rdPuppet_ResetTrack(rdPuppet *pPuppet, int track)
 {
     rdPuppetTrack *v2; // edx
 
-    v2 = &puppet->aTracks[trackNum];
+    v2 = &pPuppet->aTracks[track];
 
-    rdPuppet_ClearTrackNodes(puppet, trackNum);
+    rdPuppet_ClearTrackNodes(pPuppet, track);
 
     v2->field_120 = 0.0;
     v2->field_124 = 0.0;
     v2->status = 3;
 }
 
-int rdPuppet_NewEntry(rdPuppet *puppet, rdThing *renderData)
+int rdPuppet_NewEntry(rdPuppet *pPuppet, rdThing *parent)
 {
-    puppet->bPaused = 0;
-    puppet->renderData = renderData;
+    pPuppet->bPaused = 0;
+    pPuppet->renderData = parent;
     for (int i = 0; i < RDPUPPET_MAX_TRACKS; i++)
     {
-        puppet->aTracks[i].field_120 = 0.0;
-        puppet->aTracks[i].field_124 = 0.0;
+        pPuppet->aTracks[i].field_120 = 0.0;
+        pPuppet->aTracks[i].field_124 = 0.0;
 
-        rdPuppet_RemoveTrack(puppet, i);
+        rdPuppet_RemoveTrack(pPuppet, i);
     }
 
     return 1;

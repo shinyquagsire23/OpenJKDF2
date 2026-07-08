@@ -23,25 +23,25 @@
 #define rdPuppet_ResetTrack_ADDR (0x0043EE60)
 #define rdPuppet_BuildJointMatrices_ADDR (0x0043EEB0)
 
-rdPuppet* rdPuppet_New(rdThing *thing);
-void rdPuppet_Free(rdPuppet *puppet);
+rdPuppet* rdPuppet_New(rdThing *pParent);
+void rdPuppet_Free(rdPuppet *pPuppet);
 void rdPuppet_FreeEntry();
-void rdPuppet_SetPause(rdPuppet *puppet, int bPaused);
-void rdPuppet_SetTrackNoise(rdPuppet *puppet, int trackNum, flex_t noise);
-void rdPuppet_SetTrackPriority(rdPuppet *puppet, int trackNum, int lowPri, int highPri);
-MATH_FUNC FAST_FUNC void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix);
-int rdPuppet_RemoveTrack(rdPuppet *puppet, int trackNum);
-MATH_FUNC int rdPuppet_UpdateTracks(rdPuppet *puppet, flex_t a2);
-int rdPuppet_AddTrack(rdPuppet *puppet, rdKeyframe *keyframe, int lowPri, int highPri);
-void rdPuppet_SetCallback(rdPuppet *a1, int trackNum, rdPuppetTrackCallback_t callback);
-int rdPuppet_FadeInTrack(rdPuppet *puppet, int trackNum, flex_t speed);
-MATH_FUNC void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, flex_t a3);
-int rdPuppet_FadeOutTrack(rdPuppet *puppet, int trackNum, flex_t speed);
-void rdPuppet_SetTrackSpeed(rdPuppet *puppet, int trackNum, flex_t speed);
-int rdPuppet_SetStatus(rdPuppet *puppet, int trackNum, int status);
-int rdPuppet_PlayTrack(rdPuppet *puppet, int trackNum);
-void rdPuppet_ResetTrack(rdPuppet *puppet, int trackNum);
-int rdPuppet_NewEntry(rdPuppet *puppet, rdThing *renderData);
+void rdPuppet_SetPause(rdPuppet *pPuppet, int bPaused);
+void rdPuppet_SetTrackNoise(rdPuppet *pPuppet, int track, flex_t noise);
+void rdPuppet_SetTrackPriority(rdPuppet *pPuppet, int track, int lowPri, int heighPri);
+MATH_FUNC FAST_FUNC void rdPuppet_BuildJointMatrices(rdThing *prdThing, rdMatrix34 *pPlacement);
+int rdPuppet_RemoveTrack(rdPuppet *pPuppet, int track);
+MATH_FUNC int rdPuppet_UpdateTracks(rdPuppet *pPuppet, flex_t a2);
+int rdPuppet_AddTrack(rdPuppet *pPuppet, rdKeyframe *pKFTrack, int lowPriority, int highPriority);
+void rdPuppet_SetCallback(rdPuppet *pPuppet, int track, rdPuppetTrackCallback_t pfCallback);
+int rdPuppet_FadeInTrack(rdPuppet *pPuppet, int track, flex_t speed);
+MATH_FUNC void rdPuppet_AdvanceTrack(rdPuppet *pPuppet, int track, flex_t a3);
+int rdPuppet_FadeOutTrack(rdPuppet *pPuppet, int track, flex_t speed);
+void rdPuppet_SetTrackSpeed(rdPuppet *pPuppet, int track, flex_t fps);
+int rdPuppet_SetStatus(rdPuppet *pPuppet, int track, int status);
+int rdPuppet_PlayTrack(rdPuppet *pPuppet, int track);
+void rdPuppet_ResetTrack(rdPuppet *pPuppet, int track);
+int rdPuppet_NewEntry(rdPuppet *pPuppet, rdThing *parent);
 
 //static void (*rdPuppet_ResetTrack)(rdPuppet *a1, int a2) = (void*)rdPuppet_ResetTrack_ADDR;
 //static int (*rdPuppet_AddTrack)(rdPuppet *puppet, rdKeyframe *keyframe, int a3, int a4) = (void*)rdPuppet_AddTrack_ADDR;

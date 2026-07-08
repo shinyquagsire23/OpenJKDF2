@@ -13,9 +13,9 @@ static rdVector3 aParticleVerticesTmp[32];
 static rdVector3 aParticleVertices[256];
 static rdParticleLoader_t rdParticle_loader;
 
-void rdParticle_RegisterLoader(rdParticleLoader_t loader)
+void rdParticle_RegisterLoader(rdParticleLoader_t pFunc)
 {
-    rdParticle_loader = loader;
+    rdParticle_loader = pFunc;
 }
 
 rdParticle* rdParticle_New(int numVertices, flex_t size, rdMaterial *material, int lightingMode, int allocateVertices)
@@ -62,63 +62,63 @@ int rdParticle_NewEntry(rdParticle *particle, int numVertices, flex_t size, rdMa
     return 0;
 }
 
-rdParticle* rdParticle_Duplicate(rdParticle *particle)
+rdParticle* rdParticle_Duplicate(rdParticle *pOriginal)
 {
     rdParticle *clonedPart; // eax
 
     clonedPart = (rdParticle*)RDROID_ALLOC(sizeof(rdParticle));
     if (clonedPart)
     {
-        rdParticle_NewEntry(clonedPart, particle->numVertices, particle->size, particle->material, particle->lightingMode, 1);
-        _memcpy(clonedPart->aVertices, particle->aVertices, sizeof(rdVector3) * particle->numVertices);
-        _memcpy(clonedPart->aVertMatCelNums, particle->aVertMatCelNums, sizeof(int) * particle->numVertices);
+        rdParticle_NewEntry(clonedPart, pOriginal->numVertices, pOriginal->size, pOriginal->material, pOriginal->lightingMode, 1);
+        _memcpy(clonedPart->aVertices, pOriginal->aVertices, sizeof(rdVector3) * pOriginal->numVertices);
+        _memcpy(clonedPart->aVertMatCelNums, pOriginal->aVertMatCelNums, sizeof(int) * pOriginal->numVertices);
     }
 
     return clonedPart;
 }
 
-void rdParticle_Free(rdParticle *particle)
+void rdParticle_Free(rdParticle *pParticle)
 {
-    if (!particle)
+    if (!pParticle)
         return;
 
-    rdParticle_FreeEntry(particle);
+    rdParticle_FreeEntry(pParticle);
     
-    RDROID_FREE(particle);
+    RDROID_FREE(pParticle);
 }
 
-void rdParticle_FreeEntry(rdParticle *particle)
+void rdParticle_FreeEntry(rdParticle *pParticle)
 {
-    if (particle->hasVertices)
+    if (pParticle->hasVertices)
     {
-        if (!particle->aVertices)
+        if (!pParticle->aVertices)
             return;
-        RDROID_FREE(particle->aVertices);
-        RDROID_FREE(particle->aVertMatCelNums);
+        RDROID_FREE(pParticle->aVertices);
+        RDROID_FREE(pParticle->aVertMatCelNums);
     }
-    particle->aVertices = NULL;
-    particle->aVertMatCelNums = NULL;
+    pParticle->aVertices = NULL;
+    pParticle->aVertMatCelNums = NULL;
 }
 
-rdParticle* rdParticle_Load(char *path)
+rdParticle* rdParticle_Load(char *pFilename)
 {
     rdParticle *particle;
 
     if (rdParticle_loader)
-        return (rdParticle*)rdParticle_loader(path);
+        return (rdParticle*)rdParticle_loader(pFilename);
 
     particle = (rdParticle*)RDROID_ALLOC(sizeof(rdParticle));
     if (!particle)
         return NULL;
 
-    if (rdParticle_LoadEntry(path, particle))
+    if (rdParticle_LoadEntry(pFilename, particle))
         return particle;
 
     rdParticle_Free(particle);
     return NULL;
 }
 
-int rdParticle_LoadEntry(char *fpath, rdParticle *pParticle)
+int rdParticle_LoadEntry(char *pFilename, rdParticle *pParticle)
 {
     rdParticle *v4; // esi
     int v5; // ebx
@@ -137,10 +137,10 @@ int rdParticle_LoadEntry(char *fpath, rdParticle *pParticle)
     int versMajor; // [esp+28h] [ebp-8h]
     int v24; // [esp+2Ch] [ebp-4h]
 
-    stdString_SafeStrCopy(pParticle->name, stdFileFromPath(fpath), 0x20);
+    stdString_SafeStrCopy(pParticle->name, stdFileFromPath(pFilename), 0x20);
     v5 = 0;
     pParticle->hasVertices = 1;
-    if (!stdConffile_Open(fpath))
+    if (!stdConffile_Open(pFilename))
         goto done;
     if (!stdConffile_ReadLine())
         goto done_close;
@@ -249,32 +249,32 @@ done:
     return 0;
 }
 
-int rdParticle_Write(char *writePath, rdParticle *particle, char *madeBy)
+int rdParticle_Write(char *pFilename, rdParticle *pParticle, char *pCreatedName)
 {
     int v3; // ebx
     unsigned int v4; // edi
     int v6; // [esp+28h] [ebp-4h]
 
-    v3 = rdroid_g_pHS->fileOpen(writePath, "wt+");
+    v3 = rdroid_g_pHS->fileOpen(pFilename, "wt+");
     v4 = 0;
     if ( !v3 )
         return 0;
-    rdroid_g_pHS->filePrintf(v3, "# PAR '%s' created from '%s'\n\n", particle->name, madeBy);
+    rdroid_g_pHS->filePrintf(v3, "# PAR '%s' created from '%s'\n\n", pParticle->name, pCreatedName);
     rdroid_g_pHS->filePrintf(v3, "###############\n");
     rdroid_g_pHS->filePrintf(v3, "SECTION: HEADER\n\n");
     rdroid_g_pHS->filePrintf(v3, "PAR %d.%d\n\n", 1, 0);
-    rdroid_g_pHS->filePrintf(v3, "SIZE %.6f\n\n", particle->size);
-    rdroid_g_pHS->filePrintf(v3, "MATERIAL %s\n\n", particle->material->mat_fpath);
-    rdroid_g_pHS->filePrintf(v3, "LIGHTINGMODE %d\n\n", particle->lightingMode);
+    rdroid_g_pHS->filePrintf(v3, "SIZE %.6f\n\n", pParticle->size);
+    rdroid_g_pHS->filePrintf(v3, "MATERIAL %s\n\n", pParticle->material->mat_fpath);
+    rdroid_g_pHS->filePrintf(v3, "LIGHTINGMODE %d\n\n", pParticle->lightingMode);
     rdroid_g_pHS->filePrintf(v3, "###############\n");
     rdroid_g_pHS->filePrintf(v3, "SECTION: GEOMETRYDEF\n\n");
     rdroid_g_pHS->filePrintf(v3, "# Object radius\n");
-    rdroid_g_pHS->filePrintf(v3, "RADIUS %10.6f\n\n", particle->cloudRadius);
+    rdroid_g_pHS->filePrintf(v3, "RADIUS %10.6f\n\n", pParticle->cloudRadius);
     rdroid_g_pHS->filePrintf(v3, "# Insertion offset\n");
-    rdroid_g_pHS->filePrintf(v3, "INSERT OFFSET %10.6f %10.6f %10.6f\n\n", particle->insertOffset.x, particle->insertOffset.y, particle->insertOffset.z);
-    rdroid_g_pHS->filePrintf(v3, "VERTICES %d\n\n", particle->numVertices);
+    rdroid_g_pHS->filePrintf(v3, "INSERT OFFSET %10.6f %10.6f %10.6f\n\n", pParticle->insertOffset.x, pParticle->insertOffset.y, pParticle->insertOffset.z);
+    rdroid_g_pHS->filePrintf(v3, "VERTICES %d\n\n", pParticle->numVertices);
     rdroid_g_pHS->filePrintf(v3, "# num:     x:         y:         z:       cel:\n");
-    if ( particle->numVertices > 0u )
+    if ( pParticle->numVertices > 0u )
     {
         v6 = 0;
         do
@@ -283,21 +283,21 @@ int rdParticle_Write(char *writePath, rdParticle *particle, char *madeBy)
                 v3,
                 "  %3d: %10.6f %10.6f %10.6f %d\n",
                 v4,
-                particle->aVertices[v6].x,
-                particle->aVertices[v6].y,
-                particle->aVertices[v6].z,
-                particle->aVertMatCelNums[v4]);
+                pParticle->aVertices[v6].x,
+                pParticle->aVertices[v6].y,
+                pParticle->aVertices[v6].z,
+                pParticle->aVertMatCelNums[v4]);
             ++v4;
             ++v6;
         }
-        while ( v4 < particle->numVertices );
+        while ( v4 < pParticle->numVertices );
     }
     rdroid_g_pHS->filePrintf(v3, "\n\n");
     rdroid_g_pHS->fileClose(v3);
     return 1;
 }
 
-int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
+int rdParticle_Draw(rdThing *pParticle, rdMatrix34 *pOrient)
 {
     rdParticle *particle; // edi
     int v3; // eax
@@ -333,15 +333,15 @@ int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
     int v35; // [esp+58h] [ebp+4h]
     flex_t matrix_4_3a; // [esp+5Ch] [ebp+8h]
 
-    particle = thing->particlecloud;
-    rdMatrix_TransformPoint34(&vertex_out, &matrix_4_3->scale, &rdCamera_g_pCurCamera->orient);
+    particle = pParticle->particlecloud;
+    rdMatrix_TransformPoint34(&vertex_out, &pOrient->scale, &rdCamera_g_pCurCamera->orient);
     if ( rdroid_curCullFlags & 2 )
         v3 = rdClip_SphereInFrustrum(rdCamera_g_pCurCamera->pClipFrustum, &vertex_out, particle->cloudRadius);
     else
-        v3 = thing->clippingIdk;
+        v3 = pParticle->clippingIdk;
     if ( v3 != SPHERE_FULLY_OUTSIDE )
     {
-        rdMatrix_Multiply34(&out, &rdCamera_g_pCurCamera->orient, matrix_4_3);
+        rdMatrix_Multiply34(&out, &rdCamera_g_pCurCamera->orient, pOrient);
         if ( rdroid_g_curRenderOptions & 2 )
             matrix_4_3a = rdCamera_g_pCurCamera->ambientLight;
         else

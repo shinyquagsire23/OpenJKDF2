@@ -6,70 +6,70 @@
 #include "Engine/rdPuppet.h"
 #include "Primitives/rdMatrix.h"
 
-rdThing* rdThing_New(SithThing *parent)
+rdThing* rdThing_New(SithThing *pThing)
 {
     rdThing *thing;
 
     thing = (rdThing*)RDROID_ALLOC(sizeof(rdThing));
     if ( !thing )
         return 0;
-    rdThing_NewEntry(thing, parent);
+    rdThing_NewEntry(thing, pThing);
     return thing;
 }
 
-int rdThing_NewEntry(rdThing *thing, SithThing *parent)
+int rdThing_NewEntry(rdThing *prdThing, SithThing *pThing)
 {
-    thing->model3 = 0;
-    thing->type = 0;
-    thing->puppet = 0;
-    thing->field_18 = 0;
-    thing->rdFrameNum = 0;
-    thing->geosetSelect = -1;
-    thing->wallCel = -1;
-    thing->paJointMatrices = 0;
-    thing->desiredGeoMode = RD_GEOMETRY_FULL;
-    thing->desiredLightMode = RD_LIGHTMODE_GOURAUD;
-    thing->desiredTexMode = RD_TEXTUREMODE_2_UNK;
-    thing->curGeoMode = RD_GEOMETRY_FULL;
-    thing->curLightMode = RD_LIGHTMODE_GOURAUD;
-    thing->curTexMode = RD_TEXTUREMODE_2_UNK;
-    thing->pThing = parent;
+    prdThing->model3 = 0;
+    prdThing->type = 0;
+    prdThing->puppet = 0;
+    prdThing->field_18 = 0;
+    prdThing->rdFrameNum = 0;
+    prdThing->geosetSelect = -1;
+    prdThing->wallCel = -1;
+    prdThing->paJointMatrices = 0;
+    prdThing->desiredGeoMode = RD_GEOMETRY_FULL;
+    prdThing->desiredLightMode = RD_LIGHTMODE_GOURAUD;
+    prdThing->desiredTexMode = RD_TEXTUREMODE_2_UNK;
+    prdThing->curGeoMode = RD_GEOMETRY_FULL;
+    prdThing->curLightMode = RD_LIGHTMODE_GOURAUD;
+    prdThing->curTexMode = RD_TEXTUREMODE_2_UNK;
+    prdThing->pThing = pThing;
     return 1;
 }
 
-void rdThing_Free(rdThing *thing)
+void rdThing_Free(rdThing *pThing)
 {
-    if ( thing )
+    if ( pThing )
     {
-        rdThing_FreeEntry(thing);
-        RDROID_FREE(thing);
+        rdThing_FreeEntry(pThing);
+        RDROID_FREE(pThing);
     }
 }
 
-void rdThing_FreeEntry(rdThing *thing)
+void rdThing_FreeEntry(rdThing *pThing)
 {
-    if (thing->type == RD_THING_MODEL3)
+    if (pThing->type == RD_THING_MODEL3)
     {
-        if ( thing->paJointMatrices )
+        if ( pThing->paJointMatrices )
         {
-            RDROID_FREE(thing->paJointMatrices);
-            thing->paJointMatrices = 0;
+            RDROID_FREE(pThing->paJointMatrices);
+            pThing->paJointMatrices = 0;
         }
-        if ( thing->hierarchyNodes2 )
+        if ( pThing->hierarchyNodes2 )
         {
-            RDROID_FREE((void *)thing->hierarchyNodes2); // Possible OOB write in this
-            thing->hierarchyNodes2 = 0;
+            RDROID_FREE((void *)pThing->hierarchyNodes2); // Possible OOB write in this
+            pThing->hierarchyNodes2 = 0;
         }
-        if ( thing->paJointAmputationFlags )
+        if ( pThing->paJointAmputationFlags )
         {
-            RDROID_FREE(thing->paJointAmputationFlags);
-            thing->paJointAmputationFlags = 0;
+            RDROID_FREE(pThing->paJointAmputationFlags);
+            pThing->paJointAmputationFlags = 0;
         }
     }
-    if ( thing->puppet )
+    if ( pThing->puppet )
     {
-        rdPuppet_Free(thing->puppet);
-        thing->puppet = 0;
+        rdPuppet_Free(pThing->puppet);
+        pThing->puppet = 0;
     }
 }
 
@@ -120,17 +120,17 @@ int rdThing_SetModel3(rdThing *thing, rdModel3 *model)
     return 1;
 }
 
-int rdThing_SetCamera(rdThing *thing, rdCamera *camera)
+int rdThing_SetCamera(rdThing *pThing, rdCamera *pCamera)
 {
-    thing->type = RD_THINGTYPE_CAMERA;
-    thing->camera = camera;
+    pThing->type = RD_THINGTYPE_CAMERA;
+    pThing->camera = pCamera;
     return 1;
 }
 
-int rdThing_SetLight(rdThing *thing, rdLight *light)
+int rdThing_SetLight(rdThing *pThing, rdLight *pLight)
 {
-    thing->type = RD_THINGTYPE_LIGHT;
-    thing->light = light;
+    pThing->type = RD_THINGTYPE_LIGHT;
+    pThing->light = pLight;
     return 1;
 }
 
@@ -142,68 +142,68 @@ int rdThing_SetSprite3(rdThing *thing, rdSprite *sprite)
     return 1;
 }
 
-int rdThing_SetPolyline(rdThing *thing, rdPolyline *polyline)
+int rdThing_SetPolyline(rdThing *pThing, rdPolyline *pPolyline)
 {
-    thing->type = RD_THING_POLYLINE;
-    thing->polyline = polyline;
-    thing->wallCel = -1;
+    pThing->type = RD_THING_POLYLINE;
+    pThing->polyline = pPolyline;
+    pThing->wallCel = -1;
     return 1;
 }
 
-int rdThing_SetParticleCloud(rdThing *thing, rdParticle *particle)
+int rdThing_SetParticleCloud(rdThing *pThing, rdParticle *pParticle)
 {
-    thing->type = RD_THING_PARTICLE;
-    thing->particlecloud = particle;
+    pThing->type = RD_THING_PARTICLE;
+    pThing->particlecloud = pParticle;
     return 1;
 }
 
-int rdThing_Draw(rdThing *thing, rdMatrix34 *m)
+int rdThing_Draw(rdThing *pThing, rdMatrix34 *pOrient)
 {
     if (!rdroid_g_curGeometryMode)
         return 0;
 
-    switch ( thing->type )
+    switch ( pThing->type )
     {
         case RD_THING_NONE:
         case RD_THINGTYPE_CAMERA:
         case RD_THINGTYPE_LIGHT:
             return 0;
         case RD_THING_MODEL3:
-            return rdModel3_Draw(thing, m);
+            return rdModel3_Draw(pThing, pOrient);
         case RD_THING_SPRITE3:
-            return rdSprite_Draw(thing, m);
+            return rdSprite_Draw(pThing, pOrient);
         case RD_THING_PARTICLE:
-            return rdParticle_Draw(thing, m);
+            return rdParticle_Draw(pThing, pOrient);
         case RD_THING_POLYLINE:
-            return rdPolyline_Draw(thing, m);
+            return rdPolyline_Draw(pThing, pOrient);
     }
     
     // aaaaaaaaaaaaaaaaaa original game returns undefined for other types, this is to replicate that
-    return (intptr_t)thing;
+    return (intptr_t)pThing;
 }
 
-void rdThing_AccumulateMatrices(rdThing *thing, rdHierarchyNode *node, rdMatrix34 *acc)
+void rdThing_AccumulateMatrices(rdThing *pThing, rdHierarchyNode *pNode, rdMatrix34 *pPlacement)
 {
     rdHierarchyNode *childIter;
     rdVector3 negPivot;
     rdMatrix34 matrix;
 
-    rdMatrix_BuildTranslate34(&matrix, &node->pivot);
-    rdMatrix_PostMultiply34(&matrix, &thing->paJointMatrices[node->idx]);
-    if ( node->parent )
+    rdMatrix_BuildTranslate34(&matrix, &pNode->pivot);
+    rdMatrix_PostMultiply34(&matrix, &pThing->paJointMatrices[pNode->idx]);
+    if ( pNode->parent )
     {
-        rdVector_Neg3(&negPivot, &node->parent->pivot);
+        rdVector_Neg3(&negPivot, &pNode->parent->pivot);
         rdMatrix_PostTranslate34(&matrix, &negPivot);
     }
-    rdMatrix_Multiply34(&thing->paJointMatrices[node->idx], acc, &matrix);
-    if (!node->numChildren)
+    rdMatrix_Multiply34(&pThing->paJointMatrices[pNode->idx], pPlacement, &matrix);
+    if (!pNode->numChildren)
         return;
     
-    childIter = node->child;
-    for (int i = 0; i < node->numChildren; i++)
+    childIter = pNode->child;
+    for (int i = 0; i < pNode->numChildren; i++)
     {
-        if ( !thing->paJointAmputationFlags[childIter->idx] )
-            rdThing_AccumulateMatrices(thing, childIter, &thing->paJointMatrices[node->idx]);
+        if ( !pThing->paJointAmputationFlags[childIter->idx] )
+            rdThing_AccumulateMatrices(pThing, childIter, &pThing->paJointMatrices[pNode->idx]);
         childIter = childIter->nextSibling;
     }
 }

@@ -25,17 +25,17 @@
 #define rdThing_Draw_ADDR (0x0043E4E0)
 #define rdThing_AccumulateMatrices_ADDR (0x0043E560)
 
-rdThing* rdThing_New(SithThing *parent);
-int rdThing_NewEntry(rdThing *thing, SithThing *parent);
-void rdThing_Free(rdThing *thing);
-void rdThing_FreeEntry(rdThing *thing);
+rdThing* rdThing_New(SithThing *pThing);
+int rdThing_NewEntry(rdThing *prdThing, SithThing *pThing);
+void rdThing_Free(rdThing *pThing);
+void rdThing_FreeEntry(rdThing *pThing);
 int rdThing_SetModel3(rdThing *thing, rdModel3 *model);
-int rdThing_SetCamera(rdThing *thing, rdCamera *camera);
-int rdThing_SetLight(rdThing *thing, rdLight *light);
+int rdThing_SetCamera(rdThing *pThing, rdCamera *pCamera);
+int rdThing_SetLight(rdThing *pThing, rdLight *pLight);
 int rdThing_SetSprite3(rdThing *thing, rdSprite *sprite);
-int rdThing_SetPolyline(rdThing *thing, rdPolyline *polyline);
-int rdThing_SetParticleCloud(rdThing *thing, rdParticle *particle);
-MATH_FUNC int rdThing_Draw(rdThing *thing, rdMatrix34 *m);
-MATH_FUNC FAST_FUNC void rdThing_AccumulateMatrices(rdThing *thing, rdHierarchyNode *node, rdMatrix34 *acc);
+int rdThing_SetPolyline(rdThing *pThing, rdPolyline *pPolyline);
+int rdThing_SetParticleCloud(rdThing *pThing, rdParticle *pParticle);
+MATH_FUNC int rdThing_Draw(rdThing *pThing, rdMatrix34 *pOrient);
+MATH_FUNC FAST_FUNC void rdThing_AccumulateMatrices(rdThing *pThing, rdHierarchyNode *pNode, rdMatrix34 *pPlacement);
 
 #endif // _RDTHING_H

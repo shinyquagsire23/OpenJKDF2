@@ -35,16 +35,16 @@ typedef struct rdParticle
 
 typedef rdParticle* (__cdecl *rdParticleLoader_t)(char*);
 
-void rdParticle_RegisterLoader(rdParticleLoader_t loader);
+void rdParticle_RegisterLoader(rdParticleLoader_t pFunc);
 rdParticle* rdParticle_New(int numVertices, flex_t size, rdMaterial *material, int lightingMode, int allocateVertices);
 int rdParticle_NewEntry(rdParticle *particle, int numVertices, flex_t size, rdMaterial *material, int lightingMode, int allocateVertices);
-rdParticle* rdParticle_Duplicate(rdParticle *particle);
-void rdParticle_Free(rdParticle *particle);
-void rdParticle_FreeEntry(rdParticle *particle);
-rdParticle* rdParticle_Load(char *path);
-int rdParticle_LoadEntry(char *fpath, rdParticle *particle);
-int rdParticle_Write(char *writePath, rdParticle *particle, char *madeBy);
-MATH_FUNC int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3);
+rdParticle* rdParticle_Duplicate(rdParticle *pOriginal);
+void rdParticle_Free(rdParticle *pParticle);
+void rdParticle_FreeEntry(rdParticle *pParticle);
+rdParticle* rdParticle_Load(char *pFilename);
+int rdParticle_LoadEntry(char *pFilename, rdParticle *particle);
+int rdParticle_Write(char *pFilename, rdParticle *pParticle, char *pCreatedName);
+MATH_FUNC int rdParticle_Draw(rdThing *pParticle, rdMatrix34 *pOrient);
 
 //static void (*rdParticle_Draw)(rdThing *thing, rdMatrix34 *matrix) = (void*)rdParticle_Draw_ADDR;
 

@@ -22,19 +22,19 @@
 #define rdClip_Face3GTOrtho_ADDR (0x004748D0)
 #define rdClip_SphereInFrustrum_ADDR (0x004756E0)
 
-MATH_FUNC int rdClip_Line2(rdCanvas *pCanvas, signed int *pX1, signed int *pY1, signed int *pX2, signed int *pY2);
+MATH_FUNC int rdClip_Line2(rdCanvas *pCanvas, signed int *x1, signed int *y1, signed int *x2, signed int *y2);
 MATH_FUNC int rdClip_CalcOutcode2(rdCanvas *pCanvas, int x, int y);
-MATH_FUNC int rdClip_Point3(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3 *point);
+MATH_FUNC int rdClip_Point3(const rdClipFrustum* NO_ALIAS pFrustum, rdVector3 *pPoint);
 MATH_FUNC int rdClip_Line3Project(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3 *point1, rdVector3 *point2, int *out1, int *out2);
 MATH_FUNC int rdClip_Line3Ortho(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3 *point1, rdVector3 *point2, int *out1, int *out2);
 MATH_FUNC int rdClip_Line3(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3 *point1, rdVector3 *point2, rdVector3 *pointOut1, rdVector3 *pointOut2, int *out1, int *out2);
 
-MATH_FUNC FAST_FUNC int rdClip_SphereInFrustrum(const rdClipFrustum* NO_ALIAS frust, const rdVector3* NO_ALIAS pos, flex_t rad);
+MATH_FUNC FAST_FUNC int rdClip_SphereInFrustrum(const rdClipFrustum* NO_ALIAS pFrustum, const rdVector3* NO_ALIAS pCenter, flex_t radius);
 
 MATH_FUNC FAST_FUNC int rdClip_Face3W(const rdClipFrustum* NO_ALIAS frustum, rdVector3* NO_ALIAS aVertices, int numVertices);
 MATH_FUNC FAST_FUNC int rdClip_Face3T(const rdClipFrustum* NO_ALIAS frustum, rdVector3* NO_ALIAS aVertices, rdVector2* NO_ALIAS uvs, flex_t* NO_ALIAS paIntensities, int numVertices);
-MATH_FUNC int rdClip_Face3S(const rdClipFrustum* NO_ALIAS frustum, rdVector3 *aVertices, int numVertices);
-MATH_FUNC int rdClip_Face3GS(const rdClipFrustum* NO_ALIAS frustum, rdVector3 *aVertices, flex_t *a3, int numVertices);
+MATH_FUNC int rdClip_Face3S(const rdClipFrustum* NO_ALIAS pFrustrum, rdVector3 *aVertices, int numVertices);
+MATH_FUNC int rdClip_Face3GS(const rdClipFrustum* NO_ALIAS pFrustrum, rdVector3 *aVertices, flex_t *a3, int numVertices);
 MATH_FUNC FAST_FUNC int rdClip_Face3GT(const rdClipFrustum* NO_ALIAS frustum, rdVector3* NO_ALIAS aVertices, rdVector2* NO_ALIAS uvs, int numVertices);
 
 MATH_FUNC int rdClip_Face3GSRGB(const rdClipFrustum* NO_ALIAS frustum, rdVector3 *aVertices, flex_t *pR, flex_t *pG, flex_t *pB, int numVertices);
