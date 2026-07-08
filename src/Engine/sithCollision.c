@@ -62,6 +62,7 @@ int sithCollision_Shutdown()
 void sithCollision_AddCollisionHandler(int type1, int type2, sithCollision_collisionHandler_t pProcessFunc, sithCollision_searchHandler_t pUnknownFunc)
 {
     int idx = type2 + 12 * type1;
+    SITH_ASSERTREL(pProcessFunc != NULL); // Added: J3D assert
     sithCollision_collisionHandlers[idx].handler = pProcessFunc;
     sithCollision_collisionHandlers[idx].pUnknownFunc = pUnknownFunc;
     sithCollision_collisionHandlers[idx].bDifferentTypHandler = 0;
@@ -520,6 +521,7 @@ SithSector* sithCollision_FindSectorInRadius(SithSector *pStartSector, const rdV
     rdVector3 a1; // [esp+8h] [ebp-Ch] BYREF
     flex_t a3a; // [esp+1Ch] [ebp+8h]
 
+    SITH_ASSERTREL(startPos && endPos && pStartSector); // Added: J3D assert
     if ( sithIntersect_IsSphereInSector(endPos, 0.0, pStartSector) )
         return pStartSector;
     rdVector_Sub3(&a1, endPos, startPos);
@@ -656,6 +658,8 @@ flex_t sithCollision_MoveThing(SithThing *pThing, rdVector3 *moveNorm, flex_t mo
     v64 = 0.0;
     v65 = 0.0;
     v66 = 0;
+    SITH_ASSERTREL(sithCollision_initted); // Added: J3D asserts (bCollideStartup)
+    SITH_ASSERTREL(sithThing_ValidateThingPointer(pThing));
     if ( moveDist <= 0.0 )
         return 0.0;
     v5 = pThing;
@@ -915,6 +919,8 @@ int sithCollision_HandleThingHitSurface(SithThing *pThing, SithSurface *pSurface
     flex_t a1a; // [esp+Ch] [ebp+4h]
 
     v3 = pThing;
+    SITH_ASSERTREL(pThing != NULL); // Added: J3D asserts
+    SITH_ASSERTREL(pSurface != NULL);
     if ( pThing->moveType != SITH_MT_PHYSICS )
         return 0;
     a1a = -rdVector_Dot3(&pCollision->hitNorm, &pThing->physicsParams.vel);
@@ -1057,6 +1063,7 @@ int sithCollision_CollideHurt(SithThing *pThing, rdVector3 *pHitNorm, flex_t col
     flex_t a1a; // [esp+10h] [ebp+4h]
     flex_t amount; // [esp+14h] [ebp+8h]
 
+    SITH_ASSERTREL(pThing); // Added: J3D assert
     if ( pThing->moveType != SITH_MT_PHYSICS )
         return 0;
     amount = -rdVector_Dot3(&pThing->field_268, pHitNorm);
@@ -1146,6 +1153,7 @@ int sithCollision_HasLOS(SithThing *pViewer, SithThing *pTarget, int flag)
     searchFlags = RAYCAST_2000 | RAYCAST_100 | RAYCAST_20 | RAYCAST_2;
     if ( flag )
         searchFlags = RAYCAST_2000 | RAYCAST_20 | RAYCAST_2;
+    SITH_ASSERTREL(pViewer && pTarget); // Added: J3D assert
     rdVector_Sub3(&a1a, &pTarget->position, &pViewer->position);
     a6 = rdVector_Normalize3Acc(&a1a);
     sithCollision_SearchForCollisions(pViewer->sector, 0, &pViewer->position, &a1a, a6, 0.0, searchFlags);

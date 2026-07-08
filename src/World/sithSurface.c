@@ -78,6 +78,8 @@ int sithSurface_ReadSurfacesListText(SithWorld *pWorld)
     rdTexinfo *v66; // [esp+24h] [ebp-8h] BYREF
     int32_t v61;
 
+    SITH_ASSERTREL(pWorld != NULL); // Added: ported from OpenJones3D
+
     if ( !stdConffile_ReadLine() || _sscanf(stdConffile_g_aLine, " world adjoins %d", &numAdjoins) != 1 ) {
         stdPrintf(
             pSithHS->errorPrint,
@@ -528,6 +530,7 @@ int sithSurface_ReadSurfacesListText(SithWorld *pWorld)
 
 int sithSurface_ValidateWorldSurfaces(SithWorld *pWorld)
 {
+    SITH_ASSERTREL(pWorld != NULL); // Added: ported from OpenJones3D
     for (int32_t i = 0; i < pWorld->numSurfaces; i++)
     {
         if (pWorld->surfaces[i].pSector == (SithSector*)8 || !pWorld->surfaces[i].pSector)
@@ -547,6 +550,7 @@ int sithSurface_ValidateSurfacePointer(SithSurface *pSurf)
 
 void sithSurface_HideSectorAdjoin(SithSurfaceAdjoin *pAdjoin)
 {
+    SITH_ASSERTREL(pAdjoin); // Added: ported from OpenJones3D
     if ( (pAdjoin->flags & 1) != 0 )
     {
         pAdjoin->flags &= ~0x1;
@@ -556,6 +560,7 @@ void sithSurface_HideSectorAdjoin(SithSurfaceAdjoin *pAdjoin)
 
 void sithSurface_ShowSectorAdjoin(SithSurfaceAdjoin *pAdjoin)
 {
+    SITH_ASSERTREL(pAdjoin); // Added: ported from OpenJones3D
     if ( (pAdjoin->flags & 0x20) != 0 )
     {
         pAdjoin->flags &= ~0x20;
@@ -673,6 +678,7 @@ rdSurface* sithSurface_SurfaceAnim(SithSurface *parent, flex_t a2, uint16_t flag
 
 int sithSurface_AllocWorldSurfaces(SithWorld *pWorld, int numSurfaces)
 {
+    SITH_ASSERTREL(pWorld != NULL); // Added: ported from OpenJones3D
     SithSurface *surfaces = (SithSurface *)SITH_ALLOC(numSurfaces * sizeof(SithSurface));
     pWorld->surfaces = surfaces;
     if ( !surfaces )
@@ -689,6 +695,7 @@ int sithSurface_AllocWorldSurfaces(SithWorld *pWorld, int numSurfaces)
 
 int sithSurface_AllocWorldAdjoins(SithWorld *pWorld, int numAdjoins)
 {
+    SITH_ASSERTREL(pWorld); // Added: ported from OpenJones3D
     if ( numAdjoins == 0 )
     {
         pWorld->adjoins = NULL;
@@ -709,6 +716,7 @@ int sithSurface_AllocWorldAdjoins(SithWorld *pWorld, int numAdjoins)
 
 void sithSurface_FreeWorldSurfaces(SithWorld *pWorld)
 {
+    SITH_ASSERTREL(pWorld != NULL); // Added: ported from OpenJones3D
 #ifdef SITHSURFACE_POOLED_ARRAYS
     // Added: pooled surface arrays free as one block (per-surface pointers alias
     // into it; a partially-parsed world may still hold offsets instead).
@@ -1564,6 +1572,7 @@ SithSurface* sithSurface_sub_4E63B0(int idx)
 
 void sithSurface_SyncSurface(SithSurface *pSurface)
 {
+    SITH_ASSERTREL(pSurface); // Added: ported from OpenJones3D
     pSurface->flags |= SITH_SURFACE_CHANGED;
 
     if ( sithSurface_numUnsyncedSurfaces < 0x20 )

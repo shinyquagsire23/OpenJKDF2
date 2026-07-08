@@ -32,6 +32,10 @@ int sithModel_ReadStaticModelsListText(SithWorld *pWorld, int bSkip)
 
     if ( bSkip )
         return 0;
+
+    SITH_ASSERTREL(pWorld != NULL); // Added
+    SITH_ASSERTREL(pWorld->aModels == NULL); // Added
+    SITH_ASSERTREL(pWorld->numModels == 0); // Added
     stdConffile_ReadArgs();
     if ( _memcmp(stdConffile_g_entry.aArgs[0].value, "world", 6u) || _memcmp(stdConffile_g_entry.aArgs[1].value, "models", 7u) )
         return 0;
@@ -66,9 +70,11 @@ int sithModel_ReadStaticModelsListText(SithWorld *pWorld, int bSkip)
 
 void sithModel_FreeWorldModels(SithWorld *pWorld)
 {
+    SITH_ASSERTREL(pWorld != NULL); // Added
     if (!pWorld->sizeModels )
         return;
 
+    SITH_ASSERTREL(pWorld->aModels != NULL); // Added
     for (int i = 0; i < pWorld->numModels; i++)
     {
         stdHashtbl_Remove(sithModel_hashtable, pWorld->aModels[i].filename);
@@ -85,18 +91,22 @@ rdModel3* sithModel_Load(const char *pName, int bSkipDefault)
     rdModel3 *model;
     char model_fpath[128];
 
+    SITH_ASSERTREL(sithWorld_g_pLastLoadedWorld != NULL); // Added
+    SITH_ASSERTREL(pName != NULL); // Added
     model = (rdModel3 *)stdHashtbl_Find(sithModel_hashtable, pName);
     if ( model ) {
         //stdPlatform_Printf("OpenJKDF2: %s: Load %s from static jkl.\n", __func__, model_3do_fname); // Added
         return model;
     }
 
+    SITH_ASSERTREL(sithWorld_g_pLastLoadedWorld->numModels <= sithWorld_g_pLastLoadedWorld->sizeModels); // Added
     if ( sithWorld_g_pLastLoadedWorld->numModels >= sithWorld_g_pLastLoadedWorld->sizeModels ) {
         stdPlatform_Printf("OpenJKDF2: %s: Too many models already loaded!\n", __func__); // Added
         return 0;
     }
     model = &sithWorld_g_pLastLoadedWorld->aModels[sithWorld_g_pLastLoadedWorld->numModels];
 
+    SITH_ASSERTREL(_strlen(pName) < sizeof(model_fpath)); // Added
     _sprintf(model_fpath, "%s%c%s", "3do", '\\', pName);
     if ( !rdModel3_LoadEntry(model_fpath, model) )
     {
@@ -169,6 +179,7 @@ uint32_t sithModel_GetModelMemUsage(rdModel3 *pModel)
 
 int sithModel_AllocWorldModels(SithWorld *pWorld, int size)
 {
+    SITH_ASSERTREL(pWorld->aModels == NULL); // Added
     pWorld->aModels = (rdModel3 *)SITH_ALLOC(sizeof(rdModel3) * size);
     if ( !pWorld->aModels )
         return 0;

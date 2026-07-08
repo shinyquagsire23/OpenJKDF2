@@ -56,6 +56,7 @@ void sithWeapon_Startup()
 
 void sithWeapon_Update(SithThing* pThing, flex_t secDeltaTime)
 {
+    SITH_ASSERTREL(pThing); // Added: from OpenJones3D
     sithWeaponFlags_t flags = pThing->weaponParams.flags;
     if (flags & SITH_WF_INSTANT_IMPACT) // shooting walls?
     {
@@ -493,6 +494,7 @@ SithThing* sithWeapon_WeaponFire(SithThing *pShooter, SithThing *pProjectileTemp
 {
     SithThing *spawned; // esi
 
+    SITH_ASSERTREL(pShooter); // Added: from OpenJones3D
     if ( hFireSnd )
         sithAIAwareness_CreateTransmittingEvent(pShooter->sector, &pShooter->position, 1, 4.0, pShooter);
 
@@ -522,7 +524,10 @@ SithThing* sithWeapon_WeaponFireProjectile(SithThing *pShooter, SithThing *pProj
 
     v9 = 0;
     if ( !pShooter || !pFireDir )
+    {
+        SITHLOG_ERROR("Bad arguments passed.\n"); // Added: from OpenJones3D
         return 0;
+    }
 
     if ( pProjectileTemplate )
     {
@@ -770,6 +775,7 @@ int sithWeapon_SurfaceCollisionHandler(SithThing *pThing, SithSurface *pSurf, Si
     char v10; // bl
     int v11; // eax
 
+    SITH_ASSERTREL(pThing->type == SITH_THING_WEAPON); // Added: from OpenJones3D
     if ( pThing->moveType != SITH_MT_PHYSICS )
         return 0;
     if ( (g_debugmodeFlags & DEBUGFLAG_PRINT_HITS) != 0 )
@@ -842,6 +848,7 @@ int sithWeapon_SurfaceCollisionHandler(SithThing *pThing, SithSurface *pSurf, Si
 
 void sithWeapon_DestroyWeapon(SithThing *pWeapon)
 {
+    SITH_ASSERTREL(pWeapon && (pWeapon->type == SITH_THING_WEAPON)); // Added: from OpenJones3D
     // This gets called for thermal detonators and prox mines when they run out of lifetime
     if (pWeapon->weaponParams.flags & SITH_WF_EXPLODE)
     {
@@ -1288,6 +1295,7 @@ void sithWeapon_GetAimOrient(rdMatrix34 *pOutOrient, SithThing *pShooter, rdMatr
     flex_t a3a; // [esp+6Ch] [ebp+14h]
     int a4a; // [esp+70h] [ebp+18h]
 
+    SITH_ASSERTREL(pShooter); // Added: from OpenJones3D
     if ( autoAimFovX == 0.0 && autoAimFovZ == 0.0 )
         return;
     if ( jkPlayer_setDiff == 2 )
@@ -1363,6 +1371,7 @@ SithThing* sithWeapon_FireProjectile(SithThing *pShooter, SithThing *pProjectile
     flex_t catchupFactor; // [esp+80h] [ebp+4h]
     flex_t catchupTimeOffset; // [esp+90h] [ebp+14h]
 
+    SITH_ASSERTREL(pShooter); // Added: from OpenJones3D
     thingType = pShooter->type;
     _memcpy(&senderOrient, &pShooter->orient, sizeof(senderOrient));
     if ( thingType == SITH_THING_ACTOR || thingType == SITH_THING_PLAYER )
@@ -1522,6 +1531,7 @@ int sithWeapon_ReadConf()
 // TODO these functions are interesting
 void sithWeapon_SelectNextWeapon(SithThing* pThing)
 {
+    SITH_ASSERTREL(pThing); // Added: from OpenJones3D
     if (Main_bMotsCompat) {
         int iVar1;
         int binIdx;
@@ -1583,6 +1593,7 @@ void sithWeapon_SelectNextWeapon(SithThing* pThing)
 
 void sithWeapon_SelectPreviousWeapon(SithThing* pThing)
 {
+    SITH_ASSERTREL(pThing); // Added: from OpenJones3D
     if (Main_bMotsCompat) {
         int iVar1;
         int binIdx;
