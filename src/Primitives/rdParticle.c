@@ -359,7 +359,7 @@ int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
         }
         if ( v35 >= particle->lightingMode )
             v35 = particle->lightingMode;
-        rdMatrix_TransformPointLst34(&out, particle->vertices, &aParticleVertices[0], particle->numVertices);
+        rdMatrix_TransformPointList34(&out, particle->vertices, &aParticleVertices[0], particle->numVertices);
         v32 = 0;
         if ( !particle->numVertices )
             return 1;

@@ -1508,7 +1508,7 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
     }
 
     rdMatrix_Multiply34(&out, &rdCamera_pCurCamera->view_matrix, mat);
-    rdMatrix_TransformPointLst34(&out, pCurMesh->vertices, aView, pCurMesh->numVertices);
+    rdMatrix_TransformPointList34(&out, pCurMesh->vertices, aView, pCurMesh->numVertices);
     rdMatrix_InvertOrtho34(&matInv, mat);
     
     rdModel3_geometryMode = pCurMesh->geometryMode;

@@ -698,7 +698,7 @@ int sithAICmd_TurretFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorI
           || rdVector_IsZero3(&v16->physicsParams.vel) )
         {
             v20 = &actor->thing->lookOrientation;
-            rdMatrix_TransformVector34Acc_0(&a1, &actor->attackError, &actor->thing->lookOrientation);
+            rdMatrix_TransformVectorOrtho34(&a1, &actor->attackError, &actor->thing->lookOrientation);
         }
         else
         {
@@ -707,7 +707,7 @@ int sithAICmd_TurretFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorI
 
             rdVector_Normalize3Acc(&v35);
             v20 = &actor->thing->lookOrientation;
-            rdMatrix_TransformVector34Acc_0(&a1, &v35, &actor->thing->lookOrientation);
+            rdMatrix_TransformVectorOrtho34(&a1, &v35, &actor->thing->lookOrientation);
         }
         rdVector_ExtractAngle(&a1, &a3);
         if ( a3.y < -flagsa )

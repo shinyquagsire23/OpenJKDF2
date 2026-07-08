@@ -55,7 +55,7 @@ extern "C" {
 #define rdMatrix_GetRowVector34_ADDR (0x00441DD0)
 #define rdMatrix_GetRowVector44_ADDR (0x00441E00)
 #define rdMatrix_TransformVector34_ADDR (0x00441E30)
-#define rdMatrix_TransformVector34Acc_0_ADDR (0x00441EA0)
+#define rdMatrix_TransformVectorOrtho34_ADDR (0x00441EA0)
 #define rdMatrix_TransformVector34Acc_ADDR (0x00441F10)
 #define rdMatrix_TransformVector44_ADDR (0x00441FB0)
 #define rdMatrix_TransformVector44Acc_ADDR (0x00442070)
@@ -63,7 +63,7 @@ extern "C" {
 #define rdMatrix_TransformPoint34Acc_ADDR (0x004421D0)
 #define rdMatrix_TransformPoint44_ADDR (0x00442270)
 #define rdMatrix_TransformPoint44Acc_ADDR (0x00442310)
-#define rdMatrix_TransformPointLst34_ADDR (0x004423D0)
+#define rdMatrix_TransformPointList34_ADDR (0x004423D0)
 #define rdMatrix_TransformPointLst44_ADDR (0x00442470)
 
 MATH_FUNC FAST_FUNC void rdMatrix_Build34(rdMatrix34 *out, const rdVector3 *rot, const rdVector3 *pos);
@@ -112,7 +112,7 @@ MATH_FUNC void rdMatrix_SetRowVector44(rdMatrix44 *m, int row, const rdVector4 *
 MATH_FUNC void rdMatrix_GetRowVector34(rdMatrix34 *m, int row, rdVector3 *out);
 MATH_FUNC void rdMatrix_GetRowVector44(rdMatrix44 *m, int row, rdVector4 *out);
 MATH_FUNC FAST_FUNC void rdMatrix_TransformVector34(rdVector3 *out, const rdVector3 *v, const rdMatrix34 *m);
-MATH_FUNC void rdMatrix_TransformVector34Acc_0(rdVector3 *a1, const rdVector3 *a2, const rdMatrix34 *a3);
+MATH_FUNC void rdMatrix_TransformVectorOrtho34(rdVector3 *a1, const rdVector3 *a2, const rdMatrix34 *a3);
 MATH_FUNC void rdMatrix_TransformVector34Acc(rdVector3 *a1, const rdMatrix34 *a2);
 MATH_FUNC void rdMatrix_TransformVector44(rdMatrix44 *a1, const rdVector4 *a2, const rdMatrix44 *a3);
 MATH_FUNC void rdMatrix_TransformVector44Acc(rdVector4 *a1, const rdMatrix44 *a2);
@@ -120,7 +120,7 @@ MATH_FUNC FAST_FUNC void rdMatrix_TransformPoint34(rdVector3 *vertex_out, const 
 MATH_FUNC FAST_FUNC void rdMatrix_TransformPoint34Acc(rdVector3 *a1, const rdMatrix34 *a2);
 MATH_FUNC void rdMatrix_TransformPoint44(rdVector4 *a1, const rdVector4 *a2, const rdMatrix44 *a3);
 MATH_FUNC void rdMatrix_TransformPoint44Acc(rdVector4 *a1, const rdMatrix44 *a2);
-MATH_FUNC void rdMatrix_TransformPointLst34(const rdMatrix34 *m, const rdVector3 *in, rdVector3 *out, int num);
+MATH_FUNC void rdMatrix_TransformPointList34(const rdMatrix34 *m, const rdVector3 *in, rdVector3 *out, int num);
 MATH_FUNC void rdMatrix_TransformPointLst44(const rdMatrix44 *m, const rdVector4 *in, rdVector4 *out, int num);
 
 // Added

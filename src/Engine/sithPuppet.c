@@ -397,7 +397,7 @@ flex_t sithPuppet_UpdateThingMove(sithThing *thing)
     }
     else
     {
-        rdMatrix_TransformVector34Acc_0(&a1a, &thing->physicsParams.vel, &thing->lookOrientation);
+        rdMatrix_TransformVectorOrtho34(&a1a, &thing->physicsParams.vel, &thing->lookOrientation);
         if ( thing->attach_flags || (thing->physicsParams.physflags & SITH_PF_FLY) != 0 || (thing->sector->flags & SITH_ANIM_WALK) != 0 )
         {
             v2 = a1a.y;

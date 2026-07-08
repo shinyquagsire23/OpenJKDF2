@@ -784,7 +784,7 @@ void rdMatrix_TransformVector34(rdVector3 *out, const rdVector3 *v, const rdMatr
     out->z = v8 * v9 + v6 * v11 + m->rvec.z * v->x;
 }
 
-void rdMatrix_TransformVector34Acc_0(rdVector3* NO_ALIAS a1, const rdVector3* NO_ALIAS a2, const rdMatrix34 *a3)
+void rdMatrix_TransformVectorOrtho34(rdVector3* NO_ALIAS a1, const rdVector3* NO_ALIAS a2, const rdMatrix34 *a3)
 {
     flex_d_t v3; // st5
     flex_d_t v4; // st4
@@ -878,7 +878,7 @@ void rdMatrix_TransformPoint44Acc(rdVector4 *a1, const rdMatrix44 *a2)
     rdMatrix_TransformPoint44(a1, &tmp, a2);
 }
 
-void rdMatrix_TransformPointLst34(const rdMatrix34 *m, const rdVector3 *in, rdVector3 *out, int num)
+void rdMatrix_TransformPointList34(const rdMatrix34 *m, const rdVector3 *in, rdVector3 *out, int num)
 {
     for (int i = 0; i < num; i++)
     {

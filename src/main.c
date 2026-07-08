@@ -1842,7 +1842,7 @@ void do_hooks()
     hook_function(rdMatrix_GetRowVector34_ADDR, rdMatrix_GetRowVector34);
     hook_function(rdMatrix_GetRowVector44_ADDR, rdMatrix_GetRowVector44);
     hook_function(rdMatrix_TransformVector34_ADDR, rdMatrix_TransformVector34);
-    hook_function(rdMatrix_TransformVector34Acc_0_ADDR, rdMatrix_TransformVector34Acc_0);
+    hook_function(rdMatrix_TransformVectorOrtho34_ADDR, rdMatrix_TransformVectorOrtho34);
     hook_function(rdMatrix_TransformVector34Acc_ADDR, rdMatrix_TransformVector34Acc);
     hook_function(rdMatrix_TransformVector44_ADDR, rdMatrix_TransformVector44);
     hook_function(rdMatrix_TransformVector44Acc_ADDR, rdMatrix_TransformVector44Acc);
@@ -1850,7 +1850,7 @@ void do_hooks()
     hook_function(rdMatrix_TransformPoint34Acc_ADDR, rdMatrix_TransformPoint34Acc);
     hook_function(rdMatrix_TransformPoint44_ADDR, rdMatrix_TransformPoint44);
     hook_function(rdMatrix_TransformPoint44Acc_ADDR, rdMatrix_TransformPoint44Acc);
-    hook_function(rdMatrix_TransformPointLst34_ADDR, rdMatrix_TransformPointLst34);
+    hook_function(rdMatrix_TransformPointList34_ADDR, rdMatrix_TransformPointList34);
     hook_function(rdMatrix_TransformPointLst44_ADDR, rdMatrix_TransformPointLst44);
     
     // rdCamera

@@ -1279,7 +1279,7 @@ void sithThing_AttachThingToThingFace(sithThing *a1, sithThing *a2, rdFace *a3, 
         rdVector_MultAcc3(&a1->physicsParams.vel, &a2->trackParams.vel, -a2->trackParams.lerpSpeed);
     }
     rdVector_Sub3(&a2a, &a1->position, &a2->position);
-    rdMatrix_TransformVector34Acc_0(&a1->field_4C, &a2a, &a2->lookOrientation);
+    rdMatrix_TransformVectorOrtho34(&a1->field_4C, &a2a, &a2->lookOrientation);
     if ( (a2->thingflags & SITH_TF_CAPTURED) != 0 && (a1->thingflags & (SITH_TF_DISABLED|SITH_TF_INVULN)) == 0 )
         sithCog_ThingSendMessage(a2, a1, SITH_MESSAGE_ENTERED);
     if ( v18 && !a5 )
@@ -1333,7 +1333,7 @@ void sithThing_AttachThingToThing(sithThing *parent, sithThing *child)
     parent->parentThing = 0;
     child->attachedParentMaybe = parent;
     rdVector_Sub3(&a2, &parent->position, &child->position);
-    rdMatrix_TransformVector34Acc_0(&parent->field_4C, &a2, &child->lookOrientation);
+    rdMatrix_TransformVectorOrtho34(&parent->field_4C, &a2, &child->lookOrientation);
     if ( (child->thingflags & SITH_TF_CAPTURED) != 0 && (parent->thingflags & (SITH_TF_DISABLED|SITH_TF_INVULN)) == 0 )
         sithCog_ThingSendMessage(child, parent, SITH_MESSAGE_ENTERED);
 }

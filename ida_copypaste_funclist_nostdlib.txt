@@ -1157,7 +1157,7 @@ rdMatrix_SetRowVector44	.text	00441DA0	00000028	00000000	0000000C	R	.	.	.	.	.	T	
 rdMatrix_GetRowVector34	.text	00441DD0	00000023	00000000	0000000C	R	.	.	.	.	.	T	.
 rdMatrix_GetRowVector44	.text	00441E00	00000022	00000000	0000000C	R	.	.	.	.	.	T	.
 rdMatrix_TransformVector34	.text	00441E30	0000006B	00000000	0000000C	R	.	.	.	.	.	T	.
-rdMatrix_TransformVector34Acc_0	.text	00441EA0	0000006B	00000000	0000000C	R	.	.	.	.	.	T	.
+rdMatrix_TransformVectorOrtho34	.text	00441EA0	0000006B	00000000	0000000C	R	.	.	.	.	.	T	.
 rdMatrix_TransformVector34Acc	.text	00441F10	00000097	00000014	00000008	R	.	.	.	.	.	T	.
 rdMatrix_TransformVector44	.text	00441FB0	000000B3	00000000	0000000C	R	.	.	.	.	.	T	.
 rdMatrix_TransformVector44Acc	.text	00442070	000000D7	00000010	00000008	R	.	.	.	.	.	T	.
@@ -1165,7 +1165,7 @@ rdMatrix_TransformPoint34	.text	00442150	00000074	00000000	0000000C	R	.	.	.	.	.	
 rdMatrix_TransformPoint34Acc	.text	004421D0	000000A0	00000014	00000008	R	.	.	.	.	.	T	.
 rdMatrix_TransformPoint44	.text	00442270	0000009D	00000000	0000000C	R	.	.	.	.	.	T	.
 rdMatrix_TransformPoint44Acc	.text	00442310	000000BF	00000010	00000008	R	.	.	.	.	.	T	.
-rdMatrix_TransformPointLst34	.text	004423D0	0000009D	00000000	00000010	R	.	.	.	.	.	T	.
+rdMatrix_TransformPointList34	.text	004423D0	0000009D	00000000	00000010	R	.	.	.	.	.	T	.
 rdMatrix_TransformPointLst44	.text	00442470	0000009D	00000000	00000010	R	.	.	.	.	.	T	.
 rdColormap_SetCurrent	.text	00442510	00000044	00000000	00000004	R	.	.	.	.	.	T	.
 rdColormap_SetIdentity	.text	00442560	00000031	00000000	00000004	R	.	.	.	.	.	T	.
