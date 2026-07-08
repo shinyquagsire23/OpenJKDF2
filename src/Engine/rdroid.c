@@ -68,19 +68,19 @@ void rdClose()
         bRDroidOpen = 0;
 }
 
-void rdSetRenderOptions(int a1)
+void rdSetRenderOptions(int options)
 {
-    rdroid_g_curRenderOptions = a1;
+    rdroid_g_curRenderOptions = options;
 }
 
-void rdSetGeometryMode(int a1)
+void rdSetGeometryMode(int mode)
 {
-    rdroid_g_curGeometryMode = a1;
+    rdroid_g_curGeometryMode = mode;
 }
 
-void rdSetLightingMode(int a1)
+void rdSetLightingMode(int mode)
 {
-    rdroid_g_curLightingMode = a1;
+    rdroid_g_curLightingMode = mode;
 }
 
 void rdSetTextureMode(int a1)

@@ -42,7 +42,7 @@ int rdCache_TriCompare(const void* a_, const void* b_);
 int rdCache_NGonCompare(const void* a_, const void* b_);
 #endif
 
-int rdCache_ProcFaceCompare(rdProcEntry *a, rdProcEntry *b);
+int rdCache_ProcFaceCompare(rdProcEntry *pEntry1, rdProcEntry *pEntry2);
 MATH_FUNC int rdCache_AddProcFace(int a1, unsigned int num_vertices, char flags);
 
 #ifndef __cplusplus

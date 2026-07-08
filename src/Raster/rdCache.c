@@ -1426,12 +1426,12 @@ int rdCache_NGonCompare(const void* a_, const void* b_)
 }
 #endif
 
-int rdCache_ProcFaceCompare(rdProcEntry *a, rdProcEntry *b)
+int rdCache_ProcFaceCompare(rdProcEntry *pEntry1, rdProcEntry *pEntry2)
 {
-    if ( a->z_min == b->z_min )
+    if ( pEntry1->z_min == pEntry2->z_min )
         return 0;
 
-    if ( a->z_min >= b->z_min )
+    if ( pEntry1->z_min >= pEntry2->z_min )
         return -1;
 
     return 1;

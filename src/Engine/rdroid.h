@@ -40,9 +40,9 @@ void rdShutdown();
 int rdOpen(int a1);
 void rdClose();
 
-void rdSetRenderOptions(int a1);
-void rdSetGeometryMode(int a1);
-void rdSetLightingMode(int a1);
+void rdSetRenderOptions(int options);
+void rdSetGeometryMode(int mode);
+void rdSetLightingMode(int mode);
 void rdSetTextureMode(int a1);
 void rdSetSortingMethod(int a1);
 void rdSetOcclusionMethod(int a1);
