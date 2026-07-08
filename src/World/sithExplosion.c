@@ -38,7 +38,7 @@ void sithExplosion_CreateThing(sithThing *explosion)
     }
 }
 
-void sithExplosion_Tick(sithThing *explosion)
+void sithExplosion_Update(sithThing *explosion)
 {
     flex_d_t v5; // st7
     flex_d_t v6; // st6
@@ -46,7 +46,7 @@ void sithExplosion_Tick(sithThing *explosion)
     if ((explosion->explosionParams.typeflags & SITHEXPLOSION_FLAG_HAS_BLAST_PHASE)
       && explosion->lifeLeftMs <= explosion->explosionParams.blastTime)
     {
-        sithExplosion_UpdateForce(explosion);
+        sithExplosion_MakeBlast(explosion);
         explosion->explosionParams.typeflags &= ~SITHEXPLOSION_FLAG_HAS_BLAST_PHASE;
     }
     if ((explosion->explosionParams.typeflags & SITHEXPLOSION_FLAG_VARIABLE_LIGHT) 
@@ -66,7 +66,7 @@ void sithExplosion_Tick(sithThing *explosion)
     }
 }
 
-void sithExplosion_UpdateForce(sithThing *explosion)
+void sithExplosion_MakeBlast(sithThing *explosion)
 {
     sithCollisionSearchEntry *i; // ebp
     sithThing **debrisTemplates; // edi
@@ -127,7 +127,7 @@ void sithExplosion_UpdateForce(sithThing *explosion)
     }
 }
 
-int sithExplosion_LoadThingParams(stdConffileArg *arg, sithThing *thing, int param)
+int sithExplosion_ParseArg(stdConffileArg *arg, sithThing *thing, int param)
 {
     int v15; // esi
     sithThing **i; // eax

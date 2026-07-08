@@ -247,7 +247,7 @@ void sithThing_TickAll(flex_t deltaSeconds, int deltaMs)
                     sithAI_Tick(pThingIter, deltaSeconds);
                     break;
                 case SITH_CT_EXPLOSION:
-                    sithExplosion_Tick(pThingIter);
+                    sithExplosion_Update(pThingIter);
                     break;
                 case SITH_CT_PARTICLE:
                     sithParticle_Update(pThingIter, deltaSeconds);
@@ -1597,7 +1597,7 @@ int sithThing_ParseArgs(stdConffileArg *arg, sithThing* pThing)
             v7 = sithItem_ParseArg(arg, pThing, paramIdx);
             goto LABEL_10;
         case SITH_THING_EXPLOSION:
-            v7 = sithExplosion_LoadThingParams(arg, pThing, paramIdx);
+            v7 = sithExplosion_ParseArg(arg, pThing, paramIdx);
             goto LABEL_10;
         case SITH_THING_PARTICLE:
             v7 = sithParticle_ParseArg(arg, pThing, paramIdx);

@@ -2062,9 +2062,9 @@ void do_hooks()
     
     // sithExplosion
     hook_function(sithExplosion_CreateThing_ADDR, sithExplosion_CreateThing);
-    hook_function(sithExplosion_Tick_ADDR, sithExplosion_Tick);
-    hook_function(sithExplosion_UpdateForce_ADDR, sithExplosion_UpdateForce);
-    hook_function(sithExplosion_LoadThingParams_ADDR, sithExplosion_LoadThingParams);
+    hook_function(sithExplosion_Update_ADDR, sithExplosion_Update);
+    hook_function(sithExplosion_MakeBlast_ADDR, sithExplosion_MakeBlast);
+    hook_function(sithExplosion_ParseArg_ADDR, sithExplosion_ParseArg);
     
     // sithIntersect
 #if 0

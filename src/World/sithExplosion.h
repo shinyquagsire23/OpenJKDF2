@@ -4,9 +4,9 @@
 #include "types.h"
 
 #define sithExplosion_CreateThing_ADDR (0x004FB790)
-#define sithExplosion_Tick_ADDR (0x004FB860)
-#define sithExplosion_UpdateForce_ADDR (0x004FB920)
-#define sithExplosion_LoadThingParams_ADDR (0x004FBBD0)
+#define sithExplosion_Update_ADDR (0x004FB860)
+#define sithExplosion_MakeBlast_ADDR (0x004FB920)
+#define sithExplosion_ParseArg_ADDR (0x004FBBD0)
 
 enum SithExplosionFlag
 {
@@ -25,10 +25,10 @@ enum SithExplosionFlag
 };
 
 void sithExplosion_CreateThing(sithThing *explosion);
-MATH_FUNC void sithExplosion_Tick(sithThing *explosion);
-MATH_FUNC void sithExplosion_UpdateForce(sithThing *explosion);
-int sithExplosion_LoadThingParams(stdConffileArg *arg, sithThing *thing, int param);
+MATH_FUNC void sithExplosion_Update(sithThing *explosion);
+MATH_FUNC void sithExplosion_MakeBlast(sithThing *explosion);
+int sithExplosion_ParseArg(stdConffileArg *arg, sithThing *thing, int param);
 
-//static void (*sithExplosion_UpdateForce)(sithThing *explosion) = (void*)sithExplosion_UpdateForce_ADDR;
+//static void (*sithExplosion_MakeBlast)(sithThing *explosion) = (void*)sithExplosion_MakeBlast_ADDR;
 
 #endif // _SITHEXPLOSION_H

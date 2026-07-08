@@ -2645,9 +2645,9 @@ sithTrackThing_PathMovePause	.text	004FB650	00000032	00000004	00000004	R	.	.	.	.
 sithTrackThing_PathMoveResume	.text	004FB690	00000032	00000004	00000004	R	.	.	.	.	.	T	.
 sithTrackThing_idkpathmove	.text	004FB6D0	000000C0	0000001C	0000000C	R	.	.	.	.	.	T	.
 sithExplosion_CreateThing	.text	004FB790	000000CA	00000018	00000004	R	.	.	.	.	.	T	.
-sithExplosion_Tick	.text	004FB860	000000BD	00000018	00000004	R	.	.	.	.	.	T	.
-sithExplosion_UpdateForce	.text	004FB920	000002B0	00000060	00000004	R	.	.	.	.	.	T	.
-sithExplosion_LoadThingParams	.text	004FBBD0	000001E6	00000008	0000000C	R	.	.	.	.	.	T	.
+sithExplosion_Update	.text	004FB860	000000BD	00000018	00000004	R	.	.	.	.	.	T	.
+sithExplosion_MakeBlast	.text	004FB920	000002B0	00000060	00000004	R	.	.	.	.	.	T	.
+sithExplosion_ParseArg	.text	004FBBD0	000001E6	00000008	0000000C	R	.	.	.	.	.	T	.
 sithItem_PlayerCollisionHandler	.text	004FBE10	0000005D	00000008	00000008	R	.	.	.	.	.	T	.
 sithItem_Initialize	.text	004FBE70	0000002C	00000004	00000004	R	.	.	.	.	.	T	.
 sithItem_SetItemTaken	.text	004FBEA0	00000090	00000004	0000000C	R	.	.	.	.	.	T	.
