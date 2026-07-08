@@ -14,12 +14,12 @@
 #include <math.h>
 #include <float.h>
 
-int sithMap_Startup(sithMap *map)
+int sithMap_Startup(sithMap *pConfig)
 {
     if ( sithMap_bInitted )
         return 0;
 
-    _memcpy(&sithMap_ctx, map, sizeof(sithMap_ctx));
+    _memcpy(&sithMap_ctx, pConfig, sizeof(sithMap_ctx));
     sithMap_bInitted = 1;
     return 1;
 }
@@ -88,35 +88,35 @@ LABEL_11:
     rdPrimit3_DrawClippedCircle(&vertex_out, a2a, 20.0, color, -1);
 }
 
-void sithMap_sub_4EC4D0(SithSector *sector)
+void sithMap_sub_4EC4D0(SithSector *pSector)
 {
     int v2; // eax
     SithSurfaceAdjoin *i; // esi
 
-    if ( ++sithMap_var >= 20 || sector->renderTick == sithRender_lastRenderTick )
+    if ( ++sithMap_var >= 20 || pSector->renderTick == sithRender_lastRenderTick )
     {
 LABEL_11:
         --sithMap_var;
         return;
     }
 
-    if ( (sector->flags & SITH_SECTOR_SEEN) || (g_mapModeFlags & SITHMAPMODE_SHOWALLSECTORS))
+    if ( (pSector->flags & SITH_SECTOR_SEEN) || (g_mapModeFlags & SITHMAPMODE_SHOWALLSECTORS))
     {
-        sector->renderTick = sithRender_lastRenderTick;
-        if (sector->flags & SITH_SECTOR_HIDEONMAP)
+        pSector->renderTick = sithRender_lastRenderTick;
+        if (pSector->flags & SITH_SECTOR_HIDEONMAP)
             v2 = 1;
         else
-            v2 = sithMap_Draw(sector);
+            v2 = sithMap_Draw(pSector);
         if ( v2 )
         {
-            for ( i = sector->adjoins; i; i = i->next )
+            for ( i = pSector->adjoins; i; i = i->next )
                 sithMap_sub_4EC4D0(i->sector);
         }
         goto LABEL_11;
     }
 }
 
-int sithMap_Draw(SithSector *sector)
+int sithMap_Draw(SithSector *pSector)
 {
     SithSector *v1; // esi
     int v2; // ecx
@@ -166,10 +166,10 @@ int sithMap_Draw(SithSector *sector)
     int out2; // [esp+8Ch] [ebp-8h] BYREF
     int out1; // [esp+90h] [ebp-4h] BYREF
 
-    v1 = sector;
+    v1 = pSector;
     v56 = 0;
-    v2 = sector->numSurfaces;
-    v3 = sector->surfaces;
+    v2 = pSector->numSurfaces;
+    v3 = pSector->surfaces;
     a1 = v3;
     v57 = 0;
     if ( v2 )
@@ -272,9 +272,9 @@ LABEL_22:
                     }
                 }
             }
-            v1 = sector;
+            v1 = pSector;
             ++surfaceIter;
-            v34 = sector->numSurfaces;
+            v34 = pSector->numSurfaces;
             ++a1;
             ++v57;
         }
@@ -328,7 +328,7 @@ LABEL_22:
     return v56;
 }
 
-int sithMap_IsSurfaceDrawable(SithSurface *pSurface, int idx, int idx2)
+int sithMap_IsSurfaceDrawable(SithSurface *pSurface, int vertIdx, int nextVertIdx)
 {
     SithSector *v3; // eax
     unsigned int v4; // edx
@@ -388,8 +388,8 @@ LABEL_12:
         while ( 1 )
         {
             v10 = v8 + 1;
-            if ( *v9 == idx2
-              && surfaceIter->surfaceInfo.face.vertexPosIdx[(v8 + 1) % v7] == idx
+            if ( *v9 == nextVertIdx
+              && surfaceIter->surfaceInfo.face.vertexPosIdx[(v8 + 1) % v7] == vertIdx
               && surfaceIter->surfaceInfo.face.normal.y * pSurface->surfaceInfo.face.normal.y
                + surfaceIter->surfaceInfo.face.normal.x * pSurface->surfaceInfo.face.normal.x
                + surfaceIter->surfaceInfo.face.normal.z * pSurface->surfaceInfo.face.normal.z > 0.98000002 )
@@ -439,8 +439,8 @@ LABEL_24:
         while ( 1 )
         {
             v18 = v16 + 1;
-            if ( *v17 == idx2
-              && surfaceIter_2->surfaceInfo.face.vertexPosIdx[(v16 + 1) % v15] == idx
+            if ( *v17 == nextVertIdx
+              && surfaceIter_2->surfaceInfo.face.vertexPosIdx[(v16 + 1) % v15] == vertIdx
               && surfaceIter_2->surfaceInfo.face.normal.y * pSurface->surfaceInfo.face.normal.y
                + surfaceIter_2->surfaceInfo.face.normal.x * pSurface->surfaceInfo.face.normal.x
                + surfaceIter_2->surfaceInfo.face.normal.z * pSurface->surfaceInfo.face.normal.z > 0.98000002 )

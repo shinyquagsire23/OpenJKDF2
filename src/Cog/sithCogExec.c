@@ -28,7 +28,7 @@ sithCog* sithCogExec_pIdkMotsCtx = NULL;
 sithCog* sithCog_pActionCog = NULL;
 int32_t sithCog_actionCogIdk = 0;
 
-void sithCogExec_Execute(sithCog *cog_ctx)
+void sithCogExec_Execute(sithCog *pCog)
 {
     SithCogScript *pScript;
     int32_t op;
@@ -53,11 +53,11 @@ void sithCogExec_Execute(sithCog *cog_ctx)
     
     //jk_printf("cog trace %s %x\n", cog_ctx->pScript->aName, cog_ctx->execPos);
 
-    cog_ctx->script_running = 1;
+    pCog->script_running = 1;
     while ( 2 )
     {
-        pScript = cog_ctx->pScript;
-        op = sithCogExec_GetOpCode(cog_ctx);
+        pScript = pCog->pScript;
+        op = sithCogExec_GetOpCode(pCog);
         //jk_printf("cog trace %s %x op %u stackpos %u\n", cog_ctx->pScript->aName, cog_ctx->execPos, op, cog_ctx->stackPos);
         switch ( op )
         {
@@ -65,40 +65,40 @@ void sithCogExec_Execute(sithCog *cog_ctx)
                 break;
 
             case COG_OPCODE_PUSHINT:
-                iTmp = sithCogExec_GetOpCode(cog_ctx);
+                iTmp = sithCogExec_GetOpCode(pCog);
                 val.type = SITHCOG_VALUE_INT;
                 val.data[0] = iTmp;
-                sithCogExec_PushStack(cog_ctx, &val);
+                sithCogExec_PushStack(pCog, &val);
                 break;
 
             case COG_OPCODE_PUSHFLOAT:
-                iTmp = sithCogExec_GetOpCode(cog_ctx);
+                iTmp = sithCogExec_GetOpCode(pCog);
                 val.type = SITHCOG_VALUE_FLOAT;
                 val.dataAsFloat[0] = *(cog_flex_t*)&iTmp;
-                sithCogExec_PushStack(cog_ctx, &val);
+                sithCogExec_PushStack(pCog, &val);
                 break;
 
             case COG_OPCODE_PUSHSYMBOL:
-                iTmp = sithCogExec_GetOpCode(cog_ctx);
+                iTmp = sithCogExec_GetOpCode(pCog);
                 val.type = SITHCOG_VALUE_SYMBOLID;
                 val.data[0] = iTmp;
-                sithCogExec_PushStack(cog_ctx, &val);
+                sithCogExec_PushStack(pCog, &val);
                 break;
 
             case COG_OPCODE_PUSHVECTOR:
 #ifndef COG_COMPRESS_VAR_SIZE
-                stdPlatform_Memcpy32(val.data, &pScript->pCode[cog_ctx->execPos], sizeof(cog_flex_t) * 3); // Added: word ops (bytecode may be in extram)
+                stdPlatform_Memcpy32(val.data, &pScript->pCode[pCog->execPos], sizeof(cog_flex_t) * 3); // Added: word ops (bytecode may be in extram)
                 val.type = SITHCOG_VALUE_VECTOR;
-                sithCogExec_PushStack(cog_ctx, &val);
+                sithCogExec_PushStack(pCog, &val);
 #else
-                sithCogExec_Push3Floats(cog_ctx, (cog_flex_t*)&pScript->pCode[cog_ctx->execPos]);
+                sithCogExec_Push3Floats(pCog, (cog_flex_t*)&pScript->pCode[pCog->execPos]);
 #endif
-                cog_ctx->execPos += 3;
+                pCog->execPos += 3;
                 break;
 
             case COG_OPCODE_ARRAYINDEX:
-                iTmp = sithCogExec_PopInt(cog_ctx);
-                v19 = sithCogExec_PopStack(cog_ctx, &var);
+                iTmp = sithCogExec_PopInt(pCog);
+                v19 = sithCogExec_PopStack(pCog, &var);
 
                 if ( v19 ) {
                     v19 = var.type == SITHCOG_VALUE_SYMBOLID ? var.data[0] : 0;
@@ -112,11 +112,11 @@ void sithCogExec_Execute(sithCog *cog_ctx)
                 }
                 val.type = SITHCOG_VALUE_SYMBOLID;
                 val.data[0] = iTmp + v19;
-                sithCogExec_PushStack(cog_ctx, &val);
+                sithCogExec_PushStack(pCog, &val);
                 break;
 
             case COG_OPCODE_CALLFUNC:
-                if (!sithCogExec_PopStack(cog_ctx, &var))
+                if (!sithCogExec_PopStack(pCog, &var))
                     break;
                 tmpStackVar = &var;
 
@@ -133,34 +133,34 @@ void sithCogExec_Execute(sithCog *cog_ctx)
                     break;
                 }
 
-                v12 = sithCogParse_GetSymbolByID(cog_ctx->pSymbolTable, tmpStackVar->data[0]);
+                v12 = sithCogParse_GetSymbolByID(pCog->pSymbolTable, tmpStackVar->data[0]);
 
                 if (!v12 ) {
                     break;
                 }
                 if (v12->val.type != SITHCOG_VALUE_POINTER) {
 #if defined(SITH_DEBUG_STRUCT_NAMES) && !defined(COG_CRC32_SYMBOL_NAMES)
-                    stdPlatform_Printf("OpenJKDF2: Script `%s` attempted to call `%s`, which doesn't exist...\n", cog_ctx->pScript->aName, v12->pName);
+                    stdPlatform_Printf("OpenJKDF2: Script `%s` attempted to call `%s`, which doesn't exist...\n", pCog->pScript->aName, v12->pName);
 #endif
                     break;
                 }
                 if (v12->val.dataAsFunc) {
                     //printf("OpenJKDF2: Script `%s` call `%s`\n", cog_ctx->pScript->aName, v12->pName);
-                    v12->val.dataAsFunc(cog_ctx); 
+                    v12->val.dataAsFunc(pCog); 
                 }
                 else {
 #if defined(SITH_DEBUG_STRUCT_NAMES) && !defined(COG_CRC32_SYMBOL_NAMES)
-                    stdPlatform_Printf("OpenJKDF2: Script `%s` attempted to call `%s`, which doesn't exist...\n", cog_ctx->pScript->aName, v12->pName);
+                    stdPlatform_Printf("OpenJKDF2: Script `%s` attempted to call `%s`, which doesn't exist...\n", pCog->pScript->aName, v12->pName);
 #endif
                 }
                 //func = sithCogExec_PopSymbolFunc(cog_ctx); // this function is slightly different?
                 break;
 
             case COG_OPCODE_ASSIGN:
-                if (!sithCogExec_PopStack(cog_ctx, &val) )
+                if (!sithCogExec_PopStack(pCog, &val) )
                     break;
 
-                tmpStackVar = sithCogExec_GetSymbolValue(&outVar, cog_ctx, &val);
+                tmpStackVar = sithCogExec_GetSymbolValue(&outVar, pCog, &val);
                 val.type = tmpStackVar->type;
                 val.dataAsPtrs[0] = tmpStackVar->dataAsPtrs[0];
 #ifndef COG_COMPRESS_VAR_SIZE
@@ -168,7 +168,7 @@ void sithCogExec_Execute(sithCog *cog_ctx)
                 val.dataAsPtrs[2] = tmpStackVar->dataAsPtrs[2];
 #endif
 
-                if (!sithCogExec_PopStack(cog_ctx, &var)) {
+                if (!sithCogExec_PopStack(pCog, &var)) {
 #ifdef COG_COMPRESS_VAR_SIZE
                     // Prevent leaks
                     if (val.type == SITHCOG_VALUE_VECTOR) {
@@ -201,14 +201,14 @@ void sithCogExec_Execute(sithCog *cog_ctx)
                     break;
                 }
                 
-                tmpStackVar = &sithCogParse_GetSymbolByID(cog_ctx->pSymbolTable, var.data[0])->val;
+                tmpStackVar = &sithCogParse_GetSymbolByID(pCog->pSymbolTable, var.data[0])->val;
                 *tmpStackVar = val;
                 break;
             case COG_OPCODE_CMPFALSE:
-                sithCogExec_PushInt(cog_ctx, sithCogExec_PopInt(cog_ctx) == 0);
+                sithCogExec_PushInt(pCog, sithCogExec_PopInt(pCog) == 0);
                 break;
             case COG_OPCODE_NEG:
-                sithCogExec_PushFlex(cog_ctx, -sithCogExec_PopFlex(cog_ctx));
+                sithCogExec_PushFlex(pCog, -sithCogExec_PopFlex(pCog));
                 break;
             case COG_OPCODE_CMPAND:
             case COG_OPCODE_CMPOR:
@@ -216,39 +216,39 @@ void sithCogExec_Execute(sithCog *cog_ctx)
             case COG_OPCODE_ANDI:
             case COG_OPCODE_ORI:
             case COG_OPCODE_XORI:
-                sithCogExec_IntererOps(cog_ctx, op);
+                sithCogExec_IntererOps(pCog, op);
                 break;
             case COG_OPCODE_GOFALSE:
-                iTmp = sithCogExec_GetOpCode(cog_ctx);
-                if ( !sithCogExec_PopInt(cog_ctx) )
-                    cog_ctx->execPos = iTmp;
+                iTmp = sithCogExec_GetOpCode(pCog);
+                if ( !sithCogExec_PopInt(pCog) )
+                    pCog->execPos = iTmp;
                 break;
             case COG_OPCODE_GOTRUE:
-                iTmp = sithCogExec_GetOpCode(cog_ctx);
-                if ( sithCogExec_PopInt(cog_ctx) )
-                    cog_ctx->execPos = iTmp;
+                iTmp = sithCogExec_GetOpCode(pCog);
+                if ( sithCogExec_PopInt(pCog) )
+                    pCog->execPos = iTmp;
                 break;
             case COG_OPCODE_GO:
-                cog_ctx->execPos = sithCogExec_GetOpCode(cog_ctx);
+                pCog->execPos = sithCogExec_GetOpCode(pCog);
                 break;
             case COG_OPCODE_RET:
-                if ( cog_ctx->flags & SITH_COG_DEBUG )
+                if ( pCog->flags & SITH_COG_DEBUG )
                 {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-                    _sprintf(std_g_genBuffer, "Cog %s: Returned from depth %d.\n", cog_ctx->aName, cog_ctx->callDepth);
+                    _sprintf(std_g_genBuffer, "Cog %s: Returned from depth %d.\n", pCog->aName, pCog->callDepth);
                     sithConsole_PrintString(std_g_genBuffer);
 #endif
                 }
-                sithCogExec_PopCallstack(cog_ctx);
+                sithCogExec_PopCallstack(pCog);
                 break;
             case COG_OPCODE_CALL:
-                if (cog_ctx->callDepth >= 4)
+                if (pCog->callDepth >= 4)
                     break;
-                iTmp = sithCogExec_GetOpCode(cog_ctx);
-                if (iTmp < cog_ctx->pScript->codeSize)
+                iTmp = sithCogExec_GetOpCode(pCog);
+                if (iTmp < pCog->pScript->codeSize)
                 {
-                    sithCogExec_PushCallstack(cog_ctx);
-                    cog_ctx->execPos = iTmp;
+                    sithCogExec_PushCallstack(pCog);
+                    pCog->execPos = iTmp;
                 }
                 break;
             case COG_OPCODE_ADD:
@@ -261,14 +261,14 @@ void sithCogExec_Execute(sithCog *cog_ctx)
             case COG_OPCODE_CMPEQ:
             case COG_OPCODE_CMPLE:
             case COG_OPCODE_CMPGE:
-                sithCogExec_FloatOps(cog_ctx, op);
+                sithCogExec_FloatOps(pCog, op);
                 break;
 
             default:
                 jk_printf("OpenJKDF2: unk op %u\n", op); // added
                 break;
         }
-        if ( cog_ctx->script_running == 1 ) {
+        if ( pCog->script_running == 1 ) {
             continue;
         }
         else {
@@ -284,39 +284,39 @@ void sithCogExec_Execute(sithCog *cog_ctx)
     }
 }
 
-void sithCogExec_ExecuteMessage(sithCog *ctx, int32_t trigIdx)
+void sithCogExec_ExecuteMessage(sithCog *pCog, int32_t handlerNum)
 {
     int32_t trigPc;
 
-    trigPc = ctx->pScript->aHandlers[trigIdx].trigPc;
+    trigPc = pCog->pScript->aHandlers[handlerNum].trigPc;
     if ( trigPc >= 0 )
     {
-        if ( ctx->script_running )
+        if ( pCog->script_running )
         {
-            if ( ctx->script_running == 1 )
-                ctx->script_running = 4;
-            sithCogExec_PushCallstack(ctx);
+            if ( pCog->script_running == 1 )
+                pCog->script_running = 4;
+            sithCogExec_PushCallstack(pCog);
         }
-        else if ( ctx->stackPos )
+        else if ( pCog->stackPos )
         {
-            ctx->stackPos = 0;
+            pCog->stackPos = 0;
         }
-        ctx->execPos = ctx->pScript->aHandlers[trigIdx].trigPc;
-        ctx->trigId = ctx->pScript->aHandlers[trigIdx].trigId;
-        if ( ctx->flags & SITH_COG_DEBUG )
+        pCog->execPos = pCog->pScript->aHandlers[handlerNum].trigPc;
+        pCog->trigId = pCog->pScript->aHandlers[handlerNum].trigId;
+        if ( pCog->flags & SITH_COG_DEBUG )
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_g_genBuffer, "Cog %s: execution started.\n", ctx->aName);
+            _sprintf(std_g_genBuffer, "Cog %s: execution started.\n", pCog->aName);
             sithConsole_PrintString(std_g_genBuffer);
 #endif
         }
-        sithCogExec_Execute(ctx);
-        if ( ctx->script_running == 4 )
-            ctx->script_running = 1;
+        sithCogExec_Execute(pCog);
+        if ( pCog->script_running == 4 )
+            pCog->script_running = 1;
     }
 }
 
-int32_t sithCogExec_PopSymbol(sithCog *ctx, SithCogSymbolValue *stackVar)
+int32_t sithCogExec_PopSymbol(sithCog *pCog, SithCogSymbolValue *pVal)
 {
 
     SithCogSymbolValue *tmp; // eax
@@ -329,15 +329,15 @@ int32_t sithCogExec_PopSymbol(sithCog *ctx, SithCogSymbolValue *stackVar)
 #endif
 
 
-    if ( ctx->stackPos < 1 )
+    if ( pCog->stackPos < 1 )
         return 0;
 
-    *stackVar = ctx->stack[--ctx->stackPos];
-    tmp = stackVar;
+    *pVal = pCog->stack[--pCog->stackPos];
+    tmp = pVal;
 
-    if ( stackVar->type == SITHCOG_VALUE_SYMBOLID ) {
+    if ( pVal->type == SITHCOG_VALUE_SYMBOLID ) {
         // Added: nullptr check here
-        SithCogSymbol* sym = sithCogParse_GetSymbolByID(ctx->pSymbolTable, stackVar->data[0]);
+        SithCogSymbol* sym = sithCogParse_GetSymbolByID(pCog->pSymbolTable, pVal->data[0]);
         if (sym) {
             tmp = &sym->val;
         }
@@ -367,7 +367,7 @@ int32_t sithCogExec_PopSymbol(sithCog *ctx, SithCogSymbolValue *stackVar)
 
         // Make a copy of the Vec3 so that it can be freed
 #ifdef COG_COMPRESS_VAR_SIZE
-        if (stackVar->type == SITHCOG_VALUE_SYMBOLID && tmp->type == SITHCOG_VALUE_VECTOR)
+        if (pVal->type == SITHCOG_VALUE_SYMBOLID && tmp->type == SITHCOG_VALUE_VECTOR)
         {
             if (d0) {
                 cog_flex_t* ptr = (cog_flex_t*)SITH_ALLOC(sizeof(cog_flex_t)*3);
@@ -389,19 +389,19 @@ int32_t sithCogExec_PopSymbol(sithCog *ctx, SithCogSymbolValue *stackVar)
 #endif
     }
 
-    stackVar->type = type;
-    stackVar->dataAsPtrs[0] = d0;
+    pVal->type = type;
+    pVal->dataAsPtrs[0] = d0;
 #ifndef COG_COMPRESS_VAR_SIZE
-    stackVar->dataAsPtrs[1] = d1;
-    stackVar->dataAsPtrs[2] = d2;
+    pVal->dataAsPtrs[1] = d1;
+    pVal->dataAsPtrs[2] = d2;
 #endif
     return 1;
 }
 
-cog_flex_t sithCogExec_PopFlex(sithCog *ctx)
+cog_flex_t sithCogExec_PopFlex(sithCog *pCog)
 {
     SithCogSymbolValue tmp;
-    if (!sithCogExec_PopSymbol(ctx, &tmp))
+    if (!sithCogExec_PopSymbol(pCog, &tmp))
         return 0.0;
         
     if ( tmp.type == SITHCOG_VALUE_INT )
@@ -422,10 +422,10 @@ cog_flex_t sithCogExec_PopFlex(sithCog *ctx)
     return 0.0;
 }
 
-int32_t sithCogExec_PopInt(sithCog *ctx)
+int32_t sithCogExec_PopInt(sithCog *pCog)
 {
     SithCogSymbolValue tmp;
-    if (!sithCogExec_PopSymbol(ctx, &tmp))
+    if (!sithCogExec_PopSymbol(pCog, &tmp))
         return -1;
     
     if ( tmp.type == SITHCOG_VALUE_INT )
@@ -447,10 +447,10 @@ int32_t sithCogExec_PopInt(sithCog *ctx)
     return -1;
 }
 
-int32_t sithCogExec_PopArray(sithCog *ctx)
+int32_t sithCogExec_PopArray(sithCog *pCog)
 {
     SithCogSymbolValue tmp;
-    if (!sithCogExec_PopSymbol(ctx, &tmp))
+    if (!sithCogExec_PopSymbol(pCog, &tmp))
         return 0;
     
     if ( tmp.type == SITHCOG_VALUE_SYMBOLID )
@@ -467,45 +467,45 @@ int32_t sithCogExec_PopArray(sithCog *ctx)
     return 0;
 }
 
-int32_t sithCogExec_PopVector(sithCog *ctx, rdVector3* out)
+int32_t sithCogExec_PopVector(sithCog *pCog, rdVector3* vec)
 {
     SithCogSymbolValue tmp;
 
-    if (!sithCogExec_PopSymbol(ctx, &tmp))
+    if (!sithCogExec_PopSymbol(pCog, &tmp))
     {
-        _memset(out, 0, sizeof(*out));
+        _memset(vec, 0, sizeof(*vec));
         return 0;
     }
     
     if ( tmp.type == SITHCOG_VALUE_VECTOR )
     {
 #ifndef COG_COMPRESS_VAR_SIZE
-        out->x = (flex_t)tmp.dataAsFloat[0]; // FLEXTODO
-        out->y = (flex_t)tmp.dataAsFloat[1]; // FLEXTODO
-        out->z = (flex_t)tmp.dataAsFloat[2]; // FLEXTODO
+        vec->x = (flex_t)tmp.dataAsFloat[0]; // FLEXTODO
+        vec->y = (flex_t)tmp.dataAsFloat[1]; // FLEXTODO
+        vec->z = (flex_t)tmp.dataAsFloat[2]; // FLEXTODO
 #else
         if (tmp.dataAsPtrs[0]) {
             cog_flex_t* tmpvec = (cog_flex_t*)tmp.dataAsPtrs[0];
-            out->x = tmpvec[0];
-            out->y = tmpvec[1];
-            out->z = tmpvec[2];
+            vec->x = tmpvec[0];
+            vec->y = tmpvec[1];
+            vec->z = tmpvec[2];
             SITH_FREE((void*)tmp.dataAsPtrs[0]);
         }
 #endif
         return 1;
     }
 
-    _memset(out, 0, sizeof(*out));
+    _memset(vec, 0, sizeof(*vec));
     return 0;
 }
 
-sithCog* sithCogExec_PopCog(sithCog *ctx)
+sithCog* sithCogExec_PopCog(sithCog *pCog)
 {
     SithCogSymbolValue tmp;
     int32_t idx;
     SithWorld* world = sithWorld_g_pCurrentWorld;
 
-    if (!sithCogExec_PopSymbol(ctx, &tmp))
+    if (!sithCogExec_PopSymbol(pCog, &tmp))
     {
         return NULL;
     }
@@ -549,13 +549,13 @@ sithCog* sithCogExec_PopCog(sithCog *ctx)
     return NULL;
 } 
 
-SithThing* sithCogExec_PopThing(sithCog *ctx)
+SithThing* sithCogExec_PopThing(sithCog *pCog)
 {
     SithCogSymbolValue tmp;
     int32_t idx;
     SithWorld* world = sithWorld_g_pCurrentWorld;
 
-    if (!sithCogExec_PopSymbol(ctx, &tmp))
+    if (!sithCogExec_PopSymbol(pCog, &tmp))
     {
         tmp.type = SITHCOG_VALUE_INT;
         tmp.data[0] = -1;
@@ -600,12 +600,12 @@ SithThing* sithCogExec_PopThing(sithCog *ctx)
     return NULL;
 }
 
-SithThing* sithCogExec_PopTemplate(sithCog *ctx)
+SithThing* sithCogExec_PopTemplate(sithCog *pCog)
 {
     SithCogSymbolValue tmp;
     int32_t idx;
 
-    if (!sithCogExec_PopSymbol(ctx, &tmp))
+    if (!sithCogExec_PopSymbol(pCog, &tmp))
     {
         tmp.type = SITHCOG_VALUE_INT;
         tmp.data[0] = -1;
@@ -642,13 +642,13 @@ SithThing* sithCogExec_PopTemplate(sithCog *ctx)
     return sithTemplate_GetTemplateByIndex(idx);
 }
 
-sithSound* sithCogExec_PopSound(sithCog *ctx)
+sithSound* sithCogExec_PopSound(sithCog *pCog)
 {
     SithCogSymbolValue tmp;
     int32_t idx;
     SithWorld* world = sithWorld_g_pCurrentWorld;
 
-    if (!sithCogExec_PopSymbol(ctx, &tmp))
+    if (!sithCogExec_PopSymbol(pCog, &tmp))
     {
         tmp.type = SITHCOG_VALUE_INT;
         tmp.data[0] = -1;
@@ -701,13 +701,13 @@ sithSound* sithCogExec_PopSound(sithCog *ctx)
     return NULL;
 }
 
-SithSector* sithCogExec_PopSector(sithCog *ctx)
+SithSector* sithCogExec_PopSector(sithCog *pCog)
 {
     SithCogSymbolValue tmp;
     int32_t idx;
     SithWorld* world = sithWorld_g_pCurrentWorld;
 
-    if (!sithCogExec_PopSymbol(ctx, &tmp))
+    if (!sithCogExec_PopSymbol(pCog, &tmp))
     {
         tmp.type = SITHCOG_VALUE_INT;
         tmp.data[0] = -1;
@@ -749,13 +749,13 @@ SithSector* sithCogExec_PopSector(sithCog *ctx)
     return NULL;
 }
 
-SithSurface* sithCogExec_PopSurface(sithCog *ctx)
+SithSurface* sithCogExec_PopSurface(sithCog *pCog)
 {
     SithCogSymbolValue tmp;
     int32_t idx;
     SithWorld* world = sithWorld_g_pCurrentWorld;
 
-    if (!sithCogExec_PopSymbol(ctx, &tmp))
+    if (!sithCogExec_PopSymbol(pCog, &tmp))
     {
         tmp.type = SITHCOG_VALUE_INT;
         tmp.data[0] = -1;
@@ -798,13 +798,13 @@ SithSurface* sithCogExec_PopSurface(sithCog *ctx)
 }
 
 
-rdMaterial* sithCogExec_PopMaterial(sithCog *ctx)
+rdMaterial* sithCogExec_PopMaterial(sithCog *pCog)
 {
     SithCogSymbolValue tmp;
     int32_t idx;
     SithWorld* world = sithWorld_g_pCurrentWorld;
 
-    if (!sithCogExec_PopSymbol(ctx, &tmp))
+    if (!sithCogExec_PopSymbol(pCog, &tmp))
     {
         tmp.type = SITHCOG_VALUE_INT;
         tmp.data[0] = -1;
@@ -852,13 +852,13 @@ rdMaterial* sithCogExec_PopMaterial(sithCog *ctx)
     return NULL;
 }
 
-rdModel3* sithCogExec_PopModel3(sithCog *ctx)
+rdModel3* sithCogExec_PopModel3(sithCog *pCog)
 {
     SithCogSymbolValue tmp;
     int32_t idx;
     SithWorld* world = sithWorld_g_pCurrentWorld;
 
-    if (!sithCogExec_PopSymbol(ctx, &tmp))
+    if (!sithCogExec_PopSymbol(pCog, &tmp))
     {
         tmp.type = SITHCOG_VALUE_INT;
         tmp.data[0] = -1;
@@ -906,13 +906,13 @@ rdModel3* sithCogExec_PopModel3(sithCog *ctx)
     return NULL;
 }
 
-rdKeyframe* sithCogExec_PopKeyframe(sithCog *ctx)
+rdKeyframe* sithCogExec_PopKeyframe(sithCog *pCog)
 {
     SithCogSymbolValue tmp;
     int32_t idx;
     SithWorld* world = sithWorld_g_pCurrentWorld;
 
-    if (!sithCogExec_PopSymbol(ctx, &tmp))
+    if (!sithCogExec_PopSymbol(pCog, &tmp))
     {
         tmp.type = SITHCOG_VALUE_INT;
         tmp.data[0] = -1;
@@ -958,13 +958,13 @@ rdKeyframe* sithCogExec_PopKeyframe(sithCog *ctx)
     return NULL;
 }
 
-SithAIClass* sithCogExec_PopAIClass(sithCog *ctx)
+SithAIClass* sithCogExec_PopAIClass(sithCog *pCog)
 {
     SithCogSymbolValue tmp;
     int32_t idx;
     SithWorld* world = sithWorld_g_pCurrentWorld;
 
-    if (!sithCogExec_PopSymbol(ctx, &tmp))
+    if (!sithCogExec_PopSymbol(pCog, &tmp))
     {
         tmp.type = SITHCOG_VALUE_INT;
         tmp.data[0] = -1;
@@ -1035,17 +1035,17 @@ cogSymbolFunc_t sithCogExec_PopSymbolFunc(sithCog *cog_ctx)
     }
 }
 
-char* sithCogExec_PopString(sithCog *ctx)
+char* sithCogExec_PopString(sithCog *pCog)
 {
     uint32_t v1; // eax
     int32_t v2; // eax
     SithCogSymbol *v5; // eax
     char *result; // eax
 
-    v1 = ctx->stackPos;
+    v1 = pCog->stackPos;
     if ( v1 < 1
-      || (v2 = v1 - 1, ctx->stackPos = v2, ctx->stack[v2].type != SITHCOG_VALUE_SYMBOLID)
-      || (v5 = sithCogParse_GetSymbolByID(ctx->pSymbolTable, ctx->stack[v2].data[0]), !v5 || v5->val.type != SITHCOG_VALUE_STRING) ) // Added: v5 nullptr check
+      || (v2 = v1 - 1, pCog->stackPos = v2, pCog->stack[v2].type != SITHCOG_VALUE_SYMBOLID)
+      || (v5 = sithCogParse_GetSymbolByID(pCog->pSymbolTable, pCog->stack[v2].data[0]), !v5 || v5->val.type != SITHCOG_VALUE_STRING) ) // Added: v5 nullptr check
     {
         result = 0;
     }
@@ -1056,73 +1056,73 @@ char* sithCogExec_PopString(sithCog *ctx)
     return result;
 }
 
-void sithCogExec_PushStack(sithCog *ctx, SithCogSymbolValue *val)
+void sithCogExec_PushStack(sithCog *pCog, SithCogSymbolValue *pValue)
 {
     SithCogSymbolValue *pushVar;
 
 #ifdef COG_DYNAMIC_STACKS
-    if (ctx->stackPos >= ctx->stackSize) {
-        sithCogExec_GrowStack(ctx, ctx->stackSize+COG_DYNAMIC_STACKS_INCREMENT);
-        if (ctx->stackPos >= ctx->stackSize)
+    if (pCog->stackPos >= pCog->stackSize) {
+        sithCogExec_GrowStack(pCog, pCog->stackSize+COG_DYNAMIC_STACKS_INCREMENT);
+        if (pCog->stackPos >= pCog->stackSize)
             return; // Added: grow failed -- drop the push rather than overflow
     }
 #endif
 
-    if ( ctx->stackPos == SITHCOGVM_MAX_STACKSIZE )
+    if ( pCog->stackPos == SITHCOGVM_MAX_STACKSIZE )
     {
         // Added: word-safe shift (stack may be word-addressable-only); dst < src,
         // so a forward copy preserves the memmove semantics.
-        stdPlatform_Memcpy32(ctx->stack, &ctx->stack[1], sizeof(ctx->stack) * (SITHCOGVM_MAX_STACKSIZE-1));
-        --ctx->stackPos;
+        stdPlatform_Memcpy32(pCog->stack, &pCog->stack[1], sizeof(pCog->stack) * (SITHCOGVM_MAX_STACKSIZE-1));
+        --pCog->stackPos;
     }
     
-    pushVar = &ctx->stack[ctx->stackPos];
-    pushVar->type = val->type;
-    pushVar->dataAsPtrs[0] = val->dataAsPtrs[0];
+    pushVar = &pCog->stack[pCog->stackPos];
+    pushVar->type = pValue->type;
+    pushVar->dataAsPtrs[0] = pValue->dataAsPtrs[0];
 #ifndef COG_COMPRESS_VAR_SIZE
-    pushVar->dataAsPtrs[1] = val->dataAsPtrs[1];
-    pushVar->dataAsPtrs[2] = val->dataAsPtrs[2];
+    pushVar->dataAsPtrs[1] = pValue->dataAsPtrs[1];
+    pushVar->dataAsPtrs[2] = pValue->dataAsPtrs[2];
 #endif
-    ++ctx->stackPos;
+    ++pCog->stackPos;
 }
 
-void sithCogExec_PushInt(sithCog *ctx, int32_t val)
+void sithCogExec_PushInt(sithCog *pCog, int32_t val)
 {
     SithCogSymbolValue v;
     v.type = SITHCOG_VALUE_INT;
     v.data[0] = val;
-    sithCogExec_PushStack(ctx, &v);
+    sithCogExec_PushStack(pCog, &v);
 }
 
-void sithCogExec_PushFlex(sithCog *ctx, cog_flex_t val)
+void sithCogExec_PushFlex(sithCog *pCog, cog_flex_t value)
 {
     SithCogSymbolValue v;
     v.type = SITHCOG_VALUE_FLOAT;
-    v.dataAsFloat[0] = val; // FLEXTODO
-    sithCogExec_PushStack(ctx, &v);
+    v.dataAsFloat[0] = value; // FLEXTODO
+    sithCogExec_PushStack(pCog, &v);
 }
 
-void sithCogExec_PushVector(sithCog *ctx, const rdVector3* val)
+void sithCogExec_PushVector(sithCog *pCog, const rdVector3* vec)
 {
     SithCogSymbolValue v;
     v.type = SITHCOG_VALUE_VECTOR;
 #ifndef COG_COMPRESS_VAR_SIZE
-    v.dataAsFloat[0] = val->x;
-    v.dataAsFloat[1] = val->y;
-    v.dataAsFloat[2] = val->z;
+    v.dataAsFloat[0] = vec->x;
+    v.dataAsFloat[1] = vec->y;
+    v.dataAsFloat[2] = vec->z;
 #else
     cog_flex_t* ptr = (cog_flex_t*)SITH_ALLOC(sizeof(cog_flex_t)*3);
     if (ptr) {
         v.dataAsPtrs[0] = (intptr_t)ptr;
-        ptr[0] = (cog_flex_t)val->x;
-        ptr[1] = (cog_flex_t)val->y;
-        ptr[2] = (cog_flex_t)val->z;
+        ptr[0] = (cog_flex_t)vec->x;
+        ptr[1] = (cog_flex_t)vec->y;
+        ptr[2] = (cog_flex_t)vec->z;
     }
     else {
         v.dataAsPtrs[0] = 0;
     }
 #endif
-    sithCogExec_PushStack(ctx, &v);
+    sithCogExec_PushStack(pCog, &v);
 }
 
 // Added
@@ -1149,103 +1149,103 @@ void sithCogExec_Push3Floats(sithCog *ctx, const cog_flex_t* val)
     sithCogExec_PushStack(ctx, &v);
 }
 
-int32_t sithCogExec_GetOpCode(sithCog *ctx)
+int32_t sithCogExec_GetOpCode(sithCog *pCog)
 {
-    if ( ctx->execPos >= ctx->pScript->codeSize - 1 )
+    if ( pCog->execPos >= pCog->pScript->codeSize - 1 )
         return COG_OPCODE_RET;
 
-    return ctx->pScript->pCode[ctx->execPos++];
+    return pCog->pScript->pCode[pCog->execPos++];
 }
 
-void sithCogExec_ResetStack(sithCog *ctx)
+void sithCogExec_ResetStack(sithCog *pCog)
 {
-    if (ctx->stackPos) {
-        ctx->stackPos = 0;
+    if (pCog->stackPos) {
+        pCog->stackPos = 0;
     }
 #ifdef COG_DYNAMIC_STACKS
-    SITH_FREE(ctx->stack);
-    ctx->stack = NULL;
-    ctx->stackSize = 0;
+    SITH_FREE(pCog->stack);
+    pCog->stack = NULL;
+    pCog->stackSize = 0;
 #endif
 }
 
-void sithCogExec_PushCallstack(sithCog *ctx)
+void sithCogExec_PushCallstack(sithCog *pCog)
 {
-    if ( ctx->callDepth != 4 )
+    if ( pCog->callDepth != 4 )
     {
         sithCogExec_009d39b0 = 0;
-        ctx->callstack[ctx->callDepth].pc = ctx->execPos;
-        ctx->callstack[ctx->callDepth].script_running = ctx->script_running;
-        ctx->callstack[ctx->callDepth].waketimeMs = ctx->msecTimerTimeout;
-        ctx->callstack[ctx->callDepth++].trigId = ctx->trigId;
+        pCog->callstack[pCog->callDepth].pc = pCog->execPos;
+        pCog->callstack[pCog->callDepth].script_running = pCog->script_running;
+        pCog->callstack[pCog->callDepth].waketimeMs = pCog->msecTimerTimeout;
+        pCog->callstack[pCog->callDepth++].trigId = pCog->trigId;
 
         // MOTS added: wakeup
-        if (((sithCogExec_009d39b0 != 0) && (ctx->script_running == 2)) && (ctx == sithCogExec_pIdkMotsCtx)) {
-            ctx->script_running = 1;
+        if (((sithCogExec_009d39b0 != 0) && (pCog->script_running == 2)) && (pCog == sithCogExec_pIdkMotsCtx)) {
+            pCog->script_running = 1;
             sithCogExec_009d39b0 = 0;
             sithCogExec_pIdkMotsCtx = NULL;
         }
     }
 }
 
-void sithCogExec_PopCallstack(sithCog *ctx)
+void sithCogExec_PopCallstack(sithCog *pCog)
 {
-    if ( ctx->callDepth )
+    if ( pCog->callDepth )
     {
-        ctx->script_running = ctx->callstack[--ctx->callDepth].script_running;
-        ctx->execPos = ctx->callstack[ctx->callDepth].pc;
-        ctx->msecTimerTimeout = ctx->callstack[ctx->callDepth].waketimeMs;
-        ctx->trigId = ctx->callstack[ctx->callDepth].trigId;
+        pCog->script_running = pCog->callstack[--pCog->callDepth].script_running;
+        pCog->execPos = pCog->callstack[pCog->callDepth].pc;
+        pCog->msecTimerTimeout = pCog->callstack[pCog->callDepth].waketimeMs;
+        pCog->trigId = pCog->callstack[pCog->callDepth].trigId;
     }
     else
     {
-        ctx->script_running = 0;
+        pCog->script_running = 0;
     }
 }
 
-int32_t sithCogExec_PopStack(sithCog *cog, SithCogSymbolValue *out)
+int32_t sithCogExec_PopStack(sithCog *pCog, SithCogSymbolValue *pValue)
 {
     SithCogSymbolValue *pop; // eax
 
-    if ( cog->stackPos < 1 )
+    if ( pCog->stackPos < 1 )
         return 0;
 
-    pop = &cog->stack[--cog->stackPos];
-    out->type = pop->type;
-    out->dataAsPtrs[0] = pop->dataAsPtrs[0];
+    pop = &pCog->stack[--pCog->stackPos];
+    pValue->type = pop->type;
+    pValue->dataAsPtrs[0] = pop->dataAsPtrs[0];
 #ifndef COG_COMPRESS_VAR_SIZE
-    out->dataAsPtrs[1] = pop->dataAsPtrs[1];
-    out->dataAsPtrs[2] = pop->dataAsPtrs[2];
+    pValue->dataAsPtrs[1] = pop->dataAsPtrs[1];
+    pValue->dataAsPtrs[2] = pop->dataAsPtrs[2];
 #endif
 
     return 1;
 }
 
 // MOTS altered?
-void sithCogExec_IntererOps(sithCog *cog_ctx, int32_t op)
+void sithCogExec_IntererOps(sithCog *pCog, int32_t opcode)
 {
-    int32_t operand_a = sithCogExec_PopInt(cog_ctx);
-    int32_t operand_b = sithCogExec_PopInt(cog_ctx);
-    switch ( op )
+    int32_t operand_a = sithCogExec_PopInt(pCog);
+    int32_t operand_b = sithCogExec_PopInt(pCog);
+    switch ( opcode )
     {
         case COG_OPCODE_CMPAND:
-            sithCogExec_PushInt(cog_ctx, (operand_a && operand_b) ? 1 : 0);
+            sithCogExec_PushInt(pCog, (operand_a && operand_b) ? 1 : 0);
             break;
             
         case COG_OPCODE_CMPOR:
-            sithCogExec_PushInt(cog_ctx, (operand_a || operand_b) ? 1 : 0);
+            sithCogExec_PushInt(pCog, (operand_a || operand_b) ? 1 : 0);
             break;
         case COG_OPCODE_CMPNE:
-            sithCogExec_PushInt(cog_ctx, (operand_a != operand_b) ? 1 : 0);
+            sithCogExec_PushInt(pCog, (operand_a != operand_b) ? 1 : 0);
             break;
         case COG_OPCODE_ANDI:
-            sithCogExec_PushInt(cog_ctx, operand_a & operand_b);
+            sithCogExec_PushInt(pCog, operand_a & operand_b);
             break;
         case COG_OPCODE_ORI:
-            sithCogExec_PushInt(cog_ctx, operand_a | operand_b);
+            sithCogExec_PushInt(pCog, operand_a | operand_b);
             break;
         case COG_OPCODE_XORI:
-            sithCogExec_PushInt(cog_ctx, operand_a ^ operand_b);
+            sithCogExec_PushInt(pCog, operand_a ^ operand_b);
             break;
         default:
             return;
@@ -1253,70 +1253,70 @@ void sithCogExec_IntererOps(sithCog *cog_ctx, int32_t op)
 }
 
 // MOTS altered?
-void sithCogExec_FloatOps(sithCog *cog_ctx, int32_t op)
+void sithCogExec_FloatOps(sithCog *pCog, int32_t opcode)
 {
-    cog_flex_t operand_a = sithCogExec_PopFlex(cog_ctx);
-    cog_flex_t operand_b = sithCogExec_PopFlex(cog_ctx);
-    switch ( op )
+    cog_flex_t operand_a = sithCogExec_PopFlex(pCog);
+    cog_flex_t operand_b = sithCogExec_PopFlex(pCog);
+    switch ( opcode )
     {
         case COG_OPCODE_ADD:
-            sithCogExec_PushFlex(cog_ctx, operand_a + operand_b);
+            sithCogExec_PushFlex(pCog, operand_a + operand_b);
             break;
         case COG_OPCODE_SUB:
-            sithCogExec_PushFlex(cog_ctx, operand_b - operand_a);
+            sithCogExec_PushFlex(pCog, operand_b - operand_a);
             break;
         case COG_OPCODE_MUL:
-            sithCogExec_PushFlex(cog_ctx, operand_a * operand_b);
+            sithCogExec_PushFlex(pCog, operand_a * operand_b);
             break;
         case COG_OPCODE_DIV:
-            sithCogExec_PushFlex(cog_ctx, (operand_a == 0.0) ? (cog_flex_t)0.0 : operand_b / operand_a);
+            sithCogExec_PushFlex(pCog, (operand_a == 0.0) ? (cog_flex_t)0.0 : operand_b / operand_a);
             break;
         case COG_OPCODE_MOD:
-            sithCogExec_PushFlex(cog_ctx, fmod((float)operand_b, (float)operand_a));
+            sithCogExec_PushFlex(pCog, fmod((float)operand_b, (float)operand_a));
             break;
         case COG_OPCODE_CMPGT:
-            sithCogExec_PushInt(cog_ctx, (operand_b > operand_a) ? 1 : 0);
+            sithCogExec_PushInt(pCog, (operand_b > operand_a) ? 1 : 0);
             break;
         case COG_OPCODE_CMPLS:
-            sithCogExec_PushInt(cog_ctx, (operand_b < operand_a) ? 1 : 0);
+            sithCogExec_PushInt(pCog, (operand_b < operand_a) ? 1 : 0);
             break;
         case COG_OPCODE_CMPEQ:
-            sithCogExec_PushInt(cog_ctx, (operand_b == operand_a) ? 1 : 0);
+            sithCogExec_PushInt(pCog, (operand_b == operand_a) ? 1 : 0);
             break;
         case COG_OPCODE_CMPLE:
-            sithCogExec_PushInt(cog_ctx, (operand_b <= operand_a) ? 1 : 0);
+            sithCogExec_PushInt(pCog, (operand_b <= operand_a) ? 1 : 0);
             break;
         case COG_OPCODE_CMPGE:
-            sithCogExec_PushInt(cog_ctx, (operand_b >= operand_a) ? 1 : 0);
+            sithCogExec_PushInt(pCog, (operand_b >= operand_a) ? 1 : 0);
             break;
         default:
             return;
     }
 }
 
-SithCogSymbolValue* sithCogExec_GetSymbolValue(SithCogSymbolValue *out, sithCog *ctx, SithCogSymbolValue *in)
+SithCogSymbolValue* sithCogExec_GetSymbolValue(SithCogSymbolValue *pDest, sithCog *pCog, SithCogSymbolValue *pValue)
 {
-    if ( in->type == SITHCOG_VALUE_SYMBOLID )
-        in = &sithCogParse_GetSymbolByID(ctx->pSymbolTable, in->dataAsPtrs[0])->val;
-    if ( in->type != SITHCOG_VALUE_POINTER)
+    if ( pValue->type == SITHCOG_VALUE_SYMBOLID )
+        pValue = &sithCogParse_GetSymbolByID(pCog->pSymbolTable, pValue->dataAsPtrs[0])->val;
+    if ( pValue->type != SITHCOG_VALUE_POINTER)
     {
-        out->type = in->type;
-        out->dataAsPtrs[0] = in->dataAsPtrs[0];
+        pDest->type = pValue->type;
+        pDest->dataAsPtrs[0] = pValue->dataAsPtrs[0];
 #ifndef COG_COMPRESS_VAR_SIZE
-        out->dataAsPtrs[1] = in->dataAsPtrs[1];
-        out->dataAsPtrs[2] = in->dataAsPtrs[2];
+        pDest->dataAsPtrs[1] = pValue->dataAsPtrs[1];
+        pDest->dataAsPtrs[2] = pValue->dataAsPtrs[2];
 #endif
-        return out;
+        return pDest;
     }
     else
     {
-        out->type = SITHCOG_VALUE_INT;
-        out->dataAsPtrs[0] = *(int32_t*)in->dataAsPtrs[0]; // Why is this dereferenced...?
+        pDest->type = SITHCOG_VALUE_INT;
+        pDest->dataAsPtrs[0] = *(int32_t*)pValue->dataAsPtrs[0]; // Why is this dereferenced...?
 #ifndef COG_COMPRESS_VAR_SIZE
-        out->dataAsPtrs[1] = in->dataAsPtrs[1]; // these are undefined in the original
-        out->dataAsPtrs[2] = in->dataAsPtrs[2];
+        pDest->dataAsPtrs[1] = pValue->dataAsPtrs[1]; // these are undefined in the original
+        pDest->dataAsPtrs[2] = pValue->dataAsPtrs[2];
 #endif
-        return out;
+        return pDest;
     }    
 }
 

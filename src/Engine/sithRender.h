@@ -31,7 +31,7 @@ int sithRender_Startup();
 int sithRender_Open();
 void sithRender_Close();
 void sithRender_Shutdown();
-void sithRender_SetRenderFlags(int flag);
+void sithRender_SetRenderFlags(int flags);
 int sithRender_GetRenderFlags();
 void sithRender_EnableIRMode(flex_t a, flex_t b);
 void sithRender_DisableIRMode();
@@ -40,18 +40,18 @@ void sithRender_SetLightingMode(rdLightMode_t a1);
 void sithRender_SetTexMode(rdTexMode_t a1);
 void sithRender_SetPalette(const void *palette);
 MATH_FUNC void sithRender_Draw();
-MATH_FUNC void sithRender_BuildVisibleSectorList(SithSector *sector, rdClipFrustum *frustumArg, flex_t a3, int depth); // Added: depth safety
+MATH_FUNC void sithRender_BuildVisibleSectorList(SithSector *pSector, rdClipFrustum *pFrustrum, flex_t a3, int depth); // Added: depth safety
 MATH_FUNC void sithRender_NoClip(SithSector *sector, rdClipFrustum *frustumArg, flex_t a3, int depth);
 MATH_FUNC void sithRender_KindaClipAssignFrustum(SithSector *sector, rdClipFrustum *frustumArg, int depth, int parentSector);
 MATH_FUNC void sithRender_KindaClip(SithSector *sector, rdClipFrustum *frustumArg, flex_t prevAdjoinDistAdd, int depth);
 MATH_FUNC void sithRender_RenderSectors();
 MATH_FUNC void sithRender_BuildVisibleSectorsThingList();
-MATH_FUNC void sithRender_BuildSectorThingList(SithSector *sector, flex_t prev, flex_t dist, int depth);
+MATH_FUNC void sithRender_BuildSectorThingList(SithSector *pSector, flex_t curDistance, flex_t extraDistance, int depth);
 MATH_FUNC void sithRender_BuildDynamicLights();
 MATH_FUNC void sithRender_RenderThings();
 MATH_FUNC int sithRender_RenderThing(SithThing *povThing);
 MATH_FUNC void sithRender_RenderAlphaAdjoins();
-int sithRender_SetExtraThingRenderFunc(sithRender_weapRendFunc_t a1);
+int sithRender_SetExtraThingRenderFunc(sithRender_weapRendFunc_t pfFunc);
 void sithRender_WorldFlash(flex_t arg1,flex_t arg2);
 
 // Added

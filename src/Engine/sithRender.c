@@ -246,9 +246,9 @@ void sithRender_Shutdown()
     ;
 }
 
-void sithRender_SetRenderFlags(int flag)
+void sithRender_SetRenderFlags(int flags)
 {
-    sithRender_renderflags = flag;
+    sithRender_renderflags = flags;
 }
 
 int sithRender_GetRenderFlags()
@@ -273,9 +273,9 @@ void sithRender_SetGeoMode(rdGeoMode_t geoMode)
     sithRender_geoMode = geoMode;
 }
 
-void sithRender_SetLightingMode(rdLightMode_t lightMode)
+void sithRender_SetLightingMode(rdLightMode_t mode)
 {
-    sithRender_lightMode = lightMode;
+    sithRender_lightMode = mode;
 }
 
 void sithRender_SetTexMode(rdTexMode_t texMode)
@@ -617,7 +617,7 @@ void sithRender_Draw()
 
 // MOTS altered?
 // Added: depth safety
-void sithRender_BuildVisibleSectorList(SithSector *sector, rdClipFrustum *frustumArg, flex_t prevAdjoinDistAdd, int depth)
+void sithRender_BuildVisibleSectorList(SithSector *pSector, rdClipFrustum *pFrustrum, flex_t prevAdjoinDistAdd, int depth)
 {
     int v5; // ecx
     rdClipFrustum *frustum; // edx
@@ -638,19 +638,19 @@ void sithRender_BuildVisibleSectorList(SithSector *sector, rdClipFrustum *frustu
     // Clip visited hardening
     // Does not help much, but no visual harm either
 #ifdef QOL_IMPROVEMENTS
-    if (sector->clipVisited == sithRender_lastRenderTick) {
-        sector->pClipFrustum = rdCamera_g_pCurCamera->pClipFrustum;
+    if (pSector->clipVisited == sithRender_lastRenderTick) {
+        pSector->pClipFrustum = rdCamera_g_pCurCamera->pClipFrustum;
         return;
     }
 #endif
 
-    if ( sector->renderTick == sithRender_lastRenderTick )
+    if ( pSector->renderTick == sithRender_lastRenderTick )
     {
-        sector->pClipFrustum = rdCamera_g_pCurCamera->pClipFrustum;
+        pSector->pClipFrustum = rdCamera_g_pCurCamera->pClipFrustum;
     }
     else
     {
-        sector->renderTick = sithRender_lastRenderTick;
+        pSector->renderTick = sithRender_lastRenderTick;
         // Added: Prevent crashing
         if (sithRender_g_numVisibleSectors >= SITH_MAX_VISIBLE_SECTORS) {
             jk_printf("OpenJKDF2: Hit max visible sectors.\n");
@@ -667,17 +667,17 @@ void sithRender_BuildVisibleSectorList(SithSector *sector, rdClipFrustum *frustu
             return;
         }
 
-        sithRender_aVisibleSectors[sithRender_g_numVisibleSectors++] = sector;
-        if (!(sector->flags & SITH_SECTOR_SEEN) && !(g_debugmodeFlags & DEBUGFLAG_NOCLIP)) // Added: don't send sighted stuff in noclip, otherwise the whole map reveals
+        sithRender_aVisibleSectors[sithRender_g_numVisibleSectors++] = pSector;
+        if (!(pSector->flags & SITH_SECTOR_SEEN) && !(g_debugmodeFlags & DEBUGFLAG_NOCLIP)) // Added: don't send sighted stuff in noclip, otherwise the whole map reveals
         {
-            sector->flags |= SITH_SECTOR_SEEN;
-            if ( (sector->flags & SITH_SECTOR_COGLINKED) != 0 )
-                sithCog_SectorSendMessage(sector, 0, SITH_MESSAGE_SIGHTED);
+            pSector->flags |= SITH_SECTOR_SEEN;
+            if ( (pSector->flags & SITH_SECTOR_COGLINKED) != 0 )
+                sithCog_SectorSendMessage(pSector, 0, SITH_MESSAGE_SIGHTED);
         }
         frustum = &sithRender_aSectorFrustrums[sithRender_numSecorFrustrums++];
-        _memcpy(frustum, frustumArg, sizeof(rdClipFrustum));
-        thing = sector->pFirstThingInSector;
-        sector->pClipFrustum = frustum;
+        _memcpy(frustum, pFrustrum, sizeof(rdClipFrustum));
+        thing = pSector->pFirstThingInSector;
+        pSector->pClipFrustum = frustum;
         lightIdx = sithRender_numThingLights;
 
         // Added: safety
@@ -733,23 +733,23 @@ void sithRender_BuildVisibleSectorList(SithSector *sector, rdClipFrustum *frustu
             }
             thing = thing->pNextThingInSector;
         }
-        sithRender_aThingSectors[sithRender_numThingSectors++] = sector;
+        sithRender_aThingSectors[sithRender_numThingSectors++] = pSector;
     }
 
     // Added: noclip
     if (sithPlayer_bNoClippingRend) return;
     
-    v45 = sector->clipVisited;
+    v45 = pSector->clipVisited;
 
     // Clip visited hardening
 #ifdef QOL_IMPROVEMENTS
-    sector->clipVisited = sithRender_lastRenderTick;
+    pSector->clipVisited = sithRender_lastRenderTick;
 #else
-    sector->clipVisited = 1;
+    pSector->clipVisited = 1;
 #endif
 
     // Added: safeguard
-    for (adjoinIter = sector->adjoins ; adjoinIter != NULL; adjoinIter = adjoinIter->next)
+    for (adjoinIter = pSector->adjoins ; adjoinIter != NULL; adjoinIter = adjoinIter->next)
     {
         // Clip visited hardening
 #ifdef QOL_IMPROVEMENTS
@@ -800,7 +800,7 @@ void sithRender_BuildVisibleSectorList(SithSector *sector, rdClipFrustum *frustu
         }
 #endif
 
-        if ( dist > 0.0 || (dist == 0.0 && sector == sithCamera_g_pCurCamera->sector))
+        if ( dist > 0.0 || (dist == 0.0 && pSector == sithCamera_g_pCurCamera->sector))
         {
             int bAdjoinIsTransparent = (((!adjoinSurface->surfaceInfo.face.material ||
                         (adjoinSurface->surfaceInfo.face.geometryMode == 0)) ||
@@ -861,7 +861,7 @@ void sithRender_BuildVisibleSectorList(SithSector *sector, rdClipFrustum *frustu
             meshinfo_out.aVertices = sithRender_aClipVertices;
             sithRender_faceView.vertexUVIdx = adjoinSurface->surfaceInfo.face.vertexUVIdx;
 
-            rdPrimit3_ClipFace(frustumArg, RD_GEOMETRY_WIREFRAME, RD_LIGHTMODE_NOTLIT, RD_TEXTUREMODE_AFFINE, &sithRender_faceView, &meshinfo_out, &adjoinSurface->surfaceInfo.face.texVertOffset);
+            rdPrimit3_ClipFace(pFrustrum, RD_GEOMETRY_WIREFRAME, RD_LIGHTMODE_NOTLIT, RD_TEXTUREMODE_AFFINE, &sithRender_faceView, &meshinfo_out, &adjoinSurface->surfaceInfo.face.texVertOffset);
 
             if ((((unsigned int)meshinfo_out.numVertices >= 3u) || (rdClip_g_faceStatus & CLIPSTAT_NONE_VISIBLE)) 
                 && ((rdClip_g_faceStatus & (CLIPSTAT_NEAR|CLIPSTAT_NONE_VISIBLE)) || ((adjoinIter->flags & 1) && bAdjoinIsTransparent))) 
@@ -872,12 +872,12 @@ void sithRender_BuildVisibleSectorList(SithSector *sector, rdClipFrustum *frustu
                 rdCamera_g_pCurCamera->pfProjectList(sithRender_aTransformedClipVertices, sithRender_aClipVertices, meshinfo_out.numVertices);
 #endif
                 
-                v31 = frustumArg;
+                v31 = pFrustrum;
 
                 // no frustum culling if forced
                 if (rdClip_g_faceStatus & (CLIPSTAT_NEAR|CLIPSTAT_NONE_VISIBLE))
                 {
-                    v31 = frustumArg;
+                    v31 = pFrustrum;
                 }
                 else
                 {
@@ -953,7 +953,7 @@ void sithRender_BuildVisibleSectorList(SithSector *sector, rdClipFrustum *frustu
             }
         }
     }
-    sector->clipVisited = v45;
+    pSector->clipVisited = v45;
 }
 
 #ifdef TARGET_TWL
@@ -2526,7 +2526,7 @@ void sithRender_BuildVisibleSectorsThingList()
 }
 
 // Added: recursion depth
-void sithRender_BuildSectorThingList(SithSector *sector, flex_t prev, flex_t dist, int depth)
+void sithRender_BuildSectorThingList(SithSector *pSector, flex_t curDistance, flex_t extraDistance, int depth)
 {
     SithThing *i;
     SithSurfaceAdjoin *j;
@@ -2537,14 +2537,14 @@ void sithRender_BuildSectorThingList(SithSector *sector, flex_t prev, flex_t dis
         return;
     }
 
-    if ( sector->renderTick == sithRender_lastRenderTick )
+    if ( pSector->renderTick == sithRender_lastRenderTick )
         return;
 
-    sector->renderTick = sithRender_lastRenderTick;
-    if ( prev < 2.0 && sithRender_numThingLights < 0x20)
+    pSector->renderTick = sithRender_lastRenderTick;
+    if ( curDistance < 2.0 && sithRender_numThingLights < 0x20)
     {
         int safeguard = 0;
-        for ( i = sector->pFirstThingInSector; i; i = i->pNextThingInSector )
+        for ( i = pSector->pFirstThingInSector; i; i = i->pNextThingInSector )
         {
             // Added: safeguards
             if (++safeguard >= SITH_MAX_THINGS) {
@@ -2588,26 +2588,26 @@ void sithRender_BuildSectorThingList(SithSector *sector, flex_t prev, flex_t dis
             }
         }
     }
-    if ( prev < 0.8 )
+    if ( curDistance < 0.8 )
     {
         if ( sithRender_numThingSectors < SITH_MAX_VISIBLE_SECTORS_2 )
         {
-            sithRender_aThingSectors[sithRender_numThingSectors++] = sector;
+            sithRender_aThingSectors[sithRender_numThingSectors++] = pSector;
         }
     }
 
 #ifndef TARGET_TWL
     // What is the point of this anyhow besides wasting time?
-    for ( j = sector->adjoins; j; j = j->next )
+    for ( j = pSector->adjoins; j; j = j->next )
     {
         if ( (j->flags & 1) != 0 && j->sector->renderTick != sithRender_lastRenderTick )
         {
-            flex_t nextDist = j->mirror->dist + j->dist + dist + prev;
+            flex_t nextDist = j->mirror->dist + j->dist + extraDistance + curDistance;
             if ( nextDist < 0.8 || nextDist < 2.0 ) // Bug?
             {
                 // Allow aThings to peek their light around corners w/o screwing with frustums
 #ifndef QOL_IMPROVEMENTS
-                j->sector->pClipFrustum = sector->pClipFrustum;
+                j->sector->pClipFrustum = pSector->pClipFrustum;
 #else
                 j->sector->pClipFrustum = NULL;
 #endif
@@ -3304,9 +3304,9 @@ void sithRender_RenderAlphaAdjoins()
     rdCamera_g_pCurCamera->pClipFrustum = pFullCameraFrustum;
 }
 
-int sithRender_SetExtraThingRenderFunc(sithRender_weapRendFunc_t a1)
+int sithRender_SetExtraThingRenderFunc(sithRender_weapRendFunc_t pfFunc)
 {
-    sithRender_pExtraThingRenderFunc = a1;
+    sithRender_pExtraThingRenderFunc = pfFunc;
     return 1;
 }
 

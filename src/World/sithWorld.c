@@ -117,18 +117,18 @@ void sithWorld_Shutdown()
     sithWorld_bInitted = 0;
 }
 
-void sithWorld_SetLoadProgressCallback(sithWorldProgressCallback_t func)
+void sithWorld_SetLoadProgressCallback(sithWorldProgressCallback_t pfProgressCallback)
 {
-    sithWorld_LoadPercentCallback = func;
+    sithWorld_LoadPercentCallback = pfProgressCallback;
 }
 
-void sithWorld_UpdateLoadProgress(flex_t percent)
+void sithWorld_UpdateLoadProgress(flex_t progress)
 {
     if ( sithWorld_LoadPercentCallback )
-        sithWorld_LoadPercentCallback(percent);
+        sithWorld_LoadPercentCallback(progress);
 }
 
-int sithWorld_Load(SithWorld *pWorld, char *map_jkl_fname)
+int sithWorld_Load(SithWorld *pWorld, char *pFilename)
 {
     int result; // eax
     int v3; // esi
@@ -142,23 +142,23 @@ int sithWorld_Load(SithWorld *pWorld, char *map_jkl_fname)
     if ( !pWorld )
         return 0;
 
-    stdPlatform_Printf("OpenJKDF2: %s -> %s\n", __func__, map_jkl_fname); // Added
+    stdPlatform_Printf("OpenJKDF2: %s -> %s\n", __func__, pFilename); // Added
 
 #if defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW)
     std3D_PurgeEntireTextureCache();
 #endif
 
-    if ( map_jkl_fname )
+    if ( pFilename )
     {
         // aaaaaa these sizes are wrong
         // Added: actually use correct lengths
-        _strncpy(pWorld->map_jkl_fname, map_jkl_fname, 0x1F);
+        _strncpy(pWorld->map_jkl_fname, pFilename, 0x1F);
         pWorld->map_jkl_fname[31] = 0; 
         _strtolower(pWorld->map_jkl_fname);
         _strncpy(pWorld->episodeName, sithWorld_episodeName, 0x1Fu);
         pWorld->episodeName[0x1F] = 0;
         sithWorld_g_pLastLoadedWorld = pWorld;
-        stdFnames_MakePath(v8, 128, "jkl", map_jkl_fname);
+        stdFnames_MakePath(v8, 128, "jkl", pFilename);
         sithWorld_some_integer_4 = 0;
         if ( !stdConffile_Open(v8) )
         {
@@ -458,21 +458,21 @@ void sithWorld_FreeEntry(SithWorld *pWorld)
     SITH_FREE(pWorld);
 }
 
-int sithWorld_ReadHeaderText(SithWorld *pWorld, int junk)
+int sithWorld_ReadHeaderText(SithWorld *pWorld, int bSkip)
 {
     flex32_t tmp;
     flex32_t tmp2;
     flex32_t tmp3;
     flex32_t tmp4;
 
-    if ( junk )
+    if ( bSkip )
         return 0;
     if ( !stdConffile_ReadLine() )
         return 0;
-    if (_sscanf(stdConffile_g_aLine, "version %d", &junk) != 1) // MOTS added: check 1
+    if (_sscanf(stdConffile_g_aLine, "version %d", &bSkip) != 1) // MOTS added: check 1
         return 0;
     // MOTS added
-    if (junk != 1) {
+    if (bSkip != 1) {
         //return 0;
     }
     if ( !stdConffile_ReadLine() )
@@ -546,11 +546,11 @@ int sithWorld_ReadHeaderText(SithWorld *pWorld, int junk)
     return 1;
 }
 
-int sithWorld_ReadCopyrightText(SithWorld *lvl, int junk)
+int sithWorld_ReadCopyrightText(SithWorld *pWorld, int bSkip)
 {
     char *iter;
 
-    if (junk)
+    if (bSkip)
         return 0;
 
     iter = jkl_read_copyright;
@@ -576,29 +576,29 @@ int sithWorld_ReadCopyrightText(SithWorld *lvl, int junk)
     return 1;
 }
 
-int sithWorld_RegisterTextSectionParser(char *section_name, sithWorldSectionParser_t funcptr)
+int sithWorld_RegisterTextSectionParser(char *aSectionName, sithWorldSectionParser_t pfParseFunction)
 {
-    int idx = sithWorld_GetTextSectionParserIndex(section_name);
+    int idx = sithWorld_GetTextSectionParserIndex(aSectionName);
     if (idx == -1)
     {
         if ( sithWorld_numParsers >= 32 )
             return 0;
         idx = sithWorld_numParsers++;
     }
-    _strncpy(sithWorld_aSectionParsers[idx].section_name, section_name, 0x1Fu);
+    _strncpy(sithWorld_aSectionParsers[idx].section_name, aSectionName, 0x1Fu);
     sithWorld_aSectionParsers[idx].section_name[31] = 0;
-    sithWorld_aSectionParsers[idx].funcptr = funcptr;
+    sithWorld_aSectionParsers[idx].funcptr = pfParseFunction;
     return 1;
 }
 
-int sithWorld_GetTextSectionParserIndex(char *a1)
+int sithWorld_GetTextSectionParserIndex(char *aSectionName)
 {
     if ( sithWorld_numParsers <= 0 )
         return -1;
 
     int i = 0;
     SithWorldTextSectionParseHandler *iter = sithWorld_aSectionParsers;
-    while ( __strcmpi(iter->section_name, a1) )
+    while ( __strcmpi(iter->section_name, aSectionName) )
     {
         ++i;
         ++iter;
@@ -684,7 +684,7 @@ int sithWorld_InitPlayers()
     return 1;
 }
 
-int sithWorld_ReadGeoresourceText(SithWorld *pWorld, int a2)
+int sithWorld_ReadGeoresourceText(SithWorld *pWorld, int bSkip)
 {
     uint32_t numVertices;
     uint32_t textureVertices;
@@ -693,7 +693,7 @@ int sithWorld_ReadGeoresourceText(SithWorld *pWorld, int a2)
     flex32_t v_x, v_y, v_z, v_u, v_v;
     char colormap_fname[128];
 
-    if ( a2 )
+    if ( bSkip )
         return 0;
 
     if ( sithWorld_LoadPercentCallback )
@@ -861,72 +861,72 @@ void sithWorld_ResetGeoresource(SithWorld *pWorld)
 }
 
 // MOTS altered
-void sithWorld_GetMemoryUsage(SithWorld *pWorld, int *outAllocated, int *outQuantity)
+void sithWorld_GetMemoryUsage(SithWorld *pWorld, int *aMemUsed, int *aCount)
 {
-    _memset(outAllocated, 0, sizeof(int) * 0x11);
-    _memset(outQuantity, 0, sizeof(int) * 0x11);
-    outQuantity[0] = pWorld->numMaterials;
+    _memset(aMemUsed, 0, sizeof(int) * 0x11);
+    _memset(aCount, 0, sizeof(int) * 0x11);
+    aCount[0] = pWorld->numMaterials;
     for (int i = 0; i < pWorld->numMaterials; i++)
     {
-        outAllocated[0] += sithMaterial_GetMemorySize(&pWorld->aMaterials[i]);
+        aMemUsed[0] += sithMaterial_GetMemorySize(&pWorld->aMaterials[i]);
     }
-    outQuantity[1] = pWorld->numVertices;
-    outAllocated[1] = 0x34 * pWorld->numVertices;               // TODO: what is this size?
-    outQuantity[2] = pWorld->numTexVertices;
-    outAllocated[2] = sizeof(rdVector2) * pWorld->numTexVertices;
-    outQuantity[3] = pWorld->numSurfaces;
+    aCount[1] = pWorld->numVertices;
+    aMemUsed[1] = 0x34 * pWorld->numVertices;               // TODO: what is this size?
+    aCount[2] = pWorld->numTexVertices;
+    aMemUsed[2] = sizeof(rdVector2) * pWorld->numTexVertices;
+    aCount[3] = pWorld->numSurfaces;
     for (int i = 0; i < pWorld->numSurfaces; i++)
     {
-        outAllocated[3] += sizeof(rdVector3) * pWorld->surfaces[i].surfaceInfo.face.numVertices + sizeof(SithSurface);
+        aMemUsed[3] += sizeof(rdVector3) * pWorld->surfaces[i].surfaceInfo.face.numVertices + sizeof(SithSurface);
     }
-    outQuantity[4] = pWorld->numAdjoinsLoaded;
-    outAllocated[4] = sizeof(SithSurfaceAdjoin) * pWorld->numAdjoinsLoaded;
-    outQuantity[5] = pWorld->numSectors;
+    aCount[4] = pWorld->numAdjoinsLoaded;
+    aMemUsed[4] = sizeof(SithSurfaceAdjoin) * pWorld->numAdjoinsLoaded;
+    aCount[5] = pWorld->numSectors;
     for (int i = 0; i < pWorld->numSectors; i++)
     {
-        outAllocated[5] += sizeof(flex_t) * pWorld->aSectors[i].numVertices + sizeof(SithSector); // TODO bug?
+        aMemUsed[5] += sizeof(flex_t) * pWorld->aSectors[i].numVertices + sizeof(SithSector); // TODO bug?
     }
-    outQuantity[6] = pWorld->numSoundsLoaded;
+    aCount[6] = pWorld->numSoundsLoaded;
     for (int i = 0; i < pWorld->numSoundsLoaded; i++)
     {
-        outAllocated[6] += pWorld->sounds[i].bufferBytes + sizeof(sithSound);
+        aMemUsed[6] += pWorld->sounds[i].bufferBytes + sizeof(sithSound);
     }
-    outQuantity[8] = pWorld->numCogScripts;
+    aCount[8] = pWorld->numCogScripts;
     for (int i = 0; i < pWorld->numCogScripts; i++)
     {
-        outAllocated[8] += 4 * (7 * pWorld->aCogScripts[i].pSymbolTable->numUsedSymbols + pWorld->aCogScripts[i].numSymbolRefs) + 0x1DD0; // TODO verify struct sizes here...
+        aMemUsed[8] += 4 * (7 * pWorld->aCogScripts[i].pSymbolTable->numUsedSymbols + pWorld->aCogScripts[i].numSymbolRefs) + 0x1DD0; // TODO verify struct sizes here...
     }
-    outQuantity[7] = pWorld->numCogs;
+    aCount[7] = pWorld->numCogs;
     for (int i = 0; i < pWorld->numCogs; i++)
     {
-        outAllocated[7] += 28 * pWorld->aCogs[i].pSymbolTable->numUsedSymbols + 0x14DC; // TODO verify struct sizes
+        aMemUsed[7] += 28 * pWorld->aCogs[i].pSymbolTable->numUsedSymbols + 0x14DC; // TODO verify struct sizes
     }
-    outQuantity[10] = pWorld->numModels;
+    aCount[10] = pWorld->numModels;
     for (int i = 0; i < pWorld->numModels; i++)
     {
-        outAllocated[10] += sithModel_GetModelMemUsage(&pWorld->aModels[i]);
+        aMemUsed[10] += sithModel_GetModelMemUsage(&pWorld->aModels[i]);
     }
-    outQuantity[11] = pWorld->numKeyframes;
+    aCount[11] = pWorld->numKeyframes;
     for (int i = 0; i < pWorld->numKeyframes; i++)
     {
-        outAllocated[11] += sizeof(rdJoint) * (pWorld->aKeyframes[i].numJoints2 + 3);
+        aMemUsed[11] += sizeof(rdJoint) * (pWorld->aKeyframes[i].numJoints2 + 3);
         for (int j = 0; j < pWorld->aKeyframes[i].numJoints2; j++)
         {
-            outAllocated[11] += sizeof(rdAnimEntry) * pWorld->aKeyframes[i].aNodes[j].numEntries;
+            aMemUsed[11] += sizeof(rdAnimEntry) * pWorld->aKeyframes[i].aNodes[j].numEntries;
         }
     }
-    outQuantity[12] = pWorld->numPuppetClasses;
-    outAllocated[12] = sizeof(SithPuppetClass) * pWorld->numPuppetClasses;
-    outQuantity[13] = pWorld->numSprites;
-    outAllocated[13] = sizeof(rdSprite) * pWorld->numSprites;
+    aCount[12] = pWorld->numPuppetClasses;
+    aMemUsed[12] = sizeof(SithPuppetClass) * pWorld->numPuppetClasses;
+    aCount[13] = pWorld->numSprites;
+    aMemUsed[13] = sizeof(rdSprite) * pWorld->numSprites;
     for (int i = 0; i < pWorld->numSprites; i++)
     {
-        outAllocated[13] += sizeof(rdTri) * pWorld->aSprites[i].face.numVertices;
+        aMemUsed[13] += sizeof(rdTri) * pWorld->aSprites[i].face.numVertices;
     }
-    outQuantity[14] = pWorld->numThingTemplates;
-    outQuantity[15] = pWorld->numThingsLoaded;
-    outAllocated[14] = sizeof(SithThing) * pWorld->numThingTemplates;
-    outAllocated[15] = sizeof(SithThing) * pWorld->numThingsLoaded;
+    aCount[14] = pWorld->numThingTemplates;
+    aCount[15] = pWorld->numThingsLoaded;
+    aMemUsed[14] = sizeof(SithThing) * pWorld->numThingTemplates;
+    aMemUsed[15] = sizeof(SithThing) * pWorld->numThingsLoaded;
 }
 
 

@@ -42,27 +42,27 @@ void sithCogParse_FreeParseTree()
     sithCogParse_lastParsedFile = "INVALID";
 }
 
-int sithCogParse_Load(char *aName, SithCogScript *pScript, int unk)
+int sithCogParse_Load(char *pFilename, SithCogScript *pScript, int bParseDescription)
 {
     SithCogSymbolTable *symboltable; // eax
     unsigned int v6; // ecx
     int v8; // edx
 
-    if (!stdConffile_Open(aName))
+    if (!stdConffile_Open(pFilename))
         return 0;
 
     //printf("%s\n", aName);
 
     // Added
-    sithCogParse_lastParsedFile = aName;
+    sithCogParse_lastParsedFile = pFilename;
 
     _memset(pScript, 0, sizeof(SithCogScript));
 #ifdef STDHASHTABLE_CRC32_KEYS
-    const char* fname = stdFileFromPath(aName);
+    const char* fname = stdFileFromPath(pFilename);
     pScript->pathCrc = stdCrc32(fname, strlen(fname));
 #endif
 #ifdef SITH_DEBUG_STRUCT_NAMES
-    stdString_SafeStrCopy(pScript->aName, stdFileFromPath(aName), 32);
+    stdString_SafeStrCopy(pScript->aName, stdFileFromPath(pFilename), 32);
 #endif
     _memset(cog_parser_node_stackpos, 0xFFu, sizeof(cog_parser_node_stackpos));
     cog_yacc_loop_depth = 1;
@@ -94,35 +94,35 @@ int sithCogParse_Load(char *aName, SithCogScript *pScript, int unk)
         {
             if ( !_strcmp(stdConffile_g_entry.aArgs[0].value, "thing") )
             {
-                sithCogParse_ParseSymbolRef(pScript, 3, unk);
+                sithCogParse_ParseSymbolRef(pScript, 3, bParseDescription);
             }
             else if ( !_strcmp(stdConffile_g_entry.aArgs[0].value, "surface") )
             {
-                sithCogParse_ParseSymbolRef(pScript, 6, unk);
+                sithCogParse_ParseSymbolRef(pScript, 6, bParseDescription);
             }
             else if ( !_strcmp(stdConffile_g_entry.aArgs[0].value, "sector") )
             {
-                sithCogParse_ParseSymbolRef(pScript, 5, unk);
+                sithCogParse_ParseSymbolRef(pScript, 5, bParseDescription);
             }
             else if ( !_strcmp(stdConffile_g_entry.aArgs[0].value, "sound") )
             {
-                sithCogParse_ParseSymbolRef(pScript, 8, unk);
+                sithCogParse_ParseSymbolRef(pScript, 8, bParseDescription);
             }
             else if ( !_strcmp(stdConffile_g_entry.aArgs[0].value, "template") )
             {
-                sithCogParse_ParseSymbolRef(pScript, 4, unk);
+                sithCogParse_ParseSymbolRef(pScript, 4, bParseDescription);
             }
             else if ( !_strcmp(stdConffile_g_entry.aArgs[0].value, "model") )
             {
-                sithCogParse_ParseSymbolRef(pScript, 12, unk);
+                sithCogParse_ParseSymbolRef(pScript, 12, bParseDescription);
             }
             else if ( !_strcmp(stdConffile_g_entry.aArgs[0].value, "keyframe") )
             {
-                sithCogParse_ParseSymbolRef(pScript, 7, unk);
+                sithCogParse_ParseSymbolRef(pScript, 7, bParseDescription);
             }
             else if ( !_strcmp(stdConffile_g_entry.aArgs[0].value, "cog") )
             {
-                sithCogParse_ParseSymbolRef(pScript, 9, unk);
+                sithCogParse_ParseSymbolRef(pScript, 9, bParseDescription);
             }
             else if ( !_strcmp(stdConffile_g_entry.aArgs[0].value, "message") )
             {
@@ -130,23 +130,23 @@ int sithCogParse_Load(char *aName, SithCogScript *pScript, int unk)
             }
             else if ( !_strcmp(stdConffile_g_entry.aArgs[0].value, "material") )
             {
-                sithCogParse_ParseSymbolRef(pScript, 10, unk);
+                sithCogParse_ParseSymbolRef(pScript, 10, bParseDescription);
             }
             else if ( !_strcmp(stdConffile_g_entry.aArgs[0].value, "flex") || !_strcmp(stdConffile_g_entry.aArgs[0].value, "float") )
             {
-                sithCogParse_ParseFlex(pScript, unk);
+                sithCogParse_ParseFlex(pScript, bParseDescription);
             }
             else if ( !_strcmp(stdConffile_g_entry.aArgs[0].value, "int") )
             {
-                sithCogParse_ParseInt(pScript, unk);
+                sithCogParse_ParseInt(pScript, bParseDescription);
             }
             else if ( !_strcmp(stdConffile_g_entry.aArgs[0].value, "vector") )
             {
-                sithCogParse_ParseVector(pScript, unk);
+                sithCogParse_ParseVector(pScript, bParseDescription);
             }
             else if ( !_strcmp(stdConffile_g_entry.aArgs[0].value, "ai") )
             {
-                sithCogParse_ParseSymbolRef(pScript, 13, unk);
+                sithCogParse_ParseSymbolRef(pScript, 13, bParseDescription);
             }
         }
     }
@@ -186,7 +186,7 @@ fail_cleanup:
     return 0;
 }
 
-int sithCogParse_ParseSectionCode(SithCogScript *script)
+int sithCogParse_ParseSectionCode(SithCogScript *pScript)
 {
     stdFile_t hGobFile; // eax
     sith_cog_parser_node *v2; // eax
@@ -206,9 +206,9 @@ int sithCogParse_ParseSectionCode(SithCogScript *script)
     int next_stackpos; // ecx
 
     hGobFile = stdConffile_GetFileHandle();
-    parsing_script = script;
+    parsing_script = pScript;
     yyin = (stdFile_t)hGobFile;
-    sithCogParse_pSymbolTable = script->pSymbolTable;
+    sithCogParse_pSymbolTable = pScript->pSymbolTable;
     if ( parsing_script_idk )
         parsing_script_idk = 0;
     else
@@ -272,12 +272,12 @@ LABEL_16:
 #else
                 pCode = (int32_t *)SITH_ALLOC(sizeof(int32_t) * cogvm_stackpos + sizeof(int32_t));
 #endif
-                script->pCode = pCode;
+                pScript->pCode = pCode;
                 if ( !pCode )
                     goto LABEL_19;
                 cur_instr = cogparser_topnode;
                 script_prog_curidx = 0;
-                script->codeSize = cogvm_stackpos + 1;
+                pScript->codeSize = cogvm_stackpos + 1;
                 script_prog_next = pCode;
                 node_parent = cur_instr->parent;
                 cogvm_stackpos = 0;
@@ -327,7 +327,7 @@ LABEL_32:
                             break;
                     }
                 }
-                script->pCode[script->codeSize - 1] = 29;
+                pScript->pCode[pScript->codeSize - 1] = 29;
                 cogparser_current_nodeidx = 0;
                 cogparser_topnode = 0;
                 result = 1;
@@ -338,7 +338,7 @@ LABEL_32:
 #ifdef QOL_IMPROVEMENTS
     if (yynerrs) {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-        jk_printf("OpenJKDF2: PARSER error was in file: %s\n", script->aName);
+        jk_printf("OpenJKDF2: PARSER error was in file: %s\n", pScript->aName);
 #endif
     }
 #endif
@@ -346,14 +346,14 @@ LABEL_32:
     return result;
 }
 
-SithCogSymbolTable* sithCogParse_DuplicateSymbolTable(SithCogSymbolTable *table)
+SithCogSymbolTable* sithCogParse_DuplicateSymbolTable(SithCogSymbolTable *pSource)
 {
     int numUsedSymbols; // ebp
     SithCogSymbolTable *newTable; // ebx
     SithCogSymbol *aSymbols; // eax
     SithCogSymbolTable *result; // eax
 
-    numUsedSymbols = table->numUsedSymbols;
+    numUsedSymbols = pSource->numUsedSymbols;
     newTable = (SithCogSymbolTable *)SITH_ALLOC(sizeof(SithCogSymbolTable));
     if ( !newTable )
         return 0;
@@ -368,7 +368,7 @@ SithCogSymbolTable* sithCogParse_DuplicateSymbolTable(SithCogSymbolTable *table)
     newTable->aSymbols = aSymbols;
     if ( !aSymbols )
         return 0;
-    stdPlatform_Memcpy32(aSymbols, table->aSymbols, sizeof(SithCogSymbol) * numUsedSymbols); // Added: word-safe both sides
+    stdPlatform_Memcpy32(aSymbols, pSource->aSymbols, sizeof(SithCogSymbol) * numUsedSymbols); // Added: word-safe both sides
     result = newTable;
     newTable->tableSize = numUsedSymbols;
     newTable->numUsedSymbols = numUsedSymbols;
@@ -376,7 +376,7 @@ SithCogSymbolTable* sithCogParse_DuplicateSymbolTable(SithCogSymbolTable *table)
     return result;
 }
 
-SithCogSymbolTable* sithCogParse_AllocSymbolTable(int amt)
+SithCogSymbolTable* sithCogParse_AllocSymbolTable(int numElements)
 {
     SithCogSymbolTable *newTable; // esi
     tHashTable *newHashtable; // eax
@@ -391,8 +391,8 @@ SithCogSymbolTable* sithCogParse_AllocSymbolTable(int amt)
 #endif
     if ( newTable
       && (_memset(newTable, 0, sizeof(SithCogSymbolTable)),
-          newTable->aSymbols = (SithCogSymbol *)SITH_ALLOC(sizeof(SithCogSymbol) * amt),
-          newHashtable = stdHashtbl_New(2 * amt),
+          newTable->aSymbols = (SithCogSymbol *)SITH_ALLOC(sizeof(SithCogSymbol) * numElements),
+          newHashtable = stdHashtbl_New(2 * numElements),
           aSymbols = newTable->aSymbols,
           newTable->pHashtbl = newHashtable,
           newTable->aSymbols)
@@ -401,8 +401,8 @@ SithCogSymbolTable* sithCogParse_AllocSymbolTable(int amt)
 #ifdef TARGET_RETRO_HOMEBREW
         pSithHS->suggestHeap(prevSuggest);
 #endif
-        stdPlatform_Memzero32(aSymbols, sizeof(SithCogSymbol) * amt); // Added: word-safe
-        newTable->tableSize = amt;
+        stdPlatform_Memzero32(aSymbols, sizeof(SithCogSymbol) * numElements); // Added: word-safe
+        newTable->tableSize = numElements;
         newTable->numUsedSymbols = 0;
         newTable->unk_14 = 0;
         result = newTable;
@@ -426,7 +426,7 @@ SithCogSymbolTable* sithCogParse_AllocSymbolTable(int amt)
     return result;
 }
 
-int sithCogParse_ReallocSymbolTable(SithCogSymbolTable *table)
+int sithCogParse_ReallocSymbolTable(SithCogSymbolTable *pTable)
 {
     unsigned int amt; // eax
     SithCogSymbol *reallocBuckets; // eax
@@ -437,50 +437,50 @@ int sithCogParse_ReallocSymbolTable(SithCogSymbolTable *table)
     int i; // esi
 
     // Added: nullptr checks
-    if (!table) {
+    if (!pTable) {
         return 0;
     }
 
-    if ( table->pHashtbl )
+    if ( pTable->pHashtbl )
     {
-        stdHashtbl_Free(table->pHashtbl);
-        table->pHashtbl = 0;
+        stdHashtbl_Free(pTable->pHashtbl);
+        pTable->pHashtbl = 0;
     }
-    amt = table->numUsedSymbols;
-    if ( table->tableSize > amt )
+    amt = pTable->numUsedSymbols;
+    if ( pTable->tableSize > amt )
     {
 #ifdef TARGET_RETRO_HOMEBREW
         int prevSuggest = pSithHS->suggestHeap(HEAP_WORD_ADDRESSABLE); // Added: keep the trim in the arena
 #endif
-        reallocBuckets = (SithCogSymbol *)SITH_REALLOC(table->aSymbols, sizeof(SithCogSymbol) * amt);
+        reallocBuckets = (SithCogSymbol *)SITH_REALLOC(pTable->aSymbols, sizeof(SithCogSymbol) * amt);
 #ifdef TARGET_RETRO_HOMEBREW
         pSithHS->suggestHeap(prevSuggest);
 #endif
         // Added: nullptr checks
         if (!reallocBuckets) {
-            table->tableSize = 0;
+            pTable->tableSize = 0;
             return 0;
         }
-        reallocAmt = table->numUsedSymbols;
-        table->aSymbols = reallocBuckets;
-        table->tableSize = reallocAmt;
+        reallocAmt = pTable->numUsedSymbols;
+        pTable->aSymbols = reallocBuckets;
+        pTable->tableSize = reallocAmt;
     }
-    result = table->tableSize;
+    result = pTable->tableSize;
 #ifndef COG_CRC32_SYMBOL_NAMES
     i_ = 0;
     if ( result )
     {
-        aSymbols = table->aSymbols;
+        aSymbols = pTable->aSymbols;
         i = 0;
         do
         {
             if ( aSymbols[i].pName )
             {
                 SITH_FREE(aSymbols[i].pName);
-                aSymbols = table->aSymbols;
-                table->aSymbols[i].pName = 0;
+                aSymbols = pTable->aSymbols;
+                pTable->aSymbols[i].pName = 0;
             }
-            result = table->tableSize;
+            result = pTable->tableSize;
             ++i_;
             ++i;
         }
@@ -490,24 +490,24 @@ int sithCogParse_ReallocSymbolTable(SithCogSymbolTable *table)
     return result;
 }
 
-void sithCogParse_FreeSymbolTable(SithCogSymbolTable *table)
+void sithCogParse_FreeSymbolTable(SithCogSymbolTable *pTable)
 {
     SithCogSymbol *v1; // eax
     unsigned int v2; // ebx
     int v3; // esi
 
-    if ( table->pHashtbl )
+    if ( pTable->pHashtbl )
     {
-        stdHashtbl_Free(table->pHashtbl);
-        table->pHashtbl = 0;
+        stdHashtbl_Free(pTable->pHashtbl);
+        pTable->pHashtbl = 0;
     }
-    v1 = table->aSymbols;
-    if ( table->aSymbols )
+    v1 = pTable->aSymbols;
+    if ( pTable->aSymbols )
     {
-        if ( !table->unk_14 )
+        if ( !pTable->unk_14 )
         {
             v2 = 0;
-            if ( table->tableSize )
+            if ( pTable->tableSize )
             {
                 v3 = 0;
                 do
@@ -527,119 +527,119 @@ void sithCogParse_FreeSymbolTable(SithCogSymbolTable *table)
                         v1[v3].val.dataAsPtrs[0] = 0;
                     }
 #endif
-                    v1 = table->aSymbols;
-                    if (table->aSymbols[v3].val.type == SITHCOG_VALUE_STRING)
+                    v1 = pTable->aSymbols;
+                    if (pTable->aSymbols[v3].val.type == SITHCOG_VALUE_STRING)
                     {
                         SITH_FREE(v1[v3].val.dataAsName);
-                        v1 = table->aSymbols;
-                        table->aSymbols[v3].val.dataAsName = 0;
+                        v1 = pTable->aSymbols;
+                        pTable->aSymbols[v3].val.dataAsName = 0;
                     }
                     ++v2;
                     ++v3;
                 }
-                while ( v2 < table->tableSize );
+                while ( v2 < pTable->tableSize );
             }
         }
-        SITH_FREE(table->aSymbols);
-        table->aSymbols = 0;
+        SITH_FREE(pTable->aSymbols);
+        pTable->aSymbols = 0;
     }
-    SITH_FREE(table);
+    SITH_FREE(pTable);
 }
 
-SithCogSymbol* sithCogParse_AddSymbol(SithCogSymbolTable *table, const char *symbolName)
+SithCogSymbol* sithCogParse_AddSymbol(SithCogSymbolTable *pTable, const char *pName)
 {
-    if ( table->tableSize > table->numUsedSymbols )
+    if ( pTable->tableSize > pTable->numUsedSymbols )
     {
-        SithCogSymbol* symbol = &table->aSymbols[table->numUsedSymbols];
-        table->numUsedSymbols++;
-        if ( symbolName )
+        SithCogSymbol* symbol = &pTable->aSymbols[pTable->numUsedSymbols];
+        pTable->numUsedSymbols++;
+        if ( pName )
         {
 #if !defined(COG_CRC32_SYMBOL_NAMES)
-            char* key = (char *)SITH_ALLOC(_strlen(symbolName) + 1);
-            _strcpy(key, symbolName);
+            char* key = (char *)SITH_ALLOC(_strlen(pName) + 1);
+            _strcpy(key, pName);
             symbol->pName = key;
-            if ( table->pHashtbl )
-                stdHashtbl_Add(table->pHashtbl, key, symbol);
+            if ( pTable->pHashtbl )
+                stdHashtbl_Add(pTable->pHashtbl, key, symbol);
 #else
-            symbol->nameCrc = stdCrc32(symbolName, strlen(symbolName));
-            if ( table->pHashtbl )
-                stdHashtbl_Add(table->pHashtbl, symbolName, symbol);
+            symbol->nameCrc = stdCrc32(pName, strlen(pName));
+            if ( pTable->pHashtbl )
+                stdHashtbl_Add(pTable->pHashtbl, pName, symbol);
 #endif
             
         }
         symbol->field_14 = cog_yacc_loop_depth;
         cog_yacc_loop_depth++;
-        symbol->id = table->firstId + symbol - table->aSymbols;
+        symbol->id = pTable->firstId + symbol - pTable->aSymbols;
         //v7 = ((((char *)v5 - (char *)sithCogParse_pSymbolTable->aSymbols) * 4) / 7) >> 4; ??
         
         return symbol;
     }
     else
     {
-        stdPrintf(pSithHS->errorPrint, ".\\Cog\\sithCogParse.c", 573, "No space for COG symbol %s.\n", symbolName);
+        stdPrintf(pSithHS->errorPrint, ".\\Cog\\sithCogParse.c", 573, "No space for COG symbol %s.\n", pName);
         return NULL;
     }
 }
 
-void sithCogParse_SetSymbolValue(SithCogSymbol *a1, SithCogSymbolValue *a2)
+void sithCogParse_SetSymbolValue(SithCogSymbol *pSymbol, SithCogSymbolValue *pValue)
 {
     // TODO ehhhhhh
     //*(SithCogSymbolValue *)&a1->val = *a2;
-    a1->val.type = a2->type;
+    pSymbol->val.type = pValue->type;
     // Added: word stores -- symbol tables may live in word-addressable-only
     // memory, and a tiny _memcpy compiles to a byte loop (dropped by the bus).
-    for (size_t i = 0; i < sizeof(a1->val.dataAsPtrs)/sizeof(a1->val.dataAsPtrs[0]); i++)
-        a1->val.dataAsPtrs[i] = a2->dataAsPtrs[i];
+    for (size_t i = 0; i < sizeof(pSymbol->val.dataAsPtrs)/sizeof(pSymbol->val.dataAsPtrs[0]); i++)
+        pSymbol->val.dataAsPtrs[i] = pValue->dataAsPtrs[i];
 }
 
-SithCogSymbol* sithCogParse_GetSymbol(SithCogSymbolTable *pSymbolTable, char *a2)
+SithCogSymbol* sithCogParse_GetSymbol(SithCogSymbolTable *pLocal, char *pName)
 {
     SithCogSymbol *result; // eax
 
-    if (!pSymbolTable->pHashtbl)
+    if (!pLocal->pHashtbl)
         return NULL;
     
-    if (result = (SithCogSymbol*)stdHashtbl_Find(pSymbolTable->pHashtbl, a2))
+    if (result = (SithCogSymbol*)stdHashtbl_Find(pLocal->pHashtbl, pName))
         return result;
 
-    if (pSymbolTable == sithCog_g_pSymbolTable) {
+    if (pLocal == sithCog_g_pSymbolTable) {
         //jk_printf("OpenJKDF2: Missing symbol `%s` in `%s`!\n", a2, sithCogParse_lastParsedFile);
         return NULL;
     }
 
-    return sithCogParse_GetSymbol(sithCog_g_pSymbolTable, a2);
+    return sithCogParse_GetSymbol(sithCog_g_pSymbolTable, pName);
 }
 
-SithCogSymbol* sithCogParse_GetSymbolByID(SithCogSymbolTable *table, unsigned int idx)
+SithCogSymbol* sithCogParse_GetSymbolByID(SithCogSymbolTable *pTable, unsigned int symbolId)
 {
     SithCogSymbol *result; // eax
 
-    if ( idx >= 0x100 )
+    if ( symbolId >= 0x100 )
     {
-        table = sithCog_g_pSymbolTable;
-        idx -= 256;
+        pTable = sithCog_g_pSymbolTable;
+        symbolId -= 256;
     }
 
-    if ( table && idx < table->numUsedSymbols )
-        result = &table->aSymbols[idx];
+    if ( pTable && symbolId < pTable->numUsedSymbols )
+        result = &pTable->aSymbols[symbolId];
     else
         result = NULL;
 
     return result;
 }
 
-int sithCogParse_GetSymbolLabel(unsigned int idx)
+int sithCogParse_GetSymbolLabel(unsigned int symbolId)
 {
     // aaaaaaaaaaaaa this will dereference a nullptr
-    return sithCogParse_GetSymbolByID(sithCogParse_pSymbolTable, idx)->field_14;
+    return sithCogParse_GetSymbolByID(sithCogParse_pSymbolTable, symbolId)->field_14;
 }
 
-sith_cog_parser_node* sithCogParse_MakeLeafNode(int op, int val)
+sith_cog_parser_node* sithCogParse_MakeLeafNode(int opcode, int symbolId)
 {
-    return sithCogParse_MakeNode(NULL, NULL, op, (int)val);
+    return sithCogParse_MakeNode(NULL, NULL, opcode, (int)symbolId);
 }
 
-sith_cog_parser_node* sithCogParse_MakeVectorLeafNode(int opcode, cog_flex_t* vector)
+sith_cog_parser_node* sithCogParse_MakeVectorLeafNode(int opcode, cog_flex_t* pVect)
 {
     if (!cogparser_nodes_alloc)
     {
@@ -656,9 +656,9 @@ sith_cog_parser_node* sithCogParse_MakeVectorLeafNode(int opcode, cog_flex_t* ve
     sith_cog_parser_node* node = &cogparser_nodes_alloc[cogparser_current_nodeidx++];
     _memset(node, 0, sizeof(sith_cog_parser_node));
     node->opcode = opcode;
-    node->vector[0] = vector[0];
-    node->vector[1] = vector[1];
-    node->vector[2] = vector[2];
+    node->vector[0] = pVect[0];
+    node->vector[1] = pVect[1];
+    node->vector[2] = pVect[2];
     
     cogparser_topnode = node;
     //printf("Add node %p w/ op %x, %p %p\n", node, opcode, parent, child);
@@ -666,7 +666,7 @@ sith_cog_parser_node* sithCogParse_MakeVectorLeafNode(int opcode, cog_flex_t* ve
     return node;
 }
 
-sith_cog_parser_node* sithCogParse_MakeNode(sith_cog_parser_node* parent, sith_cog_parser_node* child, int opcode, int val)
+sith_cog_parser_node* sithCogParse_MakeNode(sith_cog_parser_node* pLeft, sith_cog_parser_node* pRight, int opcode, int value)
 {
     if (!cogparser_nodes_alloc)
     {
@@ -683,9 +683,9 @@ sith_cog_parser_node* sithCogParse_MakeNode(sith_cog_parser_node* parent, sith_c
     sith_cog_parser_node* node = &cogparser_nodes_alloc[cogparser_current_nodeidx++];
     _memset(node, 0, sizeof(sith_cog_parser_node));
     node->opcode = opcode;
-    node->value = val;
-    node->parent = parent;
-    node->child = child;
+    node->value = value;
+    node->parent = pLeft;
+    node->child = pRight;
     
     cogparser_topnode = node;
     //printf("Add node %p w/ op %x, %p %p\n", node, opcode, parent, child);
@@ -698,12 +698,12 @@ int sithCogParse_GetNextLabel()
     return cog_yacc_loop_depth++;
 }
 
-void sithCogParse_LexerSetSymbol(char *symName)
+void sithCogParse_LexerSetSymbol(char *pName)
 {
     SithCogSymbol *v6; // ecx
 
-    _strtolower(symName);
-    v6 = sithCogParse_GetSymbol(sithCogParse_pSymbolTable, symName);
+    _strtolower(pName);
+    v6 = sithCogParse_GetSymbol(sithCogParse_pSymbolTable, pName);
 
     if ( v6 )
     {
@@ -711,7 +711,7 @@ void sithCogParse_LexerSetSymbol(char *symName)
     }
     else
     {
-        v6 = sithCogParse_AddSymbol(sithCogParse_pSymbolTable, symName);
+        v6 = sithCogParse_AddSymbol(sithCogParse_pSymbolTable, pName);
 
         if ( v6 )
         {
@@ -727,30 +727,30 @@ void sithCogParse_LexerSetSymbol(char *symName)
     }
 }
 
-void sithCogParse_LexerSetString(const char *symName)
+void sithCogParse_LexerSetString(const char *pString)
 {
     SithCogSymbol *symbol; // esi
 
-    symbol = sithCogParse_AddSymbol(sithCogParse_pSymbolTable, symName);
+    symbol = sithCogParse_AddSymbol(sithCogParse_pSymbolTable, pString);
     
     if ( symbol )
     {
         symbol->val.type = SITHCOG_VALUE_STRING;
-        symbol->val.dataAsName = (char *)SITH_ALLOC(_strlen(symName) - 1);
-        _strncpy(symbol->val.dataAsName, symName + 1, _strlen(symName) - 2);
-        symbol->val.dataAsName[_strlen(symName) - 2] = 0;
+        symbol->val.dataAsName = (char *)SITH_ALLOC(_strlen(pString) - 1);
+        _strncpy(symbol->val.dataAsName, pString + 1, _strlen(pString) - 2);
+        symbol->val.dataAsName[_strlen(pString) - 2] = 0;
         yylval.as_int = symbol->id;
     }
 }
 
-void sithCogParse_LexerSetVector(char* text)
+void sithCogParse_LexerSetVector(char* pString)
 {
     // Added: flex_t
     flex32_t scan_x = 0.0;
     flex32_t scan_y = 0.0;
     flex32_t scan_z = 0.0;
 
-    _sscanf(text, "'%f %f %f'", &scan_x, &scan_y, &scan_z);
+    _sscanf(pString, "'%f %f %f'", &scan_x, &scan_y, &scan_z);
 
     // Added: flex_t
     yylval.as_vector[0] = scan_x;
@@ -758,21 +758,21 @@ void sithCogParse_LexerSetVector(char* text)
     yylval.as_vector[2] = scan_z;
 }
 
-int sithCogParse_GenerateLabelTable(sith_cog_parser_node *node)
+int sithCogParse_GenerateLabelTable(sith_cog_parser_node *pRoot)
 {
     int result; // eax
     int v2; // esi
 
-    if ( node->child_loop_depth )
-        cog_parser_node_stackpos[node->child_loop_depth] = cogvm_stackpos;
+    if ( pRoot->child_loop_depth )
+        cog_parser_node_stackpos[pRoot->child_loop_depth] = cogvm_stackpos;
 
-    if ( node->parent )
-        sithCogParse_GenerateLabelTable(node->parent);
+    if ( pRoot->parent )
+        sithCogParse_GenerateLabelTable(pRoot->parent);
 
-    if ( node->child )
-        sithCogParse_GenerateLabelTable(node->child);
+    if ( pRoot->child )
+        sithCogParse_GenerateLabelTable(pRoot->child);
 
-    result = node->opcode;
+    result = pRoot->opcode;
     switch ( result )
     {
         case COG_OPCODE_NOP:
@@ -794,7 +794,7 @@ int sithCogParse_GenerateLabelTable(sith_cog_parser_node *node)
 LABEL_11:
             cogvm_stackpos = result;
 LABEL_12:
-            v2 = node->parent_loop_depth;
+            v2 = pRoot->parent_loop_depth;
             if ( v2 )
             {
                 result = cogvm_stackpos;
@@ -804,52 +804,52 @@ LABEL_12:
     }
 }
 
-void sithCogParse_GenerateCode(sith_cog_parser_node *node)
+void sithCogParse_GenerateCode(sith_cog_parser_node *pNode)
 {
-    if ( node->parent )
-        sithCogParse_GenerateCode(node->parent);
+    if ( pNode->parent )
+        sithCogParse_GenerateCode(pNode->parent);
 
-    if ( node->child )
-        sithCogParse_GenerateCode(node->child);
+    if ( pNode->child )
+        sithCogParse_GenerateCode(pNode->child);
 
-    if (!node->opcode )
+    if (!pNode->opcode )
         return;
 
-    cogvm_stack[cogvm_stackpos] = node->opcode;
+    cogvm_stack[cogvm_stackpos] = pNode->opcode;
     cogvm_stackpos++;
-    switch ( node->opcode )
+    switch ( pNode->opcode )
     {
         case COG_OPCODE_PUSHINT:
         case COG_OPCODE_PUSHFLOAT:
         case COG_OPCODE_PUSHSYMBOL:
-            cogvm_stack[cogvm_stackpos] = node->value;
+            cogvm_stack[cogvm_stackpos] = pNode->value;
             cogvm_stackpos++;
             break;
         case COG_OPCODE_PUSHVECTOR:
-            _memcpy(&cogvm_stack[cogvm_stackpos], &node->vector, sizeof(cog_flex_t)*3);
+            _memcpy(&cogvm_stack[cogvm_stackpos], &pNode->vector, sizeof(cog_flex_t)*3);
             cogvm_stackpos += 3;
             break;
         case COG_OPCODE_GOFALSE:
         case COG_OPCODE_GOTRUE:
         case COG_OPCODE_GO:
         case COG_OPCODE_CALL:
-            cogvm_stack[cogvm_stackpos++] = cog_parser_node_stackpos[node->value];
+            cogvm_stack[cogvm_stackpos++] = cog_parser_node_stackpos[pNode->value];
             break;
         default:
             return;
     }
 }
 
-int sithCogParse_ParseSymbolRef(SithCogScript *cogScript, int a2, int unk)
+int sithCogParse_ParseSymbolRef(SithCogScript *pScript, int symbolType, int bParseDescription)
 {
     SithCogSymbolRef *cogIdk;
 
-    if ( cogScript->numSymbolRefs >= 0x80u )
+    if ( pScript->numSymbolRefs >= 0x80u )
         return 0;
     if ( stdConffile_g_entry.numArgs < 2u )
         return 0;
     
-    SithCogSymbol* symbol = sithCogParse_AddSymbol(cogScript->pSymbolTable, stdConffile_g_entry.aArgs[1].key);
+    SithCogSymbol* symbol = sithCogParse_AddSymbol(pScript->pSymbolTable, stdConffile_g_entry.aArgs[1].key);
     
     if ( !symbol )
         return 0;
@@ -864,12 +864,12 @@ int sithCogParse_ParseSymbolRef(SithCogScript *cogScript, int a2, int unk)
     symbol->val.dataAsName = 0;
 
 #ifdef COG_DYNAMIC_IDK
-    cogScript->aSymRefs = (SithCogSymbolRef*)SITH_REALLOC(cogScript->aSymRefs, sizeof(SithCogSymbolRef) * (cogScript->numSymbolRefs+1));
+    pScript->aSymRefs = (SithCogSymbolRef*)SITH_REALLOC(pScript->aSymRefs, sizeof(SithCogSymbolRef) * (pScript->numSymbolRefs+1));
 #endif
     
-    cogIdk = &cogScript->aSymRefs[cogScript->numSymbolRefs];
+    cogIdk = &pScript->aSymRefs[pScript->numSymbolRefs];
     _memset(cogIdk, 0, sizeof(SithCogSymbolRef));
-    cogIdk->type = a2;
+    cogIdk->type = symbolType;
     cogIdk->mask = 0x401;
     cogIdk->hash = symbol->id;
         
@@ -880,7 +880,7 @@ int sithCogParse_ParseSymbolRef(SithCogScript *cogScript, int a2, int unk)
         {
             cogIdk->flags |= 1;
         }
-        else if ( unk && !_strcmp(arg->key, "desc"))
+        else if ( bParseDescription && !_strcmp(arg->key, "desc"))
         {
             if ( cogIdk->desc )
                 SITH_FREE(cogIdk->desc);
@@ -904,21 +904,21 @@ int sithCogParse_ParseSymbolRef(SithCogScript *cogScript, int a2, int unk)
     {
         if ( stdConffile_g_entry.aArgs[1].value != stdConffile_g_entry.aArgs[1].key )
         {
-            stdString_SafeStrCopy(cogScript->aSymRefs[cogScript->numSymbolRefs].value, stdConffile_g_entry.aArgs[1].value, 32);
+            stdString_SafeStrCopy(pScript->aSymRefs[pScript->numSymbolRefs].value, stdConffile_g_entry.aArgs[1].value, 32);
         }
     }
-    ++cogScript->numSymbolRefs;
+    ++pScript->numSymbolRefs;
     return 1;
 }
 
-int sithCogParse_ParseFlex(SithCogScript *cogScript, int a2)
+int sithCogParse_ParseFlex(SithCogScript *pScript, int bParseDescription)
 {
     char* v20 = 0;
 
-    if ( cogScript->numSymbolRefs >= 0x80u ) // added
+    if ( pScript->numSymbolRefs >= 0x80u ) // added
         return 0;
 
-    SithCogSymbol* symbol = sithCogParse_AddSymbol(cogScript->pSymbolTable, stdConffile_g_entry.aArgs[1].key);
+    SithCogSymbol* symbol = sithCogParse_AddSymbol(pScript->pSymbolTable, stdConffile_g_entry.aArgs[1].key);
     
     if ( !symbol )
         return 0;
@@ -941,35 +941,35 @@ int sithCogParse_ParseFlex(SithCogScript *cogScript, int a2)
             return 1;
         }
 
-        if ( a2 && !_strcmp(arg->key, "desc"))
+        if ( bParseDescription && !_strcmp(arg->key, "desc"))
         {
             v20 = _strcpy((char *)SITH_ALLOC(_strlen(arg->value) + 1), arg->value);
         }
     }
     
 #ifdef COG_DYNAMIC_IDK
-    cogScript->aSymRefs = (SithCogSymbolRef*)SITH_REALLOC(cogScript->aSymRefs, sizeof(SithCogSymbolRef) * (cogScript->numSymbolRefs+1));
+    pScript->aSymRefs = (SithCogSymbolRef*)SITH_REALLOC(pScript->aSymRefs, sizeof(SithCogSymbolRef) * (pScript->numSymbolRefs+1));
 #endif
 
-    SithCogSymbolRef* cogIdk = &cogScript->aSymRefs[cogScript->numSymbolRefs];
+    SithCogSymbolRef* cogIdk = &pScript->aSymRefs[pScript->numSymbolRefs];
     _memset(cogIdk, 0, sizeof(SithCogSymbolRef)); // added
     cogIdk->type = SITHCOG_SYM_REF_FLEX; // hmm
     cogIdk->linkid = -1;
     cogIdk->hash = symbol->id;
     cogIdk->desc = v20;
 
-    ++cogScript->numSymbolRefs;
+    ++pScript->numSymbolRefs;
     return 1;
 }
 
-int sithCogParse_ParseInt(SithCogScript *cogScript, int a2)
+int sithCogParse_ParseInt(SithCogScript *pScript, int bParseDescription)
 {
     char* v20 = 0;
 
-    if ( cogScript->numSymbolRefs >= 0x80u ) // added
+    if ( pScript->numSymbolRefs >= 0x80u ) // added
         return 0;
 
-    SithCogSymbol* symbol = sithCogParse_AddSymbol(cogScript->pSymbolTable, stdConffile_g_entry.aArgs[1].key);
+    SithCogSymbol* symbol = sithCogParse_AddSymbol(pScript->pSymbolTable, stdConffile_g_entry.aArgs[1].key);
     
     if ( !symbol )
         return 0;
@@ -992,35 +992,35 @@ int sithCogParse_ParseInt(SithCogScript *cogScript, int a2)
             return 1;
         }
 
-        if ( a2 && !_strcmp(arg->key, "desc"))
+        if ( bParseDescription && !_strcmp(arg->key, "desc"))
         {
             v20 = _strcpy((char *)SITH_ALLOC(_strlen(arg->value) + 1), arg->value);
         }
     }
     
 #ifdef COG_DYNAMIC_IDK
-    cogScript->aSymRefs = (SithCogSymbolRef*)SITH_REALLOC(cogScript->aSymRefs, sizeof(SithCogSymbolRef) * (cogScript->numSymbolRefs+1));
+    pScript->aSymRefs = (SithCogSymbolRef*)SITH_REALLOC(pScript->aSymRefs, sizeof(SithCogSymbolRef) * (pScript->numSymbolRefs+1));
 #endif
 
-    SithCogSymbolRef* cogIdk = &cogScript->aSymRefs[cogScript->numSymbolRefs];
+    SithCogSymbolRef* cogIdk = &pScript->aSymRefs[pScript->numSymbolRefs];
     _memset(cogIdk, 0, sizeof(SithCogSymbolRef)); // added
     cogIdk->type = COG_TYPE_INT; // hmmm
     cogIdk->linkid = -1;
     cogIdk->hash = symbol->id;
     cogIdk->desc = v20;
 
-    ++cogScript->numSymbolRefs;
+    ++pScript->numSymbolRefs;
     return 1;
 }
 
-int sithCogParse_ParseVector(SithCogScript *cogScript, int a2)
+int sithCogParse_ParseVector(SithCogScript *pScript, int bParseDescription)
 {
     char* v20 = 0;
 
-    if ( cogScript->numSymbolRefs >= 0x80u ) // added
+    if ( pScript->numSymbolRefs >= 0x80u ) // added
         return 0;
 
-    SithCogSymbol* symbol = sithCogParse_AddSymbol(cogScript->pSymbolTable, stdConffile_g_entry.aArgs[1].key);
+    SithCogSymbol* symbol = sithCogParse_AddSymbol(pScript->pSymbolTable, stdConffile_g_entry.aArgs[1].key);
     
     if ( !symbol )
         return 0;
@@ -1043,49 +1043,49 @@ int sithCogParse_ParseVector(SithCogScript *cogScript, int a2)
             return 1;
         }
 
-        if ( a2 && !_strcmp(arg->key, "desc"))
+        if ( bParseDescription && !_strcmp(arg->key, "desc"))
         {
             v20 = _strcpy((char *)SITH_ALLOC(_strlen(arg->value) + 1), arg->value);
         }
     }
 
 #ifdef COG_DYNAMIC_IDK
-    cogScript->aSymRefs = (SithCogSymbolRef*)SITH_REALLOC(cogScript->aSymRefs, sizeof(SithCogSymbolRef) * (cogScript->numSymbolRefs+1));
+    pScript->aSymRefs = (SithCogSymbolRef*)SITH_REALLOC(pScript->aSymRefs, sizeof(SithCogSymbolRef) * (pScript->numSymbolRefs+1));
 #endif
     
-    SithCogSymbolRef* cogIdk = &cogScript->aSymRefs[cogScript->numSymbolRefs];
+    SithCogSymbolRef* cogIdk = &pScript->aSymRefs[pScript->numSymbolRefs];
     _memset(cogIdk, 0, sizeof(SithCogSymbolRef)); // added
     cogIdk->type = SITHCOG_SYM_REF_VECTOR; // TODO hmmmm
     cogIdk->linkid = -1;
     cogIdk->hash = symbol->id;
     cogIdk->desc = v20;
 
-    ++cogScript->numSymbolRefs;
+    ++pScript->numSymbolRefs;
     return 1;
 }
 
-int sithCogParse_ParseMessage(SithCogScript *cogScript)
+int sithCogParse_ParseMessage(SithCogScript *pScript)
 {
-    if ( cogScript->numHandlers == 32 )
+    if ( pScript->numHandlers == 32 )
         return 0;
 
     SithCogSymbol* symbolGet = sithCogParse_GetSymbol(sithCog_g_pSymbolTable, stdConffile_g_entry.aArgs[1].value);
     if (!symbolGet) return 0;
 
-    SithCogSymbol* symbol = sithCogParse_AddSymbol(cogScript->pSymbolTable, stdConffile_g_entry.aArgs[1].key);
+    SithCogSymbol* symbol = sithCogParse_AddSymbol(pScript->pSymbolTable, stdConffile_g_entry.aArgs[1].key);
     if (!symbol) return 0;
     
     //printf("Add message? %x %x %s\n", symbolGet->val.data[0], symbol->field_14, stdConffile_g_entry.aArgs[1].value);
     
 #ifdef COG_DYNAMIC_TRIGGERS
-    cogScript->aHandlers = (sithCogTrigger*)SITH_REALLOC(cogScript->aHandlers, sizeof(sithCogTrigger) * (cogScript->numHandlers+1));
+    pScript->aHandlers = (sithCogTrigger*)SITH_REALLOC(pScript->aHandlers, sizeof(sithCogTrigger) * (pScript->numHandlers+1));
 #endif
 
     symbol->val.dataAsName = symbolGet->val.dataAsName;
     symbol->val.type = COG_TYPE_INT;
-    cogScript->aHandlers[cogScript->numHandlers].trigId = symbolGet->val.data[0];
-    cogScript->aHandlers[cogScript->numHandlers].field_8 = symbol->field_14;
+    pScript->aHandlers[pScript->numHandlers].trigId = symbolGet->val.data[0];
+    pScript->aHandlers[pScript->numHandlers].field_8 = symbol->field_14;
     
-    cogScript->numHandlers++;
+    pScript->numHandlers++;
     return 1;
 }
