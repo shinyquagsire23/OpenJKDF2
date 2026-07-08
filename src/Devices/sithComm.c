@@ -105,13 +105,13 @@ static int sithComm_EnsureMsgTmpBuf(void)
 }
 #endif
 
-void sithMessage_RegisterFunction(int msgid, cogMsg_Handler func)
+void sithMessage_RegisterFunction(int type, cogMsg_Handler pFunc)
 {
-    sithMessage_aTypeFuncs[msgid] = func;
+    sithMessage_aTypeFuncs[type] = pFunc;
 }
 
 // MOTS altered
-int sithComm_SendMsgToPlayer(SithMessage *msg, int a2, int mpFlags, int a4)
+int sithComm_SendMsgToPlayer(SithMessage *pMessage, int idTo, int outstream, int dwDPFlags)
 {
     char multiplayerFlags; // bl
     unsigned int curMs; // esi
@@ -126,34 +126,34 @@ int sithComm_SendMsgToPlayer(SithMessage *msg, int a2, int mpFlags, int a4)
     //printf("sithComm_SendMsgToPlayer %x %x %x %x\n", msg->netMsg.cogMsgId, a2, mpFlags, a4);
 
     int ret = 1;
-    multiplayerFlags = sithMessage_g_outputstream & mpFlags;
+    multiplayerFlags = sithMessage_g_outputstream & outstream;
     if (!multiplayerFlags)
         return 1;
     curMs = sithTime_g_msecGameTime;
-    msg->netMsg.idx = playerThingIdx;
-    msg->netMsg.timeMs = curMs;
+    pMessage->netMsg.idx = playerThingIdx;
+    pMessage->netMsg.timeMs = curMs;
     if ( (multiplayerFlags & 1) != 0 )
     {
-        if ( a4 )
+        if ( dwDPFlags )
         {
             v9 = sithComm_msgId;
             if ( !sithComm_msgId )
                 v9 = 1;
-            msg->netMsg.msgId = v9;
+            pMessage->netMsg.msgId = v9;
             sithComm_msgId = v9 + 1;
-            msg->netMsg.field_C = a2;
+            pMessage->netMsg.field_C = idTo;
             idx_ = 0;
-            msg->netMsg.timeMs2 = curMs;
-            msg->netMsg.field_14 = 0;
+            pMessage->netMsg.timeMs2 = curMs;
+            pMessage->netMsg.field_14 = 0;
             for (int i = 0; i < jkPlayer_maxPlayers; i++)
             {
-                if ( i != playerThingIdx && (jkPlayer_playerInfos[i].playerNetId == a2 || (a2 == -1 || !a2) && (jkPlayer_playerInfos[i].flags & 1) != 0) )
-                    msg->netMsg.field_14 |= 1 << i;
+                if ( i != playerThingIdx && (jkPlayer_playerInfos[i].playerNetId == idTo || (idTo == -1 || !idTo) && (jkPlayer_playerInfos[i].flags & 1) != 0) )
+                    pMessage->netMsg.field_14 |= 1 << i;
                 if (!i && i != playerThingIdx) {
-                    msg->netMsg.field_14 |= 1 << i; // Added: Dedicated server hax
+                    pMessage->netMsg.field_14 |= 1 << i; // Added: Dedicated server hax
                 }
             }
-            if ( !msg->netMsg.field_14 )
+            if ( !pMessage->netMsg.field_14 )
                 goto LABEL_35;
 #ifdef SITHCOMM_HEAP_MSGBUF
             // Added: first reliable send allocates the retry buffer; if that
@@ -199,35 +199,35 @@ int sithComm_SendMsgToPlayer(SithMessage *msg, int a2, int mpFlags, int a4)
                 --sithComm_idk2;
             }
             ++sithComm_idk2;
-            v20 = msg->netMsg.field_14;
-            _memcpy(&sithComm_MsgTmpBuf[idx_], msg, sizeof(SithMessage));
+            v20 = pMessage->netMsg.field_14;
+            _memcpy(&sithComm_MsgTmpBuf[idx_], pMessage, sizeof(SithMessage));
             if ( !v20 )
 LABEL_35:
-                msg->netMsg.msgId = 0;
+                pMessage->netMsg.msgId = 0;
         }
         else
         {
-            msg->netMsg.msgId = 0;
+            pMessage->netMsg.msgId = 0;
         }
-        ret = stdComm_SendToPlayer(msg, a2);
+        ret = stdComm_SendToPlayer(pMessage, idTo);
     }
     if ( (multiplayerFlags & 4) != 0 )
     {
-        sithMessage_FileWrite(msg);
+        sithMessage_FileWrite(pMessage);
     }
     return ret;
 }
 
 // MOTS altered
-void sithMessage_FileWrite(SithMessage* ctx)
+void sithMessage_FileWrite(SithMessage* pMessage)
 {
     // Added: multiple version handling
     if (sithComm_version == 0x7D6) {
         stdConffile_Write((const char*)&sithComm_009a1160, sizeof(sithComm_009a1160));
     }
-    stdConffile_Write((const char*)&ctx->netMsg.cogMsgId, sizeof(int));
-    stdConffile_Write((const char*)&ctx->netMsg.msg_size, sizeof(int));
-    stdConffile_Write((const char*)&ctx->pktData[0], ctx->netMsg.msg_size);
+    stdConffile_Write((const char*)&pMessage->netMsg.cogMsgId, sizeof(int));
+    stdConffile_Write((const char*)&pMessage->netMsg.msg_size, sizeof(int));
+    stdConffile_Write((const char*)&pMessage->pktData[0], pMessage->netMsg.msg_size);
 }
 
 // MOTS altered
@@ -316,14 +316,14 @@ void sithMessage_StopProcessMessages()
     sithMessage_bStopProcessMessages = 1;
 }
 
-int sithMessage_Process(SithMessage *a1)
+int sithMessage_Process(SithMessage *pMessage)
 {
     int result; // eax
 
-    int msgId = a1->netMsg.cogMsgId;
+    int msgId = pMessage->netMsg.cogMsgId;
 
     if ( (signed int)(uint16_t)msgId < 65 && sithMessage_aTypeFuncs[msgId])
-        result = sithMessage_aTypeFuncs[msgId](a1);
+        result = sithMessage_aTypeFuncs[msgId](pMessage);
     else
         result = 1;
     return result;

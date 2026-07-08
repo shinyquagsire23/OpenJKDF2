@@ -58,12 +58,12 @@ void sithMulti_SendChat(const char *pStr, int arg0, int arg1)
 }
 
 // MOTS altered
-int sithMulti_ProcessChat(SithMessage *msg)
+int sithMulti_ProcessChat(SithMessage *pMsg)
 {
     // Added: 132 -> 256
     char v5[256];
 
-    NETMSG_IN_START(msg);
+    NETMSG_IN_START(pMsg);
 
     int arg0 = NETMSG_POPS32();
     int arg1 = NETMSG_POPS32();
@@ -233,11 +233,11 @@ int sithMulti_Startup()
     }
 }
 
-void sithMulti_RemoveStaticThing(int a1)
+void sithMulti_RemoveStaticThing(int guid)
 {
     if ( sithMulti_numRemovedStaticThings < 0x100 )
     {
-        sithMulti_aRemovedStaticThings[sithMulti_numRemovedStaticThings++] = a1;
+        sithMulti_aRemovedStaticThings[sithMulti_numRemovedStaticThings++] = guid;
     }
 }
 
@@ -347,7 +347,7 @@ void sithMulti_SyncScores()
     sithNet_bSyncScores = 1;
 }
 
-void sithMulti_ProcessKilledPlayer(SithPlayer *pPlayerInfo, SithThing *pKilledThing, SithThing *pKilledByThing)
+void sithMulti_ProcessKilledPlayer(SithPlayer *pPlayer, SithThing *pPlayerThing, SithThing *pKiller)
 {
     flex_d_t v3; // st7
     wchar_t *v4; // eax
@@ -359,28 +359,28 @@ void sithMulti_ProcessKilledPlayer(SithPlayer *pPlayerInfo, SithThing *pKilledTh
     SithPlayer *v10; // [esp-4h] [ebp-110h]
     wchar_t a1a[128]; // [esp+Ch] [ebp-100h] BYREF
 
-    ++pPlayerInfo->numKilled;
-    if ( !pKilledByThing || pKilledByThing->type != SITH_THING_PLAYER )
+    ++pPlayer->numKilled;
+    if ( !pKiller || pKiller->type != SITH_THING_PLAYER )
     {
         v6 = sithStrTable_GetUniStringWithFallback("%s_DIED");
-        jk_snwprintf(a1a, 0x80u, v6, pPlayerInfo);
+        jk_snwprintf(a1a, 0x80u, v6, pPlayer);
         sithConsole_PrintWString(a1a);
         goto LABEL_15;
     }
-    if ( pKilledByThing != pKilledThing )
+    if ( pKiller != pPlayerThing )
     {
-        v10 = pKilledByThing->actorParams.pPlayer;
+        v10 = pKiller->actorParams.pPlayer;
         v5 = sithStrTable_GetUniStringWithFallback("%s_WAS_KILLED_BY_%s");
-        jk_snwprintf(a1a, 0x80u, v5, pPlayerInfo, v10);
+        jk_snwprintf(a1a, 0x80u, v5, pPlayer, v10);
         sithConsole_PrintWString(a1a);
-        ++pKilledByThing->actorParams.pPlayer->numKills;
+        ++pKiller->actorParams.pPlayer->numKills;
         sithMulti_ProcessScore();
         return;
     }
     v3 = _frand() * 4.0;
     if ( v3 < 1.0 )
     {
-        v9 = pPlayerInfo;
+        v9 = pPlayer;
         v4 = sithStrTable_GetUniStringWithFallback("%s_COMMITTED_SUICIDE0");
 LABEL_11:
         jk_snwprintf(a1a, 0x80u, v4, v9);
@@ -388,24 +388,24 @@ LABEL_11:
     }
     if ( v3 >= 2.0 )
     {
-        v9 = pPlayerInfo;
+        v9 = pPlayer;
         if ( v3 >= 3.0 )
         {
             v4 = sithStrTable_GetUniStringWithFallback("%s_COMMITTED_SUICIDE3");
             goto LABEL_11;
         }
         v8 = sithStrTable_GetUniStringWithFallback("%s_COMMITTED_SUICIDE2");
-        jk_snwprintf(a1a, 0x80u, v8, pPlayerInfo);
+        jk_snwprintf(a1a, 0x80u, v8, pPlayer);
     }
     else
     {
         v7 = sithStrTable_GetUniStringWithFallback("%s_COMMITTED_SUICIDE1");
-        jk_snwprintf(a1a, 0x80u, v7, pPlayerInfo);
+        jk_snwprintf(a1a, 0x80u, v7, pPlayer);
     }
 LABEL_12:
     sithConsole_PrintWString(a1a);
 LABEL_15:
-    ++pPlayerInfo->numSuicides;
+    ++pPlayer->numSuicides;
     sithMulti_ProcessScore();
 }
 
@@ -480,37 +480,37 @@ void sithMulti_ProcessScore()
     }
 }
 
-void sithMulti_QuitGame(uint32_t waitMs, int type)
+void sithMulti_QuitGame(uint32_t msecTime, int state)
 {
-    if ( sithMulti_quitGameState != type || waitMs < sithMulti_msecQuitGameTime )
+    if ( sithMulti_quitGameState != state || msecTime < sithMulti_msecQuitGameTime )
     {
-        sithMulti_quitGameState = type;
-        sithMulti_msecQuitGameTime = waitMs;
+        sithMulti_quitGameState = state;
+        sithMulti_msecQuitGameTime = msecTime;
     }
 }
 
-void sithMulti_SendWelcome(int a1, int playerIdx, int sendtoId)
+void sithMulti_SendWelcome(int idPlayer, int playerNum, int idTo)
 {
     NETMSG_START;
 
-    NETMSG_PUSHS32(playerIdx);
-    NETMSG_PUSHS32(a1);
-    NETMSG_PUSHWSTR(jkPlayer_playerInfos[playerIdx].player_name, 0x10);
+    NETMSG_PUSHS32(playerNum);
+    NETMSG_PUSHS32(idPlayer);
+    NETMSG_PUSHWSTR(jkPlayer_playerInfos[playerNum].player_name, 0x10);
     NETMSG_END(DSS_WELCOME);
 
-    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendtoId, 1, 1);
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, idTo, 1, 1);
 }
 
-void sithMulti_QuitPlayer(int idx)
+void sithMulti_QuitPlayer(int id)
 {
     if (!sithNet_isServer) return;
 
     NETMSG_START;
 
-    NETMSG_PUSHS32(idx);
+    NETMSG_PUSHS32(id);
     NETMSG_END(DSS_QUIT);
 
-    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, idx, 1, 1);
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, id, 1, 1);
 }
 
 int sithMulti_LobbyMessage()
@@ -571,7 +571,7 @@ int sithMulti_LobbyMessage()
     return stdComm_DoReceive();
 }
 
-int sithMulti_ProcessWelcome(SithMessage *msg)
+int sithMulti_ProcessWelcome(SithMessage *pMsg)
 {
     int v1; // edi
     int v2; // ebx
@@ -581,7 +581,7 @@ int sithMulti_ProcessWelcome(SithMessage *msg)
     wchar_t *v8; // eax
     wchar_t a1a[128]; // [esp+10h] [ebp-100h] BYREF
 
-    NETMSG_IN_START(msg);
+    NETMSG_IN_START(pMsg);
 
     v1 = NETMSG_POPS32();
     v2 = NETMSG_POPS32();
@@ -633,24 +633,24 @@ int sithMulti_ProcessWelcome(SithMessage *msg)
     return 1;
 }
 
-int sithMulti_ProcessPing(SithMessage *msg)
+int sithMulti_ProcessPing(SithMessage *pMsg)
 {
-    msg->netMsg.cogMsgId = DSS_PINGREPLY;
-    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, msg->netMsg.idx, 1, 0);
+    pMsg->netMsg.cogMsgId = DSS_PINGREPLY;
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, pMsg->netMsg.idx, 1, 0);
     return 1;
 }
 
-int sithMulti_ProcessPong(SithMessage *msg)
+int sithMulti_ProcessPong(SithMessage *pMsg)
 {
     int v1; // eax
     SithPlayer* i; // ecx
 
-    if ( msg->pktData[0] == sithMulti_msecPingStartTime )
+    if ( pMsg->pktData[0] == sithMulti_msecPingStartTime )
     {
         v1 = 0;
         if ( jkPlayer_maxPlayers )
         {
-            for ( i = &jkPlayer_playerInfos[0]; i->playerNetId != msg->netMsg.idx; ++i )
+            for ( i = &jkPlayer_playerInfos[0]; i->playerNetId != pMsg->netMsg.idx; ++i )
             {
                 if ( ++v1 >= jkPlayer_maxPlayers )
                     return 1;
@@ -662,7 +662,7 @@ int sithMulti_ProcessPong(SithMessage *msg)
     return 1;
 }
 
-int sithMulti_ProcessQuit(SithMessage *msg)
+int sithMulti_ProcessQuit(SithMessage *pMsg)
 {
     wchar_t *v2; // eax
     int v3; // eax
@@ -672,9 +672,9 @@ int sithMulti_ProcessQuit(SithMessage *msg)
     wchar_t *v7; // eax
     wchar_t a1a[128]; // [esp+Ch] [ebp-100h] BYREF
 
-    if ( msg->netMsg.idx != sithNet_serverNetId )
+    if ( pMsg->netMsg.idx != sithNet_serverNetId )
         return 0;
-    if ( msg->pktData[0] == stdComm_dplayIdSelf )
+    if ( pMsg->pktData[0] == stdComm_dplayIdSelf )
     {
         if ( sithMulti_quitGameState != 2 )
         {
@@ -691,7 +691,7 @@ int sithMulti_ProcessQuit(SithMessage *msg)
     }
     else
     {
-        v3 = sithPlayer_GetPlayerNum(msg->pktData[0]);
+        v3 = sithPlayer_GetPlayerNum(pMsg->pktData[0]);
         v4 = v3;
         if ( v3 >= 0 )
         {
@@ -720,7 +720,7 @@ int sithMulti_ProcessQuit(SithMessage *msg)
     return 1;
 }
 
-int sithMulti_CheckPlayers(int32_t a, SithEventParams* b)
+int sithMulti_CheckPlayers(int32_t msecTime, SithEventParams* pParam)
 {
     uint32_t v0; // edi
     SithPlayer* v1; // esi
@@ -810,7 +810,7 @@ int sithMulti_CheckPlayers(int32_t a, SithEventParams* b)
     return 1;
 }
 
-void sithMulti_SyncPlayers(int sendtoId, int bSync)
+void sithMulti_SyncPlayers(int idTo, int dpFlags)
 {
     char v15[32]; // [esp+10h] [ebp-20h] BYREF
 
@@ -848,10 +848,10 @@ void sithMulti_SyncPlayers(int sendtoId, int bSync)
         }
     }
     NETMSG_END(DSS_LEAVEJOIN);
-    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendtoId, 1, bSync);
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, idTo, 1, dpFlags);
 }
 
-int sithMulti_ProcessSyncPlayers(SithMessage *msg)
+int sithMulti_ProcessSyncPlayers(SithMessage *pMsg)
 {
     uint32_t v1; // eax
     int v2; // edx
@@ -867,7 +867,7 @@ int sithMulti_ProcessSyncPlayers(SithMessage *msg)
     wchar_t a1a[128]; // [esp+30h] [ebp-200h] BYREF
     wchar_t v22[128]; // [esp+130h] [ebp-100h] BYREF
 
-    NETMSG_IN_START(msg);
+    NETMSG_IN_START(pMsg);
 
     sithNet_MultiModeFlags = 0;
     sithNet_serverNetId = 0;
@@ -949,7 +949,7 @@ int sithMulti_ProcessSyncPlayers(SithMessage *msg)
     return 1;
 }
 
-void sithMulti_ProcessPlayerLost(int a1)
+void sithMulti_ProcessPlayerLost(int idPlayer)
 {
     uint32_t v1; // eax
     SithPlayer* v2; // ecx
@@ -958,7 +958,7 @@ void sithMulti_ProcessPlayerLost(int a1)
     wchar_t *v5; // eax
     wchar_t a1a[128]; // [esp+Ch] [ebp-100h] BYREF
 
-    if ( sithNet_bNeedsFullThingSyncForLeaveJoin && a1 == sithMulti_newPlayerId )
+    if ( sithNet_bNeedsFullThingSyncForLeaveJoin && idPlayer == sithMulti_newPlayerId )
     {
         if ( sithMulti_newPlayerId )
         {
@@ -978,7 +978,7 @@ void sithMulti_ProcessPlayerLost(int a1)
     if ( jkPlayer_maxPlayers )
     {
         v2 = &jkPlayer_playerInfos[0];
-        while ( a1 != v2->playerNetId )
+        while ( idPlayer != v2->playerNetId )
         {
             ++v1;
             ++v2;
@@ -1039,7 +1039,7 @@ void sithMulti_InitTick(uint32_t tickrate)
     sithNet_dword_8C4BA8 = 0;
 }
 
-int sithMulti_ProcessJoinRequest(SithMessage *msg)
+int sithMulti_ProcessJoinRequest(SithMessage *pMsg)
 {
     int v1; // esi
     uint32_t v3; // eax
@@ -1052,9 +1052,9 @@ int sithMulti_ProcessJoinRequest(SithMessage *msg)
     int v10; // ecx
     char v11[32]; // [esp+Ch] [ebp-20h] BYREF
 
-    NETMSG_IN_START(msg);
+    NETMSG_IN_START(pMsg);
 
-    v1 = msg->netMsg.idx;
+    v1 = pMsg->netMsg.idx;
 
     if ( stdComm_bIsServer && v1 )
     {
@@ -1252,7 +1252,7 @@ LABEL_11:
 }
 
 // MOTS altered
-void sithMulti_Update(int deltaMs)
+void sithMulti_Update(int msecDeltaTime)
 {
     uint32_t v2; // esi
     SithSurface *v8; // edx
@@ -1329,8 +1329,8 @@ void sithMulti_Update(int deltaMs)
             }
             else
             {
-                uint32_t update_steps = (sithMulti_msecWelcomeUpdateInterval + deltaMs) / MULTI_BIG_UPDATE_INTERVAL_MS;
-                sithMulti_msecWelcomeUpdateInterval = (sithMulti_msecWelcomeUpdateInterval + deltaMs) - MULTI_BIG_UPDATE_INTERVAL_MS * update_steps;
+                uint32_t update_steps = (sithMulti_msecWelcomeUpdateInterval + msecDeltaTime) / MULTI_BIG_UPDATE_INTERVAL_MS;
+                sithMulti_msecWelcomeUpdateInterval = (sithMulti_msecWelcomeUpdateInterval + msecDeltaTime) - MULTI_BIG_UPDATE_INTERVAL_MS * update_steps;
                 //printf("steps %x %x %x\n", update_steps, stdComm_currentBigSyncStage, stdComm_dword_832208);
                 for (int i = 0; i < update_steps; i++)
                 {
@@ -1445,7 +1445,7 @@ void sithMulti_Update(int deltaMs)
     }
 }
 
-uint32_t sithMulti_GetPlayerIndexByID(int playerNetId)
+uint32_t sithMulti_GetPlayerIndexByID(int playerID)
 {
     uint32_t result; // eax
     SithPlayer* i; // ecx
@@ -1453,7 +1453,7 @@ uint32_t sithMulti_GetPlayerIndexByID(int playerNetId)
     result = 0;
     if ( !jkPlayer_maxPlayers )
         return -1;
-    for ( i = &jkPlayer_playerInfos[0]; playerNetId != i->playerNetId; ++i )
+    for ( i = &jkPlayer_playerInfos[0]; playerID != i->playerNetId; ++i )
     {
         if ( ++result >= jkPlayer_maxPlayers )
             return -1;
@@ -1461,14 +1461,14 @@ uint32_t sithMulti_GetPlayerIndexByID(int playerNetId)
     return result;
 }
 
-int sithMulti_Ping(int sendtoId)
+int sithMulti_Ping(int idTo)
 {
     sithMulti_msecPingStartTime = sithTime_g_msecGameTime;
     sithComm_netMsgTmp.pktData[0] = sithTime_g_msecGameTime;
     sithComm_netMsgTmp.netMsg.msg_size = 4;
     sithComm_netMsgTmp.netMsg.flag_maybe = 0;
     sithComm_netMsgTmp.netMsg.cogMsgId = DSS_PING;
-    return sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendtoId, 1, 0);
+    return sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, idTo, 1, 0);
 }
 
 int sithMulti_map_init_related()
@@ -1536,15 +1536,15 @@ void sithMulti_CleanupThings(SithWorld *pWorld)
     }
 }
 
-void sithMulti_RemovePlayer(int playerIdx)
+void sithMulti_RemovePlayer(int playerNum)
 {
     wchar_t buf[128];
     wchar_t *fmt = sithStrTable_GetUniStringWithFallback("%s_HAS_LEFT_THE_GAME");
-    jk_snwprintf(buf, 0x80, fmt, jkPlayer_playerInfos[playerIdx].player_name);
+    jk_snwprintf(buf, 0x80, fmt, jkPlayer_playerInfos[playerNum].player_name);
     sithConsole_PrintWString(buf);
     sithConsole_AlertSound();
 
-    if ( jkPlayer_playerInfos[playerIdx].playerNetId == sithNet_serverNetId )
+    if ( jkPlayer_playerInfos[playerNum].playerNetId == sithNet_serverNetId )
     {
         wchar_t *serverMsg = sithStrTable_GetUniStringWithFallback("SERVER_LEFT_GAME");
         sithConsole_PrintWString(serverMsg);
@@ -1556,27 +1556,27 @@ void sithMulti_RemovePlayer(int playerIdx)
         }
     }
 
-    sithSoundClass_StopSound(jkPlayer_playerInfos[playerIdx].pLocalPlayer, 0);
-    sithPlayer_Startup(playerIdx);
+    sithSoundClass_StopSound(jkPlayer_playerInfos[playerNum].pLocalPlayer, 0);
+    sithPlayer_Startup(playerNum);
 
     if ( sithNet_isServer )
     {
-        sithCog_BroadcastMessage(SITH_MESSAGE_JOIN, 3, jkPlayer_playerInfos[playerIdx].pLocalPlayer->guid, 0, playerIdx);
+        sithCog_BroadcastMessage(SITH_MESSAGE_JOIN, 3, jkPlayer_playerInfos[playerNum].pLocalPlayer->guid, 0, playerNum);
     }
 }
 
-void sithMulti_ProcessPlayerJoin(int playerIdx)
+void sithMulti_ProcessPlayerJoin(int playerNum)
 {
     wchar_t buf[128];
     wchar_t *fmt = sithStrTable_GetUniStringWithFallback("%s_HAS_JOINED_THE_GAME");
-    jk_snwprintf(buf, 0x80, fmt, jkPlayer_playerInfos[playerIdx].player_name);
+    jk_snwprintf(buf, 0x80, fmt, jkPlayer_playerInfos[playerNum].player_name);
     sithConsole_PrintWString(buf);
 
-    jkPlayer_playerInfos[playerIdx].msecLastCommTime = sithTime_g_msecGameTime;
+    jkPlayer_playerInfos[playerNum].msecLastCommTime = sithTime_g_msecGameTime;
 
     if ( sithNet_isServer )
     {
-        sithCog_BroadcastMessage(SITH_MESSAGE_JOIN, 3, jkPlayer_playerInfos[playerIdx].pLocalPlayer->guid, 0, playerIdx);
+        sithCog_BroadcastMessage(SITH_MESSAGE_JOIN, 3, jkPlayer_playerInfos[playerNum].pLocalPlayer->guid, 0, playerNum);
     }
 
     if ( sithMulti_pfNewPlayerJoinedCallback )
@@ -1587,13 +1587,13 @@ void sithMulti_ProcessPlayerJoin(int playerIdx)
     sithDSSThing_UpdateState(sithPlayer_g_pLocalPlayerThing, -1, 0xFF);
 }
 
-void sithMulti_FinishJoining(int param1, int param2, int sendtoId)
+void sithMulti_FinishJoining(int code, int param2, int playerId)
 {
     NETMSG_START;
 
-    NETMSG_PUSHS32(param1);
+    NETMSG_PUSHS32(code);
     NETMSG_PUSHS32(param2);
     NETMSG_END(0x24);
 
-    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendtoId, 1, 0);
+    sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, playerId, 1, 0);
 }

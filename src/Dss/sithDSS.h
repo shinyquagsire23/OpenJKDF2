@@ -27,28 +27,28 @@
 #define sithDSS_SyncGameState_ADDR (0x004FA420)
 #define sithDSS_ProcessSyncGameState_ADDR (0x004FA5D0)
 
-void sithDSS_SurfaceStatus(SithSurface *surface, int sendto_id, int mpFlags);
-int sithDSS_ProcessSurfaceStatus(SithMessage *msg);
-void sithDSS_SectorStatus(SithSector *sector, int sendto_id, int mpFlags);
-int sithDSS_ProcessSectorStatus(SithMessage *msg);
-void sithDSS_SectorFlags(SithSector *pSector, int sendto_id, int mpFlags);
-int sithDSS_ProcessSectorFlags(SithMessage *msg);
-void sithDSS_AIStatus(SithAIControlBlock *actor, int sendto_id, int idx);
-int sithDSS_ProcessAIStatus(SithMessage *msg);
-void sithDSS_Inventory(SithThing *thing, int binIdx, int sendto_id, int mpFlags);
-int sithDSS_ProcessInventory(SithMessage *msg);
-void sithDSS_AnimStatus(rdSurface *surface, int sendto_id, int mpFlags);
-int sithDSS_ProcessAnimStatus(SithMessage *msg);
-void sithDSS_PuppetStatus(SithThing *thing, int sendto_id, int mpFlags);
-int sithDSS_ProcessPuppetStatus(SithMessage *msg);
-void sithDSS_SyncTaskEvents(SithEvent *timer, int sendto_id, int mpFlags);
-int sithDSS_ProcessSyncTaskEvents(SithMessage *msg);
+void sithDSS_SurfaceStatus(SithSurface *pSurf, int idTo, int outstream);
+int sithDSS_ProcessSurfaceStatus(SithMessage *pMsg);
+void sithDSS_SectorStatus(SithSector *pSector, int sendto_id, int outstream);
+int sithDSS_ProcessSectorStatus(SithMessage *pMsg);
+void sithDSS_SectorFlags(SithSector *pSector, int idTo, int outstream);
+int sithDSS_ProcessSectorFlags(SithMessage *pMsg);
+void sithDSS_AIStatus(SithAIControlBlock *pLocal, int idTo, int outstream);
+int sithDSS_ProcessAIStatus(SithMessage *pMsg);
+void sithDSS_Inventory(SithThing *pThing, int inventoryId, int idTo, int outstream);
+int sithDSS_ProcessInventory(SithMessage *pMsg);
+void sithDSS_AnimStatus(rdSurface *pAnim, int idTo, int outstream);
+int sithDSS_ProcessAnimStatus(SithMessage *pMsg);
+void sithDSS_PuppetStatus(SithThing *pThing, int idTo, int outstream);
+int sithDSS_ProcessPuppetStatus(SithMessage *pMsg);
+void sithDSS_SyncTaskEvents(SithEvent *pEvent, int idTo, int outstream);
+int sithDSS_ProcessSyncTaskEvents(SithMessage *pMsg);
 void sithDSS_SendSyncPalEffects(int sendto_id, int mpFlags);
 int sithDSS_ProcessSyncPalEffects(SithMessage *msg);
-void sithDSS_SyncCameras(int sendto_id, int mpFlags);
-int sithDSS_ProcessSyncCameras(SithMessage *msg);
-void sithDSS_SyncGameState(int sendto_id, int mpFlags);
-int sithDSS_ProcessSyncGameState(SithMessage *msg);
+void sithDSS_SyncCameras(int idTo, int outstream);
+int sithDSS_ProcessSyncCameras(SithMessage *pMsg);
+void sithDSS_SyncGameState(int idTo, int outstream);
+int sithDSS_ProcessSyncGameState(SithMessage *pMsg);
 
 
 //static int (*_sithDSS_ProcessSyncPuppet)(SithMessage *msg) = (void*)sithDSS_ProcessPuppetStatus_ADDR;
