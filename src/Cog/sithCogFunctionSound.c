@@ -303,7 +303,7 @@ void sithCogFunctionSound_PlaySoundClass(sithCog *ctx)
     }
 }
 
-void sithCogFunctionSound_ChangeSoundVol(sithCog *ctx)
+void sithCogFunctionSound_ChangeVolume(sithCog *ctx)
 {
     cog_flex_t fadeintime_ = sithCogExec_PopFlex(ctx);
     cog_flex_t vol = sithCogExec_PopFlex(ctx);
@@ -324,7 +324,7 @@ void sithCogFunctionSound_ChangeSoundVol(sithCog *ctx)
     }
 }
 
-void sithCogFunctionSound_ChangeSoundPitch(sithCog *ctx)
+void sithCogFunctionSound_ChangePitch(sithCog *ctx)
 {
     cog_flex_t changetime = sithCogExec_PopFlex(ctx);
     cog_flex_t pitch = sithCogExec_PopFlex(ctx);
@@ -599,8 +599,8 @@ void sithCogFunctionSound_Startup(sithCogSymboltable* ctx)
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_StopSound, "stopsound");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_LoadSound, "loadsound");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_PlaySoundClass, "playsoundclass");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_ChangeSoundVol, "changesoundvol");
-    sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_ChangeSoundPitch, "changesoundpitch");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_ChangeVolume, "changesoundvol");
+    sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_ChangePitch, "changesoundpitch");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_SectorSound, "sectorsound");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_SetMusicVol, "setmusicvol");
     sithCogScript_RegisterVerb(ctx, sithCogFunctionSound_GetSoundLen, "getsoundlen");

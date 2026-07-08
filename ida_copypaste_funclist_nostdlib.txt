@@ -2717,8 +2717,8 @@ sithCogFunctionSound_PlaySoundGlobal	.text	004FF6A0	0000012E	00000014	00000004	R
 sithCogFunctionSound_StopSound	.text	004FF7D0	000000A1	0000000C	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionSound_LoadSound	.text	004FF880	0000003D	00000004	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionSound_PlaySoundClass	.text	004FF8C0	0000008F	00000010	00000004	R	.	.	.	.	.	T	.
-sithCogFunctionSound_ChangeSoundVol	.text	004FF950	00000093	00000008	00000004	R	.	.	.	.	.	T	.
-sithCogFunctionSound_ChangeSoundPitch	.text	004FF9F0	00000070	00000008	00000004	R	.	.	.	.	.	T	.
+sithCogFunctionSound_ChangeVolume	.text	004FF950	00000093	00000008	00000004	R	.	.	.	.	.	T	.
+sithCogFunctionSound_ChangePitch	.text	004FF9F0	00000070	00000008	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionSound_SectorSound	.text	004FFA60	0000003D	00000008	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionSound_SetMusicVol	.text	004FFAA0	0000005B	00000000	00000004	R	.	.	.	.	.	T	.
 sithCogFunctionSound_GetSoundLen	.text	004FFB00	0000004F	00000010	00000004	R	.	.	.	.	.	T	.
