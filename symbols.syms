@@ -282,8 +282,8 @@ aActiveEdges 0x00755680 rdEdge[1024] NO_REINIT // TODO verify
 rdActive_drawnFaces 0x0082D6E0 int
 
 sithMain_bEndLevel 0x0082F0A8 int
-sithMain_bInitialized 0x0082F0AC int
-sithMain_bOpened 0x0082F0B0 int
+sith_bStartup 0x0082F0AC int
+sith_bOpen 0x0082F0B0 int
 
 sithSurface_numAvail 0x0084DF48 int
 sithSurface_aAvail 0x0084DF4C int[256+1]

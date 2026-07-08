@@ -94,7 +94,7 @@ int sithMain_Startup(HostServices *commonFuncs)
     if ( !is_started )
         return 0;
 
-    sithMain_bInitialized = 1;
+    sith_bStartup = 1;
     return 1;
 }
 
@@ -123,7 +123,7 @@ void sithShutdown()
     sithWorld_Shutdown();
     sithEvent_Shutdown();
     sithStrTable_Shutdown();
-    sithMain_bInitialized = 0;
+    sith_bStartup = 0;
 }
 
 int sithOpenStatic(char *path)
@@ -197,13 +197,13 @@ int sithOpen()
     sithAIAwareness_Startup();
     sithRender_Open();
     sithWeapon_StartupEntry();
-    sithMain_bOpened = 1;
+    sith_bOpen = 1;
     return 1;
 }
 
 void sithClose()
 {
-    if ( sithMain_bOpened )
+    if ( sith_bOpen )
     {
         sithSoundMixer_StopSong();
         sithRender_Close();
@@ -219,7 +219,7 @@ void sithClose()
         sithWeapon_ShutdownEntry();
         g_sithMode = 0;
         g_submodeFlags = 0;
-        sithMain_bOpened = 0;
+        sith_bOpen = 0;
     }
 }
 
