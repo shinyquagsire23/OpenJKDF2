@@ -323,22 +323,22 @@ void sithSector_SyncSector(sithSector *pSector, int a2)
         pSector->flags |= SITH_SECTOR_SYNC;
     }
 
-    if (!sithComm_multiplayerFlags || sithSector_numSync >= 0x10)
+    if (!sithComm_multiplayerFlags || sithSector_numModifiedSectors >= 0x10)
         return;
 
-    for (v4 = 0; v4 < sithSector_numSync; v4++ )
+    for (v4 = 0; v4 < sithSector_numModifiedSectors; v4++ )
     {
-        if ( sithSector_aSyncIdk[v4] == pSector )
+        if ( sithSector_aModifiedSectors[v4] == pSector )
         {
-            sithSector_aSyncIdk2[v4] |= a2;
+            sithSector_aSyncFlags[v4] |= a2;
             break;
         }
     }
 
-    if (v4 == sithSector_numSync)
+    if (v4 == sithSector_numModifiedSectors)
     {
-        sithSector_aSyncIdk[sithSector_numSync] = pSector;
-        sithSector_aSyncIdk2[sithSector_numSync++] = a2;
+        sithSector_aModifiedSectors[sithSector_numModifiedSectors] = pSector;
+        sithSector_aSyncFlags[sithSector_numModifiedSectors++] = a2;
     }
 }
 
@@ -346,14 +346,14 @@ void sithSector_SyncSectors()
 {
     uint32_t i; // esi
 
-    for ( i = 0; i < sithSector_numSync; ++i )
+    for ( i = 0; i < sithSector_numModifiedSectors; ++i )
     {
-        if ( (sithSector_aSyncIdk2[i] & 1) != 0 )
-            sithDSS_SectorStatus(sithSector_aSyncIdk[i], -1, 255);
+        if ( (sithSector_aSyncFlags[i] & 1) != 0 )
+            sithDSS_SectorStatus(sithSector_aModifiedSectors[i], -1, 255);
         else
-            sithDSS_SectorFlags(sithSector_aSyncIdk[i], -1, 255);
+            sithDSS_SectorFlags(sithSector_aModifiedSectors[i], -1, 255);
     }
-    sithSector_numSync = 0;
+    sithSector_numModifiedSectors = 0;
 }
 
 sithSector* sithSector_FindSectorAtPos(sithWorld *pWorld, rdVector3 *pos)
