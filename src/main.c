@@ -34,7 +34,7 @@
 #include "General/stdFnames.h"
 #include "General/stdFileUtil.h"
 #include "General/stdHashtbl.h"
-#include "General/stdLinklist.h"
+#include "General/stdLinkList.h"
 #include "General/stdString.h"
 #include "General/stdStrTable.h"
 #include "General/sithStrTable.h"
@@ -1405,16 +1405,16 @@ void do_hooks()
     hook_function(stdHashtbl_DumpTable_ADDR, stdHashtbl_DumpTable);
 
     // stdLinkList
-    hook_function(stdLinklist_InsertAfter_ADDR, stdLinklist_InsertAfter);
-    hook_function(stdLinklist_InsertBefore_ADDR, stdLinklist_InsertBefore);
-    hook_function(stdLinklist_InsertAtEnd_ADDR, stdLinklist_InsertAtEnd);
-    hook_function(stdLinklist_UnlinkChild_ADDR, stdLinklist_UnlinkChild);
-    hook_function(stdLinklist_NumChildren_ADDR, stdLinklist_NumChildren);
-    hook_function(stdLinklist_RemoveParent_ADDR, stdLinklist_RemoveParent);
-    hook_function(stdLinklist_UnlinkNode_ADDR, stdLinklist_UnlinkNode);
-    hook_function(stdLinklist_GetNthChild_ADDR, stdLinklist_GetNthChild);
-    hook_function(stdLinklist_GetHead_ADDR, stdLinklist_GetHead);
-    hook_function(stdLinklist_GetTail_ADDR, stdLinklist_GetTail);
+    hook_function(stdLinkList_AddNode_ADDR, stdLinkList_AddNode);
+    hook_function(stdLinklist_InsertNode_ADDR, stdLinklist_InsertNode);
+    hook_function(stdLinklist_AppendNode_ADDR, stdLinklist_AppendNode);
+    hook_function(stdLinkList_RemoveNode_ADDR, stdLinkList_RemoveNode);
+    hook_function(stdLinklist_GetCount_ADDR, stdLinklist_GetCount);
+    hook_function(stdLinklist_NewList_ADDR, stdLinklist_NewList);
+    hook_function(stdLinklist_DetachNode_ADDR, stdLinklist_DetachNode);
+    hook_function(stdLinklist_GetNode_ADDR, stdLinklist_GetNode);
+    hook_function(stdLinklist_GetFirstNode_ADDR, stdLinklist_GetFirstNode);
+    hook_function(stdLinklist_GetLastNode_ADDR, stdLinklist_GetLastNode);
 
     // stdPalEffects
     hook_function(stdPalEffects_Open_ADDR, stdPalEffects_Open);

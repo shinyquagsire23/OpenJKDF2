@@ -3,7 +3,7 @@
 #include "jk.h"
 
 #include "stdPlatform.h"
-#include "General/stdLinklist.h"
+#include "General/stdLinkList.h"
 #include "General/stdSingleLinklist.h"
 #include <math.h>
 #include <stdlib.h>
@@ -199,7 +199,7 @@ tHashLink* stdHashtbl_GetTailNode(tHashLink *pLL)
 #ifdef STDHASHTABLE_SINGLE_LINKLIST
     return stdSingleLinklist_GetTail(pLL);
 #else
-    return stdLinklist_GetTail(pLL);
+    return stdLinklist_GetLastNode(pLL);
 #endif
 }
 
@@ -299,7 +299,7 @@ int stdHashtbl_Add(stdHashTable *hashmap, const char *key, void *value)
 #ifdef STDHASHTABLE_SINGLE_LINKLIST
         stdSingleLinklist_InsertAfter(v10, new_child);
 #else
-        stdLinklist_InsertAfter(v10, new_child);
+        stdLinkList_AddNode(v10, new_child);
 #endif
     }
     else
@@ -407,7 +407,7 @@ int stdHashtbl_Remove(stdHashTable *hashtable, const char *key)
     if ( !foundKey )
         return 0;
 
-    //stdLinklist_UnlinkChild(foundKey); // Added: Moved to prevent freeing issues
+    //stdLinkList_RemoveNode(foundKey); // Added: Moved to prevent freeing issues
     bucketTopKey = &hashtable->buckets[v2];
     if ( bucketTopKey == foundKey )
     {
@@ -447,7 +447,7 @@ int stdHashtbl_Remove(stdHashTable *hashtable, const char *key)
 #ifdef STDHASHTABLE_SINGLE_LINKLIST
         stdSingleLinklist_UnlinkChild(foundKey, beforeFoundKey); // Added: Moved to prevent freeing issues
 #else
-        stdLinklist_UnlinkChild(foundKey); // Added: Moved to prevent freeing issues
+        stdLinkList_RemoveNode(foundKey); // Added: Moved to prevent freeing issues
 #endif
         STDHASHTABLE_NODE_FREE(foundKey); // Added
     }
@@ -485,7 +485,7 @@ int stdHashtbl_FreeKeyCrc32(stdHashTable *hashtable, uint32_t keyCrc32)
     if ( !foundKey )
         return 0;
 
-    //stdLinklist_UnlinkChild(foundKey); // Added: Moved to prevent freeing issues
+    //stdLinkList_RemoveNode(foundKey); // Added: Moved to prevent freeing issues
     bucketTopKey = &hashtable->buckets[v2];
     if ( bucketTopKey == foundKey )
     {
@@ -517,7 +517,7 @@ int stdHashtbl_FreeKeyCrc32(stdHashTable *hashtable, uint32_t keyCrc32)
 #ifdef STDHASHTABLE_SINGLE_LINKLIST
         stdSingleLinklist_UnlinkChild(foundKey, beforeFoundKey); // Added: Moved to prevent freeing issues
 #else
-        stdLinklist_UnlinkChild(foundKey); // Added: Moved to prevent freeing issues
+        stdLinkList_RemoveNode(foundKey); // Added: Moved to prevent freeing issues
 #endif
         STDHASHTABLE_NODE_FREE(foundKey); // Added
     }
@@ -551,7 +551,7 @@ void stdHashtbl_PrintTableDiagnostics(stdHashTable *hashtable)
 #ifdef STDHASHTABLE_SINGLE_LINKLIST
                 numChildren = stdSingleLinklist_NumChildren(&hashtable->buckets[bucketIdx]);
 #else
-                numChildren = stdLinklist_NumChildren(&hashtable->buckets[bucketIdx]);
+                numChildren = stdLinklist_GetCount(&hashtable->buckets[bucketIdx]);
 #endif
                 totalChildren += numChildren;
                 if ( numChildren > maxLookups )

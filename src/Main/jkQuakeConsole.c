@@ -4,7 +4,7 @@
 #include "General/stdBitmap.h"
 #include "General/stdFont.h"
 #include "General/stdString.h"
-#include "General/stdLinklist.h"
+#include "General/stdLinkList.h"
 #include "General/stdSingleLinklist.h"
 #include "Win95/stdDisplay.h"
 #include "Devices/sithConsole.h"
