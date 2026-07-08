@@ -11,41 +11,41 @@
 
 int sithOverlayMap_Startup(const sithMapViewConfig *config)
 {
-    if (sithOverlayMap_bInitted)
+    if (sithOverlayMap_bOpened)
         return 0;
 
     _memcpy(&sithOverlayMap_inst.config, config, sizeof(sithMapViewConfig));
-    sithOverlayMap_bInitted = 1;
+    sithOverlayMap_bOpened = 1;
     return 1;
 }
 
 int sithOverlayMap_Close()
 {
-    if (sithOverlayMap_bInitted)
+    if (sithOverlayMap_bOpened)
     {
-        sithOverlayMap_bShowMap = 0;
-        sithOverlayMap_bInitted = 0;
+        sithOverlayMap_bMapVisible = 0;
+        sithOverlayMap_bOpened = 0;
     }
     return 0;
 }
 
 void sithOverlayMap_ToggleMap()
 {
-    sithOverlayMap_bShowMap = !sithOverlayMap_bShowMap;
+    sithOverlayMap_bMapVisible = !sithOverlayMap_bMapVisible;
 }
 
 void sithOverlayMap_ZoomIn()
 {
     flex_d_t v0; // st7
 
-    if ( sithOverlayMap_bShowMap )
+    if ( sithOverlayMap_bMapVisible )
     {
-        v0 = (sithOverlayMap_flMapSize - 10.0) * (1/290.0) * 20.0;
+        v0 = (sithOverlayMap_curScale - 10.0) * (1/290.0) * 20.0;
         if ( v0 <= 1.0 )
             v0 = 1.0;
-        sithOverlayMap_flMapSize += v0;
-        if ( sithOverlayMap_flMapSize >= 300.0 )
-            sithOverlayMap_flMapSize = 300.0;
+        sithOverlayMap_curScale += v0;
+        if ( sithOverlayMap_curScale >= 300.0 )
+            sithOverlayMap_curScale = 300.0;
     }
 }
 
@@ -53,14 +53,14 @@ void sithOverlayMap_ZoomOut()
 {
     flex_d_t v0; // st7
 
-    if ( sithOverlayMap_bShowMap )
+    if ( sithOverlayMap_bMapVisible )
     {
-        v0 = (sithOverlayMap_flMapSize - 10.0) * (1/290.0) * 20.0;
+        v0 = (sithOverlayMap_curScale - 10.0) * (1/290.0) * 20.0;
         if ( v0 <= 1.0 )
             v0 = 1.0;
-        sithOverlayMap_flMapSize -= v0;
-        if ( sithOverlayMap_flMapSize <= 10.0 )
-            sithOverlayMap_flMapSize = 10.0;
+        sithOverlayMap_curScale -= v0;
+        if ( sithOverlayMap_curScale <= 10.0 )
+            sithOverlayMap_curScale = 10.0;
     }
 }
 
@@ -78,8 +78,8 @@ int sithOverlayMap_Draw(rdCanvas *canvas)
     int v12; // [esp+1Ch] [ebp-4h]
     flex_t canvasa; // [esp+28h] [ebp+8h]
 
-    result = sithOverlayMap_bShowMap;
-    if (!sithOverlayMap_bShowMap)
+    result = sithOverlayMap_bMapVisible;
+    if (!sithOverlayMap_bMapVisible)
         return 0;
 
     sithAdvanceRenderTick();
@@ -89,7 +89,7 @@ int sithOverlayMap_Draw(rdCanvas *canvas)
     v2 = sithWorld_pCurrentWorld->playerThing;
     v3 = canvas->half_screen_width;
     sithOverlayMap_pCanvas = canvas;
-    sithOverlayMap_pPlayer = v2;
+    sithOverlayMap_pLocalPlayer = v2;
     v12 = (int)v3;
     sithOverlayMap_x1 = v12;
     v12 = (int)canvas->half_screen_height;
@@ -97,13 +97,13 @@ int sithOverlayMap_Draw(rdCanvas *canvas)
     a3.y = -sithCamera_g_pCurCamera->viewPYR.y;
     sithOverlayMap_y1 = v12;
     a3.z = 0.0;
-    rdMatrix_BuildRotate34(&sithOverlayMap_matrix, &a3);
+    rdMatrix_BuildRotate34(&sithOverlayMap_mapOrient, &a3);
 
-    sithOverlayMap_DrawSectors(sithOverlayMap_pPlayer->sector);
+    sithOverlayMap_DrawSectors(sithOverlayMap_pLocalPlayer->sector);
 
     if ( sithNet_isMulti && (sithNet_MultiModeFlags & MULTIMODEFLAG_TEAMS) != 0 )
     {
-        v8 = sithOverlayMap_inst.config.aTeamColors[sithOverlayMap_pPlayer->actorParams.playerinfo->teamNum];
+        v8 = sithOverlayMap_inst.config.aTeamColors[sithOverlayMap_pLocalPlayer->actorParams.playerinfo->teamNum];
         v9 = v8;
     }
     else
@@ -111,7 +111,7 @@ int sithOverlayMap_Draw(rdCanvas *canvas)
         v8 = sithOverlayMap_inst.config.playerColor & 0xFFFF;
         v9 = sithOverlayMap_inst.config.playerLineColor;
     }
-    canvasa = sithOverlayMap_pPlayer->moveSize * sithOverlayMap_flMapSize;
+    canvasa = sithOverlayMap_pLocalPlayer->moveSize * sithOverlayMap_curScale;
     rdPrimit2_DrawClippedCircle(sithOverlayMap_pCanvas, sithOverlayMap_x1, sithOverlayMap_y1, canvasa, 20.0, v8, -1);
     if ( sithOverlayMap_inst.config.bRotateOverlayMap )
     {
@@ -129,7 +129,7 @@ int sithOverlayMap_Draw(rdCanvas *canvas)
         a1.x = 0.0;
         a1.y = -(canvasa + canvasa);
         a1.z = 0.0;
-        rdMatrix_TransformVector34Acc(&a1, &sithOverlayMap_matrix);
+        rdMatrix_TransformVector34Acc(&a1, &sithOverlayMap_mapOrient);
         result = rdPrimit2_DrawClippedLine(
                      sithOverlayMap_pCanvas,
                      sithOverlayMap_x1,
@@ -251,12 +251,12 @@ LABEL_29:
                 v44 = 1;
                 a1a = sithOverlayMap_inst.world->vertices[v8];
                 v35 = sithOverlayMap_inst.world->vertices[v9];
-                rdVector_Sub3Acc(&a1a, &sithOverlayMap_pPlayer->position);
-                rdVector_Sub3Acc(&v35, &sithOverlayMap_pPlayer->position);
+                rdVector_Sub3Acc(&a1a, &sithOverlayMap_pLocalPlayer->position);
+                rdVector_Sub3Acc(&v35, &sithOverlayMap_pLocalPlayer->position);
                 if ( sithOverlayMap_inst.config.bRotateOverlayMap )
                 {
-                    rdMatrix_TransformVector34Acc(&a1a, &sithOverlayMap_matrix);
-                    rdMatrix_TransformVector34Acc(&v35, &sithOverlayMap_matrix);
+                    rdMatrix_TransformVector34Acc(&a1a, &sithOverlayMap_mapOrient);
+                    rdMatrix_TransformVector34Acc(&v35, &sithOverlayMap_mapOrient);
                 }
                 v11 = 0;
                 v46 = 0;
@@ -296,8 +296,8 @@ LABEL_17:
                     v17 = sithOverlayMap_inst.config.paColors[sithOverlayMap_inst.config.numArr - 1];
                     v16 = 0xCCCCCCCC;
                 }
-                rdVector_Scale3Acc(&a1a, sithOverlayMap_flMapSize);
-                rdVector_Scale3Acc(&v35, sithOverlayMap_flMapSize);
+                rdVector_Scale3Acc(&a1a, sithOverlayMap_curScale);
+                rdVector_Scale3Acc(&v35, sithOverlayMap_curScale);
                 if ( rdPrimit2_DrawClippedLine(
                          sithOverlayMap_pCanvas,
                          sithOverlayMap_x1 + (int)a1a.x,
@@ -326,9 +326,9 @@ LABEL_30:
     if ( !v47 )
     {
         rdVector3 tmp;
-        rdVector_Scale3(&tmp, &v2->center, sithOverlayMap_flMapSize);
+        rdVector_Scale3(&tmp, &v2->center, sithOverlayMap_curScale);
         v37 = (int)tmp.y;
-        v49 = v2->radius * sithOverlayMap_flMapSize;
+        v49 = v2->radius * sithOverlayMap_curScale;
         v21 = (flex_d_t)((int)(sithOverlayMap_x1 + (int)tmp.x));
         if ( v21 >= (flex_d_t)sithOverlayMap_pCanvas->xStart - v49 && v21 <= (flex_d_t)sithOverlayMap_pCanvas->widthMinusOne + v49
           || ((v23 = (flex_d_t)((int)(sithOverlayMap_y1 - v37)), v23 < (flex_d_t)sithOverlayMap_pCanvas->yStart - v49) || v23 > (flex_d_t)sithOverlayMap_pCanvas->heightMinusOne + v49 ? (v24 = 0) : (v24 = 1),
@@ -390,14 +390,14 @@ LABEL_30:
                 }
                 if ( v27 )
                 {
-                    rdVector_Sub3(&a1a, &i->position, &sithOverlayMap_pPlayer->position);
+                    rdVector_Sub3(&a1a, &i->position, &sithOverlayMap_pLocalPlayer->position);
                     if ( sithOverlayMap_inst.config.bRotateOverlayMap )
-                        rdMatrix_TransformVector34Acc(&a1a, &sithOverlayMap_matrix);
-                    rdVector_Scale3Acc(&a1a, sithOverlayMap_flMapSize);
+                        rdMatrix_TransformVector34Acc(&a1a, &sithOverlayMap_mapOrient);
+                    rdVector_Scale3Acc(&a1a, sithOverlayMap_curScale);
                     v37 = (int)a1a.x;
                     int v40_ = (int)a1a.y;
                     v30 = sithOverlayMap_y1 - v40_;
-                    a4 = i->moveSize * sithOverlayMap_flMapSize;
+                    a4 = i->moveSize * sithOverlayMap_curScale;
                     v31 = v37 + sithOverlayMap_x1;
                     rdPrimit2_DrawClippedCircle(sithOverlayMap_pCanvas, v37 + sithOverlayMap_x1, sithOverlayMap_y1 - v40_, a4, 20.0, circleColor, -1);
                     v32 = i->type;
@@ -405,10 +405,10 @@ LABEL_30:
                     {
                         rdVector_Scale3(&v35, &i->lookOrientation.lvec, i->moveSize + i->moveSize);
                         rdVector_Add3Acc(&v35, &i->position);
-                        rdVector_Sub3(&a1a, &v35, &sithOverlayMap_pPlayer->position);
+                        rdVector_Sub3(&a1a, &v35, &sithOverlayMap_pLocalPlayer->position);
                         if ( sithOverlayMap_inst.config.bRotateOverlayMap )
-                            rdMatrix_TransformVector34Acc(&a1a, &sithOverlayMap_matrix);
-                        rdVector_Scale3Acc(&a1a, sithOverlayMap_flMapSize);
+                            rdMatrix_TransformVector34Acc(&a1a, &sithOverlayMap_mapOrient);
+                        rdVector_Scale3Acc(&a1a, sithOverlayMap_curScale);
                         rdPrimit2_DrawClippedLine(sithOverlayMap_pCanvas, v31, v30, sithOverlayMap_x1 + (int)a1a.x, sithOverlayMap_y1 - (int)a1a.y, a6_ & 0xFFFF, -1);
                     }
                 }

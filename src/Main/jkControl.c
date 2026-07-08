@@ -98,7 +98,7 @@ int jkControl_HandleHudKeys(sithThing *player, flex_t b)
             i = v15 == 0;
         }
 
-        if ( !sithOverlayMap_bShowMap )
+        if ( !sithOverlayMap_bMapVisible )
         {
             sithControl_GetKey(INPUT_FUNC_INCREASE, &v15);
             for (int i = v15-- == 0; !i; --v15 )

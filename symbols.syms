@@ -250,15 +250,15 @@ sithMulti_newPlayerId 0x00832644 int32_t
 sithNet_bSyncScores 0x00832648 int32_t 
 sithNet_dword_832620 0x00832620 int32_t 
 
-sithOverlayMap_flMapSize 0x0054A5E0 flex_t = 100.0
-sithOverlayMap_matrix 0x00835840 rdMatrix34
-sithOverlayMap_pPlayer 0x00835870 sithThing*
+sithOverlayMap_curScale 0x0054A5E0 flex_t = 100.0
+sithOverlayMap_mapOrient 0x00835840 rdMatrix34
+sithOverlayMap_pLocalPlayer 0x00835870 sithThing*
 sithOverlayMap_pCanvas 0x00835874 rdCanvas*
 sithOverlayMap_x1 0x00835878 int
 sithOverlayMap_y1 0x0083587C int
 sithOverlayMap_inst 0x00835880 sithMapView
-sithOverlayMap_bShowMap 0x008358C4 int
-sithOverlayMap_bInitted 0x008358C8 int
+sithOverlayMap_bMapVisible 0x008358C4 int
+sithOverlayMap_bOpened 0x008358C8 int
 
 sithSoundClass_hashtable 0x00847F1C stdHashTable*
 sithSoundClass_nameToKeyHashtable 0x00847F20 stdHashTable*
