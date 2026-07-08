@@ -108,10 +108,10 @@ void sithPuppet_Shutdown()
     }
 }
 
-sithPuppet* sithPuppet_New(sithThing *thing)
+sithPuppet* sithPuppet_New(SithThing *thing)
 {
     sithPuppet *v1; // edi
-    sithSector *sector; // eax
+    SithSector *sector; // eax
     sithPuppet *result; // eax
 
     v1 = (sithPuppet *)SITH_ALLOC(sizeof(sithPuppet));
@@ -141,7 +141,7 @@ sithPuppet* sithPuppet_New(sithThing *thing)
     return result;
 }
 
-void sithPuppet_Free(sithThing *puppet)
+void sithPuppet_Free(SithThing *puppet)
 {
     if ( puppet->puppet )
     {
@@ -150,7 +150,7 @@ void sithPuppet_Free(sithThing *puppet)
     }
 }
 
-void sithPuppet_SetMoveMode(sithThing *thing, int a2)
+void sithPuppet_SetMoveMode(SithThing *thing, int a2)
 {
     sithPuppet *puppet; // eax
 
@@ -169,11 +169,11 @@ void sithPuppet_SetMoveMode(sithThing *thing, int a2)
 }
 
 // MOTS altered
-int sithPuppet_PlayMode(sithThing *thing, signed int anim, rdPuppetTrackCallback_t callback)
+int sithPuppet_PlayMode(SithThing *thing, signed int anim, rdPuppetTrackCallback_t callback)
 {
-    sithAnimclass *v4; // ebx
+    SithPuppetClass *v4; // ebx
     sithPuppet *v6; // edx
-    sithAnimclassEntry *v7; // eax
+    SithPuppetClassSubmode *v7; // eax
     rdKeyframe *keyframe; // ebx
     int flags; // ebp
     int v10; // eax
@@ -275,7 +275,7 @@ LABEL_8:
     return result;
 }
 
-void sithPuppet_ResetTrack(sithThing *puppet)
+void sithPuppet_ResetTrack(SithThing *puppet)
 {
     unsigned int trackNum; // esi
     sithPuppet *v2; // eax
@@ -291,21 +291,21 @@ void sithPuppet_ResetTrack(sithThing *puppet)
 }
 
 // MOTS altered?
-void sithPuppet_UpdatePuppet(sithThing *thing, flex_t deltaSeconds)
+void sithPuppet_UpdatePuppet(SithThing *thing, flex_t deltaSeconds)
 {
     flex_d_t v3; // st7
     sithPuppet *v4; // eax
-    sithAnimclassEntry *v5; // ecx
+    SithPuppetClassSubmode *v5; // ecx
     int v6; // ecx
     flex_d_t v8; // st7
     char v9; // c0
     sithPuppet *v10; // eax
     flex_d_t v11; // st7
-    sithAnimclass *v12; // edx
-    sithAnimclassEntry *v13; // eax
+    SithPuppetClass *v12; // edx
+    SithPuppetClassSubmode *v13; // eax
     int v14; // eax
-    sithAnimclass *v17; // edx
-    sithAnimclassEntry *v18; // eax
+    SithPuppetClass *v17; // edx
+    SithPuppetClassSubmode *v18; // eax
     int v19; // eax
     rdMatrix34 *v20; // eax
     rdMatrix34 *v23; // ecx
@@ -366,7 +366,7 @@ void sithPuppet_UpdatePuppet(sithThing *thing, flex_t deltaSeconds)
     }
 }
 
-flex_t sithPuppet_UpdateThingMove(sithThing *thing)
+flex_t sithPuppet_UpdateThingMove(SithThing *thing)
 {
     flex_d_t v2; // st7
     int v3; // ecx
@@ -374,14 +374,14 @@ flex_t sithPuppet_UpdateThingMove(sithThing *thing)
     char missing_1; // c0
     flex_d_t v8; // st5
     char missing_2; // c0
-    sithSector *v10 = NULL; // eax
-    sithAnimclass *v11 = NULL; // ebp
+    SithSector *v10 = NULL; // eax
+    SithPuppetClass *v11 = NULL; // ebp
     sithPuppet *v12 = NULL; // eax
     flex_d_t v14; // st6
     char missing_3; // c0
     int anim; // ecx
     sithPuppet *v18 = NULL; // edx
-    sithAnimclassEntry *v19 = NULL; // edi
+    SithPuppetClassSubmode *v19 = NULL; // edi
     int v20; // eax
     flex_t v23; // [esp+10h] [ebp-10h]
     rdVector3 a1a; // [esp+14h] [ebp-Ch] BYREF
@@ -566,7 +566,7 @@ LABEL_60:
     return thinga;
 }
 
-void sithPuppet_sub_4E4A20(sithThing *thing, sithAnimclassEntry *animClass)
+void sithPuppet_sub_4E4A20(SithThing *thing, SithPuppetClassSubmode *animClass)
 {
     rdPuppet *rdPup; // ecx
     sithPuppet *sithPup; // esi
@@ -617,15 +617,15 @@ void sithPuppet_sub_4E4A20(sithThing *thing, sithAnimclassEntry *animClass)
 }
 
 // MOTS altered
-void sithPuppet_DefaultCallback(sithThing *thing, int32_t track, uint32_t a3)
+void sithPuppet_DefaultCallback(SithThing *thing, int32_t track, uint32_t a3)
 {
     unsigned int v3; // esi
     sithPuppet *sithPup; // eax
     uint32_t soundToPlay_base; // edi
-    sithThing *v8; // eax
+    SithThing *v8; // eax
     int v10; // eax
-    sithThing *v11; // esi
-    sithActor *v12; // eax
+    SithThing *v11; // esi
+    SithAIControlBlock *v12; // eax
 
     v3 = 0;
     switch ( a3 )
@@ -761,7 +761,7 @@ LABEL_50:
         case 0xF:
             if (!Main_bMotsCompat) return;
 
-            if ((thing->controlType == SITH_CT_AI) && (v12 = thing->actor, v12 != (sithActor *)0x0)) {
+            if ((thing->controlType == SITH_CT_AI) && (v12 = thing->actor, v12 != (SithAIControlBlock *)0x0)) {
                 sithAI_Leap(v12,0.0,0.0,0.0,v12->field_26C,v12->field_264,v12->field_268);
                 return;
             }
@@ -769,7 +769,7 @@ LABEL_50:
         case 0x10:
             if (!Main_bMotsCompat) return;
 
-            if ((thing->controlType == SITH_CT_AI) && (v12 = thing->actor, v12 != (sithActor *)0x0)) {
+            if ((thing->controlType == SITH_CT_AI) && (v12 = thing->actor, v12 != (SithAIControlBlock *)0x0)) {
                 sithAI_Charge(v12,0.0,0.0,0.0,v12->field_26C,v12->field_264,v12->field_268);
             }
             return;
@@ -789,7 +789,7 @@ int sithPuppet_StopKey(rdPuppet *pupper, int track, flex_t a3)
     return 1;
 }
 
-void sithPuppet_SetArmedMode(sithThing *thing, int mode)
+void sithPuppet_SetArmedMode(SithThing *thing, int mode)
 {
     sithPuppet *v2; // ecx
 
@@ -801,17 +801,17 @@ void sithPuppet_SetArmedMode(sithThing *thing, int mode)
     }
 }
 
-void sithPuppet_PlayFidgetMode(sithThing *pThing)
+void sithPuppet_PlayFidgetMode(SithThing *pThing)
 {
     sithPuppet *puppet; // eax
     flex_d_t v2; // st7
-    sithAnimclass *v3; // edx
-    sithAnimclassEntry *v4; // eax
+    SithPuppetClass *v3; // edx
+    SithPuppetClassSubmode *v4; // eax
     int v5; // eax
     sithPuppet *v6; // esi
     unsigned int v7; // edx
-    sithAnimclass *v8; // edx
-    sithAnimclassEntry *v9; // eax
+    SithPuppetClass *v8; // edx
+    SithPuppetClassSubmode *v9; // eax
     int v10; // eax
 
     puppet = pThing->puppet;
@@ -863,7 +863,7 @@ void sithPuppet_PlayFidgetMode(sithThing *pThing)
     }
 }
 
-void sithPuppet_resetidk(sithThing *pThing)
+void sithPuppet_resetidk(SithThing *pThing)
 {
     sithPuppet *puppet; // eax
     int v2; // eax
@@ -881,11 +881,11 @@ void sithPuppet_resetidk(sithThing *pThing)
     }
 }
 
-void sithPuppet_advanceidk(sithThing *pThing, flex_t a2)
+void sithPuppet_advanceidk(SithThing *pThing, flex_t a2)
 {
     flex_d_t v3; // st7
     sithPuppet *puppet; // eax
-    sithAnimclassEntry *v5; // ecx
+    SithPuppetClassSubmode *v5; // ecx
     int v6; // ecx
     flex_d_t v8; // st7
     flex_t a3; // [esp+0h] [ebp-8h]

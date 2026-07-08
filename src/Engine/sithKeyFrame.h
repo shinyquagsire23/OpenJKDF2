@@ -12,10 +12,10 @@
 
 typedef struct rdKeyframe rdKeyframe;
 
-int sithKeyFrame_Load(sithWorld *world, int a2);
+int sithKeyFrame_Load(SithWorld *world, int a2);
 rdKeyframe* sithKeyFrame_GetByIdx(int idx);
 rdKeyframe* sithKeyFrame_LoadEntry(const char *fpath);
-int sithKeyFrame_New(sithWorld *world, int numKeyframes);
-void sithKeyFrame_Free(sithWorld *world);
+int sithKeyFrame_New(SithWorld *world, int numKeyframes);
+void sithKeyFrame_Free(SithWorld *world);
 
 #endif // _SITHKEYFRAME_H

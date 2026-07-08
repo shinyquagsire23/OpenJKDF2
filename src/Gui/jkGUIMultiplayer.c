@@ -411,7 +411,7 @@ int jkGuiMultiplayer_ShowSynchronizing()
 }
 
 
-int jkGuiMultiplayer_CogMsgHandleJoining(sithCogMsg *msg)
+int jkGuiMultiplayer_CogMsgHandleJoining(SithMessage *msg)
 {
     wchar_t *v2; // eax
     wchar_t *v3; // [esp-4h] [ebp-4h]

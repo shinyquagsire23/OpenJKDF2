@@ -35,16 +35,16 @@
 #define sithCogParse_ParseMessage_ADDR (0x004FE4D0)
 
 void sithCogParse_FreeParseTree();
-int sithCogParse_Load(char *cog_fpath, sithCogScript *cogscript, int unk);
-int sithCogParse_ParseSectionCode(sithCogScript *script);
-sithCogSymboltable* sithCogParse_DuplicateSymbolTable(sithCogSymboltable *table);
-sithCogSymboltable* sithCogParse_AllocSymbolTable(int amt);
-int sithCogParse_ReallocSymbolTable(sithCogSymboltable *table);
-void sithCogParse_FreeSymbolTable(sithCogSymboltable *table);
-sithCogSymbol* sithCogParse_AddSymbol(sithCogSymboltable *table, const char *symbolName);
-void sithCogParse_SetSymbolValue(sithCogSymbol *a1, sithCogStackvar *a2);
-sithCogSymbol* sithCogParse_GetSymbol(sithCogSymboltable *pSymbolTable, char *a2);
-sithCogSymbol* sithCogParse_GetSymbolByID(sithCogSymboltable *table, unsigned int idx);
+int sithCogParse_Load(char *cog_fpath, SithCogScript *cogscript, int unk);
+int sithCogParse_ParseSectionCode(SithCogScript *script);
+SithCogSymbolTable* sithCogParse_DuplicateSymbolTable(SithCogSymbolTable *table);
+SithCogSymbolTable* sithCogParse_AllocSymbolTable(int amt);
+int sithCogParse_ReallocSymbolTable(SithCogSymbolTable *table);
+void sithCogParse_FreeSymbolTable(SithCogSymbolTable *table);
+SithCogSymbol* sithCogParse_AddSymbol(SithCogSymbolTable *table, const char *symbolName);
+void sithCogParse_SetSymbolValue(SithCogSymbol *a1, SithCogSymbolValue *a2);
+SithCogSymbol* sithCogParse_GetSymbol(SithCogSymbolTable *pSymbolTable, char *a2);
+SithCogSymbol* sithCogParse_GetSymbolByID(SithCogSymbolTable *table, unsigned int idx);
 int sithCogParse_GetSymbolLabel(unsigned int idx);
 sith_cog_parser_node* sithCogParse_MakeLeafNode(int op, int val);
 sith_cog_parser_node* sithCogParse_MakeVectorLeafNode(int op, cog_flex_t* vector);
@@ -55,17 +55,17 @@ void sithCogParse_LexerSetVector(char *inStr);
 int sithCogParse_GetNextLabel();
 int sithCogParse_GenerateLabelTable(sith_cog_parser_node *node);
 void sithCogParse_GenerateCode(sith_cog_parser_node *node);
-int sithCogParse_ParseSymbolRef(sithCogScript *cogScript, int a2, int unk);
-int sithCogParse_ParseFlex(sithCogScript *cogScript, int a2);
-int sithCogParse_ParseInt(sithCogScript *cogScript, int a2);
-int sithCogParse_ParseVector(sithCogScript *cogScript, int a2);
-int sithCogParse_ParseMessage(sithCogScript *cogScript);
+int sithCogParse_ParseSymbolRef(SithCogScript *cogScript, int a2, int unk);
+int sithCogParse_ParseFlex(SithCogScript *cogScript, int a2);
+int sithCogParse_ParseInt(SithCogScript *cogScript, int a2);
+int sithCogParse_ParseVector(SithCogScript *cogScript, int a2);
+int sithCogParse_ParseMessage(SithCogScript *cogScript);
 
 //sith_cog_parser_node* sithCogParse_MakeNode(sith_cog_parser_node* parent, sith_cog_parser_node* child, int opcode, int val);
 //sith_cog_parser_node* sithCogParse_MakeVectorLeafNode(int op, cog_flex_t* vector);
 //sith_cog_parser_node* sithCogParse_MakeLeafNode(int op, int val);
 
-//static sithCogSymbol* (__cdecl *sithCogParse_GetSymbol_)(sithCogSymboltable *a1, unsigned int a2) = (void*)sithCogParse_GetSymbolByID_ADDR;
+//static SithCogSymbol* (__cdecl *sithCogParse_GetSymbol_)(SithCogSymbolTable *a1, unsigned int a2) = (void*)sithCogParse_GetSymbolByID_ADDR;
 //static int (*sithCogParse_GenerateCode)(sith_cog_parser_node *node) = (void*)sithCogParse_GenerateCode_ADDR;
 
 int cog_parsescript();

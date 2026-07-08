@@ -61,7 +61,7 @@ extern int jkPlayer_personality;
 extern flex_t jkPlayer_aMultiParams[0x100];
 #endif
 
-typedef struct sithSurface sithSurface;
+typedef struct SithSurface SithSurface;
 
 enum JKFLAG
 {
@@ -93,9 +93,9 @@ void jkPlayer_WriteConf(wchar_t *name);
 int jkPlayer_ReadConf(wchar_t *name);
 void jkPlayer_SetPovModel(jkPlayerInfo *info, rdModel3 *model);
 MATH_FUNC void jkPlayer_DrawPov();
-MATH_FUNC void jkPlayer_renderSaberWeaponMesh(sithThing *a1);
-MATH_FUNC void jkPlayer_renderSaberTwinkle(sithThing *player);
-void jkPlayer_SetWaggle(sithThing *player, rdVector3 *waggleVec, flex_t waggleMag);
+MATH_FUNC void jkPlayer_renderSaberWeaponMesh(SithThing *a1);
+MATH_FUNC void jkPlayer_renderSaberTwinkle(SithThing *player);
+void jkPlayer_SetWaggle(SithThing *player, rdVector3 *waggleVec, flex_t waggleMag);
 int jkPlayer_VerifyWcharName(wchar_t *name);
 int jkPlayer_VerifyCharName(char *name);
 void jkPlayer_SetMpcInfo(wchar_t *name, char *model, char *soundclass, char *sidemat, char *tipmat);
@@ -104,9 +104,9 @@ int jkPlayer_GetMpcInfo(wchar_t *name, char *model, char *soundclass, char *side
 void jkPlayer_SetChoice(int amt);
 int jkPlayer_GetChoice();
 flex_t jkPlayer_CalcAlignment(int isMp);
-void jkPlayer_MpcInitBins(sithPlayerInfo* unk);
-int jkPlayer_MPCParse(jkPlayerMpcInfo *info, sithPlayerInfo* unk, wchar_t *fname, wchar_t *name, int hasBins);
-int jkPlayer_MPCWrite(sithPlayerInfo* unk, wchar_t *mpcName, wchar_t *playerName);
+void jkPlayer_MpcInitBins(SithPlayer* unk);
+int jkPlayer_MPCParse(jkPlayerMpcInfo *info, SithPlayer* unk, wchar_t *fname, wchar_t *name, int hasBins);
+int jkPlayer_MPCWrite(SithPlayer* unk, wchar_t *mpcName, wchar_t *playerName);
 int jkPlayer_MPCBinWrite();
 int jkPlayer_MPCBinRead();
 void jkPlayer_InitForceBins();
@@ -126,7 +126,7 @@ int jkPlayer_GetJediRank();
 void jkPlayer_SetRank(int rank);
 
 uint32_t jkPlayer_ChecksumExtra(uint32_t hash); // MOTS added
-jkPlayerInfo* jkPlayer_FUN_00404fe0(sithThing *pPlayerThing); // MOTS added
+jkPlayerInfo* jkPlayer_FUN_00404fe0(SithThing *pPlayerThing); // MOTS added
 int jkPlayer_SetAmmoMaximums(int classIdx); // MOTS added
 void jkPlayer_idkEndLevel(void); // MOTS added
 int jkPlayer_SyncForcePowers(int rank,int bIsMulti); // MOTS added
@@ -194,6 +194,6 @@ extern int jkPlayer_bJankyPhysics;
 //static int (*jkPlayer_DisallowOtherSide)() = (void*)jkPlayer_DisallowOtherSide_ADDR;
 //static void (*jkPlayer_SetChoice)(signed int a1) = (void*)jkPlayer_SetChoice_ADDR;
 //static double (*jkPlayer_CalcAlignment)(flex_t a1) = (void*)jkPlayer_CalcAlignment_ADDR;
-//static void (__cdecl *jkPlayer_renderSaberTwinkle)(sithThing *a1) = (void*)jkPlayer_renderSaberTwinkle_ADDR;
+//static void (__cdecl *jkPlayer_renderSaberTwinkle)(SithThing *a1) = (void*)jkPlayer_renderSaberTwinkle_ADDR;
 
 #endif // _JK_PLAYER_H

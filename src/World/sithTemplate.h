@@ -17,13 +17,13 @@
 
 int sithTemplate_Startup();
 void sithTemplate_Shutdown();
-int sithTemplate_AllocWorldTemplates(sithWorld *world, unsigned int numTemplates);
-sithThing* sithTemplate_GetTemplateByIndex(int idx);
-int sithTemplate_ReadThingTemplatesListText(sithWorld *world, int a2);
+int sithTemplate_AllocWorldTemplates(SithWorld *world, unsigned int numTemplates);
+SithThing* sithTemplate_GetTemplateByIndex(int idx);
+int sithTemplate_ReadThingTemplatesListText(SithWorld *world, int a2);
 int sithTemplate_OldNew(char *fpath);
 void sithTemplate_OldFree();
-void sithTemplate_FreeWorldTemplates(sithWorld *world);
-sithThing* sithTemplate_GetTemplate(const char *name);
-sithThing* sithTemplate_Parse(sithWorld *world);
+void sithTemplate_FreeWorldTemplates(SithWorld *world);
+SithThing* sithTemplate_GetTemplate(const char *name);
+SithThing* sithTemplate_Parse(SithWorld *world);
 
 #endif // _SITHTEMPLATE_H

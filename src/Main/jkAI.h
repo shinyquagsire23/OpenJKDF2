@@ -11,9 +11,9 @@
 
 void jkAI_Startup();
 
-MATH_FUNC int jkAI_SaberFighting(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, int extra);
-int jkAI_SpecialAttack(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, sithThing *extra);
-int jkAI_ForcePowers(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, int extra);
+MATH_FUNC int jkAI_SaberFighting(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAIInstinctState *instinct, int flags, int extra);
+int jkAI_SpecialAttack(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAIInstinctState *instinct, int flags, SithThing *extra);
+int jkAI_ForcePowers(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAIInstinctState *instinct, int flags, int extra);
 int jkAI_SaberMove();
 
 #endif // _JKAI_H

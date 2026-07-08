@@ -308,11 +308,11 @@ LABEL_30:
 // MOTS altered
 void jkHud_Draw()
 {
-    sithThing *playerThing; // esi
-    sithItemInfo *v1; // eax
+    SithThing *playerThing; // esi
+    SithInventoryItem *v1; // eax
     int v2; // eax
     int v3; // eax
-    sithThing *v4; // ebp
+    SithThing *v4; // ebp
     int32_t v5; // eax
     int v6; // eax
     int32_t v7; // eax
@@ -338,8 +338,8 @@ void jkHud_Draw()
     int v27; // ecx
     size_t v29; // edx
     unsigned int v30; // ebx
-    sithPlayerInfo* playerInfoIter; // edi
-    sithPlayerInfo *v32; // esi
+    SithPlayer* playerInfoIter; // edi
+    SithPlayer *v32; // esi
     char *v33; // ecx
     wchar_t *v34; // eax
     int v35; // edx
@@ -926,11 +926,11 @@ LABEL_116:
 // MOTS altered
 void jkHud_DrawGPU()
 {
-    sithThing *playerThing; // esi
-    sithItemInfo *v1; // eax
+    SithThing *playerThing; // esi
+    SithInventoryItem *v1; // eax
     int v2; // eax
     int v3; // eax
-    sithThing *v4; // ebp
+    SithThing *v4; // ebp
     int32_t v5; // eax
     int v6; // eax
     int32_t v7; // eax
@@ -956,8 +956,8 @@ void jkHud_DrawGPU()
     int v27; // ecx
     size_t v29; // edx
     unsigned int v30; // ebx
-    sithPlayerInfo* playerInfoIter; // edi
-    sithPlayerInfo *v32; // esi
+    SithPlayer* playerInfoIter; // edi
+    SithPlayer *v32; // esi
     char *v33; // ecx
     wchar_t *v34; // eax
     int v35; // edx
@@ -1530,12 +1530,12 @@ LABEL_116:
 #endif
 }
 
-int jkHud_GetWeaponAmmo(sithThing *player)
+int jkHud_GetWeaponAmmo(SithThing *player)
 {
     if (Main_bMotsCompat) {
         int binIdxWeap;
         int binIdx;
-        sithItemInfo *pItemInfo;
+        SithInventoryItem *pItemInfo;
         int weaponToAmmo [21];
         
         weaponToAmmo[5] = SITHBIN_CARBPELLETS;
@@ -1582,12 +1582,12 @@ int jkHud_GetWeaponAmmo(sithThing *player)
         return binIdxWeap;
     }
     else {
-        sithPlayerInfo *v1; // eax
+        SithPlayer *v1; // eax
         int v2; // eax
         BOOL v3; // ecx
         int v4; // eax
         int binidx; // eax
-        sithItemInfo *v6; // eax
+        SithInventoryItem *v6; // eax
         int weaponToAmmo[11]; // [esp+4h] [ebp-2Ch]
 
         weaponToAmmo[2] = SITHBIN_ENERGY;
@@ -1729,7 +1729,7 @@ void jkHud_SetTargetColors(int *color_idxs)
     jkHud_targetBlue16 = stdColor_Indexed8ToRGB16(color_idxs[2] & 0xFF, (rdColor24 *)Video_aPalette, &Video_format.format);
 }
 
-void jkHud_SetTarget(sithThing *target)
+void jkHud_SetTarget(SithThing *target)
 {
     jkHud_pTargetThing = target;
     if ( target )
@@ -1822,7 +1822,7 @@ int jkHud_chat2()
 }
 
 #ifdef QOL_IMPROVEMENTS
-BOOL jkHud_shouldCrosshairBeShownForWeapon(sithThing *player) {
+BOOL jkHud_shouldCrosshairBeShownForWeapon(SithThing *player) {
   int currentWeapon = sithInventory_GetCurrentWeapon(player);
   if (currentWeapon == SITHBIN_FISTS || MOTS_ONLY_FLAG(currentWeapon == SITHBIN_MOTS_FISTS)) {
     return jkPlayer_setCrosshairOnFist;

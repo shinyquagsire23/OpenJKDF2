@@ -9,12 +9,12 @@
 #include "stdPlatform.h"
 #include "jk.h"
 
-int sithOverlayMap_Startup(const sithMapViewConfig *config)
+int sithOverlayMap_Startup(const SithOverlayMapConfig *config)
 {
     if (sithOverlayMap_bOpened)
         return 0;
 
-    _memcpy(&sithOverlayMap_inst.config, config, sizeof(sithMapViewConfig));
+    _memcpy(&sithOverlayMap_inst.config, config, sizeof(SithOverlayMapConfig));
     sithOverlayMap_bOpened = 1;
     return 1;
 }
@@ -67,10 +67,10 @@ void sithOverlayMap_ZoomOut()
 int sithOverlayMap_Draw(rdCanvas *canvas)
 {
     int result; // eax
-    sithThing *v2; // ecx
+    SithThing *v2; // ecx
     flex_t v3; // edx
     int v5; // ecx
-    sithAdjoin *i; // esi
+    SithSurfaceAdjoin *i; // esi
     int v8; // eax
     __int16 v9; // si
     rdVector3 a3; // [esp+4h] [ebp-1Ch] BYREF
@@ -143,10 +143,10 @@ int sithOverlayMap_Draw(rdCanvas *canvas)
     return result;
 }
 
-void sithOverlayMap_DrawSectors(sithSector *sector)
+void sithOverlayMap_DrawSectors(SithSector *sector)
 {
     signed int v2; // eax
-    sithAdjoin *i; // esi
+    SithSurfaceAdjoin *i; // esi
 
     if ( sector->renderTick != sithRender_lastRenderTick
         && (sector->flags & SITH_SECTOR_AUTOMAPVISIBLE || g_mapModeFlags & MAPMODE_02))
@@ -165,11 +165,11 @@ void sithOverlayMap_DrawSectors(sithSector *sector)
     }
 }
 
-int sithOverlayMap_DrawSector(sithSector *pSector)
+int sithOverlayMap_DrawSector(SithSector *pSector)
 {
-    sithSector *v2; // esi
+    SithSector *v2; // esi
     int v3; // ecx
-    sithSurface *v4; // ebx
+    SithSurface *v4; // ebx
     unsigned int v5; // edi
     unsigned int v6; // eax
     int *v7; // ecx
@@ -188,7 +188,7 @@ int sithOverlayMap_DrawSector(sithSector *pSector)
     flex_d_t v23; // st7
     int v24; // eax
     char v25; // cl
-    sithThing *i; // ebx
+    SithThing *i; // ebx
     int v27; // esi
     int v28; // eax
     __int16 v29; // ax
@@ -204,7 +204,7 @@ int sithOverlayMap_DrawSector(sithSector *pSector)
     int v45; // [esp+54h] [ebp-10h]
     int v46; // [esp+58h] [ebp-Ch]
     int v47; // [esp+5Ch] [ebp-8h]
-    sithSurface *a6; // [esp+60h] [ebp-4h]
+    SithSurface *a6; // [esp+60h] [ebp-4h]
     flex_t v49; // [esp+6Ch] [ebp+8h]
     int circleColor; // [esp+6Ch] [ebp+8h]
 
@@ -421,19 +421,19 @@ LABEL_30:
     return result;
 }
 
-int sithOverlayMap_CanDrawSurfaceEdge(sithSurface *a1, int a2, int a3)
+int sithOverlayMap_CanDrawSurfaceEdge(SithSurface *a1, int a2, int a3)
 {
-    sithSector *parent_sector; // eax
+    SithSector *parent_sector; // eax
     unsigned int sector_numSurfaces; // edx
-    sithSurface *sector_paSurfaces; // ecx
-    sithSurface* v6; // ebx
+    SithSurface *sector_paSurfaces; // ecx
+    SithSurface* v6; // ebx
     unsigned int v7; // esi
     int v8; // eax
     int *v9; // edi
     unsigned int v10; // ecx
-    sithSector *v12; // eax
+    SithSector *v12; // eax
     unsigned int v13; // ecx
-    sithSurface* v14; // ebx
+    SithSurface* v14; // ebx
     unsigned int v15; // esi
     int v16; // eax
     int *v17; // edi
@@ -441,11 +441,11 @@ int sithOverlayMap_CanDrawSurfaceEdge(sithSurface *a1, int a2, int a3)
     int result; // eax
     int v20; // [esp+10h] [ebp-14h]
     int v21; // [esp+10h] [ebp-14h]
-    sithSurface *sector_paSurfaces_; // [esp+14h] [ebp-10h]
+    SithSurface *sector_paSurfaces_; // [esp+14h] [ebp-10h]
     unsigned int sector_numSurfaces_; // [esp+18h] [ebp-Ch]
-    sithSector *v24; // [esp+1Ch] [ebp-8h]
+    SithSector *v24; // [esp+1Ch] [ebp-8h]
     unsigned int v25; // [esp+1Ch] [ebp-8h]
-    sithAdjoin *v26; // [esp+28h] [ebp+4h]
+    SithSurfaceAdjoin *v26; // [esp+28h] [ebp+4h]
 
     parent_sector = a1->parent_sector;
     v24 = parent_sector;

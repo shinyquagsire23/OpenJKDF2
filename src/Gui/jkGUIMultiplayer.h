@@ -38,7 +38,7 @@ int jkGuiMultiplayer_Show();
 int jkGuiMultiplayer_ShowSynchronizing();
 
 void jkGuiMultiplayer_idk(jkGuiMenu *pMenu);
-int jkGuiMultiplayer_CogMsgHandleJoining(sithCogMsg *msg);
+int jkGuiMultiplayer_CogMsgHandleJoining(SithMessage *msg);
 void jkGuiMultiplayer_sub_4140B0(jkGuiMenu *pMenu);
 void jkGuiMultiplayer_sub_413E50(int idx);
 int jkGuiMultiplayer_sub_413E00(jkGuiElement *pElement, jkGuiMenu *pMenu, int32_t mouseX, int32_t mouseY, int bRedraw);

@@ -68,7 +68,7 @@ int sithSound_Shutdown()
     return 1;
 }
 
-int sithSound_ReadSoundsListText(sithWorld *world, int a2)
+int sithSound_ReadSoundsListText(SithWorld *world, int a2)
 {
     int numSounds; // eax
 
@@ -99,7 +99,7 @@ int sithSound_ReadSoundsListText(sithWorld *world, int a2)
     return 1;
 }
 
-void sithSound_FreeWorldSounds(sithWorld *world)
+void sithSound_FreeWorldSounds(SithWorld *world)
 {
     if (world->sounds)
     {
@@ -116,7 +116,7 @@ void sithSound_FreeWorldSounds(sithWorld *world)
 }
 
 // MOTS altered
-int sithSound_New(sithWorld *world, int num)
+int sithSound_New(SithWorld *world, int num)
 {
     // MOTS added: reserve sound 0?
     if (Main_bMotsCompat) {
@@ -211,7 +211,7 @@ sithSound* sithSound_Load(char *sound_fname, int a2)
 
 sithSound* sithSound_GetFromIdx(int idx)
 {
-    sithWorld* world = sithWorld_g_pCurrentWorld;
+    SithWorld* world = sithWorld_g_pCurrentWorld;
 
     if (idx & 0x8000)
     {
@@ -352,7 +352,7 @@ int sithSound_ReadDataFromFd(int fd, sithSound *sound)
 
 int sithSound_FreeUpMemory(uint32_t numBytesNeeded)
 {
-    sithWorld *world; // edi
+    SithWorld *world; // edi
     int result; // eax
     int v8; // [esp+10h] [ebp-Ch]
     int v9; // [esp+14h] [ebp-8h]

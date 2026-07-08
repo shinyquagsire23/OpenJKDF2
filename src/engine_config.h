@@ -344,7 +344,7 @@
 // Kept RETRO-only until well-tested.
 #define RDMODEL3_POOLED_FACE_INDICES
 
-// Same pooling for world surfaces (sithSurface): vertexPosIdx, optional
+// Same pooling for world surfaces (SithSurface): vertexPosIdx, optional
 // vertexUVIdx and the intensity arrays are otherwise 3 tiny allocations per
 // surface (12k+ heap blocks per level). One world-owned pool, offsets during
 // parse, pointer fixup after, freed as one block in sithSurface_FreeWorldSurfaces.

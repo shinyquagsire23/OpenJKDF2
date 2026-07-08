@@ -19,12 +19,12 @@
 
 static int lastDoorOpenTime = 0;
 
-void sithPlayerActions_Activate(sithThing *thing)
+void sithPlayerActions_Activate(SithThing *thing)
 {
-    sithSector *v4; // esi
+    SithSector *v4; // esi
     int v5; // eax
-    sithCollisionSearchEntry *searchResult; // eax
-    sithThing *v7; // edx
+    SithCollision *searchResult; // eax
+    SithThing *v7; // edx
     flex_t a6; // [esp+0h] [ebp-58h]
     rdVector3 thingPos; // [esp+1Ch] [ebp-3Ch] BYREF
     rdMatrix34 out; // [esp+28h] [ebp-30h] BYREF
@@ -84,7 +84,7 @@ void sithPlayerActions_Activate(sithThing *thing)
 }
 
 // MoTS altered
-void sithPlayerActions_JumpWithVel(sithThing *thing, flex_t vel)
+void sithPlayerActions_JumpWithVel(SithThing *thing, flex_t vel)
 {
     flex_d_t final_vel;
     int isAttachedAndIsSurface; // zf
@@ -113,7 +113,7 @@ void sithPlayerActions_JumpWithVel(sithThing *thing, flex_t vel)
             rdVector_ScaleAdd3Acc(&thing->physicsParams.vel, &rdroid_zVector3, final_vel);
             if ( isAttachedAndIsSurface )
             {
-                sithSurface* pAttachedSurface = thing->attachedSurface;
+                SithSurface* pAttachedSurface = thing->attachedSurface;
                 v14 = pAttachedSurface->surfaceFlags;
                 if ( (v14 & (SITH_SURFACE_VERYDEEPWATER|SITH_SURFACE_EARTH|SITH_SURFACE_PUDDLE|SITH_SURFACE_WATER|SITH_SURFACE_METAL)) != 0 )
                 {
@@ -141,7 +141,7 @@ void sithPlayerActions_JumpWithVel(sithThing *thing, flex_t vel)
             }
             else
             {
-                sithThing* pAttachedThing = thing->attachedThing;
+                SithThing* pAttachedThing = thing->attachedThing;
                 v12 = pAttachedThing->thingflags;
                 if ( (v12 & SITH_TF_METAL) != 0 ) // wtf??
                     jumpSound = SITH_SC_JUMPMETAL;
@@ -158,7 +158,7 @@ void sithPlayerActions_JumpWithVel(sithThing *thing, flex_t vel)
     }
 }
 
-void sithPlayerActions_MoveToPlayerPosition(sithThing *thing, int idx)
+void sithPlayerActions_MoveToPlayerPosition(SithThing *thing, int idx)
 {
     if (idx < (unsigned int)jkPlayer_maxPlayers && idx >= 0) // Added: >=0 check
     {
@@ -179,12 +179,12 @@ void sithPlayerActions_MoveToPlayerPosition(sithThing *thing, int idx)
 }
 
 // Added
-sithThing* sithPlayerActions_SpawnThingAtLookAt(sithThing *pPlayerThing, sithThing* pTemplate)
+SithThing* sithPlayerActions_SpawnThingAtLookAt(SithThing *pPlayerThing, SithThing* pTemplate)
 {
-    sithSector *v4; // esi
+    SithSector *v4; // esi
     int v5; // eax
-    sithCollisionSearchEntry *searchResult; // eax
-    sithThing *v7; // edx
+    SithCollision *searchResult; // eax
+    SithThing *v7; // edx
     flex_t a6; // [esp+0h] [ebp-58h]
     rdVector3 thingPos; // [esp+1Ch] [ebp-3Ch] BYREF
     rdMatrix34 out; // [esp+28h] [ebp-30h] BYREF
@@ -204,12 +204,12 @@ sithThing* sithPlayerActions_SpawnThingAtLookAt(sithThing *pPlayerThing, sithThi
         return sithWeapon_FireProjectile(pPlayerThing, pTemplate, NULL, -1, &tmp1, &tmp2, 1.0, 0, 90.0, 90.0, 0);
     }
 
-    sithThing* pSpawned = sithThing_CreateThing(pTemplate, pPlayerThing);
+    SithThing* pSpawned = sithThing_CreateThing(pTemplate, pPlayerThing);
     if (!pSpawned) {
         return NULL;
     }
 
-    sithSector* pSectorIter = sithCollision_FindSectorInRadius(pPlayerThing->sector, &pPlayerThing->position, &thingPos, 0.0);
+    SithSector* pSectorIter = sithCollision_FindSectorInRadius(pPlayerThing->sector, &pPlayerThing->position, &thingPos, 0.0);
     if ( pSectorIter )
     {
         a6 = pPlayerThing->moveSize*10;//pPlayerThing->moveSize - -0.1;

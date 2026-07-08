@@ -21,7 +21,7 @@ static rdVector2i sithIntersect_unkArr[3] = {
 };
 
 // Added
-int sithIntersect_IsSphereInSectorBox(const rdVector3 *pos, flex_t radius, sithSector *sector)
+int sithIntersect_IsSphereInSectorBox(const rdVector3 *pos, flex_t radius, SithSector *sector)
 {
     // Added
     if (!sector)
@@ -43,7 +43,7 @@ int sithIntersect_IsSphereInSectorBox(const rdVector3 *pos, flex_t radius, sithS
 
 //sithIntersect_sub_507EA0
 
-int sithIntersect_IsSphereInSector(const rdVector3 *pos, flex_t radius, sithSector *sector)
+int sithIntersect_IsSphereInSector(const rdVector3 *pos, flex_t radius, SithSector *sector)
 {
     rdVector3 *v7; // ebp
     flex_t v8; // st7
@@ -65,8 +65,8 @@ int sithIntersect_IsSphereInSector(const rdVector3 *pos, flex_t radius, sithSect
 
     for (int i = 0; i < sector->numSurfaces; i++)
     {
-        sithSurface* surface = &sector->surfaces[i];
-        sithAdjoin* adjoin = surface->adjoin;
+        SithSurface* surface = &sector->surfaces[i];
+        SithSurfaceAdjoin* adjoin = surface->adjoin;
         if ( (surface->surfaceFlags & SITH_SURFACE_HAS_COLLISION)
             || (adjoin && adjoin->flags & SITHSURF_ADJOIN_ALLOW_MOVEMENT) )
         {
@@ -81,9 +81,9 @@ int sithIntersect_IsSphereInSector(const rdVector3 *pos, flex_t radius, sithSect
 
 // sithIntersect_CheckFaceVerticesIntersection
 
-int sithIntersect_CheckSphereThingIntersection(sithThing *pThing, const rdVector3 *a2, const rdVector3 *a3, flex_t a4, flex_t range, sithThing *a6, int raycastFlags, flex_t *a8, rdMesh **outMesh, rdFace **a10, rdVector3 *a11)
+int sithIntersect_CheckSphereThingIntersection(SithThing *pThing, const rdVector3 *a2, const rdVector3 *a3, flex_t a4, flex_t range, SithThing *a6, int raycastFlags, flex_t *a8, rdMesh **outMesh, rdFace **a10, rdVector3 *a11)
 {
-    sithThing *v11; // edi
+    SithThing *v11; // edi
     int result; // eax
     rdVector3 *v26; // ebp
     rdGeoset *v27; // esi
@@ -210,7 +210,7 @@ int sithIntersect_CheckSphereThingIntersection(sithThing *pThing, const rdVector
 }
 
 // MoTS added: Tree collision (one sphere per mesh)
-int sithIntersect_TreeIntersection(rdHierarchyNode *paNodes,rdVector3 *pPoseVec,rdVector3 *pDirVec,flex_t a4,flex_t range, sithThing *v11,flex_t *pOut,rdVector3 *pOutVec,int raycastFlags)
+int sithIntersect_TreeIntersection(rdHierarchyNode *paNodes,rdVector3 *pPoseVec,rdVector3 *pDirVec,flex_t a4,flex_t range, SithThing *v11,flex_t *pOut,rdVector3 *pOutVec,int raycastFlags)
 {
     rdModel3 *prVar1;
     int iVar2;

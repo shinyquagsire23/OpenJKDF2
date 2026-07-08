@@ -12,16 +12,16 @@
 #define sithModel_AllocWorldModels_ADDR (0x004E9A00)
 #define sithModel_GetModelByIndex_ADDR (0x004E9A60)
 
-typedef struct sithWorld sithWorld;
+typedef struct SithWorld SithWorld;
 typedef struct rdModel3 rdModel3;
 
 int sithModel_Startup();
 void sithModel_Shutdown();
-int sithModel_ReadStaticModelsListText(sithWorld *world, int a2);
-void sithModel_FreeWorldModels(sithWorld *world);
+int sithModel_ReadStaticModelsListText(SithWorld *world, int a2);
+void sithModel_FreeWorldModels(SithWorld *world);
 rdModel3* sithModel_Load(const char *model_3do_fname, int unk);
 uint32_t sithModel_GetModelMemUsage(rdModel3 *model);
-int sithModel_AllocWorldModels(sithWorld *world, int num);
+int sithModel_AllocWorldModels(SithWorld *world, int num);
 rdModel3* sithModel_GetModelByIndex(int idx);
 
 //static rdModel3* (*sithModel_LoadEntry_)(const char *model_3do_fname, int unk) = (void*)sithModel_Load_ADDR;

@@ -99,7 +99,7 @@ int sithCommand_DebugMode(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     int *v2; // esi
     int v3; // edi
-    sithThing *v4; // eax
+    SithThing *v4; // eax
     wchar_t *v5; // eax
     wchar_t *v6; // eax
     int result; // eax
@@ -365,7 +365,7 @@ int sithCommand_CogList(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 
 int sithCommand_Fly(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
-    sithThing *v0; // ecx
+    SithThing *v0; // ecx
     wchar_t *v3; // eax
 
     if ( sithWorld_g_pCurrentWorld && (v0 = sithWorld_g_pCurrentWorld->playerThing) != 0 )
@@ -408,7 +408,7 @@ int sithCommand_Memory(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 
     // TODO: verify the exact indices or just rewrite this
 
-    sithWorld* pWorld = sithWorld_g_pCurrentWorld;
+    SithWorld* pWorld = sithWorld_g_pCurrentWorld;
     if (pArgStr) {
         pWorld = sithWorld_g_pStaticWorld;
     }
@@ -489,7 +489,7 @@ int sithCommand_MemoryDump(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 
 int sithCommand_Coords(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
-    sithThing *player; // esi
+    SithThing *player; // esi
     signed int result; // eax
     rdVector3 a2; // [esp+38h] [ebp-Ch] BYREF
 
@@ -526,10 +526,10 @@ int sithCommand_Coords(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 
 int sithCommand_Warp(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
-    sithThing *v3; // ebp
+    SithThing *v3; // ebp
     int result; // eax
     int v5; // eax
-    sithSector *v6; // edi
+    SithSector *v6; // edi
     unsigned int i; // esi
     flex32_t fx, fy, fz, f2x, f2y, f2z;
     rdVector3 a1; // [esp+10h] [ebp-48h] BYREF
@@ -587,7 +587,7 @@ int sithCommand_Warp(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 
 int sithCommand_Activate(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
-    sithThing *v2; // esi
+    SithThing *v2; // esi
     int tmp;
 
     // Added: fixed a nullptr dereference
@@ -638,7 +638,7 @@ int sithCommand_Jump(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 int sithCommand_Players(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     uint32_t v2; // edi
-    sithPlayerInfo* v3; // esi
+    SithPlayer* v3; // esi
     int v4; // eax
     int v5; // ecx
     char v7[32]; // [esp+8h] [ebp-20h] BYREF
@@ -691,7 +691,7 @@ int sithCommand_PingPlayer(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 int sithCommand_Kick(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     uint32_t v2; // edi
-    sithPlayerInfo *v3; // esi
+    SithPlayer *v3; // esi
     wchar_t a1[32]; // [esp+Ch] [ebp-40h] BYREF
 
     v2 = 0;
@@ -725,7 +725,7 @@ int sithCommand_CompareMatInfos(const void *a, const void *b)
 
 int sithCommand_MatList(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
-    sithWorld *pWorld = sithWorld_g_pCurrentWorld;
+    SithWorld *pWorld = sithWorld_g_pCurrentWorld;
     if ( !pWorld )
     {
         sithConsole_PrintString("No world.");
@@ -812,13 +812,13 @@ int sithCommand_CmdThingNpc(stdDebugConsoleCmd *pCmd, const char *pArgStr)
             return 1;
         }
         
-        sithThing* pTemplate = sithTemplate_GetTemplate(pArgIter);
+        SithThing* pTemplate = sithTemplate_GetTemplate(pArgIter);
         if (!pTemplate) {
             sithConsole_PrintString("No template by that name.");
         }
         else if (pTemplate && sithWorld_g_pCurrentWorld && sithPlayer_g_pLocalPlayerThing) {
-            //sithThing* pSpawned = sithThing_CreateThing(pTemplate, sithPlayer_g_pLocalPlayerThing);
-            sithThing* pSpawned = sithPlayerActions_SpawnThingAtLookAt(sithPlayer_g_pLocalPlayerThing, pTemplate);
+            //SithThing* pSpawned = sithThing_CreateThing(pTemplate, sithPlayer_g_pLocalPlayerThing);
+            SithThing* pSpawned = sithPlayerActions_SpawnThingAtLookAt(sithPlayer_g_pLocalPlayerThing, pTemplate);
         }
         else {
             sithConsole_PrintString("No world.");

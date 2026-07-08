@@ -21,17 +21,17 @@
 #include "jk.h"
 
 // Added: Targeting for multiple players for co-op
-sithThing* sithAICmd_NearestPlayer(sithActor *actor)
+SithThing* sithAICmd_NearestPlayer(SithAIControlBlock *actor)
 {
     if (!sithNet_isMulti)
         return sithPlayer_g_pLocalPlayerThing;
 
-    sithThing* closest = sithPlayer_g_pLocalPlayerThing;
+    SithThing* closest = sithPlayer_g_pLocalPlayerThing;
     flex_t closestDist = FLEX(999999.0);
     for (int i = 0; i < jkPlayer_maxPlayers; i++)
     {
-        sithPlayerInfo* playerInfo = &jkPlayer_playerInfos[i];
-        sithThing* playerThing = playerInfo->playerThing;
+        SithPlayer* playerInfo = &jkPlayer_playerInfos[i];
+        SithThing* playerThing = playerInfo->playerThing;
         if (!playerThing) continue;
 
         if ((playerThing->thingflags & (SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) || playerThing->type != SITH_THING_PLAYER)
@@ -161,11 +161,11 @@ p1 - Max Dist to allow
 p2 - Max Melee dist (rifle/punch combo)
 p3 - Set to 1 to disable LOS checking (enemy doesn't need to see)
 */
-int sithAICmd_Follow(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, intptr_t otherFlags)
+int sithAICmd_Follow(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAIInstinctState *instinct, int flags, intptr_t otherFlags)
 {
-    sithThing *v7; // ebp
-    sithAIClassEntry *v8; // ebx
-    sithActorInstinct *v9; // edi
+    SithThing *v7; // ebp
+    SithAIInstinct *v8; // ebx
+    SithAIInstinctState *v9; // edi
     int v10; // eax
     flex_d_t v16; // st7
     rdVector3 a4a; // [esp+10h] [ebp-3Ch] BYREF
@@ -314,11 +314,11 @@ p2 - Max Dist to attempt Strafe
 p3 - Update interval (typically 1000msec)
 p4 - 0 single dir strafe, 1 random strafe
 */
-int sithAICmd_CircleStrafe(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, intptr_t otherFlags)
+int sithAICmd_CircleStrafe(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAIInstinctState *instinct, int flags, intptr_t otherFlags)
 {
     int v8; // edi
     flex_d_t v13; // st7
-    sithAIClass *v15; // edx
+    SithAIClass *v15; // edx
     rdVector3 movePos; // [esp+10h] [ebp-30h] BYREF
     rdVector3 a2a; // [esp+1Ch] [ebp-24h] BYREF
     rdVector3 a4; // [esp+28h] [ebp-18h] BYREF
@@ -370,7 +370,7 @@ int sithAICmd_CircleStrafe(sithActor *actor, sithAIClassEntry *aiclass, sithActo
 }
 
 //p0 - How long to stand between crouches
-int sithAICmd_Crouch(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, intptr_t otherFlags)
+int sithAICmd_Crouch(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAIInstinctState *instinct, int flags, intptr_t otherFlags)
 {
     instinct->nextUpdate = sithTime_g_msecGameTime + aiclass->argsAsInt[0];
     if (!(actor->flags & SITHAI_MODE_MOVING) 
@@ -395,12 +395,12 @@ p3 - MinDot Max shoot angle
 p4 - MinDist Don't shoot closer than this
 p5 - ShotError % 0 to 1
 */
-int sithAICmd_BlindFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, intptr_t otherFlags)
+int sithAICmd_BlindFire(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAIInstinctState *instinct, int flags, intptr_t otherFlags)
 {
-    sithThing *weapon; // esi
+    SithThing *weapon; // esi
     unsigned int bWhichProjectile; // ebp
-    sithThing *projectile; // ebx
-    sithThing *v11; // eax
+    SithThing *projectile; // ebx
+    SithThing *v11; // eax
     int v13; // eax
     rdVector3 fireOffs; // [esp+2Ch] [ebp-Ch] BYREF
     flex_t fOut;
@@ -455,11 +455,11 @@ p3 - Max Dist (don't fire if further)
 p4 - % Error in aim
 p5 - % use secondary (0 always primary, 1 always second)
 */
-int sithAICmd_LobFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, intptr_t otherFlags)
+int sithAICmd_LobFire(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAIInstinctState *instinct, int flags, intptr_t otherFlags)
 {
     int v5; // ebx
-    sithThing *v6; // eax
-    sithThing *v7; // ebp
+    SithThing *v6; // eax
+    SithThing *v7; // ebp
     int v11; // eax
 
     v5 = 0;
@@ -531,11 +531,11 @@ p7 - Use Secondary % (1.0 always)
 p8 - Burst Count (#-1, 0 never)
 p9 - Burst Interval (time between shots, msec)
 */
-int sithAICmd_PrimaryFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, intptr_t otherFlags)
+int sithAICmd_PrimaryFire(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAIInstinctState *instinct, int flags, intptr_t otherFlags)
 {
     int v5; // ebp
     int v6; // ebx
-    sithThing *v7; // eax
+    SithThing *v7; // eax
     rdVector3 v18; // [esp+28h] [ebp-Ch] BYREF
 
     v5 = 0;
@@ -638,20 +638,20 @@ p6 - Fire Rate in Berzerk (msec)
 p7 - Time from Berzerk till death (msec)
 p8 - %lead chance (0 never, 1 always)
 */
-int sithAICmd_TurretFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, intptr_t otherFlags)
+int sithAICmd_TurretFire(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAIInstinctState *instinct, int flags, intptr_t otherFlags)
 {
-    sithThing *v7; // eax
-    sithThing *v8; // edi
+    SithThing *v7; // eax
+    SithThing *v8; // edi
     int result; // eax
-    sithActorInstinct *v13; // edi
-    sithThing *v15; // eax
-    sithThing *v16; // ecx
+    SithAIInstinctState *v13; // edi
+    SithThing *v15; // eax
+    SithThing *v16; // ecx
     rdMatrix34 *v20; // esi
     flex_d_t v23; // st7
     flex_d_t v24; // st7
     flex_d_t v25; // st7
     flex_d_t v28; // st7
-    sithThing *v29; // eax
+    SithThing *v29; // eax
     flex_t v31; // [esp+10h] [ebp-60h]
     flex_t v32; // [esp+14h] [ebp-5Ch]
     rdVector3 a3; // [esp+1Ch] [ebp-54h] BYREF
@@ -813,10 +813,10 @@ LABEL_50:
 p0 - Investigate % (0 never, 1 always)
 p1 - Distance to move from danger?
 */
-int sithAICmd_Listen(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, sithThing *extra)
+int sithAICmd_Listen(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAIInstinctState *instinct, int flags, SithThing *extra)
 {
-    sithActor *actor_; // esi
-    sithThing *v6; // ebx
+    SithAIControlBlock *actor_; // esi
+    SithThing *v6; // ebx
     sithSectorAlloc *v8; // ecx
     int result; // eax
     rdVector3 *v10; // ebp
@@ -824,9 +824,9 @@ int sithAICmd_Listen(sithActor *actor, sithAIClassEntry *aiclass, sithActorInsti
     int v12; // edi
     int v13; // ecx
     flex_d_t v14; // st7
-    sithThing *v15; // ebp
-    sithActorInstinct *instinct_; // edi
-    sithThing *v17; // ebx
+    SithThing *v15; // ebp
+    SithAIInstinctState *instinct_; // edi
+    SithThing *v17; // ebx
     sithSectorAlloc *v25; // [esp+10h] [ebp-28h]
     rdVector3 movePos; // [esp+14h] [ebp-24h] BYREF
     rdVector3 lookPos; // [esp+20h] [ebp-18h] BYREF
@@ -909,7 +909,7 @@ LABEL_26:
         {
             // TODO ??????
             //v14 = *(flex_t *)&instinct;
-            //v15 = (sithThing *)instinct;
+            //v15 = (SithThing *)instinct;
             
             v14 = 0.0;
             v15 = NULL;
@@ -949,7 +949,7 @@ LABEL_15:
 p0 - interval look (msec)
 p1 - Time to sleep before check again (msec)
 */
-int sithAICmd_LookForTarget(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, void *extra)
+int sithAICmd_LookForTarget(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAIInstinctState *instinct, int flags, void *extra)
 {
     if (flags || (g_debugmodeFlags & DEBUGFLAG_NO_AILOOK_FOR_TARGET))
         return 0;
@@ -973,7 +973,7 @@ int sithAICmd_LookForTarget(sithActor *actor, sithAIClassEntry *aiclass, sithAct
         if (Main_bMotsCompat)
         {
             int uVar1 = 0;
-            sithThing* psVar3 = actor->pInterest;
+            SithThing* psVar3 = actor->pInterest;
             instinct->nextUpdate = aiclass->argsAsInt[0] + sithTime_g_msecGameTime;
             if (((!actor->pInterest 
                 && sithAI_pDistractor) 
@@ -1036,7 +1036,7 @@ int sithAICmd_LookForTarget(sithActor *actor, sithAIClassEntry *aiclass, sithAct
     return 0;
 }
 
-int sithAICmd_OpenDoors(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, void *extra)
+int sithAICmd_OpenDoors(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAIInstinctState *instinct, int flags, void *extra)
 {
     if ( (actor->flags & SITHAI_MODE_MOVING) != 0 )
     {
@@ -1051,11 +1051,11 @@ p0 - Time between jump checks
 p1 - Max jump height (Ai Thinks not Actual)
 p2 - Max jump dist (Ai Thinks not Actual)
 */
-int sithAICmd_Jump(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, void *extra)
+int sithAICmd_Jump(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAIInstinctState *instinct, int flags, void *extra)
 {
-    sithActor *_actor; // edi
-    sithThing *actorThing; // esi
-    sithSector *actorSector; // ebx
+    SithAIControlBlock *_actor; // edi
+    SithThing *actorThing; // esi
+    SithSector *actorSector; // ebx
     rdVector3 pos; // [esp+Ch] [ebp-18h] BYREF
     rdVector3 tmpPos; // [esp+18h] [ebp-Ch] BYREF
 
@@ -1091,7 +1091,7 @@ int sithAICmd_Jump(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinc
     }
     rdVector_Copy3(&tmpPos, &actorThing->position);
     rdVector_ScaleAdd3Acc(&tmpPos, &rdroid_zVector3, aiclass->argsAsFloat[1]);
-    sithSector* result = sithCollision_FindSectorInRadius(actorSector, &actorThing->position, &tmpPos, 0.0);
+    SithSector* result = sithCollision_FindSectorInRadius(actorSector, &actorThing->position, &tmpPos, 0.0);
     if ( result )
     {
         pos.x = _actor->toMovePos.x * 0.1 + tmpPos.x;
@@ -1117,15 +1117,15 @@ p0 - Distance considered to be out of danger
 p1 - Interval to check for new flee dir
 p2 - Duration of flee in seconds (10s is default)
 */
-int sithAICmd_Flee(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, void *extra)
+int sithAICmd_Flee(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAIInstinctState *instinct, int flags, void *extra)
 {
     int v7; // ecx
     flex_d_t v8; // st7
     int result; // eax
-    sithThing *v11; // edi
+    SithThing *v11; // edi
     int v12; // eax
-    sithThing *v15; // ecx
-    sithThing *v16; // eax
+    SithThing *v15; // ecx
+    SithThing *v16; // eax
     rdVector3 a5; // [esp+Ch] [ebp-24h] BYREF
     rdVector3 v19; // [esp+18h] [ebp-18h] BYREF
     rdVector3 movePos; // [esp+24h] [ebp-Ch] BYREF
@@ -1197,11 +1197,11 @@ int sithAICmd_Flee(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinc
 p0 - interval to check for new dir (typical 5000, msec)
 p1 - Distance considered as withdrew
 */
-int sithAICmd_Withdraw(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, void *extra)
+int sithAICmd_Withdraw(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAIInstinctState *instinct, int flags, void *extra)
 {
     int result; // eax
-    sithThing *v13; // eax
-    sithThing *v14; // eax
+    SithThing *v13; // eax
+    SithThing *v14; // eax
     rdVector3 a5; // [esp+4h] [ebp-24h] BYREF
     rdVector3 v17; // [esp+10h] [ebp-18h] BYREF
     rdVector3 movePos; // [esp+1Ch] [ebp-Ch] BYREF
@@ -1264,7 +1264,7 @@ int sithAICmd_Withdraw(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
 p0 - how far to get from projectile
 p1 - scale factor for how much to move
 */
-int sithAICmd_Dodge(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, sithThing *extra)
+int sithAICmd_Dodge(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAIInstinctState *instinct, int flags, SithThing *extra)
 {
     sithSectorAlloc *v16; // ecx
     rdVector3 a5; // [esp+10h] [ebp-24h] BYREF
@@ -1338,7 +1338,7 @@ int sithAICmd_Dodge(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstin
 p0 - interval for turn (msec)
 p1 - min dist to see for valid (ave 1 or 2)
 */
-int sithAICmd_RandomTurn(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, sithThing *extra)
+int sithAICmd_RandomTurn(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAIInstinctState *instinct, int flags, SithThing *extra)
 {
     int result; // eax
     rdVector3 out; // [esp+20h] [ebp-30h] BYREF
@@ -1368,7 +1368,7 @@ int sithAICmd_RandomTurn(sithActor *actor, sithAIClassEntry *aiclass, sithActorI
 p0 - How often pick new roam
 p1 - Radius to roam from home
 */
-int sithAICmd_Roam(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, void *extra)
+int sithAICmd_Roam(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAIInstinctState *instinct, int flags, void *extra)
 {
     flex_d_t randVal; // st6
     rdVector3 *v13; // [esp-8h] [ebp-30h]
@@ -1406,10 +1406,10 @@ int sithAICmd_Roam(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinc
 p0 - min to trigger (0 always)
 p1 - on sight (nonzero flee if see player)
 */
-int sithAICmd_SenseDanger(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, sithThing *extra)
+int sithAICmd_SenseDanger(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAIInstinctState *instinct, int flags, SithThing *extra)
 {
     sithSectorAlloc *v7; // ecx
-    sithThing *v8; // ebx
+    SithThing *v8; // ebx
     int v9; // eax
     int result; // eax
     rdVector3 a5; // [esp+Ch] [ebp-Ch] BYREF
@@ -1423,7 +1423,7 @@ int sithAICmd_SenseDanger(sithActor *actor, sithAIClassEntry *aiclass, sithActor
         if ( aiclass->argsAsFloat[1] != 0.0 )
         {
             if (Main_bMotsCompat) {
-                sithThing* psVar4 = actor->pInterest;
+                SithThing* psVar4 = actor->pInterest;
                 if (!actor->pInterest) {
                     psVar4 = sithAICmd_NearestPlayer(actor);
                 }
@@ -1486,7 +1486,7 @@ int sithAICmd_SenseDanger(sithActor *actor, sithAIClassEntry *aiclass, sithActor
 p0 - Time after Attack till flee (msec)
 p1 - Time till reengaging (msec)
 */
-int sithAICmd_HitAndRun(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, void *extra)
+int sithAICmd_HitAndRun(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAIInstinctState *instinct, int flags, void *extra)
 {
     int result; // eax
     flex_d_t v8; // st7
@@ -1529,7 +1529,7 @@ p1 - %moral fail (will flee)
 p2 - time moral checks (msec)
 p3 - maximum number of times we will retreat before not retreating anymore
 */
-int sithAICmd_Retreat(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, sithThing *extra)
+int sithAICmd_Retreat(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAIInstinctState *instinct, int flags, SithThing *extra)
 {
     int result; // eax
 
@@ -1565,7 +1565,7 @@ int sithAICmd_Retreat(sithActor *actor, sithAIClassEntry *aiclass, sithActorInst
     return result;
 }
 
-int sithAICmd_ReturnHome(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, intptr_t extra)
+int sithAICmd_ReturnHome(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAIInstinctState *instinct, int flags, intptr_t extra)
 {
     rdVector3 a2;
 
@@ -1590,7 +1590,7 @@ int sithAICmd_ReturnHome(sithActor *actor, sithAIClassEntry *aiclass, sithActorI
 p0 - interval between voice (msec)
 p1 - %chance of say (0 never, 1 always)
 */
-int sithAICmd_Talk(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, void *extra)
+int sithAICmd_Talk(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAIInstinctState *instinct, int flags, void *extra)
 {
     flex_d_t healthPercent; // st7
 
@@ -1639,10 +1639,10 @@ int sithAICmd_Talk(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinc
 p0 - interval look (msec)
 p1 - Time to sleep before check again (msec)
 */
-int sithAICmd_LookForOpposingTarget(sithActor *pActor, sithAIClassEntry *pAiclass, sithActorInstinct *pInstinct, int flags, intptr_t otherFlags)
+int sithAICmd_LookForOpposingTarget(SithAIControlBlock *pActor, SithAIInstinct *pAiclass, SithAIInstinctState *pInstinct, int flags, intptr_t otherFlags)
 {
-    sithAIClass *psVar2;
-    sithThing *psVar3;
+    SithAIClass *psVar2;
+    SithThing *psVar3;
 
     if (flags)
         return 0;
@@ -1661,12 +1661,12 @@ int sithAICmd_LookForOpposingTarget(sithActor *pActor, sithAIClassEntry *pAiclas
         }
 
         psVar3 = pActor->pInterest;
-        if (psVar3 == (sithThing *)0x0)
+        if (psVar3 == (SithThing *)0x0)
         {
             psVar3 = sithAI_FUN_00539a60(pActor);
         }
         pActor->pDistractor = psVar3;
-        if ((psVar3 != (sithThing *)0x0) && ((psVar3->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0))
+        if ((psVar3 != (SithThing *)0x0) && ((psVar3->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0))
         {
             sithAI_sub_4EAD60(pActor);
             if (pActor->field_1F4 == 0) {
@@ -1705,9 +1705,9 @@ p3 - Min Dist
 p4 - Min time from awakening to first leap
 p5 - Leap speed
 */
-int sithAICmd_Leap(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, intptr_t otherFlags)
+int sithAICmd_Leap(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAIInstinctState *instinct, int flags, intptr_t otherFlags)
 {
-    sithThing *psVar1;
+    SithThing *psVar1;
     int iVar2;
     int64_t lVar3;
     rdVector3 *lookPos;
@@ -1728,12 +1728,12 @@ int sithAICmd_Leap(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinc
             instinct->nextUpdate = aiclass->argsAsInt[4] + sithTime_g_msecGameTime;
             return 0;
         }
-        if ((sithThing *)otherFlags == psVar1) {
+        if ((SithThing *)otherFlags == psVar1) {
             sithAI_FireWeapon(actor, 0.0, 0.0, 0.0, 0.0, 1, 8);
         }
     }
 
-    if (psVar1 == (sithThing *)0x0) {
+    if (psVar1 == (SithThing *)0x0) {
         return 0;
     }
 
@@ -1752,7 +1752,7 @@ int sithAICmd_Leap(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinc
     }
     else
     {
-        if (((actor->field_1F4 != 0) || (psVar1 = actor->pDistractor, psVar1 == (sithThing *)0x0)) ||
+        if (((actor->field_1F4 != 0) || (psVar1 = actor->pDistractor, psVar1 == (SithThing *)0x0)) ||
         (psVar1->moveType != 1)) goto LAB_0055c4da;
         lookPos = &local_c;
         local_c.x = psVar1->physicsParams.vel.x * 0.5 + psVar1->position.x;
@@ -1779,9 +1779,9 @@ p4 - Min time from awakening to first charge
 p5 - Charge speed
 */
 // TODO verify params
-int sithAICmd_Charge(sithActor *pActor, sithAIClassEntry *pAiclass, sithActorInstinct *pInstinct, int flags, intptr_t otherFlags)
+int sithAICmd_Charge(SithAIControlBlock *pActor, SithAIInstinct *pAiclass, SithAIInstinctState *pInstinct, int flags, intptr_t otherFlags)
 {
-    sithThing *psVar1;
+    SithThing *psVar1;
     int iVar2;
     int64_t lVar3;
     rdVector3 *lookPos;
@@ -1804,7 +1804,7 @@ int sithAICmd_Charge(sithActor *pActor, sithAIClassEntry *pAiclass, sithActorIns
         pInstinct->nextUpdate = pAiclass->argsAsInt[4] + sithTime_g_msecGameTime;
         return 0;
     }
-    if (pActor->pDistractor == (sithThing *)0x0) {
+    if (pActor->pDistractor == (SithThing *)0x0) {
         return 0;
     }
     iVar2 = sithAI_Charge(pActor, pAiclass->argsAsFloat[3], pAiclass->argsAsFloat[2], pAiclass->argsAsFloat[1], 1, pAiclass->argsAsFloat[5], 0);
@@ -1819,7 +1819,7 @@ int sithAICmd_Charge(sithActor *pActor, sithAIClassEntry *pAiclass, sithActorIns
         lookPos = &pActor->field_1D4;
     }
     else {
-        if (((pActor->field_1F4 != 0) || (psVar1 = pActor->pDistractor, psVar1 == (sithThing *)0x0)) ||
+        if (((pActor->field_1F4 != 0) || (psVar1 = pActor->pDistractor, psVar1 == (SithThing *)0x0)) ||
         (psVar1->moveType != 1)) goto LAB_0055c33d;
         lookPos = &local_c;
         local_c.x = psVar1->physicsParams.vel.x * 0.5 + psVar1->position.x;

@@ -8,7 +8,7 @@ int sithEvent_Startup()
     if ( sithEvent_bInit )
         return 0;
 
-    _memset(sithEvent_aTasks, 0, sizeof(sithEventTask) * SITH_NUM_EVENTS);
+    _memset(sithEvent_aTasks, 0, sizeof(SithEventTask) * SITH_NUM_EVENTS);
 
     sithEvent_Reset();
     sithEvent_bInit = 1;
@@ -39,7 +39,7 @@ void sithEvent_Close()
 
 void sithEvent_Reset()
 {
-    _memset(sithEvent_aEvents, 0, sizeof(sithEvent) * 256);
+    _memset(sithEvent_aEvents, 0, sizeof(SithEvent) * 256);
     int id = 256;
     for (int i = 0; i < 256; i++)
     {
@@ -50,11 +50,11 @@ void sithEvent_Reset()
     sithEvent_g_pFirstQueuedEvent = 0;
 }
 
-int sithEvent_CreateEvent(int taskId, sithEventInfo *timerInfo, uint32_t when)
+int sithEvent_CreateEvent(int taskId, SithEventParams *timerInfo, uint32_t when)
 {
-    sithEvent *timer;
-    sithEvent *v5;
-    sithEvent *i;
+    SithEvent *timer;
+    SithEvent *v5;
+    SithEvent *i;
 
     if ( sithEvent_numFreeEventBuffers )
         timer = &sithEvent_aEvents[sithEvent_arrLut[--sithEvent_numFreeEventBuffers]];
@@ -90,13 +90,13 @@ int sithEvent_CreateEvent(int taskId, sithEventInfo *timerInfo, uint32_t when)
     return 1;
 }
 
-void sithEvent_FreeEvent(sithEvent *pEvent)
+void sithEvent_FreeEvent(SithEvent *pEvent)
 {
-    _memset(pEvent, 0, sizeof(sithEvent));
+    _memset(pEvent, 0, sizeof(SithEvent));
     
     intptr_t timerOffs = ((intptr_t)pEvent - (intptr_t)sithEvent_aEvents);
     
-    sithEvent_arrLut[sithEvent_numFreeEventBuffers] = timerOffs / sizeof(sithEvent);
+    sithEvent_arrLut[sithEvent_numFreeEventBuffers] = timerOffs / sizeof(SithEvent);
 
     sithEvent_numFreeEventBuffers++;
 }
@@ -113,11 +113,11 @@ int sithEvent_RegisterTask(int idx, sithEventHandler_t handler, int rate, int st
 
 void sithEvent_Process()
 {
-    sithEvent *i;
+    SithEvent *i;
 
     for (int idx = 1; idx < 5; idx++)
     {
-        sithEventTask* timerFunc = &sithEvent_aTasks[idx];
+        SithEventTask* timerFunc = &sithEvent_aTasks[idx];
         if ( timerFunc->startMode == SITHEVENT_TASKPERIODIC )
         {
             uint32_t delta = (sithTime_g_msecGameTime - timerFunc->creationMs);

@@ -128,11 +128,11 @@ void sithWorld_UpdateLoadProgress(flex_t percent)
         sithWorld_LoadPercentCallback(percent);
 }
 
-int sithWorld_Load(sithWorld *pWorld, char *map_jkl_fname)
+int sithWorld_Load(SithWorld *pWorld, char *map_jkl_fname)
 {
     int result; // eax
     int v3; // esi
-    sithWorldParser *parser; // edi
+    SithWorldTextSectionParseHandler *parser; // edi
     int startMsecs; // edi
     __int64 v6; // [esp+1Ch] [ebp-120h]
     char section[32]; // [esp+24h] [ebp-118h] BYREF
@@ -243,33 +243,33 @@ cleanup:
     return 0;
 }
 
-sithWorld* sithWorld_NewEntry()
+SithWorld* sithWorld_NewEntry()
 {
-    sithWorld *result; // eax
+    SithWorld *result; // eax
 
-    result = (sithWorld *)SITH_ALLOC(sizeof(sithWorld));
+    result = (SithWorld *)SITH_ALLOC(sizeof(SithWorld));
     if ( result )
-        _memset(result, 0, sizeof(sithWorld));
+        _memset(result, 0, sizeof(SithWorld));
 
     return result;
 }
 
-int sithWorld_LoadPostProcess(sithWorld *pWorld)
+int sithWorld_LoadPostProcess(SithWorld *pWorld)
 {
-    sithAdjoin *v1; // ebp
-    sithSector *v2; // ebx
+    SithSurfaceAdjoin *v1; // ebp
+    SithSector *v2; // ebx
     int v3; // eax
     rdVector3 *v4; // eax
     flex_t *v5; // edi
     int32_t *v6; // edi
     int32_t *v7; // edi
-    sithSector **v8; // edx
+    SithSector **v8; // edx
     int v9; // edi
-    sithAdjoin *adjoinIter; // eax
-    sithAdjoin *adjoinIterMirror; // ecx
-    sithSector *v12; // ecx
-    sithThing *v15; // edx
-    sithThing *v16; // eax
+    SithSurfaceAdjoin *adjoinIter; // eax
+    SithSurfaceAdjoin *adjoinIterMirror; // ecx
+    SithSector *v12; // ecx
+    SithThing *v15; // edx
+    SithThing *v16; // eax
 
     v1 = 0;
     v2 = 0;
@@ -349,7 +349,7 @@ int sithWorld_LoadPostProcess(sithWorld *pWorld)
 }
 
 // MOTS altered
-void sithWorld_FreeEntry(sithWorld *pWorld)
+void sithWorld_FreeEntry(SithWorld *pWorld)
 {
     unsigned int v1; // edi
     int v2; // ebx
@@ -458,7 +458,7 @@ void sithWorld_FreeEntry(sithWorld *pWorld)
     SITH_FREE(pWorld);
 }
 
-int sithWorld_ReadHeaderText(sithWorld *pWorld, int junk)
+int sithWorld_ReadHeaderText(SithWorld *pWorld, int junk)
 {
     flex32_t tmp;
     flex32_t tmp2;
@@ -546,7 +546,7 @@ int sithWorld_ReadHeaderText(sithWorld *pWorld, int junk)
     return 1;
 }
 
-int sithWorld_ReadCopyrightText(sithWorld *lvl, int junk)
+int sithWorld_ReadCopyrightText(SithWorld *lvl, int junk)
 {
     char *iter;
 
@@ -597,7 +597,7 @@ int sithWorld_GetTextSectionParserIndex(char *a1)
         return -1;
 
     int i = 0;
-    sithWorldParser *iter = sithWorld_aSectionParsers;
+    SithWorldTextSectionParseHandler *iter = sithWorld_aSectionParsers;
     while ( __strcmpi(iter->section_name, a1) )
     {
         ++i;
@@ -608,7 +608,7 @@ int sithWorld_GetTextSectionParserIndex(char *a1)
     return i;
 }
 
-int sithWorld_ValidateWorld(sithWorld *pWorld)
+int sithWorld_ValidateWorld(SithWorld *pWorld)
 {
     if ( !pWorld->things && pWorld->numThingsLoaded )
     {
@@ -637,7 +637,7 @@ int sithWorld_ValidateWorld(sithWorld *pWorld)
 }
 
 // MOTS altered
-uint32_t sithWorld_CalcWorldChecksum(sithWorld *pWorld, uint32_t seed)
+uint32_t sithWorld_CalcWorldChecksum(SithWorld *pWorld, uint32_t seed)
 {
     // Starting hash seed
     uint32_t hash = seed;
@@ -684,7 +684,7 @@ int sithWorld_InitPlayers()
     return 1;
 }
 
-int sithWorld_ReadGeoresourceText(sithWorld *pWorld, int a2)
+int sithWorld_ReadGeoresourceText(SithWorld *pWorld, int a2)
 {
     uint32_t numVertices;
     uint32_t textureVertices;
@@ -817,18 +817,18 @@ int sithWorld_ReadGeoresourceText(sithWorld *pWorld, int a2)
     return sithSurface_ReadSurfacesListText(pWorld) != 0;
 }
 
-void sithWorld_ResetRenderState(sithWorld *pWorld)
+void sithWorld_ResetRenderState(SithWorld *pWorld)
 {
     _memset(pWorld->alloc_unk98, 0, sizeof(int) * pWorld->numVertices);
     _memset(pWorld->alloc_unk9c, 0, sizeof(int) * pWorld->numVertices);
 
     for (int i = 0; i < pWorld->numSectors; i++)
     {
-        sithSector* sector = &pWorld->sectors[i];
+        SithSector* sector = &pWorld->sectors[i];
         
         for (int j = 0; j < pWorld->sectors[i].numSurfaces; j++)
         {
-            sithSurface* surface = &pWorld->sectors[i].surfaces[j];
+            SithSurface* surface = &pWorld->sectors[i].surfaces[j];
             surface->field_4 = 0;
         }
         sector->renderTick = 0;
@@ -845,7 +845,7 @@ void sithWorld_Free()
     }
 }
 
-void sithWorld_ResetGeoresource(sithWorld *pWorld)
+void sithWorld_ResetGeoresource(SithWorld *pWorld)
 {
     for (int i = 0; i < pWorld->numMaterialsLoaded; i++)
     {
@@ -861,7 +861,7 @@ void sithWorld_ResetGeoresource(sithWorld *pWorld)
 }
 
 // MOTS altered
-void sithWorld_GetMemoryUsage(sithWorld *pWorld, int *outAllocated, int *outQuantity)
+void sithWorld_GetMemoryUsage(SithWorld *pWorld, int *outAllocated, int *outQuantity)
 {
     _memset(outAllocated, 0, sizeof(int) * 0x11);
     _memset(outQuantity, 0, sizeof(int) * 0x11);
@@ -877,14 +877,14 @@ void sithWorld_GetMemoryUsage(sithWorld *pWorld, int *outAllocated, int *outQuan
     outQuantity[3] = pWorld->numSurfaces;
     for (int i = 0; i < pWorld->numSurfaces; i++)
     {
-        outAllocated[3] += sizeof(rdVector3) * pWorld->surfaces[i].surfaceInfo.face.numVertices + sizeof(sithSurface);
+        outAllocated[3] += sizeof(rdVector3) * pWorld->surfaces[i].surfaceInfo.face.numVertices + sizeof(SithSurface);
     }
     outQuantity[4] = pWorld->numAdjoinsLoaded;
-    outAllocated[4] = sizeof(sithAdjoin) * pWorld->numAdjoinsLoaded;
+    outAllocated[4] = sizeof(SithSurfaceAdjoin) * pWorld->numAdjoinsLoaded;
     outQuantity[5] = pWorld->numSectors;
     for (int i = 0; i < pWorld->numSectors; i++)
     {
-        outAllocated[5] += sizeof(flex_t) * pWorld->sectors[i].numVertices + sizeof(sithSector); // TODO bug?
+        outAllocated[5] += sizeof(flex_t) * pWorld->sectors[i].numVertices + sizeof(SithSector); // TODO bug?
     }
     outQuantity[6] = pWorld->numSoundsLoaded;
     for (int i = 0; i < pWorld->numSoundsLoaded; i++)
@@ -916,7 +916,7 @@ void sithWorld_GetMemoryUsage(sithWorld *pWorld, int *outAllocated, int *outQuan
         }
     }
     outQuantity[12] = pWorld->numAnimClassesLoaded;
-    outAllocated[12] = sizeof(sithAnimclass) * pWorld->numAnimClassesLoaded;
+    outAllocated[12] = sizeof(SithPuppetClass) * pWorld->numAnimClassesLoaded;
     outQuantity[13] = pWorld->numSpritesLoaded;
     outAllocated[13] = sizeof(rdSprite) * pWorld->numSpritesLoaded;
     for (int i = 0; i < pWorld->numSpritesLoaded; i++)
@@ -925,8 +925,8 @@ void sithWorld_GetMemoryUsage(sithWorld *pWorld, int *outAllocated, int *outQuan
     }
     outQuantity[14] = pWorld->numTemplatesLoaded;
     outQuantity[15] = pWorld->numThingsLoaded;
-    outAllocated[14] = sizeof(sithThing) * pWorld->numTemplatesLoaded;
-    outAllocated[15] = sizeof(sithThing) * pWorld->numThingsLoaded;
+    outAllocated[14] = sizeof(SithThing) * pWorld->numTemplatesLoaded;
+    outAllocated[15] = sizeof(SithThing) * pWorld->numThingsLoaded;
 }
 
 

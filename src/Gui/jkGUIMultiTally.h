@@ -12,7 +12,7 @@
 #define jkGuiMultiTally_sub_4188B0_ADDR (0x004188B0)
 
 int jkGuiMultiTally_Show(int a1);
-int jkGuiMultiTally_SortPlayerScore(const sithPlayerInfo *pA, const sithPlayerInfo *pB);
+int jkGuiMultiTally_SortPlayerScore(const SithPlayer *pA, const SithPlayer *pB);
 void jkGuiMultiTally_Startup();
 void jkGuiMultiTally_Shutdown();
 int jkGuiMultiTally_ShowTeamScores(int a1);

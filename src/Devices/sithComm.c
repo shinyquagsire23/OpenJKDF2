@@ -90,16 +90,16 @@ void sithMessage_Shutdown()
 // Added: shadow the generated 66KB .bss retry buffer with a lazily-allocated
 // heap buffer (multiplayer-only; see engine_config.h). The generated array
 // becomes unreferenced and --gc-sections strips it.
-static sithCogMsg* sithComm_pMsgTmpBufHeap = NULL;
+static SithMessage* sithComm_pMsgTmpBufHeap = NULL;
 #define sithComm_MsgTmpBuf sithComm_pMsgTmpBufHeap
 static int sithComm_EnsureMsgTmpBuf(void)
 {
     if (!sithComm_pMsgTmpBufHeap)
     {
         // On DC an OOM here purges the material cache and retries internally.
-        sithComm_pMsgTmpBufHeap = (sithCogMsg*)SITH_ALLOC(32 * sizeof(sithCogMsg));
+        sithComm_pMsgTmpBufHeap = (SithMessage*)SITH_ALLOC(32 * sizeof(SithMessage));
         if (sithComm_pMsgTmpBufHeap)
-            _memset(sithComm_pMsgTmpBufHeap, 0, 32 * sizeof(sithCogMsg));
+            _memset(sithComm_pMsgTmpBufHeap, 0, 32 * sizeof(SithMessage));
     }
     return sithComm_pMsgTmpBufHeap != NULL;
 }
@@ -111,14 +111,14 @@ void sithMessage_RegisterFunction(int msgid, cogMsg_Handler func)
 }
 
 // MOTS altered
-int sithComm_SendMsgToPlayer(sithCogMsg *msg, int a2, int mpFlags, int a4)
+int sithComm_SendMsgToPlayer(SithMessage *msg, int a2, int mpFlags, int a4)
 {
     char multiplayerFlags; // bl
     unsigned int curMs; // esi
     __int16 v9; // ax
     int idx; // ecx
-    sithCogMsg *v14; // eax
-    sithCogMsg *v17; // edi
+    SithMessage *v14; // eax
+    SithMessage *v17; // edi
     int v19; // ecx
     int v20; // eax
     int idx_; // [esp+18h] [ebp+Ch]
@@ -192,7 +192,7 @@ int sithComm_SendMsgToPlayer(sithCogMsg *msg, int a2, int mpFlags, int a4)
                 }
                 if ( !sithComm_MsgTmpBuf[idx_].netMsg.field_14 || sithComm_MsgTmpBuf[idx_].netMsg.field_18 >= 6u )
                 {
-                    _memset(v17, 0, sizeof(sithCogMsg));
+                    _memset(v17, 0, sizeof(SithMessage));
                     --sithComm_idk2;
                 }
                 idx = idx_;
@@ -200,7 +200,7 @@ int sithComm_SendMsgToPlayer(sithCogMsg *msg, int a2, int mpFlags, int a4)
             }
             ++sithComm_idk2;
             v20 = msg->netMsg.field_14;
-            _memcpy(&sithComm_MsgTmpBuf[idx_], msg, sizeof(sithCogMsg));
+            _memcpy(&sithComm_MsgTmpBuf[idx_], msg, sizeof(SithMessage));
             if ( !v20 )
 LABEL_35:
                 msg->netMsg.msgId = 0;
@@ -219,7 +219,7 @@ LABEL_35:
 }
 
 // MOTS altered
-void sithMessage_FileWrite(sithCogMsg* ctx)
+void sithMessage_FileWrite(SithMessage* ctx)
 {
     // Added: multiple version handling
     if (sithComm_version == 0x7D6) {
@@ -316,7 +316,7 @@ void sithMessage_StopProcessMessages()
     sithMessage_bStopProcessMessages = 1;
 }
 
-int sithMessage_Process(sithCogMsg *a1)
+int sithMessage_Process(SithMessage *a1)
 {
     int result; // eax
 
@@ -361,7 +361,7 @@ void sithComm_SyncWithPlayers()
 
                 if ( !sithComm_MsgTmpBuf[i].netMsg.field_14 || sithComm_MsgTmpBuf[i].netMsg.field_18 >= 6 )
                 {
-                    _memset(&sithComm_MsgTmpBuf[i], 0, sizeof(sithCogMsg));
+                    _memset(&sithComm_MsgTmpBuf[i], 0, sizeof(SithMessage));
                     --sithComm_idk2;
                 }
             }
@@ -384,7 +384,7 @@ void sithComm_ClearMsgTmpBuf()
     sithComm_idk2 = 0;
 }
 
-int sithComm_cogMsg_Reset(sithCogMsg *msg)
+int sithComm_cogMsg_Reset(SithMessage *msg)
 {
     int v1; // edi
     char playerIdx; // al
@@ -411,7 +411,7 @@ int sithComm_cogMsg_Reset(sithCogMsg *msg)
         sithComm_MsgTmpBuf[foundIdx].netMsg.field_14 &= ~(1 << playerIdx);
         if (!sithComm_MsgTmpBuf[foundIdx].netMsg.field_14)
         {
-            _memset(&sithComm_MsgTmpBuf[foundIdx], 0, sizeof(sithCogMsg));
+            _memset(&sithComm_MsgTmpBuf[foundIdx], 0, sizeof(SithMessage));
             --sithComm_idk2;
         }
     }

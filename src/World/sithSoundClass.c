@@ -154,7 +154,7 @@ void sithSoundClass_Shutdown()
     }
 }
 
-int sithSoundClass_ReadSoundClassesListText(sithWorld *world, int a2)
+int sithSoundClass_ReadSoundClassesListText(SithWorld *world, int a2)
 {
     int num_soundclasses; // ebx
     signed int result; // eax
@@ -242,7 +242,7 @@ failed:
 
 sithSoundClass* sithSoundClass_Load(char *fpath)
 {
-    sithWorld *v1; // ebx
+    SithWorld *v1; // ebx
     sithSoundClass *result; // eax
     int v3; // eax
     sithSoundClass *v4; // esi
@@ -359,7 +359,7 @@ int sithSoundClass_LoadEntry(sithSoundClass *soundClass, char *fpath)
     return 1;
 }
 
-void sithSoundClass_PlayModeFirst(sithThing *thing, unsigned int soundclass_id)
+void sithSoundClass_PlayModeFirst(SithThing *thing, unsigned int soundclass_id)
 {
     sithSoundClass *soundclass; // eax
     sithSoundClassEntry *v3; // eax
@@ -383,7 +383,7 @@ void sithSoundClass_PlayModeFirst(sithThing *thing, unsigned int soundclass_id)
     }
 }
 
-sithPlayingSound* sithSoundClass_PlayMode(sithThing *thing, int sc_id, flex_t a3)
+sithPlayingSound* sithSoundClass_PlayMode(SithThing *thing, int sc_id, flex_t a3)
 {
     sithSoundClassEntry *v4; // esi
     unsigned int v5; // edi
@@ -431,7 +431,7 @@ sithPlayingSound* sithSoundClass_PlayMode(sithThing *thing, int sc_id, flex_t a3
     return NULL;
 }
 
-void sithSoundClass_PlayModeFirstEx(sithThing *thing, int sc_id, flex_t a3)
+void sithSoundClass_PlayModeFirstEx(SithThing *thing, int sc_id, flex_t a3)
 {
     sithSoundClassEntry *entry; // eax
 
@@ -454,7 +454,7 @@ void sithSoundClass_PlayModeFirstEx(sithThing *thing, int sc_id, flex_t a3)
     }
 }
 
-void sithSoundClass_StopMode(sithThing *thing, unsigned int sc_id)
+void sithSoundClass_StopMode(SithThing *thing, unsigned int sc_id)
 {
     sithSoundClassEntry *v3; // eax
 
@@ -466,7 +466,7 @@ void sithSoundClass_StopMode(sithThing *thing, unsigned int sc_id)
     }
 }
 
-void sithSoundClass_FreeWorldSoundClasses(sithWorld *world)
+void sithSoundClass_FreeWorldSoundClasses(SithWorld *world)
 {
     sithSoundClass *v2; // esi
     sithSoundClassEntry **v3; // edi
@@ -509,7 +509,7 @@ void sithSoundClass_FreeWorldSoundClasses(sithWorld *world)
     world->numSoundClassesLoaded = 0;
 }
 
-sithPlayingSound* sithSoundClass_PlayModeRandom(sithThing *thing, uint32_t a2)
+sithPlayingSound* sithSoundClass_PlayModeRandom(SithThing *thing, uint32_t a2)
 {
     sithSoundClassEntry *v3; // esi
     uint32_t v5; // rax
@@ -547,7 +547,7 @@ sithPlayingSound* sithSoundClass_PlayModeRandom(sithThing *thing, uint32_t a2)
     return NULL;
 }
 
-sithPlayingSound* sithSoundClass_PlayModeEntry(sithThing *thing, sithSoundClassEntry *entry, flex_t a3)
+sithPlayingSound* sithSoundClass_PlayModeEntry(SithThing *thing, sithSoundClassEntry *entry, flex_t a3)
 {
     sithSound* pSithSound = entry->sound;
     if ( !entry->sound )
@@ -582,7 +582,7 @@ sithPlayingSound* sithSoundClass_PlayModeEntry(sithThing *thing, sithSoundClassE
     }
 }
 
-void sithSoundClass_StopSound(sithThing *thing, sithSound *sound)
+void sithSoundClass_StopSound(SithThing *thing, sithSound *sound)
 {
     sithPlayingSound* v3; // esi
     sithPlayingSound *v5; // edi
@@ -603,7 +603,7 @@ void sithSoundClass_StopSound(sithThing *thing, sithSound *sound)
         thing->actorParams.field_1BC = 0;
 }
 
-int sithSoundClass_SetThingClass(sithThing *thing, sithSoundClass *soundclass)
+int sithSoundClass_SetThingClass(SithThing *thing, sithSoundClass *soundclass)
 {
     if ( thing->soundclass == soundclass )
         return 0;

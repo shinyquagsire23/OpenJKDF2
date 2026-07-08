@@ -11,7 +11,7 @@
 void sithCogFunctionAI_AISetMoveSpeed(sithCog *ctx)
 {
     cog_flex_t moveSpeed = stdMath_Clamp(sithCogExec_PopFlex(ctx), 0.0, 2.0);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing && pThing->controlType == SITH_CT_AI && pThing->actor)
     {
         pThing->actor->moveSpeed = moveSpeed;
@@ -20,14 +20,14 @@ void sithCogFunctionAI_AISetMoveSpeed(sithCog *ctx)
 
 void sithCogFunctionAI_AISetMovePos(sithCog *ctx)
 {
-    sithThing *v1; // eax
-    sithActor *v2; // eax
+    SithThing *v1; // eax
+    SithAIControlBlock *v2; // eax
     rdVector3 v3; // [esp+4h] [ebp-Ch] BYREF
 
     // TODO: Bug? If the vector is invalid, other args will never get popped.
     if (sithCogExec_PopVector(ctx, &v3))
     {
-        sithThing* pThing = sithCogExec_PopThing(ctx);
+        SithThing* pThing = sithCogExec_PopThing(ctx);
         
         // Added
         if (g_debugmodeFlags & DEBUGFLAG_NO_AIEVENTS) return;
@@ -42,8 +42,8 @@ void sithCogFunctionAI_AISetMovePos(sithCog *ctx)
 void sithCogFunctionAI_AIJump(sithCog *ctx)
 {
     signed int v2; // edi
-    sithThing *v3; // eax
-    sithActor *v4; // eax
+    SithThing *v3; // eax
+    SithAIControlBlock *v4; // eax
     rdVector3 v5; // [esp+8h] [ebp-Ch] BYREF
 
     cog_flex_t a1 = sithCogExec_PopFlex(ctx);
@@ -64,8 +64,8 @@ void sithCogFunctionAI_AIJump(sithCog *ctx)
 void sithCogFunctionAI_AISetMoveFrame(sithCog *ctx)
 {
     unsigned int v1; // esi
-    sithThing *v2; // eax
-    sithActor *v3; // eax
+    SithThing *v2; // eax
+    SithAIControlBlock *v3; // eax
     rdVector3 *v4; // ecx
 
     v1 = sithCogExec_PopInt(ctx);
@@ -94,9 +94,9 @@ void sithCogFunctionAI_AISetMoveFrame(sithCog *ctx)
 
 void sithCogFunctionAI_AISetMoveThing(sithCog *ctx)
 {
-    sithThing *v1; // edi
-    sithThing *v2; // eax
-    sithActor *v3; // eax
+    SithThing *v1; // edi
+    SithThing *v2; // eax
+    SithAIControlBlock *v3; // eax
 
     v1 = sithCogExec_PopThing(ctx);
     v2 = sithCogExec_PopThing(ctx);
@@ -117,8 +117,8 @@ void sithCogFunctionAI_AISetMoveThing(sithCog *ctx)
 
 void sithCogFunctionAI_AISetLookPos(sithCog *ctx)
 {
-    sithThing *v1; // eax
-    sithActor *v2; // eax
+    SithThing *v1; // eax
+    SithAIControlBlock *v2; // eax
     rdVector3 v3; // [esp+4h] [ebp-Ch] BYREF
 
     // TODO: Bug? If the vector is invalid, other args will never get popped.
@@ -144,8 +144,8 @@ void sithCogFunctionAI_AISetLookPos(sithCog *ctx)
 void sithCogFunctionAI_AISetLookFrame(sithCog *ctx)
 {
     unsigned int v1; // esi
-    sithThing *v2; // eax
-    sithActor *v3; // eax
+    SithThing *v2; // eax
+    SithAIControlBlock *v3; // eax
     rdVector3 *v4; // ecx
 
     v1 = sithCogExec_PopInt(ctx);
@@ -174,8 +174,8 @@ void sithCogFunctionAI_AISetLookFrame(sithCog *ctx)
 
 void sithCogFunctionAI_AIGetMovePos(sithCog *ctx)
 {
-    sithThing *v1; // eax
-    sithActor *v2; // eax
+    SithThing *v1; // eax
+    SithAIControlBlock *v2; // eax
 
     v1 = sithCogExec_PopThing(ctx);
     if ( v1 && v1->controlType == SITH_CT_AI )
@@ -189,8 +189,8 @@ void sithCogFunctionAI_AIGetMovePos(sithCog *ctx)
 void sithCogFunctionAI_AISetMode(sithCog *ctx)
 {
     signed int v1; // edi
-    sithThing *v2; // eax
-    sithActor *v3; // ecx
+    SithThing *v2; // eax
+    SithAIControlBlock *v3; // ecx
     int v4; // edx
 
     v1 = sithCogExec_PopInt(ctx);
@@ -217,8 +217,8 @@ void sithCogFunctionAI_AISetMode(sithCog *ctx)
 
 void sithCogFunctionAI_AIGetMode(sithCog *ctx)
 {
-    sithThing *v1; // eax
-    sithActor *v2; // eax
+    SithThing *v1; // eax
+    SithAIControlBlock *v2; // eax
 
     v1 = sithCogExec_PopThing(ctx);
     if ( v1 && v1->controlType == SITH_CT_AI && (v2 = v1->actor) != 0 )
@@ -230,8 +230,8 @@ void sithCogFunctionAI_AIGetMode(sithCog *ctx)
 void sithCogFunctionAI_AIClearMode(sithCog *ctx)
 {
     signed int mode; // esi
-    sithThing *thing; // eax
-    sithActor *v3; // ecx
+    SithThing *thing; // eax
+    SithAIControlBlock *v3; // ecx
     int v4; // edx
     int mode_inv; // esi
 
@@ -260,8 +260,8 @@ void sithCogFunctionAI_AIClearMode(sithCog *ctx)
 
 void sithCogFunctionAI_FirstThingInView(sithCog *ctx)
 {
-    sithThing *v2; // eax
-    sithThing *v3; // ebx
+    SithThing *v2; // eax
+    SithThing *v3; // ebx
     int v4; // eax
     signed int v5; // [esp+10h] [ebp-38h]
     rdMatrix34 v7; // [esp+18h] [ebp-30h] BYREF
@@ -303,7 +303,7 @@ void sithCogFunctionAI_FirstThingInView(sithCog *ctx)
 void sithCogFunctionAI_NextThingInView(sithCog *ctx)
 {
     int v1; // eax
-    sithThing *v2; // eax
+    SithThing *v2; // eax
 
     v1 = ++sithCogFunctionAI_curThingInView;
     if ( sithCogFunctionAI_curThingInView < sithCogFunctionAI_numThingsInView && (v2 = sithCogFunctionAI_aThingsInView[v1]) != 0 )
@@ -314,9 +314,9 @@ void sithCogFunctionAI_NextThingInView(sithCog *ctx)
 
 void sithCogFunctionAI_ThingViewDot(sithCog *ctx)
 {
-    sithThing *v1; // ebp
-    sithThing *v2; // eax
-    sithThing *v3; // ebx
+    SithThing *v1; // ebp
+    SithThing *v2; // eax
+    SithThing *v3; // ebx
     cog_flex_t a2; // [esp+0h] [ebp-5Ch]
     rdVector3 v6; // [esp+14h] [ebp-48h] BYREF
     rdVector3 v7; // [esp+20h] [ebp-3Ch] BYREF
@@ -355,9 +355,9 @@ void sithCogFunctionAI_ThingViewDot(sithCog *ctx)
 
 void sithCogFunctionAI_AISetFireTarget(sithCog *ctx)
 {
-    sithThing *v1; // esi
-    sithThing *v2; // eax
-    sithActor *v3; // eax
+    SithThing *v1; // esi
+    SithThing *v2; // eax
+    SithAIControlBlock *v3; // eax
     unsigned int v4; // ecx
     int v5; // ecx
     unsigned int v6; // edx
@@ -395,9 +395,9 @@ void sithCogFunctionAI_AISetFireTarget(sithCog *ctx)
 void sithCogFunctionAI_sub_501330(sithCog *ctx)
 {
     char *v1; // edi
-    sithThing *v2; // eax
-    sithActor *v3; // esi
-    sithAICommand *v4; // eax
+    SithThing *v2; // eax
+    SithAIControlBlock *v3; // esi
+    SithAIRegisteredInstinct *v4; // eax
     unsigned int v5; // edx
     unsigned int v6; // ecx
     void *v7; // edi
@@ -438,8 +438,8 @@ LABEL_12:
 
 void sithCogFunctionAI_IsAITargetInSight(sithCog *ctx)
 {
-    sithThing *v1; // eax
-    sithActor *v2; // eax
+    SithThing *v1; // eax
+    SithAIControlBlock *v2; // eax
 
     v1 = sithCogExec_PopThing(ctx);
     if ( v1 && v1->type == SITH_THING_ACTOR && v1->controlType == SITH_CT_AI && (v2 = v1->actor) != 0 && !v2->field_1F4 )
@@ -450,9 +450,9 @@ void sithCogFunctionAI_IsAITargetInSight(sithCog *ctx)
 
 void sithCogFunctionAI_AIFlee(sithCog *ctx)
 {
-    sithThing *v1; // edi
-    sithThing *v2; // eax
-    sithActor *v3; // eax
+    SithThing *v1; // edi
+    SithThing *v2; // eax
+    SithAIControlBlock *v3; // eax
     int v4; // ecx
 
     v1 = sithCogExec_PopThing(ctx);
@@ -485,9 +485,9 @@ void sithCogFunctionAI_AIFlee(sithCog *ctx)
 
 void sithCogFunctionAI_AISetClass(sithCog *ctx)
 {
-    sithAIClass *aiclass; // esi
-    sithThing *thing; // eax
-    sithActor *v3; // ecx
+    SithAIClass *aiclass; // esi
+    SithThing *thing; // eax
+    SithAIControlBlock *v3; // ecx
     int v4; // eax
 
     aiclass = sithCogExec_PopAIClass(ctx);
@@ -508,7 +508,7 @@ void sithCogFunctionAI_AISetClass(sithCog *ctx)
 // MOTS added
 void sithCogFunctionAI_AIGetAlignment(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing && pThing->controlType == SITH_CT_AI && pThing->actor && pThing->actor->pAIClass) 
     {
         sithCogExec_PushFlex(ctx, pThing->actor->pAIClass->alignment);
@@ -521,7 +521,7 @@ void sithCogFunctionAI_AIGetAlignment(sithCog *ctx)
 void sithCogFunctionAI_AISetAlignment(sithCog *ctx)
 {
     cog_flex_t val = sithCogExec_PopFlex(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing && pThing->controlType == SITH_CT_AI && pThing->actor && pThing->actor->pAIClass) 
     {
         pThing->actor->pAIClass->alignment = val;
@@ -531,8 +531,8 @@ void sithCogFunctionAI_AISetAlignment(sithCog *ctx)
 // MOTS added
 void sithCogFunctionAI_AISetInterest(sithCog *ctx)
 {
-    sithThing* pInterest = sithCogExec_PopThing(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pInterest = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing && pThing->controlType == SITH_CT_AI && pThing->actor) 
     {
         if (pInterest == sithPlayer_g_pLocalPlayerThing) {
@@ -547,7 +547,7 @@ void sithCogFunctionAI_AISetInterest(sithCog *ctx)
 // MOTS added
 void sithCogFunctionAI_AIGetInterest(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing && pThing->controlType == SITH_CT_AI && pThing->actor && pThing->actor->pInterest) 
     {
         sithCogExec_PushInt(ctx, pThing->actor->pInterest->thingIdx);
@@ -559,7 +559,7 @@ void sithCogFunctionAI_AIGetInterest(sithCog *ctx)
 // MOTS added
 void sithCogFunctionAI_AISetDistractor(sithCog *ctx)
 {
-    sithThing *pThing;
+    SithThing *pThing;
 
     pThing = sithCogExec_PopThing(ctx);
     sithAI_SetDistractor(pThing);
@@ -639,8 +639,8 @@ void sithCogFunctionAI_AIRemoveAlignmentPriority(sithCog *ctx)
 // MoTS Added
 void sithCogFunctionAI_FirstThingInCone(sithCog *ctx)
 {
-    sithThing *v2; // eax
-    sithThing *v3; // ebx
+    SithThing *v2; // eax
+    SithThing *v3; // ebx
     int v4; // eax
     signed int v5; // [esp+10h] [ebp-38h]
     cog_flex_t v6; // [esp+14h] [ebp-34h]
@@ -698,7 +698,7 @@ void sithCogFunctionAI_NextThingInCone(sithCog *ctx)
 
 
 
-void sithCogFunctionAI_Startup(sithCogSymboltable* ctx)
+void sithCogFunctionAI_Startup(SithCogSymbolTable* ctx)
 {
     sithCog_RegisterFunction(ctx, sithCogFunctionAI_AIGetMode, "aigetmode");
     sithCog_RegisterFunction(ctx, sithCogFunctionAI_AISetMode, "aisetmode");

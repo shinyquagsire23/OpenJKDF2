@@ -32,7 +32,7 @@ void sithMaterial_Shutdown()
     }
 }
 
-void sithMaterial_FreeWorldMaterials(sithWorld *world)
+void sithMaterial_FreeWorldMaterials(SithWorld *world)
 {
     unsigned int v1; // ebx
     int v2; // edi
@@ -62,7 +62,7 @@ void sithMaterial_FreeWorldMaterials(sithWorld *world)
     world->materials2 = 0;
 }
 
-int sithMaterial_ReadMaterialsListText(sithWorld *world, int a2)
+int sithMaterial_ReadMaterialsListText(SithWorld *world, int a2)
 {
     int v2; // ebx
     int result; // eax
@@ -136,7 +136,7 @@ int sithMaterial_ReadMaterialsListText(sithWorld *world, int a2)
 
 rdMaterial* sithMaterial_Load(const char *a1, int create_ddraw_surface, int gpu_mem)
 {
-    sithWorld *v4; // ebp
+    SithWorld *v4; // ebp
     rdMaterial *result; // eax
     unsigned int v6; // eax
     char *v7; // edi
@@ -197,7 +197,7 @@ LABEL_10:
 
 rdMaterial* sithMaterial_GetMaterialByIndex(int idx)
 {
-    sithWorld *world; // ecx
+    SithWorld *world; // ecx
     rdMaterial *result; // eax
 
     world = sithWorld_g_pCurrentWorld;
@@ -230,7 +230,7 @@ int sithMaterial_GetMemorySize(rdMaterial *mat)
     return result;
 }
 
-rdVector2* sithMaterial_AllocWorldMaterials(sithWorld *world, int num)
+rdVector2* sithMaterial_AllocWorldMaterials(SithWorld *world, int num)
 {
     rdMaterial *v2; // eax
     rdVector2 *result; // eax

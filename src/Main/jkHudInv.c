@@ -108,13 +108,13 @@ void jkHudInv_ClearRects()
 
 void jkHudInv_Draw()
 {
-    sithThing *player; // ebx MAPDST
+    SithThing *player; // ebx MAPDST
     int v1; // edi
     int v2; // ebp
     int i; // esi
     stdBitmap *v4; // eax
     int j; // ebp
-    sithItemDescriptor *v6; // ebx
+    SithInventoryType *v6; // ebx
     stdBitmap *v7; // eax
     int curItem; // edi
     int curPower; // ebp
@@ -124,7 +124,7 @@ void jkHudInv_Draw()
     int v13; // edx
     stdBitmap *v14; // edi
     unsigned int v15; // ebp
-    sithItemDescriptor *v16; // ebx
+    SithInventoryType *v16; // ebx
     stdBitmap *v17; // edi
     int v18; // esi
     int v19; // edi
@@ -132,13 +132,13 @@ void jkHudInv_Draw()
     int v22; // eax
     signed int v23; // eax
     int v24; // ebp
-    sithItemDescriptor *v25; // ebx
+    SithInventoryType *v25; // ebx
     stdBitmap *v26; // esi
     int v27; // edi
     int v28; // ebx
     unsigned int v29; // esi
     int v31; // eax
-    sithItemDescriptor *v32; // ebx
+    SithInventoryType *v32; // ebx
     stdBitmap *v33; // edi
     int v34; // esi
     int v35; // ebp
@@ -416,13 +416,13 @@ LABEL_84:
 
 void jkHudInv_DrawGPU()
 {
-    sithThing *player; // ebx MAPDST
+    SithThing *player; // ebx MAPDST
     int v1; // edi
     int v2; // ebp
     int i; // esi
     stdBitmap *v4; // eax
     int j; // ebp
-    sithItemDescriptor *v6; // ebx
+    SithInventoryType *v6; // ebx
     stdBitmap *v7; // eax
     int curItem; // edi
     int curPower; // ebp
@@ -432,7 +432,7 @@ void jkHudInv_DrawGPU()
     int v13; // edx
     stdBitmap *v14; // edi
     unsigned int v15; // ebp
-    sithItemDescriptor *v16; // ebx
+    SithInventoryType *v16; // ebx
     stdBitmap *v17; // edi
     int v18; // esi
     int v19; // edi
@@ -440,13 +440,13 @@ void jkHudInv_DrawGPU()
     int v22; // eax
     signed int v23; // eax
     int v24; // ebp
-    sithItemDescriptor *v25; // ebx
+    SithInventoryType *v25; // ebx
     stdBitmap *v26; // esi
     int v27; // edi
     int v28; // ebx
     unsigned int v29; // esi
     int v31; // eax
-    sithItemDescriptor *v32; // ebx
+    SithInventoryType *v32; // ebx
     stdBitmap *v33; // edi
     int v34; // esi
     int v35; // ebp
@@ -763,10 +763,10 @@ void jkHudInv_InputInit()
 int jkHudInv_InitItems()
 {
     int v1; // ecx
-    sithItemDescriptor *v2; // eax
+    SithInventoryType *v2; // eax
     int *v3; // edx
     int v4; // ecx
-    sithItemDescriptor *v5; // eax
+    SithInventoryType *v5; // eax
 
     _sprintf(std_g_genBuffer, "misc\\%s", "items.dat");
     if (!jkHudInv_ItemDatLoad(std_g_genBuffer))

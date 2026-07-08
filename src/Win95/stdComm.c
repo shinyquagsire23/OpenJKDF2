@@ -113,9 +113,9 @@ int stdComm_CreatePlayer(jkMultiEntry *pEntry)
     return result;
 }
 
-int stdComm_Recv(sithCogMsg *msg)
+int stdComm_Recv(SithMessage *msg)
 {
-    sithCogMsg *pMsg; // esi
+    SithMessage *pMsg; // esi
     int ret; // eax
     int msgBytes; // [esp+4h] [ebp-4h] BYREF
 
@@ -166,7 +166,7 @@ int stdComm_DoReceive()
     return result;
 }
 
-int stdComm_SendToPlayer(sithCogMsg *msg, int sendto_id)
+int stdComm_SendToPlayer(SithMessage *msg, int sendto_id)
 {
     uint32_t v2 = msg->netMsg.msg_size + 4;
     if ( sendto_id != -1 )
@@ -185,7 +185,7 @@ int stdComm_SendToPlayer(sithCogMsg *msg, int sendto_id)
     
     for (int i = 0; i < jkPlayer_maxPlayers; i++)
     {
-        sithPlayerInfo* v5 = &jkPlayer_playerInfos[i];
+        SithPlayer* v5 = &jkPlayer_playerInfos[i];
         if ( !i || ((v5->flags & 1) != 0 && v5->net_id != stdComm_dplayIdSelf) ) // Added: always allow sending to 0, for dedicated servers' fake player
         {
             DirectPlay_Send(stdComm_dplayIdSelf, v5->net_id, &msg->netMsg.cogMsgId, v2);

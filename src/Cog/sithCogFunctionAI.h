@@ -5,7 +5,7 @@
 #include "types.h"
 #include "globals.h"
 
-void sithCogFunctionAI_Startup(sithCogSymboltable* ctx);
+void sithCogFunctionAI_Startup(SithCogSymbolTable* ctx);
 
 //MATH_FUNC void sithCogFunctionAI_ThingViewDot(sithCog *ctx);
 

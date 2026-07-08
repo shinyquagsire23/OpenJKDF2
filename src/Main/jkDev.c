@@ -1208,7 +1208,7 @@ int jkDev_CmdNoclip(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
     if (sithNet_isMulti ) return 1;
 
-    sithThing *v0; // ecx
+    SithThing *v0; // ecx
     wchar_t *v3; // eax
 
     if (!sithWorld_g_pCurrentWorld || !sithWorld_g_pCurrentWorld->playerThing) {

@@ -117,13 +117,13 @@ void sithRender_RenderDebugLight2(flex_t intensity, rdVector3* pos, rdVector3* n
 
 void sithRender_RenderDebugLights()
 {
-    sithSector *sectorIter; // edx
+    SithSector *sectorIter; // edx
     //rdLight **lightIter; // ebx
     //rdLight **curCamera_lights; // edi
     int *verticeIdxs; // edx
     rdLight **lightIter2; // edi
     //unsigned int v24; // [esp+8h] [ebp-13Ch]
-    sithSector **aSectorIter; // [esp+Ch] [ebp-138h]
+    SithSector **aSectorIter; // [esp+Ch] [ebp-138h]
     flex_t attenuationMax; // [esp+40h] [ebp-104h]
     rdLight *tmpLights[64]; // [esp+44h] [ebp-100h] BYREF
 
@@ -297,8 +297,8 @@ void sithRender_SetPalette(const void *palette)
 
 void sithRender_Draw()
 {
-    sithSector *v2; // edi
-    sithSector *v4; // eax
+    SithSector *v2; // edi
+    SithSector *v4; // eax
     flex_t a2; // [esp+0h] [ebp-28h]
     flex_t v7; // [esp+8h] [ebp-20h]
     flex_t v9; // [esp+8h] [ebp-20h]
@@ -320,7 +320,7 @@ void sithRender_Draw()
 #if 0
     for (int i = 0; i < sithWorld_g_pCurrentWorld->numThingsLoaded; i++)
     {
-        sithThing* v16 = &sithWorld_g_pCurrentWorld->things[i];
+        SithThing* v16 = &sithWorld_g_pCurrentWorld->things[i];
         if (v16->moveType == SITH_MT_PATH)
         {
             if (v16->trackParams.loadedFrames < 0) {
@@ -331,7 +331,7 @@ void sithRender_Draw()
 
     for (int i = 0; i < sithWorld_g_pCurrentWorld->numTemplatesLoaded; i++)
     {
-        sithThing* v16 = &sithWorld_g_pCurrentWorld->templates[i];
+        SithThing* v16 = &sithWorld_g_pCurrentWorld->templates[i];
         if (v16->moveType == SITH_MT_PATH)
         {
             if (v16->trackParams.loadedFrames < 0 || v16->trackParams.sizeFrames <= 0) {
@@ -432,7 +432,7 @@ void sithRender_Draw()
         rdVector3 camPos = sithCamera_g_pCurCamera->vec3_1;
         for (int i = 0; i < sithWorld_g_pCurrentWorld->numSectors; i++)
         {
-            sithSector* pSectorIter = &sithWorld_g_pCurrentWorld->sectors[i];
+            SithSector* pSectorIter = &sithWorld_g_pCurrentWorld->sectors[i];
             if (pSectorIter == sithCamera_g_pCurCamera->sector) {
                 //continue;
             }
@@ -479,7 +479,7 @@ void sithRender_Draw()
         rdVector3 camPos = sithCamera_g_pCurCamera->vec3_1;
         for (int i = 0; i < sithWorld_g_pCurrentWorld->numSectors; i++)
         {
-            sithSector* pSectorIter = &sithWorld_g_pCurrentWorld->sectors[i];
+            SithSector* pSectorIter = &sithWorld_g_pCurrentWorld->sectors[i];
             if (pSectorIter == sithCamera_g_pCurCamera->sector) {
                 //continue;
             }
@@ -617,14 +617,14 @@ void sithRender_Draw()
 
 // MOTS altered?
 // Added: depth safety
-void sithRender_BuildVisibleSectorList(sithSector *sector, rdClipFrustum *frustumArg, flex_t prevAdjoinDistAdd, int depth)
+void sithRender_BuildVisibleSectorList(SithSector *sector, rdClipFrustum *frustumArg, flex_t prevAdjoinDistAdd, int depth)
 {
     int v5; // ecx
     rdClipFrustum *frustum; // edx
-    sithThing *thing; // esi
+    SithThing *thing; // esi
     unsigned int lightIdx; // ecx
-    sithAdjoin *adjoinIter; // ebx
-    sithSurface *adjoinSurface; // esi
+    SithSurfaceAdjoin *adjoinIter; // ebx
+    SithSurface *adjoinSurface; // esi
     rdMaterial *adjoinMat; // eax
     rdVector3 *v20; // eax
     int v25; // eax
@@ -813,7 +813,7 @@ void sithRender_BuildVisibleSectorList(sithSector *sector, rdClipFrustum *frustu
             // The ground under the water surface somehow renders.
             // As a mitigation, if a mirror surface is transparent but the top-layer isn't,
             // we will render underneath anyways.
-            sithSurface* adjoinMirrorSurface = adjoinIter->mirror->surface;
+            SithSurface* adjoinMirrorSurface = adjoinIter->mirror->surface;
             rdMaterial* adjoinMirrorMat = adjoinMirrorSurface->surfaceInfo.face.material;
             rdTexinfo* adjoinMirrorTexinfo = NULL;
             if ( adjoinMirrorMat )
@@ -958,14 +958,14 @@ void sithRender_BuildVisibleSectorList(sithSector *sector, rdClipFrustum *frustu
 
 #ifdef TARGET_TWL
 // TODO: clean this up of ifdefs
-void sithRender_NoClip(sithSector *sector, rdClipFrustum *frustumArg, flex_t prevAdjoinDistAdd, int depth)
+void sithRender_NoClip(SithSector *sector, rdClipFrustum *frustumArg, flex_t prevAdjoinDistAdd, int depth)
 {
     int v5; // ecx
     rdClipFrustum *frustum; // edx
-    sithThing *thing; // esi
+    SithThing *thing; // esi
     unsigned int lightIdx; // ecx
-    sithAdjoin *adjoinIter; // ebx
-    sithSurface *adjoinSurface; // esi
+    SithSurfaceAdjoin *adjoinIter; // ebx
+    SithSurface *adjoinSurface; // esi
     rdMaterial *adjoinMat; // eax
     rdVector3 *v20; // eax
     int v25; // eax
@@ -1157,7 +1157,7 @@ void sithRender_NoClip(sithSector *sector, rdClipFrustum *frustumArg, flex_t pre
             // The ground under the water surface somehow renders.
             // As a mitigation, if a mirror surface is transparent but the top-layer isn't,
             // we will render underneath anyways.
-            sithSurface* adjoinMirrorSurface = adjoinIter->mirror->surface;
+            SithSurface* adjoinMirrorSurface = adjoinIter->mirror->surface;
             rdMaterial* adjoinMirrorMat = adjoinMirrorSurface->surfaceInfo.face.material;
             rdTexinfo* adjoinMirrorTexinfo = NULL;
             if ( adjoinMirrorMat )
@@ -1199,14 +1199,14 @@ void sithRender_NoClip(sithSector *sector, rdClipFrustum *frustumArg, flex_t pre
 }
 #endif
 
-void sithRender_KindaClipAssignFrustum(sithSector *sector, rdClipFrustum *frustumArg, int depth, int parentSector)
+void sithRender_KindaClipAssignFrustum(SithSector *sector, rdClipFrustum *frustumArg, int depth, int parentSector)
 {
     int v5; // ecx
     rdClipFrustum *frustum; // edx
-    sithThing *thing; // esi
+    SithThing *thing; // esi
     unsigned int lightIdx; // ecx
-    sithAdjoin *adjoinIter; // ebx
-    sithSurface *adjoinSurface; // esi
+    SithSurfaceAdjoin *adjoinIter; // ebx
+    SithSurface *adjoinSurface; // esi
     rdMaterial *adjoinMat; // eax
     rdVector3 *v20; // eax
     int v25; // eax
@@ -1308,14 +1308,14 @@ void sithRender_KindaClipAssignFrustum(sithSector *sector, rdClipFrustum *frustu
     sithRender_aThingSectors[sithRender_numThingSectors++] = sector;
 }
 
-void sithRender_KindaClip(sithSector *sector, rdClipFrustum *frustumArg, flex_t prevAdjoinDistAdd, int depth)
+void sithRender_KindaClip(SithSector *sector, rdClipFrustum *frustumArg, flex_t prevAdjoinDistAdd, int depth)
 {
     int v5; // ecx
     rdClipFrustum *frustum; // edx
-    sithThing *thing; // esi
+    SithThing *thing; // esi
     unsigned int lightIdx; // ecx
-    sithAdjoin *adjoinIter; // ebx
-    sithSurface *adjoinSurface; // esi
+    SithSurfaceAdjoin *adjoinIter; // ebx
+    SithSurface *adjoinSurface; // esi
     rdMaterial *adjoinMat; // eax
     rdVector3 *v20; // eax
     int v25; // eax
@@ -1402,7 +1402,7 @@ void sithRender_KindaClip(sithSector *sector, rdClipFrustum *frustumArg, flex_t 
             // The ground under the water surface somehow renders.
             // As a mitigation, if a mirror surface is transparent but the top-layer isn't,
             // we will render underneath anyways.
-            sithSurface* adjoinMirrorSurface = adjoinIter->mirror->surface;
+            SithSurface* adjoinMirrorSurface = adjoinIter->mirror->surface;
             rdMaterial* adjoinMirrorMat = adjoinMirrorSurface->surfaceInfo.face.material;
             rdTexinfo* adjoinMirrorTexinfo = NULL;
             if ( adjoinMirrorMat )
@@ -1692,14 +1692,14 @@ void sithRender_RenderSectors()
     rdMaterial *v58; // ecx
     int v59; // ecx
     char rend_flags; // al
-    sithThing *i; // esi
+    SithThing *i; // esi
     int v63; // eax
     rdTexMode_t texMode3; // [esp-10h] [ebp-74h]
-    sithSurface *v65; // [esp+10h] [ebp-54h]
+    SithSurface *v65; // [esp+10h] [ebp-54h]
     flex_t v66; // [esp+14h] [ebp-50h]
     flex_t v67; // [esp+14h] [ebp-50h]
     BOOL v68; // [esp+18h] [ebp-4Ch]
-    sithSector *level_idk; // [esp+1Ch] [ebp-48h]
+    SithSector *level_idk; // [esp+1Ch] [ebp-48h]
     flex_t a2; // [esp+20h] [ebp-44h]
     int v71; // [esp+24h] [ebp-40h]
     int v72; // [esp+28h] [ebp-3Ch]
@@ -2505,7 +2505,7 @@ LABEL_150:
 
 void sithRender_BuildVisibleSectorsThingList()
 {
-    sithAdjoin *i; // esi
+    SithSurfaceAdjoin *i; // esi
 
     for (int j = 0; j < sithRender_g_numVisibleSectors; j++)
     {
@@ -2526,10 +2526,10 @@ void sithRender_BuildVisibleSectorsThingList()
 }
 
 // Added: recursion depth
-void sithRender_BuildSectorThingList(sithSector *sector, flex_t prev, flex_t dist, int depth)
+void sithRender_BuildSectorThingList(SithSector *sector, flex_t prev, flex_t dist, int depth)
 {
-    sithThing *i;
-    sithAdjoin *j;
+    SithThing *i;
+    SithSurfaceAdjoin *j;
     rdVector3 vertex_out;
 
     // Added: safeguards
@@ -2623,7 +2623,7 @@ void sithRender_BuildSectorThingList(sithSector *sector, flex_t prev, flex_t dis
 
 void sithRender_BuildDynamicLights()
 {
-    sithSector *sectorIter;
+    SithSector *sectorIter;
     rdLight **curCamera_lights;
     unsigned int numSectorLights;
     rdLight *tmpLights[64];
@@ -2680,12 +2680,12 @@ void sithRender_BuildDynamicLights()
 // MoTS altered
 void sithRender_RenderThings()
 {
-    sithSector *v1; // ebp
+    SithSector *v1; // ebp
     flex_d_t v2; // st7
-    sithThing *thingIter; // esi
+    SithThing *thingIter; // esi
     flex_t radius; // edx
     int clippingVal; // eax
-    sithWorld *curWorld; // edx
+    SithWorld *curWorld; // edx
     rdModel3 *model3; // ecx
     int texMode; // ecx
     int texMode2; // eax
@@ -2697,7 +2697,7 @@ void sithRender_RenderThings()
     BOOL v16; // [esp+18h] [ebp-4h]
 
     // MoTS added
-    sithThing* lastDrawn = NULL;
+    SithThing* lastDrawn = NULL;
     if (sithRender_008d1668) {
         rdSetCullFlags(0);
     }
@@ -2966,7 +2966,7 @@ void sithRender_RenderThings()
     
 }
 
-int sithRender_RenderThing(sithThing *pThing)
+int sithRender_RenderThing(SithThing *pThing)
 {
     int ret;
 
@@ -3041,8 +3041,8 @@ int sithRender_RenderThing(sithThing *pThing)
 
 void sithRender_RenderAlphaAdjoins()
 {
-    sithSurface *v0; // edi
-    sithSector *v1; // esi
+    SithSurface *v0; // edi
+    SithSector *v1; // esi
     flex_d_t v2; // st7
     unsigned int v4; // ebp
     int v7; // eax
@@ -3052,7 +3052,7 @@ void sithRender_RenderAlphaAdjoins()
     flex_t *v22; // edx
     char v23; // bl
     flex_t v31; // [esp+4h] [ebp-10h]
-    sithSector *surfaceSector; // [esp+Ch] [ebp-8h]
+    SithSector *surfaceSector; // [esp+Ch] [ebp-8h]
 
     // Added: Ensure the clipping frustum doesn't get mutated
     rdClipFrustum* pFullCameraFrustum = rdCamera_g_pCurCamera->pClipFrustum;

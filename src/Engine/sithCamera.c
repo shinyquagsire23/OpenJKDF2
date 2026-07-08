@@ -47,9 +47,9 @@ void sithCamera_Shutdown()
 
     // Added: Clean reset
 #ifdef DW_CAMERA
-    memset(sithCamera_g_aCameras, 0, sizeof(sithCamera) * 8);
+    memset(sithCamera_g_aCameras, 0, sizeof(SithCamera) * 8);
 #else
-    memset(sithCamera_g_aCameras, 0, sizeof(sithCamera) * 7);
+    memset(sithCamera_g_aCameras, 0, sizeof(SithCamera) * 7);
 #endif
 
     sithCamera_bStartup = 0;
@@ -128,7 +128,7 @@ void sithCamera_Close()
 
 void sithCamera_ResetAllCameras()
 {
-    sithThing *v0; // eax
+    SithThing *v0; // eax
     rdVector3 rot; // [esp+Ch] [ebp-Ch] BYREF
 
     v0 = sithWorld_g_pCurrentWorld->cameraFocus;
@@ -165,7 +165,7 @@ void sithCamera_ResetAllCameras()
 }
 
 // MOTS altered
-int sithCamera_NewEntry(sithCamera *camera, uint32_t a2, uint32_t a3, flex_t fov, flex_t aspectRatio, rdCanvas *canvas, sithThing *focus_far, sithThing *focus_near)
+int sithCamera_NewEntry(SithCamera *camera, uint32_t a2, uint32_t a3, flex_t fov, flex_t aspectRatio, rdCanvas *canvas, SithThing *focus_far, SithThing *focus_near)
 {
     camera->cameraPerspective = a3;
     camera->dword4 = a2;
@@ -204,7 +204,7 @@ int sithCamera_NewEntry(sithCamera *camera, uint32_t a2, uint32_t a3, flex_t fov
 }
 
 // MOTS altered
-void sithCamera_Update(sithCamera *cam)
+void sithCamera_Update(SithCamera *cam)
 {
     rdVector3 mode64Tmp;
     rdVector3 v76;
@@ -214,7 +214,7 @@ void sithCamera_Update(sithCamera *cam)
     rdVector3 rot; // [esp+50h] [ebp-3Ch] BYREF
     rdMatrix34 out; // [esp+5Ch] [ebp-30h] BYREF
 
-    sithThing* focusThing = cam->primaryFocus;
+    SithThing* focusThing = cam->primaryFocus;
     flex_t v77 = sithCamera_g_cameraAngleDelta * sithTime_g_frameTimeFlex;
     flex_t v78 = sithCamera_g_cameraPosDelta * sithTime_g_frameTimeFlex;
     switch ( cam->cameraPerspective )
@@ -529,13 +529,13 @@ void sithCamera_RenderScene()
 
 void sithCamera_SetCurrentToCycleCamera()
 {
-    sithCamera *v0; // esi
+    SithCamera *v0; // esi
 
     v0 = &sithCamera_g_aCameras[sithCamera_camIdxToGlobalIdx[sithCamera_g_curCycleCamNum]];
     sithCamera_SetCurrentCamera(v0);
 }
 
-int sithCamera_SetCurrentCamera(sithCamera *camera)
+int sithCamera_SetCurrentCamera(SithCamera *camera)
 {
     rdVector3 rot; // [esp+8h] [ebp-Ch] BYREF
 
@@ -556,17 +556,17 @@ int sithCamera_SetCurrentCamera(sithCamera *camera)
     return 1;
 }
 
-void sithCamera_SetCameraFocus(sithCamera *camera, sithThing *primary, sithThing *secondary)
+void sithCamera_SetCameraFocus(SithCamera *camera, SithThing *primary, SithThing *secondary)
 {
     camera->primaryFocus = primary;
     camera->secondaryFocus = secondary;
 }
 
-sithSector* sithCamera_SearchSectorInRadius(sithThing *a3, sithSector *a2, rdVector3 *a4, rdVector3 *a6, flex_t a7, int flags)
+SithSector* sithCamera_SearchSectorInRadius(SithThing *a3, SithSector *a2, rdVector3 *a4, rdVector3 *a6, flex_t a7, int flags)
 {
     flex_d_t v7; // st7
-    sithSector *v9; // ebx
-    sithCollisionSearchEntry *i; // ecx
+    SithSector *v9; // ebx
+    SithCollision *i; // ecx
     rdVector3 a5; // [esp+Ch] [ebp-Ch] BYREF
     flex_t a6a; // [esp+28h] [ebp+10h]
 
@@ -600,12 +600,12 @@ void sithCamera_SetPOVShake(rdVector3 *a1, rdVector3 *a2, flex_t a3, flex_t a4)
     sithCamera_g_cameraAngleDelta = a4;
 }
 
-sithThing* sithCamera_GetPrimaryFocus(sithCamera *pCamera)
+SithThing* sithCamera_GetPrimaryFocus(SithCamera *pCamera)
 {
     return pCamera->primaryFocus;
 }
 
-sithThing* sithCamera_GetSecondaryFocus(sithCamera *pCamera)
+SithThing* sithCamera_GetSecondaryFocus(SithCamera *pCamera)
 {
     return pCamera->secondaryFocus;
 }
@@ -627,7 +627,7 @@ int sithCamera_GetCameraStateFlags()
 void sithCamera_CycleCamera()
 {
     int cam_id; // eax
-    sithCamera *v1; // esi
+    SithCamera *v1; // esi
     rdVector3 rot; // [esp+8h] [ebp-Ch] BYREF
 
     cam_id = ++sithCamera_g_curCycleCamNum;
@@ -642,7 +642,7 @@ void sithCamera_CycleCamera()
 }
 
 // MOTS added
-void sithCamera_SetZoom(sithCamera *pCamera, flex_t zoomScale, flex_t zoomSpeed)
+void sithCamera_SetZoom(SithCamera *pCamera, flex_t zoomScale, flex_t zoomSpeed)
 {
     if (!pCamera) return;
     if (!pCamera->rdCam.canvas) return;
@@ -698,7 +698,7 @@ void sithCamera_SetZoom(sithCamera *pCamera, flex_t zoomScale, flex_t zoomSpeed)
 
 #ifdef QOL_IMPROVEMENTS
 // MOTS added (overhauled, zoomFov is now used as a stored scale value)
-void sithCamera_UpdateZoom(sithCamera *pCamera)
+void sithCamera_UpdateZoom(SithCamera *pCamera)
 {
     flex_t currentScale;
     flex_t fVar2;
@@ -791,7 +791,7 @@ void sithCamera_UpdateZoom(sithCamera *pCamera)
 #else
 
 // MOTS added (original)
-void sithCamera_UpdateZoom(sithCamera *pCamera)
+void sithCamera_UpdateZoom(SithCamera *pCamera)
 {
     flex_t currentFov;
     flex_t fVar2;

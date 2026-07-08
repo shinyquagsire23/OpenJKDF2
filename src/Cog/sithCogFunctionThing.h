@@ -4,7 +4,7 @@
 #include "types.h"
 #include "sithCog.h"
 
-void sithCogFunctionThing_Startup(sithCogSymboltable* ctx);
+void sithCogFunctionThing_Startup(SithCogSymbolTable* ctx);
 
 //MATH_FUNC void sithCogFunctionThing_InterpolatePYR(sithCog *ctx);
 

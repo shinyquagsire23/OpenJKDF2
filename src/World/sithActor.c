@@ -18,7 +18,7 @@
 #include "Dss/sithDSSThing.h"
 #include "jk.h"
 
-void sithActor_SetDifficulty(sithThing *thing)
+void sithActor_SetDifficulty(SithThing *thing)
 {
     if ( jkPlayer_setDiff )
     {
@@ -35,7 +35,7 @@ void sithActor_SetDifficulty(sithThing *thing)
     }
 }
 
-void sithActor_Update(sithThing *thing, int deltaMs)
+void sithActor_Update(SithThing *thing, int deltaMs)
 {
     unsigned int v2; // eax
     unsigned int v3; // eax
@@ -76,11 +76,11 @@ void sithActor_Update(sithThing *thing, int deltaMs)
 }
 
 // MOTS altered
-flex_t sithActor_DamageActor(sithThing *sender, sithThing *receiver, flex_t amount, int flags)
+flex_t sithActor_DamageActor(SithThing *sender, SithThing *receiver, flex_t amount, int flags)
 {
-    sithThing *receiver_; // edi
+    SithThing *receiver_; // edi
     flex_d_t v6; // st7
-    sithThing *v7; // eax
+    SithThing *v7; // eax
     flex_t fR; // [esp+0h] [ebp-1Ch]
 
     if ( sithNet_isMulti && (sender->thingflags & SITH_TF_INVULN) != 0 )
@@ -165,7 +165,7 @@ LABEL_32:
     return amount - sender->actorParams.health;
 }
 
-void sithActor_PlayDamageSoundFx(sithThing *thing, flex_t amount, int hurtType)
+void sithActor_PlayDamageSoundFx(SithThing *thing, flex_t amount, int hurtType)
 {
     if ( thing->actorParams.health <= 0.0 || amount < 3.0 ) return;
 
@@ -206,9 +206,9 @@ void sithActor_PlayDamageSoundFx(sithThing *thing, flex_t amount, int hurtType)
 }
 
 // MOTS altered
-void sithActor_KillActor(sithThing *thing, sithThing *a3, int a4)
+void sithActor_KillActor(SithThing *thing, SithThing *a3, int a4)
 {
-    sithThing *v8; // eax
+    SithThing *v8; // eax
     uint32_t v10; // edx
 
     if (thing->thingflags & SITH_TF_DEAD) return;
@@ -301,7 +301,7 @@ void sithActor_KillActor(sithThing *thing, sithThing *a3, int a4)
     }
 }
 
-int sithActor_SurfaceCollisionHandler(sithThing *thing, sithSurface *surface, sithCollisionSearchEntry *searchEnt)
+int sithActor_SurfaceCollisionHandler(SithThing *thing, SithSurface *surface, SithCollision *searchEnt)
 {
     int ret = sithCollision_HandleThingHitSurface(thing, surface, searchEnt);
     if (ret && thing->controlType == SITH_CT_AI) {
@@ -310,9 +310,9 @@ int sithActor_SurfaceCollisionHandler(sithThing *thing, sithSurface *surface, si
     return ret;
 }
 
-void sithActor_SetHeadPYR(sithThing *actor, const rdVector3 *eyePYR)
+void sithActor_SetHeadPYR(SithThing *actor, const rdVector3 *eyePYR)
 {
-    sithAnimclass *pAnimClass; // eax
+    SithPuppetClass *pAnimClass; // eax
     rdVector3 *v4; // ebx
     int torsoIdx; // esi
     int primaryWeapJointIdx; // ebp
@@ -381,7 +381,7 @@ void sithActor_SetHeadPYR(sithThing *actor, const rdVector3 *eyePYR)
     }
 }
 
-int sithActor_ActorCollisionHandler(sithThing *thing, sithThing *thing2, sithCollisionSearchEntry *a3, int a4)
+int sithActor_ActorCollisionHandler(SithThing *thing, SithThing *thing2, SithCollision *a3, int a4)
 {
     int ret = sithCollision_ThingCollisionHandler(thing, thing2, a3, a4);
     if (ret)
@@ -398,9 +398,9 @@ int sithActor_ActorCollisionHandler(sithThing *thing, sithThing *thing2, sithCol
     return ret;
 }
 
-void sithActor_UpdateAimJoints(sithThing* pThing)
+void sithActor_UpdateAimJoints(SithThing* pThing)
 {
-    sithAnimclass* pAnimClass = pThing->animclass;
+    SithPuppetClass* pAnimClass = pThing->animclass;
     if (pAnimClass)
     {
         int pitch_idx = pAnimClass->bodypart_to_joint[JOINTTYPE_TURRETPITCH];
@@ -413,7 +413,7 @@ void sithActor_UpdateAimJoints(sithThing* pThing)
 }
 
 // MOTS altered
-int sithActor_thing_anim_blocked(sithThing *a1, sithThing *thing2, sithCollisionSearchEntry *a3)
+int sithActor_thing_anim_blocked(SithThing *a1, SithThing *thing2, SithCollision *a3)
 {
     rdVector3 a1a; // [esp+10h] [ebp-54h] BYREF
     rdVector3 v18; // [esp+1Ch] [ebp-48h] BYREF
@@ -466,7 +466,7 @@ int sithActor_thing_anim_blocked(sithThing *a1, sithThing *thing2, sithCollision
     return 1;
 }
 
-void sithActor_DestroyActor(sithThing *thing)
+void sithActor_DestroyActor(SithThing *thing)
 {
     thing->thingflags |= SITH_TF_DEAD;
     sithThing_DetachAttachedThings(thing);
@@ -477,7 +477,7 @@ void sithActor_DestroyActor(sithThing *thing)
     sithPhysics_FindFloor(thing, 0);
 }
 
-void sithActor_DestroyCorpse(sithThing *corpse)
+void sithActor_DestroyCorpse(SithThing *corpse)
 {
     // Added: retain corpses option
     if (jkPlayer_bKeepCorpses || corpse->lastRenderedTickIdx + 1 == jkPlayer_currentTickIdx ) {
@@ -488,7 +488,7 @@ void sithActor_DestroyCorpse(sithThing *corpse)
     }
 }
 
-int sithActor_ParseArg(stdConffileArg *arg, sithThing *thing, unsigned int param)
+int sithActor_ParseArg(stdConffileArg *arg, SithThing *thing, unsigned int param)
 {
     int result; // eax
     flex_d_t v6; // st7

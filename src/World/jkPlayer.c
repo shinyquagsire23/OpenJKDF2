@@ -350,7 +350,7 @@ void jkPlayer_InitSaber()
     for (int i = 0; i < jkPlayer_maxPlayers; i++)
     {
         jkPlayerInfo* playerInfoJk = &playerThings[i];
-        sithPlayerInfo* playerInfo = &jkPlayer_playerInfos[i];
+        SithPlayer* playerInfo = &jkPlayer_playerInfos[i];
 
         playerInfoJk->actorThing = playerInfo->playerThing;
         if (playerInfo->playerThing) // Added
@@ -370,9 +370,9 @@ void jkPlayer_InitSaber()
         playerInfoJk->jkmUnk6 = 0;
 #endif
 
-        sithThing* saberSparks = sithTemplate_GetTemplate("+ssparks_saber");
-        sithThing* bloodSparks = sithTemplate_GetTemplate("+ssparks_blood");
-        sithThing* wallSparks = sithTemplate_GetTemplate("+ssparks_wall");
+        SithThing* saberSparks = sithTemplate_GetTemplate("+ssparks_saber");
+        SithThing* bloodSparks = sithTemplate_GetTemplate("+ssparks_blood");
+        SithThing* wallSparks = sithTemplate_GetTemplate("+ssparks_wall");
         
         jkSaber_InitializeSaberInfo(playerThings[i].actorThing, "sabergreen1.mat", "sabergreen0.mat", 0.0032, 0.0018, 0.12, wallSparks, bloodSparks, saberSparks);
     }
@@ -384,7 +384,7 @@ void jkPlayer_InitThings()
     for (int i = 0; i < jkPlayer_maxPlayers; i++)
     {
         jkPlayerInfo* playerInfoJk = &playerThings[i];
-        sithPlayerInfo* playerInfo = &jkPlayer_playerInfos[i];
+        SithPlayer* playerInfo = &jkPlayer_playerInfos[i];
 
         playerInfoJk->actorThing = playerInfo->playerThing;
 
@@ -403,7 +403,7 @@ void jkPlayer_InitThings()
 #ifdef QOL_IMPROVEMENTS
     for (int i = 0; i < sithWorld_g_pCurrentWorld->numThingsLoaded; i++)
     {
-        sithThing* thingIter = &sithWorld_g_pCurrentWorld->things[i];
+        SithThing* thingIter = &sithWorld_g_pCurrentWorld->things[i];
 
         if (thingIter->type == SITH_THING_ACTOR 
             && thingIter->actorParams.typeflags & SITH_AF_BOSS 
@@ -423,7 +423,7 @@ void jkPlayer_InitThings()
     jkPlayerInfo* playerInfoIter = &jkPlayer_otherThings[jkPlayer_numOtherThings];
     for (int i = 0; i < sithWorld_g_pCurrentWorld->numThingsLoaded; i++)
     {
-        sithThing* thingIter = &sithWorld_g_pCurrentWorld->things[i];
+        SithThing* thingIter = &sithWorld_g_pCurrentWorld->things[i];
 
         if (thingIter->type == SITH_THING_ACTOR 
             && thingIter->actorParams.typeflags & SITH_AF_BOSS 
@@ -438,9 +438,9 @@ void jkPlayer_InitThings()
 
             // MOTS added: weird hack?
             if (Main_bMotsCompat && !playerInfoIter->polylineThing.polyline) {
-                sithThing* saberSparks = sithTemplate_GetTemplate("+ssparks_saber");
-                sithThing* bloodSparks = sithTemplate_GetTemplate("+ssparks_blood");
-                sithThing* wallSparks = sithTemplate_GetTemplate("+ssparks_wall");
+                SithThing* saberSparks = sithTemplate_GetTemplate("+ssparks_saber");
+                SithThing* bloodSparks = sithTemplate_GetTemplate("+ssparks_blood");
+                SithThing* wallSparks = sithTemplate_GetTemplate("+ssparks_wall");
 
                 jkSaber_InitializeSaberInfo(thingIter, "saberred1.mat", "saberred0.mat", 0.0032, 0.0018, 0.12, wallSparks, bloodSparks, saberSparks);
             }
@@ -865,7 +865,7 @@ void jkPlayer_DrawPov()
 
     if ( !(sithCamera_g_pCurCamera->cameraPerspective & 0xFC) && sithCamera_g_pCurCamera->primaryFocus == sithWorld_g_pCurrentWorld->cameraFocus )
     {
-        sithThing* player = playerThings[playerThingIdx].actorThing;
+        SithThing* player = playerThings[playerThingIdx].actorThing;
 
         // TODO: I think this explains some weird duplication
 #ifndef QOL_IMPROVEMENTS
@@ -978,7 +978,7 @@ void jkPlayer_DrawPov()
     }
 }
 
-void jkPlayer_renderSaberWeaponMesh(sithThing *thing)
+void jkPlayer_renderSaberWeaponMesh(SithThing *thing)
 {
     jkPlayerInfo* playerInfo = thing->playerInfo;
     if (!playerInfo) {
@@ -988,9 +988,9 @@ void jkPlayer_renderSaberWeaponMesh(sithThing *thing)
 
             jkPlayer_FUN_00404fe0(thing);
 
-            sithThing* saberSparks = sithTemplate_GetTemplate("+ssparks_saber");
-            sithThing* bloodSparks = sithTemplate_GetTemplate("+ssparks_blood");
-            sithThing* wallSparks = sithTemplate_GetTemplate("+ssparks_wall");
+            SithThing* saberSparks = sithTemplate_GetTemplate("+ssparks_saber");
+            SithThing* bloodSparks = sithTemplate_GetTemplate("+ssparks_blood");
+            SithThing* wallSparks = sithTemplate_GetTemplate("+ssparks_wall");
             jkSaber_InitializeSaberInfo(thing, "saberred1.mat", "saberred0.mat", 0.0032, 0.0018, 0.12, wallSparks, bloodSparks, saberSparks);
         }
         return;
@@ -1075,7 +1075,7 @@ void jkPlayer_renderSaberWeaponMesh(sithThing *thing)
     }
 }
 
-void jkPlayer_renderSaberTwinkle(sithThing *player)
+void jkPlayer_renderSaberTwinkle(SithThing *player)
 {
     rdVector3 vTmp;
     rdMatrix34 matTmp;
@@ -1122,7 +1122,7 @@ void jkPlayer_renderSaberTwinkle(sithThing *player)
     }
 }
 
-void jkPlayer_SetWaggle(sithThing *player, rdVector3 *waggleVec, flex_t waggleMag)
+void jkPlayer_SetWaggle(SithThing *player, rdVector3 *waggleVec, flex_t waggleMag)
 {
     if ( player == playerThings[playerThingIdx].actorThing )
     {
@@ -1278,7 +1278,7 @@ flex_t jkPlayer_CalcAlignment(int isMp)
     return alignment;
 }
 
-void jkPlayer_MpcInitBins(sithPlayerInfo* unk)
+void jkPlayer_MpcInitBins(SithPlayer* unk)
 {
     flex_t alignment; // [esp+8h] [ebp-E8h]
     jkPlayerMpcInfo info; // [esp+Ch] [ebp-E4h] BYREF
@@ -1297,7 +1297,7 @@ void jkPlayer_MpcInitBins(sithPlayerInfo* unk)
 }
 
 // MOTS altered TODO
-int jkPlayer_MPCParse(jkPlayerMpcInfo *info, sithPlayerInfo* unk, wchar_t *fname, wchar_t *name, int hasBins)
+int jkPlayer_MPCParse(jkPlayerMpcInfo *info, SithPlayer* unk, wchar_t *fname, wchar_t *name, int hasBins)
 {
     int v6; // edi
     flex_t a2; // [esp+Ch] [ebp-CCh] BYREF
@@ -1372,7 +1372,7 @@ int jkPlayer_MPCParse(jkPlayerMpcInfo *info, sithPlayerInfo* unk, wchar_t *fname
     return 0;
 }
 
-int jkPlayer_MPCWrite(sithPlayerInfo* unk, wchar_t *mpcName, wchar_t *playerName)
+int jkPlayer_MPCWrite(SithPlayer* unk, wchar_t *mpcName, wchar_t *playerName)
 {
     int v4; // esi
     char mpcNameChar[32]; // [esp+10h] [ebp-C0h] BYREF
@@ -2081,7 +2081,7 @@ uint32_t jkPlayer_ChecksumExtra(uint32_t hash)
 }
 
 // MOTS added
-jkPlayerInfo* jkPlayer_FUN_00404fe0(sithThing *pPlayerThing)
+jkPlayerInfo* jkPlayer_FUN_00404fe0(SithThing *pPlayerThing)
 {
 #ifdef JKM_DSS
     int iVar3;

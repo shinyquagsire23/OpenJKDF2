@@ -9,11 +9,11 @@
 #include "Win95/std.h"
 #include "jk.h"
 
-int sithAnimClass_Load(sithWorld *world, int a2)
+int sithAnimClass_Load(SithWorld *world, int a2)
 {
     int num_animclasses; // ebx
-    sithAnimclass *animclasses; // edi
-    sithAnimclass *animclass; // esi
+    SithPuppetClass *animclasses; // edi
+    SithPuppetClass *animclass; // esi
     char pup_path[128]; // [esp+10h] [ebp-80h] BYREF
 
     if ( a2 )
@@ -30,7 +30,7 @@ int sithAnimClass_Load(sithWorld *world, int a2)
     // word-addressable-only memory (DC VRAM arena / NDS slot-2 RAM).
     int prevSuggest = pSithHS->suggestHeap(HEAP_WORD_ADDRESSABLE);
 #endif
-    animclasses = (sithAnimclass *)SITH_ALLOC(sizeof(sithAnimclass) * num_animclasses);
+    animclasses = (SithPuppetClass *)SITH_ALLOC(sizeof(SithPuppetClass) * num_animclasses);
 #ifdef TARGET_RETRO_HOMEBREW
     pSithHS->suggestHeap(prevSuggest);
 #endif
@@ -39,7 +39,7 @@ int sithAnimClass_Load(sithWorld *world, int a2)
         return 0;
     world->numAnimClasses = num_animclasses;
     world->numAnimClassesLoaded = 0;
-    stdPlatform_Memzero32(animclasses, sizeof(sithAnimclass) * num_animclasses); // Added: word-safe
+    stdPlatform_Memzero32(animclasses, sizeof(SithPuppetClass) * num_animclasses); // Added: word-safe
     while ( stdConffile_ReadArgs() )
     {
         if ( !_strcmp(stdConffile_g_entry.args[0].value, "end") )
@@ -49,7 +49,7 @@ int sithAnimClass_Load(sithWorld *world, int a2)
             if ( sithWorld_g_pLastLoadedWorld->numAnimClassesLoaded != sithWorld_g_pLastLoadedWorld->numAnimClasses )
             {
                 animclass = &sithWorld_g_pLastLoadedWorld->animclasses[sithWorld_g_pLastLoadedWorld->numAnimClassesLoaded];
-                stdPlatform_Memzero32(animclass, sizeof(sithAnimclass)); // Added: word-safe
+                stdPlatform_Memzero32(animclass, sizeof(SithPuppetClass)); // Added: word-safe
                 const char* name = stdConffile_g_entry.args[1].value;
 #ifdef SITH_DEBUG_STRUCT_NAMES
                 stdString_SafeStrCopy(animclass->name, name, 32);
@@ -75,24 +75,24 @@ int sithAnimClass_Load(sithWorld *world, int a2)
     return 1;
 }
 
-sithAnimclass* sithAnimClass_LoadEntry(char *a1)
+SithPuppetClass* sithAnimClass_LoadEntry(char *a1)
 {
-    sithAnimclass *result; // eax
+    SithPuppetClass *result; // eax
     int v3; // ecx
-    sithAnimclass *v4; // esi
+    SithPuppetClass *v4; // esi
     stdHashTable *v5; // [esp-Ch] [ebp-9Ch]
     char v6[128]; // [esp+10h] [ebp-80h] BYREF
 #ifdef STDHASHTABLE_CRC32_KEYS
     char tmp[32];
 #endif
 
-    result = (sithAnimclass *)stdHashtbl_Find(sithPuppet_pClassHashtable, a1);
+    result = (SithPuppetClass *)stdHashtbl_Find(sithPuppet_pClassHashtable, a1);
     if ( !result )
     {
         v3 = sithWorld_g_pLastLoadedWorld->numAnimClassesLoaded;
         if ( v3 == sithWorld_g_pLastLoadedWorld->numAnimClasses
           || (v4 = &sithWorld_g_pLastLoadedWorld->animclasses[v3],
-              stdPlatform_Memzero32(v4, sizeof(sithAnimclass)), // Added: word-safe
+              stdPlatform_Memzero32(v4, sizeof(SithPuppetClass)), // Added: word-safe
 #ifdef SITH_DEBUG_STRUCT_NAMES
               stdString_SafeStrCopy(v4->name, a1, 32),
 #endif
@@ -120,13 +120,13 @@ sithAnimclass* sithAnimClass_LoadEntry(char *a1)
     return result;
 }
 
-int sithAnimClass_LoadPupEntry(sithAnimclass *animclass, char *fpath)
+int sithAnimClass_LoadPupEntry(SithPuppetClass *animclass, char *fpath)
 {
     int mode; // ebx
     unsigned int bodypart_idx; // esi
     int joint_idx; // eax
     intptr_t animNameIdx; // ebp
-    sithWorld *world; // esi
+    SithWorld *world; // esi
     char *key_fname; // edi
     rdKeyframe *v10; // eax
     unsigned int v12; // eax
@@ -230,14 +230,14 @@ LABEL_39:
     return 1;
 }
 
-int sithAnimClass_New(sithWorld *world, int num)
+int sithAnimClass_New(SithWorld *world, int num)
 {
-    sithAnimclass *animclasses;
+    SithPuppetClass *animclasses;
 
 #ifdef TARGET_RETRO_HOMEBREW
     int prevSuggest = pSithHS->suggestHeap(HEAP_WORD_ADDRESSABLE); // Added: see sithAnimClass_Load
 #endif
-    animclasses = (sithAnimclass *)SITH_ALLOC(sizeof(sithAnimclass) * num);
+    animclasses = (SithPuppetClass *)SITH_ALLOC(sizeof(SithPuppetClass) * num);
 #ifdef TARGET_RETRO_HOMEBREW
     pSithHS->suggestHeap(prevSuggest);
 #endif
@@ -246,11 +246,11 @@ int sithAnimClass_New(sithWorld *world, int num)
         return 0;
     world->numAnimClasses = num;
     world->numAnimClassesLoaded = 0;
-    stdPlatform_Memzero32(animclasses, sizeof(sithAnimclass) * num); // Added: word-safe
+    stdPlatform_Memzero32(animclasses, sizeof(SithPuppetClass) * num); // Added: word-safe
     return 1;
 }
 
-void sithAnimClass_Free(sithWorld *world)
+void sithAnimClass_Free(SithWorld *world)
 {
     unsigned int v1; // edi
     int v2; // ebx

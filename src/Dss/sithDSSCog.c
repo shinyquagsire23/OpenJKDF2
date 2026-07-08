@@ -10,8 +10,8 @@
 int sithDSSCog_SendMessage(sithCog *a1, int a2, int a3, int a4, int a5, int a6, int a7, flex32_t param0, flex32_t param1, flex32_t param2, flex32_t param3, int a11)
 {
     int v12; // edi
-    sithThing *v13; // eax
-    sithThing *v14; // eax
+    SithThing *v13; // eax
+    SithThing *v14; // eax
     
     NETMSG_START;
 
@@ -51,15 +51,15 @@ int sithDSSCog_SendMessage(sithCog *a1, int a2, int a3, int a4, int a5, int a6, 
     return sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, a11, 1, v12);
 }
 
-int sithDSSCog_ProcessMessage(sithCogMsg *in_netMsg)
+int sithDSSCog_ProcessMessage(SithMessage *in_netMsg)
 {
     int senderType; // edi
     int senderIdx; // ebx
     int sourceIndex; // ebp
-    sithThing *v6; // eax
-    sithThing *v7; // eax
+    SithThing *v6; // eax
+    SithThing *v7; // eax
     int msgid; // eax
-    sithThing *v12; // eax
+    SithThing *v12; // eax
     flex32_t param3; // [esp+10h] [ebp-1Ch]
     flex32_t param2; // [esp+14h] [ebp-18h]
     flex32_t param1; // [esp+18h] [ebp-14h]
@@ -111,7 +111,7 @@ int sithDSSCog_ProcessMessage(sithCogMsg *in_netMsg)
 
 int sithDSSCog_SyncCogState(sithCog *cog, int sendto_id, int mpFlags)
 {
-    sithCogSymboltable *v13; // ebp
+    SithCogSymbolTable *v13; // ebp
     
     NETMSG_START;
 
@@ -146,7 +146,7 @@ int sithDSSCog_SyncCogState(sithCog *cog, int sendto_id, int mpFlags)
         // TODO: figure out how to handle this in 64-bit
         for (int i = 0; i < v13->entry_cnt; i++)
         {
-            sithCogSymbol* sym = &v13->buckets[i];
+            SithCogSymbol* sym = &v13->buckets[i];
             if (sym->val.type == COG_VARTYPE_FLEX)
             {
                 NETMSG_PUSHS32((uint32_t)sym->val.data[0]);
@@ -186,10 +186,10 @@ int sithDSSCog_SyncCogState(sithCog *cog, int sendto_id, int mpFlags)
     return sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendto_id, mpFlags, 1);
 }
 
-int sithDSSCog_ProcessCogState(sithCogMsg *msg)
+int sithDSSCog_ProcessCogState(SithMessage *msg)
 {
     sithCog *cog; // eax
-    sithCogSymboltable *v13; // ebp
+    SithCogSymbolTable *v13; // ebp
     
     NETMSG_IN_START(msg);
 
@@ -232,7 +232,7 @@ int sithDSSCog_ProcessCogState(sithCogMsg *msg)
         // TODO: verify in 64-bit, particularly with AICLASS
         for (int i = 0; i < v13->entry_cnt; i++)
         {
-            sithCogSymbol* sym = &v13->buckets[i];
+            SithCogSymbol* sym = &v13->buckets[i];
             if (sym->val.type == COG_VARTYPE_FLEX)
             {
                 sym->val.data[0] = NETMSG_POPS32();

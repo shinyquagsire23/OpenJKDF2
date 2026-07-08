@@ -14,16 +14,16 @@
 #define sithOverlayMap_DrawSector_ADDR (0x004D9560)
 #define sithOverlayMap_CanDrawSurfaceEdge_ADDR (0x004D9C40)
 
-int sithOverlayMap_Startup(const sithMapViewConfig *config);
+int sithOverlayMap_Startup(const SithOverlayMapConfig *config);
 int sithOverlayMap_Close();
 void sithOverlayMap_ToggleMap();
 void sithOverlayMap_ZoomIn();
 void sithOverlayMap_ZoomOut();
 
 MATH_FUNC int sithOverlayMap_Draw(rdCanvas *canvas);
-MATH_FUNC void sithOverlayMap_DrawSectors(sithSector *sector);
-MATH_FUNC int sithOverlayMap_DrawSector(sithSector *pSector);
-MATH_FUNC int sithOverlayMap_CanDrawSurfaceEdge(sithSurface *a1, int a2, int a3);
+MATH_FUNC void sithOverlayMap_DrawSectors(SithSector *sector);
+MATH_FUNC int sithOverlayMap_DrawSector(SithSector *pSector);
+MATH_FUNC int sithOverlayMap_CanDrawSurfaceEdge(SithSurface *a1, int a2, int a3);
 
 //static int (*sithOverlayMap_Draw)(rdCanvas* canvas) = (void*)sithOverlayMap_Draw_ADDR;
 //static int (*sithOverlayMap_ToggleMap)() = (void*)sithOverlayMap_ToggleMap_ADDR;

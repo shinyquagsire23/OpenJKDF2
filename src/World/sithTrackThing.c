@@ -9,7 +9,7 @@
 #include "Cog/sithCog.h"
 #include "jk.h"
 
-void sithTrackThing_MoveToFrame(sithThing *thing, int goalFrame, flex_t a3)
+void sithTrackThing_MoveToFrame(SithThing *thing, int goalFrame, flex_t a3)
 {
     if ( goalFrame < thing->trackParams.loadedFrames )
     {
@@ -22,10 +22,10 @@ void sithTrackThing_MoveToFrame(sithThing *thing, int goalFrame, flex_t a3)
     }
 }
 
-void sithTrackThing_Arrivedidk(sithThing *thing)
+void sithTrackThing_Arrivedidk(SithThing *thing)
 {
-    sithThingFrame *v4; // edx
-    sithThingFrame *v12; // eax
+    SithPathFrame *v4; // edx
+    SithPathFrame *v12; // eax
     flex_t thinga; // [esp+10h] [ebp+4h]
 
     int goalFrame = thing->goalframe;
@@ -68,7 +68,7 @@ void sithTrackThing_Arrivedidk(sithThing *thing)
     sithTrackThing_PrepareForOrient(thing, &thing->trackParams.aFrames[goalFrame].rot, thinga);
 }
 
-void sithTrackThing_Tick(sithThing *thing, flex_t deltaSeconds)
+void sithTrackThing_Tick(SithThing *thing, flex_t deltaSeconds)
 {
     flex_d_t v4; // st7
     flex_d_t v5; // st7
@@ -116,7 +116,7 @@ void sithTrackThing_Tick(sithThing *thing, flex_t deltaSeconds)
         // MoTS added: MoveToFrame was kinda just broken in JK?
         // MoTS uses absolute rotations, but maybe JK used deltas?
         if (Main_bMotsCompat) {
-            sithThingFrame* pFrame = &thing->trackParams.aFrames[thing->curframe];
+            SithPathFrame* pFrame = &thing->trackParams.aFrames[thing->curframe];
             rdVector_Add3Acc(&rotVec, &pFrame->rot);
             rdVector_NormalizeAngleAcute3(&rotVec);
             rdMatrix_BuildRotate34(&rotMat, &rotVec);
@@ -208,7 +208,7 @@ void sithTrackThing_Tick(sithThing *thing, flex_t deltaSeconds)
     }
 }
 
-void sithTrackThing_BlockedIdk(sithThing* pThing)
+void sithTrackThing_BlockedIdk(SithThing* pThing)
 {
     if ((pThing->thingflags & SITH_TF_CAPTURED) && !(pThing->thingflags & SITH_TF_INVULN))
     {
@@ -216,7 +216,7 @@ void sithTrackThing_BlockedIdk(sithThing* pThing)
     }
 }
 
-void sithTrackThing_StoppedMoving(sithThing* pThing)
+void sithTrackThing_StoppedMoving(SithThing* pThing)
 {
     if ( (pThing->trackParams.flags & 4) != 0 )
     {
@@ -234,7 +234,7 @@ void sithTrackThing_StoppedMoving(sithThing* pThing)
     sithTrackThing_Stop(pThing);
 }
 
-flex_t sithTrackThing_CalcMoveDirection(sithThing *thing, rdVector3 *targetPos)
+flex_t sithTrackThing_CalcMoveDirection(SithThing *thing, rdVector3 *targetPos)
 {
     flex_t dist;
 
@@ -249,7 +249,7 @@ flex_t sithTrackThing_CalcMoveDirection(sithThing *thing, rdVector3 *targetPos)
     return thing->trackParams.field_1C;
 }
 
-void sithTrackThing_PrepareForOrient(sithThing *thing, rdVector3 *pGoalFrameRot, flex_t a3)
+void sithTrackThing_PrepareForOrient(SithThing *thing, rdVector3 *pGoalFrameRot, flex_t a3)
 {
     rdVector3 out;
     rdVector3 angles;
@@ -280,7 +280,7 @@ void sithTrackThing_PrepareForOrient(sithThing *thing, rdVector3 *pGoalFrameRot,
     }
 }
 
-int sithTrackThing_LoadPathParams(stdConffileArg *arg, sithThing *thing, int param)
+int sithTrackThing_LoadPathParams(stdConffileArg *arg, SithThing *thing, int param)
 {
     switch (param)
     {
@@ -293,7 +293,7 @@ int sithTrackThing_LoadPathParams(stdConffileArg *arg, sithThing *thing, int par
             {
                 if ( _sscanf(arg->value, "(%f/%f/%f:%f/%f/%f)", &tmpPosx, &tmpPosy, &tmpPosz, &tmpRotx, &tmpRoty, &tmpRotz) != 6 )
                     return 0;
-                sithThingFrame* pFrame = &thing->trackParams.aFrames[thing->trackParams.loadedFrames++];
+                SithPathFrame* pFrame = &thing->trackParams.aFrames[thing->trackParams.loadedFrames++];
                 pFrame->pos.x = tmpPosx; // FLEXTODO
                 pFrame->pos.y = tmpPosy; // FLEXTODO
                 pFrame->pos.z = tmpPosz; // FLEXTODO
@@ -322,8 +322,8 @@ int sithTrackThing_LoadPathParams(stdConffileArg *arg, sithThing *thing, int par
                 return 0;
             }
 
-            size_t alloc_sz = sizeof(sithThingFrame) * numFrames;
-            thing->trackParams.aFrames = (sithThingFrame*)SITH_ALLOC(alloc_sz);
+            size_t alloc_sz = sizeof(SithPathFrame) * numFrames;
+            thing->trackParams.aFrames = (SithPathFrame*)SITH_ALLOC(alloc_sz);
             if ( thing->trackParams.aFrames )
             {
                 _memset(thing->trackParams.aFrames, 0, alloc_sz);
@@ -339,7 +339,7 @@ int sithTrackThing_LoadPathParams(stdConffileArg *arg, sithThing *thing, int par
     }
 }
 
-void sithTrackThing_Stop(sithThing *thing)
+void sithTrackThing_Stop(SithThing *thing)
 {
     thing->trackParams.flags &= ~0x17u;
     thing->trackParams.lerpSpeed = 0.0;
@@ -352,13 +352,13 @@ void sithTrackThing_Stop(sithThing *thing)
         sithCog_ThingSendMessage(thing, 0, SITH_MESSAGE_ARRIVED);
 }
 
-void sithTrackThing_idkpathmove(sithThing *thing, sithThing *thing2, rdVector3 *a3)
+void sithTrackThing_idkpathmove(SithThing *thing, SithThing *thing2, rdVector3 *a3)
 {
-    sithThingFrame *v9; // esi
+    SithPathFrame *v9; // esi
     rdVector3 a1a; // [esp+10h] [ebp-Ch] BYREF
 
-    thing->trackParams.aFrames = (sithThingFrame *)SITH_ALLOC(sizeof(sithThingFrame) * thing2->trackParams.sizeFrames);
-    _memcpy(thing->trackParams.aFrames, thing2->trackParams.aFrames, sizeof(sithThingFrame) * thing2->trackParams.sizeFrames);
+    thing->trackParams.aFrames = (SithPathFrame *)SITH_ALLOC(sizeof(SithPathFrame) * thing2->trackParams.sizeFrames);
+    _memcpy(thing->trackParams.aFrames, thing2->trackParams.aFrames, sizeof(SithPathFrame) * thing2->trackParams.sizeFrames);
     thing->trackParams.sizeFrames = thing2->trackParams.sizeFrames;
     thing->trackParams.loadedFrames = thing2->trackParams.loadedFrames;
     for (uint32_t v7 = 0; v7 < thing->trackParams.loadedFrames; v7++)
@@ -369,7 +369,7 @@ void sithTrackThing_idkpathmove(sithThing *thing, sithThing *thing2, rdVector3 *
     }
 }
 
-void sithTrackThing_RotatePivot(sithThing *thing, rdVector3 *a2, rdVector3 *a3, flex_t a4)
+void sithTrackThing_RotatePivot(SithThing *thing, rdVector3 *a2, rdVector3 *a3, flex_t a4)
 {
     thing->trackParams.flags |= 0x12u;
     sithSoundClass_PlayModeFirst(thing, 3u);
@@ -384,7 +384,7 @@ void sithTrackThing_RotatePivot(sithThing *thing, rdVector3 *a2, rdVector3 *a3, 
     thing->trackParams.field_54 = 1.0 / a4;
 }
 
-void sithTrackThing_Rotate(sithThing *trackThing, rdVector3 *rot)
+void sithTrackThing_Rotate(SithThing *trackThing, rdVector3 *rot)
 {
     flex_t largestAnglePercentage;
     flex_t tmp;
@@ -427,9 +427,9 @@ void sithTrackThing_Rotate(sithThing *trackThing, rdVector3 *rot)
     }
 }
 
-void sithTrackThing_SkipToFrame(sithThing *trackThing, uint32_t goalframeNum, flex_t a3)
+void sithTrackThing_SkipToFrame(SithThing *trackThing, uint32_t goalframeNum, flex_t a3)
 {
-    sithThingFrame *goalFrame; // eax
+    SithPathFrame *goalFrame; // eax
 
     if ( goalframeNum < trackThing->trackParams.loadedFrames )
     {
@@ -445,7 +445,7 @@ void sithTrackThing_SkipToFrame(sithThing *trackThing, uint32_t goalframeNum, fl
     }
 }
 
-int sithTrackThing_PathMovePause(sithThing *trackThing)
+int sithTrackThing_PathMovePause(SithThing *trackThing)
 {
     if ( (trackThing->trackParams.flags & 3) == 0 )
         return 0;
@@ -456,7 +456,7 @@ int sithTrackThing_PathMovePause(sithThing *trackThing)
     return 1;
 }
 
-int sithTrackThing_PathMoveResume(sithThing *trackThing)
+int sithTrackThing_PathMoveResume(SithThing *trackThing)
 {
     if (!(trackThing->trackParams.flags & 0x80))
         return 0;

@@ -73,7 +73,7 @@ void jkCog_addLaser(sithCog *ctx)
 {
     cog_flex_t a = sithCogExec_PopFlex(ctx);
     int b = sithCogExec_PopInt(ctx);
-    sithThing* c = sithCogExec_PopThing(ctx);
+    SithThing* c = sithCogExec_PopThing(ctx);
     sithCogExec_PushInt(ctx, -1);
 }
 
@@ -84,7 +84,7 @@ void jkCog_removeLaser(sithCog *ctx)
 
 void jkCog_getLaserId(sithCog *ctx)
 {
-    sithThing* a = sithCogExec_PopThing(ctx);
+    SithThing* a = sithCogExec_PopThing(ctx);
     sithCogExec_PushInt(ctx, -1);
 }
 
@@ -92,8 +92,8 @@ void jkCog_addBeam(sithCog *ctx)
 {
     cog_flex_t a = sithCogExec_PopFlex(ctx);
     int b = sithCogExec_PopInt(ctx);
-    sithThing* c = sithCogExec_PopThing(ctx);
-    sithThing* d = sithCogExec_PopThing(ctx);
+    SithThing* c = sithCogExec_PopThing(ctx);
+    SithThing* d = sithCogExec_PopThing(ctx);
     sithCogExec_PushInt(ctx, -1);
 }
 
@@ -101,8 +101,8 @@ void jkCog_computeCatapaultVelocity(sithCog *ctx)
 {
     rdVector3 ret;
     cog_flex_t a = sithCogExec_PopFlex(ctx);
-    sithThing* b = sithCogExec_PopThing(ctx);
-    sithThing* c = sithCogExec_PopThing(ctx);
+    SithThing* b = sithCogExec_PopThing(ctx);
+    SithThing* c = sithCogExec_PopThing(ctx);
     cog_flex_t d = sithCogExec_PopFlex(ctx);
     
     rdVector_Sub3(&ret, &b->position, &c->position);
@@ -156,7 +156,7 @@ int jkCog_StringsInit()
 void jkCog_SetFlags(sithCog *ctx)
 {
     signed int flags; // esi
-    sithThing *thing; // eax
+    SithThing *thing; // eax
 
     flags = sithCogExec_PopInt(ctx);
     thing = sithCogExec_PopThing(ctx);
@@ -173,7 +173,7 @@ void jkCog_SetFlags(sithCog *ctx)
 void jkCog_ClearFlags(sithCog *ctx)
 {
     signed int v1; // esi
-    sithThing *v2; // eax
+    SithThing *v2; // eax
 
     v1 = sithCogExec_PopInt(ctx);
     v2 = sithCogExec_PopThing(ctx);
@@ -193,7 +193,7 @@ void jkCog_ClearFlags(sithCog *ctx)
 void jkCog_GetFlags(sithCog *ctx)
 {
     int v1; // esi
-    sithThing *v2; // eax
+    SithThing *v2; // eax
 
     v1 = 0;
     v2 = sithCogExec_PopThing(ctx);
@@ -206,8 +206,8 @@ void jkCog_GetFlags(sithCog *ctx)
 void jkCog_SetWeaponMesh(sithCog *ctx)
 {
     rdModel3 *model3; // edi
-    sithThing *actorThing; // eax
-    sithThing *v3; // ebx
+    SithThing *actorThing; // eax
+    SithThing *v3; // ebx
     jkPlayerInfo *v4; // eax
     rdThing *v5; // esi
     int v6; // eax
@@ -261,7 +261,7 @@ void jkCog_EndLevel(sithCog *ctx)
 void jkCog_SetPovModel(sithCog *ctx)
 {
     rdModel3 *model3; // edi
-    sithThing *actorThing; // eax
+    SithThing *actorThing; // eax
 
     model3 = sithCogExec_PopModel3(ctx);
     actorThing = sithCogExec_PopThing(ctx);
@@ -280,7 +280,7 @@ void jkCog_PlayPovKey(sithCog *ctx)
     int v1; // ebp
     int v2; // edi
     rdKeyframe *keyframe; // ebx
-    sithThing *actorThing; // eax
+    SithThing *actorThing; // eax
     int v5; // ecx
     rdPuppet *v6; // eax
     int v7; // eax
@@ -306,7 +306,7 @@ void jkCog_PlayPovKey(sithCog *ctx)
 void jkCog_StopPovKey(sithCog *ctx)
 {
     int v2; // edi
-    sithThing *actorThing; // eax
+    SithThing *actorThing; // eax
     rdPuppet *v5; // eax
     cog_flex_t a1a; // [esp+Ch] [ebp+4h]
 
@@ -333,7 +333,7 @@ void jkCog_SetForceSpeed(sithCog *pCog)
 void jkCog_SetInvis(sithCog *pCog)
 {
     int v1; // edi
-    sithThing *v2; // eax
+    SithThing *v2; // eax
     int v3; // esi
 
     v1 = sithCogExec_PopInt(pCog);
@@ -351,7 +351,7 @@ void jkCog_SetInvis(sithCog *pCog)
 void jkCog_SetInvulnerable(sithCog *pCog)
 {
     int v1; // edi
-    sithThing *v2; // eax
+    SithThing *v2; // eax
     uint32_t v3; // ecx
     unsigned int v4; // ecx
     int v5; // esi
@@ -493,7 +493,7 @@ void jkCog_SetPersuasionInfo(sithCog *ctx)
 {
     signed int v1; // edi
     signed int v2; // ebx
-    sithThing *v3; // eax
+    SithThing *v3; // eax
     jkPlayerInfo *v4; // ecx
     int v5; // esi
 
@@ -511,7 +511,7 @@ void jkCog_SetPersuasionInfo(sithCog *ctx)
 
 void jkCog_SetTarget(sithCog *ctx)
 {
-    sithThing *v1; // eax
+    SithThing *v1; // eax
 
     v1 = sithCogExec_PopThing(ctx);
     jkHud_SetTarget(v1);
@@ -529,15 +529,15 @@ void jkCog_SetTargetColors(sithCog *ctx)
 
 void jkCog_SetSaberInfo(sithCog *ctx)
 {
-    sithThing *saber_sparks; // ebx
-    sithThing *blood_sparks; // ebp
-    sithThing *v4; // edi
+    SithThing *saber_sparks; // ebx
+    SithThing *blood_sparks; // ebp
+    SithThing *v4; // edi
     cog_flex_t len; // [esp+10h] [ebp-14h]
     cog_flex_t tip_rad; // [esp+14h] [ebp-10h]
     cog_flex_t base_rad; // [esp+18h] [ebp-Ch]
     rdMaterial *v9; // [esp+1Ch] [ebp-8h]
     rdMaterial *v10; // [esp+20h] [ebp-4h]
-    sithThing *wall_sparks; // [esp+28h] [ebp+4h]
+    SithThing *wall_sparks; // [esp+28h] [ebp+4h]
 
     saber_sparks = sithCogExec_PopTemplate(ctx);
     blood_sparks = sithCogExec_PopTemplate(ctx);
@@ -572,7 +572,7 @@ void jkCog_SetSaberInfo(sithCog *ctx)
 // MOTS added
 void jkCog_GetSaberSideMat(sithCog *ctx)
 {
-    sithThing* pPlayerThing = sithCogExec_PopThing(ctx);
+    SithThing* pPlayerThing = sithCogExec_PopThing(ctx);
     if (pPlayerThing->playerInfo) {
         sithCogExec_PushInt(ctx,((pPlayerThing->playerInfo->polyline).edgeFace.material)->id);
     }
@@ -587,8 +587,8 @@ void jkCog_GetSaberCam(sithCog *ctx)
 
 void jkCog_EnableSaber(sithCog *ctx)
 {
-    sithThing *v2; // eax
-    sithThing *v3; // esi
+    SithThing *v2; // eax
+    SithThing *v3; // esi
     cog_flex_t a3; // [esp+4h] [ebp-8h]
     cog_flex_t a2; // [esp+8h] [ebp-4h]
     cog_flex_t a1a; // [esp+10h] [ebp+4h]
@@ -608,7 +608,7 @@ void jkCog_EnableSaber(sithCog *ctx)
 
 void jkCog_DisableSaber(sithCog *ctx)
 {
-    sithThing *v1; // eax
+    SithThing *v1; // eax
 
     v1 = sithCogExec_PopThing(ctx);
     if ( v1 )
@@ -620,7 +620,7 @@ void jkCog_DisableSaber(sithCog *ctx)
 
 void jkCog_SetWaggle(sithCog *ctx)
 {
-    sithThing *v2; // eax
+    SithThing *v2; // eax
     rdVector3 a2; // [esp+4h] [ebp-Ch] BYREF
     cog_flex_t a1a; // [esp+14h] [ebp+4h]
 
@@ -691,9 +691,9 @@ void jkCog_StringConcatAsciiString(sithCog *pCog)
 
 void jkCog_StringConcatPlayerName(sithCog *pCog)
 {
-    sithThing *v1; // eax
+    SithThing *v1; // eax
     size_t finalLen;
-    sithPlayerInfo *v2; // esi
+    SithPlayer *v2; // esi
 
     v1 = sithCogExec_PopThing(pCog);
     if ( v1 )
@@ -943,7 +943,7 @@ void jkCog_CreateBubble(sithCog *ctx)
 {
     int type = sithCogExec_PopInt(ctx);
     cog_flex_t radius = sithCogExec_PopFlex(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing && radius > 0.0) {
         jkEpisode_CreateBubble(pThing, radius, type);
@@ -953,7 +953,7 @@ void jkCog_CreateBubble(sithCog *ctx)
 // MOTS added
 void jkCog_DestroyBubble(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing) {
         jkEpisode_DestroyBubble(pThing);
     }
@@ -965,7 +965,7 @@ void jkCog_GetBubbleDistance(sithCog *ctx)
     int iVar1;
     flex_t tmp;
     
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing == sithPlayer_g_pLocalPlayerThing) {
         iVar1 = playerThings[playerThingIdx].jkmUnk4;
         tmp = playerThings[playerThingIdx].jkmUnk6;
@@ -984,9 +984,9 @@ void jkCog_GetBubbleDistance(sithCog *ctx)
 // MOTS added
 void jkCog_ThingInBubble(sithCog *ctx)
 {
-    sithThing *pThingOut = NULL;
+    SithThing *pThingOut = NULL;
 
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     int iVar1 = jkEpisode_GetBubbleInfo(pThing, NULL, &pThingOut, NULL);
     if (iVar1 != 0) {
         sithCogExec_PushInt(ctx,pThingOut->thingIdx);
@@ -1027,7 +1027,7 @@ void jkCog_GetNextBubble(sithCog *ctx)
 // MOTS added
 void jkCog_GetBubbleType(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     for (int i = 0; i < 64; i++) {
         if (jkPlayer_aBubbleInfo[i].pThing == pThing) {
             sithCogExec_PushInt(ctx,jkPlayer_aBubbleInfo[i].type);
@@ -1040,7 +1040,7 @@ void jkCog_GetBubbleType(sithCog *ctx)
 // MOTS added
 void jkCog_GetBubbleRadius(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     for (int i = 0; i < 64; i++) {
         if (jkPlayer_aBubbleInfo[i].pThing == pThing) {
             sithCogExec_PushFlex(ctx,stdMath_Sqrt(jkPlayer_aBubbleInfo[i].radiusSquared));
@@ -1054,7 +1054,7 @@ void jkCog_GetBubbleRadius(sithCog *ctx)
 void jkCog_SetBubbleType(sithCog *ctx)
 {
     int val = sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     for (int i = 0; i < 64; i++) 
     {
         if (jkPlayer_aBubbleInfo[i].pThing == pThing) {
@@ -1068,7 +1068,7 @@ void jkCog_SetBubbleType(sithCog *ctx)
 void jkCog_SetBubbleRadius(sithCog *ctx)
 {
     cog_flex_t val = sithCogExec_PopFlex(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     for (int i = 0; i < 64; i++) 
     {
         if (jkPlayer_aBubbleInfo[i].pThing == pThing) {
@@ -1194,11 +1194,11 @@ void jkCogExt_(sithCog* ctx)
 void jkCogExt_GetThingAttachSurface(sithCog* ctx)
 {
     int retval = -1;
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
     {
         if (pThing->attach_flags == SITH_ATTACH_WORLDSURFACE) {
-            sithSurface* pAttached = pThing->attachedSurface;
+            SithSurface* pAttached = pThing->attachedSurface;
             if (pAttached) {
                 retval = pAttached->index;
             }
@@ -1210,11 +1210,11 @@ void jkCogExt_GetThingAttachSurface(sithCog* ctx)
 void jkCogExt_GetThingAttachThing(sithCog* ctx)
 {
     int retval = -1;
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
     {
         if (pThing->attach_flags == SITH_ATTACH_THINGSURFACE) {
-            sithThing* pAttached = pThing->attachedThing;
+            SithThing* pAttached = pThing->attachedThing;
             if (pAttached) {
                 retval = pAttached->thingIdx;
             }
@@ -1358,7 +1358,7 @@ void jkCogExt_SetHotkeyCog(sithCog* ctx)
 
 void jkCogExt_IsAdjoin(sithCog* ctx)
 {
-    sithSurface* pSurface = sithCogExec_PopSurface(ctx);
+    SithSurface* pSurface = sithCogExec_PopSurface(ctx);
     int retval = 0;
     if (pSurface && pSurface->adjoin) {
         retval = 1;
@@ -1377,7 +1377,7 @@ void jkCogExt_SetGameSpeed(sithCog* ctx)
 
 void jkCogExt_GetThingHeadLvec(sithCog* ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     // TODO
     rdVector3 vec = {0};
@@ -1387,14 +1387,14 @@ void jkCogExt_GetThingHeadLvec(sithCog* ctx)
 
 void jkCogExt_GetThingHeadPitch(sithCog* ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     sithCogExec_PushFlex(ctx, 0.0); // TODO
     Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
 }
 
 void jkCogExt_GetThingHeadPYR(sithCog* ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     // TODO
     rdVector3 vec = {0};
@@ -1404,7 +1404,7 @@ void jkCogExt_GetThingHeadPYR(sithCog* ctx)
 
 void jkCogExt_GetThingPYR(sithCog* ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     // TODO
     rdVector3 vec = {0};
@@ -1417,17 +1417,17 @@ void jkCogExt_SetThingHeadPYR(sithCog* ctx)
     //TODO
     rdVector3 vec = {0};
     sithCogExec_PopVector(ctx, &vec);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
 }
 
 void jkCogExt_SetThingPosEx(sithCog* ctx)
 {
     //TODO
-    sithSector* pSector = sithCogExec_PopSector(ctx);
+    SithSector* pSector = sithCogExec_PopSector(ctx);
     rdVector3 vec = {0};
     sithCogExec_PopVector(ctx, &vec);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
 }
 
@@ -1436,7 +1436,7 @@ void jkCogExt_SetThingPYR(sithCog* ctx)
     //TODO
     rdVector3 vec = {0};
     sithCogExec_PopVector(ctx, &vec);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
 }
 
@@ -1447,14 +1447,14 @@ void jkCogExt_SetThingLRUVecs(sithCog* ctx)
     sithCogExec_PopVector(ctx, &vec);
     sithCogExec_PopVector(ctx, &vec);
     sithCogExec_PopVector(ctx, &vec);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
 }
 
 void jkCogExt_SetThingSector(sithCog* ctx)
 {
-    sithSector* pSector = sithCogExec_PopSector(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithSector* pSector = sithCogExec_PopSector(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     sithCogExec_PushInt(ctx, -1); // TODO
     Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
 }
@@ -1462,20 +1462,20 @@ void jkCogExt_SetThingSector(sithCog* ctx)
 void jkCogExt_RestoreJoint(sithCog* ctx)
 {
     int val = sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
 }
 
 void jkCogExt_GetThingAirDrag(sithCog* ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     sithCogExec_PushFlex(ctx, 0.0); // TODO
     Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
 }
 
 void jkCogExt_GetThingEyeOffset(sithCog* ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     // TODO
     rdVector3 vec = {0};
     sithCogExec_PushVector(ctx, &vec);
@@ -1484,21 +1484,21 @@ void jkCogExt_GetThingEyeOffset(sithCog* ctx)
 
 void jkCogExt_GetThingHeadPitchMax(sithCog* ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     sithCogExec_PushFlex(ctx, 0.0); // TODO
     Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
 }
 
 void jkCogExt_GetThingHeadPitchMin(sithCog* ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     sithCogExec_PushFlex(ctx, 0.0); // TODO
     Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
 }
 
 void jkCogExt_GetThingJumpSpeed(sithCog* ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     sithCogExec_PushFlex(ctx, 0.0); // TODO
     Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
 }
@@ -1506,7 +1506,7 @@ void jkCogExt_GetThingJumpSpeed(sithCog* ctx)
 void jkCogExt_SetThingAirDrag(sithCog* ctx)
 {
     cog_flex_t a = sithCogExec_PopFlex(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
 }
 
@@ -1515,7 +1515,7 @@ void jkCogExt_SetThingEyeOffset(sithCog* ctx)
     //TODO
     rdVector3 vec = {0};
     sithCogExec_PopVector(ctx, &vec);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
 }
 
@@ -1523,14 +1523,14 @@ void jkCogExt_SetThingHeadPitchMinMax(sithCog* ctx)
 {
     cog_flex_t a = sithCogExec_PopFlex(ctx);
     cog_flex_t b = sithCogExec_PopFlex(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
 }
 
 void jkCogExt_SetThingJumpSpeed(sithCog* ctx)
 {
     cog_flex_t a = sithCogExec_PopFlex(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
 }
 
@@ -1539,20 +1539,20 @@ void jkCogExt_SetThingMesh(sithCog* ctx)
     char* a = sithCogExec_PopString(ctx);
     rdModel3* model3 = sithCogExec_PopModel3(ctx);
     char* c = sithCogExec_PopString(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
 }
 
 void jkCogExt_SetThingParent(sithCog* ctx)
 {
-    sithThing* pThing2 = sithCogExec_PopThing(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing2 = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     Windows_ErrorMsgboxWide("Unimplemented %s\n", __func__);
 }
 
 void jkCogExt_SetSaberFaceFlags(sithCog* ctx)
 {
-    sithThing* pPlayer = sithCogExec_PopThing(ctx);
+    SithThing* pPlayer = sithCogExec_PopThing(ctx);
     int flags = sithCogExec_PopInt(ctx);
 
     jkPlayerInfo* pPlayerInfo = pPlayer->playerInfo;

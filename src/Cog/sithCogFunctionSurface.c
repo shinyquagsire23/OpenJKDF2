@@ -9,7 +9,7 @@
 
 void sithCogFunctionSurface_GetSurfaceAdjoin(sithCog *ctx)
 {
-    sithSurface* pSurface = sithCogExec_PopSurface(ctx);
+    SithSurface* pSurface = sithCogExec_PopSurface(ctx);
 
     // TODO was this borked in JKDF2 and fixed in MoTS?
     // Previously: (v2 = &pSurface->adjoin->mirror->surface->index) != 0
@@ -21,7 +21,7 @@ void sithCogFunctionSurface_GetSurfaceAdjoin(sithCog *ctx)
 
 void sithCogFunctionSurface_GetSurfaceSector(sithCog *ctx)
 {
-    sithSurface *v1; // eax
+    SithSurface *v1; // eax
     uint32_t *v2; // eax
 
     v1 = sithCogExec_PopSurface(ctx);
@@ -33,7 +33,7 @@ void sithCogFunctionSurface_GetSurfaceSector(sithCog *ctx)
 
 void sithCogFunctionSurface_GetNumSurfaceVertices(sithCog *ctx)
 {
-    sithSurface *surface; // eax
+    SithSurface *surface; // eax
 
     surface = sithCogExec_PopSurface(ctx);
     if ( surface )
@@ -45,7 +45,7 @@ void sithCogFunctionSurface_GetNumSurfaceVertices(sithCog *ctx)
 void sithCogFunctionSurface_GetSurfaceVertexPos(sithCog *ctx)
 {
     uint32_t vtx_idx; // edi
-    sithSurface *surface; // eax
+    SithSurface *surface; // eax
 
     vtx_idx = sithCogExec_PopInt(ctx);
     surface = sithCogExec_PopSurface(ctx);
@@ -131,7 +131,7 @@ void sithCogFunctionSurface_SurfaceLightAnim(sithCog *ctx)
     cog_flex_t v5 = sithCogExec_PopFlex(ctx);
     cog_flex_t v6 = sithCogExec_PopFlex(ctx);
     cog_flex_t a1 = sithCogExec_PopFlex(ctx);
-    sithSurface* v2 = sithCogExec_PopSurface(ctx);
+    SithSurface* v2 = sithCogExec_PopSurface(ctx);
     if ( v2 && v6 >= (flex_d_t)a1 && v5 > 0.0 && (v4 = v5 * 0.5, v2->surfaceInfo.face.extraLight = a1, (v3 = sithSurface_SurfaceLightAnim(v2, v6, v4)) != 0) )
         sithCogExec_PushInt(ctx, v3->index);
     else
@@ -141,8 +141,8 @@ void sithCogFunctionSurface_SurfaceLightAnim(sithCog *ctx)
 void sithCogFunctionSurface_SlideWall(sithCog *ctx)
 {
     signed int pop_vec; // ebx
-    sithSurface *surface; // eax
-    sithSurface *v4; // edi
+    SithSurface *surface; // eax
+    SithSurface *v4; // edi
     rdSurface *v5; // ebx
     rdVector3 v7; // [esp+Ch] [ebp-Ch] BYREF
 
@@ -169,7 +169,7 @@ void sithCogFunctionSurface_SlideWall(sithCog *ctx)
 
 void sithCogFunctionSurface_GetWallCel(sithCog *ctx)
 {
-    sithSurface* surface = sithCogExec_PopSurface(ctx);
+    SithSurface* surface = sithCogExec_PopSurface(ctx);
     if ( surface && surface->surfaceInfo.face.material )
         sithCogExec_PushInt(ctx, surface->surfaceInfo.face.wallCel);
     else
@@ -179,7 +179,7 @@ void sithCogFunctionSurface_GetWallCel(sithCog *ctx)
 void sithCogFunctionSurface_SetWallCel(sithCog *ctx)
 {
     int wallCel; // esi
-    sithSurface *surface; // eax
+    SithSurface *surface; // eax
     rdMaterial *v3; // ecx
     int v4; // ebx
 
@@ -205,7 +205,7 @@ void sithCogFunctionSurface_GetSurfaceMaterial(sithCog *ctx)
 {
     rdMaterial *v2; // eax
 
-    sithSurface* surface = sithCogExec_PopSurface(ctx);
+    SithSurface* surface = sithCogExec_PopSurface(ctx);
     if ( surface && (v2 = surface->surfaceInfo.face.material) != 0 )
         sithCogExec_PushInt(ctx, v2 - sithWorld_g_pCurrentWorld->materials);
     else
@@ -217,7 +217,7 @@ void sithCogFunctionSurface_SetSurfaceMaterial(sithCog *ctx)
     rdMaterial *v4; // eax
 
     rdMaterial* mat = sithCogExec_PopMaterial(ctx);
-    sithSurface* surface = sithCogExec_PopSurface(ctx);
+    SithSurface* surface = sithCogExec_PopSurface(ctx);
     if ( surface )
     {
         v4 = surface->surfaceInfo.face.material;
@@ -240,7 +240,7 @@ void sithCogFunctionSurface_SetSurfaceMaterial(sithCog *ctx)
 void sithCogFunctionSurface_SetSurfaceFlags(sithCog *ctx)
 {
     uint32_t flags = sithCogExec_PopInt(ctx);
-    sithSurface* surface = sithCogExec_PopSurface(ctx);
+    SithSurface* surface = sithCogExec_PopSurface(ctx);
 
     if (surface && flags)
     {
@@ -255,7 +255,7 @@ void sithCogFunctionSurface_SetSurfaceFlags(sithCog *ctx)
 void sithCogFunctionSurface_ClearSurfaceFlags(sithCog *ctx)
 {
     uint32_t flags = sithCogExec_PopInt(ctx);
-    sithSurface* surface = sithCogExec_PopSurface(ctx);
+    SithSurface* surface = sithCogExec_PopSurface(ctx);
 
     if (surface && flags)
     {
@@ -269,7 +269,7 @@ void sithCogFunctionSurface_ClearSurfaceFlags(sithCog *ctx)
 
 void sithCogFunctionSurface_GetSurfaceFlags(sithCog *ctx)
 {
-    sithSurface* surface = sithCogExec_PopSurface(ctx);
+    SithSurface* surface = sithCogExec_PopSurface(ctx);
 
     if ( surface )
         sithCogExec_PushInt(ctx, surface->surfaceFlags);
@@ -280,11 +280,11 @@ void sithCogFunctionSurface_GetSurfaceFlags(sithCog *ctx)
 void sithCogFunctionSurface_SetAdjoinFlags(sithCog *ctx)
 {
     uint32_t flags = sithCogExec_PopInt(ctx);
-    sithSurface* surface = sithCogExec_PopSurface(ctx);
+    SithSurface* surface = sithCogExec_PopSurface(ctx);
 
     if ( surface )
     {
-        sithAdjoin* adjoin = surface->adjoin;
+        SithSurfaceAdjoin* adjoin = surface->adjoin;
         if ( adjoin )
         {
             if ( flags )
@@ -302,11 +302,11 @@ void sithCogFunctionSurface_SetAdjoinFlags(sithCog *ctx)
 void sithCogFunctionSurface_ClearAdjoinFlags(sithCog *ctx)
 {
     uint32_t flags = sithCogExec_PopInt(ctx);
-    sithSurface* surface = sithCogExec_PopSurface(ctx);
+    SithSurface* surface = sithCogExec_PopSurface(ctx);
 
     if ( surface )
     {
-        sithAdjoin* adjoin = surface->adjoin;
+        SithSurfaceAdjoin* adjoin = surface->adjoin;
         if ( adjoin )
         {
             if ( flags )
@@ -323,7 +323,7 @@ void sithCogFunctionSurface_ClearAdjoinFlags(sithCog *ctx)
 
 void sithCogFunctionSurface_GetAdjoinFlags(sithCog *ctx)
 {
-    sithSurface* surface = sithCogExec_PopSurface(ctx);
+    SithSurface* surface = sithCogExec_PopSurface(ctx);
     if (surface && surface->adjoin)
     {
         sithCogExec_PushInt(ctx, surface->adjoin->flags);
@@ -337,7 +337,7 @@ void sithCogFunctionSurface_GetAdjoinFlags(sithCog *ctx)
 void sithCogFunctionSurface_SetFaceType(sithCog *ctx)
 {
     uint32_t type = sithCogExec_PopInt(ctx);
-    sithSurface* surface = sithCogExec_PopSurface(ctx);
+    SithSurface* surface = sithCogExec_PopSurface(ctx);
     if ( surface )
     {
         surface->surfaceInfo.face.type |= type;
@@ -351,7 +351,7 @@ void sithCogFunctionSurface_SetFaceType(sithCog *ctx)
 void sithCogFunctionSurface_ClearFaceType(sithCog *ctx)
 {
     uint32_t type = sithCogExec_PopInt(ctx);
-    sithSurface* surface = sithCogExec_PopSurface(ctx);
+    SithSurface* surface = sithCogExec_PopSurface(ctx);
     if ( surface )
     {
         surface->surfaceInfo.face.type &= ~type;
@@ -364,7 +364,7 @@ void sithCogFunctionSurface_ClearFaceType(sithCog *ctx)
 
 void sithCogFunctionSurface_GetFaceType(sithCog *ctx)
 {
-    sithSurface* surface = sithCogExec_PopSurface(ctx);
+    SithSurface* surface = sithCogExec_PopSurface(ctx);
     if ( surface )
         sithCogExec_PushInt(ctx, surface->surfaceInfo.face.type);
     else
@@ -374,7 +374,7 @@ void sithCogFunctionSurface_GetFaceType(sithCog *ctx)
 void sithCogFunctionSurface_SetFaceGeoMode(sithCog *ctx)
 {
     rdGeoMode_t geoMode; // edi
-    sithSurface *v2; // eax
+    SithSurface *v2; // eax
 
     geoMode = (rdGeoMode_t)sithCogExec_PopInt(ctx);
     v2 = sithCogExec_PopSurface(ctx);
@@ -408,7 +408,7 @@ void sithCogFunctionSurface_SetFaceGeoMode(sithCog *ctx)
 
 void sithCogFunctionSurface_GetFaceGeoMode(sithCog *ctx)
 {
-    sithSurface *v1; // eax
+    SithSurface *v1; // eax
 
     v1 = sithCogExec_PopSurface(ctx);
     if ( v1 )
@@ -420,7 +420,7 @@ void sithCogFunctionSurface_GetFaceGeoMode(sithCog *ctx)
 void sithCogFunctionSurface_SetFaceLightMode(sithCog *ctx)
 {
     rdLightMode_t lightMode; // edi
-    sithSurface *v2; // eax
+    SithSurface *v2; // eax
 
     lightMode = (rdLightMode_t)sithCogExec_PopInt(ctx);
     v2 = sithCogExec_PopSurface(ctx);
@@ -436,7 +436,7 @@ void sithCogFunctionSurface_SetFaceLightMode(sithCog *ctx)
 
 void sithCogFunctionSurface_GetFaceLightMode(sithCog *ctx)
 {
-    sithSurface *v1; // eax
+    SithSurface *v1; // eax
 
     v1 = sithCogExec_PopSurface(ctx);
     if ( v1 )
@@ -448,7 +448,7 @@ void sithCogFunctionSurface_GetFaceLightMode(sithCog *ctx)
 void sithCogFunctionSurface_SetFaceTexMode(sithCog *ctx)
 {
     rdTexMode_t texMode; // edi
-    sithSurface *v2; // eax
+    SithSurface *v2; // eax
 
     texMode = (rdTexMode_t)sithCogExec_PopInt(ctx);
     v2 = sithCogExec_PopSurface(ctx);
@@ -464,7 +464,7 @@ void sithCogFunctionSurface_SetFaceTexMode(sithCog *ctx)
 
 void sithCogFunctionSurface_GetFaceTexMode(sithCog *ctx)
 {
-    sithSurface *v1; // eax
+    SithSurface *v1; // eax
 
     v1 = sithCogExec_PopSurface(ctx);
     if ( v1 )
@@ -475,7 +475,7 @@ void sithCogFunctionSurface_GetFaceTexMode(sithCog *ctx)
 
 void sithCogFunctionSurface_SetSurfaceLight(sithCog *ctx)
 {
-    sithSurface *v2; // ecx
+    SithSurface *v2; // ecx
 
     cog_flex_t v4 = sithCogExec_PopFlex(ctx);
     cog_flex_t a1 = sithCogExec_PopFlex(ctx);
@@ -499,7 +499,7 @@ void sithCogFunctionSurface_SetSurfaceLight(sithCog *ctx)
 
 void sithCogFunctionSurface_GetSurfaceLight(sithCog *ctx)
 {
-    sithSurface *v1; // eax
+    SithSurface *v1; // eax
 
     v1 = sithCogExec_PopSurface(ctx);
     if ( v1 ) {
@@ -510,7 +510,7 @@ void sithCogFunctionSurface_GetSurfaceLight(sithCog *ctx)
 
 void sithCogFunctionSurface_GetSurfaceCenter(sithCog *ctx)
 {
-    sithSurface *v1; // eax
+    SithSurface *v1; // eax
     rdVector3 a2; // [esp+4h] [ebp-Ch] BYREF
 
     v1 = sithCogExec_PopSurface(ctx);
@@ -535,7 +535,7 @@ void sithCogFunctionSurface_GetSurfaceCount(sithCog *ctx)
 
 void sithCogFunctionSurface_GetSurfaceNormal(sithCog *ctx)
 {
-    sithSurface *v1; // eax
+    SithSurface *v1; // eax
 
     v1 = sithCogExec_PopSurface(ctx);
     if ( v1 )
@@ -546,7 +546,7 @@ void sithCogFunctionSurface_GetSurfaceNormal(sithCog *ctx)
 
 void sithCogFunctionSurface_SyncSurface(sithCog *ctx)
 {
-    sithSurface *v1; // eax
+    SithSurface *v1; // eax
 
     v1 = sithCogExec_PopSurface(ctx);
     if ( v1 )
@@ -557,7 +557,7 @@ void sithCogFunctionSurface_SyncSurface(sithCog *ctx)
 void sithCogFunctionSurface_GetSurfaceVertexLight(sithCog *ctx)
 {
     int num = sithCogExec_PopInt(ctx);
-    sithSurface* pSurface = sithCogExec_PopSurface(ctx);
+    SithSurface* pSurface = sithCogExec_PopSurface(ctx);
     
     if ((pSurface && (num < (pSurface->surfaceInfo).face.numVertices)) && num > -1) {
         sithCogExec_PushFlex(ctx,(pSurface->surfaceInfo).intensities[num]);
@@ -572,7 +572,7 @@ void sithCogFunctionSurface_SetSurfaceVertexLight(sithCog *ctx)
 {
     cog_flex_t val = sithCogExec_PopFlex(ctx);
     int num = sithCogExec_PopInt(ctx);
-    sithSurface* pSurface = sithCogExec_PopSurface(ctx);
+    SithSurface* pSurface = sithCogExec_PopSurface(ctx);
 
     if ((pSurface && ((uint32_t)num < (pSurface->surfaceInfo).face.numVertices)) && num > -1) {
         (pSurface->surfaceInfo).intensities[num] = val;
@@ -585,8 +585,8 @@ void sithCogFunctionSurface_GetSurfaceVertexLightRGB(sithCog *ctx)
     rdVector3 tmp;
 
     int num = sithCogExec_PopInt(ctx);
-    sithSurface* pSurface = sithCogExec_PopSurface(ctx);
-    if (pSurface == (sithSurface *)0x0) {
+    SithSurface* pSurface = sithCogExec_PopSurface(ctx);
+    if (pSurface == (SithSurface *)0x0) {
         tmp.x = -1.0;
         tmp.y = -1.0;
         tmp.z = -1.0;
@@ -624,9 +624,9 @@ void sithCogFunctionSurface_SetSurfaceVertexLightRGB(sithCog *ctx)
     
     sithCogExec_PopVector(ctx, &valRGB);
     int num = sithCogExec_PopInt(ctx);
-    sithSurface* pSurface = sithCogExec_PopSurface(ctx);
+    SithSurface* pSurface = sithCogExec_PopSurface(ctx);
 
-    if ((((pSurface != (sithSurface *)0x0) 
+    if ((((pSurface != (SithSurface *)0x0) 
         && (uVar1 = (pSurface->surfaceInfo).face.numVertices, (uint32_t)num < uVar1)) && (-1 < num)) 
         && ((pSurface->surfaceFlags & SITH_SURFACE_1000000) != 0)) {
         (pSurface->surfaceInfo).intensities[num + uVar1] = valRGB.x;
@@ -635,7 +635,7 @@ void sithCogFunctionSurface_SetSurfaceVertexLightRGB(sithCog *ctx)
     }
 }
 
-void sithCogFunctionSurface_Startup(sithCogSymboltable* ctx)
+void sithCogFunctionSurface_Startup(SithCogSymbolTable* ctx)
 {
     sithCog_RegisterFunction(ctx, sithCogFunctionSurface_GetSurfaceAdjoin, "getsurfaceadjoin");
     sithCog_RegisterFunction(ctx, sithCogFunctionSurface_GetSurfaceSector, "getsurfacesector");

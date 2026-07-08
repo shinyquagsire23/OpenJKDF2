@@ -26,7 +26,7 @@ int sithCollision_Startup()
     if ( sithCollision_initted )
         return 0;
 
-    _memset(sithCollision_collisionHandlers, 0, 144 * sizeof(sithCollisionEntry)); // sizeof(sithCollision_collisionHandlers)
+    _memset(sithCollision_collisionHandlers, 0, 144 * sizeof(SithCollideResult)); // sizeof(sithCollision_collisionHandlers)
     _memset(sithCollision_aThingSurfaceCollideResults, 0, 12 * sizeof(int)); // sizeof(sithCollision_aThingSurfaceCollideResults)
     sithCollision_AddCollisionHandler(SITH_THING_ACTOR, SITH_THING_ACTOR, sithActor_ActorCollisionHandler, 0);
     sithCollision_AddCollisionHandler(SITH_THING_ACTOR, SITH_THING_PLAYER, sithActor_ActorCollisionHandler, 0);
@@ -79,14 +79,14 @@ void sithCollision_AddSurfaceCollisionHandler(int type, sithCollisionHitHandler_
     sithCollision_aThingSurfaceCollideResults[type] = a2;
 }
 
-sithCollisionSearchEntry* sithCollision_PopStack()
+SithCollision* sithCollision_PopStack()
 {
-    sithCollisionSearchEntry* retVal = NULL;
+    SithCollision* retVal = NULL;
     flex_t maxDist = 3.4e38;
     
     for (int i = 0; i < sithCollision_aNumStackCollisions[sithCollision_searchStackIdx]; i++)
     {
-        sithCollisionSearchEntry* iter = &sithCollision_aCollisions[sithCollision_searchStackIdx].collisions[i];
+        SithCollision* iter = &sithCollision_aCollisions[sithCollision_searchStackIdx].collisions[i];
         if ( !iter->hasBeenEnumerated )
         {
             if ( maxDist <= iter->distance )
@@ -115,18 +115,18 @@ sithCollisionSearchEntry* sithCollision_PopStack()
     }
 }
 
-flex_t sithCollision_SearchForCollisions(sithSector *pStartSector, sithThing *pThing, const rdVector3 *pStartPos, const rdVector3 *pMoveNorm, flex_t moveDist, flex_t radius, int flags)
+flex_t sithCollision_SearchForCollisions(SithSector *pStartSector, SithThing *pThing, const rdVector3 *pStartPos, const rdVector3 *pMoveNorm, flex_t moveDist, flex_t radius, int flags)
 {
-    sithCollisionSearchEntry *i; // ebp
-    sithSector *pSurfAdjSector; // esi
+    SithCollision *i; // ebp
+    SithSector *pSurfAdjSector; // esi
     unsigned int num; // eax
     unsigned int chk; // edi
     unsigned int v17; // edx
     unsigned int v18; // ebp
-    sithSector *j; // eax
-    sithAdjoin *pAdjoin; // ebx
-    sithSector *pAdjoinSector; // esi
-    sithSector *v24; // edx
+    SithSector *j; // eax
+    SithSurfaceAdjoin *pAdjoin; // ebx
+    SithSector *pAdjoinSector; // esi
+    SithSector *v24; // edx
     unsigned int v26; // [esp+10h] [ebp-8h]
     flex_t curMoveDist; // [esp+2Ch] [ebp+14h]
 
@@ -212,21 +212,21 @@ void sithCollision_DecreaseStackLevel()
     --sithCollision_searchStackIdx;
 }
 
-flex_t sithCollision_SearchForThingCollisions(sithSector *pSector, sithThing *sender, const rdVector3 *a2, const rdVector3 *a3, flex_t a4, flex_t range, int flags)
+flex_t sithCollision_SearchForThingCollisions(SithSector *pSector, SithThing *sender, const rdVector3 *a2, const rdVector3 *a3, flex_t a4, flex_t range, int flags)
 {
-    sithThing *v7; // esi
-    sithThing *v8; // ebp
+    SithThing *v7; // esi
+    SithThing *v8; // ebp
     int v9; // ebx
     int v10; // eax
-    sithThing *v13; // ecx
-    sithThing *v14; // eax
-    sithThing *v15; // ecx
-    sithThing *v16; // eax
+    SithThing *v13; // ecx
+    SithThing *v14; // eax
+    SithThing *v15; // ecx
+    SithThing *v16; // eax
     int v19; // eax
     rdFace *v21; // ebx
     int v22; // edx
     flex_t v23; // st7
-    sithCollisionSearchEntry *v24; // ecx
+    SithCollision *v24; // ecx
     rdMesh *senderMesh; // edx
     sithCollision_searchHandler_t handler;
     int v27; // eax
@@ -316,31 +316,31 @@ LABEL_41:
     return a4;
 }
 
-void sithCollision_SearchForSurfaceCollisions(sithSector *sector, const rdVector3 *vec1, const rdVector3 *vec2, flex_t a4, flex_t a5, int raycastFlags)
+void sithCollision_SearchForSurfaceCollisions(SithSector *sector, const rdVector3 *vec1, const rdVector3 *vec2, flex_t a4, flex_t a5, int raycastFlags)
 {
-    sithSurface *v12; // esi
-    sithAdjoin *v15; // eax
+    SithSurface *v12; // esi
+    SithSurfaceAdjoin *v15; // eax
     unsigned int v17; // ecx
     unsigned int v18; // edi
-    sithSector **v19; // eax
+    SithSector **v19; // eax
     int v20; // ecx
     flex_d_t v21; // st7
-    sithCollisionSearchEntry *v23; // eax
+    SithCollision *v23; // eax
     int v24; // ecx
     unsigned int v25; // edi
     unsigned int v26; // edx
-    sithSector **v27; // eax
+    SithSector **v27; // eax
     int v28; // edx
     flex_d_t v29; // st7
-    sithCollisionSearchEntry *v31; // eax
+    SithCollision *v31; // eax
     int v32; // edx
     flex_d_t v33; // st7
-    sithCollisionSearchEntry *v34; // eax
+    SithCollision *v34; // eax
     rdVector3 *v35; // ecx
     int v36; // ecx
     flex_d_t v37; // st7
     int v38; // edx
-    sithCollisionSearchEntry *v40; // eax
+    SithCollision *v40; // eax
     int v42; // [esp+0h] [ebp-40h] BYREF
     flex_t a7; // [esp+10h] [ebp-30h] BYREF
     int v47; // [esp+20h] [ebp-20h]
@@ -507,15 +507,15 @@ LABEL_42:
     }
 }
 
-sithSector* sithCollision_FindSectorInRadius(sithSector *pStartSector, const rdVector3 *pStartPos, rdVector3 *pEndPos, flex_t a5)
+SithSector* sithCollision_FindSectorInRadius(SithSector *pStartSector, const rdVector3 *pStartPos, rdVector3 *pEndPos, flex_t a5)
 {
     flex_d_t v4; // st6
-    sithSector *result; // eax
+    SithSector *result; // eax
     int v7; // edi
     sithCollisionSearchResult *v8; // ebx
-    sithCollisionSearchEntry *v9; // edx
+    SithCollision *v9; // edx
     flex_d_t v10; // st7
-    sithCollisionSearchEntry *v11; // ecx
+    SithCollision *v11; // ecx
     int v12; // esi
     rdVector3 a1; // [esp+8h] [ebp-Ch] BYREF
     flex_t a3a; // [esp+1Ch] [ebp+8h]
@@ -531,7 +531,7 @@ sithSector* sithCollision_FindSectorInRadius(sithSector *pStartSector, const rdV
     {
         v9 = 0;
         v10 = 3.4e38;
-        v11 = (sithCollisionSearchEntry *)v8;
+        v11 = (SithCollision *)v8;
         if ( sithCollision_aNumStackCollisions[v7] )
         {
             v12 = sithCollision_aNumStackCollisions[v7];
@@ -579,7 +579,7 @@ sithSector* sithCollision_FindSectorInRadius(sithSector *pStartSector, const rdV
     return result;
 }
 
-void sithCollision_FallHurt(sithThing *thing, flex_t vel)
+void sithCollision_FallHurt(SithThing *thing, flex_t vel)
 {
     flex_d_t v2; // st7
 
@@ -591,9 +591,9 @@ void sithCollision_FallHurt(sithThing *thing, flex_t vel)
     }
 }
 
-void sithCollision_RotateThing(sithThing *thing, rdMatrix34 *orient)
+void sithCollision_RotateThing(SithThing *thing, rdMatrix34 *orient)
 {
-    sithThing *i; // esi
+    SithThing *i; // esi
     rdVector3 a1a; // [esp+18h] [ebp-Ch] BYREF
     rdVector3 tmp;
 
@@ -615,35 +615,35 @@ void sithCollision_RotateThing(sithThing *thing, rdMatrix34 *orient)
     }
 }
 
-flex_t sithCollision_MoveThing(sithThing *pThing, rdVector3 *a2, flex_t a6, int flags)
+flex_t sithCollision_MoveThing(SithThing *pThing, rdVector3 *a2, flex_t a6, int flags)
 {
-    sithThing *v5; // ebp
-    sithThing *v10; // esi
+    SithThing *v5; // ebp
+    SithThing *v10; // esi
     flex_d_t v11; // st7
     flex_d_t v12; // st7
     //char v15; // c0
     int v16; // edi
     flex_t v17; // edx
     //int v18; // edx
-    sithCollisionSearchEntry *v19; // esi
+    SithCollision *v19; // esi
     //flex_d_t v20; // st7
-    //sithCollisionSearchEntry *v21; // ecx
+    //SithCollision *v21; // ecx
     int v22; // ebx
     flex_d_t v23; // st6
     flex_d_t v24; // st7
     flex_d_t v25; // st7
     flex_d_t v30; // st5
-    sithThing *v34; // ecx
+    SithThing *v34; // ecx
     int v35; // eax
     int v36; // eax
-    sithSurface *v37; // eax
+    SithSurface *v37; // eax
     flex_d_t v44; // st7
     //char v46; // c3
     //char v49; // c0
     //char v52; // c0
-    sithThing *i; // esi
+    SithThing *i; // esi
     int v61; // eax
-    sithSurface *amount; // [esp+0h] [ebp-54h]
+    SithSurface *amount; // [esp+0h] [ebp-54h]
     flex_t v64; // [esp+18h] [ebp-3Ch]
     flex_t v65; // [esp+1Ch] [ebp-38h]
     unsigned int v66; // [esp+20h] [ebp-34h]
@@ -651,7 +651,7 @@ flex_t sithCollision_MoveThing(sithThing *pThing, rdVector3 *a2, flex_t a6, int 
     rdVector3 posCopy;
     rdVector3 out; // [esp+3Ch] [ebp-18h] BYREF
     rdVector3 v72; // [esp+48h] [ebp-Ch] BYREF
-    sithSector* sectTmp;
+    SithSector* sectTmp;
 
     v64 = 0.0;
     v65 = 0.0;
@@ -909,9 +909,9 @@ LABEL_81:
     return v64;
 }
 
-int sithCollision_HandleThingHitSurface(sithThing *thing, sithSurface *surface, sithCollisionSearchEntry *a3)
+int sithCollision_HandleThingHitSurface(SithThing *thing, SithSurface *surface, SithCollision *a3)
 {
-    sithThing *v3; // esi
+    SithThing *v3; // esi
     flex_t a1a; // [esp+Ch] [ebp+4h]
 
     v3 = thing;
@@ -941,10 +941,10 @@ int sithCollision_HandleThingHitSurface(sithThing *thing, sithSurface *surface, 
     return 1;
 }
 
-int sithCollision_ThingCollisionHandler(sithThing *thing1, sithThing *thing2, sithCollisionSearchEntry *a3, int isInverse)
+int sithCollision_ThingCollisionHandler(SithThing *thing1, SithThing *thing2, SithCollision *a3, int isInverse)
 {
-    sithThing *v4; // esi
-    sithThing *v5; // edi
+    SithThing *v4; // esi
+    SithThing *v5; // edi
     flex_d_t v6; // st6
     //char v9; // c0
     flex_d_t v11; // st7
@@ -1039,7 +1039,7 @@ int sithCollision_ThingCollisionHandler(sithThing *thing1, sithThing *thing2, si
     return 1;
 }
 
-int sithCollision_CollideHurt(sithThing *a1, rdVector3 *a2, flex_t a3, int a4)
+int sithCollision_CollideHurt(SithThing *a1, rdVector3 *a2, flex_t a3, int a4)
 {
     int result; // eax
     flex_d_t v10; // st6
@@ -1128,15 +1128,15 @@ int sithCollision_CollideHurt(sithThing *a1, rdVector3 *a2, flex_t a3, int a4)
     return result;
 }
 
-int sithCollision_HasLOS(sithThing *thing1, sithThing *thing2, int flag)
+int sithCollision_HasLOS(SithThing *thing1, SithThing *thing2, int flag)
 {
     int searchFlags; // edi
     int v4; // edi
-    sithCollisionSearchEntry *v5; // ebp
+    SithCollision *v5; // ebp
     flex_d_t v6; // st7
-    sithCollisionSearchEntry *v7; // edx
-    sithCollisionSearchEntry *v8; // ecx
-    sithThing *v10; // edx
+    SithCollision *v7; // edx
+    SithCollision *v8; // ecx
+    SithThing *v10; // edx
     int result; // eax
     int v12; // [esp+10h] [ebp-10h]
     rdVector3 a1a; // [esp+14h] [ebp-Ch] BYREF
@@ -1206,9 +1206,9 @@ int sithCollision_HasLOS(sithThing *thing1, sithThing *thing2, int flag)
     return result;
 }
 
-void sithCollision_sub_4E77A0(sithThing *thing, rdMatrix34 *a2)
+void sithCollision_sub_4E77A0(SithThing *thing, rdMatrix34 *a2)
 {
-    sithThing *v5; // edi
+    SithThing *v5; // edi
     rdVector3 a2a; // [esp+10h] [ebp-6Ch] BYREF
     rdMatrix34 out; // [esp+1Ch] [ebp-60h] BYREF
     rdMatrix34 mat1; // [esp+4Ch] [ebp-30h] BYREF
@@ -1249,7 +1249,7 @@ void sithCollision_sub_4E77A0(sithThing *thing, rdMatrix34 *a2)
     stdPlatform_Memcpy32(&thing->lookOrientation, a2, sizeof(thing->lookOrientation)); // Added: word-safe (things may be in extram)
 }
 
-int sithCollision_ParticleAndActorCollisionHandler(sithThing *thing, sithThing *thing2, sithCollisionSearchEntry *searchEnt, int isSolid)
+int sithCollision_ParticleAndActorCollisionHandler(SithThing *thing, SithThing *thing2, SithCollision *searchEnt, int isSolid)
 {
     int result; // eax
     flex_t mass; // [esp+14h] [ebp+4h]
@@ -1277,15 +1277,15 @@ int sithCollision_ParticleAndActorCollisionHandler(sithThing *thing, sithThing *
 }
 
 // Find nearest collision result from search
-static sithCollisionSearchEntry* sithCollision_PopClosest()
+static SithCollision* sithCollision_PopClosest()
 {
-    sithCollisionSearchEntry *best = NULL;
+    SithCollision *best = NULL;
     flex_t bestDist = 3.4e38f;
     int numResults = sithCollision_aNumStackCollisions[sithCollision_searchStackIdx];
 
     for (int i = 0; i < numResults; i++)
     {
-        sithCollisionSearchEntry *entry = &sithCollision_aCollisions[sithCollision_searchStackIdx].collisions[i];
+        SithCollision *entry = &sithCollision_aCollisions[sithCollision_searchStackIdx].collisions[i];
         if ( !entry->hasBeenEnumerated )
         {
             if ( bestDist <= entry->distance )
@@ -1303,7 +1303,7 @@ static sithCollisionSearchEntry* sithCollision_PopClosest()
     return best;
 }
 
-sithThing* sithCollision_RaycastFromCamera(rdVector3 *pos)
+SithThing* sithCollision_RaycastFromCamera(rdVector3 *pos)
 {
     rdVector3 dir;
     rdVector3 camPos;
@@ -1323,8 +1323,8 @@ sithThing* sithCollision_RaycastFromCamera(rdVector3 *pos)
     sithCollision_SearchForCollisions(sithCamera_g_pCurCamera->sector, NULL,
         &sithCamera_g_pCurCamera->vec3_1, &dir, 100.0f, 0.0f, 0x103);
 
-    sithCollisionSearchEntry *best = sithCollision_PopClosest();
-    sithThing *result = NULL;
+    SithCollision *best = sithCollision_PopClosest();
+    SithThing *result = NULL;
     if ( best )
     {
         best->hasBeenEnumerated = 1;
@@ -1337,12 +1337,12 @@ sithThing* sithCollision_RaycastFromCamera(rdVector3 *pos)
     return result;
 }
 
-sithThing* sithCollision_RaycastSector(sithSector *sector, rdVector3 *startPos, rdVector3 *dir, flex_t dist, flex_t radius, uint32_t *pHitType)
+SithThing* sithCollision_RaycastSector(SithSector *sector, rdVector3 *startPos, rdVector3 *dir, flex_t dist, flex_t radius, uint32_t *pHitType)
 {
     sithCollision_SearchForCollisions(sector, NULL, startPos, dir, dist, radius, 0x103);
 
-    sithCollisionSearchEntry *best = sithCollision_PopClosest();
-    sithThing *result = NULL;
+    SithCollision *best = sithCollision_PopClosest();
+    SithThing *result = NULL;
     if ( best )
     {
         best->hasBeenEnumerated = 1;
@@ -1356,7 +1356,7 @@ sithThing* sithCollision_RaycastSector(sithSector *sector, rdVector3 *startPos, 
     return result;
 }
 
-int sithCollision_CheckPathClear(sithSector *sector, rdVector3 *startPos, rdVector3 *endPos, flex_t radius)
+int sithCollision_CheckPathClear(SithSector *sector, rdVector3 *startPos, rdVector3 *endPos, flex_t radius)
 {
     rdVector3 dir;
     rdVector_Sub3(&dir, endPos, startPos);
@@ -1364,7 +1364,7 @@ int sithCollision_CheckPathClear(sithSector *sector, rdVector3 *startPos, rdVect
 
     sithCollision_SearchForCollisions(sector, NULL, startPos, &dir, dist, radius, 0x12A);
 
-    sithCollisionSearchEntry *best = sithCollision_PopClosest();
+    SithCollision *best = sithCollision_PopClosest();
     int result = 1;
     if ( best )
     {

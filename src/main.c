@@ -1906,7 +1906,7 @@ void do_hooks()
     hook_function(sithAnimClass_New_ADDR, sithAnimClass_New);
     hook_function(sithAnimClass_Free_ADDR, sithAnimClass_Free);
     
-    // sithCamera
+    // SithCamera
     hook_function(sithCamera_Startup_ADDR, sithCamera_Startup);
     hook_function(sithCamera_ResetAllCameras_ADDR, sithCamera_ResetAllCameras);
     hook_function(sithCamera_NewEntry_ADDR, sithCamera_NewEntry);
@@ -1932,7 +1932,7 @@ void do_hooks()
     hook_function(sithPlayerActions_JumpWithVel_ADDR, sithPlayerActions_JumpWithVel);
     hook_function(sithPlayerActions_MoveToPlayerPosition_ADDR, sithPlayerActions_MoveToPlayerPosition);
     
-    // sithThing
+    // SithThing
     hook_function(sithThing_Startup_ADDR, sithThing_Startup);
     hook_function(sithThing_Shutdown_ADDR, sithThing_Shutdown);
     hook_function(sithThing_RegisterUnknownFunc_ADDR, sithThing_RegisterUnknownFunc);
@@ -1967,7 +1967,7 @@ void do_hooks()
     hook_function(sithThing_GetGuidThing_ADDR, sithThing_GetGuidThing);
     hook_function(sithActor_DestroyActor_ADDR, sithActor_DestroyActor);
     
-    // sithSector
+    // SithSector
     hook_function(sithAIAwareness_Startup_ADDR, sithAIAwareness_Startup);
     hook_function(sithAIAwareness_Close_ADDR, sithAIAwareness_Close);
     hook_function(sithAIAwareness_sub_4F2B10_ADDR, sithAIAwareness_ProcessEvents);
@@ -2098,7 +2098,7 @@ void do_hooks()
     hook_function(sithModel_AllocWorldModels_ADDR, sithModel_AllocWorldModels);
     hook_function(sithModel_GetModelByIndex_ADDR, sithModel_GetModelByIndex);
     
-    // sithWorld
+    // SithWorld
     hook_function(sithWorld_Startup_ADDR, sithWorld_Startup);
     hook_function(sithWorld_Shutdown_ADDR, sithWorld_Shutdown);
     hook_function(sithWorld_SetLoadProgressCallback_ADDR, sithWorld_SetLoadProgressCallback);
@@ -2188,7 +2188,7 @@ void do_hooks()
     hook_function(sithPhysics_FindFloor_ADDR, sithPhysics_FindFloor);
     hook_function(sithPhysics_UpdateThing_ADDR, sithPhysics_UpdateThing);
     
-    // sithSurface
+    // SithSurface
     hook_function(sithSurface_AllocWorldSurfaces_ADDR, sithSurface_AllocWorldSurfaces);
     hook_function(sithSurface_sub_4E5AD0_ADDR, sithSurface_AllocWorldAdjoins);
     hook_function(sithSurface_FreeWorldSurfaces_ADDR, sithSurface_FreeWorldSurfaces);
@@ -2377,7 +2377,7 @@ void do_hooks()
     hook_function(sithCollision_sub_4E73F0_ADDR, sithCollision_CheckPathClear);
 #endif
     
-    // sithActor
+    // SithAIControlBlock
     hook_function(sithActor_SetDifficulty_ADDR, sithActor_SetDifficulty);
     hook_function(sithActor_SurfaceCollisionHandler_ADDR, sithActor_SurfaceCollisionHandler);
     hook_function(sithActor_SetHeadPYR_ADDR, sithActor_SetHeadPYR);
@@ -2397,7 +2397,7 @@ void do_hooks()
     hook_function(sithMap_Startup_ADDR, sithMap_Startup);
     hook_function(sithMap_Shutdown_ADDR, sithMap_Shutdown);
     
-    // sithEvent
+    // SithEvent
     hook_function(sithEvent_Startup_ADDR, sithEvent_Startup);
     hook_function(sithEvent_Shutdown_ADDR, sithEvent_Shutdown);
     hook_function(sithEvent_Open_ADDR, sithEvent_Open);
@@ -2581,7 +2581,7 @@ void do_hooks()
     hook_function(sithAI_RandomRotationVector_ADDR, sithAI_RandomRotationVector);
     hook_function(sithAI_sub_4EB860_ADDR, sithAI_sub_4EB860);
 
-    // sithAIClass
+    // SithAIClass
     hook_function(sithAIClass_Startup_ADDR, sithAIClass_Startup);
     hook_function(sithAIClass_Shutdown_ADDR, sithAIClass_Shutdown);
     hook_function(sithAIClass_ReadStaticAIClassesListText_ADDR, sithAIClass_ReadStaticAIClassesListText);

@@ -42,22 +42,22 @@ p10 - Att4 Range
 p11 - Att4 Damage
 p12 - Att4 Duration
 */
-int jkAI_SaberFighting(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, int extra)
+int jkAI_SaberFighting(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAIInstinctState *instinct, int flags, int extra)
 {
     unsigned int v5; // edi
-    sithThing *v7; // ecx
+    SithThing *v7; // ecx
     jkPlayerInfo *v8; // eax
-    sithThing *v9; // edx
+    SithThing *v9; // edx
     signed int result; // eax
     unsigned int v11; // eax
     int v12; // eax
-    sithThing *v13; // ecx
+    SithThing *v13; // ecx
     flex_t *v14; // ecx
     int v17_lo; // rax lo
     flex_d_t v18; // st7
     int v19; // ebx
     signed int v20; // edi
-    sithThing *v21; // ecx
+    SithThing *v21; // ecx
     int v23; // eax
     flex_t a2a; // [esp+1Ch] [ebp+4h]
     flex_t a3a; // [esp+28h] [ebp+10h]
@@ -185,16 +185,16 @@ LABEL_27:
     return result;
 }
 
-int jkAI_SpecialAttack(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, sithThing *extra)
+int jkAI_SpecialAttack(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAIInstinctState *instinct, int flags, SithThing *extra)
 {
     rdPuppet *v5; // ebx
     int v6; // edx
     rdPuppet *v9; // ebp
     unsigned int v10; // eax
     int v11; // edx
-    sithThing *v13; // eax
+    SithThing *v13; // eax
     uint32_t v14; // ecx
-    sithThing *v15; // edx
+    SithThing *v15; // edx
     int v16; // eax
     int aiclassa; // [esp+24h] [ebp+8h]
 
@@ -277,7 +277,7 @@ p10 - recharge time for FP1 (msec)
 p11 - recharge time for FP2 (msec)
 p12 - recharge time for FP3 (msec)
 */
-int jkAI_ForcePowers(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinct *instinct, int flags, int extra)
+int jkAI_ForcePowers(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAIInstinctState *instinct, int flags, int extra)
 {
     int v6; // ebx
     flex_d_t v7; // st6

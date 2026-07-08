@@ -25,8 +25,8 @@
 #define rdThing_Draw_ADDR (0x0043E4E0)
 #define rdThing_AccumulateMatrices_ADDR (0x0043E560)
 
-rdThing* rdThing_New(sithThing *parent);
-int rdThing_NewEntry(rdThing *thing, sithThing *parent);
+rdThing* rdThing_New(SithThing *parent);
+int rdThing_NewEntry(rdThing *thing, SithThing *parent);
 void rdThing_Free(rdThing *thing);
 void rdThing_FreeEntry(rdThing *thing);
 int rdThing_SetModel3(rdThing *thing, rdModel3 *model);

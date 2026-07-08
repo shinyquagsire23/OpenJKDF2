@@ -903,7 +903,7 @@ int sithControl_buttonPressDebounce = 0;
 #endif
 
 // MOTS altered
-int sithControl_HandlePlayer(sithThing *player, flex_t deltaSecs)
+int sithControl_HandlePlayer(SithThing *player, flex_t deltaSecs)
 {
     int v3; // esi
     int result; // eax
@@ -1047,7 +1047,7 @@ debug_controls:
 
     // Added
     if (sithControl_followingPlayer > 0) {
-        sithThing* pThing = jkPlayer_playerInfos[sithControl_followingPlayer].playerThing;
+        SithThing* pThing = jkPlayer_playerInfos[sithControl_followingPlayer].playerThing;
         if (pThing) {
             rdVector_Copy3(&player->position, &pThing->position);
             rdMatrix_Copy34(&player->lookOrientation, &pThing->lookOrientation);
@@ -1184,7 +1184,7 @@ debug_controls:
     return result;
 }
 
-void sithControl_PlayerLook(sithThing *player, flex_t deltaSecs)
+void sithControl_PlayerLook(SithThing *player, flex_t deltaSecs)
 {
     int v3; // edi
     flex_d_t v5; // st7
@@ -1279,7 +1279,7 @@ LABEL_20:
 }
 
 
-void sithControl_PlayerMovementMots(sithThing *player)
+void sithControl_PlayerMovementMots(SithThing *player)
 {
     uint32_t uVar1;
     int iVar2;
@@ -1287,7 +1287,7 @@ void sithControl_PlayerMovementMots(sithThing *player)
     flex_t fVar4;
     flex_t local_8;
     int local_4;
-    sithThing *thing;
+    SithThing *thing;
     
     thing = player;
     flex_t move_multiplier = 1.0;
@@ -1478,7 +1478,7 @@ LAB_00527d1c:
     }
 }
 
-void sithControl_PlayerMovement(sithThing *player)
+void sithControl_PlayerMovement(SithThing *player)
 {
     if (Main_bMotsCompat) {
         sithControl_PlayerMovementMots(player);
@@ -1595,11 +1595,11 @@ void sithControl_PlayerMovement(sithThing *player)
 }
 
 // MOTS altered
-void sithControl_FreeCam(sithThing *player)
+void sithControl_FreeCam(SithThing *player)
 {
-    sithThing *v1; // esi
+    SithThing *v1; // esi
     int v2; // ebp
-    sithSector *v3; // eax
+    SithSector *v3; // eax
     flex_d_t v5; // st7
     flex_d_t v6; // st6
     rdVector3 *v7; // edi

@@ -507,7 +507,7 @@ void sithMain_SetEpisodeName(char *text)
 // MOTS altered
 void sithOpenPostProcess()
 {
-    sithThing *v3; // esi
+    SithThing *v3; // esi
     sithCog *v4; // eax
     char v5[128]; // [esp+10h] [ebp-80h] BYREF
 

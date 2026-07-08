@@ -34,7 +34,7 @@ void sithAIAwareness_Close()
     sithAIAwareness_bInitted = 0;
 }
 
-int sithAIAwareness_CreateTransmittingEvent(sithSector *sector, rdVector3 *pos, int32_t a3, flex_t a4, sithThing *thing)
+int sithAIAwareness_CreateTransmittingEvent(SithSector *sector, rdVector3 *pos, int32_t a3, flex_t a4, SithThing *thing)
 {
     if (!sithAI_bOpened) {
         return 0;
@@ -65,7 +65,7 @@ void sithAIAwareness_ProcessEvents()
     }
 }
 
-int sithAIAwareness_Update(int32_t a, sithEventInfo* b)
+int sithAIAwareness_Update(int32_t a, SithEventParams* b)
 {
     // Added: co-op
     if (sithNet_isMulti && !sithNet_isServer) {
@@ -93,7 +93,7 @@ int sithAIAwareness_Update(int32_t a, sithEventInfo* b)
         // TODO: define this maximum
         if (v3 >= SITHAI_MAX_ACTORS) break;
 
-        sithActor* i = &sithAI_actors[v3];
+        SithAIControlBlock* i = &sithAI_actors[v3];
 
         if ( i->pAIClass )
         {
@@ -101,7 +101,7 @@ int sithAIAwareness_Update(int32_t a, sithEventInfo* b)
             {
                 if ( (i->thing->thingflags & (SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
                 {
-                    sithSector* v6 = i->thing->sector;
+                    SithSector* v6 = i->thing->sector;
                     if ( v6 )
                     {
                         if ( sithAIAwareness_g_aSectors[v6->id].field_0 == sithAIAwareness_timerTicks )
@@ -115,7 +115,7 @@ int sithAIAwareness_Update(int32_t a, sithEventInfo* b)
     return 1;
 }
 
-void sithAIAwareness_ProcessEvent(sithSectorEntry *pSectorEntry, sithSector *pSector, rdVector3 *pPos1, rdVector3 *pPos2, flex_t a5, flex_t a6, sithThing *pThing)
+void sithAIAwareness_ProcessEvent(sithSectorEntry *pSectorEntry, SithSector *pSector, rdVector3 *pPos1, rdVector3 *pPos2, flex_t a5, flex_t a6, SithThing *pThing)
 {
     // Added: potential crash maybe?
     OPENJKDF2_WARN_NULL_AND_RETURN(pSectorEntry);
@@ -141,7 +141,7 @@ void sithAIAwareness_ProcessEvent(sithSectorEntry *pSectorEntry, sithSector *pSe
         pSectorAlloc->field_58[pSectorEntry->field_14] = pThing;
         if (a6 > 0.0)
         {
-            for (sithAdjoin* i = pSector->adjoins; i; i = i->next)
+            for (SithSurfaceAdjoin* i = pSector->adjoins; i; i = i->next)
             {
                 flex_t a6a = (i->mirror ? a6 - i->mirror->dist : a6);
 

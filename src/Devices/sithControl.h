@@ -48,11 +48,11 @@ void sithControl_Reset();
 void sithControl_RegisterControlFunctions();
 void sithControl_Update(flex_t deltaSecs, int deltaMs);
 void sithControl_RegisterControlCallback(sithControl_handler_t a1);
-MATH_FUNC int sithControl_HandlePlayer(sithThing *player_, flex_t a2);
-MATH_FUNC void sithControl_PlayerLook(sithThing *player, flex_t deltaSecs);
-MATH_FUNC void sithControl_PlayerMovement(sithThing *player);
-MATH_FUNC void sithControl_PlayerMovementMots(sithThing *player);
-MATH_FUNC void sithControl_FreeCam(sithThing *player);
+MATH_FUNC int sithControl_HandlePlayer(SithThing *player_, flex_t a2);
+MATH_FUNC void sithControl_PlayerLook(SithThing *player, flex_t deltaSecs);
+MATH_FUNC void sithControl_PlayerMovement(SithThing *player);
+MATH_FUNC void sithControl_PlayerMovementMots(SithThing *player);
+MATH_FUNC void sithControl_FreeCam(SithThing *player);
 
 stdControlKeyInfoEntry* sithControl_BindControl(int funcIdx, int keyNum, int flags);
 stdControlKeyInfoEntry* sithControl_BindAxis(int funcIdx, int dxKeyNum, uint32_t flags);
@@ -86,14 +86,14 @@ int sithControl_GetLastSelected();
 
 //static stdControlKeyInfo* (*sithControl_EnumBindings)(sithControlEnumFunc_t func, int a2, int a3, int a4, int a5) = (void*)sithControl_EnumBindings_ADDR;
 //static void (*sithControl_RebindMouse)() = (void*)sithControl_RebindMouse_ADDR;
-//static int (*sithControl_HandlePlayer)(sithThing *a1, flex_t a2) = (void*)sithControl_HandlePlayer_ADDR;
+//static int (*sithControl_HandlePlayer)(SithThing *a1, flex_t a2) = (void*)sithControl_HandlePlayer_ADDR;
 
 //static int (*sithControl_IsOpen)() = (void*)sithControl_IsOpen_ADDR;
 //static int (*sithControl_Close)() = (void*)sithControl_Close_ADDR;
 //static int (*sithControl_Open)() = (void*)sithControl_Open_ADDR;
 
-//static void (*sithControl_PlayerLook)(sithThing *player, flex_t a3) = (void*)sithControl_PlayerLook_ADDR;
-//static void (*sithControl_PlayerMovement)(sithThing *player) = (void*)sithControl_PlayerMovement_ADDR;
-//static int (*sithControl_FreeCam)(sithThing *player) = (void*)sithControl_FreeCam_ADDR;
+//static void (*sithControl_PlayerLook)(SithThing *player, flex_t a3) = (void*)sithControl_PlayerLook_ADDR;
+//static void (*sithControl_PlayerMovement)(SithThing *player) = (void*)sithControl_PlayerMovement_ADDR;
+//static int (*sithControl_FreeCam)(SithThing *player) = (void*)sithControl_FreeCam_ADDR;
 
 #endif // _SITHCONTROL_H

@@ -37,10 +37,10 @@ int sithMap_Shutdown()
 
 void sithMap_DrawCircle(rdCamera *camera, rdMatrix34 *viewMat)
 {
-    sithThing *v2; // edx
-    sithSector *v3; // esi
+    SithThing *v2; // edx
+    SithSector *v3; // esi
     int v5; // eax
-    sithAdjoin *i; // esi
+    SithSurfaceAdjoin *i; // esi
     int color; // esi
     flex_t a2a; // [esp+0h] [ebp-20h]
     rdVector3 vertex_out; // [esp+14h] [ebp-Ch] BYREF
@@ -88,10 +88,10 @@ LABEL_11:
     rdPrimit3_DrawClippedCircle(&vertex_out, a2a, 20.0, color, -1);
 }
 
-void sithMap_sub_4EC4D0(sithSector *sector)
+void sithMap_sub_4EC4D0(SithSector *sector)
 {
     int v2; // eax
-    sithAdjoin *i; // esi
+    SithSurfaceAdjoin *i; // esi
 
     if ( ++sithMap_var >= 20 || sector->renderTick == sithRender_lastRenderTick )
     {
@@ -116,14 +116,14 @@ LABEL_11:
     }
 }
 
-int sithMap_Draw(sithSector *sector)
+int sithMap_Draw(SithSector *sector)
 {
-    sithSector *v1; // esi
+    SithSector *v1; // esi
     int v2; // ecx
-    sithSurface *v3; // ebx
-    sithWorld *v4; // ecx
+    SithSurface *v3; // ebx
+    SithWorld *v4; // ecx
     int v5; // edx
-    sithSurface *surfaceIter; // ebx
+    SithSurface *surfaceIter; // ebx
     rdVector3 *v7; // esi
     int v8; // esi
     int v9; // eax
@@ -142,7 +142,7 @@ int sithMap_Draw(sithSector *sector)
     int v24; // eax
     int v25; // ecx
     unsigned int v34; // edi
-    sithThing *i; // edi
+    SithThing *i; // edi
     int circleColor; // esi
     flex_t xOffs; // [esp+0h] [ebp-94h]
     rdVector3 vertex_out; // [esp+1Ch] [ebp-78h] BYREF
@@ -162,7 +162,7 @@ int sithMap_Draw(sithSector *sector)
     int v56; // [esp+7Ch] [ebp-18h]
     unsigned int v57; // [esp+80h] [ebp-14h]
     int v58; // [esp+84h] [ebp-10h]
-    sithSurface *a1; // [esp+88h] [ebp-Ch]
+    SithSurface *a1; // [esp+88h] [ebp-Ch]
     int out2; // [esp+8Ch] [ebp-8h] BYREF
     int out1; // [esp+90h] [ebp-4h] BYREF
 
@@ -328,29 +328,29 @@ LABEL_22:
     return v56;
 }
 
-int sithMap_IsSurfaceDrawable(sithSurface *pSurface, int idx, int idx2)
+int sithMap_IsSurfaceDrawable(SithSurface *pSurface, int idx, int idx2)
 {
-    sithSector *v3; // eax
+    SithSector *v3; // eax
     unsigned int v4; // edx
-    sithSurface *v5; // ecx
-    sithSurface *surfaceIter; // ebx
+    SithSurface *v5; // ecx
+    SithSurface *surfaceIter; // ebx
     unsigned int v7; // esi
     int v8; // eax
     int *v9; // edi
     unsigned int v10; // ecx
-    sithSector *v12; // eax
+    SithSector *v12; // eax
     unsigned int v13; // ecx
-    sithSurface *surfaceIter_2; // ebp
+    SithSurface *surfaceIter_2; // ebp
     unsigned int v15; // esi
     int v16; // eax
     int *v17; // edi
     unsigned int v18; // ecx
     int v20; // [esp+10h] [ebp-10h]
     int v21; // [esp+10h] [ebp-10h]
-    sithSurface *v22; // [esp+14h] [ebp-Ch]
-    sithAdjoin *v23; // [esp+14h] [ebp-Ch]
+    SithSurface *v22; // [esp+14h] [ebp-Ch]
+    SithSurfaceAdjoin *v23; // [esp+14h] [ebp-Ch]
     unsigned int v24; // [esp+18h] [ebp-8h]
-    sithSector *v25; // [esp+1Ch] [ebp-4h]
+    SithSector *v25; // [esp+1Ch] [ebp-4h]
     unsigned int v26; // [esp+1Ch] [ebp-4h]
 
     v3 = pSurface->parent_sector;

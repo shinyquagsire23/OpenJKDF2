@@ -6,7 +6,7 @@
 #include "Engine/rdPuppet.h"
 #include "Primitives/rdMatrix.h"
 
-rdThing* rdThing_New(sithThing *parent)
+rdThing* rdThing_New(SithThing *parent)
 {
     rdThing *thing;
 
@@ -17,7 +17,7 @@ rdThing* rdThing_New(sithThing *parent)
     return thing;
 }
 
-int rdThing_NewEntry(rdThing *thing, sithThing *parent)
+int rdThing_NewEntry(rdThing *thing, SithThing *parent)
 {
     thing->model3 = 0;
     thing->type = 0;

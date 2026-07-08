@@ -9,14 +9,14 @@
 #include "World/jkPlayer.h"
 #include "jk.h"
 
-void sithPhysics_FindFloor(sithThing *pThing, int a3)
+void sithPhysics_FindFloor(SithThing *pThing, int a3)
 {
     int v4; // ecx
-    sithCollisionSearchEntry *v5; // eax
+    SithCollision *v5; // eax
     flex_d_t v8; // st7
     flex_d_t v9; // st7
-    sithCollisionSearchEntry *i; // esi
-    sithThing *v11; // edi
+    SithCollision *i; // esi
+    SithThing *v11; // edi
     rdFace *v12; // eax
     int searchFlags; // [esp+10h] [ebp-20h]
     flex_t range; // [esp+14h] [ebp-1Ch]
@@ -154,7 +154,7 @@ LABEL_8:
 
 // Inlined func
 
-void sithPhysics_UpdateThing(sithThing *pThing, flex_t deltaSecs)
+void sithPhysics_UpdateThing(SithThing *pThing, flex_t deltaSecs)
 {
     if (!pThing->sector)
         return;
@@ -204,7 +204,7 @@ void sithPhysics_UpdateThing(sithThing *pThing, flex_t deltaSecs)
     }
 }
 
-void sithPhysics_ApplyForce(sithThing *pThing, rdVector3 *forceVec)
+void sithPhysics_ApplyForce(SithThing *pThing, rdVector3 *forceVec)
 {
     // Added: noclip
     if (pThing == sithPlayer_g_pLocalPlayerThing && (g_debugmodeFlags & DEBUGFLAG_NOCLIP)) {
@@ -223,7 +223,7 @@ void sithPhysics_ApplyForce(sithThing *pThing, rdVector3 *forceVec)
     }
 }
 
-void sithPhysics_SetThingLook(sithThing *pThing, const rdVector3 *look, flex_t a3)
+void sithPhysics_SetThingLook(SithThing *pThing, const rdVector3 *look, flex_t a3)
 {
     flex_d_t v4; // st7
     flex_d_t v20; // st7
@@ -289,7 +289,7 @@ void sithPhysics_ApplyDrag(rdVector3 *vec, flex_t drag, flex_t mag, flex_t delta
     }
 }
 
-int sithPhysics_ParseArg(stdConffileArg *arg, sithThing *pThing, int param)
+int sithPhysics_ParseArg(stdConffileArg *arg, SithThing *pThing, int param)
 {
     flex32_t tmp;
     int tmpInt;
@@ -379,7 +379,7 @@ int sithPhysics_ParseArg(stdConffileArg *arg, sithThing *pThing, int param)
     }
 }
 
-void sithPhysics_ResetThingMovement(sithThing *pThing)
+void sithPhysics_ResetThingMovement(SithThing *pThing)
 {
     rdVector_Zero3(&pThing->physicsParams.vel);
     rdVector_Zero3(&pThing->physicsParams.angVel);
@@ -389,7 +389,7 @@ void sithPhysics_ResetThingMovement(sithThing *pThing)
     rdVector_Zero3(&pThing->field_268);
 }
 
-flex_t sithPhysics_GetThingHeight(sithThing *pThing)
+flex_t sithPhysics_GetThingHeight(SithThing *pThing)
 {
     flex_d_t result; // st7
     flex_t v2; // [esp+4h] [ebp+4h]
@@ -407,7 +407,7 @@ flex_t sithPhysics_GetThingHeight(sithThing *pThing)
 }
 
 // MOTS altered
-void sithPhysics_UpdateThingPhysics(sithThing *pThing, flex_t deltaSeconds)
+void sithPhysics_UpdateThingPhysics(SithThing *pThing, flex_t deltaSeconds)
 {
     rdVector3 a1a;
     rdVector3 a3;
@@ -546,7 +546,7 @@ void sithPhysics_UpdateThingPhysics(sithThing *pThing, flex_t deltaSeconds)
 }
 
 // MOTS altered
-void sithPhysics_UpdatePlayerPhysics(sithThing *player, flex_t deltaSeconds)
+void sithPhysics_UpdatePlayerPhysics(SithThing *player, flex_t deltaSeconds)
 {
     rdMatrix34 a;
     rdVector3 a3;
@@ -680,7 +680,7 @@ void sithPhysics_UpdatePlayerPhysics(sithThing *player, flex_t deltaSeconds)
 }
 
 // MOTS altered
-void sithPhysics_UpdateUnderwaterThingPhysics(sithThing *pThing, flex_t deltaSeconds)
+void sithPhysics_UpdateUnderwaterThingPhysics(SithThing *pThing, flex_t deltaSeconds)
 {
     flex_d_t v35; // st6
     flex_d_t v51; // st7
@@ -759,7 +759,7 @@ void sithPhysics_UpdateUnderwaterThingPhysics(sithThing *pThing, flex_t deltaSec
 }
 
 // MOTS altered
-void sithPhysics_UpdateAttachedThingPhysics(sithThing *pThing, flex_t deltaSeconds)
+void sithPhysics_UpdateAttachedThingPhysics(SithThing *pThing, flex_t deltaSeconds)
 {   
     flex_t a2a; // [esp+0h] [ebp-94h]
     flex_t v144; // [esp+4h] [ebp-90h]

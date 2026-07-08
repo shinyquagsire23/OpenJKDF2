@@ -8,7 +8,7 @@
 #include "stdPlatform.h"
 #include "jk.h"
 
-int sithKeyFrame_Load(sithWorld *world, int a2)
+int sithKeyFrame_Load(SithWorld *world, int a2)
 {
     unsigned int alloc_size;
 
@@ -65,7 +65,7 @@ rdKeyframe* sithKeyFrame_GetByIdx(int idx)
 {
     rdKeyframe *result;
 
-    sithWorld* world = sithWorld_g_pCurrentWorld;
+    SithWorld* world = sithWorld_g_pCurrentWorld;
     if ( (idx & 0x8000) != 0 )
     {
         world = sithWorld_g_pStaticWorld;
@@ -85,7 +85,7 @@ rdKeyframe* sithKeyFrame_LoadEntry(const char *fpath)
     rdKeyframe *keyframe;
     char key_fpath[128];
 
-    sithWorld* world = sithWorld_g_pLastLoadedWorld;
+    SithWorld* world = sithWorld_g_pLastLoadedWorld;
     if ( !sithWorld_g_pLastLoadedWorld->keyframes )
         return NULL;
 
@@ -120,7 +120,7 @@ rdKeyframe* sithKeyFrame_LoadEntry(const char *fpath)
     return keyframe;
 }
 
-int sithKeyFrame_New(sithWorld *world, int numKeyframes)
+int sithKeyFrame_New(SithWorld *world, int numKeyframes)
 {
     { TWL_EXTRAM_SUGGEST(pSithHS); // Added: rdKeyframe fields are word-width on RETRO
     world->keyframes = (rdKeyframe *)SITH_ALLOC(sizeof(rdKeyframe) * numKeyframes);
@@ -133,7 +133,7 @@ int sithKeyFrame_New(sithWorld *world, int numKeyframes)
     return 1;
 }
 
-void sithKeyFrame_Free(sithWorld *world)
+void sithKeyFrame_Free(SithWorld *world)
 {
     if (!world->numKeyframes)
         return;

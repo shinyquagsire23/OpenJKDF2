@@ -28,8 +28,8 @@ int sithPlayer_bNoClippingRend = 0;
 
 void sithPlayer_Startup(int idx)
 {
-    sithPlayerInfo *v1; // esi
-    sithThing *v2; // eax
+    SithPlayer *v1; // esi
+    SithThing *v2; // eax
 
     v1 = &jkPlayer_playerInfos[idx];
     v1->flags = jkPlayer_playerInfos[idx].flags & ~1u;
@@ -60,9 +60,9 @@ void sithPlayer_Close()
     sithPlayer_g_pLocalPlayer = 0;
 }
 
-void sithPlayer_PlacePlayers(sithWorld *world)
+void sithPlayer_PlacePlayers(SithWorld *world)
 {
-    sithThing *v1; // eax
+    SithThing *v1; // eax
     int v2; // ecx
     uint32_t v3; // ebx
     int v5; // ebp
@@ -74,7 +74,7 @@ void sithPlayer_PlacePlayers(sithWorld *world)
     v3 = 0;
     if ( v2 >= 0 )
     {
-        sithPlayerInfo* playerInfo = &jkPlayer_playerInfos[0];
+        SithPlayer* playerInfo = &jkPlayer_playerInfos[0];
         for (v5 = v2 + 1; v5 >= 0; v5--)
         {
             if ( v1->type == SITH_THING_PLAYER && v3 < JKPLAYER_NUM_INFOS )
@@ -133,7 +133,7 @@ void sithPlayer_SetInvItemAmount(int idx, flex_t amt)
     jkPlayer_playerInfos[playerThingIdx].iteminfo[idx].ammoAmt = amt;
 }
 
-int sithPlayer_GetThingPlayerNum(sithThing *player)
+int sithPlayer_GetThingPlayerNum(SithThing *player)
 {
     int i;
 
@@ -195,10 +195,10 @@ void sithPlayer_ResetPalEffects()
     sithPlayer_g_pLocalPlayer->palEffectsIdx2 = stdPalEffects_NewRequest(2);
 }
 
-void sithPlayer_Update(sithPlayerInfo *playerInfo, flex_t a2)
+void sithPlayer_Update(SithPlayer *playerInfo, flex_t a2)
 {
     int v2; // edi
-    sithThing *v3; // esi
+    SithThing *v3; // esi
     stdPalEffect *pPalEffect; // ebx
     flex_d_t v5; // st7
     int v14; // ecx
@@ -262,7 +262,7 @@ void sithPlayer_Update(sithPlayerInfo *playerInfo, flex_t a2)
     }
 }
 
-void sithPlayer_debug_loadauto(sithThing *player)
+void sithPlayer_debug_loadauto(SithThing *player)
 {
     char v1[128]; // [esp+4h] [ebp-80h] BYREF
 
@@ -283,7 +283,7 @@ void sithPlayer_debug_loadauto(sithThing *player)
 
 void sithPlayer_SetScreenTint(flex_t tintR, flex_t tintG, flex_t tintB)
 {
-    sithThing *focusThing; // eax
+    SithThing *focusThing; // eax
     stdPalEffect *pPalEffects; // ecx
     flex_d_t v8; // st7
 
@@ -324,10 +324,10 @@ void sithPlayer_AddDyamicAdd(int r, int g, int b)
     if ( pPalEffects->add.z > 0xFF )
         pPalEffects->add.z = 255;
 }
-int sithPlayer_sub_4C9060(sithThing *thing1, sithThing *thing2)
+int sithPlayer_sub_4C9060(SithThing *thing1, SithThing *thing2)
 {
-    sithPlayerInfo *v2; // ecx
-    sithPlayerInfo *v3; // eax
+    SithPlayer *v2; // ecx
+    SithPlayer *v3; // eax
     int v4; // ecx
     int v5; // eax
 
@@ -352,9 +352,9 @@ int sithPlayer_sub_4C9060(sithThing *thing1, sithThing *thing2)
     return 0;
 }
 
-void sithPlayer_KillPlayer(sithThing *thing)
+void sithPlayer_KillPlayer(SithThing *thing)
 {
-    sithPlayerInfo *v1; // edi
+    SithPlayer *v1; // edi
     char v4[128]; // [esp+8h] [ebp-80h] BYREF
 
     v1 = thing->actorParams.playerinfo;
@@ -382,9 +382,9 @@ void sithPlayer_KillPlayer(sithThing *thing)
     }
 }
 
-void sithPlayer_PlayerKilledAction(sithThing *player, sithThing *killedBy)
+void sithPlayer_PlayerKilledAction(SithThing *player, SithThing *killedBy)
 {
-    sithPlayerInfo *v5; // edi
+    SithPlayer *v5; // edi
 
     v5 = player->actorParams.playerinfo;
     player->physicsParams.physflags &= ~(SITH_PF_800|SITH_PF_100);
@@ -403,7 +403,7 @@ void sithPlayer_PlayerKilledAction(sithThing *player, sithThing *killedBy)
 int sithPlayer_GetThingPlayerNumByIndex(int a1)
 {
     int result; // eax
-    sithPlayerInfo* i;
+    SithPlayer* i;
 
     if ( !sithNet_isMulti )
         return 0;
@@ -420,7 +420,7 @@ int sithPlayer_GetThingPlayerNumByIndex(int a1)
 
 void sithPlayer_SetInvItemAvailable(int binIdx, int bCarries)
 {
-    sithItemInfo *v2; // eax
+    SithInventoryItem *v2; // eax
     int v3; // ecx
 
     v2 = &jkPlayer_playerInfos[playerThingIdx].iteminfo[binIdx];
@@ -433,7 +433,7 @@ void sithPlayer_SetInvItemAvailable(int binIdx, int bCarries)
 
 void sithPlayer_Reset(unsigned int idx)
 {
-    sithPlayerInfo *pPlayerInfo;
+    SithPlayer *pPlayerInfo;
 
     pPlayerInfo = &jkPlayer_playerInfos[idx];
     if ( idx < 0x20 )
@@ -473,11 +473,11 @@ int sithPlayer_ShowPlayer(int idx, int netId)
 }
 
 // MOTS altered
-void sithPlayer_NewPlayer(sithThing *player)
+void sithPlayer_NewPlayer(SithThing *player)
 {
     rdPuppet *v1; // ecx
     int v3; // eax
-    sithThing *v4; // eax
+    SithThing *v4; // eax
     stdPalEffect *v6; // eax
     int v9; // edi
 
@@ -551,7 +551,7 @@ uint32_t sithPlayer_GetPlayerNum(int thingIdx)
 int sithPlayer_GetPlayerNumByName(wchar_t *pwStr)
 {
     int v1; // edi
-    sithPlayerInfo *i; // esi
+    SithPlayer *i; // esi
 
     if ( !pwStr )
         return -1;

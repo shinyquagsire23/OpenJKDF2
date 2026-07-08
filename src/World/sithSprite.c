@@ -26,7 +26,7 @@ void sithSprite_Shutdown()
     }
 }
 
-int sithSprite_ReadStaticSpritesListText(sithWorld *world, int a2)
+int sithSprite_ReadStaticSpritesListText(SithWorld *world, int a2)
 {
     int sprites_amt;
 
@@ -80,7 +80,7 @@ int sithSprite_ReadStaticSpritesListText(sithWorld *world, int a2)
     return 1;
 }
 
-void sithSprite_FreeWorldSprites(sithWorld *world)
+void sithSprite_FreeWorldSprites(SithWorld *world)
 {
     if (!world->numSprites)
         return;
@@ -98,7 +98,7 @@ void sithSprite_FreeWorldSprites(sithWorld *world)
 
 rdSprite* sithSprite_Load(char *fpath)
 {
-    sithWorld *world;
+    SithWorld *world;
     rdSprite *result;
     rdSprite *sprite;
     char spriteFpath[128];
@@ -169,7 +169,7 @@ rdSprite* sithSprite_Load(char *fpath)
     return result;
 }
 
-int sithSprite_AllocWorldSprites(sithWorld *world, int num)
+int sithSprite_AllocWorldSprites(SithWorld *world, int num)
 {
     rdSprite *sprites; // edi
 

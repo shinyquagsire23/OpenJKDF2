@@ -146,25 +146,25 @@ typedef struct sithSoundClass
 
 int sithSoundClass_Startup();
 void sithSoundClass_Shutdown();
-int sithSoundClass_ReadSoundClassesListText(sithWorld *world, int a2);
+int sithSoundClass_ReadSoundClassesListText(SithWorld *world, int a2);
 sithSoundClass* sithSoundClass_Load(char *fpath);
 int sithSoundClass_LoadEntry(sithSoundClass *soundClass, char *fpath);
-MATH_FUNC void sithSoundClass_PlayModeFirst(sithThing *thing, unsigned int soundclass_id);
-MATH_FUNC sithPlayingSound* sithSoundClass_PlayMode(sithThing *thing, int sc_id, flex_t a3);
-MATH_FUNC void sithSoundClass_PlayModeFirstEx(sithThing *thing, int sc_id, flex_t a3);
-void sithSoundClass_StopMode(sithThing *thing, unsigned int sc_id);
-void sithSoundClass_FreeWorldSoundClasses(sithWorld *world);
+MATH_FUNC void sithSoundClass_PlayModeFirst(SithThing *thing, unsigned int soundclass_id);
+MATH_FUNC sithPlayingSound* sithSoundClass_PlayMode(SithThing *thing, int sc_id, flex_t a3);
+MATH_FUNC void sithSoundClass_PlayModeFirstEx(SithThing *thing, int sc_id, flex_t a3);
+void sithSoundClass_StopMode(SithThing *thing, unsigned int sc_id);
+void sithSoundClass_FreeWorldSoundClasses(SithWorld *world);
 
-MATH_FUNC sithPlayingSound* sithSoundClass_PlayModeRandom(sithThing *thing, uint32_t a2);
-sithPlayingSound* sithSoundClass_PlayModeEntry(sithThing *thing, sithSoundClassEntry *entry, flex_t a3);
-void sithSoundClass_StopSound(sithThing *thing, sithSound *sound);
-int sithSoundClass_SetThingClass(sithThing *thing, sithSoundClass *soundclass);
+MATH_FUNC sithPlayingSound* sithSoundClass_PlayModeRandom(SithThing *thing, uint32_t a2);
+sithPlayingSound* sithSoundClass_PlayModeEntry(SithThing *thing, sithSoundClassEntry *entry, flex_t a3);
+void sithSoundClass_StopSound(SithThing *thing, sithSound *sound);
+int sithSoundClass_SetThingClass(SithThing *thing, sithSoundClass *soundclass);
 
 //static void (*sithSoundClass_Shutdown)() = (void*)sithSoundClass_Shutdown_ADDR;
 //static int (*sithSoundClass_Startup)() = (void*)sithSoundClass_Startup_ADDR;
-//static int (*sithSoundClass_ReadSoundClassesListText)(sithWorld* world, int a) = (void*)sithSoundClass_ReadSoundClassesListText_ADDR;
-//static void (*sithSoundClass_PlayModeFirst)(sithThing *a1, unsigned int a2) = (void*)sithSoundClass_PlayModeFirst_ADDR;
-//static void (*sithSoundClass_StopMode)(sithThing *a1, unsigned int a2) = (void*)sithSoundClass_StopMode_ADDR;
-//static void (*sithSoundClass_FreeWorldSoundClasses)(sithWorld* world) = (void*)sithSoundClass_FreeWorldSoundClasses_ADDR;
+//static int (*sithSoundClass_ReadSoundClassesListText)(SithWorld* world, int a) = (void*)sithSoundClass_ReadSoundClassesListText_ADDR;
+//static void (*sithSoundClass_PlayModeFirst)(SithThing *a1, unsigned int a2) = (void*)sithSoundClass_PlayModeFirst_ADDR;
+//static void (*sithSoundClass_StopMode)(SithThing *a1, unsigned int a2) = (void*)sithSoundClass_StopMode_ADDR;
+//static void (*sithSoundClass_FreeWorldSoundClasses)(SithWorld* world) = (void*)sithSoundClass_FreeWorldSoundClasses_ADDR;
 
 #endif // _SITHSOUNDCLASS_H

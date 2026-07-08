@@ -7,15 +7,15 @@
 #define sithPlayerActions_JumpWithVel_ADDR (0x004FC270)
 #define sithPlayerActions_MoveToPlayerPosition_ADDR (0x004FC450)
 
-MATH_FUNC void sithPlayerActions_JumpWithVel(sithThing *thing, flex_t vel);
-void sithPlayerActions_Activate(sithThing *thing);
-void sithPlayerActions_MoveToPlayerPosition(sithThing *thing, int idx);
+MATH_FUNC void sithPlayerActions_JumpWithVel(SithThing *thing, flex_t vel);
+void sithPlayerActions_Activate(SithThing *thing);
+void sithPlayerActions_MoveToPlayerPosition(SithThing *thing, int idx);
 
 // Added
-sithThing* sithPlayerActions_SpawnThingAtLookAt(sithThing *pPlayerThing, sithThing* pTemplate);
+SithThing* sithPlayerActions_SpawnThingAtLookAt(SithThing *pPlayerThing, SithThing* pTemplate);
 
-//static void (*sithPlayerActions_Remove)(sithThing *thing) = (void*)sithPlayerActions_Remove_ADDR;
-//static void (*sithPlayerActions_Activate)(sithThing*) = (void*)sithPlayerActions_Activate_ADDR;
-//static void (*sithPlayerActions_MoveToPlayerPosition)(sithThing *a1, int a2) = (void*)sithPlayerActions_MoveToPlayerPosition_ADDR;
+//static void (*sithPlayerActions_Remove)(SithThing *thing) = (void*)sithPlayerActions_Remove_ADDR;
+//static void (*sithPlayerActions_Activate)(SithThing*) = (void*)sithPlayerActions_Activate_ADDR;
+//static void (*sithPlayerActions_MoveToPlayerPosition)(SithThing *a1, int a2) = (void*)sithPlayerActions_MoveToPlayerPosition_ADDR;
 
 #endif // _SITHPLAYERACTIONS_H

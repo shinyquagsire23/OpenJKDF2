@@ -24,12 +24,12 @@
 #include "Main/Main.h"
 #include "jk.h"
 
-void sithCogFunctionThing_createThingAtPos_nr_Mots(sithCog *ctx, int idk, sithThing* pThingIn);
+void sithCogFunctionThing_createThingAtPos_nr_Mots(sithCog *ctx, int idk, SithThing* pThingIn);
 void sithCogFunctionThing_createThingAtPos_nr(sithCog *ctx, int idk);
 
 void sithCogFunctionThing_GetThingType(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
         sithCogExec_PushInt(ctx, pThing->type);
     else
@@ -38,9 +38,9 @@ void sithCogFunctionThing_GetThingType(sithCog *ctx)
 
 void sithCogFunctionThing_CreateThing(sithCog *ctx)
 {
-    sithThing *v1; // esi
-    sithThing *v2; // ebx
-    sithThing *v3; // edi
+    SithThing *v1; // esi
+    SithThing *v2; // ebx
+    SithThing *v3; // edi
 
     v1 = sithCogExec_PopThing(ctx);
     v2 = sithCogExec_PopTemplate(ctx);
@@ -61,9 +61,9 @@ void sithCogFunctionThing_CreateThing(sithCog *ctx)
 
 void sithCogFunctionThing_CreateThingNr(sithCog *ctx)
 {
-    sithThing *v1; // esi
-    sithThing *v2; // ebx
-    sithThing *v3; // edi
+    SithThing *v1; // esi
+    SithThing *v2; // ebx
+    SithThing *v3; // edi
 
     v1 = sithCogExec_PopThing(ctx);
     v2 = sithCogExec_PopTemplate(ctx);
@@ -83,9 +83,9 @@ void sithCogFunctionThing_CreateThingNr(sithCog *ctx)
 
 void sithCogFunctionThing_createThingUnused(sithCog *ctx)
 {
-    sithThing *v1; // esi
-    sithThing *v2; // ebx
-    sithThing *v3; // edi
+    SithThing *v1; // esi
+    SithThing *v2; // ebx
+    SithThing *v3; // edi
     int v6; // [esp+18h] [ebp+8h]
 
     v6 = 0; // aaaaaa original is undefined
@@ -109,9 +109,9 @@ void sithCogFunctionThing_createThingUnused(sithCog *ctx)
 // MOTS added
 void sithCogFunctionThing_CreateThingLocal(sithCog *ctx)
 {
-    sithThing *v1; // esi
-    sithThing *v2; // ebx
-    sithThing *v3; // edi
+    SithThing *v1; // esi
+    SithThing *v2; // ebx
+    SithThing *v3; // edi
 
     v1 = sithCogExec_PopThing(ctx);
     v2 = sithCogExec_PopTemplate(ctx);
@@ -134,7 +134,7 @@ void sithCogFunctionThing_CreateThingAtPosMots(sithCog *ctx)
 // MOTS added
 void sithCogFunctionThing_CreateThingAtPosOwner(sithCog *ctx)
 {
-    sithThing* pThingIn = sithCogExec_PopThing(ctx);
+    SithThing* pThingIn = sithCogExec_PopThing(ctx);
     sithCogFunctionThing_createThingAtPos_nr_Mots(ctx, 0, pThingIn);
 }
 
@@ -144,13 +144,13 @@ void sithCogFunctionThing_CreateThingAtPosNrMots(sithCog *ctx)
 }
 
 // MOTS added
-void sithCogFunctionThing_createThingAtPos_nr_Mots(sithCog *ctx, int idk, sithThing* pThingIn)
+void sithCogFunctionThing_createThingAtPos_nr_Mots(sithCog *ctx, int idk, SithThing* pThingIn)
 {
-    sithSector *popSector; // ebp
-    sithThing *popTemplate; // eax
+    SithSector *popSector; // ebp
+    SithThing *popTemplate; // eax
     rdVector3 *v5; // eax
     rdVector3 *v6; // ecx
-    sithThing *v7; // ebx
+    SithThing *v7; // ebx
     rdVector3 a1; // [esp+10h] [ebp-54h]
     rdVector3 pos; // [esp+1Ch] [ebp-48h]
     rdVector3 rot; // [esp+28h] [ebp-3Ch]
@@ -221,11 +221,11 @@ void sithCogFunctionThing_CreateThingAtPosNr(sithCog *ctx)
 
 void sithCogFunctionThing_createThingAtPos_nr(sithCog *ctx, int idk)
 {
-    sithSector *popSector; // ebp
-    sithThing *popTemplate; // eax
+    SithSector *popSector; // ebp
+    SithThing *popTemplate; // eax
     rdVector3 *v5; // eax
     rdVector3 *v6; // ecx
-    sithThing *v7; // ebx
+    SithThing *v7; // ebx
     rdVector3 a1; // [esp+10h] [ebp-54h]
     rdVector3 pos; // [esp+1Ch] [ebp-48h]
     rdVector3 rot; // [esp+28h] [ebp-3Ch]
@@ -273,10 +273,10 @@ void sithCogFunctionThing_createThingAtPos_nr(sithCog *ctx, int idk)
 
 void sithCogFunctionThing_DamageThing(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     int a4 = sithCogExec_PopInt(ctx);
     cog_flex_t a5 = sithCogExec_PopFlex(ctx);
-    sithThing* pThing2 = sithCogExec_PopThing(ctx);
+    SithThing* pThing2 = sithCogExec_PopThing(ctx);
 
     if ( a5 > 0.0 && pThing2 )
     {
@@ -297,7 +297,7 @@ void sithCogFunctionThing_DamageThing(sithCog *ctx)
 void sithCogFunctionThing_HealThing(sithCog *ctx)
 {
     cog_flex_t amt = sithCogExec_PopFlex(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (amt > 0.0 && pThing && (pThing->type == SITH_THING_ACTOR || pThing->type == SITH_THING_PLAYER))
     {
         pThing->actorParams.health += amt;
@@ -308,7 +308,7 @@ void sithCogFunctionThing_HealThing(sithCog *ctx)
 
 void sithCogFunctionThing_GetHealth(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if ( pThing && (pThing->type == SITH_THING_ACTOR || pThing->type == SITH_THING_PLAYER) )
         sithCogExec_PushFlex(ctx, pThing->actorParams.health);
@@ -319,7 +319,7 @@ void sithCogFunctionThing_GetHealth(sithCog *ctx)
 void sithCogFunctionThing_SetHealth(sithCog *ctx)
 {
     cog_flex_t amt = sithCogExec_PopFlex(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing && (pThing->type == SITH_THING_ACTOR || pThing->type == SITH_THING_PLAYER))
         pThing->actorParams.health = amt;
@@ -327,7 +327,7 @@ void sithCogFunctionThing_SetHealth(sithCog *ctx)
 
 void sithCogFunctionThing_DestroyThing(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (!pThing)
         return;
 
@@ -341,9 +341,9 @@ void sithCogFunctionThing_DestroyThing(sithCog *ctx)
 
 void sithCogFunctionThing_JumpToFrame(sithCog *ctx)
 {
-    sithSector* sector = sithCogExec_PopSector(ctx);
+    SithSector* sector = sithCogExec_PopSector(ctx);
     uint32_t frame = sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if ( pThing && sector && pThing->moveType == SITH_MT_PATH && frame < pThing->trackParams.loadedFrames )
     {
@@ -365,7 +365,7 @@ void sithCogFunctionThing_MoveToFrame(sithCog *ctx)
 {
     cog_flex_t speed = sithCogExec_PopFlex(ctx) * 0.1;
     int frame = sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if ( pThing && pThing->moveType == SITH_MT_PATH && pThing->trackParams.loadedFrames > frame )
     {
         if ( speed == 0.0 )
@@ -382,7 +382,7 @@ void sithCogFunctionThing_SkipToFrame(sithCog *ctx)
 {
     cog_flex_t speed = sithCogExec_PopFlex(ctx) * 0.1;
     int frame = sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if ( pThing && pThing->moveType == SITH_MT_PATH && pThing->trackParams.loadedFrames > frame )
     {
         if ( speed == 0.0 )
@@ -399,7 +399,7 @@ void sithCogFunctionThing_RotatePivot(sithCog *ctx)
 {
     cog_flex_t speed = sithCogExec_PopFlex(ctx);
     uint32_t frame = sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if ( speed == 0.0 )
         speed = 1.0;
@@ -428,7 +428,7 @@ void sithCogFunctionThing_Rotate(sithCog *ctx)
     rdVector3 rot;
 
     sithCogExec_PopVector(ctx, &rot);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing)
     {
@@ -439,7 +439,7 @@ void sithCogFunctionThing_Rotate(sithCog *ctx)
 
 void sithCogFunctionThing_GetThingLight(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
         sithCogExec_PushFlex(ctx, pThing->light);
     else
@@ -450,7 +450,7 @@ void sithCogFunctionThing_ThingLight(sithCog *ctx)
 {
     cog_flex_t idk = sithCogExec_PopFlex(ctx);
     cog_flex_t light = sithCogExec_PopFlex(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if ( pThing && light >= 0.0 )
     {
@@ -477,7 +477,7 @@ void sithCogFunctionThing_ThingLightAnim(sithCog *ctx)
     cog_flex_t idk = sithCogExec_PopFlex(ctx);
     cog_flex_t light2 = sithCogExec_PopFlex(ctx);
     cog_flex_t light = sithCogExec_PopFlex(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if ( pThing
       && light2 >= (flex_d_t)light
       && idk > 0.0
@@ -493,7 +493,7 @@ void sithCogFunctionThing_ThingLightAnim(sithCog *ctx)
 
 void sithCogFunctionThing_WaitForStop(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if ( pThing && pThing->moveType == SITH_MT_PATH && pThing->trackParams.flags & 3 )
     {
@@ -513,9 +513,9 @@ void sithCogFunctionThing_WaitForStop(sithCog *ctx)
 
 void sithCogFunctionThing_GetThingSector(sithCog *ctx)
 {
-    sithSector *sector;
+    SithSector *sector;
 
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if ( pThing && (sector = pThing->sector) != 0 )
         sithCogExec_PushInt(ctx, sector->id);
     else
@@ -524,7 +524,7 @@ void sithCogFunctionThing_GetThingSector(sithCog *ctx)
 
 void sithCogFunctionThing_GetCurFrame(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if ( pThing && pThing->moveType == SITH_MT_PATH )
         sithCogExec_PushInt(ctx, pThing->curframe);
@@ -534,7 +534,7 @@ void sithCogFunctionThing_GetCurFrame(sithCog *ctx)
 
 void sithCogFunctionThing_GetGoalFrame(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if ( pThing && pThing->moveType == SITH_MT_PATH )
         sithCogExec_PushInt(ctx, pThing->goalframe);
@@ -544,7 +544,7 @@ void sithCogFunctionThing_GetGoalFrame(sithCog *ctx)
 
 void sithCogFunctionThing_StopThing(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (!pThing)
         return;
@@ -563,7 +563,7 @@ void sithCogFunctionThing_StopThing(sithCog *ctx)
 
 void sithCogFunctionThing_IsThingMoving(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if ( !pThing || pThing->type == SITH_THING_FREE )
     {
         sithCogExec_PushInt(ctx, 0);
@@ -590,7 +590,7 @@ void sithCogFunctionThing_IsThingMoving(sithCog *ctx)
 void sithCogFunctionThing_SetThingPulse(sithCog *ctx)
 {
     cog_flex_t pulseSecs = sithCogExec_PopFlex(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (!pThing)
         return;
 
@@ -611,7 +611,7 @@ void sithCogFunctionThing_SetThingPulse(sithCog *ctx)
 void sithCogFunctionThing_SetThingTimer(sithCog *ctx)
 {
     cog_flex_t timerSecs = sithCogExec_PopFlex(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (!pThing)
         return;
 
@@ -629,7 +629,7 @@ void sithCogFunctionThing_SetThingTimer(sithCog *ctx)
 
 void sithCogFunctionThing_CaptureThing(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
     {
         pThing->capture_cog = ctx;
@@ -639,7 +639,7 @@ void sithCogFunctionThing_CaptureThing(sithCog *ctx)
 
 void sithCogFunctionThing_ReleaseThing(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
     {
         sithCog* class_cog = pThing->class_cog;
@@ -653,9 +653,9 @@ void sithCogFunctionThing_ReleaseThing(sithCog *ctx)
 
 void sithCogFunctionThing_GetThingParent(sithCog *ctx)
 {
-    sithThing* parent;
+    SithThing* parent;
 
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if ( pThing && (parent = sithThing_GetThingParent(pThing)) != 0 )
         sithCogExec_PushInt(ctx, parent->thingIdx);
     else
@@ -666,10 +666,10 @@ void sithCogFunctionThing_GetThingParent(sithCog *ctx)
 void sithCogFunctionThing_SetThingParent(sithCog *ctx)
 {
     int thing_id = sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing) 
     {
-        sithThing* pThing2 = sithThing_GetGuidThing(thing_id);
+        SithThing* pThing2 = sithThing_GetGuidThing(thing_id);
         if (pThing2) 
         {
             pThing->prev_thing = pThing2;
@@ -680,7 +680,7 @@ void sithCogFunctionThing_SetThingParent(sithCog *ctx)
 
 void sithCogFunctionThing_GetThingPos(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
         sithCogExec_PushVector(ctx, &pThing->position);
     else
@@ -692,7 +692,7 @@ void sithCogFunctionThing_SetThingPos(sithCog *ctx)
     rdVector3 poppedVec;
 
     sithCogExec_PopVector(ctx, &poppedVec);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
     {
         rdVector_Copy3(&pThing->position, &poppedVec);
@@ -713,10 +713,10 @@ void sithCogFunctionThing_SetThingPosEx(sithCog *ctx)
 {
     rdVector3 poppedVec;
 
-    sithSector* pSector = sithCogExec_PopSector(ctx);
+    SithSector* pSector = sithCogExec_PopSector(ctx);
     sithCogExec_PopVector(ctx, &poppedVec);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
-    if (pSector || (pSector == (sithSector *)-1)) {
+    SithThing* pThing = sithCogExec_PopThing(ctx);
+    if (pSector || (pSector == (SithSector *)-1)) {
         pSector = sithSector_FindSectorAtPos(sithWorld_g_pCurrentWorld, &poppedVec);
     }
     if (pThing)
@@ -744,7 +744,7 @@ void sithCogFunctionThing_SetThingPosEx(sithCog *ctx)
 void sithCogFunctionThing_GetInventory(sithCog *ctx)
 {
     unsigned int binIdx;
-    sithThing *playerThing;
+    SithThing *playerThing;
 
     binIdx = sithCogExec_PopInt(ctx);
     playerThing = sithCogExec_PopThing(ctx);
@@ -770,7 +770,7 @@ void sithCogFunctionThing_SetInventory(sithCog *ctx)
 {
     cog_flex_t amt = sithCogExec_PopFlex(ctx);
     uint32_t binIdx = sithCogExec_PopInt(ctx);
-    sithThing* playerThing = sithCogExec_PopThing(ctx);
+    SithThing* playerThing = sithCogExec_PopThing(ctx);
 
     if (Main_bMotsCompat && binIdx < SITHBIN_ENERGY) {
         binIdx = sithInventory_SelectWeaponFollowing(binIdx);
@@ -787,7 +787,7 @@ void sithCogFunctionThing_ChangeInventory(sithCog *ctx)
 {
     cog_flex_t amt = sithCogExec_PopFlex(ctx);
     uint32_t binIdx = sithCogExec_PopInt(ctx);
-    sithThing* playerThing = sithCogExec_PopThing(ctx);
+    SithThing* playerThing = sithCogExec_PopThing(ctx);
 
     if (Main_bMotsCompat && binIdx < SITHBIN_ENERGY) {
         binIdx = sithInventory_SelectWeaponFollowing(binIdx);
@@ -809,8 +809,8 @@ void sithCogFunctionThing_ChangeInventory(sithCog *ctx)
 void sithCogFunctionThing_GetInventoryCog(sithCog *ctx)
 {
     unsigned int binIdx;
-    sithThing *playerThing;
-    sithItemDescriptor *desc;
+    SithThing *playerThing;
+    SithInventoryType *desc;
     sithCog *descCog;
 
     binIdx = sithCogExec_PopInt(ctx);
@@ -840,7 +840,7 @@ void sithCogFunctionThing_GetThingVelocity(sithCog *ctx)
     rdVector3 retval;
 
     rdVector_Copy3(&retval, (rdVector3*)&rdroid_zeroVector3);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
     {
         if ( pThing->moveType == SITH_MT_PHYSICS)
@@ -864,7 +864,7 @@ void sithCogFunctionThing_SetThingVel(sithCog *ctx)
     rdVector3 poppedVec;
 
     sithCogExec_PopVector(ctx, &poppedVec);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if ( pThing && pThing->moveType == SITH_MT_PHYSICS)
     {
         rdVector_Copy3(&pThing->physicsParams.vel, &poppedVec);
@@ -880,7 +880,7 @@ void sithCogFunctionThing_ApplyForce(sithCog *ctx)
     rdVector3 poppedVec;
 
     sithCogExec_PopVector(ctx, &poppedVec);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if ( pThing && pThing->moveType == SITH_MT_PHYSICS)
     {
         sithPhysics_ApplyForce(pThing, &poppedVec);
@@ -896,7 +896,7 @@ void sithCogFunctionThing_AddThingVel(sithCog *ctx)
     rdVector3 poppedVec;
 
     sithCogExec_PopVector(ctx, &poppedVec);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if ( pThing && pThing->moveType == SITH_MT_PHYSICS)
     {
         rdVector_Add3Acc(&pThing->physicsParams.vel, &poppedVec);
@@ -909,7 +909,7 @@ void sithCogFunctionThing_AddThingVel(sithCog *ctx)
 
 void sithCogFunctionThing_GetThingLVec(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
         sithCogExec_PushVector(ctx, &pThing->lookOrientation.lvec);
     else
@@ -918,7 +918,7 @@ void sithCogFunctionThing_GetThingLVec(sithCog *ctx)
 
 void sithCogFunctionThing_GetThingLVecPYR(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (!pThing) {
         sithCogExec_PushVector(ctx, (rdVector3*)&rdroid_zeroVector3);
         return;
@@ -933,7 +933,7 @@ void sithCogFunctionThing_GetThingLVecPYR(sithCog *ctx)
 
 void sithCogFunctionThing_GetThingUVec(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
         sithCogExec_PushVector(ctx, &pThing->lookOrientation.uvec);
     else
@@ -942,7 +942,7 @@ void sithCogFunctionThing_GetThingUVec(sithCog *ctx)
 
 void sithCogFunctionThing_GetThingRVec(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing)
         sithCogExec_PushVector(ctx, &pThing->lookOrientation.rvec);
@@ -952,7 +952,7 @@ void sithCogFunctionThing_GetThingRVec(sithCog *ctx)
 
 void sithCogFunctionThing_GetEyePYR(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if ( pThing && (pThing->type == SITH_THING_ACTOR || pThing->type == SITH_THING_PLAYER))
         sithCogExec_PushVector(ctx, &pThing->actorParams.eyePYR);
@@ -962,7 +962,7 @@ void sithCogFunctionThing_GetEyePYR(sithCog *ctx)
 
 void sithCogFunctionThing_DetachThing(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
     {
         sithThing_DetachThing(pThing);
@@ -975,7 +975,7 @@ void sithCogFunctionThing_DetachThing(sithCog *ctx)
 
 void sithCogFunctionThing_GetThingAttachFlags(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
         sithCogExec_PushInt(ctx, pThing->attach_flags);
     else
@@ -984,8 +984,8 @@ void sithCogFunctionThing_GetThingAttachFlags(sithCog *ctx)
 
 void sithCogFunctionThing_AttachThingToSurf(sithCog *ctx)
 {
-    sithSurface* surface = sithCogExec_PopSurface(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithSurface* surface = sithCogExec_PopSurface(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing && surface)
     {
@@ -999,8 +999,8 @@ void sithCogFunctionThing_AttachThingToSurf(sithCog *ctx)
 
 void sithCogFunctionThing_AttachThingToThing(sithCog *ctx)
 {
-    sithThing* attached = sithCogExec_PopThing(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* attached = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing && attached)
     {
@@ -1015,8 +1015,8 @@ void sithCogFunctionThing_AttachThingToThing(sithCog *ctx)
 void sithCogFunctionThing_AttachThingToThingEx(sithCog *ctx)
 {
     int attachFlags = sithCogExec_PopInt(ctx);
-    sithThing* attached = sithCogExec_PopThing(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* attached = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing && attached)
     {
@@ -1033,7 +1033,7 @@ void sithCogFunctionThing_AttachThingToThingEx(sithCog *ctx)
 void sithCogFunctionThing_PlayMode(sithCog *ctx)
 {
     int mode = sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if ( mode < 43 && pThing && pThing->animclass && pThing->rdthing.puppet)
     {
         int track = sithPuppet_PlayMode(pThing, mode, 0);
@@ -1057,7 +1057,7 @@ void sithCogFunctionThing_PlayKey(sithCog *ctx)
     int trackNum = sithCogExec_PopInt(ctx);
     int popInt = sithCogExec_PopInt(ctx);
     rdKeyframe* keyframe = sithCogExec_PopKeyframe(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     rdPuppet* puppet = NULL;
     int track = 0;
 
@@ -1104,7 +1104,7 @@ void sithCogFunctionThing_StopKey(sithCog *ctx)
 {
     cog_flex_t poppedFlex = sithCogExec_PopFlex(ctx);
     int track = sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (!pThing)
         return;
 
@@ -1128,7 +1128,7 @@ void sithCogFunctionThing_StopKey(sithCog *ctx)
 void sithCogFunctionThing_SetThingModel(sithCog *ctx)
 {
     rdModel3* model = sithCogExec_PopModel3(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if ( pThing && model)
     {
         rdModel3* v4 = pThing->rdthing.model3;
@@ -1160,7 +1160,7 @@ void sithCogFunctionThing_GetThingModel(sithCog *ctx)
 {
     rdModel3 *model;
 
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if ( pThing && pThing->rdthing.type == RD_THINGTYPE_MODEL && (model = pThing->rdthing.model3) != 0 )
         sithCogExec_PushInt(ctx, model->id);
     else
@@ -1170,7 +1170,7 @@ void sithCogFunctionThing_GetThingModel(sithCog *ctx)
 void sithCogFunctionThing_SetArmedMode(sithCog *ctx)
 {
     int poppedInt = sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if ( pThing && poppedInt >= 0 && poppedInt <= 2)
     {
         sithPuppet_SetArmedMode(pThing, poppedInt);
@@ -1184,7 +1184,7 @@ void sithCogFunctionThing_SetArmedMode(sithCog *ctx)
 
 void sithCogFunctionThing_GetThingFlags(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
         sithCogExec_PushInt(ctx, pThing->thingflags);
     else
@@ -1194,7 +1194,7 @@ void sithCogFunctionThing_GetThingFlags(sithCog *ctx)
 void sithCogFunctionThing_SetThingFlags(sithCog *ctx)
 {
     int flags = sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if ( pThing && flags)
     {
         pThing->thingflags |= flags;
@@ -1209,7 +1209,7 @@ void sithCogFunctionThing_SetThingFlags(sithCog *ctx)
 void sithCogFunctionThing_ClearThingFlags(sithCog *ctx)
 {
     int flags = sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if ( pThing && flags)
     {
         pThing->thingflags &= ~flags;
@@ -1223,8 +1223,8 @@ void sithCogFunctionThing_ClearThingFlags(sithCog *ctx)
 
 void sithCogFunctionThing_TeleportThing(sithCog *ctx)
 {
-    sithThing* thingTo = sithCogExec_PopThing(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* thingTo = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing && thingTo )
     {
@@ -1250,7 +1250,7 @@ void sithCogFunctionThing_TeleportThing(sithCog *ctx)
 void sithCogFunctionThing_SetThingType(sithCog *ctx)
 {
     int type = sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if ( pThing && type >= 0 && type < 12 )
         pThing->type = type;
@@ -1258,7 +1258,7 @@ void sithCogFunctionThing_SetThingType(sithCog *ctx)
 
 void sithCogFunctionThing_GetCollideType(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing)
         sithCogExec_PushInt(ctx, pThing->collide);
@@ -1269,7 +1269,7 @@ void sithCogFunctionThing_GetCollideType(sithCog *ctx)
 void sithCogFunctionThing_SetCollideType(sithCog *ctx)
 {
     int collideType = sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if ( pThing && collideType < 4)
     {
@@ -1284,10 +1284,10 @@ void sithCogFunctionThing_SetCollideType(sithCog *ctx)
 
 void sithCogFunctionThing_FirstThingInSector(sithCog *ctx)
 {
-    sithSector* sector = sithCogExec_PopSector(ctx);
+    SithSector* sector = sithCogExec_PopSector(ctx);
     if (sector)
     {
-        sithThing* pThing = sector->thingsList;
+        SithThing* pThing = sector->thingsList;
 
         if (pThing)
             sithCogExec_PushInt(ctx, pThing->thingIdx);
@@ -1303,9 +1303,9 @@ void sithCogFunctionThing_FirstThingInSector(sithCog *ctx)
 
 void sithCogFunctionThing_NextThingInSector(sithCog *ctx)
 {
-    sithThing *nextThing;
+    SithThing *nextThing;
 
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if ( pThing && (nextThing = pThing->nextThing) != 0 )
     {
         sithCogExec_PushInt(ctx, nextThing->thingIdx);
@@ -1316,9 +1316,9 @@ void sithCogFunctionThing_NextThingInSector(sithCog *ctx)
 
 void sithCogFunctionThing_PrevThingInSector(sithCog *ctx)
 {
-    sithThing *prevThing;
+    SithThing *prevThing;
 
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if ( pThing && (prevThing = pThing->prevThing) != 0 )
         sithCogExec_PushInt(ctx, prevThing->thingIdx);
     else
@@ -1328,7 +1328,7 @@ void sithCogFunctionThing_PrevThingInSector(sithCog *ctx)
 void sithCogFunctionThing_GetInventoryMinimum(sithCog *ctx)
 {
     int binIdx = sithCogExec_PopInt(ctx);
-    sithThing* player = sithCogExec_PopThing(ctx);
+    SithThing* player = sithCogExec_PopThing(ctx);
 
     if (Main_bMotsCompat && binIdx < SITHBIN_ENERGY) {
         binIdx = sithInventory_SelectWeaponFollowing(binIdx);
@@ -1347,7 +1347,7 @@ void sithCogFunctionThing_GetInventoryMinimum(sithCog *ctx)
 void sithCogFunctionThing_GetInventoryMaximum(sithCog *ctx)
 {
     int binIdx = sithCogExec_PopInt(ctx);
-    sithThing* player = sithCogExec_PopThing(ctx);
+    SithThing* player = sithCogExec_PopThing(ctx);
 
     if (Main_bMotsCompat && binIdx < SITHBIN_ENERGY) {
         binIdx = sithInventory_SelectWeaponFollowing(binIdx);
@@ -1366,7 +1366,7 @@ void sithCogFunctionThing_GetInventoryMaximum(sithCog *ctx)
 // unused/unreferenced
 void sithCogFunctionThing_GetLoadedFrames(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing && pThing->moveType == SITH_MT_PATH)
         sithCogExec_PushInt(ctx, pThing->trackParams.loadedFrames);
@@ -1378,7 +1378,7 @@ void sithCogFunctionThing_GetLoadedFrames(sithCog *ctx)
 void sithCogFunctionThing_GetFramePos(sithCog *ctx)
 {
     uint32_t frame = sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if ( pThing && pThing->moveType == SITH_MT_PATH && frame < pThing->trackParams.loadedFrames )
         sithCogExec_PushVector(ctx, &pThing->trackParams.aFrames[frame].pos);
@@ -1389,7 +1389,7 @@ void sithCogFunctionThing_GetFramePos(sithCog *ctx)
 void sithCogFunctionThing_GetFrameRot(sithCog *ctx)
 {
     uint32_t frame = sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing && pThing->moveType == SITH_MT_PATH && frame < pThing->trackParams.loadedFrames)
         sithCogExec_PushVector(ctx, &pThing->trackParams.aFrames[frame].rot);
@@ -1399,7 +1399,7 @@ void sithCogFunctionThing_GetFrameRot(sithCog *ctx)
 void sithCogFunctionThing_PathMovePause(sithCog *ctx)
 {
     int ret = 0;
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if ( pThing && pThing->moveType == SITH_MT_PATH )
         ret = sithTrackThing_PathMovePause(pThing);
@@ -1413,7 +1413,7 @@ void sithCogFunctionThing_PathMovePause(sithCog *ctx)
 void sithCogFunctionThing_SetHeadLightIntensity(sithCog *ctx)
 {
     cog_flex_t intensity = sithCogExec_PopFlex(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing && (pThing->type == SITH_THING_ACTOR || pThing->type == SITH_THING_PLAYER))
     {
@@ -1429,7 +1429,7 @@ void sithCogFunctionThing_SetHeadLightIntensity(sithCog *ctx)
 void sithCogFunctionThing_GetHeadLightIntensity(sithCog *ctx)
 {
     sithCogExec_PopFlex(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing && (pThing->type == SITH_THING_ACTOR || pThing->type == SITH_THING_PLAYER))
         sithCogExec_PushFlex(ctx, pThing->actorParams.lightIntensity);
@@ -1439,7 +1439,7 @@ void sithCogFunctionThing_GetHeadLightIntensity(sithCog *ctx)
 
 void sithCogFunctionThing_IsThingVisible(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing)
         sithCogExec_PushInt(ctx, pThing->lastRenderedTickIdx + 1 >= (unsigned int)jkPlayer_currentTickIdx);
@@ -1450,7 +1450,7 @@ void sithCogFunctionThing_IsThingVisible(sithCog *ctx)
 void sithCogFunctionThing_PathMoveResume(sithCog *ctx)
 {
     int ret = 0;
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if ( pThing && pThing->moveType == SITH_THING_ACTOR )
         ret = sithTrackThing_PathMoveResume(pThing);
@@ -1463,7 +1463,7 @@ void sithCogFunctionThing_PathMoveResume(sithCog *ctx)
 void sithCogFunctionThing_SetCurInvWeapon(sithCog *ctx)
 {
     int binIdx = sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (Main_bMotsCompat && binIdx < SITHBIN_ENERGY) {
         binIdx = sithInventory_SelectWeaponFollowing(binIdx);
     }
@@ -1473,7 +1473,7 @@ void sithCogFunctionThing_SetCurInvWeapon(sithCog *ctx)
 
 void sithCogFunctionThing_GetCurInvWeapon(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
     {
         int binIdx = sithInventory_GetCurrentWeapon(pThing);
@@ -1491,7 +1491,7 @@ void sithCogFunctionThing_GetCurInvWeapon(sithCog *ctx)
 // MOTS added
 void sithCogFunctionThing_GetCurInvWeaponMots(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
     {
         int idx = sithInventory_GetCurrentWeapon(pThing);
@@ -1507,14 +1507,14 @@ void sithCogFunctionThing_GetCurInvWeaponMots(sithCog *ctx)
 void sithCogFunctionThing_SetThingGeoMode(sithCog *ctx)
 {
     rdGeoMode_t mode = (rdGeoMode_t)sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
         pThing->rdthing.desiredGeoMode = mode;
 }
 
 void sithCogFunctionThing_GetThingGeoMode(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
         sithCogExec_PushInt(ctx, (int)pThing->rdthing.desiredGeoMode);
 }
@@ -1522,14 +1522,14 @@ void sithCogFunctionThing_GetThingGeoMode(sithCog *ctx)
 void sithCogFunctionThing_SetThingLightMode(sithCog *ctx)
 {
     rdLightMode_t mode = (rdLightMode_t)sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
         pThing->rdthing.desiredLightMode = mode;
 }
 
 void sithCogFunctionThing_GetThingLightMode(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
         sithCogExec_PushInt(ctx, (int)pThing->rdthing.desiredLightMode);
 }
@@ -1537,14 +1537,14 @@ void sithCogFunctionThing_GetThingLightMode(sithCog *ctx)
 void sithCogFunctionThing_SetThingTexMode(sithCog *ctx)
 {
     int mode = sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
         pThing->rdthing.desiredTexMode = mode;
 }
 
 void sithCogFunctionThing_GetThingTexMode(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
         sithCogExec_PushInt(ctx, pThing->rdthing.desiredTexMode);
 }
@@ -1552,7 +1552,7 @@ void sithCogFunctionThing_GetThingTexMode(sithCog *ctx)
 void sithCogFunctionThing_SetThingCurGeoMode(sithCog *ctx)
 {
     rdGeoMode_t mode = (rdGeoMode_t)sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
     {
         pThing->rdthing.curGeoMode = mode;
@@ -1565,7 +1565,7 @@ void sithCogFunctionThing_SetThingCurGeoMode(sithCog *ctx)
 
 void sithCogFunctionThing_GetThingCurGeoMode(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing)
         sithCogExec_PushInt(ctx, (int)pThing->rdthing.curGeoMode);
@@ -1574,14 +1574,14 @@ void sithCogFunctionThing_GetThingCurGeoMode(sithCog *ctx)
 void sithCogFunctionThing_SetThingCurLightMode(sithCog *ctx)
 {
     rdLightMode_t mode = (rdLightMode_t)sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
         pThing->rdthing.curLightMode = mode;
 }
 
 void sithCogFunctionThing_GetThingCurLightMode(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing)
         sithCogExec_PushInt(ctx, (int)pThing->rdthing.curLightMode);
@@ -1590,14 +1590,14 @@ void sithCogFunctionThing_GetThingCurLightMode(sithCog *ctx)
 void sithCogFunctionThing_SetThingCurTexMode(sithCog *ctx)
 {
     int mode = sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
         pThing->rdthing.curTexMode = mode;
 }
 
 void sithCogFunctionThing_GetThingCurTexMode(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing)
         sithCogExec_PushInt(ctx, pThing->rdthing.curTexMode);
@@ -1606,14 +1606,14 @@ void sithCogFunctionThing_GetThingCurTexMode(sithCog *ctx)
 void sithCogFunctionThing_SetActorExtraSpeed(sithCog *ctx)
 {
     cog_flex_t extraSpeed = sithCogExec_PopFlex(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
         pThing->actorParams.extraSpeed = extraSpeed;
 }
 
 void sithCogFunctionThing_GetThingTemplate(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing && pThing->templateBase)
         sithCogExec_PushInt(ctx, pThing->templateBase->thingIdx);
@@ -1624,7 +1624,7 @@ void sithCogFunctionThing_GetThingTemplate(sithCog *ctx)
 void sithCogFunctionThing_SetLifeleft(sithCog *ctx)
 {
     cog_flex_t lifeLeftSecs = sithCogExec_PopFlex(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if ( pThing && lifeLeftSecs >= 0.0)
     {
         pThing->lifeLeftMs = (int)(lifeLeftSecs * 1000.0);
@@ -1637,7 +1637,7 @@ void sithCogFunctionThing_SetLifeleft(sithCog *ctx)
 
 void sithCogFunctionThing_GetLifeleft(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
     {
         sithCogExec_PushFlex(ctx, (flex_d_t)(unsigned int)pThing->lifeLeftMs * 0.001);
@@ -1649,7 +1649,7 @@ void sithCogFunctionThing_SetThingThrust(sithCog *ctx)
     rdVector3 poppedVec;
 
     int couldPopVec = sithCogExec_PopVector(ctx, &poppedVec);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if ( pThing && pThing->moveType == SITH_MT_PHYSICS && couldPopVec)
     {
@@ -1660,7 +1660,7 @@ void sithCogFunctionThing_SetThingThrust(sithCog *ctx)
 
 void sithCogFunctionThing_GetThingThrust(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if ( pThing )
     {
@@ -1672,14 +1672,14 @@ void sithCogFunctionThing_GetThingThrust(sithCog *ctx)
 void sithCogFunctionThing_AmputateJoint(sithCog *ctx)
 {
     uint32_t idx = sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing)
     {
         rdThing* rdthing = &pThing->rdthing;
-        if ( pThing != (sithThing *)-196 )
+        if ( pThing != (SithThing *)-196 )
         {
-            sithAnimclass* animclass = pThing->animclass;
+            SithPuppetClass* animclass = pThing->animclass;
             if (animclass && idx < 0xA)
             {
                 int jointIdx = animclass->bodypart_to_joint[idx];
@@ -1695,9 +1695,9 @@ void sithCogFunctionThing_AmputateJoint(sithCog *ctx)
 
 void sithCogFunctionThing_SetActorWeapon(sithCog *ctx)
 {
-    sithThing* weapTemplate = sithCogExec_PopTemplate(ctx);
+    SithThing* weapTemplate = sithCogExec_PopTemplate(ctx);
     int weap_idx = sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if ( pThing && (pThing->type == SITH_THING_ACTOR || pThing->type == SITH_THING_PLAYER))
     {
@@ -1716,11 +1716,11 @@ void sithCogFunctionThing_SetActorWeapon(sithCog *ctx)
 void sithCogFunctionThing_GetActorWeapon(sithCog *ctx)
 {
     int weap_idx = sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing && (pThing->type == SITH_THING_ACTOR || pThing->type == SITH_THING_PLAYER))
     {
-        sithThing* weapTemplate;
+        SithThing* weapTemplate;
         if ( weap_idx == 1 )
         {
             weapTemplate = pThing->actorParams.templateWeapon;
@@ -1750,11 +1750,11 @@ void sithCogFunctionThing_GetActorWeapon(sithCog *ctx)
 void sithCogFunctionThing_GetActorWeaponMots(sithCog *ctx)
 {
     int weap_idx = sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing && (pThing->type == SITH_THING_ACTOR || pThing->type == SITH_THING_PLAYER))
     {
-        sithThing* weapTemplate;
+        SithThing* weapTemplate;
         if ( weap_idx == 1 )
         {
             weapTemplate = pThing->actorParams.templateWeapon;
@@ -1787,7 +1787,7 @@ void sithCogFunctionThing_GetActorWeaponMots(sithCog *ctx)
 
 void sithCogFunctionThing_GetPhysicsFlags(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if ( pThing && pThing->moveType == SITH_MT_PHYSICS )
         sithCogExec_PushInt(ctx, pThing->physicsParams.physflags);
     else
@@ -1797,7 +1797,7 @@ void sithCogFunctionThing_GetPhysicsFlags(sithCog *ctx)
 void sithCogFunctionThing_SetPhysicsFlags(sithCog *ctx)
 {
     int flags = sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing && flags && pThing->moveType == SITH_MT_PHYSICS)
     {
@@ -1812,7 +1812,7 @@ void sithCogFunctionThing_SetPhysicsFlags(sithCog *ctx)
 void sithCogFunctionThing_ClearPhysicsFlags(sithCog *ctx)
 {
     int flags = sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing && flags && pThing->moveType == SITH_MT_PHYSICS)
         pThing->physicsParams.physflags &= ~flags;
@@ -1824,8 +1824,8 @@ void sithCogFunctionThing_SkillTarget(sithCog *ctx)
 
     cog_flex_t param1 = sithCogExec_PopFlex(ctx);
     cog_flex_t param0 = sithCogExec_PopFlex(ctx);
-    sithThing* otherThing = sithCogExec_PopThing(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* otherThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if ( pThing && otherThing && (classCog = pThing->class_cog) != 0 )
     {
@@ -1872,7 +1872,7 @@ void sithCogFunctionThing_SkillTarget(sithCog *ctx)
 void sithCogFunctionThing_ParseArg(sithCog *ctx)
 {
     char* str = sithCogExec_PopString(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (str && pThing)
     {
@@ -1893,7 +1893,7 @@ void sithCogFunctionThing_SetThingRotVel(sithCog *ctx)
     rdVector3 popped_vector3;
 
     sithCogExec_PopVector(ctx, &popped_vector3);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if ( pThing && pThing->moveType == SITH_MT_PHYSICS)
     {
         rdVector_Copy3(&pThing->physicsParams.angVel, &popped_vector3);
@@ -1906,7 +1906,7 @@ void sithCogFunctionThing_SetThingRotVel(sithCog *ctx)
 
 void sithCogFunctionThing_GetThingRotVel(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if ( pThing && pThing->moveType == SITH_MT_PHYSICS )
         sithCogExec_PushVector(ctx, &pThing->physicsParams.angVel);
     else
@@ -1918,7 +1918,7 @@ void sithCogFunctionThing_SetThingLook(sithCog *ctx)
     rdVector3 popped_vector3;
 
     int pop_v3_retval = sithCogExec_PopVector(ctx, &popped_vector3);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if ( pThing && pop_v3_retval == 1)
     {
@@ -1934,7 +1934,7 @@ void sithCogFunctionThing_SetThingLook(sithCog *ctx)
 
 void sithCogFunctionThing_IsThingCrouching(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if ( !pThing || pThing->moveType != SITH_MT_PHYSICS )
         sithCogExec_PushInt(ctx, -1);
 
@@ -1948,7 +1948,7 @@ void sithCogFunctionThing_GetThingClassCog(sithCog *ctx)
 {
     sithCog *classCog; // eax
 
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if ( pThing && (classCog = pThing->class_cog) != 0 )
         sithCogExec_PushInt(ctx, classCog->selfCog);
     else
@@ -1958,7 +1958,7 @@ void sithCogFunctionThing_GetThingClassCog(sithCog *ctx)
 void sithCogFunctionThing_SetThingClassCog(sithCog *ctx)
 {
     sithCog* classCog = sithCogExec_PopCog(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if ( pThing )
     {
         if ( classCog )
@@ -1970,7 +1970,7 @@ void sithCogFunctionThing_GetThingCaptureCog(sithCog *ctx)
 {
     sithCog *captureCog; // eax
 
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if ( pThing && (captureCog = pThing->capture_cog) != 0 )
         sithCogExec_PushInt(ctx, captureCog->selfCog);
     else
@@ -1982,7 +1982,7 @@ void sithCogFunctionThing_SetThingCaptureCog(sithCog *ctx)
     sithCog *captureCog; // edi
 
     captureCog = sithCogExec_PopCog(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if ( pThing )
     {
         if ( captureCog )
@@ -1992,7 +1992,7 @@ void sithCogFunctionThing_SetThingCaptureCog(sithCog *ctx)
 
 void sithCogFunctionThing_GetThingRespawn(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing && pThing->type == SITH_THING_ITEM)
     {
         sithCogExec_PushFlex(ctx, pThing->itemParams.respawn);
@@ -2001,7 +2001,7 @@ void sithCogFunctionThing_GetThingRespawn(sithCog *ctx)
 
 void sithCogFunctionThing_GetThingSignature(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if ( pThing )
         sithCogExec_PushInt(ctx, pThing->signature);
@@ -2012,7 +2012,7 @@ void sithCogFunctionThing_GetThingSignature(sithCog *ctx)
 // MOTS added
 void sithCogFunctionThing_GetThingGuid(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing) {
         sithCogExec_PushInt(ctx, pThing->thing_id);
         return;
@@ -2024,8 +2024,8 @@ void sithCogFunctionThing_GetThingGuid(sithCog *ctx)
 void sithCogFunctionThing_GetGuidThing(sithCog *ctx)
 {
     int thing_id = sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithThing_GetGuidThing(thing_id);
-    if (pThing == (sithThing *)0x0) {
+    SithThing* pThing = sithThing_GetGuidThing(thing_id);
+    if (pThing == (SithThing *)0x0) {
         sithCogExec_PushInt(ctx,-1);
         return;
     }
@@ -2036,7 +2036,7 @@ void sithCogFunctionThing_GetGuidThing(sithCog *ctx)
 void sithCogFunctionThing_SetThingAttachFlags(sithCog *ctx)
 {
     int flags = sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if ( pThing && flags)
     {
@@ -2052,7 +2052,7 @@ void sithCogFunctionThing_SetThingAttachFlags(sithCog *ctx)
 void sithCogFunctionThing_ClearThingAttachFlags(sithCog *ctx)
 {
     int flags = sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if ( pThing && flags)
     {
@@ -2067,7 +2067,7 @@ void sithCogFunctionThing_ClearThingAttachFlags(sithCog *ctx)
 
 void sithCogFunctionThing_GetParticleSize(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing && pThing->type == SITH_THING_PARTICLE)
         sithCogExec_PushFlex(ctx, pThing->particleParams.elementSize);
@@ -2078,7 +2078,7 @@ void sithCogFunctionThing_GetParticleSize(sithCog *ctx)
 void sithCogFunctionThing_SetParticleSize(sithCog *ctx)
 {
     cog_flex_t size = sithCogExec_PopFlex(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing && pThing->type == SITH_THING_PARTICLE)
     {
@@ -2088,7 +2088,7 @@ void sithCogFunctionThing_SetParticleSize(sithCog *ctx)
 
 void sithCogFunctionThing_GetParticleGrowthSpeed(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if ( pThing && pThing->type == SITH_THING_PARTICLE )
         sithCogExec_PushFlex(ctx, pThing->particleParams.growthSpeed);
@@ -2099,7 +2099,7 @@ void sithCogFunctionThing_GetParticleGrowthSpeed(sithCog *ctx)
 void sithCogFunctionThing_SetParticleGrowthSpeed(sithCog *ctx)
 {
     cog_flex_t speed = sithCogExec_PopFlex(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing && pThing->type == SITH_THING_PARTICLE)
     {
@@ -2109,7 +2109,7 @@ void sithCogFunctionThing_SetParticleGrowthSpeed(sithCog *ctx)
 
 void sithCogFunctionThing_GetParticleTimeoutRate(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if ( pThing && pThing->type == SITH_THING_PARTICLE )
         sithCogExec_PushFlex(ctx, pThing->particleParams.rate);
@@ -2120,7 +2120,7 @@ void sithCogFunctionThing_GetParticleTimeoutRate(sithCog *ctx)
 void sithCogFunctionThing_SetParticleTimeoutRate(sithCog *ctx)
 {
     cog_flex_t rate = sithCogExec_PopFlex(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing && pThing->type == SITH_THING_PARTICLE)
     {
@@ -2130,7 +2130,7 @@ void sithCogFunctionThing_SetParticleTimeoutRate(sithCog *ctx)
 
 void sithCogFunctionThing_GetTypeFlags(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
     {
         switch ( pThing->type )
@@ -2156,7 +2156,7 @@ void sithCogFunctionThing_GetTypeFlags(sithCog *ctx)
 void sithCogFunctionThing_SetTypeFlags(sithCog *ctx)
 {
     int flags = sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if ( pThing && flags )
     {
@@ -2184,7 +2184,7 @@ void sithCogFunctionThing_SetTypeFlags(sithCog *ctx)
 void sithCogFunctionThing_ClearTypeFlags(sithCog *ctx)
 {
     int flags = sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if ( pThing && flags )
     {
@@ -2212,16 +2212,16 @@ void sithCogFunctionThing_ClearTypeFlags(sithCog *ctx)
 // MOTS altered
 void sithCogFunctionThing_TakeItem(sithCog *ctx)
 {
-    sithThing* player = sithCogExec_PopThing(ctx);
-    sithThing* itemThing = sithCogExec_PopThing(ctx);
+    SithThing* player = sithCogExec_PopThing(ctx);
+    SithThing* itemThing = sithCogExec_PopThing(ctx);
     if ( itemThing && (Main_bMotsCompat || player) && itemThing->type == SITH_THING_ITEM )
         sithItem_SetItemTaken(itemThing, player, 0);
 }
 
 void sithCogFunctionThing_HasLOS(sithCog *ctx)
 {
-    sithThing* pThingB = sithCogExec_PopThing(ctx);
-    sithThing* pThingA = sithCogExec_PopThing(ctx);
+    SithThing* pThingB = sithCogExec_PopThing(ctx);
+    SithThing* pThingA = sithCogExec_PopThing(ctx);
 
     if ( pThingA && pThingB )
     {
@@ -2238,7 +2238,7 @@ void sithCogFunctionThing_HasLOS(sithCog *ctx)
 
 void sithCogFunctionThing_GetFireOffset(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing)
         sithCogExec_PushVector(ctx, &pThing->actorParams.fireOffset);
@@ -2251,7 +2251,7 @@ void sithCogFunctionThing_SetFireOffset(sithCog *ctx)
     rdVector3 poppedVec;
 
     sithCogExec_PopVector(ctx, &poppedVec);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing)
     {
@@ -2261,7 +2261,7 @@ void sithCogFunctionThing_SetFireOffset(sithCog *ctx)
 
 void sithCogFunctionThing_GetThingUserData(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing)
         sithCogExec_PushFlex(ctx, pThing->userdata);
@@ -2272,7 +2272,7 @@ void sithCogFunctionThing_GetThingUserData(sithCog *ctx)
 void sithCogFunctionThing_SetThingUserData(sithCog *ctx)
 {
     cog_flex_t userdata = sithCogExec_PopFlex(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing)
         pThing->userdata = userdata;
@@ -2280,7 +2280,7 @@ void sithCogFunctionThing_SetThingUserData(sithCog *ctx)
 
 void sithCogFunctionThing_GetThingCollideSize(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing)
         sithCogExec_PushFlex(ctx, pThing->collideSize);
@@ -2291,7 +2291,7 @@ void sithCogFunctionThing_GetThingCollideSize(sithCog *ctx)
 void sithCogFunctionThing_SetThingCollideSize(sithCog *ctx)
 {
     cog_flex_t size = sithCogExec_PopFlex(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing)
         pThing->collideSize = size;
@@ -2299,7 +2299,7 @@ void sithCogFunctionThing_SetThingCollideSize(sithCog *ctx)
 
 void sithCogFunctionThing_GetThingMoveSize(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing)
         sithCogExec_PushFlex(ctx, pThing->moveSize);
@@ -2310,7 +2310,7 @@ void sithCogFunctionThing_GetThingMoveSize(sithCog *ctx)
 void sithCogFunctionThing_SetThingMoveSize(sithCog *ctx)
 {
     cog_flex_t moveSize = sithCogExec_PopFlex(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing)
         pThing->moveSize = moveSize;
@@ -2318,7 +2318,7 @@ void sithCogFunctionThing_SetThingMoveSize(sithCog *ctx)
 
 void sithCogFunctionThing_GetThingMass(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
     {
         if (pThing->moveType == SITH_MT_PHYSICS)
@@ -2331,7 +2331,7 @@ void sithCogFunctionThing_GetThingMass(sithCog *ctx)
 void sithCogFunctionThing_SetThingMass(sithCog *ctx)
 {
     cog_flex_t mass = sithCogExec_PopFlex(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing && pThing->moveType == SITH_MT_PHYSICS)
     {
@@ -2345,7 +2345,7 @@ void sithCogFunctionThing_SetThingMass(sithCog *ctx)
 
 void sithCogFunctionThing_SyncThingPos(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing)
         sithThing_SyncThing(pThing, THING_SYNC_POS);
@@ -2353,7 +2353,7 @@ void sithCogFunctionThing_SyncThingPos(sithCog *ctx)
 
 void sithCogFunctionThing_SyncThingAttachment(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing)
         sithDSSThing_Attachment(pThing, -1, 255, 0);
@@ -2361,7 +2361,7 @@ void sithCogFunctionThing_SyncThingAttachment(sithCog *ctx)
 
 void sithCogFunctionThing_SyncThingState(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing)
         sithThing_SyncThing(pThing, THING_SYNC_STATE);
@@ -2369,7 +2369,7 @@ void sithCogFunctionThing_SyncThingState(sithCog *ctx)
 
 void sithCogFunctionThing_GetMajorMode(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if (pThing && pThing->animclass && pThing->rdthing.puppet)
         sithCogExec_PushInt(ctx, pThing->puppet->majorMode);
@@ -2380,7 +2380,7 @@ void sithCogFunctionThing_GetMajorMode(sithCog *ctx)
 // MOTS added
 void sithCogFunctionThing_GetThingMaxVelocity(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing && pThing->moveType == SITH_MT_PHYSICS) 
     {
         sithCogExec_PushFlex(ctx,pThing->physicsParams.maxVel);
@@ -2395,7 +2395,7 @@ void sithCogFunctionThing_GetThingMaxVelocity(sithCog *ctx)
 void sithCogFunctionThing_SetThingMaxVelocity(sithCog *ctx)
 {
     cog_flex_t val = sithCogExec_PopFlex(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing && pThing->moveType == SITH_MT_PHYSICS) 
     {
         pThing->physicsParams.maxVel = val;
@@ -2405,7 +2405,7 @@ void sithCogFunctionThing_SetThingMaxVelocity(sithCog *ctx)
 // MOTS added
 void sithCogFunctionThing_GetThingMaxAngularVelocity(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing && pThing->moveType == SITH_MT_PHYSICS) 
     {
         sithCogExec_PushFlex(ctx,pThing->physicsParams.maxRotVel);
@@ -2420,7 +2420,7 @@ void sithCogFunctionThing_GetThingMaxAngularVelocity(sithCog *ctx)
 void sithCogFunctionThing_SetThingMaxAngularVelocity(sithCog *ctx)
 {
     cog_flex_t val = sithCogExec_PopFlex(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing && pThing->moveType == SITH_MT_PHYSICS) 
     {
         pThing->physicsParams.maxRotVel = val;
@@ -2430,7 +2430,7 @@ void sithCogFunctionThing_SetThingMaxAngularVelocity(sithCog *ctx)
 // MOTS added
 void sithCogFunctionThing_GetActorHeadPYR(sithCog *ctx)
 {
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing && (pThing->type == SITH_THING_ACTOR || pThing->type == SITH_THING_PLAYER))
     {
         sithCogExec_PushVector(ctx, &pThing->actorParams.eyePYR);
@@ -2445,7 +2445,7 @@ void sithCogFunctionThing_SetHeadPYR(sithCog *ctx)
     rdVector3 tmp;
 
     sithCogExec_PopVector(ctx, &tmp);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing && (pThing->type == SITH_THING_ACTOR || pThing->type == SITH_THING_PLAYER))
     {
         rdVector_Copy3(&pThing->actorParams.eyePYR, &tmp);
@@ -2456,7 +2456,7 @@ void sithCogFunctionThing_SetHeadPYR(sithCog *ctx)
 void sithCogFunctionThing_SetMaxHeadPitch(sithCog *ctx)
 {
     cog_flex_t val = sithCogExec_PopFlex(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing && pThing->moveType == SITH_MT_PHYSICS) 
     {
         sithCogExec_PushFlex(ctx, pThing->actorParams.maxHeadPitch);
@@ -2468,7 +2468,7 @@ void sithCogFunctionThing_SetMaxHeadPitch(sithCog *ctx)
 void sithCogFunctionThing_SetMinHeadPitch(sithCog *ctx)
 {
     cog_flex_t val = sithCogExec_PopFlex(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing && pThing->moveType == SITH_MT_PHYSICS) 
     {
         sithCogExec_PushFlex(ctx, pThing->actorParams.minHeadPitch);
@@ -2480,8 +2480,8 @@ void sithCogFunctionThing_SetMinHeadPitch(sithCog *ctx)
 void sithCogFunctionThing_SetWeaponTarget(sithCog *ctx)
 {
     cog_flex_t fVar1 = sithCogExec_PopFlex(ctx);
-    sithThing* pTargetThing = sithCogExec_PopThing(ctx);
-    sithThing* pWeaponThing = sithCogExec_PopThing(ctx);
+    SithThing* pTargetThing = sithCogExec_PopThing(ctx);
+    SithThing* pWeaponThing = sithCogExec_PopThing(ctx);
 
     if (fVar1 > 0.0 && pWeaponThing && pWeaponThing->type == SITH_THING_WEAPON) 
     {
@@ -2529,7 +2529,7 @@ void sithCogFunctionThing_SetJointAngle(sithCog *ctx)
 {
     rdVector3 *prVar1;
     int arg1;
-    sithThing *pThing;
+    SithThing *pThing;
 
     cog_flex_t fVar2 = sithCogExec_PopFlex(ctx);
     arg1 = sithCogExec_PopInt(ctx);
@@ -2551,7 +2551,7 @@ void sithCogFunctionThing_GetJointAngle(sithCog *ctx)
 
     flex_t local_4 = -1.0;
     int arg1 = sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
     {
         if (((pThing->animclass && pThing->rdthing.type == RD_THINGTYPE_MODEL) &&
@@ -2569,7 +2569,7 @@ void sithCogFunctionThing_GetJointAngle(sithCog *ctx)
 void sithCogFunctionThing_SetThingLookPYR(sithCog *ctx)
 {
     int iVar1;
-    sithThing *pThing;
+    SithThing *pThing;
     rdVector3 pyr;
     rdMatrix34 tmp_mat;
 
@@ -2591,8 +2591,8 @@ void sithCogFunctionThing_SetThingLookPYR(sithCog *ctx)
 void sithCogFunctionThing_GetThingInsertOffset(sithCog *ctx)
 {
     rdModel3 *prVar1;
-    sithThing* pThing = sithCogExec_PopThing(ctx);
-    if (((pThing != (sithThing *)0x0) 
+    SithThing* pThing = sithCogExec_PopThing(ctx);
+    if (((pThing != (SithThing *)0x0) 
         && ((pThing->rdthing).type == RD_THINGTYPE_MODEL)) 
         && (prVar1 = (pThing->rdthing).model3, prVar1 != (rdModel3 *)0x0))
     {
@@ -2604,7 +2604,7 @@ void sithCogFunctionThing_GetThingInsertOffset(sithCog *ctx)
 
 
 
-void sithCogFunctionThing_Startup(sithCogSymboltable* ctx)
+void sithCogFunctionThing_Startup(SithCogSymbolTable* ctx)
 {
     sithCog_RegisterFunction(ctx, sithCogFunctionThing_WaitForStop, "waitforstop");
     sithCog_RegisterFunction(ctx, sithCogFunctionThing_StopThing, "stopthing");

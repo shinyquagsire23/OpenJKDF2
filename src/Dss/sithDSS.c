@@ -96,7 +96,7 @@ const char* sithDSS_IdToStr(int id)
     return strs[id];
 }
 
-void sithDSS_SurfaceStatus(sithSurface *surface, int sendto_id, int mpFlags)
+void sithDSS_SurfaceStatus(SithSurface *surface, int sendto_id, int mpFlags)
 {
     NETMSG_START;
 
@@ -125,10 +125,10 @@ void sithDSS_SurfaceStatus(sithSurface *surface, int sendto_id, int mpFlags)
     sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendto_id, mpFlags, 1);
 }
 
-int sithDSS_ProcessSurfaceStatus(sithCogMsg *msg)
+int sithDSS_ProcessSurfaceStatus(SithMessage *msg)
 {
     uint32_t v1; // eax
-    sithSurface *surface; // edi
+    SithSurface *surface; // edi
     int32_t v4; // ecx
     
     NETMSG_IN_START(msg);
@@ -161,7 +161,7 @@ int sithDSS_ProcessSurfaceStatus(sithCogMsg *msg)
     return 1;
 }
 
-void sithDSS_SectorStatus(sithSector *sector, int sendto_id, int mpFlags)
+void sithDSS_SectorStatus(SithSector *sector, int sendto_id, int mpFlags)
 {
     NETMSG_START;
 
@@ -182,10 +182,10 @@ void sithDSS_SectorStatus(sithSector *sector, int sendto_id, int mpFlags)
     sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendto_id, mpFlags, 1);
 }
 
-int sithDSS_ProcessSectorStatus(sithCogMsg *msg)
+int sithDSS_ProcessSectorStatus(SithMessage *msg)
 {
     uint32_t idx; // eax
-    sithSector *sector; // edi
+    SithSector *sector; // edi
     uint32_t colormapIdx = 0; // eax
     int oldSectorFlags = 0;
 
@@ -238,7 +238,7 @@ LABEL_11:
     return 1;
 }
 
-void sithDSS_SectorFlags(sithSector *pSector, int sendto_id, int mpFlags)
+void sithDSS_SectorFlags(SithSector *pSector, int sendto_id, int mpFlags)
 {
     NETMSG_START;
 
@@ -252,13 +252,13 @@ void sithDSS_SectorFlags(sithSector *pSector, int sendto_id, int mpFlags)
         sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendto_id, mpFlags, 0);
 }
 
-int sithDSS_ProcessSectorFlags(sithCogMsg *msg)
+int sithDSS_ProcessSectorFlags(SithMessage *msg)
 {
     NETMSG_IN_START(msg);
 
     int idx = NETMSG_POPS16();
 
-    sithSector* pSector = sithSector_GetPtrFromIdx(idx);
+    SithSector* pSector = sithSector_GetPtrFromIdx(idx);
     if ( pSector )
     {
         int oldFlags = pSector->flags;
@@ -284,12 +284,12 @@ int sithDSS_ProcessSectorFlags(sithCogMsg *msg)
     return 0;
 }
 
-void sithDSS_AIStatus(sithActor *actor, int sendto_id, int idx)
+void sithDSS_AIStatus(SithAIControlBlock *actor, int sendto_id, int idx)
 {    
     NETMSG_START;
 
     NETMSG_PUSHS16(actor->thing->thingIdx);
-    NETMSG_PUSHS16((int16_t)(((intptr_t)actor->pAIClass - (intptr_t)sithWorld_g_pCurrentWorld->aiclasses) / sizeof(sithAIClass)));
+    NETMSG_PUSHS16((int16_t)(((intptr_t)actor->pAIClass - (intptr_t)sithWorld_g_pCurrentWorld->aiclasses) / sizeof(SithAIClass)));
     NETMSG_PUSHU32(actor->flags);
     NETMSG_PUSHU32(actor->nextUpdate);
     if ( actor->pMoveThing ) {
@@ -352,10 +352,10 @@ void sithDSS_AIStatus(sithActor *actor, int sendto_id, int idx)
     sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendto_id, idx, 1);
 }
 
-int sithDSS_ProcessAIStatus(sithCogMsg *msg)
+int sithDSS_ProcessAIStatus(SithMessage *msg)
 {
-    sithThing *thing;
-    sithActor *actor;
+    SithThing *thing;
+    SithAIControlBlock *actor;
     
     NETMSG_IN_START(msg);
 
@@ -441,11 +441,11 @@ int sithDSS_ProcessAIStatus(sithCogMsg *msg)
     return 1;
 }
 
-void sithDSS_Inventory(sithThing *thing, int binIdx, int sendto_id, int mpFlags)
+void sithDSS_Inventory(SithThing *thing, int binIdx, int sendto_id, int mpFlags)
 {
     if ( thing->type == SITH_THING_PLAYER || thing->type == SITH_THING_ACTOR )
     {
-        sithPlayerInfo* v5 = thing->actorParams.playerinfo;
+        SithPlayer* v5 = thing->actorParams.playerinfo;
         if ( v5 )
         {
             NETMSG_START;
@@ -466,13 +466,13 @@ void sithDSS_Inventory(sithThing *thing, int binIdx, int sendto_id, int mpFlags)
     }
 }
 
-int sithDSS_ProcessInventory(sithCogMsg *msg)
+int sithDSS_ProcessInventory(SithMessage *msg)
 {
     int thingIdx; // edx
-    sithThing *thing; // ecx
-    sithPlayerInfo *playerInfo; // edx
+    SithThing *thing; // ecx
+    SithPlayer *playerInfo; // edx
     int binIdx; // ecx
-    sithItemInfo *iteminfo; // ecx
+    SithInventoryItem *iteminfo; // ecx
     
     NETMSG_IN_START(msg);
 
@@ -551,7 +551,7 @@ void sithDSS_AnimStatus(rdSurface *surface, int sendto_id, int mpFlags)
     sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendto_id, mpFlags, 1);
 }
 
-int sithDSS_ProcessAnimStatus(sithCogMsg *msg)
+int sithDSS_ProcessAnimStatus(SithMessage *msg)
 {
     rdSurface *rdsurface; // edi
     rdSurface *surface; // eax
@@ -628,7 +628,7 @@ int sithDSS_ProcessAnimStatus(sithCogMsg *msg)
     return 1;
 }
 
-void sithDSS_SyncTaskEvents(sithEvent *timer, int sendto_id, int mpFlags)
+void sithDSS_SyncTaskEvents(SithEvent *timer, int sendto_id, int mpFlags)
 {
     NETMSG_START;
 
@@ -644,11 +644,11 @@ void sithDSS_SyncTaskEvents(sithEvent *timer, int sendto_id, int mpFlags)
     sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendto_id, mpFlags, 1);
 }
 
-int sithDSS_ProcessSyncTaskEvents(sithCogMsg *msg)
+int sithDSS_ProcessSyncTaskEvents(SithMessage *msg)
 {
     int deltaMs;
     int16_t field_4;
-    sithEventInfo info;
+    SithEventParams info;
 
     NETMSG_IN_START(msg);
 
@@ -701,7 +701,7 @@ void sithDSS_SendSyncPalEffects(int sendto_id, int mpFlags)
     sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendto_id, mpFlags, 1);
 }
 
-int sithDSS_ProcessSyncPalEffects(sithCogMsg *msg)
+int sithDSS_ProcessSyncPalEffects(SithMessage *msg)
 {
     NETMSG_IN_START(msg);
 
@@ -794,7 +794,7 @@ void sithDSS_SyncCameras(int sendto_id, int mpFlags)
 }
 
 // MOTS altered
-int sithDSS_ProcessSyncCameras(sithCogMsg *msg)
+int sithDSS_ProcessSyncCameras(SithMessage *msg)
 {
     NETMSG_IN_START(msg);
     
@@ -918,7 +918,7 @@ void sithDSS_SyncGameState(int sendto_id, int mpFlags)
 }
 
 // MOTS altered
-int sithDSS_ProcessSyncGameState(sithCogMsg *msg)
+int sithDSS_ProcessSyncGameState(SithMessage *msg)
 {
     NETMSG_IN_START(msg);
 
@@ -984,7 +984,7 @@ int sithDSS_ProcessSyncGameState(sithCogMsg *msg)
     return 1;
 }
 
-void sithDSS_PuppetStatus(sithThing *thing, int sendto_id, int mpFlags)
+void sithDSS_PuppetStatus(SithThing *thing, int sendto_id, int mpFlags)
 {
     NETMSG_START;
 
@@ -1018,9 +1018,9 @@ void sithDSS_PuppetStatus(sithThing *thing, int sendto_id, int mpFlags)
     sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendto_id, mpFlags, 1);
 }
 
-int sithDSS_ProcessPuppetStatus(sithCogMsg *msg)
+int sithDSS_ProcessPuppetStatus(SithMessage *msg)
 {
-    sithThing *thing; // eax
+    SithThing *thing; // eax
     rdPuppet *rdpuppet; // edi
 
     NETMSG_IN_START(msg);

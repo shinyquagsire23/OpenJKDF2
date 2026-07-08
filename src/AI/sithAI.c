@@ -35,13 +35,13 @@ uint32_t sithAI_maxActors = 0;
 int sithAI_actorInitted[SITHAI_MAX_ACTORS] = {0};
 int sithAI_bOpened = 0;
 int sithAI_bInit = 0;
-sithAICommand* sithAI_commandList = NULL;
+SithAIRegisteredInstinct* sithAI_commandList = NULL;
 uint32_t sithAI_numCommands = 0;
 flex_t sithAI_flt_84DE58 = 0.0;
 uint32_t sithAI_dword_84DE5C = 0;
 int sithAI_dword_84DE60 = 0;
 flex_t sithAI_flt_84DE64 = 0.0;
-sithThing** sithAI_pThing_84DE68 = NULL;
+SithThing** sithAI_pThing_84DE68 = NULL;
 int sithAI_dword_84DE6C = 0;
 flex_t sithAI_flt_84DE70 = 0.0;
 int sithAI_dword_84DE74 = 0;
@@ -49,17 +49,17 @@ int sithAI_dword_84DE74 = 0;
 // These are located in a different part of .data?
 sithAIAlign sithAI_aAlignments[10] = {0}; // MoTS Added
 #ifdef TARGET_TWL
-// Added: 84KB of .bss -> extram. Allocated once at sithAI_Startup; sithActor is
+// Added: 84KB of .bss -> extram. Allocated once at sithAI_Startup; SithAIControlBlock is
 // all word-width fields (audited) and every clear below is word-safe.
-sithActor* sithAI_actors = NULL;
+SithAIControlBlock* sithAI_actors = NULL;
 #else
-sithActor sithAI_actors[SITHAI_MAX_ACTORS] = {0};
+SithAIControlBlock sithAI_actors[SITHAI_MAX_ACTORS] = {0};
 #endif
 int sithAI_inittedActors = 0;
 
 // This is also in a different part
 // MoTS Added
-sithThing* sithAI_pDistractor = NULL;
+SithThing* sithAI_pDistractor = NULL;
 
 flex_t sithAI_FLOAT_005a79d8 = 1.0;
 
@@ -67,16 +67,16 @@ int sithAI_Startup()
 {
     int v1; // edx
     int *v2; // ebp
-    sithActor *v3; // esi
+    SithAIControlBlock *v3; // esi
     int v4; // eax
-    sithActor *v5; // ecx
+    SithAIControlBlock *v5; // ecx
 
 #ifdef TARGET_TWL
     // Added: allocate the actor pool in extram (was 84KB of .bss)
     if ( !sithAI_actors )
     {
         TWL_EXTRAM_SUGGEST(pSithHS);
-        sithAI_actors = (sithActor*)SITH_ALLOC(sizeof(sithActor) * SITHAI_MAX_ACTORS);
+        sithAI_actors = (SithAIControlBlock*)SITH_ALLOC(sizeof(SithAIControlBlock) * SITHAI_MAX_ACTORS);
         TWL_EXTRAM_RESTORE(pSithHS);
         if ( !sithAI_actors )
             return 0;
@@ -87,7 +87,7 @@ int sithAI_Startup()
 
     sithAI_FLOAT_005a79d8 = 1.0; // MoTS added
 
-    sithAI_commandList = (sithAICommand *)SITH_ALLOC(sizeof(sithAICommand) * 32);
+    sithAI_commandList = (SithAIRegisteredInstinct *)SITH_ALLOC(sizeof(SithAIRegisteredInstinct) * 32);
     if ( sithAI_commandList )
     {
         sithAI_commandsHashmap = stdHashtbl_New(64);
@@ -98,7 +98,7 @@ int sithAI_Startup()
     sithAICmd_Startup();
 
     // TODO: what is this inline?
-    stdPlatform_Memzero32(sithAI_actors, sizeof(sithActor) * SITHAI_MAX_ACTORS); // Added: word-safe
+    stdPlatform_Memzero32(sithAI_actors, sizeof(SithAIControlBlock) * SITHAI_MAX_ACTORS); // Added: word-safe
 
     v1 = SITHAI_MAX_ACTORS-1;
     v2 = sithAI_actorInitted;
@@ -107,7 +107,7 @@ int sithAI_Startup()
 
     do
     {
-        stdPlatform_Memzero32(v3, sizeof(sithActor)); // Added: word-safe
+        stdPlatform_Memzero32(v3, sizeof(SithAIControlBlock)); // Added: word-safe
         if ( v1 == sithAI_inittedActors )
         {
             v4 = v1 - 1;
@@ -164,12 +164,12 @@ void sithAI_Shutdown()
 
     // These are located in a different part of .data?
     _memset(sithAI_aAlignments, 0, sizeof(sithAI_aAlignments));
-    stdPlatform_Memzero32(sithAI_actors, sizeof(sithActor) * SITHAI_MAX_ACTORS); // Added: word-safe (and pointer-safe sizeof)
+    stdPlatform_Memzero32(sithAI_actors, sizeof(SithAIControlBlock) * SITHAI_MAX_ACTORS); // Added: word-safe (and pointer-safe sizeof)
     sithAI_inittedActors = 0;
 
     // This is also in a different part
     // MoTS Added
-    sithThing* sithAI_pDistractor = NULL;
+    SithThing* sithAI_pDistractor = NULL;
 
     sithAI_FLOAT_005a79d8 = 1.0;
 }
@@ -192,16 +192,16 @@ void sithAI_Close()
     int v0; // ebx
     int v1; // edx
     int *v2; // ebp
-    sithActor *v3; // esi
+    SithAIControlBlock *v3; // esi
     int v4; // eax
-    sithActor *v5; // ecx
+    SithAIControlBlock *v5; // ecx
     
     if (sithAI_bOpened)
         return;
     
     // TODO: what is this inline?
     v0 = sithAI_inittedActors;
-    stdPlatform_Memzero32(sithAI_actors, sizeof(sithActor) * SITHAI_MAX_ACTORS); // Added: word-safe
+    stdPlatform_Memzero32(sithAI_actors, sizeof(SithAIControlBlock) * SITHAI_MAX_ACTORS); // Added: word-safe
 
     v1 = SITHAI_MAX_ACTORS-1;
     v2 = sithAI_actorInitted;
@@ -210,7 +210,7 @@ void sithAI_Close()
 
     do
     {
-        stdPlatform_Memzero32(v3, sizeof(sithActor)); // Added: word-safe
+        stdPlatform_Memzero32(v3, sizeof(SithAIControlBlock)); // Added: word-safe
         if ( v1 == v0 )
         {
             v4 = v1 - 1;
@@ -239,12 +239,12 @@ void sithAI_Close()
     sithAI_bOpened = 0;
 }
 
-void sithAI_Create(sithThing *thing)
+void sithAI_Create(SithThing *thing)
 {
-    sithAIClass *sith_ai; // edx
+    SithAIClass *sith_ai; // edx
     int v2; // eax
     int v3; // eax
-    sithActor *actor; // eax
+    SithAIControlBlock *actor; // eax
 
     sith_ai = thing->pAIClass;
     if ( sith_ai )
@@ -287,14 +287,14 @@ void sithAI_Create(sithThing *thing)
     }
 }
 
-void sithAI_Free(sithThing *thing)
+void sithAI_Free(SithThing *thing)
 {
-    sithActor *v1; // eax
+    SithAIControlBlock *v1; // eax
     int v2; // edx
     int v3; // eax
-    sithActor *v4; // ecx
+    SithAIControlBlock *v4; // ecx
 
-    sithActor* pActor = thing->actor;
+    SithAIControlBlock* pActor = thing->actor;
     if (!pActor)
         return;
 
@@ -307,7 +307,7 @@ void sithAI_Free(sithThing *thing)
         sithAI_actors[v2].paFrames = NULL;
     }
 
-    stdPlatform_Memzero32(&sithAI_actors[v2], sizeof(sithActor)); // Added: word-safe
+    stdPlatform_Memzero32(&sithAI_actors[v2], sizeof(SithAIControlBlock)); // Added: word-safe
     if (v2 == sithAI_inittedActors)
     {
         v3 = v2 - 1;
@@ -332,7 +332,7 @@ void sithAI_Free(sithThing *thing)
 void sithAI_Process()
 {
     int v0; // edi
-    sithActor *actor; // esi
+    SithAIControlBlock *actor; // esi
 
     v0 = 0;
     for ( actor = sithAI_actors; v0 <= sithAI_inittedActors; ++actor )
@@ -376,7 +376,7 @@ void sithAI_Process()
     }
 }
 
-void sithAI_InstinctUpdate(sithActor *actor)
+void sithAI_InstinctUpdate(SithAIControlBlock *actor)
 {
     int v3; // ebx
     int *v4; // edi
@@ -420,7 +420,7 @@ void sithAI_InstinctUpdate(sithActor *actor)
 }
 
 // MoTS altered
-void sithAI_EmitEvent(sithActor *actor, int a2, intptr_t actorFlags)
+void sithAI_EmitEvent(SithAIControlBlock *actor, int a2, intptr_t actorFlags)
 {
     int v6; // eax
     uint32_t v7; // ebx
@@ -452,7 +452,7 @@ void sithAI_EmitEvent(sithActor *actor, int a2, intptr_t actorFlags)
         v7 = 0;
         for (v7 = 0; v7 < actor->numAIClassEntries; v7++)
         {
-            sithActorInstinct* entry = &actor->instincts[v7];
+            SithAIInstinctState* entry = &actor->instincts[v7];
             if ( (entry->field_0 & 1) == 0 )
             {
                 if ( (actor->pAIClass->entries[v7].param3 & a2) != 0 )
@@ -473,7 +473,7 @@ void sithAI_RegisterInstinct(const char *cmdName, sithAICommandFunc_t func, int 
     if ( sithAI_numCommands >= 0x20 )
         return;
 
-    sithAICommand* aiCmd = &sithAI_commandList[sithAI_numCommands];
+    SithAIRegisteredInstinct* aiCmd = &sithAI_commandList[sithAI_numCommands];
 
 #ifndef SITHAI_CRC32_INSTINCTS
     stdString_SafeStrCopy(aiCmd->name, cmdName, 32);
@@ -488,7 +488,7 @@ void sithAI_RegisterInstinct(const char *cmdName, sithAICommandFunc_t func, int 
     sithAI_numCommands++;
 }
 
-sithAICommand* sithAI_FindInstinct(const char *cmdName)
+SithAIRegisteredInstinct* sithAI_FindInstinct(const char *cmdName)
 {
     if ( !sithAI_numCommands )
         return NULL;
@@ -513,8 +513,8 @@ sithAICommand* sithAI_FindInstinct(const char *cmdName)
 int sithAI_AIList(stdDebugConsoleCmd* a, const char* b)
 {
     int v1; // edi
-    sithActor *i; // esi
-    sithAIClass *v3; // ecx
+    SithAIControlBlock *i; // esi
+    SithAIClass *v3; // ecx
 
 #ifdef SITH_DEBUG_STRUCT_NAMES
     if ( sithAI_bOpened )
@@ -554,8 +554,8 @@ int sithAI_AIList(stdDebugConsoleCmd* a, const char* b)
 int sithAI_AIStatus(stdDebugConsoleCmd* a1, const char *idxStr)
 {
     uint32_t v2; // ebx
-    sithThing *v3; // eax
-    sithActor *v4; // edi
+    SithThing *v3; // eax
+    SithAIControlBlock *v4; // edi
     int result = 1; // eax
     int v7; // [esp+3Ch] [ebp-8h]
     int actorIdx; // [esp+40h] [ebp-4h] BYREF
@@ -584,7 +584,7 @@ int sithAI_AIStatus(stdDebugConsoleCmd* a1, const char *idxStr)
             if ( v4->numAIClassEntries )
             {
                 v7 = 0;
-                sithActorInstinct* v6 = &v4->instincts[0];
+                SithAIInstinctState* v6 = &v4->instincts[0];
                 do
                 {
                     _sprintf(
@@ -622,9 +622,9 @@ int sithAI_AIStatus(stdDebugConsoleCmd* a1, const char *idxStr)
 #endif // SITH_DEBUG_STRUCT_NAMES
 }
 
-int sithAI_ParseArg(stdConffileArg *arg, sithThing *thing, int param)
+int sithAI_ParseArg(stdConffileArg *arg, SithThing *thing, int param)
 {
-    sithActor *v3; // esi
+    SithAIControlBlock *v3; // esi
     intptr_t result; // eax
     int v5; // ebp
     unsigned int v6; // edi
@@ -668,10 +668,10 @@ int sithAI_ParseArg(stdConffileArg *arg, sithThing *thing, int param)
 }
 
 // Unused
-void sithAI_CreateAIFramesFomMarker(sithThing *a2, sithThing *a3, rdVector3 *a4)
+void sithAI_CreateAIFramesFomMarker(SithThing *a2, SithThing *a3, rdVector3 *a4)
 {
-    sithThing *v3; // esi
-    sithActor *v4; // edi
+    SithThing *v3; // esi
+    SithAIControlBlock *v4; // edi
     uint32_t v5; // eax
     int v6; // ebp
     unsigned int v7; // ebx
@@ -704,7 +704,7 @@ void sithAI_CreateAIFramesFomMarker(sithThing *a2, sithThing *a3, rdVector3 *a4)
     }
 }
 
-void sithAI_Tick(sithThing *thing, flex_t deltaSeconds)
+void sithAI_Tick(SithThing *thing, flex_t deltaSeconds)
 {
     if ( thing->type == SITH_THING_ACTOR && thing->actorParams.health > 0.0 )
     {
@@ -715,9 +715,9 @@ void sithAI_Tick(sithThing *thing, flex_t deltaSeconds)
     }
 }
 
-void sithAI_sub_4EA630(sithActor *actor, flex_t deltaSeconds)
+void sithAI_sub_4EA630(SithAIControlBlock *actor, flex_t deltaSeconds)
 {
-    sithThing *v2; // esi
+    SithThing *v2; // esi
     rdVector3 *v3; // ebp
     rdMatrix34 *v4; // ebx
     flex_d_t v5; // st7
@@ -786,14 +786,14 @@ void sithAI_sub_4EA630(sithActor *actor, flex_t deltaSeconds)
 }
 
 // MoTS altered
-void sithAI_idk_msgarrived_target(sithActor *actor, flex_t deltaSeconds)
+void sithAI_idk_msgarrived_target(SithAIControlBlock *actor, flex_t deltaSeconds)
 {
-    sithThing *v3; // esi
+    SithThing *v3; // esi
     flex_d_t v9; // st7
     flex_d_t v10; // st5
     flex_d_t v11; // st6
     flex_d_t v13; // st7
-    sithSector *v18; // eax
+    SithSector *v18; // eax
     int v19; // eax
     flex_t v20; // [esp+10h] [ebp-20h]
     flex_t v21; // [esp+14h] [ebp-1Ch]
@@ -866,9 +866,9 @@ LABEL_22:
     }
 }
 
-void sithAI_SetLookFrame(sithActor *actor, rdVector3 *lookPos)
+void sithAI_SetLookFrame(SithAIControlBlock *actor, rdVector3 *lookPos)
 {
-    sithThingActorParams *v5; // edi
+    SithActorInfo *v5; // edi
     flex_d_t v6; // st7
     rdVector3 a2a; // [esp+Ch] [ebp-Ch] BYREF
 
@@ -901,7 +901,7 @@ void sithAI_SetLookFrame(sithActor *actor, rdVector3 *lookPos)
     }
 }
 
-void sithAI_SetMoveThing(sithActor *actor, rdVector3 *movePos, flex_t moveSpeed)
+void sithAI_SetMoveThing(SithAIControlBlock *actor, rdVector3 *movePos, flex_t moveSpeed)
 {
     if ( sithTime_g_msecGameTime >= actor->field_28C || (actor->flags & SITHAI_MODE_MOVING) == 0 )
     {
@@ -912,7 +912,7 @@ void sithAI_SetMoveThing(sithActor *actor, rdVector3 *movePos, flex_t moveSpeed)
     }
 }
 
-void sithAI_Jump(sithActor *actor, rdVector3 *pos, flex_t vel)
+void sithAI_Jump(SithAIControlBlock *actor, rdVector3 *pos, flex_t vel)
 {
     actor->moveSpeed = 2.0;
     rdVector_Copy3(&actor->movePos, pos);
@@ -924,11 +924,11 @@ void sithAI_Jump(sithActor *actor, rdVector3 *pos, flex_t vel)
     actor->flags |= SITHAI_MODE_MOVING;
 }
 
-void sithAI_sub_4EAD60(sithActor *actor)
+void sithAI_sub_4EAD60(SithAIControlBlock *actor)
 {
-    sithThing *v2; // edi
-    sithThing *v3; // eax
-    sithThing *v4; // eax
+    SithThing *v2; // edi
+    SithThing *v3; // eax
+    SithThing *v4; // eax
     int v5; // eax
     int v6; // eax
     int v9; // [esp+10h] [ebp-4h]
@@ -989,7 +989,7 @@ void sithAI_sub_4EAD60(sithActor *actor)
     }
 }
 
-void sithAI_sub_4EAF40(sithActor *actor)
+void sithAI_sub_4EAF40(SithAIControlBlock *actor)
 {
     int v1; // ebx
     int v3; // eax
@@ -1040,13 +1040,13 @@ void sithAI_sub_4EAF40(sithActor *actor)
 }
 
 // MoTS altered
-int sithAI_CheckSightThing(sithThing *thing, rdVector3 *targetPosition, sithThing *targetThing, flex_t fov, flex_t maxDistance, flex_t unused, rdVector3 *targetErrorDir, flex_t *targetDistance)
+int sithAI_CheckSightThing(SithThing *thing, rdVector3 *targetPosition, SithThing *targetThing, flex_t fov, flex_t maxDistance, flex_t unused, rdVector3 *targetErrorDir, flex_t *targetDistance)
 {
     flex_d_t v12; // st7
     flex_d_t v18; // st7
-    sithSector *v21; // eax
-    sithCollisionSearchEntry *v22; // esi
-    sithThing *v23; // eax
+    SithSector *v21; // eax
+    SithCollision *v22; // esi
+    SithThing *v23; // eax
     flex_t a4a; // [esp+18h] [ebp+8h]
     flex_t a5a; // [esp+2Ch] [ebp+1Ch]
 
@@ -1119,12 +1119,12 @@ int sithAI_CheckSightThing(sithThing *thing, rdVector3 *targetPosition, sithThin
 }
 
 // MOTS altered
-int sithAI_sub_4EB300(sithThing *a3, rdVector3 *a4, rdVector3 *arg8, flex_t argC, flex_t arg10, flex_t a7, rdVector3 *a5, flex_t *a8)
+int sithAI_sub_4EB300(SithThing *a3, rdVector3 *a4, rdVector3 *arg8, flex_t argC, flex_t arg10, flex_t a7, rdVector3 *a5, flex_t *a8)
 {
     flex_t v11; // st7
     flex_d_t v16; // st7
-    sithSector *v19; // eax
-    sithCollisionSearchEntry *v20; // esi
+    SithSector *v19; // eax
+    SithCollision *v20; // esi
     flex_t a4a; // [esp+18h] [ebp+8h]
     flex_t arg8a; // [esp+1Ch] [ebp+Ch]
  
@@ -1167,14 +1167,14 @@ int sithAI_sub_4EB300(sithThing *a3, rdVector3 *a4, rdVector3 *arg8, flex_t argC
 }
 
 // TODO this one has some inlined funcs
-int sithAI_CanWalk(sithActor *actor, rdVector3 *targetPosition, int *out)
+int sithAI_CanWalk(SithAIControlBlock *actor, rdVector3 *targetPosition, int *out)
 {
-    sithThing *actorThing; // esi
+    SithThing *actorThing; // esi
     intptr_t result; // eax
-    sithSector *v6; // edi
-    sithCollisionSearchEntry *colSearchEntry; // eax
-    sithSurface *searchSurface; // ecx
-    sithThing *searchThing; // eax
+    SithSector *v6; // edi
+    SithCollision *colSearchEntry; // eax
+    SithSurface *searchSurface; // ecx
+    SithThing *searchThing; // eax
     flex_t searchDist; // [esp+0h] [ebp-2Ch]
     int v12; // [esp+1Ch] [ebp-10h]
     rdVector3 moveNorm; // [esp+20h] [ebp-Ch] BYREF
@@ -1185,7 +1185,7 @@ int sithAI_CanWalk(sithActor *actor, rdVector3 *targetPosition, int *out)
     searchRadius = actorThing->moveSize * 0.25;
     v12 = 0;
     result = (intptr_t)sithCollision_FindSectorInRadius(actorThing->sector, &actorThing->position, targetPosition, 0.0);
-    v6 = (sithSector *)result;
+    v6 = (SithSector *)result;
     if ( !result )
         return result;
     searchDist = sithPhysics_GetThingHeight(actorThing) + actor->pAIClass->maxStep;
@@ -1244,14 +1244,14 @@ LABEL_8:
     return result;
 }
 
-int sithAI_CanWalk_ExplicitSector(sithActor *actor, rdVector3 *targetPosition, sithSector *targetSector, int *out)
+int sithAI_CanWalk_ExplicitSector(SithAIControlBlock *actor, rdVector3 *targetPosition, SithSector *targetSector, int *out)
 {
-    sithThing *actorThing; // edi
+    SithThing *actorThing; // edi
     int retval; // ebx
-    sithCollisionSearchEntry *colSearchEntry; // eax
-    sithSurface *searchSurface; // ecx
+    SithCollision *colSearchEntry; // eax
+    SithSurface *searchSurface; // ecx
     int result; // eax
-    sithThing *searchThing; // eax
+    SithThing *searchThing; // eax
     flex_t searchDist; // [esp+0h] [ebp-24h]
     flex_t searchRadius; // [esp+4h] [ebp-20h]
     rdVector3 moveNorm; // [esp+18h] [ebp-Ch] BYREF
@@ -1319,7 +1319,7 @@ LABEL_19:
     return retval;
 }
 
-int sithAI_FirstThingInView(sithSector *sector, rdMatrix34 *out, flex_t autoaimFov, flex_t autoaimMaxDist, int a5, sithThing **thingList, int a7, flex_t a8)
+int sithAI_FirstThingInView(SithSector *sector, rdMatrix34 *out, flex_t autoaimFov, flex_t autoaimMaxDist, int a5, SithThing **thingList, int a7, flex_t a8)
 {
     if ( autoaimFov < 0.0 || autoaimMaxDist < 0.0 )
         return 0;
@@ -1343,7 +1343,7 @@ int sithAI_sub_4EB860(int a1, flex_t a2)
     return 0;
 }
 
-void sithAI_SetRandomThingLook(rdMatrix34 *a1, sithThing *a2, rdVector3 *a3, flex_t a4)
+void sithAI_SetRandomThingLook(rdMatrix34 *a1, SithThing *a2, rdVector3 *a3, flex_t a4)
 {
     rdVector3 rot; // [esp+4h] [ebp-Ch] BYREF
     flex_t v2; // [esp+1Ch] [ebp+Ch]
@@ -1378,14 +1378,14 @@ void sithAI_RandomRotationVector(rdVector3 *out)
 }
 
 // MoTS altered
-int sithAI_FireWeapon(sithActor *actor, flex_t minDistToFire, flex_t maxDistToFire, flex_t minDot, flex_t percentageErrorInAim, int bAltFire, int a7)
+int sithAI_FireWeapon(SithAIControlBlock *actor, flex_t minDistToFire, flex_t maxDistToFire, flex_t minDot, flex_t percentageErrorInAim, int bAltFire, int a7)
 {
-    sithThing *v8; // ebp
-    sithThing *v9; // edi
-    sithThing *v11; // ecx
+    SithThing *v8; // ebp
+    SithThing *v9; // edi
+    SithThing *v11; // ecx
     flex_d_t v14; // rt2
     int16_t v15; // bx
-    sithThing *v16; // eax
+    SithThing *v16; // eax
     flex_d_t v19; // st7
     signed int v20; // [esp+10h] [ebp-20h]
     flex_t v21; // [esp+14h] [ebp-1Ch]
@@ -1503,11 +1503,11 @@ LABEL_12:
     return 1;
 }
 
-void sithAI_GetThingsInView(sithSector *a1, rdMatrix34 *a2, flex_t a3)
+void sithAI_GetThingsInView(SithSector *a1, rdMatrix34 *a2, flex_t a3)
 {
-    sithThing *v4; // esi
+    SithThing *v4; // esi
     unsigned int v6; // eax
-    sithAdjoin *v7; // esi
+    SithSurfaceAdjoin *v7; // esi
     rdTexinfo *v8; // ebp
     rdMaterial *v9; // ecx
     uint32_t v10; // edx
@@ -1600,11 +1600,11 @@ void sithAI_GetThingsInView(sithSector *a1, rdMatrix34 *a2, flex_t a3)
 }
 
 // MoTS altered
-int sithAI_CanDetectSightThing(sithActor *actor, sithThing *targetThing, flex_t distance)
+int sithAI_CanDetectSightThing(SithAIControlBlock *actor, SithThing *targetThing, flex_t distance)
 {
-    sithThing *actorThing; // esi
+    SithThing *actorThing; // esi
     flex_d_t clampedDistance; // st7
-    sithSector *targetSector; // edx
+    SithSector *targetSector; // edx
     int result; // eax
     flex_t awareness; // [esp+0h] [ebp-4h]
 
@@ -1652,11 +1652,11 @@ int sithAI_CanDetectSightThing(sithActor *actor, sithThing *targetThing, flex_t 
 }
 
 // MOTS added
-void sithAI_SetDistractor(sithThing *pDistractor)
+void sithAI_SetDistractor(SithThing *pDistractor)
 {
-    sithActor *ppsVar1;
-    sithThing **ppsVar2;
-    sithThing *pPlayer;
+    SithAIControlBlock *ppsVar1;
+    SithThing **ppsVar2;
+    SithThing *pPlayer;
 
     pPlayer = sithPlayer_g_pLocalPlayerThing;
     if (sithAI_pDistractor) 
@@ -1685,10 +1685,10 @@ void sithAI_AddAlignmentPriority(flex_t param_1)
     sithAI_FLOAT_005a79d8 = param_1;
 }
 
-void sithAI_GetThingsInCone(sithSector *a1, rdMatrix34 *a2, flex_t a3)
+void sithAI_GetThingsInCone(SithSector *a1, rdMatrix34 *a2, flex_t a3)
 {
-    sithThing *v4; // esi
-    sithAdjoin *v7; // esi
+    SithThing *v4; // esi
+    SithSurfaceAdjoin *v7; // esi
     rdTexinfo *v8; // ebp
     rdMaterial *v9; // ecx
     uint32_t v10; // edx
@@ -1746,10 +1746,10 @@ void sithAI_GetThingsInCone(sithSector *a1, rdMatrix34 *a2, flex_t a3)
         for (int j = 0; j < sithAI_dword_84DE60 - i - 1; j++) {
             if (local_190[j] > local_190[j+1]) {
                 flex_t val_a_1 = local_190[j];
-                sithThing* val_a_2 = sithAI_pThing_84DE68[j];
+                SithThing* val_a_2 = sithAI_pThing_84DE68[j];
 
                 flex_t val_b_1 = local_190[j+1];
-                sithThing* val_b_2 = sithAI_pThing_84DE68[j+1];
+                SithThing* val_b_2 = sithAI_pThing_84DE68[j+1];
 
                 local_190[j] = val_b_1;
                 sithAI_pThing_84DE68[j] = val_b_2;
@@ -1762,7 +1762,7 @@ void sithAI_GetThingsInCone(sithSector *a1, rdMatrix34 *a2, flex_t a3)
 }
 
 // MOTS added
-int sithAI_FirstThingInCone(sithSector *sector, rdMatrix34 *out, flex_t autoaimFov, flex_t autoaimMaxDist, int a5, sithThing **thingList, int a7, flex_t a8)
+int sithAI_FirstThingInCone(SithSector *sector, rdMatrix34 *out, flex_t autoaimFov, flex_t autoaimMaxDist, int a5, SithThing **thingList, int a7, flex_t a8)
 {
     if ( autoaimFov < 0.0 || autoaimMaxDist < 0.0 )
         return 0;
@@ -1780,12 +1780,12 @@ int sithAI_FirstThingInCone(sithSector *sector, rdMatrix34 *out, flex_t autoaimF
 }
 
 // MOTS added
-int sithAI_Charge(sithActor *pActor,flex_t param_2,flex_t param_3,flex_t param_4,int param_5,
+int sithAI_Charge(SithAIControlBlock *pActor,flex_t param_2,flex_t param_3,flex_t param_4,int param_5,
                        flex_t param_6,uint32_t param_7)
 {
-    sithThing *thing;
-    sithThing *pDistractorThing;
-    sithThing *pActorThing;
+    SithThing *thing;
+    SithThing *pDistractorThing;
+    SithThing *pActorThing;
     flex_t fVar3;
     flex_t fVar4;
     flex_t xDist;
@@ -1865,13 +1865,13 @@ LAB_0053a691:
 }
 
 // MOTS added
-int sithAI_Leap(sithActor *pActor,flex_t minDist,flex_t maxDist,flex_t minDot,int param_5,
+int sithAI_Leap(SithAIControlBlock *pActor,flex_t minDist,flex_t maxDist,flex_t minDot,int param_5,
                        flex_t leapSpeed,uint32_t param_7)
 {
     flex_t fVar1;
-    sithThing *thing;
-    sithThing *pDistractorThing;
-    sithThing *pActorThing;
+    SithThing *thing;
+    SithThing *pDistractorThing;
+    SithThing *pActorThing;
     int bVar4;
     int anim;
     flex_d_t xDist;
@@ -1967,21 +1967,21 @@ LAB_0053a3b9:
 }
 
 // MOTS added
-sithThing* sithAI_FUN_00539a60(sithActor *pThing)
+SithThing* sithAI_FUN_00539a60(SithAIControlBlock *pThing)
 {
-    sithThing *a3;
-    sithAIClass *psVar1;
+    SithThing *a3;
+    SithAIClass *psVar1;
     flex_t fVar2;
     int iVar3;
-    sithThing *psVar4;
-    sithThing *arg8;
+    SithThing *psVar4;
+    SithThing *arg8;
     int iVar5;
     flex_t local_1c;
     int local_18;
     flex_t local_10;
     rdVector3 local_c;
 
-    psVar4 = (sithThing *)0x0;
+    psVar4 = (SithThing *)0x0;
     if (pThing->pAIClass->alignment != 0.0) 
     {
         a3 = pThing->thing;

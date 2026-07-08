@@ -421,13 +421,13 @@ int sithGamesave_SaveCurrentWorld(int mpFlags)
     uint32_t v17; // ebx
     int v18; // ebp
     int v19; // ebx
-    sithItemDescriptor *v20; // esi
+    SithInventoryType *v20; // esi
 
     if ( (sithMessage_g_outputstream & mpFlags) == 0 )
         return 0;
     for (uint32_t i = 0; i < sithWorld_g_pCurrentWorld->numThingsLoaded; i++)
     {
-        sithThing* v4 = &sithWorld_g_pCurrentWorld->things[i];
+        SithThing* v4 = &sithWorld_g_pCurrentWorld->things[i];
         if ( sithThing_CanSync(v4) )
         {
             sithDSSThing_FullDescription(v4, 0, mpFlags);
@@ -438,7 +438,7 @@ int sithGamesave_SaveCurrentWorld(int mpFlags)
 
     for (uint32_t i = 0; i < sithWorld_g_pCurrentWorld->numThingsLoaded; i++)
     {
-        sithThing* v7 = &sithWorld_g_pCurrentWorld->things[i];
+        SithThing* v7 = &sithWorld_g_pCurrentWorld->things[i];
         if (sithThing_CanSync(v7))
         {
             if ( v7->attach_flags )
@@ -490,7 +490,7 @@ int sithGamesave_SaveCurrentWorld(int mpFlags)
 
     sithSurface_SyncFull(mpFlags);
 
-    for (sithEvent* timerIter = sithEvent_g_pFirstQueuedEvent; timerIter; timerIter = timerIter->nextTimer )
+    for (SithEvent* timerIter = sithEvent_g_pFirstQueuedEvent; timerIter; timerIter = timerIter->nextTimer )
         sithDSS_SyncTaskEvents(timerIter, 0, mpFlags);
 
     sithDSS_SendSyncPalEffects(0, mpFlags);
@@ -505,7 +505,7 @@ int sithGamesave_Save(char *saveFname, int a2, int a3, wchar_t *saveName)
 {
     wchar_t *v5; // esi
     flex32_t *v7; // eax
-    sithItemInfo *v8; // ecx
+    SithInventoryItem *v8; // ecx
     char tmp_playerName[32]; // [esp+Ch] [ebp-2A0h] BYREF
     char PathName[128]; // [esp+2Ch] [ebp-280h] BYREF
     wchar_t v13[256]; // [esp+ACh] [ebp-200h] BYREF

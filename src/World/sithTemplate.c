@@ -25,7 +25,7 @@ void sithTemplate_Shutdown()
     }
 }
 
-int sithTemplate_AllocWorldTemplates(sithWorld *world, unsigned int numTemplates)
+int sithTemplate_AllocWorldTemplates(SithWorld *world, unsigned int numTemplates)
 {
 #ifdef TARGET_RETRO_HOMEBREW
     // Added: templates are parsed into a stack local and copied in word-safely,
@@ -33,14 +33,14 @@ int sithTemplate_AllocWorldTemplates(sithWorld *world, unsigned int numTemplates
     // and word-safe, so they can live in word-addressable-only memory.
     int prevSuggest = pSithHS->suggestHeap(HEAP_WORD_ADDRESSABLE);
 #endif
-    world->templates = (sithThing*)SITH_ALLOC(sizeof(sithThing) * numTemplates);
+    world->templates = (SithThing*)SITH_ALLOC(sizeof(SithThing) * numTemplates);
 #ifdef TARGET_RETRO_HOMEBREW
     pSithHS->suggestHeap(prevSuggest);
 #endif
     if (!world->templates)
         return 0;
 
-    stdPlatform_Memzero32(world->templates, sizeof(sithThing) * numTemplates); // Added: word-safe
+    stdPlatform_Memzero32(world->templates, sizeof(SithThing) * numTemplates); // Added: word-safe
     for (int i = 0; i < numTemplates; i++)
     {
         sithThing_Reset(&world->templates[i]);
@@ -59,9 +59,9 @@ int sithTemplate_AllocWorldTemplates(sithWorld *world, unsigned int numTemplates
     return 1;
 }
 
-sithThing* sithTemplate_GetTemplateByIndex(int idx)
+SithThing* sithTemplate_GetTemplateByIndex(int idx)
 {
-    sithWorld* world = sithWorld_g_pCurrentWorld;
+    SithWorld* world = sithWorld_g_pCurrentWorld;
     if ( idx & 0x8000 )
     {
         world = sithWorld_g_pStaticWorld;
@@ -76,7 +76,7 @@ sithThing* sithTemplate_GetTemplateByIndex(int idx)
     return NULL;
 }
 
-int sithTemplate_ReadThingTemplatesListText(sithWorld *world, int a2)
+int sithTemplate_ReadThingTemplatesListText(SithWorld *world, int a2)
 {
     unsigned int numTemplates;
 
@@ -112,7 +112,7 @@ void sithTemplate_OldFree()
     // TODO unused but interesting
 }
 
-void sithTemplate_FreeWorldTemplates(sithWorld *world)
+void sithTemplate_FreeWorldTemplates(SithWorld *world)
 {
     for (int i = 0; i < world->numTemplatesLoaded; i++)
     {
@@ -133,13 +133,13 @@ void sithTemplate_FreeWorldTemplates(sithWorld *world)
     }
 }
 
-sithThing* sithTemplate_GetTemplate(const char *name)
+SithThing* sithTemplate_GetTemplate(const char *name)
 {
-    sithThing *result;
+    SithThing *result;
 
     if ( !_memcmp(name, "none", 5u) )
         return 0;
-    result = (sithThing *)stdHashtbl_Find(sithTemplate_pHashtable, name);
+    result = (SithThing *)stdHashtbl_Find(sithTemplate_pHashtable, name);
     if ( result )
         return result;
 
@@ -167,13 +167,13 @@ sithThing* sithTemplate_GetTemplate(const char *name)
     return 0;
 }
 
-sithThing* sithTemplate_Parse(sithWorld *world)
+SithThing* sithTemplate_Parse(SithWorld *world)
 {
-    sithThing *result;
-    sithThing tmp;
+    SithThing *result;
+    SithThing tmp;
     const char* template_name;
 
-    result = (sithThing *)stdHashtbl_Find(sithTemplate_pHashtable, (const char*)stdConffile_g_entry.args[0].value);
+    result = (SithThing *)stdHashtbl_Find(sithTemplate_pHashtable, (const char*)stdConffile_g_entry.args[0].value);
     if ( result )
         return result;
 
@@ -181,7 +181,7 @@ sithThing* sithTemplate_Parse(sithWorld *world)
     memset(&tmp, 0, sizeof(tmp));
 
     sithThing_Reset(&tmp);
-    result = (sithThing *)stdHashtbl_Find(sithTemplate_pHashtable, (const char*)stdConffile_g_entry.args[1].value);
+    result = (SithThing *)stdHashtbl_Find(sithTemplate_pHashtable, (const char*)stdConffile_g_entry.args[1].value);
     sithThing_SetThingBasedOn(&tmp, result);
 
     template_name = stdConffile_g_entry.args[0].value;
@@ -205,7 +205,7 @@ sithThing* sithTemplate_Parse(sithWorld *world)
 
     result = &world->templates[world->numTemplatesLoaded++];
     tmp.thingIdx = result->thingIdx;
-    stdPlatform_Memcpy32(result, &tmp, sizeof(sithThing)); // Added: word-safe (array may be word-addressable-only)
+    stdPlatform_Memcpy32(result, &tmp, sizeof(SithThing)); // Added: word-safe (array may be word-addressable-only)
 #ifdef SITH_DEBUG_STRUCT_NAMES
     // The copies of names are load-bearing, SetKeyVal stores a reference
     stdHashtbl_Add(sithTemplate_pHashtable, result->template_name, result);

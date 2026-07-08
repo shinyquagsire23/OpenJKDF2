@@ -156,11 +156,11 @@ int jkGuiMultiTally_Show(int a1)
 {
     int result; // eax
     uint32_t v2; // ebp
-    sithPlayerInfo* pPlayerInfoIter2; // ecx
+    SithPlayer* pPlayerInfoIter2; // ecx
     int v4; // edx
     uint32_t v5; // eax
     jkGuiElement* pElementIter; // esi
-    sithPlayerInfo* pPlayerInfoIter; // edi
+    SithPlayer* pPlayerInfoIter; // edi
     int v8; // ebp
     int v9; // eax
     int v10; // ecx
@@ -173,7 +173,7 @@ int jkGuiMultiTally_Show(int a1)
     wchar_t *v18; // eax
     uint32_t v19; // ecx
     jkGuiElement* v20; // esi
-    sithPlayerInfo* v21; // edi
+    SithPlayer* v21; // edi
     int v22; // ebp
     int v23; // ecx
     int v24; // edx
@@ -197,7 +197,7 @@ int jkGuiMultiTally_Show(int a1)
     wchar_t wtmp2[1024]; // [esp+1020h] [ebp-28E80h] BYREF
     wchar_t wtmp3[1024]; // [esp+1820h] [ebp-28680h] BYREF
     wchar_t wtmp4[1024]; // [esp+2020h] [ebp-27E80h] BYREF
-    sithPlayerInfo aPlayerInfoSorted[32]; // [esp+2820h] [ebp-27680h] BYREF
+    SithPlayer aPlayerInfoSorted[32]; // [esp+2820h] [ebp-27680h] BYREF
 
     memset(jkGuiMultiTally_waTmp, 0, 0x40u);
     jkGuiMultiTally_msStart = stdPlatform_GetTimeMsec();
@@ -226,7 +226,7 @@ int jkGuiMultiTally_Show(int a1)
 #endif
 
     _memcpy(aPlayerInfoSorted, jkPlayer_playerInfos, sizeof(aPlayerInfoSorted));
-    _qsort(aPlayerInfoSorted, 0x20u, sizeof(sithPlayerInfo), (int (__cdecl *)(const void *, const void *))jkGuiMultiTally_SortPlayerScore);
+    _qsort(aPlayerInfoSorted, 0x20u, sizeof(SithPlayer), (int (__cdecl *)(const void *, const void *))jkGuiMultiTally_SortPlayerScore);
     v2 = 0;
     v35 = 0;
     if ( jkPlayer_maxPlayers )
@@ -436,7 +436,7 @@ LABEL_50:
     return v17;
 }
 
-int jkGuiMultiTally_SortPlayerScore(const sithPlayerInfo *pA, const sithPlayerInfo *pB)
+int jkGuiMultiTally_SortPlayerScore(const SithPlayer *pA, const SithPlayer *pB)
 {
     int v2; // edx
     int v3; // eax
@@ -552,7 +552,7 @@ int jkGuiMultiTally_ShowTeamScores(int a1)
 
     for (int i = 0; i < jkPlayer_maxPlayers; i++)
     {
-        sithPlayerInfo* pPlayerInfoIter = &jkPlayer_playerInfos[i];
+        SithPlayer* pPlayerInfoIter = &jkPlayer_playerInfos[i];
         if ( (pPlayerInfoIter->flags & 4) != 0 )
             aTmpTeamScores[pPlayerInfoIter->teamNum].field_8 = 1;
     }

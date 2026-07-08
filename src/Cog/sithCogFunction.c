@@ -154,7 +154,7 @@ void sithCogFunction_SurfaceAnim(sithCog *ctx)
 {
     sithCog *ctx_;
     int popInt; // edi
-    sithSurface *surface; // ecx
+    SithSurface *surface; // ecx
     rdSurface *v4; // eax
     cog_flex_t popFlex; // [esp+Ch] [ebp+4h]
 
@@ -209,7 +209,7 @@ void sithCogFunction_MaterialAnim(sithCog *ctx)
 
 void sithCogFunction_StopThing(sithCog *ctx) // unused
 {
-    sithThing *v1;
+    SithThing *v1;
 
     v1 = sithCogExec_PopThing(ctx);
     if ( v1 )
@@ -242,7 +242,7 @@ void sithCogFunction_StopAnim(sithCog *ctx)
 
 void sithCogFunction_StopSurfaceAnim(sithCog *ctx)
 {
-    sithSurface *v1; // eax
+    SithSurface *v1; // eax
     rdSurface *v2; // eax
 
     v1 = sithCogExec_PopSurface(ctx);
@@ -260,7 +260,7 @@ void sithCogFunction_StopSurfaceAnim(sithCog *ctx)
 
 void sithCogFunction_GetSurfaceAnim(sithCog *ctx)
 {
-    sithSurface *v1; // eax
+    SithSurface *v1; // eax
     int v2; // eax
 
     v1 = sithCogExec_PopSurface(ctx);
@@ -278,7 +278,7 @@ void sithCogFunction_GetSurfaceAnim(sithCog *ctx)
 void sithCogFunction_LoadTemplate(sithCog *ctx)
 {
     char *v1; // eax
-    sithThing *v2; // eax
+    SithThing *v2; // eax
 
     v1 = sithCogExec_PopString(ctx);
     if ( v1 && (v2 = sithTemplate_GetTemplate(v1)) != 0 )
@@ -372,7 +372,7 @@ void sithCogFunction_SetTimer(sithCog *ctx)
 
 void sithCogFunction_SetTimerEx(sithCog *ctx)
 {
-    sithEventInfo timerInfo;
+    SithEventParams timerInfo;
 
     timerInfo.field_14 = sithCogExec_PopFlex(ctx);
     timerInfo.field_10 = sithCogExec_PopFlex(ctx);
@@ -387,9 +387,9 @@ void sithCogFunction_SetTimerEx(sithCog *ctx)
 
 void sithCogFunction_KillTimerEx(sithCog *ctx)
 {
-    sithEvent *v2; // eax
-    sithEvent *v3; // edi
-    sithEvent *v4; // esi
+    SithEvent *v2; // eax
+    SithEvent *v3; // edi
+    SithEvent *v4; // esi
 
     int v1 = sithCogExec_PopInt(ctx);
     if ( v1 > 0 )
@@ -656,8 +656,8 @@ void sithCogFunction_GetThingCount(sithCog *ctx)
 
 void sithCogFunction_GetThingTemplateCount(sithCog *ctx)
 {
-    sithWorld *v1; // esi
-    sithThing *v2; // eax
+    SithWorld *v1; // esi
+    SithThing *v2; // eax
     int template_count; // edi
 
     v1 = sithWorld_g_pCurrentWorld;
@@ -667,7 +667,7 @@ void sithCogFunction_GetThingTemplateCount(sithCog *ctx)
         template_count = 0;
         for (int i = 0; i < v1->numThings; i++ )
         {
-            sithThing* thing = &v1->things[i];
+            SithThing* thing = &v1->things[i];
             if ( thing->type && thing->type != SITH_THING_CORPSE && thing->templateBase == v2 )
                 ++template_count;
         }
@@ -780,7 +780,7 @@ void sithCogFunction_SetInvFlags(sithCog *ctx)
 {
     int flags;
     int binIdx;
-    sithThing *player;
+    SithThing *player;
 
     flags = sithCogExec_PopInt(ctx);
     binIdx = sithCogExec_PopInt(ctx);
@@ -809,7 +809,7 @@ void sithCogFunction_ClearMapModeFlags(sithCog *ctx)
 
 void sithCogFunction_SetCameraFocus(sithCog *ctx)
 {
-    sithThing *focusThing; // esi
+    SithThing *focusThing; // esi
     signed int camIdx; // eax
 
     focusThing = sithCogExec_PopThing(ctx);
@@ -831,7 +831,7 @@ void sithCogFunction_SetCameraFocus(sithCog *ctx)
 void sithCogFunction_GetPrimaryFocus(sithCog *ctx)
 {
     signed int camIdx; // eax
-    sithThing *v2; // eax
+    SithThing *v2; // eax
 
     camIdx = sithCogExec_PopInt(ctx);
 
@@ -850,7 +850,7 @@ void sithCogFunction_GetPrimaryFocus(sithCog *ctx)
 void sithCogFunction_GetSecondaryFocus(sithCog *ctx)
 {
     signed int camIdx; // eax
-    sithThing *v2; // eax
+    SithThing *v2; // eax
 
     camIdx = sithCogExec_PopInt(ctx);
     
@@ -930,8 +930,8 @@ void sithCogFunction_SetPOVShake(sithCog *ctx)
 
 void sithCogFunction_HeapNew(sithCog *ctx)
 {
-    sithCogStackvar *oldHeap; // eax
-    sithCogStackvar *newHeap; // edi
+    SithCogSymbolValue *oldHeap; // eax
+    SithCogSymbolValue *newHeap; // edi
 
     int numHeapVars = sithCogExec_PopInt(ctx);
     if ( numHeapVars > 0 )
@@ -943,21 +943,21 @@ void sithCogFunction_HeapNew(sithCog *ctx)
             ctx->numHeapVars = 0;
         }
         { TWL_EXTRAM_SUGGEST(pSithHS); // Added: heap vars are word-safe stackvars
-        newHeap = (sithCogStackvar *)SITH_ALLOC(sizeof(sithCogStackvar) * numHeapVars);
+        newHeap = (SithCogSymbolValue *)SITH_ALLOC(sizeof(SithCogSymbolValue) * numHeapVars);
         TWL_EXTRAM_RESTORE(pSithHS); }
         ctx->heap = newHeap;
         if (!newHeap) { // Added: don't memset NULL on OOM
             ctx->numHeapVars = 0;
             return;
         }
-        stdPlatform_Memzero32(newHeap, (sizeof(sithCogStackvar) * numHeapVars)); // Added: word-safe
+        stdPlatform_Memzero32(newHeap, (sizeof(SithCogSymbolValue) * numHeapVars)); // Added: word-safe
         ctx->numHeapVars = numHeapVars;
     }
 }
 
 void sithCogFunction_HeapSet(sithCog *ctx)
 {
-    sithCogStackvar stackVar;
+    SithCogSymbolValue stackVar;
 
     int val = sithCogExec_PopSymbol(ctx, &stackVar);
     int idx = sithCogExec_PopInt(ctx);
@@ -967,8 +967,8 @@ void sithCogFunction_HeapSet(sithCog *ctx)
 
 void sithCogFunction_HeapGet(sithCog *ctx)
 {
-    sithCogStackvar *heapVar;
-    sithCogStackvar tmp;
+    SithCogSymbolValue *heapVar;
+    SithCogSymbolValue tmp;
 
     int idx = sithCogExec_PopInt(ctx);
     if (idx < 0 || idx >= ctx->numHeapVars)
@@ -1111,7 +1111,7 @@ void sithCogFunction_FreeColorEffect(sithCog *ctx)
 void sithCogFunction_AddDynamicTint(sithCog *ctx)
 {
     sithCog *v1; // esi
-    sithThing *player; // eax
+    SithThing *player; // eax
 
     v1 = ctx;
     cog_flex_t fB = sithCogExec_PopFlex(ctx);
@@ -1127,7 +1127,7 @@ void sithCogFunction_AddDynamicAdd(sithCog *ctx)
     int b; // edi
     int g; // ebx
     int r; // ebp
-    sithThing *playerThing; // eax
+    SithThing *playerThing; // eax
 
     b = sithCogExec_PopInt(ctx);
     g = sithCogExec_PopInt(ctx);
@@ -1153,8 +1153,8 @@ void sithCogFunction_FireProjectileInternal(sithCog *ctx, int extra)
     sithCogExec_PopVector(ctx,&fireOffset);
     int mode = sithCogExec_PopInt(ctx);
     sithSound* fireSound = sithCogExec_PopSound(ctx);
-    sithThing* projectileTemplate = sithCogExec_PopTemplate(ctx);
-    sithThing* sender = sithCogExec_PopThing(ctx);
+    SithThing* projectileTemplate = sithCogExec_PopTemplate(ctx);
+    SithThing* sender = sithCogExec_PopThing(ctx);
 
     if (sender) {
         projectileTemplate = sithWeapon_FireProjectile(sender,projectileTemplate,fireSound,mode,&fireOffset,&aimError,scale,(int16_t)scaleFlags,autoaimFov,autoaimMaxDist,extra);
@@ -1190,14 +1190,14 @@ void sithCogFunction_FireProjectileLocal(sithCog *ctx)
 
 void sithCogFunction_SendTrigger(sithCog *ctx)
 {
-    sithPlayerInfo* playerinfo;
+    SithPlayer* playerinfo;
 
     cog_flex_t arg3 = sithCogExec_PopFlex(ctx);
     cog_flex_t arg2 = sithCogExec_PopFlex(ctx);
     cog_flex_t arg1 = sithCogExec_PopFlex(ctx);
     cog_flex_t arg0 = sithCogExec_PopFlex(ctx);
     int sourceType = sithCogExec_PopInt(ctx);
-    sithThing* sourceThing = sithCogExec_PopThing(ctx);
+    SithThing* sourceThing = sithCogExec_PopThing(ctx);
     
     if ( sourceThing )
     {
@@ -1251,7 +1251,7 @@ void sithCogFunction_ActivateWeapon(sithCog *ctx)
 {
     int mode = sithCogExec_PopInt(ctx);
     cog_flex_t fireRate = sithCogExec_PopFlex(ctx);
-    sithThing* weaponThing = sithCogExec_PopThing(ctx);
+    SithThing* weaponThing = sithCogExec_PopThing(ctx);
 
     if ( weaponThing && fireRate >= 0.0 && mode >= 0 && mode < 2 )
         sithWeapon_ActivateWeapon(weaponThing, ctx, fireRate, mode);
@@ -1260,7 +1260,7 @@ void sithCogFunction_ActivateWeapon(sithCog *ctx)
 void sithCogFunction_DeactivateWeapon(sithCog *ctx)
 {
     int mode = sithCogExec_PopInt(ctx);
-    sithThing* weapon = sithCogExec_PopThing(ctx);
+    SithThing* weapon = sithCogExec_PopThing(ctx);
     if ( weapon && mode >= 0 && mode < 2 )
     {
         sithCogExec_PushFlex(ctx, sithWeapon_DeactivateWeapon(weapon, ctx, mode));
@@ -1274,7 +1274,7 @@ void sithCogFunction_DeactivateWeapon(sithCog *ctx)
 void sithCogFunction_SetFireWait(sithCog *ctx)
 {
     cog_flex_t fireRate = sithCogExec_PopFlex(ctx);
-    sithThing* weapon = sithCogExec_PopThing(ctx);
+    SithThing* weapon = sithCogExec_PopThing(ctx);
 
     if ( weapon && weapon == sithPlayer_g_pLocalPlayerThing && fireRate >= -1.0 )
         sithWeapon_SetFireWait(weapon, fireRate);
@@ -1283,7 +1283,7 @@ void sithCogFunction_SetFireWait(sithCog *ctx)
 void sithCogFunction_SetMountWait(sithCog *ctx)
 {
     cog_flex_t mountWait = sithCogExec_PopFlex(ctx);
-    sithThing* weapon = sithCogExec_PopThing(ctx);
+    SithThing* weapon = sithCogExec_PopThing(ctx);
 
     if ( weapon && weapon == sithPlayer_g_pLocalPlayerThing && mountWait >= -1.0 )
         sithWeapon_SetMountWait(weapon, mountWait);
@@ -1292,7 +1292,7 @@ void sithCogFunction_SetMountWait(sithCog *ctx)
 void sithCogFunction_SelectWeapon(sithCog *ctx)
 {
     int binIdx = sithCogExec_PopInt(ctx);
-    sithThing* player = sithCogExec_PopThing(ctx);
+    SithThing* player = sithCogExec_PopThing(ctx);
 
     if (Main_bMotsCompat && binIdx < SITHBIN_ENERGY) {
         binIdx = sithInventory_SelectWeaponFollowing(binIdx);
@@ -1308,7 +1308,7 @@ void sithCogFunction_SelectWeapon(sithCog *ctx)
 void sithCogFunction_AssignWeapon(sithCog *ctx)
 {
     int binIdx = sithCogExec_PopInt(ctx);
-    sithThing* player = sithCogExec_PopThing(ctx);
+    SithThing* player = sithCogExec_PopThing(ctx);
 
     if (Main_bMotsCompat && binIdx < SITHBIN_ENERGY) {
         binIdx = sithInventory_SelectWeaponFollowing(binIdx);
@@ -1324,7 +1324,7 @@ void sithCogFunction_AssignWeapon(sithCog *ctx)
 void sithCogFunction_AutoSelectWeapon(sithCog *ctx)
 {
     int weapIdx = sithCogExec_PopInt(ctx);
-    sithThing* player = sithCogExec_PopThing(ctx);
+    SithThing* player = sithCogExec_PopThing(ctx);
 
     if ( weapIdx >= 0 && weapIdx <= 2 && player )
     {
@@ -1346,7 +1346,7 @@ void sithCogFunction_SetCurWeapon(sithCog *ctx)
     int v4; // eax
 
     int binIdx = sithCogExec_PopInt(ctx);
-    sithThing* player = sithCogExec_PopThing(ctx);
+    SithThing* player = sithCogExec_PopThing(ctx);
 
     if (Main_bMotsCompat && binIdx < SITHBIN_ENERGY) {
         binIdx = sithInventory_SelectWeaponFollowing(binIdx);
@@ -1367,7 +1367,7 @@ void sithCogFunction_GetWeaponPriority(sithCog *ctx)
 {
     int mode = sithCogExec_PopInt(ctx);
     int binIdx = sithCogExec_PopInt(ctx);
-    sithThing* player = sithCogExec_PopThing(ctx);
+    SithThing* player = sithCogExec_PopThing(ctx);
 
     if (Main_bMotsCompat && binIdx < SITHBIN_ENERGY) {
         binIdx = sithInventory_SelectWeaponFollowing(binIdx);
@@ -1396,7 +1396,7 @@ void sithCogFunction_GetCurWeaponMode(sithCog *ctx)
 
 void sithCogFunction_GetCurWeapon(sithCog *ctx)
 {
-    sithThing* player = sithCogExec_PopThing(ctx);
+    SithThing* player = sithCogExec_PopThing(ctx);
 
     if ( player && player->type == SITH_THING_PLAYER )
     {
@@ -1523,7 +1523,7 @@ void sithCogFunction_SetScoreLimit(sithCog *ctx)
 void sithCogFunction_ChangeFireRate(sithCog *ctx)
 {
     cog_flex_t fireRate = sithCogExec_PopFlex(ctx);
-    sithThing* player = sithCogExec_PopThing(ctx);
+    SithThing* player = sithCogExec_PopThing(ctx);
 
     if ( player && player == sithPlayer_g_pLocalPlayerThing && fireRate > 0.0 )
         sithWeapon_SetFireRate(player, fireRate);
@@ -1540,8 +1540,8 @@ void sithCogFunction_AutoSavegame(sithCog *ctx)
 
 void sithCogFunction_SetCameraFocii(sithCog *ctx)
 {
-    sithThing* focusThing2 = sithCogExec_PopThing(ctx);
-    sithThing* focusThing = sithCogExec_PopThing(ctx);
+    SithThing* focusThing2 = sithCogExec_PopThing(ctx);
+    SithThing* focusThing = sithCogExec_PopThing(ctx);
     int camIdx = sithCogExec_PopInt(ctx);
 
 #ifdef QOL_IMPROVEMENTS
@@ -1716,7 +1716,7 @@ void sithCogFunction_SendMessageExRadius(sithCog *ctx)
     int message;
     uint32_t uVar4;
     int iVar5;
-    sithThing *sender;
+    SithThing *sender;
     int local_28;
     rdVector3 local_1c;
 
@@ -1756,7 +1756,7 @@ void sithCogFunction_SendMessageExRadius(sithCog *ctx)
 
 
 
-void sithCogFunction_Startup(sithCogSymboltable* ctx)
+void sithCogFunction_Startup(SithCogSymbolTable* ctx)
 {
     sithCog_RegisterFunction(ctx, sithCogFunction_Sleep, "sleep");
     if (Main_bMotsCompat) {

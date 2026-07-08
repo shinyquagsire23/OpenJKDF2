@@ -30,17 +30,17 @@ int32_t sithCog_actionCogIdk = 0;
 
 void sithCogExec_Execute(sithCog *cog_ctx)
 {
-    sithCogScript *cogscript;
+    SithCogScript *cogscript;
     int32_t op;
-    sithCogSymbol *v12; // eax
+    SithCogSymbol *v12; // eax
     cogSymbolFunc_t func; // eax
     int32_t *vec; // ecx
     int32_t v19; // eax
-    sithCogStackvar val; // [esp+20h] [ebp-80h]
-    sithCogStackvar var; // [esp+70h] [ebp-30h]
-    sithCogStackvar outVar; // [esp+90h] [ebp-10h]
+    SithCogSymbolValue val; // [esp+20h] [ebp-80h]
+    SithCogSymbolValue var; // [esp+70h] [ebp-30h]
+    SithCogSymbolValue outVar; // [esp+90h] [ebp-10h]
     int32_t iTmp;
-    sithCogStackvar* tmpStackVar;
+    SithCogSymbolValue* tmpStackVar;
 
     // MOTS added
     /*
@@ -316,10 +316,10 @@ void sithCogExec_ExecuteMessage(sithCog *ctx, int32_t trigIdx)
     }
 }
 
-int32_t sithCogExec_PopSymbol(sithCog *ctx, sithCogStackvar *stackVar)
+int32_t sithCogExec_PopSymbol(sithCog *ctx, SithCogSymbolValue *stackVar)
 {
 
-    sithCogStackvar *tmp; // eax
+    SithCogSymbolValue *tmp; // eax
     int32_t *v5; // edx
     int32_t type; // ecx
     intptr_t d0; // edx
@@ -337,7 +337,7 @@ int32_t sithCogExec_PopSymbol(sithCog *ctx, sithCogStackvar *stackVar)
 
     if ( stackVar->type == COG_VARTYPE_SYMBOL ) {
         // Added: nullptr check here
-        sithCogSymbol* sym = sithCogParse_GetSymbolByID(ctx->pSymbolTable, stackVar->data[0]);
+        SithCogSymbol* sym = sithCogParse_GetSymbolByID(ctx->pSymbolTable, stackVar->data[0]);
         if (sym) {
             tmp = &sym->val;
         }
@@ -400,7 +400,7 @@ int32_t sithCogExec_PopSymbol(sithCog *ctx, sithCogStackvar *stackVar)
 
 cog_flex_t sithCogExec_PopFlex(sithCog *ctx)
 {
-    sithCogStackvar tmp;
+    SithCogSymbolValue tmp;
     if (!sithCogExec_PopSymbol(ctx, &tmp))
         return 0.0;
         
@@ -424,7 +424,7 @@ cog_flex_t sithCogExec_PopFlex(sithCog *ctx)
 
 int32_t sithCogExec_PopInt(sithCog *ctx)
 {
-    sithCogStackvar tmp;
+    SithCogSymbolValue tmp;
     if (!sithCogExec_PopSymbol(ctx, &tmp))
         return -1;
     
@@ -449,7 +449,7 @@ int32_t sithCogExec_PopInt(sithCog *ctx)
 
 int32_t sithCogExec_PopArray(sithCog *ctx)
 {
-    sithCogStackvar tmp;
+    SithCogSymbolValue tmp;
     if (!sithCogExec_PopSymbol(ctx, &tmp))
         return 0;
     
@@ -469,7 +469,7 @@ int32_t sithCogExec_PopArray(sithCog *ctx)
 
 int32_t sithCogExec_PopVector(sithCog *ctx, rdVector3* out)
 {
-    sithCogStackvar tmp;
+    SithCogSymbolValue tmp;
 
     if (!sithCogExec_PopSymbol(ctx, &tmp))
     {
@@ -501,9 +501,9 @@ int32_t sithCogExec_PopVector(sithCog *ctx, rdVector3* out)
 
 sithCog* sithCogExec_PopCog(sithCog *ctx)
 {
-    sithCogStackvar tmp;
+    SithCogSymbolValue tmp;
     int32_t cogIdx;
-    sithWorld* world = sithWorld_g_pCurrentWorld;
+    SithWorld* world = sithWorld_g_pCurrentWorld;
 
     if (!sithCogExec_PopSymbol(ctx, &tmp))
     {
@@ -549,11 +549,11 @@ sithCog* sithCogExec_PopCog(sithCog *ctx)
     return NULL;
 } 
 
-sithThing* sithCogExec_PopThing(sithCog *ctx)
+SithThing* sithCogExec_PopThing(sithCog *ctx)
 {
-    sithCogStackvar tmp;
+    SithCogSymbolValue tmp;
     int32_t idx;
-    sithWorld* world = sithWorld_g_pCurrentWorld;
+    SithWorld* world = sithWorld_g_pCurrentWorld;
 
     if (!sithCogExec_PopSymbol(ctx, &tmp))
     {
@@ -600,9 +600,9 @@ sithThing* sithCogExec_PopThing(sithCog *ctx)
     return NULL;
 }
 
-sithThing* sithCogExec_PopTemplate(sithCog *ctx)
+SithThing* sithCogExec_PopTemplate(sithCog *ctx)
 {
-    sithCogStackvar tmp;
+    SithCogSymbolValue tmp;
     int32_t idx;
 
     if (!sithCogExec_PopSymbol(ctx, &tmp))
@@ -644,9 +644,9 @@ sithThing* sithCogExec_PopTemplate(sithCog *ctx)
 
 sithSound* sithCogExec_PopSound(sithCog *ctx)
 {
-    sithCogStackvar tmp;
+    SithCogSymbolValue tmp;
     int32_t idx;
-    sithWorld* world = sithWorld_g_pCurrentWorld;
+    SithWorld* world = sithWorld_g_pCurrentWorld;
 
     if (!sithCogExec_PopSymbol(ctx, &tmp))
     {
@@ -701,11 +701,11 @@ sithSound* sithCogExec_PopSound(sithCog *ctx)
     return NULL;
 }
 
-sithSector* sithCogExec_PopSector(sithCog *ctx)
+SithSector* sithCogExec_PopSector(sithCog *ctx)
 {
-    sithCogStackvar tmp;
+    SithCogSymbolValue tmp;
     int32_t idx;
-    sithWorld* world = sithWorld_g_pCurrentWorld;
+    SithWorld* world = sithWorld_g_pCurrentWorld;
 
     if (!sithCogExec_PopSymbol(ctx, &tmp))
     {
@@ -749,11 +749,11 @@ sithSector* sithCogExec_PopSector(sithCog *ctx)
     return NULL;
 }
 
-sithSurface* sithCogExec_PopSurface(sithCog *ctx)
+SithSurface* sithCogExec_PopSurface(sithCog *ctx)
 {
-    sithCogStackvar tmp;
+    SithCogSymbolValue tmp;
     int32_t idx;
-    sithWorld* world = sithWorld_g_pCurrentWorld;
+    SithWorld* world = sithWorld_g_pCurrentWorld;
 
     if (!sithCogExec_PopSymbol(ctx, &tmp))
     {
@@ -800,9 +800,9 @@ sithSurface* sithCogExec_PopSurface(sithCog *ctx)
 
 rdMaterial* sithCogExec_PopMaterial(sithCog *ctx)
 {
-    sithCogStackvar tmp;
+    SithCogSymbolValue tmp;
     int32_t idx;
-    sithWorld* world = sithWorld_g_pCurrentWorld;
+    SithWorld* world = sithWorld_g_pCurrentWorld;
 
     if (!sithCogExec_PopSymbol(ctx, &tmp))
     {
@@ -854,9 +854,9 @@ rdMaterial* sithCogExec_PopMaterial(sithCog *ctx)
 
 rdModel3* sithCogExec_PopModel3(sithCog *ctx)
 {
-    sithCogStackvar tmp;
+    SithCogSymbolValue tmp;
     int32_t idx;
-    sithWorld* world = sithWorld_g_pCurrentWorld;
+    SithWorld* world = sithWorld_g_pCurrentWorld;
 
     if (!sithCogExec_PopSymbol(ctx, &tmp))
     {
@@ -908,9 +908,9 @@ rdModel3* sithCogExec_PopModel3(sithCog *ctx)
 
 rdKeyframe* sithCogExec_PopKeyframe(sithCog *ctx)
 {
-    sithCogStackvar tmp;
+    SithCogSymbolValue tmp;
     int32_t idx;
-    sithWorld* world = sithWorld_g_pCurrentWorld;
+    SithWorld* world = sithWorld_g_pCurrentWorld;
 
     if (!sithCogExec_PopSymbol(ctx, &tmp))
     {
@@ -958,11 +958,11 @@ rdKeyframe* sithCogExec_PopKeyframe(sithCog *ctx)
     return NULL;
 }
 
-sithAIClass* sithCogExec_PopAIClass(sithCog *ctx)
+SithAIClass* sithCogExec_PopAIClass(sithCog *ctx)
 {
-    sithCogStackvar tmp;
+    SithCogSymbolValue tmp;
     int32_t idx;
-    sithWorld* world = sithWorld_g_pCurrentWorld;
+    SithWorld* world = sithWorld_g_pCurrentWorld;
 
     if (!sithCogExec_PopSymbol(ctx, &tmp))
     {
@@ -1007,8 +1007,8 @@ sithAIClass* sithCogExec_PopAIClass(sithCog *ctx)
 // popsymbolfunc is unused
 cogSymbolFunc_t sithCogExec_PopSymbolFunc(sithCog *cog_ctx)
 {
-    sithCogStackvar *v3; // ecx
-    sithCogSymbol *sym; // eax
+    SithCogSymbolValue *v3; // ecx
+    SithCogSymbol *sym; // eax
     intptr_t v12; // [esp+10h] [ebp-Ch]
 
     if ( cog_ctx->stackPos < 1 )
@@ -1039,7 +1039,7 @@ char* sithCogExec_PopString(sithCog *ctx)
 {
     uint32_t v1; // eax
     int32_t v2; // eax
-    sithCogSymbol *v5; // eax
+    SithCogSymbol *v5; // eax
     char *result; // eax
 
     v1 = ctx->stackPos;
@@ -1056,9 +1056,9 @@ char* sithCogExec_PopString(sithCog *ctx)
     return result;
 }
 
-void sithCogExec_PushStack(sithCog *ctx, sithCogStackvar *val)
+void sithCogExec_PushStack(sithCog *ctx, SithCogSymbolValue *val)
 {
-    sithCogStackvar *pushVar;
+    SithCogSymbolValue *pushVar;
 
 #ifdef COG_DYNAMIC_STACKS
     if (ctx->stackPos >= ctx->stackSize) {
@@ -1088,7 +1088,7 @@ void sithCogExec_PushStack(sithCog *ctx, sithCogStackvar *val)
 
 void sithCogExec_PushInt(sithCog *ctx, int32_t val)
 {
-    sithCogStackvar v;
+    SithCogSymbolValue v;
     v.type = COG_VARTYPE_INT;
     v.data[0] = val;
     sithCogExec_PushStack(ctx, &v);
@@ -1096,7 +1096,7 @@ void sithCogExec_PushInt(sithCog *ctx, int32_t val)
 
 void sithCogExec_PushFlex(sithCog *ctx, cog_flex_t val)
 {
-    sithCogStackvar v;
+    SithCogSymbolValue v;
     v.type = COG_VARTYPE_FLEX;
     v.dataAsFloat[0] = val; // FLEXTODO
     sithCogExec_PushStack(ctx, &v);
@@ -1104,7 +1104,7 @@ void sithCogExec_PushFlex(sithCog *ctx, cog_flex_t val)
 
 void sithCogExec_PushVector(sithCog *ctx, const rdVector3* val)
 {
-    sithCogStackvar v;
+    SithCogSymbolValue v;
     v.type = COG_VARTYPE_VECTOR;
 #ifndef COG_COMPRESS_VAR_SIZE
     v.dataAsFloat[0] = val->x;
@@ -1128,7 +1128,7 @@ void sithCogExec_PushVector(sithCog *ctx, const rdVector3* val)
 // Added
 void sithCogExec_Push3Floats(sithCog *ctx, const cog_flex_t* val)
 {
-    sithCogStackvar v;
+    SithCogSymbolValue v;
     v.type = COG_VARTYPE_VECTOR;
 #ifndef COG_COMPRESS_VAR_SIZE
     v.dataAsFloat[0] = (cog_flex_t)val[0];
@@ -1203,9 +1203,9 @@ void sithCogExec_PopCallstack(sithCog *ctx)
     }
 }
 
-int32_t sithCogExec_PopStack(sithCog *cog, sithCogStackvar *out)
+int32_t sithCogExec_PopStack(sithCog *cog, SithCogSymbolValue *out)
 {
-    sithCogStackvar *pop; // eax
+    SithCogSymbolValue *pop; // eax
 
     if ( cog->stackPos < 1 )
         return 0;
@@ -1294,7 +1294,7 @@ void sithCogExec_FloatOps(sithCog *cog_ctx, int32_t op)
     }
 }
 
-sithCogStackvar* sithCogExec_GetSymbolValue(sithCogStackvar *out, sithCog *ctx, sithCogStackvar *in)
+SithCogSymbolValue* sithCogExec_GetSymbolValue(SithCogSymbolValue *out, sithCog *ctx, SithCogSymbolValue *in)
 {
     if ( in->type == COG_VARTYPE_SYMBOL )
         in = &sithCogParse_GetSymbolByID(ctx->pSymbolTable, in->dataAsPtrs[0])->val;
@@ -1328,9 +1328,9 @@ void sithCogExec_GrowStack(sithCog* pCtx, uint32_t sz) {
 #ifdef TARGET_TWL
     // Added: stacks live in extram on TWL. TWL realloc can't migrate heaps (and
     // dlmalloc's in-mspace move is a byte copy), so grow by alloc+wordcopy+free.
-    sithCogStackvar* pNew;
+    SithCogSymbolValue* pNew;
     { TWL_EXTRAM_SUGGEST(pSithHS);
-    pNew = (sithCogStackvar*)SITH_ALLOC(sz * sizeof(*pCtx->stack));
+    pNew = (SithCogSymbolValue*)SITH_ALLOC(sz * sizeof(*pCtx->stack));
     TWL_EXTRAM_RESTORE(pSithHS); }
     if (!pNew)
         return; // Added: keep the old stack; the push site drops the value instead
@@ -1342,7 +1342,7 @@ void sithCogExec_GrowStack(sithCog* pCtx, uint32_t sz) {
 #else
     // Added: a failed grow used to overwrite the stack pointer with NULL,
     // leaking the stack and silently killing the cog. Keep the old stack.
-    sithCogStackvar* pNew = (sithCogStackvar*)SITH_REALLOC(pCtx->stack, sz*sizeof(*pCtx->stack));
+    SithCogSymbolValue* pNew = (SithCogSymbolValue*)SITH_REALLOC(pCtx->stack, sz*sizeof(*pCtx->stack));
     if (!pNew)
         return;
     pCtx->stack = pNew;

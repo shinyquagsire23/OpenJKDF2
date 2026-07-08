@@ -4,6 +4,6 @@
 #include "types.h"
 #include "sithCog.h"
 
-void sithCogFunctionSound_Startup(sithCogSymboltable* ctx);
+void sithCogFunctionSound_Startup(SithCogSymbolTable* ctx);
 
 #endif // _SITHCOGFUNCTIONSOUND_H

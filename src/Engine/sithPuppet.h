@@ -24,30 +24,30 @@
 
 int sithPuppet_Startup();
 void sithPuppet_Shutdown();
-sithPuppet* sithPuppet_New(sithThing *thing);
-void sithPuppet_Free(sithThing *puppet);
-void sithPuppet_SetMoveMode(sithThing *thing, int a2);
-int sithPuppet_PlayMode(sithThing *thing, signed int anim, rdPuppetTrackCallback_t callback);
+sithPuppet* sithPuppet_New(SithThing *thing);
+void sithPuppet_Free(SithThing *puppet);
+void sithPuppet_SetMoveMode(SithThing *thing, int a2);
+int sithPuppet_PlayMode(SithThing *thing, signed int anim, rdPuppetTrackCallback_t callback);
 int sithPuppet_PlayKey(rdPuppet *puppet, rdKeyframe *keyframe, int a3, int a4, int a5, rdPuppetTrackCallback_t callback);
-void sithPuppet_ResetTrack(sithThing *puppet);
-MATH_FUNC void sithPuppet_UpdatePuppet(sithThing *thing, flex_t deltaSeconds);
-flex_t sithPuppet_UpdateThingMove(sithThing *thing);
-void sithPuppet_sub_4E4A20(sithThing *thing, sithAnimclassEntry *animClass);
-void sithPuppet_DefaultCallback(sithThing *thing, int32_t track, uint32_t a3);
+void sithPuppet_ResetTrack(SithThing *puppet);
+MATH_FUNC void sithPuppet_UpdatePuppet(SithThing *thing, flex_t deltaSeconds);
+flex_t sithPuppet_UpdateThingMove(SithThing *thing);
+void sithPuppet_sub_4E4A20(SithThing *thing, SithPuppetClassSubmode *animClass);
+void sithPuppet_DefaultCallback(SithThing *thing, int32_t track, uint32_t a3);
 int sithPuppet_StopKey(rdPuppet *pupper, int track, flex_t a3);
-void sithPuppet_SetArmedMode(sithThing *thing, int mode);
-void sithPuppet_PlayFidgetMode(sithThing *pThing);
-void sithPuppet_resetidk(sithThing *pThing);
-void sithPuppet_advanceidk(sithThing *pThing, flex_t a2);
+void sithPuppet_SetArmedMode(SithThing *thing, int mode);
+void sithPuppet_PlayFidgetMode(SithThing *pThing);
+void sithPuppet_resetidk(SithThing *pThing);
+void sithPuppet_advanceidk(SithThing *pThing, flex_t a2);
 
 //static int (*sithPuppet_Startup)() = (void*)sithPuppet_Startup_ADDR;
-//static void (*sithPuppet_Free)(sithThing *puppet) = (void*)sithPuppet_Free_ADDR;
-//static void (*sithPuppet_UpdatePuppet)(sithThing *thing, flex_t a2) = (void*)sithPuppet_UpdatePuppet_ADDR;
-//static int (__cdecl *sithPuppet_PlayMode)(sithThing *a1, signed int anim, int callback) = (void*)sithPuppet_PlayMode_ADDR;
+//static void (*sithPuppet_Free)(SithThing *puppet) = (void*)sithPuppet_Free_ADDR;
+//static void (*sithPuppet_UpdatePuppet)(SithThing *thing, flex_t a2) = (void*)sithPuppet_UpdatePuppet_ADDR;
+//static int (__cdecl *sithPuppet_PlayMode)(SithThing *a1, signed int anim, int callback) = (void*)sithPuppet_PlayMode_ADDR;
 //static int (*sithPuppet_PlayKey)(rdPuppet *puppet, rdKeyframe *keyframe, int a3, int a4, int a5, int callback) = (void*)sithPuppet_PlayKey_ADDR;
 //static int (*sithPuppet_StopKey)(rdPuppet *a1, int track, flex_t a3) = (void*)sithPuppet_StopKey_ADDR;
-//static void (*sithPuppet_SetArmedMode)(sithThing *a1, int a2) = (void*)sithPuppet_SetArmedMode_ADDR;
-//static void (*sithPuppet_DefaultCallback)(sithThing *thing, int a2, int a3) = (void*)sithPuppet_DefaultCallback_ADDR;
-//static flex_t (*sithPuppet_UpdateThingMove)(sithThing *thing) = (void*)sithPuppet_UpdateThingMove_ADDR;
+//static void (*sithPuppet_SetArmedMode)(SithThing *a1, int a2) = (void*)sithPuppet_SetArmedMode_ADDR;
+//static void (*sithPuppet_DefaultCallback)(SithThing *thing, int a2, int a3) = (void*)sithPuppet_DefaultCallback_ADDR;
+//static flex_t (*sithPuppet_UpdateThingMove)(SithThing *thing) = (void*)sithPuppet_UpdateThingMove_ADDR;
 
 #endif // _SITHPUPPET_H

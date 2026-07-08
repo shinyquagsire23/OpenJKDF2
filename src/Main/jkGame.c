@@ -38,7 +38,7 @@ int jkGame_Startup()
     return 1;
 }
 
-int jkGame_ParseSection(sithWorld* a1, int a2)
+int jkGame_ParseSection(SithWorld* a1, int a2)
 {
     return a2 == 0;
 }
@@ -132,7 +132,7 @@ void jkGame_SetDefaultSettings()
 int jkGame_Update()
 {
     int64_t v0; // rcx
-    sithThing *v2; // esi
+    SithThing *v2; // esi
     int v3; // eax
     flex_d_t v4; // st7
     int result; // eax
@@ -368,7 +368,7 @@ int jkGame_Update()
     int bHasFieldLight = 0;
 
     if (sithWorld_g_pCurrentWorld) {
-        sithThing* pPlayer = sithWorld_g_pCurrentWorld->playerThing;
+        SithThing* pPlayer = sithWorld_g_pCurrentWorld->playerThing;
         if ( pPlayer->type == SITH_THING_PLAYER ) {
             healthNum = pPlayer->actorParams.health;
             shieldsNum = (int32_t)sithInventory_GetInventory(pPlayer, SITHBIN_SHIELDS);

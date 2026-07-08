@@ -24,7 +24,7 @@ void sithModel_Shutdown()
     }
 }
 
-int sithModel_ReadStaticModelsListText(sithWorld *world, int a2)
+int sithModel_ReadStaticModelsListText(SithWorld *world, int a2)
 {
     int numModels;
     flex_t loadStep;
@@ -64,7 +64,7 @@ int sithModel_ReadStaticModelsListText(sithWorld *world, int a2)
     return 1;
 }
 
-void sithModel_FreeWorldModels(sithWorld *world)
+void sithModel_FreeWorldModels(SithWorld *world)
 {
     if (!world->numModels )
         return;
@@ -167,7 +167,7 @@ uint32_t sithModel_GetModelMemUsage(rdModel3 *model)
     return result;
 }
 
-int sithModel_AllocWorldModels(sithWorld *world, int num)
+int sithModel_AllocWorldModels(SithWorld *world, int num)
 {
     world->models = (rdModel3 *)SITH_ALLOC(sizeof(rdModel3) * num);
     if ( !world->models )
@@ -182,7 +182,7 @@ int sithModel_AllocWorldModels(sithWorld *world, int num)
 
 rdModel3* sithModel_GetModelByIndex(int idx)
 {
-    sithWorld *world;
+    SithWorld *world;
     rdModel3 *result;
 
     world = sithWorld_g_pCurrentWorld;

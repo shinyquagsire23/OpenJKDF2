@@ -6,6 +6,6 @@
 
 void sithCogFunctionPlayer_GetLocalPlayerThing(sithCog *ctx);
 
-void sithCogFunctionPlayer_Startup(sithCogSymboltable* a1);
+void sithCogFunctionPlayer_Startup(SithCogSymbolTable* a1);
 
 #endif // _SITHCOGFUNCTIONPLAYER_H

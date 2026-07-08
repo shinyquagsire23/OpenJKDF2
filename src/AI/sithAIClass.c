@@ -25,17 +25,17 @@ void sithAIClass_Shutdown()
 }
 
 // Unused
-int sithAIClass_AllocWorldAIClasses(sithWorld *world, int a2)
+int sithAIClass_AllocWorldAIClasses(SithWorld *world, int a2)
 {
     intptr_t result; // eax
 
     { TWL_EXTRAM_SUGGEST(pSithHS); // Added: parsed once, word-width fields (fpath is debug-only)
-    result = (intptr_t)SITH_ALLOC(sizeof(sithAIClass) * a2);
+    result = (intptr_t)SITH_ALLOC(sizeof(SithAIClass) * a2);
     TWL_EXTRAM_RESTORE(pSithHS); }
-    world->aiclasses = (sithAIClass *)result;
+    world->aiclasses = (SithAIClass *)result;
     if (result)
     {
-        stdPlatform_Memzero32((void *)result, sizeof(sithAIClass) * a2); // Added: word-safe
+        stdPlatform_Memzero32((void *)result, sizeof(SithAIClass) * a2); // Added: word-safe
         world->numAIClasses = a2;
         world->numAIClassesLoaded = 0;
         result = 1;
@@ -48,10 +48,10 @@ int sithAIClass_AllocWorldAIClasses(sithWorld *world, int a2)
     return result;
 }
 
-int sithAIClass_ReadStaticAIClassesListText(sithWorld *world, int a2)
+int sithAIClass_ReadStaticAIClassesListText(SithWorld *world, int a2)
 {
     int numAIClasses; // ebx
-    sithAIClass *aiclasses; // eax
+    SithAIClass *aiclasses; // eax
 
     if (a2) {
         return 0;
@@ -65,7 +65,7 @@ int sithAIClass_ReadStaticAIClassesListText(sithWorld *world, int a2)
         return 1;
     }
     { TWL_EXTRAM_SUGGEST(pSithHS); // Added: parsed once, word-width fields (fpath is debug-only)
-    aiclasses = (sithAIClass *)SITH_ALLOC(sizeof(sithAIClass) * numAIClasses);
+    aiclasses = (SithAIClass *)SITH_ALLOC(sizeof(SithAIClass) * numAIClasses);
     TWL_EXTRAM_RESTORE(pSithHS); }
     world->aiclasses = aiclasses;
     if (!aiclasses)
@@ -76,7 +76,7 @@ int sithAIClass_ReadStaticAIClassesListText(sithWorld *world, int a2)
         return 0;
     }
     
-    stdPlatform_Memzero32(aiclasses, sizeof(sithAIClass) * numAIClasses); // Added: word-safe
+    stdPlatform_Memzero32(aiclasses, sizeof(SithAIClass) * numAIClasses); // Added: word-safe
     world->numAIClassesLoaded = 0;
     world->numAIClasses = numAIClasses;
     if ( stdConffile_ReadArgs() )
@@ -95,19 +95,19 @@ int sithAIClass_ReadStaticAIClassesListText(sithWorld *world, int a2)
     return 1;
 }
 
-sithAIClass* sithAIClass_Load(char *fpath)
+SithAIClass* sithAIClass_Load(char *fpath)
 {
-    sithWorld *world; // ebp
-    sithAIClass *result; // eax
+    SithWorld *world; // ebp
+    SithAIClass *result; // eax
     unsigned int numLoaded; // ecx
-    sithAIClass *aiclass; // ebx
+    SithAIClass *aiclass; // ebx
     char fullpath[128]; // [esp+10h] [ebp-80h] BYREF
 
     world = sithWorld_g_pLastLoadedWorld;
     if ( !sithWorld_g_pLastLoadedWorld->aiclasses )
         return 0;
 
-    result = (sithAIClass *)stdHashtbl_Find(sithAIClass_g_pHashtable, fpath);
+    result = (SithAIClass *)stdHashtbl_Find(sithAIClass_g_pHashtable, fpath);
     if ( result )
         return result;
 
@@ -119,7 +119,7 @@ sithAIClass* sithAIClass_Load(char *fpath)
 
     aiclass = &world->aiclasses[numLoaded];
 
-    stdPlatform_Memzero32(aiclass, sizeof(sithAIClass)); // Added: word-safe
+    stdPlatform_Memzero32(aiclass, sizeof(SithAIClass)); // Added: word-safe
 
 #ifdef SITH_DEBUG_STRUCT_NAMES
     stdString_SafeStrCopy(aiclass->fpath, fpath, 32);
@@ -146,13 +146,13 @@ sithAIClass* sithAIClass_Load(char *fpath)
     return sithAIClass_Load("default.ai");
 }
 
-int sithAIClass_LoadEntry(char *fpath, sithAIClass *aiclass)
+int sithAIClass_LoadEntry(char *fpath, SithAIClass *aiclass)
 {
     int result; // eax
-    sithAIClass *v3; // ebx
+    SithAIClass *v3; // ebx
     unsigned int nextIdx; // eax
-    sithAIClassEntry *entry; // esi
-    sithAICommand *instinct; // eax
+    SithAIInstinct *entry; // esi
+    SithAIRegisteredInstinct *instinct; // eax
     uint32_t v11; // eax
     char jkl_fname[128]; // [esp+18h] [ebp-8Ch] BYREF
     flex_t a3; // [esp+98h] [ebp-Ch] BYREF
@@ -251,7 +251,7 @@ int sithAIClass_LoadEntry(char *fpath, sithAIClass *aiclass)
     return result;
 }
 
-void sithAIClass_FreeWorldAIClasses(sithWorld *world)
+void sithAIClass_FreeWorldAIClasses(SithWorld *world)
 {
     if (world->aiclasses)
     {

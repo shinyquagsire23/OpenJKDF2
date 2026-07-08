@@ -12,7 +12,7 @@ void sithCogFunctionSector_GetSectorTint(sithCog *ctx)
 {
     rdVector3 vecCopy;
 
-    sithSector* sector = sithCogExec_PopSector(ctx);
+    SithSector* sector = sithCogExec_PopSector(ctx);
     if ( sector )
     {
         vecCopy = sector->tint;
@@ -26,7 +26,7 @@ void sithCogFunctionSector_GetSectorTint(sithCog *ctx)
 
 void sithCogFunctionSector_SetSectorTint(sithCog *ctx)
 {
-    sithSector *sector; // ecx
+    SithSector *sector; // ecx
     rdVector3 poppedVector; // [esp+4h] [ebp-Ch] BYREF
 
     sithCogExec_PopVector(ctx, &poppedVector);
@@ -46,7 +46,7 @@ void sithCogFunctionSector_SetSectorTint(sithCog *ctx)
 void sithCogFunctionSector_SetSectorAdjoins(sithCog *ctx)
 {
     signed int v1; // edi
-    sithSector *sector; // esi
+    SithSector *sector; // esi
     int v3; // eax
 
     v1 = sithCogExec_PopInt(ctx);
@@ -74,7 +74,7 @@ void sithCogFunctionSector_SetSectorAdjoins(sithCog *ctx)
 
 void sithCogFunctionSector_GetSectorLight(sithCog *ctx)
 {
-    sithSector *sector; // eax
+    SithSector *sector; // eax
 
     sector = sithCogExec_PopSector(ctx);
     if ( sector )
@@ -85,7 +85,7 @@ void sithCogFunctionSector_GetSectorLight(sithCog *ctx)
 
 void sithCogFunctionSector_SetSectorLight(sithCog *ctx)
 {
-    sithSector *sector; // ecx
+    SithSector *sector; // ecx
 
     cog_flex_t v4 = sithCogExec_PopFlex(ctx);
     cog_flex_t extraLight = sithCogExec_PopFlex(ctx);
@@ -109,7 +109,7 @@ void sithCogFunctionSector_SetSectorLight(sithCog *ctx)
 
 void sithCogFunctionSector_GetSectorColormap(sithCog *ctx)
 {
-    sithSector *sector; // eax
+    SithSector *sector; // eax
     uintptr_t v2; // ecx
 
     sector = sithCogExec_PopSector(ctx);
@@ -127,9 +127,9 @@ void sithCogFunctionSector_GetSectorColormap(sithCog *ctx)
 
 void sithCogFunctionSector_SetSectorColormap(sithCog *ctx)
 {
-    sithWorld* world = sithWorld_g_pCurrentWorld;
+    SithWorld* world = sithWorld_g_pCurrentWorld;
     uint32_t colormap_idx = sithCogExec_PopInt(ctx);
-    sithSector* sector = sithCogExec_PopSector(ctx);
+    SithSector* sector = sithCogExec_PopSector(ctx);
 
     if ( world )
     {
@@ -149,7 +149,7 @@ void sithCogFunctionSector_SetSectorColormap(sithCog *ctx)
 
 void sithCogFunctionSector_GetSectorThrust(sithCog *ctx)
 {
-    sithSector* sector = sithCogExec_PopSector(ctx);
+    SithSector* sector = sithCogExec_PopSector(ctx);
 
     if ( sector )
         sithCogExec_PushVector(ctx, &sector->thrust);
@@ -163,7 +163,7 @@ void sithCogFunctionSector_SetSectorThrust(sithCog *ctx)
 
     cog_flex_t mult = sithCogExec_PopFlex(ctx);
     int thrust_valid = sithCogExec_PopVector(ctx, &thrust);
-    sithSector* sector = sithCogExec_PopSector(ctx);
+    SithSector* sector = sithCogExec_PopSector(ctx);
 
     if ( sector && thrust_valid )
     {
@@ -191,7 +191,7 @@ void sithCogFunctionSector_SetSectorThrust(sithCog *ctx)
 void sithCogFunctionSector_SetSectorFlags(sithCog *ctx)
 {
     uint32_t flags = sithCogExec_PopInt(ctx);
-    sithSector* sector = sithCogExec_PopSector(ctx);
+    SithSector* sector = sithCogExec_PopSector(ctx);
 
     if (sector && flags)
     {
@@ -206,7 +206,7 @@ void sithCogFunctionSector_SetSectorFlags(sithCog *ctx)
 void sithCogFunctionSector_ClearSectorFlags(sithCog *ctx)
 {
     uint32_t flags = sithCogExec_PopInt(ctx);
-    sithSector* sector = sithCogExec_PopSector(ctx);
+    SithSector* sector = sithCogExec_PopSector(ctx);
 
     if (sector && flags)
     {
@@ -220,7 +220,7 @@ void sithCogFunctionSector_ClearSectorFlags(sithCog *ctx)
 
 void sithCogFunctionSector_GetSectorFlags(sithCog *ctx)
 {
-    sithSector* sector = sithCogExec_PopSector(ctx);
+    SithSector* sector = sithCogExec_PopSector(ctx);
     if ( sector )
         sithCogExec_PushInt(ctx, sector->flags);
     else
@@ -229,7 +229,7 @@ void sithCogFunctionSector_GetSectorFlags(sithCog *ctx)
 
 void sithCogFunctionSector_GetSectorThingCount(sithCog *ctx)
 {
-    sithSector* sector = sithCogExec_PopSector(ctx);
+    SithSector* sector = sithCogExec_PopSector(ctx);
     if ( sector )
     {
         sithCogExec_PushInt(ctx, sithSector_GetSectorThingCount(sector));
@@ -242,7 +242,7 @@ void sithCogFunctionSector_GetSectorThingCount(sithCog *ctx)
 
 void sithCogFunctionSector_GetSectorPlayerCount(sithCog *ctx)
 {
-    sithSector *v1; // eax
+    SithSector *v1; // eax
     int v2; // eax
 
     v1 = sithCogExec_PopSector(ctx);
@@ -264,7 +264,7 @@ void sithCogFunctionSector_GetSectorCount(sithCog *ctx)
 
 void sithCogFunctionSector_GetSectorCenter(sithCog *ctx)
 {
-    sithSector *v1; // eax
+    SithSector *v1; // eax
 
     v1 = sithCogExec_PopSector(ctx);
     if ( v1 )
@@ -275,7 +275,7 @@ void sithCogFunctionSector_GetSectorCenter(sithCog *ctx)
 
 void sithCogFunctionSector_GetNumSectorVertices(sithCog *ctx)
 {
-    sithSector *v1; // eax
+    SithSector *v1; // eax
 
     v1 = sithCogExec_PopSector(ctx);
     if ( v1 )
@@ -286,7 +286,7 @@ void sithCogFunctionSector_GetNumSectorVertices(sithCog *ctx)
 
 void sithCogFunctionSector_GetNumSectorSurfaces(sithCog *ctx)
 {
-    sithSector *v1; // eax
+    SithSector *v1; // eax
 
     v1 = sithCogExec_PopSector(ctx);
     if ( v1 )
@@ -297,9 +297,9 @@ void sithCogFunctionSector_GetNumSectorSurfaces(sithCog *ctx)
 
 void sithCogFunctionSector_GetSectorVertexPos(sithCog *ctx)
 {
-    sithWorld *active_jkl; // ebx
+    SithWorld *active_jkl; // ebx
     int vertex_idx; // edi
-    sithSector *sector; // eax
+    SithSector *sector; // eax
 
     active_jkl = sithWorld_g_pCurrentWorld;
     vertex_idx = sithCogExec_PopInt(ctx);
@@ -313,7 +313,7 @@ void sithCogFunctionSector_GetSectorVertexPos(sithCog *ctx)
 void sithCogFunctionSector_GetSectorSurfaceRef(sithCog *ctx)
 {
     int v1; // esi
-    sithSector *v2; // eax
+    SithSector *v2; // eax
 
     v1 = sithCogExec_PopInt(ctx);
     v2 = sithCogExec_PopSector(ctx);
@@ -325,7 +325,7 @@ void sithCogFunctionSector_GetSectorSurfaceRef(sithCog *ctx)
 
 void sithCogFunctionSector_SyncSector(sithCog *ctx)
 {
-    sithSector *v1; // eax
+    SithSector *v1; // eax
 
     v1 = sithCogExec_PopSector(ctx);
     if ( v1 )
@@ -335,11 +335,11 @@ void sithCogFunctionSector_SyncSector(sithCog *ctx)
 // MOTS added
 void sithCogFunctionSector_ChangeAllSectorsLight(sithCog *ctx)
 {
-    sithSector *v1; // eax
+    SithSector *v1; // eax
 
     cog_flex_t val = sithCogExec_PopFlex(ctx);
     for (int i = 0; i < sithWorld_g_pCurrentWorld->numSectors; i++) {
-        sithSector* pSector = &sithWorld_g_pCurrentWorld->sectors[i];
+        SithSector* pSector = &sithWorld_g_pCurrentWorld->sectors[i];
         pSector->extraLight = val;
     }
 }
@@ -350,7 +350,7 @@ void sithCogFunctionSector_FindSectorAtPos(sithCog *ctx)
     rdVector3 tmp;
     
     sithCogExec_PopVector(ctx,&tmp);
-    sithSector* pSector = sithSector_FindSectorAtPos(sithWorld_g_pCurrentWorld,&tmp);
+    SithSector* pSector = sithSector_FindSectorAtPos(sithWorld_g_pCurrentWorld,&tmp);
     if (pSector) {
         sithCogExec_PushInt(ctx, pSector->id);
         return;
@@ -363,7 +363,7 @@ void sithCogFunctionSector_IsSphereInSector(sithCog *ctx)
 {
     rdVector3 tmp;
     
-    sithSector* pSector = sithCogExec_PopSector(ctx);
+    SithSector* pSector = sithCogExec_PopSector(ctx);
     cog_flex_t radius = sithCogExec_PopFlex(ctx);
     sithCogExec_PopVector(ctx,&tmp);
     if (pSector && (0.0 <= radius)) {
@@ -378,7 +378,7 @@ void sithCogFunctionSector_IsSphereInSector(sithCog *ctx)
 // MOTS added
 void sithCogFunctionSector_GetSectorAmbientLight(sithCog *ctx)
 {
-    sithSector *pSector;
+    SithSector *pSector;
     
     pSector = sithCogExec_PopSector(ctx);
     if (pSector) {
@@ -392,7 +392,7 @@ void sithCogFunctionSector_GetSectorAmbientLight(sithCog *ctx)
 void sithCogFunctionSector_SetSectorAmbientLight(sithCog *ctx)
 {
     cog_flex_t val = sithCogExec_PopFlex(ctx);
-    sithSector* pSector = sithCogExec_PopSector(ctx);
+    SithSector* pSector = sithCogExec_PopSector(ctx);
 
     if (pSector && (0.0 <= val)) {
         pSector->ambientLight = val;
@@ -402,7 +402,7 @@ void sithCogFunctionSector_SetSectorAmbientLight(sithCog *ctx)
 // DW added
 void sithCogFunctionSector_GetAmbient(sithCog *ctx)
 {
-    sithSector* pSector = sithCogExec_PopSector(ctx);
+    SithSector* pSector = sithCogExec_PopSector(ctx);
     if (!pSector) {
         sithCogExec_PushFlex(ctx, 0.0);
         return;
@@ -421,7 +421,7 @@ void sithCogFunctionSector_GetAmbient(sithCog *ctx)
     sithCogExec_PushFlex(ctx,0.0);
 }
 
-void sithCogFunctionSector_Startup(sithCogSymboltable* ctx)
+void sithCogFunctionSector_Startup(SithCogSymbolTable* ctx)
 {
     sithCog_RegisterFunction(ctx, sithCogFunctionSector_GetSectorTint, "getsectortint");
     sithCog_RegisterFunction(ctx, sithCogFunctionSector_SetSectorTint, "setsectortint");

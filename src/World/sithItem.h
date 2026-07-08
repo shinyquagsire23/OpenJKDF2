@@ -10,10 +10,10 @@
 #define sithItem_ParseArg_ADDR (0x004FC030)
 
 
-int sithItem_PlayerCollisionHandler(sithThing *a1, sithThing *a2, sithCollisionSearchEntry *a4, int a5);
-void sithItem_Initialize(sithThing *out);
-MATH_FUNC void sithItem_SetItemTaken(sithThing *item, sithThing *actor, int a3);
-void sithItem_DestroyItem(sithThing *item);
-int sithItem_ParseArg(stdConffileArg *arg, sithThing *thing, int paramIdx);
+int sithItem_PlayerCollisionHandler(SithThing *a1, SithThing *a2, SithCollision *a4, int a5);
+void sithItem_Initialize(SithThing *out);
+MATH_FUNC void sithItem_SetItemTaken(SithThing *item, SithThing *actor, int a3);
+void sithItem_DestroyItem(SithThing *item);
+int sithItem_ParseArg(stdConffileArg *arg, SithThing *thing, int paramIdx);
 
 #endif // _SITHITEM_H

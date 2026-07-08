@@ -179,7 +179,7 @@ int rdSetMipDistances(rdVector4 *dists)
     static flex_t origGourad;
     static flex_t origPerspective;
     static int once = 0;
-    static sithWorld* onceWorld = NULL;
+    static SithWorld* onceWorld = NULL;
     if (onceWorld != sithWorld_g_pCurrentWorld) {
         once = 0;
     }

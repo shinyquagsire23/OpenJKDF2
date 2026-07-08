@@ -56,8 +56,8 @@ void sithSoundMixer_StopAll();
 void sithSoundMixer_ResumeAll();
 sithPlayingSound* sithSoundMixer_PlayingSoundFromSound(sithSound *sound, int flags);
 sithPlayingSound* sithSoundMixer_PlaySound(sithSound *sound, flex_t volume, flex_t pan, int flags);
-sithPlayingSound* sithSoundMixer_PlaySoundPos(sithSound *a1, rdVector3 *a2, sithSector *a3, flex_t a4, flex_t a5, flex_t a6, int a7);
-sithPlayingSound* sithSoundMixer_PlaySoundThing(sithSound *sound, sithThing *a2, flex_t a3, flex_t a4, flex_t a5, int flags);
+sithPlayingSound* sithSoundMixer_PlaySoundPos(sithSound *a1, rdVector3 *a2, SithSector *a3, flex_t a4, flex_t a5, flex_t a6, int a7);
+sithPlayingSound* sithSoundMixer_PlaySoundThing(sithSound *sound, SithThing *a2, flex_t a3, flex_t a4, flex_t a5, int flags);
 void sithSoundMixer_PlayingSoundReset(sithPlayingSound *sound);
 void sithSoundMixer_Reset();
 MATH_FUNC void sithSoundMixer_SetPitch(sithPlayingSound *sound, flex_t pitch, flex_t changetime);
@@ -73,26 +73,26 @@ void sithSoundMixer_SetVelocity(sithPlayingSound *sound);
 void sithSoundMixer_SyncSounds();
 void sithSoundMixer_FreePlayingSound(sithPlayingSound *sound);
 
-void sithSoundMixer_FreeThing(sithThing *thing);
+void sithSoundMixer_FreeThing(SithThing *thing);
 sithPlayingSound* sithSoundMixer_GetChannelHandle(int refid);
 MATH_FUNC void sithSoundMixer_UpdatePlayingSoundPosition(sithPlayingSound *sound);
-void sithSoundMixer_SetSectorAmbientSound(sithSector *sector, sithSound *sound, flex_t vol);
+void sithSoundMixer_SetSectorAmbientSound(SithSector *sector, sithSound *sound, flex_t vol);
 int sithSoundMixer_sub_4DD3F0(sithPlayingSound *sound);
 int sithSoundMixer_sub_4DD5D0(sithPlayingSound *sound);
-int32_t sithSoundMixer_GetThingSoundIdx(sithThing *thing, sithSound *sound);
+int32_t sithSoundMixer_GetThingSoundIdx(SithThing *thing, sithSound *sound);
 void sithSoundMixer_StopSound(sithPlayingSound *sound);
 sithPlayingSound* sithSoundMixer_GetSoundFromIdx(int idx);
 
 //static int (*sithSoundMixer_Startup)() = (void*)sithSoundMixer_Startup_ADDR;
 //static void (*sithSoundMixer_Shutdown)() = (void*)sithSoundMixer_Shutdown_ADDR;
 
-//static void (*sithSoundMixer_FreeThing)(sithThing *thing) = (void*)sithSoundMixer_FreeThing_ADDR;
-//static sithPlayingSound* (*sithSoundMixer_PlaySoundThing)(sithSound *a1, sithThing *a2, flex_t a3, flex_t a4, flex_t a5, int a6) = (void*)sithSoundMixer_PlaySoundThing_ADDR;
-//static sithPlayingSound* (*sithSoundMixer_PlaySoundPos)(sithSound *a1, rdVector3 *a2, sithSector *a3, flex_t a4, flex_t a5, flex_t a6, int a7) = (void*)sithSoundMixer_PlaySoundPos_ADDR;
+//static void (*sithSoundMixer_FreeThing)(SithThing *thing) = (void*)sithSoundMixer_FreeThing_ADDR;
+//static sithPlayingSound* (*sithSoundMixer_PlaySoundThing)(sithSound *a1, SithThing *a2, flex_t a3, flex_t a4, flex_t a5, int a6) = (void*)sithSoundMixer_PlaySoundThing_ADDR;
+//static sithPlayingSound* (*sithSoundMixer_PlaySoundPos)(sithSound *a1, rdVector3 *a2, SithSector *a3, flex_t a4, flex_t a5, flex_t a6, int a7) = (void*)sithSoundMixer_PlaySoundPos_ADDR;
 //static int (*sithSoundMixer_StopSound)(sithPlayingSound *a1) = (void*)sithSoundMixer_StopSound_ADDR;
 //static sithPlayingSound* (*sithSoundMixer_GetChannelHandle)(int a1) = (void*)sithSoundMixer_GetChannelHandle_ADDR;
 //static void (*_sithSoundMixer_FadeSound)(sithPlayingSound *sound, flex_t vol_, flex_t fadeintime_) = (void*)sithSoundMixer_FadeVolume_ADDR;
 //static void (*sithSoundMixer_SetPitch)(sithPlayingSound *a1, flex_t pitch, flex_t changetime) = (void*)sithSoundMixer_SetPitch_ADDR;
-//static void (*sithSoundMixer_SetSectorAmbientSound)(sithSector *a1, sithSound *a2, flex_t a3) = (void*)sithSoundMixer_SetSectorAmbientSound_ADDR;
+//static void (*sithSoundMixer_SetSectorAmbientSound)(SithSector *a1, sithSound *a2, flex_t a3) = (void*)sithSoundMixer_SetSectorAmbientSound_ADDR;
 
 #endif // _ENGINE_SITHSOUNDMIXER_H

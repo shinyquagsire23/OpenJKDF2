@@ -23,7 +23,7 @@
 #define jkHud_Tally_ADDR (0x004091C0)
 
 #ifdef QOL_IMPROVEMENTS
-BOOL jkHud_shouldCrosshairBeShownForWeapon(sithThing *player);
+BOOL jkHud_shouldCrosshairBeShownForWeapon(SithThing *player);
 #endif // DEBUG
 
 int jkHud_Startup();
@@ -33,11 +33,11 @@ void jkHud_Close();
 int jkHud_ClearRects(int unk);
 MATH_FUNC void jkHud_Draw();
 MATH_FUNC void jkHud_DrawGPU();
-int jkHud_GetWeaponAmmo(sithThing *player);
+int jkHud_GetWeaponAmmo(SithThing *player);
 int jkHud_Chat();
 void jkHud_SendChat(char a1);
 void jkHud_SetTargetColors(int *color_idxs);
-void jkHud_SetTarget(sithThing *target);
+void jkHud_SetTarget(SithThing *target);
 void jkHud_EndTarget();
 int jkHud_SortPlayerScore(const void* a, const void* b);
 int jkHud_SortTeamScore(const void* a, const void* b);

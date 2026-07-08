@@ -1093,7 +1093,7 @@ int jkGuiBuildMulti_Show2(Darray *pDarray, jkGuiElement *pElement, int minIdk, i
     char path[128]; // [esp+94h] [ebp-15C0h] BYREF
     char fpath[128]; // [esp+114h] [ebp-1540h] BYREF
     stdFileSearchResult v16; // [esp+194h] [ebp-14C0h] BYREF
-    sithPlayerInfo playerInfo; // [esp+2A0h] [ebp-13B4h] BYREF
+    SithPlayer playerInfo; // [esp+2A0h] [ebp-13B4h] BYREF
 
     v5 = 0;
     stdString_WcharToChar(a1, jkPlayer_playerShortName, 31);

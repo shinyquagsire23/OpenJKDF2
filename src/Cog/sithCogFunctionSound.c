@@ -34,7 +34,7 @@ void sithCogFunctionSound_PlaySoundThing(sithCog *ctx)
     cog_flex_t maxDist = sithCogExec_PopFlex(ctx);
     cog_flex_t minDist = sithCogExec_PopFlex(ctx);
     cog_flex_t volume = sithCogExec_PopFlex(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     sithSound* pSound = sithCogExec_PopSound(ctx);
 
     //printf("sithCogFunctionSound_PlaySoundThing %s\n", ctx->cogscript_fpath);
@@ -287,7 +287,7 @@ void sithCogFunctionSound_PlaySoundClass(sithCog *ctx)
     sithPlayingSound *pPlayingSound;
 
     int soundClassId = sithCogExec_PopInt(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
 
     if ( pThing && pThing->soundclass && (pPlayingSound = sithSoundClass_PlayModeRandom(pThing, soundClassId)) != 0 )
     {
@@ -339,7 +339,7 @@ void sithCogFunctionSound_SectorSound(sithCog *ctx)
 {
     cog_flex_t vol = sithCogExec_PopFlex(ctx);
     sithSound* pSound = sithCogExec_PopSound(ctx);
-    sithSector* sector = sithCogExec_PopSector(ctx);
+    SithSector* sector = sithCogExec_PopSector(ctx);
 
     if ( sector )
         sithSoundMixer_SetSectorAmbientSound(sector, pSound, vol);
@@ -389,7 +389,7 @@ void sithCogFunctionSound_PlaySoundThingLocal(sithCog *ctx)
     cog_flex_t maxDist = sithCogExec_PopFlex(ctx);
     cog_flex_t minDist = sithCogExec_PopFlex(ctx);
     cog_flex_t volume = sithCogExec_PopFlex(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     sithSound* pSound = sithCogExec_PopSound(ctx);
 
     //printf("sithCogFunctionSound_PlaySoundThing %s\n", ctx->cogscript_fpath);
@@ -503,7 +503,7 @@ void sithCogFunctionSound_PlaySoundThingAndWait(sithCog *ctx)
     cog_flex_t maxDist = sithCogExec_PopFlex(ctx);
     cog_flex_t minDist = sithCogExec_PopFlex(ctx);
     cog_flex_t volume = sithCogExec_PopFlex(ctx);
-    sithThing* pThing = sithCogExec_PopThing(ctx);
+    SithThing* pThing = sithCogExec_PopThing(ctx);
     sithSound* pSound = sithCogExec_PopSound(ctx);
 
     //printf("sithCogFunctionSound_PlaySoundThing %s\n", ctx->cogscript_fpath);
@@ -577,7 +577,7 @@ void sithCogFunctionSound_PlaySoundThingAndWait(sithCog *ctx)
         sithCogExec_PushInt(ctx, -1);
 }
 
-void sithCogFunctionSound_Startup(sithCogSymboltable* ctx)
+void sithCogFunctionSound_Startup(SithCogSymbolTable* ctx)
 {
     sithCog_RegisterFunction(ctx, sithCogFunctionSound_PlaySong, "playsong");
     sithCog_RegisterFunction(ctx, sithCogFunctionSound_PlaySoundThing, "playsoundthing");

@@ -553,7 +553,7 @@ int jkEpisode_EndLevel(jkEpisodeLoad *pEpisode, int levelNum)
 }
 
 // MOTS altered TODO verify
-int jkEpisode_UpdateExtra(sithThing *pPlayerThing)
+int jkEpisode_UpdateExtra(SithThing *pPlayerThing)
 {
     // HACK: Sometimes when the player is killed, the blade isn't restored?
     if (sithInventory_GetCurrentWeapon(pPlayerThing) == SITHBIN_LIGHTSABER && !(pPlayerThing->jkFlags & JKFLAG_SABERON)) {
@@ -579,7 +579,7 @@ int jkEpisode_UpdateExtra(sithThing *pPlayerThing)
         int bHasBubble;
         flex_t bubbleRadSqrd;
 
-        sithThing* pBubbleThing = NULL;
+        SithThing* pBubbleThing = NULL;
         bHasBubble = jkEpisode_GetBubbleInfo(pPlayerThing,&bubbleType,&pBubbleThing,&bubbleRadSqrd);
         iVar4 = 0;
         if (bHasBubble == 0) {
@@ -706,7 +706,7 @@ LABEL_7:
 }
 
 // MOTS added
-void jkEpisode_CreateBubble(sithThing *pThing,flex_t radius,uint32_t type)
+void jkEpisode_CreateBubble(SithThing *pThing,flex_t radius,uint32_t type)
 {
     int iVar1;
     jkBubbleInfo *pjVar2;
@@ -741,7 +741,7 @@ void jkEpisode_CreateBubble(sithThing *pThing,flex_t radius,uint32_t type)
 }
 
 // MOTS added
-void jkEpisode_DestroyBubble(sithThing *pThing)
+void jkEpisode_DestroyBubble(SithThing *pThing)
 {
     for (int i = 0; i < 64; i++) {
         if (jkPlayer_aBubbleInfo[i].pThing == pThing)
@@ -752,9 +752,9 @@ void jkEpisode_DestroyBubble(sithThing *pThing)
 }
 
 // MOTS added
-int jkEpisode_GetBubbleInfo(sithThing *pThing,uint32_t *pTypeOut,sithThing **pThingOut,flex_t *pOut)
+int jkEpisode_GetBubbleInfo(SithThing *pThing,uint32_t *pTypeOut,SithThing **pThingOut,flex_t *pOut)
 {
-    sithThing *psVar1;
+    SithThing *psVar1;
     flex_t fVar3;
     flex_t fVar4;
     jkBubbleInfo *pjVar7;
@@ -768,7 +768,7 @@ int jkEpisode_GetBubbleInfo(sithThing *pThing,uint32_t *pTypeOut,sithThing **pTh
     local_4 = 0x40;
     do {
         psVar1 = pjVar9->pThing;
-        if (psVar1 != (sithThing *)0x0) {
+        if (psVar1 != (SithThing *)0x0) {
             if (psVar1->type == 0) {
                 jkEpisode_DestroyBubble(psVar1);
             }

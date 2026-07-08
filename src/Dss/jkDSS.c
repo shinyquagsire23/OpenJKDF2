@@ -99,7 +99,7 @@ int jkDSS_Startup()
     return 1;
 }
 
-int jkDSS_JKM1(int32_t unused1, sithEventInfo* unused2)
+int jkDSS_JKM1(int32_t unused1, SithEventParams* unused2)
 {
     if (jkDSS_005aec8c != 0) {
         jkDSS_SendSaberInfo_alt_Mots(sithPlayer_g_pLocalPlayerThing,jkGuiMultiplayer_mpcInfo.model,jkGuiMultiplayer_mpcInfo.soundClass,jkGuiMultiplayer_mpcInfo.sideMat,jkGuiMultiplayer_mpcInfo.tipMat,jkGuiMultiplayer_mpcInfo.personality);
@@ -251,7 +251,7 @@ int jkDSS_wrap_SendSaberInfo_alt()
 }
 
 // MOTS altered
-int jkDSS_SendSaberInfo_alt_Mots(sithThing *pPlayerThing, char *pModelStr, char *pSoundclassStr, char *pSideMatStr, char *pTipMatStr, int personality)
+int jkDSS_SendSaberInfo_alt_Mots(SithThing *pPlayerThing, char *pModelStr, char *pSoundclassStr, char *pSideMatStr, char *pTipMatStr, int personality)
 {
     int result; // eax
 
@@ -273,7 +273,7 @@ int jkDSS_SendSaberInfo_alt_Mots(sithThing *pPlayerThing, char *pModelStr, char 
     return result;
 }
 
-int jkDSS_SendSaberInfo_alt(sithThing *pPlayerThing, char *pModelStr, char *pSoundclassStr, char *pSideMatStr, char *pTipMatStr)
+int jkDSS_SendSaberInfo_alt(SithThing *pPlayerThing, char *pModelStr, char *pSoundclassStr, char *pSideMatStr, char *pTipMatStr)
 {
     int result; // eax
 
@@ -295,7 +295,7 @@ int jkDSS_SendSaberInfo_alt(sithThing *pPlayerThing, char *pModelStr, char *pSou
 }
 
 // MOTS altered
-void jkDSS_SendSetSaberInfoMots(sithThing *thing, int personality)
+void jkDSS_SendSetSaberInfoMots(SithThing *thing, int personality)
 {
     NETMSG_START;
 
@@ -317,9 +317,9 @@ void jkDSS_SendSetSaberInfoMots(sithThing *thing, int personality)
 }
 
 // MOTS altered
-int jkDSS_ProcessSetSaberInfoMots(sithCogMsg *msg)
+int jkDSS_ProcessSetSaberInfoMots(SithMessage *msg)
 {
-    sithPlayerInfo *v11; // [esp+10h] [ebp-88h]
+    SithPlayer *v11; // [esp+10h] [ebp-88h]
     char model_3do_fname[32]; // [esp+18h] [ebp-80h] BYREF
     char v14[32]; // [esp+38h] [ebp-60h] BYREF
     
@@ -331,7 +331,7 @@ int jkDSS_ProcessSetSaberInfoMots(sithCogMsg *msg)
     if ( msg->netMsg.cogMsgId == DSS_SABERINFO1 && !sithNet_isServer )
         return 1;
 
-    sithThing* v2 = sithThing_GetGuidThing(NETMSG_POPS32());
+    SithThing* v2 = sithThing_GetGuidThing(NETMSG_POPS32());
     if ( !v2 )
         return 0;
     v11 = v2->actorParams.playerinfo;
@@ -376,9 +376,9 @@ int jkDSS_ProcessSetSaberInfoMots(sithCogMsg *msg)
     sithSoundClass* v6 = sithSoundClass_Load(v14);
     if ( v6 )
         sithSoundClass_SetThingClass(v2, v6);
-    sithThing* v10 = sithTemplate_GetTemplate("+ssparks_saber");
-    sithThing* v9 = sithTemplate_GetTemplate("+ssparks_blood");
-    sithThing* v7 = sithTemplate_GetTemplate("+ssparks_wall");
+    SithThing* v10 = sithTemplate_GetTemplate("+ssparks_saber");
+    SithThing* v9 = sithTemplate_GetTemplate("+ssparks_blood");
+    SithThing* v7 = sithTemplate_GetTemplate("+ssparks_wall");
     jkSaber_InitializeSaberInfo(v2, material_side_fname, material_tip_fname, 0.0031999999, 0.0018, 0.12, v7, v9, v10);
 
     if ( sithNet_isServer && msg->netMsg.cogMsgId == DSS_SABERINFO1)
@@ -389,7 +389,7 @@ int jkDSS_ProcessSetSaberInfoMots(sithCogMsg *msg)
 }
 
 // MOTS altered
-void jkDSS_SendSetSaberInfo(sithThing *thing)
+void jkDSS_SendSetSaberInfo(SithThing *thing)
 {
     if (Main_bMotsCompat) {
         jk_fatal();
@@ -420,9 +420,9 @@ void jkDSS_SendSetSaberInfo(sithThing *thing)
 }
 
 // MOTS altered
-int jkDSS_ProcessSetSaberInfo(sithCogMsg *msg)
+int jkDSS_ProcessSetSaberInfo(SithMessage *msg)
 {
-    sithPlayerInfo *v11; // [esp+10h] [ebp-88h]
+    SithPlayer *v11; // [esp+10h] [ebp-88h]
     char model_3do_fname[32]; // [esp+18h] [ebp-80h] BYREF
     char v14[32]; // [esp+38h] [ebp-60h] BYREF
     
@@ -438,7 +438,7 @@ int jkDSS_ProcessSetSaberInfo(sithCogMsg *msg)
     if ( msg->netMsg.cogMsgId == DSS_SABERINFO1 && !sithNet_isServer )
         return 1;
 
-    sithThing* v2 = sithThing_GetGuidThing(NETMSG_POPS32());
+    SithThing* v2 = sithThing_GetGuidThing(NETMSG_POPS32());
     if ( !v2 )
         return 0;
     v11 = v2->actorParams.playerinfo;
@@ -466,9 +466,9 @@ int jkDSS_ProcessSetSaberInfo(sithCogMsg *msg)
     sithSoundClass* v6 = sithSoundClass_Load(v14);
     if ( v6 )
         sithSoundClass_SetThingClass(v2, v6);
-    sithThing* v10 = sithTemplate_GetTemplate("+ssparks_saber");
-    sithThing* v9 = sithTemplate_GetTemplate("+ssparks_blood");
-    sithThing* v7 = sithTemplate_GetTemplate("+ssparks_wall");
+    SithThing* v10 = sithTemplate_GetTemplate("+ssparks_saber");
+    SithThing* v9 = sithTemplate_GetTemplate("+ssparks_blood");
+    SithThing* v7 = sithTemplate_GetTemplate("+ssparks_wall");
     jkSaber_InitializeSaberInfo(v2, material_side_fname, material_tip_fname, 0.0031999999, 0.0018, 0.12, v7, v9, v10);
 
     if ( sithNet_isServer )
@@ -481,7 +481,7 @@ int jkDSS_ProcessSetSaberInfo(sithCogMsg *msg)
     return 1;
 }
 
-void jkDSS_SendJKEnableSaber(sithThing *pPlayerThing)
+void jkDSS_SendJKEnableSaber(SithThing *pPlayerThing)
 {
     NETMSG_START;
 
@@ -497,11 +497,11 @@ void jkDSS_SendJKEnableSaber(sithThing *pPlayerThing)
     sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 255, 0);
 }
 
-int jkDSS_ProcessJKEnableSaber(sithCogMsg *msg)
+int jkDSS_ProcessJKEnableSaber(SithMessage *msg)
 {
     NETMSG_IN_START(msg);
 
-    sithThing* pThing = sithThing_GetThingByIndex(NETMSG_POPS16());
+    SithThing* pThing = sithThing_GetThingByIndex(NETMSG_POPS16());
     if ( !pThing )
         return 0;
     if ( !pThing->playerInfo )
@@ -519,7 +519,7 @@ int jkDSS_ProcessJKEnableSaber(sithCogMsg *msg)
 }
 
 // MOTS altered
-void jkDSS_SendSetSaberInfo2(sithThing *thing)
+void jkDSS_SendSetSaberInfo2(SithThing *thing)
 {
     // MOTS added
     if (!thing)
@@ -609,7 +609,7 @@ void jkDSS_SendSetSaberInfo2(sithThing *thing)
 }
 
 // MOTS altered
-int jkDSS_ProcessSetSaberInfo2(sithCogMsg *msg)
+int jkDSS_ProcessSetSaberInfo2(SithMessage *msg)
 {
     char material_tip_fname[32];
     char material_side_fname[32];
@@ -664,7 +664,7 @@ int jkDSS_ProcessSetSaberInfo2(sithCogMsg *msg)
     
 
     int idx = NETMSG_POPS32();
-    sithThing* thing = sithThing_GetGuidThing(idx);
+    SithThing* thing = sithThing_GetGuidThing(idx);
     if (!thing) {
         return Main_bMotsCompat ? 1 : 0; // MOTS altered
     }
@@ -703,7 +703,7 @@ int jkDSS_ProcessSetSaberInfo2(sithCogMsg *msg)
     return 1;
 }
 
-void jkDSS_SendJKSetWeaponMesh(sithThing *pPlayerThing)
+void jkDSS_SendJKSetWeaponMesh(SithThing *pPlayerThing)
 {
     NETMSG_START;
 
@@ -727,7 +727,7 @@ void jkDSS_SendJKSetWeaponMesh(sithThing *pPlayerThing)
 }
 
 // MOTS altered
-int jkDSS_ProcessJKSetWeaponMesh(sithCogMsg *msg)
+int jkDSS_ProcessJKSetWeaponMesh(SithMessage *msg)
 {
     NETMSG_IN_START(msg);
     int arg0 = NETMSG_POPS32();
@@ -735,7 +735,7 @@ int jkDSS_ProcessJKSetWeaponMesh(sithCogMsg *msg)
     int16_t arg2 = NETMSG_POPS16();
     int16_t arg3 = NETMSG_POPS16();
 
-    sithThing* pThing = sithThing_GetGuidThing(arg0);
+    SithThing* pThing = sithThing_GetGuidThing(arg0);
     if (!pThing)
         return 0;
 
@@ -784,7 +784,7 @@ int jkDSS_SendHudTarget()
     return sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 4, 1);
 }
 
-int jkDSS_ProcessHudTarget(sithCogMsg *msg)
+int jkDSS_ProcessHudTarget(SithMessage *msg)
 {
     NETMSG_IN_START(msg);
 
@@ -843,7 +843,7 @@ void jkDSS_Sendx32(jkPlayerInfo *playerInfo)
     sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, -1, 255, 1);
 }
 
-int jkDSS_Processx32(sithCogMsg *msg)
+int jkDSS_Processx32(SithMessage *msg)
 {
     NETMSG_IN_START(msg);
 
@@ -887,7 +887,7 @@ int jkDSS_Processx32(sithCogMsg *msg)
 }
 
 // Unused?
-int jkDSS_Sendx33(sithThing* pThing, rdKeyframe* pKeyframe, int a3, int16_t a4)
+int jkDSS_Sendx33(SithThing* pThing, rdKeyframe* pKeyframe, int a3, int16_t a4)
 {
     NETMSG_START;
 
@@ -902,7 +902,7 @@ int jkDSS_Sendx33(sithThing* pThing, rdKeyframe* pKeyframe, int a3, int16_t a4)
 }
 
 // Unused?
-int jkDSS_Processx33(sithCogMsg *msg)
+int jkDSS_Processx33(SithMessage *msg)
 {
     NETMSG_IN_START(msg);
     int16_t arg0 = NETMSG_POPS16();
@@ -912,7 +912,7 @@ int jkDSS_Processx33(sithCogMsg *msg)
 
     if ( arg0 >= sithWorld_g_pCurrentWorld->numThingsLoaded ) // Added: off-by-one fix
         return 0;
-    sithThing* pThing = &sithWorld_g_pCurrentWorld->things[arg0];
+    SithThing* pThing = &sithWorld_g_pCurrentWorld->things[arg0];
 
 
     int type = pThing->type;
@@ -990,7 +990,7 @@ int jkDSS_Sendx36()
 }
 
 // MOTS altered
-int jkDSS_Processx36_setwaggle(sithCogMsg *msg)
+int jkDSS_Processx36_setwaggle(SithMessage *msg)
 {
     NETMSG_IN_START(msg);
 
@@ -1056,7 +1056,7 @@ LABEL_6:
     }
 }
 
-int jkDSS_ProcessJKPrintUniString(sithCogMsg *msg)
+int jkDSS_ProcessJKPrintUniString(SithMessage *msg)
 {
     char key[64];
 
@@ -1092,7 +1092,7 @@ void jkDSS_SendEndLevel()
     sithMulti_QuitGame(sithTime_g_msecGameTime + 10000, 1);
 }
 
-int jkDSS_ProcessEndLevel(sithCogMsg *msg)
+int jkDSS_ProcessEndLevel(SithMessage *msg)
 {
     if ( msg->netMsg.thingIdx != sithNet_serverNetId )
         return 0;
@@ -1127,7 +1127,7 @@ void jkDSS_SendSetTeam(int16_t teamNum)
 }
 
 // MOTS altered
-int jkDSS_ProcessSetTeam(sithCogMsg *pMsg)
+int jkDSS_ProcessSetTeam(SithMessage *pMsg)
 {
     uint32_t playerIdx; // edx
     uint32_t teamNum; // ecx

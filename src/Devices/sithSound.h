@@ -20,9 +20,9 @@
 
 int sithSound_Startup();
 int sithSound_Shutdown();
-int sithSound_ReadSoundsListText(sithWorld *world, int a2);
-void sithSound_FreeWorldSounds(sithWorld *world);
-int sithSound_New(sithWorld *world, int num);
+int sithSound_ReadSoundsListText(SithWorld *world, int a2);
+void sithSound_FreeWorldSounds(SithWorld *world);
+int sithSound_New(SithWorld *world, int num);
 sithSound* sithSound_Load(char *sound_fname, int a2);
 sithSound* sithSound_GetFromIdx(int idx);
 int sithSound_LoadFileData(sithSound *sound);
@@ -32,7 +32,7 @@ int sithSound_FreeUpMemory(uint32_t idk);
 stdSound_buffer_t* sithSound_InitFromPath(char *path);
 int sithSound_ReadDataFromFd(int fd, sithSound *sound);
 
-//static int (*sithSound_ReadSoundsListText)(sithWorld *world, int a2) = (void*)sithSound_ReadSoundsListText_ADDR;
+//static int (*sithSound_ReadSoundsListText)(SithWorld *world, int a2) = (void*)sithSound_ReadSoundsListText_ADDR;
 //static sithSound* (*sithSound_Load)(char *sound_fname, int a2) = (void*)sithSound_Load_ADDR;
 //static int (*sithSound_LoadFileData)(sithSound *sound) = (void*)sithSound_LoadFileData_ADDR;
 //static unsigned int (*sithSound_FreeUpMemory)(sithSound *sound) = (void*)sithSound_FreeUpMemory_ADDR;

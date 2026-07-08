@@ -40,16 +40,16 @@ void sithRender_SetLightingMode(rdLightMode_t a1);
 void sithRender_SetTexMode(rdTexMode_t a1);
 void sithRender_SetPalette(const void *palette);
 MATH_FUNC void sithRender_Draw();
-MATH_FUNC void sithRender_BuildVisibleSectorList(sithSector *sector, rdClipFrustum *frustumArg, flex_t a3, int depth); // Added: depth safety
-MATH_FUNC void sithRender_NoClip(sithSector *sector, rdClipFrustum *frustumArg, flex_t a3, int depth);
-MATH_FUNC void sithRender_KindaClipAssignFrustum(sithSector *sector, rdClipFrustum *frustumArg, int depth, int parentSector);
-MATH_FUNC void sithRender_KindaClip(sithSector *sector, rdClipFrustum *frustumArg, flex_t prevAdjoinDistAdd, int depth);
+MATH_FUNC void sithRender_BuildVisibleSectorList(SithSector *sector, rdClipFrustum *frustumArg, flex_t a3, int depth); // Added: depth safety
+MATH_FUNC void sithRender_NoClip(SithSector *sector, rdClipFrustum *frustumArg, flex_t a3, int depth);
+MATH_FUNC void sithRender_KindaClipAssignFrustum(SithSector *sector, rdClipFrustum *frustumArg, int depth, int parentSector);
+MATH_FUNC void sithRender_KindaClip(SithSector *sector, rdClipFrustum *frustumArg, flex_t prevAdjoinDistAdd, int depth);
 MATH_FUNC void sithRender_RenderSectors();
 MATH_FUNC void sithRender_BuildVisibleSectorsThingList();
-MATH_FUNC void sithRender_BuildSectorThingList(sithSector *sector, flex_t prev, flex_t dist, int depth);
+MATH_FUNC void sithRender_BuildSectorThingList(SithSector *sector, flex_t prev, flex_t dist, int depth);
 MATH_FUNC void sithRender_BuildDynamicLights();
 MATH_FUNC void sithRender_RenderThings();
-MATH_FUNC int sithRender_RenderThing(sithThing *povThing);
+MATH_FUNC int sithRender_RenderThing(SithThing *povThing);
 MATH_FUNC void sithRender_RenderAlphaAdjoins();
 int sithRender_SetExtraThingRenderFunc(sithRender_weapRendFunc_t a1);
 void sithRender_WorldFlash(flex_t arg1,flex_t arg2);
@@ -59,12 +59,12 @@ void sithRender_RenderDebugLight(flex_t intensity, rdVector3* pos);
 
 #define SITHREND_NUM_LIGHTS (32)
 
-//static void (*sithRender_Clip_)(sithSector *sector, rdClipFrustum *frustumArg, flex_t a3) = (void*)sithRender_BuildVisibleSectorList_ADDR;
-//static void (*sithRender_UpdateLights_)(sithSector *sector, flex_t a2, flex_t dist) = (void*)sithRender_BuildSectorThingList_ADDR;
+//static void (*sithRender_Clip_)(SithSector *sector, rdClipFrustum *frustumArg, flex_t a3) = (void*)sithRender_BuildVisibleSectorList_ADDR;
+//static void (*sithRender_UpdateLights_)(SithSector *sector, flex_t a2, flex_t dist) = (void*)sithRender_BuildSectorThingList_ADDR;
 //static void (*sithRender_RenderDynamicLights_)() = (void*)sithRender_BuildDynamicLights_ADDR;
 //static void (*sithRender_RenderLevelGeometry_)() = (void*)sithRender_RenderSectors_ADDR;
 //static void (*sithRender_RenderThings)() = (void*)sithRender_RenderThings_ADDR;
 //static void (*sithRender_RenderAlphaSurfaces_)() = (void*)sithRender_RenderAlphaAdjoins_ADDR;
-//static int (*sithRender_RenderThing)(sithThing *a2) = (void*)sithRender_RenderThing_ADDR;
+//static int (*sithRender_RenderThing)(SithThing *a2) = (void*)sithRender_RenderThing_ADDR;
 
 #endif // _SITHRENDER_H

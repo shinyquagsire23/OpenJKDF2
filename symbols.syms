@@ -70,16 +70,16 @@ sithRender_faceView 0x0082F648 rdMeshinfo
 meshinfo_out 0x0082F490 rdMeshinfo
 sithRender_pExtraThingRenderFunc 0x00831998 sithRender_weapRendFunc_t
 sithRender_aThingLights 0x0082F668 rdLight[32]
-sithRender_aVisibleSectors 0x0082F110 sithSector*[SITH_MAX_VISIBLE_SECTORS]
+sithRender_aVisibleSectors 0x0082F110 SithSector*[SITH_MAX_VISIBLE_SECTORS]
 sithRender_aSectorFrustrums 0x0082FEF0 rdClipFrustum[SITH_MAX_VISIBLE_SECTORS]
-sithRender_aThingSectors 0x0082FC68 sithSector*[SITH_MAX_VISIBLE_SECTORS_2+2]
+sithRender_aThingSectors 0x0082FC68 SithSector*[SITH_MAX_VISIBLE_SECTORS_2+2]
 sithRender_aClipVertices 0x0082F310 rdVector3[32] NO_REINIT
 sithRender_aTransformedClipVertices 0x0082F4C0 rdVector3[32] NO_REINIT
-sithRender_aAlphaAdjoins 0x008318F8 sithSurface*[SITH_MAX_VISIBLE_ALPHA_SURFACES]
+sithRender_aAlphaAdjoins 0x008318F8 SithSurface*[SITH_MAX_VISIBLE_ALPHA_SURFACES]
 sithRender_lastRenderTick 0x008EE678 int
-aSithSurfaces 0x00847E98 sithSurface*[SITH_MAX_VISIBLE_ALPHA_SURFACES]
+aSithSurfaces 0x00847E98 SithSurface*[SITH_MAX_VISIBLE_ALPHA_SURFACES]
 
-sithCamera_g_aCameras 0x008EC380 sithCamera[SITHCAMERA_NUMCAMERAS]
+sithCamera_g_aCameras 0x008EC380 SithCamera[SITHCAMERA_NUMCAMERAS]
 sithCamera_g_bCurCameraSet 0x008EE5A0 int
 sithCamera_g_stateFlags 0x008EE5A4 int
 sithCamera_g_curCycleCamNum 0x008EE5A8 int
@@ -87,7 +87,7 @@ sithCamera_g_vecCameraPosOffset 0x008EE5AC rdVector3
 sithCamera_g_vecCameraAngleOffset 0x008EE5B8 rdVector3
 sithCamera_g_cameraPosDelta 0x008EE5C4 flex_t
 sithCamera_g_cameraAngleDelta 0x008EE5C8 flex_t
-sithCamera_g_pCurCamera 0x0082F104 sithCamera*
+sithCamera_g_pCurCamera 0x0082F104 SithCamera*
 sithCamera_bStartup 0x0082F108 int
 sithCamera_g_orbCamOrient 0x008EE5E0 rdMatrix34
 sithCamera_idleCamOrient 0x0082F0B8 rdMatrix34
@@ -149,10 +149,10 @@ rdColormap_pCurMap 0x0073A3C8 rdColormap*
 rdColormap_pIdentityMap 0x0073A3CC rdColormap*
 //rdColormap_colorInfo 0x00548260 rdTexFormat
 
-sithEvent_aEvents 0x00852F98 sithEvent[256]
-sithEvent_g_pFirstQueuedEvent 0x00855000 sithEvent*
+sithEvent_aEvents 0x00852F98 SithEvent[256]
+sithEvent_g_pFirstQueuedEvent 0x00855000 SithEvent*
 sithEvent_arrLut 0x00854B98 int[256]
-sithEvent_aTasks 0x00854F98 sithEventTask[SITH_NUM_EVENTS]
+sithEvent_aTasks 0x00854F98 SithEventTask[SITH_NUM_EVENTS]
 sithEvent_numFreeEventBuffers 0x00854FFC int
 sithEvent_bInit 0x855004 int
 sithEvent_bOpen 0x855008 int
@@ -181,7 +181,7 @@ sithSoundMixer_aPlayingSounds 0x00835FE8 sithPlayingSound[SITH_MIXER_NUMPLAYINGS
 sithSoundMixer_aIdk 0x00836B68 int[SITH_MIXER_NUMPLAYINGSOUNDS]
 sithSoundMixer_activeChannels 0x00836BE8 int
 sithSoundMixer_bOpened 0x00836BEC int
-sithSoundMixer_pCurSector 0x00836BF4 sithSector*
+sithSoundMixer_pCurSector 0x00836BF4 SithSector*
 sithSoundMixer_dword_836BFC 0x00836BFC int
 sithSoundMixer_trackFrom 0x008BBC74 int
 sithSoundMixer_trackTo 0x008BBC70 int
@@ -189,7 +189,7 @@ sithSoundMixer_hCurAmbientChannel 0x00836BF8 sithPlayingSound*
 sithSoundMixer_dword_836C00 0x00836C00 int
 sithSoundMixer_channelGUIDSeed 0x0054A684 int = 1
 sithSoundMixer_dword_836C04 0x00836C04 int
-sithSoundMixer_pFocusedThing 0x00836BF0 sithThing*
+sithSoundMixer_pFocusedThing 0x00836BF0 SithThing*
 
 sithSound_maxDataLoaded 0x0054C390 int = 0x400000
 sithSound_var3 0x0054C394 int = 1
@@ -239,7 +239,7 @@ sithNet_things 0x008326AC int32_t [SITH_MAX_THINGS]
 sithNet_thingsIdx 0x008330F0 int32_t 
 sithNet_syncIdx 0x008330F4 int32_t 
 sithNet_aSyncFlags 0x008330B0 int32_t [SITH_MAX_SYNC_THINGS]
-sithNet_aSyncThings 0x00832668 sithThing*[SITH_MAX_SYNC_THINGS]
+sithNet_aSyncThings 0x00832668 SithThing*[SITH_MAX_SYNC_THINGS]
 sithNet_tickrate 0x005490D4 int32_t  = 180
 sithNet_dword_8C4BA8 0x008C4BA8 int32_t 
 sithNet_dword_83262C 0x0083262C int32_t 
@@ -252,7 +252,7 @@ sithNet_dword_832620 0x00832620 int32_t
 
 sithOverlayMap_curScale 0x0054A5E0 flex_t = 100.0
 sithOverlayMap_mapOrient 0x00835840 rdMatrix34
-sithOverlayMap_pLocalPlayer 0x00835870 sithThing*
+sithOverlayMap_pLocalPlayer 0x00835870 SithThing*
 sithOverlayMap_pCanvas 0x00835874 rdCanvas*
 sithOverlayMap_x1 0x00835878 int
 sithOverlayMap_y1 0x0083587C int
@@ -352,7 +352,7 @@ stdComm_waIdk 0x008C4C60 wchar_t[32]
 stdComm_dword_8321DC 0x008321DC int
 stdComm_dword_832200 0x00832200 int
 stdComm_dword_832210 0x00832210 int
-stdComm_cogMsgTmp 0x00008319B0 sithCogMsg
+stdComm_cogMsgTmp 0x00008319B0 SithMessage
 
 stdMci_mciId 0x00563720 MCIDEVICEID
 stdMci_dwVolume 0x00563724 int
@@ -460,11 +460,11 @@ rdRaster_aOtherLUT 0x86CDDC flex_t[16]
 rdRaster_aOneDivXLUT 0x0086CE20 flex_t[2048]
 rdRaster_fixedScale 0x00548E28 flex_t = 65536.0f
 
-sithCogFunctionAI_aThingsInView 0x00855CE8 sithThing*[32]
+sithCogFunctionAI_aThingsInView 0x00855CE8 SithThing*[32]
 sithCogFunctionAI_numThingsInView 0x00855D68 int
 sithCogFunctionAI_curThingInView 0x00855D6C int
 
-sithComm_MsgTmpBuf 0x00837468 sithCogMsg[32]
+sithComm_MsgTmpBuf 0x00837468 SithMessage[32]
 sithComm_aMsgPairs 0x00847968 sithCogMsg_Pair[128]
 sithMessage_aTypeFuncs 0x00847D68 cogMsg_Handler[65]
 sithMessage_bStopProcessMessages 0x00847E6C int
@@ -474,8 +474,8 @@ sithComm_idk2 0x00847E7C int
 sithMessage_bSturtup 0x00847E80 int
 sithComm_dword_847E84 0x00847E84 uint32_t
 sithComm_msgId 0x0054B004 int = 1
-sithComm_MsgTmpBuf2 0x00836C40 sithCogMsg
-sithComm_netMsgTmp 0x008B4C00 sithCogMsg
+sithComm_MsgTmpBuf2 0x00836C40 SithMessage
+sithComm_netMsgTmp 0x008B4C00 SithMessage
 
 jkCog_emptystring 0x005540BC wchar_t[2]
 jkCog_jkstring 0x00553FB8 wchar_t[130]
@@ -484,12 +484,12 @@ jkCog_strings 0x0553FA0 stdStrTable
 
 sithCog_bOpened 0x00836C2C int
 sithCog_g_pHashtable 0x00836C3C stdHashTable*
-sithCog_aSectorLinks 0x008B5440 sithCogSectorLink[SITHCOG_MAX_LINKS]
+sithCog_aSectorLinks 0x008B5440 SithCogSectorLink[SITHCOG_MAX_LINKS]
 sithCog_numSectorLinks 0x00836C38 int
-sithCog_aThingLinks 0x008B7460 sithCogThingLink[SITHCOG_MAX_LINKS]
+sithCog_aThingLinks 0x008B7460 SithCogThingLink[SITHCOG_MAX_LINKS]
 sithCog_numThingLinks 0x00836C30 int
 sithCog_numSurfaceLinks 0x00836C34 int
-sithCog_aSurfaceLinks 0x008B9C60 sithCogSurfaceLink[SITHCOG_MAX_LINKS]
+sithCog_aSurfaceLinks 0x008B9C60 SithCogSurfaceLink[SITHCOG_MAX_LINKS]
 sithCog_g_pMasterCog 0x008B542C sithCog*
 
 jkDev_aEntryPositions 0x00559EF0 rdVector2i[10]
@@ -534,7 +534,7 @@ jkHud_chatStr 0x00552BD8 char[128]
 jkHud_aTeamColors16bpp 0x00552C58 int[5]
 jkHud_rightBlitX 0x00552C6C uint32_t
 jkHud_leftBlitX 0x00552C70 uint32_t
-jkHud_mapRendConfig 0x00552C78 sithMapViewConfig
+jkHud_mapRendConfig 0x00552C78 SithOverlayMapConfig
 jkHud_chatStrPos 0x00552CB8 int
 jkHud_rightBlitY 0x00552CBC int
 jkHud_aTeamScores 0x00552CC0 jkHudTeamScore[5]
@@ -557,7 +557,7 @@ jkHud_pMsgFontSft 0x00553E70 stdFont*
 jkHud_pStatusLeftBm 0x00553E74 stdBitmap*
 jkHud_pStatusRightBm 0x00553E78 stdBitmap*
 jkHud_bHasTarget 0x00553E7C int
-jkHud_pTargetThing 0x00553E80 sithThing*
+jkHud_pTargetThing 0x00553E80 SithThing*
 jkHud_targetRed16 0x00553E88 uint32_t
 jkHud_targetGreen16 0x00553E8C uint32_t
 jkHud_targetBlue16 0x00553E90 uint32_t
@@ -667,19 +667,19 @@ gamemode_1_str 0x00552958 char[128]
 jkMain_strIdk 0x005529D8 char[128]
 jkMain_wstrIdk 0x00552A58 wchar_t[128]
 
-sithWorld_aSectionParsers 0x00833548 sithWorldParser[32]
+sithWorld_aSectionParsers 0x00833548 SithWorldTextSectionParseHandler[32]
 sithWorld_some_integer_4 0x008339E0 uint32_t
-sithWorld_g_pCurrentWorld 0x8339C8 sithWorld*
-sithWorld_g_pStaticWorld 0x8339CC sithWorld*
-sithWorld_g_pLastLoadedWorld 0x8339D0 sithWorld*
+sithWorld_g_pCurrentWorld 0x8339C8 SithWorld*
+sithWorld_g_pStaticWorld 0x8339CC SithWorld*
+sithWorld_g_pLastLoadedWorld 0x8339D0 SithWorld*
 sithWorld_numParsers 0x8339D4 uint32_t
 sithWorld_bInitted 0x8339D8 uint32_t
 sithWorld_bLoaded 0x008339DC int
 sithWorld_episodeName 0x008EE620 char[32]
 
-sithInventory_powerKeybinds 0x008BD0C0 sithKeybind[SITHINVENTORY_NUM_POWERKEYBINDS]
+sithInventory_powerKeybinds 0x008BD0C0 SithControlBinding[SITHINVENTORY_NUM_POWERKEYBINDS]
 sithInventory_g_bInitInventory 0x00549FA0 int = 1
-sithInventory_g_aTypes 0x008BD1C0 sithItemDescriptor[SITHBIN_NUMBINS]
+sithInventory_g_aTypes 0x008BD1C0 SithInventoryType[SITHBIN_NUMBINS]
 sithInventory_g_bSendDeactivateMessage 0x008339E4 int
 sithInventory_bUnkPower 0x008339E8 int
 sithInventory_8339EC 0x008339EC int
@@ -714,7 +714,7 @@ sithWeapon_8BD008 0x008BD008 int[6]
 sithWeapon_8BD024 0x008BD024 int
 sithWeapon_senderIndex 0x008BD028 int
 
-jkPlayer_playerInfos 0x008C4CA0 sithPlayerInfo[JKPLAYER_NUM_INFOS]
+jkPlayer_playerInfos 0x008C4CA0 SithPlayer[JKPLAYER_NUM_INFOS]
 jkPlayer_playerShortName 0x08EC320 wchar_t[32]
 jkPlayer_numOtherThings 0x0085FF44 int
 jkPlayer_numThings 0x0085B560 int
@@ -722,8 +722,8 @@ jkPlayer_otherThings 0x008592E0 jkPlayerInfo[NUM_JKPLAYER_THINGS]
 jkPlayer_bLoadingSomething 0x00525470 int = 1
 playerThingIdx 0x83199C int
 jkPlayer_maxPlayers 0x8319A0 uint32_t
-sithPlayer_g_pLocalPlayerThing 0x8319A4 sithThing*
-sithPlayer_g_pLocalPlayer 0x8319A8 sithPlayerInfo*
+sithPlayer_g_pLocalPlayerThing 0x8319A4 SithThing*
+sithPlayer_g_pLocalPlayer 0x8319A8 SithPlayer*
 playerThings 0x85B580 jkPlayerInfo[JKPLAYER_NUM_INFOS]
 jkSaber_rotateMat 0x85FA80 rdMatrix34
 jkPlayer_setRotateOverlayMap 0x00860764 int
@@ -749,7 +749,7 @@ jkPlayer_sideMat 0x00860560 char[32]
 jkPlayer_tipMat 0x00860580 char[32]
 
 sithCollision_aNumSearchedSectors 0x847F28 int[4]
-sithCollision_collisionHandlers 0x00847F38 sithCollisionEntry[144]
+sithCollision_collisionHandlers 0x00847F38 SithCollideResult[144]
 sithCollision_aThingSurfaceCollideResults 0x8485F8 sithCollisionHitHandler_t[12]
 sithCollision_aCollisions 0x00848628 sithCollisionSearchResult[4]
 sithCollision_aNumStackCollisions 0x84DA28 int[4]
@@ -775,7 +775,7 @@ sithSector_zMinVec 0x008553E0 rdVector3
 sithSector_horizontalPixelsPerRev_idk 0x008553EC flex_t
 sithSector_horizontalDist 0x008553F0 flex_t
 sithSector_flt_8553F4 0x008553F4 flex_t
-sithSector_aModifiedSectors 0x00855438 sithSector*[16]
+sithSector_aModifiedSectors 0x00855438 SithSector*[16]
 sithSector_aSyncFlags 0x00855478 int[16]
 sithSector_numModifiedSectors 0x008554B8 uint32_t
 
@@ -833,7 +833,7 @@ jkGuiMultiplayer_multiEntry 0x00556050 jkMultiEntry
 jkGuiMultiplayer_dword_5564F0 0x005564F0 int
 
 g_hInstance 0x00855DEC HINSTANCE
-sithCog_g_pSymbolTable 0x008B5428 sithCogSymboltable*
+sithCog_g_pSymbolTable 0x008B5428 SithCogSymbolTable*
 pSithHS 0x82F0A4 struct HostServices*
 g_hWnd 0x855DE0 HWND
 g_nShowCmd 0x855DE8 uint32_t
@@ -877,7 +877,7 @@ stdMemory_g_curState 0x008607C0 stdMemoryInfo
 yyin 0x00855D90 stdFile_t
 yyout 0x00855D94 stdFile_t
 
-sithCogParse_pSymbolTable 0x008554C0 sithCogSymboltable*
+sithCogParse_pSymbolTable 0x008554C0 SithCogSymbolTable*
 yacc_linenum 0x00889F0C int
 cog_yacc_loop_depth 0x0054C850 int = 1
 cog_parser_node_stackpos 0x008554C8 int[SITHCOG_NODE_STACKDEPTH]
@@ -887,7 +887,7 @@ cogparser_topnode 0x00855CCC sith_cog_parser_node*
 cogvm_stack 0x00855CC8 int32_t*
 cogparser_num_nodes 0x00855CE0 int
 cogparser_current_nodeidx 0x00855CDC int
-parsing_script 0x00855CD4 sithCogScript*
+parsing_script 0x00855CD4 SithCogScript*
 parsing_script_idk 0x0054C854 int = 1
 
 dplay_dword_55D618 0x0055D618 int
@@ -932,12 +932,12 @@ jkGuiMap_dword_556668 0x00556668 int
 jkGuiMap_dword_55666C 0x0055666C int
 
 sithMap_unkArr 0x0052E9E0 flex_t[12] = {0.5, 1.0, 1.5, 2.0, 2.5, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 0.0}
-sithMap_pPlayerThing 0x0084DE78 sithThing*
+sithMap_pPlayerThing 0x0084DE78 SithThing*
 sithMap_invMatrix 0x0084DE80 rdMatrix34
 sithMap_flt_84DEA8 0x0084DEA8 flex_t
 sithMap_flt_84DEAC 0x0084DEAC flex_t
 sithMap_ctx 0x0084DEB0 sithMap
-sithMap_pCurWorld 0x0084DEE4 sithWorld*
+sithMap_pCurWorld 0x0084DEE4 SithWorld*
 sithMap_camera 0x0084DEE8 rdMatrix34
 sithMap_pCurCamera 0x0084DF18 rdCamera*
 sithMap_bInitted 0x0084DF1C int

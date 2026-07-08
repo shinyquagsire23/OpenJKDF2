@@ -20,13 +20,13 @@ extern int sithComm_version;
 int sithComm_Startup();
 void sithMessage_Shutdown();
 void sithMessage_RegisterFunction(int msgid, cogMsg_Handler func);
-int sithComm_SendMsgToPlayer(sithCogMsg *msg, int a2, int mpFlags, int a4);
-void sithMessage_FileWrite(sithCogMsg *ctx);
+int sithComm_SendMsgToPlayer(SithMessage *msg, int a2, int mpFlags, int a4);
+void sithMessage_FileWrite(SithMessage *ctx);
 int sithMessage_ProcessMessages();
 void sithMessage_StopProcessMessages();
-int sithMessage_Process(sithCogMsg *a1);
+int sithMessage_Process(SithMessage *a1);
 void sithComm_SyncWithPlayers();
 void sithComm_ClearMsgTmpBuf();
-int sithComm_cogMsg_Reset(sithCogMsg *msg);
+int sithComm_cogMsg_Reset(SithMessage *msg);
 
 #endif // _DEVICES_SITHCOMM_H

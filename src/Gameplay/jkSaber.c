@@ -30,7 +30,7 @@ void jkSaber_Shutdown()
 {
 }
 
-void jkSaber_InitializeSaberInfo(sithThing *thing, char *material_side_fname, char *material_tip_fname, flex_t base_rad, flex_t tip_rad, flex_t len, sithThing *wall_sparks, sithThing *blood_sparks, sithThing *saber_sparks)
+void jkSaber_InitializeSaberInfo(SithThing *thing, char *material_side_fname, char *material_tip_fname, flex_t base_rad, flex_t tip_rad, flex_t len, SithThing *wall_sparks, SithThing *blood_sparks, SithThing *saber_sparks)
 {
     if (!thing) return; // Added: Fix nullptr deref in Mots cutscenes
 
@@ -95,7 +95,7 @@ void jkSaber_Draw(rdMatrix34 *posRotMat)
     }
 }
 
-void jkSaber_UpdateLength(sithThing *thing)
+void jkSaber_UpdateLength(SithThing *thing)
 {
     jkPlayerInfo* playerInfo = thing->playerInfo;
     if (!playerInfo )
@@ -199,11 +199,11 @@ void jkSaber_UpdateLength(sithThing *thing)
 }
 
 // MOTS added: split into its own func
-void  jkSaber_UpdateCollision2(sithThing *pPlayerThing,rdVector3 *pSaberPos,rdVector3 *pSaberDir,jkSaberCollide *pCollideInfo)
+void  jkSaber_UpdateCollision2(SithThing *pPlayerThing,rdVector3 *pSaberPos,rdVector3 *pSaberDir,jkSaberCollide *pCollideInfo)
 {
-    sithSector *pSector;
-    sithCollisionSearchEntry *searchResult;
-    sithThing *resultThing;
+    SithSector *pSector;
+    SithCollision *searchResult;
+    SithThing *resultThing;
     rdVector3 local_54;
     rdVector3 local_3c;
     jkPlayerInfo *playerInfo;
@@ -217,7 +217,7 @@ void  jkSaber_UpdateCollision2(sithThing *pPlayerThing,rdVector3 *pSaberPos,rdVe
     sithCollision_SearchForCollisions(pSector,pPlayerThing,pSaberPos,pSaberDir,pCollideInfo->bladeLength,0.0,0);
     
 
-    sithSector* pSectorIter = pSector;
+    SithSector* pSectorIter = pSector;
     while (1) 
     {
         searchResult = sithCollision_PopStack();
@@ -336,7 +336,7 @@ void  jkSaber_UpdateCollision2(sithThing *pPlayerThing,rdVector3 *pSaberPos,rdVe
 }
 
 // MOTS altered: interpolation and multiple blades
-void jkSaber_UpdateCollision(sithThing *player, int joint, int bSecondary)
+void jkSaber_UpdateCollision(SithThing *player, int joint, int bSecondary)
 {
     jkPlayerInfo *playerInfo; // ebx
     rdVector3 a2a;
@@ -429,10 +429,10 @@ void jkSaber_UpdateCollision(sithThing *player, int joint, int bSecondary)
     playerInfo->bHasLastJointMat = 1;
 }
 
-void jkSaber_SpawnSparks(jkPlayerInfo *pPlayerInfo, rdVector3 *pPos, sithSector *psector, int sparkType)
+void jkSaber_SpawnSparks(jkPlayerInfo *pPlayerInfo, rdVector3 *pPos, SithSector *psector, int sparkType)
 {
-    sithThing *pTemplate; // eax
-    sithThing *pSpawned; // eax
+    SithThing *pTemplate; // eax
+    SithThing *pSpawned; // eax
 
     if ( sithTime_g_msecGameTime < pPlayerInfo->lastSparkSpawnMs + 200 )
         return;
@@ -462,7 +462,7 @@ void jkSaber_SpawnSparks(jkPlayerInfo *pPlayerInfo, rdVector3 *pPos, sithSector 
 }
 
 // MOTS altered
-void jkSaber_Enable(sithThing *pThing, flex_t damage, flex_t bladeLength, flex_t stunDelay)
+void jkSaber_Enable(SithThing *pThing, flex_t damage, flex_t bladeLength, flex_t stunDelay)
 {
     if (!pThing || !pThing->playerInfo) return; // MOTS added
 
@@ -484,7 +484,7 @@ void jkSaber_Enable(sithThing *pThing, flex_t damage, flex_t bladeLength, flex_t
 }
 
 // MOTS altered
-void jkSaber_Disable(sithThing *player)
+void jkSaber_Disable(SithThing *player)
 {
     //MOTS added:
     if (!player || !player->playerInfo) return;

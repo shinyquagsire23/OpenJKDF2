@@ -34,7 +34,7 @@ void sithParticle_Shutdown()
 
 rdParticle* sithParticle_Load(const char *a1)
 {
-    sithWorld *v1; // ebx
+    SithWorld *v1; // ebx
     rdParticle *v2; // edi
     rdParticle *result; // eax
     unsigned int v4; // eax
@@ -76,7 +76,7 @@ rdParticle* sithParticle_Load(const char *a1)
     return result;
 }
 
-int sithParticle_AllocWorldParticles(sithWorld *world, int numParticles)
+int sithParticle_AllocWorldParticles(SithWorld *world, int numParticles)
 {
     rdParticle *newParticle; // edi
 
@@ -90,7 +90,7 @@ int sithParticle_AllocWorldParticles(sithWorld *world, int numParticles)
     return 1;
 }
 
-int sithParticle_ParseArg(stdConffileArg *arg, sithThing *thing, int param)
+int sithParticle_ParseArg(stdConffileArg *arg, SithThing *thing, int param)
 {
     switch (param)
     {
@@ -140,7 +140,7 @@ int sithParticle_ParseArg(stdConffileArg *arg, sithThing *thing, int param)
     }
 }
 
-void sithParticle_Update(sithThing *particle, flex_t deltaMs)
+void sithParticle_Update(SithThing *particle, flex_t deltaMs)
 {
     flex_d_t v2; // st7
     char typeFlags; // al
@@ -214,7 +214,7 @@ void sithParticle_Update(sithThing *particle, flex_t deltaMs)
     }
 }
 
-void sithParticle_Initalize(sithThing *thing)
+void sithParticle_Initalize(SithThing *thing)
 {
     int v1; // ecx
     rdThing *v3; // ebp
@@ -316,7 +316,7 @@ void sithParticle_Initalize(sithThing *thing)
     }
 }
 
-void sithParticle_DestroyParticle(sithThing *particle)
+void sithParticle_DestroyParticle(SithThing *particle)
 {
     unsigned int v1;
     rdParticle* particlePrim;
@@ -345,7 +345,7 @@ void sithParticle_DestroyParticle(sithThing *particle)
     }
 }
 
-void sithParticle_Free(sithThing *thing)
+void sithParticle_Free(SithThing *thing)
 {
     if (thing->rdthing.particlecloud)
     {
@@ -354,7 +354,7 @@ void sithParticle_Free(sithThing *thing)
     }
 }
 
-void sithParticle_FreeWorldParticles(sithWorld *world)
+void sithParticle_FreeWorldParticles(SithWorld *world)
 {
     if (!world->numParticlesLoaded) return;
 

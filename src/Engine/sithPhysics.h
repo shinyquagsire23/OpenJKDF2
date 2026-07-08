@@ -18,19 +18,19 @@
 #define sithPhysics_UpdateUnderwaterThingPhysics_ADDR (0x004F6D80)
 #define sithPhysics_UpdateAttachedThingPhysics_ADDR (0x004F7430)
 
-MATH_FUNC void sithPhysics_FindFloor(sithThing *pThing, int a3);
-MATH_FUNC void sithPhysics_UpdateThing(sithThing *pThing, flex_t force);
-MATH_FUNC void sithPhysics_ApplyForce(sithThing *pThing, rdVector3 *forceVec);
-MATH_FUNC void sithPhysics_SetThingLook(sithThing *pThing, const rdVector3 *look, flex_t a3);
+MATH_FUNC void sithPhysics_FindFloor(SithThing *pThing, int a3);
+MATH_FUNC void sithPhysics_UpdateThing(SithThing *pThing, flex_t force);
+MATH_FUNC void sithPhysics_ApplyForce(SithThing *pThing, rdVector3 *forceVec);
+MATH_FUNC void sithPhysics_SetThingLook(SithThing *pThing, const rdVector3 *look, flex_t a3);
 MATH_FUNC void sithPhysics_ApplyDrag(rdVector3 *vec, flex_t drag, flex_t mag, flex_t dragCoef);
-MATH_FUNC int sithPhysics_ParseArg(stdConffileArg *arg, sithThing *pThing, int param);
-MATH_FUNC void sithPhysics_ResetThingMovement(sithThing *pThing);
-MATH_FUNC flex_t sithPhysics_GetThingHeight(sithThing *pThing);
-MATH_FUNC void sithPhysics_UpdateThingPhysics(sithThing *pThing, flex_t deltaSeconds);
-MATH_FUNC void sithPhysics_UpdatePlayerPhysics(sithThing *player, flex_t deltaSeconds);
-MATH_FUNC void sithPhysics_UpdateUnderwaterThingPhysics(sithThing *pThing, flex_t deltaSeconds);
-MATH_FUNC void sithPhysics_UpdateAttachedThingPhysics(sithThing *pThing, flex_t deltaSeconds);
+MATH_FUNC int sithPhysics_ParseArg(stdConffileArg *arg, SithThing *pThing, int param);
+MATH_FUNC void sithPhysics_ResetThingMovement(SithThing *pThing);
+MATH_FUNC flex_t sithPhysics_GetThingHeight(SithThing *pThing);
+MATH_FUNC void sithPhysics_UpdateThingPhysics(SithThing *pThing, flex_t deltaSeconds);
+MATH_FUNC void sithPhysics_UpdatePlayerPhysics(SithThing *player, flex_t deltaSeconds);
+MATH_FUNC void sithPhysics_UpdateUnderwaterThingPhysics(SithThing *pThing, flex_t deltaSeconds);
+MATH_FUNC void sithPhysics_UpdateAttachedThingPhysics(SithThing *pThing, flex_t deltaSeconds);
 
-//static void (*_sithPhysics_ThingPhysAttached)(sithThing *pThing, flex_t deltaSeconds) = (void*)sithPhysics_UpdateAttachedThingPhysics_ADDR;
+//static void (*_sithPhysics_ThingPhysAttached)(SithThing *pThing, flex_t deltaSeconds) = (void*)sithPhysics_UpdateAttachedThingPhysics_ADDR;
 
 #endif // _ENGINE_SITHPHYSICS_H

@@ -14,15 +14,15 @@
 
 int sithAIClass_Startup();
 void sithAIClass_Shutdown();
-int sithAIClass_AllocWorldAIClasses(sithWorld *world, int a2);
-int sithAIClass_ReadStaticAIClassesListText(sithWorld *world, int a2);
-sithAIClass* sithAIClass_Load(char *fpath);
-int sithAIClass_LoadEntry(char *fpath, sithAIClass *aiclass);
-void sithAIClass_FreeWorldAIClasses(sithWorld *world);
+int sithAIClass_AllocWorldAIClasses(SithWorld *world, int a2);
+int sithAIClass_ReadStaticAIClassesListText(SithWorld *world, int a2);
+SithAIClass* sithAIClass_Load(char *fpath);
+int sithAIClass_LoadEntry(char *fpath, SithAIClass *aiclass);
+void sithAIClass_FreeWorldAIClasses(SithWorld *world);
 
 //static int (*sithAIClass_Startup)() = (void*)sithAIClass_Startup_ADDR;
-//static int (*sithAIClass_ReadStaticAIClassesListText)(sithWorld *world, int a2) = (void*)sithAIClass_ReadStaticAIClassesListText_ADDR;
-//static sithAIClass* (*sithAIClass_Load)(char *a1) = (void*)sithAIClass_Load_ADDR;
-//static void (*sithAIClass_FreeWorldAIClasses)(sithWorld *a1) = (void*)sithAIClass_FreeWorldAIClasses_ADDR;
+//static int (*sithAIClass_ReadStaticAIClassesListText)(SithWorld *world, int a2) = (void*)sithAIClass_ReadStaticAIClassesListText_ADDR;
+//static SithAIClass* (*sithAIClass_Load)(char *a1) = (void*)sithAIClass_Load_ADDR;
+//static void (*sithAIClass_FreeWorldAIClasses)(SithWorld *a1) = (void*)sithAIClass_FreeWorldAIClasses_ADDR;
 
 #endif // _SITHAICLASS_H

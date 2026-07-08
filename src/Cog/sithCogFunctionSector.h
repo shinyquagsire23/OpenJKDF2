@@ -3,7 +3,7 @@
 
 #include "sithCog.h"
 
-void sithCogFunctionSector_Startup(sithCogSymboltable* ctx);
+void sithCogFunctionSector_Startup(SithCogSymbolTable* ctx);
 
 //MATH_FUNC void sithCogFunctionSector_SetSectorThrust(sithCog *ctx);
 

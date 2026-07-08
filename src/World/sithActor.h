@@ -17,23 +17,23 @@
 #define sithActor_DestroyCorpse_ADDR (0x004ED7B0)
 #define sithActor_ParseArg_ADDR (0x004ED7E0)
 
-MATH_FUNC void sithActor_SetDifficulty(sithThing *thing);
-void sithActor_Update(sithThing *thing, int deltaMs);
-MATH_FUNC flex_t sithActor_DamageActor(sithThing *sender, sithThing *receiver, flex_t amount, int flags);
-void sithActor_PlayDamageSoundFx(sithThing *thing, flex_t amount, int hurtType);
-void sithActor_KillActor(sithThing *thing, sithThing *a3, int a4);
-int sithActor_SurfaceCollisionHandler(sithThing *thing, sithSurface *surface, sithCollisionSearchEntry *searchEnt);
-MATH_FUNC void sithActor_SetHeadPYR(sithThing *actor, const rdVector3 *eyePYR);
-int sithActor_ActorCollisionHandler(sithThing *thing, sithThing *thing2, sithCollisionSearchEntry *a3, int a4);
-void sithActor_UpdateAimJoints(sithThing *a1);
-MATH_FUNC int sithActor_thing_anim_blocked(sithThing *a1, sithThing *thing2, sithCollisionSearchEntry *a3);
-void sithActor_DestroyActor(sithThing *thing);
-void sithActor_DestroyCorpse(sithThing *corpse);
-int sithActor_ParseArg(stdConffileArg *arg, sithThing *thing, unsigned int param);
+MATH_FUNC void sithActor_SetDifficulty(SithThing *thing);
+void sithActor_Update(SithThing *thing, int deltaMs);
+MATH_FUNC flex_t sithActor_DamageActor(SithThing *sender, SithThing *receiver, flex_t amount, int flags);
+void sithActor_PlayDamageSoundFx(SithThing *thing, flex_t amount, int hurtType);
+void sithActor_KillActor(SithThing *thing, SithThing *a3, int a4);
+int sithActor_SurfaceCollisionHandler(SithThing *thing, SithSurface *surface, SithCollision *searchEnt);
+MATH_FUNC void sithActor_SetHeadPYR(SithThing *actor, const rdVector3 *eyePYR);
+int sithActor_ActorCollisionHandler(SithThing *thing, SithThing *thing2, SithCollision *a3, int a4);
+void sithActor_UpdateAimJoints(SithThing *a1);
+MATH_FUNC int sithActor_thing_anim_blocked(SithThing *a1, SithThing *thing2, SithCollision *a3);
+void sithActor_DestroyActor(SithThing *thing);
+void sithActor_DestroyCorpse(SithThing *corpse);
+int sithActor_ParseArg(stdConffileArg *arg, SithThing *thing, unsigned int param);
 
-//static int (__cdecl *sithActor_ActorCollisionHandler)(sithThing *thing, sithThing *a2, rdMatrix34 *a3, int a4) = (void*)sithActor_ActorCollisionHandler_ADDR;
-//static int (*sithActor_thing_anim_blocked)(sithThing *a1, sithThing *a2, rdMatrix34 *a3) = (void*)sithActor_thing_anim_blocked_ADDR;
-//static void (*sithActor_SetHeadPYR)(sithThing *actor, rdVector3 *eyePYR) = (void*)sithActor_SetHeadPYR_ADDR;
-//static void (*sithActor_SetDifficulty)(sithThing*) = (void*)sithActor_SetDifficulty_ADDR;
+//static int (__cdecl *sithActor_ActorCollisionHandler)(SithThing *thing, SithThing *a2, rdMatrix34 *a3, int a4) = (void*)sithActor_ActorCollisionHandler_ADDR;
+//static int (*sithActor_thing_anim_blocked)(SithThing *a1, SithThing *a2, rdMatrix34 *a3) = (void*)sithActor_thing_anim_blocked_ADDR;
+//static void (*sithActor_SetHeadPYR)(SithThing *actor, rdVector3 *eyePYR) = (void*)sithActor_SetHeadPYR_ADDR;
+//static void (*sithActor_SetDifficulty)(SithThing*) = (void*)sithActor_SetDifficulty_ADDR;
 
 #endif // _WORLD_SITHACTOR_H

@@ -24,11 +24,11 @@ enum SithExplosionFlag
     SITHEXPLOSION_FLAG_USE_FADE_TIME = 0x1000,
 };
 
-void sithExplosion_CreateThing(sithThing *explosion);
-MATH_FUNC void sithExplosion_Update(sithThing *explosion);
-MATH_FUNC void sithExplosion_MakeBlast(sithThing *explosion);
-int sithExplosion_ParseArg(stdConffileArg *arg, sithThing *thing, int param);
+void sithExplosion_CreateThing(SithThing *explosion);
+MATH_FUNC void sithExplosion_Update(SithThing *explosion);
+MATH_FUNC void sithExplosion_MakeBlast(SithThing *explosion);
+int sithExplosion_ParseArg(stdConffileArg *arg, SithThing *thing, int param);
 
-//static void (*sithExplosion_MakeBlast)(sithThing *explosion) = (void*)sithExplosion_MakeBlast_ADDR;
+//static void (*sithExplosion_MakeBlast)(SithThing *explosion) = (void*)sithExplosion_MakeBlast_ADDR;
 
 #endif // _SITHEXPLOSION_H

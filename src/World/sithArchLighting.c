@@ -8,7 +8,7 @@
 
 #ifdef JKM_LIGHTING
 
-void sithArchLighting_Free(sithWorld* pWorld)
+void sithArchLighting_Free(SithWorld* pWorld)
 {
     if (pWorld->aArchlights)
     {
@@ -31,7 +31,7 @@ void sithArchLighting_Free(sithWorld* pWorld)
     }
 }
 
-int sithArchLighting_ParseSection(sithWorld *pWorld, int unk)
+int sithArchLighting_ParseSection(SithWorld *pWorld, int unk)
 {
     uint32_t uVar2;
     sithArchLight *psVar3;

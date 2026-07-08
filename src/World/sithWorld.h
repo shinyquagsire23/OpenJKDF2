@@ -38,29 +38,29 @@ int sithWorld_Startup();
 void sithWorld_Shutdown();
 void sithWorld_SetLoadProgressCallback(sithWorldProgressCallback_t func);
 void sithWorld_UpdateLoadProgress(flex_t percent);
-int sithWorld_Load(sithWorld *pWorld, char *map_jkl_fname);
-sithWorld* sithWorld_NewEntry();
-int sithWorld_LoadPostProcess(sithWorld *pWorld);
-void sithWorld_FreeEntry(sithWorld *pWorld);
-int sithWorld_ReadHeaderText(sithWorld *pWorld, int junk);
-int sithWorld_ReadCopyrightText(sithWorld *lvl, int junk);
+int sithWorld_Load(SithWorld *pWorld, char *map_jkl_fname);
+SithWorld* sithWorld_NewEntry();
+int sithWorld_LoadPostProcess(SithWorld *pWorld);
+void sithWorld_FreeEntry(SithWorld *pWorld);
+int sithWorld_ReadHeaderText(SithWorld *pWorld, int junk);
+int sithWorld_ReadCopyrightText(SithWorld *lvl, int junk);
 int sithWorld_RegisterTextSectionParser(char *section_name, sithWorldSectionParser_t parser);
 int sithWorld_GetTextSectionParserIndex(char *a1);
-int sithWorld_ValidateWorld(sithWorld *pWorld);
-uint32_t sithWorld_CalcWorldChecksum(sithWorld *pWorld, uint32_t seed);
+int sithWorld_ValidateWorld(SithWorld *pWorld);
+uint32_t sithWorld_CalcWorldChecksum(SithWorld *pWorld, uint32_t seed);
 int sithWorld_InitPlayers();
-int sithWorld_ReadGeoresourceText(sithWorld *pWorld, int a2);
-void sithWorld_ResetRenderState(sithWorld *pWorld);
+int sithWorld_ReadGeoresourceText(SithWorld *pWorld, int a2);
+void sithWorld_ResetRenderState(SithWorld *pWorld);
 void sithWorld_Free();
-void sithWorld_ResetGeoresource(sithWorld *pWorld);
-void sithWorld_GetMemoryUsage(sithWorld *pWorld, int *outAllocated, int *outQuantity);
+void sithWorld_ResetGeoresource(SithWorld *pWorld);
+void sithWorld_GetMemoryUsage(SithWorld *pWorld, int *outAllocated, int *outQuantity);
 void sithWorld_SetChecksumExtraFunc(sithWorld_ChecksumHandler_t handler); // MOTS added
 
 
-//static int (*sithWorld_LoadPostProcess)(sithWorld *pWorld) = (void*)sithWorld_LoadPostProcess_ADDR;
-//static void (*sithWorld_ResetRenderState)(sithWorld *pWorld) = (void*)sithWorld_ResetRenderState_ADDR;
-//static int (*sithWorld_Load)(sithWorld *pWorld, char *map_jkl_fname) = (void*)sithWorld_Load_ADDR;
+//static int (*sithWorld_LoadPostProcess)(SithWorld *pWorld) = (void*)sithWorld_LoadPostProcess_ADDR;
+//static void (*sithWorld_ResetRenderState)(SithWorld *pWorld) = (void*)sithWorld_ResetRenderState_ADDR;
+//static int (*sithWorld_Load)(SithWorld *pWorld, char *map_jkl_fname) = (void*)sithWorld_Load_ADDR;
 
-//static void (*sithWorld_ResetGeoresource)(sithWorld *pWorld) = (void*)sithWorld_ResetGeoresource_ADDR;
+//static void (*sithWorld_ResetGeoresource)(SithWorld *pWorld) = (void*)sithWorld_ResetGeoresource_ADDR;
 
 #endif // _SITHWORLD_H

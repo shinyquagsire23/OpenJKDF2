@@ -5,8 +5,8 @@
 
 #ifdef JKM_LIGHTING
 
-void sithArchLighting_Free(sithWorld* pWorld);
-int sithArchLighting_ParseSection(sithWorld *pWorld, int unk);
+void sithArchLighting_Free(SithWorld* pWorld);
+int sithArchLighting_ParseSection(SithWorld *pWorld, int unk);
 
 #endif // JKM_LIGHTING
 

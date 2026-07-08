@@ -10,7 +10,7 @@
 #include "Primitives/rdMath.h"
 #include "jk.h"
 
-void sithExplosion_CreateThing(sithThing *explosion)
+void sithExplosion_CreateThing(SithThing *explosion)
 {
     rdMaterial *v3; // ecx
     unsigned int v4; // ecx
@@ -38,7 +38,7 @@ void sithExplosion_CreateThing(sithThing *explosion)
     }
 }
 
-void sithExplosion_Update(sithThing *explosion)
+void sithExplosion_Update(SithThing *explosion)
 {
     flex_d_t v5; // st7
     flex_d_t v6; // st6
@@ -66,10 +66,10 @@ void sithExplosion_Update(sithThing *explosion)
     }
 }
 
-void sithExplosion_MakeBlast(sithThing *explosion)
+void sithExplosion_MakeBlast(SithThing *explosion)
 {
-    sithCollisionSearchEntry *i; // ebp
-    sithThing **debrisTemplates; // edi
+    SithCollision *i; // ebp
+    SithThing **debrisTemplates; // edi
     rdVector3 a2; // [esp+24h] [ebp-3Ch] BYREF
     rdMatrix34 a3; // [esp+30h] [ebp-30h] BYREF
 
@@ -91,7 +91,7 @@ void sithExplosion_MakeBlast(sithThing *explosion)
             }
             else
             {
-                sithThing* v4 = i->receiver;
+                SithThing* v4 = i->receiver;
                 if ( ((explosion->explosionParams.typeflags & SITHEXPLOSION_FLAG_NO_DAMAGE_TO_SHOOTER) == 0
                    || v4 != explosion->prev_thing
                    || v4->signature != explosion->child_signature)
@@ -127,10 +127,10 @@ void sithExplosion_MakeBlast(sithThing *explosion)
     }
 }
 
-int sithExplosion_ParseArg(stdConffileArg *arg, sithThing *thing, int param)
+int sithExplosion_ParseArg(stdConffileArg *arg, SithThing *thing, int param)
 {
     int v15; // esi
-    sithThing **i; // eax
+    SithThing **i; // eax
     int tmp;
 
     switch ( param )

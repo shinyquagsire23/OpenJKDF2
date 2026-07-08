@@ -27,12 +27,12 @@
 #include "Dss/sithDSS.h"
 
 // MOTS altered
-int sithSector_ReadSectorsListText(sithWorld *world, int tmp)
+int sithSector_ReadSectorsListText(SithWorld *world, int tmp)
 {
     unsigned int alloc_size; // ebx
-    sithSector *v6; // eax
+    SithSector *v6; // eax
     unsigned int v7; // ecx
-    sithSector *sectors; // esi
+    SithSector *sectors; // esi
     int v13; // edi
     unsigned int v15; // eax
     void *v16; // ecx
@@ -59,9 +59,9 @@ int sithSector_ReadSectorsListText(sithWorld *world, int tmp)
 #ifdef STDPLATFORM_HEAP_SUGGESTIONS
     int prevSuggest = pSithHS->suggestHeap(HEAP_FAST);
 #endif
-    alloc_size = sizeof(sithSector) * sectors_amt;
+    alloc_size = sizeof(SithSector) * sectors_amt;
     { TWL_EXTRAM_SUGGEST(pSithHS); // Added: word-width fields/writes (audited)
-    world->sectors = (sithSector *)SITH_ALLOC(sizeof(sithSector) * sectors_amt);
+    world->sectors = (SithSector *)SITH_ALLOC(sizeof(SithSector) * sectors_amt);
     TWL_EXTRAM_RESTORE(pSithHS); }
 #ifdef STDPLATFORM_HEAP_SUGGESTIONS
     pSithHS->suggestHeap(prevSuggest);
@@ -212,33 +212,33 @@ int sithSector_ReadSectorsListText(sithWorld *world, int tmp)
     return 1;
 }
 
-int sithSector_GetIdxFromPtr(sithSector *sector)
+int sithSector_GetIdxFromPtr(SithSector *sector)
 {
     return sector && sector->id == sector - sithWorld_g_pCurrentWorld->sectors && sector->id < (unsigned int)sithWorld_g_pCurrentWorld->numSectors;
 }
 
-void sithSector_ShowSectorAdjoins(sithSector *sector)
+void sithSector_ShowSectorAdjoins(SithSector *sector)
 {
-    sithAdjoin *i; // esi
+    SithSurfaceAdjoin *i; // esi
 
     for ( i = sector->adjoins; i; i = i->next )
         sithSurface_ShowSectorAdjoin(i);
     sector->flags &= ~SITH_SECTOR_ADJOINS_SET;
 }
 
-void sithSector_HideSectorAdjoins(sithSector *sector)
+void sithSector_HideSectorAdjoins(SithSector *sector)
 {
-    sithAdjoin *i; // esi
+    SithSurfaceAdjoin *i; // esi
 
     for ( i = sector->adjoins; i; i = i->next )
         sithSurface_HideSectorAdjoin(i);
     sector->flags |= SITH_SECTOR_ADJOINS_SET;
 }
 
-int sithSector_GetSectorThingCount(sithSector *sector)
+int sithSector_GetSectorThingCount(SithSector *sector)
 {
     int result; // eax
-    sithThing *i; // ecx
+    SithThing *i; // ecx
 
     result = 0;
     for ( i = sector->thingsList; i; ++result )
@@ -246,21 +246,21 @@ int sithSector_GetSectorThingCount(sithSector *sector)
     return result;
 }
 
-int sithSector_AllocWorldSectors(sithWorld *world, int num)
+int sithSector_AllocWorldSectors(SithWorld *world, int num)
 {
-    sithSector *sectors;
+    SithSector *sectors;
     { TWL_EXTRAM_SUGGEST(pSithHS); // Added: word-width fields/writes (audited)
-    sectors = (sithSector *)SITH_ALLOC(num * sizeof(sithSector));
+    sectors = (SithSector *)SITH_ALLOC(num * sizeof(SithSector));
     TWL_EXTRAM_RESTORE(pSithHS); }
     world->sectors = sectors;
     if ( !sectors )
         return 0;
-    stdPlatform_Memzero32(sectors, num * sizeof(sithSector)); // Added: word-safe
+    stdPlatform_Memzero32(sectors, num * sizeof(SithSector)); // Added: word-safe
     world->numSectors = num;
     return 1;
 }
 
-void sithSector_NewEntry(sithSector *sector, int idx)
+void sithSector_NewEntry(SithSector *sector, int idx)
 {
     sector->id = idx;
     sector->ambientLight = 0.0f;
@@ -275,7 +275,7 @@ void sithSector_NewEntry(sithSector *sector, int idx)
     sector->thingsList = NULL;
 }
 
-void sithSector_FreeWorldSectors(sithWorld *world)
+void sithSector_FreeWorldSectors(SithWorld *world)
 {
     for (uint32_t i = 0; i < world->numSectors; i++)
     {
@@ -287,10 +287,10 @@ void sithSector_FreeWorldSectors(sithWorld *world)
     world->numSectors = 0;
 }
 
-int sithSector_GetSectorPlayerCount(sithSector *sector)
+int sithSector_GetSectorPlayerCount(SithSector *sector)
 {
     int result; // eax
-    sithThing *i; // ecx
+    SithThing *i; // ecx
 
     result = 0;
     for ( i = sector->thingsList; i; i = i->nextThing )
@@ -301,9 +301,9 @@ int sithSector_GetSectorPlayerCount(sithSector *sector)
     return result;
 }
 
-sithSector* sithSector_GetPtrFromIdx(int idx)
+SithSector* sithSector_GetPtrFromIdx(int idx)
 {
-    sithSector *result; // eax
+    SithSector *result; // eax
 
     if ( sithWorld_g_pCurrentWorld && idx >= 0 && idx < sithWorld_g_pCurrentWorld->numSectors )
         result = &sithWorld_g_pCurrentWorld->sectors[idx];
@@ -312,11 +312,11 @@ sithSector* sithSector_GetPtrFromIdx(int idx)
     return result;
 }
 
-void sithSector_SyncSector(sithSector *pSector, int a2)
+void sithSector_SyncSector(SithSector *pSector, int a2)
 {
     uint32_t v3; // edx
     uint32_t v4; // eax
-    sithSector **v5; // ecx
+    SithSector **v5; // ecx
 
     if ( a2 )
     {
@@ -356,11 +356,11 @@ void sithSector_SyncSectors()
     sithSector_numModifiedSectors = 0;
 }
 
-sithSector* sithSector_FindSectorAtPos(sithWorld *pWorld, rdVector3 *pos)
+SithSector* sithSector_FindSectorAtPos(SithWorld *pWorld, rdVector3 *pos)
 {
     int v2; // ebx
     unsigned int v3; // ebp
-    sithSector *v4; // esi
+    SithSector *v4; // esi
     int v7; // eax
 
     v2 = 0;

@@ -68,13 +68,13 @@ void stdComm_Shutdown();
 HRESULT stdComm_EnumSessions2(void);
 int stdComm_seed_idk(jkMultiEntry *pEntry);
 int stdComm_CreatePlayer(jkMultiEntry *pEntry);
-int stdComm_Recv(sithCogMsg *msg);
+int stdComm_Recv(SithMessage *msg);
 int stdComm_DoReceive();
-int stdComm_SendToPlayer(sithCogMsg *msg, int sendto_id);
+int stdComm_SendToPlayer(SithMessage *msg, int sendto_id);
 int stdComm_EnumPlayersCallback(DPID dpId, DWORD dwPlayerType, LPCDPNAME lpName, DWORD dwFlags, LPVOID lpContext);
 
 void stdComm_cogMsg_SendEnumPlayers(int sendtoId);
-int stdComm_cogMsg_HandleEnumPlayers(sithCogMsg *msg);
+int stdComm_cogMsg_HandleEnumPlayers(SithMessage *msg);
 int stdComm_EarlyInit();
 
 //static void (*stdComm_Shutdown)() = (void*)stdComm_Shutdown_ADDR;

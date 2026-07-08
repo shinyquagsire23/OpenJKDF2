@@ -17,12 +17,12 @@
 int sithParticle_Startup();
 void sithParticle_Shutdown();
 rdParticle* sithParticle_Load(const char *a1);
-int sithParticle_AllocWorldParticles(sithWorld *world, int numParticles);
-int sithParticle_ParseArg(stdConffileArg *arg, sithThing *thing, int param);
-MATH_FUNC void sithParticle_Update(sithThing *particle, flex_t deltaMs);
-MATH_FUNC void sithParticle_Initalize(sithThing *thing);
-MATH_FUNC void sithParticle_DestroyParticle(sithThing *particle);
-void sithParticle_Free(sithThing *thing);
-void sithParticle_FreeWorldParticles(sithWorld *world);
+int sithParticle_AllocWorldParticles(SithWorld *world, int numParticles);
+int sithParticle_ParseArg(stdConffileArg *arg, SithThing *thing, int param);
+MATH_FUNC void sithParticle_Update(SithThing *particle, flex_t deltaMs);
+MATH_FUNC void sithParticle_Initalize(SithThing *thing);
+MATH_FUNC void sithParticle_DestroyParticle(SithThing *particle);
+void sithParticle_Free(SithThing *thing);
+void sithParticle_FreeWorldParticles(SithWorld *world);
 
 #endif // _SITHPARTICLE_H
