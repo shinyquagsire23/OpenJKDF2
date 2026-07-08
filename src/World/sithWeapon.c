@@ -602,7 +602,7 @@ sithThing* sithWeapon_FireProjectile_0(sithThing *sender, sithThing *projectileT
 
 LABEL_31:
     if ( fireSound ) {
-        sithSoundMixer_PlaySoundPosThing(fireSound, sender, 1.0, 1.0, 4.0, SITHSOUNDFLAG_FOLLOWSTHING|SITHSOUNDFLAG_HIGHPRIO);
+        sithSoundMixer_PlaySoundThing(fireSound, sender, 1.0, 1.0, 4.0, SITHSOUNDFLAG_FOLLOWSTHING|SITHSOUNDFLAG_HIGHPRIO);
     }
     if ( anim >= 0 )
     {

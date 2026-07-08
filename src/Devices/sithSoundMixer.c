@@ -271,7 +271,7 @@ sithPlayingSound* sithSoundMixer_PlayingSoundFromSound(sithSound *sound, int fla
     return result;
 }
 
-sithPlayingSound* sithSoundMixer_cog_playsound_internal(sithSound *sound, flex_t volume, flex_t pan, int flags)
+sithPlayingSound* sithSoundMixer_PlaySound(sithSound *sound, flex_t volume, flex_t pan, int flags)
 {
     sithPlayingSound *result; // eax
     sithPlayingSound *v6; // ebx
@@ -373,7 +373,7 @@ LABEL_46:
     return result;
 }
 
-sithPlayingSound* sithSoundMixer_PlaySoundPosAbsolute(sithSound *a1, rdVector3 *a2, sithSector *a3, flex_t a4, flex_t a5, flex_t a6, int a7)
+sithPlayingSound* sithSoundMixer_PlaySoundPos(sithSound *a1, rdVector3 *a2, sithSector *a3, flex_t a4, flex_t a5, flex_t a6, int a7)
 {
     int32_t v7; // ebx
     flex_d_t v10; // st7
@@ -417,7 +417,7 @@ sithPlayingSound* sithSoundMixer_PlaySoundPosAbsolute(sithSound *a1, rdVector3 *
     return NULL;
 }
 
-sithPlayingSound* sithSoundMixer_PlaySoundPosThing(sithSound *sound, sithThing *pThing, flex_t a3, flex_t a4, flex_t a5, int flags)
+sithPlayingSound* sithSoundMixer_PlaySoundThing(sithSound *sound, sithThing *pThing, flex_t a3, flex_t a4, flex_t a5, int flags)
 {
     sithPlayingSound *v11; // esi
     int v12; // eax
@@ -618,7 +618,7 @@ int sithSoundMixer_SetFrequency(sithPlayingSound *sound, flex_t pitch)
     return 1;
 }
 
-void sithSoundMixer_FadeSound(sithPlayingSound *sound, flex_t vol_, flex_t fadeintime_)
+void sithSoundMixer_FadeVolume(sithPlayingSound *sound, flex_t vol_, flex_t fadeintime_)
 {
     flex_d_t v3; // st7
     flex_d_t v7; // st6
@@ -775,7 +775,7 @@ void sithSoundMixer_TickSectorSound()
         sithSoundMixer_pCurSectorPlayingSound = sithSoundMixer_StopSectorSound(lastSectorFadingOutSound);
 
         if (sithSoundMixer_pCurSectorPlayingSound)
-            sithSoundMixer_FadeSound(sithSoundMixer_pCurSectorPlayingSound, sithSoundMixer_pLastSectorSoundSector->sectorSoundVol, 0.5);
+            sithSoundMixer_FadeVolume(sithSoundMixer_pCurSectorPlayingSound, sithSoundMixer_pLastSectorSoundSector->sectorSoundVol, 0.5);
         return;
     }
 
@@ -830,7 +830,7 @@ void sithSoundMixer_TickSectorSound()
     return;
 }
 
-void sithSoundMixer_Tick(flex_t deltaSecs)
+void sithSoundMixer_Update(flex_t deltaSecs)
 {
     rdVector3 tmp;
 
@@ -1122,7 +1122,7 @@ void sithSoundMixer_FreeThing(sithThing *thing)
     }
 }
 
-sithPlayingSound* sithSoundMixer_GetSoundFromRef(int refid)
+sithPlayingSound* sithSoundMixer_GetChannelHandle(int refid)
 {
     unsigned int playingsound_idx; // ecx
 
@@ -1186,7 +1186,7 @@ void sithSoundMixer_UpdatePlayingSoundPosition(sithPlayingSound *sound)
     }
 }
 
-void sithSoundMixer_SectorSound(sithSector *sector, sithSound *sound, flex_t vol)
+void sithSoundMixer_SetSectorAmbientSound(sithSector *sector, sithSound *sound, flex_t vol)
 {
     sector->sectorSound = sound;
     sector->sectorSoundVol = vol;

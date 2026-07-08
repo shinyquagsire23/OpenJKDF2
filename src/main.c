@@ -2542,12 +2542,12 @@ void do_hooks()
     hook_function(sithSoundMixer_StopAll_ADDR, sithSoundMixer_StopAll);
     hook_function(sithSoundMixer_ResumeAll_ADDR, sithSoundMixer_ResumeAll);
     hook_function(sithSoundMixer_PlayingSoundFromSound_ADDR, sithSoundMixer_PlayingSoundFromSound);
-    hook_function(sithSoundMixer_cog_playsound_internal_ADDR, sithSoundMixer_cog_playsound_internal);
-    hook_function(sithSoundMixer_PlaySoundPosAbsolute_ADDR, sithSoundMixer_PlaySoundPosAbsolute);
-    hook_function(sithSoundMixer_PlaySoundPosThing_ADDR, sithSoundMixer_PlaySoundPosThing);
+    hook_function(sithSoundMixer_PlaySound_ADDR, sithSoundMixer_PlaySound);
+    hook_function(sithSoundMixer_PlaySoundPos_ADDR, sithSoundMixer_PlaySoundPos);
+    hook_function(sithSoundMixer_PlaySoundThing_ADDR, sithSoundMixer_PlaySoundThing);
     hook_function(sithSoundMixer_SetPitch_ADDR, sithSoundMixer_SetPitch);
     hook_function(sithSoundMixer_FreeThing_ADDR, sithSoundMixer_FreeThing);
-    hook_function(sithSoundMixer_SectorSound_ADDR, sithSoundMixer_SectorSound);
+    hook_function(sithSoundMixer_SetSectorAmbientSound_ADDR, sithSoundMixer_SetSectorAmbientSound);
     hook_function(sithSoundMixer_SetVelocity_ADDR, sithSoundMixer_SetVelocity);
     
     // sithAI

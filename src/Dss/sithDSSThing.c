@@ -338,11 +338,11 @@ int sithDSSThing_ProcessPlaySound(sithCogMsg *msg)
         if ( (flags & SITHSOUNDFLAG_ABSOLUTE) != 0 )
         {
             rdVector3 pos = NETMSG_POPVEC3();
-            out = sithSoundMixer_PlaySoundPosAbsolute(sound, &pos, 0, 1.0, volume, a5, flags);
+            out = sithSoundMixer_PlaySoundPos(sound, &pos, 0, 1.0, volume, a5, flags);
         }
         else
         {
-            out = sithSoundMixer_cog_playsound_internal(sound, volume, a5, flags);
+            out = sithSoundMixer_PlaySound(sound, volume, a5, flags);
         }
     }
     else
@@ -350,7 +350,7 @@ int sithDSSThing_ProcessPlaySound(sithCogMsg *msg)
         sithThing* thing = sithThing_GetById(NETMSG_POPS32());
         if ( !thing )
             return 0;
-        out = sithSoundMixer_PlaySoundPosThing(sound, thing, 1.0, volume, a5, flags);
+        out = sithSoundMixer_PlaySoundThing(sound, thing, 1.0, volume, a5, flags);
     }
 
     if ( out )
@@ -576,7 +576,7 @@ int sithDSSThing_ProcessStopSound(sithCogMsg *msg)
 
     int refid = NETMSG_POPS32();
     flex32_t fadeInTime = NETMSG_POPF32();
-    sithPlayingSound* pSound = sithSoundMixer_GetSoundFromRef(refid);
+    sithPlayingSound* pSound = sithSoundMixer_GetChannelHandle(refid);
     if ( pSound )
     {
         if ( fadeInTime <= 0.0 )
@@ -584,7 +584,7 @@ int sithDSSThing_ProcessStopSound(sithCogMsg *msg)
             sithSoundMixer_StopSound(pSound);
             return 1;
         }
-        sithSoundMixer_FadeSound(pSound, 0.0, fadeInTime);
+        sithSoundMixer_FadeVolume(pSound, 0.0, fadeInTime);
         pSound->flags |= SITHSOUNDFLAG_FADING;
     }
     return 1;

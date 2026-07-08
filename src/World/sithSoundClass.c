@@ -574,11 +574,11 @@ sithPlayingSound* sithSoundClass_PlayModeEntry(sithThing *thing, sithSoundClassE
     
     if (entry->playflags & SITHSOUNDFLAG_ABSOLUTE) {
         //printf("absolute\n");
-        return sithSoundMixer_PlaySoundPosAbsolute(pSithSound, &thing->position, thing->sector, entry->maxVolume * a3, entry->minRadius, entry->maxRadius, entry->playflags);
+        return sithSoundMixer_PlaySoundPos(pSithSound, &thing->position, thing->sector, entry->maxVolume * a3, entry->minRadius, entry->maxRadius, entry->playflags);
     }
     else {
         //printf("thing\n");
-        return sithSoundMixer_PlaySoundPosThing(pSithSound, thing, entry->maxVolume * a3, entry->minRadius, entry->maxRadius, entry->playflags);
+        return sithSoundMixer_PlaySoundThing(pSithSound, thing, entry->maxVolume * a3, entry->minRadius, entry->maxRadius, entry->playflags);
     }
 }
 
