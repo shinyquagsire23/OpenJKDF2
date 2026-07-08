@@ -942,9 +942,9 @@ stdGob_Free	.text	004364D0	0000008E	00000008	00000004	R	.	.	.	.	.	T	.
 stdGob_FreeEntry	.text	00436560	00000070	00000008	00000004	R	.	.	.	.	.	T	.
 stdGob_FileOpen	.text	004365D0	00000087	00000008	00000008	R	.	.	.	.	.	T	.
 stdGob_FileClose	.text	00436660	00000020	00000000	00000004	R	.	.	.	.	.	T	.
-stdGob_FSeek	.text	00436680	00000059	00000000	0000000C	R	.	.	.	.	.	T	.
-stdGob_FTell	.text	004366E0	00000008	00000000	00000004	R	.	.	.	.	.	T	.
-stdGob_FEof	.text	004366F0	0000001A	00000004	00000004	R	.	.	.	.	.	T	.
+stdGob_FileSeek	.text	00436680	00000059	00000000	0000000C	R	.	.	.	.	.	T	.
+stdGob_FileTell	.text	004366E0	00000008	00000000	00000004	R	.	.	.	.	.	T	.
+stdGob_FileEOF	.text	004366F0	0000001A	00000004	00000004	R	.	.	.	.	.	T	.
 stdGob_FileRead	.text	00436710	00000071	00000004	0000000C	R	.	.	.	.	.	T	.
 stdGob_FileGets	.text	00436790	00000092	00000004	0000000C	R	.	.	.	.	.	T	.
 stdGob_FileGetws	.text	00436830	00000091	00000004	0000000C	R	.	.	.	.	.	T	.

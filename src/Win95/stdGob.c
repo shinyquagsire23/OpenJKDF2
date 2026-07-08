@@ -282,7 +282,7 @@ void stdGob_FileClose(stdGobFile *f)
     }
 }
 
-int stdGob_FSeek(stdGobFile *f, int pos, int whence)
+int stdGob_FileSeek(stdGobFile *f, int pos, int whence)
 {
     int seekOffsAbsolute;
     stdGob *gob;
@@ -312,12 +312,12 @@ int stdGob_FSeek(stdGobFile *f, int pos, int whence)
     return 1;
 }
 
-int32_t stdGob_FTell(stdGobFile *f)
+int32_t stdGob_FileTell(stdGobFile *f)
 {
     return f->seekOffs;
 }
 
-bool stdGob_FEof(stdGobFile *f)
+bool stdGob_FileEOF(stdGobFile *f)
 {
     int ret = 0;
     ret = f->seekOffs >= f->entry->fileSize - 1;

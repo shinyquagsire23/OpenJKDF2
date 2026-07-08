@@ -1376,9 +1376,9 @@ void do_hooks()
     hook_function(stdGob_FreeEntry_ADDR, stdGob_FreeEntry);
     hook_function(stdGob_FileOpen_ADDR, stdGob_FileOpen);
     hook_function(stdGob_FileClose_ADDR, stdGob_FileClose);
-    hook_function(stdGob_FSeek_ADDR, stdGob_FSeek);
-    hook_function(stdGob_FTell_ADDR, stdGob_FTell);
-    hook_function(stdGob_FEof_ADDR, stdGob_FEof);
+    hook_function(stdGob_FileSeek_ADDR, stdGob_FileSeek);
+    hook_function(stdGob_FileTell_ADDR, stdGob_FileTell);
+    hook_function(stdGob_FileEOF_ADDR, stdGob_FileEOF);
     hook_function(stdGob_FileRead_ADDR, stdGob_FileRead);
     hook_function(stdGob_FileGets_ADDR, stdGob_FileGets);
     hook_function(stdGob_FileGetws_ADDR, stdGob_FileGetws);

@@ -623,7 +623,7 @@ int jkRes_FEof(stdFile_t fd)
     if ( resFile->useLowLevel )
         return pLowLevelHS->fileEof(resFile->fsHandle);
     else
-        return stdGob_FEof(resFile->gobHandle);
+        return stdGob_FileEOF(resFile->gobHandle);
 }
 
 int jkRes_FTell(stdFile_t fd)
@@ -632,7 +632,7 @@ int jkRes_FTell(stdFile_t fd)
     if ( resFile->useLowLevel )
         return pLowLevelHS->ftell(resFile->fsHandle);
     else
-        return stdGob_FTell(resFile->gobHandle);
+        return stdGob_FileTell(resFile->gobHandle);
 }
 
 int jkRes_FSeek(stdFile_t fd, int offs, int whence)
@@ -641,7 +641,7 @@ int jkRes_FSeek(stdFile_t fd, int offs, int whence)
     if ( resFile->useLowLevel )
         return pLowLevelHS->fseek(resFile->fsHandle, offs, whence);
     else
-        return stdGob_FSeek(resFile->gobHandle, offs, whence);
+        return stdGob_FileSeek(resFile->gobHandle, offs, whence);
 }
 
 int jkRes_FileSize(stdFile_t fd)

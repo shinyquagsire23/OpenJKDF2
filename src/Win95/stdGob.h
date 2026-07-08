@@ -14,9 +14,9 @@
 #define stdGob_FreeEntry_ADDR (0x00436560)
 #define stdGob_FileOpen_ADDR (0x004365D0)
 #define stdGob_FileClose_ADDR (0x00436660)
-#define stdGob_FSeek_ADDR (0x00436680)
-#define stdGob_FTell_ADDR (0x004366E0)
-#define stdGob_FEof_ADDR (0x004366F0)
+#define stdGob_FileSeek_ADDR (0x00436680)
+#define stdGob_FileTell_ADDR (0x004366E0)
+#define stdGob_FileEOF_ADDR (0x004366F0)
 #define stdGob_FileRead_ADDR (0x00436710)
 #define stdGob_FileGets_ADDR (0x00436790)
 #define stdGob_FileGetws_ADDR (0x00436830)
@@ -93,9 +93,9 @@ void stdGob_Free(stdGob *gob);
 void stdGob_FreeEntry(stdGob *gob);
 stdGobFile* stdGob_FileOpen(stdGob *gob, const char *filepath);
 void stdGob_FileClose(stdGobFile *f);
-int stdGob_FSeek(stdGobFile *f, int pos, int whence);
-int32_t stdGob_FTell(stdGobFile *f);
-bool stdGob_FEof(stdGobFile *f);
+int stdGob_FileSeek(stdGobFile *f, int pos, int whence);
+int32_t stdGob_FileTell(stdGobFile *f);
+bool stdGob_FileEOF(stdGobFile *f);
 size_t stdGob_FileRead(stdGobFile *f, void *out, uint32_t len);
 const char* stdGob_FileGets(stdGobFile *f, char *out, unsigned int len);
 const wchar_t* stdGob_FileGetws(stdGobFile *f, wchar_t *out, unsigned int len);
