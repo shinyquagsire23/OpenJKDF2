@@ -273,7 +273,7 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
                 if (v25 & 1)
                 {
                     rdVector_Copy3(&v89, &v24->pos);
-                    rdVector_MultAcc3(&v89, &v24->vel, v23);
+                    rdVector_ScaleAdd3Acc(&v89, &v24->vel, v23);
                 }
                 else
                 {
@@ -282,7 +282,7 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
                 if (v25 & 2)
                 {
                     rdVector_Copy3(&tmp1, &v24->orientation);
-                    rdVector_MultAcc3(&tmp1, &v24->angVel, v23);
+                    rdVector_ScaleAdd3Acc(&tmp1, &v24->angVel, v23);
                 }
                 else
                 {
@@ -353,8 +353,8 @@ void rdPuppet_BuildJointMatrices(rdThing *thing, rdMatrix34 *matrix)
                 rdVector_Scale3Acc(&v91, v45);
             }
             v46 = 1.0 - v70;
-            rdVector_MultAcc3(&a4, &v90, v46);
-            rdVector_MultAcc3(&a3, &v91, v46);
+            rdVector_ScaleAdd3Acc(&a4, &v90, v46);
+            rdVector_ScaleAdd3Acc(&a3, &v91, v46);
         }
 
         rdVector_NormalizeAngleAcute3(&a3);

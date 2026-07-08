@@ -197,7 +197,7 @@ int sithAICmd_Follow(sithActor *actor, sithAIClassEntry *aiclass, sithActorInsti
                 rdVector_Rotate3(&a1, &actor->thing->lookOrientation.lvec, &a4a);
             }
             rdVector_Copy3(&a2, &actor->thing->position);
-            rdVector_MultAcc3(&a2, &a1, FLEX(0.7));
+            rdVector_ScaleAdd3Acc(&a2, &a1, FLEX(0.7));
             sithAI_SetLookFrame(actor, &a2);
             sithAI_SetMoveThing(actor, &a2, FLEX(2.0));
             return 0;
@@ -260,7 +260,7 @@ int sithAICmd_Follow(sithActor *actor, sithAIClassEntry *aiclass, sithActorInsti
             }
 
             rdVector_Copy3(&arg8a, &actor->thing->position);
-            rdVector_MultAcc3(&arg8a, &actor->field_228, v16);
+            rdVector_ScaleAdd3Acc(&arg8a, &actor->field_228, v16);
             if ( (actor->thing->physicsParams.physflags & SITH_PF_FLY) != 0 )
             {
                 arg8a.z = v7->position.z - -0.02;
@@ -599,7 +599,7 @@ int sithAICmd_PrimaryFire(sithActor *actor, sithAIClassEntry *aiclass, sithActor
             if (actor->pDistractor && actor->pDistractor->moveType == SITH_MT_PHYSICS )
             {
                 rdVector_Copy3(&v18, &actor->pDistractor->position);
-                rdVector_MultAcc3(&v18, &actor->pDistractor->physicsParams.vel, 0.5);
+                rdVector_ScaleAdd3Acc(&v18, &actor->pDistractor->physicsParams.vel, 0.5);
                 sithAI_SetLookFrame(actor, &v18);
             }
         }
@@ -703,7 +703,7 @@ int sithAICmd_TurretFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorI
         else
         {
             rdVector_Copy3(&v35, &v16->physicsParams.vel);
-            rdVector_MultAcc3(&v35, &actor->attackError, v8->physicsParams.vel.y);
+            rdVector_ScaleAdd3Acc(&v35, &actor->attackError, v8->physicsParams.vel.y);
 
             rdVector_Normalize3Acc(&v35);
             v20 = &actor->thing->lookOrientation;
@@ -1079,18 +1079,18 @@ int sithAICmd_Jump(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinc
             return 0;
 
         rdVector_Copy3(&pos, &actorThing->position);
-        rdVector_MultAcc3(&pos, &_actor->toMovePos, aiclass->argsAsFloat[2]);
+        rdVector_ScaleAdd3Acc(&pos, &_actor->toMovePos, aiclass->argsAsFloat[2]);
 
         if ( sithAI_CanWalk(_actor, &pos, 0) )
         {
-            rdVector_MultAcc3(&actorThing->physicsParams.vel, &_actor->toMovePos, 0.1);
+            rdVector_ScaleAdd3Acc(&actorThing->physicsParams.vel, &_actor->toMovePos, 0.1);
             sithAI_Jump(_actor, &_actor->movePos, 1.0);
             return 1;
         }
         return 1;
     }
     rdVector_Copy3(&tmpPos, &actorThing->position);
-    rdVector_MultAcc3(&tmpPos, &rdroid_zVector3, aiclass->argsAsFloat[1]);
+    rdVector_ScaleAdd3Acc(&tmpPos, &rdroid_zVector3, aiclass->argsAsFloat[1]);
     sithSector* result = sithCollision_FindSectorInRadius(actorSector, &actorThing->position, &tmpPos, 0.0);
     if ( result )
     {
@@ -1180,7 +1180,7 @@ int sithAICmd_Flee(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinc
                 rdVector_Rotate3(&a5, &actor->toMovePos, &v19);
             }
             rdVector_Copy3(&movePos, &actor->thing->position);
-            rdVector_MultAcc3(&movePos, &a5, aiclass1a);
+            rdVector_ScaleAdd3Acc(&movePos, &a5, aiclass1a);
             sithAI_SetMoveThing(actor, &movePos, 2.5);
             sithAI_SetLookFrame(actor, &movePos);
             result = 0;
@@ -1247,7 +1247,7 @@ int sithAICmd_Withdraw(sithActor *actor, sithAIClassEntry *aiclass, sithActorIns
                 v13 = actor->thing;
             }
             rdVector_Copy3(&movePos, &v13->position);
-            rdVector_MultAcc3(&movePos, &a5, aiclass->argsAsFloat[1]);
+            rdVector_ScaleAdd3Acc(&movePos, &a5, aiclass->argsAsFloat[1]);
             sithAI_SetMoveThing(actor, &movePos, 1.5);
             result = 0;
         }
@@ -1282,7 +1282,7 @@ int sithAICmd_Dodge(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstin
             rdVector_Sub3(&a5, &vAngs, &actor->thing->position);
             tmp = rdVector_Normalize3Acc(&a5);
             rdVector_Copy3(&movePos, &actor->thing->position);
-            rdVector_MultAcc3(&movePos, &a5, -aiclass->argsAsFloat[1]);
+            rdVector_ScaleAdd3Acc(&movePos, &a5, -aiclass->argsAsFloat[1]);
             sithAI_SetMoveThing(actor, &movePos, 2.5);
             actor->field_28C = sithTime_curMs + 1000;
             return 0;
@@ -1304,7 +1304,7 @@ int sithAICmd_Dodge(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstin
                       && !sithAI_CheckSightThing(actor->thing, &actor->thing->position, v16->field_58[2], actor->pAIClass->fov, 1.0, 0.0, &a5, &tmp) )
                     {
                         rdVector_Copy3(&movePos, &actor->thing->position);
-                        rdVector_MultAcc3(&movePos, &a5, -aiclass->argsAsFloat[0]);
+                        rdVector_ScaleAdd3Acc(&movePos, &a5, -aiclass->argsAsFloat[0]);
                         sithAI_SetMoveThing(actor, &movePos, 2.5);
                         actor->field_28C = sithTime_curMs + 1000;
                         sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_CURIOUS);
@@ -1329,7 +1329,7 @@ int sithAICmd_Dodge(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstin
         vAngs.y = -vAngs.y;
     rdVector_Rotate3Acc(&a5, &vAngs);
     rdVector_Copy3(&movePos, &actor->thing->position);
-    rdVector_MultAcc3(&movePos, &a5, -aiclass->argsAsFloat[1]);
+    rdVector_ScaleAdd3Acc(&movePos, &a5, -aiclass->argsAsFloat[1]);
     sithAI_SetMoveThing(actor, &movePos, 2.5);
     return 0;
 }
@@ -1357,7 +1357,7 @@ int sithAICmd_RandomTurn(sithActor *actor, sithAIClassEntry *aiclass, sithActorI
     rdVector_Scale3(&vAngs, &rdroid_yVector3, _frand() * 360.0);
     rdVector_Rotate3Acc(&out, &vAngs);
     rdVector_Copy3(&arg8, &actor->thing->position);
-    rdVector_MultAcc3(&arg8, &out, aiclass->argsAsFloat[1]);
+    rdVector_ScaleAdd3Acc(&arg8, &out, aiclass->argsAsFloat[1]);
     result = sithAI_sub_4EB300(actor->thing, &actor->thing->position, &arg8, -1.0, aiclass->argsAsFloat[1], 0.0, &a5, &tmp);
     if ( !result )
         sithAI_SetLookFrame(actor, &arg8);
@@ -1387,13 +1387,13 @@ int sithAICmd_Roam(sithActor *actor, sithAIClassEntry *aiclass, sithActorInstinc
         {
             randVal = _frand() * -aiclass->argsAsFloat[1];
             rdVector_Copy3(&movePos, &actor->thing->position);
-            rdVector_MultAcc3(&movePos, &v16, randVal);
+            rdVector_ScaleAdd3Acc(&movePos, &v16, randVal);
         }
         else
         {
             randVal = _frand() * aiclass->argsAsFloat[1];
             rdVector_Copy3(&movePos, &actor->position);
-            rdVector_MultAcc3(&movePos, &v16, randVal);
+            rdVector_ScaleAdd3Acc(&movePos, &v16, randVal);
         }
         sithAI_SetLookFrame(actor, &movePos);
         sithAI_SetMoveThing(actor, &movePos, 1.0);

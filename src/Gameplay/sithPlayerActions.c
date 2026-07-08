@@ -101,7 +101,7 @@ void sithPlayerActions_JumpWithVel(sithThing *thing, flex_t vel)
             final_vel = final_vel * 0.7;
         if ( (thing->physicsParams.physflags & SITH_PF_WATERSURFACE) != 0 )
         {
-            rdVector_MultAcc3(&thing->physicsParams.vel, &rdroid_zVector3, final_vel);
+            rdVector_ScaleAdd3Acc(&thing->physicsParams.vel, &rdroid_zVector3, final_vel);
             thing->physicsParams.physflags &= ~SITH_PF_WATERSURFACE;
         }
         else
@@ -110,7 +110,7 @@ void sithPlayerActions_JumpWithVel(sithThing *thing, flex_t vel)
                 return;
             isAttachedAndIsSurface = (thing->attach_flags & (SITH_ATTACH_THING|SITH_ATTACH_THINGSURFACE)) == 0;
             
-            rdVector_MultAcc3(&thing->physicsParams.vel, &rdroid_zVector3, final_vel);
+            rdVector_ScaleAdd3Acc(&thing->physicsParams.vel, &rdroid_zVector3, final_vel);
             if ( isAttachedAndIsSurface )
             {
                 sithSurface* pAttachedSurface = thing->attachedSurface;
@@ -235,7 +235,7 @@ sithThing* sithPlayerActions_SpawnThingAtLookAt(sithThing *pPlayerThing, sithThi
                 rdVector_Copy3(&tmp, &thingPos);
                 rdVector_Copy3(&tmp2, &searchResult->surface->surfaceInfo.face.normal);
                 rdVector_Scale3Acc(&tmp2, pTemplate->moveSize / 2);
-                rdVector_MultAcc3(&tmp, &out.lvec, searchResult->distance - 0.001);
+                rdVector_ScaleAdd3Acc(&tmp, &out.lvec, searchResult->distance - 0.001);
                 rdVector_Add3Acc(&tmp, &tmp2);
                 pSpawned->position = tmp;
 
@@ -259,7 +259,7 @@ sithThing* sithPlayerActions_SpawnThingAtLookAt(sithThing *pPlayerThing, sithThi
 
         rdVector3 tmp;
         rdVector_Copy3(&tmp, &pPlayerThing->position);
-        rdVector_MultAcc3(&tmp, &out.lvec, a6);
+        rdVector_ScaleAdd3Acc(&tmp, &out.lvec, a6);
         pSpawned->position = tmp;
     }
 

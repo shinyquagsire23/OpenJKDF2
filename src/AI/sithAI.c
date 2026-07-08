@@ -828,7 +828,7 @@ LABEL_15:
                     else
                     {
                         rdVector_Copy3(&a4, &v3->position);
-                        rdVector_MultAcc3(&a4, &v3->physicsParams.vel, deltaSeconds);
+                        rdVector_ScaleAdd3Acc(&a4, &v3->physicsParams.vel, deltaSeconds);
                         v18 = sithCollision_FindSectorInRadius(v3->sector, &v3->position, &a4, 0.0);
                         if ( !v18 || (v18->flags & SITH_SECTOR_UNDERWATER) == 0 )
                             goto LABEL_22;
@@ -850,7 +850,7 @@ LABEL_22:
             if (!rdVector_IsZero3(&tmp))
             {
                 rdVector_Copy3(&a4, &v3->position);
-                rdVector_MultAcc3(&a4, &v3->physicsParams.vel, deltaSeconds);
+                rdVector_ScaleAdd3Acc(&a4, &v3->physicsParams.vel, deltaSeconds);
                 if ( !sithAI_CanWalk(actor, &a4, 0) )
                 {
                     rdVector_Zero3(&v3->physicsParams.vel);

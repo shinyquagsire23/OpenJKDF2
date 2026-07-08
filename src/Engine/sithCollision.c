@@ -352,7 +352,7 @@ void sithCollision_SearchForSurfaceCollisions(sithSector *sector, const rdVector
     //if (!sector) return;
 
     rdVector_Copy3(&tmp, vec1);
-    rdVector_MultAcc3(&tmp, vec2, a4);
+    rdVector_ScaleAdd3Acc(&tmp, vec2, a4);
 
     if(sithIntersect_IsSphereInSectorBox(&tmp, a5, sector))
     {
@@ -569,7 +569,7 @@ sithSector* sithCollision_FindSectorInRadius(sithSector *pStartSector, const rdV
         if ( (v9->hitType & SITHCOLLISION_ADJOINCROSS) == 0 )
         {
             rdVector_Copy3(pEndPos, pStartPos);
-            rdVector_MultAcc3(pEndPos, &a1, v9->distance);
+            rdVector_ScaleAdd3Acc(pEndPos, &a1, v9->distance);
             break;
         }
         pStartSector = v9->surface->adjoin->sector;
@@ -734,7 +734,7 @@ LABEL_78:
                 if ( v19->distance != 0.0 )
                 {
                     rdVector_Copy3(&v5->position, &posCopy);
-                    rdVector_MultAcc3(&v5->position, &direction, v19->distance);
+                    rdVector_ScaleAdd3Acc(&v5->position, &direction, v19->distance);
                 }
                 if ( v19->distance >= (flex_d_t)a6 )
                 {
@@ -750,7 +750,7 @@ LABEL_78:
                     {
                         v30 = 1.0 - v19->distance / a6;
                         v65 = v30;
-                        rdVector_MultAcc3(&v5->physicsParams.vel, &v5->physicsParams.addedVelocity, -v30);
+                        rdVector_ScaleAdd3Acc(&v5->physicsParams.vel, &v5->physicsParams.addedVelocity, -v30);
                     }
                 }
                 if ( (v19->hitType & SITHCOLLISION_THING) != 0 )
@@ -830,7 +830,7 @@ LABEL_78:
             {
                 v44 = v64 + a6;
                 rdVector_Copy3(&v5->position, &posCopy);
-                rdVector_MultAcc3(&v5->position, &direction, a6);
+                rdVector_ScaleAdd3Acc(&v5->position, &direction, a6);
                 rdVector_Zero3(&v5->field_268);
                 a6 = 0.0;
                 v64 = v44;
@@ -1075,23 +1075,23 @@ int sithCollision_CollideHurt(sithThing *a1, rdVector3 *a2, flex_t a3, int a4)
         else
         {
             v10 = -rdVector_Dot3(&a1->physicsParams.vel, a2);
-            rdVector_MultAcc3(&a1->field_268, a2, amount);
+            rdVector_ScaleAdd3Acc(&a1->field_268, a2, amount);
             if ( v10 > 0.0 )
             {
-                rdVector_MultAcc3(&a1->physicsParams.vel, a2, v10);
+                rdVector_ScaleAdd3Acc(&a1->physicsParams.vel, a2, v10);
             }
             v19 = -rdVector_Dot3(a2, &sithCollision_collideHurtIdk);
-            rdVector_MultAcc3(&sithCollision_collideHurtIdk, a2, v19);
+            rdVector_ScaleAdd3Acc(&sithCollision_collideHurtIdk, a2, v19);
             rdVector_Normalize3Acc(&sithCollision_collideHurtIdk);
             v22 = -rdVector_Dot3(&a1->physicsParams.vel, &sithCollision_collideHurtIdk);
             if ( v22 > 0.0 )
             {
-                rdVector_MultAcc3(&a1->physicsParams.vel, &sithCollision_collideHurtIdk, v22);
+                rdVector_ScaleAdd3Acc(&a1->physicsParams.vel, &sithCollision_collideHurtIdk, v22);
             }
             v26 = -rdVector_Dot3(&a1->field_268, &sithCollision_collideHurtIdk);
             if ( v26 > 0.0 )
             {
-                rdVector_MultAcc3(&a1->field_268, &sithCollision_collideHurtIdk, v26);
+                rdVector_ScaleAdd3Acc(&a1->field_268, &sithCollision_collideHurtIdk, v26);
             }
             result = 1;
         }
@@ -1109,7 +1109,7 @@ int sithCollision_CollideHurt(sithThing *a1, rdVector3 *a2, flex_t a3, int a4)
         if ( v35 > 0.0 )
         {
             v36 = v43 * v35;
-            rdVector_MultAcc3(&a1->physicsParams.vel, a2, v36);
+            rdVector_ScaleAdd3Acc(&a1->physicsParams.vel, a2, v36);
             if ( !a4 && v35 > 2.5 )
             {
                 v39 = (v35 - 2.5) * (v35 - 2.5) * 45.0;
@@ -1122,7 +1122,7 @@ int sithCollision_CollideHurt(sithThing *a1, rdVector3 *a2, flex_t a3, int a4)
             }
         }
         v40 = v43 * a1a;
-        rdVector_MultAcc3(&a1->field_268, a2, v40);
+        rdVector_ScaleAdd3Acc(&a1->field_268, a2, v40);
         result = 1;
     }
     return result;

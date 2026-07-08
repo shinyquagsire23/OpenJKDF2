@@ -132,7 +132,7 @@ int sithIntersect_CheckSphereThingIntersection(sithThing *pThing, const rdVector
     if (!bFaceCollision && MOTS_ONLY_COND(!bIsTreeCollide))
     {
         rdVector_Sub3(a11, a2, &a6->position);
-        rdVector_MultAcc3(a11, a3, unkOut);
+        rdVector_ScaleAdd3Acc(a11, a3, unkOut);
         rdVector_Normalize3Acc(a11);
         *a8 = unkOut;
         return SITHCOLLISION_THING;
@@ -165,7 +165,7 @@ int sithIntersect_CheckSphereThingIntersection(sithThing *pThing, const rdVector
         }
 
         rdVector_Copy3(a11, &posVec);
-        rdVector_MultAcc3(a11, &dirVec, tmp);
+        rdVector_ScaleAdd3Acc(a11, &dirVec, tmp);
         rdVector_Sub3Acc(a11, &tmpVec);
         rdVector_Normalize3Acc(a11);
         
@@ -349,7 +349,7 @@ LABEL_11:
     rdVector3 tmp2, tmp3;
     rdVector_Copy3(&tmp2, pSpherePos);
     rdVector_Copy3(&tmp3, pStartPos);
-    rdVector_MultAcc3(&tmp3, pRayDirection, v15);
+    rdVector_ScaleAdd3Acc(&tmp3, pRayDirection, v15);
 
     v21 = rdVector_Dist3(&tmp2, &tmp3);
     if ( v21 >= v33 )
@@ -528,7 +528,7 @@ int sithIntersect_CheckSphereFaceHitVerticesIntersection(rdVector3 *a1, flex_t a
                         rdVector_Copy3(&v29, v14);
                         
                         // projected point
-                        rdVector_MultAcc3(&v29, &a1a, v34);
+                        rdVector_ScaleAdd3Acc(&v29, &a1a, v34);
                         v19 = SITHCOLLISION_THINGCROSS;
                     }
                     else
@@ -629,7 +629,7 @@ int sithIntersect_CheckSphereFaceIntersectionEx(const rdVector3 *pStartPos, cons
                 v37 = stdMath_ClipPrecision(v37);
                 if ( v37 != 0.0 )
                 {
-                    rdVector_MultAcc3(&v45, &pFace->normal, -v37);
+                    rdVector_ScaleAdd3Acc(&v45, &pFace->normal, -v37);
                 }
             }
             else
@@ -642,7 +642,7 @@ int sithIntersect_CheckSphereFaceIntersectionEx(const rdVector3 *pStartPos, cons
                 if ( v21 != 0.0 )
                 {
                     v25 = -v21;
-                    rdVector_MultAcc3(&v45, &pFace->normal, v25);
+                    rdVector_ScaleAdd3Acc(&v45, &pFace->normal, v25);
                 }
             }
             if ( pPushVelOut )
@@ -717,7 +717,7 @@ int sithIntersect_CheckSphereFaceIntersection(const rdVector3 *pStartPos, const 
         if ( radius == 0.0 )
         {
             rdVector_Copy3(&v15, pStartPos);
-            rdVector_MultAcc3(&v15, pRayDirection, *pSphereHitDist);
+            rdVector_ScaleAdd3Acc(&v15, pRayDirection, *pSphereHitDist);
             
             int tmp = 0;
             result = sithIntersect_TestSphereFaceHit(&v15, radius, &v8->face, a6, &tmp);

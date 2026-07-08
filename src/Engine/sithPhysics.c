@@ -218,7 +218,7 @@ void sithPhysics_ApplyForce(sithThing *pThing, rdVector3 *forceVec)
         if ( forceVec->z * invMass > 0.5 ) // TODO verify
             sithThing_DetachThing(pThing);
 
-        rdVector_MultAcc3(&pThing->physicsParams.vel, forceVec, invMass);
+        rdVector_ScaleAdd3Acc(&pThing->physicsParams.vel, forceVec, invMass);
         pThing->physicsParams.physflags |= SITH_PF_8000;
     }
 }
@@ -278,7 +278,7 @@ void sithPhysics_ApplyDrag(rdVector3 *vec, flex_t drag, flex_t mag, flex_t delta
             if (scaled > 1.0)
                 scaled = 1.0;
 
-            rdVector_MultAcc3(vec, vec, -scaled);
+            rdVector_ScaleAdd3Acc(vec, vec, -scaled);
             
             rdMath_ClipVector3Acc(vec, 0.00001);
         }
@@ -425,7 +425,7 @@ void sithPhysics_UpdateThingPhysics(sithThing *pThing, flex_t deltaSeconds)
             sithPhysics_ApplyDrag(&pThing->physicsParams.angVel, pThing->physicsParams.airDrag - -0.2, 0.0, deltaSeconds);
         }
 
-        rdVector_MultAcc3(&pThing->physicsParams.angVel, &pThing->physicsParams.field_1F8, deltaSeconds);
+        rdVector_ScaleAdd3Acc(&pThing->physicsParams.angVel, &pThing->physicsParams.field_1F8, deltaSeconds);
         
         rdMath_ClampVector3Acc(&pThing->physicsParams.angVel, -pThing->physicsParams.maxRotVel, pThing->physicsParams.maxRotVel);
         rdMath_ClipVector3Acc(&pThing->physicsParams.angVel, 0.00001);
@@ -517,7 +517,7 @@ void sithPhysics_UpdateThingPhysics(sithThing *pThing, flex_t deltaSeconds)
         && (pThing->sector->flags & SITH_SECTOR_HASTHRUST) 
         && !(pThing->physicsParams.physflags & SITH_PF_NOTHRUST))
     {
-        rdVector_MultAcc3(&a1a, &pThing->sector->thrust, deltaSeconds);
+        rdVector_ScaleAdd3Acc(&a1a, &pThing->sector->thrust, deltaSeconds);
     }
 
     if (pThing->physicsParams.mass != 0.0 
@@ -562,7 +562,7 @@ void sithPhysics_UpdatePlayerPhysics(sithThing *player, flex_t deltaSeconds)
             sithPhysics_ApplyDrag(&player->physicsParams.angVel, player->physicsParams.airDrag - -0.2, 0.0, deltaSeconds);
         }
 
-        rdVector_MultAcc3(&player->physicsParams.angVel, &player->physicsParams.field_1F8, deltaSeconds);
+        rdVector_ScaleAdd3Acc(&player->physicsParams.angVel, &player->physicsParams.field_1F8, deltaSeconds);
 
         rdMath_ClampVector3Acc(&player->physicsParams.angVel, -player->physicsParams.maxRotVel, player->physicsParams.maxRotVel);
         rdMath_ClipVector3Acc(&player->physicsParams.angVel, 0.00001);
@@ -660,7 +660,7 @@ void sithPhysics_UpdatePlayerPhysics(sithThing *player, flex_t deltaSeconds)
             if ((player->sector->flags & SITH_SECTOR_HASTHRUST)
                 && !(player->physicsParams.physflags & SITH_PF_NOTHRUST))
             {
-                rdVector_MultAcc3(&a1a, &player->sector->thrust, OLDSTEP_DELTA_50FPS);
+                rdVector_ScaleAdd3Acc(&a1a, &player->sector->thrust, OLDSTEP_DELTA_50FPS);
             }
         }
 
@@ -675,7 +675,7 @@ void sithPhysics_UpdatePlayerPhysics(sithThing *player, flex_t deltaSeconds)
             player->physicsParams.addedVelocity.z = -gravity;
         }
         rdVector_Add3Acc(&player->physicsParams.vel, &a1a);
-        rdVector_MultAcc3(&player->physicsParams.velocityMaybe, &player->physicsParams.vel, OLDSTEP_DELTA_50FPS);
+        rdVector_ScaleAdd3Acc(&player->physicsParams.velocityMaybe, &player->physicsParams.vel, OLDSTEP_DELTA_50FPS);
     }
 }
 
@@ -696,7 +696,7 @@ void sithPhysics_UpdateUnderwaterThingPhysics(sithThing *pThing, flex_t deltaSec
         {
             sithPhysics_ApplyDrag(&pThing->physicsParams.angVel, pThing->physicsParams.airDrag - -0.2, 0.0, deltaSeconds);
         }
-        rdVector_MultAcc3(&pThing->physicsParams.angVel, &pThing->physicsParams.field_1F8, deltaSeconds);
+        rdVector_ScaleAdd3Acc(&pThing->physicsParams.angVel, &pThing->physicsParams.field_1F8, deltaSeconds);
         rdVector_ClampValue3(&pThing->physicsParams.angVel, pThing->physicsParams.maxRotVel);
         rdVector_ClipPrecision3(&pThing->physicsParams.angVel);
     }
@@ -728,7 +728,7 @@ void sithPhysics_UpdateUnderwaterThingPhysics(sithThing *pThing, flex_t deltaSec
     }
     if ( pThing->physicsParams.mass != 0.0 && pThing->sector && (pThing->sector->flags & SITH_SECTOR_HASTHRUST) && !(pThing->physicsParams.physflags & SITH_PF_NOTHRUST) )
     {
-        rdVector_MultAcc3(&a1a, &pThing->sector->thrust, deltaSeconds);
+        rdVector_ScaleAdd3Acc(&a1a, &pThing->sector->thrust, deltaSeconds);
     }
 
     if ( ((pThing->physicsParams.physflags & SITH_PF_WATERSURFACE) == 0 || (pThing->thingflags & SITH_TF_DEAD) != 0) && (pThing->physicsParams.physflags & SITH_PF_USEGRAVITY) != 0 )
@@ -753,7 +753,7 @@ void sithPhysics_UpdateUnderwaterThingPhysics(sithThing *pThing, flex_t deltaSec
         {
             if ( v51 >= deltaSeconds * 0.2 )
                 v51 = deltaSeconds * 0.2;
-            rdVector_MultAcc3(&pThing->physicsParams.velocityMaybe, &rdroid_zVector3, v51);
+            rdVector_ScaleAdd3Acc(&pThing->physicsParams.velocityMaybe, &rdroid_zVector3, v51);
         }
     }
 }
@@ -905,7 +905,7 @@ void sithPhysics_UpdateAttachedThingPhysics(sithThing *pThing, flex_t deltaSecon
         {
             rdMatrix_TransformVector34(&out, &pThing->physicsParams.vel, &a);
             rdVector_Scale3Acc(&pThing->physicsParams.vel, 1.0 - possibly_undef_2);
-            rdVector_MultAcc3(&pThing->physicsParams.vel, &out, possibly_undef_2);
+            rdVector_ScaleAdd3Acc(&pThing->physicsParams.vel, &out, possibly_undef_2);
         }
         if ( (((jkPlayer_currentTickIdx & 0xFF) + (pThing->thingIdx & 0xFF)) & 7) == 0 )
             rdMatrix_Normalize34(&pThing->lookOrientation);
@@ -972,7 +972,7 @@ void sithPhysics_UpdateAttachedThingPhysics(sithThing *pThing, flex_t deltaSecon
                 {
                     sithPhysics_ApplyDrag(&pThing->physicsParams.angVel, pThing->physicsParams.airDrag - -0.2, 0.0, deltaSeconds);
                 }
-                rdVector_MultAcc3(&pThing->physicsParams.angVel, &pThing->physicsParams.field_1F8, deltaSeconds);
+                rdVector_ScaleAdd3Acc(&pThing->physicsParams.angVel, &pThing->physicsParams.field_1F8, deltaSeconds);
 
                 rdVector_ClampValue3(&pThing->physicsParams.angVel, pThing->physicsParams.maxRotVel);
                 rdVector_ClipPrecision3(&pThing->physicsParams.angVel);
@@ -1011,7 +1011,7 @@ void sithPhysics_UpdateAttachedThingPhysics(sithThing *pThing, flex_t deltaSecon
               && (pThing->sector->flags & SITH_SECTOR_HASTHRUST)
               && !(pThing->physicsParams.physflags & SITH_PF_NOTHRUST))
             {
-                rdVector_MultAcc3(&out, &pThing->sector->thrust, deltaSeconds);
+                rdVector_ScaleAdd3Acc(&out, &pThing->sector->thrust, deltaSeconds);
             }
 
             if ( pThing->physicsParams.mass != 0.0 && (pThing->physicsParams.physflags & SITH_PF_USEGRAVITY) != 0 && (pThing->sector->flags & SITH_PF_USEGRAVITY) == 0 )
@@ -1030,7 +1030,7 @@ void sithPhysics_UpdateAttachedThingPhysics(sithThing *pThing, flex_t deltaSecon
             }
             return;
         }
-        rdVector_MultAcc3(&vel_change, &pThing->sector->thrust, deltaSeconds);
+        rdVector_ScaleAdd3Acc(&vel_change, &pThing->sector->thrust, deltaSeconds);
     }
     rdVector_Add3Acc(&pThing->physicsParams.vel, &vel_change);
     
@@ -1061,7 +1061,7 @@ void sithPhysics_UpdateAttachedThingPhysics(sithThing *pThing, flex_t deltaSecon
             if (!(NEEDS_STEPPED_PHYS) && (deltaSeconds < CANONICAL_PHYS_TICKRATE))
                 v109 *= (deltaSeconds / CANONICAL_PHYS_TICKRATE);
 #endif
-            rdVector_MultAcc3(&pThing->physicsParams.vel, &attachedNormal, -v109);
+            rdVector_ScaleAdd3Acc(&pThing->physicsParams.vel, &attachedNormal, -v109);
         }
     }
 
@@ -1129,11 +1129,11 @@ void sithPhysics_UpdateAttachedThingPhysics(sithThing *pThing, flex_t deltaSecon
 
         if ( (pThing->physicsParams.physflags & SITH_PF_800) != 0 )
         {
-            rdVector_MultAcc3(&pThing->physicsParams.velocityMaybe, &rdroid_zVector3, -v131);
+            rdVector_ScaleAdd3Acc(&pThing->physicsParams.velocityMaybe, &rdroid_zVector3, -v131);
         }
         else
         {
-            rdVector_MultAcc3(&pThing->physicsParams.velocityMaybe, &attachedNormal, -v131);
+            rdVector_ScaleAdd3Acc(&pThing->physicsParams.velocityMaybe, &attachedNormal, -v131);
         }
     }
 }

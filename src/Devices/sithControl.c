@@ -1698,13 +1698,13 @@ void sithControl_FreeCam(sithThing *player)
 
                 rdMatrix_BuildRotate34(&a, &v1->actorParams.eyePYR);
                 rdVector_Zero3(&addVec);
-                rdVector_MultAcc3(&addVec, &rdroid_yVector3, sithControl_GetKeyAsAxis(INPUT_FUNC_FORWARD) * mult);
+                rdVector_ScaleAdd3Acc(&addVec, &rdroid_yVector3, sithControl_GetKeyAsAxis(INPUT_FUNC_FORWARD) * mult);
 #ifdef TARGET_RETRO_HOMEBREW
                 if (sithControl_GetKey(INPUT_FUNC_JUMP, &tmp)) {
-                    rdVector_MultAcc3(&addVec, &rdroid_zVector3, 1.0);
+                    rdVector_ScaleAdd3Acc(&addVec, &rdroid_zVector3, 1.0);
                 }
                 if (sithControl_GetKey(INPUT_FUNC_DUCK, &tmp)) {
-                    rdVector_MultAcc3(&addVec, &rdroid_zVector3, -1.0);
+                    rdVector_ScaleAdd3Acc(&addVec, &rdroid_zVector3, -1.0);
                 }
 #endif
 
@@ -1720,7 +1720,7 @@ void sithControl_FreeCam(sithThing *player)
 
                 rdMatrix_BuildRotate34(&a, &v1->actorParams.eyePYR);
                 rdVector_Zero3(&addVec);
-                rdVector_MultAcc3(&addVec, &rdroid_xVector3, (Main_bMotsCompat ? -1.0 : 1.0) * sithControl_GetKeyAsAxis(INPUT_FUNC_SLIDE));
+                rdVector_ScaleAdd3Acc(&addVec, &rdroid_xVector3, (Main_bMotsCompat ? -1.0 : 1.0) * sithControl_GetKeyAsAxis(INPUT_FUNC_SLIDE));
 
                 rdMatrix_TransformVector34Acc(&addVec, &a);
                 rdMatrix_TransformVector34Acc(&addVec, &v1->lookOrientation);

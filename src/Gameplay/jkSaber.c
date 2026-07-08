@@ -231,7 +231,7 @@ void  jkSaber_UpdateCollision2(sithThing *pPlayerThing,rdVector3 *pSaberPos,rdVe
         else if (searchResult->hitType & SITHCOLLISION_THING) 
         {
             rdVector_Copy3(&local_54, pSaberPos);
-            rdVector_MultAcc3(&local_54, pSaberDir, searchResult->distance);
+            rdVector_ScaleAdd3Acc(&local_54, pSaberDir, searchResult->distance);
 
             resultThing = searchResult->receiver;
 
@@ -311,7 +311,7 @@ void  jkSaber_UpdateCollision2(sithThing *pPlayerThing,rdVector3 *pSaberPos,rdVe
         else if (searchResult->hitType & SITHCOLLISION_WORLD)
         {
             rdVector_Copy3(&local_54, pSaberPos);
-            rdVector_MultAcc3(&local_54, pSaberDir, searchResult->distance - 0.001);
+            rdVector_ScaleAdd3Acc(&local_54, pSaberDir, searchResult->distance - 0.001);
             
             jkSaber_SpawnSparks(playerInfo, &local_54, pSectorIter, SPARKTYPE_WALL);
 
@@ -363,7 +363,7 @@ void jkSaber_UpdateCollision(sithThing *player, int joint, int bSecondary)
         return;
 
     rdVector_Copy3(&player->actorParams.saberBladePos, &jointMat.scale);
-    rdVector_MultAcc3(&player->actorParams.saberBladePos, &jointMat.lvec, playerInfo->polyline.length);
+    rdVector_ScaleAdd3Acc(&player->actorParams.saberBladePos, &jointMat.lvec, playerInfo->polyline.length);
 
     if ( player->jkFlags & JKFLAG_40 )
     {
@@ -410,10 +410,10 @@ void jkSaber_UpdateCollision(sithThing *player, int joint, int bSecondary)
         // This will step 0 times at 20fps, once at 10fps, twice at 5fps, etc
         for (; fVar1 < 1.0; fVar1 += stepAmount) {
             rdVector_Copy3(&lerpSaberPos, &lastJointMat.scale);
-            rdVector_MultAcc3(&lerpSaberPos, &lerpPosDelta, fVar1);
+            rdVector_ScaleAdd3Acc(&lerpSaberPos, &lerpPosDelta, fVar1);
 
             rdVector_Copy3(&lerpSaberDir, &lastJointMat.lvec);
-            rdVector_MultAcc3(&lerpSaberDir, &lerpDirDelta, fVar1);
+            rdVector_ScaleAdd3Acc(&lerpSaberDir, &lerpDirDelta, fVar1);
 
             jkSaber_UpdateCollision2(player,&lerpSaberPos,&lerpSaberDir,&playerInfo->saberCollideInfo);
         }

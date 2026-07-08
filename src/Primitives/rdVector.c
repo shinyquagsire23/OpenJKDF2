@@ -639,7 +639,7 @@ flex_t rdVector_DistSquared3(const rdVector3 *v1, const rdVector3 *v2)
     return rdVector_Dot3(&tmp,&tmp);
 }
 
-rdVector3* rdVector_MultAcc3(rdVector3 *v1, const rdVector3 *v2, flex_t scale)
+rdVector3* rdVector_ScaleAdd3Acc(rdVector3 *v1, const rdVector3 *v2, flex_t scale)
 {
     v1->x += v2->x * scale;
     v1->y += v2->y * scale;

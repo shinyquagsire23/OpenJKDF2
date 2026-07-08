@@ -584,7 +584,7 @@ sithSector* sithCamera_SearchSectorInRadius(sithThing *a3, sithSector *a2, rdVec
         else if ( (i->hitType & SITHCOLLISION_THING) == 0 || (i->receiver->type != SITH_THING_ITEM) && i->distance != 0.0 && i->receiver->type != SITH_THING_WEAPON )
         {
             rdVector_Copy3(a6, a4);
-            rdVector_MultAcc3(a6, &a5, i->distance);
+            rdVector_ScaleAdd3Acc(a6, &a5, i->distance);
             break;
         }
     }

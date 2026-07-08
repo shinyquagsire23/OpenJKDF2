@@ -328,7 +328,7 @@ void sithThing_UpdateMove(sithThing *pThing, flex_t deltaSecs)
         if ( (v5->surfaceFlags & SITH_SURFACE_SCROLLING) != 0 )
         {
             sithSurface_DetachThing(v5, &v8);
-            rdVector_MultAcc3(&pThing->field_268, &v8, deltaSecs);
+            rdVector_ScaleAdd3Acc(&pThing->field_268, &v8, deltaSecs);
         }
     }
     
@@ -1276,7 +1276,7 @@ void sithThing_AttachThingToThingFace(sithThing *a1, sithThing *a2, rdFace *a3, 
     }
     else if ( a2->moveType == SITH_MT_PATH )
     {
-        rdVector_MultAcc3(&a1->physicsParams.vel, &a2->trackParams.vel, -a2->trackParams.lerpSpeed);
+        rdVector_ScaleAdd3Acc(&a1->physicsParams.vel, &a2->trackParams.vel, -a2->trackParams.lerpSpeed);
     }
     rdVector_Sub3(&a2a, &a1->position, &a2->position);
     rdMatrix_TransformVectorOrtho34(&a1->field_4C, &a2a, &a2->lookOrientation);

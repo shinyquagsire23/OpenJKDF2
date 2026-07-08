@@ -128,7 +128,7 @@ MATH_FUNC void rdVector_ExtractAngle(const rdVector3 *v1, rdVector3 *out);
 // Added
 MATH_FUNC flex_t rdVector_Dist3(const rdVector3 *v1, const rdVector3 *v2);
 MATH_FUNC flex_t rdVector_DistSquared3(const rdVector3 *v1, const rdVector3 *v2);
-MATH_FUNC FAST_FUNC rdVector3* rdVector_MultAcc3(rdVector3 *v1, const rdVector3 *v2, flex_t scale);
+MATH_FUNC FAST_FUNC rdVector3* rdVector_ScaleAdd3Acc(rdVector3 *v1, const rdVector3 *v2, flex_t scale);
 MATH_FUNC void rdVector_Zero3(rdVector3 *v);
 MATH_FUNC void rdVector_Zero2(rdVector2 *v);
 MATH_FUNC int rdVector_IsZero3(const rdVector3* v);

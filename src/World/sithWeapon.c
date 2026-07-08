@@ -121,7 +121,7 @@ void sithWeapon_HandleImpact(sithThing *weapon)
                 do
                 {
                     rdVector_Copy3(&tmp, &weapon->position);
-                    rdVector_MultAcc3(&tmp, &weaponPos_, elementSize);
+                    rdVector_ScaleAdd3Acc(&tmp, &weaponPos_, elementSize);
                     sithThing_CreateThingAtPos(weapon->weaponParams.trailThing, &tmp, &weapon->lookOrientation, sector, 0);
                     elementSize += weapon->weaponParams.elementSize;
                 }
@@ -160,7 +160,7 @@ void sithWeapon_HandleImpact(sithThing *weapon)
         if ( weapon->weaponParams.explodeTemplate )
         {
             rdVector_Copy3(&tmp2, &weapon->position);
-            rdVector_MultAcc3(&tmp2, &weaponPos_, searchRes->distance);
+            rdVector_ScaleAdd3Acc(&tmp2, &weaponPos_, searchRes->distance);
             sithThing_CreateThingAtPos(weapon->weaponParams.explodeTemplate, &tmp2, &rdroid_identMatrix34, sector, 0);
         }
     }
@@ -175,7 +175,7 @@ LABEL_20:
         do
         {
             rdVector_Copy3(&tmp, &weapon->position);
-            rdVector_MultAcc3(&tmp, &weaponPos_, elementSize);
+            rdVector_ScaleAdd3Acc(&tmp, &weaponPos_, elementSize);
             sithThing_CreateThingAtPos(weapon->weaponParams.trailThing, &tmp, &weapon->lookOrientation, sector, 0);
             elementSize += weapon->weaponParams.elementSize;
         }
@@ -272,7 +272,7 @@ void sithWeapon_sub_4D3920(sithThing *weapon)
                     if ( elementSize_ > searchRes->distance )
                         break;
                     rdVector_Copy3(&a3, &weapon->position);
-                    rdVector_MultAcc3(&a3, &lookOrient, elementSize_);
+                    rdVector_ScaleAdd3Acc(&a3, &lookOrient, elementSize_);
                     rdVector_Sub3(&a1a, &a3, &weaponPos);
                     if (rdVector_Len3(&a1a) <= weapon->weaponParams.trailCylRadius)
                     {
@@ -299,7 +299,7 @@ void sithWeapon_sub_4D3920(sithThing *weapon)
                         v50 = 1.0 - v19;
                         
                         rdVector_Copy3(&tmp, &a1a);
-                        rdVector_MultAcc3(&tmp, &lookOrient, v50);
+                        rdVector_ScaleAdd3Acc(&tmp, &lookOrient, v50);
                         rdVector_Normalize3Acc(&tmp);
                         rdVector_ExtractAngle(&tmp, &rot);
                         rdMatrix_BuildRotate34(&camera, &rot);
@@ -391,7 +391,7 @@ LABEL_25:
                 rdVector_Scale3Acc(&a1a, v43);
                 v51 = 1.0 - v43;
                 rdVector_Copy3(&tmp, &a1a);
-                rdVector_MultAcc3(&tmp, &lookOrient, v51);
+                rdVector_ScaleAdd3Acc(&tmp, &lookOrient, v51);
                 rdVector_Normalize3Acc(&tmp);
                 rdVector_ExtractAngle(&tmp, &rot);
                 rdMatrix_BuildRotate34(&camera, &rot);
@@ -674,7 +674,7 @@ int sithWeapon_ThingCollisionHandler(sithThing *physicsThing, sithThing *collide
                     v8 = -v8;
 
                 rdVector_Copy3(&physicsThing->physicsParams.vel, &v31);
-                rdVector_MultAcc3(&physicsThing->physicsParams.vel, &a4->hitNorm, v8);
+                rdVector_ScaleAdd3Acc(&physicsThing->physicsParams.vel, &a4->hitNorm, v8);
 
                 rdVector3 tmp;
                 rdVector_Normalize3(&tmp, &physicsThing->physicsParams.vel);
