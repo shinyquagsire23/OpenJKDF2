@@ -181,13 +181,13 @@ sithSoundMixer_aPlayingSounds 0x00835FE8 sithPlayingSound[SITH_MIXER_NUMPLAYINGS
 sithSoundMixer_aIdk 0x00836B68 int[SITH_MIXER_NUMPLAYINGSOUNDS]
 sithSoundMixer_activeChannels 0x00836BE8 int
 sithSoundMixer_bOpened 0x00836BEC int
-sithSoundMixer_pLastSectorSoundSector 0x00836BF4 sithSector*
+sithSoundMixer_pCurSector 0x00836BF4 sithSector*
 sithSoundMixer_dword_836BFC 0x00836BFC int
 sithSoundMixer_trackFrom 0x008BBC74 int
 sithSoundMixer_trackTo 0x008BBC70 int
-sithSoundMixer_pCurSectorPlayingSound 0x00836BF8 sithPlayingSound*
+sithSoundMixer_hCurAmbientChannel 0x00836BF8 sithPlayingSound*
 sithSoundMixer_dword_836C00 0x00836C00 int
-sithSoundMixer_nextSoundIdx 0x0054A684 int = 1
+sithSoundMixer_channelGUIDSeed 0x0054A684 int = 1
 sithSoundMixer_dword_836C04 0x00836C04 int
 sithSoundMixer_pFocusedThing 0x00836BF0 sithThing*
 
