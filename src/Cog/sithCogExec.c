@@ -133,7 +133,7 @@ void sithCogExec_Exec(sithCog *cog_ctx)
                     break;
                 }
 
-                v12 = sithCogParse_GetSymbol(cog_ctx->pSymbolTable, tmpStackVar->data[0]);
+                v12 = sithCogParse_GetSymbolByID(cog_ctx->pSymbolTable, tmpStackVar->data[0]);
 
                 if (!v12 ) {
                     break;
@@ -201,7 +201,7 @@ void sithCogExec_Exec(sithCog *cog_ctx)
                     break;
                 }
                 
-                tmpStackVar = &sithCogParse_GetSymbol(cog_ctx->pSymbolTable, var.data[0])->val;
+                tmpStackVar = &sithCogParse_GetSymbolByID(cog_ctx->pSymbolTable, var.data[0])->val;
                 *tmpStackVar = val;
                 break;
             case COG_OPCODE_CMPFALSE:
@@ -337,7 +337,7 @@ int32_t sithCogExec_PopValue(sithCog *ctx, sithCogStackvar *stackVar)
 
     if ( stackVar->type == COG_VARTYPE_SYMBOL ) {
         // Added: nullptr check here
-        sithCogSymbol* sym = sithCogParse_GetSymbol(ctx->pSymbolTable, stackVar->data[0]);
+        sithCogSymbol* sym = sithCogParse_GetSymbolByID(ctx->pSymbolTable, stackVar->data[0]);
         if (sym) {
             tmp = &sym->val;
         }
@@ -1018,7 +1018,7 @@ cogSymbolFunc_t sithCogExec_PopSymbolFunc(sithCog *cog_ctx)
 
     if ( v3->type == COG_VARTYPE_SYMBOL )
     {
-        sym = sithCogParse_GetSymbol(cog_ctx->pSymbolTable, cog_ctx->stack[cog_ctx->stackPos].data[0]);
+        sym = sithCogParse_GetSymbolByID(cog_ctx->pSymbolTable, cog_ctx->stack[cog_ctx->stackPos].data[0]);
         if ( sym->val.type )
             return (cogSymbolFunc_t)sym->val.dataAsFunc; // Added: changed from & to not &?
         else
@@ -1045,7 +1045,7 @@ char* sithCogExec_PopString(sithCog *ctx)
     v1 = ctx->stackPos;
     if ( v1 < 1
       || (v2 = v1 - 1, ctx->stackPos = v2, ctx->stack[v2].type != COG_VARTYPE_SYMBOL)
-      || (v5 = sithCogParse_GetSymbol(ctx->pSymbolTable, ctx->stack[v2].data[0]), !v5 || v5->val.type != COG_VARTYPE_STR) ) // Added: v5 nullptr check
+      || (v5 = sithCogParse_GetSymbolByID(ctx->pSymbolTable, ctx->stack[v2].data[0]), !v5 || v5->val.type != COG_VARTYPE_STR) ) // Added: v5 nullptr check
     {
         result = 0;
     }
@@ -1297,7 +1297,7 @@ void sithCogExec_MathOperation(sithCog *cog_ctx, int32_t op)
 sithCogStackvar* sithCogExec_AssignStackVar(sithCogStackvar *out, sithCog *ctx, sithCogStackvar *in)
 {
     if ( in->type == COG_VARTYPE_SYMBOL )
-        in = &sithCogParse_GetSymbol(ctx->pSymbolTable, in->dataAsPtrs[0])->val;
+        in = &sithCogParse_GetSymbolByID(ctx->pSymbolTable, in->dataAsPtrs[0])->val;
     if ( in->type != COG_VARTYPE_VERB)
     {
         out->type = in->type;

@@ -41,7 +41,7 @@ int32_t sithCog_Startup()
 {
     struct cogSymbol a2; // [esp+8h] [ebp-10h]
 
-    sithCog_pSymbolTable = sithCogParse_NewSymboltable(SITHCOG_SYMBOL_LIMIT); // MOTS altered, DW altered, changed from 512 to 1024
+    sithCog_pSymbolTable = sithCogParse_AllocSymbolTable(SITHCOG_SYMBOL_LIMIT); // MOTS altered, DW altered, changed from 512 to 1024
     if (!sithCog_pSymbolTable )
     {
         stdPrintf(pSithHS->errorPrint, ".\\Cog\\sithCog.c", 118, "Could not allocate COG symboltable.");
@@ -389,13 +389,13 @@ int32_t sithCog_StartupEnhanced()
 
 void sithCog_Shutdown()
 {
-    sithCogParse_FreeSymboltable(sithCog_pSymbolTable);
+    sithCogParse_FreeSymbolTable(sithCog_pSymbolTable);
     if ( sithCog_pScriptHashtable )
     {
         stdHashTable_Free(sithCog_pScriptHashtable);
         sithCog_pScriptHashtable = 0;
     }
-    sithCogParse_Reset();
+    sithCogParse_FreeParseTree();
     sithCog_bInitted = 0;
 
     // Added: sithCogExec var clean reset
@@ -660,7 +660,7 @@ sithCog* sithCog_LoadCogscript(const char *fpath)
 #endif
     cog->cogscript = v8;
     cog->flags = v8->flags;
-    cog->pSymbolTable = sithCogParse_CopySymboltable(v8->pSymbolTable);
+    cog->pSymbolTable = sithCogParse_DuplicateSymbolTable(v8->pSymbolTable);
     if ( cog->pSymbolTable )
     {
         sithWorld_pLoading->numCogsLoaded++;
@@ -1455,7 +1455,7 @@ void sithCog_Free(sithWorld *world)
         for (int32_t i = 0; i < world->numCogScriptsLoaded; i++)
         {
             v4 = &world->cogScripts[i];
-            sithCogParse_FreeSymboltable(v4->pSymbolTable);
+            sithCogParse_FreeSymbolTable(v4->pSymbolTable);
             for (v5 = 0; v5 < v4->numIdk; v5++)
             {
                 if (v4->aIdk[v5].desc)
@@ -1495,7 +1495,7 @@ void sithCog_Free(sithWorld *world)
         for (int32_t i = 0; i < world->numCogsLoaded; i++ )
         {
             v9 = &world->cogs[i];
-            sithCogParse_FreeSymboltable(v9->pSymbolTable);
+            sithCogParse_FreeSymbolTable(v9->pSymbolTable);
 #ifdef COG_HEAP_INIT_ARGS
             if ( v9->aInitArgs ) // Added: failed-load path can leave these live
             {
@@ -1631,7 +1631,7 @@ void sithCogScript_RegisterVerb(sithCogSymboltable *a1, cogSymbolFunc_t a2, cons
     {
         a2a.type = COG_TYPE_VERB;
         a2a.dataAsFunc = a2;
-        sithCogParse_SetSymbolVal(symbol, &a2a);
+        sithCogParse_SetSymbolValue(symbol, &a2a);
     }
 }
 
@@ -1644,7 +1644,7 @@ void sithCogScript_RegisterMessageSymbol(sithCogSymboltable *a1, int32_t a2, con
     {
         a2a.type = COG_TYPE_INT;
         a2a.data[0] = a2;
-        sithCogParse_SetSymbolVal(v3, &a2a);
+        sithCogParse_SetSymbolValue(v3, &a2a);
     }
 }
 
@@ -1657,7 +1657,7 @@ void sithCogScript_RegisterGlobalMessage(sithCogSymboltable *a1, const char *a2,
     {
         a2a.type = COG_TYPE_FLEX;
         a2a.data[0] = a3;
-        sithCogParse_SetSymbolVal(v3, &a2a);
+        sithCogParse_SetSymbolValue(v3, &a2a);
     }
 }
 
@@ -1828,7 +1828,7 @@ sithCog* sithCog_GetByIdx(int32_t idx)
 
 void sithCog_FreeEntry(sithCog *cog)
 {
-    sithCogParse_FreeSymboltable(cog->pSymbolTable);
+    sithCogParse_FreeSymbolTable(cog->pSymbolTable);
     for (uint32_t i = 0; i < cog->cogscript->numIdk; i++)
     {
         if ( cog->cogscript->aIdk[i].desc )
@@ -1846,7 +1846,7 @@ void sithCog_FreeEntry(sithCog *cog)
 
 void sithCog_Free2(sithCogScript *cogscript)
 {
-    sithCogParse_FreeSymboltable(cogscript->pSymbolTable);
+    sithCogParse_FreeSymbolTable(cogscript->pSymbolTable);
     if ( cogscript->script_program )
     {
         SITH_FREE(cogscript->script_program);

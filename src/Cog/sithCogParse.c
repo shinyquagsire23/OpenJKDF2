@@ -29,7 +29,7 @@ extern int yyparse();
 // Added: debug
 char* sithCogParse_lastParsedFile = "INVALID";
 
-void sithCogParse_Reset()
+void sithCogParse_FreeParseTree()
 {
     if ( cogparser_nodes_alloc )
     {
@@ -80,7 +80,7 @@ int sithCogParse_Load(char *cog_fpath, sithCogScript *cogscript, int unk)
     if ( _strcmp(stdConffile_entry.args[0].value, "symbols") )
         goto fail_cleanup;
 
-    symboltable = sithCogParse_NewSymboltable(SITHCOG_LINKED_SYMBOL_LIMIT);
+    symboltable = sithCogParse_AllocSymbolTable(SITHCOG_LINKED_SYMBOL_LIMIT);
     cogscript->pSymbolTable = symboltable;
     if ( !symboltable )
         goto fail_cleanup;
@@ -94,35 +94,35 @@ int sithCogParse_Load(char *cog_fpath, sithCogScript *cogscript, int unk)
         {
             if ( !_strcmp(stdConffile_entry.args[0].value, "thing") )
             {
-                sithCogParse_ParseSymbol(cogscript, 3, unk);
+                sithCogParse_ParseSymbolRef(cogscript, 3, unk);
             }
             else if ( !_strcmp(stdConffile_entry.args[0].value, "surface") )
             {
-                sithCogParse_ParseSymbol(cogscript, 6, unk);
+                sithCogParse_ParseSymbolRef(cogscript, 6, unk);
             }
             else if ( !_strcmp(stdConffile_entry.args[0].value, "sector") )
             {
-                sithCogParse_ParseSymbol(cogscript, 5, unk);
+                sithCogParse_ParseSymbolRef(cogscript, 5, unk);
             }
             else if ( !_strcmp(stdConffile_entry.args[0].value, "sound") )
             {
-                sithCogParse_ParseSymbol(cogscript, 8, unk);
+                sithCogParse_ParseSymbolRef(cogscript, 8, unk);
             }
             else if ( !_strcmp(stdConffile_entry.args[0].value, "template") )
             {
-                sithCogParse_ParseSymbol(cogscript, 4, unk);
+                sithCogParse_ParseSymbolRef(cogscript, 4, unk);
             }
             else if ( !_strcmp(stdConffile_entry.args[0].value, "model") )
             {
-                sithCogParse_ParseSymbol(cogscript, 12, unk);
+                sithCogParse_ParseSymbolRef(cogscript, 12, unk);
             }
             else if ( !_strcmp(stdConffile_entry.args[0].value, "keyframe") )
             {
-                sithCogParse_ParseSymbol(cogscript, 7, unk);
+                sithCogParse_ParseSymbolRef(cogscript, 7, unk);
             }
             else if ( !_strcmp(stdConffile_entry.args[0].value, "cog") )
             {
-                sithCogParse_ParseSymbol(cogscript, 9, unk);
+                sithCogParse_ParseSymbolRef(cogscript, 9, unk);
             }
             else if ( !_strcmp(stdConffile_entry.args[0].value, "message") )
             {
@@ -130,7 +130,7 @@ int sithCogParse_Load(char *cog_fpath, sithCogScript *cogscript, int unk)
             }
             else if ( !_strcmp(stdConffile_entry.args[0].value, "material") )
             {
-                sithCogParse_ParseSymbol(cogscript, 10, unk);
+                sithCogParse_ParseSymbolRef(cogscript, 10, unk);
             }
             else if ( !_strcmp(stdConffile_entry.args[0].value, "flex") || !_strcmp(stdConffile_entry.args[0].value, "float") )
             {
@@ -146,11 +146,11 @@ int sithCogParse_Load(char *cog_fpath, sithCogScript *cogscript, int unk)
             }
             else if ( !_strcmp(stdConffile_entry.args[0].value, "ai") )
             {
-                sithCogParse_ParseSymbol(cogscript, 13, unk);
+                sithCogParse_ParseSymbolRef(cogscript, 13, unk);
             }
         }
     }
-    if ( stdConffile_ReadArgs() && !_strcmp(stdConffile_entry.args[0].value, "code") && sithCogParse_LoadEntry(cogscript) )
+    if ( stdConffile_ReadArgs() && !_strcmp(stdConffile_entry.args[0].value, "code") && sithCogParse_ParseSectionCode(cogscript) )
     {
         for (v6 = 0; v6 < cogscript->num_triggers; v6++)
         {
@@ -161,7 +161,7 @@ int sithCogParse_Load(char *cog_fpath, sithCogScript *cogscript, int unk)
         // Added: seal the table (free parse-time hashtable, trim buckets); see
         // engine_config.h. Guarded: an empty table would realloc to 0 bytes.
         if ( cogscript->pSymbolTable && cogscript->pSymbolTable->entry_cnt )
-            sithCogParse_ReallocSymboltable(cogscript->pSymbolTable);
+            sithCogParse_ReallocSymbolTable(cogscript->pSymbolTable);
 #endif
         stdConffile_Close();
         return 1;
@@ -174,7 +174,7 @@ int sithCogParse_Load(char *cog_fpath, sithCogScript *cogscript, int unk)
 fail_cleanup:
     if ( cogscript->pSymbolTable )
     {
-        sithCogParse_FreeSymboltable(cogscript->pSymbolTable);
+        sithCogParse_FreeSymbolTable(cogscript->pSymbolTable);
         cogscript->pSymbolTable = 0;
     }
     if ( cogparser_topnode )
@@ -186,7 +186,7 @@ fail_cleanup:
     return 0;
 }
 
-int sithCogParse_LoadEntry(sithCogScript *script)
+int sithCogParse_ParseSectionCode(sithCogScript *script)
 {
     stdFile_t fhand; // eax
     sith_cog_parser_node *v2; // eax
@@ -233,9 +233,9 @@ LABEL_19:
         if ( cogparser_topnode->child_loop_depth )
             cog_parser_node_stackpos[cogparser_topnode->child_loop_depth] = 0;
         if ( v2->parent )
-            sithCogParse_RecurseStackdepth(v2->parent);
+            sithCogParse_GenerateLabelTable(v2->parent);
         if ( v3->child )
-            sithCogParse_RecurseStackdepth(v3->child);
+            sithCogParse_GenerateLabelTable(v3->child);
         switch ( v3->opcode )
         {
             case COG_OPCODE_NOP:
@@ -284,13 +284,13 @@ LABEL_16:
                 cogvm_stack = script_prog_next;
                 if ( node_parent )
                 {
-                    sithCogParse_RecurseWrite(node_parent);
+                    sithCogParse_GenerateCode(node_parent);
                     script_prog_curidx = cogvm_stackpos;
                     script_prog_next = cogvm_stack;
                 }
                 if ( cur_instr->child )
                 {
-                    sithCogParse_RecurseWrite(cur_instr->child);
+                    sithCogParse_GenerateCode(cur_instr->child);
                     script_prog_curidx = cogvm_stackpos;
                     script_prog_next = cogvm_stack;
                 }
@@ -346,7 +346,7 @@ LABEL_32:
     return result;
 }
 
-sithCogSymboltable* sithCogParse_CopySymboltable(sithCogSymboltable *table)
+sithCogSymboltable* sithCogParse_DuplicateSymbolTable(sithCogSymboltable *table)
 {
     int entry_cnt; // ebp
     sithCogSymboltable *newTable; // ebx
@@ -376,7 +376,7 @@ sithCogSymboltable* sithCogParse_CopySymboltable(sithCogSymboltable *table)
     return result;
 }
 
-sithCogSymboltable* sithCogParse_NewSymboltable(int amt)
+sithCogSymboltable* sithCogParse_AllocSymbolTable(int amt)
 {
     sithCogSymboltable *newTable; // esi
     stdHashTable *newHashtable; // eax
@@ -426,7 +426,7 @@ sithCogSymboltable* sithCogParse_NewSymboltable(int amt)
     return result;
 }
 
-int sithCogParse_ReallocSymboltable(sithCogSymboltable *table)
+int sithCogParse_ReallocSymbolTable(sithCogSymboltable *table)
 {
     unsigned int amt; // eax
     sithCogSymbol *reallocBuckets; // eax
@@ -490,7 +490,7 @@ int sithCogParse_ReallocSymboltable(sithCogSymboltable *table)
     return result;
 }
 
-void sithCogParse_FreeSymboltable(sithCogSymboltable *table)
+void sithCogParse_FreeSymbolTable(sithCogSymboltable *table)
 {
     sithCogSymbol *v1; // eax
     unsigned int v2; // ebx
@@ -581,7 +581,7 @@ sithCogSymbol* sithCogParse_AddSymbol(sithCogSymboltable *table, const char *sym
     }
 }
 
-void sithCogParse_SetSymbolVal(sithCogSymbol *a1, sithCogStackvar *a2)
+void sithCogParse_SetSymbolValue(sithCogSymbol *a1, sithCogStackvar *a2)
 {
     // TODO ehhhhhh
     //*(sithCogStackvar *)&a1->val = *a2;
@@ -592,7 +592,7 @@ void sithCogParse_SetSymbolVal(sithCogSymbol *a1, sithCogStackvar *a2)
         a1->val.dataAsPtrs[i] = a2->dataAsPtrs[i];
 }
 
-sithCogSymbol* sithCogParse_GetSymbolVal(sithCogSymboltable *pSymbolTable, char *a2)
+sithCogSymbol* sithCogParse_GetSymbol(sithCogSymboltable *pSymbolTable, char *a2)
 {
     sithCogSymbol *result; // eax
 
@@ -607,10 +607,10 @@ sithCogSymbol* sithCogParse_GetSymbolVal(sithCogSymboltable *pSymbolTable, char 
         return NULL;
     }
 
-    return sithCogParse_GetSymbolVal(sithCog_pSymbolTable, a2);
+    return sithCogParse_GetSymbol(sithCog_pSymbolTable, a2);
 }
 
-sithCogSymbol* sithCogParse_GetSymbol(sithCogSymboltable *table, unsigned int idx)
+sithCogSymbol* sithCogParse_GetSymbolByID(sithCogSymboltable *table, unsigned int idx)
 {
     sithCogSymbol *result; // eax
 
@@ -628,18 +628,18 @@ sithCogSymbol* sithCogParse_GetSymbol(sithCogSymboltable *table, unsigned int id
     return result;
 }
 
-int sithCogParse_GetSymbolScriptIdx(unsigned int idx)
+int sithCogParse_GetSymbolLabel(unsigned int idx)
 {
     // aaaaaaaaaaaaa this will dereference a nullptr
-    return sithCogParse_GetSymbol(sithCogParse_pSymbolTable, idx)->field_14;
+    return sithCogParse_GetSymbolByID(sithCogParse_pSymbolTable, idx)->field_14;
 }
 
-sith_cog_parser_node* sithCogParse_AddLeaf(int op, int val)
+sith_cog_parser_node* sithCogParse_MakeLeafNode(int op, int val)
 {
-    return sithCogParse_AddLinkingNode(NULL, NULL, op, (int)val);
+    return sithCogParse_MakeNode(NULL, NULL, op, (int)val);
 }
 
-sith_cog_parser_node* sithCogParse_AddLeafVector(int opcode, cog_flex_t* vector)
+sith_cog_parser_node* sithCogParse_MakeVectorLeafNode(int opcode, cog_flex_t* vector)
 {
     if (!cogparser_nodes_alloc)
     {
@@ -666,7 +666,7 @@ sith_cog_parser_node* sithCogParse_AddLeafVector(int opcode, cog_flex_t* vector)
     return node;
 }
 
-sith_cog_parser_node* sithCogParse_AddLinkingNode(sith_cog_parser_node* parent, sith_cog_parser_node* child, int opcode, int val)
+sith_cog_parser_node* sithCogParse_MakeNode(sith_cog_parser_node* parent, sith_cog_parser_node* child, int opcode, int val)
 {
     if (!cogparser_nodes_alloc)
     {
@@ -693,17 +693,17 @@ sith_cog_parser_node* sithCogParse_AddLinkingNode(sith_cog_parser_node* parent, 
    return node;
 }
 
-int sithCogParse_IncrementLoopdepth()
+int sithCogParse_GetNextLabel()
 {
     return cog_yacc_loop_depth++;
 }
 
-void sithCogParse_LexGetSym(char *symName)
+void sithCogParse_LexerSetSymbol(char *symName)
 {
     sithCogSymbol *v6; // ecx
 
     _strtolower(symName);
-    v6 = sithCogParse_GetSymbolVal(sithCogParse_pSymbolTable, symName);
+    v6 = sithCogParse_GetSymbol(sithCogParse_pSymbolTable, symName);
 
     if ( v6 )
     {
@@ -727,7 +727,7 @@ void sithCogParse_LexGetSym(char *symName)
     }
 }
 
-void sithCogParse_LexAddSymbol(const char *symName)
+void sithCogParse_LexerSetString(const char *symName)
 {
     sithCogSymbol *symbol; // esi
 
@@ -743,7 +743,7 @@ void sithCogParse_LexAddSymbol(const char *symName)
     }
 }
 
-void sithCogParse_LexScanVector3(char* text)
+void sithCogParse_LexerSetVector(char* text)
 {
     // Added: flex_t
     flex32_t scan_x = 0.0;
@@ -758,7 +758,7 @@ void sithCogParse_LexScanVector3(char* text)
     yylval.as_vector[2] = scan_z;
 }
 
-int sithCogParse_RecurseStackdepth(sith_cog_parser_node *node)
+int sithCogParse_GenerateLabelTable(sith_cog_parser_node *node)
 {
     int result; // eax
     int v2; // esi
@@ -767,10 +767,10 @@ int sithCogParse_RecurseStackdepth(sith_cog_parser_node *node)
         cog_parser_node_stackpos[node->child_loop_depth] = cogvm_stackpos;
 
     if ( node->parent )
-        sithCogParse_RecurseStackdepth(node->parent);
+        sithCogParse_GenerateLabelTable(node->parent);
 
     if ( node->child )
-        sithCogParse_RecurseStackdepth(node->child);
+        sithCogParse_GenerateLabelTable(node->child);
 
     result = node->opcode;
     switch ( result )
@@ -804,13 +804,13 @@ LABEL_12:
     }
 }
 
-void sithCogParse_RecurseWrite(sith_cog_parser_node *node)
+void sithCogParse_GenerateCode(sith_cog_parser_node *node)
 {
     if ( node->parent )
-        sithCogParse_RecurseWrite(node->parent);
+        sithCogParse_GenerateCode(node->parent);
 
     if ( node->child )
-        sithCogParse_RecurseWrite(node->child);
+        sithCogParse_GenerateCode(node->child);
 
     if (!node->opcode )
         return;
@@ -840,7 +840,7 @@ void sithCogParse_RecurseWrite(sith_cog_parser_node *node)
     }
 }
 
-int sithCogParse_ParseSymbol(sithCogScript *cogScript, int a2, int unk)
+int sithCogParse_ParseSymbolRef(sithCogScript *cogScript, int a2, int unk)
 {
     sithCogReference *cogIdk;
 
@@ -1069,7 +1069,7 @@ int sithCogParse_ParseMessage(sithCogScript *cogScript)
     if ( cogScript->num_triggers == 32 )
         return 0;
 
-    sithCogSymbol* symbolGet = sithCogParse_GetSymbolVal(sithCog_pSymbolTable, stdConffile_entry.args[1].value);
+    sithCogSymbol* symbolGet = sithCogParse_GetSymbol(sithCog_pSymbolTable, stdConffile_entry.args[1].value);
     if (!symbolGet) return 0;
 
     sithCogSymbol* symbol = sithCogParse_AddSymbol(cogScript->pSymbolTable, stdConffile_entry.args[1].key);

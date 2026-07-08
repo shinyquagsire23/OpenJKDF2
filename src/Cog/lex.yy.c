@@ -604,7 +604,7 @@ case 12:
 	YY_BREAK
 case 13:
 # line 39 "cog.l"
-{ sithCogParse_LexGetSym(yytext); return(IDENTIFIER); }
+{ sithCogParse_LexerSetSymbol(yytext); return(IDENTIFIER); }
 	YY_BREAK
 case 14:
 # line 41 "cog.l"
@@ -632,11 +632,11 @@ case 19:
 	YY_BREAK
 case 20:
 # line 50 "cog.l"
-{ sithCogParse_LexAddSymbol(yytext); return(STRING_LITERAL); }
+{ sithCogParse_LexerSetString(yytext); return(STRING_LITERAL); }
 	YY_BREAK
 case 21:
 # line 51 "cog.l"
-{ sithCogParse_LexScanVector3(yytext); return(VECTOR_LITERAL); }
+{ sithCogParse_LexerSetVector(yytext); return(VECTOR_LITERAL); }
 	YY_BREAK
 case 22:
 # line 53 "cog.l"

@@ -2660,28 +2660,28 @@ sithDSSCog_SendMessage	.text	004FC520	00000104	0000000C	00000030	R	.	.	.	.	.	T	.
 sithDSSCog_ProcessMessage	.text	004FC630	00000131	0000002C	00000004	R	.	.	.	.	.	T	.
 sithDSSCog_SyncCogState	.text	004FC770	0000012C	00000010	0000000C	R	.	.	.	.	.	T	.
 sithDSSCog_ProcessCogState	.text	004FC8A0	000000FF	00000004	00000004	R	.	.	.	.	.	T	.
-sithCogParse_Reset	.text	004FC9A0	0000002A			R	.	.	.	.	.	T	.
+sithCogParse_FreeParseTree	.text	004FC9A0	0000002A			R	.	.	.	.	.	T	.
 sithCogParse_Load	.text	004FC9D0	00000391	00000010	0000000C	R	.	.	.	.	.	T	.
-sithCogParse_LoadEntry	.text	004FCD70	000001F3	00000010	00000004	R	.	.	.	.	.	T	.
-sithCogParse_CopySymboltable	.text	004FCFD0	0000007A	00000010	00000004	R	.	.	.	.	.	T	.
-sithCogParse_NewSymboltable	.text	004FD050	000000DF	00000010	00000004	R	.	.	.	.	.	T	.
-sithCogParse_ReallocSymboltable	.text	004FD130	00000082	00000010	00000004	R	.	.	.	.	.	T	.
-sithCogParse_FreeSymboltable	.text	004FD1C0	00000095	00000010	00000004	R	.	.	.	.	.	T	.
+sithCogParse_ParseSectionCode	.text	004FCD70	000001F3	00000010	00000004	R	.	.	.	.	.	T	.
+sithCogParse_DuplicateSymbolTable	.text	004FCFD0	0000007A	00000010	00000004	R	.	.	.	.	.	T	.
+sithCogParse_AllocSymbolTable	.text	004FD050	000000DF	00000010	00000004	R	.	.	.	.	.	T	.
+sithCogParse_ReallocSymbolTable	.text	004FD130	00000082	00000010	00000004	R	.	.	.	.	.	T	.
+sithCogParse_FreeSymbolTable	.text	004FD1C0	00000095	00000010	00000004	R	.	.	.	.	.	T	.
 sithCogParse_AddSymbol	.text	004FD260	000000EA	00000004	00000008	R	.	.	.	.	.	T	.
-sithCogParse_SetSymbolVal	.text	004FD350	00000022	00000000	00000008	R	.	.	.	.	.	T	.
-sithCogParse_GetSymbolVal	.text	004FD380	00000046	00000008	00000008	R	.	.	.	.	.	T	.
-sithCogParse_GetSymbol	.text	004FD3D0	00000035	00000000	00000008	R	.	.	.	.	.	T	.
-sithCogParse_GetSymbolScriptIdx	.text	004FD410	0000003B	00000000	00000004	R	.	.	.	.	.	T	.
-sithCogParse_AddLeaf	.text	004FD450	0000009C	00000008	00000008	R	.	.	.	.	.	T	.
-sithCogParse_AddLeafVector	.text	004FD4F0	000000AC	00000008	00000008	R	.	.	.	.	.	T	.
-sithCogParse_AddLinkingNode	.text	004FD5A0	000000AA	00000008	00000010	R	.	.	.	.	.	T	.
-sithCogParse_LexGetSym	.text	004FD650	00000196	00000020	00000004	R	.	.	.	.	.	T	.
-sithCogParse_LexAddSymbol	.text	004FD7F0	000000EA	0000000C	00000004	R	.	.	.	.	.	T	.
-sithCogParse_LexScanVector3	.text	004FD8E0	00000045	0000000C	00000004	R	.	.	.	.	.	T	.
-sithCogParse_IncrementLoopdepth	.text	004FD930	00000010			R	.	.	.	.	.	.	.
-sithCogParse_RecurseStackdepth	.text	004FD940	00000083	00000004	00000004	R	.	.	.	.	.	T	.
-sithCogParse_RecurseWrite	.text	004FDA00	0000009F	00000008	00000004	R	.	.	.	.	.	T	.
-sithCogParse_ParseSymbol	.text	004FDAE0	00000321	00000024	0000000C	R	.	.	.	.	.	T	.
+sithCogParse_SetSymbolValue	.text	004FD350	00000022	00000000	00000008	R	.	.	.	.	.	T	.
+sithCogParse_GetSymbol	.text	004FD380	00000046	00000008	00000008	R	.	.	.	.	.	T	.
+sithCogParse_GetSymbolByID	.text	004FD3D0	00000035	00000000	00000008	R	.	.	.	.	.	T	.
+sithCogParse_GetSymbolLabel	.text	004FD410	0000003B	00000000	00000004	R	.	.	.	.	.	T	.
+sithCogParse_MakeLeafNode	.text	004FD450	0000009C	00000008	00000008	R	.	.	.	.	.	T	.
+sithCogParse_MakeVectorLeafNode	.text	004FD4F0	000000AC	00000008	00000008	R	.	.	.	.	.	T	.
+sithCogParse_MakeNode	.text	004FD5A0	000000AA	00000008	00000010	R	.	.	.	.	.	T	.
+sithCogParse_LexerSetSymbol	.text	004FD650	00000196	00000020	00000004	R	.	.	.	.	.	T	.
+sithCogParse_LexerSetString	.text	004FD7F0	000000EA	0000000C	00000004	R	.	.	.	.	.	T	.
+sithCogParse_LexerSetVector	.text	004FD8E0	00000045	0000000C	00000004	R	.	.	.	.	.	T	.
+sithCogParse_GetNextLabel	.text	004FD930	00000010			R	.	.	.	.	.	.	.
+sithCogParse_GenerateLabelTable	.text	004FD940	00000083	00000004	00000004	R	.	.	.	.	.	T	.
+sithCogParse_GenerateCode	.text	004FDA00	0000009F	00000008	00000004	R	.	.	.	.	.	T	.
+sithCogParse_ParseSymbolRef	.text	004FDAE0	00000321	00000024	0000000C	R	.	.	.	.	.	T	.
 sithCogParse_ParseFlex	.text	004FDE10	00000221	00000028	00000008	R	.	.	.	.	.	T	.
 sithCogParse_ParseInt	.text	004FE040	00000238	00000028	00000008	R	.	.	.	.	.	T	.
 sithCogParse_ParseVector	.text	004FE280	00000246	00000028	00000008	R	.	.	.	.	.	T	.
