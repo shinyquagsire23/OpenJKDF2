@@ -207,7 +207,7 @@ void sithMain_Close()
     {
         sithSoundMixer_StopSong();
         sithRender_Close();
-        sithAIAwareness_Shutdown();
+        sithAIAwareness_Close();
         sithControl_Close();
         sithCog_Close();
         sithSoundMixer_Close();

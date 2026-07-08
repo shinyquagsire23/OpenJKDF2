@@ -1969,8 +1969,8 @@ void do_hooks()
     
     // sithSector
     hook_function(sithAIAwareness_Startup_ADDR, sithAIAwareness_Startup);
-    hook_function(sithAIAwareness_Shutdown_ADDR, sithAIAwareness_Shutdown);
-    hook_function(sithAIAwareness_sub_4F2B10_ADDR, sithAIAwareness_FlushEntries);
+    hook_function(sithAIAwareness_Close_ADDR, sithAIAwareness_Close);
+    hook_function(sithAIAwareness_sub_4F2B10_ADDR, sithAIAwareness_ProcessEvents);
     hook_function(sithPhysics_ApplyDrag_ADDR, sithPhysics_ApplyDrag);
     hook_function(sithPhysics_ThingPhysGeneral_ADDR, sithPhysics_ThingPhysGeneral);
     hook_function(sithPhysics_ThingPhysPlayer_ADDR, sithPhysics_ThingPhysPlayer);
@@ -1986,9 +1986,9 @@ void do_hooks()
     hook_function(sithPhysics_ThingSetLook_ADDR, sithPhysics_ThingSetLook);
     hook_function(sithPhysics_ThingApplyForce_ADDR, sithPhysics_ThingApplyForce);
     hook_function(sithRenderSky_CeilingFaceToPlane_ADDR, sithRenderSky_CeilingFaceToPlane);
-    hook_function(sithAIAwareness_AddEntry_ADDR, sithAIAwareness_AddEntry);
-    hook_function(sithAIAwareness_Tick_ADDR, sithAIAwareness_Tick);
-    hook_function(sithAIAwareness_sub_4F2C30_ADDR, sithAIAwareness_sub_4F2C30);
+    hook_function(sithAIAwareness_CreateTransmittingEvent_ADDR, sithAIAwareness_CreateTransmittingEvent);
+    hook_function(sithAIAwareness_Update_ADDR, sithAIAwareness_Update);
+    hook_function(sithAIAwareness_ProcessEvent_ADDR, sithAIAwareness_ProcessEvent);
     hook_function(sithPhysics_ThingGetInsertOffsetZ_ADDR, sithPhysics_ThingGetInsertOffsetZ);
     hook_function(sithSector_GetPtrFromIdx_ADDR, sithSector_GetPtrFromIdx);
 

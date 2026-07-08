@@ -78,7 +78,7 @@ void sithExplosion_MakeBlast(sithThing *explosion)
     flex_t damage = explosion->explosionParams.damage;
     if ( range > 0.0 && (damage > 0.0 || force > 0.0) )
     {
-        sithAIAwareness_AddEntry(explosion->sector, &explosion->position, 1, 3.0, explosion);
+        sithAIAwareness_CreateTransmittingEvent(explosion->sector, &explosion->position, 1, 3.0, explosion);
         sithCollision_SearchRadiusForThings(explosion->sector, 0, &explosion->position, &rdroid_zeroVector3, 0.0, range, RAYCAST_400 | RAYCAST_80 | RAYCAST_2);
         for ( i = sithCollision_NextSearchResult(); i; i = sithCollision_NextSearchResult() )
         {

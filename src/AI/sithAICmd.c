@@ -984,7 +984,7 @@ int sithAICmd_LookForTarget(sithActor *actor, sithAIClassEntry *aiclass, sithAct
                 actor->flags |= (SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_HASDEST|SITHAI_MODE_ATTACKING);
                 sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_ALERT);
                 sithSoundClass_PlayModeFirst(actor->thing, SITH_SC_ACTIVATE);
-                sithAIAwareness_AddEntry(actor->pDistractor->sector, &actor->thing->position, 0, 3.0, actor->pDistractor);
+                sithAIAwareness_CreateTransmittingEvent(actor->pDistractor->sector, &actor->thing->position, 0, 3.0, actor->pDistractor);
                 actor->pMoveThing = actor->pDistractor;
                 return 1;
             }
@@ -1002,7 +1002,7 @@ int sithAICmd_LookForTarget(sithActor *actor, sithAIClassEntry *aiclass, sithAct
                     actor->flags |= (SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_HASDEST|SITHAI_MODE_ATTACKING);
                     sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_ALERT);
                     sithSoundClass_PlayModeFirst(actor->thing, SITH_SC_ACTIVATE);
-                    sithAIAwareness_AddEntry(actor->pDistractor->sector, &actor->thing->position, 0, 3.0, actor->pDistractor);
+                    sithAIAwareness_CreateTransmittingEvent(actor->pDistractor->sector, &actor->thing->position, 0, 3.0, actor->pDistractor);
                     actor->pMoveThing = actor->pDistractor;
                     return 1;
                 }
@@ -1023,7 +1023,7 @@ int sithAICmd_LookForTarget(sithActor *actor, sithAIClassEntry *aiclass, sithAct
                     actor->flags |= (SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_HASDEST|SITHAI_MODE_ATTACKING);
                     sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_ALERT);
                     sithSoundClass_PlayModeFirst(actor->thing, SITH_SC_ACTIVATE);
-                    sithAIAwareness_AddEntry(actor->pDistractor->sector, &actor->thing->position, 0, 3.0, actor->pDistractor);
+                    sithAIAwareness_CreateTransmittingEvent(actor->pDistractor->sector, &actor->thing->position, 0, 3.0, actor->pDistractor);
                     actor->pMoveThing = actor->pDistractor;
                     return 1;
                 }
@@ -1441,7 +1441,7 @@ int sithAICmd_SenseDanger(sithActor *actor, sithAIClassEntry *aiclass, sithActor
                 actor->flags &= ~SITHAI_MODE_SEARCHING;
                 actor->flags |= SITHAI_MODE_FLEEING;
                 sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_FEAR);
-                sithAIAwareness_AddEntry(actor->thing->sector, &actor->thing->position, 1, 3.0, actor->thing);
+                sithAIAwareness_CreateTransmittingEvent(actor->thing->sector, &actor->thing->position, 1, 3.0, actor->thing);
                 actor->pFleeThing = actor->pDistractor;
                 return 1;
             }
@@ -1463,7 +1463,7 @@ int sithAICmd_SenseDanger(sithActor *actor, sithAIClassEntry *aiclass, sithActor
                     if ( (actor->flags & SITHAI_MODE_FLEEING) == 0 )
                     {
                         sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_FEAR);
-                        sithAIAwareness_AddEntry(actor->thing->sector, &actor->thing->position, 1, 4.0, actor->thing);
+                        sithAIAwareness_CreateTransmittingEvent(actor->thing->sector, &actor->thing->position, 1, 4.0, actor->thing);
                     }
                     actor->flags &= ~SITHAI_MODE_SEARCHING;
                     actor->flags |= SITHAI_MODE_FLEEING;
@@ -1674,7 +1674,7 @@ int sithAICmd_LookForOpposingTarget(sithActor *pActor, sithAIClassEntry *pAiclas
                 pActor->flags |= (SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_HASDEST|SITHAI_MODE_ATTACKING);
                 sithSoundClass_PlayModeRandom(pActor->thing, SITH_SC_ALERT);
                 sithSoundClass_PlayModeFirst(pActor->thing, SITH_SC_ACTIVATE);
-                sithAIAwareness_AddEntry(pActor->pDistractor->sector, &pActor->thing->position, 0, 3.0, pActor->pDistractor);
+                sithAIAwareness_CreateTransmittingEvent(pActor->pDistractor->sector, &pActor->thing->position, 0, 3.0, pActor->pDistractor);
                 pActor->pMoveThing = pActor->pDistractor;
                 return 1;
             }

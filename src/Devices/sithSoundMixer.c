@@ -465,7 +465,7 @@ sithPlayingSound* sithSoundMixer_PlaySoundPosThing(sithSound *sound, sithThing *
         }
         if ( pThing == sithPlayer_pLocalPlayerThing || pThing->moveType == SITH_MT_PATH || pThing->type == SITH_THING_PLAYER) // Added: third comparison, co-op
         {
-            sithAIAwareness_AddEntry(pThing->sector, &pThing->position, 0, a5 * 0.6, pThing);
+            sithAIAwareness_CreateTransmittingEvent(pThing->sector, &pThing->position, 0, a5 * 0.6, pThing);
         }
 
         v11 = sithSoundMixer_PlayingSoundFromSound(sound, flags);

@@ -79,7 +79,7 @@ void sithWeapon_Tick(sithThing* weapon, flex_t deltaSeconds)
             weapon->weaponParams.damage = v3;
         }
         if ( (typeFlags & SITH_WF_TRIGGER_AI_AWARENESS) != 0 && (((uint8_t)jkPlayer_currentTickIdx + (weapon->thingIdx & 0xFF)) & 7) == 0 )
-            sithAIAwareness_AddEntry(weapon->sector, &weapon->position, 2, 2.0, weapon);
+            sithAIAwareness_CreateTransmittingEvent(weapon->sector, &weapon->position, 2, 2.0, weapon);
     }
 }
 
@@ -479,7 +479,7 @@ sithThing* sithWeapon_FireMots(sithThing *weapon, sithThing *projectile, rdVecto
     sithThing *spawned; // esi
 
     if ( fireSound )
-        sithAIAwareness_AddEntry(weapon->sector, &weapon->position, 1, 4.0, weapon);
+        sithAIAwareness_CreateTransmittingEvent(weapon->sector, &weapon->position, 1, 4.0, weapon);
 
     spawned = sithWeapon_FireProjectile_0(weapon, projectile, fireOffset, aimError, fireSound, anim, scale, scaleFlags, a9, 0);
 
@@ -494,7 +494,7 @@ sithThing* sithWeapon_Fire(sithThing *weapon, sithThing *projectile, rdVector3 *
     sithThing *spawned; // esi
 
     if ( fireSound )
-        sithAIAwareness_AddEntry(weapon->sector, &weapon->position, 1, 4.0, weapon);
+        sithAIAwareness_CreateTransmittingEvent(weapon->sector, &weapon->position, 1, 4.0, weapon);
 
     spawned = sithWeapon_FireProjectile_0(weapon, projectile, fireOffset, aimError, fireSound, anim, scale, scaleFlags, a9, 0);
 
@@ -863,7 +863,7 @@ void sithWeapon_RemoveAndExplode(sithThing *weapon, sithThing *explodeTemplate)
         {
             // Added: second comparison, co-op
             if (player == sithPlayer_pLocalPlayerThing || player->type == SITH_THING_PLAYER) {
-                sithAIAwareness_AddEntry(spawned->sector, &spawned->position, 0, 2.0, player);
+                sithAIAwareness_CreateTransmittingEvent(spawned->sector, &spawned->position, 0, 2.0, player);
             }
             if (weapon->thingflags & SITH_TF_INVULN)
             {
@@ -1414,7 +1414,7 @@ sithThing* sithWeapon_FireProjectile(sithThing *pSender, sithThing *pProjectileT
         }
     }
     if ( pFireSound )
-        sithAIAwareness_AddEntry(pSender->sector, &pSender->position, 1, 4.0, pSender);
+        sithAIAwareness_CreateTransmittingEvent(pSender->sector, &pSender->position, 1, 4.0, pSender);
     pResult = sithWeapon_FireProjectile_0(pSender, pProjectileTemplate, &fireDir, pFireOffset, pFireSound, mode, scale, scaleFlags, finalTimeOffset, extra);
     if ( pResult && sithComm_multiplayerFlags )
     {

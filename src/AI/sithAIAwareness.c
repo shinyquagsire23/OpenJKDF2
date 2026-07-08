@@ -16,7 +16,7 @@ int sithAIAwareness_Startup()
     if (sithAIAwareness_aSectors)
     {
         sithAIAwareness_numEntries = 0;
-        if ( sithEvent_RegisterTask(3, sithAIAwareness_Tick, 1000, SITHEVENT_TASKPERIODIC) )
+        if ( sithEvent_RegisterTask(3, sithAIAwareness_Update, 1000, SITHEVENT_TASKPERIODIC) )
         {
             sithAIAwareness_bInitted = 1;
             return 1;
@@ -26,7 +26,7 @@ int sithAIAwareness_Startup()
     return 0;
 }
 
-void sithAIAwareness_Shutdown()
+void sithAIAwareness_Close()
 {
     SITH_FREE(sithAIAwareness_aSectors);
     sithAIAwareness_aSectors = 0;
@@ -34,7 +34,7 @@ void sithAIAwareness_Shutdown()
     sithAIAwareness_bInitted = 0;
 }
 
-int sithAIAwareness_AddEntry(sithSector *sector, rdVector3 *pos, int32_t a3, flex_t a4, sithThing *thing)
+int sithAIAwareness_CreateTransmittingEvent(sithSector *sector, rdVector3 *pos, int32_t a3, flex_t a4, sithThing *thing)
 {
     if (!sithAI_bOpened) {
         return 0;
@@ -53,19 +53,19 @@ int sithAIAwareness_AddEntry(sithSector *sector, rdVector3 *pos, int32_t a3, fle
     return 1;
 }
 
-void sithAIAwareness_FlushEntries()
+void sithAIAwareness_ProcessEvents()
 {
     if ( sithAIAwareness_numEntries )
     {
         for (uint32_t i = 0; i < sithAIAwareness_numEntries; i++)
         {
             sithSectorEntry* entry = &sithAIAwareness_aEntries[i];
-            sithAIAwareness_sub_4F2C30(entry, entry->sector, &entry->pos, &entry->pos, entry->field_18, entry->field_18, entry->thing);
+            sithAIAwareness_ProcessEvent(entry, entry->sector, &entry->pos, &entry->pos, entry->field_18, entry->field_18, entry->thing);
         }
     }
 }
 
-int sithAIAwareness_Tick(int32_t a, sithEventInfo* b)
+int sithAIAwareness_Update(int32_t a, sithEventInfo* b)
 {
     // Added: co-op
     if (sithNet_isMulti && !sithNet_isServer) {
@@ -81,7 +81,7 @@ int sithAIAwareness_Tick(int32_t a, sithEventInfo* b)
     {
         sithSectorEntry* v2 = &sithAIAwareness_aEntries[v1];
         // Added: potential crash maybe?
-        sithAIAwareness_sub_4F2C30(v2, v2->sector, &v2->pos, &v2->pos, v2->field_18, v2->field_18, v2->thing);
+        sithAIAwareness_ProcessEvent(v2, v2->sector, &v2->pos, &v2->pos, v2->field_18, v2->field_18, v2->thing);
     }
     
     // sithAI_inittedActors is an inclusive max index (-1 when empty), so the loop must be `<=`
@@ -115,7 +115,7 @@ int sithAIAwareness_Tick(int32_t a, sithEventInfo* b)
     return 1;
 }
 
-void sithAIAwareness_sub_4F2C30(sithSectorEntry *pSectorEntry, sithSector *pSector, rdVector3 *pPos1, rdVector3 *pPos2, flex_t a5, flex_t a6, sithThing *pThing)
+void sithAIAwareness_ProcessEvent(sithSectorEntry *pSectorEntry, sithSector *pSector, rdVector3 *pPos1, rdVector3 *pPos2, flex_t a5, flex_t a6, sithThing *pThing)
 {
     // Added: potential crash maybe?
     OPENJKDF2_WARN_NULL_AND_RETURN(pSectorEntry);
@@ -149,7 +149,7 @@ void sithAIAwareness_sub_4F2C30(sithSectorEntry *pSectorEntry, sithSector *pSect
 #ifndef OPTIMIZE_AWAY_UNUSED_FIELDS
                 adjoinUnk = i->field_1C; // Maybe this was the adjoin center...?
 #endif
-                sithAIAwareness_sub_4F2C30(pSectorEntry, i->sector, pPos1, &adjoinUnk, a6, a6a, pThing);
+                sithAIAwareness_ProcessEvent(pSectorEntry, i->sector, pPos1, &adjoinUnk, a6, a6a, pThing);
             }
         }
     }
