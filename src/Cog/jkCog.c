@@ -440,11 +440,11 @@ void jkCog_PrintUniString(sithCog *ctx)
 
     // Added: Allow openjkdf2_i8n.uni to override everything
 #ifdef QOL_IMPROVEMENTS
-    v4 = stdStrTable_GetUniString(&jkStrings_tableExtOver, key);
+    v4 = stdStrTable_GetValue(&jkStrings_tableExtOver, key);
     if ( !v4 )
 #endif
 
-    v4 = stdStrTable_GetUniString(&jkCog_strings, key);
+    v4 = stdStrTable_GetValue(&jkCog_strings, key);
     if ( !v4 )
         v4 = jkStrings_GetUniStringWithFallback(key);
     stdString_WcharToChar(v8, v4, 127);
@@ -656,11 +656,11 @@ void jkCog_StringConcatUnistring(sithCog *pCog)
 
 // Added: Allow openjkdf2_i8n.uni to override everything
 #ifdef QOL_IMPROVEMENTS
-    str = stdStrTable_GetUniString(&jkStrings_tableExtOver, key);
+    str = stdStrTable_GetValue(&jkStrings_tableExtOver, key);
     if ( !str )
 #endif
 
-    str = stdStrTable_GetUniString(&jkCog_strings, key);
+    str = stdStrTable_GetValue(&jkCog_strings, key);
     if ( !str )
         str = jkStrings_GetUniStringWithFallback(key);
 

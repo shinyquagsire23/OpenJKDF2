@@ -1067,11 +1067,11 @@ int jkDSS_ProcessJKPrintUniString(sithCogMsg *msg)
     wchar_t* v1 = NULL;
 // Added: Allow openjkdf2_i8n.uni to override everything
 #ifdef QOL_IMPROVEMENTS
-    v1 = stdStrTable_GetUniString(&jkStrings_tableExtOver, key);
+    v1 = stdStrTable_GetValue(&jkStrings_tableExtOver, key);
     if ( !v1 )
 #endif
 
-    v1 = stdStrTable_GetUniString(&jkCog_strings, key);
+    v1 = stdStrTable_GetValue(&jkCog_strings, key);
     if ( !v1 )
         v1 = jkStrings_GetUniStringWithFallback(key);
     jkDev_PrintUniString(v1);

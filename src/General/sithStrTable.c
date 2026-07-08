@@ -28,11 +28,11 @@ wchar_t* sithStrTable_GetUniString(const char *key)
     wchar_t* result = NULL;
 #ifdef QOL_IMPROVEMENTS
     if (!result) {
-        result = stdStrTable_GetUniString(&jkStrings_tableExtOver, key);
+        result = stdStrTable_GetValue(&jkStrings_tableExtOver, key);
     }
 #endif
     if (!result) {
-        result = stdStrTable_GetUniString(&sithStrTable_pSithStrings, key);
+        result = stdStrTable_GetValue(&sithStrTable_pSithStrings, key);
     }
     return result;
 }
@@ -42,11 +42,11 @@ wchar_t* sithStrTable_GetUniStringWithFallback(char *key)
     wchar_t* result = NULL;
 #ifdef QOL_IMPROVEMENTS
     if (!result) {
-        result = stdStrTable_GetUniString(&jkStrings_tableExtOver, key);
+        result = stdStrTable_GetValue(&jkStrings_tableExtOver, key);
     }
 #endif
     if (!result) {
-        result = stdStrTable_GetStringWithFallback(&sithStrTable_pSithStrings, key);
+        result = stdStrTable_GetValueOrKey(&sithStrTable_pSithStrings, key);
     }
     return result;
 }

@@ -1455,9 +1455,9 @@ void do_hooks()
     // stdStrTable
     hook_function(stdStrTable_Load_ADDR, stdStrTable_Load);
     hook_function(stdStrTable_Free_ADDR, stdStrTable_Free);
-    hook_function(stdStrTable_GetUniString_ADDR, stdStrTable_GetUniString);
-    hook_function(stdStrTable_GetStringWithFallback_ADDR, stdStrTable_GetStringWithFallback);
-    hook_function(stdStrTable_ParseLine_ADDR, stdStrTable_ParseLine);
+    hook_function(stdStrTable_GetValue_ADDR, stdStrTable_GetValue);
+    hook_function(stdStrTable_GetValueOrKey_ADDR, stdStrTable_GetValueOrKey);
+    hook_function(stdStrTable_ReadLine_ADDR, stdStrTable_ReadLine);
     hook_function(stdStrTable_ParseUniLine_ADDR, stdStrTable_ParseUniLine);
 
     // stdPcx

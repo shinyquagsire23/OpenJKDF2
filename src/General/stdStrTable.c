@@ -231,7 +231,7 @@ void stdStrTable_Free(stdStrTable* pTable)
     }
 }
 
-wchar_t* stdStrTable_GetUniString(stdStrTable* pTable, const char *key)
+wchar_t* stdStrTable_GetValue(stdStrTable* pTable, const char *key)
 {
     stdStrMsg *v2; // eax
     wchar_t *result; // eax
@@ -243,7 +243,7 @@ wchar_t* stdStrTable_GetUniString(stdStrTable* pTable, const char *key)
     return result;
 }
 
-int stdStrTable_ParseLine(stdFile_t fhand, char *buf, int bufLen)
+int stdStrTable_ReadLine(stdFile_t fhand, char *buf, int bufLen)
 {
     int found;
     char *p;
@@ -293,7 +293,7 @@ int stdStrTable_ParseUniLine(stdFile_t fhand, wchar_t *buf)
     return 1;
 }
 
-wchar_t* stdStrTable_GetStringWithFallback(stdStrTable* pTable, const char *key)
+wchar_t* stdStrTable_GetValueOrKey(stdStrTable* pTable, const char *key)
 {
     stdStrMsg *v2; // eax
     wchar_t *result; // eax

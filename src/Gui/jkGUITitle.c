@@ -133,11 +133,11 @@ wchar_t* jkGuiTitle_quicksave_related_func1(stdStrTable *strTable, char *jkl_fna
 
     // Added: Allow openjkdf2_i8n.uni to override everything
 #ifdef QOL_IMPROVEMENTS
-    retval = stdStrTable_GetUniString(&jkStrings_tableExtOver, key);
+    retval = stdStrTable_GetValue(&jkStrings_tableExtOver, key);
     if ( !retval )
 #endif
 
-    retval = stdStrTable_GetUniString(strTable, key);
+    retval = stdStrTable_GetValue(strTable, key);
     if ( !retval )
         retval = jkStrings_GetUniStringWithFallback(key);
 
@@ -160,11 +160,11 @@ wchar_t* jkGuiTitle_quicksave_related_func1(stdStrTable *strTable, char *jkl_fna
 
         // Added: Allow openjkdf2_i8n.uni to override everything
 #ifdef QOL_IMPROVEMENTS
-        pTextStr = stdStrTable_GetUniString(&jkStrings_tableExtOver, key);
+        pTextStr = stdStrTable_GetValue(&jkStrings_tableExtOver, key);
         if ( !pTextStr )
 #endif
 
-        pTextStr = stdStrTable_GetUniString(&jkCog_strings, tmp);
+        pTextStr = stdStrTable_GetValue(&jkCog_strings, tmp);
         texts->str = stdString_FastWCopy(pTextStr);
         ++texts;
     }

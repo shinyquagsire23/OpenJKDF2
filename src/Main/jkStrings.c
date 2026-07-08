@@ -58,15 +58,15 @@ wchar_t* jkStrings_GetUniString(const char *key)
 
     // Added: Allow openjkdf2_i8n.uni to override everything
 #ifdef QOL_IMPROVEMENTS
-    result = stdStrTable_GetUniString(&jkStrings_tableExtOver, key);
+    result = stdStrTable_GetValue(&jkStrings_tableExtOver, key);
     if ( !result )
 #endif
-    result = stdStrTable_GetUniString(&jkStrings_table, key);
+    result = stdStrTable_GetValue(&jkStrings_table, key);
     if ( !result )
-        result = stdStrTable_GetUniString(&jkCog_strings, key);
+        result = stdStrTable_GetValue(&jkCog_strings, key);
 #ifdef QOL_IMPROVEMENTS
     if ( !result )
-        result = stdStrTable_GetUniString(&jkStrings_tableExt, key);
+        result = stdStrTable_GetValue(&jkStrings_tableExt, key);
 #endif
     return result;
 }
@@ -77,21 +77,21 @@ wchar_t* jkStrings_GetUniStringWithFallback(const char *key)
 
     // Added: Allow openjkdf2_i8n.uni to override everything
 #ifdef QOL_IMPROVEMENTS
-    result = stdStrTable_GetUniString(&jkStrings_tableExtOver, key);
+    result = stdStrTable_GetValue(&jkStrings_tableExtOver, key);
     if ( !result )
 #endif
-    result = stdStrTable_GetUniString(&jkStrings_table, key);
+    result = stdStrTable_GetValue(&jkStrings_table, key);
 
-    // Added: OpenJKDF2 i8n -- stdStrTable_GetStringWithFallback must always be the last lookup
+    // Added: OpenJKDF2 i8n -- stdStrTable_GetValueOrKey must always be the last lookup
     // because it always succeeds.
 #ifdef QOL_IMPROVEMENTS
     if ( !result )
-        result = stdStrTable_GetUniString(&jkCog_strings, (char *)key);
+        result = stdStrTable_GetValue(&jkCog_strings, (char *)key);
     if ( !result )
-        result = stdStrTable_GetStringWithFallback(&jkStrings_tableExt, key);
+        result = stdStrTable_GetValueOrKey(&jkStrings_tableExt, key);
 #else
         if ( !result )
-        result = stdStrTable_GetStringWithFallback(&jkCog_strings, (char *)key);
+        result = stdStrTable_GetValueOrKey(&jkCog_strings, (char *)key);
 #endif
     return result;
 }
