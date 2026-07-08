@@ -85,11 +85,24 @@ lets fixes/insights flow between them.
        chars: r/g/b/id/vel) + all-headers uniqueness scan to the processor.
        rd *type*-name diffs (rdThing→rdThingData, rdFace→rdPrimit3, rdColor24→rdRGB,
        rdMeshinfo→rdModel3Mesh) DEFERRED — fuzzy/3a-scope.
-     - **STILL TODO**: `std*` structs (tVBuffer/Gob/tHashTable/stdFont…) + leftover
-       sith (SithSoundClass, SithPlayingSound, SithMap/MapView, collision structs,
-       SithGamesave); and **enum-type field retyping** (`uint32_t type`→`SithThingType`,
-       creating the enum typedefs) — retype targets captured in scratchpad
-       `members_*_retype.json` (28 so far).
+     - **std*/sound/collision structs ✅** — 35 member renames (Gob, GobFileHandle,
+       tHashTable, tLinkListNode, tMemoryState, tRasterInfo, tVBuffer, StdDisplayInfo,
+       StdConffileEntry, stdFileSearch, SithCollision, SithCollideResult,
+       sithSoundClass[Entry], sithSound). All three platforms green, no pruning needed
+       (hardened processor caught everything upfront). Added guards: drop PascalCase
+       olds (a type used as a field, e.g. `StdVideoMode`→`aModes`) and `gap*` positional.
+     - **MEMBER NAME RENAMING (3c names) ✅** — 247 renames across ~55 structs, 4
+       committed batches, all verified macOS+TWL+Dreamcast.
+     - **STILL TODO in 3c**: **enum-type field retyping** (`uint32_t type`→`SithThingType`)
+       — 29 targets in scratchpad `all_retypes.json`. NEEDS: (1) convert the bare
+       DF2 enums to `typedef enum eName {…} Name;` (structural edits to types_enums.h;
+       27-enum map in scratchpad), (2) **reconcile each target's field name** — many
+       point at the J3D new name (`rdFace.flags`) but that name rename was DROPPED
+       (`type`→`flags` blocklisted), so the field is still its old name; retype the
+       ACTUAL current field, (3) verify width/signedness on all 3 platforms.
+     - **DEFERRED generic members** — recoverable via clang-AST scoped rename; the
+       full drop list is regenerable from `process_members.py` (GENERIC/short/PascalCase/
+       positional/shared-in-N filters).
 4. **Style match (final)** — for each function, match OpenJones3D's *style* as
    closely as possible **without changing functionality**:
    - **argument names** → adopt J3D's parameter names.
