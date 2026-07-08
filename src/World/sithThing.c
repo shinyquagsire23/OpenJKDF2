@@ -154,14 +154,14 @@ int sithThing_Startup()
 
     if ( !sithThing_bInitted )
     {
-        sithThing_paramKeyToParamValMap = stdHashtbl_New((NUM_THING_PARAMS+1) * 2);
-        if ( sithThing_paramKeyToParamValMap )
+        sithThing_pParseHashtbl = stdHashtbl_New((NUM_THING_PARAMS+1) * 2);
+        if ( sithThing_pParseHashtbl )
         {
             v1 = 1;
             v2 = (const char **)sithThing_aParams;
             while ( 1 )
             {
-                stdHashtbl_Add(sithThing_paramKeyToParamValMap, *v2++, (void *)(intptr_t)v1++);
+                stdHashtbl_Add(sithThing_pParseHashtbl, *v2++, (void *)(intptr_t)v1++);
                 if ( (intptr_t)v2 >= (intptr_t)&sithThing_aParams[NUM_THING_PARAMS] )
                     break;
             }
@@ -176,7 +176,7 @@ int sithThing_Shutdown()
 {
     if ( !sithThing_bInitted )
         return 0;
-    stdHashtbl_Free(sithThing_paramKeyToParamValMap);
+    stdHashtbl_Free(sithThing_pParseHashtbl);
     sithThing_bInitted = 0;
     return 1;
 }
@@ -184,7 +184,7 @@ int sithThing_Shutdown()
 void sithThing_RegisterUnknownFunc(sithThing_handler_t handler)
 {
     if ( handler )
-        sithThing_handler = handler;
+        sithThing_pfUnknownFunc = handler;
 }
 
 // MOTS altered?
@@ -265,8 +265,8 @@ void sithThing_Update(flex_t deltaSeconds, int deltaMs)
                     sithWeapon_Update(pThingIter, deltaSeconds);
                     break;
             }
-            if ( sithThing_handler && pThingIter->jkFlags )
-                sithThing_handler(pThingIter);
+            if ( sithThing_pfUnknownFunc && pThingIter->jkFlags )
+                sithThing_pfUnknownFunc(pThingIter);
             if ( pThingIter->moveType == SITH_MT_PHYSICS )
             {
                 // CPU optimization testing
@@ -961,12 +961,12 @@ sithThing* sithThing_Create(uint32_t thingType)
     pThingRet = pWorld->things + iVar4;
     sithThing_Reset(pThingRet);
     pThingRet->thingIdx = iVar4;
-    if (sithThing_inittedThings == 0) {
-        sithThing_inittedThings = 1; // TODO: this is a 32-bit write?
+    if (sithThing_guidEntropy == 0) {
+        sithThing_guidEntropy = 1; // TODO: this is a 32-bit write?
     }
     iVar3 = playerThingIdx + 1;
-    uint32_t uVar5 = sithThing_inittedThings & 0xffff;
-    sithThing_inittedThings = sithThing_inittedThings + 1;
+    uint32_t uVar5 = sithThing_guidEntropy & 0xffff;
+    sithThing_guidEntropy = sithThing_guidEntropy + 1;
     pThingRet->signature = sithThing_bInitted2;
     sithThing_bInitted2 = sithThing_bInitted2 + 1;
     pThingRet->thing_id = (iVar3 << 16) | uVar5;
@@ -1578,7 +1578,7 @@ int sithThing_ParseArg(stdConffileArg *arg, sithThing* pThing)
     int32_t v8; // eax
 
     v2 = 0;
-    param = (int)(intptr_t)stdHashtbl_Find(sithThing_paramKeyToParamValMap, arg->key);
+    param = (int)(intptr_t)stdHashtbl_Find(sithThing_pParseHashtbl, arg->key);
     paramIdx = param;
     if ( !param )
         return 0;

@@ -779,9 +779,9 @@ sithSector_aModifiedSectors 0x00855438 sithSector*[16]
 sithSector_aSyncFlags 0x00855478 int[16]
 sithSector_numModifiedSectors 0x008554B8 uint32_t
 
-sithThing_paramKeyToParamValMap 0x008326A8 stdHashTable*
-sithThing_handler 0x008330FC sithThing_handler_t
-sithThing_inittedThings 0x00549358 uint16_t = 1
+sithThing_pParseHashtbl 0x008326A8 stdHashTable*
+sithThing_pfUnknownFunc 0x008330FC sithThing_handler_t
+sithThing_guidEntropy 0x00549358 uint16_t = 1
 
 jkGuiSaveLoad_wtextEpisode 0x00559528 wchar_t[256]
 jkGuiSaveLoad_wtextHealth 0x00559728 wchar_t[64]
