@@ -16,7 +16,7 @@ LSTATUS wuRegistry_Startup(HKEY hKey, LPCSTR lpSubKey, BYTE *lpData)
     DWORD Type; // [esp+5Ch] [ebp-84h] BYREF
     BYTE Data[128]; // [esp+60h] [ebp-80h] BYREF
 
-    wuRegistry_bInitted = 1;
+    wuRegistry_bStarted = 1;
     wuRegistry_lpSubKey = lpSubKey;
     wuRegistry_hKey = hKey;
     result = RegCreateKeyExA(hKey, lpSubKey, 0, wuRegistry_lpClass, 0, 0xF003Fu, 0, &phkResult, &dwDisposition);
@@ -50,7 +50,7 @@ LSTATUS wuRegistry_Startup(HKEY hKey, LPCSTR lpSubKey, BYTE *lpData)
 
 void wuRegistry_Shutdown()
 {
-    wuRegistry_bInitted = 0;
+    wuRegistry_bStarted = 0;
 }
 
 int wuRegistry_SaveInt(LPCSTR lpValueName, int val)

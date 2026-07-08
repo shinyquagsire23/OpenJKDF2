@@ -359,7 +359,7 @@ stdMci_dwVolume 0x00563724 int
 stdMci_bInitted 0x00563728 int
 stdMci_uDeviceID 0x00548118 int
 
-wuRegistry_bInitted 0x00855EA4 int
+wuRegistry_bStarted 0x00855EA4 int
 wuRegistry_lpClass 0x00855EB0 uint8_t[4]
 wuRegistry_byte_855EB4 0x00855EB4 uint8_t[4]
 wuRegistry_hKey 0x00855EAC HKEY

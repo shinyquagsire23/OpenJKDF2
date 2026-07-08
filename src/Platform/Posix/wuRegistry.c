@@ -6,13 +6,13 @@
 
 LSTATUS wuRegistry_Startup(HKEY hKey, LPCSTR lpSubKey, BYTE *lpData)
 {
-    wuRegistry_bInitted = 1;
+    wuRegistry_bStarted = 1;
     return 0;
 }
 
 void wuRegistry_Shutdown()
 {
-    wuRegistry_bInitted = 0;
+    wuRegistry_bStarted = 0;
 }
 
 int wuRegistry_SaveInt(LPCSTR lpValueName, int val)
