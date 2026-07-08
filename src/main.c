@@ -1770,9 +1770,9 @@ void do_hooks()
     hook_function(rdPuppet_SetTrackSpeed_ADDR, rdPuppet_SetTrackSpeed);
     hook_function(rdPuppet_SetStatus_ADDR, rdPuppet_SetStatus);
     hook_function(rdPuppet_PlayTrack_ADDR, rdPuppet_PlayTrack);
-    hook_function(rdPuppet_unk_ADDR, rdPuppet_unk);
+    hook_function(rdPuppet_ResetTrack_ADDR, rdPuppet_ResetTrack);
     //hook_function(rdPuppet_AdvanceTrack_ADDR, rdPuppet_AdvanceTrack);
-    hook_function(rdPuppet_RemoveTrack_ADDR, rdPuppet_RemoveTrack);
+    hook_function(rdPuppet_NewEntry_ADDR, rdPuppet_NewEntry);
 #endif
     
     // rdSprite
@@ -3036,7 +3036,7 @@ void do_hooks()
     hook_function_inv(rdPuppet_New_ADDR, rdPuppet_New);
     hook_function_inv(rdPuppet_Free_ADDR, rdPuppet_Free);
     hook_function_inv(rdPuppet_BuildJointMatrices_ADDR, rdPuppet_BuildJointMatrices);
-    hook_function_inv(rdPuppet_ResetTrack_ADDR, rdPuppet_ResetTrack);
+    hook_function_inv(rdPuppet_RemoveTrack_ADDR, rdPuppet_RemoveTrack);
     hook_function_inv(rdPuppet_UpdateTracks_ADDR, rdPuppet_UpdateTracks);
     hook_function_inv(rdPuppet_AddTrack_ADDR, rdPuppet_AddTrack);
     hook_function_inv(rdPuppet_SetCallback_ADDR, rdPuppet_SetCallback);
@@ -3046,8 +3046,8 @@ void do_hooks()
     hook_function_inv(rdPuppet_SetTrackSpeed_ADDR, rdPuppet_SetTrackSpeed);
     hook_function_inv(rdPuppet_SetStatus_ADDR, rdPuppet_SetStatus);
     hook_function_inv(rdPuppet_PlayTrack_ADDR, rdPuppet_PlayTrack);
-    hook_function_inv(rdPuppet_unk_ADDR, rdPuppet_unk);
-    hook_function_inv(rdPuppet_RemoveTrack_ADDR, rdPuppet_RemoveTrack);
+    hook_function_inv(rdPuppet_ResetTrack_ADDR, rdPuppet_ResetTrack);
+    hook_function_inv(rdPuppet_NewEntry_ADDR, rdPuppet_NewEntry);
 #endif
 
 #if 0

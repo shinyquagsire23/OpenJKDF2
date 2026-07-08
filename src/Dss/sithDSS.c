@@ -1040,7 +1040,7 @@ int sithDSS_ProcessPuppetStatus(sithCogMsg *msg)
     if ( !rdpuppet )
         return 0;
 
-    rdPuppet_RemoveTrack(rdpuppet, &thing->rdthing);
+    rdPuppet_NewEntry(rdpuppet, &thing->rdthing);
 
     for (int i = 0; i < 4; i++)
     {

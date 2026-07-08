@@ -372,7 +372,7 @@ accumulate_finalize:
     thing->frameTrue = rdroid_frameTrue;
 }
 
-int rdPuppet_ResetTrack(rdPuppet *puppet, int trackNum)
+int rdPuppet_RemoveTrack(rdPuppet *puppet, int trackNum)
 {
     if ( puppet->tracks[trackNum].callback )
         puppet->tracks[trackNum].callback(puppet->rdthing->parentSithThing, trackNum, 0);
@@ -433,7 +433,7 @@ int rdPuppet_UpdateTracks(rdPuppet *puppet, flex_t deltaSeconds)
                 }
                 else
                 {
-                    rdPuppet_ResetTrack(puppet, v2);
+                    rdPuppet_RemoveTrack(puppet, v2);
                 }
             }
         }
@@ -470,7 +470,7 @@ int rdPuppet_AddTrack(rdPuppet *puppet, rdKeyframe *keyframe, int lowPri, int hi
         if ( newTrackIdx >= 4 )
             return -1;
 
-        rdPuppet_ResetTrack(puppet, newTrackIdx);
+        rdPuppet_RemoveTrack(puppet, newTrackIdx);
     }
     
     newTrack = &puppet->tracks[newTrackIdx];
@@ -481,7 +481,7 @@ int rdPuppet_AddTrack(rdPuppet *puppet, rdKeyframe *keyframe, int lowPri, int hi
     newTrack->status |= 1;
     newTrack->playSpeed = 0.0;
 
-    rdPuppet_unk(puppet, newTrackIdx);
+    rdPuppet_ResetTrack(puppet, newTrackIdx);
     
     return newTrackIdx;
 }
@@ -599,7 +599,7 @@ void rdPuppet_AdvanceTrack(rdPuppet *puppet, int trackNum, flex_t deltaSecondsKi
 
     if ( v20 )
     {
-        rdPuppet_ResetTrack(puppet, trackNum);
+        rdPuppet_RemoveTrack(puppet, trackNum);
     }
     else
     {
@@ -643,7 +643,7 @@ int rdPuppet_PlayTrack(rdPuppet *puppet, int trackNum)
     return 1;
 }
 
-void rdPuppet_unk(rdPuppet *puppet, int trackNum)
+void rdPuppet_ResetTrack(rdPuppet *puppet, int trackNum)
 {
     rdPuppetTrack *v2; // edx
 
@@ -656,7 +656,7 @@ void rdPuppet_unk(rdPuppet *puppet, int trackNum)
     v2->status = 3;
 }
 
-int rdPuppet_RemoveTrack(rdPuppet *puppet, rdThing *rdthing)
+int rdPuppet_NewEntry(rdPuppet *puppet, rdThing *rdthing)
 {
     puppet->paused = 0;
     puppet->rdthing = rdthing;
@@ -665,7 +665,7 @@ int rdPuppet_RemoveTrack(rdPuppet *puppet, rdThing *rdthing)
         puppet->tracks[i].field_120 = 0.0;
         puppet->tracks[i].field_124 = 0.0;
 
-        rdPuppet_ResetTrack(puppet, i);
+        rdPuppet_RemoveTrack(puppet, i);
     }
 
     return 1;

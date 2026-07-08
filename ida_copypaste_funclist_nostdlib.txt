@@ -1093,12 +1093,12 @@ rdThing_SetParticleCloud	.text	0043E4C0	00000017	00000000	00000008	R	.	.	.	.	.	T
 rdThing_Draw	.text	0043E4E0	0000005D	00000000	00000008	R	.	.	.	.	.	T	.
 rdThing_AccumulateMatrices	.text	0043E560	000000D9	0000004C	0000000C	R	.	.	.	.	.	T	.
 rdPuppet_New	.text	0043E640	00000090	0000000C	00000004	R	.	.	.	.	.	T	.
-rdPuppet_RemoveTrack	.text	0043E6D0	00000065	00000010	00000008	R	.	.	.	.	.	T	.
+rdPuppet_NewEntry	.text	0043E6D0	00000065	00000010	00000008	R	.	.	.	.	.	T	.
 rdPuppet_Free	.text	0043E740	00000015	00000000	00000004	R	.	.	.	.	.	T	.
 rdPuppet_FreeEntry	.text	0043E760	00000001	00000000	00000000	R	.	.	.	.	.	.	.
 rdPuppet_SetPause	.text	0043E770	0000000B	00000000	00000008	R	.	.	.	.	.	T	.
 rdPuppet_AddTrack	.text	0043E780	000000F0	00000010	00000010	R	.	.	.	.	.	T	.
-rdPuppet_ResetTrack	.text	0043E870	00000051	00000004	00000008	R	.	.	.	.	.	T	.
+rdPuppet_RemoveTrack	.text	0043E870	00000051	00000004	00000008	R	.	.	.	.	.	T	.
 rdPuppet_SetStatus	.text	0043E8D0	00000025	00000000	0000000C	R	.	.	.	.	.	T	.
 rdPuppet_SetCallback	.text	0043E900	0000001A	00000000	0000000C	R	.	.	.	.	.	T	.
 rdPuppet_PlayTrack	.text	0043E920	0000002E	00000000	00000008	R	.	.	.	.	.	T	.
@@ -1109,7 +1109,7 @@ rdPuppet_SetTrackNoise	.text	0043EA30	0000003B	00000000	0000000C	R	.	.	.	.	.	T	.
 rdPuppet_SetTrackPriority	.text	0043EA70	00000024	00000000	00000010	R	.	.	.	.	.	T	.
 rdPuppet_AdvanceTrack	.text	0043EAA0	000002C7	00000020	0000000C	R	.	.	.	.	B	T	.
 rdPuppet_UpdateTracks	.text	0043ED70	000000EE	00000018	00000008	R	.	.	.	.	.	T	.
-rdPuppet_unk	.text	0043EE60	0000004D	00000008	00000008	R	.	.	.	.	.	T	.
+rdPuppet_ResetTrack	.text	0043EE60	0000004D	00000008	00000008	R	.	.	.	.	.	T	.
 rdPuppet_BuildJointMatrices	.text	0043EEB0	0000083C	00000084	00000008	R	.	.	.	.	.	T	.
 rdMatrix_Build34	.text	0043F6F0	00000121	00000024	0000000C	R	.	.	.	.	.	T	.
 rdMatrix_BuildFromLook34	.text	0043F820	00000164	00000008	00000008	R	.	.	.	.	.	T	.

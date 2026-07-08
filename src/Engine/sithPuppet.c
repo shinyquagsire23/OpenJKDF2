@@ -206,7 +206,7 @@ int sithPuppet_PlayMode(sithThing *thing, signed int anim, rdPuppetTrackCallback
         {
             v11 = thing->rdthing.puppet;
             if ( v11->tracks[v10].keyframe )
-                rdPuppet_ResetTrack(v11, v10);
+                rdPuppet_RemoveTrack(v11, v10);
             thing->puppet->currentTrack = -1;
         }
     }
@@ -233,7 +233,7 @@ int sithPuppet_PlayKey(rdPuppet *puppet, rdKeyframe *keyframe, int a3, int a4, i
             if ( trackNum >= 4 )
                 goto LABEL_8;
         }
-        rdPuppet_unk(puppet, trackNum);
+        rdPuppet_ResetTrack(puppet, trackNum);
         v6 = 0;
     }
     else
@@ -281,7 +281,7 @@ void sithPuppet_ResetTrack(sithThing *puppet)
     sithPuppet *v2; // eax
 
     for ( trackNum = 0; trackNum < 4; ++trackNum )
-        rdPuppet_ResetTrack(puppet->rdthing.puppet, trackNum);
+        rdPuppet_RemoveTrack(puppet->rdthing.puppet, trackNum);
     v2 = puppet->puppet;
     v2->playingAnim = NULL;
     v2->otherTrack = -1;
@@ -587,7 +587,7 @@ void sithPuppet_sub_4E4A20(sithThing *thing, sithAnimclassEntry *animClass)
             if ( v5 >= 0 )
             {
                 if ( rdPup->tracks[v5].keyframe )
-                    rdPuppet_ResetTrack(rdPup, v5);
+                    rdPuppet_RemoveTrack(rdPup, v5);
                 sithPup = thing->puppet;
                 sithPup->currentTrack = -1;
             }
@@ -783,7 +783,7 @@ int sithPuppet_StopKey(rdPuppet *pupper, int track, flex_t a3)
     if ( !pupper->tracks[track].keyframe )
         return 0;
     if ( a3 <= 0.0 )
-        rdPuppet_ResetTrack(pupper, track);
+        rdPuppet_RemoveTrack(pupper, track);
     else
         rdPuppet_FadeOutTrack(pupper, track, a3);
     return 1;
@@ -876,7 +876,7 @@ void sithPuppet_resetidk(sithThing *pThing)
     {
         v3 = pThing->rdthing.puppet;
         if ( v3->tracks[v2].keyframe )
-            rdPuppet_ResetTrack(v3, v2);
+            rdPuppet_RemoveTrack(v3, v2);
         pThing->puppet->currentTrack = -1;
     }
 }
