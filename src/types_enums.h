@@ -1143,14 +1143,14 @@ typedef enum SITH_SECTOR_FLAG
 } SITH_SECTOR_FLAG;
 
 
-enum MOVETYPE
+typedef enum eSithThingMoveType
 {
     SITH_MT_NONE = 0x0,
     SITH_MT_PHYSICS = 0x1,
     SITH_MT_PATH = 0x2,
-};
+} SithThingMoveType;
 
-enum THING_PHYSFLAGS
+typedef enum eSithPhysicsFlags
 {
     SITH_PF_USEGRAVITY = 0x1,
     SITH_PF_USETHRUST = 0x2,
@@ -1180,7 +1180,7 @@ enum THING_PHYSFLAGS
     SITH_PF_2000000 = 0x2000000,
     SITH_PF_4000000 = 0x4000000,
     SITH_PF_8000000 = 0x8000000,
-};
+} SithPhysicsFlags;
 
 enum THINGPARAM
 {
@@ -1265,7 +1265,7 @@ enum THINGPARAM
     THINGPARAM_FLESHHIT
 };
 
-enum THINGTYPE
+typedef enum eSithThingType
 {
     SITH_THING_FREE   = 0,
     SITH_THING_CAMERA  = 1,
@@ -1288,10 +1288,11 @@ enum THINGTYPE
     SITH_THING_POLYLINE = 14,
     SITH_THING_NUMTYPES = 15,
     */
-};
+} SithThingType;
 
 // Control Type
-enum SITH_CT {
+typedef enum eSithControlType
+{
     SITH_CT_PLOT = 0,
     SITH_CT_PLAYER = 1,
     SITH_CT_AI = 2,
@@ -1305,7 +1306,7 @@ enum SITH_CT {
     SITH_CT_10 = 10,
     SITH_CT_11 = 11,
     SITH_CT_12 = 12,
-};
+} SithControlType;
 
 enum SITH_DAMAGE
 {
@@ -1318,7 +1319,7 @@ enum SITH_DAMAGE
     SITH_DAMAGE_FALL    = 0x40,
 };
 
-enum SITH_TF
+typedef enum eSithThingFlag
 {
     SITH_TF_EMITLIGHT    = 1,
     SITH_TF_DESTROYED  = 2,
@@ -1352,7 +1353,7 @@ enum SITH_TF
     SITH_TF_SPLASHES  = 0x20000000,
     SITH_TF_40000000 = 0x40000000,
     SITH_TF_80000000 = 0x80000000,
-};
+} SithThingFlag;
 
 enum THING_TYPEFLAGS
 {
@@ -1390,7 +1391,7 @@ enum THING_TYPEFLAGS
     THING_TYPEFLAGS_80000000  = 0x80000000
 };
 
-enum SITH_AF
+typedef enum eSithActorFlag
 {
     SITH_AF_CANROTATEHEAD = 0x1,
     SITH_AF_VIEWCENTRING = 0x2,
@@ -1424,7 +1425,7 @@ enum SITH_AF
     SITH_AF_SCOPEHUD = 0x20000000,
     SITH_AF_ELECTRICWHIP = 0x40000000, // Jones: ELECTRICT_WHIP
     SITH_AF_ARACHNID = 0x80000000, // Jones: ARACHNID
-};
+} SithActorFlag;
 
 #define SITH_AF_COMBO_FREEZE (Main_bMotsCompat ? (SITH_AF_IMMOBILE|SITH_AF_FREEZE_MOVEMENT) : (SITH_AF_IMMOBILE))
 #define SITH_AF_COMBO_BLIND (SITH_AF_BLIND | MOTS_ONLY_FLAG(SITH_AF_FLYERMOVE))
