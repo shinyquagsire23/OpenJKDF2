@@ -25,7 +25,7 @@ void sithAIClass_Shutdown()
 }
 
 // Unused
-int sithAIClass_New(sithWorld *world, int a2)
+int sithAIClass_AllocWorldAIClasses(sithWorld *world, int a2)
 {
     intptr_t result; // eax
 
@@ -48,7 +48,7 @@ int sithAIClass_New(sithWorld *world, int a2)
     return result;
 }
 
-int sithAIClass_ParseSection(sithWorld *world, int a2)
+int sithAIClass_ReadStaticAIClassesListText(sithWorld *world, int a2)
 {
     int numAIClasses; // ebx
     sithAIClass *aiclasses; // eax
@@ -251,7 +251,7 @@ int sithAIClass_LoadEntry(char *fpath, sithAIClass *aiclass)
     return result;
 }
 
-void sithAIClass_Free(sithWorld *world)
+void sithAIClass_FreeWorldAIClasses(sithWorld *world)
 {
     if (world->aiclasses)
     {

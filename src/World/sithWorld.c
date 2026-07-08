@@ -94,7 +94,7 @@ int sithWorld_Startup()
     sithWorld_SetSectionParser("cogscripts", sithCogScript_Load);
     sithWorld_SetSectionParser("keyframes", sithKeyFrame_Load);
     sithWorld_SetSectionParser("animclass", sithAnimClass_Load);
-    sithWorld_SetSectionParser("aiclass", sithAIClass_ParseSection);
+    sithWorld_SetSectionParser("aiclass", sithAIClass_ReadStaticAIClassesListText);
     sithWorld_SetSectionParser("soundclass", sithSoundClass_Load);
 #ifdef JKM_LIGHTING
     sithWorld_SetSectionParser("archlighting", sithArchLighting_ParseSection); // MOTS added
@@ -427,7 +427,7 @@ void sithWorld_FreeEntry(sithWorld *pWorld)
     if ( pWorld->animclasses )
         sithAnimClass_Free(pWorld);
     if ( pWorld->aiclasses )
-        sithAIClass_Free(pWorld);
+        sithAIClass_FreeWorldAIClasses(pWorld);
     if ( pWorld->soundclasses )
         sithSoundClass_Free2(pWorld);
 

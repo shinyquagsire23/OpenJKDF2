@@ -2499,9 +2499,9 @@ sithMaterial_AllocWorldMaterials	.text	004F1140	0000007D	00000008	00000008	R	.	.
 sithMaterial_UnloadAll	.text	004F11C0	00000030	00000008	00000000	R	.	.	.	.	.	T	.
 sithAIClass_Startup	.text	004F11F0	00000019			R	.	.	.	.	.	.	.
 sithAIClass_Shutdown	.text	004F1210	0000001D			R	.	.	.	.	.	.	.
-sithAIClass_ParseSection	.text	004F1230	00000165	0000000C	00000008	R	.	.	.	.	.	T	.
-sithAIClass_New	.text	004F13A0	0000006D	0000000C	00000008	R	.	.	.	.	.	T	.
-sithAIClass_Free	.text	004F1410	00000082	00000004	00000004	R	.	.	.	.	.	T	.
+sithAIClass_ReadStaticAIClassesListText	.text	004F1230	00000165	0000000C	00000008	R	.	.	.	.	.	T	.
+sithAIClass_AllocWorldAIClasses	.text	004F13A0	0000006D	0000000C	00000008	R	.	.	.	.	.	T	.
+sithAIClass_FreeWorldAIClasses	.text	004F1410	00000082	00000004	00000004	R	.	.	.	.	.	T	.
 sithAIClass_Load	.text	004F14A0	00000117	00000090	00000004	R	.	.	.	.	.	T	.
 sithAIClass_LoadEntry	.text	004F15C0	000002E8	000000A8	00000008	R	.	.	.	.	B	T	.
 sithParticle_Startup	.text	004F18B0	00000040			R	.	.	.	.	.	.	.

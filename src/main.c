@@ -2584,9 +2584,9 @@ void do_hooks()
     // sithAIClass
     hook_function(sithAIClass_Startup_ADDR, sithAIClass_Startup);
     hook_function(sithAIClass_Shutdown_ADDR, sithAIClass_Shutdown);
-    hook_function(sithAIClass_ParseSection_ADDR, sithAIClass_ParseSection);
-    hook_function(sithAIClass_New_ADDR, sithAIClass_New);
-    hook_function(sithAIClass_Free_ADDR, sithAIClass_Free);
+    hook_function(sithAIClass_ReadStaticAIClassesListText_ADDR, sithAIClass_ReadStaticAIClassesListText);
+    hook_function(sithAIClass_AllocWorldAIClasses_ADDR, sithAIClass_AllocWorldAIClasses);
+    hook_function(sithAIClass_FreeWorldAIClasses_ADDR, sithAIClass_FreeWorldAIClasses);
     hook_function(sithAIClass_Load_ADDR, sithAIClass_Load);
     hook_function(sithAIClass_LoadEntry_ADDR, sithAIClass_LoadEntry);
     
