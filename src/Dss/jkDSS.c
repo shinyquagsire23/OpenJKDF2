@@ -99,7 +99,7 @@ int jkDSS_Startup()
     return 1;
 }
 
-int jkDSS_JKM1(int32_t unused1, SithEventParams* unused2)
+int jkDSS_JKM1(int32_t vecUnknown1, SithEventParams* unused2)
 {
     if (jkDSS_005aec8c != 0) {
         jkDSS_SendSaberInfo_alt_Mots(sithPlayer_g_pLocalPlayerThing,jkGuiMultiplayer_mpcInfo.model,jkGuiMultiplayer_mpcInfo.soundClass,jkGuiMultiplayer_mpcInfo.sideMat,jkGuiMultiplayer_mpcInfo.tipMat,jkGuiMultiplayer_mpcInfo.personality);
@@ -1050,7 +1050,7 @@ LABEL_6:
     }
     if ( a2 < jkPlayer_maxPlayers && (jkPlayer_playerInfos[a2].flags & 1) != 0 )
     {
-        v2 = jkPlayer_playerInfos[a2].net_id;
+        v2 = jkPlayer_playerInfos[a2].playerNetId;
         if ( v2 )
             goto LABEL_6;
     }

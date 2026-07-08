@@ -1358,7 +1358,7 @@ typedef struct SithPuppetClass
     uint32_t namecrc;
 #endif
     sithAnimclassMode modes[6];
-    int32_t bodypart_to_joint[10];
+    int32_t aJoints[10];
 } SithPuppetClass;
 
 typedef struct SithSurfaceAdjoin
@@ -1378,21 +1378,21 @@ typedef struct SithSurfaceAdjoin
 #pragma pack(push, 4)
 typedef struct SithCamera
 {
-    uint32_t cameraPerspective;
+    uint32_t type;
     uint32_t dword4;
     flex_t fov;
     flex_t aspectRatio;
-    SithThing* primaryFocus;
-    SithThing* secondaryFocus;
+    SithThing* pPrimaryFocusThing;
+    SithThing* pSecondaryFocusThing;
     SithSector* sector;
-    rdVector3 collisionOffset;
+    rdVector3 offset;
 #ifndef OPTIMIZE_AWAY_UNUSED_FIELDS
-    rdVector3 unused1;
+    rdVector3 vecUnknown1;
 #endif
-    rdMatrix34 viewMat;
-    rdVector3 vec3_1;
-    rdVector3 viewPYR;
-    rdCamera rdCam;
+    rdMatrix34 orient;
+    rdVector3 lookPos;
+    rdVector3 lookPYR;
+    rdCamera rdCamera;
 #ifdef JKM_CAMERA
     int32_t bZoomed;
     flex_t zoomScale;
@@ -1413,7 +1413,7 @@ typedef int (*sithEventHandler_t)(int32_t, SithEventParams*);
 
 typedef struct SithEventParams
 {
-    int32_t cogIdx;
+    int32_t idx;
     int32_t timerIdx;
     flex_t field_10;
     flex_t field_14;
@@ -1421,10 +1421,10 @@ typedef struct SithEventParams
 
 typedef struct SithEvent
 {
-    uint32_t endMs;
+    uint32_t msecEventTime;
     int32_t taskNum;
-    SithEventParams timerInfo;
-    SithEvent* nextTimer;
+    SithEventParams params;
+    SithEvent* pNextEvent;
 } SithEvent;
 
 typedef struct SithEventTask
@@ -1432,7 +1432,7 @@ typedef struct SithEventTask
     sithEventHandler_t pfProcess;
     uint32_t startMode;
     uint32_t rate;
-    uint32_t creationMs;
+    uint32_t msecLastIntervalTime;
     uint32_t field_10;
 } SithEventTask;
 
@@ -1886,25 +1886,25 @@ typedef struct SithCogSymbolValue
 
 typedef struct sithCog
 {
-    SithCogScript* cogscript;
+    SithCogScript* pScript;
     sithCogFlags_t flags;
-    int32_t selfCog;
+    int32_t idx;
     uint32_t script_running;
     uint32_t execPos;
-    uint32_t wakeTimeMs;
-    uint32_t pulsePeriodMs;
-    uint32_t nextPulseMs;
+    uint32_t msecTimerTimeout;
+    uint32_t msecPulseInterval;
+    uint32_t msecNextPulseTime;
     uint32_t field_20;
     uint32_t senderId;
     uint32_t senderRef;
     uint32_t senderType;
-    uint32_t sourceRef;
+    uint32_t sourceIdx;
     uint32_t sourceType;
     uint32_t trigId;
     cog_flex_t params[4];
-    cog_flex_t returnEx;
+    cog_flex_t returnValue;
     SithCogCallstackElement callstack[4];
-    uint32_t calldepth;
+    uint32_t callDepth;
     SithCogSymbolTable* pSymbolTable;
 #ifdef COG_DYNAMIC_STACKS
     SithCogSymbolValue* stack;
@@ -1914,11 +1914,11 @@ typedef struct sithCog
 #endif
     uint32_t stackPos;
 #ifdef SITH_DEBUG_STRUCT_NAMES
-    char cogscript_fpath[32];
+    char aName[32];
 #endif
 #ifdef JKM_TYPES
     uint32_t unk1;
-    int32_t numHeapVars;
+    int32_t heapSize;
     SithCogSymbolValue* heap;
 #endif
 #ifdef COG_HEAP_INIT_ARGS
@@ -1928,7 +1928,7 @@ typedef struct sithCog
 #endif
 #ifndef JKM_TYPES
     SithCogSymbolValue* heap;
-    int32_t numHeapVars;
+    int32_t heapSize;
 #endif
 } sithCog;
 
@@ -2113,7 +2113,7 @@ typedef struct cogSymbol
 
 typedef struct SithCogSymbol
 {
-  int32_t symbol_id;
+  int32_t id;
   SithCogSymbolValue val;
 #if 0
   int32_t symbol_type;
@@ -2140,11 +2140,11 @@ typedef struct SithCogSymbol
 
 typedef struct SithCogSymbolTable
 {
-    SithCogSymbol* buckets;
-    tHashTable* hashtable;
-    uint32_t entry_cnt;
-    uint32_t max_entries;
-    uint32_t bucket_idx;
+    SithCogSymbol* aSymbols;
+    tHashTable* pHashtbl;
+    uint32_t numUsedSymbols;
+    uint32_t tableSize;
+    uint32_t firstId;
     uint32_t unk_14;
 } SithCogSymbolTable;
 
@@ -2163,28 +2163,28 @@ typedef struct SithCogScript
 {
     sithCogFlags_t flags;
 #ifdef SITH_DEBUG_STRUCT_NAMES
-    char cog_fpath[32];
+    char aName[32];
 #endif
 #ifdef STDHASHTABLE_CRC32_KEYS
     uint32_t pathCrc;
 #endif
-    int32_t* script_program;
+    int32_t* pCode;
     uint32_t codeSize;
     SithCogSymbolTable *pSymbolTable;
-    uint32_t num_triggers;
+    uint32_t numHandlers;
 
 #ifdef COG_DYNAMIC_TRIGGERS
-    sithCogTrigger* triggers;
+    sithCogTrigger* aHandlers;
 #else
-    sithCogTrigger triggers[32];
+    sithCogTrigger aHandlers[32];
 #endif
 
 #ifdef COG_DYNAMIC_IDK
-    SithCogSymbolRef* aIdk;
+    SithCogSymbolRef* aSymRefs;
 #else    
-    SithCogSymbolRef aIdk[128];
+    SithCogSymbolRef aSymRefs[128];
 #endif
-    uint32_t numIdk;
+    uint32_t numSymbolRefs;
 } SithCogScript;
 
 typedef struct SithAIRegisteredInstinct
@@ -2205,8 +2205,8 @@ typedef struct SithAIInstinct
   int32_t param1;
   int32_t param2;
   int32_t param3;
-  flex_t argsAsFloat[16];
-  int32_t argsAsInt[16];
+  flex_t fltArg[16];
+  int32_t intArg[16];
   sithAICommandFunc_t func;
 } SithAIInstinct;
 
@@ -2217,11 +2217,11 @@ typedef struct SithAIClass
   flex_t alignment;
   flex_t rank;
   flex_t maxStep;
-  flex_t sightDist;
-  flex_t hearDist;
+  flex_t sightDistance;
+  flex_t heardDistance;
   flex_t fov;
-  flex_t wakeupDist;
-  flex_t accuracy;
+  flex_t weakupDistance;
+  flex_t accurancy;
   int32_t numEntries;
   SithAIInstinct entries[16];
 #ifdef SITH_DEBUG_STRUCT_NAMES
@@ -2370,8 +2370,8 @@ typedef struct SithInventoryType
 #else
     char fpath[8];
 #endif
-    flex_t ammoMin;
-    flex_t ammoMax;
+    flex_t min;
+    flex_t max;
     sithCog* cog;
 #ifndef DW_TYPES
     uint32_t field_90;
@@ -2382,7 +2382,7 @@ typedef struct SithInventoryType
 
 typedef struct SithInventoryItem
 {
-    flex_t ammoAmt;
+    flex_t amount;
     int32_t field_4;
     int32_t state;
     flex_t activatedTimeSecs;
@@ -2493,23 +2493,23 @@ typedef struct SithPlayer
     wchar_t multi_name[32];
 #endif
     uint32_t flags;
-    uint32_t net_id;
+    uint32_t playerNetId;
 
 #ifdef DW_TYPES
-    SithInventoryItem iteminfo[32];
+    SithInventoryItem aItems[32];
     int32_t pad[0x6C];
 #else
-    SithInventoryItem iteminfo[200];
+    SithInventoryItem aItems[200];
 #endif
-    int32_t curItem;
-    int32_t curWeapon;
+    int32_t curItemID;
+    int32_t curWeaponID;
     int32_t curPower;
 #ifndef DW_TYPES
     int32_t field_1354;
 #endif
     SithThing* pLocalPlayer;
-    rdMatrix34 spawnPosOrient;
-    SithSector* pSpawnSector;
+    rdMatrix34 orient;
+    SithSector* pInSector;
 #ifndef DW_TYPES
     uint32_t respawnMask;
 #endif
@@ -2520,7 +2520,7 @@ typedef struct SithPlayer
     int32_t numKilled;
     int32_t numSuicides;
     int32_t score;
-    int32_t lastUpdateMs;
+    int32_t msecLastCommTime;
 } SithPlayer;
 
 typedef struct jkSaberCollide
@@ -2695,20 +2695,20 @@ typedef struct SithAIInstinctState
 typedef struct SithAIControlBlock
 {
     SithThing *thing;
-    SithAIClass *pAIClass;
+    SithAIClass *pClass;
     int32_t flags;
-    SithAIInstinctState instincts[16];
-    uint32_t numAIClassEntries;
+    SithAIInstinctState aInstinctStates[16];
+    uint32_t numInstincts;
     int32_t nextUpdate;
 #ifdef JKM_AI
     SithThing* pInterest;
 #endif
-    rdVector3 lookVector;
+    rdVector3 goalLVec;
     rdVector3 movePos;
-    rdVector3 toMovePos;
-    flex_t distToMovePos;
+    rdVector3 moveDirection;
+    flex_t moveDistance;
     flex_t moveSpeed;
-    SithThing* pFleeThing;
+    SithThing* pFleeFromThing;
     rdVector3 field_1C4;
     SithThing* pDistractor;
     rdVector3 field_1D4;
@@ -2723,7 +2723,7 @@ typedef struct SithAIControlBlock
     rdVector3 movepos;
     int32_t field_224;
     rdVector3 field_228;
-    flex_t currentDistanceFromTarget;
+    flex_t targetDistance;
     int32_t field_238;
     rdVector3 field_23C;
     int32_t field_248;
@@ -2742,7 +2742,7 @@ typedef struct SithAIControlBlock
 #endif
     int32_t field_288;
     int32_t field_28C;
-    rdVector3 *paFrames;
+    rdVector3 *aFrames;
     int32_t loadedFrames;
     int32_t sizeFrames;
 } SithAIControlBlock;
@@ -2968,8 +2968,8 @@ typedef struct SithPathMoveInfo
     uint32_t flags;
     rdVector3 vel;
     flex_t field_1C;
-    flex_t lerpSpeed;
-    rdMatrix34 moveFrameOrientation;
+    flex_t moveVel;
+    rdMatrix34 curOrient;
     flex_t field_54;
     rdVector3 field_58;
     rdVector3 moveFrameDeltaAngles;
@@ -3065,7 +3065,7 @@ typedef struct SithThing
     uint32_t field_260;
     flex_t waggle;
     rdVector3 field_268;
-    SithAIClass* pAIClass;
+    SithAIClass* pClass;
     SithAIControlBlock* actor;
 #ifdef SITH_DEBUG_STRUCT_NAMES
     char aName[32];

@@ -38,7 +38,7 @@ int stdStrTable_Load(stdStrTable *strtable, char *fpath)
     v2 = 0;
     strtable->msgs = 0;
     numMsgs = 0;
-    strtable->hashtable = 0;
+    strtable->pHashtbl = 0;
     strtable->magic_sTbl = 0;
     fhand = std_g_pHS->fileOpen(fpath, "rt");
 
@@ -77,8 +77,8 @@ int stdStrTable_Load(stdStrTable *strtable, char *fpath)
     if ( !strtable->msgs )
         std_g_pHS->assert("Out of memory--cannot load string table", ".\\General\\stdStrTable.c", 120);
     stdPlatform_Memzero32(strtable->msgs, sizeof(stdStrMsg) * numMsgs); // Added: word-safe
-    strtable->hashtable = stdHashtbl_New(numMsgs + (numMsgs/2));
-    if ( !strtable->hashtable )
+    strtable->pHashtbl = stdHashtbl_New(numMsgs + (numMsgs/2));
+    if ( !strtable->pHashtbl )
         std_g_pHS->assert("Out of memory--cannot load string table", ".\\General\\stdStrTable.c", 126);
     v11 = 1;
     v30 = 0;
@@ -129,7 +129,7 @@ int stdStrTable_Load(stdStrTable *strtable, char *fpath)
                     v19->field_8 = _atoi(v34);
                     stdString_GetQuotedStringContents(v20, v34, 256);
                     v19->uniStr = stdString_CstrCopy(v34);
-                    if ( !stdHashtbl_Add(strtable->hashtable, v19->key, v19) )
+                    if ( !stdHashtbl_Add(strtable->pHashtbl, v19->key, v19) )
                         stdPrintf(
                             std_g_pHS->errorPrint,
                             ".\\General\\stdStrTable.c",
@@ -208,7 +208,7 @@ void stdStrTable_Free(stdStrTable* pTable)
         // Added: Moved
         //pTable->numMsgs = 0;
         //pTable->msgs = 0;
-        stdHashtbl_Free(pTable->hashtable);
+        stdHashtbl_Free(pTable->pHashtbl);
         if ( pTable->msgs )
         {
             for (int i = 0; i < pTable->numMsgs; i++)
@@ -236,7 +236,7 @@ wchar_t* stdStrTable_GetValue(stdStrTable* pTable, const char *key)
     stdStrMsg *v2; // eax
     wchar_t *result; // eax
 
-    if ( pTable->numMsgs && (v2 = (stdStrMsg *)stdHashtbl_Find(pTable->hashtable, key)) != 0 )
+    if ( pTable->numMsgs && (v2 = (stdStrMsg *)stdHashtbl_Find(pTable->pHashtbl, key)) != 0 )
         result = v2->uniStr;
     else
         result = 0;
@@ -303,7 +303,7 @@ wchar_t* stdStrTable_GetValueOrKey(stdStrTable* pTable, const char *key)
         return L"(NULL)";
     }
 
-    if ( pTable->numMsgs && (v2 = (stdStrMsg *)stdHashtbl_Find(pTable->hashtable, key)) != 0 )
+    if ( pTable->numMsgs && (v2 = (stdStrMsg *)stdHashtbl_Find(pTable->pHashtbl, key)) != 0 )
         result = v2->uniStr;
     else
         result = 0;

@@ -150,15 +150,15 @@ int jkGame_Update()
 
     // HACK HACK HACK: Adjust zNear depending on if we're using the scope/camera views
 #if defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW)
-    if (sithCamera_g_aCameras[0].rdCam.pClipFrustum) {
-        sithCamera_g_aCameras[0].rdCam.pClipFrustum->zNear = SITHCAMERA_ZNEAR_FIRSTPERSON;
+    if (sithCamera_g_aCameras[0].rdCamera.pClipFrustum) {
+        sithCamera_g_aCameras[0].rdCamera.pClipFrustum->zNear = SITHCAMERA_ZNEAR_FIRSTPERSON;
 
         if (Main_bMotsCompat) {
             if (playerThings[playerThingIdx].actorThing->actorParams.flags & SITH_AF_SCOPEHUD) {
-                sithCamera_g_aCameras[0].rdCam.pClipFrustum->zNear = SITHCAMERA_ZNEAR;
+                sithCamera_g_aCameras[0].rdCamera.pClipFrustum->zNear = SITHCAMERA_ZNEAR;
             }
             if ((playerThings[playerThingIdx].actorThing->actorParams.flags & SITH_AF_ARACHNID) != 0) {
-                sithCamera_g_aCameras[0].rdCam.pClipFrustum->zNear = SITHCAMERA_ZNEAR;
+                sithCamera_g_aCameras[0].rdCamera.pClipFrustum->zNear = SITHCAMERA_ZNEAR;
             }
         }
     }

@@ -5,7 +5,7 @@ void sithWorld_RemoveSectionParser(){} // ?? useless
 void sithWorld_CalcFaceNormals(){} // editor leftover
 void sithWorld_TimeSectionParse(){} // inlined?
 void sithSoundClass_allocidk(){} // inlined?
-void sithSoundClass_Free(){} // weird unused hashtable?
+void sithSoundClass_Free(){} // weird unused pHashtbl?
 void sithCamera_New(){}
 void sithCamera_FreeEntry(){}
 void sithCamera_Free(){}

@@ -258,7 +258,7 @@ int jkGuiMultiTally_Show(int a1)
         {
             if ( (pPlayerInfoIter->flags & 2) != 0 && (pPlayerInfoIter->flags & 4) != 0)
             {
-                if ( pPlayerInfoIter->net_id == jkPlayer_playerInfos[playerThingIdx].net_id )
+                if ( pPlayerInfoIter->playerNetId == jkPlayer_playerInfos[playerThingIdx].playerNetId )
                 {
                     pElementIter[-16].textType = 1;
                     pElementIter->textType = 1;

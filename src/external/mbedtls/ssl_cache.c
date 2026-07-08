@@ -37,7 +37,7 @@ void mbedtls_ssl_cache_init(mbedtls_ssl_cache_context *cache)
     memset(cache, 0, sizeof(mbedtls_ssl_cache_context));
 
     cache->timeout = MBEDTLS_SSL_CACHE_DEFAULT_TIMEOUT;
-    cache->max_entries = MBEDTLS_SSL_CACHE_DEFAULT_MAX_ENTRIES;
+    cache->tableSize = MBEDTLS_SSL_CACHE_DEFAULT_MAX_ENTRIES;
 
 #if defined(MBEDTLS_THREADING_C)
     mbedtls_mutex_init(&cache->mutex);
@@ -176,7 +176,7 @@ static int ssl_cache_pick_writing_slot(mbedtls_ssl_cache_context *cache,
 
     /* Check 3: Is there free space in the cache? */
 
-    if (count < cache->max_entries) {
+    if (count < cache->tableSize) {
         /* Create new entry */
         cur = mbedtls_calloc(1, sizeof(mbedtls_ssl_cache_entry));
         if (cur == NULL) {
@@ -200,7 +200,7 @@ static int ssl_cache_pick_writing_slot(mbedtls_ssl_cache_context *cache,
 #if defined(MBEDTLS_HAVE_TIME)
     if (old == NULL) {
         /* This should only happen on an ill-configured cache
-         * with max_entries == 0. */
+         * with tableSize == 0. */
         return 1;
     }
 #else /* MBEDTLS_HAVE_TIME */
@@ -331,7 +331,7 @@ void mbedtls_ssl_cache_set_max_entries(mbedtls_ssl_cache_context *cache, int max
         max = 0;
     }
 
-    cache->max_entries = max;
+    cache->tableSize = max;
 }
 
 void mbedtls_ssl_cache_free(mbedtls_ssl_cache_context *cache)

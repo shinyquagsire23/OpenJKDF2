@@ -33,7 +33,7 @@ void sithPlayer_Startup(int idx)
 
     v1 = &jkPlayer_playerInfos[idx];
     v1->flags = jkPlayer_playerInfos[idx].flags & ~1u;
-    v1->net_id = 0;
+    v1->playerNetId = 0;
     v2 = jkPlayer_playerInfos[idx].pLocalPlayer;
     if ( v2 )
     {
@@ -83,9 +83,9 @@ void sithPlayer_PlacePlayers(SithWorld *world)
                 v1->flags |= SITH_TF_INVULN;
                 v1->actorParams.pPlayer = playerInfo;
                 playerInfo->flags |= 2;
-                rdMatrix_Copy34(&playerInfo->spawnPosOrient, &v1->orient);
-                rdVector_Copy3(&playerInfo->spawnPosOrient.scale, &v1->position);
-                playerInfo->pSpawnSector = v1->sector;
+                rdMatrix_Copy34(&playerInfo->orient, &v1->orient);
+                rdVector_Copy3(&playerInfo->orient.scale, &v1->position);
+                playerInfo->pInSector = v1->sector;
                 playerInfo++;
                 ++v3;
 
@@ -98,39 +98,39 @@ void sithPlayer_PlacePlayers(SithWorld *world)
     for (int i = jkPlayer_maxPlayers; i < JKPLAYER_NUM_INFOS; i++)
     {
         jkPlayer_playerInfos[i].pLocalPlayer = 0;
-        jkPlayer_playerInfos[i].pSpawnSector = 0;
+        jkPlayer_playerInfos[i].pInSector = 0;
     }
 }
 
 int sithPlayer_GetBinItemActive(int binIdx)
 {
-    return (jkPlayer_playerInfos[playerThingIdx].iteminfo[binIdx].state & 4) >> 2;
+    return (jkPlayer_playerInfos[playerThingIdx].aItems[binIdx].state & 4) >> 2;
 }
 
 int sithPlayer_IsInvItemAvailable(int binIdx)
 {
-    return (jkPlayer_playerInfos[playerThingIdx].iteminfo[binIdx].state & 8) >> 3;
+    return (jkPlayer_playerInfos[playerThingIdx].aItems[binIdx].state & 8) >> 3;
 }
 
 void sithPlayer_SetBinItemActive(int binIdx, int active)
 {
     if ( active )
-        jkPlayer_playerInfos[playerThingIdx].iteminfo[binIdx].state |= 4;
+        jkPlayer_playerInfos[playerThingIdx].aItems[binIdx].state |= 4;
     else
-        jkPlayer_playerInfos[playerThingIdx].iteminfo[binIdx].state &= ~4;
+        jkPlayer_playerInfos[playerThingIdx].aItems[binIdx].state &= ~4;
 }
 
 flex_t sithPlayer_GetInvItemAmount(int idx)
 {
     //if (idx)
-    //    jk_printf("Get %u: %f\n", idx, jkPlayer_playerInfos[playerThingIdx].iteminfo[idx].ammoAmt);
+    //    jk_printf("Get %u: %f\n", idx, jkPlayer_playerInfos[playerThingIdx].aItems[idx].amount);
 
-    return jkPlayer_playerInfos[playerThingIdx].iteminfo[idx].ammoAmt;
+    return jkPlayer_playerInfos[playerThingIdx].aItems[idx].amount;
 }
 
 void sithPlayer_SetInvItemAmount(int idx, flex_t amt)
 {
-    jkPlayer_playerInfos[playerThingIdx].iteminfo[idx].ammoAmt = amt;
+    jkPlayer_playerInfos[playerThingIdx].aItems[idx].amount = amt;
 }
 
 int sithPlayer_GetThingPlayerNum(SithThing *player)
@@ -423,7 +423,7 @@ void sithPlayer_SetInvItemAvailable(int binIdx, int bCarries)
     SithInventoryItem *v2; // eax
     int v3; // ecx
 
-    v2 = &jkPlayer_playerInfos[playerThingIdx].iteminfo[binIdx];
+    v2 = &jkPlayer_playerInfos[playerThingIdx].aItems[binIdx];
     v3 = v2->state;
     if ( bCarries )
         v2->state = v3 | 8;
@@ -444,7 +444,7 @@ void sithPlayer_Reset(unsigned int idx)
         pPlayerInfo->numSuicides = 0;
         pPlayerInfo->score = 0;
         pPlayerInfo->respawnMask = 0;
-        pPlayerInfo->net_id = 0;
+        pPlayerInfo->playerNetId = 0;
         pPlayerInfo->player_name[0] = 0;
         pPlayerInfo->multi_name[0] = 0;
         if ( pPlayerInfo->pLocalPlayer && sithWorld_g_pCurrentWorld )
@@ -464,7 +464,7 @@ int sithPlayer_ShowPlayer(int idx, int netId)
     if ( !jkPlayer_playerInfos[idx].pLocalPlayer )
         return 0;
     jkPlayer_playerInfos[idx].flags |= 5;
-    jkPlayer_playerInfos[idx].net_id = netId;
+    jkPlayer_playerInfos[idx].playerNetId = netId;
     jkPlayer_playerInfos[idx].pLocalPlayer->flags &= ~SITH_TF_DISABLED;
 
     //jkPlayer_playerInfos[idx].pLocalPlayer->controlType = SITH_CT_10; // TODO: WHY IS THIS NEEDED?
@@ -520,9 +520,9 @@ void sithPlayer_NewPlayer(SithThing *player)
             sithThing_ExitSector(player);
             sithThing_SetPositionAndOrient(
                 player,
-                &jkPlayer_playerInfos[v9].spawnPosOrient.scale,
-                &jkPlayer_playerInfos[v9].spawnPosOrient);
-            sithThing_EnterSector(player, jkPlayer_playerInfos[v9].pSpawnSector, 1, 0);
+                &jkPlayer_playerInfos[v9].orient.scale,
+                &jkPlayer_playerInfos[v9].orient);
+            sithThing_EnterSector(player, jkPlayer_playerInfos[v9].pInSector, 1, 0);
             sithCamera_Update(sithCamera_g_pCurCamera);
             sithPhysics_ResetThingMovement(player);
             sithWeapon_SyncPuppet(player);
@@ -542,7 +542,7 @@ uint32_t sithPlayer_GetPlayerNum(int idx)
         return -1;
     for ( uint32_t i = 0; i < jkPlayer_maxPlayers; ++i )
     {
-        if (jkPlayer_playerInfos[i].net_id == idx)
+        if (jkPlayer_playerInfos[i].playerNetId == idx)
             return i;
     }
     return -1;

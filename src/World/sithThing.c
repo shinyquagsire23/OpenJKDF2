@@ -206,8 +206,8 @@ void sithThing_Update(flex_t deltaSeconds, int deltaMs)
         // camera thing) never render, so the rendered-recently gates below would
         // throttle their animation to the 1/64 offscreen rate and freeze the shot.
         int bIsCameraFocus = sithCamera_g_pCurCamera
-            && (sithCamera_g_pCurCamera->primaryFocus == pThingIter
-             || sithCamera_g_pCurCamera->secondaryFocus == pThingIter);
+            && (sithCamera_g_pCurCamera->pPrimaryFocusThing == pThingIter
+             || sithCamera_g_pCurCamera->pSecondaryFocusThing == pThingIter);
         int bCanUpdateOffscreen = bIsCameraFocus ||
             (((uint8_t)jkPlayer_currentTickIdx + (pThingIter->idx & 0xFF)) & 0x3F) == 0;
         int bActorCanUpdateEveryOther = pThingIter->type == SITH_THING_ACTOR && (((uint8_t)jkPlayer_currentTickIdx + (pThingIter->idx & 0xFF)) & 1) == 0;
@@ -1276,7 +1276,7 @@ void sithThing_AttachThingToThingFace(SithThing *a1, SithThing *a2, rdFace *a3, 
     }
     else if ( a2->moveType == SITH_MT_PATH )
     {
-        rdVector_ScaleAdd3Acc(&a1->physicsParams.vel, &a2->trackParams.vel, -a2->trackParams.lerpSpeed);
+        rdVector_ScaleAdd3Acc(&a1->physicsParams.vel, &a2->trackParams.vel, -a2->trackParams.moveVel);
     }
     rdVector_Sub3(&a2a, &a1->position, &a2->position);
     rdMatrix_TransformVectorOrtho34(&a1->field_4C, &a2a, &a2->orient);
@@ -1379,9 +1379,9 @@ int sithThing_DetachThing(SithThing* pThing)
         {
             if ( v3->moveType != SITH_MT_PATH )
                 goto LABEL_8;
-            pThing->physicsParams.vel.x = (v3->trackParams.vel.x * v3->trackParams.lerpSpeed) + pThing->physicsParams.vel.x;
-            pThing->physicsParams.vel.y = (v3->trackParams.vel.y * v3->trackParams.lerpSpeed) + pThing->physicsParams.vel.y;
-            pThing->physicsParams.vel.z = (v3->trackParams.vel.z * v3->trackParams.lerpSpeed) + pThing->physicsParams.vel.z;
+            pThing->physicsParams.vel.x = (v3->trackParams.vel.x * v3->trackParams.moveVel) + pThing->physicsParams.vel.x;
+            pThing->physicsParams.vel.y = (v3->trackParams.vel.y * v3->trackParams.moveVel) + pThing->physicsParams.vel.y;
+            pThing->physicsParams.vel.z = (v3->trackParams.vel.z * v3->trackParams.moveVel) + pThing->physicsParams.vel.z;
         }
     }
 LABEL_8:
@@ -1633,7 +1633,7 @@ int sithThing_ParseThingArg(StdConffileArg *arg, SithThing* pThing, int param)
     const char **v4; // edi
     int32_t v5; // eax
     int32_t result; // eax
-    SithAIClass *pAIClass; // eax
+    SithAIClass *pClass; // eax
     SithAIControlBlock *pActor; // esi
     int32_t collide; // eax
     flex_d_t size; // st7
@@ -1798,13 +1798,13 @@ int sithThing_ParseThingArg(StdConffileArg *arg, SithThing* pThing, int param)
             break;
         case THINGPARAM_AICLASS:
             pThing->controlType = SITH_CT_AI;
-            pAIClass = sithAIClass_Load(arg->value);
-            pThing->pAIClass = pAIClass;
+            pClass = sithAIClass_Load(arg->value);
+            pThing->pClass = pClass;
             pActor = pThing->actor;
-            if ( !pActor || !pAIClass )
+            if ( !pActor || !pClass )
                 goto LABEL_58;
-            pActor->pAIClass = pAIClass;
-            pActor->numAIClassEntries = pAIClass->numEntries;
+            pActor->pClass = pClass;
+            pActor->numInstincts = pClass->numEntries;
             result = 1;
             break;
         case THINGPARAM_COG:
@@ -1982,7 +1982,7 @@ void sithThing_SyncThings()
 
         // Added: Co-op
         if (sithMulti_multiModeFlags & MULTIMODEFLAG_COOP && (sithNet_aSyncFlags[v0] & THING_SYNC_AI)) {
-            if (sithNet_aSyncThings[v0]->actor && sithNet_aSyncThings[v0]->actor->pAIClass)
+            if (sithNet_aSyncThings[v0]->actor && sithNet_aSyncThings[v0]->actor->pClass)
                 sithDSS_AIStatus(sithNet_aSyncThings[v0]->actor, -1, 1);
         }
 

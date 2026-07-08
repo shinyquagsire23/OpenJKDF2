@@ -163,10 +163,10 @@ int sithAIClass_LoadEntry(char *fpath, SithAIClass *aiclass)
     if ( stdConffile_Open(jkl_fname) || (result = stdConffile_Open(fpath)) != 0 )
     {
         aiclass->maxStep = 0.5;
-        aiclass->sightDist = 20.0;
-        aiclass->hearDist = 10.0;
+        aiclass->sightDistance = 20.0;
+        aiclass->heardDistance = 10.0;
         aiclass->fov = 0.0;
-        aiclass->accuracy = 0.5;
+        aiclass->accurancy = 0.5;
         if ( stdConffile_ReadArgs() )
         {
             for (int v19 = 0; v19 < stdConffile_g_entry.numArgs; v19++)
@@ -186,15 +186,15 @@ int sithAIClass_LoadEntry(char *fpath, SithAIClass *aiclass)
                 }
                 else if ( !_strcmp(arg->key, "sightdist") )
                 {
-                    aiclass->sightDist = _atof(arg->value);
+                    aiclass->sightDistance = _atof(arg->value);
                 }
                 else if ( !_strcmp(arg->key, "heardist") )
                 {
-                    aiclass->hearDist = _atof(arg->value);
+                    aiclass->heardDistance = _atof(arg->value);
                 }
                 else if ( !_strcmp(arg->key, "wakeupdist") )
                 {
-                    aiclass->wakeupDist = _atof(arg->value);
+                    aiclass->weakupDistance = _atof(arg->value);
                 }
                 else if ( !_strcmp(arg->key, "fov") )
                 {
@@ -202,9 +202,9 @@ int sithAIClass_LoadEntry(char *fpath, SithAIClass *aiclass)
                     stdMath_SinCos(fov, &a3, &a4);
                     aiclass->fov = a4;
                 }
-                else if ( !_strcmp(arg->key, "accuracy") )
+                else if ( !_strcmp(arg->key, "accurancy") )
                 {
-                    aiclass->accuracy = _atof(arg->value);
+                    aiclass->accurancy = _atof(arg->value);
                 }
             }
             while ( stdConffile_ReadArgs() )
@@ -225,14 +225,14 @@ int sithAIClass_LoadEntry(char *fpath, SithAIClass *aiclass)
                         {
                             if ( stdConffile_g_entry.numArgs <= v11 + 1 )
                             {
-                                entry->argsAsFloat[v11] = 0;
-                                entry->argsAsInt[v11] = 0;
+                                entry->fltArg[v11] = 0;
+                                entry->intArg[v11] = 0;
                             }
                             else
                             {
                                 flex_t v15 = _atof(stdConffile_g_entry.args[1+v11].value);
-                                entry->argsAsFloat[v11] = v15;
-                                entry->argsAsInt[v11] = (int32_t)v15;
+                                entry->fltArg[v11] = v15;
+                                entry->intArg[v11] = (int32_t)v15;
                             }
                         }
                         ++aiclass->numEntries;

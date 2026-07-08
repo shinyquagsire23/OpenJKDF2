@@ -124,7 +124,7 @@ int stdGob_LoadEntry(Gob *gob, char *fname, int a3, int a4)
     {
 #ifdef STDGOB_COMPACT_ENTRIES
         // Added: stage the fixed 136-byte disk entry; only offset/size stay
-        // resident (the CRC-keyed hashtable doesn't retain the name pointer).
+        // resident (the CRC-keyed pHashtbl doesn't retain the name pointer).
         stdGobDiskEntry diskEntry;
         pGobHS->fileRead(gob->fhand, &diskEntry, sizeof(stdGobDiskEntry));
         gob->entries[v4].fileOffset = diskEntry.fileOffset;

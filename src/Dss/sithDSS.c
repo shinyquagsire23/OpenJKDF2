@@ -289,7 +289,7 @@ void sithDSS_AIStatus(SithAIControlBlock *actor, int sendto_id, int idx)
     NETMSG_START;
 
     NETMSG_PUSHS16(actor->thing->idx);
-    NETMSG_PUSHS16((int16_t)(((intptr_t)actor->pAIClass - (intptr_t)sithWorld_g_pCurrentWorld->aAIClasses) / sizeof(SithAIClass)));
+    NETMSG_PUSHS16((int16_t)(((intptr_t)actor->pClass - (intptr_t)sithWorld_g_pCurrentWorld->aAIClasses) / sizeof(SithAIClass)));
     NETMSG_PUSHU32(actor->flags);
     NETMSG_PUSHU32(actor->nextUpdate);
     if ( actor->pMoveThing ) {
@@ -318,12 +318,12 @@ void sithDSS_AIStatus(SithAIControlBlock *actor, int sendto_id, int idx)
     }
     if (actor->flags & SITHAI_MODE_TURNING)
     {
-        NETMSG_PUSHVEC3(actor->lookVector);
+        NETMSG_PUSHVEC3(actor->goalLVec);
     }
     if (actor->flags & SITHAI_MODE_FLEEING)
     {
-        if ( actor->pFleeThing) {
-            NETMSG_PUSHS16(actor->pFleeThing->idx);
+        if ( actor->pFleeFromThing) {
+            NETMSG_PUSHS16(actor->pFleeFromThing->idx);
         }
         else {
             NETMSG_PUSHS16(-1);
@@ -331,20 +331,20 @@ void sithDSS_AIStatus(SithAIControlBlock *actor, int sendto_id, int idx)
     }
     NETMSG_PUSHVEC3(actor->position);
     NETMSG_PUSHVEC3(actor->orient);
-    for (int i = 0; i < actor->numAIClassEntries; i++)
+    for (int i = 0; i < actor->numInstincts; i++)
     {
-        NETMSG_PUSHU32(actor->instincts[i].nextUpdate);
-        NETMSG_PUSHF32(actor->instincts[i].param0);
-        NETMSG_PUSHF32(actor->instincts[i].param1);
-        NETMSG_PUSHF32(actor->instincts[i].param2);
-        NETMSG_PUSHF32(actor->instincts[i].param3);
+        NETMSG_PUSHU32(actor->aInstinctStates[i].nextUpdate);
+        NETMSG_PUSHF32(actor->aInstinctStates[i].param0);
+        NETMSG_PUSHF32(actor->aInstinctStates[i].param1);
+        NETMSG_PUSHF32(actor->aInstinctStates[i].param2);
+        NETMSG_PUSHF32(actor->aInstinctStates[i].param3);
     }
     NETMSG_PUSHU32(actor->field_288);
     NETMSG_PUSHU32(actor->field_28C);
     NETMSG_PUSHU32(actor->loadedFrames);
     for (int i = 0; i < actor->loadedFrames; i++)
     {
-        NETMSG_PUSHVEC3(actor->paFrames[i]);
+        NETMSG_PUSHVEC3(actor->aFrames[i]);
     }
     
     NETMSG_END(DSS_AISTATUS);
@@ -372,8 +372,8 @@ int sithDSS_ProcessAIStatus(SithMessage *msg)
     if ( idx >= sithWorld_g_pCurrentWorld->numAIClasses )
         return 0;
 
-    actor->pAIClass = &sithWorld_g_pCurrentWorld->aAIClasses[idx];
-    actor->numAIClassEntries = sithWorld_g_pCurrentWorld->aAIClasses[idx].numEntries;
+    actor->pClass = &sithWorld_g_pCurrentWorld->aAIClasses[idx];
+    actor->numInstincts = sithWorld_g_pCurrentWorld->aAIClasses[idx].numEntries;
     actor->flags = NETMSG_POPU32();
     actor->nextUpdate = NETMSG_POPU32();
     actor->pMoveThing = sithThing_GetThingByIndex(NETMSG_POPS16());
@@ -397,22 +397,22 @@ int sithDSS_ProcessAIStatus(SithMessage *msg)
     }
     if (actor->flags & SITHAI_MODE_TURNING)
     {
-        actor->lookVector = NETMSG_POPVEC3();
+        actor->goalLVec = NETMSG_POPVEC3();
     }
     if (actor->flags & SITHAI_MODE_FLEEING)
     {
-        actor->pFleeThing = sithThing_GetThingByIndex(NETMSG_POPS16());
+        actor->pFleeFromThing = sithThing_GetThingByIndex(NETMSG_POPS16());
     }
     actor->position = NETMSG_POPVEC3();
     actor->orient = NETMSG_POPVEC3();
 
-    for (int i = 0; i < actor->numAIClassEntries; i++)
+    for (int i = 0; i < actor->numInstincts; i++)
     {
-        actor->instincts[i].nextUpdate = NETMSG_POPU32();
-        actor->instincts[i].param0 = NETMSG_POPF32();
-        actor->instincts[i].param1 = NETMSG_POPF32();
-        actor->instincts[i].param2 = NETMSG_POPF32();
-        actor->instincts[i].param3 = NETMSG_POPF32();
+        actor->aInstinctStates[i].nextUpdate = NETMSG_POPU32();
+        actor->aInstinctStates[i].param0 = NETMSG_POPF32();
+        actor->aInstinctStates[i].param1 = NETMSG_POPF32();
+        actor->aInstinctStates[i].param2 = NETMSG_POPF32();
+        actor->aInstinctStates[i].param3 = NETMSG_POPF32();
     }
     
     actor->field_288 = NETMSG_POPU32();
@@ -421,13 +421,13 @@ int sithDSS_ProcessAIStatus(SithMessage *msg)
     
     if ( actor->loadedFrames)
     {
-        actor->paFrames = (rdVector3 *)SITH_ALLOC(sizeof(rdVector3) * actor->loadedFrames);
+        actor->aFrames = (rdVector3 *)SITH_ALLOC(sizeof(rdVector3) * actor->loadedFrames);
         actor->sizeFrames = actor->loadedFrames;
-        if ( actor->paFrames )
+        if ( actor->aFrames )
         {
             for (int i = 0; i < actor->loadedFrames; i++)
             {
-                actor->paFrames[i] = NETMSG_POPVEC3();
+                actor->aFrames[i] = NETMSG_POPVEC3();
             }
             return 1;
         }
@@ -436,7 +436,7 @@ int sithDSS_ProcessAIStatus(SithMessage *msg)
     {
         actor->sizeFrames = 0;
         actor->loadedFrames = 0;
-        actor->paFrames = NULL; // Added
+        actor->aFrames = NULL; // Added
     }
     return 1;
 }
@@ -452,12 +452,12 @@ void sithDSS_Inventory(SithThing *thing, int binIdx, int sendto_id, int mpFlags)
         
             NETMSG_PUSHS16(thing->idx);
             NETMSG_PUSHS16(binIdx);
-            NETMSG_PUSHF32(v5->iteminfo[binIdx].ammoAmt);
-            NETMSG_PUSHU32(v5->iteminfo[binIdx].state);
-            NETMSG_PUSHU32(v5->iteminfo[binIdx].field_4);
-            NETMSG_PUSHF32(v5->iteminfo[binIdx].activatedTimeSecs);
-            NETMSG_PUSHF32(v5->iteminfo[binIdx].activationDelaySecs);
-            NETMSG_PUSHF32(v5->iteminfo[binIdx].binWait);
+            NETMSG_PUSHF32(v5->aItems[binIdx].amount);
+            NETMSG_PUSHU32(v5->aItems[binIdx].state);
+            NETMSG_PUSHU32(v5->aItems[binIdx].field_4);
+            NETMSG_PUSHF32(v5->aItems[binIdx].activatedTimeSecs);
+            NETMSG_PUSHF32(v5->aItems[binIdx].activationDelaySecs);
+            NETMSG_PUSHF32(v5->aItems[binIdx].binWait);
             
             NETMSG_END(DSS_INVENTORY);
             
@@ -472,7 +472,7 @@ int sithDSS_ProcessInventory(SithMessage *msg)
     SithThing *thing; // ecx
     SithPlayer *playerInfo; // edx
     int binIdx; // ecx
-    SithInventoryItem *iteminfo; // ecx
+    SithInventoryItem *aItems; // ecx
     
     NETMSG_IN_START(msg);
 
@@ -494,15 +494,15 @@ int sithDSS_ProcessInventory(SithMessage *msg)
     if ( binIdx < 0 || binIdx >= 200 )
         return 0;
 
-    iteminfo = &playerInfo->iteminfo[binIdx];
-    iteminfo->ammoAmt = NETMSG_POPF32();
-    iteminfo->state = NETMSG_POPU32();
-    iteminfo->field_4 = NETMSG_POPU32();
-    iteminfo->activatedTimeSecs = NETMSG_POPF32();
-    iteminfo->activationDelaySecs = NETMSG_POPF32();
-    iteminfo->binWait = NETMSG_POPF32();
+    aItems = &playerInfo->aItems[binIdx];
+    aItems->amount = NETMSG_POPF32();
+    aItems->state = NETMSG_POPU32();
+    aItems->field_4 = NETMSG_POPU32();
+    aItems->activatedTimeSecs = NETMSG_POPF32();
+    aItems->activationDelaySecs = NETMSG_POPF32();
+    aItems->binWait = NETMSG_POPF32();
 
-    //printf("%x %f\n", binIdx, iteminfo->ammoAmt);
+    //printf("%x %f\n", binIdx, aItems->amount);
 
     // Added: idk if this is necessary
     sithInventory_g_aTypes[binIdx].flags |= SITHINVENTORY_TYPE_REGISTERED;
@@ -632,11 +632,11 @@ void sithDSS_SyncTaskEvents(SithEvent *timer, int sendto_id, int mpFlags)
 {
     NETMSG_START;
 
-    NETMSG_PUSHU32(timer->endMs - sithTime_g_msecGameTime);
-    NETMSG_PUSHU32(timer->timerInfo.cogIdx);
-    NETMSG_PUSHU32(timer->timerInfo.timerIdx);
-    NETMSG_PUSHF32(timer->timerInfo.field_10);
-    NETMSG_PUSHF32(timer->timerInfo.field_14);
+    NETMSG_PUSHU32(timer->msecEventTime - sithTime_g_msecGameTime);
+    NETMSG_PUSHU32(timer->params.idx);
+    NETMSG_PUSHU32(timer->params.timerIdx);
+    NETMSG_PUSHF32(timer->params.field_10);
+    NETMSG_PUSHF32(timer->params.field_14);
     NETMSG_PUSHS16(timer->taskNum);
     
     NETMSG_END(DSS_SYNCEVENTS);
@@ -653,7 +653,7 @@ int sithDSS_ProcessSyncTaskEvents(SithMessage *msg)
     NETMSG_IN_START(msg);
 
     deltaMs = NETMSG_POPU32();
-    info.cogIdx = NETMSG_POPU32();
+    info.idx = NETMSG_POPU32();
     info.timerIdx = NETMSG_POPU32();
     info.field_10 = NETMSG_POPF32();
     info.field_14 = NETMSG_POPF32();
@@ -751,15 +751,15 @@ void sithDSS_SyncCameras(int sendto_id, int mpFlags)
 
     for (int i = 0; i < 7; i++) // TODO define this maximum
     {
-        if ( sithCamera_g_aCameras[i].primaryFocus ) {
-            NETMSG_PUSHS32(sithCamera_g_aCameras[i].primaryFocus->idx);
+        if ( sithCamera_g_aCameras[i].pPrimaryFocusThing ) {
+            NETMSG_PUSHS32(sithCamera_g_aCameras[i].pPrimaryFocusThing->idx);
         }
         else {
             NETMSG_PUSHS32(-1);
         }
 
-        if ( sithCamera_g_aCameras[i].secondaryFocus ) {
-            NETMSG_PUSHS32(sithCamera_g_aCameras[i].secondaryFocus->idx);
+        if ( sithCamera_g_aCameras[i].pSecondaryFocusThing ) {
+            NETMSG_PUSHS32(sithCamera_g_aCameras[i].pSecondaryFocusThing->idx);
         }
         else {
             NETMSG_PUSHS32(-1);
@@ -767,8 +767,8 @@ void sithDSS_SyncCameras(int sendto_id, int mpFlags)
 
         if (Main_bMotsCompat) {
 #ifndef QOL_IMPROVEMENTS
-            if (!sithCamera_g_aCameras[i].rdCam.canvas || !sithCamera_g_aCameras[i].bZoomed) {
-                NETMSG_PUSHF32(sithCamera_g_aCameras[i].rdCam.fov); //fVar1 = (ADJ(ppsVar5)->rdCam).fov;
+            if (!sithCamera_g_aCameras[i].rdCamera.canvas || !sithCamera_g_aCameras[i].bZoomed) {
+                NETMSG_PUSHF32(sithCamera_g_aCameras[i].rdCamera.fov); //fVar1 = (ADJ(ppsVar5)->rdCamera).fov;
             }
             else {
                 NETMSG_PUSHF32(sithCamera_g_aCameras[i].zoomFov);
@@ -811,11 +811,11 @@ int sithDSS_ProcessSyncCameras(SithMessage *msg)
         // Added: shifted around the -1 checks
         int primaryIdx = NETMSG_POPS32();
         int secondaryIdx = NETMSG_POPS32();
-        sithCamera_g_aCameras[i].primaryFocus = sithThing_GetThingByIndex(primaryIdx);
-        if (!sithCamera_g_aCameras[i].primaryFocus && primaryIdx != -1) return 0;
+        sithCamera_g_aCameras[i].pPrimaryFocusThing = sithThing_GetThingByIndex(primaryIdx);
+        if (!sithCamera_g_aCameras[i].pPrimaryFocusThing && primaryIdx != -1) return 0;
 
-        sithCamera_g_aCameras[i].secondaryFocus = sithThing_GetThingByIndex(secondaryIdx);
-        if (!sithCamera_g_aCameras[i].secondaryFocus && secondaryIdx != -1) return 0;
+        sithCamera_g_aCameras[i].pSecondaryFocusThing = sithThing_GetThingByIndex(secondaryIdx);
+        if (!sithCamera_g_aCameras[i].pSecondaryFocusThing && secondaryIdx != -1) return 0;
 
         sithCamera_g_aCameras[i].fov = NETMSG_POPF32();
 
@@ -831,7 +831,7 @@ int sithDSS_ProcessSyncCameras(SithMessage *msg)
             }
 #endif
 
-            rdCamera_SetFOV(&sithCamera_g_aCameras[i].rdCam, sithCamera_g_aCameras[i].fov);
+            rdCamera_SetFOV(&sithCamera_g_aCameras[i].rdCamera, sithCamera_g_aCameras[i].fov);
             sithCamera_g_aCameras[i].bZoomed = 0;
             sithCamera_g_aCameras[i].zoomFov = sithCamera_g_aCameras[i].fov;
 #ifdef QOL_IMPROVEMENTS
@@ -854,9 +854,9 @@ void sithDSS_SyncGameState(int sendto_id, int mpFlags)
 {
     NETMSG_START;
 
-    NETMSG_PUSHS32(sithCog_g_pMasterCog ? sithCog_g_pMasterCog->selfCog : -1);
+    NETMSG_PUSHS32(sithCog_g_pMasterCog ? sithCog_g_pMasterCog->idx : -1);
     if (Main_bMotsCompat) {
-        NETMSG_PUSHS32(sithCog_pActionCog ? sithCog_pActionCog->selfCog : -1);
+        NETMSG_PUSHS32(sithCog_pActionCog ? sithCog_pActionCog->idx : -1);
         NETMSG_PUSHS32(sithCog_actionCogIdk);
     }
 
@@ -873,8 +873,8 @@ void sithDSS_SyncGameState(int sendto_id, int mpFlags)
     NETMSG_PUSHF32(sithWeapon_fireRate);
     NETMSG_PUSHU32(sithWeapon_CurWeaponMode);
     NETMSG_PUSHU32(sithWeapon_8BD024);
-    NETMSG_PUSHU32(sithPlayer_g_pLocalPlayer->curItem);
-    NETMSG_PUSHU32(sithPlayer_g_pLocalPlayer->curWeapon);
+    NETMSG_PUSHU32(sithPlayer_g_pLocalPlayer->curItemID);
+    NETMSG_PUSHU32(sithPlayer_g_pLocalPlayer->curWeaponID);
     NETMSG_PUSHU32(sithPlayer_g_pLocalPlayer->curPower);
 
     for (int i = 0; i < ((sithComm_version == 0x7D6) ? 32 : 20); i++)
@@ -941,8 +941,8 @@ int sithDSS_ProcessSyncGameState(SithMessage *msg)
     sithWeapon_fireRate = NETMSG_POPF32();
     sithWeapon_CurWeaponMode = NETMSG_POPU32();
     sithWeapon_8BD024 = NETMSG_POPU32();
-    sithPlayer_g_pLocalPlayer->curItem = NETMSG_POPU32();
-    sithPlayer_g_pLocalPlayer->curWeapon = NETMSG_POPU32();
+    sithPlayer_g_pLocalPlayer->curItemID = NETMSG_POPU32();
+    sithPlayer_g_pLocalPlayer->curWeaponID = NETMSG_POPU32();
     sithPlayer_g_pLocalPlayer->curPower = NETMSG_POPU32();
 
     for (int i = 0; i < ((sithComm_version == 0x7D6) ? 32 : 20); i++)

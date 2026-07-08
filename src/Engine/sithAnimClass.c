@@ -140,7 +140,7 @@ int sithAnimClass_LoadPupEntry(SithPuppetClass *pPuppetClass, char *fpath)
     if (!stdConffile_Open(fpath))
         return 0;
 
-    stdPlatform_Memset32(pPuppetClass->bodypart_to_joint, 0xFFu, sizeof(pPuppetClass->bodypart_to_joint)); // Added: word-safe
+    stdPlatform_Memset32(pPuppetClass->aJoints, 0xFFu, sizeof(pPuppetClass->aJoints)); // Added: word-safe
     while ( stdConffile_ReadArgs() )
     {
         if ( !stdConffile_g_entry.numArgs )
@@ -160,7 +160,7 @@ int sithAnimClass_LoadPupEntry(SithPuppetClass *pPuppetClass, char *fpath)
                 bodypart_idx = _atoi(stdConffile_g_entry.args[0].key);
                 joint_idx = _atoi(stdConffile_g_entry.args[0].value);
                 if ( bodypart_idx < 0xA )
-                    pPuppetClass->bodypart_to_joint[bodypart_idx] = joint_idx;
+                    pPuppetClass->aJoints[bodypart_idx] = joint_idx;
             }
         }
         else if ( stdConffile_g_entry.numArgs > 1u )

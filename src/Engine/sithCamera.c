@@ -23,9 +23,9 @@ int sithCamera_Startup()
 {
     sithCamera_NewEntry(&sithCamera_g_aCameras[0], 0, 0x1, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
     sithCamera_NewEntry(&sithCamera_g_aCameras[1], 0, 0x4, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
-    sithCamera_g_aCameras[1].collisionOffset.x = 0.0;
-    sithCamera_g_aCameras[1].collisionOffset.y = -0.2;
-    sithCamera_g_aCameras[1].collisionOffset.z = 0.06;
+    sithCamera_g_aCameras[1].offset.x = 0.0;
+    sithCamera_g_aCameras[1].offset.y = -0.2;
+    sithCamera_g_aCameras[1].offset.z = 0.06;
     sithCamera_NewEntry(&sithCamera_g_aCameras[2], 0, 0x8, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
     sithCamera_NewEntry(&sithCamera_g_aCameras[4], 0, 0x20, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
     sithCamera_NewEntry(&sithCamera_g_aCameras[5], 0, 0x40, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
@@ -61,35 +61,35 @@ int sithCamera_Open(rdCanvas *canvas, flex_t aspect)
         return 0;
 
     sithCamera_g_aCameras[0].aspectRatio = aspect;
-    rdCamera_NewEntry(&sithCamera_g_aCameras[0].rdCam, sithCamera_g_aCameras[0].rdCam.fov, 0, SITHCAMERA_ZNEAR_FIRSTPERSON, SITHCAMERA_ZFAR, aspect);
-    rdCamera_SetAttenuation(&sithCamera_g_aCameras[0].rdCam, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
-    rdCamera_SetCanvas(&sithCamera_g_aCameras[0].rdCam, canvas);
+    rdCamera_NewEntry(&sithCamera_g_aCameras[0].rdCamera, sithCamera_g_aCameras[0].rdCamera.fov, 0, SITHCAMERA_ZNEAR_FIRSTPERSON, SITHCAMERA_ZFAR, aspect);
+    rdCamera_SetAttenuation(&sithCamera_g_aCameras[0].rdCamera, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
+    rdCamera_SetCanvas(&sithCamera_g_aCameras[0].rdCamera, canvas);
     sithCamera_g_aCameras[1].aspectRatio = aspect;
-    rdCamera_NewEntry(&sithCamera_g_aCameras[1].rdCam, sithCamera_g_aCameras[1].rdCam.fov, 0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
-    rdCamera_SetAttenuation(&sithCamera_g_aCameras[1].rdCam, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
-    rdCamera_SetCanvas(&sithCamera_g_aCameras[1].rdCam, canvas);
+    rdCamera_NewEntry(&sithCamera_g_aCameras[1].rdCamera, sithCamera_g_aCameras[1].rdCamera.fov, 0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
+    rdCamera_SetAttenuation(&sithCamera_g_aCameras[1].rdCamera, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
+    rdCamera_SetCanvas(&sithCamera_g_aCameras[1].rdCamera, canvas);
     sithCamera_g_aCameras[2].aspectRatio = aspect;
-    rdCamera_NewEntry(&sithCamera_g_aCameras[2].rdCam, sithCamera_g_aCameras[2].rdCam.fov, 0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
-    rdCamera_SetAttenuation(&sithCamera_g_aCameras[2].rdCam, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
-    rdCamera_SetCanvas(&sithCamera_g_aCameras[2].rdCam, canvas);
+    rdCamera_NewEntry(&sithCamera_g_aCameras[2].rdCamera, sithCamera_g_aCameras[2].rdCamera.fov, 0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
+    rdCamera_SetAttenuation(&sithCamera_g_aCameras[2].rdCamera, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
+    rdCamera_SetCanvas(&sithCamera_g_aCameras[2].rdCamera, canvas);
     sithCamera_g_aCameras[4].aspectRatio = aspect;
-    rdCamera_NewEntry(&sithCamera_g_aCameras[4].rdCam, sithCamera_g_aCameras[4].rdCam.fov, 0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
-    rdCamera_SetAttenuation(&sithCamera_g_aCameras[4].rdCam, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
-    rdCamera_SetCanvas(&sithCamera_g_aCameras[4].rdCam, canvas);
+    rdCamera_NewEntry(&sithCamera_g_aCameras[4].rdCamera, sithCamera_g_aCameras[4].rdCamera.fov, 0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
+    rdCamera_SetAttenuation(&sithCamera_g_aCameras[4].rdCamera, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
+    rdCamera_SetCanvas(&sithCamera_g_aCameras[4].rdCamera, canvas);
     sithCamera_g_aCameras[5].aspectRatio = aspect;
-    rdCamera_NewEntry(&sithCamera_g_aCameras[5].rdCam, sithCamera_g_aCameras[5].rdCam.fov, 0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
-    rdCamera_SetAttenuation(&sithCamera_g_aCameras[5].rdCam, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
-    rdCamera_SetCanvas(&sithCamera_g_aCameras[5].rdCam, canvas);
+    rdCamera_NewEntry(&sithCamera_g_aCameras[5].rdCamera, sithCamera_g_aCameras[5].rdCamera.fov, 0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
+    rdCamera_SetAttenuation(&sithCamera_g_aCameras[5].rdCamera, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
+    rdCamera_SetCanvas(&sithCamera_g_aCameras[5].rdCamera, canvas);
     sithCamera_g_aCameras[6].aspectRatio = aspect;
-    rdCamera_NewEntry(&sithCamera_g_aCameras[6].rdCam, sithCamera_g_aCameras[6].rdCam.fov, 0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
-    rdCamera_SetAttenuation(&sithCamera_g_aCameras[6].rdCam, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
-    rdCamera_SetCanvas(&sithCamera_g_aCameras[6].rdCam, canvas);
+    rdCamera_NewEntry(&sithCamera_g_aCameras[6].rdCamera, sithCamera_g_aCameras[6].rdCamera.fov, 0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
+    rdCamera_SetAttenuation(&sithCamera_g_aCameras[6].rdCamera, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
+    rdCamera_SetCanvas(&sithCamera_g_aCameras[6].rdCamera, canvas);
 #ifdef DW_CAMERA
     if (Main_bDwCompat) {
         sithCamera_g_aCameras[7].aspectRatio = aspect;
-        rdCamera_NewEntry(&sithCamera_g_aCameras[7].rdCam, sithCamera_g_aCameras[7].rdCam.fov, 0.0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
-        rdCamera_SetAttenuation(&sithCamera_g_aCameras[7].rdCam, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
-        rdCamera_SetCanvas(&sithCamera_g_aCameras[7].rdCam, canvas);
+        rdCamera_NewEntry(&sithCamera_g_aCameras[7].rdCamera, sithCamera_g_aCameras[7].rdCamera.fov, 0.0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
+        rdCamera_SetAttenuation(&sithCamera_g_aCameras[7].rdCamera, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
+        rdCamera_SetCanvas(&sithCamera_g_aCameras[7].rdCamera, canvas);
     }
 #endif // DW_CAMERA
     sithCamera_Update(sithCamera_g_pCurCamera);
@@ -103,24 +103,24 @@ void sithCamera_Close()
         sithCamera_bOpen = 0;
 
         // Added: Prevent UAF
-        rdCamera_SetCanvas(&sithCamera_g_aCameras[0].rdCam, NULL);
-        rdCamera_SetCanvas(&sithCamera_g_aCameras[1].rdCam, NULL);
-        rdCamera_SetCanvas(&sithCamera_g_aCameras[2].rdCam, NULL);
-        rdCamera_SetCanvas(&sithCamera_g_aCameras[4].rdCam, NULL);
-        rdCamera_SetCanvas(&sithCamera_g_aCameras[5].rdCam, NULL);
-        rdCamera_SetCanvas(&sithCamera_g_aCameras[6].rdCam, NULL);
+        rdCamera_SetCanvas(&sithCamera_g_aCameras[0].rdCamera, NULL);
+        rdCamera_SetCanvas(&sithCamera_g_aCameras[1].rdCamera, NULL);
+        rdCamera_SetCanvas(&sithCamera_g_aCameras[2].rdCamera, NULL);
+        rdCamera_SetCanvas(&sithCamera_g_aCameras[4].rdCamera, NULL);
+        rdCamera_SetCanvas(&sithCamera_g_aCameras[5].rdCamera, NULL);
+        rdCamera_SetCanvas(&sithCamera_g_aCameras[6].rdCamera, NULL);
 #ifdef DW_CAMERA
-        rdCamera_SetCanvas(&sithCamera_g_aCameras[7].rdCam, NULL);
+        rdCamera_SetCanvas(&sithCamera_g_aCameras[7].rdCamera, NULL);
 #endif
 
         // Added: Prevent memleak
         for (int i = 0; i < 7; i++)
         {
-            rdCamera_FreeEntry(&sithCamera_g_aCameras[i].rdCam);
+            rdCamera_FreeEntry(&sithCamera_g_aCameras[i].rdCamera);
         }
 #ifdef DW_CAMERA
         if (Main_bDwCompat) {
-            rdCamera_FreeEntry(&sithCamera_g_aCameras[7].rdCam);
+            rdCamera_FreeEntry(&sithCamera_g_aCameras[7].rdCamera);
         }
 #endif
     }
@@ -133,27 +133,27 @@ void sithCamera_ResetAllCameras()
 
     v0 = sithWorld_g_pCurrentWorld->pCameraFocusThing;
     sithCamera_g_stateFlags &= ~1u;
-    sithCamera_g_aCameras[0].primaryFocus = v0;
-    sithCamera_g_aCameras[1].primaryFocus = v0;
-    sithCamera_g_aCameras[2].primaryFocus = v0;
-    sithCamera_g_aCameras[2].secondaryFocus = v0;
-    sithCamera_g_aCameras[4].primaryFocus = v0;
-    sithCamera_g_aCameras[4].secondaryFocus = v0;
-    sithCamera_g_aCameras[5].primaryFocus = v0;
-    sithCamera_g_aCameras[5].secondaryFocus = v0;
-    sithCamera_g_aCameras[6].primaryFocus = v0;
-    sithCamera_g_aCameras[6].secondaryFocus = v0;
+    sithCamera_g_aCameras[0].pPrimaryFocusThing = v0;
+    sithCamera_g_aCameras[1].pPrimaryFocusThing = v0;
+    sithCamera_g_aCameras[2].pPrimaryFocusThing = v0;
+    sithCamera_g_aCameras[2].pSecondaryFocusThing = v0;
+    sithCamera_g_aCameras[4].pPrimaryFocusThing = v0;
+    sithCamera_g_aCameras[4].pSecondaryFocusThing = v0;
+    sithCamera_g_aCameras[5].pPrimaryFocusThing = v0;
+    sithCamera_g_aCameras[5].pSecondaryFocusThing = v0;
+    sithCamera_g_aCameras[6].pPrimaryFocusThing = v0;
+    sithCamera_g_aCameras[6].pSecondaryFocusThing = v0;
     sithCamera_g_bCurCameraSet = 0;
-    sithCamera_g_aCameras[0].secondaryFocus = 0;
-    sithCamera_g_aCameras[1].secondaryFocus = 0;
+    sithCamera_g_aCameras[0].pSecondaryFocusThing = 0;
+    sithCamera_g_aCameras[1].pSecondaryFocusThing = 0;
     if ( !sithCamera_g_pCurCamera || sithCamera_g_aCameras[0].dword4 >= sithCamera_g_pCurCamera->dword4 )
     {
         sithCamera_g_pCurCamera = sithCamera_g_aCameras;
         sithCamera_g_bCurCameraSet = 1;
-        rdCamera_SetCurrent(&sithCamera_g_aCameras[0].rdCam);
-        if ( sithCamera_g_aCameras[0].cameraPerspective == 32 )
+        rdCamera_SetCurrent(&sithCamera_g_aCameras[0].rdCamera);
+        if ( sithCamera_g_aCameras[0].type == 32 )
         {
-            rdMatrix_Copy34(&sithCamera_idleCamOrient, &sithCamera_g_pCurCamera->primaryFocus->orient);
+            rdMatrix_Copy34(&sithCamera_idleCamOrient, &sithCamera_g_pCurCamera->pPrimaryFocusThing->orient);
             rot.x = 0.0;
             rot.z = 0.0;
             rot.y = -45.0;
@@ -167,26 +167,26 @@ void sithCamera_ResetAllCameras()
 // MOTS altered
 int sithCamera_NewEntry(SithCamera *camera, uint32_t a2, uint32_t a3, flex_t fov, flex_t aspectRatio, rdCanvas *canvas, SithThing *focus_far, SithThing *focus_near)
 {
-    camera->cameraPerspective = a3;
+    camera->type = a3;
     camera->dword4 = a2;
-    camera->primaryFocus = focus_far;
+    camera->pPrimaryFocusThing = focus_far;
     camera->fov = fov;
     camera->aspectRatio = aspectRatio;
-    camera->secondaryFocus = focus_near;
-    rdCamera_NewEntry(&camera->rdCam, fov, 0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspectRatio);
-    rdCamera_SetAttenuation(&camera->rdCam, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
+    camera->pSecondaryFocusThing = focus_near;
+    rdCamera_NewEntry(&camera->rdCamera, fov, 0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspectRatio);
+    rdCamera_SetAttenuation(&camera->rdCamera, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
 
     if (canvas) {
-        rdCamera_SetCanvas(&camera->rdCam, canvas);
+        rdCamera_SetCanvas(&camera->rdCamera, canvas);
     }
 
-    rdVector_Zero3(&camera->vec3_1);
-    rdVector_Zero3(&camera->viewPYR);
-    rdVector_Zero3(&camera->collisionOffset);
+    rdVector_Zero3(&camera->lookPos);
+    rdVector_Zero3(&camera->lookPYR);
+    rdVector_Zero3(&camera->offset);
 #ifndef OPTIMIZE_AWAY_UNUSED_FIELDS
-    rdVector_Zero3(&camera->unused1);
+    rdVector_Zero3(&camera->vecUnknown1);
 #endif
-    rdMatrix_Identity34(&camera->viewMat);
+    rdMatrix_Identity34(&camera->orient);
 
 #ifdef JKM_CAMERA
     camera->bZoomed = 0;
@@ -214,10 +214,10 @@ void sithCamera_Update(SithCamera *cam)
     rdVector3 rot; // [esp+50h] [ebp-3Ch] BYREF
     rdMatrix34 out; // [esp+5Ch] [ebp-30h] BYREF
 
-    SithThing* focusThing = cam->primaryFocus;
+    SithThing* focusThing = cam->pPrimaryFocusThing;
     flex_t v77 = sithCamera_g_cameraAngleDelta * sithTime_g_frameTimeFlex;
     flex_t v78 = sithCamera_g_cameraPosDelta * sithTime_g_frameTimeFlex;
-    switch ( cam->cameraPerspective )
+    switch ( cam->type )
     {
         case 1:
             // MOTS added: scope zoom
@@ -232,10 +232,10 @@ void sithCamera_Update(SithCamera *cam)
             rdCamera_SetMipmapScalar(cam->invZoomScale);
 #endif
 
-            rdMatrix_Copy34(&cam->viewMat, &focusThing->orient);
+            rdMatrix_Copy34(&cam->orient, &focusThing->orient);
             if ( focusThing->moveType == SITH_MT_PATH && focusThing->renderData.hierarchyNodeMatrices)
             {
-                rdMatrix_Copy34(&cam->viewMat, focusThing->renderData.hierarchyNodeMatrices);
+                rdMatrix_Copy34(&cam->orient, focusThing->renderData.hierarchyNodeMatrices);
             }
             else
             {
@@ -259,21 +259,21 @@ void sithCamera_Update(SithCamera *cam)
                     rdVector_Add3Acc(&v76, &sithCamera_g_vecCameraAngleOffset);
                 }
 
-                rdMatrix_PreRotate34(&cam->viewMat, &v76);
-                rdMatrix_PostTranslate34(&cam->viewMat, &focusThing->position);
+                rdMatrix_PreRotate34(&cam->orient, &v76);
+                rdMatrix_PostTranslate34(&cam->orient, &focusThing->position);
                 if ( focusThing->type == SITH_THING_ACTOR || focusThing->type == SITH_THING_PLAYER )
                 {
-                    rdMatrix_PreTranslate34(&cam->viewMat, &focusThing->actorParams.eyeOffset);
+                    rdMatrix_PreTranslate34(&cam->orient, &focusThing->actorParams.eyeOffset);
                     
                     // MOTS added: hmm??
                     if (Main_bMotsCompat || focusThing == sithPlayer_g_pLocalPlayerThing )
-                        rdMatrix_PreTranslate34(&cam->viewMat, &sithCamera_g_vecCameraPosOffset);
+                        rdMatrix_PreTranslate34(&cam->orient, &sithCamera_g_vecCameraPosOffset);
                 }
-                rdMatrix_Normalize34(&cam->viewMat);
+                rdMatrix_Normalize34(&cam->orient);
             }
             // Added: nullptr check
             if (focusThing->sector)
-                cam->sector = sithCollision_FindSectorInRadius(focusThing->sector, &focusThing->position, &cam->viewMat.scale, 0.02);
+                cam->sector = sithCollision_FindSectorInRadius(focusThing->sector, &focusThing->position, &cam->orient.scale, 0.02);
             break;
         case 4:
             if ( focusThing->type == SITH_THING_ACTOR || focusThing->type == SITH_THING_PLAYER )
@@ -298,25 +298,25 @@ void sithCamera_Update(SithCamera *cam)
                 rdMatrix_PostTranslate34(&out, &focusThing->actorParams.eyeOffset);
             cam->sector = sithCamera_SearchSectorInRadius(0, focusThing->sector, &focusThing->position, &out.scale, 0.02, RAYCAST_2000 | RAYCAST_200);
             rdVector_Copy3(&v84, &out.scale);
-            rdMatrix_Copy34(&cam->viewMat, &out);
+            rdMatrix_Copy34(&cam->orient, &out);
 
             // MOTS added: hmm?
             if (Main_bMotsCompat) {
-                rdMatrix_PreTranslate34(&cam->viewMat,&sithCamera_g_vecCameraPosOffset);
+                rdMatrix_PreTranslate34(&cam->orient,&sithCamera_g_vecCameraPosOffset);
             }
 
             rdMatrix_PreTranslate34(&out, &sithCamera_trans);
-            rdMatrix_PreTranslate34(&cam->viewMat, &cam->collisionOffset);
-            rdMatrix_LookAt(&cam->viewMat, &cam->viewMat.scale, &out.scale, 0.0);
-            cam->sector = sithCamera_SearchSectorInRadius(0, cam->sector, &v84, &cam->viewMat.scale, 0.02, RAYCAST_2000 | RAYCAST_200);
+            rdMatrix_PreTranslate34(&cam->orient, &cam->offset);
+            rdMatrix_LookAt(&cam->orient, &cam->orient.scale, &out.scale, 0.0);
+            cam->sector = sithCamera_SearchSectorInRadius(0, cam->sector, &v84, &cam->orient.scale, 0.02, RAYCAST_2000 | RAYCAST_200);
             break;
         case 32:
             rdMatrix_TransformVector34(&a1, &sithCamera_trans2, &sithCamera_idleCamOrient);
             v2 = (rdVector3){0.0, 0.0, 0.05};
             rdVector_Sub3(&v2, &focusThing->position, &v2);
             rdVector_Add3Acc(&a1, &v2);
-            rdMatrix_LookAt(&cam->viewMat, &a1, &v2, 0.0);
-            cam->sector = sithCamera_SearchSectorInRadius(0, focusThing->sector, &focusThing->position, &cam->viewMat.scale, 0.02, RAYCAST_2000 | RAYCAST_200);
+            rdMatrix_LookAt(&cam->orient, &a1, &v2, 0.0);
+            cam->sector = sithCamera_SearchSectorInRadius(0, focusThing->sector, &focusThing->position, &cam->orient.scale, 0.02, RAYCAST_2000 | RAYCAST_200);
             rot.x = 0.0;
             rot.y = sithTime_g_frameTimeFlex * 8.0;
             rot.z = 0.0;
@@ -328,32 +328,32 @@ void sithCamera_Update(SithCamera *cam)
             rdVector_Neg3(&mode64Tmp, &sithCamera_trans3);
             
             // rdMatrix_BuildFromLook34 ish?
-            cam->viewMat.lvec.x = mode64Tmp.x;
-            cam->viewMat.lvec.y = mode64Tmp.y;
-            cam->viewMat.lvec.z = mode64Tmp.z;
-            cam->viewMat.rvec.x = (1.0 * mode64Tmp.y) - (0.0 * mode64Tmp.z);
-            cam->viewMat.rvec.y = (0.0 * mode64Tmp.z) - (1.0 * mode64Tmp.x);
-            cam->viewMat.rvec.z = (0.0 * mode64Tmp.x) - (0.0 * mode64Tmp.y);
-            cam->viewMat.uvec.x = (cam->viewMat.rvec.y * mode64Tmp.z) - (cam->viewMat.rvec.z * mode64Tmp.y);
-            cam->viewMat.uvec.y = (cam->viewMat.rvec.z * mode64Tmp.x) - (cam->viewMat.rvec.x * mode64Tmp.z);
-            cam->viewMat.uvec.z = (cam->viewMat.rvec.x * mode64Tmp.y) - (cam->viewMat.rvec.y * mode64Tmp.x);
+            cam->orient.lvec.x = mode64Tmp.x;
+            cam->orient.lvec.y = mode64Tmp.y;
+            cam->orient.lvec.z = mode64Tmp.z;
+            cam->orient.rvec.x = (1.0 * mode64Tmp.y) - (0.0 * mode64Tmp.z);
+            cam->orient.rvec.y = (0.0 * mode64Tmp.z) - (1.0 * mode64Tmp.x);
+            cam->orient.rvec.z = (0.0 * mode64Tmp.x) - (0.0 * mode64Tmp.y);
+            cam->orient.uvec.x = (cam->orient.rvec.y * mode64Tmp.z) - (cam->orient.rvec.z * mode64Tmp.y);
+            cam->orient.uvec.y = (cam->orient.rvec.z * mode64Tmp.x) - (cam->orient.rvec.x * mode64Tmp.z);
+            cam->orient.uvec.z = (cam->orient.rvec.x * mode64Tmp.y) - (cam->orient.rvec.y * mode64Tmp.x);
 
-            rdMatrix_Normalize34(&cam->viewMat);
-            rdVector_Scale3(&cam->viewMat.scale, &sithCamera_trans3, 0.2);
+            rdMatrix_Normalize34(&cam->orient);
+            rdVector_Scale3(&cam->orient.scale, &sithCamera_trans3, 0.2);
 
-            rdMatrix_PostTranslate34(&cam->viewMat, &focusThing->position);
-            cam->sector = sithCamera_SearchSectorInRadius(0, focusThing->sector, &focusThing->position, &cam->viewMat.scale, 0.02, RAYCAST_2000 | RAYCAST_200);
+            rdMatrix_PostTranslate34(&cam->orient, &focusThing->position);
+            cam->sector = sithCamera_SearchSectorInRadius(0, focusThing->sector, &focusThing->position, &cam->orient.scale, 0.02, RAYCAST_2000 | RAYCAST_200);
             break;
         case 128:
-            rdMatrix_Copy34(&cam->viewMat, &sithCamera_g_orbCamOrient);
-            rdMatrix_PostTranslate34(&cam->viewMat, &focusThing->position);
-            cam->sector = sithCollision_FindSectorInRadius(focusThing->sector, &focusThing->position, &cam->viewMat.scale, 0.02);
+            rdMatrix_Copy34(&cam->orient, &sithCamera_g_orbCamOrient);
+            rdMatrix_PostTranslate34(&cam->orient, &focusThing->position);
+            cam->sector = sithCollision_FindSectorInRadius(focusThing->sector, &focusThing->position, &cam->orient.scale, 0.02);
             break;
         default:
             break;
     }
-    cam->vec3_1 = cam->viewMat.scale;
-    rdMatrix_ExtractAngles34(&cam->viewMat, &cam->viewPYR);
+    cam->lookPos = cam->orient.scale;
+    rdMatrix_ExtractAngles34(&cam->orient, &cam->lookPYR);
 
     // TODO what inlined func is this
     if ( sithCamera_g_vecCameraPosOffset.x <= 0.0 )
@@ -521,8 +521,8 @@ void sithCamera_RenderScene()
 {
     if ( sithCamera_g_pCurCamera )
     {
-        rdCamera_SetCurrent(&sithCamera_g_pCurCamera->rdCam);
-        rdCamera_Update(&sithCamera_g_pCurCamera->viewMat);
+        rdCamera_SetCurrent(&sithCamera_g_pCurCamera->rdCamera);
+        rdCamera_Update(&sithCamera_g_pCurCamera->orient);
         sithRender_Draw();
     }
 }
@@ -543,10 +543,10 @@ int sithCamera_SetCurrentCamera(SithCamera *camera)
         return 0;
     sithCamera_g_pCurCamera = camera;
     sithCamera_g_bCurCameraSet = 1;
-    rdCamera_SetCurrent(&camera->rdCam);
-    if ( camera->cameraPerspective == 32 )
+    rdCamera_SetCurrent(&camera->rdCamera);
+    if ( camera->type == 32 )
     {
-        rdMatrix_Copy34(&sithCamera_idleCamOrient, &sithCamera_g_pCurCamera->primaryFocus->orient);
+        rdMatrix_Copy34(&sithCamera_idleCamOrient, &sithCamera_g_pCurCamera->pPrimaryFocusThing->orient);
         rot.x = 0.0;
         rot.y = -45.0;
         rot.z = 0.0;
@@ -558,8 +558,8 @@ int sithCamera_SetCurrentCamera(SithCamera *camera)
 
 void sithCamera_SetCameraFocus(SithCamera *camera, SithThing *primary, SithThing *secondary)
 {
-    camera->primaryFocus = primary;
-    camera->secondaryFocus = secondary;
+    camera->pPrimaryFocusThing = primary;
+    camera->pSecondaryFocusThing = secondary;
 }
 
 SithSector* sithCamera_SearchSectorInRadius(SithThing *a3, SithSector *a2, rdVector3 *a4, rdVector3 *a6, flex_t a7, int flags)
@@ -602,12 +602,12 @@ void sithCamera_SetPOVShake(rdVector3 *a1, rdVector3 *a2, flex_t a3, flex_t a4)
 
 SithThing* sithCamera_GetPrimaryFocus(SithCamera *pCamera)
 {
-    return pCamera->primaryFocus;
+    return pCamera->pPrimaryFocusThing;
 }
 
 SithThing* sithCamera_GetSecondaryFocus(SithCamera *pCamera)
 {
-    return pCamera->secondaryFocus;
+    return pCamera->pSecondaryFocusThing;
 }
 
 int sithCamera_SetCameraStateFlags(int a1)
@@ -645,13 +645,13 @@ void sithCamera_CycleCamera()
 void sithCamera_SetZoom(SithCamera *pCamera, flex_t zoomScale, flex_t zoomSpeed)
 {
     if (!pCamera) return;
-    if (!pCamera->rdCam.canvas) return;
+    if (!pCamera->rdCamera.canvas) return;
 
 #ifdef JKM_CAMERA
 #ifdef QOL_IMPROVEMENTS
     flex_t zoomScaleNew = zoomScale;
-    if (jkPlayer_fovIsVertical && pCamera->rdCam.screenAspectRatio != 0.0) {
-        flex_t horFov = (stdMath_ArcTan3(1.0, stdMath_Tan(jkPlayer_fov * 0.5) / pCamera->rdCam.screenAspectRatio) *
+    if (jkPlayer_fovIsVertical && pCamera->rdCamera.screenAspectRatio != 0.0) {
+        flex_t horFov = (stdMath_ArcTan3(1.0, stdMath_Tan(jkPlayer_fov * 0.5) / pCamera->rdCamera.screenAspectRatio) *
  -2.0);
         flex_t zoomFov = zoomScale * horFov;
         zoomScaleNew = zoomFov / horFov;
@@ -667,7 +667,7 @@ void sithCamera_SetZoom(SithCamera *pCamera, flex_t zoomScale, flex_t zoomSpeed)
         return;
     }
 
-    rdCamera_SetFOV(&pCamera->rdCam, jkPlayer_fov / zoomScale);
+    rdCamera_SetFOV(&pCamera->rdCamera, jkPlayer_fov / zoomScale);
     pCamera->zoomSpeed = 0.0;
     pCamera->bZoomed = 0;
     pCamera->zoomFov = zoomScale;
@@ -676,7 +676,7 @@ void sithCamera_SetZoom(SithCamera *pCamera, flex_t zoomScale, flex_t zoomSpeed)
     flex_t zoomFov = stdMath_ArcTan4(zoomScale * 0.5, 0.0);
     zoomFov = -zoomFov * 2.0;
 
-    if (zoomFov != pCamera->rdCam.fov) 
+    if (zoomFov != pCamera->rdCamera.fov) 
     {
         if (zoomSpeed != 0.0) 
         {
@@ -688,7 +688,7 @@ void sithCamera_SetZoom(SithCamera *pCamera, flex_t zoomScale, flex_t zoomSpeed)
             return;
         }
 
-        rdCamera_SetFOV(&pCamera->rdCam, zoomFov);
+        rdCamera_SetFOV(&pCamera->rdCamera, zoomFov);
         pCamera->zoomSpeed = 0.0;
         pCamera->bZoomed = 0;
     }
@@ -706,11 +706,11 @@ void sithCamera_UpdateZoom(SithCamera *pCamera)
     int iVar4;
     int zoomDirection;
 
-    if (!pCamera->rdCam.canvas) return;
+    if (!pCamera->rdCamera.canvas) return;
 
     // Fix zoomscale if screen size changed mid-zoom
-    if (jkPlayer_fovIsVertical && pCamera->rdCam.screenAspectRatio != 0.0) {
-        flex_t horFov = (stdMath_ArcTan3(1.0, stdMath_Tan(jkPlayer_fov * 0.5) / pCamera->rdCam.screenAspectRatio) *
+    if (jkPlayer_fovIsVertical && pCamera->rdCamera.screenAspectRatio != 0.0) {
+        flex_t horFov = (stdMath_ArcTan3(1.0, stdMath_Tan(jkPlayer_fov * 0.5) / pCamera->rdCamera.screenAspectRatio) *
  -2.0);
         flex_t zoomFov = pCamera->zoomScaleOrig * horFov;
         pCamera->zoomScale = zoomFov / horFov;
@@ -718,7 +718,7 @@ void sithCamera_UpdateZoom(SithCamera *pCamera)
 
     if (!pCamera->bZoomed) {
         if (Main_bMotsCompat) {
-            rdCamera_SetFOV(&sithCamera_g_pCurCamera->rdCam, jkPlayer_fov / pCamera->zoomScale); 
+            rdCamera_SetFOV(&sithCamera_g_pCurCamera->rdCamera, jkPlayer_fov / pCamera->zoomScale); 
         }
         //printf("Zoom: en=%x scale=%f, fov=%f, speed=%f, invScale=%f; %x %x %f\n", pCamera->bZoomed, pCamera->zoomScale, pCamera->zoomFov, pCamera->zoomSpeed, pCamera->invZoomScale, 999, 999, jkPlayer_fov / pCamera->zoomScale);
         return;
@@ -782,7 +782,7 @@ void sithCamera_UpdateZoom(SithCamera *pCamera)
     }
 
     pCamera->zoomFov = newScale;
-    rdCamera_SetFOV(&pCamera->rdCam, jkPlayer_fov / newScale);
+    rdCamera_SetFOV(&pCamera->rdCamera, jkPlayer_fov / newScale);
     if ((pCamera->zoomFov == currentScale) || (iVar4 != iVar3)) {
         pCamera->zoomSpeed = 0.0;
         pCamera->bZoomed = 0;
@@ -799,17 +799,17 @@ void sithCamera_UpdateZoom(SithCamera *pCamera)
     int iVar4;
     int zoomDirection;
 
-    if (!pCamera->rdCam.canvas) return;
+    if (!pCamera->rdCamera.canvas) return;
     if (!pCamera->bZoomed) {
 
         // Added
         if (Main_bMotsCompat) {
-            rdCamera_SetFOV(&sithCamera_g_pCurCamera->rdCam, jkPlayer_fov / pCamera->zoomScale); 
+            rdCamera_SetFOV(&sithCamera_g_pCurCamera->rdCamera, jkPlayer_fov / pCamera->zoomScale); 
         }
         return;
     }
 
-    currentFov = pCamera->rdCam.fov;
+    currentFov = pCamera->rdCamera.fov;
     fVar2 = pCamera->zoomFov - currentFov;
     if (0.0 <= fVar2) {
         zoomDirection = 1;
@@ -852,8 +852,8 @@ void sithCamera_UpdateZoom(SithCamera *pCamera)
         newFov = pCamera->zoomFov;
     }
     
-    rdCamera_SetFOV(&pCamera->rdCam, newFov);
-    if ((pCamera->rdCam.fov == currentFov) || (iVar4 != iVar3)) {
+    rdCamera_SetFOV(&pCamera->rdCamera, newFov);
+    if ((pCamera->rdCamera.fov == currentFov) || (iVar4 != iVar3)) {
         pCamera->zoomSpeed = 0.0;
         pCamera->bZoomed = 0;
     }

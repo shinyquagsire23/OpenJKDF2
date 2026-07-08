@@ -116,7 +116,7 @@ void jkHudInv_Draw()
     int j; // ebp
     SithInventoryType *v6; // ebx
     stdBitmap *v7; // eax
-    int curItem; // edi
+    int curItemID; // edi
     int curPower; // ebp
     unsigned int time_msec; // esi
     int v11; // ecx
@@ -213,7 +213,7 @@ void jkHudInv_Draw()
             jkHudInv_scroll.rendIdx = jkHudInv_scroll.maxItemRend - 1;
     }
     jkHudInv_scroll.maxItemRend = v1;
-    curItem = sithInventory_GetCurrentItem(player);
+    curItemID = sithInventory_GetCurrentItem(player);
     curPower = sithInventory_GetCurPower(player);
     time_msec = stdPlatform_GetTimeMsec();
     v11 = 0;
@@ -244,7 +244,7 @@ void jkHudInv_Draw()
     else
     {
         jkHudInv_info.field_24 = 1;
-        if ( jkHudInv_rend_isshowing_maybe && curItem )
+        if ( jkHudInv_rend_isshowing_maybe && curItemID )
         {
             v12 = 2;
         }
@@ -275,7 +275,7 @@ void jkHudInv_Draw()
         }
         else
         {
-            a2 = curItem;
+            a2 = curItemID;
         }
         v14 = jkHudInv_aBitmaps[v11];
         if ( v14 )
@@ -424,7 +424,7 @@ void jkHudInv_DrawGPU()
     int j; // ebp
     SithInventoryType *v6; // ebx
     stdBitmap *v7; // eax
-    int curItem; // edi
+    int curItemID; // edi
     int curPower; // ebp
     unsigned int time_msec; // esi
     int v11; // ecx
@@ -514,7 +514,7 @@ void jkHudInv_DrawGPU()
             jkHudInv_scroll.rendIdx = jkHudInv_scroll.maxItemRend - 1;
     }
     jkHudInv_scroll.maxItemRend = v1;
-    curItem = sithInventory_GetCurrentItem(player);
+    curItemID = sithInventory_GetCurrentItem(player);
     curPower = sithInventory_GetCurPower(player);
     time_msec = stdPlatform_GetTimeMsec();
     v11 = 0;
@@ -545,7 +545,7 @@ void jkHudInv_DrawGPU()
     else
     {
         jkHudInv_info.field_24 = 1;
-        if ( jkHudInv_rend_isshowing_maybe && curItem )
+        if ( jkHudInv_rend_isshowing_maybe && curItemID )
         {
             v12 = 2;
         }
@@ -576,7 +576,7 @@ void jkHudInv_DrawGPU()
         }
         else
         {
-            a2 = curItem;
+            a2 = curItemID;
         }
         v14 = jkHudInv_aBitmaps[v11];
         if ( v14 )
@@ -1023,6 +1023,6 @@ void jkHudInv_FixAmmoMaximums()
 {
     for (int i = 0; i < SITHBIN_NUMBINS; i++)
     {
-        sithInventory_g_aTypes[i].ammoMax = jkHud_aBinMaxAmt[i];
+        sithInventory_g_aTypes[i].max = jkHud_aBinMaxAmt[i];
     }
 }

@@ -642,10 +642,10 @@ uint32_t sithWorld_CalcWorldChecksum(SithWorld *pWorld, uint32_t seed)
     // Starting hash seed
     uint32_t hash = seed;
 
-    // Hash all world cogscript __VM bytecode__ (*not* text)
+    // Hash all world pScript __VM bytecode__ (*not* text)
     for (int i = 0; i < pWorld->numCogScripts; i++)
     {
-        hash = util_Weirdchecksum((uint8_t *)pWorld->aCogScripts[i].script_program, pWorld->aCogScripts[i].codeSize, hash);
+        hash = util_Weirdchecksum((uint8_t *)pWorld->aCogScripts[i].pCode, pWorld->aCogScripts[i].codeSize, hash);
     }
 
     // Hash all world aVertices
@@ -662,7 +662,7 @@ uint32_t sithWorld_CalcWorldChecksum(SithWorld *pWorld, uint32_t seed)
     {
         for (int i = 0; i < sithWorld_g_pStaticWorld->numCogScripts; i++)
         {
-            hash = util_Weirdchecksum((uint8_t *)sithWorld_g_pStaticWorld->aCogScripts[i].script_program, sithWorld_g_pStaticWorld->aCogScripts[i].codeSize, hash);
+            hash = util_Weirdchecksum((uint8_t *)sithWorld_g_pStaticWorld->aCogScripts[i].pCode, sithWorld_g_pStaticWorld->aCogScripts[i].codeSize, hash);
         }
     }
 
@@ -894,12 +894,12 @@ void sithWorld_GetMemoryUsage(SithWorld *pWorld, int *outAllocated, int *outQuan
     outQuantity[8] = pWorld->numCogScripts;
     for (int i = 0; i < pWorld->numCogScripts; i++)
     {
-        outAllocated[8] += 4 * (7 * pWorld->aCogScripts[i].pSymbolTable->entry_cnt + pWorld->aCogScripts[i].numIdk) + 0x1DD0; // TODO verify struct sizes here...
+        outAllocated[8] += 4 * (7 * pWorld->aCogScripts[i].pSymbolTable->numUsedSymbols + pWorld->aCogScripts[i].numSymbolRefs) + 0x1DD0; // TODO verify struct sizes here...
     }
     outQuantity[7] = pWorld->numCogs;
     for (int i = 0; i < pWorld->numCogs; i++)
     {
-        outAllocated[7] += 28 * pWorld->aCogs[i].pSymbolTable->entry_cnt + 0x14DC; // TODO verify struct sizes
+        outAllocated[7] += 28 * pWorld->aCogs[i].pSymbolTable->numUsedSymbols + 0x14DC; // TODO verify struct sizes
     }
     outQuantity[10] = pWorld->numModels;
     for (int i = 0; i < pWorld->numModels; i++)

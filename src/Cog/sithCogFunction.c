@@ -55,7 +55,7 @@ void sithCogFunction_GetSenderType(sithCog *ctx)
 
 void sithCogFunction_GetSourceRef(sithCog *ctx)
 {
-    sithCogExec_PushInt(ctx, ctx->sourceRef);
+    sithCogExec_PushInt(ctx, ctx->sourceIdx);
 }
 
 void sithCogFunction_GetSourceType(sithCog *ctx)
@@ -104,12 +104,12 @@ void sithCogFunction_Sleep(sithCog *ctx)
     if ( ctx_->flags & SITH_COG_DEBUG )
     {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-        _sprintf(std_g_genBuffer, "Cog %s: Sleeping for %f seconds.\n", ctx_->cogscript_fpath, fSecs);
+        _sprintf(std_g_genBuffer, "Cog %s: Sleeping for %f seconds.\n", ctx_->aName, fSecs);
         sithConsole_PrintString(std_g_genBuffer);
 #endif
     }
     ctx_->script_running = 2;
-    ctx_->wakeTimeMs = sithTime_g_msecGameTime + (int)(fSecs * 1000.0);
+    ctx_->msecTimerTimeout = sithTime_g_msecGameTime + (int)(fSecs * 1000.0);
 }
 
 void sithCogFunction_Print(sithCog *ctx)
@@ -321,7 +321,7 @@ void sithCogFunction_SetPulse(sithCog *ctx)
         if ( ctx->flags & SITH_COG_DEBUG )
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_g_genBuffer, "Cog %s: Pulse disabled.\n", ctx->cogscript_fpath);
+            _sprintf(std_g_genBuffer, "Cog %s: Pulse disabled.\n", ctx->aName);
             sithConsole_PrintString(std_g_genBuffer);
 #endif
         }
@@ -332,13 +332,13 @@ void sithCogFunction_SetPulse(sithCog *ctx)
         if ( ctx->flags & SITH_COG_DEBUG )
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_g_genBuffer, "Cog %s: Pulse set to %f seconds.\n", ctx->cogscript_fpath, popFlex);
+            _sprintf(std_g_genBuffer, "Cog %s: Pulse set to %f seconds.\n", ctx->aName, popFlex);
             sithConsole_PrintString(std_g_genBuffer);
 #endif
         }
         ctx->flags |= SITH_COG_PULSE_SET;
-        ctx->pulsePeriodMs = (int)(popFlex * 1000.0);
-        ctx->nextPulseMs = (int)(popFlex * 1000.0) + sithTime_g_msecGameTime;
+        ctx->msecPulseInterval = (int)(popFlex * 1000.0);
+        ctx->msecNextPulseTime = (int)(popFlex * 1000.0) + sithTime_g_msecGameTime;
     }
 }
 
@@ -350,7 +350,7 @@ void sithCogFunction_SetTimer(sithCog *ctx)
         if ( ctx->flags & SITH_COG_DEBUG )
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_g_genBuffer, "Cog %s: Timer cancelled.\n", ctx->cogscript_fpath);
+            _sprintf(std_g_genBuffer, "Cog %s: Timer cancelled.\n", ctx->aName);
             sithConsole_PrintString(std_g_genBuffer);
 #endif
         }
@@ -361,7 +361,7 @@ void sithCogFunction_SetTimer(sithCog *ctx)
         if ( ctx->flags & SITH_COG_DEBUG )
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_g_genBuffer, "Cog %s: Timer set for %f seconds.\n", ctx->cogscript_fpath, popFlex);
+            _sprintf(std_g_genBuffer, "Cog %s: Timer set for %f seconds.\n", ctx->aName, popFlex);
             sithConsole_PrintString(std_g_genBuffer);
 #endif
         }
@@ -372,16 +372,16 @@ void sithCogFunction_SetTimer(sithCog *ctx)
 
 void sithCogFunction_SetTimerEx(sithCog *ctx)
 {
-    SithEventParams timerInfo;
+    SithEventParams params;
 
-    timerInfo.field_14 = sithCogExec_PopFlex(ctx);
-    timerInfo.field_10 = sithCogExec_PopFlex(ctx);
-    timerInfo.timerIdx = sithCogExec_PopInt(ctx);
-    timerInfo.cogIdx = ctx->selfCog;
+    params.field_14 = sithCogExec_PopFlex(ctx);
+    params.field_10 = sithCogExec_PopFlex(ctx);
+    params.timerIdx = sithCogExec_PopInt(ctx);
+    params.idx = ctx->idx;
     cog_flex_t a1a = sithCogExec_PopFlex(ctx) * 1000.0;
     int timerMs = (signed int)a1a;
     if ( timerMs >= 0 ) {
-        sithEvent_CreateEvent(4, &timerInfo, timerMs);
+        sithEvent_CreateEvent(4, &params, timerMs);
     }
 }
 
@@ -400,13 +400,13 @@ void sithCogFunction_KillTimerEx(sithCog *ctx)
         {
             do
             {
-                v4 = v2->nextTimer;
-                if ( v2->taskNum == 4 && v2->timerInfo.cogIdx == ctx->selfCog && v2->timerInfo.timerIdx == v1 )
+                v4 = v2->pNextEvent;
+                if ( v2->taskNum == 4 && v2->params.idx == ctx->idx && v2->params.timerIdx == v1 )
                 {
                     if ( v3 )
-                        v3->nextTimer = v4;
+                        v3->pNextEvent = v4;
                     else
-                        sithEvent_g_pFirstQueuedEvent = v2->nextTimer;
+                        sithEvent_g_pFirstQueuedEvent = v2->pNextEvent;
                     sithEvent_FreeEvent(v2);
                     v2 = v3;
                 }
@@ -420,7 +420,7 @@ void sithCogFunction_KillTimerEx(sithCog *ctx)
 
 void sithCogFunction_Reset(sithCog *ctx)
 {
-    ctx->calldepth = 0;
+    ctx->callDepth = 0;
 }
 
 void sithCogFunction_VectorSet(sithCog *ctx)
@@ -532,7 +532,7 @@ void sithCogFunction_SendMessage(sithCog *ctx)
     sithCog* cog = sithCogExec_PopCog(ctx);
 
     if (cog && msgId >= 0 && msgId < SITH_MESSAGE_MAX)
-        sithCog_SendMessage(cog, msgId, SENDERTYPE_COG, ctx->selfCog, ctx->sourceType, ctx->sourceRef, 0);
+        sithCog_SendMessage(cog, msgId, SENDERTYPE_COG, ctx->idx, ctx->sourceType, ctx->sourceIdx, 0);
 }
 
 void sithCogFunction_SendMessageEx(struct sithCog *ctx)
@@ -546,7 +546,7 @@ void sithCogFunction_SendMessageEx(struct sithCog *ctx)
 
     if (cog && msgId >= 0 && msgId < SITH_MESSAGE_MAX)
     {
-        cog_flex_t flexRet = sithCog_SendMessageEx(cog, msgId, SENDERTYPE_COG, ctx->selfCog, ctx->sourceType, ctx->sourceRef, 0, param0, param1, param2, param3);
+        cog_flex_t flexRet = sithCog_SendMessageEx(cog, msgId, SENDERTYPE_COG, ctx->idx, ctx->sourceType, ctx->sourceIdx, 0, param0, param1, param2, param3);
         sithCogExec_PushFlex(ctx, flexRet);
     }
 }
@@ -687,7 +687,7 @@ void sithCogFunction_SetGravity(sithCog *ctx)
 
 void sithCogFunction_ReturnEx(sithCog *ctx)
 {
-    ctx->returnEx = sithCogExec_PopFlex(ctx);
+    ctx->returnValue = sithCogExec_PopFlex(ctx);
 }
 
 void sithCogFunction_GetParam(sithCog *ctx)
@@ -933,25 +933,25 @@ void sithCogFunction_HeapNew(sithCog *ctx)
     SithCogSymbolValue *oldHeap; // eax
     SithCogSymbolValue *newHeap; // edi
 
-    int numHeapVars = sithCogExec_PopInt(ctx);
-    if ( numHeapVars > 0 )
+    int heapSize = sithCogExec_PopInt(ctx);
+    if ( heapSize > 0 )
     {
         oldHeap = ctx->heap;
         if ( oldHeap )
         {
             SITH_FREE(oldHeap);
-            ctx->numHeapVars = 0;
+            ctx->heapSize = 0;
         }
         { TWL_EXTRAM_SUGGEST(pSithHS); // Added: heap vars are word-safe stackvars
-        newHeap = (SithCogSymbolValue *)SITH_ALLOC(sizeof(SithCogSymbolValue) * numHeapVars);
+        newHeap = (SithCogSymbolValue *)SITH_ALLOC(sizeof(SithCogSymbolValue) * heapSize);
         TWL_EXTRAM_RESTORE(pSithHS); }
         ctx->heap = newHeap;
         if (!newHeap) { // Added: don't memset NULL on OOM
-            ctx->numHeapVars = 0;
+            ctx->heapSize = 0;
             return;
         }
-        stdPlatform_Memzero32(newHeap, (sizeof(SithCogSymbolValue) * numHeapVars)); // Added: word-safe
-        ctx->numHeapVars = numHeapVars;
+        stdPlatform_Memzero32(newHeap, (sizeof(SithCogSymbolValue) * heapSize)); // Added: word-safe
+        ctx->heapSize = heapSize;
     }
 }
 
@@ -961,7 +961,7 @@ void sithCogFunction_HeapSet(sithCog *ctx)
 
     int val = sithCogExec_PopSymbol(ctx, &stackVar);
     int idx = sithCogExec_PopInt(ctx);
-    if ( val && idx >= 0 && idx < ctx->numHeapVars )
+    if ( val && idx >= 0 && idx < ctx->heapSize )
         ctx->heap[idx] = stackVar;
 }
 
@@ -971,7 +971,7 @@ void sithCogFunction_HeapGet(sithCog *ctx)
     SithCogSymbolValue tmp;
 
     int idx = sithCogExec_PopInt(ctx);
-    if (idx < 0 || idx >= ctx->numHeapVars)
+    if (idx < 0 || idx >= ctx->heapSize)
     {
         sithCogExec_PushInt(ctx, 0);
     }
@@ -991,19 +991,19 @@ void sithCogFunction_HeapFree(sithCog *ctx)
     if ( ctx->heap )
     {
         SITH_FREE(ctx->heap);
-        ctx->numHeapVars = 0;
+        ctx->heapSize = 0;
     }
 }
 
 void sithCogFunction_GetSelfCog(sithCog *ctx)
 {
-    sithCogExec_PushInt(ctx, ctx->selfCog);
+    sithCogExec_PushInt(ctx, ctx->idx);
 }
 
 void sithCogFunction_GetMasterCog(sithCog *ctx)
 {
     if ( sithCog_g_pMasterCog )
-        sithCogExec_PushInt(ctx, sithCog_g_pMasterCog->selfCog);
+        sithCogExec_PushInt(ctx, sithCog_g_pMasterCog->idx);
     else
         sithCogExec_PushInt(ctx, -1);
 }
@@ -1017,7 +1017,7 @@ void sithCogFunction_SetMasterCog(sithCog *ctx)
 void sithCogFunction_GetActionCog(sithCog *ctx)
 {
     if ( sithCog_pActionCog )
-        sithCogExec_PushInt(ctx, sithCog_pActionCog->selfCog);
+        sithCogExec_PushInt(ctx, sithCog_pActionCog->idx);
     else
         sithCogExec_PushInt(ctx, -1);
 }
@@ -1223,7 +1223,7 @@ void sithCogFunction_SendTrigger(sithCog *ctx)
                             arg1,
                             arg2,
                             arg3,
-                            pPlayer->net_id);
+                            pPlayer->playerNetId);
                 }
             }
         }

@@ -17,7 +17,7 @@ int sithDSSCog_SendMessage(sithCog *a1, int a2, int a3, int a4, int a5, int a6, 
 
     NETMSG_PUSHS32(a7);
     v12 = 1;
-    NETMSG_PUSHS16(a1 ? a1->selfCog : -1);
+    NETMSG_PUSHS16(a1 ? a1->idx : -1);
     NETMSG_PUSHU8(a3);
     NETMSG_PUSHU8(a5);
 
@@ -42,7 +42,7 @@ int sithDSSCog_SendMessage(sithCog *a1, int a2, int a3, int a4, int a5, int a6, 
     NETMSG_PUSHF32(param2);
     NETMSG_PUSHF32(param3);
 
-    //printf("%x %x %x %x %x %x %x, %f %f %f %f\n", a7, a1->selfCog, a3, a5, a, b, a2, param0, param1, param2, param3);
+    //printf("%x %x %x %x %x %x %x, %f %f %f %f\n", a7, a1->idx, a3, a5, a, b, a2, param0, param1, param2, param3);
     
     NETMSG_END(DSS_SENDTRIGGER);
 
@@ -93,7 +93,7 @@ int sithDSSCog_ProcessMessage(SithMessage *in_netMsg)
     param1 = NETMSG_POPF32();
     param2 = NETMSG_POPF32();
     param3 = NETMSG_POPF32();
-    //printf("%x %x %x %x %x %x %x, %f %f %f %f\n", linkId, cog->selfCog, senderType, sourceType, senderIdx, sourceIndex, msgid, param0, param1, param2, param3);
+    //printf("%x %x %x %x %x %x %x, %f %f %f %f\n", linkId, cog->idx, senderType, sourceType, senderIdx, sourceIndex, msgid, param0, param1, param2, param3);
     if ( !cog )
     {
         sithCog_BroadcastMessageEx(msgid, senderType, senderIdx, sourceType, sourceIndex, param0, param1, param2, param3);
@@ -115,38 +115,38 @@ int sithDSSCog_SyncCogState(sithCog *cog, int sendto_id, int mpFlags)
     
     NETMSG_START;
 
-    NETMSG_PUSHS32(cog->selfCog);
+    NETMSG_PUSHS32(cog->idx);
     NETMSG_PUSHS32(cog->script_running);
     NETMSG_PUSHS32(cog->flags);
     if (cog->script_running)
     {
-        NETMSG_PUSHS32(cog->wakeTimeMs);
+        NETMSG_PUSHS32(cog->msecTimerTimeout);
         NETMSG_PUSHS32(cog->execPos);
         NETMSG_PUSHS32(cog->senderId);
         NETMSG_PUSHS32(cog->senderRef);
         NETMSG_PUSHS32(cog->senderType);
-        NETMSG_PUSHS32(cog->sourceRef);
+        NETMSG_PUSHS32(cog->sourceIdx);
         NETMSG_PUSHS32(cog->sourceType);
     }
     if ( (cog->flags & SITH_COG_PULSE_SET) != 0 )
     {
-        NETMSG_PUSHS32(cog->pulsePeriodMs);
-        NETMSG_PUSHS32(cog->nextPulseMs);
+        NETMSG_PUSHS32(cog->msecPulseInterval);
+        NETMSG_PUSHS32(cog->msecNextPulseTime);
     }
     if ( (cog->flags & SITH_COG_TIMER_SET) != 0 )
         NETMSG_PUSHS32(cog->field_20);
     v13 = cog->pSymbolTable;
-    if ( v13->entry_cnt )
+    if ( v13->numUsedSymbols )
     {
-        for (int i = 0; i < v13->entry_cnt; i++)
+        for (int i = 0; i < v13->numUsedSymbols; i++)
         {
-            NETMSG_PUSHU8(v13->buckets[i].val.type & 0xFF);
+            NETMSG_PUSHU8(v13->aSymbols[i].val.type & 0xFF);
         }
 
         // TODO: figure out how to handle this in 64-bit
-        for (int i = 0; i < v13->entry_cnt; i++)
+        for (int i = 0; i < v13->numUsedSymbols; i++)
         {
-            SithCogSymbol* sym = &v13->buckets[i];
+            SithCogSymbol* sym = &v13->aSymbols[i];
             if (sym->val.type == SITHCOG_VALUE_FLOAT)
             {
                 NETMSG_PUSHS32((uint32_t)sym->val.data[0]);
@@ -201,19 +201,19 @@ int sithDSSCog_ProcessCogState(SithMessage *msg)
     cog->flags = NETMSG_POPS32();
     if (cog->script_running)
     {
-        cog->wakeTimeMs = NETMSG_POPS32();
+        cog->msecTimerTimeout = NETMSG_POPS32();
         cog->execPos = NETMSG_POPS32();
         cog->senderId = NETMSG_POPS32();
         cog->senderRef = NETMSG_POPS32();
         cog->senderType = NETMSG_POPS32();
-        cog->sourceRef = NETMSG_POPS32();
+        cog->sourceIdx = NETMSG_POPS32();
         cog->sourceType = NETMSG_POPS32();
     }
 
     if (cog->flags & SITH_COG_PULSE_SET)
     {
-        cog->pulsePeriodMs = NETMSG_POPS32();
-        cog->nextPulseMs = NETMSG_POPS32();
+        cog->msecPulseInterval = NETMSG_POPS32();
+        cog->msecNextPulseTime = NETMSG_POPS32();
     }
 
     if (cog->flags & SITH_COG_TIMER_SET)
@@ -222,17 +222,17 @@ int sithDSSCog_ProcessCogState(SithMessage *msg)
     }
     
     v13 = cog->pSymbolTable;
-    if ( v13->entry_cnt )
+    if ( v13->numUsedSymbols )
     {
-        for (int i = 0; i < v13->entry_cnt; i++)
+        for (int i = 0; i < v13->numUsedSymbols; i++)
         {
-            v13->buckets[i].val.type = NETMSG_POPU8();
+            v13->aSymbols[i].val.type = NETMSG_POPU8();
         }
 
         // TODO: verify in 64-bit, particularly with AICLASS
-        for (int i = 0; i < v13->entry_cnt; i++)
+        for (int i = 0; i < v13->numUsedSymbols; i++)
         {
-            SithCogSymbol* sym = &v13->buckets[i];
+            SithCogSymbol* sym = &v13->aSymbols[i];
             if (sym->val.type == SITHCOG_VALUE_FLOAT)
             {
                 sym->val.data[0] = NETMSG_POPS32();

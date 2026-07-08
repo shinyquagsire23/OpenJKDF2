@@ -23,12 +23,12 @@ void sithEvent_Shutdown();
 void sithEvent_Open();
 void sithEvent_Close();
 void sithEvent_Reset();
-int sithEvent_CreateEvent(int taskId, SithEventParams *timerInfo, uint32_t when);
+int sithEvent_CreateEvent(int taskId, SithEventParams *params, uint32_t when);
 void sithEvent_FreeEvent(SithEvent *pEvent);
 int sithEvent_RegisterTask(int idx, sithEventHandler_t handler, int rate, int startMode);
 void sithEvent_Process();
 
 //static void (*sithEvent_FreeEvent)(SithEvent *timer) = (void*)sithEvent_FreeEvent_ADDR;
-//static int (*sithEvent_CreateEvent)(int a1, SithEventParams *timerInfo, int timerMs) = (void*)sithEvent_CreateEvent_ADDR;
+//static int (*sithEvent_CreateEvent)(int a1, SithEventParams *params, int timerMs) = (void*)sithEvent_CreateEvent_ADDR;
 
 #endif // _SITHEVENT_H

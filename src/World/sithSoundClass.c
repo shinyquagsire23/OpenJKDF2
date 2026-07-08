@@ -135,7 +135,7 @@ int sithSoundClass_Startup()
     }
     else
     {
-        stdPrintf(pSithHS->errorPrint, ".\\World\\sithSoundClass.c", 214, "Could not allocate hashtable for aSoundClasses.\n", 0, 0, 0, 0);
+        stdPrintf(pSithHS->errorPrint, ".\\World\\sithSoundClass.c", 214, "Could not allocate pHashtbl for aSoundClasses.\n", 0, 0, 0, 0);
         return 0;
     }
 }

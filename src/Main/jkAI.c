@@ -98,7 +98,7 @@ int jkAI_SaberFighting(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithA
                 {
                     if ( v12 != 3 )
                         sithAI_SetLookFrame(actor, &actor->pDistractor->position);
-                    if ( actor->field_1F4 || aiclass->argsAsFloat[0] != 0.0 && aiclass->argsAsFloat[0] > _frand() )
+                    if ( actor->field_1F4 || aiclass->fltArg[0] != 0.0 && aiclass->fltArg[0] > _frand() )
                     {
 LABEL_27:
                         if ( (actor->thing->actorParams.flags & SITHAI_MODE_DISABLED) == 0 )
@@ -109,7 +109,7 @@ LABEL_27:
                         return 0;
                     }
                 }
-                v14 = &aiclass->argsAsFloat[1];
+                v14 = &aiclass->fltArg[1];
                 do
                 {
                     if ( actor->attackDistance > (flex_d_t)*v14 )
@@ -128,25 +128,25 @@ LABEL_27:
                 {
                     if ( v17_lo == 1 )
                     {
-                        a2a = aiclass->argsAsFloat[5];
-                        v19 = aiclass->argsAsInt[6];
+                        a2a = aiclass->fltArg[5];
+                        v19 = aiclass->intArg[6];
                         v20 = SITH_ANIM_FIRE2;
-                        a3a = aiclass->argsAsFloat[4];
+                        a3a = aiclass->fltArg[4];
                     }
                     else
                     {
                         if ( v17_lo == 2 )
                         {
-                            a2a = aiclass->argsAsFloat[8];
-                            v18 = aiclass->argsAsFloat[7];
-                            v19 = aiclass->argsAsInt[9];
+                            a2a = aiclass->fltArg[8];
+                            v18 = aiclass->fltArg[7];
+                            v19 = aiclass->intArg[9];
                             v20 = SITH_ANIM_FIRE3;
                         }
                         else
                         {
-                            a2a = aiclass->argsAsFloat[11];
-                            v18 = aiclass->argsAsFloat[10];
-                            v19 = aiclass->argsAsInt[12];
+                            a2a = aiclass->fltArg[11];
+                            v18 = aiclass->fltArg[10];
+                            v19 = aiclass->intArg[12];
                             v20 = SITH_ANIM_FIRE4;
                         }
                         a3a = v18;
@@ -154,10 +154,10 @@ LABEL_27:
                 }
                 else
                 {
-                    v19 = aiclass->argsAsInt[3];
+                    v19 = aiclass->intArg[3];
                     v20 = SITH_ANIM_FIRE;
-                    a2a = aiclass->argsAsFloat[2];
-                    a3a = aiclass->argsAsFloat[1];
+                    a2a = aiclass->fltArg[2];
+                    a3a = aiclass->fltArg[1];
                 }
                 v21 = actor->thing;
                 if ( (actor->thing->actorParams.flags & SITHAI_MODE_DISABLED) != 0 )
@@ -213,17 +213,17 @@ int jkAI_SpecialAttack(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithA
                     sithPuppet_StopKey(v9, (__int64)instinct->param0, 0.5);
                 jkSaber_Disable(actor->thing);
                 v10 = sithTime_g_msecGameTime;
-                v11 = sithTime_g_msecGameTime + aiclass->argsAsInt[8];
+                v11 = sithTime_g_msecGameTime + aiclass->intArg[8];
                 instinct->param0 = 0.0;
                 instinct->nextUpdate = v11;
             }
             if ( actor->pDistractor )
             {
-                instinct->nextUpdate = v10 + aiclass->argsAsInt[0];
-                if ( actor->field_288 <= v10 && aiclass->argsAsFloat[1] >= _frand() )
+                instinct->nextUpdate = v10 + aiclass->intArg[0];
+                if ( actor->field_288 <= v10 && aiclass->fltArg[1] >= _frand() )
                 {
                     sithAI_sub_4EAD60(actor);
-                    if ( aiclass->argsAsFloat[2] <= (flex_d_t)actor->attackDistance && aiclass->argsAsFloat[3] >= (flex_d_t)actor->attackDistance)
+                    if ( aiclass->fltArg[2] <= (flex_d_t)actor->attackDistance && aiclass->fltArg[3] >= (flex_d_t)actor->attackDistance)
                     {
                         sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_RESERVED1);
                         v13 = actor->thing;
@@ -231,14 +231,14 @@ int jkAI_SpecialAttack(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithA
                         {
                             v13->actorParams.flags &= ~SITHAI_MODE_DISABLED;
                         }
-                        aiclassa = sithPuppet_PlayMode(v13, aiclass->argsAsInt[5], 0);
+                        aiclassa = sithPuppet_PlayMode(v13, aiclass->intArg[5], 0);
                         if ( aiclassa >= 0 )
                         {
                             v15 = actor->thing;
                             instinct->param0 = (flex_t)aiclassa;
-                            jkSaber_Enable(v15, aiclass->argsAsFloat[7], 0.3, 0.0);
+                            jkSaber_Enable(v15, aiclass->fltArg[7], 0.3, 0.0);
                             sithAI_SetMoveThing(actor, &actor->field_1D4, 4.0);
-                            v16 = aiclass->argsAsInt[4] + sithTime_g_msecGameTime;
+                            v16 = aiclass->intArg[4] + sithTime_g_msecGameTime;
                             instinct->nextUpdate = v16;
                             actor->field_288 = v16;
                         }
@@ -250,13 +250,13 @@ int jkAI_SpecialAttack(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithA
     }
     if ( !extra || extra != sithPlayer_g_pLocalPlayerThing )
         return 0;
-    sithThing_DamageThing(extra, actor->thing, aiclass->argsAsFloat[7], SITH_DAMAGE_SABER);
+    sithThing_DamageThing(extra, actor->thing, aiclass->fltArg[7], SITH_DAMAGE_SABER);
     sithSoundClass_PlayModeRandom(actor->thing, SITH_SC_RESERVED2);
     v5 = actor->thing->renderData.puppet;
     if ( v5 )
         sithPuppet_StopKey(v5, (__int64)instinct->param0, 0.5);
     jkSaber_Disable(actor->thing);
-    v6 = sithTime_g_msecGameTime + aiclass->argsAsInt[8];
+    v6 = sithTime_g_msecGameTime + aiclass->intArg[8];
     instinct->param0 = 0.0;
     instinct->nextUpdate = v6;
     return 0;
@@ -290,27 +290,27 @@ int jkAI_ForcePowers(SithAIControlBlock *actor, SithAIInstinct *aiclass, SithAII
 
     v6 = 0;
     v14 = 0;
-    instinct->nextUpdate = sithTime_g_msecGameTime + aiclass->argsAsInt[0];
+    instinct->nextUpdate = sithTime_g_msecGameTime + aiclass->intArg[0];
     sithAI_sub_4EAD60(actor);
     if ( !actor->pDistractor || actor->field_1F4 )
         return 0;
     v7 = _frand();
     instincta = v7;
-    if ( v7 < aiclass->argsAsFloat[7]
-      && (aiclass->argsAsFloat[1] > (flex_d_t)actor->attackDistance || aiclass->argsAsFloat[2] < (flex_d_t)actor->attackDistance ? (v8 = 0) : (v8 = 1), v8) )
+    if ( v7 < aiclass->fltArg[7]
+      && (aiclass->fltArg[1] > (flex_d_t)actor->attackDistance || aiclass->fltArg[2] < (flex_d_t)actor->attackDistance ? (v8 = 0) : (v8 = 1), v8) )
     {
         v6 = 1;
     }
-    else if ( instincta < (flex_d_t)aiclass->argsAsFloat[8]
-           && (aiclass->argsAsFloat[3] > (flex_d_t)actor->attackDistance || aiclass->argsAsFloat[4] < (flex_d_t)actor->attackDistance ? (v9 = 0) : (v9 = 1), v9) )
+    else if ( instincta < (flex_d_t)aiclass->fltArg[8]
+           && (aiclass->fltArg[3] > (flex_d_t)actor->attackDistance || aiclass->fltArg[4] < (flex_d_t)actor->attackDistance ? (v9 = 0) : (v9 = 1), v9) )
     {
         v6 = 2;
     }
     else
     {
-        if ( instincta >= (flex_d_t)aiclass->argsAsFloat[9] )
+        if ( instincta >= (flex_d_t)aiclass->fltArg[9] )
             goto LABEL_25;
-        if ( aiclass->argsAsFloat[5] > (flex_d_t)actor->attackDistance || aiclass->argsAsFloat[6] < (flex_d_t)actor->attackDistance)
+        if ( aiclass->fltArg[5] > (flex_d_t)actor->attackDistance || aiclass->fltArg[6] < (flex_d_t)actor->attackDistance)
             goto LABEL_25;
         v6 = 3;
     }
@@ -321,7 +321,7 @@ LABEL_25:
         v13 = (flex_t)v14;
         v12 = (flex_t)(unsigned int)actor->pDistractor->idx;
         sithCog_ThingSendMessageEx(actor->thing, 0, SITH_MESSAGE_USER0, v12, v13, 0.0, 0.0);
-        instinct->nextUpdate = sithTime_g_msecGameTime + aiclass->argsAsInt[v6 + 9];
+        instinct->nextUpdate = sithTime_g_msecGameTime + aiclass->intArg[v6 + 9];
     }
     return 0;
 }

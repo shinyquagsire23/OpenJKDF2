@@ -1554,7 +1554,7 @@ struct mbedtls_ssl_config {
 #if defined(MBEDTLS_SSL_RENEGOTIATION)
     int MBEDTLS_PRIVATE(renego_max_records);         /*!< grace period for renegotiation     */
     unsigned char MBEDTLS_PRIVATE(renego_period)[8]; /*!< value of the record counters
-                                                        that triggers renegotiation        */
+                                                        that aHandlers renegotiation        */
 #endif
 
     unsigned int MBEDTLS_PRIVATE(badmac_limit);      /*!< limit of records with a bad MAC    */

@@ -124,7 +124,7 @@ MATH_FUNC void rdMatrix_TransformPointList34(const rdMatrix34 *m, const rdVector
 MATH_FUNC void rdMatrix_TransformPointLst44(const rdMatrix44 *m, const rdVector4 *in, rdVector4 *out, int num);
 
 // Added
-void rdMatrix_Print34(const rdMatrix34 *viewMat);
+void rdMatrix_Print34(const rdMatrix34 *orient);
 
 extern const rdMatrix34 rdroid_identMatrix34;
 extern const rdMatrix44 rdroid_identMatrix44;

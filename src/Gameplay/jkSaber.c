@@ -187,13 +187,13 @@ void jkSaber_UpdateLength(SithThing *thing)
         thing->jkFlags &= ~JKFLAG_SABERFORCEON;
     }
 
-    if ( thing->pPuppetClass->bodypart_to_joint[JOINTTYPE_PRIMARYWEAP] >= 0 )
+    if ( thing->pPuppetClass->aJoints[JOINTTYPE_PRIMARYWEAP] >= 0 )
     {
-        jkSaber_UpdateCollision(thing, thing->pPuppetClass->bodypart_to_joint[JOINTTYPE_PRIMARYWEAP], 0); // MOTS added: last arg
+        jkSaber_UpdateCollision(thing, thing->pPuppetClass->aJoints[JOINTTYPE_PRIMARYWEAP], 0); // MOTS added: last arg
         if ( thing->jkFlags & JKFLAG_DUALSABERS )
         {
-            if ( thing->pPuppetClass->bodypart_to_joint[JOINTTYPE_SECONDARYWEAP] >= 0 )
-                jkSaber_UpdateCollision(thing, thing->pPuppetClass->bodypart_to_joint[JOINTTYPE_SECONDARYWEAP], 1); // MOTS added: last arg
+            if ( thing->pPuppetClass->aJoints[JOINTTYPE_SECONDARYWEAP] >= 0 )
+                jkSaber_UpdateCollision(thing, thing->pPuppetClass->aJoints[JOINTTYPE_SECONDARYWEAP], 1); // MOTS added: last arg
         }
     }
 }

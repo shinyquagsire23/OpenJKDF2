@@ -285,7 +285,7 @@ typedef union {
      */
     struct psa_crypto_transaction_unknown_s {
         psa_crypto_transaction_type_t type;
-        uint16_t unused1;
+        uint16_t vecUnknown1;
         uint32_t unused2;
         uint64_t unused3;
         uint64_t unused4;
@@ -294,7 +294,7 @@ typedef union {
      * #PSA_CRYPTO_TRANSACTION_DESTROY_KEY. */
     struct psa_crypto_transaction_key_s {
         psa_crypto_transaction_type_t type;
-        uint16_t unused1;
+        uint16_t vecUnknown1;
         psa_key_lifetime_t lifetime;
         psa_key_slot_number_t slot;
         mbedtls_svc_key_id_t id;

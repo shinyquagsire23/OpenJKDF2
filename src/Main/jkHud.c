@@ -389,7 +389,7 @@ void jkHud_Draw()
             v1 = sithInventory_GetBin(pLocalPlayer, SITHBIN_FORCEMANA);
             if ( v1 )
             {
-                tmpFloat1 = v1->ammoAmt;
+                tmpFloat1 = v1->amount;
             }
             else
             {
@@ -399,7 +399,7 @@ void jkHud_Draw()
             jkHud_GetWeaponAmmo(pLocalPlayer);
             if ( pLocalPlayer->type == SITH_THING_PLAYER )
             {
-                v2 = pLocalPlayer->actorParams.pPlayer->curItem;
+                v2 = pLocalPlayer->actorParams.pPlayer->curItemID;
                 if ( v2 >= 0 )
                     stdString_snprintf(
                         &std_g_genBuffer[_strlen(std_g_genBuffer)],
@@ -609,7 +609,7 @@ void jkHud_Draw()
 
     if (
         jkPlayer_setCrosshair 
-        && sithCamera_g_pCurCamera->cameraPerspective == 1
+        && sithCamera_g_pCurCamera->type == 1
         && !(sithPlayer_g_pLocalPlayerThing->flags & SITH_TF_DEAD) 
         && MOTS_ONLY_COND(!(sithPlayer_g_pLocalPlayerThing->actorParams.flags & SITH_AF_SCOPEHUD))
 #ifdef QOL_IMPROVEMENTS
@@ -1200,7 +1200,7 @@ void jkHud_DrawGPU()
     // MoTS altered: Scope hud
     if (
         jkPlayer_setCrosshair
-        && sithCamera_g_pCurCamera->cameraPerspective == 1 
+        && sithCamera_g_pCurCamera->type == 1 
         && !(sithPlayer_g_pLocalPlayerThing->flags & SITH_TF_DEAD) 
         && MOTS_ONLY_COND(!(sithPlayer_g_pLocalPlayerThing->actorParams.flags & SITH_AF_SCOPEHUD))
 #ifdef QOL_IMPROVEMENTS
@@ -1560,7 +1560,7 @@ int jkHud_GetWeaponAmmo(SithThing *player)
         weaponToAmmo[18] = SITHBIN_MOTS_SEQUENCER_CHARGE;
         weaponToAmmo[19] = -1;
 
-        binIdxWeap = sithInventory_SelectWeaponPrior(player->actorParams.pPlayer->curWeapon);
+        binIdxWeap = sithInventory_SelectWeaponPrior(player->actorParams.pPlayer->curWeaponID);
         if (binIdxWeap < 0) {
             return -999;
         }
@@ -1575,7 +1575,7 @@ int jkHud_GetWeaponAmmo(SithThing *player)
         if (!pItemInfo) {
             return -999;
         }
-        binIdxWeap = (int)pItemInfo->ammoAmt;
+        binIdxWeap = (int)pItemInfo->amount;
         if (binIdxWeap < 0) {
             binIdxWeap = 0;
         }
@@ -1597,7 +1597,7 @@ int jkHud_GetWeaponAmmo(SithThing *player)
         weaponToAmmo[9] = SITHBIN_POWER;
         v1 = player->actorParams.pPlayer;
         weaponToAmmo[4] = SITHBIN_THERMAL_DETONATOR;
-        v2 = v1->curWeapon;
+        v2 = v1->curWeaponID;
         weaponToAmmo[0] = -1;
         weaponToAmmo[1] = -1;
         weaponToAmmo[7] = SITHBIN_RAILCHARGES;
@@ -1613,7 +1613,7 @@ int jkHud_GetWeaponAmmo(SithThing *player)
         v6 = sithInventory_GetBin(player, binidx);
         if ( !v6 )
             return -999;
-        v4 = (int32_t)v6->ammoAmt;
+        v4 = (int32_t)v6->amount;
         if ( v4 < 0 )
             v4 = 0;
         return v4;

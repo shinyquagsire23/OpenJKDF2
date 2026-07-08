@@ -144,7 +144,7 @@ void sithMulti_ProcessPlayerLost(int a1);
 void sithMulti_InitTick(uint32_t tickrate);
 int sithMulti_ProcessJoinRequest(SithMessage *msg);
 void sithMulti_Update(int deltaMs);
-uint32_t sithMulti_GetPlayerIndexByID(int net_id);
+uint32_t sithMulti_GetPlayerIndexByID(int playerNetId);
 int sithMulti_Ping(int sendtoId);
 
 //static void (*sithMulti_Startup)() = (void*)sithMulti_Startup_ADDR;

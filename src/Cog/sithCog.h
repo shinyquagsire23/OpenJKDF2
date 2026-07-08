@@ -94,7 +94,7 @@ void sithCog_SendMessage(sithCog *cog, int32_t msgid, int32_t senderType, int32_
 cog_flex_t sithCog_SendMessageEx(sithCog *cog, int32_t message, int32_t senderType, int32_t senderIndex, int32_t sourceType, int32_t sourceIndex, int32_t linkId, cog_flex_t param0, cog_flex_t param1, cog_flex_t param2, cog_flex_t param3);
 void sithCog_FreeWorldCogs(SithWorld *world);
 void sithCog_FreeEntry(sithCog *cog);
-void sithCog_FreeScriptEntry(SithCogScript *cogscript);
+void sithCog_FreeScriptEntry(SithCogScript *pScript);
 int sithCog_AllocWorldCogScripts(SithWorld *world, int num);
 int sithCog_AllocWorldCogs(SithWorld *world, int num);
 int sithCog_LinkCogToThing(sithCog *cog, SithThing *thing, int linkId, int mask);

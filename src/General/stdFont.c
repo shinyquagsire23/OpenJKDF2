@@ -103,7 +103,7 @@ stdFont* stdFont_Load(char *fpath, int a2, int a3)
     }
     fname = stdFileFromPath(fpath);
 
-    // TODO: maybe Jones/MoTS had hashtable changes here to avoid copies of fonts?
+    // TODO: maybe Jones/MoTS had pHashtbl changes here to avoid copies of fonts?
 #ifdef SITH_DEBUG_STRUCT_NAMES
     stdString_SafeStrCopy(fontAlloc_->name, fname, 32);
 #endif

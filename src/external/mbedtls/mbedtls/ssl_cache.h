@@ -79,7 +79,7 @@ struct mbedtls_ssl_cache_entry {
 struct mbedtls_ssl_cache_context {
     mbedtls_ssl_cache_entry *MBEDTLS_PRIVATE(chain);     /*!< start of the chain     */
     int MBEDTLS_PRIVATE(timeout);                /*!< cache entry timeout    */
-    int MBEDTLS_PRIVATE(max_entries);            /*!< maximum entries        */
+    int MBEDTLS_PRIVATE(tableSize);            /*!< maximum entries        */
 #if defined(MBEDTLS_THREADING_C)
     mbedtls_threading_mutex_t MBEDTLS_PRIVATE(mutex);    /*!< mutex                  */
 #endif

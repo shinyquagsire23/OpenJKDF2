@@ -35,7 +35,7 @@ int sithMap_Shutdown()
     return 0;
 }
 
-void sithMap_DrawCircle(rdCamera *camera, rdMatrix34 *viewMat)
+void sithMap_DrawCircle(rdCamera *camera, rdMatrix34 *orient)
 {
     SithThing *v2; // edx
     SithSector *v3; // esi
@@ -51,7 +51,7 @@ void sithMap_DrawCircle(rdCamera *camera, rdMatrix34 *viewMat)
     sithMap_pCurCamera = camera;
     sithMap_pCurWorld = sithWorld_g_pCurrentWorld;
     sithMap_pPlayerThing = sithWorld_g_pCurrentWorld->pLocalPlayer;
-    rdMatrix_Multiply34(&sithMap_camera, &camera->view_matrix, viewMat);
+    rdMatrix_Multiply34(&sithMap_camera, &camera->view_matrix, orient);
     rdMatrix_InvertOrtho34(&sithMap_invMatrix, &sithMap_camera);
     v2 = sithMap_pPlayerThing;
     sithMap_var = 1;

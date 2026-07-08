@@ -1013,7 +1013,7 @@ LABEL_39:
             {
                 // MOTS added
                 if (Main_bMotsCompat) {
-                    sithControl_008d7f44 = sithCamera_g_aCameras[sithCamera_g_pCurCamera - sithCamera_g_aCameras].rdCam.fov * 0.01111111;
+                    sithControl_008d7f44 = sithCamera_g_aCameras[sithCamera_g_pCurCamera - sithCamera_g_aCameras].rdCamera.fov * 0.01111111;
                     sithControl_PlayerLook(player, deltaSecs);
                 }
 
@@ -1112,7 +1112,7 @@ debug_controls:
         sithControl_GetKey(INPUT_FUNC_ACTIVATE, &input_read);
         if ( input_read )
         {
-            if ( sithCamera_g_pCurCamera->cameraPerspective == 128 )
+            if ( sithCamera_g_pCurCamera->type == 128 )
                 sithCamera_SetCurrentToCycleCamera();
             else
                 sithCamera_SetCurrentCamera(&sithCamera_g_aCameras[6]);
@@ -1175,7 +1175,7 @@ debug_controls:
         sithControl_GetKey(INPUT_FUNC_MAP, &input_read);
         if ( input_read )
             g_mapModeFlags ^= 0x42u;
-        sithCamera_g_pCurCamera->cameraPerspective = 128;
+        sithCamera_g_pCurCamera->type = 128;
         if (!(sithNet_isServer && jkGuiNetHost_bIsDedicated)) // Added
             result = 1;
         else

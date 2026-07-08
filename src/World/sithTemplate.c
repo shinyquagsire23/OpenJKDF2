@@ -146,7 +146,7 @@ SithThing* sithTemplate_GetTemplate(const char *name)
     if ( !sithTemplate_masterFileCount )
         return 0;
 
-    // TODO interesting, but this hashtable is never initialized
+    // TODO interesting, but this pHashtbl is never initialized
 #if 0
     char v6[0x400];
     const char** v3 = (const char **)stdHashtbl_Find(sithTemplate_pMasterHashtable, name);

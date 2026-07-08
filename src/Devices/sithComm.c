@@ -147,7 +147,7 @@ int sithComm_SendMsgToPlayer(SithMessage *msg, int a2, int mpFlags, int a4)
             msg->netMsg.field_14 = 0;
             for (int i = 0; i < jkPlayer_maxPlayers; i++)
             {
-                if ( i != playerThingIdx && (jkPlayer_playerInfos[i].net_id == a2 || (a2 == -1 || !a2) && (jkPlayer_playerInfos[i].flags & 1) != 0) )
+                if ( i != playerThingIdx && (jkPlayer_playerInfos[i].playerNetId == a2 || (a2 == -1 || !a2) && (jkPlayer_playerInfos[i].flags & 1) != 0) )
                     msg->netMsg.field_14 |= 1 << i;
                 if (!i && i != playerThingIdx) {
                     msg->netMsg.field_14 |= 1 << i; // Added: Dedicated server hax
@@ -184,8 +184,8 @@ int sithComm_SendMsgToPlayer(SithMessage *msg, int a2, int mpFlags, int a4)
                     v19 = sithComm_MsgTmpBuf[idx_].netMsg.field_14;
                     if ( (v19 & (1 << v15)) != 0 )
                     {
-                        if (jkPlayer_playerInfos[v15].net_id)
-                            stdComm_SendToPlayer(v17, jkPlayer_playerInfos[v15].net_id);
+                        if (jkPlayer_playerInfos[v15].playerNetId)
+                            stdComm_SendToPlayer(v17, jkPlayer_playerInfos[v15].playerNetId);
                         else
                             sithComm_MsgTmpBuf[idx_].netMsg.field_14 = ~(1 << v15) & v19;
                     }
@@ -253,7 +253,7 @@ int sithMessage_ProcessMessages()
             v2 = sithComm_netMsgTmp.netMsg.cogMsgId;
             if ( v1 >= 0 )
             {
-                jkPlayer_playerInfos[v1].lastUpdateMs = sithTime_g_msecGameTime;
+                jkPlayer_playerInfos[v1].msecLastCommTime = sithTime_g_msecGameTime;
 LABEL_14:
                 if ( sithComm_netMsgTmp.netMsg.msgId )
                 {
@@ -352,8 +352,8 @@ void sithComm_SyncWithPlayers()
                 {
                     if (sithComm_MsgTmpBuf[i].netMsg.field_14 & (1 << v9))
                     {
-                        if (jkPlayer_playerInfos[v9].net_id)
-                            stdComm_SendToPlayer(&sithComm_MsgTmpBuf[i], jkPlayer_playerInfos[v9].net_id);
+                        if (jkPlayer_playerInfos[v9].playerNetId)
+                            stdComm_SendToPlayer(&sithComm_MsgTmpBuf[i], jkPlayer_playerInfos[v9].playerNetId);
                         else
                             sithComm_MsgTmpBuf[i].netMsg.field_14 &= ~(1 << v9);
                     }

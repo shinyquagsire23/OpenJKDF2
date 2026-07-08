@@ -1311,17 +1311,17 @@ SithThing* sithCollision_RaycastFromCamera(rdVector3 *pos)
     if ( !sithCamera_g_pCurCamera->sector )
         return NULL;
 
-    camPos.x = pos->x - sithCamera_g_pCurCamera->collisionOffset.x;
-    camPos.y = sithCamera_g_pCurCamera->vec3_1.y;
-    camPos.z = sithCamera_g_pCurCamera->collisionOffset.z - pos->y;
+    camPos.x = pos->x - sithCamera_g_pCurCamera->offset.x;
+    camPos.y = sithCamera_g_pCurCamera->lookPos.y;
+    camPos.z = sithCamera_g_pCurCamera->offset.z - pos->y;
 
-    rdMatrix_TransformPoint34Acc(&camPos, &sithCamera_g_pCurCamera->viewMat);
+    rdMatrix_TransformPoint34Acc(&camPos, &sithCamera_g_pCurCamera->orient);
 
-    rdVector_Sub3(&dir, &camPos, &sithCamera_g_pCurCamera->vec3_1);
+    rdVector_Sub3(&dir, &camPos, &sithCamera_g_pCurCamera->lookPos);
     rdVector_Normalize3Acc(&dir);
 
     sithCollision_SearchForCollisions(sithCamera_g_pCurCamera->sector, NULL,
-        &sithCamera_g_pCurCamera->vec3_1, &dir, 100.0f, 0.0f, 0x103);
+        &sithCamera_g_pCurCamera->lookPos, &dir, 100.0f, 0.0f, 0x103);
 
     SithCollision *best = sithCollision_PopClosest();
     SithThing *result = NULL;

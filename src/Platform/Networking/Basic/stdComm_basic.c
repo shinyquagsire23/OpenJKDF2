@@ -79,8 +79,8 @@ void Hack_ResetClients()
         id_self = 2;
         id_other = 1;
     }
-    //jkPlayer_playerInfos[0].net_id = id_self;
-    //jkPlayer_playerInfos[1].net_id = id_other;
+    //jkPlayer_playerInfos[0].playerNetId = id_self;
+    //jkPlayer_playerInfos[1].playerNetId = id_other;
     //jk_snwprintf(jkPlayer_playerInfos[0].player_name, 32, "asdf1");
     //jk_snwprintf(jkPlayer_playerInfos[1].player_name, 32, "asdf2");
 

@@ -130,12 +130,12 @@ flex_t sithActor_DamageActor(SithThing *sender, SithThing *receiver, flex_t amou
             if (Main_bMotsCompat
                 && sender->controlType == SITH_CT_AI
                 && sender->actor
-                && sender->actor->pAIClass
+                && sender->actor->pClass
                 && v7->controlType == SITH_CT_AI
                 && v7->actor
-                && v7->actor->pAIClass) {
+                && v7->actor->pClass) {
 
-                if (v7->actor->pAIClass->alignment * sender->actor->pAIClass->alignment <= -1.0) {
+                if (v7->actor->pClass->alignment * sender->actor->pClass->alignment <= -1.0) {
                     damageMult = 0.5;
                 }
             }
@@ -334,11 +334,11 @@ void sithActor_SetHeadPYR(SithThing *actor, const rdVector3 *headPYR)
     v4 = actor->renderData.hierarchyNodes2;
     if (v4)
     {
-        torsoIdx = pAnimClass->bodypart_to_joint[JOINTTYPE_TORSO];
-        primaryWeapJointIdx = pAnimClass->bodypart_to_joint[JOINTTYPE_PRIMARYWEAPJOINT];
+        torsoIdx = pAnimClass->aJoints[JOINTTYPE_TORSO];
+        primaryWeapJointIdx = pAnimClass->aJoints[JOINTTYPE_PRIMARYWEAPJOINT];
         v7 = actor->renderData.model3->numHierarchyNodes;
-        neckIdx = pAnimClass->bodypart_to_joint[JOINTTYPE_NECK];
-        v9 = pAnimClass->bodypart_to_joint[JOINTTYPE_SECONDARYWEAPJOINT];
+        neckIdx = pAnimClass->aJoints[JOINTTYPE_NECK];
+        v9 = pAnimClass->aJoints[JOINTTYPE_SECONDARYWEAPJOINT];
         v10 = v7 - 1;
         if ( neckIdx < 0 )
         {
@@ -403,8 +403,8 @@ void sithActor_UpdateAimJoints(SithThing* pThing)
     SithPuppetClass* pAnimClass = pThing->pPuppetClass;
     if (pAnimClass)
     {
-        int pitch_idx = pAnimClass->bodypart_to_joint[JOINTTYPE_TURRETPITCH];
-        int yaw_idx = pAnimClass->bodypart_to_joint[JOINTTYPE_TURRETYAW];
+        int pitch_idx = pAnimClass->aJoints[JOINTTYPE_TURRETPITCH];
+        int yaw_idx = pAnimClass->aJoints[JOINTTYPE_TURRETYAW];
         if (pitch_idx >= 0)
             pThing->renderData.hierarchyNodes2[pitch_idx].x = pThing->actorParams.headPYR.x;
         if (yaw_idx >= 0)

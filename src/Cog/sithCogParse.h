@@ -35,7 +35,7 @@
 #define sithCogParse_ParseMessage_ADDR (0x004FE4D0)
 
 void sithCogParse_FreeParseTree();
-int sithCogParse_Load(char *cog_fpath, SithCogScript *cogscript, int unk);
+int sithCogParse_Load(char *aName, SithCogScript *pScript, int unk);
 int sithCogParse_ParseSectionCode(SithCogScript *script);
 SithCogSymbolTable* sithCogParse_DuplicateSymbolTable(SithCogSymbolTable *table);
 SithCogSymbolTable* sithCogParse_AllocSymbolTable(int amt);

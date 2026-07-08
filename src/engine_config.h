@@ -319,7 +319,7 @@
 #define COG_CRC32_SYMBOL_NAMES
 #define COG_COMPRESS_VAR_SIZE
 
-// Seal each script's symbol table after parsing: drop the parse-time hashtable
+// Seal each script's symbol table after parsing: drop the parse-time pHashtbl
 // and shrink the bucket array (allocated at SITHCOG_LINKED_SYMBOL_LIMIT
 // entries) down to what the script actually uses. This restores the retail
 // engine's post-parse ReallocSymboltable step, which the reimplementation
@@ -329,7 +329,7 @@
 // Kept RETRO-only until well-tested there; PC keeps the untrimmed behavior.
 #define COG_SEAL_SYMBOLTABLES
 
-// Heap-allocate each cog's jkl-provided symbol init strings (numIdk * 32 bytes,
+// Heap-allocate each cog's jkl-provided symbol init strings (numSymbolRefs * 32 bytes,
 // zeroed) instead of the fixed 4KB inline array (field_4BC, 128 * 32 chars).
 // They are filled while parsing the jkl aCogs section, consumed exactly once by
 // the level-load linking pass in sithCog_Open, then freed there. ~4KB saved per
@@ -353,7 +353,7 @@
 
 // Drop the 128-byte inline filename from in-memory GOB directory entries: the
 // disk format keeps it, but a staging read feeds the name straight into the
-// CRC-keyed lookup hashtable (which retains no key pointer) and nothing else
+// CRC-keyed lookup pHashtbl (which retains no key pointer) and nothing else
 // reads it afterward. 136 -> 8 bytes per entry, ~0.5 MB across the loaded
 // GOBs. Requires STDHASHTABLE_CRC32_KEYS. Kept RETRO-only until well-tested.
 #define STDGOB_COMPACT_ENTRIES

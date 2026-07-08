@@ -28,7 +28,7 @@ typedef tLinkListNode tHashLink;
 typedef struct tHashTable
 {
     int numBuckets;
-    tHashLink* buckets;
+    tHashLink* aSymbols;
     uint32_t (*keyHashToIndex)(const char *data, uint32_t numBuckets);
 } tHashTable;
 
@@ -38,12 +38,12 @@ tHashLink* stdHashtbl_GetTailNode(tHashLink *pLL);
 void stdHashtbl_FreeListNodes(tHashLink *a1);
 void stdHashtbl_Free(tHashTable *table);
 #ifdef STDHASHTABLE_CRC32_KEYS
-int stdHashtbl_FreeKeyCrc32(tHashTable *hashtable, uint32_t keyCrc32);
+int stdHashtbl_FreeKeyCrc32(tHashTable *pHashtbl, uint32_t keyCrc32);
 #endif
 void* stdHashtbl_Find(tHashTable *table, const char *key);
 int stdHashtbl_Add(tHashTable *hashmap, const char *key, void *value);
-int stdHashtbl_Remove(tHashTable *hashtable, const char *key);
-void stdHashtbl_PrintTableDiagnostics(tHashTable *hashtable);
-void stdHashtbl_DumpTable(tHashTable *hashtable);
+int stdHashtbl_Remove(tHashTable *pHashtbl, const char *key);
+void stdHashtbl_PrintTableDiagnostics(tHashTable *pHashtbl);
+void stdHashtbl_DumpTable(tHashTable *pHashtbl);
 
 #endif // _STDHASHTABLE_H

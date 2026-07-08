@@ -37,7 +37,7 @@ void sithCogFunctionSound_PlaySoundThing(sithCog *ctx)
     SithThing* pThing = sithCogExec_PopThing(ctx);
     sithSound* pSound = sithCogExec_PopSound(ctx);
 
-    //printf("sithCogFunctionSound_PlaySoundThing %s\n", ctx->cogscript_fpath);
+    //printf("sithCogFunctionSound_PlaySoundThing %s\n", ctx->aName);
 
     if ( !pSound )
     {
@@ -165,7 +165,7 @@ void sithCogFunctionSound_PlaySoundLocal(sithCog *ctx)
     cog_flex_t volume = sithCogExec_PopFlex(ctx);
     sithSound* pSound = sithCogExec_PopSound(ctx);
 
-    //printf("sithCogFunctionSound_PlaySoundLocal %s\n", ctx->cogscript_fpath);
+    //printf("sithCogFunctionSound_PlaySoundLocal %s\n", ctx->aName);
 
     if (!pSound)
     {
@@ -206,7 +206,7 @@ void sithCogFunctionSound_PlaySoundGlobal(sithCog *ctx)
     cog_flex_t volume = sithCogExec_PopFlex(ctx);
     sithSound* pSound = sithCogExec_PopSound(ctx);
 
-    //printf("sithCogFunctionSound_PlaySoundGlobal %s\n", ctx->cogscript_fpath);
+    //printf("sithCogFunctionSound_PlaySoundGlobal %s\n", ctx->aName);
 
     if (!pSound)
     {
@@ -392,7 +392,7 @@ void sithCogFunctionSound_PlaySoundThingLocal(sithCog *ctx)
     SithThing* pThing = sithCogExec_PopThing(ctx);
     sithSound* pSound = sithCogExec_PopSound(ctx);
 
-    //printf("sithCogFunctionSound_PlaySoundThing %s\n", ctx->cogscript_fpath);
+    //printf("sithCogFunctionSound_PlaySoundThing %s\n", ctx->aName);
 
     if ( !pSound )
     {
@@ -506,7 +506,7 @@ void sithCogFunctionSound_PlaySoundThingAndWait(sithCog *ctx)
     SithThing* pThing = sithCogExec_PopThing(ctx);
     sithSound* pSound = sithCogExec_PopSound(ctx);
 
-    //printf("sithCogFunctionSound_PlaySoundThing %s\n", ctx->cogscript_fpath);
+    //printf("sithCogFunctionSound_PlaySoundThing %s\n", ctx->aName);
 
     if ( !pSound )
     {
@@ -569,7 +569,7 @@ void sithCogFunctionSound_PlaySoundThingAndWait(sithCog *ctx)
     }
     if ( playingSound ) {
         ctx->script_running = 2;
-        ctx->wakeTimeMs = sithTime_g_msecGameTime + pSound->sound_len;
+        ctx->msecTimerTimeout = sithTime_g_msecGameTime + pSound->sound_len;
 
         sithCogExec_PushInt(ctx, playingSound->refid);
     }

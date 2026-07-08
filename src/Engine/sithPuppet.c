@@ -348,7 +348,7 @@ void sithPuppet_UpdatePuppet(SithThing *thing, flex_t deltaSeconds)
             rdPuppet_BuildJointMatrices(&thing->renderData, &thing->orient);
             v20 = thing->renderData.hierarchyNodeMatrices;
             thing->renderData.field_18 = 1;
-            rdVector_Add3(&a1a, &thing->trackParams.moveFrameOrientation.scale, &v20->scale);
+            rdVector_Add3(&a1a, &thing->trackParams.curOrient.scale, &v20->scale);
             rdVector_Sub3Acc(&a1a, &thing->position);
             if (!rdVector_IsZero3(&a1a))
             {

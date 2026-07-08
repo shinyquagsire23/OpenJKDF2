@@ -561,7 +561,7 @@ private:
                     {
                         if (!i && jkGuiNetHost_bIsDedicated) continue;
 
-                        if ( (jkPlayer_playerInfos[i].flags & 2) != 0 && jkPlayer_playerInfos[i].net_id == itClient->second.m_id) {
+                        if ( (jkPlayer_playerInfos[i].flags & 2) != 0 && jkPlayer_playerInfos[i].playerNetId == itClient->second.m_id) {
                             m_DisconnectedPeers.push(itClient->second.m_id);
                             break;
                         }
@@ -704,11 +704,11 @@ private:
             if (!i && jkGuiNetHost_bIsDedicated) continue;
 
 
-            if ( (jkPlayer_playerInfos[i].flags & 2) != 0 && !jkPlayer_playerInfos[i].net_id ){
+            if ( (jkPlayer_playerInfos[i].flags & 2) != 0 && !jkPlayer_playerInfos[i].playerNetId ){
                 
             }
             else {
-                //availableIds |= (1ULL << (jkPlayer_playerInfos[i].net_id-1));
+                //availableIds |= (1ULL << (jkPlayer_playerInfos[i].playerNetId-1));
                 amt++;
             }
         }
@@ -1076,8 +1076,8 @@ void Hack_ResetClients()
         id_self = 2;
         id_other = 1;
     }
-    //jkPlayer_playerInfos[0].net_id = id_self;
-    //jkPlayer_playerInfos[1].net_id = id_other;
+    //jkPlayer_playerInfos[0].playerNetId = id_self;
+    //jkPlayer_playerInfos[1].playerNetId = id_other;
     //jk_snwprintf(jkPlayer_playerInfos[0].player_name, 32, "asdf1");
     //jk_snwprintf(jkPlayer_playerInfos[1].player_name, 32, "asdf2");
 

@@ -343,7 +343,7 @@ int sithCommand_CogList(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         v3 = 0;
         for ( i = sithWorld_g_pCurrentWorld->aCogs; v3 < sithWorld_g_pCurrentWorld->numCogs; ++i )
         {
-            _sprintf(std_g_genBuffer, "%d: %-16s %-16s ", v3, i->cogscript_fpath, i->cogscript->cog_fpath);
+            _sprintf(std_g_genBuffer, "%d: %-16s %-16s ", v3, i->aName, i->pScript->aName);
             if ( (i->flags & SITH_COG_DISABLED) != 0 )
                 _sprintf(&std_g_genBuffer[strlen(std_g_genBuffer)], "(paused) ");
             if ( (i->flags & SITH_COG_DEBUG) != 0 )
@@ -652,7 +652,7 @@ int sithCommand_Players(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         do
         {
             stdString_WcharToChar(v7, v3->player_name, 31);
-            v4 = v3->net_id;
+            v4 = v3->playerNetId;
             v5 = v3->flags;
             v7[31] = 0;
             _sprintf(std_g_genBuffer, "Player %d:  Name: %s  Flags: %x  ID: %x", v2, v7, v5, v4);
@@ -684,7 +684,7 @@ int sithCommand_PingPlayer(stdDebugConsoleCmd *pCmd, const char *pArgStr)
             sithConsole_PrintString(std_g_genBuffer);
         }
     }
-    sithMulti_Ping(jkPlayer_playerInfos[v2].net_id);
+    sithMulti_Ping(jkPlayer_playerInfos[v2].playerNetId);
     return 1;
 }
 
@@ -708,7 +708,7 @@ int sithCommand_Kick(stdDebugConsoleCmd *pCmd, const char *pArgStr)
             {
                 _sprintf(std_g_genBuffer, "Kicked %S", v3->player_name);
                 sithConsole_PrintString(std_g_genBuffer);
-                sithMulti_QuitPlayer(v3->net_id);
+                sithMulti_QuitPlayer(v3->playerNetId);
             }
             ++v2;
             ++v3;

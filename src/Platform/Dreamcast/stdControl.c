@@ -6,7 +6,7 @@
 //
 //  - Keyboard: held keys feed in-game controls (HID scancode -> DIK); the typed-text
 //    and special keys for menus are posted from Window_Dreamcast.c.
-//  - Controller: treated as joystick 0 (face buttons, triggers, dpad, analog stick).
+//  - Controller: treated as joystick 0 (face buttons, aHandlers, dpad, analog stick).
 //  - Mouse: relative motion -> look axes, buttons -> KEY_MOUSE_B*.
 
 #include "Platform/stdControl.h"

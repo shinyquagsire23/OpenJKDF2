@@ -58,7 +58,7 @@ static psa_status_t psa_hmac_setup_internal(
      * is implemented correctly. */
     /* The size checks against the ipad and opad buffers cannot be written
      * `block_size > sizeof( ipad ) || block_size > sizeof( hmac->opad )`
-     * because that triggers -Wlogical-op on GCC 7.3. */
+     * because that aHandlers -Wlogical-op on GCC 7.3. */
     if (block_size > sizeof(ipad)) {
         return PSA_ERROR_NOT_SUPPORTED;
     }

@@ -394,7 +394,7 @@ sithPlayingSound* sithSoundMixer_PlaySoundPos(sithSound *a1, rdVector3 *a2, Sith
     if (!sithCamera_g_pCurCamera)
         return NULL;
     
-    rdVector_Sub3(&v16, a2, &sithCamera_g_pCurCamera->vec3_1);
+    rdVector_Sub3(&v16, a2, &sithCamera_g_pCurCamera->lookPos);
     v10 = rdVector_Normalize3QuickAcc(&v16);
     if ( (v7 & SITHSOUNDFLAG_LOOP) != 0 || v10 <= a6 )
     {
@@ -452,7 +452,7 @@ sithPlayingSound* sithSoundMixer_PlaySoundThing(sithSound *sound, SithThing *pTh
     flags |= SITHSOUNDFLAG_FOLLOWSTHING;
 
     if (sithCamera_g_pCurCamera) {
-        rdVector_Sub3(&a1, &pThing->position, &sithCamera_g_pCurCamera->vec3_1);
+        rdVector_Sub3(&a1, &pThing->position, &sithCamera_g_pCurCamera->lookPos);
         v34 = rdVector_Normalize3QuickAcc(&a1);
     }
     if ( (flags & SITHSOUNDFLAG_LOOP) != 0 || (sithCamera_g_pCurCamera && (v34 <= a5)) )
@@ -840,7 +840,7 @@ void sithSoundMixer_Update(flex_t deltaSecs)
 
     if ( !sithCamera_g_pCurCamera )
         return;
-    if ( (sithCamera_g_pCurCamera->cameraPerspective & 0xFC) != 0 )
+    if ( (sithCamera_g_pCurCamera->type & 0xFC) != 0 )
         sithSoundMixer_pFocusedThing = 0;
     else
         sithSoundMixer_pFocusedThing = sithWorld_g_pCurrentWorld->pCameraFocusThing;
@@ -858,8 +858,8 @@ void sithSoundMixer_Update(flex_t deltaSecs)
         }
     }
     //printf("--- %u\n", sithSoundMixer_activeChannels);
-    rdVector_Scale3(&tmp, &sithCamera_g_pCurCamera->vec3_1, 10.0);
-    stdSound_SetPositionOrientation(&tmp, &sithCamera_g_pCurCamera->viewMat.lvec, &sithCamera_g_pCurCamera->viewMat.uvec);
+    rdVector_Scale3(&tmp, &sithCamera_g_pCurCamera->lookPos, 10.0);
+    stdSound_SetPositionOrientation(&tmp, &sithCamera_g_pCurCamera->orient.lvec, &sithCamera_g_pCurCamera->orient.uvec);
 }
 
 void sithSoundMixer_TickPlayingSound(sithPlayingSound *sound, flex_t deltaSecs)
@@ -1025,8 +1025,8 @@ void sithSoundMixer_UpdateSoundPos(sithPlayingSound *sound)
         if (!(sound->flags & SITHSOUNDFLAG_AMBIENT_NOPAN))
         {
             v5 = sound->pSoundBuf;
-            a1a = rdVector_Dot3(&sithCamera_g_pCurCamera->viewMat.lvec, &sound->posRelative);
-            a2 = rdVector_Dot3(&sithCamera_g_pCurCamera->viewMat.rvec, &sound->posRelative);
+            a1a = rdVector_Dot3(&sithCamera_g_pCurCamera->orient.lvec, &sound->posRelative);
+            a2 = rdVector_Dot3(&sithCamera_g_pCurCamera->orient.rvec, &sound->posRelative);
 
             stdSound_BufferSetPan(v5, a2);
             if (a1a >= 0.0)
@@ -1147,13 +1147,13 @@ void sithSoundMixer_UpdatePlayingSoundPosition(sithPlayingSound *sound)
 {
     if ( (sound->flags & SITHSOUNDFLAG_ABSOLUTE) != 0 )
     {
-        rdVector_Sub3(&sound->posRelative, &sound->pos, &sithCamera_g_pCurCamera->vec3_1);
+        rdVector_Sub3(&sound->posRelative, &sound->pos, &sithCamera_g_pCurCamera->lookPos);
     }
     else
     {
         SithThing* pThing = sound->thing;
         rdVector_Copy3(&sound->pos, &pThing->position);
-        rdVector_Sub3(&sound->posRelative, &sound->pos, &sithCamera_g_pCurCamera->vec3_1);
+        rdVector_Sub3(&sound->posRelative, &sound->pos, &sithCamera_g_pCurCamera->lookPos);
         
         if ( pThing->sector && !(pThing->sector->flags & SITH_SECTOR_UNDERWATER)) // Added: nullptr check, pThing->sector
             sound->flags &= ~SITHSOUNDFLAG_UNDERWATER;

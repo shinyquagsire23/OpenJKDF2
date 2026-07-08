@@ -294,7 +294,7 @@ int sithMulti_GetSpawnIdx(SithThing *pPlayerThing)
     for (v3 = 0; v3 < jkPlayer_maxPlayers; v3++)
     {
         // Added: HACK for weird maps w/ <32 spawn points
-        if (!jkPlayer_playerInfos[v3].pSpawnSector && v3 < realMaxSpawns) {
+        if (!jkPlayer_playerInfos[v3].pInSector && v3 < realMaxSpawns) {
             realMaxSpawns = v3;
         }
 
@@ -317,9 +317,9 @@ int sithMulti_GetSpawnIdx(SithThing *pPlayerThing)
         v8 = v12[v7];
         v8 = v8 % realMaxSpawns; // Added: HACK for weird maps w/ <32 spawn points
         sithCollision_SearchForCollisions(
-            jkPlayer_playerInfos[v8].pSpawnSector,
+            jkPlayer_playerInfos[v8].pInSector,
             0,
-            &jkPlayer_playerInfos[v8].spawnPosOrient.scale,
+            &jkPlayer_playerInfos[v8].orient.scale,
             &rdroid_zeroVector3,
             0.0,
             pPlayerThing->moveSize,
@@ -449,7 +449,7 @@ void sithMulti_ProcessScore()
             {
                 if ( jkPlayer_playerInfos[i].score >= sithNet_scorelimit ) {
                     score_limit_met = 1;
-                    sithMulti_infoPrintf("Player score limit met by player %d (netid %u), %u pts of %u\n", i, jkPlayer_playerInfos[i].net_id, jkPlayer_playerInfos[i].score, sithNet_scorelimit);
+                    sithMulti_infoPrintf("Player score limit met by player %d (netid %u), %u pts of %u\n", i, jkPlayer_playerInfos[i].playerNetId, jkPlayer_playerInfos[i].score, sithNet_scorelimit);
                 }
             }
         }
@@ -597,7 +597,7 @@ int sithMulti_ProcessWelcome(SithMessage *msg)
             v8 = sithStrTable_GetUniStringWithFallback("%s_HAS_JOINED_THE_GAME");
             jk_snwprintf(a1a, 0x80u, v8, jkPlayer_playerInfos[v1].player_name);
             sithConsole_PrintWString(a1a);
-            jkPlayer_playerInfos[v1].lastUpdateMs = sithTime_g_msecGameTime;
+            jkPlayer_playerInfos[v1].msecLastCommTime = sithTime_g_msecGameTime;
             if ( sithNet_isServer )
                 sithCog_BroadcastMessage(SITH_MESSAGE_JOIN, 3, jkPlayer_playerInfos[v1].pLocalPlayer->idx, 0, v1);
             if ( sithMulti_pfNewPlayerJoinedCallback )
@@ -617,7 +617,7 @@ int sithMulti_ProcessWelcome(SithMessage *msg)
         v6 = &jkPlayer_playerInfos[0];
         do
         {
-            v6->lastUpdateMs = v5;
+            v6->msecLastCommTime = v5;
             v6++;
             --v4;
         }
@@ -650,7 +650,7 @@ int sithMulti_ProcessPong(SithMessage *msg)
         v1 = 0;
         if ( jkPlayer_maxPlayers )
         {
-            for ( i = &jkPlayer_playerInfos[0]; i->net_id != msg->netMsg.idx; ++i )
+            for ( i = &jkPlayer_playerInfos[0]; i->playerNetId != msg->netMsg.idx; ++i )
             {
                 if ( ++v1 >= jkPlayer_maxPlayers )
                     return 1;
@@ -700,7 +700,7 @@ int sithMulti_ProcessQuit(SithMessage *msg)
             jk_snwprintf(a1a, 0x80u, v6, &jkPlayer_playerInfos[v5]);
             sithConsole_PrintWString(a1a);
             sithConsole_AlertSound();
-            if ( jkPlayer_playerInfos[v5].net_id == sithNet_serverNetId )
+            if ( jkPlayer_playerInfos[v5].playerNetId == sithNet_serverNetId )
             {
                 v7 = sithStrTable_GetUniStringWithFallback("SERVER_LEFT_GAME");
                 sithConsole_PrintWString(v7);
@@ -741,12 +741,12 @@ int sithMulti_CheckPlayers(int32_t a, SithEventParams* b)
             v1 = &jkPlayer_playerInfos[1];
             do
             {
-                if ( (v1->flags & 1) != 0 && sithTime_g_msecGameTime > v1->lastUpdateMs + MULTI_TIMEOUT_MS )
+                if ( (v1->flags & 1) != 0 && sithTime_g_msecGameTime > v1->msecLastCommTime + MULTI_TIMEOUT_MS )
                 {
-                    v2 = v1->net_id;
+                    v2 = v1->playerNetId;
                     if ( sithNet_isServer )
                     {
-                        sithComm_netMsgTmp.pktData[0] = v1->net_id;
+                        sithComm_netMsgTmp.pktData[0] = v1->playerNetId;
                         sithComm_netMsgTmp.netMsg.msg_size = 4;
                         sithComm_netMsgTmp.netMsg.flag_maybe = 0;
                         sithComm_netMsgTmp.netMsg.cogMsgId = DSS_QUIT;
@@ -756,7 +756,7 @@ int sithMulti_CheckPlayers(int32_t a, SithEventParams* b)
                     jk_snwprintf(a1, 0x80u, v3, v1);
                     sithConsole_PrintWString(a1);
                     sithConsole_AlertSound();
-                    if ( v1->net_id == sithNet_serverNetId )
+                    if ( v1->playerNetId == sithNet_serverNetId )
                     {
                         v4 = sithStrTable_GetUniStringWithFallback("SERVER_LEFT_GAME");
                         sithConsole_PrintWString(v4);
@@ -784,14 +784,14 @@ int sithMulti_CheckPlayers(int32_t a, SithEventParams* b)
             return 1;
         }
     }
-    else if ( sithTime_g_msecGameTime > jkPlayer_playerInfos[0].lastUpdateMs + MULTI_TIMEOUT_MS )
+    else if ( sithTime_g_msecGameTime > jkPlayer_playerInfos[0].msecLastCommTime + MULTI_TIMEOUT_MS )
     {
-        jkPlayer_playerInfos[0].lastUpdateMs = sithTime_g_msecGameTime;
+        jkPlayer_playerInfos[0].msecLastCommTime = sithTime_g_msecGameTime;
         v6 = sithStrTable_GetUniStringWithFallback("%s_HAS_LEFT_THE_GAME");
         jk_snwprintf(a1, 0x80u, v6, jkPlayer_playerInfos);
         sithConsole_PrintWString(a1);
         sithConsole_AlertSound();
-        if ( jkPlayer_playerInfos[0].net_id == sithNet_serverNetId )
+        if ( jkPlayer_playerInfos[0].playerNetId == sithNet_serverNetId )
         {
             v7 = sithStrTable_GetUniStringWithFallback("SERVER_LEFT_GAME");
             sithConsole_PrintWString(v7);
@@ -826,7 +826,7 @@ void sithMulti_SyncPlayers(int sendtoId, int bSync)
         NETMSG_PUSHS32((sithNet_isServer && jkGuiNetHost_bIsDedicated && !i) ? v6->flags & ~2 : v6->flags);
         if ( (v6->flags & 4) != 0 )
         {
-            NETMSG_PUSHS32(v6->net_id);
+            NETMSG_PUSHS32(v6->playerNetId);
 
             stdString_WcharToChar(v15, v6->player_name, 15);
             v15[15] = 0;
@@ -889,16 +889,16 @@ int sithMulti_ProcessSyncPlayers(SithMessage *msg)
         if ( (v6->flags & 4) != 0 )
         {
             v8 = NETMSG_POPS32();
-            v6->net_id = v8;
+            v6->playerNetId = v8;
             if ( (v6->flags & 1) == 0 || (v7 & 1) != 0 || (g_submodeFlags & 8) != 0 )
             {
-                if ( !v6->net_id && (v7 & 1) != 0 && (g_submodeFlags & 8) == 0 )
+                if ( !v6->playerNetId && (v7 & 1) != 0 && (g_submodeFlags & 8) == 0 )
                 {
                     v12 = sithStrTable_GetUniStringWithFallback("%s_HAS_LEFT_THE_GAME");
                     jk_snwprintf(v22, 0x80u, v12, v6);
                     sithConsole_PrintWString(v22);
                     sithConsole_AlertSound();
-                    if ( v6->net_id == sithNet_serverNetId )
+                    if ( v6->playerNetId == sithNet_serverNetId )
                     {
                         v13 = sithStrTable_GetUniStringWithFallback("SERVER_LEFT_GAME");
                         sithConsole_PrintWString(v13);
@@ -921,7 +921,7 @@ int sithMulti_ProcessSyncPlayers(SithMessage *msg)
                 jk_snwprintf(a1a, 0x80u, v10, v6);
                 sithConsole_PrintWString(a1a);
 
-                v6->lastUpdateMs = sithTime_g_msecGameTime;
+                v6->msecLastCommTime = sithTime_g_msecGameTime;
                 if (sithNet_isServer)
                     sithCog_BroadcastMessage(SITH_MESSAGE_JOIN, 3, v6->pLocalPlayer->idx, 0, v3);
                 if ( sithMulti_pfNewPlayerJoinedCallback )
@@ -978,7 +978,7 @@ void sithMulti_ProcessPlayerLost(int a1)
     if ( jkPlayer_maxPlayers )
     {
         v2 = &jkPlayer_playerInfos[0];
-        while ( a1 != v2->net_id )
+        while ( a1 != v2->playerNetId )
         {
             ++v1;
             ++v2;
@@ -998,7 +998,7 @@ LABEL_10:
         jk_snwprintf(a1a, 0x80u, v4, &jkPlayer_playerInfos[v3]);
         sithConsole_PrintWString(a1a);
         sithConsole_AlertSound();
-        if ( jkPlayer_playerInfos[v3].net_id == sithNet_serverNetId )
+        if ( jkPlayer_playerInfos[v3].playerNetId == sithNet_serverNetId )
         {
             v5 = sithStrTable_GetUniStringWithFallback("SERVER_LEFT_GAME");
             sithConsole_PrintWString(v5);
@@ -1077,7 +1077,7 @@ int sithMulti_ProcessJoinRequest(SithMessage *msg)
         for (v3 = 0; v3 < jkPlayer_maxPlayers; v3++)
         {
             v4 = &jkPlayer_playerInfos[v3];
-            if ( v4->net_id == v1 )
+            if ( v4->playerNetId == v1 )
                 break;
         }
         if ( v3 < jkPlayer_maxPlayers )
@@ -1125,7 +1125,7 @@ int sithMulti_ProcessJoinRequest(SithMessage *msg)
         for (v5 = 0; v5 < jkPlayer_maxPlayers; v5++)
         {
             v6 = &jkPlayer_playerInfos[v5];
-            if ( (v6->flags & 2) != 0 && !v6->net_id )
+            if ( (v6->flags & 2) != 0 && !v6->playerNetId )
                 break;
         }
         if ( v5 == jkPlayer_maxPlayers )
@@ -1153,7 +1153,7 @@ int sithMulti_ProcessJoinRequest(SithMessage *msg)
 
             NETMSG_POPWSTR(jkPlayer_playerInfos[sithMulti_curWelcomePlayerNum].player_name, 0x10);
             NETMSG_POPWSTR(jkPlayer_playerInfos[sithMulti_curWelcomePlayerNum].multi_name, 0x20);
-            //jkPlayer_playerInfos[sithMulti_curWelcomePlayerNum].net_id = v1; // Added?
+            //jkPlayer_playerInfos[sithMulti_curWelcomePlayerNum].playerNetId = v1; // Added?
             //jkPlayer_playerInfos[sithMulti_curWelcomePlayerNum].flags = 5;
 
             uint32_t popped_check = NETMSG_POPS32();
@@ -1425,7 +1425,7 @@ void sithMulti_Update(int deltaMs)
                             if ( (sithNet_MultiModeFlags & MULTIMODEFLAG_TEAMS) != 0 && (sithNet_MultiModeFlags & MULTIMODEFLAG_100) != 0 )
                                 jkPlayer_playerInfos[sithMulti_curWelcomePlayerNum].teamNum = (sithMulti_curWelcomePlayerNum & 1) + 1;
                             sithMulti_verbosePrintf("Last sync %x %x\n", sithMulti_newPlayerId, sithMulti_curWelcomePlayerNum);
-                            jkPlayer_playerInfos[sithMulti_curWelcomePlayerNum].net_id = sithMulti_newPlayerId;
+                            jkPlayer_playerInfos[sithMulti_curWelcomePlayerNum].playerNetId = sithMulti_newPlayerId;
                             sithMulti_SyncPlayers(sithMulti_newPlayerId, 1);
                             sithMulti_SendWelcome(sithMulti_newPlayerId, sithMulti_curWelcomePlayerNum, sithMulti_newPlayerId);
 
@@ -1445,7 +1445,7 @@ void sithMulti_Update(int deltaMs)
     }
 }
 
-uint32_t sithMulti_GetPlayerIndexByID(int net_id)
+uint32_t sithMulti_GetPlayerIndexByID(int playerNetId)
 {
     uint32_t result; // eax
     SithPlayer* i; // ecx
@@ -1453,7 +1453,7 @@ uint32_t sithMulti_GetPlayerIndexByID(int net_id)
     result = 0;
     if ( !jkPlayer_maxPlayers )
         return -1;
-    for ( i = &jkPlayer_playerInfos[0]; net_id != i->net_id; ++i )
+    for ( i = &jkPlayer_playerInfos[0]; playerNetId != i->playerNetId; ++i )
     {
         if ( ++result >= jkPlayer_maxPlayers )
             return -1;
@@ -1544,7 +1544,7 @@ void sithMulti_RemovePlayer(int playerIdx)
     sithConsole_PrintWString(buf);
     sithConsole_AlertSound();
 
-    if ( jkPlayer_playerInfos[playerIdx].net_id == sithNet_serverNetId )
+    if ( jkPlayer_playerInfos[playerIdx].playerNetId == sithNet_serverNetId )
     {
         wchar_t *serverMsg = sithStrTable_GetUniStringWithFallback("SERVER_LEFT_GAME");
         sithConsole_PrintWString(serverMsg);
@@ -1572,7 +1572,7 @@ void sithMulti_ProcessPlayerJoin(int playerIdx)
     jk_snwprintf(buf, 0x80, fmt, jkPlayer_playerInfos[playerIdx].player_name);
     sithConsole_PrintWString(buf);
 
-    jkPlayer_playerInfos[playerIdx].lastUpdateMs = sithTime_g_msecGameTime;
+    jkPlayer_playerInfos[playerIdx].msecLastCommTime = sithTime_g_msecGameTime;
 
     if ( sithNet_isServer )
     {

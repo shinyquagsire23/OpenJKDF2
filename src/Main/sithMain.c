@@ -430,10 +430,10 @@ void sithDrawScene()
         sithAdvanceRenderTick();
 
 #if defined(QOL_IMPROVEMENTS)
-        if (sithCamera_g_pCurCamera && sithCamera_g_pCurCamera->rdCam.canvas)
+        if (sithCamera_g_pCurCamera && sithCamera_g_pCurCamera->rdCamera.canvas)
         {
             // Set screen aspect ratio
-            flex_t aspect = sithCamera_g_pCurCamera->rdCam.canvas->half_screen_height / sithCamera_g_pCurCamera->rdCam.canvas->half_screen_width;
+            flex_t aspect = sithCamera_g_pCurCamera->rdCamera.canvas->half_screen_height / sithCamera_g_pCurCamera->rdCamera.canvas->half_screen_width;
 #if defined(TARGET_TWL)
             //aspect = 192.0/256.0;
             //const flex_t canvasWidth = 256.0;
@@ -442,29 +442,29 @@ void sithDrawScene()
             aspect = 192.0/256.0;
             const flex_t canvasWidth = 256.0;
             const flex_t canvasHeight = 192.0;
-            sithCamera_g_pCurCamera->rdCam.canvas->half_screen_width = canvasWidth/2;
-            sithCamera_g_pCurCamera->rdCam.canvas->half_screen_height = canvasHeight/2;
-            sithCamera_g_pCurCamera->rdCam.canvas->widthMinusOne = canvasWidth - 1.0;
-            sithCamera_g_pCurCamera->rdCam.canvas->heightMinusOne = canvasHeight - 1.0;
+            sithCamera_g_pCurCamera->rdCamera.canvas->half_screen_width = canvasWidth/2;
+            sithCamera_g_pCurCamera->rdCamera.canvas->half_screen_height = canvasHeight/2;
+            sithCamera_g_pCurCamera->rdCamera.canvas->widthMinusOne = canvasWidth - 1.0;
+            sithCamera_g_pCurCamera->rdCamera.canvas->heightMinusOne = canvasHeight - 1.0;
             static flex_t sithMain_UpdateCamera_lastFov = 90.0;
             static void* sithMain_UpdateCamera_lastCamera = NULL;
 
-            //if (aspect != sithMain_lastAspect || jkPlayer_fov != sithCamera_g_pCurCamera->rdCam.fov || jkPlayer_fov != sithMain_UpdateCamera_lastFov || sithMain_UpdateCamera_lastCamera != sithCamera_g_pCurCamera) {
+            //if (aspect != sithMain_lastAspect || jkPlayer_fov != sithCamera_g_pCurCamera->rdCamera.fov || jkPlayer_fov != sithMain_UpdateCamera_lastFov || sithMain_UpdateCamera_lastCamera != sithCamera_g_pCurCamera) {
 #endif
                 if (!Main_bMotsCompat)
                 {
-                    rdCamera_SetAspectRatio(&sithCamera_g_pCurCamera->rdCam, aspect);
-                    rdCamera_SetFOV(&sithCamera_g_pCurCamera->rdCam, jkPlayer_fov);
-                    rdCamera_SetOrthoScale(&sithCamera_g_pCurCamera->rdCam, 250.0);
+                    rdCamera_SetAspectRatio(&sithCamera_g_pCurCamera->rdCamera, aspect);
+                    rdCamera_SetFOV(&sithCamera_g_pCurCamera->rdCamera, jkPlayer_fov);
+                    rdCamera_SetOrthoScale(&sithCamera_g_pCurCamera->rdCamera, 250.0);
                 }
                 else {
-                    rdCamera_SetAspectRatio(&sithCamera_g_pCurCamera->rdCam, aspect);
+                    rdCamera_SetAspectRatio(&sithCamera_g_pCurCamera->rdCamera, aspect);
 
                     // We still need this override for cameras that don't have zoom (third-person)
-                    if (sithCamera_g_pCurCamera->cameraPerspective != 1) {
-                        rdCamera_SetFOV(&sithCamera_g_pCurCamera->rdCam, jkPlayer_fov);
+                    if (sithCamera_g_pCurCamera->type != 1) {
+                        rdCamera_SetFOV(&sithCamera_g_pCurCamera->rdCamera, jkPlayer_fov);
                     }
-                    rdCamera_SetOrthoScale(&sithCamera_g_pCurCamera->rdCam, 250.0);
+                    rdCamera_SetOrthoScale(&sithCamera_g_pCurCamera->rdCamera, 250.0);
                 }
 #if defined(TARGET_TWL)
             //}
@@ -478,7 +478,7 @@ void sithDrawScene()
         }
 #endif
 
-        //sithCamera_g_pCurCamera->rdCam.screenAspectRatio += 0.01;
+        //sithCamera_g_pCurCamera->rdCamera.screenAspectRatio += 0.01;
         sithCamera_Update(sithCamera_g_pCurCamera);
         sithCamera_RenderScene();
     }

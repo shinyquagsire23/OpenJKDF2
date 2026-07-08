@@ -853,7 +853,7 @@ int jkPlayer_checkPov = 0;
 void jkPlayer_DrawPov()
 {
     rdVector3 trans;
-    rdMatrix34 viewMat;
+    rdMatrix34 orient;
 
     if (!playerThings[playerThingIdx].povModel.model3)
         return;
@@ -863,7 +863,7 @@ void jkPlayer_DrawPov()
         rdPuppet_UpdateTracks(playerThings[playerThingIdx].povModel.puppet, sithTime_g_frameTimeFlex);
     }
 
-    if ( !(sithCamera_g_pCurCamera->cameraPerspective & 0xFC) && sithCamera_g_pCurCamera->primaryFocus == sithWorld_g_pCurrentWorld->pCameraFocusThing )
+    if ( !(sithCamera_g_pCurCamera->type & 0xFC) && sithCamera_g_pCurCamera->pPrimaryFocusThing == sithWorld_g_pCurrentWorld->pCameraFocusThing )
     {
         SithThing* player = playerThings[playerThingIdx].actorThing;
 
@@ -914,18 +914,18 @@ void jkPlayer_DrawPov()
 
         flex_t ambLight = stdMath_Clamp(sithCamera_g_pCurCamera->sector->extraLight + sithCamera_g_pCurCamera->sector->ambientLight, 0.0, 1.0);
 
-        rdCamera_SetAmbientLight(&sithCamera_g_pCurCamera->rdCam, ambLight);
+        rdCamera_SetAmbientLight(&sithCamera_g_pCurCamera->rdCamera, ambLight);
         rdColormap_SetCurrent(sithCamera_g_pCurCamera->sector->colormap);
 
-        rdMatrix_Copy34(&viewMat, &sithCamera_g_pCurCamera->viewMat);
+        rdMatrix_Copy34(&orient, &sithCamera_g_pCurCamera->orient);
         rdVector_Copy3(&trans, &playerThings[playerThingIdx].actorThing->actorParams.eyeOffset);
         //printf("%f %f %f\n", (flex32_t)playerThings[playerThingIdx].actorThing->actorParams.eyeOffset.x, (flex32_t)playerThings[playerThingIdx].actorThing->actorParams.eyeOffset.y, (flex32_t)playerThings[playerThingIdx].actorThing->actorParams.eyeOffset.z);
 #ifdef QOL_IMPROVEMENTS
         // Shift gun down slightly at higher aspect ratios
         // TODO just make a cvar-alike for this
-        //trans.z += 0.007 * (1.0 / sithCamera_g_pCurCamera->rdCam.screenAspectRatio);
+        //trans.z += 0.007 * (1.0 / sithCamera_g_pCurCamera->rdCamera.screenAspectRatio);
 #endif
-        //printf("%f %f %f\n", (flex32_t)viewMat.scale.x, (flex32_t)viewMat.scale.y, (flex32_t)viewMat.scale.z);
+        //printf("%f %f %f\n", (flex32_t)orient.scale.x, (flex32_t)orient.scale.y, (flex32_t)orient.scale.z);
 
         // Shift gun up slightly
 #ifdef TARGET_TWL
@@ -937,21 +937,21 @@ void jkPlayer_DrawPov()
 #endif
 
         rdVector_Neg3Acc(&trans);
-        rdMatrix_PreTranslate34(&viewMat, &trans);
-        rdMatrix_PreMultiply34(&viewMat, &jkSaber_rotateMat);
+        rdMatrix_PreTranslate34(&orient, &trans);
+        rdMatrix_PreMultiply34(&orient, &jkSaber_rotateMat);
 
         // Moved: see below.
 #if !(defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW))
         // Render saber if applicable
         if (playerThings[playerThingIdx].actorThing->jkFlags & JKFLAG_SABERON)
         {
-            jkSaber_Draw(&viewMat);
+            jkSaber_Draw(&orient);
         }
 #endif
         
         //printf("pov in\n");
         //jkPlayer_checkPov = 1;
-        rdThing_Draw(&playerThings[playerThingIdx].povModel, &viewMat);
+        rdThing_Draw(&playerThings[playerThingIdx].povModel, &orient);
         //jkPlayer_checkPov = 0;
         //printf("pov done\n");
 
@@ -966,7 +966,7 @@ void jkPlayer_DrawPov()
         if (playerThings[playerThingIdx].actorThing->jkFlags & JKFLAG_SABERON)
         {
             rdSetZBufferMethod(RD_ZBUFFER_READ_NOWRITE);
-            jkSaber_Draw(&viewMat);
+            jkSaber_Draw(&orient);
         }
 
 
@@ -999,8 +999,8 @@ void jkPlayer_renderSaberWeaponMesh(SithThing *thing)
     if (!thing->pPuppetClass)
         return;
 
-    int primary_mesh = thing->pPuppetClass->bodypart_to_joint[JOINTTYPE_PRIMARYWEAP];
-    int secondary_mesh = thing->pPuppetClass->bodypart_to_joint[JOINTTYPE_SECONDARYWEAP];
+    int primary_mesh = thing->pPuppetClass->aJoints[JOINTTYPE_PRIMARYWEAP];
+    int secondary_mesh = thing->pPuppetClass->aJoints[JOINTTYPE_SECONDARYWEAP];
 
     // Attempt to find a proper secondary weapon hand
     if (thing->jkFlags & JKFLAG_DUALSABERS && primary_mesh == secondary_mesh && thing->renderData.model3) {
@@ -1016,7 +1016,7 @@ void jkPlayer_renderSaberWeaponMesh(SithThing *thing)
         }
 
         if (primary_mesh != secondary_mesh) {
-            thing->pPuppetClass->bodypart_to_joint[JOINTTYPE_SECONDARYWEAP] = secondary_mesh;
+            thing->pPuppetClass->aJoints[JOINTTYPE_SECONDARYWEAP] = secondary_mesh;
         }
     }
 
@@ -1025,7 +1025,7 @@ void jkPlayer_renderSaberWeaponMesh(SithThing *thing)
 
     if (thing->jkFlags & JKFLAG_PERSUASION)
     {
-        if ( sithPlayer_g_pLocalPlayer->iteminfo[SITHBIN_F_SEEING].state & SITHINVENTORY_ITEM_ACTIVATED )
+        if ( sithPlayer_g_pLocalPlayer->aItems[SITHBIN_F_SEEING].state & SITHINVENTORY_ITEM_ACTIVATED )
         {
             rdGeoMode_t oldGeoMode = thing->renderData.curGeoMode;
 #ifdef TARGET_TWL
@@ -1459,13 +1459,13 @@ void jkPlayer_InitForceBins()
     {
         if ( i != SITHBIN_JEDI_RANK )
         {
-            if ( sithPlayer_GetInvItemAmount(i) > 0.0 && jkPlayer_playerInfos[playerThingIdx].iteminfo[i].state & SITHINVENTORY_ITEM_FOUND)
+            if ( sithPlayer_GetInvItemAmount(i) > 0.0 && jkPlayer_playerInfos[playerThingIdx].aItems[i].state & SITHINVENTORY_ITEM_FOUND)
             {
-                jkPlayer_playerInfos[playerThingIdx].iteminfo[i].state |= SITHINVENTORY_ITEM_AVAILABLE;
+                jkPlayer_playerInfos[playerThingIdx].aItems[i].state |= SITHINVENTORY_ITEM_AVAILABLE;
             }
             else
             {
-                jkPlayer_playerInfos[playerThingIdx].iteminfo[i].state &= ~SITHINVENTORY_ITEM_AVAILABLE;
+                jkPlayer_playerInfos[playerThingIdx].aItems[i].state &= ~SITHINVENTORY_ITEM_AVAILABLE;
             }
         }
     }
@@ -1529,7 +1529,7 @@ void jkPlayer_SetAccessiblePowers(int rank)
         for (int i = SITHBIN_FP_START; i <= SITHBIN_FP_END; ++i )
         {
             if ( i != SITHBIN_JEDI_RANK )
-                jkPlayer_playerInfos[playerThingIdx].iteminfo[i].state |= SITHINVENTORY_ITEM_FOUND;
+                jkPlayer_playerInfos[playerThingIdx].aItems[i].state |= SITHINVENTORY_ITEM_FOUND;
         }
 #endif
         return;
@@ -1538,7 +1538,7 @@ void jkPlayer_SetAccessiblePowers(int rank)
     for (int i = SITHBIN_FP_START; i <= SITHBIN_FP_END; ++i )
     {
         if ( i != SITHBIN_JEDI_RANK )
-            jkPlayer_playerInfos[playerThingIdx].iteminfo[i].state &= ~SITHINVENTORY_ITEM_FOUND;
+            jkPlayer_playerInfos[playerThingIdx].aItems[i].state &= ~SITHINVENTORY_ITEM_FOUND;
     }
 
     if ( rank )
@@ -1546,27 +1546,27 @@ void jkPlayer_SetAccessiblePowers(int rank)
         for (int j = SITHBIN_FP_START; j <= SITHBIN_F_PULL; ++j )
         {
             if ( j != SITHBIN_JEDI_RANK )
-                jkPlayer_playerInfos[playerThingIdx].iteminfo[j].state |= SITHINVENTORY_ITEM_FOUND;
+                jkPlayer_playerInfos[playerThingIdx].aItems[j].state |= SITHINVENTORY_ITEM_FOUND;
         }
 
         if ( rank > 3 )
         {
-            jkPlayer_playerInfos[playerThingIdx].iteminfo[SITHBIN_F_HEALING].state |= SITHINVENTORY_ITEM_FOUND;
-            jkPlayer_playerInfos[playerThingIdx].iteminfo[SITHBIN_F_THROW].state |= SITHINVENTORY_ITEM_FOUND;
+            jkPlayer_playerInfos[playerThingIdx].aItems[SITHBIN_F_HEALING].state |= SITHINVENTORY_ITEM_FOUND;
+            jkPlayer_playerInfos[playerThingIdx].aItems[SITHBIN_F_THROW].state |= SITHINVENTORY_ITEM_FOUND;
             
             if ( rank > 4 )
             {
-                jkPlayer_playerInfos[playerThingIdx].iteminfo[SITHBIN_F_PERSUASION].state |= SITHINVENTORY_ITEM_FOUND;
-                jkPlayer_playerInfos[playerThingIdx].iteminfo[SITHBIN_F_GRIP].state |= SITHINVENTORY_ITEM_FOUND;
+                jkPlayer_playerInfos[playerThingIdx].aItems[SITHBIN_F_PERSUASION].state |= SITHINVENTORY_ITEM_FOUND;
+                jkPlayer_playerInfos[playerThingIdx].aItems[SITHBIN_F_GRIP].state |= SITHINVENTORY_ITEM_FOUND;
                 
                 if ( rank > 5 )
                 {
-                    jkPlayer_playerInfos[playerThingIdx].iteminfo[SITHBIN_F_BLINDING].state |= SITHINVENTORY_ITEM_FOUND;
-                    jkPlayer_playerInfos[playerThingIdx].iteminfo[SITHBIN_F_LIGHTNING].state |= SITHINVENTORY_ITEM_FOUND;
+                    jkPlayer_playerInfos[playerThingIdx].aItems[SITHBIN_F_BLINDING].state |= SITHINVENTORY_ITEM_FOUND;
+                    jkPlayer_playerInfos[playerThingIdx].aItems[SITHBIN_F_LIGHTNING].state |= SITHINVENTORY_ITEM_FOUND;
                     if ( rank > 6 )
                     {
-                        jkPlayer_playerInfos[playerThingIdx].iteminfo[SITHBIN_F_ABSORB].state |= SITHINVENTORY_ITEM_FOUND;
-                        jkPlayer_playerInfos[playerThingIdx].iteminfo[SITHBIN_F_DESTRUCTION].state |= SITHINVENTORY_ITEM_FOUND;
+                        jkPlayer_playerInfos[playerThingIdx].aItems[SITHBIN_F_ABSORB].state |= SITHINVENTORY_ITEM_FOUND;
+                        jkPlayer_playerInfos[playerThingIdx].aItems[SITHBIN_F_DESTRUCTION].state |= SITHINVENTORY_ITEM_FOUND;
                     }
                 }
             }
@@ -2139,7 +2139,7 @@ int jkPlayer_SetAmmoMaximums(int classIdx)
                     do {
                         iVar1 = (int)pfVar2[-1];
                         if ((-1 < iVar1) && (iVar1 < 200)) {
-                            sithInventory_g_aTypes[iVar1].ammoMax = *pfVar2;
+                            sithInventory_g_aTypes[iVar1].max = *pfVar2;
                         }
                         pfVar2 = pfVar2 + 2;
                     } while (pfVar2 < &jkPlayer_aMultiParams[61]);
@@ -2349,7 +2349,7 @@ LAB_004074a0:
     for (iVar5 = SITHBIN_FP_START; iVar5 <= SITHBIN_FP_END; iVar5++)
     {
         if (iVar5 != SITHBIN_JEDI_RANK) {
-            jkPlayer_playerInfos[playerThingIdx].iteminfo[iVar5].state &= ~SITHINVENTORY_ITEM_FOUND;
+            jkPlayer_playerInfos[playerThingIdx].aItems[iVar5].state &= ~SITHINVENTORY_ITEM_FOUND;
         }
     }
 
@@ -2357,7 +2357,7 @@ LAB_004074a0:
        (fVar9 = sithPlayer_GetInvItemAmount(SITHBIN_F_DEFENSE), 
        0.0 < fVar9)) 
     {
-        jkPlayer_playerInfos[playerThingIdx].iteminfo[SITHBIN_F_DEFENSE].state |= SITHINVENTORY_ITEM_FOUND;
+        jkPlayer_playerInfos[playerThingIdx].aItems[SITHBIN_F_DEFENSE].state |= SITHINVENTORY_ITEM_FOUND;
     }
     local_4 = 3;
     local_c = jkPlayer_aMotsFpBins + 0x18;
@@ -2387,7 +2387,7 @@ LAB_004074a0:
             piVar2 = local_c;
             do {
                 if (*piVar2 != 0) {
-                    jkPlayer_playerInfos[playerThingIdx].iteminfo[*piVar2].state |= SITHINVENTORY_ITEM_FOUND;
+                    jkPlayer_playerInfos[playerThingIdx].aItems[*piVar2].state |= SITHINVENTORY_ITEM_FOUND;
                 }
                 piVar2 = piVar2 + 1;
                 iVar3 = iVar3 + -1;
@@ -2413,7 +2413,7 @@ LAB_004074a0:
                 iVar5 = *piVar2;
                 if ((iVar5 != 0) &&
                    (fVar9 = sithPlayer_GetInvItemAmount(iVar5), 0.0 < fVar9)) {
-                    jkPlayer_playerInfos[playerThingIdx].iteminfo[iVar5].state |= SITHINVENTORY_ITEM_FOUND;
+                    jkPlayer_playerInfos[playerThingIdx].aItems[iVar5].state |= SITHINVENTORY_ITEM_FOUND;
                 }
                 piVar2 = piVar2 + 1;
                 iVar3 = iVar3 + -1;

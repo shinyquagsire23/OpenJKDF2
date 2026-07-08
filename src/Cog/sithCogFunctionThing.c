@@ -331,7 +331,7 @@ void sithCogFunctionThing_DestroyThing(sithCog *ctx)
     if (!pThing)
         return;
 
-    //printf("destroy %x %s\n", pThing->guid, ctx->cogscript_fpath);
+    //printf("destroy %x %s\n", pThing->guid, ctx->aName);
 
     if (COG_SHOULD_SYNC(ctx) )
         sithDSSThing_DestroyThing(pThing->guid, -1);
@@ -499,12 +499,12 @@ void sithCogFunctionThing_WaitForStop(sithCog *ctx)
     {
         int idx = pThing->idx;
         ctx->script_running = 3;
-        ctx->wakeTimeMs = idx;
+        ctx->msecTimerTimeout = idx;
 
         if ( ctx->flags & SITH_COG_DEBUG)
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_g_genBuffer, "Cog %s: Waiting for stop on object %d.\n", ctx->cogscript_fpath, idx);
+            _sprintf(std_g_genBuffer, "Cog %s: Waiting for stop on object %d.\n", ctx->aName, idx);
             sithConsole_PrintString(std_g_genBuffer);
 #endif
         }
@@ -827,7 +827,7 @@ void sithCogFunctionThing_GetInventoryCog(sithCog *ctx)
       && desc
       && (descCog = desc->cog) != 0 )
     {
-        sithCogExec_PushInt(ctx, descCog->selfCog);
+        sithCogExec_PushInt(ctx, descCog->idx);
     }
     else
     {
@@ -849,7 +849,7 @@ void sithCogFunctionThing_GetThingVelocity(sithCog *ctx)
         }
         else if ( pThing->moveType == SITH_MT_PATH )
         {
-            rdVector_Scale3(&retval, &pThing->trackParams.vel, pThing->trackParams.lerpSpeed);
+            rdVector_Scale3(&retval, &pThing->trackParams.vel, pThing->trackParams.moveVel);
         }
         sithCogExec_PushVector(ctx, &retval);
     }
@@ -1087,7 +1087,7 @@ void sithCogFunctionThing_PlayKey(sithCog *ctx)
         {
             if ( pThing->trackParams.flags )
                 sithTrackThing_Stop(pThing);
-            rdVector_Copy3(&pThing->trackParams.moveFrameOrientation.scale, &pThing->position);
+            rdVector_Copy3(&pThing->trackParams.curOrient.scale, &pThing->position);
         }
         if (COG_SHOULD_SYNC(ctx))
         {
@@ -1682,7 +1682,7 @@ void sithCogFunctionThing_AmputateJoint(sithCog *ctx)
             SithPuppetClass* pPuppetClass = pThing->pPuppetClass;
             if (pPuppetClass && idx < 0xA)
             {
-                int jointIdx = pPuppetClass->bodypart_to_joint[idx];
+                int jointIdx = pPuppetClass->aJoints[idx];
                 if ( jointIdx >= 0 ) {
                     // Added: prevent oob
                     if (renderData->model3 && jointIdx < renderData->model3->numHierarchyNodes)
@@ -1843,7 +1843,7 @@ void sithCogFunctionThing_SkillTarget(sithCog *ctx)
                 param1,
                 0.0,
                 0.0,
-                pThing->actorParams.pPlayer->net_id);
+                pThing->actorParams.pPlayer->playerNetId);
             sithCogExec_PushFlex(ctx, 0.0);
         }
         else
@@ -1950,7 +1950,7 @@ void sithCogFunctionThing_GetThingClassCog(sithCog *ctx)
 
     SithThing* pThing = sithCogExec_PopThing(ctx);
     if ( pThing && (classCog = pThing->pCog) != 0 )
-        sithCogExec_PushInt(ctx, classCog->selfCog);
+        sithCogExec_PushInt(ctx, classCog->idx);
     else
         sithCogExec_PushInt(ctx, -1);
 }
@@ -1972,7 +1972,7 @@ void sithCogFunctionThing_GetThingCaptureCog(sithCog *ctx)
 
     SithThing* pThing = sithCogExec_PopThing(ctx);
     if ( pThing && (captureCog = pThing->pCaptureCog) != 0 )
-        sithCogExec_PushInt(ctx, captureCog->selfCog);
+        sithCogExec_PushInt(ctx, captureCog->idx);
     else
         sithCogExec_PushInt(ctx, -1);
 }
@@ -2537,7 +2537,7 @@ void sithCogFunctionThing_SetJointAngle(sithCog *ctx)
     if (((pThing && pThing->pPuppetClass) 
       && (pThing->renderData.type == RD_THING_MODEL3)) 
       && ((prVar1 = pThing->renderData.hierarchyNodes2, prVar1 != NULL &&
-      (arg1 = pThing->pPuppetClass->bodypart_to_joint[arg1],
+      (arg1 = pThing->pPuppetClass->aJoints[arg1],
       arg1 > -1 && arg1 <= (int)(pThing->renderData.model3->numHierarchyNodes - 1))))) 
     {
         prVar1[arg1].x = fVar2;
@@ -2556,7 +2556,7 @@ void sithCogFunctionThing_GetJointAngle(sithCog *ctx)
     {
         if (((pThing->pPuppetClass && pThing->renderData.type == RD_THING_MODEL3) &&
             (prVar1 = (pThing->renderData).hierarchyNodes2, prVar1 != NULL)) &&
-           (arg1 = pThing->pPuppetClass->bodypart_to_joint[arg1],
+           (arg1 = pThing->pPuppetClass->aJoints[arg1],
            arg1 > -1 && arg1 <= (int)(pThing->renderData.model3->numHierarchyNodes - 1))) 
         {
           local_4 = prVar1[arg1].x;

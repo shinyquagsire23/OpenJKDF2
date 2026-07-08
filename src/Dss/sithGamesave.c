@@ -65,7 +65,7 @@ const char* sithGamesave_AutosaveMapName(void)
 // Added: with no SD, the level-start autosave (the death/restart buffer) is kept
 // as a single FULL save file in volatile KOS /ram. That flat ramdisk holds one
 // file fine (no subdirs), and living outside the writable tree means it's never
-// packed into the VMU snapshot and never triggers a slow VMU write on level load.
+// packed into the VMU snapshot and never aHandlers a slow VMU write on level load.
 // Returns 1 (and fills pOut with the /ram path) when saveFname is that autosave.
 static int sithGamesave_DcRamAutosavePath(const char* saveFname, char* pOut, int outSz)
 {
@@ -454,7 +454,7 @@ int sithGamesave_SaveCurrentWorld(int mpFlags)
 
     for (uint32_t i = 0; i < SITHAI_MAX_ACTORS; i++) // TODO define this maximum
     {
-        if ( sithAI_actors[i].pAIClass ) {
+        if ( sithAI_actors[i].pClass ) {
             sithDSS_AIStatus(&sithAI_actors[i], 0, mpFlags);
         }
     }
@@ -490,7 +490,7 @@ int sithGamesave_SaveCurrentWorld(int mpFlags)
 
     sithSurface_SyncFull(mpFlags);
 
-    for (SithEvent* timerIter = sithEvent_g_pFirstQueuedEvent; timerIter; timerIter = timerIter->nextTimer )
+    for (SithEvent* timerIter = sithEvent_g_pFirstQueuedEvent; timerIter; timerIter = timerIter->pNextEvent )
         sithDSS_SyncTaskEvents(timerIter, 0, mpFlags);
 
     sithDSS_SendSyncPalEffects(0, mpFlags);
@@ -560,10 +560,10 @@ int sithGamesave_Save(char *saveFname, int a2, int a3, wchar_t *saveName)
         sithGamesave_headerTmp.playerHealth = sithPlayer_g_pLocalPlayerThing->actorParams.health;
         sithGamesave_headerTmp.playerMaxHealth = sithPlayer_g_pLocalPlayerThing->actorParams.maxHealth;
         v7 = sithGamesave_headerTmp.binAmts;
-        v8 = sithPlayer_g_pLocalPlayer->iteminfo;
+        v8 = sithPlayer_g_pLocalPlayer->aItems;
         do
         {
-            *v7++ = v8->ammoAmt;
+            *v7++ = v8->amount;
             ++v8;
         }
         while ( (intptr_t)v7 < (intptr_t)sithGamesave_headerTmp.saveName );

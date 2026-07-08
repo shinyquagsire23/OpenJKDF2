@@ -89,7 +89,7 @@ int jkControl_HandleHudKeys(SithThing *player, flex_t b)
             {
                 sithCamera_CycleCamera();
                 //DAT_005b9254 = 2; // MOTS TODO
-                if ( (sithCamera_g_pCurCamera->cameraPerspective & 0xFC) != 0 )
+                if ( (sithCamera_g_pCurCamera->type & 0xFC) != 0 )
                     v5 = jkStrings_GetUniStringWithFallback("GAME_EXTERNALCAM");
                 else
                     v5 = jkStrings_GetUniStringWithFallback("GAME_INTERNALCAM");

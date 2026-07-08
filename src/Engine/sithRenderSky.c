@@ -28,9 +28,9 @@ void sithRenderSky_Close()
 void sithRenderSky_Update()
 {
     sithSector_flt_8553C0 = sithSector_horizontalDist / rdCamera_g_pCurCamera->fovDx;
-    stdMath_SinCos(sithCamera_g_pCurCamera->viewPYR.z, &sithSector_flt_8553F4, &sithSector_flt_8553C8);
-    sithSector_flt_8553B8 = -(sithCamera_g_pCurCamera->viewPYR.y * sithSector_horizontalPixelsPerRev_idk);
-    sithSector_flt_8553C4 = -(sithCamera_g_pCurCamera->viewPYR.x * sithSector_horizontalPixelsPerRev_idk);
+    stdMath_SinCos(sithCamera_g_pCurCamera->lookPYR.z, &sithSector_flt_8553F4, &sithSector_flt_8553C8);
+    sithSector_flt_8553B8 = -(sithCamera_g_pCurCamera->lookPYR.y * sithSector_horizontalPixelsPerRev_idk);
+    sithSector_flt_8553C4 = -(sithCamera_g_pCurCamera->lookPYR.x * sithSector_horizontalPixelsPerRev_idk);
 }
 
 // As seen in: Return Home to Sulon
@@ -109,14 +109,14 @@ void sithRenderSky_CeilingFaceToPlane(rdProcEntry *pProcEntry, sithSurfaceInfo *
     for (uint32_t i = 0; i < num_vertices; i++)
     {
         rdMatrix_TransformPoint34(&a2a, &pUntransformedVerts[i], &rdCamera_g_camMatrix);
-        rdVector_Sub3Acc(&a2a, &sithCamera_g_pCurCamera->vec3_1);
+        rdVector_Sub3Acc(&a2a, &sithCamera_g_pCurCamera->lookPos);
 
         // This seems to bug out when a2a.z < 0.0 (not sure how that's even happening)
         rdVector_Normalize3(&a1a, &a2a);
 
         const flex_t hitTestMaxZ = 1000.0;
         flex_t tmp = 0.0;
-        if (!sithIntersect_CheckSphereHit(&sithCamera_g_pCurCamera->vec3_1, &a1a, hitTestMaxZ, 0.0, &sithSector_surfaceNormal, &sithSector_zMaxVec, &tmp, 0)) {
+        if (!sithIntersect_CheckSphereHit(&sithCamera_g_pCurCamera->lookPos, &a1a, hitTestMaxZ, 0.0, &sithSector_surfaceNormal, &sithSector_zMaxVec, &tmp, 0)) {
             tmp = hitTestMaxZ;
 #ifdef QOL_IMPROVEMENTS
             /*bHitTestFailed = true;
@@ -125,7 +125,7 @@ void sithRenderSky_CeilingFaceToPlane(rdProcEntry *pProcEntry, sithSurfaceInfo *
         }
         rdVector_Scale3Acc(&a1a, tmp);
         pVertUV = &pProcEntry->aTexVerticies[i];
-        rdVector_Add3Acc(&a1a, &sithCamera_g_pCurCamera->vec3_1);
+        rdVector_Add3Acc(&a1a, &sithCamera_g_pCurCamera->lookPos);
         rdVector_Scale2(pVertUV, (rdVector2*)&a1a, 16.0);
 
 #ifdef QOL_IMPROVEMENTS
@@ -135,7 +135,7 @@ void sithRenderSky_CeilingFaceToPlane(rdProcEntry *pProcEntry, sithSurfaceInfo *
 
         rdVector_Add2Acc(pVertUV, &sithWorld_g_pCurrentWorld->ceilingSkyOffset);
         rdVector_Add2Acc(pVertUV, &pSurfaceInfo->face.clipIdk);
-        rdMatrix_TransformPoint34(&vertex_out, &a1a, &sithCamera_g_pCurCamera->rdCam.view_matrix);
+        rdMatrix_TransformPoint34(&vertex_out, &a1a, &sithCamera_g_pCurCamera->rdCamera.view_matrix);
 
 #ifdef TARGET_TWL
         flex_t prev_z = pProcEntry->aVertices[i].y;

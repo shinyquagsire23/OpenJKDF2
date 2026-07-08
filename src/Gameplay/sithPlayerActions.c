@@ -164,10 +164,10 @@ void sithPlayerActions_MoveToPlayerPosition(SithThing *thing, int idx)
     {
         if ( (jkPlayer_playerInfos[idx].flags & 2) != 0 )
         {
-            stdPlatform_Memcpy32(&thing->orient, &jkPlayer_playerInfos[idx].spawnPosOrient, sizeof(thing->orient)); // Added: word-safe (aThings may be in extram)
+            stdPlatform_Memcpy32(&thing->orient, &jkPlayer_playerInfos[idx].orient, sizeof(thing->orient)); // Added: word-safe (aThings may be in extram)
             thing->position = thing->orient.scale;
             rdVector_Zero3(&thing->orient.scale);
-            sithThing_SetSector(thing, jkPlayer_playerInfos[idx].pSpawnSector, 0);
+            sithThing_SetSector(thing, jkPlayer_playerInfos[idx].pInSector, 0);
         }
         if ( thing->moveType == SITH_MT_PHYSICS )
         {

@@ -51,10 +51,10 @@ int32_t sithCog_Startup()
     sithCog_g_pHashtable = stdHashtbl_New(256);
     if (!sithCog_g_pHashtable)
     {
-        stdPrintf(pSithHS->errorPrint, ".\\Cog\\sithCog.c", 124, "Could not allocate COG hashtable.");
+        stdPrintf(pSithHS->errorPrint, ".\\Cog\\sithCog.c", 124, "Could not allocate COG pHashtbl.");
         return 0;
     }
-    sithCog_g_pSymbolTable->bucket_idx = 0x100;
+    sithCog_g_pSymbolTable->firstId = 0x100;
     sithCogFunction_Startup(sithCog_g_pSymbolTable);
     sithCogFunctionThing_Startup(sithCog_g_pSymbolTable);
     sithCogFunctionAI_Startup(sithCog_g_pSymbolTable);
@@ -430,11 +430,11 @@ int32_t sithCog_Open()
         v2 = sithWorld_g_pStaticWorld->aCogs;
         for (int32_t i = 0; i < sithWorld_g_pStaticWorld->numCogs; i++)
         {
-            for (int32_t j = 0; j < v2->cogscript->numIdk; j++)
+            for (int32_t j = 0; j < v2->pScript->numSymbolRefs; j++)
             {
-                v3 = &v2->cogscript->aIdk[j];
+                v3 = &v2->pScript->aSymRefs[j];
                 if ( _strlen(v3->value) )
-                    sithCog_ParseSymbolRef(&v2->pSymbolTable->buckets[v3->hash], v3, v3->value);
+                    sithCog_ParseSymbolRef(&v2->pSymbolTable->aSymbols[v3->hash], v3, v3->value);
             }
 #ifdef COG_HEAP_INIT_ARGS
             // Added: static-world aCogs never consume jkl init strings; drop them
@@ -455,8 +455,8 @@ int32_t sithCog_Open()
         while ( 1 )
         {
             v10 = 0;
-            v6 = aCogs->cogscript->aIdk;
-            if ( aCogs->cogscript->numIdk )
+            v6 = aCogs->pScript->aSymRefs;
+            if ( aCogs->pScript->numSymbolRefs )
                 break;
 LABEL_25:
 #ifdef COG_HEAP_INIT_ARGS
@@ -478,8 +478,8 @@ LABEL_25:
 #endif
         while ( 1 )
         {
-            idk = &aCogs->cogscript->aIdk[v10];
-            v8 = &aCogs->pSymbolTable->buckets[idk->hash];
+            idk = &aCogs->pScript->aSymRefs[v10];
+            v8 = &aCogs->pSymbolTable->aSymbols[idk->hash];
             v14 = v8;
             if ( (idk->flags & 1) != 0 )
             {
@@ -503,7 +503,7 @@ LABEL_25:
 
 LABEL_24:
             ++v6;
-            if (++v10 >= aCogs->cogscript->numIdk )
+            if (++v10 >= aCogs->pScript->numSymbolRefs )
                 goto LABEL_25;
         }
     }
@@ -546,7 +546,7 @@ int sithCog_ReadCogsListText(SithWorld *world, int a2)
     char *v21; // esi
     uint32_t v22; // [esp+10h] [ebp-88h]
     uint32_t v23; // [esp+14h] [ebp-84h]
-    char cog_fpath[32]; // [esp+18h] [ebp-80h] BYREF
+    char aName[32]; // [esp+18h] [ebp-80h] BYREF
 
     if ( a2 )
         return 0;
@@ -577,25 +577,25 @@ int sithCog_ReadCogsListText(SithWorld *world, int a2)
 
             if ( v9 )
             {
-                v18 = v9->cogscript;
+                v18 = v9->pScript;
                 v23 = 0;
 #ifdef COG_HEAP_INIT_ARGS
                 // Added: exact-size init-arg strings, freed after linking in sithCog_Open
                 v9->aInitArgs = NULL;
-                if (v9->cogscript->numIdk) {
-                    v9->aInitArgs = (char*)SITH_ALLOC(32 * v9->cogscript->numIdk);
+                if (v9->pScript->numSymbolRefs) {
+                    v9->aInitArgs = (char*)SITH_ALLOC(32 * v9->pScript->numSymbolRefs);
                     if (v9->aInitArgs)
-                        _memset(v9->aInitArgs, 0, 32 * v9->cogscript->numIdk);
+                        _memset(v9->aInitArgs, 0, 32 * v9->pScript->numSymbolRefs);
                 }
                 v21 = v9->aInitArgs;
 #else
                 v21 = &v9->field_4BC[0];
 #endif
                 v22 = 2;
-                for (v23 = 0; v23 < v9->cogscript->numIdk; v23++)
+                for (v23 = 0; v23 < v9->pScript->numSymbolRefs; v23++)
                 {
                     //printf("%s\n", stdConffile_g_entry.args[v22].value);
-                    if ( v21 && (v18->aIdk[v23].flags & 1) == 0 && stdConffile_g_entry.numArgs > v22 )
+                    if ( v21 && (v18->aSymRefs[v23].flags & 1) == 0 && stdConffile_g_entry.numArgs > v22 )
                     {
                         stdString_SafeStrCopy(v21, stdConffile_g_entry.args[v22].value, 32);
                         v21 += 32;
@@ -616,25 +616,25 @@ int sithCog_ReadCogsListText(SithWorld *world, int a2)
 
 sithCog* sithCog_Load(const char *fpath)
 {
-    uint32_t cogIdx; // eax
+    uint32_t idx; // eax
     SithCogSymbolTable *result; // eax
     sithCog *cog; // ebx
     SithCogScript *v7; // eax
     SithCogScript *v8; // esi
     uint32_t v9; // eax
-    char cog_fpath[128]; // [esp+10h] [ebp-80h] BYREF
+    char aName[128]; // [esp+10h] [ebp-80h] BYREF
 
-    cogIdx = sithWorld_g_pLastLoadedWorld->numCogs;
-    if ( cogIdx >= sithWorld_g_pLastLoadedWorld->sizeCogs )
+    idx = sithWorld_g_pLastLoadedWorld->numCogs;
+    if ( idx >= sithWorld_g_pLastLoadedWorld->sizeCogs )
         return 0;
 
-    cog = &sithWorld_g_pLastLoadedWorld->aCogs[cogIdx];
-    cog->selfCog = cogIdx;
+    cog = &sithWorld_g_pLastLoadedWorld->aCogs[idx];
+    cog->idx = idx;
     if (sithWorld_g_pLastLoadedWorld->level_type_maybe & 1)
     {
-        cog->selfCog |= 0x8000;
+        cog->idx |= 0x8000;
     }
-    _sprintf(cog_fpath, "%s%c%s", "cog", '\\', fpath);
+    _sprintf(aName, "%s%c%s", "cog", '\\', fpath);
     v7 = (SithCogScript *)stdHashtbl_Find(sithCog_g_pHashtable, fpath);
     if ( v7 )
     {
@@ -643,9 +643,9 @@ sithCog* sithCog_Load(const char *fpath)
     else
     {
         v9 = sithWorld_g_pLastLoadedWorld->numCogScripts;
-        if ( v9 < sithWorld_g_pLastLoadedWorld->sizeCogScripts && (v8 = &sithWorld_g_pLastLoadedWorld->aCogScripts[v9], sithCogParse_Load(cog_fpath, v8, 0)) )
+        if ( v9 < sithWorld_g_pLastLoadedWorld->sizeCogScripts && (v8 = &sithWorld_g_pLastLoadedWorld->aCogScripts[v9], sithCogParse_Load(aName, v8, 0)) )
         {
-            stdHashtbl_Add(sithCog_g_pHashtable, cog_fpath, v8); // Added: v8 -> no v8 for cog_fpath
+            stdHashtbl_Add(sithCog_g_pHashtable, aName, v8); // Added: v8 -> no v8 for aName
             ++sithWorld_g_pLastLoadedWorld->numCogScripts;
         }
         else
@@ -656,9 +656,9 @@ sithCog* sithCog_Load(const char *fpath)
     if ( !v8 )
         return 0;
 #ifdef SITH_DEBUG_STRUCT_NAMES
-    stdString_SafeStrCopy(cog->cogscript_fpath, cog_fpath, 32); // v8 -> no v8 for cog_fpath
+    stdString_SafeStrCopy(cog->aName, aName, 32); // v8 -> no v8 for aName
 #endif
-    cog->cogscript = v8;
+    cog->pScript = v8;
     cog->flags = v8->flags;
     cog->pSymbolTable = sithCogParse_DuplicateSymbolTable(v8->pSymbolTable);
     if ( cog->pSymbolTable )
@@ -885,7 +885,7 @@ cog_flex_t sithCog_ThingSendMessageEx(SithThing *sender, SithThing *receiver, SI
 #ifdef DEBUG_QOL_CHEATS
         if (receiver == sithPlayer_g_pLocalPlayerThing && message == SITH_MESSAGE_ACTIVATE) {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            jk_printf("OpenJKDF2: Debug thing cog class %s\n", v9->cogscript_fpath);
+            jk_printf("OpenJKDF2: Debug thing cog class %s\n", v9->aName);
 #endif
         }
 #endif
@@ -914,7 +914,7 @@ cog_flex_t sithCog_ThingSendMessageEx(SithThing *sender, SithThing *receiver, SI
 #ifdef DEBUG_QOL_CHEATS
         if (receiver == sithPlayer_g_pLocalPlayerThing && message == SITH_MESSAGE_ACTIVATE) {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            jk_printf("OpenJKDF2: Debug thing cog capture %s\n", v12->cogscript_fpath);
+            jk_printf("OpenJKDF2: Debug thing cog capture %s\n", v12->aName);
 #endif
         }
 #endif
@@ -942,7 +942,7 @@ cog_flex_t sithCog_ThingSendMessageEx(SithThing *sender, SithThing *receiver, SI
 #ifdef DEBUG_QOL_CHEATS
             if (receiver == sithPlayer_g_pLocalPlayerThing &&message == SITH_MESSAGE_ACTIVATE && v15->cog) {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-                jk_printf("OpenJKDF2: Debug thing cog link %s\n", v15->cog->cogscript_fpath);
+                jk_printf("OpenJKDF2: Debug thing cog link %s\n", v15->cog->aName);
 #endif
             }
 #endif
@@ -1025,7 +1025,7 @@ cog_flex_t sithCog_SurfaceSendMessageEx(SithSurface *sender, SithThing *thing, S
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
             if (thing == sithPlayer_g_pLocalPlayerThing && msg == SITH_MESSAGE_ACTIVATE) {
-                printf("OpenJKDF2: Debug %s\n", surfaceLink->cog->cogscript_fpath);
+                printf("OpenJKDF2: Debug %s\n", surfaceLink->cog->aName);
             }
 #endif
             if ( msg == SITH_MESSAGE_DAMAGED )
@@ -1169,14 +1169,14 @@ void sithCog_SendMessage(sithCog *cog, int32_t msgid, int32_t senderType, int32_
     if (!cog)
         return;
 
-    v7 = cog->cogscript;
+    v7 = cog->pScript;
     if (cog->flags & SITH_COG_DEBUG)
     {
 #ifdef SITH_DEBUG_STRUCT_NAMES
         _sprintf(
             std_g_genBuffer,
             "Cog %s: Message %d delivered, senderType=%d, senderIndex=%d, sourceType=%d, sourceIndex=%d, linkId=%d.\n",
-            cog->cogscript_fpath,
+            cog->aName,
             msgid,
             senderType,
             senderIndex,
@@ -1192,25 +1192,25 @@ void sithCog_SendMessage(sithCog *cog, int32_t msgid, int32_t senderType, int32_
         if ( (cog->flags & SITH_COG_DEBUG) != 0 )
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_g_genBuffer, "Cog %s: Disabled, message ignored.\n", cog->cogscript_fpath);
+            _sprintf(std_g_genBuffer, "Cog %s: Disabled, message ignored.\n", cog->aName);
             sithConsole_PrintString(std_g_genBuffer);
 #endif
         }
         return;
     }
 
-    for (v10 = 0; v10 < v7->num_triggers; v10++)
+    for (v10 = 0; v10 < v7->numHandlers; v10++)
     {
-        if ( msgid == v7->triggers[v10].trigId )
+        if ( msgid == v7->aHandlers[v10].trigId )
             break;
     }
 
-    if ( v10 == v7->num_triggers )
+    if ( v10 == v7->numHandlers )
     {
         if (cog->flags & SITH_COG_DEBUG)
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_g_genBuffer, "--Cog %s: Message %d received but ignored.  No handler.\n", cog->cogscript_fpath, msgid);
+            _sprintf(std_g_genBuffer, "--Cog %s: Message %d received but ignored.  No handler.\n", cog->aName, msgid);
             sithConsole_PrintString(std_g_genBuffer);
 #endif
         }
@@ -1222,7 +1222,7 @@ void sithCog_SendMessage(sithCog *cog, int32_t msgid, int32_t senderType, int32_
         if (cog->flags & SITH_COG_DEBUG)
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_g_genBuffer, "--Cog %s: Message %d received but COG is paused.\n", cog->cogscript_fpath, msgid);
+            _sprintf(std_g_genBuffer, "--Cog %s: Message %d received but COG is paused.\n", cog->aName, msgid);
             sithConsole_PrintString(std_g_genBuffer);
 #endif
         }
@@ -1230,7 +1230,7 @@ void sithCog_SendMessage(sithCog *cog, int32_t msgid, int32_t senderType, int32_
     }
 
     // Added: Co-op
-    if ((sithMulti_multiModeFlags & MULTIMODEFLAG_COOP) && msgid == SITH_MESSAGE_USER0 && sithCog_g_pMasterCog && cog->selfCog == sithCog_g_pMasterCog->selfCog && sithNet_isMulti)
+    if ((sithMulti_multiModeFlags & MULTIMODEFLAG_COOP) && msgid == SITH_MESSAGE_USER0 && sithCog_g_pMasterCog && cog->idx == sithCog_g_pMasterCog->idx && sithNet_isMulti)
     {
         // Send objectives to everyone
         //printf("Send objective to everyone\n");
@@ -1264,7 +1264,7 @@ execute:
         cog->senderId = linkId;
         cog->senderRef = senderIndex;
         cog->senderType = senderType;
-        cog->sourceRef = sourceIndex;
+        cog->sourceIdx = sourceIndex;
         cog->sourceType = sourceType;
         cog->params[1] = 0.0;
         cog->params[2] = 0.0;
@@ -1272,7 +1272,7 @@ execute:
         if ( (cog->flags & SITH_COG_DEBUG) != 0 )
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_g_genBuffer, "--Cog %s: Message %d received and accepted for execution.\n", cog->cogscript_fpath, msgid);
+            _sprintf(std_g_genBuffer, "--Cog %s: Message %d received and accepted for execution.\n", cog->aName, msgid);
             sithConsole_PrintString(std_g_genBuffer);
 #endif
         }
@@ -1295,14 +1295,14 @@ cog_flex_t sithCog_SendMessageEx(sithCog *cog, int32_t message, int32_t senderTy
 
     if ( !cog )
         return -9999.9873046875;
-    v12 = cog->cogscript;
+    v12 = cog->pScript;
     if ( (cog->flags & SITH_COG_DEBUG) != 0 )
     {
 #ifdef SITH_DEBUG_STRUCT_NAMES
         _sprintf(
             std_g_genBuffer,
             "Cog %s: MessageEx %d delivered, senderType=%d, senderIndex=%d, sourceType=%d, sourceIndex=%d, linkId=%d, param0=%g, param1=%g, param2=%g, param3=%g.\n",
-            cog->cogscript_fpath,
+            cog->aName,
             message,
             senderType,
             senderIndex,
@@ -1322,18 +1322,18 @@ cog_flex_t sithCog_SendMessageEx(sithCog *cog, int32_t message, int32_t senderTy
         if ( (v13 & 1) != 0 )
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_g_genBuffer, "Cog %s: Disabled, MessageEx ignored.\n", cog->cogscript_fpath);
+            _sprintf(std_g_genBuffer, "Cog %s: Disabled, MessageEx ignored.\n", cog->aName);
             sithConsole_PrintString(std_g_genBuffer);
 #endif
             return -9999.9873046875;
         }
         return -9999.9873046875;
     }
-    trigIdxMax = v12->num_triggers;
+    trigIdxMax = v12->numHandlers;
     trigIdx = 0;
     if ( trigIdxMax )
     {
-        trig = v12->triggers;
+        trig = v12->aHandlers;
         do
         {
             if ( message == trig->trigId )
@@ -1348,7 +1348,7 @@ cog_flex_t sithCog_SendMessageEx(sithCog *cog, int32_t message, int32_t senderTy
         if ( (v13 & 1) != 0 )
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_g_genBuffer, "--Cog %s: MessageEx %d received but ignored.  No handler.\n", cog->cogscript_fpath, message);
+            _sprintf(std_g_genBuffer, "--Cog %s: MessageEx %d received but ignored.  No handler.\n", cog->aName, message);
             sithConsole_PrintString(std_g_genBuffer);
 #endif
         }
@@ -1359,7 +1359,7 @@ cog_flex_t sithCog_SendMessageEx(sithCog *cog, int32_t message, int32_t senderTy
         if ( (v13 & 1) != 0 )
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_g_genBuffer, "--Cog %s: MessageEx %d received but COG is paused.\n", cog->cogscript_fpath, message);
+            _sprintf(std_g_genBuffer, "--Cog %s: MessageEx %d received but COG is paused.\n", cog->aName, message);
             sithConsole_PrintString(std_g_genBuffer);
 #endif
         }
@@ -1367,7 +1367,7 @@ cog_flex_t sithCog_SendMessageEx(sithCog *cog, int32_t message, int32_t senderTy
     }
 
     // Added: Co-op
-    if ((sithMulti_multiModeFlags & MULTIMODEFLAG_COOP) && message == SITH_MESSAGE_USER0 && sithCog_g_pMasterCog && cog->selfCog == sithCog_g_pMasterCog->selfCog && sithNet_isMulti)
+    if ((sithMulti_multiModeFlags & MULTIMODEFLAG_COOP) && message == SITH_MESSAGE_USER0 && sithCog_g_pMasterCog && cog->idx == sithCog_g_pMasterCog->idx && sithNet_isMulti)
     {
         // Send objectives to everyone
         //printf("Send objective to everyone\n");
@@ -1401,22 +1401,22 @@ execute:
         cog->senderId = linkId;
         cog->senderRef = senderIndex;
         cog->senderType = senderType;
-        cog->sourceRef = sourceIndex;
+        cog->sourceIdx = sourceIndex;
         cog->sourceType = sourceType;
         cog->params[0] = param0;
         cog->params[1] = param1;
         cog->params[2] = param2;
         cog->params[3] = param3;
-        cog->returnEx = -9999.9873046875;
+        cog->returnValue = -9999.9873046875;
         if ( (v13 & 1) != 0 )
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_g_genBuffer, "--Cog %s: MessageEx %d received and accepted for execution.\n", cog->cogscript_fpath, message);
+            _sprintf(std_g_genBuffer, "--Cog %s: MessageEx %d received and accepted for execution.\n", cog->aName, message);
             sithConsole_PrintString(std_g_genBuffer);
 #endif
         }
         sithCogExec_ExecuteMessage(cog, trigIdx);
-        result = cog->returnEx;
+        result = cog->returnValue;
     }
     else if ( message == SITH_MESSAGE_PULSE || message == SITH_MESSAGE_TIMER )
     {
@@ -1456,33 +1456,33 @@ void sithCog_FreeWorldCogs(SithWorld *world)
         {
             v4 = &world->aCogScripts[i];
             sithCogParse_FreeSymbolTable(v4->pSymbolTable);
-            for (v5 = 0; v5 < v4->numIdk; v5++)
+            for (v5 = 0; v5 < v4->numSymbolRefs; v5++)
             {
-                if (v4->aIdk[v5].desc)
+                if (v4->aSymRefs[v5].desc)
                 {
-                    SITH_FREE(v4->aIdk[v5].desc);
-                    v4->aIdk[v5].desc = NULL;
+                    SITH_FREE(v4->aSymRefs[v5].desc);
+                    v4->aSymRefs[v5].desc = NULL;
                 }
             }
 #ifdef COG_DYNAMIC_IDK
-            if (v4->aIdk)
-                SITH_FREE(v4->aIdk);
-            v4->aIdk = NULL;
+            if (v4->aSymRefs)
+                SITH_FREE(v4->aSymRefs);
+            v4->aSymRefs = NULL;
 #endif
 #ifdef COG_DYNAMIC_TRIGGERS
-            if (v4->triggers)
-                SITH_FREE(v4->triggers);
-            v4->triggers = NULL;
+            if (v4->aHandlers)
+                SITH_FREE(v4->aHandlers);
+            v4->aHandlers = NULL;
 #endif
-            if ( v4->script_program )
+            if ( v4->pCode )
             {
-                SITH_FREE(v4->script_program);
-                v4->script_program = 0;
+                SITH_FREE(v4->pCode);
+                v4->pCode = 0;
             }
 #ifdef STDHASHTABLE_CRC32_KEYS
             stdHashtbl_FreeKeyCrc32(sithCog_g_pHashtable, v4->pathCrc);
 #else
-            stdHashtbl_Remove(sithCog_g_pHashtable, v4->cog_fpath);
+            stdHashtbl_Remove(sithCog_g_pHashtable, v4->aName);
 #endif
         }
         SITH_FREE(world->aCogScripts);
@@ -1506,7 +1506,7 @@ void sithCog_FreeWorldCogs(SithWorld *world)
             if ( v9->heap )
             {
                 SITH_FREE(v9->heap);
-                v9->numHeapVars = 0;
+                v9->heapSize = 0;
                 v9->heap = NULL; // Added
             }
 #ifdef COG_DYNAMIC_STACKS
@@ -1548,7 +1548,7 @@ int sithCog_ReadCogScriptsListText(SithWorld *lvl, int a2)
     SithWorld *v6; // edi
     uint32_t v7; // eax
     int32_t v8; // esi
-    char cog_fpath[128]; // [esp+10h] [ebp-80h] BYREF
+    char aName[128]; // [esp+10h] [ebp-80h] BYREF
 
     // Added: ??
     v8 = 0;
@@ -1607,7 +1607,7 @@ SithCogScript* sithCog_LoadScript(const char *pFpath, int32_t unk)
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
             // The copies of names are load-bearing, SetKeyVal stores a reference
-            stdHashtbl_Add(sithCog_g_pHashtable, v5->cog_fpath, v5);
+            stdHashtbl_Add(sithCog_g_pHashtable, v5->aName, v5);
 #else
             stdHashtbl_Add(sithCog_g_pHashtable, pFpath, v5);
 #endif
@@ -1684,10 +1684,10 @@ void sithCog_ProcessCog(sithCog *cog)
 {
     if (!(cog->flags & SITH_COG_DISABLED))
     {
-        //printf("%x %x %x %s\n", cog->flags, sithTime_g_msecGameTime, cog->nextPulseMs, cog->cogscript_fpath);
-        if ( (cog->flags & SITH_COG_PULSE_SET) && sithTime_g_msecGameTime >= cog->nextPulseMs )
+        //printf("%x %x %x %s\n", cog->flags, sithTime_g_msecGameTime, cog->msecNextPulseTime, cog->aName);
+        if ( (cog->flags & SITH_COG_PULSE_SET) && sithTime_g_msecGameTime >= cog->msecNextPulseTime )
         {
-            cog->nextPulseMs = sithTime_g_msecGameTime + cog->pulsePeriodMs;
+            cog->msecNextPulseTime = sithTime_g_msecGameTime + cog->msecPulseInterval;
             sithCog_SendMessage(cog, SITH_MESSAGE_PULSE, 0, 0, 0, 0, 0);
         }
 
@@ -1699,12 +1699,12 @@ void sithCog_ProcessCog(sithCog *cog)
         }
         if ( cog->script_running == 2 )
         {
-            if ( cog->wakeTimeMs >= sithTime_g_msecGameTime )
+            if ( cog->msecTimerTimeout >= sithTime_g_msecGameTime )
                 return;
             if ((cog->flags & SITH_COG_DEBUG))
             {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-                _sprintf(std_g_genBuffer, "Cog %s: Waking up due to timer elapse.\n", cog->cogscript_fpath);
+                _sprintf(std_g_genBuffer, "Cog %s: Waking up due to timer elapse.\n", cog->aName);
                 sithConsole_PrintString(std_g_genBuffer);
 #endif
             }
@@ -1712,12 +1712,12 @@ void sithCog_ProcessCog(sithCog *cog)
             sithCogExec_Execute(cog);
             return;
         }
-        if ( cog->script_running == 3 && (sithWorld_g_pCurrentWorld->aThings[cog->wakeTimeMs].trackParams.flags & 3) == 0 )
+        if ( cog->script_running == 3 && (sithWorld_g_pCurrentWorld->aThings[cog->msecTimerTimeout].trackParams.flags & 3) == 0 )
         {
             if ((cog->flags & SITH_COG_DEBUG))
             {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-                _sprintf(std_g_genBuffer, "Cog %s: Waking up due to movement completion.\n", cog->cogscript_fpath);
+                _sprintf(std_g_genBuffer, "Cog %s: Waking up due to movement completion.\n", cog->aName);
                 sithConsole_PrintString(std_g_genBuffer);
 #endif
             }
@@ -1735,7 +1735,7 @@ int sithCog_TimerEventTask(int32_t deltaMs, SithEventParams *info)
     sithCog *v4; // eax
 
     v2 = sithWorld_g_pCurrentWorld;
-    v3 = info->cogIdx;
+    v3 = info->idx;
     if ( (v3 & 0x8000u) != 0 )
     {
         v2 = sithWorld_g_pStaticWorld;
@@ -1746,7 +1746,7 @@ int sithCog_TimerEventTask(int32_t deltaMs, SithEventParams *info)
     else
         v4 = 0;
     if ( v4 )
-        sithCog_SendMessageEx(v4, SITH_MESSAGE_TIMER, SENDERTYPE_COG, v4->selfCog, 0, 0, info->timerIdx, info->field_10, info->field_14, 0.0, 0.0);
+        sithCog_SendMessageEx(v4, SITH_MESSAGE_TIMER, SENDERTYPE_COG, v4->idx, 0, 0, info->timerIdx, info->field_10, info->field_14, 0.0, 0.0);
     return 1;
 }
 
@@ -1767,15 +1767,15 @@ int sithCog_CogStatus(stdDebugConsoleCmd *cmd, const char *extra)
       && extra
       && _sscanf(extra, "%d", &tmp) == 1
       && tmp <= world->numCogs
-      && (v3 = &world->aCogs[tmp], v3->cogscript)
+      && (v3 = &world->aCogs[tmp], v3->pScript)
       && v3->pSymbolTable )
     {
-        _sprintf(std_g_genBuffer, "Cog #%d: Name:%s  Script %s\n", tmp, v3->cogscript_fpath, v3->cogscript->cog_fpath);
+        _sprintf(std_g_genBuffer, "Cog #%d: Name:%s  Script %s\n", tmp, v3->aName, v3->pScript->aName);
         sithConsole_PrintString(std_g_genBuffer);
         v4 = v3->pSymbolTable;
         v5 = 0;
-        v6 = v4->buckets;
-        if ( v4->entry_cnt )
+        v6 = v4->aSymbols;
+        if ( v4->numUsedSymbols )
         {
             do
             {
@@ -1786,7 +1786,7 @@ int sithCog_CogStatus(stdDebugConsoleCmd *cmd, const char *extra)
 #endif
                 if ( !v7 )
                     v7 = "<null>";
-                _sprintf(std_g_genBuffer, "  Symbol %d: '%s' ", v6->symbol_id, v7);
+                _sprintf(std_g_genBuffer, "  Symbol %d: '%s' ", v6->id, v7);
                 if ( v6->val.type == 2 )
                     _sprintf(&std_g_genBuffer[_strlen(std_g_genBuffer)], " = %f\n", v6->val.dataAsFloat[0]);
                 else
@@ -1795,7 +1795,7 @@ int sithCog_CogStatus(stdDebugConsoleCmd *cmd, const char *extra)
                 ++v5;
                 ++v6;
             }
-            while ( v5 < v3->pSymbolTable->entry_cnt );
+            while ( v5 < v3->pSymbolTable->numUsedSymbols );
         }
     }
     else
@@ -1829,12 +1829,12 @@ sithCog* sithCog_GetCogByIndex(int32_t idx)
 void sithCog_FreeEntry(sithCog *cog)
 {
     sithCogParse_FreeSymbolTable(cog->pSymbolTable);
-    for (uint32_t i = 0; i < cog->cogscript->numIdk; i++)
+    for (uint32_t i = 0; i < cog->pScript->numSymbolRefs; i++)
     {
-        if ( cog->cogscript->aIdk[i].desc )
+        if ( cog->pScript->aSymRefs[i].desc )
         {
-            SITH_FREE(cog->cogscript->aIdk[i].desc);
-            cog->cogscript->aIdk[i].desc = NULL;
+            SITH_FREE(cog->pScript->aSymRefs[i].desc);
+            cog->pScript->aSymRefs[i].desc = NULL;
         }
     }
     if ( cog->heap )
@@ -1844,13 +1844,13 @@ void sithCog_FreeEntry(sithCog *cog)
     }
 }
 
-void sithCog_FreeScriptEntry(SithCogScript *cogscript)
+void sithCog_FreeScriptEntry(SithCogScript *pScript)
 {
-    sithCogParse_FreeSymbolTable(cogscript->pSymbolTable);
-    if ( cogscript->script_program )
+    sithCogParse_FreeSymbolTable(pScript->pSymbolTable);
+    if ( pScript->pCode )
     {
-        SITH_FREE(cogscript->script_program);
-        cogscript->script_program = NULL;
+        SITH_FREE(pScript->pCode);
+        pScript->pCode = NULL;
     }
 }
 

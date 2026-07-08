@@ -95,7 +95,7 @@ int sithAIAwareness_Update(int32_t a, SithEventParams* b)
 
         SithAIControlBlock* i = &sithAI_actors[v3];
 
-        if ( i->pAIClass )
+        if ( i->pClass )
         {
             if ( i->thing )
             {
