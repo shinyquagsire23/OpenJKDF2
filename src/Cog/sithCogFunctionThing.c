@@ -513,6 +513,8 @@ void sithCogFunctionThing_WaitForStop(sithCog *pCog)
 
 void sithCogFunctionThing_GetThingSector(sithCog *pCog)
 {
+    SITH_ASSERTREL(pCog); // Added
+
     SithSector *sector;
 
     SithThing* pThing = sithCogExec_PopThing(pCog);
@@ -524,6 +526,8 @@ void sithCogFunctionThing_GetThingSector(sithCog *pCog)
 
 void sithCogFunctionThing_GetCurFrame(sithCog *pCog)
 {
+    SITH_ASSERTREL(pCog); // Added
+
     SithThing* pThing = sithCogExec_PopThing(pCog);
 
     if ( pThing && pThing->moveType == SITH_MT_PATH )
@@ -534,6 +538,8 @@ void sithCogFunctionThing_GetCurFrame(sithCog *pCog)
 
 void sithCogFunctionThing_GetGoalFrame(sithCog *pCog)
 {
+    SITH_ASSERTREL(pCog); // Added
+
     SithThing* pThing = sithCogExec_PopThing(pCog);
 
     if ( pThing && pThing->moveType == SITH_MT_PATH )
@@ -563,6 +569,8 @@ void sithCogFunctionThing_StopThing(sithCog *pCog)
 
 void sithCogFunctionThing_IsThingMoving(sithCog *pCog)
 {
+    SITH_ASSERTREL(pCog); // Added
+
     SithThing* pThing = sithCogExec_PopThing(pCog);
     if ( !pThing || pThing->type == SITH_THING_FREE )
     {
