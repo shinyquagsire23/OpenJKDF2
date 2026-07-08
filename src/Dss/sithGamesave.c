@@ -461,14 +461,14 @@ int sithGamesave_SerializeAllThings(int mpFlags)
 
     for (uint32_t i = 0; i < sithWorld_pCurrentWorld->numCogsLoaded; i++)
     {
-        sithDSSCog_SendSyncCog(&sithWorld_pCurrentWorld->cogs[i], 0, mpFlags);
+        sithDSSCog_SyncCogState(&sithWorld_pCurrentWorld->cogs[i], 0, mpFlags);
     }
 
     if ( sithWorld_pStatic )
     {
         for (uint32_t i = 0; i < sithWorld_pStatic->numCogsLoaded; i++)
         {
-            sithDSSCog_SendSyncCog(&sithWorld_pStatic->cogs[i], 0, mpFlags);
+            sithDSSCog_SyncCogState(&sithWorld_pStatic->cogs[i], 0, mpFlags);
         }
     }
 

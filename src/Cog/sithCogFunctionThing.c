@@ -1831,7 +1831,7 @@ void sithCogFunctionThing_SkillTarget(sithCog *ctx)
     {
         if ( sithNet_isMulti && pThing->type == SITH_THING_PLAYER )
         {
-            sithDSSCog_SendSendTrigger(
+            sithDSSCog_SendMessage(
                 classCog,
                 SITH_MESSAGE_SKILL,
                 SENDERTYPE_THING,

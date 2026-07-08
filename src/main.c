@@ -1510,9 +1510,9 @@ void do_hooks()
 #endif
 
     // sithDSSCog
-    hook_function(sithDSSCog_SendSendTrigger_ADDR, sithDSSCog_SendSendTrigger);
-    hook_function(sithDSSCog_ProcessSendTrigger_ADDR, sithDSSCog_ProcessSendTrigger);
-    hook_function(sithDSSCog_SendSyncCog_ADDR, sithDSSCog_SendSyncCog);
+    hook_function(sithDSSCog_SendMessage_ADDR, sithDSSCog_SendMessage);
+    hook_function(sithDSSCog_ProcessMessage_ADDR, sithDSSCog_ProcessMessage);
+    hook_function(sithDSSCog_SyncCogState_ADDR, sithDSSCog_SyncCogState);
     
     // Window
     hook_function(Window_AddMsgHandler_ADDR, Window_AddMsgHandler);

@@ -7,7 +7,7 @@
 #include "Devices/sithComm.h"
 #include "Main/Main.h"
 
-int sithDSSCog_SendSendTrigger(sithCog *a1, int a2, int a3, int a4, int a5, int a6, int a7, flex32_t param0, flex32_t param1, flex32_t param2, flex32_t param3, int a11)
+int sithDSSCog_SendMessage(sithCog *a1, int a2, int a3, int a4, int a5, int a6, int a7, flex32_t param0, flex32_t param1, flex32_t param2, flex32_t param3, int a11)
 {
     int v12; // edi
     sithThing *v13; // eax
@@ -51,7 +51,7 @@ int sithDSSCog_SendSendTrigger(sithCog *a1, int a2, int a3, int a4, int a5, int 
     return sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, a11, 1, v12);
 }
 
-int sithDSSCog_ProcessSendTrigger(sithCogMsg *in_netMsg)
+int sithDSSCog_ProcessMessage(sithCogMsg *in_netMsg)
 {
     int senderType; // edi
     int senderIdx; // ebx
@@ -109,7 +109,7 @@ int sithDSSCog_ProcessSendTrigger(sithCogMsg *in_netMsg)
     return 1;
 }
 
-int sithDSSCog_SendSyncCog(sithCog *cog, int sendto_id, int mpFlags)
+int sithDSSCog_SyncCogState(sithCog *cog, int sendto_id, int mpFlags)
 {
     sithCogSymboltable *v13; // ebp
     
@@ -186,7 +186,7 @@ int sithDSSCog_SendSyncCog(sithCog *cog, int sendto_id, int mpFlags)
     return sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendto_id, mpFlags, 1);
 }
 
-int sithDSSCog_ProcessSyncCog(sithCogMsg *msg)
+int sithDSSCog_ProcessCogState(sithCogMsg *msg)
 {
     sithCog *cog; // eax
     sithCogSymboltable *v13; // ebp

@@ -1211,7 +1211,7 @@ void sithCogFunction_SendTrigger(sithCog *ctx)
                     if ( sourceThing == sithPlayer_pLocalPlayerThing )
                         sithCog_SendMessageToAll(SITH_MESSAGE_TRIGGER, SENDERTYPE_THING, sithPlayer_pLocalPlayerThing->thingIdx, 0, sourceType, arg0, arg1, arg2, arg3);
                     else
-                        sithDSSCog_SendSendTrigger(
+                        sithDSSCog_SendMessage(
                             0,
                             SITH_MESSAGE_TRIGGER,
                             SENDERTYPE_THING,
@@ -1230,7 +1230,7 @@ void sithCogFunction_SendTrigger(sithCog *ctx)
     }
     else
     {
-        sithDSSCog_SendSendTrigger(
+        sithDSSCog_SendMessage(
             0,
             SITH_MESSAGE_TRIGGER,
             SENDERTYPE_THING,

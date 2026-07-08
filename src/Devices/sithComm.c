@@ -27,12 +27,12 @@ int sithComm_Startup()
     sithComm_msgFuncs[DSS_WELCOME] = sithMulti_ProcessJoinLeave;
     sithComm_msgFuncs[DSS_DEATH] = sithDSSThing_ProcessDeath;
     sithComm_msgFuncs[DSS_DAMAGE] = sithDSSThing_ProcessDamage;
-    sithComm_msgFuncs[DSS_SENDTRIGGER] = sithDSSCog_ProcessSendTrigger;
+    sithComm_msgFuncs[DSS_SENDTRIGGER] = sithDSSCog_ProcessMessage;
     sithComm_msgFuncs[DSS_SYNCTHING] = sithDSSThing_ProcessSyncThing;
     sithComm_msgFuncs[DSS_PLAYSOUND] = sithDSSThing_ProcessPlaySound;
     sithComm_msgFuncs[DSS_PLAYKEY] = sithDSSThing_ProcessPlayKey;
     sithComm_msgFuncs[DSS_THINGFULLDESC] = sithDSSThing_ProcessFullDesc;
-    sithComm_msgFuncs[DSS_SYNCCOG] = sithDSSCog_ProcessSyncCog;
+    sithComm_msgFuncs[DSS_SYNCCOG] = sithDSSCog_ProcessCogState;
     sithComm_msgFuncs[DSS_SURFACESTATUS] = sithDSS_ProcessSurfaceStatus;
     sithComm_msgFuncs[DSS_AISTATUS] = sithDSS_ProcessAIStatus;
     sithComm_msgFuncs[DSS_INVENTORY] = sithDSS_ProcessInventory;

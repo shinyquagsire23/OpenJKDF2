@@ -1235,7 +1235,7 @@ void sithCog_SendMessage(sithCog *cog, int32_t msgid, int32_t senderType, int32_
         // Send objectives to everyone
         //printf("Send objective to everyone\n");
         //if (param3 != 1234.0)
-        sithDSSCog_SendSendTrigger(
+        sithDSSCog_SendMessage(
             cog,
             msgid,
             senderType,
@@ -1280,7 +1280,7 @@ execute:
     }
     else if ( msgid != SITH_MESSAGE_PULSE && msgid != SITH_MESSAGE_TIMER )
     {
-        sithDSSCog_SendSendTrigger(cog, msgid, senderType, senderIndex, sourceType, sourceIndex, linkId, 0.0, 0.0, 0.0, 0.0, sithNet_serverNetId);
+        sithDSSCog_SendMessage(cog, msgid, senderType, senderIndex, sourceType, sourceIndex, linkId, 0.0, 0.0, 0.0, 0.0, sithNet_serverNetId);
     }
 }
 
@@ -1372,7 +1372,7 @@ cog_flex_t sithCog_SendMessageEx(sithCog *cog, int32_t message, int32_t senderTy
         // Send objectives to everyone
         //printf("Send objective to everyone\n");
         if (param3 != 1234.0) {
-            sithDSSCog_SendSendTrigger(
+            sithDSSCog_SendMessage(
                 cog,
                 message,
                 senderType,
@@ -1424,7 +1424,7 @@ execute:
     }
     else
     {
-        sithDSSCog_SendSendTrigger(
+        sithDSSCog_SendMessage(
             cog,
             message,
             senderType,
