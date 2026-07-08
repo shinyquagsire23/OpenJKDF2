@@ -23,15 +23,28 @@ lets fixes/insights flow between them.
 
 ## Hard constraints
 
-- **Do NOT change the OpenJKDF2 folder layout.** OpenJKDF2 uses a flat
-  `src/<Category>/` layout; OpenJones3D uses `Libs/<lib>/<Category>/`. Re-homing
-  files to match Jones3D's layout is deferred to a *future* project. This project
-  only touches **symbol names**, not file locations.
-- Follow the OpenJKDF2 `CLAUDE.md` conventions. In particular, when a rename
-  changes original in-`JK.EXE` code, keep the loose-Hungarian conventions and add
-  `// Added:` notes only where behavior (not just a name) diverges from the
-  decomp baseline. Pure identifier renames that preserve behavior don't need
-  `// Added:`.
+- **Don't re-home files across directories** to mirror OpenJones3D's
+  `Libs/<lib>/<Category>/` tree — that cross-directory reorganization is a
+  *future* project. OpenJKDF2 keeps its flat `src/<Category>/` layout.
+- **DO rename a C/H file when the module's *file* name differs** between the two
+  projects (e.g. `rdPolyLine`↔`rdPolyline`, `stdHashTable`↔`stdHashtbl`,
+  `stdLinklist`↔`stdLinkList`), and **split/merge files** when the module
+  decomposition differs (e.g. DF2 `sithAICmd` ↔ J3D `sithAIInstinct` +
+  `sithAIMove` + `sithAIUtil`) — refactor to match OpenJones3D's file
+  organization, staying within the current directory. A file rename also touches
+  the `#include`s, the include-guard macro, and `CMakeLists.txt`.
+  (NB: a differing *function prefix* does not always imply a file rename — J3D's
+  `sithMessage_*` functions still live in a file named `sithComm.c`, so `sithComm`
+  keeps its filename and only its functions are renamed.)
+- **Prefer the OpenJKDF2 name when it is clearer than the OpenJones3D name.** The
+  goal is the best canonical name, not blind matching. In particular, **skip any
+  rename whose J3D target is an unnamed `sub_XXXXXX`** (a Jones3D binary address,
+  meaningless in JK.EXE and a loss of information) — keep the DF2 name. The
+  reverse, DF2 `sub_XXXXXX` → a descriptive J3D name, **is** applied.
+- Follow the OpenJKDF2 `CLAUDE.md` conventions. When a rename changes original
+  in-`JK.EXE` code, keep loose-Hungarian conventions; add `// Added:` notes only
+  where behavior (not just a name) diverges from the decomp baseline. Pure
+  identifier renames that preserve behavior don't need `// Added:`.
 - OpenJones3D is the **reference** and is never modified — we only read it.
 
 ## Method (per module)
@@ -112,7 +125,7 @@ Symbols with **no** OpenJones3D counterpart (JK-only features, platform backends
 ## Progress
 
 **91 shared engine modules** identified (52 sith · 20 rdroid · 18 std · 1 w32util).
-Functions-only pass completed: **1 / 91**.
+Functions-only pass completed: **52 / 91**.
 
 Current phase: **functions only** (per project decision, globals → struct
 members/names/typedefs come in later passes). `_Startup` functions are **kept**
@@ -140,58 +153,58 @@ as-is (DF2 soft-reset convention), not renamed to J3D's `_Reset`/`_ResetGlobals`
 
 | ☐ | DF2 module | J3D module | DF2 src | J3D src | Notes |
 |---|-----------|-----------|---------|---------|-------|
-| ☐ | `sithAI` | `sithAI` | AI/sithAI.c | Libs/sith/AI/sithAI.c |  |
-| ☐ | `sithAIAwareness` | `sithAIAwareness` | AI/sithAIAwareness.c | Libs/sith/AI/sithAIAwareness.c |  |
-| ☐ | `sithAIClass` | `sithAIClass` | AI/sithAIClass.c | Libs/sith/AI/sithAIClass.c |  |
-| ☐ | `sithActor` | `sithActor` | World/sithActor.c | Libs/sith/World/sithActor.c |  |
-| ☐ | `sithCamera` | `sithCamera` | Engine/sithCamera.c | Libs/sith/Engine/sithCamera.c |  |
-| ☐ | `sithCog` | `sithCog` | Cog/sithCog.c | Libs/sith/Cog/sithCog.c |  |
-| ☐ | `sithCogExec` | `sithCogExec` | Cog/sithCogExec.c | Libs/sith/Cog/sithCogExec.c |  |
-| ☐ | `sithCogFunction` | `sithCogFunction` | Cog/sithCogFunction.c | Libs/sith/Cog/sithCogFunction.c |  |
-| ☐ | `sithCogFunctionAI` | `sithCogFunctionAI` | Cog/sithCogFunctionAI.c | Libs/sith/Cog/sithCogFunctionAI.c |  |
-| ☐ | `sithCogFunctionPlayer` | `sithCogFunctionPlayer` | Cog/sithCogFunctionPlayer.c | Libs/sith/Cog/sithCogFunctionPlayer.c |  |
-| ☐ | `sithCogFunctionSector` | `sithCogFunctionSector` | Cog/sithCogFunctionSector.c | Libs/sith/Cog/sithCogFunctionSector.c |  |
-| ☐ | `sithCogFunctionSound` | `sithCogFunctionSound` | Cog/sithCogFunctionSound.c | Libs/sith/Cog/sithCogFunctionSound.c |  |
-| ☐ | `sithCogFunctionSurface` | `sithCogFunctionSurface` | Cog/sithCogFunctionSurface.c | Libs/sith/Cog/sithCogFunctionSurface.c |  |
-| ☐ | `sithCogFunctionThing` | `sithCogFunctionThing` | Cog/sithCogFunctionThing.c | Libs/sith/Cog/sithCogFunctionThing.c |  |
-| ☐ | `sithCogParse` | `sithCogParse` | Cog/sithCogParse.c | Libs/sith/Cog/sithCogParse.c |  |
-| ☐ | `sithCollision` | `sithCollision` | Engine/sithCollision.c | Libs/sith/Engine/sithCollision.c |  |
-| ☐ | `sithComm` | `sithComm` | Devices/sithComm.c | Libs/sith/Devices/sithComm.c |  |
-| ☐ | `sithCommand` | `sithCommand` | Main/sithCommand.c | Libs/sith/Main/sithCommand.c |  |
-| ☐ | `sithConsole` | `sithConsole` | Devices/sithConsole.c | Libs/sith/Devices/sithConsole.c |  |
-| ☐ | `sithControl` | `sithControl` | Devices/sithControl.c | Libs/sith/Devices/sithControl.c |  |
-| ☐ | `sithDSS` | `sithDSS` | Dss/sithDSS.c | Libs/sith/Dss/sithDSS.c |  |
-| ☐ | `sithDSSCog` | `sithDSSCog` | Dss/sithDSSCog.c | Libs/sith/Dss/sithDSSCog.c |  |
-| ☐ | `sithDSSThing` | `sithDSSThing` | Dss/sithDSSThing.c | Libs/sith/Dss/sithDSSThing.c |  |
-| ☐ | `sithEvent` | `sithEvent` | Gameplay/sithEvent.c | Libs/sith/Gameplay/sithEvent.c |  |
-| ☐ | `sithExplosion` | `sithExplosion` | World/sithExplosion.c | Libs/sith/World/sithExplosion.c |  |
-| ☐ | `sithGamesave` | `sithGamesave` | Dss/sithGamesave.c | Libs/sith/Dss/sithGamesave.c |  |
-| ☐ | `sithIntersect` | `sithIntersect` | Engine/sithIntersect.c | Libs/sith/Engine/sithIntersect.c |  |
-| ☐ | `sithInventory` | `sithInventory` | Gameplay/sithInventory.c | Libs/sith/Gameplay/sithInventory.c |  |
-| ☐ | `sithItem` | `sithItem` | World/sithItem.c | Libs/sith/World/sithItem.c |  |
-| ☐ | `sithMain` | `sithMain` | Main/sithMain.c | Libs/sith/Main/sithMain.c |  |
-| ☐ | `sithMaterial` | `sithMaterial` | World/sithMaterial.c | Libs/sith/World/sithMaterial.c |  |
-| ☐ | `sithModel` | `sithModel` | World/sithModel.c | Libs/sith/World/sithModel.c |  |
-| ☐ | `sithMulti` | `sithMulti` | Dss/sithMulti.c | Libs/sith/Dss/sithMulti.c |  |
-| ☐ | `sithOverlayMap` | `sithOverlayMap` | Gameplay/sithOverlayMap.c | Libs/sith/Gameplay/sithOverlayMap.c |  |
-| ☐ | `sithParticle` | `sithParticle` | Engine/sithParticle.c | Libs/sith/Engine/sithParticle.c |  |
-| ☐ | `sithPhysics` | `sithPhysics` | Engine/sithPhysics.c | Libs/sith/Engine/sithPhysics.c |  |
-| ☐ | `sithPlayer` | `sithPlayer` | Gameplay/sithPlayer.c | Libs/sith/Gameplay/sithPlayer.c |  |
-| ☐ | `sithPlayerActions` | `sithPlayerActions` | Gameplay/sithPlayerActions.c | Libs/sith/Gameplay/sithPlayerActions.c |  |
-| ☐ | `sithPuppet` | `sithPuppet` | Engine/sithPuppet.c | Libs/sith/Engine/sithPuppet.c |  |
-| ☐ | `sithRender` | `sithRender` | Engine/sithRender.c | Libs/sith/Engine/sithRender.c |  |
-| ☐ | `sithRenderSky` | `sithRenderSky` | Engine/sithRenderSky.c | Libs/sith/Engine/sithRenderSky.c |  |
-| ☐ | `sithSector` | `sithSector` | World/sithSector.c | Libs/sith/World/sithSector.c |  |
-| ☐ | `sithSound` | `sithSound` | Devices/sithSound.c | Libs/sith/Devices/sithSound.c |  |
-| ☐ | `sithSoundClass` | `sithSoundClass` | World/sithSoundClass.c | Libs/sith/World/sithSoundClass.c |  |
-| ☐ | `sithSoundMixer` | `sithSoundMixer` | Devices/sithSoundMixer.c | Libs/sith/Devices/sithSoundMixer.c |  |
-| ☐ | `sithSprite` | `sithSprite` | World/sithSprite.c | Libs/sith/World/sithSprite.c |  |
-| ☐ | `sithSurface` | `sithSurface` | World/sithSurface.c | Libs/sith/World/sithSurface.c |  |
-| ☐ | `sithTemplate` | `sithTemplate` | World/sithTemplate.c | Libs/sith/World/sithTemplate.c |  |
-| ☐ | `sithThing` | `sithThing` | World/sithThing.c | Libs/sith/World/sithThing.c |  |
+| ☑fn | `sithAI` | `sithAI` | AI/sithAI.c | Libs/sith/AI/sithAI.c |  |
+| ☑fn | `sithAIAwareness` | `sithAIAwareness` | AI/sithAIAwareness.c | Libs/sith/AI/sithAIAwareness.c |  |
+| ☑fn | `sithAIClass` | `sithAIClass` | AI/sithAIClass.c | Libs/sith/AI/sithAIClass.c |  |
+| ☑fn | `sithActor` | `sithActor` | World/sithActor.c | Libs/sith/World/sithActor.c |  |
+| ☑fn | `sithCamera` | `sithCamera` | Engine/sithCamera.c | Libs/sith/Engine/sithCamera.c |  |
+| ☑fn | `sithCog` | `sithCog` | Cog/sithCog.c | Libs/sith/Cog/sithCog.c |  |
+| ☑fn | `sithCogExec` | `sithCogExec` | Cog/sithCogExec.c | Libs/sith/Cog/sithCogExec.c |  |
+| ☑fn | `sithCogFunction` | `sithCogFunction` | Cog/sithCogFunction.c | Libs/sith/Cog/sithCogFunction.c |  |
+| ☑fn | `sithCogFunctionAI` | `sithCogFunctionAI` | Cog/sithCogFunctionAI.c | Libs/sith/Cog/sithCogFunctionAI.c |  |
+| ☑fn | `sithCogFunctionPlayer` | `sithCogFunctionPlayer` | Cog/sithCogFunctionPlayer.c | Libs/sith/Cog/sithCogFunctionPlayer.c |  |
+| ☑fn | `sithCogFunctionSector` | `sithCogFunctionSector` | Cog/sithCogFunctionSector.c | Libs/sith/Cog/sithCogFunctionSector.c |  |
+| ☑fn | `sithCogFunctionSound` | `sithCogFunctionSound` | Cog/sithCogFunctionSound.c | Libs/sith/Cog/sithCogFunctionSound.c |  |
+| ☑fn | `sithCogFunctionSurface` | `sithCogFunctionSurface` | Cog/sithCogFunctionSurface.c | Libs/sith/Cog/sithCogFunctionSurface.c |  |
+| ☑fn | `sithCogFunctionThing` | `sithCogFunctionThing` | Cog/sithCogFunctionThing.c | Libs/sith/Cog/sithCogFunctionThing.c |  |
+| ☑fn | `sithCogParse` | `sithCogParse` | Cog/sithCogParse.c | Libs/sith/Cog/sithCogParse.c |  |
+| ☑fn | `sithCollision` | `sithCollision` | Engine/sithCollision.c | Libs/sith/Engine/sithCollision.c |  |
+| ☑fn | `sithComm` | `sithComm` | Devices/sithComm.c | Libs/sith/Devices/sithComm.c |  |
+| ☑fn | `sithCommand` | `sithCommand` | Main/sithCommand.c | Libs/sith/Main/sithCommand.c |  |
+| ☑fn | `sithConsole` | `sithConsole` | Devices/sithConsole.c | Libs/sith/Devices/sithConsole.c |  |
+| ☑fn | `sithControl` | `sithControl` | Devices/sithControl.c | Libs/sith/Devices/sithControl.c |  |
+| ☑fn | `sithDSS` | `sithDSS` | Dss/sithDSS.c | Libs/sith/Dss/sithDSS.c |  |
+| ☑fn | `sithDSSCog` | `sithDSSCog` | Dss/sithDSSCog.c | Libs/sith/Dss/sithDSSCog.c |  |
+| ☑fn | `sithDSSThing` | `sithDSSThing` | Dss/sithDSSThing.c | Libs/sith/Dss/sithDSSThing.c |  |
+| ☑fn | `sithEvent` | `sithEvent` | Gameplay/sithEvent.c | Libs/sith/Gameplay/sithEvent.c |  |
+| ☑fn | `sithExplosion` | `sithExplosion` | World/sithExplosion.c | Libs/sith/World/sithExplosion.c |  |
+| ☑fn | `sithGamesave` | `sithGamesave` | Dss/sithGamesave.c | Libs/sith/Dss/sithGamesave.c |  |
+| ☑fn | `sithIntersect` | `sithIntersect` | Engine/sithIntersect.c | Libs/sith/Engine/sithIntersect.c |  |
+| ☑fn | `sithInventory` | `sithInventory` | Gameplay/sithInventory.c | Libs/sith/Gameplay/sithInventory.c |  |
+| ☑fn | `sithItem` | `sithItem` | World/sithItem.c | Libs/sith/World/sithItem.c |  |
+| ☑fn | `sithMain` | `sithMain` | Main/sithMain.c | Libs/sith/Main/sithMain.c |  |
+| ☑fn | `sithMaterial` | `sithMaterial` | World/sithMaterial.c | Libs/sith/World/sithMaterial.c |  |
+| ☑fn | `sithModel` | `sithModel` | World/sithModel.c | Libs/sith/World/sithModel.c |  |
+| ☑fn | `sithMulti` | `sithMulti` | Dss/sithMulti.c | Libs/sith/Dss/sithMulti.c |  |
+| ☑fn | `sithOverlayMap` | `sithOverlayMap` | Gameplay/sithOverlayMap.c | Libs/sith/Gameplay/sithOverlayMap.c |  |
+| ☑fn | `sithParticle` | `sithParticle` | Engine/sithParticle.c | Libs/sith/Engine/sithParticle.c |  |
+| ☑fn | `sithPhysics` | `sithPhysics` | Engine/sithPhysics.c | Libs/sith/Engine/sithPhysics.c |  |
+| ☑fn | `sithPlayer` | `sithPlayer` | Gameplay/sithPlayer.c | Libs/sith/Gameplay/sithPlayer.c |  |
+| ☑fn | `sithPlayerActions` | `sithPlayerActions` | Gameplay/sithPlayerActions.c | Libs/sith/Gameplay/sithPlayerActions.c |  |
+| ☑fn | `sithPuppet` | `sithPuppet` | Engine/sithPuppet.c | Libs/sith/Engine/sithPuppet.c |  |
+| ☑fn | `sithRender` | `sithRender` | Engine/sithRender.c | Libs/sith/Engine/sithRender.c |  |
+| ☑fn | `sithRenderSky` | `sithRenderSky` | Engine/sithRenderSky.c | Libs/sith/Engine/sithRenderSky.c | funcs done; globals/members pending |
+| ☑fn | `sithSector` | `sithSector` | World/sithSector.c | Libs/sith/World/sithSector.c |  |
+| ☑fn | `sithSound` | `sithSound` | Devices/sithSound.c | Libs/sith/Devices/sithSound.c |  |
+| ☑fn | `sithSoundClass` | `sithSoundClass` | World/sithSoundClass.c | Libs/sith/World/sithSoundClass.c |  |
+| ☑fn | `sithSoundMixer` | `sithSoundMixer` | Devices/sithSoundMixer.c | Libs/sith/Devices/sithSoundMixer.c |  |
+| ☑fn | `sithSprite` | `sithSprite` | World/sithSprite.c | Libs/sith/World/sithSprite.c |  |
+| ☑fn | `sithSurface` | `sithSurface` | World/sithSurface.c | Libs/sith/World/sithSurface.c |  |
+| ☑fn | `sithTemplate` | `sithTemplate` | World/sithTemplate.c | Libs/sith/World/sithTemplate.c |  |
+| ☑fn | `sithThing` | `sithThing` | World/sithThing.c | Libs/sith/World/sithThing.c |  |
 | ☑fn | `sithTime` | `sithTime` | Gameplay/sithTime.c | Libs/sith/Gameplay/sithTime.c | funcs done; globals/members pending |
-| ☐ | `sithWeapon` | `sithWeapon` | World/sithWeapon.c | Libs/sith/World/sithWeapon.c |  |
-| ☐ | `sithWorld` | `sithWorld` | World/sithWorld.c | Libs/sith/World/sithWorld.c |  |
+| ☑fn | `sithWeapon` | `sithWeapon` | World/sithWeapon.c | Libs/sith/World/sithWeapon.c |  |
+| ☑fn | `sithWorld` | `sithWorld` | World/sithWorld.c | Libs/sith/World/sithWorld.c |  |
 
 ### rdroid  (20 modules)
 
