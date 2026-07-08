@@ -17,12 +17,12 @@ typedef struct rdModel3 rdModel3;
 
 int sithModel_Startup();
 void sithModel_Shutdown();
-int sithModel_ReadStaticModelsListText(SithWorld *world, int a2);
-void sithModel_FreeWorldModels(SithWorld *world);
-rdModel3* sithModel_Load(const char *model_3do_fname, int unk);
-uint32_t sithModel_GetModelMemUsage(rdModel3 *model);
-int sithModel_AllocWorldModels(SithWorld *world, int num);
-rdModel3* sithModel_GetModelByIndex(int idx);
+int sithModel_ReadStaticModelsListText(SithWorld *pWorld, int bSkip);
+void sithModel_FreeWorldModels(SithWorld *pWorld);
+rdModel3* sithModel_Load(const char *pName, int bSkipDefault);
+uint32_t sithModel_GetModelMemUsage(rdModel3 *pModel);
+int sithModel_AllocWorldModels(SithWorld *pWorld, int size);
+rdModel3* sithModel_GetModelByIndex(int modelIdx);
 
 //static rdModel3* (*sithModel_LoadEntry_)(const char *model_3do_fname, int unk) = (void*)sithModel_Load_ADDR;
 

@@ -24,32 +24,32 @@ void sithModel_Shutdown()
     }
 }
 
-int sithModel_ReadStaticModelsListText(SithWorld *world, int a2)
+int sithModel_ReadStaticModelsListText(SithWorld *pWorld, int bSkip)
 {
     int sizeModels;
     flex_t loadStep;
     flex_t loadProgress;
 
-    if ( a2 )
+    if ( bSkip )
         return 0;
     stdConffile_ReadArgs();
     if ( _memcmp(stdConffile_g_entry.aArgs[0].value, "world", 6u) || _memcmp(stdConffile_g_entry.aArgs[1].value, "models", 7u) )
         return 0;
-    world->sizeModels = _atoi(stdConffile_g_entry.aArgs[2].value);
-    if ( !world->sizeModels )
+    pWorld->sizeModels = _atoi(stdConffile_g_entry.aArgs[2].value);
+    if ( !pWorld->sizeModels )
         return 1;
 
-    world->aModels = (rdModel3 *)SITH_ALLOC(sizeof(rdModel3) * world->sizeModels);
-    if ( !world->aModels )
+    pWorld->aModels = (rdModel3 *)SITH_ALLOC(sizeof(rdModel3) * pWorld->sizeModels);
+    if ( !pWorld->aModels )
     {
         stdPrintf(pSithHS->errorPrint, ".\\World\\sithModel.c", 164, "Memory error while reading models, line %d.\n", stdConffile_linenum, 0, 0, 0);
         return 0;
     }
-    world->numModels = 0;
-    _memset(world->aModels, 0, sizeof(rdModel3) * world->sizeModels);
+    pWorld->numModels = 0;
+    _memset(pWorld->aModels, 0, sizeof(rdModel3) * pWorld->sizeModels);
 
     sithWorld_UpdateLoadProgress(60.0);
-    loadStep = 10.0 / (flex_d_t)world->sizeModels;
+    loadStep = 10.0 / (flex_d_t)pWorld->sizeModels;
     loadProgress = 60.0;
     while ( stdConffile_ReadArgs() )
     {
@@ -64,28 +64,28 @@ int sithModel_ReadStaticModelsListText(SithWorld *world, int a2)
     return 1;
 }
 
-void sithModel_FreeWorldModels(SithWorld *world)
+void sithModel_FreeWorldModels(SithWorld *pWorld)
 {
-    if (!world->sizeModels )
+    if (!pWorld->sizeModels )
         return;
 
-    for (int i = 0; i < world->numModels; i++)
+    for (int i = 0; i < pWorld->numModels; i++)
     {
-        stdHashtbl_Remove(sithModel_hashtable, world->aModels[i].filename);
-        rdModel3_FreeEntryGeometryOnly(&world->aModels[i]);
+        stdHashtbl_Remove(sithModel_hashtable, pWorld->aModels[i].filename);
+        rdModel3_FreeEntryGeometryOnly(&pWorld->aModels[i]);
     }
-    SITH_FREE(world->aModels);
-    world->aModels = 0;
-    world->numModels = 0;
-    world->sizeModels = 0;
+    SITH_FREE(pWorld->aModels);
+    pWorld->aModels = 0;
+    pWorld->numModels = 0;
+    pWorld->sizeModels = 0;
 }
 
-rdModel3* sithModel_Load(const char *model_3do_fname, int unk)
+rdModel3* sithModel_Load(const char *pName, int bSkipDefault)
 {
     rdModel3 *model;
     char model_fpath[128];
 
-    model = (rdModel3 *)stdHashtbl_Find(sithModel_hashtable, model_3do_fname);
+    model = (rdModel3 *)stdHashtbl_Find(sithModel_hashtable, pName);
     if ( model ) {
         //stdPlatform_Printf("OpenJKDF2: %s: Load %s from static jkl.\n", __func__, model_3do_fname); // Added
         return model;
@@ -97,11 +97,11 @@ rdModel3* sithModel_Load(const char *model_3do_fname, int unk)
     }
     model = &sithWorld_g_pLastLoadedWorld->aModels[sithWorld_g_pLastLoadedWorld->numModels];
 
-    _sprintf(model_fpath, "%s%c%s", "3do", '\\', model_3do_fname);
+    _sprintf(model_fpath, "%s%c%s", "3do", '\\', pName);
     if ( !rdModel3_LoadEntry(model_fpath, model) )
     {
-        if ( !unk ) {
-            stdPlatform_Printf("OpenJKDF2: %s: rdModel3_LoadEntry failed for `%s`, loading dflt.3do!\n", __func__, model_3do_fname); // Added
+        if ( !bSkipDefault ) {
+            stdPlatform_Printf("OpenJKDF2: %s: rdModel3_LoadEntry failed for `%s`, loading dflt.3do!\n", __func__, pName); // Added
             return sithModel_Load("dflt.3do", 1);
         }
         return 0;
@@ -117,7 +117,7 @@ rdModel3* sithModel_Load(const char *model_3do_fname, int unk)
     return model;
 }
 
-uint32_t sithModel_GetModelMemUsage(rdModel3 *model)
+uint32_t sithModel_GetModelMemUsage(rdModel3 *pModel)
 {
     unsigned int result; // eax
     rdGeoset *v2; // ebx
@@ -127,11 +127,11 @@ uint32_t sithModel_GetModelMemUsage(rdModel3 *model)
     rdFace* v6; // ecx
     int modela; // [esp+8h] [ebp+4h]
 
-    result = (sizeof(void*) * model->sizeMaterials) + (sizeof(rdHierarchyNode) * model->numHNodes) + sizeof(rdModel3);
-    if ( model->numGeos )
+    result = (sizeof(void*) * pModel->sizeMaterials) + (sizeof(rdHierarchyNode) * pModel->numHNodes) + sizeof(rdModel3);
+    if ( pModel->numGeos )
     {
-        v2 = model->aGeos;
-        modela = model->numGeos;
+        v2 = pModel->aGeos;
+        modela = pModel->numGeos;
         do
         {
             result += 8;
@@ -167,32 +167,32 @@ uint32_t sithModel_GetModelMemUsage(rdModel3 *model)
     return result;
 }
 
-int sithModel_AllocWorldModels(SithWorld *world, int num)
+int sithModel_AllocWorldModels(SithWorld *pWorld, int size)
 {
-    world->aModels = (rdModel3 *)SITH_ALLOC(sizeof(rdModel3) * num);
-    if ( !world->aModels )
+    pWorld->aModels = (rdModel3 *)SITH_ALLOC(sizeof(rdModel3) * size);
+    if ( !pWorld->aModels )
         return 0;
 
-    world->sizeModels = num;
-    world->numModels = 0;
-    _memset(world->aModels, 0, sizeof(rdModel3) * num);
+    pWorld->sizeModels = size;
+    pWorld->numModels = 0;
+    _memset(pWorld->aModels, 0, sizeof(rdModel3) * size);
 
     return 1;
 }
 
-rdModel3* sithModel_GetModelByIndex(int idx)
+rdModel3* sithModel_GetModelByIndex(int modelIdx)
 {
     SithWorld *world;
     rdModel3 *result;
 
     world = sithWorld_g_pCurrentWorld;
-    if ( (idx & 0x8000) != 0 )
+    if ( (modelIdx & 0x8000) != 0 )
     {
         world = sithWorld_g_pStaticWorld;
-        idx &= 0x7FFF;
+        modelIdx &= 0x7FFF;
     }
-    if ( world && idx >= 0 && idx < world->numModels )
-        return &world->aModels[idx];
+    if ( world && modelIdx >= 0 && modelIdx < world->numModels )
+        return &world->aModels[modelIdx];
 
     return NULL;
 }

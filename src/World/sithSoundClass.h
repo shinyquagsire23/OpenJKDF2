@@ -146,19 +146,19 @@ typedef struct sithSoundClass
 
 int sithSoundClass_Startup();
 void sithSoundClass_Shutdown();
-int sithSoundClass_ReadSoundClassesListText(SithWorld *world, int a2);
-sithSoundClass* sithSoundClass_Load(char *fpath);
-int sithSoundClass_LoadEntry(sithSoundClass *soundClass, char *fpath);
-MATH_FUNC void sithSoundClass_PlayModeFirst(SithThing *thing, unsigned int soundclass_id);
-MATH_FUNC sithPlayingSound* sithSoundClass_PlayMode(SithThing *thing, int sc_id, flex_t a3);
-MATH_FUNC void sithSoundClass_PlayModeFirstEx(SithThing *thing, int sc_id, flex_t a3);
-void sithSoundClass_StopMode(SithThing *thing, unsigned int sc_id);
-void sithSoundClass_FreeWorldSoundClasses(SithWorld *world);
+int sithSoundClass_ReadSoundClassesListText(SithWorld *pWorld, int bSkip);
+sithSoundClass* sithSoundClass_Load(char *pName);
+int sithSoundClass_LoadEntry(sithSoundClass *pClass, char *pPath);
+MATH_FUNC void sithSoundClass_PlayModeFirst(SithThing *pThing, unsigned int mode);
+MATH_FUNC sithPlayingSound* sithSoundClass_PlayMode(SithThing *pThing, int mode, flex_t selectionRatio);
+MATH_FUNC void sithSoundClass_PlayModeFirstEx(SithThing *pThing, int mode, flex_t volume);
+void sithSoundClass_StopMode(SithThing *pThing, unsigned int mode);
+void sithSoundClass_FreeWorldSoundClasses(SithWorld *pWorld);
 
-MATH_FUNC sithPlayingSound* sithSoundClass_PlayModeRandom(SithThing *thing, uint32_t a2);
-sithPlayingSound* sithSoundClass_PlayModeEntry(SithThing *thing, sithSoundClassEntry *entry, flex_t a3);
+MATH_FUNC sithPlayingSound* sithSoundClass_PlayModeRandom(SithThing *pThing, uint32_t mode);
+sithPlayingSound* sithSoundClass_PlayModeEntry(SithThing *pThing, sithSoundClassEntry *pEntry, flex_t volume);
 void sithSoundClass_StopSound(SithThing *thing, sithSound *sound);
-int sithSoundClass_SetThingClass(SithThing *thing, sithSoundClass *pSoundClass);
+int sithSoundClass_SetThingClass(SithThing *pThing, sithSoundClass *pSoundClass);
 
 //static void (*sithSoundClass_Shutdown)() = (void*)sithSoundClass_Shutdown_ADDR;
 //static int (*sithSoundClass_Startup)() = (void*)sithSoundClass_Startup_ADDR;

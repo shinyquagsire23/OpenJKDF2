@@ -18,18 +18,18 @@
 #define sithSector_SyncSectors_ADDR (0x004F8EF0)
 #define sithSector_GetPtrFromIdx_ADDR (0x004F8F50)
 
-int sithSector_ReadSectorsListText(SithWorld *world, int tmp);
+int sithSector_ReadSectorsListText(SithWorld *pWorld, int bSkip);
 
-int sithSector_GetIdxFromPtr(SithSector *sector);
-void sithSector_ShowSectorAdjoins(SithSector *sector);
-void sithSector_HideSectorAdjoins(SithSector *sector);
-int sithSector_GetSectorThingCount(SithSector *sector);
-int sithSector_AllocWorldSectors(SithWorld *world, int num);
+int sithSector_GetIdxFromPtr(SithSector *pSector);
+void sithSector_ShowSectorAdjoins(SithSector *pSector);
+void sithSector_HideSectorAdjoins(SithSector *pSector);
+int sithSector_GetSectorThingCount(SithSector *pSector);
+int sithSector_AllocWorldSectors(SithWorld *pWorld, int numSectors);
 void sithSector_NewEntry(SithSector *sector, int idx);
-void sithSector_FreeWorldSectors(SithWorld *world);
-int sithSector_GetSectorPlayerCount(SithSector *sector);
+void sithSector_FreeWorldSectors(SithWorld *pWorld);
+int sithSector_GetSectorPlayerCount(SithSector *pSector);
 SithSector* sithSector_GetPtrFromIdx(int idx);
-void sithSector_SyncSector(SithSector *pSector, int a2);
+void sithSector_SyncSector(SithSector *pSector, int flags);
 void sithSector_SyncSectors();
 SithSector* sithSector_FindSectorAtPos(SithWorld *pWorld, rdVector3 *pos);
 

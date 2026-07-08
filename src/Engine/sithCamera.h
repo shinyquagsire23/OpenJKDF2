@@ -38,18 +38,18 @@ void sithCamera_Shutdown();
 int sithCamera_Open(rdCanvas *pCanvas, flex_t aspect);
 void sithCamera_Close();
 void sithCamera_ResetAllCameras();
-int sithCamera_NewEntry(SithCamera *camera, uint32_t a2, uint32_t a3, flex_t fov, flex_t aspectRatio, rdCanvas *pCanvas, SithThing *focus_far, SithThing *focus_near);
+int sithCamera_NewEntry(SithCamera *pCamera, uint32_t a2, uint32_t type, flex_t fov, flex_t aspect, rdCanvas *pCanvas, SithThing *pPrimaryFocus, SithThing *pSecondaryFocus);
 
-MATH_FUNC void sithCamera_Update(SithCamera *cam);
+MATH_FUNC void sithCamera_Update(SithCamera *pCamera);
 void sithCamera_RenderScene();
 void sithCamera_SetCurrentToCycleCamera();
-int sithCamera_SetCurrentCamera(SithCamera *camera);
-void sithCamera_SetCameraFocus(SithCamera *camera, SithThing *primary, SithThing *secondary);
-SithSector* sithCamera_SearchSectorInRadius(SithThing* a3, SithSector* a2, rdVector3* a4, rdVector3* a6, flex_t a7, int flags);
-void sithCamera_SetPOVShake(rdVector3 *a1, rdVector3 *a2, flex_t a3, flex_t a4);
+int sithCamera_SetCurrentCamera(SithCamera *pCamera);
+void sithCamera_SetCameraFocus(SithCamera *pCamera, SithThing *pPrimaryFocusThing, SithThing *pSecondaryFocusThing);
+SithSector* sithCamera_SearchSectorInRadius(SithThing* a3, SithSector* pSector, rdVector3* startPos, rdVector3* endPos, flex_t unused, int flags);
+void sithCamera_SetPOVShake(rdVector3 *posOffset, rdVector3 *angleOffset, flex_t posDelta, flex_t angleDelta);
 SithThing* sithCamera_GetPrimaryFocus(SithCamera *pCamera);
 SithThing* sithCamera_GetSecondaryFocus(SithCamera *pCamera);
-int sithCamera_SetCameraStateFlags(int a1);
+int sithCamera_SetCameraStateFlags(int flags);
 int sithCamera_GetCameraStateFlags();
 void sithCamera_CycleCamera();
 MATH_FUNC void sithCamera_SetZoom(SithCamera *pCamera, flex_t zoomScale, flex_t zoom_2); // MOTS added

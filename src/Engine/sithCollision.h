@@ -29,25 +29,25 @@
 
 int sithCollision_Startup();
 int sithCollision_Shutdown();
-void sithCollision_AddCollisionHandler(int idxA, int idxB, sithCollision_collisionHandler_t func, sithCollision_searchHandler_t a4);
-void sithCollision_AddSurfaceCollisionHandler(int type, sithCollisionHitHandler_t a2);
+void sithCollision_AddCollisionHandler(int idxA, int idxB, sithCollision_collisionHandler_t func, sithCollision_searchHandler_t pUnknownFunc);
+void sithCollision_AddSurfaceCollisionHandler(int type, sithCollisionHitHandler_t fpHandler);
 #if 1
 MATH_FUNC SithCollision* sithCollision_PopStack();
-MATH_FUNC flex_t sithCollision_SearchForCollisions(SithSector* pStartSector, SithThing* pThing, const rdVector3* pStartPos, const rdVector3* pMoveNorm, flex_t moveDist, flex_t radius, int flags);
+MATH_FUNC flex_t sithCollision_SearchForCollisions(SithSector* pStartSector, SithThing* pThing, const rdVector3* startPos, const rdVector3* moveNorm, flex_t moveDist, flex_t radius, int searchFlags);
 MATH_FUNC void sithCollision_DecreaseStackLevel();
-MATH_FUNC flex_t sithCollision_SearchForThingCollisions(SithSector *a1, SithThing *pMeshCollided, const rdVector3 *a2, const rdVector3 *a3, flex_t a4, flex_t range, int flags);
-MATH_FUNC void sithCollision_SearchForSurfaceCollisions(SithSector *a1, const rdVector3 *a2, const rdVector3 *a3, flex_t a4, flex_t a5, int raycastFlags);
-MATH_FUNC SithSector* sithCollision_FindSectorInRadius(SithSector *sector, const rdVector3 *a3, rdVector3 *a4, flex_t a5);
+MATH_FUNC flex_t sithCollision_SearchForThingCollisions(SithSector *a1, SithThing *pThing, const rdVector3 *startPos, const rdVector3 *moveNorm, flex_t moveDist, flex_t radius, int searchFlags);
+MATH_FUNC void sithCollision_SearchForSurfaceCollisions(SithSector *a1, const rdVector3 *a2, const rdVector3 *a3, flex_t moveDist, flex_t radius, int colflags);
+MATH_FUNC SithSector* sithCollision_FindSectorInRadius(SithSector *sector, const rdVector3 *a3, rdVector3 *a4, flex_t radius);
 #endif
 MATH_FUNC void sithCollision_FallHurt(SithThing *thing, flex_t vel);
-MATH_FUNC void sithCollision_RotateThing(SithThing *thing, rdMatrix34 *orient);
-MATH_FUNC flex_t sithCollision_MoveThing(SithThing* pThing, rdVector3* a2, flex_t a6, int flags);
-MATH_FUNC int sithCollision_HandleThingHitSurface(SithThing *thing, SithSurface *surface, SithCollision *a3);
-MATH_FUNC int sithCollision_ThingCollisionHandler(SithThing *thing1, SithThing *thing2, SithCollision *a3, int isInverse);
-MATH_FUNC int sithCollision_CollideHurt(SithThing *a1, rdVector3 *a2, flex_t a3, int a4);
-MATH_FUNC int sithCollision_HasLOS(SithThing *thing1, SithThing *thing2, int flag);
-MATH_FUNC void sithCollision_sub_4E77A0(SithThing *thing, rdMatrix34 *a2);
-MATH_FUNC int sithCollision_ParticleAndActorCollisionHandler(SithThing *thing, SithThing *thing2, SithCollision *searchEnt, int isSolid);
+MATH_FUNC void sithCollision_RotateThing(SithThing *pThing, rdMatrix34 *pOrient);
+MATH_FUNC flex_t sithCollision_MoveThing(SithThing* pThing, rdVector3* moveNorm, flex_t moveDist, int flags);
+MATH_FUNC int sithCollision_HandleThingHitSurface(SithThing *pThing, SithSurface *pSurface, SithCollision *pCollision);
+MATH_FUNC int sithCollision_ThingCollisionHandler(SithThing *pSrcThing, SithThing *pThingCollided, SithCollision *pCollision, int bSecondThingIsSource);
+MATH_FUNC int sithCollision_CollideHurt(SithThing *pThing, rdVector3 *pHitNorm, flex_t colDistance, int a4);
+MATH_FUNC int sithCollision_HasLOS(SithThing *pViewer, SithThing *pTarget, int flag);
+MATH_FUNC void sithCollision_sub_4E77A0(SithThing *pThing, rdMatrix34 *pOrient);
+MATH_FUNC int sithCollision_ParticleAndActorCollisionHandler(SithThing *pSrcThing, SithThing *pThingCollided, SithCollision *pCollision, int bSecondThingIsSource);
 SithThing* sithCollision_RaycastFromCamera(rdVector3 *pos);
 SithThing* sithCollision_RaycastSector(SithSector *sector, rdVector3 *startPos, rdVector3 *dir, flex_t dist, flex_t radius, uint32_t *pHitType);
 int sithCollision_CheckPathClear(SithSector *sector, rdVector3 *startPos, rdVector3 *endPos, flex_t radius);

@@ -165,38 +165,38 @@ void sithCamera_ResetAllCameras()
 }
 
 // MOTS altered
-int sithCamera_NewEntry(SithCamera *camera, uint32_t a2, uint32_t a3, flex_t fov, flex_t aspectRatio, rdCanvas *pCanvas, SithThing *focus_far, SithThing *focus_near)
+int sithCamera_NewEntry(SithCamera *pCamera, uint32_t a2, uint32_t type, flex_t fov, flex_t aspect, rdCanvas *pCanvas, SithThing *pPrimaryFocus, SithThing *pSecondaryFocus)
 {
-    camera->type = a3;
-    camera->dword4 = a2;
-    camera->pPrimaryFocusThing = focus_far;
-    camera->fov = fov;
-    camera->aspectRatio = aspectRatio;
-    camera->pSecondaryFocusThing = focus_near;
-    rdCamera_NewEntry(&camera->rdCamera, fov, 0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspectRatio);
-    rdCamera_SetAttenuation(&camera->rdCamera, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
+    pCamera->type = type;
+    pCamera->dword4 = a2;
+    pCamera->pPrimaryFocusThing = pPrimaryFocus;
+    pCamera->fov = fov;
+    pCamera->aspectRatio = aspect;
+    pCamera->pSecondaryFocusThing = pSecondaryFocus;
+    rdCamera_NewEntry(&pCamera->rdCamera, fov, 0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
+    rdCamera_SetAttenuation(&pCamera->rdCamera, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
 
     if (pCanvas) {
-        rdCamera_SetCanvas(&camera->rdCamera, pCanvas);
+        rdCamera_SetCanvas(&pCamera->rdCamera, pCanvas);
     }
 
-    rdVector_Zero3(&camera->lookPos);
-    rdVector_Zero3(&camera->lookPYR);
-    rdVector_Zero3(&camera->offset);
+    rdVector_Zero3(&pCamera->lookPos);
+    rdVector_Zero3(&pCamera->lookPYR);
+    rdVector_Zero3(&pCamera->offset);
 #ifndef OPTIMIZE_AWAY_UNUSED_FIELDS
-    rdVector_Zero3(&camera->vecUnknown1);
+    rdVector_Zero3(&pCamera->vecUnknown1);
 #endif
-    rdMatrix_Identity34(&camera->orient);
+    rdMatrix_Identity34(&pCamera->orient);
 
 #ifdef JKM_CAMERA
-    camera->bZoomed = 0;
-    camera->zoomScale = 1.0;
-    camera->invZoomScale = 1.0;
-    camera->zoomFov = camera->fov;
-    camera->zoomSpeed = 0.0;
+    pCamera->bZoomed = 0;
+    pCamera->zoomScale = 1.0;
+    pCamera->invZoomScale = 1.0;
+    pCamera->zoomFov = pCamera->fov;
+    pCamera->zoomSpeed = 0.0;
 #ifdef QOL_IMPROVEMENTS
-    camera->zoomScaleOrig = 1.0;
-    camera->zoomFov = 1.0;
+    pCamera->zoomScaleOrig = 1.0;
+    pCamera->zoomFov = 1.0;
 #endif
 #endif
 
@@ -204,7 +204,7 @@ int sithCamera_NewEntry(SithCamera *camera, uint32_t a2, uint32_t a3, flex_t fov
 }
 
 // MOTS altered
-void sithCamera_Update(SithCamera *cam)
+void sithCamera_Update(SithCamera *pCamera)
 {
     rdVector3 mode64Tmp;
     rdVector3 v76;
@@ -214,28 +214,28 @@ void sithCamera_Update(SithCamera *cam)
     rdVector3 rot; // [esp+50h] [ebp-3Ch] BYREF
     rdMatrix34 out; // [esp+5Ch] [ebp-30h] BYREF
 
-    SithThing* focusThing = cam->pPrimaryFocusThing;
+    SithThing* focusThing = pCamera->pPrimaryFocusThing;
     flex_t v77 = sithCamera_g_cameraAngleDelta * sithTime_g_frameTimeFlex;
     flex_t v78 = sithCamera_g_cameraPosDelta * sithTime_g_frameTimeFlex;
-    switch ( cam->type )
+    switch ( pCamera->type )
     {
         case 1:
             // MOTS added: scope zoom
 #ifdef JKM_CAMERA
 #ifndef QOL_IMPROVEMENTS
             // Redundant
-            if (cam->bZoomed) 
+            if (pCamera->bZoomed) 
 #endif
             {
-                sithCamera_UpdateZoom(cam);
+                sithCamera_UpdateZoom(pCamera);
             }
-            rdCamera_SetMipmapScalar(cam->invZoomScale);
+            rdCamera_SetMipmapScalar(pCamera->invZoomScale);
 #endif
 
-            rdMatrix_Copy34(&cam->orient, &focusThing->orient);
+            rdMatrix_Copy34(&pCamera->orient, &focusThing->orient);
             if ( focusThing->moveType == SITH_MT_PATH && focusThing->renderData.paJointMatrices)
             {
-                rdMatrix_Copy34(&cam->orient, focusThing->renderData.paJointMatrices);
+                rdMatrix_Copy34(&pCamera->orient, focusThing->renderData.paJointMatrices);
             }
             else
             {
@@ -259,21 +259,21 @@ void sithCamera_Update(SithCamera *cam)
                     rdVector_Add3Acc(&v76, &sithCamera_g_vecCameraAngleOffset);
                 }
 
-                rdMatrix_PreRotate34(&cam->orient, &v76);
-                rdMatrix_PostTranslate34(&cam->orient, &focusThing->position);
+                rdMatrix_PreRotate34(&pCamera->orient, &v76);
+                rdMatrix_PostTranslate34(&pCamera->orient, &focusThing->position);
                 if ( focusThing->type == SITH_THING_ACTOR || focusThing->type == SITH_THING_PLAYER )
                 {
-                    rdMatrix_PreTranslate34(&cam->orient, &focusThing->actorParams.eyeOffset);
+                    rdMatrix_PreTranslate34(&pCamera->orient, &focusThing->actorParams.eyeOffset);
                     
                     // MOTS added: hmm??
                     if (Main_bMotsCompat || focusThing == sithPlayer_g_pLocalPlayerThing )
-                        rdMatrix_PreTranslate34(&cam->orient, &sithCamera_g_vecCameraPosOffset);
+                        rdMatrix_PreTranslate34(&pCamera->orient, &sithCamera_g_vecCameraPosOffset);
                 }
-                rdMatrix_Normalize34(&cam->orient);
+                rdMatrix_Normalize34(&pCamera->orient);
             }
             // Added: nullptr check
             if (focusThing->sector)
-                cam->sector = sithCollision_FindSectorInRadius(focusThing->sector, &focusThing->position, &cam->orient.scale, 0.02);
+                pCamera->sector = sithCollision_FindSectorInRadius(focusThing->sector, &focusThing->position, &pCamera->orient.scale, 0.02);
             break;
         case 4:
             if ( focusThing->type == SITH_THING_ACTOR || focusThing->type == SITH_THING_PLAYER )
@@ -296,27 +296,27 @@ void sithCamera_Update(SithCamera *cam)
             rdMatrix_PostTranslate34(&out, &focusThing->position);
             if ( focusThing->type == SITH_THING_ACTOR || focusThing->type == SITH_THING_PLAYER )
                 rdMatrix_PostTranslate34(&out, &focusThing->actorParams.eyeOffset);
-            cam->sector = sithCamera_SearchSectorInRadius(0, focusThing->sector, &focusThing->position, &out.scale, 0.02, RAYCAST_2000 | RAYCAST_200);
+            pCamera->sector = sithCamera_SearchSectorInRadius(0, focusThing->sector, &focusThing->position, &out.scale, 0.02, RAYCAST_2000 | RAYCAST_200);
             rdVector_Copy3(&v84, &out.scale);
-            rdMatrix_Copy34(&cam->orient, &out);
+            rdMatrix_Copy34(&pCamera->orient, &out);
 
             // MOTS added: hmm?
             if (Main_bMotsCompat) {
-                rdMatrix_PreTranslate34(&cam->orient,&sithCamera_g_vecCameraPosOffset);
+                rdMatrix_PreTranslate34(&pCamera->orient,&sithCamera_g_vecCameraPosOffset);
             }
 
             rdMatrix_PreTranslate34(&out, &sithCamera_trans);
-            rdMatrix_PreTranslate34(&cam->orient, &cam->offset);
-            rdMatrix_LookAt(&cam->orient, &cam->orient.scale, &out.scale, 0.0);
-            cam->sector = sithCamera_SearchSectorInRadius(0, cam->sector, &v84, &cam->orient.scale, 0.02, RAYCAST_2000 | RAYCAST_200);
+            rdMatrix_PreTranslate34(&pCamera->orient, &pCamera->offset);
+            rdMatrix_LookAt(&pCamera->orient, &pCamera->orient.scale, &out.scale, 0.0);
+            pCamera->sector = sithCamera_SearchSectorInRadius(0, pCamera->sector, &v84, &pCamera->orient.scale, 0.02, RAYCAST_2000 | RAYCAST_200);
             break;
         case 32:
             rdMatrix_TransformVector34(&a1, &sithCamera_trans2, &sithCamera_idleCamOrient);
             v2 = (rdVector3){0.0, 0.0, 0.05};
             rdVector_Sub3(&v2, &focusThing->position, &v2);
             rdVector_Add3Acc(&a1, &v2);
-            rdMatrix_LookAt(&cam->orient, &a1, &v2, 0.0);
-            cam->sector = sithCamera_SearchSectorInRadius(0, focusThing->sector, &focusThing->position, &cam->orient.scale, 0.02, RAYCAST_2000 | RAYCAST_200);
+            rdMatrix_LookAt(&pCamera->orient, &a1, &v2, 0.0);
+            pCamera->sector = sithCamera_SearchSectorInRadius(0, focusThing->sector, &focusThing->position, &pCamera->orient.scale, 0.02, RAYCAST_2000 | RAYCAST_200);
             rot.x = 0.0;
             rot.y = sithTime_g_frameTimeFlex * 8.0;
             rot.z = 0.0;
@@ -328,32 +328,32 @@ void sithCamera_Update(SithCamera *cam)
             rdVector_Neg3(&mode64Tmp, &sithCamera_trans3);
             
             // rdMatrix_BuildFromLook34 ish?
-            cam->orient.lvec.x = mode64Tmp.x;
-            cam->orient.lvec.y = mode64Tmp.y;
-            cam->orient.lvec.z = mode64Tmp.z;
-            cam->orient.rvec.x = (1.0 * mode64Tmp.y) - (0.0 * mode64Tmp.z);
-            cam->orient.rvec.y = (0.0 * mode64Tmp.z) - (1.0 * mode64Tmp.x);
-            cam->orient.rvec.z = (0.0 * mode64Tmp.x) - (0.0 * mode64Tmp.y);
-            cam->orient.uvec.x = (cam->orient.rvec.y * mode64Tmp.z) - (cam->orient.rvec.z * mode64Tmp.y);
-            cam->orient.uvec.y = (cam->orient.rvec.z * mode64Tmp.x) - (cam->orient.rvec.x * mode64Tmp.z);
-            cam->orient.uvec.z = (cam->orient.rvec.x * mode64Tmp.y) - (cam->orient.rvec.y * mode64Tmp.x);
+            pCamera->orient.lvec.x = mode64Tmp.x;
+            pCamera->orient.lvec.y = mode64Tmp.y;
+            pCamera->orient.lvec.z = mode64Tmp.z;
+            pCamera->orient.rvec.x = (1.0 * mode64Tmp.y) - (0.0 * mode64Tmp.z);
+            pCamera->orient.rvec.y = (0.0 * mode64Tmp.z) - (1.0 * mode64Tmp.x);
+            pCamera->orient.rvec.z = (0.0 * mode64Tmp.x) - (0.0 * mode64Tmp.y);
+            pCamera->orient.uvec.x = (pCamera->orient.rvec.y * mode64Tmp.z) - (pCamera->orient.rvec.z * mode64Tmp.y);
+            pCamera->orient.uvec.y = (pCamera->orient.rvec.z * mode64Tmp.x) - (pCamera->orient.rvec.x * mode64Tmp.z);
+            pCamera->orient.uvec.z = (pCamera->orient.rvec.x * mode64Tmp.y) - (pCamera->orient.rvec.y * mode64Tmp.x);
 
-            rdMatrix_Normalize34(&cam->orient);
-            rdVector_Scale3(&cam->orient.scale, &sithCamera_trans3, 0.2);
+            rdMatrix_Normalize34(&pCamera->orient);
+            rdVector_Scale3(&pCamera->orient.scale, &sithCamera_trans3, 0.2);
 
-            rdMatrix_PostTranslate34(&cam->orient, &focusThing->position);
-            cam->sector = sithCamera_SearchSectorInRadius(0, focusThing->sector, &focusThing->position, &cam->orient.scale, 0.02, RAYCAST_2000 | RAYCAST_200);
+            rdMatrix_PostTranslate34(&pCamera->orient, &focusThing->position);
+            pCamera->sector = sithCamera_SearchSectorInRadius(0, focusThing->sector, &focusThing->position, &pCamera->orient.scale, 0.02, RAYCAST_2000 | RAYCAST_200);
             break;
         case 128:
-            rdMatrix_Copy34(&cam->orient, &sithCamera_g_orbCamOrient);
-            rdMatrix_PostTranslate34(&cam->orient, &focusThing->position);
-            cam->sector = sithCollision_FindSectorInRadius(focusThing->sector, &focusThing->position, &cam->orient.scale, 0.02);
+            rdMatrix_Copy34(&pCamera->orient, &sithCamera_g_orbCamOrient);
+            rdMatrix_PostTranslate34(&pCamera->orient, &focusThing->position);
+            pCamera->sector = sithCollision_FindSectorInRadius(focusThing->sector, &focusThing->position, &pCamera->orient.scale, 0.02);
             break;
         default:
             break;
     }
-    cam->lookPos = cam->orient.scale;
-    rdMatrix_ExtractAngles34(&cam->orient, &cam->lookPYR);
+    pCamera->lookPos = pCamera->orient.scale;
+    rdMatrix_ExtractAngles34(&pCamera->orient, &pCamera->lookPYR);
 
     // TODO what inlined func is this
     if ( sithCamera_g_vecCameraPosOffset.x <= 0.0 )
@@ -535,16 +535,16 @@ void sithCamera_SetCurrentToCycleCamera()
     sithCamera_SetCurrentCamera(v0);
 }
 
-int sithCamera_SetCurrentCamera(SithCamera *camera)
+int sithCamera_SetCurrentCamera(SithCamera *pCamera)
 {
     rdVector3 rot; // [esp+8h] [ebp-Ch] BYREF
 
-    if ( sithCamera_g_pCurCamera && camera->dword4 < sithCamera_g_pCurCamera->dword4 )
+    if ( sithCamera_g_pCurCamera && pCamera->dword4 < sithCamera_g_pCurCamera->dword4 )
         return 0;
-    sithCamera_g_pCurCamera = camera;
+    sithCamera_g_pCurCamera = pCamera;
     sithCamera_g_bCurCameraSet = 1;
-    rdCamera_SetCurrent(&camera->rdCamera);
-    if ( camera->type == 32 )
+    rdCamera_SetCurrent(&pCamera->rdCamera);
+    if ( pCamera->type == 32 )
     {
         rdMatrix_Copy34(&sithCamera_idleCamOrient, &sithCamera_g_pCurCamera->pPrimaryFocusThing->orient);
         rot.x = 0.0;
@@ -556,13 +556,13 @@ int sithCamera_SetCurrentCamera(SithCamera *camera)
     return 1;
 }
 
-void sithCamera_SetCameraFocus(SithCamera *camera, SithThing *primary, SithThing *secondary)
+void sithCamera_SetCameraFocus(SithCamera *pCamera, SithThing *pPrimaryFocusThing, SithThing *pSecondaryFocusThing)
 {
-    camera->pPrimaryFocusThing = primary;
-    camera->pSecondaryFocusThing = secondary;
+    pCamera->pPrimaryFocusThing = pPrimaryFocusThing;
+    pCamera->pSecondaryFocusThing = pSecondaryFocusThing;
 }
 
-SithSector* sithCamera_SearchSectorInRadius(SithThing *a3, SithSector *a2, rdVector3 *a4, rdVector3 *a6, flex_t a7, int flags)
+SithSector* sithCamera_SearchSectorInRadius(SithThing *a3, SithSector *pSector, rdVector3 *startPos, rdVector3 *endPos, flex_t unused, int flags)
 {
     flex_d_t v7; // st7
     SithSector *v9; // ebx
@@ -570,11 +570,11 @@ SithSector* sithCamera_SearchSectorInRadius(SithThing *a3, SithSector *a2, rdVec
     rdVector3 a5; // [esp+Ch] [ebp-Ch] BYREF
     flex_t a6a; // [esp+28h] [ebp+10h]
 
-    rdVector_Sub3(&a5, a6, a4);
+    rdVector_Sub3(&a5, endPos, startPos);
     v7 = rdVector_Normalize3Acc(&a5);
     a6a = v7;
-    v9 = a2;
-    sithCollision_SearchForCollisions(a2, a3, a4, &a5, a6a, a7, flags | RAYCAST_800);
+    v9 = pSector;
+    sithCollision_SearchForCollisions(pSector, a3, startPos, &a5, a6a, unused, flags | RAYCAST_800);
     for ( i = sithCollision_PopStack(); i; i = sithCollision_PopStack() )
     {
         if ( (i->type & SITHCOLLISION_ADJOINCROSS) != 0 )
@@ -583,8 +583,8 @@ SithSector* sithCamera_SearchSectorInRadius(SithThing *a3, SithSector *a2, rdVec
         }
         else if ( (i->type & SITHCOLLISION_THING) == 0 || (i->pThingCollided->type != SITH_THING_ITEM) && i->distance != 0.0 && i->pThingCollided->type != SITH_THING_WEAPON )
         {
-            rdVector_Copy3(a6, a4);
-            rdVector_ScaleAdd3Acc(a6, &a5, i->distance);
+            rdVector_Copy3(endPos, startPos);
+            rdVector_ScaleAdd3Acc(endPos, &a5, i->distance);
             break;
         }
     }
@@ -592,12 +592,12 @@ SithSector* sithCamera_SearchSectorInRadius(SithThing *a3, SithSector *a2, rdVec
     return v9;
 }
 
-void sithCamera_SetPOVShake(rdVector3 *a1, rdVector3 *a2, flex_t a3, flex_t a4)
+void sithCamera_SetPOVShake(rdVector3 *posOffset, rdVector3 *angleOffset, flex_t posDelta, flex_t angleDelta)
 {
-    rdVector_Copy3(&sithCamera_g_vecCameraPosOffset, a1);
-    rdVector_Copy3(&sithCamera_g_vecCameraAngleOffset, a2);
-    sithCamera_g_cameraPosDelta = a3;
-    sithCamera_g_cameraAngleDelta = a4;
+    rdVector_Copy3(&sithCamera_g_vecCameraPosOffset, posOffset);
+    rdVector_Copy3(&sithCamera_g_vecCameraAngleOffset, angleOffset);
+    sithCamera_g_cameraPosDelta = posDelta;
+    sithCamera_g_cameraAngleDelta = angleDelta;
 }
 
 SithThing* sithCamera_GetPrimaryFocus(SithCamera *pCamera)
@@ -610,12 +610,12 @@ SithThing* sithCamera_GetSecondaryFocus(SithCamera *pCamera)
     return pCamera->pSecondaryFocusThing;
 }
 
-int sithCamera_SetCameraStateFlags(int a1)
+int sithCamera_SetCameraStateFlags(int flags)
 {
     int result; // eax
 
-    result = a1;
-    sithCamera_g_stateFlags = a1;
+    result = flags;
+    sithCamera_g_stateFlags = flags;
     return result;
 }
 

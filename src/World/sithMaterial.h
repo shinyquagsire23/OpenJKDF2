@@ -16,12 +16,12 @@
 
 int sithMaterial_Startup();
 void sithMaterial_Shutdown();
-void sithMaterial_FreeWorldMaterials(SithWorld *world);
-MATH_FUNC int sithMaterial_ReadMaterialsListText(SithWorld *world, int a2);
-rdMaterial* sithMaterial_Load(const char *a1, int create_ddraw_surface, int gpu_mem);
-rdMaterial* sithMaterial_GetMaterialByIndex(int idx);
+void sithMaterial_FreeWorldMaterials(SithWorld *pWorld);
+MATH_FUNC int sithMaterial_ReadMaterialsListText(SithWorld *pWorld, int bSkip);
+rdMaterial* sithMaterial_Load(const char *pName, int create_ddraw_surface, int gpu_mem);
+rdMaterial* sithMaterial_GetMaterialByIndex(int index);
 int sithMaterial_GetMemorySize(rdMaterial *mat);
-rdVector2* sithMaterial_AllocWorldMaterials(SithWorld *world, int num);
+rdVector2* sithMaterial_AllocWorldMaterials(SithWorld *pWorld, int numMaterials);
 void sithMaterial_UnloadAll();
 
 #endif // _SITHMATERIAL_H
