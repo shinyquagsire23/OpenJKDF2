@@ -250,7 +250,7 @@ void sithThing_TickAll(flex_t deltaSeconds, int deltaMs)
                     sithExplosion_Tick(pThingIter);
                     break;
                 case SITH_CT_PARTICLE:
-                    sithParticle_Tick(pThingIter, deltaSeconds);
+                    sithParticle_Update(pThingIter, deltaSeconds);
                     break;
             }
 
@@ -381,7 +381,7 @@ void sithThing_Remove(sithThing* pThing)
         case SITH_THING_PLAYER:
             return;
         case SITH_THING_PARTICLE:
-            sithParticle_Remove(pThing);
+            sithParticle_DestroyParticle(pThing);
             break;
         default:
             pThing->thingflags |= SITH_TF_WILLBEREMOVED;
@@ -617,7 +617,7 @@ void sithThing_FreeEverything(sithThing* pThing)
     if ( pThing->controlType == SITH_CT_AI )
         sithAI_FreeEntry(pThing);
     if ( pThing->type == SITH_THING_PARTICLE )
-        sithParticle_FreeEntry(pThing);
+        sithParticle_Free(pThing);
     if ( pThing->animclass )
         sithPuppet_FreeEntry(pThing);
     rdThing_FreeEntry(&pThing->rdthing);
@@ -638,7 +638,7 @@ void sithThing_sub_4CD100(sithThing* pThing)
             sithExplosion_CreateThing(pThing);
             break;
         case SITH_THING_PARTICLE:
-            sithParticle_CreateThing(pThing);
+            sithParticle_Initalize(pThing);
             break;
     }
     if ( pThing->rdthing.puppet )
@@ -1600,7 +1600,7 @@ int sithThing_ParseArgs(stdConffileArg *arg, sithThing* pThing)
             v7 = sithExplosion_LoadThingParams(arg, pThing, paramIdx);
             goto LABEL_10;
         case SITH_THING_PARTICLE:
-            v7 = sithParticle_LoadThingParams(arg, pThing, paramIdx);
+            v7 = sithParticle_ParseArg(arg, pThing, paramIdx);
 LABEL_10:
             v2 = v7;
             break;
@@ -1828,7 +1828,7 @@ int sithThing_LoadThingParam(stdConffileArg *arg, sithThing* pThing, int param)
             result = 1;
             break;
         case THINGPARAM_PARTICLE:
-            pParticle = sithParticle_LoadEntry(arg->value);
+            pParticle = sithParticle_Load(arg->value);
             if ( !pParticle )
                 goto LABEL_58;
             rdThing_FreeEntry(&pThing->rdthing);

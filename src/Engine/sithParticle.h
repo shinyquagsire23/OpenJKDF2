@@ -5,24 +5,24 @@
 
 #define sithParticle_Startup_ADDR (0x004F18B0)
 #define sithParticle_Shutdown_ADDR (0x004F18F0)
-#define sithParticle_LoadEntry_ADDR (0x004F1910)
-#define sithParticle_New_ADDR (0x004F1A00)
-#define sithParticle_LoadThingParams_ADDR (0x004F1A60)
-#define sithParticle_Tick_ADDR (0x004F1C30)
-#define sithParticle_CreateThing_ADDR (0x004F1DA0)
-#define sithParticle_Remove_ADDR (0x004F2010)
-#define sithParticle_FreeEntry_ADDR (0x004F2080)
-#define sithParticle_Free_ADDR (0x004F20B0)
+#define sithParticle_Load_ADDR (0x004F1910)
+#define sithParticle_AllocWorldParticles_ADDR (0x004F1A00)
+#define sithParticle_ParseArg_ADDR (0x004F1A60)
+#define sithParticle_Update_ADDR (0x004F1C30)
+#define sithParticle_Initalize_ADDR (0x004F1DA0)
+#define sithParticle_DestroyParticle_ADDR (0x004F2010)
+#define sithParticle_Free_ADDR (0x004F2080)
+#define sithParticle_FreeWorldParticles_ADDR (0x004F20B0)
 
 int sithParticle_Startup();
 void sithParticle_Shutdown();
-rdParticle* sithParticle_LoadEntry(const char *a1);
-int sithParticle_New(sithWorld *world, int numParticles);
-int sithParticle_LoadThingParams(stdConffileArg *arg, sithThing *thing, int param);
-MATH_FUNC void sithParticle_Tick(sithThing *particle, flex_t deltaMs);
-MATH_FUNC void sithParticle_CreateThing(sithThing *thing);
-MATH_FUNC void sithParticle_Remove(sithThing *particle);
-void sithParticle_FreeEntry(sithThing *thing);
-void sithParticle_Free(sithWorld *world);
+rdParticle* sithParticle_Load(const char *a1);
+int sithParticle_AllocWorldParticles(sithWorld *world, int numParticles);
+int sithParticle_ParseArg(stdConffileArg *arg, sithThing *thing, int param);
+MATH_FUNC void sithParticle_Update(sithThing *particle, flex_t deltaMs);
+MATH_FUNC void sithParticle_Initalize(sithThing *thing);
+MATH_FUNC void sithParticle_DestroyParticle(sithThing *particle);
+void sithParticle_Free(sithThing *thing);
+void sithParticle_FreeWorldParticles(sithWorld *world);
 
 #endif // _SITHPARTICLE_H

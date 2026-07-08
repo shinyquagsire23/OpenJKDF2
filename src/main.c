@@ -2450,14 +2450,14 @@ void do_hooks()
     // sithParticle
     hook_function(sithParticle_Startup_ADDR, sithParticle_Startup);
     hook_function(sithParticle_Shutdown_ADDR, sithParticle_Shutdown);
-    hook_function(sithParticle_LoadEntry_ADDR, sithParticle_LoadEntry);
-    hook_function(sithParticle_New_ADDR, sithParticle_New);
-    hook_function(sithParticle_LoadThingParams_ADDR, sithParticle_LoadThingParams);
-    hook_function(sithParticle_Tick_ADDR, sithParticle_Tick);
-    hook_function(sithParticle_CreateThing_ADDR, sithParticle_CreateThing);
-    hook_function(sithParticle_Remove_ADDR, sithParticle_Remove);
-    hook_function(sithParticle_FreeEntry_ADDR, sithParticle_FreeEntry);
+    hook_function(sithParticle_Load_ADDR, sithParticle_Load);
+    hook_function(sithParticle_AllocWorldParticles_ADDR, sithParticle_AllocWorldParticles);
+    hook_function(sithParticle_ParseArg_ADDR, sithParticle_ParseArg);
+    hook_function(sithParticle_Update_ADDR, sithParticle_Update);
+    hook_function(sithParticle_Initalize_ADDR, sithParticle_Initalize);
+    hook_function(sithParticle_DestroyParticle_ADDR, sithParticle_DestroyParticle);
     hook_function(sithParticle_Free_ADDR, sithParticle_Free);
+    hook_function(sithParticle_FreeWorldParticles_ADDR, sithParticle_FreeWorldParticles);
     
 #if 0
     // sithPuppet

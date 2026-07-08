@@ -381,7 +381,7 @@ void sithWorld_FreeEntry(sithWorld *pWorld)
     if ( pWorld->sprites )
         sithSprite_FreeEntry(pWorld);
     if ( pWorld->particles )
-        sithParticle_Free(pWorld);
+        sithParticle_FreeWorldParticles(pWorld);
     if ( pWorld->keyframes )
         sithKeyFrame_Free(pWorld);
     if ( pWorld->templates )
