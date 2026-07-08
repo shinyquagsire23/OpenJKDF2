@@ -345,7 +345,7 @@ int sithCommand_CogList(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         {
             _sprintf(std_g_genBuffer, "%d: %-16s %-16s ", v3, i->aName, i->pScript->aName);
             if ( (i->flags & SITH_COG_DISABLED) != 0 )
-                _sprintf(&std_g_genBuffer[strlen(std_g_genBuffer)], "(paused) ");
+                _sprintf(&std_g_genBuffer[strlen(std_g_genBuffer)], "(bPaused) ");
             if ( (i->flags & SITH_COG_DEBUG) != 0 )
                 _sprintf(&std_g_genBuffer[strlen(std_g_genBuffer)], "(trace)  ");
             _sprintf(&std_g_genBuffer[strlen(std_g_genBuffer)], sithCommand_aIdk);

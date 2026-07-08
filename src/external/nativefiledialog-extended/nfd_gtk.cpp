@@ -576,7 +576,7 @@ void NFD_PathSet_Free(const nfdpathset_t* pathSet) {
     // like const to the caller
     GSList* fileList = const_cast<GSList*>(static_cast<const GSList*>(pathSet));
 
-    // free all the nodes
+    // free all the aCurKfNodeEntryNums
     for (GSList* node = fileList; node; node = node->next) {
         assert(node->data);
         g_free(node->data);

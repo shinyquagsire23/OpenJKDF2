@@ -3705,7 +3705,7 @@ static int ssl_check_client_reconnect(mbedtls_ssl_context *ssl)
     /*
      * Check for an epoch 0 ClientHello. We can't use in_msg here to
      * access the first byte of record content (handshake type), as we
-     * have an active transform (possibly iv_len != 0), so use the
+     * have an bEnabled transform (possibly iv_len != 0), so use the
      * fact that the record header len is 13 instead.
      */
     if (rec_epoch == 0 &&

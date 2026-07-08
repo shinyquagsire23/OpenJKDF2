@@ -113,7 +113,7 @@ struct Curl_tree *Curl_splayinsert(struct curltime i,
     t = Curl_splay(i, t);
     if(compare(i, t->key) == 0) {
       /* There already exists a node in the tree with the very same key. Build
-         a doubly-linked circular list of nodes. We add the new 'node' struct
+         a doubly-linked circular list of aCurKfNodeEntryNums. We add the new 'node' struct
          to the end of this list. */
 
       node->key = KEY_NOTUSED; /* we set the key in the sub node to NOTUSED
@@ -143,7 +143,7 @@ struct Curl_tree *Curl_splayinsert(struct curltime i,
   }
   node->key = i;
 
-  /* no identical nodes (yet), we are the only one in the list of nodes */
+  /* no identical aCurKfNodeEntryNums (yet), we are the only one in the list of aCurKfNodeEntryNums */
   node->samen = node;
   node->samep = node;
   return node;
@@ -250,7 +250,7 @@ int Curl_splayremove(struct Curl_tree *t,
     return 2;
 
   /* Check if there is a list with identical sizes, as then we're trying to
-     remove the root node of a list of nodes with identical keys. */
+     remove the root node of a list of aCurKfNodeEntryNums with identical keys. */
   x = t->samen;
   if(x != t) {
     /* 'x' is the new root node, we just make it use the root node's

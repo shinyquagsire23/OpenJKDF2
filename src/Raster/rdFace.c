@@ -27,8 +27,8 @@ int rdFace_NewEntry(rdFace* out)
     out->normal.x = 0.0;
     out->normal.y = 0.0;
     out->normal.z = 0.0;
-    out->clipIdk.x = 0.0;
-    out->clipIdk.y = 0.0;
+    out->texVertOffset.x = 0.0;
+    out->texVertOffset.y = 0.0;
     out->extraLight = 0.0;
     return 1;
 }

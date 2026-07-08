@@ -1018,7 +1018,7 @@ SithThing* sithThing_SetThingBasedOn(SithThing *pThing, SithThing *pTemplateThin
     thinga = pThing->idx;
     v11 = pThing->guid;
     v10 = pThing->signature;
-    v12 = pThing->renderData.parentSithThing;
+    v12 = pThing->renderData.pThing;
     if ( pTemplateThing )
     {
         stdPlatform_Memcpy32(pThing, pTemplateThing, sizeof(SithThing)); // Added: word-safe (aThings/aThingTemplates may be word-addressable-only)
@@ -1050,7 +1050,7 @@ SithThing* sithThing_SetThingBasedOn(SithThing *pThing, SithThing *pTemplateThin
     pThing->pTemplate = pTemplateThing;
     pThing->guid = v11;
     pThing->signature = v10;
-    pThing->renderData.parentSithThing = v12;
+    pThing->renderData.pThing = v12;
     return result;
 }
 

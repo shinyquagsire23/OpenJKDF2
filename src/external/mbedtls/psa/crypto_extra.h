@@ -1583,7 +1583,7 @@ psa_status_t psa_pake_set_role(psa_pake_operation_t *operation,
  * \retval #PSA_ERROR_DATA_CORRUPT \emptydescription
  * \retval #PSA_ERROR_DATA_INVALID \emptydescription
  * \retval #PSA_ERROR_BAD_STATE
- *         The operation state is not valid (it must be active, and fully set
+ *         The operation state is not valid (it must be bEnabled, and fully set
  *         up, and this call must conform to the algorithm's requirements
  *         for ordering of input and output steps), or
  *         the library has not been previously initialized by psa_crypto_init().
@@ -1638,7 +1638,7 @@ psa_status_t psa_pake_output(psa_pake_operation_t *operation,
  * \retval #PSA_ERROR_DATA_CORRUPT \emptydescription
  * \retval #PSA_ERROR_DATA_INVALID \emptydescription
  * \retval #PSA_ERROR_BAD_STATE
- *         The operation state is not valid (it must be active, and fully set
+ *         The operation state is not valid (it must be bEnabled, and fully set
  *         up, and this call must conform to the algorithm's requirements
  *         for ordering of input and output steps), or
  *         the library has not been previously initialized by psa_crypto_init().
@@ -1698,7 +1698,7 @@ psa_status_t psa_pake_input(psa_pake_operation_t *operation,
  * \retval #PSA_ERROR_DATA_CORRUPT \emptydescription
  * \retval #PSA_ERROR_DATA_INVALID \emptydescription
  * \retval #PSA_ERROR_BAD_STATE
- *         The PAKE operation state is not valid (it must be active, but beyond
+ *         The PAKE operation state is not valid (it must be bEnabled, but beyond
  *         that validity is specific to the algorithm), or
  *         the library has not been previously initialized by psa_crypto_init(),
  *         or the state of \p output is not valid for

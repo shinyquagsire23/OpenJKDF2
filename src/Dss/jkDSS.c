@@ -307,7 +307,7 @@ void jkDSS_SendSetSaberInfoMots(SithThing *thing, int personality)
     const char* dummy = "ky.snd";
     NETMSG_PUSHSTR(dummy, 0x20);
 #endif
-    NETMSG_PUSHSTR(thing->playerInfo->polyline.edgeFace.material->mat_fpath, 0x20);
+    NETMSG_PUSHSTR(thing->playerInfo->polyline.face.material->mat_fpath, 0x20);
     NETMSG_PUSHSTR(thing->playerInfo->polyline.tipFace.material->mat_fpath, 0x20);
     NETMSG_PUSHS16(personality);
 
@@ -407,10 +407,10 @@ void jkDSS_SendSetSaberInfo(SithThing *thing)
 #endif
 
 #ifdef SITH_DEBUG_STRUCT_NAMES
-    NETMSG_PUSHSTR(thing->playerInfo->polyline.edgeFace.material->mat_fpath, 0x20);
+    NETMSG_PUSHSTR(thing->playerInfo->polyline.face.material->mat_fpath, 0x20);
     NETMSG_PUSHSTR(thing->playerInfo->polyline.tipFace.material->mat_fpath, 0x20);
 #else
-    NETMSG_PUSHSTR(stdFileFromPath(thing->playerInfo->polyline.edgeFace.material->mat_fpath), 0x20);
+    NETMSG_PUSHSTR(stdFileFromPath(thing->playerInfo->polyline.face.material->mat_fpath), 0x20);
     NETMSG_PUSHSTR(stdFileFromPath(thing->playerInfo->polyline.tipFace.material->mat_fpath), 0x20);
 #endif
 
@@ -569,7 +569,7 @@ void jkDSS_SendSetSaberInfo2(SithThing *thing)
     {
         NETMSG_PUSHF32(thing->playerInfo->polylineThing.polyline->baseRadius);
         NETMSG_PUSHF32(thing->playerInfo->polylineThing.polyline->tipRadius);
-        NETMSG_PUSHSTR(thing->playerInfo->polylineThing.polyline->edgeFace.material->mat_fpath, 0x20);
+        NETMSG_PUSHSTR(thing->playerInfo->polylineThing.polyline->face.material->mat_fpath, 0x20);
         NETMSG_PUSHSTR(thing->playerInfo->polylineThing.polyline->tipFace.material->mat_fpath, 0x20);
         NETMSG_PUSHF32(thing->playerInfo->polylineThing.polyline->length);
     }
@@ -818,7 +818,7 @@ void jkDSS_Sendx32(jkPlayerInfo *playerInfo)
     rdPuppet* puppet = playerInfo->povModel.puppet;
     if ( puppet )
     {
-        trackIter = puppet->tracks;
+        trackIter = puppet->aTracks;
 
         for (int i = 0; i < 4; i++)
         {
@@ -863,7 +863,7 @@ int jkDSS_Processx32(SithMessage *msg)
     rdPuppet* puppet = playerInfo->povModel.puppet;
     if ( puppet )
     {
-        rdPuppetTrack* trackIter = puppet->tracks;
+        rdPuppetTrack* trackIter = puppet->aTracks;
 
         for (int i = 0; i < 4; i++)
         {

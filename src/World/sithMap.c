@@ -51,7 +51,7 @@ void sithMap_DrawCircle(rdCamera *camera, rdMatrix34 *orient)
     sithMap_pCurCamera = camera;
     sithMap_pCurWorld = sithWorld_g_pCurrentWorld;
     sithMap_pPlayerThing = sithWorld_g_pCurrentWorld->pLocalPlayer;
-    rdMatrix_Multiply34(&sithMap_camera, &camera->view_matrix, orient);
+    rdMatrix_Multiply34(&sithMap_camera, &camera->orient, orient);
     rdMatrix_InvertOrtho34(&sithMap_invMatrix, &sithMap_camera);
     v2 = sithMap_pPlayerThing;
     sithMap_var = 1;
@@ -227,8 +227,8 @@ int sithMap_Draw(SithSector *sector)
                                 point2 = sithMap_pCurWorld->aTransformedVertices[v17];
                                 if ( rdClip_Line3Project(sithMap_pCurCamera->pClipFrustum, &point1, &point2, &out1, &out2) )
                                 {
-                                    sithMap_pCurCamera->fnProject(&v46, &point1);
-                                    sithMap_pCurCamera->fnProject(&v43, &point2);
+                                    sithMap_pCurCamera->pfProject(&v46, &point1);
+                                    sithMap_pCurCamera->pfProject(&v43, &point2);
                                     v18 = 0;
                                     v19 = 0;
                                     if ( sithMap_ctx.numArr )
@@ -259,7 +259,7 @@ LABEL_22:
                                         v25 = sithMap_ctx.anonymous_1[sithMap_ctx.numArr - 1];
                                         v24 = 0xCCCCCCCC;
                                     }
-                                    if ( rdPrimit2_DrawClippedLine(sithMap_pCurCamera->canvas, stdMath_Ceil(v46.x), stdMath_Ceil(v46.y), stdMath_Ceil(v43.x), stdMath_Ceil(v43.y), (uint8_t)v25, v24) )
+                                    if ( rdPrimit2_DrawClippedLine(sithMap_pCurCamera->pCanvas, stdMath_Ceil(v46.x), stdMath_Ceil(v46.y), stdMath_Ceil(v43.x), stdMath_Ceil(v43.y), (uint8_t)v25, v24) )
                                         v56 = 1;
                                 }
                             }

@@ -118,7 +118,7 @@ struct Curl_multi {
   struct PslCache psl;
 #endif
 
-  /* timetree points to the splay-tree of time nodes to figure out expire
+  /* timetree points to the splay-tree of time aCurKfNodeEntryNums to figure out expire
      times of all currently set timers */
   struct Curl_tree *timetree;
 

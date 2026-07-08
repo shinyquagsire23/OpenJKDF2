@@ -335,7 +335,7 @@ int rdCache_SendFaceListToHardware()
     std3D_ResetRenderList();
     rdCache_ResetRenderList();
     v7 = rdCamera_g_pCurCamera->pClipFrustum;
-    invZFar = 1.0 / v7->zFar;
+    invZFar = 1.0 / v7->farPlane;
     rend_6c_current_idx = 0;
     
     for (rend_6c_current_idx = 0; rend_6c_current_idx < rdCache_numProcFaces; rend_6c_current_idx++)
@@ -435,7 +435,7 @@ int rdCache_SendFaceListToHardware()
         v14 = active_6c->wallCel;
         if ( v14 == -1 )
         {
-            v14 = v11.material->celIdx;
+            v14 = v11.material->curCelNum;
             if ( v14 >= 0 )
             {
                 if ( v14 > v11.material->num_texinfo - 1 )

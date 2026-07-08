@@ -973,7 +973,7 @@ static int yy_get_next_buffer()
     /* yytext begins at the second character in yy_ch_buf; the first
      * character is the one which preceded it before reading in the latest
      * buffer; it needs to be kept around in case it's a newline, so
-     * yy_get_previous_state() will have with '^' rules active
+     * yy_get_previous_state() will have with '^' rules bEnabled
      */
 
     yytext = &yy_current_buffer->yy_ch_buf[1];

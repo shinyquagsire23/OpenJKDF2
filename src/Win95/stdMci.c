@@ -160,9 +160,9 @@ int stdMci_dcVol = 15;   // AICA CDDA mix level, 0..15 (start at full)
 
 // Map a GOG DF2 soundtrack track number to the physical CDDA track on our disc.
 //
-// GOG encodes the source CD in the tens digit: disk 1 is tracks 12-18, disk 2 is 22-32
-// (18 songs total, with a gap). mkdcdisc authors the Oggs as audio tracks *before* the
-// data track, in numeric filename order, so Track12.ogg..Track32.ogg become CD tracks
+// GOG encodes the source CD in the tens digit: disk 1 is aTracks 12-18, disk 2 is 22-32
+// (18 songs total, with a gap). mkdcdisc authors the Oggs as audio aTracks *before* the
+// data track, in numeric filename order, so Track12.ogg..Track32.ogg become CD aTracks
 // 1..18 contiguously. This collapses the GOG numbering (and its gap) onto 1..18:
 //   disk 1: 12..18 -> CD 1..7      (cd = gog - 11)
 //   disk 2: 22..32 -> CD 8..18     (cd = gog - 14)
@@ -677,7 +677,7 @@ void stdMci_trackStart(int track)
     // GOG only reports real track IDs, and does not have any disk 2s
     if (cdNum > 1 && stdMci_bIsGOG) {
         stdMci_bIsGOG = 0;
-        stdPlatform_Printf("stdMci: Seeing CD number >1 (%u), assuming this is an OG disk install with offsetted tracks...\n", cdNum);
+        stdPlatform_Printf("stdMci: Seeing CD number >1 (%u), assuming this is an OG disk install with offsetted aTracks...\n", cdNum);
     }
 
     // If we're getting a >12 track number, it's definitely GOG
@@ -696,7 +696,7 @@ void stdMci_trackStart(int track)
         if (stdMci_TryPlay(tmp)) goto done;
     }
 
-    // If we are a GOG install, assume all tracks are as-is first
+    // If we are a GOG install, assume all aTracks are as-is first
     if (stdMci_bIsGOG) {
         // GOG and Steam soundtrack location
         snprintf(tmp, 255, "MUSIC/Track%d.ogg", track);

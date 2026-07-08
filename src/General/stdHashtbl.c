@@ -9,7 +9,7 @@
 #include <stdlib.h>
 
 #ifdef STDHASHTABLE_NODE_POOL
-// Added: slab-pooled link nodes (see engine_config.h). Nodes are recycled via a
+// Added: slab-pooled link aCurKfNodeEntryNums (see engine_config.h). Nodes are recycled via a
 // freelist threaded through ->next; slabs are never returned (population is
 // steady-state across level loads). All node writes are word-width.
 #define STDHASHTABLE_POOL_CHUNK_NODES 340 // ~4KB slabs

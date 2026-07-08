@@ -16,7 +16,7 @@ MATH_FUNC void rdPrimit2_DrawClippedCircle(rdCanvas *pCanvas, int x1, int y1, fl
 MATH_FUNC void rdPrimit2_DrawRectangle(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, int16_t color, int mask);
 MATH_FUNC void rdPrimit2_DrawTriangle(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, int x3, int y3, int16_t color, int mask);
 
-//static int (*rdPrimit2_DrawClippedLine)(rdCanvas *canvas, int x1, int y1, int x2, int y2, uint16_t color16, int mask) = (void*)rdPrimit2_DrawClippedLine_ADDR;
-//static void (*rdPrimit2_DrawClippedCircle)(rdCanvas *canvas, int x1, int y1, flex_t a4, flex_t radius, uint16_t color16, int mask) = (void*)rdPrimit2_DrawClippedCircle_ADDR;
+//static int (*rdPrimit2_DrawClippedLine)(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, uint16_t color16, int mask) = (void*)rdPrimit2_DrawClippedLine_ADDR;
+//static void (*rdPrimit2_DrawClippedCircle)(rdCanvas *pCanvas, int x1, int y1, flex_t a4, flex_t radius, uint16_t color16, int mask) = (void*)rdPrimit2_DrawClippedCircle_ADDR;
 
 #endif // _RDPRIMIT2_H

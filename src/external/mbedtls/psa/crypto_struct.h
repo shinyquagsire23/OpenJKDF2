@@ -85,7 +85,7 @@ struct psa_hash_operation_s {
      * drivers halfway through the operation is not supported.
      * ID values are auto-generated in psa_driver_wrappers.h.
      * ID value zero means the context is not valid or not assigned to
-     * any driver (i.e. the driver context is not active, in use). */
+     * any driver (i.e. the driver context is not bEnabled, in use). */
     unsigned int MBEDTLS_PRIVATE(id);
     psa_driver_hash_context_t MBEDTLS_PRIVATE(ctx);
 };
@@ -103,7 +103,7 @@ struct psa_cipher_operation_s {
      * drivers halfway through the operation is not supported.
      * ID values are auto-generated in psa_crypto_driver_wrappers.h
      * ID value zero means the context is not valid or not assigned to
-     * any driver (i.e. none of the driver contexts are active). */
+     * any driver (i.e. none of the driver contexts are bEnabled). */
     unsigned int MBEDTLS_PRIVATE(id);
 
     unsigned int MBEDTLS_PRIVATE(iv_required) : 1;
@@ -131,7 +131,7 @@ struct psa_mac_operation_s {
      * drivers halfway through the operation is not supported.
      * ID values are auto-generated in psa_driver_wrappers.h
      * ID value zero means the context is not valid or not assigned to
-     * any driver (i.e. none of the driver contexts are active). */
+     * any driver (i.e. none of the driver contexts are bEnabled). */
     unsigned int MBEDTLS_PRIVATE(id);
     uint8_t MBEDTLS_PRIVATE(mac_size);
     unsigned int MBEDTLS_PRIVATE(is_sign) : 1;
@@ -152,7 +152,7 @@ struct psa_aead_operation_s {
      * drivers halfway through the operation is not supported.
      * ID values are auto-generated in psa_crypto_driver_wrappers.h
      * ID value zero means the context is not valid or not assigned to
-     * any driver (i.e. none of the driver contexts are active). */
+     * any driver (i.e. none of the driver contexts are bEnabled). */
     unsigned int MBEDTLS_PRIVATE(id);
 
     psa_algorithm_t MBEDTLS_PRIVATE(alg);
@@ -500,7 +500,7 @@ struct psa_sign_hash_interruptible_operation_s {
      * drivers halfway through the operation is not supported.
      * ID values are auto-generated in psa_crypto_driver_wrappers.h
      * ID value zero means the context is not valid or not assigned to
-     * any driver (i.e. none of the driver contexts are active). */
+     * any driver (i.e. none of the driver contexts are bEnabled). */
     unsigned int MBEDTLS_PRIVATE(id);
 
     psa_driver_sign_hash_interruptible_context_t MBEDTLS_PRIVATE(ctx);
@@ -530,7 +530,7 @@ struct psa_verify_hash_interruptible_operation_s {
      * drivers halfway through the operation is not supported.
      * ID values are auto-generated in psa_crypto_driver_wrappers.h
      * ID value zero means the context is not valid or not assigned to
-     * any driver (i.e. none of the driver contexts are active). */
+     * any driver (i.e. none of the driver contexts are bEnabled). */
     unsigned int MBEDTLS_PRIVATE(id);
 
     psa_driver_verify_hash_interruptible_context_t MBEDTLS_PRIVATE(ctx);

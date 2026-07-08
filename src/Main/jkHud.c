@@ -433,13 +433,13 @@ void jkHud_Draw()
     tVBuffer* pOverlayBuffer = Video_pMenuBuffer;
     rdCanvas* pOverlayCanvas = Video_pCanvas;
 #else
-    tVBuffer* pOverlayBuffer = Video_pCanvasOverlayMap->vbuffer;
+    tVBuffer* pOverlayBuffer = Video_pCanvasOverlayMap->pVBuffer;
     rdCanvas* pOverlayCanvas = Video_pCanvasOverlayMap;
 #endif
 
     if (Main_bNoHUD) {
 #ifdef SDL2_RENDER
-    stdDisplay_VBufferUnlock(Video_pCanvas->vbuffer);
+    stdDisplay_VBufferUnlock(Video_pCanvas->pVBuffer);
 #endif
         return;
     }
@@ -457,7 +457,7 @@ void jkHud_Draw()
         stdDisplay_VBufferUnlock(Video_pMenuBuffer);
 
 #ifdef SDL2_RENDER
-    stdDisplay_VBufferLock(Video_pCanvas->vbuffer);
+    stdDisplay_VBufferLock(Video_pCanvas->pVBuffer);
 #endif
 
     if ( v4->type == SITH_THING_PLAYER && !(sithNet_isServer && jkGuiNetHost_bIsDedicated) )
@@ -916,8 +916,8 @@ LABEL_116:
     }
 
 #ifdef SDL2_RENDER
-    stdDisplay_VBufferUnlock(Video_pCanvasOverlayMap->vbuffer);
-    stdDisplay_VBufferUnlock(Video_pCanvas->vbuffer);
+    stdDisplay_VBufferUnlock(Video_pCanvasOverlayMap->pVBuffer);
+    stdDisplay_VBufferUnlock(Video_pCanvas->pVBuffer);
 #endif
 
     jkHud_DrawGPU();
@@ -1009,13 +1009,13 @@ void jkHud_DrawGPU()
     tVBuffer* pOverlayBuffer = Video_pMenuBuffer;
     rdCanvas* pOverlayCanvas = Video_pCanvas;
 #else
-    tVBuffer* pOverlayBuffer = Video_pCanvasOverlayMap->vbuffer;
+    tVBuffer* pOverlayBuffer = Video_pCanvasOverlayMap->pVBuffer;
     rdCanvas* pOverlayCanvas = Video_pCanvasOverlayMap;
 #endif
 
     if (Main_bNoHUD) {
 #ifdef SDL2_RENDER
-    stdDisplay_VBufferUnlock(Video_pCanvas->vbuffer);
+    stdDisplay_VBufferUnlock(Video_pCanvas->pVBuffer);
 #endif
         return;
     }
@@ -1033,7 +1033,7 @@ void jkHud_DrawGPU()
         stdDisplay_VBufferUnlock(Video_pMenuBuffer);
 
 #ifdef SDL2_RENDER
-    stdDisplay_VBufferLock(Video_pCanvas->vbuffer);
+    stdDisplay_VBufferLock(Video_pCanvas->pVBuffer);
 #endif
 
     // The rendering for GPU is kind of inverted from how the original does it.
@@ -1525,8 +1525,8 @@ LABEL_116:
     }
 
 #ifdef SDL2_RENDER
-    stdDisplay_VBufferUnlock(Video_pCanvasOverlayMap->vbuffer);
-    stdDisplay_VBufferUnlock(Video_pCanvas->vbuffer);
+    stdDisplay_VBufferUnlock(Video_pCanvasOverlayMap->pVBuffer);
+    stdDisplay_VBufferUnlock(Video_pCanvas->pVBuffer);
 #endif
 }
 

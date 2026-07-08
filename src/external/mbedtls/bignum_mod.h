@@ -129,7 +129,7 @@ typedef struct {
     const mbedtls_mpi_uint *p;
     size_t limbs;                            // number of limbs
     size_t bits;                             // bitlen of p
-    mbedtls_mpi_mod_rep_selector int_rep;    // selector to signal the active member of the union
+    mbedtls_mpi_mod_rep_selector int_rep;    // selector to signal the bEnabled member of the union
     union rep {
         /* if int_rep == #MBEDTLS_MPI_MOD_REP_MONTGOMERY */
         mbedtls_mpi_mont_struct mont;

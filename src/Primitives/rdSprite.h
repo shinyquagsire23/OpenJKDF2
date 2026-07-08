@@ -29,8 +29,8 @@ typedef struct rdSprite
     uint32_t anonymous_18;
     flex_t width;
     flex_t height;
-    flex_t halfWidth;
-    flex_t halfHeight;
+    flex_t widthHalf;
+    flex_t heightHalf;
     rdFace face;
     rdVector2* aTexVerticies;
     rdVector3 offset;

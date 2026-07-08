@@ -127,18 +127,18 @@ uint32_t sithModel_GetModelMemUsage(rdModel3 *model)
     rdFace* v6; // ecx
     int modela; // [esp+8h] [ebp+4h]
 
-    result = (sizeof(void*) * model->sizeMaterials) + (sizeof(rdHierarchyNode) * model->numHierarchyNodes) + sizeof(rdModel3);
-    if ( model->numGeosets )
+    result = (sizeof(void*) * model->sizeMaterials) + (sizeof(rdHierarchyNode) * model->numHNodes) + sizeof(rdModel3);
+    if ( model->numGeos )
     {
-        v2 = model->geosets;
-        modela = model->numGeosets;
+        v2 = model->aGeos;
+        modela = model->numGeos;
         do
         {
             result += 8;
             if ( v2->numMeshes )
             {
                 v3 = v2->numMeshes;
-                v4 = v2->meshes;
+                v4 = v2->aMeshes;
                 do
                 {
                     v5 = v4->numFaces;

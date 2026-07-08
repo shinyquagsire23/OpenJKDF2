@@ -92,20 +92,20 @@ typedef struct rdHierarchyNode
 typedef struct rdGeoset
 {
     uint32_t numMeshes;
-    rdMesh* meshes;    
+    rdMesh* aMeshes;    
 } rdGeoset;
 
 typedef struct rdModel3
 {
     char filename[32];
     int id;
-    rdGeoset geosets[4];
-    uint32_t numGeosets;
+    rdGeoset aGeos[4];
+    uint32_t numGeos;
     rdMaterial** aMaterials;
     uint32_t sizeMaterials;
     uint32_t geosetSelect;
-    uint32_t numHierarchyNodes;
-    rdHierarchyNode* hierarchyNodes;
+    uint32_t numHNodes;
+    rdHierarchyNode* aHierarchyNodes;
     flex_t radius;
     uint32_t field_60;
     flex_t field_64;
@@ -206,7 +206,7 @@ MATH_FUNC void rdModel3_CalcFaceNormals(rdModel3 *model);
 MATH_FUNC void rdModel3_CalcVertexNormals(rdModel3 *model);
 MATH_FUNC void rdModel3_CalcNumParents(rdModel3* pModel); // MOTS added
 rdHierarchyNode* rdModel3_FindNamedNode(char *name, rdModel3 *model);
-MATH_FUNC int rdModel3_GetMeshMatrix(rdThing *thing, rdMatrix34 *matrix, uint32_t nodeIdx, rdMatrix34 *out);
+MATH_FUNC int rdModel3_GetMeshMatrix(rdThing *thing, rdMatrix34 *matrix, uint32_t nodeNum, rdMatrix34 *out);
 MATH_FUNC int rdModel3_ReplaceMesh(rdModel3 *model, int geosetIdx, int meshIdx, rdMesh *in);
 MATH_FUNC int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3);
 MATH_FUNC void rdModel3_DrawHNode(rdHierarchyNode *pNode);

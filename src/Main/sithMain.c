@@ -430,10 +430,10 @@ void sithDrawScene()
         sithAdvanceRenderTick();
 
 #if defined(QOL_IMPROVEMENTS)
-        if (sithCamera_g_pCurCamera && sithCamera_g_pCurCamera->rdCamera.canvas)
+        if (sithCamera_g_pCurCamera && sithCamera_g_pCurCamera->rdCamera.pCanvas)
         {
             // Set screen aspect ratio
-            flex_t aspect = sithCamera_g_pCurCamera->rdCamera.canvas->half_screen_height / sithCamera_g_pCurCamera->rdCamera.canvas->half_screen_width;
+            flex_t aspect = sithCamera_g_pCurCamera->rdCamera.pCanvas->half_screen_height / sithCamera_g_pCurCamera->rdCamera.pCanvas->half_screen_width;
 #if defined(TARGET_TWL)
             //aspect = 192.0/256.0;
             //const flex_t canvasWidth = 256.0;
@@ -442,10 +442,10 @@ void sithDrawScene()
             aspect = 192.0/256.0;
             const flex_t canvasWidth = 256.0;
             const flex_t canvasHeight = 192.0;
-            sithCamera_g_pCurCamera->rdCamera.canvas->half_screen_width = canvasWidth/2;
-            sithCamera_g_pCurCamera->rdCamera.canvas->half_screen_height = canvasHeight/2;
-            sithCamera_g_pCurCamera->rdCamera.canvas->widthMinusOne = canvasWidth - 1.0;
-            sithCamera_g_pCurCamera->rdCamera.canvas->heightMinusOne = canvasHeight - 1.0;
+            sithCamera_g_pCurCamera->rdCamera.pCanvas->half_screen_width = canvasWidth/2;
+            sithCamera_g_pCurCamera->rdCamera.pCanvas->half_screen_height = canvasHeight/2;
+            sithCamera_g_pCurCamera->rdCamera.pCanvas->widthMinusOne = canvasWidth - 1.0;
+            sithCamera_g_pCurCamera->rdCamera.pCanvas->heightMinusOne = canvasHeight - 1.0;
             static flex_t sithMain_UpdateCamera_lastFov = 90.0;
             static void* sithMain_UpdateCamera_lastCamera = NULL;
 
@@ -478,7 +478,7 @@ void sithDrawScene()
         }
 #endif
 
-        //sithCamera_g_pCurCamera->rdCamera.screenAspectRatio += 0.01;
+        //sithCamera_g_pCurCamera->rdCamera.aspectRatio += 0.01;
         sithCamera_Update(sithCamera_g_pCurCamera);
         sithCamera_RenderScene();
     }

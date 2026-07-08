@@ -247,7 +247,7 @@ CURLcode Curl_fillreadbuffer(struct Curl_easy *data, size_t bytes,
     struct SingleRequest *k = &data->req;
 
     if(data->conn->handler->flags & PROTOPT_NONETWORK) {
-      /* protocols that work without network cannot be paused. This is
+      /* protocols that work without network cannot be bPaused. This is
          actually only FILE:// just now, and it can't pause since the transfer
          isn't done using the "normal" procedure. */
       failf(data, "Read callback asked for PAUSE when not supported");
@@ -255,7 +255,7 @@ CURLcode Curl_fillreadbuffer(struct Curl_easy *data, size_t bytes,
     }
 
     /* CURL_READFUNC_PAUSE pauses read callbacks that feed socket writes */
-    k->keepon |= KEEP_SEND_PAUSE; /* mark socket send as paused */
+    k->keepon |= KEEP_SEND_PAUSE; /* mark socket send as bPaused */
     if(data->req.upload_chunky) {
         /* Back out the preallocation done above */
       data->req.upload_fromhere -= (8 + 2);
@@ -745,7 +745,7 @@ static CURLcode readwrite_data(struct Curl_easy *data,
     }
 
     if((k->keepon & KEEP_RECV_PAUSE) || !(k->keepon & KEEP_RECV)) {
-      /* this is a paused or stopped transfer */
+      /* this is a bPaused or stopped transfer */
       break;
     }
 
@@ -892,7 +892,7 @@ static CURLcode readwrite_upload(struct Curl_easy *data,
         nread = 0; /* we're done uploading/reading */
 
       if(!nread && (k->keepon & KEEP_SEND_PAUSE)) {
-        /* this is a paused transfer */
+        /* this is a bPaused transfer */
         break;
       }
       if(nread <= 0) {

@@ -1268,11 +1268,11 @@ void Window_SdlVblank()
 
 #ifdef ARCH_WASM
 EM_JS(int, canvas_get_width, (), {
-  return canvas.width;
+  return pCanvas.width;
 });
 
 EM_JS(int, canvas_get_height, (), {
-  return canvas.height;
+  return pCanvas.height;
 });
 #endif
 

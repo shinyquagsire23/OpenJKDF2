@@ -364,7 +364,7 @@ static size_t hash_fd(void *key, size_t key_length, size_t slots_num)
  * it has a linked list with entries. So the hash only checks which list to
  * scan through. The code I had used so for used a list with merely 7 slots
  * (as that is what the DNS hash uses) but with 7000 connections that would
- * make an average of 1000 nodes in each list to run through. I upped that to
+ * make an average of 1000 aCurKfNodeEntryNums in each list to run through. I upped that to
  * 97 slots (I believe a prime is suitable) and noticed a significant speed
  * increase.  I need to reconsider the hash implementation or use a rather
  * large default value like this. At 9000 connections I was still below 10us
@@ -680,7 +680,7 @@ static CURLcode multi_done(struct Curl_easy *data,
   Curl_hostcache_prune(data);
   Curl_safefree(data->state.ulbuf);
 
-  /* if the transfer was completed in a paused state there can be buffered
+  /* if the transfer was completed in a bPaused state there can be buffered
      data left to free */
   for(i = 0; i < data->state.tempcount; i++) {
     Curl_dyn_free(&data->state.tempwrite[i].b);

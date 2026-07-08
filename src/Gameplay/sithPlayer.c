@@ -112,9 +112,9 @@ int sithPlayer_IsInvItemAvailable(int binIdx)
     return (jkPlayer_playerInfos[playerThingIdx].aItems[binIdx].state & 8) >> 3;
 }
 
-void sithPlayer_SetBinItemActive(int binIdx, int active)
+void sithPlayer_SetBinItemActive(int binIdx, int bEnabled)
 {
-    if ( active )
+    if ( bEnabled )
         jkPlayer_playerInfos[playerThingIdx].aItems[binIdx].state |= 4;
     else
         jkPlayer_playerInfos[playerThingIdx].aItems[binIdx].state &= ~4;

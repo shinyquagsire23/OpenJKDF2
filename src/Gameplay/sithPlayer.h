@@ -41,7 +41,7 @@ void sithPlayer_Close();
 void sithPlayer_PlacePlayers(SithWorld *world);
 int sithPlayer_GetBinItemActive(int binIdx);
 int sithPlayer_IsInvItemAvailable(int binIdx);
-void sithPlayer_SetBinItemActive(int binIdx, int active);
+void sithPlayer_SetBinItemActive(int binIdx, int bEnabled);
 flex_t sithPlayer_GetInvItemAmount(int idx);
 void sithPlayer_SetInvItemAmount(int idx, flex_t amt);
 int sithPlayer_GetThingPlayerNum(SithThing *player);

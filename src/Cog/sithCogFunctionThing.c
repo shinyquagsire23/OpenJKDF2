@@ -1042,7 +1042,7 @@ void sithCogFunctionThing_PlayMode(sithCog *ctx)
             sithCogExec_PushInt(ctx, track);
             if (COG_SHOULD_SYNC(ctx))
             {
-                sithDSSThing_PlayKeyMode(pThing, mode, pThing->renderData.puppet->tracks[track].field_130, -1, 255);
+                sithDSSThing_PlayKeyMode(pThing, mode, pThing->renderData.puppet->aTracks[track].field_130, -1, 255);
             }
         }
     }
@@ -1091,7 +1091,7 @@ void sithCogFunctionThing_PlayKey(sithCog *ctx)
         }
         if (COG_SHOULD_SYNC(ctx))
         {
-            sithDSSThing_PlayKey(pThing, keyframe, trackNum, popInt, pThing->renderData.puppet->tracks[track].field_130, -1, 255);
+            sithDSSThing_PlayKey(pThing, keyframe, trackNum, popInt, pThing->renderData.puppet->aTracks[track].field_130, -1, 255);
         }
         return;
     }
@@ -1114,7 +1114,7 @@ void sithCogFunctionThing_StopKey(sithCog *ctx)
 
     if ( track >= 0 && track < 4 && poppedFlex >= 0.0 )
     {
-        int v6 = puppet->tracks[track].field_130;
+        int v6 = puppet->aTracks[track].field_130;
         if ( sithPuppet_StopKey(puppet, track, poppedFlex) )
         {
             if (COG_SHOULD_SYNC(ctx))
@@ -1685,8 +1685,8 @@ void sithCogFunctionThing_AmputateJoint(sithCog *ctx)
                 int jointIdx = pPuppetClass->aJoints[idx];
                 if ( jointIdx >= 0 ) {
                     // Added: prevent oob
-                    if (renderData->model3 && jointIdx < renderData->model3->numHierarchyNodes)
-                        renderData->amputatedJoints[jointIdx] = 1;
+                    if (renderData->model3 && jointIdx < renderData->model3->numHNodes)
+                        renderData->paJointAmputationFlags[jointIdx] = 1;
                 }
             }
         }
@@ -2538,7 +2538,7 @@ void sithCogFunctionThing_SetJointAngle(sithCog *ctx)
       && (pThing->renderData.type == RD_THING_MODEL3)) 
       && ((prVar1 = pThing->renderData.hierarchyNodes2, prVar1 != NULL &&
       (arg1 = pThing->pPuppetClass->aJoints[arg1],
-      arg1 > -1 && arg1 <= (int)(pThing->renderData.model3->numHierarchyNodes - 1))))) 
+      arg1 > -1 && arg1 <= (int)(pThing->renderData.model3->numHNodes - 1))))) 
     {
         prVar1[arg1].x = fVar2;
     }
@@ -2557,7 +2557,7 @@ void sithCogFunctionThing_GetJointAngle(sithCog *ctx)
         if (((pThing->pPuppetClass && pThing->renderData.type == RD_THING_MODEL3) &&
             (prVar1 = (pThing->renderData).hierarchyNodes2, prVar1 != NULL)) &&
            (arg1 = pThing->pPuppetClass->aJoints[arg1],
-           arg1 > -1 && arg1 <= (int)(pThing->renderData.model3->numHierarchyNodes - 1))) 
+           arg1 > -1 && arg1 <= (int)(pThing->renderData.model3->numHNodes - 1))) 
         {
           local_4 = prVar1[arg1].x;
         }

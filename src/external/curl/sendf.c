@@ -236,7 +236,7 @@ static CURLcode pausewrite(struct Curl_easy *data,
   if(Curl_dyn_addn(&s->tempwrite[i].b, (unsigned char *)ptr, len))
     return CURLE_OUT_OF_MEMORY;
 
-  /* mark the connection as RECV paused */
+  /* mark the connection as RECV bPaused */
   k->keepon |= KEEP_RECV_PAUSE;
 
   return CURLE_OK;
@@ -262,7 +262,7 @@ static CURLcode chop_write(struct Curl_easy *data,
   if(!len)
     return CURLE_OK;
 
-  /* If reading is paused, append this data to the already held data for this
+  /* If reading is bPaused, append this data to the already held data for this
      type. */
   if(data->req.keepon & KEEP_RECV_PAUSE)
     return pausewrite(data, type, ptr, len);
@@ -302,7 +302,7 @@ static CURLcode chop_write(struct Curl_easy *data,
 
       if(CURL_WRITEFUNC_PAUSE == wrote) {
         if(conn->handler->flags & PROTOPT_NONETWORK) {
-          /* Protocols that work without network cannot be paused. This is
+          /* Protocols that work without network cannot be bPaused. This is
              actually only FILE:// just now, and it can't pause since the
              transfer isn't done using the "normal" procedure. */
           failf(data, "Write callback asked for PAUSE when not supported");

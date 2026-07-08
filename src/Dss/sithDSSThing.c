@@ -434,7 +434,7 @@ int sithDSSThing_ProcessPlayKey(SithMessage *msg)
                          arg2,
                          0);
                 if ( v4 >= 0 )
-                    pThing->renderData.puppet->tracks[v4].field_130 = arg3;
+                    pThing->renderData.puppet->aTracks[v4].field_130 = arg3;
                 return 1;
             }
         }
@@ -473,7 +473,7 @@ int sithDSSThing_ProcessPlayKeyMode(SithMessage *msg)
     int arg1 = NETMSG_POPS32();
     int v4 = sithPuppet_PlayMode(pThing, NETMSG_POPS16(), 0);
     if ( v4 >= 0 )
-        pThing->renderData.puppet->tracks[v4].field_130 = arg1;
+        pThing->renderData.puppet->aTracks[v4].field_130 = arg1;
     return 1;
 }
 
@@ -543,7 +543,7 @@ int sithDSSThing_ProcessStopKey(SithMessage *msg)
 
     uint32_t v3 = 0;
     int arg1 = NETMSG_POPS32();
-    rdPuppetTrack* v4 = &pPuppet->tracks[0];
+    rdPuppetTrack* v4 = &pPuppet->aTracks[0];
     for (int i = 0; i < 4; i++)
     {
         if ( v4->field_130 == arg1 )
@@ -864,17 +864,17 @@ void sithDSSThing_FullDescription(SithThing *thing, int sendto_id, int mpFlags)
                 NETMSG_PUSHS16(0);
             }
 
-            if (thing->renderData.amputatedJoints) {
+            if (thing->renderData.paJointAmputationFlags) {
 
                 int numJoints = 0;
-                for (int i = 0; i < model->numHierarchyNodes; i++) {
-                    if (thing->renderData.amputatedJoints[i]) {
+                for (int i = 0; i < model->numHNodes; i++) {
+                    if (thing->renderData.paJointAmputationFlags[i]) {
                         numJoints++;
                     }
                 }
                 NETMSG_PUSHS16(numJoints);
-                for (int i = 0; i < model->numHierarchyNodes; i++) {
-                    if (thing->renderData.amputatedJoints[i]) {
+                for (int i = 0; i < model->numHNodes; i++) {
+                    if (thing->renderData.paJointAmputationFlags[i]) {
                         NETMSG_PUSHS16(i);
                     }
                 }
@@ -1063,8 +1063,8 @@ int sithDSSThing_ProcessFullDescription(SithMessage *msg)
             for (int i = 0; i < numJoints; i++)
             {
                 int val = NETMSG_POPS16();
-                if (thing->renderData.amputatedJoints && (uint32_t)val < model->numHierarchyNodes) {
-                    thing->renderData.amputatedJoints[val] = 1;
+                if (thing->renderData.paJointAmputationFlags && (uint32_t)val < model->numHNodes) {
+                    thing->renderData.paJointAmputationFlags[val] = 1;
                 }
             }
         }
@@ -1263,7 +1263,7 @@ void sithDSSThing_Attachment(SithThing *thing, int sendto_id, int mpFlags, int a
         NETMSG_PUSHS32(v7->guid)
         if ( (thing->attach_flags & SITH_ATTACH_THINGFACE) != 0 )
         {
-            NETMSG_PUSHS16(((intptr_t)thing->attachedSufaceInfo - (intptr_t)v7->renderData.model3->geosets[0].meshes->faces) / sizeof(sithSurfaceInfo));
+            NETMSG_PUSHS16(((intptr_t)thing->attachedSufaceInfo - (intptr_t)v7->renderData.model3->aGeos[0].aMeshes->faces) / sizeof(sithSurfaceInfo));
         }
         else
         {
@@ -1305,8 +1305,8 @@ int sithDSSThing_ProcessAttachment(SithMessage *msg)
             sithThing_AttachThingToThingFace(
                 v1,
                 v9,
-                &v9->renderData.model3->geosets[0].meshes->faces[NETMSG_POPS16()],
-                v9->renderData.model3->geosets[0].meshes->aVertices,
+                &v9->renderData.model3->aGeos[0].aMeshes->faces[NETMSG_POPS16()],
+                v9->renderData.model3->aGeos[0].aMeshes->aVertices,
                 1);
             v1->attach_flags = v3;
             return 1;

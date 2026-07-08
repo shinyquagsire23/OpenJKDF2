@@ -381,7 +381,7 @@ struct socketmonitor {
 struct events {
   long ms;              /* timeout, run the timeout function when reached */
   bool msbump;          /* set TRUE when timeout is set by callback */
-  int num_sockets;      /* number of nodes in the monitor list */
+  int num_sockets;      /* number of aCurKfNodeEntryNums in the monitor list */
   struct socketmonitor *list; /* list of sockets to monitor */
   int running_handles;  /* store the returned number */
 };
@@ -1060,7 +1060,7 @@ void curl_easy_reset(struct Curl_easy *data)
  * transfer and direction. This function sets the full new state for the
  * current connection this easy handle operates on.
  *
- * NOTE: if you have the receiving paused and you call this function to remove
+ * NOTE: if you have the receiving bPaused and you call this function to remove
  * the pausing, you may get your write callback called at this point.
  *
  * Action is a bitmask consisting of CURLPAUSE_* bits in curl/curl.h
@@ -1093,7 +1093,7 @@ CURLcode curl_easy_pause(struct Curl_easy *data, int action)
     return CURLE_OK;
   }
 
-  /* Unpause parts in active mime tree. */
+  /* Unpause parts in bEnabled mime tree. */
   if((k->keepon & ~newstate & KEEP_SEND_PAUSE) &&
      (data->mstate == MSTATE_PERFORMING ||
       data->mstate == MSTATE_RATELIMITING) &&

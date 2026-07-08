@@ -517,7 +517,7 @@ typedef struct rdLight
 {
     uint32_t id;
     int32_t type;
-    uint32_t active;
+    uint32_t bEnabled;
     rdVector3 direction;
     flex_t intensity;
     uint32_t color;
@@ -532,8 +532,8 @@ typedef struct rdLight
     uint32_t dword20;
     uint32_t dword24;
 #endif
-    flex_t falloffMin;
-    flex_t falloffMax;
+    flex_t minRadius;
+    flex_t maxRadius;
 } rdLight;
 
 
@@ -548,22 +548,22 @@ typedef struct sithCameraRenderInfo
 typedef struct rdCamera
 {
     int32_t projectType;
-    rdCanvas* canvas;
-    rdMatrix34 view_matrix;
+    rdCanvas* pCanvas;
+    rdMatrix34 orient;
     flex_t fov;
-    flex_t fovDx;
-    flex_t screenAspectRatio;
+    flex_t focalLength;
+    flex_t aspectRatio;
     flex_t orthoScale;
     rdClipFrustum *pClipFrustum;
-    void (*fnProject)(rdVector3 *, const rdVector3 *);
-    void (*fnProjectLst)(rdVector3 *, const rdVector3 *, unsigned int);
+    void (*pfProject)(rdVector3 *, const rdVector3 *);
+    void (*pfProjectList)(rdVector3 *, const rdVector3 *, unsigned int);
 #ifdef TARGET_TWL
     void (*fnProjectLstClip)(rdVector3 *, const rdVector3 *, unsigned int);
 #endif
     flex_t ambientLight;
     int32_t numLights;
-    rdLight* lights[RDCAMERA_MAX_LIGHTS];
-    rdVector3 lightPositions[RDCAMERA_MAX_LIGHTS];
+    rdLight* aLights[RDCAMERA_MAX_LIGHTS];
+    rdVector3 aLightPositions[RDCAMERA_MAX_LIGHTS];
     flex_t attenuationMin;
     flex_t attenuationMax;
 } rdCamera;
@@ -571,7 +571,7 @@ typedef struct rdCamera
 typedef struct rdCanvas
 {
     uint32_t bIdk;
-    tVBuffer* vbuffer;
+    tVBuffer* pVBuffer;
     flex_t half_screen_width;
     flex_t half_screen_height;
     tVBuffer* d3d_vbuf;
@@ -601,11 +601,11 @@ typedef struct rdAnimEntry
 typedef struct rdJoint
 {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-    char mesh_name[32];
+    char aMeshName[32];
 #endif
-    int32_t nodeIdx;
-    uint32_t numAnimEntries;
-    rdAnimEntry* paAnimEntries;
+    int32_t nodeNum;
+    uint32_t numEntries;
+    rdAnimEntry* aEntries;
 } rdJoint;
 
 typedef struct rdKeyframe
@@ -623,7 +623,7 @@ typedef struct rdKeyframe
     flex_t fps;
     uint32_t numFrames;
     uint32_t numJoints2;
-    rdJoint* paJoints;
+    rdJoint* aNodes;
     uint32_t numMarkers;
     rdMarkers markers;
 } rdKeyframe;
@@ -631,12 +631,12 @@ typedef struct rdKeyframe
 typedef struct rdClipFrustum
 {
   int bClipFar;
-  flex_t zNear;
-  flex_t zFar;
-  flex_t orthoLeft;
-  flex_t orthoTop;
-  flex_t orthoRight;
-  flex_t orthoBottom;
+  flex_t nearPlane;
+  flex_t farPlane;
+  flex_t orthoLeftPlane;
+  flex_t orthoTopPlane;
+  flex_t orthoRightPlane;
+  flex_t orthoBottomPlane;
   flex_t farTop;
   flex_t bottom;
   flex_t farLeft;
@@ -1303,7 +1303,7 @@ typedef struct rdMaterial
 #endif
     rdColor24 *palette_alloc;
     uint32_t num_texinfo;
-    uint32_t celIdx;
+    uint32_t curCelNum;
     rdTexinfo *texinfos[RDMATERIAL_MAX_TEXINFOS];
     uint32_t num_textures;
     rdTexture *textures;
@@ -1567,7 +1567,7 @@ typedef struct rdFace
     int* vertexUVIdx;
     rdMaterial* material;
     uint32_t wallCel;
-    rdVector2 clipIdk;
+    rdVector2 texVertOffset;
     flex_t extraLight;
     rdVector3 normal;
 } rdFace;
@@ -2420,7 +2420,7 @@ typedef struct rdPolyline
     rdGeoMode_t geometryMode;
     rdLightMode_t lightingMode;
     rdTexMode_t textureMode;
-    rdFace edgeFace;
+    rdFace face;
     rdFace tipFace;
     rdVector2* extraUVTipMaybe;
     rdVector2* extraUVFaceMaybe;
@@ -2448,17 +2448,17 @@ typedef struct rdThing
     rdTexMode_t desiredTexMode;
     rdPuppet* puppet;
     uint32_t field_18;
-    uint32_t frameTrue;
-    rdMatrix34 *hierarchyNodeMatrices;
+    uint32_t rdFrameNum;
+    rdMatrix34 *paJointMatrices;
     rdVector3* hierarchyNodes2;
-    int* amputatedJoints;
+    int* paJointAmputationFlags;
     uint32_t wallCel;
     uint32_t geosetSelect;
     rdGeoMode_t curGeoMode;
     rdLightMode_t curLightMode;
     rdTexMode_t curTexMode;
     uint32_t clippingIdk;
-    SithThing* parentSithThing;
+    SithThing* pThing;
 } rdThing;
 
 typedef struct rdPuppetTrack
@@ -2471,7 +2471,7 @@ typedef struct rdPuppetTrack
     flex_t noise;
     flex_t playSpeed;
     flex_t fadeSpeed;
-    uint32_t nodes[64];
+    uint32_t aCurKfNodeEntryNums[64];
     flex_t field_120;
     flex_t field_124;
     rdKeyframe *keyframe;
@@ -2481,9 +2481,9 @@ typedef struct rdPuppetTrack
 
 typedef struct rdPuppet
 {
-    uint32_t paused;
+    uint32_t bPaused;
     rdThing *renderData;
-    rdPuppetTrack tracks[4];
+    rdPuppetTrack aTracks[4];
 } rdPuppet;
 
 typedef struct SithPlayer

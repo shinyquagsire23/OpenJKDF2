@@ -19,40 +19,40 @@ rdCanvas* rdCanvas_New(int bIdk, tVBuffer *vbuf1, tVBuffer *vbuf2, int x, int y,
     return result;
 }
 
-int rdCanvas_NewEntry(rdCanvas *canvas, int bIdk, tVBuffer *vbuf, tVBuffer *a4, int x, int y, int width, int height, int a9)
+int rdCanvas_NewEntry(rdCanvas *pCanvas, int bIdk, tVBuffer *vbuf, tVBuffer *a4, int x, int y, int width, int height, int a9)
 {
     int v9; // eax
     signed int result; // eax
 
-    canvas->d3d_vbuf = a4;
-    canvas->bIdk = bIdk;
-    canvas->vbuffer = vbuf;
-    canvas->field_14 = a9;
+    pCanvas->d3d_vbuf = a4;
+    pCanvas->bIdk = bIdk;
+    pCanvas->pVBuffer = vbuf;
+    pCanvas->field_14 = a9;
     if ( bIdk & 1 )
     {
-        canvas->xStart = x;
-        canvas->yStart = y;
-        canvas->widthMinusOne = width;
-        canvas->heightMinusOne = height;
+        pCanvas->xStart = x;
+        pCanvas->yStart = y;
+        pCanvas->widthMinusOne = width;
+        pCanvas->heightMinusOne = height;
     }
     else
     {
-        canvas->xStart = 0;
-        canvas->yStart = 0;
-        canvas->widthMinusOne = vbuf->format.width - 1;
-        canvas->heightMinusOne = vbuf->format.height - 1;
+        pCanvas->xStart = 0;
+        pCanvas->yStart = 0;
+        pCanvas->widthMinusOne = vbuf->format.width - 1;
+        pCanvas->heightMinusOne = vbuf->format.height - 1;
     }
-    canvas->half_screen_width = (flex_d_t)(canvas->widthMinusOne - canvas->xStart + 1) * 0.5 + (flex_d_t)canvas->xStart;
-    canvas->half_screen_height = (flex_d_t)(canvas->heightMinusOne - canvas->yStart + 1) * 0.5 + (flex_d_t)canvas->yStart;
+    pCanvas->half_screen_width = (flex_d_t)(pCanvas->widthMinusOne - pCanvas->xStart + 1) * 0.5 + (flex_d_t)pCanvas->xStart;
+    pCanvas->half_screen_height = (flex_d_t)(pCanvas->heightMinusOne - pCanvas->yStart + 1) * 0.5 + (flex_d_t)pCanvas->yStart;
     return 1;
 }
 
-void rdCanvas_Free(rdCanvas *canvas)
+void rdCanvas_Free(rdCanvas *pCanvas)
 {
-    if ( canvas )
-        RDROID_FREE(canvas);
+    if ( pCanvas )
+        RDROID_FREE(pCanvas);
 }
 
-void rdCanvas_FreeEntry(rdCanvas *canvas)
+void rdCanvas_FreeEntry(rdCanvas *pCanvas)
 {
 }

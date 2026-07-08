@@ -22,8 +22,8 @@
 #define rdClip_Face3GTOrtho_ADDR (0x004748D0)
 #define rdClip_SphereInFrustrum_ADDR (0x004756E0)
 
-MATH_FUNC int rdClip_Line2(rdCanvas *canvas, signed int *pX1, signed int *pY1, signed int *pX2, signed int *pY2);
-MATH_FUNC int rdClip_CalcOutcode2(rdCanvas *canvas, int x, int y);
+MATH_FUNC int rdClip_Line2(rdCanvas *pCanvas, signed int *pX1, signed int *pY1, signed int *pX2, signed int *pY2);
+MATH_FUNC int rdClip_CalcOutcode2(rdCanvas *pCanvas, int x, int y);
 MATH_FUNC int rdClip_Point3(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3 *point);
 MATH_FUNC int rdClip_Line3Project(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3 *point1, rdVector3 *point2, int *out1, int *out2);
 MATH_FUNC int rdClip_Line3Ortho(const rdClipFrustum* NO_ALIAS pClipFrustum, rdVector3 *point1, rdVector3 *point2, int *out1, int *out2);

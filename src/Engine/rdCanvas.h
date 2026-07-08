@@ -13,9 +13,9 @@ extern "C" {
 #define rdCanvas_FreeEntry_ADDR (0x0043AD50)
 
 rdCanvas* rdCanvas_New(int bIdk, tVBuffer *vbuf1, tVBuffer *vbuf2, int x, int y, int w, int h, int a8);
-int rdCanvas_NewEntry(rdCanvas *canvas, int bIdk, tVBuffer *vbuf, tVBuffer *a4, int x, int y, int width, int height, int a9);
-void rdCanvas_Free(rdCanvas *canvas);
-void rdCanvas_FreeEntry(rdCanvas *canvas);
+int rdCanvas_NewEntry(rdCanvas *pCanvas, int bIdk, tVBuffer *vbuf, tVBuffer *a4, int x, int y, int width, int height, int a9);
+void rdCanvas_Free(rdCanvas *pCanvas);
+void rdCanvas_FreeEntry(rdCanvas *pCanvas);
 
 #ifdef __cplusplus
 }

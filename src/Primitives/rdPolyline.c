@@ -51,45 +51,45 @@ int rdPolyline_NewEntry(rdPolyline *polyline, char *polyline_fname, char *materi
     }
     polyline->length = length;
     polyline->baseRadius = base_rad;
-    polyline->edgeFace.textureMode = edgeTextureMode;
+    polyline->face.textureMode = edgeTextureMode;
     polyline->textureMode = edgeTextureMode;
     polyline->lightingMode = edgeLightingMode;
     polyline->tipRadius = tip_rad;
-    polyline->edgeFace.type = 0;
-    polyline->edgeFace.geometryMode = edgeGeometryMode;
-    polyline->edgeFace.lightingMode = edgeLightingMode;
+    polyline->face.type = 0;
+    polyline->face.geometryMode = edgeGeometryMode;
+    polyline->face.lightingMode = edgeLightingMode;
     polyline->geometryMode = edgeGeometryMode;
-    polyline->edgeFace.extraLight = extraLight;
+    polyline->face.extraLight = extraLight;
 
-    polyline->edgeFace.material = rdMaterial_Load(material_side_fname, 0, 0);
-    if ( !polyline->edgeFace.material )
+    polyline->face.material = rdMaterial_Load(material_side_fname, 0, 0);
+    if ( !polyline->face.material )
         return 0;
-    rdMaterial_EnsureDataForced(polyline->edgeFace.material); // Added: TWL
-    polyline->edgeFace.numVertices = 4;
-    vertexPosIdx = (int *)RDROID_ALLOC(sizeof(int) * polyline->edgeFace.numVertices);
-    polyline->edgeFace.vertexPosIdx = vertexPosIdx;
+    rdMaterial_EnsureDataForced(polyline->face.material); // Added: TWL
+    polyline->face.numVertices = 4;
+    vertexPosIdx = (int *)RDROID_ALLOC(sizeof(int) * polyline->face.numVertices);
+    polyline->face.vertexPosIdx = vertexPosIdx;
     if ( !vertexPosIdx )
         return 0;
-    numVertices = polyline->edgeFace.numVertices;
+    numVertices = polyline->face.numVertices;
     for (int i = 0; i < numVertices; ++vertexPosIdx )
         *vertexPosIdx = i++;
-    if ( polyline->edgeFace.geometryMode >= RD_GEOMETRY_FULL)
+    if ( polyline->face.geometryMode >= RD_GEOMETRY_FULL)
     {
         vertexUVIdx = (int *)RDROID_ALLOC(4 * numVertices);
-        polyline->edgeFace.vertexUVIdx = vertexUVIdx;
+        polyline->face.vertexUVIdx = vertexUVIdx;
         if ( !vertexUVIdx )
             return 0;
-        for (int j = 0; j < polyline->edgeFace.numVertices; ++vertexUVIdx )
+        for (int j = 0; j < polyline->face.numVertices; ++vertexUVIdx )
             *vertexUVIdx = j++;
-        extraUVTipMaybe = (rdVector2 *)RDROID_ALLOC(sizeof(rdVector2) * polyline->edgeFace.numVertices);
+        extraUVTipMaybe = (rdVector2 *)RDROID_ALLOC(sizeof(rdVector2) * polyline->face.numVertices);
         polyline->extraUVTipMaybe = extraUVTipMaybe;
         if ( !extraUVTipMaybe )
             return 0;
         // Odd quirk: This requires the material be actually loaded
         // Added: nullptr fallbacks
         v22 = NULL;
-        if (polyline->edgeFace.material->texinfos[0] && polyline->edgeFace.material->texinfos[0]->texture_ptr) {
-            v22 = polyline->edgeFace.material->texinfos[0]->texture_ptr->texture_struct[0];
+        if (polyline->face.material->texinfos[0] && polyline->face.material->texinfos[0]->texture_ptr) {
+            v22 = polyline->face.material->texinfos[0]->texture_ptr->texture_struct[0];
         }
         extraUVTipMaybe[0].x = (flex_d_t)(v22 ? (unsigned int)v22->format.width : 1) - 0.01;// Added: nullptr check and fallback
         extraUVTipMaybe[0].y = 0.0;
@@ -100,7 +100,7 @@ int rdPolyline_NewEntry(rdPolyline *polyline, char *polyline_fname, char *materi
         extraUVTipMaybe[3].x = (flex_d_t)(v22 ? (unsigned int)v22->format.width : 1) - 0.01;// Added: nullptr check and fallback
         extraUVTipMaybe[3].y = (flex_d_t)(v22 ? (unsigned int)v22->format.height : 1) - 0.01;// Added: nullptr check and fallback
     }
-    rdMaterial_OptionalFree(polyline->edgeFace.material); // Added: TWL
+    rdMaterial_OptionalFree(polyline->face.material); // Added: TWL
     polyline->tipFace.textureMode = edgeTextureMode;
     polyline->textureMode = edgeTextureMode;
     polyline->lightingMode = edgeLightingMode;
@@ -182,15 +182,15 @@ void rdPolyline_FreeEntry(rdPolyline *polyline)
         RDROID_FREE(polyline->tipFace.vertexUVIdx);
         polyline->tipFace.vertexUVIdx = 0;
     }
-    if ( polyline->edgeFace.vertexPosIdx )
+    if ( polyline->face.vertexPosIdx )
     {
-        RDROID_FREE(polyline->edgeFace.vertexPosIdx);
-        polyline->edgeFace.vertexPosIdx = 0;
+        RDROID_FREE(polyline->face.vertexPosIdx);
+        polyline->face.vertexPosIdx = 0;
     }
-    if ( polyline->edgeFace.vertexUVIdx )
+    if ( polyline->face.vertexUVIdx )
     {
-        RDROID_FREE(polyline->edgeFace.vertexUVIdx);
-        polyline->edgeFace.vertexUVIdx = 0;
+        RDROID_FREE(polyline->face.vertexUVIdx);
+        polyline->face.vertexUVIdx = 0;
     }
 }
 
@@ -218,7 +218,7 @@ int rdPolyline_Draw(rdThing *thing, rdMatrix34 *matrix)
     idxInfo.paDynamicLight = 0;
     idxInfo.intensities = 0;
 
-    rdMatrix_Multiply34(&out, &rdCamera_g_pCurCamera->view_matrix, matrix);
+    rdMatrix_Multiply34(&out, &rdCamera_g_pCurCamera->orient, matrix);
     vertex.x = 0.0;
     vertex.y = polyline->length;
     vertex.z = 0.0;
@@ -304,7 +304,7 @@ int rdPolyline_Draw(rdThing *thing, rdMatrix34 *matrix)
         polylineVerts[3].y = out.scale.y;
         polylineVerts[3].z = (polyline->baseRadius * angSin) + (flex_t)0.0 + out.scale.z;
         idxInfo.aTexVerticies = polyline->extraUVTipMaybe;
-        rdPolyline_DrawFace(thing, &polyline->edgeFace, polylineVerts, &idxInfo);
+        rdPolyline_DrawFace(thing, &polyline->face, polylineVerts, &idxInfo);
     }
     return 1;
 }
@@ -379,11 +379,11 @@ void rdPolyline_DrawFace(rdThing *thing, rdFace *face, rdVector3 *unused, rdMesh
             procEntry->textureMode = rdroid_curTextureMode;
     }
 
-    rdPrimit3_ClipFace(rdCamera_g_pCurCamera->pClipFrustum, procEntry->geometryMode, procEntry->lightingMode, procEntry->textureMode, idxInfo, &mesh_out, &face->clipIdk);
+    rdPrimit3_ClipFace(rdCamera_g_pCurCamera->pClipFrustum, procEntry->geometryMode, procEntry->lightingMode, procEntry->textureMode, idxInfo, &mesh_out, &face->texVertOffset);
     if ( mesh_out.numVertices < 3 )
         return;
 
-    rdCamera_g_pCurCamera->fnProjectLst(mesh_out.verticesOrig, mesh_out.aVertices, mesh_out.numVertices);
+    rdCamera_g_pCurCamera->pfProjectList(mesh_out.verticesOrig, mesh_out.aVertices, mesh_out.numVertices);
 
     if ( rdroid_g_curRenderOptions & 2 )
         procEntry->ambientLight = rdCamera_g_pCurCamera->ambientLight;

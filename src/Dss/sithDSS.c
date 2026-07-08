@@ -109,7 +109,7 @@ void sithDSS_SurfaceStatus(SithSurface *surface, int sendto_id, int mpFlags)
         NETMSG_PUSHS32(-1);
     }
     NETMSG_PUSHS16(surface->surfaceInfo.face.wallCel);
-    NETMSG_PUSHVEC2(surface->surfaceInfo.face.clipIdk);
+    NETMSG_PUSHVEC2(surface->surfaceInfo.face.texVertOffset);
     NETMSG_PUSHF32(surface->surfaceInfo.face.extraLight);
     NETMSG_PUSHU32(surface->surfaceInfo.face.type);
     NETMSG_PUSHU32(surface->surfaceInfo.face.geometryMode);
@@ -148,7 +148,7 @@ int sithDSS_ProcessSurfaceStatus(SithMessage *msg)
     else
         surface->surfaceInfo.face.wallCel = v4;
 
-    surface->surfaceInfo.face.clipIdk = NETMSG_POPVEC2();
+    surface->surfaceInfo.face.texVertOffset = NETMSG_POPVEC2();
     surface->surfaceInfo.face.extraLight = NETMSG_POPF32();
     surface->surfaceInfo.face.type = NETMSG_POPU32();
     surface->surfaceInfo.face.geometryMode = (rdGeoMode_t)NETMSG_POPU32();
@@ -767,7 +767,7 @@ void sithDSS_SyncCameras(int sendto_id, int mpFlags)
 
         if (Main_bMotsCompat) {
 #ifndef QOL_IMPROVEMENTS
-            if (!sithCamera_g_aCameras[i].rdCamera.canvas || !sithCamera_g_aCameras[i].bZoomed) {
+            if (!sithCamera_g_aCameras[i].rdCamera.pCanvas || !sithCamera_g_aCameras[i].bZoomed) {
                 NETMSG_PUSHF32(sithCamera_g_aCameras[i].rdCamera.fov); //fVar1 = (ADJ(ppsVar5)->rdCamera).fov;
             }
             else {
@@ -993,17 +993,17 @@ void sithDSS_PuppetStatus(SithThing *thing, int sendto_id, int mpFlags)
     NETMSG_PUSHS32(thing->idx);
     for (int i = 0; i < 4; i++)
     {           
-        NETMSG_PUSHU32(puppet->tracks[i].status);
-        if ( puppet->tracks[i].status )
+        NETMSG_PUSHU32(puppet->aTracks[i].status);
+        if ( puppet->aTracks[i].status )
         {
-            NETMSG_PUSHS32(puppet->tracks[i].keyframe->id);
-            NETMSG_PUSHS32(puppet->tracks[i].field_4);
-            NETMSG_PUSHS16(puppet->tracks[i].lowPri);
-            NETMSG_PUSHS16(puppet->tracks[i].highPri);
-            NETMSG_PUSHF32(puppet->tracks[i].speed);
-            NETMSG_PUSHF32(puppet->tracks[i].playSpeed);
-            NETMSG_PUSHF32(puppet->tracks[i].field_120);
-            NETMSG_PUSHF32(puppet->tracks[i].field_124);
+            NETMSG_PUSHS32(puppet->aTracks[i].keyframe->id);
+            NETMSG_PUSHS32(puppet->aTracks[i].field_4);
+            NETMSG_PUSHS16(puppet->aTracks[i].lowPri);
+            NETMSG_PUSHS16(puppet->aTracks[i].highPri);
+            NETMSG_PUSHF32(puppet->aTracks[i].speed);
+            NETMSG_PUSHF32(puppet->aTracks[i].playSpeed);
+            NETMSG_PUSHF32(puppet->aTracks[i].field_120);
+            NETMSG_PUSHF32(puppet->aTracks[i].field_124);
         }
     }
     if ( thing->puppet )
@@ -1044,34 +1044,34 @@ int sithDSS_ProcessPuppetStatus(SithMessage *msg)
 
     for (int i = 0; i < 4; i++)
     {
-        rdpuppet->tracks[i].status = NETMSG_POPU32();
-        if ( rdpuppet->tracks[i].status )
+        rdpuppet->aTracks[i].status = NETMSG_POPU32();
+        if ( rdpuppet->aTracks[i].status )
         {
             int idx = NETMSG_POPS32();
-            rdpuppet->tracks[i].keyframe = sithKeyFrame_GetByIdx(idx);
-            //if (rdpuppet->tracks[i].keyframe)
-            //    rdpuppet->tracks[i].keyframe->id = idx;
-            rdpuppet->tracks[i].field_4 = NETMSG_POPS32();
-            rdpuppet->tracks[i].lowPri = (int)NETMSG_POPS16();
-            rdpuppet->tracks[i].highPri = (int)NETMSG_POPS16();
-            rdpuppet->tracks[i].speed = NETMSG_POPF32();
-            rdpuppet->tracks[i].playSpeed = NETMSG_POPF32();
-            rdpuppet->tracks[i].field_120 = NETMSG_POPF32();
-            rdpuppet->tracks[i].field_124 = NETMSG_POPF32();
+            rdpuppet->aTracks[i].keyframe = sithKeyFrame_GetByIdx(idx);
+            //if (rdpuppet->aTracks[i].keyframe)
+            //    rdpuppet->aTracks[i].keyframe->id = idx;
+            rdpuppet->aTracks[i].field_4 = NETMSG_POPS32();
+            rdpuppet->aTracks[i].lowPri = (int)NETMSG_POPS16();
+            rdpuppet->aTracks[i].highPri = (int)NETMSG_POPS16();
+            rdpuppet->aTracks[i].speed = NETMSG_POPF32();
+            rdpuppet->aTracks[i].playSpeed = NETMSG_POPF32();
+            rdpuppet->aTracks[i].field_120 = NETMSG_POPF32();
+            rdpuppet->aTracks[i].field_124 = NETMSG_POPF32();
 
             // Added: Fix lingering animations?
-            if ( rdpuppet->tracks[i].status & 8) {
-                rdPuppet_FadeOutTrack(rdpuppet, i, rdpuppet->tracks[i].speed);
+            if ( rdpuppet->aTracks[i].status & 8) {
+                rdPuppet_FadeOutTrack(rdpuppet, i, rdpuppet->aTracks[i].speed);
             }
-            else if ( rdpuppet->tracks[i].status & 4) {
-                int tmp = rdpuppet->tracks[i].status; // TODO idk if this is needed but idk
-                rdPuppet_FadeInTrack(rdpuppet, i, rdpuppet->tracks[i].speed);
-                rdpuppet->tracks[i].status = tmp;
+            else if ( rdpuppet->aTracks[i].status & 4) {
+                int tmp = rdpuppet->aTracks[i].status; // TODO idk if this is needed but idk
+                rdPuppet_FadeInTrack(rdpuppet, i, rdpuppet->aTracks[i].speed);
+                rdpuppet->aTracks[i].status = tmp;
             }
         }
         else // Added
         {
-            _memset(&rdpuppet->tracks[i], 0, sizeof(rdpuppet->tracks[i]));
+            _memset(&rdpuppet->aTracks[i], 0, sizeof(rdpuppet->aTracks[i]));
         }
     }
 

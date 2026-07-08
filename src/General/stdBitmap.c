@@ -214,7 +214,7 @@ int stdBitmap_LoadEntryFromFile(intptr_t fp, stdBitmap *out, int bCreateDDrawSur
         v15 = surface->format.width * ((unsigned int)surface->format.format.bpp >> 3);
 #ifdef TARGET_RETRO_HOMEBREW
         // Added: bounce rows through a temp buffer; fileRead byte-writes internally
-        // and the vbuffer may be word-addressable-only (DC VRAM / NDS slot-2).
+        // and the pVBuffer may be word-addressable-only (DC VRAM / NDS slot-2).
         char* pRowTmp = (char*)STD_ALLOC(v15);
         for ( i = 0; i < vbufTexFmt.height; ++i )
         {

@@ -24,8 +24,8 @@ typedef struct rdParticle
     int lightingMode;
     uint32_t numVertices;
     rdVector3* aVertices;
-    int* vertexCel;
-    flex_t diameter;
+    int* aVertMatCelNums;
+    flex_t size;
     flex_t radius;
     rdMaterial* material;
     flex_t cloudRadius;

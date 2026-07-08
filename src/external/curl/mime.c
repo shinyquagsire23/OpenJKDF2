@@ -1901,7 +1901,7 @@ CURLcode Curl_mime_prepare_headers(struct Curl_easy *data,
   return ret;
 }
 
-/* Recursively reset paused status in the given part. */
+/* Recursively reset bPaused status in the given part. */
 void Curl_mime_unpause(curl_mimepart *part)
 {
   if(part) {

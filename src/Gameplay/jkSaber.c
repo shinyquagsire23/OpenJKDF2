@@ -70,8 +70,8 @@ void jkSaber_PolylineRand(rdThing *thing)
     if ( line )
     {
         if ( !(jkPlayer_currentTickIdx & 0xF) )
-            line->edgeFace.clipIdk.y = 0.0;
-        line->edgeFace.clipIdk.y += (_frand() - 0.8) * 80.0;
+            line->face.texVertOffset.y = 0.0;
+        line->face.texVertOffset.y += (_frand() - 0.8) * 80.0;
     }
 }
 
@@ -81,17 +81,17 @@ void jkSaber_Draw(rdMatrix34 *posRotMat)
       && playerThings[playerThingIdx].povModel.model3
       && playerThings[playerThingIdx].polylineThing.model3 )
     {
-        if ( playerThings[playerThingIdx].povModel.frameTrue != rdroid_frameTrue )
+        if ( playerThings[playerThingIdx].povModel.rdFrameNum != rdroid_frameTrue )
         {
             rdPuppet_BuildJointMatrices(&playerThings[playerThingIdx].povModel, posRotMat);
         }
 
         jkSaber_PolylineRand(&playerThings[playerThingIdx].polylineThing);
-        rdThing_Draw(&playerThings[playerThingIdx].polylineThing, &playerThings[playerThingIdx].povModel.hierarchyNodeMatrices[5]); // aaaaa hardcoded K_Rhand
+        rdThing_Draw(&playerThings[playerThingIdx].polylineThing, &playerThings[playerThingIdx].povModel.paJointMatrices[5]); // aaaaa hardcoded K_Rhand
         
         // Added: Dual sabers
         if (playerThings[playerThingIdx].actorThing->jkFlags & JKFLAG_DUALSABERS)
-            rdThing_Draw(&playerThings[playerThingIdx].polylineThing, &playerThings[playerThingIdx].povModel.hierarchyNodeMatrices[2]); // K_Lhand
+            rdThing_Draw(&playerThings[playerThingIdx].polylineThing, &playerThings[playerThingIdx].povModel.paJointMatrices[2]); // K_Lhand
     }
 }
 

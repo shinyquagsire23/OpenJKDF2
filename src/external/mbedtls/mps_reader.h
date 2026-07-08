@@ -298,8 +298,8 @@ int mbedtls_mps_reader_feed(mbedtls_mps_reader *reader,
  *
  * \param reader    The reader context to use. The reader must be
  *                  in consuming mode.
- * \param paused    If not \c NULL, the integer at address \p paused will be
- *                  modified to indicate whether the reader has been paused
+ * \param bPaused    If not \c NULL, the integer at address \p bPaused will be
+ *                  modified to indicate whether the reader has been bPaused
  *                  (value \c 1) or not (value \c 0). Pausing happens if there
  *                  is uncommitted data and a previous request to
  *                  mbedtls_mps_reader_get() has exceeded the bounds of the
@@ -309,7 +309,7 @@ int mbedtls_mps_reader_feed(mbedtls_mps_reader *reader,
  * \return          A negative \c MBEDTLS_ERR_READER_XXX error code on failure.
  */
 int mbedtls_mps_reader_reclaim(mbedtls_mps_reader *reader,
-                               int *paused);
+                               int *bPaused);
 
 /*
  * Usage API (Upper layer)

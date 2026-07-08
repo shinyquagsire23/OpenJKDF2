@@ -360,8 +360,8 @@ struct mallinfo dlmallinfo(void);
 
   independent_calloc simplifies and speeds up implementations of many
   kinds of pools.  It may also be useful when constructing large data
-  structures that initially have a fixed number of fixed-sized nodes,
-  but the number is not known at compile time, and some of the nodes
+  structures that initially have a fixed number of fixed-sized aCurKfNodeEntryNums,
+  but the number is not known at compile time, and some of the aCurKfNodeEntryNums
   may later need to be freed. For example:
 
   struct Node { int item; struct Node* next; };

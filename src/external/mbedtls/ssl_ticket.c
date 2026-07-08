@@ -118,7 +118,7 @@ static int ssl_ticket_update_keys(mbedtls_ssl_ticket_context *ctx)
 #else
     if (ctx->ticket_lifetime != 0) {
         mbedtls_time_t current_time = mbedtls_time(NULL);
-        mbedtls_time_t key_time = ctx->keys[ctx->active].generation_time;
+        mbedtls_time_t key_time = ctx->keys[ctx->bEnabled].generation_time;
 
 #if defined(MBEDTLS_USE_PSA_CRYPTO)
         psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
@@ -129,29 +129,29 @@ static int ssl_ticket_update_keys(mbedtls_ssl_ticket_context *ctx)
             return 0;
         }
 
-        ctx->active = 1 - ctx->active;
+        ctx->bEnabled = 1 - ctx->bEnabled;
 
 #if defined(MBEDTLS_USE_PSA_CRYPTO)
-        if ((status = psa_destroy_key(ctx->keys[ctx->active].key)) != PSA_SUCCESS) {
+        if ((status = psa_destroy_key(ctx->keys[ctx->bEnabled].key)) != PSA_SUCCESS) {
             return psa_ssl_status_to_mbedtls(status);
         }
 #endif /* MBEDTLS_USE_PSA_CRYPTO */
 
-        return ssl_ticket_gen_key(ctx, ctx->active);
+        return ssl_ticket_gen_key(ctx, ctx->bEnabled);
     } else
 #endif /* MBEDTLS_HAVE_TIME */
     return 0;
 }
 
 /*
- * Rotate active session ticket encryption key
+ * Rotate bEnabled session ticket encryption key
  */
 int mbedtls_ssl_ticket_rotate(mbedtls_ssl_ticket_context *ctx,
                               const unsigned char *name, size_t nlength,
                               const unsigned char *k, size_t klength,
                               uint32_t lifetime)
 {
-    const unsigned char idx = 1 - ctx->active;
+    const unsigned char idx = 1 - ctx->bEnabled;
     mbedtls_ssl_ticket_key * const key = ctx->keys + idx;
     int ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
 
@@ -192,7 +192,7 @@ int mbedtls_ssl_ticket_rotate(mbedtls_ssl_ticket_context *ctx,
     }
 #endif /* MBEDTLS_USE_PSA_CRYPTO */
 
-    ctx->active = idx;
+    ctx->bEnabled = idx;
     ctx->ticket_lifetime = lifetime;
     memcpy(key->name, name, TICKET_KEY_NAME_BYTES);
 #if defined(MBEDTLS_HAVE_TIME)
@@ -329,7 +329,7 @@ int mbedtls_ssl_ticket_write(void *p_ticket,
         goto cleanup;
     }
 
-    key = &ctx->keys[ctx->active];
+    key = &ctx->keys[ctx->bEnabled];
 
     *ticket_lifetime = ctx->ticket_lifetime;
 

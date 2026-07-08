@@ -159,7 +159,7 @@ int sithIntersect_CheckSphereThingIntersection(SithThing *pThing, const rdVector
         rdVector3 tmpVec;
         rdVector_Zero3(&tmpVec); // Added
 
-        int iVar11 = sithIntersect_TreeIntersection(v11->renderData.model3->hierarchyNodes, &posVec, &dirVec, a4, range, v11, &tmp, &tmpVec, raycastFlags);
+        int iVar11 = sithIntersect_TreeIntersection(v11->renderData.model3->aHierarchyNodes, &posVec, &dirVec, a4, range, v11, &tmp, &tmpVec, raycastFlags);
         if (iVar11 == 0) {
             return 0;
         }
@@ -182,17 +182,17 @@ int sithIntersect_CheckSphereThingIntersection(SithThing *pThing, const rdVector
     rdMatrix_TransformPoint34Acc(&posVec, &out);
     rdMatrix_TransformVector34Acc(&dirVec, &out);
     v26 = a11;
-    v27 = v11->renderData.model3->geosets;
+    v27 = v11->renderData.model3->aGeos;
     v28 = 0;
     v30 = 0;
     //printf("aaaaa %f %f %f\n", dirVec.x, dirVec.y, dirVec.z);
     for (thinga = 0; thinga < v27->numMeshes; thinga++)
     {
-        v31 = sithIntersect_CheckSphereMeshIntersection(&posVec, &dirVec, a4, range, &v27->meshes[v30], a8, a10, v26);
+        v31 = sithIntersect_CheckSphereMeshIntersection(&posVec, &dirVec, a4, range, &v27->aMeshes[v30], a8, a10, v26);
         if ( v31 )
         {
             v28 = v31;
-            *outMesh = &v27->meshes[v30];
+            *outMesh = &v27->aMeshes[v30];
             a4 = *a8;
         }
         ++v30;
@@ -235,7 +235,7 @@ int sithIntersect_TreeIntersection(rdHierarchyNode *paNodes,rdVector3 *pPoseVec,
         if (uVar3 == 0xffffffff) {
             uVar3 = prVar1->geosetSelect;
         }
-        local_70 = prVar1->geosets[uVar3].meshes[paNodes->meshIdx].radius * 0.75;
+        local_70 = prVar1->aGeos[uVar3].aMeshes[paNodes->meshIdx].radius * 0.75;
         iVar2 = sithIntersect_CheckSphereIntersection(pPoseVec, pDirVec, a4, range, &local_6c, local_70, &local_74, 1, raycastFlags);
         if ((iVar2 != 0) && (local_74 < *pOut)) {
             *pOut = local_74;
@@ -249,7 +249,7 @@ int sithIntersect_TreeIntersection(rdHierarchyNode *paNodes,rdVector3 *pPoseVec,
         uint32_t local_70_2 = 0;
         do
         {
-            if (((v11->renderData).amputatedJoints[pChildNode->idx] == 0) &&
+            if (((v11->renderData).paJointAmputationFlags[pChildNode->idx] == 0) &&
                (iVar2 = sithIntersect_TreeIntersection(pChildNode, pPoseVec, pDirVec, a4, range, v11, pOut, pOutVec, raycastFlags),
                iVar2 != 0)) {
                 ret = 1;
@@ -749,5 +749,5 @@ int sithIntersect_CheckFaceVerticesIntersection(rdVector3 *a1, flex_t a2, rdFace
 }
 
 // sub_507EA0 and sub_508370 need struct offset verification before implementation.
-// Both iterate mesh faces/geosets calling SphereHit/sub_508400.
+// Both iterate mesh faces/aGeos calling SphereHit/sub_508400.
 // Ghidra decompilation available but struct layout depends on conditional compilation.

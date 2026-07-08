@@ -383,19 +383,19 @@ UNITTEST CURLcode Curl_shuffle_addr(struct Curl_easy *data,
   const int num_addrs = Curl_num_addresses(*addr);
 
   if(num_addrs > 1) {
-    struct Curl_addrinfo **nodes;
+    struct Curl_addrinfo **aCurKfNodeEntryNums;
     infof(data, "Shuffling %i addresses", num_addrs);
 
-    nodes = malloc(num_addrs*sizeof(*nodes));
-    if(nodes) {
+    aCurKfNodeEntryNums = malloc(num_addrs*sizeof(*aCurKfNodeEntryNums));
+    if(aCurKfNodeEntryNums) {
       int i;
       unsigned int *rnd;
       const size_t rnd_size = num_addrs * sizeof(*rnd);
 
       /* build a plain array of Curl_addrinfo pointers */
-      nodes[0] = *addr;
+      aCurKfNodeEntryNums[0] = *addr;
       for(i = 1; i < num_addrs; i++) {
-        nodes[i] = nodes[i-1]->ai_next;
+        aCurKfNodeEntryNums[i] = aCurKfNodeEntryNums[i-1]->ai_next;
       }
 
       rnd = malloc(rnd_size);
@@ -404,24 +404,24 @@ UNITTEST CURLcode Curl_shuffle_addr(struct Curl_easy *data,
         if(Curl_rand(data, (unsigned char *)rnd, rnd_size) == CURLE_OK) {
           struct Curl_addrinfo *swap_tmp;
           for(i = num_addrs - 1; i > 0; i--) {
-            swap_tmp = nodes[rnd[i] % (i + 1)];
-            nodes[rnd[i] % (i + 1)] = nodes[i];
-            nodes[i] = swap_tmp;
+            swap_tmp = aCurKfNodeEntryNums[rnd[i] % (i + 1)];
+            aCurKfNodeEntryNums[rnd[i] % (i + 1)] = aCurKfNodeEntryNums[i];
+            aCurKfNodeEntryNums[i] = swap_tmp;
           }
 
           /* relink list in the new order */
           for(i = 1; i < num_addrs; i++) {
-            nodes[i-1]->ai_next = nodes[i];
+            aCurKfNodeEntryNums[i-1]->ai_next = aCurKfNodeEntryNums[i];
           }
 
-          nodes[num_addrs-1]->ai_next = NULL;
-          *addr = nodes[0];
+          aCurKfNodeEntryNums[num_addrs-1]->ai_next = NULL;
+          *addr = aCurKfNodeEntryNums[0];
         }
         free(rnd);
       }
       else
         result = CURLE_OUT_OF_MEMORY;
-      free(nodes);
+      free(aCurKfNodeEntryNums);
     }
     else
       result = CURLE_OUT_OF_MEMORY;
@@ -956,7 +956,7 @@ enum resolve_t Curl_resolv_timeout(struct Curl_easy *data,
 clean_up:
 
   if(!prev_alarm)
-    /* deactivate a possibly active alarm before uninstalling the handler */
+    /* deactivate a possibly bEnabled alarm before uninstalling the handler */
     alarm(0);
 
 #ifdef HAVE_SIGACTION

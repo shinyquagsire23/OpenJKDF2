@@ -186,7 +186,7 @@ int rdMaterial_LoadEntry_Common(char *mat_fpath, rdMaterial *material, int creat
     material->num_textures = mat_header.num_textures;
     material->tex_type = tex_type;
     material->num_texinfo = num_texinfo;
-    material->celIdx = 0;
+    material->curCelNum = 0;
     tex_num = 0;
 #ifdef RDMATERIAL_MINIMIZE_STRUCTS
     material->texFormat.is16bit = mat_header.texFormat.is16bit;
@@ -358,7 +358,7 @@ LABEL_21:
               stdDisplay_VBufferSetColorKey(created_tex, texture->color_transparent);
             stdDisplay_VBufferLock(*texture_struct);
             // Added: bounce through a temp; fileRead byte-writes internally and the
-            // vbuffer may be word-addressable-only (DC VRAM / NDS slot-2).
+            // pVBuffer may be word-addressable-only (DC VRAM / NDS slot-2).
             {
                 uint32_t mipLen = (*texture_struct)->format.texture_size_in_bytes;
                 void* pMipTmp = STD_ALLOC(mipLen);
@@ -389,7 +389,7 @@ no_loading:
           goto LABEL_21;
         }
       }
-      stdPlatform_Printf("OpenJKDF2: Material `%s` vbuffer could not be allocated!\n", mat_fpath); // Added
+      stdPlatform_Printf("OpenJKDF2: Material `%s` pVBuffer could not be allocated!\n", mat_fpath); // Added
       mat_file_ = mat_file__;
       rdroid_g_pHS->fileClose(mat_file_);
 
@@ -536,7 +536,7 @@ int rdMaterial_LoadEntry_Deferred(rdMaterial *material, int create_ddraw_surface
     int prevSuggest = pSithHS->suggestHeap(HEAP_SLOW);
 #endif
     int prevId = material->id;
-    int prevCelIdx = material->celIdx;
+    int prevCelIdx = material->curCelNum;
 #if 0
     int prevRefCnt = material->refcnt;
 #endif
@@ -562,7 +562,7 @@ int rdMaterial_LoadEntry_Deferred(rdMaterial *material, int create_ddraw_surface
         }
     }
     material->id = prevId;
-    material->celIdx = prevCelIdx;
+    material->curCelNum = prevCelIdx;
 #if 0
     material->refcnt = prevRefCnt;
 #endif

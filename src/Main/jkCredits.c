@@ -203,7 +203,7 @@ LABEL_19:
     }
     while ( v17 < 0x1B80 );
 
-    // MOTS added: CD tracks
+    // MOTS added: CD aTracks
     if (!Main_bMotsCompat)
     {
         // Added: Discern the CD number from the episode.

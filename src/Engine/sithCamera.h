@@ -35,10 +35,10 @@ extern "C" {
 
 int sithCamera_Startup();
 void sithCamera_Shutdown();
-int sithCamera_Open(rdCanvas *canvas, flex_t aspect);
+int sithCamera_Open(rdCanvas *pCanvas, flex_t aspect);
 void sithCamera_Close();
 void sithCamera_ResetAllCameras();
-int sithCamera_NewEntry(SithCamera *camera, uint32_t a2, uint32_t a3, flex_t fov, flex_t aspectRatio, rdCanvas *canvas, SithThing *focus_far, SithThing *focus_near);
+int sithCamera_NewEntry(SithCamera *camera, uint32_t a2, uint32_t a3, flex_t fov, flex_t aspectRatio, rdCanvas *pCanvas, SithThing *focus_far, SithThing *focus_near);
 
 MATH_FUNC void sithCamera_Update(SithCamera *cam);
 void sithCamera_RenderScene();

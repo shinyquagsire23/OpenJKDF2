@@ -1222,7 +1222,7 @@ void sithCog_SendMessage(sithCog *cog, int32_t msgid, int32_t senderType, int32_
         if (cog->flags & SITH_COG_DEBUG)
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_g_genBuffer, "--Cog %s: Message %d received but COG is paused.\n", cog->aName, msgid);
+            _sprintf(std_g_genBuffer, "--Cog %s: Message %d received but COG is bPaused.\n", cog->aName, msgid);
             sithConsole_PrintString(std_g_genBuffer);
 #endif
         }
@@ -1359,7 +1359,7 @@ cog_flex_t sithCog_SendMessageEx(sithCog *cog, int32_t message, int32_t senderTy
         if ( (v13 & 1) != 0 )
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_g_genBuffer, "--Cog %s: MessageEx %d received but COG is paused.\n", cog->aName, message);
+            _sprintf(std_g_genBuffer, "--Cog %s: MessageEx %d received but COG is bPaused.\n", cog->aName, message);
             sithConsole_PrintString(std_g_genBuffer);
 #endif
         }

@@ -448,7 +448,7 @@ int InstallHelper_AttemptInstallFromExisting(nfdu8char_t* path)
         "MUSIC/Track10.ogg",
         "MUSIC/Track11.ogg",
 
-        // Gog tracks
+        // Gog aTracks
         "MUSIC/Track00.ogg",
         "MUSIC/Track01.ogg",
         "MUSIC/Track02.ogg",
@@ -511,7 +511,7 @@ int InstallHelper_AttemptInstallFromExisting(nfdu8char_t* path)
         "MUSIC/2/Track08.ogg",
         "MUSIC/2/Track09.ogg",
 
-        // GOG tracks
+        // GOG aTracks
         "MUSIC/Track12.ogg",
         "MUSIC/Track13.ogg",
         "MUSIC/Track14.ogg",

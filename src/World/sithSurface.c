@@ -279,7 +279,7 @@ int sithSurface_ReadSurfacesListText(SithWorld *world)
             {
                 wallCel = face->wallCel;
                 if ( wallCel == -1 )
-                    wallCel = face->material->celIdx;
+                    wallCel = face->material->curCelNum;
                 v66 = face->material->texinfos[wallCel];
             }
             else {
@@ -804,13 +804,13 @@ void sithSurface_Tick(flex_t deltaSecs)
                         flex_t scroll_y = surface->scrollVector.y * deltaSecs;
                         //printf("%x: %f %f %x\n", surface->index, scroll_x, scroll_y, surface->flags);
 
-                        v10->surfaceInfo.face.clipIdk.x += scroll_x;
-                        v10->surfaceInfo.face.clipIdk.y += scroll_y;
+                        v10->surfaceInfo.face.texVertOffset.x += scroll_x;
+                        v10->surfaceInfo.face.texVertOffset.y += scroll_y;
 
                         if ( ((v2 + jkPlayer_currentTickIdx) & 0xF) == 0 )
                         {
-                            v10->surfaceInfo.face.clipIdk.x = stdMath_Fmod(v10->surfaceInfo.face.clipIdk.x, 1024.0);
-                            v10->surfaceInfo.face.clipIdk.y = stdMath_Fmod(v10->surfaceInfo.face.clipIdk.y, 1024.0);
+                            v10->surfaceInfo.face.texVertOffset.x = stdMath_Fmod(v10->surfaceInfo.face.texVertOffset.x, 1024.0);
+                            v10->surfaceInfo.face.texVertOffset.y = stdMath_Fmod(v10->surfaceInfo.face.texVertOffset.y, 1024.0);
                         }
                     }
                 }
@@ -884,7 +884,7 @@ void sithSurface_Tick(flex_t deltaSecs)
                     }
                     else if ( (v22 & 0x10000) != 0 )
                     {
-                        surface->material->celIdx = surface->wallCel;
+                        surface->material->curCelNum = surface->wallCel;
                     }
                     if ( v15 )
                     {

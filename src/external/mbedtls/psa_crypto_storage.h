@@ -243,14 +243,14 @@ typedef uint16_t psa_crypto_transaction_type_t;
  * This type is designed to be serialized by writing the memory representation
  * and reading it back on the same device.
  *
- * \note The transaction mechanism is designed for a single active transaction
+ * \note The transaction mechanism is designed for a single bEnabled transaction
  *       at a time. The transaction object is #psa_crypto_transaction.
  *
  * \note If an API call starts a transaction, it must complete this transaction
  *       before returning to the application.
  *
  * The lifetime of a transaction is the following (note that only one
- * transaction may be active at a time):
+ * transaction may be bEnabled at a time):
  *
  * -# Call psa_crypto_prepare_transaction() to initialize the transaction
  *    object in memory and declare the type of transaction that is starting.
@@ -301,7 +301,7 @@ typedef union {
     } key;
 } psa_crypto_transaction_t;
 
-/** The single active transaction.
+/** The single bEnabled transaction.
  */
 extern psa_crypto_transaction_t psa_crypto_transaction;
 

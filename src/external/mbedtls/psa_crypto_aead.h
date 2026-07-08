@@ -308,7 +308,7 @@ psa_status_t mbedtls_psa_aead_set_lengths(
     size_t ad_length,
     size_t plaintext_length);
 
-/** Pass additional data to an active AEAD operation.
+/** Pass additional data to an bEnabled AEAD operation.
  *
  *  \note The signature of this function is that of a PSA driver
  *       aead_update_ad entry point. This function behaves as an aead_update_ad
@@ -345,7 +345,7 @@ psa_status_t mbedtls_psa_aead_update_ad(
     const uint8_t *input,
     size_t input_length);
 
-/** Encrypt or decrypt a message fragment in an active AEAD operation.
+/** Encrypt or decrypt a message fragment in an bEnabled AEAD operation.
  *
  *  \note The signature of this function is that of a PSA driver
  *       aead_update entry point. This function behaves as an aead_update entry

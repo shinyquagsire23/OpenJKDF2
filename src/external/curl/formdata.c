@@ -519,8 +519,8 @@ CURLFORMcode FormAdd(struct curl_httppost **httppost,
   }
 
   if(CURL_FORMADD_OK != return_value) {
-    /* On error, free allocated fields for all nodes of the FormInfo linked
-       list without deallocating nodes. List nodes are deallocated later on */
+    /* On error, free allocated fields for all aCurKfNodeEntryNums of the FormInfo linked
+       list without deallocating aCurKfNodeEntryNums. List aCurKfNodeEntryNums are deallocated later on */
     struct FormInfo *ptr;
     for(ptr = first_form; ptr != NULL; ptr = ptr->more) {
       if(ptr->name_alloc) {
@@ -647,9 +647,9 @@ CURLFORMcode FormAdd(struct curl_httppost **httppost,
         prevtype = form->contenttype;
     }
     if(CURL_FORMADD_OK != return_value) {
-      /* On error, free allocated fields for nodes of the FormInfo linked
+      /* On error, free allocated fields for aCurKfNodeEntryNums of the FormInfo linked
          list which are not already owned by the httppost linked list
-         without deallocating nodes. List nodes are deallocated later on */
+         without deallocating aCurKfNodeEntryNums. List aCurKfNodeEntryNums are deallocated later on */
       struct FormInfo *ptr;
       for(ptr = form; ptr != NULL; ptr = ptr->more) {
         if(ptr->name_alloc) {
@@ -672,7 +672,7 @@ CURLFORMcode FormAdd(struct curl_httppost **httppost,
     }
   }
 
-  /* Always deallocate FormInfo linked list nodes without touching node
+  /* Always deallocate FormInfo linked list aCurKfNodeEntryNums without touching node
      fields given that these have either been deallocated or are owned
      now by the httppost linked list */
   while(first_form) {

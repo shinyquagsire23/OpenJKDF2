@@ -64,7 +64,7 @@ void sithOverlayMap_ZoomOut()
     }
 }
 
-int sithOverlayMap_Draw(rdCanvas *canvas)
+int sithOverlayMap_Draw(rdCanvas *pCanvas)
 {
     int result; // eax
     SithThing *v2; // ecx
@@ -87,12 +87,12 @@ int sithOverlayMap_Draw(rdCanvas *canvas)
     rdSetLightingMode(1);
     sithOverlayMap_inst.world = sithWorld_g_pCurrentWorld;
     v2 = sithWorld_g_pCurrentWorld->pLocalPlayer;
-    v3 = canvas->half_screen_width;
-    sithOverlayMap_pCanvas = canvas;
+    v3 = pCanvas->half_screen_width;
+    sithOverlayMap_pCanvas = pCanvas;
     sithOverlayMap_pLocalPlayer = v2;
     v12 = (int)v3;
     sithOverlayMap_x1 = v12;
-    v12 = (int)canvas->half_screen_height;
+    v12 = (int)pCanvas->half_screen_height;
     a3.x = 0.0;
     a3.y = -sithCamera_g_pCurCamera->lookPYR.y;
     sithOverlayMap_y1 = v12;

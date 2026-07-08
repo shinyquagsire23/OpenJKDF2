@@ -885,10 +885,10 @@ int rdPrimit3_GetScreenCoord(rdVector3 *vec, rdScreenPoint *screenpt)
     rdVector3 v4; // [esp+0h] [ebp-18h] BYREF
     rdVector3 a2a; // [esp+Ch] [ebp-Ch] BYREF
 
-    rdMatrix_TransformPoint34(&a2a, vec, &rdCamera_g_pCurCamera->view_matrix);
+    rdMatrix_TransformPoint34(&a2a, vec, &rdCamera_g_pCurCamera->orient);
     if ( !rdClip_Point3(rdCamera_g_pCurCamera->pClipFrustum, &a2a) )
         return 0;
-    rdCamera_g_pCurCamera->fnProject(&v4, &a2a);
+    rdCamera_g_pCurCamera->pfProject(&v4, &a2a);
     if ( screenpt )
     {
         v2 = v4.y;
@@ -909,16 +909,16 @@ void rdPrimit3_DrawClippedCircle(rdVector3 *pVecPos, flex_t xOffs, flex_t radius
 
     // TODO is this GetScreenCoord but inlined?
 
-    rdMatrix_TransformPoint34(&vertex_out, pVecPos, &rdCamera_g_pCurCamera->view_matrix);
+    rdMatrix_TransformPoint34(&vertex_out, pVecPos, &rdCamera_g_pCurCamera->orient);
     v7.y = vertex_out.y;
     v7.z = vertex_out.z;
     v7.x = vertex_out.x + xOffs;
     if ( vertex_out.y > 0.0 )
     {
-        rdCamera_g_pCurCamera->fnProject(&v8, &vertex_out);
-        rdCamera_g_pCurCamera->fnProject(&v9, &v7);
+        rdCamera_g_pCurCamera->pfProject(&v8, &vertex_out);
+        rdCamera_g_pCurCamera->pfProject(&v9, &v7);
         v5 = v9.x - v8.x;
-        rdPrimit2_DrawClippedCircle(rdCamera_g_pCurCamera->canvas, (__int64)(v8.x - -0.5), (__int64)(v8.y - -0.5), v5, radius, color16, mask);
+        rdPrimit2_DrawClippedCircle(rdCamera_g_pCurCamera->pCanvas, (__int64)(v8.x - -0.5), (__int64)(v8.y - -0.5), v5, radius, color16, mask);
     }
 }
 

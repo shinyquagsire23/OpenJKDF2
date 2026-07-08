@@ -409,15 +409,15 @@ int mbedtls_mps_reader_commit(mbedtls_mps_reader *rd)
 }
 
 int mbedtls_mps_reader_reclaim(mbedtls_mps_reader *rd,
-                               int *paused)
+                               int *bPaused)
 {
     unsigned char *frag, *acc;
     mbedtls_mps_size_t pending, commit;
     mbedtls_mps_size_t acc_len, frag_offset, frag_len;
     MBEDTLS_MPS_TRACE_INIT("mbedtls_mps_reader_reclaim");
 
-    if (paused != NULL) {
-        *paused = 0;
+    if (bPaused != NULL) {
+        *bPaused = 0;
     }
 
     MBEDTLS_MPS_STATE_VALIDATE_RAW(mps_reader_is_consuming(
@@ -530,8 +530,8 @@ int mbedtls_mps_reader_reclaim(mbedtls_mps_reader *rd,
         rd->acc_available = backup_len;
         rd->acc_share.acc_remaining = pending;
 
-        if (paused != NULL) {
-            *paused = 1;
+        if (bPaused != NULL) {
+            *bPaused = 1;
         }
     }
 

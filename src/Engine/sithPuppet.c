@@ -205,7 +205,7 @@ int sithPuppet_PlayMode(SithThing *thing, signed int anim, rdPuppetTrackCallback
         if ( v10 >= 0 )
         {
             v11 = thing->renderData.puppet;
-            if ( v11->tracks[v10].keyframe )
+            if ( v11->aTracks[v10].keyframe )
                 rdPuppet_RemoveTrack(v11, v10);
             thing->puppet->currentTrack = -1;
         }
@@ -227,7 +227,7 @@ int sithPuppet_PlayKey(rdPuppet *puppet, rdKeyframe *keyframe, int a3, int a4, i
     if ( (a5 & 8) != 0 )
     {
         trackNum = 0;
-        while ( puppet->tracks[trackNum].keyframe != keyframe )
+        while ( puppet->aTracks[trackNum].keyframe != keyframe )
         {
             ++trackNum;
             if ( trackNum >= 4 )
@@ -271,7 +271,7 @@ LABEL_8:
     else
         rdPuppet_FadeInTrack(puppet, trackNum, 0.1);
     result = trackNum;
-    puppet->tracks[trackNum].field_130 = ((playerThingIdx + 1) << 16) | (uint16_t)(trackNum + 1);
+    puppet->aTracks[trackNum].field_130 = ((playerThingIdx + 1) << 16) | (uint16_t)(trackNum + 1);
     return result;
 }
 
@@ -346,7 +346,7 @@ void sithPuppet_UpdatePuppet(SithThing *thing, flex_t deltaSeconds)
             rdVector_Zero3(&thing->orient.scale);
             thing->renderData.field_18 = 0;
             rdPuppet_BuildJointMatrices(&thing->renderData, &thing->orient);
-            v20 = thing->renderData.hierarchyNodeMatrices;
+            v20 = thing->renderData.paJointMatrices;
             thing->renderData.field_18 = 1;
             rdVector_Add3(&a1a, &thing->trackParams.curOrient.scale, &v20->scale);
             rdVector_Sub3Acc(&a1a, &thing->position);
@@ -355,9 +355,9 @@ void sithPuppet_UpdatePuppet(SithThing *thing, flex_t deltaSeconds)
                 a2a = rdVector_Normalize3Acc(&a1a);
                 sithCollision_MoveThing(thing, &a1a, a2a, 0);
             }
-            v23 = thing->renderData.hierarchyNodeMatrices;
+            v23 = thing->renderData.paJointMatrices;
             rdVector_Sub3(&a1a, &thing->position, &v23->scale);
-            for ( i = thing->renderData.model3->numHierarchyNodes; i != 0; i--)
+            for ( i = thing->renderData.model3->numHNodes; i != 0; i--)
             {
                 rdVector_Add3Acc(&v23->scale, &a1a);
                 v23++;
@@ -586,7 +586,7 @@ void sithPuppet_sub_4E4A20(SithThing *thing, SithPuppetClassSubmode *animClass)
             v5 = sithPup->currentTrack;
             if ( v5 >= 0 )
             {
-                if ( rdPup->tracks[v5].keyframe )
+                if ( rdPup->aTracks[v5].keyframe )
                     rdPuppet_RemoveTrack(rdPup, v5);
                 sithPup = thing->puppet;
                 sithPup->currentTrack = -1;
@@ -595,7 +595,7 @@ void sithPuppet_sub_4E4A20(SithThing *thing, SithPuppetClassSubmode *animClass)
             if ( v6 >= 0 )
             {
                 v7 = thing->renderData.puppet;
-                if ( v7->tracks[v6].keyframe )
+                if ( v7->aTracks[v6].keyframe )
                     rdPuppet_FadeOutTrack(v7, v6, 0.1);
                 sithPup = thing->puppet;
                 sithPup->otherTrack = -1;
@@ -642,7 +642,7 @@ void sithPuppet_DefaultCallback(SithThing *thing, int32_t track, uint32_t a3)
         case 2u:
         case 8u:
         case 9u:
-            if ( thing->renderData.puppet->tracks[track].playSpeed < 0.5 )
+            if ( thing->renderData.puppet->aTracks[track].playSpeed < 0.5 )
                 return;
             if ( (thing->flags & SITH_TF_DEAD) != 0 )
                 return;
@@ -705,7 +705,7 @@ LABEL_14:
             thing->jkFlags &= ~JKFLAG_SABERDAMAGE;
             return;
         case 6u:
-            if ( thing->renderData.puppet->tracks[track].playSpeed >= 0.5 && thing->pSoundClass )
+            if ( thing->renderData.puppet->aTracks[track].playSpeed >= 0.5 && thing->pSoundClass )
             {
                 if ( (thing->physicsParams.flags & SITH_PF_ONWATERSURFACE) != 0 )
                     sithSoundClass_PlayModeRandom(thing, SITH_SC_LSWIMSURFACE);
@@ -714,7 +714,7 @@ LABEL_14:
             }
             return;
         case 7u:
-            if ( thing->renderData.puppet->tracks[track].playSpeed >= 0.5 && thing->pSoundClass )
+            if ( thing->renderData.puppet->aTracks[track].playSpeed >= 0.5 && thing->pSoundClass )
             {
                 if ( (thing->physicsParams.flags & SITH_PF_ONWATERSURFACE) != 0 )
                     sithSoundClass_PlayModeRandom(thing, SITH_SC_TREADSURFACE);
@@ -723,7 +723,7 @@ LABEL_14:
             }
             return;
         case 0xAu:
-            if ( thing->renderData.puppet->tracks[track].playSpeed >= 0.5 && thing->attach_flags )
+            if ( thing->renderData.puppet->aTracks[track].playSpeed >= 0.5 && thing->attach_flags )
                 sithSoundClass_PlayModeRandom(thing, SITH_SC_CORPSEHIT);
             return;
         case 0xBu:
@@ -745,7 +745,7 @@ LABEL_50:
             }
             return;
         case 0xDu:
-            if ( thing->renderData.puppet->tracks[track].playSpeed >= 0.5 && thing->pSoundClass )
+            if ( thing->renderData.puppet->aTracks[track].playSpeed >= 0.5 && thing->pSoundClass )
             {
                 if ( (thing->physicsParams.flags & SITH_PF_ONWATERSURFACE) != 0 )
                     sithSoundClass_PlayModeRandom(thing, SITH_SC_RSWIMSURFACE);
@@ -780,7 +780,7 @@ LABEL_50:
 
 int sithPuppet_StopKey(rdPuppet *pupper, int track, flex_t a3)
 {
-    if ( !pupper->tracks[track].keyframe )
+    if ( !pupper->aTracks[track].keyframe )
         return 0;
     if ( a3 <= 0.0 )
         rdPuppet_RemoveTrack(pupper, track);
@@ -875,7 +875,7 @@ void sithPuppet_resetidk(SithThing *pThing)
     if ( v2 >= 0 )
     {
         v3 = pThing->renderData.puppet;
-        if ( v3->tracks[v2].keyframe )
+        if ( v3->aTracks[v2].keyframe )
             rdPuppet_RemoveTrack(v3, v2);
         pThing->puppet->currentTrack = -1;
     }

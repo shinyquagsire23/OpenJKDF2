@@ -137,7 +137,7 @@ psa_status_t psa_open_key(mbedtls_svc_key_id_t key,
  * kept for the time being to not break applications relying on it. It is not
  * deprecated yet but will be in the near future.
  *
- * \note If the key handle was used to set up an active
+ * \note If the key handle was used to set up an bEnabled
  * :ref:\`multipart operation <multipart-operations>\`, then closing the
  * key handle can cause the multipart operation to fail. Applications should
  * maintain the key handle until after the multipart operation has finished.

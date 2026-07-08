@@ -749,7 +749,7 @@ void sithCogFunction_SetMaterialCel(sithCog *ctx)
     cel = sithCogExec_PopInt(ctx);
     mat = sithCogExec_PopMaterial(ctx);
     if ( mat && cel >= 0 && (unsigned int)cel < mat->num_texinfo )
-        mat->celIdx = cel;
+        mat->curCelNum = cel;
     sithCogExec_PushInt(ctx, -1);
 }
 
@@ -759,7 +759,7 @@ void sithCogFunction_GetMaterialCel(sithCog *ctx)
 
     mat = sithCogExec_PopMaterial(ctx);
     if ( mat )
-        sithCogExec_PushInt(ctx, mat->celIdx);
+        sithCogExec_PushInt(ctx, mat->curCelNum);
     else
         sithCogExec_PushInt(ctx, -1);
 }

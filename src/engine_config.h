@@ -301,7 +301,7 @@
 
 // tHashTable memory optimizations
 #ifdef TARGET_TWL
-// Link nodes come from slab pools (freelist reuse) instead of thousands of
+// Link aCurKfNodeEntryNums come from slab pools (freelist reuse) instead of thousands of
 // tiny heap allocations; slabs are extram-suggested. Risk-free on TWL where
 // extram is cacheable; not enabled on DC (small uncached arena -- lookup
 // pointer-chasing there would cost more than the RAM is worth).

@@ -609,7 +609,7 @@ int sithAI_AIStatus(stdDebugConsoleCmd* a1, const char *idxStr)
         }
         else
         {
-            sithConsole_PrintString("That AI block is not currently active.\n");
+            sithConsole_PrintString("That AI block is not currently bEnabled.\n");
             result = 1;
         }
     }
@@ -1579,7 +1579,7 @@ void sithAI_GetThingsInView(SithSector *a1, rdMatrix34 *a2, flex_t a3)
                 {
                     v10 = v7->surface->surfaceInfo.face.wallCel;
                     if ( v10 == -1 )
-                        v10 = v9->celIdx;
+                        v10 = v9->curCelNum;
                     v8 = v9->texinfos[v10];
                 }
                 if ( (v7->flags & 1) != 0

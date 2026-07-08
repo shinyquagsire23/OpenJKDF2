@@ -47,7 +47,7 @@ typedef CURLcode Curl_cft_connect(struct Curl_cfilter *cf,
  * This may change with the connection state of filters when tunneling
  * is involved.
  * @param cf     the filter to ask
- * @param data   the easy handle currently active
+ * @param data   the easy handle currently bEnabled
  * @param phost  on return, points to the relevant, real hostname.
  *               this is owned by the connection.
  * @param pdisplay_host  on return, points to the printable hostname.
@@ -424,7 +424,7 @@ void Curl_conn_ev_data_done_send(struct Curl_easy *data);
 void Curl_conn_ev_data_done(struct Curl_easy *data, bool premature);
 
 /**
- * Notify connection filters that the transfer of data is paused/unpaused.
+ * Notify connection filters that the transfer of data is bPaused/unpaused.
  */
 CURLcode Curl_conn_ev_data_pause(struct Curl_easy *data, bool do_pause);
 

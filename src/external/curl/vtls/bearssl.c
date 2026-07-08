@@ -59,8 +59,8 @@ struct ssl_backend_data {
   br_x509_trust_anchor *anchors;
   size_t anchors_len;
   const char *protocols[ALPN_ENTRIES_MAX];
-  /* SSL client context is active */
-  bool active;
+  /* SSL client context is bEnabled */
+  bool bEnabled;
   /* size of pending write, yet to be flushed */
   size_t pending_write;
 };
@@ -739,7 +739,7 @@ static CURLcode bearssl_connect_step1(struct Curl_cfilter *cf,
 
   if(!br_ssl_client_reset(&backend->ctx, hostname, 1))
     return CURLE_FAILED_INIT;
-  backend->active = TRUE;
+  backend->bEnabled = TRUE;
 
   connssl->connecting_state = ssl_connect_2;
 
@@ -1114,8 +1114,8 @@ static void bearssl_close(struct Curl_cfilter *cf, struct Curl_easy *data)
 
   DEBUGASSERT(backend);
 
-  if(backend->active) {
-    backend->active = FALSE;
+  if(backend->bEnabled) {
+    backend->bEnabled = FALSE;
     br_ssl_engine_close(&backend->ctx.eng);
     (void)bearssl_run_until(cf, data, BR_SSL_CLOSED);
   }

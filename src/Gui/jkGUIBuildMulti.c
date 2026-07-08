@@ -753,7 +753,7 @@ void jkGuiBuildMulti_ModelDrawer(jkGuiElement *pElement, jkGuiMenu *pMenu, tVBuf
         rdPuppet_UpdateTracks(jkGuiBuildMulti_thing->puppet, a2a);
         jkGuiBuildMulti_startTimeSecs = v5;
         rdThing_Draw(jkGuiBuildMulti_thing, &jkGuiBuildMulti_matrix);
-        rdThing_Draw(jkGuiBuildMulti_pThingGun, jkGuiBuildMulti_thing->hierarchyNodeMatrices + 12);
+        rdThing_Draw(jkGuiBuildMulti_pThingGun, jkGuiBuildMulti_thing->paJointMatrices + 12);
         rdFinishFrame();
         stdDisplay_VBufferUnlock(jkGuiBuildMulti_pVBuf1);
         rot.x = 0.0;

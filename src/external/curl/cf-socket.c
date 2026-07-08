@@ -776,7 +776,7 @@ struct cf_socket_ctx {
   int error;                         /* errno of last failure or 0 */
   BIT(got_first_byte);               /* if first byte was received */
   BIT(accepted);                     /* socket was accepted, not connected */
-  BIT(active);
+  BIT(bEnabled);
 };
 
 static void cf_socket_ctx_init(struct cf_socket_ctx *ctx,
@@ -794,13 +794,13 @@ static void cf_socket_close(struct Curl_cfilter *cf, struct Curl_easy *data)
   struct cf_socket_ctx *ctx = cf->ctx;
 
   if(ctx && CURL_SOCKET_BAD != ctx->sock) {
-    if(ctx->active) {
-      /* We share our socket at cf->conn->sock[cf->sockindex] when active.
+    if(ctx->bEnabled) {
+      /* We share our socket at cf->conn->sock[cf->sockindex] when bEnabled.
        * If it is no longer there, someone has stolen (and hopefully
        * closed it) and we just forget about it.
        */
       if(ctx->sock == cf->conn->sock[cf->sockindex]) {
-        DEBUGF(LOG_CF(data, cf, "cf_socket_close(%d, active)",
+        DEBUGF(LOG_CF(data, cf, "cf_socket_close(%d, bEnabled)",
                      (int)ctx->sock));
         socket_close(data, cf->conn, !ctx->accepted, ctx->sock);
         cf->conn->sock[cf->sockindex] = CURL_SOCKET_BAD;
@@ -817,7 +817,7 @@ static void cf_socket_close(struct Curl_cfilter *cf, struct Curl_easy *data)
     }
     else {
       /* this is our local socket, we did never publish it */
-      DEBUGF(LOG_CF(data, cf, "cf_socket_close(%d, not active)",
+      DEBUGF(LOG_CF(data, cf, "cf_socket_close(%d, not bEnabled)",
                     (int)ctx->sock));
       sclose(ctx->sock);
       ctx->sock = CURL_SOCKET_BAD;
@@ -825,7 +825,7 @@ static void cf_socket_close(struct Curl_cfilter *cf, struct Curl_easy *data)
 #ifdef USE_RECV_BEFORE_SEND_WORKAROUND
     io_buffer_reset(&ctx->recv_buffer);
 #endif
-    ctx->active = FALSE;
+    ctx->bEnabled = FALSE;
     memset(&ctx->started_at, 0, sizeof(ctx->started_at));
     memset(&ctx->connected_at, 0, sizeof(ctx->connected_at));
   }
@@ -1426,7 +1426,7 @@ static void cf_socket_active(struct Curl_cfilter *cf, struct Curl_easy *data)
     set_local_ip(cf, data);
     Curl_persistconninfo(data, cf->conn, ctx->l_ip, ctx->l_port);
   }
-  ctx->active = TRUE;
+  ctx->bEnabled = TRUE;
 }
 
 static CURLcode cf_socket_cntrl(struct Curl_cfilter *cf,
@@ -1817,7 +1817,7 @@ CURLcode Curl_conn_tcp_listen_set(struct Curl_easy *data,
 
   conn->sock[sockindex] = ctx->sock;
   set_local_ip(cf, data);
-  ctx->active = TRUE;
+  ctx->bEnabled = TRUE;
   ctx->connected_at = Curl_now();
   cf->connected = TRUE;
   DEBUGF(LOG_CF(data, cf, "Curl_conn_tcp_listen_set(%d)", (int)ctx->sock));
@@ -1880,7 +1880,7 @@ CURLcode Curl_conn_tcp_accepted_set(struct Curl_easy *data,
   conn->sock[sockindex] = ctx->sock;
   set_accepted_remote_ip(cf, data);
   set_local_ip(cf, data);
-  ctx->active = TRUE;
+  ctx->bEnabled = TRUE;
   ctx->accepted = TRUE;
   ctx->connected_at = Curl_now();
   cf->connected = TRUE;

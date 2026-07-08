@@ -146,7 +146,7 @@ int stdBmp_LoadEntryFromFile(const char *fpath, stdBitmap *bitmap, int create_dd
     // Read rows
 #ifdef TARGET_RETRO_HOMEBREW
     // Added: bounce rows through a temp buffer; fileRead byte-writes internally
-    // and the vbuffer may be word-addressable-only (DC VRAM / NDS slot-2).
+    // and the pVBuffer may be word-addressable-only (DC VRAM / NDS slot-2).
     uint8_t* pRowTmp = (uint8_t*)STD_ALLOC(stride);
 #endif
     for (int row = 0; row < height; row++)
@@ -174,9 +174,9 @@ int stdBmp_LoadEntryFromFile(const char *fpath, stdBitmap *bitmap, int create_dd
     // Flip rows vertically if height is positive (bottom-up BMP)
     if ( infoHeader.height > 0 )
     {
-        int halfHeight = height / 2;
+        int heightHalf = height / 2;
         uint8_t *topRow = (uint8_t *)vbuf->surface_lock_alloc;
-        for (int i = 0; i < halfHeight; i++)
+        for (int i = 0; i < heightHalf; i++)
         {
             uint8_t *botRow = (uint8_t *)vbuf->surface_lock_alloc + (height - 1 - i) * stride;
 #ifdef TARGET_RETRO_HOMEBREW

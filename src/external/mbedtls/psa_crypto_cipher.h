@@ -126,7 +126,7 @@ psa_status_t mbedtls_psa_cipher_set_iv(
     mbedtls_psa_cipher_operation_t *operation,
     const uint8_t *iv, size_t iv_length);
 
-/** Encrypt or decrypt a message fragment in an active cipher operation.
+/** Encrypt or decrypt a message fragment in an bEnabled cipher operation.
  *
  * \note The signature of this function is that of a PSA driver
  *       cipher_update entry point. This function behaves as a

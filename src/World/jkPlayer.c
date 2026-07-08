@@ -923,7 +923,7 @@ void jkPlayer_DrawPov()
 #ifdef QOL_IMPROVEMENTS
         // Shift gun down slightly at higher aspect ratios
         // TODO just make a cvar-alike for this
-        //trans.z += 0.007 * (1.0 / sithCamera_g_pCurCamera->rdCamera.screenAspectRatio);
+        //trans.z += 0.007 * (1.0 / sithCamera_g_pCurCamera->rdCamera.aspectRatio);
 #endif
         //printf("%f %f %f\n", (flex32_t)orient.scale.x, (flex32_t)orient.scale.y, (flex32_t)orient.scale.z);
 
@@ -1004,12 +1004,12 @@ void jkPlayer_renderSaberWeaponMesh(SithThing *thing)
 
     // Attempt to find a proper secondary weapon hand
     if (thing->jkFlags & JKFLAG_DUALSABERS && primary_mesh == secondary_mesh && thing->renderData.model3) {
-        for (int i = 0; i < thing->renderData.model3->numHierarchyNodes; i++)
+        for (int i = 0; i < thing->renderData.model3->numHNodes; i++)
         {
-            int l = _strlen(thing->renderData.model3->hierarchyNodes[i].name);
+            int l = _strlen(thing->renderData.model3->aHierarchyNodes[i].name);
             if (l < 5) continue;
 
-            if (!__strcmpi(thing->renderData.model3->hierarchyNodes[i].name + (l - 5), "lhand")) {
+            if (!__strcmpi(thing->renderData.model3->aHierarchyNodes[i].name + (l - 5), "lhand")) {
                 secondary_mesh = i;
                 break;
             }
@@ -1020,8 +1020,8 @@ void jkPlayer_renderSaberWeaponMesh(SithThing *thing)
         }
     }
 
-    rdMatrix34* primaryMat = &thing->renderData.hierarchyNodeMatrices[primary_mesh];
-    rdMatrix34* secondaryMat = &thing->renderData.hierarchyNodeMatrices[secondary_mesh];
+    rdMatrix34* primaryMat = &thing->renderData.paJointMatrices[primary_mesh];
+    rdMatrix34* secondaryMat = &thing->renderData.paJointMatrices[secondary_mesh];
 
     if (thing->jkFlags & JKFLAG_PERSUASION)
     {
@@ -1103,14 +1103,14 @@ void jkPlayer_renderSaberTwinkle(SithThing *player)
             
             // Added: Changed both of these from `_frand() * max` to `_rand() % max`
             // to prevent an off-by-one heap buffer overflow.
-            uint32_t meshIdx = model->hierarchyNodes[_rand() % model->numHierarchyNodes].meshIdx;
+            uint32_t meshIdx = model->aHierarchyNodes[_rand() % model->numHNodes].meshIdx;
 
-            if ( meshIdx != -1 && model->geosets[0].meshes[meshIdx].numVertices)
+            if ( meshIdx != -1 && model->aGeos[0].aMeshes[meshIdx].numVertices)
             {
-                uint32_t vtxIdx = (_rand() % model->geosets[0].meshes[meshIdx].numVertices);
+                uint32_t vtxIdx = (_rand() % model->aGeos[0].aMeshes[meshIdx].numVertices);
 
                 rdModel3_GetMeshMatrix(renderData, &playerInfo->actorThing->orient, meshIdx, &matTmp);
-                rdMatrix_TransformPoint34(&vTmp, &model->geosets[0].meshes[meshIdx].aVertices[vtxIdx], &matTmp);
+                rdMatrix_TransformPoint34(&vTmp, &model->aGeos[0].aMeshes[meshIdx].aVertices[vtxIdx], &matTmp);
 
                 sithThing_CreateThingAtPos(sithTemplate_GetTemplate("+twinkle"), &vTmp, &matTmp, player->sector, 0);
 

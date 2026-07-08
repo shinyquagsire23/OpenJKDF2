@@ -2398,7 +2398,7 @@
  * Enable the CMAC (Cipher-based Message Authentication Code) mode for block
  * ciphers.
  *
- * \note When #MBEDTLS_CMAC_ALT is active, meaning that the underlying
+ * \note When #MBEDTLS_CMAC_ALT is bEnabled, meaning that the underlying
  *       implementation of the CMAC algorithm is provided by an alternate
  *       implementation, that alternate implementation may opt to not support
  *       AES-192 or 3DES as underlying block ciphers for the CMAC operation.
@@ -3834,7 +3834,7 @@
  *
  * \warning No dependency checking is done on that field! This option can only
  * be used to restrict the set of available ciphersuites. It is your
- * responsibility to make sure the needed modules are active.
+ * responsibility to make sure the needed modules are bEnabled.
  *
  * Use this to save a few hundred bytes of ROM (default ordering of all
  * available ciphersuites) and a few to a few hundred bytes of RAM.

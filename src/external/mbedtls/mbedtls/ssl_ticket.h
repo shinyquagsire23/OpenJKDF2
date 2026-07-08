@@ -78,7 +78,7 @@ mbedtls_ssl_ticket_key;
  */
 typedef struct mbedtls_ssl_ticket_context {
     mbedtls_ssl_ticket_key MBEDTLS_PRIVATE(keys)[2]; /*!< ticket protection keys             */
-    unsigned char MBEDTLS_PRIVATE(active);           /*!< index of the currently active key  */
+    unsigned char MBEDTLS_PRIVATE(bEnabled);           /*!< index of the currently bEnabled key  */
 
     uint32_t MBEDTLS_PRIVATE(ticket_lifetime);       /*!< lifetime of tickets in seconds     */
 

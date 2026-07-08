@@ -849,7 +849,7 @@ void sithWorld_ResetGeoresource(SithWorld *pWorld)
 {
     for (int i = 0; i < pWorld->numMaterials; i++)
     {
-        pWorld->aMaterials[i].celIdx = 0;;
+        pWorld->aMaterials[i].curCelNum = 0;;
     }
 
     for (int i = 0; i < pWorld->numSectors; i++)
@@ -912,7 +912,7 @@ void sithWorld_GetMemoryUsage(SithWorld *pWorld, int *outAllocated, int *outQuan
         outAllocated[11] += sizeof(rdJoint) * (pWorld->aKeyframes[i].numJoints2 + 3);
         for (int j = 0; j < pWorld->aKeyframes[i].numJoints2; j++)
         {
-            outAllocated[11] += sizeof(rdAnimEntry) * pWorld->aKeyframes[i].paJoints[j].numAnimEntries;
+            outAllocated[11] += sizeof(rdAnimEntry) * pWorld->aKeyframes[i].aNodes[j].numEntries;
         }
     }
     outQuantity[12] = pWorld->numPuppetClasses;

@@ -547,8 +547,8 @@ struct hostname {
                                  might still be data to read */
 #define KEEP_SEND_HOLD (1<<3) /* when set, no writing should be done but there
                                   might still be data to write */
-#define KEEP_RECV_PAUSE (1<<4) /* reading is paused */
-#define KEEP_SEND_PAUSE (1<<5) /* writing is paused */
+#define KEEP_RECV_PAUSE (1<<4) /* reading is bPaused */
+#define KEEP_SEND_PAUSE (1<<5) /* writing is bPaused */
 
 #define KEEP_RECVBITS (KEEP_RECV | KEEP_RECV_HOLD | KEEP_RECV_PAUSE)
 #define KEEP_SENDBITS (KEEP_SEND | KEEP_SEND_HOLD | KEEP_SEND_PAUSE)
@@ -1326,7 +1326,7 @@ struct UrlState {
   struct curltime expiretime; /* set this with Curl_expire() only */
   struct Curl_tree timenode; /* for the splay stuff */
   struct Curl_llist timeoutlist; /* list of pending timeouts */
-  struct time_node expires[EXPIRE_LAST]; /* nodes for each expire type */
+  struct time_node expires[EXPIRE_LAST]; /* aCurKfNodeEntryNums for each expire type */
 
   /* a place to store the most recently set (S)FTP entrypath */
   char *most_recent_ftp_entrypath;

@@ -148,17 +148,17 @@ int jkGame_Update()
 
     jkGame_Update_Start = stdPlatform_GetTimeMsec();
 
-    // HACK HACK HACK: Adjust zNear depending on if we're using the scope/camera views
+    // HACK HACK HACK: Adjust nearPlane depending on if we're using the scope/camera views
 #if defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW)
     if (sithCamera_g_aCameras[0].rdCamera.pClipFrustum) {
-        sithCamera_g_aCameras[0].rdCamera.pClipFrustum->zNear = SITHCAMERA_ZNEAR_FIRSTPERSON;
+        sithCamera_g_aCameras[0].rdCamera.pClipFrustum->nearPlane = SITHCAMERA_ZNEAR_FIRSTPERSON;
 
         if (Main_bMotsCompat) {
             if (playerThings[playerThingIdx].actorThing->actorParams.flags & SITH_AF_SCOPEHUD) {
-                sithCamera_g_aCameras[0].rdCamera.pClipFrustum->zNear = SITHCAMERA_ZNEAR;
+                sithCamera_g_aCameras[0].rdCamera.pClipFrustum->nearPlane = SITHCAMERA_ZNEAR;
             }
             if ((playerThings[playerThingIdx].actorThing->actorParams.flags & SITH_AF_ARACHNID) != 0) {
-                sithCamera_g_aCameras[0].rdCamera.pClipFrustum->zNear = SITHCAMERA_ZNEAR;
+                sithCamera_g_aCameras[0].rdCamera.pClipFrustum->nearPlane = SITHCAMERA_ZNEAR;
             }
         }
     }
@@ -272,7 +272,7 @@ int jkGame_Update()
 #endif
 
 #if defined(SDL2_RENDER)
-    tVBuffer* pOverlayBuffer = Video_pCanvasOverlayMap->vbuffer;
+    tVBuffer* pOverlayBuffer = Video_pCanvasOverlayMap->pVBuffer;
     stdDisplay_VBufferLock(pOverlayBuffer);
     stdDisplay_VBufferFill(pOverlayBuffer, Video_fillColor, 0);
     stdDisplay_VBufferUnlock(pOverlayBuffer);

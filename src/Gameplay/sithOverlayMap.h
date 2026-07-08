@@ -20,12 +20,12 @@ void sithOverlayMap_ToggleMap();
 void sithOverlayMap_ZoomIn();
 void sithOverlayMap_ZoomOut();
 
-MATH_FUNC int sithOverlayMap_Draw(rdCanvas *canvas);
+MATH_FUNC int sithOverlayMap_Draw(rdCanvas *pCanvas);
 MATH_FUNC void sithOverlayMap_DrawSectors(SithSector *sector);
 MATH_FUNC int sithOverlayMap_DrawSector(SithSector *pSector);
 MATH_FUNC int sithOverlayMap_CanDrawSurfaceEdge(SithSurface *a1, int a2, int a3);
 
-//static int (*sithOverlayMap_Draw)(rdCanvas* canvas) = (void*)sithOverlayMap_Draw_ADDR;
+//static int (*sithOverlayMap_Draw)(rdCanvas* pCanvas) = (void*)sithOverlayMap_Draw_ADDR;
 //static int (*sithOverlayMap_ToggleMap)() = (void*)sithOverlayMap_ToggleMap_ADDR;
 //static void (*sithOverlayMap_ZoomIn)() = (void*)sithOverlayMap_ZoomIn_ADDR;
 //static void (*sithOverlayMap_ZoomOut)() = (void*)sithOverlayMap_ZoomOut_ADDR;

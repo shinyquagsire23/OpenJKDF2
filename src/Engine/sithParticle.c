@@ -172,12 +172,12 @@ void sithParticle_Update(SithThing *particle, flex_t deltaMs)
         {
             do
             {
-                v7 = v6 - v5->vertexCel[i] - 1;
-                if ( v6 - v5->vertexCel[i] != 1 )
+                v7 = v6 - v5->aVertMatCelNums[i] - 1;
+                if ( v6 - v5->aVertMatCelNums[i] != 1 )
                 {
                     if ( (flex_d_t)v7 * v16 > _frand() )
                     {
-                        v8 = &particle->renderData.particlecloud->vertexCel[i];
+                        v8 = &particle->renderData.particlecloud->aVertMatCelNums[i];
                         ++*v8;
                     }
                 }
@@ -297,11 +297,11 @@ void sithParticle_Initalize(SithThing *thing)
                         if ( v17 >= v7 - 1 )
                             v17 = v7 - 1;
                         v13 = thing->renderData.particlecloud;
-                        v13->vertexCel[v10] = v17;
+                        v13->aVertMatCelNums[v10] = v17;
                     }
                     else
                     {
-                        v13->vertexCel[v10] = -1;
+                        v13->aVertMatCelNums[v10] = -1;
                     }
                     ++v10;
                     ++v11;

@@ -55,7 +55,7 @@ void sithCamera_Shutdown()
     sithCamera_bStartup = 0;
 }
 
-int sithCamera_Open(rdCanvas *canvas, flex_t aspect)
+int sithCamera_Open(rdCanvas *pCanvas, flex_t aspect)
 {
     if ( sithCamera_bOpen )
         return 0;
@@ -63,33 +63,33 @@ int sithCamera_Open(rdCanvas *canvas, flex_t aspect)
     sithCamera_g_aCameras[0].aspectRatio = aspect;
     rdCamera_NewEntry(&sithCamera_g_aCameras[0].rdCamera, sithCamera_g_aCameras[0].rdCamera.fov, 0, SITHCAMERA_ZNEAR_FIRSTPERSON, SITHCAMERA_ZFAR, aspect);
     rdCamera_SetAttenuation(&sithCamera_g_aCameras[0].rdCamera, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
-    rdCamera_SetCanvas(&sithCamera_g_aCameras[0].rdCamera, canvas);
+    rdCamera_SetCanvas(&sithCamera_g_aCameras[0].rdCamera, pCanvas);
     sithCamera_g_aCameras[1].aspectRatio = aspect;
     rdCamera_NewEntry(&sithCamera_g_aCameras[1].rdCamera, sithCamera_g_aCameras[1].rdCamera.fov, 0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
     rdCamera_SetAttenuation(&sithCamera_g_aCameras[1].rdCamera, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
-    rdCamera_SetCanvas(&sithCamera_g_aCameras[1].rdCamera, canvas);
+    rdCamera_SetCanvas(&sithCamera_g_aCameras[1].rdCamera, pCanvas);
     sithCamera_g_aCameras[2].aspectRatio = aspect;
     rdCamera_NewEntry(&sithCamera_g_aCameras[2].rdCamera, sithCamera_g_aCameras[2].rdCamera.fov, 0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
     rdCamera_SetAttenuation(&sithCamera_g_aCameras[2].rdCamera, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
-    rdCamera_SetCanvas(&sithCamera_g_aCameras[2].rdCamera, canvas);
+    rdCamera_SetCanvas(&sithCamera_g_aCameras[2].rdCamera, pCanvas);
     sithCamera_g_aCameras[4].aspectRatio = aspect;
     rdCamera_NewEntry(&sithCamera_g_aCameras[4].rdCamera, sithCamera_g_aCameras[4].rdCamera.fov, 0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
     rdCamera_SetAttenuation(&sithCamera_g_aCameras[4].rdCamera, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
-    rdCamera_SetCanvas(&sithCamera_g_aCameras[4].rdCamera, canvas);
+    rdCamera_SetCanvas(&sithCamera_g_aCameras[4].rdCamera, pCanvas);
     sithCamera_g_aCameras[5].aspectRatio = aspect;
     rdCamera_NewEntry(&sithCamera_g_aCameras[5].rdCamera, sithCamera_g_aCameras[5].rdCamera.fov, 0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
     rdCamera_SetAttenuation(&sithCamera_g_aCameras[5].rdCamera, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
-    rdCamera_SetCanvas(&sithCamera_g_aCameras[5].rdCamera, canvas);
+    rdCamera_SetCanvas(&sithCamera_g_aCameras[5].rdCamera, pCanvas);
     sithCamera_g_aCameras[6].aspectRatio = aspect;
     rdCamera_NewEntry(&sithCamera_g_aCameras[6].rdCamera, sithCamera_g_aCameras[6].rdCamera.fov, 0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
     rdCamera_SetAttenuation(&sithCamera_g_aCameras[6].rdCamera, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
-    rdCamera_SetCanvas(&sithCamera_g_aCameras[6].rdCamera, canvas);
+    rdCamera_SetCanvas(&sithCamera_g_aCameras[6].rdCamera, pCanvas);
 #ifdef DW_CAMERA
     if (Main_bDwCompat) {
         sithCamera_g_aCameras[7].aspectRatio = aspect;
         rdCamera_NewEntry(&sithCamera_g_aCameras[7].rdCamera, sithCamera_g_aCameras[7].rdCamera.fov, 0.0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspect);
         rdCamera_SetAttenuation(&sithCamera_g_aCameras[7].rdCamera, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
-        rdCamera_SetCanvas(&sithCamera_g_aCameras[7].rdCamera, canvas);
+        rdCamera_SetCanvas(&sithCamera_g_aCameras[7].rdCamera, pCanvas);
     }
 #endif // DW_CAMERA
     sithCamera_Update(sithCamera_g_pCurCamera);
@@ -165,7 +165,7 @@ void sithCamera_ResetAllCameras()
 }
 
 // MOTS altered
-int sithCamera_NewEntry(SithCamera *camera, uint32_t a2, uint32_t a3, flex_t fov, flex_t aspectRatio, rdCanvas *canvas, SithThing *focus_far, SithThing *focus_near)
+int sithCamera_NewEntry(SithCamera *camera, uint32_t a2, uint32_t a3, flex_t fov, flex_t aspectRatio, rdCanvas *pCanvas, SithThing *focus_far, SithThing *focus_near)
 {
     camera->type = a3;
     camera->dword4 = a2;
@@ -176,8 +176,8 @@ int sithCamera_NewEntry(SithCamera *camera, uint32_t a2, uint32_t a3, flex_t fov
     rdCamera_NewEntry(&camera->rdCamera, fov, 0, SITHCAMERA_ZNEAR, SITHCAMERA_ZFAR, aspectRatio);
     rdCamera_SetAttenuation(&camera->rdCamera, SITHCAMERA_ATTENUATION_MIN, SITHCAMERA_ATTENUATION_MAX);
 
-    if (canvas) {
-        rdCamera_SetCanvas(&camera->rdCamera, canvas);
+    if (pCanvas) {
+        rdCamera_SetCanvas(&camera->rdCamera, pCanvas);
     }
 
     rdVector_Zero3(&camera->lookPos);
@@ -233,9 +233,9 @@ void sithCamera_Update(SithCamera *cam)
 #endif
 
             rdMatrix_Copy34(&cam->orient, &focusThing->orient);
-            if ( focusThing->moveType == SITH_MT_PATH && focusThing->renderData.hierarchyNodeMatrices)
+            if ( focusThing->moveType == SITH_MT_PATH && focusThing->renderData.paJointMatrices)
             {
-                rdMatrix_Copy34(&cam->orient, focusThing->renderData.hierarchyNodeMatrices);
+                rdMatrix_Copy34(&cam->orient, focusThing->renderData.paJointMatrices);
             }
             else
             {
@@ -645,13 +645,13 @@ void sithCamera_CycleCamera()
 void sithCamera_SetZoom(SithCamera *pCamera, flex_t zoomScale, flex_t zoomSpeed)
 {
     if (!pCamera) return;
-    if (!pCamera->rdCamera.canvas) return;
+    if (!pCamera->rdCamera.pCanvas) return;
 
 #ifdef JKM_CAMERA
 #ifdef QOL_IMPROVEMENTS
     flex_t zoomScaleNew = zoomScale;
-    if (jkPlayer_fovIsVertical && pCamera->rdCamera.screenAspectRatio != 0.0) {
-        flex_t horFov = (stdMath_ArcTan3(1.0, stdMath_Tan(jkPlayer_fov * 0.5) / pCamera->rdCamera.screenAspectRatio) *
+    if (jkPlayer_fovIsVertical && pCamera->rdCamera.aspectRatio != 0.0) {
+        flex_t horFov = (stdMath_ArcTan3(1.0, stdMath_Tan(jkPlayer_fov * 0.5) / pCamera->rdCamera.aspectRatio) *
  -2.0);
         flex_t zoomFov = zoomScale * horFov;
         zoomScaleNew = zoomFov / horFov;
@@ -706,11 +706,11 @@ void sithCamera_UpdateZoom(SithCamera *pCamera)
     int iVar4;
     int zoomDirection;
 
-    if (!pCamera->rdCamera.canvas) return;
+    if (!pCamera->rdCamera.pCanvas) return;
 
     // Fix zoomscale if screen size changed mid-zoom
-    if (jkPlayer_fovIsVertical && pCamera->rdCamera.screenAspectRatio != 0.0) {
-        flex_t horFov = (stdMath_ArcTan3(1.0, stdMath_Tan(jkPlayer_fov * 0.5) / pCamera->rdCamera.screenAspectRatio) *
+    if (jkPlayer_fovIsVertical && pCamera->rdCamera.aspectRatio != 0.0) {
+        flex_t horFov = (stdMath_ArcTan3(1.0, stdMath_Tan(jkPlayer_fov * 0.5) / pCamera->rdCamera.aspectRatio) *
  -2.0);
         flex_t zoomFov = pCamera->zoomScaleOrig * horFov;
         pCamera->zoomScale = zoomFov / horFov;
@@ -799,7 +799,7 @@ void sithCamera_UpdateZoom(SithCamera *pCamera)
     int iVar4;
     int zoomDirection;
 
-    if (!pCamera->rdCamera.canvas) return;
+    if (!pCamera->rdCamera.pCanvas) return;
     if (!pCamera->bZoomed) {
 
         // Added

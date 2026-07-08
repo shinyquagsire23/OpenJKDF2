@@ -15,13 +15,13 @@ void rdActive_AdvanceFrame()
     int v1; // edx
     unsigned int v2; // esi
 
-    rdCanvas* canvas = rdCamera_g_pCurCamera->canvas;
+    rdCanvas* pCanvas = rdCamera_g_pCurCamera->pCanvas;
 
     activeEdgeHead.field_28 = -65536;
     activeEdgeHead.next = &activeEdgeTail;
     activeEdgeTail.prev = &activeEdgeHead;
-    v1 = canvas->yStart;
-    v2 = 4 * (canvas->heightMinusOne - v1 + 1);
+    v1 = pCanvas->yStart;
+    v2 = 4 * (pCanvas->heightMinusOne - v1 + 1);
     _memset((void *)&apNewActiveEdges[v1], 0, v2);
     _memset((void *)&apRemoveActiveEdges[v1], 0, v2);
     yMinEdge = 0x7FFFFFFF;

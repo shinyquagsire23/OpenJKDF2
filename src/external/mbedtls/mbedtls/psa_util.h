@@ -288,7 +288,7 @@ typedef int mbedtls_f_rng_t(void *p_rng, unsigned char *output, size_t output_si
  * \note Depending on the configuration, this may be a function or
  *       a pointer to a function.
  *
- * \note This function may only be used if the PSA crypto subsystem is active.
+ * \note This function may only be used if the PSA crypto subsystem is bEnabled.
  *       This means that you must call psa_crypto_init() before any call to
  *       this function, and you must not call this function after calling
  *       mbedtls_psa_crypto_free().

@@ -1105,8 +1105,8 @@ DLMALLOC_EXPORT struct mallinfo dlmallinfo(void);
 
   independent_calloc simplifies and speeds up implementations of many
   kinds of pools.  It may also be useful when constructing large data
-  structures that initially have a fixed number of fixed-sized nodes,
-  but the number is not known at compile time, and some of the nodes
+  structures that initially have a fixed number of fixed-sized aCurKfNodeEntryNums,
+  but the number is not known at compile time, and some of the aCurKfNodeEntryNums
   may later need to be freed. For example:
 
   struct Node { int item; struct Node* next; };
@@ -2298,7 +2298,7 @@ typedef unsigned int flag_t;           /* The type of various bit flag sets */
 /* ---------------------- Overlaid data structures ----------------------- */
 
 /*
-  When chunks are not in use, they are treated as nodes of either
+  When chunks are not in use, they are treated as aCurKfNodeEntryNums of either
   lists or trees.
 
   "Small"  chunks are stored in circular doubly-linked lists, and look
@@ -2482,7 +2482,7 @@ typedef struct malloc_segment* msegmentptr;
    The main fields are:
 
   Top
-    The topmost chunk of the currently active segment. Its size is
+    The topmost chunk of the currently bEnabled segment. Its size is
     cached in topsize.  The actual size of topmost space is
     topsize+TOP_FOOT_SIZE, which includes space reserved for adding
     fenceposts and segment records if necessary when getting more
@@ -3303,7 +3303,7 @@ static void do_check_tree(mstate m, tchunkptr t) {
   assert(tsize >= minsize_for_tree_index(idx));
   assert((idx == NTREEBINS-1) || (tsize < minsize_for_tree_index((idx+1))));
 
-  do { /* traverse through chain of same-sized nodes */
+  do { /* traverse through chain of same-sized aCurKfNodeEntryNums */
     do_check_any_chunk(m, ((mchunkptr)u));
     assert(u->index == tindex);
     assert(chunksize(u) == tsize);

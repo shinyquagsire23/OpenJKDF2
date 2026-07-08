@@ -32,7 +32,7 @@ rdParticle* rdParticle_New(int numVertices, flex_t size, rdMaterial *material, i
 int rdParticle_NewEntry(rdParticle *particle, int numVertices, flex_t size, rdMaterial *material, int lightingMode, int allocateVertices)
 {
     particle->material = material;
-    particle->diameter = size;
+    particle->size = size;
     particle->radius = size * 0.5;
     particle->numVertices = numVertices;
     particle->lightingMode = lightingMode;
@@ -42,11 +42,11 @@ int rdParticle_NewEntry(rdParticle *particle, int numVertices, flex_t size, rdMa
     if (allocateVertices)
     {
         particle->aVertices = (rdVector3 *)RDROID_ALLOC(sizeof(rdVector3) * numVertices);
-        particle->vertexCel = (int *)RDROID_ALLOC(sizeof(int) * particle->numVertices);
-        if (particle->aVertices && particle->vertexCel)
+        particle->aVertMatCelNums = (int *)RDROID_ALLOC(sizeof(int) * particle->numVertices);
+        if (particle->aVertices && particle->aVertMatCelNums)
         {
             _memset(particle->aVertices, 0, sizeof(rdVector3) * particle->numVertices);
-            _memset(particle->vertexCel, 0xFF, sizeof(int) * particle->numVertices);
+            _memset(particle->aVertMatCelNums, 0xFF, sizeof(int) * particle->numVertices);
             return 1;
         }
         
@@ -55,7 +55,7 @@ int rdParticle_NewEntry(rdParticle *particle, int numVertices, flex_t size, rdMa
     else
     {
         particle->aVertices = 0;
-        particle->vertexCel = 0;
+        particle->aVertMatCelNums = 0;
         return 1;
     }
 
@@ -69,9 +69,9 @@ rdParticle* rdParticle_Duplicate(rdParticle *particle)
     clonedPart = (rdParticle*)RDROID_ALLOC(sizeof(rdParticle));
     if (clonedPart)
     {
-        rdParticle_NewEntry(clonedPart, particle->numVertices, particle->diameter, particle->material, particle->lightingMode, 1);
+        rdParticle_NewEntry(clonedPart, particle->numVertices, particle->size, particle->material, particle->lightingMode, 1);
         _memcpy(clonedPart->aVertices, particle->aVertices, sizeof(rdVector3) * particle->numVertices);
-        _memcpy(clonedPart->vertexCel, particle->vertexCel, sizeof(int) * particle->numVertices);
+        _memcpy(clonedPart->aVertMatCelNums, particle->aVertMatCelNums, sizeof(int) * particle->numVertices);
     }
 
     return clonedPart;
@@ -94,10 +94,10 @@ void rdParticle_FreeEntry(rdParticle *particle)
         if (!particle->aVertices)
             return;
         RDROID_FREE(particle->aVertices);
-        RDROID_FREE(particle->vertexCel);
+        RDROID_FREE(particle->aVertMatCelNums);
     }
     particle->aVertices = NULL;
-    particle->vertexCel = NULL;
+    particle->aVertMatCelNums = NULL;
 }
 
 rdParticle* rdParticle_Load(char *path)
@@ -158,7 +158,7 @@ int rdParticle_LoadEntry(char *fpath, rdParticle *pParticle)
     if (_sscanf(stdConffile_g_aLine, " size %f", &size) != 1)
         goto done_close;
 
-    pParticle->diameter = size; // FLEXTODO
+    pParticle->size = size; // FLEXTODO
     pParticle->radius = size * 0.5; // FLEXTODO
     if (!stdConffile_ReadLine())
         goto done_close;
@@ -210,11 +210,11 @@ int rdParticle_LoadEntry(char *fpath, rdParticle *pParticle)
         pParticle->numVertices = numVertices;
         v13 = (rdVector3 *)RDROID_ALLOC(sizeof(rdVector3) * numVertices);
         pParticle->aVertices = v13;
-        pParticle->vertexCel = (int*)RDROID_ALLOC(sizeof(int) * numVertices);
+        pParticle->aVertMatCelNums = (int*)RDROID_ALLOC(sizeof(int) * numVertices);
         v16 = pParticle->aVertices;
-        if ( v16 && pParticle->vertexCel)
+        if ( v16 && pParticle->aVertMatCelNums)
         {
-            v17 = pParticle->vertexCel;
+            v17 = pParticle->aVertMatCelNums;
             if ( numVertices <= 0 )
             {
 LABEL_28:
@@ -263,7 +263,7 @@ int rdParticle_Write(char *writePath, rdParticle *particle, char *madeBy)
     rdroid_g_pHS->filePrintf(v3, "###############\n");
     rdroid_g_pHS->filePrintf(v3, "SECTION: HEADER\n\n");
     rdroid_g_pHS->filePrintf(v3, "PAR %d.%d\n\n", 1, 0);
-    rdroid_g_pHS->filePrintf(v3, "SIZE %.6f\n\n", particle->diameter);
+    rdroid_g_pHS->filePrintf(v3, "SIZE %.6f\n\n", particle->size);
     rdroid_g_pHS->filePrintf(v3, "MATERIAL %s\n\n", particle->material->mat_fpath);
     rdroid_g_pHS->filePrintf(v3, "LIGHTINGMODE %d\n\n", particle->lightingMode);
     rdroid_g_pHS->filePrintf(v3, "###############\n");
@@ -286,7 +286,7 @@ int rdParticle_Write(char *writePath, rdParticle *particle, char *madeBy)
                 particle->aVertices[v6].x,
                 particle->aVertices[v6].y,
                 particle->aVertices[v6].z,
-                particle->vertexCel[v4]);
+                particle->aVertMatCelNums[v4]);
             ++v4;
             ++v6;
         }
@@ -334,14 +334,14 @@ int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
     flex_t matrix_4_3a; // [esp+5Ch] [ebp+8h]
 
     particle = thing->particlecloud;
-    rdMatrix_TransformPoint34(&vertex_out, &matrix_4_3->scale, &rdCamera_g_pCurCamera->view_matrix);
+    rdMatrix_TransformPoint34(&vertex_out, &matrix_4_3->scale, &rdCamera_g_pCurCamera->orient);
     if ( rdroid_curCullFlags & 2 )
         v3 = rdClip_SphereInFrustrum(rdCamera_g_pCurCamera->pClipFrustum, &vertex_out, particle->cloudRadius);
     else
         v3 = thing->clippingIdk;
     if ( v3 != SPHERE_FULLY_OUTSIDE )
     {
-        rdMatrix_Multiply34(&out, &rdCamera_g_pCurCamera->view_matrix, matrix_4_3);
+        rdMatrix_Multiply34(&out, &rdCamera_g_pCurCamera->orient, matrix_4_3);
         if ( rdroid_g_curRenderOptions & 2 )
             matrix_4_3a = rdCamera_g_pCurCamera->ambientLight;
         else
@@ -405,9 +405,9 @@ int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
             v27 = v26;
             if ( v26 >= 3 )
             {
-                rdCamera_g_pCurCamera->fnProjectLst(v5->aVertices, aParticleVerticesTmp, v26);
+                rdCamera_g_pCurCamera->pfProjectList(v5->aVertices, aParticleVerticesTmp, v26);
                 v5->lightingMode = v35;
-                v29 = particle->vertexCel;
+                v29 = particle->aVertMatCelNums;
                 v5->material = particle->material;
 
                 // Added: Particles should always be drawn

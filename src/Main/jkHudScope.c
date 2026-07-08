@@ -180,7 +180,7 @@ void jkHudScope_Draw(void)
     tVBuffer* pOverlayBuffer = Video_pMenuBuffer;
     rdCanvas* pOverlayCanvas = Video_pCanvas;
 #else
-    tVBuffer* pOverlayBuffer = Video_pCanvasOverlayMap->vbuffer;
+    tVBuffer* pOverlayBuffer = Video_pCanvasOverlayMap->pVBuffer;
     rdCanvas* pOverlayCanvas = Video_pCanvasOverlayMap;
     stdDisplay_VBufferLock(pOverlayBuffer);
 #endif

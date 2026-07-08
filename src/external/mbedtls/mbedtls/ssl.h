@@ -1863,11 +1863,11 @@ void mbedtls_ssl_init(mbedtls_ssl_context *ssl);
  *
  * \warning        The conf structure will be accessed during the session.
  *                 It must not be modified or freed as long as the session
- *                 is active.
+ *                 is bEnabled.
  *
  * \warning        This function must be called exactly once per context.
  *                 Calling mbedtls_ssl_setup again is not supported, even
- *                 if no session is active.
+ *                 if no session is bEnabled.
  *
  * \param ssl      SSL context
  * \param conf     SSL configuration to use
@@ -2874,7 +2874,7 @@ void mbedtls_ssl_conf_dtls_anti_replay(mbedtls_ssl_config *conf, char mode);
  *                 ones going through the authentication-decryption phase.
  *
  * \note           This is a security trade-off related to the fact that it's
- *                 often relatively easy for an active attacker to inject UDP
+ *                 often relatively easy for an bEnabled attacker to inject UDP
  *                 datagrams. On one hand, setting a low limit here makes it
  *                 easier for such an attacker to forcibly terminated a
  *                 connection. On the other hand, a high limit or no limit
@@ -4899,7 +4899,7 @@ int mbedtls_ssl_read(mbedtls_ssl_context *ssl, unsigned char *buf, size_t len);
  *                 - with TLS, less bytes than requested are written.
  *                 - with DTLS, MBEDTLS_ERR_SSL_BAD_INPUT_DATA is returned.
  *                 \c mbedtls_ssl_get_max_out_record_payload() may be used to
- *                 query the active maximum fragment length.
+ *                 query the bEnabled maximum fragment length.
  *
  * \note           Attempting to write 0 bytes will result in an empty TLS
  *                 application record being sent.
@@ -5094,7 +5094,7 @@ void mbedtls_ssl_free(mbedtls_ssl_context *ssl);
 
 #if defined(MBEDTLS_SSL_CONTEXT_SERIALIZATION)
 /**
- * \brief          Save an active connection as serialized data in a buffer.
+ * \brief          Save an bEnabled connection as serialized data in a buffer.
  *                 This allows the freeing or re-using of the SSL context
  *                 while still picking up the connection later in a way that
  *                 it entirely transparent to the peer.
@@ -5202,7 +5202,7 @@ int mbedtls_ssl_context_save(mbedtls_ssl_context *ssl,
  * \note           If you have new information about the path MTU, you want to
  *                 call mbedtls_ssl_set_mtu() after calling this function, as
  *                 otherwise this function would overwrite your
- *                 newly-configured value with the value that was active when
+ *                 newly-configured value with the value that was bEnabled when
  *                 the context was saved.
  *
  * \note           When this function returns an error code, it calls

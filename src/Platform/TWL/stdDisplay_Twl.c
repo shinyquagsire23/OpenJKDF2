@@ -258,7 +258,7 @@ tVBuffer* stdDisplay_VBufferNew(tRasterInfo *fmt, int create_ddraw_surface, int 
 
     //out->format.width = 0;
     //out->format.width_in_bytes = 0;
-    // vbuffer pixel data is only accessed word-safe on this port, so allow
+    // pVBuffer pixel data is only accessed word-safe on this port, so allow
     // placement in word-addressable-only memory (e.g. future slot-2 RAM heap).
     int prevSuggest = std_g_pHS->suggestHeap(HEAP_WORD_ADDRESSABLE);
     out->surface_lock_alloc = (char*)STD_ALLOC(out->format.texture_size_in_bytes);

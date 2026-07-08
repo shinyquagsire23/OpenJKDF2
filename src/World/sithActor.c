@@ -336,7 +336,7 @@ void sithActor_SetHeadPYR(SithThing *actor, const rdVector3 *headPYR)
     {
         torsoIdx = pAnimClass->aJoints[JOINTTYPE_TORSO];
         primaryWeapJointIdx = pAnimClass->aJoints[JOINTTYPE_PRIMARYWEAPJOINT];
-        v7 = actor->renderData.model3->numHierarchyNodes;
+        v7 = actor->renderData.model3->numHNodes;
         neckIdx = pAnimClass->aJoints[JOINTTYPE_NECK];
         v9 = pAnimClass->aJoints[JOINTTYPE_SECONDARYWEAPJOINT];
         v10 = v7 - 1;

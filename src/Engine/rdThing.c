@@ -23,17 +23,17 @@ int rdThing_NewEntry(rdThing *thing, SithThing *parent)
     thing->type = 0;
     thing->puppet = 0;
     thing->field_18 = 0;
-    thing->frameTrue = 0;
+    thing->rdFrameNum = 0;
     thing->geosetSelect = -1;
     thing->wallCel = -1;
-    thing->hierarchyNodeMatrices = 0;
+    thing->paJointMatrices = 0;
     thing->desiredGeoMode = RD_GEOMETRY_FULL;
     thing->desiredLightMode = RD_LIGHTMODE_GOURAUD;
     thing->desiredTexMode = RD_TEXTUREMODE_2_UNK;
     thing->curGeoMode = RD_GEOMETRY_FULL;
     thing->curLightMode = RD_LIGHTMODE_GOURAUD;
     thing->curTexMode = RD_TEXTUREMODE_2_UNK;
-    thing->parentSithThing = parent;
+    thing->pThing = parent;
     return 1;
 }
 
@@ -50,20 +50,20 @@ void rdThing_FreeEntry(rdThing *thing)
 {
     if (thing->type == RD_THING_MODEL3)
     {
-        if ( thing->hierarchyNodeMatrices )
+        if ( thing->paJointMatrices )
         {
-            RDROID_FREE(thing->hierarchyNodeMatrices);
-            thing->hierarchyNodeMatrices = 0;
+            RDROID_FREE(thing->paJointMatrices);
+            thing->paJointMatrices = 0;
         }
         if ( thing->hierarchyNodes2 )
         {
             RDROID_FREE((void *)thing->hierarchyNodes2); // Possible OOB write in this
             thing->hierarchyNodes2 = 0;
         }
-        if ( thing->amputatedJoints )
+        if ( thing->paJointAmputationFlags )
         {
-            RDROID_FREE(thing->amputatedJoints);
-            thing->amputatedJoints = 0;
+            RDROID_FREE(thing->paJointAmputationFlags);
+            thing->paJointAmputationFlags = 0;
         }
     }
     if ( thing->puppet )
@@ -82,37 +82,37 @@ int rdThing_SetModel3(rdThing *thing, rdModel3 *model)
 #ifdef STDPLATFORM_HEAP_SUGGESTIONS
     int prevSuggest = pSithHS->suggestHeap(HEAP_FAST);
 #endif
-    thing->hierarchyNodeMatrices = (rdMatrix34*)RDROID_ALLOC(sizeof(rdMatrix34) * model->numHierarchyNodes);
+    thing->paJointMatrices = (rdMatrix34*)RDROID_ALLOC(sizeof(rdMatrix34) * model->numHNodes);
 #ifdef STDPLATFORM_HEAP_SUGGESTIONS
     pSithHS->suggestHeap(prevSuggest);
 #endif
 
     // moved
-    if (!thing->hierarchyNodeMatrices)
+    if (!thing->paJointMatrices)
         return 0;
 
     { TWL_EXTRAM_SUGGEST(rdroid_g_pHS); // Added: word writes only
-    thing->hierarchyNodes2 = (rdVector3*)RDROID_ALLOC(sizeof(rdVector3) * model->numHierarchyNodes);
+    thing->hierarchyNodes2 = (rdVector3*)RDROID_ALLOC(sizeof(rdVector3) * model->numHNodes);
     TWL_EXTRAM_RESTORE(rdroid_g_pHS); }
     // memset used to be here??
 
-    // thing->hierarchyNodeMatrices check used to be here??
+    // thing->paJointMatrices check used to be here??
     
     if (!thing->hierarchyNodes2)
         return 0;
     
-    stdPlatform_Memzero32(thing->hierarchyNodes2, sizeof(rdVector3) * model->numHierarchyNodes); // Added: word-safe
+    stdPlatform_Memzero32(thing->hierarchyNodes2, sizeof(rdVector3) * model->numHNodes); // Added: word-safe
 
     { TWL_EXTRAM_SUGGEST(rdroid_g_pHS); // Added
-    thing->amputatedJoints = (int *)RDROID_ALLOC(sizeof(int) * model->numHierarchyNodes);
+    thing->paJointAmputationFlags = (int *)RDROID_ALLOC(sizeof(int) * model->numHNodes);
     TWL_EXTRAM_RESTORE(rdroid_g_pHS); }
-    if (!thing->amputatedJoints)
+    if (!thing->paJointAmputationFlags)
         return 0;
 
-    stdPlatform_Memzero32(thing->amputatedJoints, sizeof(int) * model->numHierarchyNodes); // Added: word-safe
+    stdPlatform_Memzero32(thing->paJointAmputationFlags, sizeof(int) * model->numHNodes); // Added: word-safe
 
-    rdHierarchyNode* iter = model->hierarchyNodes;
-    for (int i = 0; i < model->numHierarchyNodes; i++)
+    rdHierarchyNode* iter = model->aHierarchyNodes;
+    for (int i = 0; i < model->numHNodes; i++)
     {
         rdMatrix_Build34(&iter->posRotMatrix, &iter->rot, &iter->pos);
         iter++;
@@ -189,21 +189,21 @@ void rdThing_AccumulateMatrices(rdThing *thing, rdHierarchyNode *node, rdMatrix3
     rdMatrix34 matrix;
 
     rdMatrix_BuildTranslate34(&matrix, &node->pivot);
-    rdMatrix_PostMultiply34(&matrix, &thing->hierarchyNodeMatrices[node->idx]);
+    rdMatrix_PostMultiply34(&matrix, &thing->paJointMatrices[node->idx]);
     if ( node->parent )
     {
         rdVector_Neg3(&negPivot, &node->parent->pivot);
         rdMatrix_PostTranslate34(&matrix, &negPivot);
     }
-    rdMatrix_Multiply34(&thing->hierarchyNodeMatrices[node->idx], acc, &matrix);
+    rdMatrix_Multiply34(&thing->paJointMatrices[node->idx], acc, &matrix);
     if (!node->numChildren)
         return;
     
     childIter = node->child;
     for (int i = 0; i < node->numChildren; i++)
     {
-        if ( !thing->amputatedJoints[childIter->idx] )
-            rdThing_AccumulateMatrices(thing, childIter, &thing->hierarchyNodeMatrices[node->idx]);
+        if ( !thing->paJointAmputationFlags[childIter->idx] )
+            rdThing_AccumulateMatrices(thing, childIter, &thing->paJointMatrices[node->idx]);
         childIter = childIter->nextSibling;
     }
 }

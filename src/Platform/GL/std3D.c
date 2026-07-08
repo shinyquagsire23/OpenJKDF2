@@ -556,7 +556,7 @@ int init_resources()
     
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, 256, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, worldpal_data);
 
-    // World palette lights
+    // World palette aLights
     glGenTextures(1, &worldpal_lights_texture);
     worldpal_lights_data = jkgm_alloc_aligned(0x4000);
     memset(worldpal_lights_data, 0xFF, 0x4000);

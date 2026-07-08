@@ -42,7 +42,7 @@ CURLcode Curl_speedcheck(struct Curl_easy *data,
                          struct curltime now)
 {
   if(data->req.keepon & KEEP_RECV_PAUSE)
-    /* A paused transfer is not qualified for speed checks */
+    /* A bPaused transfer is not qualified for speed checks */
     return CURLE_OK;
 
   if((data->progress.current_speed >= 0) && data->set.low_speed_time) {

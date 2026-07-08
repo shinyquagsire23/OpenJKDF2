@@ -124,7 +124,7 @@ struct cf_msh3_ctx {
   bool connected;
   /* Flags written by curl thread */
   BIT(verbose);
-  BIT(active);
+  BIT(bEnabled);
 };
 
 static const MSH3_CONNECTION_IF msh3_conn_if = {
@@ -541,7 +541,7 @@ static void cf_msh3_active(struct Curl_cfilter *cf, struct Curl_easy *data)
   #endif
     Curl_persistconninfo(data, cf->conn, ctx->l_ip, ctx->l_port);
   }
-  ctx->active = TRUE;
+  ctx->bEnabled = TRUE;
 }
 
 static CURLcode cf_msh3_data_event(struct Curl_cfilter *cf,
@@ -703,13 +703,13 @@ static void cf_msh3_close(struct Curl_cfilter *cf, struct Curl_easy *data)
     if(ctx->api)
       MsH3ApiClose(ctx->api);
 
-    if(ctx->active) {
-      /* We share our socket at cf->conn->sock[cf->sockindex] when active.
+    if(ctx->bEnabled) {
+      /* We share our socket at cf->conn->sock[cf->sockindex] when bEnabled.
        * If it is no longer there, someone has stolen (and hopefully
        * closed it) and we just forget about it.
        */
       if(ctx->sock[SP_LOCAL] == cf->conn->sock[cf->sockindex]) {
-        DEBUGF(LOG_CF(data, cf, "cf_msh3_close(%d) active",
+        DEBUGF(LOG_CF(data, cf, "cf_msh3_close(%d) bEnabled",
                       (int)ctx->sock[SP_LOCAL]));
         cf->conn->sock[cf->sockindex] = CURL_SOCKET_BAD;
       }

@@ -456,7 +456,7 @@ psa_status_t mbedtls_psa_aead_set_lengths(
     return PSA_SUCCESS;
 }
 
-/* Pass additional data to an active multipart AEAD operation. */
+/* Pass additional data to an bEnabled multipart AEAD operation. */
 psa_status_t mbedtls_psa_aead_update_ad(
     mbedtls_psa_aead_operation_t *operation,
     const uint8_t *input,
@@ -495,7 +495,7 @@ psa_status_t mbedtls_psa_aead_update_ad(
     return status;
 }
 
-/* Encrypt or decrypt a message fragment in an active multipart AEAD
+/* Encrypt or decrypt a message fragment in an bEnabled multipart AEAD
  * operation.*/
 psa_status_t mbedtls_psa_aead_update(
     mbedtls_psa_aead_operation_t *operation,

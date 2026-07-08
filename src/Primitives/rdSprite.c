@@ -90,9 +90,9 @@ int rdSprite_NewEntry(rdSprite *sprite, char *spritepath, int type, char *materi
                 sprite->aTexVerticies[3].x = 0.5;
                 sprite->aTexVerticies[3].y = 0.5;
             }
-            sprite->halfWidth = sprite->width * 0.5;
-            sprite->halfHeight = sprite->height * 0.5;
-            sprite->radius = stdMath_Sqrt(sprite->halfWidth * sprite->halfWidth + sprite->halfHeight * sprite->halfHeight);
+            sprite->widthHalf = sprite->width * 0.5;
+            sprite->heightHalf = sprite->height * 0.5;
+            sprite->radius = stdMath_Sqrt(sprite->widthHalf * sprite->widthHalf + sprite->heightHalf * sprite->heightHalf);
             return 1;
         }
     }
@@ -142,7 +142,7 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     rdMeshinfo mesh_in;
 
     rdSprite *sprite = thing->sprite3;
-    rdMatrix_TransformPoint34(&vertex_out, &mat->scale, &rdCamera_g_pCurCamera->view_matrix);
+    rdMatrix_TransformPoint34(&vertex_out, &mat->scale, &rdCamera_g_pCurCamera->orient);
     if ( rdroid_curCullFlags & 2 )
         clipResult = rdClip_SphereInFrustrum(rdCamera_g_pCurCamera->pClipFrustum, &vertex_out, sprite->radius);
     else
@@ -166,18 +166,18 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     mesh_out.verticesOrig = procEntry->aVertices;
     mesh_out.aTexVerticies = procEntry->aTexVerticies;
     mesh_out.paDynamicLight = procEntry->vertexIntensities;
-    rdSprite_inVerts[0].x = sprite->offset.x - sprite->halfWidth + vertex_out.x;
+    rdSprite_inVerts[0].x = sprite->offset.x - sprite->widthHalf + vertex_out.x;
     rdSprite_inVerts[1].y = sprite->offset.y + vertex_out.y;
-    rdSprite_inVerts[1].z = sprite->offset.z - sprite->halfHeight + vertex_out.z;
-    rdSprite_inVerts[2].x = sprite->halfWidth + sprite->offset.x + vertex_out.x;
+    rdSprite_inVerts[1].z = sprite->offset.z - sprite->heightHalf + vertex_out.z;
+    rdSprite_inVerts[2].x = sprite->widthHalf + sprite->offset.x + vertex_out.x;
     rdSprite_inVerts[2].y = sprite->offset.y + vertex_out.y;
-    rdSprite_inVerts[2].z = sprite->offset.z + sprite->halfHeight + vertex_out.z;
+    rdSprite_inVerts[2].z = sprite->offset.z + sprite->heightHalf + vertex_out.z;
     rdSprite_inVerts[0].y = sprite->offset.y + vertex_out.y;
-    rdSprite_inVerts[0].z = sprite->offset.z - sprite->halfHeight + vertex_out.z;
-    rdSprite_inVerts[3].x = sprite->offset.x - sprite->halfWidth + vertex_out.x;
-    rdSprite_inVerts[1].x = sprite->halfWidth + sprite->offset.x + vertex_out.x;
+    rdSprite_inVerts[0].z = sprite->offset.z - sprite->heightHalf + vertex_out.z;
+    rdSprite_inVerts[3].x = sprite->offset.x - sprite->widthHalf + vertex_out.x;
+    rdSprite_inVerts[1].x = sprite->widthHalf + sprite->offset.x + vertex_out.x;
     rdSprite_inVerts[3].y = sprite->offset.y + vertex_out.y;
-    rdSprite_inVerts[3].z = sprite->offset.z + sprite->halfHeight + vertex_out.z;
+    rdSprite_inVerts[3].z = sprite->offset.z + sprite->heightHalf + vertex_out.z;
 
     rdGeoMode_t curGeometryMode_ = rdroid_g_curGeometryMode;
     rdLightMode_t curLightingMode_ = rdroid_g_curLightingMode;
@@ -237,13 +237,13 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
             procEntry->textureMode,
             &mesh_in,
             &mesh_out,
-            &sprite->face.clipIdk);
+            &sprite->face.texVertOffset);
     else
-        rdPrimit3_NoClipFace(procEntry->geometryMode, procEntry->lightingMode, procEntry->textureMode, &mesh_in, &mesh_out, &sprite->face.clipIdk);
+        rdPrimit3_NoClipFace(procEntry->geometryMode, procEntry->lightingMode, procEntry->textureMode, &mesh_in, &mesh_out, &sprite->face.texVertOffset);
     if ( mesh_out.numVertices < 3u )
         return 0;
 
-    rdCamera_g_pCurCamera->fnProjectLst(mesh_out.verticesOrig, mesh_out.aVertices, mesh_out.numVertices);
+    rdCamera_g_pCurCamera->pfProjectList(mesh_out.verticesOrig, mesh_out.aVertices, mesh_out.numVertices);
 
     if ( rdroid_g_curRenderOptions & 2 )
         procEntry->ambientLight = rdCamera_g_pCurCamera->ambientLight;

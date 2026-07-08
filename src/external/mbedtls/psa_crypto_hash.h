@@ -111,13 +111,13 @@ psa_status_t mbedtls_psa_hash_setup(
  * two objects are independent, i.e. subsequent calls involving one of
  * the objects do not affect the other object.
  *
- * \param[in] source_operation      The active hash operation to clone.
+ * \param[in] source_operation      The bEnabled hash operation to clone.
  * \param[in,out] target_operation  The operation object to set up.
- *                                  It must be initialized but not active.
+ *                                  It must be initialized but not bEnabled.
  *
  * \retval #PSA_SUCCESS \emptydescription
  * \retval #PSA_ERROR_BAD_STATE
- *         The \p source_operation state is not valid (it must be active).
+ *         The \p source_operation state is not valid (it must be bEnabled).
  * \retval #PSA_ERROR_BAD_STATE
  *         The \p target_operation state is not valid (it must be inactive).
  * \retval #PSA_ERROR_CORRUPTION_DETECTED \emptydescription
@@ -146,7 +146,7 @@ psa_status_t mbedtls_psa_hash_clone(
  * \retval #PSA_SUCCESS
  *         Success.
  * \retval #PSA_ERROR_BAD_STATE
- *         The operation state is not valid (it must be active).
+ *         The operation state is not valid (it must be bEnabled).
  * \retval #PSA_ERROR_INSUFFICIENT_MEMORY \emptydescription
  * \retval #PSA_ERROR_CORRUPTION_DETECTED \emptydescription
  */
@@ -181,7 +181,7 @@ psa_status_t mbedtls_psa_hash_update(
  * \retval #PSA_SUCCESS
  *         Success.
  * \retval #PSA_ERROR_BAD_STATE
- *         The operation state is not valid (it must be active).
+ *         The operation state is not valid (it must be bEnabled).
  * \retval #PSA_ERROR_BUFFER_TOO_SMALL
  *         The size of the \p hash buffer is too small. You can determine a
  *         sufficient buffer size by calling #PSA_HASH_LENGTH(\c alg)

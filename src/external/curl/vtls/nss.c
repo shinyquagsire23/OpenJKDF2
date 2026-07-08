@@ -97,7 +97,7 @@ static struct Curl_llist nss_crl_list;
 static NSSInitContext *nss_context = NULL;
 static volatile int initialized = 0;
 
-/* type used to wrap pointers as list nodes */
+/* type used to wrap pointers as list aCurKfNodeEntryNums */
 struct ptr_list_wrap {
   void *ptr;
   struct Curl_llist_element node;

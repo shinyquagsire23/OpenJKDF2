@@ -24,7 +24,7 @@ rdLight *rdLight_New()
 int rdLight_NewEntry(rdLight *light)
 {
     light->type = 2;
-    light->active = 1;
+    light->bEnabled = 1;
     light->direction.x = 0.0;
     light->direction.y = 0.0;
     light->direction.z = 0.0;
@@ -109,7 +109,7 @@ flex_t rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
             rdVector_Sub3(&diff, &localLightPoses[i], vertexIter);
             light = *meshLightIter;
             len = rdVector_Len3(&diff);
-            if ( len < (*meshLightIter)->falloffMin )
+            if ( len < (*meshLightIter)->minRadius )
             {
                 rdVector_Normalize3Acc(&diff);
                 lightMagnitude = rdVector_Dot3(vertexNormals, &diff);
@@ -160,7 +160,7 @@ flex_t rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
                 rdVector_Sub3(&diff, &localLightPoses[i], vertexIter);
                 light = *meshLightIter;
                 len = rdVector_Len3(&diff);
-                if ( len < (*meshLightIter)->falloffMin )
+                if ( len < (*meshLightIter)->minRadius )
                 {
                     rdVector_Normalize3Acc(&diff);
                     lightMagnitude = rdVector_Dot3(vertexNormals, &diff);
@@ -210,7 +210,7 @@ flex_t rdLight_CalcVertexIntensities(rdLight **meshLights, rdVector3 *localLight
         {
             rdVector_Sub3(&diff, verticesEnd, vertexIter);
             light = *meshLightIter;
-            if ((light->falloffMin * light->falloffMin) > rdVector_Dot3(&diff, &diff))
+            if ((light->minRadius * light->minRadius) > rdVector_Dot3(&diff, &diff))
             {
                 fVar8 = rdVector_Normalize3Acc(&diff);
                 if (light->type < 3) 
@@ -273,13 +273,13 @@ flex_t rdLight_CalcFaceIntensity(rdLight **meshLights, rdVector3 *localLightPose
   for (v15 = 0; v15 < numLights; v15++)
   {
       meshLight = *meshLightIter;
-      if ( (*meshLightIter)->active )
+      if ( (*meshLightIter)->bEnabled )
       {
         v9 = face->vertexPosIdx;
         rdVector_Sub3(&diff, lightPosIter, &aVertices[*v9]);
         v10 = rdMath_DistancePointToPlane(lightPosIter, faceNormal, &aVertices[*v9]);
         meshLightsa = v10;
-        if ( v10 < meshLight->falloffMin )
+        if ( v10 < meshLight->minRadius )
         {
           rdVector_Normalize3Acc(&diff);
           v11 = rdVector_Dot3(faceNormal, &diff);

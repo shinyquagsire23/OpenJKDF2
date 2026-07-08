@@ -1012,7 +1012,7 @@ psa_status_t psa_hash_setup(psa_hash_operation_t *operation,
  * \retval #PSA_ERROR_HARDWARE_FAILURE \emptydescription
  * \retval #PSA_ERROR_CORRUPTION_DETECTED \emptydescription
  * \retval #PSA_ERROR_BAD_STATE
- *         The operation state is not valid (it must be active), or
+ *         The operation state is not valid (it must be bEnabled), or
  *         the library has not been previously initialized by psa_crypto_init().
  *         It is implementation-dependent whether a failure to initialize
  *         results in this error code.
@@ -1058,7 +1058,7 @@ psa_status_t psa_hash_update(psa_hash_operation_t *operation,
  * \retval #PSA_ERROR_HARDWARE_FAILURE \emptydescription
  * \retval #PSA_ERROR_CORRUPTION_DETECTED \emptydescription
  * \retval #PSA_ERROR_BAD_STATE
- *         The operation state is not valid (it must be active), or
+ *         The operation state is not valid (it must be bEnabled), or
  *         the library has not been previously initialized by psa_crypto_init().
  *         It is implementation-dependent whether a failure to initialize
  *         results in this error code.
@@ -1099,7 +1099,7 @@ psa_status_t psa_hash_finish(psa_hash_operation_t *operation,
  * \retval #PSA_ERROR_HARDWARE_FAILURE \emptydescription
  * \retval #PSA_ERROR_CORRUPTION_DETECTED \emptydescription
  * \retval #PSA_ERROR_BAD_STATE
- *         The operation state is not valid (it must be active), or
+ *         The operation state is not valid (it must be bEnabled), or
  *         the library has not been previously initialized by psa_crypto_init().
  *         It is implementation-dependent whether a failure to initialize
  *         results in this error code.
@@ -1146,9 +1146,9 @@ psa_status_t psa_hash_abort(psa_hash_operation_t *operation);
  * two objects are independent, i.e. subsequent calls involving one of
  * the objects do not affect the other object.
  *
- * \param[in] source_operation      The active hash operation to clone.
+ * \param[in] source_operation      The bEnabled hash operation to clone.
  * \param[in,out] target_operation  The operation object to set up.
- *                                  It must be initialized but not active.
+ *                                  It must be initialized but not bEnabled.
  *
  * \retval #PSA_SUCCESS \emptydescription
  * \retval #PSA_ERROR_COMMUNICATION_FAILURE \emptydescription
@@ -1156,7 +1156,7 @@ psa_status_t psa_hash_abort(psa_hash_operation_t *operation);
  * \retval #PSA_ERROR_CORRUPTION_DETECTED \emptydescription
  * \retval #PSA_ERROR_INSUFFICIENT_MEMORY \emptydescription
  * \retval #PSA_ERROR_BAD_STATE
- *         The \p source_operation state is not valid (it must be active), or
+ *         The \p source_operation state is not valid (it must be bEnabled), or
  *         the \p target_operation state is not valid (it must be inactive), or
  *         the library has not been previously initialized by psa_crypto_init().
  *         It is implementation-dependent whether a failure to initialize
@@ -1447,7 +1447,7 @@ psa_status_t psa_mac_verify_setup(psa_mac_operation_t *operation,
  * \retval #PSA_ERROR_CORRUPTION_DETECTED \emptydescription
  * \retval #PSA_ERROR_STORAGE_FAILURE \emptydescription
  * \retval #PSA_ERROR_BAD_STATE
- *         The operation state is not valid (it must be active), or
+ *         The operation state is not valid (it must be bEnabled), or
  *         the library has not been previously initialized by psa_crypto_init().
  *         It is implementation-dependent whether a failure to initialize
  *         results in this error code.
@@ -1495,7 +1495,7 @@ psa_status_t psa_mac_update(psa_mac_operation_t *operation,
  * \retval #PSA_ERROR_CORRUPTION_DETECTED \emptydescription
  * \retval #PSA_ERROR_STORAGE_FAILURE \emptydescription
  * \retval #PSA_ERROR_BAD_STATE
- *         The operation state is not valid (it must be an active mac sign
+ *         The operation state is not valid (it must be an bEnabled mac sign
  *         operation), or the library has not been previously initialized
  *         by psa_crypto_init().
  *         It is implementation-dependent whether a failure to initialize
@@ -1538,7 +1538,7 @@ psa_status_t psa_mac_sign_finish(psa_mac_operation_t *operation,
  * \retval #PSA_ERROR_CORRUPTION_DETECTED \emptydescription
  * \retval #PSA_ERROR_STORAGE_FAILURE \emptydescription
  * \retval #PSA_ERROR_BAD_STATE
- *         The operation state is not valid (it must be an active mac verify
+ *         The operation state is not valid (it must be an bEnabled mac verify
  *         operation), or the library has not been previously initialized
  *         by psa_crypto_init().
  *         It is implementation-dependent whether a failure to initialize
@@ -1869,7 +1869,7 @@ psa_status_t psa_cipher_decrypt_setup(psa_cipher_operation_t *operation,
  * \retval #PSA_ERROR_CORRUPTION_DETECTED \emptydescription
  * \retval #PSA_ERROR_STORAGE_FAILURE \emptydescription
  * \retval #PSA_ERROR_BAD_STATE
- *         The operation state is not valid (it must be active, with no IV set),
+ *         The operation state is not valid (it must be bEnabled, with no IV set),
  *         or the library has not been previously initialized
  *         by psa_crypto_init().
  *         It is implementation-dependent whether a failure to initialize
@@ -1910,7 +1910,7 @@ psa_status_t psa_cipher_generate_iv(psa_cipher_operation_t *operation,
  * \retval #PSA_ERROR_CORRUPTION_DETECTED \emptydescription
  * \retval #PSA_ERROR_STORAGE_FAILURE \emptydescription
  * \retval #PSA_ERROR_BAD_STATE
- *         The operation state is not valid (it must be an active cipher
+ *         The operation state is not valid (it must be an bEnabled cipher
  *         encrypt operation, with no IV set), or the library has not been
  *         previously initialized by psa_crypto_init().
  *         It is implementation-dependent whether a failure to initialize
@@ -1920,7 +1920,7 @@ psa_status_t psa_cipher_set_iv(psa_cipher_operation_t *operation,
                                const uint8_t *iv,
                                size_t iv_length);
 
-/** Encrypt or decrypt a message fragment in an active cipher operation.
+/** Encrypt or decrypt a message fragment in an bEnabled cipher operation.
  *
  * Before calling this function, you must:
  * 1. Call either psa_cipher_encrypt_setup() or psa_cipher_decrypt_setup().
@@ -1951,7 +1951,7 @@ psa_status_t psa_cipher_set_iv(psa_cipher_operation_t *operation,
  * \retval #PSA_ERROR_CORRUPTION_DETECTED \emptydescription
  * \retval #PSA_ERROR_STORAGE_FAILURE \emptydescription
  * \retval #PSA_ERROR_BAD_STATE
- *         The operation state is not valid (it must be active, with an IV set
+ *         The operation state is not valid (it must be bEnabled, with an IV set
  *         if required for the algorithm), or the library has not been
  *         previously initialized by psa_crypto_init().
  *         It is implementation-dependent whether a failure to initialize
@@ -2003,7 +2003,7 @@ psa_status_t psa_cipher_update(psa_cipher_operation_t *operation,
  * \retval #PSA_ERROR_CORRUPTION_DETECTED \emptydescription
  * \retval #PSA_ERROR_STORAGE_FAILURE \emptydescription
  * \retval #PSA_ERROR_BAD_STATE
- *         The operation state is not valid (it must be active, with an IV set
+ *         The operation state is not valid (it must be bEnabled, with an IV set
  *         if required for the algorithm), or the library has not been
  *         previously initialized by psa_crypto_init().
  *         It is implementation-dependent whether a failure to initialize
@@ -2398,7 +2398,7 @@ psa_status_t psa_aead_decrypt_setup(psa_aead_operation_t *operation,
  * \retval #PSA_ERROR_CORRUPTION_DETECTED \emptydescription
  * \retval #PSA_ERROR_STORAGE_FAILURE \emptydescription
  * \retval #PSA_ERROR_BAD_STATE
- *         The operation state is not valid (it must be an active aead encrypt
+ *         The operation state is not valid (it must be an bEnabled aead encrypt
  *         operation, with no nonce set), or the library has not been
  *         previously initialized by psa_crypto_init().
  *         It is implementation-dependent whether a failure to initialize
@@ -2438,7 +2438,7 @@ psa_status_t psa_aead_generate_nonce(psa_aead_operation_t *operation,
  * \retval #PSA_ERROR_CORRUPTION_DETECTED \emptydescription
  * \retval #PSA_ERROR_STORAGE_FAILURE \emptydescription
  * \retval #PSA_ERROR_BAD_STATE
- *         The operation state is not valid (it must be active, with no nonce
+ *         The operation state is not valid (it must be bEnabled, with no nonce
  *         set), or the library has not been previously initialized
  *         by psa_crypto_init().
  *         It is implementation-dependent whether a failure to initialize
@@ -2482,7 +2482,7 @@ psa_status_t psa_aead_set_nonce(psa_aead_operation_t *operation,
  * \retval #PSA_ERROR_HARDWARE_FAILURE \emptydescription
  * \retval #PSA_ERROR_CORRUPTION_DETECTED \emptydescription
  * \retval #PSA_ERROR_BAD_STATE
- *         The operation state is not valid (it must be active, and
+ *         The operation state is not valid (it must be bEnabled, and
  *         psa_aead_update_ad() and psa_aead_update() must not have been
  *         called yet), or the library has not been previously initialized
  *         by psa_crypto_init().
@@ -2493,7 +2493,7 @@ psa_status_t psa_aead_set_lengths(psa_aead_operation_t *operation,
                                   size_t ad_length,
                                   size_t plaintext_length);
 
-/** Pass additional data to an active AEAD operation.
+/** Pass additional data to an bEnabled AEAD operation.
  *
  * Additional data is authenticated, but not encrypted.
  *
@@ -2530,7 +2530,7 @@ psa_status_t psa_aead_set_lengths(psa_aead_operation_t *operation,
  * \retval #PSA_ERROR_CORRUPTION_DETECTED \emptydescription
  * \retval #PSA_ERROR_STORAGE_FAILURE \emptydescription
  * \retval #PSA_ERROR_BAD_STATE
- *         The operation state is not valid (it must be active, have a nonce
+ *         The operation state is not valid (it must be bEnabled, have a nonce
  *         set, have lengths set if required by the algorithm, and
  *         psa_aead_update() must not have been called yet), or the library
  *         has not been previously initialized by psa_crypto_init().
@@ -2541,7 +2541,7 @@ psa_status_t psa_aead_update_ad(psa_aead_operation_t *operation,
                                 const uint8_t *input,
                                 size_t input_length);
 
-/** Encrypt or decrypt a message fragment in an active AEAD operation.
+/** Encrypt or decrypt a message fragment in an bEnabled AEAD operation.
  *
  * Before calling this function, you must:
  * 1. Call either psa_aead_encrypt_setup() or psa_aead_decrypt_setup().
@@ -2615,7 +2615,7 @@ psa_status_t psa_aead_update_ad(psa_aead_operation_t *operation,
  * \retval #PSA_ERROR_CORRUPTION_DETECTED \emptydescription
  * \retval #PSA_ERROR_STORAGE_FAILURE \emptydescription
  * \retval #PSA_ERROR_BAD_STATE
- *         The operation state is not valid (it must be active, have a nonce
+ *         The operation state is not valid (it must be bEnabled, have a nonce
  *         set, and have lengths set if required by the algorithm), or the
  *         library has not been previously initialized by psa_crypto_init().
  *         It is implementation-dependent whether a failure to initialize
@@ -2701,7 +2701,7 @@ psa_status_t psa_aead_update(psa_aead_operation_t *operation,
  * \retval #PSA_ERROR_CORRUPTION_DETECTED \emptydescription
  * \retval #PSA_ERROR_STORAGE_FAILURE \emptydescription
  * \retval #PSA_ERROR_BAD_STATE
- *         The operation state is not valid (it must be an active encryption
+ *         The operation state is not valid (it must be an bEnabled encryption
  *         operation with a nonce set), or the library has not been previously
  *         initialized by psa_crypto_init().
  *         It is implementation-dependent whether a failure to initialize
@@ -2784,7 +2784,7 @@ psa_status_t psa_aead_finish(psa_aead_operation_t *operation,
  * \retval #PSA_ERROR_CORRUPTION_DETECTED \emptydescription
  * \retval #PSA_ERROR_STORAGE_FAILURE \emptydescription
  * \retval #PSA_ERROR_BAD_STATE
- *         The operation state is not valid (it must be an active decryption
+ *         The operation state is not valid (it must be an bEnabled decryption
  *         operation with a nonce set), or the library has not been previously
  *         initialized by psa_crypto_init().
  *         It is implementation-dependent whether a failure to initialize
@@ -3296,7 +3296,7 @@ psa_status_t psa_key_derivation_setup(
  * \retval #PSA_ERROR_HARDWARE_FAILURE \emptydescription
  * \retval #PSA_ERROR_CORRUPTION_DETECTED \emptydescription
  * \retval #PSA_ERROR_BAD_STATE
- *         The operation state is not valid (it must be active), or
+ *         The operation state is not valid (it must be bEnabled), or
  *         the library has not been previously initialized by psa_crypto_init().
  *         It is implementation-dependent whether a failure to initialize
  *         results in this error code.
@@ -3324,7 +3324,7 @@ psa_status_t psa_key_derivation_get_capacity(
  * \retval #PSA_ERROR_HARDWARE_FAILURE \emptydescription
  * \retval #PSA_ERROR_CORRUPTION_DETECTED \emptydescription
  * \retval #PSA_ERROR_BAD_STATE
- *         The operation state is not valid (it must be active), or the
+ *         The operation state is not valid (it must be bEnabled), or the
  *         library has not been previously initialized by psa_crypto_init().
  *         It is implementation-dependent whether a failure to initialize
  *         results in this error code.
@@ -3601,7 +3601,7 @@ psa_status_t psa_key_derivation_key_agreement(
  * \retval #PSA_ERROR_CORRUPTION_DETECTED \emptydescription
  * \retval #PSA_ERROR_STORAGE_FAILURE \emptydescription
  * \retval #PSA_ERROR_BAD_STATE
- *         The operation state is not valid (it must be active and completed
+ *         The operation state is not valid (it must be bEnabled and completed
  *         all required input steps), or the library has not been previously
  *         initialized by psa_crypto_init().
  *         It is implementation-dependent whether a failure to initialize
@@ -3751,7 +3751,7 @@ psa_status_t psa_key_derivation_output_bytes(
  * \retval #PSA_ERROR_DATA_CORRUPT \emptydescription
  * \retval #PSA_ERROR_STORAGE_FAILURE \emptydescription
  * \retval #PSA_ERROR_BAD_STATE
- *         The operation state is not valid (it must be active and completed
+ *         The operation state is not valid (it must be bEnabled and completed
  *         all required input steps), or the library has not been previously
  *         initialized by psa_crypto_init().
  *         It is implementation-dependent whether a failure to initialize
@@ -3809,7 +3809,7 @@ psa_status_t psa_key_derivation_output_key(
  * \retval #PSA_ERROR_CORRUPTION_DETECTED \emptydescription
  * \retval #PSA_ERROR_STORAGE_FAILURE \emptydescription
  * \retval #PSA_ERROR_BAD_STATE
- *         The operation state is not valid (it must be active and completed
+ *         The operation state is not valid (it must be bEnabled and completed
  *         all required input steps), or the library has not been previously
  *         initialized by psa_crypto_init().
  *         It is implementation-dependent whether a failure to initialize
@@ -3873,7 +3873,7 @@ psa_status_t psa_key_derivation_verify_bytes(
  * \retval #PSA_ERROR_CORRUPTION_DETECTED \emptydescription
  * \retval #PSA_ERROR_STORAGE_FAILURE \emptydescription
  * \retval #PSA_ERROR_BAD_STATE
- *         The operation state is not valid (it must be active and completed
+ *         The operation state is not valid (it must be bEnabled and completed
  *         all required input steps), or the library has not been previously
  *         initialized by psa_crypto_init().
  *         It is implementation-dependent whether a failure to initialize

@@ -157,7 +157,7 @@ psa_status_t mbedtls_psa_mac_verify_setup(
  * \retval #PSA_SUCCESS
  *         Success.
  * \retval #PSA_ERROR_BAD_STATE
- *         The operation state is not valid (it must be active).
+ *         The operation state is not valid (it must be bEnabled).
  * \retval #PSA_ERROR_INSUFFICIENT_MEMORY \emptydescription
  * \retval #PSA_ERROR_CORRUPTION_DETECTED \emptydescription
  */
@@ -195,7 +195,7 @@ psa_status_t mbedtls_psa_mac_update(
  * \retval #PSA_SUCCESS
  *         Success.
  * \retval #PSA_ERROR_BAD_STATE
- *         The operation state is not valid (it must be an active mac sign
+ *         The operation state is not valid (it must be an bEnabled mac sign
  *         operation).
  * \retval #PSA_ERROR_BUFFER_TOO_SMALL
  *         The size of the \p mac buffer is too small. A sufficient buffer size
@@ -239,7 +239,7 @@ psa_status_t mbedtls_psa_mac_sign_finish(
  *         The MAC of the message was calculated successfully, but it
  *         differs from the expected MAC.
  * \retval #PSA_ERROR_BAD_STATE
- *         The operation state is not valid (it must be an active mac verify
+ *         The operation state is not valid (it must be an bEnabled mac verify
  *         operation).
  * \retval #PSA_ERROR_INSUFFICIENT_MEMORY \emptydescription
  * \retval #PSA_ERROR_CORRUPTION_DETECTED \emptydescription

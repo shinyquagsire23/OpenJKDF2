@@ -152,7 +152,7 @@ static void std3D_EmitDeferredTR(void);          // defined in the render list s
 // Added: bring the PVR (and with it the VRAM overflow arena) up at boot, before
 // any GUI assets allocate -- the engine only calls std3D_Startup at the first
 // drawn frame, which is AFTER jkGui loads its fonts/bitmaps. On the autoload
-// path that meant every vbuffer went to system RAM (the arena didn't exist yet)
+// path that meant every pVBuffer went to system RAM (the arena didn't exist yet)
 // and heavy maps ran out of memory. Idempotent; called from main() and from
 // std3D_Startup.
 void std3D_EarlyInit(void)

@@ -21,7 +21,7 @@ void rdDebug_DrawScreenLine3(rdVector3* v1, rdVector3* v2, uint32_t color)
         return;
     
     rdDebug_solidMat.num_texinfo = 8;
-    rdDebug_solidMat.celIdx = 0;
+    rdDebug_solidMat.curCelNum = 0;
     for (int i = 0; i < 8; i++)
     {
         rdDebug_solidMat.texinfos[i] = &rdDebug_solidTexTexinfo;
@@ -67,7 +67,7 @@ void rdDebug_DrawLine3(rdVector3* v1, rdVector3* v2, uint32_t color)
     rdClip_Line3Project(rdCamera_g_pCurCamera->pClipFrustum, &verts[0], &verts[1], &out1, &out2);
 
     // And project to screen coords
-    rdCamera_g_pCurCamera->fnProjectLst(vertsOut, verts, 2);
+    rdCamera_g_pCurCamera->pfProjectList(vertsOut, verts, 2);
     
     vertsOut[0].x = (flex_t)(int)vertsOut[0].x + 0.0001; // FLEXTODO
     vertsOut[0].y = (flex_t)(int)vertsOut[0].y + 0.0001; // FLEXTODO
@@ -116,7 +116,7 @@ void rdDebug_DrawBoundingBox(rdMatrix34* m, flex_t radius, uint32_t color)
     verts[7].y = v1.y + 0.0001;
     
     rdMatrix34 tmpMat;
-    rdMatrix_Multiply34(&tmpMat, &rdCamera_g_pCurCamera->view_matrix, m);
+    rdMatrix_Multiply34(&tmpMat, &rdCamera_g_pCurCamera->orient, m);
     
     for (int i = 0; i < 8; i++)
     {

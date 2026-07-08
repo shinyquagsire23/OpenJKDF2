@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "General/stdMath.h"
 #include "Engine/rdClip.h"
-#include "stdPlatform.h" // Added: word-safe vbuffer stores
+#include "stdPlatform.h" // Added: word-safe pVBuffer stores
 
 int rdPrimit2_DrawLine(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, uint16_t color16, int mask)
 {
@@ -26,7 +26,7 @@ int rdPrimit2_DrawLine(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, uint16
     int v24; // [esp+14h] [ebp-4h]
     int v25; // [esp+14h] [ebp-4h]
 
-    v7 = pCanvas->vbuffer;
+    v7 = pCanvas->pVBuffer;
     v19 = 0x80000000;
     if ( v7->format.format.bpp == 8 )
     {
@@ -60,7 +60,7 @@ int rdPrimit2_DrawLine(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, uint16
                 v8 += v22;
             }
             if ( (v19 & mask) != 0 ) // Added: word-safe store
-                stdPlatform_WriteByte16((uint8_t*)pCanvas->vbuffer->surface_lock_alloc + v9 * pCanvas->vbuffer->format.width_in_bytes + v8, (uint8_t)color16);
+                stdPlatform_WriteByte16((uint8_t*)pCanvas->pVBuffer->surface_lock_alloc + v9 * pCanvas->pVBuffer->format.width_in_bytes + v8, (uint8_t)color16);
         }
     }
     else
@@ -95,7 +95,7 @@ int rdPrimit2_DrawLine(rdCanvas *pCanvas, int x1, int y1, int x2, int y2, uint16
                 v12 += v23;
             }
             if ( (v19 & mask) != 0 ) // Added: explicit byte-pointer math (field is void* now)
-                *(uint16_t*)((uint8_t*)pCanvas->vbuffer->surface_lock_alloc + 2 * v12 + 2 * v13 * pCanvas->vbuffer->format.width_in_pixels) = color16;
+                *(uint16_t*)((uint8_t*)pCanvas->pVBuffer->surface_lock_alloc + 2 * v12 + 2 * v13 * pCanvas->pVBuffer->format.width_in_pixels) = color16;
         }
     }
     return 1;

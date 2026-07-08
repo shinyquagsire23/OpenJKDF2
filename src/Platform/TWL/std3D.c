@@ -479,13 +479,13 @@ void std3DTwl_LoadProjection() {
         return;
     }
     const float zMult = 1.0f;
-    MATRIX_LOAD4x4 = floattof32((zMult*2.0f) * (rdCamera_g_pCurCamera->fovDx >> 8));
+    MATRIX_LOAD4x4 = floattof32((zMult*2.0f) * (rdCamera_g_pCurCamera->focalLength >> 8));
     MATRIX_LOAD4x4 = 0;
     MATRIX_LOAD4x4 = 0;
     MATRIX_LOAD4x4 = floattof32(0.0f);
 
     MATRIX_LOAD4x4 = 0;
-    MATRIX_LOAD4x4 = floattof32((zMult*2.0f) * (rdCamera_g_pCurCamera->fovDx >> 8) / rdCamera_g_pCurCamera->screenAspectRatio);
+    MATRIX_LOAD4x4 = floattof32((zMult*2.0f) * (rdCamera_g_pCurCamera->focalLength >> 8) / rdCamera_g_pCurCamera->aspectRatio);
     MATRIX_LOAD4x4 = 0;
     MATRIX_LOAD4x4 = floattof32(0.0f);
 
@@ -496,7 +496,7 @@ void std3DTwl_LoadProjection() {
 
     MATRIX_LOAD4x4 = floattof32(0.0f);//0;
     MATRIX_LOAD4x4 = floattof32(0.0f); //0;
-    MATRIX_LOAD4x4 = floattof32(0.0F);//-divf32(zFar + zNear, zFar - zNear);//0;
+    MATRIX_LOAD4x4 = floattof32(0.0F);//-divf32(farPlane + nearPlane, farPlane - nearPlane);//0;
     MATRIX_LOAD4x4 = floattof32(0.0f);
 }
 

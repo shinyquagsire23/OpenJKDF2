@@ -18,7 +18,7 @@ static flex_t rdCamera_mipmapScalar = 1.0; // MOTS added
 int rdCamera_bForceRealProj = 0;
 #endif
 
-rdCamera* rdCamera_New(flex_t fov, BOOL bClipFar, flex_t zNear, flex_t zFar, flex_t aspectRatio)
+rdCamera* rdCamera_New(flex_t fov, BOOL bClipFar, flex_t nearPlane, flex_t farPlane, flex_t aspectRatio)
 {
     rdCamera* out = (rdCamera *)RDROID_ALLOC(sizeof(rdCamera));
     if ( !out ) {
@@ -28,12 +28,12 @@ rdCamera* rdCamera_New(flex_t fov, BOOL bClipFar, flex_t zNear, flex_t zFar, fle
     // Added: zero out alloc
     memset(out, 0, sizeof(*out));
 
-    rdCamera_NewEntry(out, fov, bClipFar, zNear, zFar, aspectRatio);    
+    rdCamera_NewEntry(out, fov, bClipFar, nearPlane, farPlane, aspectRatio);    
     
     return out;
 }
 
-int rdCamera_NewEntry(rdCamera *camera, flex_t fov, BOOL bClipFar, flex_t zNear, flex_t zFar, flex_t aspectRatio)
+int rdCamera_NewEntry(rdCamera *camera, flex_t fov, BOOL bClipFar, flex_t nearPlane, flex_t farPlane, flex_t aspectRatio)
 {
     if (!camera)
         return 0;
@@ -50,14 +50,14 @@ int rdCamera_NewEntry(rdCamera *camera, flex_t fov, BOOL bClipFar, flex_t zNear,
 
     if ( camera->pClipFrustum )
     {
-        camera->canvas = 0;
+        camera->pCanvas = 0;
         rdCamera_SetFOV(camera, fov);
         rdCamera_SetOrthoScale(camera, 1.0);
 
         camera->pClipFrustum->bClipFar = bClipFar;
-        camera->pClipFrustum->zNear = zNear;
-        camera->pClipFrustum->zFar = zFar;
-        camera->screenAspectRatio = aspectRatio;
+        camera->pClipFrustum->nearPlane = nearPlane;
+        camera->pClipFrustum->farPlane = farPlane;
+        camera->aspectRatio = aspectRatio;
         camera->ambientLight = 0.0;
         camera->numLights = 0;
         camera->attenuationMin = 0.2;
@@ -87,9 +87,9 @@ void rdCamera_FreeEntry(rdCamera *camera)
     }
 }
 
-int rdCamera_SetCanvas(rdCamera *camera, rdCanvas *canvas)
+int rdCamera_SetCanvas(rdCamera *camera, rdCanvas *pCanvas)
 {
-    camera->canvas = canvas;
+    camera->pCanvas = pCanvas;
     rdCamera_BuildFOV(camera);
     return 1;
 }
@@ -114,8 +114,8 @@ int rdCamera_SetFOV(rdCamera *camera, flex_t fovVal)
     }
 
 #ifdef QOL_IMPROVEMENTS
-    if (!jkGuiBuildMulti_bRendering && jkPlayer_fovIsVertical && camera->screenAspectRatio != 0.0) {
-        camera->fov = stdMath_ArcTan3(1.0, stdMath_Tan(fovVal * 0.5) / camera->screenAspectRatio) * -2.0;
+    if (!jkGuiBuildMulti_bRendering && jkPlayer_fovIsVertical && camera->aspectRatio != 0.0) {
+        camera->fov = stdMath_ArcTan3(1.0, stdMath_Tan(fovVal * 0.5) / camera->aspectRatio) * -2.0;
 
         if ( camera->fov < 5.0 )
         {
@@ -144,18 +144,18 @@ int rdCamera_SetProjectType(rdCamera *camera, int type)
     {
         case rdCameraProjectType_Ortho:
         {
-            if (camera->screenAspectRatio == 1.0 )
+            if (camera->aspectRatio == 1.0 )
             {
-                camera->fnProject = rdCamera_OrthoProjectSquare;
-                camera->fnProjectLst = rdCamera_OrthoProjectSquareLst;
+                camera->pfProject = rdCamera_OrthoProjectSquare;
+                camera->pfProjectList = rdCamera_OrthoProjectSquareLst;
 #ifdef TARGET_TWL
                 camera->fnProjectLstClip = rdCamera_OrthoProjectSquareLst;
 #endif
             }
             else
             {
-                camera->fnProject = rdCamera_OrthoProject;
-                camera->fnProjectLst = rdCamera_OrthoProjectLst;
+                camera->pfProject = rdCamera_OrthoProject;
+                camera->pfProjectList = rdCamera_OrthoProjectLst;
 #ifdef TARGET_TWL
                 camera->fnProjectLstClip = rdCamera_OrthoProjectLst;
 #endif
@@ -164,27 +164,27 @@ int rdCamera_SetProjectType(rdCamera *camera, int type)
         }
         case rdCameraProjectType_Perspective:
         {
-            if (camera->screenAspectRatio == 1.0)
+            if (camera->aspectRatio == 1.0)
             {
-                camera->fnProject = rdCamera_PerspProjectSquare;
-                camera->fnProjectLst = rdCamera_PerspProjectSquareLst;
+                camera->pfProject = rdCamera_PerspProjectSquare;
+                camera->pfProjectList = rdCamera_PerspProjectSquareLst;
 #ifdef TARGET_TWL
                 camera->fnProjectLstClip = rdCamera_PerspProjectLstClip;
                 if (rdCamera_bForceRealProj) {
-                    camera->fnProject = rdCamera_PerspProjectClip;
-                    camera->fnProjectLst = rdCamera_PerspProjectLstClip;
+                    camera->pfProject = rdCamera_PerspProjectClip;
+                    camera->pfProjectList = rdCamera_PerspProjectLstClip;
                 }
 #endif
             }
             else
             {
-                camera->fnProject = rdCamera_PerspProject;
-                camera->fnProjectLst = rdCamera_PerspProjectLst;
+                camera->pfProject = rdCamera_PerspProject;
+                camera->pfProjectList = rdCamera_PerspProjectLst;
 #ifdef TARGET_TWL
                 camera->fnProjectLstClip = rdCamera_PerspProjectLstClip;
                 if (rdCamera_bForceRealProj) {
-                    camera->fnProject = rdCamera_PerspProjectClip;
-                    camera->fnProjectLst = rdCamera_PerspProjectLstClip;
+                    camera->pfProject = rdCamera_PerspProjectClip;
+                    camera->pfProjectList = rdCamera_PerspProjectLstClip;
                 }
 #endif
             }
@@ -193,7 +193,7 @@ int rdCamera_SetProjectType(rdCamera *camera, int type)
         
     }
 
-    if ( camera->canvas )
+    if ( camera->pCanvas )
         rdCamera_BuildFOV(camera);
 
     return 1;
@@ -212,7 +212,7 @@ int rdCamera_SetAspectRatio(rdCamera *camera, flex_t ratio)
     if (jkPlayer_enableOrigAspect) ratio = 1.0;
 #endif
 
-    camera->screenAspectRatio = ratio;
+    camera->aspectRatio = ratio;
     return rdCamera_SetProjectType(camera, camera->projectType);
 }
 
@@ -223,21 +223,21 @@ int rdCamera_BuildFOV(rdCamera *camera)
     flex_t camerac; // [esp+1Ch] [ebp+4h]
 
     rdClipFrustum* pClipFrustum = camera->pClipFrustum;
-    rdCanvas* canvas = camera->canvas;
-    if ( !canvas )
+    rdCanvas* pCanvas = camera->pCanvas;
+    if ( !pCanvas )
         return 0;
 
     switch (camera->projectType)
     {
         case rdCameraProjectType_Ortho:
         {
-            camera->fovDx = 0.0;
-            camerac = ((flex_d_t)(canvas->heightMinusOne - canvas->yStart) * 0.5) / camera->orthoScale;
-            v15 = ((flex_d_t)(canvas->widthMinusOne - canvas->xStart) * 0.5) / camera->orthoScale;
-            pClipFrustum->orthoLeft = -v15;
-            pClipFrustum->orthoTop = camerac / camera->screenAspectRatio;
-            pClipFrustum->orthoRight = v15;
-            pClipFrustum->orthoBottom = -camerac / camera->screenAspectRatio;
+            camera->focalLength = 0.0;
+            camerac = ((flex_d_t)(pCanvas->heightMinusOne - pCanvas->yStart) * 0.5) / camera->orthoScale;
+            v15 = ((flex_d_t)(pCanvas->widthMinusOne - pCanvas->xStart) * 0.5) / camera->orthoScale;
+            pClipFrustum->orthoLeftPlane = -v15;
+            pClipFrustum->orthoTopPlane = camerac / camera->aspectRatio;
+            pClipFrustum->orthoRightPlane = v15;
+            pClipFrustum->orthoBottomPlane = -camerac / camera->aspectRatio;
             pClipFrustum->farTop = 0.0;
             pClipFrustum->bottom = 0.0;
             pClipFrustum->farLeft = 0.0;
@@ -252,26 +252,26 @@ int rdCamera_BuildFOV(rdCamera *camera)
 #else
             flex_t overdraw = 0.0;
 #endif
-            flex_t width = canvas->xStart;
-            flex_t height = canvas->yStart;
-            flex_t project_width_half = overdraw + (canvas->widthMinusOne - (flex_d_t)width) * 0.5;
-            flex_t project_height_half = overdraw + (canvas->heightMinusOne - (flex_d_t)height) * 0.5;
+            flex_t width = pCanvas->xStart;
+            flex_t height = pCanvas->yStart;
+            flex_t project_width_half = overdraw + (pCanvas->widthMinusOne - (flex_d_t)width) * 0.5;
+            flex_t project_height_half = overdraw + (pCanvas->heightMinusOne - (flex_d_t)height) * 0.5;
             
             flex_t project_width_half_2 = project_width_half;
             flex_t project_height_half_2 = project_height_half;
             
             flex_t tangent = stdMath_Tan(camera->fov * 0.5);
-            camera->fovDx = project_width_half / tangent;
+            camera->focalLength = project_width_half / tangent;
 
-            flex_t fovDx = camera->fovDx;
-            flex_t fovDy = camera->fovDx;
+            flex_t focalLength = camera->focalLength;
+            flex_t fovDy = camera->focalLength;
 
             // UBSAN fixes
             if (fovDy == 0) {
                 fovDy = 0.000001;
             }
-            if (fovDx == 0) {
-                fovDx = 0.000001;
+            if (focalLength == 0) {
+                focalLength = 0.000001;
             }
 
             // This area is very susceptible to fixed-point error 
@@ -286,11 +286,11 @@ int rdCamera_BuildFOV(rdCamera *camera)
             pClipFrustum->nearLeft = (-(project_width_half - -1.0) / project_width_half) * tangent; // near left
 #else
             pClipFrustum->farTop = project_height_half / fovDy; // far top
-            pClipFrustum->farLeft = -project_width_half / fovDx; // far left
+            pClipFrustum->farLeft = -project_width_half / focalLength; // far left
             pClipFrustum->bottom = -project_height_half_2 / fovDy; // bottom
-            pClipFrustum->right = project_width_half_2 / fovDx; // right
+            pClipFrustum->right = project_width_half_2 / focalLength; // right
             pClipFrustum->nearTop = (project_height_half - -1.0) / fovDy; // near top
-            pClipFrustum->nearLeft = -(project_width_half - -1.0) / fovDx; // near left
+            pClipFrustum->nearLeft = -(project_width_half - -1.0) / focalLength; // near left
 #endif
             return 1;
         }
@@ -304,8 +304,8 @@ int rdCamera_SetFrustrum(rdCamera *camera, rdClipFrustum *outClip, signed int mi
     //jk_printf("%u %u %u %u\n", height, width, height2, width2);
 
     rdClipFrustum* cameraClip = camera->pClipFrustum;
-    rdCanvas* canvas = camera->canvas;
-    if ( !canvas )
+    rdCanvas* pCanvas = camera->pCanvas;
+    if ( !pCanvas )
         return 0;
 
 #if defined(QOL_IMPROVEMENTS)
@@ -313,25 +313,25 @@ int rdCamera_SetFrustrum(rdCamera *camera, rdClipFrustum *outClip, signed int mi
 #else
     flex_t overdraw = 0.0;
 #endif
-    flex_t project_width_half = overdraw + canvas->half_screen_height - ((flex_d_t)minY - 0.5);
-    flex_t project_height_half = overdraw + canvas->half_screen_width - ((flex_d_t)minX - 0.5);
+    flex_t project_width_half = overdraw + pCanvas->half_screen_height - ((flex_d_t)minY - 0.5);
+    flex_t project_height_half = overdraw + pCanvas->half_screen_width - ((flex_d_t)minX - 0.5);
     
-    flex_t project_width_half_2 = -canvas->half_screen_height + ((flex_d_t)maxY - 0.5);
-    flex_t project_height_half_2 = -canvas->half_screen_width + ((flex_d_t)maxX - 0.5);
+    flex_t project_width_half_2 = -pCanvas->half_screen_height + ((flex_d_t)maxY - 0.5);
+    flex_t project_height_half_2 = -pCanvas->half_screen_width + ((flex_d_t)maxX - 0.5);
 
     outClip->bClipFar = cameraClip->bClipFar;
-    outClip->zNear = cameraClip->zNear;
-    outClip->zFar = cameraClip->zFar;
+    outClip->nearPlane = cameraClip->nearPlane;
+    outClip->farPlane = cameraClip->farPlane;
     
-    flex_t fovDx = camera->fovDx;
-    flex_t fovDy = camera->fovDx;
+    flex_t focalLength = camera->focalLength;
+    flex_t fovDy = camera->focalLength;
 
     // UBSAN fixes
     if (fovDy == 0) {
         fovDy = 0.000001;
     }
-    if (fovDx == 0) {
-        fovDx = 0.000001;
+    if (focalLength == 0) {
+        focalLength = 0.000001;
     }
 
 #if 0 //def EXPERIMENTAL_FIXED_POINT
@@ -345,11 +345,11 @@ int rdCamera_SetFrustrum(rdCamera *camera, rdClipFrustum *outClip, signed int mi
     pClipFrustum->nearLeft = (-(project_width_half - -1.0) / project_width_half) * tangent; // near left
 #else
     outClip->farTop = project_width_half / fovDy;
-    outClip->farLeft = -project_height_half / fovDx;
+    outClip->farLeft = -project_height_half / focalLength;
     outClip->bottom = -project_width_half_2 / fovDy;
-    outClip->right = project_height_half_2 / fovDx;
+    outClip->right = project_height_half_2 / focalLength;
     outClip->nearTop = (project_width_half - -1.0) / fovDy;
-    outClip->nearLeft = -(project_height_half - -1.0) / fovDx;
+    outClip->nearLeft = -(project_height_half - -1.0) / focalLength;
 #endif
 
     return 1;
@@ -357,7 +357,7 @@ int rdCamera_SetFrustrum(rdCamera *camera, rdClipFrustum *outClip, signed int mi
 
 void rdCamera_Update(rdMatrix34 *orthoProj)
 {
-    rdMatrix_InvertOrtho34(&rdCamera_g_pCurCamera->view_matrix, orthoProj);
+    rdMatrix_InvertOrtho34(&rdCamera_g_pCurCamera->orient, orthoProj);
     rdMatrix_Copy34(&rdCamera_g_camMatrix, orthoProj);
     rdMatrix_ExtractAngles34(&rdCamera_g_camMatrix, &rdCamera_camRotation);
 }
@@ -366,8 +366,8 @@ void rdCamera_OrthoProject(rdVector3* out, const rdVector3* v)
 {
     //rdCamera_g_pCurCamera->orthoScale = 200.0;
 
-    out->x = rdCamera_g_pCurCamera->orthoScale * v->x + rdCamera_g_pCurCamera->canvas->half_screen_width;
-    out->y = -(v->z * rdCamera_g_pCurCamera->orthoScale) * rdCamera_g_pCurCamera->screenAspectRatio + rdCamera_g_pCurCamera->canvas->half_screen_height;
+    out->x = rdCamera_g_pCurCamera->orthoScale * v->x + rdCamera_g_pCurCamera->pCanvas->half_screen_width;
+    out->y = -(v->z * rdCamera_g_pCurCamera->orthoScale) * rdCamera_g_pCurCamera->aspectRatio + rdCamera_g_pCurCamera->pCanvas->half_screen_height;
     out->z = v->y * rdCamera_g_pCurCamera->orthoScale;
 
     //printf("%f %f %f -> %f %f %f\n", v->x, v->y, v->z, out->x, out->y, out->z);
@@ -385,8 +385,8 @@ void rdCamera_OrthoProjectLst(rdVector3 *vertices_out, const rdVector3 *vertices
 
 void rdCamera_OrthoProjectSquare(rdVector3 *out, const rdVector3 *v)
 {
-    out->x = rdCamera_g_pCurCamera->orthoScale * v->x + rdCamera_g_pCurCamera->canvas->half_screen_width;
-    out->y = rdCamera_g_pCurCamera->canvas->half_screen_height - v->z * rdCamera_g_pCurCamera->orthoScale;
+    out->x = rdCamera_g_pCurCamera->orthoScale * v->x + rdCamera_g_pCurCamera->pCanvas->half_screen_width;
+    out->y = rdCamera_g_pCurCamera->pCanvas->half_screen_height - v->z * rdCamera_g_pCurCamera->orthoScale;
     out->z = v->y;
 }
 
@@ -410,10 +410,10 @@ void rdCamera_PerspProject(rdVector3 *out, const rdVector3 *v)
     out->y = v->y;
     out->z = v->z;
 #else
-    flex_t fov_y_calc = (rdCamera_g_pCurCamera->fovDx / v->y);
+    flex_t fov_y_calc = (rdCamera_g_pCurCamera->focalLength / v->y);
     flex_t fov_x_calc = fov_y_calc; // This is the same because the clipping is what actually handles the aspect change
-    out->x = rdCamera_g_pCurCamera->canvas->half_screen_width + (v->x * fov_x_calc);
-    out->y = rdCamera_g_pCurCamera->canvas->half_screen_height - (v->z * fov_y_calc);
+    out->x = rdCamera_g_pCurCamera->pCanvas->half_screen_width + (v->x * fov_x_calc);
+    out->y = rdCamera_g_pCurCamera->pCanvas->half_screen_height - (v->z * fov_y_calc);
     out->z = v->y;
 #endif
     //printf("%f %f %f -> %f %f %f\n", v->x, v->y, v->z, out->x, out->y, out->z);
@@ -438,11 +438,11 @@ void rdCamera_PerspProjectLst(rdVector3 *pVerticesOut, const rdVector3 *pVertice
 #ifdef TARGET_TWL
 void rdCamera_PerspProjectClip(rdVector3 *out, const rdVector3 *v)
 {
-    flex_t fov_y_calc = (rdCamera_g_pCurCamera->fovDx / v->y);
+    flex_t fov_y_calc = (rdCamera_g_pCurCamera->focalLength / v->y);
     flex_t fov_x_calc = fov_y_calc; // This is the same because the clipping is what actually handles the aspect change
     
-    out->x = rdCamera_g_pCurCamera->canvas->half_screen_width + (v->x * fov_x_calc);
-    out->y = rdCamera_g_pCurCamera->canvas->half_screen_height - (v->z * fov_y_calc);
+    out->x = rdCamera_g_pCurCamera->pCanvas->half_screen_width + (v->x * fov_x_calc);
+    out->y = rdCamera_g_pCurCamera->pCanvas->half_screen_height - (v->z * fov_y_calc);
     out->z = v->y;
 }
 
@@ -465,9 +465,9 @@ void rdCamera_PerspProjectSquare(rdVector3 *out, const rdVector3 *v)
     out->y = v->y;
     out->z = v->z;
 #else
-    flex_t fov_y_calc = (rdCamera_g_pCurCamera->fovDx / v->y);
-    out->x = rdCamera_g_pCurCamera->canvas->half_screen_width + (v->x * fov_y_calc);
-    out->y = rdCamera_g_pCurCamera->canvas->half_screen_height - (v->z * fov_y_calc);
+    flex_t fov_y_calc = (rdCamera_g_pCurCamera->focalLength / v->y);
+    out->x = rdCamera_g_pCurCamera->pCanvas->half_screen_width + (v->x * fov_y_calc);
+    out->y = rdCamera_g_pCurCamera->pCanvas->half_screen_height - (v->z * fov_y_calc);
     out->z = v->y;
 #endif
 }
@@ -502,13 +502,13 @@ void rdCamera_SetAttenuation(rdCamera *camera, flex_t minVal, flex_t maxVal)
     camera->attenuationMin = minVal;
     if ( numLights )
     {
-        v4 = camera->lights;
+        v4 = camera->aLights;
         do
         {
             v5 = *v4++;
             --numLights;
-            v5->falloffMin = v5->intensity / minVal;
-            v5->falloffMax = v5->intensity / maxVal;
+            v5->minRadius = v5->intensity / minVal;
+            v5->maxRadius = v5->intensity / maxVal;
         }
         while ( numLights );
     }
@@ -520,12 +520,12 @@ int rdCamera_AddLight(rdCamera *camera, rdLight *light, rdVector3 *lightPos)
     if ( camera->numLights >= RDCAMERA_MAX_LIGHTS ) // Added: > to >=
         return 0;
 
-    camera->lights[camera->numLights] = light;
+    camera->aLights[camera->numLights] = light;
 
     light->id = camera->numLights;
-    rdVector_Copy3(&camera->lightPositions[camera->numLights], lightPos);
-    light->falloffMin = light->intensity / camera->attenuationMin;
-    light->falloffMax = light->intensity / camera->attenuationMax;
+    rdVector_Copy3(&camera->aLightPositions[camera->numLights], lightPos);
+    light->minRadius = light->intensity / camera->attenuationMin;
+    light->maxRadius = light->intensity / camera->attenuationMax;
 
     ++camera->numLights;
     return 1;
@@ -542,7 +542,7 @@ void rdCamera_AdvanceFrame()
     rdCanvas *v0; // eax
     rdRect a4; // [esp+0h] [ebp-10h] BYREF
 
-    v0 = rdCamera_g_pCurCamera->canvas;
+    v0 = rdCamera_g_pCurCamera->pCanvas;
     if ( (rdroid_g_curRenderOptions & 0x100) != 0 && (v0->bIdk & 2) != 0 )
     {
         if ( rdroid_curAcceleration <= 0 )

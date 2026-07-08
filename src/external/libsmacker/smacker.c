@@ -310,7 +310,7 @@ static smk smk_open_generic(const uint8_t m, union smk_read_t fp, uint32_t size,
 			/* Audio track specifies "exists" flag, malloc structure and copy components. */
 			s->audio[temp_l].exists = 1;
 
-			/* and for all audio tracks */
+			/* and for all audio aTracks */
 			smk_malloc(s->audio[temp_l].buffer, s->audio[temp_l].max_buffer);
 
 			if (temp_u & 0x80000000)

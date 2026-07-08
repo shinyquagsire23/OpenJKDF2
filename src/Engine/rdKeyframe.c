@@ -56,7 +56,7 @@ rdKeyframe* rdKeyframe_Load(char *fname)
 int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
 {
     char *key_fname_only;
-    rdJoint *paJoints;
+    rdJoint *aNodes;
     rdKeyframe *num_joints;
     unsigned int num_markers_read;
     rdMarkers *markers;
@@ -72,7 +72,7 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
     flex32_t velx, vely, velz;
     flex32_t angVelx, angVely, angVelz;
     int entry_num;
-    char mesh_name[32];
+    char aMeshName[32];
     unsigned int nodes_read;
     flex32_t ftmp;
 
@@ -127,13 +127,13 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
       goto read_fail;
 
     { TWL_EXTRAM_SUGGEST(rdroid_g_pHS); // Added: joints are word-width on RETRO
-    paJoints = (rdJoint *)RDROID_ALLOC(sizeof(rdJoint) * (keyframe->numJoints+1)); // Added: try and contain rdPuppet crashes...
+    aNodes = (rdJoint *)RDROID_ALLOC(sizeof(rdJoint) * (keyframe->numJoints+1)); // Added: try and contain rdPuppet crashes...
     TWL_EXTRAM_RESTORE(rdroid_g_pHS); }
-    keyframe->paJoints = paJoints;
-    if (!paJoints)
+    keyframe->aNodes = aNodes;
+    if (!aNodes)
       goto read_fail;
 
-    stdPlatform_Memzero32(paJoints, sizeof(rdJoint) * (keyframe->numJoints+1)); // Added: word-safe
+    stdPlatform_Memzero32(aNodes, sizeof(rdJoint) * (keyframe->numJoints+1)); // Added: word-safe
     keyframe->numJoints2 = keyframe->numJoints;
 
     if (!stdConffile_ReadLine() || _sscanf(stdConffile_g_aLine, " section: %s", std_g_genBuffer) != 1)
@@ -173,7 +173,7 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
     }
     
     
-    if (!stdConffile_ReadLine() || _sscanf(stdConffile_g_aLine, " nodes %d", &num_nodes) != 1)
+    if (!stdConffile_ReadLine() || _sscanf(stdConffile_g_aLine, " aCurKfNodeEntryNums %d", &num_nodes) != 1)
     {
       goto read_fail;
     }
@@ -186,12 +186,12 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
             goto read_fail;
         if (!stdConffile_ReadLine())
             goto read_fail;
-        if (_sscanf(stdConffile_g_aLine, " mesh name %s", mesh_name) != 1)
+        if (_sscanf(stdConffile_g_aLine, " mesh name %s", aMeshName) != 1)
             goto read_fail;
-        joint = &keyframe->paJoints[node_idx];
+        joint = &keyframe->aNodes[node_idx];
         
 #ifdef SITH_DEBUG_STRUCT_NAMES
-        stdString_SafeStrCopy(joint->mesh_name, mesh_name, 32);
+        stdString_SafeStrCopy(joint->aMeshName, aMeshName, 32);
 #endif
         
         if (!stdConffile_ReadLine())
@@ -200,23 +200,23 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
         if (_sscanf(stdConffile_g_aLine, " entries %d", &anim_entry_cnt) != 1)
             goto read_fail;
 
-        joint->nodeIdx = node_idx;
-        joint->numAnimEntries = anim_entry_cnt;
+        joint->nodeNum = node_idx;
+        joint->numEntries = anim_entry_cnt;
 #ifdef TARGET_RETRO_HOMEBREW
         // Added: anim entries are written word-safely (parse-time float/u32 stores
         // only) and read-only afterward, so they can live in word-addressable-only
         // memory (DC VRAM arena). Biggest per-level chunk of animation data.
         int prevSuggest = rdroid_g_pHS->suggestHeap(HEAP_WORD_ADDRESSABLE);
 #endif
-        joint->paAnimEntries = (rdAnimEntry*)RDROID_ALLOC(sizeof(rdAnimEntry) * anim_entry_cnt + 2); // Added: prevent some oob accesses in rdPuppet
+        joint->aEntries = (rdAnimEntry*)RDROID_ALLOC(sizeof(rdAnimEntry) * anim_entry_cnt + 2); // Added: prevent some oob accesses in rdPuppet
 #ifdef TARGET_RETRO_HOMEBREW
         rdroid_g_pHS->suggestHeap(prevSuggest);
 #endif
-        if (!joint->paAnimEntries)
+        if (!joint->aEntries)
           goto read_fail;
 
-        anim_entry = joint->paAnimEntries;
-        for (anim_entry_read = 0; anim_entry_read < joint->numAnimEntries; anim_entry_read++)
+        anim_entry = joint->aEntries;
+        for (anim_entry_read = 0; anim_entry_read < joint->numEntries; anim_entry_read++)
         {
             if (!stdConffile_ReadLine()) {
                 goto read_fail;
@@ -309,23 +309,23 @@ int rdKeyframe_Write(char *out_fpath, rdKeyframe *keyframe, char *creation_metho
     totalAnimEntries = 0;
     for (i = 0; i < keyframe->numJoints2; i++)
     {
-        if (keyframe->paJoints[i].numAnimEntries)
+        if (keyframe->aNodes[i].numEntries)
             ++totalAnimEntries;
     }
     rdroid_g_pHS->filePrintf(fd, "NODES %d\n\n", totalAnimEntries);
-    joint_iter = keyframe->paJoints;
+    joint_iter = keyframe->aNodes;
     for (i = 0; i < keyframe->numJoints2; i++, joint_iter++)
     {
-        if (!joint_iter->numAnimEntries)
+        if (!joint_iter->numEntries)
             continue;
 
         rdroid_g_pHS->filePrintf(fd, "NODE    %d\n", i);
 #ifdef SITH_DEBUG_STRUCT_NAMES
-        rdroid_g_pHS->filePrintf(fd, "MESH NAME %s\n", joint_iter->mesh_name);
+        rdroid_g_pHS->filePrintf(fd, "MESH NAME %s\n", joint_iter->aMeshName);
 #else
         rdroid_g_pHS->filePrintf(fd, "MESH NAME %s\n", "UNKNOWN");
 #endif
-        rdroid_g_pHS->filePrintf(fd, "ENTRIES %d\n", joint_iter->numAnimEntries);
+        rdroid_g_pHS->filePrintf(fd, "ENTRIES %d\n", joint_iter->numEntries);
         rdroid_g_pHS->filePrintf(fd, "\n");
         rdroid_g_pHS->filePrintf(
         fd,
@@ -333,8 +333,8 @@ int rdKeyframe_Write(char *out_fpath, rdKeyframe *keyframe, char *creation_metho
         rdroid_g_pHS->filePrintf(
         fd,
         "#                                 dx:          dy:          dz:          dp:          dy:          dr:\n");
-        animEntry_iter = joint_iter->paAnimEntries;
-        for (j = 0; j < joint_iter->numAnimEntries; j++ )
+        animEntry_iter = joint_iter->aEntries;
+        for (j = 0; j < joint_iter->numEntries; j++ )
         {
             rdroid_g_pHS->filePrintf(
                 fd,
@@ -389,19 +389,19 @@ void rdKeyframe_FreeEntry(rdKeyframe *keyframe)
     unsigned int i;
     rdJoint* joint_iter;
     
-    if (!keyframe->paJoints)
+    if (!keyframe->aNodes)
         return;
 
-    joint_iter = keyframe->paJoints;
+    joint_iter = keyframe->aNodes;
     for (i = 0; i < keyframe->numJoints2; i++)
     {
-        if (joint_iter->paAnimEntries)
+        if (joint_iter->aEntries)
         {
-            RDROID_FREE(joint_iter->paAnimEntries);
-            joint_iter->paAnimEntries = NULL;
+            RDROID_FREE(joint_iter->aEntries);
+            joint_iter->aEntries = NULL;
         }
         joint_iter++;
     }
-    RDROID_FREE(keyframe->paJoints);
-    keyframe->paJoints = NULL;
+    RDROID_FREE(keyframe->aNodes);
+    keyframe->aNodes = NULL;
 }

@@ -2147,7 +2147,7 @@ exit:
 
 psa_status_t psa_hash_abort(psa_hash_operation_t *operation)
 {
-    /* Aborting a non-active operation is allowed */
+    /* Aborting a non-bEnabled operation is allowed */
     if (operation->id == 0) {
         return PSA_SUCCESS;
     }
@@ -2333,7 +2333,7 @@ psa_status_t psa_hash_clone(const psa_hash_operation_t *source_operation,
 
 psa_status_t psa_mac_abort(psa_mac_operation_t *operation)
 {
-    /* Aborting a non-active operation is allowed */
+    /* Aborting a non-bEnabled operation is allowed */
     if (operation->id == 0) {
         return PSA_SUCCESS;
     }
@@ -4754,7 +4754,7 @@ exit:
     return status;
 }
 
-/* Pass additional data to an active multipart AEAD operation. */
+/* Pass additional data to an bEnabled multipart AEAD operation. */
 psa_status_t psa_aead_update_ad(psa_aead_operation_t *operation,
                                 const uint8_t *input,
                                 size_t input_length)
@@ -4799,7 +4799,7 @@ exit:
     return status;
 }
 
-/* Encrypt or decrypt a message fragment in an active multipart AEAD
+/* Encrypt or decrypt a message fragment in an bEnabled multipart AEAD
    operation.*/
 psa_status_t psa_aead_update(psa_aead_operation_t *operation,
                              const uint8_t *input,

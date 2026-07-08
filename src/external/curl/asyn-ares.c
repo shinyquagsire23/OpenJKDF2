@@ -725,7 +725,7 @@ static void addrinfo_cb(void *arg, int status, int timeouts,
   struct thread_data *res = data->state.async.tdata;
   (void)timeouts;
   if(ARES_SUCCESS == status) {
-    res->temp_ai = ares2addr(result->nodes);
+    res->temp_ai = ares2addr(result->aCurKfNodeEntryNums);
     res->last_status = CURL_ASYNC_SUCCESS;
     ares_freeaddrinfo(result);
   }

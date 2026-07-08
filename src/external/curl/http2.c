@@ -113,7 +113,7 @@ struct cf_h2_ctx {
      nghttp2_session_mem_recv() but mem buffer is still not full. In
      this case, we wrongly sends the content of mem buffer if we share
      them for both cases. */
-  int32_t pause_stream_id; /* stream ID which paused
+  int32_t pause_stream_id; /* stream ID which bPaused
                               nghttp2_session_mem_recv */
   size_t drain_total; /* sum of all stream's UrlState.drain */
 };
@@ -1782,7 +1782,7 @@ static ssize_t cf_h2_recv(struct Curl_cfilter *cf, struct Curl_easy *data,
     }
 
     if(ctx->pause_stream_id == stream->stream_id && !stream->pausedata) {
-      /* We have paused nghttp2, but we have no pause data (see
+      /* We have bPaused nghttp2, but we have no pause data (see
          on_data_chunk_recv). */
       ctx->pause_stream_id = 0;
       if(h2_process_pending_input(cf, data, err) != 0) {
@@ -1813,7 +1813,7 @@ static ssize_t cf_h2_recv(struct Curl_cfilter *cf, struct Curl_easy *data,
     goto out;
   }
   else if(ctx->pause_stream_id) {
-    /* If a stream paused nghttp2_session_mem_recv previously, and has
+    /* If a stream bPaused nghttp2_session_mem_recv previously, and has
        not processed all data, it still refers to the buffer in
        nghttp2_session.  If we call nghttp2_session_mem_recv(), we may
        overwrite that buffer.  To avoid that situation, just return
@@ -1822,19 +1822,19 @@ static ssize_t cf_h2_recv(struct Curl_cfilter *cf, struct Curl_easy *data,
        notified with its drain property, and socket is read again
        quickly. */
     if(stream->closed) {
-      /* closed overrides paused */
+      /* closed overrides bPaused */
       drained_transfer(cf, data);
       nread = 0;
       goto out;
     }
-    DEBUGF(LOG_CF(data, cf, "[h2sid=%u] is paused, pause h2sid: %u",
+    DEBUGF(LOG_CF(data, cf, "[h2sid=%u] is bPaused, pause h2sid: %u",
                   stream->stream_id, ctx->pause_stream_id));
     *err = CURLE_AGAIN;
     nread = -1;
     goto out;
   }
   else {
-    /* We have nothing buffered for `data` and no other stream paused
+    /* We have nothing buffered for `data` and no other stream bPaused
      * the processing of incoming data, we can therefore read new data
      * from the network.
      * If DATA is coming for this stream, we want to store it ad the
@@ -1852,7 +1852,7 @@ static ssize_t cf_h2_recv(struct Curl_cfilter *cf, struct Curl_easy *data,
     }
 
     while(stream->memlen == 0          /* have no data for this stream */
-          && !ctx->pause_stream_id     /* we are not paused either */
+          && !ctx->pause_stream_id     /* we are not bPaused either */
           && ctx->inbuflen == 0) {     /* and out input buffer is empty */
       /* Receive data from the "lower" filters */
       nread = Curl_conn_cf_recv(cf->next, data, ctx->inbuf, H2_BUFSIZE, err);
@@ -2165,7 +2165,7 @@ static int cf_h2_get_select_socks(struct Curl_cfilter *cf,
   sock[0] = Curl_conn_cf_get_socket(cf, data);
 
   if(!(k->keepon & KEEP_RECV_PAUSE))
-    /* Unless paused - in an HTTP/2 connection we can basically always get a
+    /* Unless bPaused - in an HTTP/2 connection we can basically always get a
        frame so we should always be ready for one */
     bitmap |= GETSOCK_READSOCK(0);
 

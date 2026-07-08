@@ -250,9 +250,9 @@ bool Curl_ssl_supports(struct Curl_easy *data, int ssl_option);
 /**
  * Get the internal ssl instance (like OpenSSL's SSL*) from the filter
  * chain at `sockindex` of type specified by `info`.
- * For `n` == 0, the first active (top down) instance is returned.
- * 1 gives the second active, etc.
- * NULL is returned when no active SSL filter is present.
+ * For `n` == 0, the first bEnabled (top down) instance is returned.
+ * 1 gives the second bEnabled, etc.
+ * NULL is returned when no bEnabled SSL filter is present.
  */
 void *Curl_ssl_get_internals(struct Curl_easy *data, int sockindex,
                              CURLINFO info, int n);

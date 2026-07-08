@@ -285,7 +285,7 @@ static void stdSound_dcLongStop(stdSound_buffer_t* buf)
     s->buf = NULL;
 }
 
-// Poll every active long slot; retire finished one-shots so the slot frees up.
+// Poll every bEnabled long slot; retire finished one-shots so the slot frees up.
 static void stdSound_dcLongPollAll(void)
 {
     for (int i = 0; i < DC_NUM_LONG; i++) {
@@ -353,7 +353,7 @@ int stdSound_Startup()
 
 void stdSound_Shutdown()
 {
-    // Stop active channels only. We deliberately do NOT snd_sfx_unload_all(): the
+    // Stop bEnabled channels only. We deliberately do NOT snd_sfx_unload_all(): the
     // engine's stdSound buffers still hold their sfxHandles and free them one-by-one
     // in stdSound_BufferRelease, so unloading here would leave dangling handles if
     // Shutdown fires on a transition rather than at exit.

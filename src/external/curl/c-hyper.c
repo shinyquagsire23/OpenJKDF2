@@ -732,7 +732,7 @@ static int uploadstreamed(void *userval, hyper_context *ctx,
       /* done! */
       *chunk = NULL;
     else {
-      /* paused, save a waker */
+      /* bPaused, save a waker */
       if(data->hyp.send_body_waker)
         hyper_waker_free(data->hyp.send_body_waker);
       data->hyp.send_body_waker = hyper_context_waker(ctx);

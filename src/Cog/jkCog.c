@@ -226,7 +226,7 @@ void jkCog_SetWeaponMesh(sithCog *ctx)
         {
             if ( model3 )
             {
-                if ( model3->numGeosets == 1 && model3->geosets[0].numMeshes == 1 )
+                if ( model3->numGeos == 1 && model3->aGeos[0].numMeshes == 1 )
                 {
                     v5 = &v4->rd_thing;
                     rdThing_FreeEntry(v5); // Added: fix memleak
@@ -574,7 +574,7 @@ void jkCog_GetSaberSideMat(sithCog *ctx)
 {
     SithThing* pPlayerThing = sithCogExec_PopThing(ctx);
     if (pPlayerThing->playerInfo) {
-        sithCogExec_PushInt(ctx,((pPlayerThing->playerInfo->polyline).edgeFace.material)->id);
+        sithCogExec_PushInt(ctx,((pPlayerThing->playerInfo->polyline).face.material)->id);
     }
     // TODO bugfix: push a -1??
     return;
@@ -1558,7 +1558,7 @@ void jkCogExt_SetSaberFaceFlags(sithCog* ctx)
     jkPlayerInfo* pPlayerInfo = pPlayer->playerInfo;
     if ( pPlayerInfo && pPlayerInfo->polylineThing.polyline )
     {
-        pPlayerInfo->polylineThing.polyline->edgeFace.type = flags;
+        pPlayerInfo->polylineThing.polyline->face.type = flags;
         pPlayerInfo->polylineThing.polyline->tipFace.type = flags;
     }
 }
