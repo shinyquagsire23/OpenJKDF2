@@ -1700,7 +1700,7 @@ void do_hooks()
     // rdPrimit2
     hook_function(rdPrimit2_DrawLine_ADDR, rdPrimit2_DrawLine);
     hook_function(rdPrimit2_DrawClippedLine_ADDR, rdPrimit2_DrawClippedLine);
-    hook_function(rdPrimit2_DrawCircle_ADDR, rdPrimit2_DrawCircle);
+    hook_function(rdPrimit2_DrawClippedCircle_ADDR, rdPrimit2_DrawClippedCircle);
     hook_function(rdPrimit2_DrawRectangle_ADDR, rdPrimit2_DrawRectangle);
     hook_function(rdPrimit2_DrawTriangle_ADDR, rdPrimit2_DrawTriangle);
 

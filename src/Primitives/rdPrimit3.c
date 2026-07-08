@@ -918,7 +918,7 @@ void rdPrimit3_DrawCircle(rdVector3 *pVecPos, flex_t xOffs, flex_t radius, int c
         rdCamera_pCurCamera->fnProject(&v8, &vertex_out);
         rdCamera_pCurCamera->fnProject(&v9, &v7);
         v5 = v9.x - v8.x;
-        rdPrimit2_DrawCircle(rdCamera_pCurCamera->canvas, (__int64)(v8.x - -0.5), (__int64)(v8.y - -0.5), v5, radius, color16, mask);
+        rdPrimit2_DrawClippedCircle(rdCamera_pCurCamera->canvas, (__int64)(v8.x - -0.5), (__int64)(v8.y - -0.5), v5, radius, color16, mask);
     }
 }
 

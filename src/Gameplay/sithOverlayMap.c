@@ -112,7 +112,7 @@ int sithOverlayMap_Draw(rdCanvas *canvas)
         v9 = sithOverlayMap_inst.config.playerLineColor;
     }
     canvasa = sithOverlayMap_pPlayer->moveSize * sithOverlayMap_flMapSize;
-    rdPrimit2_DrawCircle(sithOverlayMap_pCanvas, sithOverlayMap_x1, sithOverlayMap_y1, canvasa, 20.0, v8, -1);
+    rdPrimit2_DrawClippedCircle(sithOverlayMap_pCanvas, sithOverlayMap_x1, sithOverlayMap_y1, canvasa, 20.0, v8, -1);
     if ( sithOverlayMap_inst.config.bRotateOverlayMap )
     {
         result = rdPrimit2_DrawClippedLine(
@@ -399,7 +399,7 @@ LABEL_30:
                     v30 = sithOverlayMap_y1 - v40_;
                     a4 = i->moveSize * sithOverlayMap_flMapSize;
                     v31 = v37 + sithOverlayMap_x1;
-                    rdPrimit2_DrawCircle(sithOverlayMap_pCanvas, v37 + sithOverlayMap_x1, sithOverlayMap_y1 - v40_, a4, 20.0, circleColor, -1);
+                    rdPrimit2_DrawClippedCircle(sithOverlayMap_pCanvas, v37 + sithOverlayMap_x1, sithOverlayMap_y1 - v40_, a4, 20.0, circleColor, -1);
                     v32 = i->type;
                     if ( v32 == SITH_THING_ACTOR || v32 == SITH_THING_PLAYER )
                     {

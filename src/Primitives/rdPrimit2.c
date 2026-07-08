@@ -109,7 +109,7 @@ int rdPrimit2_DrawClippedLine(rdCanvas *pCanvas, int x1, int y1, int x2, int y2,
 }
 
 
-void rdPrimit2_DrawCircle(rdCanvas *pCanvas, int x1, int y1, flex_t a4, flex_t radius, uint16_t color16, int mask)
+void rdPrimit2_DrawClippedCircle(rdCanvas *pCanvas, int x1, int y1, flex_t a4, flex_t radius, uint16_t color16, int mask)
 {
     __int64 v7; // rax
     int v8; // edi

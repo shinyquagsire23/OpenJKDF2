@@ -654,11 +654,11 @@ void jkHud_Draw()
         {
             stdMath_SinCos(a2, &valSin, &valCos);
             v58 = valSin * 20.0;
-            rdPrimit2_DrawCircle(pOverlayCanvas, tmpScreenPt.x, tmpScreenPt.y, v58, 20.0, jkHud_targetRed16, -1);
+            rdPrimit2_DrawClippedCircle(pOverlayCanvas, tmpScreenPt.x, tmpScreenPt.y, v58, 20.0, jkHud_targetRed16, -1);
             a2c = (sithTime_curSeconds - 0.1) * 200.0;
             stdMath_SinCos(a2c, &valSin, &valCos);
             v59 = valSin * 20.0;
-            rdPrimit2_DrawCircle(pOverlayCanvas, tmpScreenPt.x, tmpScreenPt.y, v59, 20.0, jkHud_targetGreen16, -1);
+            rdPrimit2_DrawClippedCircle(pOverlayCanvas, tmpScreenPt.x, tmpScreenPt.y, v59, 20.0, jkHud_targetGreen16, -1);
             a2d = (sithTime_curSeconds - 0.2) * 200.0;
             stdMath_SinCos(a2d, &valSin, &valCos);
             v26 = jkHud_targetBlue16;
@@ -667,17 +667,17 @@ void jkHud_Draw()
         {
             stdMath_SinCos(a2, &valSin, &valCos);
             v56 = valSin * 20.0;
-            rdPrimit2_DrawCircle(pOverlayCanvas, tmpScreenPt.x, tmpScreenPt.y, v56, 20.0, jkHud_targetRed, -1);
+            rdPrimit2_DrawClippedCircle(pOverlayCanvas, tmpScreenPt.x, tmpScreenPt.y, v56, 20.0, jkHud_targetRed, -1);
             a2a = (sithTime_curSeconds - 0.1) * 200.0;
             stdMath_SinCos(a2a, &valSin, &valCos);
             v57 = valSin * 20.0;
-            rdPrimit2_DrawCircle(pOverlayCanvas, tmpScreenPt.x, tmpScreenPt.y, v57, 20.0, jkHud_targetBlue, -1);
+            rdPrimit2_DrawClippedCircle(pOverlayCanvas, tmpScreenPt.x, tmpScreenPt.y, v57, 20.0, jkHud_targetBlue, -1);
             a2b = (sithTime_curSeconds - 0.2) * 200.0;
             stdMath_SinCos(a2b, &valSin, &valCos);
             v26 = jkHud_targetGreen;
         }
         v60 = valSin * 20.0;
-        rdPrimit2_DrawCircle(pOverlayCanvas, tmpScreenPt.x, tmpScreenPt.y, v60, 20.0, v26, -1);
+        rdPrimit2_DrawClippedCircle(pOverlayCanvas, tmpScreenPt.x, tmpScreenPt.y, v60, 20.0, v26, -1);
     }
 
     
@@ -1259,11 +1259,11 @@ void jkHud_DrawGPU()
         {
             stdMath_SinCos(a2, &valSin, &valCos);
             v58 = valSin * 20.0;
-            rdPrimit2_DrawCircle(pOverlayCanvas, tmpScreenPt.x, tmpScreenPt.y, v58, 20.0, jkHud_targetRed16, -1);
+            rdPrimit2_DrawClippedCircle(pOverlayCanvas, tmpScreenPt.x, tmpScreenPt.y, v58, 20.0, jkHud_targetRed16, -1);
             a2c = (sithTime_curSeconds - 0.1) * 200.0;
             stdMath_SinCos(a2c, &valSin, &valCos);
             v59 = valSin * 20.0;
-            rdPrimit2_DrawCircle(pOverlayCanvas, tmpScreenPt.x, tmpScreenPt.y, v59, 20.0, jkHud_targetGreen16, -1);
+            rdPrimit2_DrawClippedCircle(pOverlayCanvas, tmpScreenPt.x, tmpScreenPt.y, v59, 20.0, jkHud_targetGreen16, -1);
             a2d = (sithTime_curSeconds - 0.2) * 200.0;
             stdMath_SinCos(a2d, &valSin, &valCos);
             v26 = jkHud_targetBlue16;
@@ -1272,17 +1272,17 @@ void jkHud_DrawGPU()
         {
             stdMath_SinCos(a2, &valSin, &valCos);
             v56 = valSin * 20.0;
-            rdPrimit2_DrawCircle(pOverlayCanvas, tmpScreenPt.x, tmpScreenPt.y, v56, 20.0, jkHud_targetRed, -1);
+            rdPrimit2_DrawClippedCircle(pOverlayCanvas, tmpScreenPt.x, tmpScreenPt.y, v56, 20.0, jkHud_targetRed, -1);
             a2a = (sithTime_curSeconds - 0.1) * 200.0;
             stdMath_SinCos(a2a, &valSin, &valCos);
             v57 = valSin * 20.0;
-            rdPrimit2_DrawCircle(pOverlayCanvas, tmpScreenPt.x, tmpScreenPt.y, v57, 20.0, jkHud_targetBlue, -1);
+            rdPrimit2_DrawClippedCircle(pOverlayCanvas, tmpScreenPt.x, tmpScreenPt.y, v57, 20.0, jkHud_targetBlue, -1);
             a2b = (sithTime_curSeconds - 0.2) * 200.0;
             stdMath_SinCos(a2b, &valSin, &valCos);
             v26 = jkHud_targetGreen;
         }
         v60 = valSin * 20.0;
-        rdPrimit2_DrawCircle(pOverlayCanvas, tmpScreenPt.x, tmpScreenPt.y, v60, 20.0, v26, -1);
+        rdPrimit2_DrawClippedCircle(pOverlayCanvas, tmpScreenPt.x, tmpScreenPt.y, v60, 20.0, v26, -1);
     }
 
     
