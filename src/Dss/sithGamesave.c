@@ -490,7 +490,7 @@ int sithGamesave_SaveCurrentWorld(int mpFlags)
 
     sithSurface_SyncFull(mpFlags);
 
-    for (sithEvent* timerIter = sithEvent_list; timerIter; timerIter = timerIter->nextTimer )
+    for (sithEvent* timerIter = sithEvent_g_pFirstQueuedEvent; timerIter; timerIter = timerIter->nextTimer )
         sithDSS_SyncTaskEvents(timerIter, 0, mpFlags);
 
     sithDSS_SendSyncPalEffects(0, mpFlags);

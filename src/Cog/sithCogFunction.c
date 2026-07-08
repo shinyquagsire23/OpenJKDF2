@@ -394,9 +394,9 @@ void sithCogFunction_KillTimerEx(sithCog *ctx)
     int v1 = sithCogExec_PopInt(ctx);
     if ( v1 > 0 )
     {
-        v2 = sithEvent_list;
+        v2 = sithEvent_g_pFirstQueuedEvent;
         v3 = 0;
-        if ( sithEvent_list )
+        if ( sithEvent_g_pFirstQueuedEvent )
         {
             do
             {
@@ -406,7 +406,7 @@ void sithCogFunction_KillTimerEx(sithCog *ctx)
                     if ( v3 )
                         v3->nextTimer = v4;
                     else
-                        sithEvent_list = v2->nextTimer;
+                        sithEvent_g_pFirstQueuedEvent = v2->nextTimer;
                     sithEvent_FreeEvent(v2);
                     v2 = v3;
                 }

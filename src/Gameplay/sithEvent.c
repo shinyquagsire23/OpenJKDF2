@@ -47,7 +47,7 @@ void sithEvent_Reset()
     }
 
     sithEvent_numFreeEventBuffers = 256;
-    sithEvent_list = 0;
+    sithEvent_g_pFirstQueuedEvent = 0;
 }
 
 int sithEvent_CreateEvent(int taskId, sithEventInfo *timerInfo, uint32_t when)
@@ -68,7 +68,7 @@ int sithEvent_CreateEvent(int taskId, sithEventInfo *timerInfo, uint32_t when)
     timer->taskNum = taskId;
     timer->timerInfo = *timerInfo;
 
-    v5 = sithEvent_list;
+    v5 = sithEvent_g_pFirstQueuedEvent;
     for ( i = 0; v5; v5 = v5->nextTimer )
     {
         if ( v5->endMs > timer->endMs )
@@ -84,7 +84,7 @@ int sithEvent_CreateEvent(int taskId, sithEventInfo *timerInfo, uint32_t when)
     else
     {
         timer->nextTimer = v5;
-        sithEvent_list = timer;
+        sithEvent_g_pFirstQueuedEvent = timer;
     }
 
     return 1;
@@ -129,19 +129,19 @@ void sithEvent_Process()
         }
     }
 
-    i = sithEvent_list;
+    i = sithEvent_g_pFirstQueuedEvent;
     while (i)
     {
         if ( i->endMs >= sithTime_g_msecGameTime )
             break;
 
-        sithEvent_list = i->nextTimer;
+        sithEvent_g_pFirstQueuedEvent = i->nextTimer;
 
         // Added: nullptr check
         if (sithEvent_aTasks[i->taskNum].pfProcess)
             sithEvent_aTasks[i->taskNum].pfProcess(0, &i->timerInfo);
         
         sithEvent_FreeEvent(i);
-        i = sithEvent_list;
+        i = sithEvent_g_pFirstQueuedEvent;
     }
 }
