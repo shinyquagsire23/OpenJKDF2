@@ -126,6 +126,59 @@ uint32_t stdPlatform_AllocSize(void* p);
 #define JK_ALLOC(len)        pHS->alloc(len)
 #define JK_FREE(p)           pHS->free(p)
 #endif
+
+// Added: OpenJones3D-style logging/assert macros (SITHLOG_*/STDLOG_*/RDLOG_*,
+// SITH_ASSERT/STD_ASSERT/RD_ASSERT). They map to the host-services print/assert used
+// throughout the original code (stdPrintf(hs->xxxPrint, file, line, fmt, ...) and
+// hs->assert(cond, file, line)), so desktop output matches the original engine.
+// On TARGET_RETRO_HOMEBREW they compile to nothing — the guard lives here in the header
+// (not at each call site) so the debug strings/calls cost zero RAM on DSi/Dreamcast.
+#ifdef TARGET_RETRO_HOMEBREW
+#define SITHLOG_STATUS(fmt, ...)   ((void)0)
+#define SITHLOG_MESSAGE(fmt, ...)  ((void)0)
+#define SITHLOG_WARNING(fmt, ...)  ((void)0)
+#define SITHLOG_ERROR(fmt, ...)    ((void)0)
+#define SITHLOG_DEBUG(fmt, ...)    ((void)0)
+#define STDLOG_STATUS(fmt, ...)    ((void)0)
+#define STDLOG_MESSAGE(fmt, ...)   ((void)0)
+#define STDLOG_WARNING(fmt, ...)   ((void)0)
+#define STDLOG_ERROR(fmt, ...)     ((void)0)
+#define STDLOG_DEBUG(fmt, ...)     ((void)0)
+#define RDLOG_STATUS(fmt, ...)     ((void)0)
+#define RDLOG_MESSAGE(fmt, ...)    ((void)0)
+#define RDLOG_WARNING(fmt, ...)    ((void)0)
+#define RDLOG_ERROR(fmt, ...)      ((void)0)
+#define RDLOG_DEBUG(fmt, ...)      ((void)0)
+#define SITH_ASSERT(cond)          ((void)0)
+#define STD_ASSERT(cond)           ((void)0)
+#define RD_ASSERT(cond)            ((void)0)
+#define SITH_ASSERTREL(cond)       ((void)0)
+#define STD_ASSERTREL(cond)        ((void)0)
+#define RD_ASSERTREL(cond)         ((void)0)
+#else
+#define SITHLOG_STATUS(fmt, ...)   stdPrintf(pSithHS->statusPrint,  __FILE__, __LINE__, (fmt), ##__VA_ARGS__)
+#define SITHLOG_MESSAGE(fmt, ...)  stdPrintf(pSithHS->messagePrint, __FILE__, __LINE__, (fmt), ##__VA_ARGS__)
+#define SITHLOG_WARNING(fmt, ...)  stdPrintf(pSithHS->warningPrint, __FILE__, __LINE__, (fmt), ##__VA_ARGS__)
+#define SITHLOG_ERROR(fmt, ...)    stdPrintf(pSithHS->errorPrint,   __FILE__, __LINE__, (fmt), ##__VA_ARGS__)
+#define SITHLOG_DEBUG(fmt, ...)    stdPrintf(pSithHS->debugPrint,   __FILE__, __LINE__, (fmt), ##__VA_ARGS__)
+#define STDLOG_STATUS(fmt, ...)    stdPrintf(std_g_pHS->statusPrint,  __FILE__, __LINE__, (fmt), ##__VA_ARGS__)
+#define STDLOG_MESSAGE(fmt, ...)   stdPrintf(std_g_pHS->messagePrint, __FILE__, __LINE__, (fmt), ##__VA_ARGS__)
+#define STDLOG_WARNING(fmt, ...)   stdPrintf(std_g_pHS->warningPrint, __FILE__, __LINE__, (fmt), ##__VA_ARGS__)
+#define STDLOG_ERROR(fmt, ...)     stdPrintf(std_g_pHS->errorPrint,   __FILE__, __LINE__, (fmt), ##__VA_ARGS__)
+#define STDLOG_DEBUG(fmt, ...)     stdPrintf(std_g_pHS->debugPrint,   __FILE__, __LINE__, (fmt), ##__VA_ARGS__)
+#define RDLOG_STATUS(fmt, ...)     stdPrintf(rdroid_g_pHS->statusPrint,  __FILE__, __LINE__, (fmt), ##__VA_ARGS__)
+#define RDLOG_MESSAGE(fmt, ...)    stdPrintf(rdroid_g_pHS->messagePrint, __FILE__, __LINE__, (fmt), ##__VA_ARGS__)
+#define RDLOG_WARNING(fmt, ...)    stdPrintf(rdroid_g_pHS->warningPrint, __FILE__, __LINE__, (fmt), ##__VA_ARGS__)
+#define RDLOG_ERROR(fmt, ...)      stdPrintf(rdroid_g_pHS->errorPrint,   __FILE__, __LINE__, (fmt), ##__VA_ARGS__)
+#define RDLOG_DEBUG(fmt, ...)      stdPrintf(rdroid_g_pHS->debugPrint,   __FILE__, __LINE__, (fmt), ##__VA_ARGS__)
+#define SITH_ASSERT(cond)          do { if (!(cond)) pSithHS->assert(#cond, __FILE__, __LINE__); } while (0)
+#define STD_ASSERT(cond)           do { if (!(cond)) std_g_pHS->assert(#cond, __FILE__, __LINE__); } while (0)
+#define RD_ASSERT(cond)            do { if (!(cond)) rdroid_g_pHS->assert(#cond, __FILE__, __LINE__); } while (0)
+#define SITH_ASSERTREL(cond)       do { if (!(cond)) pSithHS->assert(#cond, __FILE__, __LINE__); } while (0)
+#define STD_ASSERTREL(cond)        do { if (!(cond)) std_g_pHS->assert(#cond, __FILE__, __LINE__); } while (0)
+#define RD_ASSERTREL(cond)         do { if (!(cond)) rdroid_g_pHS->assert(#cond, __FILE__, __LINE__); } while (0)
+#endif
+
 void stdPlatform_Memcpy32(void* dst, const void* src, uint32_t len);
 void stdPlatform_Memset32(void* dst, uint8_t val, uint32_t len);
 

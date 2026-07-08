@@ -83,7 +83,10 @@ int sithAI_Startup()
     }
 #endif
     if ( sithAI_bInit )
+    {
+        SITHLOG_ERROR("Warning: System already initialized!\n"); // Added: OpenJones3D-style log
         return 0;
+    }
 
     sithAI_FLOAT_005a79d8 = 1.0; // MoTS added
 
@@ -245,6 +248,9 @@ void sithAI_Create(SithThing *pThing)
     int v2; // eax
     int v3; // eax
     SithAIControlBlock *actor; // eax
+
+    SITH_ASSERTREL(pThing); // Added: OpenJones3D-style assert
+    SITH_ASSERTREL(pThing->controlType == SITH_CT_AI); // Added: OpenJones3D-style assert
 
     sith_ai = pThing->pClass;
     if ( sith_ai )
