@@ -38,6 +38,8 @@ void sithMaterial_FreeWorldMaterials(SithWorld *pWorld)
     int v2; // edi
     void *v3; // eax
 
+    SITH_ASSERTREL(pWorld != NULL); // Added: ported from OpenJones3D
+
     if (!pWorld->sizeMaterials)
         return;
 
@@ -73,6 +75,8 @@ int sithMaterial_ReadMaterialsListText(SithWorld *pWorld, int bSkip)
     char *a1; // [esp+0h] [ebp-24h]
     flex_t a1a; // [esp+0h] [ebp-24h]
     flex_t v12; // [esp+14h] [ebp-10h]
+
+    SITH_ASSERTREL(pWorld != NULL); // Added: ported from OpenJones3D
 
     v2 = 0;
     if ( bSkip && bSkip != 3 )
@@ -151,6 +155,9 @@ rdMaterial* sithMaterial_Load(const char *pName, int create_ddraw_surface, int g
     while ( 1 )
     {
         v4 = sithWorld_g_pLastLoadedWorld;
+        SITH_ASSERTREL(v4 != NULL); // Added: ported from OpenJones3D
+        SITH_ASSERTREL(pName != NULL); // Added: ported from OpenJones3D
+        SITH_ASSERTREL(v4->aMaterials != NULL); // Added: ported from OpenJones3D
         result = (rdMaterial *)stdHashtbl_Find(sithMaterial_pHashtable, pName);
         if ( result )
             return result;

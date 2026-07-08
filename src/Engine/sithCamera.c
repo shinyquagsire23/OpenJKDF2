@@ -21,6 +21,8 @@ static int sithCamera_camIdxToGlobalIdx[2] = {0,1};
 
 int sithCamera_Startup()
 {
+    SITH_ASSERTREL(sithCamera_bStartup == 0); // Added: J3D assert
+
     sithCamera_NewEntry(&sithCamera_g_aCameras[0], 0, 0x1, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
     sithCamera_NewEntry(&sithCamera_g_aCameras[1], 0, 0x4, SITHCAMERA_FOV, SITHCAMERA_ASPECT, NULL, NULL, NULL);
     sithCamera_g_aCameras[1].offset.x = 0.0;
@@ -57,6 +59,8 @@ void sithCamera_Shutdown()
 
 int sithCamera_Open(rdCanvas *pCanvas, flex_t aspect)
 {
+    SITH_ASSERTREL(sithCamera_bStartup == 1); // Added: J3D assert
+
     if ( sithCamera_bOpen )
         return 0;
 
@@ -214,12 +218,16 @@ void sithCamera_Update(SithCamera *pCamera)
     rdVector3 rot; // [esp+50h] [ebp-3Ch] BYREF
     rdMatrix34 out; // [esp+5Ch] [ebp-30h] BYREF
 
+    SITH_ASSERTREL(pCamera != NULL); // Added: J3D assert
+
     SithThing* focusThing = pCamera->pPrimaryFocusThing;
     flex_t v77 = sithCamera_g_cameraAngleDelta * sithTime_g_frameTimeFlex;
     flex_t v78 = sithCamera_g_cameraPosDelta * sithTime_g_frameTimeFlex;
     switch ( pCamera->type )
     {
         case 1:
+            SITH_ASSERTREL(focusThing != NULL); // Added: J3D assert
+            SITH_ASSERTREL(sithThing_ValidateThingPointer(focusThing)); // Added: J3D assert
             // MOTS added: scope zoom
 #ifdef JKM_CAMERA
 #ifndef QOL_IMPROVEMENTS
@@ -276,6 +284,8 @@ void sithCamera_Update(SithCamera *pCamera)
                 pCamera->sector = sithCollision_FindSectorInRadius(focusThing->sector, &focusThing->position, &pCamera->orient.scale, 0.02);
             break;
         case 4:
+            SITH_ASSERTREL(focusThing != NULL); // Added: J3D assert
+            SITH_ASSERTREL(sithThing_ValidateThingPointer(focusThing)); // Added: J3D assert
             if ( focusThing->type == SITH_THING_ACTOR || focusThing->type == SITH_THING_PLAYER )
             {
                 rdVector_Copy3(&v76, &focusThing->actorParams.headPYR);
@@ -311,6 +321,8 @@ void sithCamera_Update(SithCamera *pCamera)
             pCamera->sector = sithCamera_SearchSectorInRadius(0, pCamera->sector, &v84, &pCamera->orient.scale, 0.02, RAYCAST_2000 | RAYCAST_200);
             break;
         case 32:
+            SITH_ASSERTREL(focusThing != NULL); // Added: J3D assert
+            SITH_ASSERTREL(sithThing_ValidateThingPointer(focusThing)); // Added: J3D assert
             rdMatrix_TransformVector34(&a1, &sithCamera_trans2, &sithCamera_idleCamOrient);
             v2 = (rdVector3){0.0, 0.0, 0.05};
             rdVector_Sub3(&v2, &focusThing->position, &v2);
@@ -345,6 +357,8 @@ void sithCamera_Update(SithCamera *pCamera)
             pCamera->sector = sithCamera_SearchSectorInRadius(0, focusThing->sector, &focusThing->position, &pCamera->orient.scale, 0.02, RAYCAST_2000 | RAYCAST_200);
             break;
         case 128:
+            SITH_ASSERTREL(focusThing != NULL); // Added: J3D assert
+            SITH_ASSERTREL(sithThing_ValidateThingPointer(focusThing)); // Added: J3D assert
             rdMatrix_Copy34(&pCamera->orient, &sithCamera_g_orbCamOrient);
             rdMatrix_PostTranslate34(&pCamera->orient, &focusThing->position);
             pCamera->sector = sithCollision_FindSectorInRadius(focusThing->sector, &focusThing->position, &pCamera->orient.scale, 0.02);
@@ -539,6 +553,8 @@ int sithCamera_SetCurrentCamera(SithCamera *pCamera)
 {
     rdVector3 rot; // [esp+8h] [ebp-Ch] BYREF
 
+    SITH_ASSERTREL(pCamera != NULL); // Added: J3D assert
+
     if ( sithCamera_g_pCurCamera && pCamera->dword4 < sithCamera_g_pCurCamera->dword4 )
         return 0;
     sithCamera_g_pCurCamera = pCamera;
@@ -558,6 +574,7 @@ int sithCamera_SetCurrentCamera(SithCamera *pCamera)
 
 void sithCamera_SetCameraFocus(SithCamera *pCamera, SithThing *pPrimaryFocusThing, SithThing *pSecondaryFocusThing)
 {
+    SITH_ASSERTREL(pCamera); // Added: J3D assert
     pCamera->pPrimaryFocusThing = pPrimaryFocusThing;
     pCamera->pSecondaryFocusThing = pSecondaryFocusThing;
 }
@@ -579,6 +596,7 @@ SithSector* sithCamera_SearchSectorInRadius(SithThing *a3, SithSector *pSector, 
     {
         if ( (i->type & SITHCOLLISION_ADJOINCROSS) != 0 )
         {
+            SITH_ASSERTREL(i->surface->pAdjoin != NULL); // Added: J3D assert
             v9 = i->surface->pAdjoin->sector;
         }
         else if ( (i->type & SITHCOLLISION_THING) == 0 || (i->pThingCollided->type != SITH_THING_ITEM) && i->distance != 0.0 && i->pThingCollided->type != SITH_THING_WEAPON )
@@ -602,11 +620,13 @@ void sithCamera_SetPOVShake(rdVector3 *posOffset, rdVector3 *angleOffset, flex_t
 
 SithThing* sithCamera_GetPrimaryFocus(SithCamera *pCamera)
 {
+    SITH_ASSERTREL(pCamera != NULL); // Added: J3D assert
     return pCamera->pPrimaryFocusThing;
 }
 
 SithThing* sithCamera_GetSecondaryFocus(SithCamera *pCamera)
 {
+    SITH_ASSERTREL(pCamera != NULL); // Added: J3D assert
     return pCamera->pSecondaryFocusThing;
 }
 

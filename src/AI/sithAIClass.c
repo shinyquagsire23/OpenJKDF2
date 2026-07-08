@@ -29,6 +29,8 @@ int sithAIClass_AllocWorldAIClasses(SithWorld *pWorld, int numClasses)
 {
     intptr_t result; // eax
 
+    SITH_ASSERTREL(pWorld); // Added: J3D assert
+    SITH_ASSERTREL(pWorld->aAIClasses == NULL); // Added: J3D assert
     { TWL_EXTRAM_SUGGEST(pSithHS); // Added: parsed once, word-width fields (fpath is debug-only)
     result = (intptr_t)SITH_ALLOC(sizeof(SithAIClass) * numClasses);
     TWL_EXTRAM_RESTORE(pSithHS); }
@@ -42,6 +44,7 @@ int sithAIClass_AllocWorldAIClasses(SithWorld *pWorld, int numClasses)
     }
     else
     {
+        SITHLOG_ERROR("Memory allocation failure.\n"); // Added: J3D log
         pWorld->sizeAIClasses = 0;
         pWorld->numAIClasses = 0;
     }
@@ -56,8 +59,10 @@ int sithAIClass_ReadStaticAIClassesListText(SithWorld *pWorld, int bSkip)
     if (bSkip) {
         return 0;
     }
+    SITH_ASSERTREL(pWorld != NULL); // Added: J3D assert
     stdConffile_ReadArgs();
     if (_strcmp(stdConffile_g_entry.aArgs[0].value, "world") || _strcmp(stdConffile_g_entry.aArgs[1].value, "aiclasses")) {
+        SITHLOG_ERROR("Parse error reading static aiclasses list line %d.\n", stdConffile_linenum); // Added: J3D log
         return 0;
     }
     sizeAIClasses = _atoi(stdConffile_g_entry.aArgs[2].value);
@@ -92,6 +97,7 @@ int sithAIClass_ReadStaticAIClassesListText(SithWorld *pWorld, int bSkip)
                 break;
         }
     }
+    SITH_ASSERTREL(pWorld->numAIClasses <= pWorld->sizeAIClasses); // Added: J3D assert
     return 1;
 }
 
@@ -103,6 +109,8 @@ SithAIClass* sithAIClass_Load(char *fpath)
     SithAIClass *aiclass; // ebx
     char fullpath[128]; // [esp+10h] [ebp-80h] BYREF
 
+    SITH_ASSERTREL(sithWorld_g_pLastLoadedWorld && fpath); // Added: J3D assert (pWorld && pName)
+    SITH_ASSERTREL(strlen(fpath) < 64); // Added: J3D assert
     world = sithWorld_g_pLastLoadedWorld;
     if ( !sithWorld_g_pLastLoadedWorld->aAIClasses )
         return 0;
@@ -159,6 +167,7 @@ int sithAIClass_LoadEntry(char *pPath, SithAIClass *pClass)
     flex_t a4; // [esp+A0h] [ebp-4h] BYREF
     flex_t fpathb; // [esp+ACh] [ebp+8h]
 
+    SITH_ASSERTREL(pPath && pClass); // Added: J3D assert
     _sprintf(jkl_fname, "%s%1d", pPath, jkPlayer_setDiff);
     if ( stdConffile_Open(jkl_fname) || (result = stdConffile_Open(pPath)) != 0 )
     {
@@ -253,6 +262,7 @@ int sithAIClass_LoadEntry(char *pPath, SithAIClass *pClass)
 
 void sithAIClass_FreeWorldAIClasses(SithWorld *pWorld)
 {
+    SITH_ASSERTREL(pWorld); // Added: J3D assert
     if (pWorld->aAIClasses)
     {
         for (uint32_t i = 0; i < pWorld->numAIClasses; i++)

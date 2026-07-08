@@ -200,6 +200,7 @@ void sithControl_Close()
 
 void sithControl_RegisterAxisFunction(int functionId, uint32_t flag)
 {
+    SITH_ASSERTREL((functionId >= 0) && (functionId < INPUT_FUNC_MAX)); // Added: port from OpenJones3D
     sithControl_inputFuncToControlType[functionId] = flag | 3;
 }
 
@@ -273,6 +274,7 @@ void sithControl_Update(flex_t secDeltaTime, int msecDeltaTime)
     {
         if ( sithCamera_g_pCurCamera == &sithCamera_g_aCameras[4] )
         {
+            SITHLOG_STATUS("Switch out of idle camera.\n"); // Added: port from OpenJones3D
             sithCamera_SetCurrentToCycleCamera();
         }
     }
@@ -293,6 +295,7 @@ void sithControl_Update(flex_t secDeltaTime, int msecDeltaTime)
         else {
             sithControl_msIdle = 0;
             if ( sithCamera_g_pCurCamera == &sithCamera_g_aCameras[4] ) {
+                SITHLOG_STATUS("Switch out of idle camera.\n"); // Added: port from OpenJones3D
                 sithCamera_SetCurrentToCycleCamera();
             }
         }
@@ -328,6 +331,8 @@ stdControlKeyInfoEntry* sithControl_BindControl(int functionId, int controlId, i
     uint32_t v13; // ecx
     stdControlKeyInfoEntry *v14; // eax
     int a3a; // [esp+1Ch] [ebp+Ch]
+
+    SITH_ASSERTREL((functionId >= 0) && (functionId < INPUT_FUNC_MAX)); // Added: port from OpenJones3D
 
     v3 = flags;
     v3 = flags & ~(8|1) | 2;
@@ -402,6 +407,8 @@ stdControlKeyInfoEntry* sithControl_BindAxis(int functionId, int axis, uint32_t 
     uint32_t v16; // ecx
     int flagsa; // [esp+1Ch] [ebp+Ch]
 
+    SITH_ASSERTREL((functionId >= 0) && (functionId < INPUT_FUNC_MAX)); // Added: port from OpenJones3D
+
     v3 = flags;
     v3 = flags & ~2 | 1;
     flagsa = v3;
@@ -473,6 +480,8 @@ void sithControl_UnbindFunctionIndex(int funcId, unsigned int bindIndex)
     unsigned int v4; // ecx
     stdControlKeyInfoEntry *v5; // ecx
     stdControlKeyInfoEntry *v6; // edi
+
+    SITH_ASSERTREL((funcId >= 0) && (funcId < INPUT_FUNC_MAX)); // Added: port from OpenJones3D
 
     v2 = bindIndex;
     v4 = sithControl_aInputFuncToKeyinfo[funcId].numEntries - 1;
@@ -706,6 +715,8 @@ int sithControl_GetKey(int keyId, int *pState)
 
     //sithWeapon_controlOptions |= 0x20;
 
+    SITH_ASSERTREL((keyId >= 0) && (keyId < INPUT_FUNC_MAX)); // Added: port from OpenJones3D
+
     v6 = 0;
     if ( pState )
         *pState = 0;
@@ -744,6 +755,8 @@ flex_t sithControl_GetKeyAsAxisNormalized(int axisId)
     int v3; // ebx
     flex_d_t v4; // st7
     flex_t v6; // [esp+10h] [ebp-4h]
+
+    SITH_ASSERTREL((axisId >= 0) && (axisId < INPUT_FUNC_MAX)); // Added: port from OpenJones3D
 
     v1 = 0;
     v6 = 0.0;
@@ -811,6 +824,8 @@ flex_t sithControl_GetKeyAsAxis(int axisId)
     flex_d_t v4; // st7
     flex_t v6; // [esp+8h] [ebp-4h]
 
+    SITH_ASSERTREL((axisId >= 0) && (axisId < INPUT_FUNC_MAX)); // Added: port from OpenJones3D
+
     v1 = 0;
     v6 = 0.0;
     if ( sithControl_aInputFuncToKeyinfo[axisId].numEntries )
@@ -861,6 +876,8 @@ flex_t sithControl_GetAxis(int axisId)
     int v4; // ebx
     flex_d_t v5; // st7
     flex_t v7; // [esp+4h] [ebp-4h]
+
+    SITH_ASSERTREL((axisId >= 0) && (axisId < INPUT_FUNC_MAX)); // Added: port from OpenJones3D
 
     v7 = 0.0;
     v1 = sithControl_aInputFuncToKeyinfo[axisId].aEntries;
@@ -1892,6 +1909,7 @@ void sithControl_DefaultInit()
 
 void sithControl_RegisterKeyFunction(int functionId)
 {
+    SITH_ASSERTREL((functionId >= 0) && (functionId < INPUT_FUNC_MAX)); // Added: port from OpenJones3D
     sithControl_inputFuncToControlType[functionId] = 5;
 }
 

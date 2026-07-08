@@ -48,6 +48,8 @@ int sithCogParse_Load(char *pFilename, SithCogScript *pScript, int bParseDescrip
     unsigned int v6; // ecx
     int v8; // edx
 
+    SITH_ASSERTREL(pScript != NULL); // Added: J3D assert (pScript dereferenced unconditionally)
+
     if (!stdConffile_Open(pFilename))
         return 0;
 
@@ -353,6 +355,8 @@ SithCogSymbolTable* sithCogParse_DuplicateSymbolTable(SithCogSymbolTable *pSourc
     SithCogSymbol *aSymbols; // eax
     SithCogSymbolTable *result; // eax
 
+    SITH_ASSERTREL(pSource); // Added: J3D assert (pSource dereferenced unconditionally)
+
     numUsedSymbols = pSource->numUsedSymbols;
     newTable = (SithCogSymbolTable *)SITH_ALLOC(sizeof(SithCogSymbolTable));
     if ( !newTable )
@@ -496,6 +500,8 @@ void sithCogParse_FreeSymbolTable(SithCogSymbolTable *pTable)
     unsigned int v2; // ebx
     int v3; // esi
 
+    SITH_ASSERTREL(pTable != NULL); // Added: J3D assert (pTable dereferenced unconditionally)
+
     if ( pTable->pHashtbl )
     {
         stdHashtbl_Free(pTable->pHashtbl);
@@ -548,6 +554,9 @@ void sithCogParse_FreeSymbolTable(SithCogSymbolTable *pTable)
 
 SithCogSymbol* sithCogParse_AddSymbol(SithCogSymbolTable *pTable, const char *pName)
 {
+    SITH_ASSERTREL(pTable != NULL); // Added: J3D assert (pTable dereferenced unconditionally)
+    SITH_ASSERTREL(pTable->aSymbols != NULL); // Added: J3D assert (aSymbols indexed unconditionally)
+
     if ( pTable->tableSize > pTable->numUsedSymbols )
     {
         SithCogSymbol* symbol = &pTable->aSymbols[pTable->numUsedSymbols];
@@ -583,6 +592,9 @@ SithCogSymbol* sithCogParse_AddSymbol(SithCogSymbolTable *pTable, const char *pN
 
 void sithCogParse_SetSymbolValue(SithCogSymbol *pSymbol, SithCogSymbolValue *pValue)
 {
+    SITH_ASSERTREL(pSymbol != NULL); // Added: J3D assert (pSymbol dereferenced unconditionally)
+    SITH_ASSERTREL(pValue != NULL); // Added: J3D assert (pValue dereferenced unconditionally)
+
     // TODO ehhhhhh
     //*(SithCogSymbolValue *)&a1->val = *a2;
     pSymbol->val.type = pValue->type;
@@ -595,6 +607,8 @@ void sithCogParse_SetSymbolValue(SithCogSymbol *pSymbol, SithCogSymbolValue *pVa
 SithCogSymbol* sithCogParse_GetSymbol(SithCogSymbolTable *pLocal, char *pName)
 {
     SithCogSymbol *result; // eax
+
+    SITH_ASSERTREL(pLocal != NULL); // Added: J3D assert (pLocal dereferenced unconditionally)
 
     if (!pLocal->pHashtbl)
         return NULL;
@@ -631,7 +645,9 @@ SithCogSymbol* sithCogParse_GetSymbolByID(SithCogSymbolTable *pTable, unsigned i
 int sithCogParse_GetSymbolLabel(unsigned int symbolId)
 {
     // aaaaaaaaaaaaa this will dereference a nullptr
-    return sithCogParse_GetSymbolByID(sithCogParse_pSymbolTable, symbolId)->field_14;
+    SithCogSymbol* pSymbol = sithCogParse_GetSymbolByID(sithCogParse_pSymbolTable, symbolId); // Added: J3D captures the result to assert before deref
+    SITH_ASSERTREL(pSymbol); // Added: J3D assert (pSymbol dereferenced unconditionally)
+    return pSymbol->field_14;
 }
 
 sith_cog_parser_node* sithCogParse_MakeLeafNode(int opcode, int symbolId)
@@ -702,6 +718,8 @@ void sithCogParse_LexerSetSymbol(char *pName)
 {
     SithCogSymbol *v6; // ecx
 
+    SITH_ASSERTREL(pName && sithCogParse_pSymbolTable); // Added: J3D assert (both dereferenced unconditionally)
+
     _strtolower(pName);
     v6 = sithCogParse_GetSymbol(sithCogParse_pSymbolTable, pName);
 
@@ -731,6 +749,8 @@ void sithCogParse_LexerSetString(const char *pString)
 {
     SithCogSymbol *symbol; // esi
 
+    SITH_ASSERTREL(pString && sithCogParse_pSymbolTable); // Added: J3D assert (both dereferenced unconditionally)
+
     symbol = sithCogParse_AddSymbol(sithCogParse_pSymbolTable, pString);
     
     if ( symbol )
@@ -749,6 +769,8 @@ void sithCogParse_LexerSetVector(char* pString)
     flex32_t scan_x = 0.0;
     flex32_t scan_y = 0.0;
     flex32_t scan_z = 0.0;
+
+    SITH_ASSERTREL(pString); // Added: J3D assert (pString dereferenced unconditionally)
 
     _sscanf(pString, "'%f %f %f'", &scan_x, &scan_y, &scan_z);
 

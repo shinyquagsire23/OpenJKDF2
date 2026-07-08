@@ -41,6 +41,9 @@ rdParticle* sithParticle_Load(const char *pName)
     rdParticle *v5; // esi
     char v6[128]; // [esp+Ch] [ebp-80h] BYREF
 
+    SITH_ASSERTREL(sithWorld_g_pLastLoadedWorld != NULL); // Added
+    SITH_ASSERTREL(pName != NULL); // Added
+
     v1 = sithWorld_g_pLastLoadedWorld;
     if ( !sithWorld_g_pLastLoadedWorld->aParticles )
     {
@@ -70,6 +73,7 @@ rdParticle* sithParticle_Load(const char *pName)
         }
         else
         {
+            SITHLOG_ERROR("No space to define new particle '%s'.\n", pName); // Added
             result = 0;
         }
     }
@@ -79,6 +83,9 @@ rdParticle* sithParticle_Load(const char *pName)
 int sithParticle_AllocWorldParticles(SithWorld *pWorld, int size)
 {
     rdParticle *newParticle; // edi
+
+    SITH_ASSERTREL(pWorld->aParticles == NULL); // Added
+    SITH_ASSERTREL(pWorld->sizeParticles == 0); // Added
 
     newParticle = (rdParticle *)SITH_ALLOC(sizeof(rdParticle) * size);
     pWorld->aParticles = newParticle;
@@ -101,10 +108,12 @@ int sithParticle_ParseArg(StdConffileArg *pArg, SithThing *pThing, int adjNum)
 
         case THINGPARAM_MAXTHRUST:
             pThing->particleParams.growthSpeed = _atof(pArg->value);
+            SITH_ASSERTREL(pThing->particleParams.growthSpeed >= 0.0f); // Added
             return 1;
 
         case THINGPARAM_RANGE:
             pThing->particleParams.range = _atof(pArg->value);
+            SITH_ASSERTREL(pThing->particleParams.range >= 0.0f); // Added
             return 1;
 
         case THINGPARAM_MATERIAL:
@@ -113,6 +122,7 @@ int sithParticle_ParseArg(StdConffileArg *pArg, SithThing *pThing, int adjNum)
 
         case THINGPARAM_RATE:
             pThing->particleParams.rate = _atof(pArg->value);
+            SITH_ASSERTREL(pThing->particleParams.rate >= 0.0f); // Added
             return 1;
 
         case THINGPARAM_COUNT:
@@ -121,18 +131,22 @@ int sithParticle_ParseArg(StdConffileArg *pArg, SithThing *pThing, int adjNum)
 
         case THINGPARAM_ELEMENTSIZE:
             pThing->particleParams.size = _atof(pArg->value);
+            SITH_ASSERTREL(pThing->particleParams.size > 0.0f); // Added
             return 1;
 
         case THINGPARAM_MINSIZE:
             pThing->particleParams.minRadius = _atof(pArg->value);
+            SITH_ASSERTREL(pThing->particleParams.minRadius >= 0.0f); // Added
             return 1;
 
         case THINGPARAM_PITCHRANGE:
             pThing->particleParams.pitchRange = _atof(pArg->value);
+            SITH_ASSERTREL(pThing->particleParams.pitchRange >= 0.0f); // Added
             return 1;
 
         case THINGPARAM_YAWRANGE:
             pThing->particleParams.yawRange = _atof(pArg->value);
+            SITH_ASSERTREL(pThing->particleParams.yawRange >= 0.0f); // Added
             return 1;
 
         default:
@@ -158,6 +172,8 @@ void sithParticle_Update(SithThing *pThing, flex_t secDeltaTime)
     rdVector3 a2a; // [esp+8h] [ebp-3Ch] BYREF
     rdMatrix34 a1a; // [esp+14h] [ebp-30h] BYREF
     flex_t deltaMsa; // [esp+4Ch] [ebp+8h]
+
+    SITH_ASSERTREL(pThing && (pThing->type == SITH_THING_PARTICLE)); // Added
 
     v2 = secDeltaTime + pThing->particleParams.field_2C;
     flags = pThing->particleParams.flags;
@@ -238,6 +254,8 @@ void sithParticle_Initalize(SithThing *pThing)
     flex_t v22; // [esp+18h] [ebp-18h]
     rdVector3 v23; // [esp+24h] [ebp-Ch] BYREF
     flex_t thinga; // [esp+34h] [ebp+4h]
+
+    SITH_ASSERTREL(pThing && (pThing->type == SITH_THING_PARTICLE)); // Added
 
     v1 = 2;
     v3 = &pThing->renderData;
@@ -320,6 +338,8 @@ void sithParticle_DestroyParticle(SithThing *pThing)
 {
     unsigned int v1;
     rdParticle* particlePrim;
+
+    SITH_ASSERTREL(pThing && (pThing->type == SITH_THING_PARTICLE)); // Added
 
     if (!(pThing->particleParams.flags & SITHPARTICLE_FLAG_FADE_OUT_OVER_TIME))
     {
