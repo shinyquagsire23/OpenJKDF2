@@ -1965,7 +1965,7 @@ void do_hooks()
     hook_function(sithThing_SetSyncFlags_ADDR, sithThing_SetSyncFlags);
     hook_function(sithThing_ShouldSync_ADDR, sithThing_ShouldSync);
     hook_function(sithThing_GetById_ADDR, sithThing_GetById);
-    hook_function(sithActor_Remove_ADDR, sithActor_Remove);
+    hook_function(sithActor_DestroyActor_ADDR, sithActor_DestroyActor);
     
     // sithSector
     hook_function(sithAIAwareness_Startup_ADDR, sithAIAwareness_Startup);
@@ -2378,12 +2378,12 @@ void do_hooks()
 #endif
     
     // sithActor
-    hook_function(sithActor_SetMaxHeathForDifficulty_ADDR, sithActor_SetMaxHeathForDifficulty);
-    hook_function(sithActor_sub_4ED1D0_ADDR, sithActor_sub_4ED1D0);
-    hook_function(sithActor_MoveJointsForEyePYR_ADDR, sithActor_MoveJointsForEyePYR);
-    hook_function(sithActor_ActorActorCollide_ADDR, sithActor_ActorActorCollide);
-    hook_function(sithActor_Tick_ADDR, sithActor_Tick);
-    hook_function(sithActor_RemoveCorpse_ADDR, sithActor_RemoveCorpse);
+    hook_function(sithActor_SetDifficulty_ADDR, sithActor_SetDifficulty);
+    hook_function(sithActor_SurfaceCollisionHandler_ADDR, sithActor_SurfaceCollisionHandler);
+    hook_function(sithActor_SetHeadPYR_ADDR, sithActor_SetHeadPYR);
+    hook_function(sithActor_ActorCollisionHandler_ADDR, sithActor_ActorCollisionHandler);
+    hook_function(sithActor_Update_ADDR, sithActor_Update);
+    hook_function(sithActor_DestroyCorpse_ADDR, sithActor_DestroyCorpse);
     
     // sithItem
     hook_function(sithItem_PlayerCollisionHandler_ADDR, sithItem_PlayerCollisionHandler);

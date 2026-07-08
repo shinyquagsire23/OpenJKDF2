@@ -892,7 +892,7 @@ void sithAI_SetLookFrame(sithActor *actor, rdVector3 *lookPos)
                 a2a.x = v6;
                 a2a.y = v5->eyePYR.y;
                 a2a.z = v5->eyePYR.z;
-                sithActor_MoveJointsForEyePYR(actor->thing, &a2a);
+                sithActor_SetHeadPYR(actor->thing, &a2a);
             }
         }
         actor->lookVector.z = 0.0;

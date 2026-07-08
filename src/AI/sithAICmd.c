@@ -764,7 +764,7 @@ LABEL_41:
                 v28 = a3.x;
         }
         actor->thing->actorParams.eyePYR.x = v28;
-        sithActor_RotateTurretToEyePYR(actor->thing);
+        sithActor_UpdateAimJoints(actor->thing);
 LABEL_50:
         if ( sithTime_curSeconds > (flex_d_t)instinct->param0 && (g_debugmodeFlags & DEBUGFLAG_NO_AI) == 0 )
         {
@@ -787,12 +787,12 @@ LABEL_50:
     }
     else if ( sithTime_curSeconds > (flex_d_t)instinct->param1 )
     {
-        sithActor_SpawnDeadBodyMaybe(actor->thing, actor->thing, 2);
+        sithActor_KillActor(actor->thing, actor->thing, 2);
         return 0;
     }
     actor->thing->actorParams.eyePYR.y = _frand() * (flagsa + flagsa) - flagsa;
     actor->thing->actorParams.eyePYR.x = _frand() * (actora + actora) - actora;
-    sithActor_RotateTurretToEyePYR(actor->thing);
+    sithActor_UpdateAimJoints(actor->thing);
     if ( sithTime_curSeconds > (flex_d_t)instinct->param0 )
     {
         _memcpy(&v37, &actor->thing->lookOrientation, sizeof(v37));
@@ -960,7 +960,7 @@ int sithAICmd_LookForTarget(sithActor *actor, sithAIClassEntry *aiclass, sithAct
         {
             actor->flags &= ~(SITHAI_MODE_TARGET_VISIBLE|SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_ATTACKING);
             actor->flags |= SITHAI_MODE_SEARCHING;
-            sithActor_MoveJointsForEyePYR(actor->thing, &rdroid_zeroVector3);
+            sithActor_SetHeadPYR(actor->thing, &rdroid_zeroVector3);
             return 1;
         }
     }
@@ -1689,7 +1689,7 @@ int sithAICmd_LookForOpposingTarget(sithActor *pActor, sithAIClassEntry *pAiclas
     {
         pActor->flags &= ~(SITHAI_MODE_TARGET_VISIBLE|SITHAI_MODE_ACTIVE|SITHAI_MODE_TOUGHSKIN|SITHAI_MODE_ATTACKING); 
         pActor->flags |= SITHAI_MODE_SEARCHING;
-        sithActor_MoveJointsForEyePYR(pActor->thing, &rdroid_zeroVector3);
+        sithActor_SetHeadPYR(pActor->thing, &rdroid_zeroVector3);
         return 1;
     }
 

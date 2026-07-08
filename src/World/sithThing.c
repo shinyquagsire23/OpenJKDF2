@@ -259,7 +259,7 @@ void sithThing_TickAll(flex_t deltaSeconds, int deltaMs)
                 case SITH_THING_PLAYER:
                     sithPlayer_Tick(pThingIter->actorParams.playerinfo, deltaSeconds);
                 case SITH_THING_ACTOR:
-                    sithActor_Tick(pThingIter, deltaMs);
+                    sithActor_Update(pThingIter, deltaMs);
                     break;
                 case SITH_THING_WEAPON:
                     sithWeapon_Tick(pThingIter, deltaSeconds);
@@ -367,7 +367,7 @@ void sithThing_Remove(sithThing* pThing)
     switch ( pThing->type )
     {
         case SITH_THING_ACTOR:
-            sithActor_Remove(pThing);
+            sithActor_DestroyActor(pThing);
             break;
         case SITH_THING_WEAPON:
             sithWeapon_Remove(pThing);
@@ -376,7 +376,7 @@ void sithThing_Remove(sithThing* pThing)
             sithItem_DestroyItem(pThing);
             break;
         case SITH_THING_CORPSE:
-            sithActor_RemoveCorpse(pThing);
+            sithActor_DestroyCorpse(pThing);
             break;
         case SITH_THING_PLAYER:
             return;
@@ -479,7 +479,7 @@ flex_t sithThing_Damage(sithThing *sender, sithThing *reciever, flex_t amount, i
             if ( sender->type != SITH_THING_PLAYER )
                 return amount;
         }
-        amount = amount - sithActor_Hit(sender, reciever, amount, damageClass);
+        amount = amount - sithActor_DamageActor(sender, reciever, amount, damageClass);
     }
     return amount;
 }
@@ -1588,7 +1588,7 @@ int sithThing_ParseArgs(stdConffileArg *arg, sithThing* pThing)
     {
         case SITH_THING_ACTOR:
         case SITH_THING_PLAYER:
-            v7 = sithActor_LoadParams(arg, pThing, paramIdx);
+            v7 = sithActor_ParseArg(arg, pThing, paramIdx);
             goto LABEL_10;
         case SITH_THING_WEAPON:
             v7 = sithWeapon_LoadParams(arg, pThing, paramIdx);

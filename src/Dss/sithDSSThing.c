@@ -111,7 +111,7 @@ int sithDSSThing_ProcessPos(sithCogMsg *msg)
     {
         rdVector_Zero3(&lookTmp);
         lookTmp.x = NETMSG_POPF32();
-        sithActor_MoveJointsForEyePYR(pThing, &lookTmp);
+        sithActor_SetHeadPYR(pThing, &lookTmp);
     }
 
     return 1;
@@ -742,7 +742,7 @@ int sithDSSThing_ProcessDeath(sithCogMsg *msg)
         int senderType = pSender->type;
         if ( senderType == SITH_THING_ACTOR)
         {
-            sithActor_SpawnDeadBodyMaybe(pSender, pReceiver, 0);
+            sithActor_KillActor(pSender, pReceiver, 0);
         }
         else if (senderType == SITH_THING_PLAYER)
         {
@@ -751,7 +751,7 @@ int sithDSSThing_ProcessDeath(sithCogMsg *msg)
                 sithPlayer_HandleSentDeathPkt(pSender);
                 return 1;
             }
-            sithActor_SpawnDeadBodyMaybe(pSender, pReceiver, 0);
+            sithActor_KillActor(pSender, pReceiver, 0);
         }
         return 1;
     }

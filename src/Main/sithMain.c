@@ -531,7 +531,7 @@ void sithMain_AutoSave()
         }
         if ( v3->type == SITH_THING_ACTOR )
         {
-            sithActor_SetMaxHeathForDifficulty(v3);
+            sithActor_SetDifficulty(v3);
         }
     }
 

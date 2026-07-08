@@ -1084,7 +1084,7 @@ debug_controls:
 
         // Added: dedicated
         if (!(sithNet_isServer && jkGuiNetHost_bIsDedicated)) {
-            sithActor_Hit(player, player, 200.0, 1);
+            sithActor_DamageActor(player, player, 200.0, 1);
             result = 1;
         }
         else {
@@ -1241,7 +1241,7 @@ void sithControl_PlayerLook(sithThing *player, flex_t deltaSecs)
                 // MOTS added
                 if (!sithThing_MotsTick(8, (int)(local_10 * 100.0), a2.x)) return;
 
-                sithActor_MoveJointsForEyePYR(player, &a2);
+                sithActor_SetHeadPYR(player, &a2);
                 player->actorParams.typeflags &= ~SITH_AF_CENTER_VIEW;
             }
             else
@@ -1265,7 +1265,7 @@ LABEL_20:
                     else
                     {
                         player->actorParams.eyePYR.x += v9;
-                        sithActor_MoveJointsForEyePYR(player, &player->actorParams.eyePYR);
+                        sithActor_SetHeadPYR(player, &player->actorParams.eyePYR);
                     }
                 }
             }

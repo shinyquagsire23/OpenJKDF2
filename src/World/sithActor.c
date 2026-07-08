@@ -18,7 +18,7 @@
 #include "Dss/sithDSSThing.h"
 #include "jk.h"
 
-void sithActor_SetMaxHeathForDifficulty(sithThing *thing)
+void sithActor_SetDifficulty(sithThing *thing)
 {
     if ( jkPlayer_setDiff )
     {
@@ -35,7 +35,7 @@ void sithActor_SetMaxHeathForDifficulty(sithThing *thing)
     }
 }
 
-void sithActor_Tick(sithThing *thing, int deltaMs)
+void sithActor_Update(sithThing *thing, int deltaMs)
 {
     unsigned int v2; // eax
     unsigned int v3; // eax
@@ -76,7 +76,7 @@ void sithActor_Tick(sithThing *thing, int deltaMs)
 }
 
 // MOTS altered
-flex_t sithActor_Hit(sithThing *sender, sithThing *receiver, flex_t amount, int flags)
+flex_t sithActor_DamageActor(sithThing *sender, sithThing *receiver, flex_t amount, int flags)
 {
     sithThing *receiver_; // edi
     flex_d_t v6; // st7
@@ -156,16 +156,16 @@ flex_t sithActor_Hit(sithThing *sender, sithThing *receiver, flex_t amount, int 
 LABEL_32:
         if ( sender->animclass && sender != receiver_ && amount * 0.05 > _frand() )
             sithPuppet_PlayMode(sender, SITH_ANIM_HIT, 0);
-        sithActor_HurtSound(sender, amount, flags);
+        sithActor_PlayDamageSoundFx(sender, amount, flags);
         return amount;
     }
     if ( sithComm_multiplayerFlags )
         sithDSSThing_SendDeath(sender, receiver_, 0, -1, 255);
-    sithActor_SpawnDeadBodyMaybe(sender, receiver_, flags);
+    sithActor_KillActor(sender, receiver_, flags);
     return amount - sender->actorParams.health;
 }
 
-void sithActor_HurtSound(sithThing *thing, flex_t amount, int hurtType)
+void sithActor_PlayDamageSoundFx(sithThing *thing, flex_t amount, int hurtType)
 {
     if ( thing->actorParams.health <= 0.0 || amount < 3.0 ) return;
 
@@ -206,7 +206,7 @@ void sithActor_HurtSound(sithThing *thing, flex_t amount, int hurtType)
 }
 
 // MOTS altered
-void sithActor_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4)
+void sithActor_KillActor(sithThing *thing, sithThing *a3, int a4)
 {
     sithThing *v8; // eax
     uint32_t v10; // edx
@@ -242,7 +242,7 @@ void sithActor_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4)
                 sithSoundClass_PlayModeRandom(thing, SITH_SC_DEATH2);
             }
         }
-        sithActor_MoveJointsForEyePYR(thing, &rdroid_zeroVector3);
+        sithActor_SetHeadPYR(thing, &rdroid_zeroVector3);
 
         // MOTS added: quiet death
         if (!Main_bMotsCompat || a4 != 12345678) {
@@ -290,7 +290,7 @@ void sithActor_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4)
                 }
                 if (thing->physicsParams.physflags & SITH_PF_FLY)
                 {
-                    sithActor_Remove(thing);
+                    sithActor_DestroyActor(thing);
                 }
                 else
                 {
@@ -301,7 +301,7 @@ void sithActor_SpawnDeadBodyMaybe(sithThing *thing, sithThing *a3, int a4)
     }
 }
 
-int sithActor_sub_4ED1D0(sithThing *thing, sithSurface *surface, sithCollisionSearchEntry *searchEnt)
+int sithActor_SurfaceCollisionHandler(sithThing *thing, sithSurface *surface, sithCollisionSearchEntry *searchEnt)
 {
     int ret = sithCollision_DefaultHitHandler(thing, surface, searchEnt);
     if (ret && thing->controlType == SITH_CT_AI) {
@@ -310,7 +310,7 @@ int sithActor_sub_4ED1D0(sithThing *thing, sithSurface *surface, sithCollisionSe
     return ret;
 }
 
-void sithActor_MoveJointsForEyePYR(sithThing *actor, const rdVector3 *eyePYR)
+void sithActor_SetHeadPYR(sithThing *actor, const rdVector3 *eyePYR)
 {
     sithAnimclass *pAnimClass; // eax
     rdVector3 *v4; // ebx
@@ -381,7 +381,7 @@ void sithActor_MoveJointsForEyePYR(sithThing *actor, const rdVector3 *eyePYR)
     }
 }
 
-int sithActor_ActorActorCollide(sithThing *thing, sithThing *thing2, sithCollisionSearchEntry *a3, int a4)
+int sithActor_ActorCollisionHandler(sithThing *thing, sithThing *thing2, sithCollisionSearchEntry *a3, int a4)
 {
     int ret = sithCollision_DebrisDebrisCollide(thing, thing2, a3, a4);
     if (ret)
@@ -398,7 +398,7 @@ int sithActor_ActorActorCollide(sithThing *thing, sithThing *thing2, sithCollisi
     return ret;
 }
 
-void sithActor_RotateTurretToEyePYR(sithThing* pThing)
+void sithActor_UpdateAimJoints(sithThing* pThing)
 {
     sithAnimclass* pAnimClass = pThing->animclass;
     if (pAnimClass)
@@ -466,7 +466,7 @@ int sithActor_thing_anim_blocked(sithThing *a1, sithThing *thing2, sithCollision
     return 1;
 }
 
-void sithActor_Remove(sithThing *thing)
+void sithActor_DestroyActor(sithThing *thing)
 {
     thing->thingflags |= SITH_TF_DEAD;
     sithThing_detachallchildren(thing);
@@ -477,7 +477,7 @@ void sithActor_Remove(sithThing *thing)
     sithPhysics_FindFloor(thing, 0);
 }
 
-void sithActor_RemoveCorpse(sithThing *corpse)
+void sithActor_DestroyCorpse(sithThing *corpse)
 {
     // Added: retain corpses option
     if (jkPlayer_bKeepCorpses || corpse->lastRenderedTickIdx + 1 == jkPlayer_currentTickIdx ) {
@@ -488,7 +488,7 @@ void sithActor_RemoveCorpse(sithThing *corpse)
     }
 }
 
-int sithActor_LoadParams(stdConffileArg *arg, sithThing *thing, unsigned int param)
+int sithActor_ParseArg(stdConffileArg *arg, sithThing *thing, unsigned int param)
 {
     int result; // eax
     flex_d_t v6; // st7
