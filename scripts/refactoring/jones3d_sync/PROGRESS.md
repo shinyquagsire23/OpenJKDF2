@@ -25,7 +25,8 @@ lets fixes/insights flow between them.
 
 1. **Functions** — rename function names. ✅ COMPLETE (91/91).
 2. **Globals** — rename file-scope globals via `symbols.syms`. ✅ COMPLETE (37 modules renamed; 8 had only bare-static/DF2-only globals). Build green.
-3. **Structs / members / typedefs / enums** ◐ IN PROGRESS. Order names → enums →
+3. **Structs / members / typedefs / enums** ✅ COMPLETE (member names, enum
+   constants, 30 enum typedefs; field retyping abandoned — see below). Order names → enums →
    members. Enum adoption width-safe only; member renames name-only +
    layout-preserving (DF2 structs are JK.EXE-hooked — do NOT adopt J3D structural
    reorganizations like union↔sub-struct).
