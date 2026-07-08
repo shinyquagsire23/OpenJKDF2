@@ -38,54 +38,54 @@
 
 void sithCogFunction_ReturnBool(int a1, sithCog *a2);
 
-void sithCogFunction_GetSenderID(sithCog* ctx)
+void sithCogFunction_GetSenderID(sithCog* pCog)
 {
-    sithCogExec_PushInt(ctx, ctx->senderId);
+    sithCogExec_PushInt(pCog, pCog->senderId);
 }
 
-void sithCogFunction_GetSenderRef(sithCog *ctx)
+void sithCogFunction_GetSenderRef(sithCog *pCog)
 {
-    sithCogExec_PushInt(ctx, ctx->senderRef);
+    sithCogExec_PushInt(pCog, pCog->senderRef);
 }
 
-void sithCogFunction_GetSenderType(sithCog *ctx)
+void sithCogFunction_GetSenderType(sithCog *pCog)
 {
-    sithCogExec_PushInt(ctx, ctx->senderType);
+    sithCogExec_PushInt(pCog, pCog->senderType);
 }
 
-void sithCogFunction_GetSourceRef(sithCog *ctx)
+void sithCogFunction_GetSourceRef(sithCog *pCog)
 {
-    sithCogExec_PushInt(ctx, ctx->sourceIdx);
+    sithCogExec_PushInt(pCog, pCog->sourceIdx);
 }
 
-void sithCogFunction_GetSourceType(sithCog *ctx)
+void sithCogFunction_GetSourceType(sithCog *pCog)
 {
-    sithCogExec_PushInt(ctx, ctx->sourceType);
+    sithCogExec_PushInt(pCog, pCog->sourceType);
 }
 
-void sithCogFunction_Rand(sithCog *ctx)
+void sithCogFunction_Rand(sithCog *pCog)
 {
     cog_flex_t val = _frand();
-    sithCogExec_PushFlex(ctx, val);
+    sithCogExec_PushFlex(pCog, val);
 }
 
-void sithCogFunction_RandVec(sithCog *ctx)
+void sithCogFunction_RandVec(sithCog *pCog)
 {
     rdVector3 rvec;
 
     rvec.x = _frand();
     rvec.y = _frand();
     rvec.z = _frand();
-    sithCogExec_PushVector(ctx, &rvec);
+    sithCogExec_PushVector(pCog, &rvec);
 }
 
-void sithCogFunction_Sleep(sithCog *ctx)
+void sithCogFunction_Sleep(sithCog *pCog)
 {
     sithCog *ctx_;
     flex_d_t fSecs;
 
-    ctx_ = ctx;
-    fSecs = sithCogExec_PopFlex(ctx);
+    ctx_ = pCog;
+    fSecs = sithCogExec_PopFlex(pCog);
     if ( fSecs <= 0.0 )
         fSecs = 0.1;
 
@@ -112,29 +112,29 @@ void sithCogFunction_Sleep(sithCog *ctx)
     ctx_->msecTimerTimeout = sithTime_g_msecGameTime + (int)(fSecs * 1000.0);
 }
 
-void sithCogFunction_Print(sithCog *ctx)
+void sithCogFunction_Print(sithCog *pCog)
 {
     char *str;
 
-    str = sithCogExec_PopString(ctx);
+    str = sithCogExec_PopString(pCog);
     if (str)
         sithConsole_PrintString(str);
 }
 
-void sithCogFunction_PrintInt(sithCog *ctx)
+void sithCogFunction_PrintInt(sithCog *pCog)
 {
     char tmp[32];
 
-    stdString_snprintf(tmp, 32, "%d", sithCogExec_PopInt(ctx));
+    stdString_snprintf(tmp, 32, "%d", sithCogExec_PopInt(pCog));
     sithConsole_PrintString(tmp);
 }
 
-void sithCogFunction_PrintVector(sithCog *ctx)
+void sithCogFunction_PrintVector(sithCog *pCog)
 {
     rdVector3 popVec;
     char tmp[32];
 
-    if (sithCogExec_PopVector(ctx, &popVec))
+    if (sithCogExec_PopVector(pCog, &popVec))
         stdString_snprintf(tmp, 32, "<%f %f %f>", popVec.x, popVec.y, popVec.z);
     else
         stdString_snprintf(tmp, 32, "Bad vector");
@@ -142,15 +142,15 @@ void sithCogFunction_PrintVector(sithCog *ctx)
     sithConsole_PrintString(tmp);
 }
 
-void sithCogFunction_PrintFlex(sithCog *ctx)
+void sithCogFunction_PrintFlex(sithCog *pCog)
 {
     char tmp[32];
 
-    stdString_snprintf(tmp, 32, "%f", sithCogExec_PopFlex(ctx));
+    stdString_snprintf(tmp, 32, "%f", sithCogExec_PopFlex(pCog));
     sithConsole_PrintString(tmp);
 }
 
-void sithCogFunction_SurfaceAnim(sithCog *ctx)
+void sithCogFunction_SurfaceAnim(sithCog *pCog)
 {
     sithCog *ctx_;
     int popInt; // edi
@@ -159,9 +159,9 @@ void sithCogFunction_SurfaceAnim(sithCog *ctx)
     cog_flex_t popFlex; // [esp+Ch] [ebp+4h]
 
     // TODO: is this inlined?
-    ctx_ = ctx;
-    popInt = sithCogExec_PopInt(ctx);
-    popFlex = sithCogExec_PopFlex(ctx);
+    ctx_ = pCog;
+    popInt = sithCogExec_PopInt(pCog);
+    popFlex = sithCogExec_PopFlex(pCog);
     surface = sithCogExec_PopSurface(ctx_); // TODO
     if ( !surface )
     {
@@ -179,7 +179,7 @@ void sithCogFunction_SurfaceAnim(sithCog *ctx)
         sithCogExec_PushInt(ctx_, -1);
 }
 
-void sithCogFunction_MaterialAnim(sithCog *ctx)
+void sithCogFunction_MaterialAnim(sithCog *pCog)
 {
     sithCog *ctx_; // esi
     int popInt; // edi
@@ -188,9 +188,9 @@ void sithCogFunction_MaterialAnim(sithCog *ctx)
     cog_flex_t popFlex; // [esp+Ch] [ebp+4h]
 
     // TODO is this inlined
-    ctx_ = ctx;
-    popInt = sithCogExec_PopInt(ctx);
-    popFlex = sithCogExec_PopFlex(ctx);
+    ctx_ = pCog;
+    popInt = sithCogExec_PopInt(pCog);
+    popFlex = sithCogExec_PopFlex(pCog);
     material = sithCogExec_PopMaterial(ctx_);
     if ( !material )
     {
@@ -225,12 +225,12 @@ void sithCogFunction_StopThing(sithCog *ctx) // unused
     }
 }
 
-void sithCogFunction_StopAnim(sithCog *ctx)
+void sithCogFunction_StopAnim(sithCog *pCog)
 {
     int v1; // eax
     rdSurface *v2; // eax
 
-    v1 = sithCogExec_PopInt(ctx);
+    v1 = sithCogExec_PopInt(pCog);
     v2 = sithSurface_GetByIdx(v1);
     if ( v2 )
     {
@@ -240,12 +240,12 @@ void sithCogFunction_StopAnim(sithCog *ctx)
     }
 }
 
-void sithCogFunction_StopSurfaceAnim(sithCog *ctx)
+void sithCogFunction_StopSurfaceAnim(sithCog *pCog)
 {
     SithSurface *v1; // eax
     rdSurface *v2; // eax
 
-    v1 = sithCogExec_PopSurface(ctx);
+    v1 = sithCogExec_PopSurface(pCog);
     if ( v1 )
     {
         v2 = sithSurface_GetRdSurface(v1);
@@ -258,140 +258,140 @@ void sithCogFunction_StopSurfaceAnim(sithCog *ctx)
     }
 }
 
-void sithCogFunction_GetSurfaceAnim(sithCog *ctx)
+void sithCogFunction_GetSurfaceAnim(sithCog *pCog)
 {
     SithSurface *v1; // eax
     int v2; // eax
 
-    v1 = sithCogExec_PopSurface(ctx);
+    v1 = sithCogExec_PopSurface(pCog);
     if ( v1 )
     {
         v2 = sithSurface_GetSurfaceAnim(v1);
-        sithCogExec_PushInt(ctx, v2);
+        sithCogExec_PushInt(pCog, v2);
     }
     else
     {
-        sithCogExec_PushInt(ctx, -1);
+        sithCogExec_PushInt(pCog, -1);
     }
 }
 
-void sithCogFunction_LoadTemplate(sithCog *ctx)
+void sithCogFunction_LoadTemplate(sithCog *pCog)
 {
     char *v1; // eax
     SithThing *v2; // eax
 
-    v1 = sithCogExec_PopString(ctx);
+    v1 = sithCogExec_PopString(pCog);
     if ( v1 && (v2 = sithTemplate_GetTemplate(v1)) != 0 )
-        sithCogExec_PushInt(ctx, v2->idx);
+        sithCogExec_PushInt(pCog, v2->idx);
     else
-        sithCogExec_PushInt(ctx, -1);
+        sithCogExec_PushInt(pCog, -1);
 }
 
-void sithCogFunction_LoadKeyframe(sithCog *a1)
+void sithCogFunction_LoadKeyframe(sithCog *pCog)
 {
     char *v1; // eax
     rdKeyframe *v2; // eax
 
-    v1 = sithCogExec_PopString(a1);
+    v1 = sithCogExec_PopString(pCog);
     if ( v1 && (v2 = sithKeyFrame_LoadEntry(v1)) != 0 )
-        sithCogExec_PushInt(a1, v2->id);
+        sithCogExec_PushInt(pCog, v2->id);
     else
-        sithCogExec_PushInt(a1, -1);
+        sithCogExec_PushInt(pCog, -1);
 }
 
-void sithCogFunction_LoadModel(sithCog *ctx)
+void sithCogFunction_LoadModel(sithCog *pCog)
 {
     char *v1; // eax
     rdModel3 *v2; // eax
 
-    v1 = sithCogExec_PopString(ctx);
+    v1 = sithCogExec_PopString(pCog);
     if ( v1 && (v2 = sithModel_Load(v1, 1)) != 0 )
-        sithCogExec_PushInt(ctx, v2->id);
+        sithCogExec_PushInt(pCog, v2->id);
     else
-        sithCogExec_PushInt(ctx, -1);
+        sithCogExec_PushInt(pCog, -1);
 }
 
-void sithCogFunction_SetPulse(sithCog *ctx)
+void sithCogFunction_SetPulse(sithCog *pCog)
 {
     cog_flex_t popFlex;
 
-    popFlex = sithCogExec_PopFlex(ctx);
+    popFlex = sithCogExec_PopFlex(pCog);
     if ( popFlex <= 0.0 )
     {
-        if ( ctx->flags & SITH_COG_DEBUG )
+        if ( pCog->flags & SITH_COG_DEBUG )
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_g_genBuffer, "Cog %s: Pulse disabled.\n", ctx->aName);
+            _sprintf(std_g_genBuffer, "Cog %s: Pulse disabled.\n", pCog->aName);
             sithConsole_PrintString(std_g_genBuffer);
 #endif
         }
-        ctx->flags &= ~SITH_COG_PULSE_SET;
+        pCog->flags &= ~SITH_COG_PULSE_SET;
     }
     else
     {
-        if ( ctx->flags & SITH_COG_DEBUG )
+        if ( pCog->flags & SITH_COG_DEBUG )
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_g_genBuffer, "Cog %s: Pulse set to %f seconds.\n", ctx->aName, popFlex);
+            _sprintf(std_g_genBuffer, "Cog %s: Pulse set to %f seconds.\n", pCog->aName, popFlex);
             sithConsole_PrintString(std_g_genBuffer);
 #endif
         }
-        ctx->flags |= SITH_COG_PULSE_SET;
-        ctx->msecPulseInterval = (int)(popFlex * 1000.0);
-        ctx->msecNextPulseTime = (int)(popFlex * 1000.0) + sithTime_g_msecGameTime;
+        pCog->flags |= SITH_COG_PULSE_SET;
+        pCog->msecPulseInterval = (int)(popFlex * 1000.0);
+        pCog->msecNextPulseTime = (int)(popFlex * 1000.0) + sithTime_g_msecGameTime;
     }
 }
 
-void sithCogFunction_SetTimer(sithCog *ctx)
+void sithCogFunction_SetTimer(sithCog *pCog)
 {
-    cog_flex_t popFlex = sithCogExec_PopFlex(ctx);
+    cog_flex_t popFlex = sithCogExec_PopFlex(pCog);
     if ( popFlex <= 0.0 )
     {
-        if ( ctx->flags & SITH_COG_DEBUG )
+        if ( pCog->flags & SITH_COG_DEBUG )
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_g_genBuffer, "Cog %s: Timer cancelled.\n", ctx->aName);
+            _sprintf(std_g_genBuffer, "Cog %s: Timer cancelled.\n", pCog->aName);
             sithConsole_PrintString(std_g_genBuffer);
 #endif
         }
-        ctx->flags &= ~SITH_COG_TIMER_SET;
+        pCog->flags &= ~SITH_COG_TIMER_SET;
     }
     else
     {
-        if ( ctx->flags & SITH_COG_DEBUG )
+        if ( pCog->flags & SITH_COG_DEBUG )
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            _sprintf(std_g_genBuffer, "Cog %s: Timer set for %f seconds.\n", ctx->aName, popFlex);
+            _sprintf(std_g_genBuffer, "Cog %s: Timer set for %f seconds.\n", pCog->aName, popFlex);
             sithConsole_PrintString(std_g_genBuffer);
 #endif
         }
-        ctx->flags |= SITH_COG_TIMER_SET;
-        ctx->field_20 = sithTime_g_msecGameTime + (int)(popFlex * 1000.0);
+        pCog->flags |= SITH_COG_TIMER_SET;
+        pCog->field_20 = sithTime_g_msecGameTime + (int)(popFlex * 1000.0);
     }
 }
 
-void sithCogFunction_SetTimerEx(sithCog *ctx)
+void sithCogFunction_SetTimerEx(sithCog *pCog)
 {
     SithEventParams params;
 
-    params.field_14 = sithCogExec_PopFlex(ctx);
-    params.field_10 = sithCogExec_PopFlex(ctx);
-    params.timerIdx = sithCogExec_PopInt(ctx);
-    params.idx = ctx->idx;
-    cog_flex_t a1a = sithCogExec_PopFlex(ctx) * 1000.0;
+    params.field_14 = sithCogExec_PopFlex(pCog);
+    params.field_10 = sithCogExec_PopFlex(pCog);
+    params.timerIdx = sithCogExec_PopInt(pCog);
+    params.idx = pCog->idx;
+    cog_flex_t a1a = sithCogExec_PopFlex(pCog) * 1000.0;
     int timerMs = (signed int)a1a;
     if ( timerMs >= 0 ) {
         sithEvent_CreateEvent(4, &params, timerMs);
     }
 }
 
-void sithCogFunction_KillTimerEx(sithCog *ctx)
+void sithCogFunction_KillTimerEx(sithCog *pCog)
 {
     SithEvent *v2; // eax
     SithEvent *v3; // edi
     SithEvent *v4; // esi
 
-    int v1 = sithCogExec_PopInt(ctx);
+    int v1 = sithCogExec_PopInt(pCog);
     if ( v1 > 0 )
     {
         v2 = sithEvent_g_pFirstQueuedEvent;
@@ -401,7 +401,7 @@ void sithCogFunction_KillTimerEx(sithCog *ctx)
             do
             {
                 v4 = v2->pNextEvent;
-                if ( v2->taskNum == 4 && v2->params.idx == ctx->idx && v2->params.timerIdx == v1 )
+                if ( v2->taskNum == 4 && v2->params.idx == pCog->idx && v2->params.timerIdx == v1 )
                 {
                     if ( v3 )
                         v3->pNextEvent = v4;
@@ -418,250 +418,250 @@ void sithCogFunction_KillTimerEx(sithCog *ctx)
     }
 }
 
-void sithCogFunction_Reset(sithCog *ctx)
+void sithCogFunction_Reset(sithCog *pCog)
 {
-    ctx->callDepth = 0;
+    pCog->callDepth = 0;
 }
 
-void sithCogFunction_VectorSet(sithCog *ctx)
+void sithCogFunction_VectorSet(sithCog *pCog)
 {
     rdVector3 out;
 
-    out.z = sithCogExec_PopFlex(ctx);
-    out.y = sithCogExec_PopFlex(ctx);
-    out.x = sithCogExec_PopFlex(ctx);
-    sithCogExec_PushVector(ctx, &out);
+    out.z = sithCogExec_PopFlex(pCog);
+    out.y = sithCogExec_PopFlex(pCog);
+    out.x = sithCogExec_PopFlex(pCog);
+    sithCogExec_PushVector(pCog, &out);
 }
 
-void sithCogFunction_VectorAdd(sithCog *ctx)
+void sithCogFunction_VectorAdd(sithCog *pCog)
 {
     rdVector3 inA;
     rdVector3 inB;
     rdVector3 out;
 
-    sithCogExec_PopVector(ctx, &inA);
-    sithCogExec_PopVector(ctx, &inB);
+    sithCogExec_PopVector(pCog, &inA);
+    sithCogExec_PopVector(pCog, &inB);
     rdVector_Add3(&out, &inA, &inB);
-    sithCogExec_PushVector(ctx, &out);
+    sithCogExec_PushVector(pCog, &out);
 }
 
-void sithCogFunction_VectorSub(sithCog *ctx)
+void sithCogFunction_VectorSub(sithCog *pCog)
 {
     rdVector3 inA;
     rdVector3 inB;
     rdVector3 out;
 
-    sithCogExec_PopVector(ctx, &inA);
-    sithCogExec_PopVector(ctx, &inB);
+    sithCogExec_PopVector(pCog, &inA);
+    sithCogExec_PopVector(pCog, &inB);
     rdVector_Sub3(&out, &inB, &inA);
-    sithCogExec_PushVector(ctx, &out);
+    sithCogExec_PushVector(pCog, &out);
 }
 
-void sithCogFunction_VectorDot(sithCog *ctx)
+void sithCogFunction_VectorDot(sithCog *pCog)
 {
     rdVector3 inA;
     rdVector3 inB;
 
-    sithCogExec_PopVector(ctx, &inA);
-    sithCogExec_PopVector(ctx, &inB);
-    sithCogExec_PushFlex(ctx, rdVector_Dot3(&inA, &inB));
+    sithCogExec_PopVector(pCog, &inA);
+    sithCogExec_PopVector(pCog, &inB);
+    sithCogExec_PushFlex(pCog, rdVector_Dot3(&inA, &inB));
 }
 
-void sithCogFunction_VectorCross(sithCog *ctx)
+void sithCogFunction_VectorCross(sithCog *pCog)
 {
     rdVector3 inA;
     rdVector3 inB;
     rdVector3 out;
 
-    sithCogExec_PopVector(ctx, &inA);
-    sithCogExec_PopVector(ctx, &inB);
+    sithCogExec_PopVector(pCog, &inA);
+    sithCogExec_PopVector(pCog, &inB);
     rdVector_Cross3(&out, &inA, &inB);
-    sithCogExec_PushVector(ctx, &out);
+    sithCogExec_PushVector(pCog, &out);
 }
 
-void sithCogFunction_VectorLen(sithCog *ctx)
+void sithCogFunction_VectorLen(sithCog *pCog)
 {
     rdVector3 in;
 
-    sithCogExec_PopVector(ctx, &in);
-    sithCogExec_PushFlex(ctx, rdVector_Len3(&in));
+    sithCogExec_PopVector(pCog, &in);
+    sithCogExec_PushFlex(pCog, rdVector_Len3(&in));
 }
 
-void sithCogFunction_VectorScale(sithCog *ctx)
+void sithCogFunction_VectorScale(sithCog *pCog)
 {
     rdVector3 inA;
     rdVector3 out;
 
-    cog_flex_t scale = sithCogExec_PopFlex(ctx);
-    sithCogExec_PopVector(ctx, &inA);
+    cog_flex_t scale = sithCogExec_PopFlex(pCog);
+    sithCogExec_PopVector(pCog, &inA);
     rdVector_Scale3(&out, &inA, scale);
-    sithCogExec_PushVector(ctx, &out);
+    sithCogExec_PushVector(pCog, &out);
 }
 
-void sithCogFunction_VectorDist(sithCog *ctx)
+void sithCogFunction_VectorDist(sithCog *pCog)
 {
     rdVector3 inA;
     rdVector3 inB;
     rdVector3 tmp;
 
-    sithCogExec_PopVector(ctx, &inA);
-    sithCogExec_PopVector(ctx, &inB);
+    sithCogExec_PopVector(pCog, &inA);
+    sithCogExec_PopVector(pCog, &inB);
     rdVector_Sub3(&tmp, &inB, &inA);
-    sithCogExec_PushFlex(ctx, rdVector_Len3(&tmp));
+    sithCogExec_PushFlex(pCog, rdVector_Len3(&tmp));
 }
 
 // MOTS added
-void sithCogFunction_VectorEqual(sithCog *ctx)
+void sithCogFunction_VectorEqual(sithCog *pCog)
 {
     rdVector3 popB;
     rdVector3 popA;
     
-    sithCogExec_PopVector(ctx,&popA);
-    sithCogExec_PopVector(ctx,&popB);
+    sithCogExec_PopVector(pCog,&popA);
+    sithCogExec_PopVector(pCog,&popB);
     if (((popB.x == popA.x) && (popB.y == popA.y)) && (popB.z == popA.z)) {
-        sithCogExec_PushInt(ctx,1);
+        sithCogExec_PushInt(pCog,1);
         return;
     }
-    sithCogExec_PushInt(ctx,0);
+    sithCogExec_PushInt(pCog,0);
     return;
 }
 
-void sithCogFunction_SendMessage(sithCog *ctx)
+void sithCogFunction_SendMessage(sithCog *pCog)
 {
-    int msgId = sithCogExec_PopInt(ctx);
-    sithCog* cog = sithCogExec_PopCog(ctx);
+    int msgId = sithCogExec_PopInt(pCog);
+    sithCog* cog = sithCogExec_PopCog(pCog);
 
     if (cog && msgId >= 0 && msgId < SITH_MESSAGE_MAX)
-        sithCog_SendMessage(cog, msgId, SENDERTYPE_COG, ctx->idx, ctx->sourceType, ctx->sourceIdx, 0);
+        sithCog_SendMessage(cog, msgId, SENDERTYPE_COG, pCog->idx, pCog->sourceType, pCog->sourceIdx, 0);
 }
 
-void sithCogFunction_SendMessageEx(struct sithCog *ctx)
+void sithCogFunction_SendMessageEx(struct sithCog *pCog)
 {
-    cog_flex_t param3 = sithCogExec_PopFlex(ctx);
-    cog_flex_t param2 = sithCogExec_PopFlex(ctx);
-    cog_flex_t param1 = sithCogExec_PopFlex(ctx);
-    cog_flex_t param0 = sithCogExec_PopFlex(ctx);
-    int msgId = sithCogExec_PopInt(ctx);
-    sithCog* cog = sithCogExec_PopCog(ctx);
+    cog_flex_t param3 = sithCogExec_PopFlex(pCog);
+    cog_flex_t param2 = sithCogExec_PopFlex(pCog);
+    cog_flex_t param1 = sithCogExec_PopFlex(pCog);
+    cog_flex_t param0 = sithCogExec_PopFlex(pCog);
+    int msgId = sithCogExec_PopInt(pCog);
+    sithCog* cog = sithCogExec_PopCog(pCog);
 
     if (cog && msgId >= 0 && msgId < SITH_MESSAGE_MAX)
     {
-        cog_flex_t flexRet = sithCog_SendMessageEx(cog, msgId, SENDERTYPE_COG, ctx->idx, ctx->sourceType, ctx->sourceIdx, 0, param0, param1, param2, param3);
-        sithCogExec_PushFlex(ctx, flexRet);
+        cog_flex_t flexRet = sithCog_SendMessageEx(cog, msgId, SENDERTYPE_COG, pCog->idx, pCog->sourceType, pCog->sourceIdx, 0, param0, param1, param2, param3);
+        sithCogExec_PushFlex(pCog, flexRet);
     }
 }
 
-void sithCogFunction_GetKeyLen(sithCog *ctx)
+void sithCogFunction_GetKeyLen(sithCog *pCog)
 {
-    rdKeyframe* keyframe = sithCogExec_PopKeyframe(ctx);
+    rdKeyframe* keyframe = sithCogExec_PopKeyframe(pCog);
 
     if (!keyframe || keyframe->fps == 0.0)
     {
-        sithCogExec_PushFlex(ctx, 0.0);
+        sithCogExec_PushFlex(pCog, 0.0);
         return;
     }
 
-    sithCogExec_PushFlex(ctx, (flex_d_t)keyframe->numFrames / keyframe->fps);
+    sithCogExec_PushFlex(pCog, (flex_d_t)keyframe->numFrames / keyframe->fps);
 }
 
-void sithCogFunction_GetSithMode(sithCog* ctx)
+void sithCogFunction_GetSithMode(sithCog* pCog)
 {
-    sithCogExec_PushInt(ctx, g_sithMode);
+    sithCogExec_PushInt(pCog, g_sithMode);
 }
 
-void sithCogFunction_GetGameTime(sithCog *ctx)
+void sithCogFunction_GetGameTime(sithCog *pCog)
 {
-    sithCogExec_PushInt(ctx, sithTime_g_msecGameTime);
+    sithCogExec_PushInt(pCog, sithTime_g_msecGameTime);
 }
 
-void sithCogFunction_GetFlexGameTime(sithCog *ctx)
+void sithCogFunction_GetFlexGameTime(sithCog *pCog)
 {
-    sithCogExec_PushFlex(ctx, sithTime_g_secGameTime);
+    sithCogExec_PushFlex(pCog, sithTime_g_secGameTime);
 }
 
-void sithCogFunction_GetDifficulty(sithCog *ctx)
+void sithCogFunction_GetDifficulty(sithCog *pCog)
 {
-    sithCogExec_PushInt(ctx, jkPlayer_setDiff);
+    sithCogExec_PushInt(pCog, jkPlayer_setDiff);
 }
 
-void sithCogFunction_SetSubModeFlags(sithCog *ctx)
+void sithCogFunction_SetSubModeFlags(sithCog *pCog)
 {
-    g_submodeFlags |= sithCogExec_PopInt(ctx);
+    g_submodeFlags |= sithCogExec_PopInt(pCog);
 }
 
-void sithCogFunction_ClearSubModeFlags(sithCog *ctx)
+void sithCogFunction_ClearSubModeFlags(sithCog *pCog)
 {
-    g_submodeFlags &= ~sithCogExec_PopInt(ctx);
+    g_submodeFlags &= ~sithCogExec_PopInt(pCog);
 }
 
-void sithCogFunction_GetSubModeFlags(sithCog *ctx)
+void sithCogFunction_GetSubModeFlags(sithCog *pCog)
 {
-    sithCogExec_PushInt(ctx, g_submodeFlags);
+    sithCogExec_PushInt(pCog, g_submodeFlags);
 }
 
-void sithCogFunction_SetDebugModeFlags(sithCog *ctx)
+void sithCogFunction_SetDebugModeFlags(sithCog *pCog)
 {
-    g_debugmodeFlags |= sithCogExec_PopInt(ctx);
+    g_debugmodeFlags |= sithCogExec_PopInt(pCog);
 }
 
-void sithCogFunction_ClearDebugModeFlags(sithCog *ctx)
+void sithCogFunction_ClearDebugModeFlags(sithCog *pCog)
 {
-    g_debugmodeFlags &= ~sithCogExec_PopInt(ctx);
+    g_debugmodeFlags &= ~sithCogExec_PopInt(pCog);
 }
 
-void sithCogFunction_GetDebugModeFlags(sithCog *ctx)
+void sithCogFunction_GetDebugModeFlags(sithCog *pCog)
 {
-    sithCogExec_PushInt(ctx, g_debugmodeFlags);
+    sithCogExec_PushInt(pCog, g_debugmodeFlags);
 }
 
-void sithCogFunction_BitSet(sithCog *ctx)
-{
-    signed int a;
-    signed int b;
-
-    a = sithCogExec_PopInt(ctx);
-    b = sithCogExec_PopInt(ctx);
-    sithCogExec_PushInt(ctx, b | a);
-}
-
-void sithCogFunction_BitTest(sithCog *ctx)
+void sithCogFunction_BitSet(sithCog *pCog)
 {
     signed int a;
     signed int b;
 
-    a = sithCogExec_PopInt(ctx);
-    b = sithCogExec_PopInt(ctx);
-    sithCogExec_PushInt(ctx, b & a);
+    a = sithCogExec_PopInt(pCog);
+    b = sithCogExec_PopInt(pCog);
+    sithCogExec_PushInt(pCog, b | a);
 }
 
-void sithCogFunction_BitClear(sithCog *ctx)
+void sithCogFunction_BitTest(sithCog *pCog)
 {
     signed int a;
     signed int b;
 
-    a = sithCogExec_PopInt(ctx);
-    b = sithCogExec_PopInt(ctx);
-    sithCogExec_PushInt(ctx, b & ~a);
+    a = sithCogExec_PopInt(pCog);
+    b = sithCogExec_PopInt(pCog);
+    sithCogExec_PushInt(pCog, b & a);
 }
 
-void sithCogFunction_GetLevelTime(sithCog *ctx)
+void sithCogFunction_BitClear(sithCog *pCog)
 {
-    sithCogExec_PushFlex(ctx, sithTime_g_msecGameTime * 0.001);
+    signed int a;
+    signed int b;
+
+    a = sithCogExec_PopInt(pCog);
+    b = sithCogExec_PopInt(pCog);
+    sithCogExec_PushInt(pCog, b & ~a);
 }
 
-void sithCogFunction_GetThingCount(sithCog *ctx)
+void sithCogFunction_GetLevelTime(sithCog *pCog)
 {
-    sithCogExec_PushInt(ctx, sithWorld_g_pCurrentWorld->numThingsLoaded);
+    sithCogExec_PushFlex(pCog, sithTime_g_msecGameTime * 0.001);
 }
 
-void sithCogFunction_GetThingTemplateCount(sithCog *ctx)
+void sithCogFunction_GetThingCount(sithCog *pCog)
+{
+    sithCogExec_PushInt(pCog, sithWorld_g_pCurrentWorld->numThingsLoaded);
+}
+
+void sithCogFunction_GetThingTemplateCount(sithCog *pCog)
 {
     SithWorld *v1; // esi
     SithThing *v2; // eax
     int template_count; // edi
 
     v1 = sithWorld_g_pCurrentWorld;
-    v2 = sithCogExec_PopTemplate(ctx);
+    v2 = sithCogExec_PopTemplate(pCog);
     if ( v2 )
     {
         template_count = 0;
@@ -671,120 +671,120 @@ void sithCogFunction_GetThingTemplateCount(sithCog *ctx)
             if ( thing->type && thing->type != SITH_THING_CORPSE && thing->pTemplate == v2 )
                 ++template_count;
         }
-        sithCogExec_PushInt(ctx, template_count);
+        sithCogExec_PushInt(pCog, template_count);
     }
 }
 
-void sithCogFunction_GetGravity(sithCog *ctx)
+void sithCogFunction_GetGravity(sithCog *pCog)
 {
-    sithCogExec_PushFlex(ctx, sithWorld_g_pCurrentWorld->gravity);
+    sithCogExec_PushFlex(pCog, sithWorld_g_pCurrentWorld->gravity);
 }
 
-void sithCogFunction_SetGravity(sithCog *ctx)
+void sithCogFunction_SetGravity(sithCog *pCog)
 {
-    sithWorld_g_pCurrentWorld->gravity = sithCogExec_PopFlex(ctx);
+    sithWorld_g_pCurrentWorld->gravity = sithCogExec_PopFlex(pCog);
 }
 
-void sithCogFunction_ReturnEx(sithCog *ctx)
+void sithCogFunction_ReturnEx(sithCog *pCog)
 {
-    ctx->returnValue = sithCogExec_PopFlex(ctx);
+    pCog->returnValue = sithCogExec_PopFlex(pCog);
 }
 
-void sithCogFunction_GetParam(sithCog *ctx)
+void sithCogFunction_GetParam(sithCog *pCog)
 {
-    int idx = sithCogExec_PopInt(ctx);
+    int idx = sithCogExec_PopInt(pCog);
     if ( idx < 0 || idx >= 4 )
-        sithCogExec_PushFlex(ctx, -9999.0);
+        sithCogExec_PushFlex(pCog, -9999.0);
     else
-        sithCogExec_PushFlex(ctx, ctx->params[idx]);
+        sithCogExec_PushFlex(pCog, pCog->params[idx]);
 }
 
-void sithCogFunction_SetParam(sithCog *ctx)
+void sithCogFunction_SetParam(sithCog *pCog)
 {
-    cog_flex_t val = sithCogExec_PopFlex(ctx);
-    int idx = sithCogExec_PopInt(ctx);
+    cog_flex_t val = sithCogExec_PopFlex(pCog);
+    int idx = sithCogExec_PopInt(pCog);
     if (idx >= 0 && idx < 4)
-        ctx->params[idx] = val;
+        pCog->params[idx] = val;
 }
 
-void sithCogFunction_VectorX(sithCog *ctx)
+void sithCogFunction_VectorX(sithCog *pCog)
 {
     rdVector3 popVec;
 
-    sithCogExec_PopVector(ctx, &popVec);
-    sithCogExec_PushFlex(ctx, popVec.x);
+    sithCogExec_PopVector(pCog, &popVec);
+    sithCogExec_PushFlex(pCog, popVec.x);
 }
 
-void sithCogFunction_VectorY(sithCog *ctx)
+void sithCogFunction_VectorY(sithCog *pCog)
 {
     rdVector3 popVec;
 
-    sithCogExec_PopVector(ctx, &popVec);
-    sithCogExec_PushFlex(ctx, popVec.y);
+    sithCogExec_PopVector(pCog, &popVec);
+    sithCogExec_PushFlex(pCog, popVec.y);
 }
 
-void sithCogFunction_VectorZ(sithCog *ctx)
+void sithCogFunction_VectorZ(sithCog *pCog)
 {
     rdVector3 popVec;
 
-    sithCogExec_PopVector(ctx, &popVec);
-    sithCogExec_PushFlex(ctx, popVec.z);
+    sithCogExec_PopVector(pCog, &popVec);
+    sithCogExec_PushFlex(pCog, popVec.z);
 }
 
-void sithCogFunction_VectorNorm(sithCog *ctx)
+void sithCogFunction_VectorNorm(sithCog *pCog)
 {
     rdVector3 popVec;
     rdVector3 out;
 
-    sithCogExec_PopVector(ctx, &popVec);
+    sithCogExec_PopVector(pCog, &popVec);
     rdVector_Normalize3(&out, &popVec);
-    sithCogExec_PushVector(ctx, &out);
+    sithCogExec_PushVector(pCog, &out);
 }
 
-void sithCogFunction_SetMaterialCel(sithCog *ctx)
+void sithCogFunction_SetMaterialCel(sithCog *pCog)
 {
     signed int cel; // esi
     rdMaterial *mat; // eax
 
-    cel = sithCogExec_PopInt(ctx);
-    mat = sithCogExec_PopMaterial(ctx);
+    cel = sithCogExec_PopInt(pCog);
+    mat = sithCogExec_PopMaterial(pCog);
     if ( mat && cel >= 0 && (unsigned int)cel < mat->num_texinfo )
         mat->curCelNum = cel;
-    sithCogExec_PushInt(ctx, -1);
+    sithCogExec_PushInt(pCog, -1);
 }
 
-void sithCogFunction_GetMaterialCel(sithCog *ctx)
+void sithCogFunction_GetMaterialCel(sithCog *pCog)
 {
     rdMaterial *mat; // eax
 
-    mat = sithCogExec_PopMaterial(ctx);
+    mat = sithCogExec_PopMaterial(pCog);
     if ( mat )
-        sithCogExec_PushInt(ctx, mat->curCelNum);
+        sithCogExec_PushInt(pCog, mat->curCelNum);
     else
-        sithCogExec_PushInt(ctx, -1);
+        sithCogExec_PushInt(pCog, -1);
 }
 
-void sithCogFunction_EnableIRMode(sithCog *ctx)
+void sithCogFunction_EnableIRMode(sithCog *pCog)
 {
-    cog_flex_t flex1 = sithCogExec_PopFlex(ctx);
-    cog_flex_t flex2 = sithCogExec_PopFlex(ctx);
+    cog_flex_t flex1 = sithCogExec_PopFlex(pCog);
+    cog_flex_t flex2 = sithCogExec_PopFlex(pCog);
     sithRender_EnableIRMode(flex2, flex1);
 }
 
-void sithCogFunction_DisableIRMode(sithCog *ctx)
+void sithCogFunction_DisableIRMode(sithCog *pCog)
 {
     sithRender_DisableIRMode();
 }
 
-void sithCogFunction_SetInvFlags(sithCog *ctx)
+void sithCogFunction_SetInvFlags(sithCog *pCog)
 {
     int flags;
     int binIdx;
     SithThing *player;
 
-    flags = sithCogExec_PopInt(ctx);
-    binIdx = sithCogExec_PopInt(ctx);
-    player = sithCogExec_PopThing(ctx);
+    flags = sithCogExec_PopInt(pCog);
+    binIdx = sithCogExec_PopInt(pCog);
+    player = sithCogExec_PopThing(pCog);
     if (Main_bMotsCompat && binIdx < SITHBIN_ENERGY) {
         binIdx = sithInventory_SelectWeaponFollowing(binIdx);
     }
@@ -792,28 +792,28 @@ void sithCogFunction_SetInvFlags(sithCog *ctx)
         sithInventory_SetInventoryFlags(player, binIdx, flags);
 }
 
-void sithCogFunction_SetMapModeFlags(sithCog *ctx)
+void sithCogFunction_SetMapModeFlags(sithCog *pCog)
 {
-    g_mapModeFlags |= sithCogExec_PopInt(ctx);
+    g_mapModeFlags |= sithCogExec_PopInt(pCog);
 }
 
-void sithCogFunction_GetMapModelFlags(sithCog *ctx)
+void sithCogFunction_GetMapModelFlags(sithCog *pCog)
 {
-    sithCogExec_PushInt(ctx, g_mapModeFlags);
+    sithCogExec_PushInt(pCog, g_mapModeFlags);
 }
 
-void sithCogFunction_ClearMapModeFlags(sithCog *ctx)
+void sithCogFunction_ClearMapModeFlags(sithCog *pCog)
 {
-    g_mapModeFlags &= ~sithCogExec_PopInt(ctx);
+    g_mapModeFlags &= ~sithCogExec_PopInt(pCog);
 }
 
-void sithCogFunction_SetCameraFocus(sithCog *ctx)
+void sithCogFunction_SetCameraFocus(sithCog *pCog)
 {
     SithThing *focusThing; // esi
     signed int camIdx; // eax
 
-    focusThing = sithCogExec_PopThing(ctx);
-    camIdx = sithCogExec_PopInt(ctx);
+    focusThing = sithCogExec_PopThing(pCog);
+    camIdx = sithCogExec_PopInt(pCog);
 
 #ifdef QOL_IMPROVEMENTS
     // Droidworks tmp
@@ -828,12 +828,12 @@ void sithCogFunction_SetCameraFocus(sithCog *ctx)
     }
 }
 
-void sithCogFunction_GetPrimaryFocus(sithCog *ctx)
+void sithCogFunction_GetPrimaryFocus(sithCog *pCog)
 {
     signed int camIdx; // eax
     SithThing *v2; // eax
 
-    camIdx = sithCogExec_PopInt(ctx);
+    camIdx = sithCogExec_PopInt(pCog);
 
 #ifdef QOL_IMPROVEMENTS
     // Droidworks tmp
@@ -842,17 +842,17 @@ void sithCogFunction_GetPrimaryFocus(sithCog *ctx)
 #endif
 
     if ( camIdx > -1 && camIdx < 7 && (v2 = sithCamera_GetPrimaryFocus(&sithCamera_g_aCameras[camIdx])) != 0 )
-        sithCogExec_PushInt(ctx, v2->idx);
+        sithCogExec_PushInt(pCog, v2->idx);
     else
-        sithCogExec_PushInt(ctx, -1);
+        sithCogExec_PushInt(pCog, -1);
 }
 
-void sithCogFunction_GetSecondaryFocus(sithCog *ctx)
+void sithCogFunction_GetSecondaryFocus(sithCog *pCog)
 {
     signed int camIdx; // eax
     SithThing *v2; // eax
 
-    camIdx = sithCogExec_PopInt(ctx);
+    camIdx = sithCogExec_PopInt(pCog);
     
 #ifdef QOL_IMPROVEMENTS
     // Droidworks tmp
@@ -861,16 +861,16 @@ void sithCogFunction_GetSecondaryFocus(sithCog *ctx)
 #endif
     
     if ( camIdx > -1 && camIdx < 7 && (v2 = sithCamera_GetSecondaryFocus(&sithCamera_g_aCameras[camIdx])) != 0 )
-        sithCogExec_PushInt(ctx, v2->idx);
+        sithCogExec_PushInt(pCog, v2->idx);
     else
-        sithCogExec_PushInt(ctx, -1);
+        sithCogExec_PushInt(pCog, -1);
 }
 
-void sithCogFunction_SetCameraMode(sithCog *ctx)
+void sithCogFunction_SetCameraMode(sithCog *pCog)
 {
     signed int camIdx; // eax
 
-    camIdx = sithCogExec_PopInt(ctx);
+    camIdx = sithCogExec_PopInt(pCog);
 
 #ifdef QOL_IMPROVEMENTS
     // Droidworks tmp
@@ -887,139 +887,139 @@ void sithCogFunction_SetCameraMode(sithCog *ctx)
         sithCamera_SetCurrentCamera(&sithCamera_g_aCameras[camIdx]);
 }
 
-void sithCogFunction_GetCameraMode(sithCog *ctx)
+void sithCogFunction_GetCameraMode(sithCog *pCog)
 {
     int camIdx; // edx
 
     if ( sithCamera_g_pCurCamera && (camIdx = sithCamera_g_pCurCamera - sithCamera_g_aCameras, camIdx < 7) )
-        sithCogExec_PushInt(ctx, camIdx);
+        sithCogExec_PushInt(pCog, camIdx);
     else
-        sithCogExec_PushInt(ctx, -1);
+        sithCogExec_PushInt(pCog, -1);
 }
 
-void sithCogFunction_CycleCamera(sithCog *ctx)
+void sithCogFunction_CycleCamera(sithCog *pCog)
 {
     sithCamera_CycleCamera();
 }
 
 // MOTS added
-void sithCogFunction_SetCameraZoom(sithCog *ctx)
+void sithCogFunction_SetCameraZoom(sithCog *pCog)
 {
-    cog_flex_t zoomSpeed = sithCogExec_PopFlex(ctx);
-    cog_flex_t zoomScale = sithCogExec_PopFlex(ctx);
-    int camIdx = sithCogExec_PopInt(ctx);
+    cog_flex_t zoomSpeed = sithCogExec_PopFlex(pCog);
+    cog_flex_t zoomScale = sithCogExec_PopFlex(pCog);
+    int camIdx = sithCogExec_PopInt(pCog);
 
     if ((-1 < camIdx) && (camIdx < 7)) {
         sithCamera_SetZoom(sithCamera_g_aCameras + camIdx, zoomScale, zoomSpeed);
     }
 }
 
-void sithCogFunction_SetPOVShake(sithCog *ctx)
+void sithCogFunction_SetPOVShake(sithCog *pCog)
 {
     rdVector3 v3;
     rdVector3 v4;
 
-    cog_flex_t a1a = sithCogExec_PopFlex(ctx);
-    cog_flex_t v2 = sithCogExec_PopFlex(ctx);
-    if ( sithCogExec_PopVector(ctx, &v3) )
+    cog_flex_t a1a = sithCogExec_PopFlex(pCog);
+    cog_flex_t v2 = sithCogExec_PopFlex(pCog);
+    if ( sithCogExec_PopVector(pCog, &v3) )
     {
-        if ( sithCogExec_PopVector(ctx, &v4) )
+        if ( sithCogExec_PopVector(pCog, &v4) )
             sithCamera_SetPOVShake(&v4, &v3, v2, a1a);
     }
 }
 
-void sithCogFunction_HeapNew(sithCog *ctx)
+void sithCogFunction_HeapNew(sithCog *pCog)
 {
     SithCogSymbolValue *oldHeap; // eax
     SithCogSymbolValue *newHeap; // edi
 
-    int heapSize = sithCogExec_PopInt(ctx);
+    int heapSize = sithCogExec_PopInt(pCog);
     if ( heapSize > 0 )
     {
-        oldHeap = ctx->heap;
+        oldHeap = pCog->heap;
         if ( oldHeap )
         {
             SITH_FREE(oldHeap);
-            ctx->heapSize = 0;
+            pCog->heapSize = 0;
         }
         { TWL_EXTRAM_SUGGEST(pSithHS); // Added: heap vars are word-safe stackvars
         newHeap = (SithCogSymbolValue *)SITH_ALLOC(sizeof(SithCogSymbolValue) * heapSize);
         TWL_EXTRAM_RESTORE(pSithHS); }
-        ctx->heap = newHeap;
+        pCog->heap = newHeap;
         if (!newHeap) { // Added: don't memset NULL on OOM
-            ctx->heapSize = 0;
+            pCog->heapSize = 0;
             return;
         }
         stdPlatform_Memzero32(newHeap, (sizeof(SithCogSymbolValue) * heapSize)); // Added: word-safe
-        ctx->heapSize = heapSize;
+        pCog->heapSize = heapSize;
     }
 }
 
-void sithCogFunction_HeapSet(sithCog *ctx)
+void sithCogFunction_HeapSet(sithCog *pCog)
 {
     SithCogSymbolValue stackVar;
 
-    int val = sithCogExec_PopSymbol(ctx, &stackVar);
-    int idx = sithCogExec_PopInt(ctx);
-    if ( val && idx >= 0 && idx < ctx->heapSize )
-        ctx->heap[idx] = stackVar;
+    int val = sithCogExec_PopSymbol(pCog, &stackVar);
+    int idx = sithCogExec_PopInt(pCog);
+    if ( val && idx >= 0 && idx < pCog->heapSize )
+        pCog->heap[idx] = stackVar;
 }
 
-void sithCogFunction_HeapGet(sithCog *ctx)
+void sithCogFunction_HeapGet(sithCog *pCog)
 {
     SithCogSymbolValue *heapVar;
     SithCogSymbolValue tmp;
 
-    int idx = sithCogExec_PopInt(ctx);
-    if (idx < 0 || idx >= ctx->heapSize)
+    int idx = sithCogExec_PopInt(pCog);
+    if (idx < 0 || idx >= pCog->heapSize)
     {
-        sithCogExec_PushInt(ctx, 0);
+        sithCogExec_PushInt(pCog, 0);
     }
     else
     {
-        heapVar = &ctx->heap[idx];
+        heapVar = &pCog->heap[idx];
         tmp.type = heapVar->type;
         tmp.data[0] = heapVar->data[0];
         tmp.data[1] = heapVar->data[1];
         tmp.data[2] = heapVar->data[2];
-        sithCogExec_PushStack(ctx, &tmp);
+        sithCogExec_PushStack(pCog, &tmp);
     }
 }
 
-void sithCogFunction_HeapFree(sithCog *ctx)
+void sithCogFunction_HeapFree(sithCog *pCog)
 {
-    if ( ctx->heap )
+    if ( pCog->heap )
     {
-        SITH_FREE(ctx->heap);
-        ctx->heapSize = 0;
+        SITH_FREE(pCog->heap);
+        pCog->heapSize = 0;
     }
 }
 
-void sithCogFunction_GetSelfCog(sithCog *ctx)
+void sithCogFunction_GetSelfCog(sithCog *pCog)
 {
-    sithCogExec_PushInt(ctx, ctx->idx);
+    sithCogExec_PushInt(pCog, pCog->idx);
 }
 
-void sithCogFunction_GetMasterCog(sithCog *ctx)
+void sithCogFunction_GetMasterCog(sithCog *pCog)
 {
     if ( sithCog_g_pMasterCog )
-        sithCogExec_PushInt(ctx, sithCog_g_pMasterCog->idx);
+        sithCogExec_PushInt(pCog, sithCog_g_pMasterCog->idx);
     else
-        sithCogExec_PushInt(ctx, -1);
+        sithCogExec_PushInt(pCog, -1);
 }
 
-void sithCogFunction_SetMasterCog(sithCog *ctx)
+void sithCogFunction_SetMasterCog(sithCog *pCog)
 {
-    sithCog_g_pMasterCog = sithCogExec_PopCog(ctx);
+    sithCog_g_pMasterCog = sithCogExec_PopCog(pCog);
 }
 
 // MOTS added
-void sithCogFunction_GetActionCog(sithCog *ctx)
+void sithCogFunction_GetActionCog(sithCog *pCog)
 {
     if ( sithCog_pActionCog )
-        sithCogExec_PushInt(ctx, sithCog_pActionCog->idx);
+        sithCogExec_PushInt(pCog, sithCog_pActionCog->idx);
     else
-        sithCogExec_PushInt(ctx, -1);
+        sithCogExec_PushInt(pCog, -1);
 }
 
 // MOTS added
@@ -1030,7 +1030,7 @@ void sithCogFunction_SetActionCog(sithCog *ctx)
     sithCog_pActionCog = (pCog == (void*)-1) ? NULL : pCog;
 }
 
-void sithCogFunction_NewColorEffect(sithCog *ctx)
+void sithCogFunction_NewColorEffect(sithCog *pCog)
 {
     int addB; // ebx
     int addG; // ebp
@@ -1044,20 +1044,20 @@ void sithCogFunction_NewColorEffect(sithCog *ctx)
     cog_flex_t fade; // [esp+28h] [ebp-4h]
     int filterB; // [esp+30h] [ebp+4h]
 
-    fade = sithCogExec_PopFlex(ctx);
-    addB = sithCogExec_PopInt(ctx);
-    addG = sithCogExec_PopInt(ctx);
-    addR = sithCogExec_PopInt(ctx);
-    tintB = sithCogExec_PopFlex(ctx);
-    tintG = sithCogExec_PopFlex(ctx);
-    tintR = sithCogExec_PopFlex(ctx);
-    filterB = sithCogExec_PopInt(ctx);
-    filterG = sithCogExec_PopInt(ctx);
-    filterR = sithCogExec_PopInt(ctx);
+    fade = sithCogExec_PopFlex(pCog);
+    addB = sithCogExec_PopInt(pCog);
+    addG = sithCogExec_PopInt(pCog);
+    addR = sithCogExec_PopInt(pCog);
+    tintB = sithCogExec_PopFlex(pCog);
+    tintG = sithCogExec_PopFlex(pCog);
+    tintR = sithCogExec_PopFlex(pCog);
+    filterB = sithCogExec_PopInt(pCog);
+    filterG = sithCogExec_PopInt(pCog);
+    filterR = sithCogExec_PopInt(pCog);
     idx = stdPalEffects_NewRequest(1);
     if ( idx == -1 )
     {
-        sithCogExec_PushInt(ctx, -1);
+        sithCogExec_PushInt(pCog, -1);
     }
     else
     {
@@ -1065,11 +1065,11 @@ void sithCogFunction_NewColorEffect(sithCog *ctx)
         stdPalEffects_SetTint(idx, tintR, tintG, tintB);
         stdPalEffects_SetAdd(idx, addR, addG, addB);
         stdPalEffects_SetFade(idx, fade);
-        sithCogExec_PushInt(ctx, idx);
+        sithCogExec_PushInt(pCog, idx);
     }
 }
 
-void sithCogFunction_ModifyColorEffect(sithCog *ctx)
+void sithCogFunction_ModifyColorEffect(sithCog *pCog)
 {
     cog_flex_t fade; // ST34_4
     int addB; // edi
@@ -1083,38 +1083,38 @@ void sithCogFunction_ModifyColorEffect(sithCog *ctx)
     int idx; // esi
     int filterB; // [esp+2Ch] [ebp+4h]
 
-    fade = sithCogExec_PopFlex(ctx);
-    addB = sithCogExec_PopInt(ctx);
-    addG = sithCogExec_PopInt(ctx);
-    addR = sithCogExec_PopInt(ctx);
-    tintB = sithCogExec_PopFlex(ctx);
-    tintG = sithCogExec_PopFlex(ctx);
-    tintR = sithCogExec_PopFlex(ctx);
-    filterB = sithCogExec_PopInt(ctx);
-    filterG = sithCogExec_PopInt(ctx);
-    filterR = sithCogExec_PopInt(ctx);
-    idx = sithCogExec_PopInt(ctx);
+    fade = sithCogExec_PopFlex(pCog);
+    addB = sithCogExec_PopInt(pCog);
+    addG = sithCogExec_PopInt(pCog);
+    addR = sithCogExec_PopInt(pCog);
+    tintB = sithCogExec_PopFlex(pCog);
+    tintG = sithCogExec_PopFlex(pCog);
+    tintR = sithCogExec_PopFlex(pCog);
+    filterB = sithCogExec_PopInt(pCog);
+    filterG = sithCogExec_PopInt(pCog);
+    filterR = sithCogExec_PopInt(pCog);
+    idx = sithCogExec_PopInt(pCog);
     stdPalEffects_SetFilter(idx, filterR, filterG, filterB);
     stdPalEffects_SetTint(idx, tintR, tintG, tintB);
     stdPalEffects_SetAdd(idx, addR, addG, addB);
     stdPalEffects_SetFade(idx, fade);
 }
 
-void sithCogFunction_FreeColorEffect(sithCog *ctx)
+void sithCogFunction_FreeColorEffect(sithCog *pCog)
 {
     uint32_t v1; // eax
 
-    v1 = sithCogExec_PopInt(ctx);
+    v1 = sithCogExec_PopInt(pCog);
     stdPalEffects_FreeRequest(v1);
 }
 
-void sithCogFunction_AddDynamicTint(sithCog *ctx)
+void sithCogFunction_AddDynamicTint(sithCog *pCog)
 {
     sithCog *v1; // esi
     SithThing *player; // eax
 
-    v1 = ctx;
-    cog_flex_t fB = sithCogExec_PopFlex(ctx);
+    v1 = pCog;
+    cog_flex_t fB = sithCogExec_PopFlex(pCog);
     cog_flex_t fG = sithCogExec_PopFlex(v1);
     cog_flex_t fR = sithCogExec_PopFlex(v1);
     player = sithCogExec_PopThing(v1);
@@ -1122,17 +1122,17 @@ void sithCogFunction_AddDynamicTint(sithCog *ctx)
         sithPlayer_AddDynamicTint(fR, fG, fB);
 }
 
-void sithCogFunction_AddDynamicAdd(sithCog *ctx)
+void sithCogFunction_AddDynamicAdd(sithCog *pCog)
 {
     int b; // edi
     int g; // ebx
     int r; // ebp
     SithThing *pLocalPlayer; // eax
 
-    b = sithCogExec_PopInt(ctx);
-    g = sithCogExec_PopInt(ctx);
-    r = sithCogExec_PopInt(ctx);
-    pLocalPlayer = sithCogExec_PopThing(ctx);
+    b = sithCogExec_PopInt(pCog);
+    g = sithCogExec_PopInt(pCog);
+    r = sithCogExec_PopInt(pCog);
+    pLocalPlayer = sithCogExec_PopThing(pCog);
     if ( pLocalPlayer && pLocalPlayer->type == SITH_THING_PLAYER && pLocalPlayer == sithPlayer_g_pLocalPlayerThing )
         sithPlayer_AddDyamicAdd(r, g, b);
 }
@@ -1140,64 +1140,64 @@ void sithCogFunction_AddDynamicAdd(sithCog *ctx)
 // modifycoloreffect, freecoloreffect, adddynamictint, adddynamicadd
 
 // MOTS added
-void sithCogFunction_FireProjectileInternal(sithCog *ctx, int extra)
+void sithCogFunction_FireProjectileInternal(sithCog *pCog, int extra)
 {
     rdVector3 aimError;
     rdVector3 fireOffset;
     
-    cog_flex_t autoaimMaxDist = sithCogExec_PopFlex(ctx);
-    cog_flex_t autoaimFov = sithCogExec_PopFlex(ctx);
-    int scaleFlags = sithCogExec_PopInt(ctx);
-    cog_flex_t scale = sithCogExec_PopFlex(ctx);
-    sithCogExec_PopVector(ctx,&aimError);
-    sithCogExec_PopVector(ctx,&fireOffset);
-    int mode = sithCogExec_PopInt(ctx);
-    sithSound* fireSound = sithCogExec_PopSound(ctx);
-    SithThing* projectileTemplate = sithCogExec_PopTemplate(ctx);
-    SithThing* pMeshCollided = sithCogExec_PopThing(ctx);
+    cog_flex_t autoaimMaxDist = sithCogExec_PopFlex(pCog);
+    cog_flex_t autoaimFov = sithCogExec_PopFlex(pCog);
+    int scaleFlags = sithCogExec_PopInt(pCog);
+    cog_flex_t scale = sithCogExec_PopFlex(pCog);
+    sithCogExec_PopVector(pCog,&aimError);
+    sithCogExec_PopVector(pCog,&fireOffset);
+    int mode = sithCogExec_PopInt(pCog);
+    sithSound* fireSound = sithCogExec_PopSound(pCog);
+    SithThing* projectileTemplate = sithCogExec_PopTemplate(pCog);
+    SithThing* pMeshCollided = sithCogExec_PopThing(pCog);
 
     if (pMeshCollided) {
         projectileTemplate = sithWeapon_FireProjectile(pMeshCollided,projectileTemplate,fireSound,mode,&fireOffset,&aimError,scale,(int16_t)scaleFlags,autoaimFov,autoaimMaxDist,extra);
         if (projectileTemplate) {
-            sithCogExec_PushInt(ctx,projectileTemplate->idx);
+            sithCogExec_PushInt(pCog,projectileTemplate->idx);
             return;
         }
     }
-    sithCogExec_PushInt(ctx,-1);
+    sithCogExec_PushInt(pCog,-1);
 }
 
-void sithCogFunction_FireProjectile(sithCog *ctx)
+void sithCogFunction_FireProjectile(sithCog *pCog)
 {
-    sithCogFunction_FireProjectileInternal(ctx, 0);
+    sithCogFunction_FireProjectileInternal(pCog, 0);
 }
 
 // MOTS added
-void sithCogFunction_FireProjectileData(sithCog *ctx)
+void sithCogFunction_FireProjectileData(sithCog *pCog)
 {
-    int popA = sithCogExec_PopInt(ctx);
-    sithCogFunction_FireProjectileInternal(ctx,popA);
+    int popA = sithCogExec_PopInt(pCog);
+    sithCogFunction_FireProjectileInternal(pCog,popA);
 }
 
 // MOTS added
-void sithCogFunction_FireProjectileLocal(sithCog *ctx)
+void sithCogFunction_FireProjectileLocal(sithCog *pCog)
 {
     int tmp = sithMessage_g_outputstream;
     sithMessage_g_outputstream = 0;
-    sithCogFunction_FireProjectile(ctx);
+    sithCogFunction_FireProjectile(pCog);
     sithMessage_g_outputstream = tmp;
     return;
 }
 
-void sithCogFunction_SendTrigger(sithCog *ctx)
+void sithCogFunction_SendTrigger(sithCog *pCog)
 {
     SithPlayer* pPlayer;
 
-    cog_flex_t arg3 = sithCogExec_PopFlex(ctx);
-    cog_flex_t arg2 = sithCogExec_PopFlex(ctx);
-    cog_flex_t arg1 = sithCogExec_PopFlex(ctx);
-    cog_flex_t arg0 = sithCogExec_PopFlex(ctx);
-    int sourceType = sithCogExec_PopInt(ctx);
-    SithThing* sourceThing = sithCogExec_PopThing(ctx);
+    cog_flex_t arg3 = sithCogExec_PopFlex(pCog);
+    cog_flex_t arg2 = sithCogExec_PopFlex(pCog);
+    cog_flex_t arg1 = sithCogExec_PopFlex(pCog);
+    cog_flex_t arg0 = sithCogExec_PopFlex(pCog);
+    int sourceType = sithCogExec_PopInt(pCog);
+    SithThing* sourceThing = sithCogExec_PopThing(pCog);
     
     if ( sourceThing )
     {
@@ -1247,52 +1247,52 @@ void sithCogFunction_SendTrigger(sithCog *ctx)
     }
 }
 
-void sithCogFunction_ActivateWeapon(sithCog *ctx)
+void sithCogFunction_ActivateWeapon(sithCog *pCog)
 {
-    int mode = sithCogExec_PopInt(ctx);
-    cog_flex_t fireRate = sithCogExec_PopFlex(ctx);
-    SithThing* weaponThing = sithCogExec_PopThing(ctx);
+    int mode = sithCogExec_PopInt(pCog);
+    cog_flex_t fireRate = sithCogExec_PopFlex(pCog);
+    SithThing* weaponThing = sithCogExec_PopThing(pCog);
 
     if ( weaponThing && fireRate >= 0.0 && mode >= 0 && mode < 2 )
-        sithWeapon_ActivateWeapon(weaponThing, ctx, fireRate, mode);
+        sithWeapon_ActivateWeapon(weaponThing, pCog, fireRate, mode);
 }
 
-void sithCogFunction_DeactivateWeapon(sithCog *ctx)
+void sithCogFunction_DeactivateWeapon(sithCog *pCog)
 {
-    int mode = sithCogExec_PopInt(ctx);
-    SithThing* weapon = sithCogExec_PopThing(ctx);
+    int mode = sithCogExec_PopInt(pCog);
+    SithThing* weapon = sithCogExec_PopThing(pCog);
     if ( weapon && mode >= 0 && mode < 2 )
     {
-        sithCogExec_PushFlex(ctx, sithWeapon_DeactivateWeapon(weapon, ctx, mode));
+        sithCogExec_PushFlex(pCog, sithWeapon_DeactivateWeapon(weapon, pCog, mode));
     }
     else
     {
-        sithCogExec_PushFlex(ctx, -1.0);
+        sithCogExec_PushFlex(pCog, -1.0);
     }
 }
 
-void sithCogFunction_SetFireWait(sithCog *ctx)
+void sithCogFunction_SetFireWait(sithCog *pCog)
 {
-    cog_flex_t fireRate = sithCogExec_PopFlex(ctx);
-    SithThing* weapon = sithCogExec_PopThing(ctx);
+    cog_flex_t fireRate = sithCogExec_PopFlex(pCog);
+    SithThing* weapon = sithCogExec_PopThing(pCog);
 
     if ( weapon && weapon == sithPlayer_g_pLocalPlayerThing && fireRate >= -1.0 )
         sithWeapon_SetFireWait(weapon, fireRate);
 }
 
-void sithCogFunction_SetMountWait(sithCog *ctx)
+void sithCogFunction_SetMountWait(sithCog *pCog)
 {
-    cog_flex_t mountWait = sithCogExec_PopFlex(ctx);
-    SithThing* weapon = sithCogExec_PopThing(ctx);
+    cog_flex_t mountWait = sithCogExec_PopFlex(pCog);
+    SithThing* weapon = sithCogExec_PopThing(pCog);
 
     if ( weapon && weapon == sithPlayer_g_pLocalPlayerThing && mountWait >= -1.0 )
         sithWeapon_SetMountWait(weapon, mountWait);
 }
 
-void sithCogFunction_SelectWeapon(sithCog *ctx)
+void sithCogFunction_SelectWeapon(sithCog *pCog)
 {
-    int binIdx = sithCogExec_PopInt(ctx);
-    SithThing* player = sithCogExec_PopThing(ctx);
+    int binIdx = sithCogExec_PopInt(pCog);
+    SithThing* player = sithCogExec_PopThing(pCog);
 
     if (Main_bMotsCompat && binIdx < SITHBIN_ENERGY) {
         binIdx = sithInventory_SelectWeaponFollowing(binIdx);
@@ -1305,10 +1305,10 @@ void sithCogFunction_SelectWeapon(sithCog *ctx)
     }
 }
 
-void sithCogFunction_AssignWeapon(sithCog *ctx)
+void sithCogFunction_AssignWeapon(sithCog *pCog)
 {
-    int binIdx = sithCogExec_PopInt(ctx);
-    SithThing* player = sithCogExec_PopThing(ctx);
+    int binIdx = sithCogExec_PopInt(pCog);
+    SithThing* player = sithCogExec_PopThing(pCog);
 
     if (Main_bMotsCompat && binIdx < SITHBIN_ENERGY) {
         binIdx = sithInventory_SelectWeaponFollowing(binIdx);
@@ -1321,10 +1321,10 @@ void sithCogFunction_AssignWeapon(sithCog *ctx)
     }
 }
 
-void sithCogFunction_AutoSelectWeapon(sithCog *ctx)
+void sithCogFunction_AutoSelectWeapon(sithCog *pCog)
 {
-    int weapIdx = sithCogExec_PopInt(ctx);
-    SithThing* player = sithCogExec_PopThing(ctx);
+    int weapIdx = sithCogExec_PopInt(pCog);
+    SithThing* player = sithCogExec_PopThing(pCog);
 
     if ( weapIdx >= 0 && weapIdx <= 2 && player )
     {
@@ -1333,20 +1333,20 @@ void sithCogFunction_AutoSelectWeapon(sithCog *ctx)
             binIdx = sithInventory_SelectWeaponPrior(binIdx);
         }
 
-        sithCogExec_PushInt(ctx, binIdx);
+        sithCogExec_PushInt(pCog, binIdx);
     }
     else
     {
-        sithCogExec_PushInt(ctx, -1);
+        sithCogExec_PushInt(pCog, -1);
     }
 }
 
-void sithCogFunction_SetCurWeapon(sithCog *ctx)
+void sithCogFunction_SetCurWeapon(sithCog *pCog)
 {
     int v4; // eax
 
-    int binIdx = sithCogExec_PopInt(ctx);
-    SithThing* player = sithCogExec_PopThing(ctx);
+    int binIdx = sithCogExec_PopInt(pCog);
+    SithThing* player = sithCogExec_PopThing(pCog);
 
     if (Main_bMotsCompat && binIdx < SITHBIN_ENERGY) {
         binIdx = sithInventory_SelectWeaponFollowing(binIdx);
@@ -1363,11 +1363,11 @@ void sithCogFunction_SetCurWeapon(sithCog *ctx)
     }
 }
 
-void sithCogFunction_GetWeaponPriority(sithCog *ctx)
+void sithCogFunction_GetWeaponPriority(sithCog *pCog)
 {
-    int mode = sithCogExec_PopInt(ctx);
-    int binIdx = sithCogExec_PopInt(ctx);
-    SithThing* player = sithCogExec_PopThing(ctx);
+    int mode = sithCogExec_PopInt(pCog);
+    int binIdx = sithCogExec_PopInt(pCog);
+    SithThing* player = sithCogExec_PopThing(pCog);
 
     if (Main_bMotsCompat && binIdx < SITHBIN_ENERGY) {
         binIdx = sithInventory_SelectWeaponFollowing(binIdx);
@@ -1377,26 +1377,26 @@ void sithCogFunction_GetWeaponPriority(sithCog *ctx)
     {
         if ( mode < 0 || mode > 2 )
         {
-            sithCogExec_PushInt(ctx, -1);
+            sithCogExec_PushInt(pCog, -1);
             return;
         }
         if ( binIdx >= 0 && binIdx < SITHBIN_NUMBINS )
         {
-            sithCogExec_PushFlex(ctx, sithWeapon_GetPriority(player, binIdx, mode));
+            sithCogExec_PushFlex(pCog, sithWeapon_GetPriority(player, binIdx, mode));
             return;
         }
     }
-    sithCogExec_PushFlex(ctx, -1.0);
+    sithCogExec_PushFlex(pCog, -1.0);
 }
 
-void sithCogFunction_GetCurWeaponMode(sithCog *ctx)
+void sithCogFunction_GetCurWeaponMode(sithCog *pCog)
 {
-    sithCogExec_PushInt(ctx, sithWeapon_GetCurWeaponMode());
+    sithCogExec_PushInt(pCog, sithWeapon_GetCurWeaponMode());
 }
 
-void sithCogFunction_GetCurWeapon(sithCog *ctx)
+void sithCogFunction_GetCurWeapon(sithCog *pCog)
 {
-    SithThing* player = sithCogExec_PopThing(ctx);
+    SithThing* player = sithCogExec_PopThing(pCog);
 
     if ( player && player->type == SITH_THING_PLAYER )
     {
@@ -1404,132 +1404,132 @@ void sithCogFunction_GetCurWeapon(sithCog *ctx)
         if (Main_bMotsCompat) {
             binIdx = sithInventory_SelectWeaponPrior(binIdx);
         }
-        sithCogExec_PushInt(ctx, binIdx);
+        sithCogExec_PushInt(pCog, binIdx);
     }
     else
     {
-        sithCogExec_PushInt(ctx, -1);
+        sithCogExec_PushInt(pCog, -1);
     }
 }
 
 // MOTS added
-void sithCogFunction_GetWeaponBin(sithCog *ctx)
+void sithCogFunction_GetWeaponBin(sithCog *pCog)
 {
     int popA;
     
-    popA = sithCogExec_PopInt(ctx);
+    popA = sithCogExec_PopInt(pCog);
     popA = sithInventory_SelectWeaponFollowing(popA);
-    sithCogExec_PushInt(ctx,popA);
+    sithCogExec_PushInt(pCog,popA);
 }
 
-void sithCogFunction_GetCameraStateFlags(sithCog *ctx)
+void sithCogFunction_GetCameraStateFlags(sithCog *pCog)
 {
     int v1; // eax
 
     v1 = sithCamera_GetCameraStateFlags();
-    sithCogExec_PushInt(ctx, v1);
+    sithCogExec_PushInt(pCog, v1);
 }
 
-void sithCogFunction_SetCameraStateFlags(sithCog *ctx)
+void sithCogFunction_SetCameraStateFlags(sithCog *pCog)
 {
     int v1; // eax
 
-    v1 = sithCogExec_PopInt(ctx);
+    v1 = sithCogExec_PopInt(pCog);
     sithCamera_SetCameraStateFlags(v1);
 }
 
-void sithCogFunction_SetMultiModeFlags(sithCog *ctx)
+void sithCogFunction_SetMultiModeFlags(sithCog *pCog)
 {
-    sithNet_MultiModeFlags |= sithCogExec_PopInt(ctx);
+    sithNet_MultiModeFlags |= sithCogExec_PopInt(pCog);
 }
 
-void sithCogFunction_GetMultiModeFlags(sithCog *ctx)
+void sithCogFunction_GetMultiModeFlags(sithCog *pCog)
 {
-    sithCogExec_PushInt(ctx, sithNet_MultiModeFlags);
+    sithCogExec_PushInt(pCog, sithNet_MultiModeFlags);
 }
 
-void sithCogFunction_ClearMultiModeFlags(sithCog *ctx)
+void sithCogFunction_ClearMultiModeFlags(sithCog *pCog)
 {
-    sithNet_MultiModeFlags &= ~sithCogExec_PopInt(ctx);
+    sithNet_MultiModeFlags &= ~sithCogExec_PopInt(pCog);
 }
 
-void sithCogFunction_IsMulti(sithCog *ctx)
+void sithCogFunction_IsMulti(sithCog *pCog)
 {
     if ( sithNet_isMulti )
-        sithCogExec_PushInt(ctx, 1);
+        sithCogExec_PushInt(pCog, 1);
     else
-        sithCogExec_PushInt(ctx, 0);
+        sithCogExec_PushInt(pCog, 0);
 }
 
-void sithCogFunction_IsServer(sithCog *ctx)
+void sithCogFunction_IsServer(sithCog *pCog)
 {
-    sithCogFunction_ReturnBool(sithNet_isServer, ctx);
+    sithCogFunction_ReturnBool(sithNet_isServer, pCog);
 }
 
 // unused
-void sithCogFunction_ReturnBool(int a1, sithCog *a2)
+void sithCogFunction_ReturnBool(int pCog, sithCog *a2)
 {
-    if ( a1 )
+    if ( pCog )
         sithCogExec_PushInt(a2, 1);
     else
         sithCogExec_PushInt(a2, 0);
 }
 
-void sithCogFunction_GetTeamScore(sithCog *ctx)
+void sithCogFunction_GetTeamScore(sithCog *pCog)
 {
     signed int idx; // eax
 
-    idx = sithCogExec_PopInt(ctx);
+    idx = sithCogExec_PopInt(pCog);
     if ( idx <= 0 || idx >= 5 )
-        sithCogExec_PushInt(ctx, -999999);
+        sithCogExec_PushInt(pCog, -999999);
     else
-        sithCogExec_PushInt(ctx, sithNet_teamScore[idx]);
+        sithCogExec_PushInt(pCog, sithNet_teamScore[idx]);
 }
 
-void sithCogFunction_SetTeamScore(sithCog *ctx)
+void sithCogFunction_SetTeamScore(sithCog *pCog)
 {
     signed int score; // edi
     signed int idx; // eax
 
-    score = sithCogExec_PopInt(ctx);
-    idx = sithCogExec_PopInt(ctx);
+    score = sithCogExec_PopInt(pCog);
+    idx = sithCogExec_PopInt(pCog);
     if ( idx > 0 && idx < 5 )
         sithNet_teamScore[idx] = score;
 }
 
-void sithCogFunction_GetTimeLimit(sithCog *a1)
+void sithCogFunction_GetTimeLimit(sithCog *pCog)
 {
     cog_flex_t a2 = (flex_d_t)(unsigned int)sithNet_multiplayer_timelimit * 0.000016666667;
-    sithCogExec_PushFlex(a1, a2);
+    sithCogExec_PushFlex(pCog, a2);
 }
 
-void sithCogFunction_SetTimeLimit(sithCog *ctx)
+void sithCogFunction_SetTimeLimit(sithCog *pCog)
 {
-    cog_flex_t v1 = sithCogExec_PopFlex(ctx);
+    cog_flex_t v1 = sithCogExec_PopFlex(pCog);
     if ( v1 >= 0.0 )
         sithNet_multiplayer_timelimit = (int)(v1 * 60000.0);
 }
 
-void sithCogFunction_GetScoreLimit(sithCog *ctx)
+void sithCogFunction_GetScoreLimit(sithCog *pCog)
 {
-    sithCogExec_PushInt(ctx, sithNet_scorelimit);
+    sithCogExec_PushInt(pCog, sithNet_scorelimit);
 }
 
-void sithCogFunction_SetScoreLimit(sithCog *ctx)
+void sithCogFunction_SetScoreLimit(sithCog *pCog)
 {
-    sithNet_scorelimit = sithCogExec_PopInt(ctx);
+    sithNet_scorelimit = sithCogExec_PopInt(pCog);
 }
 
-void sithCogFunction_ChangeFireRate(sithCog *ctx)
+void sithCogFunction_ChangeFireRate(sithCog *pCog)
 {
-    cog_flex_t fireRate = sithCogExec_PopFlex(ctx);
-    SithThing* player = sithCogExec_PopThing(ctx);
+    cog_flex_t fireRate = sithCogExec_PopFlex(pCog);
+    SithThing* player = sithCogExec_PopThing(pCog);
 
     if ( player && player == sithPlayer_g_pLocalPlayerThing && fireRate > 0.0 )
         sithWeapon_SetFireRate(player, fireRate);
 }
 
-void sithCogFunction_AutoSavegame(sithCog *ctx)
+void sithCogFunction_AutoSavegame(sithCog *pCog)
 {
     char tmp[128];
 
@@ -1538,11 +1538,11 @@ void sithCogFunction_AutoSavegame(sithCog *ctx)
     sithGamesave_Save(tmp, 1, 0, 0);
 }
 
-void sithCogFunction_SetCameraFocii(sithCog *ctx)
+void sithCogFunction_SetCameraFocii(sithCog *pCog)
 {
-    SithThing* focusThing2 = sithCogExec_PopThing(ctx);
-    SithThing* focusThing = sithCogExec_PopThing(ctx);
-    int camIdx = sithCogExec_PopInt(ctx);
+    SithThing* focusThing2 = sithCogExec_PopThing(pCog);
+    SithThing* focusThing = sithCogExec_PopThing(pCog);
+    int camIdx = sithCogExec_PopInt(pCog);
 
 #ifdef QOL_IMPROVEMENTS
     // Droidworks tmp
@@ -1558,15 +1558,15 @@ void sithCogFunction_SetCameraFocii(sithCog *ctx)
 }
 
 // MOTS added
-void sithCogFunction_Pow(sithCog *ctx)
+void sithCogFunction_Pow(sithCog *pCog)
 {
-    cog_flex_t fVar2 = sithCogExec_PopFlex(ctx);
-    cog_flex_t fVar3 = sithCogExec_PopFlex(ctx);
+    cog_flex_t fVar2 = sithCogExec_PopFlex(pCog);
+    cog_flex_t fVar3 = sithCogExec_PopFlex(pCog);
     if ((fVar2 == 0.0) && (fVar3 == 0.0)) {
-        sithCogExec_PushFlex(ctx,0.0);
+        sithCogExec_PushFlex(pCog,0.0);
         return;
     }
-    sithCogExec_PushFlex(ctx,stdMath_FlexPower(fVar2, fVar3)); // TODO verify
+    sithCogExec_PushFlex(pCog,stdMath_FlexPower(fVar2, fVar3)); // TODO verify
     return;
 }
 
@@ -1579,33 +1579,33 @@ void sithCogFunction_Wakeup(sithCog *pCtx)
 }
 
 // MOTS added
-void sithCogFunction_Sin(sithCog *ctx)
+void sithCogFunction_Sin(sithCog *pCog)
 {
     flex_t outSin;
     flex_t outCos;
     
-    cog_flex_t angle = sithCogExec_PopFlex(ctx);
+    cog_flex_t angle = sithCogExec_PopFlex(pCog);
     stdMath_SinCos(angle,&outSin,&outCos);
-    sithCogExec_PushFlex(ctx,outSin);
+    sithCogExec_PushFlex(pCog,outSin);
 }
 
 // MOTS added
-void sithCogFunction_Cos(sithCog *ctx)
+void sithCogFunction_Cos(sithCog *pCog)
 {
     flex_t outSin;
     flex_t outCos;
     
-    cog_flex_t angle = sithCogExec_PopFlex(ctx);
+    cog_flex_t angle = sithCogExec_PopFlex(pCog);
     stdMath_SinCos(angle,&outSin,&outCos);
-    sithCogExec_PushFlex(ctx,outCos);
+    sithCogExec_PushFlex(pCog,outCos);
 }
 
 // MOTS added
-void sithCogFunction_Tan(sithCog *ctx)
+void sithCogFunction_Tan(sithCog *pCog)
 {
-    cog_flex_t fVar1 = sithCogExec_PopFlex(ctx);
+    cog_flex_t fVar1 = sithCogExec_PopFlex(pCog);
     fVar1 = stdMath_Tan(fVar1);
-    sithCogExec_PushFlex(ctx,fVar1);
+    sithCogExec_PushFlex(pCog,fVar1);
 }
 
 // MOTS added
@@ -1634,21 +1634,21 @@ void sithCogFunction_ClearCogFlags(sithCog *ctx)
 }
 
 // MOTS added
-void sithCogFunction_DebugBreak(sithCog *ctx)
+void sithCogFunction_DebugBreak(sithCog *pCog)
 {
     // TODO
 }
 
 // MOTS added
-void sithCogFunction_WorldFlash(sithCog *ctx)
+void sithCogFunction_WorldFlash(sithCog *pCog)
 {
-    cog_flex_t arg2 = sithCogExec_PopFlex(ctx);
-    cog_flex_t arg1 = sithCogExec_PopFlex(ctx);
+    cog_flex_t arg2 = sithCogExec_PopFlex(pCog);
+    cog_flex_t arg1 = sithCogExec_PopFlex(pCog);
     sithRender_WorldFlash(arg1, arg2);
 }
 
 // MOTS added
-void sithCogFunction_GetSysDate(sithCog *ctx)
+void sithCogFunction_GetSysDate(sithCog *pCog)
 {
     rdVector3 out;
 
@@ -1674,11 +1674,11 @@ void sithCogFunction_GetSysDate(sithCog *ctx)
         rdVector_Zero3(&out);
     }
 
-    sithCogExec_PushVector(ctx, &out);
+    sithCogExec_PushVector(pCog, &out);
 }
 
 // MOTS added
-void sithCogFunction_GetSysTime(sithCog *ctx)
+void sithCogFunction_GetSysTime(sithCog *pCog)
 {
     rdVector3 out;
 
@@ -1704,11 +1704,11 @@ void sithCogFunction_GetSysTime(sithCog *ctx)
     }
     
 
-    sithCogExec_PushVector(ctx, &out);
+    sithCogExec_PushVector(pCog, &out);
 }
 
 // MOTS added
-void sithCogFunction_SendMessageExRadius(sithCog *ctx)
+void sithCogFunction_SendMessageExRadius(sithCog *pCog)
 {
     cog_flex_t fVar1;
     cog_flex_t fVar2;
@@ -1720,14 +1720,14 @@ void sithCogFunction_SendMessageExRadius(sithCog *ctx)
     int local_28;
     rdVector3 local_1c;
 
-    cog_flex_t local_4 = sithCogExec_PopFlex(ctx);
-    cog_flex_t local_8 = sithCogExec_PopFlex(ctx);
-    cog_flex_t local_c = sithCogExec_PopFlex(ctx);
-    cog_flex_t local_10 = sithCogExec_PopFlex(ctx);
-    message = sithCogExec_PopInt(ctx);
-    uVar4 = sithCogExec_PopInt(ctx);
-    cog_flex_t fVar6 = sithCogExec_PopFlex(ctx);
-    iVar5 = sithCogExec_PopVector(ctx,&local_1c);
+    cog_flex_t local_4 = sithCogExec_PopFlex(pCog);
+    cog_flex_t local_8 = sithCogExec_PopFlex(pCog);
+    cog_flex_t local_c = sithCogExec_PopFlex(pCog);
+    cog_flex_t local_10 = sithCogExec_PopFlex(pCog);
+    message = sithCogExec_PopInt(pCog);
+    uVar4 = sithCogExec_PopInt(pCog);
+    cog_flex_t fVar6 = sithCogExec_PopFlex(pCog);
+    iVar5 = sithCogExec_PopVector(pCog,&local_1c);
     cog_flex_t param1 = local_c;
     cog_flex_t param0 = local_10;
     if ((((iVar5 != 0) && (-1 < message)) && (message < SITH_MESSAGE_ENTERBUBBLE)) 
@@ -1756,175 +1756,175 @@ void sithCogFunction_SendMessageExRadius(sithCog *ctx)
 
 
 
-void sithCogFunction_Startup(SithCogSymbolTable* ctx)
+void sithCogFunction_Startup(SithCogSymbolTable* pCog)
 {
-    sithCog_RegisterFunction(ctx, sithCogFunction_Sleep, "sleep");
+    sithCog_RegisterFunction(pCog, sithCogFunction_Sleep, "sleep");
     if (Main_bMotsCompat) {
-        sithCog_RegisterFunction(ctx, sithCogFunction_Pow, "pow"); // MOTS
-        sithCog_RegisterFunction(ctx, sithCogFunction_Wakeup, "wakeup"); // MOTS
+        sithCog_RegisterFunction(pCog, sithCogFunction_Pow, "pow"); // MOTS
+        sithCog_RegisterFunction(pCog, sithCogFunction_Wakeup, "wakeup"); // MOTS
     }
-    sithCog_RegisterFunction(ctx, sithCogFunction_Rand, "rand");
-    sithCog_RegisterFunction(ctx, sithCogFunction_RandVec, "randvec");
-    sithCog_RegisterFunction(ctx, sithCogFunction_GetSenderRef, "getsenderref");
-    sithCog_RegisterFunction(ctx, sithCogFunction_GetSenderType, "getsendertype");
-    sithCog_RegisterFunction(ctx, sithCogFunction_GetSenderID, "getsenderid");
-    sithCog_RegisterFunction(ctx, sithCogFunction_GetSourceType, "getsourcetype");
-    sithCog_RegisterFunction(ctx, sithCogFunction_GetSourceRef, "getsourceref");
-    sithCog_RegisterFunction(ctx, sithCogFunction_GetThingCount, "getthingcount");
-    sithCog_RegisterFunction(ctx, sithCogFunction_GetGravity, "getgravity");
-    sithCog_RegisterFunction(ctx, sithCogFunction_SetGravity, "setgravity");
-    sithCog_RegisterFunction(ctx, sithCogFunction_GetLevelTime, "getleveltime");
-    sithCog_RegisterFunction(ctx, sithCogFunction_GetGameTime, "getgametime");
-    sithCog_RegisterFunction(ctx, sithCogFunction_GetFlexGameTime, "getflexgametime");
-    sithCog_RegisterFunction(ctx, sithCogFunction_GetThingTemplateCount, "getthingtemplatecount");
-    sithCog_RegisterFunction(ctx, sithCogFunction_SetPulse, "setpulse");
-    sithCog_RegisterFunction(ctx, sithCogFunction_SetTimer, "settimer");
-    sithCog_RegisterFunction(ctx, sithCogFunction_SetTimerEx, "settimerex");
-    sithCog_RegisterFunction(ctx, sithCogFunction_KillTimerEx, "killtimerex");
-    sithCog_RegisterFunction(ctx, sithCogFunction_Reset, "reset");
-    sithCog_RegisterFunction(ctx, sithCogFunction_MaterialAnim, "materialanim");
-    sithCog_RegisterFunction(ctx, sithCogFunction_StopAnim, "stopanim");
-    sithCog_RegisterFunction(ctx, sithCogFunction_StopSurfaceAnim, "stopsurfaceanim");
-    sithCog_RegisterFunction(ctx, sithCogFunction_GetSurfaceAnim, "getsurfaceanim");
-    sithCog_RegisterFunction(ctx, sithCogFunction_SurfaceAnim, "surfaceanim");
-    sithCog_RegisterFunction(ctx, sithCogFunction_GetKeyLen, "getkeylen");
-    sithCog_RegisterFunction(ctx, sithCogFunction_LoadTemplate, "loadtemplate");
-    sithCog_RegisterFunction(ctx, sithCogFunction_LoadKeyframe, "loadkeyframe");
-    sithCog_RegisterFunction(ctx, sithCogFunction_LoadModel, "loadmodel");
-    sithCog_RegisterFunction(ctx, sithCogFunction_Print, "print");
-    sithCog_RegisterFunction(ctx, sithCogFunction_PrintInt, "printint");
-    sithCog_RegisterFunction(ctx, sithCogFunction_PrintFlex, "printflex");
-    sithCog_RegisterFunction(ctx, sithCogFunction_PrintVector, "printvector");
-    sithCog_RegisterFunction(ctx, sithCogFunction_VectorAdd, "vectoradd");
-    sithCog_RegisterFunction(ctx, sithCogFunction_VectorSub, "vectorsub");
-    sithCog_RegisterFunction(ctx, sithCogFunction_VectorDot, "vectordot");
-    sithCog_RegisterFunction(ctx, sithCogFunction_VectorCross, "vectorcross");
-    sithCog_RegisterFunction(ctx, sithCogFunction_VectorSet, "vectorset");
-    sithCog_RegisterFunction(ctx, sithCogFunction_VectorLen, "vectorlen");
-    sithCog_RegisterFunction(ctx, sithCogFunction_VectorScale, "vectorscale");
-    sithCog_RegisterFunction(ctx, sithCogFunction_VectorDist, "vectordist");
-    sithCog_RegisterFunction(ctx, sithCogFunction_VectorX, "vectorx");
-    sithCog_RegisterFunction(ctx, sithCogFunction_VectorY, "vectory");
-    sithCog_RegisterFunction(ctx, sithCogFunction_VectorZ, "vectorz");
-    sithCog_RegisterFunction(ctx, sithCogFunction_VectorNorm, "vectornorm");
+    sithCog_RegisterFunction(pCog, sithCogFunction_Rand, "rand");
+    sithCog_RegisterFunction(pCog, sithCogFunction_RandVec, "randvec");
+    sithCog_RegisterFunction(pCog, sithCogFunction_GetSenderRef, "getsenderref");
+    sithCog_RegisterFunction(pCog, sithCogFunction_GetSenderType, "getsendertype");
+    sithCog_RegisterFunction(pCog, sithCogFunction_GetSenderID, "getsenderid");
+    sithCog_RegisterFunction(pCog, sithCogFunction_GetSourceType, "getsourcetype");
+    sithCog_RegisterFunction(pCog, sithCogFunction_GetSourceRef, "getsourceref");
+    sithCog_RegisterFunction(pCog, sithCogFunction_GetThingCount, "getthingcount");
+    sithCog_RegisterFunction(pCog, sithCogFunction_GetGravity, "getgravity");
+    sithCog_RegisterFunction(pCog, sithCogFunction_SetGravity, "setgravity");
+    sithCog_RegisterFunction(pCog, sithCogFunction_GetLevelTime, "getleveltime");
+    sithCog_RegisterFunction(pCog, sithCogFunction_GetGameTime, "getgametime");
+    sithCog_RegisterFunction(pCog, sithCogFunction_GetFlexGameTime, "getflexgametime");
+    sithCog_RegisterFunction(pCog, sithCogFunction_GetThingTemplateCount, "getthingtemplatecount");
+    sithCog_RegisterFunction(pCog, sithCogFunction_SetPulse, "setpulse");
+    sithCog_RegisterFunction(pCog, sithCogFunction_SetTimer, "settimer");
+    sithCog_RegisterFunction(pCog, sithCogFunction_SetTimerEx, "settimerex");
+    sithCog_RegisterFunction(pCog, sithCogFunction_KillTimerEx, "killtimerex");
+    sithCog_RegisterFunction(pCog, sithCogFunction_Reset, "reset");
+    sithCog_RegisterFunction(pCog, sithCogFunction_MaterialAnim, "materialanim");
+    sithCog_RegisterFunction(pCog, sithCogFunction_StopAnim, "stopanim");
+    sithCog_RegisterFunction(pCog, sithCogFunction_StopSurfaceAnim, "stopsurfaceanim");
+    sithCog_RegisterFunction(pCog, sithCogFunction_GetSurfaceAnim, "getsurfaceanim");
+    sithCog_RegisterFunction(pCog, sithCogFunction_SurfaceAnim, "surfaceanim");
+    sithCog_RegisterFunction(pCog, sithCogFunction_GetKeyLen, "getkeylen");
+    sithCog_RegisterFunction(pCog, sithCogFunction_LoadTemplate, "loadtemplate");
+    sithCog_RegisterFunction(pCog, sithCogFunction_LoadKeyframe, "loadkeyframe");
+    sithCog_RegisterFunction(pCog, sithCogFunction_LoadModel, "loadmodel");
+    sithCog_RegisterFunction(pCog, sithCogFunction_Print, "print");
+    sithCog_RegisterFunction(pCog, sithCogFunction_PrintInt, "printint");
+    sithCog_RegisterFunction(pCog, sithCogFunction_PrintFlex, "printflex");
+    sithCog_RegisterFunction(pCog, sithCogFunction_PrintVector, "printvector");
+    sithCog_RegisterFunction(pCog, sithCogFunction_VectorAdd, "vectoradd");
+    sithCog_RegisterFunction(pCog, sithCogFunction_VectorSub, "vectorsub");
+    sithCog_RegisterFunction(pCog, sithCogFunction_VectorDot, "vectordot");
+    sithCog_RegisterFunction(pCog, sithCogFunction_VectorCross, "vectorcross");
+    sithCog_RegisterFunction(pCog, sithCogFunction_VectorSet, "vectorset");
+    sithCog_RegisterFunction(pCog, sithCogFunction_VectorLen, "vectorlen");
+    sithCog_RegisterFunction(pCog, sithCogFunction_VectorScale, "vectorscale");
+    sithCog_RegisterFunction(pCog, sithCogFunction_VectorDist, "vectordist");
+    sithCog_RegisterFunction(pCog, sithCogFunction_VectorX, "vectorx");
+    sithCog_RegisterFunction(pCog, sithCogFunction_VectorY, "vectory");
+    sithCog_RegisterFunction(pCog, sithCogFunction_VectorZ, "vectorz");
+    sithCog_RegisterFunction(pCog, sithCogFunction_VectorNorm, "vectornorm");
     if (Main_bMotsCompat) {
-        sithCog_RegisterFunction(ctx,sithCogFunction_VectorEqual,"vectorequal"); // MOTS
+        sithCog_RegisterFunction(pCog,sithCogFunction_VectorEqual,"vectorequal"); // MOTS
     }
-    sithCog_RegisterFunction(ctx, sithCogFunction_GetSithMode, "getsithmode");
-    sithCog_RegisterFunction(ctx, sithCogFunction_GetDifficulty, "getdifficulty");
-    sithCog_RegisterFunction(ctx, sithCogFunction_SetSubModeFlags, "setsubmodeflags");
-    sithCog_RegisterFunction(ctx, sithCogFunction_GetSubModeFlags, "getsubmodeflags");
-    sithCog_RegisterFunction(ctx, sithCogFunction_ClearSubModeFlags, "clearsubmodeflags");
-    sithCog_RegisterFunction(ctx, sithCogFunction_SetDebugModeFlags, "setdebugmodeflags");
-    sithCog_RegisterFunction(ctx, sithCogFunction_GetDebugModeFlags, "getdebugmodeflags");
-    sithCog_RegisterFunction(ctx, sithCogFunction_ClearDebugModeFlags, "cleardebugmodeflags");
-    sithCog_RegisterFunction(ctx, sithCogFunction_BitSet, "bitset");
-    sithCog_RegisterFunction(ctx, sithCogFunction_BitTest, "bittest");
-    sithCog_RegisterFunction(ctx, sithCogFunction_BitClear, "bitclear");
-    sithCog_RegisterFunction(ctx, sithCogFunction_FireProjectile, "fireprojectile");
+    sithCog_RegisterFunction(pCog, sithCogFunction_GetSithMode, "getsithmode");
+    sithCog_RegisterFunction(pCog, sithCogFunction_GetDifficulty, "getdifficulty");
+    sithCog_RegisterFunction(pCog, sithCogFunction_SetSubModeFlags, "setsubmodeflags");
+    sithCog_RegisterFunction(pCog, sithCogFunction_GetSubModeFlags, "getsubmodeflags");
+    sithCog_RegisterFunction(pCog, sithCogFunction_ClearSubModeFlags, "clearsubmodeflags");
+    sithCog_RegisterFunction(pCog, sithCogFunction_SetDebugModeFlags, "setdebugmodeflags");
+    sithCog_RegisterFunction(pCog, sithCogFunction_GetDebugModeFlags, "getdebugmodeflags");
+    sithCog_RegisterFunction(pCog, sithCogFunction_ClearDebugModeFlags, "cleardebugmodeflags");
+    sithCog_RegisterFunction(pCog, sithCogFunction_BitSet, "bitset");
+    sithCog_RegisterFunction(pCog, sithCogFunction_BitTest, "bittest");
+    sithCog_RegisterFunction(pCog, sithCogFunction_BitClear, "bitclear");
+    sithCog_RegisterFunction(pCog, sithCogFunction_FireProjectile, "fireprojectile");
     if (Main_bMotsCompat) {
-        sithCog_RegisterFunction(ctx,sithCogFunction_FireProjectileData,"fireprojectiledata"); // MOTS
-        sithCog_RegisterFunction(ctx,sithCogFunction_FireProjectileLocal,"fireprojectilelocal"); // MOTS
+        sithCog_RegisterFunction(pCog,sithCogFunction_FireProjectileData,"fireprojectiledata"); // MOTS
+        sithCog_RegisterFunction(pCog,sithCogFunction_FireProjectileLocal,"fireprojectilelocal"); // MOTS
     }
-    sithCog_RegisterFunction(ctx, sithCogFunction_ActivateWeapon, "activateweapon");
-    sithCog_RegisterFunction(ctx, sithCogFunction_DeactivateWeapon, "deactivateweapon");
-    sithCog_RegisterFunction(ctx, sithCogFunction_SetMountWait, "setmountwait");
-    sithCog_RegisterFunction(ctx, sithCogFunction_SetFireWait, "setfirewait");
-    sithCog_RegisterFunction(ctx, sithCogFunction_SelectWeapon, "selectweapon");
-    sithCog_RegisterFunction(ctx, sithCogFunction_AssignWeapon, "assignweapon");
-    sithCog_RegisterFunction(ctx, sithCogFunction_AutoSelectWeapon, "autoselectweapon");
-    sithCog_RegisterFunction(ctx, sithCogFunction_GetWeaponPriority, "getweaponpriority");
-    sithCog_RegisterFunction(ctx, sithCogFunction_SetCurWeapon, "setcurweapon");
-    sithCog_RegisterFunction(ctx, sithCogFunction_GetCurWeapon, "getcurweapon");
-    sithCog_RegisterFunction(ctx, sithCogFunction_GetCurWeaponMode, "getcurweaponmode");
+    sithCog_RegisterFunction(pCog, sithCogFunction_ActivateWeapon, "activateweapon");
+    sithCog_RegisterFunction(pCog, sithCogFunction_DeactivateWeapon, "deactivateweapon");
+    sithCog_RegisterFunction(pCog, sithCogFunction_SetMountWait, "setmountwait");
+    sithCog_RegisterFunction(pCog, sithCogFunction_SetFireWait, "setfirewait");
+    sithCog_RegisterFunction(pCog, sithCogFunction_SelectWeapon, "selectweapon");
+    sithCog_RegisterFunction(pCog, sithCogFunction_AssignWeapon, "assignweapon");
+    sithCog_RegisterFunction(pCog, sithCogFunction_AutoSelectWeapon, "autoselectweapon");
+    sithCog_RegisterFunction(pCog, sithCogFunction_GetWeaponPriority, "getweaponpriority");
+    sithCog_RegisterFunction(pCog, sithCogFunction_SetCurWeapon, "setcurweapon");
+    sithCog_RegisterFunction(pCog, sithCogFunction_GetCurWeapon, "getcurweapon");
+    sithCog_RegisterFunction(pCog, sithCogFunction_GetCurWeaponMode, "getcurweaponmode");
     if (Main_bMotsCompat) {
-        sithCog_RegisterFunction(ctx,sithCogFunction_GetWeaponBin,"getweaponbin"); // MOTS
+        sithCog_RegisterFunction(pCog,sithCogFunction_GetWeaponBin,"getweaponbin"); // MOTS
     }
-    sithCog_RegisterFunction(ctx, sithCogFunction_ChangeFireRate, "changefirerate");
-    sithCog_RegisterFunction(ctx, sithCogFunction_SendMessage, "sendmessage");
-    sithCog_RegisterFunction(ctx, sithCogFunction_SendMessageEx, "sendmessageex");
+    sithCog_RegisterFunction(pCog, sithCogFunction_ChangeFireRate, "changefirerate");
+    sithCog_RegisterFunction(pCog, sithCogFunction_SendMessage, "sendmessage");
+    sithCog_RegisterFunction(pCog, sithCogFunction_SendMessageEx, "sendmessageex");
     if (Main_bMotsCompat) {
-        sithCog_RegisterFunction(ctx,sithCogFunction_SendMessageExRadius,"sendmessageexradius"); // MOTS
+        sithCog_RegisterFunction(pCog,sithCogFunction_SendMessageExRadius,"sendmessageexradius"); // MOTS
     }
-    sithCog_RegisterFunction(ctx, sithCogFunction_ReturnEx, "returnex");
-    sithCog_RegisterFunction(ctx, sithCogFunction_GetParam, "getparam");
-    sithCog_RegisterFunction(ctx, sithCogFunction_SetParam, "setparam");
+    sithCog_RegisterFunction(pCog, sithCogFunction_ReturnEx, "returnex");
+    sithCog_RegisterFunction(pCog, sithCogFunction_GetParam, "getparam");
+    sithCog_RegisterFunction(pCog, sithCogFunction_SetParam, "setparam");
     if (Main_bMotsCompat) {
-        sithCog_RegisterFunction(ctx,sithCogFunction_WorldFlash,"worldflash"); // MOTS
+        sithCog_RegisterFunction(pCog,sithCogFunction_WorldFlash,"worldflash"); // MOTS
     }
-    sithCog_RegisterFunction(ctx, sithCogFunction_EnableIRMode, "enableirmode");
-    sithCog_RegisterFunction(ctx, sithCogFunction_DisableIRMode, "disableirmode");
-    sithCog_RegisterFunction(ctx, sithCogFunction_SetInvFlags, "setinvflags");
-    sithCog_RegisterFunction(ctx, sithCogFunction_SetMapModeFlags, "setmapmodeflags");
-    sithCog_RegisterFunction(ctx, sithCogFunction_GetMapModelFlags, "getmapmodeflags");
-    sithCog_RegisterFunction(ctx, sithCogFunction_ClearMapModeFlags, "clearmapmodeflags");
-    sithCog_RegisterFunction(ctx, sithCogFunction_NewColorEffect, "newcoloreffect");
-    sithCog_RegisterFunction(ctx, sithCogFunction_FreeColorEffect, "freecoloreffect");
+    sithCog_RegisterFunction(pCog, sithCogFunction_EnableIRMode, "enableirmode");
+    sithCog_RegisterFunction(pCog, sithCogFunction_DisableIRMode, "disableirmode");
+    sithCog_RegisterFunction(pCog, sithCogFunction_SetInvFlags, "setinvflags");
+    sithCog_RegisterFunction(pCog, sithCogFunction_SetMapModeFlags, "setmapmodeflags");
+    sithCog_RegisterFunction(pCog, sithCogFunction_GetMapModelFlags, "getmapmodeflags");
+    sithCog_RegisterFunction(pCog, sithCogFunction_ClearMapModeFlags, "clearmapmodeflags");
+    sithCog_RegisterFunction(pCog, sithCogFunction_NewColorEffect, "newcoloreffect");
+    sithCog_RegisterFunction(pCog, sithCogFunction_FreeColorEffect, "freecoloreffect");
     if (Main_bDwCompat) {
-        sithCog_RegisterFunction(ctx, sithCogFunction_ModifyColorEffect, "modifycoloreffect");
+        sithCog_RegisterFunction(pCog, sithCogFunction_ModifyColorEffect, "modifycoloreffect");
     }
     else {
-        sithCog_RegisterFunction(ctx, sithCogFunction_FreeColorEffect, "modifycoloreffect"); // oops? Droidworks fixes this
+        sithCog_RegisterFunction(pCog, sithCogFunction_FreeColorEffect, "modifycoloreffect"); // oops? Droidworks fixes this
     }
-    sithCog_RegisterFunction(ctx, sithCogFunction_AddDynamicTint, "adddynamictint");
-    sithCog_RegisterFunction(ctx, sithCogFunction_AddDynamicAdd, "adddynamicadd");
-    sithCog_RegisterFunction(ctx, sithCogFunction_GetMaterialCel, "getmaterialcel");
-    sithCog_RegisterFunction(ctx, sithCogFunction_SetMaterialCel, "setmaterialcel");
-    sithCog_RegisterFunction(ctx, sithCogFunction_SetCameraFocus, "setcamerafocus");
-    sithCog_RegisterFunction(ctx, sithCogFunction_GetPrimaryFocus, "getprimaryfocus");
-    sithCog_RegisterFunction(ctx, sithCogFunction_GetSecondaryFocus, "getsecondaryfocus");
-    sithCog_RegisterFunction(ctx, sithCogFunction_SetCameraMode, "setcurrentcamera");
-    sithCog_RegisterFunction(ctx, sithCogFunction_GetCameraMode, "getcurrentcamera");
-    sithCog_RegisterFunction(ctx, sithCogFunction_CycleCamera, "cyclecamera");
-    sithCog_RegisterFunction(ctx, sithCogFunction_SetPOVShake, "setpovshake");
-    sithCog_RegisterFunction(ctx, sithCogFunction_SetCameraStateFlags, "setcamerastateflags");
-    sithCog_RegisterFunction(ctx, sithCogFunction_GetCameraStateFlags, "getcamerastateflags");
+    sithCog_RegisterFunction(pCog, sithCogFunction_AddDynamicTint, "adddynamictint");
+    sithCog_RegisterFunction(pCog, sithCogFunction_AddDynamicAdd, "adddynamicadd");
+    sithCog_RegisterFunction(pCog, sithCogFunction_GetMaterialCel, "getmaterialcel");
+    sithCog_RegisterFunction(pCog, sithCogFunction_SetMaterialCel, "setmaterialcel");
+    sithCog_RegisterFunction(pCog, sithCogFunction_SetCameraFocus, "setcamerafocus");
+    sithCog_RegisterFunction(pCog, sithCogFunction_GetPrimaryFocus, "getprimaryfocus");
+    sithCog_RegisterFunction(pCog, sithCogFunction_GetSecondaryFocus, "getsecondaryfocus");
+    sithCog_RegisterFunction(pCog, sithCogFunction_SetCameraMode, "setcurrentcamera");
+    sithCog_RegisterFunction(pCog, sithCogFunction_GetCameraMode, "getcurrentcamera");
+    sithCog_RegisterFunction(pCog, sithCogFunction_CycleCamera, "cyclecamera");
+    sithCog_RegisterFunction(pCog, sithCogFunction_SetPOVShake, "setpovshake");
+    sithCog_RegisterFunction(pCog, sithCogFunction_SetCameraStateFlags, "setcamerastateflags");
+    sithCog_RegisterFunction(pCog, sithCogFunction_GetCameraStateFlags, "getcamerastateflags");
     if (Main_bMotsCompat) {
-        sithCog_RegisterFunction(ctx,sithCogFunction_SetCameraZoom,"setcamerazoom"); // MOTS
+        sithCog_RegisterFunction(pCog,sithCogFunction_SetCameraZoom,"setcamerazoom"); // MOTS
     }
-    sithCog_RegisterFunction(ctx, sithCogFunction_HeapNew, "heapnew");
-    sithCog_RegisterFunction(ctx, sithCogFunction_HeapSet, "heapset");
-    sithCog_RegisterFunction(ctx, sithCogFunction_HeapGet, "heapget");
-    sithCog_RegisterFunction(ctx, sithCogFunction_HeapFree, "heapfree");
-    sithCog_RegisterFunction(ctx, sithCogFunction_GetSelfCog, "getselfcog");
-    sithCog_RegisterFunction(ctx, sithCogFunction_GetMasterCog, "getmastercog");
-    sithCog_RegisterFunction(ctx, sithCogFunction_SetMasterCog, "setmastercog");
+    sithCog_RegisterFunction(pCog, sithCogFunction_HeapNew, "heapnew");
+    sithCog_RegisterFunction(pCog, sithCogFunction_HeapSet, "heapset");
+    sithCog_RegisterFunction(pCog, sithCogFunction_HeapGet, "heapget");
+    sithCog_RegisterFunction(pCog, sithCogFunction_HeapFree, "heapfree");
+    sithCog_RegisterFunction(pCog, sithCogFunction_GetSelfCog, "getselfcog");
+    sithCog_RegisterFunction(pCog, sithCogFunction_GetMasterCog, "getmastercog");
+    sithCog_RegisterFunction(pCog, sithCogFunction_SetMasterCog, "setmastercog");
     if (Main_bMotsCompat) {
-        sithCog_RegisterFunction(ctx,sithCogFunction_GetActionCog,"getactioncog"); // MOTS
-        sithCog_RegisterFunction(ctx,sithCogFunction_SetActionCog,"setactioncog"); // MOTS
+        sithCog_RegisterFunction(pCog,sithCogFunction_GetActionCog,"getactioncog"); // MOTS
+        sithCog_RegisterFunction(pCog,sithCogFunction_SetActionCog,"setactioncog"); // MOTS
     }
 
     // Droidworks removes start
-    sithCog_RegisterFunction(ctx, sithCogFunction_SetMultiModeFlags, "setmultimodeflags");
-    sithCog_RegisterFunction(ctx, sithCogFunction_GetMultiModeFlags, "getmultimodeflags");
-    sithCog_RegisterFunction(ctx, sithCogFunction_ClearMultiModeFlags, "clearmultimodeflags");
-    sithCog_RegisterFunction(ctx, sithCogFunction_IsMulti, "ismulti");
-    sithCog_RegisterFunction(ctx, sithCogFunction_IsServer, "isserver");
-    sithCog_RegisterFunction(ctx, sithCogFunction_SetTeamScore, "setteamscore");
-    sithCog_RegisterFunction(ctx, sithCogFunction_GetTeamScore, "getteamscore");
-    sithCog_RegisterFunction(ctx, sithCogFunction_SetTimeLimit, "settimelimit");
-    sithCog_RegisterFunction(ctx, sithCogFunction_GetTimeLimit, "gettimelimit");
-    sithCog_RegisterFunction(ctx, sithCogFunction_SetScoreLimit, "setscorelimit");
-    sithCog_RegisterFunction(ctx, sithCogFunction_GetScoreLimit, "getscorelimit");
+    sithCog_RegisterFunction(pCog, sithCogFunction_SetMultiModeFlags, "setmultimodeflags");
+    sithCog_RegisterFunction(pCog, sithCogFunction_GetMultiModeFlags, "getmultimodeflags");
+    sithCog_RegisterFunction(pCog, sithCogFunction_ClearMultiModeFlags, "clearmultimodeflags");
+    sithCog_RegisterFunction(pCog, sithCogFunction_IsMulti, "ismulti");
+    sithCog_RegisterFunction(pCog, sithCogFunction_IsServer, "isserver");
+    sithCog_RegisterFunction(pCog, sithCogFunction_SetTeamScore, "setteamscore");
+    sithCog_RegisterFunction(pCog, sithCogFunction_GetTeamScore, "getteamscore");
+    sithCog_RegisterFunction(pCog, sithCogFunction_SetTimeLimit, "settimelimit");
+    sithCog_RegisterFunction(pCog, sithCogFunction_GetTimeLimit, "gettimelimit");
+    sithCog_RegisterFunction(pCog, sithCogFunction_SetScoreLimit, "setscorelimit");
+    sithCog_RegisterFunction(pCog, sithCogFunction_GetScoreLimit, "getscorelimit");
     // Droidworks removes end
 
-    sithCog_RegisterFunction(ctx, sithCogFunction_SendTrigger, "sendtrigger");
-    sithCog_RegisterFunction(ctx, sithCogFunction_AutoSavegame, "autosavegame");
+    sithCog_RegisterFunction(pCog, sithCogFunction_SendTrigger, "sendtrigger");
+    sithCog_RegisterFunction(pCog, sithCogFunction_AutoSavegame, "autosavegame");
 
     if (Main_bMotsCompat) {
-        sithCog_RegisterFunction(ctx,sithCogFunction_Sin,"sin"); // MOTS
-        sithCog_RegisterFunction(ctx,sithCogFunction_Cos,"cos"); // MOTS
-        sithCog_RegisterFunction(ctx,sithCogFunction_Tan,"tan"); // MOTS
-        sithCog_RegisterFunction(ctx,sithCogFunction_GetCogFlags,"getcogflags"); // MOTS
-        sithCog_RegisterFunction(ctx,sithCogFunction_SetCogFlags,"setcogflags"); // MOTS
-        sithCog_RegisterFunction(ctx,sithCogFunction_ClearCogFlags,"clearcogflags"); // MOTS
-        sithCog_RegisterFunction(ctx,sithCogFunction_DebugBreak,"debugbreak"); // MOTS
-        sithCog_RegisterFunction(ctx,sithCogFunction_GetSysDate,"getsysdate"); // MOTS
-        sithCog_RegisterFunction(ctx,sithCogFunction_GetSysTime,"getsystime"); // MOTS
+        sithCog_RegisterFunction(pCog,sithCogFunction_Sin,"sin"); // MOTS
+        sithCog_RegisterFunction(pCog,sithCogFunction_Cos,"cos"); // MOTS
+        sithCog_RegisterFunction(pCog,sithCogFunction_Tan,"tan"); // MOTS
+        sithCog_RegisterFunction(pCog,sithCogFunction_GetCogFlags,"getcogflags"); // MOTS
+        sithCog_RegisterFunction(pCog,sithCogFunction_SetCogFlags,"setcogflags"); // MOTS
+        sithCog_RegisterFunction(pCog,sithCogFunction_ClearCogFlags,"clearcogflags"); // MOTS
+        sithCog_RegisterFunction(pCog,sithCogFunction_DebugBreak,"debugbreak"); // MOTS
+        sithCog_RegisterFunction(pCog,sithCogFunction_GetSysDate,"getsysdate"); // MOTS
+        sithCog_RegisterFunction(pCog,sithCogFunction_GetSysTime,"getsystime"); // MOTS
     }
     
     // Droidworks
     if (Main_bDwCompat) {
-        sithCog_RegisterFunction(ctx, sithCogFunction_SetCameraFocii, "setcamerafocii");
+        sithCog_RegisterFunction(pCog, sithCogFunction_SetCameraFocii, "setcamerafocii");
     }
 }

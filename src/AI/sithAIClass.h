@@ -14,11 +14,11 @@
 
 int sithAIClass_Startup();
 void sithAIClass_Shutdown();
-int sithAIClass_AllocWorldAIClasses(SithWorld *world, int a2);
-int sithAIClass_ReadStaticAIClassesListText(SithWorld *world, int a2);
+int sithAIClass_AllocWorldAIClasses(SithWorld *pWorld, int numClasses);
+int sithAIClass_ReadStaticAIClassesListText(SithWorld *pWorld, int bSkip);
 SithAIClass* sithAIClass_Load(char *fpath);
-int sithAIClass_LoadEntry(char *fpath, SithAIClass *aiclass);
-void sithAIClass_FreeWorldAIClasses(SithWorld *world);
+int sithAIClass_LoadEntry(char *pPath, SithAIClass *pClass);
+void sithAIClass_FreeWorldAIClasses(SithWorld *pWorld);
 
 //static int (*sithAIClass_Startup)() = (void*)sithAIClass_Startup_ADDR;
 //static int (*sithAIClass_ReadStaticAIClassesListText)(SithWorld *world, int a2) = (void*)sithAIClass_ReadStaticAIClassesListText_ADDR;

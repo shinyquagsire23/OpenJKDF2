@@ -25,35 +25,35 @@ void sithAIClass_Shutdown()
 }
 
 // Unused
-int sithAIClass_AllocWorldAIClasses(SithWorld *world, int a2)
+int sithAIClass_AllocWorldAIClasses(SithWorld *pWorld, int numClasses)
 {
     intptr_t result; // eax
 
     { TWL_EXTRAM_SUGGEST(pSithHS); // Added: parsed once, word-width fields (fpath is debug-only)
-    result = (intptr_t)SITH_ALLOC(sizeof(SithAIClass) * a2);
+    result = (intptr_t)SITH_ALLOC(sizeof(SithAIClass) * numClasses);
     TWL_EXTRAM_RESTORE(pSithHS); }
-    world->aAIClasses = (SithAIClass *)result;
+    pWorld->aAIClasses = (SithAIClass *)result;
     if (result)
     {
-        stdPlatform_Memzero32((void *)result, sizeof(SithAIClass) * a2); // Added: word-safe
-        world->sizeAIClasses = a2;
-        world->numAIClasses = 0;
+        stdPlatform_Memzero32((void *)result, sizeof(SithAIClass) * numClasses); // Added: word-safe
+        pWorld->sizeAIClasses = numClasses;
+        pWorld->numAIClasses = 0;
         result = 1;
     }
     else
     {
-        world->sizeAIClasses = 0;
-        world->numAIClasses = 0;
+        pWorld->sizeAIClasses = 0;
+        pWorld->numAIClasses = 0;
     }
     return result;
 }
 
-int sithAIClass_ReadStaticAIClassesListText(SithWorld *world, int a2)
+int sithAIClass_ReadStaticAIClassesListText(SithWorld *pWorld, int bSkip)
 {
     int sizeAIClasses; // ebx
     SithAIClass *aAIClasses; // eax
 
-    if (a2) {
+    if (bSkip) {
         return 0;
     }
     stdConffile_ReadArgs();
@@ -67,18 +67,18 @@ int sithAIClass_ReadStaticAIClassesListText(SithWorld *world, int a2)
     { TWL_EXTRAM_SUGGEST(pSithHS); // Added: parsed once, word-width fields (fpath is debug-only)
     aAIClasses = (SithAIClass *)SITH_ALLOC(sizeof(SithAIClass) * sizeAIClasses);
     TWL_EXTRAM_RESTORE(pSithHS); }
-    world->aAIClasses = aAIClasses;
+    pWorld->aAIClasses = aAIClasses;
     if (!aAIClasses)
     {
-        world->sizeAIClasses = 0;
-        world->numAIClasses = 0;
+        pWorld->sizeAIClasses = 0;
+        pWorld->numAIClasses = 0;
         stdPrintf(pSithHS->errorPrint, ".\\Ai\\sithAIClass.c", 176, "Memory error while reading aiclasses, line %d.\n", stdConffile_linenum);
         return 0;
     }
     
     stdPlatform_Memzero32(aAIClasses, sizeof(SithAIClass) * sizeAIClasses); // Added: word-safe
-    world->numAIClasses = 0;
-    world->sizeAIClasses = sizeAIClasses;
+    pWorld->numAIClasses = 0;
+    pWorld->sizeAIClasses = sizeAIClasses;
     if ( stdConffile_ReadArgs() )
     {
         while ( _strcmp(stdConffile_g_entry.aArgs[0].value, "end") )
@@ -146,7 +146,7 @@ SithAIClass* sithAIClass_Load(char *fpath)
     return sithAIClass_Load("default.ai");
 }
 
-int sithAIClass_LoadEntry(char *fpath, SithAIClass *aiclass)
+int sithAIClass_LoadEntry(char *pPath, SithAIClass *pClass)
 {
     int result; // eax
     SithAIClass *v3; // ebx
@@ -159,14 +159,14 @@ int sithAIClass_LoadEntry(char *fpath, SithAIClass *aiclass)
     flex_t a4; // [esp+A0h] [ebp-4h] BYREF
     flex_t fpathb; // [esp+ACh] [ebp+8h]
 
-    _sprintf(jkl_fname, "%s%1d", fpath, jkPlayer_setDiff);
-    if ( stdConffile_Open(jkl_fname) || (result = stdConffile_Open(fpath)) != 0 )
+    _sprintf(jkl_fname, "%s%1d", pPath, jkPlayer_setDiff);
+    if ( stdConffile_Open(jkl_fname) || (result = stdConffile_Open(pPath)) != 0 )
     {
-        aiclass->maxStep = 0.5;
-        aiclass->sightDistance = 20.0;
-        aiclass->heardDistance = 10.0;
-        aiclass->fov = 0.0;
-        aiclass->accurancy = 0.5;
+        pClass->maxStep = 0.5;
+        pClass->sightDistance = 20.0;
+        pClass->heardDistance = 10.0;
+        pClass->fov = 0.0;
+        pClass->accurancy = 0.5;
         if ( stdConffile_ReadArgs() )
         {
             for (int v19 = 0; v19 < stdConffile_g_entry.numArgs; v19++)
@@ -174,43 +174,43 @@ int sithAIClass_LoadEntry(char *fpath, SithAIClass *aiclass)
                 StdConffileArg* arg = &stdConffile_g_entry.aArgs[v19];
                 if ( !_strcmp(arg->key, "alignment") )
                 {
-                    aiclass->alignment = _atof(arg->value);
+                    pClass->alignment = _atof(arg->value);
                 }
                 else if ( !_strcmp(arg->key, "rank") )
                 {
-                    aiclass->rank = _atof(arg->value);
+                    pClass->rank = _atof(arg->value);
                 }
                 else if ( !_strcmp(arg->key, "maxstep") )
                 {
-                    aiclass->maxStep = _atof(arg->value);
+                    pClass->maxStep = _atof(arg->value);
                 }
                 else if ( !_strcmp(arg->key, "sightdist") )
                 {
-                    aiclass->sightDistance = _atof(arg->value);
+                    pClass->sightDistance = _atof(arg->value);
                 }
                 else if ( !_strcmp(arg->key, "heardist") )
                 {
-                    aiclass->heardDistance = _atof(arg->value);
+                    pClass->heardDistance = _atof(arg->value);
                 }
                 else if ( !_strcmp(arg->key, "wakeupdist") )
                 {
-                    aiclass->weakupDistance = _atof(arg->value);
+                    pClass->weakupDistance = _atof(arg->value);
                 }
                 else if ( !_strcmp(arg->key, "fov") )
                 {
                     flex_t fov = _atof(arg->value) * 0.5;
                     stdMath_SinCos(fov, &a3, &a4);
-                    aiclass->fov = a4;
+                    pClass->fov = a4;
                 }
                 else if ( !_strcmp(arg->key, "accuracy") )
                 {
-                    aiclass->accurancy = _atof(arg->value);
+                    pClass->accurancy = _atof(arg->value);
                 }
             }
             while ( stdConffile_ReadArgs() )
             {
-                nextIdx = aiclass->numEntries;
-                entry = &aiclass->entries[nextIdx];
+                nextIdx = pClass->numEntries;
+                entry = &pClass->entries[nextIdx];
                 if ( nextIdx < 0x10 )
                 {
                     instinct = sithAI_FindInstinct(stdConffile_g_entry.aArgs[0].value);
@@ -235,7 +235,7 @@ int sithAIClass_LoadEntry(char *fpath, SithAIClass *aiclass)
                                 entry->intArg[v11] = (int32_t)v15;
                             }
                         }
-                        ++aiclass->numEntries;
+                        ++pClass->numEntries;
                     }
                 }
             }
@@ -251,21 +251,21 @@ int sithAIClass_LoadEntry(char *fpath, SithAIClass *aiclass)
     return result;
 }
 
-void sithAIClass_FreeWorldAIClasses(SithWorld *world)
+void sithAIClass_FreeWorldAIClasses(SithWorld *pWorld)
 {
-    if (world->aAIClasses)
+    if (pWorld->aAIClasses)
     {
-        for (uint32_t i = 0; i < world->numAIClasses; i++)
+        for (uint32_t i = 0; i < pWorld->numAIClasses; i++)
         {
 #ifdef STDHASHTABLE_CRC32_KEYS
-            stdHashtbl_FreeKeyCrc32(sithAIClass_g_pHashtable, world->aAIClasses[i].fpathcrc);
+            stdHashtbl_FreeKeyCrc32(sithAIClass_g_pHashtable, pWorld->aAIClasses[i].fpathcrc);
 #else
-            stdHashtbl_Remove(sithAIClass_g_pHashtable, world->aAIClasses[i].fpath);
+            stdHashtbl_Remove(sithAIClass_g_pHashtable, pWorld->aAIClasses[i].fpath);
 #endif
         }
-        SITH_FREE(world->aAIClasses);
-        world->aAIClasses = 0;
+        SITH_FREE(pWorld->aAIClasses);
+        pWorld->aAIClasses = 0;
     }
-    world->sizeAIClasses = 0;
-    world->numAIClasses = 0;
+    pWorld->sizeAIClasses = 0;
+    pWorld->numAIClasses = 0;
 }

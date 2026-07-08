@@ -13,9 +13,9 @@
 
 int sithAIAwareness_Startup();
 void sithAIAwareness_Close();
-int sithAIAwareness_CreateTransmittingEvent(SithSector *sector, rdVector3 *pos, int32_t a3, flex_t a4, SithThing *thing);
+int sithAIAwareness_CreateTransmittingEvent(SithSector *pSector, rdVector3 *pos, int32_t type, flex_t transmittingLevel, SithThing *pThing);
 void sithAIAwareness_ProcessEvents();
-int sithAIAwareness_Update(int32_t a, SithEventParams* b);
-void sithAIAwareness_ProcessEvent(sithSectorEntry *pSectorEntry, SithSector *pSector, rdVector3 *pPos1, rdVector3 *pPos2, flex_t a5, flex_t a6, SithThing *pThing);
+int sithAIAwareness_Update(int32_t msecTime, SithEventParams* pParams);
+void sithAIAwareness_ProcessEvent(sithSectorEntry *pEvent, SithSector *pSector, rdVector3 *startPos, rdVector3 *endPos, flex_t levelAtTransmittingPos, flex_t a6, SithThing *pThing);
 
 #endif // _AI_SITHAIAWARENESS_H

@@ -34,7 +34,7 @@ void sithAIAwareness_Close()
     sithAIAwareness_bInitted = 0;
 }
 
-int sithAIAwareness_CreateTransmittingEvent(SithSector *sector, rdVector3 *pos, int32_t a3, flex_t a4, SithThing *thing)
+int sithAIAwareness_CreateTransmittingEvent(SithSector *pSector, rdVector3 *pos, int32_t type, flex_t transmittingLevel, SithThing *pThing)
 {
     if (!sithAI_bOpened) {
         return 0;
@@ -42,11 +42,11 @@ int sithAIAwareness_CreateTransmittingEvent(SithSector *sector, rdVector3 *pos, 
     if (sithAIAwareness_numEntries == 32) {
         return 0;
     }
-    sithAIAwareness_aEntries[sithAIAwareness_numEntries].sector = sector;
+    sithAIAwareness_aEntries[sithAIAwareness_numEntries].sector = pSector;
     rdVector_Copy3(&sithAIAwareness_aEntries[sithAIAwareness_numEntries].pos, pos);
-    sithAIAwareness_aEntries[sithAIAwareness_numEntries].field_14 = a3;
-    sithAIAwareness_aEntries[sithAIAwareness_numEntries].field_18 = a4;
-    sithAIAwareness_aEntries[sithAIAwareness_numEntries].thing = thing;
+    sithAIAwareness_aEntries[sithAIAwareness_numEntries].field_14 = type;
+    sithAIAwareness_aEntries[sithAIAwareness_numEntries].field_18 = transmittingLevel;
+    sithAIAwareness_aEntries[sithAIAwareness_numEntries].thing = pThing;
 
     sithAIAwareness_numEntries++;
 
@@ -65,7 +65,7 @@ void sithAIAwareness_ProcessEvents()
     }
 }
 
-int sithAIAwareness_Update(int32_t a, SithEventParams* b)
+int sithAIAwareness_Update(int32_t msecTime, SithEventParams* pParams)
 {
     // Added: co-op
     if (sithNet_isMulti && !sithNet_isServer) {
@@ -115,13 +115,13 @@ int sithAIAwareness_Update(int32_t a, SithEventParams* b)
     return 1;
 }
 
-void sithAIAwareness_ProcessEvent(sithSectorEntry *pSectorEntry, SithSector *pSector, rdVector3 *pPos1, rdVector3 *pPos2, flex_t a5, flex_t a6, SithThing *pThing)
+void sithAIAwareness_ProcessEvent(sithSectorEntry *pEvent, SithSector *pSector, rdVector3 *startPos, rdVector3 *endPos, flex_t levelAtTransmittingPos, flex_t a6, SithThing *pThing)
 {
     // Added: potential crash maybe?
-    OPENJKDF2_WARN_NULL_AND_RETURN(pSectorEntry);
+    OPENJKDF2_WARN_NULL_AND_RETURN(pEvent);
     OPENJKDF2_WARN_NULL_AND_RETURN(pSector);
-    OPENJKDF2_WARN_NULL_AND_RETURN(pPos1);
-    OPENJKDF2_WARN_NULL_AND_RETURN(pPos2);
+    OPENJKDF2_WARN_NULL_AND_RETURN(startPos);
+    OPENJKDF2_WARN_NULL_AND_RETURN(endPos);
     OPENJKDF2_WARN_NULL_AND_RETURN(sithAIAwareness_g_aSectors);
 
     sithSectorAlloc* pSectorAlloc = &sithAIAwareness_g_aSectors[pSector->id];
@@ -131,14 +131,14 @@ void sithAIAwareness_ProcessEvent(sithSectorEntry *pSectorEntry, SithSector *pSe
         pSectorAlloc->field_0 = sithAIAwareness_timerTicks;
     }
 
-    if (pSectorAlloc->field_4[pSectorEntry->field_14] < (flex_d_t)a5)
+    if (pSectorAlloc->field_4[pEvent->field_14] < (flex_d_t)levelAtTransmittingPos)
     {
-        pSectorAlloc->field_4[pSectorEntry->field_14] = a5;
-        pSectorAlloc->field_10[pSectorEntry->field_14] = *pPos1;
+        pSectorAlloc->field_4[pEvent->field_14] = levelAtTransmittingPos;
+        pSectorAlloc->field_10[pEvent->field_14] = *startPos;
 #ifndef OPTIMIZE_AWAY_UNUSED_FIELDS
-        pSectorAlloc->field_34[pSectorEntry->field_14] = *pPos2;
+        pSectorAlloc->field_34[pEvent->field_14] = *endPos;
 #endif
-        pSectorAlloc->field_58[pSectorEntry->field_14] = pThing;
+        pSectorAlloc->field_58[pEvent->field_14] = pThing;
         if (a6 > 0.0)
         {
             for (SithSurfaceAdjoin* i = pSector->adjoins; i; i = i->next)
@@ -149,7 +149,7 @@ void sithAIAwareness_ProcessEvent(sithSectorEntry *pSectorEntry, SithSector *pSe
 #ifndef OPTIMIZE_AWAY_UNUSED_FIELDS
                 adjoinUnk = i->field_1C; // Maybe this was the pAdjoin center...?
 #endif
-                sithAIAwareness_ProcessEvent(pSectorEntry, i->sector, pPos1, &adjoinUnk, a6, a6a, pThing);
+                sithAIAwareness_ProcessEvent(pEvent, i->sector, startPos, &adjoinUnk, a6, a6a, pThing);
             }
         }
     }
