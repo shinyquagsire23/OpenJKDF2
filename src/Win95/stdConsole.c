@@ -16,20 +16,20 @@ int stdConsole_Startup(LPCSTR lpConsoleTitle, uint32_t dwWriteCoord, int a3)
     jk_AllocConsole();
     v3 = lpConsoleTitle;
     jk_SetConsoleTitleA(lpConsoleTitle);
-    stdConsole_hConsoleInput = jk_GetStdHandle(0xFFFFFFF6);
+    stdConsole_hInput = jk_GetStdHandle(0xFFFFFFF6);
     v5 = (void *)jk_GetStdHandle(0xFFFFFFF5);
     stdConsole_wAttributes = dwWriteCoord;
-    stdConsole_hConsoleOutput = v5;
+    stdConsole_hOutput = v5;
     stdConsole_ConsoleCursorInfo.dwSize = 8;
     stdConsole_ConsoleCursorInfo.bVisible = 1;
     stdConsole_cursorHidden = 0;
-    stdConsole_foregroundAttr = dwWriteCoord & 0xF0;
+    stdConsole_textAttribute = dwWriteCoord & 0xF0;
     jk_SetConsoleTextAttribute(v5, dwWriteCoord & 0xF0);
     dwWriteCoord = 0;
-    jk_FillConsoleOutputCharacterA(stdConsole_hConsoleOutput, ' ', 0x7D0u, nopCoord, (LPDWORD)&tmp);
+    jk_FillConsoleOutputCharacterA(stdConsole_hOutput, ' ', 0x7D0u, nopCoord, (LPDWORD)&tmp);
     v7 = (v7 & 0xFFFF0000) | stdConsole_wAttributes;
-    stdConsole_foregroundAttr = stdConsole_wAttributes;
-    jk_SetConsoleTextAttribute(stdConsole_hConsoleOutput, v7);
+    stdConsole_textAttribute = stdConsole_wAttributes;
+    jk_SetConsoleTextAttribute(stdConsole_hOutput, v7);
     if ( a3 )
     {
         v8 = jk_FindWindowA(0, v3);
@@ -113,7 +113,7 @@ void stdConsole_Free(stdConsole *a1)
 BOOL stdConsole_SetCursorPos(COORD dwCursorPosition, SHORT a2)
 {
     dwCursorPosition.Y = a2;
-    return jk_SetConsoleCursorPosition(stdConsole_hConsoleOutput, dwCursorPosition);
+    return jk_SetConsoleCursorPosition(stdConsole_hOutput, dwCursorPosition);
 }
 
 void stdConsole_GetCursorPos(COORD *a1)
@@ -121,7 +121,7 @@ void stdConsole_GetCursorPos(COORD *a1)
     SHORT v1; // cx
     struct _CONSOLE_SCREEN_BUFFER_INFO consoleScreenBufferInfo; // [esp+0h] [ebp-18h]
 
-    jk_GetConsoleScreenBufferInfo(stdConsole_hConsoleOutput, &consoleScreenBufferInfo);
+    jk_GetConsoleScreenBufferInfo(stdConsole_hOutput, &consoleScreenBufferInfo);
     v1 = consoleScreenBufferInfo.dwCursorPosition.Y;
     a1->X = consoleScreenBufferInfo.dwCursorPosition.X;
     a1->Y = v1;
@@ -134,7 +134,7 @@ void stdConsole_ToggleCursor(int a1)
         if ( stdConsole_cursorHidden > 0 && !--stdConsole_cursorHidden )
         {
             stdConsole_ConsoleCursorInfo.bVisible = 1;
-            jk_SetConsoleCursorInfo(stdConsole_hConsoleOutput, &stdConsole_ConsoleCursorInfo);
+            jk_SetConsoleCursorInfo(stdConsole_hOutput, &stdConsole_ConsoleCursorInfo);
         }
     }
     else
@@ -142,7 +142,7 @@ void stdConsole_ToggleCursor(int a1)
         if ( !stdConsole_cursorHidden )
         {
             stdConsole_ConsoleCursorInfo.bVisible = 0;
-            jk_SetConsoleCursorInfo(stdConsole_hConsoleOutput, &stdConsole_ConsoleCursorInfo);
+            jk_SetConsoleCursorInfo(stdConsole_hOutput, &stdConsole_ConsoleCursorInfo);
         }
         ++stdConsole_cursorHidden;
     }
@@ -156,13 +156,13 @@ int stdConsole_SetAttributes(WORD a1)
 
 void stdConsole_SetConsoleTextAttribute(__int16 wAttributes)
 {
-    stdConsole_foregroundAttr = wAttributes;
-    jk_SetConsoleTextAttribute(stdConsole_hConsoleOutput, wAttributes);
+    stdConsole_textAttribute = wAttributes;
+    jk_SetConsoleTextAttribute(stdConsole_hOutput, wAttributes);
 }
 
 void stdConsole_Flush()
 {
-    jk_FlushConsoleInputBuffer(stdConsole_hConsoleInput);
+    jk_FlushConsoleInputBuffer(stdConsole_hInput);
 }
 
 void stdConsole_InitOutputConsole()
@@ -170,11 +170,11 @@ void stdConsole_InitOutputConsole()
     DWORD NumberOfCharsWritten;
     COORD nopCoord = {0};
 
-    stdConsole_foregroundAttr = stdConsole_wAttributes & 0xF0;
-    jk_SetConsoleTextAttribute(stdConsole_hConsoleOutput, stdConsole_wAttributes & 0xF0);
-    jk_FillConsoleOutputCharacterA(stdConsole_hConsoleOutput, ' ', 0x7D0u, nopCoord, &NumberOfCharsWritten);
-    stdConsole_foregroundAttr = stdConsole_wAttributes;
-    jk_SetConsoleTextAttribute(stdConsole_hConsoleOutput, stdConsole_wAttributes);
+    stdConsole_textAttribute = stdConsole_wAttributes & 0xF0;
+    jk_SetConsoleTextAttribute(stdConsole_hOutput, stdConsole_wAttributes & 0xF0);
+    jk_FillConsoleOutputCharacterA(stdConsole_hOutput, ' ', 0x7D0u, nopCoord, &NumberOfCharsWritten);
+    stdConsole_textAttribute = stdConsole_wAttributes;
+    jk_SetConsoleTextAttribute(stdConsole_hOutput, stdConsole_wAttributes);
 }
 
 void stdConsole_Reset(SHORT a1)
@@ -182,31 +182,31 @@ void stdConsole_Reset(SHORT a1)
     COORD ST14_4_1; // ST14_4
     DWORD NumberOfCharsWritten; // [esp+4h] [ebp-4h]
 
-    stdConsole_foregroundAttr = stdConsole_wAttributes & 0xF0;
-    jk_SetConsoleTextAttribute(stdConsole_hConsoleOutput, stdConsole_wAttributes & 0xF0);
+    stdConsole_textAttribute = stdConsole_wAttributes & 0xF0;
+    jk_SetConsoleTextAttribute(stdConsole_hOutput, stdConsole_wAttributes & 0xF0);
     ST14_4_1.X = 0;
     ST14_4_1.Y = a1;
-    jk_FillConsoleOutputCharacterA(stdConsole_hConsoleOutput, ' ', 0x50u, ST14_4_1, &NumberOfCharsWritten);
+    jk_FillConsoleOutputCharacterA(stdConsole_hOutput, ' ', 0x50u, ST14_4_1, &NumberOfCharsWritten);
 }
 
 void stdConsole_Putc(char Buffer, __int16 wAttributes)
 {
-    if ( stdConsole_foregroundAttr != wAttributes )
+    if ( stdConsole_textAttribute != wAttributes )
     {
-        stdConsole_foregroundAttr = wAttributes;
-        jk_SetConsoleTextAttribute(stdConsole_hConsoleOutput, wAttributes);
+        stdConsole_textAttribute = wAttributes;
+        jk_SetConsoleTextAttribute(stdConsole_hOutput, wAttributes);
     }
-    jk_WriteConsoleA(stdConsole_hConsoleOutput, &Buffer, 1u, (LPDWORD)&wAttributes, 0);
+    jk_WriteConsoleA(stdConsole_hOutput, &Buffer, 1u, (LPDWORD)&wAttributes, 0);
 }
 
 void stdConsole_WriteConsole(char *lpBuffer, WORD wAttributes)
 {
-    if ( stdConsole_foregroundAttr != wAttributes )
+    if ( stdConsole_textAttribute != wAttributes )
     {
-        stdConsole_foregroundAttr = wAttributes;
-        jk_SetConsoleTextAttribute(stdConsole_hConsoleOutput, wAttributes);
+        stdConsole_textAttribute = wAttributes;
+        jk_SetConsoleTextAttribute(stdConsole_hOutput, wAttributes);
     }
-    jk_WriteConsoleA(stdConsole_hConsoleOutput, lpBuffer, _strlen(lpBuffer), (LPDWORD)&wAttributes, 0);
+    jk_WriteConsoleA(stdConsole_hOutput, lpBuffer, _strlen(lpBuffer), (LPDWORD)&wAttributes, 0);
 }
 
 int stdConsole_ClearBuf(stdConsole *a1)
@@ -393,31 +393,31 @@ void stdConsole_WriteBorderMaybe(stdConsole *console)
     if ( !stdConsole_cursorHidden )
     {
         stdConsole_ConsoleCursorInfo.bVisible = 0;
-        jk_SetConsoleCursorInfo(stdConsole_hConsoleOutput, &stdConsole_ConsoleCursorInfo);
+        jk_SetConsoleCursorInfo(stdConsole_hOutput, &stdConsole_ConsoleCursorInfo);
     }
     dwCursorPosition.X = v1->dword4;
     dwCursorPosition.Y = v1->dword8;
     ++stdConsole_cursorHidden;
-    jk_SetConsoleCursorPosition(stdConsole_hConsoleOutput, dwCursorPosition);
+    jk_SetConsoleCursorPosition(stdConsole_hOutput, dwCursorPosition);
     v6 = v1->word72;
-    if ( stdConsole_foregroundAttr != v6 )
+    if ( stdConsole_textAttribute != v6 )
     {
-        stdConsole_foregroundAttr = v1->word72;
-        jk_SetConsoleTextAttribute(stdConsole_hConsoleOutput, v6);
+        stdConsole_textAttribute = v1->word72;
+        jk_SetConsoleTextAttribute(stdConsole_hOutput, v6);
     }
-    jk_WriteConsoleA(stdConsole_hConsoleOutput, &writeChr, 1u, &NumberOfCharsWritten, 0);
+    jk_WriteConsoleA(stdConsole_hOutput, &writeChr, 1u, &NumberOfCharsWritten, 0);
     v8 = v1->dword18 + v1->dword8 - 1;
     dwCursorPosition.X = v1->dword4;
     dwCursorPosition.Y = v8;
-    jk_SetConsoleCursorPosition(stdConsole_hConsoleOutput, dwCursorPosition);
+    jk_SetConsoleCursorPosition(stdConsole_hOutput, dwCursorPosition);
     v9 = v1->word72;
     writeChr = v34;
-    if ( stdConsole_foregroundAttr != v9 )
+    if ( stdConsole_textAttribute != v9 )
     {
-        stdConsole_foregroundAttr = v9;
-        jk_SetConsoleTextAttribute(stdConsole_hConsoleOutput, v9);
+        stdConsole_textAttribute = v9;
+        jk_SetConsoleTextAttribute(stdConsole_hOutput, v9);
     }
-    jk_WriteConsoleA(stdConsole_hConsoleOutput, &writeChr, 1, &NumberOfCharsWritten, 0);
+    jk_WriteConsoleA(stdConsole_hOutput, &writeChr, 1, &NumberOfCharsWritten, 0);
     v10 = v1->dword4;
     v11 = v10 + 1;
     if ( v10 + 1 < v1->dword14 + v10 - 1 )
@@ -426,28 +426,28 @@ void stdConsole_WriteBorderMaybe(stdConsole *console)
         {
             dwCursorPosition.X = v11;
             dwCursorPosition.Y = v1->dword8;
-            jk_SetConsoleCursorPosition(stdConsole_hConsoleOutput, dwCursorPosition);
+            jk_SetConsoleCursorPosition(stdConsole_hOutput, dwCursorPosition);
             v12 = v1->word72;
             writeChr = v37;
-            if ( stdConsole_foregroundAttr != v12 )
+            if ( stdConsole_textAttribute != v12 )
             {
-                stdConsole_foregroundAttr = v12;
-                jk_SetConsoleTextAttribute(stdConsole_hConsoleOutput, v12);
+                stdConsole_textAttribute = v12;
+                jk_SetConsoleTextAttribute(stdConsole_hOutput, v12);
             }
-            jk_WriteConsoleA(stdConsole_hConsoleOutput, &writeChr, 1, &v45, 0);
+            jk_WriteConsoleA(stdConsole_hOutput, &writeChr, 1, &v45, 0);
             v13 = v1->dword18;
             v14 = v1->dword8;
             dwCursorPosition.X = v11;
             dwCursorPosition.Y = v13 + v14 - 1;
-            jk_SetConsoleCursorPosition(stdConsole_hConsoleOutput, dwCursorPosition);
+            jk_SetConsoleCursorPosition(stdConsole_hOutput, dwCursorPosition);
             v15 = v1->word72;
             writeChr = v38;
-            if ( stdConsole_foregroundAttr != v15 )
+            if ( stdConsole_textAttribute != v15 )
             {
-                stdConsole_foregroundAttr = v15;
-                jk_SetConsoleTextAttribute(stdConsole_hConsoleOutput, v15);
+                stdConsole_textAttribute = v15;
+                jk_SetConsoleTextAttribute(stdConsole_hOutput, v15);
             }
-            jk_WriteConsoleA(stdConsole_hConsoleOutput, &writeChr, 1, &v46, 0);
+            jk_WriteConsoleA(stdConsole_hOutput, &writeChr, 1, &v46, 0);
             ++v11;
         }
         while ( v11 < v1->dword14 + v1->dword4 - 1 );
@@ -455,28 +455,28 @@ void stdConsole_WriteBorderMaybe(stdConsole *console)
     v16 = v1->dword8;
     dwCursorPosition.X = v11;
     dwCursorPosition.Y = v16;
-    jk_SetConsoleCursorPosition(stdConsole_hConsoleOutput, dwCursorPosition);
+    jk_SetConsoleCursorPosition(stdConsole_hOutput, dwCursorPosition);
     v17 = v1->word72;
     writeChr = v35;
-    if ( stdConsole_foregroundAttr != v17 )
+    if ( stdConsole_textAttribute != v17 )
     {
-        stdConsole_foregroundAttr = v17;
-        jk_SetConsoleTextAttribute(stdConsole_hConsoleOutput, v17);
+        stdConsole_textAttribute = v17;
+        jk_SetConsoleTextAttribute(stdConsole_hOutput, v17);
     }
-    jk_WriteConsoleA(stdConsole_hConsoleOutput, &writeChr, 1, &v46, 0);
+    jk_WriteConsoleA(stdConsole_hOutput, &writeChr, 1, &v46, 0);
     v18 = v1->dword18;
     v19 = v1->dword8;
     dwCursorPosition.X = v11;
     dwCursorPosition.Y = (v18 + v19 - 1);
-    jk_SetConsoleCursorPosition(stdConsole_hConsoleOutput, dwCursorPosition);
+    jk_SetConsoleCursorPosition(stdConsole_hOutput, dwCursorPosition);
     v20 = v1->word72;
     writeChr = v36;
-    if ( stdConsole_foregroundAttr != v20 )
+    if ( stdConsole_textAttribute != v20 )
     {
-        stdConsole_foregroundAttr = v20;
-        jk_SetConsoleTextAttribute(stdConsole_hConsoleOutput, v20);
+        stdConsole_textAttribute = v20;
+        jk_SetConsoleTextAttribute(stdConsole_hOutput, v20);
     }
-    jk_WriteConsoleA(stdConsole_hConsoleOutput, &writeChr, 1, &v46, 0);
+    jk_WriteConsoleA(stdConsole_hOutput, &writeChr, 1, &v46, 0);
     v21 = v1->dword8;
     v22 = v21 + 1;
     if ( v21 + 1 < v1->dword18 + v21 - 1 )
@@ -485,26 +485,26 @@ void stdConsole_WriteBorderMaybe(stdConsole *console)
         {
             dwCursorPosition.X = v1->dword4;
             dwCursorPosition.Y = v22;
-            jk_SetConsoleCursorPosition(stdConsole_hConsoleOutput, dwCursorPosition);
+            jk_SetConsoleCursorPosition(stdConsole_hOutput, dwCursorPosition);
             v23 = v1->word72;
             writeChr = v39;
-            if ( stdConsole_foregroundAttr != v23 )
+            if ( stdConsole_textAttribute != v23 )
             {
-                stdConsole_foregroundAttr = v23;
-                jk_SetConsoleTextAttribute(stdConsole_hConsoleOutput, v23);
+                stdConsole_textAttribute = v23;
+                jk_SetConsoleTextAttribute(stdConsole_hOutput, v23);
             }
-            jk_WriteConsoleA(stdConsole_hConsoleOutput, &writeChr, 1, &v46, 0);
+            jk_WriteConsoleA(stdConsole_hOutput, &writeChr, 1, &v46, 0);
             dwCursorPosition.Y = v22;
             dwCursorPosition.X = (v1->dword14 & 0xFFFF) + v1->dword4 - 1;
-            jk_SetConsoleCursorPosition(stdConsole_hConsoleOutput, dwCursorPosition);
+            jk_SetConsoleCursorPosition(stdConsole_hOutput, dwCursorPosition);
             v24 = v1->word72;
             writeChr = v40;
-            if ( stdConsole_foregroundAttr != v24 )
+            if ( stdConsole_textAttribute != v24 )
             {
-                stdConsole_foregroundAttr = v24;
-                jk_SetConsoleTextAttribute(stdConsole_hConsoleOutput, v24);
+                stdConsole_textAttribute = v24;
+                jk_SetConsoleTextAttribute(stdConsole_hOutput, v24);
             }
-            jk_WriteConsoleA(stdConsole_hConsoleOutput, &writeChr, 1, &v45, 0);
+            jk_WriteConsoleA(stdConsole_hOutput, &writeChr, 1, &v45, 0);
             ++v22;
         }
         while ( v22 < v1->dword18 + v1->dword8 - 1 );
@@ -525,37 +525,37 @@ LABEL_76:
                     v29 = v1->dword8;
                     dwCursorPosition.X = v27;
                     dwCursorPosition.Y = v29;
-                    jk_SetConsoleCursorPosition(stdConsole_hConsoleOutput, dwCursorPosition);
+                    jk_SetConsoleCursorPosition(stdConsole_hOutput, dwCursorPosition);
                     v30 = v1->word72;
                     writeChr = v41;
-                    if ( stdConsole_foregroundAttr != v30 )
+                    if ( stdConsole_textAttribute != v30 )
                     {
-                        stdConsole_foregroundAttr = v30;
-                        jk_SetConsoleTextAttribute(stdConsole_hConsoleOutput, v30);
+                        stdConsole_textAttribute = v30;
+                        jk_SetConsoleTextAttribute(stdConsole_hOutput, v30);
                     }
-                    jk_WriteConsoleA(stdConsole_hConsoleOutput, &writeChr, 1, &v46, 0);
+                    jk_WriteConsoleA(stdConsole_hOutput, &writeChr, 1, &v46, 0);
                     dwCursorPosition.X = (v27 + 1);
                     dwCursorPosition.Y = v1->dword8;
-                    jk_SetConsoleCursorPosition(stdConsole_hConsoleOutput, dwCursorPosition);
+                    jk_SetConsoleCursorPosition(stdConsole_hOutput, dwCursorPosition);
                     v31 = v1->word74;
-                    if ( stdConsole_foregroundAttr != v31 )
+                    if ( stdConsole_textAttribute != v31 )
                     {
-                        stdConsole_foregroundAttr = v1->word74;
-                        jk_SetConsoleTextAttribute(stdConsole_hConsoleOutput, v31);
+                        stdConsole_textAttribute = v1->word74;
+                        jk_SetConsoleTextAttribute(stdConsole_hOutput, v31);
                     }
-                    jk_WriteConsoleA(stdConsole_hConsoleOutput, &v1->char1C, _strlen(&v1->char1C), &v46, 0);
+                    jk_WriteConsoleA(stdConsole_hOutput, &v1->char1C, _strlen(&v1->char1C), &v46, 0);
                     v32 = v1->dword8;
                     dwCursorPosition.X = (NumberOfCharsWritten + dwCursorPosition.X + 1);
                     dwCursorPosition.Y = v32;
-                    jk_SetConsoleCursorPosition(stdConsole_hConsoleOutput, dwCursorPosition);
+                    jk_SetConsoleCursorPosition(stdConsole_hOutput, dwCursorPosition);
                     v33 = v1->word72;
                     writeChr = v42;
-                    if ( stdConsole_foregroundAttr != v33 )
+                    if ( stdConsole_textAttribute != v33 )
                     {
-                        stdConsole_foregroundAttr = v33;
-                        jk_SetConsoleTextAttribute(stdConsole_hConsoleOutput, v33);
+                        stdConsole_textAttribute = v33;
+                        jk_SetConsoleTextAttribute(stdConsole_hOutput, v33);
                     }
-                    jk_WriteConsoleA(stdConsole_hConsoleOutput, &writeChr, 1, &v46, 0);
+                    jk_WriteConsoleA(stdConsole_hOutput, &writeChr, 1, &v46, 0);
                     goto LABEL_83;
                 }
 LABEL_75:
@@ -579,7 +579,7 @@ LABEL_83:
     if ( stdConsole_cursorHidden > 0 && !--stdConsole_cursorHidden )
     {
         stdConsole_ConsoleCursorInfo.bVisible = 1;
-        jk_SetConsoleCursorInfo(stdConsole_hConsoleOutput, &stdConsole_ConsoleCursorInfo);
+        jk_SetConsoleCursorInfo(stdConsole_hOutput, &stdConsole_ConsoleCursorInfo);
     }
     v1->dword0 = 1;
 }
@@ -641,7 +641,7 @@ void stdConsole_WriteBorderMaybe2(stdConsole *console, char *a2, signed int a3)
         {
             coord.Y = LOWORD(console->dword8) + LOWORD(console->dword8C) + 1;
             coord.X = console_->dword4 + console_->dword88 + 1;
-            jk_SetConsoleCursorPosition(stdConsole_hConsoleOutput, coord);
+            jk_SetConsoleCursorPosition(stdConsole_hOutput, coord);
         }
     }
 }
@@ -661,18 +661,18 @@ void stdConsole_WriteBorderMaybe3(stdConsole *a1)
     struct _CONSOLE_SCREEN_BUFFER_INFO ConsoleScreenBufferInfo; // [esp+24h] [ebp-6Ch]
     char Buffer[84]; // [esp+3Ch] [ebp-54h]
 
-    jk_GetConsoleScreenBufferInfo(stdConsole_hConsoleOutput, &ConsoleScreenBufferInfo);
+    jk_GetConsoleScreenBufferInfo(stdConsole_hOutput, &ConsoleScreenBufferInfo);
     if ( !stdConsole_cursorHidden )
     {
         stdConsole_ConsoleCursorInfo.bVisible = 0;
-        jk_SetConsoleCursorInfo(stdConsole_hConsoleOutput, &stdConsole_ConsoleCursorInfo);
+        jk_SetConsoleCursorInfo(stdConsole_hOutput, &stdConsole_ConsoleCursorInfo);
     }
     v1 = a1->word70;
     ++stdConsole_cursorHidden;
-    if ( stdConsole_foregroundAttr != v1 )
+    if ( stdConsole_textAttribute != v1 )
     {
-        stdConsole_foregroundAttr = v1;
-        jk_SetConsoleTextAttribute(stdConsole_hConsoleOutput, v1);
+        stdConsole_textAttribute = v1;
+        jk_SetConsoleTextAttribute(stdConsole_hOutput, v1);
     }
     v2 = a1->dword14 - 2;
     v3 = a1->dword18 - 2;
@@ -688,14 +688,14 @@ void stdConsole_WriteBorderMaybe3(stdConsole *a1)
             _memcpy(Buffer, v7, v2);
             ST2C_4_8.X = a1->dword4 + 1;
             ST2C_4_8.Y = v4;
-            jk_SetConsoleCursorPosition(stdConsole_hConsoleOutput, ST2C_4_8);
+            jk_SetConsoleCursorPosition(stdConsole_hOutput, ST2C_4_8);
             v6 = a1->word70;
-            if ( stdConsole_foregroundAttr != v6 )
+            if ( stdConsole_textAttribute != v6 )
             {
-                stdConsole_foregroundAttr = a1->word70;
-                jk_SetConsoleTextAttribute(stdConsole_hConsoleOutput, v6);
+                stdConsole_textAttribute = a1->word70;
+                jk_SetConsoleTextAttribute(stdConsole_hOutput, v6);
             }
-            jk_WriteConsoleA(stdConsole_hConsoleOutput, Buffer, _strlen(Buffer), &NumberOfCharsWritten, 0);
+            jk_WriteConsoleA(stdConsole_hOutput, Buffer, _strlen(Buffer), &NumberOfCharsWritten, 0);
             v7 += v2;
             v8++;
             if ( ++v9.X >= a1->dword18 - 2 )
@@ -703,11 +703,11 @@ void stdConsole_WriteBorderMaybe3(stdConsole *a1)
             v4 = v8;
         }
     }
-    jk_SetConsoleCursorPosition(stdConsole_hConsoleOutput, ConsoleScreenBufferInfo.dwCursorPosition);
+    jk_SetConsoleCursorPosition(stdConsole_hOutput, ConsoleScreenBufferInfo.dwCursorPosition);
     if ( stdConsole_cursorHidden > 0 && !--stdConsole_cursorHidden )
     {
         stdConsole_ConsoleCursorInfo.bVisible = 1;
-        jk_SetConsoleCursorInfo(stdConsole_hConsoleOutput, &stdConsole_ConsoleCursorInfo);
+        jk_SetConsoleCursorInfo(stdConsole_hOutput, &stdConsole_ConsoleCursorInfo);
     }
 }
 
@@ -727,7 +727,7 @@ void stdConsole_WriteBorderMaybe4(COORD Buffer, const char *lpBuffer, __int16 a3
     if ( !stdConsole_cursorHidden )
     {
         stdConsole_ConsoleCursorInfo.bVisible = 0;
-        jk_SetConsoleCursorInfo(stdConsole_hConsoleOutput, &stdConsole_ConsoleCursorInfo);
+        jk_SetConsoleCursorInfo(stdConsole_hOutput, &stdConsole_ConsoleCursorInfo);
     }
     ++stdConsole_cursorHidden;
     v6 = _strlen(lpBuffer) + 1;
@@ -735,7 +735,7 @@ void stdConsole_WriteBorderMaybe4(COORD Buffer, const char *lpBuffer, __int16 a3
     ST24_4_3.X = 0;
     ST24_4_3.Y = Buffer.X;
     v8 = 40 - (signed int)(v6 - 1) / 2;
-    jk_SetConsoleCursorPosition(stdConsole_hConsoleOutput, ST24_4_3);
+    jk_SetConsoleCursorPosition(stdConsole_hOutput, ST24_4_3);
     v9 = wAttributes;
     if ( v8 > 0 )
     {
@@ -743,25 +743,25 @@ void stdConsole_WriteBorderMaybe4(COORD Buffer, const char *lpBuffer, __int16 a3
         do
         {
             char tmp = ' ';
-            if ( stdConsole_foregroundAttr != v9 )
+            if ( stdConsole_textAttribute != v9 )
             {
-                stdConsole_foregroundAttr = v9;
-                jk_SetConsoleTextAttribute(stdConsole_hConsoleOutput, v9);
+                stdConsole_textAttribute = v9;
+                jk_SetConsoleTextAttribute(stdConsole_hOutput, v9);
             }
-            jk_WriteConsoleA(stdConsole_hConsoleOutput, &tmp, 1u, (LPDWORD)&wAttributes, 0);
+            jk_WriteConsoleA(stdConsole_hOutput, &tmp, 1u, (LPDWORD)&wAttributes, 0);
             --v8;
         }
         while ( v8 );
     }
     Buffer.X = v4;
     Buffer.Y = v5;
-    jk_SetConsoleCursorPosition(stdConsole_hConsoleOutput, Buffer);
-    if ( stdConsole_foregroundAttr != a3 )
+    jk_SetConsoleCursorPosition(stdConsole_hOutput, Buffer);
+    if ( stdConsole_textAttribute != a3 )
     {
-        stdConsole_foregroundAttr = a3;
-        jk_SetConsoleTextAttribute(stdConsole_hConsoleOutput, a3);
+        stdConsole_textAttribute = a3;
+        jk_SetConsoleTextAttribute(stdConsole_hOutput, a3);
     }
-    jk_WriteConsoleA(stdConsole_hConsoleOutput, lpBuffer, _strlen(lpBuffer), &Buffer, 0);
+    jk_WriteConsoleA(stdConsole_hOutput, lpBuffer, _strlen(lpBuffer), &Buffer, 0);
     v11 = v6 - 1 + v4;
     if ( v11 < 80 )
     {
@@ -769,12 +769,12 @@ void stdConsole_WriteBorderMaybe4(COORD Buffer, const char *lpBuffer, __int16 a3
         do
         {
             char tmp = ' ';
-            if ( stdConsole_foregroundAttr != v9 )
+            if ( stdConsole_textAttribute != v9 )
             {
-                stdConsole_foregroundAttr = v9;
-                jk_SetConsoleTextAttribute(stdConsole_hConsoleOutput, v9);
+                stdConsole_textAttribute = v9;
+                jk_SetConsoleTextAttribute(stdConsole_hOutput, v9);
             }
-            jk_WriteConsoleA(stdConsole_hConsoleOutput, &tmp, 1, &Buffer, 0);
+            jk_WriteConsoleA(stdConsole_hOutput, &tmp, 1, &Buffer, 0);
             --v12;
         }
         while ( v12 );
@@ -787,7 +787,7 @@ void stdConsole_WriteBorderMaybe4(COORD Buffer, const char *lpBuffer, __int16 a3
         if ( !result )
         {
             stdConsole_ConsoleCursorInfo.bVisible = 1;
-            jk_SetConsoleCursorInfo(stdConsole_hConsoleOutput, &stdConsole_ConsoleCursorInfo);
+            jk_SetConsoleCursorInfo(stdConsole_hOutput, &stdConsole_ConsoleCursorInfo);
         }
     }
 }
