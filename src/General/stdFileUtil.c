@@ -31,7 +31,7 @@
 #include <errno.h>
 #endif
 
-stdFileSearch* stdFileUtil_NewFind(const char *path, int a2, const char *extension)
+stdFileSearch* stdFileUtil_NewFind(const char *path, int mode, const char *pFilter)
 {
     stdFileSearch* search = (stdFileSearch *)STD_ALLOC(sizeof(stdFileSearch));
     if ( !search ) {
@@ -39,18 +39,18 @@ stdFileSearch* stdFileUtil_NewFind(const char *path, int a2, const char *extensi
     }
     _memset(search, 0, sizeof(stdFileSearch));
 
-    if ( a2 < 0 )
+    if ( mode < 0 )
         return search;
-    if ( a2 <= 2 )
+    if ( mode <= 2 )
     {
         stdFnames_MakePath(search->path, 128, path, "*.*");
         return search;
     }
-    if ( a2 != 3 )
+    if ( mode != 3 )
         return search;
-    if ( *extension == '.' )
-        extension = extension + 1;
-    stdString_snprintf(std_g_genBuffer, 1024, "*.%s", extension);
+    if ( *pFilter == '.' )
+        pFilter = pFilter + 1;
+    stdString_snprintf(std_g_genBuffer, 1024, "*.%s", pFilter);
     stdFnames_MakePath(search->path, 128, path, std_g_genBuffer);
     
 #ifdef FS_POSIX
@@ -75,41 +75,41 @@ stdFileSearch* stdFileUtil_NewFind(const char *path, int a2, const char *extensi
 #endif
 
 #ifdef WIN32
-int stdFileUtil_FindNext(stdFileSearch *a1, stdFileSearchResult *a2)
+int stdFileUtil_FindNext(stdFileSearch *ffData, stdFileSearchResult *pFileInfo)
 {
     intptr_t v4; // eax
     struct _finddata_t v6; // [esp+8h] [ebp-118h] BYREF
 
-    if ( !a1 )
+    if ( !ffData )
         return 0;
 
-    if (a1->isNotFirst++)
+    if (ffData->isNotFirst++)
     {
-        v4 = __findnext(a1->field_88, &v6);
+        v4 = __findnext(ffData->field_88, &v6);
     }
     else
     {
-        v4 = __findfirst(a1->path, &v6);
-        a1->field_88 = v4;
+        v4 = __findfirst(ffData->path, &v6);
+        ffData->field_88 = v4;
     }
     if ( v4 == -1 )
         return 0;
 
     // Added: strcpy -> strncpy
-    _strncpy(a2->fpath, v6.name, sizeof(a2->fpath)-1);
+    _strncpy(pFileInfo->fpath, v6.name, sizeof(pFileInfo->fpath)-1);
 
-    a2->time_write = v6.time_write;
-    a2->is_subdirectory = v6.attrib & 0x10;
+    pFileInfo->time_write = v6.time_write;
+    pFileInfo->is_subdirectory = v6.attrib & 0x10;
     return 1;
 }
 
-void stdFileUtil_DisposeFind(stdFileSearch *search)
+void stdFileUtil_DisposeFind(stdFileSearch *ffData)
 {
-    if ( search )
+    if ( ffData )
     {
-        if ( search->isNotFirst )
-            __findclose(search->field_88);
-        STD_FREE(search);
+        if ( ffData->isNotFirst )
+            __findclose(ffData->field_88);
+        STD_FREE(ffData);
     }
 }
 
@@ -125,21 +125,21 @@ void stdFileUtil_FindReset(stdFileSearch *search)
     }
 }
 
-int stdFileUtil_FindQuick(const char *path, int type, const char *extension, stdFileSearchResult *result)
+int stdFileUtil_FindQuick(const char *pPath, int mode, const char *pFilter, stdFileSearchResult *pFileInfo)
 {
-    stdFileSearch *search = stdFileUtil_NewFind(path, type, extension);
+    stdFileSearch *search = stdFileUtil_NewFind(pPath, mode, pFilter);
     if ( !search )
         return 0;
 
-    int found = stdFileUtil_FindNext(search, result);
+    int found = stdFileUtil_FindNext(search, pFileInfo);
     stdFileUtil_DisposeFind(search);
     return found;
 }
 
-int stdFileUtil_CountMatches(const char *path, int type, const char *extension)
+int stdFileUtil_CountMatches(const char *pPath, int mode, const char *pFilter)
 {
     stdFileSearchResult result;
-    stdFileSearch *search = stdFileUtil_NewFind(path, type, extension);
+    stdFileSearch *search = stdFileUtil_NewFind(pPath, mode, pFilter);
     if ( !search )
         return 0;
 
@@ -152,10 +152,10 @@ int stdFileUtil_CountMatches(const char *path, int type, const char *extension)
     return count;
 }
 
-int stdFileUtil_FileExists(const char *path)
+int stdFileUtil_FileExists(const char *pFilename)
 {
     struct _WIN32_FIND_DATAA findData;
-    HANDLE h = FindFirstFileA(path, (LPWIN32_FIND_DATAA)&findData);
+    HANDLE h = FindFirstFileA(pFilename, (LPWIN32_FIND_DATAA)&findData);
     if ( h != INVALID_HANDLE_VALUE )
     {
         FindClose(h);
@@ -164,9 +164,9 @@ int stdFileUtil_FileExists(const char *path)
     return 0;
 }
 
-void stdFileUtil_RmDir(const char *path)
+void stdFileUtil_RmDir(const char *pDir)
 {
-    RemoveDirectoryA(path);
+    RemoveDirectoryA(pDir);
 }
 
 // https://stackoverflow.com/questions/1517685/recursive-createdirectory
@@ -198,9 +198,9 @@ BOOL stdFileUtil_MkDir(LPCSTR lpPathName)
     return CreateDirectoryA(lpPathName, 0);
 }
 
-int stdFileUtil_DelFile(char* lpFileName)
+int stdFileUtil_DelFile(char* pFilename)
 {
-    return DeleteFileA(lpFileName);
+    return DeleteFileA(pFilename);
 }
 
 int stdFileUtil_Deltree(LPCSTR lpPathName)

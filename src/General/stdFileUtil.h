@@ -40,16 +40,16 @@ typedef struct stdFileSearchResult
     int time_write;
 } stdFileSearchResult;
 
-stdFileSearch* stdFileUtil_NewFind(const char *path, int a2, const char *extension);
-int stdFileUtil_FindNext(stdFileSearch *a1, stdFileSearchResult *a2);
-void stdFileUtil_DisposeFind(stdFileSearch *search);
+stdFileSearch* stdFileUtil_NewFind(const char *path, int mode, const char *pFilter);
+int stdFileUtil_FindNext(stdFileSearch *ffData, stdFileSearchResult *pFileInfo);
+void stdFileUtil_DisposeFind(stdFileSearch *ffData);
 void stdFileUtil_FindReset(stdFileSearch *search);
-int stdFileUtil_FindQuick(const char *path, int type, const char *extension, stdFileSearchResult *result);
-int stdFileUtil_CountMatches(const char *path, int type, const char *extension);
-int stdFileUtil_FileExists(const char *path);
-void stdFileUtil_RmDir(const char *path);
+int stdFileUtil_FindQuick(const char *pPath, int mode, const char *pFilter, stdFileSearchResult *pFileInfo);
+int stdFileUtil_CountMatches(const char *pPath, int mode, const char *pFilter);
+int stdFileUtil_FileExists(const char *pFilename);
+void stdFileUtil_RmDir(const char *pDir);
 
-int stdFileUtil_DelFile(char* lpFileName);
+int stdFileUtil_DelFile(char* pFilename);
 int stdFileUtil_Deltree(const char* lpPathName);
 
 #if defined(PLATFORM_POSIX) && !defined(WIN32)

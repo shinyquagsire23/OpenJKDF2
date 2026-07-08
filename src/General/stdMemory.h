@@ -20,9 +20,9 @@ void stdMemory_Startup();
 void stdMemory_Shutdown();
 int stdMemory_Open();
 void stdMemory_Close();
-stdMemoryAlloc* stdMemory_Malloc(unsigned int allocSize, char *filePath, int lineNum);
-void stdMemory_Free(stdMemoryAlloc *alloc);
-stdMemoryAlloc* stdMemory_Realloc(stdMemoryAlloc *alloc, int allocSize, char *filePath, int lineNum);
+stdMemoryAlloc* stdMemory_Malloc(unsigned int size, char *pFilename, int line);
+void stdMemory_Free(stdMemoryAlloc *pBytes);
+stdMemoryAlloc* stdMemory_Realloc(stdMemoryAlloc *pBytes, int size, char *pFilename, int line);
 
 //static void* (*daAlloc)(uint32_t) = (void*)daAlloc_ADDR;
 //static void (*daFree)(void*) = (void*)daFree_ADDR;

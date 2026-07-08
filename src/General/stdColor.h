@@ -26,8 +26,8 @@ int stdColor_ColorConvertOneRow(uint8_t *outPixels, rdTexFormat *formatTo, uint8
 int stdColor_GammaCorrect(uint8_t *pOut, uint8_t *pIn, int numColors, flex_d_t gamma);
 void stdColor_LoadPalette(rdColor24 *dst, rdColor24 *src);
 uint8_t stdColor_FindClosest(rdColor24 *palette, uint32_t numColors, flex_t r, flex_t g, flex_t b);
-void stdColor_RGBtoHSV(flex_t r, flex_t g, flex_t b, flex_t *pH, flex_t *pS, flex_t *pV);
-void stdColor_HSVtoRGB(flex_t h, flex_t s, flex_t v, flex_t *pR, flex_t *pG, flex_t *pB);
+void stdColor_RGBtoHSV(flex_t r, flex_t g, flex_t b, flex_t *hue, flex_t *saturation, flex_t *value);
+void stdColor_HSVtoRGB(flex_t hue, flex_t saturation, flex_t value, flex_t *r, flex_t *g, flex_t *b);
 int stdColor_BuildRGB16LUT(rdColor24 *palette, uint16_t *lut, rdTexFormat *format);
 int stdColor_BuildRGBAKEY16LUT(rdColor24 *palette, uint16_t *lut, rdTexFormat *format);
 int stdColor_BuildRGBA16LUT(rdColor24 *palette, uint16_t *lut, rdTexFormat *format, uint32_t alphaVal);

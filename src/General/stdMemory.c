@@ -48,51 +48,51 @@ void stdMemory_Close()
     stdMemory_bOpened = 0;
 }
 
-stdMemoryAlloc* stdMemory_Malloc(unsigned int allocSize, char *filePath, int lineNum)
+stdMemoryAlloc* stdMemory_Malloc(unsigned int size, char *pFilename, int line)
 {
     stdMemoryAlloc *result; // eax
     stdMemoryAlloc *v4; // edx
     stdMemoryAlloc *v5; // ecx
 
-    result = (stdMemoryAlloc *)STD_ALLOC(allocSize + 0x24);
+    result = (stdMemoryAlloc *)STD_ALLOC(size + 0x24);
     v4 = result;
     if ( result )
     {
         result->num = stdMemory_g_curState.totalAllocs;
-        result->filePath = filePath;
+        result->filePath = pFilename;
         v5 = stdMemory_g_curState.header.prev;
-        result->lineNum = lineNum;
+        result->lineNum = line;
         result->alloc = (void*)result;
-        result->size = allocSize;
+        result->size = size;
         result->prev = v5;
         if ( v5 )
             v5->next = result;
         result->next = &stdMemory_g_curState.header;
-        _memset(&result[1], 0xCCu, allocSize);
+        _memset(&result[1], 0xCCu, size);
         stdMemory_g_curState.header.prev = result;
         result->magic = 0x12345678;
-        *(int *)((char *)&result[1].num + allocSize) = 0x12345678;
+        *(int *)((char *)&result[1].num + size) = 0x12345678;
 
-        if ( stdMemory_g_curState.maxBytes <= allocSize + stdMemory_g_curState.totalBytes )
-            stdMemory_g_curState.maxBytes = allocSize + stdMemory_g_curState.totalBytes;
+        if ( stdMemory_g_curState.maxBytes <= size + stdMemory_g_curState.totalBytes )
+            stdMemory_g_curState.maxBytes = size + stdMemory_g_curState.totalBytes;
 
-        stdMemory_g_curState.totalBytes += allocSize;
+        stdMemory_g_curState.totalBytes += size;
         ++stdMemory_g_curState.totalAllocs;
         result = v4 + 1;
     }
     return result;
 }
 
-void stdMemory_Free(stdMemoryAlloc *alloc)
+void stdMemory_Free(stdMemoryAlloc *pBytes)
 {
     stdMemoryAlloc *v1; // edx
     stdMemoryAlloc *v2; // eax
     int v3; // edi
     int v4; // esi
 
-    v1 = alloc - 1;
-    _memset(alloc, 0xDDu, alloc[-1].size);
-    v2 = alloc[-1].prev;
+    v1 = pBytes - 1;
+    _memset(pBytes, 0xDDu, pBytes[-1].size);
+    v2 = pBytes[-1].prev;
     if ( v2 )
         v2->next = v1->next;
     v3 = stdMemory_g_curState.totalBytes;
@@ -103,7 +103,7 @@ void stdMemory_Free(stdMemoryAlloc *alloc)
     STD_FREE(v1);
 }
 
-stdMemoryAlloc* stdMemory_Realloc(stdMemoryAlloc *alloc, int allocSize, char *filePath, int lineNum)
+stdMemoryAlloc* stdMemory_Realloc(stdMemoryAlloc *pBytes, int size, char *pFilename, int line)
 {
     stdMemoryAlloc *result; // eax
     stdMemoryAlloc *v5; // edx
@@ -115,19 +115,19 @@ stdMemoryAlloc* stdMemory_Realloc(stdMemoryAlloc *alloc, int allocSize, char *fi
     stdMemoryAlloc *v11; // ecx
     unsigned int v12; // edx
 
-    if ( !alloc )
-        return stdMemory_Malloc(allocSize, filePath, lineNum);
-    if ( allocSize )
+    if ( !pBytes )
+        return stdMemory_Malloc(size, pFilename, line);
+    if ( size )
     {
-        v9 = alloc[-1].size;
-        result = (stdMemoryAlloc *)STD_REALLOC(&alloc[-1], allocSize + 0x24);
+        v9 = pBytes[-1].size;
+        result = (stdMemoryAlloc *)STD_REALLOC(&pBytes[-1], size + 0x24);
         if ( result )
         {
-            result->filePath = filePath;
+            result->filePath = pFilename;
             v10 = result->prev;
             result->alloc = (void*)result;
-            result->size = allocSize;
-            result->lineNum = lineNum;
+            result->size = size;
+            result->lineNum = line;
             if ( v10 )
                 v10->next = result;
             v11 = result->next;
@@ -135,8 +135,8 @@ stdMemoryAlloc* stdMemory_Realloc(stdMemoryAlloc *alloc, int allocSize, char *fi
                 v11->prev = result;
             v12 = stdMemory_g_curState.maxBytes;
             result->magic = 305419896;
-            *(int *)((char *)&result[1].num + allocSize) = 305419896;
-            stdMemory_g_curState.totalBytes += allocSize - v9;
+            *(int *)((char *)&result[1].num + size) = 305419896;
+            stdMemory_g_curState.totalBytes += size - v9;
             if ( v12 <= stdMemory_g_curState.totalBytes )
                 stdMemory_g_curState.maxBytes = stdMemory_g_curState.totalBytes;
             ++result;
@@ -144,9 +144,9 @@ stdMemoryAlloc* stdMemory_Realloc(stdMemoryAlloc *alloc, int allocSize, char *fi
     }
     else
     {
-        v5 = alloc - 1;
-        _memset(alloc, 0xDDu, alloc[-1].size);
-        v6 = alloc[-1].prev;
+        v5 = pBytes - 1;
+        _memset(pBytes, 0xDDu, pBytes[-1].size);
+        v6 = pBytes[-1].prev;
         if ( v6 )
             v6->next = v5->next;
         v7 = stdMemory_g_curState.totalBytes;

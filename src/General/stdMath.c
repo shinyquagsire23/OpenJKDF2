@@ -2,13 +2,13 @@
 
 #include "stdMathTables.h"
 
-flex_t stdMath_FlexPower(flex_t num, int32_t exp)
+flex_t stdMath_FlexPower(flex_t base, int32_t exponent)
 {
-    flex_t retval = num;
+    flex_t retval = base;
 
-    for (int32_t i = 0; i < exp - 1; ++i)
+    for (int32_t i = 0; i < exponent - 1; ++i)
     {
-        retval = retval * num;
+        retval = retval * base;
     }
     return retval;
 }
@@ -249,21 +249,21 @@ void stdMath_SinCos(flex_t angle, flex_t *pSinOut, flex_t *pCosOut)
     }
 }
 
-flex_t stdMath_Dist2D1(flex_t a1, flex_t a2)
+flex_t stdMath_Dist2D1(flex_t x, flex_t y)
 {
   flex_t v3; // [esp+0h] [ebp-18h]
   flex_t v4; // [esp+4h] [ebp-14h]
   flex_t v5; // [esp+8h] [ebp-10h]
   flex_t v6; // [esp+Ch] [ebp-Ch]
 
-  if ( a1 >= 0.0 )
-    v6 = a1;
+  if ( x >= 0.0 )
+    v6 = x;
   else
-    v6 = -a1;
-  if ( a2 >= 0.0 )
-    v5 = a2;
+    v6 = -x;
+  if ( y >= 0.0 )
+    v5 = y;
   else
-    v5 = -a2;
+    v5 = -y;
   if ( v6 <= v5 )
     v4 = v5;
   else
@@ -358,7 +358,7 @@ flex_t stdMath_Dist2D4(flex_t a1, flex_t a2)
   return v3;
 }
 
-flex_t stdMath_Dist3D1(flex_t a1, flex_t a2, flex_t a3)
+flex_t stdMath_Dist3D1(flex_t x, flex_t y, flex_t z)
 {
   flex_t v4; // [esp+0h] [ebp-18h]
   flex_t v5; // [esp+4h] [ebp-14h]
@@ -372,18 +372,18 @@ flex_t stdMath_Dist3D1(flex_t a1, flex_t a2, flex_t a3)
   v8 = 0.0;
   v7 = 0.0;
 
-  if ( a1 >= 0.0 )
-    v6 = a1;
+  if ( x >= 0.0 )
+    v6 = x;
   else
-    v6 = -a1;
-  if ( a2 >= 0.0 )
-    v5 = a2;
+    v6 = -x;
+  if ( y >= 0.0 )
+    v5 = y;
   else
-    v5 = -a2;
-  if ( a3 >= 0.0 )
-    v4 = a3;
+    v5 = -y;
+  if ( z >= 0.0 )
+    v4 = z;
   else
-    v4 = -a3;
+    v4 = -z;
   if ( v6 <= v5 )
   {
     if ( v5 > v4 )
@@ -632,7 +632,7 @@ flex_t stdMath_Sqrt(flex_t a)
 #endif
 }
 
-flex_t stdMath_Tan(flex_t a1)
+flex_t stdMath_Tan(flex_t angle)
 {
     flex_d_t v1; // st7
     flex_t v3; // [esp+Ch] [ebp-20h]
@@ -649,7 +649,7 @@ flex_t stdMath_Tan(flex_t a1)
     flex_t v14; // [esp+28h] [ebp-4h]
     flex_t v15; // [esp+34h] [ebp+8h]
 
-    v1 = stdMath_NormalizeAngle(a1);
+    v1 = stdMath_NormalizeAngle(angle);
     v15 = v1;
     if ( v1 >= 90.0 )
     {
@@ -712,7 +712,7 @@ flex_t stdMath_Tan(flex_t a1)
     return v9;
 }
 
-flex_t stdMath_ArcSin1(flex_t val)
+flex_t stdMath_ArcSin1(flex_t num)
 {
     flex_d_t angle; // st7
     flex_t v2; // [esp+0h] [ebp-14h]
@@ -720,10 +720,10 @@ flex_t stdMath_ArcSin1(flex_t val)
     flex_t v5; // [esp+10h] [ebp-4h]
     flex_t v6; // [esp+1Ch] [ebp+8h]
 
-    if ( val >= 0.0 )
-        v3 = val;
+    if ( num >= 0.0 )
+        v3 = num;
     else
-        v3 = -val;
+        v3 = -num;
 
     // TODO: verify all these constants are expanded properly to the og values
     if ( v3 <= 0.70710677 )
@@ -737,7 +737,7 @@ flex_t stdMath_ArcSin1(flex_t val)
         v5 = 90.0 - (stdMath_FlexPower(v6, 3) * 0.212749 + v6) *  (180.0 / M_PI);
     }
 
-    if ( val < 0.0 )
+    if ( num < 0.0 )
         angle = -v5;
     else
         angle = v5;
@@ -745,7 +745,7 @@ flex_t stdMath_ArcSin1(flex_t val)
     return angle;
 }
 
-flex_t stdMath_ArcSin2(flex_t val)
+flex_t stdMath_ArcSin2(flex_t num)
 {
     flex_d_t angle; // st7
     flex_t v2; // [esp+0h] [ebp-1Ch]
@@ -756,10 +756,10 @@ flex_t stdMath_ArcSin2(flex_t val)
     flex_t v7; // [esp+18h] [ebp-4h]
     flex_t v8; // [esp+24h] [ebp+8h]
 
-    if ( val >= 0.0 )
-        v5 = val;
+    if ( num >= 0.0 )
+        v5 = num;
     else
-        v5 = -val;
+        v5 = -num;
 
     // TODO: verify all these constants are expanded properly to the og values
     if ( v5 <= 0.70710677 )
@@ -775,7 +775,7 @@ flex_t stdMath_ArcSin2(flex_t val)
         v7 = 90.0 - (stdMath_FlexPower(v8, 5) * 0.105502 + v4) *  (180.0 / M_PI);
     }
 
-    if ( val < 0.0 )
+    if ( num < 0.0 )
         angle = -v7;
     else
         angle = v7;
@@ -783,7 +783,7 @@ flex_t stdMath_ArcSin2(flex_t val)
     return angle;
 }
 
-flex_t stdMath_ArcSin3(flex_t a1)
+flex_t stdMath_ArcSin3(flex_t num)
 {
     flex_t v2; // [esp+0h] [ebp-24h]
     flex_t v3; // [esp+4h] [ebp-20h]
@@ -795,10 +795,10 @@ flex_t stdMath_ArcSin3(flex_t a1)
     flex_t v10; // [esp+2Ch] [ebp+8h]
 
 
-    if ( a1 >= 0.0 )
-        v7 = a1;
+    if ( num >= 0.0 )
+        v7 = num;
     else
-        v7 = -a1;
+        v7 = -num;
 
     if ( v7 <= 0.70710677 )
     {
@@ -814,7 +814,7 @@ flex_t stdMath_ArcSin3(flex_t a1)
         v5 = stdMath_FlexPower(v10, 5) * 0.075000003 + v6;
         v9 = 90.0 - (stdMath_FlexPower(v10, 7) * 0.066797003 + v5) * (180.0 / M_PI);
     }
-    if ( a1 < 0.0 )
+    if ( num < 0.0 )
         return -v9;
     else
         return v9;
@@ -946,7 +946,7 @@ flex_t stdMath_ArcTan3(flex_t a1, flex_t a2)
     return v10;
 }
 
-flex_t stdMath_ArcTan4(flex_t a1, flex_t a2)
+flex_t stdMath_ArcTan4(flex_t x, flex_t y)
 {
     flex_d_t v3; // st7
     flex_t v4; // [esp+0h] [ebp-30h]
@@ -959,16 +959,16 @@ flex_t stdMath_ArcTan4(flex_t a1, flex_t a2)
     flex_t v11; // [esp+28h] [ebp-8h]
     flex_t v12; // [esp+2Ch] [ebp-4h]
 
-    if ( a2 == 0.0 && a1 == 0.0 )
+    if ( y == 0.0 && x == 0.0 )
         return 0.0;
-    if ( a1 >= 0.0 )
-        v9 = a1;
+    if ( x >= 0.0 )
+        v9 = x;
     else
-        v9 = -a1;
-    if ( a2 >= 0.0 )
-        v8 = a2;
+        v9 = -x;
+    if ( y >= 0.0 )
+        v8 = y;
     else
-        v8 = -a2;
+        v8 = -y;
     if ( v8 <= (flex_d_t)v9 )
         v3 = v8 / v9;
     else
@@ -985,9 +985,9 @@ flex_t stdMath_ArcTan4(flex_t a1, flex_t a2)
     if ( v9 >= (flex_d_t)v8 )
         v10 = 90.0 - v10;
     v11 = 90.0 - v10;
-    if ( a1 < 0.0 )
+    if ( x < 0.0 )
         v11 = 180.0 - v11;
-    if ( a2 >= 0.0 )
+    if ( y >= 0.0 )
         v11 = -v11;
     return v11;
 }

@@ -33,17 +33,17 @@ typedef struct tHashTable
 } tHashTable;
 
 uint32_t stdHashtbl_HashStringToIdx(const char *data, uint32_t numNodes);
-tHashTable* stdHashtbl_New(int maxEntries);
-tHashLink* stdHashtbl_GetTailNode(tHashLink *pLL);
-void stdHashtbl_FreeListNodes(tHashLink *a1);
-void stdHashtbl_Free(tHashTable *table);
+tHashTable* stdHashtbl_New(int size);
+tHashLink* stdHashtbl_GetTailNode(tHashLink *pCur);
+void stdHashtbl_FreeListNodes(tHashLink *pNode);
+void stdHashtbl_Free(tHashTable *pTable);
 #ifdef STDHASHTABLE_CRC32_KEYS
 int stdHashtbl_FreeKeyCrc32(tHashTable *pHashtbl, uint32_t keyCrc32);
 #endif
-void* stdHashtbl_Find(tHashTable *table, const char *key);
-int stdHashtbl_Add(tHashTable *hashmap, const char *key, void *value);
-int stdHashtbl_Remove(tHashTable *pHashtbl, const char *key);
-void stdHashtbl_PrintTableDiagnostics(tHashTable *pHashtbl);
-void stdHashtbl_DumpTable(tHashTable *pHashtbl);
+void* stdHashtbl_Find(tHashTable *table, const char *pName);
+int stdHashtbl_Add(tHashTable *pTable, const char *pName, void *pData);
+int stdHashtbl_Remove(tHashTable *pTable, const char *pName);
+void stdHashtbl_PrintTableDiagnostics(tHashTable *pTable);
+void stdHashtbl_DumpTable(tHashTable *pTable);
 
 #endif // _STDHASHTABLE_H

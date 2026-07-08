@@ -85,19 +85,19 @@ typedef struct Gob
     uint32_t hMapFile;
 } Gob;
 
-int stdGob_Startup(HostServices *pHS_in);
+int stdGob_Startup(HostServices *pHS);
 void stdGob_Shutdown();
-Gob* stdGob_Load(char *fpath, int a2, int a3);
-int stdGob_LoadEntry(Gob *gob, char *fname, int a3, int a4);
-void stdGob_Free(Gob *gob);
-void stdGob_FreeEntry(Gob *gob);
-GobFileHandle* stdGob_FileOpen(Gob *gob, const char *filepath);
-void stdGob_FileClose(GobFileHandle *f);
-int stdGob_FileSeek(GobFileHandle *f, int pos, int whence);
-int32_t stdGob_FileTell(GobFileHandle *f);
-bool stdGob_FileEOF(GobFileHandle *f);
-size_t stdGob_FileRead(GobFileHandle *f, void *out, uint32_t len);
-const char* stdGob_FileGets(GobFileHandle *f, char *out, unsigned int len);
+Gob* stdGob_Load(char *pFilename, int numFileHandles, int bMMapFile);
+int stdGob_LoadEntry(Gob *pGob, char *pFilename, int numFileHandles, int bMMapFile);
+void stdGob_Free(Gob *pGob);
+void stdGob_FreeEntry(Gob *pGob);
+GobFileHandle* stdGob_FileOpen(Gob *pGob, const char *aName);
+void stdGob_FileClose(GobFileHandle *pHandle);
+int stdGob_FileSeek(GobFileHandle *pHandle, int offset, int origin);
+int32_t stdGob_FileTell(GobFileHandle *pHandle);
+bool stdGob_FileEOF(GobFileHandle *pHandle);
+size_t stdGob_FileRead(GobFileHandle *pHandle, void *data, uint32_t size);
+const char* stdGob_FileGets(GobFileHandle *pGobFileHandle, char *pStr, unsigned int size);
 const wchar_t* stdGob_FileGetws(GobFileHandle *f, wchar_t *out, unsigned int len);
 
 // ADDED

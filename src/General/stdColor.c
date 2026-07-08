@@ -168,7 +168,7 @@ uint8_t stdColor_FindClosest(rdColor24 *palette, uint32_t numColors, flex_t r, f
     return (uint8_t)bestIdx;
 }
 
-void stdColor_RGBtoHSV(flex_t r, flex_t g, flex_t b, flex_t *pH, flex_t *pS, flex_t *pV)
+void stdColor_RGBtoHSV(flex_t r, flex_t g, flex_t b, flex_t *hue, flex_t *saturation, flex_t *value)
 {
     r /= 255.0f;
     g /= 255.0f;
@@ -183,16 +183,16 @@ void stdColor_RGBtoHSV(flex_t r, flex_t g, flex_t b, flex_t *pH, flex_t *pS, fle
     if ( minVal > b ) minVal = b;
 
     flex_t delta = maxVal - minVal;
-    *pV = maxVal;
+    *value = maxVal;
 
     if ( maxVal == 0.0f )
-        *pS = 0.0f;
+        *saturation = 0.0f;
     else
-        *pS = delta / maxVal;
+        *saturation = delta / maxVal;
 
-    if ( *pS == 0.0f )
+    if ( *saturation == 0.0f )
     {
-        *pH = 0.0f;
+        *hue = 0.0f;
         return;
     }
 
@@ -208,42 +208,42 @@ void stdColor_RGBtoHSV(flex_t r, flex_t g, flex_t b, flex_t *pH, flex_t *pS, fle
     else
         h = gc - rc + 4.0f;
 
-    *pH = h * 60.0f;
-    if ( *pH < 0.0f )
-        *pH += 360.0f;
+    *hue = h * 60.0f;
+    if ( *hue < 0.0f )
+        *hue += 360.0f;
 }
 
-void stdColor_HSVtoRGB(flex_t h, flex_t s, flex_t v, flex_t *pR, flex_t *pG, flex_t *pB)
+void stdColor_HSVtoRGB(flex_t hue, flex_t saturation, flex_t value, flex_t *r, flex_t *g, flex_t *b)
 {
-    if ( s == 0.0f )
+    if ( saturation == 0.0f )
     {
-        flex_t val = v * 255.0f;
-        *pR = val;
-        *pG = val;
-        *pB = val;
+        flex_t val = value * 255.0f;
+        *r = val;
+        *g = val;
+        *b = val;
         return;
     }
 
-    int sector = (__int64)(h / 60.0f);
-    flex_t frac = h / 60.0f - (flex_t)sector;
-    flex_t p = (1.0f - s) * v;
-    flex_t q = (1.0f - frac * s) * v;
-    flex_t t = (1.0f - (1.0f - frac) * s) * v;
+    int sector = (__int64)(hue / 60.0f);
+    flex_t frac = hue / 60.0f - (flex_t)sector;
+    flex_t p = (1.0f - saturation) * value;
+    flex_t q = (1.0f - frac * saturation) * value;
+    flex_t t = (1.0f - (1.0f - frac) * saturation) * value;
 
     flex_t rr, gg, bb;
     switch ( sector )
     {
-        case 0: rr = v;  gg = t;  bb = p;  break;
-        case 1: rr = q;  gg = v;  bb = p;  break;
-        case 2: rr = p;  gg = v;  bb = t;  break;
-        case 3: rr = p;  gg = q;  bb = v;  break;
-        case 4: rr = t;  gg = p;  bb = v;  break;
-        case 5: rr = v;  gg = p;  bb = q;  break;
+        case 0: rr = value;  gg = t;  bb = p;  break;
+        case 1: rr = q;  gg = value;  bb = p;  break;
+        case 2: rr = p;  gg = value;  bb = t;  break;
+        case 3: rr = p;  gg = q;  bb = value;  break;
+        case 4: rr = t;  gg = p;  bb = value;  break;
+        case 5: rr = value;  gg = p;  bb = q;  break;
         default: return;
     }
-    *pR = rr * 255.0f;
-    *pG = gg * 255.0f;
-    *pB = bb * 255.0f;
+    *r = rr * 255.0f;
+    *g = gg * 255.0f;
+    *b = bb * 255.0f;
 }
 
 int stdColor_BuildRGB16LUT(rdColor24 *palette, uint16_t *lut, rdTexFormat *format)
