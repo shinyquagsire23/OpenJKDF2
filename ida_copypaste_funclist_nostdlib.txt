@@ -1318,8 +1318,8 @@ rdKeyframe_NewEntry	.text	0044ABA0	00000028	00000008	00000004	R	.	.	.	.	.	T	.
 rdKeyframe_Load	.text	0044ABD0	000000C6	0000000C	00000004	R	.	.	.	.	.	T	.
 rdKeyframe_LoadEntry	.text	0044ACA0	00000542	00000078	00000008	R	.	.	.	.	.	T	.
 rdKeyframe_Write	.text	0044B1F0	00000376	0000004C	0000000C	R	.	.	.	.	B	T	.
-rdKeyframe_FreeEntry	.text	0044B570	0000007B	0000000C	00000004	R	.	.	.	.	.	T	.
-rdKeyframe_FreeJoints	.text	0044B5F0	00000058	00000004	00000004	R	.	.	.	.	.	T	.
+rdKeyframe_Free	.text	0044B570	0000007B	0000000C	00000004	R	.	.	.	.	.	T	.
+rdKeyframe_FreeEntry	.text	0044B5F0	00000058	00000004	00000004	R	.	.	.	.	.	T	.
 rdLight_New	.text	0044B650	00000042	00000000	00000000	R	.	.	.	.	.	.	.
 rdLight_NewEntry	.text	0044B6A0	00000037	00000000	00000004	R	.	.	.	.	.	T	.
 rdLight_Free	.text	0044B6E0	00000015	00000000	00000004	R	.	.	.	.	.	T	.

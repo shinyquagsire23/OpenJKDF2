@@ -1616,8 +1616,8 @@ void do_hooks()
     hook_function(rdKeyframe_Load_ADDR, rdKeyframe_Load);
     hook_function(rdKeyframe_LoadEntry_ADDR, rdKeyframe_LoadEntry);
     hook_function(rdKeyframe_Write_ADDR, rdKeyframe_Write);
+    hook_function(rdKeyframe_Free_ADDR, rdKeyframe_Free);
     hook_function(rdKeyframe_FreeEntry_ADDR, rdKeyframe_FreeEntry);
-    hook_function(rdKeyframe_FreeJoints_ADDR, rdKeyframe_FreeJoints);
 #endif
     
     // rdLight
@@ -3107,8 +3107,8 @@ void do_hooks()
     hook_function_inv(rdKeyframe_Load_ADDR, rdKeyframe_Load);
     hook_function_inv(rdKeyframe_LoadEntry_ADDR, rdKeyframe_LoadEntry);
     hook_function_inv(rdKeyframe_Write_ADDR, rdKeyframe_Write);
+    hook_function_inv(rdKeyframe_Free_ADDR, rdKeyframe_Free);
     hook_function_inv(rdKeyframe_FreeEntry_ADDR, rdKeyframe_FreeEntry);
-    hook_function_inv(rdKeyframe_FreeJoints_ADDR, rdKeyframe_FreeJoints);
 #endif
 #endif
 

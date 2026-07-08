@@ -48,7 +48,7 @@ rdKeyframe* rdKeyframe_Load(char *fname)
       return keyframe;
 
     // This was inlined
-    rdKeyframe_FreeEntry(keyframe);
+    rdKeyframe_Free(keyframe);
     
     return NULL;
 }
@@ -367,7 +367,7 @@ int rdKeyframe_Write(char *out_fpath, rdKeyframe *keyframe, char *creation_metho
     return 1;
 }
 
-void rdKeyframe_FreeEntry(rdKeyframe *keyframe)
+void rdKeyframe_Free(rdKeyframe *keyframe)
 {
     if (!keyframe)
         return;
@@ -379,12 +379,12 @@ void rdKeyframe_FreeEntry(rdKeyframe *keyframe)
     }
     
     // This was inlined
-    rdKeyframe_FreeJoints(keyframe);
+    rdKeyframe_FreeEntry(keyframe);
     
     RDROID_FREE(keyframe);
 }
 
-void rdKeyframe_FreeJoints(rdKeyframe *keyframe)
+void rdKeyframe_FreeEntry(rdKeyframe *keyframe)
 {
     unsigned int i;
     rdJoint* joint_iter;

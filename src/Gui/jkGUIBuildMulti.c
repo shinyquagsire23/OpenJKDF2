@@ -371,7 +371,7 @@ void jkGuiBuildMulti_ThingCleanup()
     //std3D_PurgeTextureCache();
 
     rdPuppet_ResetTrack(jkGuiBuildMulti_thing->puppet, jkGuiBuildMulti_trackNum);
-    rdKeyframe_FreeEntry(jkGuiBuildMulti_keyframe);
+    rdKeyframe_Free(jkGuiBuildMulti_keyframe);
     rdThing_Free(jkGuiBuildMulti_thing);
     rdModel3_Free(jkGuiBuildMulti_model);
 
