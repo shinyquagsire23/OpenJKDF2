@@ -95,7 +95,7 @@ flex_t sithActor_DamageActor(sithThing *sender, sithThing *receiver, flex_t amou
     receiver_ = receiver;
     if ( sender->type == SITH_THING_PLAYER )
     {
-        v6 = sithInventory_SendMessageToAllWithFlag(
+        v6 = sithInventory_BroadcastMessage(
                  sender,
                  SENDERTYPE_THING,
                  receiver->thingIdx,

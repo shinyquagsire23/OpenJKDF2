@@ -122,7 +122,7 @@ void jkCog_dwPlayCammySpeech(sithCog* ctx)
 
 void jkCog_dwGetActivateBin(sithCog *ctx)
 {
-    sithCogExec_PushInt(ctx, sithInventory_GetCurItem(sithPlayer_pLocalPlayerThing));
+    sithCogExec_PushInt(ctx, sithInventory_GetCurrentItem(sithPlayer_pLocalPlayerThing));
 }
 #endif
 

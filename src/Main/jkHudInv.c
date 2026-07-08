@@ -58,7 +58,7 @@ int jkHudInv_ItemDatLoad(char *fpath)
                 cog = cog_;
             }
         }
-        sithInventory_NewEntry(binNum, cog, stdConffile_entry.args[0].value, min, max, flags);
+        sithInventory_RegisterType(binNum, cog, stdConffile_entry.args[0].value, min, max, flags);
         jkHud_aBinMaxAmt[binNum] = max; // MOTS added
     }
     stdConffile_Close();
@@ -173,9 +173,9 @@ void jkHudInv_Draw()
     {
         if ( v1 >= jkHudInv_scroll.scroll )
             break;
-        if ( sithInventory_GetActivate(player, jkHudInv_aItems[v2]) )
+        if ( sithInventory_IsInventoryActivated(player, jkHudInv_aItems[v2]) )
         {
-            v4 = sithInventory_GetItemDesc(player, jkHudInv_aItems[v2])->hudBitmap;
+            v4 = sithInventory_GetInventoryType(player, jkHudInv_aItems[v2])->hudBitmap;
             if ( v4 )
             {
                 stdDisplay_VBufferCopy(Video_pMenuBuffer, *v4->mipSurfaces, jkHudInv_scroll.blitX, i, 0, 1);
@@ -189,10 +189,10 @@ void jkHudInv_Draw()
     {
         if ( v1 >= jkHudInv_scroll.scroll )
             break;
-        v6 = sithInventory_GetBinByIdx(j);
+        v6 = sithInventory_GetType(j);
         if (v6->flags & ITEMINFO_ITEM)
         {
-            if ( sithInventory_GetActivate(player, j) )
+            if ( sithInventory_IsInventoryActivated(player, j) )
             {
                 v7 = v6->hudBitmap;
                 if ( v7 )
@@ -213,7 +213,7 @@ void jkHudInv_Draw()
             jkHudInv_scroll.rendIdx = jkHudInv_scroll.maxItemRend - 1;
     }
     jkHudInv_scroll.maxItemRend = v1;
-    curItem = sithInventory_GetCurItem(player);
+    curItem = sithInventory_GetCurrentItem(player);
     curPower = sithInventory_GetCurPower(player);
     time_msec = stdPlatform_GetTimeMsec();
     v11 = 0;
@@ -289,11 +289,11 @@ void jkHudInv_Draw()
             }
             stdDisplay_VBufferCopy(Video_pMenuBuffer, v14->mipSurfaces[v13], jkHudInv_info.field_8[v11], jkHudInv_info.field_10[v11], 0, 1);
         }
-        v16 = sithInventory_GetItemDesc(player, a2);
+        v16 = sithInventory_GetInventoryType(player, a2);
         v17 = v16->hudBitmap;
         if ( v17 || (v17 = jkHudInv_aBitmaps[2]) != 0 )
         {
-            v18 = (__int64)sithInventory_GetBinAmount(player, a2);
+            v18 = (__int64)sithInventory_GetInventory(player, a2);
             if ( v18 <= 0 )
             {
                 jkHudInv_rend_isshowing_maybe = 0;
@@ -329,16 +329,16 @@ void jkHudInv_Draw()
         while ( 1 )
         {
             if ( v23 >= 0 )
-                idx = sithInventory_GetNumBinsWithFlagRev(player, v23, jkHudInv_flags);
+                idx = sithInventory_FindPreviousTypeID(player, v23, jkHudInv_flags);
             if ( idx == a2 )
                 break;
             if ( idx >= 0 )
             {
-                v25 = sithInventory_GetItemDesc(player, idx);
+                v25 = sithInventory_GetInventoryType(player, idx);
                 v26 = v25->hudBitmap;
                 if ( v26 || (v26 = jkHudInv_aBitmaps[2]) != 0 )
                 {
-                    v27 = (__int64)sithInventory_GetBinAmount(player, idx);
+                    v27 = (__int64)sithInventory_GetInventory(player, idx);
                     if ( v27 <= 0 )
                         goto LABEL_84;
                     stdDisplay_VBufferCopy(Video_pMenuBuffer, *v26->mipSurfaces, jkHudInv_info.field_0 - v24, jkHudInv_info.field_4, 0, 1);
@@ -364,16 +364,16 @@ void jkHudInv_Draw()
                 }
             }
             if ( a2 >= 0 )
-                a2 = sithInventory_GetNumBinsWithFlag(player, a2, jkHudInv_flags);
+                a2 = sithInventory_FindNextTypeID(player, a2, jkHudInv_flags);
             if ( idx == a2 )
                 return;
             if ( a2 >= 0 )
             {
-                v32 = sithInventory_GetItemDesc(player, a2);
+                v32 = sithInventory_GetInventoryType(player, a2);
                 v33 = v32->hudBitmap;
                 if ( v33 || (v33 = jkHudInv_aBitmaps[2]) != 0 )
                 {
-                    v34 = (__int64)sithInventory_GetBinAmount(player, a2);
+                    v34 = (__int64)sithInventory_GetInventory(player, a2);
                     if ( v34 <= 0 )
                     {
 LABEL_84:
@@ -472,9 +472,9 @@ void jkHudInv_DrawGPU()
     {
         if ( v1 >= jkHudInv_scroll.scroll )
             break;
-        if ( sithInventory_GetActivate(player, jkHudInv_aItems[v2]) )
+        if ( sithInventory_IsInventoryActivated(player, jkHudInv_aItems[v2]) )
         {
-            v4 = sithInventory_GetItemDesc(player, jkHudInv_aItems[v2])->hudBitmap;
+            v4 = sithInventory_GetInventoryType(player, jkHudInv_aItems[v2])->hudBitmap;
             if ( v4 )
             {
                 std3D_DrawUIBitmap(v4, 0, jkHudInv_scroll.blitX, i, NULL, jkPlayer_hudScale, 1);
@@ -489,10 +489,10 @@ void jkHudInv_DrawGPU()
     {
         if ( v1 >= jkHudInv_scroll.scroll )
             break;
-        v6 = sithInventory_GetBinByIdx(j);
+        v6 = sithInventory_GetType(j);
         if (v6->flags & ITEMINFO_ITEM)
         {
-            if ( sithInventory_GetActivate(player, j) )
+            if ( sithInventory_IsInventoryActivated(player, j) )
             {
                 v7 = v6->hudBitmap;
                 if ( v7 )
@@ -514,7 +514,7 @@ void jkHudInv_DrawGPU()
             jkHudInv_scroll.rendIdx = jkHudInv_scroll.maxItemRend - 1;
     }
     jkHudInv_scroll.maxItemRend = v1;
-    curItem = sithInventory_GetCurItem(player);
+    curItem = sithInventory_GetCurrentItem(player);
     curPower = sithInventory_GetCurPower(player);
     time_msec = stdPlatform_GetTimeMsec();
     v11 = 0;
@@ -591,11 +591,11 @@ void jkHudInv_DrawGPU()
             //stdDisplay_VBufferCopy(Video_pMenuBuffer, v14->mipSurfaces[v13], jkHudInv_info.field_8[v11], jkHudInv_info.field_10[v11], 0, 1);
             std3D_DrawUIBitmap(v14, v13, jkHudInv_info.field_8[v11], jkHudInv_info.field_10[v11], NULL, jkPlayer_hudScale, 1);
         }
-        v16 = sithInventory_GetItemDesc(player, a2);
+        v16 = sithInventory_GetInventoryType(player, a2);
         v17 = v16->hudBitmap;
         if ( v17 || (v17 = jkHudInv_aBitmaps[2]) != 0 )
         {
-            v18 = (__int64)sithInventory_GetBinAmount(player, a2);
+            v18 = (__int64)sithInventory_GetInventory(player, a2);
             if ( v18 <= 0 )
             {
                 jkHudInv_rend_isshowing_maybe = 0;
@@ -640,16 +640,16 @@ void jkHudInv_DrawGPU()
         while ( 1 )
         {
             if ( v23 >= 0 )
-                idx = sithInventory_GetNumBinsWithFlagRev(player, v23, jkHudInv_flags);
+                idx = sithInventory_FindPreviousTypeID(player, v23, jkHudInv_flags);
             if ( idx == a2 )
                 break;
             if ( idx >= 0 )
             {
-                v25 = sithInventory_GetItemDesc(player, idx);
+                v25 = sithInventory_GetInventoryType(player, idx);
                 v26 = v25->hudBitmap;
                 if ( v26 || (v26 = jkHudInv_aBitmaps[2]) != 0 )
                 {
-                    v27 = (__int64)sithInventory_GetBinAmount(player, idx);
+                    v27 = (__int64)sithInventory_GetInventory(player, idx);
                     if ( v27 <= 0 )
                         goto LABEL_84;
                     //stdDisplay_VBufferCopy(Video_pMenuBuffer, *v26->mipSurfaces, jkHudInv_info.field_0 - v24, jkHudInv_info.field_4, 0, 1);
@@ -685,16 +685,16 @@ void jkHudInv_DrawGPU()
                 }
             }
             if ( a2 >= 0 )
-                a2 = sithInventory_GetNumBinsWithFlag(player, a2, jkHudInv_flags);
+                a2 = sithInventory_FindNextTypeID(player, a2, jkHudInv_flags);
             if ( idx == a2 )
                 return;
             if ( a2 >= 0 )
             {
-                v32 = sithInventory_GetItemDesc(player, a2);
+                v32 = sithInventory_GetInventoryType(player, a2);
                 v33 = v32->hudBitmap;
                 if ( v33 || (v33 = jkHudInv_aBitmaps[2]) != 0 )
                 {
-                    v34 = (__int64)sithInventory_GetBinAmount(player, a2);
+                    v34 = (__int64)sithInventory_GetInventory(player, a2);
                     if ( v34 <= 0 )
                     {
 LABEL_84:

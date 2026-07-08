@@ -43,7 +43,7 @@ void jkGuiObjectives_CustomRender(jkGuiElement *element, jkGuiMenu *menu, stdVBu
     for (int i = 0; i < 50; i++)
     {
         jkGuiStringEntry* pTextEnt = &jkGuiObjectives_aTexts[i];
-        int goal_flags = (__int64)sithInventory_GetBinAmount(sithPlayer_pLocalPlayerThing, i + SITHBIN_GOAL00);
+        int goal_flags = (__int64)sithInventory_GetInventory(sithPlayer_pLocalPlayerThing, i + SITHBIN_GOAL00);
         if ( (goal_flags & GOAL_EXISTS) != 0 )
         {
             if ( pTextEnt->str )
@@ -100,7 +100,7 @@ int jkGuiObjectives_Show()
 #endif // QOL_IMPROVEMENTS
 
     _memset(jkGuiObjectives_aTexts, 0, sizeof(jkGuiObjectives_aTexts));
-    v0 = (__int64)sithInventory_GetBinAmount(sithPlayer_pLocalPlayerThing, 99);
+    v0 = (__int64)sithInventory_GetInventory(sithPlayer_pLocalPlayerThing, 99);
     if ( v0 )
     {
         for (v1 = 0; v1 < 50; v1++)

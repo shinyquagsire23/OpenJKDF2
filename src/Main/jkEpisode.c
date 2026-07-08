@@ -556,7 +556,7 @@ int jkEpisode_EndLevel(jkEpisodeLoad *pEpisode, int levelNum)
 int jkEpisode_UpdateExtra(sithThing *pPlayerThing)
 {
     // HACK: Sometimes when the player is killed, the blade isn't restored?
-    if (sithInventory_GetCurWeapon(pPlayerThing) == SITHBIN_LIGHTSABER && !(pPlayerThing->jkFlags & JKFLAG_SABERON)) {
+    if (sithInventory_GetCurrentWeapon(pPlayerThing) == SITHBIN_LIGHTSABER && !(pPlayerThing->jkFlags & JKFLAG_SABERON)) {
         pPlayerThing->jkFlags |= JKFLAG_SABERON;
     }
 
@@ -588,7 +588,7 @@ int jkEpisode_UpdateExtra(sithThing *pPlayerThing)
 
                 for (int binIdx = 0; binIdx < SITHBIN_NUMBINS; binIdx++) 
                 {
-                    if (sithInventory_GetAvailable(pPlayerThing, binIdx) && (sithInventory_aDescriptors[binIdx].flags & 8) && sithInventory_aDescriptors[binIdx].cog) {
+                    if (sithInventory_IsInventoryAvailable(pPlayerThing, binIdx) && (sithInventory_aDescriptors[binIdx].flags & 8) && sithInventory_aDescriptors[binIdx].cog) {
                         sithCog_SendMessageEx(sithInventory_aDescriptors[binIdx].cog, SITH_MESSAGE_EXITBUBBLE, SENDERTYPE_THING, pPlayerThing->thingIdx, 0,-1,0,(flex_t)playerThings[playerThingIdx].jkmUnk5,0.0,0.0,0.0);
                     }
                 }
@@ -607,7 +607,7 @@ int jkEpisode_UpdateExtra(sithThing *pPlayerThing)
 
             for (int binIdx = 0; binIdx < SITHBIN_NUMBINS; binIdx++) 
             {
-                if (sithInventory_GetAvailable(pPlayerThing, binIdx) && (sithInventory_aDescriptors[binIdx].flags & 8) && sithInventory_aDescriptors[binIdx].cog) {
+                if (sithInventory_IsInventoryAvailable(pPlayerThing, binIdx) && (sithInventory_aDescriptors[binIdx].flags & 8) && sithInventory_aDescriptors[binIdx].cog) {
                     sithCog_SendMessageEx(sithInventory_aDescriptors[binIdx].cog, SITH_MESSAGE_ENTERBUBBLE, SENDERTYPE_THING, pPlayerThing->thingIdx, iVar4,uVar5,0,(flex_t)playerThings[playerThingIdx].jkmUnk5,0.0,0.0,0.0);
                 }
             }
@@ -619,7 +619,7 @@ int jkEpisode_UpdateExtra(sithThing *pPlayerThing)
                 
                 for (int binIdx = 0; binIdx < SITHBIN_NUMBINS; binIdx++) 
                 {
-                    if (sithInventory_GetAvailable(pPlayerThing, binIdx) && (sithInventory_aDescriptors[binIdx].flags & 8) && sithInventory_aDescriptors[binIdx].cog) {
+                    if (sithInventory_IsInventoryAvailable(pPlayerThing, binIdx) && (sithInventory_aDescriptors[binIdx].flags & 8) && sithInventory_aDescriptors[binIdx].cog) {
                         sithCog_SendMessageEx(sithInventory_aDescriptors[binIdx].cog, SITH_MESSAGE_EXITBUBBLE, SENDERTYPE_THING, pPlayerThing->thingIdx, 0,-1,0,(flex_t)playerThings[playerThingIdx].jkmUnk5,0.0,0.0,0.0);
                     }
                 }
@@ -637,7 +637,7 @@ int jkEpisode_UpdateExtra(sithThing *pPlayerThing)
 
                 for (int binIdx = 0; binIdx < SITHBIN_NUMBINS; binIdx++) 
                 {
-                    if (sithInventory_GetAvailable(pPlayerThing, binIdx) && (sithInventory_aDescriptors[binIdx].flags & 8) && sithInventory_aDescriptors[binIdx].cog) {
+                    if (sithInventory_IsInventoryAvailable(pPlayerThing, binIdx) && (sithInventory_aDescriptors[binIdx].flags & 8) && sithInventory_aDescriptors[binIdx].cog) {
                         sithCog_SendMessageEx(sithInventory_aDescriptors[binIdx].cog, SITH_MESSAGE_ENTERBUBBLE, SENDERTYPE_THING, pPlayerThing->thingIdx, iVar4,uVar5,0,(flex_t)playerThings[playerThingIdx].jkmUnk5,0.0,0.0,0.0);
                     }
                 }

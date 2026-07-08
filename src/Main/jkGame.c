@@ -371,14 +371,14 @@ int jkGame_Update()
         sithThing* pPlayer = sithWorld_pCurrentWorld->playerThing;
         if ( pPlayer->type == SITH_THING_PLAYER ) {
             healthNum = pPlayer->actorParams.health;
-            shieldsNum = (int32_t)sithInventory_GetBinAmount(pPlayer, SITHBIN_SHIELDS);
-            forceNum = (int32_t)sithInventory_GetBinAmount(pPlayer, SITHBIN_FORCEMANA);
+            shieldsNum = (int32_t)sithInventory_GetInventory(pPlayer, SITHBIN_SHIELDS);
+            forceNum = (int32_t)sithInventory_GetInventory(pPlayer, SITHBIN_FORCEMANA);
             ammoNum = jkHud_GetWeaponAmmo(pPlayer);
 
             bHasSuperShields = playerThings[playerThingIdx].bHasSuperShields;
             bHasSuperWeapon = playerThings[playerThingIdx].bHasSuperWeapon;
             bHasForceSurge = playerThings[playerThingIdx].bHasForceSurge;
-            bHasFieldLight = sithInventory_GetActivate(pPlayer, SITHBIN_FIELDLIGHT);
+            bHasFieldLight = sithInventory_IsInventoryActivated(pPlayer, SITHBIN_FIELDLIGHT);
         }
     }
 

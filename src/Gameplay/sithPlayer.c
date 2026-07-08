@@ -393,7 +393,7 @@ void sithPlayer_PlayerKilledAction(sithThing *player, sithThing *killedBy)
     player->actorParams.typeflags &= ~SITH_AF_BLEEDS;
     sithPhysics_ResetThingMovement(player);
     sithWeapon_SyncPuppet(player);
-    sithInventory_SendKilledMessageToAll(player, killedBy);
+    sithInventory_BroadcastKilledMessage(player, killedBy);
     if ( sithNet_isMulti )
         sithMulti_ProcessKilledPlayer(v5, player, killedBy);
     if ( player == sithPlayer_pLocalPlayerThing )
@@ -448,7 +448,7 @@ void sithPlayer_Reset(unsigned int idx)
         pPlayerInfo->player_name[0] = 0;
         pPlayerInfo->multi_name[0] = 0;
         if ( pPlayerInfo->playerThing && sithWorld_pCurrentWorld )
-            sithInventory_ClearInventory(pPlayerInfo->playerThing);
+            sithInventory_InitInventory(pPlayerInfo->playerThing);
         if ( pPlayerInfo == sithPlayer_pLocalPlayer )
         {
             stdPalEffects_FlushAllEffects();

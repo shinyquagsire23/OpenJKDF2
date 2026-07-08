@@ -462,7 +462,7 @@ void jkHud_Draw()
 
     if ( v4->type == SITH_THING_PLAYER && !(sithNet_isServer && jkGuiNetHost_bIsDedicated) )
     {
-        v5 = (int32_t)sithInventory_GetBinAmount(v4, SITHBIN_BATTERY);
+        v5 = (int32_t)sithInventory_GetInventory(v4, SITHBIN_BATTERY);
         if ( v5 < 0 )
         {
             v5 = 0;
@@ -482,7 +482,7 @@ void jkHud_Draw()
                 0,
                 1);
         }
-        v6 = sithInventory_GetActivate(v4, SITHBIN_FIELDLIGHT);
+        v6 = sithInventory_IsInventoryActivated(v4, SITHBIN_FIELDLIGHT);
         if ( jkHud_blittedFieldlightAmt != v6 )
         {
             jkHud_blittedFieldlightAmt = v6;
@@ -494,7 +494,7 @@ void jkHud_Draw()
                 0,
                 1);
         }
-        v7 = (int32_t)sithInventory_GetBinAmount(v4, SITHBIN_FORCEMANA);
+        v7 = (int32_t)sithInventory_GetInventory(v4, SITHBIN_FORCEMANA);
         if ( v7 < 0 )
         {
             v7 = 0;
@@ -529,7 +529,7 @@ void jkHud_Draw()
                 jkHud_blittedForceIdx = v8 / 400;
             }
         }
-        v9 = (int32_t)sithInventory_GetBinAmount(v4, SITHBIN_SHIELDS);
+        v9 = (int32_t)sithInventory_GetInventory(v4, SITHBIN_SHIELDS);
         v10 = v9;
         if ( (int)v9 < 0 )
         {
@@ -1044,7 +1044,7 @@ void jkHud_DrawGPU()
 
     if ( v4->type == SITH_THING_PLAYER && !(sithNet_isServer && jkGuiNetHost_bIsDedicated) )
     {
-        v5 = (int32_t)sithInventory_GetBinAmount(v4, SITHBIN_BATTERY);
+        v5 = (int32_t)sithInventory_GetInventory(v4, SITHBIN_BATTERY);
         if ( v5 < 0 )
         {
             v5 = 0;
@@ -1066,7 +1066,7 @@ void jkHud_DrawGPU()
             //std3D_DrawUIBitmap(jkHud_pStatusRightBm,0, 0,0,64,64,0,0,4.0);
             std3D_DrawUIBitmap(jkHud_pStBatBm, v5 * (jkHud_pStBatBm->numMips - 1) / 200, jkHud_rightBlitX + HUD_SCALED(jkHud_pStBatBm->xPos), jkHud_rightBlitY + HUD_SCALED(jkHud_pStBatBm->yPos), NULL, jkPlayer_hudScale, 1);
         }
-        v6 = sithInventory_GetActivate(v4, SITHBIN_FIELDLIGHT);
+        v6 = sithInventory_IsInventoryActivated(v4, SITHBIN_FIELDLIGHT);
         //if ( jkHud_blittedFieldlightAmt != v6 )
         {
             jkHud_blittedFieldlightAmt = v6;
@@ -1079,7 +1079,7 @@ void jkHud_DrawGPU()
                 1);*/
             std3D_DrawUIBitmap(jkHud_pFieldlightBm, v6, jkHud_rightBlitX + (int)((flex_t)jkHud_pFieldlightBm->xPos * jkPlayer_hudScale), jkHud_rightBlitY + (int)((flex_t)jkHud_pFieldlightBm->yPos * jkPlayer_hudScale), NULL, jkPlayer_hudScale, 1);
         }
-        v7 = (int32_t)sithInventory_GetBinAmount(v4, SITHBIN_FORCEMANA);
+        v7 = (int32_t)sithInventory_GetInventory(v4, SITHBIN_FORCEMANA);
         if ( v7 < 0 )
         {
             v7 = 0;
@@ -1117,7 +1117,7 @@ void jkHud_DrawGPU()
                 jkHud_blittedForceIdx = v8 / 400;
             }
         }
-        v9 = (int32_t)sithInventory_GetBinAmount(v4, SITHBIN_SHIELDS);
+        v9 = (int32_t)sithInventory_GetInventory(v4, SITHBIN_SHIELDS);
         v10 = v9;
         if ( (int)v9 < 0 )
         {
@@ -1823,7 +1823,7 @@ int jkHud_chat2()
 
 #ifdef QOL_IMPROVEMENTS
 BOOL jkHud_shouldCrosshairBeShownForWeapon(sithThing *player) {
-  int currentWeapon = sithInventory_GetCurWeapon(player);
+  int currentWeapon = sithInventory_GetCurrentWeapon(player);
   if (currentWeapon == SITHBIN_FISTS || MOTS_ONLY_FLAG(currentWeapon == SITHBIN_MOTS_FISTS)) {
     return jkPlayer_setCrosshairOnFist;
   }

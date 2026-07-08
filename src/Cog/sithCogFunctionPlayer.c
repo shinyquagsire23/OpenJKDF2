@@ -16,9 +16,9 @@ void sithCogFunctionPlayer_SetInvActivate(sithCog *ctx)
     if (player && player->type == SITH_THING_PLAYER && player->actorParams.playerinfo && binIdx < SITHBIN_NUMBINS)
     {
         if (bActivate)
-            sithInventory_SetActivate(player, binIdx, 1);
+            sithInventory_SetInventoryActivated(player, binIdx, 1);
         else
-            sithInventory_SetActivate(player, binIdx, 0);
+            sithInventory_SetInventoryActivated(player, binIdx, 0);
     }
 }
 
@@ -31,9 +31,9 @@ void sithCogFunctionPlayer_SetInvAvailable(sithCog *ctx)
     if (player && player->type == SITH_THING_PLAYER && player->actorParams.playerinfo && binIdx < SITHBIN_NUMBINS)
     {
         if (bAvailable)
-            sithInventory_SetAvailable(player, binIdx, 1);
+            sithInventory_SetInventoryAvailable(player, binIdx, 1);
         else
-            sithInventory_SetAvailable(player, binIdx, 0);
+            sithInventory_SetInventoryAvailable(player, binIdx, 0);
     }
 }
 
@@ -44,7 +44,7 @@ void sithCogFunctionPlayer_IsInvActivated(sithCog *ctx)
 
     if (player && player->type == SITH_THING_PLAYER && player->actorParams.playerinfo && binIdx < SITHBIN_NUMBINS)
     {
-        if (sithInventory_GetActivate(player, binIdx)) {
+        if (sithInventory_IsInventoryActivated(player, binIdx)) {
             sithCogExec_PushInt(ctx, 1);
         }
         else {
@@ -64,7 +64,7 @@ void sithCogFunctionPlayer_IsInvAvailable(sithCog *ctx)
 
     if (player && player->type == SITH_THING_PLAYER && player->actorParams.playerinfo && binIdx < SITHBIN_NUMBINS)
     {
-        if ( sithInventory_GetAvailable(player, binIdx) )
+        if ( sithInventory_IsInventoryAvailable(player, binIdx) )
             sithCogExec_PushInt(ctx, 1);
         else
             sithCogExec_PushInt(ctx, 0);
@@ -82,8 +82,8 @@ void sithCogFunctionPlayer_SetGoalFlags(sithCog *ctx)
     sithThing* player = sithCogExec_PopThing(ctx);
     if (player && player->type == SITH_THING_PLAYER && player->actorParams.playerinfo && binIdx < SITHBIN_NUMBINS)
     {
-        cog_flex_t amt = (cog_flex_t)((int)sithInventory_GetBinAmount(player, binIdx) | flags); // FLEXTODO
-        sithInventory_SetBinAmount(player, binIdx, amt);
+        cog_flex_t amt = (cog_flex_t)((int)sithInventory_GetInventory(player, binIdx) | flags); // FLEXTODO
+        sithInventory_SetInventory(player, binIdx, amt);
     }
 }
 
@@ -94,8 +94,8 @@ void sithCogFunctionPlayer_ClearGoalFlags(sithCog *ctx)
     sithThing* player = sithCogExec_PopThing(ctx);
     if (player && player->type == SITH_THING_PLAYER && player->actorParams.playerinfo && binIdx < SITHBIN_NUMBINS)
     {
-        cog_flex_t amt = (cog_flex_t)((int)sithInventory_GetBinAmount(player, binIdx) & ~flags); // FLEXTODO
-        sithInventory_SetBinAmount(player, binIdx, amt);
+        cog_flex_t amt = (cog_flex_t)((int)sithInventory_GetInventory(player, binIdx) & ~flags); // FLEXTODO
+        sithInventory_SetInventory(player, binIdx, amt);
     }
 }
 
@@ -347,7 +347,7 @@ void sithCogFunctionPlayer_NthBackpackBin(sithCog *ctx)
         && thing->type == SITH_THING_ITEM
         && (thing->itemParams.typeflags & SITH_ITEM_BACKPACK))
     {
-        ret = sithInventory_NthBackpackBin(thing, n);
+        ret = sithInventory_GetBackpackItemID(thing, n);
         sithCogExec_PushInt(ctx, ret);
     }
 }
@@ -362,7 +362,7 @@ void sithCogFunctionPlayer_NthBackpackValue(sithCog *ctx)
         && thing->type == SITH_THING_ITEM
         && (thing->itemParams.typeflags & SITH_ITEM_BACKPACK))
     {
-        ret = sithInventory_NthBackpackValue(thing, n);
+        ret = sithInventory_GetBackpackItemValue(thing, n);
         sithCogExec_PushInt(ctx, ret);
     }
 }
@@ -376,7 +376,7 @@ void sithCogFunctionPlayer_NumBackpackItems(sithCog *ctx)
         && thing->type == SITH_THING_ITEM
         && (thing->itemParams.typeflags & SITH_ITEM_BACKPACK))
     {
-        ret = sithInventory_NumBackpackItems(thing);
+        ret = sithInventory_GetNumBackpackItems(thing);
         sithCogExec_PushInt(ctx, ret);
     }
 }

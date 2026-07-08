@@ -758,7 +758,7 @@ void sithCogFunctionThing_GetInv(sithCog *ctx)
          && playerThing->actorParams.playerinfo 
          && binIdx < SITHBIN_NUMBINS )
     {
-        sithCogExec_PushFlex(ctx, sithInventory_GetBinAmount(playerThing, binIdx));
+        sithCogExec_PushFlex(ctx, sithInventory_GetInventory(playerThing, binIdx));
     }
     else
     {
@@ -780,7 +780,7 @@ void sithCogFunctionThing_SetInv(sithCog *ctx)
          && playerThing->type == SITH_THING_PLAYER 
          && playerThing->actorParams.playerinfo 
          && binIdx < SITHBIN_NUMBINS )
-        sithInventory_SetBinAmount(playerThing, binIdx, amt);
+        sithInventory_SetInventory(playerThing, binIdx, amt);
 }
 
 void sithCogFunctionThing_ChangeInv(sithCog *ctx)
@@ -798,7 +798,7 @@ void sithCogFunctionThing_ChangeInv(sithCog *ctx)
          && playerThing->actorParams.playerinfo 
          && binIdx < SITHBIN_NUMBINS )
     {
-        sithCogExec_PushFlex(ctx, sithInventory_ChangeInv(playerThing, binIdx, amt));
+        sithCogExec_PushFlex(ctx, sithInventory_ChangeInventory(playerThing, binIdx, amt));
     }
     else
     {
@@ -823,7 +823,7 @@ void sithCogFunctionThing_GetInvCog(sithCog *ctx)
     if ( playerThing
       && playerThing->type == SITH_THING_PLAYER
       && playerThing->actorParams.playerinfo
-      && (desc = sithInventory_GetItemDesc(playerThing, binIdx), binIdx < SITHBIN_NUMBINS)
+      && (desc = sithInventory_GetInventoryType(playerThing, binIdx), binIdx < SITHBIN_NUMBINS)
       && desc
       && (descCog = desc->cog) != 0 )
     {
@@ -1336,7 +1336,7 @@ void sithCogFunctionThing_GetInvMin(sithCog *ctx)
 
     if ( player && player->type == SITH_THING_PLAYER && player->actorParams.playerinfo )
     {
-        sithCogExec_PushFlex(ctx, sithInventory_GetMin(player, binIdx));
+        sithCogExec_PushFlex(ctx, sithInventory_GetInventoryMinimum(player, binIdx));
     }
     else
     {
@@ -1355,7 +1355,7 @@ void sithCogFunctionThing_GetInvMax(sithCog *ctx)
 
     if ( player && player->type == SITH_THING_PLAYER && player->actorParams.playerinfo )
     {
-        sithCogExec_PushFlex(ctx, sithInventory_GetMax(player, binIdx));
+        sithCogExec_PushFlex(ctx, sithInventory_GetInventoryMaximum(player, binIdx));
     }
     else
     {
@@ -1468,7 +1468,7 @@ void sithCogFunctionThing_SetCurInvWeapon(sithCog *ctx)
         binIdx = sithInventory_SelectWeaponFollowing(binIdx);
     }
     if (pThing)
-        sithInventory_SetCurWeapon(pThing, binIdx);
+        sithInventory_SetCurrentWeapon(pThing, binIdx);
 }
 
 void sithCogFunctionThing_GetCurInvWeapon(sithCog *ctx)
@@ -1476,7 +1476,7 @@ void sithCogFunctionThing_GetCurInvWeapon(sithCog *ctx)
     sithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
     {
-        int binIdx = sithInventory_GetCurWeapon(pThing);
+        int binIdx = sithInventory_GetCurrentWeapon(pThing);
         if (Main_bMotsCompat) {
             binIdx = sithInventory_SelectWeaponPrior(binIdx);
         }
@@ -1494,7 +1494,7 @@ void sithCogFunctionThing_GetCurInvWeaponMots(sithCog *ctx)
     sithThing* pThing = sithCogExec_PopThing(ctx);
     if (pThing)
     {
-        int idx = sithInventory_GetCurWeapon(pThing);
+        int idx = sithInventory_GetCurrentWeapon(pThing);
         sithInventory_SelectWeaponPrior(idx);
         sithCogExec_PushInt(ctx, idx);
     }

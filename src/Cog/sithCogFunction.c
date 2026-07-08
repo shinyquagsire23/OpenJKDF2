@@ -789,7 +789,7 @@ void sithCogFunction_SetInvFlags(sithCog *ctx)
         binIdx = sithInventory_SelectWeaponFollowing(binIdx);
     }
     if ( player && player->type == SITH_THING_PLAYER && player->actorParams.playerinfo && binIdx < SITHBIN_NUMBINS )
-        sithInventory_SetFlags(player, binIdx, flags);
+        sithInventory_SetInventoryFlags(player, binIdx, flags);
 }
 
 void sithCogFunction_SetMapModeFlags(sithCog *ctx)
@@ -1358,7 +1358,7 @@ void sithCogFunction_SetCurWeapon(sithCog *ctx)
         {
             if (!Main_bMotsCompat)
                 binIdx = sithInventory_SelectWeaponFollowing(binIdx);
-            sithInventory_SetCurWeapon(player, binIdx);
+            sithInventory_SetCurrentWeapon(player, binIdx);
         }
     }
 }
@@ -1400,7 +1400,7 @@ void sithCogFunction_GetCurWeapon(sithCog *ctx)
 
     if ( player && player->type == SITH_THING_PLAYER )
     {
-        int binIdx = sithInventory_GetCurWeapon(player);
+        int binIdx = sithInventory_GetCurrentWeapon(player);
         if (Main_bMotsCompat) {
             binIdx = sithInventory_SelectWeaponPrior(binIdx);
         }

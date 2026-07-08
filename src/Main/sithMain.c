@@ -516,7 +516,7 @@ void sithOpenPostProcess()
     //g_debugmodeFlags |= 1;
 #endif
     sithTime_Startup();
-    sithInventory_Reset(sithPlayer_pLocalPlayerThing);
+    sithInventory_ResetInventory(sithPlayer_pLocalPlayerThing);
 
     sithCog_SendSimpleMessageToAll(SITH_MESSAGE_STARTUP, 0, 0, 0, 0);
     for (uint32_t v2 = 0; v2 < sithWorld_pCurrentWorld->numThingsLoaded; v2++)
