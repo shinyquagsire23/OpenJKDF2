@@ -325,7 +325,7 @@ void  jkSaber_UpdateCollision2(sithThing *pPlayerThing,rdVector3 *pSaberPos,rdVe
                 }
                 if ( surfaceNum >= pCollideInfo->numDamagedSurfaces )
                 {
-                    sithSurface_SendDamageToThing(searchResult->surface, pPlayerThing, pCollideInfo->damage, SITH_DAMAGE_SABER);
+                    sithSurface_HandleThingImpact(searchResult->surface, pPlayerThing, pCollideInfo->damage, SITH_DAMAGE_SABER);
                     pCollideInfo->damagedSurfaces[pCollideInfo->numDamagedSurfaces++] = searchResult->surface;
                 }
             }

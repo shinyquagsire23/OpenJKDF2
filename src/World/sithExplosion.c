@@ -87,7 +87,7 @@ void sithExplosion_MakeBlast(sithThing *explosion)
 
             if ( (i->hitType & SITHCOLLISION_WORLD) != 0 )
             {
-                sithSurface_SendDamageToThing(i->surface, explosion, a1a * damage, explosion->explosionParams.damageClass);
+                sithSurface_HandleThingImpact(i->surface, explosion, a1a * damage, explosion->explosionParams.damageClass);
             }
             else
             {

@@ -412,7 +412,7 @@ void sithWorld_FreeEntry(sithWorld *pWorld)
         pWorld->vertexUVs = 0;
     }
     if ( pWorld->surfaces )
-        sithSurface_Free(pWorld);
+        sithSurface_FreeWorldSurfaces(pWorld);
     if ( pWorld->alloc_unk98 )
     {
         SITH_FREE(pWorld->alloc_unk98);
@@ -630,7 +630,7 @@ int sithWorld_Verify(sithWorld *pWorld)
         stdPrintf(pSithHS->errorPrint, ".\\World\\sithWorld.c", 1263, "A required geometry section is missing from the level file.\n", 0, 0, 0, 0);
         return 0;
     }
-    if ( sithSurface_Verify(pWorld) )
+    if ( sithSurface_ValidateWorldSurfaces(pWorld) )
         return 1;
     stdPrintf(pSithHS->errorPrint, ".\\World\\sithWorld.c", 1271, "Surface resources did not pass validation.\n", 0, 0, 0, 0);
     return 0;
@@ -814,7 +814,7 @@ int sithWorld_LoadGeoresource(sithWorld *pWorld, int a2)
         pWorld->vertexUVs[i].y = v_v;
     }
 
-    return sithSurface_Load(pWorld) != 0;
+    return sithSurface_ReadSurfacesListText(pWorld) != 0;
 }
 
 void sithWorld_sub_4D0A20(sithWorld *pWorld)

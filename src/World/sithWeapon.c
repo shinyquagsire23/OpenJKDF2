@@ -155,7 +155,7 @@ void sithWeapon_sub_4D35E0(sithThing *weapon)
         }
         else if ( (searchRes->hitType & SITHCOLLISION_WORLD) != 0 )
         {
-            sithSurface_SendDamageToThing(searchRes->surface, weapon, damage_, weapon->weaponParams.damageClass);
+            sithSurface_HandleThingImpact(searchRes->surface, weapon, damage_, weapon->weaponParams.damageClass);
         }
         if ( weapon->weaponParams.explodeTemplate )
         {
@@ -342,7 +342,7 @@ void sithWeapon_sub_4D3920(sithThing *weapon)
         }
         else if ( (searchRes->hitType & SITHCOLLISION_WORLD) != 0 )
         {
-            sithSurface_SendDamageToThing(searchRes->surface, weapon, amount, weapon->weaponParams.damageClass);
+            sithSurface_HandleThingImpact(searchRes->surface, weapon, amount, weapon->weaponParams.damageClass);
         }
         explodeTemplate = weapon->weaponParams.explodeTemplate;
         if ( explodeTemplate )
@@ -813,7 +813,7 @@ int sithWeapon_HitDebug(sithThing *thing, sithSurface *surface, sithCollisionSea
     else
     {
         if ( thing->weaponParams.damage != 0.0 )
-            sithSurface_SendDamageToThing(surface, thing, thing->weaponParams.damage, thing->weaponParams.damageClass);
+            sithSurface_HandleThingImpact(surface, thing, thing->weaponParams.damage, thing->weaponParams.damageClass);
 
         // MOTS added: floor explode?
         if (thing->weaponParams.typeflags & SITH_WF_EXPLODE_ON_SURFACE_HIT || MOTS_ONLY_FLAG(thing->weaponParams.typeflags & SITH_WF_EXPLODES_ON_WORLD_FLOOR_HIT && surface->surfaceFlags & SITH_SURFACE_FLOOR))

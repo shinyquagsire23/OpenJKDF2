@@ -222,7 +222,7 @@ void sithSector_ShowSectorAdjoins(sithSector *sector)
     sithAdjoin *i; // esi
 
     for ( i = sector->adjoins; i; i = i->next )
-        sithSurface_SetAdjoins(i);
+        sithSurface_ShowSectorAdjoin(i);
     sector->flags &= ~SITH_SECTOR_ADJOINS_SET;
 }
 
@@ -231,7 +231,7 @@ void sithSector_HideSectorAdjoins(sithSector *sector)
     sithAdjoin *i; // esi
 
     for ( i = sector->adjoins; i; i = i->next )
-        sithSurface_UnsetAdjoins(i);
+        sithSurface_HideSectorAdjoin(i);
     sector->flags |= SITH_SECTOR_ADJOINS_SET;
 }
 

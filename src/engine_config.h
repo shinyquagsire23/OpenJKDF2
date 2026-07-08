@@ -347,7 +347,7 @@
 // Same pooling for world surfaces (sithSurface): vertexPosIdx, optional
 // vertexUVIdx and the intensity arrays are otherwise 3 tiny allocations per
 // surface (12k+ heap blocks per level). One world-owned pool, offsets during
-// parse, pointer fixup after, freed as one block in sithSurface_Free.
+// parse, pointer fixup after, freed as one block in sithSurface_FreeWorldSurfaces.
 // Kept RETRO-only until well-tested.
 #define SITHSURFACE_POOLED_ARRAYS
 

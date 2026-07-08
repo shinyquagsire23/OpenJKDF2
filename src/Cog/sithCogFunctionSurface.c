@@ -516,7 +516,7 @@ void sithCogFunctionSurface_GetSurfaceCenter(sithCog *ctx)
     v1 = sithCogExec_PopSurface(ctx);
     if ( v1 )
     {
-        sithSurface_GetCenter(v1, &a2);
+        sithSurface_GetCenterPoint(v1, &a2);
         sithCogExec_PushVector3(ctx, &a2);
     }
     else

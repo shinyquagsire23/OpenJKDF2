@@ -54,7 +54,7 @@ int sithSurface_Startup3()
     return sithSurface_Startup();
 }
 
-int sithSurface_Load(sithWorld *world)
+int sithSurface_ReadSurfacesListText(sithWorld *world)
 {
     uint32_t numAdjoins; // ebp
     uint32_t allocSize; // esi
@@ -526,7 +526,7 @@ int sithSurface_Load(sithWorld *world)
     return 1;
 }
 
-int sithSurface_Verify(sithWorld *world)
+int sithSurface_ValidateWorldSurfaces(sithWorld *world)
 {
     for (int32_t i = 0; i < world->numSurfaces; i++)
     {
@@ -537,7 +537,7 @@ int sithSurface_Verify(sithWorld *world)
     return 1;
 }
 
-int sithSurface_GetIdxFromPtr(sithSurface *surface)
+int sithSurface_ValidateSurfacePointer(sithSurface *surface)
 {
     if ( surface )
         return (surface->parent_sector != 0);
@@ -545,7 +545,7 @@ int sithSurface_GetIdxFromPtr(sithSurface *surface)
     return 0;
 }
 
-void sithSurface_UnsetAdjoins(sithAdjoin *adjoin)
+void sithSurface_HideSectorAdjoin(sithAdjoin *adjoin)
 {
     if ( (adjoin->flags & 1) != 0 )
     {
@@ -554,7 +554,7 @@ void sithSurface_UnsetAdjoins(sithAdjoin *adjoin)
     }
 }
 
-void sithSurface_SetAdjoins(sithAdjoin *adjoin)
+void sithSurface_ShowSectorAdjoin(sithAdjoin *adjoin)
 {
     if ( (adjoin->flags & 0x20) != 0 )
     {
@@ -671,7 +671,7 @@ rdSurface* sithSurface_SurfaceAnim(sithSurface *parent, flex_t a2, uint16_t flag
     return result;
 }
 
-int sithSurface_New(sithWorld *world, int num)
+int sithSurface_AllocWorldSurfaces(sithWorld *world, int num)
 {
     sithSurface *surfaces = (sithSurface *)SITH_ALLOC(num * sizeof(sithSurface));
     world->surfaces = surfaces;
@@ -687,7 +687,7 @@ int sithSurface_New(sithWorld *world, int num)
     return 1;
 }
 
-int sithSurface_AllocateAdjoins(sithWorld *world, int num)
+int sithSurface_AllocWorldAdjoins(sithWorld *world, int num)
 {
     if ( num == 0 )
     {
@@ -707,7 +707,7 @@ int sithSurface_AllocateAdjoins(sithWorld *world, int num)
     return 1;
 }
 
-void sithSurface_Free(sithWorld *world)
+void sithSurface_FreeWorldSurfaces(sithWorld *world)
 {
 #ifdef SITHSURFACE_POOLED_ARRAYS
     // Added: pooled surface arrays free as one block (per-surface pointers alias
@@ -1349,7 +1349,7 @@ void sithSurface_DetachThing(sithSurface *a1, rdVector3 *out)
     }
 }
 
-int sithSurface_GetCenter(sithSurface *surface, rdVector3 *out)
+int sithSurface_GetCenterPoint(sithSurface *surface, rdVector3 *out)
 {
     rdVector3 a1a; // [esp+14h] [ebp-18h] BYREF
     rdVector3 a2a; // [esp+20h] [ebp-Ch] BYREF
@@ -1479,7 +1479,7 @@ rdSurface* sithSurface_SetThingLight(sithThing *thing, flex_t a2, flex_t a3, int
     return result;
 }
 
-void sithSurface_SendDamageToThing(sithSurface *sender, sithThing *receiver, flex_t damage, int damageType)
+void sithSurface_HandleThingImpact(sithSurface *sender, sithThing *receiver, flex_t damage, int damageType)
 {
     flex_t v4; // [esp+0h] [ebp-14h]
 
@@ -1572,7 +1572,7 @@ void sithSurface_SyncSurface(sithSurface *pSurface)
     }
 }
 
-void sithSurface_Sync()
+void sithSurface_SyncSurfaces()
 {
     if (!sithComm_multiplayerFlags) return;
 

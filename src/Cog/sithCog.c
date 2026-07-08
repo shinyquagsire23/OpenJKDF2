@@ -1909,7 +1909,7 @@ int sithCog_ThingFromSymbolidk(sithCog *cog, sithThing *thing, int linkId, int m
 
 int sithCog_Thingidk(sithCog *cog, sithSurface *surface, int linkId, int mask)
 {
-    int surfIdx = sithSurface_GetIdxFromPtr(surface);
+    int surfIdx = sithSurface_ValidateSurfacePointer(surface);
     if ( !surfIdx )
         return 0;
     if ( linkId >= 0 )

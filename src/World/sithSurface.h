@@ -5,18 +5,18 @@
 #include "globals.h"
 #include "Raster/rdFace.h"
 
-#define sithSurface_UnsetAdjoins_ADDR (0x004E5A10)
-#define sithSurface_SetAdjoins_ADDR (0x004E5A30)
-#define sithSurface_New_ADDR (0x004E5A50)
+#define sithSurface_HideSectorAdjoin_ADDR (0x004E5A10)
+#define sithSurface_ShowSectorAdjoin_ADDR (0x004E5A30)
+#define sithSurface_AllocWorldSurfaces_ADDR (0x004E5A50)
 #define sithSurface_sub_4E5AD0_ADDR (0x004E5AD0)
-#define sithSurface_Free_ADDR (0x004E5B40)
-#define sithSurface_Load_ADDR (0x004E5C00)
-#define sithSurface_GetIdxFromPtr_ADDR (0x004E6190)
-#define sithSurface_Verify_ADDR (0x004E61B0)
-#define sithSurface_SendDamageToThing_ADDR (0x004E61F0)
-#define sithSurface_GetCenter_ADDR (0x004E6250)
+#define sithSurface_FreeWorldSurfaces_ADDR (0x004E5B40)
+#define sithSurface_ReadSurfacesListText_ADDR (0x004E5C00)
+#define sithSurface_ValidateSurfacePointer_ADDR (0x004E6190)
+#define sithSurface_ValidateWorldSurfaces_ADDR (0x004E61B0)
+#define sithSurface_HandleThingImpact_ADDR (0x004E61F0)
+#define sithSurface_GetCenterPoint_ADDR (0x004E6250)
 #define sithSurface_SyncSurface_ADDR (0x004E6330)
-#define sithSurface_Sync_ADDR (0x004E6360)
+#define sithSurface_SyncSurfaces_ADDR (0x004E6360)
 #define sithSurface_sub_4E63B0_ADDR (0x004E63B0)
 #define sithSurface_Startup_ADDR (0x004EF900)
 #define sithSurface_Shutdown_ADDR (0x004EF950)
@@ -106,18 +106,18 @@ enum SithSurfaceAdjoinFlag
 int sithSurface_Startup();
 void sithSurface_Shutdown();
 int sithSurface_Open();
-int sithSurface_Verify(sithWorld *world);
-int sithSurface_Load(sithWorld *world);
-int sithSurface_GetIdxFromPtr(sithSurface *surface);
-void sithSurface_UnsetAdjoins(sithAdjoin *adjoin);
-void sithSurface_SetAdjoins(sithAdjoin *adjoin);
+int sithSurface_ValidateWorldSurfaces(sithWorld *world);
+int sithSurface_ReadSurfacesListText(sithWorld *world);
+int sithSurface_ValidateSurfacePointer(sithSurface *surface);
+void sithSurface_HideSectorAdjoin(sithAdjoin *adjoin);
+void sithSurface_ShowSectorAdjoin(sithAdjoin *adjoin);
 rdSurface* sithSurface_SurfaceAnim(sithSurface *parent, flex_t a2, uint16_t flags);
 int sithSurface_Startup2();
 int sithSurface_Startup3();
 void sithSurface_SetSectorLight(sithSector *sector, flex_t extraLight, flex_t a3, int a4);
-int sithSurface_New(sithWorld *world, int num);
-int sithSurface_AllocateAdjoins(sithWorld *world, int num);
-void sithSurface_Free(sithWorld *world);
+int sithSurface_AllocWorldSurfaces(sithWorld *world, int num);
+int sithSurface_AllocWorldAdjoins(sithWorld *world, int num);
+void sithSurface_FreeWorldSurfaces(sithWorld *world);
 MATH_FUNC void sithSurface_Tick(flex_t deltaSecs);
 MATH_FUNC void sithSurface_ScrollSky(rdSurface *surface, int flags, flex_t deltaSecs, uint8_t a4);
 int sithSurface_StopAnim(rdSurface *surface);
@@ -126,23 +126,23 @@ rdSurface* sithSurface_SurfaceLightAnim(sithSurface *surface, flex_t a2, flex_t 
 MATH_FUNC rdSurface* sithSurface_SlideWall(sithSurface *surface, rdVector3 *a2);
 rdSurface* sithSurface_MaterialAnim(rdMaterial *material, flex_t a2, int a3);
 void sithSurface_DetachThing(sithSurface *a1, rdVector3 *out);
-int sithSurface_GetCenter(sithSurface *surface, rdVector3 *out);
+int sithSurface_GetCenterPoint(sithSurface *surface, rdVector3 *out);
 rdSurface* sithSurface_SlideHorizonSky(int flags, rdVector2 *a2);
 rdSurface* sithSurface_sub_4F00A0(sithThing *thing, flex_t a2, uint32_t a3);
 rdSurface* sithSurface_SetThingLight(sithThing *thing, flex_t a2, flex_t a3, int a4);
-void sithSurface_SendDamageToThing(sithSurface *sender, sithThing *receiver, flex_t damage, int damageType);
+void sithSurface_HandleThingImpact(sithSurface *sender, sithThing *receiver, flex_t damage, int damageType);
 rdSurface* sithSurface_GetRdSurface(sithSurface *surface);
 rdSurface* sithSurface_GetByIdx(int idx);
 void sithSurface_SyncFull(int mpFlags);
 rdSurface* sithSurface_Alloc();
 sithSurface* sithSurface_sub_4E63B0(int idx);
 void sithSurface_SyncSurface(sithSurface *pSurface);
-void sithSurface_Sync();
+void sithSurface_SyncSurfaces();
 
 //static void (*sithSurface_Shutdown)() = (void*)sithSurface_Shutdown_ADDR;
 //static int (*sithSurface_Startup)() = (void*)sithSurface_Startup_ADDR;
-//static int (*_sithSurface_Load)(sithWorld*) = (void*)sithSurface_Load_ADDR;
-//static void (__cdecl *sithSurface_SendDamageToThing)(sithSurface *sender, sithThing *receiver, flex_t damage, int damageType) = (void*)sithSurface_SendDamageToThing_ADDR;
+//static int (*_sithSurface_Load)(sithWorld*) = (void*)sithSurface_ReadSurfacesListText_ADDR;
+//static void (__cdecl *sithSurface_HandleThingImpact)(sithSurface *sender, sithThing *receiver, flex_t damage, int damageType) = (void*)sithSurface_HandleThingImpact_ADDR;
 //static int* (*_sithSurface_SurfaceAnim)(void*, flex_t, int) = (void*)sithSurface_SurfaceAnim_ADDR;
 //static int* (*sithSurface_MaterialAnim)(void*, flex_t, int) = (void*)sithSurface_MaterialAnim_ADDR;
 //static rdSurface* (*sithSurface_GetByIdx)(int) = (void*)sithSurface_GetByIdx_ADDR;
@@ -151,7 +151,7 @@ void sithSurface_Sync();
 //static int (*sithSurface_GetSurfaceAnim)(sithSurface *a1) = (void*)sithSurface_GetSurfaceAnim_ADDR;
 //static rdSurface* (*sithSurface_SetThingLight)(sithThing *a1, flex_t a2, flex_t a3, int a4) = (void*)sithSurface_SetThingLight_ADDR;
 //static rdSurface* (*sithSurface_sub_4F00A0)(sithThing *a1, flex_t a2, int a3) = (void*)sithSurface_sub_4F00A0_ADDR;
-//static void (*sithSurface_Free)(sithWorld* world) = (void*)sithSurface_Free_ADDR;
+//static void (*sithSurface_FreeWorldSurfaces)(sithWorld* world) = (void*)sithSurface_FreeWorldSurfaces_ADDR;
 //static void (*_sithSurface_Tick)(flex_t time) = (void*)sithSurface_Tick_ADDR;
 //static rdSurface* (*sithSurface_SlideHorizonSky)(int a1, rdVector2 *a2) = (void*)sithSurface_SlideHorizonSky_ADDR;
 //static rdSurface* (*sithSurface_SurfaceLightAnim)(sithSurface *surface, flex_t a2, flex_t a3) = (void*)sithSurface_SurfaceLightAnim_ADDR;
@@ -159,7 +159,7 @@ void sithSurface_Sync();
 //static uint32_t (*sithSurface_SyncSurface)(sithSurface *a1) = (void*)sithSurface_SyncSurface_ADDR;
 //static void (*sithSurface_DetachThing)(sithSurface *a1, rdVector3 *out) = (void*)sithSurface_DetachThing_ADDR;
 //static void (*sithSurface_ScrollSky)(rdSurface *surface, int a2, flex_t a3, int a4) = (void*)sithSurface_ScrollSky_ADDR;
-//static int (*sithSurface_GetCenter)(sithSurface *a1, rdVector3 *a2) = (void*)sithSurface_GetCenter_ADDR;
+//static int (*sithSurface_GetCenterPoint)(sithSurface *a1, rdVector3 *a2) = (void*)sithSurface_GetCenterPoint_ADDR;
 
 //static void (*sithSurface_SyncFull)(int mpFlags) = (void*)sithSurface_SyncFull_ADDR;
 

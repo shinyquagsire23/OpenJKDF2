@@ -2189,18 +2189,18 @@ void do_hooks()
     hook_function(sithPhysics_UpdateThing_ADDR, sithPhysics_UpdateThing);
     
     // sithSurface
-    hook_function(sithSurface_New_ADDR, sithSurface_New);
-    hook_function(sithSurface_sub_4E5AD0_ADDR, sithSurface_AllocateAdjoins);
-    hook_function(sithSurface_Free_ADDR, sithSurface_Free);
+    hook_function(sithSurface_AllocWorldSurfaces_ADDR, sithSurface_AllocWorldSurfaces);
+    hook_function(sithSurface_sub_4E5AD0_ADDR, sithSurface_AllocWorldAdjoins);
+    hook_function(sithSurface_FreeWorldSurfaces_ADDR, sithSurface_FreeWorldSurfaces);
     hook_function(sithSurface_SurfaceLightAnim_ADDR, sithSurface_SurfaceLightAnim);
     hook_function(sithSurface_SlideWall_ADDR, sithSurface_SlideWall);
     hook_function(sithSurface_MaterialAnim_ADDR, sithSurface_MaterialAnim);
     hook_function(sithSurface_DetachThing_ADDR, sithSurface_DetachThing);
-    hook_function(sithSurface_GetCenter_ADDR, sithSurface_GetCenter);
+    hook_function(sithSurface_GetCenterPoint_ADDR, sithSurface_GetCenterPoint);
     hook_function(sithSurface_SlideHorizonSky_ADDR, sithSurface_SlideHorizonSky);
     hook_function(sithSurface_sub_4F00A0_ADDR, sithSurface_sub_4F00A0);
     hook_function(sithSurface_SetThingLight_ADDR, sithSurface_SetThingLight);
-    hook_function(sithSurface_SendDamageToThing_ADDR, sithSurface_SendDamageToThing);
+    hook_function(sithSurface_HandleThingImpact_ADDR, sithSurface_HandleThingImpact);
     hook_function(sithSurface_GetRdSurface_ADDR, sithSurface_GetRdSurface);
     hook_function(sithSurface_GetByIdx_ADDR, sithSurface_GetByIdx);
     hook_function(sithSurface_SyncFull_ADDR, sithSurface_SyncFull);
@@ -2975,16 +2975,16 @@ void do_hooks()
     //hook_function_inv(sithSurface_Startup_ADDR, sithSurface_Startup);
     //hook_function_inv(sithSurface_Shutdown_ADDR, sithSurface_Shutdown);
     //hook_function_inv(sithSurface_Open_ADDR, sithSurface_Open);
-    //hook_function_inv(sithSurface_Verify_ADDR, sithSurface_Verify);
-    //hook_function_inv(sithSurface_Load_ADDR, sithSurface_Load);
-    //hook_function_inv(sithSurface_GetIdxFromPtr_ADDR, sithSurface_GetIdxFromPtr);
-    //hook_function_inv(sithSurface_UnsetAdjoins_ADDR, sithSurface_UnsetAdjoins);
-    //hook_function_inv(sithSurface_SetAdjoins_ADDR, sithSurface_SetAdjoins);
+    //hook_function_inv(sithSurface_ValidateWorldSurfaces_ADDR, sithSurface_ValidateWorldSurfaces);
+    //hook_function_inv(sithSurface_ReadSurfacesListText_ADDR, sithSurface_ReadSurfacesListText);
+    //hook_function_inv(sithSurface_ValidateSurfacePointer_ADDR, sithSurface_ValidateSurfacePointer);
+    //hook_function_inv(sithSurface_HideSectorAdjoin_ADDR, sithSurface_HideSectorAdjoin);
+    //hook_function_inv(sithSurface_ShowSectorAdjoin_ADDR, sithSurface_ShowSectorAdjoin);
     //hook_function_inv(sithSurface_SurfaceAnim_ADDR, sithSurface_SurfaceAnim);
     //hook_function_inv(sithSurface_Startup2_ADDR, sithSurface_Startup2);
     //hook_function_inv(sithSurface_Startup3_ADDR, sithSurface_Startup3);
     //hook_function_inv(sithSurface_SetSectorLight_ADDR, sithSurface_SetSectorLight);
-    //hook_function_inv(sithSurface_Free_ADDR, sithSurface_Free);
+    //hook_function_inv(sithSurface_FreeWorldSurfaces_ADDR, sithSurface_FreeWorldSurfaces);
     //hook_function_inv(sithSurface_Tick_ADDR, sithSurface_Tick);
     //hook_function_inv(sithSurface_ScrollSky_ADDR, sithSurface_ScrollSky);
     //hook_function_inv(sithSurface_StopAnim_ADDR, sithSurface_StopAnim);
@@ -2993,11 +2993,11 @@ void do_hooks()
     //hook_function_inv(sithSurface_SlideWall_ADDR, sithSurface_SlideWall);
     //hook_function_inv(sithSurface_MaterialAnim_ADDR, sithSurface_MaterialAnim);
     //hook_function_inv(sithSurface_DetachThing_ADDR, sithSurface_DetachThing);
-    //hook_function_inv(sithSurface_GetCenter_ADDR, sithSurface_GetCenter);
+    //hook_function_inv(sithSurface_GetCenterPoint_ADDR, sithSurface_GetCenterPoint);
     //hook_function_inv(sithSurface_SlideHorizonSky_ADDR, sithSurface_SlideHorizonSky);
     //hook_function_inv(sithSurface_sub_4F00A0_ADDR, sithSurface_sub_4F00A0);
     //hook_function_inv(sithSurface_SetThingLight_ADDR, sithSurface_SetThingLight);
-    //hook_function_inv(sithSurface_SendDamageToThing_ADDR, sithSurface_SendDamageToThing);
+    //hook_function_inv(sithSurface_HandleThingImpact_ADDR, sithSurface_HandleThingImpact);
     //hook_function_inv(sithSurface_GetRdSurface_ADDR, sithSurface_GetRdSurface);
 
 #if 0
