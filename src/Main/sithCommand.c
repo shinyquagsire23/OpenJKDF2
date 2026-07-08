@@ -130,9 +130,9 @@ int sithCommand_DebugMode(stdDebugConsoleCmd *pCmd, const char *pArgStr)
             v3 = 128;
             goto LABEL_13;
         case 5u:
-            if ( !sithWorld_pCurrentWorld )
+            if ( !sithWorld_g_pCurrentWorld )
                 goto LABEL_24;
-            v4 = sithWorld_pCurrentWorld->playerThing;
+            v4 = sithWorld_g_pCurrentWorld->playerThing;
             if ( !v4 || v4->type != SITH_THING_PLAYER )
                 goto LABEL_24;
             v2 = (int*)&v4->actorParams.typeflags;
@@ -242,14 +242,14 @@ int sithCommand_CogTrace(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     unsigned int v3; // eax
     sithCog *v4; // esi
 
-    if ( sithWorld_pCurrentWorld )
+    if ( sithWorld_g_pCurrentWorld )
     {
         if ( pArgStr )
         {
             v3 = _atoi(pArgStr);
-            if ( v3 < sithWorld_pCurrentWorld->numCogsLoaded )
+            if ( v3 < sithWorld_g_pCurrentWorld->numCogsLoaded )
             {
-                v4 = &sithWorld_pCurrentWorld->cogs[v3];
+                v4 = &sithWorld_g_pCurrentWorld->cogs[v3];
                 if ( (v4->flags & SITH_COG_DEBUG) != 0 )
                 {
                     sithConsole_PrintString("Cog trace disabled.");
@@ -289,14 +289,14 @@ int sithCommand_CogPause(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     sithCog *v4; // esi
     int v5; // eax
 
-    if ( sithWorld_pCurrentWorld )
+    if ( sithWorld_g_pCurrentWorld )
     {
         if ( pArgStr )
         {
             v3 = _atoi(pArgStr);
-            if ( v3 < sithWorld_pCurrentWorld->numCogsLoaded )
+            if ( v3 < sithWorld_g_pCurrentWorld->numCogsLoaded )
             {
-                v4 = &sithWorld_pCurrentWorld->cogs[v3];
+                v4 = &sithWorld_g_pCurrentWorld->cogs[v3];
                 if ( (v4->flags & SITH_COG_DISABLED) != 0 )
                 {
                     sithConsole_PrintString("Cog enabled.");
@@ -335,13 +335,13 @@ int sithCommand_CogList(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     unsigned int v3; // ebp
     sithCog *i; // esi
 
-    if ( sithWorld_pCurrentWorld )
+    if ( sithWorld_g_pCurrentWorld )
     {
 #ifdef SITH_DEBUG_STRUCT_NAMES
-        _sprintf(std_genBuffer, "World cogs = %d.", sithWorld_pCurrentWorld->numCogsLoaded);
+        _sprintf(std_genBuffer, "World cogs = %d.", sithWorld_g_pCurrentWorld->numCogsLoaded);
         sithConsole_PrintString(std_genBuffer);
         v3 = 0;
-        for ( i = sithWorld_pCurrentWorld->cogs; v3 < sithWorld_pCurrentWorld->numCogsLoaded; ++i )
+        for ( i = sithWorld_g_pCurrentWorld->cogs; v3 < sithWorld_g_pCurrentWorld->numCogsLoaded; ++i )
         {
             _sprintf(std_genBuffer, "%d: %-16s %-16s ", v3, i->cogscript_fpath, i->cogscript->cog_fpath);
             if ( (i->flags & SITH_COG_DISABLED) != 0 )
@@ -368,7 +368,7 @@ int sithCommand_Fly(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     sithThing *v0; // ecx
     wchar_t *v3; // eax
 
-    if ( sithWorld_pCurrentWorld && (v0 = sithWorld_pCurrentWorld->playerThing) != 0 )
+    if ( sithWorld_g_pCurrentWorld && (v0 = sithWorld_g_pCurrentWorld->playerThing) != 0 )
     {
         if ( v0->moveType == SITH_MT_PHYSICS )
         {
@@ -408,9 +408,9 @@ int sithCommand_Memory(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 
     // TODO: verify the exact indices or just rewrite this
 
-    sithWorld* pWorld = sithWorld_pCurrentWorld;
+    sithWorld* pWorld = sithWorld_g_pCurrentWorld;
     if (pArgStr) {
-        pWorld = sithWorld_pStatic;
+        pWorld = sithWorld_g_pStaticWorld;
     }
     if (!pWorld)
     {
@@ -493,7 +493,7 @@ int sithCommand_Coords(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     signed int result; // eax
     rdVector3 a2; // [esp+38h] [ebp-Ch] BYREF
 
-    if ( sithWorld_pCurrentWorld && (player = sithWorld_pCurrentWorld->playerThing) != 0 )
+    if ( sithWorld_g_pCurrentWorld && (player = sithWorld_g_pCurrentWorld->playerThing) != 0 )
     {
         if ( player->sector )
         {
@@ -536,7 +536,7 @@ int sithCommand_Warp(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     rdVector3 a3a; // [esp+1Ch] [ebp-3Ch] BYREF
     rdMatrix34 a; // [esp+28h] [ebp-30h] BYREF
 
-    if ( !sithWorld_pCurrentWorld || (v3 = sithWorld_pCurrentWorld->playerThing) == 0 )
+    if ( !sithWorld_g_pCurrentWorld || (v3 = sithWorld_g_pCurrentWorld->playerThing) == 0 )
     {
         sithConsole_PrintString("No world.");
         return 0;
@@ -561,15 +561,15 @@ int sithCommand_Warp(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     else
         rdMatrix_Identity34(&a);
 
-    v6 = sithWorld_pCurrentWorld->sectors;
-    for ( i = 0; i < sithWorld_pCurrentWorld->numSectors; ++v6 )
+    v6 = sithWorld_g_pCurrentWorld->sectors;
+    for ( i = 0; i < sithWorld_g_pCurrentWorld->numSectors; ++v6 )
     {
         if ( sithIntersect_IsSphereInSector(&a1, 0.0, v6) )
             break;
         ++i;
     }
 
-    if ( i == sithWorld_pCurrentWorld->numSectors )
+    if ( i == sithWorld_g_pCurrentWorld->numSectors )
     {
         sithConsole_PrintString("Position not in world");
         result = 0;
@@ -593,7 +593,7 @@ int sithCommand_Activate(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     // Added: fixed a nullptr dereference
     if (!pArgStr) return 0;
 
-    if ( sithWorld_pCurrentWorld && (v2 = sithWorld_pCurrentWorld->playerThing) != 0 )
+    if ( sithWorld_g_pCurrentWorld && (v2 = sithWorld_g_pCurrentWorld->playerThing) != 0 )
     {
         if ( _sscanf(pArgStr, "%d", &tmp) >= 1
           && tmp >= 0
@@ -725,7 +725,7 @@ int sithCommand_CompareMatInfos(const void *a, const void *b)
 
 int sithCommand_MatList(stdDebugConsoleCmd *pCmd, const char *pArgStr)
 {
-    sithWorld *pWorld = sithWorld_pCurrentWorld;
+    sithWorld *pWorld = sithWorld_g_pCurrentWorld;
     if ( !pWorld )
     {
         sithConsole_PrintString("No world.");
@@ -816,7 +816,7 @@ int sithCommand_CmdThingNpc(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         if (!pTemplate) {
             sithConsole_PrintString("No template by that name.");
         }
-        else if (pTemplate && sithWorld_pCurrentWorld && sithPlayer_pLocalPlayerThing) {
+        else if (pTemplate && sithWorld_g_pCurrentWorld && sithPlayer_pLocalPlayerThing) {
             //sithThing* pSpawned = sithThing_CreateThing(pTemplate, sithPlayer_pLocalPlayerThing);
             sithThing* pSpawned = sithPlayerActions_SpawnThingAtLookAt(sithPlayer_pLocalPlayerThing, pTemplate);
         }

@@ -169,7 +169,7 @@ LABEL_17:
                         default:
                             break;
                     }
-                    rdVector_Neg3(&a2, &sithWorld_pCurrentWorld->playerThing->position);
+                    rdVector_Neg3(&a2, &sithWorld_g_pCurrentWorld->playerThing->position);
                     rdMatrix_BuildTranslate34(&jkGuiMap_matTmp, &a2);
                     rdMatrix_PostRotate34(&jkGuiMap_matTmp, &jkGuiMap_vec3Idk);
                     rdMatrix_PostRotate34(&jkGuiMap_matTmp, &jkGuiMap_vec3Idk2);
@@ -224,7 +224,7 @@ LABEL_26:
         jkGuiMap_vec3Idk.x = 0.0 + jkGuiMap_vec3Idk.x;
         jkGuiMap_vec3Idk.y = 0.5 + jkGuiMap_vec3Idk.y;
         jkGuiMap_vec3Idk.z = 0.0 + jkGuiMap_vec3Idk.z;
-        rdVector_Neg3(&v8, &sithWorld_pCurrentWorld->playerThing->position);
+        rdVector_Neg3(&v8, &sithWorld_g_pCurrentWorld->playerThing->position);
         rdMatrix_BuildTranslate34(&jkGuiMap_matTmp, &v8);
         rdMatrix_PostRotate34(&jkGuiMap_matTmp, &jkGuiMap_vec3Idk);
         rdMatrix_PostRotate34(&jkGuiMap_matTmp, &jkGuiMap_vec3Idk2);
@@ -254,7 +254,7 @@ int jkGuiMap_ResetButtonClicked(jkGuiElement* pElement, jkGuiMenu *menu, int32_t
     a2a.y = -2.0;
     a2a.z = 0.3;
     rdMatrix_BuildTranslate34(&jkGuiMap_viewMat, &a2a);
-    rdVector_Neg3(&a2a, &sithWorld_pCurrentWorld->playerThing->position);
+    rdVector_Neg3(&a2a, &sithWorld_g_pCurrentWorld->playerThing->position);
     rdMatrix_BuildTranslate34(&jkGuiMap_matTmp, &a2a);
     rdCamera_SetCurrent(jkGuiMap_pCamera);
     rdCamera_Update(&jkGuiMap_viewMat);
@@ -314,7 +314,7 @@ int jkGuiMap_Show()
         a2.y = -2.0;
         a2.z = 0.3;
         rdMatrix_BuildTranslate34(&jkGuiMap_viewMat, &a2);
-        rdVector_Neg3(&a2, &sithWorld_pCurrentWorld->playerThing->position);
+        rdVector_Neg3(&a2, &sithWorld_g_pCurrentWorld->playerThing->position);
         rdMatrix_BuildTranslate34(&jkGuiMap_matTmp, &a2);
         rdVector_Zero3(&jkGuiMap_vec3Idk2);
         rdVector_Zero3(&jkGuiMap_vec3Idk);

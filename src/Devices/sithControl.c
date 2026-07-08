@@ -297,14 +297,14 @@ void sithControl_Update(flex_t deltaSecs, int deltaMs)
             }
         }
     }
-    if ( sithWorld_pCurrentWorld->playerThing && sithControl_numHandlers > 0 )
+    if ( sithWorld_g_pCurrentWorld->playerThing && sithControl_numHandlers > 0 )
     {
 #ifndef FIXED_TIMESTEP_PHYS
         sithControl_ReadControls();
 #endif
         for (int i = 0; i < sithControl_numHandlers; i++)
         {
-            if (sithControl_aHandlers[i] && sithControl_aHandlers[i](sithWorld_pCurrentWorld->playerThing, deltaSecs) )
+            if (sithControl_aHandlers[i] && sithControl_aHandlers[i](sithWorld_g_pCurrentWorld->playerThing, deltaSecs) )
                 break;
         }
 #ifndef FIXED_TIMESTEP_PHYS
@@ -1052,8 +1052,8 @@ debug_controls:
             rdVector_Copy3(&player->position, &pThing->position);
             rdMatrix_Copy34(&player->lookOrientation, &pThing->lookOrientation);
             sithThing_SetSector(player, pThing->sector, 0);
-            sithWorld_pCurrentWorld->cameraFocus = pThing;
-            sithWorld_pCurrentWorld->playerThing = jkPlayer_playerInfos[0].playerThing;
+            sithWorld_g_pCurrentWorld->cameraFocus = pThing;
+            sithWorld_g_pCurrentWorld->playerThing = jkPlayer_playerInfos[0].playerThing;
             stdPalEffects_FlushAllAdds();
         }
     }

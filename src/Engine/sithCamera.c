@@ -131,7 +131,7 @@ void sithCamera_ResetAllCameras()
     sithThing *v0; // eax
     rdVector3 rot; // [esp+Ch] [ebp-Ch] BYREF
 
-    v0 = sithWorld_pCurrentWorld->cameraFocus;
+    v0 = sithWorld_g_pCurrentWorld->cameraFocus;
     sithCamera_g_stateFlags &= ~1u;
     sithCamera_g_aCameras[0].primaryFocus = v0;
     sithCamera_g_aCameras[1].primaryFocus = v0;

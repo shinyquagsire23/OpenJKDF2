@@ -192,12 +192,12 @@ void sithThing_Update(flex_t deltaSeconds, int deltaMs)
 {
     sithThing* pThingIter; // esi
 
-    if ( sithWorld_pCurrentWorld->numThings < 0 )
+    if ( sithWorld_g_pCurrentWorld->numThings < 0 )
         return;
 
-    for (int32_t i = 0; i < sithWorld_pCurrentWorld->numThings+1; i++)
+    for (int32_t i = 0; i < sithWorld_g_pCurrentWorld->numThings+1; i++)
     {
-        pThingIter = &sithWorld_pCurrentWorld->things[i];
+        pThingIter = &sithWorld_g_pCurrentWorld->things[i];
         if (!pThingIter->type)
             continue;
 #ifdef TARGET_RETRO_HOMEBREW
@@ -410,7 +410,7 @@ sithThing* sithThing_GetThingByIndex(int idx)
 {
     sithThing *result; // eax
 
-    if ( idx < 0 || idx >= sithWorld_pCurrentWorld->numThingsLoaded || (result = &sithWorld_pCurrentWorld->things[idx], result->type == SITH_THING_FREE) )
+    if ( idx < 0 || idx >= sithWorld_g_pCurrentWorld->numThingsLoaded || (result = &sithWorld_g_pCurrentWorld->things[idx], result->type == SITH_THING_FREE) )
         result = 0;
     return result;
 }
@@ -421,19 +421,19 @@ sithThing* sithThing_GetGuidThing(int thing_id)
 
     if ( thing_id < 0 )
         return 0;
-    if ( (thing_id & 0xFFFF0000) == 0 && thing_id < sithWorld_pCurrentWorld->numThingsLoaded )
+    if ( (thing_id & 0xFFFF0000) == 0 && thing_id < sithWorld_g_pCurrentWorld->numThingsLoaded )
     {
-        result = &sithWorld_pCurrentWorld->things[thing_id];
+        result = &sithWorld_g_pCurrentWorld->things[thing_id];
         if ( result->type )
             return result;
     }
 
-    if ( sithWorld_pCurrentWorld->numThings < 0 )
+    if ( sithWorld_g_pCurrentWorld->numThings < 0 )
         return 0;
     
-    for (int32_t i = 0; i <= sithWorld_pCurrentWorld->numThings; i++)
+    for (int32_t i = 0; i <= sithWorld_g_pCurrentWorld->numThings; i++)
     {
-        sithThing* iter = &sithWorld_pCurrentWorld->things[i];
+        sithThing* iter = &sithWorld_g_pCurrentWorld->things[i];
         if (iter->thing_id == thing_id && iter->type != SITH_THING_FREE) {
             return iter;
         }
@@ -523,9 +523,9 @@ void sithThing_RemoveWorldThings(sithWorld *pWorld)
 void sithThing_InitializeWorldThings(void)
 {
     sithNet_thingsIdx = 0;
-    for (int32_t idx = sithWorld_pCurrentWorld->numThingsLoaded - 1; idx >= 0; idx--)
+    for (int32_t idx = sithWorld_g_pCurrentWorld->numThingsLoaded - 1; idx >= 0; idx--)
     {
-        sithThing* pThing = &sithWorld_pCurrentWorld->things[idx];
+        sithThing* pThing = &sithWorld_g_pCurrentWorld->things[idx];
         sithThing_Reset(pThing);
 
         pThing->thingIdx = idx;
@@ -542,30 +542,30 @@ void sithThing_LoadPostProcess()
     int32_t v8; // ecx
 
     // Added: Prevent crashes
-    if (!sithWorld_pCurrentWorld) {
+    if (!sithWorld_g_pCurrentWorld) {
         return;
     }
 
     sithNet_thingsIdx = 0;
-    sithWorld_pCurrentWorld->numThings = -1;
+    sithWorld_g_pCurrentWorld->numThings = -1;
     v2 = sithNet_things + 1;
-    for (v1 = sithWorld_pCurrentWorld->numThingsLoaded - 1; v1 >= 0; v1--)
+    for (v1 = sithWorld_g_pCurrentWorld->numThingsLoaded - 1; v1 >= 0; v1--)
     {
-        if ( sithWorld_pCurrentWorld->things[v1].type )
+        if ( sithWorld_g_pCurrentWorld->things[v1].type )
         {
-            if ( v1 > sithWorld_pCurrentWorld->numThings )
-                sithWorld_pCurrentWorld->numThings = v1;
+            if ( v1 > sithWorld_g_pCurrentWorld->numThings )
+                sithWorld_g_pCurrentWorld->numThings = v1;
         }
         else
         {
-            if ( v1 == sithWorld_pCurrentWorld->numThings )
+            if ( v1 == sithWorld_g_pCurrentWorld->numThings )
             {
                 for (v6 = v1-1; v6 >= 0; v6--)
                 {
-                    if (sithWorld_pCurrentWorld->things[v6].type)
+                    if (sithWorld_g_pCurrentWorld->things[v6].type)
                         break;
                 }
-                sithWorld_pCurrentWorld->numThings = v6;
+                sithWorld_g_pCurrentWorld->numThings = v6;
             }
             *v2++ = v1;
             sithNet_thingsIdx++;
@@ -586,20 +586,20 @@ void sithThing_RemoveThing(sithThing* pThing)
     sithThing_FreeThing(pThing); // Inlined
 
     v2 = pThing->thingIdx;
-    if (sithWorld_pCurrentWorld && v2 == sithWorld_pCurrentWorld->numThings ) // Added: sithWorld_pCurrentWorld nullptr check
+    if (sithWorld_g_pCurrentWorld && v2 == sithWorld_g_pCurrentWorld->numThings ) // Added: sithWorld_g_pCurrentWorld nullptr check
     {
         v3 = v2 - 1;
         if ( v2 - 1 >= 0 )
         {
             do
             {
-                if (sithWorld_pCurrentWorld->things[v3].type)
+                if (sithWorld_g_pCurrentWorld->things[v3].type)
                     break;
                 --v3;
             }
             while ( v3 >= 0 );
         }
-        sithWorld_pCurrentWorld->numThings = v3;
+        sithWorld_g_pCurrentWorld->numThings = v3;
     }
     v5 = sithNet_thingsIdx;
     sithNet_things[sithNet_thingsIdx + 1] = v2;
@@ -648,7 +648,7 @@ void sithThing_Initialize(sithThing* pThing)
     if ( pThing->soundclass )
         sithSoundClass_PlayModeRandom(pThing, SITH_SC_CREATE);
 
-    if ( (sithWorld_pCurrentWorld->level_type_maybe & 2) != 0
+    if ( (sithWorld_g_pCurrentWorld->level_type_maybe & 2) != 0
       && pThing->moveType == SITH_MT_PHYSICS
       && (pThing->physicsParams.physflags & (SITH_PF_WALLSTICK|SITH_PF_FLOORSTICK)) != 0 )
     {
@@ -913,7 +913,7 @@ sithThing* sithThing_Create(uint32_t thingType)
     sithThing *pThingRet;
     int iVar4;
 
-    pWorld = sithWorld_pCurrentWorld;
+    pWorld = sithWorld_g_pCurrentWorld;
     if (sithNet_thingsIdx == 0) {
         iVar4 = -1;
         iVar3 = sithNet_thingsIdx;
@@ -922,8 +922,8 @@ sithThing* sithThing_Create(uint32_t thingType)
         iVar4 = (int)sithNet_things[sithNet_thingsIdx];
         iVar3 = sithNet_thingsIdx + -1;
         sithNet_thingsIdx = iVar3;
-        if (sithWorld_pCurrentWorld->numThings < iVar4) {
-            sithWorld_pCurrentWorld->numThings = iVar4;
+        if (sithWorld_g_pCurrentWorld->numThings < iVar4) {
+            sithWorld_g_pCurrentWorld->numThings = iVar4;
         }
     }
     if (iVar4 < 0) {
@@ -1176,7 +1176,7 @@ void sithThing_AttachThingToSurface(sithThing* pThing, sithSurface *surface, int
         sithThing_DetachThing(pThing);
     }
     v6 = surface->surfaceInfo.face.vertexPosIdx;
-    v7 = sithWorld_pCurrentWorld;
+    v7 = sithWorld_g_pCurrentWorld;
     pThing->attach_flags = 1;
     v8 = &v7->vertices[*v6];
     pThing->field_38.x = v8->x;
@@ -1469,14 +1469,14 @@ int sithThing_ReadStaticThingsListText(sithWorld *pWorld, int a2)
                     sithMulti_RemoveStaticThing(v4->thing_id);
                 sithThing_FreeThing(v4);
                 v5 = v4->thingIdx;
-                if ( v5 == sithWorld_pCurrentWorld->numThings )
+                if ( v5 == sithWorld_g_pCurrentWorld->numThings )
                 {
                     for (v6 = v5 - 1; v6 >= 0; v6--)
                     {
-                        if (sithWorld_pCurrentWorld->things[v6].type)
+                        if (sithWorld_g_pCurrentWorld->things[v6].type)
                             break;
                     }
-                    sithWorld_pCurrentWorld->numThings = v6;
+                    sithWorld_g_pCurrentWorld->numThings = v6;
                 }
                 sithNet_things[1 + sithNet_thingsIdx++] = v5;
             }
@@ -1496,10 +1496,10 @@ int sithThing_ReadStaticThingsListText(sithWorld *pWorld, int a2)
     paThings = (sithThing *)SITH_ALLOC(sizeof(sithThing) * v10);
     TWL_EXTRAM_RESTORE(pSithHS); }
 
-    sithWorld_pCurrentWorld->things = paThings;
+    sithWorld_g_pCurrentWorld->things = paThings;
     if ( !paThings )
         return 0;
-    sithWorld_pCurrentWorld->numThingsLoaded = v10;
+    sithWorld_g_pCurrentWorld->numThingsLoaded = v10;
     sithThing_InitializeWorldThings();
     sithNet_thingsIdx = 0;
     v20 = 0x1000 << jkPlayer_setDiff;
@@ -1512,7 +1512,7 @@ int sithThing_ReadStaticThingsListText(sithWorld *pWorld, int a2)
     {
         if ( !_strcmp(stdConffile_entry.args[0].value, "end") )
             break;
-        v21 = &sithWorld_pCurrentWorld->things[_atoi(stdConffile_entry.args[0].value)];
+        v21 = &sithWorld_g_pCurrentWorld->things[_atoi(stdConffile_entry.args[0].value)];
         v22 = sithTemplate_GetTemplate(stdConffile_entry.args[1].value);
         if ( stdConffile_entry.numArgs >= 0xAu )
         {
@@ -1524,9 +1524,9 @@ int sithThing_ReadStaticThingsListText(sithWorld *pWorld, int a2)
             a3.z = _atof(stdConffile_entry.args[8].value);
             rdMatrix_BuildRotate34(&a, &a3);
             v23 = _atoi(stdConffile_entry.args[9].value);
-            if ( v23 >= 0 && v23 < sithWorld_pCurrentWorld->numSectors )
+            if ( v23 >= 0 && v23 < sithWorld_g_pCurrentWorld->numSectors )
             {
-                v24 = &sithWorld_pCurrentWorld->sectors[v23];
+                v24 = &sithWorld_g_pCurrentWorld->sectors[v23];
                 if ( stdConffile_entry.numArgs >= 11 && (stdConffile_entry.args[10].key == stdConffile_entry.args[10].value)) // MOTS added (w/o comparison)
                 {
                     // && (!stdConffile_entry.args[10].key || strlen(stdConffile_entry.args[10].key) == 0)
@@ -1889,7 +1889,7 @@ int sithThing_ValidateThingPointer(sithThing* pThing)
     if ( pThing )
     {
         v1 = pThing->thingIdx;
-        if ( v1 == pThing - sithWorld_pCurrentWorld->things && v1 < (SITH_MAX_THINGS-1) )
+        if ( v1 == pThing - sithWorld_g_pCurrentWorld->things && v1 < (SITH_MAX_THINGS-1) )
             result = 1;
     }
     return result;
@@ -2009,15 +2009,15 @@ int sithThing_FreeThingIndex(int a1)
 {
     int32_t v1; // eax
 
-    if ( a1 == sithWorld_pCurrentWorld->numThings )
+    if ( a1 == sithWorld_g_pCurrentWorld->numThings )
     {
         v1 = a1 - 1;
         for (v1 = a1 - 1; v1 >= 0; v1--)
         {
-            if (sithWorld_pCurrentWorld->things[v1].type)
+            if (sithWorld_g_pCurrentWorld->things[v1].type)
                 break;
         }
-        sithWorld_pCurrentWorld->numThings = v1;
+        sithWorld_g_pCurrentWorld->numThings = v1;
     }
     sithNet_things[1 + sithNet_thingsIdx++] = a1;
     return sithNet_thingsIdx;

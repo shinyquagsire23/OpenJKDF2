@@ -50,7 +50,7 @@ void sithCogFunctionSurface_GetSurfaceVertexPos(sithCog *ctx)
     vtx_idx = sithCogExec_PopInt(ctx);
     surface = sithCogExec_PopSurface(ctx);
     if ( surface && vtx_idx < surface->surfaceInfo.face.numVertices && (vtx_idx & 0x80000000) == 0 )
-        sithCogExec_PushVector(ctx, &sithWorld_pCurrentWorld->vertices[surface->surfaceInfo.face.vertexPosIdx[vtx_idx]]);
+        sithCogExec_PushVector(ctx, &sithWorld_g_pCurrentWorld->vertices[surface->surfaceInfo.face.vertexPosIdx[vtx_idx]]);
     else
         sithCogExec_PushVector(ctx, &rdroid_zeroVector3);
 }
@@ -61,16 +61,16 @@ void sithCogFunctionSurface_SetHorizonSkyOffset(sithCog *ctx)
 
     // TODO add valid check?
     sithCogExec_PopVector(ctx, &offs);
-    sithWorld_pCurrentWorld->horizontalSkyOffs.x = offs.x;
-    sithWorld_pCurrentWorld->horizontalSkyOffs.y = offs.y;
+    sithWorld_g_pCurrentWorld->horizontalSkyOffs.x = offs.x;
+    sithWorld_g_pCurrentWorld->horizontalSkyOffs.y = offs.y;
 }
 
 void sithCogFunctionSurface_GetHorizonSkyOffset(sithCog *ctx)
 {
     rdVector3 offs;
 
-    offs.x = sithWorld_pCurrentWorld->horizontalSkyOffs.x;
-    offs.y = sithWorld_pCurrentWorld->horizontalSkyOffs.y;
+    offs.x = sithWorld_g_pCurrentWorld->horizontalSkyOffs.x;
+    offs.y = sithWorld_g_pCurrentWorld->horizontalSkyOffs.y;
     offs.z = 0.0;
     sithCogExec_PushVector(ctx, &offs);
 }
@@ -81,16 +81,16 @@ void sithCogFunctionSurface_SetCeilingSkyOffset(sithCog *ctx)
 
     // TODO add valid check?
     sithCogExec_PopVector(ctx, &offs);
-    sithWorld_pCurrentWorld->ceilingSkyOffs.x = offs.x;
-    sithWorld_pCurrentWorld->ceilingSkyOffs.y = offs.y;
+    sithWorld_g_pCurrentWorld->ceilingSkyOffs.x = offs.x;
+    sithWorld_g_pCurrentWorld->ceilingSkyOffs.y = offs.y;
 }
 
 void sithCogFunctionSurface_GetCeilingSkyOffset(sithCog *ctx)
 {
     rdVector3 offs;
 
-    offs.x = sithWorld_pCurrentWorld->ceilingSkyOffs.x;
-    offs.y = sithWorld_pCurrentWorld->ceilingSkyOffs.y;
+    offs.x = sithWorld_g_pCurrentWorld->ceilingSkyOffs.x;
+    offs.y = sithWorld_g_pCurrentWorld->ceilingSkyOffs.y;
     offs.z = 0.0;
     sithCogExec_PushVector(ctx, &offs);
 }
@@ -207,7 +207,7 @@ void sithCogFunctionSurface_GetSurfaceMaterial(sithCog *ctx)
 
     sithSurface* surface = sithCogExec_PopSurface(ctx);
     if ( surface && (v2 = surface->surfaceInfo.face.material) != 0 )
-        sithCogExec_PushInt(ctx, v2 - sithWorld_pCurrentWorld->materials);
+        sithCogExec_PushInt(ctx, v2 - sithWorld_g_pCurrentWorld->materials);
     else
         sithCogExec_PushInt(ctx, -1);
 }
@@ -223,7 +223,7 @@ void sithCogFunctionSurface_SetSurfaceMaterial(sithCog *ctx)
         v4 = surface->surfaceInfo.face.material;
         surface->surfaceInfo.face.material = mat;
         if ( v4 )
-            sithCogExec_PushInt(ctx, v4 - sithWorld_pCurrentWorld->materials);
+            sithCogExec_PushInt(ctx, v4 - sithWorld_g_pCurrentWorld->materials);
         else
             sithCogExec_PushInt(ctx, -1);
         if ( COG_SHOULD_SYNC(ctx) )
@@ -527,8 +527,8 @@ void sithCogFunctionSurface_GetSurfaceCenter(sithCog *ctx)
 
 void sithCogFunctionSurface_GetSurfaceCount(sithCog *ctx)
 {
-    if ( sithWorld_pCurrentWorld )
-        sithCogExec_PushInt(ctx, sithWorld_pCurrentWorld->numSurfaces);
+    if ( sithWorld_g_pCurrentWorld )
+        sithCogExec_PushInt(ctx, sithWorld_g_pCurrentWorld->numSurfaces);
     else
         sithCogExec_PushInt(ctx, -1);
 }

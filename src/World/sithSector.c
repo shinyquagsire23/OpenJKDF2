@@ -214,7 +214,7 @@ int sithSector_ReadSectorsListText(sithWorld *world, int tmp)
 
 int sithSector_GetIdxFromPtr(sithSector *sector)
 {
-    return sector && sector->id == sector - sithWorld_pCurrentWorld->sectors && sector->id < (unsigned int)sithWorld_pCurrentWorld->numSectors;
+    return sector && sector->id == sector - sithWorld_g_pCurrentWorld->sectors && sector->id < (unsigned int)sithWorld_g_pCurrentWorld->numSectors;
 }
 
 void sithSector_ShowSectorAdjoins(sithSector *sector)
@@ -305,8 +305,8 @@ sithSector* sithSector_GetPtrFromIdx(int idx)
 {
     sithSector *result; // eax
 
-    if ( sithWorld_pCurrentWorld && idx >= 0 && idx < sithWorld_pCurrentWorld->numSectors )
-        result = &sithWorld_pCurrentWorld->sectors[idx];
+    if ( sithWorld_g_pCurrentWorld && idx >= 0 && idx < sithWorld_g_pCurrentWorld->numSectors )
+        result = &sithWorld_g_pCurrentWorld->sectors[idx];
     else
         result = 0;
     return result;

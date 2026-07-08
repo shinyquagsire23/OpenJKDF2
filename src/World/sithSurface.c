@@ -444,7 +444,7 @@ int sithSurface_ReadSurfacesListText(sithWorld *world)
         rdVector3 surfaceCenterPt = {0};
         for (int idx = 0; idx < surfaceIter->surfaceInfo.face.numVertices; idx++) {
             int fullIdx = pPosIdx[idx]; // Added: pool-safe (field may hold an offset here)
-            rdVector3* pIter = &sithWorld_pLoading->vertices[fullIdx];
+            rdVector3* pIter = &sithWorld_g_pLastLoadedWorld->vertices[fullIdx];
             rdVector_Add3Acc(&surfaceCenterPt, pIter);
             //rdVector_Scale3Acc(&surfaceCenterPt, 0.5);
         }
@@ -453,7 +453,7 @@ int sithSurface_ReadSurfacesListText(sithWorld *world)
         flex_t radius = 0.0;
         for (int idx = 0; idx < surfaceIter->surfaceInfo.face.numVertices; idx++) {
             int fullIdx = pPosIdx[idx]; // Added: pool-safe
-            rdVector3* pIter = &sithWorld_pLoading->vertices[fullIdx];
+            rdVector3* pIter = &sithWorld_g_pLastLoadedWorld->vertices[fullIdx];
             radius = stdMath_Max(rdVector_Dist3(&surfaceCenterPt, pIter), radius);
         }
         surfaceIter->radius = radius;
@@ -972,30 +972,30 @@ void sithSurface_ScrollSky(rdSurface *surface, int skyType, flex_t deltaSecs, ui
 
     if ( skyType == SITH_SURFACE_HORIZONSKY )
     {
-        flex_t offs_x = scroll_x + sithWorld_pCurrentWorld->horizontalSkyOffs.x;
-        flex_t offs_y = scroll_y + sithWorld_pCurrentWorld->horizontalSkyOffs.y;
+        flex_t offs_x = scroll_x + sithWorld_g_pCurrentWorld->horizontalSkyOffs.x;
+        flex_t offs_y = scroll_y + sithWorld_g_pCurrentWorld->horizontalSkyOffs.y;
 
-        sithWorld_pCurrentWorld->horizontalSkyOffs.x = offs_x;
-        sithWorld_pCurrentWorld->horizontalSkyOffs.y = offs_y;
+        sithWorld_g_pCurrentWorld->horizontalSkyOffs.x = offs_x;
+        sithWorld_g_pCurrentWorld->horizontalSkyOffs.y = offs_y;
 
         if ( ((jkPlayer_currentTickIdx + a4) & 0xF) == 0 )
         {
-            sithWorld_pCurrentWorld->horizontalSkyOffs.x = stdMath_Fmod(offs_x, 1024.0);
-            sithWorld_pCurrentWorld->horizontalSkyOffs.y = stdMath_Fmod(offs_y, 1024.0);
+            sithWorld_g_pCurrentWorld->horizontalSkyOffs.x = stdMath_Fmod(offs_x, 1024.0);
+            sithWorld_g_pCurrentWorld->horizontalSkyOffs.y = stdMath_Fmod(offs_y, 1024.0);
         }
     }
     else
     {
-        flex_t offs_x = scroll_x + sithWorld_pCurrentWorld->ceilingSkyOffs.x;
-        flex_t offs_y = scroll_y + sithWorld_pCurrentWorld->ceilingSkyOffs.y;
+        flex_t offs_x = scroll_x + sithWorld_g_pCurrentWorld->ceilingSkyOffs.x;
+        flex_t offs_y = scroll_y + sithWorld_g_pCurrentWorld->ceilingSkyOffs.y;
 
-        sithWorld_pCurrentWorld->ceilingSkyOffs.x = offs_x;
-        sithWorld_pCurrentWorld->ceilingSkyOffs.y = offs_y;
+        sithWorld_g_pCurrentWorld->ceilingSkyOffs.x = offs_x;
+        sithWorld_g_pCurrentWorld->ceilingSkyOffs.y = offs_y;
 
         if ( ((jkPlayer_currentTickIdx + a4) & 0xF) == 0 )
         {
-            sithWorld_pCurrentWorld->ceilingSkyOffs.x = stdMath_Fmod(offs_x, 1024.0);
-            sithWorld_pCurrentWorld->ceilingSkyOffs.y = stdMath_Fmod(offs_y, 1024.0);
+            sithWorld_g_pCurrentWorld->ceilingSkyOffs.x = stdMath_Fmod(offs_x, 1024.0);
+            sithWorld_g_pCurrentWorld->ceilingSkyOffs.y = stdMath_Fmod(offs_y, 1024.0);
         }
     }
 }
@@ -1147,7 +1147,7 @@ rdSurface* sithSurface_SlideWall(sithSurface *surface, rdVector3 *a2)
         return 0;
     v3->flags = SITH_SURFACE_VERYDEEPWATER|SITH_SURFACE_WATER;
     v3->sithSurfaceParent = surface;
-    v6 = sithWorld_pCurrentWorld;
+    v6 = sithWorld_g_pCurrentWorld;
     v3->field_24 = *a2;
     v7 = 1;
     v8 = surface->surfaceInfo.face.normal.x;
@@ -1356,7 +1356,7 @@ int sithSurface_GetCenterPoint(sithSurface *surface, rdVector3 *out)
 
     rdVector_Zero3(&a1a);
     for (uint32_t i = 0; i < surface->surfaceInfo.face.numVertices; ++i )
-        rdVector_Add3Acc(&a1a, &sithWorld_pCurrentWorld->vertices[surface->surfaceInfo.face.vertexPosIdx[i]]);
+        rdVector_Add3Acc(&a1a, &sithWorld_g_pCurrentWorld->vertices[surface->surfaceInfo.face.vertexPosIdx[i]]);
 
     rdVector_InvScale3(out, &a1a, (flex_t)(uint32_t)surface->surfaceInfo.face.numVertices); // FLEXTODO
 
@@ -1555,8 +1555,8 @@ sithSurface* sithSurface_sub_4E63B0(int idx)
 {
     sithSurface *result; // eax
 
-    if ( sithWorld_pCurrentWorld && idx >= 0 && idx < sithWorld_pCurrentWorld->numSurfaces )
-        result = &sithWorld_pCurrentWorld->surfaces[idx];
+    if ( sithWorld_g_pCurrentWorld && idx >= 0 && idx < sithWorld_g_pCurrentWorld->numSurfaces )
+        result = &sithWorld_g_pCurrentWorld->surfaces[idx];
     else
         result = 0;
     return result;

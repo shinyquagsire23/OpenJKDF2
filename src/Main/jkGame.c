@@ -191,7 +191,7 @@ int jkGame_Update()
         rdSetColorEffects(&stdPalEffects_state.effect);
 
 #if defined(SDL2_RENDER) || defined(TARGET_RETRO_HOMEBREW)
-    _memcpy(stdDisplay_masterPalette, sithWorld_pCurrentWorld->colormaps->colors, 0x300);
+    _memcpy(stdDisplay_masterPalette, sithWorld_g_pCurrentWorld->colormaps->colors, 0x300);
 #endif
     rdAdvanceFrame();
     jkGame_Update_AdvanceFrame = stdPlatform_GetTimeMsec();
@@ -220,7 +220,7 @@ int jkGame_Update()
     ++Video_dword_5528A0; // MOTS added
     if ( Main_bDispStats )
     {
-        v2 = sithWorld_pCurrentWorld->playerThing;
+        v2 = sithWorld_g_pCurrentWorld->playerThing;
         //++Video_dword_5528A0; // MOTS removed
         v3 = stdPlatform_GetTimeMsec();
         v0 = v3 - Video_lastTimeMsec;
@@ -367,8 +367,8 @@ int jkGame_Update()
     int bHasForceSurge = 0;
     int bHasFieldLight = 0;
 
-    if (sithWorld_pCurrentWorld) {
-        sithThing* pPlayer = sithWorld_pCurrentWorld->playerThing;
+    if (sithWorld_g_pCurrentWorld) {
+        sithThing* pPlayer = sithWorld_g_pCurrentWorld->playerThing;
         if ( pPlayer->type == SITH_THING_PLAYER ) {
             healthNum = pPlayer->actorParams.health;
             shieldsNum = (int32_t)sithInventory_GetInventory(pPlayer, SITHBIN_SHIELDS);

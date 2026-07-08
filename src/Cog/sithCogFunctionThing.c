@@ -717,7 +717,7 @@ void sithCogFunctionThing_SetThingPosEx(sithCog *ctx)
     sithCogExec_PopVector(ctx, &poppedVec);
     sithThing* pThing = sithCogExec_PopThing(ctx);
     if (pSector || (pSector == (sithSector *)-1)) {
-        pSector = sithSector_FindSectorAtPos(sithWorld_pCurrentWorld, &poppedVec);
+        pSector = sithSector_FindSectorAtPos(sithWorld_g_pCurrentWorld, &poppedVec);
     }
     if (pThing)
     {

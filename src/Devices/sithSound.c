@@ -174,11 +174,11 @@ sithSound* sithSound_Load(char *sound_fname, int a2)
     if ( !sound_file )
         return 0;
 
-    if ( sithWorld_pLoading->numSoundsLoaded < sithWorld_pLoading->numSounds )
+    if ( sithWorld_g_pLastLoadedWorld->numSoundsLoaded < sithWorld_g_pLastLoadedWorld->numSounds )
     {
-        sound = &sithWorld_pLoading->sounds[sithWorld_pLoading->numSoundsLoaded];
-        sound->id = sithWorld_pLoading->numSoundsLoaded;
-        if ((sithWorld_pLoading->level_type_maybe & 1))
+        sound = &sithWorld_g_pLastLoadedWorld->sounds[sithWorld_g_pLastLoadedWorld->numSoundsLoaded];
+        sound->id = sithWorld_g_pLastLoadedWorld->numSoundsLoaded;
+        if ((sithWorld_g_pLastLoadedWorld->level_type_maybe & 1))
         {
             sound->id |= 0x8000;
         }
@@ -199,7 +199,7 @@ sithSound* sithSound_Load(char *sound_fname, int a2)
             sound->infoLoaded = 1;
             stdHashtbl_Add(sithSound_hashtable, sound->sound_fname, sound);
             v12 = pSithHS;
-            ++sithWorld_pLoading->numSoundsLoaded;
+            ++sithWorld_g_pLastLoadedWorld->numSoundsLoaded;
             v12->fileClose(sound_file);
             return sound;
         }
@@ -211,11 +211,11 @@ sithSound* sithSound_Load(char *sound_fname, int a2)
 
 sithSound* sithSound_GetFromIdx(int idx)
 {
-    sithWorld* world = sithWorld_pCurrentWorld;
+    sithWorld* world = sithWorld_g_pCurrentWorld;
 
     if (idx & 0x8000)
     {
-        world = sithWorld_pStatic;
+        world = sithWorld_g_pStaticWorld;
         idx &= ~0x8000;
     }
 
@@ -363,14 +363,14 @@ int sithSound_FreeUpMemory(uint32_t numBytesNeeded)
     v9 = 0;
     while ( 1 )
     {
-        world = sithWorld_pCurrentWorld;
+        world = sithWorld_g_pCurrentWorld;
         if ( v8 )
         {
-            world = sithWorld_pStatic;
+            world = sithWorld_g_pStaticWorld;
             if (!world)
-                world = sithWorld_pCurrentWorld;
+                world = sithWorld_g_pCurrentWorld;
             else if(!world) // Added: allow freeing sounds during loading
-                world = sithWorld_pLoading;
+                world = sithWorld_g_pLastLoadedWorld;
             else
                 v8 = 0;
         }

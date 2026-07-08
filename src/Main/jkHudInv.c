@@ -162,7 +162,7 @@ void jkHudInv_Draw()
     return;
 #endif
 
-    player = sithWorld_pCurrentWorld->playerThing;
+    player = sithWorld_g_pCurrentWorld->playerThing;
     if ( player->type != SITH_THING_PLAYER ) {
         return;
     }
@@ -461,7 +461,7 @@ void jkHudInv_DrawGPU()
     wchar_t v48[3]; // [esp+30h] [ebp-10h] BYREF
     wchar_t v50[3]; // [esp+38h] [ebp-8h] BYREF
 
-    player = sithWorld_pCurrentWorld->playerThing;
+    player = sithWorld_g_pCurrentWorld->playerThing;
     if ( player->type != SITH_THING_PLAYER ) {
         return;
     }

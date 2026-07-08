@@ -114,8 +114,8 @@ void sithCogFunctionSector_GetSectorColormap(sithCog *ctx)
 
     sector = sithCogExec_PopSector(ctx);
     if ( sector
-      && (v2 = (char *)sector->colormap - (char *)sithWorld_pCurrentWorld->colormaps,
-          (unsigned int)((int)v2 / (int)sizeof(rdColormap)) < sithWorld_pCurrentWorld->numColormaps) )
+      && (v2 = (char *)sector->colormap - (char *)sithWorld_g_pCurrentWorld->colormaps,
+          (unsigned int)((int)v2 / (int)sizeof(rdColormap)) < sithWorld_g_pCurrentWorld->numColormaps) )
     {
         sithCogExec_PushInt(ctx, (int)v2 / (int)sizeof(rdColormap));
     }
@@ -127,7 +127,7 @@ void sithCogFunctionSector_GetSectorColormap(sithCog *ctx)
 
 void sithCogFunctionSector_SetSectorColormap(sithCog *ctx)
 {
-    sithWorld* world = sithWorld_pCurrentWorld;
+    sithWorld* world = sithWorld_g_pCurrentWorld;
     uint32_t colormap_idx = sithCogExec_PopInt(ctx);
     sithSector* sector = sithCogExec_PopSector(ctx);
 
@@ -259,7 +259,7 @@ void sithCogFunctionSector_GetSectorPlayerCount(sithCog *ctx)
 
 void sithCogFunctionSector_GetSectorCount(sithCog *ctx)
 {
-    sithCogExec_PushInt(ctx, sithWorld_pCurrentWorld->numSectors);
+    sithCogExec_PushInt(ctx, sithWorld_g_pCurrentWorld->numSectors);
 }
 
 void sithCogFunctionSector_GetSectorCenter(sithCog *ctx)
@@ -301,7 +301,7 @@ void sithCogFunctionSector_GetSectorVertexPos(sithCog *ctx)
     int vertex_idx; // edi
     sithSector *sector; // eax
 
-    active_jkl = sithWorld_pCurrentWorld;
+    active_jkl = sithWorld_g_pCurrentWorld;
     vertex_idx = sithCogExec_PopInt(ctx);
     sector = sithCogExec_PopSector(ctx);
     if ( sector && (unsigned int)vertex_idx < sector->numVertices && vertex_idx >= 0 )
@@ -338,8 +338,8 @@ void sithCogFunctionSector_ChangeAllSectorsLight(sithCog *ctx)
     sithSector *v1; // eax
 
     cog_flex_t val = sithCogExec_PopFlex(ctx);
-    for (int i = 0; i < sithWorld_pCurrentWorld->numSectors; i++) {
-        sithSector* pSector = &sithWorld_pCurrentWorld->sectors[i];
+    for (int i = 0; i < sithWorld_g_pCurrentWorld->numSectors; i++) {
+        sithSector* pSector = &sithWorld_g_pCurrentWorld->sectors[i];
         pSector->extraLight = val;
     }
 }
@@ -350,7 +350,7 @@ void sithCogFunctionSector_FindSectorAtPos(sithCog *ctx)
     rdVector3 tmp;
     
     sithCogExec_PopVector(ctx,&tmp);
-    sithSector* pSector = sithSector_FindSectorAtPos(sithWorld_pCurrentWorld,&tmp);
+    sithSector* pSector = sithSector_FindSectorAtPos(sithWorld_g_pCurrentWorld,&tmp);
     if (pSector) {
         sithCogExec_PushInt(ctx, pSector->id);
         return;

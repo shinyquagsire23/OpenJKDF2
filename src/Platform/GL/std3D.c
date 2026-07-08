@@ -791,20 +791,20 @@ int std3D_StartScene()
 
         loaded_colormap = rdColormap_pCurMap;
     }
-    else if (sithWorld_pCurrentWorld && sithWorld_pCurrentWorld->colormaps && loaded_colormap != sithWorld_pCurrentWorld->colormaps)
+    else if (sithWorld_g_pCurrentWorld && sithWorld_g_pCurrentWorld->colormaps && loaded_colormap != sithWorld_g_pCurrentWorld->colormaps)
     {
         glBindTexture(GL_TEXTURE_2D, worldpal_texture);
-        memcpy(worldpal_data, sithWorld_pCurrentWorld->colormaps->colors, 0x300);
+        memcpy(worldpal_data, sithWorld_g_pCurrentWorld->colormaps->colors, 0x300);
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 1, GL_RGB, GL_UNSIGNED_BYTE, worldpal_data);
     
-        if (sithWorld_pCurrentWorld->colormaps->lightlevel)
+        if (sithWorld_g_pCurrentWorld->colormaps->lightlevel)
         {
             glBindTexture(GL_TEXTURE_2D, worldpal_lights_texture);
-            memcpy(worldpal_lights_data, sithWorld_pCurrentWorld->colormaps->lightlevel, 0x4000);
+            memcpy(worldpal_lights_data, sithWorld_g_pCurrentWorld->colormaps->lightlevel, 0x4000);
             glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 0x40, GL_RED, GL_UNSIGNED_BYTE, worldpal_lights_data);
         }
 
-        loaded_colormap = sithWorld_pCurrentWorld->colormaps;
+        loaded_colormap = sithWorld_g_pCurrentWorld->colormaps;
     }
 
     if (memcmp(displaypal_data, stdDisplay_masterPalette, 0x300))
@@ -3014,7 +3014,7 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
                 else
                 {
                     uint8_t val = image_8bpp[index];
-                    rdColor24* pal_master = (rdColor24*)sithWorld_pCurrentWorld->colormaps->colors;//stdDisplay_gammaPalette;
+                    rdColor24* pal_master = (rdColor24*)sithWorld_g_pCurrentWorld->colormaps->colors;//stdDisplay_gammaPalette;
                     rdColor24* color = &pal_master[val];
                     val_rgba |= (color->r << 16);
                     val_rgba |= (color->g << 8);
@@ -3299,9 +3299,9 @@ int std3D_AddBitmapToTextureCache(stdBitmap *texture, int mipIdx, int is_alpha_t
                 {
                     uint8_t val = image_8bpp[index];
 #if 0
-                    if (sithWorld_pCurrentWorld && sithWorld_pCurrentWorld->colormaps && sithWorld_pCurrentWorld->colormaps->colors)
+                    if (sithWorld_g_pCurrentWorld && sithWorld_g_pCurrentWorld->colormaps && sithWorld_g_pCurrentWorld->colormaps->colors)
                     {
-                        rdColor24* pal_master = (rdColor24*)sithWorld_pCurrentWorld->colormaps->colors;//stdDisplay_gammaPalette;
+                        rdColor24* pal_master = (rdColor24*)sithWorld_g_pCurrentWorld->colormaps->colors;//stdDisplay_gammaPalette;
                         rdColor24* color = &pal_master[val];
                         val_rgba |= (color->r << 16);
                         val_rgba |= (color->g << 8);

@@ -128,26 +128,26 @@ void sithShutdown()
 
 int sithOpenStatic(char *path)
 {
-    sithWorld_pStatic = sithWorld_NewEntry();
-    sithWorld_pStatic->level_type_maybe |= 1;
-    return sithWorld_Load(sithWorld_pStatic, path) != 0;
+    sithWorld_g_pStaticWorld = sithWorld_NewEntry();
+    sithWorld_g_pStaticWorld->level_type_maybe |= 1;
+    return sithWorld_Load(sithWorld_g_pStaticWorld, path) != 0;
 }
 
 void sithCloseStatic()
 {
     stdPlatform_Printf("OpenJKDF2: %s\n", __func__);
-    if ( sithWorld_pStatic )
+    if ( sithWorld_g_pStaticWorld )
     {
-        sithWorld_FreeEntry(sithWorld_pStatic);
-        sithWorld_pStatic = 0;
+        sithWorld_FreeEntry(sithWorld_g_pStaticWorld);
+        sithWorld_g_pStaticWorld = 0;
     }
 }
 
 int sithMain_Mode1Init(char *a1)
 {
-    sithWorld_pCurrentWorld = sithWorld_NewEntry();
+    sithWorld_g_pCurrentWorld = sithWorld_NewEntry();
 
-    if ( !sithWorld_Load(sithWorld_pCurrentWorld, a1) )
+    if ( !sithWorld_Load(sithWorld_g_pCurrentWorld, a1) )
         return 0;
 
     sithTime_Startup();
@@ -160,9 +160,9 @@ int sithMain_Mode1Init(char *a1)
 
 int sithOpenNormal(char *path)
 {
-    sithWorld_pCurrentWorld = sithWorld_NewEntry();
+    sithWorld_g_pCurrentWorld = sithWorld_NewEntry();
 
-    if ( !sithWorld_Load(sithWorld_pCurrentWorld, path) )
+    if ( !sithWorld_Load(sithWorld_g_pCurrentWorld, path) )
         return 0;
 
     sithWorld_InitPlayers();
@@ -173,8 +173,8 @@ int sithOpenNormal(char *path)
 
 int sithOpenMulti(char *fpath)
 {
-    sithWorld_pCurrentWorld = sithWorld_NewEntry();
-    if ( !sithWorld_Load(sithWorld_pCurrentWorld, fpath) )
+    sithWorld_g_pCurrentWorld = sithWorld_NewEntry();
+    if ( !sithWorld_Load(sithWorld_g_pCurrentWorld, fpath) )
         return 0;
     sithOpen();
     sithTime_Startup();
@@ -187,7 +187,7 @@ int sithOpen()
 {
     jkPlayer_currentTickIdx = 0;
     sithRender_lastRenderTick = 1;
-    sithWorld_ResetRenderState(sithWorld_pCurrentWorld);
+    sithWorld_ResetRenderState(sithWorld_g_pCurrentWorld);
     sithEvent_Open();
     sithSurface_Open();
     sithAI_Open();
@@ -235,9 +235,9 @@ int sithMain_tickEndMs;
 int sithUpdate()
 {
 #if 0
-    if (sithWorld_pCurrentWorld) {
-        for (int i = 0; i < sithWorld_pCurrentWorld->numKeyframesLoaded; i++) {
-            rdKeyframe* keyframe = &sithWorld_pCurrentWorld->keyframes[i];
+    if (sithWorld_g_pCurrentWorld) {
+        for (int i = 0; i < sithWorld_g_pCurrentWorld->numKeyframesLoaded; i++) {
+            rdKeyframe* keyframe = &sithWorld_g_pCurrentWorld->keyframes[i];
             if (keyframe->id != i) {
                 stdPlatform_Printf("BAD KEYFRAME!! %d -> %d\n", i, keyframe->id);
             }
@@ -300,8 +300,8 @@ int sithUpdate()
     else
     {
         // TODO REMOVE
-        //sithWorld_pCurrentWorld->playerThing->physicsParams.physflags |= SITH_PF_FLY;
-        //sithWorld_pCurrentWorld->playerThing->physicsParams.physflags &= ~SITH_PF_USEGRAVITY;
+        //sithWorld_g_pCurrentWorld->playerThing->physicsParams.physflags |= SITH_PF_FLY;
+        //sithWorld_g_pCurrentWorld->playerThing->physicsParams.physflags &= ~SITH_PF_USEGRAVITY;
         
         ++jkPlayer_currentTickIdx;
         sithAdvanceRenderTick();
@@ -488,7 +488,7 @@ void sithAdvanceRenderTick()
 {
     if ( !++sithRender_lastRenderTick )
     {
-        sithWorld_ResetRenderState(sithWorld_pCurrentWorld);
+        sithWorld_ResetRenderState(sithWorld_g_pCurrentWorld);
         sithRender_lastRenderTick = 1;
     }
 }
@@ -519,9 +519,9 @@ void sithOpenPostProcess()
     sithInventory_ResetInventory(sithPlayer_pLocalPlayerThing);
 
     sithCog_BroadcastMessage(SITH_MESSAGE_STARTUP, 0, 0, 0, 0);
-    for (uint32_t v2 = 0; v2 < sithWorld_pCurrentWorld->numThingsLoaded; v2++)
+    for (uint32_t v2 = 0; v2 < sithWorld_g_pCurrentWorld->numThingsLoaded; v2++)
     {
-        v3 = &sithWorld_pCurrentWorld->things[v2];
+        v3 = &sithWorld_g_pCurrentWorld->things[v2];
         v4 = v3->class_cog;
         if (Main_bMotsCompat && !v3->type) continue; // MOTS added
 

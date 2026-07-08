@@ -1211,12 +1211,12 @@ int jkDev_CmdNoclip(stdDebugConsoleCmd *pCmd, const char *pArgStr)
     sithThing *v0; // ecx
     wchar_t *v3; // eax
 
-    if (!sithWorld_pCurrentWorld || !sithWorld_pCurrentWorld->playerThing) {
+    if (!sithWorld_g_pCurrentWorld || !sithWorld_g_pCurrentWorld->playerThing) {
         sithConsole_PrintString("No world.");
         return 0;
     }
 
-    v0 = sithWorld_pCurrentWorld->playerThing;
+    v0 = sithWorld_g_pCurrentWorld->playerThing;
 
     if ( v0->moveType == SITH_MT_PHYSICS )
     {

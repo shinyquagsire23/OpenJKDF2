@@ -46,9 +46,9 @@ int sithAnimClass_Load(sithWorld *world, int a2)
             break;
         if ( !stdHashtbl_Find(sithPuppet_hashtable, stdConffile_entry.args[1].value) )
         {
-            if ( sithWorld_pLoading->numAnimClassesLoaded != sithWorld_pLoading->numAnimClasses )
+            if ( sithWorld_g_pLastLoadedWorld->numAnimClassesLoaded != sithWorld_g_pLastLoadedWorld->numAnimClasses )
             {
-                animclass = &sithWorld_pLoading->animclasses[sithWorld_pLoading->numAnimClassesLoaded];
+                animclass = &sithWorld_g_pLastLoadedWorld->animclasses[sithWorld_g_pLastLoadedWorld->numAnimClassesLoaded];
                 stdPlatform_Memzero32(animclass, sizeof(sithAnimclass)); // Added: word-safe
                 const char* name = stdConffile_entry.args[1].value;
 #ifdef SITH_DEBUG_STRUCT_NAMES
@@ -61,7 +61,7 @@ int sithAnimClass_Load(sithWorld *world, int a2)
                 stdString_snprintf(pup_path, 128, "%s%c%s", "misc\\pup", 92, stdConffile_entry.args[1].value);
                 if ( sithAnimClass_LoadPupEntry(animclass, pup_path) )
                 {
-                    ++sithWorld_pLoading->numAnimClassesLoaded;
+                    ++sithWorld_g_pLastLoadedWorld->numAnimClassesLoaded;
 #ifdef SITH_DEBUG_STRUCT_NAMES
                     // The copies of names are load-bearing, SetKeyVal stores a reference
                     stdHashtbl_Add(sithPuppet_hashtable, animclass->name, animclass);
@@ -89,9 +89,9 @@ sithAnimclass* sithAnimClass_LoadEntry(char *a1)
     result = (sithAnimclass *)stdHashtbl_Find(sithPuppet_hashtable, a1);
     if ( !result )
     {
-        v3 = sithWorld_pLoading->numAnimClassesLoaded;
-        if ( v3 == sithWorld_pLoading->numAnimClasses
-          || (v4 = &sithWorld_pLoading->animclasses[v3],
+        v3 = sithWorld_g_pLastLoadedWorld->numAnimClassesLoaded;
+        if ( v3 == sithWorld_g_pLastLoadedWorld->numAnimClasses
+          || (v4 = &sithWorld_g_pLastLoadedWorld->animclasses[v3],
               stdPlatform_Memzero32(v4, sizeof(sithAnimclass)), // Added: word-safe
 #ifdef SITH_DEBUG_STRUCT_NAMES
               stdString_SafeStrCopy(v4->name, a1, 32),
@@ -108,7 +108,7 @@ sithAnimclass* sithAnimClass_LoadEntry(char *a1)
         else
         {
             v5 = sithPuppet_hashtable;
-            ++sithWorld_pLoading->numAnimClassesLoaded;
+            ++sithWorld_g_pLastLoadedWorld->numAnimClassesLoaded;
 #ifdef SITH_DEBUG_STRUCT_NAMES
             stdHashtbl_Add(v5, v4->name, v4);
 #else
@@ -182,9 +182,9 @@ int sithAnimClass_LoadPupEntry(sithAnimclass *animclass, char *fpath)
                     hipri = _atoi(stdConffile_entry.args[4].value);
                 if ( _strcmp(stdConffile_entry.args[1].value, "none") )
                 {
-                    world = sithWorld_pLoading;
+                    world = sithWorld_g_pLastLoadedWorld;
                     key_fname = stdConffile_entry.args[1].value;
-                    if ( sithWorld_pLoading->keyframes )
+                    if ( sithWorld_g_pLastLoadedWorld->keyframes )
                     {
                         _sprintf(keyframe_fpath, "%s%c%s", "3do\\key", 92, stdConffile_entry.args[1].value);
                         v10 = (rdKeyframe *)stdHashtbl_Find(sithPuppet_keyframesHashtable, key_fname);

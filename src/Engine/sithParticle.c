@@ -41,8 +41,8 @@ rdParticle* sithParticle_Load(const char *a1)
     rdParticle *v5; // esi
     char v6[128]; // [esp+Ch] [ebp-80h] BYREF
 
-    v1 = sithWorld_pLoading;
-    if ( !sithWorld_pLoading->particles )
+    v1 = sithWorld_g_pLastLoadedWorld;
+    if ( !sithWorld_g_pLastLoadedWorld->particles )
     {
         v2 = (rdParticle *)SITH_ALLOC(SITHPARTICLE_MAX_PARTICLES * sizeof(rdParticle));
         v1->particles = v2;

@@ -61,7 +61,7 @@ int sithDSSThing_ProcessPos(sithCogMsg *msg)
     rdVector3 lookTmp; // [esp+10h] [ebp-18h] BYREF
     rdVector3 pos; // [esp+1Ch] [ebp-Ch] BYREF
 
-    if ( !sithWorld_pCurrentWorld )
+    if ( !sithWorld_g_pCurrentWorld )
         return 0;
 
     NETMSG_IN_START(msg);
@@ -980,11 +980,11 @@ int sithDSSThing_ProcessFullDescription(sithCogMsg *msg)
         return 0;
 
     thingIdx = NETMSG_POPS16();
-    if ( thingIdx >= sithWorld_pCurrentWorld->numThingsLoaded )
+    if ( thingIdx >= sithWorld_g_pCurrentWorld->numThingsLoaded )
         return 0;
 
-    if ( sithWorld_pCurrentWorld->things[thingIdx].type )
-        sithThing_RemoveThing(&sithWorld_pCurrentWorld->things[thingIdx]);
+    if ( sithWorld_g_pCurrentWorld->things[thingIdx].type )
+        sithThing_RemoveThing(&sithWorld_g_pCurrentWorld->things[thingIdx]);
 
     // Only bump the high-water mark; do NOT clobber the destination slot.
     // The original game (JK.EXE @ 0x004F46F0) keeps these as two separate locals:
@@ -996,21 +996,21 @@ int sithDSSThing_ProcessFullDescription(sithCogMsg *msg)
     // inflates numThings, which misroutes the FullDesc of every static thing still
     // streaming through the join sync, corrupting the thing_id<->slot mapping and
     // causing remote things to teleport.
-    if ( sithWorld_pCurrentWorld->numThings < thingIdx )
-        sithWorld_pCurrentWorld->numThings = thingIdx;
+    if ( sithWorld_g_pCurrentWorld->numThings < thingIdx )
+        sithWorld_g_pCurrentWorld->numThings = thingIdx;
 
     type = NETMSG_POPS16();
     if ( !type )
         return 1;
 
-    thing = &sithWorld_pCurrentWorld->things[thingIdx];
+    thing = &sithWorld_g_pCurrentWorld->things[thingIdx];
     sithThing_Reset(thing);
     v8 = NETMSG_POPS16();
 
-    if ( v8 >= sithWorld_pCurrentWorld->numTemplatesLoaded )
+    if ( v8 >= sithWorld_g_pCurrentWorld->numTemplatesLoaded )
         return 0;
 
-    sithThing_SetThingBasedOn(thing, &sithWorld_pCurrentWorld->templates[v8]);
+    sithThing_SetThingBasedOn(thing, &sithWorld_g_pCurrentWorld->templates[v8]);
 
     thing->signature = NETMSG_POPS32();
     thing->thing_id = NETMSG_POPS32();
@@ -1143,7 +1143,7 @@ int sithDSSThing_ProcessFullDescription(sithCogMsg *msg)
         else if (!thing->trackParams.sizeFrames && thing->trackParams.loadedFrames < 0) {
             stdPlatform_Printf("OpenJKDF2: Serialized thing has underflowed trackParams.loadedFrames 0x%x, size 0x%x, recovering?\n", thing->trackParams.loadedFrames, thing->trackParams.sizeFrames);
 #ifdef SITH_DEBUG_STRUCT_NAMES
-            stdPlatform_Printf("OpenJKDF2: Template ID %x, %s\n", v8, sithWorld_pCurrentWorld->templates[v8].template_name);
+            stdPlatform_Printf("OpenJKDF2: Template ID %x, %s\n", v8, sithWorld_g_pCurrentWorld->templates[v8].template_name);
 #endif
             thing->trackParams.loadedFrames = thing->trackParams.sizeFrames;
         }

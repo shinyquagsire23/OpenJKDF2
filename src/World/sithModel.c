@@ -91,11 +91,11 @@ rdModel3* sithModel_Load(const char *model_3do_fname, int unk)
         return model;
     }
 
-    if ( sithWorld_pLoading->numModelsLoaded >= sithWorld_pLoading->numModels ) {
+    if ( sithWorld_g_pLastLoadedWorld->numModelsLoaded >= sithWorld_g_pLastLoadedWorld->numModels ) {
         stdPlatform_Printf("OpenJKDF2: %s: Too many models already loaded!\n", __func__); // Added
         return 0;
     }
-    model = &sithWorld_pLoading->models[sithWorld_pLoading->numModelsLoaded];
+    model = &sithWorld_g_pLastLoadedWorld->models[sithWorld_g_pLastLoadedWorld->numModelsLoaded];
 
     _sprintf(model_fpath, "%s%c%s", "3do", '\\', model_3do_fname);
     if ( !rdModel3_LoadEntry(model_fpath, model) )
@@ -107,12 +107,12 @@ rdModel3* sithModel_Load(const char *model_3do_fname, int unk)
         return 0;
     }
     
-    model->id = sithWorld_pLoading->numModelsLoaded;
-    if (sithWorld_pLoading->level_type_maybe & 1)
+    model->id = sithWorld_g_pLastLoadedWorld->numModelsLoaded;
+    if (sithWorld_g_pLastLoadedWorld->level_type_maybe & 1)
         model->id |= 0x8000;
     
     stdHashtbl_Add(sithModel_hashtable, model->filename, model);
-    sithWorld_pLoading->numModelsLoaded += 1;
+    sithWorld_g_pLastLoadedWorld->numModelsLoaded += 1;
 
     return model;
 }
@@ -185,10 +185,10 @@ rdModel3* sithModel_GetModelByIndex(int idx)
     sithWorld *world;
     rdModel3 *result;
 
-    world = sithWorld_pCurrentWorld;
+    world = sithWorld_g_pCurrentWorld;
     if ( (idx & 0x8000) != 0 )
     {
-        world = sithWorld_pStatic;
+        world = sithWorld_g_pStaticWorld;
         idx &= 0x7FFF;
     }
     if ( world && idx >= 0 && idx < world->numModelsLoaded )

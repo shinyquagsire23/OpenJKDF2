@@ -172,7 +172,7 @@ void jkHudScope_Draw(void)
 #endif
 
     if (!jkHudScope_bOpened) return;
-    if (sithWorld_pCurrentWorld->playerThing->type != SITH_THING_PLAYER) return;
+    if (sithWorld_g_pCurrentWorld->playerThing->type != SITH_THING_PLAYER) return;
 
     jkHudMotsBitmap* pBmIter = jkHudScope_aBitmaps;
 

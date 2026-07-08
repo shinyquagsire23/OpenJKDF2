@@ -71,7 +71,7 @@ void sithRenderSky_HorizonFaceToPlane(rdProcEntry *pProcEntry, sithSurfaceInfo *
 
         pVertUV->x = tmp1 * sithSector_flt_8553C8 - tmp2 * sithSector_flt_8553F4 + sithSector_flt_8553B8;
         pVertUV->y = tmp2 * sithSector_flt_8553C8 + tmp1 * sithSector_flt_8553F4 + sithSector_flt_8553C4;
-        rdVector_Add2Acc(pVertUV, &sithWorld_pCurrentWorld->horizontalSkyOffs);
+        rdVector_Add2Acc(pVertUV, &sithWorld_g_pCurrentWorld->horizontalSkyOffs);
         rdVector_Add2Acc(pVertUV, &pSurfaceInfo->face.clipIdk);
 
         ++pVertXYZ;
@@ -133,7 +133,7 @@ void sithRenderSky_CeilingFaceToPlane(rdProcEntry *pProcEntry, sithSurfaceInfo *
         //pVertUV->y *= invMatHeight;
 #endif
 
-        rdVector_Add2Acc(pVertUV, &sithWorld_pCurrentWorld->ceilingSkyOffs);
+        rdVector_Add2Acc(pVertUV, &sithWorld_g_pCurrentWorld->ceilingSkyOffs);
         rdVector_Add2Acc(pVertUV, &pSurfaceInfo->face.clipIdk);
         rdMatrix_TransformPoint34(&vertex_out, &a1a, &sithCamera_g_pCurCamera->rdCam.view_matrix);
 

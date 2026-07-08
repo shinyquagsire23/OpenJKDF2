@@ -200,7 +200,7 @@ int stdDisplay_DDrawGdiSurfaceFlip()
 {
     extern int Window_bFlipRequested;
 
-    if (!jkCutscene_isRendering && !sithWorld_pLoading && !jkGame_isDDraw) {
+    if (!jkCutscene_isRendering && !sithWorld_g_pLastLoadedWorld && !jkGame_isDDraw) {
         Window_bFlipRequested = 1;
     }
     else {

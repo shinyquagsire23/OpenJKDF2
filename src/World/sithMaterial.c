@@ -150,7 +150,7 @@ rdMaterial* sithMaterial_Load(const char *a1, int create_ddraw_surface, int gpu_
 
     while ( 1 )
     {
-        v4 = sithWorld_pLoading;
+        v4 = sithWorld_g_pLastLoadedWorld;
         result = (rdMaterial *)stdHashtbl_Find(sithMaterial_hashmap, a1);
         if ( result )
             return result;
@@ -200,10 +200,10 @@ rdMaterial* sithMaterial_GetMaterialByIndex(int idx)
     sithWorld *world; // ecx
     rdMaterial *result; // eax
 
-    world = sithWorld_pCurrentWorld;
+    world = sithWorld_g_pCurrentWorld;
     if ( (idx & 0x8000) != 0 )
     {
-        world = sithWorld_pStatic;
+        world = sithWorld_g_pStaticWorld;
         idx &= 0x7FFF;
     }
 
@@ -268,7 +268,7 @@ void sithMaterial_UnloadAll()
     rdMaterial *i; // esi
 
     v0 = 0;
-    for ( i = sithWorld_pCurrentWorld->materials; v0 < sithWorld_pCurrentWorld->numMaterialsLoaded; ++v0 )
+    for ( i = sithWorld_g_pCurrentWorld->materials; v0 < sithWorld_g_pCurrentWorld->numMaterialsLoaded; ++v0 )
     {
         rdMaterial_ResetCacheInfo(i++);
     }

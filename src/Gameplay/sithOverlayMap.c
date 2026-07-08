@@ -85,8 +85,8 @@ int sithOverlayMap_Draw(rdCanvas *canvas)
     sithAdvanceRenderTick();
     rdSetGeometryMode(2);
     rdSetLightingMode(1);
-    sithOverlayMap_inst.world = sithWorld_pCurrentWorld;
-    v2 = sithWorld_pCurrentWorld->playerThing;
+    sithOverlayMap_inst.world = sithWorld_g_pCurrentWorld;
+    v2 = sithWorld_g_pCurrentWorld->playerThing;
     v3 = canvas->half_screen_width;
     sithOverlayMap_pCanvas = canvas;
     sithOverlayMap_pLocalPlayer = v2;
@@ -342,7 +342,7 @@ LABEL_30:
     {
         for ( i = v2->thingsList; i; i = i->nextThing )
         {
-            if ( i != sithWorld_pCurrentWorld->cameraFocus && (i->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_WILLBEREMOVED)) == 0 )
+            if ( i != sithWorld_g_pCurrentWorld->cameraFocus && (i->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_WILLBEREMOVED)) == 0 )
             {
                 v27 = (g_mapModeFlags & MAPMODE_40) != 0;
                 v28 = i->type;

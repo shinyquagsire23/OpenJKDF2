@@ -74,7 +74,7 @@ int jkControl_HandleHudKeys(sithThing *player, flex_t b)
             sithControl_GetKey(INPUT_FUNC_GAMESAVE, &v15);
             if (v15 && sithThing_MotsTick(0xe,0,2.0))
             {
-                v2 = jkGuiTitle_quicksave_related_func1(&jkCog_strings, sithWorld_pCurrentWorld->map_jkl_fname);
+                v2 = jkGuiTitle_quicksave_related_func1(&jkCog_strings, sithWorld_g_pCurrentWorld->map_jkl_fname);
                 jk_snwprintf(a4, 0x100u, L"%s~%s", v2, jkStrings_GetUniStringWithFallback("GUI_SLQUICKSAVE"));
                 
                 sithGamesave_Save("quicksave.jks", 1, 0, a4);

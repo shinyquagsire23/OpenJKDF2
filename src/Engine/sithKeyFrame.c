@@ -65,10 +65,10 @@ rdKeyframe* sithKeyFrame_GetByIdx(int idx)
 {
     rdKeyframe *result;
 
-    sithWorld* world = sithWorld_pCurrentWorld;
+    sithWorld* world = sithWorld_g_pCurrentWorld;
     if ( (idx & 0x8000) != 0 )
     {
-        world = sithWorld_pStatic;
+        world = sithWorld_g_pStaticWorld;
         idx &= ~0x8000;
     }
 
@@ -85,8 +85,8 @@ rdKeyframe* sithKeyFrame_LoadEntry(const char *fpath)
     rdKeyframe *keyframe;
     char key_fpath[128];
 
-    sithWorld* world = sithWorld_pLoading;
-    if ( !sithWorld_pLoading->keyframes )
+    sithWorld* world = sithWorld_g_pLastLoadedWorld;
+    if ( !sithWorld_g_pLastLoadedWorld->keyframes )
         return NULL;
 
     _sprintf(key_fpath, "%s%c%s", "3do\\key", 92, fpath);
@@ -106,7 +106,7 @@ rdKeyframe* sithKeyFrame_LoadEntry(const char *fpath)
         return NULL;
 
     keyframe->id = world->numKeyframesLoaded;
-    if ((world->level_type_maybe & 1) || world == sithWorld_pStatic) // Added: check world ptr just in case?
+    if ((world->level_type_maybe & 1) || world == sithWorld_g_pStaticWorld) // Added: check world ptr just in case?
     {
         keyframe->id |= 0x8000;
     }

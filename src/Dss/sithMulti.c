@@ -215,9 +215,9 @@ int sithMulti_Startup()
     sithMessage_g_inputstream |= 1u;
 
     // Remove all actor things from the world
-    sithMulti_RemoveAllActorsFromWorld(sithWorld_pCurrentWorld);
+    sithMulti_RemoveAllActorsFromWorld(sithWorld_g_pCurrentWorld);
 
-    sithNet_checksum = sithWorld_CalcWorldChecksum(sithWorld_pCurrentWorld, 0/*jkGuiMultiplayer_checksumSeed*/); // Added: TODO fix the checksum seed
+    sithNet_checksum = sithWorld_CalcWorldChecksum(sithWorld_g_pCurrentWorld, 0/*jkGuiMultiplayer_checksumSeed*/); // Added: TODO fix the checksum seed
     sithNet_syncIdx = 0;
     sithSurface_numSurfaces_0 = 0;
     sithSector_numModifiedSectors = 0;
@@ -256,7 +256,7 @@ int sithMulti_SendJoinRequest(int sendto_id)
 {
     NETMSG_START;
 
-    NETMSG_PUSHSTR(sithWorld_pCurrentWorld->map_jkl_fname, 0x20);
+    NETMSG_PUSHSTR(sithWorld_g_pCurrentWorld->map_jkl_fname, 0x20);
     NETMSG_PUSHWSTR(jkPlayer_playerShortName, 0x10);
     NETMSG_PUSHWSTR(sithMulti_name, 0x20);
     NETMSG_PUSHU32(sithNet_checksum);
@@ -731,7 +731,7 @@ int sithMulti_CheckPlayers(int32_t a, sithEventInfo* b)
     wchar_t *v7; // eax
     wchar_t a1[128]; // [esp+10h] [ebp-100h] BYREF
 
-    if ( sithWorld_pCurrentWorld && sithPlayer_pLocalPlayerThing && (g_submodeFlags & 8) == 0 )
+    if ( sithWorld_g_pCurrentWorld && sithPlayer_pLocalPlayerThing && (g_submodeFlags & 8) == 0 )
         sithDSSThing_Pos(sithPlayer_pLocalPlayerThing, -1, 0);
     if ( sithNet_isServer )
     {
@@ -1062,7 +1062,7 @@ int sithMulti_ProcessJoinRequest(sithCogMsg *msg)
 
         sithMulti_verbosePrintf("sithMulti_ProcessJoinRequest, id %x map %s\n", v1, v11);
 
-        if ( __strcmpi(v11, sithWorld_pCurrentWorld->map_jkl_fname) )
+        if ( __strcmpi(v11, sithWorld_g_pCurrentWorld->map_jkl_fname) )
         {
             sithMulti_verbosePrintf("Bad map name %s\n", v11);
 
@@ -1337,9 +1337,9 @@ void sithMulti_Update(int deltaMs)
                     switch ( stdComm_currentBigSyncStage )
                     {
                     case 1:
-                        while (stdComm_dword_832208 < sithWorld_pCurrentWorld->numSectors)
+                        while (stdComm_dword_832208 < sithWorld_g_pCurrentWorld->numSectors)
                         {
-                            v11 = &sithWorld_pCurrentWorld->sectors[stdComm_dword_832208++];
+                            v11 = &sithWorld_g_pCurrentWorld->sectors[stdComm_dword_832208++];
                             if (v11->flags & SITH_SECTOR_SYNC )
                             {
                                 sithDSS_SectorStatus(v11, sithMulti_newPlayerId, 1);
@@ -1352,7 +1352,7 @@ void sithMulti_Update(int deltaMs)
                             }
                         }
 
-                        if ( stdComm_dword_832208 >= sithWorld_pCurrentWorld->numSectors )
+                        if ( stdComm_dword_832208 >= sithWorld_g_pCurrentWorld->numSectors )
                         {
                             stdComm_dword_832208 = 0;
                             stdComm_currentBigSyncStage = 3;
@@ -1361,9 +1361,9 @@ void sithMulti_Update(int deltaMs)
                         ++stdComm_dword_832210;
                         continue;
                     case 2:
-                        while (stdComm_dword_832208 < sithWorld_pCurrentWorld->numSurfaces)
+                        while (stdComm_dword_832208 < sithWorld_g_pCurrentWorld->numSurfaces)
                         {
-                            v8 = &sithWorld_pCurrentWorld->surfaces[stdComm_dword_832208++];
+                            v8 = &sithWorld_g_pCurrentWorld->surfaces[stdComm_dword_832208++];
                             if (v8->surfaceFlags & SITH_SURFACE_CHANGED)
                             {
                                 sithDSS_SurfaceStatus(v8, sithMulti_newPlayerId, 1);
@@ -1371,7 +1371,7 @@ void sithMulti_Update(int deltaMs)
                             }
                         }
                         
-                        if ( stdComm_dword_832208 >= sithWorld_pCurrentWorld->numSurfaces )
+                        if ( stdComm_dword_832208 >= sithWorld_g_pCurrentWorld->numSurfaces )
                         {
                             stdComm_dword_832208 = 0;
                             stdComm_currentBigSyncStage = 1;
@@ -1381,9 +1381,9 @@ void sithMulti_Update(int deltaMs)
                         continue;
                     case 3:
                         // Sync stage 3 (TODO: is there an off-by-one here...? not touching it for now.)
-                        while (stdComm_dword_832208 <= sithWorld_pCurrentWorld->numThings)
+                        while (stdComm_dword_832208 <= sithWorld_g_pCurrentWorld->numThings)
                         {
-                            v14 = &sithWorld_pCurrentWorld->things[stdComm_dword_832208++];
+                            v14 = &sithWorld_g_pCurrentWorld->things[stdComm_dword_832208++];
                             if ( sithThing_CanSync(v14) )
                             {
                                 if ( v14->type != SITH_THING_WEAPON && v14->type != SITH_THING_EXPLOSION )
@@ -1407,7 +1407,7 @@ void sithMulti_Update(int deltaMs)
                             }
                         }
 
-                        if (stdComm_dword_832208 > sithWorld_pCurrentWorld->numThings)
+                        if (stdComm_dword_832208 > sithWorld_g_pCurrentWorld->numThings)
                         {
                             stdComm_dword_832208 = 0;
                             stdComm_currentBigSyncStage = 4;

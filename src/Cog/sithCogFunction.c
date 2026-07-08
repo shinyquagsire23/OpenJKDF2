@@ -651,7 +651,7 @@ void sithCogFunction_GetLevelTime(sithCog *ctx)
 
 void sithCogFunction_GetThingCount(sithCog *ctx)
 {
-    sithCogExec_PushInt(ctx, sithWorld_pCurrentWorld->numThingsLoaded);
+    sithCogExec_PushInt(ctx, sithWorld_g_pCurrentWorld->numThingsLoaded);
 }
 
 void sithCogFunction_GetThingTemplateCount(sithCog *ctx)
@@ -660,7 +660,7 @@ void sithCogFunction_GetThingTemplateCount(sithCog *ctx)
     sithThing *v2; // eax
     int template_count; // edi
 
-    v1 = sithWorld_pCurrentWorld;
+    v1 = sithWorld_g_pCurrentWorld;
     v2 = sithCogExec_PopTemplate(ctx);
     if ( v2 )
     {
@@ -677,12 +677,12 @@ void sithCogFunction_GetThingTemplateCount(sithCog *ctx)
 
 void sithCogFunction_GetGravity(sithCog *ctx)
 {
-    sithCogExec_PushFlex(ctx, sithWorld_pCurrentWorld->worldGravity);
+    sithCogExec_PushFlex(ctx, sithWorld_g_pCurrentWorld->worldGravity);
 }
 
 void sithCogFunction_SetGravity(sithCog *ctx)
 {
-    sithWorld_pCurrentWorld->worldGravity = sithCogExec_PopFlex(ctx);
+    sithWorld_g_pCurrentWorld->worldGravity = sithCogExec_PopFlex(ctx);
 }
 
 void sithCogFunction_ReturnEx(sithCog *ctx)
@@ -1731,13 +1731,13 @@ void sithCogFunction_SendMessageExRadius(sithCog *ctx)
     cog_flex_t param1 = local_c;
     cog_flex_t param0 = local_10;
     if ((((iVar5 != 0) && (-1 < message)) && (message < SITH_MESSAGE_ENTERBUBBLE)) 
-        && (local_28 = sithWorld_pCurrentWorld->numThings, -1 < local_28)) 
+        && (local_28 = sithWorld_g_pCurrentWorld->numThings, -1 < local_28)) 
     {
         int iVar5_idx = local_28;
         local_28 = local_28 + 1;
         do 
         {
-            sender = &sithWorld_pCurrentWorld->things[iVar5_idx];
+            sender = &sithWorld_g_pCurrentWorld->things[iVar5_idx];
             if (((((uVar4 & 1 << (sender->type & 0x1f)) != 0) 
                 && ((sender->thingflags & (SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0))
                 && ((sender->type != 10 || ((uVar4 & 0x400) != 0)))) 

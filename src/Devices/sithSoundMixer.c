@@ -843,7 +843,7 @@ void sithSoundMixer_Update(flex_t deltaSecs)
     if ( (sithCamera_g_pCurCamera->cameraPerspective & 0xFC) != 0 )
         sithSoundMixer_pFocusedThing = 0;
     else
-        sithSoundMixer_pFocusedThing = sithWorld_pCurrentWorld->cameraFocus;
+        sithSoundMixer_pFocusedThing = sithWorld_g_pCurrentWorld->cameraFocus;
 
     // This was inlined, TODO check Jones3D and see if it had a name
     sithSoundMixer_TickSectorSound();

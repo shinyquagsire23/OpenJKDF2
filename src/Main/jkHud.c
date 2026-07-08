@@ -383,7 +383,7 @@ void jkHud_Draw()
 #ifdef SITH_DEBUG_STRUCT_NAMES
     if ( Main_bDispStats )
     {
-        playerThing = sithWorld_pCurrentWorld->playerThing;
+        playerThing = sithWorld_g_pCurrentWorld->playerThing;
         if ( playerThing->type == SITH_THING_PLAYER )
         {
             v1 = sithInventory_GetBin(playerThing, SITHBIN_FORCEMANA);
@@ -444,7 +444,7 @@ void jkHud_Draw()
         return;
     }
 
-    v4 = sithWorld_pCurrentWorld->playerThing;
+    v4 = sithWorld_g_pCurrentWorld->playerThing;
     if ( Video_modeStruct.b3DAccel )
         stdDisplay_VBufferLock(Video_pMenuBuffer);
 
@@ -1020,7 +1020,7 @@ void jkHud_DrawGPU()
         return;
     }
 
-    v4 = sithWorld_pCurrentWorld->playerThing;
+    v4 = sithWorld_g_pCurrentWorld->playerThing;
     if ( Video_modeStruct.b3DAccel )
         stdDisplay_VBufferLock(Video_pMenuBuffer);
 

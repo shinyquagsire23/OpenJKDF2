@@ -524,7 +524,7 @@ void sithPhysics_UpdateThingPhysics(sithThing *pThing, flex_t deltaSeconds)
         && pThing->physicsParams.physflags & SITH_PF_USEGRAVITY
         && !(pThing->sector->flags & SITH_SECTOR_NOGRAVITY))
     {
-        flex_t gravity = sithWorld_pCurrentWorld->worldGravity * deltaSeconds;
+        flex_t gravity = sithWorld_g_pCurrentWorld->worldGravity * deltaSeconds;
         if ( (pThing->physicsParams.physflags & SITH_PF_PARTIALGRAVITY) != 0 )
             gravity *= 0.5;
         a1a.z = a1a.z - gravity;
@@ -668,7 +668,7 @@ void sithPhysics_UpdatePlayerPhysics(sithThing *player, flex_t deltaSeconds)
              && (player->physicsParams.physflags & SITH_PF_USEGRAVITY) 
              && !(player->sector->flags & SITH_SECTOR_NOGRAVITY) )
         {
-            flex_t gravity = sithWorld_pCurrentWorld->worldGravity * OLDSTEP_DELTA_50FPS;
+            flex_t gravity = sithWorld_g_pCurrentWorld->worldGravity * OLDSTEP_DELTA_50FPS;
             if ( (player->physicsParams.physflags & SITH_PF_PARTIALGRAVITY) != 0 )
                 gravity = gravity * 0.5;
             a1a.z = a1a.z - gravity;
@@ -733,7 +733,7 @@ void sithPhysics_UpdateUnderwaterThingPhysics(sithThing *pThing, flex_t deltaSec
 
     if ( ((pThing->physicsParams.physflags & SITH_PF_WATERSURFACE) == 0 || (pThing->thingflags & SITH_TF_DEAD) != 0) && (pThing->physicsParams.physflags & SITH_PF_USEGRAVITY) != 0 )
     {
-        v35 = sithWorld_pCurrentWorld->worldGravity * deltaSeconds * pThing->physicsParams.buoyancy;
+        v35 = sithWorld_g_pCurrentWorld->worldGravity * deltaSeconds * pThing->physicsParams.buoyancy;
         a1a.z -= v35;
         pThing->physicsParams.addedVelocity.z -= v35;
     }
@@ -961,7 +961,7 @@ void sithPhysics_UpdateAttachedThingPhysics(sithThing *pThing, flex_t deltaSecon
 
     if (pThing->physicsParams.mass != 0.0 && (pThing->sector->flags & SITH_SECTOR_HASTHRUST) && !(pThing->physicsParams.physflags & SITH_PF_NOTHRUST))
     {
-        if ( pThing->sector->thrust.z > sithWorld_pCurrentWorld->worldGravity * pThing->physicsParams.mass )
+        if ( pThing->sector->thrust.z > sithWorld_g_pCurrentWorld->worldGravity * pThing->physicsParams.mass )
         {
             sithThing_DetachThing(pThing);
             rdVector_Zero3(&pThing->physicsParams.addedVelocity);
@@ -1016,7 +1016,7 @@ void sithPhysics_UpdateAttachedThingPhysics(sithThing *pThing, flex_t deltaSecon
 
             if ( pThing->physicsParams.mass != 0.0 && (pThing->physicsParams.physflags & SITH_PF_USEGRAVITY) != 0 && (pThing->sector->flags & SITH_PF_USEGRAVITY) == 0 )
             {
-                flex_t v91 = sithWorld_pCurrentWorld->worldGravity * deltaSeconds;
+                flex_t v91 = sithWorld_g_pCurrentWorld->worldGravity * deltaSeconds;
                 if ( (pThing->physicsParams.physflags & SITH_PF_PARTIALGRAVITY) != 0 )
                     v91 = v91 * 0.5;
                 out.z -= v91;
@@ -1041,7 +1041,7 @@ void sithPhysics_UpdateAttachedThingPhysics(sithThing *pThing, flex_t deltaSecon
       && (possibly_undef_2 < 0.8 || !rdVector_IsZero3(&pThing->physicsParams.vel)) )
     {
         flex_t v108 = stdMath_Clamp(1.0 - possibly_undef_2, 0.2, 0.8);
-        pThing->physicsParams.vel.z -= sithWorld_pCurrentWorld->worldGravity * deltaSeconds * v108;
+        pThing->physicsParams.vel.z -= sithWorld_g_pCurrentWorld->worldGravity * deltaSeconds * v108;
     }
 
     if ( !rdVector_IsZero3(&pThing->physicsParams.vel) )

@@ -70,7 +70,7 @@ int sithIntersect_IsSphereInSector(const rdVector3 *pos, flex_t radius, sithSect
         if ( (surface->surfaceFlags & SITH_SURFACE_HAS_COLLISION)
             || (adjoin && adjoin->flags & SITHSURF_ADJOIN_ALLOW_MOVEMENT) )
         {
-            v7 = sithWorld_pCurrentWorld->vertices;
+            v7 = sithWorld_g_pCurrentWorld->vertices;
             v8 = stdMath_ClipNearZero(rdMath_DistancePointToPlane(pos, &surface->surfaceInfo.face.normal, &v7[*surface->surfaceInfo.face.vertexPosIdx]));
             if ( v8 < radius )
                 return 0;

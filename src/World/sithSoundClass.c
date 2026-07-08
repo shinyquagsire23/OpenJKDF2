@@ -204,15 +204,15 @@ int sithSoundClass_ReadSoundClassesListText(sithWorld *world, int a2)
         if ( !_strcmp(stdConffile_entry.args[0].value, "end") )
             break;
         v6 = stdConffile_entry.args[1].value;
-        if ( _strcmp(stdConffile_entry.args[1].value, "none") && sithWorld_pLoading->soundclasses)
+        if ( _strcmp(stdConffile_entry.args[1].value, "none") && sithWorld_g_pLastLoadedWorld->soundclasses)
         {
             _sprintf(soundclass_fname, "%s%c%s", "misc\\snd", 92, stdConffile_entry.args[1].value);
             if ( !stdHashtbl_Find(sithSoundClass_hashtable, v6) )
             {
-                idx = sithWorld_pLoading->numSoundClassesLoaded;
-                if ( idx != sithWorld_pLoading->numSoundClasses )
+                idx = sithWorld_g_pLastLoadedWorld->numSoundClassesLoaded;
+                if ( idx != sithWorld_g_pLastLoadedWorld->numSoundClasses )
                 {
-                    current_soundclass = &sithWorld_pLoading->soundclasses[idx];
+                    current_soundclass = &sithWorld_g_pLastLoadedWorld->soundclasses[idx];
 #ifdef STDHASHTABLE_CRC32_KEYS
                     current_soundclass->nameCrc = stdCrc32(v6, strlen(v6));
 #endif
@@ -222,7 +222,7 @@ int sithSoundClass_ReadSoundClassesListText(sithWorld *world, int a2)
                     if ( sithSoundClass_LoadEntry(current_soundclass, soundclass_fname) )
                     {
                         v10 = sithSoundClass_hashtable;
-                        ++sithWorld_pLoading->numSoundClassesLoaded;
+                        ++sithWorld_g_pLastLoadedWorld->numSoundClassesLoaded;
 #ifdef SITH_DEBUG_STRUCT_NAMES
                         stdHashtbl_Add(v10, current_soundclass->snd_fname, current_soundclass); // this is load-bearing
 #else
@@ -249,8 +249,8 @@ sithSoundClass* sithSoundClass_Load(char *fpath)
     stdHashTable *v5; // [esp-Ch] [ebp-9Ch]
     char v6[128]; // [esp+10h] [ebp-80h] BYREF
 
-    v1 = sithWorld_pLoading;
-    if ( !_strcmp(fpath, "none") || !sithWorld_pLoading->soundclasses )
+    v1 = sithWorld_g_pLastLoadedWorld;
+    if ( !_strcmp(fpath, "none") || !sithWorld_g_pLastLoadedWorld->soundclasses )
         return 0;
     _sprintf(v6, "%s%c%s", "misc\\snd", '\\', fpath);
     result = (sithSoundClass *)stdHashtbl_Find(sithSoundClass_hashtable, fpath);

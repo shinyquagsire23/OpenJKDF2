@@ -401,9 +401,9 @@ void jkPlayer_InitThings()
 
     // Added: Properly serialize sabers.
 #ifdef QOL_IMPROVEMENTS
-    for (int i = 0; i < sithWorld_pCurrentWorld->numThingsLoaded; i++)
+    for (int i = 0; i < sithWorld_g_pCurrentWorld->numThingsLoaded; i++)
     {
-        sithThing* thingIter = &sithWorld_pCurrentWorld->things[i];
+        sithThing* thingIter = &sithWorld_g_pCurrentWorld->things[i];
 
         if (thingIter->type == SITH_THING_ACTOR 
             && thingIter->actorParams.typeflags & SITH_AF_BOSS 
@@ -421,9 +421,9 @@ void jkPlayer_InitThings()
     
     // Added: skip already initted
     jkPlayerInfo* playerInfoIter = &jkPlayer_otherThings[jkPlayer_numOtherThings];
-    for (int i = 0; i < sithWorld_pCurrentWorld->numThingsLoaded; i++)
+    for (int i = 0; i < sithWorld_g_pCurrentWorld->numThingsLoaded; i++)
     {
-        sithThing* thingIter = &sithWorld_pCurrentWorld->things[i];
+        sithThing* thingIter = &sithWorld_g_pCurrentWorld->things[i];
 
         if (thingIter->type == SITH_THING_ACTOR 
             && thingIter->actorParams.typeflags & SITH_AF_BOSS 
@@ -863,7 +863,7 @@ void jkPlayer_DrawPov()
         rdPuppet_UpdateTracks(playerThings[playerThingIdx].povModel.puppet, sithTime_g_frameTimeFlex);
     }
 
-    if ( !(sithCamera_g_pCurCamera->cameraPerspective & 0xFC) && sithCamera_g_pCurCamera->primaryFocus == sithWorld_pCurrentWorld->cameraFocus )
+    if ( !(sithCamera_g_pCurCamera->cameraPerspective & 0xFC) && sithCamera_g_pCurCamera->primaryFocus == sithWorld_g_pCurrentWorld->cameraFocus )
     {
         sithThing* player = playerThings[playerThingIdx].actorThing;
 

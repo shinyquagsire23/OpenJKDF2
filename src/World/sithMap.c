@@ -49,8 +49,8 @@ void sithMap_DrawCircle(rdCamera *camera, rdMatrix34 *viewMat)
     rdSetGeometryMode(2);
     rdSetLightingMode(1);
     sithMap_pCurCamera = camera;
-    sithMap_pCurWorld = sithWorld_pCurrentWorld;
-    sithMap_pPlayerThing = sithWorld_pCurrentWorld->playerThing;
+    sithMap_pCurWorld = sithWorld_g_pCurrentWorld;
+    sithMap_pPlayerThing = sithWorld_g_pCurrentWorld->playerThing;
     rdMatrix_Multiply34(&sithMap_camera, &camera->view_matrix, viewMat);
     rdMatrix_InvertOrtho34(&sithMap_invMatrix, &sithMap_camera);
     v2 = sithMap_pPlayerThing;
@@ -197,7 +197,7 @@ int sithMap_Draw(sithSector *sector)
                             {
                                 v10 = surfaceIter->surfaceInfo.face.vertexPosIdx[v9];
                                 v11 = v10;
-                                if ( sithWorld_pCurrentWorld->alloc_unk98[v10] != v5 )
+                                if ( sithWorld_g_pCurrentWorld->alloc_unk98[v10] != v5 )
                                 {
                                     rdMatrix_TransformPoint34(&v4->verticesTransformed[v10], &v4->vertices[v10], &sithMap_camera);
                                     v4 = sithMap_pCurWorld;
@@ -284,7 +284,7 @@ LABEL_22:
     {
         for ( i = v1->thingsList; i; i = i->nextThing )
         {
-            if ( i != sithWorld_pCurrentWorld->cameraFocus && (i->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_WILLBEREMOVED)) == 0 )
+            if ( i != sithWorld_g_pCurrentWorld->cameraFocus && (i->thingflags & (SITH_TF_DISABLED|SITH_TF_10|SITH_TF_WILLBEREMOVED)) == 0 )
             {
                 int v37 = (g_mapModeFlags & MAPMODE_40) != 0;
                 switch ( i->type )

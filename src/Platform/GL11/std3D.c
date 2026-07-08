@@ -476,9 +476,9 @@ int std3D_AddToTextureCache(stdVBuffer* vbuf, rdDDrawSurface* texture, int is_al
             {
                 uint8_t r, g, b;
                 if (pal) { r = pal[k*3+0]; g = pal[k*3+1]; b = pal[k*3+2]; }
-                else if (sithWorld_pCurrentWorld && sithWorld_pCurrentWorld->colormaps)
+                else if (sithWorld_g_pCurrentWorld && sithWorld_g_pCurrentWorld->colormaps)
                 {
-                    rdColor24* c = &sithWorld_pCurrentWorld->colormaps->colors[k];
+                    rdColor24* c = &sithWorld_g_pCurrentWorld->colormaps->colors[k];
                     r = c->r; g = c->g; b = c->b;
                 }
                 else { r = std3D_currentPalette[k].r; g = std3D_currentPalette[k].g; b = std3D_currentPalette[k].b; }
@@ -500,9 +500,9 @@ int std3D_AddToTextureCache(stdVBuffer* vbuf, rdDDrawSurface* texture, int is_al
                 uint8_t idx = src8[i];
                 uint8_t r, g, b;
                 if (pal) { r = pal[idx*3+0]; g = pal[idx*3+1]; b = pal[idx*3+2]; }
-                else if (sithWorld_pCurrentWorld && sithWorld_pCurrentWorld->colormaps)
+                else if (sithWorld_g_pCurrentWorld && sithWorld_g_pCurrentWorld->colormaps)
                 {
-                    rdColor24* c = &sithWorld_pCurrentWorld->colormaps->colors[idx];
+                    rdColor24* c = &sithWorld_g_pCurrentWorld->colormaps->colors[idx];
                     r = c->r; g = c->g; b = c->b;
                 }
                 else { r = std3D_currentPalette[idx].r; g = std3D_currentPalette[idx].g; b = std3D_currentPalette[idx].b; }

@@ -503,7 +503,7 @@ sithCog* sithCogExec_PopCog(sithCog *ctx)
 {
     sithCogStackvar tmp;
     int32_t cogIdx;
-    sithWorld* world = sithWorld_pCurrentWorld;
+    sithWorld* world = sithWorld_g_pCurrentWorld;
 
     if (!sithCogExec_PopSymbol(ctx, &tmp))
     {
@@ -540,7 +540,7 @@ sithCog* sithCogExec_PopCog(sithCog *ctx)
     
     if ( (uint16_t)cogIdx & 0x8000 )
     {
-        world = sithWorld_pStatic;
+        world = sithWorld_g_pStaticWorld;
         cogIdx &= ~0x8000;
     }
     if ( world && cogIdx >= 0 && (uint32_t )cogIdx < world->numCogsLoaded )
@@ -553,7 +553,7 @@ sithThing* sithCogExec_PopThing(sithCog *ctx)
 {
     sithCogStackvar tmp;
     int32_t idx;
-    sithWorld* world = sithWorld_pCurrentWorld;
+    sithWorld* world = sithWorld_g_pCurrentWorld;
 
     if (!sithCogExec_PopSymbol(ctx, &tmp))
     {
@@ -646,7 +646,7 @@ sithSound* sithCogExec_PopSound(sithCog *ctx)
 {
     sithCogStackvar tmp;
     int32_t idx;
-    sithWorld* world = sithWorld_pCurrentWorld;
+    sithWorld* world = sithWorld_g_pCurrentWorld;
 
     if (!sithCogExec_PopSymbol(ctx, &tmp))
     {
@@ -689,7 +689,7 @@ sithSound* sithCogExec_PopSound(sithCog *ctx)
     
     if ( idx & 0x8000 )
     {
-        world = sithWorld_pStatic;
+        world = sithWorld_g_pStaticWorld;
         idx &= ~0x8000; // ?
     }
     
@@ -705,7 +705,7 @@ sithSector* sithCogExec_PopSector(sithCog *ctx)
 {
     sithCogStackvar tmp;
     int32_t idx;
-    sithWorld* world = sithWorld_pCurrentWorld;
+    sithWorld* world = sithWorld_g_pCurrentWorld;
 
     if (!sithCogExec_PopSymbol(ctx, &tmp))
     {
@@ -753,7 +753,7 @@ sithSurface* sithCogExec_PopSurface(sithCog *ctx)
 {
     sithCogStackvar tmp;
     int32_t idx;
-    sithWorld* world = sithWorld_pCurrentWorld;
+    sithWorld* world = sithWorld_g_pCurrentWorld;
 
     if (!sithCogExec_PopSymbol(ctx, &tmp))
     {
@@ -802,7 +802,7 @@ rdMaterial* sithCogExec_PopMaterial(sithCog *ctx)
 {
     sithCogStackvar tmp;
     int32_t idx;
-    sithWorld* world = sithWorld_pCurrentWorld;
+    sithWorld* world = sithWorld_g_pCurrentWorld;
 
     if (!sithCogExec_PopSymbol(ctx, &tmp))
     {
@@ -840,7 +840,7 @@ rdMaterial* sithCogExec_PopMaterial(sithCog *ctx)
     
     if ( idx & 0x8000 )
     {
-        world = sithWorld_pStatic;
+        world = sithWorld_g_pStaticWorld;
         idx &= ~0x8000; // ?
     }
     
@@ -856,7 +856,7 @@ rdModel3* sithCogExec_PopModel3(sithCog *ctx)
 {
     sithCogStackvar tmp;
     int32_t idx;
-    sithWorld* world = sithWorld_pCurrentWorld;
+    sithWorld* world = sithWorld_g_pCurrentWorld;
 
     if (!sithCogExec_PopSymbol(ctx, &tmp))
     {
@@ -894,7 +894,7 @@ rdModel3* sithCogExec_PopModel3(sithCog *ctx)
     
     if ( idx & 0x8000 )
     {
-        world = sithWorld_pStatic;
+        world = sithWorld_g_pStaticWorld;
         idx &= ~0x8000; // ?
     }
     
@@ -910,7 +910,7 @@ rdKeyframe* sithCogExec_PopKeyframe(sithCog *ctx)
 {
     sithCogStackvar tmp;
     int32_t idx;
-    sithWorld* world = sithWorld_pCurrentWorld;
+    sithWorld* world = sithWorld_g_pCurrentWorld;
 
     if (!sithCogExec_PopSymbol(ctx, &tmp))
     {
@@ -948,7 +948,7 @@ rdKeyframe* sithCogExec_PopKeyframe(sithCog *ctx)
     
     if ( idx & 0x8000 )
     {
-        world = sithWorld_pStatic;
+        world = sithWorld_g_pStaticWorld;
         idx &= ~0x8000; // ?
     }
 
@@ -962,7 +962,7 @@ sithAIClass* sithCogExec_PopAIClass(sithCog *ctx)
 {
     sithCogStackvar tmp;
     int32_t idx;
-    sithWorld* world = sithWorld_pCurrentWorld;
+    sithWorld* world = sithWorld_g_pCurrentWorld;
 
     if (!sithCogExec_PopSymbol(ctx, &tmp))
     {

@@ -421,14 +421,14 @@ int32_t sithCog_Open()
     sithCogSymbol *v14; // [esp+10h] [ebp-8h]
     sithWorld *world_; // [esp+14h] [ebp-4h]
 
-    world = sithWorld_pCurrentWorld;
-    world_ = sithWorld_pCurrentWorld;
+    world = sithWorld_g_pCurrentWorld;
+    world_ = sithWorld_g_pCurrentWorld;
     if ( sithCog_bOpened )
         return 0;
-    if ( sithWorld_pStatic )
+    if ( sithWorld_g_pStaticWorld )
     {
-        v2 = sithWorld_pStatic->cogs;
-        for (int32_t i = 0; i < sithWorld_pStatic->numCogsLoaded; i++)
+        v2 = sithWorld_g_pStaticWorld->cogs;
+        for (int32_t i = 0; i < sithWorld_g_pStaticWorld->numCogsLoaded; i++)
         {
             for (int32_t j = 0; j < v2->cogscript->numIdk; j++)
             {
@@ -624,13 +624,13 @@ sithCog* sithCog_Load(const char *fpath)
     uint32_t v9; // eax
     char cog_fpath[128]; // [esp+10h] [ebp-80h] BYREF
 
-    cogIdx = sithWorld_pLoading->numCogsLoaded;
-    if ( cogIdx >= sithWorld_pLoading->numCogs )
+    cogIdx = sithWorld_g_pLastLoadedWorld->numCogsLoaded;
+    if ( cogIdx >= sithWorld_g_pLastLoadedWorld->numCogs )
         return 0;
 
-    cog = &sithWorld_pLoading->cogs[cogIdx];
+    cog = &sithWorld_g_pLastLoadedWorld->cogs[cogIdx];
     cog->selfCog = cogIdx;
-    if (sithWorld_pLoading->level_type_maybe & 1)
+    if (sithWorld_g_pLastLoadedWorld->level_type_maybe & 1)
     {
         cog->selfCog |= 0x8000;
     }
@@ -642,11 +642,11 @@ sithCog* sithCog_Load(const char *fpath)
     }
     else
     {
-        v9 = sithWorld_pLoading->numCogScriptsLoaded;
-        if ( v9 < sithWorld_pLoading->numCogScripts && (v8 = &sithWorld_pLoading->cogScripts[v9], sithCogParse_Load(cog_fpath, v8, 0)) )
+        v9 = sithWorld_g_pLastLoadedWorld->numCogScriptsLoaded;
+        if ( v9 < sithWorld_g_pLastLoadedWorld->numCogScripts && (v8 = &sithWorld_g_pLastLoadedWorld->cogScripts[v9], sithCogParse_Load(cog_fpath, v8, 0)) )
         {
             stdHashtbl_Add(sithCog_g_pHashtable, cog_fpath, v8); // Added: v8 -> no v8 for cog_fpath
-            ++sithWorld_pLoading->numCogScriptsLoaded;
+            ++sithWorld_g_pLastLoadedWorld->numCogScriptsLoaded;
         }
         else
         {
@@ -663,7 +663,7 @@ sithCog* sithCog_Load(const char *fpath)
     cog->pSymbolTable = sithCogParse_DuplicateSymbolTable(v8->pSymbolTable);
     if ( cog->pSymbolTable )
     {
-        sithWorld_pLoading->numCogsLoaded++;
+        sithWorld_g_pLastLoadedWorld->numCogsLoaded++;
         return cog;
     }
     return NULL;
@@ -715,14 +715,14 @@ int32_t sithCog_ParseSymbolRef(sithCogSymbol *cogSymbol, sithCogReference *cogId
 
             // HACK HACK HACK HACK HACK somehow some keyframes aren't being set correctly?
             if (!(v17->id & 0x8000)) {
-                v17->id = (v17 - sithWorld_pCurrentWorld->keyframes) & 0xFFFF;
+                v17->id = (v17 - sithWorld_g_pCurrentWorld->keyframes) & 0xFFFF;
                 if (v17->id >= 0x8000)
                 {
-                    v17->id = (v17 - sithWorld_pStatic->keyframes) | 0x8000;
+                    v17->id = (v17 - sithWorld_g_pStaticWorld->keyframes) | 0x8000;
                 }
             }
             else {
-                v17->id = (v17 - sithWorld_pStatic->keyframes) | 0x8000;
+                v17->id = (v17 - sithWorld_g_pStaticWorld->keyframes) | 0x8000;
             }
 
             cogSymbol->val.data[0] = v17->id;
@@ -828,17 +828,17 @@ int32_t sithCog_LinkCog(sithCog *cog, sithCogReference *idk, sithCogSymbol *symb
     switch ( idk->type )
     {
         case 3:
-            if ( v3 >= sithWorld_pCurrentWorld->numThingsLoaded )
+            if ( v3 >= sithWorld_g_pCurrentWorld->numThingsLoaded )
                 return 0;
-            return sithCog_LinkCogToThing(cog, &sithWorld_pCurrentWorld->things[v3], idk->linkid, idk->mask);
+            return sithCog_LinkCogToThing(cog, &sithWorld_g_pCurrentWorld->things[v3], idk->linkid, idk->mask);
         case 5:
-            if ( v3 >= sithWorld_pCurrentWorld->numSectors )
+            if ( v3 >= sithWorld_g_pCurrentWorld->numSectors )
                 return 0;
-            return sithCog_LinkCogToSector(cog, &sithWorld_pCurrentWorld->sectors[v3], idk->linkid, idk->mask);
+            return sithCog_LinkCogToSector(cog, &sithWorld_g_pCurrentWorld->sectors[v3], idk->linkid, idk->mask);
         case 6:
-            if ( v3 >= sithWorld_pCurrentWorld->numSurfaces )
+            if ( v3 >= sithWorld_g_pCurrentWorld->numSurfaces )
                 return 0;
-            return sithCog_LinkCogToSurface(cog, &sithWorld_pCurrentWorld->surfaces[v3], idk->linkid, idk->mask);
+            return sithCog_LinkCogToSurface(cog, &sithWorld_g_pCurrentWorld->surfaces[v3], idk->linkid, idk->mask);
     }
     return 1;
 }
@@ -1147,16 +1147,16 @@ void sithCog_BroadcastMessageEx(int32_t cmdid, int32_t senderType, int32_t sende
     sithCog *v11; // esi
     uint32_t j; // edi
 
-    if ( sithWorld_pStatic )
+    if ( sithWorld_g_pStaticWorld )
     {
-        v9 = sithWorld_pStatic->cogs;
-        for ( i = 0; i < sithWorld_pStatic->numCogsLoaded; ++i )
+        v9 = sithWorld_g_pStaticWorld->cogs;
+        for ( i = 0; i < sithWorld_g_pStaticWorld->numCogsLoaded; ++i )
             sithCog_SendMessageEx(v9++, cmdid, senderType, senderIdx, sourceType, sourceIdx, 0, arg0, arg1, arg2, arg3);
     }
-    if ( sithWorld_pCurrentWorld )
+    if ( sithWorld_g_pCurrentWorld )
     {
-        v11 = sithWorld_pCurrentWorld->cogs;
-        for ( j = 0; j < sithWorld_pCurrentWorld->numCogsLoaded; ++j )
+        v11 = sithWorld_g_pCurrentWorld->cogs;
+        for ( j = 0; j < sithWorld_g_pCurrentWorld->numCogsLoaded; ++j )
             sithCog_SendMessageEx(v11++, cmdid, senderType, senderIdx, sourceType, sourceIdx, 0, arg0, arg1, arg2, arg3);
     }
 }
@@ -1602,8 +1602,8 @@ sithCogScript* sithCog_LoadScript(const char *pFpath, int32_t unk)
     result = (sithCogScript *)stdHashtbl_Find(sithCog_g_pHashtable, pFpath);
     if ( !result )
     {
-        v4 = sithWorld_pLoading->numCogScriptsLoaded;
-        if ( v4 < sithWorld_pLoading->numCogScripts && (v5 = &sithWorld_pLoading->cogScripts[v4], sithCogParse_Load(v6, v5, unk)) )
+        v4 = sithWorld_g_pLastLoadedWorld->numCogScriptsLoaded;
+        if ( v4 < sithWorld_g_pLastLoadedWorld->numCogScripts && (v5 = &sithWorld_g_pLastLoadedWorld->cogScripts[v4], sithCogParse_Load(v6, v5, unk)) )
         {
 #ifdef SITH_DEBUG_STRUCT_NAMES
             // The copies of names are load-bearing, SetKeyVal stores a reference
@@ -1611,7 +1611,7 @@ sithCogScript* sithCog_LoadScript(const char *pFpath, int32_t unk)
 #else
             stdHashtbl_Add(sithCog_g_pHashtable, pFpath, v5);
 #endif
-            ++sithWorld_pLoading->numCogScriptsLoaded;
+            ++sithWorld_g_pLastLoadedWorld->numCogScriptsLoaded;
             result = v5;
         }
         else
@@ -1666,16 +1666,16 @@ void sithCog_ProcessCogs()
     if (g_sithMode == 2)
         return;
 
-    for (uint32_t i = 0; i < sithWorld_pCurrentWorld->numCogsLoaded; i++)
+    for (uint32_t i = 0; i < sithWorld_g_pCurrentWorld->numCogsLoaded; i++)
     {
-        sithCog_ProcessCog(&sithWorld_pCurrentWorld->cogs[i]);
+        sithCog_ProcessCog(&sithWorld_g_pCurrentWorld->cogs[i]);
     }
 
-    if ( sithWorld_pStatic )
+    if ( sithWorld_g_pStaticWorld )
     {
-        for (uint32_t i = 0; i < sithWorld_pStatic->numCogsLoaded; i++)
+        for (uint32_t i = 0; i < sithWorld_g_pStaticWorld->numCogsLoaded; i++)
         {
-            sithCog_ProcessCog(&sithWorld_pStatic->cogs[i]);
+            sithCog_ProcessCog(&sithWorld_g_pStaticWorld->cogs[i]);
         }
     }
 }
@@ -1712,7 +1712,7 @@ void sithCog_ProcessCog(sithCog *cog)
             sithCogExec_Execute(cog);
             return;
         }
-        if ( cog->script_running == 3 && (sithWorld_pCurrentWorld->things[cog->wakeTimeMs].trackParams.flags & 3) == 0 )
+        if ( cog->script_running == 3 && (sithWorld_g_pCurrentWorld->things[cog->wakeTimeMs].trackParams.flags & 3) == 0 )
         {
             if ((cog->flags & SITH_COG_DEBUG))
             {
@@ -1734,11 +1734,11 @@ int sithCog_TimerEventTask(int32_t deltaMs, sithEventInfo *info)
     int32_t v3; // eax
     sithCog *v4; // eax
 
-    v2 = sithWorld_pCurrentWorld;
+    v2 = sithWorld_g_pCurrentWorld;
     v3 = info->cogIdx;
     if ( (v3 & 0x8000u) != 0 )
     {
-        v2 = sithWorld_pStatic;
+        v2 = sithWorld_g_pStaticWorld;
         v3 &= ~0x8000u;
     }
     if ( v2 && v3 >= 0 && v3 < v2->numCogsLoaded )
@@ -1762,8 +1762,8 @@ int sithCog_CogStatus(stdDebugConsoleCmd *cmd, const char *extra)
     uint32_t tmp;
 
 #ifdef SITH_DEBUG_STRUCT_NAMES
-    world = sithWorld_pCurrentWorld;
-    if ( sithWorld_pCurrentWorld
+    world = sithWorld_g_pCurrentWorld;
+    if ( sithWorld_g_pCurrentWorld
       && extra
       && _sscanf(extra, "%d", &tmp) == 1
       && tmp <= world->numCogsLoaded
@@ -1811,10 +1811,10 @@ sithCog* sithCog_GetCogByIndex(int32_t idx)
     sithWorld *world; // ecx
     sithCog *result; // eax
 
-    world = sithWorld_pCurrentWorld;
+    world = sithWorld_g_pCurrentWorld;
     if ( (idx & 0x8000) != 0 )
     {
-        world = sithWorld_pStatic;
+        world = sithWorld_g_pStaticWorld;
         idx &= ~0x8000u;
     }
 

@@ -371,7 +371,7 @@ void sithCollision_SearchForSurfaceCollisions(sithSector *sector, const rdVector
 LABEL_46:
             if ( (raycastFlags & RAYCAST_4) == 0 && ((raycastFlags & RAYCAST_10) == 0 || (v12->surfaceFlags & SITH_SURFACE_FLOOR) != 0) )
             {
-                v35 = sithWorld_pCurrentWorld->vertices;
+                v35 = sithWorld_g_pCurrentWorld->vertices;
                 
                 if ( rdMath_DistancePointToPlane(&tmp, &v12->surfaceInfo.face.normal, &v35[*v12->surfaceInfo.face.vertexPosIdx]) <= a5 )
                 {
@@ -417,7 +417,7 @@ LABEL_46:
         }
 LABEL_22:
         // Standing?
-        if ( sithIntersect_CheckSphereFaceIntersection(vec1, vec2, a4, a5, &v12->surfaceInfo, sithWorld_pCurrentWorld->vertices, &a7, raycastFlags) )
+        if ( sithIntersect_CheckSphereFaceIntersection(vec1, vec2, a4, a5, &v12->surfaceInfo, sithWorld_g_pCurrentWorld->vertices, &a7, raycastFlags) )
         {
             if ( !(raycastFlags & RAYCAST_4) || (raycastFlags & RAYCAST_1) == 0 )
             {
@@ -455,7 +455,7 @@ LABEL_30:
             }
 
             // Falling?
-            if ( (raycastFlags & RAYCAST_2) == 0 && sithIntersect_CheckSphereFaceIntersection(vec1, vec2, a4, 0.0, &v12->surfaceInfo, sithWorld_pCurrentWorld->vertices, &v48, raycastFlags) )
+            if ( (raycastFlags & RAYCAST_2) == 0 && sithIntersect_CheckSphereFaceIntersection(vec1, vec2, a4, 0.0, &v12->surfaceInfo, sithWorld_g_pCurrentWorld->vertices, &v48, raycastFlags) )
             {
                 v24 = sithCollision_searchStackIdx;
                 if ( (raycastFlags & RAYCAST_4) && (raycastFlags & RAYCAST_1) != 0 )
@@ -863,14 +863,14 @@ LABEL_81:
                 sithThing_DestroyThing(v5);
         }
         else {
-            for (int i = 0; i < sithWorld_pCurrentWorld->numSectors; i++)
+            for (int i = 0; i < sithWorld_g_pCurrentWorld->numSectors; i++)
             {
                 int found = 0;
-                if (sithIntersect_IsSphereInSector(&v5->position, 0.0, &sithWorld_pCurrentWorld->sectors[i]))
+                if (sithIntersect_IsSphereInSector(&v5->position, 0.0, &sithWorld_g_pCurrentWorld->sectors[i]))
                 {
                     found = 1;
                     sithPlayer_bNoClippingRend = 0;
-                    sithThing_SetSector(v5, &sithWorld_pCurrentWorld->sectors[i], 0);
+                    sithThing_SetSector(v5, &sithWorld_g_pCurrentWorld->sectors[i], 0);
                     break;
                 }
 

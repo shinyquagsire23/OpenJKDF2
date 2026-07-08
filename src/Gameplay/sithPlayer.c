@@ -37,7 +37,7 @@ void sithPlayer_Startup(int idx)
     v2 = jkPlayer_playerInfos[idx].playerThing;
     if ( v2 )
     {
-        if ( sithWorld_pCurrentWorld )
+        if ( sithWorld_g_pCurrentWorld )
         {
             sithThing_SetThingModel(v2, v2->templateBase->rdthing.model3);
             jkPlayer_playerInfos[idx].playerThing->thingflags |= SITH_TF_DISABLED;
@@ -164,8 +164,8 @@ void sithPlayer_SetLocalPlayer(int idx)
     sithPlayer_pLocalPlayer = &jkPlayer_playerInfos[idx];
     sithPlayer_pLocalPlayerThing = jkPlayer_playerInfos[idx].playerThing;
 
-    sithWorld_pCurrentWorld->playerThing = sithPlayer_pLocalPlayerThing;
-    sithWorld_pCurrentWorld->cameraFocus = sithPlayer_pLocalPlayerThing;
+    sithWorld_g_pCurrentWorld->playerThing = sithPlayer_pLocalPlayerThing;
+    sithWorld_g_pCurrentWorld->cameraFocus = sithPlayer_pLocalPlayerThing;
 
     sithPlayer_pLocalPlayerThing->thingflags &= ~SITH_TF_INVULN;
 
@@ -287,7 +287,7 @@ void sithPlayer_SetScreenTint(flex_t tintR, flex_t tintG, flex_t tintB)
     stdPalEffect *pPalEffects; // ecx
     flex_d_t v8; // st7
 
-    focusThing = sithWorld_pCurrentWorld->cameraFocus;
+    focusThing = sithWorld_g_pCurrentWorld->cameraFocus;
     if ( (focusThing->type & 0xA) != 0 ) // ???
     {
         pPalEffects = stdPalEffects_GetEffectPointer(focusThing->actorParams.playerinfo->palEffectsIdx2);
@@ -447,7 +447,7 @@ void sithPlayer_Reset(unsigned int idx)
         pPlayerInfo->net_id = 0;
         pPlayerInfo->player_name[0] = 0;
         pPlayerInfo->multi_name[0] = 0;
-        if ( pPlayerInfo->playerThing && sithWorld_pCurrentWorld )
+        if ( pPlayerInfo->playerThing && sithWorld_g_pCurrentWorld )
             sithInventory_InitInventory(pPlayerInfo->playerThing);
         if ( pPlayerInfo == sithPlayer_pLocalPlayer )
         {

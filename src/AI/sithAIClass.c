@@ -103,8 +103,8 @@ sithAIClass* sithAIClass_Load(char *fpath)
     sithAIClass *aiclass; // ebx
     char fullpath[128]; // [esp+10h] [ebp-80h] BYREF
 
-    world = sithWorld_pLoading;
-    if ( !sithWorld_pLoading->aiclasses )
+    world = sithWorld_g_pLastLoadedWorld;
+    if ( !sithWorld_g_pLastLoadedWorld->aiclasses )
         return 0;
 
     result = (sithAIClass *)stdHashtbl_Find(sithAIClass_hashmap, fpath);

@@ -58,7 +58,7 @@ const char* sithGamesave_AutosaveMapName(void)
     if (!dcStorage_HasFilesystem())
         return "dcauto.jkl";
 #endif
-    return sithWorld_pCurrentWorld->map_jkl_fname;
+    return sithWorld_g_pCurrentWorld->map_jkl_fname;
 }
 
 #ifdef TARGET_DREAMCAST
@@ -142,7 +142,7 @@ int sithGamesave_Restore(char *saveFname, int debugNextCheckpoint, int a3)
     {
         stdConffile_Close();
         sithGamesave_dword_835914 = a3;
-        if (sithWorld_pCurrentWorld)
+        if (sithWorld_g_pCurrentWorld)
         {
             sithGamesave_state = debugNextCheckpoint != 0 ? SITH_GS_LOAD_DEBUG_NEXTCHECKPOINT : SITH_GS_LOAD;
             _strncpy(sithGamesave_aCurFilename, fpath, 0x7Fu);
@@ -246,11 +246,11 @@ int sithGamesave_RestoreFile(char *fpath)
     }
 #endif
 
-    if ( sithWorld_pCurrentWorld )
+    if ( sithWorld_g_pCurrentWorld )
     {
-        if ( !_strcmp(SrcStr, sithWorld_pCurrentWorld->map_jkl_fname) )
+        if ( !_strcmp(SrcStr, sithWorld_g_pCurrentWorld->map_jkl_fname) )
         {
-            sithWorld_ResetGeoresource(sithWorld_pCurrentWorld);
+            sithWorld_ResetGeoresource(sithWorld_g_pCurrentWorld);
             goto LABEL_11;
         }
         sithClose();
@@ -289,7 +289,7 @@ LABEL_11:
         goto skip_free_things;
     }
 
-    sithThing_RemoveWorldThings(sithWorld_pCurrentWorld);
+    sithThing_RemoveWorldThings(sithWorld_g_pCurrentWorld);
 
 skip_free_things:
     // Apparently this works by interpreting a bunch of netMsg packets from the
@@ -425,9 +425,9 @@ int sithGamesave_SaveCurrentWorld(int mpFlags)
 
     if ( (sithMessage_g_outputstream & mpFlags) == 0 )
         return 0;
-    for (uint32_t i = 0; i < sithWorld_pCurrentWorld->numThingsLoaded; i++)
+    for (uint32_t i = 0; i < sithWorld_g_pCurrentWorld->numThingsLoaded; i++)
     {
-        sithThing* v4 = &sithWorld_pCurrentWorld->things[i];
+        sithThing* v4 = &sithWorld_g_pCurrentWorld->things[i];
         if ( sithThing_CanSync(v4) )
         {
             sithDSSThing_FullDescription(v4, 0, mpFlags);
@@ -436,9 +436,9 @@ int sithGamesave_SaveCurrentWorld(int mpFlags)
         }
     }
 
-    for (uint32_t i = 0; i < sithWorld_pCurrentWorld->numThingsLoaded; i++)
+    for (uint32_t i = 0; i < sithWorld_g_pCurrentWorld->numThingsLoaded; i++)
     {
-        sithThing* v7 = &sithWorld_pCurrentWorld->things[i];
+        sithThing* v7 = &sithWorld_g_pCurrentWorld->things[i];
         if (sithThing_CanSync(v7))
         {
             if ( v7->attach_flags )
@@ -459,27 +459,27 @@ int sithGamesave_SaveCurrentWorld(int mpFlags)
         }
     }
 
-    for (uint32_t i = 0; i < sithWorld_pCurrentWorld->numCogsLoaded; i++)
+    for (uint32_t i = 0; i < sithWorld_g_pCurrentWorld->numCogsLoaded; i++)
     {
-        sithDSSCog_SyncCogState(&sithWorld_pCurrentWorld->cogs[i], 0, mpFlags);
+        sithDSSCog_SyncCogState(&sithWorld_g_pCurrentWorld->cogs[i], 0, mpFlags);
     }
 
-    if ( sithWorld_pStatic )
+    if ( sithWorld_g_pStaticWorld )
     {
-        for (uint32_t i = 0; i < sithWorld_pStatic->numCogsLoaded; i++)
+        for (uint32_t i = 0; i < sithWorld_g_pStaticWorld->numCogsLoaded; i++)
         {
-            sithDSSCog_SyncCogState(&sithWorld_pStatic->cogs[i], 0, mpFlags);
+            sithDSSCog_SyncCogState(&sithWorld_g_pStaticWorld->cogs[i], 0, mpFlags);
         }
     }
 
-    for (uint32_t i = 0; i < sithWorld_pCurrentWorld->numSurfaces; i++)
+    for (uint32_t i = 0; i < sithWorld_g_pCurrentWorld->numSurfaces; i++)
     {
-        sithDSS_SurfaceStatus(&sithWorld_pCurrentWorld->surfaces[i], 0, mpFlags);
+        sithDSS_SurfaceStatus(&sithWorld_g_pCurrentWorld->surfaces[i], 0, mpFlags);
     }
 
-    for (uint32_t i = 0; i < sithWorld_pCurrentWorld->numSectors; i++)
+    for (uint32_t i = 0; i < sithWorld_g_pCurrentWorld->numSectors; i++)
     {
-        sithDSS_SectorStatus(&sithWorld_pCurrentWorld->sectors[i], 0, mpFlags);
+        sithDSS_SectorStatus(&sithWorld_g_pCurrentWorld->sectors[i], 0, mpFlags);
     }
 
     for (v19 = 0; v19 < SITHBIN_NUMBINS; v19++) // TODO define this maximum
@@ -551,9 +551,9 @@ int sithGamesave_Save(char *saveFname, int a2, int a3, wchar_t *saveName)
     {
         _memset(&sithGamesave_headerTmp, 0, sizeof(sithGamesave_headerTmp));
         sithGamesave_headerTmp.version = COMPAT_SAVE_VERSION;
-        _strncpy(sithGamesave_headerTmp.episodeName, sithWorld_pCurrentWorld->episodeName, 0x7Fu);
+        _strncpy(sithGamesave_headerTmp.episodeName, sithWorld_g_pCurrentWorld->episodeName, 0x7Fu);
         sithGamesave_headerTmp.episodeName[127] = 0;
-        _strncpy(sithGamesave_headerTmp.jklName, sithWorld_pCurrentWorld->map_jkl_fname, 0x7Fu);
+        _strncpy(sithGamesave_headerTmp.jklName, sithWorld_g_pCurrentWorld->map_jkl_fname, 0x7Fu);
         sithGamesave_headerTmp.jklName[127] = 0;
         _wcsncpy(sithGamesave_headerTmp.saveName, v5, 0xFFu);
         sithGamesave_headerTmp.saveName[255] = 0;
@@ -615,7 +615,7 @@ int sithGamesave_Process()
         stdConffile_Write((const char*)&sithGamesave_headerTmp, sizeof(sithGamesave_Header));
         if ( sithGamesave_funcWrite )
             sithGamesave_funcWrite();
-        stdConffile_Write((const char*)sithWorld_pCurrentWorld->map_jkl_fname, 32);
+        stdConffile_Write((const char*)sithWorld_g_pCurrentWorld->map_jkl_fname, 32);
         stdConffile_Write((const char*)&sithTime_g_msecGameTime, sizeof(uint32_t));
         
         // Added: split this apart, g_sithMode is a struct...

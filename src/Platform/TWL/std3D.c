@@ -208,9 +208,9 @@ static void update_from_display_palette()
 
 MATH_FUNC static void update_from_world_palette()
 {
-    if (sithWorld_pCurrentWorld && sithWorld_pCurrentWorld->colormaps && loaded_colormap != sithWorld_pCurrentWorld->colormaps)
+    if (sithWorld_g_pCurrentWorld && sithWorld_g_pCurrentWorld->colormaps && loaded_colormap != sithWorld_g_pCurrentWorld->colormaps)
     {
-        rdColormap* pWorldCmp = sithWorld_pCurrentWorld->colormaps;
+        rdColormap* pWorldCmp = sithWorld_g_pCurrentWorld->colormaps;
 
         loaded_colormap = pWorldCmp;
         
@@ -311,7 +311,7 @@ MATH_FUNC static void std3D_UpdateFogColor() {
     // TODO: Make this dynamic based on the furthest Z?
     glFogShift(11);
     glFogOffset(std3D_fogDepth & 0x7FFF);
-    rdColor24 skyColor = sithWorld_pCurrentWorld->colormaps->colors[sithSurface_skyColorGuess];
+    rdColor24 skyColor = sithWorld_g_pCurrentWorld->colormaps->colors[sithSurface_skyColorGuess];
 
     if (std3D_currentFogAmbientMult < ambientLight) {
         std3D_currentFogAmbientMult += 0.001;
@@ -1637,7 +1637,7 @@ int std3D_AddToTextureCache(stdVBuffer *vbuf, rdDDrawSurface *texture, int is_al
                 else
                 {
                     uint8_t val = image_8bpp[index];
-                    rdColor24* pal_master = (rdColor24*)sithWorld_pCurrentWorld->colormaps->colors;//stdDisplay_gammaPalette;
+                    rdColor24* pal_master = (rdColor24*)sithWorld_g_pCurrentWorld->colormaps->colors;//stdDisplay_gammaPalette;
                     rdColor24* color = &pal_master[val];
                     val_rgba |= (color->r << 16);
                     val_rgba |= (color->g << 8);

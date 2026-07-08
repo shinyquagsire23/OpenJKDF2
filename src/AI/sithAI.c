@@ -1484,7 +1484,7 @@ LABEL_12:
 
         v14 = actor->attackDistance / yvel * 0.5;
         rdVector_Scale3(&a1a, &actor->attackError, v8->physicsParams.vel.y);
-        a1a.z = v14 * sithWorld_pCurrentWorld->worldGravity + a1a.z;
+        a1a.z = v14 * sithWorld_g_pCurrentWorld->worldGravity + a1a.z;
         v15 = 1;
         v21 = rdVector_Normalize3(&v1, &a1a) / yvel;
     }
@@ -1707,9 +1707,9 @@ void sithAI_GetThingsInCone(sithSector *a1, rdMatrix34 *a2, flex_t a3)
         sithAI_dword_84DE6C = 100;
     }
 
-    for (int iterIdx = sithWorld_pCurrentWorld->numThings; iterIdx >= 0; iterIdx--)
+    for (int iterIdx = sithWorld_g_pCurrentWorld->numThings; iterIdx >= 0; iterIdx--)
     {
-        v4 = &sithWorld_pCurrentWorld->things[iterIdx];
+        v4 = &sithWorld_g_pCurrentWorld->things[iterIdx];
         if ( sithAI_dword_84DE60 >= (unsigned int)sithAI_dword_84DE6C )
             break;
         if ( ((1 << v4->type) & sithAI_dword_84DE74) != 0 && (v4->thingflags & (SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0 )
@@ -1914,7 +1914,7 @@ LAB_0053a3b9:
         
         fVar9 = stdMath_Sqrt(fVar8 * (flex_d_t)(flex_t)fVar8 + fVar7 * fVar7 + xDist * (flex_d_t)(flex_t)xDist); // FLEXTODO
         fVar10 = fVar9 / (flex_d_t)leapSpeed - (flex_d_t) - 0.2;
-        fVar1 = sithWorld_pCurrentWorld->worldGravity;
+        fVar1 = sithWorld_g_pCurrentWorld->worldGravity;
         (pActor->attackError).x = (flex_t)xDist; // FLEXTODO
         (pActor->attackError).y = (flex_t)fVar7; // FLEXTODO
         (pActor->attackError).z = (flex_t)fVar8; // FLEXTODO
@@ -1987,14 +1987,14 @@ sithThing* sithAI_FUN_00539a60(sithActor *pThing)
         a3 = pThing->thing;
         local_1c = 0.0;
         sithAI_dword_84DE74 = 0x404;
-        local_18 = sithWorld_pCurrentWorld->numThings;
+        local_18 = sithWorld_g_pCurrentWorld->numThings;
         if (-1 < local_18) 
         {
             iVar5 = local_18;
             local_18 = local_18 + 1;
             do 
             {
-                arg8 = &sithWorld_pCurrentWorld->things[iVar5];
+                arg8 = &sithWorld_g_pCurrentWorld->things[iVar5];
                 if (((sithAI_dword_84DE74 & 1 << (arg8->type & 0x1f)) != 0) &&
                 ((arg8->thingflags & (SITH_TF_DISABLED|SITH_TF_DEAD|SITH_TF_WILLBEREMOVED)) == 0))
                 {

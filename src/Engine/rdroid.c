@@ -180,16 +180,16 @@ int rdSetMipDistances(rdVector4 *dists)
     static flex_t origPerspective;
     static int once = 0;
     static sithWorld* onceWorld = NULL;
-    if (onceWorld != sithWorld_pCurrentWorld) {
+    if (onceWorld != sithWorld_g_pCurrentWorld) {
         once = 0;
     }
     if (!once) {
-        origLod = sithWorld_pCurrentWorld->lodDistance;
-        origGourad = sithWorld_pCurrentWorld->gouradDistance;
-        origPerspective = sithWorld_pCurrentWorld->perspectiveDistance;
+        origLod = sithWorld_g_pCurrentWorld->lodDistance;
+        origGourad = sithWorld_g_pCurrentWorld->gouradDistance;
+        origPerspective = sithWorld_g_pCurrentWorld->perspectiveDistance;
         once = 1;
     }
-    onceWorld = sithWorld_pCurrentWorld;
+    onceWorld = sithWorld_g_pCurrentWorld;
 #ifdef TARGET_TWL
     flex_t scale_factor = 0.6;
 #else
@@ -200,13 +200,13 @@ int rdSetMipDistances(rdVector4 *dists)
     rdroid_aMipDistances.z *= scale_factor;
     rdroid_aMipDistances.w *= scale_factor;
 
-    if (sithWorld_pCurrentWorld) {
-        sithWorld_pCurrentWorld->lodDistance.x = origLod.x * scale_factor;
-        sithWorld_pCurrentWorld->lodDistance.y = origLod.y * scale_factor;
-        sithWorld_pCurrentWorld->lodDistance.z = origLod.z * scale_factor;
-        sithWorld_pCurrentWorld->lodDistance.w = origLod.w * scale_factor;
-        sithWorld_pCurrentWorld->gouradDistance = origGourad * scale_factor;
-        sithWorld_pCurrentWorld->perspectiveDistance = origPerspective * scale_factor;
+    if (sithWorld_g_pCurrentWorld) {
+        sithWorld_g_pCurrentWorld->lodDistance.x = origLod.x * scale_factor;
+        sithWorld_g_pCurrentWorld->lodDistance.y = origLod.y * scale_factor;
+        sithWorld_g_pCurrentWorld->lodDistance.z = origLod.z * scale_factor;
+        sithWorld_g_pCurrentWorld->lodDistance.w = origLod.w * scale_factor;
+        sithWorld_g_pCurrentWorld->gouradDistance = origGourad * scale_factor;
+        sithWorld_g_pCurrentWorld->perspectiveDistance = origPerspective * scale_factor;
     }
 #endif
 

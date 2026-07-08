@@ -105,15 +105,15 @@ int sithWorld_Startup()
 
 void sithWorld_Shutdown()
 {
-    if ( sithWorld_pCurrentWorld )
-        SITH_FREE(sithWorld_pCurrentWorld);
-    if ( sithWorld_pStatic ) {
-        //SITH_FREE(sithWorld_pStatic); // Added: Actually free everything
-        sithWorld_FreeEntry(sithWorld_pStatic); // Added: Actually free everything
+    if ( sithWorld_g_pCurrentWorld )
+        SITH_FREE(sithWorld_g_pCurrentWorld);
+    if ( sithWorld_g_pStaticWorld ) {
+        //SITH_FREE(sithWorld_g_pStaticWorld); // Added: Actually free everything
+        sithWorld_FreeEntry(sithWorld_g_pStaticWorld); // Added: Actually free everything
     }
-    sithWorld_pCurrentWorld = 0;
-    sithWorld_pStatic = 0;
-    sithWorld_pLoading = 0;
+    sithWorld_g_pCurrentWorld = 0;
+    sithWorld_g_pStaticWorld = 0;
+    sithWorld_g_pLastLoadedWorld = 0;
     sithWorld_bInitted = 0;
 }
 
@@ -157,7 +157,7 @@ int sithWorld_Load(sithWorld *pWorld, char *map_jkl_fname)
         _strtolower(pWorld->map_jkl_fname);
         _strncpy(pWorld->episodeName, sithWorld_episodeName, 0x1Fu);
         pWorld->episodeName[0x1F] = 0;
-        sithWorld_pLoading = pWorld;
+        sithWorld_g_pLastLoadedWorld = pWorld;
         stdFnames_MakePath(v8, 128, "jkl", map_jkl_fname);
         sithWorld_some_integer_4 = 0;
         if ( !stdConffile_Open(v8) )
@@ -452,7 +452,7 @@ void sithWorld_FreeEntry(sithWorld *pWorld)
 
     // Added: Kinda hacky, but static never gets unloaded.
     memset(pWorld, 0, sizeof(*pWorld));
-    sithWorld_pCurrentWorld = 0;
+    sithWorld_g_pCurrentWorld = 0;
 
     // Added (Droidworks): JK and MoTS memleaked the world alloc
     SITH_FREE(pWorld);
@@ -658,11 +658,11 @@ uint32_t sithWorld_CalcWorldChecksum(sithWorld *pWorld, uint32_t seed)
     }
     
     // Hash static COG __VM bytecode__ (*not* text)
-    if (sithWorld_pStatic )
+    if (sithWorld_g_pStaticWorld )
     {
-        for (int i = 0; i < sithWorld_pStatic->numCogScriptsLoaded; i++)
+        for (int i = 0; i < sithWorld_g_pStaticWorld->numCogScriptsLoaded; i++)
         {
-            hash = util_Weirdchecksum((uint8_t *)sithWorld_pStatic->cogScripts[i].script_program, sithWorld_pStatic->cogScripts[i].codeSize, hash);
+            hash = util_Weirdchecksum((uint8_t *)sithWorld_g_pStaticWorld->cogScripts[i].script_program, sithWorld_g_pStaticWorld->cogScripts[i].codeSize, hash);
         }
     }
 
@@ -839,8 +839,8 @@ void sithWorld_Free()
 {
     if ( sithWorld_bLoaded )
     {
-        sithWorld_FreeEntry(sithWorld_pCurrentWorld);
-        sithWorld_pCurrentWorld = 0;
+        sithWorld_FreeEntry(sithWorld_g_pCurrentWorld);
+        sithWorld_g_pCurrentWorld = 0;
         sithWorld_bLoaded = 0;
     }
 }

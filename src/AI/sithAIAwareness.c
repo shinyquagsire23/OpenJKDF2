@@ -12,7 +12,7 @@
 
 int sithAIAwareness_Startup()
 {
-    sithAIAwareness_aSectors = (sithSectorAlloc *)SITH_ALLOC(sizeof(sithSectorAlloc) * sithWorld_pCurrentWorld->numSectors);
+    sithAIAwareness_aSectors = (sithSectorAlloc *)SITH_ALLOC(sizeof(sithSectorAlloc) * sithWorld_g_pCurrentWorld->numSectors);
     if (sithAIAwareness_aSectors)
     {
         sithAIAwareness_numEntries = 0;

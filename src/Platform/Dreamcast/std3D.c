@@ -644,8 +644,8 @@ static inline int std3D_IsPow2(uint32_t n) { return n && !(n & (n - 1)); }
 // colormap pointer changing (level load), like the TWL update_from_world_palette.
 static void std3D_UpdateWorldPaletteBanks()
 {
-    if (!sithWorld_pCurrentWorld || !sithWorld_pCurrentWorld->colormaps) return;
-    rdColormap* pCmp = sithWorld_pCurrentWorld->colormaps;
+    if (!sithWorld_g_pCurrentWorld || !sithWorld_g_pCurrentWorld->colormaps) return;
+    rdColormap* pCmp = sithWorld_g_pCurrentWorld->colormaps;
     if ((void*)pCmp == std3D_loadedColormap) return; // unchanged since last upload
     std3D_loadedColormap = (void*)pCmp;
 
@@ -694,7 +694,7 @@ int std3D_AddToTextureCache(stdVBuffer* vbuf, rdDDrawSurface* texture, int is_al
     // requires power-of-two dims; anything else falls through to 16-bit expansion.
     int usePaletted = !vbuf->format.format.is16bit
                    && std3D_IsPow2(width) && std3D_IsPow2(height)
-                   && sithWorld_pCurrentWorld && sithWorld_pCurrentWorld->colormaps;
+                   && sithWorld_g_pCurrentWorld && sithWorld_g_pCurrentWorld->colormaps;
 
     if (usePaletted)
     {
@@ -739,8 +739,8 @@ int std3D_AddToTextureCache(stdVBuffer* vbuf, rdDDrawSurface* texture, int is_al
                     uint8_t idx = src8[y * rowpx + x];
                     uint8_t r, g, b;
                     if (pal) { r = pal[idx*3+0]; g = pal[idx*3+1]; b = pal[idx*3+2]; }
-                    else if (sithWorld_pCurrentWorld && sithWorld_pCurrentWorld->colormaps)
-                    { rdColor24* c = &sithWorld_pCurrentWorld->colormaps->colors[idx]; r=c->r; g=c->g; b=c->b; }
+                    else if (sithWorld_g_pCurrentWorld && sithWorld_g_pCurrentWorld->colormaps)
+                    { rdColor24* c = &sithWorld_g_pCurrentWorld->colormaps->colors[idx]; r=c->r; g=c->g; b=c->b; }
                     else { rdColor24* c = &std3D_currentPalette[idx]; r=c->r; g=c->g; b=c->b; }
 
                     if (is_alpha_tex)

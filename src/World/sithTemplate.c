@@ -61,10 +61,10 @@ int sithTemplate_AllocWorldTemplates(sithWorld *world, unsigned int numTemplates
 
 sithThing* sithTemplate_GetTemplateByIndex(int idx)
 {
-    sithWorld* world = sithWorld_pCurrentWorld;
+    sithWorld* world = sithWorld_g_pCurrentWorld;
     if ( idx & 0x8000 )
     {
-        world = sithWorld_pStatic;
+        world = sithWorld_g_pStaticWorld;
         idx &= ~0x8000; // ?
     }
     
@@ -160,7 +160,7 @@ sithThing* sithTemplate_GetTemplate(const char *name)
     v6[0x3FF] = 0;
 
     stdConffile_ReadArgsFromStr(&v6);
-    result = sithTemplate_Parse(sithWorld_pLoading);
+    result = sithTemplate_Parse(sithWorld_g_pLastLoadedWorld);
     stdConffile_Close();
     return result;
 #endif

@@ -103,7 +103,7 @@ rdSprite* sithSprite_Load(char *fpath)
     rdSprite *sprite;
     char spriteFpath[128];
 
-    world = sithWorld_pLoading;
+    world = sithWorld_g_pLastLoadedWorld;
     result = (rdSprite *)stdHashtbl_Find(sithSprite_hashmap, fpath);
     if ( !result )
     {

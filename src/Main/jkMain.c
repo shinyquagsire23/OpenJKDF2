@@ -123,7 +123,7 @@ int jkMain_SetVideoMode()
     if ( jkGame_isDDraw )
         return 0;
     jkPlayer_Open();
-    if ( Video_SetVideoDesc(sithWorld_pCurrentWorld->colormaps->colors) )
+    if ( Video_SetVideoDesc(sithWorld_g_pCurrentWorld->colormaps->colors) )
         goto LABEL_12;
     if ( !sithNet_isMulti )
     {
@@ -137,7 +137,7 @@ int jkMain_SetVideoMode()
     }
     _memcpy(&Video_modeStruct, &Video_modeStruct2, sizeof(Video_modeStruct));
     jkGuiDisplay_sub_4149C0();
-    if ( Video_SetVideoDesc(sithWorld_pCurrentWorld->colormaps->colors) )
+    if ( Video_SetVideoDesc(sithWorld_g_pCurrentWorld->colormaps->colors) )
     {
 LABEL_12:
         Windows_InitGdi(stdDisplay_pCurDevice->video_device[0].windowedMaybe);
@@ -596,7 +596,7 @@ void jkMain_GameplayShow(int a1, int a2)
         }
 
         // MOTS added:
-        //sithWorld_GetMemoryUsage(sithWorld_pCurrentWorld,local_44,local_88);
+        //sithWorld_GetMemoryUsage(sithWorld_g_pCurrentWorld,local_44,local_88);
 
         if ( !sithNet_isMulti )
         {
