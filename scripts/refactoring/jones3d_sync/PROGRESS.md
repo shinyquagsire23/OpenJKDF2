@@ -35,8 +35,20 @@ lets fixes/insights flow between them.
      module/file names → the apply must not rewrite `.h`/`.c` refs in `#include`s
      (scratchpad `apply_types.py` has a `(?!\.[ch])` lookahead + covers `.cpp`).
      Skipped `stdFileSearch`→`FindFileData` (would shadow a local WIN32_FIND_DATA).
-   - **3b enum types + constants** — NOT STARTED.
-   - **3c struct members** — NOT STARTED (name-only, layout-preserving; largest blast radius).
+   - **3b enum CONSTANTS ✅** — 115 constant renames (`SITH_TF_LIGHT`→`SITH_TF_EMITLIGHT`,
+     `ITEMINFO_*`→`SITHINVENTORY_TYPE_*`, `SITH_PF_*`, `SITH_AF_*`, `COG_*`, `RD_GEOMODE_*`→
+     `RD_GEOMETRY_*`, …). DF2 constants already largely matched J3D. **Excluded as
+     semantically divergent** (would change behavior): `RD_LIGHTMODE_*` (FULLYLIT↔NONE
+     flip), `SITHCOLLISION_THING*` (bit values swapped between projects),
+     `SITH_MESSAGE_AUTOSELECT/SKILL` (different messages). Collision-checked, build green.
+   - Enum **TYPE naming** (bare `enum THINGTYPE` → `typedef enum eSithThingType {…}
+     SithThingType`) is FOLDED INTO 3c — a typedef is only useful once a field adopts
+     it, so create the typedef + retype the width-matching field together per struct.
+     Map is in scratchpad (27 enums: THINGTYPE→SithThingType, SITH_TF→SithThingFlag,
+     MOVETYPE→SithThingMoveType, SITH_CT→SithControlType, ATTACHFLAGS→SithAttachFlag, …).
+   - **3c struct members + enum-type field retyping** — NOT STARTED (name-only,
+     layout-preserving; largest blast radius). Member map from J3D struct defs
+     (`thingflags`→`flags`, `lifeLeftMs`→`msecLifeLeft`, `sector`→`pInSector`, …).
 4. **Style match (final)** — for each function, match OpenJones3D's *style* as
    closely as possible **without changing functionality**:
    - **argument names** → adopt J3D's parameter names.
