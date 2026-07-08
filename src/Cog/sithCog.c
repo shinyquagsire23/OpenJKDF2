@@ -249,7 +249,7 @@ int32_t sithCog_StartupEnhanced()
 
         sithCog_RegisterFunction(ctx, sithCogFunctionThing_SetThingPosEx, "setthingposex");
 
-        sithCog_RegisterFunction(ctx, sithCogFunctionThing_GetThingLvecPYR, "getthinglvecpyr");
+        sithCog_RegisterFunction(ctx, sithCogFunctionThing_GetThingLVecPYR, "getthinglvecpyr");
 
         sithCog_RegisterFunction(ctx, sithCogFunctionThing_GetCurInvWeapon, "getcurinvweapon2");
 
@@ -257,19 +257,19 @@ int32_t sithCog_StartupEnhanced()
 
         sithCog_RegisterFunction(ctx, sithCogFunctionThing_SetThingLookPYR, "setthinglookpyr");
 
-        sithCog_RegisterFunction(ctx,sithCogFunctionThing_GetThingGUID,"getthingguid");
-        sithCog_RegisterFunction(ctx,sithCogFunctionThing_GetGUIDThing,"getguidthing");
+        sithCog_RegisterFunction(ctx,sithCogFunctionThing_GetThingGuid,"getthingguid");
+        sithCog_RegisterFunction(ctx,sithCogFunctionThing_GetGuidThing,"getguidthing");
 
         sithCog_RegisterFunction(ctx, sithCogFunctionThing_GetThingMaxVelocity, "getthingmaxvelocity");
         sithCog_RegisterFunction(ctx, sithCogFunctionThing_SetThingMaxVelocity, "setthingmaxvelocity");
         sithCog_RegisterFunction(ctx, sithCogFunctionThing_GetThingMaxAngularVelocity, "getthingmaxangularvelocity");
         sithCog_RegisterFunction(ctx, sithCogFunctionThing_SetThingMaxAngularVelocity, "setthingmaxangularvelocity");
         sithCog_RegisterFunction(ctx, sithCogFunctionThing_GetActorHeadPYR, "getactorheadpyr");
-        sithCog_RegisterFunction(ctx, sithCogFunctionThing_SetActorHeadPYR, "setactorheadpyr");
-        sithCog_RegisterFunction(ctx, sithCogFunctionThing_SetThingJointAngle, "setthingjointangle");
-        sithCog_RegisterFunction(ctx, sithCogFunctionThing_GetThingJointAngle, "getthingjointangle");
-        sithCog_RegisterFunction(ctx, sithCogFunctionThing_SetThingMaxHeadPitch, "setthingmaxheadpitch");
-        sithCog_RegisterFunction(ctx, sithCogFunctionThing_SetThingMinHeadPitch, "setthingminheadpitch");
+        sithCog_RegisterFunction(ctx, sithCogFunctionThing_SetHeadPYR, "setactorheadpyr");
+        sithCog_RegisterFunction(ctx, sithCogFunctionThing_SetJointAngle, "setthingjointangle");
+        sithCog_RegisterFunction(ctx, sithCogFunctionThing_GetJointAngle, "getthingjointangle");
+        sithCog_RegisterFunction(ctx, sithCogFunctionThing_SetMaxHeadPitch, "setthingmaxheadpitch");
+        sithCog_RegisterFunction(ctx, sithCogFunctionThing_SetMinHeadPitch, "setthingminheadpitch");
         sithCog_RegisterFunction(ctx, sithCogFunctionThing_InterpolatePYR, "interpolatepyr");
         sithCog_RegisterFunction(ctx, sithCogFunctionThing_SetWeaponTarget, "setweapontarget");
 
