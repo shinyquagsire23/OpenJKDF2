@@ -1545,8 +1545,8 @@ void do_hooks()
     hook_function(wuRegistry_GetBool_ADDR, wuRegistry_GetBool);
     hook_function(wuRegistry_SaveBytes_ADDR, wuRegistry_SaveBytes);
     hook_function(wuRegistry_GetBytes_ADDR, wuRegistry_GetBytes);
-    hook_function(wuRegistry_SetString_ADDR, wuRegistry_SetString);
-    hook_function(wuRegistry_GetString_ADDR, wuRegistry_GetString);
+    hook_function(wuRegistry_SaveStr_ADDR, wuRegistry_SaveStr);
+    hook_function(wuRegistry_GetStr_ADDR, wuRegistry_GetStr);
     
 #ifndef LINUX
     // stdGdi

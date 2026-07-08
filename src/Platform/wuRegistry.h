@@ -14,8 +14,8 @@
 #define wuRegistry_GetBool_ADDR (0x0050F260)
 #define wuRegistry_SaveBytes_ADDR (0x0050F2E0)
 #define wuRegistry_GetBytes_ADDR (0x0050F340)
-#define wuRegistry_SetString_ADDR (0x0050F3B0)
-#define wuRegistry_GetString_ADDR (0x0050F410)
+#define wuRegistry_SaveStr_ADDR (0x0050F3B0)
+#define wuRegistry_GetStr_ADDR (0x0050F410)
 
 LSTATUS wuRegistry_Startup(HKEY hKey, LPCSTR lpSubKey, BYTE *lpData);
 void wuRegistry_Shutdown();
@@ -27,8 +27,8 @@ int wuRegistry_SaveBool(LPCSTR lpValueName, int bDefault);
 int wuRegistry_GetBool(LPCSTR lpValueName, int a2);
 int wuRegistry_SaveBytes(LPCSTR lpValueName, BYTE *lpData, DWORD cbData);
 int wuRegistry_GetBytes(LPCSTR lpValueName, BYTE *lpDefaultData, DWORD defaultDataSize);
-int wuRegistry_SetString(LPCSTR lpValueName, const char *lpData);
-int wuRegistry_GetString(LPCSTR lpValueName, char* lpData, int outSize, const char *outDefault);
+int wuRegistry_SaveStr(LPCSTR lpValueName, const char *lpData);
+int wuRegistry_GetStr(LPCSTR lpValueName, char* lpData, int outSize, const char *outDefault);
 
 int wuRegistry_SetWString(LPCSTR lpValueName, const wchar_t *lpData);
 int wuRegistry_GetWString(LPCSTR lpValueName, wchar_t* lpData, int outSize, const wchar_t *outDefault);
@@ -38,8 +38,8 @@ int wuRegistry_GetWString(LPCSTR lpValueName, wchar_t* lpData, int outSize, cons
 //static int (*wuRegistry_SaveBool)(LPCSTR lpValueName, HKEY phkResult) = (void*)wuRegistry_SaveBool_ADDR;
 //static flex_t (*wuRegistry_GetFloat)(LPCSTR lpValueName, flex_t v5) = (void*)wuRegistry_GetFloat_ADDR;
 //static int (*wuRegistry_GetInt)(LPCSTR lpValueName, int a2) = (void*)wuRegistry_GetInt_ADDR;
-//static LSTATUS (*wuRegistry_SetString)(LPCSTR lpValueName, BYTE *lpData) = (void*)wuRegistry_SetString_ADDR;
-//static int (*wuRegistry_GetString)(LPCSTR lpValueName, LPBYTE lpData, int outSize, char *out) = (void*)wuRegistry_GetString_ADDR;
+//static LSTATUS (*wuRegistry_SaveStr)(LPCSTR lpValueName, BYTE *lpData) = (void*)wuRegistry_SaveStr_ADDR;
+//static int (*wuRegistry_GetStr)(LPCSTR lpValueName, LPBYTE lpData, int outSize, char *out) = (void*)wuRegistry_GetStr_ADDR;
 
 //static void (*wuRegistry_Shutdown)() = (void*)wuRegistry_Shutdown_ADDR;
 

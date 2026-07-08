@@ -3113,8 +3113,8 @@ wuRegistry_SaveBool	.text	0050F200	0000005D	00000004	00000008	R	.	.	.	.	.	T	.
 wuRegistry_GetBool	.text	0050F260	0000007A	0000000C	00000008	R	.	.	.	.	.	T	.
 wuRegistry_SaveBytes	.text	0050F2E0	00000059	00000004	0000000C	R	.	.	.	.	.	T	.
 wuRegistry_GetBytes	.text	0050F340	0000006B	00000004	0000000C	R	.	.	.	.	.	T	.
-wuRegistry_SetString	.text	0050F3B0	00000055	00000004	00000008	R	.	.	.	.	.	T	.
-wuRegistry_GetString	.text	0050F410	0000009A	00000014	00000010	R	.	.	.	.	.	T	.
+wuRegistry_SaveStr	.text	0050F3B0	00000055	00000004	00000008	R	.	.	.	.	.	T	.
+wuRegistry_GetStr	.text	0050F410	0000009A	00000014	00000010	R	.	.	.	.	.	T	.
 jkGuiRend_CopyVBuffer	.text	0050F4B0	0000003C	00000000	00000008	R	.	.	.	.	.	T	.
 jkGuiRend_SetPalette	.text	0050F4F0	00000015	00000008	00000004	R	.	.	.	.	.	T	.
 jkGuiRend_DrawRect	.text	0050F510	000001E6	00000018	0000000A	R	.	.	.	.	.	T	.

@@ -46,7 +46,7 @@ void Windows_Startup()
     WinIdk_detect_cpu(Windows_cpu_info);
 
 #if !defined(SDL2_RENDER) && defined(WIN32)
-    wuRegistry_GetString("CD Path", cdPath, 128, Windows_cdpath_default); // ????
+    wuRegistry_GetStr("CD Path", cdPath, 128, Windows_cdpath_default); // ????
 #else
     memset(cdPath, 0, sizeof(cdPath));
 #endif

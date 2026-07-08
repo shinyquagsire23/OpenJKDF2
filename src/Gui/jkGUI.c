@@ -259,7 +259,7 @@ int jkGui_Startup()
 
     stdString_WcharToChar(playerShortName, jkPlayer_playerShortName, 31);
     playerShortName[31] = 0;
-    wuRegistry_GetString("playerShortName", playerShortName, 32, playerShortName);
+    wuRegistry_GetStr("playerShortName", playerShortName, 32, playerShortName);
     stdString_CharToWchar(jkPlayer_playerShortName, playerShortName, 31);
     jkPlayer_playerShortName[31] = 0;
 
@@ -392,7 +392,7 @@ void jkGui_Shutdown()
 
     stdString_WcharToChar(playerShortName, jkPlayer_playerShortName, 31);
     playerShortName[31] = 0;
-    wuRegistry_SetString("playerShortName", playerShortName);
+    wuRegistry_SaveStr("playerShortName", playerShortName);
 
 #ifndef SDL2_RENDER
     stdDisplay_422A50();

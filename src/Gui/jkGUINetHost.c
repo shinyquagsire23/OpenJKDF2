@@ -431,8 +431,8 @@ int jkGuiNetHost_Show(jkMultiEntry3 *pMultiEntry)
 #ifdef QOL_IMPROVEMENTS
             jkGuiNetHost_portNum = wstr_to_int_clamped(jkGuiNetHost_portText, 1, 65535);
             wuRegistry_SetWString("serverPassword", pMultiEntry->wPassword);
-            wuRegistry_SetString("serverEpisodeGob", pMultiEntry->episodeGobName);
-            wuRegistry_SetString("serverMapJkl", pMultiEntry->mapJklFname);
+            wuRegistry_SaveStr("serverEpisodeGob", pMultiEntry->episodeGobName);
+            wuRegistry_SaveStr("serverMapJkl", pMultiEntry->mapJklFname);
 
             // Added: Only add Co-op flags on singleplayer levels
             if (jkGuiSingleplayer_FUN_0041d590(pMultiEntry->episodeGobName) & JK_EPISODE_SINGLEPLAYER) {

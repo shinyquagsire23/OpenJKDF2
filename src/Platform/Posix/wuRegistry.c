@@ -56,12 +56,12 @@ int wuRegistry_GetBytes(LPCSTR lpValueName, BYTE *lpData, DWORD cbData)
     return stdJSON_GetBytes(REGISTRY_FNAME, lpValueName, lpData, cbData);
 }
 
-int wuRegistry_SetString(LPCSTR lpValueName, const char *lpData)
+int wuRegistry_SaveStr(LPCSTR lpValueName, const char *lpData)
 {
     return stdJSON_SetString(REGISTRY_FNAME, lpValueName, lpData);
 }
 
-int wuRegistry_GetString(LPCSTR lpValueName, char* lpData, int outSize, const char *outDefault)
+int wuRegistry_GetStr(LPCSTR lpValueName, char* lpData, int outSize, const char *outDefault)
 {
     return stdJSON_GetString(REGISTRY_FNAME, lpValueName, lpData, outSize, outDefault);
 }

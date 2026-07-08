@@ -176,7 +176,7 @@ int wuRegistry_GetBytes(LPCSTR lpValueName, BYTE *lpDefaultData, DWORD defaultDa
     return 0;
 }
 
-int wuRegistry_SetString(LPCSTR lpValueName, const char *lpData)
+int wuRegistry_SaveStr(LPCSTR lpValueName, const char *lpData)
 {
     HKEY phkResult; // [esp+0h] [ebp-4h] BYREF
 
@@ -185,7 +185,7 @@ int wuRegistry_SetString(LPCSTR lpValueName, const char *lpData)
     return RegCloseKey(phkResult);
 }
 
-int wuRegistry_GetString(LPCSTR lpValueName, char* lpData, int outSize, const char *outDefault)
+int wuRegistry_GetStr(LPCSTR lpValueName, char* lpData, int outSize, const char *outDefault)
 {
     int result; // eax
     HKEY phkResult; // [esp+8h] [ebp-Ch] BYREF
