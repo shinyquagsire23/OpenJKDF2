@@ -1659,7 +1659,7 @@ int jkMain_SetVideoMode()
     }*/
     
     sithControl_Open();
-    sithRender_SetRenderWeaponHandle(jkPlayer_renderSaberWeaponMesh);
+    sithRender_SetExtraThingRenderFunc(jkPlayer_renderSaberWeaponMesh);
 
     uint32_t newW = Window_xSize;
     uint32_t newH = Window_ySize;
@@ -1734,16 +1734,16 @@ int jkMain_SetVideoMode()
 #endif
 #ifdef JKM_LIGHTING
     if (Main_bMotsCompat) {
-        sithRender_SetSomeRenderflag(0xaa);
+        sithRender_SetRenderFlags(0xaa);
     }
     else {
-        sithRender_SetSomeRenderflag(0x2a);
+        sithRender_SetRenderFlags(0x2a);
     }
 #else
-    sithRender_SetSomeRenderflag(0x2a);
+    sithRender_SetRenderFlags(0x2a);
 #endif
     sithRender_SetGeoMode(Video_modeStruct.geoMode);
-    sithRender_SetLightMode(Video_modeStruct.lightMode);
+    sithRender_SetLightingMode(Video_modeStruct.lightMode);
     sithRender_SetTexMode(Video_modeStruct.texMode);
     sithCamera_Open(Video_pCanvas, stdDisplay_pCurVideoMode->widthMaybe);
 

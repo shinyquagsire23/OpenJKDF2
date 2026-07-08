@@ -69,7 +69,7 @@ static void std3D_DrawRenderListReal(void); // eager per-batch emitter
 // pass at EndScene.
 //
 // This stays small because the engine already renders alpha *surfaces* in their own
-// pass (sithRender_RenderAlphaSurfaces); only the transparent *things* (sprites,
+// pass (sithRender_RenderAlphaAdjoins); only the transparent *things* (sprites,
 // blaster impacts, effects) interleaved into RenderThings actually need buffering.
 // Overflow silently drops tris -- bump this if heavy particle scenes flicker.
 // #2 test: set to 1 to bypass the whole TR/defer path -- translucent tris go

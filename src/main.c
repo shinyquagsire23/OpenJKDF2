@@ -2474,24 +2474,24 @@ void do_hooks()
     hook_function(sithRender_Open_ADDR, sithRender_Open);
     hook_function(sithRender_Close_ADDR, sithRender_Close);
     hook_function(sithRender_Shutdown_ADDR, sithRender_Shutdown);
-    hook_function(sithRender_SetSomeRenderflag_ADDR, sithRender_SetSomeRenderflag);
-    hook_function(sithRender_GetSomeRenderFlag_ADDR, sithRender_GetSomeRenderFlag);
+    hook_function(sithRender_SetRenderFlags_ADDR, sithRender_SetRenderFlags);
+    hook_function(sithRender_GetRenderFlags_ADDR, sithRender_GetRenderFlags);
     hook_function(sithRender_EnableIRMode_ADDR, sithRender_EnableIRMode);
     hook_function(sithRender_DisableIRMode_ADDR, sithRender_DisableIRMode);
     hook_function(sithRender_SetGeoMode_ADDR, sithRender_SetGeoMode);
-    hook_function(sithRender_SetLightMode_ADDR, sithRender_SetLightMode);
+    hook_function(sithRender_SetLightingMode_ADDR, sithRender_SetLightingMode);
     hook_function(sithRender_SetTexMode_ADDR, sithRender_SetTexMode);
     hook_function(sithRender_SetPalette_ADDR, sithRender_SetPalette);
     hook_function(sithRender_Draw_ADDR, sithRender_Draw);
-    //hook_function(sithRender_Clip_ADDR, sithRender_Clip);
-    hook_function(sithRender_RenderLevelGeometry_ADDR, sithRender_RenderLevelGeometry);
-    hook_function(sithRender_UpdateAllLights_ADDR, sithRender_UpdateAllLights);
-    hook_function(sithRender_UpdateLights_ADDR, sithRender_UpdateLights);
-    hook_function(sithRender_RenderDynamicLights_ADDR, sithRender_RenderDynamicLights);
+    //hook_function(sithRender_BuildVisibleSectorList_ADDR, sithRender_BuildVisibleSectorList);
+    hook_function(sithRender_RenderSectors_ADDR, sithRender_RenderSectors);
+    hook_function(sithRender_BuildVisibleSectorsThingList_ADDR, sithRender_BuildVisibleSectorsThingList);
+    hook_function(sithRender_BuildSectorThingList_ADDR, sithRender_BuildSectorThingList);
+    hook_function(sithRender_BuildDynamicLights_ADDR, sithRender_BuildDynamicLights);
     hook_function(sithRender_RenderThings_ADDR, sithRender_RenderThings);
     hook_function(sithRender_RenderThing_ADDR, sithRender_RenderThing);
-    hook_function(sithRender_RenderAlphaSurfaces_ADDR, sithRender_RenderAlphaSurfaces);
-    hook_function(sithRender_SetRenderWeaponHandle_ADDR, sithRender_SetRenderWeaponHandle);
+    hook_function(sithRender_RenderAlphaAdjoins_ADDR, sithRender_RenderAlphaAdjoins);
+    hook_function(sithRender_SetExtraThingRenderFunc_ADDR, sithRender_SetExtraThingRenderFunc);
     
     // sithSave
     hook_function(sithGamesave_Setidk_ADDR, sithGamesave_Setidk);

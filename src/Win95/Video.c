@@ -176,9 +176,9 @@ int Video_camera_related()
         viewRect.height = v11;
         std3D_InitializeViewport(&viewRect);
     }
-    sithRender_SetSomeRenderflag(a1a);
+    sithRender_SetRenderFlags(a1a);
     sithRender_SetGeoMode(Video_modeStruct.geoMode);
-    sithRender_SetLightMode(Video_modeStruct.lightMode);
+    sithRender_SetLightingMode(Video_modeStruct.lightMode);
     sithRender_SetTexMode(Video_modeStruct.texMode);
     sithCamera_Open(Video_pCanvas, stdDisplay_pCurVideoMode->widthMaybe);
     return 1;
@@ -264,7 +264,7 @@ LABEL_9:
         rdSetRenderOptions(v5);
         Video_pVbufIdk = &Video_bufIdk;
 LABEL_25:
-        sithRender_SetRenderWeaponHandle(jkPlayer_renderSaberWeaponMesh);
+        sithRender_SetExtraThingRenderFunc(jkPlayer_renderSaberWeaponMesh);
         Video_camera_related();
         stdPalEffects_RefreshPalette();
         v7 = (char*)stdDisplay_GetPalette();

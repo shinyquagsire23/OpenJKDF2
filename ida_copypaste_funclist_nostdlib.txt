@@ -1792,24 +1792,24 @@ sithRender_Startup	.text	004C6180	00000039			R	.	.	.	.	.	.	.
 sithRender_Open	.text	004C61C0	00000090	00000004	00000000	R	.	.	.	.	.	.	.
 sithRender_Close	.text	004C6250	00000005			R	.	.	.	.	.	T	.
 sithRender_Shutdown	.text	004C6260	00000001			R	.	.	.	.	.	.	.
-sithRender_SetSomeRenderflag	.text	004C6270	0000000A	00000000	00000004	R	.	.	.	.	.	T	.
-sithRender_GetSomeRenderFlag	.text	004C6280	00000006	00000000	00000000	R	.	.	.	.	.	.	.
+sithRender_SetRenderFlags	.text	004C6270	0000000A	00000000	00000004	R	.	.	.	.	.	T	.
+sithRender_GetRenderFlags	.text	004C6280	00000006	00000000	00000000	R	.	.	.	.	.	.	.
 sithRender_EnableIRMode	.text	004C6290	00000090	00000000	00000008	R	.	.	.	.	.	T	.
 sithRender_DisableIRMode	.text	004C6320	0000000B	00000000	00000000	R	.	.	.	.	.	.	.
 sithRender_SetGeoMode	.text	004C6330	0000000A	00000000	00000004	R	.	.	.	.	.	T	.
-sithRender_SetLightMode	.text	004C6340	0000000A	00000000	00000004	R	.	.	.	.	.	T	.
+sithRender_SetLightingMode	.text	004C6340	0000000A	00000000	00000004	R	.	.	.	.	.	T	.
 sithRender_SetTexMode	.text	004C6350	0000000A	00000000	00000004	R	.	.	.	.	.	T	.
 sithRender_SetPalette	.text	004C6360	00000046	00000000	00000004	R	.	.	.	.	.	T	.
 sithRender_Draw	.text	004C63B0	00000292	00000028	00000000	R	.	.	.	.	.	.	.
-sithRender_Clip	.text	004C6650	000005E6	00000084	0000000C	R	.	.	.	.	B	T	.
-sithRender_RenderLevelGeometry	.text	004C6C40	00000A61	00000064	00000000	R	.	.	.	.	.	T	.
-sithRender_UpdateAllLights	.text	004C76B0	00000069	00000004	00000000	R	.	.	.	.	.	T	.
-sithRender_UpdateLights	.text	004C7720	0000027D	00000018	0000000C	R	.	.	.	.	.	T	.
-sithRender_RenderDynamicLights	.text	004C79A0	0000023F	00000144	00000000	R	.	.	.	.	.	T	.
+sithRender_BuildVisibleSectorList	.text	004C6650	000005E6	00000084	0000000C	R	.	.	.	.	B	T	.
+sithRender_RenderSectors	.text	004C6C40	00000A61	00000064	00000000	R	.	.	.	.	.	T	.
+sithRender_BuildVisibleSectorsThingList	.text	004C76B0	00000069	00000004	00000000	R	.	.	.	.	.	T	.
+sithRender_BuildSectorThingList	.text	004C7720	0000027D	00000018	0000000C	R	.	.	.	.	.	T	.
+sithRender_BuildDynamicLights	.text	004C79A0	0000023F	00000144	00000000	R	.	.	.	.	.	T	.
 sithRender_RenderThings	.text	004C7BE0	00000471	0000001C	00000000	R	.	.	.	.	.	.	.
 sithRender_RenderThing	.text	004C8070	000001AC	0000001C	00000004	R	.	.	.	.	.	T	.
-sithRender_RenderAlphaSurfaces	.text	004C8220	000003D6	00000014	00000000	R	.	.	.	.	.	.	.
-sithRender_SetRenderWeaponHandle	.text	004C8600	0000000F	00000000	00000004	R	.	.	.	.	.	T	.
+sithRender_RenderAlphaAdjoins	.text	004C8220	000003D6	00000014	00000000	R	.	.	.	.	.	.	.
+sithRender_SetExtraThingRenderFunc	.text	004C8600	0000000F	00000000	00000004	R	.	.	.	.	.	T	.
 sithPlayer_Open	.text	004C8610	00000001	00000000	00000000	R	.	.	.	.	.	.	.
 sithPlayer_Close	.text	004C8620	00000042			R	.	.	.	.	.	.	.
 sithPlayer_PlacePlayers	.text	004C8670	000000D6	00000010	00000004	R	.	.	.	.	.	T	.
