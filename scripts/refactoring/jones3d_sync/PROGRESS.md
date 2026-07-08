@@ -405,3 +405,14 @@ as-is (DF2 soft-reset convention), not renamed to J3D's `_Reset`/`_ResetGlobals`
 ## Unmatched — OpenJKDF2 modules with no direct OpenJones3D file (113)
 
 `Darray`, `DirectX`, `InstallHelper`, `Main`, `Video`, `WinIdk`, `Window`, `Window_Dreamcast`, `Window_Twl`, `Windows`, `crc32`, `dcDebug`, `dcFault`, `dcRamFat`, `dcStorage`, `dcVmu`, `dlmalloc`, `hook`, `jk`, `jkAI`, `jkCog`, `jkControl`, `jkCredits`, `jkCutscene`, `jkDSS`, `jkDev`, `jkEpisode`, `jkGUI`, `jkGUIBuildMulti`, `jkGUIControlOptions`, `jkGUIControlSaveLoad`, `jkGUIDecision`, `jkGUIDialog`, `jkGUIDisplay`, `jkGUIEsc`, `jkGUIForce`, `jkGUIGameplay`, `jkGUIGeneral`, `jkGUIJoystick`, `jkGUIKeyboard`, `jkGUIMain`, `jkGUIMap`, `jkGUIMods`, `jkGUIMouse`, `jkGUIMultiTally`, `jkGUIMultiplayer`, `jkGUINetHost`, `jkGUIObjectives`, `jkGUIPlayer`, `jkGUIRend`, `jkGUISaveLoad`, `jkGUISetup`, `jkGUISingleTally`, `jkGUISingleplayer`, `jkGUISound`, `jkGUITitle`, `jkGame`, `jkGob`, `jkHud`, `jkHudCameraView`, `jkHudInv`, `jkHudScope`, `jkMain`, `jkPlayer`, `jkQuakeConsole`, `jkRes`, `jkSaber`, `jkSmack`, `jkStrings`, `jkgm`, `lex.yy`, `main`, `main_globals`, `md5`, `rdActive`, `rdColormap`, `rdDebug`, `rdRaster`, `rle_test`, `shader_utils`, `sithAICmd`, `sithAnimClass`, `sithArchLighting`, `sithCvar`, `sithKeyFrame`, `sithMap`, `sithStrTable`, `sithTrackThing`, `stdBitmap`, `stdBitmapRle`, `stdComm_GNS`, `stdComm_basic`, `stdComm_none`, `stdDisplay_Dreamcast`, `stdDisplay_Twl`, `stdEmbeddedRes`, `stdFont`, `stdGdi`, `stdHttp`, `stdJSON`, `stdLbm`, `stdMci`, `stdPalEffects`, `stdPcx`, `stdSingleLinklist`, `stdSound`, `stdString`, `stdUpdater`, `unusedWontImpl`, `util`, `version`, `wprintf`, `y.tab`
+
+### ⚠ Regression fixed (level loading) — string-literal corruption
+Token member renames rewrote identifiers **inside C string literals**, corrupting
+the JKL parser (section-name registrations, sscanf keywords like `" world vertices %d"`,
+the thing-param keyword table where `"thingflags"/"physflags"/"typeflags"` all became
+`"flags"`, and asset paths). Build stayed green but `georesource` parsing failed →
+levels wouldn't load. Fixed with scratchpad `restore_strings.py 0db6a8d5` (restores every
+string literal to its exact pre-rename content from git; 1:1 by order). `apply_types.py`
+is now string-safe (skips `"…"`/`'…'` and `#` lines). **Always runtime-verify** renames:
+`build_darwin64/openjkdf2-64 -dedicatedServer -episode JK1 -map 01narshadda.jkl` parses
+the world headless — watch for `FAILED`/`Parse problem`. Compile-green ≠ correct.
