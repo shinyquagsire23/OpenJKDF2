@@ -14,7 +14,7 @@ void rdMath_CalcSurfaceNormal(rdVector3 *out, rdVector3 *edge1, rdVector3 *edge2
     rdVector_Cross3(out, &b, &a);
     rdVector_Normalize3Acc(out);
 
-    rdMath_ClampVector(out, 0.000001);
+    rdMath_ClipVector3Acc(out, 0.000001);
 }
 
 flex_t rdMath_DistancePointToPlane(const rdVector3 *light, const rdVector3 *normal, const rdVector3 *vertex)
@@ -49,7 +49,7 @@ flex_t rdMath_DeltaAngleNormalized(rdVector3 *a1, rdVector3 *a2, rdVector3 *a3)
         return v7;
 }
 
-void rdMath_ClampVector(rdVector3* out, flex_t minVal)
+void rdMath_ClipVector3Acc(rdVector3* out, flex_t minVal)
 {
     if ( (out->x < 0.0 ? -out->x : out->x) >= minVal )
         out->x = out->x;
@@ -84,7 +84,7 @@ int rdMath_PointsCollinear(rdVector3 *a1, rdVector3 *a2, rdVector3 *a3)
 }
 
 // added
-void rdMath_ClampVectorRange(rdVector3* out, flex_t minVal, flex_t maxVal)
+void rdMath_ClampVector3Acc(rdVector3* out, flex_t minVal, flex_t maxVal)
 {
     out->x = rdMath_clampf(out->x, minVal, maxVal);
     out->y = rdMath_clampf(out->y, minVal, maxVal);

@@ -280,7 +280,7 @@ void sithPhysics_ApplyDrag(rdVector3 *vec, flex_t drag, flex_t mag, flex_t delta
 
             rdVector_MultAcc3(vec, vec, -scaled);
             
-            rdMath_ClampVector(vec, 0.00001);
+            rdMath_ClipVector3Acc(vec, 0.00001);
         }
     }
     else
@@ -427,8 +427,8 @@ void sithPhysics_UpdateThingPhysics(sithThing *pThing, flex_t deltaSeconds)
 
         rdVector_MultAcc3(&pThing->physicsParams.angVel, &pThing->physicsParams.field_1F8, deltaSeconds);
         
-        rdMath_ClampVectorRange(&pThing->physicsParams.angVel, -pThing->physicsParams.maxRotVel, pThing->physicsParams.maxRotVel);
-        rdMath_ClampVector(&pThing->physicsParams.angVel, 0.00001);
+        rdMath_ClampVector3Acc(&pThing->physicsParams.angVel, -pThing->physicsParams.maxRotVel, pThing->physicsParams.maxRotVel);
+        rdMath_ClipVector3Acc(&pThing->physicsParams.angVel, 0.00001);
     }
 
     if (rdVector_IsZero3(&pThing->physicsParams.angVel))
@@ -537,7 +537,7 @@ void sithPhysics_UpdateThingPhysics(sithThing *pThing, flex_t deltaSeconds)
         pThing->physicsParams.vel.z = zOverride;
     }
 #endif
-    rdMath_ClampVector(&pThing->physicsParams.vel, 0.00001);
+    rdMath_ClipVector3Acc(&pThing->physicsParams.vel, 0.00001);
 
     if (!rdVector_IsZero3(&pThing->physicsParams.vel))
     {
@@ -564,8 +564,8 @@ void sithPhysics_UpdatePlayerPhysics(sithThing *player, flex_t deltaSeconds)
 
         rdVector_MultAcc3(&player->physicsParams.angVel, &player->physicsParams.field_1F8, deltaSeconds);
 
-        rdMath_ClampVectorRange(&player->physicsParams.angVel, -player->physicsParams.maxRotVel, player->physicsParams.maxRotVel);
-        rdMath_ClampVector(&player->physicsParams.angVel, 0.00001);
+        rdMath_ClampVector3Acc(&player->physicsParams.angVel, -player->physicsParams.maxRotVel, player->physicsParams.maxRotVel);
+        rdMath_ClipVector3Acc(&player->physicsParams.angVel, 0.00001);
     }
 
     if (rdVector_IsZero3(&player->physicsParams.angVel))

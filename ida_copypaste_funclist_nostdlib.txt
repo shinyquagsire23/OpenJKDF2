@@ -1524,7 +1524,7 @@ rdMath_CalcSurfaceNormal	.text	0046D250	00000170	0000001C	00000010	R	.	.	.	.	.	T
 rdMath_DistancePointToPlane	.text	0046D3C0	00000035	00000000	0000000C	R	.	.	.	.	.	T	.
 rdMath_DeltaAngleNormalizedAbs	.text	0046D400	00000050	00000000	00000008	R	.	.	.	.	.	T	.
 rdMath_DeltaAngleNormalized	.text	0046D450	00000112	00000008	0000000C	R	.	.	.	.	.	T	.
-rdMath_ClampVector	.text	0046D570	0000008D	00000000	00000008	R	.	.	.	.	.	T	.
+rdMath_ClipVector3Acc	.text	0046D570	0000008D	00000000	00000008	R	.	.	.	.	.	T	.
 rdMath_PointsCollinear	.text	0046D600	000000E9	00000018	0000000C	R	.	.	.	.	.	T	.
 rdClip_Line2	.text	0046D6F0	0000031B	00000030	00000014	R	.	.	.	.	.	T	.
 rdClip_CalcOutcode2	.text	0046DA10	0000003B	00000004	0000000C	R	.	.	.	.	.	T	.

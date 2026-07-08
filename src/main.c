@@ -1694,7 +1694,7 @@ void do_hooks()
     hook_function(rdMath_DistancePointToPlane_ADDR, rdMath_DistancePointToPlane);
     hook_function(rdMath_DeltaAngleNormalizedAbs_ADDR, rdMath_DeltaAngleNormalizedAbs);
     hook_function(rdMath_DeltaAngleNormalized_ADDR, rdMath_DeltaAngleNormalized);
-    hook_function(rdMath_ClampVector_ADDR, rdMath_ClampVector);
+    hook_function(rdMath_ClipVector3Acc_ADDR, rdMath_ClipVector3Acc);
     hook_function(rdMath_PointsCollinear_ADDR, rdMath_PointsCollinear);
     
     // rdPrimit2
