@@ -98,9 +98,9 @@ rdroid_aMipDistances 0x00548250 rdVector4 = {10.0, 20.0, 40.0, 80.0}
 rdroid_frameTrue 0x00570390 int
 bRDroidStartup 0x00570394 int
 bRDroidOpen 0x00570398 int
-rdroid_curLightingMode 0x00889EA0 int
-rdroid_pHS 0x00889EA4 struct HostServices*
-rdroid_curGeometryMode 0x00889EA8 int
+rdroid_g_curLightingMode 0x00889EA0 int
+rdroid_g_pHS 0x00889EA4 struct HostServices*
+rdroid_g_curGeometryMode 0x00889EA8 int
 rdroid_curColorEffects 0x00889EC0 stdPalEffect
 rdroid_curOcclusionMethod 0x00889EE8 int
 rdroid_curZBufferMethod 0x00889EEC rdZBufferMethod_t
@@ -108,7 +108,7 @@ rdroid_curProcFaceUserData 0x00889EF0 int
 rdroid_curSortingMethod 0x00889EF4 int
 rdroid_curAcceleration 0x00889EF8 int
 rdroid_curTextureMode 0x00889EFC int
-rdroid_curRenderOptions 0x00889F00 int
+rdroid_g_curRenderOptions 0x00889F00 int
 rdroid_curCullFlags 0x00889F04 int
 
 sithMaterial_hashmap 0x00852F84 stdHashTable*

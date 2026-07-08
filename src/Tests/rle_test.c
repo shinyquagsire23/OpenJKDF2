@@ -235,7 +235,7 @@ int main(int argc, char** argv)
     hs.errorPrint = stdConsolePrintf;
     pHS = &hs;
     std_pHS = &hs;
-    rdroid_pHS = &hs;
+    rdroid_g_pHS = &hs;
 
     stdStartup(&hs); // Added
     //InstallHelper_SetCwd(); // Added

@@ -344,7 +344,7 @@ int rdCache_SendFaceListToHardware()
         mipmap_level = a3;
 
         flags_idk_ = flags_idk;
-        if ( (rdroid_curRenderOptions & 2) != 0 )
+        if ( (rdroid_g_curRenderOptions & 2) != 0 )
             v148 = active_6c->ambientLight;
         else
             v148 = 0.0;
@@ -364,17 +364,17 @@ int rdCache_SendFaceListToHardware()
             rdCache_ResetRenderList();
         }
 
-        v11.mipmap_related = rdroid_curGeometryMode;
+        v11.mipmap_related = rdroid_g_curGeometryMode;
         tri_vert_idx = rdCache_totalVerts;
 
-        if ( active_6c->geometryMode < rdroid_curGeometryMode )
+        if ( active_6c->geometryMode < rdroid_g_curGeometryMode )
             v11.mipmap_related = active_6c->geometryMode;
 
         mipmap_related = v11.mipmap_related;
         lighting_capability = active_6c->lightingMode;
 
-        if ( lighting_capability >= rdroid_curLightingMode )
-            lighting_capability = rdroid_curLightingMode;
+        if ( lighting_capability >= rdroid_g_curLightingMode )
+            lighting_capability = rdroid_g_curLightingMode;
 
         if ( (active_6c->type & RD_FF_TEX_TRANSLUCENT) != 0 )
         {

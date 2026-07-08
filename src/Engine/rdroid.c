@@ -16,7 +16,7 @@ int rdStartup(HostServices *p_hs)
     if (bRDroidStartup)
         return 1;
 
-    rdroid_pHS = p_hs;
+    rdroid_g_pHS = p_hs;
     rdCache_Startup();
     rdActive_Startup();
     rdRaster_Startup();
@@ -38,9 +38,9 @@ int rdOpen(int a1)
     if (bRDroidOpen)
         return 1;
 
-    rdroid_curGeometryMode = 5;
-    rdroid_curLightingMode = 5;
-    rdroid_curRenderOptions = 1;
+    rdroid_g_curGeometryMode = 5;
+    rdroid_g_curLightingMode = 5;
+    rdroid_g_curRenderOptions = 1;
     rdroid_curTextureMode = 3;
     rdroid_curSortingMethod = 0;
     rdroid_curOcclusionMethod = 0;
@@ -70,17 +70,17 @@ void rdClose()
 
 void rdSetRenderOptions(int a1)
 {
-    rdroid_curRenderOptions = a1;
+    rdroid_g_curRenderOptions = a1;
 }
 
 void rdSetGeometryMode(int a1)
 {
-    rdroid_curGeometryMode = a1;
+    rdroid_g_curGeometryMode = a1;
 }
 
 void rdSetLightingMode(int a1)
 {
-    rdroid_curLightingMode = a1;
+    rdroid_g_curLightingMode = a1;
 }
 
 void rdSetTextureMode(int a1)
@@ -121,17 +121,17 @@ void rdSetVertexColorMode(int a1)
 
 int rdGetRenterOptions(void)
 {
-    return rdroid_curRenderOptions;
+    return rdroid_g_curRenderOptions;
 }
 
 int rdGetGeometryMode(void)
 {
-    return rdroid_curGeometryMode;
+    return rdroid_g_curGeometryMode;
 }
 
 int rdGetLightingMode(void)
 {
-    return rdroid_curLightingMode;
+    return rdroid_g_curLightingMode;
 }
 
 int rdGetTextureMode(void)

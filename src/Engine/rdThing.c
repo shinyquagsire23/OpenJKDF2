@@ -91,9 +91,9 @@ int rdThing_SetModel3(rdThing *thing, rdModel3 *model)
     if (!thing->hierarchyNodeMatrices)
         return 0;
 
-    { TWL_EXTRAM_SUGGEST(rdroid_pHS); // Added: word writes only
+    { TWL_EXTRAM_SUGGEST(rdroid_g_pHS); // Added: word writes only
     thing->hierarchyNodes2 = (rdVector3*)RDROID_ALLOC(sizeof(rdVector3) * model->numHierarchyNodes);
-    TWL_EXTRAM_RESTORE(rdroid_pHS); }
+    TWL_EXTRAM_RESTORE(rdroid_g_pHS); }
     // memset used to be here??
 
     // thing->hierarchyNodeMatrices check used to be here??
@@ -103,9 +103,9 @@ int rdThing_SetModel3(rdThing *thing, rdModel3 *model)
     
     stdPlatform_Memzero32(thing->hierarchyNodes2, sizeof(rdVector3) * model->numHierarchyNodes); // Added: word-safe
 
-    { TWL_EXTRAM_SUGGEST(rdroid_pHS); // Added
+    { TWL_EXTRAM_SUGGEST(rdroid_g_pHS); // Added
     thing->amputatedJoints = (int *)RDROID_ALLOC(sizeof(int) * model->numHierarchyNodes);
-    TWL_EXTRAM_RESTORE(rdroid_pHS); }
+    TWL_EXTRAM_RESTORE(rdroid_g_pHS); }
     if (!thing->amputatedJoints)
         return 0;
 
@@ -159,7 +159,7 @@ int rdThing_SetParticleCloud(rdThing *thing, rdParticle *particle)
 
 int rdThing_Draw(rdThing *thing, rdMatrix34 *m)
 {
-    if (!rdroid_curGeometryMode)
+    if (!rdroid_g_curGeometryMode)
         return 0;
 
     switch ( thing->type )

@@ -126,9 +126,9 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
     if (_sscanf(stdConffile_aLine, " joints %d", &keyframe->numJoints) != 1)
       goto read_fail;
 
-    { TWL_EXTRAM_SUGGEST(rdroid_pHS); // Added: joints are word-width on RETRO
+    { TWL_EXTRAM_SUGGEST(rdroid_g_pHS); // Added: joints are word-width on RETRO
     paJoints = (rdJoint *)RDROID_ALLOC(sizeof(rdJoint) * (keyframe->numJoints+1)); // Added: try and contain rdPuppet crashes...
-    TWL_EXTRAM_RESTORE(rdroid_pHS); }
+    TWL_EXTRAM_RESTORE(rdroid_g_pHS); }
     keyframe->paJoints = paJoints;
     if (!paJoints)
       goto read_fail;
@@ -206,11 +206,11 @@ int rdKeyframe_LoadEntry(char *key_fpath, rdKeyframe *keyframe)
         // Added: anim entries are written word-safely (parse-time float/u32 stores
         // only) and read-only afterward, so they can live in word-addressable-only
         // memory (DC VRAM arena). Biggest per-level chunk of animation data.
-        int prevSuggest = rdroid_pHS->suggestHeap(HEAP_WORD_ADDRESSABLE);
+        int prevSuggest = rdroid_g_pHS->suggestHeap(HEAP_WORD_ADDRESSABLE);
 #endif
         joint->paAnimEntries = (rdAnimEntry*)RDROID_ALLOC(sizeof(rdAnimEntry) * anim_entry_cnt + 2); // Added: prevent some oob accesses in rdPuppet
 #ifdef TARGET_RETRO_HOMEBREW
-        rdroid_pHS->suggestHeap(prevSuggest);
+        rdroid_g_pHS->suggestHeap(prevSuggest);
 #endif
         if (!joint->paAnimEntries)
           goto read_fail;
@@ -279,64 +279,64 @@ int rdKeyframe_Write(char *out_fpath, rdKeyframe *keyframe, char *creation_metho
     unsigned int i;
     unsigned int j;
 
-    fd = rdroid_pHS->fileOpen(out_fpath, "wt+");
+    fd = rdroid_g_pHS->fileOpen(out_fpath, "wt+");
     if (!fd)
         return 0;
 
-    rdroid_pHS->filePrintf(fd, "# KEYFRAME '%s' created from '%s'\n\n", keyframe, creation_method);
-    rdroid_pHS->filePrintf(fd, "###############\n");
-    rdroid_pHS->filePrintf(fd, "SECTION: HEADER\n\n");
-    rdroid_pHS->filePrintf(fd, "FLAGS  0x%04x\n", keyframe->flags);
-    rdroid_pHS->filePrintf(fd, "TYPE   0x%X\n", keyframe->type);
-    rdroid_pHS->filePrintf(fd, "FRAMES %d\n", keyframe->numFrames);
-    rdroid_pHS->filePrintf(fd, "FPS    %.3f\n", keyframe->fps);
-    rdroid_pHS->filePrintf(fd, "JOINTS %d\n", keyframe->numJoints);
+    rdroid_g_pHS->filePrintf(fd, "# KEYFRAME '%s' created from '%s'\n\n", keyframe, creation_method);
+    rdroid_g_pHS->filePrintf(fd, "###############\n");
+    rdroid_g_pHS->filePrintf(fd, "SECTION: HEADER\n\n");
+    rdroid_g_pHS->filePrintf(fd, "FLAGS  0x%04x\n", keyframe->flags);
+    rdroid_g_pHS->filePrintf(fd, "TYPE   0x%X\n", keyframe->type);
+    rdroid_g_pHS->filePrintf(fd, "FRAMES %d\n", keyframe->numFrames);
+    rdroid_g_pHS->filePrintf(fd, "FPS    %.3f\n", keyframe->fps);
+    rdroid_g_pHS->filePrintf(fd, "JOINTS %d\n", keyframe->numJoints);
     if (keyframe->numMarkers)
     {
-        rdroid_pHS->filePrintf(fd, "\n\n");
-        rdroid_pHS->filePrintf(fd, "###############\n");
-        rdroid_pHS->filePrintf(fd, "SECTION: MARKERS\n\n");
-        rdroid_pHS->filePrintf(fd, "MARKERS %d\n\n", keyframe->numMarkers);
+        rdroid_g_pHS->filePrintf(fd, "\n\n");
+        rdroid_g_pHS->filePrintf(fd, "###############\n");
+        rdroid_g_pHS->filePrintf(fd, "SECTION: MARKERS\n\n");
+        rdroid_g_pHS->filePrintf(fd, "MARKERS %d\n\n", keyframe->numMarkers);
         for (i = 0; i < keyframe->numMarkers; i++)
         {
-            rdroid_pHS->filePrintf(fd, "%f %d\n", keyframe->markers.marker_float[i], keyframe->markers.marker_int[i]);
+            rdroid_g_pHS->filePrintf(fd, "%f %d\n", keyframe->markers.marker_float[i], keyframe->markers.marker_int[i]);
         }
     }
     
-    rdroid_pHS->filePrintf(fd, "\n\n");
-    rdroid_pHS->filePrintf(fd, "###############\n");
-    rdroid_pHS->filePrintf(fd, "SECTION: KEYFRAME NODES\n\n");
+    rdroid_g_pHS->filePrintf(fd, "\n\n");
+    rdroid_g_pHS->filePrintf(fd, "###############\n");
+    rdroid_g_pHS->filePrintf(fd, "SECTION: KEYFRAME NODES\n\n");
     totalAnimEntries = 0;
     for (i = 0; i < keyframe->numJoints2; i++)
     {
         if (keyframe->paJoints[i].numAnimEntries)
             ++totalAnimEntries;
     }
-    rdroid_pHS->filePrintf(fd, "NODES %d\n\n", totalAnimEntries);
+    rdroid_g_pHS->filePrintf(fd, "NODES %d\n\n", totalAnimEntries);
     joint_iter = keyframe->paJoints;
     for (i = 0; i < keyframe->numJoints2; i++, joint_iter++)
     {
         if (!joint_iter->numAnimEntries)
             continue;
 
-        rdroid_pHS->filePrintf(fd, "NODE    %d\n", i);
+        rdroid_g_pHS->filePrintf(fd, "NODE    %d\n", i);
 #ifdef SITH_DEBUG_STRUCT_NAMES
-        rdroid_pHS->filePrintf(fd, "MESH NAME %s\n", joint_iter->mesh_name);
+        rdroid_g_pHS->filePrintf(fd, "MESH NAME %s\n", joint_iter->mesh_name);
 #else
-        rdroid_pHS->filePrintf(fd, "MESH NAME %s\n", "UNKNOWN");
+        rdroid_g_pHS->filePrintf(fd, "MESH NAME %s\n", "UNKNOWN");
 #endif
-        rdroid_pHS->filePrintf(fd, "ENTRIES %d\n", joint_iter->numAnimEntries);
-        rdroid_pHS->filePrintf(fd, "\n");
-        rdroid_pHS->filePrintf(
+        rdroid_g_pHS->filePrintf(fd, "ENTRIES %d\n", joint_iter->numAnimEntries);
+        rdroid_g_pHS->filePrintf(fd, "\n");
+        rdroid_g_pHS->filePrintf(
         fd,
         "# num:   frame:   flags:           x:           y:           z:           p:           y:           r:\n");
-        rdroid_pHS->filePrintf(
+        rdroid_g_pHS->filePrintf(
         fd,
         "#                                 dx:          dy:          dz:          dp:          dy:          dr:\n");
         animEntry_iter = joint_iter->paAnimEntries;
         for (j = 0; j < joint_iter->numAnimEntries; j++ )
         {
-            rdroid_pHS->filePrintf(
+            rdroid_g_pHS->filePrintf(
                 fd,
                 " %3d:  %7d   0x%04x %12.8f %12.8f %12.8f %12.8f %12.8f %12.8f\n",
                 j,
@@ -349,7 +349,7 @@ int rdKeyframe_Write(char *out_fpath, rdKeyframe *keyframe, char *creation_metho
                 animEntry_iter->orientation.y,
                 animEntry_iter->orientation.z);
 
-            rdroid_pHS->filePrintf(
+            rdroid_g_pHS->filePrintf(
                 fd,
                 " %35.8f %12.8f %12.8f %12.8f %12.8f %12.8f\n",
                 animEntry_iter->vel.x,
@@ -360,9 +360,9 @@ int rdKeyframe_Write(char *out_fpath, rdKeyframe *keyframe, char *creation_metho
                 animEntry_iter->angVel.z);
             ++animEntry_iter;
         }
-        rdroid_pHS->filePrintf(fd, "\n");
+        rdroid_g_pHS->filePrintf(fd, "\n");
     }
-    rdroid_pHS->fileClose(fd);
+    rdroid_g_pHS->fileClose(fd);
     
     return 1;
 }

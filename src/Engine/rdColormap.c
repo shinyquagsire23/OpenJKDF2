@@ -59,7 +59,7 @@ static int rdColormap_ReadAll(stdFile_t fp, void* pDst, int len)
     int got = 0;
     while (got < len)
     {
-        int r = rdroid_pHS->fileRead(fp, (char*)pDst + got, len - got);
+        int r = rdroid_g_pHS->fileRead(fp, (char*)pDst + got, len - got);
         if (r <= 0)
         {
             stdPlatform_Printf("OpenJKDF2: rdColormap short read %d/%d!\n", got, len);
@@ -80,7 +80,7 @@ int rdColormap_LoadEntry(char *colormap_fname, rdColormap *colormap)
     char *transparencyAlloc; // eax
     rdColormapHeader header; // [esp+10h] [ebp-40h] BYREF
 
-    colormap_fptr = rdroid_pHS->fileOpen(colormap_fname, "rb");
+    colormap_fptr = rdroid_g_pHS->fileOpen(colormap_fname, "rb");
     if ( !colormap_fptr )
     {
         stdPlatform_Printf("failed to open colormap `%s`!\n", colormap_fname);
@@ -163,7 +163,7 @@ int rdColormap_LoadEntry(char *colormap_fname, rdColormap *colormap)
         if ( v11 )
         {
             if ( rdColormap_colorInfo.g_bits == 5 )
-                rdroid_pHS->fseek(colormap_fptr, 0x10000, 1);
+                rdroid_g_pHS->fseek(colormap_fptr, 0x10000, 1);
             if (!rdColormap_ReadAll(colormap_fptr, colormap->dword34C, 0x10000)) goto safe_fallback; // Added: checked read
             goto LABEL_15;
         }
@@ -174,7 +174,7 @@ LABEL_15:
     colormap->dword340 = 0;
     colormap->dword344 = 0;
 LABEL_26:
-    rdroid_pHS->fileClose(colormap_fptr);
+    rdroid_g_pHS->fileClose(colormap_fptr);
     return 1;
     */
 
@@ -226,28 +226,28 @@ LABEL_26:
             colormap->dword34C = NULL;
         }
         else {
-            v11 = (*rdroid_pHS->alloc)(0x10000);
+            v11 = (*rdroid_g_pHS->alloc)(0x10000);
             colormap->dword34C = v11;
             if (v11 == NULL) goto safe_fallback;
 
             if (rdColormap_colorInfo.g_bits == 5) {
-                rdroid_pHS->fseek(colormap_fptr,0x10000,1);
+                rdroid_g_pHS->fseek(colormap_fptr,0x10000,1);
                 if (!rdColormap_ReadAll(colormap_fptr, colormap->dword34C, 0x10000)) goto safe_fallback; // Added: checked read
             }
             else {
                 if (!rdColormap_ReadAll(colormap_fptr, v11, 0x10000)) goto safe_fallback; // Added: checked read
-                rdroid_pHS->fseek(colormap_fptr,0x10000,1);
+                rdroid_g_pHS->fseek(colormap_fptr,0x10000,1);
             }
         }
         colormap->dword340 = 0;
         colormap->dword344 = 0;
     }
-    rdroid_pHS->fileClose(colormap_fptr);
+    rdroid_g_pHS->fileClose(colormap_fptr);
     return 1;
 
     // Generate a gray ramp if something fails
 safe_fallback:    
-    rdroid_pHS->fileClose(colormap_fptr);
+    rdroid_g_pHS->fileClose(colormap_fptr);
     rdColormap_BuildGrayRamp(colormap);
     return 1;
 }
@@ -299,12 +299,12 @@ int rdColormap_Write(char *outpath, rdColormap *colormap)
     header.tint[2] = colormap->tint.z;
     header.flags = colormap->flags;
 
-    fd = rdroid_pHS->fileOpen(outpath, "wb+");
+    fd = rdroid_g_pHS->fileOpen(outpath, "wb+");
     if (!fd)
         return 0;
 
-    rdroid_pHS->fileWrite(fd, &header, sizeof(header));
-    rdroid_pHS->fileWrite(fd, colormap->colors, sizeof(colormap->colors));
+    rdroid_g_pHS->fileWrite(fd, &header, sizeof(header));
+    rdroid_g_pHS->fileWrite(fd, colormap->colors, sizeof(colormap->colors));
 
     // JKDF2
     /*
@@ -312,29 +312,29 @@ int rdColormap_Write(char *outpath, rdColormap *colormap)
     {
       if ( colormap->flags & 1 )
       {
-        rdroid_pHS->fileWrite(fd, colormap->transparency, 0x10000);
-        rdroid_pHS->fileWrite(fd, colormap->dword34C, 0x20000);
+        rdroid_g_pHS->fileWrite(fd, colormap->transparency, 0x10000);
+        rdroid_g_pHS->fileWrite(fd, colormap->dword34C, 0x20000);
       }
     }
     else
     {
-      rdroid_pHS->fileWrite(fd, colormap->lightlevel, 0x4000);
+      rdroid_g_pHS->fileWrite(fd, colormap->lightlevel, 0x4000);
       if ( colormap->flags & 1 )
-        rdroid_pHS->fileWrite(fd, colormap->transparency, 0x10000);
+        rdroid_g_pHS->fileWrite(fd, colormap->transparency, 0x10000);
     }
     */
 
     // MOTS
-    rdroid_pHS->fileWrite(fd, colormap->lightlevel, 0x4000);
+    rdroid_g_pHS->fileWrite(fd, colormap->lightlevel, 0x4000);
     if ( colormap->flags & 1 ) {
-        rdroid_pHS->fileWrite(fd, colormap->transparency, 0x10000);
+        rdroid_g_pHS->fileWrite(fd, colormap->transparency, 0x10000);
         if ( colormap->flags & 4 ) {
-            rdroid_pHS->fileWrite(fd, colormap->dword34C, 0x20000);
+            rdroid_g_pHS->fileWrite(fd, colormap->dword34C, 0x20000);
         }
     }
 
 
-    rdroid_pHS->fileClose(fd);
+    rdroid_g_pHS->fileClose(fd);
 
     return 1;
 }

@@ -5,8 +5,8 @@
 // heap. Not enabled on DC: these are read in per-frame transform loops and DC
 // VRAM CPU reads are uncached.
 #ifdef TARGET_TWL
-#define RDMODEL3_EXTRAM_SUGGEST() int _prevSuggest = rdroid_pHS->suggestHeap(HEAP_WORD_ADDRESSABLE)
-#define RDMODEL3_EXTRAM_RESTORE() rdroid_pHS->suggestHeap(_prevSuggest)
+#define RDMODEL3_EXTRAM_SUGGEST() int _prevSuggest = rdroid_g_pHS->suggestHeap(HEAP_WORD_ADDRESSABLE)
+#define RDMODEL3_EXTRAM_RESTORE() rdroid_g_pHS->suggestHeap(_prevSuggest)
 #else
 #define RDMODEL3_EXTRAM_SUGGEST() do {} while (0)
 #define RDMODEL3_EXTRAM_RESTORE() do {} while (0)
@@ -710,56 +710,56 @@ int rdModel3_Write(char *fout, rdModel3 *model, char *createdfrom)
     int childIdx;
     int fd;
 
-    fd = rdroid_pHS->fileOpen(fout, "wt+");
+    fd = rdroid_g_pHS->fileOpen(fout, "wt+");
     if (!fd)
         return 0;
 
-    rdroid_pHS->filePrintf(fd, "# MODEL '%s' created from '%s'\n\n", model->filename, createdfrom);
-    rdroid_pHS->filePrintf(fd, "###############\n");
-    rdroid_pHS->filePrintf(fd, "SECTION: HEADER\n\n");
-    rdroid_pHS->filePrintf(fd, "3DO %d.%d\n\n", 2, 1);
-    rdroid_pHS->filePrintf(fd, "###############\n");
-    rdroid_pHS->filePrintf(fd, "SECTION: MODELRESOURCE\n\n");
-    rdroid_pHS->filePrintf(fd, "# Materials list\n");
-    rdroid_pHS->filePrintf(fd, "MATERIALS %d\n\n", model->numMaterials);
+    rdroid_g_pHS->filePrintf(fd, "# MODEL '%s' created from '%s'\n\n", model->filename, createdfrom);
+    rdroid_g_pHS->filePrintf(fd, "###############\n");
+    rdroid_g_pHS->filePrintf(fd, "SECTION: HEADER\n\n");
+    rdroid_g_pHS->filePrintf(fd, "3DO %d.%d\n\n", 2, 1);
+    rdroid_g_pHS->filePrintf(fd, "###############\n");
+    rdroid_g_pHS->filePrintf(fd, "SECTION: MODELRESOURCE\n\n");
+    rdroid_g_pHS->filePrintf(fd, "# Materials list\n");
+    rdroid_g_pHS->filePrintf(fd, "MATERIALS %d\n\n", model->numMaterials);
     for (int i = 0; i < model->numMaterials; i++)
     {
-            rdroid_pHS->filePrintf(fd, "%10d:%15s\n", i, model->materials[i]->mat_fpath);
+            rdroid_g_pHS->filePrintf(fd, "%10d:%15s\n", i, model->materials[i]->mat_fpath);
     }
-    rdroid_pHS->filePrintf(fd, "\n\n");
-    rdroid_pHS->filePrintf(fd, "###############\n");
-    rdroid_pHS->filePrintf(fd, "SECTION: GEOMETRYDEF\n\n");
-    rdroid_pHS->filePrintf(fd, "# Object radius\n");
-    rdroid_pHS->filePrintf(fd, "RADIUS %10.6f\n\n", model->radius);
-    rdroid_pHS->filePrintf(fd, "# Insertion offset\n");
-    rdroid_pHS->filePrintf(fd, "INSERT OFFSET %10.6f %10.6f %10.6f\n\n", model->insertOffset.x, model->insertOffset.y, model->insertOffset.z);
-    rdroid_pHS->filePrintf(fd, "# Number of Geometry Sets\n");
-    rdroid_pHS->filePrintf(fd, "GEOSETS %d\n\n", model->numGeosets);
+    rdroid_g_pHS->filePrintf(fd, "\n\n");
+    rdroid_g_pHS->filePrintf(fd, "###############\n");
+    rdroid_g_pHS->filePrintf(fd, "SECTION: GEOMETRYDEF\n\n");
+    rdroid_g_pHS->filePrintf(fd, "# Object radius\n");
+    rdroid_g_pHS->filePrintf(fd, "RADIUS %10.6f\n\n", model->radius);
+    rdroid_g_pHS->filePrintf(fd, "# Insertion offset\n");
+    rdroid_g_pHS->filePrintf(fd, "INSERT OFFSET %10.6f %10.6f %10.6f\n\n", model->insertOffset.x, model->insertOffset.y, model->insertOffset.z);
+    rdroid_g_pHS->filePrintf(fd, "# Number of Geometry Sets\n");
+    rdroid_g_pHS->filePrintf(fd, "GEOSETS %d\n\n", model->numGeosets);
 
     geoset = model->geosets;
     for (int geosetNum = 0; geosetNum < model->numGeosets; geosetNum++)
     {
-        rdroid_pHS->filePrintf(fd, "# Geometry Set definition\n");
-        rdroid_pHS->filePrintf(fd, "GEOSET %d\n\n", geosetNum);
-        rdroid_pHS->filePrintf(fd, "# Number of Meshes\n");
-        rdroid_pHS->filePrintf(fd, "MESHES %d\n\n\n", geoset->numMeshes);
+        rdroid_g_pHS->filePrintf(fd, "# Geometry Set definition\n");
+        rdroid_g_pHS->filePrintf(fd, "GEOSET %d\n\n", geosetNum);
+        rdroid_g_pHS->filePrintf(fd, "# Number of Meshes\n");
+        rdroid_g_pHS->filePrintf(fd, "MESHES %d\n\n\n", geoset->numMeshes);
 
         for (int meshNum = 0; meshNum < geoset->numMeshes; meshNum++)
         {
-            rdroid_pHS->filePrintf(fd, "# Mesh definition\n");
-            rdroid_pHS->filePrintf(fd, "MESH %d\n\n", meshNum);
-            rdroid_pHS->filePrintf(fd, "NAME %s\n\n", geoset->meshes[meshNum].name);
-            rdroid_pHS->filePrintf(fd, "RADIUS %10.6f\n\n", geoset->meshes[meshNum].radius);
-            rdroid_pHS->filePrintf(fd, "GEOMETRYMODE\t%d\n", geoset->meshes[meshNum].geometryMode);
-            rdroid_pHS->filePrintf(fd, "LIGHTINGMODE\t%d\n", geoset->meshes[meshNum].lightingMode);
-            rdroid_pHS->filePrintf(fd, "TEXTUREMODE\t%d\n", geoset->meshes[meshNum].textureMode);
-            rdroid_pHS->filePrintf(fd, "\n\n");
-            rdroid_pHS->filePrintf(fd, "VERTICES %d\n\n", geoset->meshes[meshNum].numVertices);
-            rdroid_pHS->filePrintf(fd, "# num:     x:         y:         z:         i: \n");
+            rdroid_g_pHS->filePrintf(fd, "# Mesh definition\n");
+            rdroid_g_pHS->filePrintf(fd, "MESH %d\n\n", meshNum);
+            rdroid_g_pHS->filePrintf(fd, "NAME %s\n\n", geoset->meshes[meshNum].name);
+            rdroid_g_pHS->filePrintf(fd, "RADIUS %10.6f\n\n", geoset->meshes[meshNum].radius);
+            rdroid_g_pHS->filePrintf(fd, "GEOMETRYMODE\t%d\n", geoset->meshes[meshNum].geometryMode);
+            rdroid_g_pHS->filePrintf(fd, "LIGHTINGMODE\t%d\n", geoset->meshes[meshNum].lightingMode);
+            rdroid_g_pHS->filePrintf(fd, "TEXTUREMODE\t%d\n", geoset->meshes[meshNum].textureMode);
+            rdroid_g_pHS->filePrintf(fd, "\n\n");
+            rdroid_g_pHS->filePrintf(fd, "VERTICES %d\n\n", geoset->meshes[meshNum].numVertices);
+            rdroid_g_pHS->filePrintf(fd, "# num:     x:         y:         z:         i: \n");
             for (int vertexNum = 0; vertexNum < geoset->meshes[meshNum].numVertices; vertexNum++)
             {
                 rdVector3* vertex = &geoset->meshes[meshNum].vertices[vertexNum];
-                rdroid_pHS->filePrintf(
+                rdroid_g_pHS->filePrintf(
                     fd,
                     "  %3d: %10.6f %10.6f %10.6f %10.6f\n",
                     vertexNum,
@@ -768,20 +768,20 @@ int rdModel3_Write(char *fout, rdModel3 *model, char *createdfrom)
                     vertex->z,
                     geoset->meshes[meshNum].vertices_i[vertexNum]);
             }
-            rdroid_pHS->filePrintf(fd, "\n\n");
-            rdroid_pHS->filePrintf(fd, "TEXTURE VERTICES %d\n\n", geoset->meshes[meshNum].numVertices);
+            rdroid_g_pHS->filePrintf(fd, "\n\n");
+            rdroid_g_pHS->filePrintf(fd, "TEXTURE VERTICES %d\n\n", geoset->meshes[meshNum].numVertices);
             for (int vertexNum = 0; vertexNum < geoset->meshes[meshNum].numUVs; vertexNum++)
             {
                 rdVector2* uv = &geoset->meshes[meshNum].vertexUVs[vertexNum];
-                rdroid_pHS->filePrintf(fd, "  %3d: %10.6f %10.6f\n", vertexNum, uv->x, uv->y);
+                rdroid_g_pHS->filePrintf(fd, "  %3d: %10.6f %10.6f\n", vertexNum, uv->x, uv->y);
             }
-            rdroid_pHS->filePrintf(fd, "\n\n");
-            rdroid_pHS->filePrintf(fd, "VERTEX NORMALS\n\n");
-            rdroid_pHS->filePrintf(fd, "# num:     x:         y:         z:\n");
+            rdroid_g_pHS->filePrintf(fd, "\n\n");
+            rdroid_g_pHS->filePrintf(fd, "VERTEX NORMALS\n\n");
+            rdroid_g_pHS->filePrintf(fd, "# num:     x:         y:         z:\n");
             for (int vertexNum = 0; vertexNum < geoset->meshes[meshNum].numVertices; vertexNum++)
             {
                 rdVector3* norm = &geoset->meshes[meshNum].vertexNormals[vertexNum];
-                rdroid_pHS->filePrintf(
+                rdroid_g_pHS->filePrintf(
                     fd,
                     "  %3d: %10.6f %10.6f %10.6f\n",
                     vertexNum,
@@ -789,9 +789,9 @@ int rdModel3_Write(char *fout, rdModel3 *model, char *createdfrom)
                     norm->y,
                     norm->z);
             }
-            rdroid_pHS->filePrintf(fd, "\n\n");
-            rdroid_pHS->filePrintf(fd, "FACES %d\n\n", geoset->meshes[meshNum].numFaces);
-            rdroid_pHS->filePrintf(fd, "#  num:  material:   type:  geo:  light:   tex:  extralight:  verts:\n");
+            rdroid_g_pHS->filePrintf(fd, "\n\n");
+            rdroid_g_pHS->filePrintf(fd, "FACES %d\n\n", geoset->meshes[meshNum].numFaces);
+            rdroid_g_pHS->filePrintf(fd, "#  num:  material:   type:  geo:  light:   tex:  extralight:  verts:\n");
             rdFace* face = geoset->meshes[meshNum].faces;
             for (int faceNum = 0; faceNum < geoset->meshes[meshNum].numFaces; faceNum++)
             {
@@ -805,7 +805,7 @@ int rdModel3_Write(char *fout, rdModel3 *model, char *createdfrom)
                         materialIdx = j;
                 }
 
-                rdroid_pHS->filePrintf(
+                rdroid_g_pHS->filePrintf(
                     fd,
                     "   %3d: %9d  0x%04x  %4d %7d %6d %12.4f %7d  ",
                     faceNum,
@@ -821,7 +821,7 @@ int rdModel3_Write(char *fout, rdModel3 *model, char *createdfrom)
                 {
                     for (int j = 0; j < face->numVertices; j++)
                     {
-                        rdroid_pHS->filePrintf(
+                        rdroid_g_pHS->filePrintf(
                             fd,
                             "%3d,%3d ",
                             face->vertexPosIdx[j],
@@ -832,28 +832,28 @@ int rdModel3_Write(char *fout, rdModel3 *model, char *createdfrom)
                 {
                     for (int j = 0; j < face->numVertices; j++)
                     {
-                        rdroid_pHS->filePrintf(fd, "%3d, 0 ", face->vertexPosIdx[j]);
+                        rdroid_g_pHS->filePrintf(fd, "%3d, 0 ", face->vertexPosIdx[j]);
                     }
                 }
-                rdroid_pHS->filePrintf(fd, "\n");
+                rdroid_g_pHS->filePrintf(fd, "\n");
             }
-            rdroid_pHS->filePrintf(fd, "\n\n");
-            rdroid_pHS->filePrintf(fd, "FACE NORMALS\n\n");
-            rdroid_pHS->filePrintf(fd, "# num:     x:         y:         z:\n");
+            rdroid_g_pHS->filePrintf(fd, "\n\n");
+            rdroid_g_pHS->filePrintf(fd, "FACE NORMALS\n\n");
+            rdroid_g_pHS->filePrintf(fd, "# num:     x:         y:         z:\n");
             for (int j = 0; j < geoset->meshes[meshNum].numFaces; j++)
             {
                 rdVector3* norm = &geoset->meshes[meshNum].faces[j].normal;
-                rdroid_pHS->filePrintf(fd, "  %3d: %10.6f %10.6f %10.6f\n", j, norm->x, norm->y, norm->z);
+                rdroid_g_pHS->filePrintf(fd, "  %3d: %10.6f %10.6f %10.6f\n", j, norm->x, norm->y, norm->z);
             }
-            rdroid_pHS->filePrintf(fd, "\n\n");
+            rdroid_g_pHS->filePrintf(fd, "\n\n");
         }
         ++geoset;
     }
-    rdroid_pHS->filePrintf(fd, "###############\n");
-    rdroid_pHS->filePrintf(fd, "SECTION: HIERARCHYDEF\n\n");
-    rdroid_pHS->filePrintf(fd, "# Hierarchy node list\n");
-    rdroid_pHS->filePrintf(fd, "HIERARCHY NODES %d\n\n", model->numHierarchyNodes);
-    rdroid_pHS->filePrintf(fd, 
+    rdroid_g_pHS->filePrintf(fd, "###############\n");
+    rdroid_g_pHS->filePrintf(fd, "SECTION: HIERARCHYDEF\n\n");
+    rdroid_g_pHS->filePrintf(fd, "# Hierarchy node list\n");
+    rdroid_g_pHS->filePrintf(fd, "HIERARCHY NODES %d\n\n", model->numHierarchyNodes);
+    rdroid_g_pHS->filePrintf(fd, 
         "#  num:   flags:   type:    mesh:  parent:  child:  sibling:  numChildren:        x:         y:         z:     pitch:       yaw:      roll:    pivot"
         "x:    pivoty:    pivotz:  hnodename:\n");
 
@@ -876,7 +876,7 @@ int rdModel3_Write(char *fout, rdModel3 *model, char *createdfrom)
         else
             siblingIdx = -1;
 
-        rdroid_pHS->filePrintf(
+        rdroid_g_pHS->filePrintf(
             fd,
             "   %3d:  0x%04x 0x%05X %8d %8d %7d %9d %13d %10.6f %10.6f %10.6f %10.6f %10.6f %10.6f %10.6f %10.6f %10.6f  %s\n",
             nodeIdx,
@@ -898,7 +898,7 @@ int rdModel3_Write(char *fout, rdModel3 *model, char *createdfrom)
             node->pivot.z,
             node->name);
     }
-    rdroid_pHS->fileClose(fd);
+    rdroid_g_pHS->fileClose(fd);
     return 1;
 }
 
@@ -1386,18 +1386,18 @@ int rdModel3_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
     }
 
     curGeometryMode = pCurThing->curGeoMode;
-    if ( curGeometryMode >= rdroid_curGeometryMode )
-        curGeometryMode = rdroid_curGeometryMode;
+    if ( curGeometryMode >= rdroid_g_curGeometryMode )
+        curGeometryMode = rdroid_g_curGeometryMode;
 
-    if ((rdroid_curRenderOptions & 2) && rdCamera_pCurCamera->ambientLight >= 1.0 )
+    if ((rdroid_g_curRenderOptions & 2) && rdCamera_pCurCamera->ambientLight >= 1.0 )
     {
         curLightingMode = RD_LIGHTMODE_FULLYLIT;
     }
     else
     {
         curLightingMode = pCurThing->curLightMode;
-        if ( curLightingMode >= rdroid_curLightingMode )
-            curLightingMode = rdroid_curLightingMode;
+        if ( curLightingMode >= rdroid_g_curLightingMode )
+            curLightingMode = rdroid_g_curLightingMode;
     }
 
     curTextureMode = pCurThing->curTexMode;
@@ -1641,7 +1641,7 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
 
     // Be extra sure we're setting backface culling
 #ifdef TARGET_TWL
-    rdroid_curRenderOptions |= 1;
+    rdroid_g_curRenderOptions |= 1;
 #endif
 
     for (int i = 0; i < meshIn->numFaces; i++)
@@ -1656,7 +1656,7 @@ void rdModel3_DrawMesh(rdMesh *meshIn, rdMatrix34 *mat)
         if ( normalCheck <= 0.0 )
         {
             flags = 1;
-            if ( !(face->type & 1) && (rdroid_curRenderOptions & 1) )
+            if ( !(face->type & 1) && (rdroid_g_curRenderOptions & 1) )
             {
                 ++face;
                 continue;
@@ -1771,7 +1771,7 @@ int rdModel3_DrawFace(rdFace *face, int lightFlags)
         }
     }
     rdCamera_pCurCamera->fnProjectLst(vertexDst.verticesOrig, vertexDst.vertices, vertexDst.numVertices);
-    if ( rdroid_curRenderOptions & 2 )
+    if ( rdroid_g_curRenderOptions & 2 )
         procEntry->ambientLight = rdCamera_pCurCamera->ambientLight;
     else
         procEntry->ambientLight = 0.0;

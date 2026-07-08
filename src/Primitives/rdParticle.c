@@ -255,31 +255,31 @@ int rdParticle_Write(char *writePath, rdParticle *particle, char *madeBy)
     unsigned int v4; // edi
     int v6; // [esp+28h] [ebp-4h]
 
-    v3 = rdroid_pHS->fileOpen(writePath, "wt+");
+    v3 = rdroid_g_pHS->fileOpen(writePath, "wt+");
     v4 = 0;
     if ( !v3 )
         return 0;
-    rdroid_pHS->filePrintf(v3, "# PAR '%s' created from '%s'\n\n", particle->name, madeBy);
-    rdroid_pHS->filePrintf(v3, "###############\n");
-    rdroid_pHS->filePrintf(v3, "SECTION: HEADER\n\n");
-    rdroid_pHS->filePrintf(v3, "PAR %d.%d\n\n", 1, 0);
-    rdroid_pHS->filePrintf(v3, "SIZE %.6f\n\n", particle->diameter);
-    rdroid_pHS->filePrintf(v3, "MATERIAL %s\n\n", particle->material->mat_fpath);
-    rdroid_pHS->filePrintf(v3, "LIGHTINGMODE %d\n\n", particle->lightingMode);
-    rdroid_pHS->filePrintf(v3, "###############\n");
-    rdroid_pHS->filePrintf(v3, "SECTION: GEOMETRYDEF\n\n");
-    rdroid_pHS->filePrintf(v3, "# Object radius\n");
-    rdroid_pHS->filePrintf(v3, "RADIUS %10.6f\n\n", particle->cloudRadius);
-    rdroid_pHS->filePrintf(v3, "# Insertion offset\n");
-    rdroid_pHS->filePrintf(v3, "INSERT OFFSET %10.6f %10.6f %10.6f\n\n", particle->insertOffset.x, particle->insertOffset.y, particle->insertOffset.z);
-    rdroid_pHS->filePrintf(v3, "VERTICES %d\n\n", particle->numVertices);
-    rdroid_pHS->filePrintf(v3, "# num:     x:         y:         z:       cel:\n");
+    rdroid_g_pHS->filePrintf(v3, "# PAR '%s' created from '%s'\n\n", particle->name, madeBy);
+    rdroid_g_pHS->filePrintf(v3, "###############\n");
+    rdroid_g_pHS->filePrintf(v3, "SECTION: HEADER\n\n");
+    rdroid_g_pHS->filePrintf(v3, "PAR %d.%d\n\n", 1, 0);
+    rdroid_g_pHS->filePrintf(v3, "SIZE %.6f\n\n", particle->diameter);
+    rdroid_g_pHS->filePrintf(v3, "MATERIAL %s\n\n", particle->material->mat_fpath);
+    rdroid_g_pHS->filePrintf(v3, "LIGHTINGMODE %d\n\n", particle->lightingMode);
+    rdroid_g_pHS->filePrintf(v3, "###############\n");
+    rdroid_g_pHS->filePrintf(v3, "SECTION: GEOMETRYDEF\n\n");
+    rdroid_g_pHS->filePrintf(v3, "# Object radius\n");
+    rdroid_g_pHS->filePrintf(v3, "RADIUS %10.6f\n\n", particle->cloudRadius);
+    rdroid_g_pHS->filePrintf(v3, "# Insertion offset\n");
+    rdroid_g_pHS->filePrintf(v3, "INSERT OFFSET %10.6f %10.6f %10.6f\n\n", particle->insertOffset.x, particle->insertOffset.y, particle->insertOffset.z);
+    rdroid_g_pHS->filePrintf(v3, "VERTICES %d\n\n", particle->numVertices);
+    rdroid_g_pHS->filePrintf(v3, "# num:     x:         y:         z:       cel:\n");
     if ( particle->numVertices > 0u )
     {
         v6 = 0;
         do
         {
-            rdroid_pHS->filePrintf(
+            rdroid_g_pHS->filePrintf(
                 v3,
                 "  %3d: %10.6f %10.6f %10.6f %d\n",
                 v4,
@@ -292,8 +292,8 @@ int rdParticle_Write(char *writePath, rdParticle *particle, char *madeBy)
         }
         while ( v4 < particle->numVertices );
     }
-    rdroid_pHS->filePrintf(v3, "\n\n");
-    rdroid_pHS->fileClose(v3);
+    rdroid_g_pHS->filePrintf(v3, "\n\n");
+    rdroid_g_pHS->fileClose(v3);
     return 1;
 }
 
@@ -342,7 +342,7 @@ int rdParticle_Draw(rdThing *thing, rdMatrix34 *matrix_4_3)
     if ( v3 != SPHERE_FULLY_OUTSIDE )
     {
         rdMatrix_Multiply34(&out, &rdCamera_pCurCamera->view_matrix, matrix_4_3);
-        if ( rdroid_curRenderOptions & 2 )
+        if ( rdroid_g_curRenderOptions & 2 )
             matrix_4_3a = rdCamera_pCurCamera->ambientLight;
         else
             matrix_4_3a = 0.0;

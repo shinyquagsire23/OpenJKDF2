@@ -179,8 +179,8 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     rdSprite_inVerts[3].y = sprite->offset.y + vertex_out.y;
     rdSprite_inVerts[3].z = sprite->offset.z + sprite->halfHeight + vertex_out.z;
 
-    rdGeoMode_t curGeometryMode_ = rdroid_curGeometryMode;
-    rdLightMode_t curLightingMode_ = rdroid_curLightingMode;
+    rdGeoMode_t curGeometryMode_ = rdroid_g_curGeometryMode;
+    rdLightMode_t curLightingMode_ = rdroid_g_curLightingMode;
     rdTexMode_t curTextureMode_ = rdroid_curTextureMode;
     if ( curGeometryMode_ >= sprite->face.geometryMode )
         curGeometryMode_ = sprite->face.geometryMode;
@@ -188,17 +188,17 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
     {
         procEntry->geometryMode = thing->curGeoMode;
     }    
-    else if ( rdroid_curGeometryMode >= sprite->face.geometryMode )
+    else if ( rdroid_g_curGeometryMode >= sprite->face.geometryMode )
     {
         procEntry->geometryMode = sprite->face.geometryMode;
     }
     else
     {
-        procEntry->geometryMode = rdroid_curGeometryMode;
+        procEntry->geometryMode = rdroid_g_curGeometryMode;
     }
     
     procEntry->geometryMode = procEntry->geometryMode;
-    if ( rdroid_curRenderOptions & 2 && rdCamera_pCurCamera->ambientLight >= 1.0 )
+    if ( rdroid_g_curRenderOptions & 2 && rdCamera_pCurCamera->ambientLight >= 1.0 )
     {
         procEntry->lightingMode = RD_LIGHTMODE_FULLYLIT;
     }
@@ -210,9 +210,9 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
         {
             sprite->face.lightingMode = thing->curLightMode;
         }
-        else if ( rdroid_curLightingMode < sprite->face.lightingMode )
+        else if ( rdroid_g_curLightingMode < sprite->face.lightingMode )
         {
-            sprite->face.lightingMode = rdroid_curLightingMode;
+            sprite->face.lightingMode = rdroid_g_curLightingMode;
         }
         procEntry->lightingMode = sprite->face.lightingMode;
     }
@@ -245,7 +245,7 @@ int rdSprite_Draw(rdThing *thing, rdMatrix34 *mat)
 
     rdCamera_pCurCamera->fnProjectLst(mesh_out.verticesOrig, mesh_out.vertices, mesh_out.numVertices);
 
-    if ( rdroid_curRenderOptions & 2 )
+    if ( rdroid_g_curRenderOptions & 2 )
         procEntry->ambientLight = rdCamera_pCurCamera->ambientLight;
     else
         procEntry->ambientLight = 0.0;

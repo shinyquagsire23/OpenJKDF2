@@ -142,7 +142,7 @@ int rdMaterial_LoadEntry_Common(char *mat_fpath, rdMaterial *material, int creat
     }
 #endif
 
-    mat_file = rdroid_pHS->fileOpen(mat_fpath, "rb");
+    mat_file = rdroid_g_pHS->fileOpen(mat_fpath, "rb");
     mat_file_ = mat_file;
     mat_file__ = mat_file;
     if (!mat_file) {
@@ -150,11 +150,11 @@ int rdMaterial_LoadEntry_Common(char *mat_fpath, rdMaterial *material, int creat
         return 0;
     }
 
-    rdroid_pHS->fileRead(mat_file, &mat_header, sizeof(rdMaterialHeader));
+    rdroid_g_pHS->fileRead(mat_file, &mat_header, sizeof(rdMaterialHeader));
     if ( _memcmp(mat_header.magic, "MAT ", 4u) || mat_header.revision != '2' )
     {
         stdPlatform_Printf("OpenJKDF2: Material `%s` has improper magic or bad revision!\n", mat_fpath); // Added
-        rdroid_pHS->fileClose(mat_file_);
+        rdroid_g_pHS->fileClose(mat_file_);
 
         return 0;
     }
@@ -167,7 +167,7 @@ int rdMaterial_LoadEntry_Common(char *mat_fpath, rdMaterial *material, int creat
         rdMaterial_WordSafeStrCopy(material->mat_fpath, stdFileFromPath(mat_fpath), sizeof(material->mat_fpath)); // Added: word-safe
 #endif
         rdMaterial_WordSafeStrCopy(material->mat_full_fpath, mat_fpath, sizeof(material->mat_full_fpath)); // Added: word-safe
-        rdroid_pHS->fileClose(mat_file_);
+        rdroid_g_pHS->fileClose(mat_file_);
         return 1;
     }
 #endif
@@ -198,23 +198,23 @@ int rdMaterial_LoadEntry_Common(char *mat_fpath, rdMaterial *material, int creat
     stdPlatform_Memzero32(material->texinfos, sizeof(material->texinfos)); // Added: just in case? (word-safe)
     for (tex_num = 0; tex_num < material->num_texinfo; tex_num++)
     {
-        { TWL_EXTRAM_SUGGEST(rdroid_pHS); // Added: texinfo fields are all word-width
+        { TWL_EXTRAM_SUGGEST(rdroid_g_pHS); // Added: texinfo fields are all word-width
         texinfo_alloc = (rdTexinfo *)RDROID_ALLOC(sizeof(rdTexinfo));
-        TWL_EXTRAM_RESTORE(rdroid_pHS); }
+        TWL_EXTRAM_RESTORE(rdroid_g_pHS); }
         material->texinfos[tex_num] = texinfo_alloc;
         if ( !texinfo_alloc )
         {
             stdPlatform_Printf("OpenJKDF2: Material `%s` texinfo could not be allocated!\n", mat_fpath); // Added
-            rdroid_pHS->fileClose(mat_file_);
+            rdroid_g_pHS->fileClose(mat_file_);
 
             return 0;
         }
         memset(texinfo_alloc, 0, sizeof(rdTexinfo)); // Moved
-        rdroid_pHS->fileRead(mat_file_, &texinfo_header, sizeof(rdTexinfoHeader));
+        rdroid_g_pHS->fileRead(mat_file_, &texinfo_header, sizeof(rdTexinfoHeader));
         texinfo_alloc->header = texinfo_header;
         if ( texinfo_header.texture_type & 8 )  // bitflag for texture, not color
         {
-              rdroid_pHS->fileRead(mat_file_, &tex_ext, sizeof(rdTexinfoExtHeader));
+              rdroid_g_pHS->fileRead(mat_file_, &tex_ext, sizeof(rdTexinfoExtHeader));
               texinfo_alloc->texext_unk00 = tex_ext.unk_00;
               *texture_idk = tex_ext.unk_0c;
         }
@@ -229,7 +229,7 @@ int rdMaterial_LoadEntry_Common(char *mat_fpath, rdMaterial *material, int creat
     // Short circuit only after metadata
     if (bDoLoad == 2) {
         rdMaterial_WordSafeStrCopy(material->mat_full_fpath, mat_fpath, sizeof(material->mat_full_fpath)); // Added: word-safe
-        rdroid_pHS->fileClose(mat_file_);
+        rdroid_g_pHS->fileClose(mat_file_);
         return 1;
     }
 #endif
@@ -237,13 +237,13 @@ int rdMaterial_LoadEntry_Common(char *mat_fpath, rdMaterial *material, int creat
     material->textures = 0;
     if ( num_textures )
     {
-      { TWL_EXTRAM_SUGGEST(rdroid_pHS); // Added: rdTexture fields are all word-width
+      { TWL_EXTRAM_SUGGEST(rdroid_g_pHS); // Added: rdTexture fields are all word-width
       textures = (rdTexture *)RDROID_ALLOC(sizeof(rdTexture) * num_textures);
-      TWL_EXTRAM_RESTORE(rdroid_pHS); }
+      TWL_EXTRAM_RESTORE(rdroid_g_pHS); }
       if ( !textures )
       {
         stdPlatform_Printf("OpenJKDF2: Material `%s` textures array could not be allocated!\n", mat_fpath); // Added
-        rdroid_pHS->fileClose(mat_file_);
+        rdroid_g_pHS->fileClose(mat_file_);
 
         return 0;
       }
@@ -263,7 +263,7 @@ int rdMaterial_LoadEntry_Common(char *mat_fpath, rdMaterial *material, int creat
       while ( 1 )
       {
         //printf("asdf %x %x\n", tex_numa, material->num_textures);
-        rdroid_pHS->fileRead(mat_file_, &tex_header_1, sizeof(rdTextureHeader));
+        rdroid_g_pHS->fileRead(mat_file_, &tex_header_1, sizeof(rdTextureHeader));
         texture = &material->textures[tex_numa];
         texture->alpha_en = tex_header_1.alpha_en;
         texture->unk_0c = tex_header_1.unk_0c;
@@ -323,7 +323,7 @@ LABEL_21:
         if ( texture->alpha_en & 1 )
           stdDisplay_VBufferSetColorKey(created_tex, texture->color_transparent);
         stdDisplay_VBufferLock(*texture_struct);
-        rdroid_pHS->fileRead(
+        rdroid_g_pHS->fileRead(
           mat_file__,
           (void *)(*texture_struct)->surface_lock_alloc,
           (*texture_struct)->format.texture_size_in_bytes);
@@ -348,7 +348,7 @@ LABEL_21:
 #endif
             if ( !created_tex ) {
                 /*mat_file_ = mat_file__;
-                rdroid_pHS->fileClose(mat_file_);
+                rdroid_g_pHS->fileClose(mat_file_);
                 return 1;*/
                 std_pHS->fseek(mat_file__, format.width*format.height*(format.format.is16bit?2:1), SEEK_CUR);
                 goto no_loading;
@@ -363,11 +363,11 @@ LABEL_21:
                 uint32_t mipLen = (*texture_struct)->format.texture_size_in_bytes;
                 void* pMipTmp = STD_ALLOC(mipLen);
                 if (pMipTmp) {
-                    rdroid_pHS->fileRead(mat_file__, pMipTmp, mipLen);
+                    rdroid_g_pHS->fileRead(mat_file__, pMipTmp, mipLen);
                     stdPlatform_Memcpy32((*texture_struct)->surface_lock_alloc, pMipTmp, mipLen);
                     STD_FREE(pMipTmp);
                 } else {
-                    rdroid_pHS->fileRead(mat_file__, (void *)(*texture_struct)->surface_lock_alloc, mipLen);
+                    rdroid_g_pHS->fileRead(mat_file__, (void *)(*texture_struct)->surface_lock_alloc, mipLen);
                 }
             }
             stdDisplay_VBufferUnlock(*texture_struct);
@@ -391,7 +391,7 @@ no_loading:
       }
       stdPlatform_Printf("OpenJKDF2: Material `%s` vbuffer could not be allocated!\n", mat_fpath); // Added
       mat_file_ = mat_file__;
-      rdroid_pHS->fileClose(mat_file_);
+      rdroid_g_pHS->fileClose(mat_file_);
 
       return 0;
     }
@@ -422,7 +422,7 @@ LABEL_22:
       if ( !colors )
       {
         jk_printf("OpenJKDF2: Material `%s` color palette could not be allocated!\n", mat_fpath); // Added
-        rdroid_pHS->fileClose(mat_file_);
+        rdroid_g_pHS->fileClose(mat_file_);
 
         return 0;
       }
@@ -431,7 +431,7 @@ LABEL_22:
       {
         int gotPal = 0;
         while (gotPal < 0x300) {
-          int r = rdroid_pHS->fileRead(mat_file_, (char*)colors + gotPal, 0x300 - gotPal);
+          int r = rdroid_g_pHS->fileRead(mat_file_, (char*)colors + gotPal, 0x300 - gotPal);
           if (r <= 0) {
             stdPlatform_Printf("OpenJKDF2: Material `%s` palette short read %d/768!\n", mat_fpath, gotPal);
             break;
@@ -447,7 +447,7 @@ LABEL_22:
 #ifdef SITH_DEBUG_STRUCT_NAMES
     rdMaterial_WordSafeStrCopy(material->mat_fpath, v26, sizeof(material->mat_fpath)); // Added: word-safe
 #endif
-    rdroid_pHS->fileClose(mat_file_);
+    rdroid_g_pHS->fileClose(mat_file_);
     mat_file = 1;
 
 #if defined(SDL2_RENDER) || defined(RDMATERIAL_LRU_LOAD_UNLOAD)
