@@ -513,11 +513,24 @@ Thing (sithAICmd ↔ J3D sithAIInstinct/Move/Util split); **batch8** sithCogFunc
 {Player,AI,Sector,Sound,Surface} + sithThing; **batch9** stdColor/Math/Memory/Hashtbl/
 FileUtil/Gob; **batch10** sithDSS/DSSThing/Multi + sithComm + stdStrTable (sithGamesave
 had no unambiguous renames); **batch11** rdParticle/Thing/Puppet/Clip (rdCanvas + stdBmp
-already matched / arg-count mismatch). = **61 modules.**
+already matched / arg-count mismatch); **batch12** sithPlayer/Inventory/OverlayMap +
+rdMatrix/rdVector (sithControl already matched; rdVector_Cross3 chained swap
+v1→dest/v2→v1/v3→v2 handled swap-safe by single-pass apply); **batch13** rdMath/Polyline/
+Sprite/Primit2/Primit3/Face (rdPrimit2_DrawClippedCircle chained a4→radius/radius→step);
+**batch14** sithEvent/Sound/Console/Intersect/SoundMixer/Main. = **78 modules.**
 Tool: scratchpad `apply_argnames.py` + per-module subagent maps. **jk\* game layer has NO
 J3D counterpart** (JK-specific; Indy has its own game code) — do NOT attempt. Remaining
-candidates: sithPlayer, sithNet, sithSoundSys, sithVoice/Trap/Save, w32util modules,
-rdMatrix/rdVector/rdString math helpers (likely already matched), assorted std leftovers.
+candidates remaining (thin): rdCache, rdroid (Engine), wuRegistry (platform-specific,
+divergent added code), sithGamesave (no unambiguous renames). **jk\* game layer, stdControl,
+stdBmp, stdFont, rdColormap, rdActive, sithControl = no J3D counterpart OR already matched.**
+The chained-rename `#var`-macro and platform-only-file hazards are all handled by the
+collision pre-check + 3-platform build + NDS byte-oracle gate.
+
+**Chained/swap renames (batches 12-13):** when an agent maps A→B and B→C in the same
+function (or a param to another param's old name), the single-pass regex in apply_argnames
+does them simultaneously (matches original text, never re-scans output) so it is swap-safe.
+The collision pre-check must IGNORE new-names that are themselves old-keys in the same
+function's map, else it false-positives on every swap. Verified byte-identical each time.
 
 **Batch 8-11 process refinements (all byte-identical except batch7's WARN strings):**
 - **Collision pre-check before applying** (avoids the batch-7 rebuild loop): for each
