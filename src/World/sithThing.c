@@ -289,9 +289,9 @@ void sithThing_TickAll(flex_t deltaSeconds, int deltaMs)
             // CPU optimization testing
 #ifdef TARGET_RETRO_HOMEBREW
             if ((pThingIter->type == SITH_THING_PLAYER) || bActorCanUpdateNow || bActorCanUpdateEveryOther || (pThingIter->type != SITH_THING_ACTOR && pThingIter->lastRenderedTickIdx >= jkPlayer_currentTickIdx-3) || bCanUpdateOffscreen)
-            sithPuppet_Tick(pThingIter, bActorCanUpdateEveryOther ? deltaSeconds * 2 : deltaSeconds);
+            sithPuppet_UpdatePuppet(pThingIter, bActorCanUpdateEveryOther ? deltaSeconds * 2 : deltaSeconds);
 #else
-            sithPuppet_Tick(pThingIter, deltaSeconds);
+            sithPuppet_UpdatePuppet(pThingIter, deltaSeconds);
 #endif
             continue;
         }
@@ -619,7 +619,7 @@ void sithThing_FreeEverything(sithThing* pThing)
     if ( pThing->type == SITH_THING_PARTICLE )
         sithParticle_Free(pThing);
     if ( pThing->animclass )
-        sithPuppet_FreeEntry(pThing);
+        sithPuppet_Free(pThing);
     rdThing_FreeEntry(&pThing->rdthing);
     sithSoundMixer_FreeThing(pThing);
     pThing->type = SITH_THING_FREE;
@@ -642,7 +642,7 @@ void sithThing_sub_4CD100(sithThing* pThing)
             break;
     }
     if ( pThing->rdthing.puppet )
-        sithPuppet_NewEntry(pThing);
+        sithPuppet_New(pThing);
     if ( pThing->controlType == SITH_CT_AI )
         sithAI_NewEntry(pThing);
     if ( pThing->soundclass )
@@ -803,7 +803,7 @@ void sithThing_EnterWater(sithThing* pThing, int a2)
 
     pThing->thingflags |= SITH_TF_WATER;
     if ( pThing->animclass )
-        sithPuppet_sub_4E4760(pThing, 1);
+        sithPuppet_SetMoveMode(pThing, 1);
     if ( (pThing->thingflags & SITH_TF_DROWNS) != 0 )
     {
         pThing->thingflags |= SITH_TF_WILLBEREMOVED;
@@ -863,7 +863,7 @@ void sithThing_ExitWater(sithThing* pThing, int a2)
 {
     pThing->thingflags &= ~SITH_TF_WATER;
     if ( pThing->animclass )
-        sithPuppet_sub_4E4760(pThing, 0);
+        sithPuppet_SetMoveMode(pThing, 0);
 
 #ifdef QOL_IMPROVEMENTS
     // Prevent splash sound spam if they're not actually making significant movement

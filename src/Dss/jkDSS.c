@@ -928,7 +928,7 @@ int jkDSS_Processx33(sithCogMsg *msg)
     rdKeyframe* pKeyframe = sithKeyFrame_GetByIdx(arg1);
     if ( !pKeyframe )
         return 0;
-    sithPuppet_StartKey(
+    sithPuppet_PlayKey(
         pPlayerInfo->povModel.puppet,
         pKeyframe,
         arg2,

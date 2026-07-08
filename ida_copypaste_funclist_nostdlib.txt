@@ -2296,18 +2296,18 @@ sithCogExec_MathOperation	.text	004E3870	000002EA	00000030	00000008	R	.	.	.	.	.	
 sithCogExec_AssignStackVar	.text	004E3B90	00000067	0000001C	0000000C	R	.	.	.	.	.	T	.
 sithPuppet_Startup	.text	004E3C00	0000009F	00000008	00000000	R	.	.	.	.	.	.	.
 sithPuppet_Shutdown	.text	004E3CA0	00000055			R	.	.	.	.	.	.	.
-sithPuppet_NewEntry	.text	004E3D00	00000070	00000004	00000004	R	.	.	.	.	.	T	.
-sithPuppet_FreeEntry	.text	004E3D70	00000027	00000004	00000004	R	.	.	.	.	.	T	.
+sithPuppet_New	.text	004E3D00	00000070	00000004	00000004	R	.	.	.	.	.	T	.
+sithPuppet_Free	.text	004E3D70	00000027	00000004	00000004	R	.	.	.	.	.	T	.
 sithPuppet_ResetTrack	.text	004E3DA0	0000003A	00000008	00000004	R	.	.	.	.	.	T	.
-sithPuppet_Tick	.text	004E3DE0	0000036B	00000018	00000008	R	.	.	.	.	.	T	.
-sithPuppet_FidgetAnim	.text	004E4150	00000167	0000000C	00000004	R	.	.	.	.	.	T	.
+sithPuppet_UpdatePuppet	.text	004E3DE0	0000036B	00000018	00000008	R	.	.	.	.	.	T	.
+sithPuppet_PlayFidgetMode	.text	004E4150	00000167	0000000C	00000004	R	.	.	.	.	.	T	.
 sithPuppet_resetidk	.text	004E42C0	00000050	00000004	00000004	R	.	.	.	.	.	T	.
 sithPuppet_advanceidk	.text	004E4310	00000063	00000008	00000008	R	.	.	.	.	.	T	.
-sithPuppet_sub_4E4380	.text	004E4380	000003D3	00000020	00000004	R	.	.	.	.	.	T	.
-sithPuppet_sub_4E4760	.text	004E4760	00000031	00000000	00000008	R	.	.	.	.	.	T	.
+sithPuppet_UpdateThingMove	.text	004E4380	000003D3	00000020	00000004	R	.	.	.	.	.	T	.
+sithPuppet_SetMoveMode	.text	004E4760	00000031	00000000	00000008	R	.	.	.	.	.	T	.
 sithPuppet_SetArmedMode	.text	004E47A0	00000026	00000000	00000008	R	.	.	.	.	.	T	.
 sithPuppet_PlayMode	.text	004E47D0	000000DD	00000010	0000000C	R	.	.	.	.	.	T	.
-sithPuppet_StartKey	.text	004E48B0	00000107	00000010	00000018	R	.	.	.	.	.	T	.
+sithPuppet_PlayKey	.text	004E48B0	00000107	00000010	00000018	R	.	.	.	.	.	T	.
 sithPuppet_StopKey	.text	004E49C0	00000059	00000004	0000000C	R	.	.	.	.	.	T	.
 sithPuppet_sub_4E4A20	.text	004E4A20	000000EF	00000004	00000008	R	.	.	.	.	.	T	.
 sithPuppet_DefaultCallback	.text	004E4B10	00000382	00000008	0000000C	R	.	.	.	.	.	T	.

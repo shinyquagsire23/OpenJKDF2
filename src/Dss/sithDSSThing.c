@@ -255,7 +255,7 @@ int sithDSSThing_ProcessStateUpdate(sithCogMsg *msg)
     if ( pAnimclass )
     {
         sithPuppet_SetArmedMode(pThing, NETMSG_POPS16());
-        sithPuppet_sub_4E4760(pThing, NETMSG_POPS16());
+        sithPuppet_SetMoveMode(pThing, NETMSG_POPS16());
     }
 
     pThing->light = NETMSG_POPF32();
@@ -426,7 +426,7 @@ int sithDSSThing_ProcessPlayKey(sithCogMsg *msg)
                 int arg1 = NETMSG_POPS16();
                 int arg2 = NETMSG_POPS32();
                 int arg3 = NETMSG_POPS32();
-                int v4 = sithPuppet_StartKey(
+                int v4 = sithPuppet_PlayKey(
                          pThing->rdthing.puppet,
                          pKeyframe,
                          arg1,

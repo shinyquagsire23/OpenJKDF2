@@ -108,7 +108,7 @@ void sithPuppet_Shutdown()
     }
 }
 
-sithPuppet* sithPuppet_NewEntry(sithThing *thing)
+sithPuppet* sithPuppet_New(sithThing *thing)
 {
     sithPuppet *v1; // edi
     sithSector *sector; // eax
@@ -141,7 +141,7 @@ sithPuppet* sithPuppet_NewEntry(sithThing *thing)
     return result;
 }
 
-void sithPuppet_FreeEntry(sithThing *puppet)
+void sithPuppet_Free(sithThing *puppet)
 {
     if ( puppet->puppet )
     {
@@ -150,7 +150,7 @@ void sithPuppet_FreeEntry(sithThing *puppet)
     }
 }
 
-void sithPuppet_sub_4E4760(sithThing *thing, int a2)
+void sithPuppet_SetMoveMode(sithThing *thing, int a2)
 {
     sithPuppet *puppet; // eax
 
@@ -211,13 +211,13 @@ int sithPuppet_PlayMode(sithThing *thing, signed int anim, rdPuppetTrackCallback
         }
     }
     
-    result = sithPuppet_StartKey(thing->rdthing.puppet, keyframe, lowPri, highPri, flags, callback);
+    result = sithPuppet_PlayKey(thing->rdthing.puppet, keyframe, lowPri, highPri, flags, callback);
     if ( result < 0 )
         return -1;
     return result;
 }
 
-int sithPuppet_StartKey(rdPuppet *puppet, rdKeyframe *keyframe, int a3, int a4, int a5, rdPuppetTrackCallback_t callback)
+int sithPuppet_PlayKey(rdPuppet *puppet, rdKeyframe *keyframe, int a3, int a4, int a5, rdPuppetTrackCallback_t callback)
 {
     int v6; // ecx
     int trackNum; // esi
@@ -291,7 +291,7 @@ void sithPuppet_ResetTrack(sithThing *puppet)
 }
 
 // MOTS altered?
-void sithPuppet_Tick(sithThing *thing, flex_t deltaSeconds)
+void sithPuppet_UpdatePuppet(sithThing *thing, flex_t deltaSeconds)
 {
     flex_d_t v3; // st7
     sithPuppet *v4; // eax
@@ -320,7 +320,7 @@ void sithPuppet_Tick(sithThing *thing, flex_t deltaSeconds)
     {
         if ( thing->moveType == SITH_MT_PHYSICS )
         {
-            v3 = sithPuppet_sub_4E4380(thing);
+            v3 = sithPuppet_UpdateThingMove(thing);
             v4 = thing->puppet;
             v5 = v4->playingAnim;
             if ( v5 )
@@ -339,7 +339,7 @@ void sithPuppet_Tick(sithThing *thing, flex_t deltaSeconds)
                     }
                 }
             }
-            sithPuppet_FidgetAnim(thing);
+            sithPuppet_PlayFidgetMode(thing);
         }
         if ( rdPuppet_UpdateTracks(thing->rdthing.puppet, deltaSeconds) && thing->moveType == SITH_MT_PATH )
         {
@@ -366,7 +366,7 @@ void sithPuppet_Tick(sithThing *thing, flex_t deltaSeconds)
     }
 }
 
-flex_t sithPuppet_sub_4E4380(sithThing *thing)
+flex_t sithPuppet_UpdateThingMove(sithThing *thing)
 {
     flex_d_t v2; // st7
     int v3; // ecx
@@ -603,7 +603,7 @@ void sithPuppet_sub_4E4A20(sithThing *thing, sithAnimclassEntry *animClass)
             if ( animClass->keyframe )
             {
                 sithPup = thing->puppet;
-                sithPup->otherTrack = sithPuppet_StartKey(
+                sithPup->otherTrack = sithPuppet_PlayKey(
                                           thing->rdthing.puppet,
                                           animClass->keyframe,
                                           animClass->lowPri,
@@ -801,7 +801,7 @@ void sithPuppet_SetArmedMode(sithThing *thing, int mode)
     }
 }
 
-void sithPuppet_FidgetAnim(sithThing *pThing)
+void sithPuppet_PlayFidgetMode(sithThing *pThing)
 {
     sithPuppet *puppet; // eax
     flex_d_t v2; // st7
@@ -825,7 +825,7 @@ void sithPuppet_FidgetAnim(sithThing *pThing)
                 v8 = pThing->animclass;
                 if ( !v8
                   || (v9 = &v8->modes[pThing->puppet->majorMode].keyframe[SITH_ANIM_FIDGET2], !v9->keyframe)
-                  || (v10 = sithPuppet_StartKey(
+                  || (v10 = sithPuppet_PlayKey(
                                 pThing->rdthing.puppet,
                                 v9->keyframe,
                                 v9->lowPri,
@@ -844,7 +844,7 @@ void sithPuppet_FidgetAnim(sithThing *pThing)
             v3 = pThing->animclass;
             if ( !v3
               || (v4 = &v3->modes[pThing->puppet->majorMode].keyframe[SITH_ANIM_FIDGET], !v4->keyframe)
-              || (v5 = sithPuppet_StartKey(
+              || (v5 = sithPuppet_PlayKey(
                            pThing->rdthing.puppet,
                            v4->keyframe,
                            v4->lowPri,
@@ -891,7 +891,7 @@ void sithPuppet_advanceidk(sithThing *pThing, flex_t a2)
     flex_t a3; // [esp+0h] [ebp-8h]
     flex_t thinga; // [esp+Ch] [ebp+4h]
 
-    v3 = sithPuppet_sub_4E4380(pThing);
+    v3 = sithPuppet_UpdateThingMove(pThing);
     puppet = pThing->puppet;
     v5 = puppet->playingAnim;
     if ( v5 )

@@ -1080,7 +1080,7 @@ int sithDSS_ProcessPuppetStatus(sithCogMsg *msg)
         thing->puppet->otherTrack = NETMSG_POPS32();
         
         sithPuppet_SetArmedMode(thing, NETMSG_POPS16());
-        sithPuppet_sub_4E4760(thing, NETMSG_POPS16());
+        sithPuppet_SetMoveMode(thing, NETMSG_POPS16());
     }
     return 1;
 }

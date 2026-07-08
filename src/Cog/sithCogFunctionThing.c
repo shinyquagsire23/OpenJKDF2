@@ -1079,7 +1079,7 @@ void sithCogFunctionThing_PlayKey(sithCog *ctx)
        goto fail;
     }
     
-    track = sithPuppet_StartKey(puppet, keyframe, popInt, popInt + 2, trackNum, 0);
+    track = sithPuppet_PlayKey(puppet, keyframe, popInt, popInt + 2, trackNum, 0);
     if ( track >= 0 )
     {
         sithCogExec_PushInt(ctx, track);

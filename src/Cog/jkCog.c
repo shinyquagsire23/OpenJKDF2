@@ -294,7 +294,7 @@ void jkCog_PlayPovKey(sithCog *ctx)
       && ((v5 = actorThing->type, v5 == SITH_THING_ACTOR) || v5 == SITH_THING_PLAYER)
       && (v6 = actorThing->playerInfo->povModel.puppet) != 0 )
     {
-        v7 = sithPuppet_StartKey(v6, keyframe, v2, v2 + 2, v1, 0);
+        v7 = sithPuppet_PlayKey(v6, keyframe, v2, v2 + 2, v1, 0);
         sithCogExec_PushInt(ctx, v7);
     }
     else

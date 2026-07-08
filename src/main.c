@@ -2461,9 +2461,9 @@ void do_hooks()
     
 #if 0
     // sithPuppet
-    hook_function(sithPuppet_FreeEntry_ADDR, sithPuppet_FreeEntry);
+    hook_function(sithPuppet_Free_ADDR, sithPuppet_Free);
     hook_function(sithPuppet_PlayMode_ADDR, sithPuppet_PlayMode);
-    hook_function(sithPuppet_StartKey_ADDR, sithPuppet_StartKey);
+    hook_function(sithPuppet_PlayKey_ADDR, sithPuppet_PlayKey);
     hook_function(sithPuppet_DefaultCallback_ADDR, sithPuppet_DefaultCallback);
     hook_function(sithPuppet_StopKey_ADDR, sithPuppet_StopKey);
     hook_function(sithPuppet_SetArmedMode_ADDR, sithPuppet_SetArmedMode);
@@ -3080,14 +3080,14 @@ void do_hooks()
     hook_function_inv(sithDSSThing_Attachment_ADDR, sithDSSThing_Attachment);
     
     hook_function_inv(sithPuppet_Startup_ADDR, sithPuppet_Startup);
-    hook_function_inv(sithPuppet_NewEntry_ADDR, sithPuppet_NewEntry);
-    hook_function_inv(sithPuppet_FreeEntry_ADDR, sithPuppet_FreeEntry);
-    hook_function_inv(sithPuppet_sub_4E4760_ADDR, sithPuppet_sub_4E4760);
+    hook_function_inv(sithPuppet_New_ADDR, sithPuppet_New);
+    hook_function_inv(sithPuppet_Free_ADDR, sithPuppet_Free);
+    hook_function_inv(sithPuppet_SetMoveMode_ADDR, sithPuppet_SetMoveMode);
     hook_function_inv(sithPuppet_PlayMode_ADDR, sithPuppet_PlayMode);
-    hook_function_inv(sithPuppet_StartKey_ADDR, sithPuppet_StartKey);
+    hook_function_inv(sithPuppet_PlayKey_ADDR, sithPuppet_PlayKey);
     hook_function_inv(sithPuppet_ResetTrack_ADDR, sithPuppet_ResetTrack);
-    hook_function_inv(sithPuppet_Tick_ADDR, sithPuppet_Tick);
-    hook_function_inv(sithPuppet_sub_4E4380_ADDR, sithPuppet_sub_4E4380);
+    hook_function_inv(sithPuppet_UpdatePuppet_ADDR, sithPuppet_UpdatePuppet);
+    hook_function_inv(sithPuppet_UpdateThingMove_ADDR, sithPuppet_UpdateThingMove);
     hook_function_inv(sithPuppet_sub_4E4A20_ADDR, sithPuppet_sub_4E4A20);
     hook_function_inv(sithPuppet_DefaultCallback_ADDR, sithPuppet_DefaultCallback);
     hook_function_inv(sithPuppet_StopKey_ADDR, sithPuppet_StopKey);
