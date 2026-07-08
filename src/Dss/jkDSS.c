@@ -93,7 +93,7 @@ int jkDSS_Startup()
     // MOTS added:
     if (Main_bMotsCompat) {
         sithWorld_SetChecksumExtraFunc(jkPlayer_ChecksumExtra);
-        sithEvent_RegisterFunc(5,jkDSS_JKM1,0,2);
+        sithEvent_RegisterTask(5,jkDSS_JKM1,0,2);
     }
 
     return 1;

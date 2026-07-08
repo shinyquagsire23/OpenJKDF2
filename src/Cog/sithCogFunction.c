@@ -381,7 +381,7 @@ void sithCogFunction_SetTimerEx(sithCog *ctx)
     cog_flex_t a1a = sithCogExec_PopFlex(ctx) * 1000.0;
     int timerMs = (signed int)a1a;
     if ( timerMs >= 0 ) {
-        sithEvent_Set(4, &timerInfo, timerMs);
+        sithEvent_CreateEvent(4, &timerInfo, timerMs);
     }
 }
 
@@ -407,7 +407,7 @@ void sithCogFunction_KillTimerEx(sithCog *ctx)
                         v3->nextTimer = v4;
                     else
                         sithEvent_list = v2->nextTimer;
-                    sithEvent_Kill(v2);
+                    sithEvent_FreeEvent(v2);
                     v2 = v3;
                 }
                 v3 = v2;

@@ -343,7 +343,7 @@ int sithMain_Tick()
             for (int i = 0; i < wholeFramesToApply; i++)
             {
                 sithSoundMixer_Tick(sithTime_deltaSeconds);
-                sithEvent_Advance();
+                sithEvent_Process();
 
                 if ( sithComm_bSyncMultiplayer )
                     sithComm_Sync();
@@ -378,7 +378,7 @@ int sithMain_Tick()
 #endif
         {
             sithSoundMixer_Tick(sithTime_deltaSeconds);
-            sithEvent_Advance();
+            sithEvent_Process();
 
             if ( sithComm_bSyncMultiplayer )
                 sithComm_Sync();

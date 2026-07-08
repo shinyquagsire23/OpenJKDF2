@@ -115,7 +115,7 @@ HRESULT sithMulti_CreatePlayer(const wchar_t *a1, const wchar_t *a2, const char 
         sithMulti_multiplayerTimelimit = sithNet_multiplayer_timelimit;
         stdComm_dword_832204 = sithNet_scorelimit;
         sithNet_tickrate = rate;
-        sithEvent_RegisterFunc(2, sithMulti_ServerLeft, rate, 1); // TODO enum
+        sithEvent_RegisterTask(2, sithMulti_ServerLeft, rate, 1); // TODO enum
         result = 0;
     }
     return result;
@@ -247,7 +247,7 @@ void sithMulti_Shutdown()
     sithNet_isMulti = 0;
     sithNet_isServer = 0;
     sithComm_bSyncMultiplayer &= ~1u;
-    sithEvent_RegisterFunc(2, 0, 0, 0);
+    sithEvent_RegisterTask(2, 0, 0, 0);
     stdComm_Close();
     stdComm_CloseConnection();
 }
@@ -628,7 +628,7 @@ int sithMulti_ProcessJoinLeave(sithCogMsg *msg)
     sithPlayer_sub_4C87C0(v1, v2);
     sithPlayer_idk(v1); // sets playerThingIdx and info
     sithPlayer_ResetPalEffects();
-    sithEvent_RegisterFunc(2, sithMulti_ServerLeft, sithNet_tickrate, 1);
+    sithEvent_RegisterTask(2, sithMulti_ServerLeft, sithNet_tickrate, 1);
     sithComm_SetNeedsSync();
     return 1;
 }

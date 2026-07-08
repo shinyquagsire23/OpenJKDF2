@@ -50,7 +50,7 @@ void sithEvent_Reset()
     sithEvent_list = 0;
 }
 
-int sithEvent_Set(int taskId, sithEventInfo *timerInfo, uint32_t when)
+int sithEvent_CreateEvent(int taskId, sithEventInfo *timerInfo, uint32_t when)
 {
     sithEvent *timer;
     sithEvent *v5;
@@ -90,7 +90,7 @@ int sithEvent_Set(int taskId, sithEventInfo *timerInfo, uint32_t when)
     return 1;
 }
 
-void sithEvent_Kill(sithEvent *pEvent)
+void sithEvent_FreeEvent(sithEvent *pEvent)
 {
     _memset(pEvent, 0, sizeof(sithEvent));
     
@@ -101,7 +101,7 @@ void sithEvent_Kill(sithEvent *pEvent)
     sithEvent_numFreeEventBuffers++;
 }
 
-int sithEvent_RegisterFunc(int idx, sithEventHandler_t handler, int rate, int startMode)
+int sithEvent_RegisterTask(int idx, sithEventHandler_t handler, int rate, int startMode)
 {
     sithEvent_aTasks[idx].pfProcess = handler;
     sithEvent_aTasks[idx].creationMs = sithTime_curMs;
@@ -111,7 +111,7 @@ int sithEvent_RegisterFunc(int idx, sithEventHandler_t handler, int rate, int st
     return 1;
 }
 
-void sithEvent_Advance()
+void sithEvent_Process()
 {
     sithEvent *i;
 
@@ -141,7 +141,7 @@ void sithEvent_Advance()
         if (sithEvent_aTasks[i->taskNum].pfProcess)
             sithEvent_aTasks[i->taskNum].pfProcess(0, &i->timerInfo);
         
-        sithEvent_Kill(i);
+        sithEvent_FreeEvent(i);
         i = sithEvent_list;
     }
 }

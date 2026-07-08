@@ -658,7 +658,7 @@ int sithDSS_ProcessSyncEvents(sithCogMsg *msg)
     info.field_10 = NETMSG_POPF32();
     info.field_14 = NETMSG_POPF32();
     field_4 = NETMSG_POPS16();
-    sithEvent_Set(field_4, &info, deltaMs);
+    sithEvent_CreateEvent(field_4, &info, deltaMs);
     return 1;
 }
 

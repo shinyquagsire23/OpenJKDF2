@@ -16,7 +16,7 @@ int sithAIAwareness_Startup()
     if (sithAIAwareness_aSectors)
     {
         sithAIAwareness_numEntries = 0;
-        if ( sithEvent_RegisterFunc(3, sithAIAwareness_Tick, 1000, SITHEVENT_TASKPERIODIC) )
+        if ( sithEvent_RegisterTask(3, sithAIAwareness_Tick, 1000, SITHEVENT_TASKPERIODIC) )
         {
             sithAIAwareness_bInitted = 1;
             return 1;
@@ -30,7 +30,7 @@ void sithAIAwareness_Shutdown()
 {
     SITH_FREE(sithAIAwareness_aSectors);
     sithAIAwareness_aSectors = 0;
-    sithEvent_RegisterFunc(3, NULL, 0, SITHEVENT_TASKDISABLED);
+    sithEvent_RegisterTask(3, NULL, 0, SITHEVENT_TASKDISABLED);
     sithAIAwareness_bInitted = 0;
 }
 

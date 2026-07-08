@@ -190,7 +190,7 @@ int sithCommand_CmdTick(stdDebugConsoleCmd *pCmd, const char *pArgStr)
         if ( newTickrate >= 100 && newTickrate <= 300)
         {
             sithNet_tickrate = newTickrate;
-            sithEvent_RegisterFunc(2, sithMulti_ServerLeft, newTickrate, 1);
+            sithEvent_RegisterTask(2, sithMulti_ServerLeft, newTickrate, 1);
             result = 1;
         }
         else

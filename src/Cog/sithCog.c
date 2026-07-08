@@ -135,7 +135,7 @@ int32_t sithCog_Startup()
     sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global13", 0);
     sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global14", 0);
     sithCogScript_RegisterGlobalMessage(sithCog_pSymbolTable, "global15", 0);
-    sithEvent_RegisterFunc(4, sithCogScript_TimerTick, 0, 2);
+    sithEvent_RegisterTask(4, sithCogScript_TimerTick, 0, 2);
     sithCog_bInitted = 1;
     return 1;
 }

@@ -2403,10 +2403,10 @@ void do_hooks()
     hook_function(sithEvent_Open_ADDR, sithEvent_Open);
     hook_function(sithEvent_Close_ADDR, sithEvent_Close);
     hook_function(sithEvent_Reset_ADDR, sithEvent_Reset);
-    hook_function(sithEvent_Set_ADDR, sithEvent_Set);
-    hook_function(sithEvent_Kill_ADDR, sithEvent_Kill);
-    hook_function(sithEvent_RegisterFunc_ADDR, sithEvent_RegisterFunc);
-    hook_function(sithEvent_Advance_ADDR, sithEvent_Advance);
+    hook_function(sithEvent_CreateEvent_ADDR, sithEvent_CreateEvent);
+    hook_function(sithEvent_FreeEvent_ADDR, sithEvent_FreeEvent);
+    hook_function(sithEvent_RegisterTask_ADDR, sithEvent_RegisterTask);
+    hook_function(sithEvent_Process_ADDR, sithEvent_Process);
     
 #if 0
     // sithKeyFrame
