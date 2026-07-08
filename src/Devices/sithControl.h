@@ -43,21 +43,21 @@ int sithControl_Shutdown();
 int sithControl_IsOpen();
 int sithControl_Open();
 void sithControl_Close();
-void sithControl_RegisterAxisFunction(int funcIdx, uint32_t flags);
+void sithControl_RegisterAxisFunction(int functionId, uint32_t flag);
 void sithControl_Reset();
 void sithControl_RegisterControlFunctions();
-void sithControl_Update(flex_t deltaSecs, int deltaMs);
-void sithControl_RegisterControlCallback(sithControl_handler_t a1);
+void sithControl_Update(flex_t secDeltaTime, int msecDeltaTime);
+void sithControl_RegisterControlCallback(sithControl_handler_t pfCallback);
 MATH_FUNC int sithControl_HandlePlayer(SithThing *player_, flex_t a2);
 MATH_FUNC void sithControl_PlayerLook(SithThing *player, flex_t deltaSecs);
 MATH_FUNC void sithControl_PlayerMovement(SithThing *player);
 MATH_FUNC void sithControl_PlayerMovementMots(SithThing *player);
 MATH_FUNC void sithControl_FreeCam(SithThing *player);
 
-stdControlKeyInfoEntry* sithControl_BindControl(int funcIdx, int keyNum, int flags);
-stdControlKeyInfoEntry* sithControl_BindAxis(int funcIdx, int dxKeyNum, uint32_t flags);
-void sithControl_UnbindFunctionIndex(int funcIdx, unsigned int idx);
-void sithControl_UnbindControl(int funcIdx, int dxKeyNum);
+stdControlKeyInfoEntry* sithControl_BindControl(int functionId, int controlId, int flags);
+stdControlKeyInfoEntry* sithControl_BindAxis(int functionId, int axis, uint32_t flags);
+void sithControl_UnbindFunctionIndex(int funcId, unsigned int bindIndex);
+void sithControl_UnbindControl(int flags, int controlId);
 int sithControl_ReadConf();
 int sithControl_WriteConf();
 
@@ -65,13 +65,13 @@ void sithControl_ReadControls();
 void sithControl_FinishRead();
 void sithControl_RegisterKeyboardBindings();
 void sithControl_DefaultInit();
-MATH_FUNC flex_t sithControl_GetKeyAsAxisNormalized(int axisNum);
-MATH_FUNC flex_t sithControl_GetKeyAsAxis(int funcIdx);
-MATH_FUNC flex_t sithControl_GetAxis(int funcIdx);
+MATH_FUNC flex_t sithControl_GetKeyAsAxisNormalized(int axisId);
+MATH_FUNC flex_t sithControl_GetKeyAsAxis(int axisId);
+MATH_FUNC flex_t sithControl_GetAxis(int axisId);
 int sithControl_GetKey(int func, int* out);
 
 void sithControl_RegisterKeyFunction(int a);
-stdControlKeyInfo* sithControl_EnumBindings(sithControlEnumFunc_t pfEnumFunction, int a2, int a3, int a4, Darray *a5);
+stdControlKeyInfo* sithControl_EnumBindings(sithControlEnumFunc_t pfFunc, int a2, int a3, int a4, Darray *a5);
 void sithControl_RegisterMouseBindings(); // Added
 void sithControl_RebindMouse();
 void sithControl_RebindKeyboard();

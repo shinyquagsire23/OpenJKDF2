@@ -108,23 +108,23 @@ void sithPuppet_Shutdown()
     }
 }
 
-sithPuppet* sithPuppet_New(SithThing *thing)
+sithPuppet* sithPuppet_New(SithThing *pThing)
 {
     sithPuppet *v1; // edi
     SithSector *sector; // eax
     sithPuppet *result; // eax
 
     v1 = (sithPuppet *)SITH_ALLOC(sizeof(sithPuppet));
-    thing->puppet = v1;
+    pThing->puppet = v1;
     if ( !v1 ) {
-        thing->pPuppetClass = 0;
+        pThing->pPuppetClass = 0;
         return NULL; // Added
     }
     _memset(v1, 0, sizeof(sithPuppet));
-    sector = thing->sector;
+    sector = pThing->sector;
     if ( sector && (sector->flags & SITH_SECTOR_UNDERWATER) != 0 )
     {
-        result = thing->puppet;
+        result = pThing->puppet;
         result->field_4 = 1;
         result->otherTrack = -1;
         result->field_18 = -1;
@@ -132,7 +132,7 @@ sithPuppet* sithPuppet_New(SithThing *thing)
     }
     else
     {
-        result = thing->puppet;
+        result = pThing->puppet;
         result->field_4 = 0;
         result->otherTrack = -1;
         result->field_18 = -1;
@@ -141,35 +141,35 @@ sithPuppet* sithPuppet_New(SithThing *thing)
     return result;
 }
 
-void sithPuppet_Free(SithThing *puppet)
+void sithPuppet_Free(SithThing *pThing)
 {
-    if ( puppet->puppet )
+    if ( pThing->puppet )
     {
-        SITH_FREE(puppet->puppet);
-        puppet->puppet = 0;
+        SITH_FREE(pThing->puppet);
+        pThing->puppet = 0;
     }
 }
 
-void sithPuppet_SetMoveMode(SithThing *thing, int a2)
+void sithPuppet_SetMoveMode(SithThing *pThing, int newMode)
 {
     sithPuppet *puppet; // eax
 
-    if ( thing->pPuppetClass )
+    if ( pThing->pPuppetClass )
     {
-        puppet = thing->puppet;
+        puppet = pThing->puppet;
         if ( puppet )
         {
-            if ( puppet->field_4 != a2 )
+            if ( puppet->field_4 != newMode )
             {
-                puppet->field_4 = a2;
-                puppet->majorMode = puppet->field_0 + 3 * a2;
+                puppet->field_4 = newMode;
+                puppet->majorMode = puppet->field_0 + 3 * newMode;
             }
         }
     }
 }
 
 // MOTS altered
-int sithPuppet_PlayMode(SithThing *thing, signed int anim, rdPuppetTrackCallback_t callback)
+int sithPuppet_PlayMode(SithThing *pThing, signed int submode, rdPuppetTrackCallback_t pfCallback)
 {
     SithPuppetClass *v4; // ebx
     sithPuppet *v6; // edx
@@ -182,107 +182,107 @@ int sithPuppet_PlayMode(SithThing *thing, signed int anim, rdPuppetTrackCallback
     int highPri; // [esp+14h] [ebp+4h]
     int lowPri; // [esp+18h] [ebp+8h]
 
-    v4 = thing->pPuppetClass;
+    v4 = pThing->pPuppetClass;
     if ( !v4 )
         return -1;
-    if ( anim < 0 )
+    if ( submode < 0 )
         return -1;
-    if ( anim >= SITHPUPPET_NUMANIMS )
+    if ( submode >= SITHPUPPET_NUMANIMS )
         return -1;
-    v6 = thing->puppet;
+    v6 = pThing->puppet;
 
-    v7 = &v4->modes[v6->majorMode].keyframe[anim];
+    v7 = &v4->modes[v6->majorMode].keyframe[submode];
     keyframe = v7->keyframe;
     if ( !v7->keyframe )
         return -1;
     flags = v7->flags;
     lowPri = v7->lowPri;
     highPri = v7->highPri;
-    if ( anim != SITH_ANIM_FIDGET && anim != SITH_ANIM_FIDGET2 )
+    if ( submode != SITH_ANIM_FIDGET && submode != SITH_ANIM_FIDGET2 )
     {
         v6->animStartedMs = sithTime_g_msecGameTime;
         v10 = v6->currentTrack;
         if ( v10 >= 0 )
         {
-            v11 = thing->renderData.puppet;
+            v11 = pThing->renderData.puppet;
             if ( v11->aTracks[v10].keyframe )
                 rdPuppet_RemoveTrack(v11, v10);
-            thing->puppet->currentTrack = -1;
+            pThing->puppet->currentTrack = -1;
         }
     }
     
-    result = sithPuppet_PlayKey(thing->renderData.puppet, keyframe, lowPri, highPri, flags, callback);
+    result = sithPuppet_PlayKey(pThing->renderData.puppet, keyframe, lowPri, highPri, flags, pfCallback);
     if ( result < 0 )
         return -1;
     return result;
 }
 
-int sithPuppet_PlayKey(rdPuppet *puppet, rdKeyframe *keyframe, int a3, int a4, int a5, rdPuppetTrackCallback_t callback)
+int sithPuppet_PlayKey(rdPuppet *pPuppet, rdKeyframe *pTrack, int lowPriority, int highPriority, int flags, rdPuppetTrackCallback_t pfCallback)
 {
     int v6; // ecx
     int trackNum; // esi
     signed int result; // eax
 
     v6 = 1;
-    if ( (a5 & 8) != 0 )
+    if ( (flags & 8) != 0 )
     {
         trackNum = 0;
-        while ( puppet->aTracks[trackNum].keyframe != keyframe )
+        while ( pPuppet->aTracks[trackNum].keyframe != pTrack )
         {
             ++trackNum;
             if ( trackNum >= 4 )
                 goto LABEL_8;
         }
-        rdPuppet_ResetTrack(puppet, trackNum);
+        rdPuppet_ResetTrack(pPuppet, trackNum);
         v6 = 0;
     }
     else
     {
-        trackNum = a5;
+        trackNum = flags;
     }
 
 LABEL_8:
     if ( v6 )
     {
-        trackNum = rdPuppet_AddTrack(puppet, keyframe, a3, a4);
+        trackNum = rdPuppet_AddTrack(pPuppet, pTrack, lowPriority, highPriority);
         if ( trackNum < 0 )
             return -1;
     }
-    if ( callback )
-        rdPuppet_SetCallback(puppet, trackNum, callback);
+    if ( pfCallback )
+        rdPuppet_SetCallback(pPuppet, trackNum, pfCallback);
     else
-        rdPuppet_SetCallback(puppet, trackNum, sithPuppet_DefaultCallback);
-    if ( (a5 & 2) != 0 )
+        rdPuppet_SetCallback(pPuppet, trackNum, sithPuppet_DefaultCallback);
+    if ( (flags & 2) != 0 )
     {
-        rdPuppet_SetStatus(puppet, trackNum, 0x20);
+        rdPuppet_SetStatus(pPuppet, trackNum, 0x20);
     }
-    else if ( (a5 & 0x20) != 0 )
+    else if ( (flags & 0x20) != 0 )
     {
-        rdPuppet_SetStatus(puppet, trackNum, 0x80);
+        rdPuppet_SetStatus(pPuppet, trackNum, 0x80);
     }
-    else if ( (a5 & 4) != 0 )
+    else if ( (flags & 4) != 0 )
     {
-        rdPuppet_SetStatus(puppet, trackNum, 0x40);
+        rdPuppet_SetStatus(pPuppet, trackNum, 0x40);
     }
-    if ( (a5 & 1) != 0 )
-        rdPuppet_SetTrackSpeed(puppet, trackNum, 0.0);
-    if ( (a5 & 0x10) != 0 )
-        rdPuppet_PlayTrack(puppet, trackNum);
+    if ( (flags & 1) != 0 )
+        rdPuppet_SetTrackSpeed(pPuppet, trackNum, 0.0);
+    if ( (flags & 0x10) != 0 )
+        rdPuppet_PlayTrack(pPuppet, trackNum);
     else
-        rdPuppet_FadeInTrack(puppet, trackNum, 0.1);
+        rdPuppet_FadeInTrack(pPuppet, trackNum, 0.1);
     result = trackNum;
-    puppet->aTracks[trackNum].field_130 = ((playerThingIdx + 1) << 16) | (uint16_t)(trackNum + 1);
+    pPuppet->aTracks[trackNum].field_130 = ((playerThingIdx + 1) << 16) | (uint16_t)(trackNum + 1);
     return result;
 }
 
-void sithPuppet_ResetTrack(SithThing *puppet)
+void sithPuppet_ResetTrack(SithThing *pThing)
 {
     unsigned int trackNum; // esi
     sithPuppet *v2; // eax
 
     for ( trackNum = 0; trackNum < 4; ++trackNum )
-        rdPuppet_RemoveTrack(puppet->renderData.puppet, trackNum);
-    v2 = puppet->puppet;
+        rdPuppet_RemoveTrack(pThing->renderData.puppet, trackNum);
+    v2 = pThing->puppet;
     v2->playingAnim = NULL;
     v2->otherTrack = -1;
     v2->field_18 = -1;
@@ -291,7 +291,7 @@ void sithPuppet_ResetTrack(SithThing *puppet)
 }
 
 // MOTS altered?
-void sithPuppet_UpdatePuppet(SithThing *thing, flex_t deltaSeconds)
+void sithPuppet_UpdatePuppet(SithThing *pThing, flex_t secDeltaTime)
 {
     flex_d_t v3; // st7
     sithPuppet *v4; // eax
@@ -316,12 +316,12 @@ void sithPuppet_UpdatePuppet(SithThing *thing, flex_t deltaSeconds)
     flex_t thinga; // [esp+1Ch] [ebp+4h]
     flex_t a2a; // [esp+20h] [ebp+8h]
 
-    if ( thing->pPuppetClass && thing->puppet && thing->renderData.puppet && (g_debugmodeFlags & DEBUGFLAG_NO_PUPPETS) == 0 )
+    if ( pThing->pPuppetClass && pThing->puppet && pThing->renderData.puppet && (g_debugmodeFlags & DEBUGFLAG_NO_PUPPETS) == 0 )
     {
-        if ( thing->moveType == SITH_MT_PHYSICS )
+        if ( pThing->moveType == SITH_MT_PHYSICS )
         {
-            v3 = sithPuppet_UpdateThingMove(thing);
-            v4 = thing->puppet;
+            v3 = sithPuppet_UpdateThingMove(pThing);
+            v4 = pThing->puppet;
             v5 = v4->playingAnim;
             if ( v5 )
             {
@@ -330,34 +330,34 @@ void sithPuppet_UpdatePuppet(SithThing *thing, flex_t deltaSeconds)
                     v6 = v4->otherTrack;
                     if ( v6 >= 0 )
                     {
-                        thinga = v3 * deltaSeconds;
+                        thinga = v3 * secDeltaTime;
                         v8 = thinga;
                         if ( v8 < 0.0 )
                             v8 = -v8;
                         v31 = v8 * 280.0;
-                        rdPuppet_AdvanceTrack(thing->renderData.puppet, v6, v31);
+                        rdPuppet_AdvanceTrack(pThing->renderData.puppet, v6, v31);
                     }
                 }
             }
-            sithPuppet_PlayFidgetMode(thing);
+            sithPuppet_PlayFidgetMode(pThing);
         }
-        if ( rdPuppet_UpdateTracks(thing->renderData.puppet, deltaSeconds) && thing->moveType == SITH_MT_PATH )
+        if ( rdPuppet_UpdateTracks(pThing->renderData.puppet, secDeltaTime) && pThing->moveType == SITH_MT_PATH )
         {
-            rdVector_Zero3(&thing->orient.scale);
-            thing->renderData.field_18 = 0;
-            rdPuppet_BuildJointMatrices(&thing->renderData, &thing->orient);
-            v20 = thing->renderData.paJointMatrices;
-            thing->renderData.field_18 = 1;
-            rdVector_Add3(&a1a, &thing->trackParams.curOrient.scale, &v20->scale);
-            rdVector_Sub3Acc(&a1a, &thing->position);
+            rdVector_Zero3(&pThing->orient.scale);
+            pThing->renderData.field_18 = 0;
+            rdPuppet_BuildJointMatrices(&pThing->renderData, &pThing->orient);
+            v20 = pThing->renderData.paJointMatrices;
+            pThing->renderData.field_18 = 1;
+            rdVector_Add3(&a1a, &pThing->trackParams.curOrient.scale, &v20->scale);
+            rdVector_Sub3Acc(&a1a, &pThing->position);
             if (!rdVector_IsZero3(&a1a))
             {
                 a2a = rdVector_Normalize3Acc(&a1a);
-                sithCollision_MoveThing(thing, &a1a, a2a, 0);
+                sithCollision_MoveThing(pThing, &a1a, a2a, 0);
             }
-            v23 = thing->renderData.paJointMatrices;
-            rdVector_Sub3(&a1a, &thing->position, &v23->scale);
-            for ( i = thing->renderData.model3->numHNodes; i != 0; i--)
+            v23 = pThing->renderData.paJointMatrices;
+            rdVector_Sub3(&a1a, &pThing->position, &v23->scale);
+            for ( i = pThing->renderData.model3->numHNodes; i != 0; i--)
             {
                 rdVector_Add3Acc(&v23->scale, &a1a);
                 v23++;
@@ -366,7 +366,7 @@ void sithPuppet_UpdatePuppet(SithThing *thing, flex_t deltaSeconds)
     }
 }
 
-flex_t sithPuppet_UpdateThingMove(SithThing *thing)
+flex_t sithPuppet_UpdateThingMove(SithThing *pThing)
 {
     flex_d_t v2; // st7
     int v3; // ecx
@@ -388,8 +388,8 @@ flex_t sithPuppet_UpdateThingMove(SithThing *thing)
     flex_t thinga; // [esp+24h] [ebp+4h]
 
     v23 = 0.5;
-    if ( !thing->sector
-      || rdVector_IsZero3(&thing->physicsParams.vel) )
+    if ( !pThing->sector
+      || rdVector_IsZero3(&pThing->physicsParams.vel) )
     {
         v2 = 0.0;
         thinga = 0.0;
@@ -397,8 +397,8 @@ flex_t sithPuppet_UpdateThingMove(SithThing *thing)
     }
     else
     {
-        rdMatrix_TransformVectorOrtho34(&a1a, &thing->physicsParams.vel, &thing->orient);
-        if ( thing->attach_flags || (thing->physicsParams.flags & SITH_PF_FLY) != 0 || (thing->sector->flags & SITH_ANIM_WALK) != 0 )
+        rdMatrix_TransformVectorOrtho34(&a1a, &pThing->physicsParams.vel, &pThing->orient);
+        if ( pThing->attach_flags || (pThing->physicsParams.flags & SITH_PF_FLY) != 0 || (pThing->sector->flags & SITH_ANIM_WALK) != 0 )
         {
             v2 = a1a.y;
             v5 = stdMath_Fabs(a1a.y);
@@ -418,7 +418,7 @@ flex_t sithPuppet_UpdateThingMove(SithThing *thing)
         else
         {
             v2 = a1a.y;
-            thinga = thing->physicsParams.vel.z;
+            thinga = pThing->physicsParams.vel.z;
             v3 = SITH_ANIM_WALK;
         }
     }
@@ -426,13 +426,13 @@ flex_t sithPuppet_UpdateThingMove(SithThing *thing)
     // MOTS also routes actors with the SITH_AF_ELECTRICWHIP typeflag through the submerged
     // animation set (majorMode = field_0 + 3) even when not underwater. Without this, such MOTS
     // actors play the wrong animation set. Gated on MoTS so JK behavior is unchanged.
-    if ( (thing->sector && (thing->sector->flags & SITH_SECTOR_UNDERWATER) != 0)
-      || (Main_bMotsCompat && (thing->actorParams.flags & SITH_AF_ELECTRICWHIP) != 0) )
+    if ( (pThing->sector && (pThing->sector->flags & SITH_SECTOR_UNDERWATER) != 0)
+      || (Main_bMotsCompat && (pThing->actorParams.flags & SITH_AF_ELECTRICWHIP) != 0) )
     {
-        v11 = thing->pPuppetClass;
+        v11 = pThing->pPuppetClass;
         if ( v11 )
         {
-            v12 = thing->puppet;
+            v12 = pThing->puppet;
             if ( v12 )
             {
                 if ( v12->field_4 != SITH_ANIM_STAND )
@@ -445,21 +445,21 @@ flex_t sithPuppet_UpdateThingMove(SithThing *thing)
     }
     else
     {
-        if ( thing->type == SITH_THING_PLAYER )
+        if ( pThing->type == SITH_THING_PLAYER )
             v23 = 1.0;
-        v11 = thing->pPuppetClass;
+        v11 = pThing->pPuppetClass;
         if ( v11 )
         {
-            if ( thing->puppet )
+            if ( pThing->puppet )
             {
-                if ( thing->puppet->field_4 )
+                if ( pThing->puppet->field_4 )
                 {
-                    thing->puppet->field_4 = 0;
-                    thing->puppet->majorMode = thing->puppet->field_0;
+                    pThing->puppet->field_4 = 0;
+                    pThing->puppet->majorMode = pThing->puppet->field_0;
                 }
             }
         }
-        if ( thing->moveType == SITH_MT_PHYSICS && thing->attach_flags && (thing->physicsParams.flags & (SITH_PF_200000|SITH_PF_CROUCHING)) )
+        if ( pThing->moveType == SITH_MT_PHYSICS && pThing->attach_flags && (pThing->physicsParams.flags & (SITH_PF_200000|SITH_PF_CROUCHING)) )
         {
             if ( v3 == SITH_ANIM_STAND && thinga < 0.0 )
                 anim = SITH_ANIM_CROUCHBACK;
@@ -473,15 +473,15 @@ flex_t sithPuppet_UpdateThingMove(SithThing *thing)
         v14 = -v14;
     if ( v14 <= 0.02 )
     {
-        if ( thing->controlType == SITH_CT_AI && thing->actor )
+        if ( pThing->controlType == SITH_CT_AI && pThing->actor )
         {
             thinga = 0.2;
-            anim = (thing->actor->flags & SITHAI_MODE_TURNING) != 0 ? SITH_ANIM_TURNLEFT : SITH_ANIM_STAND;
+            anim = (pThing->actor->flags & SITHAI_MODE_TURNING) != 0 ? SITH_ANIM_TURNLEFT : SITH_ANIM_STAND;
         }
         else
         {
-            thinga = thing->physicsParams.angularVelocity.y * 0.0002;
-            if ( (((jkPlayer_currentTickIdx & 0xFF) + (thing->idx & 0xFF)) & 3) != 0 )
+            thinga = pThing->physicsParams.angularVelocity.y * 0.0002;
+            if ( (((jkPlayer_currentTickIdx & 0xFF) + (pThing->idx & 0xFF)) & 3) != 0 )
                 return thinga;
             if ( thinga >= -0.01 )
             {
@@ -536,7 +536,7 @@ flex_t sithPuppet_UpdateThingMove(SithThing *thing)
         anim = SITH_ANIM_STRAFERIGHT;
     }
 LABEL_51:
-    v18 = thing->puppet;
+    v18 = pThing->puppet;
     v18->currentAnimation = anim;
 
     v19 = &v11->modes[v18->majorMode].keyframe[anim];
@@ -544,23 +544,23 @@ LABEL_51:
     {
         if ( anim == SITH_ANIM_FALL )
         {
-            if ( (thing->flags & SITH_TF_DEAD) != 0 || (thing->actorParams.flags & SITH_AF_SCREAMING) != 0 )
+            if ( (pThing->flags & SITH_TF_DEAD) != 0 || (pThing->actorParams.flags & SITH_AF_SCREAMING) != 0 )
                 goto LABEL_60;
-            sithSoundClass_PlayModeFirst(thing, SITH_SC_FALLING);
-            v20 = thing->actorParams.flags | SITH_AF_SCREAMING;
+            sithSoundClass_PlayModeFirst(pThing, SITH_SC_FALLING);
+            v20 = pThing->actorParams.flags | SITH_AF_SCREAMING;
         }
         else
         {
-            if ( (thing->actorParams.flags & SITH_AF_SCREAMING) == 0 )
+            if ( (pThing->actorParams.flags & SITH_AF_SCREAMING) == 0 )
             {
 LABEL_60:
-                sithPuppet_sub_4E4A20(thing, v19);
+                sithPuppet_sub_4E4A20(pThing, v19);
                 return thinga;
             }
-            sithSoundClass_StopMode(thing, SITH_SC_FALLING);
-            v20 = thing->actorParams.flags & ~SITH_AF_SCREAMING;
+            sithSoundClass_StopMode(pThing, SITH_SC_FALLING);
+            v20 = pThing->actorParams.flags & ~SITH_AF_SCREAMING;
         }
-        thing->actorParams.flags = v20;
+        pThing->actorParams.flags = v20;
         goto LABEL_60;
     }
     return thinga;
@@ -617,7 +617,7 @@ void sithPuppet_sub_4E4A20(SithThing *thing, SithPuppetClassSubmode *animClass)
 }
 
 // MOTS altered
-void sithPuppet_DefaultCallback(SithThing *thing, int32_t track, uint32_t a3)
+void sithPuppet_DefaultCallback(SithThing *pThing, int32_t track, uint32_t markerType)
 {
     unsigned int v3; // esi
     sithPuppet *sithPup; // eax
@@ -628,10 +628,10 @@ void sithPuppet_DefaultCallback(SithThing *thing, int32_t track, uint32_t a3)
     SithAIControlBlock *v12; // eax
 
     v3 = 0;
-    switch ( a3 )
+    switch ( markerType )
     {
         case 0u:
-            sithPup = thing->puppet;
+            sithPup = pThing->puppet;
             if ( sithPup )
             {
                 if ( track == sithPup->currentTrack )
@@ -642,33 +642,33 @@ void sithPuppet_DefaultCallback(SithThing *thing, int32_t track, uint32_t a3)
         case 2u:
         case 8u:
         case 9u:
-            if ( thing->renderData.puppet->aTracks[track].playSpeed < 0.5 )
+            if ( pThing->renderData.puppet->aTracks[track].playSpeed < 0.5 )
                 return;
-            if ( (thing->flags & SITH_TF_DEAD) != 0 )
+            if ( (pThing->flags & SITH_TF_DEAD) != 0 )
                 return;
-            if ( thing->type == SITH_THING_CORPSE )
+            if ( pThing->type == SITH_THING_CORPSE )
                 return;
 
-            if ( !thing->attach_flags || !thing->pSoundClass )
+            if ( !pThing->attach_flags || !pThing->pSoundClass )
                 return;
-            soundToPlay_base = a3 - 1;
-            if ( a3 - 1 > 1 )
-                soundToPlay_base = a3 - 6;
-            if ( !(thing->attach_flags & SITH_ATTACH_THINGFACE) )
+            soundToPlay_base = markerType - 1;
+            if ( markerType - 1 > 1 )
+                soundToPlay_base = markerType - 6;
+            if ( !(pThing->attach_flags & SITH_ATTACH_THINGFACE) )
             {
-                v10 = thing->attachedSurface->flags;
+                v10 = pThing->attachedSurface->flags;
                 if ( (v10 & (SITH_SURFACE_VERYDEEPWATER|SITH_SURFACE_EARTH|SITH_SURFACE_PUDDLE|SITH_SURFACE_WATER|SITH_SURFACE_METAL)) != 0 )
                 {
                     if ( (v10 & SITH_SURFACE_METAL) != 0 )
                         goto LABEL_14;
                     if ( (v10 & SITH_SURFACE_WATER) != 0 )
                     {
-                        sithSoundClass_PlayModeRandom(thing, (soundToPlay_base + SITH_SC_LWALKWATER));
+                        sithSoundClass_PlayModeRandom(pThing, (soundToPlay_base + SITH_SC_LWALKWATER));
                         return;
                     }
                     if ( (v10 & SITH_SURFACE_PUDDLE) != 0 )
                     {
-                        sithSoundClass_PlayModeRandom(thing, (soundToPlay_base + SITH_SC_LWALKPUDDLE));
+                        sithSoundClass_PlayModeRandom(pThing, (soundToPlay_base + SITH_SC_LWALKPUDDLE));
                         return;
                     }
                     v3 = (~v10 & SITH_SURFACE_EARTH | (unsigned int)SITH_SURFACE_200000) >> 19;
@@ -676,92 +676,92 @@ void sithPuppet_DefaultCallback(SithThing *thing, int32_t track, uint32_t a3)
             }
             else
             {
-                if ( (thing->attachedThing->flags & SITH_TF_METAL) != 0 )
+                if ( (pThing->attachedThing->flags & SITH_TF_METAL) != 0 )
                 {
 LABEL_14:
-                    sithSoundClass_PlayModeRandom(thing, (soundToPlay_base + SITH_SC_LWALKMETAL));
+                    sithSoundClass_PlayModeRandom(pThing, (soundToPlay_base + SITH_SC_LWALKMETAL));
                     return;
                 }
-                if ( (thing->attachedThing->flags & SITH_TF_EARTH) != 0 )
+                if ( (pThing->attachedThing->flags & SITH_TF_EARTH) != 0 )
                 {
-                    sithSoundClass_PlayModeRandom(thing, (soundToPlay_base + SITH_SC_LWALKEARTH));
+                    sithSoundClass_PlayModeRandom(pThing, (soundToPlay_base + SITH_SC_LWALKEARTH));
                     return;
                 }
             }
-            sithSoundClass_PlayModeRandom(thing, (soundToPlay_base + 4 * v3 + 6));
+            sithSoundClass_PlayModeRandom(pThing, (soundToPlay_base + 4 * v3 + 6));
             return;
         case 3u:
-            if ( thing->controlType == SITH_CT_AI )
+            if ( pThing->controlType == SITH_CT_AI )
             {
-                v12 = thing->actor;
+                v12 = pThing->actor;
                 if ( v12 )
                     sithAI_FireWeapon(v12, 0.0, 0.0, 0.0, v12->field_264, v12->field_26C, v12->field_268);
             }
             return;
         case 4u:
-            thing->jkFlags |= JKFLAG_SABERDAMAGE;
+            pThing->jkFlags |= JKFLAG_SABERDAMAGE;
             return;
         case 5u:
-            thing->jkFlags &= ~JKFLAG_SABERDAMAGE;
+            pThing->jkFlags &= ~JKFLAG_SABERDAMAGE;
             return;
         case 6u:
-            if ( thing->renderData.puppet->aTracks[track].playSpeed >= 0.5 && thing->pSoundClass )
+            if ( pThing->renderData.puppet->aTracks[track].playSpeed >= 0.5 && pThing->pSoundClass )
             {
-                if ( (thing->physicsParams.flags & SITH_PF_ONWATERSURFACE) != 0 )
-                    sithSoundClass_PlayModeRandom(thing, SITH_SC_LSWIMSURFACE);
+                if ( (pThing->physicsParams.flags & SITH_PF_ONWATERSURFACE) != 0 )
+                    sithSoundClass_PlayModeRandom(pThing, SITH_SC_LSWIMSURFACE);
                 else
-                    sithSoundClass_PlayModeRandom(thing, SITH_SC_LSWIMUNDER);
+                    sithSoundClass_PlayModeRandom(pThing, SITH_SC_LSWIMUNDER);
             }
             return;
         case 7u:
-            if ( thing->renderData.puppet->aTracks[track].playSpeed >= 0.5 && thing->pSoundClass )
+            if ( pThing->renderData.puppet->aTracks[track].playSpeed >= 0.5 && pThing->pSoundClass )
             {
-                if ( (thing->physicsParams.flags & SITH_PF_ONWATERSURFACE) != 0 )
-                    sithSoundClass_PlayModeRandom(thing, SITH_SC_TREADSURFACE);
+                if ( (pThing->physicsParams.flags & SITH_PF_ONWATERSURFACE) != 0 )
+                    sithSoundClass_PlayModeRandom(pThing, SITH_SC_TREADSURFACE);
                 else
-                    sithSoundClass_PlayModeRandom(thing, SITH_SC_TREADUNDER);
+                    sithSoundClass_PlayModeRandom(pThing, SITH_SC_TREADUNDER);
             }
             return;
         case 0xAu:
-            if ( thing->renderData.puppet->aTracks[track].playSpeed >= 0.5 && thing->attach_flags )
-                sithSoundClass_PlayModeRandom(thing, SITH_SC_CORPSEHIT);
+            if ( pThing->renderData.puppet->aTracks[track].playSpeed >= 0.5 && pThing->attach_flags )
+                sithSoundClass_PlayModeRandom(pThing, SITH_SC_CORPSEHIT);
             return;
         case 0xBu:
-            v11 = thing;
-            if ( thing->attach_flags )
+            v11 = pThing;
+            if ( pThing->attach_flags )
             {
-                sithPlayerActions_JumpWithVel(thing, 1.0);
+                sithPlayerActions_JumpWithVel(pThing, 1.0);
                 goto LABEL_50;
             }
             return;
         case 0xCu:
-            v11 = thing;
-            if ( thing->attach_flags )
+            v11 = pThing;
+            if ( pThing->attach_flags )
             {
-                sithPlayerActions_JumpWithVel(thing, 2.0);
+                sithPlayerActions_JumpWithVel(pThing, 2.0);
 LABEL_50:
                 if ( v11->controlType == SITH_CT_AI )
                     v11->actor->flags |= 1u;
             }
             return;
         case 0xDu:
-            if ( thing->renderData.puppet->aTracks[track].playSpeed >= 0.5 && thing->pSoundClass )
+            if ( pThing->renderData.puppet->aTracks[track].playSpeed >= 0.5 && pThing->pSoundClass )
             {
-                if ( (thing->physicsParams.flags & SITH_PF_ONWATERSURFACE) != 0 )
-                    sithSoundClass_PlayModeRandom(thing, SITH_SC_RSWIMSURFACE);
+                if ( (pThing->physicsParams.flags & SITH_PF_ONWATERSURFACE) != 0 )
+                    sithSoundClass_PlayModeRandom(pThing, SITH_SC_RSWIMSURFACE);
                 else
-                    sithSoundClass_PlayModeRandom(thing, SITH_SC_RSWIMUNDER);
+                    sithSoundClass_PlayModeRandom(pThing, SITH_SC_RSWIMUNDER);
             }
             return;
         case 0xEu:
-            thing->jkFlags |= JKFLAG_40;
+            pThing->jkFlags |= JKFLAG_40;
             return;
 
         // MoTS added
         case 0xF:
             if (!Main_bMotsCompat) return;
 
-            if ((thing->controlType == SITH_CT_AI) && (v12 = thing->actor, v12 != (SithAIControlBlock *)0x0)) {
+            if ((pThing->controlType == SITH_CT_AI) && (v12 = pThing->actor, v12 != (SithAIControlBlock *)0x0)) {
                 sithAI_Leap(v12,0.0,0.0,0.0,v12->field_26C,v12->field_264,v12->field_268);
                 return;
             }
@@ -769,7 +769,7 @@ LABEL_50:
         case 0x10:
             if (!Main_bMotsCompat) return;
 
-            if ((thing->controlType == SITH_CT_AI) && (v12 = thing->actor, v12 != (SithAIControlBlock *)0x0)) {
+            if ((pThing->controlType == SITH_CT_AI) && (v12 = pThing->actor, v12 != (SithAIControlBlock *)0x0)) {
                 sithAI_Charge(v12,0.0,0.0,0.0,v12->field_26C,v12->field_264,v12->field_268);
             }
             return;
@@ -778,26 +778,26 @@ LABEL_50:
     }
 }
 
-int sithPuppet_StopKey(rdPuppet *pupper, int track, flex_t a3)
+int sithPuppet_StopKey(rdPuppet *pPuppet, int track, flex_t fadeTime)
 {
-    if ( !pupper->aTracks[track].keyframe )
+    if ( !pPuppet->aTracks[track].keyframe )
         return 0;
-    if ( a3 <= 0.0 )
-        rdPuppet_RemoveTrack(pupper, track);
+    if ( fadeTime <= 0.0 )
+        rdPuppet_RemoveTrack(pPuppet, track);
     else
-        rdPuppet_FadeOutTrack(pupper, track, a3);
+        rdPuppet_FadeOutTrack(pPuppet, track, fadeTime);
     return 1;
 }
 
-void sithPuppet_SetArmedMode(SithThing *thing, int mode)
+void sithPuppet_SetArmedMode(SithThing *pThing, int newMode)
 {
     sithPuppet *v2; // ecx
 
-    if ( thing->pPuppetClass )
+    if ( pThing->pPuppetClass )
     {
-        v2 = thing->puppet;
-        v2->field_0 = mode;
-        v2->majorMode = mode + 2 * v2->field_4 + v2->field_4;
+        v2 = pThing->puppet;
+        v2->field_0 = newMode;
+        v2->majorMode = newMode + 2 * v2->field_4 + v2->field_4;
     }
 }
 

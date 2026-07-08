@@ -198,9 +198,9 @@ void sithControl_Close()
     }
 }
 
-void sithControl_RegisterAxisFunction(int funcIdx, uint32_t flags)
+void sithControl_RegisterAxisFunction(int functionId, uint32_t flag)
 {
-    sithControl_inputFuncToControlType[funcIdx] = flags | 3;
+    sithControl_inputFuncToControlType[functionId] = flag | 3;
 }
 
 void sithControl_Reset()
@@ -260,7 +260,7 @@ void sithControl_RegisterControlFunctions()
 }
 
 // MOTS altered
-void sithControl_Update(flex_t deltaSecs, int deltaMs)
+void sithControl_Update(flex_t secDeltaTime, int msecDeltaTime)
 {
     if ( !sithControl_bOpened )
         return;
@@ -280,7 +280,7 @@ void sithControl_Update(flex_t deltaSecs, int deltaMs)
     {
         if ( stdControl_bControlsIdle )
         {
-            sithControl_msIdle += deltaMs;
+            sithControl_msIdle += msecDeltaTime;
             if ( sithControl_msIdle > 30000 && sithCamera_g_pCurCamera != &sithCamera_g_aCameras[4] )
                 sithCamera_SetCurrentCamera(&sithCamera_g_aCameras[4]);
 #ifdef QOL_IMPROVEMENTS
@@ -304,7 +304,7 @@ void sithControl_Update(flex_t deltaSecs, int deltaMs)
 #endif
         for (int i = 0; i < sithControl_numHandlers; i++)
         {
-            if (sithControl_aHandlers[i] && sithControl_aHandlers[i](sithWorld_g_pCurrentWorld->pLocalPlayer, deltaSecs) )
+            if (sithControl_aHandlers[i] && sithControl_aHandlers[i](sithWorld_g_pCurrentWorld->pLocalPlayer, secDeltaTime) )
                 break;
         }
 #ifndef FIXED_TIMESTEP_PHYS
@@ -313,7 +313,7 @@ void sithControl_Update(flex_t deltaSecs, int deltaMs)
     }
 }
 
-stdControlKeyInfoEntry* sithControl_BindControl(int funcIdx, int keyNum, int flags)
+stdControlKeyInfoEntry* sithControl_BindControl(int functionId, int controlId, int flags)
 {
     int v3; // eax
     int v4; // edi
@@ -333,7 +333,7 @@ stdControlKeyInfoEntry* sithControl_BindControl(int funcIdx, int keyNum, int fla
     v3 = flags & ~(8|1) | 2;
     a3a = v3;
     //printf("1] Map %x\n", keyNum);
-    if ( (sithControl_inputFuncToControlType[funcIdx] & 1) != 0 && sithControl_aInputFuncToKeyinfo[funcIdx].numEntries != 8 )
+    if ( (sithControl_inputFuncToControlType[functionId] & 1) != 0 && sithControl_aInputFuncToKeyinfo[functionId].numEntries != 8 )
     {
         v4 = 0;
         v5 = sithControl_aInputFuncToKeyinfo;
@@ -349,7 +349,7 @@ LABEL_9:
                 goto LABEL_14;
         }
         v7 = v5->aEntries;
-        while ( (v7->flags & INPUT_MAPPING_FLAG_DXKEY) == 0 || v7->dxKeyNum != keyNum )
+        while ( (v7->flags & INPUT_MAPPING_FLAG_DXKEY) == 0 || v7->dxKeyNum != controlId )
         {
             ++v6;
             ++v7;
@@ -373,19 +373,19 @@ LABEL_9:
         }
 LABEL_14:
 
-        v13 = sithControl_aInputFuncToKeyinfo[funcIdx].numEntries;
+        v13 = sithControl_aInputFuncToKeyinfo[functionId].numEntries;
         //printf("1] Map %x, %x %x %x %x\n", keyNum, funcIdx, v8, v6, v13);
-        v14 = &sithControl_aInputFuncToKeyinfo[funcIdx].aEntries[v13];
+        v14 = &sithControl_aInputFuncToKeyinfo[functionId].aEntries[v13];
         v14->flags = a3a;
-        v14->dxKeyNum = keyNum;
-        sithControl_aInputFuncToKeyinfo[funcIdx].numEntries = v13 + 1;
+        v14->dxKeyNum = controlId;
+        sithControl_aInputFuncToKeyinfo[functionId].numEntries = v13 + 1;
 
         return v14;
     }
     return NULL;
 }
 
-stdControlKeyInfoEntry* sithControl_BindAxis(int funcIdx, int dxKeyNum, uint32_t flags)
+stdControlKeyInfoEntry* sithControl_BindAxis(int functionId, int axis, uint32_t flags)
 {
     unsigned int v3; // eax
     int v4; // ecx
@@ -405,12 +405,12 @@ stdControlKeyInfoEntry* sithControl_BindAxis(int funcIdx, int dxKeyNum, uint32_t
     v3 = flags;
     v3 = flags & ~2 | 1;
     flagsa = v3;
-    v4 = stdControl_aAxes[dxKeyNum].flags;
+    v4 = stdControl_aAxes[axis].flags;
     if ( (v4 & 1) == 0 )
         return 0;
-    if ( (sithControl_inputFuncToControlType[funcIdx] & 1) == 0 )
+    if ( (sithControl_inputFuncToControlType[functionId] & 1) == 0 )
         return 0;
-    if ( sithControl_aInputFuncToKeyinfo[funcIdx].numEntries == 8 )
+    if ( sithControl_aInputFuncToKeyinfo[functionId].numEntries == 8 )
         return 0;
     if ( (v4 & INPUT_MAPPING_FLAG_DXKEY) != 0 )
     {
@@ -428,7 +428,7 @@ LABEL_14:
                 goto LABEL_20;
         }
         v10 = v8->aEntries;
-        while ( (v10->flags & 1) == 0 || v10->dxKeyNum != dxKeyNum )
+        while ( (v10->flags & 1) == 0 || v10->dxKeyNum != axis )
         {
             ++v9;
             ++v10;
@@ -452,21 +452,21 @@ LABEL_14:
         }
     }
 LABEL_20:
-    if ( stdControl_EnableAxis(dxKeyNum) )
+    if ( stdControl_EnableAxis(axis) )
     {
         if ( (flagsa & 0x10) != 0 )
-            stdControl_aAxes[dxKeyNum].flags |= 8u;
-        v16 = sithControl_aInputFuncToKeyinfo[funcIdx].numEntries;
-        result = &sithControl_aInputFuncToKeyinfo[funcIdx].aEntries[v16];
+            stdControl_aAxes[axis].flags |= 8u;
+        v16 = sithControl_aInputFuncToKeyinfo[functionId].numEntries;
+        result = &sithControl_aInputFuncToKeyinfo[functionId].aEntries[v16];
         result->flags = flagsa;
-        result->dxKeyNum = dxKeyNum;
-        sithControl_aInputFuncToKeyinfo[funcIdx].numEntries = v16 + 1;
+        result->dxKeyNum = axis;
+        sithControl_aInputFuncToKeyinfo[functionId].numEntries = v16 + 1;
         return result;
     }
     return 0;
 }
 
-void sithControl_UnbindFunctionIndex(int funcIdx, unsigned int idx)
+void sithControl_UnbindFunctionIndex(int funcId, unsigned int bindIndex)
 {
     unsigned int v2; // edx
     int result; // eax
@@ -474,23 +474,23 @@ void sithControl_UnbindFunctionIndex(int funcIdx, unsigned int idx)
     stdControlKeyInfoEntry *v5; // ecx
     stdControlKeyInfoEntry *v6; // edi
 
-    v2 = idx;
-    v4 = sithControl_aInputFuncToKeyinfo[funcIdx].numEntries - 1;
-    sithControl_aInputFuncToKeyinfo[funcIdx].numEntries = v4;
-    if ( idx < v4 )
+    v2 = bindIndex;
+    v4 = sithControl_aInputFuncToKeyinfo[funcId].numEntries - 1;
+    sithControl_aInputFuncToKeyinfo[funcId].numEntries = v4;
+    if ( bindIndex < v4 )
     {
-        v5 = &sithControl_aInputFuncToKeyinfo[funcIdx].aEntries[idx];
+        v5 = &sithControl_aInputFuncToKeyinfo[funcId].aEntries[bindIndex];
         do
         {
             v6 = v5;
             ++v2;
             *v6 = *++v5;
         }
-        while ( v2 < sithControl_aInputFuncToKeyinfo[funcIdx].numEntries );
+        while ( v2 < sithControl_aInputFuncToKeyinfo[funcId].numEntries );
     }
 }
 
-void sithControl_UnbindControl(int funcIdx, int dxKeyNum)
+void sithControl_UnbindControl(int flags, int controlId)
 {
     int v2; // edi
     stdControlKeyInfo *v3; // esi
@@ -516,7 +516,7 @@ LABEL_7:
             return;
     }
     v5 = v3->aEntries;
-    while ( (funcIdx & v5->flags) == 0 || v5->dxKeyNum != dxKeyNum )
+    while ( (flags & v5->flags) == 0 || v5->dxKeyNum != controlId )
     {
         v4++;
         ++v5;
@@ -697,7 +697,7 @@ int sithControl_WriteConf()
     return 1;
 }
 
-int sithControl_GetKey(int funcIdx, int *pOut)
+int sithControl_GetKey(int keyId, int *pState)
 {
     uint32_t v2; // ebx
     stdControlKeyInfoEntry *v3; // esi
@@ -707,21 +707,21 @@ int sithControl_GetKey(int funcIdx, int *pOut)
     //sithWeapon_controlOptions |= 0x20;
 
     v6 = 0;
-    if ( pOut )
-        *pOut = 0;
+    if ( pState )
+        *pState = 0;
     v2 = 0;
-    if ( sithControl_aInputFuncToKeyinfo[funcIdx].numEntries )
+    if ( sithControl_aInputFuncToKeyinfo[keyId].numEntries )
     {
-        v3 = sithControl_aInputFuncToKeyinfo[funcIdx].aEntries;
+        v3 = sithControl_aInputFuncToKeyinfo[keyId].aEntries;
         do
         {
             v4 = v3->dxKeyNum;
             if ( !(sithWeapon_controlOptions & 0x20) || v4 < JK_EXTENDED_KEY_START || KEY_IS_MOUSE(v4) )
-                v6 |= stdControl_ReadKey(v4, pOut);
+                v6 |= stdControl_ReadKey(v4, pState);
             ++v2;
             ++v3;
         }
-        while ( v2 < sithControl_aInputFuncToKeyinfo[funcIdx].numEntries );
+        while ( v2 < sithControl_aInputFuncToKeyinfo[keyId].numEntries );
     }
 
     return v6;
@@ -737,7 +737,7 @@ void sithControl_FinishRead()
     stdControl_FinishRead();
 }
 
-flex_t sithControl_GetKeyAsAxisNormalized(int axisNum)
+flex_t sithControl_GetKeyAsAxisNormalized(int axisId)
 {
     uint32_t v1; // ebp
     stdControlKeyInfoEntry *entryIter; // esi
@@ -747,9 +747,9 @@ flex_t sithControl_GetKeyAsAxisNormalized(int axisNum)
 
     v1 = 0;
     v6 = 0.0;
-    if ( sithControl_aInputFuncToKeyinfo[axisNum].numEntries )
+    if ( sithControl_aInputFuncToKeyinfo[axisId].numEntries )
     {
-        entryIter = sithControl_aInputFuncToKeyinfo[axisNum].aEntries;
+        entryIter = sithControl_aInputFuncToKeyinfo[axisId].aEntries;
         do
         {
             v3 = entryIter->flags;
@@ -794,7 +794,7 @@ LABEL_23:
             ++v1;
             ++entryIter;
         }
-        while ( v1 < sithControl_aInputFuncToKeyinfo[axisNum].numEntries );
+        while ( v1 < sithControl_aInputFuncToKeyinfo[axisId].numEntries );
     }
     if ( v6 < -1.0 )
         return -1.0;
@@ -803,7 +803,7 @@ LABEL_23:
     return v6;
 }
 
-flex_t sithControl_GetKeyAsAxis(int funcIdx)
+flex_t sithControl_GetKeyAsAxis(int axisId)
 {
     uint32_t v1; // ebp
     stdControlKeyInfoEntry *v2; // esi
@@ -813,9 +813,9 @@ flex_t sithControl_GetKeyAsAxis(int funcIdx)
 
     v1 = 0;
     v6 = 0.0;
-    if ( sithControl_aInputFuncToKeyinfo[funcIdx].numEntries )
+    if ( sithControl_aInputFuncToKeyinfo[axisId].numEntries )
     {
-        v2 = sithControl_aInputFuncToKeyinfo[funcIdx].aEntries;
+        v2 = sithControl_aInputFuncToKeyinfo[axisId].aEntries;
         do
         {
             v3 = v2->flags;
@@ -848,12 +848,12 @@ LABEL_18:
             ++v1;
             ++v2;
         }
-        while ( v1 < sithControl_aInputFuncToKeyinfo[funcIdx].numEntries );
+        while ( v1 < sithControl_aInputFuncToKeyinfo[axisId].numEntries );
     }
     return v6;
 }
 
-flex_t sithControl_GetAxis(int funcIdx)
+flex_t sithControl_GetAxis(int axisId)
 {
     stdControlKeyInfoEntry *v1; // edi
     stdControlKeyInfoEntry *v2; // esi
@@ -863,11 +863,11 @@ flex_t sithControl_GetAxis(int funcIdx)
     flex_t v7; // [esp+4h] [ebp-4h]
 
     v7 = 0.0;
-    v1 = sithControl_aInputFuncToKeyinfo[funcIdx].aEntries;
-    if ( sithControl_aInputFuncToKeyinfo[funcIdx].numEntries )
+    v1 = sithControl_aInputFuncToKeyinfo[axisId].aEntries;
+    if ( sithControl_aInputFuncToKeyinfo[axisId].numEntries )
     {
-        v2 = &sithControl_aInputFuncToKeyinfo[funcIdx].aEntries[0];
-        v3 = sithControl_aInputFuncToKeyinfo[funcIdx].numEntries;
+        v2 = &sithControl_aInputFuncToKeyinfo[axisId].aEntries[0];
+        v3 = sithControl_aInputFuncToKeyinfo[axisId].numEntries;
         do
         {
             v4 = v2->flags;
@@ -889,12 +889,12 @@ flex_t sithControl_GetAxis(int funcIdx)
     return v7;
 }
 
-void sithControl_RegisterControlCallback(sithControl_handler_t a1)
+void sithControl_RegisterControlCallback(sithControl_handler_t pfCallback)
 {
     // The original engine had an off-by-one here?
     if (sithControl_numHandlers < SITHCONTROL_NUM_HANDLERS)
     {
-        sithControl_aHandlers[sithControl_numHandlers++] = a1;
+        sithControl_aHandlers[sithControl_numHandlers++] = pfCallback;
     }
 }
 
@@ -1890,12 +1890,12 @@ void sithControl_DefaultInit()
 #endif // TARGET_RETRO_HOMEBREW
 }
 
-void sithControl_RegisterKeyFunction(int funcIdx)
+void sithControl_RegisterKeyFunction(int functionId)
 {
-    sithControl_inputFuncToControlType[funcIdx] = 5;
+    sithControl_inputFuncToControlType[functionId] = 5;
 }
 
-stdControlKeyInfo* sithControl_EnumBindings(sithControlEnumFunc_t pfEnumFunction, int a2, int a3, int a4, Darray *a5)
+stdControlKeyInfo* sithControl_EnumBindings(sithControlEnumFunc_t pfFunc, int a2, int a3, int a4, Darray *a5)
 {
     stdControlKeyInfo *result; // eax
     int v6; // ebp
@@ -1940,7 +1940,7 @@ stdControlKeyInfo* sithControl_EnumBindings(sithControlEnumFunc_t pfEnumFunction
               && (((v9 & 1) == 0 || v10 >= AXIS_MOUSE_X) 
               && (!v11 || v10 < JK_EXTENDED_KEY_START || KEY_IS_MOUSE(v10)) || a3) )
             {
-                v6 = pfEnumFunction(v7, sithControl_aFunctionStrs[v7], flags, v16, v10, v9, v8, a5);
+                v6 = pfFunc(v7, sithControl_aFunctionStrs[v7], flags, v16, v10, v9, v8, a5);
                 if ( v18 || (v12 = i, (i->flags & INPUT_MAPPING_FLAG_DXKEY) != 0) && (i->flags & 4) == 0 )
                 {
                     v12 = i;
@@ -1962,16 +1962,16 @@ stdControlKeyInfo* sithControl_EnumBindings(sithControlEnumFunc_t pfEnumFunction
         if ( v6 && v21 && !v17 )
         {
             v13 = a5;
-            v6 = pfEnumFunction(v7, sithControl_aFunctionStrs[v7], flags, -1u, 0, 1, 0, a5);
+            v6 = pfFunc(v7, sithControl_aFunctionStrs[v7], flags, -1u, 0, 1, 0, a5);
         }
         else
         {
             v13 = a5;
         }
         if ( v6 && !v18 || !v20->numEntries )
-            v6 = pfEnumFunction(v7, sithControl_aFunctionStrs[v7], flags, -1u, 0, 2, 0, v13);
+            v6 = pfFunc(v7, sithControl_aFunctionStrs[v7], flags, -1u, 0, 2, 0, v13);
         if ( v6 && v21 && !v19 )
-            v6 = pfEnumFunction(v7, sithControl_aFunctionStrs[v7], flags, -1u, 0, 6, 0, v13);
+            v6 = pfFunc(v7, sithControl_aFunctionStrs[v7], flags, -1u, 0, 6, 0, v13);
         ++v7;
         result = ++v20;
     }

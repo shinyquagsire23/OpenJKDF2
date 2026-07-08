@@ -17,19 +17,19 @@
 #define sithActor_DestroyCorpse_ADDR (0x004ED7B0)
 #define sithActor_ParseArg_ADDR (0x004ED7E0)
 
-MATH_FUNC void sithActor_SetDifficulty(SithThing *thing);
-void sithActor_Update(SithThing *thing, int deltaMs);
-MATH_FUNC flex_t sithActor_DamageActor(SithThing *pMeshCollided, SithThing *pThingCollided, flex_t amount, int flags);
-void sithActor_PlayDamageSoundFx(SithThing *thing, flex_t amount, int hurtType);
-void sithActor_KillActor(SithThing *thing, SithThing *a3, int a4);
-int sithActor_SurfaceCollisionHandler(SithThing *thing, SithSurface *surface, SithCollision *searchEnt);
-MATH_FUNC void sithActor_SetHeadPYR(SithThing *actor, const rdVector3 *headPYR);
-int sithActor_ActorCollisionHandler(SithThing *thing, SithThing *thing2, SithCollision *a3, int a4);
+MATH_FUNC void sithActor_SetDifficulty(SithThing *pActor);
+void sithActor_Update(SithThing *pThing, int msecDeltaTime);
+MATH_FUNC flex_t sithActor_DamageActor(SithThing *pActor, SithThing *pThing, flex_t damage, int damageType);
+void sithActor_PlayDamageSoundFx(SithThing *pThing, flex_t amount, int hurtType);
+void sithActor_KillActor(SithThing *pThing, SithThing *pSrcThing, int damageType);
+int sithActor_SurfaceCollisionHandler(SithThing *pThing, SithSurface *pSurface, SithCollision *pHitStack);
+MATH_FUNC void sithActor_SetHeadPYR(SithThing *pThing, const rdVector3 *headAngles);
+int sithActor_ActorCollisionHandler(SithThing *pSrcThing, SithThing *pThing, SithCollision *pCollision, int a4);
 void sithActor_UpdateAimJoints(SithThing *a1);
 MATH_FUNC int sithActor_thing_anim_blocked(SithThing *a1, SithThing *thing2, SithCollision *a3);
-void sithActor_DestroyActor(SithThing *thing);
-void sithActor_DestroyCorpse(SithThing *corpse);
-int sithActor_ParseArg(StdConffileArg *arg, SithThing *thing, unsigned int param);
+void sithActor_DestroyActor(SithThing *pActor);
+void sithActor_DestroyCorpse(SithThing *pThing);
+int sithActor_ParseArg(StdConffileArg *pArg, SithThing *pThing, unsigned int adjNum);
 
 //static int (__cdecl *sithActor_ActorCollisionHandler)(SithThing *thing, SithThing *a2, rdMatrix34 *a3, int a4) = (void*)sithActor_ActorCollisionHandler_ADDR;
 //static int (*sithActor_thing_anim_blocked)(SithThing *a1, SithThing *a2, rdMatrix34 *a3) = (void*)sithActor_thing_anim_blocked_ADDR;
