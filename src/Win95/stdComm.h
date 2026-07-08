@@ -58,7 +58,7 @@ extern "C" {
 #define DirectPlay_SendLobbyMessage_ADDR (0x004305E0)
 #define DirectPlay_EnumConnectionsCallback_ADDR (0x004306E0)
 #define DirectPlay_EnumSessionsCallback_ADDR (0x004307C0)
-#define DirectPlay_EnumPlayersCallback_ADDR (0x00430810)
+#define stdComm_EnumPlayersCallback_ADDR (0x00430810)
 #define DirectPlay_sub_4308C0_ADDR (0x004308C0)
 #define DirectPlay_parseSessionDescidk_ADDR (0x004308F0)
 
@@ -71,7 +71,7 @@ int stdComm_CreatePlayer(jkMultiEntry *pEntry);
 int stdComm_Recv(sithCogMsg *msg);
 int stdComm_DoReceive();
 int stdComm_SendToPlayer(sithCogMsg *msg, int sendto_id);
-int DirectPlay_EnumPlayersCallback(DPID dpId, DWORD dwPlayerType, LPCDPNAME lpName, DWORD dwFlags, LPVOID lpContext);
+int stdComm_EnumPlayersCallback(DPID dpId, DWORD dwPlayerType, LPCDPNAME lpName, DWORD dwFlags, LPVOID lpContext);
 
 void stdComm_cogMsg_SendEnumPlayers(int sendtoId);
 int stdComm_cogMsg_HandleEnumPlayers(sithCogMsg *msg);

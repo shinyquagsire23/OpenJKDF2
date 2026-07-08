@@ -197,7 +197,7 @@ int stdComm_SendToPlayer(sithCogMsg *msg, int sendto_id)
     return 1;
 }
 
-int DirectPlay_EnumPlayersCallback(DPID dpId, DWORD dwPlayerType, LPCDPNAME lpName, DWORD dwFlags, LPVOID lpContext)
+int stdComm_EnumPlayersCallback(DPID dpId, DWORD dwPlayerType, LPCDPNAME lpName, DWORD dwFlags, LPVOID lpContext)
 {
     if (DirectPlay_numPlayers >= 0x20) return 1;
 

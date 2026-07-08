@@ -833,7 +833,7 @@ DirectPlay_EnumGroupPlayers	.text	004305B0	00000026	00000000	00000004	R	.	.	.	.	
 DirectPlay_SendLobbyMessage	.text	004305E0	000000F6	0000000C	00000008	R	.	.	.	.	.	T	.
 DirectPlay_EnumConnectionsCallback	.text	004306E0	000000DA	00000000	00000010	R	.	.	.	.	.	T	.
 DirectPlay_EnumSessionsCallback	.text	004307C0	00000044	00000000	00000009	R	.	.	.	.	.	.	.
-DirectPlay_EnumPlayersCallback	.text	00430810	000000AD	00000004	00000014	R	.	.	.	.	.	T	.
+stdComm_EnumPlayersCallback	.text	00430810	000000AD	00000004	00000014	R	.	.	.	.	.	T	.
 DirectPlay_sub_4308C0	.text	004308C0	00000023	00000000	00000004	R	.	.	.	.	.	.	.
 DirectPlay_parseSessionDescidk	.text	004308F0	00000117	0000010C	00000008	R	.	.	.	.	.	T	.
 stdFnames_FindMedName	.text	00430A10	00000028	00000004	00000004	R	.	.	.	.	.	T	.
