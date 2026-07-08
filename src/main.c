@@ -2030,27 +2030,27 @@ void do_hooks()
     // sithWeapon
     hook_function(sithWeapon_InitDefaults_ADDR, sithWeapon_InitDefaults);
     hook_function(sithWeapon_Startup_ADDR, sithWeapon_Startup);
-    hook_function(sithWeapon_Tick_ADDR, sithWeapon_Tick);
-    hook_function(sithWeapon_sub_4D35E0_ADDR, sithWeapon_sub_4D35E0);
+    hook_function(sithWeapon_Update_ADDR, sithWeapon_Update);
+    hook_function(sithWeapon_HandleImpact_ADDR, sithWeapon_HandleImpact);
     hook_function(sithWeapon_sub_4D3920_ADDR, sithWeapon_sub_4D3920);
-    hook_function(sithWeapon_LoadParams_ADDR, sithWeapon_LoadParams);
-    hook_function(sithWeapon_Fire_ADDR, sithWeapon_Fire);
-    hook_function(sithWeapon_FireProjectile_0_ADDR, sithWeapon_FireProjectile_0);
-    hook_function(sithWeapon_SetTimeLeft_ADDR, sithWeapon_SetTimeLeft);
-    hook_function(sithWeapon_Collide_ADDR, sithWeapon_Collide);
-    hook_function(sithWeapon_HitDebug_ADDR, sithWeapon_HitDebug);
-    hook_function(sithWeapon_Remove_ADDR, sithWeapon_Remove);
-    hook_function(sithWeapon_RemoveAndExplode_ADDR, sithWeapon_RemoveAndExplode);
+    hook_function(sithWeapon_ParseArg_ADDR, sithWeapon_ParseArg);
+    hook_function(sithWeapon_WeaponFire_ADDR, sithWeapon_WeaponFire);
+    hook_function(sithWeapon_WeaponFireProjectile_ADDR, sithWeapon_WeaponFireProjectile);
+    hook_function(sithWeapon_DamageWeapon_ADDR, sithWeapon_DamageWeapon);
+    hook_function(sithWeapon_ThingCollisionHandler_ADDR, sithWeapon_ThingCollisionHandler);
+    hook_function(sithWeapon_SurfaceCollisionHandler_ADDR, sithWeapon_SurfaceCollisionHandler);
+    hook_function(sithWeapon_DestroyWeapon_ADDR, sithWeapon_DestroyWeapon);
+    hook_function(sithWeapon_CreateWeaponExplosion_ADDR, sithWeapon_CreateWeaponExplosion);
     hook_function(sithWeapon_StartupEntry_ADDR, sithWeapon_StartupEntry);
     hook_function(sithWeapon_ShutdownEntry_ADDR, sithWeapon_ShutdownEntry);
 
     hook_function(sithWeapon_SetMountWait_ADDR, sithWeapon_SetMountWait);
     hook_function(sithWeapon_SetFireWait_ADDR, sithWeapon_SetFireWait);
-    hook_function(sithWeapon_handle_inv_msgs_ADDR, sithWeapon_handle_inv_msgs);
-    hook_function(sithWeapon_Activate_ADDR, sithWeapon_Activate);
-    hook_function(sithWeapon_Deactivate_ADDR, sithWeapon_Deactivate);
+    hook_function(sithWeapon_UpdateActorWeaponState_ADDR, sithWeapon_UpdateActorWeaponState);
+    hook_function(sithWeapon_ActivateWeapon_ADDR, sithWeapon_ActivateWeapon);
+    hook_function(sithWeapon_DeactivateWeapon_ADDR, sithWeapon_DeactivateWeapon);
     hook_function(sithWeapon_AutoSelect_ADDR, sithWeapon_AutoSelect);
-    hook_function(sithWeapon_HandleWeaponKeys_ADDR, sithWeapon_HandleWeaponKeys);
+    hook_function(sithWeapon_ProcessWeaponControls_ADDR, sithWeapon_ProcessWeaponControls);
     
     hook_function(sithWeapon_FireProjectile_ADDR, sithWeapon_FireProjectile);
     hook_function(sithWeapon_GetPriority_ADDR, sithWeapon_GetPriority);

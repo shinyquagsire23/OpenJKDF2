@@ -435,7 +435,7 @@ int sithAICmd_BlindFire(sithActor *actor, sithAIClassEntry *aiclass, sithActorIn
             if ( (g_debugmodeFlags & DEBUGFLAG_NO_AI) == 0 )
             {
                 sithSoundClass_PlayModeFirst(weapon, bWhichProjectile + SITH_SC_FIRE1);
-                v11 = sithWeapon_Fire(weapon, projectile, &fireOffs, &actor->blindAimError, 0, bWhichProjectile + SITH_ANIM_FIRE, 1.0, 0, 0.0);
+                v11 = sithWeapon_WeaponFire(weapon, projectile, &fireOffs, &actor->blindAimError, 0, bWhichProjectile + SITH_ANIM_FIRE, 1.0, 0, 0.0);
                 if ( v11 )
                 {
                     sithCog_SendMessageFromThing(weapon, v11, SITH_MESSAGE_FIRE);
@@ -771,7 +771,7 @@ LABEL_50:
             rdMatrix_Copy34(&v37, v20);
             rdMatrix_PreRotate34(&v37, &actor->thing->actorParams.eyePYR);
             sithSoundClass_PlayModeFirst(actor->thing, SITH_SC_FIRE1);
-            v29 = sithWeapon_Fire(actor->thing, v8, &v37.lvec, &actor->blindAimError, 0, SITH_ANIM_FIRE, 1.0, 0, 0.0);
+            v29 = sithWeapon_WeaponFire(actor->thing, v8, &v37.lvec, &actor->blindAimError, 0, SITH_ANIM_FIRE, 1.0, 0, 0.0);
             if ( v29 )
                 sithCog_SendMessageFromThing(actor->thing, v29, SITH_MESSAGE_FIRE);
             instinct->param0 = aiclass->argsAsFloat[0] * 0.001 + sithTime_curSeconds;
@@ -798,7 +798,7 @@ LABEL_50:
         _memcpy(&v37, &actor->thing->lookOrientation, sizeof(v37));
         rdMatrix_PreRotate34(&v37, &actor->thing->actorParams.eyePYR);
         sithSoundClass_PlayModeFirst(actor->thing, SITH_SC_FIRE1);
-        v15 = sithWeapon_Fire(actor->thing, v8, &v37.lvec, &actor->thing->position, 0, SITH_ANIM_FIRE, 1.0, 0, 0.0);
+        v15 = sithWeapon_WeaponFire(actor->thing, v8, &v37.lvec, &actor->thing->position, 0, SITH_ANIM_FIRE, 1.0, 0, 0.0);
         if ( v15 )
             sithCog_SendMessageFromThing(actor->thing, v15, SITH_MESSAGE_FIRE);
         v13 = instinct;

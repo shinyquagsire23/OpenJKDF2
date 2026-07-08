@@ -1497,7 +1497,7 @@ LABEL_12:
         sithAI_RandomFireVector(&v1, percentageErrorInAim);
     }
     sithSoundClass_PlayModeRandom(v9, bAltFire + SITH_SC_FIRE1);
-    v16 = sithWeapon_Fire(v9, v8, &v1, &actor->blindAimError, 0, v20, v21, v15, 0.0);
+    v16 = sithWeapon_WeaponFire(v9, v8, &v1, &actor->blindAimError, 0, v20, v21, v15, 0.0);
     if ( v16 )
         sithCog_SendMessageFromThing(v9, v16, SITH_MESSAGE_FIRE);
     return 1;

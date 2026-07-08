@@ -28,7 +28,7 @@ int jkControl_Startup()
     
     sithControl_Startup();
     sithControl_RegisterControlCallback(sithControl_HandlePlayer);
-    sithControl_RegisterControlCallback(sithWeapon_HandleWeaponKeys);
+    sithControl_RegisterControlCallback(sithWeapon_ProcessWeaponControls);
     sithControl_RegisterControlCallback(sithInventory_HandleInvSkillKeys);
     sithControl_RegisterControlCallback(jkControl_HandleHudKeys);
     Window_AddMsgHandler(stdControl_MessageHandler);

@@ -1254,7 +1254,7 @@ void sithCogFunction_ActivateWeapon(sithCog *ctx)
     sithThing* weaponThing = sithCogExec_PopThing(ctx);
 
     if ( weaponThing && fireRate >= 0.0 && mode >= 0 && mode < 2 )
-        sithWeapon_Activate(weaponThing, ctx, fireRate, mode);
+        sithWeapon_ActivateWeapon(weaponThing, ctx, fireRate, mode);
 }
 
 void sithCogFunction_DeactivateWeapon(sithCog *ctx)
@@ -1263,7 +1263,7 @@ void sithCogFunction_DeactivateWeapon(sithCog *ctx)
     sithThing* weapon = sithCogExec_PopThing(ctx);
     if ( weapon && mode >= 0 && mode < 2 )
     {
-        sithCogExec_PushFlex(ctx, sithWeapon_Deactivate(weapon, ctx, mode));
+        sithCogExec_PushFlex(ctx, sithWeapon_DeactivateWeapon(weapon, ctx, mode));
     }
     else
     {

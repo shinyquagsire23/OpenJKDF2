@@ -630,7 +630,7 @@ void sithDSSThing_Fire(sithThing *pWeapon, sithThing *pProjectile, rdVector3 *pF
     sithComm_SendMsgToPlayer(&sithComm_netMsgTmp, sendtoId, mpFlags, 0);
 }
 
-// MOTS altered (Added argument to sithWeapon_FireProjectile_0)
+// MOTS altered (Added argument to sithWeapon_WeaponFireProjectile)
 int sithDSSThing_ProcessFire(sithCogMsg *msg)
 {
     NETMSG_IN_START(msg);
@@ -653,7 +653,7 @@ int sithDSSThing_ProcessFire(sithCogMsg *msg)
         flex32_t a9 = NETMSG_POPF32();
         int thingId = NETMSG_POPS32();
         //printf("sithDSSThing_ProcessFire %x %x (%f %f %f) (%f %f %f) %x %f %x %f\n", idx, templateIdx, aimError.x, aimError.y, aimError.z, fireOffset.x, fireOffset.y, fireOffset.z, anim, scale, scaleFlags, a9);
-        sithThing* pThing2 = sithWeapon_FireProjectile_0(
+        sithThing* pThing2 = sithWeapon_WeaponFireProjectile(
                       pThing,
                       pTemplate,
                       &fireOffset,
@@ -691,7 +691,7 @@ int sithDSSThing_ProcessMOTSNew2(sithCogMsg *msg)
         flex32_t a9 = NETMSG_POPF32();
         int thingId = NETMSG_POPS32();
         int idk = NETMSG_POPS32();
-        sithThing* pThing2 = sithWeapon_FireProjectile_0(
+        sithThing* pThing2 = sithWeapon_WeaponFireProjectile(
                       pThing,
                       pTemplate,
                       &fireOffset,

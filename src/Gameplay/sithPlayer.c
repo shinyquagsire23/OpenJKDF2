@@ -234,7 +234,7 @@ void sithPlayer_Update(sithPlayerInfo *playerInfo, flex_t a2)
         {
             pPalEffect->add.z = stdMath_ClampInt(pPalEffect->add.z - v2, 0, 255);
         }
-        sithWeapon_handle_inv_msgs(v3);
+        sithWeapon_UpdateActorWeaponState(v3);
         sithInventory_SendFire(v3);
         if ( !v3->attach_flags )
         {

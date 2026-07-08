@@ -2025,36 +2025,36 @@ sithInventory_SetBinWait	.text	004D32F0	0000003D	00000000	0000000C	R	.	.	.	.	.	T
 sithInventory_SelectPower	.text	004D3330	000000F3	00000008	00000008	R	.	.	.	.	.	T	.
 sithWeapon_InitDefaults	.text	004D3430	00000080			R	.	.	.	.	.	.	.
 sithWeapon_Startup	.text	004D34B0	00000080			R	.	.	.	.	.	.	.
-sithWeapon_Tick	.text	004D3530	000000AF	00000000	00000008	R	.	.	.	.	.	T	.
-sithWeapon_sub_4D35E0	.text	004D35E0	00000338	00000038	00000004	R	.	.	.	.	.	T	.
+sithWeapon_Update	.text	004D3530	000000AF	00000000	00000008	R	.	.	.	.	.	T	.
+sithWeapon_HandleImpact	.text	004D35E0	00000338	00000038	00000004	R	.	.	.	.	.	T	.
 sithWeapon_sub_4D3920	.text	004D3920	00000963	000000C0	00000004	R	.	.	.	.	.	T	.
-sithWeapon_LoadParams	.text	004D4290	000001F2	00000000	0000000C	R	.	.	.	.	.	T	.
-sithWeapon_Fire	.text	004D44F0	000000A2	00000010	00000024	R	.	.	.	.	.	T	.
-sithWeapon_FireProjectile_0	.text	004D45A0	000002DA	00000058	00000024	R	.	.	.	.	.	T	.
-sithWeapon_SetTimeLeft	.text	004D4880	00000036	00000000	0000000C	R	.	.	.	.	.	T	.
-sithWeapon_Collide	.text	004D48C0	0000057D	0000001C	00000010	R	.	.	.	.	.	T	.
-sithWeapon_HitDebug	.text	004D4E40	00000317	0000000C	0000000C	R	.	.	.	.	.	T	.
-sithWeapon_Remove	.text	004D5160	00000090	00000004	00000004	R	.	.	.	.	.	T	.
-sithWeapon_RemoveAndExplode	.text	004D51F0	00000078	0000000C	00000008	R	.	.	.	.	.	T	.
+sithWeapon_ParseArg	.text	004D4290	000001F2	00000000	0000000C	R	.	.	.	.	.	T	.
+sithWeapon_WeaponFire	.text	004D44F0	000000A2	00000010	00000024	R	.	.	.	.	.	T	.
+sithWeapon_WeaponFireProjectile	.text	004D45A0	000002DA	00000058	00000024	R	.	.	.	.	.	T	.
+sithWeapon_DamageWeapon	.text	004D4880	00000036	00000000	0000000C	R	.	.	.	.	.	T	.
+sithWeapon_ThingCollisionHandler	.text	004D48C0	0000057D	0000001C	00000010	R	.	.	.	.	.	T	.
+sithWeapon_SurfaceCollisionHandler	.text	004D4E40	00000317	0000000C	0000000C	R	.	.	.	.	.	T	.
+sithWeapon_DestroyWeapon	.text	004D5160	00000090	00000004	00000004	R	.	.	.	.	.	T	.
+sithWeapon_CreateWeaponExplosion	.text	004D51F0	00000078	0000000C	00000008	R	.	.	.	.	.	T	.
 sithWeapon_StartupEntry	.text	004D5270	0000004B			R	.	.	.	.	.	.	.
 sithWeapon_ShutdownEntry	.text	004D52C0	00000001			R	.	.	.	.	.	.	.
 sithWeapon_SelectWeapon	.text	004D52D0	00000182	00000010	0000000C	R	.	.	.	.	.	T	.
 sithWeapon_SetMountWait	.text	004D5460	00000011	00000000	00000008	R	.	.	.	.	.	T	.
 sithWeapon_SetFireWait	.text	004D5480	00000040	00000000	00000008	R	.	.	.	.	.	T	.
-sithWeapon_handle_inv_msgs	.text	004D54C0	00000186	00000004	00000004	R	.	.	.	.	.	T	.
-sithWeapon_Activate	.text	004D5650	000000A1	00000000	00000010	R	.	.	.	.	.	T	.
-sithWeapon_Deactivate	.text	004D5700	00000091	00000000	0000000C	R	.	.	.	.	.	T	.
+sithWeapon_UpdateActorWeaponState	.text	004D54C0	00000186	00000004	00000004	R	.	.	.	.	.	T	.
+sithWeapon_ActivateWeapon	.text	004D5650	000000A1	00000000	00000010	R	.	.	.	.	.	T	.
+sithWeapon_DeactivateWeapon	.text	004D5700	00000091	00000000	0000000C	R	.	.	.	.	.	T	.
 sithWeapon_AutoSelect	.text	004D57A0	0000008A	00000014	00000008	R	.	.	.	.	.	T	.
-sithWeapon_HandleWeaponKeys	.text	004D5830	00000428	00000018	00000004	R	.	.	.	.	.	T	.
-sithWeapon_ProjectileAutoAim	.text	004D5C60	000002B2	00000058	00000018	R	.	.	.	.	.	T	.
+sithWeapon_ProcessWeaponControls	.text	004D5830	00000428	00000018	00000004	R	.	.	.	.	.	T	.
+sithWeapon_GetAimOrient	.text	004D5C60	000002B2	00000058	00000018	R	.	.	.	.	.	T	.
 sithWeapon_FireProjectile	.text	004D5F20	0000038B	0000007C	00000028	R	.	.	.	.	.	T	.
 sithWeapon_GetPriority	.text	004D62B0	00000058	00000000	0000000C	R	.	.	.	.	.	T	.
 sithWeapon_GetCurWeaponMode	.text	004D6310	00000006			R	.	.	.	.	.	.	.
 sithWeapon_SyncPuppet	.text	004D6320	0000004B	00000004	00000004	R	.	.	.	.	.	T	.
 sithWeapon_WriteConf	.text	004D6370	000000B2			R	.	.	.	.	.	T	.
 sithWeapon_ReadConf	.text	004D6430	0000023F	0000000C	00000000	R	.	.	.	.	.	.	.
-sithWeapon_Syncunused1	.text	004D6670	000000DA	00000008	00000004	R	.	.	.	.	.	.	.
-sithWeapon_Syncunused2	.text	004D6750	000000DA	00000008	00000004	R	.	.	.	.	.	.	.
+sithWeapon_SelectNextWeapon	.text	004D6670	000000DA	00000008	00000004	R	.	.	.	.	.	.	.
+sithWeapon_SelectPreviousWeapon	.text	004D6750	000000DA	00000008	00000004	R	.	.	.	.	.	.	.
 sithWeapon_SetFireRate	.text	004D6830	0000000A	00000000	00000008	R	.	.	.	.	.	T	.
 sithControl_Startup	.text	004D6840	0000003D	00000004	00000000	R	.	.	.	.	.	.	.
 sithControl_Shutdown	.text	004D6880	00000021	00000000	00000000	R	.	.	.	.	.	.	.
